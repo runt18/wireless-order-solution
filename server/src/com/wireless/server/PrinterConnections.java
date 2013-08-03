@@ -12,7 +12,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.req.ReqPing;
-import com.wireless.pack.req.RequestPackage;
 import com.wireless.pojo.restaurantMgr.Restaurant;
 
 public class PrinterConnections {
@@ -105,7 +104,7 @@ public class PrinterConnections {
 		List<Socket> socks = get(restaurant);
 		for(Socket sock : socks){
 			try{
-				new ReqPing(RequestPackage.EMPTY_PIN).writeToStream(sock.getOutputStream());
+				new ReqPing().writeToStream(sock.getOutputStream());
 				new ProtocolPackage().readFromStream(sock.getInputStream(), 3 * 1000);
 				
 			}catch(IOException e){

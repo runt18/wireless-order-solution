@@ -28,6 +28,7 @@ import com.wireless.pojo.printScheme.Printer;
 import com.wireless.pojo.regionMgr.Region;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.restaurantMgr.Restaurant;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.print.PFormat;
 import com.wireless.print.content.Content;
 import com.wireless.print.content.ContentCombinator;
@@ -37,7 +38,6 @@ import com.wireless.print.content.ReceiptContent;
 import com.wireless.print.content.ShiftContent;
 import com.wireless.print.content.SummaryContent;
 import com.wireless.print.content.TransTableContent;
-import com.wireless.protocol.Terminal;
 import com.wireless.util.DateType;
 
 public class JobContentFactory {
@@ -84,11 +84,11 @@ public class JobContentFactory {
 		return mInstance;
 	}
 	
-	public Content createSummaryContent(PType printType, Terminal term, List<Printer> printers, int orderId) throws SQLException, BusinessException{
+	public Content createSummaryContent(PType printType, Staff term, List<Printer> printers, int orderId) throws SQLException, BusinessException{
 		return createSummaryContent(printType, term, printers, OrderDao.getById(term, orderId, DateType.TODAY));
 	}
 	
-	public Content createSummaryContent(PType printType, Terminal term, List<Printer> printers, Order order) throws SQLException{
+	public Content createSummaryContent(PType printType, Staff term, List<Printer> printers, Order order) throws SQLException{
 		if(order.hasOrderFood() && !printers.isEmpty()){
 			
 			final List<JobContent> jobContents = new ArrayList<JobContent>();
@@ -99,10 +99,10 @@ public class JobContentFactory {
 						if(func.isDeptAll()){
 							//Generate the the summary to all departments.
 							jobContents.add(new JobContent(printer, func.getRepeat(), printType, 
-										   				   new SummaryContent(new Department(null, Department.DEPT_ALL, term.restaurantID, Department.Type.RESERVED), 
+										   				   new SummaryContent(new Department(null, Department.DEPT_ALL, term.getRestaurantId(), Department.Type.RESERVED), 
 										   						   			  PFormat.RECEIPT_FORMAT_DEF, 
 										   						   			  order,
-										   						   			  term.owner,
+										   						   			  term.getName(),
 										   						   			  printType, 
 										   						   			  printer.getStyle())));
 						}else{
@@ -121,7 +121,7 @@ public class JobContentFactory {
 						   				   new SummaryContent(func.getDepartment(), 
 						   						   			  PFormat.RECEIPT_FORMAT_DEF, 
 						   						   			  orderToDept,
-						   						   			  term.owner,
+						   						   			  term.getName(),
 						   						   			  printType, 
 						   						   			  printer.getStyle())));
 							}
@@ -138,7 +138,7 @@ public class JobContentFactory {
 		}
 	}
 	
-	public Content createDetailContent(PType printType, Terminal term, List<Printer> printers, Order order) throws BusinessException, SQLException{
+	public Content createDetailContent(PType printType, Staff term, List<Printer> printers, Order order) throws BusinessException, SQLException{
 		List<JobContent> jobContents = new ArrayList<JobContent>();
 		
 		if(order.hasOrderFood() && !printers.isEmpty()){
@@ -155,7 +155,7 @@ public class JobContentFactory {
 																	   new OrderDetailContent(of, 
 																			   				  childFood, 
 																			   				  order, 
-																			   				  term.owner, 
+																			   				  term.getName(), 
 																			   				  printType, 
 																			   				  printer.getStyle())));
 									}else{
@@ -166,7 +166,7 @@ public class JobContentFactory {
 																			   new OrderDetailContent(of, 
 																					   				  childFood, 
 																					   				  order, 
-																					   				  term.owner, 
+																					   				  term.getName(), 
 																					   				  printType, 
 																					   				  printer.getStyle())));
 												break;
@@ -180,7 +180,7 @@ public class JobContentFactory {
 									jobContents.add(new JobContent(printer, func.getRepeat(), printType,
 																   new OrderDetailContent(of, 
 																		   				  order, 
-																		   				  term.owner, 
+																		   				  term.getName(), 
 																		   				  printType, 
 																		   				  printer.getStyle())));
 								}else{
@@ -190,7 +190,7 @@ public class JobContentFactory {
 											jobContents.add(new JobContent(printer, func.getRepeat(), printType,
 																		   new OrderDetailContent(of, 
 																				   				  order, 
-																				   				  term.owner, 
+																				   				  term.getName(), 
 																				   				  printType, 
 																				   				  printer.getStyle())));
 											break;
@@ -211,7 +211,7 @@ public class JobContentFactory {
 		}
 	}
 	
-	public Content createDetailContent(PType printType, Terminal term, List<Printer> printers, int orderId) throws BusinessException, SQLException{
+	public Content createDetailContent(PType printType, Staff term, List<Printer> printers, int orderId) throws BusinessException, SQLException{
 		return createDetailContent(printType, term, printers, OrderDao.getById(term, orderId, DateType.TODAY));
 	}
 
@@ -225,12 +225,12 @@ public class JobContentFactory {
 	 * @throws BusinessException
 	 * @throws SQLException
 	 */
-	public Content createReceiptContent(PType printType, Terminal term, List<Printer> printers, Order order) throws BusinessException, SQLException{
+	public Content createReceiptContent(PType printType, Staff term, List<Printer> printers, Order order) throws BusinessException, SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			Restaurant restaurant = RestaurantDao.getById(dbCon, term.restaurantID);
-			int receiptStyle = SystemDao.getSetting(dbCon, term.restaurantID).getReceiptStyle();
+			Restaurant restaurant = RestaurantDao.getById(dbCon, term.getRestaurantId());
+			int receiptStyle = SystemDao.getSetting(dbCon, term.getRestaurantId()).getReceiptStyle();
 			
 			List<JobContent> jobContents = new ArrayList<JobContent>();
 			
@@ -241,7 +241,7 @@ public class JobContentFactory {
 														new ReceiptContent(receiptStyle,
 															  			   restaurant, 
 															  			   order,
-															  			   term.owner,
+															  			   term.getName(),
 															  			   printType, 
 															  			   printer.getStyle())));
 					}
@@ -255,15 +255,15 @@ public class JobContentFactory {
 		}
 	}
 	
-	public Content createReceiptContent(PType printType, Terminal term, List<Printer> printers, int orderId) throws BusinessException, SQLException{
+	public Content createReceiptContent(PType printType, Staff term, List<Printer> printers, int orderId) throws BusinessException, SQLException{
 		return createReceiptContent(printType, term, printers, OrderDao.getById(term, orderId, DateType.TODAY));
 	}
 	
-	public Content createShiftContent(PType printType, Terminal term, List<Printer> printers, long onDuty, long offDuty) throws SQLException{
+	public Content createShiftContent(PType printType, Staff term, List<Printer> printers, long onDuty, long offDuty) throws SQLException{
 		
 		List<JobContent> jobContents = new ArrayList<JobContent>();
 		
-		Region regionToCompare = new Region(Region.REGION_1, "", term.restaurantID);
+		Region regionToCompare = new Region(Region.REGION_1, "", term.getRestaurantId());
 		
 		for(Printer printer : printers){
 			for(PrintFunc func : printer.getPrintFuncs()){
@@ -284,7 +284,7 @@ public class JobContentFactory {
 					}
 					jobContents.add(new JobContent(printer, func.getRepeat(), printType,
 												   new ShiftContent(shiftDetail, 
-														   		    term.owner,
+														   		    term.getName(),
 														   		    printType,
 														   		    printer.getStyle())));
 				}
@@ -294,11 +294,11 @@ public class JobContentFactory {
 		return new JobCombinationContent(jobContents);
 	}
 	
-	public Content createMemberReceiptContent(PType printType, Terminal term, List<Printer> printers, int memberOperationId) throws BusinessException, SQLException{
+	public Content createMemberReceiptContent(PType printType, Staff term, List<Printer> printers, int memberOperationId) throws BusinessException, SQLException{
 		
 		List<JobContent> jobContents = new ArrayList<JobContent>();
 		
-		Region regionToCompare = new Region(Region.REGION_1, "", term.restaurantID);
+		Region regionToCompare = new Region(Region.REGION_1, "", term.getRestaurantId());
 		
 		for(Printer printer : printers){
 			for(PrintFunc func : printer.getPrintFuncs()){
@@ -312,9 +312,9 @@ public class JobContentFactory {
 						if(member.getMemberType().getAttribute() == Attribute.CHARGE){
 							
 							mo.setMember(MemberDao.getMemberById(mo.getMemberId()));
-							Restaurant restaurant = RestaurantDao.getById(term.restaurantID);
+							Restaurant restaurant = RestaurantDao.getById(term.getRestaurantId());
 							jobContents.add(new JobContent(printer, func.getRepeat(), printType,
-														   new MemberReceiptContent(restaurant, term.owner, mo, printType, printer.getStyle())));
+														   new MemberReceiptContent(restaurant, term.getName(), mo, printType, printer.getStyle())));
 
 						}
 					}					
@@ -325,10 +325,10 @@ public class JobContentFactory {
 		return new JobCombinationContent(jobContents);
 	}
 	
-	public Content createTransContent(PType printType, Terminal term, List<Printer> printers, int orderId, Table srcTbl, Table destTbl){
+	public Content createTransContent(PType printType, Staff term, List<Printer> printers, int orderId, Table srcTbl, Table destTbl){
 		List<JobContent> jobContents = new ArrayList<JobContent>();
 		
-		Region regionToCompare = new Region(Region.REGION_1, "", term.restaurantID);
+		Region regionToCompare = new Region(Region.REGION_1, "", term.getRestaurantId());
 		
 		for(Printer printer : printers){
 			for(PrintFunc func : printer.getPrintFuncs()){
@@ -338,7 +338,7 @@ public class JobContentFactory {
 														new TransTableContent(orderId,
 																   srcTbl,
 																   destTbl,
-																   term.owner,
+																   term.getName(),
 																   printType,
 																   printer.getStyle())));
 					}

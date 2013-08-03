@@ -18,8 +18,8 @@ import com.wireless.pack.resp.RespNAK;
 import com.wireless.pack.resp.RespOTAUpdate;
 import com.wireless.pack.resp.RespPrintLogin;
 import com.wireless.pojo.restaurantMgr.Restaurant;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.print.content.Content;
-import com.wireless.protocol.Terminal;
 
 /**
  * In the printer login handler, there're two request to handle.
@@ -109,8 +109,8 @@ public class PrinterLoginHandler implements Runnable{
 					//check to see whether the password is matched or not
 					//if(pwd.equals(dbCon.rs.getString("pwd"))){
 						
-						Terminal term = new Terminal();
-						term.restaurantID = restaurant.getId();
+						Staff term = new Staff();
+						term.setRestaurantId(restaurant.getId());
 						
 						//respond with the related kitchen information
 						new RespPrintLogin(loginReq.header, 
