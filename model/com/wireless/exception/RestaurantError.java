@@ -8,6 +8,7 @@ public class RestaurantError extends ErrorEnum{
 	public static final ErrorCode RESTAURANT_NOT_FOUND = build(9299, "操作失败, 查找的餐厅不存在.");
 	public static final ErrorCode UPDATE_RESTAURANT_FAIL = build(9298, "操作失败, 更新餐厅信息不成功.");
 	public static final ErrorCode CREATE_RESTAURANT_FAIL = build(9297, "操作失败, 创建餐厅不成功.");
+	public static final ErrorCode RESTAURANT_EXPIRED = build(9296, "餐厅已过期.");
 	
 	private RestaurantError(){
 		

@@ -1,6 +1,6 @@
 package com.wireless.pojo.system;
 
-public class Staff {
+public class SystemStaff {
 	private long id;
 	private int restaurantID;
 	private int aliasID;

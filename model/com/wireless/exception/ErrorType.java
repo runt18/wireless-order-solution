@@ -2,7 +2,7 @@ package com.wireless.exception;
 
 public enum ErrorType {
 	/**
-	 * cord range
+	 *  Code Range to each type as below.
 	 * 	SYSTEM : 9900 - 9999
 	 * 	FOOD : 9800 - 9899
 	 * 	MEMBER : 9600 - 9799
@@ -16,6 +16,8 @@ public enum ErrorType {
 	 * 	DEPARTMENT : 8000 - 8100 
 	 * 	STOCK : 7750 - 7999
 	 * 	SUPPLIER : 7700 - 7749
+	 *  PRINT_SCHEME : 7650 - 7699
+	 *  STAFF : 7600 - 7649 
 	 */
 	UNKNOWN(1, "unknown"),
 	PROTOCOL(2, "protocol"),
@@ -32,7 +34,8 @@ public enum ErrorType {
 	DEPARTMENT(13, "department"),
 	STOCK(14, "stock"),
 	SUPPLIER(15, "supplier"),
-	PRINT_SCHEME(16, "print scheme");
+	PRINT_SCHEME(16, "print scheme"),
+	STAFF(17, "staff");
 	
 	private final String desc;
 	
