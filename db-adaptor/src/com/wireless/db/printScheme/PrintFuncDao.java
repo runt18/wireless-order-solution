@@ -190,8 +190,13 @@ public class PrintFuncDao {
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
+			dbCon.conn.setAutoCommit(false);
+			
 			removeFunc(dbCon, staff, funcId);
+			
+			dbCon.conn.commit();
 		}finally{
+			dbCon.conn.setAutoCommit(true);
 			dbCon.disconnect();
 		}
 	}

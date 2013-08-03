@@ -21,7 +21,7 @@ public class PrinterDao {
 	 * Insert a new printer
 	 * @param dbCon
 	 * 			the database connection
-	 * @param term
+	 * @param staff
 	 * 			the terminal
 	 * @param builder
 	 * 			the builder to new printer
@@ -31,7 +31,7 @@ public class PrinterDao {
 	 * @throws BusinessException
 	 * 			throws if the printer with the same name has exist before
 	 */
-	public static int insert(DBCon dbCon, Staff term, Printer.InsertBuilder builder) throws SQLException, BusinessException{
+	public static int insert(DBCon dbCon, Staff staff, Printer.InsertBuilder builder) throws SQLException, BusinessException{
 		
 		Printer printerToAdd = builder.build();
 		
@@ -70,7 +70,7 @@ public class PrinterDao {
 	 * Update a specific printer.
 	 * @param dbCon
 	 * 			the database connection
-	 * @param term
+	 * @param staff
 	 * 			the terminal
 	 * @param builder
 	 * 			the builder to update printer
@@ -80,7 +80,7 @@ public class PrinterDao {
 	 * 			throws if the name of printer to update has exist before
 	 * 			throws if the printer to update does NOT exist
 	 */
-	public static void update(DBCon dbCon, Staff term, Printer.UpdateBuilder builder) throws SQLException, BusinessException{
+	public static void update(DBCon dbCon, Staff staff, Printer.UpdateBuilder builder) throws SQLException, BusinessException{
 		
 		Printer printerToUpdate = builder.build();
 		
@@ -121,7 +121,7 @@ public class PrinterDao {
 	 * @throws BusinessException
 	 * 			throws if the printer to delete does NOT exist
 	 */
-	public static void deleteById(DBCon dbCon, Staff term, int printerId) throws SQLException, BusinessException{
+	public static void deleteById(DBCon dbCon, Staff staff, int printerId) throws SQLException, BusinessException{
 		String sql;
 		
 		sql = " SELECT func_id FROM " + Params.dbName + ".print_func" +
@@ -136,7 +136,7 @@ public class PrinterDao {
 		dbCon.rs.close();
 		
 		for(int funcId : funcIdToRemove){
-			PrintFuncDao.removeFunc(dbCon, term, funcId);
+			PrintFuncDao.removeFunc(dbCon, staff, funcId);
 		}
 		
 		sql = " DELETE FROM " + Params.dbName + ".printer WHERE printer_id = " + printerId;
@@ -147,17 +147,17 @@ public class PrinterDao {
 	
 	/**
 	 * Get the printer along with associated print functions to a specified restaurant.
-	 * @param term
+	 * @param staff
 	 * 			the terminal
 	 * @return the printer to this specific restaurant
 	 * @throws SQLException
 	 * 			throws if the printer to delete does NOT exist
 	 */
-	public static List<Printer> getPrinters(Staff term) throws SQLException{
+	public static List<Printer> getPrinters(Staff staff) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return getPrinters(dbCon, term);
+			return getPrinters(dbCon, staff);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -167,7 +167,7 @@ public class PrinterDao {
 	 * Get the printers along with associated print functions to a specified id
 	 * @param dbCon
 	 * 			the database connection
-	 * @param term
+	 * @param staff
 	 * 			the terminal
 	 * @param printerId
 	 * 			the printer id to get
@@ -177,8 +177,8 @@ public class PrinterDao {
 	 * @throws BusinessException
 	 * 			throws if the printer to find does NOT exist
 	 */
-	public static Printer getPrinterById(DBCon dbCon, Staff term, int printerId) throws SQLException, BusinessException{
-		List<Printer> result = getPrinters(dbCon, term, " AND printer_id = " + printerId);
+	public static Printer getPrinterById(DBCon dbCon, Staff staff, int printerId) throws SQLException, BusinessException{
+		List<Printer> result = getPrinters(dbCon, staff, " AND printer_id = " + printerId);
 		if(result.isEmpty()){
 			throw new BusinessException(PrintSchemeError.PRINTER_NOT_EXIST);
 		}else{
@@ -190,34 +190,34 @@ public class PrinterDao {
 	 * Get the enabled printers along with associated print functions to a specified restaurant.
 	 * @param dbCon
 	 * 			the database connection
-	 * @param term
+	 * @param staff
 	 * 			the terminal
 	 * @return the printer to this specific restaurant
 	 * @throws SQLException
 	 * 			throws if the printer to delete does NOT exist
 	 */
-	public static List<Printer> getPrinters(DBCon dbCon, Staff term) throws SQLException{
-		return getPrinters(dbCon, term, " AND enabled = 1 ");
+	public static List<Printer> getPrinters(DBCon dbCon, Staff staff) throws SQLException{
+		return getPrinters(dbCon, staff, " AND enabled = 1 ");
 	}
 	
 	/**
 	 * Get the all printers along with associated print functions to a specified restaurant.
 	 * @param dbCon
 	 * 			the database connection
-	 * @param term
+	 * @param staff
 	 * 			the terminal
 	 * @return the printer to this specific restaurant
 	 * @throws SQLException
 	 * 			throws if the printer to delete does NOT exist
 	 */
-	public static List<Printer> getAllPrinters(DBCon dbCon, Staff term) throws SQLException{
-		return getPrinters(dbCon, term, null);
+	public static List<Printer> getAllPrinters(DBCon dbCon, Staff staff) throws SQLException{
+		return getPrinters(dbCon, staff, null);
 	}
 	
-	private static List<Printer> getPrinters(DBCon dbCon, Staff term, String extraCond) throws SQLException{
+	private static List<Printer> getPrinters(DBCon dbCon, Staff staff, String extraCond) throws SQLException{
 		String sql;
 		sql = " SELECT printer_id, restaurant_id, name, alias, style, enabled FROM " + Params.dbName + ".printer " +
-			  " WHERE restaurant_id = " + term.getRestaurantId() + " " +
+			  " WHERE restaurant_id = " + staff.getRestaurantId() + " " +
 			  (extraCond != null ? extraCond : "");
 
 		List<Printer> result = new ArrayList<Printer>();
