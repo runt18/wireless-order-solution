@@ -18,9 +18,9 @@ import com.wireless.pojo.client.MOSummary;
 import com.wireless.pojo.client.MemberOperation;
 import com.wireless.pojo.client.MemberOperation.OperationType;
 import com.wireless.pojo.dishesOrder.Order;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.DateUtil;
 import com.wireless.pojo.util.DateUtil.Pattern;
-import com.wireless.protocol.Terminal;
 import com.wireless.util.SQLUtil;
 
 public class MemberOperationDao {
@@ -38,16 +38,16 @@ public class MemberOperationDao {
 	 * @throws SQLException
 	 *             throws if failed to execute any SQL statements
 	 */
-	public static int insert(DBCon dbCon, Terminal term, MemberOperation mo) throws SQLException {
+	public static int insert(DBCon dbCon, Staff term, MemberOperation mo) throws SQLException {
 		
 		//Build the operate date and sequence.
 		Date now = new Date();
 		mo.setOperateDate(now.getTime());
 		mo.setOperateSeq(mo.getOperationType().getPrefix().concat(DateUtil.format(now, Pattern.MO_SEQ.getPattern())));
 		
-		mo.setRestaurantId(term.restaurantID);
-		mo.setStaffID(term.id);
-		mo.setStaffName(term.owner);
+		mo.setRestaurantId(term.getRestaurantId());
+		mo.setStaffID(term.getId());
+		mo.setStaffName(term.getName());
 		
 		String insertSQL = " INSERT INTO " +
 						   Params.dbName + ".member_operation " +
@@ -104,7 +104,7 @@ public class MemberOperationDao {
 	 * @throws SQLException
 	 *             Throws if failed to execute any SQL statements.
 	 */
-	public static int insert(Terminal term, MemberOperation mo) throws SQLException {
+	public static int insert(Staff term, MemberOperation mo) throws SQLException {
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();

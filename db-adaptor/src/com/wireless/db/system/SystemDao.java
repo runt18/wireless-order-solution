@@ -15,12 +15,12 @@ import com.wireless.exception.BusinessException;
 import com.wireless.exception.StockError;
 import com.wireless.exception.SystemError;
 import com.wireless.pojo.restaurantMgr.Restaurant;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.stockMgr.StockAction;
 import com.wireless.pojo.system.DailySettle;
 import com.wireless.pojo.system.Setting;
 import com.wireless.pojo.system.SystemSetting;
 import com.wireless.pojo.util.DateUtil;
-import com.wireless.protocol.Terminal;
 import com.wireless.util.SQLUtil;
 
 public class SystemDao {
@@ -78,7 +78,7 @@ public class SystemDao {
 	 * @throws BusinessException
 	 * 			if the setting is not exist
 	 */
-	public static void updateCurrentMonth(Terminal term) throws SQLException, BusinessException{
+	public static void updateCurrentMonth(Staff term) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -97,7 +97,7 @@ public class SystemDao {
 	 * @throws BusinessException
 	 * 			if the setting is not exist
 	 */
-	public static void updateCurrentMonth(DBCon dbCon, Terminal term) throws SQLException, BusinessException{
+	public static void updateCurrentMonth(DBCon dbCon, Staff term) throws SQLException, BusinessException{
 		//判断是否有未审核的盘点单
 		if(StockActionDao.isStockTakeChecking(dbCon, term)){
 			throw new BusinessException(StockError.STOCKTAKE_CURRENTMONTH_UPDATE);
@@ -108,7 +108,7 @@ public class SystemDao {
 			throw new BusinessException(StockError.STOCKACTION_CURRENTMONTH_UPDATE);
 		}
 		Map<Object, Object> params = new HashMap<Object, Object>();
-		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND B.restaurant_id = " + term.restaurantID);
+		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND B.restaurant_id = " + term.getRestaurantId());
 		
 		Setting setting = SystemDao.getSystemSetting(params).get(0).getSetting();
 		Calendar c = Calendar.getInstance();
@@ -117,7 +117,7 @@ public class SystemDao {
 		c.add(Calendar.MONTH, +1);
 		String sql = "UPDATE " + Params.dbName + ".setting SET " +
 					" current_material_month = '" + DateUtil.formatToDate(c.getTime().getTime()) + "' " + 
-					" WHERE restaurant_id = " + term.restaurantID;
+					" WHERE restaurant_id = " + term.getRestaurantId();
 		if(dbCon.stmt.executeUpdate(sql) == 0){
 			throw new BusinessException(SystemError.NOT_FIND_RESTAURANTID);
 		}
@@ -456,7 +456,7 @@ public class SystemDao {
 	 * @throws SQLException
 	 * 			if failed to execute any SQL statement
 	 */
-	public static long getCurrentMonth(Terminal term) throws SQLException{
+	public static long getCurrentMonth(Staff term) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -474,9 +474,9 @@ public class SystemDao {
 	 * @throws SQLException
 	 * 			if failed to execute any SQL statement
 	 */
-	public static long getCurrentMonth(DBCon dbCon, Terminal term) throws SQLException{
+	public static long getCurrentMonth(DBCon dbCon, Staff term) throws SQLException{
 		long currentDate = 0;
-		String selectSetting = "SELECT setting_id, current_material_month FROM "+ Params.dbName + ".setting WHERE restaurant_id = " + term.restaurantID;
+		String selectSetting = "SELECT setting_id, current_material_month FROM "+ Params.dbName + ".setting WHERE restaurant_id = " + term.getRestaurantId();
 		dbCon.rs = dbCon.stmt.executeQuery(selectSetting);
 		if(dbCon.rs.next()){
 			if(dbCon.rs.getTimestamp("current_material_month") != null){

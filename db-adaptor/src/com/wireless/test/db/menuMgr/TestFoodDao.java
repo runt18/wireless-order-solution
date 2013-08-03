@@ -1,32 +1,29 @@
 package com.wireless.test.db.menuMgr;
 
+import static org.junit.Assert.fail;
+
 import java.beans.PropertyVetoException;
 import java.sql.SQLException;
-
-import static org.junit.Assert.*;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.wireless.db.DBCon;
-import com.wireless.db.frontBusiness.VerifyPin;
 import com.wireless.db.menuMgr.FoodDao;
 import com.wireless.db.menuMgr.MenuDao;
-import com.wireless.exception.BusinessException;
+import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.pojo.menuMgr.Food;
-import com.wireless.protocol.Terminal;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.test.db.TestInit;
 
 public class TestFoodDao {
-	private static Terminal term;
+	private static Staff term;
 	
 	@BeforeClass
 	public static void beforeClass() throws PropertyVetoException{
 		TestInit.init();
 		try {
-			term = VerifyPin.exec(9720860, Terminal.MODEL_STAFF);
-		} catch (BusinessException e) {
-			e.printStackTrace();
+			term = StaffDao.getStaffs(26).get(0);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}

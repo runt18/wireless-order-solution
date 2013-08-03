@@ -1,12 +1,13 @@
 package com.wireless.test.db.client.member;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.beans.PropertyVetoException;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import static org.junit.Assert.*;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -14,7 +15,7 @@ import org.junit.Test;
 import com.wireless.db.client.member.MemberDao;
 import com.wireless.db.client.member.MemberOperationDao;
 import com.wireless.db.client.member.MemberTypeDao;
-import com.wireless.db.frontBusiness.VerifyPin;
+import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.client.Member;
 import com.wireless.pojo.client.Member.AdjustType;
@@ -23,22 +24,20 @@ import com.wireless.pojo.client.MemberOperation;
 import com.wireless.pojo.client.MemberOperation.ChargeType;
 import com.wireless.pojo.client.MemberType;
 import com.wireless.pojo.dishesOrder.Order;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.DateUtil;
-import com.wireless.protocol.Terminal;
 import com.wireless.test.db.TestInit;
 import com.wireless.util.SQLUtil;
 
 public class TestMemberDao {
 	
-	private static Terminal mTerminal;
+	private static Staff mStaff;
 	
 	@BeforeClass
 	public static void initDbParam() throws PropertyVetoException{
 		TestInit.init();
 		try {
-			mTerminal = VerifyPin.exec(229, Terminal.MODEL_STAFF);
-		} catch (BusinessException e) {
-			e.printStackTrace();
+			mStaff = StaffDao.getStaffs(37).get(0);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -97,7 +96,7 @@ public class TestMemberDao {
 	@Test
 	public void testMemberBasicOperation() throws BusinessException, SQLException{
 		Map<Object, Object> params = new HashMap<Object, Object>();
-		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND A.restaurant_id = " + mTerminal.restaurantID);
+		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND A.restaurant_id = " + mStaff.getRestaurantId());
 		List<MemberType> list = MemberTypeDao.getMemberType(params);
 		
 		MemberType memberType = null;
@@ -108,7 +107,7 @@ public class TestMemberDao {
 		}
 		
 		//Insert a new member
-		Member.InsertBuilder builder = new Member.InsertBuilder(mTerminal.restaurantID, "张三", "13694260534", memberType.getTypeId(), Sex.FEMALE)
+		Member.InsertBuilder builder = new Member.InsertBuilder(mStaff.getRestaurantId(), "张三", "13694260534", memberType.getTypeId(), Sex.FEMALE)
 												 .setBirthday(DateUtil.parseDate("1981-03-15"))
 												 .setCompany("Digie Co.,Ltd")
 												 .setContactAddr("广州市东圃镇晨晖商务大厦")
@@ -118,7 +117,7 @@ public class TestMemberDao {
 												 .setTastePref("喜欢甜品")
 												 .setTele("020-87453214");
 		
-		int memberId = MemberDao.insert(mTerminal, builder);
+		int memberId = MemberDao.insert(mStaff, builder);
 		
 		try{
 			Member expect = builder.build();
@@ -134,7 +133,7 @@ public class TestMemberDao {
 			compareMember(expect, actual);
 			
 			//Update the member just inserted
-			Member.UpdateBuilder updateBuilder = new Member.UpdateBuilder(memberId, mTerminal.restaurantID, "李四", "18520590931", memberType.getTypeId(), Sex.MALE)
+			Member.UpdateBuilder updateBuilder = new Member.UpdateBuilder(memberId, mStaff.getRestaurantId(), "李四", "18520590931", memberType.getTypeId(), Sex.MALE)
 														   .setBirthday(DateUtil.parseDate("1987-06-29"))
 														   .setCompany("DingDing Tech")
 														   .setContactAddr("广州市萝岗区科学城")
@@ -143,10 +142,10 @@ public class TestMemberDao {
 														   .setTaboo("咩都要")
 														   .setTastePref("垃圾桶")
 														   .setTele("0750-3399559");
-			MemberDao.update(mTerminal, updateBuilder);
+			MemberDao.update(mStaff, updateBuilder);
 			expect = updateBuilder.build();
 			expect.setId(memberId);
-			expect.setRestaurantId(mTerminal.restaurantID);
+			expect.setRestaurantId(mStaff.getRestaurantId());
 			expect.setMemberType(memberType);
 			//Set the initial point to expected member
 			expect.setPoint(memberType.getInitialPoint());
@@ -173,7 +172,7 @@ public class TestMemberDao {
 			
 		}finally{
 			//Delete the member 
-			MemberDao.deleteById(mTerminal, memberId);
+			MemberDao.deleteById(mStaff, memberId);
 			//Check to see whether the member is deleted
 			try{
 				MemberDao.getMemberById(memberId);
@@ -188,7 +187,7 @@ public class TestMemberDao {
 	}
 	
 	private void testCharge(Member expect) throws BusinessException, SQLException{
-		MemberOperation mo = MemberDao.charge(mTerminal, expect.getId(), 100, ChargeType.CASH);
+		MemberOperation mo = MemberDao.charge(mStaff, expect.getId(), 100, ChargeType.CASH);
 		expect.charge(100, ChargeType.CASH);
 		
 		compareMember(expect, MemberDao.getMemberById(expect.getId()));
@@ -196,18 +195,18 @@ public class TestMemberDao {
 	}
 	
 	private void testConsume(Member expect) throws BusinessException, SQLException{
-		MemberDao.charge(mTerminal, expect.getId(), 100, ChargeType.CASH);
+		MemberDao.charge(mStaff, expect.getId(), 100, ChargeType.CASH);
 		expect.charge(100, ChargeType.CASH);
 		
 		//使用会员卡余额消费
-		MemberOperation mo = MemberDao.consume(mTerminal, expect.getId(), 50, Order.PayType.MEMBER, 10);
+		MemberOperation mo = MemberDao.consume(mStaff, expect.getId(), 50, Order.PayType.MEMBER, 10);
 		expect.consume(50, Order.PayType.MEMBER);
 		
 		compareMember(expect, MemberDao.getMemberById(expect.getId()));
 		compareMemberOperation(mo, MemberOperationDao.getTodayById(mo.getId()));
 		
 		//使用现金消费
-		mo = MemberDao.consume(mTerminal, expect.getId(), 50, Order.PayType.CASH, 10);
+		mo = MemberDao.consume(mStaff, expect.getId(), 50, Order.PayType.CASH, 10);
 		expect.consume(50, Order.PayType.CASH);
 		
 		compareMember(expect, MemberDao.getMemberById(expect.getId()));
@@ -216,7 +215,7 @@ public class TestMemberDao {
 	}
 	
 	private void testPointConsume(Member expect) throws SQLException, BusinessException{
-		MemberOperation mo = MemberDao.pointConsume(mTerminal, expect.getId(), 20);
+		MemberOperation mo = MemberDao.pointConsume(mStaff, expect.getId(), 20);
 		expect.pointConsume(20);
 		
 		compareMember(expect, MemberDao.getMemberById(expect.getId()));
@@ -224,7 +223,7 @@ public class TestMemberDao {
 	}
 	
 	private void testAdjustPoint(Member expect) throws SQLException, BusinessException{
-		MemberOperation mo = MemberDao.adjustPoint(mTerminal, expect.getId(), 10, AdjustType.INCREASE);
+		MemberOperation mo = MemberDao.adjustPoint(mStaff, expect.getId(), 10, AdjustType.INCREASE);
 		expect.adjustPoint(10, AdjustType.INCREASE);
 		
 		compareMember(expect, MemberDao.getMemberById(expect.getId()));
@@ -232,7 +231,7 @@ public class TestMemberDao {
 	}
 	
 	private void testAdjustBalance(Member expect) throws SQLException, BusinessException{
-		MemberOperation mo = MemberDao.adjustBalance(mTerminal, expect.getId(), 10);
+		MemberOperation mo = MemberDao.adjustBalance(mStaff, expect.getId(), 10);
 		expect.adjustBalance(10);
 		
 		compareMember(expect, MemberDao.getMemberById(expect.getId()));

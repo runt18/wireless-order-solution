@@ -15,6 +15,7 @@ import com.wireless.db.inventoryMgr.MaterialDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.StockError;
 import com.wireless.pojo.inventoryMgr.Material;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.stockMgr.MaterialDept;
 import com.wireless.pojo.stockMgr.StockAction;
 import com.wireless.pojo.stockMgr.StockAction.AuditBuilder;
@@ -24,7 +25,6 @@ import com.wireless.pojo.stockMgr.StockAction.SubType;
 import com.wireless.pojo.stockMgr.StockActionDetail;
 import com.wireless.pojo.stockMgr.StockTake;
 import com.wireless.pojo.util.DateUtil;
-import com.wireless.protocol.Terminal;
 
 public class StockActionDao {
 
@@ -40,7 +40,7 @@ public class StockActionDao {
 	 * @throws BusinessException 
 	 * 			if the OriStockIdDate is before than the last stockTake time
 	 */
-	public static int insertStockAction(DBCon dbCon, Terminal term, InsertBuilder builder) throws SQLException, BusinessException{
+	public static int insertStockAction(DBCon dbCon, Staff term, InsertBuilder builder) throws SQLException, BusinessException{
 		
 		//判断是否同个部门下进行调拨
 		if((builder.getSubType() == SubType.STOCK_IN_TRANSFER || builder.getSubType() == SubType.STOCK_OUT_TRANSFER) && builder.getDeptIn().getId() == builder.getDeptOut().getId()){
@@ -49,7 +49,7 @@ public class StockActionDao {
 		//获取当前工作月
 		long currentDate = 0;
 		Calendar c = Calendar.getInstance();
-		String selectSetting = "SELECT setting_id, current_material_month FROM "+ Params.dbName + ".setting WHERE restaurant_id = " + term.restaurantID;
+		String selectSetting = "SELECT setting_id, current_material_month FROM "+ Params.dbName + ".setting WHERE restaurant_id = " + term.getRestaurantId();
 		dbCon.rs = dbCon.stmt.executeQuery(selectSetting);
 		if(dbCon.rs.next()){
 				currentDate = dbCon.rs.getTimestamp("current_material_month").getTime();
@@ -63,9 +63,9 @@ public class StockActionDao {
 		
 		
 		//比较盘点时间和月结时间,取最大值
-		String selectMaxDate = "SELECT MAX(date) as date FROM (SELECT current_material_month AS date FROM " + Params.dbName + ".setting WHERE restaurant_id = " + term.restaurantID + 
+		String selectMaxDate = "SELECT MAX(date) as date FROM (SELECT current_material_month AS date FROM " + Params.dbName + ".setting WHERE restaurant_id = " + term.getRestaurantId() + 
 								" UNION ALL " +
-								" SELECT finish_date AS date FROM " + Params.dbName + ".stock_take WHERE restaurant_id = " + term.restaurantID + " AND status = " + StockTake.Status.AUDIT.getVal() + ") M";
+								" SELECT finish_date AS date FROM " + Params.dbName + ".stock_take WHERE restaurant_id = " + term.getRestaurantId() + " AND status = " + StockTake.Status.AUDIT.getVal() + ") M";
 		long maxDate = 0;
 		dbCon.rs = dbCon.stmt.executeQuery(selectMaxDate);
 		if(dbCon.rs.next()){
@@ -96,7 +96,7 @@ public class StockActionDao {
 		String deptOutName;
 		String SupplierName;
 		
-		String selectDeptIn = "SELECT name FROM " + Params.dbName + ".department WHERE dept_id = " + builder.getDeptIn().getId() + " AND restaurant_id = " + term.restaurantID;		
+		String selectDeptIn = "SELECT name FROM " + Params.dbName + ".department WHERE dept_id = " + builder.getDeptIn().getId() + " AND restaurant_id = " + term.getRestaurantId();		
 		dbCon.rs = dbCon.stmt.executeQuery(selectDeptIn);
 		if(dbCon.rs.next()){
 			deptInName = dbCon.rs.getString("name");
@@ -105,7 +105,7 @@ public class StockActionDao {
 		}
 		dbCon.rs.close(); 
 		
-		String selectDeptOut = "SELECT name FROM " + Params.dbName + ".department WHERE dept_id = " + builder.getDeptOut().getId() + " AND restaurant_id = " + term.restaurantID;
+		String selectDeptOut = "SELECT name FROM " + Params.dbName + ".department WHERE dept_id = " + builder.getDeptOut().getId() + " AND restaurant_id = " + term.getRestaurantId();
 		dbCon.rs = dbCon.stmt.executeQuery(selectDeptOut);
 		if(dbCon.rs.next()){
 			deptOutName = dbCon.rs.getString("name");
@@ -113,7 +113,7 @@ public class StockActionDao {
 			deptOutName = "";
 		}
 		
-		String selectSupplierName = "SELECT name FROM " + Params.dbName + ".supplier WHERE supplier_id = " + builder.getSupplier().getSupplierId() + " AND restaurant_id = " + term.restaurantID;
+		String selectSupplierName = "SELECT name FROM " + Params.dbName + ".supplier WHERE supplier_id = " + builder.getSupplier().getSupplierId() + " AND restaurant_id = " + term.getRestaurantId();
 		dbCon.rs = dbCon.stmt.executeQuery(selectSupplierName);
 		if(dbCon.rs.next()){
 			SupplierName = dbCon.rs.getString("name");
@@ -181,7 +181,7 @@ public class StockActionDao {
 	 * @throws BusinessException 
 	 * 			if the OriStockIdDate is before than the last stockTake time
 	 */	
-	public static int insertStockAction(Terminal term, InsertBuilder builder) throws SQLException, BusinessException{
+	public static int insertStockAction(Staff term, InsertBuilder builder) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		int stockActionId;
 		try{
@@ -231,7 +231,7 @@ public class StockActionDao {
 	 * @throws BusinessException
 	 * 			if the stockAction_id is not exist
 	 */
-	public static int deleteStockAction(Terminal term, String extraCond) throws SQLException{
+	public static int deleteStockAction(Staff term, String extraCond) throws SQLException{
 		
 		return 0;
 	}
@@ -247,7 +247,7 @@ public class StockActionDao {
 	 * @throws SQLException
 	 * 			if failed to execute any SQL statement
 	 */
-	public static int deleteStockAction(DBCon dbCon, Terminal term, String extraCond) throws SQLException{
+	public static int deleteStockAction(DBCon dbCon, Staff term, String extraCond) throws SQLException{
 		return 0;
 	}
 	/**
@@ -261,7 +261,7 @@ public class StockActionDao {
 	 * @throws SQLException
 	 * 			if failed to execute any SQL statement
 	 */
-	public static void deleteStockActionById(Terminal term, int stockActionId) throws BusinessException, SQLException{
+	public static void deleteStockActionById(Staff term, int stockActionId) throws BusinessException, SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -283,8 +283,8 @@ public class StockActionDao {
 	 * @throws SQLException
 	 * 			if failed to execute any SQL statement
 	 */
-	public static void deleteStockActionById(DBCon dbCon, Terminal term, int stockActionId) throws BusinessException, SQLException{
-		if(deleteStockAction(dbCon, " AND restaurant_id = " + term.restaurantID + " AND id = " + stockActionId) == 0){
+	public static void deleteStockActionById(DBCon dbCon, Staff term, int stockActionId) throws BusinessException, SQLException{
+		if(deleteStockAction(dbCon, " AND restaurant_id = " + term.getRestaurantId() + " AND id = " + stockActionId) == 0){
 			throw new BusinessException(StockError.STOCKACTION_DELETE);
 		};
 		StockActionDetailDao.deleteStockDetail(" AND stock_action_id = " + stockActionId);
@@ -304,7 +304,7 @@ public class StockActionDao {
 	 * @throws SQLException
 	 * 			if failed to execute any SQL statement
 	 */
-	public static void updateStockAction(DBCon dbCon, Terminal term, int stockActionId, InsertBuilder builder) throws BusinessException, SQLException{
+	public static void updateStockAction(DBCon dbCon, Staff term, int stockActionId, InsertBuilder builder) throws BusinessException, SQLException{
 		//判断是否同个部门下进行调拨
 		if((builder.getSubType() == SubType.STOCK_IN_TRANSFER || builder.getSubType() == SubType.STOCK_OUT_TRANSFER) && builder.getDeptIn().getId() == builder.getDeptOut().getId()){
 			throw new BusinessException(StockError.MATERIAL_DEPT_UPDATE_EXIST);
@@ -312,7 +312,7 @@ public class StockActionDao {
 		//获取当前工作月
 		long currentDate = 0;
 		Calendar c = Calendar.getInstance();
-		String selectSetting = "SELECT setting_id, current_material_month FROM "+ Params.dbName + ".setting WHERE restaurant_id = " + term.restaurantID;
+		String selectSetting = "SELECT setting_id, current_material_month FROM "+ Params.dbName + ".setting WHERE restaurant_id = " + term.getRestaurantId();
 		dbCon.rs = dbCon.stmt.executeQuery(selectSetting);
 		if(dbCon.rs.next()){
 				currentDate = dbCon.rs.getTimestamp("current_material_month").getTime();
@@ -326,9 +326,9 @@ public class StockActionDao {
 		
 		
 		//比较盘点时间和月结时间,取最大值
-		String selectMaxDate = "SELECT MAX(date) as date FROM (SELECT current_material_month AS date FROM " + Params.dbName + ".setting WHERE restaurant_id = " + term.restaurantID + 
+		String selectMaxDate = "SELECT MAX(date) as date FROM (SELECT current_material_month AS date FROM " + Params.dbName + ".setting WHERE restaurant_id = " + term.getRestaurantId() + 
 				" UNION ALL " +
-				" SELECT finish_date AS date FROM " + Params.dbName + ".stock_take WHERE restaurant_id = " + term.restaurantID + " AND status = " + StockTake.Status.AUDIT.getVal() + ") M";
+				" SELECT finish_date AS date FROM " + Params.dbName + ".stock_take WHERE restaurant_id = " + term.getRestaurantId() + " AND status = " + StockTake.Status.AUDIT.getVal() + ") M";
 		long maxDate = 0;
 		dbCon.rs = dbCon.stmt.executeQuery(selectMaxDate);
 		if(dbCon.rs.next()){
@@ -350,7 +350,7 @@ public class StockActionDao {
 		String deptOutName;
 		String SupplierName;
 		
-		String selectDeptIn = "SELECT name FROM " + Params.dbName + ".department WHERE dept_id = " + builder.getDeptIn().getId() + " AND restaurant_id = " + term.restaurantID;		
+		String selectDeptIn = "SELECT name FROM " + Params.dbName + ".department WHERE dept_id = " + builder.getDeptIn().getId() + " AND restaurant_id = " + term.getRestaurantId();		
 		dbCon.rs = dbCon.stmt.executeQuery(selectDeptIn);
 		if(dbCon.rs.next()){
 			deptInName = dbCon.rs.getString("name");
@@ -359,7 +359,7 @@ public class StockActionDao {
 		}
 		dbCon.rs.close(); 
 		
-		String selectDeptOut = "SELECT name FROM " + Params.dbName + ".department WHERE dept_id = " + builder.getDeptOut().getId() + " AND restaurant_id = " + term.restaurantID;
+		String selectDeptOut = "SELECT name FROM " + Params.dbName + ".department WHERE dept_id = " + builder.getDeptOut().getId() + " AND restaurant_id = " + term.getRestaurantId();
 		dbCon.rs = dbCon.stmt.executeQuery(selectDeptOut);
 		if(dbCon.rs.next()){
 			deptOutName = dbCon.rs.getString("name");
@@ -367,7 +367,7 @@ public class StockActionDao {
 			deptOutName = "";
 		}
 		
-		String selectSupplierName = "SELECT name FROM " + Params.dbName + ".supplier WHERE supplier_id = " + builder.getSupplier().getSupplierId() + " AND restaurant_id = " + term.restaurantID;
+		String selectSupplierName = "SELECT name FROM " + Params.dbName + ".supplier WHERE supplier_id = " + builder.getSupplier().getSupplierId() + " AND restaurant_id = " + term.getRestaurantId();
 		dbCon.rs = dbCon.stmt.executeQuery(selectSupplierName);
 		if(dbCon.rs.next()){
 			SupplierName = dbCon.rs.getString("name");
@@ -423,7 +423,7 @@ public class StockActionDao {
 	 * @throws SQLException
 	 * 			if failed to execute any SQL statement
 	 */
-	public static void updateStockAction(Terminal term, int stockActionId, InsertBuilder builder) throws BusinessException, SQLException{
+	public static void updateStockAction(Staff term, int stockActionId, InsertBuilder builder) throws BusinessException, SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -451,13 +451,13 @@ public class StockActionDao {
 	 * @throws SQLException
 	 * 			if failed to execute any SQL statement
 	 */
-	public static boolean isStockTakeChecking(DBCon dbCon, Terminal term) throws SQLException{
+	public static boolean isStockTakeChecking(DBCon dbCon, Staff term) throws SQLException{
 		return !StockTakeDao.getStockTakes(dbCon, term, 
 										   " AND status = " + StockTake.Status.CHECKING.getVal(), 
 										   null).isEmpty();
 		
 	}
-	public static boolean checkStockTake(Terminal term) throws SQLException, BusinessException{
+	public static boolean checkStockTake(Staff term) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -467,7 +467,7 @@ public class StockActionDao {
 		}
 	}
 	
-	public static boolean checkStockTake(DBCon dbCon, Terminal term) throws SQLException, BusinessException{
+	public static boolean checkStockTake(DBCon dbCon, Staff term) throws SQLException, BusinessException{
 		if(isStockTakeChecking(dbCon, term)){
 			throw new BusinessException(StockError.STOCKACTION_INSERT); 
 		}else{
@@ -486,7 +486,7 @@ public class StockActionDao {
 	 * @throws BusinessException
 	 * 			if the stock to update does not exist
 	 */
-	public static void auditStockAction(Terminal term, AuditBuilder builder) throws SQLException, BusinessException{
+	public static void auditStockAction(Staff term, AuditBuilder builder) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -519,7 +519,7 @@ public class StockActionDao {
 	 * @throws BusinessException
 	 * 			if the stock to update does not exist
 	 */
-	public static void auditStockAction(DBCon dbCon, Terminal term, AuditBuilder builder) throws SQLException, BusinessException{
+	public static void auditStockAction(DBCon dbCon, Staff term, AuditBuilder builder) throws SQLException, BusinessException{
 		StockAction auditStockAction = getStockActionById(dbCon, term, builder.getId());
 		//如果操作类型不是盘亏或盘盈,则需要判断是否在盘点中
 		if(auditStockAction.getSubType() != SubType.MORE && auditStockAction.getSubType() != SubType.LESS){
@@ -533,7 +533,7 @@ public class StockActionDao {
 				" approve_date = " + "'" + DateUtil.format(new Date().getTime()) + "', " +
 				" status = " + stockAction.getStatus().getVal() +
 				" WHERE id = " + stockAction.getId() + 
-				" AND restaurant_id = " + term.restaurantID;
+				" AND restaurant_id = " + term.getRestaurantId();
 		if(dbCon.stmt.executeUpdate(sql) == 0){
 			throw new BusinessException(StockError.STOCKACTION_AUDIT);
 		}else{
@@ -554,7 +554,7 @@ public class StockActionDao {
 						//判断此部门下是否添加了这个原料
 						if(materialDepts.isEmpty()){
 							//如果没有就新增一条记录
-							materialDept = new MaterialDept(sActionDetail.getMaterialId(), deptInId, term.restaurantID, sActionDetail.getAmount());
+							materialDept = new MaterialDept(sActionDetail.getMaterialId(), deptInId, term.getRestaurantId(), sActionDetail.getAmount());
 							MaterialDeptDao.insertMaterialDept(term, materialDept);
 							//更新剩余数量
 							sActionDetail.setDeptInRemaining(sActionDetail.getAmount());
@@ -577,7 +577,7 @@ public class StockActionDao {
 						//入库单增加总库存
 						material.plusStock(sActionDetail.getAmount());		
 						//更新原料表
-						material.setLastModStaff(term.owner);
+						material.setLastModStaff(term.getName());
 						MaterialDao.update(dbCon, material);
 						
 						//更新库存明细表
@@ -591,7 +591,7 @@ public class StockActionDao {
 						//判断此部门下是否添加了这个原料
 						if(materialDepts.isEmpty()){
 							//如果没有就新增一条记录
-							materialDept = new MaterialDept(sActionDetail.getMaterialId(), deptInId, term.restaurantID, sActionDetail.getAmount());
+							materialDept = new MaterialDept(sActionDetail.getMaterialId(), deptInId, term.getRestaurantId(), sActionDetail.getAmount());
 							MaterialDeptDao.insertMaterialDept(dbCon, term, materialDept);
 							
 							//更新剩余数量
@@ -609,7 +609,7 @@ public class StockActionDao {
 						materialDepts = MaterialDeptDao.getMaterialDepts(term, " AND MD.material_id = " + sActionDetail.getMaterialId() + " AND MD.dept_id = " + deptOutId, null);
 						if(materialDepts.isEmpty()){
 							//如果没有就新增一条记录
-							materialDept = new MaterialDept(sActionDetail.getMaterialId(), deptOutId, term.restaurantID, (-sActionDetail.getAmount()));
+							materialDept = new MaterialDept(sActionDetail.getMaterialId(), deptOutId, term.getRestaurantId(), (-sActionDetail.getAmount()));
 							MaterialDeptDao.insertMaterialDept(dbCon, term, materialDept);
 							//更新剩余数量
 							sActionDetail.setDeptOutRemaining(materialDept.getStock());
@@ -630,9 +630,9 @@ public class StockActionDao {
 						materialDepts = MaterialDeptDao.getMaterialDepts(term, " AND MD.material_id = " + sActionDetail.getMaterialId() + " AND MD.dept_id = " + deptOutId, null);
 						if(materialDepts.isEmpty()){
 							if(updateStockAction.getSubType() == SubType.LESS){
-								materialDept = new MaterialDept(sActionDetail.getMaterialId(), deptOutId, term.restaurantID, 0);
+								materialDept = new MaterialDept(sActionDetail.getMaterialId(), deptOutId, term.getRestaurantId(), 0);
 							}else{
-								materialDept = new MaterialDept(sActionDetail.getMaterialId(), deptOutId, term.restaurantID, (-sActionDetail.getAmount()));
+								materialDept = new MaterialDept(sActionDetail.getMaterialId(), deptOutId, term.getRestaurantId(), (-sActionDetail.getAmount()));
 							}
 							
 							MaterialDeptDao.insertMaterialDept(dbCon, term, materialDept);
@@ -655,7 +655,7 @@ public class StockActionDao {
 						//出库单减少总库存
 						material.cutStock(sActionDetail.getAmount());
 						//更新原料表
-						material.setLastModStaff(term.owner);
+						material.setLastModStaff(term.getName());
 						MaterialDao.update(dbCon, material);
 						
 						//更新剩余数量
@@ -682,7 +682,7 @@ public class StockActionDao {
 	 * @throws BusinessException
 	 * 			if this stock is not exist
 	 */
-	public static StockAction getStockActionById(Terminal term, int stockInId) throws SQLException, BusinessException{
+	public static StockAction getStockActionById(Staff term, int stockInId) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -705,7 +705,7 @@ public class StockActionDao {
 	 * @throws BusinessException
 	 * 			if this stock is not exist
 	 */
-	public static StockAction getStockActionById(DBCon dbCon, Terminal term, int stockInId) throws SQLException, BusinessException{
+	public static StockAction getStockActionById(DBCon dbCon, Staff term, int stockInId) throws SQLException, BusinessException{
 		List<StockAction> stockIns = getStockActions(dbCon, term, " AND id = " + stockInId, null);
 		if(stockIns.isEmpty()){
 			throw new BusinessException(StockError.STOCKACTION_SELECT);
@@ -726,7 +726,7 @@ public class StockActionDao {
 	 * 			if failed to execute any SQL statement
 	 * @return	the list holding the stockIn result if successfully
 	 */
-	public static List<StockAction> getStockActions(Terminal term, String extraCond, String orderClause) throws SQLException{
+	public static List<StockAction> getStockActions(Staff term, String extraCond, String orderClause) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -749,14 +749,14 @@ public class StockActionDao {
 	 * 			if failed to execute any 
 	 * @return	the list holding the stockIn result if successfully
 	 */
-	public static List<StockAction> getStockActions(DBCon dbCon, Terminal term, String extraCond, String orderClause) throws SQLException{
+	public static List<StockAction> getStockActions(DBCon dbCon, Staff term, String extraCond, String orderClause) throws SQLException{
 		List<StockAction> stockActions = new ArrayList<StockAction>();
 		String sql;
 		sql = "SELECT" +
 				" id, restaurant_id, birth_date, ori_stock_id, ori_stock_date, dept_in, dept_in_name, dept_out, dept_out_name, supplier_id, supplier_name," +
 				" operator_id, operator, amount, price, actual_price, cate_type, type, sub_type, status, comment " +
 				" FROM " + Params.dbName +".stock_action " +
-				" WHERE restaurant_id = " + term.restaurantID +
+				" WHERE restaurant_id = " + term.getRestaurantId() +
 				(extraCond == null ? "" : extraCond) +
 				(orderClause == null ? "" : orderClause);
 		
@@ -805,7 +805,7 @@ public class StockActionDao {
 	 * 			if the stockIn to query does not exist
 	 * @return	the detail to this StockIn_id
 	 */
-	public static StockAction getStockAndDetailById(Terminal term, int stockInId) throws SQLException, BusinessException{
+	public static StockAction getStockAndDetailById(Staff term, int stockInId) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -830,7 +830,7 @@ public class StockActionDao {
 	 * @param BusinessException
 	 * 			if the stockIn to query does not exist
 	 */
-	public static StockAction getStockAndDetailById(DBCon dbCon, Terminal term, int stockInId) throws SQLException, BusinessException{
+	public static StockAction getStockAndDetailById(DBCon dbCon, Staff term, int stockInId) throws SQLException, BusinessException{
 		List<StockAction> stockIns = getStockAndDetail(dbCon, term, " AND S.id = " + stockInId, null);
 		if(stockIns.isEmpty()){
 			throw new BusinessException(StockError.STOCKACTION_SELECT);
@@ -851,7 +851,7 @@ public class StockActionDao {
 	 * @throws SQLException
 	 * 			if failed to execute any SQL statement
 	 */
-	public static List<StockAction> getStockAndDetail(Terminal term, String extraCond, String orderClause) throws SQLException{
+	public static List<StockAction> getStockAndDetail(Staff term, String extraCond, String orderClause) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -874,7 +874,7 @@ public class StockActionDao {
 	 * @throws SQLException
 	 * 			if failed to execute any SQL statement
 	 */
-	public static List<StockAction> getStockAndDetail(DBCon dbCon, Terminal term, String extraCond, String orderClause) throws SQLException{
+	public static List<StockAction> getStockAndDetail(DBCon dbCon, Staff term, String extraCond, String orderClause) throws SQLException{
 		String sql;
 		sql = "SELECT " +
 				" S.id, S.restaurant_id, S.birth_date, S.ori_stock_id, S.ori_stock_date, S.dept_in, S.dept_in_name, S.dept_out, S.dept_out_name, S.supplier_id, S.supplier_name," +
@@ -882,7 +882,7 @@ public class StockActionDao {
 				" FROM " + Params.dbName +".stock_action as S " +
 				" INNER JOIN " + Params.dbName + ".stock_action_detail as D " +
 				" ON S.id = D.stock_action_id" +
-				" WHERE S.restaurant_id = " + term.restaurantID +
+				" WHERE S.restaurant_id = " + term.getRestaurantId() +
 				(extraCond == null ? "" : extraCond) +
 				(orderClause == null ? "" : orderClause);
 		

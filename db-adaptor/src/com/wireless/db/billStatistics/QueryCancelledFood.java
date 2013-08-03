@@ -15,7 +15,7 @@ import com.wireless.pojo.billStatistics.CancelIncomeByReason.IncomeByEachDept;
 import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.dishesOrder.CancelledFood;
 import com.wireless.pojo.dishesOrder.OrderFood;
-import com.wireless.protocol.Terminal;
+import com.wireless.pojo.staffMgr.Staff;
 
 public class QueryCancelledFood {
 	
@@ -39,7 +39,7 @@ public class QueryCancelledFood {
 	 * @return
 	 * @throws SQLException
 	 */
-	public static CancelIncomeByDept getCancelledFoodByDept(Terminal term, DutyRange range, Integer deptId, int queryType, int orderBy) throws SQLException{
+	public static CancelIncomeByDept getCancelledFoodByDept(Staff term, DutyRange range, Integer deptId, int queryType, int orderBy) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -60,7 +60,7 @@ public class QueryCancelledFood {
 	 * @return
 	 * @throws SQLException
 	 */
-	public static CancelIncomeByDept getCancelledFoodByDept(DBCon dbCon, Terminal term, DutyRange range, Integer deptId, int queryType, int orderBy) throws SQLException{
+	public static CancelIncomeByDept getCancelledFoodByDept(DBCon dbCon, Staff term, DutyRange range, Integer deptId, int queryType, int orderBy) throws SQLException{
 		List<CancelIncomeByDept> result = getCancelledFoodByDept(dbCon, term, range, deptId != null && deptId >= 0 ?  " AND OF.dept_id = " + deptId : "", queryType, orderBy);
 		CancelIncomeByDept dept = null;
 		if(result != null && result.size() > 0){
@@ -109,7 +109,7 @@ public class QueryCancelledFood {
 	 * 			the category in which the list sort
 	 * @return
 	 */
-	public static List<CancelIncomeByDept> getCancelledFoodByDept(DBCon dbCon, Terminal term, DutyRange range, String extraCond, int queryType, int orderBy) throws SQLException{
+	public static List<CancelIncomeByDept> getCancelledFoodByDept(DBCon dbCon, Staff term, DutyRange range, String extraCond, int queryType, int orderBy) throws SQLException{
 		List<CancelIncomeByDept> result = CalcBillStatisticsDao.calcCancelIncomeByDept(dbCon, term, range, extraCond, queryType);		
 		if(result != null && result.size() > 0){
 			if(orderBy == QueryCancelledFood.ORDER_BY_COUNT){
@@ -154,7 +154,7 @@ public class QueryCancelledFood {
 	 * 			the category in which the list sort
 	 * @return
 	 */
-	public static List<CancelIncomeByDept> getCancelledFoodByDept(Terminal term, DutyRange range, String extraCond, int queryType, int orderBy) throws SQLException{
+	public static List<CancelIncomeByDept> getCancelledFoodByDept(Staff term, DutyRange range, String extraCond, int queryType, int orderBy) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();					
@@ -175,7 +175,7 @@ public class QueryCancelledFood {
 	 * @return
 	 * @throws SQLException
 	 */
-	public static CancelIncomeByReason getCancelledFoodByReason(Terminal term, DutyRange range, Integer reasonID, int queryType, int orderBy) throws SQLException{
+	public static CancelIncomeByReason getCancelledFoodByReason(Staff term, DutyRange range, Integer reasonID, int queryType, int orderBy) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -196,7 +196,7 @@ public class QueryCancelledFood {
 	 * @return
 	 * @throws SQLException
 	 */
-	public static CancelIncomeByReason getCancelledFoodByReason(DBCon dbCon, Terminal term, DutyRange range, Integer reasonID, int queryType, int orderBy) throws SQLException{
+	public static CancelIncomeByReason getCancelledFoodByReason(DBCon dbCon, Staff term, DutyRange range, Integer reasonID, int queryType, int orderBy) throws SQLException{
 		List<CancelIncomeByReason> result = getCancelledFoodByReason(dbCon, term, range, reasonID != null && reasonID > 0 ? " AND OF.cancel_reason_id = " + reasonID : "", queryType, orderBy);
 		CancelIncomeByReason reason = null;
 		if(result != null && result.size() > 0){
@@ -241,7 +241,7 @@ public class QueryCancelledFood {
 	 * @return
 	 * @throws SQLException
 	 */
-	public static List<CancelIncomeByReason> getCancelledFoodByReason(Terminal term, DutyRange range, String extraCond, int queryType, int orderBy) throws SQLException{
+	public static List<CancelIncomeByReason> getCancelledFoodByReason(Staff term, DutyRange range, String extraCond, int queryType, int orderBy) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();					
@@ -261,7 +261,7 @@ public class QueryCancelledFood {
 	 * @return
 	 * @throws SQLException
 	 */
-	public static List<CancelIncomeByReason> getCancelledFoodByReason(DBCon dbCon, Terminal term, DutyRange range, String extraCond, int queryType, int orderBy) throws SQLException{
+	public static List<CancelIncomeByReason> getCancelledFoodByReason(DBCon dbCon, Staff term, DutyRange range, String extraCond, int queryType, int orderBy) throws SQLException{
 		List<CancelIncomeByReason> result = CalcBillStatisticsDao.calcCancelIncomeByReason(dbCon, term, range, extraCond, queryType);		
 		if(result != null && result.size() > 0){
 			if(orderBy == QueryCancelledFood.ORDER_BY_COUNT){
@@ -306,7 +306,7 @@ public class QueryCancelledFood {
 	 * @return
 	 * @throws SQLException
 	 */
-	public static List<CancelledFood> getCancelledFoodDetail(Terminal term, DutyRange range, int queryType, int orderBy, Integer deptID, Integer reasonID) throws SQLException{
+	public static List<CancelledFood> getCancelledFoodDetail(Staff term, DutyRange range, int queryType, int orderBy, Integer deptID, Integer reasonID) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -324,7 +324,7 @@ public class QueryCancelledFood {
 	 * @param deptID
 	 * @return
 	 */
-	public static List<CancelledFood> getCancelledFoodDetail(DBCon dbCon, Terminal term, DutyRange range, int queryType, int orderBy, Integer deptID, Integer reasonID) throws SQLException{
+	public static List<CancelledFood> getCancelledFoodDetail(DBCon dbCon, Staff term, DutyRange range, int queryType, int orderBy, Integer deptID, Integer reasonID) throws SQLException{
 		List<CancelledFood> list = new ArrayList<CancelledFood>();
 		List<OrderFood> cancelFoods;
 		
@@ -332,14 +332,14 @@ public class QueryCancelledFood {
 			cancelFoods = OrderFoodDao.getSingleDetailHistory(dbCon, " AND OFH.order_count < 0 " +
 																   (deptID != null && deptID >= 0 ? " AND OFH.dept_id = " + deptID : "") +
 																   (reasonID != null && reasonID > 0 ? " AND OFH.cancel_reason_id = " + reasonID : "") +
-																   " AND OFH.restaurant_id = " + term.restaurantID +
+																   " AND OFH.restaurant_id = " + term.getRestaurantId() +
 																   " AND OFH.order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'", 
 																   " ORDER BY OFH.order_date ASC ");
 		}else if(queryType == QUERY_TODAY){
 			cancelFoods = OrderFoodDao.getSingleDetailToday(dbCon, " AND OF.order_count < 0 " +
 																 (deptID != null && deptID >= 0 ? " AND OFH.dept_id = " + deptID : "") +
 					   									   	      (reasonID != null && reasonID > 0 ? " AND OFH.cancel_reason_id = " + reasonID : "") +
-																 " AND OF.restaurant_id = " + term.restaurantID +
+																 " AND OF.restaurant_id = " + term.getRestaurantId() +
 					   											 " AND OF.order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'", 
 					   									  		 " ORDER BY OF.order_date ASC ");
 		}else{

@@ -18,8 +18,8 @@ import com.wireless.pojo.client.MemberOperation.ChargeType;
 import com.wireless.pojo.client.MemberType;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.distMgr.Discount;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.DateUtil;
-import com.wireless.protocol.Terminal;
 import com.wireless.util.SQLUtil;
 
 public class MemberDao {
@@ -208,9 +208,9 @@ public class MemberDao {
 	 * @throws BusinessException
 	 * 			throws the member to this card does NOT exist
 	 */
-	public static Member getMemberByCard(DBCon dbCon, Terminal term, String cardAlias) throws SQLException, BusinessException{
+	public static Member getMemberByCard(DBCon dbCon, Staff term, String cardAlias) throws SQLException, BusinessException{
 		Map<Object, Object> params = new HashMap<Object, Object>();
-		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + term.restaurantID + " AND M.member_card = '" + cardAlias + "'");
+		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + term.getRestaurantId() + " AND M.member_card = '" + cardAlias + "'");
 		List<Member> ml = MemberDao.getMember(dbCon, params);
 		if(ml.isEmpty()){
 			throw new BusinessException(MemberError.MEMBER_NOT_EXIST);
@@ -229,7 +229,7 @@ public class MemberDao {
 	 * @throws BusinessException
 	 * 			throws the member to this card does NOT exist
 	 */
-	public static Member getMemberByCard(Terminal term, String cardAlias) throws SQLException, BusinessException{
+	public static Member getMemberByCard(Staff term, String cardAlias) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -253,9 +253,9 @@ public class MemberDao {
 	 * @throws BusinessException
 	 * 			throws if the member to this mobile does NOT exist
 	 */
-	public static Member getMemberByMobile(DBCon dbCon, Terminal term, String mobile) throws SQLException, BusinessException{
+	public static Member getMemberByMobile(DBCon dbCon, Staff term, String mobile) throws SQLException, BusinessException{
 		Map<Object, Object> params = new HashMap<Object, Object>();
-		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + term.restaurantID + " AND M.mobile = '" + mobile + "'");
+		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + term.getRestaurantId() + " AND M.mobile = '" + mobile + "'");
 		List<Member> result = MemberDao.getMember(dbCon, params);
 		if(result.isEmpty()){
 			throw new BusinessException(MemberError.MEMBER_NOT_EXIST);
@@ -278,7 +278,7 @@ public class MemberDao {
 	 * @throws BusinessException
 	 * 			throws if the member to this mobile does NOT exist
 	 */
-	public static Member getMemberByMobile(Terminal term, String mobile) throws SQLException, BusinessException{
+	public static Member getMemberByMobile(Staff term, String mobile) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -344,7 +344,7 @@ public class MemberDao {
 	 * 			throws if the card to new member has been exist before
 	 * 			throws if the member type does NOT exist
 	 */
-	public static int insert(DBCon dbCon, Terminal term, Member.InsertBuilder builder) throws SQLException, BusinessException{
+	public static int insert(DBCon dbCon, Staff term, Member.InsertBuilder builder) throws SQLException, BusinessException{
 		Member member = builder.build();
 
 		checkValid(dbCon, member);
@@ -394,7 +394,7 @@ public class MemberDao {
 	 * 			the mobile to new member has been exist before<br>
 	 * 			the card to new member has been exist before
 	 */
-	public static int insert(Terminal term, Member.InsertBuilder builder) throws SQLException, BusinessException{
+	public static int insert(Staff term, Member.InsertBuilder builder) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -418,7 +418,7 @@ public class MemberDao {
 	 * 			the card to new member has been exist before<br>
 	 * 			the member to update does NOT exist
 	 */
-	public static void update(DBCon dbCon, Terminal term, Member.UpdateBuilder builder) throws SQLException, BusinessException{
+	public static void update(DBCon dbCon, Staff term, Member.UpdateBuilder builder) throws SQLException, BusinessException{
 		Member member = builder.build();
 		// 旧会员类型是充值属性, 修改为优惠属性时, 检查是否还有余额, 有则不允许修改
 		Member old = MemberDao.getMemberById(member.getId());
@@ -465,7 +465,7 @@ public class MemberDao {
 	 * 			the card to new member has been exist before<br>
 	 * 			the member to update does NOT exist
 	 */
-	public static void update(Terminal term, Member.UpdateBuilder builder) throws SQLException, BusinessException{
+	public static void update(Staff term, Member.UpdateBuilder builder) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -484,7 +484,7 @@ public class MemberDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static void deleteById(Terminal term, int memberId) throws SQLException {
+	public static void deleteById(Staff term, int memberId) throws SQLException {
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -512,7 +512,7 @@ public class MemberDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static void deleteById(DBCon dbCon, Terminal term, int memberId) throws SQLException{
+	public static void deleteById(DBCon dbCon, Staff term, int memberId) throws SQLException{
 		String sql;
 		//Delete the member operation.
 		sql = " DELETE FROM " + Params.dbName + ".member_operation WHERE member_id = " + memberId;
@@ -549,7 +549,7 @@ public class MemberDao {
 	 *			1 - the consume price exceeds total balance to this member account<br>
 	 *			2 - the member account to consume is NOT found.
 	 */
-	public static MemberOperation consume(DBCon dbCon, Terminal term, int memberId, float consumePrice, Order.PayType payType, int orderId) throws SQLException, BusinessException{
+	public static MemberOperation consume(DBCon dbCon, Staff term, int memberId, float consumePrice, Order.PayType payType, int orderId) throws SQLException, BusinessException{
 		
 		Member member = getMemberById(dbCon, memberId);
 		
@@ -596,7 +596,7 @@ public class MemberDao {
 	 *			1 - the consume price exceeds total balance to this member account<br>
 	 *			2 - the member account to consume is NOT found.
 	 */
-	public static MemberOperation consume(Terminal term, int memberId, float consumePrice, Order.PayType payType, int orderId) throws SQLException, BusinessException{
+	public static MemberOperation consume(Staff term, int memberId, float consumePrice, Order.PayType payType, int orderId) throws SQLException, BusinessException{
 		
 		DBCon dbCon = new DBCon();
 		try{
@@ -635,7 +635,7 @@ public class MemberDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statements
 	 */
-	public static MemberOperation charge(DBCon dbCon, Terminal term, int memberId, float chargeMoney, ChargeType chargeType) throws BusinessException, SQLException{
+	public static MemberOperation charge(DBCon dbCon, Staff term, int memberId, float chargeMoney, ChargeType chargeType) throws BusinessException, SQLException{
 		
 		if(chargeMoney < 0){
 			throw new IllegalArgumentException("The amount of charge money(amount = " + chargeMoney + ") must be more than zero");
@@ -676,7 +676,7 @@ public class MemberDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statements
 	 */
-	public static MemberOperation charge(Terminal term, int memberId, float chargeMoney, ChargeType chargeType) throws BusinessException, SQLException{
+	public static MemberOperation charge(Staff term, int memberId, float chargeMoney, ChargeType chargeType) throws BusinessException, SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -712,7 +712,7 @@ public class MemberDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static MemberOperation pointConsume(DBCon dbCon, Terminal term, int memberId, int pointConsume) throws BusinessException, SQLException{
+	public static MemberOperation pointConsume(DBCon dbCon, Staff term, int memberId, int pointConsume) throws BusinessException, SQLException{
 		
 		if(pointConsume < 0){
 			throw new IllegalArgumentException("The amount of point to consume(amount = " + pointConsume + ") must be more than zero");
@@ -750,7 +750,7 @@ public class MemberDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static MemberOperation pointConsume(Terminal term, int memberId, int pointConsume) throws BusinessException, SQLException{
+	public static MemberOperation pointConsume(Staff term, int memberId, int pointConsume) throws BusinessException, SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -784,7 +784,7 @@ public class MemberDao {
 	 * @throws BusinessException
 	 * 			throws if the member to this id is NOT found
 	 */
-	public static MemberOperation adjustPoint(Terminal term, int memberId, int deltaPoint, Member.AdjustType adjust) throws SQLException, BusinessException{
+	public static MemberOperation adjustPoint(Staff term, int memberId, int deltaPoint, Member.AdjustType adjust) throws SQLException, BusinessException{
 		
 		DBCon dbCon = new DBCon();
 		try{
@@ -819,7 +819,7 @@ public class MemberDao {
 	 * @throws BusinessException
 	 * 			throws if the member to this id is NOT found
 	 */
-	public static MemberOperation adjustPoint(DBCon dbCon, Terminal term, int memberId, int deltaPoint, Member.AdjustType adjust) throws SQLException, BusinessException{
+	public static MemberOperation adjustPoint(DBCon dbCon, Staff term, int memberId, int deltaPoint, Member.AdjustType adjust) throws SQLException, BusinessException{
 		
 		Member member = getMemberById(dbCon, memberId);
 		
@@ -860,7 +860,7 @@ public class MemberDao {
 	 * @throws BusinessException
 	 * 			throws if the member to this id is NOT found
 	 */
-	public static MemberOperation adjustBalance(Terminal term, int memberId, float deltaBalance) throws SQLException, BusinessException{
+	public static MemberOperation adjustBalance(Staff term, int memberId, float deltaBalance) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -896,7 +896,7 @@ public class MemberDao {
 	 * @throws BusinessException
 	 * 			throws if the member to this id is NOT found
 	 */
-	public static MemberOperation adjustBalance(DBCon dbCon, Terminal term, int memberId, float deltaBalance) throws SQLException, BusinessException{
+	public static MemberOperation adjustBalance(DBCon dbCon, Staff term, int memberId, float deltaBalance) throws SQLException, BusinessException{
 		Member member = getMemberById(dbCon, memberId);
 		
 		//Perform the point adjust and get the related member operation.

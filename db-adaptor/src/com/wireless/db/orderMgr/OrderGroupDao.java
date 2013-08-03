@@ -15,7 +15,7 @@ import com.wireless.db.regionMgr.TableDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.regionMgr.Table;
-import com.wireless.protocol.Terminal;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.util.DateType;
 
 public class OrderGroupDao {
@@ -24,7 +24,7 @@ public class OrderGroupDao {
 	 * Insert a new order group comprising the specific tables.
 	 * Create a new order associated with the table in case of idle.
 	 * Attached the order associated with the table in case of busy.
-	 * @param term
+	 * @param staff
 	 * 			the terminal
 	 * @param tableToGrouped
 	 * 			the tables to be grouped
@@ -35,20 +35,20 @@ public class OrderGroupDao {
 	 * 			Throws if one of cases below.<br>
 	 *			1 - Any table is merged.<br>
 	 */
-	public static int insert(Terminal term, Table[] tablesToGrouped) throws SQLException, BusinessException{
+	public static int insert(Staff staff, Table[] tablesToGrouped) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
 			List<Order> childOrders = new ArrayList<Order>(tablesToGrouped.length);
 			for(Table tbl : tablesToGrouped){
-				Table tableToGrouped = TableDao.getTableByAlias(dbCon, term, tbl.getAliasId());
+				Table tableToGrouped = TableDao.getTableByAlias(dbCon, staff, tbl.getAliasId());
 				Order childOrder = new Order();
 				if(tableToGrouped.isIdle()){
 					childOrder.setDestTbl(tableToGrouped);
 					childOrder.setCustomNum(tableToGrouped.getCustomNum());
 					
 				}else if(tableToGrouped.isBusy()){
-					childOrder = OrderDao.getByTableAlias(dbCon, term, tbl.getAliasId());
+					childOrder = OrderDao.getByTableAlias(dbCon, staff, tbl.getAliasId());
 					
 				}else if(tableToGrouped.isMerged()){
 					throw new BusinessException("The " + tbl + " to insert is merged.");
@@ -58,7 +58,7 @@ public class OrderGroupDao {
 			Order parentOrder = new Order();
 			parentOrder.setChildOrder(childOrders);
 			
-			return insert(dbCon, term, parentOrder);
+			return insert(dbCon, staff, parentOrder);
 			
 		}finally{
 			dbCon.disconnect();
@@ -69,7 +69,7 @@ public class OrderGroupDao {
 	 * Insert a new order group.
 	 * @param dbCon
 	 * 			the database connection
-	 * @param term
+	 * @param staff
 	 * 			the terminal
 	 * @param parentOrder
 	 * 			the order group to be inserted
@@ -81,11 +81,11 @@ public class OrderGroupDao {
 	 * 			1 - The order to join does NOT exist.<br>
 	 * 		    2 - The table associated with the new order is NOT idle.	
 	 */
-	public static int insert(Terminal term, Order parentOrder) throws BusinessException, SQLException{
+	public static int insert(Staff staff, Order parentOrder) throws BusinessException, SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return insert(dbCon, term, parentOrder);
+			return insert(dbCon, staff, parentOrder);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -95,7 +95,7 @@ public class OrderGroupDao {
 	 * Insert a new order group.
 	 * @param dbCon
 	 * 			the database connection
-	 * @param term
+	 * @param staff
 	 * 			the terminal
 	 * @param parentOrder
 	 * 			the order group to be inserted
@@ -107,7 +107,7 @@ public class OrderGroupDao {
 	 * 			1 - The order to join does NOT exist.<br>
 	 * 		    2 - The table associated with the new order is NOT idle.	
 	 */
-	public static int insert(DBCon dbCon, Terminal term, Order parentOrder) throws SQLException, BusinessException{
+	public static int insert(DBCon dbCon, Staff staff, Order parentOrder) throws SQLException, BusinessException{
 		if(parentOrder.hasChildOrder()){
 			
 			boolean isAutoCommit = dbCon.conn.getAutoCommit();
@@ -116,7 +116,7 @@ public class OrderGroupDao {
 				dbCon.conn.setAutoCommit(false);
 				
 				//Get the price plan which is in use to this restaurant.
-				parentOrder.setPricePlan(PricePlanDao.getActivePricePlan(dbCon, term));
+				parentOrder.setPricePlan(PricePlanDao.getActivePricePlan(dbCon, staff));
 	
 				//Set the new group's category to merged.
 				parentOrder.setCategory(Order.Category.MERGER_TBL);
@@ -126,17 +126,16 @@ public class OrderGroupDao {
 				//Insert the parent order.
 				sql = " INSERT INTO " + Params.dbName + ".order " +
 					  "(`id`, `restaurant_id`, `category`, " +
-					  " `terminal_model`, `terminal_pin`, `birth_date`, `order_date`, `custom_num`, `waiter`, `price_plan_id`)" +
+					  " `birth_date`, `order_date`, `custom_num`, `staff_id`, `waiter`, `price_plan_id`)" +
 					  " VALUES (" +
 					  "	NULL, " + 
-					  term.restaurantID + ", " + 
+					  staff.getRestaurantId() + ", " + 
 					  parentOrder.getCategory().getVal() + ", " +
-	  				  term.modelID + ", " + 
-					  term.pin + ", " +
 					  " NOW() " + ", " + 
 					  " NOW() " + ", " +
 					  parentOrder.getCustomNum() + ", " +
-					  "'" + term.owner + "'" + ", " +
+					  staff.getId() + ", " +
+					  "'" + staff.getName() + "'" + ", " +
 					  parentOrder.getPricePlan().getId() + ")";
 				
 				dbCon.stmt.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
@@ -151,7 +150,7 @@ public class OrderGroupDao {
 				
 				//Join each child order to parent order generated just now.
 				for(Order childOrder : parentOrder.getChildOrder()){
-					join(dbCon, term, parentOrder, childOrder);
+					join(dbCon, staff, parentOrder, childOrder);
 					parentOrder.setCustomNum(parentOrder.getCustomNum() + childOrder.getCustomNum());
 				}
 				
@@ -203,7 +202,7 @@ public class OrderGroupDao {
 	 * @throws SQLException
 	 * 			Throws if failed to execute any SQL statements.
 	 */
-	public static void update(Terminal term, int parentOrderId, Table[] tblToUpdate) throws BusinessException, SQLException{
+	public static void update(Staff term, int parentOrderId, Table[] tblToUpdate) throws BusinessException, SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -231,7 +230,7 @@ public class OrderGroupDao {
 	 * @throws SQLException
 	 * 			Throws if failed to execute any SQL statements.
 	 */
-	public static void update(DBCon dbCon, Terminal term, int parentOrderId, Table[] tblToUpdate) throws BusinessException, SQLException{
+	public static void update(DBCon dbCon, Staff term, int parentOrderId, Table[] tblToUpdate) throws BusinessException, SQLException{
 		Order orderToUpdate = new Order();
 		orderToUpdate.setId(parentOrderId);
 		
@@ -269,7 +268,7 @@ public class OrderGroupDao {
 	 * @throws SQLException
 	 * 			Throws if failed to execute any SQL statements.
 	 */
-	public static void update(Terminal term, Order parentToUpdate) throws BusinessException, SQLException{
+	public static void update(Staff term, Order parentToUpdate) throws BusinessException, SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -298,7 +297,7 @@ public class OrderGroupDao {
 	 * @throws SQLException
 	 * 			Throws if failed to execute any SQL statements.
 	 */
-	public static void update(DBCon dbCon, Terminal term, Order parentToUpdate) throws BusinessException, SQLException{
+	public static void update(DBCon dbCon, Staff term, Order parentToUpdate) throws BusinessException, SQLException{
 		
 		if(parentToUpdate.hasChildOrder()){
 			
@@ -444,7 +443,7 @@ public class OrderGroupDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	static void join(DBCon dbCon, Terminal term, Order parentJoinedTo, Order orderToJoin) throws BusinessException, SQLException{
+	static void join(DBCon dbCon, Staff term, Order parentJoinedTo, Order orderToJoin) throws BusinessException, SQLException{
 		
 		if(orderToJoin.getId() == 0){
 			// Insert a new order if the order id is zero.
@@ -476,7 +475,7 @@ public class OrderGroupDao {
 			  " VALUES (" +
 			  parentJoinedTo.getId() + ", " +
 			  orderToJoin.getId() + ", " +
-			  term.restaurantID + ")";
+			  term.getRestaurantId() + ")";
 		dbCon.stmt.executeUpdate(sql);
 		
 		//Insert the sub order.
@@ -511,7 +510,7 @@ public class OrderGroupDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	static void join(DBCon dbCon, Terminal term, Order parentJoinedTo, Table tableToJoin) throws BusinessException, SQLException{
+	static void join(DBCon dbCon, Staff term, Order parentJoinedTo, Table tableToJoin) throws BusinessException, SQLException{
 		
 		// Get the detail to table associated with order to join.
 		tableToJoin = TableDao.getTableByAlias(dbCon, term, tableToJoin.getAliasId());
@@ -555,7 +554,7 @@ public class OrderGroupDao {
 	 * @throws SQLException
 	 * 			Throws if failed to execute any SQL statement.
 	 */
-	public static void leave(DBCon dbCon, Terminal term, Order parentRemovedFrom, Order orderToRemove) throws BusinessException, SQLException{
+	public static void leave(DBCon dbCon, Staff term, Order parentRemovedFrom, Order orderToRemove) throws BusinessException, SQLException{
 		
 		String sql;
 
@@ -659,7 +658,7 @@ public class OrderGroupDao {
 	 * @throws SQLException
 	 * 			Throws if failed to execute any SQL statement.
 	 */
-	static void leave(DBCon dbCon, Terminal term, Order parentRemoveFrom, Table tableToLeave) throws BusinessException, SQLException{
+	static void leave(DBCon dbCon, Staff term, Order parentRemoveFrom, Table tableToLeave) throws BusinessException, SQLException{
 		
 		Order orderToLeave = new Order();
 		orderToLeave.setId(OrderDao.getOrderIdByUnPaidTable(dbCon, tableToLeave)[0]);
@@ -680,7 +679,7 @@ public class OrderGroupDao {
 	 * @throws SQLException
 	 * 			Throws if failed to execute any SQL statements.
 	 */
-	public static void cancel(Terminal term, Table tblToCancel) throws BusinessException, SQLException{
+	public static void cancel(Staff term, Table tblToCancel) throws BusinessException, SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -705,7 +704,7 @@ public class OrderGroupDao {
 	 * @throws SQLException
 	 * 			Throws if failed to execute any SQL statements.
 	 */
-	public static void cancel(DBCon dbCon, Terminal term, Table tblToCancel) throws BusinessException, SQLException{
+	public static void cancel(DBCon dbCon, Staff term, Table tblToCancel) throws BusinessException, SQLException{
 		
 		int[] unpaidIDs = OrderDao.getOrderIdByUnPaidTable(dbCon, TableDao.getTableByAlias(dbCon, term, tblToCancel.getAliasId()));
 		
@@ -733,7 +732,7 @@ public class OrderGroupDao {
 	 * @throws BusinessException
 	 * 			Throws if the parent order to this id does NOT exist.
 	 */
-	public static void cancel(Terminal term, Order parentToCancel) throws SQLException, BusinessException{
+	public static void cancel(Staff term, Order parentToCancel) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -756,7 +755,7 @@ public class OrderGroupDao {
 	 * @throws BusinessException
 	 * 			Throws if the parent order to this id does NOT exist.
 	 */
-	public static void cancel(DBCon dbCon, Terminal term, Order parentToCancel) throws SQLException, BusinessException{
+	public static void cancel(DBCon dbCon, Staff term, Order parentToCancel) throws SQLException, BusinessException{
 		
 		parentToCancel = OrderDao.getById(term, parentToCancel.getId(), DateType.TODAY);
 		

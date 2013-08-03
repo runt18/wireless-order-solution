@@ -8,7 +8,7 @@ import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.regionMgr.Region;
-import com.wireless.protocol.Terminal;
+import com.wireless.pojo.staffMgr.Staff;
 
 public class RegionDao {
 
@@ -21,7 +21,7 @@ public class RegionDao {
 	 * @throws BusinessException
 	 * 			if the region to update does NOT exist
 	 */
-	public static void update(Terminal term, Region region) throws SQLException, BusinessException {
+	public static void update(Staff term, Region region) throws SQLException, BusinessException {
 		DBCon dbCon = new DBCon();
 		try {
 			
@@ -34,7 +34,7 @@ public class RegionDao {
 	}
 
 	/**
-	 * Update the region to a specified restaurant defined in {@link Terminal}.
+	 * Update the region to a specified restaurant defined in {@link Staff}.
 	 * @param dbCon
 	 * 			the database connection
 	 * @param region
@@ -44,13 +44,13 @@ public class RegionDao {
 	 * @throws BusinessException
 	 * 			if the region to update does NOT exist
 	 */
-	public static void update(DBCon dbCon, Terminal term, Region region) throws SQLException, BusinessException{
+	public static void update(DBCon dbCon, Staff term, Region region) throws SQLException, BusinessException{
 		
 		String sql;
 		
 		sql = " UPDATE " + Params.dbName + ".region " + 
 			  " SET name = '" + region.getName() + "'" +
-			  " WHERE restaurant_id = " + term.restaurantID +
+			  " WHERE restaurant_id = " + term.getRestaurantId() +
 			  " AND region_id = " + region.getRegionId();
 		
 		if (dbCon.stmt.executeUpdate(sql) == 0) {
@@ -59,7 +59,7 @@ public class RegionDao {
 	}
 	
 	/**
-	 * Get regions to a specified restaurant defined in terminal {@link Terminal} and other extra condition.
+	 * Get regions to a specified restaurant defined in terminal {@link Staff} and other extra condition.
 	 * 获取地区端子{@链接终端}和其他额外条件定义到指定的餐厅。
 	 * @param term
 	 * 			the terminal终端
@@ -71,7 +71,7 @@ public class RegionDao {
 	 * @throws SQLException
 	 * 			if failed to execute any SQL statement
 	 */
-	public static List<Region> getRegions(Terminal term, String extraCond, String orderClause) throws SQLException {
+	public static List<Region> getRegions(Staff term, String extraCond, String orderClause) throws SQLException {
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -83,7 +83,7 @@ public class RegionDao {
 	
 	
 	/**
-	 * Get regions to a specified restaurant defined in terminal {@link Terminal} and other extra condition.
+	 * Get regions to a specified restaurant defined in terminal {@link Staff} and other extra condition.
 	 * @param dbCon
 	 * 			the database connection
 	 * @param term
@@ -96,13 +96,13 @@ public class RegionDao {
 	 * @throws SQLException
 	 * 			if failed to execute any SQL statement
 	 */
-	public static List<Region> getRegions(DBCon dbCon, Terminal term, String extraCond, String orderClause) throws SQLException {
+	public static List<Region> getRegions(DBCon dbCon, Staff term, String extraCond, String orderClause) throws SQLException {
 		List<Region> regions = new ArrayList<Region>();
 
 		String sql = " SELECT " 
 					+ " REGION.region_id, REGION.restaurant_id, REGION.name "
 					+ " FROM " + Params.dbName + ".region REGION"
-					+ " WHERE REGION.restaurant_id = " + term.restaurantID + " "
+					+ " WHERE REGION.restaurant_id = " + term.getRestaurantId() + " "
 					+ (extraCond == null ? "" : extraCond)
 					+ (orderClause == null ? "" : orderClause);
 		dbCon.rs = dbCon.stmt.executeQuery(sql);

@@ -11,10 +11,10 @@ import java.util.Map;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.exception.BusinessException;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.stockMgr.StockAction.Status;
 import com.wireless.pojo.stockMgr.StockAction.SubType;
 import com.wireless.pojo.stockMgr.StockReport;
-import com.wireless.protocol.Terminal;
 
 public class StockReportDao {
 	
@@ -32,7 +32,7 @@ public class StockReportDao {
 	 * @throws BusinessException 
 	 * 			if the form of time is not exactly
 	 */
-	public static List<StockReport> getStockCollectByTime(Terminal term, String begin, String end, String orderClause) throws SQLException, BusinessException{
+	public static List<StockReport> getStockCollectByTime(Staff term, String begin, String end, String orderClause) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -58,7 +58,7 @@ public class StockReportDao {
 	 * @throws BusinessException 
 	 * 			if the form of time is not exactly
 	 */
-	public static List<StockReport> getStockCollectByTypes(Terminal term, String begin, String end, String extraCond, String orderClause) throws SQLException, BusinessException{
+	public static List<StockReport> getStockCollectByTypes(Staff term, String begin, String end, String extraCond, String orderClause) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -85,7 +85,7 @@ public class StockReportDao {
 	 * @throws BusinessException 
 	 * 			if the form of time is not exactly
 	 */
-	public static List<StockReport> getStockCollect(DBCon dbCon, Terminal term, String begin, String end, String extraCond, String orderClause) throws SQLException, BusinessException{
+	public static List<StockReport> getStockCollect(DBCon dbCon, Staff term, String begin, String end, String extraCond, String orderClause) throws SQLException, BusinessException{
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 		try{
 			sdf.parse(begin);
@@ -98,7 +98,7 @@ public class StockReportDao {
 						" INNER JOIN " + Params.dbName + ".stock_action_detail as D ON S.id = D.stock_action_id) " +
 						" INNER JOIN " + Params.dbName + ".material as M ON M.material_id = D.material_id) " +
 						" INNER JOIN " + Params.dbName + ".material_cate as MC ON MC.cate_id = M.cate_id " +
-						" WHERE S.restaurant_id = " + term.restaurantID + 
+						" WHERE S.restaurant_id = " + term.getRestaurantId() + 
 						" AND S.ori_stock_date <= '" + end + " 23:59:59' AND S.ori_stock_date >= '" + begin + "'" +
 						(extraCond == null ? "" : extraCond) +
 						" GROUP BY S.sub_type, D.material_id " +
@@ -147,7 +147,7 @@ public class StockReportDao {
 					endAmountCon.connect();
 					String endAmount = "SELECT D.remaining, D.price FROM " + Params.dbName + ".stock_action as S " + 
 							" INNER JOIN " + Params.dbName + ".stock_action_detail as D  ON S.id = D.stock_action_id " +
-							" WHERE S.restaurant_id = " + term.restaurantID +
+							" WHERE S.restaurant_id = " + term.getRestaurantId() +
 							" AND S.ori_stock_date <= '" + end + " 23:59:59' AND D.material_id = " + materialId + 
 							" AND S.status = " + Status.AUDIT.getVal() +
 							" ORDER BY D.id DESC LIMIT 0,1";
@@ -166,7 +166,7 @@ public class StockReportDao {
 					primeAmountCon.connect();
 					String primeAmount = "SELECT D.remaining FROM " + Params.dbName + ".stock_action as S " + 
 							" INNER JOIN " + Params.dbName + ".stock_action_detail as D  ON S.id = D.stock_action_id " + 
-							" WHERE S.restaurant_id = " + term.restaurantID +
+							" WHERE S.restaurant_id = " + term.getRestaurantId() +
 							" AND S.ori_stock_date < '" + begin + "' AND D.material_id = " + materialId + 
 							" AND S.status = " + Status.AUDIT.getVal() +
 							" ORDER BY D.id DESC LIMIT 0,1";

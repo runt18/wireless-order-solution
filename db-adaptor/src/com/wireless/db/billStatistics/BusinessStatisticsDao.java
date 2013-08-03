@@ -9,8 +9,9 @@ import java.util.Map;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
-import com.wireless.db.frontBusiness.VerifyPin;
 import com.wireless.db.shift.QueryShiftDao;
+import com.wireless.db.staffMgr.StaffDao;
+import com.wireless.db.staffMgr.VerifyPin;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.billStatistics.BusinessStatistics;
 import com.wireless.pojo.billStatistics.DutyRange;
@@ -202,7 +203,7 @@ public class BusinessStatisticsDao {
 	
 	/**
 	 * 
-	 * @param pin
+	 * @param staffId
 	 * @param onDuty
 	 * @param offDuty
 	 * @return
@@ -224,12 +225,12 @@ public class BusinessStatisticsDao {
 			if(queryPattern == null || queryPattern.toString().equals("1")){
 				DutyRange duty = QueryDutyRange.exec(dbCon, VerifyPin.exec(dbCon, Long.valueOf(pin.toString()), Terminal.MODEL_STAFF), onDuty.toString(), offDuty.toString());
 				if(duty != null){
-					ShiftDetail res = QueryShiftDao.exec(dbCon, Long.valueOf(pin.toString()), Terminal.MODEL_STAFF, duty.getOnDutyFormat(), duty.getOffDutyFormat(), DateType.getValue(params));
+					ShiftDetail res = QueryShiftDao.exec(dbCon, StaffDao.verify(Integer.parseInt(pin.toString())), duty.getOnDutyFormat(), duty.getOffDutyFormat(), DateType.getValue(params));
 					bs = new BusinessStatistics(res);				
 				}
 			}else{
 				if(queryPattern.toString().equals("2")){
-					ShiftDetail res = QueryShiftDao.exec(dbCon, Long.valueOf(pin.toString()), Terminal.MODEL_STAFF, onDuty.toString(), offDuty.toString(), DateType.getValue(params));
+					ShiftDetail res = QueryShiftDao.exec(dbCon, StaffDao.verify(Integer.parseInt(pin.toString())), onDuty.toString(), offDuty.toString(), DateType.getValue(params));
 					bs = new BusinessStatistics(res);
 				}
 			}

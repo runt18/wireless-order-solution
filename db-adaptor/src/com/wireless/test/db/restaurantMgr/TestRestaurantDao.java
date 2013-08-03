@@ -1,18 +1,18 @@
 package com.wireless.test.db.restaurantMgr;
 
+import static org.junit.Assert.assertEquals;
+
 import java.beans.PropertyVetoException;
 import java.sql.SQLException;
-
-import static org.junit.Assert.*;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.wireless.db.frontBusiness.VerifyPin;
 import com.wireless.db.restaurantMgr.RestaurantDao;
+import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.restaurantMgr.Restaurant;
-import com.wireless.protocol.Terminal;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.test.db.TestInit;
 
 public class TestRestaurantDao {
@@ -25,9 +25,9 @@ public class TestRestaurantDao {
 	@Test
 	public void testQueryByID() throws BusinessException, SQLException{
 		
-		Terminal term = VerifyPin.exec(217, Terminal.MODEL_STAFF);
+		Staff staff = StaffDao.getStaffs(37).get(0);
 		
-		Restaurant oriRestaurant = RestaurantDao.getById(term.restaurantID);
+		Restaurant oriRestaurant = RestaurantDao.getById(staff.getRestaurantId());
 		
 		Restaurant restToUpdate = new Restaurant();
 		restToUpdate.setId(oriRestaurant.getId());
@@ -38,9 +38,9 @@ public class TestRestaurantDao {
 		restToUpdate.setTele1("测试电话1");
 		restToUpdate.setTele2("测试电话2");
 		
-		RestaurantDao.update(term, restToUpdate);
+		RestaurantDao.update(staff, restToUpdate);
 		
-		Restaurant restAfterUpdate = RestaurantDao.getById(term.restaurantID);
+		Restaurant restAfterUpdate = RestaurantDao.getById(staff.getRestaurantId());
 		
 		assertEquals("restaurant id", restToUpdate.getId(), restAfterUpdate.getId());
 		assertEquals("restaurant id", restToUpdate.getId(), restAfterUpdate.getId());
@@ -52,7 +52,7 @@ public class TestRestaurantDao {
 		assertEquals("restaurant 2nd tele", restToUpdate.getTele2(), restAfterUpdate.getTele2());
 
 		//restore the original restaurant info
-		RestaurantDao.update(term, oriRestaurant);
+		RestaurantDao.update(staff, oriRestaurant);
 	}
 	
 }

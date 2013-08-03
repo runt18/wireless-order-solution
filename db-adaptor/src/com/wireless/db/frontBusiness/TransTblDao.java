@@ -8,7 +8,7 @@ import com.wireless.db.regionMgr.TableDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.ProtocolError;
 import com.wireless.pojo.regionMgr.Table;
-import com.wireless.protocol.Terminal;
+import com.wireless.pojo.staffMgr.Staff;
 
 public class TransTblDao {
 	
@@ -28,7 +28,7 @@ public class TransTblDao {
 	 * 			1 - the source table is IDLE or merged<br>
 	 * 			2 - the destination table is BUSY or merged<br>
 	 */
-	public static int exec(Terminal term, Table srcTbl, Table destTbl) throws SQLException, BusinessException{
+	public static int exec(Staff term, Table srcTbl, Table destTbl) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -57,7 +57,7 @@ public class TransTblDao {
 	 * 			1 - the source table is IDLE or merged<br>
 	 * 			2 - the destination table is BUSY or merged<br>
 	 */
-	public static int exec(DBCon dbCon, Terminal term, Table srcTbl, Table destTbl) throws SQLException, BusinessException{		
+	public static int exec(DBCon dbCon, Staff term, Table srcTbl, Table destTbl) throws SQLException, BusinessException{		
 		
 		srcTbl = TableDao.getTableByAlias(dbCon, term, srcTbl.getAliasId());
 

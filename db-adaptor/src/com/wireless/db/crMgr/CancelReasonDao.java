@@ -8,12 +8,12 @@ import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.crMgr.CancelReason;
-import com.wireless.protocol.Terminal;
+import com.wireless.pojo.staffMgr.Staff;
 
 public class CancelReasonDao {
 
 	/**
-	 * Get the cancel reason to a specified restaurant defined in {@link Terminal} and other extra condition.
+	 * Get the cancel reason to a specified restaurant defined in {@link Staff} and other extra condition.
 	 * @param term 
 	 * 			the terminal
 	 * @param extraCond
@@ -24,7 +24,7 @@ public class CancelReasonDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute the SQL statement
 	 */
-	public static List<CancelReason> getReasons(Terminal term, String extraCond, String orderClause) throws SQLException{
+	public static List<CancelReason> getReasons(Staff term, String extraCond, String orderClause) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -35,7 +35,7 @@ public class CancelReasonDao {
 	}
 	
 	/**
-	 * Get the cancel reason to a specified restaurant defined in {@link Terminal} and other extra condition.
+	 * Get the cancel reason to a specified restaurant defined in {@link Staff} and other extra condition.
 	 * @param dbCon
 	 * 			the database connection
 	 * @param term 
@@ -48,13 +48,13 @@ public class CancelReasonDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute the SQL statement
 	 */
-	public static List<CancelReason> getReasons(DBCon dbCon, Terminal term, String extraCond, String orderClause) throws SQLException{
+	public static List<CancelReason> getReasons(DBCon dbCon, Staff term, String extraCond, String orderClause) throws SQLException{
 		String sql;
 		sql = " SELECT " + 
 			  " cancel_reason_id, reason, restaurant_id " +
 			  " FROM " + Params.dbName + ".cancel_reason CR" +
 			  " WHERE 1 = 1 " +
-			  " AND CR.restaurant_id = " + term.restaurantID +
+			  " AND CR.restaurant_id = " + term.getRestaurantId() +
 			  (extraCond != null ? extraCond : "") + " " +
 			  (orderClause != null ? orderClause : "");
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
@@ -81,7 +81,7 @@ public class CancelReasonDao {
 	 * @throws BusinessException
 	 * 			throws if the cancel reason to this id is NOT found
 	 */
-	public static CancelReason getReasonById(Terminal term, int reasonId) throws SQLException, BusinessException{
+	public static CancelReason getReasonById(Staff term, int reasonId) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -105,7 +105,7 @@ public class CancelReasonDao {
 	 * @throws BusinessException
 	 * 			throws if the cancel reason to this id is NOT found
 	 */
-	public static CancelReason getReasonById(DBCon dbCon, Terminal term, int reasonId) throws SQLException, BusinessException{
+	public static CancelReason getReasonById(DBCon dbCon, Staff term, int reasonId) throws SQLException, BusinessException{
 		List<CancelReason> result = getReasons(dbCon, term, " AND CR.cancel_reason_id = " + reasonId, null);
 		if(result.isEmpty()){
 			throw new BusinessException("The cancel reason(id = " + reasonId + ") is NOT found.");

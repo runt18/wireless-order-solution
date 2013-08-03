@@ -1,5 +1,7 @@
 package com.wireless.test.db.stockMgr;
 
+import static org.junit.Assert.assertEquals;
+
 import java.beans.PropertyVetoException;
 import java.sql.SQLException;
 import java.util.Calendar;
@@ -7,31 +9,27 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.Assert.*;
-
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.wireless.db.frontBusiness.VerifyPin;
+import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.system.SystemDao;
 import com.wireless.exception.BusinessException;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.system.Setting;
-import com.wireless.protocol.Terminal;
 import com.wireless.test.db.TestInit;
 import com.wireless.util.SQLUtil;
 
 public class TestCurrentMonth {
 
-	private static Terminal mTerminal;
+	private static Staff mStaff;
 	
 	@BeforeClass
 	public static void initDBparam() throws BusinessException, SQLException, PropertyVetoException {
 		TestInit.init();
 		try{
-			mTerminal = VerifyPin.exec(217, Terminal.MODEL_STAFF);
+			mStaff = StaffDao.getStaffs(37).get(0);
 		}catch(SQLException e){
-			e.printStackTrace();
-		}catch(BusinessException e){
 			e.printStackTrace();
 		}
 	}
@@ -46,8 +44,8 @@ public class TestCurrentMonth {
 	@Test
 	public void testSetting() throws BusinessException, SQLException{
 		Map<Object, Object> params = new HashMap<Object, Object>();
-		System.out.println(mTerminal.restaurantID);
-		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND B.restaurant_id = " + mTerminal.restaurantID);
+		System.out.println(mStaff.getRestaurantId());
+		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND B.restaurant_id = " + mStaff.getRestaurantId());
 		
 		Setting expectedSetting = SystemDao.getSystemSetting(params).get(0).getSetting();
 		
@@ -58,9 +56,9 @@ public class TestCurrentMonth {
 		
 		expectedSetting.setCurrentMonth(c.getTime().getTime());
 		
-		SystemDao.updateCurrentMonth(mTerminal);
+		SystemDao.updateCurrentMonth(mStaff);
 		System.out.println(expectedSetting.getId());
-		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND B.restaurant_id = " + mTerminal.restaurantID);
+		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND B.restaurant_id = " + mStaff.getRestaurantId());
 		
 		Setting actualSetting = SystemDao.getSystemSetting(params).get(0).getSetting();
 		

@@ -13,7 +13,7 @@ import com.wireless.exception.PrintSchemeError;
 import com.wireless.pojo.printScheme.PStyle;
 import com.wireless.pojo.printScheme.PrintFunc;
 import com.wireless.pojo.printScheme.Printer;
-import com.wireless.protocol.Terminal;
+import com.wireless.pojo.staffMgr.Staff;
 
 public class PrinterDao {
 
@@ -31,7 +31,7 @@ public class PrinterDao {
 	 * @throws BusinessException
 	 * 			throws if the printer with the same name has exist before
 	 */
-	public static int insert(DBCon dbCon, Terminal term, Printer.InsertBuilder builder) throws SQLException, BusinessException{
+	public static int insert(DBCon dbCon, Staff term, Printer.InsertBuilder builder) throws SQLException, BusinessException{
 		
 		Printer printerToAdd = builder.build();
 		
@@ -80,7 +80,7 @@ public class PrinterDao {
 	 * 			throws if the name of printer to update has exist before
 	 * 			throws if the printer to update does NOT exist
 	 */
-	public static void update(DBCon dbCon, Terminal term, Printer.UpdateBuilder builder) throws SQLException, BusinessException{
+	public static void update(DBCon dbCon, Staff term, Printer.UpdateBuilder builder) throws SQLException, BusinessException{
 		
 		Printer printerToUpdate = builder.build();
 		
@@ -121,7 +121,7 @@ public class PrinterDao {
 	 * @throws BusinessException
 	 * 			throws if the printer to delete does NOT exist
 	 */
-	public static void deleteById(DBCon dbCon, Terminal term, int printerId) throws SQLException, BusinessException{
+	public static void deleteById(DBCon dbCon, Staff term, int printerId) throws SQLException, BusinessException{
 		String sql;
 		
 		sql = " SELECT func_id FROM " + Params.dbName + ".print_func" +
@@ -153,7 +153,7 @@ public class PrinterDao {
 	 * @throws SQLException
 	 * 			throws if the printer to delete does NOT exist
 	 */
-	public static List<Printer> getPrinters(Terminal term) throws SQLException{
+	public static List<Printer> getPrinters(Staff term) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -177,7 +177,7 @@ public class PrinterDao {
 	 * @throws BusinessException
 	 * 			throws if the printer to find does NOT exist
 	 */
-	public static Printer getPrinterById(DBCon dbCon, Terminal term, int printerId) throws SQLException, BusinessException{
+	public static Printer getPrinterById(DBCon dbCon, Staff term, int printerId) throws SQLException, BusinessException{
 		List<Printer> result = getPrinters(dbCon, term, " AND printer_id = " + printerId);
 		if(result.isEmpty()){
 			throw new BusinessException(PrintSchemeError.PRINTER_NOT_EXIST);
@@ -196,7 +196,7 @@ public class PrinterDao {
 	 * @throws SQLException
 	 * 			throws if the printer to delete does NOT exist
 	 */
-	public static List<Printer> getPrinters(DBCon dbCon, Terminal term) throws SQLException{
+	public static List<Printer> getPrinters(DBCon dbCon, Staff term) throws SQLException{
 		return getPrinters(dbCon, term, " AND enabled = 1 ");
 	}
 	
@@ -210,14 +210,14 @@ public class PrinterDao {
 	 * @throws SQLException
 	 * 			throws if the printer to delete does NOT exist
 	 */
-	public static List<Printer> getAllPrinters(DBCon dbCon, Terminal term) throws SQLException{
+	public static List<Printer> getAllPrinters(DBCon dbCon, Staff term) throws SQLException{
 		return getPrinters(dbCon, term, null);
 	}
 	
-	private static List<Printer> getPrinters(DBCon dbCon, Terminal term, String extraCond) throws SQLException{
+	private static List<Printer> getPrinters(DBCon dbCon, Staff term, String extraCond) throws SQLException{
 		String sql;
 		sql = " SELECT printer_id, restaurant_id, name, alias, style, enabled FROM " + Params.dbName + ".printer " +
-			  " WHERE restaurant_id = " + term.restaurantID + " " +
+			  " WHERE restaurant_id = " + term.getRestaurantId() + " " +
 			  (extraCond != null ? extraCond : "");
 
 		List<Printer> result = new ArrayList<Printer>();

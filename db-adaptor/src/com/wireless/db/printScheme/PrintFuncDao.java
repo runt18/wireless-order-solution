@@ -15,7 +15,7 @@ import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.pojo.printScheme.PType;
 import com.wireless.pojo.printScheme.PrintFunc;
 import com.wireless.pojo.regionMgr.Region;
-import com.wireless.protocol.Terminal;
+import com.wireless.pojo.staffMgr.Staff;
 
 public class PrintFuncDao {
 	
@@ -36,7 +36,7 @@ public class PrintFuncDao {
 	 * 			throws if the printer does NOT exist
 	 * 			throws if the function type has exist before
 	 */
-	private static int addFunc(DBCon dbCon, Terminal term, int printerId, PrintFunc func) throws SQLException, BusinessException{
+	private static int addFunc(DBCon dbCon, Staff term, int printerId, PrintFunc func) throws SQLException, BusinessException{
 		
 		String sql;
 		
@@ -81,7 +81,7 @@ public class PrintFuncDao {
 				  " VALUES(" +
 				  funcId + "," +
 				  func.getDepartment().getId() + "," +
-				  term.restaurantID + 
+				  term.getRestaurantId() + 
 				  ")";
 			dbCon.stmt.executeUpdate(sql);
 		}
@@ -93,7 +93,7 @@ public class PrintFuncDao {
 				  " VALUES( " +
 				  funcId + "," +
 				  kitchen.getAliasId() + "," +
-				  term.restaurantID + 
+				  term.getRestaurantId() + 
 				  ")";
 			dbCon.stmt.executeUpdate(sql);
 		}
@@ -105,7 +105,7 @@ public class PrintFuncDao {
 				  " VALUES( " +
 				  funcId + "," +
 				  region.getRegionId() + "," +
-				  term.restaurantID +
+				  term.getRestaurantId() +
 				  ")";
 			dbCon.stmt.executeUpdate(sql);
 		}
@@ -130,7 +130,7 @@ public class PrintFuncDao {
 	 * 			throws if the printer does NOT exist
 	 * 			throws if the function type has exist before
 	 */
-	public static int addFunc(DBCon dbCon, Terminal term, int printerId, PrintFunc.SummaryBuilder builder) throws SQLException, BusinessException{
+	public static int addFunc(DBCon dbCon, Staff term, int printerId, PrintFunc.SummaryBuilder builder) throws SQLException, BusinessException{
 		return addFunc(dbCon, term, printerId, builder.build());
 	}
 	
@@ -151,7 +151,7 @@ public class PrintFuncDao {
 	 * 			throws if the printer does NOT exist
 	 * 			throws if the function type has exist before
 	 */
-	public static int addFunc(DBCon dbCon, Terminal term, int printerId, PrintFunc.DetailBuilder builder) throws SQLException, BusinessException{
+	public static int addFunc(DBCon dbCon, Staff term, int printerId, PrintFunc.DetailBuilder builder) throws SQLException, BusinessException{
 		return addFunc(dbCon, term, printerId, builder.build());
 	}
 	/**
@@ -171,15 +171,13 @@ public class PrintFuncDao {
 	 * 			throws if the printer does NOT exist
 	 * 			throws if the function type has exist before
 	 */
-	public static int addFunc(DBCon dbCon, Terminal term, int printerId, PrintFunc.Builder builder) throws SQLException, BusinessException{
+	public static int addFunc(DBCon dbCon, Staff term, int printerId, PrintFunc.Builder builder) throws SQLException, BusinessException{
 		return addFunc(dbCon, term, printerId, builder.build());
 	}
 	
 	/**
 	 * Remove the specific print function according to function id.
-	 * @param dbCon
-	 * 			the database connection
-	 * @param term
+	 * @param staff
 	 * 			the terminal
 	 * @param funcId
 	 * 			the function id to remove
@@ -188,7 +186,30 @@ public class PrintFuncDao {
 	 * @throws BusinessException
 	 * 			throws if the function to delete does NOT exist
 	 */
-	public static void removeFunc(DBCon dbCon, Terminal term, int funcId) throws SQLException, BusinessException{
+	public static void removeFunc(Staff staff, int funcId) throws SQLException, BusinessException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			removeFunc(dbCon, staff, funcId);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Remove the specific print function according to function id.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the terminal
+	 * @param funcId
+	 * 			the function id to remove
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if the function to delete does NOT exist
+	 */
+	public static void removeFunc(DBCon dbCon, Staff staff, int funcId) throws SQLException, BusinessException{
 		String sql;
 		
 		sql = " DELETE FROM " + Params.dbName + ".func_dept WHERE func_id = " + funcId;
@@ -206,23 +227,19 @@ public class PrintFuncDao {
 		}
 	}
 	
-	public static void removeFunc(Terminal term, int funcId) throws SQLException, BusinessException{
-		DBCon dbCon = new DBCon();
-		try{
-			dbCon.connect();
-			removeFunc(dbCon, term, funcId);
-		}finally{
-			dbCon.disconnect();
-		}
-	}
-	
-	public static void updateFunc(DBCon dbCon, Terminal term, int printerId, PrintFunc func) throws SQLException{
+	public static void updateFunc(DBCon dbCon, Staff term, int printerId, PrintFunc func) throws SQLException{
 		//TODO
 	}
 	
-	
-	
-	public static List<PrintFunc> getFuncByPrinterId( int printerId) throws SQLException{
+	/**
+	 * Get the print functions to the specific printer 
+	 * @param printerId
+	 * 			the id to printer
+	 * @return the print functions to this printer
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static List<PrintFunc> getFuncByPrinterId(int printerId) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -231,6 +248,7 @@ public class PrintFuncDao {
 			dbCon.disconnect();
 		}
 	}
+	
 	/**
 	 * Get the print functions to the specific printer 
 	 * @param dbCon

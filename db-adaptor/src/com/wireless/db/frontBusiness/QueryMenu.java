@@ -8,13 +8,14 @@ import com.wireless.db.deptMgr.DepartmentDao;
 import com.wireless.db.deptMgr.KitchenDao;
 import com.wireless.db.distMgr.DiscountDao;
 import com.wireless.db.menuMgr.FoodDao;
+import com.wireless.db.staffMgr.VerifyPin;
 import com.wireless.db.tasteMgr.TasteDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.menuMgr.FoodMenu;
 import com.wireless.pojo.menuMgr.Kitchen;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.tasteMgr.Taste;
-import com.wireless.protocol.Terminal;
 
 public class QueryMenu {
 
@@ -26,7 +27,7 @@ public class QueryMenu {
 	 * @throws SQLException
 	 * 			Throws if fail to execute any SQL statement.
 	 */
-	public static FoodMenu exec(Terminal term) throws BusinessException, SQLException{
+	public static FoodMenu exec(Staff term) throws BusinessException, SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -47,7 +48,7 @@ public class QueryMenu {
 	 * @throws SQLException
 	 * 			Throws if fail to execute any SQL statement.
 	 */
-	public static FoodMenu exec(DBCon dbCon, Terminal term) throws SQLException{
+	public static FoodMenu exec(DBCon dbCon, Staff term) throws SQLException{
 		return new FoodMenu(FoodDao.getFoods(dbCon, term, null, null), 
 							TasteDao.getTasteByCategory(dbCon, term, Taste.Category.TASTE),
 							TasteDao.getTasteByCategory(dbCon, term, Taste.Category.STYLE),

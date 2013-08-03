@@ -11,7 +11,6 @@ import java.util.TimeZone;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.billStatistics.CalcBillStatisticsDao;
-import com.wireless.db.frontBusiness.VerifyPin;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.billStatistics.IncomeByCancel;
@@ -24,8 +23,8 @@ import com.wireless.pojo.billStatistics.IncomeByPay;
 import com.wireless.pojo.billStatistics.IncomeByRepaid;
 import com.wireless.pojo.billStatistics.IncomeByService;
 import com.wireless.pojo.billStatistics.ShiftDetail;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.system.Shift;
-import com.wireless.protocol.Terminal;
 import com.wireless.util.DateType;
 import com.wireless.util.SQLUtil;
 
@@ -46,11 +45,11 @@ public class QueryShiftDao {
 	 * @throws SQLException
 	 *             throws if fail to execute any SQL statement
 	 */
-	public static ShiftDetail execDailybyNow(Terminal term) throws BusinessException, SQLException{
+	public static ShiftDetail execDailybyNow(Staff staff) throws BusinessException, SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return execDailyByNow(dbCon, term);
+			return execDailyByNow(dbCon, staff);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -61,7 +60,7 @@ public class QueryShiftDao {
 	 * Note that the database base should be connected before invoking this method.
 	 * @param dbCon
 	 * 			The database connection
-	 * @param term
+	 * @param staff
 	 * 			The terminal
 	 * @return The daily detail record
 	 * @throws BusinessException
@@ -71,7 +70,7 @@ public class QueryShiftDao {
 	 * @throws SQLException
 	 *             throws if fail to execute any SQL statement
 	 */
-	public static ShiftDetail execDailyByNow(DBCon dbCon, Terminal term) throws BusinessException, SQLException{
+	public static ShiftDetail execDailyByNow(DBCon dbCon, Staff staff) throws BusinessException, SQLException{
 		/**
 		 * Get the latest off duty date from daily settle history 
 		 * and make it as the on duty date to this daily shift
@@ -80,7 +79,7 @@ public class QueryShiftDao {
 		String sql = " SELECT MAX(off_duty) FROM " +
 					 Params.dbName + ".daily_settle_history " +
 					 " WHERE " +
-					 " restaurant_id=" + term.restaurantID;
+					 " restaurant_id=" + staff.getRestaurantId();
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		if(dbCon.rs.next()){
 			Timestamp offDuty = dbCon.rs.getTimestamp(1);
@@ -101,16 +100,14 @@ public class QueryShiftDao {
 		sdf.setTimeZone(TimeZone.getTimeZone("GMT+8"));
 		String offDuty = sdf.format(System.currentTimeMillis());
 		
-		return exec(dbCon, term, onDuty, offDuty, CalcBillStatisticsDao.QUERY_TODAY);
+		return exec(dbCon, staff, onDuty, offDuty, CalcBillStatisticsDao.QUERY_TODAY);
 	}
 	
 	/**
 	 * Perform to query the shift information through now to last shift.
 	 * 
-	 * @param pin
-	 *            the pin to this terminal
-	 * @param model
-	 *            the model to this terminal
+	 * @param staff
+	 *            the staff 
 	 * @return the shift detail information
 	 * @throws BusinessException
 	 *             throws if one the cases below.<br>
@@ -119,11 +116,11 @@ public class QueryShiftDao {
 	 * @throws SQLException
 	 *             throws if fail to execute any SQL statement
 	 */
-	public static ShiftDetail execByNow(long pin, short model) throws BusinessException, SQLException{
+	public static ShiftDetail execByNow(Staff staff) throws BusinessException, SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return execByNow(dbCon, pin, model);
+			return execByNow(dbCon, staff);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -135,10 +132,8 @@ public class QueryShiftDao {
 	 * 
 	 * @param dbCon
 	 *            the database connection
-	 * @param pin
-	 *            the pin to this terminal
-	 * @param model
-	 *            the model to this terminal
+	 * @param staff
+	 *            the staff 
 	 * @return the shift detail information
 	 * @throws BusinessException
 	 *             throws if one the cases below.<br>
@@ -147,9 +142,7 @@ public class QueryShiftDao {
 	 * @throws SQLException
 	 *             throws if fail to execute any SQL statement
 	 */
-	public static ShiftDetail execByNow(DBCon dbCon, long pin, short model) throws BusinessException, SQLException{
-		
-		Terminal term = VerifyPin.exec(dbCon, pin, model);
+	public static ShiftDetail execByNow(DBCon dbCon, Staff staff) throws BusinessException, SQLException{
 		
 		/**
 		 * Get the latest off duty date from the tables below.
@@ -160,9 +153,9 @@ public class QueryShiftDao {
 		 */
 		String onDuty;
 		String sql = "SELECT MAX(off_duty) FROM (" +
-					 "SELECT off_duty FROM " + Params.dbName + ".shift WHERE restaurant_id=" + term.restaurantID + " UNION " +
-					 "SELECT off_duty FROM " + Params.dbName + ".shift_history WHERE restaurant_id=" + term.restaurantID + " UNION " +
-					 "SELECT off_duty FROM " + Params.dbName + ".daily_settle_history WHERE restaurant_id=" + term.restaurantID +
+					 "SELECT off_duty FROM " + Params.dbName + ".shift WHERE restaurant_id=" + staff.getRestaurantId() + " UNION " +
+					 "SELECT off_duty FROM " + Params.dbName + ".shift_history WHERE restaurant_id=" + staff.getRestaurantId() + " UNION " +
+					 "SELECT off_duty FROM " + Params.dbName + ".daily_settle_history WHERE restaurant_id=" + staff.getRestaurantId() +
 					 ") AS all_off_duty";
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		if(dbCon.rs.next()){
@@ -184,20 +177,18 @@ public class QueryShiftDao {
 		sdf.setTimeZone(TimeZone.getTimeZone("GMT+8"));
 		String offDuty = sdf.format(System.currentTimeMillis());
 		
-		return exec(dbCon, term, onDuty, offDuty, CalcBillStatisticsDao.QUERY_TODAY);
+		return exec(dbCon, staff, onDuty, offDuty, CalcBillStatisticsDao.QUERY_TODAY);
 
 	}
 	
-	public static ShiftDetail execDailySettleByNow(long pin) throws BusinessException, SQLException{
+	public static ShiftDetail execDailySettleByNow(Staff staff) throws BusinessException, SQLException{
 		
 		DBCon dbCon = new DBCon();
 		dbCon.connect();
 		
-		Terminal term = VerifyPin.exec(dbCon, pin, Terminal.MODEL_STAFF);
-		
 		String onDuty;
 		String sql = "SELECT MAX(off_duty) FROM (" +
-					 "SELECT off_duty FROM " + Params.dbName + ".daily_settle_history WHERE restaurant_id=" + term.restaurantID +
+					 "SELECT off_duty FROM " + Params.dbName + ".daily_settle_history WHERE restaurant_id=" + staff.getRestaurantId() +
 					 ") AS all_off_duty";
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		if(dbCon.rs.next()){
@@ -219,70 +210,10 @@ public class QueryShiftDao {
 		sdf.setTimeZone(TimeZone.getTimeZone("GMT+8"));
 		String offDuty = sdf.format(System.currentTimeMillis());
 		
-		return exec(dbCon, term, onDuty, offDuty, CalcBillStatisticsDao.QUERY_TODAY);
+		return exec(dbCon, staff, onDuty, offDuty, CalcBillStatisticsDao.QUERY_TODAY);
 
 	}
 	
-	
-	/**
-	 * Generate the details to shift within the on & off duty date.
-	 * @param dbCon
-	 * 			the database connection
-	 * @param term
-	 * 			the terminal to request
-	 * @param onDuty
-	 * 			the date to be on duty
-	 * @param offDuty
-	 * 			the date to be off duty
-	 * @param queryType
-	 * 			indicate which query type should use
-	 * 			it is one of values below.
-	 * 			- QUERY_TODAY
-	 * 		    - QUERY_HISTORY
-	 * @return the shift detail information
-	 * @throws SQLException
-	 * 			throws if fail to execute any SQL statement
-	 * @throws BusinessException throws if either of cases below.<br>
-	 * 							 - The terminal is NOT attached with any restaurant.<br>
-	 * 							 - The terminal is expired.
-	 */
-	public static ShiftDetail exec(long pin, short model, String onDuty, String offDuty, int queryType) throws SQLException, BusinessException{
-		DBCon dbCon = new DBCon();
-		try{
-			dbCon.connect();
-			return exec(dbCon, pin, model, onDuty, offDuty, queryType);
-		}finally{
-			dbCon.disconnect();
-		}
-	}
-	
-	/**
-	 * Generate the details to shift within the on & off duty date.
-	 * Note that database should be connected before invoking this method.
-	 * @param dbCon
-	 * 			the database connection
-	 * @param term
-	 * 			the terminal to request
-	 * @param onDuty
-	 * 			the date to be on duty
-	 * @param offDuty
-	 * 			the date to be off duty
-	 * @param queryType
-	 * 			indicate which query type should use
-	 * 			it is one of values below.
-	 * 			- QUERY_TODAY
-	 * 		    - QUERY_HISTORY
-	 * @return the shift detail information
-	 * @throws SQLException
-	 * 			throws if fail to execute any SQL statement
-	 * @throws BusinessException throws if either of cases below.<br>
-	 * 							 - The terminal is NOT attached with any restaurant.<br>
-	 * 							 - The terminal is expired.
-	 */
-	public static ShiftDetail exec(DBCon dbCon, long pin, short model, String onDuty, String offDuty, int queryType) throws SQLException, BusinessException{
-		return exec(dbCon, VerifyPin.exec(dbCon, pin, model), onDuty, offDuty, queryType);
-	}
-	
 	/**
 	 * Generate the details to shift within the on & off duty date.
 	 * @param dbCon
@@ -302,7 +233,7 @@ public class QueryShiftDao {
 	 * @throws SQLException
 	 * 			throws if fail to execute any SQL statement
 	 */
-	public static ShiftDetail exec(Terminal term, String onDuty, String offDuty, int queryType) throws SQLException{
+	public static ShiftDetail exec(Staff term, String onDuty, String offDuty, int queryType) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -332,7 +263,7 @@ public class QueryShiftDao {
 	 * @throws SQLException
 	 * 			throws if fail to execute any SQL statement
 	 */
-	public static ShiftDetail exec(DBCon dbCon, Terminal term, String onDuty, String offDuty, int queryType) throws SQLException{
+	public static ShiftDetail exec(DBCon dbCon, Staff term, String onDuty, String offDuty, int queryType) throws SQLException{
 		
 		ShiftDetail result = new ShiftDetail();
 		result.setOnDuty(onDuty);

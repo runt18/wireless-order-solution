@@ -9,17 +9,18 @@ import java.util.List;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.deptMgr.DepartmentDao;
+import com.wireless.db.staffMgr.VerifyPin;
 import com.wireless.db.stockMgr.StockActionDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.inventoryMgr.MaterialCate;
 import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.restaurantMgr.Restaurant;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.stockMgr.StockAction;
 import com.wireless.pojo.stockMgr.StockAction.AuditBuilder;
 import com.wireless.pojo.stockMgr.StockActionDetail;
 import com.wireless.pojo.tasteMgr.TasteGroup;
-import com.wireless.protocol.Terminal;
 
 public class DailySettleDao {
 	
@@ -153,7 +154,7 @@ public class DailySettleDao {
 		
 		String sql;
 		
-		List<Terminal> terms = new ArrayList<Terminal>();
+		List<Staff> terms = new ArrayList<Staff>();
 		
 		//Filter the restaurant whose order record exceed 1 day.
 		sql = " SELECT restaurant_id " +
@@ -166,15 +167,15 @@ public class DailySettleDao {
 			  " HAVING TO_DAYS(NOW()) - TO_DAYS(MIN(order_date)) > 1 ";
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		while(dbCon.rs.next()){
-			Terminal term = new Terminal();
-			term.restaurantID = dbCon.rs.getInt("restaurant_id");
-			term.owner = "system";
+			Staff term = new Staff();
+			term.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
+			term.setName("system");
 			terms.add(term);
 		}
 		dbCon.rs.close();		
 		
 		Result result = new Result();
-		for(Terminal term : terms){			
+		for(Staff term : terms){			
 			Result eachResult = exec(dbCon, term, SettleType.AUTO_MATION);
 			
 			result.setTotalOrder(result.getTotalOrder() + eachResult.getTotalOrder());
@@ -246,7 +247,7 @@ public class DailySettleDao {
 	 *             throws if fail to execute any SQL statement
 	 * @throws BusinessException
 	 */
-	public static Result exec(Terminal term) throws SQLException, BusinessException{
+	public static Result exec(Staff term) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -271,7 +272,7 @@ public class DailySettleDao {
 	 *             throws if fail to execute any SQL statement
 	 * @throws BusinessException
 	 */
-	public static Result exec(DBCon dbCon, Terminal term, SettleType type) throws SQLException, BusinessException{
+	public static Result exec(DBCon dbCon, Staff term, SettleType type) throws SQLException, BusinessException{
 		Result result = new Result();
 		
 		//Perform food material consumption
@@ -282,7 +283,7 @@ public class DailySettleDao {
 			
 			for(MaterialCate.Type cateType : MaterialCate.Type.values()){
 				
-				StockAction.InsertBuilder builder = StockAction.InsertBuilder.newUseUp(term.restaurantID, dept, cateType);
+				StockAction.InsertBuilder builder = StockAction.InsertBuilder.newUseUp(term.getRestaurantId(), dept, cateType);
 				
 				String sql;
 				
@@ -296,7 +297,7 @@ public class DailySettleDao {
 				      " JOIN " + Params.dbName + ".material M ON FM.material_id = M.material_id " +
 					  " JOIN " + Params.dbName + ".material_cate MC ON M.cate_id = MC.cate_id " +
 					  " WHERE 1 = 1 " +
-					  " AND O.restaurant_id = " + term.restaurantID +
+					  " AND O.restaurant_id = " + term.getRestaurantId() +
 					  " AND O.status <> " + Order.Status.UNPAID.getVal() +
 					  " AND OF.dept_id = " + dept.getId() +
 					  " AND MC.type = " + cateType.getValue() +
@@ -338,7 +339,7 @@ public class DailySettleDao {
 		 */
 		sql = " SELECT MAX(off_duty) FROM " + Params.dbName + ".daily_settle_history " +
 			  " WHERE " +
-			  " restaurant_id = " + term.restaurantID;
+			  " restaurant_id = " + term.getRestaurantId();
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		if(dbCon.rs.next()){
 			Timestamp offDuty = dbCon.rs.getTimestamp(1);
@@ -358,7 +359,7 @@ public class DailySettleDao {
 		sql = " SELECT id, category FROM " + Params.dbName + ".order " +
 			  " WHERE " +
 			  " (status = " + Order.Status.PAID.getVal() + " OR " + " status = " + Order.Status.REPAID.getVal() + ")" +
-			 (term.restaurantID < 0 ? "" : "AND restaurant_id=" + term.restaurantID);
+			 (term.getRestaurantId() < 0 ? "" : "AND restaurant_id=" + term.getRestaurantId());
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		while(dbCon.rs.next()){
 			
@@ -396,7 +397,7 @@ public class DailySettleDao {
 		//get the amount to shift record
 		sql = " SELECT COUNT(*) FROM " + Params.dbName + ".shift " +
 			  " WHERE 1=1 " +
-			  (term.restaurantID < 0 ? "AND restaurant_id <> " + Restaurant.ADMIN : "AND restaurant_id=" + term.restaurantID);
+			  (term.getRestaurantId() < 0 ? "AND restaurant_id <> " + Restaurant.ADMIN : "AND restaurant_id=" + term.getRestaurantId());
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		if(dbCon.rs.next()){
 			result.setTotalShift(dbCon.rs.getInt(1));
@@ -567,13 +568,13 @@ public class DailySettleDao {
 			//Move the shift record from 'shift' to 'shift_history'.
 			sql = " INSERT INTO " + Params.dbName + ".shift_history (" + shiftItem + ") " +
 				  " SELECT " + shiftItem + " FROM " + Params.dbName + ".shift " +
-				  " WHERE " + (term.restaurantID < 0 ? "" : "restaurant_id=" + term.restaurantID);
+				  " WHERE " + (term.getRestaurantId() < 0 ? "" : "restaurant_id=" + term.getRestaurantId());
 			dbCon.stmt.executeUpdate(sql);
 			
 			//Create the daily settle record
 			sql = " INSERT INTO " + Params.dbName + ".daily_settle_history (`restaurant_id`, `name`, `on_duty`, `off_duty`) VALUES (" +
-				  term.restaurantID + ", " +
-				  "'" + (term.owner == null ? "" : term.owner) + "', " +
+				  term.getRestaurantId() + ", " +
+				  "'" + (term.getName() == null ? "" : term.getName()) + "', " +
 				  onDuty + ", " +
 				  " NOW() " +
 				  " ) ";
@@ -644,7 +645,7 @@ public class DailySettleDao {
 			}
 			
 			//Delete the shift record from "shift".
-			sql = " DELETE FROM " + Params.dbName + ".shift WHERE " + (term.restaurantID < 0 ? "" : "restaurant_id=" + term.restaurantID);
+			sql = " DELETE FROM " + Params.dbName + ".shift WHERE " + (term.getRestaurantId() < 0 ? "" : "restaurant_id=" + term.getRestaurantId());
 			dbCon.stmt.executeUpdate(sql);
 			
 			//Delete the member operation 
@@ -798,7 +799,7 @@ public class DailySettleDao {
 	 * 			return int[0] if no paid order exist. 
 	 * @throws SQLException
 	 */
-	public static int[] check(DBCon dbCon, Terminal term) throws SQLException{
+	public static int[] check(DBCon dbCon, Staff term) throws SQLException{
 		String sql;
 		int[] restOrderID = new int[0];
 		
@@ -807,8 +808,8 @@ public class DailySettleDao {
 		 */
 		String lastOffDuty;
 		sql = "SELECT MAX(off_duty) FROM (" +
-		 	  "SELECT off_duty FROM " + Params.dbName + ".shift WHERE restaurant_id=" + term.restaurantID + " UNION " +
-			  "SELECT off_duty FROM " + Params.dbName + ".shift_history WHERE restaurant_id=" + term.restaurantID + ") AS all_off_duty";
+		 	  "SELECT off_duty FROM " + Params.dbName + ".shift WHERE restaurant_id=" + term.getRestaurantId() + " UNION " +
+			  "SELECT off_duty FROM " + Params.dbName + ".shift_history WHERE restaurant_id=" + term.getRestaurantId() + ") AS all_off_duty";
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		if(dbCon.rs.next()){
 			Timestamp offDuty = dbCon.rs.getTimestamp(1);
@@ -828,7 +829,7 @@ public class DailySettleDao {
 		 * get the paid orders which has NOT been shifted between the last off duty and now,
 		 */
 		sql = " SELECT id FROM " + Params.dbName + ".order WHERE " +
-			  " restaurant_id = " + term.restaurantID + " AND " +
+			  " restaurant_id = " + term.getRestaurantId() + " AND " +
 			  " (status = " + Order.Status.PAID.getVal() + " OR " + " status = " + Order.Status.REPAID.getVal() + ")" + " AND " +
 			  " order_date BETWEEN " +
 			  "'" + lastOffDuty + "'" + " AND " + "NOW()";

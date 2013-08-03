@@ -1,43 +1,41 @@
 package com.wireless.test.db.stockMgr;
 
+import static org.junit.Assert.assertEquals;
+
 import java.beans.PropertyVetoException;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.Assert.*;
-
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.wireless.db.deptMgr.DepartmentDao;
-import com.wireless.db.frontBusiness.VerifyPin;
 import com.wireless.db.inventoryMgr.MaterialDao;
+import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.stockMgr.MaterialDeptDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.DeptError;
 import com.wireless.exception.MaterialError;
 import com.wireless.pojo.inventoryMgr.Material;
 import com.wireless.pojo.menuMgr.Department;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.stockMgr.MaterialDept;
-import com.wireless.protocol.Terminal;
 import com.wireless.test.db.TestInit;
 import com.wireless.util.SQLUtil;
 
 public class TestMaterialDept {
 
-	private static Terminal mTerminal;
+	private static Staff mStaff;
 	
 	@BeforeClass
 	public static void initDBParam() throws BusinessException, SQLException, PropertyVetoException{
 			
 		TestInit.init();
 		try{
-			mTerminal = VerifyPin.exec(217, Terminal.MODEL_STAFF);
+			mStaff = StaffDao.getStaffs(37).get(0);
 		}catch(SQLException e){
-			e.printStackTrace();
-		}catch(BusinessException e){
 			e.printStackTrace();
 		}
 	}
@@ -52,7 +50,7 @@ public class TestMaterialDept {
 	@Test
 	public void testInsertMaterialDept() throws SQLException, BusinessException{
 		Department dept;
-		List<Department> depts = DepartmentDao.getDepartments(mTerminal, null, null);
+		List<Department> depts = DepartmentDao.getDepartments(mStaff, null, null);
 		if(depts.isEmpty()){
 			throw new BusinessException(DeptError.DEPT_NOT_EXIST);
 		}else{
@@ -60,7 +58,7 @@ public class TestMaterialDept {
 		}
 		
 		Map<Object, Object> params = new HashMap<Object, Object>();
-		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + mTerminal.restaurantID);
+		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + mStaff.getRestaurantId());
 		List<Material> materials = MaterialDao.getContent(params);
 		if(materials.isEmpty()){
 			throw new BusinessException(MaterialError.SELECT_NOT_ADD);
@@ -69,26 +67,26 @@ public class TestMaterialDept {
 		//mDept.setMaterialId(3);
 		materialDept.setMaterialId(materials.get(0).getId());
 		materialDept.setDeptId(dept.getId());
-		materialDept.setRestaurantId(mTerminal.restaurantID);
+		materialDept.setRestaurantId(mStaff.getRestaurantId());
 		materialDept.setStock(6);
 		
-		MaterialDeptDao.insertMaterialDept(mTerminal, materialDept); 	
+		MaterialDeptDao.insertMaterialDept(mStaff, materialDept); 	
 		
 		materialDept.setMaterialId(materials.get(1).getId());
 		materialDept.setDeptId(dept.getId());
-		materialDept.setRestaurantId(mTerminal.restaurantID);
+		materialDept.setRestaurantId(mStaff.getRestaurantId());
 		materialDept.setStock(9);
 		
-		MaterialDeptDao.insertMaterialDept(mTerminal, materialDept); 	
-		List<MaterialDept> MaterialDepts = MaterialDeptDao.getMaterialDepts(mTerminal, " AND material_id = " + materials.get(1).getId() + " AND dept_id = " + dept.getId(), null);
+		MaterialDeptDao.insertMaterialDept(mStaff, materialDept); 	
+		List<MaterialDept> MaterialDepts = MaterialDeptDao.getMaterialDepts(mStaff, " AND material_id = " + materials.get(1).getId() + " AND dept_id = " + dept.getId(), null);
 		
 		compare(materialDept, MaterialDepts.get(0));	
 		
 		//修改库存量
 		materialDept.plusStock(89);
-		MaterialDeptDao.updateMaterialDept(mTerminal, materialDept);
+		MaterialDeptDao.updateMaterialDept(mStaff, materialDept);
 		
-		MaterialDept actual = MaterialDeptDao.getMaterialDepts(mTerminal, " AND material_id = " +materialDept.getMaterialId() + " AND dept_id = " + materialDept.getDeptId(), null).get(0);
+		MaterialDept actual = MaterialDeptDao.getMaterialDepts(mStaff, " AND material_id = " +materialDept.getMaterialId() + " AND dept_id = " + materialDept.getDeptId(), null).get(0);
 		compare(materialDept, actual);
 		
 	

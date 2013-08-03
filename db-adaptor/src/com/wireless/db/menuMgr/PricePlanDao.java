@@ -8,7 +8,7 @@ import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.ppMgr.PricePlan;
-import com.wireless.protocol.Terminal;
+import com.wireless.pojo.staffMgr.Staff;
 
 public class PricePlanDao {
 	
@@ -22,7 +22,7 @@ public class PricePlanDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statements.
 	 */
-	public static List<PricePlan> getPricePlans(Terminal term, String extraCond, String orderClause) throws SQLException{
+	public static List<PricePlan> getPricePlans(Staff term, String extraCond, String orderClause) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -33,7 +33,7 @@ public class PricePlanDao {
 	}
 	
 	/**
-	 * Get the price plan to a specified restaurant defined in {@link Terminal} according the specific condition and order clause
+	 * Get the price plan to a specified restaurant defined in {@link Staff} according the specific condition and order clause
 	 * @param dbCon
 	 * 			the database connection to this query
 	 * @param extraCond
@@ -44,14 +44,14 @@ public class PricePlanDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statements.
 	 */
-	public static List<PricePlan> getPricePlans(DBCon dbCon, Terminal term, String extraCond, String orderClause) throws SQLException{
+	public static List<PricePlan> getPricePlans(DBCon dbCon, Staff term, String extraCond, String orderClause) throws SQLException{
 		String sql;
 		sql = " SELECT " +
 			  " price_plan_id, restaurant_id, name, status " +
 			  " FROM " + 
 			  Params.dbName + ".price_plan PP " +
 			  " WHERE 1 = 1 " +
-			  " AND PP.restaurant_id = " + term.restaurantID + " " +
+			  " AND PP.restaurant_id = " + term.getRestaurantId() + " " +
 			  (extraCond != null ? extraCond : "") + " " +
 			  (orderClause != null ? orderClause : "");
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
@@ -82,7 +82,7 @@ public class PricePlanDao {
 	 * @throws BusinessException
 	 * 			throws if the price plan to this specified id is NOT found
 	 */
-	public static PricePlan getPricePlanById(DBCon dbCon, Terminal term, int pricePlanId) throws SQLException, BusinessException{
+	public static PricePlan getPricePlanById(DBCon dbCon, Staff term, int pricePlanId) throws SQLException, BusinessException{
 		List<PricePlan> result = getPricePlans(dbCon, term, "AND PP.price_plan_id = " + pricePlanId, null);
 		if(result.isEmpty()){
 			throw new BusinessException("The price plan(id = " + pricePlanId + ") is NOT found.");
@@ -92,7 +92,7 @@ public class PricePlanDao {
 	}
 
 	/**
-	 * Get the active price plan to a specified restaurant defined in {@link Terminal}.
+	 * Get the active price plan to a specified restaurant defined in {@link Staff}.
 	 * @param dbCon
 	 * 			the database connection
 	 * @param term
@@ -103,10 +103,10 @@ public class PricePlanDao {
 	 * @throws BusinessException
 	 * 			throws if the active price plan to this specified restaurant is NOT found
 	 */
-	public static PricePlan getActivePricePlan(DBCon dbCon, Terminal term) throws SQLException, BusinessException{
+	public static PricePlan getActivePricePlan(DBCon dbCon, Staff term) throws SQLException, BusinessException{
 		List<PricePlan> result = getPricePlans(dbCon, term, "AND PP.status = " + PricePlan.Status.ACTIVITY.getVal(), null);
 		if(result.isEmpty()){
-			throw new BusinessException("The active price plan to restuarnt(id = " + term.restaurantID + ") is NOT found.");
+			throw new BusinessException("The active price plan to restuarnt(id = " + term.getRestaurantId() + ") is NOT found.");
 		}else{
 			return result.get(0);
 		}

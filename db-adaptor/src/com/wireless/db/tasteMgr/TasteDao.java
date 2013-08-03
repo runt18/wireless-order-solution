@@ -8,13 +8,13 @@ import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.TasteError;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.tasteMgr.Taste;
-import com.wireless.protocol.Terminal;
 
 public class TasteDao {
 
 	/**
-	 * Get the tastes to the specified restaurant defined in {@link Terminal} and category {@link Taste.Category}.
+	 * Get the tastes to the specified restaurant defined in {@link Staff} and category {@link Taste.Category}.
 	 * @param dbCon
 	 * 			the database connection
 	 * @param term
@@ -25,7 +25,7 @@ public class TasteDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static List<Taste> getTasteByCategory(DBCon dbCon, Terminal term, Taste.Category category) throws SQLException{
+	public static List<Taste> getTasteByCategory(DBCon dbCon, Staff term, Taste.Category category) throws SQLException{
 		return getTastes(dbCon, term, " AND TASTE.category = " + category.getVal(), null);
 	}
 	
@@ -43,17 +43,17 @@ public class TasteDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static Taste getTasteByAlias(DBCon dbCon, Terminal term, int tasteAlias) throws BusinessException, SQLException{
+	public static Taste getTasteByAlias(DBCon dbCon, Staff term, int tasteAlias) throws BusinessException, SQLException{
 		List<Taste> tastes = getTastes(dbCon, term, " AND TASTE.taste_alias = " + tasteAlias, null);
 		if(tastes.isEmpty()){
-			throw new BusinessException("The taste(alias = " + tasteAlias + ", restaurant_id = " + term.restaurantID + ") is NOT found.");
+			throw new BusinessException("The taste(alias = " + tasteAlias + ", restaurant_id = " + term.getRestaurantId() + ") is NOT found.");
 		}else{
 			return tastes.get(0);
 		}
 	}
 	
 	/**
-	 * Get the tastes to the specified restaurant defined in {@link Terminal} and other extra condition.
+	 * Get the tastes to the specified restaurant defined in {@link Staff} and other extra condition.
 	 * @param dbCon
 	 * 			the database connection
 	 * @param term
@@ -66,14 +66,14 @@ public class TasteDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static List<Taste> getTastes(DBCon dbCon, Terminal term, String extraCond, String orderClause) throws SQLException{
+	public static List<Taste> getTastes(DBCon dbCon, Staff term, String extraCond, String orderClause) throws SQLException{
 		String sql = " SELECT " +
 				 	 " taste_id, taste_alias, restaurant_id, preference, " +
 				 	 " category, calc, rate, price, type " +
 				 	 " FROM " + 
 				 	 Params.dbName + ".taste TASTE " +
 				 	 " WHERE 1=1 " +
-				 	 " AND TASTE.restaurant_id = " + term.restaurantID + " " +
+				 	 " AND TASTE.restaurant_id = " + term.getRestaurantId() + " " +
 				 	 (extraCond == null ? "" : extraCond) + " " +
 				 	 (orderClause == null ? "" : orderClause);
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
@@ -106,7 +106,7 @@ public class TasteDao {
 	 * @return
 	 * @throws SQLException
 	 */
-	public static List<Taste> getTastes(Terminal term, String extraCond, String orderClause) throws SQLException{
+	public static List<Taste> getTastes(Staff term, String extraCond, String orderClause) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -124,7 +124,7 @@ public class TasteDao {
 	 * @return
 	 * @throws SQLException
 	 */
-	public static Taste getTasteById(DBCon dbCon, Terminal term, int id) throws SQLException{
+	public static Taste getTasteById(DBCon dbCon, Staff term, int id) throws SQLException{
 		List<Taste> list = TasteDao.getTastes(dbCon, term, " AND taste_id = " + id, null);
 		if(list != null && !list.isEmpty()){
 			return list.get(0);
@@ -139,7 +139,7 @@ public class TasteDao {
 	 * @return
 	 * @throws SQLException
 	 */
-	public static Taste getTasteById(Terminal term, int id) throws SQLException{
+	public static Taste getTasteById(Staff term, int id) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -177,9 +177,9 @@ public class TasteDao {
 	 * @throws BusinessException
 	 * @throws SQLException
 	 */
-	public static int insert(DBCon dbCon, Terminal term, Taste insert) throws BusinessException, SQLException{
+	public static int insert(DBCon dbCon, Staff term, Taste insert) throws BusinessException, SQLException{
 		int count = 0;
-		if(TasteDao.hasAlias(dbCon, term.restaurantID, insert.getAliasId())){
+		if(TasteDao.hasAlias(dbCon, term.getRestaurantId(), insert.getAliasId())){
 			throw new BusinessException(TasteError.HAS_ALIAS);
 		}
 		String insertSQL = "INSERT INTO " + Params.dbName + ".taste"
@@ -203,7 +203,7 @@ public class TasteDao {
 	 * @throws BusinessException
 	 * @throws SQLException
 	 */
-	public static void insert(Terminal term, Taste insert) throws BusinessException, SQLException{
+	public static void insert(Staff term, Taste insert) throws BusinessException, SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -225,12 +225,12 @@ public class TasteDao {
 	 * @throws BusinessException
 	 * @throws SQLException
 	 */
-	public static int update(DBCon dbCon, Terminal term, Taste update) throws BusinessException, SQLException{
+	public static int update(DBCon dbCon, Staff term, Taste update) throws BusinessException, SQLException{
 		int count = 0;
 		Taste old = TasteDao.getTasteById(dbCon, term, update.getTasteId());
 		// 如果新旧编号不一样.则再次检查新编号是否已存在
 		if(old.getAliasId() != update.getAliasId()){
-			if(TasteDao.hasAlias(dbCon, term.restaurantID, update.getAliasId())){
+			if(TasteDao.hasAlias(dbCon, term.getRestaurantId(), update.getAliasId())){
 				throw new BusinessException(TasteError.HAS_ALIAS);
 			}
 		}
@@ -241,7 +241,7 @@ public class TasteDao {
 						 + " price = " + update.getPrice() + ","
 						 + " category = " + update.getCategory().getVal() + ","
 						 + " taste_alias = " + update.getAliasId() 
-						 + " WHERE restaurant_id = " + term.restaurantID 
+						 + " WHERE restaurant_id = " + term.getRestaurantId() 
 						 + " AND taste_id = " + update.getTasteId();
 		count = dbCon.stmt.executeUpdate(updateSQL);
 		return count;
@@ -253,7 +253,7 @@ public class TasteDao {
 	 * @throws BusinessException
 	 * @throws SQLException
 	 */
-	public static void update(Terminal term, Taste update) throws BusinessException, SQLException{
+	public static void update(Staff term, Taste update) throws BusinessException, SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -273,11 +273,11 @@ public class TasteDao {
 	 * @return
 	 * @throws SQLException
 	 */
-	public static int delete(DBCon dbCon, Terminal term, int id) throws SQLException{
+	public static int delete(DBCon dbCon, Staff term, int id) throws SQLException{
 		int count = 0;
 		String deleteSQL = "DELETE FROM " + Params.dbName + ".taste"
 			+ " WHERE taste_id = " + id
-			+ " AND restaurant_id = " + term.restaurantID;
+			+ " AND restaurant_id = " + term.getRestaurantId();
 		count = dbCon.stmt.executeUpdate(deleteSQL);
 		return count;
 	}
@@ -288,7 +288,7 @@ public class TasteDao {
 	 * @throws BusinessException
 	 * @throws SQLException
 	 */
-	public static void delete(Terminal term, int id) throws BusinessException, SQLException{
+	public static void delete(Staff term, int id) throws BusinessException, SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();

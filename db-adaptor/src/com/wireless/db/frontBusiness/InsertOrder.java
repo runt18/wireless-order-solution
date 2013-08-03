@@ -17,47 +17,16 @@ import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.regionMgr.Table;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.tasteMgr.Taste;
 import com.wireless.pojo.tasteMgr.TasteGroup;
-import com.wireless.protocol.Terminal;
 
 public class InsertOrder {
-	/**
-	 * Insert a new order according to the specific order detail information.
-	 * @param pin the pin to this terminal
-	 * @param model the model to this terminal
-	 * @param orderToInsert the order information submitted by terminal, 
-	 * 						refer to class "ReqInsertOrder" for more detail about what information the order contains 
-	 * @throws BusinessException throws if one of cases below.<br>
-	 * 							 - The terminal is NOT attached to any restaurant.<br>
-	 * 							 - The terminal is expired.<br>
-	 * 							 - The table associated with this order does NOT exist.<br>
-	 * 							 - The table associated with this order is BUSY.<br>
-	 * 							 - Any food query to insert does NOT exist.<br>
-	 * 							 - Any food to this order does NOT exist.<br>
-	 * @throws SQLException throws if fail to execute any SQL statement
-	 * @return Order completed information to inserted order
-	 */
-	public static Order exec(long pin, short model, Order orderToInsert) throws BusinessException, SQLException{
-		
-		DBCon dbCon = new DBCon();
-			
-		try{
-			dbCon.connect();
-			
-			Terminal term = VerifyPin.exec(dbCon, pin, model);
-			
-			return exec(dbCon, term, orderToInsert);
-				
-		}finally{
-			dbCon.disconnect();
-		}			
-	}
 	
 	/**
 	 * Insert a new order according to the specific order detail information.
 	 * 
-	 * @param term
+	 * @param staff
 	 *            the terminal to query
 	 * @param orderToInsert
 	 *            the order information submitted by terminal, refer to class
@@ -75,14 +44,14 @@ public class InsertOrder {
 	 *             throws if fail to execute any SQL statement
 	 * @return Order completed information to inserted order
 	 */
-	public static Order exec(Terminal term, Order orderToInsert) throws BusinessException, SQLException{
+	public static Order exec(Staff staff, Order orderToInsert) throws BusinessException, SQLException{
 		
 		DBCon dbCon = new DBCon();
 		
 		try{
 			dbCon.connect();
 			
-			return exec(dbCon, term, orderToInsert);
+			return exec(dbCon, staff, orderToInsert);
 			
 		}finally{
 			dbCon.disconnect();
@@ -95,7 +64,7 @@ public class InsertOrder {
 	 * 
 	 * @param dbCon
 	 * 			  the database connection
-	 * @param term
+	 * @param staff
 	 *            the terminal to query
 	 * @param orderToInsert
 	 *            the order information submitted by terminal, refer to class
@@ -113,9 +82,9 @@ public class InsertOrder {
 	 *             throws if fail to execute any SQL statement
 	 * @return Order completed information to inserted order
 	 */
-	public static Order exec(DBCon dbCon, Terminal term, Order orderToInsert) throws BusinessException, SQLException{
+	public static Order exec(DBCon dbCon, Staff staff, Order orderToInsert) throws BusinessException, SQLException{
 		
-		doPrepare(dbCon, term, orderToInsert);
+		doPrepare(dbCon, staff, orderToInsert);
 		
 		/**
 		 * Put all the INSERT statements into a database transition so as to assure 
@@ -126,7 +95,7 @@ public class InsertOrder {
 			
 			dbCon.conn.setAutoCommit(false);
 			
-			doInsert(dbCon, term, orderToInsert);
+			doInsert(dbCon, staff, orderToInsert);
 			
 			dbCon.conn.commit();
 			
@@ -150,7 +119,7 @@ public class InsertOrder {
 	 * Insert a new order without database transaction.
 	 * @param dbCon
 	 * 			the database connection
-	 * @param term
+	 * @param staff
 	 * 			the terminal
 	 * @param orderToInsert
 	 * 			the order along with basic insert parameters
@@ -166,9 +135,9 @@ public class InsertOrder {
 	 * @throws SQLException
 	 * 			Throws if failed to execute any SQL statements.
 	 */
-	public static Order execAsync(DBCon dbCon, Terminal term, Order orderToInsert) throws BusinessException, SQLException{
-		doPrepare(dbCon, term, orderToInsert);
-		doInsert(dbCon, term, orderToInsert);
+	public static Order execAsync(DBCon dbCon, Staff staff, Order orderToInsert) throws BusinessException, SQLException{
+		doPrepare(dbCon, staff, orderToInsert);
+		doInsert(dbCon, staff, orderToInsert);
 		return orderToInsert;
 	}
 	
@@ -177,7 +146,7 @@ public class InsertOrder {
 	 * The SQL statements should only be the SELECT type. 
 	 * @param dbCon
 	 * 			the database connection
-	 * @param term
+	 * @param staff
 	 * 			the terminal
 	 * @param orderToInsert
 	 * 			the order along with basic insert parameters
@@ -193,9 +162,9 @@ public class InsertOrder {
 	 * @throws SQLException
 	 * 			Throws if failed to execute any SQL statements.
 	 */
-	private static void doPrepare(DBCon dbCon, Terminal term, Order orderToInsert) throws BusinessException, SQLException{
+	private static void doPrepare(DBCon dbCon, Staff staff, Order orderToInsert) throws BusinessException, SQLException{
 		
-		orderToInsert.setDestTbl(TableDao.getTableByAlias(dbCon, term, orderToInsert.getDestTbl().getAliasId()));
+		orderToInsert.setDestTbl(TableDao.getTableByAlias(dbCon, staff, orderToInsert.getDestTbl().getAliasId()));
 		
 		if(orderToInsert.getDestTbl().isIdle()){
 			
@@ -208,11 +177,11 @@ public class InsertOrder {
 					 * If the food does NOT exist, tell the terminal that the food menu has been expired.
 					 */
 					if(of.isTemp()){
-						of.asFood().setKitchen(KitchenDao.getKitchenByAlias(dbCon, term, of.getKitchen().getAliasId()));
+						of.asFood().setKitchen(KitchenDao.getKitchenByAlias(dbCon, staff, of.getKitchen().getAliasId()));
 						
 					}else{		
 						//Get the details to each order food.
-						Food detailFood = FoodDao.getFoodByAlias(dbCon, term, of.getAliasId());
+						Food detailFood = FoodDao.getFoodByAlias(dbCon, staff, of.getAliasId());
 						of.asFood().setFoodId(detailFood.getFoodId());
 						of.asFood().setAliasId(detailFood.getAliasId());
 						of.asFood().setRestaurantId(detailFood.getRestaurantId());
@@ -239,11 +208,11 @@ public class InsertOrder {
 						if(of.hasNormalTaste()){
 							//Get the detail to each taste
 							for(Taste t : of.getTasteGroup().getTastes()){
-								t.copyFrom(TasteDao.getTasteByAlias(dbCon, term, t.getAliasId()));
+								t.copyFrom(TasteDao.getTasteByAlias(dbCon, staff, t.getAliasId()));
 							}
 							//Get the detail to each spec.
 							for(Taste spec : of.getTasteGroup().getSpecs()){
-								spec.copyFrom(TasteDao.getTasteByAlias(dbCon, term, spec.getAliasId()));
+								spec.copyFrom(TasteDao.getTasteByAlias(dbCon, staff, spec.getAliasId()));
 							}
 						}
 					}					
@@ -251,7 +220,7 @@ public class InsertOrder {
 			}
 
 			//Get the price plan which is active to this restaurant
-			orderToInsert.setPricePlan(PricePlanDao.getActivePricePlan(dbCon, term));
+			orderToInsert.setPricePlan(PricePlanDao.getActivePricePlan(dbCon, staff));
 			
 		}else if(orderToInsert.getDestTbl().isBusy()){
 			throw new BusinessException("The " + orderToInsert.getDestTbl() + " to insert order is BUSY.", ProtocolError.TABLE_BUSY);
@@ -268,14 +237,14 @@ public class InsertOrder {
 	 * The SQL statements should only be the INSERT, UPDATE or DELETE type. 
 	 * @param dbCon
 	 * 			the database connection
-	 * @param term
+	 * @param staff
 	 * 			the terminal
 	 * @param orderToInsert
 	 * 			the order along with basic insert parameters
 	 * @throws SQLException
 	 * 			Throws if failed to execute any SQL statements.
 	 */
-	private static void doInsert(DBCon dbCon, Terminal term, Order orderToInsert) throws SQLException{
+	private static void doInsert(DBCon dbCon, Staff staff, Order orderToInsert) throws SQLException{
 		
 		String sql; 
 
@@ -285,7 +254,7 @@ public class InsertOrder {
 		sql = " INSERT INTO `" + Params.dbName + "`.`order` (" +
 			  " `id`, `restaurant_id`, `category`, `region_id`, `region_name`, " +
 			  " `table_id`, `table_alias`, `table_name`, " +
-			  " `terminal_model`, `terminal_pin`, `birth_date`, `order_date`, `custom_num`, `waiter`, `price_plan_id`) VALUES (" +
+			  " `birth_date`, `order_date`, `custom_num`, `staff_id`, `waiter`, `price_plan_id`) VALUES (" +
 			  " NULL, " + 
 			  orderToInsert.getDestTbl().getRestaurantId() + ", " + 
 			  orderToInsert.getCategory().getVal() + ", " +
@@ -294,12 +263,11 @@ public class InsertOrder {
 			  orderToInsert.getDestTbl().getTableId() + ", " +
 			  orderToInsert.getDestTbl().getAliasId() + ", " +
 			  "'" + orderToInsert.getDestTbl().getName() + "'" + ", " +
-			  term.modelID + ", " + 
-			  term.pin + ", " +
 			  " NOW() " + ", " + 
 			  " NOW() " + ", " +
 			  orderToInsert.getCustomNum() + ", " +
-			  "'" + term.owner + "'" + ", " +
+			  staff.getId() + ", " +
+			  "'" + staff.getName() + "'" + ", " +
 			  orderToInsert.getPricePlan().getId() + ")";
 		dbCon.stmt.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
 		//get the generated id to order 
@@ -317,7 +285,7 @@ public class InsertOrder {
 			  " status = " + Table.Status.BUSY.getVal() + ", " +
 			  " category = " + orderToInsert.getCategory().getVal() + ", " +
 			  " custom_num = " + orderToInsert.getCustomNum() +
-			  " WHERE restaurant_id = " + term.restaurantID + 
+			  " WHERE restaurant_id = " + staff.getRestaurantId() + 
 			  " AND table_alias = " + orderToInsert.getDestTbl().getAliasId();
 		dbCon.stmt.executeUpdate(sql);
 		
@@ -386,11 +354,11 @@ public class InsertOrder {
 				  " `restaurant_id`, `order_id`, `food_id`, `food_alias`, `order_count`, `unit_price`, `name`, " +
 				  " `food_status`, `discount`, `taste_group_id`, " +
 				  " `dept_id`, `kitchen_id`, `kitchen_alias`, " +
-				  " `waiter`, `order_date`, `is_temporary` " +
+				  " `staff_id`, `waiter`, `order_date`, `is_temporary` " +
 				  " ) " +
 				  " VALUES " +
 				  " ( " +	
-				  term.restaurantID + ", " +
+				  staff.getRestaurantId() + ", " +
 				  orderToInsert.getId() + ", " +
 				  (foodToInsert.getFoodId() == 0 ? "NULL" : foodToInsert.getFoodId()) + ", " +
 				  foodToInsert.getAliasId() + ", " + 
@@ -402,8 +370,9 @@ public class InsertOrder {
 				  (foodToInsert.hasTaste() ? foodToInsert.getTasteGroup().getGroupId() : TasteGroup.EMPTY_TASTE_GROUP_ID) + ", " +
 				  foodToInsert.getKitchen().getDept().getId() + ", " +
 				  foodToInsert.getKitchen().getId() + ", " +
-				  foodToInsert.getKitchen().getAliasId() + ", '" + 
-				  term.owner + "', NOW(), " + 
+				  foodToInsert.getKitchen().getAliasId() + ", " + 
+				  staff.getId() + "," +
+				  "'" + staff.getName() + "', NOW(), " + 
 				  (foodToInsert.isTemp() ? "1" : "0") + 
 				  " ) ";
 				

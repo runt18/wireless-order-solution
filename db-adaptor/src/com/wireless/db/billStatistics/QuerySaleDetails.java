@@ -18,9 +18,7 @@ import com.wireless.pojo.billStatistics.SalesDetail;
 import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.menuMgr.Kitchen;
-import com.wireless.protocol.Terminal;
-//import com.wireless.dbObject.MaterialDetail;
-//import com.wireless.dbReflect.MaterialDetailReflector;
+import com.wireless.pojo.staffMgr.Staff;
 
 public class QuerySaleDetails {
 	
@@ -43,7 +41,7 @@ public class QuerySaleDetails {
 	 * @return
 	 * @throws SQLException
 	 */
-	public static SalesDetail[] execByDept(Terminal term, String onDuty, String offDuty, int queryType) throws SQLException{
+	public static SalesDetail[] execByDept(Staff term, String onDuty, String offDuty, int queryType) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -70,7 +68,7 @@ public class QuerySaleDetails {
 	 * @throws SQLException
 	 * 			throws if any error occurred while execute any SQL statements.
 	 */
-	public static SalesDetail[] execByDept(DBCon dbCon, Terminal term, String onDuty, String offDuty, int queryType) throws SQLException{
+	public static SalesDetail[] execByDept(DBCon dbCon, Staff term, String onDuty, String offDuty, int queryType) throws SQLException{
 		List<IncomeByDept> deptIncomes;
 
 		if(queryType == QUERY_HISTORY){
@@ -173,7 +171,7 @@ public class QuerySaleDetails {
 	 * @return
 	 * @throws SQLException
 	 */
-	public static SalesDetail[] execByKitchen(Terminal term, String onDuty, String offDuty, int queryType) throws SQLException{
+	public static SalesDetail[] execByKitchen(Staff term, String onDuty, String offDuty, int queryType) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -193,7 +191,7 @@ public class QuerySaleDetails {
 	 * @return
 	 * @throws SQLException
 	 */
-	public static SalesDetail[] execByKitchen(DBCon dbCon, Terminal term, String onDuty, String offDuty, int queryType) throws SQLException{
+	public static SalesDetail[] execByKitchen(DBCon dbCon, Staff term, String onDuty, String offDuty, int queryType) throws SQLException{
 		
 		List<IncomeByKitchen> kitchenIncomes;
 
@@ -291,7 +289,7 @@ public class QuerySaleDetails {
 	 * @return
 	 * @throws SQLException
 	 */
-	public static SalesDetail[] execByFood(Terminal term, String onDuty, String offDuty, int[] deptID, int orderType, int queryType, String foodName) throws SQLException{
+	public static SalesDetail[] execByFood(Staff term, String onDuty, String offDuty, int[] deptID, int orderType, int queryType, String foodName) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -321,7 +319,7 @@ public class QuerySaleDetails {
 	 * @throws SQLException
 	 * 			throws if any error occurred while execute any SQL statements.
 	 */
-	public static SalesDetail[] execByFood(DBCon dbCon, Terminal term, String onDuty, String offDuty, int[] deptID, int orderType, int queryType, String foodName) throws SQLException{
+	public static SalesDetail[] execByFood(DBCon dbCon, Staff term, String onDuty, String offDuty, int[] deptID, int orderType, int queryType, String foodName) throws SQLException{
 		
 		StringBuffer deptCond = new StringBuffer();
 		if(deptID.length != 0){

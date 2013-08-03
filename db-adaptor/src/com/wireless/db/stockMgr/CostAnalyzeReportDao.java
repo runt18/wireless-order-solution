@@ -10,12 +10,12 @@ import com.wireless.db.deptMgr.DepartmentDao;
 import com.wireless.db.orderMgr.OrderFoodDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.menuMgr.Department;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.stockMgr.CostAnalyze;
 import com.wireless.pojo.stockMgr.MaterialDept;
 import com.wireless.pojo.stockMgr.StockAction;
 import com.wireless.pojo.stockMgr.StockAction.Status;
 import com.wireless.pojo.stockMgr.StockAction.SubType;
-import com.wireless.protocol.Terminal;
 
 public class CostAnalyzeReportDao {
 
@@ -30,7 +30,7 @@ public class CostAnalyzeReportDao {
 	 * @throws SQLException
 	 * @throws BusinessException 
 	 */
-	public static List<CostAnalyze> getCostAnalyzes(DBCon dbCon, Terminal term, String begin, String end, String orderClause) throws SQLException, BusinessException{
+	public static List<CostAnalyze> getCostAnalyzes(DBCon dbCon, Staff term, String begin, String end, String orderClause) throws SQLException, BusinessException{
 		List<CostAnalyze> costAnalyzes = new ArrayList<CostAnalyze>();
 		List<MaterialDept> materialDepts;
 		List<Department> departments = DepartmentDao.getDepartments(dbCon, term, null, null);
@@ -61,7 +61,7 @@ public class CostAnalyzeReportDao {
 				for (MaterialDept materialDept : materialDepts) {
 					String primeAmount = "SELECT S.sub_type, D.remaining, (D.dept_in_remaining * D.price) as dept_in_money, (D.dept_out_remaining * D.price) as dept_out_money, D.price FROM " + Params.dbName + ".stock_action as S " + 
 							" INNER JOIN " + Params.dbName + ".stock_action_detail as D ON S.id = D.stock_action_id " +
-							" WHERE S.restaurant_id = " + term.restaurantID +
+							" WHERE S.restaurant_id = " + term.getRestaurantId() +
 							" AND (S.dept_in = " + dept.getId() + " OR S.dept_out = " + dept.getId() + ") " +
 							" AND S.ori_stock_date < '" + begin + "' AND D.material_id = " + materialDept.getMaterialId() + 
 							" AND S.status = " + Status.AUDIT.getVal() +
@@ -79,7 +79,7 @@ public class CostAnalyzeReportDao {
 					
 					String endAmount = "SELECT S.sub_type, D.remaining, (D.dept_in_remaining * D.price) as dept_in_money, (D.dept_out_remaining * D.price) as dept_out_money, D.price FROM " + Params.dbName + ".stock_action as S " + 
 							" INNER JOIN " + Params.dbName + ".stock_action_detail as D ON S.id = D.stock_action_id " +
-							" WHERE S.restaurant_id = " + term.restaurantID +
+							" WHERE S.restaurant_id = " + term.getRestaurantId() +
 							" AND (S.dept_in = " + dept.getId() + " OR S.dept_out = " + dept.getId() + ") " +
 							" AND S.ori_stock_date <= '" + end + " 23:59:59' AND D.material_id = " + materialDept.getMaterialId() + 
 							" AND S.status = " + Status.AUDIT.getVal() +
@@ -120,7 +120,7 @@ public class CostAnalyzeReportDao {
 	 * @throws SQLException
 	 * @throws BusinessException 
 	 */
-	public static List<CostAnalyze> getCostAnalyzes(Terminal term, String begin, String end, String orderClause) throws SQLException, BusinessException{
+	public static List<CostAnalyze> getCostAnalyzes(Staff term, String begin, String end, String orderClause) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -137,7 +137,7 @@ public class CostAnalyzeReportDao {
 	 * @return
 	 * @throws SQLException
 	 */
-	public static float getMoney(Terminal term, String extraCond, String orderClause) throws SQLException{
+	public static float getMoney(Staff term, String extraCond, String orderClause) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -155,10 +155,10 @@ public class CostAnalyzeReportDao {
 	 * @return
 	 * @throws SQLException
 	 */
-	public static float getMoney(DBCon dbCon, Terminal term, String extraCond, String orderClause) throws SQLException{
+	public static float getMoney(DBCon dbCon, Staff term, String extraCond, String orderClause) throws SQLException{
 		String sql = "SELECT S.price as money" + 
 				" FROM " + Params.dbName + ".stock_action as S  INNER JOIN " + Params.dbName + ".stock_action_detail as D ON S.id = D.stock_action_id " +  
-				" WHERE S.restaurant_id = " + term.restaurantID +
+				" WHERE S.restaurant_id = " + term.getRestaurantId() +
 				" AND S.status = " + StockAction.Status.AUDIT.getVal() +
 				(extraCond == null ? "" : extraCond) +
 				" GROUP BY S.id " +

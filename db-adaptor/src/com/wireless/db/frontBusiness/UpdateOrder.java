@@ -21,9 +21,9 @@ import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.regionMgr.Table;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.tasteMgr.Taste;
 import com.wireless.pojo.tasteMgr.TasteGroup;
-import com.wireless.protocol.Terminal;
 import com.wireless.util.DateType;
 
 public class UpdateOrder {
@@ -65,12 +65,12 @@ public class UpdateOrder {
 	 * @throws SQLException
 	 *             Throws if fail to execute any SQL statement.
 	 */
-	public static DiffResult execByID(Terminal term, Order orderToUpdate) throws BusinessException, SQLException{
+	public static DiffResult execByID(Staff staff, Order orderToUpdate) throws BusinessException, SQLException{
 		DBCon dbCon = new DBCon();	
 		
 		try{
 			dbCon.connect();
-			return execByID(dbCon, term, orderToUpdate);
+			return execByID(dbCon, staff, orderToUpdate);
 
 		}finally{
 			dbCon.disconnect();
@@ -101,14 +101,14 @@ public class UpdateOrder {
 	 * @throws SQLException
 	 *             Throws if fail to execute any SQL statement.
 	 */
-	public static DiffResult execByID(DBCon dbCon, Terminal term, Order newOrder) throws BusinessException, SQLException{
+	public static DiffResult execByID(DBCon dbCon, Staff staff, Order newOrder) throws BusinessException, SQLException{
 		
 		boolean isAutoCommit = dbCon.conn.getAutoCommit();
 		
 		try{
 			dbCon.conn.setAutoCommit(false);
 			
-			DiffResult diffResult = doUpdate(dbCon, term, doPrepare(dbCon, term, newOrder));
+			DiffResult diffResult = doUpdate(dbCon, staff, doPrepare(dbCon, staff, newOrder));
 			
 			dbCon.conn.commit();
 			
@@ -129,7 +129,7 @@ public class UpdateOrder {
 	 * Note that the method does NOT run in db transition.
 	 * @param dbCon
 	 * 			the database connection
-	 * @param term
+	 * @param staff
 	 * 			the terminal
 	 * @param newOrder
 	 * 			The order to update, at least along with order id & table.
@@ -144,15 +144,15 @@ public class UpdateOrder {
 	 * 
 	 * @see DiffResult
 	 */
-	public static DiffResult execByIdAsync(DBCon dbCon, Terminal term, Order newOrder) throws BusinessException, SQLException{
-		return doUpdate(dbCon, term, doPrepare(dbCon, term, newOrder));
+	public static DiffResult execByIdAsync(DBCon dbCon, Staff staff, Order newOrder) throws BusinessException, SQLException{
+		return doUpdate(dbCon, staff, doPrepare(dbCon, staff, newOrder));
 	}
 	
 	/**
 	 * Prepare to calculate the difference between new order and the original, which is used in {@link doUpdate}
 	 * @param dbCon
 	 * 			the database connection
-	 * @param term
+	 * @param staff
 	 * 			the terminal
 	 * @param newOrder
 	 * @return the difference between original order and the new
@@ -166,11 +166,11 @@ public class UpdateOrder {
 	 * 
 	 * @see DiffResult
 	 */
-	private static DiffResult doPrepare(DBCon dbCon, Terminal term, Order newOrder) throws BusinessException, SQLException{
+	private static DiffResult doPrepare(DBCon dbCon, Staff staff, Order newOrder) throws BusinessException, SQLException{
 		
-		Order oriOrder = OrderDao.getById(dbCon, term, newOrder.getId(), DateType.TODAY);
+		Order oriOrder = OrderDao.getById(dbCon, staff, newOrder.getId(), DateType.TODAY);
 		
-		newOrder.setDestTbl(TableDao.getTableByAlias(dbCon, term, newOrder.getDestTbl().getAliasId()));
+		newOrder.setDestTbl(TableDao.getTableByAlias(dbCon, staff, newOrder.getDestTbl().getAliasId()));
 		
 		/*
 		 * If the order to update is unpaid and the table to original order is different from the new.
@@ -184,13 +184,13 @@ public class UpdateOrder {
 		
 		//Check to see whether the new order is expired.
 		if(newOrder.getOrderDate() != 0 && newOrder.getOrderDate() < oriOrder.getOrderDate()){
-			throw new BusinessException("The order(order_id=" + newOrder.getId() + ",restaurant_id=" + term.restaurantID + ") has expired.", ProtocolError.ORDER_EXPIRED);
+			throw new BusinessException("The order(order_id=" + newOrder.getId() + ",restaurant_id=" + staff.getRestaurantId() + ") has expired.", ProtocolError.ORDER_EXPIRED);
 		}
 		
 		//Fill the detail to each new order food
 		List<OrderFood> newFoods = newOrder.getOrderFoods(); 
 		for(OrderFood of : newFoods){
-			fillFoodDetail(dbCon, term, of);
+			fillFoodDetail(dbCon, staff, of);
 		}
 		
 		//Get the region detail associated with the new order.
@@ -204,7 +204,7 @@ public class UpdateOrder {
 	 * Prepare to update an order.
 	 * @param dbCon
 	 * 			the database connection
-	 * @param term
+	 * @param staff
 	 * 			the terminal
 	 * @param newOrder
 	 * @return the difference between original order and the new
@@ -218,7 +218,7 @@ public class UpdateOrder {
 	 * 
 	 * @see DiffResult
 	 */
-	private static DiffResult doUpdate(DBCon dbCon, Terminal term, DiffResult diffResult) throws SQLException{
+	private static DiffResult doUpdate(DBCon dbCon, Staff staff, DiffResult diffResult) throws SQLException{
 		
 		String sql;
 		
@@ -283,11 +283,12 @@ public class UpdateOrder {
 				  " ( " + 
 				  " `restaurant_id`, `order_id`, `food_id`, `food_alias`, `order_count`, `unit_price`, `name`, `food_status`, " +
 				  " `discount`, `taste_group_id`, " +
-				  " `dept_id`, `kitchen_id`, `kitchen_alias`, `waiter`, `order_date`, `is_temporary`, `is_paid` " +
+				  " `dept_id`, `kitchen_id`, `kitchen_alias`, " +
+				  " `staff_id`, `waiter`, `order_date`, `is_temporary`, `is_paid` " +
 				  " ) " +
 				  " VALUES " +
 				  "(" +
-				  term.restaurantID + ", " +
+				  staff.getRestaurantId() + ", " +
 				  diffResult.newOrder.getId() + ", " +
 				  (extraFood.getFoodId() == 0 ? "NULL" : extraFood.getFoodId()) + ", " +
 				  extraFood.getAliasId() + ", " + 
@@ -299,8 +300,9 @@ public class UpdateOrder {
 				  (extraFood.hasTaste() ? extraFood.getTasteGroup().getGroupId() : TasteGroup.EMPTY_TASTE_GROUP_ID) + ", " +
 				  extraFood.getKitchen().getDept().getId() + ", " +
 				  extraFood.getKitchen().getId() + ", " +
-				  extraFood.getKitchen().getAliasId() + ", '" + 
-				  term.owner + "', " +
+				  extraFood.getKitchen().getAliasId() + ", " + 
+				  staff.getId() + ", " +
+				  "'" + staff.getName() + "', " +
 				  "NOW(), " + 
 				  (extraFood.isTemp() ? 1 : 0) + ", " +
 				  (diffResult.oriOrder.isUnpaid() ? 0 : 1) +
@@ -316,8 +318,8 @@ public class UpdateOrder {
 				  " `restaurant_id`, `order_id`, `food_id`, `food_alias`, `order_count`, `unit_price`, `name`, `food_status`, " +
 				  " `discount`, `taste_group_id`, `cancel_reason_id`, `cancel_reason`, " +
 				  " `dept_id`, `kitchen_id`, `kitchen_alias`, " +
-				  " `waiter`, `order_date`, `is_temporary`, `is_paid`) VALUES (" +
-				  term.restaurantID + ", " +
+				  " `staff_id`, `waiter`, `order_date`, `is_temporary`, `is_paid`) VALUES (" +
+				  staff.getRestaurantId() + ", " +
 				  diffResult.newOrder.getId() + ", " +
 				  (cancelledFood.getFoodId() == 0 ? "NULL" : cancelledFood.getFoodId()) + ", " +
 				  cancelledFood.getAliasId() + ", " + 
@@ -332,7 +334,8 @@ public class UpdateOrder {
 				  cancelledFood.getKitchen().getDept().getId() + ", " +
 				  cancelledFood.getKitchen().getId() + ", " +
 				  cancelledFood.getKitchen().getAliasId() + ", " + 
-				  "'" + term.owner + "', " +
+				  staff.getId() + ", " +
+				  "'" + staff.getName() + "', " +
 				  "NOW(), " + 
 				  (cancelledFood.isTemp() ? 1 : 0) + ", " +
 				  (diffResult.oriOrder.isUnpaid() ? 0 : 1) +
@@ -349,8 +352,8 @@ public class UpdateOrder {
 			  " custom_num = " + diffResult.newOrder.getCustomNum() + ", " +
 			  " category = " + diffResult.newOrder.getCategory().getVal() + ", " +
 			  " order_date = NOW(), " +
-			  " terminal_pin = " + term.pin + ", " +
-			  " waiter = " + "'" + term.owner + "' " +
+			  " staff_id = " + staff.getId() + ", " +
+			  " waiter = " + "'" + staff.getName() + "' " +
 			  " WHERE " +
 			  " id = " + diffResult.newOrder.getId();
 		dbCon.stmt.executeUpdate(sql);
@@ -398,380 +401,11 @@ public class UpdateOrder {
 	}
 	
 	/**
-	 * 
-	 * @param dbCon
-	 * @param term
-	 * @param oriOrder
-	 * @param newOrder
-	 * @param isPaidAgain
-	 * @return
-	 * @throws BusinessException
-	 * @throws SQLException
-	 */
-//	private static DiffResult updateOrder(DBCon dbCon, Terminal term, Order oriOrder, Order newOrder, boolean isPaidAgain) throws BusinessException, SQLException{		
-//		
-//		//Throws exception if the new order is expired.
-//		if(newOrder.getOrderDate() != 0 && newOrder.getOrderDate() < oriOrder.getOrderDate()){
-//			throw new BusinessException("The order(order_id=" + newOrder.getId() + ",restaurant_id=" + term.restaurantID + ") has expired.", ErrorCode.ORDER_EXPIRED);
-//		}
-//		
-//		List<OrderFood> extraFoods;
-//		List<OrderFood> cancelledFoods;
-//
-//		//Get the detail to each order foods of new order.
-//		List<OrderFood> newFoods = new ArrayList<OrderFood>(newOrder.getOrderFoods().length);
-//		for(OrderFood newFood : newOrder.getOrderFoods()){
-//			//Skip the food whose count is less than zero.
-//			//if(newFood.getCount() > 0){
-//				fillFoodDetail(dbCon, term, newFood);
-//				newFoods.add(newFood);
-//			//}
-//		}
-//		newOrder.setOrderFoods(newFoods.toArray(new OrderFood[newFoods.size()]));
-//		
-//		//Get the difference between the original and new order.
-//		OrderDiff.DiffResult diffResult = OrderDiff.diff(oriOrder, newOrder);
-//		extraFoods = diffResult.extraFoods;
-//		cancelledFoods = diffResult.cancelledFoods;
-//		//hurriedFoods = diffResult.hurriedFoods;
-//		
-//		/**
-//		 * Get the region to this table if the order has NOT been paid before
-//		 */
-//		if(!isPaidAgain){
-//			newOrder.setRegion(QueryRegion.execByTbl(dbCon, term, newOrder.getDestTbl().getAliasId()));
-//		}
-//		
-//		try{
-//		
-//			String sql;
-//			float giftAmount = 0;
-//			
-//			dbCon.conn.setAutoCommit(false);
-//			
-//			//insert the extra order food records
-//			for(OrderFood extraFood : extraFoods){
-//
-//				//add the gift amount if extra foods
-//				if(extraFood.isGift()){
-//					giftAmount += extraFood.getUnitPriceWithTaste() * extraFood.getCount();
-//				}
-//				
-//				/**
-//				 * Insert the taste group info if containing taste and the extra taste group is new
-//				 */
-//				if(extraFood.hasTaste() && extraFood.getTasteGroup().getGroupId() == TasteGroup.NEW_TASTE_GROUP_ID){
-//					
-//					TasteGroup tg = extraFood.getTasteGroup();					
-//					/**
-//					 * Insert the taste group if containing taste.
-//					 */
-//					sql = " INSERT INTO " + Params.dbName + ".taste_group " +
-//						  " ( " +
-//						  " `normal_taste_group_id`, `normal_taste_pref`, `normal_taste_price`, " +
-//						  " `tmp_taste_id`, `tmp_taste_pref`, `tmp_taste_price` " +
-//						  " ) " +
-//						  " SELECT " +
-//						  (tg.hasNormalTaste() ? "MAX(normal_taste_group_id) + 1" : TasteGroup.EMPTY_NORMAL_TASTE_GROUP_ID) + ", " +
-//						  (tg.hasNormalTaste() ? ("'" + tg.getNormalTastePref() + "'") : "NULL") + ", " +
-//						  (tg.hasNormalTaste() ? tg.getNormalTastePrice() : "NULL") + ", " +
-//						  (tg.hasTmpTaste() ? tg.getTmpTaste().getAliasId() : "NULL") + ", " +
-//						  (tg.hasTmpTaste() ? ("'" + tg.getTmpTastePref() + "'") : "NULL") + ", " +
-//						  (tg.hasTmpTaste() ? tg.getTmpTastePrice() : "NULL") +
-//						  " FROM " + 
-//						  Params.dbName + ".taste_group" +
-//						  " LIMIT 1 ";
-//					dbCon.stmt.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
-//					//get the generated id to taste group 
-//					dbCon.rs = dbCon.stmt.getGeneratedKeys();
-//					if(dbCon.rs.next()){
-//						tg.setGroupId(dbCon.rs.getInt(1));
-//					}else{
-//						throw new SQLException("The id of taste group is not generated successfully.");
-//					}
-//					
-//					/**
-//					 * Insert the normal taste group if containing normal tastes.
-//					 */
-//					if(tg.hasNormalTaste()){
-//						for(Taste normalTaste : tg.getNormalTastes()){
-//							sql = " INSERT INTO " + Params.dbName + ".normal_taste_group " +
-//								  " ( " +
-//								  " `normal_taste_group_id`, `taste_id` " +
-//								  " ) " +
-//								  " VALUES " +
-//								  " ( " +
-//								  " (SELECT normal_taste_group_id FROM " + Params.dbName + ".taste_group " + 
-//								  " WHERE " +
-//								  " taste_group_id = " + tg.getGroupId() + ")" + " , " +
-//								  normalTaste.getTasteId() + 
-//								  " ) ";
-//							dbCon.stmt.executeUpdate(sql);
-//						}
-//					}
-//				}
-//				
-//				sql = " INSERT INTO " + Params.dbName + ".order_food " +
-//					  " ( " + 
-//					  " `restaurant_id`, `order_id`, `food_id`, `food_alias`, `order_count`, `unit_price`, `name`, `food_status`, " +
-//					  " `discount`, `taste_group_id`, " +
-//					  " `dept_id`, `kitchen_id`, `kitchen_alias`, `waiter`, `order_date`, `is_temporary`, `is_paid` " +
-//					  " ) " +
-//					  " VALUES " +
-//					  "(" +
-//					  term.restaurantID + ", " +
-//					  newOrder.getId() + ", " +
-//					  (extraFood.getFoodId() == 0 ? "NULL" : extraFood.getFoodId()) + ", " +
-//					  extraFood.getAliasId() + ", " + 
-//					  extraFood.getCount() + ", " + 
-//					  extraFood.getPrice() + ", '" + 
-//					  extraFood.getName() + "', " + 
-//					  extraFood.getStatus() + ", " +
-//					  extraFood.getDiscount() + ", " +
-//					  (extraFood.hasTaste() ? extraFood.getTasteGroup().getGroupId() : TasteGroup.EMPTY_TASTE_GROUP_ID) + ", " +
-//					  extraFood.getKitchen().getDept().getId() + ", " +
-//					  extraFood.getKitchen().getId() + ", " +
-//					  extraFood.getKitchen().getAliasId() + ", '" + 
-//					  term.owner + "', " +
-//					  "NOW(), " + 
-//					  (extraFood.isTemp() ? 1 : 0) + ", " +
-//					  (isPaidAgain ? 1 : 0) +
-//					  " ) ";
-//				dbCon.stmt.executeUpdate(sql);			
-//			}
-//			
-//			//insert the canceled order food records 
-//			for(OrderFood cancelledFood : cancelledFoods){
-//
-//				//minus the gift amount if canceled foods
-//				if(cancelledFood.isGift()){
-//					giftAmount -= cancelledFood.getUnitPriceWithTaste() * cancelledFood.getCount();
-//				}				
-//				
-//				sql = " INSERT INTO `" + Params.dbName + "`.`order_food` " +
-//					  " ( " +
-//					  " `restaurant_id`, `order_id`, `food_id`, `food_alias`, `order_count`, `unit_price`, `name`, `food_status`, " +
-//					  " `discount`, `taste_group_id`, `cancel_reason_id`, `cancel_reason`, " +
-//					  " `dept_id`, `kitchen_id`, `kitchen_alias`, " +
-//					  " `waiter`, `order_date`, `is_temporary`, `is_paid`) VALUES (" +
-//					  term.restaurantID + ", " +
-//					  newOrder.getId() + ", " +
-//					  (cancelledFood.getFoodId() == 0 ? "NULL" : cancelledFood.getFoodId()) + ", " +
-//					  cancelledFood.getAliasId() + ", " + 
-//					  "-" + cancelledFood.getCount() + ", " + 
-//					  cancelledFood.getPrice() + ", '" + 
-//					  cancelledFood.getName() + "', " + 
-//					  cancelledFood.getStatus() + ", " +
-//					  cancelledFood.getDiscount() + ", " +
-//					  (cancelledFood.hasTaste() ? cancelledFood.getTasteGroup().getGroupId() : TasteGroup.EMPTY_TASTE_GROUP_ID) + ", " +
-//					  (cancelledFood.hasCancelReason() ? cancelledFood.getCancelReason().getId() : CancelReason.NO_REASON) + ", " +
-//					  (cancelledFood.hasCancelReason() ? "'" + cancelledFood.getCancelReason().getReason() + "'" : "NULL") + ", " +
-//					  cancelledFood.getKitchen().getDept().getId() + ", " +
-//					  cancelledFood.getKitchen().getId() + ", " +
-//					  cancelledFood.getKitchen().getAliasId() + ", '" + 
-//					  term.owner + "', " +
-//					  "NOW(), " + 
-//					  (cancelledFood.isTemp() ? 1 : 0) + ", " +
-//					  (isPaidAgain ? 1 : 0) +
-//					  " ) ";
-//				dbCon.stmt.executeUpdate(sql);			
-//			}
-//			
-//			/**
-//			 * Update the gift amount if not reach the quota.
-//			 * Otherwise throw a business exception.
-//			 */
-//			if(term.getGiftQuota() >= 0 && !isPaidAgain){
-//				if((giftAmount + term.getGiftAmount()) > term.getGiftQuota()){
-//					throw new BusinessException("The gift amount exceeds the quota.", ErrorCode.EXCEED_GIFT_QUOTA);
-//					
-//				}else{
-//					sql = " UPDATE " + 
-//						  Params.dbName + ".terminal SET" +
-//						  " gift_amount = gift_amount + " + giftAmount +
-//						  " WHERE " +
-//						  " pin = " + "0x" + Long.toHexString(term.pin) +
-//						  " AND " +
-//						  " restaurant_id = " + term.restaurantID;
-//					dbCon.stmt.executeUpdate(sql);
-//				}
-//			}
-//			
-//			/**
-//			 * Update the related info to this order.
-//			 * Don't update the region and table status if the order has been paid before.
-//			 */
-//			sql = " UPDATE " + 
-//				  Params.dbName + ".order SET " +
-//				  " custom_num = " + newOrder.getCustomNum() +	", " +
-//				  " terminal_pin = " + term.pin + ", " +
-//				  " discount_id = " + newOrder.getDiscount().getId() + ", " +
-//				  " order_date = NOW(), " +
-//				  (isPaidAgain ? "" : "region_id = " + newOrder.getRegion().getRegionId() + ", ") +
-//				  (isPaidAgain ? "" : "region_name = '" + newOrder.getRegion().getName() + "', ") +
-//				  (isPaidAgain ? "" : "table_id = " + newOrder.getDestTbl().getTableId() + ", ") +
-//				  (isPaidAgain ? "" : "table_alias = " + newOrder.getDestTbl().getAliasId() + ", ") +
-//				  (isPaidAgain ? "" : "table_name = '" + newOrder.getDestTbl().getName() + "', ") +
-//				  " waiter = " + "'" + term.owner + "' " +
-//				  " WHERE " +
-//				  " id = " + newOrder.getId();
-//			dbCon.stmt.executeUpdate(sql);
-//			
-//			/**
-//			 * Update the custom number to the merger table if the order has NOT been paid before.
-//			 */
-//			if(!isPaidAgain){
-//				/**
-//				 * Update the table status in tow cases.
-//				 * 1 - Transfer table
-//				 * 2 - Not transfer table
-//				 */
-//				if(newOrder.getDestTbl().getAliasId() != newOrder.getSrcTbl().getAliasId()){
-//					// update the original table status to idle
-//					sql = " UPDATE " + 
-//						  Params.dbName + ".table SET " +
-//						  " status = " + Table.TABLE_IDLE + "," + 
-//						  " custom_num = NULL, " +
-//						  " category = NULL " + 
-//						  " WHERE " +
-//						  " restaurant_id = " + newOrder.getSrcTbl().getRestaurantId() + 
-//						  " AND " +
-//						  " table_alias = "	+ newOrder.getSrcTbl().getAliasId();
-//					dbCon.stmt.executeUpdate(sql);				
-//					
-//					// update the new table status to busy
-//					sql = " UPDATE " + 
-//						  Params.dbName + ".table SET " +
-//						  " status = " + Table.TABLE_BUSY + "," +
-//						  " category = " + newOrder.getSrcTbl().getCategory() + "," +
-//						  " custom_num = " + newOrder.getCustomNum() + 
-//						  " WHERE " +
-//						  " restaurant_id = " + newOrder.getDestTbl().getRestaurantId() + 
-//						  " AND " +
-//						  " table_alias = " + newOrder.getDestTbl().getAliasId();
-//					dbCon.stmt.executeUpdate(sql);				
-//					
-//				}else{
-//
-//					sql = " UPDATE " + 
-//						  Params.dbName + ".table SET " +
-//					      " status = " + Table.TABLE_BUSY + "," +
-//						  " category = " + newOrder.getCategory() + "," +
-//						  " custom_num = " + newOrder.getCustomNum() +
-//						  " WHERE " +
-//						  " restaurant_id = " + term.restaurantID + 
-//						  " AND " +
-//						  " table_alias = " + newOrder.getDestTbl().getAliasId();
-//					dbCon.stmt.executeUpdate(sql);				
-//				}				
-//			}
-//			
-//			dbCon.conn.commit();
-//			
-//			/**
-//			 * Find the extra and canceled foods and put them to result.
-//			 */
-////			if(!extraFoods.isEmpty() || !cancelledFoods.isEmpty()){			
-////				
-////				ArrayList<OrderFood> tmpFoods = new ArrayList<OrderFood>();				
-////				
-////				/**
-////				 * Find the canceled foods to print
-////				 */
-////				tmpFoods.clear();
-////				
-////				Iterator<OrderFood> iterCancelled = cancelledFoods.iterator();
-////				
-////				while(iterCancelled.hasNext()){
-////					
-////					OrderFood canceledFood = iterCancelled.next();
-////					
-////					for(OrderFood extraFood : extraFoods){						
-////						/**
-////						 * If the food to cancel is hang up before.
-////						 * Check to see whether the same extra food is exist
-////						 * and the amount is equal or greater than the canceled.
-////						 * If so, means the extra food is immediate
-////						 * and remove this food from cancelled list so that NOT print this canceled food.
-////						 */
-////						if(canceledFood.hangStatus == OrderFood.FOOD_HANG_UP){
-////							if(extraFood.equalsIgnoreHangStauts(canceledFood) && 
-////							   extraFood.getCount().floatValue() >= canceledFood.getCount().floatValue()){
-////								
-////								iterCancelled.remove();
-////								extraFood.hangStatus = OrderFood.FOOD_IMMEDIATE;
-////								break;
-////							}
-////							
-////						/**
-////						 * In the case below, 
-////						 * 1 - both of foods is the same except tastes
-////						 * 2 - order count is matched 
-////						 * Means just change the taste preference to this cancelled food. 
-////						 * Remove this food from cancelled list so that NOT print this canceled food.
-////						 */
-////						}else if(canceledFood.equalsIgnoreTaste(extraFood) &&
-////								 canceledFood.getCount().equals(extraFood.getCount())) {
-////
-////							iterCancelled.remove();
-////							break;
-////						}
-////					}					
-////				}
-////				
-////				
-////				/**
-////				 * Find the extra foods to print
-////				 */
-////				Iterator<OrderFood> iterExtra = extraFoods.iterator();
-////				while(iterExtra.hasNext()){
-////					
-////					OrderFood extraFood = iterExtra.next();
-////					
-////					/**
-////					 * In the case below, 
-////					 * 1 - both of foods is the same except tastes
-////					 * 2 - order count is matched 
-////					 * Means just change the taste preference to this extra food.
-////					 * We don't print this record.
-////					 */
-////					for(OrderFood canceledFood : cancelledFoods){
-////						if(extraFood.equalsIgnoreTaste(canceledFood) &&
-////						   extraFood.getCount().equals(canceledFood.getCount())){
-////								iterExtra.remove();
-////								break;
-////						}
-////					}					
-////				}	
-////				
-////			}	
-//			
-//			return diffResult;
-//			
-//		}catch(SQLException e){
-//			dbCon.conn.rollback();
-//			throw e;
-//			
-//		}catch(BusinessException e){
-//			dbCon.conn.rollback();
-//			throw e;
-//			
-//		}catch(Exception e){
-//			dbCon.conn.rollback();
-//			throw new BusinessException(e.getMessage());
-//			
-//		}finally{
-//			dbCon.conn.setAutoCommit(true);
-//		}
-//
-//	}	
-	
-	/**
 	 * Fill the detail to food.
 	 * The basic information consists of alias id, discount, taste id, hang status and so on.
 	 * @param dbCon
 	 * 			The db connection
-	 * @param term
+	 * @param staff
 	 * 			The terminal associated with this request
 	 * @param foodToFill
 	 * 			The food instance with the basic information
@@ -782,20 +416,20 @@ public class UpdateOrder {
 	 * @throws SQLException
 	 * 			Throws if fail to execute any SQL statement
 	 */
-	private static void fillFoodDetail(DBCon dbCon, Terminal term, OrderFood foodToFill) throws BusinessException, SQLException{
+	private static void fillFoodDetail(DBCon dbCon, Staff staff, OrderFood foodToFill) throws BusinessException, SQLException{
 		
 		//Get the details to cancel reason if contained.
 		if(foodToFill.hasCancelReason()){
-			foodToFill.setCancelReason(CancelReasonDao.getReasonById(dbCon, term, foodToFill.getCancelReason().getId()));
+			foodToFill.setCancelReason(CancelReasonDao.getReasonById(dbCon, staff, foodToFill.getCancelReason().getId()));
 		}
 		
 		if(foodToFill.isTemp()){
 			// Get the associated kitchen detail in case of temporary.
-			foodToFill.asFood().setKitchen(KitchenDao.getKitchenByAlias(dbCon, term, foodToFill.getKitchen().getAliasId()));
+			foodToFill.asFood().setKitchen(KitchenDao.getKitchenByAlias(dbCon, staff, foodToFill.getKitchen().getAliasId()));
 			
 		}else{
 			//Get the details to each order food			
-			Food detailFood = FoodDao.getFoodByAlias(dbCon, term, foodToFill.getAliasId());
+			Food detailFood = FoodDao.getFoodByAlias(dbCon, staff, foodToFill.getAliasId());
 			
 			foodToFill.asFood().setFoodId(detailFood.getFoodId());
 			foodToFill.asFood().setAliasId(detailFood.getAliasId());
@@ -823,12 +457,12 @@ public class UpdateOrder {
 			if(foodToFill.hasNormalTaste()){
 				//Get the detail to each tastes.
 				for(Taste taste : foodToFill.getTasteGroup().getTastes()){
-					taste.copyFrom(TasteDao.getTasteByAlias(dbCon, term, taste.getAliasId()));
+					taste.copyFrom(TasteDao.getTasteByAlias(dbCon, staff, taste.getAliasId()));
 				}
 				
 				//Get the detail to each specs.
 				for(Taste spec : foodToFill.getTasteGroup().getSpecs()){
-					spec.copyFrom(TasteDao.getTasteByAlias(dbCon, term, spec.getAliasId()));
+					spec.copyFrom(TasteDao.getTasteByAlias(dbCon, staff, spec.getAliasId()));
 				}
 			}			
 	

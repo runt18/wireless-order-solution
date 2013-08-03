@@ -10,7 +10,7 @@ import com.wireless.exception.BusinessException;
 import com.wireless.exception.ProtocolError;
 import com.wireless.exception.RestaurantError;
 import com.wireless.pojo.restaurantMgr.Restaurant;
-import com.wireless.protocol.Terminal;
+import com.wireless.pojo.staffMgr.Staff;
 
 public class RestaurantDao {
 	
@@ -147,7 +147,7 @@ public class RestaurantDao {
 	 * @throws SQLException
 	 * 			if failed to execute any SQL statements
 	 */
-	public static void update(Terminal term, Restaurant restaurant) throws SQLException, BusinessException {
+	public static void update(Staff term, Restaurant restaurant) throws SQLException, BusinessException {
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -171,7 +171,7 @@ public class RestaurantDao {
 	 * @throws SQLException
 	 * 			if failed to execute any SQL statements
 	 */
-	private static void update(DBCon dbCon, Terminal term, Restaurant restaurant) throws SQLException, BusinessException{
+	private static void update(DBCon dbCon, Staff term, Restaurant restaurant) throws SQLException, BusinessException{
 		String sql = " UPDATE " + Params.dbName + ".restaurant SET " +
 					 " restaurant_info = '" + restaurant.getInfo() + "'," +
 					 " restaurant_name = '" + restaurant.getName() + "'," +
@@ -179,7 +179,7 @@ public class RestaurantDao {
 					 " restaurant.tele1 = '" + restaurant.getTele1() + "'," +
 					 " restaurant.tele2 = '" + restaurant.getTele2() + "' " +
 					 " WHERE " +
-					 " id = " + term.restaurantID;
+					 " id = " + term.getRestaurantId();
 		
 		if(dbCon.stmt.executeUpdate(sql) != 1){
 			throw new BusinessException(RestaurantError.UPDATE_RESTAURANT_FAIL);

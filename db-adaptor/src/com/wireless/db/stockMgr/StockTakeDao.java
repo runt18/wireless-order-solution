@@ -21,6 +21,7 @@ import com.wireless.exception.BusinessException;
 import com.wireless.exception.StockError;
 import com.wireless.pojo.inventoryMgr.Material;
 import com.wireless.pojo.inventoryMgr.MaterialCate;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.stockMgr.MaterialDept;
 import com.wireless.pojo.stockMgr.StockAction;
 import com.wireless.pojo.stockMgr.StockAction.AuditBuilder;
@@ -33,7 +34,6 @@ import com.wireless.pojo.stockMgr.StockTake.Status;
 import com.wireless.pojo.stockMgr.StockTake.UpdateStockTakeBuilder;
 import com.wireless.pojo.stockMgr.StockTakeDetail;
 import com.wireless.pojo.util.DateUtil;
-import com.wireless.protocol.Terminal;
 import com.wireless.util.SQLUtil;
 
 public class StockTakeDao {
@@ -49,7 +49,7 @@ public class StockTakeDao {
 	 * @throws BusinessException
 	 * 			if there has stockAction is not audit
 	 */
-	public static int insertStockTake(Terminal term, InsertStockTakeBuilder builder) throws SQLException, BusinessException{
+	public static int insertStockTake(Staff term, InsertStockTakeBuilder builder) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		dbCon.connect();
 		int stockTakeId = 0;
@@ -71,7 +71,7 @@ public class StockTakeDao {
 		return stockTakeId;
 	}
 	
-	public static boolean isUnauditStockAction(Terminal term) throws SQLException{
+	public static boolean isUnauditStockAction(Staff term) throws SQLException{
 		List<StockAction> list = StockActionDao.getStockActions(term, 
 			    " AND status = " + StockAction.Status.UNAUDIT.getVal() + 
 				" AND sub_type <> " + SubType.USE_UP.getVal(), 
@@ -83,7 +83,7 @@ public class StockTakeDao {
 		}
 	}
 	
-	public static void checkStockAction(Terminal term) throws SQLException, BusinessException{
+	public static void checkStockAction(Staff term) throws SQLException, BusinessException{
 		if(isUnauditStockAction(term)){
 			throw new BusinessException(StockError.STOCKACTION_UNAUDIT);
 		}
@@ -103,7 +103,7 @@ public class StockTakeDao {
 	 * @throws BusinessException
 	 * 			if there has stockAction is not audit  
 	 */
-	public static int insertStockTake(DBCon dbCon, Terminal term, InsertStockTakeBuilder builder) throws SQLException, BusinessException{
+	public static int insertStockTake(DBCon dbCon, Staff term, InsertStockTakeBuilder builder) throws SQLException, BusinessException{
 		//判断是否有未审核的库单
 		checkStockAction(term);
 		//判断此部门的某个货品类型是否重复盘点
@@ -138,14 +138,14 @@ public class StockTakeDao {
 		StockTake sTake = builder.build();
 		String deptName;
 		String MaterialCateName;
-		String selectDept = "SELECT name FROM " + Params.dbName + ".department WHERE dept_id = " + builder.getDept().getId() + " AND restaurant_id = " + term.restaurantID;		
+		String selectDept = "SELECT name FROM " + Params.dbName + ".department WHERE dept_id = " + builder.getDept().getId() + " AND restaurant_id = " + term.getRestaurantId();		
 		dbCon.rs = dbCon.stmt.executeQuery(selectDept);
 		if(dbCon.rs.next()){
 			deptName = dbCon.rs.getString(1);
 		}else{
 			deptName = "";
 		}
-		String selectCateName = "SELECT name FROM " + Params.dbName + ".material_cate WHERE cate_id = " + sTake.getMaterialCate().getId() + " AND restaurant_id = " + term.restaurantID;		
+		String selectCateName = "SELECT name FROM " + Params.dbName + ".material_cate WHERE cate_id = " + sTake.getMaterialCate().getId() + " AND restaurant_id = " + term.getRestaurantId();		
 		dbCon.rs = dbCon.stmt.executeQuery(selectCateName);
 		if(dbCon.rs.next()){
 			MaterialCateName = dbCon.rs.getString(1);
@@ -191,7 +191,7 @@ public class StockTakeDao {
 	 * @throws BusinessException
 	 * 			if the system date not in currentMonth
 	 */
-	public static boolean beforeInsertStockTake(Terminal term) throws SQLException, BusinessException{
+	public static boolean beforeInsertStockTake(Staff term) throws SQLException, BusinessException{
 		long currentDate = 0;
 		currentDate = SystemDao.getCurrentMonth(term);
 		Calendar c = Calendar.getInstance();
@@ -220,7 +220,7 @@ public class StockTakeDao {
 	 * @throws BusinessException
 	 * 			if the StockTake is not exist
 	 */
-	public static void updateStockTake(DBCon dbCon, Terminal term, StockTake builder) throws SQLException, BusinessException{
+	public static void updateStockTake(DBCon dbCon, Staff term, StockTake builder) throws SQLException, BusinessException{
 		//判断盘点单是否已审核
 		StockTake stockTake = StockTakeDao.getStockTakeById(term, builder.getId());
 		if(stockTake.getStatus() == Status.AUDIT){
@@ -249,7 +249,7 @@ public class StockTakeDao {
 		
 		String deptName;
 
-		String selectDept = "SELECT name FROM " + Params.dbName + ".department WHERE dept_id = " + builder.getDept().getId() + " AND restaurant_id = " + term.restaurantID;		
+		String selectDept = "SELECT name FROM " + Params.dbName + ".department WHERE dept_id = " + builder.getDept().getId() + " AND restaurant_id = " + term.getRestaurantId();		
 		dbCon.rs = dbCon.stmt.executeQuery(selectDept);
 		if(dbCon.rs.next()){
 			deptName = dbCon.rs.getString("name");
@@ -285,7 +285,7 @@ public class StockTakeDao {
 	 * @throws BusinessException
 	 * 			if the StockTake is not exist
 	 */
-	public static void updateStockTake(Terminal term, int stockTakeId, InsertStockTakeBuilder builder) throws SQLException, BusinessException{
+	public static void updateStockTake(Staff term, int stockTakeId, InsertStockTakeBuilder builder) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		dbCon.connect();
 		try{
@@ -307,7 +307,7 @@ public class StockTakeDao {
 		}
 	}
 	
-	public static void updateStockTake(Terminal term,StockTake builder) throws SQLException, BusinessException{
+	public static void updateStockTake(Staff term,StockTake builder) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -328,7 +328,7 @@ public class StockTakeDao {
 	 * @throws SQLException
 	 * 			if failed to execute any SQL statement
 	 */
-	public static List<StockTake> getStockTakesAndDetail(Terminal term, String extraCond, String orderClause) throws SQLException{
+	public static List<StockTake> getStockTakesAndDetail(Staff term, String extraCond, String orderClause) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -350,7 +350,7 @@ public class StockTakeDao {
 	 * @throws SQLException
 	 * 			if failed to execute any SQL statement
 	 */
-	public static List<StockTake> getStockTakesAndDetail(DBCon dbCon, Terminal term, String extraCond, String orderClause) throws SQLException{
+	public static List<StockTake> getStockTakesAndDetail(DBCon dbCon, Staff term, String extraCond, String orderClause) throws SQLException{
 
 		String sql ;
 		sql = "SELECT ST.id, ST.restaurant_id, ST.dept_id, ST.dept_name, ST.material_cate_id, ST.material_cate_name, ST.status, ST.material_cate_type, ST.operator, ST.operator_id, " +
@@ -358,7 +358,7 @@ public class StockTakeDao {
 				" FROM " + Params.dbName + ".stock_take as ST " +
 				" INNER JOIN " + Params.dbName + ".stock_take_detail as TD " +
 				" ON ST.id = TD.stock_take_id " +
-				" WHERE ST.restaurant_id = " + term.restaurantID +
+				" WHERE ST.restaurant_id = " + term.getRestaurantId() +
 				(extraCond == null ? "" : extraCond) +
 				(orderClause == null ? "" : orderClause);
 		
@@ -417,7 +417,7 @@ public class StockTakeDao {
 	 * @throws BusinessException
 	 * 			if the stockTake is not exist
 	 */
-	public static StockTake getStockTakeAndDetailById(Terminal term, int id) throws SQLException,BusinessException {
+	public static StockTake getStockTakeAndDetailById(Staff term, int id) throws SQLException,BusinessException {
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -440,7 +440,7 @@ public class StockTakeDao {
 	 * @throws BusinessException
 	 * 			if the stockTake is not exist
 	 */
-	public static StockTake getStockTakeAndDetailById(DBCon dbCon, Terminal term, int id) throws SQLException,BusinessException{
+	public static StockTake getStockTakeAndDetailById(DBCon dbCon, Staff term, int id) throws SQLException,BusinessException{
 		List<StockTake> list = getStockTakesAndDetail(dbCon, term, " AND ST.id = " + id, null);
 		if(list.isEmpty()){
 			throw new BusinessException(StockError.STOCKTAKE_SELECT);
@@ -461,7 +461,7 @@ public class StockTakeDao {
 	 * @throws SQLException
 	 * 			if failed to execute any SQL statement
 	 */
-	public static List<StockTake> getStockTakes(Terminal term, String extraCond, String orderClause) throws SQLException{
+	public static List<StockTake> getStockTakes(Staff term, String extraCond, String orderClause) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -484,13 +484,13 @@ public class StockTakeDao {
 	 * @throws SQLException
 	 * 			if failed to execute any SQL statement
 	 */
-	public static List<StockTake> getStockTakes(DBCon dbCon, Terminal term, String extraCond, String orderClause) throws SQLException{
+	public static List<StockTake> getStockTakes(DBCon dbCon, Staff term, String extraCond, String orderClause) throws SQLException{
 		List<StockTake> sTakes = new ArrayList<StockTake>();
 		String sql ;
 		sql = "SELECT id, restaurant_id, dept_id, dept_name, material_cate_id, material_cate_name, status, material_cate_type, operator, operator_id, " +
 				"approver, approver_id, start_date, finish_date, comment " +
 				" FROM " + Params.dbName + ".stock_take" +
-				" WHERE restaurant_id = " + term.restaurantID +
+				" WHERE restaurant_id = " + term.getRestaurantId() +
 				(extraCond == null ? "" : extraCond) +
 				(orderClause == null ? "" : orderClause);
 		
@@ -532,7 +532,7 @@ public class StockTakeDao {
 	 * @throws BusinessException
 	 * 			if the stockTake is not exist
 	 */
-	public static StockTake getStockTakeById(Terminal term, int id) throws SQLException,BusinessException {
+	public static StockTake getStockTakeById(Staff term, int id) throws SQLException,BusinessException {
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -555,7 +555,7 @@ public class StockTakeDao {
 	 * @throws BusinessException
 	 * 			if the stockTake is not exist
 	 */
-	public static StockTake getStockTakeById(DBCon dbCon, Terminal term, int id) throws SQLException,BusinessException{
+	public static StockTake getStockTakeById(DBCon dbCon, Staff term, int id) throws SQLException,BusinessException{
 		List<StockTake> list = getStockTakes(dbCon, term, " AND id = " + id, null);
 		if(list.isEmpty()){
 			throw new BusinessException(StockError.STOCKTAKE_SELECT);
@@ -574,7 +574,7 @@ public class StockTakeDao {
 	 * @throws BusinessException
 	 * 			if the stockTake is not exist
 	 */
-	public static List<Integer> auditStockTake(Terminal term, UpdateStockTakeBuilder builder) throws SQLException,BusinessException{
+	public static List<Integer> auditStockTake(Staff term, UpdateStockTakeBuilder builder) throws SQLException,BusinessException{
 		DBCon dbCon = new DBCon();
 		dbCon.connect();
 		List<Integer> list;
@@ -608,7 +608,7 @@ public class StockTakeDao {
 	 * @throws SQLException
 	 * @throws BusinessException
 	 */
-	public static List<Material> getNotStockTakeDetail(Terminal term, int stockTakeId) throws SQLException, BusinessException{
+	public static List<Material> getNotStockTakeDetail(Staff term, int stockTakeId) throws SQLException, BusinessException{
 		StockTake stockTake = getStockTakeAndDetailById(term, stockTakeId);
 		List<Material> list;
 		if(stockTake.getMaterialCate().getId() == 0){
@@ -640,7 +640,7 @@ public class StockTakeDao {
 	 * @throws BusinessException
 	 * 			if the some material is not exist in this department
 	 */
-	public static void beforeAudit(Terminal term, int stockTakeId) throws SQLException, BusinessException{
+	public static void beforeAudit(Staff term, int stockTakeId) throws SQLException, BusinessException{
 		
 		StockTake stockTake = getStockTakeAndDetailById(term, stockTakeId);
 		
@@ -670,7 +670,7 @@ public class StockTakeDao {
 	 * @throws BusinessException
 	 * 			if the stockTake is not exist
 	 */
-	public static void keep(Terminal term, int stockTakeId) throws SQLException, BusinessException{
+	public static void keep(Staff term, int stockTakeId) throws SQLException, BusinessException{
 		StockTake stockTake = getStockTakeAndDetailById(term, stockTakeId);
 		List<Material> list;
 		//判断是选了是否选了小类
@@ -736,7 +736,7 @@ public class StockTakeDao {
 	 * @throws BusinessException
 	 * 			if the stockTake is not exist
 	 */
-	public static void reset(Terminal term, int stockTakeId) throws SQLException, BusinessException{
+	public static void reset(Staff term, int stockTakeId) throws SQLException, BusinessException{
 		StockTake stockTake = getStockTakeAndDetailById(term, stockTakeId);
 		List<Material> list;
 		if(stockTake.getMaterialCate().getId() == 0){
@@ -807,7 +807,7 @@ public class StockTakeDao {
 	 * 			if the stockTake is not exist
 	 */
 	
-	public static List<Integer> auditStockTake(DBCon dbCon, Terminal term, UpdateStockTakeBuilder builder) throws SQLException,BusinessException{
+	public static List<Integer> auditStockTake(DBCon dbCon, Staff term, UpdateStockTakeBuilder builder) throws SQLException,BusinessException{
 		beforeAudit(term, builder.getId());
 		String sql;
 		List<Integer> result;
@@ -818,7 +818,7 @@ public class StockTakeDao {
 				" finish_date = " + "'" + DateUtil.formatToDate(new Date().getTime()) + "', " +
 				" status = " + builder.getStatus().getVal() +
 				" WHERE id = " + builder.getId() + 
-				" AND restaurant_id = " + term.restaurantID;
+				" AND restaurant_id = " + term.getRestaurantId();
 	
 		if(dbCon.stmt.executeUpdate(sql) == 0){
 			throw new BusinessException(StockError.STOCKTAKE_DETAIL_UPDATE);
@@ -835,8 +835,8 @@ public class StockTakeDao {
 			//大于0则是盘盈
 			if(stockTakeDetail.getDeltaAmount() > 0){
 				
-				stockActionInsertBuild = StockAction.InsertBuilder.newMore(term.restaurantID)
-								   .setOperatorId((int) term.pin).setOperator(term.owner)
+				stockActionInsertBuild = StockAction.InsertBuilder.newMore(term.getRestaurantId())
+								   .setOperatorId(term.getId()).setOperator(term.getName())
 								   .setOriStockDate(new Date().getTime())
 								   .setComment(stockTake.getComment())
 								   .setDeptIn(stockTake.getDept().getId())
@@ -852,8 +852,8 @@ public class StockTakeDao {
 					insertBuilders.get(stockActionInsertBuild).addDetail(new StockActionDetail(material.getId(), material.getPrice(), stockTakeDetail.getTotalDelta()));
 				}
 			}else if(stockTakeDetail.getDeltaAmount() < 0){
-				stockActionInsertBuild = StockAction.InsertBuilder.newLess(term.restaurantID)
-														   .setOperatorId((int) term.pin).setOperator(term.owner)
+				stockActionInsertBuild = StockAction.InsertBuilder.newLess(term.getRestaurantId())
+														   .setOperatorId(term.getId()).setOperator(term.getName())
 														   .setOriStockDate(new Date().getTime())
 														   .setComment(stockTake.getComment())
 														   .setDeptOut(stockTake.getDept().getId())
@@ -877,7 +877,7 @@ public class StockTakeDao {
 			for (InsertBuilder InsertBuild : insertBuilders.values()) {
 				stockActionId = StockActionDao.insertStockAction(dbCon, term, InsertBuild);
 				AuditBuilder updateBuilder = StockAction.AuditBuilder.newStockActionAudit(stockActionId)
-											.setApproverId((int) term.pin).setApprover(term.owner);
+											.setApproverId(term.getId()).setApprover(term.getName());
 				StockActionDao.auditStockAction(dbCon, term, updateBuilder);
 				result.add(stockActionId);
 			}
@@ -911,7 +911,7 @@ public class StockTakeDao {
 	 * @throws BusinessException
 	 * 			if the stockTake is not exist
 	 */
-	public static void deleteStockTakeById(Terminal term, int id) throws SQLException,BusinessException{
+	public static void deleteStockTakeById(Staff term, int id) throws SQLException,BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -933,7 +933,7 @@ public class StockTakeDao {
 	 * @throws BusinessException
 	 * 			if the stockTake is not exist
 	 */
-	public static void deleteStockTakeById(DBCon dbCon, Terminal term, int id) throws SQLException,BusinessException{
+	public static void deleteStockTakeById(DBCon dbCon, Staff term, int id) throws SQLException,BusinessException{
 		
 		if(deleteStockTake(dbCon, term, " AND id = " + id) == 0){
 			throw new BusinessException(StockError.STOCKTAKE_DELETE);
@@ -952,10 +952,10 @@ public class StockTakeDao {
 	 * @throws SQLException
 	 * 			if failed to execute any SQL statement
 	 */
-	public static int deleteStockTake(DBCon dbCon, Terminal term, String extraCond) throws SQLException{
+	public static int deleteStockTake(DBCon dbCon, Staff term, String extraCond) throws SQLException{
 		String sql;
 		sql = "DELETE FROM " + Params.dbName + ".stock_take" + 
-				" WHERE restaurant_id = " + term.restaurantID +
+				" WHERE restaurant_id = " + term.getRestaurantId() +
 				(extraCond == null ? "" : extraCond);
 		return dbCon.stmt.executeUpdate(sql);
 	}

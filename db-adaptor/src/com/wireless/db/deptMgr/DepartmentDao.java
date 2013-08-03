@@ -8,12 +8,12 @@ import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.menuMgr.Department;
-import com.wireless.protocol.Terminal;
+import com.wireless.pojo.staffMgr.Staff;
 
 public class DepartmentDao {
 
 	/**
-	 * Get the department to a specified restaurant defined in {@link Terminal} and other extra condition.
+	 * Get the department to a specified restaurant defined in {@link Staff} and other extra condition.
 	 * @param term
 	 * 			the terminal
 	 * @param extraCond
@@ -24,7 +24,7 @@ public class DepartmentDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static List<Department> getDepartments(Terminal term, String extraCond, String orderClause) throws SQLException{
+	public static List<Department> getDepartments(Staff term, String extraCond, String orderClause) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -35,7 +35,7 @@ public class DepartmentDao {
 	}
 	
 	/**
-	 * Get the department to a specified restaurant defined in {@link Terminal} and other extra condition.
+	 * Get the department to a specified restaurant defined in {@link Staff} and other extra condition.
 	 * @param dbCon
 	 * 			the database connection
 	 * @param term
@@ -48,13 +48,13 @@ public class DepartmentDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static List<Department> getDepartments(DBCon dbCon, Terminal term, String extraCond, String orderClause) throws SQLException{
+	public static List<Department> getDepartments(DBCon dbCon, Staff term, String extraCond, String orderClause) throws SQLException{
 		
 		List<Department> result = new ArrayList<Department>();
 		
 		String sql = " SELECT dept_id, name, restaurant_id, type FROM " + Params.dbName + ".department DEPT " +
 					 " WHERE 1 = 1 AND DEPT.dept_id <> 253 AND DEPT.dept_id <> 255 " +
-					 " AND DEPT.restaurant_id = " + term.restaurantID +
+					 " AND DEPT.restaurant_id = " + term.getRestaurantId() +
 					 (extraCond != null ? extraCond : "") + " " +
 					 (orderClause != null ? orderClause : "");
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
@@ -82,7 +82,7 @@ public class DepartmentDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static Department getDepartmentById(Terminal term, int deptId) throws BusinessException, SQLException{
+	public static Department getDepartmentById(Staff term, int deptId) throws BusinessException, SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -106,16 +106,16 @@ public class DepartmentDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static Department getDepartmentById(DBCon dbCon, Terminal term, int deptId) throws BusinessException, SQLException{
+	public static Department getDepartmentById(DBCon dbCon, Staff term, int deptId) throws BusinessException, SQLException{
 		List<Department> result = getDepartments(dbCon, term, " AND DEPT.dept_id = " + deptId, null);
 		if(result.isEmpty()){
-			throw new BusinessException("The department(id = " + deptId + ",restaurant_id = " + term.restaurantID + ") does NOT exist.");
+			throw new BusinessException("The department(id = " + deptId + ",restaurant_id = " + term.getRestaurantId() + ") does NOT exist.");
 		}else{
 			return result.get(0);
 		}
 	}
 	
-	public static void update(Terminal term, Department deptToUpdate) throws SQLException, BusinessException{
+	public static void update(Staff term, Department deptToUpdate) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -125,7 +125,7 @@ public class DepartmentDao {
 		}
 	}
 	
-	public static void update(DBCon dbCon, Terminal term, Department deptToUpdate) throws SQLException, BusinessException{
+	public static void update(DBCon dbCon, Staff term, Department deptToUpdate) throws SQLException, BusinessException{
 		//TODO
 	}
 	

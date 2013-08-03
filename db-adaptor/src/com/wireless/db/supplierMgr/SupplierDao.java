@@ -9,8 +9,8 @@ import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.SupplierError;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.supplierMgr.Supplier;
-import com.wireless.protocol.Terminal;
 
 public class SupplierDao {
 	
@@ -95,8 +95,8 @@ public class SupplierDao {
 	 * @throws SQLException
 	 * 			if failed to execute any SQL Statement
 	 */
-	public static int delete(DBCon dbCon, Terminal term, String extraCond) throws SQLException{
-		return delete(dbCon, " AND restaurant_id = " + term.restaurantID + " " + (extraCond != null ? extraCond : ""));
+	public static int delete(DBCon dbCon, Staff term, String extraCond) throws SQLException{
+		return delete(dbCon, " AND restaurant_id = " + term.getRestaurantId() + " " + (extraCond != null ? extraCond : ""));
 	}
 	/**
 	 * Delete supplier according to extra condition.
@@ -108,7 +108,7 @@ public class SupplierDao {
 	 * @throws SQLException
 	 * 			if failed to execute any SQL Statement 
 	 */
-	public static int delete(Terminal term, String extraCond) throws SQLException{
+	public static int delete(Staff term, String extraCond) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -130,8 +130,8 @@ public class SupplierDao {
 	 * @throws BusinessException
 	 * 			if the supplier to delete does not exist
 	 */
-	public static void deleteById(DBCon dbCon, Terminal term, int supplierId) throws SQLException,BusinessException{
-		if(delete(dbCon, " AND restaurant_id = " + term.restaurantID + " AND supplier_id = " + supplierId) == 0){
+	public static void deleteById(DBCon dbCon, Staff term, int supplierId) throws SQLException,BusinessException{
+		if(delete(dbCon, " AND restaurant_id = " + term.getRestaurantId() + " AND supplier_id = " + supplierId) == 0){
 			throw new BusinessException(SupplierError.SUPPLIER_DELETE);
 		}
 	}
@@ -146,7 +146,7 @@ public class SupplierDao {
 	 * @throws BusinessException
 	 * 			if the supplier to delete does not exist 
 	 */
-	public static void deleteById(Terminal term, int supplierId) throws SQLException, BusinessException{
+	public static void deleteById(Staff term, int supplierId) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -167,7 +167,7 @@ public class SupplierDao {
 	 * @throws BusinessException
 	 * 			if the table to update does not exist
 	 */
-	public static void update(Terminal term,Supplier supplier) throws SQLException,BusinessException{
+	public static void update(Staff term,Supplier supplier) throws SQLException,BusinessException{
 		DBCon dbCon = new DBCon();
 		try {
 			dbCon.connect();
@@ -191,7 +191,7 @@ public class SupplierDao {
 	 * @throws BusinessException
 	 * 			if the table to update does not exist 
 	 */
-	public static void update(DBCon dbCon, Terminal term, Supplier supplier) throws SQLException,BusinessException{
+	public static void update(DBCon dbCon, Staff term, Supplier supplier) throws SQLException,BusinessException{
 		String sql;
 		sql = "UPDATE " + Params.dbName + ".supplier SET" +
 			  " name = '" + supplier.getName() + "', " +
@@ -199,7 +199,7 @@ public class SupplierDao {
 			  " addr = '" + supplier.getAddr() + "', " +
 			  " contact = '" + supplier.getContact() + "', " +
 			  " comment = '" + supplier.getComment() + "' " +
-			  " WHERE restaurant_id = " + term.restaurantID +
+			  " WHERE restaurant_id = " + term.getRestaurantId() +
 			  " AND supplier_id = " + supplier.getSupplierId();
 			  
 		
@@ -221,7 +221,7 @@ public class SupplierDao {
 	 * @throws SQLException
 	 * 			if failed to execute any SQL Statement 
 	 */
-	public static List<Supplier> getSuppliers(Terminal term, String extraCond, String orderClause) throws SQLException{
+	public static List<Supplier> getSuppliers(Staff term, String extraCond, String orderClause) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -245,14 +245,14 @@ public class SupplierDao {
 	 * @throws SQLException
 	 * 			if failed to execute any SQL Statement 
 	 */
-	public static List<Supplier> getSuppliers(DBCon dbCon, Terminal term, String extraCond, String orderClause) throws SQLException{
+	public static List<Supplier> getSuppliers(DBCon dbCon, Staff term, String extraCond, String orderClause) throws SQLException{
 		List<Supplier> suppliers = new ArrayList<Supplier>();
 		try{
 			dbCon.connect();
 			String sql = "SELECT" +
 						" supplier_id,restaurant_id,name,tele,addr,contact,comment " +
 						" FROM " + Params.dbName + ".supplier " +
-						" WHERE restaurant_id = " + term.restaurantID + " " +
+						" WHERE restaurant_id = " + term.getRestaurantId() + " " +
 						(extraCond == null ? "" : extraCond) +
 						(orderClause == null ? "" : orderClause);
 			
@@ -286,7 +286,7 @@ public class SupplierDao {
 	 * @throws SQLException
 	 * 			if failed to execute any SQL Statement 
 	 */
-	public static Supplier getSupplierById(Terminal term, int supplierId) throws BusinessException, SQLException{
+	public static Supplier getSupplierById(Staff term, int supplierId) throws BusinessException, SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -310,7 +310,7 @@ public class SupplierDao {
 	 * @throws SQLException
 	 * 			if failed to execute any SQL Statement
 	 */
-	public static Supplier getSupplierById(DBCon dbCon, Terminal term, int supplierid) throws BusinessException, SQLException{
+	public static Supplier getSupplierById(DBCon dbCon, Staff term, int supplierid) throws BusinessException, SQLException{
 		List<Supplier> result = getSuppliers(dbCon, term, " AND supplier_id = " + supplierid, null);
 		if(result.isEmpty()){
 			throw new BusinessException(SupplierError.SUPPLIER_SELECT);
@@ -328,7 +328,7 @@ public class SupplierDao {
 	 * @throws SQLException
 	 * 			if failed to execute any SQL statement
 	 */
-	public static int getSupplierCount(Terminal term, String extraCond) throws SQLException{
+	public static int getSupplierCount(Staff term, String extraCond) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -348,10 +348,10 @@ public class SupplierDao {
 	 * @throws SQLException
 	 * 			if failed to execute any SQL statement
 	 */
-	public static int getSupplierCount(DBCon dbCon, Terminal term, String extraCond) throws SQLException{
+	public static int getSupplierCount(DBCon dbCon, Staff term, String extraCond) throws SQLException{
 			String sql = "SELECT COUNT(*) "+
 						" FROM " + Params.dbName + ".supplier" +
-						" WHERE restaurant_id = " + term.restaurantID + " " +
+						" WHERE restaurant_id = " + term.getRestaurantId() + " " +
 						(extraCond == null ? "" : extraCond);
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
 			if(dbCon.rs.next()){

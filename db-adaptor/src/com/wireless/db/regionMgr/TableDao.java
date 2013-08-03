@@ -12,7 +12,7 @@ import com.wireless.exception.ProtocolError;
 import com.wireless.pojo.regionMgr.Region;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.regionMgr.Table.InsertBuilder;
-import com.wireless.protocol.Terminal;
+import com.wireless.pojo.staffMgr.Staff;
 
 public class TableDao {
 
@@ -30,7 +30,7 @@ public class TableDao {
 	 * @throws BusinessException
 	 * 			if the table to query does NOT exist
 	 */
-	public static Table getTableById(DBCon dbCon, Terminal term, int tableId) throws SQLException, BusinessException{
+	public static Table getTableById(DBCon dbCon, Staff term, int tableId) throws SQLException, BusinessException{
 		
 		List<Table> result = getTables(dbCon, term, "AND TBL.table_id = " + tableId, null);
 		if(result.isEmpty()){
@@ -52,7 +52,7 @@ public class TableDao {
 	 * @throws BusinessException
 	 * 			if the table to query does NOT exist
 	 */
-	public static Table getTableById(Terminal term, int tableId) throws SQLException, BusinessException{
+	public static Table getTableById(Staff term, int tableId) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -63,7 +63,7 @@ public class TableDao {
 	}
 	
 	/**
-	 * Get the table detail according to table alias of a specified restaurant defined in terminal {@link Terminal}.
+	 * Get the table detail according to table alias of a specified restaurant defined in terminal {@link Staff}.
 	 * @param dbCon
 	 * 			the database connection
 	 * @param term
@@ -76,7 +76,7 @@ public class TableDao {
 	 * @throws BusinessException
 	 * 			if the table to query does NOT exist
 	 */
-	public static Table getTableByAlias(DBCon dbCon, Terminal term, int tableAlias) throws SQLException, BusinessException{
+	public static Table getTableByAlias(DBCon dbCon, Staff term, int tableAlias) throws SQLException, BusinessException{
 		List<Table> result = getTables(dbCon, term, "AND TBL.table_alias = " + tableAlias, null);
 		if(result.isEmpty()){
 			throw new BusinessException(ProtocolError.TABLE_NOT_EXIST);
@@ -86,7 +86,7 @@ public class TableDao {
 	}
 	
 	/**
-	 * Get the table detail according to table alias of a specified restaurant defined in terminal {@link Terminal}.
+	 * Get the table detail according to table alias of a specified restaurant defined in terminal {@link Staff}.
 	 * @param term
 	 * 			the terminal
 	 * @param tableId
@@ -97,7 +97,7 @@ public class TableDao {
 	 * @throws BusinessException
 	 * 			if the table to query does NOT exist
 	 */
-	public static Table getTableByAlias(Terminal term, int tableAlias) throws SQLException, BusinessException{
+	public static Table getTableByAlias(Staff term, int tableAlias) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -109,7 +109,7 @@ public class TableDao {
 	
 	
 	/**
-	 * Get the tables according to a specified restaurant defined in {@link Terminal} and other condition.
+	 * Get the tables according to a specified restaurant defined in {@link Staff} and other condition.
 	 * @param dbCon
 	 * 			the database connection
 	 * @param term
@@ -122,7 +122,7 @@ public class TableDao {
 	 * @throws SQLException
 	 * 			if failed to execute any SQL statement
 	 */
-	public static List<Table> getTables(DBCon dbCon, Terminal term, String extraCond, String orderClause) throws SQLException{
+	public static List<Table> getTables(DBCon dbCon, Staff term, String extraCond, String orderClause) throws SQLException{
 		List<Table> result = new ArrayList<Table>();
 		String querySQL = " SELECT " +
 						  " REGION.name AS region_name, REGION.region_id, REGION.restaurant_id, " +
@@ -132,7 +132,7 @@ public class TableDao {
 						  " LEFT JOIN " + Params.dbName + ".region REGION " +
 						  " ON REGION.region_id = TBL.region_id AND REGION.restaurant_id = TBL.restaurant_id " +
 						  " WHERE 1 = 1 " +
-						  " AND TBL.restaurant_id = " + term.restaurantID + " " +
+						  " AND TBL.restaurant_id = " + term.getRestaurantId() + " " +
 						  (extraCond != null ? extraCond : "") + " " + 
 						  (orderClause != null ? orderClause : "");
 		
@@ -164,7 +164,7 @@ public class TableDao {
 	}
 	
 	/**
-	 * Get the tables according to a specified restaurant defined in {@link Terminal} and other condition.
+	 * Get the tables according to a specified restaurant defined in {@link Staff} and other condition.
 	 * @param term
 	 * 			the terminal
 	 * @param extraCond
@@ -175,7 +175,7 @@ public class TableDao {
 	 * @throws SQLException
 	 * 			if failed to execute any SQL statement
 	 */
-	public static List<Table> getTables(Terminal term, String extraCond, String orderClause) throws SQLException{
+	public static List<Table> getTables(Staff term, String extraCond, String orderClause) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -197,7 +197,7 @@ public class TableDao {
 	 * @throws BusinessException
 	 * 			if the table to update does NOT exist
 	 */
-	public static void updateById(DBCon dbCon, Terminal term, Table tblToUpdate) throws SQLException, BusinessException{
+	public static void updateById(DBCon dbCon, Staff term, Table tblToUpdate) throws SQLException, BusinessException{
 		String updateSQL = " UPDATE " + Params.dbName + ".table SET " +
 						   " region_id = " + tblToUpdate.getRegion().getRegionId() + "," +
 						   " name = '" + tblToUpdate.getName() + "'," +
@@ -222,7 +222,7 @@ public class TableDao {
 	 * @throws BusinessException
 	 * 			if the table to update does NOT exist
 	 */
-	public static void updateById(Terminal term, Table tblToUpdate) throws SQLException, BusinessException{
+	public static void updateById(Staff term, Table tblToUpdate) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -247,13 +247,13 @@ public class TableDao {
 	 * @throws BusinessException
 	 * 			if the alias id to new table has been exist before
 	 */
-	private static int insert(DBCon dbCon, Terminal term, Table tblToInsert) throws SQLException, BusinessException{
+	private static int insert(DBCon dbCon, Staff term, Table tblToInsert) throws SQLException, BusinessException{
 		
 		String sql;
 		
 		sql = " SELECT * FROM " + Params.dbName + ".table " +
 			  " WHERE " +
-			  " restaurant_id = " + term.restaurantID + 
+			  " restaurant_id = " + term.getRestaurantId() + 
 			  " AND " + 
 			  " table_alias = " + tblToInsert.getAliasId();
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
@@ -296,7 +296,7 @@ public class TableDao {
 	 * @throws BusinessException
 	 * 			if the alias id to new table has been exist before
 	 */
-	public static Table insert(Terminal term, InsertBuilder builder) throws SQLException, BusinessException{
+	public static Table insert(Staff term, InsertBuilder builder) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -321,7 +321,7 @@ public class TableDao {
 	 * @throws BusinessException
 	 * 			if the alias id to new table has been exist before
 	 */
-	public static Table insert(DBCon dbCon, Terminal term, InsertBuilder builder) throws SQLException, BusinessException{
+	public static Table insert(DBCon dbCon, Staff term, InsertBuilder builder) throws SQLException, BusinessException{
 		Table tblToInsert = builder.build();
 		tblToInsert.setTableId(insert(dbCon, term, tblToInsert));
 		return tblToInsert;
@@ -340,7 +340,7 @@ public class TableDao {
 	 * @throws BusinessException
 	 * 			if the table to delete does NOT exist
 	 */
-	public static void deleteById(DBCon dbCon, Terminal term, int tableId) throws SQLException, BusinessException{
+	public static void deleteById(DBCon dbCon, Staff term, int tableId) throws SQLException, BusinessException{
 		if(delete(dbCon, " AND TBL.table_id = " + tableId) == 0){
 			throw new BusinessException("删除的餐台不存在");
 		}
@@ -357,7 +357,7 @@ public class TableDao {
 	 * @throws BusinessException
 	 * 			if the table to delete does NOT exist
 	 */
-	public static void deleteById(Terminal term, int tableId) throws SQLException, BusinessException{
+	public static void deleteById(Staff term, int tableId) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -368,7 +368,7 @@ public class TableDao {
 	}
 	
 	/**
-	 * Delete a table according to table alias id of a specified restaurant defined in terminal {@link Terminal}.
+	 * Delete a table according to table alias id of a specified restaurant defined in terminal {@link Staff}.
 	 * @param dbCon
 	 * 			the database connection
 	 * @param term
@@ -380,14 +380,14 @@ public class TableDao {
 	 * @throws BusinessException
 	 * 			if the table to delete does NOT exist
 	 */
-	public static void deleteByAliasId(DBCon dbCon, Terminal term, int tableAlias) throws SQLException, BusinessException{
-		if(delete(dbCon, " AND TBL.restaurant_id = " + term.restaurantID + " AND TBL.table_alias = " + tableAlias) == 0){
+	public static void deleteByAliasId(DBCon dbCon, Staff term, int tableAlias) throws SQLException, BusinessException{
+		if(delete(dbCon, " AND TBL.restaurant_id = " + term.getRestaurantId() + " AND TBL.table_alias = " + tableAlias) == 0){
 			throw new BusinessException("删除的餐台不存在");
 		}
 	}
 	
 	/**
-	 * Delete a table according to table alias id of a specified restaurant defined in terminal {@link Terminal}.
+	 * Delete a table according to table alias id of a specified restaurant defined in terminal {@link Staff}.
 	 * @param term
 	 * 			the terminal
 	 * @param tableAlias
@@ -397,7 +397,7 @@ public class TableDao {
 	 * @throws BusinessException
 	 * 			if the table to delete does NOT exist
 	 */
-	public static void deleteByAliasId(Terminal term, int tableAlias) throws SQLException, BusinessException{
+	public static void deleteByAliasId(Staff term, int tableAlias) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -408,7 +408,7 @@ public class TableDao {
 	}
 	
 	/**
-	 * Delete the table according to extra condition of a specified restaurant defined in terminal {@link Terminal}.
+	 * Delete the table according to extra condition of a specified restaurant defined in terminal {@link Staff}.
 	 * @param dbCon
 	 * 			the database connection
 	 * @param term
@@ -419,12 +419,12 @@ public class TableDao {
 	 * @throws SQLException
 	 * 			if failed to execute any SQL statement
 	 */
-	public static int delete(DBCon dbCon, Terminal term, String extraCond) throws SQLException{
-		return delete(dbCon, " AND TBL.restaurant_id = " + term.restaurantID + (extraCond != null ? extraCond : ""));
+	public static int delete(DBCon dbCon, Staff term, String extraCond) throws SQLException{
+		return delete(dbCon, " AND TBL.restaurant_id = " + term.getRestaurantId() + (extraCond != null ? extraCond : ""));
 	}
 	
 	/**
-	 * Delete the table according to extra condition of a specified restaurant defined in terminal {@link Terminal}.
+	 * Delete the table according to extra condition of a specified restaurant defined in terminal {@link Staff}.
 	 * @param term
 	 * 			the terminal
 	 * @param extraCond
@@ -433,7 +433,7 @@ public class TableDao {
 	 * @throws SQLException
 	 * 			if failed to execute any SQL statement
 	 */
-	public static int delete(Terminal term, String extraCond) throws SQLException{
+	public static int delete(Staff term, String extraCond) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -460,7 +460,7 @@ public class TableDao {
 	}
 	
 	/**
-	 * Get the amount of table to a specified restaurant defined in terminal {@link Terminal} and extra condition.
+	 * Get the amount of table to a specified restaurant defined in terminal {@link Staff} and extra condition.
 	 * @param term
 	 * 			the terminal
 	 * @param extraCond
@@ -469,7 +469,7 @@ public class TableDao {
 	 * @throws SQLException
 	 * 			if failed to execute any SQL statement
 	 */
-	public static int getTableCount(Terminal term, String extraCond) throws SQLException{
+	public static int getTableCount(Staff term, String extraCond) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -480,7 +480,7 @@ public class TableDao {
 	}
 	
 	/**
-	 * Get the amount of table to a specified restaurant defined in terminal {@link Terminal} and extra condition.
+	 * Get the amount of table to a specified restaurant defined in terminal {@link Staff} and extra condition.
 	 * @param dbCon
 	 * 			the database connection
 	 * @param term
@@ -491,11 +491,11 @@ public class TableDao {
 	 * @throws SQLException
 	 * 			if failed to execute any SQL statement
 	 */
-	public static int getTableCount(DBCon dbCon, Terminal term, String extraCond) throws SQLException{
+	public static int getTableCount(DBCon dbCon, Staff term, String extraCond) throws SQLException{
 		String sql;
 		sql = " SELECT COUNT(*) FROM " + Params.dbName + ".table TBL" +
 			  " WHERE 1 = 1" + 
-			  " AND TBL.restaurant_id = " + term.restaurantID + " " +	
+			  " AND TBL.restaurant_id = " + term.getRestaurantId() + " " +	
 			  (extraCond != null ? extraCond : "");
 		
 		dbCon.rs = dbCon.stmt.executeQuery(sql);

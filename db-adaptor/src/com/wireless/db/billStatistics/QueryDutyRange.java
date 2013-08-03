@@ -8,12 +8,12 @@ import java.util.Map;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
-import com.wireless.db.frontBusiness.VerifyPin;
+import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.SystemError;
 import com.wireless.pojo.billStatistics.DutyRange;
-import com.wireless.pojo.system.Staff;
-import com.wireless.protocol.Terminal;
+import com.wireless.pojo.staffMgr.Staff;
+import com.wireless.pojo.system.SystemStaff;
 import com.wireless.util.DateType;
 import com.wireless.util.SQLUtil;
 
@@ -37,7 +37,7 @@ public class QueryDutyRange {
 	 * @throws SQLException
 	 * 			throws if any error occurred while execute any SQL statements.
 	 */
-	public static DutyRange exec(DBCon dbCon, Terminal term, String onDuty, String offDuty) throws SQLException{
+	public static DutyRange exec(DBCon dbCon, Staff term, String onDuty, String offDuty) throws SQLException{
 		try{
 			String sql;
 			sql = " SELECT MIN(on_duty) AS on_duty, MAX(off_duty) AS off_duty FROM "
@@ -45,7 +45,7 @@ public class QueryDutyRange {
 					+ ".daily_settle_history "
 					+ " WHERE "
 					+ " restaurant_id = "
-					+ term.restaurantID
+					+ term.getRestaurantId()
 					+ " AND "
 					+ " off_duty BETWEEN "
 					+ "'" + onDuty + "'"
@@ -89,11 +89,11 @@ public class QueryDutyRange {
 	 * @return
 	 * @throws Exception
 	 */
-	public static DutyRange exec(long pin, String onDuty, String offDuty) throws Exception{
+	public static DutyRange exec(int staffId, String onDuty, String offDuty) throws Exception{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return QueryDutyRange.exec(dbCon, VerifyPin.exec(dbCon, pin, Terminal.MODEL_STAFF), onDuty, offDuty);
+			return QueryDutyRange.exec(dbCon, StaffDao.verify(dbCon, staffId), onDuty, offDuty);
 		}catch(Exception e){
 			throw e;
 		}finally{
@@ -108,12 +108,12 @@ public class QueryDutyRange {
 	 * @return
 	 * @throws Exception
 	 */
-	public static List<DutyRange> getDutyRangeByToday(DBCon dbCon, long pin) throws Exception{
+	public static List<DutyRange> getDutyRangeByToday(DBCon dbCon, int staffId) throws Exception{
 		List<DutyRange> list = new ArrayList<DutyRange>();
 		DutyRange item = null;
-		Staff staff = null;
+		SystemStaff staff = null;
 		
-		Terminal term = VerifyPin.exec(dbCon, pin, Terminal.MODEL_STAFF);
+		Staff term = StaffDao.verify(dbCon, staffId);
 //		String selectSQL = "SELECT name, DATE_FORMAT(on_duty,'%Y-%m-%d %T') AS on_duty, DATE_FORMAT(off_duty,'%Y-%m-%d %T') AS off_duty "
 //						+ " FROM "
 //						+ " ("
@@ -128,17 +128,17 @@ public class QueryDutyRange {
 		String querySQL = "SELECT name, on_duty, off_duty "
 				+ " FROM "
 				+ " ("
-				+ " (SELECT '全天' AS name, (SELECT IFNULL(MAX(off_duty), '1970-01-01 00:00:00') FROM " + Params.dbName + ".daily_settle_history WHERE restaurant_id = " + term.restaurantID + ") AS on_duty, NOW() AS off_duty) "
+				+ " (SELECT '全天' AS name, (SELECT IFNULL(MAX(off_duty), '1970-01-01 00:00:00') FROM " + Params.dbName + ".daily_settle_history WHERE restaurant_id = " + term.getRestaurantId() + ") AS on_duty, NOW() AS off_duty) "
 				+ " UNION ALL"
-				+ " (SELECT name, on_duty, off_duty FROM " + Params.dbName + ".shift WHERE restaurant_id = " + term.restaurantID + " ORDER BY off_duty)"
+				+ " (SELECT name, on_duty, off_duty FROM " + Params.dbName + ".shift WHERE restaurant_id = " + term.getRestaurantId() + " ORDER BY off_duty)"
 				+ " UNION ALL"
-				+ " (SELECT * FROM (SELECT '本班次' AS name, (SELECT off_duty FROM " + Params.dbName + ".shift WHERE restaurant_id = " + term.restaurantID + " ORDER BY off_duty DESC LIMIT 0,1) AS on_duty, NOW() AS off_duty) TT WHERE on_duty IS NOT NULL) "
+				+ " (SELECT * FROM (SELECT '本班次' AS name, (SELECT off_duty FROM " + Params.dbName + ".shift WHERE restaurant_id = " + term.getRestaurantId() + " ORDER BY off_duty DESC LIMIT 0,1) AS on_duty, NOW() AS off_duty) TT WHERE on_duty IS NOT NULL) "
 				+ " ) "
 				+ " T";
 		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
 		while(dbCon.rs != null && dbCon.rs.next()){
 			item = new DutyRange();
-			staff = new Staff();
+			staff = new SystemStaff();
 			staff.setTerminal(null);
 			staff.setName(dbCon.rs.getString("name"));
 			item.setStaff(staff);
@@ -154,16 +154,16 @@ public class QueryDutyRange {
 	
 	/**
 	 * 
-	 * @param pin
+	 * @param staffId
 	 * @return
 	 * @throws Exception
 	 */
-	public static List<DutyRange> getDutyRangeByToday(long pin) throws Exception{
+	public static List<DutyRange> getDutyRangeByToday(int staffId) throws Exception{
 		DBCon dbCon = new DBCon();
 		List<DutyRange> list = null;
 		try{
 			dbCon.connect();
-			list = QueryDutyRange.getDutyRangeByToday(dbCon, pin);
+			list = QueryDutyRange.getDutyRangeByToday(dbCon, staffId);
 		}catch(Exception e){
 			throw e;
 		}finally{
@@ -182,7 +182,7 @@ public class QueryDutyRange {
 	private static List<DutyRange> getDutyRangeByHistory(DBCon dbCon, Map<Object, Object> params) throws Exception {
 		List<DutyRange> list = new ArrayList<DutyRange>();
 		DutyRange item = null;
-		Staff staff = null;
+		SystemStaff staff = null;
 		
 		String querySQL = "SELECT SH.restaurant_id, SH.id, SH.name, SH.on_duty, SH.off_duty"
 						+ " FROM shift_history SH"
@@ -191,7 +191,7 @@ public class QueryDutyRange {
 		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
 		while(dbCon.rs != null && dbCon.rs.next()){
 			item = new DutyRange();
-			staff = new Staff();
+			staff = new SystemStaff();
 			staff.setTerminal(null);
 			staff.setName(dbCon.rs.getString("name"));
 			item.setStaff(staff);
@@ -239,7 +239,7 @@ public class QueryDutyRange {
 			if(pin == null){
 				throw new BusinessException(SystemError.NOT_FIND_RESTAURANTID);
 			}
-			list = QueryDutyRange.getDutyRangeByToday(Long.valueOf(pin.toString()));
+			list = QueryDutyRange.getDutyRangeByToday(Integer.valueOf(pin.toString()));
 		}else if(DateType.getType(params) == DateType.HISTORY){
 			Object restaurantID, onDuty, offDuty;
 			restaurantID = params.get("restaurantID");

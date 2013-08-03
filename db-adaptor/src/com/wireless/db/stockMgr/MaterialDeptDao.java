@@ -8,9 +8,9 @@ import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.StockError;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.stockMgr.MaterialDept;
 import com.wireless.pojo.stockMgr.StockTakeDetail;
-import com.wireless.protocol.Terminal;
 import com.wireless.util.PinyinUtil;
 
 public class MaterialDeptDao {
@@ -26,7 +26,7 @@ public class MaterialDeptDao {
 	 * @throws BusinessException 
 	 * 			if has same department and cateId to insert
 	 */
-	public static void insertMaterialDept(Terminal term, MaterialDept mDept) throws SQLException, BusinessException{
+	public static void insertMaterialDept(Staff term, MaterialDept mDept) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -50,7 +50,7 @@ public class MaterialDeptDao {
 	 * @throws BusinessException 
 	 * 			if has same department and cateId to insert
 	 */
-	public static void insertMaterialDept(DBCon dbCon, Terminal term, MaterialDept materialDept)throws SQLException, BusinessException{
+	public static void insertMaterialDept(DBCon dbCon, Staff term, MaterialDept materialDept)throws SQLException, BusinessException{
 		String sql;
 		sql = "INSERT INTO " + Params.dbName + ".material_dept (material_id, dept_id, restaurant_id, stock) " +
 				" VALUES(" +
@@ -73,7 +73,7 @@ public class MaterialDeptDao {
 	 * @throws BusinessException
 	 * 			if the MaterialDept is not exist
 	 */
-	public static void updateMaterialDept(Terminal term, MaterialDept mDept) throws SQLException, BusinessException{
+	public static void updateMaterialDept(Staff term, MaterialDept mDept) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -95,7 +95,7 @@ public class MaterialDeptDao {
 	 * @throws BusinessException
 	 * 			if the MaterialDept is not exist
 	 */
-	public static void updateMaterialDept(DBCon dbCon, Terminal term, MaterialDept materialDept) throws SQLException, BusinessException{
+	public static void updateMaterialDept(DBCon dbCon, Staff term, MaterialDept materialDept) throws SQLException, BusinessException{
 		String sql;
 		sql = "UPDATE " + Params.dbName + ".material_dept " +
 				" SET stock = " + materialDept.getStock() + 
@@ -119,7 +119,7 @@ public class MaterialDeptDao {
 	 * @throws BusinessException 
 	 * 			if the material_id is not exist
 	 */
-	public static List<MaterialDept> getMaterialDepts(Terminal term, String extraCond, String orderClause)throws SQLException, BusinessException{
+	public static List<MaterialDept> getMaterialDepts(Staff term, String extraCond, String orderClause)throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -144,13 +144,13 @@ public class MaterialDeptDao {
 	 * @throws BusinessException 
 	 * 			if the material_id is not exist
 	 */
-	public static List<MaterialDept> getMaterialDepts(DBCon dbCon, Terminal term, String extraCond, String orderClause)throws SQLException, BusinessException{
+	public static List<MaterialDept> getMaterialDepts(DBCon dbCon, Staff term, String extraCond, String orderClause)throws SQLException, BusinessException{
 		List<MaterialDept> mDepts = new ArrayList<MaterialDept>();
 		String sql;
 		sql = "SELECT MD.material_id, MD.dept_id, MD.restaurant_id, MD.stock, M.price, M.name, M.stock as m_stock, D.name as d_name" +
 				" FROM (" + Params.dbName + ".material_dept as MD INNER JOIN " + Params.dbName + ".material as M ON MD.material_id = M.material_id )" +
 				" INNER JOIN " + Params.dbName + ".department as D ON MD.dept_id = D.dept_id AND MD.restaurant_id = D.restaurant_id " + 
-				" WHERE MD.restaurant_id = " + term.restaurantID +
+				" WHERE MD.restaurant_id = " + term.getRestaurantId() +
 				(extraCond == null ? "" : extraCond) +
 				(orderClause == null ? "" : orderClause);
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
@@ -176,7 +176,7 @@ public class MaterialDeptDao {
 	}
 	
 	
-	public static List<MaterialDept> getMaterialDeptState(Terminal term, String extraCond, String orderClause)throws SQLException, BusinessException{
+	public static List<MaterialDept> getMaterialDeptState(Staff term, String extraCond, String orderClause)throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -185,14 +185,14 @@ public class MaterialDeptDao {
 			dbCon.disconnect();
 		}
 	}
-	public static List<MaterialDept> getMaterialDeptState(DBCon dbCon, Terminal term, String extraCond, String orderClause)throws SQLException, BusinessException{
+	public static List<MaterialDept> getMaterialDeptState(DBCon dbCon, Staff term, String extraCond, String orderClause)throws SQLException, BusinessException{
 		List<MaterialDept> mDepts = new ArrayList<MaterialDept>();
 		String sql;
 		sql = "SELECT MD.material_id, MD.dept_id, MD.restaurant_id, MD.stock, M.price, M.name, M.stock as m_stock, D.name as d_name" +
 				" FROM ((" + Params.dbName + ".material_dept as MD INNER JOIN " + Params.dbName + ".material as M ON MD.material_id = M.material_id )" +
 				" INNER JOIN " + Params.dbName + ".material_cate as MC ON M.cate_id = MC.cate_id) " + 
 				" INNER JOIN " + Params.dbName + ".department as D ON MD.dept_id = D.dept_id AND MD.restaurant_id = D.restaurant_id " +
-				" WHERE MD.restaurant_id = " + term.restaurantID +
+				" WHERE MD.restaurant_id = " + term.getRestaurantId() +
 				(extraCond == null ? "" : extraCond) +
 				(orderClause == null ? "" : orderClause);
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
@@ -216,7 +216,7 @@ public class MaterialDeptDao {
 		return mDepts;
 		
 	}
-	public static List<StockTakeDetail> getStockTakeDetails(Terminal term, int deptId, int cateId, String orderClause) throws SQLException{
+	public static List<StockTakeDetail> getStockTakeDetails(Staff term, int deptId, int cateId, String orderClause) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -226,11 +226,11 @@ public class MaterialDeptDao {
 		}
 	}
 	
-	public static List<StockTakeDetail> getStockTakeDetails(DBCon dbCon, Terminal term, int deptId, int cateId, String orderClause) throws SQLException{
+	public static List<StockTakeDetail> getStockTakeDetails(DBCon dbCon, Staff term, int deptId, int cateId, String orderClause) throws SQLException{
 		List<StockTakeDetail> stockTakeDetails = new ArrayList<StockTakeDetail>();
 		String sql = "SELECT M.material_id, M.name, MD.stock FROM " + Params.dbName + ".material as M LEFT JOIN " + Params.dbName + ".material_dept as MD " + 
 					" ON M.material_id = MD.material_id AND MD.dept_id = " + deptId + 
-					" WHERE M.restaurant_id = " + term.restaurantID +
+					" WHERE M.restaurant_id = " + term.getRestaurantId() +
 					" AND M.cate_id = " + cateId + 
 					(orderClause == null ? "" : orderClause);
 		dbCon.rs = dbCon.stmt.executeQuery(sql);

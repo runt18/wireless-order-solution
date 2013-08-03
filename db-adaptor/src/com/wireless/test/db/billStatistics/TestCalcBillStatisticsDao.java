@@ -10,7 +10,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.wireless.db.billStatistics.CalcBillStatisticsDao;
-import com.wireless.db.frontBusiness.VerifyPin;
+import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.billStatistics.CancelIncomeByDept;
 import com.wireless.pojo.billStatistics.CancelIncomeByReason;
@@ -20,7 +20,7 @@ import com.wireless.pojo.billStatistics.IncomeByDept;
 import com.wireless.pojo.billStatistics.IncomeByFood;
 import com.wireless.pojo.billStatistics.IncomeByKitchen;
 import com.wireless.pojo.menuMgr.Department;
-import com.wireless.protocol.Terminal;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.test.db.TestInit;
 
 public class TestCalcBillStatisticsDao {
@@ -32,11 +32,11 @@ public class TestCalcBillStatisticsDao {
 	@Test 
 	public void testCalcIncomeByKitchen() throws BusinessException, SQLException{
 		
-		Terminal term = VerifyPin.exec(229, Terminal.MODEL_STAFF);
+		Staff staff = StaffDao.getStaffs(37).get(0);
 		
 		DutyRange range = new DutyRange("2012-12-10 23:40:04", "2012-12-26 23:49:36"); 
 		
-		List<IncomeByKitchen> kitchenIncomes = CalcBillStatisticsDao.calcIncomeByKitchen(term, range, null, CalcBillStatisticsDao.QUERY_HISTORY);
+		List<IncomeByKitchen> kitchenIncomes = CalcBillStatisticsDao.calcIncomeByKitchen(staff, range, null, CalcBillStatisticsDao.QUERY_HISTORY);
 		
 		HashMap<Department, IncomeByDept> deptIncomeByKitchen = new HashMap<Department, IncomeByDept>();
 		for(IncomeByKitchen kitchenIncome : kitchenIncomes){
@@ -54,7 +54,7 @@ public class TestCalcBillStatisticsDao {
 			}
 		}
 		
-		List<IncomeByDept> deptIncomes = CalcBillStatisticsDao.calcIncomeByDept(term, range, null, CalcBillStatisticsDao.QUERY_HISTORY);
+		List<IncomeByDept> deptIncomes = CalcBillStatisticsDao.calcIncomeByDept(staff, range, null, CalcBillStatisticsDao.QUERY_HISTORY);
 		
 		if(deptIncomeByKitchen.size() != deptIncomes.size()){
 			//Check if the amount of department income is the same as before.
@@ -78,11 +78,11 @@ public class TestCalcBillStatisticsDao {
 	
 	@Test 
 	public void testCalcIncomeByFood() throws BusinessException, SQLException{
-		Terminal term = VerifyPin.exec(229, Terminal.MODEL_STAFF);
+		Staff staff = StaffDao.getStaffs(37).get(0);
 		
 		DutyRange range = new DutyRange("2012-12-25 23:40:04", "2012-12-26 23:49:36"); 
 		
-		List<IncomeByFood> foodIncomes = CalcBillStatisticsDao.calcIncomeByFood(term, range, null, CalcBillStatisticsDao.QUERY_HISTORY);
+		List<IncomeByFood> foodIncomes = CalcBillStatisticsDao.calcIncomeByFood(staff, range, null, CalcBillStatisticsDao.QUERY_HISTORY);
 		
 		HashMap<Department, IncomeByDept> deptIncomeByFood = new HashMap<Department, IncomeByDept>();
 		for(IncomeByFood foodIncome : foodIncomes){
@@ -100,7 +100,7 @@ public class TestCalcBillStatisticsDao {
 			}
 		}
 		
-		List<IncomeByDept> deptIncomes = CalcBillStatisticsDao.calcIncomeByDept(term, range, null, CalcBillStatisticsDao.QUERY_HISTORY);
+		List<IncomeByDept> deptIncomes = CalcBillStatisticsDao.calcIncomeByDept(staff, range, null, CalcBillStatisticsDao.QUERY_HISTORY);
 		
 		if(deptIncomeByFood.size() != deptIncomes.size()){
 			//Check if the amount of department income is the same as before.
@@ -123,13 +123,13 @@ public class TestCalcBillStatisticsDao {
 	
 	@Test
 	public void testCalcCancelIncomeByReason() throws SQLException, BusinessException{
-		Terminal term = VerifyPin.exec(229, Terminal.MODEL_STAFF);
+		Staff staff = StaffDao.getStaffs(37).get(0);
 		
 		DutyRange range = new DutyRange("2012-12-10 23:40:04", "2012-12-26 23:49:36"); 
 		
-		List<CancelIncomeByReason> cancelByReason = CalcBillStatisticsDao.calcCancelIncomeByReason(term, range, null, CalcBillStatisticsDao.QUERY_HISTORY);
+		List<CancelIncomeByReason> cancelByReason = CalcBillStatisticsDao.calcCancelIncomeByReason(staff, range, null, CalcBillStatisticsDao.QUERY_HISTORY);
 		
-		IncomeByCancel cancelIncome = CalcBillStatisticsDao.calcCancelPrice(term, range, CalcBillStatisticsDao.QUERY_HISTORY);
+		IncomeByCancel cancelIncome = CalcBillStatisticsDao.calcCancelPrice(staff, range, CalcBillStatisticsDao.QUERY_HISTORY);
 		
 		float totalCancel = 0;
 		for(CancelIncomeByReason cancelByEachReason : cancelByReason){
@@ -141,13 +141,13 @@ public class TestCalcBillStatisticsDao {
 	
 	@Test
 	public void testCalcCancelIncomeByDept() throws SQLException, BusinessException{
-		Terminal term = VerifyPin.exec(229, Terminal.MODEL_STAFF);
+		Staff staff = StaffDao.getStaffs(37).get(0);
 		
 		DutyRange range = new DutyRange("2012-12-10 23:40:04", "2012-12-26 23:49:36"); 
 		
-		List<CancelIncomeByDept> cancelByDept = CalcBillStatisticsDao.calcCancelIncomeByDept(term, range, null, CalcBillStatisticsDao.QUERY_HISTORY);
+		List<CancelIncomeByDept> cancelByDept = CalcBillStatisticsDao.calcCancelIncomeByDept(staff, range, null, CalcBillStatisticsDao.QUERY_HISTORY);
 		
-		IncomeByCancel cancelIncome = CalcBillStatisticsDao.calcCancelPrice(term, range, CalcBillStatisticsDao.QUERY_HISTORY);
+		IncomeByCancel cancelIncome = CalcBillStatisticsDao.calcCancelPrice(staff, range, CalcBillStatisticsDao.QUERY_HISTORY);
 		
 		float totalCancel = 0;
 		for(CancelIncomeByDept cancelByEachDept : cancelByDept){

@@ -1,32 +1,31 @@
 package com.wireless.test.db.regionMgr;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.beans.PropertyVetoException;
 import java.sql.SQLException;
-
-import static org.junit.Assert.*;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.wireless.db.frontBusiness.VerifyPin;
 import com.wireless.db.regionMgr.TableDao;
+import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.regionMgr.Region;
 import com.wireless.pojo.regionMgr.Table;
-import com.wireless.protocol.Terminal;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.test.db.TestInit;
 
 public class TestTableDao {
 	
-	private static Terminal mTerminal;
+	private static Staff mStaff;
 	
 	@BeforeClass
 	public static void initDbParam() throws PropertyVetoException {
 		TestInit.init();
 		try {
-			mTerminal = VerifyPin.exec(217, Terminal.MODEL_STAFF);
-		} catch (BusinessException e) {
-			e.printStackTrace();
+			mStaff = StaffDao.getStaffs(37).get(0);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -48,14 +47,14 @@ public class TestTableDao {
 	@Test
 	public void testUpdate() throws BusinessException, SQLException{
 		
-		Table oriTbl = TableDao.getTables(mTerminal, null, null).get(0);
+		Table oriTbl = TableDao.getTables(mStaff, null, null).get(0);
 		
 		Table.UpdateBuilder builder = new Table.UpdateBuilder(oriTbl.getTableId()).setMiniCost(20)
 																				  .setServiceRate(0.1f)
 																				  .setTableName("测试餐台")
 																				  .setRegionId(Region.REGION_1);
 		Table expected = builder.build();
-		TableDao.updateById(mTerminal, expected);
+		TableDao.updateById(mStaff, expected);
 		
 		expected.setTableAlias(oriTbl.getAliasId());
 		expected.setCategory(oriTbl.getCategory());
@@ -63,40 +62,40 @@ public class TestTableDao {
 		expected.setStatus(oriTbl.getStatus());
 		expected.setRestaurantId(oriTbl.getRestaurantId());
 		
-		Table actual = TableDao.getTableById(mTerminal, expected.getTableId());
+		Table actual = TableDao.getTableById(mStaff, expected.getTableId());
 		
 		compare(expected, actual);
 		
 		//Restore the original table
-		TableDao.updateById(mTerminal, oriTbl);
+		TableDao.updateById(mStaff, oriTbl);
 	}
 	
 	@Test
 	public void testInsert() throws BusinessException, SQLException{
 		
 		//Create and insert a new table
-		Table.InsertBuilder builder = new Table.InsertBuilder(12345, mTerminal.restaurantID, Region.REGION_1).setMiniCost(200)
+		Table.InsertBuilder builder = new Table.InsertBuilder(12345, mStaff.getRestaurantId(), Region.REGION_1).setMiniCost(200)
 								  																			 .setServiceRate(0.1f)
 								  																			 .setTableName("测试餐台");
 		
-		Table expected = TableDao.insert(mTerminal, builder);
+		Table expected = TableDao.insert(mStaff, builder);
 		
-		Table actual = TableDao.getTableById(mTerminal, expected.getTableId());
+		Table actual = TableDao.getTableById(mStaff, expected.getTableId());
 		
 		compare(expected, actual);
 		
 		//Delete the table just created.
-		TableDao.deleteById(mTerminal, expected.getTableId());
+		TableDao.deleteById(mStaff, expected.getTableId());
 		
 		try{
-			TableDao.getTableById(mTerminal, expected.getTableId());
+			TableDao.getTableById(mStaff, expected.getTableId());
 			assertTrue("fail to delete table", true);
 		}catch(BusinessException e){
 			
 		}
 		
 		try{
-			TableDao.getTableById(mTerminal, expected.getTableId());
+			TableDao.getTableById(mStaff, expected.getTableId());
 			assertTrue("fail to delete table", true);
 		}catch(BusinessException e){
 			

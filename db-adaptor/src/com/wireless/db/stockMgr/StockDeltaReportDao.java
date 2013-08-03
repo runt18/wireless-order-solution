@@ -11,15 +11,15 @@ import java.util.Map;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.exception.BusinessException;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.stockMgr.StockReport;
 import com.wireless.pojo.stockMgr.StockTakeDetail;
 import com.wireless.pojo.stockMgr.StockAction.Status;
 import com.wireless.pojo.stockMgr.StockAction.SubType;
-import com.wireless.protocol.Terminal;
 
 public class StockDeltaReportDao {
 
-	public static List<StockTakeDetail> deltaReport(Terminal term, String begin, String end, String dept, String extraCond, String orderClause) throws SQLException, BusinessException{
+	public static List<StockTakeDetail> deltaReport(Staff term, String begin, String end, String dept, String extraCond, String orderClause) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -29,7 +29,7 @@ public class StockDeltaReportDao {
 		}
 	}
 	
-	public static List<StockTakeDetail> deltaReport(DBCon dbCon, Terminal term, String begin, String end, String dept, String extraCond, String orderClause) throws SQLException, BusinessException{
+	public static List<StockTakeDetail> deltaReport(DBCon dbCon, Staff term, String begin, String end, String dept, String extraCond, String orderClause) throws SQLException, BusinessException{
 		float expectFinalAmount;
 		float actualFinalAmount;
 		List<StockTakeDetail> stockTakeDetails = new ArrayList<StockTakeDetail>();
@@ -65,7 +65,7 @@ public class StockDeltaReportDao {
 	}
 	
 	
-	public static List<StockReport> getStockCollect(DBCon dbCon, Terminal term, String begin, String end, String dept, String extraCond, String orderClause) throws SQLException, BusinessException{
+	public static List<StockReport> getStockCollect(DBCon dbCon, Staff term, String begin, String end, String dept, String extraCond, String orderClause) throws SQLException, BusinessException{
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 		try{
 			sdf.parse(begin);
@@ -78,7 +78,7 @@ public class StockDeltaReportDao {
 						" INNER JOIN " + Params.dbName + ".stock_action_detail as D ON S.id = D.stock_action_id) " +
 						" INNER JOIN " + Params.dbName + ".material as M ON M.material_id = D.material_id) " +
 						" INNER JOIN " + Params.dbName + ".material_cate as MC ON MC.cate_id = M.cate_id " +
-						" WHERE S.restaurant_id = " + term.restaurantID + 
+						" WHERE S.restaurant_id = " + term.getRestaurantId() + 
 						" AND S.dept_in = " + dept  +
 						" AND S.ori_stock_date <= '" + end + " 23:59:59' AND S.ori_stock_date >= '" + begin + "'" +
 						(extraCond == null ? "" : extraCond) +
@@ -90,7 +90,7 @@ public class StockDeltaReportDao {
 						" INNER JOIN " + Params.dbName + ".stock_action_detail as D ON S.id = D.stock_action_id) " +
 						" INNER JOIN " + Params.dbName + ".material as M ON M.material_id = D.material_id) " +
 						" INNER JOIN " + Params.dbName + ".material_cate as MC ON MC.cate_id = M.cate_id " +
-						" WHERE S.restaurant_id = " + term.restaurantID + 
+						" WHERE S.restaurant_id = " + term.getRestaurantId() + 
 						" AND S.dept_out = " + dept  +
 						" AND S.ori_stock_date <= '" + end + " 23:59:59' AND S.ori_stock_date >= '" + begin + "'" +
 						(extraCond == null ? "" : extraCond) +
@@ -141,7 +141,7 @@ public class StockDeltaReportDao {
 					endAmountCon.connect();
 					String endAmount = "SELECT S.dept_in, S.sub_type, D.remaining, D.dept_in_remaining, D.dept_out_remaining, D.price FROM " + Params.dbName + ".stock_action as S " + 
 							" INNER JOIN " + Params.dbName + ".stock_action_detail as D ON S.id = D.stock_action_id " +
-							" WHERE S.restaurant_id = " + term.restaurantID +
+							" WHERE S.restaurant_id = " + term.getRestaurantId() +
 							" AND (S.dept_in = " + dept + " OR S.dept_out = " + dept + ")" +
 							" AND S.ori_stock_date <= '" + end + " 23:59:59' AND D.material_id = " + materialId + 
 							" AND S.status = " + Status.AUDIT.getVal() +
@@ -174,7 +174,7 @@ public class StockDeltaReportDao {
 					primeAmountCon.connect();
 					String primeAmount = "SELECT S.dept_in, S.sub_type, D.remaining, D.dept_in_remaining, D.dept_out_remaining FROM " + Params.dbName + ".stock_action as S " + 
 							" INNER JOIN " + Params.dbName + ".stock_action_detail as D  ON S.id = D.stock_action_id " + 
-							" WHERE S.restaurant_id = " + term.restaurantID +
+							" WHERE S.restaurant_id = " + term.getRestaurantId() +
 							" AND (S.dept_in = " + dept + " OR S.dept_out = " + dept + ")" +
 							" AND S.ori_stock_date < '" + begin + "' AND D.material_id = " + materialId + 
 							" AND S.status = " + Status.AUDIT.getVal() +

@@ -12,17 +12,17 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.wireless.db.frontBusiness.CancelOrder;
-import com.wireless.db.frontBusiness.VerifyPin;
 import com.wireless.db.menuMgr.FoodDao;
 import com.wireless.db.orderMgr.OrderDao;
 import com.wireless.db.orderMgr.OrderGroupDao;
 import com.wireless.db.regionMgr.TableDao;
+import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.regionMgr.Table;
-import com.wireless.protocol.Terminal;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.test.db.TestInit;
 import com.wireless.util.DateType;
 
@@ -35,9 +35,9 @@ public class TestOrderGroupDao {
 	@Test 
 	public void testInsertByTbl() throws BusinessException, SQLException{
 		
-		Terminal term = VerifyPin.exec(229, Terminal.MODEL_STAFF);
+		Staff staff = StaffDao.getStaffs(37).get(0);
 		
-		List<Table> tbls = TableDao.getTables(term, null, null);
+		List<Table> tbls = TableDao.getTables(staff, null, null);
 		
 		Table[] tblToInsert = new Table[]{
 			tbls.get(0),
@@ -46,28 +46,28 @@ public class TestOrderGroupDao {
 		
 		//Cancel the record before performing insertion.
 		try{
-			OrderGroupDao.cancel(term, tblToInsert[0]);
+			OrderGroupDao.cancel(staff, tblToInsert[0]);
 		}catch(BusinessException e){
 			
 		}	
 		
 		for(Table tbl : tblToInsert){
 			try{
-				CancelOrder.exec(term, tbl.getAliasId());
+				CancelOrder.exec(staff, tbl.getAliasId());
 			}catch(BusinessException e){
 				
 			}
 		}
 			
 		
-		Order orderAfterInsert = OrderDao.getById(term, OrderGroupDao.insert(term, tblToInsert), DateType.TODAY);
+		Order orderAfterInsert = OrderDao.getById(staff, OrderGroupDao.insert(staff, tblToInsert), DateType.TODAY);
 		//Check if parent order is merged.
 		Assert.assertTrue(orderAfterInsert.isMerged());
 		
 		if(orderAfterInsert.hasChildOrder()){
 			Assert.assertEquals(orderAfterInsert.getChildOrder().size(), tblToInsert.length);
 			for(Order childOrder : orderAfterInsert.getChildOrder()){
-				Order orderToChild = OrderDao.getById(term, childOrder.getId(), DateType.TODAY);
+				Order orderToChild = OrderDao.getById(staff, childOrder.getId(), DateType.TODAY);
 				//Check if each child order is merged.
 				Assert.assertTrue(orderToChild.isMergedChild());
 				//Check if the table associated with each child order is merged.
@@ -78,15 +78,15 @@ public class TestOrderGroupDao {
 		}
 		
 		//Cancel the record after performing insertion.
-		OrderGroupDao.cancel(term, tblToInsert[0]);
+		OrderGroupDao.cancel(staff, tblToInsert[0]);
 	}
 	
 	@Test
 	public void testUpdateByTbl() throws BusinessException, SQLException{		
 
-		Terminal term = VerifyPin.exec(229, Terminal.MODEL_STAFF);
+		Staff staff = StaffDao.getStaffs(37).get(0);
 	
-		List<Table> tbls = TableDao.getTables(term, null, null);
+		List<Table> tbls = TableDao.getTables(staff, null, null);
 		
 		Table[] tblToInsert = new Table[]{
 			tbls.get(0),
@@ -95,56 +95,56 @@ public class TestOrderGroupDao {
 		
 		//Cancel the record before performing insertion.
 		try{
-			OrderGroupDao.cancel(term, tblToInsert[0]);
+			OrderGroupDao.cancel(staff, tblToInsert[0]);
 		}catch(BusinessException e){
 			
 		}
 		
 		for(Table tbl : tblToInsert){
 			try{
-				CancelOrder.exec(term, tbl.getAliasId());
+				CancelOrder.exec(staff, tbl.getAliasId());
 			}catch(BusinessException e){
 				
 			}
 		}
 		
-		int parentOrderId = OrderGroupDao.insert(term, tblToInsert);
+		int parentOrderId = OrderGroupDao.insert(staff, tblToInsert);
 		
 		Table[] tblToUpdate = new Table[]{
 			tbls.get(0),
 			tbls.get(1)
 		};
-		OrderGroupDao.update(term, parentOrderId, tblToUpdate);		
-		Order parentOrder = OrderDao.getById(term, parentOrderId, DateType.TODAY);
-		checkByTbl(term, parentOrder, tblToUpdate);
+		OrderGroupDao.update(staff, parentOrderId, tblToUpdate);		
+		Order parentOrder = OrderDao.getById(staff, parentOrderId, DateType.TODAY);
+		checkByTbl(staff, parentOrder, tblToUpdate);
 
 		tblToUpdate = new Table[]{
 			tbls.get(0),
 		};
-		OrderGroupDao.update(term, parentOrderId, tblToUpdate);		
-		parentOrder = OrderDao.getById(term, parentOrderId, DateType.TODAY);
-		checkByTbl(term, parentOrder, tblToUpdate);
+		OrderGroupDao.update(staff, parentOrderId, tblToUpdate);		
+		parentOrder = OrderDao.getById(staff, parentOrderId, DateType.TODAY);
+		checkByTbl(staff, parentOrder, tblToUpdate);
 		
 		tblToUpdate = new Table[]{
 			tbls.get(1),
 			tbls.get(0)
 		};
-		OrderGroupDao.update(term, parentOrderId, tblToUpdate);		
-		parentOrder = OrderDao.getById(term, parentOrderId, DateType.TODAY);
-		checkByTbl(term, parentOrder, tblToUpdate);
+		OrderGroupDao.update(staff, parentOrderId, tblToUpdate);		
+		parentOrder = OrderDao.getById(staff, parentOrderId, DateType.TODAY);
+		checkByTbl(staff, parentOrder, tblToUpdate);
 		
 		tblToUpdate = new Table[]{
 			tbls.get(1),
 			tbls.get(2)
 		};
-		OrderGroupDao.update(term, parentOrderId, tblToUpdate);		
-		parentOrder = OrderDao.getById(term, parentOrderId, DateType.TODAY);
-		checkByTbl(term, parentOrder, tblToUpdate);
+		OrderGroupDao.update(staff, parentOrderId, tblToUpdate);		
+		parentOrder = OrderDao.getById(staff, parentOrderId, DateType.TODAY);
+		checkByTbl(staff, parentOrder, tblToUpdate);
 		
-		OrderGroupDao.cancel(term, tblToUpdate[0]);
+		OrderGroupDao.cancel(staff, tblToUpdate[0]);
 	}
 	
-	private void checkByTbl(Terminal term, Order orderToCheck, Table[] expectedTbls) throws BusinessException, SQLException{
+	private void checkByTbl(Staff term, Order orderToCheck, Table[] expectedTbls) throws BusinessException, SQLException{
 		//Check if parent order is merged.
 		Assert.assertTrue(orderToCheck.isMerged());
 		
@@ -176,11 +176,11 @@ public class TestOrderGroupDao {
 	
 	@Test 
 	public void testUpdateByOrder() throws BusinessException, SQLException{
-		Terminal term = VerifyPin.exec(229, Terminal.MODEL_STAFF);
+		Staff staff = StaffDao.getStaffs(37).get(0);
 		
-		List<Table> tbls = TableDao.getTables(term, null, null);
+		List<Table> tbls = TableDao.getTables(staff, null, null);
 
-		List<Food> foods = FoodDao.getPureFoods(term, null, null);
+		List<Food> foods = FoodDao.getPureFoods(staff, null, null);
 
 		Params4Order[] params = new Params4Order[]{
 			new Params4Order(tbls.get(0), 
@@ -198,14 +198,14 @@ public class TestOrderGroupDao {
 		
 		//Cancel the record before performing insertion.
 		try{
-			OrderGroupDao.cancel(term, params[0].tbl);
+			OrderGroupDao.cancel(staff, params[0].tbl);
 		}catch(BusinessException e){
 			
 		}
 		
 		for(Params4Order param : params){
 			try{
-				CancelOrder.exec(term, param.tbl.getAliasId());
+				CancelOrder.exec(staff, param.tbl.getAliasId());
 			}catch(BusinessException e){
 				
 			}
@@ -226,12 +226,12 @@ public class TestOrderGroupDao {
 		
 		//---------------------------------------------------------------
 		//Insert a new order group
-		int actualOrderId = OrderGroupDao.insert(term, expectOrderGroup);
+		int actualOrderId = OrderGroupDao.insert(staff, expectOrderGroup);
 
-		Order actualOrderGroup = OrderDao.getById(term, actualOrderId, DateType.TODAY);
+		Order actualOrderGroup = OrderDao.getById(staff, actualOrderId, DateType.TODAY);
 		for(int i = 0; i < actualOrderGroup.getChildOrder().size(); i++){
-			actualOrderGroup.getChildOrder().set(i, OrderDao.getById(term, actualOrderGroup.getChildOrder().get(i).getId(), DateType.TODAY));
-			actualOrderGroup.getChildOrder().get(i).setDestTbl(TableDao.getTableByAlias(term, actualOrderGroup.getChildOrder().get(i).getDestTbl().getAliasId()));
+			actualOrderGroup.getChildOrder().set(i, OrderDao.getById(staff, actualOrderGroup.getChildOrder().get(i).getId(), DateType.TODAY));
+			actualOrderGroup.getChildOrder().get(i).setDestTbl(TableDao.getTableByAlias(staff, actualOrderGroup.getChildOrder().get(i).getDestTbl().getAliasId()));
 			expectOrderGroup.getChildOrder().get(i).setId(actualOrderGroup.getChildOrder().get(i).getId());
 		}
 		compareOrderGroup(expectOrderGroup, actualOrderGroup);
@@ -273,20 +273,20 @@ public class TestOrderGroupDao {
 		}
 		expectOrderGroup.setChildOrder(childOrdersToUpdate);
 		
-		OrderGroupDao.update(term, expectOrderGroup);
+		OrderGroupDao.update(staff, expectOrderGroup);
 		
-		actualOrderGroup = OrderDao.getById(term, actualOrderId, DateType.TODAY);
+		actualOrderGroup = OrderDao.getById(staff, actualOrderId, DateType.TODAY);
 		for(int i = 0; i < actualOrderGroup.getChildOrder().size(); i++){
-			actualOrderGroup.getChildOrder().set(i, OrderDao.getById(term, actualOrderGroup.getChildOrder().get(i).getId(), DateType.TODAY));
-			actualOrderGroup.getChildOrder().get(i).setDestTbl(TableDao.getTableByAlias(term, actualOrderGroup.getChildOrder().get(i).getDestTbl().getAliasId()));
+			actualOrderGroup.getChildOrder().set(i, OrderDao.getById(staff, actualOrderGroup.getChildOrder().get(i).getId(), DateType.TODAY));
+			actualOrderGroup.getChildOrder().get(i).setDestTbl(TableDao.getTableByAlias(staff, actualOrderGroup.getChildOrder().get(i).getDestTbl().getAliasId()));
 			expectOrderGroup.getChildOrder().get(i).setId(actualOrderGroup.getChildOrder().get(i).getId());
 
 		}
 		compareOrderGroup(expectOrderGroup, actualOrderGroup);
 
 		//Check the status to leaved order
-		Order actualLeavedOrder = OrderDao.getById(term, expectedLeavedOrder.getId(), DateType.TODAY);
-		actualLeavedOrder.setDestTbl(TableDao.getTableByAlias(term, actualLeavedOrder.getDestTbl().getAliasId()));
+		Order actualLeavedOrder = OrderDao.getById(staff, expectedLeavedOrder.getId(), DateType.TODAY);
+		actualLeavedOrder.setDestTbl(TableDao.getTableByAlias(staff, actualLeavedOrder.getDestTbl().getAliasId()));
 		//Check the category to table associated with leaved order
 		Assert.assertEquals("cateogry to table associated with leaved order", actualLeavedOrder.getDestTbl().isNormal(), true);
 		//Check the category to leaved order
@@ -307,10 +307,10 @@ public class TestOrderGroupDao {
 		
 		//-----------------------------------------------------------------
 		// Cancel the order group
-		OrderGroupDao.cancel(term, actualOrderGroup);
-		CancelOrder.exec(term, actualLeavedOrder.getDestTbl().getAliasId());
+		OrderGroupDao.cancel(staff, actualOrderGroup);
+		CancelOrder.exec(staff, actualLeavedOrder.getDestTbl().getAliasId());
 		for(Order childOrder : actualOrderGroup.getChildOrder()){
-			CancelOrder.exec(term, childOrder.getDestTbl().getAliasId());
+			CancelOrder.exec(staff, childOrder.getDestTbl().getAliasId());
 		}
 	}
 	

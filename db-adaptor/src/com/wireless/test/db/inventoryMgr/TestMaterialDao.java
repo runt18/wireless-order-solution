@@ -7,24 +7,21 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.wireless.db.DBCon;
-import com.wireless.db.frontBusiness.VerifyPin;
 import com.wireless.db.inventoryMgr.MaterialDao;
-import com.wireless.exception.BusinessException;
+import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.pojo.inventoryMgr.Material;
-import com.wireless.protocol.Terminal;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.test.db.TestInit;
 
 public class TestMaterialDao {
 	
-	private static Terminal term;
+	private static Staff staff;
 	
 	@BeforeClass
 	public static void beforeClass() throws PropertyVetoException{
 		TestInit.init();
 		try {
-			term = VerifyPin.exec(9720860, Terminal.MODEL_STAFF);
-		} catch (BusinessException e) {
-			e.printStackTrace();
+			staff = StaffDao.getStaffs(26).get(0);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -35,7 +32,7 @@ public class TestMaterialDao {
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			Material m = new Material(26, "26 insert material", 1, term.owner, Material.Status.NORMAL.getValue());
+			Material m = new Material(26, "26 insert material", 1, staff.getName(), Material.Status.NORMAL.getValue());
 			MaterialDao.insert(dbCon, m);
 		}catch(Exception e){
 			e.printStackTrace();

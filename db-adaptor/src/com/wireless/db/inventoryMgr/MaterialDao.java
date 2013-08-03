@@ -14,8 +14,8 @@ import com.wireless.exception.FoodError;
 import com.wireless.exception.MaterialError;
 import com.wireless.pojo.inventoryMgr.Material;
 import com.wireless.pojo.inventoryMgr.MaterialCate;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.DateUtil;
-import com.wireless.protocol.Terminal;
 import com.wireless.util.PinyinUtil;
 import com.wireless.util.SQLUtil;
 
@@ -238,7 +238,7 @@ public class MaterialDao {
 	 * @throws BusinessException
 	 * @throws SQLException
 	 */
-	public static Material insertGood(DBCon dbCon, Terminal term, int foodId, String foodName) throws BusinessException, SQLException{
+	public static Material insertGood(DBCon dbCon, Staff term, int foodId, String foodName) throws BusinessException, SQLException{
 		// 检查是否已存在商品库存资料
 		String querySQL = "SELECT COUNT(*) FROM food_material"
 				 + " WHERE food_id = " + foodId
@@ -253,7 +253,7 @@ public class MaterialDao {
 		}
 		// 查找系统保留的商品类型
 		querySQL = "SELECT cate_id FROM material_cate " 
-				 + " WHERE restaurant_id = " + term.restaurantID + " AND type = " + MaterialCate.Type.GOOD.getValue();
+				 + " WHERE restaurant_id = " + term.getRestaurantId() + " AND type = " + MaterialCate.Type.GOOD.getValue();
 		int cateId = 0;
 		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
 		if(dbCon.rs != null && dbCon.rs.next()){
@@ -264,10 +264,10 @@ public class MaterialDao {
 		}
 		
 		// 生成新商品库存信息
-		Material good = new Material(term.restaurantID, 
+		Material good = new Material(term.getRestaurantId(), 
 				foodName, 
 				cateId, 
-				term.owner, 
+				term.getName(), 
 				Material.Status.NORMAL.getValue()
 		);
 		try{

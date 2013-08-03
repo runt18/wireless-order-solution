@@ -13,8 +13,8 @@ import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.pojo.regionMgr.Table;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.tasteMgr.TasteGroup;
-import com.wireless.protocol.Terminal;
 
 /**
  * The DB reflector is designed to the bridge between the OrderFood instance of
@@ -481,9 +481,9 @@ public class OrderFoodDao {
 	 * @return
 	 * @throws SQLException
 	 */
-	public static float getSalesMoney(DBCon dbCon, Terminal term, String extraCond) throws SQLException{
+	public static float getSalesMoney(DBCon dbCon, Staff term, String extraCond) throws SQLException{
 		String sql = "SELECT SUM(unit_price * order_count) as money FROM " + Params.dbName + ".order_food_history " +
-				 " WHERE restaurant_id = " + term.restaurantID + 
+				 " WHERE restaurant_id = " + term.getRestaurantId() + 
 				 (extraCond == null ? "" : extraCond);
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		if(dbCon.rs.next()){

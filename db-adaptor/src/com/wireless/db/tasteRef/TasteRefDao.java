@@ -17,8 +17,8 @@ import com.wireless.exception.BusinessException;
 import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.menuMgr.Kitchen;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.tasteMgr.TasteGroup;
-import com.wireless.protocol.Terminal;
 
 public class TasteRefDao {
 	
@@ -438,7 +438,7 @@ public class TasteRefDao {
 	 * 批量更新
 	 * @param modTastes
 	 */
-	public static boolean update(Terminal terminal,String modTastes){
+	public static boolean update(Staff terminal,String modTastes){
 		try{
 			DBCon dbCon = new DBCon();
 			dbCon.connect();
@@ -452,7 +452,7 @@ public class TasteRefDao {
 				String tPrice = fields[3];
 				String tRate = fields[4];
 				String tCategory = fields[5];
-				String sql = "UPDATE "+Params.dbName+".taste SET "+Params.dbName+".taste.preference = '"+tName+"',"+Params.dbName+".taste.rate="+tRate+","+Params.dbName+".taste.calc = "+tCategory+","+Params.dbName+".taste.price = "+tPrice+","+Params.dbName+".taste.taste_alias = "+tAlias+" WHERE "+Params.dbName+".taste.restaurant_id = "+terminal.restaurantID+" AND "+Params.dbName+".taste.taste_id = "+tID;
+				String sql = "UPDATE "+Params.dbName+".taste SET "+Params.dbName+".taste.preference = '"+tName+"',"+Params.dbName+".taste.rate="+tRate+","+Params.dbName+".taste.calc = "+tCategory+","+Params.dbName+".taste.price = "+tPrice+","+Params.dbName+".taste.taste_alias = "+tAlias+" WHERE "+Params.dbName+".taste.restaurant_id = "+terminal.getRestaurantId()+" AND "+Params.dbName+".taste.taste_id = "+tID;
 				dbCon.stmt.addBatch(sql);
 			}
 			dbCon.stmt.executeBatch();

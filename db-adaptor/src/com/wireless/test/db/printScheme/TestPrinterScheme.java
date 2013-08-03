@@ -1,10 +1,11 @@
 package com.wireless.test.db.printScheme;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.beans.PropertyVetoException;
 import java.sql.SQLException;
 import java.util.List;
-
-import static org.junit.Assert.*;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -12,10 +13,10 @@ import org.junit.Test;
 import com.wireless.db.DBCon;
 import com.wireless.db.deptMgr.DepartmentDao;
 import com.wireless.db.deptMgr.KitchenDao;
-import com.wireless.db.frontBusiness.VerifyPin;
 import com.wireless.db.printScheme.PrintFuncDao;
 import com.wireless.db.printScheme.PrinterDao;
 import com.wireless.db.regionMgr.RegionDao;
+import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.menuMgr.Kitchen;
@@ -26,20 +27,18 @@ import com.wireless.pojo.printScheme.PrintFunc.DetailBuilder;
 import com.wireless.pojo.printScheme.PrintFunc.SummaryBuilder;
 import com.wireless.pojo.printScheme.Printer;
 import com.wireless.pojo.regionMgr.Region;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.SortedList;
-import com.wireless.protocol.Terminal;
 import com.wireless.test.db.TestInit;
 
 public class TestPrinterScheme {
-	private static Terminal mTerminal;
+	private static Staff mStaff;
 	
 	@BeforeClass
 	public static void initDbParam() throws PropertyVetoException{
 		TestInit.init();
 		try {
-			mTerminal = VerifyPin.exec(229, Terminal.MODEL_STAFF);
-		} catch (BusinessException e) {
-			e.printStackTrace();
+			mStaff = StaffDao.getStaffs(37).get(0);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -83,14 +82,14 @@ public class TestPrinterScheme {
 		try{
 			dbCon.connect();
 			
-			List<Department> depts = DepartmentDao.getDepartments(dbCon, mTerminal, null, null);
-			List<Kitchen> kitchens = KitchenDao.getKitchens(dbCon, mTerminal, null, null);
-			List<Region> regions = RegionDao.getRegions(dbCon, mTerminal, null, null);
+			List<Department> depts = DepartmentDao.getDepartments(dbCon, mStaff, null, null);
+			List<Kitchen> kitchens = KitchenDao.getKitchens(dbCon, mStaff, null, null);
+			List<Region> regions = RegionDao.getRegions(dbCon, mStaff, null, null);
 			
-			Printer.InsertBuilder builder = new Printer.InsertBuilder("GP-80250-200", PStyle.PRINT_STYLE_58MM, mTerminal.restaurantID)
+			Printer.InsertBuilder builder = new Printer.InsertBuilder("GP-80250-200", PStyle.PRINT_STYLE_58MM, mStaff.getRestaurantId())
 													   .setAlias("海鲜打印机");
 			//Add a new printer
-			printerId = PrinterDao.insert(dbCon, mTerminal, builder);
+			printerId = PrinterDao.insert(dbCon, mStaff, builder);
 			
 			//下单
 			PrintFunc.SummaryBuilder summaryFuncBuilder = SummaryBuilder.newPrintOrder()
@@ -100,14 +99,14 @@ public class TestPrinterScheme {
 																	   .setDepartment(depts.get(0));
 			
 			//Add a summary function to this printer
-			int summaryFuncId = PrintFuncDao.addFunc(dbCon, mTerminal, printerId, summaryFuncBuilder);
+			int summaryFuncId = PrintFuncDao.addFunc(dbCon, mStaff, printerId, summaryFuncBuilder);
 			
 			//Add a detail function to this printer(下单详细)
 			PrintFunc.DetailBuilder detailFuncBuilder = DetailBuilder.newPrintFoodDetail()
 																	 .setRepeat(2)
 																	 .addKitchen(kitchens.get(0))
 																	 .addKitchen(kitchens.get(1));
-			int detailFuncId = PrintFuncDao.addFunc(dbCon, mTerminal, printerId, detailFuncBuilder);
+			int detailFuncId = PrintFuncDao.addFunc(dbCon, mStaff, printerId, detailFuncBuilder);
 			
 			//退菜
 			PrintFunc.SummaryBuilder allCancelledFoodBuilder = SummaryBuilder.newAllCancelledFood()
@@ -115,28 +114,28 @@ public class TestPrinterScheme {
 																			.addRegion(regions.get(1))
 																			.addRegion(regions.get(2))
 																			.setDepartment(depts.get(1));
-			int allCancelledFoodId = PrintFuncDao.addFunc(dbCon, mTerminal, printerId, allCancelledFoodBuilder);
+			int allCancelledFoodId = PrintFuncDao.addFunc(dbCon, mStaff, printerId, allCancelledFoodBuilder);
 			
 			//退菜详细
 			PrintFunc.DetailBuilder cancelledFoodBuilder = DetailBuilder.newCancelledFood()
 																		.setRepeat(3)
 																		.addKitchen(kitchens.get(3))
 																		.addKitchen(kitchens.get(4));
-			int CancelledFoodId = PrintFuncDao.addFunc(dbCon, mTerminal, printerId, cancelledFoodBuilder);
+			int CancelledFoodId = PrintFuncDao.addFunc(dbCon, mStaff, printerId, cancelledFoodBuilder);
 			
 			//结账
 			PrintFunc.Builder  receiptBuilder = Builder.newReceipt()
 														.setRepeat(3)
 														.addRegion(regions.get(0))
 														.addRegion(regions.get(4));
-			int receiptId = PrintFuncDao.addFunc(dbCon, mTerminal, printerId, receiptBuilder);
+			int receiptId = PrintFuncDao.addFunc(dbCon, mStaff, printerId, receiptBuilder);
 			
 			//暂结
 			PrintFunc.Builder tempReceiptBuilder = Builder.newTempReceipt()
 															.setRepeat(2)
 															.addRegion(regions.get(0))
 															.addRegion(regions.get(2));
-			int tempReceiptId = PrintFuncDao.addFunc(dbCon, mTerminal, printerId, tempReceiptBuilder);
+			int tempReceiptId = PrintFuncDao.addFunc(dbCon, mStaff, printerId, tempReceiptBuilder);
 			
 			//转台
 			PrintFunc.Builder transferTableBuilder = Builder.newTransferTable()
@@ -144,14 +143,14 @@ public class TestPrinterScheme {
 															.addRegion(regions.get(2))
 															.addRegion(regions.get(5));
 			
-			int transferTableId = PrintFuncDao.addFunc(dbCon, mTerminal, printerId, transferTableBuilder);
+			int transferTableId = PrintFuncDao.addFunc(dbCon, mStaff, printerId, transferTableBuilder);
 			
 			//催菜
 			PrintFunc.Builder allHurriedFoodBuilder = Builder.newAllHurriedFood()
 															.setRepeat(1)
 															.addRegion(regions.get(4))
 															.addRegion(regions.get(6));
-			int allHurriedFoodId = PrintFuncDao.addFunc(dbCon, mTerminal, printerId, allHurriedFoodBuilder);
+			int allHurriedFoodId = PrintFuncDao.addFunc(dbCon, mStaff, printerId, allHurriedFoodBuilder);
 			
 			
 			Printer expected = builder.build();
@@ -177,56 +176,56 @@ public class TestPrinterScheme {
 			receipt.setId(receiptId);
 			expected.addFunc(receipt);
 			
-			PrintFunc tempReceipt = tempReceiptBuilder.build();
+			PrintFunc tempReceipt = receiptBuilder.build();
 			tempReceipt.setId(tempReceiptId);
-			expected.addFunc(tempReceipt);
+			expected.addFunc(receipt);
 			
-			PrintFunc transferTable = transferTableBuilder.build();
-			transferTable.setId(transferTableId);
+			PrintFunc transferTable = receiptBuilder.build();
+			tempReceipt.setId(transferTableId);
 			expected.addFunc(transferTable);
 			
-			PrintFunc allHurriedFood = allHurriedFoodBuilder.build();
-			allHurriedFood.setId(allHurriedFoodId);
+			PrintFunc allHurriedFood = receiptBuilder.build();
+			tempReceipt.setId(allHurriedFoodId);
 			expected.addFunc(allHurriedFood);
 			
 			//Compare after insertion
-			compare(expected, PrinterDao.getPrinterById(dbCon, mTerminal, printerId));
+			compare(expected, PrinterDao.getPrinterById(dbCon, mStaff, printerId));
 			
 			//Remove the summary function
-			//PrintFuncDao.removeFunc(dbCon, mTerminal, summaryFuncId);
+			PrintFuncDao.removeFunc(dbCon, mStaff, summaryFuncId);
 			
-			//expected.removeFunc(summaryFunc);
+			expected.removeFunc(summaryFunc);
 			
-			PrintFuncDao.removeFunc(dbCon, mTerminal, allCancelledFoodId);
+			PrintFuncDao.removeFunc(dbCon, mStaff, allCancelledFoodId);
 			
 			expected.removeFunc(allCancelledFood);
 			
-			PrintFuncDao.removeFunc(dbCon, mTerminal, receiptId);
+			PrintFuncDao.removeFunc(dbCon, mStaff, receiptId);
 			
 			expected.removeFunc(receipt);
 			
 			//Compare after deletion
-			compare(expected, PrinterDao.getPrinterById(dbCon, mTerminal, printerId));
+			compare(expected, PrinterDao.getPrinterById(dbCon, mStaff, printerId));
 
 			//Update the printer
-			Printer.UpdateBuilder updateBuilder = new Printer.UpdateBuilder(printerId, "GP-80250-500", PStyle.PRINT_STYLE_58MM)
-															 .setAlias("甜品打印机").setEnabled(false);
-			PrinterDao.update(dbCon, mTerminal, updateBuilder);
+			Printer.UpdateBuilder updateBuilder = new Printer.UpdateBuilder(printerId, "GP-80250-201", PStyle.PRINT_STYLE_80MM)
+															 .setAlias("中厨打印机").setEnabled(false);
+			PrinterDao.update(dbCon, mStaff, updateBuilder);
 			
-			expected.setName("GP-80250-500");
-			expected.setStyle(PStyle.PRINT_STYLE_58MM);
-			expected.setAlias("甜品打印机");
+			expected.setName("GP-80250-201");
+			expected.setStyle(PStyle.PRINT_STYLE_80MM);
+			expected.setAlias("中厨打印机");
 			//Compare after update printer
-			compare(expected, PrinterDao.getPrinterById(dbCon, mTerminal, printerId));
+			compare(expected, PrinterDao.getPrinterById(dbCon, mStaff, printerId));
 			
 		}finally{
 			
 			//delete the printer just created
-			if(printerId < 0){
-				PrinterDao.deleteById(dbCon, mTerminal, printerId);
+			if(printerId > 0){
+				PrinterDao.deleteById(dbCon, mStaff, printerId);
 				
 				try{
-					PrinterDao.getPrinterById(dbCon, mTerminal, printerId);
+					PrinterDao.getPrinterById(dbCon, mStaff, printerId);
 					assertTrue("fail to delete printer", false);
 				}catch(BusinessException ignored){}
 				

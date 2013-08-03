@@ -19,7 +19,7 @@ import com.wireless.pojo.foodGroup.Pager;
 import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.menuMgr.FoodStatistics;
-import com.wireless.protocol.Terminal;
+import com.wireless.pojo.staffMgr.Staff;
 
 public class CalcFoodGroupDao {
 
@@ -33,7 +33,7 @@ public class CalcFoodGroupDao {
 	 * @return
 	 * @throws SQLException
 	 */
-	public static List<Pager> calc(Terminal term) throws SQLException{
+	public static List<Pager> calc(Staff term) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -50,7 +50,7 @@ public class CalcFoodGroupDao {
 	 * @return
 	 * @throws SQLException
 	 */
-	public static List<Pager> calc(DBCon dbCon, Terminal term) throws SQLException{
+	public static List<Pager> calc(DBCon dbCon, Staff term) throws SQLException{
 		
 		List<Department> depts = DepartmentDao.getDepartments(dbCon, term, null, null);
 		

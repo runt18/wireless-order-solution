@@ -6,23 +6,21 @@ import java.sql.SQLException;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.wireless.db.frontBusiness.VerifyPin;
+import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
-import com.wireless.protocol.Terminal;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.test.db.TestInit;
 
 public class TestRegionDao {
 
 	@SuppressWarnings("unused")
-	private static Terminal mTerminal;
+	private static Staff mStaff;
 
 	@BeforeClass
 	public static void initDbParam() throws PropertyVetoException {
 		TestInit.init();
 		try {
-			mTerminal = VerifyPin.exec(229, Terminal.MODEL_STAFF);
-		} catch (BusinessException e) {
-			e.printStackTrace();
+			mStaff = StaffDao.getStaffs(37).get(0);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}

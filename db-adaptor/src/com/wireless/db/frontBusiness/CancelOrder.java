@@ -6,11 +6,12 @@ import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.orderMgr.OrderDao;
 import com.wireless.db.regionMgr.TableDao;
+import com.wireless.db.staffMgr.VerifyPin;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.regionMgr.Table;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.tasteMgr.TasteGroup;
-import com.wireless.protocol.Terminal;
 import com.wireless.util.DateType;
 
 public class CancelOrder {
@@ -53,7 +54,7 @@ public class CancelOrder {
 	 * 							 - The order to this table does NOT exist.<br>
 	 * @throws SQLException throws if fail to execute any SQL statement.
 	 */
-	public static void exec(Terminal term, int tableAlias) throws BusinessException, SQLException{
+	public static void exec(Staff term, int tableAlias) throws BusinessException, SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -80,7 +81,7 @@ public class CancelOrder {
 	 * 							 - The order to this table does NOT exist.<br>
 	 * @throws SQLException throws if fail to execute any SQL statement.
 	 */
-	public static void exec(DBCon dbCon, Terminal term, int tableAlias) throws BusinessException, SQLException{ 
+	public static void exec(DBCon dbCon, Staff term, int tableAlias) throws BusinessException, SQLException{ 
 		
 		Table table = TableDao.getTableByAlias(dbCon, term, tableAlias);
 		

@@ -10,12 +10,12 @@ import com.wireless.exception.BusinessException;
 import com.wireless.exception.DeptError;
 import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.menuMgr.Kitchen;
-import com.wireless.protocol.Terminal;
+import com.wireless.pojo.staffMgr.Staff;
 
 public class KitchenDao {
 	
 	/**
-	 * Get the kitchens to a specified restaurant defined in {@link Terminal} and other extra condition.
+	 * Get the kitchens to a specified restaurant defined in {@link Staff} and other extra condition.
 	 * @param term
 	 * 			the terminal
 	 * @param extraCond
@@ -26,7 +26,7 @@ public class KitchenDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static List<Kitchen> getKitchens(Terminal term, String extraCond, String orderClause) throws SQLException{
+	public static List<Kitchen> getKitchens(Staff term, String extraCond, String orderClause) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -37,7 +37,7 @@ public class KitchenDao {
 	}
 	
 	/**
-	 * Get the kitchens to a specified restaurant defined in {@link Terminal} and other extra condition.
+	 * Get the kitchens to a specified restaurant defined in {@link Staff} and other extra condition.
 	 * @param dbCon
 	 * 			the database connection
 	 * @param term
@@ -50,7 +50,7 @@ public class KitchenDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static List<Kitchen> getKitchens(DBCon dbCon, Terminal term, String extraCond, String orderClause) throws SQLException{
+	public static List<Kitchen> getKitchens(DBCon dbCon, Staff term, String extraCond, String orderClause) throws SQLException{
 		List<Kitchen> kitchens = new ArrayList<Kitchen>();
 		String sql = " SELECT " +
 					 " KITCHEN.restaurant_id, KITCHEN.kitchen_id, KITCHEN.kitchen_alias, " +
@@ -61,7 +61,7 @@ public class KitchenDao {
 					 Params.dbName + ".department DEPT " +
 					 " ON KITCHEN.dept_id = DEPT.dept_id AND KITCHEN.restaurant_id = DEPT.restaurant_id " +
 			  		 " WHERE 1=1 " +
-					 " AND KITCHEN.restaurant_id = " + term.restaurantID +
+					 " AND KITCHEN.restaurant_id = " + term.getRestaurantId() +
 			  		 (extraCond == null ? "" : extraCond) + " " +
 			  		 (orderClause == null ? "" : orderClause);
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
@@ -82,7 +82,7 @@ public class KitchenDao {
 	}
 	
 	/**
-	 * Get the kitchen to a specified restaurant defined in {@link Terminal} and kitchen alias
+	 * Get the kitchen to a specified restaurant defined in {@link Staff} and kitchen alias
 	 * @param term
 	 * 			the terminal
 	 * @param kitchenAlias
@@ -93,7 +93,7 @@ public class KitchenDao {
 	 * @throws BusinessException
 	 * 			throws if the kitchen does NOT exist
 	 */
-	public static Kitchen getKitchenByAlias(Terminal term, int kitchenAlias) throws SQLException, BusinessException{
+	public static Kitchen getKitchenByAlias(Staff term, int kitchenAlias) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -104,7 +104,7 @@ public class KitchenDao {
 	}
 	
 	/**
-	 * Get the kitchen to a specified restaurant defined in {@link Terminal} and kitchen alias
+	 * Get the kitchen to a specified restaurant defined in {@link Staff} and kitchen alias
 	 * @param dbCon
 	 * 			the database connection
 	 * @param term
@@ -117,18 +117,18 @@ public class KitchenDao {
 	 * @throws BusinessException
 	 * 			throws if the kitchen does NOT exist
 	 */
-	public static Kitchen getKitchenByAlias(DBCon dbCon, Terminal term, int kitchenAlias) throws SQLException, BusinessException{
+	public static Kitchen getKitchenByAlias(DBCon dbCon, Staff term, int kitchenAlias) throws SQLException, BusinessException{
 		List<Kitchen> result = getKitchens(dbCon, term,
 										   " AND KITCHEN.kitchen_alias = " + kitchenAlias,
 										   null);
 		if(result.isEmpty()){
-			throw new BusinessException("The kitchen(alias_id = " + kitchenAlias + ", restaurant_id = " + term.restaurantID + ") does NOT exist.", DeptError.KITCHEN_NOT_EXIST);
+			throw new BusinessException("The kitchen(alias_id = " + kitchenAlias + ", restaurant_id = " + term.getRestaurantId() + ") does NOT exist.", DeptError.KITCHEN_NOT_EXIST);
 		}else{
 			return result.get(0);
 		}
 	}
 	
-	public static void update(DBCon dbCon, Terminal term, Kitchen kitchenToUpdate) throws SQLException, BusinessException{
+	public static void update(DBCon dbCon, Staff term, Kitchen kitchenToUpdate) throws SQLException, BusinessException{
 		//TODO
 	}
 	

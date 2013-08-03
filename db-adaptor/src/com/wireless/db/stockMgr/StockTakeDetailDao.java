@@ -11,10 +11,10 @@ import com.wireless.db.inventoryMgr.MaterialDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.StockError;
 import com.wireless.pojo.inventoryMgr.Material;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.stockMgr.MaterialDept;
 import com.wireless.pojo.stockMgr.StockTake;
 import com.wireless.pojo.stockMgr.StockTakeDetail;
-import com.wireless.protocol.Terminal;
 
 public class StockTakeDetailDao {
 
@@ -29,7 +29,7 @@ public class StockTakeDetailDao {
 	 * 			if failed to execute any SQL statement
 	 * @throws BusinessException 
 	 */
-	public static int insertstockTakeDetail(Terminal term, StockTakeDetail sTakeDetail) throws SQLException, BusinessException{
+	public static int insertstockTakeDetail(Staff term, StockTakeDetail sTakeDetail) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -51,7 +51,7 @@ public class StockTakeDetailDao {
 	 * 			if failed to execute any SQL statement
 	 * @throws BusinessException 
 	 */
-	public static int insertstockTakeDetail(DBCon dbCon, Terminal term, StockTakeDetail sTakeDetail) throws SQLException, BusinessException{
+	public static int insertstockTakeDetail(DBCon dbCon, Staff term, StockTakeDetail sTakeDetail) throws SQLException, BusinessException{
 		Material material = MaterialDao.getById(dbCon, sTakeDetail.getMaterial().getId());
 		StockTake stockTake = StockTakeDao.getStockTakeById(dbCon, term, sTakeDetail.getStockTakeId());
 		List<MaterialDept> materialDepts = MaterialDeptDao.getMaterialDepts(dbCon, term, " AND MD.material_id = " + sTakeDetail.getMaterial().getId() + " AND MD.dept_id = " + stockTake.getDept().getId(), null);
@@ -89,7 +89,7 @@ public class StockTakeDetailDao {
 	 * @throws SQLException
 	 * 			if failed to execute any SQL statement
 	 */
-	public static List<StockTakeDetail> getstockTakeDetails(Terminal term, String extraCond, String orderClause) throws SQLException{
+	public static List<StockTakeDetail> getstockTakeDetails(Staff term, String extraCond, String orderClause) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -112,7 +112,7 @@ public class StockTakeDetailDao {
 	 * @throws SQLException
 	 * 			if failed to execute any SQL statement
 	 */
-	public static List<StockTakeDetail> getstockTakeDetails(DBCon dbCon, Terminal term, String extraCond, String orderClause) throws SQLException{
+	public static List<StockTakeDetail> getstockTakeDetails(DBCon dbCon, Staff term, String extraCond, String orderClause) throws SQLException{
 		List<StockTakeDetail> sTakeDetails = new ArrayList<StockTakeDetail>();
 		String sql ;
 		sql = "SELECT id, stock_take_id, material_id, name, actual_amount, expect_amount, delta_amount " +
@@ -149,7 +149,7 @@ public class StockTakeDetailDao {
 	 * @throws BusinessException
 	 * 			if the stockTakeDetail is not exist
 	 */
-	public static StockTakeDetail getstockTakeDetailById(Terminal term, int id) throws SQLException,BusinessException {
+	public static StockTakeDetail getstockTakeDetailById(Staff term, int id) throws SQLException,BusinessException {
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -172,7 +172,7 @@ public class StockTakeDetailDao {
 	 * @throws BusinessException
 	 * 			if the stockTakeDetail is not exist
 	 */
-	public static StockTakeDetail getstockTakeDetailById(DBCon dbCon, Terminal term, int id) throws SQLException,BusinessException{
+	public static StockTakeDetail getstockTakeDetailById(DBCon dbCon, Staff term, int id) throws SQLException,BusinessException{
 		List<StockTakeDetail> list = getstockTakeDetails(dbCon, term, " AND id = " + id, null);
 		if(list.isEmpty()){
 			throw new BusinessException(StockError.STOCKTAKE_DETAIL_SELECT);
@@ -191,7 +191,7 @@ public class StockTakeDetailDao {
 	 * @throws BusinessException
 	 * 			if the stockTakeDetail is not exist
 	 */
-	public static void updateStockTakeDetail(Terminal term, StockTakeDetail tDetail) throws SQLException,BusinessException{
+	public static void updateStockTakeDetail(Staff term, StockTakeDetail tDetail) throws SQLException,BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -213,7 +213,7 @@ public class StockTakeDetailDao {
 	 * @throws BusinessException
 	 * 			if the stockTakeDetail is not exist
 	 */
-	public static void updateStockTakeDetail(DBCon dbCon, Terminal term, StockTakeDetail tDetail) throws SQLException,BusinessException{
+	public static void updateStockTakeDetail(DBCon dbCon, Staff term, StockTakeDetail tDetail) throws SQLException,BusinessException{
 		String sql;
 		sql = "UPDATE " + Params.dbName + ".stock_take_detail" + 
 				" SET actual_amount = " + tDetail.getActualAmount() +
@@ -291,7 +291,7 @@ public class StockTakeDetailDao {
 	 * @throws SQLException
 	 * 			if failed to execute any SQL statement
 	 */
-	public static List<StockTakeDetail> deltaReport(Terminal term, String extraCond, String orderClause) throws SQLException{
+	public static List<StockTakeDetail> deltaReport(Staff term, String extraCond, String orderClause) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -311,13 +311,13 @@ public class StockTakeDetailDao {
 	 * @throws SQLException
 	 * 			if failed to execute any SQL statement
 	 */
-	public static List<StockTakeDetail> deltaReport(DBCon dbCon, Terminal term, String extraCond, String orderClause) throws SQLException{
+	public static List<StockTakeDetail> deltaReport(DBCon dbCon, Staff term, String extraCond, String orderClause) throws SQLException{
 		String sql;
 		List<StockTakeDetail> list = new ArrayList<StockTakeDetail>();
 		sql = "SELECT T.dept_name, M.material_id, M.name, M.price, TD.actual_amount, TD.expect_amount, TD.delta_amount FROM (wireless_order_db.stock_take as T " +
 				"INNER JOIN wireless_order_db.stock_take_detail as TD ON T.id = TD.stock_take_id) " +
 				"INNER JOIN wireless_order_db.material as M ON M.material_id = TD.material_id " +
-				" WHERE T.restaurant_id = " + term.restaurantID + 
+				" WHERE T.restaurant_id = " + term.getRestaurantId() + 
 				(extraCond == null ? "" : extraCond) + 
 				(orderClause == null ? "" : orderClause);
 		dbCon.rs = dbCon.stmt.executeQuery(sql);

@@ -11,8 +11,8 @@ import com.wireless.db.inventoryMgr.MaterialDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.StockError;
 import com.wireless.pojo.inventoryMgr.Material;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.stockMgr.StockActionDetail;
-import com.wireless.protocol.Terminal;
 
 public class StockActionDetailDao {
 
@@ -79,7 +79,7 @@ public class StockActionDetailDao {
 	 * @throws SQLException
 	 * 			if failed to execute any SQL statement
 	 */
-	public static List<StockActionDetail> getStockActionDetails(Terminal term, String extraCond, String orderClause) throws SQLException{
+	public static List<StockActionDetail> getStockActionDetails(Staff term, String extraCond, String orderClause) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -103,7 +103,7 @@ public class StockActionDetailDao {
 	 * @throws SQLException
 	 * 			if failed to execute any SQL statement
 	 */
-	public static List<StockActionDetail> getStockActionDetails(DBCon dbCon, Terminal term, String extraCond, String orderClause) throws SQLException{
+	public static List<StockActionDetail> getStockActionDetails(DBCon dbCon, Staff term, String extraCond, String orderClause) throws SQLException{
 		List<StockActionDetail> sDetails = new ArrayList<StockActionDetail>();
 		String sql;
 		sql = "SELECT id, stock_action_id, material_id, name, price, amount, dept_in_remaining, dept_out_remaining, remaining " +
@@ -143,7 +143,7 @@ public class StockActionDetailDao {
 	 * 			if the stockActionDetail to query does not exist
 	 * @return	the detail to this stockActionDetail
 	 */
-	public static StockActionDetail getStockActionDetailById(Terminal term, int id) throws SQLException, BusinessException{
+	public static StockActionDetail getStockActionDetailById(Staff term, int id) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -166,7 +166,7 @@ public class StockActionDetailDao {
 	 * @throws BusinessException
 	 * 			if the stockActionDetail to query does not exist
 	 */
-	public static StockActionDetail getStockActionDetailById(DBCon dbCon, Terminal term, int id) throws SQLException, BusinessException{
+	public static StockActionDetail getStockActionDetailById(DBCon dbCon, Staff term, int id) throws SQLException, BusinessException{
 		List<StockActionDetail> list = getStockActionDetails(dbCon, term, " AND id= " + id, null);
 		if(list.isEmpty()){
 			throw new BusinessException(StockError.STOCKTAKE_DETAIL_SELECT);
@@ -186,7 +186,7 @@ public class StockActionDetailDao {
 	 * @throws SQLException
 	 * 			if failed to execute any SQL statement
 	 */
-	public static void deleteStockDetailById(Terminal term, int id) throws BusinessException, SQLException{
+	public static void deleteStockDetailById(Staff term, int id) throws BusinessException, SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -209,7 +209,7 @@ public class StockActionDetailDao {
 	 * @throws SQLException
 	 * 			if failed to execute any SQL statement
 	 */
-	public static void deleteStockDetailById(DBCon dbCon, Terminal term, int id) throws BusinessException, SQLException{
+	public static void deleteStockDetailById(DBCon dbCon, Staff term, int id) throws BusinessException, SQLException{
 		if(deleteStockDetail(dbCon, " AND id = " + id) == 0){
 			throw new BusinessException(StockError.STOCKTAKE_DETAIL_DELETE);
 		}

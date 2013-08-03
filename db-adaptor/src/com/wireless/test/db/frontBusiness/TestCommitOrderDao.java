@@ -1,12 +1,12 @@
 package com.wireless.test.db.frontBusiness;
 
+import static org.junit.Assert.assertEquals;
+
 import java.beans.PropertyVetoException;
 import java.sql.SQLException;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-
-import static org.junit.Assert.*;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -14,30 +14,28 @@ import org.junit.Test;
 import com.wireless.db.frontBusiness.CancelOrder;
 import com.wireless.db.frontBusiness.InsertOrder;
 import com.wireless.db.frontBusiness.UpdateOrder;
-import com.wireless.db.frontBusiness.VerifyPin;
 import com.wireless.db.menuMgr.FoodDao;
 import com.wireless.db.orderMgr.OrderDao;
 import com.wireless.db.regionMgr.TableDao;
+import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.regionMgr.Table;
-import com.wireless.protocol.Terminal;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.test.db.TestInit;
 import com.wireless.util.DateType;
 
 public class TestCommitOrderDao {
 	
-	private static Terminal mTerminal;
+	private static Staff mStaff;
 	
 	@BeforeClass
 	public static void initDbParam() throws PropertyVetoException{
 		TestInit.init();
 		try {
-			mTerminal = VerifyPin.exec(229, Terminal.MODEL_STAFF);
-		} catch (BusinessException e) {
-			e.printStackTrace();
+			mStaff = StaffDao.getStaffs(37).get(0);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -46,12 +44,12 @@ public class TestCommitOrderDao {
 	@Test
 	public void testUpdateOrder() throws BusinessException, BusinessException, SQLException{
 		
-		Table tblToInsert = TableDao.getTables(mTerminal, null, null).get(0);
-		List<Food> foods = FoodDao.getPureFoods(mTerminal, null, null);
+		Table tblToInsert = TableDao.getTables(mStaff, null, null).get(0);
+		List<Food> foods = FoodDao.getPureFoods(mStaff, null, null);
 		
 		//Cancel the order associated with table inserted if it exist before.
 		try{
-			CancelOrder.exec(mTerminal, tblToInsert.getAliasId());
+			CancelOrder.exec(mStaff, tblToInsert.getAliasId());
 		}catch(BusinessException e){
 			
 		}
@@ -72,9 +70,9 @@ public class TestCommitOrderDao {
 		
 		//---------------------------------------------------------------
 		//Insert a new order
-		Order actualOrder = InsertOrder.exec(mTerminal, expectedOrder);
+		Order actualOrder = InsertOrder.exec(mStaff, expectedOrder);
 		
-		actualOrder = OrderDao.getById(mTerminal, actualOrder.getId(), DateType.TODAY);
+		actualOrder = OrderDao.getById(mStaff, actualOrder.getId(), DateType.TODAY);
 		
 		compareOrder(expectedOrder, actualOrder);
 		
@@ -90,9 +88,9 @@ public class TestCommitOrderDao {
 		of.setCount(2.35f);
 		expectedOrder.addFood(of);
 		
-		UpdateOrder.execByID(mTerminal, expectedOrder);
+		UpdateOrder.execByID(mStaff, expectedOrder);
 		
-		actualOrder = OrderDao.getById(mTerminal, actualOrder.getId(), DateType.TODAY);
+		actualOrder = OrderDao.getById(mStaff, actualOrder.getId(), DateType.TODAY);
 		
 		compareOrder(expectedOrder, actualOrder);
 		
@@ -108,16 +106,16 @@ public class TestCommitOrderDao {
 		of.setCount(2.35f);
 		expectedOrder.addFood(of);
 		
-		UpdateOrder.execByID(mTerminal, expectedOrder);
+		UpdateOrder.execByID(mStaff, expectedOrder);
 		
-		actualOrder = OrderDao.getById(mTerminal, actualOrder.getId(), DateType.TODAY);
+		actualOrder = OrderDao.getById(mStaff, actualOrder.getId(), DateType.TODAY);
 		
 		compareOrder(expectedOrder, actualOrder);
 		
 		//------------------------------------------------------------------
 		//Cancel the order associated with table inserted after test.
 		try{
-			CancelOrder.exec(mTerminal, actualOrder.getDestTbl().getAliasId());
+			CancelOrder.exec(mStaff, actualOrder.getDestTbl().getAliasId());
 		}catch(BusinessException e){
 			
 		}
@@ -158,7 +156,7 @@ public class TestCommitOrderDao {
 		}
 		
 		//Check the associated table detail
-		Table tbl = TableDao.getTableByAlias(mTerminal, actual.getDestTbl().getAliasId());
+		Table tbl = TableDao.getTableByAlias(mStaff, actual.getDestTbl().getAliasId());
 		//Check the status to associated table
 		assertEquals("the status to associated table", tbl.getStatus().getVal(), Table.Status.BUSY.getVal());
 		//Check the custom number to associated table

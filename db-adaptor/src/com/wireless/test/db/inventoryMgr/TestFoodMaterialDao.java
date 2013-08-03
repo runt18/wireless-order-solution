@@ -9,24 +9,21 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.wireless.db.frontBusiness.VerifyPin;
 import com.wireless.db.inventoryMgr.FoodMaterialDao;
-import com.wireless.exception.BusinessException;
+import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.pojo.inventoryMgr.FoodMaterial;
-import com.wireless.protocol.Terminal;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.test.db.TestInit;
 
 public class TestFoodMaterialDao {
 	
-	private static Terminal term;
+	private static Staff staff;
 	
 	@BeforeClass
 	public static void beforeClass() throws PropertyVetoException{
 		TestInit.init();
 		try {
-			term = VerifyPin.exec(9720860, Terminal.MODEL_STAFF);
-		} catch (BusinessException e) {
-			e.printStackTrace();
+			staff = StaffDao.getStaffs(26).get(0);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -35,7 +32,7 @@ public class TestFoodMaterialDao {
 	@Test
 	public void insert(){
 		try{
-			FoodMaterial fm = new FoodMaterial(term.restaurantID, 27942, 6, 1);
+			FoodMaterial fm = new FoodMaterial(staff.getRestaurantId(), 27942, 6, 1);
 			FoodMaterialDao.insert(fm);
 			System.out.println("绑定菜品和库存资料成功!");
 		}catch(Exception e){

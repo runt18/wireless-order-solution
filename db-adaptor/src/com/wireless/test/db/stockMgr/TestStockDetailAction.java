@@ -10,29 +10,27 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.wireless.db.frontBusiness.VerifyPin;
 import com.wireless.db.inventoryMgr.MaterialDao;
+import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.stockMgr.StockActionDetailDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.inventoryMgr.Material;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.stockMgr.StockActionDetail;
-import com.wireless.protocol.Terminal;
 import com.wireless.test.db.TestInit;
 import com.wireless.util.SQLUtil;
 
 public class TestStockDetailAction {
 
-	private static Terminal mTerminal;
+	private static Staff mStaff;
 	
 	@BeforeClass
 	public static void initDBParam() throws BusinessException, SQLException, PropertyVetoException{
 		TestInit.init();
 		
 		try{
-			mTerminal = VerifyPin.exec(217, Terminal.MODEL_STAFF);
+			mStaff = StaffDao.getStaffs(37).get(0);
 		}catch(SQLException e){
-			e.printStackTrace();
-		}catch(BusinessException e){
 			e.printStackTrace();
 		}
 	}
@@ -48,7 +46,7 @@ public class TestStockDetailAction {
 	@Test
 	public void testStockDetailDao() throws SQLException, BusinessException{
 		Map<Object, Object> params = new HashMap<Object, Object>();
-		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + mTerminal.restaurantID);
+		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + mStaff.getRestaurantId());
 		List<Material> materials = MaterialDao.getContent(params);
 		if(materials.isEmpty()){
 			throw new BusinessException("没有添加任何材料!");
@@ -59,22 +57,22 @@ public class TestStockDetailAction {
 		
 		final int id = StockActionDetailDao.insertStockActionDetail(expected);
 		expected.setId(id);
-		StockActionDetail actual = StockActionDetailDao.getStockActionDetailById(mTerminal, id);
+		StockActionDetail actual = StockActionDetailDao.getStockActionDetailById(mStaff, id);
 		
 		compare(expected, actual);
 		
-		expected = StockActionDetailDao.getStockActionDetailById(mTerminal, id) ;
+		expected = StockActionDetailDao.getStockActionDetailById(mStaff, id) ;
 		expected.setPrice(80);
 		
 		StockActionDetailDao.updateStockDetail(expected);
 		
-		actual = StockActionDetailDao.getStockActionDetailById(mTerminal, expected.getId());
+		actual = StockActionDetailDao.getStockActionDetailById(mStaff, expected.getId());
 		
 		compare(expected, actual);
 		
-		StockActionDetailDao.deleteStockDetailById(mTerminal, id);
+		StockActionDetailDao.deleteStockDetailById(mStaff, id);
 		try{
-			StockActionDetailDao.getStockActionDetailById(mTerminal, id);
+			StockActionDetailDao.getStockActionDetailById(mStaff, id);
 			
 		}catch(Exception e){
 			e.printStackTrace();
@@ -88,7 +86,7 @@ public class TestStockDetailAction {
 	@Test
 	public void insertStockDetail() throws SQLException, BusinessException{
 		Map<Object, Object> params = new HashMap<Object, Object>();
-		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + mTerminal.restaurantID);
+		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + mStaff.getRestaurantId());
 		List<Material> materials = MaterialDao.getContent(params);
 		if(materials.isEmpty()){
 			throw new BusinessException("没有添加任何材料!");
@@ -99,26 +97,26 @@ public class TestStockDetailAction {
 		
 		int id = StockActionDetailDao.insertStockActionDetail(expected);
 		expected.setId(id);
-		StockActionDetail actual = StockActionDetailDao.getStockActionDetailById(mTerminal, id);
+		StockActionDetail actual = StockActionDetailDao.getStockActionDetailById(mStaff, id);
 		
 		compare(expected, actual);
 	}
 	@Test 
 	public void updateStockDetail() throws SQLException, BusinessException{
-		StockActionDetail expected = StockActionDetailDao.getStockActionDetailById(mTerminal, 1) ;
+		StockActionDetail expected = StockActionDetailDao.getStockActionDetailById(mStaff, 1) ;
 		expected.setStockActionId(116);
 		
 		StockActionDetailDao.updateStockDetail(expected);
 		
-		StockActionDetail actual = StockActionDetailDao.getStockActionDetailById(mTerminal, expected.getId());
+		StockActionDetail actual = StockActionDetailDao.getStockActionDetailById(mStaff, expected.getId());
 		
 		compare(expected, actual);
 	}
 	@Test
 	public void deleteStockDetail() throws BusinessException, SQLException{
-		StockActionDetailDao.deleteStockDetailById(mTerminal, 5);
+		StockActionDetailDao.deleteStockDetailById(mStaff, 5);
 		try{
-			StockActionDetailDao.getStockActionDetailById(mTerminal, 5);
+			StockActionDetailDao.getStockActionDetailById(mStaff, 5);
 			
 		}catch(Exception e){
 			e.printStackTrace();

@@ -1,31 +1,28 @@
 package com.wireless.test.db.supplierMgr;
+import static org.junit.Assert.assertEquals;
+
 import java.beans.PropertyVetoException;
 import java.sql.SQLException;
-
-import static org.junit.Assert.*;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.wireless.db.frontBusiness.VerifyPin;
+import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.supplierMgr.SupplierDao;
-import com.wireless.exception.BusinessException;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.supplierMgr.Supplier;
-import com.wireless.protocol.Terminal;
 import com.wireless.test.db.TestInit;
 
 public class TestSupplierDao {
 
-	private static Terminal mTerminal;
+	private static Staff mStaff;
 	
 	@BeforeClass
 	public static void initDBParam() throws PropertyVetoException{
 		TestInit.init();
 		try{
-			mTerminal = VerifyPin.exec(217, Terminal.MODEL_STAFF);
+			mStaff = StaffDao.getStaffs(37).get(0);
 		}catch(SQLException e){
-			e.printStackTrace();
-		}catch(BusinessException e){
 			e.printStackTrace();
 		}
 	}
@@ -47,7 +44,7 @@ public class TestSupplierDao {
 		
 		insupplier.setSupplierid(supplierId);
 		
-		Supplier actual = SupplierDao.getSupplierById(mTerminal, supplierId);
+		Supplier actual = SupplierDao.getSupplierById(mStaff, supplierId);
 		
 		compare(insupplier, actual);
 		
@@ -56,12 +53,12 @@ public class TestSupplierDao {
 	
 	@Test
 	public void testSupplierDao() throws Exception{
-		Supplier insupplier = new Supplier(mTerminal.restaurantID, "eozu", "12334", "内环路二号", "wang", "bedly");
+		Supplier insupplier = new Supplier(mStaff.getRestaurantId(), "eozu", "12334", "内环路二号", "wang", "bedly");
 		final int supplierId = SupplierDao.insert(insupplier);
 		
 		insupplier.setSupplierid(supplierId);
 		
-		Supplier actual = SupplierDao.getSupplierById(mTerminal, supplierId);
+		Supplier actual = SupplierDao.getSupplierById(mStaff, supplierId);
 		
 		compare(insupplier, actual);
 		
@@ -73,15 +70,15 @@ public class TestSupplierDao {
 		insupplier.setContact("佐助");
 		insupplier.setComment("good.");
 		
-		SupplierDao.update(mTerminal, insupplier);
-	    actual = SupplierDao.getSupplierById(mTerminal, insupplier.getSupplierId());
+		SupplierDao.update(mStaff, insupplier);
+	    actual = SupplierDao.getSupplierById(mStaff, insupplier.getSupplierId());
 		
 		compare(insupplier,actual);
 		
-		SupplierDao.deleteById(mTerminal, supplierId);
+		SupplierDao.deleteById(mStaff, supplierId);
 
 		try{
-			SupplierDao.getSupplierById(mTerminal, supplierId);
+			SupplierDao.getSupplierById(mStaff, supplierId);
 		}catch(Exception e){}
 		
 	}
@@ -89,10 +86,10 @@ public class TestSupplierDao {
 	@Test
 	public void testDeleteById() throws Exception{
 
-		SupplierDao.deleteById(mTerminal, 1);
+		SupplierDao.deleteById(mStaff, 1);
 
 		try{
-			SupplierDao.getSupplierById(mTerminal, 1);
+			SupplierDao.getSupplierById(mStaff, 1);
 		}catch(Exception e){}
 	
 	}

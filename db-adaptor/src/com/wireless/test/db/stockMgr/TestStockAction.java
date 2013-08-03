@@ -11,8 +11,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.wireless.db.deptMgr.DepartmentDao;
-import com.wireless.db.frontBusiness.VerifyPin;
 import com.wireless.db.inventoryMgr.MaterialDao;
+import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.stockMgr.MaterialDeptDao;
 import com.wireless.db.stockMgr.StockActionDao;
 import com.wireless.db.supplierMgr.SupplierDao;
@@ -24,6 +24,7 @@ import com.wireless.exception.SupplierError;
 import com.wireless.pojo.inventoryMgr.Material;
 import com.wireless.pojo.inventoryMgr.MaterialCate;
 import com.wireless.pojo.menuMgr.Department;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.stockMgr.MaterialDept;
 import com.wireless.pojo.stockMgr.StockAction;
 import com.wireless.pojo.stockMgr.StockAction.AuditBuilder;
@@ -33,24 +34,21 @@ import com.wireless.pojo.stockMgr.StockAction.SubType;
 import com.wireless.pojo.stockMgr.StockActionDetail;
 import com.wireless.pojo.supplierMgr.Supplier;
 import com.wireless.pojo.util.DateUtil;
-import com.wireless.protocol.Terminal;
 import com.wireless.test.db.TestInit;
 import com.wireless.util.SQLUtil;
 
 public class TestStockAction {
 
-	private static Terminal mTerminal;
+	private static Staff mStaff;
 	
 	
 	@BeforeClass
 	public static void initDBParam() throws BusinessException, SQLException, PropertyVetoException{
 		TestInit.init();
 		try{
-			mTerminal = VerifyPin.exec(217, Terminal.MODEL_STAFF);
-			mTerminal.restaurantID = 26;
+			mStaff = StaffDao.getStaffs(37).get(0);
+			mStaff.setRestaurantId(26);
 		}catch(SQLException e){
-			e.printStackTrace();
-		}catch(BusinessException e){
 			e.printStackTrace();
 		}
 	}
@@ -110,33 +108,33 @@ public class TestStockAction {
 
 		//添加一张入库存单
 	
-		final int stockActionId = StockActionDao.insertStockAction(mTerminal, builder);
+		final int stockActionId = StockActionDao.insertStockAction(mStaff, builder);
 		
 		StockAction expected = builder.build();
 		//根据不同类型获取供应商或部门
 		if(builder.getSubType() == SubType.STOCK_IN ){
-			Department deptIn = DepartmentDao.getDepartmentById(mTerminal, builder.getDeptIn().getId());
-			Supplier supplier = SupplierDao.getSupplierById(mTerminal, builder.getSupplier().getSupplierId());
+			Department deptIn = DepartmentDao.getDepartmentById(mStaff, builder.getDeptIn().getId());
+			Supplier supplier = SupplierDao.getSupplierById(mStaff, builder.getSupplier().getSupplierId());
 			expected.setDeptIn(deptIn);
 			expected.setSupplier(supplier);
 		}else if(builder.getSubType() == SubType.STOCK_OUT){
-			Department deptOut = DepartmentDao.getDepartmentById(mTerminal, builder.getDeptOut().getId());
-			Supplier supplier = SupplierDao.getSupplierById(mTerminal, builder.getSupplier().getSupplierId());
+			Department deptOut = DepartmentDao.getDepartmentById(mStaff, builder.getDeptOut().getId());
+			Supplier supplier = SupplierDao.getSupplierById(mStaff, builder.getSupplier().getSupplierId());
 			expected.setDeptOut(deptOut);
 			expected.setSupplier(supplier);
 		}else if(builder.getSubType() == SubType.STOCK_IN_TRANSFER || builder.getSubType() == SubType.STOCK_OUT_TRANSFER){
-			Department deptIn = DepartmentDao.getDepartmentById(mTerminal, builder.getDeptIn().getId());
-			Department deptOut = DepartmentDao.getDepartmentById(mTerminal, builder.getDeptOut().getId());
+			Department deptIn = DepartmentDao.getDepartmentById(mStaff, builder.getDeptIn().getId());
+			Department deptOut = DepartmentDao.getDepartmentById(mStaff, builder.getDeptOut().getId());
 			expected.setDeptIn(deptIn);
 			expected.setDeptOut(deptOut);
 		}else{
-			Department deptIn = DepartmentDao.getDepartmentById(mTerminal, builder.getDeptIn().getId());
+			Department deptIn = DepartmentDao.getDepartmentById(mStaff, builder.getDeptIn().getId());
 			expected.setDeptIn(deptIn);
 		}
 		expected.setId(stockActionId);
 
 		
-		StockAction actual = StockActionDao.getStockAndDetailById(mTerminal, stockActionId);
+		StockAction actual = StockActionDao.getStockAndDetailById(mStaff, stockActionId);
 		compare(expected, actual, true);
 		
 		//TODO 要修改的话解注释
@@ -155,10 +153,10 @@ public class TestStockAction {
 		
 		//在审核时先获取之前的数据以作对比
 		Map<Object, Object> param = new HashMap<Object, Object>();
-		param.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + mTerminal.restaurantID);
+		param.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + mStaff.getRestaurantId());
 		List<Material> beforeMaterials = MaterialDao.getContent(param);
 		
-		List<MaterialDept> beforeMaterialDepts = MaterialDeptDao.getMaterialDepts(mTerminal, " AND restaurant_id = " + mTerminal.restaurantID, null);
+		List<MaterialDept> beforeMaterialDepts = MaterialDeptDao.getMaterialDepts(mStaff, " AND restaurant_id = " + mStaff.getRestaurantId(), null);
 		//审核库存
 		expected = actual;
 		AuditBuilder uBuilder = StockAction.AuditBuilder.newStockActionAudit(expected.getId())
@@ -173,9 +171,9 @@ public class TestStockAction {
 		expected.setOriStockIdDate(DateUtil.parseDate("2013-09-29 12:12:12"));*/
 		
 		//审核
-		StockActionDao.auditStockAction(mTerminal, uBuilder);
+		StockActionDao.auditStockAction(mStaff, uBuilder);
 		
-		actual = StockActionDao.getStockAndDetailById(mTerminal, uBuilder.getId());
+		actual = StockActionDao.getStockAndDetailById(mStaff, uBuilder.getId());
 		//对比审核后期望与真实值
 		compare(expected, actual, false);	
 
@@ -186,7 +184,7 @@ public class TestStockAction {
 			float deltaStock = actualStockActionDetail.getAmount();
 			int index;
 			if(actual.getSubType() == SubType.STOCK_IN){
-				MaterialDept afterMaterialDept = MaterialDeptDao.getMaterialDepts(mTerminal, " AND material_id = " + actualStockActionDetail.getMaterialId() + " AND dept_id = " + actual.getDeptIn().getId(), null).get(0);
+				MaterialDept afterMaterialDept = MaterialDeptDao.getMaterialDepts(mStaff, " AND material_id = " + actualStockActionDetail.getMaterialId() + " AND dept_id = " + actual.getDeptIn().getId(), null).get(0);
 				index = beforeMaterialDepts.indexOf(afterMaterialDept);
 				if(index >= 0){
 					float deltaMaterialDeptStock = Math.abs(afterMaterialDept.getStock() - beforeMaterialDepts.get(index).getStock());
@@ -205,7 +203,7 @@ public class TestStockAction {
 					throw new BusinessException(MaterialError.SELECT_FAIL);
 				}
 			}else if(actual.getSubType() == SubType.SPILL || actual.getSubType() == SubType.DAMAGE || actual.getSubType() == SubType.USE_UP){
-				MaterialDept afterMaterialDept = MaterialDeptDao.getMaterialDepts(mTerminal, " AND material_id = " + actualStockActionDetail.getMaterialId() + " AND dept_id = " + actual.getDeptIn().getId(), null).get(0);
+				MaterialDept afterMaterialDept = MaterialDeptDao.getMaterialDepts(mStaff, " AND material_id = " + actualStockActionDetail.getMaterialId() + " AND dept_id = " + actual.getDeptIn().getId(), null).get(0);
 				index = beforeMaterialDepts.indexOf(afterMaterialDept);
 				if(index >= 0){
 					float deltaMaterialDeptStock = Math.abs(afterMaterialDept.getStock() - beforeMaterialDepts.get(index).getStock());
@@ -224,7 +222,7 @@ public class TestStockAction {
 				}
 				
 			}else if(actual.getSubType() == SubType.STOCK_OUT){
-				MaterialDept afterMaterialDept = MaterialDeptDao.getMaterialDepts(mTerminal, " AND material_id = " + actualStockActionDetail.getMaterialId() + " AND dept_id = " + actual.getDeptOut().getId(), null).get(0);
+				MaterialDept afterMaterialDept = MaterialDeptDao.getMaterialDepts(mStaff, " AND material_id = " + actualStockActionDetail.getMaterialId() + " AND dept_id = " + actual.getDeptOut().getId(), null).get(0);
 				index = beforeMaterialDepts.indexOf(afterMaterialDept);
 				if(index >= 0){
 					float deltaMaterialDeptStock = beforeMaterialDepts.get(index).getStock() - afterMaterialDept.getStock();
@@ -234,7 +232,7 @@ public class TestStockAction {
 				}
 				//对比原料表的变化
 				Map<Object, Object> afterParam = new HashMap<Object, Object>();
-				afterParam.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + mTerminal.restaurantID + " AND M.material_id = " + actualStockActionDetail.getMaterialId());
+				afterParam.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + mStaff.getRestaurantId() + " AND M.material_id = " + actualStockActionDetail.getMaterialId());
 				Material afterMaterial = MaterialDao.getContent(afterParam).get(0);
 				index = beforeMaterials.indexOf(afterMaterial);
 				if(index >= 0){
@@ -244,8 +242,8 @@ public class TestStockAction {
 					throw new BusinessException(MaterialError.SELECT_FAIL);
 				}
 			}else if(actual.getSubType() == SubType.STOCK_IN_TRANSFER || actual.getSubType() == SubType.STOCK_OUT_TRANSFER){
-				MaterialDept afterMaterialDeptIn = MaterialDeptDao.getMaterialDepts(mTerminal, " AND material_id = " + actualStockActionDetail.getMaterialId() + " AND dept_id = " + actual.getDeptIn().getId(), null).get(0);
-				MaterialDept afterMaterialDeptOut = MaterialDeptDao.getMaterialDepts(mTerminal, " AND material_id = " + actualStockActionDetail.getMaterialId() + " AND dept_id = " + actual.getDeptOut().getId(), null).get(0);
+				MaterialDept afterMaterialDeptIn = MaterialDeptDao.getMaterialDepts(mStaff, " AND material_id = " + actualStockActionDetail.getMaterialId() + " AND dept_id = " + actual.getDeptIn().getId(), null).get(0);
+				MaterialDept afterMaterialDeptOut = MaterialDeptDao.getMaterialDepts(mStaff, " AND material_id = " + actualStockActionDetail.getMaterialId() + " AND dept_id = " + actual.getDeptOut().getId(), null).get(0);
 				int indexOut = beforeMaterialDepts.indexOf(afterMaterialDeptOut);
 				if(indexOut >= 0){
 					float deltaMaterialDeptStock = Math.abs(afterMaterialDeptOut.getStock() - beforeMaterialDepts.get(indexOut).getStock());
@@ -279,14 +277,14 @@ public class TestStockAction {
 	@Test
 	public void testStockIn() throws BusinessException, SQLException{
 		Supplier supplier;
-		List<Supplier> suppliers = SupplierDao.getSuppliers(mTerminal, null, null);
+		List<Supplier> suppliers = SupplierDao.getSuppliers(mStaff, null, null);
 		if(suppliers.isEmpty()){
 			throw new BusinessException(SupplierError.SUPPLIER_NOT_ADD);
 		}else{
 			supplier = suppliers.get(0);
 		}
 		Department deptIn;
-		List<Department> depts = DepartmentDao.getDepartments(mTerminal, null, null);
+		List<Department> depts = DepartmentDao.getDepartments(mStaff, null, null);
 		if(depts.isEmpty()){
 			throw new BusinessException(DeptError.DEPT_NOT_EXIST);
 		}else{
@@ -294,7 +292,7 @@ public class TestStockAction {
 		}
 		
 		Map<Object, Object> params = new HashMap<Object, Object>();
-		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + mTerminal.restaurantID);
+		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + mStaff.getRestaurantId());
 		List<Material> materials = MaterialDao.getContent(params);
 		if(materials.isEmpty()){
 			throw new BusinessException(MaterialError.SELECT_NOT_ADD);
@@ -302,7 +300,7 @@ public class TestStockAction {
 			
 		InsertBuilder builder = StockAction.InsertBuilder.newStockIn(26, DateUtil.parseDate("2013-06-29"), 300)
 				   .setOriStockId("asd12000")
-				   .setOperatorId((int) mTerminal.pin).setOperator(mTerminal.owner)
+				   .setOperatorId((int) mStaff.getId()).setOperator(mStaff.getName())
 				   .setComment("good")
 				   .setDeptIn(deptIn.getId())
 				   .setCateType(MaterialCate.Type.GOOD)
@@ -319,7 +317,7 @@ public class TestStockAction {
 
 		Department deptIn;
 		Department deptOut;
-		List<Department> depts = DepartmentDao.getDepartments(mTerminal, null, null);
+		List<Department> depts = DepartmentDao.getDepartments(mStaff, null, null);
 		if(depts.isEmpty()){
 			throw new BusinessException(DeptError.DEPT_NOT_EXIST);
 		}else{
@@ -327,14 +325,14 @@ public class TestStockAction {
 			deptOut = depts.get(2);
 		}
 		Map<Object, Object> params = new HashMap<Object, Object>();
-		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + mTerminal.restaurantID);
+		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + mStaff.getRestaurantId());
 		List<Material> materials = MaterialDao.getContent(params);
 		if(materials.isEmpty()){
 			throw new BusinessException(MaterialError.SELECT_NOT_ADD);
 		}
 			
-		InsertBuilder builder = StockAction.InsertBuilder.newStockInTransfer(mTerminal.restaurantID)
-				   .setOperatorId((int) mTerminal.pin).setOperator(mTerminal.owner)
+		InsertBuilder builder = StockAction.InsertBuilder.newStockInTransfer(mStaff.getRestaurantId())
+				   .setOperatorId((int) mStaff.getId()).setOperator(mStaff.getName())
 				   .setOriStockId("bbb111").setOriStockDate(DateUtil.parseDate("2013-09-26 12:12:12"))
 				   .setComment("good")
 				   .setDeptIn(deptIn.getId())
@@ -349,7 +347,7 @@ public class TestStockAction {
 	@Test
 	public void testSpill() throws BusinessException, SQLException{
 		Department deptIn;
-		List<Department> depts = DepartmentDao.getDepartments(mTerminal, null, null);
+		List<Department> depts = DepartmentDao.getDepartments(mStaff, null, null);
 		if(depts.isEmpty()){
 			throw new BusinessException(DeptError.DEPT_NOT_EXIST);
 		}else{
@@ -357,14 +355,14 @@ public class TestStockAction {
 		}
 		
 		Map<Object, Object> params = new HashMap<Object, Object>();
-		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + mTerminal.restaurantID);
+		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + mStaff.getRestaurantId());
 		List<Material> materials = MaterialDao.getContent(params);
 		if(materials.isEmpty()){
 			throw new BusinessException(MaterialError.SELECT_NOT_ADD);
 		}
 			
-		InsertBuilder builder = StockAction.InsertBuilder.newSpill(mTerminal.restaurantID)
-				   .setOperatorId((int) mTerminal.pin).setOperator(mTerminal.owner)
+		InsertBuilder builder = StockAction.InsertBuilder.newSpill(mStaff.getRestaurantId())
+				   .setOperatorId((int) mStaff.getId()).setOperator(mStaff.getName())
 				   .setOriStockId("ccb111").setOriStockDate(DateUtil.parseDate("2013-09-26 12:12:12"))
 				   .setComment("good")
 				   .setDeptIn(deptIn.getId())
@@ -379,14 +377,14 @@ public class TestStockAction {
 	@Test
 	public void testStockOut() throws BusinessException, SQLException{
 		Supplier supplier;
-		List<Supplier> suppliers = SupplierDao.getSuppliers(mTerminal, null, null);
+		List<Supplier> suppliers = SupplierDao.getSuppliers(mStaff, null, null);
 		if(suppliers.isEmpty()){
 			throw new BusinessException(SupplierError.SUPPLIER_NOT_ADD);
 		}else{
 			supplier = suppliers.get(0);
 		}
 		Department deptOut;
-		List<Department> depts = DepartmentDao.getDepartments(mTerminal, null, null);
+		List<Department> depts = DepartmentDao.getDepartments(mStaff, null, null);
 		if(depts.isEmpty()){
 			throw new BusinessException(DeptError.DEPT_NOT_EXIST);
 		}else{
@@ -394,15 +392,15 @@ public class TestStockAction {
 		}
 		
 		Map<Object, Object> params = new HashMap<Object, Object>();
-		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + mTerminal.restaurantID);
+		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + mStaff.getRestaurantId());
 		List<Material> materials = MaterialDao.getContent(params);
 		if(materials.isEmpty()){
 			throw new BusinessException(MaterialError.SELECT_NOT_ADD);
 		}
 			
-		InsertBuilder builder = StockAction.InsertBuilder.newStockOut(mTerminal.restaurantID, DateUtil.parseDate("2013-09-28 12:12:12"), 300)
+		InsertBuilder builder = StockAction.InsertBuilder.newStockOut(mStaff.getRestaurantId(), DateUtil.parseDate("2013-09-28 12:12:12"), 300)
 				   .setOriStockId("asd12000")
-				   .setOperatorId((int) mTerminal.pin).setOperator(mTerminal.owner)
+				   .setOperatorId((int) mStaff.getId()).setOperator(mStaff.getName())
 				   .setComment("good...")
 				   .setDeptOut(deptOut.getId())
 				   .setCateType(MaterialCate.Type.GOOD)
@@ -419,7 +417,7 @@ public class TestStockAction {
 
 		Department deptIn;
 		Department deptOut;
-		List<Department> depts = DepartmentDao.getDepartments(mTerminal, null, null);
+		List<Department> depts = DepartmentDao.getDepartments(mStaff, null, null);
 		if(depts.isEmpty()){
 			throw new BusinessException(DeptError.DEPT_NOT_EXIST);
 		}else{
@@ -428,14 +426,14 @@ public class TestStockAction {
 		}
 		
 		Map<Object, Object> params = new HashMap<Object, Object>();
-		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + mTerminal.restaurantID);
+		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + mStaff.getRestaurantId());
 		List<Material> materials = MaterialDao.getContent(params);
 		if(materials.isEmpty()){
 			throw new BusinessException(MaterialError.SELECT_NOT_ADD);
 		}
 			
-		InsertBuilder builder = StockAction.InsertBuilder.newStockOutTransfer(mTerminal.restaurantID)
-				   .setOperatorId((int) mTerminal.pin).setOperator(mTerminal.owner)
+		InsertBuilder builder = StockAction.InsertBuilder.newStockOutTransfer(mStaff.getRestaurantId())
+				   .setOperatorId((int) mStaff.getId()).setOperator(mStaff.getName())
 				   .setOriStockId("bddb111").setOriStockDate(DateUtil.parseDate("2013-09-26 12:12:12"))
 				   .setComment("good")
 				   .setDeptIn(deptIn.getId())
@@ -451,7 +449,7 @@ public class TestStockAction {
 	@Test
 	public void testDamage() throws BusinessException, SQLException{
 		Department deptIn;
-		List<Department> depts = DepartmentDao.getDepartments(mTerminal, null, null);
+		List<Department> depts = DepartmentDao.getDepartments(mStaff, null, null);
 		if(depts.isEmpty()){
 			throw new BusinessException(DeptError.DEPT_NOT_EXIST);
 		}else{
@@ -459,14 +457,14 @@ public class TestStockAction {
 		}
 		
 		Map<Object, Object> params = new HashMap<Object, Object>();
-		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + mTerminal.restaurantID);
+		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + mStaff.getRestaurantId());
 		List<Material> materials = MaterialDao.getContent(params);
 		if(materials.isEmpty()){
 			throw new BusinessException(MaterialError.SELECT_NOT_ADD);
 		}
 			
-		InsertBuilder builder = StockAction.InsertBuilder.newDamage(mTerminal.restaurantID)
-				   .setOperatorId((int) mTerminal.pin).setOperator(mTerminal.owner)
+		InsertBuilder builder = StockAction.InsertBuilder.newDamage(mStaff.getRestaurantId())
+				   .setOperatorId((int) mStaff.getId()).setOperator(mStaff.getName())
 				   .setOriStockId("bbb111").setOriStockDate(DateUtil.parseDate("2013-05-26 12:12:12"))
 				   .setComment("good")
 				   .setDeptIn(deptIn.getId())
@@ -481,9 +479,9 @@ public class TestStockAction {
 	//消耗
 	@Test
 	public void testUseUp() throws BusinessException, SQLException{
-		StockActionDao.getStockAndDetail(mTerminal, null, null);
+		StockActionDao.getStockAndDetail(mStaff, null, null);
 		Department deptIn;
-		List<Department> depts = DepartmentDao.getDepartments(mTerminal, null, null);
+		List<Department> depts = DepartmentDao.getDepartments(mStaff, null, null);
 		if(depts.isEmpty()){
 			throw new BusinessException(DeptError.DEPT_NOT_EXIST);
 		}else{
@@ -491,14 +489,14 @@ public class TestStockAction {
 		}
 		
 		Map<Object, Object> params = new HashMap<Object, Object>();
-		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + mTerminal.restaurantID);
+		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + mStaff.getRestaurantId());
 		List<Material> materials = MaterialDao.getContent(params);
 		if(materials.isEmpty()){
 			throw new BusinessException(MaterialError.SELECT_NOT_ADD);
 		}
 			
-		InsertBuilder builder = StockAction.InsertBuilder.newDamage(mTerminal.restaurantID)
-				   .setOperatorId((int) mTerminal.pin).setOperator(mTerminal.owner)
+		InsertBuilder builder = StockAction.InsertBuilder.newDamage(mStaff.getRestaurantId())
+				   .setOperatorId((int) mStaff.getId()).setOperator(mStaff.getName())
 				   .setOriStockId("bbb111").setOriStockDate(DateUtil.parseDate("2013-09-26 12:12:12"))
 				   .setComment("use_up")
 				   .setDeptIn(deptIn.getId())

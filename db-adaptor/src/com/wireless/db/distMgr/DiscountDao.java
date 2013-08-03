@@ -15,12 +15,12 @@ import com.wireless.pojo.distMgr.Discount;
 import com.wireless.pojo.distMgr.Discount.Status;
 import com.wireless.pojo.distMgr.DiscountPlan;
 import com.wireless.pojo.menuMgr.Kitchen;
-import com.wireless.protocol.Terminal;
+import com.wireless.pojo.staffMgr.Staff;
 
 public class DiscountDao {
 	
 	/**
-	 * Get the discount along with its discount plan to a specified restaurant defined in {@link Terminal}
+	 * Get the discount along with its discount plan to a specified restaurant defined in {@link Staff}
 	 * and other extra condition. 
 	 * @param term
 	 * 			the terminal
@@ -32,7 +32,7 @@ public class DiscountDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static List<Discount> getDiscount(Terminal term, String extraCond, String orderClause) throws SQLException{
+	public static List<Discount> getDiscount(Staff term, String extraCond, String orderClause) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -43,7 +43,7 @@ public class DiscountDao {
 	}
 	
 	/**
-	 * Get the discount along with its discount plan to a specified restaurant defined in {@link Terminal}
+	 * Get the discount along with its discount plan to a specified restaurant defined in {@link Staff}
 	 * and other extra condition. 
 	 * @param dbCon
 	 * 			the database connection
@@ -57,7 +57,7 @@ public class DiscountDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static List<Discount> getDiscount(DBCon dbCon, Terminal term, String extraCond, String orderClause) throws SQLException{
+	public static List<Discount> getDiscount(DBCon dbCon, Staff term, String extraCond, String orderClause) throws SQLException{
 		String sql;
 		sql = " SELECT " +
 			  " DIST.discount_id, DIST.restaurant_id, DIST.name AS dist_name, DIST.level, DIST.status AS dist_status, " +
@@ -73,7 +73,7 @@ public class DiscountDao {
 			  Params.dbName + ".kitchen KITCHEN " +
 			  " ON DIST_PLAN.kitchen_id = KITCHEN.kitchen_id " +
 			  " WHERE 1=1 " +
-			  " AND DIST.restaurant_id = " + term.restaurantID +
+			  " AND DIST.restaurant_id = " + term.getRestaurantId() +
 			  (extraCond == null ? "" : extraCond) + " " +
 			  (orderClause == null ? "" : orderClause);
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
@@ -126,7 +126,7 @@ public class DiscountDao {
 	 * @throws SQLException
 	 * 			Throws if failed to execute any SQL statement.
 	 */
-	public static List<Discount> getPureDiscount(Terminal term, String extraCond, String orderClause) throws SQLException{
+	public static List<Discount> getPureDiscount(Staff term, String extraCond, String orderClause) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -151,13 +151,13 @@ public class DiscountDao {
 	 * @throws SQLException
 	 * 			Throws if failed to execute any SQL statement.
 	 */
-	public static List<Discount> getPureDiscount(DBCon dbCon, Terminal term, String extraCond, String orderClause) throws SQLException{
+	public static List<Discount> getPureDiscount(DBCon dbCon, Staff term, String extraCond, String orderClause) throws SQLException{
 		String sql;
 		sql = " SELECT " +
 			  " DIST.discount_id, DIST.restaurant_id, DIST.name AS dist_name, DIST.level, DIST.status " +
 			  " FROM " +  Params.dbName + ".discount DIST " +
 			  " WHERE 1=1 " +
-			  " AND DIST.restaurant_id = " + term.restaurantID +
+			  " AND DIST.restaurant_id = " + term.getRestaurantId() +
 			  (extraCond == null ? "" : extraCond) + " " +
 			  (orderClause == null ? "" : orderClause);
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
@@ -289,8 +289,8 @@ public class DiscountDao {
 		
 		// 生成所有厨房默认折扣
 		if(discountID != null && plan != null){
-			 Terminal term = new Terminal();
-			 term.restaurantID = pojo.getRestaurantId();
+			 Staff term = new Staff();
+			 term.setRestaurantId(pojo.getRestaurantId());
 			 List<Kitchen> kl = KitchenDao.getKitchens(dbCon, term, " AND KITCHEN.type = " + Kitchen.Type.NORMAL.getVal(), null);
 			 insertSQL = "INSERT INTO " +  Params.dbName + ".discount_plan " 
 						+ " (discount_id, kitchen_id, rate)";

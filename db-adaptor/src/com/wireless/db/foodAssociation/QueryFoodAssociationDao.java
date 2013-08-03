@@ -9,7 +9,7 @@ import com.wireless.db.Params;
 import com.wireless.db.menuMgr.FoodDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.menuMgr.Food;
-import com.wireless.protocol.Terminal;
+import com.wireless.pojo.staffMgr.Staff;
 
 public class QueryFoodAssociationDao {
 	
@@ -27,7 +27,7 @@ public class QueryFoodAssociationDao {
 	 * @throws BusinessException
 	 * 			throws if the food to be associated NOT exist
 	 */
-	public static Food[] exec(Terminal term, Food foodToAssociated) throws SQLException, BusinessException{ 
+	public static Food[] exec(Staff term, Food foodToAssociated) throws SQLException, BusinessException{ 
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -51,7 +51,7 @@ public class QueryFoodAssociationDao {
 	 * @throws BusinessException
 	 * 			throws if the food to be associated NOT exist
 	 */
-	public static Food[] exec(DBCon dbCon, Terminal term, Food foodToAssociated) throws SQLException, BusinessException{
+	public static Food[] exec(DBCon dbCon, Staff term, Food foodToAssociated) throws SQLException, BusinessException{
 		//Get the detail to food to associated.
 		foodToAssociated = FoodDao.getPureFoodByAlias(dbCon, term, foodToAssociated.getAliasId());
 		

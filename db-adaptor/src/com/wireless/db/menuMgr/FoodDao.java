@@ -22,8 +22,8 @@ import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.menuMgr.FoodStatistics;
 import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.pojo.ppMgr.PricePlan;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.tasteMgr.Taste;
-import com.wireless.protocol.Terminal;
 import com.wireless.util.PinyinUtil;
 import com.wireless.util.SQLUtil;
 
@@ -38,7 +38,7 @@ public class FoodDao {
 	 * @throws BusinessException
 	 * @throws SQLException
 	 */
-	public static int insertFoodBaisc(DBCon dbCon, Terminal term, Food fb) throws BusinessException, SQLException{
+	public static int insertFoodBaisc(DBCon dbCon, Staff term, Food fb) throws BusinessException, SQLException{
 		int count = 0;
 		String insertSQL = "", querySQL = "";
 		// 检查菜品是否存在
@@ -100,7 +100,7 @@ public class FoodDao {
 	 * @throws BusinessException
 	 * @throws SQLException
 	 */
-	public static void insertFoodBaisc(Terminal term, Food fb) throws BusinessException, SQLException{		
+	public static void insertFoodBaisc(Staff term, Food fb) throws BusinessException, SQLException{		
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -129,7 +129,7 @@ public class FoodDao {
 	 * @throws BusinessException
 	 * @throws SQLException
 	 */
-	public static void insertFoodBaisc(Terminal term, Food fb, String content) throws BusinessException, SQLException{
+	public static void insertFoodBaisc(Staff term, Food fb, String content) throws BusinessException, SQLException{
 		FoodDao.insertFoodBaisc(term, fb);
 		try{
 			TasteRefDao.execByFood(FoodDao.getFoodById(term, fb.getFoodId()));
@@ -147,7 +147,7 @@ public class FoodDao {
 	 * @throws BusinessException
 	 * @throws SQLException
 	 */
-	public static int updateFoodBaisc(DBCon dbCon, Terminal term, Food fb) throws BusinessException, SQLException{
+	public static int updateFoodBaisc(DBCon dbCon, Staff term, Food fb) throws BusinessException, SQLException{
 		Food old = MenuDao.getFoodById(dbCon, (int)fb.getFoodId());
 		int count = 0;
 		String updateSQL = "", deleteSQL = "";
@@ -235,7 +235,7 @@ public class FoodDao {
 	 * @throws BusinessException
 	 * @throws SQLException
 	 */
-	public static void updateFoodBaisc(Terminal term, Food fb) throws BusinessException, SQLException{
+	public static void updateFoodBaisc(Staff term, Food fb) throws BusinessException, SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -429,10 +429,10 @@ public class FoodDao {
 	 * @throws BusinessException
 	 * 			throws if the food to specified restaurant and id is NOT found
 	 */	
-	public static Food getFoodById(DBCon dbCon, Terminal term, long foodId) throws SQLException, BusinessException{
+	public static Food getFoodById(DBCon dbCon, Staff term, long foodId) throws SQLException, BusinessException{
 		List<Food> result = FoodDao.getFoods(dbCon, term, " AND FOOD.food_id = " + foodId, null);
 		if(result.isEmpty()){
-			throw new BusinessException("The food(food_id = " + foodId + ",restaurant_id = " + term.restaurantID + ") is NOT found.");
+			throw new BusinessException("The food(food_id = " + foodId + ",restaurant_id = " + term.getRestaurantId() + ") is NOT found.");
 		}else{
 			return result.get(0);
 		}
@@ -452,7 +452,7 @@ public class FoodDao {
 	 * @throws BusinessException
 	 * 			throws if the food to specified restaurant and id is NOT found
 	 */
-	public static Food getFoodById(Terminal term, long foodId) throws SQLException, BusinessException{
+	public static Food getFoodById(Staff term, long foodId) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -478,10 +478,10 @@ public class FoodDao {
 	 * @throws BusinessException
 	 * 			throws if the food to specified restaurant and alias id is NOT found
 	 */	
-	public static Food getFoodByAlias(DBCon dbCon, Terminal term, int foodAlias) throws SQLException, BusinessException{
+	public static Food getFoodByAlias(DBCon dbCon, Staff term, int foodAlias) throws SQLException, BusinessException{
 		List<Food> result = FoodDao.getFoods(dbCon, term, " AND FOOD.food_alias = " + foodAlias, null);
 		if(result.isEmpty()){
-			throw new BusinessException("The food(alias_id = " + foodAlias + ",restaurant_id = " + term.restaurantID + ") is NOT found.");
+			throw new BusinessException("The food(alias_id = " + foodAlias + ",restaurant_id = " + term.getRestaurantId() + ") is NOT found.");
 		}else{
 			return result.get(0);
 		}
@@ -501,7 +501,7 @@ public class FoodDao {
 	 * @throws BusinessException
 	 * 			throws if the food to specified restaurant and alias id is NOT found
 	 */	
-	public static Food getFoodByAlias(Terminal term, int foodAlias) throws SQLException, BusinessException{
+	public static Food getFoodByAlias(Staff term, int foodAlias) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -708,7 +708,7 @@ public class FoodDao {
 	}
 
 	/**
-	 * Query the foods to the specified restaurant defined in terminal {@link Terminal} according to extra condition.
+	 * Query the foods to the specified restaurant defined in terminal {@link Staff} according to extra condition.
 	 * @param dbCon
 	 * 			the database connection
 	 * @param term
@@ -721,12 +721,12 @@ public class FoodDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statements
 	 */
-	public static List<Food> getPureFoods(DBCon dbCon, Terminal term, String extraCond, String orderClause) throws SQLException{
-		return getPureFoods(dbCon, " AND FOOD.restaurant_id = " + term.restaurantID + " " + (extraCond != null ? extraCond : ""), orderClause);
+	public static List<Food> getPureFoods(DBCon dbCon, Staff term, String extraCond, String orderClause) throws SQLException{
+		return getPureFoods(dbCon, " AND FOOD.restaurant_id = " + term.getRestaurantId() + " " + (extraCond != null ? extraCond : ""), orderClause);
 	}
 
 	/**
-	 * Query the foods to the specified restaurant defined in terminal {@link Terminal} according to extra condition.
+	 * Query the foods to the specified restaurant defined in terminal {@link Staff} according to extra condition.
 	 * @param term
 	 * 			the terminal 
 	 * @param extraCondition
@@ -737,7 +737,7 @@ public class FoodDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statements
 	 */
-	public static List<Food> getPureFoods(Terminal term, String extraCond, String orderClause) throws SQLException{
+	public static List<Food> getPureFoods(Staff term, String extraCond, String orderClause) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -762,10 +762,10 @@ public class FoodDao {
 	 * 			throws if the food to specified restaurant and alias id is NOT found
 	 * 			
 	 */
-	public static Food getPureFoodByAlias(DBCon dbCon, Terminal term, int foodAlias) throws SQLException, BusinessException{
+	public static Food getPureFoodByAlias(DBCon dbCon, Staff term, int foodAlias) throws SQLException, BusinessException{
 		List<Food> result = getPureFoods(dbCon, term, " AND FOOD.food_alias = " + foodAlias, null);
 		if(result.isEmpty()){
-			throw new BusinessException("The food(alias_id = " + foodAlias + ",restaurant_id = " + term.restaurantID + ") is NOT found.");
+			throw new BusinessException("The food(alias_id = " + foodAlias + ",restaurant_id = " + term.getRestaurantId() + ") is NOT found.");
 		}else{
 			return result.get(0);
 		}
@@ -783,7 +783,7 @@ public class FoodDao {
 	 * @throws BusinessException
 	 * 			
 	 */
-	public static Food getPureFoodByAlias(Terminal term, int foodAlias) throws SQLException, BusinessException{
+	public static Food getPureFoodByAlias(Staff term, int foodAlias) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -808,12 +808,12 @@ public class FoodDao {
 	 * 			throws if the food to specified restaurant and id is NOT found
 	 * 			
 	 */
-	public static Food getPureFoodById(DBCon dbCon, Terminal term, long foodId) throws SQLException, BusinessException{
+	public static Food getPureFoodById(DBCon dbCon, Staff term, long foodId) throws SQLException, BusinessException{
 		List<Food> result = getPureFoods(dbCon, term, " AND FOOD.food_id = " + foodId, null);
 		if(!result.isEmpty()){
 			return result.get(0);
 		}else{
-			throw new BusinessException("The food(food_id = " + foodId + ",restaurant_id = " + term.restaurantID + ") is NOT found.");
+			throw new BusinessException("The food(food_id = " + foodId + ",restaurant_id = " + term.getRestaurantId() + ") is NOT found.");
 		}
 	}
 
@@ -830,7 +830,7 @@ public class FoodDao {
 	 * 			throws if the food to specified restaurant and id is NOT found
 	 * 			
 	 */
-	public static Food getPureFoodById(Terminal term, int foodId) throws SQLException, BusinessException{
+	public static Food getPureFoodById(Staff term, int foodId) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -841,7 +841,7 @@ public class FoodDao {
 	}
 
 	/**
-	 * Get the food and its related information to the specified restaurant defined in terminal {@link Terminal} as below.
+	 * Get the food and its related information to the specified restaurant defined in terminal {@link Staff} as below.
 	 * 1 - Popular taste to each food
 	 * 2 - Child food details to the food in case of combo
 	 * @param dbCon
@@ -856,7 +856,7 @@ public class FoodDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statements
 	 */			
-	public static List<Food> getFoods(DBCon dbCon, Terminal term, String extraCondition, String orderClause) throws SQLException{
+	public static List<Food> getFoods(DBCon dbCon, Staff term, String extraCondition, String orderClause) throws SQLException{
 
 		//Using link hash map to keep original order after retrieving the foods by order clause defined in SQL statement.
 		Map<Long, Food> foods = new LinkedHashMap<Long, Food>();
@@ -918,7 +918,7 @@ public class FoodDao {
 	}
 
 	/**
-	 * Get the food and its related information to the specified restaurant defined in terminal {@link Terminal} as below.
+	 * Get the food and its related information to the specified restaurant defined in terminal {@link Staff} as below.
 	 * 1 - Popular taste to each food
 	 * 2 - Child food details to the food in case of combo
 	 * @param terminal
@@ -931,7 +931,7 @@ public class FoodDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statements
 	 */	
-	public static List<Food> getFoods(Terminal term, String extraCond, String orderClause) throws SQLException{
+	public static List<Food> getFoods(Staff term, String extraCond, String orderClause) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -950,7 +950,7 @@ public class FoodDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static void makeSellOutByAlias(Terminal term, int foodAlias) throws SQLException{
+	public static void makeSellOutByAlias(Staff term, int foodAlias) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -971,12 +971,12 @@ public class FoodDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static void makeSellOutByAlias(DBCon dbCon, Terminal term, int foodAlias) throws SQLException{
+	public static void makeSellOutByAlias(DBCon dbCon, Staff term, int foodAlias) throws SQLException{
 		String sql;
 		
 		sql = " UPDATE " + Params.dbName + ".food SET " +
 			  " status = status | " + Food.SELL_OUT + 
-			  " WHERE restaurant_id = " + term.restaurantID + 
+			  " WHERE restaurant_id = " + term.getRestaurantId() + 
 			  " AND food_alias = " + foodAlias;
 		
 		dbCon.stmt.executeUpdate(sql);
@@ -991,7 +991,7 @@ public class FoodDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static void makeOnSaleByAlias(Terminal term, int foodAlias) throws SQLException{
+	public static void makeOnSaleByAlias(Staff term, int foodAlias) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -1012,12 +1012,12 @@ public class FoodDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static void makeOnSaleByAlias(DBCon dbCon, Terminal term, int foodAlias) throws SQLException{
+	public static void makeOnSaleByAlias(DBCon dbCon, Staff term, int foodAlias) throws SQLException{
 		String sql;
 		
 		sql = " UPDATE " + Params.dbName + ".food SET " +
 			  " status = status & ~" + Food.SELL_OUT + 
-			  " WHERE restaurant_id = " + term.restaurantID + 
+			  " WHERE restaurant_id = " + term.getRestaurantId() + 
 			  " AND food_alias = " + foodAlias;
 		
 		dbCon.stmt.executeUpdate(sql);

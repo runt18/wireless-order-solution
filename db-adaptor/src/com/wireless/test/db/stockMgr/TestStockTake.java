@@ -12,8 +12,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.wireless.db.deptMgr.DepartmentDao;
-import com.wireless.db.frontBusiness.VerifyPin;
 import com.wireless.db.inventoryMgr.MaterialDao;
+import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.stockMgr.MaterialDeptDao;
 import com.wireless.db.stockMgr.StockActionDao;
 import com.wireless.db.stockMgr.StockTakeDao;
@@ -23,6 +23,7 @@ import com.wireless.exception.MaterialError;
 import com.wireless.exception.StockError;
 import com.wireless.pojo.inventoryMgr.Material;
 import com.wireless.pojo.menuMgr.Department;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.stockMgr.MaterialDept;
 import com.wireless.pojo.stockMgr.StockAction;
 import com.wireless.pojo.stockMgr.StockAction.InsertBuilder;
@@ -34,23 +35,20 @@ import com.wireless.pojo.stockMgr.StockTake.Status;
 import com.wireless.pojo.stockMgr.StockTake.UpdateStockTakeBuilder;
 import com.wireless.pojo.stockMgr.StockTakeDetail;
 import com.wireless.pojo.stockMgr.StockTakeDetail.InsertStockTakeDetail;
-import com.wireless.protocol.Terminal;
 import com.wireless.test.db.TestInit;
 import com.wireless.util.SQLUtil;
 
 public class TestStockTake {
 
-	private static Terminal mTerminal;
+	private static Staff mStaff;
 	
 	@BeforeClass
 	public static void initDBParam() throws PropertyVetoException, SQLException, BusinessException{
 		TestInit.init();
 		try{
-			mTerminal = VerifyPin.exec(217, Terminal.MODEL_STAFF);
+			mStaff = StaffDao.getStaffs(37).get(0);
 			//mTerminal.restaurantID = 26;
 		}catch(SQLException e){
-			e.printStackTrace();
-		}catch(BusinessException e){
 			e.printStackTrace();
 		}
 	}
@@ -123,7 +121,7 @@ public class TestStockTake {
 	@Test
 	public void testBeforeAudit() throws SQLException, BusinessException{
 		//先进行判断是否有遗漏
-		StockTakeDao.beforeAudit(mTerminal, 5);
+		StockTakeDao.beforeAudit(mStaff, 5);
 		//System.out.println("num"+lost);
 /*		int result = StockTakeDao.keepOrReset(mTerminal, 0, uBuilder);
 		System.out.println("result"+result);*/
@@ -133,7 +131,7 @@ public class TestStockTake {
 
 		
 		Department dept;
-		List<Department> depts = DepartmentDao.getDepartments(mTerminal, null, null);
+		List<Department> depts = DepartmentDao.getDepartments(mStaff, null, null);
 		if(depts.isEmpty()){
 			throw new BusinessException(DeptError.DEPT_NOT_EXIST);
 		}else{
@@ -141,7 +139,7 @@ public class TestStockTake {
 		}
 		System.out.println(dept.getName());
 		Map<Object, Object> params = new HashMap<Object, Object>();
-		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + mTerminal.restaurantID);
+		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + mStaff.getRestaurantId());
 		List<Material> materials = MaterialDao.getContent(params);
 		if(materials.isEmpty()){
 			throw new BusinessException(MaterialError.SELECT_NOT_ADD);
@@ -153,33 +151,33 @@ public class TestStockTake {
 		List<MaterialDept> materialDepts;
 		//获取可乐的库存数量
 		System.out.println("id"+cokeId+ "sid"+spriteId);
-		materialDepts = MaterialDeptDao.getMaterialDepts(mTerminal, " AND dept_id = " + dept.getId() + " AND material_id = " + cokeId, null);
+		materialDepts = MaterialDeptDao.getMaterialDepts(mStaff, " AND dept_id = " + dept.getId() + " AND material_id = " + cokeId, null);
 		if(!materialDepts.isEmpty()){
 			cokeAmount = materialDepts.get(0).getStock();
 		}else{
 			throw new BusinessException(StockError.MATERIAL_DEPT_ADD);
 		}
 		//获取雪碧的库存数量
-		materialDepts = MaterialDeptDao.getMaterialDepts(mTerminal, " AND dept_id = " + dept.getId() + " AND material_id = " + spriteId, null);
+		materialDepts = MaterialDeptDao.getMaterialDepts(mStaff, " AND dept_id = " + dept.getId() + " AND material_id = " + spriteId, null);
 		if(!materialDepts.isEmpty()){
 			spriteAmount = materialDepts.get(0).getStock();
 		}else{
 			throw new BusinessException(StockError.MATERIAL_DEPT_ADD);
 		}
 		//添加一张盘点单	
-		InsertStockTakeBuilder builder = new InsertStockTakeBuilder(mTerminal.restaurantID)
+		InsertStockTakeBuilder builder = new InsertStockTakeBuilder(mStaff.getRestaurantId())
 											.setCateType(CateType.GOOD)
 											.setDept(dept)
 											.setCateId(2)
-											.setOperatorId((int) mTerminal.pin).setOperator(mTerminal.owner)
+											.setOperatorId((int) mStaff.getId()).setOperator(mStaff.getName())
 											.setComment("盘点1月份的")
 											.addStockTakeDetail(new InsertStockTakeDetail().setMaterial(materials.get(0)).setExpectAmount(cokeAmount).setActualAmount(10).build())
 											.addStockTakeDetail(new InsertStockTakeDetail().setMaterial(materials.get(3)).setExpectAmount(spriteAmount).setActualAmount(20).build());
-		final int id = StockTakeDao.insertStockTake(mTerminal, builder);
+		final int id = StockTakeDao.insertStockTake(mStaff, builder);
 		//System.out.println("id"+id);
 		StockTake expected = builder.build();
 		//获取真实值
-		StockTake actual = StockTakeDao.getStockTakeAndDetailById(mTerminal, id);
+		StockTake actual = StockTakeDao.getStockTakeAndDetailById(mStaff, id);
 		expected.getStockTakeDetails().get(0).setId(actual.getStockTakeDetails().get(0).getId());
 		expected.getStockTakeDetails().get(1).setId(actual.getStockTakeDetails().get(1).getId());
 		expected.getStockTakeDetails().get(0).setDeltaAmount(actual.getStockTakeDetails().get(0).getDeltaAmount());
@@ -200,21 +198,21 @@ public class TestStockTake {
 		
 		//审核盘点
 		expected = actual;
-		expected.setApprover(mTerminal.owner);
-		expected.setApproverId((int) mTerminal.pin);
+		expected.setApprover(mStaff.getName());
+		expected.setApproverId((int) mStaff.getId());
 		expected.setStatus(Status.AUDIT);
 		//expected.setComment("盘点10月份的");
 			
 		UpdateStockTakeBuilder uBuilder = StockTake.UpdateStockTakeBuilder.newAudit(id)
-								.setApproverId((int) mTerminal.pin).setApprover(mTerminal.owner);
+								.setApproverId((int) mStaff.getId()).setApprover(mStaff.getName());
 		//FIXME 应该返回更有意义的值
 		//获取库单id的集合
 
 		
 		//测试审核时解注释
-		List<Integer> stockActionIds = StockTakeDao.auditStockTake(mTerminal, uBuilder);
+		List<Integer> stockActionIds = StockTakeDao.auditStockTake(mStaff, uBuilder);
 		
-		actual = StockTakeDao.getStockTakeById(mTerminal, id);
+		actual = StockTakeDao.getStockTakeById(mStaff, id);
 
 		compare(expected, actual, false);
 		
@@ -223,17 +221,17 @@ public class TestStockTake {
 			//库存分布对比
 			for (int stockActionId : stockActionIds) {
 				//获得对应的库单
-				StockAction stockAction = StockActionDao.getStockAndDetailById(mTerminal, stockActionId);
+				StockAction stockAction = StockActionDao.getStockAndDetailById(mStaff, stockActionId);
 				//对比盘点后的数据
 				for (StockTakeDetail stockTakeDetail : builder.getStockTakeDetails()) {
 					for (StockActionDetail stockActionDetail : stockAction.getStockDetails()) {
 						//盘点明细单有可能是收支平衡的,所以得先判断库单中是否存在此明细单
 						if(stockTakeDetail.getMaterial().getId() == stockActionDetail.getMaterialId()){
 							//获取盘点审核后对应的部门_原料表信息
-							MaterialDept afterMaterialDept = MaterialDeptDao.getMaterialDepts(mTerminal, " AND material_id = " + stockActionDetail.getMaterialId() + " AND dept_id = " + stockAction.getDeptIn().getId(), null).get(0);
+							MaterialDept afterMaterialDept = MaterialDeptDao.getMaterialDepts(mStaff, " AND material_id = " + stockActionDetail.getMaterialId() + " AND dept_id = " + stockAction.getDeptIn().getId(), null).get(0);
 							
 							Map<Object, Object> afterParam = new HashMap<Object, Object>();
-							afterParam.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + mTerminal.restaurantID + " AND M.material_id = " + stockActionDetail.getMaterialId());
+							afterParam.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + mStaff.getRestaurantId() + " AND M.material_id = " + stockActionDetail.getMaterialId());
 							Material afterMaterial = MaterialDao.getContent(afterParam).get(0);
 							
 							int index = materials.indexOf(afterMaterial);
@@ -262,7 +260,7 @@ public class TestStockTake {
 			for (StockTakeDetail stockTakeDetail : expected.getStockTakeDetails()) {
 				//获取对应的material
 				Map<Object, Object> param = new HashMap<Object, Object>();
-				param.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + mTerminal.restaurantID + " AND M.material_id = " + stockTakeDetail.getMaterial().getId());
+				param.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + mStaff.getRestaurantId() + " AND M.material_id = " + stockTakeDetail.getMaterial().getId());
 				Material material = MaterialDao.getContent(param).get(0);
 				//获取库存明细单
 				StockActionDetail stockActionDetail = new StockActionDetail();
@@ -273,7 +271,7 @@ public class TestStockTake {
 				//通过差额对应生成入库单或者出库单
 				if(stockTakeDetail.getDeltaAmount() > 0){
 					//差额大于0,则是盘盈
-					stockActionInsertMore =  StockAction.InsertBuilder.newMore(mTerminal.restaurantID)
+					stockActionInsertMore =  StockAction.InsertBuilder.newMore(mStaff.getRestaurantId())
 														.setOperatorId(expected.getApproverId())
 														.setOperator(expected.getApprover())
 														.setDeptIn(expected.getDept())
@@ -287,7 +285,7 @@ public class TestStockTake {
 				
 				}else if(stockTakeDetail.getDeltaAmount() < 0){
 					//差额小于0,则是盘亏
-					stockActionInsertLess =  StockAction.InsertBuilder.newLess(mTerminal.restaurantID)
+					stockActionInsertLess =  StockAction.InsertBuilder.newLess(mStaff.getRestaurantId())
 														.setOperatorId(expected.getApproverId())
 														.setOperator(expected.getApprover())
 														.setDeptIn(expected.getDept())
@@ -313,12 +311,12 @@ public class TestStockTake {
 		
 			for (int stockActionId : stockActionIds) {	
 				//通过返回的id获取库单
-				StockAction actualStockAction = StockActionDao.getStockAndDetailById(mTerminal, stockActionId);
+				StockAction actualStockAction = StockActionDao.getStockAndDetailById(mStaff, stockActionId);
 				for (StockAction expectedStockAction : lists) {
 					if(expectedStockAction.getSubType() == actualStockAction.getSubType()){
 						expectedStockAction.setId(stockActionId);
-						expectedStockAction.setApproverId((int) mTerminal.pin);
-						expectedStockAction.setApprover(mTerminal.owner);
+						expectedStockAction.setApproverId((int) mStaff.getId());
+						expectedStockAction.setApprover(mStaff.getName());
 						expectedStockAction.setStatus(com.wireless.pojo.stockMgr.StockAction.Status.AUDIT);
 					
 						//期望值与真实值比较

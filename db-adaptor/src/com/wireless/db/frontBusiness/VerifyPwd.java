@@ -5,7 +5,7 @@ import java.sql.SQLException;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.exception.BusinessException;
-import com.wireless.protocol.Terminal;
+import com.wireless.pojo.staffMgr.Staff;
 
 public class VerifyPwd {
 	
@@ -17,10 +17,8 @@ public class VerifyPwd {
 	
 	/**
 	 * Verify the password according to specific type.
-	 * @param pin
-	 * 		The pin to terminal.
-	 * @param model
-	 * 		The model to terminal.
+	 * @param staff
+	 * 		The staff 
 	 * @param type
 	 * 		The type of password
 	 * @param pwd
@@ -35,11 +33,11 @@ public class VerifyPwd {
 	 * @throws SQLException
 	 * 		Throws if fail to execute any SQL statement.
 	 */
-	public static boolean exec(long pin, short model, int type, String pwd) throws BusinessException, SQLException{
+	public static boolean exec(Staff staff, int type, String pwd) throws BusinessException, SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return exec(dbCon, pin, model, type, pwd);
+			return exec(dbCon, staff, type, pwd);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -53,10 +51,8 @@ public class VerifyPwd {
 	 * Note that this method should be invoked before database connected.
 	 * @param dbCon
 	 * 		The database connection.
-	 * @param pin
-	 * 		The pin to terminal.
-	 * @param model
-	 * 		The model to terminal.
+	 * @param staff
+	 * 		The staff
 	 * @param type
 	 * 		The type of password
 	 * @param pwd2Verify
@@ -71,12 +67,11 @@ public class VerifyPwd {
 	 * @throws SQLException
 	 * 		Throws if fail to execute any SQL statement.
 	 */
-	public static boolean exec(DBCon dbCon, long pin, short model, int type, String pwd2Verify) throws BusinessException, SQLException{
-		Terminal term = VerifyPin.exec(dbCon, pin, model);
+	public static boolean exec(DBCon dbCon, Staff staff, int type, String pwd2Verify) throws BusinessException, SQLException{
 		
 		String pwd = "", pwd2 = "", pwd3 = "", pwd4 = "", pwd5 = "";
 		
-		String sql = "SELECT pwd, pwd2, pwd3, pwd4, pwd5 FROM " + Params.dbName + ".restaurant WHERE id=" + term.restaurantID;
+		String sql = "SELECT pwd, pwd2, pwd3, pwd4, pwd5 FROM " + Params.dbName + ".restaurant WHERE id=" + staff.getRestaurantId();
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		if(dbCon.rs.next()){
 			pwd = dbCon.rs.getString("pwd");

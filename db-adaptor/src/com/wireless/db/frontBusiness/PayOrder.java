@@ -20,8 +20,8 @@ import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.distMgr.Discount;
 import com.wireless.pojo.ppMgr.PricePlan;
 import com.wireless.pojo.regionMgr.Table;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.system.Setting;
-import com.wireless.protocol.Terminal;
 import com.wireless.util.DateType;
 //import com.wireless.dbObject.Setting;
 
@@ -30,7 +30,7 @@ public class PayOrder {
 	/**
 	 * Perform to pay an order along with the id and other pay condition.
 	 * 
-	 * @param term
+	 * @param staff
 	 * 			the terminal
 	 * @param orderToPay
 	 * 			the order to pay along with id and other pay condition
@@ -43,11 +43,11 @@ public class PayOrder {
 	 * @throws SQLException
 	 *             throws if fail to execute any SQL statement
 	 */
-	public static Order execByID(Terminal term, Order orderToPay) throws BusinessException, SQLException{
+	public static Order execByID(Staff staff, Order orderToPay) throws BusinessException, SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return execByID(dbCon, term, orderToPay);
+			return execByID(dbCon, staff, orderToPay);
 			
 		}finally{
 			dbCon.disconnect();
@@ -59,7 +59,7 @@ public class PayOrder {
 	 * 
 	 * @param dbCon
 	 * 			the database connection
-	 * @param term
+	 * @param staff
 	 * 			the terminal
 	 * @param orderToPay
 	 * 			the order to pay along with id and other pay condition
@@ -73,16 +73,16 @@ public class PayOrder {
 	 * @throws SQLException
 	 *             throws if fail to execute any SQL statement
 	 */
-	public static Order execByID(DBCon dbCon, Terminal term, Order orderToPay) throws BusinessException, SQLException{
+	public static Order execByID(DBCon dbCon, Staff staff, Order orderToPay) throws BusinessException, SQLException{
 		
-		return doPayment(dbCon, term, doPrepare(dbCon, term, orderToPay));
+		return doPayment(dbCon, staff, doPrepare(dbCon, staff, orderToPay));
 		
 	}
 	
 	/**
 	 * 
 	 * @param dbCon
-	 * @param term
+	 * @param staff
 	 * @param orderToPay
 	 * @return
 	 * @throws BusinessException
@@ -93,9 +93,9 @@ public class PayOrder {
 	 * @throws SQLException
 	 * 			Throws if failed to execute any SQL statements.
 	 */
-	private static Order doPrepare(DBCon dbCon, Terminal term, Order orderToPay) throws BusinessException, SQLException{
+	private static Order doPrepare(DBCon dbCon, Staff staff, Order orderToPay) throws BusinessException, SQLException{
 		int customNum = orderToPay.getCustomNum();
-		Order orderCalculated = calcByID(dbCon, term, orderToPay);
+		Order orderCalculated = calcByID(dbCon, staff, orderToPay);
 		orderCalculated.setCustomNum(customNum);
 		
 		if(orderCalculated.isSettledByMember()){
@@ -131,14 +131,14 @@ public class PayOrder {
 	/**
 	 * 
 	 * @param dbCon
-	 * @param term
+	 * @param staff
 	 * @param orderCalculated
 	 * @param isPaidAgain
 	 * @return
 	 * @throws SQLException
 	 * 			Throws if failed to execute any SQL statement.
 	 */
-	private static Order doPayment(DBCon dbCon, Terminal term, Order orderCalculated) throws SQLException{
+	private static Order doPayment(DBCon dbCon, Staff staff, Order orderCalculated) throws SQLException{
 		
 		String sql;
 		
@@ -219,9 +219,8 @@ public class PayOrder {
 			
 			//Update the order.
 			sql = " UPDATE " + Params.dbName + ".order SET " +
-				  " waiter = (SELECT owner_name FROM " + Params.dbName + ".terminal WHERE pin=" + "0x" + Long.toHexString(term.pin) + " AND (model_id=" + term.modelID + " OR model_id=" + Terminal.MODEL_ADMIN + "))" + " , " +
-				  " terminal_model = " + term.modelID + ", " +
-				  " terminal_pin = " + term.pin + ", " +
+				  " staff_id = " + staff.getId() + ", " +
+				  " waiter = '" + staff.getName() + "', " +
 				  " category = " + orderCalculated.getCategory().getVal() + ", " +
 				  " gift_price = " + orderCalculated.getGiftPrice() + ", " +
 				  " discount_price = " + orderCalculated.getDiscountPrice() + ", " +
@@ -277,7 +276,7 @@ public class PayOrder {
 				
 				if(orderCalculated.isUnpaid()){
 					//Perform the consumption.
-					mo = MemberDao.consume(dbCon, term, 
+					mo = MemberDao.consume(dbCon, staff, 
 										   orderCalculated.getMember().getId(), 
 										   orderCalculated.getActualPrice(), 
 										   orderCalculated.getPaymentType(),
@@ -326,7 +325,7 @@ public class PayOrder {
 	 * @throws SQLException
 	 * 			Throws if failed to execute any SQL statement.
 	 */
-	public static Order calcByTable(Terminal term, Order orderToPay) throws BusinessException, SQLException{
+	public static Order calcByTable(Staff term, Order orderToPay) throws BusinessException, SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -353,7 +352,7 @@ public class PayOrder {
 	 * @throws SQLException
 	 * 			Throws if failed to execute any SQL statement.
 	 */
-	public static Order calcByTable(DBCon dbCon, Terminal term, Order orderToPay) throws BusinessException, SQLException{
+	public static Order calcByTable(DBCon dbCon, Staff term, Order orderToPay) throws BusinessException, SQLException{
 		
 		orderToPay.setId(OrderDao.getOrderIdByUnPaidTable(dbCon, TableDao.getTableByAlias(dbCon, term, orderToPay.getDestTbl().getAliasId()))[0]);			
 		
@@ -378,7 +377,7 @@ public class PayOrder {
 	 * @throws SQLException
 	 * 			Throws if failed to execute any SQL statement.
 	 */
-	public static Order calcByTableDync(Terminal term, Order orderToPay) throws BusinessException, SQLException{
+	public static Order calcByTableDync(Staff term, Order orderToPay) throws BusinessException, SQLException{
 		
 		DBCon dbCon = new DBCon();
 		try{
@@ -409,7 +408,7 @@ public class PayOrder {
 	 * @throws SQLException
 	 * 			Throws if failed to execute any SQL statement.
 	 */
-	public static Order calcByTableDync(DBCon dbCon, Terminal term, Order orderToPay) throws BusinessException, SQLException{
+	public static Order calcByTableDync(DBCon dbCon, Staff term, Order orderToPay) throws BusinessException, SQLException{
 		
 		//Get the details of table to be calculated.
 		Table tblToCalc = TableDao.getTableByAlias(dbCon, term, orderToPay.getDestTbl().getAliasId());
@@ -440,7 +439,7 @@ public class PayOrder {
 	 * @throws SQLException
 	 * 			Throws if failed to execute any SQL statement.
 	 */
-	public static Order calcByID(Terminal term, Order orderToPay) throws BusinessException, SQLException{
+	public static Order calcByID(Staff term, Order orderToPay) throws BusinessException, SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -465,12 +464,12 @@ public class PayOrder {
 	 * @throws SQLException
 	 * 			Throws if failed to execute any SQL statement.
 	 */
-	public static Order calcByID(DBCon dbCon, Terminal term, Order orderToPay) throws BusinessException, SQLException{
+	public static Order calcByID(DBCon dbCon, Staff term, Order orderToPay) throws BusinessException, SQLException{
 		
 		String sql;
 		
 		//Get the setting.
-		Setting setting = SystemDao.getSetting(dbCon, term.restaurantID);
+		Setting setting = SystemDao.getSetting(dbCon, term.getRestaurantId());
 		
 		//Check to see whether has erase quota and the order exceed the erase quota.
 		if(setting.hasEraseQuota() && orderToPay.getErasePrice() > setting.getEraseQuota()){
