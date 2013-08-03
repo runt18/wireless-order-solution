@@ -9,7 +9,6 @@ import java.util.List;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.deptMgr.DepartmentDao;
-import com.wireless.db.staffMgr.VerifyPin;
 import com.wireless.db.stockMgr.StockActionDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.dishesOrder.Order;
@@ -187,55 +186,6 @@ public class DailySettleDao {
 		}
 		
 		return result;
-	}
-	
-	/**
-	 * Perform the daily settlement according to both pin and model.	
-	 * 
-	 * @param pin
-	 *            the pin to this terminal
-	 * @param model
-	 *            the model to this terminal
-	 * @return the result to daily settlement
-	 * @throws BusinessException
-	 *             throws if one the cases below.<br>
-	 *             - The terminal is NOT attached to any restaurant.<br>
-	 *             - The terminal is expired.<br>
-	 *             - The member to query does NOT exist.
-	 * @throws SQLException
-	 *             throws if fail to execute any SQL statement
-	 */
-	public static Result exec(long pin, short model) throws BusinessException, SQLException{
-		DBCon dbCon = new DBCon();
-		try{
-			dbCon.connect();
-			return exec(dbCon, VerifyPin.exec(dbCon, pin, model), SettleType.MANUAL);
-		}finally{
-			dbCon.disconnect();
-		}
-	}
-	
-	/**
-	 * Perform the daily settlement according to both pin and model.	
-	 * Note that the database should be connected before invoking this method.
-	 * 
-	 * @param dbCon
-	 *            the database connection
-	 * @param pin
-	 *            the pin to this terminal
-	 * @param model
-	 *            the model to this terminal
-	 * @return the result to daily settlement
-	 * @throws BusinessException
-	 *             throws if one the cases below.<br>
-	 *             - The terminal is NOT attached to any restaurant.<br>
-	 *             - The terminal is expired.<br>
-	 *             - The member to query does NOT exist.
-	 * @throws SQLException
-	 *             throws if fail to execute any SQL statement
-	 */
-	public static Result exec(DBCon dbCon, long pin, short model) throws BusinessException, SQLException{
-		return exec(dbCon, VerifyPin.exec(dbCon, pin, model), SettleType.MANUAL);
 	}
 	
 	/**

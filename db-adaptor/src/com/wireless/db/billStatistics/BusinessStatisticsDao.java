@@ -11,14 +11,12 @@ import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.shift.QueryShiftDao;
 import com.wireless.db.staffMgr.StaffDao;
-import com.wireless.db.staffMgr.VerifyPin;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.billStatistics.BusinessStatistics;
 import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.billStatistics.ShiftDetail;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.system.DailySettle;
-import com.wireless.pojo.system.Terminal;
 import com.wireless.pojo.util.DateUtil;
 import com.wireless.util.DateType;
 
@@ -223,7 +221,7 @@ public class BusinessStatisticsDao {
 			queryPattern = params.get("queryPattern");
 			dbCon.connect();
 			if(queryPattern == null || queryPattern.toString().equals("1")){
-				DutyRange duty = QueryDutyRange.exec(dbCon, VerifyPin.exec(dbCon, Long.valueOf(pin.toString()), Terminal.MODEL_STAFF), onDuty.toString(), offDuty.toString());
+				DutyRange duty = QueryDutyRange.exec(dbCon, StaffDao.verify(dbCon, Integer.parseInt(pin.toString())), onDuty.toString(), offDuty.toString());
 				if(duty != null){
 					ShiftDetail res = QueryShiftDao.exec(dbCon, StaffDao.verify(Integer.parseInt(pin.toString())), duty.getOnDutyFormat(), duty.getOffDutyFormat(), DateType.getValue(params));
 					bs = new BusinessStatistics(res);				

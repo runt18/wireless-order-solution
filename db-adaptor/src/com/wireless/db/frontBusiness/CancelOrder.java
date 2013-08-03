@@ -6,7 +6,6 @@ import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.orderMgr.OrderDao;
 import com.wireless.db.regionMgr.TableDao;
-import com.wireless.db.staffMgr.VerifyPin;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.regionMgr.Table;
@@ -15,31 +14,6 @@ import com.wireless.pojo.tasteMgr.TasteGroup;
 import com.wireless.util.DateType;
 
 public class CancelOrder {
-	/**
-	 * Cancel the unpaid order according to the specific table if the table is busy.
-	 * @param pin the pin to this terminal
-	 * @param model the model to this terminal
-	 * @param tableID the table alias id to query
-	 * @throws BusinessException throws if one of the cases below.<br>
-	 * 							 - The terminal is NOT attached to any restaurant.<br>
-	 * 							 - The terminal is expired.<br>
-	 * 						     - The table associated with this order is IDLE.<br>
-	 * 							 - The order to this table does NOT exist.<br>
-	 * @throws SQLException throws if fail to execute any SQL statement.
-	 */
-	public static void exec(long pin, short model, int tableID) throws BusinessException, SQLException{		
-		
-		DBCon dbCon = new DBCon();
-		
-		try{
-			dbCon.connect();
-			
-			exec(dbCon, VerifyPin.exec(dbCon, pin, model), tableID);
-			
-		}finally{
-			dbCon.disconnect();
-		}
-	}
 	
 	/**
 	 * Cancel the unpaid order according the specific terminal and table.

@@ -8,7 +8,6 @@ import com.wireless.db.deptMgr.DepartmentDao;
 import com.wireless.db.deptMgr.KitchenDao;
 import com.wireless.db.distMgr.DiscountDao;
 import com.wireless.db.menuMgr.FoodDao;
-import com.wireless.db.staffMgr.VerifyPin;
 import com.wireless.db.tasteMgr.TasteDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.menuMgr.Department;
@@ -59,31 +58,4 @@ public class QueryMenu {
 			    			CancelReasonDao.getReasons(dbCon, term, null, null));
 	}
 	
-	/**
-	 * Get the food menu including three information below.<br>
-	 * - Food<br>
-	 * - Taste<br>
-	 * - Kitchen
-	 * @param pin the pin to this terminal
-	 * @param model the model to this terminal
-	 * @return the food menu holding all the information
-	 * @throws BusinessException throws if either of cases below.<br>
-	 * 							 - The terminal is NOT attache to any restaurant.<br>
-	 * 							 - The terminal is expired.
-	 * @throws SQLException throws if fail to execute any SQL statement
-	 */
-	public static FoodMenu exec(long pin, short model) throws BusinessException, SQLException{
-		
-		DBCon dbCon = new DBCon();
-		
-		try{
-			dbCon.connect();
-			
-			return exec(dbCon, VerifyPin.exec(dbCon, pin, model));
-			
-		}finally{
-			dbCon.disconnect();
-		}
-	}
-
 }
