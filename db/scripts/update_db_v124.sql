@@ -80,3 +80,145 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`func_region` (
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8, 
 COMMENT = 'describe the relationship between function and region' ;
+
+-- -----------------------------------------------------
+-- Table `wireless_order_db`.`role`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `wireless_order_db`.`role` ;
+
+CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`role` (
+  `role_id` INT NOT NULL AUTO_INCREMENT ,
+  `restaurant_id` INT NOT NULL DEFAULT 0 ,
+  `name` VARCHAR(45) NOT NULL DEFAULT '' ,
+  `type` TINYINT NOT NULL DEFAULT 1 COMMENT 'the type to role as below.\n1 - 普通\n2 - 系统保留' ,
+  `cate` TINYINT NOT NULL DEFAULT 6 COMMENT 'the category to role as below.\n1 - 管理员\n2 - 老板\n3 - 财务\n4 - 部长\n5 - 服务员\n6 - 其他\n' ,
+  PRIMARY KEY (`role_id`) ,
+  INDEX `ix_restaurant_id` (`restaurant_id` ASC) )
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8, 
+COMMENT = 'describe the role information' ;
+
+-- -----------------------------------------------------
+-- Insert a '管理员' role to each restaurant
+-- -----------------------------------------------------
+INSERT INTO wireless_order_db.role
+(`restaurant_id`, `name`, `type`, `cate`)
+SELECT id, '管理员', 2, 1 FROM wireless_order_db.restaurant WHERE id > 10;
+
+-- -----------------------------------------------------
+-- Insert a '老板' role to each restaurant
+-- -----------------------------------------------------
+INSERT INTO wireless_order_db.role
+(`restaurant_id`, `name`, `type`, `cate`)
+SELECT id, '老板', 2, 2 FROM wireless_order_db.restaurant WHERE id > 10;
+
+-- -----------------------------------------------------
+-- Insert a '财务' role to each restaurant
+-- -----------------------------------------------------
+INSERT INTO wireless_order_db.role
+(`restaurant_id`, `name`, `type`, `cate`)
+SELECT id, '财务', 1, 3 FROM wireless_order_db.restaurant WHERE id > 10;
+
+-- -----------------------------------------------------
+-- Insert a '部长' role to each restaurant
+-- -----------------------------------------------------
+INSERT INTO wireless_order_db.role
+(`restaurant_id`, `name`, `type`, `cate`)
+SELECT id, '部长', 1, 4 FROM wireless_order_db.restaurant WHERE id > 10;
+
+-- -----------------------------------------------------
+-- Insert a '服务员' role to each restaurant
+-- -----------------------------------------------------
+INSERT INTO wireless_order_db.role
+(`restaurant_id`, `name`, `type`, `cate`)
+SELECT id, '服务员', 1, 5 FROM wireless_order_db.restaurant WHERE id > 10;
+
+-- -----------------------------------------------------
+-- Table `wireless_order_db`.`staff`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `wireless_order_db`.`staff2` ;
+
+CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`staff2` (
+  `staff_id` INT NOT NULL AUTO_INCREMENT ,
+  `restaurant_id` INT NOT NULL DEFAULT 0 ,
+  `role_id` INT NOT NULL DEFAULT 0 ,
+  `name` VARCHAR(45) NOT NULL DEFAULT '' ,
+  `tele` VARCHAR(45) NULL DEFAULT NULL ,
+  `pwd` VARCHAR(45) NOT NULL DEFAULT '' ,
+  `type` TINYINT NOT NULL DEFAULT 1 COMMENT 'the type to staff as below.\n1 - 普通\n2 - 系统保留' ,
+  PRIMARY KEY (`staff_id`) ,
+  INDEX `ix_restaurant_id` (`restaurant_id` ASC) ,
+  INDEX `ix_role_id` (`role_id` ASC) )
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8, 
+COMMENT = 'describe the staff information' ;
+
+-- -----------------------------------------------------
+-- Insert a '管理员' staff to each restaurant
+-- -----------------------------------------------------
+INSERT INTO wireless_order_db.staff2
+(`restaurant_id`, `role_id`, `name`, `pwd`, type)
+SELECT REST.id, ROLE.role_id, '管理员', REST.pwd, 2 
+FROM wireless_order_db.restaurant REST 
+JOIN wireless_order_db.role ROLE ON REST.id = ROLE.restaurant_id AND ROLE.cate = 1
+WHERE REST.id > 10;
+
+-- -----------------------------------------------------
+-- Move the staff information and have them assigned a '服务员' role
+-- -----------------------------------------------------
+INSERT INTO wireless_order_db.staff2
+(`restaurant_id`, `role_id`, `name`, `pwd`, type)
+SELECT STAFF.restaurant_id, ROLE.role_id, STAFF.name, STAFF.pwd, 1
+FROM wireless_order_db.staff STAFF
+LEFT JOIN wireless_order_db.role ROLE ON STAFF.restaurant_id = ROLE.restaurant_id AND ROLE.cate = 5;
+
+-- -----------------------------------------------------
+-- Add a field 'expire_date' to table 'restaurant'
+-- Update expire date to each restaurant
+-- -----------------------------------------------------
+ALTER TABLE `wireless_order_db`.`restaurant` ADD COLUMN `expire_date` DATETIME NULL DEFAULT NULL  AFTER `pwd5` ;
+
+UPDATE wireless_order_db.restaurant REST,
+(SELECT restaurant_id, MAX(expire_date) AS expire_date FROM `wireless_order_db`.`terminal` GROUP BY restaurant_id) AS TMP
+SET REST.expire_date = TMP.expire_date
+WHERE REST.id = TMP.restaurant_id;
+
+-- -----------------------------------------------------
+-- Drop the table 'staff' and 'terminal'
+-- Rename the 'staff2' to 'staff'
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `wireless_order_db`.`staff` ;
+-- DROP TABLE IF EXISTS `wireless_order_db`.`terminal` ;
+ALTER TABLE `wireless_order_db`.`staff2` RENAME TO  `wireless_order_db`.`staff` ;
+
+-- -----------------------------------------------------
+-- Drop the field 'terminal_pin' and 'terminal_model' in table 'order'
+-- Add the field 'staff_id' to table 'order'
+-- Add the field 'staff_id' to table 'order_food'
+-- -----------------------------------------------------
+ALTER TABLE `wireless_order_db`.`order` DROP COLUMN `terminal_pin` , DROP COLUMN `terminal_model` ;
+ALTER TABLE `wireless_order_db`.`order` ADD COLUMN `staff_id` INT NOT NULL DEFAULT 0  AFTER `waiter` ;
+ALTER TABLE `wireless_order_db`.`order_food` ADD COLUMN `staff_id` INT NOT NULL DEFAULT 0  AFTER `waiter` ;
+
+-- -----------------------------------------------------
+-- Drop the field 'terminal_pin' and 'terminal_model' in table 'order_history'
+-- Add the field 'staff_id' to table 'order_history'
+-- Add the field 'staff_id' to table 'order_food_history'
+-- -----------------------------------------------------
+ALTER TABLE `wireless_order_db`.`order_history` DROP COLUMN `terminal_pin` , DROP COLUMN `terminal_model` ;
+ALTER TABLE `wireless_order_db`.`order_history` ADD COLUMN `staff_id` INT NOT NULL DEFAULT 0  AFTER `waiter` ;
+ALTER TABLE `wireless_order_db`.`order_food_history` ADD COLUMN `staff_id` INT NOT NULL DEFAULT 0  AFTER `waiter` ;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
