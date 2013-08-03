@@ -12,6 +12,7 @@ import org.apache.struts.actions.DispatchAction;
 
 import com.wireless.db.frontBusiness.VerifyPin;
 import com.wireless.db.regionMgr.RegionDao;
+import com.wireless.json.JObject;
 import com.wireless.pojo.regionMgr.Region;
 import com.wireless.protocol.Terminal;
 
@@ -31,13 +32,17 @@ public class QueryRegionAction extends DispatchAction{
 			throws Exception {
 		request.setCharacterEncoding("UTF-8");
 		response.setCharacterEncoding("UTF-8");
-		StringBuilder tsb = new StringBuilder();
+		JObject jobject = new JObject();
 		try{
+			String pin = request.getParameter("pin");
+			Terminal term = VerifyPin.exec(Long.valueOf(pin), Terminal.MODEL_STAFF);
+			List<Region> list = RegionDao.getRegions(term, " AND REGION.restaurant_id = " + term.restaurantID, null);
+			jobject.setRoot(list);
 			
 		}catch(Exception e){
 			e.printStackTrace();
 		}finally{
-			response.getWriter().print(tsb.toString());
+			response.getWriter().print(jobject.toString());
 		}
 		return null;
 	}
