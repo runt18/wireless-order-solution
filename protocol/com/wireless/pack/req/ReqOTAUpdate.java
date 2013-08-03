@@ -16,8 +16,8 @@ public class ReqOTAUpdate extends RequestPackage{
 	* pin[6] - auto calculated and filled in
 	* len[2] - 0x00, 0x00
 	*******************************************************/
-	public ReqOTAUpdate(PinGen gen){
-		super(gen);
+	public ReqOTAUpdate(){
+		super(null);
 		header.mode = Mode.OTA;
 		header.type = Type.GET_HOST;
 	}

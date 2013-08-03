@@ -3,6 +3,7 @@ package com.wireless.pack.req;
 import com.wireless.pack.Mode;
 import com.wireless.pack.Type;
 import com.wireless.pojo.regionMgr.Table;
+import com.wireless.pojo.staffMgr.Staff;
 
 public class ReqQueryOrderByTable extends RequestPackage {
 	/******************************************************
@@ -19,8 +20,8 @@ public class ReqQueryOrderByTable extends RequestPackage {
 	* table[2]
 	* table[2] - 2-byte indicating the table id
 	*******************************************************/
-	public ReqQueryOrderByTable(PinGen gen, int tableAlias){
-		super(gen);
+	public ReqQueryOrderByTable(Staff staff, int tableAlias){
+		super(staff);
 		header.mode = Mode.ORDER_BUSSINESS;
 		header.type = Type.QUERY_ORDER_BY_TBL;
 		fillBody(new Table(tableAlias), Table.TABLE_PARCELABLE_SIMPLE);

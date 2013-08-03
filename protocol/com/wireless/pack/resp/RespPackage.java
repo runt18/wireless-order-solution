@@ -39,6 +39,6 @@ public class RespPackage extends ProtocolPackage{
 		this.header.mode = header.mode;
 		this.header.type = Type.ACK;
 		this.header.seq = header.seq;
-		System.arraycopy(header.pin, 0, header.pin, 0, header.pin.length);
+		System.arraycopy(header.staffId, 0, header.staffId, 0, header.staffId.length);
 	}
 }

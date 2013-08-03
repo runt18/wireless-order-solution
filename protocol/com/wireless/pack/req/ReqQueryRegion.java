@@ -2,6 +2,7 @@ package com.wireless.pack.req;
 
 import com.wireless.pack.Mode;
 import com.wireless.pack.Type;
+import com.wireless.pojo.staffMgr.Staff;
 
 public class ReqQueryRegion extends RequestPackage {
 	/******************************************************
@@ -15,8 +16,8 @@ public class ReqQueryRegion extends RequestPackage {
 	* pin[6] - auto calculated and filled in
 	* len[2] - 0x00, 0x00
 	*******************************************************/
-	public ReqQueryRegion(PinGen gen){
-		super(gen);
+	public ReqQueryRegion(Staff staff){
+		super(staff);
 		header.mode = Mode.ORDER_BUSSINESS;
 		header.type = Type.QUERY_REGION;
 	}

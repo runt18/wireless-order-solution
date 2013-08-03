@@ -3,6 +3,7 @@ package com.wireless.pack.req;
 import com.wireless.pack.Mode;
 import com.wireless.pack.Type;
 import com.wireless.pojo.dishesOrder.Order;
+import com.wireless.pojo.staffMgr.Staff;
 
 public class ReqInsertOrder extends RequestPackage {
 
@@ -15,9 +16,9 @@ public class ReqInsertOrder extends RequestPackage {
 	 * @param type indicates insert or update request
 	 * @param reserved indicates whether to print or NOT
 	 */
-	public ReqInsertOrder(PinGen gen, Order reqOrder, byte type, byte reserved){
+	public ReqInsertOrder(Staff staff, Order reqOrder, byte type, byte reserved){
 		
-		super(gen);
+		super(staff);
 		
 		check(reqOrder, type, reserved);
 		
@@ -33,16 +34,16 @@ public class ReqInsertOrder extends RequestPackage {
 	 * @param reqOrder the order detail information
 	 * @param type indicates insert or update request
 	 */
-	public ReqInsertOrder(PinGen gen, Order reqOrder, byte type){
-		this(gen, reqOrder, type, DO_PRINT);
+	public ReqInsertOrder(Staff staff, Order reqOrder, byte type){
+		this(staff, reqOrder, type, DO_PRINT);
 	}	
 	
 	/**
 	 * Make the insert order request package with default request configuration
 	 * @param reqOrder the order detail information
 	 */
-	public ReqInsertOrder(PinGen gen, Order reqOrder){
-		this(gen, reqOrder, Type.INSERT_ORDER);
+	public ReqInsertOrder(Staff staff, Order reqOrder){
+		this(staff, reqOrder, Type.INSERT_ORDER);
 	}	
 	
 	private void check(Order reqOrder, byte type, byte reserved){

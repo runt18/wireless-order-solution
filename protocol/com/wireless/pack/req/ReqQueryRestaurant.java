@@ -2,6 +2,7 @@ package com.wireless.pack.req;
 
 import com.wireless.pack.Mode;
 import com.wireless.pack.Type;
+import com.wireless.pojo.staffMgr.Staff;
 
 public class ReqQueryRestaurant extends RequestPackage{
 	/******************************************************
@@ -15,8 +16,8 @@ public class ReqQueryRestaurant extends RequestPackage{
 	* pin[6] - auto calculated and filled in
 	* len[2] - 0x00, 0x00
 	*******************************************************/
-	public ReqQueryRestaurant(PinGen gen){
-		super(gen);
+	public ReqQueryRestaurant(Staff staff){
+		super(staff);
 		header.mode = Mode.ORDER_BUSSINESS;
 		header.type = Type.QUERY_RESTAURANT;
 	}

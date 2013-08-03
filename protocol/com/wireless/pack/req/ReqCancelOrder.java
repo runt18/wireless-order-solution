@@ -3,6 +3,7 @@ package com.wireless.pack.req;
 import com.wireless.pack.Mode;
 import com.wireless.pack.Type;
 import com.wireless.pojo.regionMgr.Table;
+import com.wireless.pojo.staffMgr.Staff;
 
 public class ReqCancelOrder extends RequestPackage{
 	/******************************************************
@@ -19,8 +20,8 @@ public class ReqCancelOrder extends RequestPackage{
 	* table[2]
 	* table[2] - 2-byte indicates the table id 
 	*******************************************************/
-	public ReqCancelOrder(PinGen gen, int tableAlias){
-		super(gen);
+	public ReqCancelOrder(Staff staff, int tableAlias){
+		super(staff);
 		header.mode = Mode.ORDER_BUSSINESS;
 		header.type = Type.CANCEL_ORDER;
 		fillBody(new Table(tableAlias), Table.TABLE_PARCELABLE_SIMPLE);

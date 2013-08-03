@@ -107,12 +107,12 @@ public class ProtocolPackage {
 		bytesToSend[1] = header.type;
 		bytesToSend[2] = header.seq;
 		bytesToSend[3] = header.reserved;
-		bytesToSend[4] = header.pin[0];
-		bytesToSend[5] = header.pin[1];
-		bytesToSend[6] = header.pin[2];
-		bytesToSend[7] = header.pin[3];
-		bytesToSend[8] = header.pin[4];
-		bytesToSend[9] = header.pin[5];
+		bytesToSend[4] = header.staffId[0];
+		bytesToSend[5] = header.staffId[1];
+		bytesToSend[6] = header.staffId[2];
+		bytesToSend[7] = header.staffId[3];
+		bytesToSend[8] = header.restaurantId[0];
+		bytesToSend[9] = header.restaurantId[1];
 		bytesToSend[10] = (byte)(body.length & 0x000000FF);
 		bytesToSend[11] = (byte)((body.length & 0x0000FF00) >> 8);
 		
@@ -197,12 +197,12 @@ public class ProtocolPackage {
 			header.type = bytesToReceive[1];
 			header.seq = bytesToReceive[2];
 			header.reserved = bytesToReceive[3];
-			header.pin[0] = bytesToReceive[4];
-			header.pin[1] = bytesToReceive[5];
-			header.pin[2] = bytesToReceive[6];
-			header.pin[3] = bytesToReceive[7];
-			header.pin[4] = bytesToReceive[8];
-			header.pin[5] = bytesToReceive[9];
+			header.staffId[0] = bytesToReceive[4];
+			header.staffId[1] = bytesToReceive[5];
+			header.staffId[2] = bytesToReceive[6];
+			header.staffId[3] = bytesToReceive[7];
+			header.restaurantId[0] = bytesToReceive[8];
+			header.restaurantId[1] = bytesToReceive[9];
 			header.length[0] = bytesToReceive[10];
 			header.length[1] = bytesToReceive[11];
 			

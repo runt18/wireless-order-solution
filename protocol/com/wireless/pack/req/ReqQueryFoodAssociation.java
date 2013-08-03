@@ -3,6 +3,7 @@ package com.wireless.pack.req;
 import com.wireless.pack.Mode;
 import com.wireless.pack.Type;
 import com.wireless.pojo.menuMgr.Food;
+import com.wireless.pojo.staffMgr.Staff;
 
 public class ReqQueryFoodAssociation extends RequestPackage{
 	/******************************************************
@@ -19,8 +20,8 @@ public class ReqQueryFoodAssociation extends RequestPackage{
 	* food_alias[2]
 	* food_alias[2] - 2-byte indicating the alias to food
 	*******************************************************/
-	public ReqQueryFoodAssociation(PinGen gen, Food foodToAssociated){
-		super(gen);
+	public ReqQueryFoodAssociation(Staff staff, Food foodToAssociated){
+		super(staff);
 		header.mode = Mode.ORDER_BUSSINESS;
 		header.type = Type.QUERY_FOOD_ASSOCIATION;
 		fillBody(foodToAssociated, Food.FOOD_PARCELABLE_SIMPLE);

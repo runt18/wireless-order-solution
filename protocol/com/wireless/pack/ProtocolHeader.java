@@ -19,11 +19,13 @@ public class ProtocolHeader {
 	public byte type = 0;
 	public byte seq = 0;
 	public byte reserved = 0;
-	public byte[] pin = new byte[6];
+	public byte[] staffId = new byte[4];
+	public byte[] restaurantId = new byte[2];
 	public byte[] length = new byte[2];
 	
 	public ProtocolHeader(){
-		Arrays.fill(pin, (byte)0);
+		Arrays.fill(staffId, (byte)0);
+		Arrays.fill(restaurantId, (byte)0);
 		Arrays.fill(length, (byte)0);
 	}
 } 

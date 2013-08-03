@@ -3,6 +3,7 @@ package com.wireless.pack.req;
 import com.wireless.pack.Mode;
 import com.wireless.pack.Type;
 import com.wireless.pojo.dishesOrder.Order;
+import com.wireless.pojo.staffMgr.Staff;
 
 public class ReqPayOrder extends RequestPackage{
 	
@@ -38,9 +39,9 @@ public class ReqPayOrder extends RequestPackage{
 	* len_comment - length of the comment 
 	* comment[len] - the comment this order
 	*******************************************************/
-	public ReqPayOrder(PinGen gen, Order order, byte payCate){
+	public ReqPayOrder(Staff staff, Order order, byte payCate){
 		
-		super(gen);
+		super(staff);
 		
 		if(payCate == PAY_CATE_NORMAL || payCate == PAY_CATE_TEMP){
 		

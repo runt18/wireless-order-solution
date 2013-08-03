@@ -3,6 +3,7 @@ package com.wireless.pack.req;
 import com.wireless.pack.Mode;
 import com.wireless.pack.Type;
 import com.wireless.pojo.regionMgr.Table;
+import com.wireless.pojo.staffMgr.Staff;
 
 public class ReqTableStatus extends RequestPackage {
 	/******************************************************
@@ -19,8 +20,8 @@ public class ReqTableStatus extends RequestPackage {
 	* table[2]
 	* table[2] - 2-byte indicating the table id
 	*******************************************************/
-	public ReqTableStatus(PinGen gen, Table tblToQuery){
-		super(gen);
+	public ReqTableStatus(Staff staff, Table tblToQuery){
+		super(staff);
 		header.mode = Mode.ORDER_BUSSINESS;
 		header.type = Type.QUERY_TABLE_STATUS;
 		fillBody(tblToQuery, Table.TABLE_PARCELABLE_SIMPLE);
