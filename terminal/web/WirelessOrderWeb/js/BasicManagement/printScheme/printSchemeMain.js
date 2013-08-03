@@ -97,10 +97,11 @@ Ext.Ajax.request({
 		var jr = Ext.decode(res.responseText);
 		
 		if(jr.success){
+			alert(jr.root.length);
 			for ( var i = 0; i < jr.root.length; i++) {
 				
 				var r = jr.root[i];
-				var c = {items : [{xtype : "checkbox", name : "region",boxLabel : r.name , hideLabel : true, inputValue :  r.id }]};
+				var c = {items : [{xtype : "checkbox", name : "region", boxLabel : r.name , hideLabel : true, inputValue :  r.id }]};
 				
 				Ext.getCmp('allRegion').add(c);
 				Ext.getCmp('allRegion').doLayout();
