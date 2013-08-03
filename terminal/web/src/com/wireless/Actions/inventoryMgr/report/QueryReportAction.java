@@ -13,12 +13,12 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import com.wireless.db.frontBusiness.VerifyPin;
+import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.stockMgr.StockReportDao;
 import com.wireless.json.JObject;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.stockMgr.StockAction.Status;
 import com.wireless.pojo.stockMgr.StockReport;
-import com.wireless.protocol.Terminal;
 import com.wireless.util.WebParams;
 
 public class QueryReportAction extends Action {
@@ -38,7 +38,7 @@ public class QueryReportAction extends Action {
 			String cateId = request.getParameter("cateId");
 			String materialId = request.getParameter("materialId");
 			
-			Terminal mTerminal = VerifyPin.exec(Long.parseLong(pin), Terminal.MODEL_STAFF);
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			//String orderClause = " LIMIT " + Integer.parseInt(start) + ", " + Integer.parseInt(limit);
 			List<StockReport> stockReports = null ;
 			List<StockReport> stockReportPage = null ;
@@ -52,21 +52,21 @@ public class QueryReportAction extends Action {
 				Calendar c = Calendar.getInstance();
 				c.setTime(new Date());
 				c.add(Calendar.MONTH, -1);
-				stockReports = StockReportDao.getStockCollectByTime(mTerminal, sdf.format(c.getTime()), sdf.format(new Date()), null);
+				stockReports = StockReportDao.getStockCollectByTime(staff, sdf.format(c.getTime()), sdf.format(new Date()), null);
 				
 			}else{
 				if(!materialId.equals("-1") && !materialId.trim().isEmpty()){
 					extra += " AND M.material_id = " + materialId;
-					stockReports = StockReportDao.getStockCollectByTypes(mTerminal, beginDate, endDate, extra, null);
+					stockReports = StockReportDao.getStockCollectByTypes(staff, beginDate, endDate, extra, null);
 				}else{
 					if(cateType.trim().isEmpty() && cateId.trim().isEmpty()){
-						stockReports = StockReportDao.getStockCollectByTime(mTerminal, beginDate, endDate, null);
+						stockReports = StockReportDao.getStockCollectByTime(staff, beginDate, endDate, null);
 					}else if(!cateType.trim().isEmpty() && cateId.trim().isEmpty()){
 						extra += " AND S.cate_type = " + cateType;
-						stockReports = StockReportDao.getStockCollectByTypes(mTerminal, beginDate, endDate, extra, null);
+						stockReports = StockReportDao.getStockCollectByTypes(staff, beginDate, endDate, extra, null);
 					}else{
 						extra += " AND M.cate_id = " + cateId; 
-						stockReports = StockReportDao.getStockCollectByTypes(mTerminal, beginDate, endDate, extra, null);
+						stockReports = StockReportDao.getStockCollectByTypes(staff, beginDate, endDate, extra, null);
 					}
 				}
 			}

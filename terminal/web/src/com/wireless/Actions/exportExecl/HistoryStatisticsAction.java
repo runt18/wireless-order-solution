@@ -24,19 +24,19 @@ import org.apache.struts.actions.DispatchAction;
 
 import com.wireless.db.billStatistics.BusinessStatisticsDao;
 import com.wireless.db.billStatistics.QuerySaleDetails;
-import com.wireless.db.frontBusiness.VerifyPin;
+import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.stockMgr.StockActionDao;
 import com.wireless.pojo.billStatistics.BusinessStatistics;
 import com.wireless.pojo.billStatistics.BusinessStatisticsByDept;
 import com.wireless.pojo.billStatistics.SalesDetail;
 import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.menuMgr.Kitchen;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.stockMgr.StockAction;
 import com.wireless.pojo.stockMgr.StockAction.Status;
 import com.wireless.pojo.stockMgr.StockAction.SubType;
 import com.wireless.pojo.stockMgr.StockActionDetail;
 import com.wireless.pojo.util.DateUtil;
-import com.wireless.protocol.Terminal;
 import com.wireless.util.DateType;
 
 @SuppressWarnings("deprecation")
@@ -112,9 +112,9 @@ public class HistoryStatisticsAction extends DispatchAction{
 				did = new int[0];
 			}
 		}
-		Terminal terminal = VerifyPin.exec(Long.parseLong(pin), Terminal.MODEL_STAFF);
+		Staff staff = StaffDao.verify(Integer.parseInt(pin));
 		SalesDetail[] saleDetails = QuerySaleDetails.execByFood(
-				terminal, 
+				staff, 
 				onDuty, 
 				offDuty,
 				did,
@@ -165,7 +165,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 		row = sheet.createRow(sheet.getLastRowNum() + 1);
 		row.setHeight((short) 350);
 		cell = row.createCell(0);
-		cell.setCellValue("导出时间: " + DateUtil.format(new Date()) + "     操作人:  " +terminal.owner);
+		cell.setCellValue("导出时间: " + DateUtil.format(new Date()) + "     操作人:  " +staff.getName());
 		cell.getCellStyle().setVerticalAlignment(HSSFCellStyle.VERTICAL_CENTER);
 		sheet.addMergedRegion(new CellRangeAddress(sheet.getLastRowNum(), sheet.getLastRowNum(), 0, 11));
 		
@@ -312,8 +312,8 @@ public class HistoryStatisticsAction extends DispatchAction{
 		String onDuty = request.getParameter("onDuty");
 		String offDuty = request.getParameter("offDuty");
 		
-		Terminal terminal = VerifyPin.exec(Long.parseLong(pin), Terminal.MODEL_STAFF);
-		SalesDetail[] list = QuerySaleDetails.execByKitchen(terminal, onDuty, offDuty, 1);
+		Staff staff = StaffDao.verify(Integer.parseInt(pin));
+		SalesDetail[] list = QuerySaleDetails.execByKitchen(staff, onDuty, offDuty, 1);
 		
 		HSSFWorkbook wb = new HSSFWorkbook();
 		HSSFSheet sheet = wb.createSheet("分厨销售统计(" + DateType.HISTORY.getName() + ")");
@@ -353,7 +353,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 		row = sheet.createRow(sheet.getLastRowNum() + 1);
 		row.setHeight((short) 350);
 		cell = row.createCell(0);
-		cell.setCellValue("导出时间: " + DateUtil.format(new Date()) + "     操作人:  " +terminal.owner);
+		cell.setCellValue("导出时间: " + DateUtil.format(new Date()) + "     操作人:  " +staff.getName());
 		cell.setCellStyle(strStyle);
 		sheet.addMergedRegion(new CellRangeAddress(sheet.getLastRowNum(), sheet.getLastRowNum(), 0, 7));
 		
@@ -481,8 +481,8 @@ public class HistoryStatisticsAction extends DispatchAction{
 		String onDuty = request.getParameter("onDuty");
 		String offDuty = request.getParameter("offDuty");
 		
-		Terminal terminal = VerifyPin.exec(Long.parseLong(pin), Terminal.MODEL_STAFF);
-		SalesDetail[] list = QuerySaleDetails.execByDept(terminal, onDuty, offDuty, 1);
+		Staff staff = StaffDao.verify(Integer.parseInt(pin));
+		SalesDetail[] list = QuerySaleDetails.execByDept(staff, onDuty, offDuty, 1);
 		
 		HSSFWorkbook wb = new HSSFWorkbook();
 		HSSFSheet sheet = wb.createSheet("部门销售统计(历史)");
@@ -522,7 +522,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 		row = sheet.createRow(sheet.getLastRowNum() + 1);
 		row.setHeight((short) 350);
 		cell = row.createCell(0);
-		cell.setCellValue("导出时间: " + DateUtil.format(new Date()) + "     操作人:  " +terminal.owner);
+		cell.setCellValue("导出时间: " + DateUtil.format(new Date()) + "     操作人:  " +staff.getName());
 		cell.setCellStyle(strStyle);
 		sheet.addMergedRegion(new CellRangeAddress(sheet.getLastRowNum(), sheet.getLastRowNum(), 0, 7));
 		
@@ -654,7 +654,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 		params.put("onDuty", onDuty);
 		params.put("offDuty", offDuty);
 		
-		Terminal terminal = VerifyPin.exec(Long.parseLong(pin), Terminal.MODEL_STAFF);
+		Staff staff = StaffDao.verify(Integer.parseInt(pin));
 		List<BusinessStatistics> root = BusinessStatisticsDao.getBusinessReceiptsStatisticsByHistory(params);
 //		BusinessStatistics sum = new BusinessStatistics();
 		
@@ -703,7 +703,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 		row = sheet.createRow(sheet.getLastRowNum() + 1);
 		row.setHeight((short) 350);
 		cell = row.createCell(0);
-		cell.setCellValue("导出时间: " + DateUtil.format(new Date()) + "     操作人:  " +terminal.owner);
+		cell.setCellValue("导出时间: " + DateUtil.format(new Date()) + "     操作人:  " +staff.getName());
 		sheet.addMergedRegion(new CellRangeAddress(sheet.getLastRowNum(), sheet.getLastRowNum(), 0, 12));
 		
 		row = sheet.createRow(sheet.getLastRowNum() + 1);
@@ -901,7 +901,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 		params.put("offDuty", offDuty);
 		params.put("queryPattern", queryPattern);
 		
-		Terminal terminal = VerifyPin.exec(Long.parseLong(pin), Terminal.MODEL_STAFF);
+		Staff staff = StaffDao.verify(Integer.parseInt(pin));
 		BusinessStatistics business = BusinessStatisticsDao.getBusinessStatistics(params);
 		
 		// 创建execl主页
@@ -945,7 +945,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 		row = sheet.createRow(sheet.getLastRowNum() + 1);
 		row.setHeight((short) 350);
 		cell = row.createCell(0);
-		cell.setCellValue("导出时间: " + DateUtil.format(new Date()) + "     操作人:  " +terminal.owner);
+		cell.setCellValue("导出时间: " + DateUtil.format(new Date()) + "     操作人:  " +staff.getName());
 		cell.setCellStyle(strStyle);
 		sheet.addMergedRegion(new CellRangeAddress(sheet.getLastRowNum(), sheet.getLastRowNum(), 0, 8));
 		
@@ -1276,8 +1276,8 @@ public class HistoryStatisticsAction extends DispatchAction{
 		String pin = request.getParameter("pin");
 		String id = request.getParameter("id");
 		
-		Terminal terminal = VerifyPin.exec(Long.parseLong(pin), Terminal.MODEL_STAFF);
-		StockAction stockAction = StockActionDao.getStockAndDetailById(terminal, Integer.parseInt(id));
+		Staff staff = StaffDao.verify(Integer.parseInt(pin));
+		StockAction stockAction = StockActionDao.getStockAndDetailById(staff, Integer.parseInt(id));
 		
 		String title = stockAction.getType().getDesc() + " -- " + stockAction.getCateType().getText() +  stockAction.getSubType().getText() + "单";
 		//标题

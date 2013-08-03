@@ -10,9 +10,9 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import com.wireless.db.frontBusiness.VerifyPin;
+import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.supplierMgr.SupplierDao;
-import com.wireless.protocol.Terminal;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.util.JObject;
 import com.wireless.util.WebParams;
 
@@ -25,9 +25,9 @@ public class DeleteSupplierAction extends Action {
 		JObject jobject = new JObject();
 		try{
 			String pin = request.getParameter("pin");
-			Terminal term = VerifyPin.exec(Long.parseLong(pin), Terminal.MODEL_STAFF);
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			int supplierId =Integer.valueOf(request.getParameter("supplierId"));
-			SupplierDao.deleteById(term, supplierId);
+			SupplierDao.deleteById(staff, supplierId);
 			jobject.initTip(true, "删除成功!");
 		}catch(Exception e){
 			e.printStackTrace();

@@ -10,11 +10,11 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import com.wireless.db.frontBusiness.VerifyPin;
+import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.supplierMgr.SupplierDao;
 import com.wireless.json.JObject;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.supplierMgr.Supplier;
-import com.wireless.protocol.Terminal;
 import com.wireless.util.WebParams;
 
 public class QuerySupplierAction extends Action {
@@ -31,7 +31,7 @@ public class QuerySupplierAction extends Action {
 			String op = request.getParameter("op");
 			String tele = request.getParameter("tele");
 			String contact = request.getParameter("contact");
-			Terminal term = VerifyPin.exec(Long.parseLong(pin), Terminal.MODEL_STAFF);
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			String extraCond = "";
 			if(start !=  null && limit != null){
 				if(op != null && op.equals("e")){
@@ -46,9 +46,9 @@ public class QuerySupplierAction extends Action {
 				}
 										
 			}
-			int roots = SupplierDao.getSupplierCount(term, extraCond);
+			int roots = SupplierDao.getSupplierCount(staff, extraCond);
 			
-			List<Supplier> root = SupplierDao.getSuppliers(term, extraCond, null);
+			List<Supplier> root = SupplierDao.getSuppliers(staff, extraCond, null);
 			
 		    jobject = new JObject(roots, root);
 		}catch(Exception e){

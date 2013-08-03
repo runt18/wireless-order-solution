@@ -16,10 +16,10 @@ import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.frontBusiness.DailySettleDao;
-import com.wireless.db.frontBusiness.VerifyPin;
+import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.ProtocolError;
-import com.wireless.protocol.Terminal;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.util.JObject;
 
 public class DailySettleCheckAction extends Action {
@@ -45,11 +45,9 @@ public class DailySettleCheckAction extends Action {
 			String pin = request.getParameter("pin");
 
 			dbCon.connect();
-			Terminal term = VerifyPin.exec(dbCon, Long.parseLong(pin),
-					Terminal.MODEL_STAFF);
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 
-
-			int[] restOrderID = DailySettleDao.check(dbCon, term);
+			int[] restOrderID = DailySettleDao.check(dbCon, staff);
 			if (restOrderID.length != 0) {
 				jObj.initTip(false, "您还有"
 										+ restOrderID.length

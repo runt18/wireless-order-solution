@@ -10,14 +10,14 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import com.wireless.db.frontBusiness.VerifyPin;
 import com.wireless.db.orderMgr.OrderDao;
+import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.system.SystemDao;
 import com.wireless.json.JObject;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.OrderSummary;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.system.DailySettle;
-import com.wireless.protocol.Terminal;
 import com.wireless.util.DateType;
 import com.wireless.util.WebParams;
 
@@ -117,11 +117,11 @@ public class QueryHistoryAction extends Action {
 			
 			String orderClause = " ORDER BY OH.order_date ASC " + " LIMIT " + start + "," + limit;
 			
-			Terminal term = VerifyPin.exec(Long.parseLong(pin), Terminal.MODEL_STAFF);
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
-			List<Order> list = OrderDao.getPureOrder(term, comboCond + filterCond, orderClause, DateType.HISTORY);
+			List<Order> list = OrderDao.getPureOrder(staff, comboCond + filterCond, orderClause, DateType.HISTORY);
 			
-			OrderSummary summary = OrderDao.getOrderSummary(term, comboCond + filterCond, DateType.HISTORY);
+			OrderSummary summary = OrderDao.getOrderSummary(staff, comboCond + filterCond, DateType.HISTORY);
 			
 			jobject.setTotalProperty(summary.getTotalAmount());
 			jobject.setRoot(list);

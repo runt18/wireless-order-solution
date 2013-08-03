@@ -11,12 +11,12 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import com.wireless.db.frontBusiness.VerifyPin;
+import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.stockMgr.StockTakeDao;
 import com.wireless.db.system.SystemDao;
 import com.wireless.json.JObject;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.stockMgr.StockTake;
-import com.wireless.protocol.Terminal;
 import com.wireless.util.DataPaging;
 import com.wireless.util.WebParams;
 
@@ -36,17 +36,17 @@ public class QueryStockTakeAction extends Action{
 		try{
 			String pin = request.getParameter("pin");
 			String status = request.getParameter("status");
-			Terminal term = VerifyPin.exec(Long.valueOf(pin), Terminal.MODEL_STAFF);
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			String extraCond = "", orderClause = "";
 			if(status != null){
 				extraCond += " AND ST.status = " + status;
 			}
 			// 只能查询当前会计月份数据
-			String curmonth = new SimpleDateFormat("yyyy-MM").format(SystemDao.getCurrentMonth(term));
+			String curmonth = new SimpleDateFormat("yyyy-MM").format(SystemDao.getCurrentMonth(staff));
 			extraCond += (" AND ST.start_date BETWEEN '" + curmonth + "-01' AND '" + curmonth + "-31' ");
 			
 			orderClause += (" ORDER BY ST.status, ST.start_date ");
-			root = StockTakeDao.getStockTakesAndDetail(term, extraCond, orderClause);
+			root = StockTakeDao.getStockTakesAndDetail(staff, extraCond, orderClause);
 		}catch(Exception e){
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
 			e.printStackTrace();

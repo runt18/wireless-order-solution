@@ -9,13 +9,13 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
 import com.wireless.db.DBCon;
-import com.wireless.db.frontBusiness.VerifyPin;
 import com.wireless.db.printScheme.PrinterDao;
+import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.printScheme.PStyle;
 import com.wireless.pojo.printScheme.Printer;
-import com.wireless.protocol.Terminal;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.util.WebParams;
 
 public class OperatePrinterAction extends DispatchAction{
@@ -29,8 +29,8 @@ public class OperatePrinterAction extends DispatchAction{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			Terminal term = VerifyPin.exec(Long.valueOf(pin), Terminal.MODEL_STAFF);
-			PrinterDao.deleteById(dbCon, term, Integer.parseInt(printerId));
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			PrinterDao.deleteById(dbCon, staff, Integer.parseInt(printerId));
 			jobject.initTip(true, "操作成功, 已删除打印机");
 			
 		}catch(BusinessException e){
@@ -57,14 +57,14 @@ public class OperatePrinterAction extends DispatchAction{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			Terminal term = VerifyPin.exec(Long.valueOf(pin), Terminal.MODEL_STAFF);
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			String printerName = request.getParameter("printerName");
 			String printerAlias = request.getParameter("printerAlias");
 			int style =Integer.parseInt(request.getParameter("style"));
 			
-			Printer.InsertBuilder builder = new Printer.InsertBuilder(printerName, PStyle.valueOf(style), term.restaurantID);
+			Printer.InsertBuilder builder = new Printer.InsertBuilder(printerName, PStyle.valueOf(style), staff.getRestaurantId());
 			builder.setAlias(printerAlias);
-			PrinterDao.insert(dbCon, term, builder);
+			PrinterDao.insert(dbCon, staff, builder);
 			jobject.initTip(true, "操作成功, 已添加打印机");
 			
 		}catch(BusinessException e){
@@ -91,7 +91,7 @@ public class OperatePrinterAction extends DispatchAction{
 		
 		try{
 			dbCon.connect();
-			Terminal term = VerifyPin.exec(Long.valueOf(pin), Terminal.MODEL_STAFF);
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			String printerName = request.getParameter("printerName");
 			String printerAlias = request.getParameter("printerAlias");
 			int style =Integer.parseInt(request.getParameter("style"));
@@ -102,7 +102,7 @@ public class OperatePrinterAction extends DispatchAction{
 			builder.setAlias(printerAlias);
 			builder.setEnabled(Boolean.parseBoolean(isEnabled));
 			
-			PrinterDao.update(dbCon, term, builder);
+			PrinterDao.update(dbCon, staff, builder);
 			
 			jobject.initTip(true, "操作成功,已修改打印机");
 		}catch(BusinessException e){

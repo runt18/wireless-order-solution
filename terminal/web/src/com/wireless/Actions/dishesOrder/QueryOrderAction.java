@@ -12,9 +12,9 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.frontBusiness.PayOrder;
-import com.wireless.db.frontBusiness.VerifyPin;
 import com.wireless.db.menuMgr.MenuDao;
 import com.wireless.db.orderMgr.OrderDao;
+import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.ProtocolError;
 import com.wireless.json.JObject;
@@ -23,7 +23,7 @@ import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.distMgr.Discount;
 import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.pojo.ppMgr.PricePlan;
-import com.wireless.protocol.Terminal;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.util.DateType;
 import com.wireless.util.WebParams;
 
@@ -57,19 +57,19 @@ public class QueryOrderAction extends Action {
 			String customNum = request.getParameter("customNum");
 			
 			Order order = new Order();
-			Terminal term = VerifyPin.exec(Long.parseLong(pin), Terminal.MODEL_STAFF);
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
 			if(queryType != null && queryType.trim().equals("History")){
 				if (oid != null && !oid.trim().isEmpty()){
-					order = OrderDao.getById(term, Integer.valueOf(oid), DateType.HISTORY);
+					order = OrderDao.getById(staff, Integer.valueOf(oid), DateType.HISTORY);
 				}else{
 					order = null;
 				}
 			}else{
 				if(tid != null && !tid.trim().isEmpty()){
-					order = OrderDao.getByTableAlias(term, Integer.parseInt(tid));
+					order = OrderDao.getByTableAlias(staff, Integer.parseInt(tid));
 				} else if (oid != null && !oid.trim().isEmpty()){
-					order = OrderDao.getById(term, Integer.valueOf(oid), DateType.TODAY);
+					order = OrderDao.getById(staff, Integer.valueOf(oid), DateType.TODAY);
 				}
 				if(calc != null && Boolean.valueOf(calc)){
 					if(discountID != null && !discountID.trim().isEmpty()){
@@ -90,9 +90,9 @@ public class QueryOrderAction extends Action {
 						order.setCustomNum(Short.valueOf(customNum));
 					}
 					if(tid != null && !tid.trim().isEmpty()){
-						order = PayOrder.calcByTable(VerifyPin.exec(Long.parseLong(pin), Terminal.MODEL_STAFF), order);
+						order = PayOrder.calcByTable(staff, order);
 					} else if (oid != null && !oid.trim().isEmpty()){
-						order = PayOrder.calcByID(VerifyPin.exec(Long.parseLong(pin), Terminal.MODEL_STAFF), order);
+						order = PayOrder.calcByID(staff, order);
 					}
 				}
 			}

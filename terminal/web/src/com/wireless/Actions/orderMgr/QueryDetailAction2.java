@@ -15,10 +15,10 @@ import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
-import com.wireless.db.frontBusiness.VerifyPin;
+import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.ProtocolError;
-import com.wireless.protocol.Terminal;
+import com.wireless.pojo.staffMgr.Staff;
 
 public class QueryDetailAction2 extends Action {
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
@@ -47,13 +47,13 @@ public class QueryDetailAction2 extends Action {
 			
 			dbCon.connect();
 			
-			Terminal term = VerifyPin.exec(dbCon, Long.parseLong(pin), Terminal.MODEL_STAFF);
+			Staff term = StaffDao.verify(Integer.parseInt(pin));
 			
 			int nCount = 0;
 			StringBuffer value = new StringBuffer();
 			
 			String sql = "SELECT a.*, b.name AS kitchen_name FROM " + Params.dbName + ".order_food a, " + Params.dbName + ".kitchen b " +
-						 "WHERE order_id=" + orderID + " AND a.kitchen=b.alias_id AND b.restaurant_id=" + term.restaurantID;
+						 "WHERE order_id=" + orderID + " AND a.kitchen=b.alias_id AND b.restaurant_id=" + term.getRestaurantId();
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
 			while(dbCon.rs.next()){
 				// the string is separated by comma

@@ -11,12 +11,12 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import com.wireless.db.frontBusiness.VerifyPin;
+import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.stockMgr.StockActionDao;
 import com.wireless.db.system.SystemDao;
 import com.wireless.json.JObject;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.stockMgr.StockAction;
-import com.wireless.protocol.Terminal;
 import com.wireless.util.DataPaging;
 import com.wireless.util.WebParams;
 
@@ -46,10 +46,10 @@ public class QueryStockActionAction extends Action{
 			String beginDate = request.getParameter("beginDate");
 			String endDate = request.getParameter("endDate");
 			
-			Terminal term = VerifyPin.exec(Long.valueOf(pin), Terminal.MODEL_STAFF);
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
 			String extraCond = "", orderClause = "";
-			String curmonth = new SimpleDateFormat("yyyy-MM").format(SystemDao.getCurrentMonth(term));
+			String curmonth = new SimpleDateFormat("yyyy-MM").format(SystemDao.getCurrentMonth(staff));
 			if(isHistory == null || !Boolean.valueOf(isHistory)){
 				// 只能查询当前会计月份数据
 				extraCond += (" AND S.ori_stock_date BETWEEN '" + curmonth + "-01' AND '" + curmonth + "-31' ");
@@ -93,7 +93,7 @@ public class QueryStockActionAction extends Action{
 				extraCond += (" AND S.sub_type = " + subType.trim());
 			}
 			orderClause += (" ORDER BY S.status, S.ori_stock_date ");
-			root = StockActionDao.getStockAndDetail(term, extraCond, orderClause);
+			root = StockActionDao.getStockAndDetail(staff, extraCond, orderClause);
 
 			
 		}catch(Exception e){

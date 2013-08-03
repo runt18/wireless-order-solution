@@ -10,11 +10,11 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import com.wireless.db.frontBusiness.VerifyPin;
+import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.stockMgr.StockActionDetailDao;
 import com.wireless.json.JObject;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.stockMgr.StockActionDetail;
-import com.wireless.protocol.Terminal;
 import com.wireless.util.WebParams;
 
 public class QueryStockActionDetailAction extends Action{
@@ -29,11 +29,11 @@ public class QueryStockActionDetailAction extends Action{
 		try{
 			String pin = request.getParameter("pin");
 			String id = request.getParameter("id");
-			Terminal term = VerifyPin.exec(Long.valueOf(pin), Terminal.MODEL_STAFF);
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
 			String  orderClause = "";
 			if(id != null){
-				root = StockActionDetailDao.getStockActionDetails(term, " AND stock_action_id = " + Integer.parseInt(id), orderClause);
+				root = StockActionDetailDao.getStockActionDetails(staff, " AND stock_action_id = " + Integer.parseInt(id), orderClause);
 			}
 
 			

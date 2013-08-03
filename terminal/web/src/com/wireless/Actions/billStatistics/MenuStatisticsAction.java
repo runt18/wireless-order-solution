@@ -20,12 +20,12 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.DBCon;
-import com.wireless.db.frontBusiness.VerifyPin;
 import com.wireless.db.orderMgr.OrderFoodDao;
+import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.ProtocolError;
 import com.wireless.pojo.dishesOrder.OrderFood;
-import com.wireless.protocol.Terminal;
+import com.wireless.pojo.staffMgr.Staff;
 
 public class MenuStatisticsAction extends Action {
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
@@ -66,7 +66,7 @@ public class MenuStatisticsAction extends Action {
 			String pin = request.getParameter("pin");
 
 			dbCon.connect();
-			Terminal term = VerifyPin.exec(dbCon, Long.parseLong(pin), Terminal.MODEL_STAFF);
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 
 			// get the query condition
 			String dateBegin = request.getParameter("dateBegin");
@@ -87,7 +87,7 @@ public class MenuStatisticsAction extends Action {
 				String condition = " AND OF.food_alias IN (" + foodAlias + ") " +
 								   " AND O.order_date >= '" + dateBegin + "' " + 
 								   " AND O.order_date <= '" + dateEnd + "'" +
-								   " AND O.total_price IS NOT NULL AND O.restaurant_id = " + term.restaurantID;
+								   " AND O.total_price IS NOT NULL AND O.restaurant_id = " + staff.getRestaurantId();
 
 				String orderClause = " ORDER BY food_alias ASC, pay_datetime ";	
 				orderFoods = OrderFoodDao.getDetailToday(dbCon, condition, orderClause);
@@ -97,7 +97,7 @@ public class MenuStatisticsAction extends Action {
 				String condition = " AND OFH.food_alias IN (" + foodAlias + ") " +
 								   " AND OH.order_date >= '" + dateBegin + "' " + 
 								   " AND OH.order_date <= '" + dateEnd + "'" +
-								   " AND OH.total_price IS NOT NULL AND OH.restaurant_id = " + term.restaurantID;
+								   " AND OH.total_price IS NOT NULL AND OH.restaurant_id = " + staff.getRestaurantId();
 
 				String orderClause = " ORDER BY food_alias ASC, pay_datetime ";
 				orderFoods = OrderFoodDao.getDetailHistory(dbCon, condition, orderClause);

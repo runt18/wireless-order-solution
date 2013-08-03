@@ -20,11 +20,11 @@ import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.shift.QueryShiftDao;
+import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.ProtocolError;
 import com.wireless.pojo.billStatistics.IncomeByDept;
 import com.wireless.pojo.billStatistics.ShiftDetail;
-import com.wireless.protocol.Terminal;
 
 public class ShiftStatDetailAction extends Action {
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
@@ -64,13 +64,15 @@ public class ShiftStatDetailAction extends Action {
 
 			ShiftDetail resutl = null;
 			if (StatisticsType.equals("Today")) {
-				resutl = QueryShiftDao.exec(dbCon, Long.parseLong(pin),
-						Terminal.MODEL_STAFF, onDuty, offDuty,
-						QueryShiftDao.QUERY_TODAY);
+				resutl = QueryShiftDao.exec(dbCon, 
+											StaffDao.verify(dbCon, Integer.parseInt(pin)), 
+											onDuty, offDuty,
+											QueryShiftDao.QUERY_TODAY);
 			} else if (StatisticsType.equals("History")) {
-				resutl = QueryShiftDao.exec(dbCon, Long.parseLong(pin),
-						Terminal.MODEL_STAFF, onDuty, offDuty,
-						QueryShiftDao.QUERY_HISTORY);
+				resutl = QueryShiftDao.exec(dbCon, 
+											StaffDao.verify(dbCon, Integer.parseInt(pin)),
+											onDuty, offDuty,
+											QueryShiftDao.QUERY_HISTORY);
 			}
 
 			/**

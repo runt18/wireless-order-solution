@@ -13,14 +13,14 @@ import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.frontBusiness.PayOrder;
 import com.wireless.db.frontBusiness.UpdateOrder;
-import com.wireless.db.frontBusiness.VerifyPin;
+import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.ProtocolError;
 import com.wireless.pojo.client.Member;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.distMgr.Discount;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.NumericUtil;
-import com.wireless.protocol.Terminal;
 import com.wireless.util.Util;
 
 public class UpdateOrderAction2 extends Action{
@@ -122,10 +122,10 @@ public class UpdateOrderAction2 extends Action{
 			//get the food string to this order
 			orderToUpdate.setOrderFoods(Util.toFoodArray(request.getParameter("foods")));
 			
-			Terminal term = VerifyPin.exec(Long.parseLong(pin), Terminal.MODEL_STAFF);
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
-			UpdateOrder.execByID(term, orderToUpdate);
-			PayOrder.execByID(term, orderToUpdate);
+			UpdateOrder.execByID(staff, orderToUpdate);
+			PayOrder.execByID(staff, orderToUpdate);
 			
 			jsonResp = jsonResp.replace("$(result)", "true");	
 			jsonResp = jsonResp.replace("$(value)", orderID + "号账单修改成功");

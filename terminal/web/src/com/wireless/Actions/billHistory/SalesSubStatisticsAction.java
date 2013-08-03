@@ -13,11 +13,10 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.billStatistics.QuerySaleDetails;
-import com.wireless.db.frontBusiness.VerifyPin;
+import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.json.JObject;
 import com.wireless.pojo.billStatistics.SalesDetail;
 import com.wireless.pojo.menuMgr.Food;
-import com.wireless.protocol.Terminal;
 import com.wireless.util.DataPaging;
 import com.wireless.util.WebParams;
 
@@ -90,7 +89,7 @@ public class SalesSubStatisticsAction extends Action {
 			
 			if(qt == QuerySaleDetails.QUERY_BY_DEPT){
 				saleDetails = QuerySaleDetails.execByDept(
-	  					VerifyPin.exec(Long.parseLong(pin), Terminal.MODEL_STAFF), 
+						StaffDao.verify(Integer.parseInt(pin)), 
 	  					dateBeg, 
 	  					dateEnd,
 	  					dt);
@@ -105,7 +104,7 @@ public class SalesSubStatisticsAction extends Action {
 					did = new int[0];
 				}
 				saleDetails = QuerySaleDetails.execByFood(
-	  					VerifyPin.exec(Long.parseLong(pin), Terminal.MODEL_STAFF), 
+						StaffDao.verify(Integer.parseInt(pin)), 
 	  					dateBeg, 
 	  					dateEnd,
 	  					did,
@@ -114,7 +113,7 @@ public class SalesSubStatisticsAction extends Action {
 	  					foodName);
 			}else if(qt == QuerySaleDetails.QUERY_BY_KITCHEN){
 				saleDetails = QuerySaleDetails.execByKitchen(
-						VerifyPin.exec(Long.parseLong(pin), Terminal.MODEL_STAFF), 
+						StaffDao.verify(Integer.parseInt(pin)), 
 						dateBeg, 
 						dateEnd, 
 						dt);

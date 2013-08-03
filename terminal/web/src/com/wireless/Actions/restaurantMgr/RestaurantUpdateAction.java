@@ -13,11 +13,11 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.DBCon;
-import com.wireless.db.frontBusiness.VerifyPin;
 import com.wireless.db.restaurantMgr.RestaurantDao;
+import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.restaurantMgr.Restaurant;
-import com.wireless.protocol.Terminal;
+import com.wireless.pojo.staffMgr.Staff;
 
 public class RestaurantUpdateAction extends Action {
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
@@ -53,9 +53,9 @@ public class RestaurantUpdateAction extends Action {
 			
 			dbCon.connect();
 
-			Terminal term = VerifyPin.exec(dbCon, Long.parseLong(pin), Terminal.MODEL_STAFF);
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
-			id = term.restaurantID+"";
+			id = staff.getRestaurantId()+"";
 			
 			Restaurant restaurant = new Restaurant();
 			
@@ -71,7 +71,7 @@ public class RestaurantUpdateAction extends Action {
 			
 			restaurant.setTele2(tele2);
 			
-			RestaurantDao.update(term, restaurant);
+			RestaurantDao.update(staff, restaurant);
 			
 			success = true;
 			

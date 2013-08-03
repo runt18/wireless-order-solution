@@ -14,8 +14,8 @@ import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
-import com.wireless.db.frontBusiness.VerifyPin;
-import com.wireless.protocol.Terminal;
+import com.wireless.db.staffMgr.StaffDao;
+import com.wireless.pojo.staffMgr.Staff;
 
 public class DoShiftAction extends Action {
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
@@ -49,11 +49,11 @@ public class DoShiftAction extends Action {
 			
 			dbCon.connect();
 			
-			Terminal term = VerifyPin.exec(dbCon, Long.parseLong(pin), Terminal.MODEL_STAFF);
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
 			String sql = "INSERT INTO " + Params.dbName + ".shift (restaurant_id, name, on_duty, off_duty) VALUES(" +
-						 term.restaurantID + "," +
-						 "'" + term.owner + "'," +
+						 staff.getRestaurantId() + "," +
+						 "'" + staff.getName() + "'," +
 						 "DATE_FORMAT('" + onDuty + "', '%Y%m%d%H%i%s')" + "," +
 						 "DATE_FORMAT('" + offDuty + "', '%Y%m%d%H%i%s')" + 
 						 ")";
@@ -61,7 +61,7 @@ public class DoShiftAction extends Action {
 			dbCon.stmt.execute(sql);
 			
 			jsonResp = jsonResp.replace("$(result)", "true");
-			jsonResp = jsonResp.replace("$(value)", term.owner + "交班成功");
+			jsonResp = jsonResp.replace("$(value)", staff.getName() + "交班成功");
 			
 		}catch(SQLException e){
 			e.printStackTrace();

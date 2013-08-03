@@ -20,12 +20,12 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
 import com.wireless.db.billStatistics.QuerySaleDetails;
-import com.wireless.db.frontBusiness.VerifyPin;
+import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.pojo.billStatistics.SalesDetail;
 import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.menuMgr.Kitchen;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.DateUtil;
-import com.wireless.protocol.Terminal;
 import com.wireless.util.DateType;
 
 @SuppressWarnings("deprecation")
@@ -101,9 +101,9 @@ public class TodayStatisticsAction extends DispatchAction{
 				did = new int[0];
 			}
 		}
-		Terminal terminal = VerifyPin.exec(Long.parseLong(pin), Terminal.MODEL_STAFF);
+		Staff staff = StaffDao.verify(Integer.parseInt(pin));
 		SalesDetail[] saleDetails = QuerySaleDetails.execByFood(
-				terminal, 
+				staff, 
 				onDuty, 
 				offDuty,
 				did,
@@ -149,7 +149,7 @@ public class TodayStatisticsAction extends DispatchAction{
 		row = sheet.createRow(sheet.getLastRowNum() + 1);
 		row.setHeight((short) 350);
 		cell = row.createCell(0);
-		cell.setCellValue("导出时间: " + DateUtil.format(new Date()) + "     操作人:  " +terminal.owner);
+		cell.setCellValue("导出时间: " + DateUtil.format(new Date()) + "     操作人:  " +staff.getName());
 		cell.getCellStyle().setVerticalAlignment(HSSFCellStyle.VERTICAL_CENTER);
 		sheet.addMergedRegion(new CellRangeAddress(sheet.getLastRowNum(), sheet.getLastRowNum(), 0, 5));
 		
@@ -248,8 +248,8 @@ public class TodayStatisticsAction extends DispatchAction{
 		String onDuty = request.getParameter("onDuty");
 		String offDuty = request.getParameter("offDuty");
 		
-		Terminal terminal = VerifyPin.exec(Long.parseLong(pin), Terminal.MODEL_STAFF);
-		SalesDetail[] list = QuerySaleDetails.execByKitchen(terminal, onDuty, offDuty, DateType.TODAY.getValue());
+		Staff staff = StaffDao.verify(Integer.parseInt(pin));
+		SalesDetail[] list = QuerySaleDetails.execByKitchen(staff, onDuty, offDuty, DateType.TODAY.getValue());
 		
 		HSSFWorkbook wb = new HSSFWorkbook();
 		HSSFSheet sheet = wb.createSheet("分厨销售统计(" + DateType.HISTORY.getName() + ")");
@@ -285,7 +285,7 @@ public class TodayStatisticsAction extends DispatchAction{
 		row = sheet.createRow(sheet.getLastRowNum() + 1);
 		row.setHeight((short) 350);
 		cell = row.createCell(0);
-		cell.setCellValue("导出时间: " + DateUtil.format(new Date()) + "     操作人:  " +terminal.owner);
+		cell.setCellValue("导出时间: " + DateUtil.format(new Date()) + "     操作人:  " +staff.getName());
 		cell.setCellStyle(strStyle);
 		sheet.addMergedRegion(new CellRangeAddress(sheet.getLastRowNum(), sheet.getLastRowNum(), 0, 3));
 		
@@ -381,8 +381,8 @@ public class TodayStatisticsAction extends DispatchAction{
 		String onDuty = request.getParameter("onDuty");
 		String offDuty = request.getParameter("offDuty");
 		
-		Terminal terminal = VerifyPin.exec(Long.parseLong(pin), Terminal.MODEL_STAFF);
-		SalesDetail[] list = QuerySaleDetails.execByDept(terminal, onDuty, offDuty, DateType.TODAY.getValue());
+		Staff staff = StaffDao.verify(Integer.parseInt(pin));
+		SalesDetail[] list = QuerySaleDetails.execByDept(staff, onDuty, offDuty, DateType.TODAY.getValue());
 		
 		HSSFWorkbook wb = new HSSFWorkbook();
 		HSSFSheet sheet = wb.createSheet("部门销售统计(" + DateType.HISTORY.getName() + ")");
@@ -418,7 +418,7 @@ public class TodayStatisticsAction extends DispatchAction{
 		row = sheet.createRow(sheet.getLastRowNum() + 1);
 		row.setHeight((short) 350);
 		cell = row.createCell(0);
-		cell.setCellValue("导出时间: " + DateUtil.format(new Date()) + "     操作人:  " +terminal.owner);
+		cell.setCellValue("导出时间: " + DateUtil.format(new Date()) + "     操作人:  " +staff.getName());
 		cell.setCellStyle(strStyle);
 		sheet.addMergedRegion(new CellRangeAddress(sheet.getLastRowNum(), sheet.getLastRowNum(), 0, 3));
 		

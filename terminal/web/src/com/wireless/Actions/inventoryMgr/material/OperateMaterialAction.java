@@ -8,12 +8,12 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
-import com.wireless.db.frontBusiness.VerifyPin;
 import com.wireless.db.inventoryMgr.MaterialDao;
+import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.inventoryMgr.Material;
-import com.wireless.protocol.Terminal;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.util.WebParams;
 
 public class OperateMaterialAction extends DispatchAction {
@@ -39,8 +39,8 @@ public class OperateMaterialAction extends DispatchAction {
 			String name = request.getParameter("name");
 			String cateId = request.getParameter("cateId");
 			
-			Terminal term = VerifyPin.exec(Long.valueOf(pin), Terminal.MODEL_STAFF);
-			Material m = new Material(Integer.valueOf(restaurantID), name, Integer.valueOf(cateId), term.owner, Material.Status.NORMAL.getValue());
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			Material m = new Material(Integer.valueOf(restaurantID), name, Integer.valueOf(cateId), staff.getName(), Material.Status.NORMAL.getValue());
 			MaterialDao.insert(m);
 			jobject.initTip(true, "操作成功, 已添加新原料信息.");
 		}catch(BusinessException e){
@@ -77,8 +77,8 @@ public class OperateMaterialAction extends DispatchAction {
 			String name = request.getParameter("name");
 			String cateId = request.getParameter("cateId");
 			
-			Terminal term = VerifyPin.exec(Long.valueOf(pin), Terminal.MODEL_STAFF);
-			Material m = new Material(Integer.valueOf(id), Integer.valueOf(restaurantID), Integer.valueOf(cateId), name, term.owner);
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			Material m = new Material(Integer.valueOf(id), Integer.valueOf(restaurantID), Integer.valueOf(cateId), name, staff.getName());
 			MaterialDao.update(m);
 			jobject.initTip(true, "操作成功, 已修改原料信息.");
 		}catch(BusinessException e){	

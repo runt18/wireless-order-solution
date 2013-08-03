@@ -8,12 +8,12 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
-import com.wireless.db.frontBusiness.VerifyPin;
 import com.wireless.db.regionMgr.TableDao;
+import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.regionMgr.Table;
-import com.wireless.protocol.Terminal;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.util.WebParams;
 
 public class OperateTableAction extends DispatchAction{
@@ -41,12 +41,12 @@ public class OperateTableAction extends DispatchAction{
 			String serviceRate = request.getParameter("serviceRate");
 			String regionId = request.getParameter("regionId");
 			
-			Terminal term = VerifyPin.exec(Long.valueOf(pin), Terminal.MODEL_STAFF);
-			Table.InsertBuilder builder = new Table.InsertBuilder(Integer.parseInt(alias), term.restaurantID,  Short.parseShort(regionId))
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			Table.InsertBuilder builder = new Table.InsertBuilder(Integer.parseInt(alias), staff.getRestaurantId(),  Short.parseShort(regionId))
 					.setMiniCost(Integer.valueOf(minimumCost))
 					.setServiceRate(Float.valueOf(serviceRate))
 					.setTableName(name);
-			TableDao.insert(term, builder);
+			TableDao.insert(staff, builder);
 			jobject.initTip(true, "操作成功, 已添加新餐台信息.");
 		}catch(BusinessException e){
 			e.printStackTrace();
@@ -87,7 +87,7 @@ public class OperateTableAction extends DispatchAction{
 					.setRegionId(Short.valueOf(regionId))
 					.setServiceRate(Float.valueOf(serviceRate))
 					.setTableName(name);
-			TableDao.updateById(VerifyPin.exec(Long.valueOf(pin), Terminal.MODEL_STAFF), builder.build());
+			TableDao.updateById(StaffDao.verify(Integer.parseInt(pin)), builder.build());
 			jobject.initTip(true, "操作成功, 已修改餐台信息.");
 		}catch(BusinessException e){
 			e.printStackTrace();
@@ -119,7 +119,7 @@ public class OperateTableAction extends DispatchAction{
 		try{
 			String pin = request.getParameter("pin");
 			String id = request.getParameter("id");
-			TableDao.deleteById(VerifyPin.exec(Long.valueOf(pin), Terminal.MODEL_STAFF), Integer.valueOf(id));
+			TableDao.deleteById(StaffDao.verify(Integer.parseInt(pin)), Integer.valueOf(id));
 			jobject.initTip(true, "操作成功, 已删除餐台信息.");
 		}catch(BusinessException e){
 			e.printStackTrace();

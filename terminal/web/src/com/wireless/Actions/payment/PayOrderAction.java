@@ -11,19 +11,19 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
+import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.ErrorCode;
 import com.wireless.exception.ProtocolError;
 import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
-import com.wireless.pack.req.PinGen;
 import com.wireless.pack.req.ReqPayOrder;
 import com.wireless.parcel.Parcel;
 import com.wireless.pojo.client.Member;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.distMgr.Discount;
 import com.wireless.pojo.ppMgr.PricePlan;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.NumericUtil;
-import com.wireless.protocol.Terminal;
 import com.wireless.sccon.ServerConnector;
 
 public class PayOrderAction extends Action{
@@ -79,7 +79,7 @@ public class PayOrderAction extends Action{
 			 *           No need to pass this parameter if no comment input. 
 			 */
 			
-			final long pin = Long.parseLong(request.getParameter("pin"));
+			final Staff staff = StaffDao.verify(Integer.parseInt(request.getParameter("pin")));
 			
 			Order orderToPay = new Order();
 			
@@ -162,19 +162,7 @@ public class PayOrderAction extends Action{
 				}				
 			}
 			
-			ProtocolPackage resp = ServerConnector.instance().ask(new ReqPayOrder(
-					new PinGen(){
-						@Override
-						public long getDeviceId() {
-							return pin;
-						}
-
-						@Override
-						public short getDeviceType() {
-							return Terminal.MODEL_STAFF;
-						}
-					},
-					orderToPay, payCate));
+			ProtocolPackage resp = ServerConnector.instance().ask(new ReqPayOrder(staff, orderToPay, payCate));
 			
 			if(resp.header.type == Type.ACK){
 				jsonResp = jsonResp.replace("$(result)", "true");

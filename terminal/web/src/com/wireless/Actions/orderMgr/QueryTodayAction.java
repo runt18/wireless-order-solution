@@ -11,13 +11,12 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import com.wireless.db.frontBusiness.VerifyPin;
 import com.wireless.db.orderMgr.OrderDao;
+import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.json.JObject;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.util.DateUtil;
-import com.wireless.protocol.Terminal;
 import com.wireless.util.DataPaging;
 import com.wireless.util.DateType;
 import com.wireless.util.WebParams;
@@ -119,7 +118,7 @@ public class QueryTodayAction extends Action {
 			
 			String orderClause = " ORDER BY O.seq_id ASC ";
 			
-			list = OrderDao.getPureOrder(VerifyPin.exec(Long.parseLong(pin), Terminal.MODEL_STAFF), extraCond.toString(), orderClause, DateType.TODAY);
+			list = OrderDao.getPureOrder(StaffDao.verify(Integer.parseInt(pin)), extraCond.toString(), orderClause, DateType.TODAY);
 			
 		}catch(Exception e){
 			e.printStackTrace();

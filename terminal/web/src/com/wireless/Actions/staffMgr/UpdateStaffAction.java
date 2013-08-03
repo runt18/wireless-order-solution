@@ -14,10 +14,10 @@ import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
-import com.wireless.db.frontBusiness.VerifyPin;
+import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.ProtocolError;
-import com.wireless.protocol.Terminal;
+import com.wireless.pojo.staffMgr.Staff;
 
 public class UpdateStaffAction extends Action {
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
@@ -52,8 +52,7 @@ public class UpdateStaffAction extends Action {
 			String pin = request.getParameter("pin");
 
 			dbCon.connect();
-			Terminal term = VerifyPin.exec(dbCon, Long.parseLong(pin),
-					Terminal.MODEL_STAFF);
+			Staff staff = StaffDao.verify(dbCon, Integer.parseInt(pin));
 
 			// get parameter
 			String modStaffs = request.getParameter("modStaffs");
@@ -72,7 +71,7 @@ public class UpdateStaffAction extends Action {
 
 				sql = "UPDATE " + Params.dbName + ".staff " + " SET name = '"
 						+ fieldValues[2] + "' WHERE restaurant_id="
-						+ term.restaurantID + " AND staff_id = "
+						+ staff.getRestaurantId() + " AND staff_id = "
 						+ fieldValues[0];
 
 				dbCon.stmt.executeUpdate(sql);
@@ -80,7 +79,7 @@ public class UpdateStaffAction extends Action {
 				sql = "UPDATE " + Params.dbName + ".terminal "
 						+ " SET gift_quota = " + fieldValues[3]
 						+ " , owner_name = '" + fieldValues[2]
-						+ "' WHERE restaurant_id=" + term.restaurantID
+						+ "' WHERE restaurant_id=" + staff.getRestaurantId()
 						+ " AND terminal_id = " + fieldValues[1];
 
 				dbCon.stmt.executeUpdate(sql);

@@ -14,10 +14,10 @@ import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
-import com.wireless.db.frontBusiness.VerifyPin;
+import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.ProtocolError;
-import com.wireless.protocol.Terminal;
+import com.wireless.pojo.staffMgr.Staff;
 
 public class SetPasswordAction extends Action {
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
@@ -46,9 +46,7 @@ public class SetPasswordAction extends Action {
 			String pin = request.getParameter("pin");
 
 			dbCon.connect();
-			Terminal term = VerifyPin.exec(dbCon, Long.parseLong(pin),
-					Terminal.MODEL_STAFF);
-
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			// get parameter
 			String adminPwd = request.getParameter("adminPwd");
 			String financePwd = request.getParameter("financePwd");
@@ -60,11 +58,11 @@ public class SetPasswordAction extends Action {
 			if (!adminPwd.equals("<special_message:not_change>")) {
 				if (adminPwd.equals("")) {
 					sql = "UPDATE " + Params.dbName + ".restaurant "
-							+ " SET pwd = '' WHERE id=" + term.restaurantID;
+							+ " SET pwd = '' WHERE id=" + staff.getRestaurantId();
 				} else {
 					sql = "UPDATE " + Params.dbName + ".restaurant "
 							+ " SET pwd = md5('" + adminPwd + "') WHERE id="
-							+ term.restaurantID;
+							+ staff.getRestaurantId();
 				}
 				dbCon.stmt.executeUpdate(sql);
 			}
@@ -73,11 +71,11 @@ public class SetPasswordAction extends Action {
 			if (!financePwd.equals("<special_message:not_change>")) {
 				if (financePwd.equals("")) {
 					sql = "UPDATE " + Params.dbName + ".restaurant "
-							+ " SET pwd2 = '' WHERE id=" + term.restaurantID;
+							+ " SET pwd2 = '' WHERE id=" + staff.getRestaurantId();
 				} else {
 					sql = "UPDATE " + Params.dbName + ".restaurant "
 							+ " SET pwd2 = md5('" + financePwd + "') WHERE id="
-							+ term.restaurantID;
+							+ staff.getRestaurantId();
 				}
 				dbCon.stmt.executeUpdate(sql);
 			}
@@ -86,11 +84,11 @@ public class SetPasswordAction extends Action {
 			if (!managerPwd.equals("<special_message:not_change>")) {
 				if (managerPwd.equals("")) {
 					sql = "UPDATE " + Params.dbName + ".restaurant "
-							+ " SET pwd3 = '' WHERE id=" + term.restaurantID;
+							+ " SET pwd3 = '' WHERE id=" + staff.getRestaurantId();
 				} else {
 					sql = "UPDATE " + Params.dbName + ".restaurant "
 							+ " SET pwd3 = md5('" + managerPwd + "') WHERE id="
-							+ term.restaurantID;
+							+ staff.getRestaurantId();
 				}
 				dbCon.stmt.executeUpdate(sql);
 			}
@@ -99,11 +97,11 @@ public class SetPasswordAction extends Action {
 			if (!cashierPwd.equals("<special_message:not_change>")) {
 				if (cashierPwd.equals("")) {
 					sql = "UPDATE " + Params.dbName + ".restaurant "
-							+ " SET pwd4 = '' WHERE id=" + term.restaurantID;
+							+ " SET pwd4 = '' WHERE id=" + staff.getRestaurantId();
 				} else {
 					sql = "UPDATE " + Params.dbName + ".restaurant "
 							+ " SET pwd4 = md5('" + cashierPwd + "') WHERE id="
-							+ term.restaurantID;
+							+ staff.getRestaurantId();
 				}
 				dbCon.stmt.executeUpdate(sql);
 			}
@@ -112,11 +110,11 @@ public class SetPasswordAction extends Action {
 			if (!orderCancelPwd.equals("<special_message:not_change>")) {
 				if (orderCancelPwd.equals("")) {
 					sql = "UPDATE " + Params.dbName + ".restaurant "
-							+ " SET pwd5 = '' WHERE id=" + term.restaurantID;
+							+ " SET pwd5 = '' WHERE id=" + staff.getRestaurantId();
 				} else {
 					sql = "UPDATE " + Params.dbName + ".restaurant "
 							+ " SET pwd5 = md5('" + orderCancelPwd + "') WHERE id="
-							+ term.restaurantID;
+							+ staff.getRestaurantId();
 				}
 				dbCon.stmt.executeUpdate(sql);
 			}

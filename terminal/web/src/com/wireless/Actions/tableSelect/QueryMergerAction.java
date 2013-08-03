@@ -13,9 +13,9 @@ import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
-import com.wireless.db.frontBusiness.VerifyPin;
+import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.pojo.dishesOrder.Order;
-import com.wireless.protocol.Terminal;
+import com.wireless.pojo.staffMgr.Staff;
 
 public class QueryMergerAction extends Action {
 	
@@ -35,12 +35,12 @@ public class QueryMergerAction extends Action {
 			
 			dbCon.connect();
 			
-			Terminal term = VerifyPin.exec(dbCon, Long.parseLong(pin), Terminal.MODEL_STAFF);
+			Staff staff = StaffDao.verify(dbCon, Integer.parseInt(pin));
 			
 			String sql = "SELECT table_alias, table2_alias FROM " + 
 						 Params.dbName + 
 						 ".order WHERE category=" + Order.Category.MERGER_TBL.getVal() +
-						 " AND restaurant_id=" + term.restaurantID +
+						 " AND restaurant_id=" + staff.getRestaurantId() +
 						 " AND total_price IS NULL";
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
 			/**

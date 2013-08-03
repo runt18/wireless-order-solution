@@ -14,7 +14,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.billStatistics.QueryCancelledFood;
-import com.wireless.db.frontBusiness.VerifyPin;
+import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.pojo.billStatistics.CancelIncomeByDept;
 import com.wireless.pojo.billStatistics.CancelIncomeByDept.IncomeByEachReason;
 import com.wireless.pojo.billStatistics.CancelIncomeByReason;
@@ -23,7 +23,7 @@ import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.crMgr.CancelReason;
 import com.wireless.pojo.dishesOrder.CancelledFood;
 import com.wireless.pojo.menuMgr.Department;
-import com.wireless.protocol.Terminal;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.util.DataPaging;
 import com.wireless.util.JObject;
 import com.wireless.util.WebParams;
@@ -83,10 +83,10 @@ public class QueryCancelledFoodAction extends Action {
 			Integer did = Integer.valueOf(deptID), rid = Integer.valueOf(reasonID);
 			
 			DutyRange queryDate = new DutyRange(dateBeg, dateEnd);
-			Terminal terminal = VerifyPin.exec(Long.parseLong(pin), Terminal.MODEL_STAFF);
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
 			if(qt == QueryCancelledFood.QUERY_BY_DEPT){
-				CancelIncomeByDept dept = QueryCancelledFood.getCancelledFoodByDept(terminal, queryDate, did, dt, ot);
+				CancelIncomeByDept dept = QueryCancelledFood.getCancelledFoodByDept(staff, queryDate, did, dt, ot);
 				if(dept != null){
 					list = dept.getIncomeByEachReason();
 					if(list != null && list.size() > 0){
@@ -100,7 +100,7 @@ public class QueryCancelledFoodAction extends Action {
 					}
 				}
 			}else if(qt == QueryCancelledFood.QUERY_BY_REASON){
-				CancelIncomeByReason reason = QueryCancelledFood.getCancelledFoodByReason(terminal, queryDate, rid, dt, ot);
+				CancelIncomeByReason reason = QueryCancelledFood.getCancelledFoodByReason(staff, queryDate, rid, dt, ot);
 				if(reason != null){
 					list = reason.getIncomeByEachDept();
 					if(list != null && list.size() > 0){
@@ -114,7 +114,7 @@ public class QueryCancelledFoodAction extends Action {
 					}
 				}
 			}else if(qt == QueryCancelledFood.QUERY_BY_FOOD){
-				list = QueryCancelledFood.getCancelledFoodDetail(terminal, queryDate, dt, ot, did, rid);
+				list = QueryCancelledFood.getCancelledFoodDetail(staff, queryDate, dt, ot, did, rid);
 				if(list != null && list.size() > 0){
 					CancelledFood tempSum = new CancelledFood(), tempItem = null;
 					for(int i = 0; i < list.size(); i++){

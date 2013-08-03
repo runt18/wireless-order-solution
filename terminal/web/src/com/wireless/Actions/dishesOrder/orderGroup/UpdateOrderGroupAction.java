@@ -16,17 +16,16 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
-import com.wireless.db.frontBusiness.VerifyPin;
 import com.wireless.db.orderMgr.OrderGroupDao;
+import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
-import com.wireless.pack.req.PinGen;
 import com.wireless.pack.req.ReqPrintContent;
 import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.regionMgr.Table;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.tasteMgr.Taste;
-import com.wireless.protocol.Terminal;
 import com.wireless.sccon.ServerConnector;
 import com.wireless.util.JObject;
 import com.wireless.util.WebParams;
@@ -74,11 +73,11 @@ public class UpdateOrderGroupAction extends DispatchAction{
 						tg[i] = item;
 					}
 					if(otype.equals("0")){
-						int orderId = OrderGroupDao.insert(VerifyPin.exec(Long.parseLong(pin), Terminal.MODEL_STAFF), tg);
+						int orderId = OrderGroupDao.insert(StaffDao.verify(Integer.parseInt(pin)), tg);
 						jobject.initTip(true, "操作成功, 已合并团体餐桌信息.");
 						jobject.getOther().put("orderID", orderId);
 					}else if(otype.equals("1")){
-						OrderGroupDao.update(VerifyPin.exec(Long.parseLong(pin), Terminal.MODEL_STAFF), Integer.valueOf(pid), tg);
+						OrderGroupDao.update(StaffDao.verify(Integer.parseInt(pin)), Integer.valueOf(pid), tg);
 						jobject.initTip(true, "操作成功, 已修改团体餐桌信息.");
 					}
 				}
@@ -118,7 +117,7 @@ public class UpdateOrderGroupAction extends DispatchAction{
 			String ordersString = request.getParameter("orders");
 			String parentOrderID = request.getParameter("parentOrderID");
 			
-			final Terminal term = VerifyPin.exec(Long.parseLong(pin), Terminal.MODEL_STAFF);
+			final Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
 			JSONArray ja = JSONArray.fromObject(ordersString);
 			
@@ -187,24 +186,13 @@ public class UpdateOrderGroupAction extends DispatchAction{
 			parentOrder.setChildOrder(Arrays.asList(orderItemSet));
 			
 			if(type.equals("insert")){
-				OrderGroupDao.insert(term, parentOrder);
+				OrderGroupDao.insert(staff, parentOrder);
 				jobject.initTip(true, "操作成功, 已下单");
 			}else if(type.equals("update")){
-				OrderGroupDao.update(term, parentOrder);
+				OrderGroupDao.update(staff, parentOrder);
 				jobject.initTip(true, "操作成功, 已改单");
 			}
-			ReqPrintContent reqPrintContent = ReqPrintContent.buildReqPrintSummary(
-					new PinGen() {
-						@Override
-						public short getDeviceType() {
-							return Terminal.MODEL_STAFF;
-						}
-						@Override
-						public long getDeviceId() {
-							return term.pin;
-						}
-					},
-					parentOrder.getId());	
+			ReqPrintContent reqPrintContent = ReqPrintContent.buildReqPrintSummary(staff, parentOrder.getId());	
 			if(reqPrintContent != null){
 				ProtocolPackage resp = ServerConnector.instance().ask(reqPrintContent);
 				if(resp.header.type != Type.ACK){

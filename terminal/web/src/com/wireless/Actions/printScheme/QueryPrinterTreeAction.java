@@ -10,10 +10,10 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import com.wireless.db.frontBusiness.VerifyPin;
 import com.wireless.db.printScheme.PrinterDao;
+import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.pojo.printScheme.Printer;
-import com.wireless.protocol.Terminal;
+import com.wireless.pojo.staffMgr.Staff;
 
 public class QueryPrinterTreeAction extends Action{
 	@Override
@@ -25,8 +25,8 @@ public class QueryPrinterTreeAction extends Action{
 		String pin = request.getParameter("pin");
 		
 		try{
-			Terminal term = VerifyPin.exec(Long.parseLong(pin), Terminal.MODEL_STAFF);
-			List<Printer> result =  PrinterDao.getPrinters(term);
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			List<Printer> result =  PrinterDao.getPrinters(staff);
 			if(!result.isEmpty()){
 				int index = 0;
 				for (Printer printer : result) {

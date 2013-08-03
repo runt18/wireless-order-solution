@@ -14,10 +14,10 @@ import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
-import com.wireless.db.frontBusiness.VerifyPin;
+import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.ProtocolError;
-import com.wireless.protocol.Terminal;
+import com.wireless.pojo.staffMgr.Staff;
 
 public class ResetPwdStaffAction extends Action {
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
@@ -52,15 +52,14 @@ public class ResetPwdStaffAction extends Action {
 			String pin = request.getParameter("pin");
 
 			dbCon.connect();
-			Terminal term = VerifyPin.exec(dbCon, Long.parseLong(pin),
-					Terminal.MODEL_STAFF);
+			Staff staff = StaffDao.verify(dbCon, Integer.parseInt(pin));
 
 			// get parameter
 			String staffID = request.getParameter("staffID");
 			String newPwd = request.getParameter("newPwd");
 
 			String sql = "UPDATE " + Params.dbName + ".staff " + " SET pwd = '"
-					+ newPwd + "' WHERE restaurant_id=" + term.restaurantID
+					+ newPwd + "' WHERE restaurant_id=" + staff.getRestaurantId()
 					+ " AND staff_id = " + staffID;
 
 			dbCon.stmt.executeUpdate(sql);

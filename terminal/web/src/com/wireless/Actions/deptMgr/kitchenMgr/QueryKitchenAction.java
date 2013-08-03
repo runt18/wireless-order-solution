@@ -11,10 +11,10 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
 import com.wireless.db.deptMgr.KitchenDao;
-import com.wireless.db.frontBusiness.VerifyPin;
+import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.json.JObject;
 import com.wireless.pojo.menuMgr.Kitchen;
-import com.wireless.protocol.Terminal;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.util.DataPaging;
 import com.wireless.util.WebParams;
 
@@ -38,11 +38,11 @@ public class QueryKitchenAction extends DispatchAction {
 		StringBuffer jsb = new StringBuffer();
 		try{
 			String pin = request.getParameter("pin");
-			Terminal term = VerifyPin.exec(Long.valueOf(pin), Terminal.MODEL_STAFF);
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			String extraCond = "", orderClause = "";
-			extraCond += (" AND KITCHEN.restaurant_id = " + term.restaurantID);
+			extraCond += (" AND KITCHEN.restaurant_id = " + staff.getRestaurantId());
 			extraCond += (" AND KITCHEN.kitchen_alias <> 253 AND KITCHEN.kitchen_alias <> 255 ");
-			List<Kitchen> list = KitchenDao.getKitchens(term, extraCond, orderClause);
+			List<Kitchen> list = KitchenDao.getKitchens(staff, extraCond, orderClause);
 			for(int i = 0; i < list.size(); i++){
 				if(i>0)
 					jsb.append(",");
@@ -87,10 +87,10 @@ public class QueryKitchenAction extends DispatchAction {
 			String pin = request.getParameter("pin");
 			String deptID = request.getParameter("deptID");
 			
-			Terminal term = VerifyPin.exec(Long.valueOf(pin), Terminal.MODEL_STAFF);
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			String extraCond = "", orderClause = "";
 			
-			extraCond += (" AND KITCHEN.restaurant_id = " + term.restaurantID);
+			extraCond += (" AND KITCHEN.restaurant_id = " + staff.getRestaurantId());
 			extraCond += (" AND KITCHEN.kitchen_alias <> 253 AND KITCHEN.kitchen_alias <> 255 ");
 			if(deptID != null && !deptID.trim().isEmpty() && !deptID.equals("-1")){
 				extraCond += (" AND DEPT.dept_id = " + deptID);
@@ -98,7 +98,7 @@ public class QueryKitchenAction extends DispatchAction {
 			
 			orderClause = " ORDER BY KITCHEN.kitchen_alias ";
 			
-			root = KitchenDao.getKitchens(term, extraCond, orderClause);
+			root = KitchenDao.getKitchens(staff, extraCond, orderClause);
 		}catch(Exception e){
 			e.printStackTrace();
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);

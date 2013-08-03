@@ -14,12 +14,12 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import com.wireless.db.frontBusiness.VerifyPin;
+import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.stockMgr.CostAnalyzeReportDao;
 import com.wireless.db.system.SystemDao;
 import com.wireless.json.JObject;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.stockMgr.CostAnalyze;
-import com.wireless.protocol.Terminal;
 import com.wireless.util.WebParams;
 
 public class QueryCostAnalyzeReportAction extends Action {
@@ -33,22 +33,22 @@ public class QueryCostAnalyzeReportAction extends Action {
 			String pin = request.getParameter("pin");
 			String beginDate = request.getParameter("beginDate");
 			String endDate = "";
-			Terminal mTerminal = VerifyPin.exec(Long.parseLong(pin), Terminal.MODEL_STAFF);
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			List<CostAnalyze> list = new ArrayList<CostAnalyze>();
 			Calendar c = Calendar.getInstance();
 			if(beginDate == null){
 				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-				long current = SystemDao.getCurrentMonth(mTerminal);
+				long current = SystemDao.getCurrentMonth(staff);
 				
 				c.setTime(new Date(current));
 				c.add(Calendar.MONTH, -1);
 				beginDate = sdf.format(c.getTime());
 				int day = c.getActualMaximum(Calendar.DAY_OF_MONTH);
 				endDate = c.get(Calendar.YEAR) + "-" + (c.get(Calendar.MONTH)+1) + "-" + day;
-				list = CostAnalyzeReportDao.getCostAnalyzes(mTerminal, beginDate, endDate, null);
+				list = CostAnalyzeReportDao.getCostAnalyzes(staff, beginDate, endDate, null);
 			}else{
 				endDate = beginDate + "-31 23:59:59";
-				list = CostAnalyzeReportDao.getCostAnalyzes(mTerminal, beginDate + "-01", endDate, null);
+				list = CostAnalyzeReportDao.getCostAnalyzes(staff, beginDate + "-01", endDate, null);
 			}
 			jobject.setTotalProperty(list.size());
 			jobject.setRoot(list);

@@ -14,12 +14,12 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import com.wireless.db.frontBusiness.VerifyPin;
+import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.stockMgr.StockDeltaReportDao;
 import com.wireless.db.system.SystemDao;
 import com.wireless.json.JObject;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.stockMgr.StockTakeDetail;
-import com.wireless.protocol.Terminal;
 import com.wireless.util.WebParams;
 
 public class QueryDeltaReportAction extends Action{
@@ -39,14 +39,14 @@ public class QueryDeltaReportAction extends Action{
 			String cateType = request.getParameter("cateType");
 			String cateId = request.getParameter("cateId");
 			String deptId = request.getParameter("deptId");
-			Terminal mTerminal = VerifyPin.exec(Long.parseLong(pin), Terminal.MODEL_STAFF);
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			String extra = "";
 			String orderClause = "LIMIT " + start +", " + limit;
 			List<StockTakeDetail> deltaReports = new ArrayList<StockTakeDetail>();
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 			if(beginDate == null){
 				
-				long current = SystemDao.getCurrentMonth(mTerminal);
+				long current = SystemDao.getCurrentMonth(staff);
 				Calendar c = Calendar.getInstance();
 				c.setTime(new Date(current));
 				c.add(Calendar.MONTH, -1);
@@ -75,7 +75,7 @@ public class QueryDeltaReportAction extends Action{
 			}
 
 
-			deltaReports = StockDeltaReportDao.deltaReport(mTerminal, beginDate, endDate, deptId, extra, orderClause);
+			deltaReports = StockDeltaReportDao.deltaReport(staff, beginDate, endDate, deptId, extra, orderClause);
 			jobject.setTotalProperty(deltaReports.size());
 			jobject.setRoot(deltaReports);
 		}catch(Exception e){

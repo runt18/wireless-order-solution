@@ -14,10 +14,10 @@ import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
-import com.wireless.db.frontBusiness.VerifyPin;
+import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.ProtocolError;
-import com.wireless.protocol.Terminal;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.util.Util;
 
 public class InsertStaffAction extends Action {
@@ -49,9 +49,7 @@ public class InsertStaffAction extends Action {
 			String pin = request.getParameter("pin");
 
 			dbCon.connect();
-			Terminal term = VerifyPin.exec(dbCon, Long.parseLong(pin),
-					Terminal.MODEL_STAFF);
-
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			// get the query condition
 			int staffNumber = Integer.parseInt(request
 					.getParameter("staffNumber"));
@@ -72,7 +70,7 @@ public class InsertStaffAction extends Action {
 					+ Params.dbName
 					+ ".terminal"
 					+ "( pin, restaurant_id, model_id, model_name, owner_name, gift_quota ) "
-					+ " VALUES(" + newPin + ", " + term.restaurantID
+					+ " VALUES(" + newPin + ", " + staff.getRestaurantId()
 					+ ", 255, 'Staff', '" + staffName + "', " + staffQuota
 					+ " ) ";
 
@@ -89,7 +87,7 @@ public class InsertStaffAction extends Action {
 					+ Params.dbName
 					+ ".staff"
 					+ "(  restaurant_id, terminal_id, staff_alias, name, pwd ) "
-					+ " VALUES(" + term.restaurantID + ", " + newTerminalID
+					+ " VALUES(" + staff.getRestaurantId() + ", " + newTerminalID
 					+ ", " + staffNumber + ", '" + staffName + "', '" + pwdMd5
 					+ "' ) ";
 

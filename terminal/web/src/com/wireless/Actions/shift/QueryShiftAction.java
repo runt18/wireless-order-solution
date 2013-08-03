@@ -14,10 +14,10 @@ import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.shift.QueryShiftDao;
+import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.ProtocolError;
 import com.wireless.pojo.billStatistics.ShiftDetail;
-import com.wireless.protocol.Terminal;
 
 public class QueryShiftAction extends Action {
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
@@ -38,7 +38,7 @@ public class QueryShiftAction extends Action {
 			 */
 			String pin = request.getParameter("pin");
 					
-			ShiftDetail result = QueryShiftDao.execByNow(Long.parseLong(pin), Terminal.MODEL_STAFF);
+			ShiftDetail result = QueryShiftDao.execByNow(StaffDao.verify(dbCon, Integer.parseInt(pin)));
 			
 			/**
 			 * The json to shift record like below

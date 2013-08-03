@@ -10,11 +10,11 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import com.wireless.db.frontBusiness.VerifyPin;
+import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.stockMgr.MaterialDeptDao;
 import com.wireless.json.JObject;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.stockMgr.MaterialDept;
-import com.wireless.protocol.Terminal;
 import com.wireless.util.DataPaging;
 import com.wireless.util.WebParams;
 
@@ -36,7 +36,7 @@ public class QueryMaterialDeptAction extends Action{
 			String cateType = request.getParameter("cateType");
 			String cateId = request.getParameter("cateId");
 			String materialId = request.getParameter("materialId");
-			Terminal term = VerifyPin.exec(Long.valueOf(pin), Terminal.MODEL_STAFF);
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			String extraCond = "";
 			if(deptId != null && !deptId.trim().isEmpty()){
 				extraCond += " AND MD.dept_id = " + deptId;
@@ -51,7 +51,7 @@ public class QueryMaterialDeptAction extends Action{
 					extraCond += " AND MC.type = " + cateType;
 				}
 			}
-			root = MaterialDeptDao.getMaterialDeptState(term, extraCond, null);
+			root = MaterialDeptDao.getMaterialDeptState(staff, extraCond, null);
 		}catch(Exception e){
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
 			e.printStackTrace();

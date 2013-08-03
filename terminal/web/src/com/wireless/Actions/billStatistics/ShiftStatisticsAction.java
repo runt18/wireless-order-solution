@@ -21,10 +21,10 @@ import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
-import com.wireless.db.frontBusiness.VerifyPin;
+import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.ProtocolError;
-import com.wireless.protocol.Terminal;
+import com.wireless.pojo.staffMgr.Staff;
 
 public class ShiftStatisticsAction extends Action {
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
@@ -63,8 +63,7 @@ public class ShiftStatisticsAction extends Action {
 			String pin = request.getParameter("pin");
 
 			dbCon.connect();
-			Terminal term = VerifyPin.exec(dbCon, Long.parseLong(pin),
-					Terminal.MODEL_STAFF);
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 
 			// get the query condition
 			String dateBegin = request.getParameter("dateBegin");
@@ -86,7 +85,7 @@ public class ShiftStatisticsAction extends Action {
 				condition = condition + " AND off_duty <= '" + dateEnd + "' ";
 			}
 			condition = condition + " AND restaurant_id =  "
-					+ term.restaurantID;
+					+ staff.getRestaurantId();
 
 			String orderClause = " ORDER BY off_duty ";
 
@@ -95,7 +94,7 @@ public class ShiftStatisticsAction extends Action {
 					+ "."
 					+ tableName
 					+ " WHERE restaurant_id = "
-					+ term.restaurantID
+					+ staff.getRestaurantId()
 					+ " "
 					+ condition + orderClause;
 

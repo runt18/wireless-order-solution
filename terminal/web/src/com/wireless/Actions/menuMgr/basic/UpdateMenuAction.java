@@ -8,12 +8,12 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import com.wireless.db.frontBusiness.VerifyPin;
 import com.wireless.db.menuMgr.FoodDao;
+import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.menuMgr.Food;
-import com.wireless.protocol.Terminal;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.util.WebParams;
 
 public class UpdateMenuAction extends Action {
@@ -57,7 +57,7 @@ public class UpdateMenuAction extends Action {
 				return null;
 			}
 			
-			Terminal term = VerifyPin.exec(Long.valueOf(pin), Terminal.MODEL_STAFF);
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
 			fb.setFoodId(Integer.parseInt(foodID));
 			fb.setRestaurantId(Integer.parseInt(restaurantID));
@@ -79,7 +79,7 @@ public class UpdateMenuAction extends Action {
 			fb.setHot(Boolean.valueOf(isHot));
 			fb.setWeigh(Boolean.valueOf(isWeight));
 			
-			FoodDao.updateFoodBaisc(term, fb);
+			FoodDao.updateFoodBaisc(staff, fb);
 			
 			jobject.initTip(true, "操作成功,已修改菜品信息.");
 			

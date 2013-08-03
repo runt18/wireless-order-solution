@@ -14,10 +14,10 @@ import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
-import com.wireless.db.frontBusiness.VerifyPin;
+import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.ProtocolError;
-import com.wireless.protocol.Terminal;
+import com.wireless.pojo.staffMgr.Staff;
 
 public class DeleteStaffAction extends Action {
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
@@ -45,8 +45,7 @@ public class DeleteStaffAction extends Action {
 			String pin = request.getParameter("pin");
 
 			dbCon.connect();
-			Terminal term = VerifyPin.exec(dbCon, Long.parseLong(pin),
-					Terminal.MODEL_STAFF);
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 
 			// get the query condition
 			int staffID = Integer.parseInt(request.getParameter("staffID"));
@@ -55,20 +54,20 @@ public class DeleteStaffAction extends Action {
 			 * 
 			 */
 			String sql = " SELECT terminal_id FROM " + Params.dbName
-					+ ".staff WHERE restaurant_id=" + term.restaurantID
+					+ ".staff WHERE restaurant_id=" + staff.getRestaurantId()
 					+ " AND staff_id = " + staffID;
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
 			dbCon.rs.next();
 			int terminalID = dbCon.rs.getInt(1);
 
 			sql = "DELETE FROM " + Params.dbName + ".staff "
-					+ "WHERE restaurant_id=" + term.restaurantID
+					+ "WHERE restaurant_id=" + staff.getRestaurantId()
 					+ " AND staff_id = " + staffID;
 
 			dbCon.stmt.executeUpdate(sql);
 
 			sql = "DELETE FROM " + Params.dbName + ".terminal "
-					+ "WHERE restaurant_id=" + term.restaurantID
+					+ "WHERE restaurant_id=" + staff.getRestaurantId()
 					+ " AND terminal_id = " + terminalID;
 
 			dbCon.stmt.executeUpdate(sql);

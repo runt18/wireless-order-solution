@@ -13,13 +13,12 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.frontBusiness.TransTblDao;
-import com.wireless.db.frontBusiness.VerifyPin;
+import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.ProtocolError;
-import com.wireless.pack.req.PinGen;
 import com.wireless.pack.req.ReqPrintContent;
 import com.wireless.pojo.regionMgr.Table;
-import com.wireless.protocol.Terminal;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.sccon.ServerConnector;
 import com.wireless.util.JObject;
 import com.wireless.util.WebParams;
@@ -44,7 +43,7 @@ public class TransTableAction extends Action{
 			 * newTableID : the table id to transfer 
 			 * oldTableID : the table id to be transferred
 			 */
-			final long pin = Long.parseLong(request.getParameter("pin"));
+			final Staff staff = StaffDao.verify(Integer.parseInt(request.getParameter("pin")));
 			
 			srcTblAlias = request.getParameter("oldTableAlias");
 			destTblAlias = request.getParameter("newTableAlias");
@@ -55,24 +54,12 @@ public class TransTableAction extends Action{
 			destTbl = new Table();
 			destTbl.setTableAlias(Integer.parseInt(destTblAlias));
 				
-			int orderId = TransTblDao.exec(VerifyPin.exec(pin, Terminal.MODEL_STAFF), srcTbl, destTbl);
+			int orderId = TransTblDao.exec(staff, srcTbl, destTbl);
 			
 			jobject.initTip(true, "操作成功, 原 " + srcTbl.getAliasId() + " 号台转至新 " + destTbl.getAliasId() + " 号台成功.");
 			
 			// print the transfer table receipt
-			ServerConnector.instance().ask(ReqPrintContent.buildReqPrintTransTbl(
-					new PinGen(){
-						@Override
-						public long getDeviceId() {
-							return pin;
-						}
-
-						@Override
-						public short getDeviceType() {
-							return Terminal.MODEL_STAFF;
-						}
-					},
-					orderId, srcTbl, destTbl));			
+			ServerConnector.instance().ask(ReqPrintContent.buildReqPrintTransTbl(staff,	orderId, srcTbl, destTbl));			
 			
 		}catch(IOException e){
 			jobject.initTip(jobject.getMsg() + "但打印操作请求异常, 请联系管理员.");

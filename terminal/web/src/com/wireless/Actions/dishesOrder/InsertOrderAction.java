@@ -12,15 +12,15 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
+import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.ErrorCode;
 import com.wireless.exception.ProtocolError;
 import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
-import com.wireless.pack.req.PinGen;
 import com.wireless.pack.req.ReqInsertOrder;
 import com.wireless.parcel.Parcel;
 import com.wireless.pojo.dishesOrder.Order;
-import com.wireless.protocol.Terminal;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.sccon.ServerConnector;
 import com.wireless.util.JObject;
 import com.wireless.util.Util;
@@ -75,7 +75,7 @@ public class InsertOrderAction extends Action{
 	         * 	         [是否临时菜(true),临时菜1编号,临时菜1名称,临时菜1数量,临时菜1单价,叫起状态]，
 	         * 			 [是否临时菜(true),临时菜1编号,临时菜1名称,临时菜1数量,临时菜1单价,叫起状态]...}
 			 */
-			final long pin = Long.parseLong(request.getParameter("pin"));
+			final Staff staff = StaffDao.verify(Integer.parseInt(request.getParameter("pin")));
 			
 			Order orderToInsert = new Order();
 			int tableAlias = request.getParameter("tableID") != null ? Integer.parseInt(request.getParameter("tableID")) : 0;
@@ -99,19 +99,10 @@ public class InsertOrderAction extends Action{
 			}
 			orderToInsert.setOrderFoods(Util.toFoodArray(request.getParameter("foods")));
 			
-			ProtocolPackage resp = ServerConnector.instance().ask(new ReqInsertOrder(
-					new PinGen(){
-						@Override
-						public long getDeviceId() {
-							return pin;
-						}
-
-						@Override
-						public short getDeviceType() {
-							return Terminal.MODEL_STAFF;
-						}
-					},
-					orderToInsert, (type == 1) ? Type.INSERT_ORDER : Type.UPDATE_ORDER));
+			ProtocolPackage resp = ServerConnector.instance().ask(
+										new ReqInsertOrder(staff,
+														   orderToInsert,
+														   (type == 1) ? Type.INSERT_ORDER : Type.UPDATE_ORDER));
 			
 			if(resp.header.type == Type.ACK){
 				if(orderToInsert.isNormal()){

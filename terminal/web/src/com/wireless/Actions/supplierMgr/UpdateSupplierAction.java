@@ -10,11 +10,11 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import com.wireless.db.frontBusiness.VerifyPin;
+import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.supplierMgr.SupplierDao;
 import com.wireless.json.JObject;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.supplierMgr.Supplier;
-import com.wireless.protocol.Terminal;
 import com.wireless.util.WebParams;
 
 public class UpdateSupplierAction extends Action{
@@ -32,10 +32,10 @@ public class UpdateSupplierAction extends Action{
 			String comment = request.getParameter("comment");
 			String pin = request.getParameter("pin");
 			
-			Terminal term = VerifyPin.exec(Long.parseLong(pin), Terminal.MODEL_STAFF);
-			Supplier supplier = new Supplier(Integer.valueOf(supplierId), term.restaurantID, name, tele, addr, contact, comment);
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			Supplier supplier = new Supplier(Integer.valueOf(supplierId), staff.getRestaurantId(), name, tele, addr, contact, comment);
 			
-			SupplierDao.update(term, supplier);
+			SupplierDao.update(staff, supplier);
 			jobject.initTip(true, "修改成功");
 		}catch(Exception e){
 			e.printStackTrace();

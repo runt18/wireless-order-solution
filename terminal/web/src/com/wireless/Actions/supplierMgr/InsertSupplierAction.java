@@ -10,10 +10,10 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import com.wireless.db.frontBusiness.VerifyPin;
+import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.supplierMgr.SupplierDao;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.supplierMgr.Supplier;
-import com.wireless.protocol.Terminal;
 import com.wireless.util.JObject;
 import com.wireless.util.WebParams;
 
@@ -27,14 +27,14 @@ public class InsertSupplierAction extends Action {
 		try{
 			
 			String pin = request.getParameter("pin");
-			Terminal term = VerifyPin.exec(Long.parseLong(pin), Terminal.MODEL_STAFF);
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			String supplierName = request.getParameter("supplierName");
 			String tele = request.getParameter("tele");
 			String addr = request.getParameter("addr");
 			String contact = request.getParameter("contact");
 			String comment = request.getParameter("comment");
 			
-			Supplier supplier = new Supplier(term.restaurantID, supplierName, tele, addr, contact, comment);
+			Supplier supplier = new Supplier(staff.getRestaurantId(), supplierName, tele, addr, contact, comment);
 			SupplierDao.insert(supplier);
 			jobject.initTip(true, "添加成功!");
 			

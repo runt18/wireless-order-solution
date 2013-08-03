@@ -12,9 +12,9 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.DBCon;
-import com.wireless.db.frontBusiness.VerifyPin;
+import com.wireless.db.staffMgr.VerifyPin;
 import com.wireless.exception.BusinessException;
-import com.wireless.protocol.Terminal;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.util.WebParams;
 
 public class QueryOTAction extends Action {
@@ -56,9 +56,9 @@ public class QueryOTAction extends Action {
 				dbCon.connect();
 				long pin = Long.parseLong(request.getParameter("pin"));
 				short model = Short.parseShort(request.getParameter("model"));
-				Terminal term = VerifyPin.exec(dbCon, pin, model);
+				Staff term = VerifyPin.exec(dbCon, pin, model);
 				// 获取图片操作路径(物理路径)
-				String url = getServlet().getInitParameter(WebParams.IMAGE_BROWSE_PATH) + "/" + term.restaurantID + "/";
+				String url = getServlet().getInitParameter(WebParams.IMAGE_BROWSE_PATH) + "/" + term.getRestaurantId() + "/";
 				result = result.replace("$(result)", "true").replace("$(value)", url);
 			}			
 			

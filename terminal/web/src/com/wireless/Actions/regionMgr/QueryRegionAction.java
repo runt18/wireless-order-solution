@@ -10,11 +10,11 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
-import com.wireless.db.frontBusiness.VerifyPin;
 import com.wireless.db.regionMgr.RegionDao;
+import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.json.JObject;
 import com.wireless.pojo.regionMgr.Region;
-import com.wireless.protocol.Terminal;
+import com.wireless.pojo.staffMgr.Staff;
 
 public class QueryRegionAction extends DispatchAction{
 	
@@ -35,8 +35,8 @@ public class QueryRegionAction extends DispatchAction{
 		JObject jobject = new JObject();
 		try{
 			String pin = request.getParameter("pin");
-			Terminal term = VerifyPin.exec(Long.valueOf(pin), Terminal.MODEL_STAFF);
-			List<Region> list = RegionDao.getRegions(term, " AND REGION.restaurant_id = " + term.restaurantID, null);
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			List<Region> list = RegionDao.getRegions(staff, " AND REGION.restaurant_id = " + staff.getRestaurantId(), null);
 			jobject.setRoot(list);
 			
 		}catch(Exception e){
@@ -65,8 +65,8 @@ public class QueryRegionAction extends DispatchAction{
 		StringBuilder tsb = new StringBuilder();
 		try{
 			String pin = request.getParameter("pin");
-			Terminal term = VerifyPin.exec(Long.valueOf(pin), Terminal.MODEL_STAFF);
-			List<Region> list = RegionDao.getRegions(term, " AND REGION.restaurant_id = " + term.restaurantID, null);
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			List<Region> list = RegionDao.getRegions(staff, " AND REGION.restaurant_id = " + staff.getRestaurantId(), null);
 			if(!list.isEmpty()){
 				tsb.append("[");
 				Region temp;

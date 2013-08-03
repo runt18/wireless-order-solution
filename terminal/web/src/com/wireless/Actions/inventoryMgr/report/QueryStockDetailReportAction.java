@@ -11,11 +11,11 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import com.wireless.db.frontBusiness.VerifyPin;
+import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.stockMgr.StockDetailReportDao;
 import com.wireless.json.JObject;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.stockMgr.StockDetailReport;
-import com.wireless.protocol.Terminal;
 import com.wireless.util.WebParams;
 
 public class QueryStockDetailReportAction extends Action{
@@ -31,7 +31,7 @@ public class QueryStockDetailReportAction extends Action{
 		int roots = 0;
 		try{
 			String pin = request.getParameter("pin");
-			Terminal mTerminal = VerifyPin.exec(Long.parseLong(pin), Terminal.MODEL_STAFF);
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			String beginDate = request.getParameter("beginDate");
 			String endDate = request.getParameter("endDate");
 			String materialId = request.getParameter("materialId");
@@ -42,23 +42,23 @@ public class QueryStockDetailReportAction extends Action{
 			if(materialId == null){
 				stockDetailReports = new ArrayList<StockDetailReport>();
 			}else if(deptId == null){
-				roots = StockDetailReportDao.getStockDetailReportByDateCount(mTerminal, beginDate, endDate, Integer.parseInt(materialId), null);
-				stockDetailReports = StockDetailReportDao.getStockDetailReportByDate(mTerminal, beginDate, endDate, Integer.parseInt(materialId), " LIMIT " + Integer.parseInt(start) + ", " + Integer.parseInt(limit));
+				roots = StockDetailReportDao.getStockDetailReportByDateCount(staff, beginDate, endDate, Integer.parseInt(materialId), null);
+				stockDetailReports = StockDetailReportDao.getStockDetailReportByDate(staff, beginDate, endDate, Integer.parseInt(materialId), " LIMIT " + Integer.parseInt(start) + ", " + Integer.parseInt(limit));
 			}else if((deptId.trim().isEmpty() || deptId.equals("-1")) && stockType.equals("-1")){
-				roots = StockDetailReportDao.getStockDetailReportByDateCount(mTerminal, beginDate, endDate, Integer.parseInt(materialId), null);
-				stockDetailReports = StockDetailReportDao.getStockDetailReportByDate(mTerminal, beginDate, endDate, Integer.parseInt(materialId), " LIMIT " + Integer.parseInt(start) + ", " + Integer.parseInt(limit));
+				roots = StockDetailReportDao.getStockDetailReportByDateCount(staff, beginDate, endDate, Integer.parseInt(materialId), null);
+				stockDetailReports = StockDetailReportDao.getStockDetailReportByDate(staff, beginDate, endDate, Integer.parseInt(materialId), " LIMIT " + Integer.parseInt(start) + ", " + Integer.parseInt(limit));
 			}else if(stockType != null && !stockType.equals("-1") && !deptId.equals("-1")){
 				extra = " AND S.ori_stock_date >= '" + beginDate + "' AND S.ori_stock_date <= '" + endDate + "'" + " AND (S.dept_in =" + deptId + " OR S.dept_out =" + deptId + ")" + " AND S.type = " + stockType + " AND S.sub_type = " + subType;
-				roots = StockDetailReportDao.getStockDetailReportCount(mTerminal, Integer.parseInt(materialId), extra, null);
-				stockDetailReports = StockDetailReportDao.getStockDetailReport(mTerminal, Integer.parseInt(materialId), extra, " LIMIT " + Integer.parseInt(start) + ", " + Integer.parseInt(limit));
+				roots = StockDetailReportDao.getStockDetailReportCount(staff, Integer.parseInt(materialId), extra, null);
+				stockDetailReports = StockDetailReportDao.getStockDetailReport(staff, Integer.parseInt(materialId), extra, " LIMIT " + Integer.parseInt(start) + ", " + Integer.parseInt(limit));
 			}else if(stockType != null && !stockType.equals("-1") && deptId.equals("-1")){
 				extra = " AND S.ori_stock_date >= '" + beginDate + "' AND S.ori_stock_date <= '" + endDate + "'" + " AND S.type = " + stockType + " AND S.sub_type = " + subType;
-				roots = StockDetailReportDao.getStockDetailReportCount(mTerminal, Integer.parseInt(materialId), extra, null);
-				stockDetailReports = StockDetailReportDao.getStockDetailReport(mTerminal, Integer.parseInt(materialId), extra, " LIMIT " + Integer.parseInt(start) + ", " + Integer.parseInt(limit));
+				roots = StockDetailReportDao.getStockDetailReportCount(staff, Integer.parseInt(materialId), extra, null);
+				stockDetailReports = StockDetailReportDao.getStockDetailReport(staff, Integer.parseInt(materialId), extra, " LIMIT " + Integer.parseInt(start) + ", " + Integer.parseInt(limit));
 			}else if(stockType.equals("-1") && !deptId.equals("-1")){
 				extra = " AND S.ori_stock_date >= '" + beginDate + "' AND S.ori_stock_date <= '" + endDate + "'" + " AND (S.dept_in =" + deptId + " OR S.dept_out =" + deptId + ")";
-				roots = StockDetailReportDao.getStockDetailReportCount(mTerminal, Integer.parseInt(materialId), extra, null);
-				stockDetailReports = StockDetailReportDao.getStockDetailReport(mTerminal, Integer.parseInt(materialId), extra, " LIMIT " + Integer.parseInt(start) + ", " + Integer.parseInt(limit));
+				roots = StockDetailReportDao.getStockDetailReportCount(staff, Integer.parseInt(materialId), extra, null);
+				stockDetailReports = StockDetailReportDao.getStockDetailReport(staff, Integer.parseInt(materialId), extra, " LIMIT " + Integer.parseInt(start) + ", " + Integer.parseInt(limit));
 			}
 			//stockDetailReports = StockDetailReportDao.getStockDetailReportByDate(beginDate, endDate, Integer.parseInt(materialId), null);
 		}catch(Exception e){

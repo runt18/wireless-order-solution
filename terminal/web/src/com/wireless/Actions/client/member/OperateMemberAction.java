@@ -11,17 +11,16 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
 import com.wireless.db.client.member.MemberDao;
-import com.wireless.db.frontBusiness.VerifyPin;
+import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
-import com.wireless.pack.req.PinGen;
 import com.wireless.pack.req.ReqPrintContent;
 import com.wireless.pojo.client.Member;
 import com.wireless.pojo.client.MemberOperation;
 import com.wireless.pojo.client.MemberOperation.ChargeType;
-import com.wireless.protocol.Terminal;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.sccon.ServerConnector;
 import com.wireless.util.WebParams;
 
@@ -58,9 +57,9 @@ public class OperateMemberAction extends DispatchAction{
 			String addr = request.getParameter("addr");
 			String comment = request.getParameter("comment");
 			
-			Terminal term = VerifyPin.exec(Long.parseLong(pin), Terminal.MODEL_STAFF);
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
-			Member.InsertBuilder ib = new Member.InsertBuilder(term.restaurantID, name, mobile, Integer.valueOf(memberTypeId), Member.Sex.valueOf(Integer.valueOf(sex)));
+			Member.InsertBuilder ib = new Member.InsertBuilder(staff.getRestaurantId(), name, mobile, Integer.valueOf(memberTypeId), Member.Sex.valueOf(Integer.valueOf(sex)));
 			ib.setBirthday(birthday)
 			  .setMemberCard(memberCard)
 			  .setTele(tele)
@@ -71,7 +70,7 @@ public class OperateMemberAction extends DispatchAction{
 			  .setContactAddr(addr)
 			  .setComment(comment);
 			
-			MemberDao.insert(term, ib);
+			MemberDao.insert(staff, ib);
 			jobject.initTip(true, "操作成功, 新会员资料已添加.");
 		}catch(BusinessException e){
 			e.printStackTrace();
@@ -117,10 +116,10 @@ public class OperateMemberAction extends DispatchAction{
 			String addr = request.getParameter("addr");
 			String comment = request.getParameter("comment");
 			
-			Terminal term = VerifyPin.exec(Long.parseLong(pin), Terminal.MODEL_STAFF);
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
 			Member.UpdateBuilder ub = new Member.UpdateBuilder(Integer.valueOf(id), 
-				term.restaurantID, 
+				staff.getRestaurantId(), 
 				name, 
 				mobile, 
 				Integer.valueOf(memberTypeId), 
@@ -136,7 +135,7 @@ public class OperateMemberAction extends DispatchAction{
 			  .setContactAddr(addr)
 			  .setComment(comment);
 			
-			MemberDao.update(term, ub);
+			MemberDao.update(staff, ub);
 			jobject.initTip(true, "操作成功, 会员资料已修改.");
 		}catch(BusinessException e){
 			e.printStackTrace();
@@ -168,8 +167,8 @@ public class OperateMemberAction extends DispatchAction{
 		try{
 			String pin = request.getParameter("pin");
 			String id = request.getParameter("id");
-			Terminal term = VerifyPin.exec(Long.parseLong(pin), Terminal.MODEL_STAFF);
-			MemberDao.deleteById(term, Integer.valueOf(id));
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			MemberDao.deleteById(staff, Integer.valueOf(id));
 			jobject.initTip(true, "操作成功, 会员资料已删除.");
 		}catch(BusinessException e){
 			e.printStackTrace();
@@ -205,26 +204,16 @@ public class OperateMemberAction extends DispatchAction{
 			String rechargeType = request.getParameter("rechargeType");
 			String isPrint = request.getParameter("isPrint");
 			
-			final Terminal term = VerifyPin.exec(Long.valueOf(pin), Terminal.MODEL_STAFF);
+			final Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
-			MemberOperation mo = MemberDao.charge(term, Integer.valueOf(memberID), Float.valueOf(rechargeMoney), ChargeType.valueOf(Integer.valueOf(rechargeType)));
+			MemberOperation mo = MemberDao.charge(staff, Integer.valueOf(memberID), Float.valueOf(rechargeMoney), ChargeType.valueOf(Integer.valueOf(rechargeType)));
 			if(mo == null || mo.getId() == 0){
 				jobject.initTip(false, WebParams.TIP_TITLE_ERROE, 9998, "操作失败, 会员充值未成功, 未知错误, 请联系客服人员.");
 			}else{
 				jobject.initTip(true, "操作成功, 会员充值成功.");
 				if(isPrint != null && Boolean.valueOf(isPrint)){
 					try{
-						ReqPrintContent reqPrintContent = ReqPrintContent.buildReqPrintMemberReceipt(new PinGen(){
-							@Override
-							public long getDeviceId() {
-								return term.pin;
-							}
-							@Override
-							public short getDeviceType() {
-								return term.modelID;
-							}
-							
-						}, mo.getId());
+						ReqPrintContent reqPrintContent = ReqPrintContent.buildReqPrintMemberReceipt(staff, mo.getId());
 						if(reqPrintContent != null){
 							ProtocolPackage resp = ServerConnector.instance().ask(reqPrintContent);
 							if(resp.header.type == Type.ACK){
@@ -272,8 +261,8 @@ public class OperateMemberAction extends DispatchAction{
 			String point = request.getParameter("point");
 			String adjust = request.getParameter("adjust");
 			
-			Terminal term = VerifyPin.exec(Long.valueOf(pin), Terminal.MODEL_STAFF);
-			MemberDao.adjustPoint(term, Integer.valueOf(memberId), Integer.valueOf(point), Member.AdjustType.valueOf(Integer.valueOf(adjust)));
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			MemberDao.adjustPoint(staff, Integer.valueOf(memberId), Integer.valueOf(point), Member.AdjustType.valueOf(Integer.valueOf(adjust)));
 			jobject.initTip(true, "操作成功, 会员积分调整成功.");
 		}catch(BusinessException e){
 			e.printStackTrace();
@@ -307,8 +296,8 @@ public class OperateMemberAction extends DispatchAction{
 			String memberId = request.getParameter("memberId");
 			String point = request.getParameter("point");
 			
-			Terminal term = VerifyPin.exec(Long.valueOf(pin), Terminal.MODEL_STAFF);
-			MemberDao.pointConsume(term, Integer.valueOf(memberId), Integer.valueOf(point));
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			MemberDao.pointConsume(staff, Integer.valueOf(memberId), Integer.valueOf(point));
 			jobject.initTip(true, "操作成功, 会员积分消费成功.");
 		}catch(BusinessException e){
 			e.printStackTrace();

@@ -8,11 +8,11 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import com.wireless.db.frontBusiness.VerifyPin;
+import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.system.SystemDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
-import com.wireless.protocol.Terminal;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.util.WebParams;
 
 public class UpdateCurrentMonthAction extends Action {
@@ -25,8 +25,8 @@ public class UpdateCurrentMonthAction extends Action {
 		JObject jobject = new JObject();
 		try{
 			String pin = request.getParameter("pin");
-			Terminal term = VerifyPin.exec(Long.valueOf(pin), Terminal.MODEL_STAFF);
-			SystemDao.updateCurrentMonth(term);
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			SystemDao.updateCurrentMonth(staff);
 			jobject.initTip(true, "操作成功, 已月结.");
 		}catch(BusinessException e){
 			e.printStackTrace();

@@ -16,11 +16,11 @@ import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
-import com.wireless.db.frontBusiness.VerifyPin;
+import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.ProtocolError;
 import com.wireless.pojo.menuMgr.Food;
-import com.wireless.protocol.Terminal;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.util.Util;
 
 public class QueryHistoryAdvAction extends Action {
@@ -53,9 +53,7 @@ public class QueryHistoryAdvAction extends Action {
 
 			dbCon.connect();
 
-			Terminal term = VerifyPin.exec(dbCon, Long.parseLong(pin),
-					Terminal.MODEL_STAFF);
-
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			// get the query condition
 			String timeBegin = request.getParameter("timeBegin");
 			String timeEnd = request.getParameter("timeEnd");
@@ -132,7 +130,7 @@ public class QueryHistoryAdvAction extends Action {
 					 Params.dbName + ".order_food_history B " +
 					 " WHERE " +
 					 " A.id = B.order_id " +
-					 " AND A.restaurant_id=" + term.restaurantID + " " +
+					 " AND A.restaurant_id=" + staff.getRestaurantId() + " " +
 					 filterCondition +
 					 " GROUP BY A.id " +
 					 " LIMIT 300 ";

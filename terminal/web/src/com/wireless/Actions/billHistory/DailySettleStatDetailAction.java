@@ -20,11 +20,11 @@ import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.shift.QueryShiftDao;
+import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.ProtocolError;
 import com.wireless.pojo.billStatistics.IncomeByDept;
 import com.wireless.pojo.billStatistics.ShiftDetail;
-import com.wireless.protocol.Terminal;
 
 public class DailySettleStatDetailAction extends Action {
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
@@ -61,9 +61,10 @@ public class DailySettleStatDetailAction extends Action {
 			String offDuty = request.getParameter("offDuty");
 
 			ShiftDetail result = null;
-			result = QueryShiftDao.exec(dbCon, Long.parseLong(pin),
-					Terminal.MODEL_STAFF, onDuty, offDuty,
-					QueryShiftDao.QUERY_HISTORY);
+			result = QueryShiftDao.exec(dbCon, 
+										StaffDao.verify(dbCon, Integer.parseInt(pin)), 
+										onDuty, offDuty,
+										QueryShiftDao.QUERY_HISTORY);
 
 			/**
 			 */

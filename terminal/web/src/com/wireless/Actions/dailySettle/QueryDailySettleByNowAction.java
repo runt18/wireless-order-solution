@@ -15,9 +15,9 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.shift.QueryShiftDao;
+import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.pojo.billStatistics.IncomeByDept;
 import com.wireless.pojo.billStatistics.ShiftDetail;
-import com.wireless.protocol.Terminal;
 
 @SuppressWarnings({"rawtypes", "unchecked"})
 public class QueryDailySettleByNowAction extends Action{
@@ -37,10 +37,11 @@ public class QueryDailySettleByNowAction extends Action{
 			if(queryType == null)
 				return null;
 			
-			if(Integer.valueOf(queryType) == 0)
-				res = QueryShiftDao.execByNow(Long.valueOf(pin), Terminal.MODEL_STAFF);
-			else if(Integer.valueOf(queryType) == 1)
-				res = QueryShiftDao.execDailySettleByNow(Long.valueOf(pin));
+			if(Integer.valueOf(queryType) == 0){
+				res = QueryShiftDao.execByNow(StaffDao.verify(Integer.parseInt(pin)));
+			}else if(Integer.valueOf(queryType) == 1){
+				res = QueryShiftDao.execDailySettleByNow(StaffDao.verify(Integer.parseInt(pin)));
+			}
 			
 			if(res == null)
 				return null;

@@ -13,20 +13,19 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.DBCon;
-import com.wireless.db.frontBusiness.VerifyPin;
 import com.wireless.db.regionMgr.TableDao;
+import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.ErrorCode;
 import com.wireless.exception.ProtocolError;
 import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Reserved;
 import com.wireless.pack.Type;
-import com.wireless.pack.req.PinGen;
 import com.wireless.pack.req.ReqPrintContent;
 import com.wireless.parcel.Parcel;
 import com.wireless.pojo.regionMgr.Table;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.DateUtil;
-import com.wireless.protocol.Terminal;
 import com.wireless.sccon.ServerConnector;
 import com.wireless.util.JObject;
 import com.wireless.util.WebParams;
@@ -91,7 +90,7 @@ public class PrintOrderAction extends Action{
 			 */
 			String pin = request.getParameter("pin");
 			
-			final Terminal term = VerifyPin.exec(Long.parseLong(pin), Terminal.MODEL_STAFF);
+			final Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
 			int orderId = 0;
 			if(request.getParameter("orderID") != null){
@@ -100,7 +99,7 @@ public class PrintOrderAction extends Action{
 				if(request.getParameter("tableID") != null){
 					tableID = Integer.parseInt(request.getParameter("tableID"));
 					dbCon.connect();
-					Table table = TableDao.getTableByAlias(dbCon, term, tableID);
+					Table table = TableDao.getTableByAlias(dbCon, staff, tableID);
 					orderId = com.wireless.db.orderMgr.OrderDao.getOrderIdByUnPaidTable(dbCon, table)[0];
 				}
 			}
@@ -118,42 +117,30 @@ public class PrintOrderAction extends Action{
 			String pt = request.getParameter("printType");
 			int printType = Integer.valueOf(pt);
 			
-			PinGen gen = new PinGen(){
-				@Override
-				public long getDeviceId() {
-					return term.pin;
-				}
-				@Override
-				public short getDeviceType() {
-					return term.modelID;
-				}
-				
-			};
-			
 			switch(printType){
 				case 1:
-					reqPrintContent = ReqPrintContent.buildReqPrintSummary(gen, orderId);
+					reqPrintContent = ReqPrintContent.buildReqPrintSummary(staff, orderId);
 					break;
 				case 2:
-					reqPrintContent = ReqPrintContent.buildReqPrintDetail(gen, orderId);
+					reqPrintContent = ReqPrintContent.buildReqPrintDetail(staff, orderId);
 					break;
 				case 3:
-					reqPrintContent = ReqPrintContent.buildReqPrintReceipt(gen, orderId);
+					reqPrintContent = ReqPrintContent.buildReqPrintReceipt(staff, orderId);
 					break;
 				case 4:
-					reqPrintContent = ReqPrintContent.buildReqPrintShiftReceipt(gen, onDuty, offDuty, Reserved.PRINT_SHIFT_RECEIPT);
+					reqPrintContent = ReqPrintContent.buildReqPrintShiftReceipt(staff, onDuty, offDuty, Reserved.PRINT_SHIFT_RECEIPT);
 					break;
 				case 5:
-					reqPrintContent = ReqPrintContent.buildReqPrintShiftReceipt(gen, onDuty, offDuty, Reserved.PRINT_TEMP_SHIFT_RECEIPT);
+					reqPrintContent = ReqPrintContent.buildReqPrintShiftReceipt(staff, onDuty, offDuty, Reserved.PRINT_TEMP_SHIFT_RECEIPT);
 					break;
 				case 6:
-					reqPrintContent = ReqPrintContent.buildReqPrintShiftReceipt(gen, onDuty, offDuty, Reserved.PRINT_DAILY_SETTLE_RECEIPT);
+					reqPrintContent = ReqPrintContent.buildReqPrintShiftReceipt(staff, onDuty, offDuty, Reserved.PRINT_DAILY_SETTLE_RECEIPT);
 					break;
 				case 7:
-					reqPrintContent = ReqPrintContent.buildReqPrintShiftReceipt(gen, onDuty, offDuty, Reserved.PRINT_HISTORY_SHIFT_RECEIPT);
+					reqPrintContent = ReqPrintContent.buildReqPrintShiftReceipt(staff, onDuty, offDuty, Reserved.PRINT_HISTORY_SHIFT_RECEIPT);
 					break;
 				case 8:
-					reqPrintContent = ReqPrintContent.buildReqPrintShiftReceipt(gen, onDuty, offDuty, Reserved.PRINT_HISTORY_DAILY_SETTLE_RECEIPT);
+					reqPrintContent = ReqPrintContent.buildReqPrintShiftReceipt(staff, onDuty, offDuty, Reserved.PRINT_HISTORY_DAILY_SETTLE_RECEIPT);
 					break;
 				default:
 					reqPrintContent = null;

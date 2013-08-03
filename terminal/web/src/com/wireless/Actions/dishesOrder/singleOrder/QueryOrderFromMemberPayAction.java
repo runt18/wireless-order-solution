@@ -10,13 +10,13 @@ import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.client.member.MemberDao;
 import com.wireless.db.frontBusiness.PayOrder;
-import com.wireless.db.frontBusiness.VerifyPin;
+import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.client.Member;
 import com.wireless.pojo.client.MemberType;
 import com.wireless.pojo.distMgr.Discount;
-import com.wireless.protocol.Terminal;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.util.WebParams;
 
 public class QueryOrderFromMemberPayAction extends Action{
@@ -34,18 +34,18 @@ public class QueryOrderFromMemberPayAction extends Action{
 			String st = request.getParameter("st");
 			String sv = request.getParameter("sv");
 			
-			Terminal term = VerifyPin.exec(Long.valueOf(pin), com.wireless.protocol.Terminal.MODEL_STAFF);
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			Member m = null;
 			if(st.trim().equals("mobile")){
-				m = MemberDao.getMemberByMobile(term, sv);
+				m = MemberDao.getMemberByMobile(staff, sv);
 			}else if(st.trim().equals("card")){
-				m = MemberDao.getMemberByCard(term, sv);				
+				m = MemberDao.getMemberByCard(staff, sv);				
 			}
 			
 			com.wireless.pojo.dishesOrder.Order no = new com.wireless.pojo.dishesOrder.Order();
 			no.setId(Integer.valueOf(orderID));
 			no.setDiscount(new Discount(Integer.valueOf(m.getMemberType().getDiscount().getId())));
-			no = PayOrder.calcByID(term, no);
+			no = PayOrder.calcByID(staff, no);
 			
 			m.getMemberType().setDiscount(no.getDiscount());
 			if(m.getMemberType().getDiscountType() == MemberType.DiscountType.DISCOUNT_ENTIRE){

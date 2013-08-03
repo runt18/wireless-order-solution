@@ -13,9 +13,9 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.frontBusiness.VerifyPwd;
+import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.ProtocolError;
-import com.wireless.protocol.Terminal;
 
 public class VerifyPwdAction extends Action {
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
@@ -56,7 +56,7 @@ public class VerifyPwdAction extends Action {
 				pwd = "";
 			}
 			
-			boolean isMatch = VerifyPwd.exec(Long.parseLong(pin), Terminal.MODEL_STAFF, type, pwd);
+			boolean isMatch = VerifyPwd.exec(StaffDao.verify(Integer.parseInt(pin)), type, pwd);
 			jsonResp = jsonResp.replace("$(result)", isMatch ? "true" : "false");
 			jsonResp = jsonResp.replace("$(value)", isMatch ? "密码验证通过" : "密码验证失败");	
 			
