@@ -4,22 +4,20 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import net.sf.json.JSONObject;
-import net.sf.json.JsonConfig;
 
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import com.wireless.db.staffMgr.QueryStaffTerminal;
-import com.wireless.pojo.staffMgr.StaffTerminal;
+import com.wireless.db.staffMgr.StaffDao;
+import com.wireless.json.JObject;
+import com.wireless.pojo.staffMgr.Staff;
+import com.wireless.util.DataPaging;
 
 public class QueryStaffAction extends Action {
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
@@ -30,6 +28,9 @@ public class QueryStaffAction extends Action {
 
 		String start = request.getParameter("start");
 		String limit = request.getParameter("limit");
+		
+		JObject jobject = new JObject();
+		List<Staff> staffList = new ArrayList<Staff>();
 		int index = 0;
 		int pageSize = 0;
 		if (!(start == null)) {
@@ -37,12 +38,7 @@ public class QueryStaffAction extends Action {
 			pageSize = Integer.parseInt(limit);
 		}
 
-		List resultList = new ArrayList();
-		List outputList = new ArrayList();
-		// List chooseList = new ArrayList();
-		HashMap rootMap = new HashMap();
 
-		boolean isError = false;
 		// 是否分頁
 		String isPaging = request.getParameter("isPaging");
 		// 是否combo
@@ -56,7 +52,7 @@ public class QueryStaffAction extends Action {
 			int restaurantID = Integer.parseInt(request.getParameter("restaurantID"));
 
 			// get the type to filter
-			int type = Integer.parseInt(request.getParameter("type"));
+/*			int type = Integer.parseInt(request.getParameter("type"));
 
 			// get the operator to filter
 			String ope = request.getParameter("ope");
@@ -76,10 +72,10 @@ public class QueryStaffAction extends Action {
 			} else {
 				// 不可能到这里
 				ope = "";
-			}
+			}*/
 
 			// get the value to filter
-			String filterVal = request.getParameter("value");
+/*			String filterVal = request.getParameter("value");
 
 			// combine the operator and filter value
 			String filterCondition = null;
@@ -93,114 +89,28 @@ public class QueryStaffAction extends Action {
 			} else {
 				// 全部
 				filterCondition = "";
-			}
-
-			StaffTerminal[] staffTerminals = QueryStaffTerminal.exec(restaurantID, filterCondition, " order by staff_alias ");
-
-			// if (staffs.length != 0) {
-			for (int i = 0; i < staffTerminals.length; i++) {
-				//
-				HashMap resultMap = new HashMap();
-
-				resultMap.put("staffID", staffTerminals[i].id);
-				resultMap.put("staffAlias", staffTerminals[i].aliasID);
-				resultMap.put("staffName", staffTerminals[i].name);
-				resultMap.put("staffPassword", staffTerminals[i].pwd);
-				resultMap.put("terminalID", staffTerminals[i].terminalId);
-				resultMap.put("staffGift", staffTerminals[i].getGiftAmount());
-				resultMap.put("quotaOrig", staffTerminals[i].getGiftQuota());
-				resultMap.put("staffQuota", staffTerminals[i].getGiftQuota());
-				resultMap.put("pin", staffTerminals[i].pin);
-				resultMap.put("type", staffTerminals[i].type);
-				
-				if (staffTerminals[i].getGiftQuota() < 0) {
-					resultMap.put("noLimit", true);
-				} else {
-					resultMap.put("noLimit", false);
-				}
-
-				resultMap.put("message", "normal");
-
-				resultList.add(resultMap);
-
-			}
-			// } else {
-			// isError = true;
-			// HashMap resultMap = new HashMap();
-			// resultMap.put("message", "您的餐厅还没有任何员工信息，请在会员中心中添加员工");
-			// resultList.add(resultMap);
-			// }
+			}*/
+			staffList = StaffDao.getStaffs(restaurantID);
+			
+			
+			jobject.setMsg("normal");
 
 		} catch (SQLException e) {
 			e.printStackTrace();
-			isError = true;
-			HashMap resultMap = new HashMap();
-			resultMap.put("message", "数据库请求发生错误，请确认网络是否连接正常");
-			resultList.add(resultMap);
+			jobject.initTip(false, "数据库请求发生错误，请确认网络是否连接正常");
 
 		} catch (IOException e) {
 			e.printStackTrace();
-			isError = true;
-			HashMap resultMap = new HashMap();
-			resultMap.put("message", "未处理异常");
-			resultList.add(resultMap);
-
+			jobject.initTip(false, "未处理异常");
 		} finally {
-			String outString = "";
-
-			if (isError) {
-				rootMap.put("root", resultList);
-			} else if (isCombo.equals("true")) {
-				outString = "{\"root\":[";
-
-				if (resultList.size() == 0) {
-
-				} else {
-					for (int i = 0; i < resultList.size(); i++) {
-
-						outString = outString
-								+ "{staffID:"
-								+ ((HashMap) (resultList.get(i))).get("staffID").toString() + ",";
-						outString = outString
-								+ "staffName:'"
-								+ ((HashMap) (resultList.get(i))).get("staffName").toString() + "'},";
-
-					}
-					outString = outString.substring(0, outString.length() - 1);
-
-				}
-				outString = outString + "]}";
-			} else {
-				if (isPaging.equals("true")) {
-					// 分页
-					for (int i = index; i < pageSize + index; i++) {
-						try {
-							outputList.add(resultList.get(i));
-						} catch (Exception e) {
-							// 最后一页可能不足一页，会报错，忽略
-						}
-					}
-				} else {
-					for (int i = 0; i < resultList.size(); i++) {
-						outputList.add(resultList.get(i));
-					}
-				}
-				rootMap.put("root", outputList);
-			}
-
-			JsonConfig jsonConfig = new JsonConfig();
-
-			JSONObject obj = JSONObject.fromObject(rootMap, jsonConfig);
-
-			String outputJson = "{\"totalProperty\":" + resultList.size() + "," + obj.toString().substring(1);
-
 			if (isCombo.equals("true")) {
-				// System.out.println(outString);
-				out.write(outString);
+				
 			} else {
-				// System.out.println(outputJson);
-				out.write(outputJson);
-			}
+				staffList = DataPaging.getPagingData(staffList, isPaging, index, pageSize);
+			}	
+			jobject.setTotalProperty(staffList.size());
+			jobject.setRoot(staffList);
+			out.write(jobject.toString());
 		}
 		return null;
 	}
