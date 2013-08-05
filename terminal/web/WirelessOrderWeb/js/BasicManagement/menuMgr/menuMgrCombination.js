@@ -1,16 +1,14 @@
-﻿
-combinationOperationRenderer = function(){
+﻿function combinationOperationRenderer(){
 	return '<a href="javascript:combinationDeleteHandler()">删除</a>';
 };
 
-combinationDeleteHandler = function(){
+function combinationDeleteHandler(){
 	var cmg = Ext.getCmp('combinationFoodGrid');
 	cmg.getStore().remove(cmg.getSelectionModel().getSelections()[0]);
 	cmg.getView().refresh();
 };
 
-
-combinationDisplaySumHandler = function(){
+function combinationDisplaySumHandler(){
 	var cfg = Ext.getCmp('combinationFoodGrid').getStore();
 	var sumPrice = 0, sumAmount = 0, itemSumPrice = 0;
 	for(var i = 0; i < cfg.getCount(); i++){
@@ -34,38 +32,35 @@ var combinationFoodGrid = new Ext.grid.EditorGridPanel({
 		forceFit : true
 	},
 	sm : new Ext.grid.RowSelectionModel({singleSelect:true}),
-	cm : new Ext.grid.ColumnModel(
-		[
-		    new Ext.grid.RowNumberer(),
-//		    {header:'编号', dataIndex:'aliasID', width:70},
-		    {header:'菜名', dataIndex:'name', width:200},
-		    {header:'价格',  dataIndex:'unitPrice', align:'right', width:80, renderer:Ext.ux.txtFormat.gridDou},
-		    {
-		    	header : '份数',
-		    	dataIndex : 'amount',
-		    	width : 80,
-		    	align : 'right',
-		    	renderer : Ext.ux.txtFormat.gridDou,
-		    	editor : new Ext.form.NumberField({
-		    		maxLength : 8,
-		    		maxLengthText : '长度不能超过8位',
-		    		minValue : 1,
-		    		maxValue : 65535,
-		    		allowBlank : false,
-		    		style : 'color:green; font-weight:bold;',
-		    		validator : function(v){
- 	    	    		if(/^\d+$/.test(v)){
- 	    	    			return true;
- 	    	    		}else{
- 	    	    			return '输入有误,份数只能是正整数!';
- 	    	    		}
- 	    	    	}
-		    	})
-		    },
-		    {header:'成本',  dataIndex:'sumPrice', align:'right', width:90, renderer:Ext.ux.txtFormat.gridDou},
-		    {header:'操作', align:'center', renderer:combinationOperationRenderer}
-		]
-	),
+	cm : new Ext.grid.ColumnModel([
+	    new Ext.grid.RowNumberer(),
+	    {header:'菜名', dataIndex:'name', width:200},
+	    {header:'价格',  dataIndex:'unitPrice', align:'right', width:80, renderer:Ext.ux.txtFormat.gridDou},
+	    {
+	    	header : '份数',
+	    	dataIndex : 'amount',
+	    	width : 80,
+	    	align : 'right',
+	    	renderer : Ext.ux.txtFormat.gridDou,
+	    	editor : new Ext.form.NumberField({
+	    		maxLength : 8,
+	    		maxLengthText : '长度不能超过8位',
+	    		minValue : 1,
+	    		maxValue : 65535,
+	    		allowBlank : false,
+	    		style : 'color:green; font-weight:bold;',
+	    		validator : function(v){
+	    	    		if(/^\d+$/.test(v)){
+	    	    			return true;
+	    	    		}else{
+	    	    			return '输入有误,份数只能是正整数!';
+	    	    		}
+	    	    	}
+	    	})
+	    },
+	    {header:'成本',  dataIndex:'sumPrice', align:'right', width:90, renderer:Ext.ux.txtFormat.gridDou},
+	    {header:'操作', align:'center', renderer:combinationOperationRenderer}
+	]),
 	ds : new Ext.data.JsonStore({
 		url : '../../QueryFoodCombination.do',
 		root : 'root',
@@ -93,12 +88,16 @@ var combinationFoodGrid = new Ext.grid.EditorGridPanel({
 	}),
 	bbar : new Ext.Toolbar({
 		height : 26,
-		items : [
-			{xtype:'tbtext', text:String.format(Ext.ux.txtFormat.barTitle, '总计')}, 
-			'-', '->',
-			{xtype:'tbtext', text:String.format(Ext.ux.txtFormat.barMsg, '总成本', 'txtDisplayCombinationFoodPrice', '0.00')},
-			{xtype:'tbtext', text:String.format(Ext.ux.txtFormat.barMsg, '总份数', 'txtDisplayCombinationFoodPriceAmount', '0.00')}
-		]
+		items : [{
+			xtype:'tbtext', 
+			text:String.format(Ext.ux.txtFormat.barTitle, '总计')
+		}, '->', {
+			xtype:'tbtext', 
+			text:String.format(Ext.ux.txtFormat.barMsg, '总成本', 'txtDisplayCombinationFoodPrice', '0.00')
+		}, {
+			xtype:'tbtext', 
+			text:String.format(Ext.ux.txtFormat.barMsg, '总份数', 'txtDisplayCombinationFoodPriceAmount', '0.00')
+		}]
 	}),
 	listeners : {
 		resize : function(thiz, adjWidth, adjHeight, rawWidth, rawHeight){
@@ -107,39 +106,28 @@ var combinationFoodGrid = new Ext.grid.EditorGridPanel({
 	}
 });
 
-
 var allFoodMiniGridTbar = new Ext.Toolbar({
 	height : 26,
-	items : [
-		{ xtype:'tbtext', text:'菜名搜索:'},
-		{
-			xtype : 'textfield',
-			id : 'txtMiniAllFoodNameSearch',
-			width : 100
-		},
-		'->',
-		{
-			text : '搜索',
-			id : 'btnSearchForAllFoodMiniGridTbar',
-			iconCls : 'btn_search',
-			handler : function(){
-				var mafn = Ext.getCmp('txtMiniAllFoodNameSearch').getValue().trim();
-				var afmgs = Ext.getCmp('allFoodMiniGrid').getStore();
-				if(mafn == ''){
-					afmgs.baseParams['type'] = 0;
-				}else{
-					afmgs.baseParams['type'] = 2;
-					afmgs.baseParams['value'] = mafn;
+	items : [{ xtype:'tbtext', text:'菜名搜索:'}, {
+		xtype : 'textfield',
+		id : 'txtMiniAllFoodNameSearch',
+		width : 100
+	}, '->', {
+		text : '搜索',
+		id : 'btnSearchForAllFoodMiniGridTbar',
+		iconCls : 'btn_search',
+		handler : function(){
+			var mafn = Ext.getCmp('txtMiniAllFoodNameSearch').getValue().trim();
+			var afmgs = allFoodMiniGrid.getStore();
+			afmgs.baseParams['name'] = mafn;
+			afmgs.load({
+				params : {
+					limit : GRID_PADDING_LIMIT_20,
+					start : 0
 				}
-				afmgs.load({
-					params : {
-						limit : GRID_PADDING_LIMIT_20,
-						start : 0
-					}
-				});
-			}
+			});
 		}
-	]
+	}]
 });
 
 var allFoodMiniGrid = createGridPanel(
@@ -155,7 +143,7 @@ var allFoodMiniGrid = createGridPanel(
 	    ['价格', 'unitPrice', '', 'right', 'Ext.ux.txtFormat.gridDou']
 	],
 	FoodBasicRecord.getKeys(),
-    [['pin', pin], ['restaurantId', restaurantID], ['isPaging', true] ],
+    [['pin', pin], ['restaurantId', restaurantID], ['isPaging', true]],
     GRID_PADDING_LIMIT_20,
     '',
     allFoodMiniGridTbar

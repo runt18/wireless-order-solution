@@ -378,23 +378,22 @@ function checkOutOnLoad() {
 
 };
 
-createCancelFoodDetail = function(_data){
+function createCancelFoodDetail(_data){
 	if(_data == null || typeof _data == 'undefined' || typeof _data.root == 'undefined' || _data.root.length == 0){
 		return;
 	}
-	
 	cancelFoodDetailData = {totalProperty:0, root:[]};
 	var cancelFoodPrice = 0.00, sumAmount = 0.00;
 	
 	var item = null;
 	for(var i = 0; i < _data.root.length ; i++){		
 		item = _data.root[i];
-		if(typeof(item.amount) != 'undefined' && parseFloat(item.amount) < 0){
-			item.amount = Math.abs(item.amount);
-			item.backFoodPrice = Math.abs(parseFloat(item['unit_price'] * item.amount));			
+		if(typeof(item.count) != 'undefined' && parseFloat(item.count) < 0){
+			item.count = Math.abs(item.count);
+			item.totalPrice = Math.abs(parseFloat(item['unitPrice'] * item.count));			
 			cancelFoodDetailData.root.push(item);
-			cancelFoodPrice += parseFloat(item.backFoodPrice);
-			sumAmount += parseFloat(item.amount);
+			cancelFoodPrice += parseFloat(item.totalPrice);
+			sumAmount += parseFloat(item.count);
 		}
 	}
 	
@@ -404,9 +403,11 @@ createCancelFoodDetail = function(_data){
 	cancelFoodPrice = cancelFoodPrice.toFixed(2);
 	sumAmount = sumAmount.toFixed(2);
 	cancelFoodDetailData.root.push({
-		food_name : '汇总',		
-		amount : sumAmount,
-		backFoodPrice : cancelFoodPrice
+		orderDateFormat : '汇总',		
+		count : sumAmount,
+		totalPrice : cancelFoodPrice,
+		'kitchen' : {},
+		'tasteGroup' : {}
 	});
 	cancelFoodDetailData.totalProperty = cancelFoodDetailData.root.length;
 	
@@ -416,49 +417,33 @@ createCancelFoodDetail = function(_data){
 var showCancelFoodDetailWin = null;
 showCancelFoodDetail = function(){
 	if(!showCancelFoodDetailWin){
-		var grid = new Ext.grid.GridPanel({
-			id : 'showCancelFoodDetailWinGrid',
-			border : false,
-			stripeRows : true,
-			animate : false,
-			animCollapse : true,
-			autoScroll : true,
-			loadMask : { msg: '数据请求中，请稍后...' },
-			cm : new Ext.grid.ColumnModel([
-			    new Ext.grid.RowNumberer(),
-			    {header:'名称', dataIndex:'food_name', width:180},
-			    {header:'日期', dataIndex:'order_date', width:130},			    
-			    {header:'单价', dataIndex:'unit_price', width:80, align:'right', renderer:Ext.ux.txtFormat.gridDou},
-			    {header:'退菜数量', dataIndex:'amount', width:80, align:'right', renderer:Ext.ux.txtFormat.gridDou},
-			    {header:'退菜金额', dataIndex:'backFoodPrice', width:80, align:'right', renderer:Ext.ux.txtFormat.gridDou},
-			    {header:'厨房', dataIndex:'kitchen', width:100},
-			    {header:'服务员', dataIndex:'waiter', width:70},
-			    {header:'备注', dataIndex:'comment', width:120}
-			]),
-			ds : new Ext.data.Store({
-				proxy : new Ext.data.MemoryProxy(cancelFoodDetailData),
-				reader : new Ext.data.JsonReader({
-					totalProperty : 'totalProperty',
-					root : 'root'
-				}, [
-				 	{name:'food_name'},
-				 	{name:'order_date'},
-				 	{name:'unit_price'},
-				 	{name:'amount'},
-				 	{name:'backFoodPrice'},
-				 	{name:'kitchen'},
-				 	{name:'waiter'},
-				 	{name:'comment'}
-				]),
-				listeners : {
-					
-				}
-			})
-		});		
-		
+		var grid = createGridPanel(
+			'showCancelFoodDetailWinGrid',
+			'',
+			'',
+			'',
+			'',
+			[
+			    [true,false,false,false],
+			    ['日期','orderDateFormat',130],
+			    ['名称','name',180],
+			    ['单价','unitPrice', 80, 'right', 'Ext.ux.txtFormat.gridDou'],
+			    ['退菜数量','count', 80, 'right', 'Ext.ux.txtFormat.gridDou'], 
+			    ['退菜金额','totalPrice', 80, 'right', 'Ext.ux.txtFormat.gridDou'],
+			    ['厨房','kitchen.name', 80],
+			    ['服务员','waiter', 80],
+			    ['退菜原因', 'cancelReason.reason'],
+			    ['备注','comment', 120]
+			],
+			OrderFoodRecord.getKeys(),
+			[],
+			'',
+			''
+		);
+		grid.frame = false;
 		showCancelFoodDetailWin = new Ext.Window({
 			title : '退菜明细',
-			width : 900,
+			width : 998,
 			height : 350,
 			resizable : false,
 			modal : true,
@@ -475,7 +460,8 @@ showCancelFoodDetail = function(){
 				}
 			}],
 			listeners : {
-				show : function(){
+				show : function(thiz){
+					thiz.center();
 					// 退菜明细
 					Ext.Ajax.request({
 						url : '../../QueryDetail.do',
@@ -490,7 +476,7 @@ showCancelFoodDetail = function(){
 						},
 						success : function(response, options){
 							createCancelFoodDetail(Ext.decode(response.responseText));
-							Ext.getCmp('showCancelFoodDetailWinGrid').getStore().loadData(cancelFoodDetailData);
+							grid.getStore().loadData(cancelFoodDetailData);
 						},
 						failure : function(res, options){
 							Ext.ux.showMsg(Ext.decode(res.responseText));

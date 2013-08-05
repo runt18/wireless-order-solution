@@ -277,129 +277,38 @@ function billViewHandler() {
 	viewBillWin.center();
 };
 
-var billDetailStore = new Ext.data.Store({
-	proxy : new Ext.data.HttpProxy({
-		url : '../../QueryDetail.do'
-	}),
-	reader : new Ext.data.JsonReader({
-		totalProperty : 'totalProperty',
-		root : 'root'
-	}, [ {
-		name : 'order_date'
-	}, {
-		name : 'food_name'
-	}, {
-		name : 'unit_price'
-	}, {
-		name : 'amount'
-	}, {
-		name : 'discount'
-	}, {
-		name : 'taste_pref'
-	}, {
-		name : 'taste_price'
-	}, {
-		name : 'kitchen'
-	}, {
-		name : 'waiter'
-	}, {
-		name : 'comment'
-	}, {
-		name : 'isPaid'
-	}, {
-		name : 'isDiscount'
-	}, {
-		name : 'isGift'
-	}, {
-		name : 'isReturn'
-	}, {
-		name : 'message'
-	}, {
-		name : 'cancelReason'
-	}]),
-	listeners : {
-		beforeload : function(thiz){
-			thiz.baseParams = {
-				'pin' : pin,
-				'orderID' : Ext.ux.getSelData(billsGrid)['id'],
-				'queryType' : 'History'
-			};
-		}
-	}
-});
-
 function detailIsPaidRenderer(v){
 	return eval(v) ? '是' : '否';
 }
 
-var billDetailColumnModel = new Ext.grid.ColumnModel([
-	new Ext.grid.RowNumberer(), {
-		header : '日期',
-		dataIndex : 'order_date',
-		width : 110
-	}, {
-		header : '名称',
-		dataIndex : 'food_name',
-		width : 130
-	}, {
-		header : '单价',
-		dataIndex : 'unit_price',
-		align : 'right',
-		width : 60,
-		renderer : Ext.ux.txtFormat.gridDou
-	}, {
-		header : '数量',
-		dataIndex : 'amount',
-		align : 'right',
-		width : 60
-	}, {
-		header : '折扣',
-		dataIndex : 'discount',
-		align : 'right',
-		width : 60,
-		renderer : Ext.ux.txtFormat.gridDou
-	}, {
-		header : '口味',
-		dataIndex : 'taste_pref'
-	}, {
-		header : '口味价钱',
-		dataIndex : 'taste_price',
-		align : 'right',
-		width : 60,
-		renderer : Ext.ux.txtFormat.gridDou
-	}, {
-		header : '厨房',
-		dataIndex : 'kitchen',
-		width : 60
-	}, {
-		header : '反结账',
-		dataIndex : 'isPaid',
-		width : 60,
-		align : 'center',
-		renderer : detailIsPaidRenderer
-	}, {
-		header : '服务员',
-		dataIndex : 'waiter',
-		width : 60
-	}, {
-		header : '退菜原因',
-		dataIndex : 'cancelReason'
-	} 
-]);
-
-var billDetailGrid = new Ext.grid.GridPanel({
-	border : false,
-	ds : billDetailStore,
-	cm : billDetailColumnModel,
-	sm : new Ext.grid.RowSelectionModel({
-		singleSelect : true
-	}),
-	viewConfig : {
-		forceFit : true
-	},
-	bbar : createPagingBar(billDetailpageRecordCount, billDetailStore),
-	autoScroll : true,
-	loadMask : { msg : '数据加载中，请稍等...' }
+var billDetailGrid = createGridPanel(
+	'',
+	'',
+	'',
+	'',
+	'../../QueryDetail.do',
+	[
+	    [true,false,false,false],
+	    ['日期','orderDateFormat',100],
+	    ['名称','name',130],
+	    ['单价','unitPrice',60, 'right', 'Ext.ux.txtFormat.gridDou'],
+	    ['数量','count', 60, 'right', 'Ext.ux.txtFormat.gridDou'], 
+	    ['口味','tasteGroup.tastePref'],
+	    ['口味价钱','tasteGroup.tastePrice', 60, 'right', 'Ext.ux.txtFormat.gridDou'],
+	    ['厨房','kitchen.name', 60],
+	    ['反结账','isPaid', 60, 'center', 'detailIsPaidRenderer'],
+	    ['服务员','waiter', 60],
+	    ['退菜原因', 'cancelReason.reason']
+	],
+	OrderFoodRecord.getKeys(),
+	[['pin', pin], ['queryType', 'History']],
+	'',
+	''
+);
+billDetailGrid.frame = false;
+billDetailGrid.border = false;
+billDetailGrid.getStore().on('beforeload', function(thiz){
+	thiz.baseParams['orderID'] = Ext.ux.getSelData(billsGrid)['id'];
 });
 
 var billgodtpStatus = false;

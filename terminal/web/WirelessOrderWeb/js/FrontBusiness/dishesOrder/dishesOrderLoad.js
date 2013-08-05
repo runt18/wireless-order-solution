@@ -424,8 +424,7 @@ function initOrderSingleUI(_c){
 				['数量', 'count', 130, 'right', 'foodCountAddOrDeleteRenderer'],
 				['单价', 'unitPrice', 80, 'right', 'Ext.ux.txtFormat.gridDou'],
 				['下单时间', 'orderDateFormat', 150],
-				['服务员', 'waiter', 80]/*,
-				['操作', 'operation', 150, 'center', 'orderOrderGridPanelRenderer']*/
+				['服务员', 'waiter', 80]
 			],
 			OrderFoodRecord.getKeys(),
 			[],
@@ -494,8 +493,6 @@ function initPasswordWin(){
 			id : '',
 			width : 100,
 			fieldLabel : '密码'
-//			allowBlank : false,
-//			blankText : '密码不能为空, 请重新输入.'
 		});	
 		winValidPassword = new Ext.Window({
 			id : 'winValidPassword',
@@ -518,9 +515,6 @@ function initPasswordWin(){
 				text : '确定',
 				iconCls : 'btn_save',
 				handler : function(){
-//					if(!numCount.isValid() || !txtPassword.isValid()){
-//						return;
-//					}
 					if(!numCount.isValid()){
 						return;
 					}

@@ -366,6 +366,7 @@ var allFoodTabPanelGridTbar = new Ext.Toolbar({
 		id : 'comSearchKitchen',
 	    width : 100,
 	    listWidth : 100,
+	    value : -1,
 	    store : new Ext.data.JsonStore({
 			fields : [ 'alias', 'name' ],
 			data : [{
@@ -375,7 +376,6 @@ var allFoodTabPanelGridTbar = new Ext.Toolbar({
 		}),
 		valueField : 'alias',
 		displayField : 'name',
-		value : -1,
 		mode : 'local',
 		triggerAction : 'all',
 		typeAhead : true,
@@ -443,7 +443,7 @@ var allFoodTabPanelGridTbar = new Ext.Toolbar({
 			gs.load({
 				params : {
 					start : 0,
-					limit : 30
+					limit : GRID_PADDING_LIMIT_30
 				}
 			});
 		}
@@ -465,7 +465,7 @@ var allFoodTabPanelGrid = createGridPanel(
 	],
 	FoodBasicRecord.getKeys(),
 	[['pin',pin], ['type', 1], ['restaurantID', restaurantID], ['isPaging', true]],
-	30,
+	GRID_PADDING_LIMIT_30,
 	'',
 	allFoodTabPanelGridTbar
 );

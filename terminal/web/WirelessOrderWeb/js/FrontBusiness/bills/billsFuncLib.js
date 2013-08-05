@@ -8,7 +8,6 @@
 		sOperator = searchOperator != '' ? Ext.getCmp(searchOperator).getValue() : '';
 	}
 	sType = sValue == '' ? 0 : searchType;
-//	sAdditionFilter = Ext.getCmp(searchAdditionFilter).inputValue;	
 	var addition =  Ext.query('input[name=\"conditionRadio\"]');
 	for(var i = 0; i < addition.length; i++){
 		if(addition[i].checked){
@@ -55,25 +54,4 @@ function billListRefresh(){
 		}
 	}
 	orderedGrid.getStore().loadData({root:orderedGrid.order.orderFoods});
-	/*	
- 	var discount = Ext.getCmp('comboDiscount');
-	for ( var i = 0; i < orderedData.root.length; i++) {
-		var tpItem = orderedData.root[i];
-		
-		if (tpItem.special == true || tpItem.gift == true || tpItem.temporary == true) {
-			// 特价，送，臨時菜 不打折
-			tpItem.discount = 1.00;
-		} else {
-			tpItem.discount = 1.00;
-			for(var di = 0; di < discountPlanData.root.length; di++){
-				if(discount.getValue() != -1 && discountPlanData.root[di].discount.id == discount.getValue() 
-						&& discountPlanData.root[di].kitchen.kitchenID == tpItem.kitchen.kitchenID){
-					tpItem.discount = parseFloat(discountPlanData.root[di].rate).toFixed(2);
-					break;
-				}
-			}
-		}
-	}
-	orderedGrid.getStore().loadData(orderedData);
-	*/
 };
