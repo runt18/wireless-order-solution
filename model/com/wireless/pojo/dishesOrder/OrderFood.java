@@ -60,7 +60,7 @@ public class OrderFood implements Parcelable, Comparable<OrderFood>, Jsonable {
 	//the last order amount to this order food
 	private float mLastCnt;	
 
-	private final Food mFood = new Food();;
+	private final Food mFood = new Food();
 	
 	public Food asFood(){
 		return mFood;
@@ -381,6 +381,10 @@ public class OrderFood implements Parcelable, Comparable<OrderFood>, Jsonable {
 		return mFood.getFoodId();
 	}
 	
+	public Food getFood(){
+		return this.mFood;
+	}
+	
 	/**
 	 * Override the same method to super.
 	 * Get the alias id according to name and price in case of temporary,
@@ -634,5 +638,20 @@ public class OrderFood implements Parcelable, Comparable<OrderFood>, Jsonable {
 	public List<Object> toJsonList(int flag) {
 		return null;
 	}
-
+	
+	/**
+	 * 
+	 * @param list
+	 * @return
+	 */
+	public static int calcTotalCount(List<OrderFood> list){
+		int total = 0;
+		if(list != null && !list.isEmpty()){
+			for(OrderFood temp : list){
+				total += temp.getCount();
+			}
+		}
+		return total;
+	}
+	
 }
