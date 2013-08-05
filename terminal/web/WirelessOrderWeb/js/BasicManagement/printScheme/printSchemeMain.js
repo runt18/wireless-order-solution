@@ -4,7 +4,7 @@ var pushBackBut = new Ext.ux.ImageButton({
 	imgHeight : 50,
 	tooltip : '返回',
 	handler : function(btn){
-		location.href = 'InventoryProtal.html?restaurantID=' + restaurantID + '&pin=' + pin;
+		location.href = 'BasicMgrProtal.html?restaurantID=' + restaurantID + '&pin=' + pin;
 	}
 });
 
@@ -97,7 +97,6 @@ Ext.Ajax.request({
 		var jr = Ext.decode(res.responseText);
 		
 		if(jr.success){
-			alert(jr.root.length);
 			for ( var i = 0; i < jr.root.length; i++) {
 				
 				var r = jr.root[i];
@@ -123,15 +122,21 @@ Ext.Ajax.request({
 
 var addPrintFanc = new Ext.Window({
 	title : '添加方案',
+	id : 'addPrintFancWin',
 	closable : false,
 	resizable : true,
 	modal : true,
 	width : 650,
+	autoHeight : true,
+	
 	bbar : ['->',{
 		text : '保存',
 		id : 'btnSaveFanc',
 		iconCls : 'btn_save',
 		handler : function(e){
+			if(!Ext.getCmp('txtRepeat').isValid()){
+				return;
+			}
 			var pType = document.getElementsByName('pType');
 			for ( var i = 0; i < pType.length; i++) {
 				if(pType[i].checked){
@@ -254,13 +259,21 @@ var addPrintFanc = new Ext.Window({
 			xtype : 'label',
 			text : '请选择功能:'
 		},{
+			
 			items : [{
 				xtype : 'radio',
 				name : 'pType',
+				id : 'radioXia',
 				inputValue : 1,
 				hideLabel : true,
-				checked : true,
 				boxLabel : '下单',
+				listeners : {
+					check  : function(thiz, checked){
+						if(checked){
+							showPanel(thiz.inputValue);
+						}
+					}
+				}
 			}]
 		},{
 			items : [{
@@ -269,6 +282,14 @@ var addPrintFanc = new Ext.Window({
 				inputValue : 2,
 				hideLabel : true,
 				boxLabel : '下单详细',
+				//checked : true,
+				listeners : {
+					check  : function(thiz, checked){
+						if(checked){
+							showPanel(thiz.inputValue);
+						}
+					}
+				}
 			}]
 			
 		},{
@@ -278,6 +299,13 @@ var addPrintFanc = new Ext.Window({
 				inputValue : 8,
 				hideLabel : true,
 				boxLabel : '退菜',
+				listeners : {
+					check  : function(thiz, checked){
+						if(checked){
+							showPanel(thiz.inputValue);
+						}
+					}
+				}
 			}]
 		},{
 			items : [{
@@ -286,6 +314,13 @@ var addPrintFanc = new Ext.Window({
 				inputValue : 5,
 				hideLabel : true,
 				boxLabel : '退菜详细',
+				listeners : {
+					check  : function(thiz, checked){
+						if(checked){
+							showPanel(thiz.inputValue);
+						}
+					}
+				}
 			}]
 			
 		},{
@@ -295,6 +330,13 @@ var addPrintFanc = new Ext.Window({
 				inputValue : 3,
 				hideLabel : true,
 				boxLabel : '结账',
+				listeners : {
+					check  : function(thiz, checked){
+						if(checked){
+							showPanel(thiz.inputValue);
+						}
+					}
+				} 
 			}]
 		},{
 			items : [{
@@ -303,6 +345,13 @@ var addPrintFanc = new Ext.Window({
 				inputValue : 127,
 				hideLabel : true,
 				boxLabel : '暂结',
+				listeners : {
+					check  : function(thiz, checked){
+						if(checked){
+							showPanel(thiz.inputValue);
+						}
+					}
+				}
 			}]
 			
 		},{
@@ -312,6 +361,13 @@ var addPrintFanc = new Ext.Window({
 				inputValue : 6,
 				hideLabel : true,
 				boxLabel : '转台',
+				listeners : {
+					check  : function(thiz, checked){
+						if(checked){
+							showPanel(thiz.inputValue);
+						}
+					}
+				}
 			}]
 		},{
 			items : [{
@@ -320,6 +376,13 @@ var addPrintFanc = new Ext.Window({
 				inputValue : 9,
 				hideLabel : true,
 				boxLabel : '催菜',
+				listeners : {
+					check  : function(thiz, checked){
+						if(checked){
+							showPanel(thiz.inputValue);
+						}
+					}
+				}
 			}]
 			
 		}]
@@ -434,6 +497,24 @@ var addPrintFanc = new Ext.Window({
 	}]
 	
 });
+
+function showPanel(v){
+	if(v == 1 || v ==8){
+		Ext.getCmp('kitchens').hide();
+		Ext.getCmp('depts').show();
+		Ext.getCmp('regions').show();
+	}else if(v == 2 || v == 5){
+		Ext.getCmp('kitchens').show();
+		Ext.getCmp('depts').hide();
+		Ext.getCmp('regions').hide();
+	}else{
+		Ext.getCmp('kitchens').hide();
+		Ext.getCmp('depts').hide();
+		Ext.getCmp('regions').show();
+	}
+
+	Ext.getCmp('addPrintFancWin').center();
+} 
 
 
 var printerWin = new Ext.Window({
@@ -643,7 +724,14 @@ function printFancOperactionHandler(c){
 	if(c.type == 'insert'){
 		addPrintFanc.setTitle('添加方案');
 		addPrintFanc.operationType = c.type;
+		//addPrintFanc.center();
+		
 		addPrintFanc.show();
+		//Ext.get('radioXia').checked = true;
+		document.getElementById('radioXia').checked = true;
+		Ext.getCmp('radioXia').fireEvent('check', Ext.getCmp('radioXia'), true);
+		
+		//addPrintFanc.center();
 	}else{
 		var ss = Ext.getCmp('grid').getSelectionModel().getSelected();
 		if(ss == null){
@@ -652,12 +740,15 @@ function printFancOperactionHandler(c){
 		}
 		addPrintFanc.setTitle('修改方案');
 		addPrintFanc.operationType = c.type;
+		//addPrintFanc.center();
 		addPrintFanc.show();
+		addPrintFanc.center();
 		//功能选中
 		var pTypeValue = ss.data.pTypeValue;
 		for ( var i = 0; i < pType.length; i++) {
 			if(pType[i].value == pTypeValue){
 				pType[i].checked = true;
+				pType[i].click();
 			}
 		}
 		//厨房选中
@@ -674,6 +765,7 @@ function printFancOperactionHandler(c){
 		for ( var i = 0; i < dept.length; i++) {
 			if(dept[i].value == deptValue){
 				dept[i].checked = true;
+				dept[i].click();
 			}
 		}
 		

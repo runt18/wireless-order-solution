@@ -435,7 +435,7 @@ var memberVerifyWin = new Ext.Window({
 		scope : this 
 	}]
 });
-
+var staffForm;
 Ext.onReady(function() {
 	Ext.lib.Ajax.defaultPostHeader += '; charset=utf-8';
 	Ext.QuickTips.init();
@@ -451,7 +451,7 @@ Ext.onReady(function() {
 	});
 	emplStore.load();
 
-	var staffForm = new Ext.form.FormPanel({
+	staffForm = new Ext.form.FormPanel({
 		layout : "form",
 		id : "staffFrom",
 		frame : true,

@@ -25,18 +25,18 @@ function loginOnLoad() {
 			var rootData = resultJSON.root;
 			var staffData = [];
 			if (rootData.length != 0) {
-				if (rootData[0].message == "normal") {
-					staffData = rootData.slice(0);
+				if (resultJSON.msg == "normal") {
+					staffData = rootData;
 					emplData = [];
 					for ( var i = 0; i < staffData.length; i++) {
-						emplData.push([ staffData[i].pin, // pin
+						emplData.push([ staffData[i].staffID, // pin
 						staffData[i].staffName, // 姓名
 						staffData[i].staffPassword // 密码
 						]);
 					}
 				} else {
 					Ext.MessageBox.show({
-						msg : rootData[0].message,
+						msg : resultJSON.msg,
 						width : 300,
 						buttons : Ext.MessageBox.OK
 					});

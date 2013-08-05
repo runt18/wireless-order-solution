@@ -1,4 +1,5 @@
 ﻿function loadAllStaff() {
+	alert('laile');
 	tasteData = {};
 	Ext.Ajax.request({
 		url : "../../QueryStaff.do",
@@ -9,13 +10,14 @@
 			"isCombo" : false
 		},
 		success : function(response, options) {
+			alert('jin');
 			var resultJSON = Ext.util.JSON.decode(response.responseText);
 			// 后台：[]
 			var rootData = resultJSON.root;
 			if (rootData.length != 0) {
-				if (rootData[0].message == "normal") {
-					staffData = rootData.slice(0);
-
+				if (resultJSON.msg == "normal") {
+					staffData = rootData;
+					alert('qsloda');
 					// 我也說不清這裡為什麽要刷一次，就是找個藉口刷新一下表格
 					staffStore.reload({
 						params : {
@@ -25,7 +27,7 @@
 					});
 				} else {
 					Ext.MessageBox.show({
-						msg : rootData[0].message,
+						msg : resultJSON.msg,
 						width : 300,
 						buttons : Ext.MessageBox.OK
 					});
@@ -33,6 +35,7 @@
 			}
 		},
 		failure : function(response, options) {
+			alert('wc');
 			Ext.MessageBox.show({
 				msg : " Unknown page error ",
 				width : 300,

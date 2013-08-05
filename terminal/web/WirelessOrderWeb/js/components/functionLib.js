@@ -124,12 +124,12 @@ function getOperatorName(pin, actionPath) {
 			var resultJSON = Ext.util.JSON.decode(response.responseText);
 			var rootData = resultJSON.root;
 			if (rootData.length != 0) {
-				if (rootData[0].message == "normal") {
-					staffData = rootData.slice(0);
+				if (resultJSON.msg == "normal") {
+					staffData = rootData;
 
 					for ( var i = 0; i < staffData.length; i++) {
 						// find the name
-						if (staffData[i].pin == pin) {
+						if (staffData[i].staffID == pin) {
 							operatorName = staffData[i].staffName;
 						}
 					}
@@ -137,7 +137,7 @@ function getOperatorName(pin, actionPath) {
 					document.getElementById("optName").innerHTML = operatorName;
 				} else {
 					Ext.MessageBox.show({
-						msg : rootData[0].message,
+						msg : resultJSON.msg,
 						width : 300,
 						buttons : Ext.MessageBox.OK
 					});

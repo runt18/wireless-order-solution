@@ -60,7 +60,7 @@ function loadAllStaff() {
 		success : function(response, options) {
 			var resultJSON = Ext.decode(response.responseText);
 			var rootData = resultJSON.root;
-			if (rootData[0].message == "normal") {
+			if (resultJSON.msg == "normal") {
 				for ( var i = 0; i < rootData.length; i++) {
 					staffData.push([
 					    rootData[i].staffID,
@@ -71,7 +71,7 @@ function loadAllStaff() {
 
 			} else {
 				Ext.MessageBox.show({
-					msg : rootData[0].message,
+					msg : resultJSON.msg,
 					width : 300,
 					buttons : Ext.MessageBox.OK
 				});
