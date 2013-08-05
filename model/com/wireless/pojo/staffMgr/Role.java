@@ -1,8 +1,15 @@
 package com.wireless.pojo.staffMgr;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import com.wireless.json.Jsonable;
 
 
-public class Role {
+
+public class Role implements Jsonable{
 
 	public static enum Type{
 		NORMAL(1, "普通"),
@@ -115,5 +122,24 @@ public class Role {
 	
 	public void setType(Type type){
 		this.type = type;
+	}
+
+	@Override
+	public Map<String, Object> toJsonMap(int flag) {
+		Map<String, Object> jm = new HashMap<String, Object>();
+		jm.put("id", this.getId());
+		jm.put("name", this.getName());
+		jm.put("restaurantId", this.getRestaurantId());
+		jm.put("categoryValue", this.getCategory().getVal());
+		jm.put("categoryText", this.getCategory().getDesc());
+		jm.put("typeValue", this.getType().getVal());
+		jm.put("typeText", this.getType().getDesc());
+		
+		return Collections.unmodifiableMap(jm);
+	}
+
+	@Override
+	public List<Object> toJsonList(int flag) {
+		return null;
 	}	
 }

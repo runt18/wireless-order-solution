@@ -1,9 +1,15 @@
 package com.wireless.pojo.staffMgr;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import com.wireless.json.Jsonable;
 import com.wireless.parcel.Parcel;
 import com.wireless.parcel.Parcelable;
 
-public class Staff implements Parcelable{ 
+public class Staff implements Parcelable, Jsonable{ 
 
 	public final static byte ST_PARCELABLE_COMPLEX = 0;
 	public final static byte ST_PARCELABLE_SIMPLE = 1;
@@ -173,4 +179,24 @@ public class Staff implements Parcelable{
 			return new Staff();
 		}
 	};
+
+	@Override
+	public Map<String, Object> toJsonMap(int flag) {
+		Map<String, Object> jm = new HashMap<String, Object>();
+		jm.put("staffID", this.getId());
+		jm.put("staffName", this.getName());
+		jm.put("restaurantId", this.getRestaurantId());
+		jm.put("mobile", this.getMobile());
+		jm.put("staffPassword", this.getPwd());
+		jm.put("typeValue", this.getType().getVal());
+		jm.put("typeText", this.getType().getDesc());
+		jm.put("role", this.getRole());
+		
+		return Collections.unmodifiableMap(jm);
+	}
+
+	@Override
+	public List<Object> toJsonList(int flag) {
+		return null;
+	}
 }
