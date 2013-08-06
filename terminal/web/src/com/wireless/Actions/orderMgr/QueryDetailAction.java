@@ -48,7 +48,6 @@ public class QueryDetailAction extends Action {
 			}else {
 				list = OrderFoodDao.getSingleDetailHistory(" AND OFH.order_id=" + orderID, " ORDER BY OFH.order_date ");
 			}
-			
 		}catch(Exception e){
 			e.printStackTrace();
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
@@ -56,6 +55,7 @@ public class QueryDetailAction extends Action {
 			if(list != null){
 				LinkedHashMap<String, Object> sum =new LinkedHashMap<String, Object>();
 				sum.put("title", "汇总");
+				sum.put("totalPrice", OrderFood.calcTotalPrice(list));
 				sum.put("totalCount", OrderFood.calcTotalCount(list));
 				jobject.getOther().put("sum", sum);
 				list = DataPaging.getPagingData(list, isPaging, start, limit);
