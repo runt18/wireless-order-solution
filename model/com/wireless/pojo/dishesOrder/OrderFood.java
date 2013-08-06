@@ -654,4 +654,19 @@ public class OrderFood implements Parcelable, Comparable<OrderFood>, Jsonable {
 		return total;
 	}
 	
+	/**
+	 * 
+	 * @param list
+	 * @return
+	 */
+	public static float calcTotalPrice(List<OrderFood> list){
+		float price = 0;
+		if(list != null && !list.isEmpty()){
+			for(OrderFood temp : list){
+				price += temp.getPrice();
+			}
+		}
+		return price;
+	}
+	
 }
