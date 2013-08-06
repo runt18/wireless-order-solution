@@ -40,6 +40,10 @@ Ext.Ajax.request({
 				var c = {items : [{xtype : "checkbox", name : "kitchen",boxLabel : k.name , hideLabel : true, inputValue :  k.alias }]};
 				
 				Ext.getCmp('allKitchen').add(c);
+				//solveIE换行时格式错乱
+				if((i+1)%6 == 0){
+					Ext.getCmp('allKitchen').add({columnWidth : 1});
+				}
 				Ext.getCmp('allKitchen').doLayout();
 			
 			}
@@ -98,11 +102,14 @@ Ext.Ajax.request({
 		
 		if(jr.success){
 			for ( var i = 0; i < jr.root.length; i++) {
-				
+
 				var r = jr.root[i];
 				var c = {items : [{xtype : "checkbox", name : "region", boxLabel : r.name , hideLabel : true, inputValue :  r.id }]};
-				
+
 				Ext.getCmp('allRegion').add(c);
+				if((i+1)%6 == 0){
+					Ext.getCmp('allRegion').add({columnWidth : 1});
+				}
 				Ext.getCmp('allRegion').doLayout();
 			
 			}
@@ -457,7 +464,7 @@ var addPrintFanc = new Ext.Window({
 			layout : 'column',
 			id : 'allKitchen',
 			defaults : {
-				columnWidth : .16,
+				columnWidth : .1666666,
 				layout : 'form',
 				labelWidth : 70,
 			}
@@ -550,7 +557,7 @@ function showPanel(v){
 		Ext.getCmp('depts').hide();
 		Ext.getCmp('regions').show();
 	}
-
+	//solve切换时格式错乱
 	Ext.getCmp('addPrintFancWin').center();
 } 
 
