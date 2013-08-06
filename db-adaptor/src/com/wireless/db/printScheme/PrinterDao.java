@@ -100,6 +100,7 @@ public class PrinterDao {
 			  " name = " + "'" + printerToUpdate.getName() + "'" + 
 			  " ,alias = " + "'" + printerToUpdate.getAlias() + "'" +
 			  " ,style = " + printerToUpdate.getStyle().getVal() + 
+			  " ,enabled = " + (printerToUpdate.isEnabled() == true ? 1 : 0) +
 			  " WHERE 1 = 1 " +
 			  " AND printer_id = " + printerToUpdate.getId();
 		
@@ -157,7 +158,7 @@ public class PrinterDao {
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return getPrinters(dbCon, staff);
+			return getAllPrinters(dbCon, staff);
 		}finally{
 			dbCon.disconnect();
 		}

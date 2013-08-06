@@ -41,14 +41,18 @@ public class CostAnalyzeReportDao {
 			CostAnalyze costAnalyze = new CostAnalyze();
 			costAnalyze.setDeptId(dept.getId());
 			costAnalyze.setDeptName(dept.getName());
-			extra = " AND S.dept_out = " + dept.getId() + " AND S.sub_type <> " + SubType.LESS.getVal();
-			costAnalyze.setUseMaterialMoney(getMoney(dbCon, term, extraCond + extra, orderClause));
+			//获取领料金额
+			extra = " AND S.dept_in = " + dept.getId() + " AND S.sub_type = " + SubType.STOCK_IN.getVal();
+			costAnalyze.setPickMaterialMoney(getMoney(dbCon, term, extraCond + extra, orderClause));
+			//退料金额
 			extra = " AND S.dept_out = " + dept.getId() + " AND S.sub_type = " + SubType.STOCK_OUT.getVal();
 			costAnalyze.setStockOutMoney(getMoney(dbCon, term, extraCond + extra, orderClause));
+			//拨出金额
 			extra = " AND S.dept_out = " + dept.getId() + " AND S.sub_type = " + SubType.STOCK_OUT_TRANSFER.getVal();
 			costAnalyze.setStockOutTransferMoney(getMoney(dbCon, term, extraCond + extra, orderClause));
-			extra = " AND S.dept_in = " + dept.getId() + " AND S.sub_type = " + SubType.STOCK_IN.getVal();
-			costAnalyze.setCostMoney(getMoney(dbCon, term, extraCond + extra, orderClause));
+			//成本金额
+			costAnalyze.setCostMoney(costAnalyze.getPickMaterialMoney() - costAnalyze.getStockOutMoney() - costAnalyze.getStockOutTransferMoney());
+			//销售金额
 			String orderFoodHistoryExtra = orderFoodHistory + " AND dept_id = " + dept.getId() ;
 			costAnalyze.setSalesMoney(OrderFoodDao.getSalesMoney(dbCon, term, orderFoodHistoryExtra));
 			

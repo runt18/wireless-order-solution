@@ -232,8 +232,70 @@ public class PrintFuncDao {
 		}
 	}
 	
-	public static void updateFunc(DBCon dbCon, Staff term, int printerId, PrintFunc func) throws SQLException{
-		//TODO
+	public static void updateFunc(DBCon dbCon, Staff term, int printerId, PrintFunc func, int funcId) throws SQLException, BusinessException{
+		String sql;
+		
+		//Check to see whether the printer is exist
+		sql = " SELECT * FROM " + Params.dbName + ".printer WHERE printer_id = " + printerId;
+		dbCon.rs = dbCon.stmt.executeQuery(sql);
+		if(!dbCon.rs.next()){
+			throw new BusinessException(PrintSchemeError.PRINTER_NOT_EXIST);
+		}
+		dbCon.rs.close();
+		
+		sql = "UPDATE " + Params.dbName + ".print_func SET " +
+				" `repeat` = " + func.getRepeat() +
+				" ,type = " + func.getType().getVal() +
+				" WHERE func_id = " +  funcId;
+		
+		dbCon.stmt.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
+		
+		sql = " DELETE FROM " + Params.dbName + ".func_dept WHERE func_id = " + funcId;
+		dbCon.stmt.executeUpdate(sql);
+		
+		sql = " DELETE FROM " + Params.dbName + ".func_kitchen WHERE func_id = " + funcId;
+		dbCon.stmt.executeUpdate(sql);
+		
+		sql = " DELETE FROM " + Params.dbName + ".func_region WHERE func_id = " + funcId;
+		dbCon.stmt.executeUpdate(sql);
+		
+		//Insert the department to this print function
+		if(!func.isDeptAll()){
+			sql = " INSERT INTO " + Params.dbName + ".func_dept" +
+				  "( func_id, dept_id, restaurant_id )" +
+				  " VALUES(" +
+				  funcId + "," +
+				  func.getDepartment().getId() + "," +
+				  term.getRestaurantId() + 
+				  ")";
+			dbCon.stmt.executeUpdate(sql);
+		}
+		
+		//Insert the kitchens to this print function
+		for(Kitchen kitchen : func.getKitchens()){
+			sql = " INSERT INTO " + Params.dbName + ".func_kitchen" +
+				  "( func_id, kitchen_alias, restaurant_id )" +
+				  " VALUES( " +
+				  funcId + "," +
+				  kitchen.getAliasId() + "," +
+				  term.getRestaurantId() + 
+				  ")";
+			dbCon.stmt.executeUpdate(sql);
+		}
+		
+		//Insert the regions to this print function
+		for(Region region : func.getRegions()){
+			sql = " INSERT INTO " + Params.dbName + ".func_region" +
+				  "( func_id, region_id, restaurant_id )" +
+				  " VALUES( " +
+				  funcId + "," +
+				  region.getRegionId() + "," +
+				  term.getRestaurantId() +
+				  ")";
+			dbCon.stmt.executeUpdate(sql);
+		}
+		
+		
 	}
 	
 	/**
