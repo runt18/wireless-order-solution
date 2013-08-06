@@ -430,6 +430,10 @@ var addPrintFanc = new Ext.Window({
 				hideLabel : true,
 				boxLabel : '所有厨房',
 				listeners : {
+					focus : function(){
+						//第一次初始化控件时,解决点击无效
+						Ext.getCmp('allKitchen').enable();
+					},
 					check : function(checkbox, checked){
 						if(checked){
 							Ext.getCmp('allKitchen').disable();
@@ -504,6 +508,9 @@ var addPrintFanc = new Ext.Window({
 				hideLabel : true,
 				boxLabel : '所有区域',
 				listeners : {
+					focus : function(){
+						Ext.getCmp('allRegion').enable();
+					},
 					check : function(checkbox, checked){
 						if(checked){
 							Ext.getCmp('allRegion').disable();
@@ -761,7 +768,8 @@ function printFancOperactionHandler(c){
 		document.getElementsByName('dept')[0].checked = true;
 		document.getElementById('chkAllRegion').checked = true;
 		document.getElementById('chkAllKitchen').checked = true;
-		//Ext.getCmp('chkAllRegion').fireEvent('check', Ext.getCmp('chkAllRegion'), true);
+		Ext.getCmp('chkAllRegion').fireEvent('check', Ext.getCmp('chkAllRegion'), true);
+		Ext.getCmp('chkAllKitchen').fireEvent('check', Ext.getCmp('chkAllKitchen'), true);
 		
 	}else{
 		var allKitchen = document.getElementById('chkAllKitchen');
