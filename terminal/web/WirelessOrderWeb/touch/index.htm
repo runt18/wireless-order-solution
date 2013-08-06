@@ -1,0 +1,98 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>触摸屏点菜端</title>
+
+<link rel="stylesheet" href="./css/scrollbar.css">
+<link rel="stylesheet" href="./css/base.css">
+<link rel="stylesheet" href="./css/tableSelect.css">
+<link rel="stylesheet" href="./css/updateOrder.css">
+<link rel="stylesheet" href="./css/createOrder.css">
+
+<script type="text/javascript" src="../jquery/jquery-1.8.2.min.js"></script>
+<script type="text/javascript" src="./js/index.js"></script>
+
+</head>
+<body>
+
+<div id="divTableSelect" class="content" style="z-index:999;">
+	<input type="button" value="divTableSelect">
+	<input type="button" value="divUpdateOrder" onClick="toggleContentDisplay({type:'show', renderTo:'divUpdateOrder'})">
+	<input type="button" value="divCreateOrder" onClick="toggleContentDisplay({type:'show', renderTo:'divCreateOrder'})">
+</div>
+
+
+<div id="divUpdateOrder" class="content">
+	divUpdateOrder
+	<input type="button" value="hide" onClick="toggleContentDisplay({type:'hide', renderTo:'divUpdateOrder'})">
+</div>
+
+
+<div id="divCreateOrder" class="box-vertical content">
+	<div id="divNorthForCreateOrder" class="box-horizontal" style="margin-right: 2px;">
+    	<div style="width: 218px; margin-right: 2px;">
+    		<div class="button-base" style="line-height: 30px; height: 60px; background: #DAA520; ">
+    			<div>888</div>
+    			<div>一路发</div>
+    		</div>
+    		<div class="button-base" style="line-height: 60px; height: 60px; margin-top: 1px;">
+    			已点菜
+    		</div>
+		</div>
+		<div class="div-full" style="">
+			<div id="divSelectDeptForOrder" class="box-horizontal" style="">
+				<div class="button-base">全部部门</div>
+				<div class="button-base">&nbsp;</div>
+				<div class="button-base">&nbsp;</div>
+				<div class="button-base">&nbsp;</div>
+				<div class="button-base">&nbsp;</div>
+				<div class="button-base">&nbsp;</div>
+			</div>
+			<div id="divSelectKitchenForOrder" class="box-horizontal" style="">
+				<div class="button-base">全部厨房</div>
+				<div class="button-base">&nbsp;</div>
+				<div class="button-base">&nbsp;</div>
+				<div class="button-base">&nbsp;</div>
+				<div class="button-base">&nbsp;</div>
+				<div class="button-base">&nbsp;</div>
+				<div class="button-base">&nbsp;</div>
+				<div class="button-base">&nbsp;</div>
+				<div class="button-base">&nbsp;</div>
+				<div class="button-base">&nbsp;</div>
+				<div class="button-base">&nbsp;</div>
+				<div class="button-base">&nbsp;</div>
+			</div>
+		</div>
+  	</div>
+  	<div id="divCenterForCreateOrde" class="box-horizontal" style="">
+  		<div style="width: 300px; "></div>
+    	<div id="divCFCOHandler" style="">
+	      	<div class="button-base" style="">数量+1</div>
+	      	<div class="button-base">数量-1</div>
+	      	<div class="button-base">删除</div>
+	      	<div class="button-base">口味</div>
+	      	<div class="button-base">催菜</div>
+	      	<div class="button-base">叫起</div>
+    	</div>
+    	<div class="div-full" style=""></div>
+  	</div>
+  	<div id="divDescForCreateOrde" class="box-horizontal" style="">
+  		&nbsp;
+  	</div>
+  	<div id="divSouthForCreateOrde" class="box-horizontal" style="">
+  		<div class="button-base" style="margin-right: 2px;" onClick="toggleContentDisplay({type:'hide', renderTo:'divCreateOrder'})">返回</div>
+  		<div class="button-base" style="margin-right: 2px;">上一页</div>
+  		<div class="button-base" style="margin-right: 2px;">下一页</div>
+  		<div class="div-full">&nbsp;</div>
+  		<div class="button-base" style="margin-left: 2px;">下单</div>
+  		<div class="button-base" style="margin-left: 2px;">搜索</div>
+  		<div class="button-base" style="margin-left: 2px;">上一页</div>
+  		<div class="button-base" style="margin-left: 2px;">下一页</div>
+  	</div>
+</div>
+
+     
+</body>
+</html>
