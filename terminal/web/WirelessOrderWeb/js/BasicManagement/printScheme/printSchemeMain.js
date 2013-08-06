@@ -128,7 +128,6 @@ var addPrintFanc = new Ext.Window({
 	modal : true,
 	width : 650,
 	autoHeight : true,
-	
 	bbar : ['->',{
 		text : '保存',
 		id : 'btnSaveFanc',
@@ -144,20 +143,27 @@ var addPrintFanc = new Ext.Window({
 					break;
 				}
 			}
-			var allKitchen = Ext.getCmp('allKitchen');
+			var allKitchen = Ext.getCmp('chkAllKitchen');
 			var kitchens = '';
-			if(!allKitchen.checked){
-				var kitchen = document.getElementsByName('kitchen');
+			var kitchen = document.getElementsByName('kitchen');
+			if(allKitchen.checked){
+				//添加所有厨房
 				for ( var i = 0; i < kitchen.length; i++) {
-					
+					if(kitchens == ''){
+						kitchens += kitchen[i].value;
+					}else{
+						kitchens += (',' + kitchen[i].value);
+					}
+				}
+
+			}else{
+				for ( var i = 0; i < kitchen.length; i++) {
 					if(kitchen[i].checked && kitchens == ''){
 						kitchens += kitchen[i].value;
 					}else if(kitchen[i].checked && kitchens != ''){
 						kitchens += (',' + kitchen[i].value);
 					}
 				}
-			}else{
-				//添加所有厨房
 				
 			}
 			
@@ -169,11 +175,12 @@ var addPrintFanc = new Ext.Window({
 				}
 			}
 
-			var allRegion = Ext.getCmp('allRegion');
+			var allRegion = Ext.getCmp('chkAllRegion');
 			
 			var regions = '';
+			var region = document.getElementsByName('region');
 			if(!allRegion.checked){
-				var region = document.getElementsByName('region');
+				
 				for ( var i = 0; i < region.length; i++) {
 					if(region[i].checked && regions == ''){
 						regions += region[i].value;
@@ -183,13 +190,23 @@ var addPrintFanc = new Ext.Window({
 				}
 			}else{
 				//添加所有区域
+				for ( var i = 0; i < region.length; i++) {
+					if(regions == ''){
+						regions += region[i].value;
+					}else{
+						regions += (',' + region[i].value);
+					}
+				}
 			}
 			var dataSource = '';
+			var funcId = '';
 			if(addPrintFanc.operationType == 'insert'){
 				
 				dataSource = 'insert';
 			}
 			else if(addPrintFanc.operationType == 'update'){
+				var ss = Ext.getCmp('grid').getSelectionModel().getSelected();
+				funcId = ss.data.printFuncId;
 				dataSource = 'update';
 			}
 			else return;
@@ -207,6 +224,7 @@ var addPrintFanc = new Ext.Window({
 					dept : depts,
 					regions : regions,
 					printerId : sn.attributes.printerId,
+					funcId : funcId,
 					dataSource : dataSource
 				},
 				success : function(res, opt){
@@ -251,7 +269,12 @@ var addPrintFanc = new Ext.Window({
 				id : 'txtRepeat',
 				fieldLabel : '打印数',
 				width : 100,
-				allowBlank : false
+				allowBlank : false,
+				listeners : {
+					focus : function(thiz){
+						thiz.focus(true, 100);
+					}
+				}
 			}]
 		},         
 		{
@@ -263,7 +286,7 @@ var addPrintFanc = new Ext.Window({
 			items : [{
 				xtype : 'radio',
 				name : 'pType',
-				id : 'radioXia',
+				id : 'radioOrder',
 				inputValue : 1,
 				hideLabel : true,
 				boxLabel : '下单',
@@ -282,7 +305,6 @@ var addPrintFanc = new Ext.Window({
 				inputValue : 2,
 				hideLabel : true,
 				boxLabel : '下单详细',
-				//checked : true,
 				listeners : {
 					check  : function(thiz, checked){
 						if(checked){
@@ -403,6 +425,7 @@ var addPrintFanc = new Ext.Window({
 			items : [{
 				xtype : 'checkbox',
 				name : 'kitchens',
+				id : 'chkAllKitchen',
 				inputValue : 2,
 				hideLabel : true,
 				boxLabel : '所有厨房',
@@ -411,7 +434,14 @@ var addPrintFanc = new Ext.Window({
 						if(checked){
 							Ext.getCmp('allKitchen').disable();
 						}else{
+							var kitchen = document.getElementsByName('kitchen');
+							for ( var i = 0; i < kitchen.length; i++) {
+								if(kitchen[i].checked){
+									kitchen[i].checked = false;
+								}
+							}
 							Ext.getCmp('allKitchen').enable();
+							
 						}
 						
 					}
@@ -469,6 +499,7 @@ var addPrintFanc = new Ext.Window({
 			items : [{
 				xtype : 'checkbox',
 				name : 'pType',
+				id : 'chkAllRegion',
 				inputValue : 2,
 				hideLabel : true,
 				boxLabel : '所有区域',
@@ -525,7 +556,7 @@ var printerWin = new Ext.Window({
 	width : 260,
 	bbar : ['->',{
 		text : '保存',
-		id : 'btnSaveFanc',
+		id : 'btnSavePrinter',
 		iconCls : 'btn_save',
 		handler : function(e){
 			var printerName = Ext.getCmp('txtPrinterName');
@@ -592,73 +623,57 @@ var printerWin = new Ext.Window({
 		}
 	}],
 	items : [{
-		layout : 'column',
-		id : 'printer',
+		xtype : 'form',
+		labelAlign : 'left',
+		labelWidth : 70,
 		frame : true,
-		defaults : {
-			columnWidth : .25,
-			layout : 'form',
-			labelWidth : 70,
-		},
+		defaultType : 'textfield',
 		items : [{
-			columnWidth : 1,
-			items : [{
-				xtype : 'textfield',
-				id : 'txtPrinterName',
-				fieldLabel : '打印机',
-				width : 130,
-				allowBlank : false
-			}]
+			id : 'txtPrinterName',
+			fieldLabel : '打印机',
+			width : 130,
+			allowBlank : false
 		},{
-			columnWidth : 1,
-			items : [{
-				xtype : 'textfield',
-				id : 'txtPrinterAlias',
-				fieldLabel : '别名',
-				width : 130,
-				allowBlank : false
-			}]
+			id : 'txtPrinterAlias',
+			fieldLabel : '别名',
+			width : 130,
+			allowBlank : false
 		},{
+			xtype : 'fieldset',
+			title : '机型',
+			autoHeight : true,
+			defaultType : 'radio',
+			hideLabels : true,
 			items : [{
-				xtype : 'tbtext',
-				text : '机型:'
-			}]
-		},{
-			items : [{
-				xtype : 'radio',
 				name : 'pStyle',
 				inputValue : 1,
+				id : 'rdo58mm',
 				checked : true,
 				hideLabel : true,
-				boxLabel : '58mm&nbsp;',
-			}]
-
-		},{
-			items : [{
+				boxLabel : '58mm'
+				
+			},{
 				xtype : 'radio',
 				name : 'pStyle',
 				inputValue : 2,
 				hideLabel : true,
-				boxLabel : '80mm',
+				boxLabel : '80mm'
 			}]
-		},{columnWidth : 1},{
-			items : [{
-				xtype : 'tbtext',
-				text : '状态:'
-			}]
+			
 		},{
+			xtype : 'fieldset',
+			title : '状态',
+			autoHeight : true,
+			defaultType : 'radio',
+			hideLabels : true,
 			items : [{
-				xtype : 'radio',
 				id : 'enabled',
 				name : 'isEnabled',
 				inputValue : 'true',
 				hideLabel : true,
 				checked : true,
 				boxLabel : '可用',
-			}]
-		},{
-			items : [{
-				xtype : 'radio',
+			},{
 				id : 'unEnabled',
 				name : 'isEnabled',
 				inputValue : 'false',
@@ -721,28 +736,54 @@ function printFancOperactionHandler(c){
 	var dept = document.getElementsByName('dept');
 	var region = document.getElementsByName('region');
 	var repeat = Ext.getCmp('txtRepeat');
+	//区域重置
+	for ( var i = 0; i < region.length; i++) {
+		if(region[i].checked){
+			region[i].checked = false;
+		}
+	}
+	//厨房重置
+	for ( var i = 0; i < kitchen.length; i++) {
+		if(kitchen[i].checked){
+			kitchen[i].checked = false;
+		}
+	}
+	addPrintFanc.show();
+	addPrintFanc.center();
+	var btnSave = Ext.getCmp('btnSaveFanc');
 	if(c.type == 'insert'){
 		addPrintFanc.setTitle('添加方案');
 		addPrintFanc.operationType = c.type;
-		//addPrintFanc.center();
+		Ext.getCmp('txtRepeat').setValue(1);
+		btnSave.show();
+		document.getElementById('radioOrder').checked = true;
+		Ext.getCmp('radioOrder').fireEvent('check', Ext.getCmp('radioOrder'), true);
+		document.getElementsByName('dept')[0].checked = true;
+		document.getElementById('chkAllRegion').checked = true;
+		document.getElementById('chkAllKitchen').checked = true;
+		//Ext.getCmp('chkAllRegion').fireEvent('check', Ext.getCmp('chkAllRegion'), true);
 		
-		addPrintFanc.show();
-		//Ext.get('radioXia').checked = true;
-		document.getElementById('radioXia').checked = true;
-		Ext.getCmp('radioXia').fireEvent('check', Ext.getCmp('radioXia'), true);
-		
-		//addPrintFanc.center();
 	}else{
+		var allKitchen = document.getElementById('chkAllKitchen');
+		if(allKitchen.checked){
+			allKitchen.checked = false;
+		}
 		var ss = Ext.getCmp('grid').getSelectionModel().getSelected();
+		
 		if(ss == null){
 			Ext.MessageBox.alert('提示', '请选中一个方案再进行操作.');
 			return;
 		}
-		addPrintFanc.setTitle('修改方案');
+		if(c.type == 'update'){
+			addPrintFanc.setTitle('修改方案');
+			btnSave.show();
+		}else{
+			addPrintFanc.setTitle('查看方案');
+			btnSave.hide();
+		}
+		
 		addPrintFanc.operationType = c.type;
-		//addPrintFanc.center();
-		addPrintFanc.show();
-		addPrintFanc.center();
+
 		//功能选中
 		var pTypeValue = ss.data.pTypeValue;
 		for ( var i = 0; i < pType.length; i++) {
@@ -751,6 +792,9 @@ function printFancOperactionHandler(c){
 				pType[i].click();
 			}
 		}
+		
+
+		
 		//厨房选中
 		var kitchenValues = ss.data.kitchenValues.split(",");
 		for ( var i = 0; i < kitchen.length; i++) {
@@ -768,6 +812,8 @@ function printFancOperactionHandler(c){
 				dept[i].click();
 			}
 		}
+		
+
 		
 		//区域选中
 		var regionValues = ss.data.regionValues.split(",");
@@ -790,11 +836,16 @@ function operatePrinterHandler(c){
 	}
 	if(c.otype == 'insert'){
 		printerWin.setTitle('添加打印机');
+		
 		Ext.getCmp('txtPrinterName').setValue();
+		Ext.getCmp('txtPrinterName').clearInvalid();
 		Ext.getCmp('txtPrinterAlias').setValue();
-		Ext.getCmp('enabled').checked = true;
+		Ext.getCmp('txtPrinterAlias').clearInvalid();
+
 		printerWin.operationType = c.otype;
 		printerWin.show();
+		document.getElementById('enabled').checked = true;
+		document.getElementById('rdo58mm').checked = true;
 	}else if(c.otype == 'update'){
 		var sn = printerTree.getSelectionModel().getSelectedNode();
 		if(!sn){
@@ -813,11 +864,10 @@ function operatePrinterHandler(c){
 		}else{
 			styles[1].checked = true;
 		}
-		
 		if(sn.attributes.isEnabled ){
-			Ext.getCmp('enabled').checked = true;
+			document.getElementById('enabled').checked = true;
 		}else{
-			Ext.getCmp('unEnabled').checked = true;
+			document.getElementById('unEnabled').checked = true;
 		}
 		
 		
@@ -964,13 +1014,23 @@ Ext.onReady(function(){
 		
 	});
 	
+	function tooLength(v){
+		if(v.length > 25){
+			var after = v.substring(0,25);
+			return after + '....';
+		}else{
+			return v;
+		}
+	}
+	
+	
 	var cm = new Ext.grid.ColumnModel([
 		new Ext.grid.RowNumberer(),
 		{header : '编号', dataIndex : 'printFuncId', width : 80},
 		{header : '功能', dataIndex : 'pTypeText', width : 100},
-		{header : '厨房', dataIndex : 'kitchens', width : 300},
+		{header : '厨房', dataIndex : 'kitchens', width : 300, renderer : tooLength},
 		{header : '部门', dataIndex : 'dept', width : 100},
-		{header : '区域', dataIndex : 'regions', width : 300},
+		{header : '区域', dataIndex : 'regions', width : 300, renderer : tooLength},
 		{header : '打印数', dataIndex : 'repeat', width : 80},
 		{header : '操作',dataIndex : 'opt', renderer : opt, width : 100}
 	]);
@@ -1002,7 +1062,12 @@ Ext.onReady(function(){
 		border : true,
 		frame : true,
 		cm : cm,
-		store : ds
+		store : ds,
+		listeners : {
+			dblclick  : function(){
+				printFancOperactionHandler({type : 'query'});
+			}
+		}
 	});
 	
 	var printPanel = new Ext.Panel({
@@ -1037,7 +1102,7 @@ Ext.onReady(function(){
 		})
 		
 	});
-	
+	getOperatorName(pin, "../../");
 	new Ext.Viewport({
 		layout : 'border',
 		id : 'viewport',
@@ -1045,7 +1110,7 @@ Ext.onReady(function(){
 		[{
 			region : 'north',
 			bodyStyle : 'background-color:#DFE8F6;',
-			html : '<h4 style="padding:10px;font-size:150%;float:left;">无线点餐网页终端</h4>',
+			html : "<h4 style='padding:10px;font-size:150%;float:left;'>无线点餐网页终端</h4><div id='optName' class='optName'></div>",
 			height : 50,
 			border : false,
 			margins : '0 0 0 0'
