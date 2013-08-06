@@ -464,7 +464,7 @@ var addPrintFanc = new Ext.Window({
 			layout : 'column',
 			id : 'allKitchen',
 			defaults : {
-				columnWidth : .1666666,
+				columnWidth : .16,
 				layout : 'form',
 				labelWidth : 70,
 			}
