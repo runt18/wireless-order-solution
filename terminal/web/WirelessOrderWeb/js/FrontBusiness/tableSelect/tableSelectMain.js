@@ -225,6 +225,7 @@ var btnOrderDetail = new Ext.ux.ImageButton({
 					if(jr.root.length > 0){
 						store.add(new OrderFoodRecord({
 							orderDateFormat : '汇总',
+							unitPrice : jr.other.sum.totalPrice,
 							count : jr.other.sum.totalCount
 						}));
 					}
@@ -234,10 +235,11 @@ var btnOrderDetail = new Ext.ux.ImageButton({
 					sumRow.style.color = 'green';
 					gv.getCell(store.getCount()-1, 1).style.fontSize = '15px';
 					gv.getCell(store.getCount()-1, 1).style.fontWeight = 'bold';
+					gv.getCell(store.getCount()-1, 3).style.fontSize = '15px';
+					gv.getCell(store.getCount()-1, 3).style.fontWeight = 'bold';
 					gv.getCell(store.getCount()-1, 4).style.fontSize = '15px';
 					gv.getCell(store.getCount()-1, 4).style.fontWeight = 'bold';
 					gv.getCell(store.getCount()-1, 2).innerHTML = '';
-					gv.getCell(store.getCount()-1, 3).innerHTML = '';
 					gv.getCell(store.getCount()-1, 5).innerHTML = '';
 					gv.getCell(store.getCount()-1, 6).innerHTML = '';
 					gv.getCell(store.getCount()-1, 7).innerHTML = '';
