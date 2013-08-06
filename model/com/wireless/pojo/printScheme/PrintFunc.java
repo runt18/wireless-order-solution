@@ -80,6 +80,9 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 		}
 	}
 	
+	
+	
+	
 	public static class DetailBuilder{
 		private int mRepeat = 1;
 		private List<Kitchen> mKitchens = SortedList.newInstance();
@@ -186,6 +189,7 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 		}
 		
 	}
+	
 	
 	
 	private PrintFunc(SummaryBuilder builder){

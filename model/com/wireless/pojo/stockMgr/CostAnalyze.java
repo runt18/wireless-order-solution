@@ -13,7 +13,8 @@ public class CostAnalyze implements Jsonable{
 	private int deptId;
 	private String deptName;
 	private float primeMoney;
-	private float useMaterialMoney;
+	//private float useMaterialMoney;
+	private float pickMaterialMoney;
 	private float stockOutMoney;
 	private float stockOutTransferMoney;
 	private float endMoney;
@@ -40,12 +41,13 @@ public class CostAnalyze implements Jsonable{
 		this.deptName = deptName;
 	}
 
-	public float getUseMaterialMoney() {
-		return useMaterialMoney;
+
+	public float getPickMaterialMoney() {
+		return pickMaterialMoney;
 	}
 
-	public void setUseMaterialMoney(float useMaterialMoney) {
-		this.useMaterialMoney = useMaterialMoney;
+	public void setPickMaterialMoney(float pickMaterialMoney) {
+		this.pickMaterialMoney = pickMaterialMoney;
 	}
 
 	public float getPrimeMoney() {
@@ -144,7 +146,7 @@ public class CostAnalyze implements Jsonable{
 		jm.put("deptId", this.getDeptId());
 		jm.put("deptName", this.getDeptName());
 		jm.put("primeMoney", this.getPrimeMoney());
-		jm.put("useMaterialMoney", this.getUseMaterialMoney());
+		jm.put("useMaterialMoney", this.getPickMaterialMoney());
 		jm.put("stockOutMoney", this.getStockOutMoney());
 		jm.put("stockOutTransferMoney", this.getStockOutTransferMoney());
 		jm.put("endMoney", this.getEndMoney());
