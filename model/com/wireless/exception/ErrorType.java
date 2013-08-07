@@ -18,6 +18,7 @@ public enum ErrorType {
 	 * 	SUPPLIER : 7700 - 7749
 	 *  PRINT_SCHEME : 7650 - 7699
 	 *  STAFF : 7600 - 7649 
+	 *  DEVICE : 7559 - 7599 
 	 */
 	UNKNOWN(1, "unknown"),
 	PROTOCOL(2, "protocol"),
@@ -35,7 +36,8 @@ public enum ErrorType {
 	STOCK(14, "stock"),
 	SUPPLIER(15, "supplier"),
 	PRINT_SCHEME(16, "print scheme"),
-	STAFF(17, "staff");
+	STAFF(17, "staff"),
+	DEVICE(18, "device");
 	
 	private final String desc;
 	
