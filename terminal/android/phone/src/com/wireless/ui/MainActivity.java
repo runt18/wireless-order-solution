@@ -5,6 +5,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -40,12 +41,10 @@ import android.widget.Toast;
 
 import com.wireless.common.Params;
 import com.wireless.common.WirelessOrder;
-import com.wireless.pack.req.PinGen;
 import com.wireless.pojo.menuMgr.FoodMenu;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.restaurantMgr.Restaurant;
-import com.wireless.protocol.StaffTerminal;
-import com.wireless.protocol.Terminal;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.ui.dialog.AskTableDialog;
 import com.wireless.ui.dialog.AskTableDialog.OnTableSelectedListener;
 
@@ -62,7 +61,7 @@ public class MainActivity extends FragmentActivity implements OnTableSelectedLis
 	private static final int REDRAW_RESTAURANT = 2;
 	private static final int REDRAW_STAFF_LOGIN = 3;
 	
-	private StaffTerminal _staff;
+	private Staff _staffLogin;
 
 	/**
 	 * 请求菜谱和餐厅信息后，更新到相关的界面控件
@@ -96,9 +95,9 @@ public class MainActivity extends FragmentActivity implements OnTableSelectedLis
 					billBoard.setText(WirelessOrder.restaurant.getInfo().replaceAll("\n", ""));
 					
 					TextView userName = (TextView)mActivity.get().findViewById(R.id.username);
-					if(mActivity.get()._staff != null){
-						if(mActivity.get()._staff.name != null){
-							userName.setText(WirelessOrder.restaurant.getName() + "(" + mActivity.get()._staff.name + ")");							
+					if(mActivity.get()._staffLogin != null){
+						if(mActivity.get()._staffLogin.getName().length() != 0){
+							userName.setText(WirelessOrder.restaurant.getName() + "(" + mActivity.get()._staffLogin.getName() + ")");							
 						}else{
 							userName.setText(WirelessOrder.restaurant.getName());							
 						}
@@ -165,7 +164,7 @@ public class MainActivity extends FragmentActivity implements OnTableSelectedLis
 				 * "功能设置", "网络设置", "注销", "关于" 在任何情况都是可以使用的
 				 */
 				if(position != 4 && position != 5 && position != 7 && position != 8){
-					if(WirelessOrder.staffs == null){
+					if(WirelessOrder.staffs.isEmpty()){
 						Toast.makeText(MainActivity.this, "没有查询到任何的员工信息，请在管理后台先添加员工信息", Toast.LENGTH_SHORT).show();
 						return;
 					}else if(WirelessOrder.foodMenu == null){
@@ -222,7 +221,7 @@ public class MainActivity extends FragmentActivity implements OnTableSelectedLis
 
 				case 7:
 					//注销
-					new ReadPinTask(false).execute();
+					new QueryStaffTask(false).execute();
 					break;
 					
 				case 8:
@@ -241,11 +240,11 @@ public class MainActivity extends FragmentActivity implements OnTableSelectedLis
 		}catch(NameNotFoundException e) {
 			topTitle.setText("e点通");
 		}
-		
-		if(WirelessOrder.staffs != null){
+		 
+		if(!WirelessOrder.staffs.isEmpty()){
 			SharedPreferences sharedPreferences = getSharedPreferences(Params.PREFS_NAME, Context.MODE_PRIVATE);
-			long pin = sharedPreferences.getLong(Params.STAFF_PIN, Params.DEF_STAFF_PIN);
-			if(pin == Params.DEF_STAFF_PIN){
+			long loginStaffId = sharedPreferences.getLong(Params.STAFF_LOGIN_ID, Params.DEF_STAFF_LOGIN_ID);
+			if(loginStaffId == Params.DEF_STAFF_LOGIN_ID){
 				/**
 				 * Show the login dialog if logout before.  
 				 */
@@ -255,23 +254,14 @@ public class MainActivity extends FragmentActivity implements OnTableSelectedLis
 				 * Directly login with the previous staff account if user does NOT logout before.
 				 * Otherwise show the login dialog. 
 				 */
-				_staff = null;
-				for(int i = 0; i < WirelessOrder.staffs.length; i++){
-					if(WirelessOrder.staffs[i].pin == pin){
-						_staff = WirelessOrder.staffs[i];
+				_staffLogin = null;
+				for(Staff staff : WirelessOrder.staffs){
+					if(staff.getId() == loginStaffId){
+						_staffLogin = staff;
 					}
 				}
-				if(_staff != null){
-					WirelessOrder.pinGen = new PinGen(){
-						@Override
-						public long getDeviceId() {
-							return _staff.pin;
-						}
-						@Override
-						public short getDeviceType() {
-							return Terminal.MODEL_STAFF;
-						}
-					};
+				if(_staffLogin != null){
+					WirelessOrder.loginStaff = _staffLogin;
 				}else{
 					showDialog(DIALOG_STAFF_LOGIN);
 				}
@@ -338,7 +328,7 @@ public class MainActivity extends FragmentActivity implements OnTableSelectedLis
 		if(requestCode == NETWORK_SET ){
 		     if(resultCode == RESULT_OK){
 		    	 //重新请求员工信息并更新菜谱
-		    	 new ReadPinTask(true).execute();
+		    	 new QueryStaffTask(true).execute();
 		     }
 		}
 		super.onActivityResult(requestCode, resultCode, data);
@@ -352,7 +342,7 @@ public class MainActivity extends FragmentActivity implements OnTableSelectedLis
 		private ProgressDialog _progDialog;
 
 		QueryMenuTask() {
-			super(WirelessOrder.pinGen);
+			super(WirelessOrder.loginStaff);
 		}
 		
 		/**
@@ -403,7 +393,7 @@ public class MainActivity extends FragmentActivity implements OnTableSelectedLis
 		private ProgressDialog _progDialog;
 		
 		QueryRestaurantTask(){
-			super(WirelessOrder.pinGen);
+			super(WirelessOrder.loginStaff);
 		}
 		/**
 		 * 在执行请求餐厅请求信息前显示提示信息
@@ -445,67 +435,6 @@ public class MainActivity extends FragmentActivity implements OnTableSelectedLis
 	}
 	
 	/**
-	 * 从SDCard中读取PIN的验证信息
-	 */
-	private class ReadPinTask extends com.wireless.lib.task.ReadPinTask {
-
-		private final boolean _isMenuUpdate;
-		
-		private ProgressDialog _progDialog;
-		
-		ReadPinTask(boolean isMenuUpdate){
-			_isMenuUpdate = isMenuUpdate;
-		}
-		
-		/**
-		 * 在读取Pin信息前显示提示信息
-		 */
-		@Override
-		protected void onPreExecute() {
-			_progDialog = ProgressDialog.show(MainActivity.this, "", "正在读取验证PIN码...请稍候", true);
-		}
-
-
-		@Override
-		protected void onPostExecute(Long pin) {
-			
-			_progDialog.dismiss();
-			
-			if (mErrMsg != null) {
-				new AlertDialog.Builder(MainActivity.this)
-					.setTitle("提示")
-					.setMessage(mErrMsg)
-					.setPositiveButton("确定", new DialogInterface.OnClickListener() {
-						@Override
-						public void onClick(DialogInterface dialog,	int id) {
-							finish();
-						}
-					}).show();
-
-			} else {
-				
-				final long pinVal = pin;
-				
-				WirelessOrder.pinGen = new PinGen(){
-
-					@Override
-					public long getDeviceId() {
-						return pinVal;
-					}
-
-					@Override
-					public short getDeviceType() {
-						return Terminal.MODEL_ANDROID;
-					}
-					
-				};
-				
-				new QueryStaffTask(_isMenuUpdate).execute();
-			}
-		}
-	}
-	
-	/**
 	 * 请求查询员工信息 
 	 */
 	private class QueryStaffTask extends com.wireless.lib.task.QueryStaffTask{
@@ -515,7 +444,7 @@ public class MainActivity extends FragmentActivity implements OnTableSelectedLis
 		private final boolean _isMenuUpdate;
 		
 		QueryStaffTask(boolean isMenuUpdate){
-			super(WirelessOrder.pinGen);
+			super(MainActivity.this);
 			_isMenuUpdate = isMenuUpdate;
 		}
 		
@@ -532,10 +461,13 @@ public class MainActivity extends FragmentActivity implements OnTableSelectedLis
 		 * 如果员工信息请求成功，则显示登录Dialog。
 		 */
 		@Override
-		protected void onPostExecute(StaffTerminal[] staffs){
+		protected void onPostExecute(List<Staff> staffs){
 			//make the progress dialog disappeared
 			_progDialog.dismiss();		
 			_handler.sendEmptyMessage(REDRAW_STAFF_LOGIN);
+			
+			WirelessOrder.staffs = staffs;
+
 			/**
 			 * Prompt user message if any error occurred,
 			 * otherwise show the login dialog
@@ -549,9 +481,7 @@ public class MainActivity extends FragmentActivity implements OnTableSelectedLis
 				
 			}else{
 				
-				WirelessOrder.staffs = staffs;
-				
-				if(WirelessOrder.staffs.length == 0){
+				if(WirelessOrder.staffs.isEmpty()){
 					new AlertDialog.Builder(MainActivity.this)
 								   .setTitle("提示")
 					               .setMessage("没有查询到任何的员工信息，请在管理后台先添加员工信息")
@@ -560,7 +490,7 @@ public class MainActivity extends FragmentActivity implements OnTableSelectedLis
 					
 				}else{
 					Editor editor = getSharedPreferences(Params.PREFS_NAME, Context.MODE_PRIVATE).edit();//获取编辑器
-					editor.putLong(Params.STAFF_PIN, Params.DEF_STAFF_PIN);
+					editor.putLong(Params.STAFF_LOGIN_ID, Params.DEF_STAFF_LOGIN_ID);
 					editor.commit();
 					showDialog(DIALOG_STAFF_LOGIN);
 					if(_isMenuUpdate){
@@ -632,8 +562,8 @@ public class MainActivity extends FragmentActivity implements OnTableSelectedLis
 			staffLstView.setOnItemClickListener(new OnItemClickListener() {
 				@Override
 				public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-					_staff = WirelessOrder.staffs[position];
-					staffTxtView.setText(_staff.name);
+					_staffLogin = WirelessOrder.staffs.get(position);
+					staffTxtView.setText(_staffLogin.getName());
 				   _popupWindow.dismiss();
 				}
 			});
@@ -656,24 +586,15 @@ public class MainActivity extends FragmentActivity implements OnTableSelectedLis
 						if(staffTxtView.getText().toString().equals("")){
 							errTxtView.setText("账号不能为空");
 							
-						}else if(_staff.pwd.equals(toHexString(digester.digest()))){
+						}else if(_staffLogin.getPwd().equals(toHexString(digester.digest()))){
 							//保存staff pin到文件里面
 							Editor editor = getSharedPreferences(Params.PREFS_NAME, Context.MODE_PRIVATE).edit();//获取编辑器
-							editor.putLong(Params.STAFF_PIN, _staff.pin);
+							editor.putLong(Params.STAFF_LOGIN_ID, _staffLogin.getId());
 							//提交修改
 							editor.commit();	
 							_handler.sendEmptyMessage(REDRAW_RESTAURANT);
 							//set the pin generator according to the staff login
-							WirelessOrder.pinGen = new PinGen(){
-								@Override
-								public long getDeviceId() {
-									return _staff.pin;
-								}
-								@Override
-								public short getDeviceType() {
-									return Terminal.MODEL_STAFF;
-								}
-							};
+							WirelessOrder.loginStaff = _staffLogin;
 							dismiss();
 							
 						}else{		
@@ -734,7 +655,7 @@ public class MainActivity extends FragmentActivity implements OnTableSelectedLis
 			
 			@Override
 			public int getCount() {			
-				return WirelessOrder.staffs.length;
+				return WirelessOrder.staffs.size();
 			}
 
 			@Override
@@ -751,9 +672,9 @@ public class MainActivity extends FragmentActivity implements OnTableSelectedLis
 			public View getView(int position, View convertView, ViewGroup parent) {
 				if(convertView == null){
 					convertView = LayoutInflater.from(MainActivity.this).inflate(R.layout.orderpopuwindowitem, null);
-					((TextView)convertView.findViewById(R.id.popuwindowfoodname)).setText(WirelessOrder.staffs[position].name);
+					((TextView)convertView.findViewById(R.id.popuwindowfoodname)).setText(WirelessOrder.staffs.get(position).getName());
 				}else{
-					((TextView)convertView.findViewById(R.id.popuwindowfoodname)).setText(WirelessOrder.staffs[position].name);
+					((TextView)convertView.findViewById(R.id.popuwindowfoodname)).setText(WirelessOrder.staffs.get(position).getName());
 				}				
 				return convertView;
 			}			

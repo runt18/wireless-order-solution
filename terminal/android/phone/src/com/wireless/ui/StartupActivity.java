@@ -1,5 +1,7 @@
 package com.wireless.ui;
 
+import java.util.List;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -16,13 +18,11 @@ import android.widget.TextView;
 import com.wireless.common.Params;
 import com.wireless.common.WirelessOrder;
 import com.wireless.lib.task.CheckVersionTask;
-import com.wireless.pack.req.PinGen;
 import com.wireless.pojo.menuMgr.FoodMenu;
 import com.wireless.pojo.regionMgr.Region;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.restaurantMgr.Restaurant;
-import com.wireless.protocol.StaffTerminal;
-import com.wireless.protocol.Terminal;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.sccon.ServerConnector;
 
 public class StartupActivity extends Activity {
@@ -52,24 +52,29 @@ public class StartupActivity extends Activity {
 
 		} else {
 			ServerConnector.instance().setNetAddr(sharedPrefs.getString(Params.IP_ADDR,	Params.DEF_IP_ADDR));
-			ServerConnector.instance().setNetPort(sharedPrefs.getInt(Params.IP_PORT, Params.DEF_IP_PORT));
-			// ServerConnector.instance().setNetAPN(_netapn);
-			// ServerConnector.instance().setNetUser(_username);
-			// ServerConnector.instance().setNetPwd(_password);
-			// ServerConnector.instance().setTimeout(Integer.parseInt(_timeout));
-			// ServerConnector.instance().setConnType(Integer.parseInt(_printmethod));
+			ServerConnector.instance().setNetPort(sharedPrefs.getInt(Params.IP_PORT, Params.DEF_IP_PORT)); 
 		}
 
 		setContentView(R.layout.enter);
 		_msgTxtView = (TextView) findViewById(R.id.myTextView);
+
+		//FIXME
+		new MatchPinTask(StartupActivity.this).execute();
+
 	}
 
 	@Override
 	protected void onStart() {
 		super.onStart();
 		if (isNetworkAvail()) {
-			// new CheckVersion().execute();
-			new ReadPinTask().execute();
+
+			new com.wireless.lib.task.CheckVersionTask(StartupActivity.this, CheckVersionTask.PHONE){
+				@Override
+				public void onCheckVersionPass() {
+					new QueryStaffTask().execute();
+				}					
+			}.execute();
+			
 		} else {
 			showNetSetting();
 		}
@@ -137,18 +142,17 @@ public class StartupActivity extends Activity {
 		}
 
 		QueryStaffTask(){
-			super(WirelessOrder.pinGen);
+			super(StartupActivity.this);
 		}
 		
 		/**
 		 * 根据返回的error message判断，如果发错异常则提示用户， 如果员工信息请求成功，则继续进行请求菜谱信息的操作。
 		 */
 		@Override
-		protected void onPostExecute(StaffTerminal[] staffs) {
-			// make the progress dialog disappeared
-			// _progDialog.dismiss();
-			// notify the main activity to redraw the food menu
-			// _handler.sendEmptyMessage(REDRAW_FOOD_MENU);
+		protected void onPostExecute(List<Staff> staffs) {
+			
+			WirelessOrder.staffs = staffs;
+			
 			/**
 			 * Prompt user message if any error occurred, otherwise continue to
 			 * query restaurant info.
@@ -170,9 +174,8 @@ public class StartupActivity extends Activity {
 
 			} else {
 				
-				WirelessOrder.staffs = staffs;
 				
-				if (WirelessOrder.staffs.length == 0) {
+				if (WirelessOrder.staffs.isEmpty()) {
 					new AlertDialog.Builder(StartupActivity.this)
 						.setTitle("提示")
 						.setMessage("没有查询到任何的员工信息，请先在管理后台添加员工信息")
@@ -185,6 +188,8 @@ public class StartupActivity extends Activity {
 								}})
 						.show();
 				} else {
+					
+					WirelessOrder.loginStaff = staffs.get(0);
 					new QueryMenuTask().execute();
 				}
 			}
@@ -205,7 +210,7 @@ public class StartupActivity extends Activity {
 		}
 
 		QueryMenuTask(){
-			super(WirelessOrder.pinGen);
+			super(WirelessOrder.loginStaff);
 		}
 
 		/**
@@ -255,7 +260,7 @@ public class StartupActivity extends Activity {
 		}
 		
 		QueryRegionTask(){
-			super(WirelessOrder.pinGen);
+			super(WirelessOrder.loginStaff);
 		}
 	
 		/**
@@ -301,7 +306,7 @@ public class StartupActivity extends Activity {
 		}
 		
 		QueryTableTask(){
-			super(WirelessOrder.pinGen);
+			super(WirelessOrder.loginStaff);
 		}
 		
 		/**
@@ -348,7 +353,7 @@ public class StartupActivity extends Activity {
 		}
 
 		QueryRestaurantTask(){
-			super(WirelessOrder.pinGen);
+			super(WirelessOrder.loginStaff);
 		}
 		
 		/**
@@ -385,8 +390,12 @@ public class StartupActivity extends Activity {
 	/**
 	 * 从SDCard中读取PIN的验证信息
 	 */
-	private class ReadPinTask extends com.wireless.lib.task.ReadPinTask {
+	private class MatchPinTask extends com.wireless.lib.task.MatchPinTask {
 
+		MatchPinTask(Context context){
+			super(context);
+		}
+		
 		/**
 		 * 在读取Pin信息前显示提示信息
 		 */
@@ -397,7 +406,7 @@ public class StartupActivity extends Activity {
 
 
 		@Override
-		protected void onPostExecute(Long pin) {
+		protected void onPostExecute(Void result) {
 			if (mErrMsg != null) {
 				new AlertDialog.Builder(StartupActivity.this)
 					.setTitle("提示")
@@ -411,28 +420,12 @@ public class StartupActivity extends Activity {
 
 			} else {
 				
-				final long pinVal = pin;
-				
-				WirelessOrder.pinGen = new PinGen(){
-
-					@Override
-					public long getDeviceId() {
-						return pinVal;
-					}
-
-					@Override
-					public short getDeviceType() {
-						return Terminal.MODEL_ANDROID;
-					}
-					
-				};
-				
-				new com.wireless.lib.task.CheckVersionTask(WirelessOrder.pinGen, StartupActivity.this, CheckVersionTask.PHONE){
-					@Override
-					public void onCheckVersionPass() {
-						new QueryStaffTask().execute();
-					}					
-				}.execute();
+//				new com.wireless.lib.task.CheckVersionTask(StartupActivity.this, CheckVersionTask.PHONE){
+//					@Override
+//					public void onCheckVersionPass() {
+//						new QueryStaffTask().execute();
+//					}					
+//				}.execute();
 			}
 		}
 	}

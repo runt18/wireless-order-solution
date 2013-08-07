@@ -19,8 +19,8 @@ public final class Params {
 	public final static String USER_NAME = "UserName";
 	//The name to password
 	public final static String PWD = "Password";
-	//The pin to login staff
-	public final static String STAFF_PIN = "StaffPin";
+	//The id to staff has login before
+	public final static String STAFF_LOGIN_ID = "StaffPin";
 	//The last pick food category
 	public final static String LAST_PICK_CATE = "LastPickCate";
 	
@@ -39,12 +39,12 @@ public final class Params {
 	public final static int PICK_BY_PINYIN = 2;		//∆¥“Ùµ„≤À
 	
 	/* The default IP address */
-	public final static String DEF_IP_ADDR = "www.e-tones.net";
+	public final static String DEF_IP_ADDR = "e-tones.net";
 	
 	/* The default IP port */
 	public final static int DEF_IP_PORT = 55555;
 	
 	/* The default staff pin */
-	public final static long DEF_STAFF_PIN = -1;
+	public final static long DEF_STAFF_LOGIN_ID = -1;
 	
 }

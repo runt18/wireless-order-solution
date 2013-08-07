@@ -132,7 +132,7 @@ public class SelloutCommitDialog extends DialogFragment {
 		((Button)view.findViewById(R.id.button_ok_sellOut_commitDialog)).setOnClickListener(new OnClickListener(){
 			@Override
 			public void onClick(View v) {
-				new UpdateSelloutStatusTask(WirelessOrder.pinGen, toSellout, toOnSale){
+				new UpdateSelloutStatusTask(WirelessOrder.loginStaff, toSellout, toOnSale){
 					
 					ProgressDialog mProgDialog;
 		

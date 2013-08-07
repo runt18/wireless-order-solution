@@ -15,9 +15,10 @@ import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.inputmethod.InputMethodManager;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AbsListView;
+import android.widget.AbsListView.OnScrollListener;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -25,7 +26,6 @@ import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.AbsListView.OnScrollListener;
 
 import com.wireless.common.WirelessOrder;
 import com.wireless.pojo.menuMgr.Food;
@@ -329,7 +329,7 @@ public class SellOutActivity extends FragmentActivity {
 	private class QuerySellOutTask extends com.wireless.lib.task.QuerySellOutTask{
 		
 		QuerySellOutTask(){
-			super(WirelessOrder.pinGen, WirelessOrder.foodMenu.foods);
+			super(WirelessOrder.loginStaff, WirelessOrder.foodMenu.foods);
 		}
 		
 		@Override

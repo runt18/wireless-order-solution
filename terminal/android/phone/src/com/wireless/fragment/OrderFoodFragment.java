@@ -749,7 +749,7 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 		private ProgressDialog mProgressDialog;
 
 		QueryOrderTask(int tableAlias){
-			super(WirelessOrder.pinGen, tableAlias, WirelessOrder.foodMenu);
+			super(WirelessOrder.loginStaff, tableAlias, WirelessOrder.foodMenu);
 			mProgressDialog = ProgressDialog.show(getActivity(), "", "正在读取账单，请稍后", true);
 		}
 		
@@ -801,7 +801,7 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 	private class QuerySellOutTask extends com.wireless.lib.task.QuerySellOutTask{
 		
 		QuerySellOutTask(){
-			super(WirelessOrder.pinGen, WirelessOrder.foodMenu.foods);
+			super(WirelessOrder.loginStaff, WirelessOrder.foodMenu.foods);
 		}
 		
 		@Override

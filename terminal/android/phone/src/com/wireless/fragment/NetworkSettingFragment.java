@@ -25,7 +25,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.wireless.common.Params;
-import com.wireless.common.WirelessOrder;
 import com.wireless.pack.req.ReqPing;
 import com.wireless.sccon.ServerConnector;
 import com.wireless.ui.R;
@@ -247,7 +246,7 @@ public class NetworkSettingFragment extends Fragment {
 		@Override
 		protected String doInBackground(Void... params) {
 			try {
-				ServerConnector.instance().ask(new ReqPing(WirelessOrder.pinGen));
+				ServerConnector.instance().ask(new ReqPing());
 			} catch (IOException e) {
 				_errMsg = "网络连接失败，请检查网络参数是否正确。";
 			}

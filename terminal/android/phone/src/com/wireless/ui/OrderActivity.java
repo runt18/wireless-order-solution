@@ -156,7 +156,7 @@ public class OrderActivity extends FragmentActivity implements OnQueryOrderListe
 		private ProgressDialog mProgressDialog;
 
 		public CommitOrderTask(Order reqOrder, byte type) {
-			super(WirelessOrder.pinGen, reqOrder, type);
+			super(WirelessOrder.loginStaff, reqOrder, type);
 		}
 
 		@Override

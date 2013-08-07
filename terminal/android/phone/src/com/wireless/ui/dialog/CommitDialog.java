@@ -227,12 +227,12 @@ public class CommitDialog extends DialogFragment{
 		private final byte mReserved;
 		
 		QueryAndCommitOrderTask(int tableAlias){
-			super(WirelessOrder.pinGen, tableAlias, WirelessOrder.foodMenu);
+			super(WirelessOrder.loginStaff, tableAlias, WirelessOrder.foodMenu);
 			this.mReserved = ReqInsertOrder.DO_PRINT;
 		}
 		
 		QueryAndCommitOrderTask(int tableAlias, byte reserved){
-			super(WirelessOrder.pinGen, tableAlias, WirelessOrder.foodMenu);
+			super(WirelessOrder.loginStaff, tableAlias, WirelessOrder.foodMenu);
 			this.mReserved = ReqInsertOrder.DO_NOT_PRINT;
 		}
 		
@@ -289,7 +289,7 @@ public class CommitDialog extends DialogFragment{
 		private ProgressDialog mProgDialog;
 		
 		public InsertOrderTask(Order reqOrder, byte type, byte reserved) {
-			super(WirelessOrder.pinGen, reqOrder, type, reserved);
+			super(WirelessOrder.loginStaff, reqOrder, type, reserved);
 		}
 		
 		/**
@@ -345,7 +345,7 @@ public class CommitDialog extends DialogFragment{
 	private class QueryOrderTask2 extends com.wireless.lib.task.QueryOrderTask{
 		
 		public QueryOrderTask2(int tableAlias) {
-			super(WirelessOrder.pinGen, tableAlias, WirelessOrder.foodMenu);
+			super(WirelessOrder.loginStaff, tableAlias, WirelessOrder.foodMenu);
 		}
 
 		private ProgressDialog mProgressDialog;
@@ -389,7 +389,7 @@ public class CommitDialog extends DialogFragment{
 		private ProgressDialog mProgDialog;
 
 		PayOrderTask(Order order, byte payCate) {
-			super(WirelessOrder.pinGen, order, payCate);
+			super(WirelessOrder.loginStaff, order, payCate);
 		}
 
 		/**

@@ -122,7 +122,7 @@ public class BillActivity extends Activity {
 		private ProgressDialog mProgDialog;
 
 		PayOrderTask(Order order, byte payCate) {
-			super(WirelessOrder.pinGen, order, payCate);
+			super(WirelessOrder.loginStaff, order, payCate);
 		}
 
 		/**
@@ -259,7 +259,7 @@ public class BillActivity extends Activity {
 		private ProgressDialog _progDialog;
 	
 		QueryOrderTask(int tableAlias){
-			super(WirelessOrder.pinGen, tableAlias, WirelessOrder.foodMenu);
+			super(WirelessOrder.loginStaff, tableAlias, WirelessOrder.foodMenu);
 		}
 		
 		/**

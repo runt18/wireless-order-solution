@@ -144,7 +144,7 @@ public class TableDetailActivity extends Activity {
 		private ProgressDialog _progDialog;
 
 		public PayOrderTask(Order orderToPay, byte payCate) {
-			super(WirelessOrder.pinGen, orderToPay, payCate);
+			super(WirelessOrder.loginStaff, orderToPay, payCate);
 		}
 		
 		/**
@@ -277,7 +277,7 @@ public class TableDetailActivity extends Activity {
 		private ProgressDialog _progDialog;
 	
 		QueryOrderTask(int tableAlias){
-			super(WirelessOrder.pinGen, tableAlias, WirelessOrder.foodMenu);
+			super(WirelessOrder.loginStaff, tableAlias, WirelessOrder.foodMenu);
 		}
 		
 		/**

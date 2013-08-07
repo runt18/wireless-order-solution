@@ -20,16 +20,15 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.wireless.common.Params;
-import com.wireless.lib.PinReader;
 import com.wireless.ui.R;
+import com.wireless.util.PinReader;
 
 public class FuncSettingFragment extends Fragment {
 
 	private ArrayAdapter<String> _adapter;
 	private ArrayAdapter<String> _timeAdapter;
 	private String _values[] = { "“Ï≤Ω", "Õ¨≤Ω" };
-	private String _connectTimeouts[] = { "10√Î", "15√Î",
-			"20√Î" };
+	private String _connectTimeouts[] = { "10√Î", "15√Î", "20√Î" };
 
 	Spinner _printSettingSpinner;
 	Spinner _connTimeoutSpinner;

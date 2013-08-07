@@ -711,7 +711,7 @@ public class TableActivity extends FragmentActivity implements OnTableSelectedLi
 		private ProgressDialog mProgDialog;
 		
 		TransTblTask(Table srcTbl, Table destTbl){
-			super(WirelessOrder.pinGen, srcTbl, destTbl);
+			super(WirelessOrder.loginStaff, srcTbl, destTbl);
 		}
 		
 		/**
@@ -767,7 +767,7 @@ public class TableActivity extends FragmentActivity implements OnTableSelectedLi
 		}		
 	
 		QueryRegionTask(){
-			super(WirelessOrder.pinGen);
+			super(WirelessOrder.loginStaff);
 		}
 		
 		/**
@@ -805,7 +805,7 @@ public class TableActivity extends FragmentActivity implements OnTableSelectedLi
 		private ProgressDialog mProgDialog;
 		
 		QueryTableTask(){
-			super(WirelessOrder.pinGen);
+			super(WirelessOrder.loginStaff);
 		}
 		
 		/**
@@ -854,7 +854,7 @@ public class TableActivity extends FragmentActivity implements OnTableSelectedLi
 		private ProgressDialog _progDialog;
 
 		QueryTableStatusTask(int tableAlias){
-			super(WirelessOrder.pinGen, tableAlias);
+			super(WirelessOrder.loginStaff, tableAlias);
 		}
 		
 		@Override
