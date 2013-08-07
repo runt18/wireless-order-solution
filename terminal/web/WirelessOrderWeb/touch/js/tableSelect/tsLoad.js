@@ -16,10 +16,10 @@ function addRegions(){
 				regionHtml += "<div class='button-base' id='"+region[x].regionId+
 				"' style='margin-bottom: 2px;' onclick='addTables(this)'>"+region[x].regionName+"</div>";
 			}
-			$("#divToolRight").html(regionHtml);
+			$("#divShowRegion").html(regionHtml);
 		}
 	};
 	xmlhttp.open("POST", "/WirelessOrderWeb/QueryRegion.do?flag=normal", true);
 	xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
-	xmlhttp.send("pin=217&dataSource=tree");
+	xmlhttp.send("pin=217&dataSource=tree&random="+Math.random());
 }
