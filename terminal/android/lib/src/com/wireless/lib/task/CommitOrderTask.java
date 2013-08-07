@@ -9,10 +9,10 @@ import com.wireless.exception.ErrorCode;
 import com.wireless.exception.ProtocolError;
 import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
-import com.wireless.pack.req.PinGen;
 import com.wireless.pack.req.ReqInsertOrder;
 import com.wireless.parcel.Parcel;
 import com.wireless.pojo.dishesOrder.Order;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.sccon.ServerConnector;
 
 public class CommitOrderTask extends AsyncTask<Void, Void, Void>{
@@ -22,21 +22,21 @@ public class CommitOrderTask extends AsyncTask<Void, Void, Void>{
 	protected final Order mReqOrder;
 	
 	private final byte mType;
-	private final PinGen mPinGen;
+	private final Staff mStaff;
 	private final byte mReserved;
 	
-	public CommitOrderTask(PinGen gen, Order reqOrder, byte type, byte reserved){
+	public CommitOrderTask(Staff staff, Order reqOrder, byte type, byte reserved){
 		mReqOrder = reqOrder;
 		mType = type;
 		mReserved = reserved;
-		mPinGen = gen;
+		mStaff = staff;
 	}
 	
-	public CommitOrderTask(PinGen gen, Order reqOrder, byte type){
+	public CommitOrderTask(Staff staff, Order reqOrder, byte type){
 		mReqOrder = reqOrder;
 		mType = type;
 		mReserved = ReqInsertOrder.DO_PRINT;
-		mPinGen = gen;
+		mStaff = staff;
 	}
 	
 	/**
@@ -49,7 +49,7 @@ public class CommitOrderTask extends AsyncTask<Void, Void, Void>{
 		String errMsg = null;
 		ErrorCode errCode = null;
 		try{
-			ProtocolPackage resp = ServerConnector.instance().ask(new ReqInsertOrder(mPinGen, mReqOrder, mType, mReserved));
+			ProtocolPackage resp = ServerConnector.instance().ask(new ReqInsertOrder(mStaff, mReqOrder, mType, mReserved));
 			if(resp.header.type == Type.NAK){
 				
 				errCode = new Parcel(resp.body).readParcel(ErrorCode.CREATOR);

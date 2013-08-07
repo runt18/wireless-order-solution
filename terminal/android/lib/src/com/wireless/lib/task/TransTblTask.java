@@ -8,10 +8,10 @@ import com.wireless.exception.ErrorCode;
 import com.wireless.exception.ProtocolError;
 import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
-import com.wireless.pack.req.PinGen;
 import com.wireless.pack.req.ReqTransTbl;
 import com.wireless.parcel.Parcel;
 import com.wireless.pojo.regionMgr.Table;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.sccon.ServerConnector;
 
 public class TransTblTask extends AsyncTask<Void, Void, Void>{
@@ -22,19 +22,19 @@ public class TransTblTask extends AsyncTask<Void, Void, Void>{
 	
 	private final Table mDestTbl;
 	
-	private final PinGen mPinGen;
+	private final Staff mStaff;
 	
-	public TransTblTask(PinGen gen, Table srcTbl, Table destTbl){
+	public TransTblTask(Staff staff, Table srcTbl, Table destTbl){
 		mSrcTbl = srcTbl;
 		mDestTbl = destTbl;
-		mPinGen = gen;
+		mStaff = staff;
 	}
 	
 	@Override
 	protected Void doInBackground(Void... args) {
 		
 		try{
-			ProtocolPackage resp = ServerConnector.instance().ask(new ReqTransTbl(mPinGen, new Table[]{mSrcTbl, mDestTbl}));
+			ProtocolPackage resp = ServerConnector.instance().ask(new ReqTransTbl(mStaff, new Table[]{mSrcTbl, mDestTbl}));
 			if(resp.header.type == Type.NAK){
 
 				ErrorCode errCode = new Parcel(resp.body).readParcel(ErrorCode.CREATOR);

@@ -9,20 +9,20 @@ import com.wireless.exception.ErrorCode;
 import com.wireless.exception.ProtocolError;
 import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
-import com.wireless.pack.req.PinGen;
 import com.wireless.pack.req.ReqQueryMenu;
 import com.wireless.parcel.Parcel;
 import com.wireless.pojo.menuMgr.FoodMenu;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.sccon.ServerConnector;
 
 public class QueryMenuTask extends AsyncTask<Void, Void, FoodMenu>{
 
 	protected BusinessException mProtocolException;
 	
-	private final PinGen mPinGen;
+	private final Staff mStaff;
 	
-	public QueryMenuTask(PinGen gen){
-		mPinGen = gen;
+	public QueryMenuTask(Staff staff){
+		mStaff = staff;
 	}
 	
 	/**
@@ -37,7 +37,7 @@ public class QueryMenuTask extends AsyncTask<Void, Void, FoodMenu>{
 		String errMsg;
 		
 		try{
-			ProtocolPackage resp = ServerConnector.instance().ask(new ReqQueryMenu(mPinGen));
+			ProtocolPackage resp = ServerConnector.instance().ask(new ReqQueryMenu(mStaff));
 			if(resp.header.type == Type.ACK){
 				foodMenu = new Parcel(resp.body).readParcel(FoodMenu.CREATOR);
 				

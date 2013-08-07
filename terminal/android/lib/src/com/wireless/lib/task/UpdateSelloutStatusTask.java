@@ -8,24 +8,24 @@ import android.os.AsyncTask;
 import com.wireless.exception.BusinessException;
 import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
-import com.wireless.pack.req.PinGen;
 import com.wireless.pack.req.ReqMakeOnSale;
 import com.wireless.pack.req.ReqMakeSellOut;
 import com.wireless.pojo.menuMgr.Food;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.sccon.ServerConnector;
 
 public class UpdateSelloutStatusTask extends AsyncTask<Void, Void, Void>{
 
 	protected BusinessException mBusinessException;
 	
-	private final PinGen mPinGen;
+	private final Staff mStaff;
 	
 	private final List<Food> mToSellOut;
 	
 	private final List<Food> mToOnSale;
 	
-	public UpdateSelloutStatusTask(PinGen gen, List<Food> toSellOut, List<Food> toOnSale){
-		mPinGen = gen;
+	public UpdateSelloutStatusTask(Staff staff, List<Food> toSellOut, List<Food> toOnSale){
+		mStaff = staff;
 		mToSellOut = toSellOut;
 		mToOnSale = toOnSale;
 	}
@@ -37,12 +37,12 @@ public class UpdateSelloutStatusTask extends AsyncTask<Void, Void, Void>{
 	protected Void doInBackground(Void... args) {
 	
 		try{
-			ProtocolPackage resp = ServerConnector.instance().ask(new ReqMakeSellOut(mPinGen, mToSellOut));
+			ProtocolPackage resp = ServerConnector.instance().ask(new ReqMakeSellOut(mStaff, mToSellOut));
 			if(resp.header.type == Type.NAK){
 				mBusinessException = new BusinessException("提交菜品沽清信息不成功");
 			}
 			
-			resp = ServerConnector.instance().ask(new ReqMakeOnSale(mPinGen, mToOnSale));
+			resp = ServerConnector.instance().ask(new ReqMakeOnSale(mStaff, mToOnSale));
 			if(resp.header.type == Type.NAK){
 				mBusinessException = new BusinessException("提交菜品开售信息不成功");
 			}

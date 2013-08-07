@@ -9,20 +9,20 @@ import android.os.AsyncTask;
 import com.wireless.exception.BusinessException;
 import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
-import com.wireless.pack.req.PinGen;
 import com.wireless.pack.req.ReqQueryTable;
 import com.wireless.parcel.Parcel;
 import com.wireless.pojo.regionMgr.Table;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.sccon.ServerConnector;
 
 public class QueryTableTask extends AsyncTask<Void, Void, Table[]>{
 
 	protected BusinessException mBusinessException;
 	
-	private final PinGen mPinGen;
+	private final Staff mStaff;
 	
-	public QueryTableTask(PinGen gen){
-		mPinGen = gen;
+	public QueryTableTask(Staff staff){
+		mStaff = staff;
 	}
 	
 	/**
@@ -34,7 +34,7 @@ public class QueryTableTask extends AsyncTask<Void, Void, Table[]>{
 		List<Table> tables = new ArrayList<Table>();
 		
 		try{
-			ProtocolPackage resp = ServerConnector.instance().ask(new ReqQueryTable(mPinGen));
+			ProtocolPackage resp = ServerConnector.instance().ask(new ReqQueryTable(mStaff));
 			if(resp.header.type == Type.ACK){
 				tables.addAll(new Parcel(resp.body).readParcelList(Table.CREATOR));
 				

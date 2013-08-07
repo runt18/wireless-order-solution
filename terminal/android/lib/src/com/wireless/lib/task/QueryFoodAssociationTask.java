@@ -8,11 +8,11 @@ import android.os.AsyncTask;
 import com.wireless.exception.BusinessException;
 import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
-import com.wireless.pack.req.PinGen;
 import com.wireless.pack.req.ReqQueryFoodAssociation;
 import com.wireless.parcel.Parcel;
 import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.menuMgr.FoodList;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.sccon.ServerConnector;
 
 public class QueryFoodAssociationTask extends AsyncTask<Void, Void, Food[]>{
@@ -25,19 +25,19 @@ public class QueryFoodAssociationTask extends AsyncTask<Void, Void, Food[]>{
 	
 	private final FoodList mFoodList;
 	
-	private final PinGen mPinGen;
+	private final Staff mStaff;
 	
-	public QueryFoodAssociationTask(PinGen gen, FoodList foodList, Food foodToAssociate, boolean isForceToQuery){
+	public QueryFoodAssociationTask(Staff staff, FoodList foodList, Food foodToAssociate, boolean isForceToQuery){
 		mFoodList = foodList;
 		mIsForceToQuery = isForceToQuery;
 		mFoodToAssociate = foodToAssociate;
-		mPinGen = gen;
+		mStaff = staff;
 	}
 	
-	public QueryFoodAssociationTask(PinGen gen, FoodList foodList, Food foodToAssociate){
+	public QueryFoodAssociationTask(Staff staff, FoodList foodList, Food foodToAssociate){
 		mFoodList = foodList;
 		mFoodToAssociate = foodToAssociate;
-		mPinGen = gen;
+		mStaff = staff;
 	}
 	
 	@Override
@@ -48,7 +48,7 @@ public class QueryFoodAssociationTask extends AsyncTask<Void, Void, Food[]>{
 		if(mIsForceToQuery || !mFoodToAssociate.hasAssociatedFoods()){
 			
 			try{
-				ProtocolPackage resp = ServerConnector.instance().ask(new ReqQueryFoodAssociation(mPinGen, mFoodToAssociate));
+				ProtocolPackage resp = ServerConnector.instance().ask(new ReqQueryFoodAssociation(mStaff, mFoodToAssociate));
 				if(resp.header.type == Type.ACK){
 					associatedFoods = new Parcel(resp.body).readParcelArray(Food.CREATOR);
 					for(int i = 0; i < associatedFoods.length; i++){

@@ -24,7 +24,6 @@ import android.os.AsyncTask;
 import com.wireless.exception.BusinessException;
 import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
-import com.wireless.pack.req.PinGen;
 import com.wireless.pack.req.ReqOTAUpdate;
 import com.wireless.pack.resp.RespOTAUpdate;
 import com.wireless.pack.resp.RespOTAUpdate.OTA;
@@ -39,12 +38,10 @@ public abstract class CheckVersionTask extends AsyncTask<Void, Void, Boolean>{
 	private String[] mUpdateInfo;
 	
 	private final int mCheckType;
-	private final PinGen mPinGen;
 	private final Context mContext;
 	
-	public CheckVersionTask(PinGen gen, Context context, int checkType){
+	public CheckVersionTask(Context context, int checkType){
 		mContext = context;
-		mPinGen = gen;
 		mCheckType = checkType;
 	}		
  
@@ -93,7 +90,7 @@ public abstract class CheckVersionTask extends AsyncTask<Void, Void, Boolean>{
 	    try {
 		   
 		   //从服务器取得OTA的配置（IP地址和端口）
-		   ProtocolPackage resp = ServerConnector.instance().ask(new ReqOTAUpdate(mPinGen));
+		   ProtocolPackage resp = ServerConnector.instance().ask(new ReqOTAUpdate());
 		   if(resp.header.type == Type.NAK){
 			   throw new IOException("无法获取更新服务器信息，请检查网络设置");
 		   }

@@ -11,26 +11,26 @@ import android.os.AsyncTask;
 import com.wireless.exception.BusinessException;
 import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
-import com.wireless.pack.req.PinGen;
 import com.wireless.pack.req.ReqQueryFoodGroup;
 import com.wireless.parcel.Parcel;
 import com.wireless.pojo.foodGroup.Pager;
 import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.menuMgr.FoodList;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.sccon.ServerConnector;
 
 public class QueryFoodGroupTask extends AsyncTask<Void, Void, List<Pager>>{
 	
 	private final FoodList mFoodList;
 	
-	private final PinGen mPinGen;
+	private final Staff mStaff;
 	
 	protected BusinessException mBusinessException;
 	
-	public QueryFoodGroupTask(PinGen gen, FoodList foodList){
+	public QueryFoodGroupTask(Staff staff, FoodList foodList){
 		mFoodList = foodList;
-		mPinGen = gen;
+		mStaff = staff;
 	}
 	
 	@Override
@@ -39,7 +39,7 @@ public class QueryFoodGroupTask extends AsyncTask<Void, Void, List<Pager>>{
 		List<Pager> pagers = new ArrayList<Pager>();
 		
 		try{
-			ProtocolPackage resp = ServerConnector.instance().ask(new ReqQueryFoodGroup(mPinGen));
+			ProtocolPackage resp = ServerConnector.instance().ask(new ReqQueryFoodGroup(mStaff));
 			if(resp.header.type == Type.ACK){
 				pagers.addAll(new Parcel(resp.body).readParcelList(Pager.PAGER_CREATOR));
 					

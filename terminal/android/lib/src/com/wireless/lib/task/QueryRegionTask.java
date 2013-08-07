@@ -8,20 +8,20 @@ import android.os.AsyncTask;
 
 import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
-import com.wireless.pack.req.PinGen;
 import com.wireless.pack.req.ReqQueryRegion;
 import com.wireless.parcel.Parcel;
 import com.wireless.pojo.regionMgr.Region;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.sccon.ServerConnector;
 
 public class QueryRegionTask extends AsyncTask<Void, Void, Region[]>{
 
 	protected String mErrMsg;
 	
-	private final PinGen mPinGen;
+	private final Staff mStaff;
 	
-	public QueryRegionTask(PinGen gen){
-		mPinGen = gen;
+	public QueryRegionTask(Staff staff){
+		mStaff = staff;
 	}
 	
 	/**
@@ -32,7 +32,7 @@ public class QueryRegionTask extends AsyncTask<Void, Void, Region[]>{
 	
 		List<Region> regions = new ArrayList<Region>();
 		try{
-			ProtocolPackage resp = ServerConnector.instance().ask(new ReqQueryRegion(mPinGen));
+			ProtocolPackage resp = ServerConnector.instance().ask(new ReqQueryRegion(mStaff));
 			if(resp.header.type == Type.ACK){
 				regions.addAll(new Parcel(resp.body).readParcelList(Region.CREATOR));
 			}

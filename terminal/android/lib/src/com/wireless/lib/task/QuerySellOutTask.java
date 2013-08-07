@@ -11,11 +11,11 @@ import com.wireless.exception.ErrorCode;
 import com.wireless.exception.ProtocolError;
 import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
-import com.wireless.pack.req.PinGen;
 import com.wireless.pack.req.ReqQuerySellOut;
 import com.wireless.parcel.Parcel;
 import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.menuMgr.FoodList;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.sccon.ServerConnector;
 
 public class QuerySellOutTask extends AsyncTask<Void, Void, Food[]>{
@@ -26,11 +26,11 @@ public class QuerySellOutTask extends AsyncTask<Void, Void, Food[]>{
 	
 	private final FoodList mFoodList;
 	
-	private final PinGen mPinGen;
+	private final Staff mStaff;
 	
-	public QuerySellOutTask(PinGen gen, FoodList foodList){
+	public QuerySellOutTask(Staff staff, FoodList foodList){
 		mFoodList = foodList;
-		mPinGen = gen;
+		mStaff = staff;
 	}
 	
 	@Override
@@ -40,7 +40,7 @@ public class QuerySellOutTask extends AsyncTask<Void, Void, Food[]>{
 		
 		try{
 			String errMsg;
-			ProtocolPackage resp = ServerConnector.instance().ask(new ReqQuerySellOut(mPinGen));
+			ProtocolPackage resp = ServerConnector.instance().ask(new ReqQuerySellOut(mStaff));
 			if(resp.header.type == Type.ACK){
 				sellOutFoods.addAll(new Parcel(resp.body).readParcelList(Food.CREATOR));
 					

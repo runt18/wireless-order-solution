@@ -14,11 +14,11 @@ import android.util.Log;
 
 import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
-import com.wireless.pack.req.PinGen;
 import com.wireless.pack.req.ReqOTAUpdate;
 import com.wireless.pack.resp.RespOTAUpdate;
 import com.wireless.pack.resp.RespOTAUpdate.OTA;
 import com.wireless.pojo.menuMgr.Food;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.sccon.ServerConnector;
 
 public abstract class PicDownloadTask extends AsyncTask<Void, PicDownloadTask.Progress, PicDownloadTask.Progress[]>{
@@ -43,14 +43,14 @@ public abstract class PicDownloadTask extends AsyncTask<Void, PicDownloadTask.Pr
 
 	private final List<Food> mFoodQueue;
 	
-	private final PinGen mPinGen;
+	private final Staff mStaff;
 	
-	public PicDownloadTask(PinGen gen, List<Food> foodQueue){
+	public PicDownloadTask(Staff staff, List<Food> foodQueue){
 		mFoodQueue = foodQueue;
-		mPinGen = gen;
+		mStaff = staff;
 	}
 	
-	private String getPicRoot(PinGen gen){
+	private String getPicRoot(Staff staff){
 		
 		String rootUrl = null;
 		HttpURLConnection conn = null;
@@ -58,7 +58,7 @@ public abstract class PicDownloadTask extends AsyncTask<Void, PicDownloadTask.Pr
 	    try {
 		   
 		   //从服务器取得OTA的配置（IP地址和端口）
-		   ProtocolPackage resp = ServerConnector.instance().ask(new ReqOTAUpdate(gen));
+		   ProtocolPackage resp = ServerConnector.instance().ask(new ReqOTAUpdate());
 		   if(resp.header.type == Type.NAK){
 			   throw new IOException("无法获取更新服务器信息，请检查网络设置");
 		   }
@@ -71,8 +71,8 @@ public abstract class PicDownloadTask extends AsyncTask<Void, PicDownloadTask.Pr
 		   
 		   conn = (HttpURLConnection)new URL("http://" + ota.getAddr() + ":" + ota.getPort() + "/web-term/QueryOTA.do?" + 
 				   							 "funCode=2" + "&" + 
-				   							 "pin=" + gen.getDeviceId() + "&" +
-				   							 "model=" + gen.getDeviceType()).openConnection();
+				   							 "pin=" + staff.getId() + "&" +
+				   							 "model=0").openConnection();
 
 		   BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
 		   StringBuffer response = new StringBuffer();
@@ -114,7 +114,7 @@ public abstract class PicDownloadTask extends AsyncTask<Void, PicDownloadTask.Pr
 		
 		ByteArrayOutputStream picOutputStream = null;
 		
-		String rootUrl = getPicRoot(mPinGen);
+		String rootUrl = getPicRoot(mStaff);
 		
 		for(Progress prog : mResults){
 			

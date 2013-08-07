@@ -9,10 +9,10 @@ import com.wireless.exception.ErrorCode;
 import com.wireless.exception.ProtocolError;
 import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
-import com.wireless.pack.req.PinGen;
 import com.wireless.pack.req.ReqPayOrder;
 import com.wireless.parcel.Parcel;
 import com.wireless.pojo.dishesOrder.Order;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.sccon.ServerConnector;
 
 public class PayOrderTask extends AsyncTask<Void, Void, Void>{
@@ -21,12 +21,12 @@ public class PayOrderTask extends AsyncTask<Void, Void, Void>{
 	protected BusinessException mBusinessException;
 	protected Order mOrderToPay;
 	
-	private final PinGen mPinGen;
+	private final Staff mStaff;
 	
-	public PayOrderTask(PinGen gen, Order orderToPay, byte payCate){
+	public PayOrderTask(Staff staff, Order orderToPay, byte payCate){
 		mOrderToPay = orderToPay;
 		mPayCate = payCate;
-		mPinGen = gen;
+		mStaff = staff;
 	}
 	
 	/**
@@ -37,7 +37,7 @@ public class PayOrderTask extends AsyncTask<Void, Void, Void>{
 
 		ProtocolPackage resp;
 		try {
-			resp = ServerConnector.instance().ask(new ReqPayOrder(mPinGen, mOrderToPay, mPayCate));
+			resp = ServerConnector.instance().ask(new ReqPayOrder(mStaff, mOrderToPay, mPayCate));
 			if (resp.header.type == Type.NAK) {
 
 				ErrorCode errCode = new Parcel(resp.body).readParcel(ErrorCode.CREATOR);

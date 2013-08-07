@@ -10,12 +10,12 @@ import com.wireless.exception.ErrorEnum;
 import com.wireless.exception.ProtocolError;
 import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
-import com.wireless.pack.req.PinGen;
 import com.wireless.pack.req.ReqQueryOrderByTable;
 import com.wireless.parcel.Parcel;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.menuMgr.FoodMenu;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.tasteMgr.Taste;
 import com.wireless.sccon.ServerConnector;
 
@@ -27,12 +27,12 @@ public class QueryOrderTask extends AsyncTask<Void, Void, Order>{
 
 	private final FoodMenu mFoodMenu;
 	
-	private final PinGen mPinGen;
+	private final Staff mStaff;
 	
-	public QueryOrderTask(PinGen gen, int tableAlias, FoodMenu foodMenu){
+	public QueryOrderTask(Staff staff, int tableAlias, FoodMenu foodMenu){
 		mTblAlias = tableAlias;
 		mFoodMenu = foodMenu;
-		mPinGen = gen;
+		mStaff = staff;
 	}	
 	
 	@Override
@@ -40,7 +40,7 @@ public class QueryOrderTask extends AsyncTask<Void, Void, Order>{
 		Order order = null;
 		try{
 			//根据tableID请求数据
-			ProtocolPackage resp = ServerConnector.instance().ask(new ReqQueryOrderByTable(mPinGen, mTblAlias));
+			ProtocolPackage resp = ServerConnector.instance().ask(new ReqQueryOrderByTable(mStaff, mTblAlias));
 			if(resp.header.type == Type.ACK){
 				order = new Parcel(resp.body).readParcel(Order.CREATOR);
 				
