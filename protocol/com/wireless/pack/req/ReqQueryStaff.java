@@ -2,7 +2,7 @@ package com.wireless.pack.req;
 
 import com.wireless.pack.Mode;
 import com.wireless.pack.Type;
-import com.wireless.pojo.restaurantMgr.Restaurant;
+import com.wireless.pojo.staffMgr.Device;
 
 public class ReqQueryStaff extends RequestPackage {
 	/******************************************************
@@ -16,10 +16,17 @@ public class ReqQueryStaff extends RequestPackage {
 	* pin[6] - auto calculated and filled in
 	* len[2] - 0x00, 0x00
 	*******************************************************/
-	public ReqQueryStaff(int restaurantId){
+//	public ReqQueryStaff(int restaurantId){
+//		super(null);
+//		header.mode = Mode.ORDER_BUSSINESS;
+//		header.type = Type.QUERY_STAFF;
+//		fillBody(new Restaurant(restaurantId), Restaurant.RESTAURANT_PARCELABLE_SIMPLE);
+//	}
+	
+	public ReqQueryStaff(Device device){
 		super(null);
 		header.mode = Mode.ORDER_BUSSINESS;
 		header.type = Type.QUERY_STAFF;
-		fillBody(new Restaurant(restaurantId), Restaurant.RESTAURANT_PARCELABLE_SIMPLE);
+		fillBody(device, Device.DEVICE_PARCELABLE_SIMPLE);
 	}
 }
