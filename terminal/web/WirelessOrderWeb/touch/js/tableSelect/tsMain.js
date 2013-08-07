@@ -1,6 +1,15 @@
 $(function(){
 	addRegions();
+	addTables("allTable");
 });
+//从数据库中取出的餐桌信息
+var tables1;
+//当前页
+var pageNow = 0;
+//设置一页显示的数目
+var	limit = 50;
+//当前区域下的总的餐桌数组
+var temp = [];
 function addTables(o){
 	var xmlhttp;
 	if(window.XMLHttpRequest){
@@ -12,7 +21,7 @@ function addTables(o){
 		if(xmlhttp.readyState == 4 && xmlhttp.status == 200){
 			var responseText = xmlhttp.responseText;
 			 tables1 = eval("(" + responseText + ")");
-			 var obj = document.getElementById("right");
+			 var obj = document.getElementById("divShowTable");
 	         obj.innerHTML = "";
 	         //定义需要显示的当前页的餐桌数组
 	         var pageRoot = [];
@@ -34,14 +43,54 @@ function addTables(o){
 			//dataSize为当前页所显示的实际数目
 			dataSize = (dataIndex + limit) > temp.length ? dataSize - ((dataIndex + dataSize) - temp.length) : dataSize;
 			pageRoot = temp.slice(dataIndex, dataIndex + dataSize);
-			//显示当前页餐桌信息		
+			//显示当前页餐桌信息
 			for(x in pageRoot){
 				obj.innerHTML += "<div class='table-base' >"+pageRoot[x].alias+"</div>";
 			}
 		}
-	}
+	};
 	
-	xmlhttp.open("POST", "/WirelessOrderWeb/QueryTable.do?pin=9720860", true);
+	xmlhttp.open("POST", "/WirelessOrderWeb/QueryTable.do?pin=217", true);
 	xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
 	xmlhttp.send(null);
 }
+//显示下一页信息
+function nextPage(){
+	var start;
+	var n;
+	n = parseInt(temp.length/limit) ;
+	//判断是否为最后一页
+	if(pageNow == n){
+		alert("已经是最后一页了！");
+	}else{
+		pageNow++;
+	}		
+	start = pageNow*limit;
+	var obj = document.getElementById("right");
+	obj.innerHTML = "";	
+    var pageRoot = [];
+	var dataIndex = start, dataSize = limit;		
+	dataSize = (dataIndex + dataSize) > temp.length ? dataSize - ((dataIndex + dataSize) - temp.length) : dataSize;			
+	pageRoot = temp.slice(dataIndex, dataIndex + dataSize);				
+	for(x in pageRoot){
+		obj.innerHTML += "<div class='table-base' >"+pageRoot[x].alias+"</div>";
+	}
+}	
+function frontPage(){	
+	var start;
+	if(pageNow==0){
+		alert("已经是第一页了！");
+	}else{
+		pageNow--;
+	}	
+	start = pageNow*limit;
+	var obj = document.getElementById("right");
+	obj.innerHTML = "";	
+	var pageRoot = [];
+	var dataIndex = start, dataSize = limit;				
+	dataSize = (dataIndex + dataSize) > temp.length ? dataSize - ((dataIndex + dataSize) - temp.length) : dataSize;				
+	pageRoot = temp.slice(dataIndex, dataIndex + dataSize);	
+	for(x in pageRoot){
+		obj.innerHTML += "<div class='table-base' >"+pageRoot[x].alias+"</div>";
+	}		
+}	
