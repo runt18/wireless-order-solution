@@ -26,6 +26,7 @@ import com.wireless.db.printScheme.PrinterDao;
 import com.wireless.db.regionMgr.RegionDao;
 import com.wireless.db.regionMgr.TableDao;
 import com.wireless.db.restaurantMgr.RestaurantDao;
+import com.wireless.db.staffMgr.DeviceDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.ProtocolError;
@@ -46,7 +47,7 @@ import com.wireless.pojo.printScheme.PType;
 import com.wireless.pojo.printScheme.Printer;
 import com.wireless.pojo.regionMgr.Region;
 import com.wireless.pojo.regionMgr.Table;
-import com.wireless.pojo.restaurantMgr.Restaurant;
+import com.wireless.pojo.staffMgr.Device;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.print.scheme.JobContentFactory;
 /**
@@ -95,8 +96,16 @@ class OrderHandler implements Runnable{
 				
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_STAFF){
 				//handle the query staff request
-				int restaurantId = new Parcel(request.body).readParcel(Restaurant.CREATOR).getId();
-				response = new RespPackage(request.header, StaffDao.getStaffs(restaurantId), Staff.ST_PARCELABLE_COMPLEX);
+				Device device = DeviceDao.getWorkingDeviceById(new Parcel(request.body).readParcel(Device.CREATOR).getDeviceId());
+				response = new RespPackage(request.header, StaffDao.getStaffs(device.getRestaurantId()), Staff.ST_PARCELABLE_COMPLEX);
+				
+			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.MATCH_PIN){
+				//FIXME
+				Parcel p = new Parcel(request.body);
+				String deviceId = p.readString();
+				String pin = p.readString();
+				DeviceDao.insert(deviceId, pin);
+				response = new RespACK(request.header);
 				
 			}else{
 				
