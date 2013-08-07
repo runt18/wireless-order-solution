@@ -131,7 +131,6 @@ public class StaffDao {
 	}
 
 	private static List<Staff> getStaffs(DBCon dbCon, String extraCond, String orderClause) throws SQLException{
-		//TODO
 		String sql = " SELECT "	+
 					 " STAFF.staff_id, STAFF.restaurant_id, STAFF.name, STAFF.tele, STAFF.pwd, STAFF.type AS staff_type" +
 					 " FROM " + Params.dbName + ".staff STAFF " + " " +
