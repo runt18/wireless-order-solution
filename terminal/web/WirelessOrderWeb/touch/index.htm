@@ -13,7 +13,10 @@
 
 <script type="text/javascript" src="../jquery/jquery-1.8.2.min.js"></script>
 <script type="text/javascript" src="./js/index.js"></script>
+<script type="text/javascript">
 
+
+</script>
 </head>
 <body>
 
@@ -21,6 +24,29 @@
 	<input type="button" value="divTableSelect">
 	<input type="button" value="divUpdateOrder" onClick="toggleContentDisplay({type:'show', renderTo:'divUpdateOrder'})">
 	<input type="button" value="divCreateOrder" onClick="toggleContentDisplay({type:'show', renderTo:'divCreateOrder'})">
+	
+	<div id="divTableShow">
+		<div id="div-innerLeft"></div>	
+		<div id="divShowTable"></div>				
+	</div>
+	<div id="divToolRight" class="box-vertical" style="line-height: 60px;">
+		<div class="button-base" style="margin-bottom: 2px;">全部状态</div>
+		<div class="button-base" style="margin-bottom: 2px;" onclick="addTables('allTable')">全部区域</div>
+		<div id="divShowRegion"></div>
+	</div>
+	<div id="divToolBottom" class="box-horizontal">
+	    <div class="button-base" style="margin-right: 2px;">退出</div>
+		<div class="button-base" style="margin-right: 2px;" onclick="frontPage()">上一页</div>
+		<div class="button-base" style="margin-right: 2px;" onclick="nextPage()">下一页</div>
+  		<div class="button-base" style="margin-left: 2px;">点菜</div>
+  		<div class="button-base" style="margin-left: 2px;">结账</div>
+	</div>
+	<div id="divFoot" style="margin-top: 5px; font-size: 15px; font-weight: bold; color: #A27600;">
+		<span style="margin-right: 30px;">收银员：</span>	
+		<span id="spanTime" style="margin-right: 30px;"></span>	
+		<span id="spanPageNow"></span>
+		<span id="spanAllPage"></span>
+	</div>
 </div>
 
 
