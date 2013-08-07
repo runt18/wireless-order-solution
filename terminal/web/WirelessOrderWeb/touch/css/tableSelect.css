@@ -1,0 +1,43 @@
+#divTableShow{
+	background-color: #4682B4;
+	width: 100%;
+	height: 550px;
+	margin-left: -82px;
+	float: left;
+	border: 1px solid #D8E5F2;
+}
+#divToolRight{
+	background-color: #6395EC;
+	width: 80px;
+	height: 550px;
+	float: right;
+	border-bottom: 1px solid #D8E5F2;
+	border-top: 1px solid #D8E5F2;
+}
+#div-innerLeft{
+	width: 82px;
+	float: left;
+	height: 550px;
+}
+#divToolBottom{
+	background-color: #6395EC;
+	width: 100%;
+	height: 60px;
+	float: left;
+	line-height: 60px;
+}
+.table-base{
+	margin-bottom: 5px;
+	margin-right: 5px;
+	margin-left: 2px;
+	float: left;
+	width: 85px;
+	height: 70px;
+	border:1px solid #333;
+	background-color: #87CEEA;
+	text-align: center;
+	line-height: 60px;
+}
+.table-base:active{
+	background: #4EEE99;
+}
