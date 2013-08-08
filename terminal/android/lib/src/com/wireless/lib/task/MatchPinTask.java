@@ -9,6 +9,8 @@ import java.io.InputStreamReader;
 import android.content.Context;
 import android.os.AsyncTask;
 
+import com.wireless.exception.DeviceError;
+import com.wireless.exception.ErrorCode;
 import com.wireless.pack.Mode;
 import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
@@ -50,6 +52,11 @@ public class MatchPinTask extends AsyncTask<Void, Void, Void>{
 				ProtocolPackage resp = ServerConnector.instance().ask(new ReqMatchPin(DeviceUtil.getDeviceId(mContext), pinValue.toString()){});
 				if(resp.header.type == Type.ACK){
 					pinFile.delete();
+				}else{
+					ErrorCode errCode = new Parcel(resp.body).readParcel(ErrorCode.CREATOR);
+					if(errCode.equals(DeviceError.DEVICE_ID_DUPLICATE)){
+						throw new IOException("设备ID已存在");
+					}
 				}
 			}			
 			
