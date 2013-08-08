@@ -183,8 +183,6 @@ public class NetworkSettingFragment extends Fragment {
 		@Override
 		protected void onPreExecute() {
 			_progDialog = ProgressDialog.show(getActivity(), "", "Õ¯¬Á¡¨Ω”÷–.....«Î…‘∫Ú");
-			ServerConnector.instance().setNetAddr(_ipEdtTxt.getText().toString());
-			ServerConnector.instance().setNetPort(Integer.parseInt(_portEdtTxt.getText().toString()));
 		}
 
 		@Override

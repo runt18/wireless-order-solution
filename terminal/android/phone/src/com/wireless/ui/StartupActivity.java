@@ -55,22 +55,14 @@ public class StartupActivity extends Activity {
 		setContentView(R.layout.enter);
 		_msgTxtView = (TextView) findViewById(R.id.myTextView);
 
-		//FIXME
-		new MatchPinTask().execute();
-
 	}
 
 	@Override
 	protected void onStart() {
 		super.onStart();
 		if (isNetworkAvail()) {
-
-			new com.wireless.lib.task.CheckVersionTask(StartupActivity.this, CheckVersionTask.PHONE){
-				@Override
-				public void onCheckVersionPass() {
-					new QueryStaffTask().execute();
-				}					
-			}.execute();
+			//FIXME
+			new MatchPinTask().execute();
 			
 		} else {
 			showNetSetting();
@@ -417,12 +409,12 @@ public class StartupActivity extends Activity {
 
 			} else {
 				
-//				new com.wireless.lib.task.CheckVersionTask(StartupActivity.this, CheckVersionTask.PHONE){
-//					@Override
-//					public void onCheckVersionPass() {
-//						new QueryStaffTask().execute();
-//					}					
-//				}.execute();
+				new com.wireless.lib.task.CheckVersionTask(StartupActivity.this, CheckVersionTask.PHONE){
+					@Override
+					public void onCheckVersionPass() {
+						new QueryStaffTask().execute();
+					}					
+				}.execute();
 			}
 		}
 	}
