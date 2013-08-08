@@ -65,20 +65,14 @@ public class StartupActivity extends Activity {
 			ServerConnector.instance().setNetPort(sharedPrefs.getInt(Params.IP_PORT, Params.DEF_IP_PORT));
 		}
     		
-		//FIXME
-		new MatchPinTask().execute();
     }
     
     @Override
 	protected void onStart(){
 		super.onStart();
 		if(isNetworkAvail()){
-			new com.wireless.lib.task.CheckVersionTask(StartupActivity.this, CheckVersionTask.E_MENU){
-				@Override
-				public void onCheckVersionPass() {
-					new QueryStaffTask().execute();
-				}					
-			}.execute();
+			//FIXME
+			new MatchPinTask().execute();
 		}else{
 			showNetSetting();
 		}		
@@ -176,7 +170,12 @@ public class StartupActivity extends Activity {
  		    	}).show();				
 				
 			}else{
-				
+				new com.wireless.lib.task.CheckVersionTask(StartupActivity.this, CheckVersionTask.E_MENU){
+					@Override
+					public void onCheckVersionPass() {
+						new QueryStaffTask().execute();
+					}					
+				}.execute();
 			}
 		}
 	}
