@@ -1126,7 +1126,7 @@ public class SelectedFoodActivity extends Activity implements
 	private class QueryOrderTask extends com.wireless.lib.task.QueryOrderTask {
 
 		public QueryOrderTask(int tableAlias) {
-			super(WirelessOrder.pinGen, tableAlias, WirelessOrder.foodMenu);
+			super(WirelessOrder.loginStaff, tableAlias, WirelessOrder.foodMenu);
 		}
 
 		@Override

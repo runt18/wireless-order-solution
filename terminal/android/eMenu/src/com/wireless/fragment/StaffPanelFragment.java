@@ -27,9 +27,7 @@ import com.wireless.common.Params;
 import com.wireless.common.ShoppingCart;
 import com.wireless.common.WirelessOrder;
 import com.wireless.ordermenu.R;
-import com.wireless.pack.req.PinGen;
-import com.wireless.protocol.StaffTerminal;
-import com.wireless.protocol.Terminal;
+import com.wireless.pojo.staffMgr.Staff;
 
 /**
  * this fragment contains a {@link ListView} to show all staffs and when user choose a staff, he can 
@@ -41,7 +39,7 @@ import com.wireless.protocol.Terminal;
  *
  */
 public class StaffPanelFragment extends Fragment {
-	private StaffTerminal mStaff;
+	private Staff mStaff;
 	private TextView mServerIdTextView;
 	private EditText mServerPswdEditText;
 	private ImageView mCorrectIcon;
@@ -50,8 +48,8 @@ public class StaffPanelFragment extends Fragment {
 	private OnStaffChangedListener mOnStaffChangedListener;
 	private PswdTextWatcher mPswdTextWatcher;
 	
-	public interface OnStaffChangedListener{
-		void onStaffChanged(StaffTerminal staff, String id, String pwd);
+	public static interface OnStaffChangedListener{
+		void onStaffChanged(Staff staff, String id, String pwd);
 	}
 	
 	public void setOnStaffChangeListener(OnStaffChangedListener l){
@@ -72,8 +70,8 @@ public class StaffPanelFragment extends Fragment {
 		final ListView staffLstView = (ListView) view.findViewById(R.id.listView_server_tab2);
 		final List<String> staffNames = new ArrayList<String>();
 		if(WirelessOrder.staffs != null)
-			for(StaffTerminal s : WirelessOrder.staffs){
-				staffNames.add(s.name);
+			for(Staff s : WirelessOrder.staffs){
+				staffNames.add(s.getName());
 			}
 		staffLstView.setAdapter(new BaseAdapter(){
 
@@ -112,8 +110,8 @@ public class StaffPanelFragment extends Fragment {
 			@SuppressWarnings("deprecation")
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-				mStaff = WirelessOrder.staffs[position];
-				mServerIdTextView.setText(mStaff.name);
+				mStaff = WirelessOrder.staffs.get(0);
+				mServerIdTextView.setText(mStaff.getName());
 				
 				if(parent.getTag() != null)
 					((View)parent.getTag()).setBackgroundDrawable(null);
@@ -221,7 +219,7 @@ public class StaffPanelFragment extends Fragment {
 					mCorrectIcon.setVisibility(View.INVISIBLE);
 				} 
 				//密码正确：
-				else if(mStaff.pwd.equals(toHexString(digester.digest()))){
+				else if(mStaff.getPwd().equals(toHexString(digester.digest()))){
 					mCorrectIcon.setBackgroundResource(R.drawable.staff_correct);
 					mCorrectIcon.setVisibility(View.VISIBLE);
 					//储存这个服务员
@@ -229,7 +227,7 @@ public class StaffPanelFragment extends Fragment {
 					
 					//保存staff pin到文件里面
 					Editor editor = getActivity().getSharedPreferences(Params.PREFS_NAME, Context.MODE_PRIVATE).edit();//获取编辑器
-					editor.putLong(Params.STAFF_PIN, mStaff.pin);
+					editor.putInt(Params.STAFF_ID, mStaff.getId());
 					if(OptionBarFragment.isStaffFixed())
 					{
 						editor.putBoolean(Params.IS_FIX_STAFF, true);
@@ -237,16 +235,7 @@ public class StaffPanelFragment extends Fragment {
 					//提交修改
 					editor.commit();	
 					//set the pin generator according to the staff login
-					WirelessOrder.pinGen = new PinGen(){
-						@Override
-						public long getDeviceId() {
-							return mStaff.pin;
-						}
-						@Override
-						public short getDeviceType() {
-							return Terminal.MODEL_STAFF;
-						}
-					};
+					WirelessOrder.loginStaff = mStaff;
 					
 					//通知观察者
 					if(mOnStaffChangedListener != null)

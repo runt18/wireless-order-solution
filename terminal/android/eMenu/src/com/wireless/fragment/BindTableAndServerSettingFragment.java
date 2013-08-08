@@ -25,10 +25,8 @@ import com.wireless.common.ShoppingCart;
 import com.wireless.common.ShoppingCart.OnTableChangedListener;
 import com.wireless.common.WirelessOrder;
 import com.wireless.ordermenu.R;
-import com.wireless.pack.req.PinGen;
 import com.wireless.pojo.regionMgr.Table;
-import com.wireless.protocol.StaffTerminal;
-import com.wireless.protocol.Terminal;
+import com.wireless.pojo.staffMgr.Staff;
 
 /**
  * this fragment offers bind table and server function, the view is define by xml, <br/>
@@ -43,7 +41,7 @@ public class BindTableAndServerSettingFragment extends PreferenceFragment implem
 	private static final CharSequence UNLOCK = "未绑定";
 	private Table mTable;
 	private OnTableChangedListener mOnTableChangeListener;
-	private StaffTerminal mStaff;
+	private Staff mStaff;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -108,21 +106,21 @@ public class BindTableAndServerSettingFragment extends PreferenceFragment implem
 		}
 		
 /////////////组织服务员数据///////////////////////////////////////////////////
-		List<StaffTerminal> staffs = new ArrayList<StaffTerminal>();
-		for(StaffTerminal s : WirelessOrder.staffs){
-			if(s.name != null && !s.name.equals(""))
+		List<Staff> staffs = new ArrayList<Staff>();
+		for(Staff s : WirelessOrder.staffs){
+			if(s.getName().equals(""))
 				staffs.add(s);
 		}
 		
 		CharSequence[] staffEntries = new CharSequence[staffs.size() + 1];
 		CharSequence[] staffEntryValues = new CharSequence[staffs.size() + 1];
-		staffEntries[staffEntries.length -1 ] = "不绑定";
+		staffEntries[staffEntries.length - 1] = "不绑定";
 		staffEntryValues[staffEntryValues.length - 1] = UNLOCK;
 		
 		for (int i = 0; i < staffs.size(); i++) {
-			StaffTerminal s = staffs.get(i);
-			staffEntries[i] = s.name;
-			staffEntryValues[i] = s.name;
+			Staff s = staffs.get(i);
+			staffEntries[i] = s.getName();
+			staffEntryValues[i] = s.getName();
 		}
 		//设置服务员的preference
 		ListPreference staffPref = (ListPreference) findPreference(getString(R.string.bind_server_pref_key));
@@ -134,16 +132,16 @@ public class BindTableAndServerSettingFragment extends PreferenceFragment implem
 		//如果已绑定，则显示
 		if(oriStaffPref != null && oriStaffPref.contains(Params.IS_FIX_STAFF))
 		{
-			mStaff = new StaffTerminal();
-			long staffPin = oriStaffPref.getLong(Params.STAFF_PIN, -1);
-			mStaff.pin = staffPin;
+			mStaff = new Staff();
+			int staffPin = oriStaffPref.getInt(Params.STAFF_ID, -1);
+			mStaff.setId(staffPin);
 			
 			for (int i = 0; i < staffs.size(); i++) {
-				StaffTerminal s = staffs.get(i);
-				if(s.pin == mStaff.pin){
+				Staff s = staffs.get(i);
+				if(s.equals(mStaff)){
 					mStaff = s;
 					staffPref.setValueIndex(i);
-					staffPref.setSummary("已绑定：" + mStaff.name);
+					staffPref.setSummary("已绑定：" + mStaff.getName());
 				}
 			}
 		} else{
@@ -228,9 +226,9 @@ public class BindTableAndServerSettingFragment extends PreferenceFragment implem
 							digester = MessageDigest.getInstance("MD5");
 							digester.update(pwd.getBytes(), 0, pwd.getBytes().length); 
 							
-							StaffTerminal theStaff = null;
-							for(StaffTerminal s: WirelessOrder.staffs){
-								if(s.name.equals(newValueString)){
+							Staff theStaff = null;
+							for(Staff s: WirelessOrder.staffs){
+								if(s.getName().equals(newValueString)){
 									theStaff = s;
 									break;
 								}
@@ -238,7 +236,7 @@ public class BindTableAndServerSettingFragment extends PreferenceFragment implem
 							//验证密码
 							if(pwd.equals("")){
 								Toast.makeText(getActivity(), "请输入密码", Toast.LENGTH_SHORT).show();
-							} else if(theStaff.pwd.equals(toHexString(digester.digest()))){
+							} else if(theStaff.getPwd().equals(toHexString(digester.digest()))){
 								//储存这个服务员
 								mStaff = theStaff;
 								ShoppingCart.instance().setStaff(mStaff);
@@ -246,23 +244,14 @@ public class BindTableAndServerSettingFragment extends PreferenceFragment implem
 								Editor editor = getActivity().getSharedPreferences(Params.PREFS_NAME, Context.MODE_PRIVATE).edit();//获取编辑器
 								
 								staffPref.setSummary("已绑定："+newValueString);
-								editor.putLong(Params.STAFF_PIN, mStaff.pin);
+								editor.putInt(Params.STAFF_ID, mStaff.getId());
 								//FIXME 去掉 下面这个值
 								editor.putBoolean(Params.IS_FIX_STAFF, true);
 								editor.commit();
 								OptionBarFragment.setStaffFixed(true);
 								
 								//set the pin generator according to the staff login
-								WirelessOrder.pinGen = new PinGen(){
-									@Override
-									public long getDeviceId() {
-										return mStaff.pin;
-									}
-									@Override
-									public short getDeviceType() {
-										return Terminal.MODEL_STAFF;
-									}
-								};
+								WirelessOrder.loginStaff = mStaff;
 
 							} else {
 								Toast.makeText(getActivity(), "密码错误,请重新输入",Toast.LENGTH_SHORT).show();

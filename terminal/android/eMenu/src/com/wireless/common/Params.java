@@ -5,22 +5,12 @@ public final class Params {
 	public final static String PREFS_NAME = "TermPadPref";
 	//The name to Pin
 	public final static String PIN = "Pin";
-	//The name to "后厨打印"
-	public final static String PRINT_SETTING = "PrintSetting";
-	//The name to "连接超时"
-	public final static String CONN_TIME_OUT = "ConnTimeout";
 	//The name to IP address
 	public final static String IP_ADDR = "IPAddr";
 	//The name to IP port
 	public final static String IP_PORT = "IPPort";
-	//The name to APN
-	public final static String APN = "APN";
-	//The name to user name
-	public final static String USER_NAME = "UserName";
-	//The name to password
-	public final static String PWD = "Password";
 	//The pin to login staff
-	public final static String STAFF_PIN = "StaffPin";
+	public final static String STAFF_ID = "StaffPin";
 	public final static String IS_FIX_STAFF = "IsFixStaff";
 	//The last pick food category
 	public final static String LAST_PICK_CATE = "LastPickCate";
@@ -42,13 +32,13 @@ public final class Params {
 	public final static int PICK_BY_PINYIN = 2;		//拼音点菜
 	
 	/** The default IP address */
-	public final static String DEF_IP_ADDR = "www.e-tones.net";
+	public final static String DEF_IP_ADDR = "e-tones.net";
 	
 	/* The default IP port */
 	public final static int DEF_IP_PORT = 55555;
 	
 	/* The default staff pin */
-	public final static long DEF_STAFF_PIN = -1;
+	public final static long DEF_STAFF_ID = -1;
 
 	
 	/* The folder path to image */

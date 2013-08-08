@@ -10,11 +10,13 @@
         android:summary="绑定餐台或绑定服务员账号"
         android:title="菜谱设置" >
     </header>
-     <header
+    <header
         android:summary="更新菜谱信息"
-        android:title="刷新菜品"></header> 
+        android:title="刷新菜品" >
+    </header>
     <header
         android:summary="@string/app_versionName"
-        android:title="关于"></header>
+        android:title="关于" >
+    </header>
 
 </preference-headers>

@@ -30,15 +30,13 @@ import com.wireless.common.WirelessOrder;
 import com.wireless.lib.task.CheckVersionTask;
 import com.wireless.lib.task.PicDownloadTask;
 import com.wireless.ordermenu.R;
-import com.wireless.pack.req.PinGen;
 import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.menuMgr.FoodList;
 import com.wireless.pojo.menuMgr.FoodMenu;
 import com.wireless.pojo.regionMgr.Region;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.restaurantMgr.Restaurant;
-import com.wireless.protocol.StaffTerminal;
-import com.wireless.protocol.Terminal;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.sccon.ServerConnector;
 
 public class StartupActivity extends Activity {
@@ -51,34 +49,36 @@ public class StartupActivity extends Activity {
         mMsgTxtView = (TextView)findViewById(R.id.startupTextView);
         
         SharedPreferences sharedPrefs = getSharedPreferences(Params.PREFS_NAME, Context.MODE_PRIVATE);
-    		/*
-    		 * getString()第二个参数为缺省值，如果preference中不存在该key，将返回缺省值，
-    		 * 返回缺省值表示配置文件还未创建，需要初始化配置文件
-    		 */
-    		if(sharedPrefs.getString(Params.IP_ADDR, "").equals("")){
-    			Editor editor = sharedPrefs.edit();//获取编辑器
-    			editor.putString(Params.IP_ADDR, Params.DEF_IP_ADDR);
-    			editor.putInt(Params.IP_PORT, Params.DEF_IP_PORT);
-    			editor.putString(Params.APN, "cmnet");
-    			editor.putString(Params.USER_NAME, "");
-    			editor.putString(Params.PWD, "");
-    			editor.putInt(Params.PRINT_SETTING, Params.PRINT_ASYNC);
-    			editor.putInt(Params.CONN_TIME_OUT, Params.TIME_OUT_10s);
-    			editor.putInt(Params.LAST_PICK_CATE, Params.PICK_BY_KITCHEN);
-    			editor.commit();//提交修改
-    			
-    		}else{		
-    			ServerConnector.instance().setNetAddr(sharedPrefs.getString(Params.IP_ADDR,Params.DEF_IP_ADDR));
-    			ServerConnector.instance().setNetPort(sharedPrefs.getInt(Params.IP_PORT, Params.DEF_IP_PORT));
-    		}
+		/*
+		 * getString()第二个参数为缺省值，如果preference中不存在该key，将返回缺省值，
+		 * 返回缺省值表示配置文件还未创建，需要初始化配置文件
+		 */
+		if(sharedPrefs.getString(Params.IP_ADDR, "").equals("")){
+			Editor editor = sharedPrefs.edit();//获取编辑器
+			editor.putString(Params.IP_ADDR, Params.DEF_IP_ADDR);
+			editor.putInt(Params.IP_PORT, Params.DEF_IP_PORT);
+			editor.putInt(Params.LAST_PICK_CATE, Params.PICK_BY_KITCHEN);
+			editor.commit();//提交修改
+			
+		}else{		
+			ServerConnector.instance().setNetAddr(sharedPrefs.getString(Params.IP_ADDR,Params.DEF_IP_ADDR));
+			ServerConnector.instance().setNetPort(sharedPrefs.getInt(Params.IP_PORT, Params.DEF_IP_PORT));
+		}
     		
+		//FIXME
+		new MatchPinTask().execute();
     }
     
     @Override
 	protected void onStart(){
 		super.onStart();
 		if(isNetworkAvail()){
-			new ReadPinTask().execute();
+			new com.wireless.lib.task.CheckVersionTask(StartupActivity.this, CheckVersionTask.E_MENU){
+				@Override
+				public void onCheckVersionPass() {
+					new QueryStaffTask().execute();
+				}					
+			}.execute();
 		}else{
 			showNetSetting();
 		}		
@@ -137,7 +137,11 @@ public class StartupActivity extends Activity {
 	/**
 	 * 从SDCard中读取PIN的验证信息
 	 */
-	private class ReadPinTask extends com.wireless.lib.task.ReadPinTask{
+	private class MatchPinTask extends com.wireless.lib.task.MatchPinTask{
+		
+		MatchPinTask(){
+			super(StartupActivity.this);
+		}
 		
 		/**
 		 * 在读取Pin信息前显示提示信息
@@ -152,7 +156,7 @@ public class StartupActivity extends Activity {
 		 * 否则提示用户错误信息。
 		 */
 		@Override
-		protected void onPostExecute(Long pin){
+		protected void onPostExecute(Void result){
 			if(mErrMsg != null){
 				new AlertDialog.Builder(StartupActivity.this)
 				.setTitle("提示")
@@ -167,34 +171,11 @@ public class StartupActivity extends Activity {
 					public void onClick(DialogInterface dialog, int which) {
 						Intent intent = new Intent(StartupActivity.this, SettingsActivity.class);
 						intent.putExtra(SettingsActivity.SETTINGS_IP, true);
-						startActivity(intent);					}
+						startActivity(intent);					
+					}
  		    	}).show();				
 				
 			}else{
-				
-				final long pinVal = pin.longValue();
-				
-				WirelessOrder.pinGen = new PinGen(){
-
-					@Override
-					public long getDeviceId() {
-						return pinVal;
-					}
-
-					@Override
-					public short getDeviceType() {
-						return Terminal.MODEL_ANDROID;
-					}
-					
-				};
-				
-				new com.wireless.lib.task.CheckVersionTask(WirelessOrder.pinGen, StartupActivity.this, CheckVersionTask.E_MENU){
-					
-					@Override
-					public void onCheckVersionPass() {
-						new QueryStaffTask().execute();
-					}					
-				}.execute();
 				
 			}
 		}
@@ -203,7 +184,7 @@ public class StartupActivity extends Activity {
 	private class QueryStaffTask extends com.wireless.lib.task.QueryStaffTask{
 		
 		QueryStaffTask(){
-			super(WirelessOrder.pinGen);
+			super(StartupActivity.this);
 		}
 		
 		/**
@@ -219,7 +200,10 @@ public class StartupActivity extends Activity {
 		 * 如果员工信息请求成功，则继续进行请求菜谱信息的操作。
 		 */
 		@Override
-		protected void onPostExecute(StaffTerminal[] staffs){
+		protected void onPostExecute(List<Staff> staffs) {
+			
+			WirelessOrder.staffs = staffs;
+			
 			/**
 			 * Prompt user message if any error occurred,
 			 * otherwise continue to query restaurant info.
@@ -244,7 +228,7 @@ public class StartupActivity extends Activity {
 				.show();
 				
 			}else{
-				if(staffs.length == 0){
+				if(staffs.isEmpty()){
 					new AlertDialog
 						.Builder(StartupActivity.this)
 						.setTitle("提示")
@@ -256,9 +240,7 @@ public class StartupActivity extends Activity {
 					     })
 					     .show();
 				}else{
-	
-					WirelessOrder.staffs = staffs;
-					
+					WirelessOrder.loginStaff = staffs.get(0);
 					new QueryMenuTask().execute();
 				}
 			}
@@ -270,7 +252,7 @@ public class StartupActivity extends Activity {
 		private SharedPreferences mSharedPrefs = getSharedPreferences(Params.FOOD_IMG_PROJECT_TBL, Context.MODE_PRIVATE);
 		
 		QueryMenuTask(){
-			super(WirelessOrder.pinGen);
+			super(WirelessOrder.loginStaff);
 		}
 		
 		/**
@@ -376,7 +358,7 @@ public class StartupActivity extends Activity {
 				}
 				edit.commit();
 				
-				new PicDownloadTask(WirelessOrder.pinGen, downloadQueue){
+				new PicDownloadTask(WirelessOrder.loginStaff, downloadQueue){
 					
 					Editor edit = mSharedPrefs.edit();
 
@@ -448,7 +430,7 @@ public class StartupActivity extends Activity {
 	private class QueryRegionTask extends com.wireless.lib.task.QueryRegionTask{
 		
 		QueryRegionTask(){
-			super(WirelessOrder.pinGen);
+			super(WirelessOrder.loginStaff);
 		}
 		
 		/**
@@ -500,7 +482,7 @@ public class StartupActivity extends Activity {
 	private class QueryTableTask extends com.wireless.lib.task.QueryTableTask{
 		
 		QueryTableTask(){
-			super(WirelessOrder.pinGen);
+			super(WirelessOrder.loginStaff);
 		}
 		
 		/**
@@ -553,7 +535,7 @@ public class StartupActivity extends Activity {
 	private class QueryRestaurantTask extends com.wireless.lib.task.QueryRestaurantTask{
 		
 		QueryRestaurantTask(){
-			super(WirelessOrder.pinGen);
+			super(WirelessOrder.loginStaff);
 		}
 		
 		/**

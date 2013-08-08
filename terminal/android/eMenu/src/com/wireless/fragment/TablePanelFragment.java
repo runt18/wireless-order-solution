@@ -489,7 +489,7 @@ public class TablePanelFragment extends Fragment implements OnGestureListener {
 	private class QueryTableTask extends com.wireless.lib.task.QueryTableTask {
 		
 		QueryTableTask(){
-			super(WirelessOrder.pinGen);
+			super(WirelessOrder.loginStaff);
 		}
 		
 		/*

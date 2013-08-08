@@ -27,7 +27,7 @@ import com.wireless.ordermenu.R;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.regionMgr.Table;
-import com.wireless.protocol.StaffTerminal;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.ui.MainActivity;
 import com.wireless.ui.SelectedFoodActivity;
 import com.wireless.util.OptionDialog;
@@ -102,9 +102,9 @@ public class OptionBarFragment extends Fragment
 			}
 			
 			//BBar显示服务员姓名
-			StaffTerminal staff = ShoppingCart.instance().getStaff();
+			Staff staff = ShoppingCart.instance().getStaff();
 			if(staff != null){
-				mStaffBtn.setText(staff.name);
+				mStaffBtn.setText(staff.getName());
 			}else{
 				mStaffBtn.setText("未设定");
 			}
@@ -286,7 +286,7 @@ public class OptionBarFragment extends Fragment
 	 * 服务员改变时的回调，判断登陆信息是否正确
 	 */
 	@Override
-	public void onStaffChanged(StaffTerminal staff, String id, String pwd) {
+	public void onStaffChanged(Staff staff, String id, String pwd) {
 		mBBarRefleshHandler.sendEmptyMessage(0);
 	}
 	
@@ -296,7 +296,7 @@ public class OptionBarFragment extends Fragment
 	private class QueryOrderTask extends com.wireless.lib.task.QueryOrderTask{
 
 		QueryOrderTask(int tableAlias, int oldCustomerNum){
-			super(WirelessOrder.pinGen, tableAlias, WirelessOrder.foodMenu);
+			super(WirelessOrder.loginStaff, tableAlias, WirelessOrder.foodMenu);
 		}
 		
 		/**
@@ -350,7 +350,7 @@ public class OptionBarFragment extends Fragment
 	private class QueryTableStatusTask extends com.wireless.lib.task.QueryTableStatusTask{
 		Table mTable;
 		QueryTableStatusTask(Table table){
-			super(WirelessOrder.pinGen, table);
+			super(WirelessOrder.loginStaff, table);
 			mTable = table;
 		}
 		
@@ -423,9 +423,9 @@ public class OptionBarFragment extends Fragment
 				onTableChanged(t);
 	}
 
-	public void setStaff(long staffPin) {
-		for(StaffTerminal s:WirelessOrder.staffs)
-			if(s.pin == staffPin)
+	public void setStaff(int staffPin) {
+		for(Staff s : WirelessOrder.staffs)
+			if(s.getId() == staffPin)
 				ShoppingCart.instance().setStaff(s);
 	}
 	

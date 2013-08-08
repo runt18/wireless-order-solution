@@ -15,6 +15,7 @@ import android.text.InputType;
 
 import com.wireless.common.Params;
 import com.wireless.ordermenu.R;
+import com.wireless.util.DeviceUtil;
 
 /**
  * this is a {@link PreferenceFragment} define by the {@code R.xml.ip_setting_fgm_pref}.
@@ -44,15 +45,18 @@ public class IPSettingFragment extends PreferenceFragment implements OnPreferenc
 		portEditPref.getEditText().setInputType(InputType.TYPE_CLASS_NUMBER);
 		portEditPref.setOnPreferenceChangeListener(this);
 		
-        SharedPreferences ourPrefs = getActivity().getSharedPreferences(Params.PREFS_NAME, Context.MODE_PRIVATE);
-        if(ourPrefs.contains(Params.IP_ADDR)){
-        	ipEditPref.setText(ourPrefs.getString(Params.IP_ADDR, getString(R.string.ip_port_pref)));
-        	ipEditPref.setSummary(ourPrefs.getString(Params.IP_ADDR, getString(R.string.ip_port_pref)));
+        SharedPreferences prefs = getActivity().getSharedPreferences(Params.PREFS_NAME, Context.MODE_PRIVATE);
+        if(prefs.contains(Params.IP_ADDR)){
+        	ipEditPref.setText(prefs.getString(Params.IP_ADDR, getString(R.string.ip_port_pref)));
+        	ipEditPref.setSummary(prefs.getString(Params.IP_ADDR, getString(R.string.ip_port_pref)));
         }
-        if(ourPrefs.contains(Params.IP_PORT)){
-        	portEditPref.setText(String.valueOf(ourPrefs.getInt(Params.IP_PORT, Params.DEF_IP_PORT)));
-        	portEditPref.setSummary(String.valueOf(ourPrefs.getInt(Params.IP_PORT, Params.DEF_IP_PORT)));
+        if(prefs.contains(Params.IP_PORT)){
+        	portEditPref.setText(String.valueOf(prefs.getInt(Params.IP_PORT, Params.DEF_IP_PORT)));
+        	portEditPref.setSummary(String.valueOf(prefs.getInt(Params.IP_PORT, Params.DEF_IP_PORT)));
         }
+        
+        Preference deviceIdPref = findPreference(getString(R.string.ip_device_id_key));
+        deviceIdPref.setSummary(DeviceUtil.getDeviceId(getActivity()));
 	}
 
 	/**
@@ -72,9 +76,9 @@ public class IPSettingFragment extends PreferenceFragment implements OnPreferenc
 			EditTextPreference ipEditPref = (EditTextPreference) findPreference(getString(R.string.ip_pref_key));
 			ipEditPref.setText((String)newValue);
 			ipEditPref.setSummary((String)newValue);
-		} else
+			
+		} else if(preference.getKey().equals(getString(R.string.ip_port_pref_key))){
 			//端口设置
-			if(preference.getKey().equals(getString(R.string.ip_port_pref_key))){
 			editor.putInt(Params.IP_PORT, Integer.parseInt((String)newValue));
 			editor.commit();
 			

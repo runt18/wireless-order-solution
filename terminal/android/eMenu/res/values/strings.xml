@@ -9,8 +9,9 @@
     <string name="choose_panorama">全景模式</string>
     
     <!-- settings  -->
-    <string name="ip_pref">www.e-tones.net</string>
+    <string name="ip_pref">e-tones.net</string>
     <string name="ip_pref_key">ip_pref_key</string>
+    <string name="ip_device_id_key">ip_device_id_key</string>
     <string name="ip_revert_pref_key">ip_revert_pref_key</string>
     <string name="test_ip_pref">42.121.54.177</string>
     <string name="ip_port_pref">55555</string>

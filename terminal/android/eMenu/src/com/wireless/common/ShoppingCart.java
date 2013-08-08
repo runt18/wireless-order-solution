@@ -8,7 +8,7 @@ import com.wireless.pack.Type;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.regionMgr.Table;
-import com.wireless.protocol.StaffTerminal;
+import com.wireless.pojo.staffMgr.Staff;
 
 public final class ShoppingCart {
 	
@@ -35,7 +35,7 @@ public final class ShoppingCart {
 		public void onPostCommit(Order reqOrder, BusinessException e);
 	}
 	
-	private StaffTerminal mStaff;
+	private Staff mStaff;
 	private Table mDestTable;
 	//private List<OrderFood> mExtraFoods = new LinkedList<OrderFood>();
 	
@@ -213,7 +213,7 @@ public final class ShoppingCart {
 	 * Get the staff. 
 	 * @return the mStaff
 	 */
-	public StaffTerminal getStaff() {
+	public Staff getStaff() {
 		return mStaff;
 	}
 	
@@ -230,7 +230,7 @@ public final class ShoppingCart {
 	 * @param mStaff
 	 *            the mStaff to set
 	 */
-	public void setStaff(StaffTerminal staff) {
+	public void setStaff(Staff staff) {
 		this.mStaff = staff;
 	}
 
@@ -419,7 +419,7 @@ public final class ShoppingCart {
 		private OnCommitListener mCommitListener;
 		
 		CommitOrderTask(Order reqOrder, byte type, OnCommitListener commitListener){
-			super(WirelessOrder.pinGen, reqOrder, type);
+			super(WirelessOrder.loginStaff, reqOrder, type);
 			mCommitListener = commitListener;
 		}
 		

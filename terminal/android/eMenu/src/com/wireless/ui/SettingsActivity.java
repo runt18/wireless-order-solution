@@ -96,7 +96,7 @@ public class SettingsActivity extends PreferenceActivity  implements OnTableChan
 		private ProgressDialog mToast;
 		
 		QueryMenuTask(){
-			super(WirelessOrder.pinGen);
+			super(WirelessOrder.loginStaff);
 		}
 		
 		/**

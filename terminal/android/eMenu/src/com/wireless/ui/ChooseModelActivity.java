@@ -30,7 +30,7 @@ public class ChooseModelActivity extends Activity {
 
 			@Override
 			public void onClick(View v) {
-				new QueryFoodGroupTask(WirelessOrder.pinGen, WirelessOrder.foodMenu.foods){
+				new QueryFoodGroupTask(WirelessOrder.loginStaff, WirelessOrder.foodMenu.foods){
 
 					private ProgressDialog mProgressDialog;
 

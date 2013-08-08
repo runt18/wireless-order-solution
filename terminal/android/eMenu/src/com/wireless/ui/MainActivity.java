@@ -116,7 +116,7 @@ public class MainActivity extends Activity
 		((ImageView) findViewById(R.id.imageView_logo)).setOnLongClickListener(new View.OnLongClickListener() {
 			@Override
 			public boolean onLongClick(View v) {
-				startActivityForResult(new Intent(MainActivity.this,SettingsActivity.class), MAIN_ACTIVITY_RES_CODE);
+				startActivityForResult(new Intent(MainActivity.this, SettingsActivity.class), MAIN_ACTIVITY_RES_CODE);
 				return true;
 			}
 		});
@@ -213,7 +213,7 @@ public class MainActivity extends Activity
 		//读取服务员锁定信息
 		pref = this.getSharedPreferences(Params.PREFS_NAME, MODE_PRIVATE);
 		if(pref.contains(Params.IS_FIX_STAFF)){
-			long staffPin = pref.getLong(Params.STAFF_PIN, -1);
+			int staffPin = pref.getInt(Params.STAFF_ID, -1);
 			bar.setStaff(staffPin);
 			OptionBarFragment.setStaffFixed(true);
 		}
@@ -333,28 +333,6 @@ public class MainActivity extends Activity
 	        	}
 	        	break;
 	        	
-//	        case SelectedFoodActivity.ORDER_SUBMIT_RESULT:
-//	        	//下单返回,如果未锁定餐台，则清除已点菜显示
-//				SharedPreferences pref = getSharedPreferences(Params.TABLE_ID, MODE_PRIVATE);
-//				if(!pref.contains(Params.TABLE_ID)){
-//					ShoppingCart.instance().clearTable();
-//	        	
-//		        	GalleryFragment galleryFgm = (GalleryFragment) getFragmentManager().findFragmentByTag(TAG_GALLERY_FRAGMENT);
-//		        	if(galleryFgm != null){
-//		        		galleryFgm.refresh();
-//	        		}
-//		        	
-//		    		ThumbnailFragment thumbFgm = (ThumbnailFragment) getFragmentManager().findFragmentByTag(TAG_THUMBNAIL_FRAGMENT);
-//		    		if(thumbFgm != null){
-//		    			thumbFgm.refersh();
-//		    		}
-//		    		
-//		    		TextListFragment textFgm = (TextListFragment)getFragmentManager().findFragmentByTag(TAG_TEXT_LIST_FRAGMENT);
-//		    		if(textFgm != null){
-//		    			textFgm.refresh();
-//		    		}
-//				}
-//	        	break;
 	        }
 		}
     }

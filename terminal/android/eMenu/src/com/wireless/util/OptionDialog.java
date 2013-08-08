@@ -25,7 +25,7 @@ import com.wireless.fragment.TablePanelFragment;
 import com.wireless.fragment.TablePanelFragment.OnTableChangedListener;
 import com.wireless.ordermenu.R;
 import com.wireless.pojo.regionMgr.Table;
-import com.wireless.protocol.StaffTerminal;
+import com.wireless.pojo.staffMgr.Staff;
 
 /**
  * @deprecated it is not a good idea to use this dialog, because fragment in the dialog may throw some exceptions
@@ -62,8 +62,8 @@ public class OptionDialog extends Dialog implements OnTableChangedListener, OnSt
 	
 	private OnStaffChangedListener mOnStaffChangedListener;
 	
-	public interface OnStaffChangedListener{
-		void onStaffChanged(StaffTerminal staff, String id, String pwd);
+	public static interface OnStaffChangedListener{
+		void onStaffChanged(Staff staff, String id, String pwd);
 	}
 	
 	public void setOnStaffChangeListener(OnStaffChangedListener l){
@@ -287,7 +287,7 @@ public class OptionDialog extends Dialog implements OnTableChangedListener, OnSt
 	 * 直接把fragment返回的服务员返回给侦听器
 	 */
 	@Override
-	public void onStaffChanged(StaffTerminal staff, String id, String pwd) {
+	public void onStaffChanged(Staff staff, String id, String pwd) {
 		if(mOnStaffChangedListener != null)
 			mOnStaffChangedListener.onStaffChanged(staff, id, pwd);
 	}

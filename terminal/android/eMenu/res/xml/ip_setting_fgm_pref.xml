@@ -11,6 +11,12 @@
         android:key="@string/ip_port_pref_key"
         android:summary="@string/ip_port_pref"
         android:title="设置端口号" />
-    <Preference android:title="还原设置" android:key="@string/ip_revert_pref_key"/>
+
+    <Preference
+        android:key="@string/ip_device_id_key"
+        android:title="设备编号" />
+    <Preference
+        android:key="@string/ip_revert_pref_key"
+        android:title="还原设置" />
 
 </PreferenceScreen>
