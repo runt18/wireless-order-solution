@@ -108,7 +108,7 @@ public class BindTableAndServerSettingFragment extends PreferenceFragment implem
 /////////////组织服务员数据///////////////////////////////////////////////////
 		List<Staff> staffs = new ArrayList<Staff>();
 		for(Staff s : WirelessOrder.staffs){
-			if(s.getName().equals(""))
+			if(!s.getName().equals(""))
 				staffs.add(s);
 		}
 		

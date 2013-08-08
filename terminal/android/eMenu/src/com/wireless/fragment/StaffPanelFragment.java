@@ -57,8 +57,8 @@ public class StaffPanelFragment extends Fragment {
 	}
 	
 	@Override
-	public View onCreateView(LayoutInflater inflater , ViewGroup container, Bundle savedInstanceState)
-	{
+	public View onCreateView(LayoutInflater inflater , ViewGroup container, Bundle savedInstanceState){
+		
 		View view = inflater.inflate(R.layout.fragment_staff_panel,container,false);
 		
 		mServerIdTextView  = (TextView) view.findViewById(R.id.TextView_serverId);
@@ -110,7 +110,7 @@ public class StaffPanelFragment extends Fragment {
 			@SuppressWarnings("deprecation")
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-				mStaff = WirelessOrder.staffs.get(0);
+				mStaff = WirelessOrder.staffs.get(position);
 				mServerIdTextView.setText(mStaff.getName());
 				
 				if(parent.getTag() != null)
@@ -148,7 +148,7 @@ public class StaffPanelFragment extends Fragment {
 	 * @author ggdsn1
 	 *
 	 */
-	public class  PswdTextWatcher implements TextWatcher{
+	public class PswdTextWatcher implements TextWatcher{
 		CheckPswdRunnable checkRunnable = new CheckPswdRunnable();
 
 		public CheckPswdRunnable getCheckRunnable() {
