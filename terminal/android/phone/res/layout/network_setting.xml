@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:background="@drawable/bgcolor" >
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:orientation="vertical" >
 
     <include
         android:id="@+id/top"
@@ -11,29 +12,32 @@
     <RelativeLayout
         android:id="@+id/r1"
         android:layout_width="fill_parent"
-        android:layout_height="70dip"
+        android:layout_height="60dip"
         android:layout_below="@id/top" >
 
         <TextView
-            android:id="@+id/pin"
+            android:id="@+id/ip"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="20dip"
             android:layout_marginTop="2dip"
-            android:text="PIN"
+            android:text="服务器IP"
             android:textColor="#000000"
             android:textSize="18sp"
             android:textStyle="bold"
             android:typeface="sans" />
 
-        <TextView
-            android:id="@+id/pinnum"
-            android:layout_width="wrap_content"
+        <EditText
+            android:id="@+id/edtTxt_ip_setting"
+            android:layout_width="400dip"
             android:layout_height="wrap_content"
-            android:layout_below="@id/pin"
+            android:layout_below="@id/ip"
             android:layout_marginLeft="20dip"
             android:layout_marginTop="2dip"
+            android:background="@null"
+            android:hint="请输入服务器地址"
             android:textColor="#FF6600"
+            android:singleLine="true"
             android:textSize="15sp" />
     </RelativeLayout>
 
@@ -47,31 +51,34 @@
     <RelativeLayout
         android:id="@+id/r2"
         android:layout_width="fill_parent"
-        android:layout_height="70dip"
+        android:layout_height="60dip"
         android:layout_below="@id/l1" >
 
         <TextView
-            android:id="@+id/afterketchen"
+            android:id="@+id/port"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="20dip"
             android:layout_marginTop="2dip"
-            android:text="后厨打印"
+            android:text="服务器端口"
             android:textColor="#000000"
             android:textSize="18sp"
             android:textStyle="bold"
+            android:singleLine="true"
             android:typeface="sans" />
 
-        <Spinner
-            android:id="@+id/afterketchenmethod"
-            android:layout_width="wrap_content"
+        <EditText
+            android:id="@+id/edtTxt_port_setting"
+            android:layout_width="400dip"
             android:layout_height="wrap_content"
-            android:layout_below="@id/afterketchen"
+            android:layout_below="@id/port"
             android:layout_marginLeft="20dip"
             android:layout_marginTop="2dip"
-            android:background="@drawable/bg06"
-            android:textColor="#000000"
-            android:textSize="15sp" />
+            android:background="@null"
+            android:hint="请输入服务器端口"
+            android:textColor="#FF6600"
+            android:textSize="15sp"
+            android:inputType="numberSigned" />
     </RelativeLayout>
 
     <ImageView
@@ -84,30 +91,30 @@
     <RelativeLayout
         android:id="@+id/r3"
         android:layout_width="fill_parent"
-        android:layout_height="70dip"
+        android:layout_height="60dip"
         android:layout_below="@id/l2" >
 
         <TextView
-            android:id="@+id/connection"
+            android:id="@+id/apn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="20dip"
             android:layout_marginTop="2dip"
-            android:text="连接超时"
+            android:text="设备编号"
             android:textColor="#000000"
             android:textSize="18sp"
             android:textStyle="bold"
             android:typeface="sans" />
 
-        <Spinner
-            android:id="@+id/connectiontime"
-            android:layout_width="wrap_content"
+        <TextView
+            android:id="@+id/txtView_deviceId_setting"
+            android:layout_width="400dip"
             android:layout_height="wrap_content"
-            android:layout_below="@id/connection"
+            android:layout_below="@id/apn"
             android:layout_marginLeft="20dip"
             android:layout_marginTop="2dip"
-            android:background="@drawable/bg06"
-            android:textColor="#000000"
+            android:background="@null"
+            android:textColor="#FF6600"
             android:textSize="15sp" />
     </RelativeLayout>
 
@@ -119,27 +126,30 @@
         android:src="@drawable/line" />
 
     <RelativeLayout
-        android:id="@+id/r4"
-        android:layout_width="fill_parent"
-        android:layout_height="50dip"
-        android:layout_below="@id/l3"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="30dip" >
+        android:id="@+id/relativeLayout_testNetwork_setting"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:background="@drawable/bg02" >
 
-        <ImageView
-            android:id="@+id/definite"
+        <TextView
+            android:id="@+id/txtView_testNetwork_setting"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="50dip"
-            android:src="@drawable/yes_selector" />
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:text="测试网络"
+            android:textColor="#000000"
+            android:textSize="20sp" />
 
         <ImageView
-            android:id="@+id/cancle"
+            android:id="@+id/add"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="40dip"
-            android:layout_toRightOf="@id/definite"
-            android:src="@drawable/cancle_selector" />
+            android:layout_centerVertical="true"
+            android:layout_toLeftOf="@+id/txtView_testNetwork_setting"
+            android:src="@drawable/add_selector" />
     </RelativeLayout>
 
 </RelativeLayout>

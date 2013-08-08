@@ -161,9 +161,9 @@ public class MainActivity extends FragmentActivity implements OnTableSelectedLis
 			) {
 				
 				/**
-				 * "功能设置", "网络设置", "注销", "关于" 在任何情况都是可以使用的
+				 * "设置", "注销", "关于" 在任何情况都是可以使用的
 				 */
-				if(position != 4 && position != 5 && position != 7 && position != 8){
+				if(position != 5 && position != 7 && position != 8){
 					if(WirelessOrder.staffs.isEmpty()){
 						Toast.makeText(MainActivity.this, "没有查询到任何的员工信息，请在管理后台先添加员工信息", Toast.LENGTH_SHORT).show();
 						return;

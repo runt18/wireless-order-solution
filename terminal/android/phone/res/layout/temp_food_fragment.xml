@@ -4,7 +4,7 @@
     android:layout_height="wrap_content"
     android:layout_alignParentLeft="true"
     android:layout_alignParentTop="true" >
-
+
     <ListView
         android:id="@+id/listView_tempFood_fgm"
         android:layout_width="match_parent"
@@ -12,7 +12,6 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
         android:layout_below="@+id/relativeLayout_tempFoodFgm_add" >
-
     </ListView>
 
     <RelativeLayout
@@ -40,7 +39,6 @@
             android:layout_centerVertical="true"
             android:layout_toLeftOf="@+id/orderpin"
             android:src="@drawable/add_selector" />
-
     </RelativeLayout>
 
 </RelativeLayout>

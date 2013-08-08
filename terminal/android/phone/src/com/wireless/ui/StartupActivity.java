@@ -42,9 +42,6 @@ public class StartupActivity extends Activity {
 			Editor editor = sharedPrefs.edit();// »ñÈ¡±à¼­Æ÷
 			editor.putString(Params.IP_ADDR, Params.DEF_IP_ADDR);
 			editor.putInt(Params.IP_PORT, Params.DEF_IP_PORT);
-			editor.putString(Params.APN, "cmnet");
-			editor.putString(Params.USER_NAME, "");
-			editor.putString(Params.PWD, "");
 			editor.putInt(Params.PRINT_SETTING,	Params.PRINT_ASYNC);
 			editor.putInt(Params.CONN_TIME_OUT, Params.TIME_OUT_10s);
 			editor.putInt(Params.LAST_PICK_CATE, Params.PICK_BY_KITCHEN);

@@ -13,12 +13,6 @@ public final class Params {
 	public final static String IP_ADDR = "IPAddr";
 	//The name to IP port
 	public final static String IP_PORT = "IPPort";
-	//The name to APN
-	public final static String APN = "APN";
-	//The name to user name
-	public final static String USER_NAME = "UserName";
-	//The name to password
-	public final static String PWD = "Password";
 	//The id to staff has login before
 	public final static String STAFF_LOGIN_ID = "StaffPin";
 	//The last pick food category
