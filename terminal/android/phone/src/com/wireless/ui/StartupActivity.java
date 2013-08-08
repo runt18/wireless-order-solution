@@ -56,7 +56,7 @@ public class StartupActivity extends Activity {
 		_msgTxtView = (TextView) findViewById(R.id.myTextView);
 
 		//FIXME
-		new MatchPinTask(StartupActivity.this).execute();
+		new MatchPinTask().execute();
 
 	}
 
@@ -389,8 +389,8 @@ public class StartupActivity extends Activity {
 	 */
 	private class MatchPinTask extends com.wireless.lib.task.MatchPinTask {
 
-		MatchPinTask(Context context){
-			super(context);
+		MatchPinTask(){
+			super(StartupActivity.this);
 		}
 		
 		/**
