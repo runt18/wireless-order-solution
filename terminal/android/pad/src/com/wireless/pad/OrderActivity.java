@@ -314,7 +314,7 @@ public class OrderActivity extends ActivityGroup implements	OrderFoodListView.On
 	private class QuerySellOutTask extends com.wireless.lib.task.QuerySellOutTask{
 		
 		QuerySellOutTask(){
-			super(WirelessOrder.pinGen, WirelessOrder.foodMenu.foods);
+			super(WirelessOrder.loginStaff, WirelessOrder.foodMenu.foods);
 		}
 		
 		@Override
@@ -336,7 +336,7 @@ public class OrderActivity extends ActivityGroup implements	OrderFoodListView.On
 		private ProgressDialog mProgDialog;
 
 		public InsertOrderTask(Order reqOrder, byte type) {
-			super(WirelessOrder.pinGen, reqOrder, type);
+			super(WirelessOrder.loginStaff, reqOrder, type);
 		}
 
 		/**

@@ -1,6 +1,5 @@
 package com.wireless.pad;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import android.app.Activity;
@@ -25,10 +24,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.wireless.common.Params;
-import com.wireless.common.WirelessOrder;
-import com.wireless.lib.PinReader;
 import com.wireless.pack.req.ReqPing;
 import com.wireless.sccon.ServerConnector;
+import com.wireless.util.DeviceUtil;
 
 public class WebSettingActivity extends Activity implements OnClickListener {
 
@@ -197,16 +195,8 @@ public class WebSettingActivity extends Activity implements OnClickListener {
 		}
 
 		// 显示PIN值
-		try {
-			String pin = PinReader.read();
-			((TextView) findViewById(R.id.pinnum)).setText("0x" + pin);
-
-		} catch (FileNotFoundException e) {
-			((TextView) findViewById(R.id.pinnum)).setText("PIN验证文件缺失");
-
-		} catch (IOException e) {
-			((TextView) findViewById(R.id.pinnum)).setText("读取PIN文件出错");
-		}
+		String deviceId = DeviceUtil.getDeviceId(WebSettingActivity.this);
+		((TextView) findViewById(R.id.pinnum)).setText(deviceId);
 
 	}
 
@@ -286,7 +276,7 @@ public class WebSettingActivity extends Activity implements OnClickListener {
 		@Override
 		protected String doInBackground(Void... params) {
 			try {
-				ServerConnector.instance().ask(new ReqPing(WirelessOrder.pinGen));
+				ServerConnector.instance().ask(new ReqPing());
 			} catch (IOException e) {
 				_errMsg = "网络连接失败，请检查网络参数是否正确。";
 			}

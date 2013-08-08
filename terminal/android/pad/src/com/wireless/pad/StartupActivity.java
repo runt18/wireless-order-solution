@@ -1,7 +1,6 @@
 package com.wireless.pad;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.util.List;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -12,22 +11,18 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.widget.TextView;
 
 import com.wireless.common.Params;
 import com.wireless.common.WirelessOrder;
-import com.wireless.lib.PinReader;
 import com.wireless.lib.task.CheckVersionTask;
-import com.wireless.pack.req.PinGen;
 import com.wireless.pojo.menuMgr.FoodMenu;
 import com.wireless.pojo.regionMgr.Region;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.restaurantMgr.Restaurant;
-import com.wireless.protocol.StaffTerminal;
-import com.wireless.protocol.Terminal;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.sccon.ServerConnector;
 
 public class StartupActivity extends Activity {
@@ -68,6 +63,7 @@ public class StartupActivity extends Activity {
 
         setContentView(R.layout.startup);
         _msgTxtView = (TextView)findViewById(R.id.myTextView);
+
     }
     
     
@@ -75,7 +71,8 @@ public class StartupActivity extends Activity {
 	protected void onStart(){
 		super.onStart();
 		if(isNetworkAvail()){
-			new ReadPinTask().execute();
+	        //FIXME
+			new MatchPinTask().execute();
 		}else{
 			showNetSetting();
 		}		
@@ -129,7 +126,7 @@ public class StartupActivity extends Activity {
 	private class QueryStaffTask extends com.wireless.lib.task.QueryStaffTask{
 		
 		QueryStaffTask(){
-			super(WirelessOrder.pinGen);
+			super(StartupActivity.this);
 		}
 		
 		//private ProgressDialog _progDialog;
@@ -148,11 +145,10 @@ public class StartupActivity extends Activity {
 		 * 如果员工信息请求成功，则继续进行请求菜谱信息的操作。
 		 */
 		@Override
-		protected void onPostExecute(StaffTerminal[] staffs){
-			//make the progress dialog disappeared
-			//_progDialog.dismiss();					
-			//notify the main activity to redraw the food menu
-			//_handler.sendEmptyMessage(REDRAW_FOOD_MENU);
+		protected void onPostExecute(List<Staff> staffs){
+			
+			WirelessOrder.staffs = staffs;
+
 			/**
 			 * Prompt user message if any error occurred,
 			 * otherwise continue to query restaurant info.
@@ -170,7 +166,7 @@ public class StartupActivity extends Activity {
 				}).show();
 				
 			}else{
-				if(staffs == null){
+				if(staffs.isEmpty()){
 					new AlertDialog.Builder(StartupActivity.this)
 								   .setTitle("提示")
 					               .setMessage("没有查询到任何的员工信息，请先在管理后台添加员工信息")
@@ -183,7 +179,7 @@ public class StartupActivity extends Activity {
 					               })
 					               .show();
 				}else{
-					WirelessOrder.staffs = staffs;
+					WirelessOrder.loginStaff = staffs.get(0);
 					new QueryMenuTask().execute();					
 				}
 			}
@@ -196,7 +192,7 @@ public class StartupActivity extends Activity {
 	private class QueryMenuTask extends com.wireless.lib.task.QueryMenuTask{
 
 		QueryMenuTask(){
-			super(WirelessOrder.pinGen);
+			super(WirelessOrder.loginStaff);
 		}
 		
 		//private ProgressDialog _progDialog;
@@ -251,7 +247,7 @@ public class StartupActivity extends Activity {
 	private class QueryRegionTask extends com.wireless.lib.task.QueryRegionTask{
 		
 		QueryRegionTask(){
-			super(WirelessOrder.pinGen);
+			super(WirelessOrder.loginStaff);
 		}
 		
 		/**
@@ -296,7 +292,7 @@ public class StartupActivity extends Activity {
 	private class QueryTableTask extends com.wireless.lib.task.QueryTableTask{
 		
 		QueryTableTask(){
-			super(WirelessOrder.pinGen);
+			super(WirelessOrder.loginStaff);
 		}
 		
 		/**
@@ -341,7 +337,7 @@ public class StartupActivity extends Activity {
 	private class QueryRestaurantTask extends com.wireless.lib.task.QueryRestaurantTask{
 		
 		QueryRestaurantTask(){
-			super(WirelessOrder.pinGen);
+			super(WirelessOrder.loginStaff);
 		}
 		
 		/**
@@ -387,7 +383,11 @@ public class StartupActivity extends Activity {
 	/**
 	 * 从SDCard中读取PIN的验证信息
 	 */
-	private class ReadPinTask extends AsyncTask<Void, Void, String>{
+	private class MatchPinTask extends com.wireless.lib.task.MatchPinTask{
+		
+		MatchPinTask(){
+			super(StartupActivity.this);
+		}
 		
 		/**
 		 * 在读取Pin信息前显示提示信息
@@ -397,53 +397,21 @@ public class StartupActivity extends Activity {
 			_msgTxtView.setText("正在读取验证PIN码...请稍候");
 		}
 		
-		/**
-		 * 从SDCard的指定位置读取Pin的值
-		 */
 		@Override
-		protected String doInBackground(Void... arg0) {
-			String errMsg = null;
-			
-			try{
-				final long pin = Long.parseLong(PinReader.read(), 16);
-				WirelessOrder.pinGen = new PinGen(){
-
-					@Override
-					public long getDeviceId() {
-						return pin;
-					}
-
-					@Override
-					public short getDeviceType() {
-						return Terminal.MODEL_ANDROID;
-					}
-					
-				};
-				
-			}catch(FileNotFoundException e){
-				errMsg = "找不到PIN验证文件，请确认是否已插入验证用的SDCard";
-			}catch(IOException e){
-				errMsg = "读取PIN验证信息失败";
-			}catch(NumberFormatException e){
-				errMsg = "PIN验证信息的格式不正确";
-			}
-			return errMsg;
-		}
-		
-		@Override
-		protected void onPostExecute(String errMsg){
-			if(errMsg != null){
+		protected void onPostExecute(Void result) {
+			if (mErrMsg != null) {
 				new AlertDialog.Builder(StartupActivity.this)
-				.setTitle("提示")
-				.setMessage(errMsg)
-				.setPositiveButton("确定", new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int id) {
-						finish();
-					}
-				}).show();				
-				
-			}else{
-				new CheckVersionTask(WirelessOrder.pinGen, StartupActivity.this, CheckVersionTask.PAD){
+					.setTitle("提示")
+					.setMessage(mErrMsg)
+					.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog,	int id) {
+							finish();
+						}
+					}).show();
+
+			} else {
+				new CheckVersionTask(StartupActivity.this, CheckVersionTask.PAD){
 
 					@Override
 					public void onCheckVersionPass() {
@@ -453,6 +421,7 @@ public class StartupActivity extends Activity {
 				}.execute();
 			}
 		}
+		
 	}
 	
 }

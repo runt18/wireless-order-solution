@@ -20,7 +20,7 @@ public final class Params {
 	//The name to password
 	public final static String PWD = "Password";
 	//The pin to login staff
-	public final static String STAFF_PIN = "StaffPin";
+	public final static String STAFF_ID = "StaffPin";
 	//The last pick food category
 	public final static String LAST_PICK_CATE = "LastPickCate";
 	

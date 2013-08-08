@@ -5,6 +5,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -54,14 +55,11 @@ import android.widget.ViewSwitcher;
 
 import com.wireless.common.Params;
 import com.wireless.common.WirelessOrder;
-import com.wireless.lib.task.ReadPinTask;
 import com.wireless.pack.Type;
-import com.wireless.pack.req.PinGen;
 import com.wireless.pojo.regionMgr.Region;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.restaurantMgr.Restaurant;
-import com.wireless.protocol.StaffTerminal;
-import com.wireless.protocol.Terminal;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.view.ScrollLayout;
 import com.wireless.view.ScrollLayout.OnViewChangedListner;
 
@@ -118,7 +116,7 @@ public class MainActivity extends Activity {
 
 	private final static int NETWORK_SET = 0;
 
-	private StaffTerminal _staff;
+	private Staff _staff;
 
 	// 餐台显示区域
 	private ScrollLayout _tblScrolledArea; 
@@ -376,11 +374,11 @@ public class MainActivity extends Activity {
 		reflashTableStat();
 
 		// 弹出登陆对话框(登陆操作)
-		if (WirelessOrder.staffs != null) {
-			long pin = getSharedPreferences(Params.PREFS_NAME,
-					Context.MODE_PRIVATE).getLong(Params.STAFF_PIN,
+		if (!WirelessOrder.staffs.isEmpty()) {
+			long staffId = getSharedPreferences(Params.PREFS_NAME,
+					Context.MODE_PRIVATE).getLong(Params.STAFF_ID,
 					Params.DEF_STAFF_PIN);
-			if (pin == Params.DEF_STAFF_PIN) {
+			if (staffId == Params.DEF_STAFF_PIN) {
 				/**
 				 * Show the login dialog if logout before.
 				 */
@@ -391,24 +389,14 @@ public class MainActivity extends Activity {
 				 * NOT logout before. Otherwise show the login dialog.
 				 */
 				_staff = null;
-				for (int i = 0; i < WirelessOrder.staffs.length; i++) {
-					if (WirelessOrder.staffs[i].pin == pin) {
-						_staff = WirelessOrder.staffs[i];
+				for (Staff staff : WirelessOrder.staffs) {
+					if (staff.getId() == staffId) {
+						_staff = staff;
 					}
 				}
 				if (_staff != null) {
 					
-					WirelessOrder.pinGen = new PinGen() {
-						@Override
-						public long getDeviceId() {
-							return _staff.pin;
-						}
-
-						@Override
-						public short getDeviceType() {
-							return Terminal.MODEL_STAFF;
-						}
-					};
+					WirelessOrder.loginStaff = _staff;
 				} else {
 					showDialog(DIALOG_STAFF_LOGIN);
 				}
@@ -463,9 +451,8 @@ public class MainActivity extends Activity {
 
 			TextView userName = (TextView) findViewById(R.id.username_value);
 			if (_staff != null) {
-				if (_staff.name != null) {
-					userName.setText(WirelessOrder.restaurant.getName() + "("
-							+ _staff.name + ")");
+				if (_staff.getName().length() != 0) {
+					userName.setText(WirelessOrder.restaurant.getName() + "(" + _staff.getName() + ")");
 				} else {
 					userName.setText(WirelessOrder.restaurant.getName());
 				}
@@ -886,58 +873,8 @@ public class MainActivity extends Activity {
 		// 如果从设定Activity返回，则重新请求员工信息
 		if (requestCode == NETWORK_SET) {
 			if (resultCode == RESULT_OK) {
-				
-				new ReadPinTask(){
-					
-					private ProgressDialog _progDialog;
-					
-					/**
-					 * 在读取Pin信息前显示提示信息
-					 */
-					@Override
-					protected void onPreExecute() {
-						_progDialog = ProgressDialog.show(MainActivity.this, "", "正在读取验证PIN码...请稍候", true);
-					}
-					
-					@Override
-					protected void onPostExecute(Long pin) {
-						
-						_progDialog.dismiss();
-						
-						if (mErrMsg != null) {
-							new AlertDialog.Builder(MainActivity.this)
-								.setTitle("提示")
-								.setMessage(mErrMsg)
-								.setPositiveButton("确定", new DialogInterface.OnClickListener() {
-									@Override
-									public void onClick(DialogInterface dialog,	int id) {
-										finish();
-									}
-								}).show();
-
-						} else {
-							
-							final long pinVal = pin;
-							
-							WirelessOrder.pinGen = new PinGen(){
-
-								@Override
-								public long getDeviceId() {
-									return pinVal;
-								}
-
-								@Override
-								public short getDeviceType() {
-									return Terminal.MODEL_ANDROID;
-								}
-								
-							};
-							// 重新请求员工信息并更新菜谱
-							new QueryStaffTask(true).execute();
-						}
-					}
-				}.execute();
-				
+				// 重新请求员工信息并更新菜谱
+				new QueryStaffTask(true).execute();
 			}
 		}
 		super.onActivityResult(requestCode, resultCode, data);
@@ -1004,7 +941,7 @@ public class MainActivity extends Activity {
 	private class QueryTableTask extends com.wireless.lib.task.QueryTableTask {
 
 		QueryTableTask(){
-			super(WirelessOrder.pinGen);
+			super(WirelessOrder.loginStaff);
 		}
 		
 		/**
@@ -1087,8 +1024,8 @@ public class MainActivity extends Activity {
 			staffLstView.setOnItemClickListener(new OnItemClickListener() {
 				@Override
 				public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-					_staff = WirelessOrder.staffs[position];
-					staffTxtView.setText(_staff.name);
+					_staff = WirelessOrder.staffs.get(position);
+					staffTxtView.setText(_staff.getName());
 					_popupWindow.dismiss();
 				}
 			});
@@ -1111,24 +1048,15 @@ public class MainActivity extends Activity {
 						if (staffTxtView.getText().toString().equals("")) {
 							errTxtView.setText("账号不能为空");
 
-						} else if (_staff.pwd.equals(toHexString(digester.digest()))) {
+						} else if (_staff.getPwd().equals(toHexString(digester.digest()))) {
 							// 保存staff pin到文件里面
 							Editor editor = getSharedPreferences(Params.PREFS_NAME,	Context.MODE_PRIVATE).edit();// 获取编辑器
-							editor.putLong(Params.STAFF_PIN, _staff.pin);
+							editor.putLong(Params.STAFF_ID, _staff.getId());
 							// 提交修改
 							editor.commit();
 							_handler.sendEmptyMessage(REDRAW_RESTAURANT);
 							// set the pin generator according to the staff login
-							WirelessOrder.pinGen = new PinGen() {
-								@Override
-								public long getDeviceId() {
-									return _staff.pin;
-								}
-								@Override
-								public short getDeviceType() {
-									return Terminal.MODEL_STAFF;
-								}
-							};
+							WirelessOrder.loginStaff = _staff;
 							dismiss();
 
 						} else {
@@ -1191,7 +1119,7 @@ public class MainActivity extends Activity {
 
 			@Override
 			public int getCount() {
-				return WirelessOrder.staffs.length;
+				return WirelessOrder.staffs.size();
 			}
 
 			@Override
@@ -1208,10 +1136,10 @@ public class MainActivity extends Activity {
 			public View getView(int position, View convertView, ViewGroup parent) {
 				if (convertView == null) {
 					convertView = LayoutInflater.from(MainActivity.this).inflate(R.layout.orderpopuwindowitem, null);
-					((TextView) convertView.findViewById(R.id.popuwindowfoodname)).setText(WirelessOrder.staffs[position].name);
+					((TextView) convertView.findViewById(R.id.popuwindowfoodname)).setText(WirelessOrder.staffs.get(position).getName());
 					
 				} else {
-					((TextView) convertView.findViewById(R.id.popuwindowfoodname)).setText(WirelessOrder.staffs[position].name);
+					((TextView) convertView.findViewById(R.id.popuwindowfoodname)).setText(WirelessOrder.staffs.get(position).getName());
 				}
 				return convertView;
 			}
@@ -1227,7 +1155,7 @@ public class MainActivity extends Activity {
 		private ProgressDialog _progDialog;
 
 		QueryRegionTask(){
-			super(WirelessOrder.pinGen);
+			super(WirelessOrder.loginStaff);
 		}
 		
 		/**
@@ -1277,20 +1205,20 @@ public class MainActivity extends Activity {
 		private byte mType = Type.INSERT_ORDER;
 
 		QueryTblStatusTask(Table table) {
-			super(WirelessOrder.pinGen, table);
+			super(WirelessOrder.loginStaff, table);
 		}
 		
 		QueryTblStatusTask(Table table, byte type) {
-			super(WirelessOrder.pinGen, table);
+			super(WirelessOrder.loginStaff, table);
 			mType = type;
 		}
 
 		public QueryTblStatusTask(int tableAlias) {
-			super(WirelessOrder.pinGen, tableAlias);
+			super(WirelessOrder.loginStaff, tableAlias);
 		}
 		
 		public QueryTblStatusTask(int tableAlias, byte type) {
-			super(WirelessOrder.pinGen, tableAlias);
+			super(WirelessOrder.loginStaff, tableAlias);
 			mType = type;
 		}
 		
@@ -1356,7 +1284,7 @@ public class MainActivity extends Activity {
 		private ProgressDialog _progDialog;
 
 		QueryRestaurantTask(){
-			super(WirelessOrder.pinGen);
+			super(WirelessOrder.loginStaff);
 		}
 		
 		/**
@@ -1409,7 +1337,7 @@ public class MainActivity extends Activity {
 		private boolean _isTableUpdate;
 
 		QueryStaffTask(boolean isMenuUpdate) {
-			super(WirelessOrder.pinGen);
+			super(MainActivity.this);
 			_isTableUpdate = isMenuUpdate;
 		}
 
@@ -1427,9 +1355,12 @@ public class MainActivity extends Activity {
 		 * 根据返回的error message判断，如果发错异常则提示用户， 如果员工信息请求成功，则显示登录Dialog。
 		 */
 		@Override
-		protected void onPostExecute(StaffTerminal[] staffs) {
+		protected void onPostExecute(List<Staff> staffs) {
 			// make the progress dialog disappeared
 			_progDialog.dismiss();
+			
+			WirelessOrder.staffs = staffs;
+
 			((TextView) findViewById(R.id.username_value)).setText("");
 			((TextView) findViewById(R.id.notice)).setText("");
 			/**
@@ -1443,16 +1374,15 @@ public class MainActivity extends Activity {
 						.show();
 
 			} else {
-				if (staffs == null) {
+				if (staffs.isEmpty()) {
 					new AlertDialog.Builder(MainActivity.this)
 						.setTitle("提示")
 						.setMessage("没有查询到任何的员工信息，请在管理后台先添加员工信息")
 						.setPositiveButton("确定", null).show();
 					
 				} else {
-					WirelessOrder.staffs = staffs;
 					Editor editor = getSharedPreferences(Params.PREFS_NAME,	Context.MODE_PRIVATE).edit();// 获取编辑器
-					editor.putLong(Params.STAFF_PIN, Params.DEF_STAFF_PIN);
+					editor.putLong(Params.STAFF_ID, Params.DEF_STAFF_PIN);
 					editor.commit();
 					showDialog(DIALOG_STAFF_LOGIN);
 					if (_isTableUpdate) {

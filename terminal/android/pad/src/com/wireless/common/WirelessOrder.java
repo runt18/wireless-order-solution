@@ -1,17 +1,18 @@
 package com.wireless.common;
 
-import com.wireless.pack.req.PinGen;
+import java.util.List;
+
 import com.wireless.pojo.menuMgr.FoodMenu;
 import com.wireless.pojo.regionMgr.Region;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.restaurantMgr.Restaurant;
-import com.wireless.protocol.StaffTerminal;
+import com.wireless.pojo.staffMgr.Staff;
 
 public class WirelessOrder {
-	public static PinGen pinGen;
+	public static Staff loginStaff;
 	public static FoodMenu foodMenu;
 	public static Restaurant restaurant;
-	public static StaffTerminal[] staffs;
+	public static List<Staff> staffs;
 	public static Region[] regions;
 	public static Table[] tables;
 }

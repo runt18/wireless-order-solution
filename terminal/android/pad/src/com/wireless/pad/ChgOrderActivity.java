@@ -350,7 +350,7 @@ public class ChgOrderActivity extends ActivityGroup implements OrderFoodListView
 		private ProgressDialog _progDialog;
 		
 		UpdateOrderTask(Order reqOrder, byte type){
-			super(WirelessOrder.pinGen, reqOrder, type);
+			super(WirelessOrder.loginStaff, reqOrder, type);
 		}
 		
 		/**
@@ -464,7 +464,7 @@ public class ChgOrderActivity extends ActivityGroup implements OrderFoodListView
 	private class QuerySellOutTask extends com.wireless.lib.task.QuerySellOutTask{
 		
 		QuerySellOutTask(){
-			super(WirelessOrder.pinGen, WirelessOrder.foodMenu.foods);
+			super(WirelessOrder.loginStaff, WirelessOrder.foodMenu.foods);
 		}
 		
 		@Override
@@ -486,7 +486,7 @@ public class ChgOrderActivity extends ActivityGroup implements OrderFoodListView
 		private ProgressDialog mProgDialog;
 	
 		QueryOrderTask(int tableAlias){
-			super(WirelessOrder.pinGen, tableAlias, WirelessOrder.foodMenu);
+			super(WirelessOrder.loginStaff, tableAlias, WirelessOrder.foodMenu);
 		}
 		
 		/**
