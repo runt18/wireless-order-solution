@@ -52,7 +52,7 @@ public class StockDeltaReportDao {
 			stockTakeDetail.setEndAmount(actualFinalAmount);
 			//理论期末数量(不包括盘盈，亏)
 			expectFinalAmount = stockReport.getPrimeAmount() + stockReport.getStockIn() + stockReport.getStockInTransfer() + stockReport.getStockSpill() - stockReport.getStockOut() - stockReport.getStockOutTransfer() - stockReport.getStockDamage() - stockReport.getUseUp();
-			//实际消耗
+			//实际消耗	
 			stockTakeDetail.setActualAmount(stockReport.getPrimeAmount() - actualFinalAmount);
 			//理论消耗
 			stockTakeDetail.setExpectAmount(stockReport.getPrimeAmount() - expectFinalAmount);
