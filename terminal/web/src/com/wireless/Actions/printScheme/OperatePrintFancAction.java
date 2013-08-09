@@ -75,13 +75,17 @@ public class OperatePrintFancAction extends DispatchAction{
 			}
 			
 			
-			String[] kitchen = null,region = null;
+			String[] kitchen = null ,region = null;
 			if(!kitchens.trim().isEmpty()){
 				kitchen = kitchens.split(",");
+			}else{
+				kitchen = new String[0];
 			}
 			
 			if(!regions.trim().isEmpty()){
 				region = regions.split(",");
+			}else{
+				region = new String[0];
 			}
 			
 			if(PType.valueOf(pType) == PType.PRINT_ORDER){
@@ -188,10 +192,14 @@ public class OperatePrintFancAction extends DispatchAction{
 			String[] kitchen = null,region = null;
 			if(!kitchens.trim().isEmpty()){
 				kitchen = kitchens.split(",");
+			}else{
+				kitchen = new String[0];
 			}
 			
 			if(!regions.trim().isEmpty()){
 				region = regions.split(",");
+			}else{
+				region = new String[0];
 			}
 			
 			if(PType.valueOf(pType) == PType.PRINT_ORDER){
