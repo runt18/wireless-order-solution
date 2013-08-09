@@ -369,13 +369,21 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 
 	@Override
 	public Map<String, Object> toJsonMap(int flag) {
+		String regions = "";
+		String regionValues = "";
+		
+		String kitchens = "";
+		String kitchenValues = "";
+		
+		String dept = "";
+		String deptValue = "";
+		
 		Map<String, Object> jm = new HashMap<String, Object>();
 		jm.put("printFuncId", this.mId);
 		jm.put("pTypeValue", this.mType.getVal());
 		jm.put("pTypeText", this.mType.getDesc());
 		jm.put("repeat", this.mRepeat);
-		String regions = "----";
-		String regionValues = "";
+		
 		if(this.mRegions.size() > 0){
 			regions = "";
 			for (Region region : this.mRegions) {
@@ -388,10 +396,7 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 				}
 			}
 		}
-		jm.put("regionValues", regionValues);
-		jm.put("regions", regions);
-		String kitchens = "----";
-		String kitchenValues = "";
+		
 		if(this.mKitchens.size() > 0){
 			kitchens = "";
 			
@@ -405,10 +410,51 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 				}
 			}
 		}
+
+		if(!isDeptAll()){
+			dept = this.mDept.getName();
+			deptValue = this.mDept.getId() + "";
+		}
+		
+		if(this.mType == PType.PRINT_ORDER || this.mType == PType.PRINT_ALL_CANCELLED_FOOD){
+			kitchens = "----";
+			if(isRegionAll()){
+				regions = "所有区域";
+				regionValues = "";
+			}
+			if(isDeptAll()){
+				dept = "所有部门";
+				deptValue = "";
+			}
+		}else if(this.mType == PType.PRINT_ORDER_DETAIL || this.mType == PType.PRINT_CANCELLED_FOOD){
+			regions = "----";
+			dept = "----";
+			if(isKitchenAll()){
+				kitchens = "所有厨房";
+				kitchenValues = "";
+			}
+		
+		}else{
+			dept = "----";
+			kitchens = "----";
+			if(isRegionAll()){
+				regions = "所有区域";
+				regionValues = "";
+			}
+		}
+		
+		
+
+		jm.put("regionValues", regionValues);
+		jm.put("regions", regions);
+
 		jm.put("kitchens", kitchens);
 		jm.put("kitchenValues", kitchenValues);
-		jm.put("dept", this.mDept == null ? "----" : this.mDept.getName());
-		jm.put("deptValue", this.mDept == null ? "" : this.mDept.getId());
+		
+		jm.put("dept", dept);
+		jm.put("deptValue", deptValue);
+		
+		
 		return Collections.unmodifiableMap(jm);
 	}
 
