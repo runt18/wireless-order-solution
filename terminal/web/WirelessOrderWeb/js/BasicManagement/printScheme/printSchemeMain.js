@@ -143,27 +143,21 @@ var addPrintFanc = new Ext.Window({
 			if(!Ext.getCmp('txtRepeat').isValid()){
 				return;
 			}
+
 			var pType = document.getElementsByName('pType');
+
 			for ( var i = 0; i < pType.length; i++) {
 				if(pType[i].checked){
 					pType = pType[i].value;
 					break;
 				}
 			}
-			var allKitchen = Ext.getCmp('chkAllKitchen');
+			var allKitchen = Ext.getDom('chkAllKitchen');
 			var kitchens = '';
-			var kitchen = document.getElementsByName('kitchen');
-			if(allKitchen.checked){
-				//添加所有厨房
-				for ( var i = 0; i < kitchen.length; i++) {
-					if(kitchens == ''){
-						kitchens += kitchen[i].value;
-					}else{
-						kitchens += (',' + kitchen[i].value);
-					}
-				}
-
-			}else{
+			
+			if(!allKitchen.checked){
+				var kitchen = document.getElementsByName('kitchen');
+				//添加厨房
 				for ( var i = 0; i < kitchen.length; i++) {
 					if(kitchen[i].checked && kitchens == ''){
 						kitchens += kitchen[i].value;
@@ -171,23 +165,27 @@ var addPrintFanc = new Ext.Window({
 						kitchens += (',' + kitchen[i].value);
 					}
 				}
-				
+
 			}
 			
+			
+			var allDept = Ext.getDom('chkAllDept');
 			var depts = '';
-			var dept = document.getElementsByName('dept');
-			for ( var i = 0; i < dept.length; i++) {
-				if(dept[i].checked){
-					depts = dept[i].value;
+			if(!allDept.checked){
+				var dept = document.getElementsByName('dept');
+				//添加部门
+				for ( var i = 0; i < dept.length; i++) {
+					if(dept[i].checked){
+						depts += dept[i].value;
+					}
 				}
 			}
 
-			var allRegion = Ext.getCmp('chkAllRegion');
-			
+
+			var allRegion = Ext.getDom('chkAllRegion');
 			var regions = '';
-			var region = document.getElementsByName('region');
 			if(!allRegion.checked){
-				
+				var region = document.getElementsByName('region');
 				for ( var i = 0; i < region.length; i++) {
 					if(region[i].checked && regions == ''){
 						regions += region[i].value;
@@ -195,16 +193,10 @@ var addPrintFanc = new Ext.Window({
 						regions += (',' + region[i].value);
 					}
 				}
-			}else{
-				//添加所有区域
-				for ( var i = 0; i < region.length; i++) {
-					if(regions == ''){
-						regions += region[i].value;
-					}else{
-						regions += (',' + region[i].value);
-					}
-				}
 			}
+			
+			
+			
 			var dataSource = '';
 			var funcId = '';
 			if(addPrintFanc.operationType == 'insert'){
@@ -262,7 +254,6 @@ var addPrintFanc = new Ext.Window({
 	}],
 	items : [{
 		layout : 'column',
-		id : 'printer',
 		frame : true,
 		defaults : {
 			columnWidth : .16,
@@ -270,6 +261,15 @@ var addPrintFanc = new Ext.Window({
 			labelWidth : 70,
 		},
 		items : [{
+			columnWidth : 0.4,
+			items : [{
+				xtype : 'tbtext',
+				text : String.format(
+					Ext.ux.txtFormat.attrName,
+					'打印机','lblPrinterName',''
+				)
+			}]
+		}, {
 			columnWidth : 0.5,
 			items : [{
 				xtype : 'textfield',
@@ -283,8 +283,17 @@ var addPrintFanc = new Ext.Window({
 					}
 				}
 			}]
-		},         
-		{
+		}]
+	},{
+		layout : 'column',
+		id : 'printerType',
+		frame : true,
+		defaults : {
+			columnWidth : .16,
+			layout : 'form',
+			labelWidth : 70,
+		},
+		items : [{
 			columnWidth : 1,
 			xtype : 'label',
 			text : '请选择功能:'
@@ -433,7 +442,6 @@ var addPrintFanc = new Ext.Window({
 				xtype : 'checkbox',
 				name : 'kitchens',
 				id : 'chkAllKitchen',
-				inputValue : 2,
 				hideLabel : true,
 				boxLabel : '所有厨房',
 				listeners : {
@@ -445,12 +453,6 @@ var addPrintFanc = new Ext.Window({
 						if(checked){
 							Ext.getCmp('allKitchen').disable();
 						}else{
-							var kitchen = document.getElementsByName('kitchen');
-							for ( var i = 0; i < kitchen.length; i++) {
-								if(kitchen[i].checked){
-									kitchen[i].checked = false;
-								}
-							}
 							Ext.getCmp('allKitchen').enable();
 							
 						}
@@ -483,6 +485,27 @@ var addPrintFanc = new Ext.Window({
 			xtype : 'label',
 			text : '请选择部门:'
 		},{
+			items : [{
+				xtype : 'checkbox',
+				name : 'allDepts',
+				id : 'chkAllDept',
+				hideLabel : true,
+				boxLabel : '所有部门',
+				listeners : {
+					focus : function(){
+						Ext.getCmp('allDept').enable();
+					},
+					check : function(checkbox, checked){
+						if(checked){
+							Ext.getCmp('allDept').disable();
+						}else{
+							Ext.getCmp('allDept').enable();
+						}
+						
+					}
+				}
+			}]
+		},{
 			//所有部门
 			columnWidth : 1,
 			layout : 'column',
@@ -511,7 +534,6 @@ var addPrintFanc = new Ext.Window({
 				xtype : 'checkbox',
 				name : 'pType',
 				id : 'chkAllRegion',
-				inputValue : 2,
 				hideLabel : true,
 				boxLabel : '所有区域',
 				listeners : {
@@ -519,6 +541,7 @@ var addPrintFanc = new Ext.Window({
 						Ext.getCmp('allRegion').enable();
 					},
 					check : function(checkbox, checked){
+						alert('re' + checked);
 						if(checked){
 							Ext.getCmp('allRegion').disable();
 						}else{
@@ -592,7 +615,7 @@ var printerWin = new Ext.Window({
 			}else{
 				isEnabled = 'false';
 			}
-			if(!Ext.getCmp('txtPrinterName').isValid() || !Ext.getCmp('txtPrinterAlias').isValid()){
+			if(!Ext.getCmp('txtPrinterName').isValid()){
 				return;
 			}
 			if(printerWin.operationType == 'insert'){
@@ -650,8 +673,7 @@ var printerWin = new Ext.Window({
 		},{
 			id : 'txtPrinterAlias',
 			fieldLabel : '别名',
-			width : 130,
-			allowBlank : false
+			width : 130
 		},{
 			xtype : 'fieldset',
 			title : '机型',
@@ -660,18 +682,18 @@ var printerWin = new Ext.Window({
 			hideLabels : true,
 			items : [{
 				name : 'pStyle',
-				inputValue : 1,
-				id : 'rdo58mm',
+				inputValue : 2,
+				id : 'rdo80mm',
 				checked : true,
 				hideLabel : true,
-				boxLabel : '58mm'
+				boxLabel : '80mm'
 				
 			},{
 				xtype : 'radio',
 				name : 'pStyle',
-				inputValue : 2,
+				inputValue : 1,
 				hideLabel : true,
-				boxLabel : '80mm'
+				boxLabel : '50mm'
 			}]
 			
 		},{
@@ -763,26 +785,30 @@ function printFancOperactionHandler(c){
 		}
 	}
 	addPrintFanc.show();
-	addPrintFanc.center();
-	var btnSave = Ext.getCmp('btnSaveFanc');
+	
+	var sn = printerTree.getSelectionModel().getSelectedNode();
+	Ext.getDom('lblPrinterName').innerHTML = sn.attributes.name + " " + sn.attributes.alias;
 	if(c.type == 'insert'){
 		addPrintFanc.setTitle('添加方案');
 		addPrintFanc.operationType = c.type;
 		Ext.getCmp('txtRepeat').setValue(1);
-		btnSave.show();
+		
+		Ext.getCmp('printerType').show();
+		
 		document.getElementById('radioOrder').checked = true;
 		Ext.getCmp('radioOrder').fireEvent('check', Ext.getCmp('radioOrder'), true);
-		document.getElementsByName('dept')[0].checked = true;
-		document.getElementById('chkAllRegion').checked = true;
-		document.getElementById('chkAllKitchen').checked = true;
+		//document.getElementsByName('dept')[0].checked = true;
+		Ext.getCmp('chkAllDept').fireEvent('check', Ext.getCmp('chkAllDept'), true);
 		Ext.getCmp('chkAllRegion').fireEvent('check', Ext.getCmp('chkAllRegion'), true);
 		Ext.getCmp('chkAllKitchen').fireEvent('check', Ext.getCmp('chkAllKitchen'), true);
 		
+		document.getElementById('chkAllDept').checked = true;
+		document.getElementById('chkAllRegion').checked = true;
+		document.getElementById('chkAllKitchen').checked = true;
+		
+		
+		
 	}else{
-		var allKitchen = document.getElementById('chkAllKitchen');
-		if(allKitchen.checked){
-			allKitchen.checked = false;
-		}
 		var ss = Ext.getCmp('grid').getSelectionModel().getSelected();
 		
 		if(ss == null){
@@ -791,14 +817,12 @@ function printFancOperactionHandler(c){
 		}
 		if(c.type == 'update'){
 			addPrintFanc.setTitle('修改方案');
-			btnSave.show();
 		}else{
 			addPrintFanc.setTitle('查看方案');
-			btnSave.hide();
 		}
 		
 		addPrintFanc.operationType = c.type;
-
+		Ext.getCmp('printerType').hide();
 		//功能选中
 		var pTypeValue = ss.data.pTypeValue;
 		for ( var i = 0; i < pType.length; i++) {
@@ -811,38 +835,67 @@ function printFancOperactionHandler(c){
 
 		
 		//厨房选中
-		var kitchenValues = ss.data.kitchenValues.split(",");
-		for ( var i = 0; i < kitchen.length; i++) {
-			for ( var j = 0; j < kitchenValues.length; j++) {
-				if(kitchenValues[j] == kitchen[i].value){
-					kitchen[i].checked = true;
+		
+		if(!ss.data.kitchenValues == ''){
+			Ext.getDom('chkAllKitchen').checked = false;
+			Ext.getCmp('chkAllKitchen').fireEvent('check', Ext.getCmp('chkAllKitchen'), false);
+			var kitchenValues = ss.data.kitchenValues.split(",");
+			for ( var i = 0; i < kitchen.length; i++) {
+				for ( var j = 0; j < kitchenValues.length; j++) {
+					if(kitchenValues[j] == kitchen[i].value){
+						kitchen[i].checked = true;
+					}
 				}
 			}
+		}else{
+			Ext.getDom('chkAllKitchen').checked = true;
+			Ext.getCmp('chkAllKitchen').fireEvent('check', Ext.getCmp('chkAllKitchen'), true);
 		}
+		
+		
+
 		//部门选中
 		var deptValue = ss.data.deptValue;
-		for ( var i = 0; i < dept.length; i++) {
-			if(dept[i].value == deptValue){
-				dept[i].checked = true;
-				dept[i].click();
-			}
+		if(!deptValue == ''){
+			Ext.getDom('chkAllDept').checked = false;
+			Ext.getCmp('chkAllDept').fireEvent('check', Ext.getCmp('chkAllDept'), false);
+			for ( var i = 0; i < dept.length; i++) {
+				if(dept[i].value == deptValue){
+					dept[i].checked = true;
+					dept[i].click();
+				}
+			}	
+		}else{
+			Ext.getDom('chkAllDept').checked = true;
+			Ext.getCmp('chkAllDept').fireEvent('check', Ext.getCmp('chkAllDept'), true);
 		}
+
 		
 
 		
 		//区域选中
-		var regionValues = ss.data.regionValues.split(",");
-		for ( var i = 0; i < region.length; i++) {
-			for ( var j = 0; j < regionValues.length; j++) {
-				if(regionValues[j] == region[i].value){
-					region[i].checked = true;
+		if(ss.data.regionValues == ''){
+			Ext.getDom('chkAllRegion').checked = true;
+			Ext.getCmp('chkAllRegion').fireEvent('check', Ext.getCmp('chkAllRegion'), true);
+		}else{
+			Ext.getDom('chkAllRegion').checked = false;
+			Ext.getCmp('chkAllRegion').fireEvent('check', Ext.getCmp('chkAllRegion'), false);
+			var regionValues = ss.data.regionValues.split(",");
+			for ( var i = 0; i < region.length; i++) {
+				for ( var j = 0; j < regionValues.length; j++) {
+					if(regionValues[j] == region[i].value){
+						region[i].checked = true;
+					}
 				}
 			}
+
 		}
+
 		
 		repeat.setValue(ss.data.repeat);
 	
 	}
+	addPrintFanc.center();
 }
 
 function operatePrinterHandler(c){
@@ -860,7 +913,7 @@ function operatePrinterHandler(c){
 		printerWin.operationType = c.otype;
 		printerWin.show();
 		document.getElementById('enabled').checked = true;
-		document.getElementById('rdo58mm').checked = true;
+		document.getElementById('rdo80mm').checked = true;
 	}else if(c.otype == 'update'){
 		var sn = printerTree.getSelectionModel().getSelectedNode();
 		if(!sn){
@@ -999,13 +1052,17 @@ Ext.onReady(function(){
 								'printerId' : treeRoot[0].attributes.printerId
 							}
 						});
+/*						for ( var i = 0; i < treeRoot.length; i++) {
+							alert(treeRoot[i]);
+							treeRoot[i].iconCls = 'btn_add';
+						}*/
 					}else{
-						printerTree.getRootNode().getUI().hide();
+						/*						printerTree.getRootNode().getUI().hide();
 						Ext.Msg.show({
 							title : '提示',
 							msg : '加载打印机失败',
 							buttons : Ext.MessageBox.OK
-						});
+						});*/
 					}
 					
 				}
@@ -1022,7 +1079,12 @@ Ext.onReady(function(){
 				});
 			},
 			load : function(node, records){
-				node.firstChild.select();
+				
+				if(node.firstChild != null){
+					
+					node.firstChild.select();
+				}
+				
 			}
 		}
 		

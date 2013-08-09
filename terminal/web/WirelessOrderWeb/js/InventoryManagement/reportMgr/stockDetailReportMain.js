@@ -36,20 +36,21 @@ var stockForm = new Ext.form.FormPanel({
                 {xtype: 'textfield',fieldLabel: '入货部门',name: 'stockInName',disabled:true},
                 {xtype: 'textfield',fieldLabel: '供应商',name: 'supplierName',disabled:true},
                 {xtype: 'textfield',fieldLabel: '审核人',name: 'approverName',disabled:true}
-         ]},{
-             columnWidth : .4,  
-             layout : 'form',  
-             border :false,
-             defaults : {anchor: '95%'},  
-             // 第二列中的表项
-             items :[  
-                 {xtype:'textfield', fieldLabel:'原始日期', name:'oriStockDateFormat', disabled:true},  
-                 {xtype:'textfield', fieldLabel:'操作时间', name:'birthDateFormat', disabled:true},  
-                 {xtype:'textfield', fieldLabel:'货单小类', name:'subTypeText', disabled:true},
-                 {xtype:'textfield', fieldLabel:'总金额', name:'price', disabled:true},
-                 {xtype:'textfield', fieldLabel:'出货部门', name:'stockOutName', disabled:true},
-                 {xtype:'textfield', fieldLabel:'审核时间', name:'approverDateFormat', disabled:true}
-             ]
+         ]},
+    {
+         columnWidth : .4,  
+         layout : 'form',  
+         border :false,
+         defaults : {anchor: '95%'},  
+         // 第二列中的表项
+         items :[  
+             {xtype:'textfield', fieldLabel:'原始日期', name:'oriStockDateFormat', disabled:true},  
+             {xtype:'textfield', fieldLabel:'操作时间', name:'birthDateFormat', disabled:true},  
+             {xtype:'textfield', fieldLabel:'货单小类', name:'subTypeText', disabled:true},
+             {xtype:'textfield', fieldLabel:'总金额', name:'price', disabled:true},
+             {xtype:'textfield', fieldLabel:'出货部门', name:'stockOutName', disabled:true},
+             {xtype:'textfield', fieldLabel:'审核时间', name:'approverDateFormat', disabled:true}
+         ]
     }]	
 });
 
@@ -78,7 +79,7 @@ var stockDetailStore = new Ext.data.Store({
 	])
 });
 
-var billDetailGrid = new Ext.grid.GridPanel({
+var stockDetailGrid = new Ext.grid.GridPanel({
 	title : '库存明细',
 	id : 'detailGrid',
 	region : 'center', 
@@ -98,7 +99,7 @@ var billDetailWin = new Ext.Window({
 	closable : false,
 	resizable : false,
 	modal : true,
-	items : [stockForm, billDetailGrid],
+	items : [stockForm, stockDetailGrid],
 	bbar : ['->', {
 		text : '关闭',
 		iconCls : 'btn_close',
@@ -108,7 +109,7 @@ var billDetailWin = new Ext.Window({
 	}]
 });
 
-function billDetailHandler(orderID) {
+function stockDetailHandler(orderID) {
 	billDetailWin.show();
 	billDetailWin.setTitle('库存单 ');
 	billDetailWin.center();
@@ -549,13 +550,13 @@ Ext.onReady(function(){
 				stockForm.form.load({
 					url:'../../QueryStockAction.do?id=' + id + '&pin=' + pin
 				});
-				var detailds = billDetailGrid.getStore();
+				var detailds = stockDetailGrid.getStore();
 				detailds.load({
 					params : {
 						id : id
 					}
 				});
-				billDetailHandler();
+				stockDetailHandler();
 			}
 		}
 
