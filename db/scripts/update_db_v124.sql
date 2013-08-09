@@ -209,7 +209,22 @@ ALTER TABLE `wireless_order_db`.`order_history` DROP COLUMN `terminal_pin` , DRO
 ALTER TABLE `wireless_order_db`.`order_history` ADD COLUMN `staff_id` INT NOT NULL DEFAULT 0  AFTER `waiter` ;
 ALTER TABLE `wireless_order_db`.`order_food_history` ADD COLUMN `staff_id` INT NOT NULL DEFAULT 0  AFTER `waiter` ;
 
+-- -----------------------------------------------------
+-- Table `wireless_order_db`.`device`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `wireless_order_db`.`device` ;
 
+CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`device` (
+  `id` INT NOT NULL AUTO_INCREMENT ,
+  `restaurant_id` INT NOT NULL ,
+  `device_id` VARCHAR(45) NOT NULL ,
+  `model_id` TINYINT NOT NULL DEFAULT 1 COMMENT 'the model id as below.\n1 - Android\n2 - iOS\n3 - WP' ,
+  `status` TINYINT NOT NULL DEFAULT 1 COMMENT 'the status as below.\n1 - 空闲\n2 - 使用中' ,
+  PRIMARY KEY (`id`) ,
+  INDEX `ix_restaurant_id` (`restaurant_id` ASC) ,
+  INDEX `ix_device_id` (`device_id` ASC) )
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
 
 
 
