@@ -9,7 +9,9 @@
 .btn_delete {
     background-image: url(../images/btnDelete.png) !important;
 }
-
+.btn_error {
+    background-image: url(../images/btnError.png) !important;
+}
 .btn_edit {
     background-image: url(../images/btnEdit.png) !important;
 }
