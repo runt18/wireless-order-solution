@@ -341,6 +341,7 @@ var addPrintFanc = new Ext.Window({
 					check  : function(thiz, checked){
 						if(checked){
 							showPanel(thiz.inputValue);
+							die;
 						}
 					}
 				}
@@ -372,6 +373,7 @@ var addPrintFanc = new Ext.Window({
 					check  : function(thiz, checked){
 						if(checked){
 							showPanel(thiz.inputValue);
+							die;
 						}
 					}
 				} 
@@ -387,6 +389,7 @@ var addPrintFanc = new Ext.Window({
 					check  : function(thiz, checked){
 						if(checked){
 							showPanel(thiz.inputValue);
+							die;
 						}
 					}
 				}
@@ -403,6 +406,7 @@ var addPrintFanc = new Ext.Window({
 					check  : function(thiz, checked){
 						if(checked){
 							showPanel(thiz.inputValue);
+							die;
 						}
 					}
 				}
@@ -418,6 +422,7 @@ var addPrintFanc = new Ext.Window({
 					check  : function(thiz, checked){
 						if(checked){
 							showPanel(thiz.inputValue);
+							die;
 						}
 					}
 				}
@@ -567,6 +572,7 @@ var addPrintFanc = new Ext.Window({
 });
 
 function showPanel(v){
+
 	if(v == 1 || v ==8){
 		Ext.getCmp('kitchens').hide();
 		Ext.getCmp('depts').show();
@@ -582,6 +588,7 @@ function showPanel(v){
 	}
 	//solve切换时格式错乱
 	Ext.getCmp('addPrintFancWin').center();
+
 } 
 
 
