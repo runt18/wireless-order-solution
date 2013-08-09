@@ -2,7 +2,6 @@ $(function(){
 	addRegions();
 	addTables("allTable");
 });
-
 //当前页
 var pageNow = 1;
 //设置一页显示的数目
@@ -27,18 +26,12 @@ function showTable(temp, pageNow){
 	if(temp.length != 0){
 		var tableHtml = "";
 		var pageRoot = [];
-		var start = (pageNow-1)*limit;
+		var start = (pageNow-1) * limit;
 		pageRoot = getPagingData(start, limit, temp, true);
 		for(x in pageRoot){
 			tableHtml += "<div class = 'table-base' id = 'divtable" + pageRoot[x].alias +
-			"' onclick = 'selectTable(this)'>" + pageRoot[x].alias + 
-//			"<span style = 'display: none;'>" + 
-//			"{\"alias\":" + pageRoot[x].alias + "," + 
-//			"\"categoryText\":" + "\"" + pageRoot[x].categoryText + "\"" + "," +
-//			"\"statusText\":" + "\"" + pageRoot[x].statusText + "\"" + "," +
-//			"\"rid\":" + pageRoot[x].rid + "}" +
-//			"</span>" +
-			"<input type = 'text' value = " +pageRoot[x].region+ " />" +
+			"' onclick = 'selectTable(this)'> " + pageRoot[x].alias + 
+			"<input type = 'text' value = " + JSON.stringify(pageRoot[x]) + " style = 'display : none' />" +
 			"</div>";
 		}
 		$("#divShowTable").html(tableHtml);
@@ -52,26 +45,24 @@ function selectTable(o){
 	$("#" + o.id).css("backgroundColor", "#4CB848");
 	$("#divHide").show();
 	$("#divShowMessage").show(500);
-	var tableMessage, txt;
-//	txt = $("#" + o.id + " span").text();
-//	tableMessage = eval("(" + txt + ")");
-	tableMessage =  $("#" + o.id + " input").val()[1];
-	alert(tableMessage);
+	var tableMessage, tabMessage;
+	tabMessage =  $("#" + o.id + " input").attr("value");
+	tableMessage = JSON.parse(tabMessage);
 	var htmlMessage = '';
-	htmlMessage = "<a href = '#' name = '" + o.id + "' onclick = 'closeTableMessage(this)'" +
-			"style = 'position: absolute;  top: 0%;  left: 90%; text-decoration: none; font-weight:bold;'>" + 
+	htmlMessage = "<a href = '#' style = 'position: absolute;  top: 0%;  left: 90%; text-decoration: none; font-weight:bold;'>" + 
 				   "关闭" + "</a></ br>";
 	htmlMessage += "<p>餐桌id号: " + tableMessage.alias + "</p>" +
 				   "<p>类型: " + tableMessage.categoryText + "</p>" +
 				   "<p>就餐状态: " + tableMessage.statusText + "</p>" +
+				   "<p>区域号: " + tableMessage.region.id + "</p>" +
+				   "<p>所在区域: " + tableMessage.region.name + "</p>" +
 				   "<p>餐厅id号: " + tableMessage.rid + "</p>";
-	$("#divShowMessage").html(htmlMessage);
-	
-}
-function closeTableMessage(o){
-	$("#" +o.name).css("backgroundColor", "#87CEEA");
-	$("#divShowMessage").hide(500);
-	$("#divHide").hide();
+	$("#divShowMessage").html(htmlMessage);	
+	$("#divShowMessage a").click(function (){
+		$("#" +o.id).css("backgroundColor", "#87CEEA");
+		$("#divShowMessage").hide(500);
+		$("#divHide").hide();
+	});
 }
 //用jquery Ajax实现异步请求数据
 function addTables(o){
@@ -96,20 +87,28 @@ function addTables(o){
 //显示下一页信息
 function nextPage(){
 	//判断是否为最后一页
-	if(pageNow == n){
-		alert("已经是最后一页了！");
+	if(temp.length != 0){
+		if(pageNow == n){
+			alert("已经是最后一页了！");
+		}else{
+			pageNow ++;
+		}		
+		showTable(temp, pageNow);
 	}else{
-		pageNow ++;
-	}		
-	showTable(temp, pageNow);
+		alert("请先选择区域！");
+	}	
 }	
 function frontPage(){	
-	if(pageNow == 1){
-		alert("已经是第一页了！");
+	if(temp.length !=0){
+		if(pageNow == 1){
+			alert("已经是第一页了！");
+		}else{
+			pageNow --;
+		}
+		showTable(temp, pageNow);
 	}else{
-		pageNow --;
-	}
-	showTable(temp, pageNow);
+		alert("请先选择区域！");
+	}	
 }	  
 function showTime(){
 	$("#spanTime").text(myDate());
