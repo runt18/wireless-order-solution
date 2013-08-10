@@ -43,6 +43,8 @@ public class QueryPrinterTreeAction extends Action{
 					jsonSB.append(", leaf : true" );
 					if(!printer.isEnabled()){
 						jsonSB.append(", iconCls : 'btn_error'");
+					}else{
+						jsonSB.append(", icon : '../../images/printer.png'");
 					}
 					jsonSB.append("}");
 					index++;
