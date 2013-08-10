@@ -632,7 +632,7 @@ var addPrintFunc = new Ext.Window({
 				xtype : 'checkbox',
 				name : 'pType',
 				id : 'chkAllRegion',
-				checked : true,
+				hideLabel : true,
 				boxLabel : '所有区域',
 				listeners : {
 					focus : function(){
