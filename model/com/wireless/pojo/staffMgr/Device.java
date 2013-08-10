@@ -187,7 +187,7 @@ public class Device implements Parcelable{
 		if(deviceId == null){
 			deviceId = "";
 		}
-		return deviceId.trim().toUpperCase(Locale.US);
+		return deviceId.trim().toUpperCase(Locale.getDefault());
 	}
 	
 	public void setDeviceId(String deviceId) {
