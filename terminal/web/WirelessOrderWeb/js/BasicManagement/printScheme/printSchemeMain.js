@@ -127,9 +127,9 @@ Ext.Ajax.request({
 });
 
 
-var addPrintFanc = new Ext.Window({
+var addPrintFunc = new Ext.Window({
 	title : '添加方案',
-	id : 'addPrintFancWin',
+	id : 'addPrintFuncWin',
 	closable : false,
 	resizable : true,
 	modal : true,
@@ -137,7 +137,7 @@ var addPrintFanc = new Ext.Window({
 	autoHeight : true,
 	bbar : ['->',{
 		text : '保存',
-		id : 'btnSaveFanc',
+		id : 'btnSaveFunc',
 		iconCls : 'btn_save',
 		handler : function(e){
 			if(!Ext.getCmp('txtRepeat').isValid()){
@@ -199,11 +199,11 @@ var addPrintFanc = new Ext.Window({
 			
 			var dataSource = '';
 			var funcId = '';
-			if(addPrintFanc.operationType == 'insert'){
+			if(addPrintFunc.operationType == 'insert'){
 				
 				dataSource = 'insert';
 			}
-			else if(addPrintFanc.operationType == 'update'){
+			else if(addPrintFunc.operationType == 'update'){
 				var ss = Ext.getCmp('grid').getSelectionModel().getSelected();
 				funcId = ss.data.printFuncId;
 				dataSource = 'update';
@@ -214,7 +214,7 @@ var addPrintFanc = new Ext.Window({
 			var sn = Ext.getCmp('printerTree').getSelectionModel().getSelectedNode();
 			var repeat = Ext.getCmp('txtRepeat').getValue();
 			Ext.Ajax.request({
-				url : '../../OperatePrintFanc.do',
+				url : '../../OperatePrintFunc.do',
 				params : {
 					pin : pin,
 					repeat : repeat,
@@ -234,7 +234,7 @@ var addPrintFanc = new Ext.Window({
 					}else{
 						Ext.ux.showMsg(jr);
 					}
-					addPrintFanc.hide();
+					addPrintFunc.hide();
 				},
 				failure : function(res, opt){
 					Ext.ux.showMsg(Ext.decode(res.responseText));
@@ -246,10 +246,10 @@ var addPrintFanc = new Ext.Window({
 		
 	},{
 		text : '取消',
-		id : 'btnCloseFanc',
+		id : 'btnCloseFunc',
 		iconCls : 'btn_close',
 		handler : function(){
-			addPrintFanc.hide();
+			addPrintFunc.hide();
 		}
 	}],
 	items : [{
@@ -586,7 +586,7 @@ function showPanel(v){
 		Ext.getCmp('regions').show();
 	}
 	//solve切换时格式错乱
-	Ext.getCmp('addPrintFancWin').center();
+	Ext.getCmp('addPrintFuncWin').center();
 
 } 
 
@@ -659,7 +659,7 @@ var printerWin = new Ext.Window({
 		}
 	},{
 		text : '取消',
-		id : 'btnCloseFanc',
+		id : 'btnCloseFunc',
 		iconCls : 'btn_close',
 		handler : function(){
 			printerWin.hide();
@@ -728,7 +728,7 @@ var printerWin = new Ext.Window({
 });
 
 
-function deletePrintFancOperationHandler(){
+function deletePrintFuncOperationHandler(){
 	var ss = Ext.getCmp('grid').getSelectionModel().getSelected();
 	if(ss != null){
 		Ext.Msg.confirm(
@@ -737,10 +737,10 @@ function deletePrintFancOperationHandler(){
 			function(e){
 				if(e == 'yes'){
 					Ext.Ajax.request({
-						url : '../../OperatePrintFanc.do',
+						url : '../../OperatePrintFunc.do',
 						params : {
 							pin : pin,
-							printFancId : ss.data.printFuncId,
+							printFuncId : ss.data.printFuncId,
 							dataSource : 'delete'
 						},
 						success : function(res, opt){
@@ -769,7 +769,7 @@ function deletePrintFancOperationHandler(){
 	
 }
 
-function printFancOperactionHandler(c){
+function printFuncOperactionHandler(c){
 	if(c.type == 'undefined'){
 		return;
 	}
@@ -790,13 +790,13 @@ function printFancOperactionHandler(c){
 			kitchen[i].checked = false;
 		}
 	}
-	addPrintFanc.show();
+	addPrintFunc.show();
 	
 	var sn = printerTree.getSelectionModel().getSelectedNode();
 	Ext.getDom('lblPrinterName').innerHTML = sn.attributes.name + " " + sn.attributes.alias;
 	if(c.type == 'insert'){
-		addPrintFanc.setTitle('添加方案');
-		addPrintFanc.operationType = c.type;
+		addPrintFunc.setTitle('添加方案');
+		addPrintFunc.operationType = c.type;
 		Ext.getCmp('txtRepeat').setValue(1);
 		
 		Ext.getCmp('printerType').show();
@@ -822,12 +822,12 @@ function printFancOperactionHandler(c){
 			return;
 		}
 		if(c.type == 'update'){
-			addPrintFanc.setTitle('修改方案');
+			addPrintFunc.setTitle('修改方案');
 		}else{
-			addPrintFanc.setTitle('查看方案');
+			addPrintFunc.setTitle('查看方案');
 		}
 		
-		addPrintFanc.operationType = c.type;
+		addPrintFunc.operationType = c.type;
 		Ext.getCmp('printerType').hide();
 		//功能选中
 		var pTypeValue = ss.data.pTypeValue;
@@ -901,7 +901,7 @@ function printFancOperactionHandler(c){
 		repeat.setValue(ss.data.repeat);
 	
 	}
-	addPrintFanc.center();
+	addPrintFunc.center();
 }
 
 function operatePrinterHandler(c){
@@ -996,9 +996,9 @@ Ext.onReady(function(){
 	Ext.form.Field.prototype.msgTarget = 'side';
 	
 	var opt = function(){
-		return "<a href = \"javascript:printFancOperactionHandler({type : 'update'})\">" + "<img src='../../images/Modify.png'/>修改</a>"
+		return "<a href = \"javascript:printFuncOperactionHandler({type : 'update'})\">" + "<img src='../../images/Modify.png'/>修改</a>"
 		 +"&nbsp;&nbsp;"
-		 + "<a href=\"javascript:deletePrintFancOperationHandler()\">" + "<img src='../../images/del.png'/>删除</a>";
+		 + "<a href=\"javascript:deletePrintFuncOperationHandler()\">" + "<img src='../../images/del.png'/>删除</a>";
 	};
 	
 	
@@ -1121,7 +1121,7 @@ Ext.onReady(function(){
 	cm.defaultSortable = true;
 	
 	var ds = new Ext.data.Store({
-		proxy : new Ext.data.HttpProxy({url:'../../QueryPrintFanc.do'}),
+		proxy : new Ext.data.HttpProxy({url:'../../QueryPrintFunc.do'}),
 		reader : new Ext.data.JsonReader({totalProperty:'totalProperty', root : 'root'}, [
 		    {name : 'printFuncId'},
 		    {name : 'pTypeValue'},
@@ -1137,7 +1137,7 @@ Ext.onReady(function(){
 		
 	});
 	
-	var printFancGrid = new Ext.grid.GridPanel({
+	var printFuncGrid = new Ext.grid.GridPanel({
 		title : '打印方案',
 		id : 'grid',
 		region : 'center',
@@ -1148,7 +1148,7 @@ Ext.onReady(function(){
 		store : ds,
 		listeners : {
 			dblclick  : function(){
-				printFancOperactionHandler({type : 'update'});
+				printFuncOperactionHandler({type : 'update'});
 			}
 		}
 	});
@@ -1159,7 +1159,7 @@ Ext.onReady(function(){
 		region : 'center',
 		layout : 'border',
 		frame : true,
-		items : [printerTree, printFancGrid],
+		items : [printerTree, printFuncGrid],
 		tbar : new Ext.Toolbar({
 			height : 55,
 			items : [{
@@ -1173,7 +1173,7 @@ Ext.onReady(function(){
 			    {
 			    	text : '添加方案',
 			    	handler : function(){
-			    		printFancOperactionHandler({type : 'insert'});
+			    		printFuncOperactionHandler({type : 'insert'});
 			    	}
 			    		
 			    },
