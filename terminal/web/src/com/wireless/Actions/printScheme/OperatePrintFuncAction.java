@@ -25,7 +25,7 @@ import com.wireless.pojo.regionMgr.Region;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.util.WebParams;
 
-public class OperatePrintFancAction extends DispatchAction{
+public class OperatePrintFuncAction extends DispatchAction{
 
 	public ActionForward delete(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception{
 		request.setCharacterEncoding("UTF-8");
@@ -35,8 +35,8 @@ public class OperatePrintFancAction extends DispatchAction{
 		try{
 		
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
-			String printFancId = request.getParameter("printFancId");
-			PrintFuncDao.removeFunc(staff, Integer.parseInt(printFancId));
+			String printFuncId = request.getParameter("printFuncId");
+			PrintFuncDao.removeFunc(staff, Integer.parseInt(printFuncId));
 			
 			jobject.initTip(true, "操作成功, 已删除方案");
 			
