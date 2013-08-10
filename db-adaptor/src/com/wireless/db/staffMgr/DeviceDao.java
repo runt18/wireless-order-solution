@@ -62,7 +62,7 @@ public class DeviceDao {
 	 * 			throws if the specific device to search does NOT exist
 	 */
 	public static Device getWorkingDeviceById(DBCon dbCon, String deviceId) throws SQLException, BusinessException{
-		List<Device> result = getDevices(dbCon, " AND DEV.device_id = '" + deviceId.trim() + "'" + " AND status = " + Device.Status.WORK.getVal(), null);
+		List<Device> result = getDevices(dbCon, " AND DEV.device_id = '" + deviceId.trim() + "'" + " AND device_id_crc = CRC32(" + deviceId + ")" + " AND status = " + Device.Status.WORK.getVal(), null);
 		if(result.isEmpty()){
 			throw new BusinessException(DeviceError.DEVICE_NOT_EXIST);
 		}else{
@@ -103,7 +103,7 @@ public class DeviceDao {
 	 * 			throws if the specific device to search does NOT exist
 	 */
 	public static Device getDeviceById(DBCon dbCon, String deviceId) throws SQLException, BusinessException{
-		List<Device> result = getDevices(dbCon, " AND DEV.device_id = '" + deviceId.trim() + "'", null);
+		List<Device> result = getDevices(dbCon, " AND DEV.device_id = '" + deviceId.trim() + "'" + " AND DEV.device_id_crc = CRC32(" + deviceId + ")", null);
 		if(result.isEmpty()){
 			throw new BusinessException(DeviceError.DEVICE_NOT_EXIST);
 		}else{
@@ -154,10 +154,11 @@ public class DeviceDao {
 		
 		String sql;
 		sql = " INSERT INTO " + Params.dbName + ".device " +
-			  " (`restaurant_id`, `device_id`, `model_id`, `status`) " +
+			  " (`restaurant_id`, `device_id`, `device_id_crc`, `model_id`, `status`) " +
 			  " VALUES (" +
 			  device.getRestaurantId() + "," +
 			  "'" + device.getDeviceId() + "'," +
+			  "CRC32(" + device.getDeviceId() + ")," +
 			  device.getModel().getVal() + "," +
 			  device.getStatus().getVal() +
 			  " ) ";
