@@ -139,12 +139,6 @@
 		<action path="/OperateTaste" type="com.wireless.Actions.tasteMgr.OperateTasteAction"
 			scope="request" parameter="dataSource">
 		</action>
-		<action path="/QueryTerminal"
-			type="com.wireless.Actions.terminalMgr.QueryTerminalAction" scope="request">
-		</action>
-		<action path="/SetTerminal"
-			type="com.wireless.Actions.terminalMgr.SetTerminalAction" scope="request">
-		</action>
 		<action path="/InsertStaff" type="com.wireless.Actions.staffMgr.InsertStaffAction"
 			scope="request">
 		</action>
