@@ -329,7 +329,7 @@ public class PrintFuncDao {
 	public static List<PrintFunc> getFuncByPrinterId(DBCon dbCon, int printerId) throws SQLException{
 		String sql;
 		
-		sql = " SELECT func_id, `repeat`, `type` FROM " + Params.dbName + ".print_func WHERE printer_id = " + printerId;
+		sql = " SELECT func_id, `repeat`, `type` FROM " + Params.dbName + ".print_func WHERE printer_id = " + printerId + " ORDER BY type ";
 
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		
