@@ -212,7 +212,7 @@ public class PrinterDao {
 	 * 			throws if the printer to delete does NOT exist
 	 */
 	public static List<Printer> getAllPrinters(DBCon dbCon, Staff staff) throws SQLException{
-		return getPrinters(dbCon, staff, null);
+		return getPrinters(dbCon, staff, " ORDER BY enabled DESC");
 	}
 	
 	private static List<Printer> getPrinters(DBCon dbCon, Staff staff, String extraCond) throws SQLException{
