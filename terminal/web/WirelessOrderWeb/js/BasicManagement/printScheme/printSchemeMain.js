@@ -546,7 +546,6 @@ var addPrintFanc = new Ext.Window({
 						Ext.getCmp('allRegion').enable();
 					},
 					check : function(checkbox, checked){
-						alert('re' + checked);
 						if(checked){
 							Ext.getCmp('allRegion').disable();
 						}else{
@@ -1149,7 +1148,7 @@ Ext.onReady(function(){
 		store : ds,
 		listeners : {
 			dblclick  : function(){
-				printFancOperactionHandler({type : 'query'});
+				printFancOperactionHandler({type : 'update'});
 			}
 		}
 	});
