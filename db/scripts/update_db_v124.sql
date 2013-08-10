@@ -218,11 +218,12 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`device` (
   `id` INT NOT NULL AUTO_INCREMENT ,
   `restaurant_id` INT NOT NULL ,
   `device_id` VARCHAR(45) NOT NULL ,
+  `device_id_crc` INT UNSIGNED NOT NULL ,
   `model_id` TINYINT NOT NULL DEFAULT 1 COMMENT 'the model id as below.\n1 - Android\n2 - iOS\n3 - WP' ,
   `status` TINYINT NOT NULL DEFAULT 1 COMMENT 'the status as below.\n1 - 空闲\n2 - 使用中' ,
   PRIMARY KEY (`id`) ,
   INDEX `ix_restaurant_id` (`restaurant_id` ASC) ,
-  INDEX `ix_device_id` (`device_id` ASC) )
+  INDEX `ix_device_id_crc` (`device_id_crc` ASC) )
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8;
 
