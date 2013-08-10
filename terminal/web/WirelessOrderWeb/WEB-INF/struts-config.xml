@@ -405,12 +405,12 @@
 				type = "com.wireless.Actions.printScheme.QueryPrinterTreeAction"
 				scope="request">
 		</action>
-		<action path="/QueryPrintFanc"
-				type = "com.wireless.Actions.printScheme.QueryPrintFancAction"
+		<action path="/QueryPrintFunc"
+				type = "com.wireless.Actions.printScheme.QueryPrintFuncAction"
 				scope="request">
 		</action>
-		<action path="/OperatePrintFanc"
-				type = "com.wireless.Actions.printScheme.OperatePrintFancAction"
+		<action path="/OperatePrintFunc"
+				type = "com.wireless.Actions.printScheme.OperatePrintFuncAction"
 				scope="request" parameter="dataSource">
 		</action>
 		<action path="/OperatePrinter"
