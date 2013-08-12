@@ -1207,11 +1207,10 @@ Ext.onReady(function(){
 	
 	var cm = new Ext.grid.ColumnModel([
 		new Ext.grid.RowNumberer(),
-		{header : '编号', dataIndex : 'printFuncId', width : 80},
 		{header : '功能', dataIndex : 'pTypeText', width : 100},
-		{header : '厨房', dataIndex : 'kitchens', width : 300, renderer : tooLength},
+		{header : '厨房', dataIndex : 'kitchens', width : 350, renderer : tooLength},
 		{header : '部门', dataIndex : 'dept', width : 100},
-		{header : '区域', dataIndex : 'regions', width : 300, renderer : tooLength},
+		{header : '区域', dataIndex : 'regions', width : 320, renderer : tooLength},
 		{header : '打印数', dataIndex : 'repeat', width : 80},
 		{header : '操作',dataIndex : 'opt', renderer : opt, width : 100}
 	]);
