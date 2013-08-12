@@ -213,8 +213,8 @@ var allFoodTabPanelGridTbar = new Ext.Toolbar({
 				Ext.Ajax.request({
 					url : '../../QueryMenu.do',
 					params : {
-						restaurantID : restaurantID,
-						type : 3
+						dataSource : 'kitchens',
+						restaurantID : restaurantID
 					},
 					success : function(response, options){
 						var jr = Ext.util.JSON.decode(response.responseText);
@@ -290,7 +290,7 @@ var allFoodTabPanelGrid = createGridPanel(
 		['价格', 'unitPrice', 70, 'right', 'Ext.ux.txtFormat.gridDou']
 	],
 	FoodBasicRecord.getKeys(),
-	[['pin',pin], ['type', 1], ['restaurantID', restaurantID], ['isPaging', true]],
+	[['pin',pin], ['dataSource', 'foods'], ['restaurantID', restaurantID], ['isPaging', true]],
 	GRID_PADDING_LIMIT_30,
 	'',
 	allFoodTabPanelGridTbar

@@ -19,9 +19,9 @@ function tasteOnLoad() {
 	Ext.Ajax.request({
 		url : '../../QueryMenu.do',
 		params : {
+			dataSource : 'tastes',
 			pin : pin,
-			restaurantID : restaurantID,
-			type : 2
+			restaurantID : restaurantID
 		},
 		success : function(response, options) {
 			var rj = Ext.decode(response.responseText);

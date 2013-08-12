@@ -3,9 +3,9 @@
 	Ext.Ajax.request({
 		url : "../../QueryMenu.do",
 		params : {
+			dataSource : 'foods',
 			pin : pin,
-			restaurantID : restaurantID,
-			type : 1
+			restaurantID : restaurantID
 		},
 		success : function(response, options) {
 			var resultJSON = Ext.decode(response.responseText);

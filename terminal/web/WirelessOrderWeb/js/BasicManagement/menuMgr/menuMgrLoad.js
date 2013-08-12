@@ -471,9 +471,9 @@ function menuMgrOnLoad() {
 	Ext.Ajax.request({
 		url : "../../QueryMenu.do",
 		params : {
+			dataSource : 'kitchens',
 			pin : pin,
-			restaurantID : restaurantID,
-			type : 3
+			restaurantID : restaurantID
 		},
 		success : function(response, options) {
 			var resultJSON = Ext.decode(response.responseText);

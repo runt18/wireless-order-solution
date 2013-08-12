@@ -7,9 +7,9 @@ function initData(){
 	Ext.Ajax.request({
 		url : '../../QueryMenu.do',
 		params : {
+			dataSource : 'kitchens',
 			pin : pin,
-			restaurantID : restaurantID,
-			type : 3
+			restaurantID : restaurantID
 		},
 		success : function(res, opt) {
 			var jr = Ext.decode(res.responseText);
