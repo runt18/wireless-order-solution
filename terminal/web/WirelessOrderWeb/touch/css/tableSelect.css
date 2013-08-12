@@ -1,36 +1,29 @@
+#divTableMain, #divTableShow{
+	-moz-box-flex: 1;
+	-webkit-box-flex: 1;
+	box-flex: 1;
+}
 #divTableMain{
 	background-color: #4682B4;
 	width: 100%;
 	border-bottom: 1px solid #465224;
-	-moz-box-flex: 1;
-	-webkit-box-flex: 1;
-	box-flex: 1;
-}
-#divTableShow{
-	-moz-box-flex: 1;
-	-webkit-box-flex: 1;
-	box-flex: 1;
-	z-index:1001;
-	border-right: 1px solid #465224;
-	overflow: hidden;	
-}
-#divToolRight{
-	background-color: #6395EC;
-	width: 110px;
 	overflow: hidden;
 }
+#divTableShow{
+	z-index:1001;
+	border-right: 1px solid #465224;
+}
 #divShowMessage{
-	  display: none;  
-	  position: absolute;  
-	  top: 25%;  
-	  left: 25%;  
-	  width: 30%;  
-	  height: 30%;  
-	  padding: 16px;  
-	  border: 10px solid #4CB848;  
-	  background-color: #FAA57B;  
-	  z-index:1003;  
-	  overflow: hidden;
+	display: none;  
+	position: absolute;  
+	top: 25%;  
+	left: 25%;  
+	width: 30%;  
+	height: 30%;  
+	padding: 16px;  
+	border: 10px solid #4CB848;  
+	background-color: #FAA57B;  
+	z-index:1003;  
 }
 #divHide{
 	display: none;
@@ -39,7 +32,10 @@
 	position: absolute;
 	z-index: 1002;
 }
-
+#divToolRight{
+	background-color: #6395EC;
+	width: 110px;
+}
 #divToolBottom{
 	background-color: #6395EC;
 	width: 100%;
@@ -55,16 +51,14 @@
 	width: 100%;
 }
 .table-base{
-	margin-bottom: 5px;
-	margin-right: 5px;
-	margin-left: 2px;
+	margin: 5px;
 	float: left;
 	width: 90px;
 	height: 70px;
 	border:1px solid #333;
 	background-color: #87CEEA;
 	text-align: center;
-	line-height: 60px;
+	line-height: 70px;
 }
 .table-base:active{
 	background: #4CB848;
