@@ -64,9 +64,3 @@ body{ overflow: hidden; }
 	font-weight: bold; 
 }
 .button-base:active{ background: #DAA520; }
-
-input[type="button"]{
-	width: 300px;
-	font-size: 30px;
-}
-
