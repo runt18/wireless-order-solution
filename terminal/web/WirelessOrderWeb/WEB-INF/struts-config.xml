@@ -35,7 +35,8 @@
 			type="com.wireless.Actions.dishesOrder.orderGroup.CancelOrderGroupAction" scope="request">
 		</action>
 		<action path="/QueryMenu" type="com.wireless.Actions.dishesOrder.QueryMenuAction"
-			scope="request">
+			scope="request"
+			parameter="dataSource">
 		</action>
 		<action path="/CancelOrder"
 			type="com.wireless.Actions.tableSelect.CancelOrderAction" scope="request">
@@ -52,9 +53,6 @@
 		<action path="/QueryStaff" type="com.wireless.Actions.login.QueryStaffAction"
 			scope="request">
 		</action>
-		<action path="/QueryMerger"
-			type="com.wireless.Actions.tableSelect.QueryMergerAction" scope="request">
-		</action>
 		<action path="/TransTable"
 			type="com.wireless.Actions.tableSelect.TransTableAction" scope="request">
 		</action>
@@ -66,9 +64,6 @@
 		</action>
 		<action path="/QueryToday" type="com.wireless.Actions.orderMgr.QueryTodayAction"
 			scope="request">
-		</action>
-		<action path="/QueryTodayAdv"
-			type="com.wireless.Actions.orderMgr.QueryTodayAdvAction" scope="request">
 		</action>
 		<action path="/UpdateOrder2" type="com.wireless.Actions.orderMgr.UpdateOrderAction2"
 			scope="request">
@@ -96,9 +91,6 @@
 		</action>
 		<action path="/ImageFileUpload"
 			type="com.wireless.Actions.menuMgr.basic.ImageFileUploadAction" scope="request">
-		</action>
-		<action path="/MenuStatistics"
-			type="com.wireless.Actions.billStatistics.MenuStatisticsAction" scope="request">
 		</action>
 		<action path="/QuerySupplier"
 			type="com.wireless.Actions.supplierMgr.QuerySupplierAction" scope="request">
@@ -151,9 +143,6 @@
 		<action path="/ResetStaffPassword"
 			type="com.wireless.Actions.staffMgr.ResetPwdStaffAction" scope="request">
 		</action>
-		<action path="/shiftStatDetail"
-			type="com.wireless.Actions.billStatistics.ShiftStatDetailAction" scope="request">
-		</action>
 		<action path="/DailySettleCheck"
 			type="com.wireless.Actions.dailySettle.DailySettleCheckAction" scope="request">
 		</action>
@@ -161,9 +150,6 @@
 			type="com.wireless.Actions.dailySettle.DailySettleExecAction" scope="request">
 		</action>
 		<action path="/QueryHistory" type="com.wireless.Actions.billHistory.QueryHistoryAction"
-			scope="request">
-		</action>
-		<action path="/QueryHistoryAdv" type="com.wireless.Actions.billHistory.QueryHistoryAdvAction"
 			scope="request">
 		</action>
 		<action path="/dailySettleStat"
