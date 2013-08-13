@@ -1,18 +1,26 @@
 $(function(){
-	addRegions();
-	addTables("allTable");
+//	addRegions();
+	getTables();	
 });
 //当前页
 var pageNow = 1;
 //设置一页显示的数目
-var	limit = 78;
+var	limit;
 //全部餐桌
-
+var tables = [];
 //当前区域下的总的餐桌数组
 var temp = [];
 //总页数
 var n;
-//定义分页函数，start为开始下标，limit为一页最多显示的数目，temp为需要分页的数组对象
+//定义存在餐桌的区域id数组
+var regionId = [];
+var region = [];
+/*定义分页函数
+ * start: 开始下标
+ * limit: 一页最多显示的数目
+ * temp: 需要分页的数组对象
+ * isPaging: 是否需要分页（true，false）
+ */
 function getPagingData(start, limit, temp, isPaging){
     var pageRoot = [];
     if(temp.length != 0 && isPaging){ 
@@ -28,6 +36,76 @@ function getPagingData(start, limit, temp, isPaging){
 function showStatus(){
 	$("#divStatus").slideToggle();
 }
+//从后台取出餐桌信息，保存到tables数组中
+function getTables(){	
+	$.get("/WirelessOrderWeb/QueryTable.do", {random : Math.random(), pin : 15}, function(result){
+		var tablesTemp; 
+		tablesTemp = eval("(" + result + ")");
+		for(x in tablesTemp.root){
+			tables.push(tablesTemp.root[x]);
+		}
+		region.push(tables[0].region);
+		regionId.push(tables[0].region.id);
+		for(x in tables){
+			var flag = false;
+			for(y in regionId){
+				if(regionId[y] == tables[x].region.id){		
+					flag = true;
+					break;
+				}			
+			}
+			if(!flag){
+				region.push(tables[x].region);
+				regionId.push(tables[x].region.id);
+			}
+		}
+		var regionHtml = "";
+		for(x in region){
+			regionHtml += "<div class='button-base regionSelect' id='region"+region[x].id+
+				"' style='margin-bottom: 2px;' onclick='addTables(this)'>"+region[x].name+"</div>";		
+		}
+		$("#divShowRegion").html(regionHtml);
+		$(".button-base.regionSelect").css("backgroundColor", "#F1C40D");
+		
+		$("#divAllArea").css("backgroundColor", "#DAA520");
+		temp = tables;	
+		var width = $("#divTableShow").width();
+		var height = $("#divTableShow").height() - 1;
+		limit = Math.floor(width/102) * Math.floor(height/82);
+		n = Math.ceil(temp.length/limit) ; 
+		showTable(temp, pageNow);
+	});	
+}
+//function addRegions(){
+//		
+//
+//}
+
+function addTables(o){
+	pageNow = 1;
+	//把当前区域餐桌数组清空
+    temp = [];
+    //把对应区域的餐桌对象添加到temp数组中
+    pageNow = 1;
+    //把当前区域餐桌数组清空
+    temp = [];
+    //把对应区域的餐桌对象添加到temp数组中
+    for(x in tables){
+    	if(o == "allTable"){
+    		temp.push(tables[x]);
+    		$(".button-base.regionSelect").css("backgroundColor", "#F1C40D");
+    		$("#divAllArea").css("backgroundColor", "#DAA520");
+    	}else if(tables[x].region.id == o.id.substr(6)){
+    		temp.push(tables[x]);
+    		$(".button-base.regionSelect").css("backgroundColor", "#F1C40D");
+    	    $("#divAllArea").css("backgroundColor", "#4EEE99");
+    	    $("#" + o.id).css("backgroundColor", "#DAA520");
+    	} 
+     }
+    n = Math.ceil(temp.length/limit) ;      
+    showTable(temp, pageNow);
+}
+
 function showTable(temp, pageNow){	
 	if(temp.length != 0){
 		var tableHtml = "";
@@ -70,37 +148,6 @@ function selectTable(o){
 		$("#divHide").hide();
 	});
 }
-//用jquery Ajax实现异步请求数据
-
-function addTables(o){
-	$.get("/WirelessOrderWeb/QueryTable.do", {random : Math.random(), pin : 217}, function(result){
-		var tables;
-		tables = eval("(" + result + ")");
-		pageNow = 1;
-	    //把当前区域餐桌数组清空
-	    temp = [];
-	    //把对应区域的餐桌对象添加到temp数组中
-        for(x in tables.root){
-        	if(o == "allTable"){
-        		temp.push(tables.root[x]);
-        		$(".button-base.regionSelect").css("backgroundColor", "#F1C40D");
-        		$("#divAllArea").css("backgroundColor", "#DAA520");
-        	}else if(tables.root[x].region.id == o.id.substr(6)){
-        		temp.push(tables.root[x]);
-        		$(".button-base.regionSelect").css("backgroundColor", "#F1C40D");
-        	    $("#divAllArea").css("backgroundColor", "#4EEE99");
-        	    $("#" + o.id).css("backgroundColor", "#DAA520");
-        	} 
-         }    
-        n = Math.ceil(temp.length/limit) ;      
-        showTable(temp, pageNow);
-	});
-}
-
-//从后台取出餐桌信息，保存到tables数组中
-
-
-
 //显示下一页信息
 function nextPage(){
 	//判断是否为最后一页
@@ -146,21 +193,3 @@ function frontPage(){
 		alert("请先选择区域！");
 	}	
 }
-/*
-function showTime(){
-	$("#spanTime").text(myDate());
-}
-//返回指定格式的日期时间函数
-function myDate(){  
-    var date = new Date();
-    var weekday = ["星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六"];                          
-    var year = date.getFullYear() + "年";
-    var month = ((date.getMonth() + 1) < 10 ? "0" + (date.getMonth() + 1):  (date.getMonth() + 1))+ "月";
-    var today = (date.getDate() < 10 ? "0"+date.getDate() :  date.getDate()) + "日";
-    var week = "(" + weekday[date.getDay()] + ")";
-    var time = date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();       
-    var myDate = year + " " + month + " " + today + "  " + time + " " + week;
-    return myDate;
-} 
-setInterval(showTime, 1000); 
-*/
