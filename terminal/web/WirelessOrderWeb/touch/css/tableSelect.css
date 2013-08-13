@@ -1,54 +1,86 @@
-#divTableMain, #divTableShow{
+#divMainForTableSelect, #divTableShowForSelect, #divRightForShowMessageTS{
 	-moz-box-flex: 1;
 	-webkit-box-flex: 1;
 	box-flex: 1;
 }
-#divTableMain{
+#divMainForTableSelect{
 	background-color: #4682B4;
 	width: 100%;
 	border-bottom: 1px solid #465224;
 	overflow: hidden;
 }
-#divTableShow{
+#divTableShowForSelect{
 	z-index:1001;
 	border-right: 1px solid #465224;
 }
-#divShowMessage{
+#divShowMessageForTableSelect{
 	display: none;  
 	position: absolute;  
 	top: 25%;  
 	left: 25%;  
-	width: 30%;  
-	height: 30%;  
-	padding: 16px;  
-	border: 10px solid #4CB848;  
-	background-color: #FAA57B;  
+	width: 485px;  
+	height: 320px;  
+	border: 2px solid #fff;  
+	background-color: #6395EC;  
 	z-index:1003;  
 }
-#divHide{
+#divTopForShowMessageTS{
+	margin: 5px;	
+}
+#divCenterForShowMessageTS{
+	width: 100%;
+	height: 68%;	
+}
+#divLeftForShowMessageTS{
+	width: 38%;
+	height: 100%;
+}
+#divRightForShowMessageTS{
+	height: 100%;
+}
+#divHideForTableSelect{
 	display: none;
 	width: 100%;
 	height: 100%;
 	position: absolute;
 	z-index: 1002;
 }
-#divToolRight{
+#divToolRightForSelect{
 	background-color: #6395EC;
 	width: 110px;
 }
-#divToolBottom{
+#divToolBottomForSelect{
 	background-color: #6395EC;
 	width: 100%;
 	height: 60px;
 	line-height: 60px;
 }
-#divFoot{
+#divFootForTableSelect{
 	margin-top: 5px; 
 	font-size: 15px; 
 	font-weight: bold; 
 	color: #A27600;
 	height: 18px;
 	width: 100%;
+}
+.desk-number{
+	height: 59px; 
+	width:120px; 
+	margin: 3px; 
+	font-size: 20px;
+	padding-left: 50px;
+	background-color: #FFD700;
+}
+.keyboardbutton{
+	width: 62px;
+	height: 62px;
+	color: #A52A2A;
+	font-size: 23px;
+	font-weight: bold;
+	margin: 3px 0 3px 3px;
+	background-color: #75B2F4;
+	border: 1px solid green;
+	border-radius: 5px;
 }
 .table-base{
 	margin: 5px;
