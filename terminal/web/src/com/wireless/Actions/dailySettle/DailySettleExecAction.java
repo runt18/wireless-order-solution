@@ -14,7 +14,6 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import com.wireless.db.DBCon;
 import com.wireless.db.frontBusiness.DailySettleDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
@@ -23,11 +22,8 @@ import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.util.JObject;
 
 public class DailySettleExecAction extends Action {
-	public ActionForward execute(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
+	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 
-		DBCon dbCon = new DBCon();
 
 		PrintWriter out = null;
 
@@ -40,17 +36,11 @@ public class DailySettleExecAction extends Action {
 
 			String pin = request.getParameter("pin");
 
-			dbCon.connect();
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 
-
 			DailySettleDao.exec(staff);
-			
 
 			jObj.initTip(true, staff.getName() + "日结成功");
-			
-
-			dbCon.rs.close();
 
 		} catch (BusinessException e) {
 			e.printStackTrace();
@@ -73,7 +63,6 @@ public class DailySettleExecAction extends Action {
 			jObj.initTip(false, "数据库请求发生错误，请确认网络是否连接正常");
 
 		} finally {
-			dbCon.disconnect();
 
 			JSONObject obj = JSONObject.fromObject(jObj);
 			
