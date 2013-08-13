@@ -36,6 +36,18 @@ function getPagingData(start, limit, temp, isPaging){
 function showStatus(){
 	$("#divStatus").slideToggle();
 }
+//function showEating(){
+//	pageNow = 0;
+//	for(x in temp){
+//		if(temp[x].statusText == "就餐"){
+//			eating.push(temp[x]);
+//		}
+//	}
+//	limit = Math.floor(width/102) * Math.floor(height/82);
+//	n = Math.ceil(eating.length/limit) ; 
+//	showTable(eating, pageNow);
+//	
+//}
 //从后台取出餐桌信息，保存到tables数组中
 function getTables(){	
 	$.get("/WirelessOrderWeb/QueryTable.do", {random : Math.random(), pin : 15}, function(result){
@@ -66,21 +78,15 @@ function getTables(){
 		}
 		$("#divShowRegion").html(regionHtml);
 		$(".button-base.regionSelect").css("backgroundColor", "#F1C40D");
-		
 		$("#divAllArea").css("backgroundColor", "#DAA520");
 		temp = tables;	
-		var width = $("#divTableShow").width();
-		var height = $("#divTableShow").height() - 1;
+		var width = $("#divTableShowForSelect").width();
+		var height = $("#divTableShowForSelect").height() - 1;
 		limit = Math.floor(width/102) * Math.floor(height/82);
 		n = Math.ceil(temp.length/limit) ; 
 		showTable(temp, pageNow);
 	});	
 }
-//function addRegions(){
-//		
-//
-//}
-
 function addTables(o){
 	pageNow = 1;
 	//把当前区域餐桌数组清空
@@ -105,20 +111,25 @@ function addTables(o){
     n = Math.ceil(temp.length/limit) ;      
     showTable(temp, pageNow);
 }
-
 function showTable(temp, pageNow){	
 	if(temp.length != 0){
 		var tableHtml = "";
 		var pageRoot = [];
 		var start = (pageNow-1) * limit;
+		var tableName;
 		pageRoot = getPagingData(start, limit, temp, true);
 		for(x in pageRoot){
+			if(pageRoot[x].name ==""){
+				tableName = pageRoot[x].alias + "号桌";
+			}else{
+				tableName = pageRoot[x].name;
+			}
 			tableHtml += "<div class = 'table-base' id = 'divtable" + pageRoot[x].alias +
-			"' onclick = 'selectTable(this)'> " + pageRoot[x].alias + 
+			"' onclick = 'selectTable(this)'> " + tableName + 
 			"<input type = 'text' value = " + JSON.stringify(pageRoot[x]) + " style = 'display : none' />" +
 			"</div>";
 		}
-		$("#divShowTable").html(tableHtml);
+		$("#divShowTableForSelect").html(tableHtml);
 		$("#spanPageNow").html("第" + pageNow + "页");
 		$("#spanAllPage").html("共" + n + "页");
 	}else{
@@ -127,25 +138,22 @@ function showTable(temp, pageNow){
 }
 function selectTable(o){
 	$("#" + o.id).css("backgroundColor", "#4CB848");
-	$("#divHide").show();
-	$("#divShowMessage").show(500);
+	$("#divHideForTableSelect").show();
+	$("#divShowMessageForTableSelect").show(500);
 	var tableMessage, tabMessage;
 	tabMessage =  $("#" + o.id + " input").attr("value");
 	tableMessage = JSON.parse(tabMessage);
-	var htmlMessage = '';
-	htmlMessage = "<a href = '#' style = 'position: absolute;  top: 0%;  left: 90%; text-decoration: none; font-weight:bold;'>" + 
-				   "关闭" + "</a></ br>";
-	htmlMessage += "<p>餐桌id号: " + tableMessage.alias + "</p>" +
-				   "<p>类型: " + tableMessage.categoryText + "</p>" +
-				   "<p>就餐状态: " + tableMessage.statusText + "</p>" +
-				   "<p>区域号: " + tableMessage.region.id + "</p>" +
-				   "<p>所在区域: " + tableMessage.region.name + "</p>" +
-				   "<p>餐厅id号: " + tableMessage.rid + "</p>";
-	$("#divShowMessage").html(htmlMessage);	
-	$("#divShowMessage a").click(function (){
+	$("#btnCancelForShowMessageTS").click(function (){
 		$("#" +o.id).css("backgroundColor", "#87CEEA");
-		$("#divShowMessage").hide(500);
-		$("#divHide").hide();
+		$("#divShowMessageForTableSelect").hide(500);
+		$("#divHideForTableSelect").hide();
+	});
+	$("#txtTableNumForSM").val(tableMessage.alias);
+	$(".keyboardbutton").mouseover(function(){
+		$(this).css("backgroundColor", "#FFD700");
+	});
+	$(".keyboardbutton").mouseout(function(){
+		$(this).css("backgroundColor", "#75B2F4");
 	});
 }
 //显示下一页信息
