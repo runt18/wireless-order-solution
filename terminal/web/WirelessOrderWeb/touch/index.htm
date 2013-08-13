@@ -4,13 +4,11 @@
 
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>触摸屏点菜端</title>
-
 <link rel="stylesheet" href="./css/scrollbar.css">
 <link rel="stylesheet" href="./css/base.css">
 <link rel="stylesheet" href="./css/tableSelect.css">
 <link rel="stylesheet" href="./css/updateOrder.css">
 <link rel="stylesheet" href="./css/createOrder.css">
-
 <script type="text/javascript" src="../jquery/jquery-1.8.2.min.js"></script>
 <script type="text/javascript" src="./js/index.js"></script>
 <script type="text/javascript">
@@ -18,24 +16,53 @@
 </head>
 <body>
 <div  id = "divTableSelect" class = "content box-vertical" style = "z-index:999;" >
-	<div id="divTableMain" class = "box-horizontal">
-		<div id="divTableShow">
-			<div id = "divShowTable"></div>
-			<div id = "divShowMessage"></div>	
-			<div id = "divHide"></div>			
+	<div id="divMainForTableSelect" class = "box-horizontal">
+		<div id="divTableShowForSelect">
+			<div id = "divShowTableForSelect"></div>
+			<div id = "divShowMessageForTableSelect">
+				<div id = "divTopForShowMessageTS">
+					<span style = "color: white;"><strong>请输入桌号及人数，点击开台或者点菜按钮</strong></span>
+				</div>
+				<div id = "divCenterForShowMessageTS" class = "box-horizontal">
+					<div id = "divLeftForShowMessageTS" >
+						<input type = "text" id = "txtTableNumForSM" class = "desk-number" style = "background: url('../images/btnDesknum.png');"/>
+						<input type = "text" id = "txtPeopleNumForSM" class = "desk-number" style = "background: url('../images/btnPeoplenum.png');"/>
+					</div>
+					<div id = "divRightForShowMessageTS">
+						<input type = "button" value = "选中" class = "keyboardbutton" />
+						<input type = "button" value = "7" class = "keyboardbutton" />
+						<input type = "button" value = "8" class = "keyboardbutton" />
+						<input type = "button" value = "9" class = "keyboardbutton" />
+						<input type = "button" value = "选中" class = "keyboardbutton" />
+						<input type = "button" value = "4" class = "keyboardbutton" />
+						<input type = "button" value = "5" class = "keyboardbutton" />
+						<input type = "button" value = "6" class = "keyboardbutton" />
+						<input type = "button" value = "0" class = "keyboardbutton" />
+						<input type = "button" value = "1" class = "keyboardbutton" />
+						<input type = "button" value = "2" class = "keyboardbutton" />
+						<input type = "button" value = "3" class = "keyboardbutton" />
+					</div>
+				</div>
+				<div id = "divBottomForShowMessageTS">
+					<input type = "button" value = "开台" class = "keyboardbutton" style = "width: 100px; margin-left: 140px;"/>
+					<input type = "button" value = "点菜" class = "keyboardbutton" style = "width: 100px; margin-left: 5px;"/>
+					<input type = "button" value = "取消" id = "btnCancelForShowMessageTS" class = "keyboardbutton" style = "width: 100px; margin-left: 5px;"/>
+				</div>
+			</div>	
+			<div id = "divHideForTableSelect"></div>			
 		</div>
-		<div id="divToolRight" class="box-vertical" style = "line-height: 60px;">
+		<div id="divToolRightForSelect" class="box-vertical" style = "line-height: 60px;">
 			<div  id = "divAllStatus" class="button-base" style="margin-bottom: 2px;" onclick="showStatus()">全部状态	</div>
 			<div id = "divStatus" style =  " display: none; margin-bottom: 2px;">
-					<div class="button-base" id = "eating" style = "margin-bottom: 2px; background-color: #F1C40D">就餐</div>
-					<div class="button-base" id = "easy" style = "margin-bottom: 2px; background-color: #F1C40D">空闲</div>
-					<div class="button-base" id = "busy" style = "margin-bottom: 2px; background-color: #F1C40D">占用</div>
+					<div class="button-base" id = "eatingForTableSelect" style = "margin-bottom: 2px; background-color: #F1C40D" onclick = "showEating()">就餐</div>
+					<div class="button-base" id = "freeForTableSelect" style = "margin-bottom: 2px; background-color: #F1C40D">空闲</div>
+					<div class="button-base" id = "busyForTableSelect" style = "margin-bottom: 2px; background-color: #F1C40D">占用</div>
 			</div>
 			<div class="button-base" id = "divAllArea" style="margin-bottom: 2px;" onclick="addTables('allTable')">全部区域</div>
 			<div id="divShowRegion"></div>
 		</div>
 	</div>
-	<div id="divToolBottom" class="box-horizontal">
+	<div id="divToolBottomForSelect" class="box-horizontal">
 	    <div class="button-base" style="margin-right: 2px;">退出</div>
 	    <div class="button-base" style="margin-right: 2px;" onclick="firstPage()">第一页</div>
 		<div class="button-base" style="margin-right: 2px;" onclick="frontPage()">上一页</div>
@@ -47,7 +74,7 @@
   		<div class="button-base" style="margin-left: 2px;" onClick="toggleContentDisplay({type:'show', renderTo:'divUpdateOrder'})">divUpdateOrder</div>
 		<div class="button-base" style="margin-left: 2px;" onClick="toggleContentDisplay({type:'show', renderTo:'divCreateOrder'})">divCreateOrder</div>
 	</div>
-	<div id="divFoot">
+	<div id="divFootForTableSelect">
 		<span style="margin-right: 30px; margin-left: 10px;">收银员：</span>	
 		<span id="spanTime" style="margin-right: 30px;"></span>	
 		<span id="spanPageNow"></span>
@@ -55,14 +82,10 @@
 		<span id="spanRestaurantName"></span>
 	</div>
 </div>
-
-
 <div id="divUpdateOrder" class="content">
 	divUpdateOrder
 	<input type="button" value="hide" onClick="toggleContentDisplay({type:'hide', renderTo:'divUpdateOrder'})">
 </div>
-
-
 <div id="divCreateOrder" class="box-vertical content">
 	<div id="divNorthForCreateOrder" class="box-horizontal" style="margin-right: 2px;">
     	<div style="width: 218px; margin-right: 2px;">
@@ -124,8 +147,6 @@
   		<div class="button-base" style="margin-left: 2px;">上一页</div>
   		<div class="button-base" style="margin-left: 2px;">下一页</div>
   	</div>
-</div>
-
-     
+</div>  
 </body>
 </html>
