@@ -450,7 +450,7 @@ public class DailySettleDao {
 		
 		final String orderItem = "`id`, `seq_id`, `restaurant_id`, `birth_date`, `order_date`, `status`, " +
 				"`cancel_price`, `discount_price`, `gift_price`, `repaid_price`, `erase_price`, `total_price`, `actual_price`, `custom_num`," + 
-				"`waiter`, `settle_type`, `pay_type`, `category`, `member_id`, `member_operation_id`, `terminal_pin`, `terminal_model`, " +
+				"`waiter`, `settle_type`, `pay_type`, `category`, `member_id`, `member_operation_id`, `staff_id`, " +
 				"`region_id`, `region_name`, `table_alias`, `table_name`, `service_rate`, `comment`";
 
 //		final String memberOperationItem = "`id`, `restaurant_id`, `staff_id`, `staff_name`, " +
@@ -685,7 +685,7 @@ public class DailySettleDao {
 		final String orderFoodItem = "`id`,`restaurant_id`, `order_id`, `food_id`, `food_alias`, `order_date`, `order_count`," + 
 				"`unit_price`,`name`, `food_status`, `taste_group_id`, `cancel_reason_id`, `cancel_reason`," +
 				"`discount`, `dept_id`, `kitchen_id`, `kitchen_alias`," +
-				"`waiter`, `is_temporary`, `is_paid`";
+				"`staff_id`, `waiter`, `is_temporary`, `is_paid`";
 
 		
 		String sql;
