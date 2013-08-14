@@ -142,8 +142,7 @@ public class ImageResizer extends ImageWorker {
      * @return A bitmap sampled down from the original with the same aspect ratio and dimensions
      *         that are equal to or greater than the requested width and height
      */
-    public static Bitmap decodeSampledBitmapFromFile(String filename,
-            int reqWidth, int reqHeight) {
+    public static Bitmap decodeSampledBitmapFromFile(String filename, int reqWidth, int reqHeight) {
 
         // First decode with inJustDecodeBounds=true to check dimensions
         final BitmapFactory.Options options = new BitmapFactory.Options();
@@ -167,8 +166,7 @@ public class ImageResizer extends ImageWorker {
      * @return A bitmap sampled down from the original with the same aspect ratio and dimensions
      *         that are equal to or greater than the requested width and height
      */
-    public static Bitmap decodeSampledBitmapFromDescriptor(
-            FileDescriptor fileDescriptor, int reqWidth, int reqHeight) {
+    public static Bitmap decodeSampledBitmapFromDescriptor(FileDescriptor fileDescriptor, int reqWidth, int reqHeight) {
     	
         // First decode with inJustDecodeBounds=true to check dimensions
         final BitmapFactory.Options options = new BitmapFactory.Options();
@@ -198,7 +196,6 @@ public class ImageResizer extends ImageWorker {
      * @return The value to be used for inSampleSize
      */
     public static int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight) {
-    	
     	return computeSampleSize(options, reqWidth > reqHeight ? reqWidth : reqHeight, reqWidth * reqHeight);
     	
         // Raw height and width of image
@@ -233,8 +230,6 @@ public class ImageResizer extends ImageWorker {
 //        return inSampleSize;
     }
     
-    public static final int UNCONSTRAINED = -1;  
-    
     /** 
      * 获取需要进行缩放的比例，即options.inSampleSize 
      * @param options 
@@ -243,22 +238,24 @@ public class ImageResizer extends ImageWorker {
      * @return 
      */  
     private static int computeSampleSize(BitmapFactory.Options options, int minSideLength, int maxNumOfPixels) {  
-           int initialSize = computeInitialSampleSize(options, minSideLength, maxNumOfPixels);  
-     
-           int roundedSize;  
-           if (initialSize <= 8) {  
-               roundedSize = 1;  
-               while (roundedSize < initialSize) {  
-                   roundedSize <<= 1;  
-               }  
-           } else {  
-               roundedSize = (initialSize + 7) / 8 * 8;  
+       int initialSize = computeInitialSampleSize(options, minSideLength, maxNumOfPixels);  
+ 
+       int roundedSize;  
+       if (initialSize <= 8) {  
+           roundedSize = 1;  
+           while (roundedSize < initialSize) {  
+               roundedSize <<= 1;  
            }  
-     
-           return roundedSize;  
+       } else {  
+           roundedSize = (initialSize + 7) / 8 * 8;  
        }  
+ 
+       return roundedSize;  
+   }  
      
 	private static int computeInitialSampleSize(BitmapFactory.Options options, int minSideLength, int maxNumOfPixels) {
+		
+		final int UNCONSTRAINED = -1; 
 		double w = options.outWidth;
 		double h = options.outHeight;
 
