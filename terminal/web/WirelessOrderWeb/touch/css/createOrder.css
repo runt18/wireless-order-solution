@@ -1,5 +1,5 @@
 #divCreateOrder{
-	background: #6395EC; 
+	background: #4682B4; 
 }
 
 #divNorthForCreateOrder{
@@ -20,6 +20,7 @@
 #divSelectDeptForOrder{
 	width: 100%; 
 	overflow-y: auto;
+	height: 60px;
 }
 
 #divSelectKitchenForOrder div[class="button-base"]{
@@ -30,6 +31,7 @@
 	width: 100%; 
 	overflow-y: auto;
 	margin-top: 1px;
+	height: 60px;
 }
 
 #divDescForCreateOrde{
@@ -56,4 +58,27 @@
 	line-height: 60px;
 	margin-bottom: 1px;
 }
+
+#divCFCOAllFood{
+	
+}
+
+.divCFCOAllFood-main-box{
+	width: 90px;
+	height: 80px;
+	margin: 5px 0 0 5px;
+	float: left;
+	background: #4EEE99;
+	font-weight: bold;
+	font-szie: 22px;
+}
+
+
+
+
+
+
+
+
+
 

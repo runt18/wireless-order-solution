@@ -10,9 +10,14 @@
 <link rel="stylesheet" href="./css/updateOrder.css">
 <link rel="stylesheet" href="./css/createOrder.css">
 <script type="text/javascript" src="../jquery/jquery-1.8.2.min.js"></script>
-<script type="text/javascript" src="./js/index.js"></script>
 <script type="text/javascript">
+var pin = 15, restaurantID = 26;
+var foodData = {}, kitchenFoodData = {}, kitchenData = {}, deptData = {root:[]};
+function getDom(id){
+	return document.getElementById(id);
+}
 </script>
+<script type="text/javascript" src="./js/index.js"></script>
 </head>
 <body>
 <div  id = "divTableSelect" class = "content box-vertical" style = "z-index:999;" >
@@ -86,6 +91,7 @@
 	divUpdateOrder
 	<input type="button" value="hide" onClick="toggleContentDisplay({type:'hide', renderTo:'divUpdateOrder'})">
 </div>
+
 <div id="divCreateOrder" class="box-vertical content">
 	<div id="divNorthForCreateOrder" class="box-horizontal" style="margin-right: 2px;">
     	<div style="width: 218px; margin-right: 2px;">
@@ -98,28 +104,8 @@
     		</div>
 		</div>
 		<div class="div-full" style="">
-			<div id="divSelectDeptForOrder" class="box-horizontal" style="">
-				<div class="button-base">全部部门</div>
-				<div class="button-base">&nbsp;</div>
-				<div class="button-base">&nbsp;</div>
-				<div class="button-base">&nbsp;</div>
-				<div class="button-base">&nbsp;</div>
-				<div class="button-base">&nbsp;</div>
-			</div>
-			<div id="divSelectKitchenForOrder" class="box-horizontal" style="">
-				<div class="button-base">全部厨房</div>
-				<div class="button-base">&nbsp;</div>
-				<div class="button-base">&nbsp;</div>
-				<div class="button-base">&nbsp;</div>
-				<div class="button-base">&nbsp;</div>
-				<div class="button-base">&nbsp;</div>
-				<div class="button-base">&nbsp;</div>
-				<div class="button-base">&nbsp;</div>
-				<div class="button-base">&nbsp;</div>
-				<div class="button-base">&nbsp;</div>
-				<div class="button-base">&nbsp;</div>
-				<div class="button-base">&nbsp;</div>
-			</div>
+			<div id="divSelectDeptForOrder" class="box-horizontal" style=""> </div>
+			<div id="divSelectKitchenForOrder" class="box-horizontal" style=""> </div>
 		</div>
   	</div>
   	<div id="divCenterForCreateOrde" class="box-horizontal" style="">
@@ -132,7 +118,7 @@
 	      	<div class="button-base">催菜</div>
 	      	<div class="button-base">叫起</div>
     	</div>
-    	<div class="div-full" style=""></div>
+    	<div id="divCFCOAllFood" class="div-full" style="overflow-y: auto;"></div>
   	</div>
   	<div id="divDescForCreateOrde" class="box-horizontal" style="">
   		&nbsp;
@@ -141,6 +127,9 @@
   		<div class="button-base" style="margin-right: 2px;" onClick="toggleContentDisplay({type:'hide', renderTo:'divCreateOrder'})">返回</div>
   		<div class="button-base" style="margin-right: 2px;">上一页</div>
   		<div class="button-base" style="margin-right: 2px;">下一页</div>
+  		<div class="button-base" style="margin-right: 2px;" onClick="cr_initDeptContent()">cr_initDeptContent</div>
+  		<div class="button-base" style="margin-right: 2px;" onClick="cr_initKitchenContent()">cr_initKitchenContent</div>
+  		<div class="button-base" style="margin-right: 2px;" onClick="cr_initFoodContent()">cr_initFoodContent</div>
   		<div class="div-full">&nbsp;</div>
   		<div class="button-base" style="margin-left: 2px;">下单</div>
   		<div class="button-base" style="margin-left: 2px;">搜索</div>
