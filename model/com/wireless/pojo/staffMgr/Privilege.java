@@ -50,11 +50,11 @@ public class Privilege implements Comparable<Privilege>, Parcelable{
 	}
 	
 	public static enum Code{
-		UNKNOWN(0, null, "未知"),
-		CANCEL_FOOD(1000, Cate.FRONT_BUSINESS, "退菜"),
-		DISCOUNT(1001, Cate.FRONT_BUSINESS, "折扣"),
-		GIFT(1002, Cate.FRONT_BUSINESS, "赠送"),
-		RE_PAID(1003, Cate.FRONT_BUSINESS, "反结帐"),
+		FRONT_BUSINESS(1000, Cate.FRONT_BUSINESS, "前台"),
+		CANCEL_FOOD(1001, Cate.FRONT_BUSINESS, "退菜"),
+		DISCOUNT(1002, Cate.FRONT_BUSINESS, "折扣"),
+		GIFT(1003, Cate.FRONT_BUSINESS, "赠送"),
+		RE_PAID(1004, Cate.FRONT_BUSINESS, "反结帐"),
 		BASIC(2000, Cate.BASIC, "后台"),
 		INVENTORY(3000, Cate.INVENTORY, "库存"),
 		HISTORY(4000, Cate.HISTORY, "历史"),
