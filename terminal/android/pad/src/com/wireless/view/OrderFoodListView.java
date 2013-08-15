@@ -22,8 +22,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.wireless.common.WirelessOrder;
-import com.wireless.dialog.AskPwdDialog;
 import com.wireless.pack.Type;
 import com.wireless.pad.R;
 import com.wireless.pojo.dishesOrder.OrderFood;
@@ -462,22 +460,8 @@ public class OrderFoodListView extends ExpandableListView {
 						.setOnClickListener(new View.OnClickListener() {
 							@Override
 							public void onClick(View v) {
-								if (WirelessOrder.restaurant.hasPwd5()) {
-									/**
-									 * 提示输入权限密码2，验证通过的情况下显示删菜数量Dialog
-									 */
-									new AskPwdDialog(getContext(), AskPwdDialog.PWD_5) {
-										@Override
-										protected void onPwdPass(Context context) {
-										
-											showCancelAmountDialog(_foods.get(childPosition));
-											//new AskCancelAmountDialog(_foods.get(childPosition)).show();
-										}
-									};
-								} else {
-									//new AskCancelAmountDialog(_foods.get(childPosition)).show();
-									showCancelAmountDialog(_foods.get(childPosition));
-								}
+								//new AskCancelAmountDialog(_foods.get(childPosition)).show();
+								showCancelAmountDialog(_foods.get(childPosition));
 							}
 						});
 				
