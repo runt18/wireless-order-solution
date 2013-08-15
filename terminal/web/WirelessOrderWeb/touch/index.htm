@@ -34,32 +34,56 @@ function getDom(id){
 						<input type = "text" id = "txtPeopleNumForSM" class = "desk-number" style = "background: url('../images/btnPeoplenum.png');"/>
 					</div>
 					<div id = "divRightForShowMessageTS">
-						<input type = "button" value = "选中" class = "keyboardbutton" />
-						<input type = "button" value = "7" class = "keyboardbutton" />
-						<input type = "button" value = "8" class = "keyboardbutton" />
-						<input type = "button" value = "9" class = "keyboardbutton" />
-						<input type = "button" value = "选中" class = "keyboardbutton" />
-						<input type = "button" value = "4" class = "keyboardbutton" />
-						<input type = "button" value = "5" class = "keyboardbutton" />
-						<input type = "button" value = "6" class = "keyboardbutton" />
-						<input type = "button" value = "0" class = "keyboardbutton" />
-						<input type = "button" value = "1" class = "keyboardbutton" />
-						<input type = "button" value = "2" class = "keyboardbutton" />
-						<input type = "button" value = "3" class = "keyboardbutton" />
+						<input type = "button" value = "选中" id = "selectTableNum" class = "keyboardbutton" />
+						<input type = "button" value = "7" class = "keyboardbutton" onclick = "inputNum(this)"/>
+						<input type = "button" value = "8" class = "keyboardbutton" onclick = "inputNum(this)"/>
+						<input type = "button" value = "9" class = "keyboardbutton" onclick = "inputNum(this)"/>
+						<input type = "button" value = "选中" id = "selectPeopleNum" class = "keyboardbutton" />
+						<input type = "button" value = "4" class = "keyboardbutton" onclick = "inputNum(this)"/>
+						<input type = "button" value = "5" class = "keyboardbutton" onclick = "inputNum(this)"/>
+						<input type = "button" value = "6" class = "keyboardbutton" onclick = "inputNum(this)"/>
+						<input type = "button" value = "0" class = "keyboardbutton" onclick = "inputNum(this)"/>
+						<input type = "button" value = "1" class = "keyboardbutton" onclick = "inputNum(this)"/>
+						<input type = "button" value = "2" class = "keyboardbutton" onclick = "inputNum(this)"/>
+						<input type = "button" value = "3" class = "keyboardbutton" onclick = "inputNum(this)"/>
 					</div>
 				</div>
 				<div id = "divBottomForShowMessageTS">
-					<input type = "button" value = "开台" class = "keyboardbutton" style = "width: 100px; margin-left: 140px;"/>
-					<input type = "button" value = "点菜" class = "keyboardbutton" style = "width: 100px; margin-left: 5px;"/>
+					<input type = "button" value = "开台" class = "keyboardbutton" style = "width: 100px; margin-left: 140px;" onclick = "setEatingTable()"/>
+					<input type = "button" value = "点菜" class = "keyboardbutton" style = "width: 100px; margin-left: 5px;" />
 					<input type = "button" value = "取消" id = "btnCancelForShowMessageTS" class = "keyboardbutton" style = "width: 100px; margin-left: 5px;"/>
 				</div>
 			</div>	
-			<div id = "divHideForTableSelect"></div>			
+			<div id = "divHideForTableSelect"></div>	
+			<div id = "divSelectTableNumForTs">
+				<div id = "divTopForSelectTableNumTS"></div>
+				<div id = "divMainForSelectTableNumTS">
+					<div id = "divLeftForSelectTableNumTS">
+						<span style = "font-size: 30px; font-weight: bold; margin-left: 5px;">桌号：</span><input type = "text" id = "txtTableNumForTS"  class = "table-number" style = "background: #FFD700;"/>
+						<input type = "button" value = "7" class = "keyboardbutton" style = "margin: 5px 0 0 13px;" onclick = "inputNum(this)"/>
+						<input type = "button" value = "8" class = "keyboardbutton" style = "margin: 5px 0 0 5px;" onclick = "inputNum(this)"/>
+						<input type = "button" value = "9" class = "keyboardbutton" style = "margin: 5px 0 0 5px;" onclick = "inputNum(this)"/>
+						<input type = "button" value = "4" class = "keyboardbutton" style = "margin: 5px 0 0 13px;" onclick = "inputNum(this)"/>
+						<input type = "button" value = "5" class = "keyboardbutton" style = "margin: 5px 0 0 5px;" onclick = "inputNum(this)"/>
+						<input type = "button" value = "6" class = "keyboardbutton" style = "margin: 5px 0 0 5px;" onclick = "inputNum(this)"/>
+						<input type = "button" value = "1" class = "keyboardbutton" style = "margin: 5px 0 0 13px;" onclick = "inputNum(this)"/>
+						<input type = "button" value = "2" class = "keyboardbutton" style = "margin: 5px 0 0 5px;" onclick = "inputNum(this)"/>
+						<input type = "button" value = "3" class = "keyboardbutton" style = "margin: 5px 0 0 5px;" onclick = "inputNum(this)"/>
+						<input type = "button" value = "0" class = "keyboardbutton" style = "margin: 5px 0 0 13px; width: 156px;" onclick = "inputNum(this)"/>
+						<input type = "button" value = "00" class = "keyboardbutton" style = "margin: 5px 0 0 5px;" onclick = "inputNum(this)"/>
+					</div>
+					<div id = "divRightForSelectTableNumTS">
+						<input type = "button" value = "<--" id = "btnBackOneForSTNum" class = "keyboardbutton" style = "margin: 0 0 0 5px;" />
+						<input type = "button" value = "<<" id = "btnBackAllForSTNum" class = "keyboardbutton" style = "margin: 5px 0 0 5px;" />
+						<input type = "button" value = "关闭" id = "btnCloseForSelectTableNumTS" class = "keyboardbutton" style = "margin: 5px 0 0 5px;"/>
+						<input type = "button" value = "确定" id = "btnSubmitForSelectTableNumTS" class = "keyboardbutton" style = "margin: 5px 0 0 5px; height: 137px;"/>
+					</div>
+				</div>
+			</div>		
 		</div>
 		<div id="divToolRightForSelect" class="box-vertical" style = "line-height: 60px;">
 			<div  id = "divAllStatus" class="button-base" style="margin-bottom: 2px;" onclick="showStatus()">全部状态	</div>
 			<div id = "divStatus" style =  " display: none; margin-bottom: 2px;">
-					<div class="button-base" id = "eatingForTableSelect" style = "margin-bottom: 2px; background-color: #F1C40D" onclick = "showEating()">就餐</div>
 					<div class="button-base" id = "freeForTableSelect" style = "margin-bottom: 2px; background-color: #F1C40D">空闲</div>
 					<div class="button-base" id = "busyForTableSelect" style = "margin-bottom: 2px; background-color: #F1C40D">占用</div>
 			</div>
@@ -73,7 +97,8 @@ function getDom(id){
 		<div class="button-base" style="margin-right: 2px;" onclick="frontPage()">上一页</div>
 		<div class="button-base" style="margin-right: 2px;" onclick="nextPage()">下一页</div>
 		<div class="button-base" style="margin-right: 2px;" onclick="lastPage()">末页</div>
-  		<div class="button-base" style="margin-right: 2px;">点菜</div>
+		<div class="button-base" style="margin-right: 2px;">开台</div>
+  		<div class="button-base" style="margin-right: 2px;" onclick = "createOrderForTS()">点菜</div>
   		<div class="button-base" style="margin-right: 2px;">结账</div>
   		<div class="div-full">&nbsp;</div>
   		<div class="button-base" style="margin-left: 2px;" onClick="toggleContentDisplay({type:'show', renderTo:'divUpdateOrder'})">divUpdateOrder</div>
