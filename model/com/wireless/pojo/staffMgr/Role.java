@@ -6,11 +6,17 @@ import java.util.List;
 import java.util.Map;
 
 import com.wireless.json.Jsonable;
+import com.wireless.parcel.Parcel;
+import com.wireless.parcel.Parcelable;
+import com.wireless.pojo.util.SortedList;
 
 
 
-public class Role implements Jsonable{
+public class Role implements Jsonable, Parcelable{
 
+	public final static int ROLE_PARCELABLE_SIMPLE = 0;
+	public final static int ROLE_PARCELABLE_COMPLEX = 1;
+	
 	public static enum Type{
 		NORMAL(1, "普通"),
 		RESERVED(2, "系统保留");
@@ -80,6 +86,15 @@ public class Role implements Jsonable{
 	private String name;
 	private Category category = Category.OTHER;
 	private Type type = Type.NORMAL;
+	private List<Privilege> privileges = SortedList.newInstance();
+	
+	Role(){
+		
+	}
+	
+	public Role(int id){
+		setId(id);
+	}
 	
 	public int getId() {
 		return id;
@@ -124,6 +139,20 @@ public class Role implements Jsonable{
 		this.type = type;
 	}
 
+	public List<Privilege> getPrivileges(){
+		return Collections.unmodifiableList(privileges);
+	}
+	
+	public void addPrivilege(Privilege privilege){
+		if(privilege != null){
+			privileges.add(privilege);
+		}
+	}
+	
+	public boolean hasPrivilege(Privilege.Code code){
+		return privileges.contains(new Privilege(0, code, 0));
+	}
+	
 	@Override
 	public Map<String, Object> toJsonMap(int flag) {
 		Map<String, Object> jm = new HashMap<String, Object>();
@@ -141,5 +170,36 @@ public class Role implements Jsonable{
 	@Override
 	public List<Object> toJsonList(int flag) {
 		return null;
+	}
+
+	@Override
+	public void writeToParcel(Parcel dest, int flag) {
+		dest.writeString(getName());
+		dest.writeInt(getCategory().getVal());
+		dest.writeInt(getType().getVal());
+		dest.writeParcelList(privileges, 0);
+	}
+
+	@Override
+	public void createFromParcel(Parcel source) {
+		setName(source.readString());
+		setCategory(Category.valueOf(source.readInt()));
+		setType(Type.valueOf(source.readInt()));
+		privileges.clear();
+		privileges.addAll(source.readParcelList(Privilege.CREATOR));
 	}	
+	
+	public final static Parcelable.Creator<Role> CREATOR = new Parcelable.Creator<Role>(){
+
+		@Override
+		public Role newInstance() {
+			return new Role();
+		}
+		
+		@Override
+		public Role[] newInstance(int size){
+			return new Role[size];
+		}
+		
+	};
 }

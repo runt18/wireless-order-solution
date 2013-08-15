@@ -46,11 +46,6 @@ public class Restaurant implements Parcelable{
 	private String tele1;
 	private String tele2;
 	private String address;
-	private String pwd;
-	private String pwd2;
-	private String pwd3;
-	private String pwd4;
-	private String pwd5;
 	
 	public Restaurant(){
 		
@@ -126,66 +121,6 @@ public class Restaurant implements Parcelable{
 		this.tele2 = tele2;
 	}
 	
-	public String getPwd() {
-		return pwd;
-	}
-	
-	public void setPwd(String pwd) {
-		this.pwd = pwd;
-	}
-	
-	public boolean hasPwd(){
-		return pwd != null ? pwd.length() != 0 : false;
-	}
-	
-	public String getPwd2() {
-		return pwd2;
-	}
-	
-	public boolean hasPwd2(){
-		return pwd2 != null ? pwd2.length() != 0 : false;
-	}
-	
-	public void setPwd2(String pwd2) {
-		this.pwd2 = pwd2;
-	}
-	
-	public String getPwd3() {
-		return pwd3;
-	}
-	
-	public boolean hasPwd3(){
-		return pwd3 != null ? pwd3.length() != 0 : false;
-	}
-	
-	public void setPwd3(String pwd3) {
-		this.pwd3 = pwd3;
-	}
-	
-	public String getPwd4() {
-		return pwd4;
-	}
-	
-	public boolean hasPwd4(){
-		return pwd4 != null ? pwd4.length() != 0 : false;
-	}	
-	
-	public void setPwd4(String pwd4) {
-		this.pwd4 = pwd4;
-	}
-	
-	public String getPwd5() {
-		return pwd5;
-	}
-	
-	public void setPwd5(String pwd5) {
-		this.pwd5 = pwd5;
-	}
-	
-	public boolean hasPwd5(){
-		return pwd5 != null ? pwd5.length() != 0 : false;
-	}
-	
 	public String getAddress() {
 		return address;
 	}
@@ -222,11 +157,6 @@ public class Restaurant implements Parcelable{
 			dest.writeInt(this.id);
 			dest.writeString(this.restaurantName);
 			dest.writeString(this.restaurantInfo);
-			dest.writeString(this.pwd);
-			dest.writeString(this.pwd2);
-			dest.writeString(this.pwd3);
-			dest.writeString(this.pwd4);
-			dest.writeString(this.pwd5);
 		}
 	}
 
@@ -239,11 +169,6 @@ public class Restaurant implements Parcelable{
 			this.id = source.readInt();
 			this.restaurantName = source.readString();
 			this.restaurantInfo = source.readString();
-			this.pwd = source.readString();
-			this.pwd2 = source.readString();
-			this.pwd3 = source.readString();
-			this.pwd4 = source.readString();
-			this.pwd5 = source.readString();
 		}
 	}
 	

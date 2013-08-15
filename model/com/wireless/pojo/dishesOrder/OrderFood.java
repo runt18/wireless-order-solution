@@ -6,12 +6,15 @@ import java.util.List;
 import java.util.Map;
 
 import com.wireless.exception.BusinessException;
+import com.wireless.exception.StaffError;
 import com.wireless.json.Jsonable;
 import com.wireless.parcel.Parcel;
 import com.wireless.parcel.Parcelable;
 import com.wireless.pojo.crMgr.CancelReason;
 import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.menuMgr.Kitchen;
+import com.wireless.pojo.staffMgr.Privilege;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.tasteMgr.Taste;
 import com.wireless.pojo.tasteMgr.TasteGroup;
 import com.wireless.pojo.util.DateUtil;
@@ -127,19 +130,26 @@ public class OrderFood implements Parcelable, Comparable<OrderFood>, Jsonable {
 	 * Remove the order amount to order food.
 	 * @param countToRemove 
 	 * 			the count to remove
+	 * @param staff
+	 * 			the staff to remove count
 	 * @throws BusinessException
 	 * 			throws if the count to remove is greater than original count
+	 * 			throws if the staff does NOT own the cancel food privilege
 	 */
-	public void removeCount(float countToRemove) throws BusinessException{
-		if(countToRemove >= 0){
-			if(countToRemove <= getCount()){
-				mLastCnt = mCurCnt;
-				mCurCnt -= countToRemove;
+	public void removeCount(float countToRemove, Staff staff) throws BusinessException{
+		if(staff.getRole().hasPrivilege(Privilege.Code.CANCEL_FOOD)){
+			if(countToRemove >= 0){
+				if(countToRemove <= getCount()){
+					mLastCnt = mCurCnt;
+					mCurCnt -= countToRemove;
+				}else{
+					throw new BusinessException("输入的删除数量大于已点数量, 请重新输入");
+				}
 			}else{
-				throw new BusinessException("输入的删除数量大于已点数量, 请重新输入");
+				throw new IllegalArgumentException("The count(" + countToRemove + ") to remove should be positive.");
 			}
 		}else{
-			throw new IllegalArgumentException("The count(" + countToRemove + ") to remove should be positive.");
+			throw new BusinessException(StaffError.PERMISSION_NOT_ALLOW);
 		}
 	}
 	

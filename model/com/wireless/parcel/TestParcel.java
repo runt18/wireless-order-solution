@@ -291,11 +291,6 @@ public class TestParcel {
 		restToParcel.setId(1);
 		restToParcel.setName("测试餐厅");
 		restToParcel.setInfo("adfasdftesfsd");
-		restToParcel.setPwd("adbadyrw353423d");
-		restToParcel.setPwd2("3gsh456dsg345q4adf");
-		restToParcel.setPwd3("23523zvafja;jp2aopidjf0pqjjaf");
-		restToParcel.setPwd4("ad;jfp897345ujhbn'a8puhaq34");
-		restToParcel.setPwd5("203974hjnvnjsdup98q23hhalshdf");
 		
 		Parcel p = new Parcel();
 		restToParcel.writeToParcel(p, Restaurant.RESTAURANT_PARCELABLE_COMPLEX);
@@ -309,16 +304,6 @@ public class TestParcel {
 		assertEquals("restaurant name", restToParcel.getName(), parceableRest.getName());
 		// Check the restaurant info
 		assertEquals("restaurant info", restToParcel.getInfo(), parceableRest.getInfo());
-		// Check the pwd
-		assertEquals("restaurant pwd", restToParcel.getPwd(), parceableRest.getPwd());
-		// Check the pwd2
-		assertEquals("restaurant pwd2", restToParcel.getPwd2(), parceableRest.getPwd2());
-		// Check the pwd3
-		assertEquals("restaurant pwd3", restToParcel.getPwd3(), parceableRest.getPwd3());
-		// Check the pwd4
-		assertEquals("restaurant pwd4", restToParcel.getPwd4(), parceableRest.getPwd4());
-		// Check the pwd5
-		assertEquals("restaurant pwd5", restToParcel.getPwd5(), parceableRest.getPwd5());
 		
 	}
 	

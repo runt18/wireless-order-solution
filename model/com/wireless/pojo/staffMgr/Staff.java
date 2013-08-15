@@ -128,7 +128,9 @@ public class Staff implements Parcelable, Jsonable{
 	}
 	
 	public void setRole(Role role){
-		this.role = role;
+		if(role != null){
+			this.role = role;
+		}
 	}
 	
 	@Override 
@@ -154,6 +156,7 @@ public class Staff implements Parcelable, Jsonable{
 			dest.writeInt(this.id);
 			dest.writeString(this.pwd);
 			dest.writeInt(this.restaurantId);
+			dest.writeParcel(this.role, 0);
 		}
 	}
 
@@ -166,6 +169,7 @@ public class Staff implements Parcelable, Jsonable{
 			this.id = source.readInt();
 			this.pwd = source.readString();
 			this.restaurantId = source.readInt();
+			this.role = source.readParcel(Role.CREATOR);
 		}
 	}
 	
