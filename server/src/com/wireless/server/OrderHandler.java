@@ -120,7 +120,7 @@ class OrderHandler implements Runnable{
 //											((request.header.restaurantId[1] & 0x000000FF) << 8)); 
 				
 				// Verify to check the staff
-				final Staff staff = StaffDao.verify(staffId, Privilege.Code.UNKNOWN);
+				final Staff staff = StaffDao.verify(staffId, Privilege.Code.FRONT_BUSINESS);
 				
 				if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_MENU){
 					//handle query menu request
