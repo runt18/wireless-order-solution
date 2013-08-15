@@ -32,7 +32,7 @@ public class TestCommitOrderDao {
 	private static Staff mStaff;
 	
 	@BeforeClass
-	public static void initDbParam() throws PropertyVetoException{
+	public static void initDbParam() throws PropertyVetoException, BusinessException{
 		TestInit.init();
 		try {
 			mStaff = StaffDao.getStaffs(37).get(0);
@@ -78,7 +78,7 @@ public class TestCommitOrderDao {
 		
 		//---------------------------------------------------------------
 		//Update
-		expectedOrder.removeAll();
+		expectedOrder.removeAll(mStaff);
 		
 		of = new OrderFood(foods.get(1));
 		of.setCount(1.35f);
@@ -96,7 +96,7 @@ public class TestCommitOrderDao {
 		
 		//---------------------------------------------------------------
 		//Update
-		expectedOrder.removeAll();
+		expectedOrder.removeAll(mStaff);
 		
 		of = new OrderFood(foods.get(0));
 		of.setCount(1.35f);

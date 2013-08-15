@@ -221,14 +221,14 @@ public class BusinessStatisticsDao {
 			queryPattern = params.get("queryPattern");
 			dbCon.connect();
 			if(queryPattern == null || queryPattern.toString().equals("1")){
-				DutyRange duty = QueryDutyRange.exec(dbCon, StaffDao.verify(dbCon, Integer.parseInt(pin.toString())), onDuty.toString(), offDuty.toString());
+				DutyRange duty = QueryDutyRange.exec(dbCon, StaffDao.getStaffById(dbCon, Integer.parseInt(pin.toString())), onDuty.toString(), offDuty.toString());
 				if(duty != null){
-					ShiftDetail res = QueryShiftDao.exec(dbCon, StaffDao.verify(Integer.parseInt(pin.toString())), duty.getOnDutyFormat(), duty.getOffDutyFormat(), DateType.getValue(params));
+					ShiftDetail res = QueryShiftDao.exec(dbCon, StaffDao.getStaffById(dbCon, Integer.parseInt(pin.toString())), duty.getOnDutyFormat(), duty.getOffDutyFormat(), DateType.getValue(params));
 					bs = new BusinessStatistics(res);				
 				}
 			}else{
 				if(queryPattern.toString().equals("2")){
-					ShiftDetail res = QueryShiftDao.exec(dbCon, StaffDao.verify(Integer.parseInt(pin.toString())), onDuty.toString(), offDuty.toString(), DateType.getValue(params));
+					ShiftDetail res = QueryShiftDao.exec(dbCon, StaffDao.getStaffById(dbCon, Integer.parseInt(pin.toString())), onDuty.toString(), offDuty.toString(), DateType.getValue(params));
 					bs = new BusinessStatistics(res);
 				}
 			}

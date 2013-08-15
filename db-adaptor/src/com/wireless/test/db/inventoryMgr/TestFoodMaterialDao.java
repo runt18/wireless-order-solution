@@ -11,6 +11,7 @@ import org.junit.Test;
 
 import com.wireless.db.inventoryMgr.FoodMaterialDao;
 import com.wireless.db.staffMgr.StaffDao;
+import com.wireless.exception.BusinessException;
 import com.wireless.pojo.inventoryMgr.FoodMaterial;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.test.db.TestInit;
@@ -20,7 +21,7 @@ public class TestFoodMaterialDao {
 	private static Staff staff;
 	
 	@BeforeClass
-	public static void beforeClass() throws PropertyVetoException{
+	public static void beforeClass() throws PropertyVetoException, BusinessException{
 		TestInit.init();
 		try {
 			staff = StaffDao.getStaffs(26).get(0);

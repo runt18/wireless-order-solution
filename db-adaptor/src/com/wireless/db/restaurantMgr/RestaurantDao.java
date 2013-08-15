@@ -117,11 +117,6 @@ public class RestaurantDao {
 			Restaurant restaurant = new Restaurant();
 			restaurant.setAccount(dbCon.rs.getString("account"));
 			restaurant.setId(dbCon.rs.getInt("id"));
-			restaurant.setPwd(dbCon.rs.getString("pwd"));
-			restaurant.setPwd2(dbCon.rs.getString("pwd2"));
-			restaurant.setPwd3(dbCon.rs.getString("pwd3"));
-			restaurant.setPwd4(dbCon.rs.getString("pwd4"));
-			restaurant.setPwd5(dbCon.rs.getString("pwd5"));
 			restaurant.setRecordAlive(dbCon.rs.getInt("record_alive"));
 			restaurant.setInfo(dbCon.rs.getString("restaurant_info"));
 			restaurant.setName(dbCon.rs.getString("restaurant_name"));

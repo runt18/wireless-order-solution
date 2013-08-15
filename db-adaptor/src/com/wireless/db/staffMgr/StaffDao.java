@@ -10,6 +10,8 @@ import com.wireless.db.Params;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.RestaurantError;
 import com.wireless.exception.StaffError;
+import com.wireless.pojo.staffMgr.Privilege;
+import com.wireless.pojo.staffMgr.Role;
 import com.wireless.pojo.staffMgr.Staff;
 
 public class StaffDao {
@@ -20,6 +22,8 @@ public class StaffDao {
 	 * 2 - check if the staff owns the specific privilege   
 	 * @param staffId
 	 * 			the staff id to verify
+	 * @param code
+	 * 			the privilege code
 	 * @return the staff to this id
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
@@ -27,11 +31,11 @@ public class StaffDao {
 	 * 			throws if the staff to this id does NOT exist
 	 * 		    throws if the restaurant attached with this staff has been expired
 	 */
-	public static Staff verify(int staffId) throws SQLException, BusinessException{
+	public static Staff verify(int staffId, Privilege.Code code) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return verify(dbCon, staffId);
+			return verify(dbCon, staffId, code);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -45,14 +49,17 @@ public class StaffDao {
 	 * 			database connection
 	 * @param staffId
 	 * 			the staff id to verify
+	 * @param code
+	 * 			the privilege code
 	 * @return the staff to this id
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 * @throws BusinessException
 	 * 			throws if the staff to this id does NOT exist
 	 * 		    throws if the restaurant attached with this staff has been expired
+	 * 			throws if the privilege code is NOT allowed
 	 */
-	public static Staff verify(DBCon dbCon, int staffId) throws SQLException, BusinessException{
+	public static Staff verify(DBCon dbCon, int staffId, Privilege.Code code) throws SQLException, BusinessException{
 		String sql;
 		sql = " SELECT expire_date " +
 		      " FROM " + Params.dbName + ".restaurant REST " +
@@ -73,7 +80,13 @@ public class StaffDao {
 		
 		dbCon.rs.close();
 
-		return getStaffById(dbCon, staffId);
+		Staff staff = getStaffById(dbCon, staffId);
+		
+		if(staff.getRole().hasPrivilege(code)){
+			throw new BusinessException(StaffError.PERMISSION_NOT_ALLOW);
+		}else{
+			return staff;
+		}
 
 	}
 	
@@ -105,8 +118,10 @@ public class StaffDao {
 	 * @return the staffs to this restaurant
 	 * @throws SQLException
 	 * 			throws if failed execute any SQL statement
+	 * @throws BusinessException 
+	 * 			throws if the role to any staff does NOT exist
 	 */
-	public static List<Staff> getStaffs(int restaurantId) throws SQLException{
+	public static List<Staff> getStaffs(int restaurantId) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -125,19 +140,24 @@ public class StaffDao {
 	 * @return the staffs to this restaurant
 	 * @throws SQLException
 	 * 			throws if failed execute any SQL statement
+	 * @throws BusinessException 
+	 * 			throws if the role to any staff does NOT exist
 	 */
-	public static List<Staff> getStaffs(DBCon dbCon, int restaurantId) throws SQLException{
+	public static List<Staff> getStaffs(DBCon dbCon, int restaurantId) throws SQLException, BusinessException{
 		return getStaffs(dbCon, " AND STAFF.restaurant_id = " + restaurantId, null);
 	}
 
-	private static List<Staff> getStaffs(DBCon dbCon, String extraCond, String orderClause) throws SQLException{
+	private static List<Staff> getStaffs(DBCon dbCon, String extraCond, String orderClause) throws SQLException, BusinessException{
+		
 		String sql = " SELECT "	+
-					 " STAFF.staff_id, STAFF.restaurant_id, STAFF.name, STAFF.tele, STAFF.pwd, STAFF.type AS staff_type" +
+					 " STAFF.staff_id, STAFF.restaurant_id, STAFF.name, STAFF.role_id, STAFF.tele, STAFF.pwd, STAFF.type AS staff_type" +
 					 " FROM " + Params.dbName + ".staff STAFF " + " " +
 					 " WHERE 1 = 1 " +
 					 (extraCond != null ? extraCond : " ") +
 					 (orderClause != null ? orderClause : " ORDER BY STAFF.staff_id ");
+		
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
+		
 		List<Staff> result = new ArrayList<Staff>();
 		while(dbCon.rs.next()){
 			Staff staff = new Staff();
@@ -145,6 +165,7 @@ public class StaffDao {
 			staff.setId(dbCon.rs.getInt("staff_id"));
 			staff.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
 			staff.setName(dbCon.rs.getString("name"));
+			staff.setRole(new Role(dbCon.rs.getInt("role_id")));
 			staff.setMobile(dbCon.rs.getString("tele"));
 			staff.setPwd(dbCon.rs.getString("pwd"));
 			staff.setType(Staff.Type.valueOf(dbCon.rs.getInt("staff_type")));
@@ -152,6 +173,11 @@ public class StaffDao {
 			result.add(staff);
 		}
 		dbCon.rs.close();
+		
+		//Get the associated role to each staff
+		for(Staff staff : result){
+			staff.setRole(RoleDao.getRoleById(dbCon, staff, staff.getRole().getId()));
+		}
 		
 		return Collections.unmodifiableList(result);
 	}

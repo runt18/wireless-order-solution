@@ -22,7 +22,7 @@ public class TestTableDao {
 	private static Staff mStaff;
 	
 	@BeforeClass
-	public static void initDbParam() throws PropertyVetoException {
+	public static void initDbParam() throws PropertyVetoException, BusinessException {
 		TestInit.init();
 		try {
 			mStaff = StaffDao.getStaffs(37).get(0);

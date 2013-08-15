@@ -93,7 +93,7 @@ public class QueryDutyRange {
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return QueryDutyRange.exec(dbCon, StaffDao.verify(dbCon, staffId), onDuty, offDuty);
+			return QueryDutyRange.exec(dbCon, StaffDao.getStaffById(dbCon, staffId), onDuty, offDuty);
 		}catch(Exception e){
 			throw e;
 		}finally{
@@ -113,7 +113,7 @@ public class QueryDutyRange {
 		DutyRange item = null;
 		SystemStaff staff = null;
 		
-		Staff term = StaffDao.verify(dbCon, staffId);
+		Staff term = StaffDao.getStaffById(dbCon, staffId);
 //		String selectSQL = "SELECT name, DATE_FORMAT(on_duty,'%Y-%m-%d %T') AS on_duty, DATE_FORMAT(off_duty,'%Y-%m-%d %T') AS off_duty "
 //						+ " FROM "
 //						+ " ("

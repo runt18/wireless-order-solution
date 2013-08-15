@@ -9,6 +9,7 @@ import org.junit.Test;
 
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.supplierMgr.SupplierDao;
+import com.wireless.exception.BusinessException;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.supplierMgr.Supplier;
 import com.wireless.test.db.TestInit;
@@ -18,7 +19,7 @@ public class TestSupplierDao {
 	private static Staff mStaff;
 	
 	@BeforeClass
-	public static void initDBParam() throws PropertyVetoException{
+	public static void initDBParam() throws PropertyVetoException, BusinessException{
 		TestInit.init();
 		try{
 			mStaff = StaffDao.getStaffs(37).get(0);
