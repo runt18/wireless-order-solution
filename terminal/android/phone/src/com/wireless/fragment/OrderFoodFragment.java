@@ -46,7 +46,6 @@ import com.wireless.ui.PickTasteActivity;
 import com.wireless.ui.R;
 import com.wireless.ui.dialog.AskCancelAmountDialog;
 import com.wireless.ui.dialog.AskCancelAmountDialog.OnCancelAmountChangedListener;
-import com.wireless.ui.dialog.AskPwdDialog;
 import com.wireless.ui.dialog.SetOrderAmountDialog;
 import com.wireless.ui.dialog.SetOrderAmountDialog.OnAmountChangedListener;
 
@@ -309,7 +308,6 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 
 					@Override
 					public void onClick(View v) {
-						// TODO Auto-generated method stub
 						new AlertDialog.Builder(getActivity())
 						.setTitle("提示")
 						.setMessage("叫起" + food.getName() + "吗？")
@@ -414,20 +412,7 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 					cancelFoodImgView.setOnClickListener(new View.OnClickListener() {				
 						@Override
 						public void onClick(View v) {
-							if(WirelessOrder.restaurant.hasPwd5()){
-								/**
-								 * 提示退菜权限密码，验证通过的情况下显示删菜数量Dialog
-								 */
-								new AskPwdDialog(getActivity(), AskPwdDialog.PWD_5){
-									@Override
-									protected void onPwdPass(Context context){
-										dismiss();
-										AskCancelAmountDialog.newInstance(food, getId()).show(getFragmentManager(), AskCancelAmountDialog.TAG);
-									}
-								}.show();
-							}else{
-								AskCancelAmountDialog.newInstance(food, getId()).show(getFragmentManager(), AskCancelAmountDialog.TAG);
-							}
+							AskCancelAmountDialog.newInstance(food, getId()).show(getFragmentManager(), AskCancelAmountDialog.TAG);
 						}
 					});
 					//"催菜"操作

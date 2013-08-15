@@ -17,6 +17,7 @@ import android.widget.Toast;
 
 import com.wireless.common.WirelessOrder;
 import com.wireless.exception.BusinessException;
+import com.wireless.exception.StaffError;
 import com.wireless.parcel.OrderFoodParcel;
 import com.wireless.pojo.crMgr.CancelReason;
 import com.wireless.pojo.dishesOrder.OrderFood;
@@ -196,7 +197,7 @@ public class AskCancelAmountDialog extends DialogFragment {
 				try{
 					float cancelAmount = Float.parseFloat(amountEditTxt.getText().toString());
 
-					mTheFood.removeCount(cancelAmount);							
+					mTheFood.removeCount(cancelAmount, WirelessOrder.loginStaff);							
 						
 					if(mOnAmountChangeListener != null){
 						mOnAmountChangeListener.onCancelAmountChanged(mTheFood);
@@ -205,7 +206,11 @@ public class AskCancelAmountDialog extends DialogFragment {
 					dismiss();
 					
 				}catch(BusinessException e){
-					Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_LONG).show();
+					if(e.getErrCode().equals(StaffError.PERMISSION_NOT_ALLOW)){
+						Toast.makeText(getActivity(), "对不起, 你没有退菜的权限", Toast.LENGTH_LONG).show();
+					}else{
+						Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_LONG).show();
+					}
 					
 				}catch(NumberFormatException e){
 					Toast.makeText(getActivity(), "你输入删菜数量不正确", Toast.LENGTH_LONG).show();
