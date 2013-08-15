@@ -277,19 +277,24 @@ ENGINE = InnoDB;
 INSERT INTO wireless_order_db.privilege (`pri_code`, `cate`) VALUES (1000, 1);
 
 -- -----------------------------------------------------
--- Insert a '打折' privilege
+-- Insert a '退菜' privilege
 -- -----------------------------------------------------
 INSERT INTO wireless_order_db.privilege (`pri_code`, `cate`) VALUES (1001, 1);
 
 -- -----------------------------------------------------
--- Insert a '赠送' privilege
+-- Insert a '打折' privilege
 -- -----------------------------------------------------
 INSERT INTO wireless_order_db.privilege (`pri_code`, `cate`) VALUES (1002, 1);
 
 -- -----------------------------------------------------
--- Insert a '反结帐' privilege
+-- Insert a '赠送' privilege
 -- -----------------------------------------------------
 INSERT INTO wireless_order_db.privilege (`pri_code`, `cate`) VALUES (1003, 1);
+
+-- -----------------------------------------------------
+-- Insert a '反结帐' privilege
+-- -----------------------------------------------------
+INSERT INTO wireless_order_db.privilege (`pri_code`, `cate`) VALUES (1004, 1);
 
 -- -----------------------------------------------------
 -- Insert a '后台' privilege
@@ -338,7 +343,7 @@ FROM wireless_order_db.role R JOIN wireless_order_db.privilege P ON R.cate = 2;
 INSERT INTO wireless_order_db.role_privilege 
 (`role_id`, `pri_id`, `restaurant_id`)
 SELECT role_id, pri_id, restaurant_id
-FROM wireless_order_db.role R JOIN wireless_order_db.privilege P ON R.cate = 3 AND pri_code IN(1000, 1001, 1002, 1003, 2000, 3000, 4000, 5000);
+FROM wireless_order_db.role R JOIN wireless_order_db.privilege P ON R.cate = 3 AND pri_code IN(1000, 1001, 1002, 1003, 1004, 2000, 3000, 4000, 5000);
 
 -- -----------------------------------------------------
 -- Add '前台'、'后台' privileges to '部长'
@@ -346,7 +351,7 @@ FROM wireless_order_db.role R JOIN wireless_order_db.privilege P ON R.cate = 3 A
 INSERT INTO wireless_order_db.role_privilege 
 (`role_id`, `pri_id`, `restaurant_id`)
 SELECT role_id, pri_id, restaurant_id
-FROM wireless_order_db.role R JOIN wireless_order_db.privilege P ON R.cate = 4 AND pri_code IN(1000, 1001, 1002, 1003, 2000);
+FROM wireless_order_db.role R JOIN wireless_order_db.privilege P ON R.cate = 4 AND pri_code IN(1000, 1001, 1002, 1003, 1004, 2000);
 
 -- -----------------------------------------------------
 -- Add '前台' privileges to '服务员'
@@ -354,7 +359,7 @@ FROM wireless_order_db.role R JOIN wireless_order_db.privilege P ON R.cate = 4 A
 INSERT INTO wireless_order_db.role_privilege 
 (`role_id`, `pri_id`, `restaurant_id`)
 SELECT role_id, pri_id, restaurant_id
-FROM wireless_order_db.role R JOIN wireless_order_db.privilege P ON R.cate = 5 AND pri_code IN(1000, 1001, 1002, 1003);
+FROM wireless_order_db.role R JOIN wireless_order_db.privilege P ON R.cate = 5 AND pri_code IN(1000, 1001, 1002, 1003, 1004);
 
 -- -----------------------------------------------------
 -- Drop the field 'pwd', 'pwd2', 'pwd3', 'pwd4', 'pwd5' to table 'restaurant'
