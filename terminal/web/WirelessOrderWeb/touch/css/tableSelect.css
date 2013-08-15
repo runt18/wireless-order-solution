@@ -18,8 +18,8 @@
 	position: absolute;  
 	top: 25%;  
 	left: 25%;  
-	width: 485px;  
-	height: 320px;  
+	width: 515px;  
+	height: 330px;  
 	border: 2px solid #fff;  
 	background-color: #6395EC;  
 	z-index:1003;  
@@ -32,11 +32,39 @@
 	height: 68%;	
 }
 #divLeftForShowMessageTS{
-	width: 38%;
+	width: 37%;
 	height: 100%;
 }
 #divRightForShowMessageTS{
 	height: 100%;
+}
+#divSelectTableNumForTs{
+	display: none;
+	position: absolute;
+	top: 25%;
+	left: 35%;
+	width: 350px;
+	height: 430px;
+	border: 2px solid #fff;
+	background-color: #6395EC;
+	z-index: 1004;
+}
+#divTopForSelectTableNumTS{
+	wudth: 100%;
+	height: 45px;
+}
+#divMainForSelectTableNumTS{
+	width: 100%;
+}
+#divLeftForSelectTableNumTS{
+	width: 75%;	
+	height: 385px;
+	float: left;
+}
+#divRightForSelectTableNumTS{
+	height: 385px;
+	float: left;
+	width: 25%;
 }
 #divHideForTableSelect{
 	display: none;
@@ -71,13 +99,20 @@
 	padding-left: 50px;
 	background-color: #FFD700;
 }
+.table-number{
+	height: 62px; 
+	width:150px; 
+	font-size: 28px;
+	padding-left: 2px;
+	background-color: #FFD700;
+}
 .keyboardbutton{
-	width: 62px;
-	height: 62px;
+	width: 72px;
+	height: 66px;
 	color: #A52A2A;
 	font-size: 23px;
 	font-weight: bold;
-	margin: 3px 0 3px 3px;
+	margin: 1px 0 1px 1px;
 	background-color: #75B2F4;
 	border: 1px solid green;
 	border-radius: 5px;
