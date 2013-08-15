@@ -83,9 +83,9 @@ public class StaffDao {
 		Staff staff = getStaffById(dbCon, staffId);
 		
 		if(staff.getRole().hasPrivilege(code)){
-			throw new BusinessException(StaffError.PERMISSION_NOT_ALLOW);
-		}else{
 			return staff;
+		}else{
+			throw new BusinessException(StaffError.PERMISSION_NOT_ALLOW);
 		}
 
 	}
