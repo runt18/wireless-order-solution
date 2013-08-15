@@ -36,7 +36,7 @@ public class InsertMenuAction extends Action {
 			 * dishPrice: kitchen: isSpecial : isRecommend : isFree : isStop :
 			 * 
 			 */
-			String pin = request.getParameter("pin");
+			String pin = (String) request.getSession().getAttribute("pin");
 			String restaurantID = request.getParameter("restaurantID");
 			
 			String foodAliasID = request.getParameter("foodAliasID");

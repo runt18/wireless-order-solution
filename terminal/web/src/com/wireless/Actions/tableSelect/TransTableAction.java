@@ -43,7 +43,7 @@ public class TransTableAction extends Action{
 			 * newTableID : the table id to transfer 
 			 * oldTableID : the table id to be transferred
 			 */
-			final Staff staff = StaffDao.verify(Integer.parseInt(request.getParameter("pin")));
+			final Staff staff = StaffDao.verify(Integer.parseInt((String) request.getSession().getAttribute("pin")));
 			
 			srcTblAlias = request.getParameter("oldTableAlias");
 			destTblAlias = request.getParameter("newTableAlias");

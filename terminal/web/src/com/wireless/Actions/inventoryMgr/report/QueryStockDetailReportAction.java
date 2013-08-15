@@ -30,7 +30,7 @@ public class QueryStockDetailReportAction extends Action{
 		String limit = request.getParameter("limit");
 		int roots = 0;
 		try{
-			String pin = request.getParameter("pin");
+			String pin = (String) request.getSession().getAttribute("pin");
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			String beginDate = request.getParameter("beginDate");
 			String endDate = request.getParameter("endDate");

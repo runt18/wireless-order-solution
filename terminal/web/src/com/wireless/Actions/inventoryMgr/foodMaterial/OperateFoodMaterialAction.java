@@ -35,7 +35,7 @@ public class OperateFoodMaterialAction extends DispatchAction{
 		response.setCharacterEncoding("UTF-8");
 		JObject jobject = new JObject();
 		try{
-//			String pin = request.getParameter("pin");
+//			String pin = (String) request.getSession().getAttribute("pin");
 			String restaurantId = request.getParameter("restaurantId");
 			String foodId = request.getParameter("foodId");
 			String content = request.getParameter("content");

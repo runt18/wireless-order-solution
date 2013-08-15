@@ -42,7 +42,8 @@ public class VerifyPwdAction extends Action {
 			 * 
 			 * pwd : the password to verify, which is in the form of MD5
 			 */
-			String pin = request.getParameter("pin");
+			//String pin = (String) request.getSession().getAttribute("pin");
+			String pin = (String) request.getSession().getAttribute("pin");
 			
 			int type = VerifyPwd.PASSWORD_2;
 			if(request.getParameter("type") != null){

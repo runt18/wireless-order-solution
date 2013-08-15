@@ -49,7 +49,7 @@ public class UpdateStaffAction extends Action {
 			 * 
 			 */
 
-			String pin = request.getParameter("pin");
+			String pin = (String) request.getSession().getAttribute("pin");
 
 			dbCon.connect();
 			Staff staff = StaffDao.verify(dbCon, Integer.parseInt(pin));

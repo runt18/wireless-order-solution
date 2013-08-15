@@ -26,7 +26,7 @@ public class CancelOrderGroupAction extends Action{
 		response.setCharacterEncoding("UTF-8");
 		JObject jobject = new JObject();
 		try{
-			String pin = request.getParameter("pin");
+			String pin = (String) request.getSession().getAttribute("pin");
 			String orderID = request.getParameter("orderID");
 			if(pin == null){
 				jobject.initTip(false, "操作失败, 验证终端有效信息错误, 请联系管理员.");

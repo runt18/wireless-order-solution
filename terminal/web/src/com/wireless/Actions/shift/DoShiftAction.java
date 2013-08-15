@@ -42,7 +42,7 @@ public class DoShiftAction extends Action {
 			 * 
 			 * OffDuty : the date time to be off duty
 			 */
-			String pin = request.getParameter("pin");
+			String pin = (String) request.getSession().getAttribute("pin");
 						
 			String onDuty = request.getParameter("onDuty");
 			String offDuty = request.getParameter("offDuty");

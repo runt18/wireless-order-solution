@@ -83,7 +83,7 @@ public class UpdateOrderAction2 extends Action{
 			 * 			 [是否临时菜(true),临时菜1编号,临时菜1名称,临时菜1数量,临时菜1单价]，
 			 * 			 [是否临时菜(true),临时菜1编号,临时菜1名称,临时菜1数量,临时菜1单价]...}			 
 			 **/
-			String pin = request.getParameter("pin");
+			String pin = (String) request.getSession().getAttribute("pin");
 			
 			Order orderToUpdate = new Order();
 			//get the id to this order

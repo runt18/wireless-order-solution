@@ -42,7 +42,7 @@ public class OperateMemberAction extends DispatchAction{
 		response.setCharacterEncoding("UTF-8");
 		JObject jobject = new JObject();
 		try{
-			String pin = request.getParameter("pin");
+			String pin = (String) request.getSession().getAttribute("pin");
 			String name = request.getParameter("name");
 			String mobile = request.getParameter("mobile");
 			String memberTypeId = request.getParameter("memberTypeId");
@@ -100,7 +100,7 @@ public class OperateMemberAction extends DispatchAction{
 		response.setCharacterEncoding("UTF-8");
 		JObject jobject = new JObject();
 		try{
-			String pin = request.getParameter("pin");
+			String pin = (String) request.getSession().getAttribute("pin");
 			String id = request.getParameter("id");
 			String name = request.getParameter("name");
 			String mobile = request.getParameter("mobile");
@@ -165,7 +165,7 @@ public class OperateMemberAction extends DispatchAction{
 		response.setCharacterEncoding("UTF-8");
 		JObject jobject = new JObject();
 		try{
-			String pin = request.getParameter("pin");
+			String pin = (String) request.getSession().getAttribute("pin");
 			String id = request.getParameter("id");
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			MemberDao.deleteById(staff, Integer.valueOf(id));
@@ -198,7 +198,7 @@ public class OperateMemberAction extends DispatchAction{
 		response.setCharacterEncoding("UTF-8");
 		JObject jobject = new JObject();
 		try{
-			String pin = request.getParameter("pin");
+			String pin = (String) request.getSession().getAttribute("pin");
 			String memberID = request.getParameter("memberID");
 			String rechargeMoney = request.getParameter("rechargeMoney");
 			String rechargeType = request.getParameter("rechargeType");
@@ -256,7 +256,7 @@ public class OperateMemberAction extends DispatchAction{
 		response.setCharacterEncoding("UTF-8");
 		JObject jobject = new JObject();
 		try{
-			String pin = request.getParameter("pin");
+			String pin = (String) request.getSession().getAttribute("pin");
 			String memberId = request.getParameter("memberId");
 			String point = request.getParameter("point");
 			String adjust = request.getParameter("adjust");
@@ -292,7 +292,7 @@ public class OperateMemberAction extends DispatchAction{
 		response.setCharacterEncoding("UTF-8");
 		JObject jobject = new JObject();
 		try{
-			String pin = request.getParameter("pin");
+			String pin = (String) request.getSession().getAttribute("pin");
 			String memberId = request.getParameter("memberId");
 			String point = request.getParameter("point");
 			

@@ -45,7 +45,7 @@ public class QueryMenuAction extends DispatchAction {
 		String start = request.getParameter("start");
 		String limit = request.getParameter("limit");
 		try {
-			String restaurantID = request.getParameter("restaurantID");
+			String restaurantID = (String) request.getSession().getAttribute("restaurantID");
 			String cond = null;
 			String orderBy = null;
 			

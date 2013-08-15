@@ -88,7 +88,7 @@ public class QueryDetailAction extends Action {
 			*//**
 			 * The parameters looks like below. pin=0x1 & orderID=40
 			 *//*
-//			String pin = request.getParameter("pin");
+//			String pin = (String) request.getSession().getAttribute("pin");
 			String oid = request.getParameter("orderID");
 			String rid = request.getParameter("restaurantID");
 			String talias = request.getParameter("tableAlias");

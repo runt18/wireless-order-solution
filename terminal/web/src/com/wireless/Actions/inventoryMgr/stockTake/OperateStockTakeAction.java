@@ -39,7 +39,7 @@ public class OperateStockTakeAction extends DispatchAction{
 		response.setCharacterEncoding("UTF-8");
 		JObject jobject = new JObject();
 		try{
-			String pin = request.getParameter("pin");
+			String pin = (String) request.getSession().getAttribute("pin");
 			String cateType = request.getParameter("cateType");
 			String dept = request.getParameter("dept");
 			String comment = request.getParameter("comment");
@@ -93,7 +93,7 @@ public class OperateStockTakeAction extends DispatchAction{
 		response.setCharacterEncoding("UTF-8");
 		JObject jobject = new JObject();
 		try{
-			String pin = request.getParameter("pin");
+			String pin = (String) request.getSession().getAttribute("pin");
 			String id = request.getParameter("id");
 			String cateType = request.getParameter("cateType");
 			String dept = request.getParameter("dept");
@@ -148,7 +148,7 @@ public class OperateStockTakeAction extends DispatchAction{
 		response.setCharacterEncoding("UTF-8");
 		JObject jobject = new JObject();
 		try{
-			String pin = request.getParameter("pin");
+			String pin = (String) request.getSession().getAttribute("pin");
 			String id = request.getParameter("id");
 			
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
@@ -183,7 +183,7 @@ public class OperateStockTakeAction extends DispatchAction{
 		response.setCharacterEncoding("UTF-8");
 		JObject jobject = new JObject();
 		try{
-			String pin = request.getParameter("pin");
+			String pin = (String) request.getSession().getAttribute("pin");
 			String id = request.getParameter("id");
 			
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
@@ -220,7 +220,7 @@ public class OperateStockTakeAction extends DispatchAction{
 		response.setCharacterEncoding("UTF-8");
 		JObject jobject = new JObject();
 		try{
-			String pin = request.getParameter("pin");
+			String pin = (String) request.getSession().getAttribute("pin");
 			String id = request.getParameter("id");
 			String miss = request.getParameter("miss");
 			
@@ -259,7 +259,7 @@ public class OperateStockTakeAction extends DispatchAction{
 		response.setCharacterEncoding("UTF-8");
 		JObject jobject = new JObject();
 		try{
-			String pin = request.getParameter("pin");
+			String pin = (String) request.getSession().getAttribute("pin");
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
 			if(StockTakeDao.beforeInsertStockTake(staff)){
@@ -294,7 +294,7 @@ public class OperateStockTakeAction extends DispatchAction{
 		response.setCharacterEncoding("UTF-8");
 		JObject jobject = new JObject();
 		try{
-			String pin = request.getParameter("pin");
+			String pin = (String) request.getSession().getAttribute("pin");
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
 			StockTakeDao.checkStockAction(staff);

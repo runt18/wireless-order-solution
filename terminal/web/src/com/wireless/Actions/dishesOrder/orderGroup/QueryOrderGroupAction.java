@@ -37,7 +37,7 @@ public class QueryOrderGroupAction extends Action{
 		List<Order> orderGroup = new ArrayList<Order>();
 		Order item = null;
 		try{
-			String pin = request.getParameter("pin");
+			String pin = (String) request.getSession().getAttribute("pin");
 			String restaurantID = request.getParameter("restaurantID");
 			String queryType = request.getParameter("queryType");
 			String orderID = request.getParameter("orderID");

@@ -29,7 +29,7 @@ public class QueryOrderFromMemberPayAction extends Action{
 		JObject jobject = new JObject();
 		
 		try{
-			String pin = request.getParameter("pin");
+			String pin = (String) request.getSession().getAttribute("pin");
 			String orderID = request.getParameter("orderID");
 			String st = request.getParameter("st");
 			String sv = request.getParameter("sv");

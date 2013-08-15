@@ -34,7 +34,7 @@ public class QueryStockActionAction extends Action{
 		String start = request.getParameter("start");
 		String limit = request.getParameter("limit");
 		try{
-			String pin = request.getParameter("pin");
+			String pin = (String) request.getSession().getAttribute("pin");
 			String id = request.getParameter("id");
 			String stockType = request.getParameter("stockType");
 			String cateType = request.getParameter("cateType");

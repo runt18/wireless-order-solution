@@ -26,7 +26,7 @@ public class InsertSupplierAction extends Action {
 		JObject jobject = new JObject();
 		try{
 			
-			String pin = request.getParameter("pin");
+			String pin = (String) request.getSession().getAttribute("pin");
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			String supplierName = request.getParameter("supplierName");
 			String tele = request.getParameter("tele");

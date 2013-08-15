@@ -24,7 +24,7 @@ public class DeleteSupplierAction extends Action {
 		request.setCharacterEncoding("UTF-8");
 		JObject jobject = new JObject();
 		try{
-			String pin = request.getParameter("pin");
+			String pin = (String) request.getSession().getAttribute("pin");;
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			int supplierId =Integer.valueOf(request.getParameter("supplierId"));
 			SupplierDao.deleteById(staff, supplierId);

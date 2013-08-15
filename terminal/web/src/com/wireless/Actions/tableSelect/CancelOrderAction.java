@@ -30,7 +30,7 @@ public class CancelOrderAction extends Action {
 			response.setContentType("text/json; charset=utf-8");
 			out = response.getWriter();
 			
-			String pin = request.getParameter("pin");
+			String pin = (String) request.getSession().getAttribute("pin");
 			
 			tableAlias = Integer.parseInt(request.getParameter("tableAlias"));
 			

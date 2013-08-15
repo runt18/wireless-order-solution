@@ -34,7 +34,7 @@ public class QueryRegionAction extends DispatchAction{
 		response.setCharacterEncoding("UTF-8");
 		JObject jobject = new JObject();
 		try{
-			String pin = request.getParameter("pin");
+			String pin = (String) request.getSession().getAttribute("pin");
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			List<Region> list = RegionDao.getRegions(staff, " AND REGION.restaurant_id = " + staff.getRestaurantId(), null);
 			jobject.setRoot(list);
@@ -64,7 +64,7 @@ public class QueryRegionAction extends DispatchAction{
 		response.setCharacterEncoding("UTF-8");
 		StringBuilder tsb = new StringBuilder();
 		try{
-			String pin = request.getParameter("pin");
+			String pin = (String) request.getSession().getAttribute("pin");
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			List<Region> list = RegionDao.getRegions(staff, " AND REGION.restaurant_id = " + staff.getRestaurantId(), null);
 			if(!list.isEmpty()){

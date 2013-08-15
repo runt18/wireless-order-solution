@@ -40,7 +40,7 @@ public class OperateStockActionAction extends DispatchAction{
 		response.setCharacterEncoding("UTF-8");
 		JObject jobject = new JObject();
 		try{
-			String pin = request.getParameter("pin");
+			String pin = (String) request.getSession().getAttribute("pin");
 			String oriStockId = request.getParameter("oriStockId");
 			String oriStockDate = request.getParameter("oriStockDate");
 			String comment = request.getParameter("comment");
@@ -163,7 +163,7 @@ public class OperateStockActionAction extends DispatchAction{
 		response.setCharacterEncoding("UTF-8");
 		JObject jobject = new JObject();
 		try{
-			String pin = request.getParameter("pin");
+			String pin = (String) request.getSession().getAttribute("pin");
 			String id = request.getParameter("id");
 			String oriStockId = request.getParameter("oriStockId");
 			String oriStockDate = request.getParameter("oriStockDate");
@@ -282,7 +282,7 @@ public class OperateStockActionAction extends DispatchAction{
 		response.setCharacterEncoding("UTF-8");
 		JObject jobject = new JObject();
 		try{
-			String pin = request.getParameter("pin");
+			String pin = (String) request.getSession().getAttribute("pin");
 			String id = request.getParameter("id");
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			StockActionDao.deleteStockActionById(staff, Integer.valueOf(id));
@@ -316,7 +316,7 @@ public class OperateStockActionAction extends DispatchAction{
 		response.setCharacterEncoding("UTF-8");
 		JObject jobject = new JObject();
 		try{
-			String pin = request.getParameter("pin");
+			String pin = (String) request.getSession().getAttribute("pin");
 			String id = request.getParameter("id");
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			AuditBuilder builder = StockAction.AuditBuilder.newStockActionAudit(Integer.valueOf(id))
@@ -351,7 +351,7 @@ public class OperateStockActionAction extends DispatchAction{
 		response.setCharacterEncoding("UTF-8");
 		JObject jobject = new JObject();
 		try{
-			String pin = request.getParameter("pin");
+			String pin = (String) request.getSession().getAttribute("pin");
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
 			if(StockActionDao.checkStockTake(staff)){

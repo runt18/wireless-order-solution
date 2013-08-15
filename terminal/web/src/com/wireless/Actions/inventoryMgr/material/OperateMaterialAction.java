@@ -34,7 +34,7 @@ public class OperateMaterialAction extends DispatchAction {
 		response.setCharacterEncoding("UTF-8");
 		JObject jobject = new JObject();
 		try{
-			String pin = request.getParameter("pin");
+			String pin = (String) request.getSession().getAttribute("pin");
 			String restaurantID = request.getParameter("restaurantID");
 			String name = request.getParameter("name");
 			String cateId = request.getParameter("cateId");
@@ -71,7 +71,7 @@ public class OperateMaterialAction extends DispatchAction {
 		response.setCharacterEncoding("UTF-8");
 		JObject jobject = new JObject();
 		try{
-			String pin = request.getParameter("pin");
+			String pin = (String) request.getSession().getAttribute("pin");
 			String restaurantID = request.getParameter("restaurantID");
 			String id = request.getParameter("id");
 			String name = request.getParameter("name");

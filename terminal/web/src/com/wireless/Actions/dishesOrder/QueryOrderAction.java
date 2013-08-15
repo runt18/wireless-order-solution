@@ -44,7 +44,7 @@ public class QueryOrderAction extends Action {
 			 * id pin=0x01 & orderID=40 pin : the pin the this terminal tableID
 			 * : the order with this table ID to query
 			 */
-			String pin = request.getParameter("pin");
+			String pin = (String) request.getSession().getAttribute("pin");
 			String queryType = request.getParameter("queryType");
 			String restaurantID = request.getParameter("restaurantID");
 			String tid = request.getParameter("tableID");

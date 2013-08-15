@@ -36,7 +36,7 @@ public class QueryTodayAction extends Action {
 		String limit = request.getParameter("limit");
 		try{
 			String ope = request.getParameter("ope");
-			String pin = request.getParameter("pin");
+			String pin = (String) request.getSession().getAttribute("pin");
 			String filterVal = request.getParameter("value");
 			
 			if(ope != null && !ope.trim().isEmpty()){

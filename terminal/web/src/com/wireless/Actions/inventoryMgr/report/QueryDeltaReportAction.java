@@ -30,7 +30,7 @@ public class QueryDeltaReportAction extends Action{
 		request.setCharacterEncoding("UTF-8");
 		JObject jobject = new JObject();
 		try{
-			String pin = request.getParameter("pin");
+			String pin = (String) request.getSession().getAttribute("pin");
 			String start = request.getParameter("start");
 			String limit = request.getParameter("limit");
 			String beginDate = request.getParameter("beginDate");

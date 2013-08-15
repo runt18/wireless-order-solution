@@ -36,7 +36,7 @@ public class QueryShiftAction extends Action {
 			 * The parameters looks like below.
 			 * e.g. pin=0x01
 			 */
-			String pin = request.getParameter("pin");
+			String pin = (String) request.getSession().getAttribute("pin");
 					
 			ShiftDetail result = QueryShiftDao.execByNow(StaffDao.verify(dbCon, Integer.parseInt(pin)));
 			

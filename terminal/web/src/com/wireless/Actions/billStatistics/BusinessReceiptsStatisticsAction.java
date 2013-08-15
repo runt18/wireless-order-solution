@@ -34,7 +34,7 @@ public class BusinessReceiptsStatisticsAction extends Action {
 		JObject jobject = new JObject();
 		List<BusinessStatistics> root = null;
 		try{
-			String pin = request.getParameter("pin");
+			String pin = (String) request.getSession().getAttribute("pin");
 			String restaurantID = request.getParameter("restaurantID");
 			String onDuty = request.getParameter("dateBegin");
 			String offDuty = request.getParameter("dateEnd");

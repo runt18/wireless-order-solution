@@ -84,7 +84,7 @@ public class TodayStatisticsAction extends DispatchAction{
 		response.setContentType("application/vnd.ms-excel;");
 		response.addHeader("Content-Disposition","attachment;filename=" + new String(("菜品销售明细(" + DateType.TODAY.getName() + ").xls").getBytes("GBK"), "ISO8859_1"));
 		
-		String pin = request.getParameter("pin");
+		String pin = (String) request.getSession().getAttribute("pin");
 		String onDuty = request.getParameter("onDuty");
 		String offDuty = request.getParameter("offDuty");
 		String deptID = request.getParameter("deptID");
@@ -244,7 +244,7 @@ public class TodayStatisticsAction extends DispatchAction{
 		response.setContentType("application/vnd.ms-excel;");
 		response.addHeader("Content-Disposition","attachment;filename=" + new String(("分厨銷售统计(" + DateType.TODAY.getName() + ").xls").getBytes("GBK"), "ISO8859_1"));
 		
-		String pin = request.getParameter("pin");
+		String pin = (String) request.getSession().getAttribute("pin");
 		String onDuty = request.getParameter("onDuty");
 		String offDuty = request.getParameter("offDuty");
 		
@@ -377,7 +377,7 @@ public class TodayStatisticsAction extends DispatchAction{
 		response.setContentType("application/vnd.ms-excel;");
 		response.addHeader("Content-Disposition","attachment;filename=" + new String(("部门销售统计(" + DateType.TODAY.getName() + ").xls").getBytes("GBK"), "ISO8859_1"));
 		
-		String pin = request.getParameter("pin");
+		String pin = (String) request.getSession().getAttribute("pin");
 		String onDuty = request.getParameter("onDuty");
 		String offDuty = request.getParameter("offDuty");
 		

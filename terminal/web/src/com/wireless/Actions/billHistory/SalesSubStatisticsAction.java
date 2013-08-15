@@ -60,7 +60,7 @@ public class SalesSubStatisticsAction extends Action {
 			 * 			   "1" means "按销量排序"
 			 * 
 			 */
-			String pin = request.getParameter("pin");
+			String pin = (String) request.getSession().getAttribute("pin");
 			String restaurantId = request.getParameter("restaurantID");		
 			String dateBeg = request.getParameter("dateBeg");
 			String dateEnd = request.getParameter("dateEnd");

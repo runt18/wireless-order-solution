@@ -45,7 +45,7 @@ public class QueryCancelledFoodAction extends Action {
 		String start = request.getParameter("start");
 		
 		try{
-			String pin = request.getParameter("pin");
+			String pin = (String) request.getSession().getAttribute("pin");
 			String qtype = request.getParameter("qtype");
 			String otype = request.getParameter("otype");
 			String dtype = request.getParameter("dtype");

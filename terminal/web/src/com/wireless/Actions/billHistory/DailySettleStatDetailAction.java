@@ -53,7 +53,7 @@ public class DailySettleStatDetailAction extends Action {
 			 * "food1,food2,food3" dateBegin: dateEnd :
 			 */
 
-			String pin = request.getParameter("pin");
+			String pin = (String) request.getSession().getAttribute("pin");
 
 			dbCon.connect();
 			// get the query condition

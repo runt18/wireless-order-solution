@@ -95,7 +95,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 		response.setContentType("application/vnd.ms-excel;");
 		response.addHeader("Content-Disposition","attachment;filename=" + new String("菜品销售统计(历史).xls".getBytes("GBK"), "ISO8859_1"));
 		
-		String pin = request.getParameter("pin");
+		String pin = (String) request.getSession().getAttribute("pin");
 		String onDuty = request.getParameter("onDuty");
 		String offDuty = request.getParameter("offDuty");
 		String deptID = request.getParameter("deptID");
@@ -308,7 +308,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 		response.setContentType("application/vnd.ms-excel;");
 		response.addHeader("Content-Disposition","attachment;filename=" + new String(("分厨銷售统计(" + DateType.HISTORY.getName() + ").xls").getBytes("GBK"), "ISO8859_1"));
 		
-		String pin = request.getParameter("pin");
+		String pin = (String) request.getSession().getAttribute("pin");
 		String onDuty = request.getParameter("onDuty");
 		String offDuty = request.getParameter("offDuty");
 		
@@ -477,7 +477,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 		response.setContentType("application/vnd.ms-excel;");
 		response.addHeader("Content-Disposition","attachment;filename=" + new String("部门销售统计(历史).xls".getBytes("GBK"), "ISO8859_1"));
 		
-		String pin = request.getParameter("pin");
+		String pin = (String) request.getSession().getAttribute("pin");
 		String onDuty = request.getParameter("onDuty");
 		String offDuty = request.getParameter("offDuty");
 		
@@ -643,7 +643,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 		response.setContentType("application/vnd.ms-excel;");
 		response.addHeader("Content-Disposition","attachment;filename=" + new String("收款明细(历史).xls".getBytes("GBK"), "ISO8859_1"));
 		
-		String pin = request.getParameter("pin");
+		String pin = (String) request.getSession().getAttribute("pin");
 		String restaurantID = request.getParameter("restaurantID");
 		String onDuty = request.getParameter("onDuty");
 		String offDuty = request.getParameter("offDuty");
@@ -879,7 +879,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 		response.setCharacterEncoding("UTF-8");
 		response.setContentType("application/vnd.ms-excel;");
 		
-		String pin = request.getParameter("pin");
+		String pin = (String) request.getSession().getAttribute("pin");
 		String restaurantID = request.getParameter("restaurantID");
 		String onDuty = request.getParameter("onDuty");
 		String offDuty = request.getParameter("offDuty");
@@ -1273,7 +1273,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 		response.setCharacterEncoding("UTF-8");
 		response.setContentType("application/vnd.ms-excel;");
 		
-		String pin = request.getParameter("pin");
+		String pin = (String) request.getSession().getAttribute("pin");
 		String id = request.getParameter("id");
 		
 		Staff staff = StaffDao.verify(Integer.parseInt(pin));

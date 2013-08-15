@@ -27,7 +27,7 @@ public class QueryDiscountTreeAction extends Action{
 		StringBuffer tsb = new StringBuffer();
 		try{
 			dbCon.connect();
-			String pin = request.getParameter("pin");
+			String pin = (String) request.getSession().getAttribute("pin");
 			
 			List<Discount> discounts = DiscountDao.getPureDiscount(dbCon, 
 					(StaffDao.verify(Integer.parseInt(pin))), 

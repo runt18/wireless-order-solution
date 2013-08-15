@@ -49,7 +49,7 @@ public class UpdateOrderGroupAction extends DispatchAction{
 		JObject jobject = new JObject();
 		try{
 			String restaurantID = request.getParameter("restaurantID");
-			String pin = request.getParameter("pin");
+			String pin = (String) request.getSession().getAttribute("pin");
 			String rq = request.getParameter("tables");
 			String otype = request.getParameter("otype");
 			String pid = request.getParameter("parentID");
@@ -111,7 +111,7 @@ public class UpdateOrderGroupAction extends DispatchAction{
 		response.setCharacterEncoding("UTF-8");
 		JObject jobject = new JObject();
 		try{
-			String pin = request.getParameter("pin");
+			String pin = (String) request.getSession().getAttribute("pin");
 //			String restaurantID = request.getParameter("restaurantID");
 			String type = request.getParameter("type");
 			String ordersString = request.getParameter("orders");

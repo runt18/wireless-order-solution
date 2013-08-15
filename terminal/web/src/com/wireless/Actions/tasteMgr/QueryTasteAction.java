@@ -32,7 +32,7 @@ public class QueryTasteAction extends Action {
 		String start = request.getParameter("start");
 		String limit = request.getParameter("limit");
 		try{
-			String pin = request.getParameter("pin");
+			String pin = (String) request.getSession().getAttribute("pin");
 			String alias = request.getParameter("alias");
 			String price = request.getParameter("price");
 			String name = request.getParameter("name");

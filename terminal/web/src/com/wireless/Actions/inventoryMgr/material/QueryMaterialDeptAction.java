@@ -31,7 +31,7 @@ public class QueryMaterialDeptAction extends Action{
 		JObject jobject = new JObject();
 		List<MaterialDept> root = null;
 		try{
-			String pin = request.getParameter("pin");
+			String pin = (String) request.getSession().getAttribute("pin");
 			String deptId = request.getParameter("deptId");
 			String cateType = request.getParameter("cateType");
 			String cateId = request.getParameter("cateId");

@@ -34,7 +34,7 @@ public class OperateTableAction extends DispatchAction{
 		response.setCharacterEncoding("UTF-8");
 		JObject jobject = new JObject();
 		try{
-			String pin = request.getParameter("pin");
+			String pin = (String) request.getSession().getAttribute("pin");
 			String name = request.getParameter("name");
 			String alias = request.getParameter("alias");
 			String minimumCost = request.getParameter("minimumCost");
@@ -76,7 +76,7 @@ public class OperateTableAction extends DispatchAction{
 		response.setCharacterEncoding("UTF-8");
 		JObject jobject = new JObject();
 		try{
-			String pin = request.getParameter("pin");
+			String pin = (String) request.getSession().getAttribute("pin");
 			String id = request.getParameter("id");
 			String name = request.getParameter("name");
 			String regionId = request.getParameter("regionId"); 
@@ -117,7 +117,7 @@ public class OperateTableAction extends DispatchAction{
 		response.setCharacterEncoding("UTF-8");
 		JObject jobject = new JObject();
 		try{
-			String pin = request.getParameter("pin");
+			String pin = (String) request.getSession().getAttribute("pin");
 			String id = request.getParameter("id");
 			TableDao.deleteById(StaffDao.verify(Integer.parseInt(pin)), Integer.valueOf(id));
 			jobject.initTip(true, "操作成功, 已删除餐台信息.");

@@ -31,9 +31,9 @@ public class OperatePrintFuncAction extends DispatchAction{
 		request.setCharacterEncoding("UTF-8");
 		response.setCharacterEncoding("UTF-8");
 		JObject jobject = new JObject();
-		String pin = request.getParameter("pin");
-		try{
 		
+		try{
+			String pin = (String) request.getSession().getAttribute("pin");
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			String printFuncId = request.getParameter("printFuncId");
 			PrintFuncDao.removeFunc(staff, Integer.parseInt(printFuncId));
@@ -57,9 +57,9 @@ public class OperatePrintFuncAction extends DispatchAction{
 		request.setCharacterEncoding("UTF-8");
 		response.setCharacterEncoding("UTF-8");
 		JObject jobject = new JObject();
-		String pin = request.getParameter("pin");
 		DBCon dbCon = new DBCon();
 		try{
+			String pin = (String) request.getSession().getAttribute("pin");
 			dbCon.connect();
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			String repeat = request.getParameter("repeat");
@@ -170,9 +170,9 @@ public class OperatePrintFuncAction extends DispatchAction{
 		request.setCharacterEncoding("UTF-8");
 		response.setCharacterEncoding("UTF-8");
 		JObject jobject = new JObject();
-		String pin = request.getParameter("pin");
 		DBCon dbCon = new DBCon();
 		try{
+			String pin = (String) request.getSession().getAttribute("pin");
 			dbCon.connect();
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			String repeat = request.getParameter("repeat");

@@ -24,7 +24,7 @@ public class UpdateCurrentMonthAction extends Action {
 		response.setCharacterEncoding("UTF-8");
 		JObject jobject = new JObject();
 		try{
-			String pin = request.getParameter("pin");
+			String pin = (String) request.getSession().getAttribute("pin");
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			SystemDao.updateCurrentMonth(staff);
 			jobject.initTip(true, "操作成功, 已月结.");

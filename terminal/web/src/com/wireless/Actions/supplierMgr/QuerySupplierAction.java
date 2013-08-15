@@ -24,7 +24,13 @@ public class QuerySupplierAction extends Action {
 		request.setCharacterEncoding("UTF-8");
 		JObject jobject = null;
 		try{
-			String pin = request.getParameter("pin");
+			//String pin = (String) request.getSession().getAttribute("pin");
+
+			String pin = null;
+			if(request.getSession().getAttribute("pin") != null){
+				pin = (String) request.getSession().getAttribute("pin");
+			}
+			
 			String start = request.getParameter("start");
 			String limit = request.getParameter("limit");
 			String name = request.getParameter("name");

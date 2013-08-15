@@ -100,7 +100,7 @@ public class DailySettleStatisticsAction extends Action {
 			 * "food1,food2,food3" dateBegin: dateEnd :
 			 *//*
 
-			String pin = request.getParameter("pin");
+			String pin = (String) request.getSession().getAttribute("pin");
 
 			dbCon.connect();
 			Terminal term = VerifyPin.exec(dbCon, Long.parseLong(pin),

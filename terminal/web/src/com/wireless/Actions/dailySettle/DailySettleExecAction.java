@@ -34,7 +34,7 @@ public class DailySettleExecAction extends Action {
 			response.setContentType("text/json; charset=utf-8");
 			out = response.getWriter();
 
-			String pin = request.getParameter("pin");
+			String pin = (String) request.getSession().getAttribute("pin");
 
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 

@@ -81,7 +81,7 @@ public class QueryMaterialCateAction extends DispatchAction{
 		MaterialCate item = null;
 		StringBuffer tree = new StringBuffer();
 		try{
-//			String pin = request.getParameter("pin");
+//			String pin = (String) request.getSession().getAttribute("pin");
 			String restaurantID = request.getParameter("restaurantID");
 			String type = request.getParameter("type");
 			

@@ -4,7 +4,9 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -15,6 +17,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.staffMgr.StaffDao;
+import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.util.DataPaging;
@@ -43,13 +46,26 @@ public class QueryStaffAction extends Action {
 		String isPaging = request.getParameter("isPaging");
 		// 是否combo
 		String isCombo = request.getParameter("isCombo");
-
+		Map<Object, Object> other = new HashMap<Object, Object>();
 		try {
 			// 解决后台中文传到前台乱码
 			response.setContentType("text/json; charset=utf-8");
+			
 			out = response.getWriter();
-
-			int restaurantID = Integer.parseInt(request.getParameter("restaurantID"));
+			String restaurantID ;
+			
+			if(request.getParameter("restaurantID") == null){
+				restaurantID = (String) request.getSession().getAttribute("restaurantID");
+				
+				if(restaurantID == null){
+					throw new BusinessException("操作已超时");
+					
+				}
+			}else{
+				
+				restaurantID = request.getParameter("restaurantID");
+			}
+			
 
 			// get the type to filter
 /*			int type = Integer.parseInt(request.getParameter("type"));
@@ -90,10 +106,10 @@ public class QueryStaffAction extends Action {
 				// 全部
 				filterCondition = "";
 			}*/
-			staffList = StaffDao.getStaffs(restaurantID);
-			
+			staffList = StaffDao.getStaffs(Integer.parseInt(restaurantID));
 			
 			jobject.setMsg("normal");
+			
 
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -102,16 +118,26 @@ public class QueryStaffAction extends Action {
 		} catch (IOException e) {
 			e.printStackTrace();
 			jobject.initTip(false, "未处理异常");
+		}catch (BusinessException e){
+			e.printStackTrace();
+			jobject.initTip(false, "操作已超时, 请重新登录");
+			other.put("status", 0);
 		} finally {
 			if (isCombo.equals("true")) {
 				
 			} else {
 				staffList = DataPaging.getPagingData(staffList, isPaging, index, pageSize);
 			}	
+			
+			if(request.getSession().getAttribute("pin") != null){
+				other.put("pin", request.getSession().getAttribute("pin"));
+			}
 			jobject.setTotalProperty(staffList.size());
 			jobject.setRoot(staffList);
+			jobject.setOther(other);
 			out.write(jobject.toString());
 		}
+
 		return null;
 	}
 }

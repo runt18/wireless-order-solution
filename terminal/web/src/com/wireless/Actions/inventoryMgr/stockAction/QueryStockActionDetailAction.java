@@ -27,7 +27,7 @@ public class QueryStockActionDetailAction extends Action{
 		JObject jobject = new JObject();
 		List<StockActionDetail> root = null;
 		try{
-			String pin = request.getParameter("pin");
+			String pin = (String) request.getSession().getAttribute("pin");
 			String id = request.getParameter("id");
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			

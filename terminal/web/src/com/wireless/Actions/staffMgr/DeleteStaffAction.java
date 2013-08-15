@@ -42,7 +42,7 @@ public class DeleteStaffAction extends Action {
 			 * pin : the pin the this terminal dishNumber:
 			 * 
 			 */
-			String pin = request.getParameter("pin");
+			String pin = (String) request.getSession().getAttribute("pin");
 
 			dbCon.connect();
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));

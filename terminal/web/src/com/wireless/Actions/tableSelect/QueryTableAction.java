@@ -32,7 +32,7 @@ public class QueryTableAction extends Action {
 		String limit = request.getParameter("limit");
 		
 		try{
-			String pin = request.getParameter("pin");
+			String pin = (String) request.getSession().getAttribute("pin");
 			tables = TableDao.getTables(StaffDao.verify(Integer.parseInt(pin)), null, null);
 		}catch(BusinessException e){
 			e.printStackTrace();
