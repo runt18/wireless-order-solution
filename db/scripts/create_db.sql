@@ -49,6 +49,7 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`order` (
   `total_price` FLOAT NULL DEFAULT NULL COMMENT 'The total price to this order.' ,
   `actual_price` FLOAT NULL DEFAULT NULL COMMENT 'the actual total price to this order' ,
   `custom_num` TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the amount of custom to this order' ,
+  `staff_id` INT NOT NULL DEFAULT 0 ,
   `waiter` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the waiter who operates on this order' ,
   `settle_type` TINYINT NOT NULL DEFAULT 1 COMMENT '结帐方式：\n一般：1\n会员卡：2\n' ,
   `type` TINYINT NOT NULL DEFAULT 1 COMMENT '付款方式：\n现金 : 1\n刷卡 : 2\n会员 : 3\n签单：4\n挂账 ：5\n' ,
@@ -56,8 +57,6 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`order` (
   `price_plan_id` INT NULL DEFAULT 0 COMMENT 'the price plan id this order uses' ,
   `member_id` INT NULL DEFAULT NULL COMMENT 'the member id to this order' ,
   `member_operation_id` INT NULL DEFAULT NULL COMMENT 'the member operation id' ,
-  `terminal_model` SMALLINT NOT NULL DEFAULT 0 COMMENT 'the terminal model to this order' ,
-  `terminal_pin` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the terminal pin to this order' ,
   `region_id` TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the region id to this order' ,
   `region_name` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the region name to this order' ,
   `table_id` INT NOT NULL DEFAULT 0 COMMENT 'the table id to this order' ,
@@ -98,6 +97,7 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`order_food` (
   `kitchen_alias` TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the kitchen alias id which the order food of this record belong to.' ,
   `dept_id` TINYINT UNSIGNED NULL DEFAULT NULL COMMENT 'the department alias id to this record' ,
   `discount` DECIMAL(3,2) NOT NULL DEFAULT 1 COMMENT 'the discount to this food' ,
+  `staff_id` INT NOT NULL DEFAULT 0 ,
   `waiter` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the name of waiter who deal with this record' ,
   `is_temporary` TINYINT NOT NULL DEFAULT 0 COMMENT 'indicates whether the food to this record is temporary' ,
   `is_paid` TINYINT NULL DEFAULT 0 COMMENT 'indicates whether this record is occurred before order has been paid or not' ,
@@ -127,6 +127,7 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`restaurant` (
   `tele2` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'One of the telephones to this restaurant.' ,
   `address` VARCHAR(70) NOT NULL DEFAULT '' COMMENT 'The address to this restaurant.' ,
   `record_alive` BIGINT NOT NULL DEFAULT 0 COMMENT 'Indicates how long the order record of this restaurant can be persisted. It\'s represented in second. Value 0 means the records never expire.' ,
+  `expire_date` DATETIME NULL DEFAULT NULL ,
   PRIMARY KEY (`id`, `account`) ,
   UNIQUE INDEX `account_UNIQUE` (`account` ASC) )
 ENGINE = InnoDB
@@ -275,14 +276,13 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`order_history` (
   `actual_price` FLOAT NULL DEFAULT NULL COMMENT 'the actual total price to this order' ,
   `erase_price` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the erase price to this order' ,
   `custom_num` TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the amount of custom to this order' ,
+  `staff_id` INT NOT NULL DEFAULT 0 ,
   `waiter` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the waiter who operates on this order' ,
   `settle_type` TINYINT NOT NULL DEFAULT 1 COMMENT '付款方式\n一般：1\n会员：2' ,
   `type` TINYINT NOT NULL DEFAULT 1 COMMENT '付款方式\n现金 : 1\n刷卡 : 2\n会员卡 : 3\n签单：4\n挂账 ：5\n' ,
   `category` TINYINT NOT NULL DEFAULT 1 COMMENT 'the category to this order, it should be one the values below.\n一般 : 1\n外卖 : 2\n并台 : 3\n拼台 : 4' ,
   `member_id` INT NULL DEFAULT NULL COMMENT 'the member id to this order' ,
   `member_operation_id` INT NULL DEFAULT NULL COMMENT 'the member operation id' ,
-  `terminal_model` SMALLINT NOT NULL DEFAULT 0 COMMENT 'the terminal model to this order' ,
-  `terminal_pin` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the terminal pin to this order' ,
   `region_id` TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the region id to this order' ,
   `region_name` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the region name to this order' ,
   `table_id` INT NOT NULL DEFAULT 0 COMMENT 'the table id to this order' ,
@@ -321,6 +321,7 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`order_food_history` (
   `kitchen_id` INT NULL DEFAULT NULL COMMENT 'the kitchen id which the order food of this record belong to.' ,
   `kitchen_alias` TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the kitchen number which the order food of this record belong to. the maximum value (255) means the food does not belong to any kitchen.' ,
   `discount` DECIMAL(3,2) NOT NULL DEFAULT 1 COMMENT 'the discount to this food' ,
+  `staff_id` INT NOT NULL DEFAULT 0 ,
   `waiter` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the name of waiter who deal with this record' ,
   `is_temporary` TINYINT NOT NULL DEFAULT 0 COMMENT 'indicates whether the food to this record is temporary' ,
   `is_paid` TINYINT NULL DEFAULT 0 COMMENT 'indicates whether this record is occurred before order has been paid or not' ,
@@ -331,36 +332,6 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`order_food_history` (
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8, 
 COMMENT = 'descirbe the relationship between the order and food' ;
-
-
--- -----------------------------------------------------
--- Table `wireless_order_db`.`staff`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `wireless_order_db`.`staff` ;
-
-CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`staff` (
-  `staff_id` INT NOT NULL AUTO_INCREMENT ,
-  `restaurant_id` INT UNSIGNED NOT NULL ,
-  `terminal_id` INT NOT NULL ,
-  `staff_alias` SMALLINT NOT NULL DEFAULT 0 COMMENT 'the alias id to this stuff' ,
-  `name` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the name to this staff' ,
-  `pwd` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the password to this staff whose format is MD5' ,
-  PRIMARY KEY (`staff_id`) ,
-  INDEX `fk_staff_restaurant` (`restaurant_id` ASC) ,
-  INDEX `fk_staff_terminal` (`terminal_id` ASC) ,
-  CONSTRAINT `fk_staff_restaurant`
-    FOREIGN KEY (`restaurant_id` )
-    REFERENCES `wireless_order_db`.`restaurant` (`id` )
-    ON DELETE RESTRICT
-    ON UPDATE RESTRICT,
-  CONSTRAINT `fk_staff_terminal`
-    FOREIGN KEY (`terminal_id` )
-    REFERENCES `wireless_order_db`.`terminal` (`terminal_id` )
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8, 
-COMMENT = 'the staff information ' ;
 
 
 -- -----------------------------------------------------
@@ -1213,6 +1184,109 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`func_region` (
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8, 
 COMMENT = 'describe the relationship between function and region' ;
+
+
+-- -----------------------------------------------------
+-- Table `wireless_order_db`.`role`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `wireless_order_db`.`role` ;
+
+CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`role` (
+  `role_id` INT NOT NULL AUTO_INCREMENT ,
+  `restaurant_id` INT NOT NULL DEFAULT 0 ,
+  `name` VARCHAR(45) NOT NULL DEFAULT '' ,
+  `type` TINYINT NOT NULL DEFAULT 1 COMMENT 'the type to role as below.\n1 - 普通\n2 - 系统保留' ,
+  `cate` TINYINT NOT NULL DEFAULT 6 COMMENT 'the category to role as below.\n1 - 管理员\n2 - 老板\n3 - 财务\n4 - 部长\n5 - 服务员\n6 - 其他\n' ,
+  PRIMARY KEY (`role_id`) ,
+  INDEX `ix_restaurant_id` (`restaurant_id` ASC) )
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8, 
+COMMENT = 'describe the role information' ;
+
+
+-- -----------------------------------------------------
+-- Table `wireless_order_db`.`staff`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `wireless_order_db`.`staff` ;
+
+CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`staff` (
+  `staff_id` INT NOT NULL AUTO_INCREMENT ,
+  `restaurant_id` INT NOT NULL DEFAULT 0 ,
+  `role_id` INT NOT NULL DEFAULT 0 ,
+  `name` VARCHAR(45) NOT NULL DEFAULT '' ,
+  `tele` VARCHAR(45) NULL DEFAULT NULL ,
+  `pwd` VARCHAR(45) NOT NULL DEFAULT '' ,
+  `type` TINYINT NOT NULL DEFAULT 1 COMMENT 'the type to staff as below.\n1 - 普通\n2 - 系统保留' ,
+  PRIMARY KEY (`staff_id`) ,
+  INDEX `ix_restaurant_id` (`restaurant_id` ASC) ,
+  INDEX `ix_role_id` (`role_id` ASC) )
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8, 
+COMMENT = 'describe the staff information' ;
+
+
+-- -----------------------------------------------------
+-- Table `wireless_order_db`.`device`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `wireless_order_db`.`device` ;
+
+CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`device` (
+  `id` INT NOT NULL AUTO_INCREMENT ,
+  `restaurant_id` INT NOT NULL ,
+  `device_id` VARCHAR(45) NOT NULL ,
+  `device_id_crc` INT UNSIGNED NOT NULL ,
+  `model_id` TINYINT NOT NULL DEFAULT 1 COMMENT 'the model id as below.\n1 - Android\n2 - iOS\n3 - WP' ,
+  `status` TINYINT NOT NULL DEFAULT 1 COMMENT 'the status as below.\n1 - 停用\n2 - 启用' ,
+  PRIMARY KEY (`id`) ,
+  INDEX `ix_restaurant_id` (`restaurant_id` ASC) ,
+  INDEX `ix_device_id_crc` (`device_id_crc` ASC) )
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
+
+-- -----------------------------------------------------
+-- Table `wireless_order_db`.`privilege`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `wireless_order_db`.`privilege` ;
+
+CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`privilege` (
+  `pri_id` INT NOT NULL AUTO_INCREMENT ,
+  `pri_code` INT NOT NULL COMMENT 'the privilege code as below:\n1000 - 退菜\n1001 - 打折\n1002 - 赠送\n1003 - 反结帐\n2000 - 后台\n3000 - 库存\n4000 - 历史\n5000 - 会员\n6000 - 系统' ,
+  `cate` TINYINT NOT NULL COMMENT 'the category to privilege as below.\n1 - 前台\n2 - 后台\n3 - 库存\n4 - 历史\n5 - 会员\n6 - 系统' ,
+  PRIMARY KEY (`pri_id`) ,
+  INDEX `ix_privilege_code` (`pri_code` ASC) )
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8, 
+COMMENT = 'describe the privilege information' ;
+
+
+-- -----------------------------------------------------
+-- Table `wireless_order_db`.`role_privilege`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `wireless_order_db`.`role_privilege` ;
+
+CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`role_privilege` (
+  `role_id` INT NOT NULL ,
+  `pri_id` INT NOT NULL ,
+  `restaurant_id` INT NOT NULL DEFAULT 0 ,
+  `discount_privilege_id` INT NULL DEFAULT NULL ,
+  PRIMARY KEY (`role_id`, `pri_id`) ,
+  INDEX `ix_restaurant_id` (`restaurant_id` ASC) )
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
+
+-- -----------------------------------------------------
+-- Table `wireless_order_db`.`discount_privilege`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `wireless_order_db`.`discount_privilege` ;
+
+CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`discount_privilege` (
+  `discount_privilege_id` INT NOT NULL AUTO_INCREMENT ,
+  `discount_id` INT NULL ,
+  PRIMARY KEY (`discount_privilege_id`) ,
+  INDEX `ix_discount_id` (`discount_id` ASC) )
+ENGINE = InnoDB;
 
 
 

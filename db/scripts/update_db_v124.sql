@@ -220,20 +220,146 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`device` (
   `device_id` VARCHAR(45) NOT NULL ,
   `device_id_crc` INT UNSIGNED NOT NULL ,
   `model_id` TINYINT NOT NULL DEFAULT 1 COMMENT 'the model id as below.\n1 - Android\n2 - iOS\n3 - WP' ,
-  `status` TINYINT NOT NULL DEFAULT 1 COMMENT 'the status as below.\n1 - 空闲\n2 - 使用中' ,
+  `status` TINYINT NOT NULL DEFAULT 1 COMMENT 'the status as below.\n1 - 停用\n2 - 启用' ,
   PRIMARY KEY (`id`) ,
   INDEX `ix_restaurant_id` (`restaurant_id` ASC) ,
   INDEX `ix_device_id_crc` (`device_id_crc` ASC) )
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8;
 
+-- -----------------------------------------------------
+-- Table `wireless_order_db`.`privilege`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `wireless_order_db`.`privilege` ;
+
+CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`privilege` (
+  `pri_id` INT NOT NULL AUTO_INCREMENT ,
+  `pri_code` INT NOT NULL COMMENT 'the privilege code as below:\n1000 - 退菜\n1001 - 打折\n1002 - 赠送\n1003 - 反结帐\n2000 - 后台\n3000 - 库存\n4000 - 历史\n5000 - 会员\n6000 - 系统' ,
+  `cate` TINYINT NOT NULL COMMENT 'the category to privilege as below.\n1 - 前台\n2 - 后台\n3 - 库存\n4 - 历史\n5 - 会员\n6 - 系统' ,
+  PRIMARY KEY (`pri_id`) ,
+  INDEX `ix_privilege_code` (`pri_code` ASC) )
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8, 
+COMMENT = 'describe the privilege information' ;
 
 
+-- -----------------------------------------------------
+-- Table `wireless_order_db`.`role_privilege`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `wireless_order_db`.`role_privilege` ;
+
+CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`role_privilege` (
+  `role_id` INT NOT NULL ,
+  `pri_id` INT NOT NULL ,
+  `restaurant_id` INT NOT NULL DEFAULT 0 ,
+  `discount_privilege_id` INT NULL DEFAULT NULL ,
+  PRIMARY KEY (`role_id`, `pri_id`) ,
+  INDEX `ix_restaurant_id` (`restaurant_id` ASC) )
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
 
 
+-- -----------------------------------------------------
+-- Table `wireless_order_db`.`discount_privilege`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `wireless_order_db`.`discount_privilege` ;
 
+CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`discount_privilege` (
+  `discount_privilege_id` INT NOT NULL AUTO_INCREMENT ,
+  `discount_id` INT NULL ,
+  PRIMARY KEY (`discount_privilege_id`) ,
+  INDEX `ix_discount_id` (`discount_id` ASC) )
+ENGINE = InnoDB;
 
+-- -----------------------------------------------------
+-- Insert a '退菜' privilege
+-- -----------------------------------------------------
+INSERT INTO wireless_order_db.privilege (`pri_code`, `cate`) VALUES (1000, 1);
 
+-- -----------------------------------------------------
+-- Insert a '打折' privilege
+-- -----------------------------------------------------
+INSERT INTO wireless_order_db.privilege (`pri_code`, `cate`) VALUES (1001, 1);
+
+-- -----------------------------------------------------
+-- Insert a '赠送' privilege
+-- -----------------------------------------------------
+INSERT INTO wireless_order_db.privilege (`pri_code`, `cate`) VALUES (1002, 1);
+
+-- -----------------------------------------------------
+-- Insert a '反结帐' privilege
+-- -----------------------------------------------------
+INSERT INTO wireless_order_db.privilege (`pri_code`, `cate`) VALUES (1003, 1);
+
+-- -----------------------------------------------------
+-- Insert a '后台' privilege
+-- -----------------------------------------------------
+INSERT INTO wireless_order_db.privilege (`pri_code`, `cate`) VALUES (2000, 2);
+
+-- -----------------------------------------------------
+-- Insert a '库存' privilege
+-- -----------------------------------------------------
+INSERT INTO wireless_order_db.privilege (`pri_code`, `cate`) VALUES (3000, 3);
+
+-- -----------------------------------------------------
+-- Insert a '历史' privilege
+-- -----------------------------------------------------
+INSERT INTO wireless_order_db.privilege (`pri_code`, `cate`) VALUES (4000, 4);
+
+-- -----------------------------------------------------
+-- Insert a '会员' privilege
+-- -----------------------------------------------------
+INSERT INTO wireless_order_db.privilege (`pri_code`, `cate`) VALUES (5000, 5);
+
+-- -----------------------------------------------------
+-- Insert a '系统' privilege
+-- -----------------------------------------------------
+INSERT INTO wireless_order_db.privilege (`pri_code`, `cate`) VALUES (6000, 6);
+
+-- -----------------------------------------------------
+-- All all privileges to '管理员'
+-- -----------------------------------------------------
+INSERT INTO wireless_order_db.role_privilege 
+(`role_id`, `pri_id`, `restaurant_id`)
+SELECT role_id, pri_id, restaurant_id
+FROM wireless_order_db.role R JOIN wireless_order_db.privilege P ON R.cate = 1;
+
+-- -----------------------------------------------------
+-- Add all privileges to '老板'
+-- -----------------------------------------------------
+INSERT INTO wireless_order_db.role_privilege 
+(`role_id`, `pri_id`, `restaurant_id`)
+SELECT role_id, pri_id, restaurant_id
+FROM wireless_order_db.role R JOIN wireless_order_db.privilege P ON R.cate = 2;
+
+-- -----------------------------------------------------
+-- Add '前台'、'后台'、'库存'、'历史'、'会员' privileges to '财务'
+-- -----------------------------------------------------
+INSERT INTO wireless_order_db.role_privilege 
+(`role_id`, `pri_id`, `restaurant_id`)
+SELECT role_id, pri_id, restaurant_id
+FROM wireless_order_db.role R JOIN wireless_order_db.privilege P ON R.cate = 3 AND pri_code IN(1000, 1001, 1002, 1003, 2000, 3000, 4000, 5000);
+
+-- -----------------------------------------------------
+-- Add '前台'、'后台' privileges to '部长'
+-- -----------------------------------------------------
+INSERT INTO wireless_order_db.role_privilege 
+(`role_id`, `pri_id`, `restaurant_id`)
+SELECT role_id, pri_id, restaurant_id
+FROM wireless_order_db.role R JOIN wireless_order_db.privilege P ON R.cate = 4 AND pri_code IN(1000, 1001, 1002, 1003, 2000);
+
+-- -----------------------------------------------------
+-- Add '前台' privileges to '服务员'
+-- -----------------------------------------------------
+INSERT INTO wireless_order_db.role_privilege 
+(`role_id`, `pri_id`, `restaurant_id`)
+SELECT role_id, pri_id, restaurant_id
+FROM wireless_order_db.role R JOIN wireless_order_db.privilege P ON R.cate = 5 AND pri_code IN(1000, 1001, 1002, 1003);
+
+-- -----------------------------------------------------
+-- Drop the field 'pwd', 'pwd2', 'pwd3', 'pwd4', 'pwd5' to table 'restaurant'
+-- -----------------------------------------------------
+ALTER TABLE `wireless_order_db`.`restaurant` DROP COLUMN `pwd5` , DROP COLUMN `pwd4` , DROP COLUMN `pwd3` , DROP COLUMN `pwd2` , DROP COLUMN `pwd` ;
 
 
 
