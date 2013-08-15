@@ -144,11 +144,15 @@ public final class ShoppingCart {
 	 * Remove the specific order food from new order list.
 	 * @param foodToDel 
 	 * 			the food to remove
+	 * @param staff
+	 * 			the staff to remove food
 	 * @return true if the food to be removed exist before, otherwise return false
+	 * @throws BusinessException 
+	 * 			throws if the staff does NOT own the cancel food privilege
 	 */
-	public boolean remove(OrderFood foodToDel){
+	public boolean remove(OrderFood foodToDel, Staff staff) throws BusinessException{
 		if(mNewOrder != null){
-			if(mNewOrder.remove(foodToDel)){
+			if(mNewOrder.remove(foodToDel, staff)){
 				notifyFoodsChanged();
 				return true;
 			}else{
@@ -183,7 +187,7 @@ public final class ShoppingCart {
 	 * @param fooodToAdd
 	 *            要添加的菜品
 	 * @throws BusinessException
-	 * 				Throws if the order amount of the added food exceed MAX_ORDER_AMOUNT
+	 * 				throws if the order amount of the added food exceed MAX_ORDER_AMOUNT
 	 */
 	public void addFood(OrderFood foodToAdd) throws BusinessException{
 		if(mNewOrder == null){

@@ -1061,9 +1061,9 @@ public class SelectedFoodActivity extends Activity implements
 							 * 如果数量相等，则从列表中删除此菜
 							 */
 							if (method.equals(DELETE))
-								ShoppingCart.instance().remove(selectedFood);
+								ShoppingCart.instance().remove(selectedFood, WirelessOrder.loginStaff);
 							else if (method.equals(RETREAT)) {
-								selectedFood.removeCount(cancelAmount);
+								selectedFood.removeCount(cancelAmount, WirelessOrder.loginStaff);
 							}
 
 							// 若完全没有菜式，则关闭该activity
@@ -1084,7 +1084,7 @@ public class SelectedFoodActivity extends Activity implements
 							/**
 							 * 如果删除数量少于已点数量，则相应减去删除数量
 							 */
-							selectedFood.removeCount(cancelAmount);
+							selectedFood.removeCount(cancelAmount, WirelessOrder.loginStaff);
 							mFoodListHandler
 									.sendEmptyMessage(SelectedFoodActivity.LIST_CHANGED);
 							dismiss();
@@ -1146,20 +1146,22 @@ public class SelectedFoodActivity extends Activity implements
 	 */
 	@Override
 	public void onTasteChanged(OrderFood food) {
-		ShoppingCart.instance().remove(mCurrentFood);
-		mCurrentFood = food;
 		try {
+			ShoppingCart.instance().remove(mCurrentFood, WirelessOrder.loginStaff);
+			mCurrentFood = food;
+			
 			ShoppingCart.instance().addFood(mCurrentFood);
+			
+			mFoodDetailHandler.sendEmptyMessage(SelectedFoodActivity.CUR_NEW_FOOD_CHANGED);
+			
+			((TextView) mCurrentView.findViewById(R.id.textView_picked_food_price_item)).setText(NumericUtil.float2String2(mCurrentFood.getUnitPriceWithTaste()));
+			((TextView) mCurrentView.findViewById(R.id.textView_picked_food_sum_price)).setText(NumericUtil.float2String2(mCurrentFood.calcPriceWithTaste()));
+			
+			mTotalCountHandler.sendEmptyMessage(0);
+			
 		} catch (BusinessException e) {
-			e.printStackTrace();
+			Toast.makeText(SelectedFoodActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
 		}
-		mFoodDetailHandler.sendEmptyMessage(SelectedFoodActivity.CUR_NEW_FOOD_CHANGED);
-		
-		((TextView) mCurrentView.findViewById(R.id.textView_picked_food_price_item))
-			.setText(NumericUtil.float2String2(mCurrentFood.getUnitPriceWithTaste()));
-		((TextView) mCurrentView.findViewById(R.id.textView_picked_food_sum_price))
-			.setText(NumericUtil.float2String2(mCurrentFood.calcPriceWithTaste()));
-		mTotalCountHandler.sendEmptyMessage(0);
 	}
 
 	/**
