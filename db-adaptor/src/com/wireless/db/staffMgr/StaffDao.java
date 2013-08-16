@@ -92,6 +92,26 @@ public class StaffDao {
 	
 	/**
 	 * Get the staff by specific id.
+	 * @param staffId
+	 * 			the staff id 
+	 * @return the staff to this id
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if the staff to find does NOT exist
+	 */
+	public static Staff getStaffById(int staffId) throws SQLException, BusinessException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return getStaffById(dbCon, staffId);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Get the staff by specific id.
 	 * @param dbCon
 	 * 			the database connection
 	 * @param staffId
