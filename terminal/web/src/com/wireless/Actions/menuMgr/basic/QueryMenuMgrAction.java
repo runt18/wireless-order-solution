@@ -36,7 +36,7 @@ public class QueryMenuMgrAction extends Action {
 		String imageBrowsePath = this.getServlet().getInitParameter("imageBrowsePath");
 		
 		try{
-			String restaurantId = (String) request.getSession().getAttribute("restaurantId");
+			String restaurantId = (String) request.getSession().getAttribute("restaurantID");
 			String kitchen = request.getParameter("kitchen");
 			String alias = request.getParameter("alias");
 			String operqtor = request.getParameter("operator");
