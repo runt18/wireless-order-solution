@@ -116,7 +116,7 @@ Ext.onReady(function(){
 						params : {
 							dataSource : dataSource,
 							queryPattern : queryPattern,
-							pin : pin,
+							
 							restaurantID : restaurantID,
 							onDuty : paramsOnDuty,
 							offDuty : paramsOffDuty
@@ -227,7 +227,7 @@ Ext.onReady(function(){
 					url = String.format(
 							url, 
 							'ExportHistoryStatisticsToExecl.do', 
-							pin, 
+							-10, 
 							restaurantID, 
 							'business',
 							paramsOnDuty,

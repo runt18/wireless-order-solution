@@ -70,7 +70,7 @@ stockDetail.defaultSortable = true;
 
 var stockDetailStore = new Ext.data.Store({
 	//proxy : new Ext.data.MemoryProxy(data),
-	proxy : new Ext.data.HttpProxy({url:'../../QueryStockActionDetail.do?pin=' + pin}),
+	proxy : new Ext.data.HttpProxy({url:'../../QueryStockActionDetail.do'}),
 	reader : new Ext.data.JsonReader({totalProperty:'totalProperty', root : 'root'}, [
          {name : 'materialName'},
          {name : 'amount'},
@@ -121,7 +121,7 @@ var pushBackBut = new Ext.ux.ImageButton({
 	imgHeight : 50,
 	tooltip : '返回',
 	handler : function(btn){
-		location.href = 'InventoryProtal.html?restaurantID=' + restaurantID + '&pin=' + pin;
+		location.href = 'InventoryProtal.html?'+ strEncode('restaurantID=' + restaurantID, 'mi');
 	}
 });
 
@@ -301,7 +301,7 @@ Ext.onReady(function(){
 	//数据加载器
 	var ds = new Ext.data.Store({
 		//proxy : new Ext.data.MemoryProxy(data),
-		proxy : new Ext.data.HttpProxy({url:'../../QueryStockDetailReport.do?pin=' + pin}),
+		proxy : new Ext.data.HttpProxy({url:'../../QueryStockDetailReport.do'}),
 		reader : new Ext.data.JsonReader({totalProperty:'totalProperty', root : 'root'}, [
 	         {name : 'id'},                                                                         
 	         {name : 'date'},
@@ -548,7 +548,7 @@ Ext.onReady(function(){
 			         	id = rec.get('id');
 			    });   
 				stockForm.form.load({
-					url:'../../QueryStockAction.do?id=' + id + '&pin=' + pin
+					url:'../../QueryStockAction.do?'+ strEncode('restaurantID=' + restaurantID + '&id'+ id, 'mi')
 				});
 				var detailds = stockDetailGrid.getStore();
 				detailds.load({
@@ -588,7 +588,7 @@ Ext.onReady(function(){
 			}
 		}]
 	});
-   getOperatorName(pin, "../../");
+   getOperatorName("../../");
 	new Ext.Viewport({
 		layout : 'border',
 		id : 'viewport',

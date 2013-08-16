@@ -28,7 +28,7 @@ var pushBackBut = new Ext.ux.ImageButton({
 	imgHeight : 50,
 	tooltip : '返回',
 	handler : function(btn){
-		location.href = 'BasicMgrProtal.html?restaurantID=' + restaurantID + '&pin=' + pin;
+		location.href = 'BasicMgrProtal.html?'+ strEncode('restaurantID=' + restaurantID, 'mi');
 	}
 });
 
@@ -281,7 +281,7 @@ Ext.onReady(function(){
 		loader : new Ext.tree.TreeLoader({
 			dataUrl : '../../QueryDiscountTree.do',
 			baseParams : {
-				pin : pin,
+				
 				restaurantID : restaurantID
 			}
 		}),
@@ -439,7 +439,7 @@ Ext.onReady(function(){
 			['操作', 'operation', '', 'center', 'discountOperationRenderer']
 		],
 		DiscountPlanRecord.getKeys(),
-		[['pin',pin], ['isPaging', true], ['restaurantID', restaurantID]],
+		[ ['isPaging', true], ['restaurantID', restaurantID]],
 		50,
 		'',
 		discountGridTbar
@@ -475,7 +475,7 @@ Ext.onReady(function(){
 	});
 	
 	initMainView(null, centerPanel, null);
-	getOperatorName(pin, "../../");
+	getOperatorName("../../");
 	
 	if(!addProgramWin){
 		addProgramWin = new Ext.Window({

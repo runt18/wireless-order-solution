@@ -205,10 +205,10 @@ function loginOnLoad() {
 	protalFuncReg();
 
 	// update the operator name
-	if (currPin != "") {
+/*	if (currPin != "") {
 		getOperatorName(currPin, "../../");
-	}
-
+	}*/
+	getOperatorName("../../");
 	// mouse over & mouse off -- heightlight the icon
 	$("#menuMgr").each(function(){
 		$(this).hover(function(){

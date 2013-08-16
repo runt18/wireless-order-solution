@@ -10,7 +10,7 @@ function loadDataForOrderGroup(_c){
 	Ext.Ajax.request({
 		url : '../../QueryOrderGroup.do',
 		params : {
-			pin : pin,
+			
 			restaurantID : restaurantID,
 			queryType : 1,
 			status : 0
@@ -123,7 +123,7 @@ function oOrderGroup(_c){
 			],
 //			['tableID', 'tableAlias', 'tableName', 'tableStatus'],
 			TableRecord.getKeys(),
-			[['isPaging', false], ['restaurantID', restaurantID], ['pin', pin]],
+			[['isPaging', false], ['restaurantID', restaurantID]],
 			30,
 			''
 		);
@@ -174,7 +174,7 @@ function oOrderGroup(_c){
 			],
 //			['tableID', 'tableAlias', 'tableName', 'tableStatus'],
 			TableRecord.getKeys(),
-			[['isPaging', false], ['restaurantID', restaurantID], ['pin', pin]],
+			[['isPaging', false], ['restaurantID', restaurantID]],
 			30,
 			'',
 			centerGridPanelTbar
@@ -243,7 +243,7 @@ function oOrderGroup(_c){
 								Ext.Ajax.request({
 									url : '../../CancelOrderGroup.do',
 									params : {
-										pin : pin,
+										
 										orderID : sd.parentID
 									},
 									success : function(res, opt){
@@ -280,7 +280,7 @@ function oOrderGroup(_c){
 				['parentID', 'parentID', 10]
 			],
 			['id', 'alias', 'name', 'parentID'],
-			[['isPaging', false], ['restaurantID', restaurantID], ['pin', pin]],
+			[['isPaging', false], ['restaurantID', restaurantID]],
 			30,
 			{ name : 'parentID', hide : true, sort : 'alias' },
 			eastPanelTbar
@@ -425,7 +425,7 @@ function oOrderGroup(_c){
 						url : '../../UpdateOrderGroup.do',
 						params : {
 							dataSource : 'updateTable',
-							pin : pin,
+							
 							restaurantID : restaurantID,
 							otype : otype,
 							tables : Ext.encode(tables),
@@ -437,19 +437,17 @@ function oOrderGroup(_c){
 							var jr = Ext.decode(res.responseText);
 							if(jr.success){
 								if(orderGroupWin.otype == 1){
-									location.href = "OrderMain.html?"
-										+ "&pin=" + pin
-										+ "&restaurantID=" + restaurantID
+									location.href = "OrderMain.html?"+ 
+										strEncode('restaurantID=' + restaurantID
 										+ "&category=" + 4
 										+ "&tableAliasID=" + tables[0].alias
 										+ "&orderID=" + jr.other.orderID
-										+ "&ts=" + 1;  // 团体操作暂定为都是改单操作
+										+ "&ts=" + 1, 'mi');  // 团体操作暂定为都是改单操作
 								}else if(orderGroupWin.otype == 2){
-									location.href = "CheckOut.html?"
-										+ "orderID=" + (otype == 1 ? parentID : jr.other.orderID)
-										+ "&pin=" + pin
-										+ "&restaurantID=" + restaurantID
-										+ "&category=" + 4;
+									location.href = "CheckOut.html?" +
+										 		strEncode('restaurantID=' + restaurantID
+												 + "&category=" + 4
+												 + "&orderID=" + (otype == 1 ? parentID : jr.other.orderID), 'mi');
 								}
 							}else{
 								Ext.ux.showMsg(jr);

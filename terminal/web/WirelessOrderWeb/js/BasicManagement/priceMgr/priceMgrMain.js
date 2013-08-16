@@ -14,7 +14,7 @@ var pushBackBut = new Ext.ux.ImageButton({
 	imgHeight : 50,
 	tooltip : '返回',
 	handler : function(btn){
-		location.href = 'BasicMgrProtal.html?restaurantID=' + restaurantID + '&pin=' + pin;
+		location.href = 'BasicMgrProtal.html?'+ strEncode('restaurantID=' + restaurantID, 'mi');
 	}
 });
 
@@ -249,7 +249,7 @@ Ext.onReady(function(){
 	});
 	
 	initMainView(null, centerPanel, null);
-	getOperatorName(pin, "../../");
+	getOperatorName("../../");
 	
 	// 
 	initWin();

@@ -24,8 +24,7 @@ var pushBackBut = new Ext.ux.ImageButton({
 	imgHeight : 50,
 	tooltip : '返回',
 	handler : function(btn) {
-		location.href = 'FrontBusinessProtal.html?restaurantID=' + restaurantID
-				+ '&pin=' + pin;
+		location.href = 'FrontBusinessProtal.html?'+ strEncode('restaurantID=' + restaurantID, 'mi');
 	}
 });
 
@@ -48,7 +47,7 @@ function billOptModifyHandler(rowindex) {
 		Ext.example.msg('提示', '会员结账单暂不允许反结账.');
 		return;
 	}
-	location.href = 'BillModify.html?pin=' + pin + '&restaurantID=' + restaurantID + '&orderID=' + data['id'];
+	location.href = 'BillModify.html?' + strEncode('restaurantID=' + restaurantID + '&orderID=' + data['id'], "mi");
 };
 
 var viewBillGenPanel = new Ext.Panel({
@@ -138,7 +137,7 @@ var viewBillWin = new Ext.Window({
 			Ext.Ajax.request({
 				url : '../../QueryOrder.do',
 				params : {
-					'pin' : pin,
+					
 					'orderID' : billID,
 					'queryType' : 'Today'
 				},
@@ -228,7 +227,7 @@ var billDetailGrid = createGridPanel(
 	    ['退菜原因', 'cancelReason.reason']
 	],
 	OrderFoodRecord.getKeys(),
-	[['pin', pin], ['queryType', 'Today']],
+	[ ['queryType', 'Today']],
 	'',
 	''
 );
@@ -318,7 +317,7 @@ var billDetailWin = new Ext.Window({
 						    ['退菜原因', 'cancelReason']
 						],
 						OrderFoodRecord.getKeys(),
-					    [['pin', pin], ['orderID', sd.childOrder[i].id], ['queryType', 'Today']],
+					    [ ['orderID', sd.childOrder[i].id], ['queryType', 'Today']],
 					    billDetailpageRecordCount,
 					    ''
 					);
@@ -366,7 +365,7 @@ function printBillFunc(orderID) {
 	Ext.Ajax.request({
 		url : '../../PrintOrder.do',
 		params : {
-			'pin' : pin,
+			
 			'orderID' : orderID,
 			'printType' : 3
 		},
@@ -697,7 +696,7 @@ Ext.onReady(function(){
 			['操作', 'operator', 270, 'center', 'billOpt']
 		],
 		OrderRecord.getKeys(),
-		[['isPaging', true], ['restaurantID', restaurantID], ['pin', pin]],
+		[['isPaging', true], ['restaurantID', restaurantID]],
 		GRID_PADDING_LIMIT_20,
 		'',
 		billsGridTbar
@@ -768,6 +767,6 @@ Ext.onReady(function(){
 	});
 	
 	initMainView(null, centerPanel, null);
-	getOperatorName(pin, "../../");
+	getOperatorName("../../");
 	
 });

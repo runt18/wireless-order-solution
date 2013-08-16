@@ -51,7 +51,7 @@ function memberOperationHandler(c){
 						url : '../../OperateMember.do',
 						params : {
 							dataSource : 'delete',
-							pin : pin,
+							
 							id : data['id']
 						},
 						success : function(res, opt){
@@ -394,7 +394,7 @@ function initAdjustPointWin(){
 									url : '../../OperateMember.do',
 									params : {
 										dataSource : 'adjustPoint',
-										pin : pin,
+										
 										memberId : data['id'],
 										point : numAdjustPoint.getValue(),
 										adjust : adjust

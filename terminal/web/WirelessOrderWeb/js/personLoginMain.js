@@ -45,15 +45,13 @@ var menuVerifyWin = new Ext.Window({
 			Ext.Ajax.request({
 				url : "../VerifyPwd.do",
 				params : {
-					"pin" : currPin,
 					"type" : "3",
 					"pwd" : pwdTrans
 				},
 				success : function(response, options) {
 					var resultJSON = Ext.util.JSON.decode(response.responseText);
 					if (resultJSON.success == true) {
-						location.href = "BasicManagement_Module/BasicMgrProtal.html?pin=" + currPin
-										+ "&restaurantID=" + restaurantID;
+						location.href = "BasicManagement_Module/BasicMgrProtal.html?" + strEncode("restaurantID=" + restaurantID, "mi");
 					} else {
 						Ext.MessageBox.show({
 							msg : resultJSON.data,
@@ -132,7 +130,6 @@ var historyVerifyWin = new Ext.Window({
 			Ext.Ajax.request({
 				url : "../VerifyPwd.do",
 				params : {
-					"pin" : currPin,
 					"type" : "2",
 					"pwd" : pwdTrans
 				},
@@ -140,10 +137,7 @@ var historyVerifyWin = new Ext.Window({
 					var resultJSON = Ext.util.JSON
 							.decode(response.responseText);
 					if (resultJSON.success == true) {
-						location.href = 'History_Module/HistoryStatistics.html?pin='
-							+ currPin 
-							+ '&restaurantID='
-							+ restaurantID;
+						location.href = 'History_Module/HistoryStatistics.html?'+ strEncode('restaurantID=' + restaurantID, 'mi');
 					} else {
 						Ext.MessageBox.show({
 							msg : resultJSON.data,
@@ -220,7 +214,6 @@ var inventoryVerifyWin = new Ext.Window({
 			Ext.Ajax.request({
 				url : "../VerifyPwd.do",
 				params : {
-					"pin" : currPin,
 					"type" : "3",
 					"pwd" : pwdTrans
 				},
@@ -228,10 +221,7 @@ var inventoryVerifyWin = new Ext.Window({
 					var resultJSON = Ext.util.JSON
 							.decode(response.responseText);
 					if (resultJSON.success == true) {
-						location.href = "InventoryManagement_Module/InventoryProtal.html?pin="
-								+ currPin
-								+ "&restaurantID="
-								+ restaurantID;
+						location.href = "InventoryManagement_Module/InventoryProtal.html?" + strEncode("restaurantID="+restaurantID, "mi");
 					} else {
 						Ext.MessageBox.show({
 							msg : resultJSON.data,
@@ -308,7 +298,6 @@ var systemVerifyWin = new Ext.Window({
 			Ext.Ajax.request({
 				url : "../VerifyPwd.do",
 				params : {
-					"pin" : currPin,
 					"type" : "1",
 					"pwd" : pwdTrans
 				},
@@ -316,9 +305,7 @@ var systemVerifyWin = new Ext.Window({
 					var resultJSON = Ext.util.JSON
 							.decode(response.responseText);
 					if (resultJSON.success == true) {
-						location.href = "System_Module/SystemProtal.html?pin="
-							+ currPin + "&restaurantID="
-							+ restaurantID;
+						location.href = "System_Module/SystemProtal.html?"+ strEncode('restaurantID=' + restaurantID, 'mi');
 					} else {
 						Ext.MessageBox.show({
 							msg : resultJSON.data,
@@ -393,16 +380,13 @@ var memberVerifyWin = new Ext.Window({
 			Ext.Ajax.request({
 				url : "../VerifyPwd.do",
 				params : {
-					"pin" : currPin,
 					"type" : 3,
 					"pwd" : pwdTrans
 				},
 				success : function(response, options) {
 					var resultJSON = Ext.util.JSON.decode(response.responseText);
 					if (resultJSON.success == true) {
-						window.location.href = 'Client_Module/ClientMain.html?'
-							+ 'pin=' + currPin
-							+ '&restaurantID=' + restaurantID;
+						window.location.href = 'Client_Module/ClientMain.html?'+ strEncode('restaurantID=' + restaurantID, 'mi');
 					} else {
 						Ext.MessageBox.show({
 							msg : resultJSON.data,
@@ -502,9 +486,24 @@ Ext.onReady(function() {
 					var pwdTrans;
 					pwdTrans = MD5(passwordInput);
 					if (password == pwdTrans) {
-						currPin = pin;
-						getOperatorName(currPin, "../");
+						Ext.Ajax.request({
+							url : '../OperateStaff.do',
+							params : {
+								pin : pin,
+								restaurantID : restaurantID
+							},
+							success : function(response, options) {
+								
+							},
+							failure : function(response, options) {
+							}
+						});
+						//currPin = pin;
+						getOperatorName("../");
 						isVerified = true;
+						
+
+						
 						personLoginWin.hide();
 						personLoginWin.findById(
 								"empPassword")

@@ -276,7 +276,7 @@ function gridInit(){
 			['操作', 'operation', 230, 'center', 'memberOperationRenderer']
 		],
 		MemberBasicRecord.getKeys(),
-		[['isPaging', true], ['restaurantID', restaurantID], ['pin', pin], ['dataSource', 'normal']],
+		[['isPaging', true], ['restaurantID', restaurantID],  ['dataSource', 'normal']],
 		GRID_PADDING_LIMIT_20,
 		'',
 		memberBasicGridTbar

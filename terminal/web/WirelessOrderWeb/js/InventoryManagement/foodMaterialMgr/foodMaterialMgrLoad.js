@@ -27,7 +27,7 @@ function initControl(){
 			dataUrl : '../../QueryKitchen.do',
 			baseParams : {
 				dataSource : 'tree',
-				pin : pin,
+				
 				restaurantID : restaurantID
 			}
 		}),
@@ -103,7 +103,7 @@ function initControl(){
 			['厨房', 'kitchen.name', 60]
 		],
 		FoodBasicRecord.getKeys(),
-		[['isPaging', true], ['pin',pin], ['restaurantId', restaurantID], ['stockStatus', 3]],
+		[['isPaging', true],  ['restaurantId', restaurantID], ['stockStatus', 3]],
 		GRID_PADDING_LIMIT_20,
 		'',
 		foodBasicGridTbar
@@ -167,7 +167,7 @@ function initControl(){
 					url : '../../OperateFoodMaterial.do',
 					params : {
 						dataSource : 'update',
-						pin : pin,
+						
 						restaurantId : restaurantID,
 						foodId : food['id'],
 						content : content
@@ -201,7 +201,7 @@ function initControl(){
 			['数量', 'consumption', ,'right', 'foodMaterialGridRenderer']
 		],
 		FoodMaterialRecord.getKeys(),
-		[['isPaging', true], ['pin',pin], ['restaurantId', restaurantID]],
+		[['isPaging', true],  ['restaurantId', restaurantID]],
 		GRID_PADDING_LIMIT_20,
 		'',
 		foodMaterialGridTbar
@@ -272,7 +272,7 @@ function initControl(){
 			['操作', 'operate', , 'center', 'materialBasicGridRenderer']
 		],
 		MaterialRecord.getKeys(),
-		[['isPaging', true], ['pin',pin], ['restaurantID', restaurantID], ['dataSource', 'normal'], ['cateType', 2]],
+		[['isPaging', true],  ['restaurantID', restaurantID], ['dataSource', 'normal'], ['cateType', 2]],
 		GRID_PADDING_LIMIT_20,
 		'',
 		materialBasicGridTbar

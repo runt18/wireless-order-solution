@@ -5,7 +5,7 @@ var pushBackBut = new Ext.ux.ImageButton({
 	imgHeight : 50,
 	tooltip : "返回",
 	handler : function(btn){
-		location.href = "BasicMgrProtal.html?restaurantID=" + restaurantID + "&pin=" + pin;
+		location.href = "BasicMgrProtal.html?"+ strEncode('restaurantID=' + restaurantID, 'mi');
 	}
 });
 
@@ -433,7 +433,7 @@ Ext.onReady(function() {
 		],
 		KitchenRecord.getKeys(),
 		//['kitchenID', 'kitchenName', 'department', 'deptName', 'kitchenAlias', 'isAllowTemp'],
-		[['pin', pin], ['isPaging', false], ['dataSource', 'normal']],
+		[ ['isPaging', false], ['dataSource', 'normal']],
 		0,
 		'',
 		kitchenGridTbar

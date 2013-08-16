@@ -4,7 +4,7 @@ var pushBackBut = new Ext.ux.ImageButton({
 	imgHeight : 50,
 	tooltip : '返回',
 	handler : function(btn){
-		location.href = 'InventoryProtal.html?restaurantID=' + restaurantID + '&pin=' + pin;
+		location.href = 'InventoryProtal.html?'+ strEncode('restaurantID=' + restaurantID, 'mi');
 	}
 });
 
@@ -178,7 +178,7 @@ Ext.onReady(function(){
 	cm.defaultSortable = true;
 	
 	var ds = new Ext.data.Store({
-		proxy : new Ext.data.HttpProxy({url: '../../QueryDeltaReport.do?pin='+pin}),
+		proxy : new Ext.data.HttpProxy({url: '../../QueryDeltaReport.do'}),
 		reader : new Ext.data.JsonReader({totalProperty: 'totalProperty', root:'root'},[
 				{name: 'material.name'},
 				{name: 'primeAmount'},
@@ -364,7 +364,7 @@ Ext.onReady(function(){
 			}
 		}]
 	});
-	getOperatorName(pin, "../../");
+	getOperatorName("../../");
 	new Ext.Viewport({
 		layout : 'border',
 		id : 'viewport',

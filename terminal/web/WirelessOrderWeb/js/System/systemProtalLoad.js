@@ -17,7 +17,7 @@ function loginOnLoad() {
 	
 	// update the operator name
 	if (pin != "") {
-		getOperatorName(pin, "../../");
+		getOperatorName("../../");
 	}
 
 	// emplData: [pin，姓名，密码]

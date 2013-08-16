@@ -1,3 +1,4 @@
+getOperatorName("../../");
 var addSupplier;
 
 addSupplier = new Ext.Window({
@@ -107,7 +108,7 @@ addSupplier = new Ext.Window({
 				Ext.Ajax.request({
 					url : actionUrl,
 					params : {
-						pin : pin,
+						
 						supplierID : sId,
 						supplierName : sName,
 						tele : sTele,
@@ -181,7 +182,7 @@ var pushBackBut = new Ext.ux.ImageButton({
 	imgHeight : 50,
 	tooltip : '返回',
 	handler : function(btn){
-		location.href = 'InventoryProtal.html?restaurantID=' + restaurantID + '&pin=' + pin;
+		location.href = 'InventoryProtal.html?' + strEncode("restaurantID="+restaurantID, "mi");
 	}
 });
 
@@ -292,7 +293,7 @@ deleteSupplierOperationHandler = function(){
 				function(e){
 					if(e == 'yes'){
 						Ext.Ajax.request({
-							url : '../../DeleteSupplier.do?pin='+pin,
+							url : '../../DeleteSupplier.do',
 							params : {
 								supplierId : sd.data.supplierID
 							},
@@ -370,7 +371,7 @@ Ext.onReady(function(){
 		//代理,加载本地和远程
 		//proxy : new Ext.data.MemoryProxy(data),
 		//加载远程的
-		proxy : new Ext.data.HttpProxy({url:'../../QuerySupplier.do?pin=' + pin}),
+		proxy : new Ext.data.HttpProxy({url:'../../QuerySupplier.do'}),
 		reader : new Ext.data.JsonReader({totalProperty:'totalProperty', root:'root'},[
 			{name : 'supplierID'},
 	        {name : 'name'},
@@ -475,7 +476,7 @@ Ext.onReady(function(){
 		    border : true,
 		    frame : true,
 		    store : ds,
-		    cm: cm,
+		    cm : cm,
 		    tbar : suppllierGridTbar,
 		    bbar : pagingBar
 		});
@@ -509,7 +510,7 @@ Ext.onReady(function(){
 			}
 		}]
 	});
-	getOperatorName(pin, "../../");
+	
 	new Ext.Viewport({
 		layout : 'border',
 		id : 'viewport',
@@ -517,7 +518,8 @@ Ext.onReady(function(){
 		[{
 			region : 'north',
 			bodyStyle : 'background-color:#DFE8F6;',
-			html : "<h4 style='padding:10px;font-size:150%;float:left;'>无线点餐网页终端</h4><div id='optName' class='optName'></div>",
+			html : "<h4 style='padding:10px;font-size:150%;float:left;'>无线点餐网页终端</h4>" +
+				"<div id='optName' class='optName'></div>",
 			height : 50,
 			border : false,
 			margins : '0 0 0 0'

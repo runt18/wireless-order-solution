@@ -197,7 +197,7 @@ Ext.onReady(function(){
 			['金额调整', 'moneyAdjust',,'right', 'Ext.ux.txtFormat.gridDou']
 		],
 		MOSummaryRecord.getKeys(),
-		[['pin',pin], ['isPaging', true], ['restaurantID', restaurantID]],
+		[ ['isPaging', true], ['restaurantID', restaurantID]],
 		GRID_PADDING_LIMIT_20,
 		'',
 		mcsc_center_grid_tbar

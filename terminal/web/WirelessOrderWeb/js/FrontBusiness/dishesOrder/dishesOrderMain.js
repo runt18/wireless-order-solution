@@ -5,7 +5,7 @@
 	tooltip : "返回",
 	handler : function(btn) {
 		if (orderIsChanged == false) {
-			location.href = 'TableSelect.html?' + 'pin=' + pin + '&restaurantID=' + restaurantID;
+			location.href = 'TableSelect.html?'+ strEncode('restaurantID=' + restaurantID, 'mi');
 		} else {
 			Ext.MessageBox.show({
 				msg : '下/改单还未提交，是否确认退出？',
@@ -13,7 +13,7 @@
 				buttons : Ext.MessageBox.YESNO,
 				fn : function(btn) {
 					if (btn == 'yes') {
-						location.href = 'TableSelect.html?' + 'pin=' + pin + '&restaurantID=' + restaurantID;
+						location.href = 'TableSelect.html?'+ strEncode('restaurantID=' + restaurantID, 'mi');
 					}
 				}
 			});
@@ -84,7 +84,6 @@ var commonTasteGridForTabPanel = new Ext.grid.GridPanel({
 					data = Ext.ux.getSelData(orderSingleGridPanel);
 				}
 				this.baseParams['foodID'] = data.id;
-				this.baseParams['pin'] = pin;
 				this.baseParams['restaurantID'] = restaurantID;
 			},
 			load : function(thiz){
@@ -464,7 +463,7 @@ var allFoodTabPanelGrid = createGridPanel(
 		['价格', 'unitPrice', 70, 'right', 'Ext.ux.txtFormat.gridDou']
 	],
 	FoodBasicRecord.getKeys(),
-	[['pin',pin], ['dataSource', 'foods'], ['restaurantID', restaurantID], ['isPaging', true]],
+	[ ['dataSource', 'foods'], ['restaurantID', restaurantID], ['isPaging', true]],
 	GRID_PADDING_LIMIT_30,
 	'',
 	allFoodTabPanelGridTbar
@@ -667,7 +666,7 @@ var orderPanel = new Ext.Panel({
 		text : '提交',
 		handler : function() {
 			submitOrderHandler({
-				href : 'TableSelect.html?pin=' + pin + '&restaurantID=' + restaurantID
+				href : 'TableSelect.html?'+ strEncode('restaurantID=' + restaurantID, "mi")
 			});
 		}
 	}, {
@@ -675,9 +674,9 @@ var orderPanel = new Ext.Panel({
 		handler : function() {
 			var href = '';
 			if(isGroup){
-				href = 'CheckOut.html?' + 'pin=' + pin + '&restaurantID=' + restaurantID + '&orderID=' + orderID + '&category=' + tableCategory;
+				href = 'CheckOut.html?'+ strEncode('restaurantID=' + restaurantID + '&orderID=' + orderID + '&category=' + tableCategory, 'mi');
 			}else{
-				href = 'CheckOut.html?' + 'pin=' + pin + '&restaurantID=' + restaurantID + '&tableID=' + tableAliasID+ '&personCount=1';
+				href = 'CheckOut.html?'+ strEncode('restaurantID=' + restaurantID + '&tableID=' + tableAliasID+ '&personCount=1', 'mi');
 			}
 			submitOrderHandler({
 				href : href			
@@ -693,7 +692,7 @@ var orderPanel = new Ext.Panel({
 		text : '返回',
 		handler : function() {
 			if (orderIsChanged == false) {
-				location.href = 'TableSelect.html?' + 'pin=' + pin + '&restaurantID=' + restaurantID;
+				location.href = 'TableSelect.html?'+ strEncode('restaurantID=' + restaurantID, 'mi');
 			} else {
 				Ext.MessageBox.show({
 					msg : '下/改单还未提交，是否确认退出？',
@@ -701,7 +700,7 @@ var orderPanel = new Ext.Panel({
 					buttons : Ext.MessageBox.YESNO,
 					fn : function(btn) {
 						if (btn == 'yes') {
-							location.href = 'TableSelect.html?' + 'pin=' +pin + '&restaurantID=' + restaurantID;
+							location.href = 'TableSelect.html?'+ strEncode('restaurantID=' + restaurantID, 'mi');
 						}
 					}
 				});
@@ -776,5 +775,5 @@ Ext.onReady(function() {
 	});
 
 	initMainView(null, centerPanel, null);
-	getOperatorName(pin, '../../');
+	getOperatorName("../../");
 });

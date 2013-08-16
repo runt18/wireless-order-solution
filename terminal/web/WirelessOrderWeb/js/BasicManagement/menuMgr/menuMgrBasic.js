@@ -470,7 +470,7 @@ function basicOperationBasicHandler(c){
 	Ext.Ajax.request({
 		url : actionURL,
 		params : {
-			pin : pin,
+			
 			restaurantID : restaurantID,
 			foodID : (typeof(c.data) != 'undefined' && typeof(c.data.id) != 'undefined' ? c.data.id : 0),
 			foodName : foodName.getValue().trim(),

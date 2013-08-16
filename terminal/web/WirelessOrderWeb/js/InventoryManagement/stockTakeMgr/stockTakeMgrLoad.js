@@ -70,7 +70,7 @@ function initGrid(){
 			['操作', 'operate', ,'center', 'stockTakeGridOperateRenderer']
 		],
 		StockTakeRecord.getKeys(),
-		[['isPaging', true], ['pin',pin], ['restaurantId', restaurantID], ['dataSource', 'normal']],
+		[['isPaging', true],  ['restaurantId', restaurantID], ['dataSource', 'normal']],
 		GRID_PADDING_LIMIT_20,
 		'',
 		stockTakeGridTbar
@@ -132,7 +132,7 @@ function initWin(){
     					url: '../../QueryDept.do?',
     					baseParams : {
     						dataSource : 'normal',
-    						pin : pin
+    						
     					},
     					root : 'root',
     					fields : DeptRecord.getKeys()
@@ -274,7 +274,7 @@ function initWin(){
 				root : 'root',
 				baseParams : {
 					dataSource : 'normal',
-					pin : pin,
+					
 					restaurantID : restaurantID
 				},
 				fields : MaterialDeptRecord.getKeys()
@@ -372,7 +372,7 @@ function initWin(){
 			['盘盈数', 'deltaAmount',80,'right', 'overageAmountRenderer']
 		],
 		StockTakeDetailRecord.getKeys(),
-		[['isPaging', true], ['pin',pin], ['dataSource', 'stockTakeDetail'], ['restaurantId', restaurantID], ['stockStatus', 3]],
+		[['isPaging', true],  ['dataSource', 'stockTakeDetail'], ['restaurantId', restaurantID], ['stockStatus', 3]],
 		GRID_PADDING_LIMIT_20,
 		''
 	);
@@ -429,7 +429,7 @@ function initWin(){
 					url : '../../OperateStockTake.do',
 					params : {
 						dataSource : stockTakeWin.otype.toLowerCase(),
-						pin : pin,
+						
 						id : id.getValue(),
 						dept : dept.getValue(),
 						cateType : cate.getValue(),

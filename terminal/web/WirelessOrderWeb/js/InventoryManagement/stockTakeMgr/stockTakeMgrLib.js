@@ -89,7 +89,7 @@ function insertStockTakeHandler(){
 		url : '../../OperateStockTake.do',
 		params : {
 			dataSource : 'checkCurrentMonth',
-			pin : pin
+			
 		},
 		success : function(res, opt){
 			var jr = Ext.decode(res.responseText);
@@ -98,7 +98,7 @@ function insertStockTakeHandler(){
 					url : '../../OperateStockTake.do',
 					params : {
 						dataSource : 'checkStockAction',
-						pin : pin
+						
 					},
 					success : function(res, opt){
 						var jr = Ext.decode(res.responseText);
@@ -210,7 +210,7 @@ function cancelStockTakeHandler(){
 					url : '../../OperateStockTake.do',
 					params : {
 						'dataSource' : 'cancel',
-						pin : pin,
+						
 						id : data['id']
 					},
 					success : function(res, opt){
@@ -247,7 +247,7 @@ function auditStockTakeHandlerCenter(c){
 					url : '../../OperateStockTake.do',
 					params : {
 						'dataSource' : 'audit',
-						pin : pin,
+						
 						id : c.data['id']
 					},
 					success : function(res, opt){
@@ -349,7 +349,7 @@ function operateMissDetail(c){
 		url : '../../OperateStockTake.do',
 		params : {
 			'dataSource' : 'miss',
-			pin : pin,
+			
 			id : c.data['id'],
 			miss : c.miss
 		},

@@ -288,7 +288,7 @@ function initOperateMaterialWin(){
 						url : '../../OperateMaterial.do',
 						params : {
 							dataSource : dataSource,
-							pin : pin,
+							
 							restaurantID : restaurantID,
 							id : materialId.getValue(),
 							name : materialName.getValue(),
@@ -335,7 +335,7 @@ function initOperateMaterialWin(){
 						url : '../../OperateMaterial.do',
 						params : {
 							dataSource : dataSource,
-							pin : pin,
+							
 							restaurantID : restaurantID,
 							id : materialId.getValue(),
 							name : materialName.getValue(),

@@ -132,7 +132,7 @@ Ext.onReady(function(){
 		['clientID', 'name', 'clientType', 'clientTypeID', 'clientType.name', 'birthdayFormat', 'birthday',
 		 'memberAccount', 'sexDisplay', 'sex', 'mobile', 'tele', 'company', 
 		 'tastePref', 'taboo', 'comment', 'contactAddress', 'IDCard'],
-		[['pin',pin], ['isPaging', true], ['restaurantID', restaurantID]],
+		[ ['isPaging', true], ['restaurantID', restaurantID]],
 		GRID_PADDING_LIMIT_10,
 		'',
 		sc_searchClientGridTbar

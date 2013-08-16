@@ -77,7 +77,6 @@ var haveMaterialGrid = new Ext.grid.EditorGridPanel({
 			beforeload : function(){
 				var selData = Ext.ux.getSelData('menuMgrGrid');
 				this.baseParams['foodID'] = selData.foodID;
-				this.baseParams['pin'] = pin;
 				this.baseParams['restaurantID'] = restaurantID;
 			},
 			load : function(thiz, rs){
@@ -158,7 +157,7 @@ var allMaterialGrid = createGridPanel(
 //		['种类', 'cateName']
 	],
 	['materialName', 'price','materialAlias','materialID', 'cateID', 'cateName', 'warningNbr', 'dangerNbr', 'storage'],
-	[['pin',pin], ['type',0], ['isDanger',false], ['isWarning', false], ['isPaging',true], ['value', '']],
+	[ ['type',0], ['isDanger',false], ['isWarning', false], ['isPaging',true], ['value', '']],
 	30,
 	'',
 	allMaterialGridTbar

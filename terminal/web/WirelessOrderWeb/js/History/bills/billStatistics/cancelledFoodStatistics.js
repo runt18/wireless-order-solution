@@ -179,7 +179,7 @@ function cancelFoodDetailsStatPanelInit(){
          ['退菜原因','reason', 200]
 		],
 		['orderDateFormat', 'foodName', 'deptName', 'orderID', 'unitPrice', 'count', 'totalPrice', 'waiter', 'reason'],
-		[['pin', pin], ['isPaging', true], ['qtype', 2], ['otype', 0], ['dtype', 1]],
+		[ ['isPaging', true], ['qtype', 2], ['otype', 0], ['dtype', 1]],
 		15,
 		null,
 		cfdsGridTbar
@@ -334,7 +334,7 @@ function cancelFoodByDeptStatPanelInit(){
          ['退菜金额','price', ,'right','Ext.ux.txtFormat.gridDou']		              
 		],
 		['reason.reason', 'amount','price'],
-		[['pin', pin], ['qtype', 0], ['otype', 0], ['dtype', 1]],
+		[ ['qtype', 0], ['otype', 0], ['dtype', 1]],
 		0,
 		null,
 		cfbdsGridTbar
@@ -472,7 +472,7 @@ function cancelFoodByReasonStatPanelInit(){
          ['退菜金额','price', ,'right','Ext.ux.txtFormat.gridDou']		              
 		],
 		['dept.name','amount','price'],
-		[['pin', pin], ['qtype', 1], ['otype', 0], ['dtype', 1]],
+		[ ['qtype', 1], ['otype', 0], ['dtype', 1]],
 		15,
 		null,
 		cfbrsGridTbar

@@ -54,7 +54,7 @@ var btnPushBack = new Ext.ux.ImageButton({
 	imgHeight : 50,
 	tooltip : '返回',
 	handler : function(e){
-		location.href = './ClientMain.html?restaurantID=' + restaurantID + '&isNewAccess=false&' + '&pin=' + pin;
+		location.href = './ClientMain.html?'+ strEncode('restaurantID=' + restaurantID + '&isNewAccess=false', 'mi');
 	}
 });
 
@@ -102,7 +102,7 @@ Ext.onReady(function(){
 	});
 
 	initMainView(null, center, null);
-	getOperatorName(pin, '../../');
+	getOperatorName("../../");
 	 
 	winInit();
 	memberBasicWin.render(document.body);

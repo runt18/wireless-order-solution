@@ -307,7 +307,7 @@ function stockTaskNavHandler(e){
 					url : '../../OperateStockAction.do',
 					params : {
 						'dataSource' : stockTaskNavWin.otype.toLowerCase(),
-						pin : pin,
+						
 						id : id.getValue(),
 						deptIn : deptIn.getValue(),
 						supplier : supplier.getValue(),
@@ -482,7 +482,7 @@ function insertStockActionHandler(){
 		url : '../../OperateStockAction.do',
 		params : {
 			'dataSource' : 'checkStockTake',
-			pin : pin
+			
 		},
 		success : function(res, opt){
 			var jr = Ext.decode(res.responseText);
@@ -573,7 +573,7 @@ function deleteStockActionHandler(){
 					url : '../../OperateStockAction.do',
 					params : {
 						'dataSource' : 'delete',
-						pin : pin,
+						
 						id : data['id']
 					},
 					success : function(res, opt){
@@ -617,7 +617,7 @@ function auditStockActionHandler(){
 					url : '../../OperateStockAction.do',
 					params : {
 						'dataSource' : 'audit',
-						pin : pin,
+						
 						id : data['id']
 					},
 					success : function(res, opt){
@@ -677,7 +677,7 @@ function exportExcel(){
 	url = String.format(
 		url,
 		'ExportHistoryStatisticsToExecl.do',
-		pin,
+		-10,
 		sn.data.id,
 		'stockAction'
 	);
@@ -692,7 +692,7 @@ function operateExportExcel(id){
 	url = String.format(
 		url,
 		'ExportHistoryStatisticsToExecl.do',
-		pin,
+		-10,
 		id,
 		'stockAction'
 	);

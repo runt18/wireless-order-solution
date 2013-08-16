@@ -8,8 +8,8 @@ function initData(){
 		url : '../../QueryMenu.do',
 		params : {
 			dataSource : 'kitchens',
-			pin : pin,
-			restaurantID : restaurantID
+			restaurantID : restaurantID,
+			type : 3
 		},
 		success : function(res, opt) {
 			var jr = Ext.decode(res.responseText);
@@ -75,7 +75,7 @@ function initTree(){
 		loader : new Ext.tree.TreeLoader({
 			dataUrl : '../../QueryPricePlanTree.do',
 			baseParams : {
-				pin : pin,
+				
 				restaurantID : restaurantID
 			}
 		}),
@@ -316,7 +316,7 @@ function initGrid(){
 			['操作', 'operation', '', 'center', 'priceBaiscGridRenderer']
 		],
 		FoodPricePlanRecord.getKeys(),
-		[['pin',pin], ['isPaging', true], ['restaurantID', restaurantID]],
+		[ ['isPaging', true], ['restaurantID', restaurantID]],
 		GRID_PADDING_LIMIT_20,
 		'',
 		tbar
@@ -434,7 +434,7 @@ function initWin(){
 				Ext.Ajax.request({
 					url : action,
 					params : {
-						pin : pin,
+						
 						restaurantID : restaurantID,
 						name : pricePlan.name,
 						id : pricePlan.id,

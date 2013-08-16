@@ -11,7 +11,7 @@
 				imgHeight : 50,
 				tooltip : '返回',
 				handler : function(e){
-					location.href = '../PersonLogin.html?restaurantID=' + restaurantID + '&isNewAccess=false' + '&pin=' + pin;
+					location.href = '../PersonLogin.html?'+ strEncode('restaurantID=' + restaurantID + '&isNewAccess=false', 'mi');
 				}
 			}), {
 				xtype : 'tbtext',
@@ -35,7 +35,7 @@
 	});
 	
 	initMainView(null, center,null);
-	getOperatorName(pin, '../../');
+	getOperatorName("../../");
 	
 	bingActiveEvent();
 });
@@ -45,19 +45,19 @@ function bingActiveEvent(){
 //	bindActiveEvent('clientMgr', 
 //			'url(../../images/clientMgr_select.png) no-repeat 50%',
 //			'url(../../images/clientMgr.png) no-repeat 50%',
-//			"SupplierManagement.html?pin=" + pin + "&restaurantID=" + restaurantID
+//			"SupplierManagement.html"+ strEncode('restaurantID=' + restaurantID, 'mi')
 //	);
 	// ---------------------------------
 	bindActiveEvent('memberTypeMgr', 
 			'url(../../images/memberTypeMgr_select.png) no-repeat 50%',
 			'url(../../images/memberTypeMgr.png) no-repeat 50%',
-			"MemberTypeManagement.html?pin=" + pin + "&restaurantID=" + restaurantID
+			"MemberTypeManagement.html?"+ strEncode('restaurantID=' + restaurantID, 'mi')
 	);
 	// ---------------------------------
 	bindActiveEvent('memberMgr', 
 			'url(../../images/memberMgr_select.png) no-repeat 50%',
 			'url(../../images/memberMgr.png) no-repeat 50%',
-			"MemberManagement.html?pin=" + pin + "&restaurantID=" + restaurantID
+			"MemberManagement.html?"+ strEncode('restaurantID=' + restaurantID, 'mi')
 	);
 };
 

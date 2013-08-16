@@ -5,7 +5,7 @@
 			dataSource : 'normal',
 			restaurantID : restaurantID,
 			isPaging : false,
-			pin : pin
+			
 		},
 		success : function(res, opt){
 			discountData = Ext.decode(res.responseText);

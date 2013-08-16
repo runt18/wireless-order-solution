@@ -251,7 +251,7 @@ Ext.onReady(function(){
 			['操作人', 'staffName', 60]
 		],
 		MemberOperationRecord.getKeys(),
-		[['pin',pin], ['isPaging', true], ['restaurantID', restaurantID]],
+		[ ['isPaging', true], ['restaurantID', restaurantID]],
 		GRID_PADDING_LIMIT_20,
 		'',
 		cdd_mo_tbar

@@ -655,7 +655,7 @@ function refreshOrderHandler(){
 	Ext.Ajax.request({
 		url : '../../QueryOrder.do',
 		params : {
-			'pin' : pin,
+			
 			'tableID' : tableAliasID
 		},
 		success : function(response, options) {
@@ -693,7 +693,7 @@ function refreshOrderHandler(){
  * 根据返回做错误码作相关操作
  */
 function refreshOrder(res){
-	var href = 'TableSelect.html?pin=' + Request['pin'] + '&restaurantID=' + restaurantID;
+	var href = 'TableSelect.html?'+ strEncode('restaurantID=' + restaurantID, "mi");
 	if(eval(res.code == 14)){
 		Ext.MessageBox.confirm('警告', '账单信息已更新,是否刷新已点菜并继续操作?否则返回.', function(btn){
 			if(btn == 'yes'){
@@ -722,7 +722,7 @@ function refreshOrder(res){
 			buttons : Ext.MessageBox.OK,
 			fn : function(){
 				if(submitType != 6){
-					location.href = "TableSelect.html?pin=" + Request["pin"] + "&restaurantID=" + restaurantID;
+					location.href = "TableSelect.html?"+ strEncode('restaurantID=' + restaurantID, 'mi');
 				}
 			}
 		});
@@ -792,7 +792,7 @@ function submitSingleOrderHandler(_c){
 		Ext.Ajax.request({
 			url : '../../InsertOrder.do',
 			params : {
-				'pin' : pin,
+				
 				'tableID' : tableAliasID,
 				'orderID' : _c.grid.order.id,
 				'customNum' : 1,
@@ -860,7 +860,7 @@ function submitOrderGroupHandler(_c){
 		url : '../../UpdateOrderGroup.do',
 		params : {
 			'dataSource' : 'updateOrder',
-			'pin' : pin,
+			
 			'restaurantID' : restaurantID,
 			'parentOrderID' : orderGroupData.root[0].id,
 			'type' : tableStatus == 1 ? 'update' : 'insert',

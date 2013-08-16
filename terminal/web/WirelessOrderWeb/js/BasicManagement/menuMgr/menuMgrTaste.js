@@ -109,7 +109,6 @@ var commonTasteGrid = new Ext.grid.EditorGridPanel({
 			beforeload : function(){
 				var selData = Ext.ux.getSelData('menuMgrGrid');
 				this.baseParams['foodID'] = selData.id;
-				this.baseParams['pin'] = pin;
 				this.baseParams['restaurantID'] = restaurantID;
 			}
 		}
@@ -190,7 +189,7 @@ var allTasteGrid = createGridPanel(
 	    ['计算方式', 'calcValue', '', '', 'tasteCalcRenderer']
 	],
 	TasteRecord.getKeys(),
-	[['pin',pin], ['type',0], ['isCombo',false], ['isPaging',false]],
+	[ ['type',0], ['isCombo',false], ['isPaging',false]],
 	0,
 	'',
 	allTasteGridTbar

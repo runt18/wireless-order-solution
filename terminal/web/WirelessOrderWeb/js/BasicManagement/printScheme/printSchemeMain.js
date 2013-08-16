@@ -4,7 +4,7 @@ var pushBackBut = new Ext.ux.ImageButton({
 	imgHeight : 50,
 	tooltip : '返回',
 	handler : function(btn){
-		location.href = 'BasicMgrProtal.html?restaurantID=' + restaurantID + '&pin=' + pin;
+		location.href = 'BasicMgrProtal.html?'+strEncode("restaurantID=" + restaurantID, "mi");
 	}
 });
 
@@ -28,7 +28,6 @@ Ext.Ajax.request({
 	url : '../../QueryKitchen.do',
 	params : {
 		dataSource : 'normal',
-		pin : pin
 	},
 	success : function(res, opt){
 		var jr = Ext.decode(res.responseText);
@@ -63,7 +62,6 @@ Ext.Ajax.request({
 	url : '../../QueryDept.do',
 	params : {
 		dataSource : 'normal',
-		pin : pin
 	},
 	success : function(res, opt){
 		var jr = Ext.decode(res.responseText);
@@ -95,7 +93,6 @@ Ext.Ajax.request({
 	url : '../../QueryRegion.do',
 	params : {
 		dataSource : 'normal',
-		pin : pin
 	},
 	success : function(res, opt){
 		var jr = Ext.decode(res.responseText);
@@ -200,7 +197,6 @@ var addPrintFunc = new Ext.Window({
 			Ext.Ajax.request({
 				url : '../../OperatePrintFunc.do',
 				params : {
-					pin : pin,
 					repeat : repeat,
 					pType : pType,
 					kitchens : kitchens,
@@ -307,7 +303,6 @@ var addPrintFunc = new Ext.Window({
 			Ext.Ajax.request({
 				url : '../../OperatePrintFunc.do',
 				params : {
-					pin : pin,
 					repeat : repeat,
 					pType : pType,
 					kitchens : kitchens,
@@ -728,7 +723,6 @@ var printerWin = new Ext.Window({
 			Ext.Ajax.request({
 				url : '../../OperatePrinter.do',
 				params : {
-					pin : pin,
 					printerName : printerName.getValue(),
 					printerAlias : printerAlias.getValue(),
 					style : style,
@@ -832,7 +826,6 @@ function deletePrintFuncOperationHandler(){
 					Ext.Ajax.request({
 						url : '../../OperatePrintFunc.do',
 						params : {
-							pin : pin,
 							printFuncId : ss.data.printFuncId,
 							dataSource : 'delete'
 						},
@@ -1058,7 +1051,6 @@ function operatePrinterHandler(c){
 						url : '../../OperatePrinter.do',
 						params : {
 							dataSource : 'delete',
-							pin : pin,
 							printerId : sn.attributes.printerId
 						},
 						success : function(res, opt){
@@ -1134,9 +1126,6 @@ Ext.onReady(function(){
 		
 		loader : new Ext.tree.TreeLoader({
 			dataUrl : '../../QueryPrinterTree.do',
-			baseParams : {
-				pin : pin
-			}
 		}),
 		root : new Ext.tree.AsyncTreeNode({
 			expanded : true,
@@ -1293,7 +1282,7 @@ Ext.onReady(function(){
 		})
 		
 	});
-	getOperatorName(pin, "../../");
+	getOperatorName("../../");
 	new Ext.Viewport({
 		layout : 'border',
 		id : 'viewport',

@@ -120,9 +120,7 @@ Ext.onReady(function() {
 		imgHeight : 50,
 		tooltip : "返回",
 		handler : function(btn) {
-			location.href = "../PersonLogin.html?restaurantID="
-						+ restaurantID + "&isNewAccess=false&pin="
-						+ currPin;
+			location.href = "../PersonLogin.html?"+ strEncode('restaurantID=' + restaurantID + '&isNewAccess=false', 'mi');
 		}
 	});
 	

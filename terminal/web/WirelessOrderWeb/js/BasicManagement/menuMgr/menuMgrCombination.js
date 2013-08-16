@@ -69,7 +69,6 @@ var combinationFoodGrid = new Ext.grid.EditorGridPanel({
 			beforeload : function(){
 				var selData = Ext.ux.getSelData('menuMgrGrid');
 				this.baseParams['foodID'] = selData.id;
-				this.baseParams['pin'] = pin;
 				this.baseParams['restaurantID'] = restaurantID;
 			},
 			load : function(){
@@ -143,7 +142,7 @@ var allFoodMiniGrid = createGridPanel(
 	    ['价格', 'unitPrice', '', 'right', 'Ext.ux.txtFormat.gridDou']
 	],
 	FoodBasicRecord.getKeys(),
-    [['pin', pin], ['restaurantId', restaurantID], ['isPaging', true]],
+    [ ['restaurantId', restaurantID], ['isPaging', true]],
     GRID_PADDING_LIMIT_20,
     '',
     allFoodMiniGridTbar

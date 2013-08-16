@@ -7,7 +7,7 @@ var pushBackBut = new Ext.ux.ImageButton({
 	imgHeight : 50,
 	tooltip : '返回',
 	handler : function(btn){
-		location.href = 'InventoryProtal.html?restaurantID=' + restaurantID + '&pin=' + pin;
+		location.href = 'InventoryProtal.html?'+ strEncode('restaurantID=' + restaurantID, 'mi');
 	}
 });
 
@@ -116,7 +116,7 @@ Ext.onReady(function(){
 	//数据加载器
 	var ds = new Ext.data.Store({
 		//proxy : new Ext.data.MemoryProxy(data),
-		proxy : new Ext.data.HttpProxy({url:'../../QueryReport.do?pin=' + pin}),
+		proxy : new Ext.data.HttpProxy({url:'../../QueryReport.do'}),
 		reader : new Ext.data.JsonReader({totalProperty:'totalProperty', root : 'root'}, [
 	         {name : 'materialId'},
 	         {name : 'materialName'},
@@ -357,7 +357,7 @@ Ext.onReady(function(){
 			]
 		})
 	});
-    getOperatorName(pin, "../../");
+    getOperatorName("../../");
 	new Ext.Viewport({
 		layout : 'border',
 		id : 'viewport',

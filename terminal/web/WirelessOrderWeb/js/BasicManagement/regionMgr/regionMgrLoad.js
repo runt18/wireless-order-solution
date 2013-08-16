@@ -26,7 +26,7 @@ function initTree(){
 				dataUrl : '../../QueryRegion.do',
 				baseParams : {
 					dataSource : 'tree',
-					pin : pin
+					
 				}
 			}),
 			listeners : {
@@ -98,7 +98,7 @@ function initTree(){
 									url : '../../OperateRegion.do',
 									params : {
 										dataSource : 'update',
-										pin : pin,
+										
 										id : id.getValue(),
 										name : name.getValue()
 									},
@@ -218,7 +218,7 @@ function initGrid(){
 			['操作', 'operate', 200 ,'center', 'tableBasicGridOperateRenderer']
 		],
 		TableRecord.getKeys(),
-		[['isPaging', true], ['restaurantID', restaurantID], ['pin', pin], ['dataSource', 'normal']],
+		[['isPaging', true], ['restaurantID', restaurantID],  ['dataSource', 'normal']],
 		GRID_PADDING_LIMIT_20,
 		'',
 		tableBasicGridTbar
@@ -353,7 +353,7 @@ function initWin(){
 					url : '../../OperateTable.do',
 					params : {
 						dataSource : tableBasicWin.otype.toLowerCase(),
-						pin : pin,
+						
 						alias : alias.getValue(),
 						id : id.getValue(),
 						name : name.getValue(),

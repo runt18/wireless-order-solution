@@ -68,7 +68,7 @@ var paySubmit = function(submitType) {
 			Ext.Ajax.request({
 				url : "../../PayOrder.do",
 				params : {
-					"pin" : pin,
+					
 					"orderID" : orderMsg.id,
 					"cashIncome" : submitPrice,
 					"payType" : payType,
@@ -133,9 +133,7 @@ var paySubmit = function(submitType) {
 									text : '确&nbsp;&nbsp;定',
 									handler : function(e){
 										if (submitType != 6) {
-											location.href = "TableSelect.html?pin="
-													+ pin + "&restaurantID="
-													+ restaurantID;
+											location.href = "TableSelect.html?"+ strEncode('restaurantID=' + restaurantID, 'mi');
 										}
 									},
 									listeners : {
@@ -149,9 +147,7 @@ var paySubmit = function(submitType) {
 										new Ext.util.TaskRunner().start({
 											run: function(){
 												if(interval < 1){
-													location.href = "TableSelect.html?pin="
-														+ Request["pin"] + "&restaurantID="
-														+ restaurantID;
+													location.href = "TableSelect.html?"+ strEncode('restaurantID=' + restaurantID, 'mi');
 												}
 												Ext.getDom('returnInterval').innerHTML = interval;
 												interval--;
@@ -228,7 +224,7 @@ function memberPay(){
 					if(memberPayOrderHandler){
 						memberPayOrderHandler({
 							tempPay : true,
-							pin : pin,
+							
 							disabledButton : function(){
 								bindMemberWin.buttons[0].setDisabled(true);
 								bindMemberWin.buttons[1].setDisabled(true);
@@ -255,7 +251,7 @@ function memberPay(){
 					if(memberPayOrderHandler){
 						memberPayOrderHandler({
 							tempPay : false,
-							pin : pin,
+							
 							disabledButton : function(){
 								bindMemberWin.buttons[0].setDisabled(true);
 								bindMemberWin.buttons[1].setDisabled(true);
@@ -307,7 +303,7 @@ function memberPay(){
 											text : '确&nbsp;&nbsp;定',
 											width : 200,
 											handler : function(e){
-												location.href = "TableSelect.html?pin=" + pin +  "&restaurantID=" + restaurantID;
+												location.href = "TableSelect.html?"+ strEncode('restaurantID=' + restaurantID, 'mi');
 											}
 										}],
 										listeners : {
@@ -315,7 +311,7 @@ function memberPay(){
 												new Ext.util.TaskRunner().start({
 													run: function(){
 														if(interval < 1){
-															location.href = "TableSelect.html?pin=" + pin +  "&restaurantID=" + restaurantID;
+															location.href = "TableSelect.html?"+ strEncode('restaurantID=' + restaurantID, 'mi');
 														}
 														Ext.getDom('returnInterval').innerHTML = interval;
 														interval--;

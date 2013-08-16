@@ -14,7 +14,7 @@ var btnPushBack = new Ext.ux.ImageButton({
 	imgHeight : 50,
 	tooltip : '返回',
 	handler : function(e){
-		location.href = './ClientMain.html?restaurantID=' + restaurantID + '&isNewAccess=false&' + '&pin=' + pin;
+		location.href = './ClientMain.html?'+ strEncode('restaurantID=' + restaurantID + '&isNewAccess=false', 'mi');
 	}
 });
 
@@ -91,7 +91,7 @@ function memberTypeOperationHandler(c){
 						params : {
 							dataSource : 'delete',
 							restaurantID : restaurantID,
-							pin : pin,
+							
 							typeID : sd['id'],
 							discountType : sd['discountTypeValue'],
 							discountID : sd['discount']['id']
@@ -197,7 +197,7 @@ Ext.onReady(function(){
 	});
 	
 	initMainView(null, centerPanel, null);
-	getOperatorName(pin, '../../');
+	getOperatorName("../../");
 	 
 	memberTypeWinInit();
 	/*

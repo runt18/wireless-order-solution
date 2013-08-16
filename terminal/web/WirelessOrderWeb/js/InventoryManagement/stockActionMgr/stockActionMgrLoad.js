@@ -209,7 +209,7 @@ function initControl(){
 						url : '../../QueryDept.do',
 						params : {
 							dataSource : 'normal',
-							pin : pin
+							
 						},
 						success : function(res, opt){
 							var jr = Ext.decode(res.responseText);
@@ -277,7 +277,7 @@ function initControl(){
 					Ext.Ajax.request({
 						url : '../../QuerySupplier.do',
 						params : {
-							pin : pin
+							
 						},
 						success : function(res, opt){
 							var jr = Ext.decode(res.responseText);
@@ -375,7 +375,7 @@ function initControl(){
 			['操作', 'center', 150, 'center', 'stockOperateRenderer']
 		],
 		StockRecord.getKeys(),
-		[['isPaging', true], ['pin',pin], ['restaurantId', restaurantID]],
+		[['isPaging', true],  ['restaurantId', restaurantID]],
 		GRID_PADDING_LIMIT_20,
 		'',
 		stockBasicGridTbar
@@ -646,7 +646,7 @@ function initControl(){
     					url: '../../QueryDept.do?',
     					baseParams : {
     						dataSource : 'normal',
-    						pin : pin
+    						
     					},
     					root : 'root',
     					fields : DeptRecord.getKeys()
@@ -676,7 +676,7 @@ function initControl(){
     				width : 103,
     				listWidth : 120,
     				store : new Ext.data.JsonStore({
-    					url: '../../QuerySupplier.do?pin='+pin,
+    					url: '../../QuerySupplier.do',
     					root : 'root',
     					fields : SupplierRecord.getKeys()
     				}),
@@ -708,7 +708,7 @@ function initControl(){
     					url: '../../QueryDept.do?',
     					baseParams : {
     						dataSource : 'normal',
-    						pin : pin
+    						
     					},
     					root : 'root',
     					fields : DeptRecord.getKeys()
@@ -800,7 +800,7 @@ function initControl(){
 			['总价', 'totalPrice',80,'right', 'stockDetailTotalPriceRenderer']
 		],
 		StockDetailRecord.getKeys(),
-		[['isPaging', true], ['pin',pin], ['restaurantId', restaurantID], ['stockStatus', 3]],
+		[['isPaging', true],  ['restaurantId', restaurantID], ['stockStatus', 3]],
 		GRID_PADDING_LIMIT_20,
 		''
 	);
@@ -856,7 +856,7 @@ function initControl(){
 				url : '../../QueryMaterial.do',
 				baseParams : {
 					dataSource : 'normal',
-					pin : pin,
+					
 					restaurantID : restaurantID
 				},
 				root : 'root',
@@ -906,7 +906,7 @@ function initControl(){
 							url : '../../QueryMaterial.do',
 							params : {
 								dataSource : 'normal',
-								pin : pin,
+								
 								restaurantID : restaurantID,
 								materialId : thiz.getValue()
 							},

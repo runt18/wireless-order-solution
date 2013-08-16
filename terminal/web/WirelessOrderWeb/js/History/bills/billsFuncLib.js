@@ -23,7 +23,7 @@
 	var gs = billsGrid.getStore();
 	gs.baseParams['isPaging'] = true;
 	gs.baseParams['restaurantID'] = restaurantID;
-	gs.baseParams['pin'] = pin;
+	
 	gs.baseParams['type'] = sType;
 	gs.baseParams['ope'] = sOperator;
 	gs.baseParams['value'] = sValue;

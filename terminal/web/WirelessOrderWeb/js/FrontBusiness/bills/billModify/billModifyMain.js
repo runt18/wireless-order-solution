@@ -173,5 +173,5 @@ Ext.onReady(function(){
 	});
 	
 	initMainView(null, billModCenterPanel, null);
-	getOperatorName(pin, "../../");
+	getOperatorName("../../");
 });

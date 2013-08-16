@@ -330,19 +330,15 @@ function tableListReflash(node) {
 				temp = tableStatusListTSDisplay[i];
 				if (temp.alias == selectedTable) {
 					if (temp.statusValue == TABLE_IDLE) {
-						location.href = "OrderMain.html?"
-							+ "pin=" + pin
-							+ "&restaurantID=" + restaurantID
-							+ "&tableAliasID=" + selectedTable
-							+ "&ts=0"
-							+ "&category=1"
-							+ "&minCost=" + temp.minimumCost
-							+ "&serviceRate=" + temp.serviceRate;
+						location.href = "OrderMain.html?"+ strEncode('restaurantID=' + restaurantID
+								+ "&tableAliasID=" + selectedTable
+								+ "&ts=0"
+								+ "&category=1"
+								+ "&minCost=" + temp.minimumCost
+								+ "&serviceRate=" + temp.serviceRate
+								, 'mi');
 					} else {
-						location.href = "CheckOut.html?"
-							+ "tableID=" + selectedTable
-							+ "&pin=" + pin
-							+ "&restaurantID=" + restaurantID;
+						location.href = "CheckOut.html?"+ strEncode('restaurantID=' + restaurantID+ "&tableID=" + selectedTable, 'mi');
 					}
 					break;
 				}
@@ -448,7 +444,7 @@ function memberPointConsume(c){
 			url : '../../OperateMember.do',
 			params : {
 				dataSource : 'consumePoint',
-				pin : pin,
+				
 				memberId : memberPointConsumeWin.member['id'],
 				point : consumePoint.getValue()
 			},

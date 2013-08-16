@@ -49,7 +49,7 @@
 function staffMgrOnLoad() {
 
 	// update the operator name
-	getOperatorName(pin, "../../");
+	getOperatorName("../../");
 
 	searchForm.remove("conditionText");
 

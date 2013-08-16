@@ -109,7 +109,7 @@ staffAddWin = new Ext.Window({
 						Ext.Ajax.request({
 							url : '../../InsertStaff.do',
 							params : {
-								'pin' : pin,
+								
 								'staffNumber' : staffAddNumber,
 								'staffName' : staffAddName,
 								'staffPwd' : staffAddPwd,
@@ -249,7 +249,7 @@ var changePwdWin = new Ext.Window({
 						Ext.Ajax.request({
 							url : '../../ResetStaffPassword.do',
 							params : {
-								'pin' : pin,
+								
 								'staffID' : staffID,
 								'newPwd' : hex_md5(newPwd)
 							},
@@ -345,12 +345,12 @@ var pushBackBut = new Ext.ux.ImageButton({
 				buttons : Ext.MessageBox.YESNO,
 				fn : function(btn) {
 					if (btn == 'yes') {
-						location.href = 'BasicMgrProtal.html?restaurantID=' + restaurantID + '&pin=' + pin;
+						location.href = 'BasicMgrProtal.html?'+ strEncode('restaurantID=' + restaurantID, 'mi');
 					}
 				}
 			});
 		} else {
-			location.href = 'BasicMgrProtal.html?restaurantID=' + restaurantID + '&pin=' + pin;
+			location.href = 'BasicMgrProtal.html?'+ strEncode('restaurantID=' + restaurantID, 'mi');
 		}
 	}
 });
@@ -445,7 +445,7 @@ function staffDeleteHandler(rowIndex){
 				Ext.Ajax.request({
 					url : '../../DeleteStaff.do',
 					params : {
-						'pin' : pin,
+						
 						'staffID' : staffID
 					},
 					success : function(response, options) {
@@ -741,7 +741,7 @@ Ext.onReady(function() {
 					Ext.Ajax.request({
 						url : '../../UpdateStaff.do',
 						params : {
-							'pin' : pin,
+							
 							'modStaffs' : modStaffs
 						},
 						success : function(response, options) {

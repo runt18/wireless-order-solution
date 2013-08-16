@@ -6,7 +6,7 @@
 		imgHeight : 50,
 		tooltip : "返回",
 		handler : function(btn) {
-			location.href = "../PersonLogin.html?restaurantID=" + restaurantID + "&isNewAccess=false&pin=" + pin;
+			location.href = "../PersonLogin.html?"+ strEncode('restaurantID=' + restaurantID + '&isNewAccess=false', 'mi');
 		}
 	});
 
@@ -37,6 +37,6 @@
 	});
 	
 	initMainView(null,centerPanel,null);
-	getOperatorName(pin, "../../");
+	getOperatorName("../../");
 	
 });

@@ -8,7 +8,7 @@ function loadDiscountData(_c){
 	Ext.Ajax.request({
 		url : '../../QueryDiscountTree.do',
 		params : {
-			pin : pin,
+			
 			restaurantID : restaurantID
 		},
 		success : function(response, options) {
@@ -169,7 +169,7 @@ function loadTableData(_c){
 	Ext.Ajax.request({
 		url : "../../QueryOrder.do",
 		params : {
-			pin : pin,
+			
 			restaurantID : restaurantID,
 			tableID : tableID,
 			orderID : orderID,
@@ -227,7 +227,7 @@ function loadTableGroupData(_c){
 		url : "../../QueryOrderGroup.do",
 		params : {
 			queryType : 0, ////////
-			pin : pin,
+			
 			restaurantID : restaurantID,
 			status : 0,
 			tableID : tableID,
@@ -366,7 +366,7 @@ function refreshCheckOutData(_c){
 }
 
 function checkOutOnLoad() {	
-	getOperatorName(pin, "../../");
+	getOperatorName("../../");
 	// 加载系统设置
 	loadSystemSetting();
 	// 加载折扣方案
@@ -469,7 +469,7 @@ showCancelFoodDetail = function(){
 							time : new Date(),
 							limit : 200,
 							start : 0,
-							pin : pin,
+							
 							queryType : 'TodayByTbl',
 							tableAlias : tableID,
 							restaurantID : restaurantID

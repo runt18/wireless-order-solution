@@ -10,25 +10,24 @@
 				temp = tableStatusListTSDisplay[i];
 				if (temp.alias == selectedTable) {
 					if (temp.statusValue == TABLE_BUSY) {
-						location.href = "OrderMain.html?"
-							+ "pin=" + pin
-							+ "&restaurantID=" + restaurantID
-							+ "&tableAliasID=" + temp.alias
-							+ "&ts=1" 
-							+ "&personCount=" + temp.customNum
-							+ "&category=" + temp.categoryValue
-							+ "&minCost=" + temp.minCost
-							+ "&serviceRate=" + temp.serviceRate;
+						location.href = "OrderMain.html?"+ strEncode('restaurantID=' + restaurantID
+								+ "&tableAliasID=" + temp.alias
+								+ "&ts=1" 
+								+ "&personCount=" + temp.customNum
+								+ "&category=" + temp.categoryValue
+								+ "&minCost=" + temp.minCost
+								+ "&serviceRate=" + temp.serviceRate
+								, 'mi');
 					} else if (temp.statusValue == TABLE_IDLE) {
-						location.href = "OrderMain.html?"
-							+ "pin=" + pin
-							+ "&restaurantID=" + restaurantID
-							+ "&ts=0"
-							+ "&tableAliasID=" + selectedTable
-							+ "&personCount=1"
-							+ "&category=" + CATE_NORMAL
-							+ "&minCost=" + temp.minimumCost
-							+ "&serviceRate=" + temp.serviceRat;
+						location.href = "OrderMain.html?"+ strEncode('restaurantID=' + restaurantID
+								+ "&ts=0"
+								+ "&tableAliasID=" + selectedTable
+								+ "&personCount=1"
+								+ "&category=" + CATE_NORMAL
+								+ "&minCost=" + temp.minimumCost
+								+ "&serviceRate=" + temp.serviceRat
+								, 'mi')
+;
 					}
 					break;
 				}
@@ -53,10 +52,9 @@ var checkOutImgBut = new Ext.ux.ImageButton({
 					if (temp.statusValue == TABLE_IDLE) {
 						Ext.example.msg('提示', '<font color="red">操作失败, 此桌没有下单, 不能结账, 请重新确认.</font>');
 					} else {
-						location.href = "CheckOut.html?"
-							+ "tableID=" + selectedTable
-							+ "&pin=" + pin 
-							+ "&restaurantID=" + restaurantID;
+						location.href = "CheckOut.html?"+ strEncode('restaurantID=' + restaurantID
+								+ "&tableID=" + selectedTable	
+								, 'mi');
 					}
 					break;
 				}
@@ -205,7 +203,7 @@ var btnOrderDetail = new Ext.ux.ImageButton({
 					    ['退菜原因', 'cancelReason.reason']
 					],
 					OrderFoodRecord.getKeys(),
-					[['pin', pin], ['queryType', 'TodayByTbl'], ['tableAlias', selTabContent.alias], ['restaurantID', restaurantID]],
+					[ ['queryType', 'TodayByTbl'], ['tableAlias', selTabContent.alias], ['restaurantID', restaurantID]],
 					pageSize,
 					''
 				);
@@ -637,8 +635,7 @@ var pushBackBut = new Ext.ux.ImageButton({
 	imgHeight : 50,
 	tooltip : "返回",
 	handler : function(btn) {
-		location.href = "FrontBusinessProtal.html?restaurantID="
-				+ restaurantID + "&pin=" + pin;
+		location.href = "FrontBusinessProtal.html?"+ strEncode('restaurantID=' + restaurantID, 'mi');
 	}
 });
 
@@ -723,7 +720,7 @@ Ext.onReady(function() {
 						Ext.Ajax.request({
 							url : "../../TransTable.do",
 							params : {
-								"pin" : pin,
+								
 								"oldTableAlias" : selectedTable,
 								"newTableAlias" : inputTableNbr
 							},
@@ -995,7 +992,7 @@ Ext.onReady(function() {
 				Ext.Ajax.request({
 					url : "../../VerifyPwd.do",
 					params : {
-						"pin" : pin,
+						
 						"type" : 1,
 						"pwd" : pwdTrans
 					},
@@ -1005,7 +1002,7 @@ Ext.onReady(function() {
 							Ext.Ajax.request({
 								url : "../../CancelOrder.do",
 								params : {
-									"pin" : pin,
+									
 									"tableAlias" : selectedTable
 								},
 								success : function(response, options) {
@@ -1159,7 +1156,7 @@ Ext.onReady(function() {
 				url : "../../QueryRegion.do",
 				baseParams : {
 					dataSource : 'tree',
-					pin : pin
+					
 				},
 				listeners : {
 					load : function(){

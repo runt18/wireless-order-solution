@@ -137,7 +137,7 @@ function orderFoodStatPanelInit(){
 				url = String.format(
 						url, 
 						'ExportTodayStatisticsToExecl.do', 
-						pin, 
+						-10, 
 						restaurantID, 
 						'salesFoodDetail',
 						duty.getValue().split(salesSubSplitSymbol)[0],
@@ -164,7 +164,7 @@ function orderFoodStatPanelInit(){
          ['赠送额','gifted',,'right','Ext.ux.txtFormat.gridDou']
 		],
 		SalesSubStatRecord.getKeys().concat(['food', 'food.name']),
-		[['pin', pin], ['isPaging', true], ['restaurantID', restaurantID], ['dataType', 0], ['queryType', 1]],
+		[ ['isPaging', true], ['restaurantID', restaurantID], ['dataType', 0], ['queryType', 1]],
 		15,
 		'',
 		orderFoodStatPanelGridTbar
@@ -241,7 +241,7 @@ function kitchenStatPanelInit(){
 				url = String.format(
 						url, 
 						'ExportTodayStatisticsToExecl.do', 
-						pin, 
+						-10, 
 						restaurantID, 
 						'salesByKitchen',
 						duty.getValue().split(salesSubSplitSymbol)[0],
@@ -266,7 +266,7 @@ function kitchenStatPanelInit(){
 	     ['dept.id','dept.id', 10]
 		],
 		SalesSubStatRecord.getKeys().concat(['kitchen', 'kitchen.name', 'dept', 'dept.id', 'dept.name']),
-		[['pin', pin], ['restaurantID', restaurantID], ['dataType', 0], ['queryType', 2]],
+		[ ['restaurantID', restaurantID], ['dataType', 0], ['queryType', 2]],
 		15,
 		{
 			name : 'dept.id',
@@ -333,7 +333,7 @@ function deptStatPanelInit(){
 				url = String.format(
 						url, 
 						'ExportTodayStatisticsToExecl.do', 
-						pin, 
+						-10, 
 						restaurantID, 
 						'salesByDept',
 						duty.getValue().split(salesSubSplitSymbol)[0],
@@ -357,7 +357,7 @@ function deptStatPanelInit(){
 	     ['赠送额','gifted',,'right','Ext.ux.txtFormat.gridDou']
 		],
 		SalesSubStatRecord.getKeys().concat(['dept', 'dept.id', 'dept.name']),
-		[['pin', pin], ['restaurantID', restaurantID], ['dataType', 0]],
+		[ ['restaurantID', restaurantID], ['dataType', 0]],
 		30,
 		null,
 		deptStatPanelGridTbar

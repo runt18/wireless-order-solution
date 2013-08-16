@@ -2,6 +2,6 @@
 function termMgrOnLoad() {
 
 	// update the operator name
-	getOperatorName(pin, "../../");
+	getOperatorName("../../");
 
 };

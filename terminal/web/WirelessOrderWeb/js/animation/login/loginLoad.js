@@ -3,7 +3,6 @@ function loginOnLoad() {
 
 	var Request = new URLParaQuery();
 	restaurantID = Request["restaurantID"];
-
 	// for local test
 	if (restaurantID == undefined) {
 		restaurantID = "18";
@@ -49,7 +48,7 @@ function loginOnLoad() {
 					if (isNewAccess) {
 						personLoginWin.show();
 					} else {
-						currPin = Request["pin"];
+						//currPin = Request["pin"];
 						isVerified = true;
 					}
 				} else {
@@ -66,8 +65,11 @@ function loginOnLoad() {
 	});
 
 	// update the operator name
-	if (currPin != "") {
+/*	if (currPin != "") {
 		getOperatorName(currPin, "../");
+	}*/
+	if (!isNewAccess) {
+		getOperatorName("../");
 	}
 
 	// shiftWin.show();

@@ -52,14 +52,13 @@ var billVerifyWin = new Ext.Window({
 			Ext.Ajax.request({
 				url : "../../VerifyPwd.do",
 				params : {
-					"pin" : currPin,
 					"type" : 4,
 					"pwd" : pwdTrans
 				},
 				success : function(response, options) {
 					var resultJSON = Ext.util.JSON.decode(response.responseText);
 					if (resultJSON.success == true) {
-						location.href = "Bills.html?restaurantID=" + restaurantID + "&pin=" + currPin;
+						location.href = "Bills.html?"+ strEncode('restaurantID=' + restaurantID, 'mi');
 					} else {
 						Ext.MessageBox.show({
 							msg : resultJSON.data,
@@ -132,7 +131,6 @@ shiftVerifyWin = new Ext.Window({
 			Ext.Ajax.request({
 				url : "../../VerifyPwd.do",
 				params : {
-					"pin" : currPin,
 					"type" : 4,
 					"pwd" : pwdTrans
 				},
@@ -142,9 +140,6 @@ shiftVerifyWin = new Ext.Window({
 						// 交班信息
 						Ext.Ajax.request({
 							url : "../../QueryShift.do",
-							params : {
-								"pin" : currPin
-							},
 							success : function(response, options){
 								var resultJSON = Ext.util.JSON.decode(response.responseText);
 								if (resultJSON.success == true){
@@ -229,9 +224,6 @@ shiftVerifyWin = new Ext.Window({
 doDailySettle = function() {
 	Ext.Ajax.request({
 		url : "../../DailySettleExec.do",
-		params : {
-			"pin" : currPin
-		},
 		success : function(response, options) {
 			var resultJSON = Ext.util.JSON.decode(response.responseText);
 			if (eval(resultJSON.success == true)) {
@@ -322,7 +314,6 @@ dailyConfirmWin = new Ext.Window({
 			Ext.Ajax.request({
 				url : "../../VerifyPwd.do",
 				params : {
-					"pin" : currPin,
 					"type" : 4,
 					"pwd" : pwdTrans
 				},
@@ -331,9 +322,6 @@ dailyConfirmWin = new Ext.Window({
 					if (resultJSON.success == true) {
 						Ext.Ajax.request({
 							url : "../../DailySettleCheck.do",
-							params : {
-								"pin" : currPin
-							},
 							success : function(response, options) {
 								var resultJSON = Ext.util.JSON.decode(response.responseText);
 								var rootData = resultJSON.root;
@@ -480,7 +468,6 @@ var dailySettleCheckTableWin = new Ext.Window({
 						Ext.Ajax.request({
 							url : "../../DoShift.do",
 							params : {
-								pin : currPin,
 								onDuty : shiftCheckDate.onDuty,
 								offDuty : shiftCheckDate.offDuty
 							},
@@ -523,7 +510,6 @@ var dailySettleCheckTableWin = new Ext.Window({
 			Ext.Ajax.request({
 				url : "../../PrintOrder.do",
 				params : {
-					pin : currPin,
 					onDuty : shiftCheckDate.onDuty,
 					offDuty : shiftCheckDate.offDuty,
 					'printType' : e == null ? 4 : 5
@@ -557,9 +543,6 @@ var dailySettleCheckTableWin = new Ext.Window({
 						// 未交班帳單檢查
 						Ext.Ajax.request({
 							url : "../../DailySettleCheck.do",
-							params : {
-								"pin" : currPin
-							},
 							success : function(response, options) {
 								var resultJSON = Ext.util.JSON.decode(response.responseText);
 								if (eval(resultJSON.success == true)) {
@@ -593,7 +576,6 @@ var dailySettleCheckTableWin = new Ext.Window({
 			Ext.Ajax.request({
 				url : "../../PrintOrder.do",
 				params : {
-					pin : currPin,
 					onDuty : shiftCheckDate.onDuty,
 					offDuty : shiftCheckDate.offDuty,
 					'printType' : e == null ? 6 : 5
@@ -717,7 +699,7 @@ Ext.onReady(function() {
 		imgHeight : 50,
 		tooltip : "返回",
 		handler : function(btn) {
-			location.href = "../PersonLogin.html?restaurantID=" + restaurantID + "&isNewAccess=false&pin=" + currPin;
+			location.href = "../PersonLogin.html?"+ strEncode('restaurantID=' + restaurantID + '&isNewAccess=false', 'mi');
 		}
 	});
 

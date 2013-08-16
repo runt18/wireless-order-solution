@@ -4,8 +4,8 @@
 		url : "../../QueryMenu.do",
 		params : {
 			dataSource : 'foods',
-			pin : pin,
-			restaurantID : restaurantID
+			restaurantID : restaurantID,
+			type : 1
 		},
 		success : function(response, options) {
 			var resultJSON = Ext.decode(response.responseText);
@@ -24,7 +24,7 @@ function loadAddKitchens() {
 		url : "../../QueryKitchen.do",
 		params : {
 			dataSource : "normal",
-			pin : pin
+			
 		},
 		success : function(response, options) {
 			var resultJSON = Ext.decode(response.responseText);
@@ -94,7 +94,7 @@ function loadShiftDuty(){
 		url : '../../DutyRangeStat.do',
 		params : {
 			dataSource : 'today',
-			pin : pin
+			
 		},
 		success : function(res, opt){
 			var jr = Ext.decode(res.responseText);

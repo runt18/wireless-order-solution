@@ -35,12 +35,15 @@ Ext.ux.otype = {
 	'set' : 'SET', 'SET' : 'SET',
 	'get' : 'GET', 'GET' : 'GET'
 };
+
 //从url获取当前桌信息
 function URLParaQuery() {
 	var name, value, i;
 	var str = location.href;
 	var num = str.indexOf("?");
 	str = str.substr(num + 1);
+	//"mi" is the key
+	str = strDecode(str, "mi");
 	var arrtmp = str.split("&");
 	for (i = 0; i < arrtmp.length; i++) {
 		num = arrtmp[i].indexOf("=");
@@ -51,6 +54,8 @@ function URLParaQuery() {
 		}
 	}
 }
+
+
 //修正日期控件在IE8显示不完全的问题
 Ext.override(Ext.menu.Menu, {
 	autoWidth : function() {
@@ -109,11 +114,11 @@ Ext.grid.CheckColumn.prototype = {
 };
 
 //获取操作人姓名, 此函数要求页面上有operatorName,restaurantID全局变量；有id为optName的div
-function getOperatorName(pin, actionPath) {
+function getOperatorName(actionPath) {
 	Ext.Ajax.request({
 		url : actionPath + "QueryStaff.do",
 		params : {
-			"restaurantID" : restaurantID,
+			//"restaurantID" : restaurantID,
 			"type" : 0,
 			"isPaging" : false,
 			"isCombo" : false
@@ -123,6 +128,21 @@ function getOperatorName(pin, actionPath) {
 			var operatorName = "";
 			var resultJSON = Ext.util.JSON.decode(response.responseText);
 			var rootData = resultJSON.root;
+			var pin = resultJSON.other.pin;
+			var status = resultJSON.other.status;
+			if(status == 0){
+				Ext.MessageBox.show({
+					msg : resultJSON.msg,
+					width : 300,
+					buttons : Ext.MessageBox.OK,
+					fn : function(btn){
+						if(btn == 'ok'){
+							window.location.href = '/WirelessOrderWeb/pages/PersonLogin.html?'+strEncode('restaurantID='+restaurantID, 'mi');
+						}
+					}
+				});
+				
+			}
 			if (rootData.length != 0) {
 				if (resultJSON.msg == "normal") {
 					staffData = rootData;
@@ -148,6 +168,9 @@ function getOperatorName(pin, actionPath) {
 		}
 	});
 };
+
+
+
 /**
  * 初始化页面布局
  * 

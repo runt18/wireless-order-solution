@@ -20,8 +20,8 @@ function tasteOnLoad() {
 		url : '../../QueryMenu.do',
 		params : {
 			dataSource : 'tastes',
-			pin : pin,
-			restaurantID : restaurantID
+			restaurantID : restaurantID,
+			type : 2
 		},
 		success : function(response, options) {
 			var rj = Ext.decode(response.responseText);
@@ -57,7 +57,7 @@ function loadSingleOrderData(){
 		Ext.Ajax.request({
 			url : '../../QueryOrder.do',
 			params : {
-				'pin' : pin,
+				
 				'tableID' : tableAliasID
 			},
 			success : function(response, options) {
@@ -101,7 +101,7 @@ function loadOrderGroupData(){
 	Ext.Ajax.request({
 		url : '../../QueryOrderGroup.do',
 		params : {
-			'pin' : pin,
+			
 			'restaurantID' : restaurantID,
 			'queryType' : 0,
 			'childTableAliasID' : tableAliasID,
@@ -329,7 +329,7 @@ function createOrderFoodGridPanelTbar(){
 							Ext.Ajax.request({
 								url : '../../PrintOrder.do',
 								params : {
-									'pin' : pin,
+									
 									'tableID' : tableAliasID,
 									'printType' : 1
 								},
@@ -362,7 +362,7 @@ function createOrderFoodGridPanelTbar(){
 										Ext.Ajax.request({
 											url : '../../PrintOrder.do',
 											params : {
-												'pin' : pin,
+												
 												'tableID' : tableAliasID,
 												'printType' : 2
 											},
@@ -534,7 +534,7 @@ function initPasswordWin(){
 					Ext.Ajax.request({
 						url : '../../VerifyPwd.do',
 						params : {
-							'pin' : pin,
+							
 							'type' : 5,
 							'pwd' : pwdTrans
 						},

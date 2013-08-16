@@ -66,7 +66,7 @@ function dailySettleStatPrintHandler() {
 		Ext.Ajax.request({
 			url : '../../PrintOrder.do',
 			params : {
-				pin : pin,
+				
 				'printType' : 8,
 				onDuty : gs['onDutyFormat'],
 				offDuty : gs['offDutyFormat']
@@ -171,7 +171,7 @@ function dailySettleStatGridInit(){
 		 ['操作', 'operator', 130, 'center', 'dailySettleStatResultGridRenderer']
 		],
 		['name', 'onDuty', 'onDutyFormat', 'offDuty', 'offDutyFormat'],
-		[['pin', pin], ['isPaging', true], ['restaurantID', restaurantID]],
+		[ ['isPaging', true], ['restaurantID', restaurantID]],
 		15,
 		null,
 		dailySettleStatGridTbar

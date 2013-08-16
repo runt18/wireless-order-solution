@@ -324,7 +324,7 @@ var passwordConfigWin = new Ext.Window({
 							Ext.Ajax.request({
 								url : "../../SetPassword.do",
 								params : {
-									"pin" : pin,
+									
 									"adminPwd" : adminPwd,
 									"financePwd" : financePwd,
 									"managerPwd" : managerPwd,
@@ -661,7 +661,6 @@ var resturantMgr = new Ext.Window({
 				   },
 				   params: {
 					   restaurantID:restaurantID,
-					   pin:pin
 				   }
 				});
 		 }
@@ -749,7 +748,6 @@ var resturantMgr = new Ext.Window({
 					   },
 					   params: {
 						   restaurantID:restaurantID,
-						   pin:pin,
 						   restaurant_name:restaurant_name,
 						   restaurant_info:restaurant_info,
 						   address:address,
@@ -781,7 +779,7 @@ Ext.onReady(function() {
 		imgHeight : 50,
 		tooltip : "返回",
 		handler : function(btn) {
-			location.href = "../PersonLogin.html?restaurantID=" + restaurantID + "&isNewAccess=false&pin=" + pin;
+			location.href = "../PersonLogin.html?"+ strEncode('restaurantID=' + restaurantID + '&isNewAccess=false', 'mi');
 		}
 	});
 	

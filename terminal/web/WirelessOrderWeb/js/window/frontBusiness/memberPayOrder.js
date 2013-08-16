@@ -329,7 +329,7 @@ function memberPayOrderToLoadData(c){
 	Ext.Ajax.request({
 		url : '../../QueryOrderFromMemberPay.do',
 		params : {
-			pin : pin,
+			
 			restaurantID : restaurantID,
 			orderID : orderID,
 			st : c.otype,

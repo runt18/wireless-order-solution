@@ -3,7 +3,7 @@
 		url : "../../BusinessReceiptsStatistics.do"
 	}),
 	baseParams : {
-		pin : pin,
+		
 		restaurantID : restaurantID,
 		isPaging : true,
 		StatisticsType : 'History'
@@ -287,7 +287,7 @@ var receivablesStatResultGrid = new Ext.grid.GridPanel({
 			url = String.format(
 					url, 
 					'ExportHistoryStatisticsToExecl.do', 
-					pin, 
+					-10, 
 					restaurantID, 
 					'businessReceips',
 					onDuty.getValue().format('Y-m-d 00:00:00'),

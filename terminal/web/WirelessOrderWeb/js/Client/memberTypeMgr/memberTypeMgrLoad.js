@@ -39,7 +39,7 @@ function dataInit(){
 		url : '../../QueryDiscountTree.do',
 		params : {
 			restaurantID : restaurantID,
-			pin : pin
+			
 		},
 		success : function(res, opt){
 			discountData = eval(res.responseText);
@@ -499,7 +499,7 @@ function initMemberTypeGrid(){
 		],
 		['id','name','chargeRate','exchangeRate','discountTypeValue', 'discountTypeText','discountRate','attributeValue',
 		 'discount', 'discount.id', 'discount.name', 'discount.status', 'initialPoint'],
-		[['pin',pin], ['isPaging', true], ['restaurantID', restaurantID], ['dataSource', 'normal']],
+		[ ['isPaging', true], ['restaurantID', restaurantID], ['dataSource', 'normal']],
 		30,
 		'',
 		memberTypeGridTbar

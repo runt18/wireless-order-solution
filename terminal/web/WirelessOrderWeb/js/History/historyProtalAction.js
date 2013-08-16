@@ -5,9 +5,7 @@
 						"click",
 						function() {
 							if (!isPrompt) {
-								location.href = "HistoryStatistics.html?pin="
-										+ pin + "&restaurantID="
-										+ restaurantID;
+								location.href = "HistoryStatistics.html?"+ strEncode('restaurantID=' + restaurantID, 'mi');
 							}
 						});
 			});

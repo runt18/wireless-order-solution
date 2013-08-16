@@ -64,8 +64,7 @@ var pushBackBut = new Ext.ux.ImageButton({
 	imgHeight : 50,
 	tooltip : '返回',
 	handler : function(btn) {
-		location.href = "BasicMgrProtal.html?restaurantID=" + restaurantID
-				+ "&isNewAccess=false&pin=" + pin;
+		location.href = "BasicMgrProtal.html?"+ strEncode('restaurantID=' + restaurantID + '&isNewAccess=false', 'mi');
 	}
 });
 
@@ -164,7 +163,7 @@ function deleteFoodHandler() {
 				Ext.Ajax.request({
 					url : '../../DeleteMenu.do',
 					params : {
-						pin : pin,
+						
 						foodID : selData.id,
 						restaurantID : restaurantID
 					},
@@ -239,7 +238,7 @@ Ext.onReady(function() {
 	});
 	
 	initMainView(null, centerPanel, null);
-	getOperatorName(pin, "../../");
+	getOperatorName("../../");
 	
 	initFoodOperationWin();
 	

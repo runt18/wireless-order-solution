@@ -140,7 +140,7 @@ var pushBackBut = new Ext.ux.ImageButton({
 	imgHeight : 50,
 	tooltip : "返回",
 	handler : function(btn) {
-		location.href = '../PersonLogin.html?restaurantID=' + restaurantID + '&isNewAccess=false' + '&pin=' + pin;
+		location.href = '../PersonLogin.html?'+ strEncode('restaurantID=' + restaurantID + '&isNewAccess=false', 'mi');
 	}
 });
 
@@ -250,7 +250,7 @@ var viewBillWin = new Ext.Window({
 			Ext.Ajax.request({
 				url : '../../QueryOrder.do',
 				params : {
-					'pin' : pin,
+					
 					'orderID' : orderID,
 					'queryType' : 'History'
 				},
@@ -301,7 +301,7 @@ var billDetailGrid = createGridPanel(
 	    ['退菜原因', 'cancelReason.reason']
 	],
 	OrderFoodRecord.getKeys(),
-	[['pin', pin], ['queryType', 'History']],
+	[ ['queryType', 'History']],
 	'',
 	''
 );
@@ -387,7 +387,7 @@ billDetailWin = new Ext.Window({
 						],
 						['order_date', 'food_name', 'unit_price', 'amount', 'discount',
 						 'taste_pref', 'taste_price', 'kitchen', 'waiter', 'cancelReason'],
-					    [['pin', pin], ['orderID', sd.childOrder[i].id], ['queryType', 'History']],
+					    [ ['orderID', sd.childOrder[i].id], ['queryType', 'History']],
 					    billDetailpageRecordCount,
 					    ''
 					);
@@ -434,7 +434,7 @@ function printBillFunc(rowInd) {
 	Ext.Ajax.request({
 		url : "../../PrintOrder.do",
 		params : {
-			"pin" : pin,
+			
 			"orderID" : billsGrid.getStore().getAt(rowInd).get("id"),
 			'printType' : 3
 		},
@@ -768,7 +768,7 @@ Ext.onReady(function() {
 			['操作', 'operator', 270, 'center', 'billOpt']
 		],
 		OrderRecord.getKeys(),
-		[['isPaging', true], ['restaurantID', restaurantID], ['pin', pin]],
+		[['isPaging', true], ['restaurantID', restaurantID]],
 		GRID_PADDING_LIMIT_20,
 		'',
 		billsGridTbar
@@ -821,5 +821,5 @@ Ext.onReady(function() {
 	});
 
 	initMainView(null, centerPanel, null);
-	getOperatorName(pin, "../../");
+	getOperatorName("../../");
 });

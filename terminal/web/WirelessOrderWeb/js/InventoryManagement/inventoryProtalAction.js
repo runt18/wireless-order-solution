@@ -28,7 +28,7 @@ var form = new Ext.form.FormPanel({
 		 		Ext.Ajax.request({
 		 			url : '../../UpdateCurrentMonth.do',
 		 			params : {
-		 				pin : pin
+		 				
 		 			},
 		 			success : function(res, opt){
 						var jr = Ext.decode(res.responseText);
@@ -91,7 +91,7 @@ function monthSettleHandler(){
 	Ext.Ajax.request({
 		url : '../../QueryStockTake.do',
 		params : {
-			pin : pin,
+			
 			status : 1
 		},
 		success : function(res, opt){
@@ -109,7 +109,7 @@ function monthSettleHandler(){
 	Ext.Ajax.request({
 		url : '../../QueryStockAction.do',
 		params : {
-			pin : pin,
+			
 			status : 1
 		},
 		success : function(res, opt){

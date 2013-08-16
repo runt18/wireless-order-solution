@@ -101,7 +101,7 @@ function deleteTableBasicHandler(){
 					url : '../../OperateTable.do',
 					params : {
 						'dataSource' : 'delete',
-						pin : pin,
+						
 						id : data['id']
 					},
 					success : function(res, opt){

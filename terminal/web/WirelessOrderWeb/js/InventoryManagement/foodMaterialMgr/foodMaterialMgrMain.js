@@ -4,7 +4,7 @@
 	imgHeight : 50,
 	tooltip : '返回',
 	handler : function(btn){
-		location.href = 'InventoryProtal.html?restaurantID=' + restaurantID + '&pin=' + pin;
+		location.href = 'InventoryProtal.html?'+ strEncode('restaurantID=' + restaurantID, 'mi');
 	}
 });
 
@@ -42,5 +42,5 @@ Ext.onReady(function(){
 	});
 	
 	initMainView(null,centerPanel,null);
-	getOperatorName(pin, "../../");
+	getOperatorName("../../");
 });

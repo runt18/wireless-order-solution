@@ -88,7 +88,7 @@ orderedGrid.buttons = [new Ext.Button({
 	},
 	handler : function() {
 		if (orderIsChanged == false) {
-			location.href = "Bills.html?pin=" + pin + "&restaurantID=" + restaurantID;
+			location.href = "Bills.html?"+ strEncode('restaurantID=' + restaurantID, 'mi');
 		} else {
 			Ext.MessageBox.show({
 				msg : "账单修改还未提交，是否确认返回？",
@@ -96,7 +96,7 @@ orderedGrid.buttons = [new Ext.Button({
 				buttons : Ext.MessageBox.YESNO,
 				fn : function(btn) {
 					if (btn == "yes") {
-						location.href = "Bills.html?pin=" + pin + "&restaurantID=" + restaurantID;
+						location.href = "Bills.html?"+ strEncode('restaurantID=' + restaurantID, 'mi');
 					}
 				}
 			});
@@ -290,7 +290,7 @@ var allFoodTabPanelGrid = createGridPanel(
 		['价格', 'unitPrice', 70, 'right', 'Ext.ux.txtFormat.gridDou']
 	],
 	FoodBasicRecord.getKeys(),
-	[['pin',pin], ['dataSource', 'foods'], ['restaurantID', restaurantID], ['isPaging', true]],
+	[ ['dataSource', 'foods'], ['restaurantID', restaurantID], ['isPaging', true]],
 	GRID_PADDING_LIMIT_30,
 	'',
 	allFoodTabPanelGridTbar
@@ -364,7 +364,7 @@ function billModifyOnLoad() {
 	Ext.Ajax.request({
 		url : "../../QueryOrder.do",
 		params : {
-			pin : pin,
+			
 			restaurantID : restaurantID,
 			orderID : orderID,
 			queryType: 'Today'
@@ -391,7 +391,7 @@ function billModifyOnLoad() {
 				Ext.Ajax.request({
 					url : '../../QueryDiscountTree.do',
 					params : {
-						pin : pin,
+						
 						restaurantID : restaurantID
 					},
 					success : function(res, opt) {
@@ -400,7 +400,7 @@ function billModifyOnLoad() {
 						Ext.Ajax.request({
 							url : '../../QueryDiscountPlan.do',
 							params : {
-								pin : pin,
+								
 								restaurantID : restaurantID
 							},
 							success : function(res, opt){

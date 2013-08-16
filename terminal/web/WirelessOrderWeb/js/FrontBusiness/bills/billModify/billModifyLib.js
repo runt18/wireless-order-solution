@@ -275,7 +275,7 @@ function submitOrderHandler(_c){
 		Ext.Ajax.request({
 			url : "../../UpdateOrder2.do",
 			params : {
-				"pin" : pin,
+				
 				"orderID" : orderedGrid.order["id"],
 				'tableAlias' : orderedGrid.order.table.alias,
 				"category" : orderedGrid.order["categoryValue"],
@@ -306,7 +306,7 @@ function submitOrderHandler(_c){
 								Ext.Ajax.request({
 									url : "../../PrintOrder.do",
 									params : {
-										"pin" : pin,
+										
 										"orderID" : Request["orderID"],
 										'printType' : 3
 									},
@@ -318,10 +318,7 @@ function submitOrderHandler(_c){
 											width : 300,
 											buttons : Ext.MessageBox.OK,
 											fn : function() {
-												location.href = "Bills.html?pin="
-																+ pin
-																+ "&restaurantID="
-																+ restaurantID;
+												location.href = "Bills.html?"+ strEncode('restaurantID=' + restaurantID, 'mi');
 											}
 										});
 									},
@@ -331,10 +328,7 @@ function submitOrderHandler(_c){
 									}
 								});
 							} else {
-								location.href = "Bills.html?pin="
-												+ pin
-												+ "&restaurantID="
-												+ restaurantID;
+								location.href = "Bills.html?"+ strEncode('restaurantID=' + restaurantID, 'mi');
 							}
 						}
 					});

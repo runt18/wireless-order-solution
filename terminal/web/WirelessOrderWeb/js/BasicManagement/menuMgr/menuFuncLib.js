@@ -4,7 +4,7 @@
 function searchMenuHandler(){
 	var baseParams = {
 		'isPaging' : true,
-		'pin' : pin,
+		
 		'restaurantId' : restaurantID
 	};
 	// 分厨

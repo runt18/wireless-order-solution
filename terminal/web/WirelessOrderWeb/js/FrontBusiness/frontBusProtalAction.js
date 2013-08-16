@@ -2,7 +2,7 @@
 	$("#order").each(function(){
 		$(this).bind("click", function(){
 			if (!isPrompt){
-				location.href = "TableSelect.html?pin=" + currPin + "&restaurantID=" + restaurantID;
+				location.href = "TableSelect.html?"+ strEncode('restaurantID=' + restaurantID, 'mi');
 			}
 		});
 	});
@@ -22,7 +22,7 @@
 			Ext.Ajax.request({
 				url : '../../QueryDailySettleByNow.do',
 				params : {
-					pin : pin,
+					
 					queryType : 0
 				},
 				success : function(res, opt){
@@ -54,7 +54,7 @@
 			Ext.Ajax.request({
 				url : '../../QueryDailySettleByNow.do',
 				params : {
-					pin : pin,
+					
 					queryType : 1
 				},
 				success : function(res, opt){

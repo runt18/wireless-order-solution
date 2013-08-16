@@ -20,7 +20,7 @@
 
 function deptMgrOnLoad() {
 
-	getOperatorName(pin, "../../");
+	getOperatorName("../../");
 
 //	loadDepartment();
 	

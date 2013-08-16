@@ -184,7 +184,7 @@ var pushBackBut = new Ext.ux.ImageButton({
 	imgHeight : 50,
 	tooltip : '返回',
 	handler : function(btn){
-		location.href = 'InventoryProtal.html?restaurantID=' + restaurantID + '&pin=' + pin;
+		location.href = 'InventoryProtal.html?'+ strEncode('restaurantID=' + restaurantID, 'mi');
 	}
 });
 
@@ -330,7 +330,7 @@ Ext.onReady(function(){
 	
 	var ds = new Ext.data.Store({
 		
-		proxy : new Ext.data.HttpProxy({url: '../../QueryStockAction.do?pin=' + pin}),
+		proxy : new Ext.data.HttpProxy({url: '../../QueryStockAction.do'}),
 		reader : new Ext.data.JsonReader({totalProperty : 'totalProperty', root : 'root'}, [
 			{name : 'id'},
 			{name : 'typeText'},
@@ -557,7 +557,7 @@ Ext.onReady(function(){
 							url : '../../QueryDept.do',
 							params : {
 								dataSource : 'normal',
-								pin : pin
+								
 							},
 							success : function(res, opt){
 								var jr = Ext.decode(res.responseText);
@@ -625,7 +625,7 @@ Ext.onReady(function(){
 						Ext.Ajax.request({
 							url : '../../QuerySupplier.do',
 							params : {
-								pin : pin
+								
 							},
 							success : function(res, opt){
 								var jr = Ext.decode(res.responseText);
@@ -844,7 +844,8 @@ Ext.onReady(function(){
 		items : [{
 			region : 'north',
 			bodyStyle : 'background-color:#DFE8F6;',
-			html : '<h4 style="padding:10px;font-size:150%;float:left;">无线点餐网页终端</h4>',
+			html : '<h4 style="padding:10px;font-size:150%;float:left;">无线点餐网页终端</h4>'+
+				"<div id='optName' class='optName'></div>",
 			height : 50,
 			border : false,
 			margins : '0 0 0 0'

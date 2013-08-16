@@ -169,7 +169,7 @@ function initTasteGrid(){
 			['操作', '',,'center','tasteGridRenderer']
 		],
 		TasteRecord.getKeys(),
-		[['isPaging', true], ['restaurantID', restaurantID], ['pin', pin]],
+		[['isPaging', true], ['restaurantID', restaurantID]],
 		GRID_PADDING_LIMIT_20,
 		'',
 		tasteGridTbar
@@ -332,7 +332,7 @@ function initTasteOperatorWin(){
 					url : '../../OperateTaste.do',
 					params : {
 						'dataSource' : tasteOperatorWin.otype.toLowerCase(),
-						pin : pin,
+						
 						id : tasteId.getValue(),
 						alias : tasteAlias.getValue(),
 						name : tasteName.getValue(),

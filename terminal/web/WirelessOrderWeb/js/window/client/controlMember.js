@@ -350,7 +350,7 @@ function operateMemberHandler(c){
 		url : '../../OperateMember.do',
 		params : {
 			dataSource : cm_obj.otype.toLowerCase(),
-			pin : pin,
+			
 			id : Ext.getCmp('cm_numberMemberId').getValue(),
 			name : memberName.getValue(),
 			mobile : memberMobile.getValue(),

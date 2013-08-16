@@ -8,7 +8,7 @@
 	Ext.Ajax.request({
 		url : '../../PrintOrder.do',
 		params : {
-			'pin' : pin,
+			
 			'printType' : 5,
 			'onDuty' : gs['onDutyFormat'],
 			'offDuty' : gs['offDutyFormat']
@@ -122,7 +122,7 @@ function dutyRangePanelInit(){
 	     ['操作','Operation', 100, 'center', 'dutyRangePanelOperationRenderer']
 		],
 		['staff.name', 'onDuty', 'offDuty', 'onDutyFormat', 'offDutyFormat'],
-		[['pin', pin], ['dataSource', 'today']],
+		[ ['dataSource', 'today']],
 		0,
 		null,
 		dutyRangePanelTbar

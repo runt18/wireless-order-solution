@@ -4,7 +4,7 @@ var pushBackBut = new Ext.ux.ImageButton({
 	imgHeight : 50,
 	tooltip : "返回",
 	handler : function(btn){
-		location.href = "InventoryProtal.html?restaurantID=" + restaurantID + "&pin=" + pin;
+		location.href = "InventoryProtal.html?"+ strEncode('restaurantID=' + restaurantID, 'mi');
 	}
 });
 
@@ -238,7 +238,7 @@ Ext.onReady(function(){
 	    stockDetail.defaultSortable = true;
 	var ds = new Ext.data.GroupingStore({
 		//proxy : new Ext.data.MemoryProxy(data),
-		proxy : new Ext.data.HttpProxy({url:'../../QueryMaterialDept.do?pin=' + pin}),
+		proxy : new Ext.data.HttpProxy({url:'../../QueryMaterialDept.do'}),
 		reader : new Ext.data.JsonReader({totalProperty:'totalProperty', root : 'root'}, [
 			 {name : 'dept.name'},
 	         {name : 'materialName'},
@@ -345,7 +345,7 @@ Ext.onReady(function(){
 			]
 		})
 	});
-	getOperatorName(pin, "../../");
+	getOperatorName("../../");
 	new Ext.Viewport({
 		layout : 'border',
 		id : 'viewport',

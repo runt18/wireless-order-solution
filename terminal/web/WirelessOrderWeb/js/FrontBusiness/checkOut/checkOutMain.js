@@ -175,8 +175,8 @@ var checkOutForm = new Ext.form.FormPanel({
 		text : '返回',
 		disabled : true,
 		handler : function() {
-			var Request = new URLParaQuery();
-			location.href = 'TableSelect.html?pin=' + Request['pin'] + '&restaurantID=' + restaurantID;
+			//var Request = new URLParaQuery();
+			location.href = 'TableSelect.html?'+ strEncode('restaurantID=' + restaurantID, "mi");
 		}
 	}],
 	listeners : {

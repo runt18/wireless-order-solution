@@ -3,61 +3,61 @@
 	bindActiveEvent('supplierMgr', 
 			'url(../../images/supplierMgr_select.png) no-repeat 50%',
 			'url(../../images/supplierMgr.png) no-repeat 50%',
-			"SupplierManagement.html?pin=" + pin + "&restaurantID=" + restaurantID
+			"SupplierManagement.html?" + strEncode("restaurantID="+restaurantID, "mi")
 	);
 	// ---------------------------------
 	bindActiveEvent('inventoryBasicMgr', 
 			'url(../../images/inventoryBasicMgr_select.png) no-repeat 50%',
 			'url(../../images/inventoryBasicMgr.png) no-repeat 50%',
-			"InventoryBasicManagement.html?pin=" + pin + "&restaurantID=" + restaurantID
+			"InventoryBasicManagement.html?"+ strEncode('restaurantID=' + restaurantID, 'mi')
 	);
 	// ---------------------------------
 	bindActiveEvent('foodMaterialMgr', 
 			'url(../../images/foodMaterialMgr_select.png) no-repeat 50%',
 			'url(../../images/foodMaterialMgr.png) no-repeat 50%',
-			"FoodMaterialManagement.html?pin=" + pin  + "&restaurantID=" + restaurantID
+			"FoodMaterialManagement.html?"+ strEncode('restaurantID=' + restaurantID, 'mi')
 	);
 	// ---------------------------------
 	bindActiveEvent('stockActionMgr', 
 			'url(../../images/stockActionMgr_select.png) no-repeat 50%',
 			'url(../../images/stockActionMgr.png) no-repeat 50%',
-			"StockActionManagement.html?pin=" + pin  + "&restaurantID=" + restaurantID
+			"StockActionManagement.html?"+ strEncode('restaurantID=' + restaurantID, 'mi')
 	);
 	// ---------------------------------
 	bindActiveEvent('stockTakeMgr', 
 			'url(../../images/stockTakeMgr_select.png) no-repeat 50%',
 			'url(../../images/stockTakeMgr.png) no-repeat 50%',
-			"StockTakeManagement.html?pin=" + pin  + "&restaurantID=" + restaurantID
+			"StockTakeManagement.html?"+ strEncode('restaurantID=' + restaurantID, 'mi')
 	);
 	// ---------------------------------
 	bindActiveEvent('stockReport', 
 			'url(../../images/stockReport_select.png) no-repeat 50%',
 			'url(../../images/stockReport.png) no-repeat 50%',
-			"StockReport.html?pin=" + pin  + "&restaurantID=" + restaurantID
+			"StockReport.html?"+ strEncode('restaurantID=' + restaurantID, 'mi')
 	);
 	// ---------------------------------
 	bindActiveEvent('stockDetailReport', 
 			'url(../../images/stockDetailReport_select.png) no-repeat 50%',
 			'url(../../images/stockDetailReport.png) no-repeat 50%',
-			"StockDetailReport.html?pin=" + pin  + "&restaurantID=" + restaurantID
+			"StockDetailReport.html?"+ strEncode('restaurantID=' + restaurantID, 'mi')
 	);
 	// ---------------------------------
 	bindActiveEvent('stockDistributionReport', 
 			'url(../../images/stockDistributionReport_select.png) no-repeat 50%',
 			'url(../../images/stockDistributionReport.png) no-repeat 50%',
-			"StockDistributionReport.html?pin=" + pin  + "&restaurantID=" + restaurantID
+			"StockDistributionReport.html?"+ strEncode('restaurantID=' + restaurantID, 'mi')
 	);
 	// ---------------------------------
 	bindActiveEvent('deltaReport', 
 			'url(../../images/deltaReport_select.png) no-repeat 50%',
 			'url(../../images/deltaReport.png) no-repeat 50%',
-			"DeltaReport.html?pin=" + pin  + "&restaurantID=" + restaurantID
+			"DeltaReport.html?"+ strEncode('restaurantID=' + restaurantID, 'mi')
 	);
 	// ---------------------------------
 	bindActiveEvent('costAnalyzeReport', 
 			'url(../../images/costAnalyzeReport_select.png) no-repeat 50%',
 			'url(../../images/costAnalyzeReport.png) no-repeat 50%',
-			"CostAnalysisReport.html?pin=" + pin  + "&restaurantID=" + restaurantID
+			"CostAnalysisReport.html?"+ strEncode('restaurantID=' + restaurantID, 'mi')
 	);
 	// ---------------------------------
 	bindActiveEvent('monthSettle', 
@@ -69,7 +69,7 @@
 	bindActiveEvent('historyStockAction', 
 			'url(../../images/monthSettle_select.png) no-repeat 50%',
 			'url(../../images/monthSettle.png) no-repeat 50%',
-			"HistoryStockAction.html?pin=" + pin  + "&restaurantID=" + restaurantID
+			"HistoryStockAction.html?"+ strEncode('restaurantID=' + restaurantID, 'mi')
 	);
 	
 };

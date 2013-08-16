@@ -4,7 +4,7 @@
 		url : "../../QueryKitchen.do",
 		params : {
 			"dataSource" : "normal",
-			"pin" : pin,
+			
 			"isPaging" : false
 		},
 		success : function(response, options) {

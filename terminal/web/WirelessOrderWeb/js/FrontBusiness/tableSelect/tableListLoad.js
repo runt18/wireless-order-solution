@@ -8,7 +8,7 @@
 	Ext.Ajax.request({
 		url : "../../QueryTable.do",
 		params : {
-			"pin" : pin,
+			
 			"type" : 0,
 			"isPaging" : false,
 			"isCombo" : false
@@ -41,7 +41,7 @@ function tableSelectOnLoad() {
 		regionTree.getRootNode().reload();
 	}
 	
-	getOperatorName(pin, "../../");
+	getOperatorName("../../");
 
 	// 随机刷新, 利用时间戳为服务器减压
 	var x = 1000 * 60 * 5, y = 1000 * 60 * 3;

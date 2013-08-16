@@ -78,7 +78,7 @@
 //								Ext.Ajax.request({
 //									url : "../../SetTerminal.do",
 //									params : {
-//										"pin" : pin,
+//										
 //										"terminalID" : terminalID,
 //										"staff" : staff,
 //										"giftQuota" : giftQuota
@@ -159,8 +159,7 @@ var pushBackBut = new Ext.ux.ImageButton({
 	imgHeight : 50,
 	tooltip : "返回",
 	handler : function(btn) {
-		location.href = "BasicMgrProtal.html?restaurantID=" + restaurantID
-				+ "&pin=" + pin;
+		location.href = "BasicMgrProtal.html?"+ strEncode('restaurantID=' + restaurantID, 'mi');
 	}
 });
 
@@ -398,7 +397,7 @@ Ext
 											.request({
 												url : "../../SetTerminal.do",
 												params : {
-													"pin" : pin,
+													
 													"modTernimials" : modTernimials
 												},
 												success : function(response,
@@ -447,7 +446,7 @@ Ext
 
 				// 输入查询条件参数
 				this.baseParams = {
-					"pin" : pin,
+					
 					"isPaging" : true,
 					"isCombo" : false
 				};
