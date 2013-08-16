@@ -79,7 +79,36 @@ var orderDeleteImgBut = new Ext.ux.ImageButton({
 					if (temp.statusValue == TABLE_IDLE) {
 						Ext.example.msg('提示', '<font color="red">操作失败, 此桌没有下单, 不能删单.</font>');
 					} else {
-						dishPushBackWin.show();
+						//dishPushBackWin.show();
+						Ext.Ajax.request({
+							url : "../../CancelOrder.do",
+							params : {
+								
+								"tableAlias" : selectedTable
+							},
+							success : function(response, options) {
+								var resultJSON1 = Ext.decode(response.responseText);
+								if (resultJSON1.success == true) {
+									Ext.MessageBox.show({
+										msg : resultJSON1.data,
+										width : 300,
+										buttons : Ext.MessageBox.OK,
+										fn : function() {
+											location.reload();
+										}
+									});
+								} else {
+									Ext.MessageBox.show({
+										msg : resultJSON.data,
+										width : 300,
+										buttons : Ext.MessageBox.OK
+									});
+								}
+							},
+							failure : function(response, options) {
+								
+							}
+						});
 					}
 					break;
 				}

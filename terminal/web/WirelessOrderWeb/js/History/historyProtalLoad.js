@@ -5,9 +5,7 @@ function loginOnLoad() {
 	protalFuncReg();
 
 	// update the operator name
-	if (pin != "") {
-		getOperatorName("../../");
-	}
+	getOperatorName("../../");
 
 	// emplData: [pin，姓名，密码]
 	// 后台格式：{success:true,

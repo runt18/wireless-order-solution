@@ -1159,14 +1159,15 @@ Ext.onReady(function(){
 			}
 		}),
 		listeners : {
-			click : function(e){
+/*			click : function(e){
 				Ext.getDom('tbPrinterName').innerHTML = e.attributes.name + " " + e.attributes.alias;
-			},
+			},*/
 			dblclick : function(e){
-				var rn = printerTree.getSelectionModel().getSelectedNode();
+				Ext.getDom('tbPrinterName').innerHTML = e.attributes.name + " " + e.attributes.alias;
+				//var rn = printerTree.getSelectionModel().getSelectedNode();
 				ds.load({
 					params : {
-						'printerId' : rn.attributes.printerId
+						'printerId' : e.attributes.printerId
 					}
 				});
 			},
