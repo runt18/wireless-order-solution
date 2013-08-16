@@ -11,9 +11,11 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
 import com.wireless.db.client.member.MemberTypeDao;
+import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.client.MemberType;
 import com.wireless.pojo.client.MemberType.DiscountType;
+import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.util.JObject;
 import com.wireless.util.WebParams;
 
@@ -35,6 +37,10 @@ public class OperateMemberTypeAction extends DispatchAction{
 		response.setCharacterEncoding("UTF-8");
 		JObject jobject = new JObject();
 		try{
+			
+			String pin = (String) request.getSession().getAttribute("pin");
+			StaffDao.verify(Integer.parseInt(pin), Privilege.Code.MEMBER);
+			
 			String restaurantID = request.getParameter("restaurantID");
 			String typeName = request.getParameter("typeName");
 			String discountID = request.getParameter("discountID");

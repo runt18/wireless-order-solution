@@ -15,10 +15,10 @@ import com.wireless.db.frontBusiness.PayOrder;
 import com.wireless.db.frontBusiness.UpdateOrder;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
-import com.wireless.exception.ProtocolError;
 import com.wireless.pojo.client.Member;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.distMgr.Discount;
+import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.NumericUtil;
 import com.wireless.util.Util;
@@ -122,7 +122,7 @@ public class UpdateOrderAction2 extends Action{
 			//get the food string to this order
 			orderToUpdate.setOrderFoods(Util.toFoodArray(request.getParameter("foods")));
 			
-			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			Staff staff = StaffDao.verify(Integer.parseInt(pin), Privilege.Code.RE_PAID);
 			
 			UpdateOrder.execByID(staff, orderToUpdate);
 			PayOrder.execByID(staff, orderToUpdate);
@@ -133,18 +133,7 @@ public class UpdateOrderAction2 extends Action{
 		}catch(BusinessException e){
 			e.printStackTrace();
 			jsonResp = jsonResp.replace("$(result)", "false");		
-			if(e.getErrCode() == ProtocolError.TERMINAL_NOT_ATTACHED){
-				jsonResp = jsonResp.replace("$(value)", "登录人员不存在，请重新确认");	
-				
-			}else if(e.getErrCode() == ProtocolError.TERMINAL_EXPIRED){
-				jsonResp = jsonResp.replace("$(value)", "终端已过期，请重新确认");	
-				
-			}else if(e.getErrCode() == ProtocolError.ORDER_NOT_EXIST){
-				jsonResp = jsonResp.replace("$(value)", orderID + "号账单不存在，请重新确认");	
-				
-			}else{
-				jsonResp = jsonResp.replace("$(value)", orderID + "号账单修改失败，请重新确认");	
-			}
+			jsonResp = jsonResp.replace("$(value)", e.getDesc());	
 			
 		}catch(IOException e){
 			e.printStackTrace();

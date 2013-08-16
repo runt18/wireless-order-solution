@@ -13,7 +13,9 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.menuMgr.MenuDao;
+import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.pojo.ppMgr.PricePlan;
+import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.util.SQLUtil;
 
 public class QueryPricePlanTreeAction extends Action {
@@ -28,6 +30,10 @@ public class QueryPricePlanTreeAction extends Action {
 		PricePlan item = null;
 		StringBuffer sbt = new StringBuffer();
 		try{
+			
+			String pin = (String) request.getSession().getAttribute("pin");
+			StaffDao.verify(Integer.parseInt(pin), Privilege.Code.BASIC);
+			
 			String extra = "", orderBy = null;
 			String restaurantID = request.getParameter("restaurantID");
 			extra += (" AND A.restaurant_id = " + restaurantID);

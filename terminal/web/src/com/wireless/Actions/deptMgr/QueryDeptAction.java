@@ -12,8 +12,10 @@ import org.apache.struts.actions.DispatchAction;
 
 import com.wireless.db.deptMgr.DepartmentDao;
 import com.wireless.db.staffMgr.StaffDao;
+import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.menuMgr.Department;
+import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.util.DataPaging;
 import com.wireless.util.WebParams;
@@ -42,9 +44,14 @@ public class QueryDeptAction extends DispatchAction{
 		String limit = request.getParameter("limit");
 		try{
 			String pin = (String) request.getSession().getAttribute("pin");
-			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			Staff staff = StaffDao.verify(Integer.parseInt(pin), Privilege.Code.BASIC);
 			String extraCond = "", orderClause = " ORDER BY dept_id ";
 			root = DepartmentDao.getDepartments(staff, extraCond, orderClause);
+			
+		}catch(BusinessException e){
+			e.printStackTrace();
+			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getCode(), e.getDesc());
+			
 		}catch(Exception e){
 			e.printStackTrace();
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);

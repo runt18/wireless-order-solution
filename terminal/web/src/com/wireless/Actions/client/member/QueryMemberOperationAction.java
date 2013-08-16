@@ -14,8 +14,11 @@ import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.client.member.MemberDao;
 import com.wireless.db.client.member.MemberOperationDao;
+import com.wireless.db.staffMgr.StaffDao;
+import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.client.MemberOperation;
+import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.util.DateType;
 import com.wireless.util.SQLUtil;
 import com.wireless.util.WebParams;
@@ -33,6 +36,10 @@ public class QueryMemberOperationAction extends Action{
 		String isPaging = request.getParameter("isPaging");
 		List<MemberOperation> list = null;
 		try{
+			
+			String pin = (String) request.getSession().getAttribute("pin");
+			StaffDao.verify(Integer.parseInt(pin), Privilege.Code.MEMBER);
+			
 			String restaurantID = request.getParameter("restaurantID");
 			String dataSource = request.getParameter("dataSource");
 			String memberMobile = request.getParameter("memberMobile");
@@ -92,6 +99,11 @@ public class QueryMemberOperationAction extends Action{
 				}
 			}
 			jobject.setRoot(list);
+			
+		}catch(BusinessException e){
+			e.printStackTrace();
+			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getCode(), e.getDesc());
+				
 		}catch(Exception e){
 			e.printStackTrace();
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);

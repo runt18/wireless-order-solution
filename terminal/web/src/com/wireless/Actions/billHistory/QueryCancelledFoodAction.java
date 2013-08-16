@@ -15,6 +15,7 @@ import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.billStatistics.QueryCancelledFood;
 import com.wireless.db.staffMgr.StaffDao;
+import com.wireless.exception.BusinessException;
 import com.wireless.pojo.billStatistics.CancelIncomeByDept;
 import com.wireless.pojo.billStatistics.CancelIncomeByDept.IncomeByEachReason;
 import com.wireless.pojo.billStatistics.CancelIncomeByReason;
@@ -23,14 +24,15 @@ import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.crMgr.CancelReason;
 import com.wireless.pojo.dishesOrder.CancelledFood;
 import com.wireless.pojo.menuMgr.Department;
+import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.util.DataPaging;
 import com.wireless.util.JObject;
 import com.wireless.util.WebParams;
 
-@SuppressWarnings({"rawtypes", "unchecked"})
 public class QueryCancelledFoodAction extends Action {
 	
+	@SuppressWarnings("unchecked")
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
@@ -38,6 +40,7 @@ public class QueryCancelledFoodAction extends Action {
 		request.setCharacterEncoding("UTF-8");
 		response.setContentType("text/json; charset=utf-8");
 		JObject jobject = new JObject();
+		@SuppressWarnings("rawtypes")
 		List list = new ArrayList();
 		Object sum = null;
 		String isPaging = request.getParameter("isPaging");
@@ -83,7 +86,7 @@ public class QueryCancelledFoodAction extends Action {
 			Integer did = Integer.valueOf(deptID), rid = Integer.valueOf(reasonID);
 			
 			DutyRange queryDate = new DutyRange(dateBeg, dateEnd);
-			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			Staff staff = StaffDao.verify(Integer.parseInt(pin), Privilege.Code.HISTORY);
 			
 			if(qt == QueryCancelledFood.QUERY_BY_DEPT){
 				CancelIncomeByDept dept = QueryCancelledFood.getCancelledFoodByDept(staff, queryDate, did, dt, ot);
@@ -125,6 +128,11 @@ public class QueryCancelledFoodAction extends Action {
 					sum = tempSum;
 				}
 			}
+		}catch(BusinessException e){
+			e.printStackTrace();
+			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getCode(), e.getDesc());
+			list = null;
+			
 		} catch(Exception e){
 			e.printStackTrace();
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);

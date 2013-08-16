@@ -13,8 +13,11 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
 import com.wireless.db.client.member.MemberDao;
+import com.wireless.db.staffMgr.StaffDao;
+import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.client.Member;
+import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.util.SQLUtil;
 import com.wireless.util.WebParams;
 
@@ -40,6 +43,9 @@ public class QueryMemberAction extends DispatchAction {
 		String start = request.getParameter("start");
 		String limit = request.getParameter("limit");
 		try{
+			String pin = (String) request.getSession().getAttribute("pin");
+			StaffDao.verify(Integer.parseInt(pin), Privilege.Code.MEMBER);
+			
 			String extraCond = " ", orderClause = " ";
 			String id = request.getParameter("id");
 			String restaurantID = request.getParameter("restaurantID");
@@ -121,9 +127,15 @@ public class QueryMemberAction extends DispatchAction {
 			}
 			list = MemberDao.getMember(paramsSet);
 			jobject.setRoot(list);
+			
+		}catch(BusinessException e){
+			e.printStackTrace();
+			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getCode(), e.getDesc());
+			
 		}catch(Exception e){
 			e.printStackTrace();
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
+			
 		}finally{
 			response.getWriter().print(jobject.toString());
 		}

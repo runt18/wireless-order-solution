@@ -16,8 +16,8 @@ import com.wireless.db.DBCon;
 import com.wireless.db.shift.QueryShiftDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
-import com.wireless.exception.ProtocolError;
 import com.wireless.pojo.billStatistics.ShiftDetail;
+import com.wireless.pojo.staffMgr.Privilege;
 
 public class QueryShiftAction extends Action {
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
@@ -38,7 +38,7 @@ public class QueryShiftAction extends Action {
 			 */
 			String pin = (String) request.getSession().getAttribute("pin");
 					
-			ShiftDetail result = QueryShiftDao.execByNow(StaffDao.verify(dbCon, Integer.parseInt(pin)));
+			ShiftDetail result = QueryShiftDao.execByNow(StaffDao.verify(dbCon, Integer.parseInt(pin), Privilege.Code.FRONT_BUSINESS));
 			
 			/**
 			 * The json to shift record like below
@@ -73,15 +73,7 @@ public class QueryShiftAction extends Action {
 		}catch(BusinessException e){
 			e.printStackTrace();
 			jsonResp = jsonResp.replace("$(result)", "false");		
-			if(e.getErrCode() == ProtocolError.TERMINAL_NOT_ATTACHED){
-				jsonResp = jsonResp.replace("$(value)", "没有获取到餐厅信息，请重新确认");	
-				
-			}else if(e.getErrCode() == ProtocolError.TERMINAL_EXPIRED){
-				jsonResp = jsonResp.replace("$(value)", "终端已过期，请重新确认");	
-				
-			}else{
-				jsonResp = jsonResp.replace("$(value)", "没有获取到当日账单信息，请重新确认");	
-			}
+			jsonResp = jsonResp.replace("$(value)", e.getDesc());	
 		
 		}catch(SQLException e){
 			e.printStackTrace();

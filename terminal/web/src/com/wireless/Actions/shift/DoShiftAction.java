@@ -15,6 +15,8 @@ import org.apache.struts.action.ActionMapping;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.staffMgr.StaffDao;
+import com.wireless.exception.BusinessException;
+import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.staffMgr.Staff;
 
 public class DoShiftAction extends Action {
@@ -49,7 +51,7 @@ public class DoShiftAction extends Action {
 			
 			dbCon.connect();
 			
-			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			Staff staff = StaffDao.verify(Integer.parseInt(pin), Privilege.Code.FRONT_BUSINESS);
 			
 			String sql = "INSERT INTO " + Params.dbName + ".shift (restaurant_id, name, on_duty, off_duty) VALUES(" +
 						 staff.getRestaurantId() + "," +
@@ -62,6 +64,11 @@ public class DoShiftAction extends Action {
 			
 			jsonResp = jsonResp.replace("$(result)", "true");
 			jsonResp = jsonResp.replace("$(value)", staff.getName() + "交班成功");
+			
+		}catch(BusinessException e){
+			e.printStackTrace();
+			jsonResp = jsonResp.replace("$(result)", "false");
+			jsonResp = jsonResp.replace("$(value)", e.getDesc());
 			
 		}catch(SQLException e){
 			e.printStackTrace();

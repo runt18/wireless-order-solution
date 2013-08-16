@@ -12,7 +12,9 @@ import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.stockMgr.MaterialDeptDao;
+import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
+import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.stockMgr.MaterialDept;
 import com.wireless.util.DataPaging;
@@ -36,7 +38,7 @@ public class QueryMaterialDeptAction extends Action{
 			String cateType = request.getParameter("cateType");
 			String cateId = request.getParameter("cateId");
 			String materialId = request.getParameter("materialId");
-			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			Staff staff = StaffDao.verify(Integer.parseInt(pin), Privilege.Code.INVENTORY);
 			String extraCond = "";
 			if(deptId != null && !deptId.trim().isEmpty()){
 				extraCond += " AND MD.dept_id = " + deptId;
@@ -52,6 +54,10 @@ public class QueryMaterialDeptAction extends Action{
 				}
 			}
 			root = MaterialDeptDao.getMaterialDeptState(staff, extraCond, null);
+		}catch(BusinessException e){
+			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getCode(), e.getDesc());
+			e.printStackTrace();
+			
 		}catch(Exception e){
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
 			e.printStackTrace();

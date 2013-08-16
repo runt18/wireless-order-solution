@@ -13,8 +13,11 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
 import com.wireless.db.inventoryMgr.MaterialCateDao;
+import com.wireless.db.staffMgr.StaffDao;
+import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.inventoryMgr.MaterialCate;
+import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.util.DataPaging;
 import com.wireless.util.SQLUtil;
 import com.wireless.util.WebParams;
@@ -41,6 +44,10 @@ public class QueryMaterialCateAction extends DispatchAction{
 		String start = request.getParameter("start");
 		String limit = request.getParameter("limit");
 		try{
+			
+			String pin = (String) request.getSession().getAttribute("pin");
+			StaffDao.verify(Integer.parseInt(pin), Privilege.Code.INVENTORY);
+			
 			String restaurantID = request.getParameter("restaurantID");
 			String type = request.getParameter("type");
 			String extra = "";
@@ -49,6 +56,11 @@ public class QueryMaterialCateAction extends DispatchAction{
 			Map<Object, Object> params = new LinkedHashMap<Object, Object>();
 			params.put(SQLUtil.SQL_PARAMS_EXTRA, extra);
 			root = MaterialCateDao.getContent(params);
+			
+		}catch(BusinessException e){
+			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getCode(), e.getDesc());
+			e.printStackTrace();
+			
 		}catch(Exception e){
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
 			e.printStackTrace();

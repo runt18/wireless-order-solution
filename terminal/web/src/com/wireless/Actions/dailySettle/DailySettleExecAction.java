@@ -17,7 +17,7 @@ import org.apache.struts.action.ActionMapping;
 import com.wireless.db.frontBusiness.DailySettleDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
-import com.wireless.exception.ProtocolError;
+import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.util.JObject;
 
@@ -36,7 +36,7 @@ public class DailySettleExecAction extends Action {
 
 			String pin = (String) request.getSession().getAttribute("pin");
 
-			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			Staff staff = StaffDao.verify(Integer.parseInt(pin), Privilege.Code.FRONT_BUSINESS);
 
 			DailySettleDao.exec(staff);
 
@@ -44,15 +44,7 @@ public class DailySettleExecAction extends Action {
 
 		} catch (BusinessException e) {
 			e.printStackTrace();
-			if (e.getErrCode() == ProtocolError.TERMINAL_NOT_ATTACHED) {
-				jObj.initTip(false, "没有获取到餐厅信息，请重新确认");
-				
-			} else if (e.getErrCode() == ProtocolError.TERMINAL_EXPIRED) {
-				jObj.initTip(false, "终端已过期，请重新确认");
-
-			} else {
-				jObj.initTip(false, "没有获取到信息，请重新确认");
-			}
+			jObj.initTip(false, e.getDesc());
 			
 		} catch (SQLException e) {
 			e.printStackTrace();

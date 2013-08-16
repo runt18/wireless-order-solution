@@ -22,9 +22,9 @@ import com.wireless.db.DBCon;
 import com.wireless.db.shift.QueryShiftDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
-import com.wireless.exception.ProtocolError;
 import com.wireless.pojo.billStatistics.IncomeByDept;
 import com.wireless.pojo.billStatistics.ShiftDetail;
+import com.wireless.pojo.staffMgr.Privilege;
 
 public class DailySettleStatDetailAction extends Action {
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
@@ -62,7 +62,7 @@ public class DailySettleStatDetailAction extends Action {
 
 			ShiftDetail result = null;
 			result = QueryShiftDao.exec(dbCon, 
-										StaffDao.verify(dbCon, Integer.parseInt(pin)), 
+										StaffDao.verify(dbCon, Integer.parseInt(pin), Privilege.Code.HISTORY), 
 										onDuty, offDuty,
 										QueryShiftDao.QUERY_HISTORY);
 
@@ -129,16 +129,9 @@ public class DailySettleStatDetailAction extends Action {
 		} catch (BusinessException e) {
 			e.printStackTrace();
 			HashMap<String, Object> resultMap = new HashMap<String, Object>();
-			if (e.getErrCode() == ProtocolError.TERMINAL_NOT_ATTACHED) {
-				resultMap.put("message", "没有获取到餐厅信息，请重新确认");
-
-			} else if (e.getErrCode() == ProtocolError.TERMINAL_EXPIRED) {
-				resultMap.put("message", "终端已过期，请重新确认");
-
-			} else {
-				resultMap.put("message", "没有获取到信息，请重新确认");
-			}
+			resultMap.put("message", e.getDesc());
 			resultList.add(resultMap);
+			
 		} catch (SQLException e) {
 			e.printStackTrace();
 			HashMap<String, Object> resultMap = new HashMap<String, Object>();

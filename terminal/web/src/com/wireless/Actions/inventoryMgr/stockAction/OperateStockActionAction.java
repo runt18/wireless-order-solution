@@ -16,6 +16,7 @@ import com.wireless.db.stockMgr.StockActionDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.inventoryMgr.MaterialCate;
+import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.stockMgr.StockAction;
 import com.wireless.pojo.stockMgr.StockAction.AuditBuilder;
@@ -54,7 +55,7 @@ public class OperateStockActionAction extends DispatchAction{
 			String deptOut = request.getParameter("deptOut");
 			String supplier = request.getParameter("supplier");
 			
-			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			Staff staff = StaffDao.verify(Integer.parseInt(pin), Privilege.Code.INVENTORY);
 			MaterialCate.Type cate = MaterialCate.Type.valueOf(Integer.valueOf(cateValue));
 			StockAction.SubType subType = StockAction.SubType.valueOf(Integer.valueOf(subTypeValue));
 			StockAction.Type type = StockAction.Type.valueOf(Integer.valueOf(typeValue));
@@ -178,7 +179,7 @@ public class OperateStockActionAction extends DispatchAction{
 			String deptOut = request.getParameter("deptOut");
 			String supplier = request.getParameter("supplier");
 			
-			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			Staff staff = StaffDao.verify(Integer.parseInt(pin), Privilege.Code.INVENTORY);
 			MaterialCate.Type cate = MaterialCate.Type.valueOf(Integer.valueOf(cateValue));
 			StockAction.SubType subType = StockAction.SubType.valueOf(Integer.valueOf(subTypeValue));
 			StockAction.Type type = StockAction.Type.valueOf(Integer.valueOf(typeValue));
@@ -284,7 +285,7 @@ public class OperateStockActionAction extends DispatchAction{
 		try{
 			String pin = (String) request.getSession().getAttribute("pin");
 			String id = request.getParameter("id");
-			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			Staff staff = StaffDao.verify(Integer.parseInt(pin), Privilege.Code.INVENTORY);
 			StockActionDao.deleteStockActionById(staff, Integer.valueOf(id));
 			jobject.initTip(true, "操作成功, 已删除库存单信息.");
 		}catch(BusinessException e){
@@ -318,7 +319,7 @@ public class OperateStockActionAction extends DispatchAction{
 		try{
 			String pin = (String) request.getSession().getAttribute("pin");
 			String id = request.getParameter("id");
-			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			Staff staff = StaffDao.verify(Integer.parseInt(pin), Privilege.Code.INVENTORY);
 			AuditBuilder builder = StockAction.AuditBuilder.newStockActionAudit(Integer.valueOf(id))
 					.setApprover(staff.getName())
 					.setApproverId((int) staff.getId());
@@ -352,7 +353,7 @@ public class OperateStockActionAction extends DispatchAction{
 		JObject jobject = new JObject();
 		try{
 			String pin = (String) request.getSession().getAttribute("pin");
-			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			Staff staff = StaffDao.verify(Integer.parseInt(pin), Privilege.Code.INVENTORY);
 			
 			if(StockActionDao.checkStockTake(staff)){
 				jobject.initTip(true, "操作成功, 继续添加信息.");

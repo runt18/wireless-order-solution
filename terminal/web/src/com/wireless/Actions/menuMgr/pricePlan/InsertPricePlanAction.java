@@ -9,9 +9,11 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.menuMgr.MenuDao;
+import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.ppMgr.PricePlan;
+import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.util.WebParams;
 
 public class InsertPricePlanAction extends Action {
@@ -23,6 +25,10 @@ public class InsertPricePlanAction extends Action {
 		response.setCharacterEncoding("UTF-8");
 		JObject jobject = new JObject();
 		try{
+			
+			String pin = (String) request.getSession().getAttribute("pin");
+			StaffDao.verify(Integer.parseInt(pin), Privilege.Code.BASIC);
+			
 			String restaurantID = request.getParameter("restaurantID");
 			String name = request.getParameter("name");
 			String status = request.getParameter("status");

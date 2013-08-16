@@ -11,7 +11,10 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.distMgr.DiscountDao;
+import com.wireless.db.staffMgr.StaffDao;
+import com.wireless.exception.BusinessException;
 import com.wireless.pojo.distMgr.Discount;
+import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.util.JObject;
 import com.wireless.util.WebParams;
 
@@ -26,6 +29,10 @@ public class UpdateDiscountAction extends Action{
 		JObject jobject = new JObject();
 		
 		try{
+			
+			String pin = (String) request.getSession().getAttribute("pin");
+			StaffDao.verify(Integer.parseInt(pin), Privilege.Code.BASIC);
+			
 			String resturantID = request.getParameter("restaurantID");
 			String discountID = request.getParameter("discountID");
 			String discountName = request.getParameter("discountName");
@@ -44,7 +51,9 @@ public class UpdateDiscountAction extends Action{
 			DiscountDao.updateDiscount(pojo);
 			
 			jobject.initTip(true,  "操作成功, 已修改折扣方案!");
-			
+		}catch(BusinessException e){
+			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getCode(), e.getDesc());
+			e.printStackTrace();
 		}catch(Exception e){
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
 			e.printStackTrace();

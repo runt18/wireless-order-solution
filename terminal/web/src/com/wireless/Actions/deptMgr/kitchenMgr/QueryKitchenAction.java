@@ -14,6 +14,7 @@ import com.wireless.db.deptMgr.KitchenDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.json.JObject;
 import com.wireless.pojo.menuMgr.Kitchen;
+import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.util.DataPaging;
 import com.wireless.util.WebParams;
@@ -38,14 +39,15 @@ public class QueryKitchenAction extends DispatchAction {
 		StringBuffer jsb = new StringBuffer();
 		try{
 			String pin = (String) request.getSession().getAttribute("pin");
-			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			Staff staff = StaffDao.verify(Integer.parseInt(pin), Privilege.Code.BASIC);
 			String extraCond = "", orderClause = "";
 			extraCond += (" AND KITCHEN.restaurant_id = " + staff.getRestaurantId());
 			extraCond += (" AND KITCHEN.kitchen_alias <> 253 AND KITCHEN.kitchen_alias <> 255 ");
 			List<Kitchen> list = KitchenDao.getKitchens(staff, extraCond, orderClause);
 			for(int i = 0; i < list.size(); i++){
-				if(i>0)
+				if(i > 0){
 					jsb.append(",");
+				}
 				jsb.append("{");
 				jsb.append("leaf:true");
 				jsb.append(",text:'" + list.get(i).getName() + "'");
@@ -87,7 +89,7 @@ public class QueryKitchenAction extends DispatchAction {
 			String pin = (String) request.getSession().getAttribute("pin");
 			String deptID = request.getParameter("deptID");
 			
-			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			Staff staff = StaffDao.verify(Integer.parseInt(pin), Privilege.Code.BASIC);
 			String extraCond = "", orderClause = "";
 			
 			extraCond += (" AND KITCHEN.restaurant_id = " + staff.getRestaurantId());

@@ -15,7 +15,7 @@ import org.apache.struts.action.ActionMapping;
 import com.wireless.db.frontBusiness.CancelOrder;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
-import com.wireless.exception.ProtocolError;
+import com.wireless.pojo.staffMgr.Privilege;
 
 public class CancelOrderAction extends Action {
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
@@ -34,7 +34,7 @@ public class CancelOrderAction extends Action {
 			
 			tableAlias = Integer.parseInt(request.getParameter("tableAlias"));
 			
-			CancelOrder.exec(StaffDao.verify(Integer.parseInt(pin)), tableAlias);
+			CancelOrder.exec(StaffDao.verify(Integer.parseInt(pin), Privilege.Code.SYSTEM), tableAlias);
 			jsonResp = jsonResp.replace("$(result)", "true");
 			jsonResp = jsonResp.replace("$(value)", tableAlias + "号餐台删单成功");
 			
@@ -45,18 +45,7 @@ public class CancelOrderAction extends Action {
 		}catch(BusinessException e){
 			e.printStackTrace();
 			jsonResp = jsonResp.replace("$(result)", "false");
-			if(e.getErrCode() == ProtocolError.TERMINAL_NOT_ATTACHED){
-				jsonResp = jsonResp.replace("$(value)", "没有获取到餐厅信息，请重新确认");
-				
-			}else if(e.getErrCode() == ProtocolError.TABLE_NOT_EXIST){
-				jsonResp = jsonResp.replace("$(value)", tableAlias + "号餐台信息不存在，请重新确认");
-				
-			}else if(e.getErrCode() == ProtocolError.TABLE_IDLE){
-				jsonResp = jsonResp.replace("$(value)", tableAlias + "号餐台是空闲状态，可能已结帐，请与餐厅管理人员确认");
-				
-			}else{
-				jsonResp = jsonResp.replace("$(value)", "删除" + tableAlias + "号餐台信息不成功，请确认网络连接是否正常");
-			}
+			jsonResp = jsonResp.replace("$(value)", e.getDesc());
 		}catch(SQLException e){
 			e.printStackTrace();
 			jsonResp = jsonResp.replace("$(result)", "false");

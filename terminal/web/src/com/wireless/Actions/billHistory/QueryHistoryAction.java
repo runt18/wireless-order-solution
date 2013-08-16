@@ -13,9 +13,11 @@ import org.apache.struts.action.ActionMapping;
 import com.wireless.db.orderMgr.OrderDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.system.SystemDao;
+import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.OrderSummary;
+import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.system.DailySettle;
 import com.wireless.util.DateType;
@@ -117,7 +119,7 @@ public class QueryHistoryAction extends Action {
 			
 			String orderClause = " ORDER BY OH.order_date ASC " + " LIMIT " + start + "," + limit;
 			
-			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			Staff staff = StaffDao.verify(Integer.parseInt(pin), Privilege.Code.HISTORY);
 			
 			List<Order> list = OrderDao.getPureOrder(staff, comboCond + filterCond, orderClause, DateType.HISTORY);
 			
@@ -125,12 +127,15 @@ public class QueryHistoryAction extends Action {
 			
 			jobject.setTotalProperty(summary.getTotalAmount());
 			jobject.setRoot(list);
-			//FIXME
-			//jobject.getOther().put("sum", sum);
+			
+		}catch(BusinessException e){
+			e.printStackTrace();
+			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getCode(), e.getDesc());
 			
 		}catch(Exception e){
 			e.printStackTrace();
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
+			
 		}finally{
 			response.getWriter().print(jobject.toString());
 		}

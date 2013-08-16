@@ -24,6 +24,7 @@ import com.wireless.pack.Type;
 import com.wireless.pack.req.ReqPrintContent;
 import com.wireless.parcel.Parcel;
 import com.wireless.pojo.regionMgr.Table;
+import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.DateUtil;
 import com.wireless.sccon.ServerConnector;
@@ -90,7 +91,7 @@ public class PrintOrderAction extends Action{
 			 */
 			String pin = (String) request.getSession().getAttribute("pin");
 			
-			final Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			final Staff staff = StaffDao.verify(Integer.parseInt(pin), Privilege.Code.FRONT_BUSINESS);
 			
 			int orderId = 0;
 			if(request.getParameter("orderID") != null){
@@ -192,11 +193,7 @@ public class PrintOrderAction extends Action{
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, "操作失败, 获取账单编号或餐台编号或打印类型信息失败.");
 		}catch(BusinessException e){
 			e.printStackTrace();
-			if(e.getErrCode() == ProtocolError.TABLE_IDLE){		
-				jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getCode(), "操作失败, " + tableID + "号餐台是空闲状态, 不存在此张餐台的账单信息, 请重新确认.");
-			}else{
-				jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getCode(), "操作失败, 打印" + tableID + "号餐台的账单不成功.");
-			}
+			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getCode(), e.getDesc());
 		}catch(IOException e){
 			e.printStackTrace();
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, "操作失败, 服务器请求不成功, 请重新检查网络是否连通.");

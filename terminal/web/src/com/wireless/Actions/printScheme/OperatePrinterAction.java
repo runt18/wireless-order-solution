@@ -15,6 +15,7 @@ import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.printScheme.PStyle;
 import com.wireless.pojo.printScheme.Printer;
+import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.util.WebParams;
 
@@ -29,7 +30,7 @@ public class OperatePrinterAction extends DispatchAction{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			Staff staff = StaffDao.verify(Integer.parseInt(pin), Privilege.Code.BASIC);
 			PrinterDao.deleteById(dbCon, staff, Integer.parseInt(printerId));
 			jobject.initTip(true, "操作成功, 已删除打印机");
 			
@@ -57,7 +58,7 @@ public class OperatePrinterAction extends DispatchAction{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			Staff staff = StaffDao.verify(Integer.parseInt(pin), Privilege.Code.BASIC);
 			String printerName = request.getParameter("printerName");
 			String printerAlias = request.getParameter("printerAlias");
 			int style =Integer.parseInt(request.getParameter("style"));
@@ -91,7 +92,7 @@ public class OperatePrinterAction extends DispatchAction{
 		
 		try{
 			dbCon.connect();
-			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			Staff staff = StaffDao.verify(Integer.parseInt(pin), Privilege.Code.BASIC);
 			String printerName = request.getParameter("printerName");
 			String printerAlias = request.getParameter("printerAlias");
 			int style =Integer.parseInt(request.getParameter("style"));

@@ -11,7 +11,10 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.menuMgr.FoodTasteDao;
+import com.wireless.db.staffMgr.StaffDao;
+import com.wireless.exception.BusinessException;
 import com.wireless.pojo.menuMgr.FoodTaste;
+import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.util.JObject;
 import com.wireless.util.WebParams;
 
@@ -29,6 +32,10 @@ public class InsertFoodTasteAction extends Action{
 		FoodTaste ft = new FoodTaste();
 		
 		try{
+			
+			String pin = (String) request.getSession().getAttribute("pin");
+			StaffDao.verify(Integer.parseInt(pin), Privilege.Code.BASIC);
+			
 			response.setContentType("text/json; charset=utf-8");
 			if(foodID == null || restaurantID == null || tasteID == null){
 				jobject.initTip(false, WebParams.TIP_TITLE_ERROE, "操作失败,口味信息不完整!");
@@ -44,6 +51,10 @@ public class InsertFoodTasteAction extends Action{
 					jobject.initTip(true, "操作成功,已关联口味!");
 				}
 			}
+		}catch(BusinessException e){
+			e.printStackTrace();
+			jobject.initTip(true, WebParams.TIP_TITLE_EXCEPTION, e.getCode(), e.getDesc());
+			
 		} catch(Exception e) {
 			e.printStackTrace();
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);

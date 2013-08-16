@@ -45,6 +45,7 @@ public class QueryMenuAction extends DispatchAction {
 		String start = request.getParameter("start");
 		String limit = request.getParameter("limit");
 		try {
+			
 			String restaurantID = (String) request.getSession().getAttribute("restaurantID");
 			String cond = null;
 			String orderBy = null;
@@ -75,6 +76,7 @@ public class QueryMenuAction extends DispatchAction {
 				cond += (" AND A.food_alias like '" + foodAlias.trim() + "%'");
 			}
 			root = MenuDao.getFood(cond, orderBy);
+			
 		}catch(Exception e){
 			e.printStackTrace();
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, WebParams.TIP_CODE_EXCEPTION, WebParams.TIP_CONTENT_SQLEXCEPTION);

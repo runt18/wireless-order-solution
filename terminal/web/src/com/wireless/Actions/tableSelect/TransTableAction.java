@@ -15,9 +15,9 @@ import org.apache.struts.action.ActionMapping;
 import com.wireless.db.frontBusiness.TransTblDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
-import com.wireless.exception.ProtocolError;
 import com.wireless.pack.req.ReqPrintContent;
 import com.wireless.pojo.regionMgr.Table;
+import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.sccon.ServerConnector;
 import com.wireless.util.JObject;
@@ -43,7 +43,7 @@ public class TransTableAction extends Action{
 			 * newTableID : the table id to transfer 
 			 * oldTableID : the table id to be transferred
 			 */
-			final Staff staff = StaffDao.verify(Integer.parseInt((String) request.getSession().getAttribute("pin")));
+			final Staff staff = StaffDao.verify(Integer.parseInt((String) request.getSession().getAttribute("pin")), Privilege.Code.FRONT_BUSINESS);
 			
 			srcTblAlias = request.getParameter("oldTableAlias");
 			destTblAlias = request.getParameter("newTableAlias");
@@ -68,16 +68,7 @@ public class TransTableAction extends Action{
 			jobject.initTip(false, "操作失败, 餐台号输入不正确，请重新输入");
 			System.out.println(WebParams.TIP_TITLE_ERROE + ":" + jobject.getMsg());
 		}catch (BusinessException e) {
-			if(e.getErrCode() == ProtocolError.TABLE_NOT_EXIST){
-				jobject.initTip(false, "操作失败, " + srcTblAlias + "或" + destTblAlias + "号台信息不存在, 请重新确认.");
-			}else if(e.getErrCode() == ProtocolError.TABLE_IDLE){
-				jobject.initTip(false, "操作失败, " + "原" + srcTbl.getAliasId() + "号台是空闲状态，可能已经结帐，请重新确认.");
-			}else if(e.getErrCode() == ProtocolError.TABLE_BUSY){
-				jobject.initTip(false, "操作失败, " + "新" + destTbl.getAliasId()	+ "号台是就餐状态，请重新确认.");
-			}else{
-				jobject.initTip(false, "操作失败, 原 " + srcTbl.getAliasId() + "号台转至新 " + destTbl.getAliasId() + "号台失败, 未知错误.");
-			}
-			System.out.println(WebParams.TIP_TITLE_ERROE + ":" + jobject.getMsg());
+			jobject.initTip(false, e.getDesc());
 		} catch (Exception e) {
 			e.printStackTrace();
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);

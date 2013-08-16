@@ -11,9 +11,10 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.menuMgr.FoodTasteDao;
-
+import com.wireless.db.staffMgr.StaffDao;
+import com.wireless.exception.BusinessException;
 import com.wireless.pojo.menuMgr.Food;
-
+import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.util.JObject;
 import com.wireless.util.WebParams;
 
@@ -27,6 +28,8 @@ public class UpdateFoodTasteAction extends Action {
 		JObject jobject = new JObject();
 		
 		try{
+			String pin = (String) request.getSession().getAttribute("pin");
+			StaffDao.verify(Integer.parseInt(pin), Privilege.Code.BASIC);
 			
 			String foodID = request.getParameter("foodID");
 			String restaurantID = request.getParameter("restaurantID");
@@ -61,6 +64,10 @@ public class UpdateFoodTasteAction extends Action {
 					jobject.initTip(false, WebParams.TIP_TITLE_ERROE, "操作失败,菜品口味关联方式选择不正确!");
 				}
 			}
+		}catch(BusinessException e){
+			e.printStackTrace();
+			jobject.initTip(true, WebParams.TIP_TITLE_EXCEPTION, e.getCode(), e.getDesc());
+			
 		} catch(Exception e) {
 			e.printStackTrace();
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);

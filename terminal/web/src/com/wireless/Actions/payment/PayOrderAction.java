@@ -12,6 +12,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.staffMgr.StaffDao;
+import com.wireless.exception.BusinessException;
 import com.wireless.exception.ErrorCode;
 import com.wireless.exception.ProtocolError;
 import com.wireless.pack.ProtocolPackage;
@@ -22,6 +23,7 @@ import com.wireless.pojo.client.Member;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.distMgr.Discount;
 import com.wireless.pojo.ppMgr.PricePlan;
+import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.NumericUtil;
 import com.wireless.sccon.ServerConnector;
@@ -79,7 +81,7 @@ public class PayOrderAction extends Action{
 			 *           No need to pass this parameter if no comment input. 
 			 */
 			
-			final Staff staff = StaffDao.verify(Integer.parseInt((String) request.getSession().getAttribute("pin")));
+			final Staff staff = StaffDao.verify(Integer.parseInt((String) request.getSession().getAttribute("pin")), Privilege.Code.FRONT_BUSINESS);
 			
 			Order orderToPay = new Order();
 			
@@ -196,6 +198,11 @@ public class PayOrderAction extends Action{
 				jsonResp = jsonResp.replace("$(result)", "false");
 				jsonResp = jsonResp.replace("$(value)", orderToPay.getId() + "号账单结帐不成功，请重新确认");
 			}
+			
+		}catch(BusinessException e){
+			e.printStackTrace();
+			jsonResp = jsonResp.replace("$(result)", "false");
+			jsonResp = jsonResp.replace("$(value)", e.getDesc());
 			
 		}catch(IOException e){
 			e.printStackTrace();

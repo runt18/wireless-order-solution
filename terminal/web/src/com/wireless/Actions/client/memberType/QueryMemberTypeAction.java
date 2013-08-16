@@ -14,8 +14,11 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
 import com.wireless.db.client.member.MemberTypeDao;
+import com.wireless.db.staffMgr.StaffDao;
+import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.client.MemberType;
+import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.util.SQLUtil;
 import com.wireless.util.WebParams;
 
@@ -39,6 +42,10 @@ public class QueryMemberTypeAction extends DispatchAction {
 		List<MemberType> list = new ArrayList<MemberType>();
 		
 		try{
+			
+			String pin = (String) request.getSession().getAttribute("pin");
+			StaffDao.verify(Integer.parseInt(pin), Privilege.Code.MEMBER);
+			
 			String restaurantID = request.getParameter("restaurantID");
 			String name = request.getParameter("name");
 			String discountType = request.getParameter("discountType");
@@ -59,6 +66,11 @@ public class QueryMemberTypeAction extends DispatchAction {
 			paramsSet.put(SQLUtil.SQL_PARAMS_EXTRA, extraCond);
 			paramsSet.put(SQLUtil.SQL_PARAMS_ORDERBY, " ORDER BY A.member_type_id ");
 			list = MemberTypeDao.getMemberType(paramsSet);
+			
+		}catch(BusinessException e){
+			e.printStackTrace();
+			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getCode(), e.getDesc());
+			
 		}catch(Exception e){
 			e.printStackTrace();
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, WebParams.TIP_CODE_EXCEPTION, WebParams.TIP_CONTENT_SQLEXCEPTION);

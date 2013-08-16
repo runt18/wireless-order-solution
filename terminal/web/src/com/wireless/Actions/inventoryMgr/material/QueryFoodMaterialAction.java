@@ -13,9 +13,12 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.inventoryMgr.FoodMaterialDao;
+import com.wireless.db.staffMgr.StaffDao;
+import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.inventoryMgr.FoodMaterial;
 import com.wireless.pojo.inventoryMgr.MaterialCate;
+import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.util.SQLUtil;
 import com.wireless.util.WebParams;
 
@@ -28,6 +31,10 @@ public class QueryFoodMaterialAction extends Action{
 		response.setCharacterEncoding("UTF-8");
 		JObject jobject = new JObject();
 		try{
+			
+			String pin = (String) request.getSession().getAttribute("pin");
+			StaffDao.verify(Integer.parseInt(pin), Privilege.Code.INVENTORY);
+			
 			String foodId = request.getParameter("foodId");
 			
 			String extra = " AND MC.type = " + MaterialCate.Type.MATERIAL.getValue();
@@ -37,6 +44,11 @@ public class QueryFoodMaterialAction extends Action{
 			
 			List<FoodMaterial> root = FoodMaterialDao.getList(params);
 			jobject.setRoot(root);
+			
+		}catch(BusinessException e){
+			e.printStackTrace();
+			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getCode(), e.getDesc());
+			
 		}catch(Exception e){
 			e.printStackTrace();
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);

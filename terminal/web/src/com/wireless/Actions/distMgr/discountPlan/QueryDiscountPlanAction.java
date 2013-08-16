@@ -11,8 +11,11 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.distMgr.DiscountDao;
+import com.wireless.db.staffMgr.StaffDao;
+import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.distMgr.DiscountPlan;
+import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.util.DataPaging;
 import com.wireless.util.WebParams;
 
@@ -31,6 +34,10 @@ public class QueryDiscountPlanAction extends Action{
 		
 		List<DiscountPlan> list = null;
 		try{
+			
+			String pin = (String) request.getSession().getAttribute("pin");
+			StaffDao.verify(Integer.parseInt(pin), Privilege.Code.BASIC);
+			
 			String restaurantID = request.getParameter("restaurantID");
 			String discountID = request.getParameter("discountID");
 			String kitchenName = request.getParameter("kitchenName");
@@ -42,6 +49,10 @@ public class QueryDiscountPlanAction extends Action{
 				extraCond += " AND K.name like '%" + kitchenName.trim() + "%'";
 			
 			list = DiscountDao.getDiscountPlan(extraCond, " ORDER BY A.dist_plan_id,K.kitchen_alias");
+			
+		}catch(BusinessException e){
+			e.printStackTrace();
+			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getCode(), e.getDesc());
 		}catch(Exception e){
 			e.printStackTrace();
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);

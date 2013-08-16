@@ -13,10 +13,13 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
 import com.wireless.db.client.member.MemberOperationDao;
+import com.wireless.db.staffMgr.StaffDao;
+import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.client.MOSummary;
 import com.wireless.pojo.client.MemberOperation;
 import com.wireless.pojo.client.MemberOperation.OperationType;
+import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.util.DateType;
 import com.wireless.util.SQLUtil;
 import com.wireless.util.WebParams;
@@ -34,6 +37,9 @@ public class QueryMemberOperationSummaryAction extends DispatchAction{
 		List<MOSummary> list = null;
 		JObject jobject = new JObject();
 		try{
+			String pin = (String) request.getSession().getAttribute("pin");
+			StaffDao.verify(Integer.parseInt(pin), Privilege.Code.MEMBER);
+			
 			String restaurantID = request.getParameter("restaurantID");
 			String dataSource = request.getParameter("dataSource");
 			String operateType = request.getParameter("operateType");
@@ -89,6 +95,11 @@ public class QueryMemberOperationSummaryAction extends DispatchAction{
 			}
 			
 			jobject.setRoot(list);
+			
+		}catch(BusinessException e){
+			e.printStackTrace();
+			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getCode(), e.getDesc());
+			
 		}catch(Exception e){
 			e.printStackTrace();
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, WebParams.TIP_CODE_ERROE, WebParams.TIP_CONTENT_SQLEXCEPTION);

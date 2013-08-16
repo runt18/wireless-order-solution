@@ -13,7 +13,9 @@ import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.stockMgr.StockDetailReportDao;
+import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
+import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.stockMgr.StockDetailReport;
 import com.wireless.util.WebParams;
@@ -31,7 +33,7 @@ public class QueryStockDetailReportAction extends Action{
 		int roots = 0;
 		try{
 			String pin = (String) request.getSession().getAttribute("pin");
-			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			Staff staff = StaffDao.verify(Integer.parseInt(pin), Privilege.Code.INVENTORY);
 			String beginDate = request.getParameter("beginDate");
 			String endDate = request.getParameter("endDate");
 			String materialId = request.getParameter("materialId");
@@ -61,6 +63,9 @@ public class QueryStockDetailReportAction extends Action{
 				stockDetailReports = StockDetailReportDao.getStockDetailReport(staff, Integer.parseInt(materialId), extra, " LIMIT " + Integer.parseInt(start) + ", " + Integer.parseInt(limit));
 			}
 			//stockDetailReports = StockDetailReportDao.getStockDetailReportByDate(beginDate, endDate, Integer.parseInt(materialId), null);
+		}catch(BusinessException e){
+			e.printStackTrace();
+			jobject.initTip(false, e.getMessage(), e.getCode(), e.getDesc());
 		}catch(Exception e){
 			e.printStackTrace();
 			jobject.initTip(false, e.getMessage(), 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);

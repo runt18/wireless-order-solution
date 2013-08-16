@@ -18,6 +18,7 @@ import com.wireless.db.shift.QueryShiftDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.pojo.billStatistics.IncomeByDept;
 import com.wireless.pojo.billStatistics.ShiftDetail;
+import com.wireless.pojo.staffMgr.Privilege;
 
 @SuppressWarnings({"rawtypes", "unchecked"})
 public class QueryDailySettleByNowAction extends Action{
@@ -38,9 +39,9 @@ public class QueryDailySettleByNowAction extends Action{
 				return null;
 			
 			if(Integer.valueOf(queryType) == 0){
-				res = QueryShiftDao.execByNow(StaffDao.verify(Integer.parseInt(pin)));
+				res = QueryShiftDao.execByNow(StaffDao.verify(Integer.parseInt(pin), Privilege.Code.FRONT_BUSINESS));
 			}else if(Integer.valueOf(queryType) == 1){
-				res = QueryShiftDao.execDailySettleByNow(StaffDao.verify(Integer.parseInt(pin)));
+				res = QueryShiftDao.execDailySettleByNow(StaffDao.verify(Integer.parseInt(pin), Privilege.Code.FRONT_BUSINESS));
 			}
 			
 			if(res == null)

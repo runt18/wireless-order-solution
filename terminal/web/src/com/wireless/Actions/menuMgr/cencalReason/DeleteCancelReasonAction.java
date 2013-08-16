@@ -11,8 +11,10 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.menuMgr.MenuDao;
+import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.crMgr.CancelReason;
+import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.util.JObject;
 import com.wireless.util.WebParams;
 
@@ -26,6 +28,10 @@ public class DeleteCancelReasonAction extends Action{
 		JObject jobject = new JObject();
 		JSONObject centent = null;
 		try{
+			
+			String pin = (String) request.getSession().getAttribute("pin");
+			StaffDao.verify(Integer.parseInt(pin), Privilege.Code.BASIC);
+			
 			String cancelReason = request.getParameter("cancelReason");
 			centent = JSONObject.fromObject(cancelReason);
 			CancelReason cr = (CancelReason) JSONObject.toBean(centent, CancelReason.class);

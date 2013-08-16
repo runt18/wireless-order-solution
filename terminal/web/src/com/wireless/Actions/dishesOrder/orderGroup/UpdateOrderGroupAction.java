@@ -24,6 +24,7 @@ import com.wireless.pack.Type;
 import com.wireless.pack.req.ReqPrintContent;
 import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.regionMgr.Table;
+import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.tasteMgr.Taste;
 import com.wireless.sccon.ServerConnector;
@@ -73,11 +74,11 @@ public class UpdateOrderGroupAction extends DispatchAction{
 						tg[i] = item;
 					}
 					if(otype.equals("0")){
-						int orderId = OrderGroupDao.insert(StaffDao.verify(Integer.parseInt(pin)), tg);
+						int orderId = OrderGroupDao.insert(StaffDao.verify(Integer.parseInt(pin), Privilege.Code.FRONT_BUSINESS), tg);
 						jobject.initTip(true, "操作成功, 已合并团体餐桌信息.");
 						jobject.getOther().put("orderID", orderId);
 					}else if(otype.equals("1")){
-						OrderGroupDao.update(StaffDao.verify(Integer.parseInt(pin)), Integer.valueOf(pid), tg);
+						OrderGroupDao.update(StaffDao.verify(Integer.parseInt(pin), Privilege.Code.FRONT_BUSINESS), Integer.valueOf(pid), tg);
 						jobject.initTip(true, "操作成功, 已修改团体餐桌信息.");
 					}
 				}
@@ -117,7 +118,7 @@ public class UpdateOrderGroupAction extends DispatchAction{
 			String ordersString = request.getParameter("orders");
 			String parentOrderID = request.getParameter("parentOrderID");
 			
-			final Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			final Staff staff = StaffDao.verify(Integer.parseInt(pin), Privilege.Code.FRONT_BUSINESS);
 			
 			JSONArray ja = JSONArray.fromObject(ordersString);
 			

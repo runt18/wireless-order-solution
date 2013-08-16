@@ -22,8 +22,11 @@ import com.oreilly.servlet.multipart.FilePart;
 import com.oreilly.servlet.multipart.MultipartParser;
 import com.oreilly.servlet.multipart.Part;
 import com.wireless.db.menuMgr.FoodDao;
+import com.wireless.db.staffMgr.StaffDao;
+import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.menuMgr.Food;
+import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.util.WebParams;
 
 public class ImageFileUploadAction extends Action{
@@ -37,7 +40,8 @@ public class ImageFileUploadAction extends Action{
 		JObject jobject = new JObject();
 		
 		try{
-//			System.out.println("--------------------------------------------------");
+			String pin = (String) request.getSession().getAttribute("pin");
+			StaffDao.verify(Integer.parseInt(pin), Privilege.Code.BASIC);
 			
 			String restaurantID = request.getParameter("restaurantID");
 			String foodID = request.getParameter("foodID");
@@ -212,6 +216,10 @@ public class ImageFileUploadAction extends Action{
 			
 			jobject.initTip(true, WebParams.TIP_TITLE_DEFAULT, 1111, "操作成功, 已更新菜品图片信息成功!");
 			jobject.setRoot(root);
+			
+		}catch(BusinessException e){
+			e.printStackTrace();
+			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getCode(), e.getDesc());
 		}catch(IOException e){	
 			e.printStackTrace();
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9998, "操作失败, 服务器未能处理图片信息, 请联系客服人员!");

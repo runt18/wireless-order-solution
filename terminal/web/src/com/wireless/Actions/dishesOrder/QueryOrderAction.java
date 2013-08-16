@@ -16,13 +16,13 @@ import com.wireless.db.menuMgr.MenuDao;
 import com.wireless.db.orderMgr.OrderDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
-import com.wireless.exception.ProtocolError;
 import com.wireless.json.JObject;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.distMgr.Discount;
 import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.pojo.ppMgr.PricePlan;
+import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.util.DateType;
 import com.wireless.util.WebParams;
@@ -57,7 +57,7 @@ public class QueryOrderAction extends Action {
 			String customNum = request.getParameter("customNum");
 			
 			Order order = new Order();
-			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			Staff staff = StaffDao.verify(Integer.parseInt(pin), Privilege.Code.FRONT_BUSINESS);
 			
 			if(queryType != null && queryType.trim().equals("History")){
 				if (oid != null && !oid.trim().isEmpty()){
@@ -138,20 +138,12 @@ public class QueryOrderAction extends Action {
 			}
 		} catch (BusinessException e) {
 			e.printStackTrace();
-			if (e.getErrCode() == ProtocolError.TERMINAL_NOT_ATTACHED) {
-				jobject.initTip(false, e.getCode(), "操作失败, 没有获取到餐厅信息, 请重新确认!");
-			} else if (e.getErrCode() == ProtocolError.TABLE_NOT_EXIST) {
-				jobject.initTip(false, e.getCode(), "操作失败, 账单信息不正确, 请重新返回确认!");
-			} else if (e.getErrCode() == ProtocolError.MENU_EXPIRED) {
-				jobject.initTip(false, e.getCode(), "操作失败, 菜谱信息与服务器不匹配, 请与餐厅负责人确认或重新更新菜谱!");
-			} else if (e.getErrCode() == ProtocolError.ORDER_NOT_EXIST) {
-				jobject.initTip(false, e.getCode(), "操作失败, 账单信息不正确, 请重新返回确认!");
-			} else {
-				jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getCode(), e.getDesc());
-			}
+			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getCode(), e.getDesc());
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
+			
 		} finally {
 			response.getWriter().print(jobject.toString());
 		}

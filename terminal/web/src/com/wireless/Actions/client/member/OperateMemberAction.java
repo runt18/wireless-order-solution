@@ -20,6 +20,7 @@ import com.wireless.pack.req.ReqPrintContent;
 import com.wireless.pojo.client.Member;
 import com.wireless.pojo.client.MemberOperation;
 import com.wireless.pojo.client.MemberOperation.ChargeType;
+import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.sccon.ServerConnector;
 import com.wireless.util.WebParams;
@@ -57,7 +58,7 @@ public class OperateMemberAction extends DispatchAction{
 			String addr = request.getParameter("addr");
 			String comment = request.getParameter("comment");
 			
-			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			Staff staff = StaffDao.verify(Integer.parseInt(pin), Privilege.Code.MEMBER);
 			
 			Member.InsertBuilder ib = new Member.InsertBuilder(staff.getRestaurantId(), name, mobile, Integer.valueOf(memberTypeId), Member.Sex.valueOf(Integer.valueOf(sex)));
 			ib.setBirthday(birthday)
@@ -116,7 +117,7 @@ public class OperateMemberAction extends DispatchAction{
 			String addr = request.getParameter("addr");
 			String comment = request.getParameter("comment");
 			
-			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			Staff staff = StaffDao.verify(Integer.parseInt(pin), Privilege.Code.MEMBER);
 			
 			Member.UpdateBuilder ub = new Member.UpdateBuilder(Integer.valueOf(id), 
 				staff.getRestaurantId(), 
@@ -167,7 +168,7 @@ public class OperateMemberAction extends DispatchAction{
 		try{
 			String pin = (String) request.getSession().getAttribute("pin");
 			String id = request.getParameter("id");
-			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			Staff staff = StaffDao.verify(Integer.parseInt(pin), Privilege.Code.MEMBER);
 			MemberDao.deleteById(staff, Integer.valueOf(id));
 			jobject.initTip(true, "操作成功, 会员资料已删除.");
 		}catch(BusinessException e){
@@ -204,7 +205,7 @@ public class OperateMemberAction extends DispatchAction{
 			String rechargeType = request.getParameter("rechargeType");
 			String isPrint = request.getParameter("isPrint");
 			
-			final Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			final Staff staff = StaffDao.verify(Integer.parseInt(pin), Privilege.Code.MEMBER);
 			
 			MemberOperation mo = MemberDao.charge(staff, Integer.valueOf(memberID), Float.valueOf(rechargeMoney), ChargeType.valueOf(Integer.valueOf(rechargeType)));
 			if(mo == null || mo.getId() == 0){
@@ -261,7 +262,7 @@ public class OperateMemberAction extends DispatchAction{
 			String point = request.getParameter("point");
 			String adjust = request.getParameter("adjust");
 			
-			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			Staff staff = StaffDao.verify(Integer.parseInt(pin), Privilege.Code.MEMBER);
 			MemberDao.adjustPoint(staff, Integer.valueOf(memberId), Integer.valueOf(point), Member.AdjustType.valueOf(Integer.valueOf(adjust)));
 			jobject.initTip(true, "操作成功, 会员积分调整成功.");
 		}catch(BusinessException e){
@@ -296,7 +297,7 @@ public class OperateMemberAction extends DispatchAction{
 			String memberId = request.getParameter("memberId");
 			String point = request.getParameter("point");
 			
-			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			Staff staff = StaffDao.verify(Integer.parseInt(pin), Privilege.Code.MEMBER);
 			MemberDao.pointConsume(staff, Integer.valueOf(memberId), Integer.valueOf(point));
 			jobject.initTip(true, "操作成功, 会员积分消费成功.");
 		}catch(BusinessException e){

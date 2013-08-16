@@ -25,8 +25,8 @@ public class QueryPrinterTreeAction extends Action{
 		String pin = (String) request.getSession().getAttribute("pin");
 		
 		try{
-			Staff staff = StaffDao.verify(Integer.parseInt(pin));
-			List<Printer> result =  PrinterDao.getPrinters(staff);
+			Staff staff = StaffDao.getStaffById(Integer.parseInt(pin));
+			List<Printer> result = PrinterDao.getPrinters(staff);
 			if(!result.isEmpty()){
 				int index = 0;
 				for (Printer printer : result) {
@@ -51,7 +51,6 @@ public class QueryPrinterTreeAction extends Action{
 					
 				}
 			}
-
 		}finally{
 			response.getWriter().print("[" + jsonSB.toString() + "]");
 		}

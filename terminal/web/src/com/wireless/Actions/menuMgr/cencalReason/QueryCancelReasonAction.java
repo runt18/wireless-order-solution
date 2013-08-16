@@ -16,8 +16,10 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.menuMgr.MenuDao;
+import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.crMgr.CancelReason;
+import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.util.JObject;
 import com.wireless.util.SQLUtil;
 import com.wireless.util.WebParams;
@@ -32,6 +34,10 @@ public class QueryCancelReasonAction extends Action{
 		List<CancelReason> list = new ArrayList<CancelReason>();
 		JObject jobject = new JObject();
 		try{
+			
+			String pin = (String) request.getSession().getAttribute("pin");
+			StaffDao.verify(Integer.parseInt(pin), Privilege.Code.BASIC);
+			
 			String extra = "", orderBy = null;
 			String restaurantID = request.getParameter("restaurantID");
 			extra += (" AND A.restaurant_id = " + restaurantID);

@@ -12,6 +12,8 @@ import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.supplierMgr.SupplierDao;
+import com.wireless.exception.BusinessException;
+import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.util.JObject;
 import com.wireless.util.WebParams;
@@ -25,10 +27,15 @@ public class DeleteSupplierAction extends Action {
 		JObject jobject = new JObject();
 		try{
 			String pin = (String) request.getSession().getAttribute("pin");;
-			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			Staff staff = StaffDao.verify(Integer.parseInt(pin), Privilege.Code.INVENTORY);
 			int supplierId =Integer.valueOf(request.getParameter("supplierId"));
 			SupplierDao.deleteById(staff, supplierId);
 			jobject.initTip(true, "删除成功!");
+			
+		}catch(BusinessException e){
+			e.printStackTrace();
+			jobject.initTip(false, e.getMessage(), e.getCode(), e.getDesc());
+
 		}catch(Exception e){
 			e.printStackTrace();
 			jobject.initTip(false, e.getMessage(), 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);

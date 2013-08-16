@@ -24,8 +24,9 @@ public class QueryMemberTypeTreeAction extends Action {
 		
 		request.setCharacterEncoding("UTF-8");
 		response.setCharacterEncoding("UTF-8");
-		StringBuffer tsb = new StringBuffer();
+		StringBuilder tsb = new StringBuilder();
 		try{
+			
 			String restaurantID = request.getParameter("restaurantID");
 			Map<Object, Object> paramsSet = new HashMap<Object, Object>();
 			paramsSet.put(SQLUtil.SQL_PARAMS_EXTRA, " AND A.restaurant_id = " + restaurantID);
@@ -48,7 +49,6 @@ public class QueryMemberTypeTreeAction extends Action {
 				tsb.append("}");
 			}
 			tsb.append("]");
-			
 		}catch(Exception e){
 			e.printStackTrace();
 		}finally{

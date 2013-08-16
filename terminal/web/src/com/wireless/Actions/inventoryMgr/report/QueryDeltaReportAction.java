@@ -17,7 +17,9 @@ import org.apache.struts.action.ActionMapping;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.stockMgr.StockDeltaReportDao;
 import com.wireless.db.system.SystemDao;
+import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
+import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.stockMgr.StockTakeDetail;
 import com.wireless.util.WebParams;
@@ -39,7 +41,7 @@ public class QueryDeltaReportAction extends Action{
 			String cateType = request.getParameter("cateType");
 			String cateId = request.getParameter("cateId");
 			String deptId = request.getParameter("deptId");
-			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			Staff staff = StaffDao.verify(Integer.parseInt(pin), Privilege.Code.INVENTORY);
 			String extra = "";
 			String orderClause = "LIMIT " + start +", " + limit;
 			List<StockTakeDetail> deltaReports = new ArrayList<StockTakeDetail>();
@@ -78,6 +80,9 @@ public class QueryDeltaReportAction extends Action{
 			deltaReports = StockDeltaReportDao.deltaReport(staff, beginDate, endDate, deptId, extra, orderClause);
 			jobject.setTotalProperty(deltaReports.size());
 			jobject.setRoot(deltaReports);
+		}catch(BusinessException e){
+			e.printStackTrace();
+			jobject.initTip(false, e.getMessage(), e.getCode(), e.getDesc());
 		}catch(Exception e){
 			e.printStackTrace();
 			jobject.initTip(false, e.getMessage(), 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);

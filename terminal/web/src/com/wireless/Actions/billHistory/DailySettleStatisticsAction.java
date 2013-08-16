@@ -14,7 +14,10 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
+import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.system.SystemDao;
+import com.wireless.exception.BusinessException;
+import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.system.DailySettle;
 import com.wireless.util.DataPaging;
 import com.wireless.util.JObject;
@@ -37,6 +40,10 @@ public class DailySettleStatisticsAction extends Action {
 		List<DailySettle> list = null;
 		
 		try{
+			
+			String pin = (String) request.getSession().getAttribute("pin");
+			StaffDao.verify(Integer.parseInt(pin), Privilege.Code.HISTORY);
+			
 			String restaurantID = request.getParameter("restaurantID");
 			String onDuty = request.getParameter("onDuty");
 			String offDuty = request.getParameter("offDuty");
@@ -48,6 +55,10 @@ public class DailySettleStatisticsAction extends Action {
 			Map<Object, Object> paramsSet = new HashMap<Object, Object>();
 			paramsSet.put(SQLUtil.SQL_PARAMS_EXTRA, extra);
 			list = SystemDao.getDailySettle(paramsSet);
+			
+		}catch(BusinessException e){
+			e.printStackTrace();
+			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getCode(), e.getDesc());
 			
 		}catch(Exception e){
 			e.printStackTrace();

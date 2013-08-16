@@ -14,7 +14,10 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
 import com.wireless.db.billStatistics.BusinessStatisticsDao;
+import com.wireless.db.staffMgr.StaffDao;
+import com.wireless.exception.BusinessException;
 import com.wireless.pojo.billStatistics.BusinessStatistics;
+import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.util.DateType;
 import com.wireless.util.JObject;
 import com.wireless.util.WebParams;
@@ -39,6 +42,9 @@ public class BusinessStatisticsAction extends DispatchAction {
 		JObject jobject = new JObject();
 		try{
 			String pin = (String) request.getSession().getAttribute("pin");
+			
+			StaffDao.verify(Integer.parseInt(pin), Privilege.Code.HISTORY);
+			
 			String restaurantID = request.getParameter("restaurantID");
 			String onDuty = request.getParameter("onDuty");
 			String offDuty = request.getParameter("offDuty");
@@ -58,9 +64,15 @@ public class BusinessStatisticsAction extends DispatchAction {
 			}else{
 				jobject.initTip(false, WebParams.TIP_TITLE_DEFAULT, 1111, "操作成功, 该时间段没有记录, 请重新查询.");
 			}
+			
+		}catch(BusinessException e){
+			e.printStackTrace();
+			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getCode(), e.getDesc());
+			
 		}catch(Exception e){
 			e.printStackTrace();
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
+			
 		}finally{
 			JSONObject json = JSONObject.fromObject(jobject);
 			response.getWriter().print(json.toString());

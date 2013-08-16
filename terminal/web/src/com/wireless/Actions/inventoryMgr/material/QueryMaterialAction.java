@@ -16,8 +16,10 @@ import org.apache.struts.actions.DispatchAction;
 import com.wireless.db.inventoryMgr.MaterialDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.stockMgr.MaterialDeptDao;
+import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.inventoryMgr.Material;
+import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.stockMgr.StockTakeDetail;
 import com.wireless.util.DataPaging;
@@ -37,7 +39,9 @@ public class QueryMaterialAction extends DispatchAction{
 		String start = request.getParameter("start");
 		String limit = request.getParameter("limit");
 		try{
-//			String pin = (String) request.getSession().getAttribute("pin");
+			String pin = (String) request.getSession().getAttribute("pin");
+			StaffDao.verify(Integer.parseInt(pin), Privilege.Code.INVENTORY);
+			
 			String restaurantID = request.getParameter("restaurantID");
 			String name = request.getParameter("name");
 			String cateId = request.getParameter("cateId");
@@ -63,6 +67,10 @@ public class QueryMaterialAction extends DispatchAction{
 			params.put(SQLUtil.SQL_PARAMS_EXTRA, extra);
 			
 			root = MaterialDao.getContent(params);
+		}catch(BusinessException e){
+			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getCode(), e.getDesc());
+			e.printStackTrace();
+			
 		}catch(Exception e){
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
 			e.printStackTrace();
@@ -97,12 +105,16 @@ public class QueryMaterialAction extends DispatchAction{
 		List<StockTakeDetail> root = new ArrayList<StockTakeDetail>();
 		try{
 			String pin = (String) request.getSession().getAttribute("pin");
-			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			Staff staff = StaffDao.verify(Integer.parseInt(pin), Privilege.Code.INVENTORY);
 			String cateId = request.getParameter("cateId");
 			String deptId = request.getParameter("deptId");
 			if(cateId != null && !cateId.trim().isEmpty() && deptId != null){
 				root = MaterialDeptDao.getStockTakeDetails(staff, Integer.parseInt(deptId), Integer.parseInt(cateId), " ORDER BY MD.stock DESC");
 			}
+		}catch(BusinessException e){
+			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getCode(), e.getDesc());
+			e.printStackTrace();
+			
 		}catch(Exception e){
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
 			e.printStackTrace();

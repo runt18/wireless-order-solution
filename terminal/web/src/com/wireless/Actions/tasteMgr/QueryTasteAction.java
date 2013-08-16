@@ -12,7 +12,9 @@ import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.tasteMgr.TasteDao;
+import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
+import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.tasteMgr.Taste;
 import com.wireless.util.DataPaging;
@@ -40,7 +42,7 @@ public class QueryTasteAction extends Action {
 			
 			String ope = request.getParameter("ope");
 			
-			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			Staff staff = StaffDao.verify(Integer.parseInt(pin), Privilege.Code.BASIC);
 			String extraCond = "";
 			if(ope != null && !ope.trim().isEmpty() && !ope.equals("")){
 				try{
@@ -76,6 +78,10 @@ public class QueryTasteAction extends Action {
 			}
 			
 			root = TasteDao.getTastes(staff, extraCond, " ORDER BY TASTE.taste_alias ");
+		} catch(BusinessException e){
+			e.printStackTrace();
+			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getCode(), e.getDesc());
+			
 		} catch(Exception e) {
 			e.printStackTrace();
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);

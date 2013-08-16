@@ -12,7 +12,9 @@ import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.supplierMgr.SupplierDao;
+import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
+import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.supplierMgr.Supplier;
 import com.wireless.util.WebParams;
@@ -22,7 +24,7 @@ public class QuerySupplierAction extends Action {
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception{
 		response.setCharacterEncoding("UTF-8");
 		request.setCharacterEncoding("UTF-8");
-		JObject jobject = null;
+		JObject jobject = new JObject();
 		try{
 			//String pin = (String) request.getSession().getAttribute("pin");
 
@@ -37,7 +39,7 @@ public class QuerySupplierAction extends Action {
 			String op = request.getParameter("op");
 			String tele = request.getParameter("tele");
 			String contact = request.getParameter("contact");
-			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			Staff staff = StaffDao.verify(Integer.parseInt(pin), Privilege.Code.INVENTORY);
 			String extraCond = "";
 			if(start !=  null && limit != null){
 				if(op != null && op.equals("e")){
@@ -56,7 +58,13 @@ public class QuerySupplierAction extends Action {
 			
 			List<Supplier> root = SupplierDao.getSuppliers(staff, extraCond, null);
 			
-		    jobject = new JObject(roots, root);
+		    jobject.setTotalProperty(roots);
+		    jobject.setRoot(root);
+		    
+		}catch(BusinessException e){
+			e.printStackTrace();
+			jobject.initTip(false, e.getMessage(), e.getCode(), e.getDesc());
+
 		}catch(Exception e){
 			e.printStackTrace();
 			jobject.initTip(false, e.getMessage(), 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);

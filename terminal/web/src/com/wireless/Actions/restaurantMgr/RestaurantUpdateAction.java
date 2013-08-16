@@ -17,6 +17,7 @@ import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.restaurantMgr.Restaurant;
+import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.staffMgr.Staff;
 
 public class RestaurantUpdateAction extends Action {
@@ -53,7 +54,7 @@ public class RestaurantUpdateAction extends Action {
 			
 			dbCon.connect();
 
-			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			Staff staff = StaffDao.verify(Integer.parseInt(pin), Privilege.Code.SYSTEM);
 			
 			id = staff.getRestaurantId()+"";
 			
