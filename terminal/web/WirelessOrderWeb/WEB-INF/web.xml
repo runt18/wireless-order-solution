@@ -3,6 +3,9 @@
 	xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
 	<display-name>WirelessOrderWeb</display-name>
+	<session-config>     
+		<session-timeout>1</session-timeout>       <!-- 单位：分钟 -->
+	</session-config>
 	<servlet>
 		<servlet-name>action</servlet-name>
 		<servlet-class>com.wireless.Actions.init.InitServlet</servlet-class>
@@ -25,7 +28,7 @@
 		</init-param>
 		<init-param>
 			<param-name>db_host</param-name>
-			<param-value>192.168.157.100</param-value>
+			<param-value>127.0.0.1</param-value>
 		</init-param>
 		<init-param>
 			<param-name>db_port</param-name>
@@ -37,7 +40,7 @@
 		</init-param>
 		<init-param>
 			<param-name>db_pwd</param-name>
-			<param-value>HelloZ315</param-value>
+			<param-value>root</param-value>
 		</init-param>
 		<!-- Below is the configuration parameters to socket -->
 		<init-param>
