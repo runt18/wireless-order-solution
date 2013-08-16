@@ -25,6 +25,7 @@
 <script type="text/javascript" src="../../js/common/Ext.ux.js"></script>
 <script type="text/javascript" src="../../js/common/Ext.ux.check.js"></script>
 <script type="text/javascript" src="../../js/components/md5.js"></script>
+<script type="text/javascript" src="../../js/components/Encrypt.js"></script>
 <script type="text/javascript" src="../../js/components/functionLib.js"></script>
 
 <script type="text/javascript">
@@ -36,7 +37,7 @@
  	var Request = new URLParaQuery();
 	
   	var restaurantID = Request["restaurantID"];
-	var pin = Request["pin"]; 
+	 
 	var winParams = {
 			st : [[-1, '全部'], [1, '入库'], [2, '出库']],
 			cate : [[-1, '全部'], [1, '商品'], [2, '原料']],
