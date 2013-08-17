@@ -315,7 +315,7 @@ var addPrintFunc = new Ext.Window({
 				success : function(res, opt){
 					var jr = Ext.decode(res.responseText);
 					if(jr.success){
-						Ext.getCmp('grid').store.reload();
+						sn.fireEvent('dblclick', sn);
 						Ext.example.msg(jr.title, jr.msg);
 					}else{
 						Ext.ux.showMsg(jr);
@@ -427,8 +427,8 @@ var addPrintFunc = new Ext.Window({
 					check  : function(thiz, checked){
 						if(checked){
 							showPanel(thiz.inputValue);
-							document.getElementById('chkAllRegion').checked = true;
-							return ;
+/*							document.getElementById('chkAllRegion').checked = true;
+							return ;*/
 							
 						}
 					},
@@ -461,7 +461,6 @@ var addPrintFunc = new Ext.Window({
 					check  : function(thiz, checked){
 						if(checked){
 							showPanel(thiz.inputValue);
-							die;
 						}
 					}
 				} 
@@ -477,7 +476,6 @@ var addPrintFunc = new Ext.Window({
 					check  : function(thiz, checked){
 						if(checked){
 							showPanel(thiz.inputValue);
-							die;
 						}
 					}
 				}
@@ -494,7 +492,6 @@ var addPrintFunc = new Ext.Window({
 					check  : function(thiz, checked){
 						if(checked){
 							showPanel(thiz.inputValue);
-							die;
 						}
 					}
 				}
@@ -510,7 +507,6 @@ var addPrintFunc = new Ext.Window({
 					check  : function(thiz, checked){
 						if(checked){
 							showPanel(thiz.inputValue);
-							die;
 						}
 					}
 				}
@@ -533,7 +529,7 @@ var addPrintFunc = new Ext.Window({
 		},{
 			items : [{
 				xtype : 'checkbox',
-				name : 'kitchens',
+				//name : 'kitchens',
 				id : 'chkAllKitchen',
 				hideLabel : true,
 				boxLabel : '所有厨房',
@@ -625,7 +621,7 @@ var addPrintFunc = new Ext.Window({
 		},{
 			items : [{
 				xtype : 'checkbox',
-				name : 'pType',
+//				name : 'pType',
 				id : 'chkAllRegion',
 				hideLabel : true,
 				boxLabel : '所有区域',
