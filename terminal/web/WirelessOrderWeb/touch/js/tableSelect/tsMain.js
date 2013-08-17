@@ -123,8 +123,8 @@ function getTables(){
 }
 
 /**
- * 取得当前区域下的空闲和就餐状态的餐桌数组 
- * @param {string} type 状态类型，分为空闲（free）和就餐（busy）两种类型
+ * 取得当前区域下不同状态的餐桌数组 
+ * @param {string} type 状态类型，分为空闲（free），就餐（busy），全部状态（allStatus）
  * @param {object} tempTables 区域数组对象
  * @returns {object} statusTables 餐桌数组对象 
  */
@@ -149,10 +149,10 @@ function getStatusTables(type, tempTables){
 	}
 	return statusTables;
 }
-/**
- * 把被选中的餐桌背景色改为选中色(#FFA07A)
- * @param {string} selectingId 被选中餐桌的id
- */
+///**
+// * 把被选中的餐桌背景色改为选中色(#FFA07A)
+// * @param {string} selectingId 被选中餐桌的id
+// */
 //function changeColorForSelect(selectingId){
 //	//把上次被选的餐桌背景色还原
 //	$("#" + selectTableId).css("backgroundColor", primeBgColor);
@@ -163,6 +163,10 @@ function getStatusTables(type, tempTables){
 //	//设置被选中餐桌的背景色
 //	$("#" + selectTableId).css("backgroundColor", "#FFA07A");	
 //}
+/**
+ * 点击区域，显示不同状态的餐桌数组
+ * @param {object} o 
+ */
 function addTables(o){
     pageNow = 1;
     //把当前区域餐桌数组清空
@@ -170,6 +174,14 @@ function addTables(o){
     tempForAllStatus = [];
     tempForRegion = [];
     var statusTable = [];
+    //初始化当前区域的所有状态餐桌数组
+    for(x in tables){
+    	if(o == "allTable"){
+    		tempForAllStatus.push(tables[x]);	
+    	}else if(tables[x].region.id == o.id.substr(6)){
+    		tempForAllStatus.push(tables[x]); 		
+    	} 
+     }
    //判断当前处于哪个状态
     if(statusType == "allStatus"){
     	statusTable = tables;
@@ -178,30 +190,28 @@ function addTables(o){
     }else if(statusType == "busy"){
     	statusTable = busyTables;
     }
-    //把对应区域的餐桌对象添加到tempForRegion数组中
+    //获得当前状态的对应区域餐桌数组
     for(x in statusTable){
     	if(o == "allTable"){
     		tempForRegion.push(statusTable[x]);
-    	}else if(statusTable[x].region.id == o.id.substr(6)){
-    		tempForRegion.push(statusTable[x]);
-    	} 
-     }
-    for(x in tables){
-    	if(o == "allTable"){
-    		tempForAllStatus.push(tables[x]);
     		$(".button-base.regionSelect").css("backgroundColor", "#D4F640");
     		$("#divAllArea").css("backgroundColor", "#FFA07A");
-    	}else if(tables[x].region.id == o.id.substr(6)){
-    		tempForAllStatus.push(tables[x]);
+    	}else if(statusTable[x].region.id == o.id.substr(6)){
+    		tempForRegion.push(statusTable[x]);
     		$(".button-base.regionSelect").css("backgroundColor", "#D4F640");
     	    $("#divAllArea").css("backgroundColor", "#4EEE99");
     	    $("#" + o.id).css("backgroundColor", "#FFA07A");
     	} 
-     }
+     }  
     temp = tempForRegion;
     n = Math.ceil(temp.length/limit) ;      
     showTable(temp, pageNow);
 }
+/**
+ * 显示餐桌
+ * @param {object} temp 需要显示的餐桌数组
+ * @param {int} pageNow 当前页数
+ */
 function showTable(temp, pageNow){	
 	if(temp.length != 0){
 		var tableHtml = "";
@@ -215,15 +225,13 @@ function showTable(temp, pageNow){
 			}else{
 				tableName = pageRoot[x].name;
 			}
-			tableHtml += "<div class = 'table-base' id = 'divtable" + pageRoot[x].alias +
+			tableHtml += "<div class = 'table-base' tableObject = " + JSON.stringify(pageRoot[x]) + " id = 'divtable" + pageRoot[x].alias +
 			"' onclick = 'selectTable(this)'> " + 
 			"<div style = 'margin-top: 25px; font-weight: bold;'>" + 
 			tableName + "</div>" + 
 			"<div style = 'color: #462B77; font-size: 10px;'>" + pageRoot[x].alias + "</div>" + 
-			"<input type = 'text' value = " + JSON.stringify(pageRoot[x]) + " style = 'display : none' />" +
 			"</div>";
 		}
-		
 		$("#divShowTableForSelect").html(tableHtml);
 		//把占用的餐桌背景色改为占用色（#FFFF00）
 		for(x in busyTables){
@@ -237,7 +245,9 @@ function showTable(temp, pageNow){
 		alert("该区域没有设置餐桌！");
 	}	
 }
-//点击全部状态
+/**
+ * 点击全部状态按钮
+ */
 function showStatus(){
 	$("#divStatus").slideToggle();
 	$("#divAllStatus").css("backgroundColor", "#FFA07A");
@@ -245,9 +255,7 @@ function showStatus(){
 	$("#freeForTableSelect").css("backgroundColor", "#D4F640");
 	statusType = "allStatus";
 	pageNow = 1;
-	var tempAllStatus = [];
-	tempAllStatus = getStatusTables("allStatus", tempForAllStatus);
-	temp = tempAllStatus;
+	temp = tempForAllStatus;
 	n = Math.ceil(temp.length/limit) ;      
     showTable(temp, pageNow);
 }
@@ -258,13 +266,10 @@ $("#freeForTableSelect").click(function(){
 	$("#divAllStatus").css("backgroundColor", "#4EEE99");
 	statusType = "free";
 	pageNow = 1;
-	var tempFree = [];
-	tempFree = getStatusTables("free", tempForAllStatus);
-	temp = tempFree;
+	temp = getStatusTables("free", tempForAllStatus);
 	n = Math.ceil(temp.length/limit) ;      
     showTable(temp, pageNow);
 });
-
 //点击就餐状态按钮
 $("#busyForTableSelect").click(function(){
 	$("#busyForTableSelect").css("backgroundColor", "#FFA07A");
@@ -272,24 +277,27 @@ $("#busyForTableSelect").click(function(){
 	$("#divAllStatus").css("backgroundColor", "#4EEE99");
 	statusType = "busy";
 	pageNow = 1;
-	var tempBusy = [];
-	tempBusy = getStatusTables("busy", tempForAllStatus);
-	temp = tempBusy;
-	n = Math.ceil(tempBusy.length/limit) ;      
-    showTable(tempBusy, pageNow);
+	temp = getStatusTables("busy", tempForAllStatus);
+	n = Math.ceil(temp.length/limit) ;      
+    showTable(temp, pageNow);
 });
+//设置鼠标移到数字键盘上的移进移出效果
 $(".keyboardbutton").mouseover(function(){
 	$(this).css("backgroundColor", "#FFD700");
 });
 $(".keyboardbutton").mouseout(function(){
 	$(this).css("backgroundColor", "#75B2F4");
 });
+/**
+ * 选中一张餐桌
+ * @param {object} o 被选中的餐桌对象
+ */
 function selectTable(o){
 //	changeColorForSelect(o.id);
 	$("#divHideForTableSelect").show();
 	$("#divShowMessageForTableSelect").show(100);
 	var tableMessage, tabMessage;
-	tabMessage =  $("#" + o.id + " input").attr("value");
+	tabMessage = document.getElementById(o.id).getAttribute("tableObject");
 	tableMessage = JSON.parse(tabMessage);
 	//关闭该界面
 	$("#btnCancelForShowMessageTS").click(function (){
@@ -301,21 +309,6 @@ function selectTable(o){
 	$("#txtTableNumForSM").val(tableMessage.alias);
 	$("#txtPeopleNumForSM").select();
 	inputNumId  = "txtPeopleNumForSM";
-	//点击选中按钮，选择桌号输入框
-	$("#selectTableNum").click(function(){
-		$("#txtTableNumForSM").select();
-		inputNumId  = "txtTableNumForSM";
-		inputNumVal = "";
-	});
-	//点击选中按钮，选择人数输入框
-	$("#selectPeopleNum").click(function(){
-		$("#txtPeopleNumForSM").select();
-		inputNumId  = "txtPeopleNumForSM";
-		inputNumVal = "";
-	});
-	
-}
-function inputNum(o){
 	//点击选中按钮，选择桌号输入框
 	$("#selectTableNum").click(function(){
 		$("#txtTableNumForSM").select();
@@ -340,6 +333,12 @@ function inputNum(o){
 		inputNumVal = "";
 		inputNumVal += $("#" + inputNumId).val();
 	});
+}
+/**
+ * 点击数字键盘上的数字，对输入框进行输入
+ * @param {object} o
+ */
+function inputNum(o){
 	inputNumVal += o.value;
 	$("#" + inputNumId).val(inputNumVal);
 	//判断人数是否超过限定
@@ -358,7 +357,6 @@ function inputNum(o){
 			$("#" + inputNumId).val(inputNumVal);
 		}
 	}
-	
 	$("#" + inputNumId).focus();	
 }
 //清除一位数字
@@ -366,7 +364,7 @@ $("#btnBackOneForSTNum").click(function(){
 	var tempNum;
 	tempNum = $("#txtTableNumForTS").val();
 	if(tempNum.length > 0){
-		inputNumVal = tempNum.substring(0,tempNum.length-1);
+		inputNumVal = tempNum.substring(0, tempNum.length-1);
 		$("#txtTableNumForTS").val(inputNumVal);
 	}
 	$("#" + inputNumId).focus();
@@ -377,7 +375,6 @@ $("#btnBackAllForSTNum").click(function(){
 	$("#txtTableNumForTS").val(inputNumVal);
 	$("#" + inputNumId).focus();
 });
-
 //跳转到点菜界面
 function renderToCreateOrder(tableNo, peopleNo){
 	if(hasTable(tables, tableNo)){
@@ -385,7 +382,7 @@ function renderToCreateOrder(tableNo, peopleNo){
 		$("#divShowMessageForTableSelect").hide(100);
 		$("#divHideForTableSelect").hide();
 		inputNumVal = "";
-		$("#txtTableNumForTS").val("");
+		$("#txtTableNumForTS").val(inputNumVal);
 		$("#txtPeopleNumForSM").val(inputNumVal);
 		//设置该餐桌为选中状态
 //		changeColorForSelect("divtable" + tableNo);
