@@ -60,6 +60,52 @@ public class StaffDao {
 	 * 			throws if the privilege code is NOT allowed
 	 */
 	public static Staff verify(DBCon dbCon, int staffId, Privilege.Code code) throws SQLException, BusinessException{
+		
+		Staff staff = verify(dbCon, staffId);
+		
+		if(staff.getRole().hasPrivilege(code)){
+			return staff;
+		}else{
+			throw new BusinessException(StaffError.PERMISSION_NOT_ALLOW);
+		}
+
+	}
+	
+	/**
+	 * Verify a staff to check if the attached restaurant is expired
+	 * @param staffId
+	 * 			the staff id to verify
+	 * @return the staff to this id
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if the staff to this id does NOT exist
+	 * 		    throws if the restaurant attached with this staff has been expired
+	 */
+	public static Staff verify(int staffId) throws SQLException, BusinessException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return verify(dbCon, staffId);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Verify a staff to check if the attached restaurant is expired
+	 * @param dbCon
+	 * 			database connection
+	 * @param staffId
+	 * 			the staff id to verify
+	 * @return the staff to this id
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if the staff to this id does NOT exist
+	 * 		    throws if the restaurant attached with this staff has been expired
+	 */
+	public static Staff verify(DBCon dbCon, int staffId) throws SQLException, BusinessException{
 		String sql;
 		sql = " SELECT expire_date " +
 		      " FROM " + Params.dbName + ".restaurant REST " +
@@ -80,13 +126,7 @@ public class StaffDao {
 		
 		dbCon.rs.close();
 
-		Staff staff = getStaffById(dbCon, staffId);
-		
-		if(staff.getRole().hasPrivilege(code)){
-			return staff;
-		}else{
-			throw new BusinessException(StaffError.PERMISSION_NOT_ALLOW);
-		}
+		return getStaffById(dbCon, staffId);
 
 	}
 	
