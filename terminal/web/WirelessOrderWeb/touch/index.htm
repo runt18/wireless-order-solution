@@ -4,18 +4,19 @@
 
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>触摸屏点菜端</title>
-<link rel="stylesheet" href="./css/scrollbar.css">
+<!-- <link rel="stylesheet" href="./css/scrollbar.css"> -->
 <link rel="stylesheet" href="./css/base.css">
 <link rel="stylesheet" href="./css/tableSelect.css">
 <link rel="stylesheet" href="./css/updateOrder.css">
 <link rel="stylesheet" href="./css/createOrder.css">
 <script type="text/javascript" src="../jquery/jquery-1.8.2.min.js"></script>
+<script type="text/javascript" src="../jquery/jquery.msg.js"></script>
 <script type="text/javascript">
 var pin = 15, restaurantID = 26;
 var foodData = {}, kitchenFoodData = {}, kitchenData = {}, deptData = {root:[]};
 function getDom(id){
 	return document.getElementById(id);
-} 
+}
 </script>
 <script type="text/javascript" src="./js/index.js"></script>
 </head>
@@ -106,7 +107,7 @@ function getDom(id){
   		<div class="button-base" style="margin-right: 2px;" onclick = "checkOnTS()">结账</div>
   		<div class="div-full">&nbsp;</div>
   		<div class="button-base" style="margin-left: 2px;" onClick="toggleContentDisplay({type:'show', renderTo:'divUpdateOrder'})">divUpdateOrder</div>
-		<div class="button-base" style="margin-left: 2px;" onClick="toggleContentDisplay({type:'show', renderTo:'divCreateOrder'})">divCreateOrder</div>
+		<div class="button-base" style="margin-left: 2px;" onClick="cr.show()">cr.show()</div>
 	</div>
 	<div id="divFootForTableSelect">
 		<span style="margin-right: 30px; margin-left: 10px;">收银员：</span>	
@@ -124,7 +125,7 @@ function getDom(id){
 <div id="divCreateOrder" class="box-vertical content">
 	<div id="divNorthForCreateOrder" class="box-horizontal" style="margin-right: 2px;">
     	<div style="width: 218px; margin-right: 2px;">
-    		<div class="button-base" style="line-height: 30px; height: 60px; background: #DAA520; ">
+    		<div class="button-base" style="line-height: 30px; height: 60px; background: #FFD700; ">
     			<div>888</div>
     			<div>一路发</div>
     		</div>
@@ -138,7 +139,7 @@ function getDom(id){
 		</div>
   	</div>
   	<div id="divCenterForCreateOrde" class="box-horizontal" style="">
-  		<div style="width: 300px; "></div>
+  		<div id="divCFCONewFood" style=""> </div>
     	<div id="divCFCOHandler" style="">
 	      	<div class="button-base" style="">数量+1</div>
 	      	<div class="button-base">数量-1</div>
@@ -149,21 +150,19 @@ function getDom(id){
     	</div>
     	<div id="divCFCOAllFood" class="div-full" style="overflow-y: auto;"></div>
   	</div>
-  	<div id="divDescForCreateOrde" class="box-horizontal" style="">
+  	<div id="divDescForCreateOrde" class="box-horizontal" style="background: #FFD700;">
   		&nbsp;
   	</div>
   	<div id="divSouthForCreateOrde" class="box-horizontal" style="">
   		<div class="button-base" style="margin-right: 2px;" onClick="toggleContentDisplay({type:'hide', renderTo:'divCreateOrder'})">返回</div>
-  		<div class="button-base" style="margin-right: 2px;">上一页</div>
-  		<div class="button-base" style="margin-right: 2px;">下一页</div>
-  		<div class="button-base" style="margin-right: 2px;" onClick="cr_initDeptContent()">cr_initDeptContent</div>
-  		<div class="button-base" style="margin-right: 2px;" onClick="cr_initKitchenContent()">cr_initKitchenContent</div>
-  		<div class="button-base" style="margin-right: 2px;" onClick="cr_initFoodContent()">cr_initFoodContent</div>
+  		<div class="button-base" style="margin-right: 2px;">上翻</div>
+  		<div class="button-base" style="margin-right: 2px;">下翻</div>
   		<div class="div-full">&nbsp;</div>
   		<div class="button-base" style="margin-left: 2px;">下单</div>
-  		<div class="button-base" style="margin-left: 2px;">搜索</div>
-  		<div class="button-base" style="margin-left: 2px;">上一页</div>
-  		<div class="button-base" style="margin-left: 2px;">下一页</div>
+  		<div class="button-base" style="margin-left: 2px;" onClick="cr.fd.getFirstPage()">首页</div>
+  		<div class="button-base" style="margin-left: 2px;" onClick="cr.fd.getPreviousPage()">上一页</div>
+  		<div class="button-base" style="margin-left: 2px;" onClick="cr.fd.getNextPage()">下一页</div>
+  		<div class="button-base" style="margin-left: 2px;" onClick="cr.fd.getLastPage()">尾页</div>
   	</div>
 </div>  
 </body>

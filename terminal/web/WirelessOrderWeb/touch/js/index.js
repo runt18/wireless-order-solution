@@ -1,3 +1,44 @@
+/**
+ * 
+ * @param args
+ * @returns {String}
+ */
+String.prototype.format = function(args){
+    var result = this;
+    if (arguments.length > 0) {    
+        if (arguments.length == 1 && typeof (args) == "object") {
+            for (var key in args) {
+                if(args[key]!=undefined){
+                    var reg = new RegExp("({" + key + "})", "g");
+                    result = result.replace(reg, args[key]);
+                }
+            }
+        }else{
+        	for (var i = 0; i < arguments.length; i++) {
+        		if (arguments[i] != undefined) {
+        			var reg= new RegExp("({)" + i + "(})", "g");
+        			result = result.replace(reg, arguments[i]);
+                }
+            }
+        }
+    }
+    return result;
+};
+/**
+ * 显示模板
+ */
+var Templet = {
+	cr : {
+		dept : '<div class="button-base" data-value={value} data-type="dept-select" '
+			+ 'onClick="cr.initKitchenContent({event:this, deptId:{value}})">{text}</div>',
+		kitchen : '<div class="button-base" data-value={value} data-type="kitchen-select" '
+			+ 'onClick="cr.findFoodByKitchen({event:this, kitchenId:{value}})">{text}</div>',
+		newFood : '<div data-value={id} data-type="newFood-select" onClick="cr.selectNewFood({event:this, foodId:{id}})">'
+			+ '<div style="line-height: 40px; ">{name}</div>'
+  			+ '<div style="height: 40px;">{unitPrice} x {count} = {totalPrice}(¥)</div>'
+  			+ '</div>'
+	}
+};
 
 
 /**

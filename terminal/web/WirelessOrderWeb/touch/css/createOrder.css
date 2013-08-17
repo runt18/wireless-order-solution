@@ -65,16 +65,41 @@
 
 .divCFCOAllFood-main-box{
 	width: 90px;
-	height: 80px;
+	height: 70px;
 	margin: 5px 0 0 5px;
 	float: left;
-	background: #4EEE99;
+	background: #87CEEA;
 	font-weight: bold;
-	font-szie: 22px;
+	font-size: 16px;
+}
+.divCFCOAllFood-main-box:active{ background: #FFD700; }
+
+.div-deptOrKitchen-select{
+	line-height: 60px;
+	color: #fff;
+	background: #228B22;
+	margin-right: 1px;
 }
 
-
-
+#divCFCONewFood{
+	width: 300px; 
+	overflow-y: auto; 
+	font-size: 20px;
+}
+#divCFCONewFood div[data-type="newFood-select"]{
+	width: 100%; 
+	border-bottom: 2px solid #ddd; 
+	height: 80px; 
+	background: #87CEEA;
+	text-align: center;
+	vertical-align: middle;
+	font-weight: bold;
+	font-size: 20px;
+}
+.div-newFood-select{
+	color: #fff;
+	background: #228B22 !important;
+}
 
 
 
