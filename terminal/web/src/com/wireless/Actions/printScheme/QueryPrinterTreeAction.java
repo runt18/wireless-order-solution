@@ -39,7 +39,11 @@ public class QueryPrinterTreeAction extends Action{
 					jsonSB.append(", styleValue : '" + printer.getStyle().getVal() + "'");
 					jsonSB.append(", styleText : '" + printer.getStyle().getDesc() + "'");
 					jsonSB.append(", isEnabled : " + printer.isEnabled());
-					jsonSB.append(", text : '" + printer.getName() + "(" + printer.getAlias() + "  " + printer.getStyle().getDesc() + ")'");
+					if(printer.getAlias().equals("")){
+						jsonSB.append(", text : '" + printer.getName() + "(" + printer.getStyle().getDesc() + ")'");
+					}else{
+						jsonSB.append(", text : '" + printer.getName() + "(" + printer.getAlias() + " " + printer.getStyle().getDesc() + ")'");
+					}
 					jsonSB.append(", leaf : true" );
 					if(!printer.isEnabled()){
 						jsonSB.append(", iconCls : 'btn_error'");
