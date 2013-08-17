@@ -48,7 +48,6 @@ import com.wireless.pojo.printScheme.Printer;
 import com.wireless.pojo.regionMgr.Region;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.staffMgr.Device;
-import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.print.scheme.JobContentFactory;
 /**
@@ -120,7 +119,7 @@ class OrderHandler implements Runnable{
 //											((request.header.restaurantId[1] & 0x000000FF) << 8)); 
 				
 				// Verify to check the staff
-				final Staff staff = StaffDao.verify(staffId, Privilege.Code.FRONT_BUSINESS);
+				final Staff staff = StaffDao.verify(staffId);
 				
 				if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_MENU){
 					//handle query menu request
