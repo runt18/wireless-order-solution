@@ -17,7 +17,6 @@ import com.wireless.db.billStatistics.BusinessStatisticsDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.billStatistics.BusinessStatistics;
-import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.util.DateType;
 import com.wireless.util.JObject;
 import com.wireless.util.WebParams;
@@ -43,7 +42,7 @@ public class BusinessStatisticsAction extends DispatchAction {
 		try{
 			String pin = (String) request.getSession().getAttribute("pin");
 			
-			StaffDao.verify(Integer.parseInt(pin), Privilege.Code.HISTORY);
+			StaffDao.verify(Integer.parseInt(pin));
 			
 			String restaurantID = request.getParameter("restaurantID");
 			String onDuty = request.getParameter("onDuty");

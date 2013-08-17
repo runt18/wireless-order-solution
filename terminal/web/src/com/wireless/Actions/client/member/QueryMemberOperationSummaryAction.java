@@ -19,7 +19,6 @@ import com.wireless.json.JObject;
 import com.wireless.pojo.client.MOSummary;
 import com.wireless.pojo.client.MemberOperation;
 import com.wireless.pojo.client.MemberOperation.OperationType;
-import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.util.DateType;
 import com.wireless.util.SQLUtil;
 import com.wireless.util.WebParams;
@@ -38,7 +37,7 @@ public class QueryMemberOperationSummaryAction extends DispatchAction{
 		JObject jobject = new JObject();
 		try{
 			String pin = (String) request.getSession().getAttribute("pin");
-			StaffDao.verify(Integer.parseInt(pin), Privilege.Code.MEMBER);
+			StaffDao.verify(Integer.parseInt(pin));
 			
 			String restaurantID = request.getParameter("restaurantID");
 			String dataSource = request.getParameter("dataSource");

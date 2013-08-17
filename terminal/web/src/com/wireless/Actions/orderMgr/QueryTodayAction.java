@@ -17,7 +17,6 @@ import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.regionMgr.Table;
-import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.util.DateUtil;
 import com.wireless.util.DataPaging;
 import com.wireless.util.DateType;
@@ -120,7 +119,7 @@ public class QueryTodayAction extends Action {
 			
 			String orderClause = " ORDER BY O.seq_id ASC ";
 			
-			list = OrderDao.getPureOrder(StaffDao.verify(Integer.parseInt(pin), Privilege.Code.FRONT_BUSINESS), extraCond.toString(), orderClause, DateType.TODAY);
+			list = OrderDao.getPureOrder(StaffDao.verify(Integer.parseInt(pin)), extraCond.toString(), orderClause, DateType.TODAY);
 			
 		}catch(BusinessException e){
 			e.printStackTrace();

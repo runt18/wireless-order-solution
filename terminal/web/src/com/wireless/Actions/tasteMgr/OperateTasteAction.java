@@ -12,7 +12,6 @@ import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.tasteMgr.TasteDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
-import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.tasteMgr.Taste;
 import com.wireless.util.WebParams;
@@ -34,7 +33,7 @@ public class OperateTasteAction extends DispatchAction{
 			String rate = request.getParameter("rate");
 			String cate = request.getParameter("cate");
 			
-			Staff staff = StaffDao.verify(Integer.parseInt(pin), Privilege.Code.BASIC);
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			Taste insert = new Taste(Integer.valueOf(alias), 
 				staff.getRestaurantId(), 
 				name, 
@@ -73,7 +72,7 @@ public class OperateTasteAction extends DispatchAction{
 			String rate = request.getParameter("rate");
 			String cate = request.getParameter("cate");
 			
-			Staff staff = StaffDao.verify(Integer.parseInt(pin), Privilege.Code.BASIC);
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			Taste insert = new Taste(Integer.valueOf(id), 
 				Integer.valueOf(alias), 
 				staff.getRestaurantId(), 
@@ -107,7 +106,7 @@ public class OperateTasteAction extends DispatchAction{
 		try{
 			String pin = (String) request.getSession().getAttribute("pin");
 			String id = request.getParameter("id");
-			TasteDao.delete(StaffDao.verify(Integer.parseInt(pin), Privilege.Code.BASIC), Integer.valueOf(id));
+			TasteDao.delete(StaffDao.verify(Integer.parseInt(pin)), Integer.valueOf(id));
 			jobject.initTip(true, "操作成功, 已删除口味信息.");
 		}catch(BusinessException e){
 			e.printStackTrace();

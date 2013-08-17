@@ -20,7 +20,6 @@ import com.wireless.pack.Type;
 import com.wireless.pack.req.ReqPrintContent;
 import com.wireless.pojo.client.MemberOperation;
 import com.wireless.pojo.client.MemberOperation.ChargeType;
-import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.sccon.ServerConnector;
 import com.wireless.util.JObject;
@@ -41,7 +40,7 @@ public class MemberRechargeAction extends Action{
 			String rechargeType = request.getParameter("rechargeType");
 			String isPrint = request.getParameter("isPrint");
 			
-			final Staff staff = StaffDao.verify(Integer.parseInt(pin), Privilege.Code.MEMBER);
+			final Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
 			MemberOperation mo = MemberDao.charge(staff, Integer.valueOf(memberID), Float.valueOf(rechargeMoney), ChargeType.valueOf(Integer.valueOf(rechargeType)));
 			if(mo == null || mo.getId() == 0){

@@ -17,7 +17,6 @@ import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.client.Member;
-import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.util.SQLUtil;
 import com.wireless.util.WebParams;
 
@@ -44,7 +43,7 @@ public class QueryMemberAction extends DispatchAction {
 		String limit = request.getParameter("limit");
 		try{
 			String pin = (String) request.getSession().getAttribute("pin");
-			StaffDao.verify(Integer.parseInt(pin), Privilege.Code.MEMBER);
+			StaffDao.verify(Integer.parseInt(pin));
 			
 			String extraCond = " ", orderClause = " ";
 			String id = request.getParameter("id");

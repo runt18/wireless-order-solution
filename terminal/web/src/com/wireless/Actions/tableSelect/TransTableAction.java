@@ -17,7 +17,6 @@ import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pack.req.ReqPrintContent;
 import com.wireless.pojo.regionMgr.Table;
-import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.sccon.ServerConnector;
 import com.wireless.util.JObject;
@@ -43,7 +42,7 @@ public class TransTableAction extends Action{
 			 * newTableID : the table id to transfer 
 			 * oldTableID : the table id to be transferred
 			 */
-			final Staff staff = StaffDao.verify(Integer.parseInt((String) request.getSession().getAttribute("pin")), Privilege.Code.FRONT_BUSINESS);
+			final Staff staff = StaffDao.verify(Integer.parseInt((String) request.getSession().getAttribute("pin")));
 			
 			srcTblAlias = request.getParameter("oldTableAlias");
 			destTblAlias = request.getParameter("newTableAlias");

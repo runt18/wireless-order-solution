@@ -22,7 +22,6 @@ import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.distMgr.Discount;
 import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.pojo.ppMgr.PricePlan;
-import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.util.DateType;
 import com.wireless.util.WebParams;
@@ -57,7 +56,7 @@ public class QueryOrderAction extends Action {
 			String customNum = request.getParameter("customNum");
 			
 			Order order = new Order();
-			Staff staff = StaffDao.verify(Integer.parseInt(pin), Privilege.Code.FRONT_BUSINESS);
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
 			if(queryType != null && queryType.trim().equals("History")){
 				if (oid != null && !oid.trim().isEmpty()){

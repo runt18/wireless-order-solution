@@ -15,7 +15,6 @@ import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.stockMgr.StockDetailReportDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
-import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.stockMgr.StockDetailReport;
 import com.wireless.util.WebParams;
@@ -33,7 +32,7 @@ public class QueryStockDetailReportAction extends Action{
 		int roots = 0;
 		try{
 			String pin = (String) request.getSession().getAttribute("pin");
-			Staff staff = StaffDao.verify(Integer.parseInt(pin), Privilege.Code.INVENTORY);
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			String beginDate = request.getParameter("beginDate");
 			String endDate = request.getParameter("endDate");
 			String materialId = request.getParameter("materialId");

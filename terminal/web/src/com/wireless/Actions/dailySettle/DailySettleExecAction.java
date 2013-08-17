@@ -17,7 +17,6 @@ import org.apache.struts.action.ActionMapping;
 import com.wireless.db.frontBusiness.DailySettleDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
-import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.util.JObject;
 
@@ -36,7 +35,7 @@ public class DailySettleExecAction extends Action {
 
 			String pin = (String) request.getSession().getAttribute("pin");
 
-			Staff staff = StaffDao.verify(Integer.parseInt(pin), Privilege.Code.FRONT_BUSINESS);
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 
 			DailySettleDao.exec(staff);
 

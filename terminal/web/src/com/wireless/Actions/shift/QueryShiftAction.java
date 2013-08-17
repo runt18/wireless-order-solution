@@ -17,7 +17,6 @@ import com.wireless.db.shift.QueryShiftDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.billStatistics.ShiftDetail;
-import com.wireless.pojo.staffMgr.Privilege;
 
 public class QueryShiftAction extends Action {
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
@@ -38,7 +37,7 @@ public class QueryShiftAction extends Action {
 			 */
 			String pin = (String) request.getSession().getAttribute("pin");
 					
-			ShiftDetail result = QueryShiftDao.execByNow(StaffDao.verify(dbCon, Integer.parseInt(pin), Privilege.Code.FRONT_BUSINESS));
+			ShiftDetail result = QueryShiftDao.execByNow(StaffDao.verify(dbCon, Integer.parseInt(pin)));
 			
 			/**
 			 * The json to shift record like below

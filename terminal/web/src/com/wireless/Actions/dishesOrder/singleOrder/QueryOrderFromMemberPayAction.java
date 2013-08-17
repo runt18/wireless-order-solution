@@ -16,7 +16,6 @@ import com.wireless.json.JObject;
 import com.wireless.pojo.client.Member;
 import com.wireless.pojo.client.MemberType;
 import com.wireless.pojo.distMgr.Discount;
-import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.util.WebParams;
 
@@ -35,7 +34,7 @@ public class QueryOrderFromMemberPayAction extends Action{
 			String st = request.getParameter("st");
 			String sv = request.getParameter("sv");
 			
-			Staff staff = StaffDao.verify(Integer.parseInt(pin), Privilege.Code.FRONT_BUSINESS);
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			Member m = null;
 			if(st.trim().equals("mobile")){
 				m = MemberDao.getMemberByMobile(staff, sv);

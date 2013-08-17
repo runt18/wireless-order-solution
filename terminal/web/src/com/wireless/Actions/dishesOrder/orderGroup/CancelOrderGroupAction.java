@@ -14,7 +14,6 @@ import com.wireless.db.orderMgr.OrderGroupDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.dishesOrder.Order;
-import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.util.JObject;
 import com.wireless.util.WebParams;
 
@@ -38,7 +37,7 @@ public class CancelOrderGroupAction extends Action{
 			if(jobject.isSuccess()){
 				Order o = new Order();
 				o.setId(Integer.valueOf(orderID));
-				OrderGroupDao.cancel(StaffDao.verify(Integer.parseInt(pin), Privilege.Code.FRONT_BUSINESS), o);
+				OrderGroupDao.cancel(StaffDao.verify(Integer.parseInt(pin)), o);
 				jobject.initTip(true, "操作成功, 已取消团体餐桌信息.");
 			}
 		} catch (BusinessException e){

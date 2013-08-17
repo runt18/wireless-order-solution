@@ -13,7 +13,6 @@ import org.apache.struts.action.ActionMapping;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.system.SystemDao;
 import com.wireless.exception.BusinessException;
-import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.system.SystemSetting;
 import com.wireless.util.JObject;
 import com.wireless.util.WebParams;
@@ -31,7 +30,7 @@ public class UpdatePriceTailAction extends Action{
 		try{
 			
 			String pin = (String) request.getSession().getAttribute("pin");
-			StaffDao.verify(Integer.parseInt(pin), Privilege.Code.SYSTEM);
+			StaffDao.verify(Integer.parseInt(pin));
 			
 			String restaurantID = request.getParameter("restaurantID");
 			String priceTail = request.getParameter("priceTail");

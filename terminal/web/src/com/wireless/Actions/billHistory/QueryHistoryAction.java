@@ -17,7 +17,6 @@ import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.OrderSummary;
-import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.system.DailySettle;
 import com.wireless.util.DateType;
@@ -119,7 +118,7 @@ public class QueryHistoryAction extends Action {
 			
 			String orderClause = " ORDER BY OH.order_date ASC " + " LIMIT " + start + "," + limit;
 			
-			Staff staff = StaffDao.verify(Integer.parseInt(pin), Privilege.Code.HISTORY);
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
 			List<Order> list = OrderDao.getPureOrder(staff, comboCond + filterCond, orderClause, DateType.HISTORY);
 			

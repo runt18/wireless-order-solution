@@ -18,7 +18,6 @@ import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.billStatistics.SalesDetail;
 import com.wireless.pojo.menuMgr.Food;
-import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.util.DataPaging;
 import com.wireless.util.WebParams;
 
@@ -91,7 +90,7 @@ public class SalesSubStatisticsAction extends Action {
 			
 			if(qt == QuerySaleDetails.QUERY_BY_DEPT){
 				saleDetails = QuerySaleDetails.execByDept(
-						StaffDao.verify(Integer.parseInt(pin), Privilege.Code.HISTORY), 
+						StaffDao.verify(Integer.parseInt(pin)), 
 	  					dateBeg, 
 	  					dateEnd,
 	  					dt);
@@ -106,7 +105,7 @@ public class SalesSubStatisticsAction extends Action {
 					did = new int[0];
 				}
 				saleDetails = QuerySaleDetails.execByFood(
-						StaffDao.verify(Integer.parseInt(pin), Privilege.Code.HISTORY), 
+						StaffDao.verify(Integer.parseInt(pin)), 
 	  					dateBeg, 
 	  					dateEnd,
 	  					did,
@@ -115,7 +114,7 @@ public class SalesSubStatisticsAction extends Action {
 	  					foodName);
 			}else if(qt == QuerySaleDetails.QUERY_BY_KITCHEN){
 				saleDetails = QuerySaleDetails.execByKitchen(
-						StaffDao.verify(Integer.parseInt(pin), Privilege.Code.HISTORY), 
+						StaffDao.verify(Integer.parseInt(pin)), 
 						dateBeg, 
 						dateEnd, 
 						dt);

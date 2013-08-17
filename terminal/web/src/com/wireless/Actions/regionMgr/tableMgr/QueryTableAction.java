@@ -15,7 +15,6 @@ import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.regionMgr.Table;
-import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.util.DataPaging;
 import com.wireless.util.WebParams;
 
@@ -50,7 +49,7 @@ public class QueryTableAction extends Action {
 			}
 			
 			orderClause = "ORDER BY TBL.table_alias";
-			tables = TableDao.getTables(StaffDao.verify(Integer.parseInt(pin), Privilege.Code.FRONT_BUSINESS), extraCond, orderClause);
+			tables = TableDao.getTables(StaffDao.verify(Integer.parseInt(pin)), extraCond, orderClause);
 		}catch(BusinessException e){
 			e.printStackTrace();
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getCode(), e.getDesc());

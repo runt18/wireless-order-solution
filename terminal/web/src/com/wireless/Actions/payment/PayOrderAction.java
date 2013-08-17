@@ -23,7 +23,6 @@ import com.wireless.pojo.client.Member;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.distMgr.Discount;
 import com.wireless.pojo.ppMgr.PricePlan;
-import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.NumericUtil;
 import com.wireless.sccon.ServerConnector;
@@ -81,7 +80,7 @@ public class PayOrderAction extends Action{
 			 *           No need to pass this parameter if no comment input. 
 			 */
 			
-			final Staff staff = StaffDao.verify(Integer.parseInt((String) request.getSession().getAttribute("pin")), Privilege.Code.FRONT_BUSINESS);
+			final Staff staff = StaffDao.verify(Integer.parseInt((String) request.getSession().getAttribute("pin")));
 			
 			Order orderToPay = new Order();
 			

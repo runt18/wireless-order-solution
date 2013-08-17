@@ -24,7 +24,6 @@ import com.wireless.pack.Type;
 import com.wireless.pack.req.ReqPrintContent;
 import com.wireless.parcel.Parcel;
 import com.wireless.pojo.regionMgr.Table;
-import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.DateUtil;
 import com.wireless.sccon.ServerConnector;
@@ -91,7 +90,7 @@ public class PrintOrderAction extends Action{
 			 */
 			String pin = (String) request.getSession().getAttribute("pin");
 			
-			final Staff staff = StaffDao.verify(Integer.parseInt(pin), Privilege.Code.FRONT_BUSINESS);
+			final Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
 			int orderId = 0;
 			if(request.getParameter("orderID") != null){

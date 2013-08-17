@@ -14,7 +14,6 @@ import com.wireless.db.menuMgr.FoodTasteDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.menuMgr.Food;
-import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.util.JObject;
 import com.wireless.util.WebParams;
 
@@ -29,7 +28,7 @@ public class UpdateFoodTasteAction extends Action {
 		
 		try{
 			String pin = (String) request.getSession().getAttribute("pin");
-			StaffDao.verify(Integer.parseInt(pin), Privilege.Code.BASIC);
+			StaffDao.verify(Integer.parseInt(pin));
 			
 			String foodID = request.getParameter("foodID");
 			String restaurantID = request.getParameter("restaurantID");

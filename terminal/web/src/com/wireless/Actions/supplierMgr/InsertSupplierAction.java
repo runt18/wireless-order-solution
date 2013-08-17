@@ -13,7 +13,6 @@ import org.apache.struts.action.ActionMapping;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.supplierMgr.SupplierDao;
 import com.wireless.exception.BusinessException;
-import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.supplierMgr.Supplier;
 import com.wireless.util.JObject;
@@ -29,7 +28,7 @@ public class InsertSupplierAction extends Action {
 		try{
 			
 			String pin = (String) request.getSession().getAttribute("pin");
-			Staff staff = StaffDao.verify(Integer.parseInt(pin), Privilege.Code.INVENTORY);
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			String supplierName = request.getParameter("supplierName");
 			String tele = request.getParameter("tele");
 			String addr = request.getParameter("addr");

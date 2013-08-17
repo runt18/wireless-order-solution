@@ -17,7 +17,6 @@ import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.inventoryMgr.MaterialCate;
-import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.util.DataPaging;
 import com.wireless.util.SQLUtil;
 import com.wireless.util.WebParams;
@@ -46,7 +45,7 @@ public class QueryMaterialCateAction extends DispatchAction{
 		try{
 			
 			String pin = (String) request.getSession().getAttribute("pin");
-			StaffDao.verify(Integer.parseInt(pin), Privilege.Code.INVENTORY);
+			StaffDao.verify(Integer.parseInt(pin));
 			
 			String restaurantID = request.getParameter("restaurantID");
 			String type = request.getParameter("type");

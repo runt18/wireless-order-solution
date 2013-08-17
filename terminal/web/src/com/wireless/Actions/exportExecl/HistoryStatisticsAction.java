@@ -31,7 +31,6 @@ import com.wireless.pojo.billStatistics.BusinessStatisticsByDept;
 import com.wireless.pojo.billStatistics.SalesDetail;
 import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.menuMgr.Kitchen;
-import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.stockMgr.StockAction;
 import com.wireless.pojo.stockMgr.StockAction.Status;
@@ -113,7 +112,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 				did = new int[0];
 			}
 		}
-		Staff staff = StaffDao.verify(Integer.parseInt(pin), Privilege.Code.HISTORY);
+		Staff staff = StaffDao.verify(Integer.parseInt(pin));
 		SalesDetail[] saleDetails = QuerySaleDetails.execByFood(
 				staff, 
 				onDuty, 
@@ -313,7 +312,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 		String onDuty = request.getParameter("onDuty");
 		String offDuty = request.getParameter("offDuty");
 		
-		Staff staff = StaffDao.verify(Integer.parseInt(pin), Privilege.Code.HISTORY);
+		Staff staff = StaffDao.verify(Integer.parseInt(pin));
 		SalesDetail[] list = QuerySaleDetails.execByKitchen(staff, onDuty, offDuty, 1);
 		
 		HSSFWorkbook wb = new HSSFWorkbook();
@@ -482,7 +481,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 		String onDuty = request.getParameter("onDuty");
 		String offDuty = request.getParameter("offDuty");
 		
-		Staff staff = StaffDao.verify(Integer.parseInt(pin), Privilege.Code.HISTORY);
+		Staff staff = StaffDao.verify(Integer.parseInt(pin));
 		SalesDetail[] list = QuerySaleDetails.execByDept(staff, onDuty, offDuty, 1);
 		
 		HSSFWorkbook wb = new HSSFWorkbook();
@@ -655,7 +654,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 		params.put("onDuty", onDuty);
 		params.put("offDuty", offDuty);
 		
-		Staff staff = StaffDao.verify(Integer.parseInt(pin), Privilege.Code.HISTORY);
+		Staff staff = StaffDao.verify(Integer.parseInt(pin));
 		List<BusinessStatistics> root = BusinessStatisticsDao.getBusinessReceiptsStatisticsByHistory(params);
 //		BusinessStatistics sum = new BusinessStatistics();
 		
@@ -902,7 +901,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 		params.put("offDuty", offDuty);
 		params.put("queryPattern", queryPattern);
 		
-		Staff staff = StaffDao.verify(Integer.parseInt(pin), Privilege.Code.HISTORY);
+		Staff staff = StaffDao.verify(Integer.parseInt(pin));
 		BusinessStatistics business = BusinessStatisticsDao.getBusinessStatistics(params);
 		
 		// 创建execl主页
@@ -1277,7 +1276,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 		String pin = (String) request.getSession().getAttribute("pin");
 		String id = request.getParameter("id");
 		
-		Staff staff = StaffDao.verify(Integer.parseInt(pin), Privilege.Code.HISTORY);
+		Staff staff = StaffDao.verify(Integer.parseInt(pin));
 		StockAction stockAction = StockActionDao.getStockAndDetailById(staff, Integer.parseInt(id));
 		
 		String title = stockAction.getType().getDesc() + " -- " + stockAction.getCateType().getText() +  stockAction.getSubType().getText() + "单";

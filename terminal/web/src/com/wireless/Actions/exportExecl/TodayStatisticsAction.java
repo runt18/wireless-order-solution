@@ -24,7 +24,6 @@ import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.pojo.billStatistics.SalesDetail;
 import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.menuMgr.Kitchen;
-import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.DateUtil;
 import com.wireless.util.DateType;
@@ -102,7 +101,7 @@ public class TodayStatisticsAction extends DispatchAction{
 				did = new int[0];
 			}
 		}
-		Staff staff = StaffDao.verify(Integer.parseInt(pin), Privilege.Code.FRONT_BUSINESS);
+		Staff staff = StaffDao.verify(Integer.parseInt(pin));
 		SalesDetail[] saleDetails = QuerySaleDetails.execByFood(
 				staff, 
 				onDuty, 
@@ -249,7 +248,7 @@ public class TodayStatisticsAction extends DispatchAction{
 		String onDuty = request.getParameter("onDuty");
 		String offDuty = request.getParameter("offDuty");
 		
-		Staff staff = StaffDao.verify(Integer.parseInt(pin), Privilege.Code.FRONT_BUSINESS);
+		Staff staff = StaffDao.verify(Integer.parseInt(pin));
 		SalesDetail[] list = QuerySaleDetails.execByKitchen(staff, onDuty, offDuty, DateType.TODAY.getValue());
 		
 		HSSFWorkbook wb = new HSSFWorkbook();
@@ -382,7 +381,7 @@ public class TodayStatisticsAction extends DispatchAction{
 		String onDuty = request.getParameter("onDuty");
 		String offDuty = request.getParameter("offDuty");
 		
-		Staff staff = StaffDao.verify(Integer.parseInt(pin), Privilege.Code.FRONT_BUSINESS);
+		Staff staff = StaffDao.verify(Integer.parseInt(pin));
 		SalesDetail[] list = QuerySaleDetails.execByDept(staff, onDuty, offDuty, DateType.TODAY.getValue());
 		
 		HSSFWorkbook wb = new HSSFWorkbook();

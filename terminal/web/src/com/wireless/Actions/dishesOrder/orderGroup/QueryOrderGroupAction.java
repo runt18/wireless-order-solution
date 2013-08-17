@@ -22,7 +22,6 @@ import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.distMgr.Discount;
 import com.wireless.pojo.ppMgr.PricePlan;
 import com.wireless.pojo.regionMgr.Table;
-import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.util.DateType;
 import com.wireless.util.JObject;
@@ -62,7 +61,7 @@ public class QueryOrderGroupAction extends Action{
 				return null;
 			}
 			
-			Staff staff = StaffDao.verify(Integer.parseInt(pin), Privilege.Code.FRONT_BUSINESS);
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
 			if(calc != null && Boolean.valueOf(calc) && orderID != null){
 				// 读取计算数据

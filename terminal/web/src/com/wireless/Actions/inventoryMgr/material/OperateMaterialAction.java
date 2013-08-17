@@ -13,7 +13,6 @@ import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.inventoryMgr.Material;
-import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.util.WebParams;
 
@@ -40,7 +39,7 @@ public class OperateMaterialAction extends DispatchAction {
 			String name = request.getParameter("name");
 			String cateId = request.getParameter("cateId");
 			
-			Staff staff = StaffDao.verify(Integer.parseInt(pin), Privilege.Code.INVENTORY);
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			Material m = new Material(Integer.valueOf(restaurantID), name, Integer.valueOf(cateId), staff.getName(), Material.Status.NORMAL.getValue());
 			MaterialDao.insert(m);
 			jobject.initTip(true, "操作成功, 已添加新原料信息.");
@@ -78,7 +77,7 @@ public class OperateMaterialAction extends DispatchAction {
 			String name = request.getParameter("name");
 			String cateId = request.getParameter("cateId");
 			
-			Staff staff = StaffDao.verify(Integer.parseInt(pin), Privilege.Code.INVENTORY);
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			Material m = new Material(Integer.valueOf(id), Integer.valueOf(restaurantID), Integer.valueOf(cateId), name, staff.getName());
 			MaterialDao.update(m);
 			jobject.initTip(true, "操作成功, 已修改原料信息.");

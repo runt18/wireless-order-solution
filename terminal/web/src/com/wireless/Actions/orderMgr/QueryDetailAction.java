@@ -17,7 +17,6 @@ import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.regionMgr.Table;
-import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.util.DataPaging;
 import com.wireless.util.WebParams;
 
@@ -38,7 +37,7 @@ public class QueryDetailAction extends Action {
 		try{
 			
 			String pin = (String) request.getSession().getAttribute("pin");
-			StaffDao.verify(Integer.parseInt(pin), Privilege.Code.FRONT_BUSINESS);
+			StaffDao.verify(Integer.parseInt(pin));
 			
 			String orderID = request.getParameter("orderID");
 			String restaurantID = request.getParameter("restaurantID");

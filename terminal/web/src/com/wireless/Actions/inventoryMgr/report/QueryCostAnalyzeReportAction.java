@@ -19,7 +19,6 @@ import com.wireless.db.stockMgr.CostAnalyzeReportDao;
 import com.wireless.db.system.SystemDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
-import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.stockMgr.CostAnalyze;
 import com.wireless.util.WebParams;
@@ -35,7 +34,7 @@ public class QueryCostAnalyzeReportAction extends Action {
 			String pin = (String) request.getSession().getAttribute("pin");
 			String beginDate = request.getParameter("beginDate");
 			String endDate = "";
-			Staff staff = StaffDao.verify(Integer.parseInt(pin), Privilege.Code.INVENTORY);
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			List<CostAnalyze> list = new ArrayList<CostAnalyze>();
 			Calendar c = Calendar.getInstance();
 			if(beginDate == null){

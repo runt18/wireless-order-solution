@@ -21,7 +21,6 @@ import com.wireless.pack.Type;
 import com.wireless.pack.req.ReqInsertOrder;
 import com.wireless.parcel.Parcel;
 import com.wireless.pojo.dishesOrder.Order;
-import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.sccon.ServerConnector;
 import com.wireless.util.JObject;
@@ -77,7 +76,7 @@ public class InsertOrderAction extends Action{
 	         * 	         [是否临时菜(true),临时菜1编号,临时菜1名称,临时菜1数量,临时菜1单价,叫起状态]，
 	         * 			 [是否临时菜(true),临时菜1编号,临时菜1名称,临时菜1数量,临时菜1单价,叫起状态]...}
 			 */
-			final Staff staff = StaffDao.verify(Integer.parseInt((String) request.getSession().getAttribute("pin")), Privilege.Code.FRONT_BUSINESS);
+			final Staff staff = StaffDao.verify(Integer.parseInt((String) request.getSession().getAttribute("pin")));
 			
 			Order orderToInsert = new Order();
 			int tableAlias = request.getParameter("tableID") != null ? Integer.parseInt(request.getParameter("tableID")) : 0;

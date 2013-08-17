@@ -16,7 +16,6 @@ import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
-import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.staffMgr.Staff;
 
 public class DoShiftAction extends Action {
@@ -51,7 +50,7 @@ public class DoShiftAction extends Action {
 			
 			dbCon.connect();
 			
-			Staff staff = StaffDao.verify(Integer.parseInt(pin), Privilege.Code.FRONT_BUSINESS);
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
 			String sql = "INSERT INTO " + Params.dbName + ".shift (restaurant_id, name, on_duty, off_duty) VALUES(" +
 						 staff.getRestaurantId() + "," +

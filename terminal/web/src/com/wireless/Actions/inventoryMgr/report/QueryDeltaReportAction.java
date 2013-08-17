@@ -19,7 +19,6 @@ import com.wireless.db.stockMgr.StockDeltaReportDao;
 import com.wireless.db.system.SystemDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
-import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.stockMgr.StockTakeDetail;
 import com.wireless.util.WebParams;
@@ -41,7 +40,7 @@ public class QueryDeltaReportAction extends Action{
 			String cateType = request.getParameter("cateType");
 			String cateId = request.getParameter("cateId");
 			String deptId = request.getParameter("deptId");
-			Staff staff = StaffDao.verify(Integer.parseInt(pin), Privilege.Code.INVENTORY);
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			String extra = "";
 			String orderClause = "LIMIT " + start +", " + limit;
 			List<StockTakeDetail> deltaReports = new ArrayList<StockTakeDetail>();

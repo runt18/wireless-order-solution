@@ -14,7 +14,6 @@ import com.wireless.db.menuMgr.MenuDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.menuMgr.FoodPricePlan;
-import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.util.JObject;
 import com.wireless.util.WebParams;
 
@@ -30,7 +29,7 @@ public class UpdateFoodPricePlanAction extends Action {
 		try{
 			
 			String pin = (String) request.getSession().getAttribute("pin");
-			StaffDao.verify(Integer.parseInt(pin), Privilege.Code.BASIC);
+			StaffDao.verify(Integer.parseInt(pin));
 			
 			content = JSONObject.fromObject(request.getParameter("foodPricePlan"));
 			FoodPricePlan foodPricePlan = new FoodPricePlan(content.getInt("planId"),

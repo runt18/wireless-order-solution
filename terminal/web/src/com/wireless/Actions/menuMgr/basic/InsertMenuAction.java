@@ -13,7 +13,6 @@ import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.menuMgr.Food;
-import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.util.WebParams;
 
@@ -72,7 +71,7 @@ public class InsertMenuAction extends Action {
 			}
 				
 			if(jobject.isSuccess()){
-				Staff staff = StaffDao.verify(Integer.parseInt(pin), Privilege.Code.BASIC);
+				Staff staff = StaffDao.verify(Integer.parseInt(pin));
 				
 				fb.setRestaurantId(Integer.parseInt(restaurantID));
 				fb.setAliasId(Integer.parseInt(foodAliasID));

@@ -18,7 +18,6 @@ import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.inventoryMgr.FoodMaterial;
 import com.wireless.pojo.inventoryMgr.MaterialCate;
-import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.util.SQLUtil;
 import com.wireless.util.WebParams;
 
@@ -33,7 +32,7 @@ public class QueryFoodMaterialAction extends Action{
 		try{
 			
 			String pin = (String) request.getSession().getAttribute("pin");
-			StaffDao.verify(Integer.parseInt(pin), Privilege.Code.INVENTORY);
+			StaffDao.verify(Integer.parseInt(pin));
 			
 			String foodId = request.getParameter("foodId");
 			

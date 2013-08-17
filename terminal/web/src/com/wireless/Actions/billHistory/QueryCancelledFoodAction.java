@@ -24,7 +24,6 @@ import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.crMgr.CancelReason;
 import com.wireless.pojo.dishesOrder.CancelledFood;
 import com.wireless.pojo.menuMgr.Department;
-import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.util.DataPaging;
 import com.wireless.util.JObject;
@@ -86,7 +85,7 @@ public class QueryCancelledFoodAction extends Action {
 			Integer did = Integer.valueOf(deptID), rid = Integer.valueOf(reasonID);
 			
 			DutyRange queryDate = new DutyRange(dateBeg, dateEnd);
-			Staff staff = StaffDao.verify(Integer.parseInt(pin), Privilege.Code.HISTORY);
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
 			if(qt == QueryCancelledFood.QUERY_BY_DEPT){
 				CancelIncomeByDept dept = QueryCancelledFood.getCancelledFoodByDept(staff, queryDate, did, dt, ot);

@@ -32,7 +32,7 @@ public class QueryFoodPricePlanByOrderAction extends Action {
 		try{
 			
 			//String pin = (String) request.getSession().getAttribute("pin");
-			//StaffDao.verify(Integer.parseInt(pin), Privilege.Code.FRONT_BUSINESS);
+			//StaffDao.verify(Integer.parseInt(pin));
 			
 			Map<Object, Object> params = new HashMap<Object, Object>();
 			String restaurantID = request.getParameter("restaurantID");

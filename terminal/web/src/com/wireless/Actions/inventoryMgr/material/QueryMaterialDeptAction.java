@@ -14,7 +14,6 @@ import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.stockMgr.MaterialDeptDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
-import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.stockMgr.MaterialDept;
 import com.wireless.util.DataPaging;
@@ -38,7 +37,7 @@ public class QueryMaterialDeptAction extends Action{
 			String cateType = request.getParameter("cateType");
 			String cateId = request.getParameter("cateId");
 			String materialId = request.getParameter("materialId");
-			Staff staff = StaffDao.verify(Integer.parseInt(pin), Privilege.Code.INVENTORY);
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			String extraCond = "";
 			if(deptId != null && !deptId.trim().isEmpty()){
 				extraCond += " AND MD.dept_id = " + deptId;

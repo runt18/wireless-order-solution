@@ -22,7 +22,6 @@ import com.wireless.pojo.printScheme.PrintFunc.Builder;
 import com.wireless.pojo.printScheme.PrintFunc.DetailBuilder;
 import com.wireless.pojo.printScheme.PrintFunc.SummaryBuilder;
 import com.wireless.pojo.regionMgr.Region;
-import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.util.WebParams;
 
@@ -35,7 +34,7 @@ public class OperatePrintFuncAction extends DispatchAction{
 		
 		try{
 			String pin = (String) request.getSession().getAttribute("pin");
-			Staff staff = StaffDao.verify(Integer.parseInt(pin), Privilege.Code.BASIC);
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			String printFuncId = request.getParameter("printFuncId");
 			PrintFuncDao.removeFunc(staff, Integer.parseInt(printFuncId));
 			
@@ -62,7 +61,7 @@ public class OperatePrintFuncAction extends DispatchAction{
 		try{
 			String pin = (String) request.getSession().getAttribute("pin");
 			dbCon.connect();
-			Staff staff = StaffDao.verify(Integer.parseInt(pin), Privilege.Code.BASIC);
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			String repeat = request.getParameter("repeat");
 			String kitchens = request.getParameter("kitchens");
 			String dept = request.getParameter("dept");
@@ -175,7 +174,7 @@ public class OperatePrintFuncAction extends DispatchAction{
 		try{
 			String pin = (String) request.getSession().getAttribute("pin");
 			dbCon.connect();
-			Staff staff = StaffDao.verify(Integer.parseInt(pin), Privilege.Code.BASIC);
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			String repeat = request.getParameter("repeat");
 			String kitchens = request.getParameter("kitchens");
 			String dept = request.getParameter("dept");

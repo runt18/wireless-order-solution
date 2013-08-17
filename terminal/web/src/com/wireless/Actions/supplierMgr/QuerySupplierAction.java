@@ -14,7 +14,6 @@ import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.supplierMgr.SupplierDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
-import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.supplierMgr.Supplier;
 import com.wireless.util.WebParams;
@@ -39,7 +38,7 @@ public class QuerySupplierAction extends Action {
 			String op = request.getParameter("op");
 			String tele = request.getParameter("tele");
 			String contact = request.getParameter("contact");
-			Staff staff = StaffDao.verify(Integer.parseInt(pin), Privilege.Code.INVENTORY);
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			String extraCond = "";
 			if(start !=  null && limit != null){
 				if(op != null && op.equals("e")){

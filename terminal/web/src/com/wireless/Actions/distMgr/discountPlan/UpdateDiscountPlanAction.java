@@ -14,7 +14,6 @@ import com.wireless.db.distMgr.DiscountDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.distMgr.DiscountPlan;
-import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.util.JObject;
 import com.wireless.util.WebParams;
 
@@ -31,7 +30,7 @@ public class UpdateDiscountPlanAction extends Action{
 		try{
 			
 			String pin = (String) request.getSession().getAttribute("pin");
-			StaffDao.verify(Integer.parseInt(pin), Privilege.Code.BASIC);
+			StaffDao.verify(Integer.parseInt(pin));
 			
 			String planID = request.getParameter("planID");
 			String rate = request.getParameter("rate");

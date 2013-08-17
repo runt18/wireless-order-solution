@@ -19,7 +19,6 @@ import com.wireless.db.stockMgr.MaterialDeptDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.inventoryMgr.Material;
-import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.stockMgr.StockTakeDetail;
 import com.wireless.util.DataPaging;
@@ -40,7 +39,7 @@ public class QueryMaterialAction extends DispatchAction{
 		String limit = request.getParameter("limit");
 		try{
 			String pin = (String) request.getSession().getAttribute("pin");
-			StaffDao.verify(Integer.parseInt(pin), Privilege.Code.INVENTORY);
+			StaffDao.verify(Integer.parseInt(pin));
 			
 			String restaurantID = request.getParameter("restaurantID");
 			String name = request.getParameter("name");
@@ -105,7 +104,7 @@ public class QueryMaterialAction extends DispatchAction{
 		List<StockTakeDetail> root = new ArrayList<StockTakeDetail>();
 		try{
 			String pin = (String) request.getSession().getAttribute("pin");
-			Staff staff = StaffDao.verify(Integer.parseInt(pin), Privilege.Code.INVENTORY);
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			String cateId = request.getParameter("cateId");
 			String deptId = request.getParameter("deptId");
 			if(cateId != null && !cateId.trim().isEmpty() && deptId != null){

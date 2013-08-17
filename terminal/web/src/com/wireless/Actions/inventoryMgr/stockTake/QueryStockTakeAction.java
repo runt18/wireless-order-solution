@@ -16,7 +16,6 @@ import com.wireless.db.stockMgr.StockTakeDao;
 import com.wireless.db.system.SystemDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
-import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.stockMgr.StockTake;
 import com.wireless.util.DataPaging;
@@ -38,7 +37,7 @@ public class QueryStockTakeAction extends Action{
 		try{
 			String pin = (String) request.getSession().getAttribute("pin");
 			String status = request.getParameter("status");
-			Staff staff = StaffDao.verify(Integer.parseInt(pin), Privilege.Code.INVENTORY);
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			String extraCond = "", orderClause = "";
 			if(status != null){
 				extraCond += " AND ST.status = " + status;

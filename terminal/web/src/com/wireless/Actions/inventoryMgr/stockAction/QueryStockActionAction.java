@@ -16,7 +16,6 @@ import com.wireless.db.stockMgr.StockActionDao;
 import com.wireless.db.system.SystemDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
-import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.stockMgr.StockAction;
 import com.wireless.util.DataPaging;
@@ -48,7 +47,7 @@ public class QueryStockActionAction extends Action{
 			String beginDate = request.getParameter("beginDate");
 			String endDate = request.getParameter("endDate");
 			
-			Staff staff = StaffDao.verify(Integer.parseInt(pin), Privilege.Code.INVENTORY);
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
 			String extraCond = "", orderClause = "";
 			String curmonth = new SimpleDateFormat("yyyy-MM").format(SystemDao.getCurrentMonth(staff));

@@ -13,7 +13,6 @@ import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.ppMgr.PricePlan;
-import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.util.WebParams;
 
 public class UpdatePricePlanAction extends Action {
@@ -27,7 +26,7 @@ public class UpdatePricePlanAction extends Action {
 		try{
 			
 			String pin = (String) request.getSession().getAttribute("pin");
-			StaffDao.verify(Integer.parseInt(pin), Privilege.Code.BASIC);
+			StaffDao.verify(Integer.parseInt(pin));
 			
 			String id = request.getParameter("id");
 			String restaurantID = request.getParameter("restaurantID");

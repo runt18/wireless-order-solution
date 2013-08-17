@@ -17,7 +17,6 @@ import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.stockMgr.StockReportDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
-import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.stockMgr.StockAction.Status;
 import com.wireless.pojo.stockMgr.StockReport;
@@ -40,7 +39,7 @@ public class QueryReportAction extends Action {
 			String cateId = request.getParameter("cateId");
 			String materialId = request.getParameter("materialId");
 			
-			Staff staff = StaffDao.verify(Integer.parseInt(pin), Privilege.Code.INVENTORY);
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			//String orderClause = " LIMIT " + Integer.parseInt(start) + ", " + Integer.parseInt(limit);
 			List<StockReport> stockReports = null ;
 			List<StockReport> stockReportPage = null ;

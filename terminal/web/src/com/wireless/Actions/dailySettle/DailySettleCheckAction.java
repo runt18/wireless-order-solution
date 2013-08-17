@@ -18,7 +18,6 @@ import com.wireless.db.DBCon;
 import com.wireless.db.frontBusiness.DailySettleDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
-import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.util.JObject;
 
@@ -45,7 +44,7 @@ public class DailySettleCheckAction extends Action {
 			String pin = (String) request.getSession().getAttribute("pin");
 
 			dbCon.connect();
-			Staff staff = StaffDao.verify(Integer.parseInt(pin), Privilege.Code.FRONT_BUSINESS);
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 
 			int[] restOrderID = DailySettleDao.check(dbCon, staff);
 			if (restOrderID.length != 0) {

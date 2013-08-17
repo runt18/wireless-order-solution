@@ -14,7 +14,6 @@ import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.stockMgr.StockActionDetailDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
-import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.stockMgr.StockActionDetail;
 import com.wireless.util.WebParams;
@@ -31,7 +30,7 @@ public class QueryStockActionDetailAction extends Action{
 		try{
 			String pin = (String) request.getSession().getAttribute("pin");
 			String id = request.getParameter("id");
-			Staff staff = StaffDao.verify(Integer.parseInt(pin), Privilege.Code.INVENTORY);
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
 			String  orderClause = "";
 			if(id != null){

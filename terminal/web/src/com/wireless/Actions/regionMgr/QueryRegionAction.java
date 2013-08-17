@@ -14,7 +14,6 @@ import com.wireless.db.regionMgr.RegionDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.json.JObject;
 import com.wireless.pojo.regionMgr.Region;
-import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.staffMgr.Staff;
 
 public class QueryRegionAction extends DispatchAction{
@@ -36,7 +35,7 @@ public class QueryRegionAction extends DispatchAction{
 		JObject jobject = new JObject();
 		try{
 			String pin = (String) request.getSession().getAttribute("pin");
-			Staff staff = StaffDao.verify(Integer.parseInt(pin), Privilege.Code.BASIC);
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			List<Region> list = RegionDao.getRegions(staff, " AND REGION.restaurant_id = " + staff.getRestaurantId(), null);
 			jobject.setRoot(list);
 			

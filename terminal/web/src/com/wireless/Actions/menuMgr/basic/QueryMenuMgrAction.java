@@ -16,7 +16,6 @@ import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.menuMgr.Food;
-import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.util.DataPaging;
 import com.wireless.util.WebParams;
 
@@ -41,7 +40,7 @@ public class QueryMenuMgrAction extends Action {
 		try{
 			
 			String pin = (String) request.getSession().getAttribute("pin");
-			StaffDao.verify(Integer.parseInt(pin), Privilege.Code.BASIC);
+			StaffDao.verify(Integer.parseInt(pin));
 			
 			String restaurantId = (String) request.getSession().getAttribute("restaurantID");
 			String kitchen = request.getParameter("kitchen");

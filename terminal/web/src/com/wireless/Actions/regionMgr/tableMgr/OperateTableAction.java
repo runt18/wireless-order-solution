@@ -13,7 +13,6 @@ import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.regionMgr.Table;
-import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.util.WebParams;
 
@@ -42,7 +41,7 @@ public class OperateTableAction extends DispatchAction{
 			String serviceRate = request.getParameter("serviceRate");
 			String regionId = request.getParameter("regionId");
 			
-			Staff staff = StaffDao.verify(Integer.parseInt(pin), Privilege.Code.BASIC);
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			Table.InsertBuilder builder = new Table.InsertBuilder(Integer.parseInt(alias), staff.getRestaurantId(),  Short.parseShort(regionId))
 					.setMiniCost(Integer.valueOf(minimumCost))
 					.setServiceRate(Float.valueOf(serviceRate))
@@ -88,7 +87,7 @@ public class OperateTableAction extends DispatchAction{
 					.setRegionId(Short.valueOf(regionId))
 					.setServiceRate(Float.valueOf(serviceRate))
 					.setTableName(name);
-			TableDao.updateById(StaffDao.verify(Integer.parseInt(pin), Privilege.Code.BASIC), builder.build());
+			TableDao.updateById(StaffDao.verify(Integer.parseInt(pin)), builder.build());
 			jobject.initTip(true, "操作成功, 已修改餐台信息.");
 		}catch(BusinessException e){
 			e.printStackTrace();
@@ -120,7 +119,7 @@ public class OperateTableAction extends DispatchAction{
 		try{
 			String pin = (String) request.getSession().getAttribute("pin");
 			String id = request.getParameter("id");
-			TableDao.deleteById(StaffDao.verify(Integer.parseInt(pin), Privilege.Code.BASIC), Integer.valueOf(id));
+			TableDao.deleteById(StaffDao.verify(Integer.parseInt(pin)), Integer.valueOf(id));
 			jobject.initTip(true, "操作成功, 已删除餐台信息.");
 		}catch(BusinessException e){
 			e.printStackTrace();

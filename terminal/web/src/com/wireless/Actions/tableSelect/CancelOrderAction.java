@@ -15,7 +15,6 @@ import org.apache.struts.action.ActionMapping;
 import com.wireless.db.frontBusiness.CancelOrder;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
-import com.wireless.pojo.staffMgr.Privilege;
 
 public class CancelOrderAction extends Action {
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
@@ -34,7 +33,7 @@ public class CancelOrderAction extends Action {
 			
 			tableAlias = Integer.parseInt(request.getParameter("tableAlias"));
 			
-			CancelOrder.exec(StaffDao.verify(Integer.parseInt(pin), Privilege.Code.SYSTEM), tableAlias);
+			CancelOrder.exec(StaffDao.verify(Integer.parseInt(pin)), tableAlias);
 			jsonResp = jsonResp.replace("$(result)", "true");
 			jsonResp = jsonResp.replace("$(value)", tableAlias + "号餐台删单成功");
 			
