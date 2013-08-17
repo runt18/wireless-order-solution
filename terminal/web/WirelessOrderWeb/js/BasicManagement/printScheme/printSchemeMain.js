@@ -39,7 +39,7 @@ Ext.Ajax.request({
 				var c = {items : [{xtype : "checkbox", name : "kitchen",boxLabel : k.name , hideLabel : true, inputValue :  k.alias }]};
 				
 				Ext.getCmp('allKitchen').add(c);
-				//solveIE换行时格式错乱
+				//solveIE自动换行时格式错乱
 				if((i+1)%6 == 0){
 					Ext.getCmp('allKitchen').add({columnWidth : 1});
 				}
