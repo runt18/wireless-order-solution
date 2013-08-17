@@ -26,7 +26,7 @@ function getDom(id){
 			<div id = "divShowTableForSelect"></div>
 			<div id = "divShowMessageForTableSelect">
 				<div id = "divTopForShowMessageTS">
-					<span style = "color: white;"><strong>请输入桌号及人数，点击开台或者点菜按钮</strong></span>
+					<span style = "color: white;"><strong>请输入桌号及人数</strong></span>
 				</div>
 				<div id = "divCenterForShowMessageTS" class = "box-horizontal">
 					<div id = "divLeftForShowMessageTS" >
@@ -49,9 +49,11 @@ function getDom(id){
 					</div>
 				</div>
 				<div id = "divBottomForShowMessageTS">
+				<!--  
 					<input type = "button" value = "开台" class = "keyboardbutton" style = "width: 100px; margin-left: 140px;" onclick = "setEatingTable()"/>
-					<input type = "button" value = "点菜" class = "keyboardbutton" style = "width: 100px; margin-left: 5px;" />
-					<input type = "button" value = "取消" id = "btnCancelForShowMessageTS" class = "keyboardbutton" style = "width: 100px; margin-left: 5px;"/>
+				 -->
+					<input type = "button" value = "点菜" id = "btnRenderToCreateOrder" class = "keyboardbutton" style = "width: 100px; margin-left: 100px;" />
+					<input type = "button" value = "取消" id = "btnCancelForShowMessageTS" class = "keyboardbutton" style = "width: 100px; margin-left: 65px;"/>
 				</div>
 			</div>	
 			<div id = "divHideForTableSelect"></div>	
@@ -85,7 +87,7 @@ function getDom(id){
 			<div  id = "divAllStatus" class="button-base" style="margin-bottom: 2px;" onclick="showStatus()">全部状态	</div>
 			<div id = "divStatus" style =  " display: none; margin-bottom: 2px;">
 					<div class="button-base" id = "freeForTableSelect" style = "margin-bottom: 2px; background-color: #F1C40D">空闲</div>
-					<div class="button-base" id = "busyForTableSelect" style = "margin-bottom: 2px; background-color: #F1C40D">占用</div>
+					<div class="button-base" id = "busyForTableSelect" style = "margin-bottom: 2px; background-color: #F1C40D">就餐</div>
 			</div>
 			<div class="button-base" id = "divAllArea" style="margin-bottom: 2px;" onclick="addTables('allTable')">全部区域</div>
 			<div id="divShowRegion"></div>
@@ -97,9 +99,11 @@ function getDom(id){
 		<div class="button-base" style="margin-right: 2px;" onclick="frontPage()">上一页</div>
 		<div class="button-base" style="margin-right: 2px;" onclick="nextPage()">下一页</div>
 		<div class="button-base" style="margin-right: 2px;" onclick="lastPage()">末页</div>
+		<!-- 
 		<div class="button-base" style="margin-right: 2px;">开台</div>
+		 -->
   		<div class="button-base" style="margin-right: 2px;" onclick = "createOrderForTS()">点菜</div>
-  		<div class="button-base" style="margin-right: 2px;">结账</div>
+  		<div class="button-base" style="margin-right: 2px;" onclick = "checkOnTS()">结账</div>
   		<div class="div-full">&nbsp;</div>
   		<div class="button-base" style="margin-left: 2px;" onClick="toggleContentDisplay({type:'show', renderTo:'divUpdateOrder'})">divUpdateOrder</div>
 		<div class="button-base" style="margin-left: 2px;" onClick="toggleContentDisplay({type:'show', renderTo:'divCreateOrder'})">divCreateOrder</div>
