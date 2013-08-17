@@ -20,7 +20,7 @@ function initFoodData(){
 					data.root[i].deptId = data.root[i].kitchen.dept.id;
 					delete data.root[i].kitchen;
 				}
-//				localStorage.setItem('foods', JSON.stringify(data));
+				localStorage.setItem('foods', JSON.stringify(data));
 				foodData = data;
 				
 				$.getScript('./js/createOrder/coLoad.js');
@@ -69,12 +69,16 @@ function initFoodData(){
 								name : '全部分厨',
 								dept : {
 									id : -1
-								}
+								},
+								foods : foodData.root.slice(0)
 							});
 							kitchenFoodData.root.unshift({
 								id : -1,
 								name : '全部分厨',
-								foods : foodData.root
+								dept : {
+									id : -1
+								},
+								foods : foodData.root.slice(0)
 							});
 							// 清理多余数据
 							for(var i = kitchenFoodData.root.length - 1; i >= 0; i--){
@@ -107,6 +111,7 @@ function initFoodData(){
 		}
 	});
 }
+
 /**
  * onload
  */
