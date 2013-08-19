@@ -386,12 +386,27 @@ function renderToCreateOrder(tableNo, peopleNo){
 		$("#txtPeopleNumForSM").val(inputNumVal);
 		//设置该餐桌为选中状态
 //		changeColorForSelect("divtable" + tableNo);
-		toggleContentDisplay({type:'show', renderTo:'divCreateOrder'});
+		//toggleContentDisplay({type:'show', renderTo:'divCreateOrder'});
+		cr.show({
+			table : getTableBytableId(tableNo)
+		});
 	}else{
 		alert("没有该餐桌，请重新输入一个桌号！");
 	}	
 }
-//点击空台弹出点菜页面上的点菜按钮
+/**
+ * 根据餐桌id，返回餐桌对象字符串
+ * @param {int} tableId
+ * @returns {string} 
+ */
+function getTableBytableId(tableId){
+	for(x in tables){
+		if(tables[x].alias == tableId){
+			return tables[x];		
+		}
+	}
+}
+//点击空台 8弹出点菜页面上的点菜按钮
 $("#btnRenderToCreateOrder").click(function(){
 	var tableNo;
 	var peopleNo;
