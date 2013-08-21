@@ -17,6 +17,7 @@ function loginOnLoad() {
 	Ext.Ajax.request({
 		url : "../QueryStaff.do",
 		params : {
+			"skipVerify" : 1,
 			"restaurantID" : restaurantID,
 			"type" : 0,
 			"isPaging" : false,

@@ -118,7 +118,7 @@ function getOperatorName(actionPath) {
 	Ext.Ajax.request({
 		url : actionPath + "QueryStaff.do",
 		params : {
-			//"restaurantID" : restaurantID,
+			"restaurantID" : restaurantID,
 			"type" : 0,
 			"isPaging" : false,
 			"isCombo" : false
