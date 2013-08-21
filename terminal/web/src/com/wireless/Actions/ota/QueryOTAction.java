@@ -11,7 +11,6 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import com.wireless.db.DBCon;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.staffMgr.Staff;
@@ -27,8 +26,6 @@ public class QueryOTAction extends Action {
 		PrintWriter out = null;
 		
 		String result = null;
-		
-		DBCon dbCon = new DBCon();
 		
 		try {
 
@@ -53,8 +50,7 @@ public class QueryOTAction extends Action {
 			if(funCode == 1){
 				
 			}else if(funCode == 2){
-				dbCon.connect();
-				int pin = Integer.parseInt((String)request.getAttribute("pin"));
+				int pin = Integer.parseInt(request.getParameter("pin"));
 				Staff staff = StaffDao.getStaffById(pin);
 				// 获取图片操作路径(物理路径)
 				String url = getServlet().getInitParameter(WebParams.IMAGE_BROWSE_PATH) + "/" + staff.getRestaurantId() + "/";
@@ -68,7 +64,6 @@ public class QueryOTAction extends Action {
 		}finally{
 			out.write(result);
 			out.close();
-			dbCon.disconnect();
 		}
 		
 		return null;
