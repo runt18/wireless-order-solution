@@ -29,7 +29,7 @@ public class InsertDiscountPlanAction extends Action{
 		
 		try{
 			
-			String pin = (String) request.getSession().getAttribute("pin");
+			String pin = (String)request.getAttribute("pin");
 			StaffDao.verify(Integer.parseInt(pin));
 			
 			String discountID = request.getParameter("discountID");

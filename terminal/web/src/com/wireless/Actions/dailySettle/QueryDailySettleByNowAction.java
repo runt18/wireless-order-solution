@@ -31,7 +31,7 @@ public class QueryDailySettleByNowAction extends Action{
 		HashMap resultMap = new HashMap();
 		ShiftDetail res = null;
 		try{
-			String pin = (String) request.getSession().getAttribute("pin");
+			String pin = (String)request.getAttribute("pin");
 			String queryType = request.getParameter("queryType");
 			
 			if(queryType == null)

@@ -29,7 +29,7 @@ public class DeletePricePlanAction extends Action {
 		JObject jobject = new JObject();
 		try{
 			
-			String pin = (String) request.getSession().getAttribute("pin");
+			String pin = (String)request.getAttribute("pin");
 			StaffDao.verify(Integer.parseInt(pin));
 			
 			String restaurantID = request.getParameter("restaurantID");

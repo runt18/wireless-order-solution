@@ -44,7 +44,7 @@ public class QueryMaterialCateAction extends DispatchAction{
 		String limit = request.getParameter("limit");
 		try{
 			
-			String pin = (String) request.getSession().getAttribute("pin");
+			String pin = (String)request.getAttribute("pin");
 			StaffDao.verify(Integer.parseInt(pin));
 			
 			String restaurantID = request.getParameter("restaurantID");
@@ -92,7 +92,7 @@ public class QueryMaterialCateAction extends DispatchAction{
 		MaterialCate item = null;
 		StringBuffer tree = new StringBuffer();
 		try{
-//			String pin = (String) request.getSession().getAttribute("pin");
+//			String pin = (String)request.getAttribute("pin");
 			String restaurantID = request.getParameter("restaurantID");
 			String type = request.getParameter("type");
 			

@@ -39,10 +39,10 @@ public class QueryMenuMgrAction extends Action {
 		
 		try{
 			
-			String pin = (String) request.getSession().getAttribute("pin");
+			String pin = (String)request.getAttribute("pin");
 			StaffDao.verify(Integer.parseInt(pin));
 			
-			String restaurantId = (String) request.getSession().getAttribute("restaurantID");
+			String restaurantId = request.getParameter("restaurantId");
 			String kitchen = request.getParameter("kitchen");
 			String alias = request.getParameter("alias");
 			String operqtor = request.getParameter("operator");

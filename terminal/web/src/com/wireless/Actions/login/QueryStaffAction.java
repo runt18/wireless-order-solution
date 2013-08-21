@@ -53,18 +53,8 @@ public class QueryStaffAction extends Action {
 			
 			out = response.getWriter();
 			String restaurantID ;
-			
-			if(request.getParameter("restaurantID") == null){
-				restaurantID = (String) request.getSession().getAttribute("restaurantID");
 				
-				if(restaurantID == null){
-					throw new BusinessException("操作已超时");
-					
-				}
-			}else{
-				
-				restaurantID = request.getParameter("restaurantID");
-			}
+			restaurantID = request.getParameter("restaurantID");
 			
 
 			// get the type to filter
@@ -129,8 +119,8 @@ public class QueryStaffAction extends Action {
 				staffList = DataPaging.getPagingData(staffList, isPaging, index, pageSize);
 			}	
 			
-			if(request.getSession().getAttribute("pin") != null){
-				other.put("pin", request.getSession().getAttribute("pin"));
+			if(request.getAttribute("pin") != null){
+				other.put("pin", request.getAttribute("pin"));
 			}
 			jobject.setTotalProperty(staffList.size());
 			jobject.setRoot(staffList);

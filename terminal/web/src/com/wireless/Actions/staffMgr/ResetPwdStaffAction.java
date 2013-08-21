@@ -49,7 +49,7 @@ public class ResetPwdStaffAction extends Action {
 			 * 
 			 */
 
-			String pin = (String) request.getSession().getAttribute("pin");
+			String pin = (String)request.getAttribute("pin");
 
 			dbCon.connect();
 			Staff staff = StaffDao.verify(dbCon, Integer.parseInt(pin));

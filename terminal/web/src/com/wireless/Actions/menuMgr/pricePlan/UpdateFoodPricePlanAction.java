@@ -28,7 +28,7 @@ public class UpdateFoodPricePlanAction extends Action {
 		JObject jobject = new JObject();
 		try{
 			
-			String pin = (String) request.getSession().getAttribute("pin");
+			String pin = (String)request.getAttribute("pin");
 			StaffDao.verify(Integer.parseInt(pin));
 			
 			content = JSONObject.fromObject(request.getParameter("foodPricePlan"));

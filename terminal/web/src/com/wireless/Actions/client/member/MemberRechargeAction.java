@@ -34,7 +34,7 @@ public class MemberRechargeAction extends Action{
 		response.setCharacterEncoding("UTF-8");
 		JObject jobject = new JObject();
 		try{
-			String pin = (String) request.getSession().getAttribute("pin");
+			String pin = (String)request.getAttribute("pin");
 			String memberID = request.getParameter("memberID");
 			String rechargeMoney = request.getParameter("rechargeMoney");
 			String rechargeType = request.getParameter("rechargeType");

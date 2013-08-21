@@ -33,7 +33,7 @@ public class OperatePrintFuncAction extends DispatchAction{
 		JObject jobject = new JObject();
 		
 		try{
-			String pin = (String) request.getSession().getAttribute("pin");
+			String pin = (String)request.getAttribute("pin");
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			String printFuncId = request.getParameter("printFuncId");
 			PrintFuncDao.removeFunc(staff, Integer.parseInt(printFuncId));
@@ -59,7 +59,7 @@ public class OperatePrintFuncAction extends DispatchAction{
 		JObject jobject = new JObject();
 		DBCon dbCon = new DBCon();
 		try{
-			String pin = (String) request.getSession().getAttribute("pin");
+			String pin = (String)request.getAttribute("pin");
 			dbCon.connect();
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			String repeat = request.getParameter("repeat");
@@ -172,7 +172,7 @@ public class OperatePrintFuncAction extends DispatchAction{
 		JObject jobject = new JObject();
 		DBCon dbCon = new DBCon();
 		try{
-			String pin = (String) request.getSession().getAttribute("pin");
+			String pin = (String)request.getAttribute("pin");
 			dbCon.connect();
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			String repeat = request.getParameter("repeat");

@@ -31,7 +31,7 @@ public class QueryFoodPricePlanByOrderAction extends Action {
 		List<PricePlan> root = null;
 		try{
 			
-			//String pin = (String) request.getSession().getAttribute("pin");
+			//String pin = (String)request.getAttribute("pin");
 			//StaffDao.verify(Integer.parseInt(pin));
 			
 			Map<Object, Object> params = new HashMap<Object, Object>();

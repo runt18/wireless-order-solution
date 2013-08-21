@@ -47,7 +47,7 @@ public class RestaurantUpdateAction extends Action {
 			
 			String tele2 = request.getParameter("tel2");
 			
-			String pin = (String) request.getSession().getAttribute("pin");
+			String pin = (String)request.getAttribute("pin");
 			
 			String id = request.getParameter("restaurantID"); 
 			

@@ -42,7 +42,7 @@ public class QueryDeptAction extends DispatchAction{
 		String start = request.getParameter("start");
 		String limit = request.getParameter("limit");
 		try{
-			String pin = (String) request.getSession().getAttribute("pin");
+			String pin = (String)request.getAttribute("pin");
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			String extraCond = "", orderClause = " ORDER BY dept_id ";
 			root = DepartmentDao.getDepartments(staff, extraCond, orderClause);

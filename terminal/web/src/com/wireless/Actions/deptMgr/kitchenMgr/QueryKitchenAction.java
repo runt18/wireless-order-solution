@@ -37,7 +37,7 @@ public class QueryKitchenAction extends DispatchAction {
 		
 		StringBuffer jsb = new StringBuffer();
 		try{
-			String pin = (String) request.getSession().getAttribute("pin");
+			String pin = (String)request.getAttribute("pin");
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			String extraCond = "", orderClause = "";
 			extraCond += (" AND KITCHEN.restaurant_id = " + staff.getRestaurantId());
@@ -85,7 +85,7 @@ public class QueryKitchenAction extends DispatchAction {
 		String limit = request.getParameter("limit");
 		
 		try{
-			String pin = (String) request.getSession().getAttribute("pin");
+			String pin = (String)request.getAttribute("pin");
 			String deptID = request.getParameter("deptID");
 			
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));

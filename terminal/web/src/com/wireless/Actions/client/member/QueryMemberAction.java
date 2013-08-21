@@ -42,7 +42,7 @@ public class QueryMemberAction extends DispatchAction {
 		String start = request.getParameter("start");
 		String limit = request.getParameter("limit");
 		try{
-			String pin = (String) request.getSession().getAttribute("pin");
+			String pin = (String)request.getAttribute("pin");
 			StaffDao.verify(Integer.parseInt(pin));
 			
 			String extraCond = " ", orderClause = " ";

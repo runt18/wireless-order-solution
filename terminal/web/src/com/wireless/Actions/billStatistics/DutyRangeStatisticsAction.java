@@ -41,7 +41,7 @@ public class DutyRangeStatisticsAction extends DispatchAction {
 		JObject jobject = new JObject();
 		List<DutyRange> list = null;
 		try{
-			String pin = (String) request.getSession().getAttribute("pin");
+			String pin = (String)request.getAttribute("pin");
 			list = QueryDutyRange.getDutyRangeByToday(Integer.parseInt(pin));
 		}catch(Exception e){
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, "操作失败, 数据库操作请求发生错误!");
@@ -74,7 +74,7 @@ public class DutyRangeStatisticsAction extends DispatchAction {
 		String start = request.getParameter("start");
 		String limit = request.getParameter("limit");
 		try{
-			String pin = (String) request.getSession().getAttribute("pin");
+			String pin = (String)request.getAttribute("pin");
 			String restaurantID = request.getParameter("restaurantID");
 			String onDuty = request.getParameter("onDuty");
 			String offDuty = request.getParameter("offDuty");
@@ -145,7 +145,7 @@ public class DutyRangeStatisticsAction extends DispatchAction {
 			 * "food1,food2,food3" dateBegin: dateEnd :
 			 *//*
 
-			String pin = (String) request.getSession().getAttribute("pin");
+			String pin = (String)request.getAttribute("pin");
 
 			dbCon.connect();
 			Terminal term = VerifyPin.exec(dbCon, Long.parseLong(pin),

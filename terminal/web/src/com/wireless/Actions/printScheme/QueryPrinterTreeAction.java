@@ -22,7 +22,7 @@ public class QueryPrinterTreeAction extends Action{
 		response.setCharacterEncoding("UTF-8");
 		
 		StringBuilder jsonSB = new StringBuilder();
-		String pin = (String) request.getSession().getAttribute("pin");
+		String pin = (String)request.getAttribute("pin");
 		
 		try{
 			Staff staff = StaffDao.getStaffById(Integer.parseInt(pin));

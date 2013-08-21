@@ -25,7 +25,7 @@ public class UpdateMenuAction extends Action {
 		JObject jobject = new JObject();
 		try {
 			
-			String pin = (String) request.getSession().getAttribute("pin");
+			String pin = (String)request.getAttribute("pin");
 			String restaurantID = request.getParameter("restaurantID");
 			
 			String foodID = request.getParameter("foodID");

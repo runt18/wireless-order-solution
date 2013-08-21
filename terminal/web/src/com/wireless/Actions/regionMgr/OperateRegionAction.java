@@ -33,7 +33,7 @@ public class OperateRegionAction extends DispatchAction{
 		response.setCharacterEncoding("UTF-8");
 		JObject jobject = new JObject();
 		try{
-			String pin = (String) request.getSession().getAttribute("pin");
+			String pin = (String)request.getAttribute("pin");
 			String id = request.getParameter("id");
 			String name = request.getParameter("name");
 			

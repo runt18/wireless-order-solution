@@ -35,7 +35,7 @@ public class QueryStockTakeAction extends Action{
 		String limit = request.getParameter("limit");
 		
 		try{
-			String pin = (String) request.getSession().getAttribute("pin");
+			String pin = (String)request.getAttribute("pin");
 			String status = request.getParameter("status");
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			String extraCond = "", orderClause = "";

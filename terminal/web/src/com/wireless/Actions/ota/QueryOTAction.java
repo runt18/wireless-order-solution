@@ -54,7 +54,7 @@ public class QueryOTAction extends Action {
 				
 			}else if(funCode == 2){
 				dbCon.connect();
-				int pin = Integer.parseInt((String) request.getSession().getAttribute("pin"));
+				int pin = Integer.parseInt((String)request.getAttribute("pin"));
 				Staff staff = StaffDao.getStaffById(pin);
 				// 获取图片操作路径(物理路径)
 				String url = getServlet().getInitParameter(WebParams.IMAGE_BROWSE_PATH) + "/" + staff.getRestaurantId() + "/";

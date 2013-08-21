@@ -40,7 +40,7 @@ public class BusinessStatisticsAction extends DispatchAction {
 		
 		JObject jobject = new JObject();
 		try{
-			String pin = (String) request.getSession().getAttribute("pin");
+			String pin = (String)request.getAttribute("pin");
 			
 			StaffDao.verify(Integer.parseInt(pin));
 			
@@ -96,7 +96,7 @@ public class BusinessStatisticsAction extends DispatchAction {
 		
 		JObject jobject = new JObject();
 		try{
-			String pin = (String) request.getSession().getAttribute("pin");
+			String pin = (String)request.getAttribute("pin");
 			String restaurantID = request.getParameter("restaurantID");
 			String onDuty = request.getParameter("onDuty");
 			String offDuty = request.getParameter("offDuty");

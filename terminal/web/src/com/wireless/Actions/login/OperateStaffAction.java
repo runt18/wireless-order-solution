@@ -12,7 +12,7 @@ import org.apache.struts.action.ActionMapping;
 public class OperateStaffAction extends Action{
 	public ActionForward execute(ActionMapping mapping, ActionForm form,HttpServletRequest request, HttpServletResponse response)throws Exception {
 				
-		String pin = request.getParameter("pin");
+		String pin = (String)request.getParameter("pin");
 		String restaurantID = request.getParameter("restaurantID");
 		try{
 			HttpSession session = request.getSession();

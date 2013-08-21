@@ -38,7 +38,7 @@ public class QueryMaterialAction extends DispatchAction{
 		String start = request.getParameter("start");
 		String limit = request.getParameter("limit");
 		try{
-			String pin = (String) request.getSession().getAttribute("pin");
+			String pin = (String)request.getAttribute("pin");
 			StaffDao.verify(Integer.parseInt(pin));
 			
 			String restaurantID = request.getParameter("restaurantID");
@@ -103,7 +103,7 @@ public class QueryMaterialAction extends DispatchAction{
 		JObject jobject = new JObject();
 		List<StockTakeDetail> root = new ArrayList<StockTakeDetail>();
 		try{
-			String pin = (String) request.getSession().getAttribute("pin");
+			String pin = (String)request.getAttribute("pin");
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			String cateId = request.getParameter("cateId");
 			String deptId = request.getParameter("deptId");

@@ -24,7 +24,7 @@ public class OperatePrinterAction extends DispatchAction{
 		request.setCharacterEncoding("UTF-8");
 		response.setCharacterEncoding("UTF-8");
 		JObject jobject = new JObject();
-		String pin = (String) request.getSession().getAttribute("pin");
+		String pin = (String)request.getAttribute("pin");
 		String printerId = request.getParameter("printerId");
 		DBCon dbCon = new DBCon();
 		try{
@@ -52,7 +52,7 @@ public class OperatePrinterAction extends DispatchAction{
 		request.setCharacterEncoding("UTF-8");
 		response.setCharacterEncoding("UTF-8");
 		JObject jobject = new JObject();
-		String pin = (String) request.getSession().getAttribute("pin");
+		String pin = (String)request.getAttribute("pin");
 		
 		DBCon dbCon = new DBCon();
 		try{
@@ -86,7 +86,7 @@ public class OperatePrinterAction extends DispatchAction{
 		request.setCharacterEncoding("UTF-8");
 		response.setCharacterEncoding("UTF-8");
 		JObject jobject = new JObject();
-		String pin = (String) request.getSession().getAttribute("pin");
+		String pin = (String)request.getAttribute("pin");
 		DBCon dbCon = new DBCon();
 		
 		try{

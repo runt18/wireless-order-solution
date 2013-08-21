@@ -76,7 +76,7 @@ public class InsertOrderAction extends Action{
 	         * 	         [是否临时菜(true),临时菜1编号,临时菜1名称,临时菜1数量,临时菜1单价,叫起状态]，
 	         * 			 [是否临时菜(true),临时菜1编号,临时菜1名称,临时菜1数量,临时菜1单价,叫起状态]...}
 			 */
-			final Staff staff = StaffDao.verify(Integer.parseInt((String) request.getSession().getAttribute("pin")));
+			final Staff staff = StaffDao.verify(Integer.parseInt((String)request.getAttribute("pin")));
 			
 			Order orderToInsert = new Order();
 			int tableAlias = request.getParameter("tableID") != null ? Integer.parseInt(request.getParameter("tableID")) : 0;

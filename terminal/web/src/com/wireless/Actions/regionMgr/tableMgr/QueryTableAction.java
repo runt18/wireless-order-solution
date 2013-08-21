@@ -32,7 +32,7 @@ public class QueryTableAction extends Action {
 		String limit = request.getParameter("limit");
 		
 		try{
-			String pin = (String) request.getSession().getAttribute("pin");
+			String pin = (String)request.getAttribute("pin");
 			String alias = request.getParameter("alias");
 			String name = request.getParameter("name");
 			String regionId = request.getParameter("regionId");

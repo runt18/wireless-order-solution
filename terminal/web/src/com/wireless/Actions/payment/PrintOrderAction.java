@@ -88,7 +88,7 @@ public class PrintOrderAction extends Action{
 			 * offDuty : the date time to be off duty
 			 * 
 			 */
-			String pin = (String) request.getSession().getAttribute("pin");
+			String pin = (String)request.getAttribute("pin");
 			
 			final Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			

@@ -36,7 +36,7 @@ public class QueryMemberOperationAction extends Action{
 		List<MemberOperation> list = null;
 		try{
 			
-			String pin = (String) request.getSession().getAttribute("pin");
+			String pin = (String)request.getAttribute("pin");
 			StaffDao.verify(Integer.parseInt(pin));
 			
 			String restaurantID = request.getParameter("restaurantID");

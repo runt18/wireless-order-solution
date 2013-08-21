@@ -32,7 +32,7 @@ public class QueryMaterialDeptAction extends Action{
 		JObject jobject = new JObject();
 		List<MaterialDept> root = null;
 		try{
-			String pin = (String) request.getSession().getAttribute("pin");
+			String pin = (String)request.getAttribute("pin");
 			String deptId = request.getParameter("deptId");
 			String cateType = request.getParameter("cateType");
 			String cateId = request.getParameter("cateId");

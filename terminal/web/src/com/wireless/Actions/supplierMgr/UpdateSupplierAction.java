@@ -31,7 +31,7 @@ public class UpdateSupplierAction extends Action{
 			String addr = request.getParameter("addr");
 			String contact = request.getParameter("contact");
 			String comment = request.getParameter("comment");
-			String pin = (String) request.getSession().getAttribute("pin");
+			String pin = (String)request.getAttribute("pin");
 			
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			Supplier supplier = new Supplier(Integer.valueOf(supplierId), staff.getRestaurantId(), name, tele, addr, contact, comment);

@@ -35,7 +35,7 @@ public class QueryHistoryAction extends Action {
 		String limit = request.getParameter("limit");
 		try{
 			String restaurantId = request.getParameter("restaurantID");
-			String pin = (String) request.getSession().getAttribute("pin");
+			String pin = (String)request.getAttribute("pin");
 			String value = request.getParameter("value");
 			
 			String ope = request.getParameter("ope");

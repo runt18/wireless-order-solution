@@ -28,7 +28,7 @@ public class UpdateCancelReasonAction extends Action{
 		JSONObject centent = null;
 		try{
 			
-			String pin = (String) request.getSession().getAttribute("pin");
+			String pin = (String)request.getAttribute("pin");
 			StaffDao.verify(Integer.parseInt(pin));
 			
 			String cancelReason = request.getParameter("cancelReason");

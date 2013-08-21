@@ -26,7 +26,7 @@ public class OperateTasteAction extends DispatchAction{
 		
 		JObject jobject = new JObject();
 		try{
-			String pin = (String) request.getSession().getAttribute("pin");
+			String pin = (String)request.getAttribute("pin");
 			String alias = request.getParameter("alias");
 			String name = request.getParameter("name");
 			String price = request.getParameter("price");
@@ -64,7 +64,7 @@ public class OperateTasteAction extends DispatchAction{
 		
 		JObject jobject = new JObject();
 		try{
-			String pin = (String) request.getSession().getAttribute("pin");
+			String pin = (String)request.getAttribute("pin");
 			String id = request.getParameter("id");
 			String alias = request.getParameter("alias");
 			String name = request.getParameter("name");
@@ -104,7 +104,7 @@ public class OperateTasteAction extends DispatchAction{
 		
 		JObject jobject = new JObject();
 		try{
-			String pin = (String) request.getSession().getAttribute("pin");
+			String pin = (String)request.getAttribute("pin");
 			String id = request.getParameter("id");
 			TasteDao.delete(StaffDao.verify(Integer.parseInt(pin)), Integer.valueOf(id));
 			jobject.initTip(true, "操作成功, 已删除口味信息.");

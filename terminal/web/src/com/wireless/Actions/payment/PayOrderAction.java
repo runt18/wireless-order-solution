@@ -80,7 +80,7 @@ public class PayOrderAction extends Action{
 			 *           No need to pass this parameter if no comment input. 
 			 */
 			
-			final Staff staff = StaffDao.verify(Integer.parseInt((String) request.getSession().getAttribute("pin")));
+			final Staff staff = StaffDao.verify(Integer.parseInt((String)request.getAttribute("pin")));
 			
 			Order orderToPay = new Order();
 			

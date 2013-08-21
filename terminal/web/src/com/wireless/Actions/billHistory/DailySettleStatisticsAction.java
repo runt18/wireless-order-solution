@@ -40,7 +40,7 @@ public class DailySettleStatisticsAction extends Action {
 		
 		try{
 			
-			String pin = (String) request.getSession().getAttribute("pin");
+			String pin = (String)request.getAttribute("pin");
 			StaffDao.verify(Integer.parseInt(pin));
 			
 			String restaurantID = request.getParameter("restaurantID");
@@ -110,7 +110,7 @@ public class DailySettleStatisticsAction extends Action {
 			 * "food1,food2,food3" dateBegin: dateEnd :
 			 *//*
 
-			String pin = (String) request.getSession().getAttribute("pin");
+			String pin = (String)request.getAttribute("pin");
 
 			dbCon.connect();
 			Terminal term = VerifyPin.exec(dbCon, Long.parseLong(pin),
