@@ -14,8 +14,9 @@ Release v1.2.4 <xx/08/2013>
 2 - 表'order'和'order_history'增加'staff_id'字段
 3 - 增加表'printer'、'print_func'、'func_dept'、'func_region'、'func_kitchen'
 4 - 修改表'staff'
-5 - 增加表'device'、'role'、'privilege'、'role_privilege'
+5 - 增加表'device'、'role'、'privilege'、'role_privilege'、'role_discount'
 6 - 表'restaurant'增加'expire_date'字段
+7 - 表'restaurant'删除'pwd'、'pwd2'、'pwd3'、'pwd4'、'pwd5'字段
 ******************************************************************************************************/
 
 /******************************************************************************************************

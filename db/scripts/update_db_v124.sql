@@ -252,7 +252,6 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`role_privilege` (
   `role_id` INT NOT NULL ,
   `pri_id` INT NOT NULL ,
   `restaurant_id` INT NOT NULL DEFAULT 0 ,
-  `discount_privilege_id` INT NULL DEFAULT NULL ,
   PRIMARY KEY (`role_id`, `pri_id`) ,
   INDEX `ix_restaurant_id` (`restaurant_id` ASC) )
 ENGINE = InnoDB
@@ -260,15 +259,14 @@ DEFAULT CHARACTER SET = utf8;
 
 
 -- -----------------------------------------------------
--- Table `wireless_order_db`.`discount_privilege`
+-- Table `wireless_order_db`.`role_discount`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `wireless_order_db`.`discount_privilege` ;
+DROP TABLE IF EXISTS `wireless_order_db`.`role_discount` ;
 
-CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`discount_privilege` (
-  `discount_privilege_id` INT NOT NULL AUTO_INCREMENT ,
-  `discount_id` INT NULL ,
-  PRIMARY KEY (`discount_privilege_id`) ,
-  INDEX `ix_discount_id` (`discount_id` ASC) )
+CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`role_discount` (
+  `role_id` INT NOT NULL ,
+  `discount_id` INT NOT NULL ,
+  PRIMARY KEY (`role_id`, `discount_id`) )
 ENGINE = InnoDB;
 
 -- -----------------------------------------------------

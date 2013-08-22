@@ -117,12 +117,9 @@ DROP TABLE IF EXISTS `wireless_order_db`.`restaurant` ;
 
 CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`restaurant` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'the id to this restaurant, id 1 indicates the root user, id 2 indicates idle-repository, id 3 indicates discarded-repository' ,
-  `pwd` VARCHAR(45) NOT NULL COMMENT 'the password for the restaurant to log in' ,
   `account` VARCHAR(45) NOT NULL COMMENT 'the account for the restaurant to log in' ,
   `restaurant_name` VARCHAR(50) NOT NULL DEFAULT '' COMMENT 'the restaurant name ' ,
   `restaurant_info` VARCHAR(300) NOT NULL DEFAULT '' COMMENT 'the restaurant info' ,
-  `pwd2` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the 2nd password to this restaurant, whose permission priority is lower than pwd' ,
-  `pwd3` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'the 3rd password to this restaurant, whose permission priority is lower than pwd2' ,
   `tele1` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'One of the telephones to this restaurant.' ,
   `tele2` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'One of the telephones to this restaurant.' ,
   `address` VARCHAR(70) NOT NULL DEFAULT '' COMMENT 'The address to this restaurant.' ,
@@ -1269,7 +1266,6 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`role_privilege` (
   `role_id` INT NOT NULL ,
   `pri_id` INT NOT NULL ,
   `restaurant_id` INT NOT NULL DEFAULT 0 ,
-  `discount_privilege_id` INT NULL DEFAULT NULL ,
   PRIMARY KEY (`role_id`, `pri_id`) ,
   INDEX `ix_restaurant_id` (`restaurant_id` ASC) )
 ENGINE = InnoDB
@@ -1277,15 +1273,14 @@ DEFAULT CHARACTER SET = utf8;
 
 
 -- -----------------------------------------------------
--- Table `wireless_order_db`.`discount_privilege`
+-- Table `wireless_order_db`.`role_discount`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `wireless_order_db`.`discount_privilege` ;
+DROP TABLE IF EXISTS `wireless_order_db`.`role_discount` ;
 
-CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`discount_privilege` (
-  `discount_privilege_id` INT NOT NULL AUTO_INCREMENT ,
-  `discount_id` INT NULL ,
-  PRIMARY KEY (`discount_privilege_id`) ,
-  INDEX `ix_discount_id` (`discount_id` ASC) )
+CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`role_discount` (
+  `role_id` INT NOT NULL ,
+  `discount_id` INT NOT NULL ,
+  PRIMARY KEY (`role_id`, `discount_id`) )
 ENGINE = InnoDB;
 
 
