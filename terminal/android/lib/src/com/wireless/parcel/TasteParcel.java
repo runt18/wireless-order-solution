@@ -23,7 +23,7 @@ public class TasteParcel implements Parcelable{
 	private TasteParcel(Parcel in){
 		if(in.readInt() != 1){
 			mSrcTaste = new Taste();
-			mSrcTaste.setAliasId(in.readInt());
+			mSrcTaste.setTasteId(in.readInt());
 			mSrcTaste.setPreference(in.readString());
 			mSrcTaste.setCategory(in.readInt());
 			mSrcTaste.setCalc(in.readInt());
@@ -56,7 +56,7 @@ public class TasteParcel implements Parcelable{
 			parcel.writeInt(1);
 		}else{
 			parcel.writeInt(0);
-			parcel.writeInt(mSrcTaste.getAliasId());
+			parcel.writeInt(mSrcTaste.getTasteId());
 			parcel.writeString(mSrcTaste.getPreference());
 			parcel.writeInt(mSrcTaste.getCategory().getVal());
 			parcel.writeInt(mSrcTaste.getCalc().getVal());
