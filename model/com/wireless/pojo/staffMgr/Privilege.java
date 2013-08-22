@@ -101,7 +101,6 @@ public class Privilege implements Comparable<Privilege>, Parcelable{
 	private int id;
 	private Code code;
 	private int restaurantId;
-	private int discountPrivilegeId;
 	private List<Discount> discounts = new ArrayList<Discount>();
 	
 	Privilege(){
@@ -162,14 +161,6 @@ public class Privilege implements Comparable<Privilege>, Parcelable{
 		}
 	}
 	
-	public int getDiscountPrivilegeId() {
-		return discountPrivilegeId;
-	}
-
-	public void setDiscountPrivilegeId(int discountPrivilegeId) {
-		this.discountPrivilegeId = discountPrivilegeId;
-	}
-
 	@Override
 	public boolean equals(Object obj){
 		if(obj == null || !(obj instanceof Privilege)){
