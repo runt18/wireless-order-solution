@@ -886,7 +886,7 @@ public class FoodDao {
 		String sql;
 		sql = " SELECT " +
 		      " FTR.food_id, " + 
-			  " TASTE.taste_id, TASTE.taste_alias, TASTE.restaurant_id " +
+			  " TASTE.taste_id, TASTE.restaurant_id " +
 			  " FROM " + Params.dbName + ".food_taste_rank FTR " +
 			  " LEFT JOIN " + Params.dbName + ".taste TASTE " +
 			  " ON TASTE.taste_id = FTR.taste_id " + 
@@ -899,7 +899,6 @@ public class FoodDao {
 			Food f = foods.get(dbCon.rs.getLong("food_id"));
 			if(f != null){
 				f.addPopTaste(new Taste(dbCon.rs.getInt("taste_id"),
-						   	 		    dbCon.rs.getInt("taste_alias"),
 						   				dbCon.rs.getInt("restaurant_id")));
 			}
 		}

@@ -243,7 +243,7 @@ public class UpdateOrder {
 					  (tg.hasNormalTaste() ? "MAX(normal_taste_group_id) + 1" : TasteGroup.EMPTY_NORMAL_TASTE_GROUP_ID) + ", " +
 					  (tg.hasNormalTaste() ? ("'" + tg.getNormalTastePref() + "'") : "NULL") + ", " +
 					  (tg.hasNormalTaste() ? tg.getNormalTastePrice() : "NULL") + ", " +
-					  (tg.hasTmpTaste() ? tg.getTmpTaste().getAliasId() : "NULL") + ", " +
+					  (tg.hasTmpTaste() ? tg.getTmpTaste().getTasteId() : "NULL") + ", " +
 					  (tg.hasTmpTaste() ? ("'" + tg.getTmpTastePref() + "'") : "NULL") + ", " +
 					  (tg.hasTmpTaste() ? tg.getTmpTastePrice() : "NULL") +
 					  " FROM " + 
@@ -440,29 +440,16 @@ public class UpdateOrder {
 			foodToFill.asFood().setKitchen(detailFood.getKitchen());
 			foodToFill.asFood().setChildFoods(detailFood.getChildFoods());
 			
-//			if(detailFood.length > 0){
-//				foodToFill.setFoodId(detailFood[0].getFoodId());
-//				foodToFill.setAliasId(detailFood[0].getAliasId());
-//				foodToFill.setRestaurantId(detailFood[0].getRestaurantId());
-//				foodToFill.setStatus(detailFood[0].getStatus());
-//				foodToFill.setName(detailFood[0].getName());
-//				foodToFill.setPrice(detailFood[0].getPrice());
-//				foodToFill.setKitchen(detailFood[0].getKitchen());
-//				foodToFill.setChildFoods(detailFood[0].getChildFoods());
-//			}else{
-//				throw new BusinessException("The food(alias_id=" + foodToFill.getAliasId() + ", restaurant_id=" + term.restaurantID + ") to query does NOT exist.", ProtocolError.MENU_EXPIRED);
-//			}			
-
 			//Get the details to each normal tastes.
 			if(foodToFill.hasNormalTaste()){
 				//Get the detail to each tastes.
 				for(Taste taste : foodToFill.getTasteGroup().getTastes()){
-					taste.copyFrom(TasteDao.getTasteByAlias(dbCon, staff, taste.getAliasId()));
+					taste.copyFrom(TasteDao.getTasteById(dbCon, staff, taste.getTasteId()));
 				}
 				
 				//Get the detail to each specs.
 				for(Taste spec : foodToFill.getTasteGroup().getSpecs()){
-					spec.copyFrom(TasteDao.getTasteByAlias(dbCon, staff, spec.getAliasId()));
+					spec.copyFrom(TasteDao.getTasteById(dbCon, staff, spec.getTasteId()));
 				}
 			}			
 	

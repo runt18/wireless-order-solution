@@ -214,7 +214,7 @@ public class MenuDao {
 	 * @throws Exception
 	 */
 	public static List<FoodTaste> getFoodTaste(int restaurantID) throws Exception{
-		return MenuDao.getFoodTaste(" and A.restaurant_id = " + restaurantID, " order by A.taste_alias");
+		return MenuDao.getFoodTaste(" and A.restaurant_id = " + restaurantID, " order by A.taste_id");
 	}
 	
 	/**
@@ -232,7 +232,7 @@ public class MenuDao {
 		try{
 			dbCon.connect();
 			String querySQL = "SELECT "
-							+ " A.taste_id, A.taste_alias, A.restaurant_id, A.preference, A.price, A.category, A.rate, A.calc, A.type "
+							+ " A.taste_id, A.restaurant_id, A.preference, A.price, A.category, A.rate, A.calc, A.type "
 							+ " FROM " + Params.dbName + ".taste A "
 							+ " WHERE 1=1 "
 							+ (cond != null && cond.trim().length() > 0 ? " " + cond : "")
@@ -241,7 +241,6 @@ public class MenuDao {
 			while(dbCon.rs != null && dbCon.rs.next()){
 				taste = new Taste();
 				taste.setTasteId(dbCon.rs.getInt("taste_id"));
-				taste.setAliasId(dbCon.rs.getInt("taste_alias"));
 				taste.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
 				taste.setPreference(dbCon.rs.getString("preference"));
 				taste.setPrice(dbCon.rs.getFloat("price"));

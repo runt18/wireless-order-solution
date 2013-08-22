@@ -208,11 +208,11 @@ public class InsertOrder {
 						if(of.hasNormalTaste()){
 							//Get the detail to each taste
 							for(Taste t : of.getTasteGroup().getTastes()){
-								t.copyFrom(TasteDao.getTasteByAlias(dbCon, staff, t.getAliasId()));
+								t.copyFrom(TasteDao.getTasteById(dbCon, staff, t.getTasteId()));
 							}
 							//Get the detail to each spec.
 							for(Taste spec : of.getTasteGroup().getSpecs()){
-								spec.copyFrom(TasteDao.getTasteByAlias(dbCon, staff, spec.getAliasId()));
+								spec.copyFrom(TasteDao.getTasteById(dbCon, staff, spec.getTasteId()));
 							}
 						}
 					}					
@@ -311,7 +311,7 @@ public class InsertOrder {
 					  (tg.hasNormalTaste() ? "MAX(normal_taste_group_id) + 1" : TasteGroup.EMPTY_NORMAL_TASTE_GROUP_ID) + ", " +
 					  (tg.hasNormalTaste() ? ("'" + tg.getNormalTastePref() + "'") : "NULL") + ", " +
 					  (tg.hasNormalTaste() ? tg.getNormalTastePrice() : "NULL") + ", " +
-					  (tg.hasTmpTaste() ? tg.getTmpTaste().getAliasId() : "NULL") + ", " +
+					  (tg.hasTmpTaste() ? tg.getTmpTaste().getTasteId() : "NULL") + ", " +
 					  (tg.hasTmpTaste() ? "'" + tg.getTmpTastePref() + "'" : "NULL") + ", " +
 					  (tg.hasTmpTaste() ? tg.getTmpTastePrice() : "NULL") +
 					  " FROM " +

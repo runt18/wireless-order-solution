@@ -28,7 +28,7 @@ public class FoodTasteDao {
 		FoodTaste item = null;
 		Taste taste = null;
 		String sql = " SELECT A.food_id, A.taste_id, A.restaurant_id, A.rank, "  
-				   + " B.taste_alias, B.preference as taste_name, B.price, B.category, B.rate, B.calc, B.type, "
+				   + " B.preference as taste_name, B.price, B.category, B.rate, B.calc, B.type, "
 				   + " C.name food_name, C.food_alias food_alias "
 				   + " FROM " + Params.dbName + ".food_taste_rank A, " + Params.dbName + ".taste B, " + Params.dbName + ".food C "
 				   + " WHERE A.restaurant_id = B.restaurant_id AND A.taste_id = B.taste_id AND A.food_id = C.food_id "
@@ -40,7 +40,6 @@ public class FoodTasteDao {
 		while(dbCon.rs.next()){
 			taste = new Taste();
 			taste.setTasteId(dbCon.rs.getInt("taste_id"));
-			taste.setAliasId(dbCon.rs.getInt("taste_alias"));
 			taste.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
 			taste.setPreference(dbCon.rs.getString("taste_name"));
 			taste.setPrice(dbCon.rs.getFloat("price"));
