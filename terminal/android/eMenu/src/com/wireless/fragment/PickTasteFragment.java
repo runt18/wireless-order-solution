@@ -377,7 +377,7 @@ public class PickTasteFragment extends DialogFragment  implements OnGestureListe
 
 		@Override
 		public long getItemId(int position) {
-			return mTastes.get(position).getAliasId();
+			return mTastes.get(position).getTasteId();
 		}
 
 		@Override
