@@ -126,6 +126,94 @@ public class Taste implements Parcelable, Comparable<Taste>, Jsonable{
 		}
 	}
 	
+	public static class InsertBuilder{
+		private final String preference;				// 口味名称
+		private final int restaurantId;					// 餐厅编号
+		private float price;							// 口味价格
+		private float rate;								// 口味比例
+		private Category category = Category.TASTE;		// 口味类型    0:口味  1:做法     2:规格
+		private Calc calc = Calc.BY_PRICE;				// 口味计算方式          0:按价格     1:按比例
+		
+		public InsertBuilder(int restaurantId, String pref){
+			this.restaurantId = restaurantId;
+			this.preference = pref;
+		}
+		
+		public InsertBuilder setPrice(float price){
+			if(price < 0){
+				throw new IllegalArgumentException("The price should be more than zero.");
+			}
+			this.price = price;
+			return this;
+		}
+		
+		public InsertBuilder setRate(float rate){
+			if(rate < 0){
+				throw new IllegalArgumentException();
+			}
+			this.rate = rate;
+			return this;
+		}
+		
+		public InsertBuilder setCategory(Category category){
+			this.category = category;
+			if(this.category == Category.TASTE){
+				this.calc = Calc.BY_PRICE;
+			}else if(this.category == Category.SPEC){
+				this.calc = Calc.BY_RATE;
+			}
+			return this;
+		}
+		
+		public Taste build(){
+			return new Taste(this);
+		}
+	}
+	
+	public static class UpdateBuilder{
+		private final int tasteId;
+		private final String preference;				// 口味名称
+		private float price;							// 口味价格
+		private float rate;								// 口味比例
+		private Category category = Category.TASTE;		// 口味类型    0:口味  1:做法     2:规格
+		private Calc calc = Calc.BY_PRICE;				// 口味计算方式          0:按价格     1:按比例
+		
+		public UpdateBuilder(int tasteId, String pref){
+			this.tasteId = tasteId;
+			this.preference = pref;
+		}
+		
+		public UpdateBuilder setPrice(float price){
+			if(price < 0){
+				throw new IllegalArgumentException("The price should be more than zero.");
+			}
+			this.price = price;
+			return this;
+		}
+		
+		public UpdateBuilder setRate(float rate){
+			if(rate < 0){
+				throw new IllegalArgumentException();
+			}
+			this.rate = rate;
+			return this;
+		}
+		
+		public UpdateBuilder setCategory(Category category){
+			this.category = category;
+			if(this.category == Category.TASTE){
+				this.calc = Calc.BY_PRICE;
+			}else if(this.category == Category.SPEC){
+				this.calc = Calc.BY_RATE;
+			}
+			return this;
+		}
+		
+		public Taste build(){
+			return new Taste(this);
+		}
+	}
+	
 	public final static byte TASTE_PARCELABLE_COMPLEX = 0;
 	public final static byte TASTE_PARCELABLE_SIMPLE = 1;
 	
@@ -133,7 +221,6 @@ public class Taste implements Parcelable, Comparable<Taste>, Jsonable{
 	
 	private int restaurantId;						// 餐厅编号
 	private int tasteId;							// 口味编号
-	private int aliasId;							// 口味自定义编号
 	private String preference;						// 口味名称
 	private float price;							// 口味价格
 	private float rate;								// 口味比例
@@ -141,6 +228,24 @@ public class Taste implements Parcelable, Comparable<Taste>, Jsonable{
 	private Category category = Category.TASTE;		// 口味类型    0:口味  1:做法     2:规格
 	private Calc calc = Calc.BY_PRICE;				// 口味计算方式          0:按价格     1:按比例
 	private Type type = Type.NORMAL;				// 操作类型	0:默认    1:系统保留(不可删除)
+	
+	private Taste(InsertBuilder builder){
+		setRestaurantId(builder.restaurantId);
+		setPreference(builder.preference);
+		setPrice(builder.price);
+		setRate(builder.rate);
+		setCategory(builder.category);
+		setCalc(builder.calc);
+	}
+	
+	private Taste(UpdateBuilder builder){
+		setTasteId(builder.tasteId);
+		setPreference(builder.preference);
+		setPrice(builder.price);
+		setRate(builder.rate);
+		setCategory(builder.category);
+		setCalc(builder.calc);
+	}
 	
 	/**
 	 * 
@@ -154,9 +259,8 @@ public class Taste implements Parcelable, Comparable<Taste>, Jsonable{
 	 * @param calc
 	 * @param type
 	 */
-	public void init(int id, int alias, int rid, String pref, float price, float rate, Category cate, Calc calc, Type type){
+	public void init(int id, int rid, String pref, float price, float rate, Category cate, Calc calc, Type type){
 		this.tasteId = id;
-		this.aliasId = alias;
 		this.restaurantId = rid;
 		this.preference = pref;
 		this.price = price;
@@ -173,7 +277,7 @@ public class Taste implements Parcelable, Comparable<Taste>, Jsonable{
 	 */
 	public static Taste newTmpTaste(String pref, float price){
 		Taste tmpTaste = new Taste();
-		tmpTaste.setAliasId((int)(System.currentTimeMillis() % 65535));
+		tmpTaste.setTasteId((int)(System.currentTimeMillis() % 65535));
 		tmpTaste.setPreference(pref);
 		tmpTaste.setPrice(price);
 		return tmpTaste;
@@ -181,9 +285,8 @@ public class Taste implements Parcelable, Comparable<Taste>, Jsonable{
 	
 	public Taste(){ }
 	
-	public Taste(int tasteId, int tasteAlias, int restaurantId){
+	public Taste(int tasteId, int restaurantId){
 		this.tasteId = tasteId;
-		this.aliasId = tasteAlias;
 		this.restaurantId = restaurantId;
 	}
 	
@@ -196,8 +299,8 @@ public class Taste implements Parcelable, Comparable<Taste>, Jsonable{
 	 * @param rate
 	 * @param cate
 	 */
-	public Taste(int alias, int rid, String pref, float price, float rate, int cate){
-		this(0, alias, rid, pref, price, rate, cate);
+	public Taste(int rid, String pref, float price, float rate, int cate){
+		this(0, rid, pref, price, rate, cate);
 	}
 	/**
 	 * update model
@@ -209,14 +312,14 @@ public class Taste implements Parcelable, Comparable<Taste>, Jsonable{
 	 * @param rate
 	 * @param cate
 	 */
-	public Taste(int id, int alias, int rid, String pref, float price, float rate, int cate){
+	public Taste(int id, int rid, String pref, float price, float rate, int cate){
 		this.category = Category.valueOf(Integer.valueOf(cate));
 		if(this.category == Category.TASTE){
 			this.calc = Calc.BY_PRICE;
 		}else if(this.category == Category.SPEC){
 			this.calc = Calc.BY_RATE;
 		}
-		this.init(id, alias, rid, pref, price, rate, null, null, null);
+		this.init(id, rid, pref, price, rate, null, null, null);
 	}
 	
 	public int getRestaurantId() {
@@ -235,16 +338,13 @@ public class Taste implements Parcelable, Comparable<Taste>, Jsonable{
 		this.tasteId = tasteId;
 	}
 	
-	public int getAliasId() {
-		return aliasId;
-	}
-	
-	public void setAliasId(int aliasId) {
-		this.aliasId = aliasId;
-	}
-	
 	public String getPreference() {
-		return preference == null ? NO_PREFERENCE : preference;
+		if(preference == null){
+			return NO_PREFERENCE;
+		}else{
+			String pref = preference.trim();
+			return pref.length() == 0 ? NO_PREFERENCE : pref;
+		}
 	}
 	
 	public void setPreference(String pref) {
@@ -346,7 +446,6 @@ public class Taste implements Parcelable, Comparable<Taste>, Jsonable{
 	public void copyFrom(Taste src){
 		if(src != null && src != this){
 			this.tasteId = src.tasteId;
-			this.aliasId = src.aliasId;
 			this.restaurantId = src.restaurantId;
 			this.preference = src.preference;
 			this.category = src.category;
@@ -360,8 +459,7 @@ public class Taste implements Parcelable, Comparable<Taste>, Jsonable{
 	@Override 
 	public int hashCode(){
 		int result = 17;
-		result = result * 31 + getAliasId();
-		result = result * 31 + getRestaurantId();
+		result = result * 31 + getTasteId();
 		return result;
 	}
 	
@@ -371,14 +469,14 @@ public class Taste implements Parcelable, Comparable<Taste>, Jsonable{
 			return false;
 		}else{
 			Taste t = (Taste)obj;
-			return getAliasId() == t.getAliasId() && getRestaurantId() == t.getRestaurantId();
+			return getTasteId() == t.getTasteId();
 		}
 	}
 	
 	@Override 
 	public String toString(){
 		return "taste(" +
-			   "alias_id = " + getAliasId() +
+			   "taste_id = " + getTasteId() +
 			   ",restaurant_id = " + getRestaurantId() +
 			   ",name = " + getPreference() + ")";
 	}
@@ -387,10 +485,10 @@ public class Taste implements Parcelable, Comparable<Taste>, Jsonable{
 	public void writeToParcel(Parcel dest, int flag) {
 		dest.writeByte(flag);
 		if(flag == TASTE_PARCELABLE_SIMPLE){
-			dest.writeShort(this.aliasId);
+			dest.writeInt(this.tasteId);
 			
 		}else if(flag == TASTE_PARCELABLE_COMPLEX){
-			dest.writeShort(this.aliasId);
+			dest.writeInt(this.tasteId);
 			dest.writeByte(this.category.getVal());
 			dest.writeByte(this.calc.getVal());
 			dest.writeByte(this.type.getVal());
@@ -404,10 +502,10 @@ public class Taste implements Parcelable, Comparable<Taste>, Jsonable{
 	public void createFromParcel(Parcel source) {
 		short flag = source.readByte();
 		if(flag == TASTE_PARCELABLE_SIMPLE){
-			this.aliasId = source.readShort();
+			this.tasteId = source.readInt();
 			
 		}else if(flag == TASTE_PARCELABLE_COMPLEX){
-			this.aliasId = source.readShort();
+			this.tasteId = source.readInt();
 			this.category = Category.valueOf(source.readByte());
 			this.calc = Calc.valueOf(source.readByte());
 			this.type = Type.valueOf(source.readByte());
@@ -430,9 +528,9 @@ public class Taste implements Parcelable, Comparable<Taste>, Jsonable{
 
 	@Override
 	public int compareTo(Taste o) {
-		if(getAliasId() > o.getAliasId()){
+		if(getTasteId() > o.getTasteId()){
 			return 1;
-		}else if(getAliasId() < o.getAliasId()){
+		}else if(getTasteId() < o.getTasteId()){
 			return -1;
 		}else{
 			return 0;
@@ -443,7 +541,7 @@ public class Taste implements Parcelable, Comparable<Taste>, Jsonable{
 	public Map<String, Object> toJsonMap(int flag) {
 		Map<String, Object> jm = new LinkedHashMap<String, Object>();
 		jm.put("id", this.tasteId);
-		jm.put("alias", this.aliasId);
+		jm.put("alias", this.tasteId);
 		jm.put("rid", this.restaurantId);
 		jm.put("name", this.preference);
 		jm.put("price", this.getPrice());

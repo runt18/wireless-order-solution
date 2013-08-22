@@ -42,16 +42,16 @@ public class TestParcel {
 		foodToParcel.setStatistics(new FoodStatistics(15367));
 		
 		List<Taste> popTastes = new ArrayList<Taste>();
-		popTastes.add(new Taste(0, 1, 0));
-		popTastes.add(new Taste(0, 2, 0));
-		popTastes.add(new Taste(0, 3, 0));
-		popTastes.add(new Taste(0, 4, 0));
-		popTastes.add(new Taste(0, 5, 0));
-		popTastes.add(new Taste(0, 6, 0));
-		popTastes.add(new Taste(0, 7, 0));
-		popTastes.add(new Taste(0, 8, 0));
-		popTastes.add(new Taste(0, 9, 0));
-		popTastes.add(new Taste(0, 10, 0));
+		popTastes.add(new Taste(1, 0));
+		popTastes.add(new Taste(2, 0));
+		popTastes.add(new Taste(3, 0));
+		popTastes.add(new Taste(4, 0));
+		popTastes.add(new Taste(5, 0));
+		popTastes.add(new Taste(6, 0));
+		popTastes.add(new Taste(7, 0));
+		popTastes.add(new Taste(8, 0));
+		popTastes.add(new Taste(9, 0));
+		popTastes.add(new Taste(10, 0));
 		foodToParcel.setPopTastes(popTastes);
 		
 		List<Food> childFoods = new ArrayList<Food>();
@@ -114,7 +114,7 @@ public class TestParcel {
 	public void testComplexTasteParcel(){
 		Taste tasteToParcel = new Taste();
 		
-		tasteToParcel.setAliasId(1);
+		tasteToParcel.setTasteId(1);
 		tasteToParcel.setCategory(Taste.Category.STYLE);
 		tasteToParcel.setCalc(Taste.Calc.BY_RATE);
 		tasteToParcel.setType(Taste.Type.RESERVED);
@@ -132,7 +132,7 @@ public class TestParcel {
 		parcelableTaste.createFromParcel(p2);
 		
 		//Check the taste alias id
-		assertEquals("taste alias id", tasteToParcel.getAliasId(), parcelableTaste.getAliasId());
+		assertEquals("taste alias id", tasteToParcel.getTasteId(), parcelableTaste.getTasteId());
 		
 		//Check the taste category
 		assertEquals("taste category", tasteToParcel.getCategory().getVal(), parcelableTaste.getCategory().getVal());
@@ -376,14 +376,14 @@ public class TestParcel {
 		
 		tgToParcel.setGroupId(100);
 		
-		tgToParcel.addTaste(new Taste(0, 100, 0));
-		tgToParcel.addTaste(new Taste(0, 101, 0));
-		tgToParcel.addTaste(new Taste(0, 102, 0));
-		tgToParcel.addTaste(new Taste(0, 103, 0));
-		tgToParcel.addTaste(new Taste(0, 104, 0));
+		tgToParcel.addTaste(new Taste(100, 0));
+		tgToParcel.addTaste(new Taste(101, 0));
+		tgToParcel.addTaste(new Taste(102, 0));
+		tgToParcel.addTaste(new Taste(103, 0));
+		tgToParcel.addTaste(new Taste(104, 0));
 		
 		Taste tmpTaste = new Taste();
-		tmpTaste.setAliasId(302);
+		tmpTaste.setTasteId(302);
 		tmpTaste.setPreference("临时口味");
 		tmpTaste.setPrice(2.3f);
 		tgToParcel.setTmpTaste(tmpTaste);
@@ -403,7 +403,7 @@ public class TestParcel {
 		// Check the temporary taste
 		assertEquals("preference to tmp taste", tgToParcel.getTmpTaste().getPreference(), parcelabledTG.getTmpTaste().getPreference());
 		assertEquals("price to tmp taste", tgToParcel.getTmpTaste().getPrice(), parcelabledTG.getTmpTaste().getPrice(), 0.01);
-		assertEquals("alias id to tmp taste", tgToParcel.getTmpTaste().getAliasId(), parcelabledTG.getTmpTaste().getAliasId());
+		assertEquals("alias id to tmp taste", tgToParcel.getTmpTaste().getTasteId(), parcelabledTG.getTmpTaste().getTasteId());
 	}
 	
 	@Test 
@@ -421,14 +421,14 @@ public class TestParcel {
 		
 		orderFoodToParcel.getTasteGroup().setGroupId(100);
 		
-		orderFoodToParcel.getTasteGroup().addTaste(new Taste(0, 100, 0));
-		orderFoodToParcel.getTasteGroup().addTaste(new Taste(0, 101, 0));
-		orderFoodToParcel.getTasteGroup().addTaste(new Taste(0, 102, 0));
-		orderFoodToParcel.getTasteGroup().addTaste(new Taste(0, 103, 0));
-		orderFoodToParcel.getTasteGroup().addTaste(new Taste(0, 104, 0));
+		orderFoodToParcel.getTasteGroup().addTaste(new Taste(100, 0));
+		orderFoodToParcel.getTasteGroup().addTaste(new Taste(101, 0));
+		orderFoodToParcel.getTasteGroup().addTaste(new Taste(102, 0));
+		orderFoodToParcel.getTasteGroup().addTaste(new Taste(103, 0));
+		orderFoodToParcel.getTasteGroup().addTaste(new Taste(104, 0));
 		
 		Taste tmpTaste = new Taste();
-		tmpTaste.setAliasId(302);
+		tmpTaste.setTasteId(302);
 		tmpTaste.setPreference("临时口味");
 		tmpTaste.setPrice(2.3f);
 		orderFoodToParcel.getTasteGroup().setTmpTaste(tmpTaste);
@@ -473,7 +473,7 @@ public class TestParcel {
 			if(of1.hasTmpTaste() && of2.hasTmpTaste()){
 				assertEquals("preference to tmp taste", of1.getTasteGroup().getTmpTaste().getPreference(), of2.getTasteGroup().getTmpTaste().getPreference());
 				assertEquals("price to tmp taste", of1.getTasteGroup().getTmpTaste().getPrice(), of2.getTasteGroup().getTmpTaste().getPrice(), 0.01);
-				assertEquals("alias id to tmp taste", of1.getTasteGroup().getTmpTaste().getAliasId(), of2.getTasteGroup().getTmpTaste().getAliasId());
+				assertEquals("alias id to tmp taste", of1.getTasteGroup().getTmpTaste().getTasteId(), of2.getTasteGroup().getTmpTaste().getTasteId());
 			}
 		}
 
@@ -523,14 +523,14 @@ public class TestParcel {
 		
 		foods[0].getTasteGroup().setGroupId(100);
 		
-		foods[0].getTasteGroup().addTaste(new Taste(0, 100, 0));
-		foods[0].getTasteGroup().addTaste(new Taste(0, 101, 0));
-		foods[0].getTasteGroup().addTaste(new Taste(0, 102, 0));
-		foods[0].getTasteGroup().addTaste(new Taste(0, 103, 0));
-		foods[0].getTasteGroup().addTaste(new Taste(0, 104, 0));
+		foods[0].getTasteGroup().addTaste(new Taste(100, 0));
+		foods[0].getTasteGroup().addTaste(new Taste(101, 0));
+		foods[0].getTasteGroup().addTaste(new Taste(102, 0));
+		foods[0].getTasteGroup().addTaste(new Taste(103, 0));
+		foods[0].getTasteGroup().addTaste(new Taste(104, 0));
 		
 		Taste tmpTaste = new Taste();
-		tmpTaste.setAliasId(302);
+		tmpTaste.setTasteId(302);
 		tmpTaste.setPreference("临时口味");
 		tmpTaste.setPrice(2.3f);
 		foods[0].getTasteGroup().setTmpTaste(tmpTaste);
@@ -596,14 +596,14 @@ public class TestParcel {
 		
 		orderFoodToParcel.getTasteGroup().setGroupId(100);
 		
-		orderFoodToParcel.getTasteGroup().addTaste(new Taste(0, 100, 0));
-		orderFoodToParcel.getTasteGroup().addTaste(new Taste(0, 101, 0));
-		orderFoodToParcel.getTasteGroup().addTaste(new Taste(0, 102, 0));
-		orderFoodToParcel.getTasteGroup().addTaste(new Taste(0, 103, 0));
-		orderFoodToParcel.getTasteGroup().addTaste(new Taste(0, 104, 0));
+		orderFoodToParcel.getTasteGroup().addTaste(new Taste(100, 0));
+		orderFoodToParcel.getTasteGroup().addTaste(new Taste(101, 0));
+		orderFoodToParcel.getTasteGroup().addTaste(new Taste(102, 0));
+		orderFoodToParcel.getTasteGroup().addTaste(new Taste(103, 0));
+		orderFoodToParcel.getTasteGroup().addTaste(new Taste(104, 0));
 		
 		Taste tmpTaste = new Taste();
-		tmpTaste.setAliasId(302);
+		tmpTaste.setTasteId(302);
 		tmpTaste.setPreference("临时口味");
 		tmpTaste.setPrice(2.3f);
 		orderFoodToParcel.getTasteGroup().setTmpTaste(tmpTaste);
@@ -648,7 +648,7 @@ public class TestParcel {
 			if(of1.hasTmpTaste() && of2.hasTmpTaste()){
 				assertEquals("preference to tmp taste", of1.getTasteGroup().getTmpTaste().getPreference(), of2.getTasteGroup().getTmpTaste().getPreference());
 				assertEquals("price to tmp taste", of1.getTasteGroup().getTmpTaste().getPrice(), of2.getTasteGroup().getTmpTaste().getPrice(), 0.01);
-				assertEquals("alias id to tmp taste", of1.getTasteGroup().getTmpTaste().getAliasId(), of2.getTasteGroup().getTmpTaste().getAliasId());
+				assertEquals("alias id to tmp taste", of1.getTasteGroup().getTmpTaste().getTasteId(), of2.getTasteGroup().getTmpTaste().getTasteId());
 			}
 		}
 
