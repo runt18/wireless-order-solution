@@ -61,7 +61,7 @@ public class RoleDao {
 		for(Role role : roles){
 			//Get the privileges to each role
 			sql = " SELECT " +
-				  " P.pri_id, P.pri_code, P.cate, RP.discount_privilege_id, RP.restaurant_id " + 
+				  " P.pri_id, P.pri_code, P.cate, RP.restaurant_id " + 
 				  " FROM " + Params.dbName + ".role_privilege RP " +
 				  " JOIN " + Params.dbName + ".privilege P ON RP.pri_id = P.pri_id " +
 				  " WHERE RP.role_id = " + role.getId();
@@ -71,7 +71,6 @@ public class RoleDao {
 													Code.valueOf(dbCon.rs.getInt("pri_code")),
 													dbCon.rs.getInt("restaurant_id"));
 				
-				privilege.setDiscountPrivilegeId(dbCon.rs.getInt("discount_privilege_id"));
 				role.addPrivilege(privilege);
 			}
 			dbCon.rs.close();
@@ -80,9 +79,9 @@ public class RoleDao {
 			for(Privilege privilege : role.getPrivileges()){
 				if(privilege.getCode() == Code.DISCOUNT){
 					sql = " SELECT D.discount_id, D.restaurant_id, D.name, D.level, D.status "	+
-						  " FROM " + Params.dbName + ".discount_privilege DP " +
-						  " JOIN " + Params.dbName + ".discount D ON DP.discount_id = D.discount_id " +
-						  " WHERE DP.discount_privilege_id = " + privilege.getDiscountPrivilegeId();
+						  " FROM " + Params.dbName + ".role_discount RD " +
+						  " JOIN " + Params.dbName + ".discount D ON RD.discount_id = D.discount_id " +
+						  " WHERE RD.role_id = " + role.getId();
 					dbCon.rs = dbCon.stmt.executeQuery(sql);
 					while(dbCon.rs.next()){
 						Discount discount = new Discount(dbCon.rs.getInt("discount_id"));
