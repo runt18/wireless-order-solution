@@ -364,6 +364,12 @@ FROM wireless_order_db.role R JOIN wireless_order_db.privilege P ON R.cate = 5 A
 -- -----------------------------------------------------
 ALTER TABLE `wireless_order_db`.`restaurant` DROP COLUMN `pwd5` , DROP COLUMN `pwd4` , DROP COLUMN `pwd3` , DROP COLUMN `pwd2` , DROP COLUMN `pwd` ;
 
-
+-- -----------------------------------------------------
+-- Drop the field 'taste_alias' and index 'ix_taste_alias_id'
+-- Add the index 'ix_restaurant_id'
+-- -----------------------------------------------------
+ALTER TABLE `wireless_order_db`.`taste` DROP COLUMN `taste_alias` 
+, DROP INDEX `ix_taste_alias_id` 
+, ADD INDEX `ix_restaurant_id` (`restaurant_id` ASC) ;
 
 
