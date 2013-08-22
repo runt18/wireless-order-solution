@@ -64,8 +64,9 @@ public class PickTasteActivity extends Activity{
 	public final static String INIT_TAG = "initial_tag";
 	public static final String PICK_ALL_ORDER_TASTE = "pickAllOrderTaste";
 	private OrderFood mSelectedFood;
-	//private TabHost _tabHost;
 	
+	private float mPriceToPinZhu;
+	private String mPinZhu;	
 
 	/** Called when the activity is first created. */
 	@Override
@@ -445,9 +446,12 @@ public class PickTasteActivity extends Activity{
 		final EditText priceEdtTxt = ((EditText)pinZhuView.findViewById(R.id.priceEdtTxt));
 		pinZhuEdtTxt.requestFocus();
 		
+		mPinZhu = mSelectedFood.getTasteGroup().getTmpTastePref();
+		mPriceToPinZhu = mSelectedFood.getTasteGroup().getTmpTastePrice();
+		
 		if(mSelectedFood.hasTmpTaste()){
-			pinZhuEdtTxt.setText(mSelectedFood.getTasteGroup().getTmpTastePref());
-			priceEdtTxt.setText(NumericUtil.float2String2(mSelectedFood.getTasteGroup().getTmpTastePrice()));
+			pinZhuEdtTxt.setText(mPinZhu);
+			priceEdtTxt.setText(NumericUtil.float2String2(mPriceToPinZhu));
 		}
 		
 		//品注的EditText的处理函数
@@ -455,21 +459,10 @@ public class PickTasteActivity extends Activity{
 
 			@Override
 			public void afterTextChanged(Editable s) {
-				String tmpTasteValue = s.toString().trim();
-				if(tmpTasteValue.length() != 0){
-					Taste tmpTaste;
-					if(!mSelectedFood.hasTmpTaste()){
-						tmpTaste = new Taste();
-					} else{
-						tmpTaste = mSelectedFood.getTasteGroup().getTmpTaste();
-					}
-					
-					tmpTaste.setAliasId((int)(System.currentTimeMillis() % 65535));
-					tmpTaste.setPreference(tmpTasteValue);
-					mSelectedFood.getTasteGroup().setTmpTaste(tmpTaste);
-				}else{
-					mSelectedFood.getTasteGroup().setTmpTaste(null);
-				}
+				mPinZhu = s.toString().trim();
+   				if(mPinZhu != null || mPriceToPinZhu != 0){
+   					mSelectedFood.getTasteGroup().setTmpTaste(Taste.newTmpTaste(mPinZhu, mPriceToPinZhu));
+   				}
 				_handler.sendEmptyMessage(0);
 			}
 
@@ -490,54 +483,19 @@ public class PickTasteActivity extends Activity{
 
 			@Override
 			public void afterTextChanged(Editable s) {
-//				if(mSelectedFood.hasTmpTaste()){
-//					Taste tmpTaste = mSelectedFood.getTasteGroup().getTmpTaste();
-//					try{
-//						if(s.length() == 0){
-//							tmpTaste.setPrice(Float.valueOf(0));
-//						}else{
-//							Float price = Float.valueOf(s.toString());
-//							if(price >= 0 && price < 9999){
-//								tmpTaste.setPrice(price);
-//							}else{
-//								priceEdtTxt.setText(tmpTaste.getPrice() > 9999 ? "" : NumericUtil.float2String2(tmpTaste.getPrice()));
-//								priceEdtTxt.setSelection(priceEdtTxt.getText().length());
-//								Toast.makeText(PickTasteActivity.this, "临时口味的价格范围是0～9999", Toast.LENGTH_SHORT).show();
-//							}
-//						}
-//					}catch(NumberFormatException e){
-//						priceEdtTxt.setText(tmpTaste.getPrice() > 9999 ? "" : NumericUtil.float2String2(tmpTaste.getPrice()));
-//						priceEdtTxt.setSelection(priceEdtTxt.getText().length());
-//						Toast.makeText(PickTasteActivity.this, "临时口味的价钱格式不正确，请重新输入", Toast.LENGTH_SHORT).show();
-//					}
-//				}else{
-//					Toast.makeText(PickTasteActivity.this, "请先输入临时口味", Toast.LENGTH_SHORT).show();
-//				}
 				
-				if(!mSelectedFood.hasTmpTaste()){
-					Taste tmpTaste = new Taste();
-					tmpTaste.setPreference("");
-					tmpTaste.setAliasId((int)(System.currentTimeMillis() % 65535));
-					mSelectedFood.getTasteGroup().setTmpTaste(tmpTaste);
-				}
-				
-				Taste tmpTaste = mSelectedFood.getTasteGroup().getTmpTaste();
 				try{
-					if(s.length() == 0){
-						tmpTaste.setPrice(Float.valueOf(0));
-					}else{
-						Float price = Float.valueOf(s.toString());
-						if(price >= 0 && price < 9999){
-							tmpTaste.setPrice(price);
-						}else{
-							priceEdtTxt.setText(tmpTaste.getPrice() > 9999 ? "" : NumericUtil.float2String2(tmpTaste.getPrice()));
-							priceEdtTxt.setSelection(priceEdtTxt.getText().length());
-							Toast.makeText(PickTasteActivity.this, "临时口味的价格范围是0～9999", Toast.LENGTH_SHORT).show();
-						}
+					if(s.toString().trim().length() == 0){
+						mPriceToPinZhu = 0;
+						
+					}else if(s.toString().trim().length() > 0){
+						mPriceToPinZhu = Float.valueOf(s.toString());
 					}
+					
+	   				if(mPinZhu != null || mPriceToPinZhu != 0){
+	   					mSelectedFood.getTasteGroup().setTmpTaste(Taste.newTmpTaste(mPinZhu, mPriceToPinZhu));
+	   				}
 				}catch(NumberFormatException e){
-					priceEdtTxt.setText(tmpTaste.getPrice() > 9999 ? "" : NumericUtil.float2String2(tmpTaste.getPrice()));
-					priceEdtTxt.setSelection(priceEdtTxt.getText().length());
 					Toast.makeText(PickTasteActivity.this, "临时口味的价钱格式不正确，请重新输入", Toast.LENGTH_SHORT).show();
 				}
 				
@@ -607,13 +565,13 @@ public class PickTasteActivity extends Activity{
 			}
 			//set name to taste
 			((TextView)view.findViewById(R.id.foodname)).setText(mTastes.get(position).getPreference());
-			//set number to taste
-			((TextView)view.findViewById(R.id.nums)).setText(String.valueOf(mTastes.get(position).getAliasId()));
 			//set the price to taste
 			if(mTastes.get(position).isCalcByRate()){
-				((TextView)view.findViewById(R.id.foodprice)).setText(NumericUtil.float2Int(mTastes.get(position).getRate()) + "%");
+				((TextView)view.findViewById(R.id.txtView_1stKey_foodItem)).setText("比例：");
+				((TextView)view.findViewById(R.id.txtView_1stValue_foodItem)).setText(NumericUtil.float2Int(mTastes.get(position).getRate()) + "%");
 			}else{
-				((TextView)view.findViewById(R.id.foodprice)).setText(NumericUtil.CURRENCY_SIGN + NumericUtil.float2String2(mTastes.get(position).getPrice()));
+				((TextView)view.findViewById(R.id.txtView_1stKey_foodItem)).setText("价格：");
+				((TextView)view.findViewById(R.id.txtView_1stValue_foodItem)).setText(NumericUtil.CURRENCY_SIGN + NumericUtil.float2String2(mTastes.get(position).getPrice()));
 			}
 			//set the status to whether the taste is selected
 			final CheckBox selectChkBox = (CheckBox)view.findViewById(R.id.chioce);
@@ -621,7 +579,7 @@ public class PickTasteActivity extends Activity{
 			selectChkBox.requestFocus();
 			if(mSelectedFood.hasNormalTaste()){
 				for(Taste taste : mSelectedFood.getTasteGroup().getNormalTastes()){
-					if(mTastes.get(position).getAliasId() == taste.getAliasId()){
+					if(mTastes.get(position).equals(taste)){
 						selectChkBox.setChecked(true);
 						break;						
 					}

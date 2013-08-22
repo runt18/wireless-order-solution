@@ -161,13 +161,6 @@ public class PickFoodActivity extends FragmentActivity
 		
 		mViewHandler = new ViewHandler(this);
 		
-		// 取得新点菜中已有的菜品List，并保存到pickFood的List中
-//		OrderParcel orderParcel = getIntent().getParcelableExtra(OrderParcel.KEY_VALUE);
-//		for (int i = 0; i < orderParcel.foods.length; i++) {
-//			mPickFoods.add(orderParcel.foods[i]);
-//		}
-		//mTmpOrder = getIntent().getParcelableExtra(OrderParcel.KEY_VALUE);
-		
 		//返回Button
 		TextView left = (TextView) findViewById(R.id.textView_left);
 		left.setText("返回");
