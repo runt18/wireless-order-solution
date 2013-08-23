@@ -92,6 +92,64 @@ public class Role implements Jsonable, Parcelable{
 		
 	}
 	
+	public static class DefAdminInsertBuilder extends InsertBuilder{
+		public DefAdminInsertBuilder(){
+			setName("管理员");
+			setType(Type.RESERVED);
+			setCategoty(Category.ADMIN);
+		}
+	}
+	
+	public static class InsertBuilder{
+		private int restaurantId;
+		private String name;
+		private Type type;
+		private Category categoty;
+		private List<Privilege> privileges = SortedList.newInstance();
+		
+		
+		public int getRestaurantId() {
+			return restaurantId;
+		}
+		public void setRestaurantId(int restaurantId) {
+			this.restaurantId = restaurantId;
+		}
+		public String getName() {
+			return name;
+		}
+		public void setName(String name) {
+			this.name = name;
+		}
+		public Type getType() {
+			return type;
+		}
+		public void setType(Type type) {
+			this.type = type;
+		}
+		public Category getCategoty() {
+			return categoty;
+		}
+		public void setCategoty(Category categoty) {
+			this.categoty = categoty;
+		}
+		public List<Privilege> getPrivileges() {
+			return privileges;
+		}
+		public void addPrivileges(Privilege privilege) {
+			this.privileges.add(privilege);
+		}
+		
+		public Role build(){
+			return new Role(this);
+		}
+		
+		
+	}
+	
+	
+	
+	
+	
 	public Role(int id){
 		setId(id);
 	}
@@ -152,6 +210,15 @@ public class Role implements Jsonable, Parcelable{
 	public boolean hasPrivilege(Privilege.Code code){
 		return privileges.contains(new Privilege(0, code, 0));
 	}
+	
+	public Role(InsertBuilder builder){
+		setCategory(builder.getCategoty());
+		setName(builder.getName());
+		setRestaurantId(builder.getRestaurantId());
+		setType(builder.getType());
+		this.privileges.addAll(builder.getPrivileges());
+	}
+	
 	
 	@Override
 	public Map<String, Object> toJsonMap(int flag) {
