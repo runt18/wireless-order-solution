@@ -245,4 +245,48 @@ public class PrinterDao {
 		
 		return Collections.unmodifiableList(result);
 	}
+	/**
+	 * Get the printerId by Name.
+	 * @param staff
+	 * 			the terminal
+	 * @param printerName
+	 * 			the name of printer
+	 * @return	the printerId
+	 * @throws SQLException
+	 * @throws BusinessException
+	 * 			if the printerName is not exist
+	 */
+	public static int getPrinterIdByName(Staff staff, String printerName) throws SQLException, BusinessException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return getPrinterIdByName(dbCon, staff, printerName);
+			
+		}finally{
+			dbCon.disconnect();
+		}
+		
+	}
+	/**
+	 * Get the printerId by Name.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * @param printerName
+	 * @return
+	 * @throws SQLException
+	 * @throws BusinessException
+	 */
+	public static int getPrinterIdByName(DBCon dbCon, Staff staff, String printerName) throws SQLException, BusinessException{
+		String sql = "SELECT printer_id FROM " + Params.dbName + ".printer "
+				+ " WHERE restaurant_id = " + staff.getRestaurantId()
+				+ " AND name = " + printerName;
+		dbCon.rs = dbCon.stmt.executeQuery(sql);
+		if(dbCon.rs.next()){
+			return dbCon.rs.getInt("printer_Id");
+		}else{
+			throw new BusinessException("无此打印机");
+		}
+		
+	}
 }
