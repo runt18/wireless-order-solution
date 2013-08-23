@@ -34,7 +34,6 @@ public class QueryTasteAction extends Action {
 		String limit = request.getParameter("limit");
 		try{
 			String pin = (String)request.getAttribute("pin");
-			String alias = request.getParameter("alias");
 			String price = request.getParameter("price");
 			String name = request.getParameter("name");
 			String cate = request.getParameter("cate");
@@ -63,9 +62,6 @@ public class QueryTasteAction extends Action {
 				}
 			}
 			
-			if(alias != null && !alias.trim().isEmpty() && !alias.equals("")){
-				extraCond += (" AND TASTE.taste_alias " + ope + alias);
-			}
 			if(price != null && !price.trim().isEmpty() && !price.equals("")){
 				extraCond += (" AND TASTE.price " + ope + price);
 			}
@@ -76,7 +72,7 @@ public class QueryTasteAction extends Action {
 				extraCond += (" AND TASTE.category = " + cate);
 			}
 			
-			root = TasteDao.getTastes(staff, extraCond, " ORDER BY TASTE.taste_alias ");
+			root = TasteDao.getTastes(staff, extraCond, " ORDER BY TASTE.taste_id ");
 		} catch(BusinessException e){
 			e.printStackTrace();
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getCode(), e.getDesc());

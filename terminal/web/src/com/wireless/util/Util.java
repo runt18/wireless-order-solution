@@ -132,7 +132,7 @@ public class Util {
 							if(taste.length == 3){
 								Taste it = new Taste();
 								it.setTasteId(Integer.valueOf(taste[0]));
-								it.setAliasId(Integer.valueOf(taste[1]));
+								it.setTasteId(Integer.valueOf(taste[1]));
 								it.setCategory(Short.valueOf(taste[2]));
 								foods[i].getTasteGroup().addTaste(it);
 							}
@@ -146,7 +146,7 @@ public class Util {
 							tmpTaste.setPrice(Float.valueOf(tTaste[0]));
 							tmpTaste.setPreference(tTaste[1]);
 							tmpTaste.setTasteId(Integer.valueOf(tTaste[2]));
-							tmpTaste.setAliasId(Integer.valueOf(tTaste[3]));
+							tmpTaste.setTasteId(Integer.valueOf(tTaste[3]));
 							foods[i].getTasteGroup().setTmpTaste(tmpTaste);							
 						}
 					}

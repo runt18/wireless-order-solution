@@ -14,6 +14,7 @@ import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.tasteMgr.Taste;
+import com.wireless.pojo.tasteMgr.Taste.Category;
 import com.wireless.util.WebParams;
 
 public class OperateTasteAction extends DispatchAction{
@@ -27,23 +28,21 @@ public class OperateTasteAction extends DispatchAction{
 		JObject jobject = new JObject();
 		try{
 			String pin = (String)request.getAttribute("pin");
-			String alias = request.getParameter("alias");
 			String name = request.getParameter("name");
 			String price = request.getParameter("price");
 			String rate = request.getParameter("rate");
 			String cate = request.getParameter("cate");
 			
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
-			Taste insert = new Taste(Integer.valueOf(alias), 
-				staff.getRestaurantId(), 
-				name, 
-				Float.valueOf(price), 
-				Float.valueOf(rate), 
-				Integer.valueOf(cate)
-			);
 			
-			TasteDao.insert(staff, insert);
+			Taste.InsertBuilder builder = new Taste.InsertBuilder(staff.getRestaurantId(), name)
+												   .setPrice(Float.valueOf(price))
+												   .setRate(Float.valueOf(rate))
+												   .setCategory(Category.valueOf(Integer.valueOf(cate)));
+			
+			TasteDao.insert(staff, builder);
 			jobject.initTip(true, "操作成功, 已添加新口味信息.");
+			
 		}catch(BusinessException e){
 			e.printStackTrace();
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getCode(), e.getDesc());
@@ -66,23 +65,20 @@ public class OperateTasteAction extends DispatchAction{
 		try{
 			String pin = (String)request.getAttribute("pin");
 			String id = request.getParameter("id");
-			String alias = request.getParameter("alias");
 			String name = request.getParameter("name");
 			String price = request.getParameter("price");
 			String rate = request.getParameter("rate");
 			String cate = request.getParameter("cate");
 			
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
-			Taste insert = new Taste(Integer.valueOf(id), 
-				Integer.valueOf(alias), 
-				staff.getRestaurantId(), 
-				name, 
-				Float.valueOf(price), 
-				Float.valueOf(rate), 
-				Integer.valueOf(cate)
-			);
 			
-			TasteDao.update(staff, insert);
+			Taste.UpdateBuilder builder = new Taste.UpdateBuilder(Integer.valueOf(id), name)
+												   .setPrice(Float.valueOf(price))
+												   .setRate(Float.valueOf(rate))
+												   .setCategory(Category.valueOf(Integer.valueOf(cate)));
+			
+			TasteDao.update(staff, builder);
+			
 			jobject.initTip(true, "操作成功, 已修改口味信息.");
 		}catch(BusinessException e){
 			e.printStackTrace();
