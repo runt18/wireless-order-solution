@@ -11,6 +11,7 @@ import org.apache.struts.actions.DispatchAction;
 import com.wireless.db.DBCon;
 import com.wireless.db.deptMgr.DepartmentDao;
 import com.wireless.db.printScheme.PrintFuncDao;
+import com.wireless.db.printScheme.PrinterDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
@@ -66,7 +67,14 @@ public class OperatePrintFuncAction extends DispatchAction{
 			String kitchens = request.getParameter("kitchens");
 			String dept = request.getParameter("dept");
 			String regions = request.getParameter("regions");
-			int printerId = Integer.parseInt(request.getParameter("printerId"));
+			int printerId = -1;
+			if(request.getParameter("printerId") == null){
+				String printerName = request.getParameter("printerName");
+				printerId = PrinterDao.getPrinterIdByName(staff, printerName);
+			}else{
+				printerId = Integer.parseInt(request.getParameter("printerId"));
+			}
+			 
 			int pType = Integer.parseInt(request.getParameter("pType"));
 			
 			Department de = null;

@@ -1,5 +1,6 @@
 package com.wireless.commands;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.struts.chain.commands.ActionCommandBase;
@@ -12,8 +13,22 @@ public class VerifyLoginCommand extends ActionCommandBase{
 	public boolean execute(ActionContext context) throws Exception {
 		HttpServletRequest request = ((ServletActionContext)context).getRequest();
 		String skipVerify = request.getParameter("skipVerify");
+		String isCookie = request.getParameter("isCookie");
 		if(skipVerify == null){
-			String pin = (String)request.getSession().getAttribute("pin");
+			String pin = null;
+			if(isCookie == null){
+				pin = (String)request.getSession().getAttribute("pin");
+				
+			}else{
+				Cookie[] cookies = request.getCookies();
+				if(cookies != null){
+					for (Cookie cookie : cookies) {
+						if(cookie.getName().equalsIgnoreCase("pin")){
+							pin = cookie.getValue();
+						}
+					}
+				}
+			}
 			request.setAttribute("pin", pin);
 		}
 		return false;
