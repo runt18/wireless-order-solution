@@ -71,6 +71,7 @@
 	background: #87CEEA;
 	font-weight: bold;
 	font-size: 16px;
+	padding: 3px;
 }
 .divCFCOAllFood-main-box:active{ background: #FFD700; }
 
@@ -89,7 +90,7 @@
 #divCFCONewFood div[data-type="newFood-select"]{
 	width: 100%; 
 	border-bottom: 2px solid #ddd; 
-	height: 80px; 
+	min-height: 70px; 
 	background: #87CEEA;
 	text-align: center;
 	vertical-align: middle;

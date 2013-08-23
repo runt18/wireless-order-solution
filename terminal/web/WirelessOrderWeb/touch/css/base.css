@@ -44,6 +44,7 @@ body{ overflow: hidden; }
 }
 
 .content-hide{
+	z-index: -1;
 	-webkit-animation: content-hide-outDownBig .5s .01s ease both;
 	-moz-animation: content-hide-outDownBig .5s .01s ease both;
 }
@@ -54,6 +55,42 @@ body{ overflow: hidden; }
 @-moz-keyframes content-hide-outDownBig{
 	0%{opacity:1; -moz-transform:translateY(0)}
 	100%{opacity:0; -moz-transform:translateY(100%)}
+}
+
+.dialong-show{
+	z-index: 9999;
+	-webkit-animation: dl-bounceIn .5s .2s ease both;
+	-moz-animation: dl-bounceIn .5s .2s ease both;
+}
+@-webkit-keyframes dl-bounceIn{
+	0%{opacity:0; -webkit-transform:scale(.3)}
+	50%{opacity:.3; -webkit-transform:scale(1.1)}
+	70%{opacity:.3; -webkit-transform:scale(.9)}
+	100%{opacity:.3; -webkit-transform:scale(1)}
+}
+@-moz-keyframes dl-bounceIn{
+	0%{opacity:0; -moz-transform:scale(.3)}
+	50%{opacity:.3; -moz-transform:scale(1.05)}
+	70%{opacity:.3; -moz-transform:scale(.9)}
+	100%{opacity:.3; -moz-transform:scale(1)}
+}
+
+.dialong-hide{
+	z-index: -1;
+	-webkit-animation: dl-bounceOut 1s .2s ease both;
+	-moz-animation: dl-bounceOut 1s .2s ease both;
+}
+@-webkit-keyframes dl-bounceOut{
+	0%{opacity:.3; -webkit-transform:scale(1)}
+	25%{-webkit-transform:scale(.95)}
+	50%{-webkit-transform:scale(1.1)}
+	100%{opacity:0; -webkit-transform:scale(.3)}
+}
+@-moz-keyframes dl-bounceOut{
+	0%{opacity:.3; -moz-transform:scale(1)}
+	25%{-moz-transform:scale(.95)}
+	50%{ -moz-transform:scale(1.1)}
+	100%{opacity:0; -moz-transform:scale(.3)}
 }
 
 .button-base{

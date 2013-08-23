@@ -1,9 +1,3 @@
-// 下单操作包
-var cr = {
-	table : {},
-	newFood : []
-};
-
 // 菜品分页包
 cr.fd = {
 	renderTo : 'divCFCOAllFood',
@@ -23,7 +17,7 @@ cr.fd = {
 		this.dom = getDom(this.renderTo);
 		this.dom.innerHTML = '';
 		var ch = this.dom.clientHeight, cw = this.dom.clientWidth;
-		this.limit = parseInt((ch / (70 + 5))) * parseInt((cw / (90 + 5)));
+		this.limit = parseInt((ch / (70 + 5 + 3 * 2))) * parseInt((cw / (90 + 5 + 3 * 2)));
 		//
 		this.data = c.data;
 		//
@@ -39,10 +33,12 @@ cr.fd = {
 				temp = this.data[start+i];
 				this.pageData.push(temp);
 				if(temp != null){
-					html += ('<div data-value='+temp.id+' class="divCFCOAllFood-main-box" onClick="cr.insertFood({foodId:'+temp.id+'})">' 
-							+ temp.name 
-							+ '<div>¥:' + temp.unitPrice + '</div>'
-							+ '</div>');					
+					html += Templet.cr.boxFood.format({
+						dataIndex : i,
+						id : temp.id,
+						name : temp.name,
+						unitPrice : temp.unitPrice
+					});				
 				}
 			}
 			temp = null;
@@ -74,6 +70,38 @@ cr.fd = {
 		this.initFoodContent();
 	}
 };
+/**
+ * 初始化新点菜区域
+ */
+cr.initNewFoodContent = function(c){
+	var html = [];
+	var temp = null;
+	for(var i = 0; i < cr.newFood.length; i++){
+		temp = cr.newFood[i];
+		html.push(Templet.cr.newFood.format({
+			dataIndex : i,
+			id : temp.id,
+			name : temp.name,
+			count : temp.count.toFixed(2),
+			unitPrice : temp.unitPrice.toFixed(2),
+			totalPrice : (temp.count * temp.unitPrice).toFixed(2),
+			tasteDisplay : '口味一,口味二,口味三'
+		}));
+	}
+	temp = null;
+	$('#divCFCONewFood').html(html.join(''));
+	if(c.data != null){
+		var select = $('#divCFCONewFood > div[data-value='+c.data.id+']');
+		if(select.length > 0){
+			select.addClass('div-newFood-select');
+			getDom('divCFCONewFood').scrollTop = getDom('divCFCONewFood').scrollHeight / cr.newFood.length * select.attr('data-index');
+		}else{
+			getDom('divCFCONewFood').scrollTop = 0;
+		}
+	}else{
+		getDom('divCFCONewFood').scrollTop = 0;
+	}
+};
 
 /**
  * 点菜
@@ -91,7 +119,7 @@ cr.insertFood = function(c){
 		}
 	}
 	if(data == null){
-		alert('程序异常!')
+		alert('添加菜品失败, 程序异常, 请刷新后重试或联系客服人员');
 		return;
 	}
 	//
@@ -107,24 +135,10 @@ cr.insertFood = function(c){
 		data.count = 1;
 		cr.newFood.push(data);
 	}
-	var html = [];
-	var temp = null;
-	for(var i = 0; i < cr.newFood.length; i++){
-		temp = cr.newFood[i];
-		html.push(Templet.cr.newFood.format({
-			id : temp.id,
-			name : temp.name,
-			count : temp.count.toFixed(2),
-			unitPrice : temp.unitPrice.toFixed(2),
-			totalPrice : (temp.count * temp.unitPrice).toFixed(2)
-		}));
-	}
-	temp = null;
-	$('#divCFCONewFood').html(html.join(''));
-	var select = $('#divCFCONewFood > div[data-value='+data.id+']');
-	select.addClass('div-newFood-select');
-//	alert(select[0].offsetHeight+'  :  '+select[0].offsetTop+'  :  '+$('#divCFCONewFood')[0].scrollHeight)
-	$('#divCFCONewFood')[0].scrollTop = select[0].offsetTop;
+	//
+	cr.initNewFoodContent({
+		data : data
+	});
 };
 
 /**
@@ -206,74 +220,4 @@ cr.initKitchenContent = function(c){
 		data : tempFoodData
 	});
 	cr.fd.getFirstPage();
-};
-/**
- * 分厨选菜
- */
-cr.findFoodByKitchen = function(c){
-	c = c == null || typeof c == 'undefined' ? {} : c;
-	//
-	var sl = $('#divSelectKitchenForOrder > div[data-type=kitchen-select]');
-	for(var i = 0; i < sl.length; i++){
-		$(sl[i]).removeClass('div-deptOrKitchen-select');
-	}
-	$(c.event).addClass('div-deptOrKitchen-select');
-	
-	var tempFoodData = [];
-	var temp = null;
-	if(c.kitchenId == -1){
-		var dl = $('.div-deptOrKitchen-select[data-type=dept-select]');
-		if(dl.length == 0){
-			for(var i = 0; i < kitchenData.root.length; i++){
-				tempFoodData = tempFoodData.concat(kitchenData.root[i].foods);
-			}
-		}else{
-			for(var i = 0; i < kitchenData.root.length; i++){
-				temp = kitchenData.root[i];
-				if(temp.dept.id == parseInt(dl[0].getAttribute('data-value'))){
-					tempFoodData = tempFoodData.concat(temp.foods);					
-				}
-			}
-		}
-	}else{
-		for(var i = 0; i < kitchenData.root.length; i++){
-			temp = kitchenData.root[i];
-			if(typeof c.kitchenId == 'number' && c.kitchenId != -1){
-				if(temp.id == c.kitchenId){
-					tempFoodData = tempFoodData.concat(temp.foods);
-				}
-			}else{
-				tempFoodData.concat();
-			}
-		}
-	}
-	temp = null;
-	// 
-	cr.fd.init({
-		data : tempFoodData
-	});
-	cr.fd.getFirstPage();
-};
-/**
- * 
- */
-cr.show = function(c){
-	toggleContentDisplay({
-		type:'show', 
-		renderTo:'divCreateOrder'
-	});
-	cr.initDeptContent();
-	var defaults = $('#divSelectDeptForOrder > div[data-value=-1]');
-	defaults[0].click();
-	
-	$('#divCFCONewFood').css('height', $('#divCenterForCreateOrde').height());
-};
-/**
- * 
- */
-cr.hide = function(c){
-	toggleContentDisplay({
-		type:'hide', 
-		renderTo:'divCreateOrder'
-	});
 };
