@@ -157,11 +157,15 @@ function initFoodData(){
  * onload
  */
 $(function(){
+	
 	initFoodData();
 	
 	$.getScript('./js/tableSelect/tsLoad.js');
 	
 	$.getScript('./js/tableSelect/tsMain.js');
+	
+	$.getScript('./js/updateOrder/uoLoad.js');
+	$.getScript('./js/updateOrder/uoMain.js');
 });
 
 /**

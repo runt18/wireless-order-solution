@@ -1,15 +1,121 @@
 #divUpdateOrder{
-	
+	background-color: #4682B4;
+	z-index:1001;
 }
 #divNorthForUpdateOrder{
 	width: 100%; 
 	height: 41px; 
 	border-bottom: 1px solid #fff;
-	background-color: pink;
+	line-height: 41px;
+	background-color: #FFA500;
 }
 #divCenterForUpdateOrder{
 	width:100%; 
 	box-flex: 1;
 	-webkit-box-flex: 1;
-	background-color: #358;
+}
+#divDescForUpdateOrder{
+	margin-right: 1px;
+	line-height: 30px;
+}
+table{
+	padding: 0;
+	margin: 0;
+	width: 100%;
+	text-align: center;
+}
+table th{
+	width: 100px;
+	height: 40px;
+	background-color: #20B2AA;
+}
+table td{
+	width: 100px;
+	height: 50px;
+	background-color: #87CEEB;
+	
+}
+#divSouthForUpdateOrder{
+	width:100%;
+	line-height: 60px;
+	border-top: 1px solid #fff;
+}
+.cancelFoodBtn{
+	width: 90%; 
+	height: 95%;
+	color: #A52A2A;
+	font-size: 23px;
+	font-weight: bold;
+	background-color: #75B2F4;
+	border: 1px solid green;
+	border-radius: 5px;
+}
+#divKeyboardNumForUO{
+	display: none;
+	position: absolute;
+	top: 25%;
+	left: 35%;
+	width: 725px;
+	height: 430px;
+	border: 2px solid #fff;
+	background-color: #6395EC;
+	z-index: 1004;
+}
+#divTopForKeyboardNumForUO{
+	wudth: 100%;
+	height: 45px;
+}
+#divMainForKeyboardNumForUO{
+	width: 100%;
+}
+#divLeftForKeyboardNumForUO{
+	width: 262px;	
+	height: 370px;
+	float: left;	
+}
+#divRightForKeyboardNumForUO{
+	height: 370px;
+	float: left;
+	width: 87px;	
+}
+#divReasonForKeyboardNumForUO{
+	height: 370px;
+	float: left;
+	width: 375px;
+}
+#divHideForUO{
+	display: none;
+	width: 100%;
+	height: 100%;
+	position: absolute;
+	z-index: 1002;
+}
+
+#divKeyboardPeopleForUO{
+	display: none;
+	position: absolute;
+	top: 25%;
+	left: 35%;
+	width: 350px;
+	height: 430px;
+	border: 2px solid #fff;
+	background-color: #6395EC;
+	z-index: 1004;
+}
+#divTopForKeyboardPeopleForUO{
+	wudth: 100%;
+	height: 45px;
+}
+#divMainForKeyboardPeopleForUO{
+	width: 100%;
+}
+#divLeftForKeyboardPeopleForUO{
+	width: 262px;	
+	height: 370px;
+	float: left;	
+}
+#divRightForKeyboardPeopleForUO{
+	height: 370px;
+	float: left;
+	width: 87px;	
 }
