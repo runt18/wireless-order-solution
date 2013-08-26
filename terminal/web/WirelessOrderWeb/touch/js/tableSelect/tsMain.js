@@ -290,49 +290,56 @@ $(".keyboardbutton").mouseout(function(){
 });
 /**
  * 选中一张餐桌
- * @param {object} o 被选中的餐桌对象
+ * @param {object} o 被选中的餐桌节点
  */
 function selectTable(o){
-//	changeColorForSelect(o.id);
-	$("#divHideForTableSelect").show();
-	$("#divShowMessageForTableSelect").show(100);
 	var tableMessage, tabMessage;
 	tabMessage = document.getElementById(o.id).getAttribute("tableObject");
 	tableMessage = JSON.parse(tabMessage);
-	//关闭该界面
-	$("#btnCancelForShowMessageTS").click(function (){
-		$("#divShowMessageForTableSelect").hide(100);
-		$("#divHideForTableSelect").hide();
-		inputNumVal = "";
-		$("#txtPeopleNumForSM").val("");
-	});
-	$("#txtTableNumForSM").val(tableMessage.alias);
-	$("#txtPeopleNumForSM").select();
-	inputNumId  = "txtPeopleNumForSM";
-	//点击选中按钮，选择桌号输入框
-	$("#selectTableNum").click(function(){
-		$("#txtTableNumForSM").select();
-		inputNumId  = "txtTableNumForSM";
-		inputNumVal = "";
-	});
-	//点击选中按钮，选择人数输入框
-	$("#selectPeopleNum").click(function(){
+	//判断是否为已点菜餐桌
+	if(tableMessage.statusText == "就餐"){
+//		toggleContentDisplay({type:'show', renderTo:'divUpdateOrder'});
+		uo.show({
+			table : getTableBytableId(o.id.substring(8, o.id.length)),
+		});
+	}else{
+		$("#divHideForTableSelect").show();
+		$("#divShowMessageForTableSelect").show(100);
+		//关闭该界面
+		$("#btnCancelForShowMessageTS").click(function (){
+			$("#divShowMessageForTableSelect").hide(100);
+			$("#divHideForTableSelect").hide();
+			inputNumVal = "";
+			$("#txtPeopleNumForSM").val("");
+		});
+		$("#txtTableNumForSM").val(tableMessage.alias);
 		$("#txtPeopleNumForSM").select();
 		inputNumId  = "txtPeopleNumForSM";
-		inputNumVal = "";
-	});
-	//直接点击桌号 输入框
-	$("#txtTableNumForSM").click(function(){
-		inputNumId  = "txtTableNumForSM";
-		inputNumVal = "";
-		inputNumVal += $("#" + inputNumId).val();
-	});
-	//直接点击人数 输入框
-	$("#txtPeopleNumForSM").click(function(){
-		inputNumId  = "txtPeopleNumForSM";
-		inputNumVal = "";
-		inputNumVal += $("#" + inputNumId).val();
-	});
+		//点击选中按钮，选择桌号输入框
+		$("#selectTableNum").click(function(){
+			$("#txtTableNumForSM").select();
+			inputNumId  = "txtTableNumForSM";
+			inputNumVal = "";
+		});
+		//点击选中按钮，选择人数输入框
+		$("#selectPeopleNum").click(function(){
+			$("#txtPeopleNumForSM").select();
+			inputNumId  = "txtPeopleNumForSM";
+			inputNumVal = "";
+		});
+		//直接点击桌号 输入框
+		$("#txtTableNumForSM").click(function(){
+			inputNumId  = "txtTableNumForSM";
+			inputNumVal = "";
+			inputNumVal += $("#" + inputNumId).val();
+		});
+		//直接点击人数 输入框
+		$("#txtPeopleNumForSM").click(function(){
+			inputNumId  = "txtPeopleNumForSM";
+			inputNumVal = "";
+			inputNumVal += $("#" + inputNumId).val();
+		});
+	}	
 }
 /**
  * 点击数字键盘上的数字，对输入框进行输入
@@ -480,7 +487,6 @@ function showSelectTableNumTS(type){
 		inputNumVal = "";
 		$("#txtTableNumForTS").val("");
 	});
-//	$("#txtTableNumForTS").val(selectTableId.substring(8, selectTableId.length));
 	$("#txtTableNumForTS").select();
 	inputNumId  = "txtTableNumForTS";
 }
