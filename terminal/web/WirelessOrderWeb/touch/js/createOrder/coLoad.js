@@ -163,3 +163,71 @@ co.initKitchenContent = function(c){
 	});
 	co.fp.getFirstPage();
 };
+
+/*** -------------------------------------------------- ***/
+
+/**
+ * 
+ */
+co.ot.initBarForCommomTaste = function(){
+	co.ot.ctp = new Util.padding({
+		renderTo : 'divCFOTTasteContent',
+		templet : function(c){
+			return Templet.co.boxTaste.format({
+				dataIndex : c.dataIndex,
+				id : c.data.taste.id,
+				name : c.data.taste.name,
+				price : c.data.taste.price
+			});
+		}
+	});
+};
+/**
+ * 
+ */
+co.ot.initBarForAllTaste = function(){
+	var data = [];
+	for(var i = 0; i < tasteData.root.length; i++){
+		if(tasteData.root[i].taste.cateValue == 0){
+			data.push(tasteData.root[i]);
+		}
+	}
+	co.ot.atp = new Util.padding({
+		data : data,
+		renderTo : 'divCFOTTasteContent',
+		templet : function(c){
+			return Templet.co.boxTaste.format({
+				dataIndex : c.dataIndex,
+				id : c.data.taste.id,
+				name : c.data.taste.name,
+				price : c.data.taste.price
+			});
+		}
+	});
+	data = null;
+};
+/**
+ * 
+ */
+co.ot.initBarForGuiGe = function(){
+	var data = [];
+	for(var i = 0; i < tasteData.root.length; i++){
+		if(tasteData.root[i].taste.cateValue == 2){
+			data.push(tasteData.root[i]);
+		}
+	}
+	co.ot.ggp = new Util.padding({
+		data : data,
+		renderTo : 'divCFOTTasteContent',
+		templet : function(c){
+			return Templet.co.boxTaste.format({
+				dataIndex : c.dataIndex,
+				id : c.data.taste.id,
+				name : c.data.taste.name,
+				price : c.data.taste.price
+			});
+		}
+	});
+	
+	data = null;
+};

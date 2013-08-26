@@ -31,7 +31,7 @@ Util.padding = function(c){
 				return;
 			}
 			this.dom = getDom(this.renderTo);
-			this.dom.innerHTML = '';
+			this.clearContent();
 			var ch = this.dom.clientHeight, cw = this.dom.clientWidth;
 			this.limit = parseInt((ch / (70 + 5 + 3 * 2))) * parseInt((cw / (90 + 5 + 3 * 2)));
 			//
@@ -39,11 +39,16 @@ Util.padding = function(c){
 			//
 			this.length = this.data.length;
 		},
+		clearContent : function(){
+			if(this.dom){
+				this.dom.innerHTML = '';				
+			}
+		},
 		initContent : function(c){
 			this.pageData = [];
 			if(!this.isEmpty()){
 				var html = '';
-				var start = this.start, limit = this.start + this.limit > this.data.length ? this.start + this.limit - this.data.length : this.limit;
+				var start = this.start, limit = this.start > this.data.length && this.start + this.limit > this.data.length ? this.start + this.limit - this.data.length : this.limit;
 				var temp = null;
 				for(var i = 0; i < limit; i++){
 					temp = this.data[start+i];
@@ -57,6 +62,8 @@ Util.padding = function(c){
 				}
 				temp = null;
 				this.dom.innerHTML = html;
+			}else{
+				this.clearContent();
 			}
 		},
 		getFirstPage : function(){
@@ -84,6 +91,9 @@ Util.padding = function(c){
 			this.initContent();
 		}
 	};
+	obj.init({
+		data : c.data
+	});
 	return obj;
 };
 

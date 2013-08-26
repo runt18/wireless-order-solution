@@ -124,33 +124,100 @@ co.operateFoodCount = function(c){
 	});
 };
 
+
+/*** -------------------------------------------------- ***/
+
 /**
  * 口味操作
  */
-co.operateFoodTaste = function(c){
+co.ot.show = function(){
+	var sf = $('#divCFCONewFood > div[class*=div-newFood-select]');
+	if(sf.length != 1){
+		alert('请选中一道菜品');
+		return;
+	}
+	var data = co.newFood[sf.attr('data-index')];
+	
 	Util.dialongDisplay({
 		type : 'show',
 		renderTo : 'divOperateBoxForFoodTaste'
 	});
 	
+	if(typeof co.ot.ctp == 'undefined'){
+		co.ot.initBarForCommomTaste();
+	}
+	if(typeof co.ot.atp == 'undefined'){
+		co.ot.initBarForAllTaste();
+	}
+	if(typeof co.ot.ggp == 'undefined'){
+		co.ot.initBarForGuiGe();
+	}
 	
+	co.ot.changeTaste({
+		foodData : data,
+		type : 1,
+		event : $('#divCFOTTasteChange > div[data-value=1]'),
+		change : true
+	});
 };
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+/**
+ * 
+ */
+co.ot.changeTaste = function(c){
+	if(c == null || typeof c.type != 'number'){
+		return;
+	}
+	var ac = $('#divCFOTTasteChange > div');
+	for(var i = 0; i < ac.length; i++){
+		$(ac[i]).removeClass('div-deptOrKitchen-select');
+	}
+	$('#divCFOTTasteChange > div[data-value='+c.type+']').addClass('div-deptOrKitchen-select');
+	
+	if(c.type == 1){
+		// 常用口味
+		co.ot.tp = co.ot.ctp;
+		if(typeof c.foodData == 'undefined'){
+			c.foodData = co.newFood[$('#divCFCONewFood > div[class*=div-newFood-select]').attr('data-index')];
+		}
+		$.ajax({
+			url : '../QueryFoodTaste.do',
+			type : 'post',
+			data : {
+				foodID : c.foodData.id,
+				pin : pin,
+				restaurantID : restaurantID
+			},
+			success : function(data, status, xhr){
+				if(data.success && data.root.length > 0){
+					co.ot.ctp.init({
+						data : data.root.slice(0)
+					});
+					co.ot.tp.getFirstPage();
+				}else{
+					co.ot.tp.clearContent();
+					if(c.change){
+						co.ot.changeTaste({
+							type : 2,
+							foodData : c.foodData
+						});
+					}
+				}
+			},
+			error : function(request, status, err){
+				alert('加载菜品常用口味数据失败.');
+			}
+		});
+	}else if(c.type == 2){
+		// 所有口味
+		co.ot.tp = co.ot.atp;
+		co.ot.tp.getFirstPage();
+	}else if(c.type == 3){
+		// 规格
+		co.ot.tp = co.ot.ggp;
+		co.ot.tp.getFirstPage();
+	}
+};
 
 
 

@@ -41,6 +41,10 @@ var Templet = {
 			+ '<div style="line-height: 40px; ">{name} x {count}</div>'
   			+ '<div>{tasteDisplay}</div>'
   			+ '<div style="text-align: right; padding-right: 5px;">¥:{totalPrice}</div>'
+  			+ '</div>',
+  		boxTaste : '<div data-index={dataIndex} data-value={id} class="divCFCOAllFood-main-box" >'
+  			+ '{name}'
+  			+ '<div>¥:{price}</div>'
   			+ '</div>'
 	},
 	uo : {
