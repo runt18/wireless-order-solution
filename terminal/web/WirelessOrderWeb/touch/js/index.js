@@ -42,6 +42,9 @@ var Templet = {
   			+ '<div>{tasteDisplay}</div>'
   			+ '<div style="text-align: right; padding-right: 5px;">¥:{totalPrice}</div>'
   			+ '</div>'
+	},
+	uo : {
+		order : '<tr ></tr>'
 	}
 };
 
