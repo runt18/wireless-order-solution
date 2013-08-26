@@ -394,7 +394,7 @@ function renderToCreateOrder(tableNo, peopleNo){
 		//设置该餐桌为选中状态
 //		changeColorForSelect("divtable" + tableNo);
 		//toggleContentDisplay({type:'show', renderTo:'divCreateOrder'});
-		cr.show({
+		co.show({
 			table : getTableBytableId(tableNo)
 		});
 	}else{
