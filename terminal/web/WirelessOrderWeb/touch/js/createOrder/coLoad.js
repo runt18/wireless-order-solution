@@ -1,84 +1,26 @@
+
 // 菜品分页包
-cr.fd = {
+co.fp = new Util.padding({
 	renderTo : 'divCFCOAllFood',
-	dom : null,
-	start : 0,
-	limit : 20,
-	data : [],
-	length : 0,
-	pageData : [],
-	isEmpty : function(){
-		return this.data == null || this.data.length <= 0;
-	},
-	init : function(c){
-		if(c == null || typeof c.data != 'object'){
-			return;
-		}
-		this.dom = getDom(this.renderTo);
-		this.dom.innerHTML = '';
-		var ch = this.dom.clientHeight, cw = this.dom.clientWidth;
-		this.limit = parseInt((ch / (70 + 5 + 3 * 2))) * parseInt((cw / (90 + 5 + 3 * 2)));
-		//
-		this.data = c.data;
-		//
-		this.length = this.data.length;
-	},
-	initFoodContent : function(c){
-		this.pageData = [];
-		if(!this.isEmpty()){
-			var html = '';
-			var start = this.start, limit = this.start + this.limit > this.data.length ? this.start + this.limit - this.data.length : this.limit;
-			var temp = null;
-			for(var i = 0; i < limit; i++){
-				temp = this.data[start+i];
-				this.pageData.push(temp);
-				if(temp != null){
-					html += Templet.cr.boxFood.format({
-						dataIndex : i,
-						id : temp.id,
-						name : temp.name,
-						unitPrice : temp.unitPrice
-					});				
-				}
-			}
-			temp = null;
-			this.dom.innerHTML = html;
-		}
-	},
-	getFirstPage : function(){
-		this.start = 0;
-		this.initFoodContent();
-	},
-	getLastPage : function(){
-		this.start = this.data.length - this.data.length % this.limit;
-		this.initFoodContent();
-	},
-	getNextPage : function(){
-		this.start += this.limit;
-		if(this.start > this.data.length){
-			this.start -= this.limit;
-			return;
-		}
-		this.initFoodContent();
-	},
-	getPreviousPage : function(){
-		this.start -= this.limit;
-		if(this.start < 0){
-			this.start += this.limit;
-			return;
-		}
-		this.initFoodContent();
+	templet : function(c){
+		return Templet.co.boxFood.format({
+			dataIndex : c.dataIndex,
+			id : c.data.id,
+			name : c.data.name,
+			unitPrice : c.data.unitPrice
+		});
 	}
-};
+});
+
 /**
  * 初始化新点菜区域
  */
-cr.initNewFoodContent = function(c){
+co.initNewFoodContent = function(c){
 	var html = [];
 	var temp = null;
-	for(var i = 0; i < cr.newFood.length; i++){
-		temp = cr.newFood[i];
-		html.push(Templet.cr.newFood.format({
+	for(var i = 0; i < co.newFood.length; i++){
+		temp = co.newFood[i];
+		html.push(Templet.co.newFood.format({
 			dataIndex : i,
 			id : temp.id,
 			name : temp.name,
@@ -94,7 +36,7 @@ cr.initNewFoodContent = function(c){
 		var select = $('#divCFCONewFood > div[data-value='+c.data.id+']');
 		if(select.length > 0){
 			select.addClass('div-newFood-select');
-			getDom('divCFCONewFood').scrollTop = getDom('divCFCONewFood').scrollHeight / cr.newFood.length * select.attr('data-index');
+			getDom('divCFCONewFood').scrollTop = getDom('divCFCONewFood').scrollHeight / co.newFood.length * select.attr('data-index');
 		}else{
 			getDom('divCFCONewFood').scrollTop = 0;
 		}
@@ -106,15 +48,15 @@ cr.initNewFoodContent = function(c){
 /**
  * 点菜
  */
-cr.insertFood = function(c){
+co.insertFood = function(c){
 	if(c == null || typeof c.foodId != 'number'){
 		return;
 	}
 	//
 	var data = null;
-	for(var i = 0; i < cr.fd.pageData.length; i++){
-		if(cr.fd.pageData[i].id == c.foodId){
-			data = cr.fd.pageData[i];
+	for(var i = 0; i < co.fp.getPageData().length; i++){
+		if(co.fp.getPageData()[i].id == c.foodId){
+			data = co.fp.getPageData()[i];
 			break;
 		}
 	}
@@ -124,19 +66,19 @@ cr.insertFood = function(c){
 	}
 	//
 	var has = false;
-	for(var i = 0; i < cr.newFood.length; i++){
-		if(cr.newFood[i].id == data.id){
+	for(var i = 0; i < co.newFood.length; i++){
+		if(co.newFood[i].id == data.id){
 			has = true;
-			cr.newFood[i].count++;
+			co.newFood[i].count++;
 			break;
 		}
 	}
 	if(!has){
 		data.count = 1;
-		cr.newFood.push(data);
+		co.newFood.push(data);
 	}
 	//
-	cr.initNewFoodContent({
+	co.initNewFoodContent({
 		data : data
 	});
 };
@@ -144,7 +86,7 @@ cr.insertFood = function(c){
 /**
  * 选中菜品
  */
-cr.selectNewFood = function(c){
+co.selectNewFood = function(c){
 	if(c == null || typeof c.foodId != 'number'){
 		return;
 	}
@@ -162,11 +104,11 @@ cr.selectNewFood = function(c){
  * 初始化部门选择
  * @param c
  */
-cr.initDeptContent = function(c){
+co.initDeptContent = function(c){
 	var dc = getDom('divSelectDeptForOrder');
 	var html = '';
 	for(var i = 0; i < deptData.root.length; i++){
-		html += Templet.cr.dept.format({
+		html += Templet.co.dept.format({
 			value : deptData.root[i].id,
 			text : deptData.root[i].name
 		});
@@ -177,7 +119,7 @@ cr.initDeptContent = function(c){
  * 初始化分厨选择
  * @param c
  */
-cr.initKitchenContent = function(c){
+co.initKitchenContent = function(c){
 	c = c == null || typeof c == 'undefined' ? {} : c;
 	//
 	var sl = $('div[data-type=dept-select]');
@@ -187,7 +129,7 @@ cr.initKitchenContent = function(c){
 	$(c.event).addClass('div-deptOrKitchen-select');
 	// 
 	var kc = getDom('divSelectKitchenForOrder');
-	var html = Templet.cr.kitchen.format({
+	var html = Templet.co.kitchen.format({
 		value : -1,
 		text : '全部分厨'
 	});
@@ -197,7 +139,7 @@ cr.initKitchenContent = function(c){
 		temp = kitchenData.root[i];
 		if(typeof c.deptId == 'number' && c.deptId != -1){
 			if(temp.dept.id == c.deptId){
-				html += Templet.cr.kitchen.format({
+				html += Templet.co.kitchen.format({
 					value : temp.id,
 					text : temp.name
 				});
@@ -205,7 +147,7 @@ cr.initKitchenContent = function(c){
 			}
 		}else{
 			if(temp.dept.id != -1){
-				html += Templet.cr.kitchen.format({
+				html += Templet.co.kitchen.format({
 					value : temp.id,
 					text : temp.name
 				});
@@ -216,8 +158,8 @@ cr.initKitchenContent = function(c){
 	temp = null;
 	kc.innerHTML = html;
 	//
-	cr.fd.init({
+	co.fp.init({
 		data : tempFoodData
 	});
-	cr.fd.getFirstPage();
+	co.fp.getFirstPage();
 };
