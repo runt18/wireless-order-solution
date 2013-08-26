@@ -1,8 +1,10 @@
 $(function(){
-	initOrderData();
-	initCancelReason();
+	
 });
+//菜品数组
 var uoFood = [];
+
+var uoCancelFoods = [];
 var uoOther;
 var selectigRow = "";
 var typeForKeyNum;
@@ -12,8 +14,7 @@ var inputNumId1;
 var count;
 var selectingReasonName = "";
 var selectingReasonId = "";
-var customNumForUo;
-function initOrderData(){
+function initOrderData(data){
 	// 加载菜单数据
 	$.ajax({
 		url : '../QueryOrder.do',
@@ -21,9 +22,10 @@ function initOrderData(){
 		data : {
 			pin : pin,
 			restaurantID : restaurantID,
-			tableID : 1,			
+			tableID : data.alias,			
 		},
 		success : function(data, status, xhr){
+			uoFood = [];
 			if(data.success){
 				for(x in data.root){
 					uoFood.push(data.root[x]);
@@ -40,7 +42,15 @@ function initOrderData(){
 		error : function(request, status, err){
 			alert('初始化菜品数据失败.');
 		}
-	});
+	});	
+}
+//计算消费总额
+function getTotalPriceUO(){
+	var totalPriceUO = 0;
+	for(x in uoFood){
+		totalPriceUO += uoFood[x].count * uoFood[x].actualPrice;
+	}
+	return totalPriceUO;
 }
 function initCancelReason(){
 	$.ajax({
@@ -51,14 +61,14 @@ function initCancelReason(){
 			restaurantID : restaurantID,
 		},
 		success : function(data, status, xhr){
+			cancelReasonData = [];
 			data = JSON.parse(data);
 			for(x in data.root){
 				cancelReasonData.push(data.root[x]);
 			}
 		},
-		
 		error : function(request, status, err){
-			alert('初始化退菜数据失败.');
+			alert('初始化退菜原因失败.');
 		}
 	});
 }
@@ -70,7 +80,7 @@ function showNorthForUpdateOrder(){
 	}else{
 		tableName = uoOther.order.table.name;
 	}
-	customNum = uoOther.order.customNum;
+	var customNum = uoOther.order.customNum;
 	html = "<div>" +
 			"<span style ='margin: 10px;'>账单号：" + uoOther.order.id + " </span>" +
 			"<span style ='margin: 10px;'>餐台号：" + uoOther.order.table.alias + " </span>" +
@@ -80,7 +90,17 @@ function showNorthForUpdateOrder(){
 	$("#divNorthForUpdateOrder").html(html);
 }
 function showOrder(){
-	var html = "";
+	var html = "<tr>" +
+				"<th style = 'width: 4%'></th>" +
+				"<th style = 'width: 24%'>菜名</th>" +
+				"<th style = 'width: 6%'>数量</th>" +
+				"<th style = 'width: 22%'>口味</th>" +
+				"<th style = 'width: 6%'>单价</th>" +
+				"<th style = 'width: 6%'>总价</th>" +
+				"<th style = 'width: 10%'>时间</th>" +
+				"<th>操作</th>" +
+				"<th>服务员</th>" +
+			"</tr>";
 	var n = 1;
 	for(x in uoFood){
 		html += "<tr id = 'truoFood" + n + "' onclick = 'selectUOFood(this)'>" + 
@@ -96,7 +116,7 @@ function showOrder(){
 				"<td>" + uoFood[x].waiter + "</td></tr>";
 		n++;
 	}
-	$("#divCenterForUpdateOrder table").append(html);
+	$("#divCenterForUpdateOrder table").html(html);
 	//设置鼠标移到退菜按钮上的移进移出效果
 	$(".cancelFoodBtn").mouseover(function(){
 		$(this).css("backgroundColor", "#FFD700");
@@ -114,9 +134,10 @@ function showDescForUpdateOrder(){
 	var html = "";
 	html = "<div>" +
 	"<span style = 'margin-left: 500px;'>菜品数量：" + uoFood.length + "</span>" +
-	"<span style = 'margin-left: 50px;'>消费总额：</span>" +	
+	"<span style = 'margin-left: 50px;'>消费总额：</span>" + "<span id = 'spanTotalPriceUO'>" + "</span>" +	
 	"</div>";
 	$("#divDescForUpdateOrder").html(html);
+	$("#spanTotalPriceUO").html(getTotalPriceUO() + "元");
 }
 function selectUOFood(o){
 //	$("td").css("backgroundColor", "#87CEEB");
@@ -124,35 +145,41 @@ function selectUOFood(o){
 //	$("#" + selectigRow + " td").css("backgroundColor", "#FFA07A");
 }
 function cancelFood(o){
-	var rowId;
+	var rowId, foodName, dishes;
 	rowId = "truoFood" + o.id.substring(5, o.id.length);
 	count = $("#" + rowId).find("td").eq(2).text();
-	showKeyboardNumForUO("foodCount");	
-//	$("#" + o.id).unbind("click");
-//	//绑定取消退菜事件
-//	$("#" + o.id).bind("click", function(){
-//		cancelForCancelFood(rowId);
-//		$("#" + o.id).unbind("click");
-//		$("#" + o.id).bind("click", function(){
-//			cancelFood(this);
-//		});
-//	});
+	foodName = $("#" + rowId).find("td").eq(1).text();
+	dishes = $("#" + rowId).find("td").eq(3).text();
+	showKeyboardNumForUO("foodCount", foodName, dishes);	
 }
 //取消退菜按钮
 function cancelForCancelFood(rowId){
-	var cancelIndex;
+	var cancelIndex, foodName, dishes;
+	foodName = $("#" + rowId).find("td").eq(1).text();
+	dishes = $("#" + rowId).find("td").eq(3).text();
 	cancelIndex = $("#" + rowId).prevAll().length + 1;
 	$("#tabForUpdateOrder").find("tr").eq(cancelIndex).remove();
+	for(x in uoCancelFoods){
+		if(uoCancelFoods[x].foodName == foodName && uoCancelFoods[x].dishes == dishes){
+			uoCancelFoods.splice(x, 1);
+			break;
+		}
+	}
+	var totalPrice = getTotalPriceUO();
+	for(x in uoCancelFoods){
+		totalPrice += uoCancelFoods[x].totalPrice;
+	}
+	$("#spanTotalPriceUO").html(totalPrice + "元");
 	$("#" + rowId).find("td").eq(7).find("input").val("退菜");
 }
-function showKeyboardNumForUO(type){
+function showKeyboardNumForUO(type, foodName, dishes){
 	$("#divHideForUO").show();
 	$("#divKeyboardNumForUO").show(100);
 	
 	typeForKeyNum = type;
 	var title = "";
 	if(typeForKeyNum == "foodCount"){
-		title = "";
+		title = foodName + "(" + dishes + ")";
 	}else if(typeForKeyNum == "peopleCount"){
 		title = "请输入人数";
 	}
@@ -195,9 +222,7 @@ function showKeyboardNumForUO(type){
 
 //得到选中的退菜原因
 function getReason(o){
-//	$("#txtreasonForKeyboardNum").val(o.value);
 	selectingReasonName = o.value;
-//	$(".keyboardbutton.reason").unbind("mouseout mouseover");
 	$(".keyboardbutton.reason").css("backgroundColor", "#75B2F4");
     $("#" + o.id).css("backgroundColor", "#F0A00A");
 }
@@ -205,7 +230,7 @@ function inputNum1(o){
 	inputNumVal1 += o.value;
 	$("#" + inputNumId1).val(inputNumVal1);
 	//判断退菜数目是否合法
-	if(typeForKeyNum == "foodCount"){
+	if(inputNumId1 == "txtNumForUO"){
 		if(parseFloat($("#" + inputNumId1).val()) > count){
 			alert("退菜数不能超过点菜数！");
 			inputNumVal1 = "";
@@ -261,7 +286,11 @@ $("#addOneForKeyboardNumUO1").click(function(){
 });
 //减一按钮1
 $("#deleteOneForKeyboardNumUO1").click(function(){
-	inputNumVal1 = parseInt(inputNumVal1) - 1;
+	if($("#" + inputNumId1).val() == "" || parseInt($("#" + inputNumId1).val()) <= 0){
+		inputNumVal1 = 0;
+	}else{
+		inputNumVal1 = parseInt($("#" + inputNumId1).val()) - 1;
+	}
 	$("#" + inputNumId1).val(inputNumVal1);
 	$("#" + inputNumId1).focus();
 });
@@ -276,24 +305,48 @@ $("#btnSubmitForKeyboardNumUO").click(function(){
 	var num = $("#" + inputNumId1).val();
 	num = parseFloat(num).toFixed(1);
 	if(num == 0){
-		alert("退菜数目不能为0");
+		alert("退菜数目不能为0或太小");
 	}else if(num == 'NaN'){
 		alert("数字不合规范");
 		inputNumVal1 = count;
 		$("#" + inputNumId1).val(inputNumVal1);
 		$("#" + inputNumId1).focus();
 	}else{
-		var rowId, htmlcancel = "";
+		var uoCancelFood = {
+				foodName : "" ,
+				dishes : "" ,
+				count : 0 ,
+				reason : "" ,
+				actualPrice : "",
+				totalPrice : "",
+			};
+		var rowId, htmlcancel = "", foodName, totalPrice, actualPrice;
 		rowId = selectigRow;
+		foodName = $("#" + rowId).find("td").eq(1).text();
+		actualPrice = $("#" + rowId).find("td").eq(4).text();
+		totalPrice = actualPrice * (-num);
 		htmlcancel = "<tr><td style = 'background: #FFA07A'>退</td>" +
-				"<td style = 'background: #FFA07A'>" + $("#" + rowId).find("td").eq(1).text() + "</td>" +
-				"<td style = 'background: #FFA07A'>-" + num + "</td>" +
+				"<td style = 'background: #FFA07A'>" + foodName + "</td>" +
+				"<td style = 'background: #FFA07A'>" + (-num) + "</td>" +
 				"<td colspan = '7' style = 'background: #FFA07A'> " +
 				"退菜原因：" + selectingReasonName + "</td>" + 
 						"</tr>";
 		
 		$("#" + rowId).after(htmlcancel);
-//		$("#" + rowId + " td").css("backgroundColor", "#FFA07A");	
+		//把相关数据加到退菜信息对象
+		uoCancelFood.foodName = foodName;
+		uoCancelFood.dishes = $("#" + rowId).find("td").eq(3).text();
+		uoCancelFood.count = -num;
+		uoCancelFood.reason = selectingReasonName;
+		uoCancelFood.actualPrice = actualPrice;
+		uoCancelFood.totalPrice = totalPrice;
+		uoCancelFoods.push(uoCancelFood);
+		//更改消费总额
+		var totalPrice = getTotalPriceUO();
+		for(x in uoCancelFoods){
+			totalPrice += uoCancelFoods[x].totalPrice;
+		}
+		$("#spanTotalPriceUO").html(totalPrice + "元");
 		//关闭该界面
 		$("#divKeyboardNumForUO").hide(100);
 		$("#divHideForUO").hide();
@@ -312,20 +365,26 @@ $("#btnSubmitForKeyboardNumUO").click(function(){
 				cancelFood(this);
 			});
 		});
-	}	
+	};	
 });
 
 //确定按钮1
 $("#btnSubmitForKeyboardNumUO1").click(function(){
 	var num;
-	num = $("#" + inputNumId1).val();
-	
-	//关闭该界面
-	$("#divKeyboardPeopleForUO").hide(100);
-	$("#divHideForUO").hide();
-	inputNumVal1 = "";
-	$("#" + inputNumId1).val(inputNumVal1);		
-	$("#customNumForUO").html("用餐人数：" + num);		
+	num = parseInt($("#" + inputNumId1).val());
+	if(num > 999){
+		alert("人数不能超过999人");
+		inputNumVal1 = "";
+		$("#" + inputNumId1).val(inputNumVal1);
+	}else{
+		//关闭该界面
+		$("#divKeyboardPeopleForUO").hide(100);
+		$("#divHideForUO").hide();
+		inputNumVal1 = "";
+		$("#" + inputNumId1).val(inputNumVal1);		
+		$("#customNumForUO").html("用餐人数：" + num);
+	};
+			
 });
 
 
@@ -350,30 +409,50 @@ function showdivKeyboardPeopleForUO(){
 		$("#" + inputNumId1).val(inputNumVal1);
 	});	
 }
+//点击工具栏的确定按钮
+function sureForUO(){	
+	for(x in uoFood){
+		for(y in uoCancelFoods){
+			if(uoFood[x].name == uoCancelFoods[y].foodName && uoFood[x].tasteGroup.tastePref){
+				uoFood[x].count = (uoFood[x].count + uoCancelFoods[y].count).toFixed(2);
+				uoFood[x].cancelReason = uoCancelFoods[y].reason;
+			}
+		}
+	}
+	uo.updateOrder = uoFood;
+	for(x in updateOrder){
+		
+	}
+//	alert(JSON.stringify(uo.updateOrder));
+//	alert(uoFood[1].count);
+	toggleContentDisplay({type:'hide', renderTo:'divUpdateOrder'});
+}
 
+//点击工具栏的取消按钮
+function cancelForUO(){
+//	showNorthForUpdateOrder();
+//	showOrder();	
+	toggleContentDisplay({type:'hide', renderTo:'divUpdateOrder'});
+}
 
-
-
-
-
+uo.show = function(c){
+	toggleContentDisplay({
+		type:'show', 
+		renderTo:'divUpdateOrder'
+	});
+	initOrderData(c.table);
+	initCancelReason();
+	
+//	alert(c.table.alias);
+};
 
 function nextRow(){
-	var rowId;
-	rowId = parseInt(selectigRow.substring(8, selectigRow.length)) + 1;
-	if(rowId > uoFood.length){
-		rowId = 1;
-	}
-	selectigRow = "truoFood" + rowId;
-//	$("td").css("backgroundColor", "#87CEEB");
-//	$("#" + selectigRow + " td").css("backgroundColor", "#FFA07A");
+	var scrollTop;
+	scrollTop = $("#divCenterForUpdateOrder").scrollTop() + 50;
+	$("#divCenterForUpdateOrder").scrollTop(scrollTop);
 }
 function preRow(){
-	var rowId;
-	rowId = parseInt(selectigRow.substring(8, selectigRow.length)) - 1;
-	if(rowId == 0){
-		rowId = uoFood.length;
-	}
-	selectigRow = "truoFood" + rowId;
-//	$("td").css("backgroundColor", "#87CEEB");
-//	$("#" + selectigRow + " td").css("backgroundColor", "#FFA07A");
-}
+	var scrollTop;
+	scrollTop = $("#divCenterForUpdateOrder").scrollTop() - 50;
+	$("#divCenterForUpdateOrder").scrollTop(scrollTop);
+};
