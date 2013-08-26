@@ -10,7 +10,8 @@
 	background-color: #FFA500;
 }
 #divCenterForUpdateOrder{
-	width:100%; 
+	width:100%;
+	overflow-y: auto; 
 	box-flex: 1;
 	-webkit-box-flex: 1;
 }
