@@ -3,7 +3,6 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>触摸屏点菜端</title>
-<!-- <link rel="stylesheet" href="./css/scrollbar.css"> -->
 <link rel="stylesheet" href="./css/base.css">
 <link rel="stylesheet" href="./css/tableSelect.css">
 <link rel="stylesheet" href="./css/updateOrder.css">
@@ -222,7 +221,7 @@ var uo = {
 	      	<div class="button-base" onClick="co.addFood()" style="">数量+1</div>
 	      	<div class="button-base" onClick="co.cutFood()">数量-1</div>
 	      	<div class="button-base" onClick="co.deleteFood()">删除</div>
-	      	<div class="button-base" onClick="co.operateFoodTaste()">口味</div>
+	      	<div class="button-base" onClick="co.ot.show()">口味</div>
 	      	<div class="button-base" >催菜</div>
 	      	<div class="button-base" onClick="aaaaaaa()">叫起</div>
     	</div>
@@ -249,30 +248,12 @@ var uo = {
 	<div class="box-horizontal" style="height: 513px;">
 		<div style="width: 490px;">1</div>
 		<div id="divCenterForOperateTaste" class="box-vertical" style="width: 310px; border-left: 1px solid #FFF;">
-			<div class="box-horizontal" style="line-height: 60px;">
-				<div id="divButtonForCommonTaste" class="button-base" style="width: 103px;">常用口味</div>
-				<div id="divButtonForAllTaste" class="button-base" style="width: 100px; margin: 0 1px 0 1px;">所有口味</div>
-				<div id="divButtonForGuiGeTaste" class="button-base" style="width: 103px;">规格</div>
+			<div id="divCFOTTasteChange" class="box-horizontal" style="line-height: 60px;">
+				<div id="divButtonForCommonTaste" class="button-base" style="width: 103px;" onClick="co.ot.changeTaste({type:parseInt(this.getAttribute('data-value'))})" data-value=1>常用口味</div>
+				<div id="divButtonForAllTaste" class="button-base" style="width: 100px; margin: 0 1px 0 1px;" onClick="co.ot.changeTaste({type:parseInt(this.getAttribute('data-value'))})" data-value=2>所有口味</div>
+				<div id="divButtonForGuiGeTaste" class="button-base" style="width: 103px;" onClick="co.ot.changeTaste({type:parseInt(this.getAttribute('data-value'))})" data-value=3>规格</div>
 			</div>
-			<div id="divCFOTTasteContent" id="div" style="-webkit-box-flex: 1; overflow-y: auto;">
-				<!-- 
-				<div class="divCFCOAllFood-main-box">&nbsp;</div>
-				<div class="divCFCOAllFood-main-box">&nbsp;</div>
-				<div class="divCFCOAllFood-main-box">&nbsp;</div>
-				<div class="divCFCOAllFood-main-box">&nbsp;</div>
-				<div class="divCFCOAllFood-main-box">&nbsp;</div>
-				<div class="divCFCOAllFood-main-box">&nbsp;</div>
-				<div class="divCFCOAllFood-main-box">&nbsp;</div>
-				<div class="divCFCOAllFood-main-box">&nbsp;</div>
-				<div class="divCFCOAllFood-main-box">&nbsp;</div>
-				<div class="divCFCOAllFood-main-box">&nbsp;</div>
-				<div class="divCFCOAllFood-main-box">&nbsp;</div>
-				<div class="divCFCOAllFood-main-box">&nbsp;</div>
-				<div class="divCFCOAllFood-main-box">&nbsp;</div>
-				<div class="divCFCOAllFood-main-box">&nbsp;</div>
-				<div class="divCFCOAllFood-main-box">&nbsp;</div> 
-				-->
-			</div>
+			<div id="divCFOTTasteContent" id="div" style="-webkit-box-flex: 1;"></div>
 		</div>
 	</div>
 	<div class="box-horizontal" style=" border-bottom: 1px solid #FFF; border-top: 1px solid #FFF; height: 25px; background: #FFD700;">
