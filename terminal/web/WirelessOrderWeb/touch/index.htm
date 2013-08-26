@@ -1,7 +1,6 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>触摸屏点菜端</title>
 <!-- <link rel="stylesheet" href="./css/scrollbar.css"> -->
@@ -22,6 +21,11 @@ var cr = {
 	table : {},
 	newFood : []
 };
+//查看和修改账单操作包
+var uo = {
+	table : {},
+	updateOrder : []
+}
 </script>
 <script type="text/javascript" src="./js/index.js"></script>
 </head>
@@ -122,22 +126,11 @@ var cr = {
 		<span id="spanRestaurantName"></span>
 	</div>
 </div>
-<div id="divUpdateOrder" class="box-vertical content">
+<div id="divUpdateOrder" class="box-vertical content content-hide">
 	<div id = "divNorthForUpdateOrder">
 	</div>
 	<div id = "divCenterForUpdateOrder">
 		<table style = "" id = "tabForUpdateOrder">
-			<tr>
-				<th style = "width: 4%"></th>
-				<th style = "width: 24%">菜名</th>
-				<th style = "width: 6%">数量</th>
-				<th style = "width: 22%">口味</th>
-				<th style = "width: 6%">单价</th>
-				<th style = "width: 6%">总价</th>
-				<th style = "width: 10%">时间</th>
-				<th>操作</th>
-				<th>服务员</th>
-			</tr>
 		</table>
 	</div>
 	<div id = "divHideForUO"></div>	
@@ -184,25 +177,24 @@ var cr = {
 				<input type = "button" value = "2" class = "keyboardbutton" style = "margin: 5px 0 0 5px;" onclick = "inputNum1(this)"/>
 				<input type = "button" value = "3" class = "keyboardbutton" style = "margin: 5px 0 0 5px;" onclick = "inputNum1(this)"/>
 				<input type = "button" value = "确定" id = "btnSubmitForKeyboardNumUO1" class = "keyboardbutton" style = "margin: 5px 0 0 13px; width: 156px;" />
-				<input type = "button" value = "0" class = "keyboardbutton" style = "margin: 5px 0 0 5px;" onclick = "inputNum1(this)"/>
+				<input type = "button" value = "取消" id = "btnCloseForKeyboardNumUO1" class = "keyboardbutton" style = "margin: 5px 0 0 5px;" />
 			</div>
 			<div id = "divRightForKeyboardPeopleForUO">
 				<input type = "button" value = "-" id = "deleteOneForKeyboardNumUO1" class = "keyboardbutton" style = "margin: 0 0 0 5px;" />
 				<input type = "button" value = "<<" id = "btnBackAllForKeyboardNumUO1" class = "keyboardbutton" style = "margin: 5px 0 0 5px;" />
-				<input type = "button" value = "取消" id = "btnCloseForKeyboardNumUO1" class = "keyboardbutton" style = "margin: 5px 0 0 5px;"/>
-				<input type = "button" value = "00" class = "keyboardbutton" style = "margin: 5px 0 0 5px; height: 137px;" onclick = "inputNum1(this)"/>
+				<input type = "button" value = "00" class = "keyboardbutton" style = "margin: 5px 0 0 5px;" onclick = "inputNum1(this)"/>
+				<input type = "button" value = "0" class = "keyboardbutton" style = "margin: 5px 0 0 5px; height: 137px;" onclick = "inputNum1(this)"/>
 			</div>
 		</div>
 	</div>			
 	<div id = "divDescForUpdateOrder" class = "box-horizontal" style = "background: #FFD700;">
 	</div>
 	<div id = "divSouthForUpdateOrder" class="box-horizontal">
-		<div class="button-base" style="margin-right: 2px; margin-left: 300px;" onClick="toggleContentDisplay({type:'hide', renderTo:'divUpdateOrder'})">返回</div>
-  		<div class="button-base" style="margin-right: 2px;" onclick = "preRow()">上翻</div>
+  		<div class="button-base" style="margin-right: 2px;  margin-left: 300px;" onclick = "preRow()">上翻</div>
   		<div class="button-base" style="margin-right: 2px;" onclick = "nextRow()">下翻</div>
   		<div class="button-base" style="margin-left: 2px;" onclick = "showdivKeyboardPeopleForUO()">人数</div>
-  		<div class="button-base" style="margin-left: 2px;">确定</div>
-  		<div class="button-base" style="margin-left: 2px;">取消</div>
+  		<div class="button-base" style="margin-left: 2px;" onclick = "sureForUO()">确定</div>
+  		<div class="button-base" style="margin-left: 2px;" onClick="cancelForUO()">取消</div>
 	</div>
 </div>
 
