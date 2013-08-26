@@ -93,10 +93,9 @@
 }
 .desk-number{
 	height: 59px; 
-	width:120px; 
+	width:110px; 
 	margin: 3px; 
 	font-size: 20px;
-	padding-left: 50px;
 	background-color: #FFD700;
 }
 .table-number{
