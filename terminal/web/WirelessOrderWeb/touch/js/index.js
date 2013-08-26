@@ -191,8 +191,8 @@ $(function(){
 	
 	$.getScript('./js/tableSelect/tsMain.js');
 	
-//	$.getScript('./js/updateOrder/uoLoad.js');
-//	$.getScript('./js/updateOrder/uoMain.js');
+	$.getScript('./js/updateOrder/uoLoad.js');
+	$.getScript('./js/updateOrder/uoMain.js');
 });
 
 /**

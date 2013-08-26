@@ -420,9 +420,6 @@ function sureForUO(){
 		}
 	}
 	uo.updateOrder = uoFood;
-	for(x in updateOrder){
-		
-	}
 //	alert(JSON.stringify(uo.updateOrder));
 //	alert(uoFood[1].count);
 	toggleContentDisplay({type:'hide', renderTo:'divUpdateOrder'});
@@ -437,8 +434,8 @@ function cancelForUO(){
 
 uo.show = function(c){
 	toggleContentDisplay({
-		type:'show', 
-		renderTo:'divUpdateOrder'
+		type: 'show', 
+		renderTo: 'divUpdateOrder'
 	});
 	initOrderData(c.table);
 	initCancelReason();

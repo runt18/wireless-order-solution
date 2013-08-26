@@ -299,8 +299,9 @@ function selectTable(o){
 	//判断是否为已点菜餐桌
 	if(tableMessage.statusText == "就餐"){
 //		toggleContentDisplay({type:'show', renderTo:'divUpdateOrder'});
+		
 		uo.show({
-			table : getTableBytableId(o.id.substring(8, o.id.length)),
+			table : getTableBytableId(o.id.substring(8, o.id.length))
 		});
 	}else{
 		$("#divHideForTableSelect").show();
