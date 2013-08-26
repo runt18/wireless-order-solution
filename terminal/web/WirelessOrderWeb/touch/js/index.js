@@ -44,7 +44,19 @@ var Templet = {
   			+ '</div>'
 	},
 	uo : {
-		order : '<tr ></tr>'
+		orderFood : '<tr data-index = {dataIndex} data-value = {id} id = "truoFood{dataIndex}" onclick = "selectUOFood(this)">'
+			+ 'data-type = "orderFood-select" >'
+			+ '<td>{dataIndex}</td>'
+			+ '<td>{name}</td>'
+			+ '<td>{count}</td>'
+			+ '<td>{tastePref}</td>'
+			+ '<td>{actualPrice}</td>'
+			+ '<td>{totalPrice}</td>'
+			+ '<td>{orderDateFormat}</td>'
+			+ '<td><input type = "button" value= "退菜" id = "btnuo{dataIndex}" ' 
+			+ 'class = "cancelFoodBtn" /></td>'
+			+ '<td>{waiter}</td>'
+			+ '</tr>'
 	}
 };
 
