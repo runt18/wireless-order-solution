@@ -44,7 +44,6 @@ body{ overflow: hidden; }
 }
 
 .content-hide{
-	z-index: -1;
 	-webkit-animation: content-hide-outDownBig .5s .01s ease both;
 	-moz-animation: content-hide-outDownBig .5s .01s ease both;
 }
@@ -57,40 +56,63 @@ body{ overflow: hidden; }
 	100%{opacity:0; -moz-transform:translateY(100%)}
 }
 
+.dialong-lm-show{
+	z-index: 9999;
+	-webkit-animation: dl-lm-bounceIn .3s .01s ease both;
+	-moz-animation: dl-bounceIn .3s .01s ease both;
+}
+@-webkit-keyframes dl-lm-bounceIn{
+	0%{opacity:0; -webkit-transform:scale(0)}
+	100%{opacity:.5; -webkit-transform:scale(1)}
+}
+@-moz-keyframes dl-lm-bounceIn{
+	0%{opacity:0; -moz-transform:scale(0)}
+	100%{opacity:.5; -moz-transform:scale(1)}
+}
+.dialong-lm-hide{
+	-webkit-animation: dl-lm-bounceOut .2s .01s ease both;
+	-moz-animation: dl-lm-bounceOut .2s .01s ease both;
+}
+@-webkit-keyframes dl-lm-bounceOut{
+	0%{opacity:.5; -webkit-transform:scale(1)}
+	100%{opacity:0; -webkit-transform:scale(0)}
+}
+@-moz-keyframes dl-lm-bounceOut{
+	0%{opacity:.5; -moz-transform:scale(1)}
+	100%{opacity:0; -moz-transform:scale(0)}
+}
+
 .dialong-show{
 	z-index: 9999;
-	-webkit-animation: dl-bounceIn .5s .2s ease both;
-	-moz-animation: dl-bounceIn .5s .2s ease both;
+	-webkit-animation: dl-bounceIn .5s .01s ease both;
+	-moz-animation: dl-bounceIn .5s .01s ease both;
 }
 @-webkit-keyframes dl-bounceIn{
-	0%{opacity:0; -webkit-transform:scale(.3)}
+	0%{opacity:0; -webkit-transform:scale(0)}
 	50%{opacity:.3; -webkit-transform:scale(1.1)}
-	70%{opacity:.3; -webkit-transform:scale(.9)}
-	100%{opacity:.3; -webkit-transform:scale(1)}
+	70%{opacity:.7; -webkit-transform:scale(.9)}
+	100%{opacity:1; -webkit-transform:scale(1)}
 }
 @-moz-keyframes dl-bounceIn{
-	0%{opacity:0; -moz-transform:scale(.3)}
-	50%{opacity:.3; -moz-transform:scale(1.05)}
-	70%{opacity:.3; -moz-transform:scale(.9)}
-	100%{opacity:.3; -moz-transform:scale(1)}
+	0%{opacity:0; -moz-transform:scale(0)}
+	50%{opacity:.3; -moz-transform:scale(1.1)}
+	70%{opacity:.7; -moz-transform:scale(.9)}
+	100%{opacity:1; -moz-transform:scale(1)}
 }
 
 .dialong-hide{
-	z-index: -1;
-	-webkit-animation: dl-bounceOut 1s .2s ease both;
-	-moz-animation: dl-bounceOut 1s .2s ease both;
+	-webkit-animation: dl-bounceOut .3s .01s ease both;
+	-moz-animation: dl-bounceOut .3s .01s ease both;
 }
 @-webkit-keyframes dl-bounceOut{
-	0%{opacity:.3; -webkit-transform:scale(1)}
-	25%{-webkit-transform:scale(.95)}
-	50%{-webkit-transform:scale(1.1)}
-	100%{opacity:0; -webkit-transform:scale(.3)}
+	0%{opacity:1; -webkit-transform:scale(1)}
+	25%{opacity:1; -webkit-transform:scale(1.1)}
+	100%{opacity:0; -webkit-transform:scale(0)}
 }
 @-moz-keyframes dl-bounceOut{
-	0%{opacity:.3; -moz-transform:scale(1)}
-	25%{-moz-transform:scale(.95)}
-	50%{ -moz-transform:scale(1.1)}
-	100%{opacity:0; -moz-transform:scale(.3)}
+	0%{opacity:1; -moz-transform:scale(1)}
+	25%{opacity:1; -moz-transform:scale(1.1)}
+	100%{opacity:0; -moz-transform:scale(0)}
 }
 
 .button-base{
