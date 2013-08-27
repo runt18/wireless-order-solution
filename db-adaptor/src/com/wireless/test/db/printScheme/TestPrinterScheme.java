@@ -96,7 +96,8 @@ public class TestPrinterScheme {
 																	   .setRepeat(2)
 																	   .addRegion(regions.get(0))
 																	   .addRegion(regions.get(1))
-																	   .setDepartment(depts.get(0));
+																	   .addDepartment(depts.get(0))
+																	   .addDepartment(depts.get(1));
 			
 			//Add a summary function to this printer
 			int summaryFuncId = PrintFuncDao.addFunc(dbCon, mStaff, printerId, summaryFuncBuilder);
@@ -113,7 +114,9 @@ public class TestPrinterScheme {
 																			.setRepeat(3)
 																			.addRegion(regions.get(1))
 																			.addRegion(regions.get(2))
-																			.setDepartment(depts.get(1));
+																			.addDepartment(depts.get(1))
+																			.addDepartment(depts.get(2));
+			
 			int allCancelledFoodId = PrintFuncDao.addFunc(dbCon, mStaff, printerId, allCancelledFoodBuilder);
 			
 			//退菜详细
@@ -176,15 +179,15 @@ public class TestPrinterScheme {
 			receipt.setId(receiptId);
 			expected.addFunc(receipt);
 			
-			PrintFunc tempReceipt = receiptBuilder.build();
+			PrintFunc tempReceipt = tempReceiptBuilder.build();
 			tempReceipt.setId(tempReceiptId);
-			expected.addFunc(receipt);
+			expected.addFunc(tempReceipt);
 			
-			PrintFunc transferTable = receiptBuilder.build();
+			PrintFunc transferTable = transferTableBuilder.build();
 			tempReceipt.setId(transferTableId);
 			expected.addFunc(transferTable);
 			
-			PrintFunc allHurriedFood = receiptBuilder.build();
+			PrintFunc allHurriedFood = allHurriedFoodBuilder.build();
 			tempReceipt.setId(allHurriedFoodId);
 			expected.addFunc(allHurriedFood);
 			
@@ -215,6 +218,7 @@ public class TestPrinterScheme {
 			expected.setName("GP-80250-201");
 			expected.setStyle(PStyle.PRINT_STYLE_80MM);
 			expected.setAlias("中厨打印机");
+			expected.setEnabled(false);
 			//Compare after update printer
 			compare(expected, PrinterDao.getPrinterById(dbCon, mStaff, printerId));
 			

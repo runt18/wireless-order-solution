@@ -75,12 +75,12 @@ public class PrintFuncDao {
 		}	
 		
 		//Insert the department to this print function
-		if(!func.isDeptAll()){
+		for(Department dept : func.getDepartment()){
 			sql = " INSERT INTO " + Params.dbName + ".func_dept" +
 				  "( func_id, dept_id, restaurant_id )" +
 				  " VALUES(" +
 				  funcId + "," +
-				  func.getDepartment().getId() + "," +
+				  dept.getId() + "," +
 				  term.getRestaurantId() + 
 				  ")";
 			dbCon.stmt.executeUpdate(sql);
@@ -260,12 +260,12 @@ public class PrintFuncDao {
 		dbCon.stmt.executeUpdate(sql);
 		
 		//Insert the department to this print function
-		if(!func.isDeptAll()){
+		for(Department dept : func.getDepartment()){
 			sql = " INSERT INTO " + Params.dbName + ".func_dept" +
 				  "( func_id, dept_id, restaurant_id )" +
 				  " VALUES(" +
 				  funcId + "," +
-				  func.getDepartment().getId() + "," +
+				  dept.getId() + "," +
 				  term.getRestaurantId() + 
 				  ")";
 			dbCon.stmt.executeUpdate(sql);
@@ -350,8 +350,8 @@ public class PrintFuncDao {
 				  " WHERE FD.func_id = " + func.getId();
 			
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
-			if(dbCon.rs.next()){
-				func.setDepartment(new Department(dbCon.rs.getInt("restaurant_id"),
+			while(dbCon.rs.next()){
+				func.addDepartment(new Department(dbCon.rs.getInt("restaurant_id"),
 												  dbCon.rs.getShort("dept_id"),
 												  dbCon.rs.getString("name")));
 			}
