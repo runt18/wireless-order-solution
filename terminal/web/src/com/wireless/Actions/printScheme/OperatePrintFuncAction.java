@@ -53,6 +53,162 @@ public class OperatePrintFuncAction extends DispatchAction{
 		return null;
 	}
 	
+	//FIXME
+	public ActionForward port(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception{
+		request.setCharacterEncoding("UTF-8");
+		response.setCharacterEncoding("UTF-8");
+		DBCon dbCon = new DBCon();
+		
+		int pType = PType.PRINT_UNKNOWN.getVal();
+		String printerName = "";
+		
+		try{
+			dbCon.connect();
+			
+			String account = request.getParameter("account");
+			printerName = request.getParameter("printerName");
+			String repeat = request.getParameter("repeat");
+			String kitchenIds = request.getParameter("kitchens");
+			String deptId = request.getParameter("dept");
+			String regionIds = request.getParameter("regions");
+			pType = Integer.parseInt(request.getParameter("pType"));
+
+			int staffId = 0;
+			int restaurantId = 0;
+			String sql;
+			sql = " SELECT STAFF.restaurant_id, STAFF.staff_id FROM " + 
+				  " restaurant REST JOIN staff STAFF ON REST.id = STAFF.restaurant_id " +
+				  " WHERE REST.account = '" + account + "'";
+			dbCon.rs = dbCon.stmt.executeQuery(sql);
+			if(dbCon.rs.next()){
+				restaurantId = dbCon.rs.getInt("restaurant_id");
+				staffId = dbCon.rs.getInt("staff_id");
+			}
+			dbCon.rs.close();
+			
+			Staff staff = StaffDao.verify(staffId);
+			
+			int printerId = 0;
+			sql = " SELECT printer_id FROM printer WHERE " +
+				  " name = '" + printerName + "'" +
+				  " AND " +
+				  " restaurant_id = " + restaurantId;
+			dbCon.rs = dbCon.stmt.executeQuery(sql);
+			if(dbCon.rs.next()){
+				printerId = dbCon.rs.getInt("printer_id");
+			}
+			dbCon.rs.close();
+			
+			
+			String[] depts = null, kitchens = null ,regions = null;
+			
+			if(!deptId.trim().isEmpty()){
+				depts = deptId.split(",");
+			}else{
+				depts = new String[0];
+			}
+
+			if(!kitchenIds.trim().isEmpty()){
+				kitchens = kitchenIds.split(",");
+			}else{
+				kitchens = new String[0];
+			}
+			
+			if(!regionIds.trim().isEmpty()){
+				regions = regionIds.split(",");
+			}else{
+				regions = new String[0];
+			}
+			
+			if(PType.valueOf(pType) == PType.PRINT_ORDER){
+				PrintFunc.SummaryBuilder summaryBuilder = SummaryBuilder.newPrintOrder();
+				for (String region : regions) {
+					summaryBuilder.addRegion(new Region(Short.parseShort(region)));
+				}
+				summaryBuilder.setRepeat(Integer.parseInt(repeat));
+				for(String dept : depts){
+					summaryBuilder.addDepartment(new Department(restaurantId, Short.parseShort(dept), null));
+				}
+				PrintFuncDao.addFunc(dbCon, staff, printerId, summaryBuilder);
+				
+			}else if(PType.valueOf(pType) == PType.PRINT_ALL_CANCELLED_FOOD){
+				PrintFunc.SummaryBuilder summaryBuilder = SummaryBuilder.newAllCancelledFood();
+				for (String region : regions) {
+					summaryBuilder.addRegion(new Region(Short.parseShort(region)));
+				}
+				summaryBuilder.setRepeat(Integer.parseInt(repeat));
+				for(String dept : depts){
+					summaryBuilder.addDepartment(new Department(restaurantId, Short.parseShort(dept), null));
+				}
+				PrintFuncDao.addFunc(dbCon, staff, printerId, summaryBuilder);
+				
+			}else if(PType.valueOf(pType) == PType.PRINT_ORDER_DETAIL){
+				PrintFunc.DetailBuilder detailBuilder = DetailBuilder.newPrintFoodDetail();
+				for (String kitchenAlias : kitchens) {
+					Kitchen k = new Kitchen();
+					k.setAliasId(Short.parseShort(kitchenAlias));
+					detailBuilder.addKitchen(k);
+				}
+				detailBuilder.setRepeat(Integer.parseInt(repeat));
+				PrintFuncDao.addFunc(dbCon, staff, printerId, detailBuilder);
+				
+			}else if(PType.valueOf(pType) == PType.PRINT_CANCELLED_FOOD){
+				PrintFunc.DetailBuilder detailBuilder = DetailBuilder.newCancelledFood();
+				for (String kitchenAlias : kitchens) {
+					Kitchen k = new Kitchen();
+					k.setAliasId(Short.parseShort(kitchenAlias));
+					detailBuilder.addKitchen(k);
+				}
+				detailBuilder.setRepeat(Integer.parseInt(repeat));
+				PrintFuncDao.addFunc(dbCon, staff, printerId, detailBuilder);
+				
+			}else if(PType.valueOf(pType) == PType.PRINT_RECEIPT){
+				PrintFunc.Builder builder = Builder.newReceipt();
+				for (String regionId : regions) {
+					builder.addRegion(new Region(Short.parseShort(regionId)));
+				}
+				builder.setRepeat(Integer.parseInt(repeat));
+				PrintFuncDao.addFunc(dbCon, staff, printerId, builder);
+				
+			}else if(PType.valueOf(pType) ==PType.PRINT_TEMP_RECEIPT){
+				PrintFunc.Builder builder = Builder.newTempReceipt();
+				for (String regionId : regions) {
+					builder.addRegion(new Region(Short.parseShort(regionId)));
+				}
+				builder.setRepeat(Integer.parseInt(repeat));
+				PrintFuncDao.addFunc(dbCon, staff, printerId, builder);
+				
+			}else if(PType.valueOf(pType) ==PType.PRINT_TRANSFER_TABLE){
+				PrintFunc.Builder builder = Builder.newTransferTable();
+				for (String regionId : regions) {
+					builder.addRegion(new Region(Short.parseShort(regionId)));
+				}
+				builder.setRepeat(Integer.parseInt(repeat));
+				PrintFuncDao.addFunc(dbCon, staff, printerId, builder);
+				
+			}else if(PType.valueOf(pType) ==PType.PRINT_ALL_HURRIED_FOOD){
+				PrintFunc.Builder builder = Builder.newAllHurriedFood();
+				for (String regionId : regions) {
+					builder.addRegion(new Region(Short.parseShort(regionId)));
+				}
+				builder.setRepeat(Integer.parseInt(repeat));
+				PrintFuncDao.addFunc(dbCon, staff, printerId, builder);
+			}
+		
+			response.getWriter().print("Port print scheme '" + printerName + " - " + PType.valueOf(pType).getVal() + "' successfully...");
+			
+		}catch(BusinessException e){
+			response.getWriter().print("Port print scheme '" + printerName + " - " + PType.valueOf(pType).getVal() + "' fail...");
+			e.printStackTrace();
+		}catch(Exception e){
+			response.getWriter().print("Port print scheme '" + printerName + " - " + PType.valueOf(pType).getVal() + "' fail...");
+			e.printStackTrace();
+		}finally{
+			dbCon.disconnect();
+		}
+		
+		return null;
+	}
 	
 	public ActionForward insert(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception{
 		request.setCharacterEncoding("UTF-8");
@@ -64,9 +220,9 @@ public class OperatePrintFuncAction extends DispatchAction{
 			dbCon.connect();
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			String repeat = request.getParameter("repeat");
-			String kitchens = request.getParameter("kitchens");
-			String dept = request.getParameter("dept");
-			String regions = request.getParameter("regions");
+			String kitchenIds = request.getParameter("kitchens");
+			String deptId = request.getParameter("dept");
+			String regionIds = request.getParameter("regions");
 			int printerId = -1;
 			if(request.getParameter("printerId") == null){
 				String printerName = request.getParameter("printerName");
@@ -77,84 +233,91 @@ public class OperatePrintFuncAction extends DispatchAction{
 			 
 			int pType = Integer.parseInt(request.getParameter("pType"));
 			
-			Department de = null;
-			if(!dept.trim().isEmpty()){
-				de = DepartmentDao.getDepartmentById(staff, Integer.parseInt(dept));
+			Department dept = null;
+			if(!deptId.trim().isEmpty()){
+				dept = DepartmentDao.getDepartmentById(staff, Integer.parseInt(deptId));
 			}
 			
 			
-			String[] kitchen = null ,region = null;
-			if(!kitchens.trim().isEmpty()){
-				kitchen = kitchens.split(",");
+			String[] kitchens = null ,regions = null;
+			if(!kitchenIds.trim().isEmpty()){
+				kitchens = kitchenIds.split(",");
 			}else{
-				kitchen = new String[0];
+				kitchens = new String[0];
 			}
 			
-			if(!regions.trim().isEmpty()){
-				region = regions.split(",");
+			if(!regionIds.trim().isEmpty()){
+				regions = regionIds.split(",");
 			}else{
-				region = new String[0];
+				regions = new String[0];
 			}
 			
 			if(PType.valueOf(pType) == PType.PRINT_ORDER){
 				PrintFunc.SummaryBuilder summaryBuilder = SummaryBuilder.newPrintOrder();
-				for (String r : region) {
-					summaryBuilder.addRegion(new Region(Short.parseShort(r)));
+				for (String region : regions) {
+					summaryBuilder.addRegion(new Region(Short.parseShort(region)));
 				}
 				summaryBuilder.setRepeat(Integer.parseInt(repeat));
-				summaryBuilder.setDepartment(de);
+				summaryBuilder.addDepartment(dept);
 				PrintFuncDao.addFunc(dbCon, staff, printerId, summaryBuilder);
+				
 			}else if(PType.valueOf(pType) == PType.PRINT_ALL_CANCELLED_FOOD){
 				PrintFunc.SummaryBuilder summaryBuilder = SummaryBuilder.newAllCancelledFood();
-				for (String r : region) {
-					summaryBuilder.addRegion(new Region(Short.parseShort(r)));
+				for (String region : regions) {
+					summaryBuilder.addRegion(new Region(Short.parseShort(region)));
 				}
 				summaryBuilder.setRepeat(Integer.parseInt(repeat));
-				summaryBuilder.setDepartment(de);
+				summaryBuilder.addDepartment(dept);
 				PrintFuncDao.addFunc(dbCon, staff, printerId, summaryBuilder);
+				
 			}else if(PType.valueOf(pType) == PType.PRINT_ORDER_DETAIL){
 				PrintFunc.DetailBuilder detailBuilder = DetailBuilder.newPrintFoodDetail();
-				for (String k : kitchen) {
-					Kitchen ki = new Kitchen();
-					ki.setAliasId(Short.parseShort(k));
-					detailBuilder.addKitchen(ki);
+				for (String kitchenAlias : kitchens) {
+					Kitchen k = new Kitchen();
+					k.setAliasId(Short.parseShort(kitchenAlias));
+					detailBuilder.addKitchen(k);
 				}
 				detailBuilder.setRepeat(Integer.parseInt(repeat));
 				PrintFuncDao.addFunc(dbCon, staff, printerId, detailBuilder);
+				
 			}else if(PType.valueOf(pType) == PType.PRINT_CANCELLED_FOOD){
 				PrintFunc.DetailBuilder detailBuilder = DetailBuilder.newCancelledFood();
-				for (String k : kitchen) {
-					Kitchen ki = new Kitchen();
-					ki.setAliasId(Short.parseShort(k));
-					detailBuilder.addKitchen(ki);
+				for (String kitchenAlias : kitchens) {
+					Kitchen k = new Kitchen();
+					k.setAliasId(Short.parseShort(kitchenAlias));
+					detailBuilder.addKitchen(k);
 				}
 				detailBuilder.setRepeat(Integer.parseInt(repeat));
 				PrintFuncDao.addFunc(dbCon, staff, printerId, detailBuilder);
+				
 			}else if(PType.valueOf(pType) == PType.PRINT_RECEIPT){
 				PrintFunc.Builder builder = Builder.newReceipt();
-				for (String r : region) {
-					builder.addRegion(new Region(Short.parseShort(r)));
+				for (String regionId : regions) {
+					builder.addRegion(new Region(Short.parseShort(regionId)));
 				}
 				builder.setRepeat(Integer.parseInt(repeat));
 				PrintFuncDao.addFunc(dbCon, staff, printerId, builder);
+				
 			}else if(PType.valueOf(pType) ==PType.PRINT_TEMP_RECEIPT){
 				PrintFunc.Builder builder = Builder.newTempReceipt();
-				for (String r : region) {
-					builder.addRegion(new Region(Short.parseShort(r)));
+				for (String regionId : regions) {
+					builder.addRegion(new Region(Short.parseShort(regionId)));
 				}
 				builder.setRepeat(Integer.parseInt(repeat));
 				PrintFuncDao.addFunc(dbCon, staff, printerId, builder);
+				
 			}else if(PType.valueOf(pType) ==PType.PRINT_TRANSFER_TABLE){
 				PrintFunc.Builder builder = Builder.newTransferTable();
-				for (String r : region) {
-					builder.addRegion(new Region(Short.parseShort(r)));
+				for (String regionId : regions) {
+					builder.addRegion(new Region(Short.parseShort(regionId)));
 				}
 				builder.setRepeat(Integer.parseInt(repeat));
 				PrintFuncDao.addFunc(dbCon, staff, printerId, builder);
+				
 			}else if(PType.valueOf(pType) ==PType.PRINT_ALL_HURRIED_FOOD){
 				PrintFunc.Builder builder = Builder.newAllHurriedFood();
-				for (String r : region) {
-					builder.addRegion(new Region(Short.parseShort(r)));
+				for (String regionId : regions) {
+					builder.addRegion(new Region(Short.parseShort(regionId)));
 				}
 				builder.setRepeat(Integer.parseInt(repeat));
 				PrintFuncDao.addFunc(dbCon, staff, printerId, builder);
@@ -168,6 +331,7 @@ public class OperatePrintFuncAction extends DispatchAction{
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
 			e.printStackTrace();
 		}finally{
+			dbCon.disconnect();
 			response.getWriter().print(jobject.toString());
 		}
 		
@@ -216,7 +380,7 @@ public class OperatePrintFuncAction extends DispatchAction{
 					summaryBuilder.addRegion(new Region(Short.parseShort(r)));
 				}
 				summaryBuilder.setRepeat(Integer.parseInt(repeat));
-				summaryBuilder.setDepartment(de);
+				summaryBuilder.addDepartment(de);
 				PrintFuncDao.updateFunc(dbCon, staff, printerId, summaryBuilder.build(), funcId);
 			}else if(PType.valueOf(pType) == PType.PRINT_ALL_CANCELLED_FOOD){
 				PrintFunc.SummaryBuilder summaryBuilder = SummaryBuilder.newAllCancelledFood();
@@ -224,7 +388,7 @@ public class OperatePrintFuncAction extends DispatchAction{
 					summaryBuilder.addRegion(new Region(Short.parseShort(r)));
 				}
 				summaryBuilder.setRepeat(Integer.parseInt(repeat));
-				summaryBuilder.setDepartment(de);
+				summaryBuilder.addDepartment(de);
 				PrintFuncDao.updateFunc(dbCon, staff, printerId, summaryBuilder.build(), funcId);
 			}else if(PType.valueOf(pType) == PType.PRINT_ORDER_DETAIL){
 				PrintFunc.DetailBuilder detailBuilder = DetailBuilder.newPrintFoodDetail();
@@ -282,6 +446,7 @@ public class OperatePrintFuncAction extends DispatchAction{
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
 			e.printStackTrace();
 		}finally{
+			dbCon.disconnect();
 			response.getWriter().print(jobject.toString());
 		}
 		

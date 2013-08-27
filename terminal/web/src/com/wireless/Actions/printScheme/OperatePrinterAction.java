@@ -40,11 +40,65 @@ public class OperatePrinterAction extends DispatchAction{
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
 			e.printStackTrace();
 		}finally{
+			dbCon.disconnect();
 			response.getWriter().print(jobject.toString());
 		}
 		
 		return null;
 		
+		
+	}
+	
+	//FIXME
+	public ActionForward port(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception{
+		request.setCharacterEncoding("UTF-8");
+		response.setCharacterEncoding("UTF-8");
+		
+		String printerName = "";
+		
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+
+			Staff staff;
+			
+			String account = request.getParameter("account");
+
+			int staffId = 0;
+			String sql;
+			sql = " SELECT STAFF.staff_id FROM " + 
+				  " restaurant REST JOIN staff STAFF ON REST.id = STAFF.restaurant_id " +
+				  " WHERE REST.account = '" + account + "'";
+			dbCon.rs = dbCon.stmt.executeQuery(sql);
+			if(dbCon.rs.next()){
+				staffId = dbCon.rs.getInt("staff_id");
+			}else{
+				return null;
+			}
+			dbCon.rs.close();
+
+			staff = StaffDao.verify(staffId);
+			
+			printerName = request.getParameter("printerName");
+			String printerAlias = request.getParameter("printerAlias");
+			int style = Integer.parseInt(request.getParameter("style"));
+			
+			Printer.InsertBuilder builder = new Printer.InsertBuilder(printerName, PStyle.valueOf(style), staff.getRestaurantId());
+			builder.setAlias(printerAlias);
+			PrinterDao.insert(dbCon, staff, builder);
+			response.getWriter().print("Port printer '" + printerName + "' successfully...");
+			
+		}catch(BusinessException e){
+			response.getWriter().print("Port printer '" + printerName + "' fail...");
+			e.printStackTrace();
+		}catch(Exception e){
+			response.getWriter().print("Port printer '" + printerName + "' fail...");
+			e.printStackTrace();
+		}finally{
+			dbCon.disconnect();
+		}
+		
+		return null;
 		
 	}
 	
@@ -74,6 +128,7 @@ public class OperatePrinterAction extends DispatchAction{
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
 			e.printStackTrace();
 		}finally{
+			dbCon.disconnect();
 			response.getWriter().print(jobject.toString());
 		}
 		
@@ -112,6 +167,7 @@ public class OperatePrinterAction extends DispatchAction{
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
 			e.printStackTrace();
 		}finally{
+			dbCon.disconnect();
 			response.getWriter().print(jobject.toString());
 		}
 		
