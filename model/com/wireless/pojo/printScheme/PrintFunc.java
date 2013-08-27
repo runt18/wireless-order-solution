@@ -19,7 +19,7 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 	
 	private final List<Region> mRegions = SortedList.newInstance();
 	
-	private Department mDept;
+	private List<Department> mDept = SortedList.newInstance();
 	
 	private final List<Kitchen> mKitchens = SortedList.newInstance();
 	
@@ -32,20 +32,20 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 		private int mRepeat = 1;
 		private PType mType;
 		private List<Region> mRegions = SortedList.newInstance();
-		private Department mDept;
+		private List<Department> mDept = SortedList.newInstance();
 		
 		private SummaryBuilder(){
 		}
 		
 		public static SummaryBuilder newPrintOrder(){
 			SummaryBuilder builder = new SummaryBuilder();
-			builder.setmType( PType.PRINT_ORDER);
+			builder.setType( PType.PRINT_ORDER);
 			return builder;
 		}
 		
 		public static SummaryBuilder newAllCancelledFood(){
 			SummaryBuilder builder = new SummaryBuilder();
-			builder.setmType(PType.PRINT_ALL_CANCELLED_FOOD);
+			builder.setType(PType.PRINT_ALL_CANCELLED_FOOD);
 			return builder;
 		}
 		
@@ -61,17 +61,17 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 			return this;
 		}
 		
-		public SummaryBuilder setDepartment(Department dept){
-			mDept = dept;
+		public SummaryBuilder addDepartment(Department dept){
+			mDept.add(dept);
 			return this;
 		}		
 		
-		public PType getmType() {
+		public PType getType() {
 			return mType;
 		}
 
-		private SummaryBuilder setmType(PType mType) {
-			this.mType = mType;
+		private SummaryBuilder setType(PType type) {
+			this.mType = type;
 			return this;
 		}
 
@@ -93,14 +93,14 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 		
 		public static DetailBuilder newPrintFoodDetail(){
 			DetailBuilder builder = new DetailBuilder();
-			builder.setmType(PType.PRINT_ORDER_DETAIL);
+			builder.setType(PType.PRINT_ORDER_DETAIL);
 			return builder;
 			
 		}
 		
 		public static DetailBuilder newCancelledFood(){
 			DetailBuilder builder = new DetailBuilder();
-			builder.setmType(PType.PRINT_CANCELLED_FOOD);
+			builder.setType(PType.PRINT_CANCELLED_FOOD);
 			return builder;
 		}
 		public DetailBuilder setRepeat(int repeat){
@@ -115,12 +115,12 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 			return this;
 		}
 		
-		public PType getmType() {
+		public PType getType() {
 			return mType;
 		}
 
-		private DetailBuilder setmType(PType mType) {
-			this.mType = mType;
+		private DetailBuilder setType(PType type) {
+			this.mType = type;
 			return this;
 		}
 
@@ -193,13 +193,13 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 	
 	
 	private PrintFunc(SummaryBuilder builder){
-		this(builder.getmType(), builder.mRepeat);
+		this(builder.getType(), builder.mRepeat);
 		mRegions.addAll(builder.mRegions);
-		setDepartment(builder.mDept);
+		mDept.addAll(builder.mDept);
 	}
 	
 	private PrintFunc(DetailBuilder builder){
-		this(builder.getmType(), builder.mRepeat);
+		this(builder.getType(), builder.mRepeat);
 		mKitchens.addAll(builder.mKitchens);
 	}
 	
@@ -228,20 +228,27 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 	public int getRepeat(){
 		return mRepeat;
 	}
-	public Department getDepartment(){
-		return mDept;
+	
+	public List<Department> getDepartment(){
+		return Collections.unmodifiableList(mDept);
 	}
 	
-	public void setDepartment(Department dept){
-		mDept = dept;
+	public void addDepartment(Department dept){
+		if(!mDept.contains(dept)){
+			mDept.add(dept);
+		}
 	}
 
+	public boolean removeDepartment(Department dept){
+		return mDept.remove(dept);
+	}
+	
 	public void setDepartmentAll(){
 		mDept = null;
 	}
 	
 	public boolean isDeptAll(){
-		return mDept == null;
+		return mDept.size() == 0;
 	}
 	
 	public List<Region> getRegions(){
@@ -411,9 +418,10 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 			}
 		}
 
+		//FIXME
 		if(!isDeptAll()){
-			dept = this.mDept.getName();
-			deptValue = this.mDept.getId() + "";
+			//dept = this.mDept.getName();
+			//deptValue = this.mDept.getId() + "";
 		}
 		
 		if(this.mType == PType.PRINT_ORDER || this.mType == PType.PRINT_ALL_CANCELLED_FOOD){

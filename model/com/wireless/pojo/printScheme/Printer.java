@@ -136,6 +136,10 @@ public class Printer implements Jsonable{
 		return this.isEnabled;
 	}
 	
+	public void setEnabled(boolean isEnabled){
+		this.isEnabled = isEnabled;
+	}
+	
 	/**
 	 * Check to see whether the print function is contained in printer.
 	 * @param func the print function to check
