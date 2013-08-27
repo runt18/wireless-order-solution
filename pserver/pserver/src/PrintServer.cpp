@@ -1051,11 +1051,12 @@ void PServer::run(IPReport* pReport, istream& in_conf){
 		}
 		in_conf >> g_Conf;
 
+		//FIXME!!! should be removed in next version
 		pRoot = TiXmlHandle(&g_Conf).FirstChildElement(ConfTags::CONF_ROOT).Element();
 		if(pRoot){
 			//upload the printer server if upload attribute exist
 			if(pRoot->Attribute(ConfTags::UPLOAD_PRINTER)){
-				uploadPrinter();
+				portPrinter(pReport);
 			}
 		}
 
@@ -1095,7 +1096,17 @@ void PServer::run(IPReport* pReport, istream& in_conf){
 
 }
 
-void PServer::uploadPrinter(){
+/*******************************************************************************
+* Function Name  : uploadPrinter
+* Description    : Port the schemes of each printer to server
+* Input          : IPReport the printer report
+* Output         : None
+* Return         : None
+*******************************************************************************/
+void PServer::portPrinter(IPReport* pReport){
+
+	vector< boost::shared_ptr<PrinterInstance> > printInstances;
+
 	//extract each printer's name and supported functions from the configuration file
 	TiXmlElement* pPrinter = TiXmlHandle(&g_Conf).FirstChildElement(ConfTags::CONF_ROOT).FirstChildElement(ConfTags::PRINTER).Element();
 	for(pPrinter; pPrinter != NULL; pPrinter = pPrinter->NextSiblingElement(ConfTags::PRINTER)){
@@ -1422,8 +1433,6 @@ void PServer::uploadPrinter(){
 		int repeat = 1;
 		pPrinter->QueryIntAttribute(ConfTags::PRINT_REPEAT, &repeat);
 
-		vector< boost::shared_ptr<PrinterInstance> > printInstances;
-
 		vector< boost::shared_ptr<PrinterInstance> >::iterator it = printInstances.begin();
 		for(it; it != printInstances.end(); it++){
 			if(name == (*it)->name){
@@ -1441,6 +1450,273 @@ void PServer::uploadPrinter(){
 			//just add the function to the exist printer instance
 			(*it)->addFunc(func, regions, kitchens, depts, repeat);
 		}
+	}
+
+	wstring account = Util::s2ws(TiXmlHandle(&g_Conf).FirstChildElement(ConfTags::CONF_ROOT).FirstChildElement(ConfTags::REMOTE).Element()->Attribute(ConfTags::ACCOUNT));
+
+	for(vector< boost::shared_ptr<PrinterInstance> >::iterator it = printInstances.begin(); it != printInstances.end(); it++){
+
+		HINTERNET  hSession = NULL, hConnect = NULL, hRequest = NULL;
+		DWORD dwSize = 0;
+		DWORD dwDownloaded = 0;
+		BOOL  bResults = FALSE;
+
+		// Use WinHttpOpen to obtain a session handle.
+		hSession = WinHttpOpen( _T("Digi-e Printer Server"),  
+			WINHTTP_ACCESS_TYPE_DEFAULT_PROXY,
+			WINHTTP_NO_PROXY_NAME, 
+			WINHTTP_NO_PROXY_BYPASS, 0 );
+
+		// Specify an HTTP server.
+		if( hSession ){
+			hConnect = WinHttpConnect( hSession, _T("e-tones.net"), 10080, 0 );
+			//hConnect = WinHttpConnect( hSession, _T("localhost"), 8080, 0 );
+		}
+	
+		wostringstream wos;
+		wos << _T("/WirelessOrderWeb/OperatePrinter.do?skipVerify&dataSource=port")
+			<< _T("&account=") << account
+			<< _T("&printerName=") + (*it)->name 
+			<< _T("&style=") << (*it)->style;
+
+		// Create an HTTP request handle to upload the printer
+		if( hConnect )
+			//hRequest = WinHttpOpenRequest( hConnect, _T("GET"), _T("/WirelessOrderWeb/OperatePrinter.do?skipVerify&dataSource=port&account=bctxt&printerName=GP80250-201&style=2"),
+			hRequest = WinHttpOpenRequest( hConnect, _T("GET"), wos.str().c_str(),
+										   NULL, WINHTTP_NO_REFERER, 
+										   WINHTTP_DEFAULT_ACCEPT_TYPES, 
+										   0);
+
+		// Send a request.
+		if( hRequest )
+			bResults = WinHttpSendRequest( hRequest,
+			WINHTTP_NO_ADDITIONAL_HEADERS, 0,
+			WINHTTP_NO_REQUEST_DATA, 0, 
+			0, 0 );
+
+
+		// End the request.
+		if( bResults )
+			bResults = WinHttpReceiveResponse( hRequest, NULL );
+
+		// Check the status code.
+		DWORD dwStatusCode = 0;
+		if( bResults ){ 
+			dwSize = 4;
+			bResults = WinHttpQueryHeaders( hRequest, WINHTTP_QUERY_STATUS_CODE | WINHTTP_QUERY_FLAG_NUMBER, NULL, &dwStatusCode, &dwSize, NULL );
+		}
+
+		string info;
+		if(bResults && dwStatusCode == 200){
+			info.erase();
+			do{
+				// Check for available data.
+				dwSize = 0;
+				if( !WinHttpQueryDataAvailable( hRequest, &dwSize ) ){
+					TCHAR buf[256];
+					swprintf_s(buf, sizeof(buf) / sizeof(TCHAR), _T("上传打印机失败：Error %u in WinHttpQueryDataAvailable."), GetLastError());
+					if(pReport){
+						bResults = FALSE;
+						pReport->OnPrintExcep(0, buf);
+					}
+				}
+
+				// Allocate space for the buffer.
+				boost::shared_ptr<char> pOutBuffer(new char[dwSize + 1], boost::checked_array_deleter<char>());
+				if( !pOutBuffer.get() )	{
+					if(pReport){
+						bResults = FALSE;
+						pReport->OnPrintExcep(0, _T("上传打印机失败：Out of memory to get the version info."));
+					}
+				}else{
+					// Read the data.
+					ZeroMemory( pOutBuffer.get(), dwSize + 1 );
+
+					if( !WinHttpReadData( hRequest, (LPVOID)pOutBuffer.get(), dwSize, &dwDownloaded ) ){
+						TCHAR buf[256];
+						swprintf_s(buf, sizeof(buf) / sizeof(TCHAR), _T("上传打印机失败：Error %u in WinHttpReadData."), GetLastError());
+						if(pReport){
+							bResults = FALSE;
+							pReport->OnPrintExcep(0, buf);
+						}
+
+					}else{
+						info.append(pOutBuffer.get(), dwSize);
+					}
+
+				}
+			} while( dwSize > 0 );
+
+			if(pReport){
+				pReport->OnPrintReport(0, Util::s2ws(info).c_str());
+			}
+		}else{
+			if(pReport){
+				TCHAR buf[256];
+				swprintf_s(buf, sizeof(buf) / sizeof(TCHAR), _T("上传打印机失败：Error %u in WinHttpReadData."), GetLastError());
+				bResults = FALSE;
+				pReport->OnPrintExcep(0, buf);
+			}
+		}
+
+		//Upload each print scheme
+		vector<PrintFunc>::iterator iter_func = (*it)->funcs.begin();
+		for(iter_func; iter_func != (*it)->funcs.end(); iter_func++){
+
+			hRequest = NULL;
+
+			//Generate the department request string
+			wostringstream wos_dept;
+			vector<int>::iterator iter_dept = find(iter_func->depts.begin(), iter_func->depts.end(), Department::DEPT_ALL);
+			if(iter_dept != iter_func->depts.end()){
+				wos_dept << _T("");
+			}else{
+				wos_dept << _T("");
+				iter_dept = iter_func->depts.begin();
+				int count = 0;
+				for(iter_dept; iter_dept != iter_func->depts.end(); iter_dept++){
+					if(count > 0){
+						wos_dept << _T(",");
+					}
+					wos_dept << (*iter_dept);
+					count++;
+				}
+
+			}
+
+			//Generate the kitchen request string
+			wostringstream wos_kitchen;
+			vector<int>::iterator iter_kitchen = find(iter_func->kitchens.begin(), iter_func->kitchens.end(), Kitchen::KITCHEN_ALL);
+			if(iter_kitchen != iter_func->kitchens.end()){
+				wos_kitchen << _T("");
+			}else{
+				wos_kitchen << _T("");
+				iter_kitchen = iter_func->kitchens.begin();
+				int count = 0;
+				for(iter_kitchen; iter_kitchen != iter_func->kitchens.end(); iter_kitchen++){
+					if((*iter_kitchen) != Kitchen::KITCHEN_TEMP){
+						if(count > 0){
+							wos_kitchen << _T(",");
+						}
+						wos_kitchen << (*iter_kitchen);
+						count++;
+					}
+				}
+			}
+
+			//Generate the region request string
+			wostringstream wos_region;
+			vector<int>::iterator iter_region = find(iter_func->regions.begin(), iter_func->regions.end(), Region::REGION_ALL);
+			if(iter_region != iter_func->regions.end()){
+				wos_region << _T("");
+			}else{
+				iter_region = iter_func->regions.begin();
+				int count = 0;
+				for(iter_region; iter_region != iter_func->regions.end(); iter_region++){
+					if(count > 0){
+						wos_region << _T(",");
+					}
+					wos_region << (*iter_region);
+					count++;
+				}
+			}
+
+			wostringstream wos;
+			wos << _T("/WirelessOrderWeb/OperatePrintFunc.do?skipVerify&dataSource=port") 
+				<< _T("&account=") << account
+				<< _T("&printerName=") + (*it)->name 
+				<< _T("&repeat=") << iter_func->repeat
+				<< _T("&kitchens=") << wos_kitchen.str()
+				<< _T("&regions=") << wos_region.str()
+				<< _T("&dept=") << wos_dept.str()
+				<< _T("&pType=") << iter_func->code;
+
+			// Create an HTTP request handle to upload the printer
+			if( hConnect )
+				//hRequest = WinHttpOpenRequest( hConnect, _T("GET"), _T("/WirelessOrderWeb/OperatePrinter.do?skipVerify&dataSource=port&account=bctxt&printerName=GP80250-201&style=2"),
+				hRequest = WinHttpOpenRequest( hConnect, _T("GET"), wos.str().c_str(),
+				NULL, WINHTTP_NO_REFERER, 
+				WINHTTP_DEFAULT_ACCEPT_TYPES, 
+				0);
+
+			// Send a request.
+			if( hRequest )
+				bResults = WinHttpSendRequest( hRequest,
+				WINHTTP_NO_ADDITIONAL_HEADERS, 0,
+				WINHTTP_NO_REQUEST_DATA, 0, 
+				0, 0 );
+
+
+			// End the request.
+			if( bResults )
+				bResults = WinHttpReceiveResponse( hRequest, NULL );
+
+			// Check the status code.
+			DWORD dwStatusCode = 0;
+			if( bResults ){ 
+				dwSize = 4;
+				bResults = WinHttpQueryHeaders( hRequest, WINHTTP_QUERY_STATUS_CODE | WINHTTP_QUERY_FLAG_NUMBER, NULL, &dwStatusCode, &dwSize, NULL );
+			}
+
+			string info;
+			if(bResults && dwStatusCode == 200){
+				info.erase();
+				do{
+					// Check for available data.
+					dwSize = 0;
+					if( !WinHttpQueryDataAvailable( hRequest, &dwSize ) ){
+						TCHAR buf[256];
+						swprintf_s(buf, sizeof(buf) / sizeof(TCHAR), _T("上传打印方案失败：Error %u in WinHttpQueryDataAvailable."), GetLastError());
+						if(pReport){
+							bResults = FALSE;
+							pReport->OnPrintExcep(0, buf);
+						}
+					}
+
+					// Allocate space for the buffer.
+					boost::shared_ptr<char> pOutBuffer(new char[dwSize + 1], boost::checked_array_deleter<char>());
+					if( !pOutBuffer.get() )	{
+						if(pReport){
+							bResults = FALSE;
+							pReport->OnPrintExcep(0, _T("上传打印方案失败：Out of memory to get the version info."));
+						}
+					}else{
+						// Read the data.
+						ZeroMemory( pOutBuffer.get(), dwSize + 1 );
+
+						if( !WinHttpReadData( hRequest, (LPVOID)pOutBuffer.get(), dwSize, &dwDownloaded ) ){
+							TCHAR buf[256];
+							swprintf_s(buf, sizeof(buf) / sizeof(TCHAR), _T("上传打印方案失败：Error %u in WinHttpReadData."), GetLastError());
+							if(pReport){
+								bResults = FALSE;
+								pReport->OnPrintExcep(0, buf);
+							}
+
+						}else{
+							info.append(pOutBuffer.get(), dwSize);
+						}
+
+					}
+				} while( dwSize > 0 );
+
+				if(pReport){
+					pReport->OnPrintReport(0, Util::s2ws(info).c_str());
+				}
+			}else{
+				if(pReport){
+					TCHAR buf[256];
+					swprintf_s(buf, sizeof(buf) / sizeof(TCHAR), _T("上传打印方案失败：Error %u in WinHttpReadData."), GetLastError());
+					bResults = FALSE;
+					pReport->OnPrintExcep(0, buf);
+				}
+			}
+
+		}
+
+		// close any open handles.
+		if( hRequest ) WinHttpCloseHandle( hRequest );
+		if( hConnect ) WinHttpCloseHandle( hConnect );
+		if( hSession ) WinHttpCloseHandle( hSession );
 	}
 
 }

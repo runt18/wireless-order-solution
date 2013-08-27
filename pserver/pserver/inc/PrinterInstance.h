@@ -42,7 +42,7 @@ public:
 	//the handle to print thread
 	HANDLE m_hPrintThread;
 
-private:
+public:
 	int style;
 	void splitDetailsByKitchen(const string& printContent, const vector<int>& kitchens, vector<string>& details);
 	void splitOrdersByDept(const string& printContent, const vector<int>& depts, vector<string>& details);

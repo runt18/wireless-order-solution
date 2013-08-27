@@ -28,5 +28,5 @@ private:
 	
 	IPReport* m_Report;
 
-	void uploadPrinter();
+	void portPrinter(IPReport* pReport);
 };
