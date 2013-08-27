@@ -107,23 +107,28 @@ public class JobContentFactory {
 										   						   			  printer.getStyle())));
 						}else{
 							//Generate the summary to specific department.
-							List<OrderFood> orderFoods = new ArrayList<OrderFood>();
-							for(OrderFood of : order.getOrderFoods()){
-								if(of.asFood().getKitchen().getDept().equals(func.getDepartment())){
-									orderFoods.add(of);
+							for(Department dept : func.getDepartment()){
+								
+								List<OrderFood> orderFoods = new ArrayList<OrderFood>();
+								for(OrderFood of : order.getOrderFoods()){
+									if(of.asFood().getKitchen().getDept().equals(dept)){
+										orderFoods.add(of);
+									}
 								}
-							}
-							if(!orderFoods.isEmpty()){
-								Order orderToDept = new Order();
-								orderToDept.copyFrom(order);
-								orderToDept.setOrderFoods(orderFoods);
-								jobContents.add(new JobContent(printer, func.getRepeat(), printType,
-						   				   new SummaryContent(func.getDepartment(), 
-						   						   			  PFormat.RECEIPT_FORMAT_DEF, 
-						   						   			  orderToDept,
-						   						   			  term.getName(),
-						   						   			  printType, 
-						   						   			  printer.getStyle())));
+								
+								if(!orderFoods.isEmpty()){
+									Order orderToDept = new Order();
+									orderToDept.copyFrom(order);
+									orderToDept.setOrderFoods(orderFoods);
+									jobContents.add(new JobContent(printer, func.getRepeat(), printType,
+								   				   new SummaryContent(dept, 
+								   						   			  PFormat.RECEIPT_FORMAT_DEF, 
+								   						   			  orderToDept,
+								   						   			  term.getName(),
+								   						   			  printType, 
+								   						   			  printer.getStyle())));
+									
+								}
 							}
 						}
 						
