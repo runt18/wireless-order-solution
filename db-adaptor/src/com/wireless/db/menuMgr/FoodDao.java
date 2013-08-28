@@ -180,7 +180,22 @@ public class FoodDao {
 			if(old.getStockStatus() == Food.StockStatus.NONE){
 				// 无需处理
 			}else if(old.getStockStatus() == Food.StockStatus.GOOD){
-				// 无需处理
+				// 删除商品出库关系
+				String sql = "SELECT material_id FROM food_material WHERE food_id = " + fb.getFoodId();
+				dbCon.rs = dbCon.stmt.executeQuery(sql);
+				if(dbCon.rs.next()){
+					int materialId = dbCon.rs.getInt("material_id");
+					dbCon.rs.close();
+					MaterialDao.delete(dbCon, materialId);
+				}
+				
+				deleteSQL = "DELETE FROM food_material"
+						  + " WHERE food_id = " + fb.getFoodId()
+						  + " AND material_id NOT IN (SELECT material_id FROM material T1, material_cate T2 WHERE T1.cate_id = T2.cate_id AND T2.type = " + MaterialCate.Type.MATERIAL.getValue() + ")";
+				dbCon.stmt.executeUpdate(deleteSQL);
+				
+				
+
 			}else if(old.getStockStatus() == Food.StockStatus.MATERIAL){
 				// 删除原料出库关系
 				deleteSQL = "DELETE FROM food_material"
