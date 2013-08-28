@@ -113,6 +113,9 @@ public class Privilege implements Comparable<Privilege>, Parcelable{
 		setRestaurantId(restaurantId);
 	}
 	
+	public Privilege(Code code){
+		setCode(code);
+	}
 	public int getId() {
 		return id;
 	}

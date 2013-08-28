@@ -382,8 +382,8 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 		String kitchens = "";
 		String kitchenValues = "";
 		
-		String dept = "";
-		String deptValue = "";
+		String depts = "";
+		String deptValues = "";
 		
 		Map<String, Object> jm = new HashMap<String, Object>();
 		jm.put("printFuncId", this.mId);
@@ -417,12 +417,19 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 				}
 			}
 		}
-
-		//FIXME
-		if(!isDeptAll()){
-			//dept = this.mDept.getName();
-			//deptValue = this.mDept.getId() + "";
+		
+		if(this.mDept.size() > 0){
+			for (Department department : this.mDept) {
+				if(depts == ""){
+					deptValues += department.getId();
+					depts += department.getName();
+				}else{
+					deptValues += ("," + department.getId());
+					depts += ("," + department.getName());
+				}
+			}
 		}
+
 		
 		if(this.mType == PType.PRINT_ORDER || this.mType == PType.PRINT_ALL_CANCELLED_FOOD){
 			kitchens = "----";
@@ -431,19 +438,19 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 				regionValues = "";
 			}
 			if(isDeptAll()){
-				dept = "所有部门";
-				deptValue = "";
+				depts = "所有部门";
+				deptValues = "";
 			}
 		}else if(this.mType == PType.PRINT_ORDER_DETAIL || this.mType == PType.PRINT_CANCELLED_FOOD){
 			regions = "----";
-			dept = "----";
+			depts = "----";
 			if(isKitchenAll()){
 				kitchens = "所有厨房";
 				kitchenValues = "";
 			}
 		
 		}else{
-			dept = "----";
+			depts = "----";
 			kitchens = "----";
 			if(isRegionAll()){
 				regions = "所有区域";
@@ -459,8 +466,8 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 		jm.put("kitchens", kitchens);
 		jm.put("kitchenValues", kitchenValues);
 		
-		jm.put("dept", dept);
-		jm.put("deptValue", deptValue);
+		jm.put("dept", depts);
+		jm.put("deptValue", deptValues);
 		
 		
 		return Collections.unmodifiableMap(jm);
