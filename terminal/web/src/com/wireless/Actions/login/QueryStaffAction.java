@@ -21,6 +21,7 @@ import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.util.DataPaging;
+import com.wireless.util.WebParams;
 
 public class QueryStaffAction extends Action {
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
@@ -56,7 +57,6 @@ public class QueryStaffAction extends Action {
 				
 			restaurantID = request.getParameter("restaurantID");
 			
-
 			// get the type to filter
 /*			int type = Integer.parseInt(request.getParameter("type"));
 
@@ -110,15 +110,13 @@ public class QueryStaffAction extends Action {
 			jobject.initTip(false, "未处理异常");
 		}catch (BusinessException e){
 			e.printStackTrace();
-			jobject.initTip(false, "操作已超时, 请重新登录");
-			other.put("status", 0);
+			jobject.initTip(false, WebParams.TIP_TITLE_DEFAULT, e.getMessage());
 		} finally {
 			if (isCombo.equals("true")) {
 				
 			} else {
 				staffList = DataPaging.getPagingData(staffList, isPaging, index, pageSize);
 			}	
-			
 			if(request.getAttribute("pin") != null){
 				other.put("pin", request.getAttribute("pin"));
 			}

@@ -14,10 +14,14 @@ public class VerifyLoginCommand extends ActionCommandBase{
 		HttpServletRequest request = ((ServletActionContext)context).getRequest();
 		String skipVerify = request.getParameter("skipVerify");
 		String isCookie = request.getParameter("isCookie");
+		boolean bool = false;
 		if(skipVerify == null){
 			String pin = null;
 			if(isCookie == null){
 				pin = (String)request.getSession().getAttribute("pin");
+				if(pin == null){
+					bool = true;
+				}
 				
 			}else{
 				Cookie[] cookies = request.getCookies();
@@ -31,7 +35,8 @@ public class VerifyLoginCommand extends ActionCommandBase{
 			}
 			request.setAttribute("pin", pin);
 		}
-		return false;
+		//false : continue
+		return bool;
 	}
 
 }

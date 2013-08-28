@@ -9,7 +9,6 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
 import com.wireless.db.DBCon;
-import com.wireless.db.deptMgr.DepartmentDao;
 import com.wireless.db.printScheme.PrintFuncDao;
 import com.wireless.db.printScheme.PrinterDao;
 import com.wireless.db.staffMgr.StaffDao;
@@ -233,13 +232,8 @@ public class OperatePrintFuncAction extends DispatchAction{
 			 
 			int pType = Integer.parseInt(request.getParameter("pType"));
 			
-			Department dept = null;
-			if(!deptId.trim().isEmpty()){
-				dept = DepartmentDao.getDepartmentById(staff, Integer.parseInt(deptId));
-			}
 			
-			
-			String[] kitchens = null ,regions = null;
+			String[] kitchens = null, regions = null, depts = null;
 			if(!kitchenIds.trim().isEmpty()){
 				kitchens = kitchenIds.split(",");
 			}else{
@@ -252,13 +246,24 @@ public class OperatePrintFuncAction extends DispatchAction{
 				regions = new String[0];
 			}
 			
+			if(!deptId.trim().isEmpty()){
+				depts = deptId.split(",");
+			}else{
+				depts = new String[0];
+			}
+			
 			if(PType.valueOf(pType) == PType.PRINT_ORDER){
 				PrintFunc.SummaryBuilder summaryBuilder = SummaryBuilder.newPrintOrder();
 				for (String region : regions) {
 					summaryBuilder.addRegion(new Region(Short.parseShort(region)));
 				}
+				for (String department : depts) {
+					Department d = new Department();
+					d.setId(Short.parseShort(department));
+					summaryBuilder.addDepartment(d);
+				}
 				summaryBuilder.setRepeat(Integer.parseInt(repeat));
-				summaryBuilder.addDepartment(dept);
+				
 				PrintFuncDao.addFunc(dbCon, staff, printerId, summaryBuilder);
 				
 			}else if(PType.valueOf(pType) == PType.PRINT_ALL_CANCELLED_FOOD){
@@ -266,8 +271,12 @@ public class OperatePrintFuncAction extends DispatchAction{
 				for (String region : regions) {
 					summaryBuilder.addRegion(new Region(Short.parseShort(region)));
 				}
+				for (String department : depts) {
+					Department d = new Department();
+					d.setId(Short.parseShort(department));
+					summaryBuilder.addDepartment(d);
+				}
 				summaryBuilder.setRepeat(Integer.parseInt(repeat));
-				summaryBuilder.addDepartment(dept);
 				PrintFuncDao.addFunc(dbCon, staff, printerId, summaryBuilder);
 				
 			}else if(PType.valueOf(pType) == PType.PRINT_ORDER_DETAIL){
@@ -349,19 +358,13 @@ public class OperatePrintFuncAction extends DispatchAction{
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			String repeat = request.getParameter("repeat");
 			String kitchens = request.getParameter("kitchens");
-			String dept = request.getParameter("dept");
+			String depts = request.getParameter("dept");
 			String regions = request.getParameter("regions");
 			int printerId = Integer.parseInt(request.getParameter("printerId"));
 			int funcId = Integer.parseInt(request.getParameter("funcId"));
 			int pType = Integer.parseInt(request.getParameter("pType"));
 			
-			Department de = null;
-			if(!dept.trim().isEmpty()){
-				de = DepartmentDao.getDepartmentById(staff, Integer.parseInt(dept));
-			}
-			
-			
-			String[] kitchen = null,region = null;
+			String[] kitchen = null, region = null, dept = null;
 			if(!kitchens.trim().isEmpty()){
 				kitchen = kitchens.split(",");
 			}else{
@@ -374,21 +377,35 @@ public class OperatePrintFuncAction extends DispatchAction{
 				region = new String[0];
 			}
 			
+			if(!depts.trim().isEmpty()){
+				dept = depts.split(",");
+			}else{
+				dept = new String[0];
+			}
+			
 			if(PType.valueOf(pType) == PType.PRINT_ORDER){
 				PrintFunc.SummaryBuilder summaryBuilder = SummaryBuilder.newPrintOrder();
 				for (String r : region) {
 					summaryBuilder.addRegion(new Region(Short.parseShort(r)));
 				}
+				for (String department : dept) {
+					Department d = new Department();
+					d.setId(Short.parseShort(department));
+					summaryBuilder.addDepartment(d);
+				}
 				summaryBuilder.setRepeat(Integer.parseInt(repeat));
-				summaryBuilder.addDepartment(de);
 				PrintFuncDao.updateFunc(dbCon, staff, printerId, summaryBuilder.build(), funcId);
 			}else if(PType.valueOf(pType) == PType.PRINT_ALL_CANCELLED_FOOD){
 				PrintFunc.SummaryBuilder summaryBuilder = SummaryBuilder.newAllCancelledFood();
 				for (String r : region) {
 					summaryBuilder.addRegion(new Region(Short.parseShort(r)));
 				}
+				for (String department : dept) {
+					Department d = new Department();
+					d.setId(Short.parseShort(department));
+					summaryBuilder.addDepartment(d);
+				}
 				summaryBuilder.setRepeat(Integer.parseInt(repeat));
-				summaryBuilder.addDepartment(de);
 				PrintFuncDao.updateFunc(dbCon, staff, printerId, summaryBuilder.build(), funcId);
 			}else if(PType.valueOf(pType) == PType.PRINT_ORDER_DETAIL){
 				PrintFunc.DetailBuilder detailBuilder = DetailBuilder.newPrintFoodDetail();
