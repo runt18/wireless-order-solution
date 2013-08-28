@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<catalog name="struts">
-    <chain name="servlet-standard-preprocess">
-        <command className="com.wireless.commands.VerifyLoginCommand"/>
-    </chain>
-</catalog>
