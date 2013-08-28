@@ -4,7 +4,7 @@
 	<display-name>WirelessOrderWeb</display-name>
 	<filter>
 		<filter-name>filter</filter-name>
-		<filter-class>com.wireless.commands.LoginFilter</filter-class>
+		<filter-class>com.wireless.filters.LoginFilter</filter-class>
 	</filter>
 	<filter-mapping>
 		<filter-name>filter</filter-name>
