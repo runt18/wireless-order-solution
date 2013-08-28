@@ -11,7 +11,6 @@
 // Colour Codes:
 // -----------------------------------------------------------------
 
-#include <list>
 
 #define COLOUR_WHITE		0
 #define COLOUR_BLACK		1
@@ -42,37 +41,21 @@ public:
 	CStatusCtrl();
 	virtual ~CStatusCtrl();
 
-	void ShowStatus(LPCTSTR status, int nType);
-	void Run();
+	void ShowStatus(CString status, int nType);
 
 //	virtual BOOL Create( DWORD in_dwStyle, const RECT& in_rcRect, 
 //                         CWnd* in_pParentWnd, UINT in_nID );
 
 	// Generierte Nachrichtenzuordnungsfunktionen
 protected:
-
-	void DoStreamIn(int extraFlags = 0);
-	static DWORD __stdcall CStatusCtrl::RichEditStreamInCallback(DWORD_PTR dwCookie, LPBYTE pbBuff, LONG cb, LONG *pcb);
-
-	struct t_buffer
-	{
-		CStringA status;
-		int pos;
-		int type;
-	};
-
-	std::list<t_buffer> m_statusBuffer;
-	int m_headerPos;
-
 	BOOL m_bEmpty;
-	UINT_PTR m_nTimerID;
-	int m_runTimer;
+	int m_nTimerID;
 	int m_nMoveToBottom;
 
 	BOOL m_doPopupCursor;
 	const static COLORREF m_ColTable[16]; // Colour Table
 
-	CStringA m_RTFHeader;
+	CString m_RTFHeader;
 
 	//{{AFX_MSG(CStatusCtrl)
 	afx_msg BOOL OnEraseBkgnd(CDC* pDC);
@@ -81,11 +64,10 @@ protected:
 	afx_msg void OnOutputcontextClearall();
 	afx_msg void OnOutputcontextCopytoclipboard();
 	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
-	afx_msg void OnTimer(UINT_PTR nIDEvent);
+	afx_msg void OnTimer(UINT nIDEvent);
 	afx_msg void OnRButtonUp(UINT nFlags, CPoint point);
 	afx_msg BOOL OnMouseWheel(UINT nFlags, short zDelta, CPoint pt);
 	//}}AFX_MSG
-
 
 	DECLARE_MESSAGE_MAP()
 };

@@ -1,6 +1,6 @@
-// FileZilla Server - a Windows ftp server
+// FileZilla - a Windows ftp client
 
-// Copyright (C) 2002-2004 - Tim Kosse <tim.kosse@gmx.de>
+// Copyright (C) 2002 - Tim Kosse <tim.kosse@gmx.de>
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -27,8 +27,8 @@
 
 /////////////////////////////////////////////////////////////////////////////
 // Ansicht CStatusView 
-class CStatusCtrl;
 
+class CStatusCtrl;
 class CStatusView : public CView
 {
 protected:
@@ -40,7 +40,10 @@ public:
 
 // Operationen
 public:
-	void ShowStatus(LPCTSTR status, int type);
+	void ShowStatus(CString status,int type);
+	virtual void SetFocus();
+
+	const CWnd *GetEditCtrl() const;
 
 // Überschreibungen
 	// Vom Klassen-Assistenten generierte virtuelle Funktionsüberschreibungen
@@ -51,6 +54,7 @@ public:
 
 // Implementierung
 protected:
+
 	virtual ~CStatusView();
 #ifdef _DEBUG
 	virtual void AssertValid() const;
@@ -59,15 +63,14 @@ protected:
 
 	// Generierte Nachrichtenzuordnungsfunktionen
 protected:
-	CStatusCtrl *m_pStatusCtrl;
-
+	CStatusCtrl *m_pRichEditCtrl;
 	//{{AFX_MSG(CStatusView)
 	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
 	afx_msg void OnSize(UINT nType, int cx, int cy);
-	//}}AFX_MSG
-	DECLARE_MESSAGE_MAP()
-public:
 	afx_msg BOOL OnEraseBkgnd(CDC* pDC);
+	//}}AFX_MSG
+
+	DECLARE_MESSAGE_MAP()
 };
 
 /////////////////////////////////////////////////////////////////////////////

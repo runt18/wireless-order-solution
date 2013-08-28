@@ -1,6 +1,6 @@
-// FileZilla Server - a Windows ftp server
+// FileZilla - a Windows ftp client
 
-// Copyright (C) 2002-2004 - Tim Kosse <tim.kosse@gmx.de>
+// Copyright (C) 2002 - Tim Kosse <tim.kosse@gmx.de>
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -22,9 +22,8 @@
 #include "stdafx.h"
 #include "StatusView.h"
 #include "StatusCtrl.h"
-#include ".\statusview.h"
 
-#if defined(_DEBUG) && !defined(MMGR)
+#ifdef _DEBUG
 #define new DEBUG_NEW
 #undef THIS_FILE
 static char THIS_FILE[] = __FILE__;
@@ -37,21 +36,21 @@ IMPLEMENT_DYNCREATE(CStatusView, CView)
 
 CStatusView::CStatusView()
 {
-	m_pStatusCtrl = new CStatusCtrl();
+	m_pRichEditCtrl = new CStatusCtrl();
 }
 
 CStatusView::~CStatusView()
 {
-	delete m_pStatusCtrl;
+	delete m_pRichEditCtrl;
+	m_pRichEditCtrl = NULL;
 }
-
 
 BEGIN_MESSAGE_MAP(CStatusView, CView)
 	//{{AFX_MSG_MAP(CStatusView)
 	ON_WM_CREATE()
 	ON_WM_SIZE()
-	//}}AFX_MSG_MAP
 	ON_WM_ERASEBKGND()
+	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
@@ -59,7 +58,7 @@ END_MESSAGE_MAP()
 
 void CStatusView::OnDraw(CDC* pDC)
 {
-	// ZU ERLEDIGEN: Code zum Zeichnen hier einfügen
+	// Nothing to do here
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -77,18 +76,41 @@ void CStatusView::Dump(CDumpContext& dc) const
 }
 #endif //_DEBUG
 
+DWORD __stdcall RichEditStreamInCallback(DWORD dwCookie, LPBYTE pbBuff, LONG cb, LONG *pcb)
+{
+	int *pos = (int *)dwCookie;
+	char *pBuffer = ((char *)dwCookie) + 4;
+
+	if (cb > static_cast<LONG>(strlen(pBuffer + *pos))) 
+		cb = strlen(pBuffer + *pos);
+
+	memcpy(pbBuff, pBuffer + *pos, cb);
+
+	*pcb = cb;
+
+	*pos += cb;
+
+	return 0;
+}
+
 int CStatusView::OnCreate(LPCREATESTRUCT lpCreateStruct) 
 {
+	USES_CONVERSION;
 	if (CView::OnCreate(lpCreateStruct) == -1)
 		return -1;
 
 	// Create the style
 	DWORD dwStyle = WS_CHILD | WS_VISIBLE | ES_MULTILINE | ES_READONLY | WS_VSCROLL | ES_AUTOVSCROLL | ES_NOHIDESEL;
 	
-	// Create the list control.  Don't worry about specifying
-	// correct coordinates.  That will be handled in OnSize()
+	// Custom initialization of the richedit control
+#if _MFC_VER > 0x0600
+	VERIFY(AfxInitRichEdit() || AfxInitRichEdit2());
+#else
 	VERIFY(AfxInitRichEdit());
-	BOOL bResult = m_pStatusCtrl->Create(dwStyle, CRect(1, 1, 10, 10), this, 0);
+#endif
+
+	CWnd* pWnd = m_pRichEditCtrl;
+	BOOL bResult = pWnd->Create(RICHEDIT_CLASS, NULL, dwStyle, CRect(1, 1, 10, 10), this, 0);
 
 	return (bResult ? 0 : -1);
 }
@@ -99,21 +121,38 @@ void CStatusView::OnSize(UINT nType, int cx, int cy)
 {
 	CView::OnSize(nType, cx, cy);
 	
-	if (::IsWindow(m_pStatusCtrl->m_hWnd))
-	m_pStatusCtrl->MoveWindow(0, 0, cx, cy, TRUE);
+	if (::IsWindow(m_pRichEditCtrl->m_hWnd))
+		m_pRichEditCtrl->MoveWindow(0, 0, cx, cy, TRUE);
 }//OnSize
 
-
-void CStatusView::ShowStatus(LPCTSTR status, int type)
+void CStatusView::ShowStatus(CString status, int type)
 {
-	//add the time stamp before the msg
-	CString date = CTime::GetCurrentTime().Format(_T("%Y-%m-%d %H:%M:%S %A"));
-	CString msg;
-	msg.Format(_T("[%s]   %s"), date, status);
-	m_pStatusCtrl->ShowStatus(msg, type);
+	USES_CONVERSION;
+	
+	if (m_pRichEditCtrl){
+		//add the time stamp before the msg
+		CString date = CTime::GetCurrentTime().Format(_T("%Y-%m-%d %H:%M:%S %A"));
+		CString msg;
+		msg.Format(_T("[%s]   %s"), date, status);
+		m_pRichEditCtrl->ShowStatus(msg, type);
+	}
+
+
 }
 
-BOOL CStatusView::OnEraseBkgnd(CDC* pDC)
+
+
+BOOL CStatusView::OnEraseBkgnd(CDC* pDC) 
 {
-	return TRUE;
+	return FALSE;
+}
+
+void CStatusView::SetFocus()
+{
+	m_pRichEditCtrl->SetFocus();
+}
+
+const CWnd *CStatusView::GetEditCtrl() const
+{
+	return m_pRichEditCtrl;
 }

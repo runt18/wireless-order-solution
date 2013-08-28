@@ -5,14 +5,24 @@
 #include "StatusCtrl.h"
 #include "Resource.h"
 #include <boost/shared_ptr.hpp>
-//#include "EnterSomething.h"
-//#include "MainFrm.h"
 
-#if defined(_DEBUG) && !defined(MMGR)
+#ifdef _DEBUG
 #define new DEBUG_NEW
 #undef THIS_FILE
 static char THIS_FILE[] = __FILE__;
 #endif
+
+//Log messages
+#define FZ_LOG_STATUS 0
+#define FZ_LOG_ERROR 1
+#define FZ_LOG_COMMAND 2
+#define FZ_LOG_REPLY 3
+#define FZ_LOG_LIST 4
+//By calling CFileZillaApi::SetDebugLevel, the aplication can enable loggint of the following messages:
+#define FZ_LOG_APIERROR 5
+#define FZ_LOG_WARNING 6
+#define FZ_LOG_INFO 7
+#define FZ_LOG_DEBUG 8
 
 const COLORREF CStatusCtrl::m_ColTable[16] = {RGB(255, 255, 255),
 										RGB(0, 0, 0),
@@ -40,10 +50,7 @@ CStatusCtrl::CStatusCtrl()
 	m_doPopupCursor = FALSE;
 	m_bEmpty = TRUE;
 	m_nMoveToBottom = 0;
-	m_nTimerID = 0;
-	m_headerPos = 0;
-	m_runTimer = 0;
-}
+	m_nTimerID = 0;}
 
 CStatusCtrl::~CStatusCtrl()
 {
@@ -69,7 +76,7 @@ END_MESSAGE_MAP()
 
 BOOL CStatusCtrl::OnEraseBkgnd(CDC* pDC) 
 {
-	return TRUE;
+	return FALSE;
 }
 
 void CStatusCtrl::OnContextMenu(CWnd* pWnd, CPoint point) 
@@ -91,7 +98,7 @@ void CStatusCtrl::OnContextMenu(CWnd* pWnd, CPoint point)
 		pPopup->EnableMenuItem(ID_OUTPUTCONTEXT_CLEARALL,MF_GRAYED);
 	}
 	HCURSOR	hCursor;
-	hCursor = AfxGetApp()->LoadStandardCursor(IDC_ARROW);
+	hCursor=AfxGetApp()->LoadStandardCursor( IDC_ARROW );
 	m_doPopupCursor = TRUE;
 	SetCursor(hCursor);
 		
@@ -111,168 +118,44 @@ BOOL CStatusCtrl::OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message)
 	return 0;
 }
 
-DWORD __stdcall CStatusCtrl::RichEditStreamInCallback(DWORD_PTR dwCookie, LPBYTE pbBuff, LONG cb, LONG *pcb)
+static DWORD __stdcall RichEditStreamInCallback(DWORD dwCookie, LPBYTE pbBuff, LONG cb, LONG *pcb)
 {
-	char* output = (char*)pbBuff;
-	
-	CStatusCtrl *pThis = (CStatusCtrl *)dwCookie;
-	if (pThis->m_headerPos != -1)
-	{
-		int len = pThis->m_RTFHeader.GetLength() - pThis->m_headerPos;
-		if (len > cb)
-		{
-			pThis->m_headerPos = cb;
-			len = cb;
-		}
-		else
-			pThis->m_headerPos = -1;
+	int *pos = (int *)dwCookie;
+	char *pBuffer = ((char *)dwCookie) + 4;
 
-		memcpy(output, (const char*)pThis->m_RTFHeader, len);
-		*pcb = len;
-	}
-	else
-	{
-		*pcb = 0;
-		if (pThis->m_statusBuffer.empty())
-			return 0;
-		t_buffer &buffer = pThis->m_statusBuffer.front();
-		if (buffer.status != _T(""))
-		{
-			if (buffer.pos == -1)
-			{
-				if (pThis->m_bEmpty)
-				{
-					pThis->m_bEmpty = false;
-					memcpy(output, "\\cf", 3);
-					output += 3;
-					cb -= 3;
-					*pcb += 3;
-				}
-				else
-				{
-					memcpy(output, "\\par \\cf", 8);
-					output += 8;
-					cb -= 8;
-					*pcb += 8;
-				}
-				switch (buffer.type)
-				{
-				default:
-				case 0:
-					*(output++) = '2';
-					break;
-				case 1:
-					*(output++) = '5';
-					break;
-				case 2:
-					*(output++) = '3';
-					break;
-				case 3:
-					*(output++) = '4';
-					break;
-				}
-				buffer.pos = 0;
-			}
-			char* status = buffer.status.GetBuffer();
-			char* p = status + buffer.pos;
-			while (*p && cb > 9)
-			{	
-				switch (*p)
-				{
-				case '\\':
-					*(output++) = '\\';
-					*(output++) = '\\';
-					cb -= 2;
-					*pcb += 2;
-					break;
-				case '{':
-					*(output++) = '\\';
-					*(output++) = '{';
-					cb -= 2;
-					*pcb += 2;
-					break;
-				case '}':
-					*(output++) = '\\';
-					*(output++) = '}';
-					cb -= 2;
-					*pcb += 2;
-					break;
-				case '\r':
-					break;
-				case '\n':
-					*(output++) = '\\';
-					*(output++) = 's';
-					*(output++) = 't';
-					*(output++) = 'a';
-					*(output++) = 't';
-					*(output++) = 'u';
-					*(output++) = 's';
-					cb -= 7;
-					*pcb += 7;
-					break;
-				default:
-					if (*p > 127)
-					{
-						sprintf_s(output, cb, "%s%2x", "\\'", *p);
-						output += 4;
-						cb -= 4;
-						*pcb += 4;	
-					}
-					else
-					{
-						*(output++) = (char)*p;
-						cb--;
-						(*pcb)++;
-					}
-				}
-				p++;
+	if (cb > static_cast<LONG>(strlen(pBuffer + *pos))) 
+		cb = strlen(pBuffer + *pos);
 
-			}
-			if (!*p)
-			{
-				pThis->m_statusBuffer.pop_front();
-				if (pThis->m_statusBuffer.empty())
-				{
-					memcpy(output, "} ", 2);
-					output += 2;
-					*pcb += 2;
-				}
-				else
-				{
-					*(output++) = ' ';
-					(*pcb)++;
-				}
-			}
-			else
-				buffer.pos = p - status;
-		}
-		else
-		{
-			pThis->m_statusBuffer.pop_front();
-			if (pThis->m_statusBuffer.empty())
-			{
-				memcpy(output, "} ", 2);
-				output += 2;
-				*pcb += 2;
-			}
-		}
-	}
+	memcpy(pbBuff, pBuffer + *pos, cb);
+
+	*pcb = cb;
+
+	*pos += cb;
 
 	return 0;
 }
 
 void CStatusCtrl::OnOutputcontextClearall() 
 {
-	t_buffer buffer;
-	buffer.status = _T("");
-	buffer.pos = -1;
-	buffer.type = 0;
-	m_statusBuffer.push_back(buffer);
+	USES_CONVERSION;
+	
+	CString rtfstr = m_RTFHeader;
 
-	DoStreamIn();
+	rtfstr += "} ";
 
+	DWORD dwNum = WideCharToMultiByte(CP_OEMCP, NULL, rtfstr.GetBuffer(), -1, NULL, 0, NULL, FALSE);
+	boost::shared_ptr<char> buffer(new char[dwNum + 5], boost::checked_array_deleter<char>());
+	WideCharToMultiByte (CP_OEMCP, NULL, rtfstr.GetBuffer(), -1, buffer.get() + 4, dwNum, NULL, FALSE);
+	*(int *)buffer.get() = 0;
+
+	EDITSTREAM es;
+	es.dwCookie = (DWORD)buffer.get(); // Pass a pointer to the CString to the callback function 
+	es.pfnCallback = RichEditStreamInCallback; // Specify the pointer to the callback function.
+	
+	StreamIn(SF_RTF, es); // Perform the streaming
 	SetSel(-1, -1);
 	LimitText(1000*1000);
+	int res = GetLimitText();
 	
 	m_bEmpty = TRUE;
 	m_nMoveToBottom = 0;
@@ -294,6 +177,54 @@ void CStatusCtrl::OnOutputcontextCopytoclipboard()
 		Copy();
 }
 
+/* Unused Unicode code
+BOOL CStatusCtrl::Create(DWORD in_dwStyle,  const RECT& in_rcRect,
+                             CWnd* in_pParentWnd, UINT in_nID)
+{
+    if(!::AfxInitRichEditEx())
+    {
+        return FALSE ;
+    }
+    
+    CWnd* l_pWnd = this ;
+#ifdef _UNICODE
+	return l_pWnd->Create(_T( "RichEdit20W" ), NULL, in_dwStyle, in_rcRect, in_pParentWnd, in_nID );
+#else
+	return l_pWnd->Create(_T( "RichEdit20A" ), NULL, in_dwStyle, in_rcRect, in_pParentWnd, in_nID );
+#endif
+}
+
+_AFX_RICHEDITEX_STATE::_AFX_RICHEDITEX_STATE()
+{
+    m_hInstRichEdit20 = NULL ;
+}
+
+_AFX_RICHEDITEX_STATE::~_AFX_RICHEDITEX_STATE()
+{
+    if( m_hInstRichEdit20 != NULL )
+    {
+        ::FreeLibrary( m_hInstRichEdit20 ) ;
+    }
+}
+
+_AFX_RICHEDITEX_STATE _afxRichEditStateEx ;
+
+BOOL PASCAL AfxInitRichEditEx()
+{
+    if( ! ::AfxInitRichEdit() )
+    {
+        return FALSE ;
+    }
+    
+    _AFX_RICHEDITEX_STATE* l_pState = &_afxRichEditStateEx ;
+    
+    if( l_pState->m_hInstRichEdit20 == NULL )
+    {
+        l_pState->m_hInstRichEdit20 = LoadLibraryA("RICHED20.DLL") ;
+    }
+    
+    return l_pState->m_hInstRichEdit20 != NULL ;
+}*/
 
 int CStatusCtrl::OnCreate(LPCREATESTRUCT lpCreateStruct) 
 {
@@ -312,11 +243,21 @@ int CStatusCtrl::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 	LOGFONT m_lfFont;
 	pFont->GetLogFont(&m_lfFont);
+	int pointsize = (-m_lfFont.lfHeight*72/ GetDeviceCaps(GetDC()->GetSafeHdc(), LOGPIXELSY))*2;
+	CString fontname = m_lfFont.lfFaceName;
+	//if (COptions::GetOptionVal(OPTION_MESSAGELOG_USECUSTOMFONT))
+	//{
+	//	CString fn = COptions::GetOption(OPTION_MESSAGELOG_FONTNAME);
+	//	int pt = COptions::GetOptionVal(OPTION_MESSAGELOG_FONTSIZE);
+	//	if (fn != "")
+	//		fontname = fn;
+	//	if (pt != 0)
+	//		pointsize = pt * 2;
+	//}
 	
-	m_RTFHeader += "{\\fonttbl{\\f0\\fnil ";
-	m_RTFHeader += CString(m_lfFont.lfFaceName);
-	m_RTFHeader += ";}}";
-	//m_RTFHeader += "{\\fonttbl{\\f0\\fnil "+ CString(m_lfFont.lfFaceName)+";}}";
+	m_RTFHeader += ("{\\fonttbl{\\f0\\fnil ");
+	m_RTFHeader += fontname;
+	m_RTFHeader += (";}}");
 	m_RTFHeader += "{\\colortbl ;";
 	for (int i=0; i<16; i++)
 	{
@@ -326,58 +267,100 @@ int CStatusCtrl::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	}
 	m_RTFHeader += "}";
 	
-	int pointsize = (-m_lfFont.lfHeight*72/ GetDeviceCaps(GetDC()->GetSafeHdc(), LOGPIXELSY))*2;
 	CString tmp;
 	tmp.Format(_T("%d"), pointsize);
-	m_RTFHeader += "\\uc1\\pard\\fi-200\\li200\\tx200\\f0\\fs";
+	m_RTFHeader += ("\\uc1\\pard\\fi-50\\li50\\tx50\\f0\\fs");
 	m_RTFHeader += tmp;
-	//m_RTFHeader += "\\uc1\\pard\\fi-200\\li200\\tx200\\f0\\fs"+tmp; //180*m_nAvgCharWidth;
 
-	t_buffer buffer;
-	buffer.status = _T("");
-	buffer.pos = -1;
-	buffer.type = 0;
-	m_statusBuffer.push_back(buffer);
+	CString rtfstr = m_RTFHeader;
+	rtfstr += "} ";
 
-	m_headerPos = 0;
+	DWORD dwNum = WideCharToMultiByte(CP_OEMCP, NULL, rtfstr.GetBuffer(), -1, NULL, 0, NULL, FALSE);
+	boost::shared_ptr<char> buffer(new char[dwNum + 5], boost::checked_array_deleter<char>());
+	WideCharToMultiByte (CP_OEMCP, NULL, rtfstr.GetBuffer(), -1, buffer.get() + 4, dwNum, NULL, FALSE);
+	*(int *)buffer.get() = 0;
 
-	DoStreamIn();
-
+	EDITSTREAM es;
+	es.dwCookie = (DWORD)buffer.get(); // Pass a pointer to the CString to the callback function 
+	es.pfnCallback = RichEditStreamInCallback; // Specify the pointer to the callback function.
+	
+	StreamIn(SF_RTF, es); // Perform the streaming
 	SetSel(-1, -1);
 	LimitText(1000*1000);
 	
 	return 0;
 }
 
-void CStatusCtrl::ShowStatus(LPCTSTR status, int nType)
+void CStatusCtrl::ShowStatus(CString status, int nType)
 {
-	t_buffer buffer;
-	//the rich edit receives the text which is RTF format
-	//so we must convert the status from unicode to ANSI in order to show the Chinese character
-	DWORD dwNum = WideCharToMultiByte(CP_ACP, NULL, status, -1, NULL, 0, NULL, FALSE);
-	boost::shared_ptr<char> content(new char[dwNum], boost::checked_array_deleter<char>());
-	WideCharToMultiByte(CP_ACP, NULL, status, -1, content.get(), dwNum, NULL, FALSE);
-	buffer.status = content.get();
-	buffer.type = nType;
-	buffer.pos = -1;
+	USES_CONVERSION;
 
-	m_statusBuffer.push_back(buffer);
-
-	if (!m_runTimer)
+	CString rtfstr = m_RTFHeader;
+	
+	status.Replace(_T("\\"), _T("\\\\"));
+	status.Replace(_T("{"), _T("\\{"));
+	status.Replace(_T("}"), _T("\\}"));
+	status.Replace(_T("\r"), _T(""));
+	status.Replace(_T("\n"), _T("\\status"));
+	
+	CString str;
+	switch (nType)
 	{
-		Run();
-	    m_runTimer = SetTimer(1339, 250, 0);
+	case FZ_LOG_STATUS:
+		//str.LoadString(IDS_STATUSMSG_PREFIX);
+		str += "\\cf2";
+		break;
+	case FZ_LOG_ERROR:
+		//str.LoadString(IDS_ERRORMSG_PREFIX);
+		str="\\cf5";
+		break;
+	case FZ_LOG_COMMAND:
+		//str.LoadString(IDS_COMMANDMSG_PREFIX);
+		str="\\cf3";
+		break;
+	case FZ_LOG_REPLY:
+		//str.LoadString(IDS_RESPONSEMSG_PREFIX);
+		str="\\cf4";
+		break;
+	case FZ_LOG_LIST:
+		//str.LoadString(IDS_TRACEMSG_TRACE);
+		str="\\cf11";
+		break;
+	case FZ_LOG_APIERROR:
+	case FZ_LOG_WARNING:
+	case FZ_LOG_INFO:
+	case FZ_LOG_DEBUG:
+		//str.LoadString(IDS_TRACEMSG_TRACE);
+		str="\\cf7";
+		break;
 	}
 
-	return;
-}
+	CString tmp;
+	tmp += str;
+	tmp += "\\tab ";
+	tmp += status;
+	status = tmp;
 
-void CStatusCtrl::Run()
-{
-	if (m_statusBuffer.empty())
-		return;
+	if (!m_bEmpty){
+		rtfstr += "\\par ";
+		rtfstr += status;
+	}else
+	{
+		m_bEmpty = FALSE;
+		rtfstr += status;
+	}
+	
+	rtfstr += "} ";
 
-	m_headerPos = 0;
+	DWORD dwNum = WideCharToMultiByte(CP_OEMCP, NULL, rtfstr.GetBuffer(), -1, NULL, 0, NULL, FALSE);
+	boost::shared_ptr<char> buffer(new char[dwNum + 5], boost::checked_array_deleter<char>());
+	WideCharToMultiByte (CP_OEMCP, NULL, rtfstr.GetBuffer(), -1, buffer.get() + 4, dwNum, NULL, FALSE);
+	*(int *)buffer.get() = 0;
+
+	EDITSTREAM es;
+
+	es.dwCookie = (DWORD)buffer.get(); // Pass a pointer to the CString to the callback function 
+	es.pfnCallback = RichEditStreamInCallback; // Specify the pointer to the callback function.
 
 	CWnd *pFocusWnd = GetFocus();
 	if (pFocusWnd && pFocusWnd == this)
@@ -392,30 +375,25 @@ void CStatusCtrl::Run()
 	GetRect(rect);
 	int height = rect.Height();
 	
-	for (int i = GetFirstVisibleLine();
-			i < GetLineCount() && GetCharPos(LineIndex(i)).y < height;
-			i++)
+	for (int i = GetFirstVisibleLine();	i < GetLineCount() && GetCharPos(LineIndex(i)).y < height; i++)
 		num++;
+
 
 	if (GetFirstVisibleLine() + num+m_nMoveToBottom >= GetLineCount())
 		nScrollToEnd = TRUE;
 	HideSelection(TRUE, FALSE);
 	SetSel(-1, -1);
+	StreamIn(SF_RTF | SFF_SELECTION, es); // Perform the streaming
 
-	DoStreamIn(SFF_SELECTION);
-
-	int count = GetLineCount();
-	if (count > 1000)
+	if (GetLineCount() > 1000)
 	{
-		count = count - 1000;
-		int index = LineIndex(count);
-		nStart -= index;
-		nEnd -= index;
+		nStart -= LineLength(0) + 2;
+		nEnd -= LineLength(0) + 2;
 		if (nStart < 0)
 			nEnd = 0;
 		if (nEnd < 0)
 			nEnd = 0;
-		SetSel(0, index);
+		SetSel(0, LineLength(0) + 2);
 		ReplaceSel(_T(""));
 	}
 
@@ -437,11 +415,12 @@ void CStatusCtrl::Run()
 				m_nTimerID = SetTimer(654, 25, NULL);
 		}
 	}
+
 }
 
-void CStatusCtrl::OnTimer(UINT_PTR nIDEvent) 
+void CStatusCtrl::OnTimer(UINT nIDEvent) 
 {
-	if (nIDEvent == m_nTimerID)
+	if (nIDEvent == static_cast<UINT>(m_nTimerID))
 	{
 		if (m_nMoveToBottom)
 		{
@@ -450,13 +429,7 @@ void CStatusCtrl::OnTimer(UINT_PTR nIDEvent)
 		}
 		KillTimer(m_nTimerID);
 		m_nTimerID = 0;
-	}
-	else if (nIDEvent == static_cast<UINT>(m_runTimer))
-	{
-		KillTimer(m_runTimer);
-		m_runTimer = 0;
-		Run();
-	}
+	}	
 	CRichEditCtrl::OnTimer(nIDEvent);
 }
 
@@ -500,14 +473,4 @@ BOOL CStatusCtrl::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
 	return TRUE;
 }
 
-void CStatusCtrl::DoStreamIn(int extraFlags)
-{
-	EDITSTREAM es;
-	es.dwCookie = (DWORD)this; // Pass a pointer to the CString to the callback function 
-	es.pfnCallback = RichEditStreamInCallback; // Specify the pointer to the callback function.
-	
-#ifdef _UNICODE
-//	extraFlags |= SF_UNICODE;
-#endif
-	StreamIn(extraFlags | SF_RTF, es); // Perform the streaming
-}
+
