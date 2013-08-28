@@ -1,3 +1,7 @@
+/**
+ * 初始化菜单数据，存放在uoFood数组中
+ * @param {object} data 餐桌对象
+ */
 function initOrderData(data){
 	// 加载菜单数据
 	$.ajax({
@@ -19,16 +23,19 @@ function initOrderData(data){
 				showOrder();
 				showDescForUpdateOrder();
 			}else{
-				alert('初始化菜品数据失败.');
+				alert('初始化菜单数据失败.');
 			}
 		},
 		
 		error : function(request, status, err){
-			alert('初始化菜品数据失败.');
+			alert('初始化菜单数据失败.');
 		}
 	});	
 }
 
+/**
+ * 初始化退菜原因数据，存在cancelReasonData数组中
+ */
 function initCancelReason(){
 	$.ajax({
 		url : '../QueryCancelReason.do',
@@ -50,17 +57,9 @@ function initCancelReason(){
 	});
 }
 
-//计算消费总额
-function getTotalPriceUO(){
-	var totalPriceUO = 0;
-	for(x in uoFood){
-		totalPriceUO += uoFood[x].count * uoFood[x].actualPrice;
-	}
-	return totalPriceUO;
-}
-function selectUOFood(o){
-	selectigRow = o.id;
-}
+/**
+ * 初始化页头信息（账单号，餐台号，餐台名，用餐人数）
+ */
 function showNorthForUpdateOrder(){
 	var html = "";
 	var tableName;
@@ -78,6 +77,10 @@ function showNorthForUpdateOrder(){
 		"</div>";
 	$("#divNorthForUpdateOrder").html(html);
 }
+
+/**
+ * 初始化菜单信息
+ */
 function showOrder(){
 	var html = "<tr>" +
 				"<th style = 'width: 4%'></th>" +
@@ -90,24 +93,9 @@ function showOrder(){
 				"<th>操作</th>" +
 				"<th>服务员</th>" +
 			"</tr>";
-//	var n = 1;
-//	for(x in uoFood){
-//		html += "<tr id = 'truoFood" + n + "' onclick = 'selectUOFood(this)'>" + 
-//				"<td>" + n + "</td>" +
-//				"<td>" + uoFood[x].name + "</td>" +
-//				"<td>" + uoFood[x].count.toFixed(1) + "</td>" +
-//				"<td>" + uoFood[x].tasteGroup.tastePref + "</td>" +
-//				"<td>" + uoFood[x].actualPrice.toFixed(2) + "</td>" +
-//				"<td>" + uoFood[x].totalPrice.toFixed(2) + "</td>" +
-//				"<td>" + uoFood[x].orderDateFormat + "</td>" +
-//				"<td><input type = 'button' value = '退菜' " + 
-//				"class = 'cancelFoodBtn' id = 'btnuo" + n + "' /></td>" +
-//				"<td>" + uoFood[x].waiter + "</td></tr>";
-//		n++;
-//	}
 	for(var i = 0; i < uoFood.length; i++){
 		html += Templet.uo.orderFood.format({
-			dataIndex : i,
+			dataIndex : i + 1,
 			id : uoFood[i].id,
 			name : uoFood[i].name,
 			count : uoFood[i].count.toFixed(2),
@@ -119,6 +107,7 @@ function showOrder(){
 		});
 	}
 	$("#divCenterForUpdateOrder table").html(html);
+	
 	//设置鼠标移到退菜按钮上的移进移出效果
 	$(".cancelFoodBtn").mouseover(function(){
 		$(this).css("backgroundColor", "#FFD700");
@@ -127,46 +116,21 @@ function showOrder(){
 		$(this).css("backgroundColor", "#75B2F4");
 	});	
 	
+	//为退菜按钮绑定退菜事件
 	$(".cancelFoodBtn").bind("click", function(){
 		cancelFood(this);
 	});
 }
+
+/**
+ * 初始化页尾信息（菜品数量，消费总额）
+ */
 function showDescForUpdateOrder(){
 	var html = "";
 	html = "<div>" +
 	"<span style = 'margin-left: 500px;'>菜品数量：" + uoFood.length + "</span>" +
-	"<span style = 'margin-left: 50px;'>消费总额：</span>" + "<span id = 'spanTotalPriceUO'>" + "</span>" +	
+	"<span style = 'margin-left: 50px;'>消费总额：</span>" + "<span id = 'spanTotalPriceUO'></span>" +	
 	"</div>";
 	$("#divDescForUpdateOrder").html(html);
-	$("#spanTotalPriceUO").html(getTotalPriceUO() + "元");
+	$("#spanTotalPriceUO").html(getTotalPriceUO().toFixed(2) + "元");
 }
-function findFoodByAlias(c){
-	var food = null;
-	for(x in uoFood){
-		if(uoFood[x].alias == c){
-			food = uoFood;
-			break;
-		}
-	}
-	return food;
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

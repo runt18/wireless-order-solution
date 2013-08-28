@@ -28,14 +28,11 @@ var inputNumId;
 var inputNumVal = "";
 //选中区域的id
 var selectingRegionId;
-//被选中餐桌的id
-//var selectTableId;
-//被选中餐桌原来的背景色
-//var primeBgColor;
 //设置输入桌号界面的类型
 var typeForInputTableNum;
 //设置当前状态类型（busy， free, allStatus）
 var statusType = "";
+
 /**
  * 取得当前区域下不同状态的餐桌数组 
  * @param {string} type 状态类型，分为空闲（free），就餐（busy），全部状态（allStatus）
@@ -63,6 +60,7 @@ function getStatusTables(type, tempTables){
 	}
 	return statusTables;
 }
+
 /**
  * 点击区域，显示不同状态的餐桌数组
  * @param {object} o 
@@ -108,7 +106,6 @@ function addTables(o){
     showTable(temp, pageNow);
 }
 
-
 /**
  * 点击全部状态按钮
  */
@@ -123,6 +120,7 @@ function showStatus(){
 	n = Math.ceil(temp.length/limit) ;      
     showTable(temp, pageNow);
 }
+
 //点击空闲状态按钮
 $("#freeForTableSelect").click(function(){
 	$("#freeForTableSelect").css("backgroundColor", "#FFA07A");
@@ -134,6 +132,7 @@ $("#freeForTableSelect").click(function(){
 	n = Math.ceil(temp.length/limit) ;      
     showTable(temp, pageNow);
 });
+
 //点击就餐状态按钮
 $("#busyForTableSelect").click(function(){
 	$("#busyForTableSelect").css("backgroundColor", "#FFA07A");
@@ -145,6 +144,7 @@ $("#busyForTableSelect").click(function(){
 	n = Math.ceil(temp.length/limit) ;      
     showTable(temp, pageNow);
 });
+
 //设置鼠标移到数字键盘上的移进移出效果
 $(".keyboardbutton").mouseover(function(){
 	$(this).css("backgroundColor", "#FFD700");
@@ -152,6 +152,7 @@ $(".keyboardbutton").mouseover(function(){
 $(".keyboardbutton").mouseout(function(){
 	$(this).css("backgroundColor", "#75B2F4");
 });
+
 /**
  * 选中一张餐桌
  * @param {object} o 被选中的餐桌节点
@@ -161,9 +162,7 @@ function selectTable(o){
 	tabMessage = document.getElementById(o.id).getAttribute("tableObject");
 	tableMessage = JSON.parse(tabMessage);
 	//判断是否为已点菜餐桌
-	if(tableMessage.statusText == "就餐"){
-//		toggleContentDisplay({type:'show', renderTo:'divUpdateOrder'});
-		
+	if(tableMessage.statusText == "就餐"){		
 		uo.show({
 			table : getTableBytableId(o.id.substring(8, o.id.length))
 		});
@@ -206,6 +205,7 @@ function selectTable(o){
 		});
 	}	
 }
+
 /**
  * 点击数字键盘上的数字，对输入框进行输入
  * @param {object} o
@@ -231,6 +231,7 @@ function inputNum(o){
 	}
 	$("#" + inputNumId).focus();	
 }
+
 //清除一位数字
 $("#btnBackOneForSTNum").click(function(){
 	var tempNum;
@@ -241,12 +242,14 @@ $("#btnBackOneForSTNum").click(function(){
 	}
 	$("#" + inputNumId).focus();
 });
+
 //重置数字
 $("#btnBackAllForSTNum").click(function(){
 	inputNumVal = "";
 	$("#txtTableNumForTS").val(inputNumVal);
 	$("#" + inputNumId).focus();
 });
+
 //跳转到点菜界面
 function renderToCreateOrder(tableNo, peopleNo){
 	if(hasTable(tables, tableNo)){
@@ -264,7 +267,7 @@ function renderToCreateOrder(tableNo, peopleNo){
 	}	
 }
 
-//点击空台 8弹出点菜页面上的点菜按钮
+//点击空台后弹出的点菜页面上的点菜按钮
 $("#btnRenderToCreateOrder").click(function(){
 	var tableNo;
 	var peopleNo;
@@ -276,6 +279,7 @@ $("#btnRenderToCreateOrder").click(function(){
 	}	
 	renderToCreateOrder(tableNo, peopleNo);
 });
+
 //点击桌号选择页面的确定（点菜）按钮
 $("#btnSubmitForSelectTableNumTS").click(function(){
 	//获得餐桌号

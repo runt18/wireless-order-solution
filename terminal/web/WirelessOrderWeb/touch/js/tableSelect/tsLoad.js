@@ -18,10 +18,8 @@ function getPagingData(start, limit, tempObject, isPaging){
 	return pageRoot;
 }
 
-
-
 /**
- * 从后台取出餐桌信息，保存到tables数组中
+ * 初始化餐桌信息，保存到tables数组中
  * freeTables存放空闲餐桌，busyTables存放就餐餐桌
  */
 function getTables(){
@@ -63,26 +61,17 @@ function getTables(){
 		//设置区域未选中状态的背景色（#D4F640）
 		$(".button-base.regionSelect").css("backgroundColor", "#D4F640");
 		//默认选中全部状态区域（#FFA07A）
-//		selectingRegionId = "divAllArea";
 		$("#divAllArea").css("backgroundColor", "#FFA07A");
 		//默认显示全部状态下的全部区域
 		statusType = "allStatus";
 		tempForAllStatus = tables;
 		temp = tables;
-		//得到就餐状态的所有餐桌
-//		busyTables = getStatusTables("busy", temp);
 		//根据实际窗口的大小设置limit
 		var width = $("#divTableShowForSelect").width();
 		var height = $("#divTableShowForSelect").height() - 1;
 		limit = Math.floor(width/102) * Math.floor(height/82);
 		n = Math.ceil(temp.length/limit) ; 
 		showTable(temp, pageNow);
-		//默认选中第一桌
-//		selectTableId = "divtable" + tables[0].alias;
-		//保存背景色
-//		primeBgColor = $("#" + selectTableId).css("backgroundColor");
-		//设置被选中餐桌的背景色
-//		$("#" + selectTableId).css("backgroundColor", "#FFA07A");
 	});	
 }
 
@@ -116,14 +105,13 @@ function showTable(temp, pageNow){
 		for(x in busyTables){
 			$("#divtable" + busyTables[x].alias).css("backgroundColor", "#FF0");
 		}
-		//设置被选中餐桌的背景色
-//		$("#" + selectTableId).css("backgroundColor", "#FFA07A");
 		$("#spanPageNow").html("第" + pageNow + "页");
 		$("#spanAllPage").html("共" + n + "页");
 	}else{
 		alert("该区域没有设置餐桌！");
 	}	
 }
+
 //判断是否有该餐桌alias
 function hasTable(tableObject, tableNo){
 	for(x in tableObject){
@@ -133,6 +121,7 @@ function hasTable(tableObject, tableNo){
 	}
 	return false;
 }
+
 /**
  * 根据餐桌id，返回餐桌对象字符串
  * @param {int} tableId
@@ -145,6 +134,7 @@ function getTableBytableId(tableId){
 		}
 	}
 }
+
 //显示第一页
 function firstPage(){
 	if(temp.length != 0){
@@ -154,6 +144,7 @@ function firstPage(){
 		alert("该区域没有餐桌！");
 	}
 }
+
 //显示最后一页
 function lastPage(){
 	if(temp.length != 0){
@@ -163,6 +154,7 @@ function lastPage(){
 		alert("该区域没有餐桌！");
 	}
 }
+
 //显示上一页
 function frontPage(){	
 	if(temp.length != 0){
@@ -176,6 +168,7 @@ function frontPage(){
 		alert("请先选择区域！");
 	}	
 }
+
 //显示下一页信息
 function nextPage(){
 	//判断是否为最后一页
@@ -190,9 +183,3 @@ function nextPage(){
 		alert("请先选择区域！");
 	}	
 }	
-
-
-
-
-
-

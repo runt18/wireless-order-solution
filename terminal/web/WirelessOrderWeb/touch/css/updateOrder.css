@@ -53,8 +53,8 @@ table td{
 #divKeyboardNumForUO{
 	display: none;
 	position: absolute;
-	top: 25%;
-	left: 35%;
+	top: 20%;
+	left: 25%;
 	width: 725px;
 	height: 430px;
 	border: 2px solid #fff;
