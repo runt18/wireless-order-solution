@@ -1,0 +1,61 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>无线点餐网页终端</title>
+
+<link rel="stylesheet" type="text/css" href="../extjs/resources/css/ext-all.css" />
+<link rel="stylesheet" type="text/css" href="../extjs/ext-patch.css">
+<link rel="stylesheet" type="text/css" href="../css/myExt.css"/>
+
+<script type="text/javascript" src="../extjs/ext-base.js"></script>
+<script type="text/javascript" src="../extjs/ext-all.js"></script>
+<script type="text/javascript" src="../js/common/Ext.ux.js"></script>
+<script type="text/javascript" src="../js/common/Ext.ux.check.js"></script>
+<script type="text/javascript" src="../extjs/ext-lang-zh_CN.js"></script>
+
+<link rel="stylesheet" type="text/css" href="../css/systemSetting.css">
+<link rel="stylesheet" type="text/css" href="../css/header.css"/>
+
+
+<script type="text/javascript" src="../js/components/Ext.ux.ImageButton.js"></script>
+<script type="text/javascript" src="../js/components/md5.js"></script>
+<script type="text/javascript" src="../js/components/Encrypt.js"></script>
+<script type="text/javascript" src="../js/components/functionLib.js"></script>
+
+
+<script type="text/javascript">
+var Request = new URLParaQuery();
+var restaurantID = Request["restaurantID"];
+	Ext.onReady(function(){
+  		var interval = 3;
+		var action = '<br>&nbsp;&nbsp;&nbsp;<span id="returnInterval" style="color:red;"></span>&nbsp;之后自动跳转';
+		new Ext.util.TaskRunner().start({
+			run: function(){
+				if(interval < 1){
+					location.href = '/WirelessOrderWeb/pages/PersonLogin.html?'+strEncode('restaurantID='+restaurantID, 'mi');								
+				}
+				Ext.getDom('returnInterval').innerHTML = interval;
+				interval--;
+			},
+			interval : 1000
+		});  
+		Ext.MessageBox.show({
+			title : '提示',
+			msg : '操作已超时, 请重新登陆' + action,
+			buttons : Ext.Msg.OK,
+			icon : Ext.MessageBox.WARNING,
+			closable : false,
+			fn : function(btn){
+				if(btn == 'ok'){
+					location.href = '/WirelessOrderWeb/pages/PersonLogin.html?'+strEncode('restaurantID='+restaurantID, 'mi');
+				}
+			}
+		});
+	});
+</script>
+</head>
+<body>
+
+</body>
+</html>
