@@ -445,6 +445,10 @@
 			type="com.wireless.Actions.printScheme.OperatePrinterAction" scope="request"
 			parameter="dataSource">
 		</action>
+		<action path="/VerifyStaff"
+				type = "com.wireless.Actions.login.VerifyStaffAction"
+				scope="request">
+		</action>
 	</action-mappings>
 
 	<message-resources parameter="com.yourcompany.struts.ApplicationResources" />
