@@ -276,9 +276,6 @@ function initControl(){
 					var data = [[-1,'全部']];
 					Ext.Ajax.request({
 						url : '../../QuerySupplier.do',
-						params : {
-							
-						},
 						success : function(res, opt){
 							var jr = Ext.decode(res.responseText);
 							for(var i = 0; i < jr.root.length; i++){
@@ -901,7 +898,7 @@ function initControl(){
 	    			var count = Ext.getCmp('numSelectCountForStockAction');
 					var stockTypeList = stockTaskNavWin.stockType.split(',');
 					var stockSubType = stockTypeList[2];
-					if(stockSubType == 3 || stockSubType == 6){
+					if(stockSubType == 3 || stockSubType == 6 || stockSubType == 2 || stockSubType == 5){
 						Ext.Ajax.request({
 							url : '../../QueryMaterial.do',
 							params : {

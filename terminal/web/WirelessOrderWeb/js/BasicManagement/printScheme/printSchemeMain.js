@@ -70,7 +70,7 @@ Ext.Ajax.request({
 			for ( var i = 0; i < jr.root.length; i++) {
 				
 				var d = jr.root[i];
-				var c = {items : [{xtype : "radio", name : "dept",boxLabel : d.name , hideLabel : true, inputValue :  d.id }]};
+				var c = {items : [{xtype : "checkbox", name : "dept",boxLabel : d.name , hideLabel : true, inputValue :  d.id }]};
 				
 				Ext.getCmp('allDept').add(c);
 				Ext.getCmp('allDept').doLayout();
@@ -172,8 +172,10 @@ var addPrintFunc = new Ext.Window({
 				var dept = document.getElementsByName('dept');
 				//添加部门
 				for ( var i = 0; i < dept.length; i++) {
-					if(dept[i].checked){
+					if(dept[i].checked && depts == ''){
 						depts += dept[i].value;
+					}else if(dept[i].checked && depts != ''){
+						depts += (',' + dept[i].value);
 					}
 				}
 			}
@@ -262,8 +264,10 @@ var addPrintFunc = new Ext.Window({
 				var dept = document.getElementsByName('dept');
 				//添加部门
 				for ( var i = 0; i < dept.length; i++) {
-					if(dept[i].checked){
+					if(dept[i].checked && depts == ''){
 						depts += dept[i].value;
+					}else if(dept[i].checked && depts != ''){
+						depts += (',' + dept[i].value);
 					}
 				}
 			}
@@ -282,12 +286,9 @@ var addPrintFunc = new Ext.Window({
 				}
 			}
 			
-			
-			
 			var dataSource = '';
 			var funcId = '';
 			if(addPrintFunc.operationType == 'insert'){
-				
 				dataSource = 'insert';
 			}
 			else if(addPrintFunc.operationType == 'update'){
@@ -427,9 +428,6 @@ var addPrintFunc = new Ext.Window({
 					check  : function(thiz, checked){
 						if(checked){
 							showPanel(thiz.inputValue);
-/*							document.getElementById('chkAllRegion').checked = true;
-							return ;*/
-							
 						}
 					},
 				}
@@ -950,9 +948,10 @@ function printFuncOperactionHandler(c){
 			Ext.getDom('chkAllDept').checked = false;
 			Ext.getCmp('chkAllDept').fireEvent('check', Ext.getCmp('chkAllDept'), false);
 			for ( var i = 0; i < dept.length; i++) {
-				if(dept[i].value == deptValue){
-					dept[i].checked = true;
-					dept[i].click();
+				for ( var j = 0; j < deptValue.length; j++) {
+					if(deptValue[j] == dept[i].value){
+						dept[i].checked = true;
+					}
 				}
 			}	
 		}else{
@@ -1138,12 +1137,8 @@ Ext.onReady(function(){
 								'printerId' : treeRoot[0].attributes.printerId
 							}
 						});
-/*						for ( var i = 0; i < treeRoot.length; i++) {
-							alert(treeRoot[i]);
-							treeRoot[i].iconCls = 'btn_add';
-						}*/
 					}else{
-						/*						printerTree.getRootNode().getUI().hide();
+						/*printerTree.getRootNode().getUI().hide();
 						Ext.Msg.show({
 							title : '提示',
 							msg : '加载打印机失败',
@@ -1155,9 +1150,6 @@ Ext.onReady(function(){
 			}
 		}),
 		listeners : {
-/*			click : function(e){
-				Ext.getDom('tbPrinterName').innerHTML = e.attributes.name + " " + e.attributes.alias;
-			},*/
 			dblclick : function(e){
 				Ext.getDom('tbPrinterName').innerHTML = e.attributes.name + " " + e.attributes.alias;
 				//var rn = printerTree.getSelectionModel().getSelectedNode();
@@ -1194,9 +1186,9 @@ Ext.onReady(function(){
 	var cm = new Ext.grid.ColumnModel([
 		new Ext.grid.RowNumberer(),
 		{header : '功能', dataIndex : 'pTypeText', width : 100},
-		{header : '厨房', dataIndex : 'kitchens', width : 350, renderer : tooLength},
-		{header : '部门', dataIndex : 'dept', width : 100},
-		{header : '区域', dataIndex : 'regions', width : 320, renderer : tooLength},
+		{header : '厨房', dataIndex : 'kitchens', width : 280, renderer : tooLength},
+		{header : '部门', dataIndex : 'dept', width : 220},
+		{header : '区域', dataIndex : 'regions', width : 256, renderer : tooLength},
 		{header : '打印数', dataIndex : 'repeat', width : 80},
 		{header : '操作',dataIndex : 'opt', renderer : opt, width : 100}
 	]);

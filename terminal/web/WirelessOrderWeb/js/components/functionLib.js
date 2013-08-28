@@ -3,6 +3,40 @@ Ext.onReady(function() {
 	Ext.QuickTips.init();
 	Ext.lib.Ajax.defaultPostHeader += '; charset=utf-8';
 });
+
+/**
+ * Ext.Ajax判断session超时后跳转
+ */
+Ext.Ajax.on('requestcomplete',checkUserSessionStatus, this);     
+function checkUserSessionStatus(conn,response,options){     
+   //Ext重新封装了response对象     
+    if(response.getResponseHeader.sessionstatus){ 
+  		var interval = 3;
+		var action = '<br>&nbsp;&nbsp;&nbsp;<span id="returnInterval" style="color:red;"></span>&nbsp;之后自动跳转';
+		new Ext.util.TaskRunner().start({
+			run: function(){
+				if(interval < 1){
+					location.href = '/WirelessOrderWeb/pages/PersonLogin.html?'+strEncode('restaurantID='+restaurantID, 'mi');								
+				}
+				Ext.getDom('returnInterval').innerHTML = interval;
+				interval--;
+			},
+			interval : 1000
+		});  
+		Ext.MessageBox.show({
+			title : '提示',
+			msg : '操作已超时, 请重新登陆' + action,
+			buttons : Ext.Msg.OK,
+			icon : Ext.MessageBox.WARNING,
+			closable : false,
+			fn : function(btn){
+				if(btn == 'ok'){
+					location.href = '/WirelessOrderWeb/pages/PersonLogin.html?'+strEncode('restaurantID='+restaurantID, 'mi');
+				}
+			}
+		});
+    }     
+} 
 Ext.override(Ext.tree.TreeNodeUI, {
 	onDblClick : function(e){
 		e.preventDefault();
@@ -129,20 +163,6 @@ function getOperatorName(actionPath) {
 			var resultJSON = Ext.util.JSON.decode(response.responseText);
 			var rootData = resultJSON.root;
 			var pin = resultJSON.other.pin;
-			var status = resultJSON.other.status;
-			if(status == 0){
-				Ext.MessageBox.show({
-					msg : resultJSON.msg,
-					width : 300,
-					buttons : Ext.MessageBox.OK,
-					fn : function(btn){
-						if(btn == 'ok'){
-							window.location.href = '/WirelessOrderWeb/pages/PersonLogin.html?'+strEncode('restaurantID='+restaurantID, 'mi');
-						}
-					}
-				});
-				
-			}
 			if (rootData.length != 0) {
 				if (resultJSON.msg == "normal") {
 					staffData = rootData;
@@ -168,8 +188,33 @@ function getOperatorName(actionPath) {
 		}
 	});
 };
-
-
+/**
+ * 验证员工权限
+ * @param actionPath 	相对路径
+ * @param code 			权限码
+ * @param href 			跳转的页面
+ */
+function verifyStaff(actionPath, code, href){
+	Ext.Ajax.request({
+		url : actionPath + "VerifyStaff.do",
+		params : {
+			restaurantID : restaurantID,
+			code : code
+		},
+		success : function(res, opt){
+			var jr = Ext.decode(res.responseText);
+			if(jr.success){
+				location.href = href;
+			}else{
+				jr['icon'] = Ext.MessageBox.WARNING;
+				Ext.ux.showMsg(jr);
+			}
+		},
+		failure : function(res, opt){
+			Ext.ux.showMsg(Ext.decode(res.responseText));
+		}
+	});
+};
 
 /**
  * 初始化页面布局

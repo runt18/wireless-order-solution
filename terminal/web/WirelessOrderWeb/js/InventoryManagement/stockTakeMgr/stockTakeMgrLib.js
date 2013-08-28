@@ -124,6 +124,7 @@ function insertStockTakeHandler(){
 							//Ext.getCmp('stockTakeWinWest').setDisabled(false);
 							//loadOperateMaterial();
 						}else{
+							jr['icon'] = Ext.Msg.WARNING; 
 							Ext.ux.showMsg(jr);
 						}
 					},

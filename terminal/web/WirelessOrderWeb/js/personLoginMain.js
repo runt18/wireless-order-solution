@@ -476,46 +476,47 @@ Ext.onReady(function() {
 			handler : function() {
 				if (staffForm.getForm().isValid()) {
 					var pin = staffForm.findById("empName").getValue();
-					var password = "";
+/*					var password = "";
 					for ( var i = 0; i < emplData.length; i++) {
 						if (emplData[i][0] == pin) {
 							password = emplData[i][2];
 						}
-					}
+					}*/
 					var passwordInput = staffForm.findById("empPassword").getValue();
 					var pwdTrans;
 					pwdTrans = MD5(passwordInput);
-					if (password == pwdTrans) {
-						Ext.Ajax.request({
-							url : '../OperateStaff.do',
-							params : {
-								pin : pin,
-								restaurantID : restaurantID
-							},
-							success : function(response, options) {
+					
+					Ext.Ajax.request({
+						url : '../OperateStaff.do',
+						params : {
+							pin : pin,
+							psw : pwdTrans,
+							restaurantID : restaurantID,
+							skipVerify : true
+						},
+						success : function(res, opt) {
+							var jr = Ext.decode(res.responseText);
+							if(jr.success){
+								getOperatorName("../");
+								isVerified = true;
 								
-							},
-							failure : function(response, options) {
+								personLoginWin.hide();
+								personLoginWin.findById(
+										"empPassword")
+										.setValue("");
+							}else{
+								jr['icon'] = Ext.Msg.WARNING;
+								Ext.ux.showMsg(jr);
 							}
-						});
-						//currPin = pin;
-						getOperatorName("../");
-						isVerified = true;
-						
 
-						
-						personLoginWin.hide();
-						personLoginWin.findById(
-								"empPassword")
-								.setValue("");
-					} else {
-						isVerified = false;
-						Ext.MessageBox.show({
-							msg : "姓名或密码错误！",
-							width : 300,
-							buttons : Ext.MessageBox.OK
-						});
-					}
+						},
+						failure : function(res, opt) {
+							isVerified = false;
+							Ext.ux.showMsg(Ext.decode(res.responseText));
+						}
+					});
+					
+					
 				}
 			}
 		}, {
