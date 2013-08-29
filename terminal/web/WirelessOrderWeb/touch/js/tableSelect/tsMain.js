@@ -101,7 +101,14 @@ function addTables(o){
     	    $("#" + o.id).css("backgroundColor", "#FFA07A");
     	} 
      }  
+    
     temp = tempForRegion;
+    //如果没有餐桌，则改变区域选中色
+    if(temp.length == 0){
+    	$(".button-base.regionSelect").css("backgroundColor", "#D4F640");
+	    $("#divAllArea").css("backgroundColor", "#4EEE99");
+	    $("#" + o.id).css("backgroundColor", "#FFA07A");
+    }
     n = Math.ceil(temp.length/limit) ;      
     showTable(temp, pageNow);
 }

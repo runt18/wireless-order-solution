@@ -108,7 +108,8 @@ function showTable(temp, pageNow){
 		$("#spanPageNow").html("第" + pageNow + "页");
 		$("#spanAllPage").html("共" + n + "页");
 	}else{
-		alert("该区域没有设置餐桌！");
+//		alert("该区域没有设置餐桌！");
+		$("#divShowTableForSelect").html("");
 	}	
 }
 
