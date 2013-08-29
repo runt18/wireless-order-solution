@@ -83,7 +83,6 @@ public class TestRoleDao {
 			DefAdminInsertBuilder builder = new DefAdminInsertBuilder();
 			builder.setRestaurantId(mStaff.getRestaurantId());
 			
-			//包括角色的插入和对应关系表的插入
 			roleId = RoleDao.insertRole(mStaff, builder);
 			
 			//期望值
@@ -118,12 +117,12 @@ public class TestRoleDao {
 			expected.setId(newRoleId);
 			
 			actual = RoleDao.getRoleById(mStaff, newRoleId);
-			
+			//compare
 			compare(expected, actual);
 			
 			//修改角色信息
 			actual.setName("经理");
-			index = privileges.indexOf(Privilege.Code.DISCOUNT);
+			index = privileges.indexOf(new Privilege(Privilege.Code.DISCOUNT));
 			if(index >= 0){
 				for (Discount discount : discounts) {
 					privileges.get(index).addDiscount(discount);
