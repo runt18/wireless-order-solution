@@ -204,6 +204,7 @@ var inventoryVerifyWin = new Ext.Window({
 			var pwdTrans;
 			if (inventoryVerifyPwd != "") {
 				pwdTrans = MD5(inventoryVerifyPwd);
+				
 			} else {
 				pwdTrans = inventoryVerifyPwd;
 			}
