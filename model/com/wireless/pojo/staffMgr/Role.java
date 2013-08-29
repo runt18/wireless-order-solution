@@ -97,6 +97,79 @@ public class Role implements Jsonable, Parcelable{
 			setName("管理员");
 			setType(Type.RESERVED);
 			setCategoty(Category.ADMIN);
+			
+			addPrivileges(new Privilege(Privilege.Code.FRONT_BUSINESS));
+			addPrivileges(new Privilege(Privilege.Code.BASIC));
+			addPrivileges(new Privilege(Privilege.Code.CANCEL_FOOD));
+			addPrivileges(new Privilege(Privilege.Code.DISCOUNT));
+			addPrivileges(new Privilege(Privilege.Code.GIFT));
+			addPrivileges(new Privilege(Privilege.Code.HISTORY));
+			addPrivileges(new Privilege(Privilege.Code.INVENTORY));
+			addPrivileges(new Privilege(Privilege.Code.MEMBER));
+			addPrivileges(new Privilege(Privilege.Code.RE_PAID));
+			addPrivileges(new Privilege(Privilege.Code.SYSTEM));
+		}
+	}
+	
+	public static class DefBossBuilder extends InsertBuilder{
+		public DefBossBuilder(){
+			setName("老板");
+			setType(Type.RESERVED);
+			setCategoty(Category.BOSS);
+			addPrivileges(new Privilege(Privilege.Code.FRONT_BUSINESS));
+			addPrivileges(new Privilege(Privilege.Code.BASIC));
+			addPrivileges(new Privilege(Privilege.Code.CANCEL_FOOD));
+			addPrivileges(new Privilege(Privilege.Code.DISCOUNT));
+			addPrivileges(new Privilege(Privilege.Code.GIFT));
+			addPrivileges(new Privilege(Privilege.Code.HISTORY));
+			addPrivileges(new Privilege(Privilege.Code.INVENTORY));
+			addPrivileges(new Privilege(Privilege.Code.MEMBER));
+			addPrivileges(new Privilege(Privilege.Code.RE_PAID));
+			addPrivileges(new Privilege(Privilege.Code.SYSTEM));
+		}
+	}
+	
+	public static class DefFinanceBuilder extends InsertBuilder{
+		public DefFinanceBuilder(){
+			setName("财务");
+			setType(Type.NORMAL);
+			setCategoty(Category.FINANCE);
+			addPrivileges(new Privilege(Privilege.Code.FRONT_BUSINESS));
+			addPrivileges(new Privilege(Privilege.Code.BASIC));
+			addPrivileges(new Privilege(Privilege.Code.CANCEL_FOOD));
+			addPrivileges(new Privilege(Privilege.Code.DISCOUNT));
+			addPrivileges(new Privilege(Privilege.Code.GIFT));
+			addPrivileges(new Privilege(Privilege.Code.HISTORY));
+			addPrivileges(new Privilege(Privilege.Code.INVENTORY));
+			addPrivileges(new Privilege(Privilege.Code.MEMBER));
+			addPrivileges(new Privilege(Privilege.Code.RE_PAID));
+		}
+	}
+	
+	public static class DefManagerBuilder extends InsertBuilder{
+		public DefManagerBuilder(){
+			setName("部长");
+			setType(Type.NORMAL);
+			setCategoty(Category.MANAGER);
+			addPrivileges(new Privilege(Privilege.Code.FRONT_BUSINESS));
+			addPrivileges(new Privilege(Privilege.Code.BASIC));
+			addPrivileges(new Privilege(Privilege.Code.CANCEL_FOOD));
+			addPrivileges(new Privilege(Privilege.Code.DISCOUNT));
+			addPrivileges(new Privilege(Privilege.Code.GIFT));
+			addPrivileges(new Privilege(Privilege.Code.RE_PAID));
+		}
+	}
+	
+	public static class DefWaiterBuilder extends InsertBuilder{
+		public DefWaiterBuilder(){
+			setName("服务员");
+			setType(Type.NORMAL);
+			setCategoty(Category.WAITER);
+			addPrivileges(new Privilege(Privilege.Code.FRONT_BUSINESS));
+			addPrivileges(new Privilege(Privilege.Code.CANCEL_FOOD));
+			addPrivileges(new Privilege(Privilege.Code.DISCOUNT));
+			addPrivileges(new Privilege(Privilege.Code.GIFT));
+			addPrivileges(new Privilege(Privilege.Code.RE_PAID));
 		}
 	}
 	
@@ -219,6 +292,19 @@ public class Role implements Jsonable, Parcelable{
 		this.privileges.addAll(builder.getPrivileges());
 	}
 	
+	@Override 
+	public int hashCode(){
+		return 31 * category.getVal() + 17;
+	}
+	
+	@Override
+	public boolean equals(Object obj){
+		if(obj == null || !(obj instanceof Role)){
+			return false;
+		}else{
+			return category == ((Role)obj).getCategory();
+		}
+	}
 	
 	@Override
 	public Map<String, Object> toJsonMap(int flag) {

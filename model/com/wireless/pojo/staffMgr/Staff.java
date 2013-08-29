@@ -8,7 +8,6 @@ import java.util.Map;
 import com.wireless.json.Jsonable;
 import com.wireless.parcel.Parcel;
 import com.wireless.parcel.Parcelable;
-
 public class Staff implements Parcelable, Jsonable{ 
 
 	public final static byte ST_PARCELABLE_COMPLEX = 0;
@@ -59,6 +58,69 @@ public class Staff implements Parcelable, Jsonable{
 	//the role to this staff
 	private Role role;
 	
+
+	public static class DefAdminBuilder extends StaffInsertBuilder{
+		public DefAdminBuilder(){
+			setName("管理员");
+			setPwd("123");
+			setType(Type.RESERVED);
+			
+		}
+	}
+	
+	public static class StaffInsertBuilder{
+		private int restaurantId;
+		private Role role;
+		private String mobile;
+		private String name;
+		private String pwd;
+		private Type type;
+		
+		
+		public int getRestaurantId() {
+			return restaurantId;
+		}
+		public void setRestaurantId(int restaurantId) {
+			this.restaurantId = restaurantId;
+		}
+		public Role getRole() {
+			return role;
+		}
+		public void setRole(Role role) {
+			this.role = role;
+		}
+		public String getMobile() {
+			return mobile;
+		}
+		public void setMobile(String mobile) {
+			this.mobile = mobile;
+		}
+		public String getName() {
+			return name;
+		}
+		public void setName(String name) {
+			this.name = name;
+		}
+		public String getPwd() {
+			return pwd;
+		}
+		public void setPwd(String pwd) {
+			this.pwd = pwd;
+		}
+		public Type getType() {
+			return type;
+		}
+		public void setType(Type type) {
+			this.type = type;
+		}
+		
+		public Staff build(){
+			return new Staff(this);
+		}
+		
+	}
+	
+	
 	public Staff(){
 		
 	}
@@ -70,6 +132,15 @@ public class Staff implements Parcelable, Jsonable{
 	public Staff(String name, int restaurantId){
 		setName(name);
 		setRestaurantId(restaurantId);
+	}
+	
+	public Staff(StaffInsertBuilder builder){
+		setRestaurantId(builder.getRestaurantId());
+		setRole(builder.getRole());
+		setMobile(builder.getMobile());
+		setName(builder.getName());
+		setPwd(builder.getPwd());
+		setType(builder.getType());
 	}
 	
 	public int getId() {
