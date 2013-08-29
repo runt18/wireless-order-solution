@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import com.mysql.jdbc.Statement;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.exception.BusinessException;
@@ -13,6 +14,7 @@ import com.wireless.exception.StaffError;
 import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.staffMgr.Role;
 import com.wireless.pojo.staffMgr.Staff;
+import com.wireless.pojo.staffMgr.Staff.StaffInsertBuilder;
 
 public class StaffDao {
 
@@ -241,7 +243,72 @@ public class StaffDao {
 		
 		return Collections.unmodifiableList(result);
 	}
+	public static int insertStaff(StaffInsertBuilder builder) throws SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return insertStaff(dbCon, builder);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
 	
+	public static int insertStaff(DBCon dbCon, StaffInsertBuilder builder) throws SQLException{
+		String sql = "INSERT INTO " + Params.dbName + ".staff(restaurant_id, role_id, name, tele, pwd, type) VALUES(" +
+					builder.getRestaurantId() + ", " +
+					builder.getRole().getId() + ", " +
+					"'" + builder.getName() + "', " +
+					"'" + builder.getMobile() + "', " +
+					"'" + builder.getPwd() + "', " +
+					builder.getType().getVal() + ")";
+		dbCon.stmt.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
+		dbCon.rs = dbCon.stmt.getGeneratedKeys();
+		int staffId;
+		if(dbCon.rs.next()){
+			staffId = dbCon.rs.getInt(1);
+		}else{
+			throw new SQLException("failed to insert staff");
+		}
+					
+		return staffId;
+	}
+	
+	public static void updateStaff(Staff staff) throws SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			updateStaff(dbCon, staff);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	public static void updateStaff(DBCon dbCon, Staff staff) throws SQLException{
+		String sql = "UPDATE " + Params.dbName + ".staff " + 
+					" SET name = '" + staff.getName() + "', " +
+					" tele = '" + staff.getMobile() + "', " +
+					" pwd = '" + staff.getPwd() + "'" + 
+					" WHERE staff_id = " + staff.getId();
+		
+		dbCon.stmt.executeUpdate(sql);
+	}
+	
+	public static void deleteStaff(int staffId) throws SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			deleteStaff(dbCon, staffId);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	public static void deleteStaff(DBCon dbCon, int staffId) throws SQLException{
+		String sql = "DELETE FROM " + Params.dbName + ".staff" +
+					" WHERE staff_id = " + staffId;
+		
+		dbCon.stmt.executeUpdate(sql);
+	}
 	
 	
 

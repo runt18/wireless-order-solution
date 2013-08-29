@@ -82,11 +82,6 @@ public class TestRoleDao {
 			//创建默认角色
 			DefAdminInsertBuilder builder = new DefAdminInsertBuilder();
 			builder.setRestaurantId(mStaff.getRestaurantId());
-			if(privileges.size() > 0){
-				for (Privilege privilege : privileges) {
-					builder.addPrivileges(privilege);
-				}
-			}
 			
 			//包括角色的插入和对应关系表的插入
 			roleId = RoleDao.insertRole(mStaff, builder);
@@ -107,11 +102,12 @@ public class TestRoleDao {
 			newBuilder.setCategoty(Category.OTHER);
 			newBuilder.setType(Type.NORMAL);
 			
-			index = privileges.indexOf(Privilege.Code.FRONT_BUSINESS); 
+			
+			index = privileges.indexOf(new Privilege(Privilege.Code.FRONT_BUSINESS)); 
 			if(index >= 0){
 				newBuilder.addPrivileges(privileges.get(index));
 			}
-			index = privileges.indexOf(Privilege.Code.BASIC);
+			index = privileges.indexOf(new Privilege(Privilege.Code.BASIC));
 			if(index >= 0){
 				newBuilder.addPrivileges(privileges.get(index));
 			}

@@ -193,7 +193,21 @@ public class RoleDao {
 			roleId = dbCon.rs.getInt(1);
 			//关联权限和折扣
 			for (Privilege privilege : builder.getPrivileges()) {
-				
+				if(privilege.getId() == 0){
+					DBCon priCon = new DBCon();
+					try{
+						priCon.connect();
+						String selectPid = "SELECT pri_id FROM " + Params.dbName + ".privilege" + " WHERE pri_code = " + privilege.getCode().getVal();
+						priCon.rs = priCon.stmt.executeQuery(selectPid);
+						if(priCon.rs.next()){
+							privilege.setId(priCon.rs.getInt("pri_id"));
+						}
+					}finally{
+						priCon.disconnect();
+					}
+
+					
+				}
 				String pSql = "INSERT INTO " + Params.dbName + ".role_privilege(role_id, pri_id, restaurant_id) " +
 								" VALUES(" +
 								roleId + ", " +
