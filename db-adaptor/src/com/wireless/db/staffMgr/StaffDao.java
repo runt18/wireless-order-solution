@@ -243,6 +243,14 @@ public class StaffDao {
 		
 		return Collections.unmodifiableList(result);
 	}
+	
+	/**
+	 * Insert a new staff.
+	 * @param builder
+	 * 			the information of staff
+	 * @return	the id of staff just create
+	 * @throws SQLException
+	 */
 	public static int insertStaff(StaffInsertBuilder builder) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
@@ -252,7 +260,13 @@ public class StaffDao {
 			dbCon.disconnect();
 		}
 	}
-	
+	/**
+	 * Insert a new staff.
+	 * @param dbCon
+	 * @param builder
+	 * @return
+	 * @throws SQLException
+	 */
 	public static int insertStaff(DBCon dbCon, StaffInsertBuilder builder) throws SQLException{
 		String sql = "INSERT INTO " + Params.dbName + ".staff(restaurant_id, role_id, name, tele, pwd, type) VALUES(" +
 					builder.getRestaurantId() + ", " +
@@ -272,7 +286,12 @@ public class StaffDao {
 					
 		return staffId;
 	}
-	
+	/**
+	 * Update the information of staff.
+	 * @param staff
+	 * 			the staff to update
+	 * @throws SQLException
+	 */
 	public static void updateStaff(Staff staff) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
@@ -282,7 +301,12 @@ public class StaffDao {
 			dbCon.disconnect();
 		}
 	}
-	
+	/**
+	 * Update the information of staff.
+	 * @param dbCon
+	 * @param staff
+	 * @throws SQLException
+	 */
 	public static void updateStaff(DBCon dbCon, Staff staff) throws SQLException{
 		String sql = "UPDATE " + Params.dbName + ".staff " + 
 					" SET name = '" + staff.getName() + "', " +
@@ -292,7 +316,13 @@ public class StaffDao {
 		
 		dbCon.stmt.executeUpdate(sql);
 	}
-	
+	/**
+	 * Delete the staff by ID.
+	 * @param staffId
+	 * 			the id of staff
+	 * @throws SQLException
+	 * 			if failed to execute any SQL statement
+	 */
 	public static void deleteStaff(int staffId) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
@@ -302,7 +332,12 @@ public class StaffDao {
 			dbCon.disconnect();
 		}
 	}
-	
+	/**
+	 * Delete the staff by ID.
+	 * @param dbCon
+	 * @param staffId
+	 * @throws SQLException
+	 */
 	public static void deleteStaff(DBCon dbCon, int staffId) throws SQLException{
 		String sql = "DELETE FROM " + Params.dbName + ".staff" +
 					" WHERE staff_id = " + staffId;
