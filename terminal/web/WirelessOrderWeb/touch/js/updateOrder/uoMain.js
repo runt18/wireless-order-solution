@@ -18,10 +18,10 @@ var inputNumIdUO;
 //存放退菜数目
 var count;
 //选中的退菜原因
-var selectingReasonName = "";
+//var selectingReasonName = "";
 //选中的退菜id
 var selectingReasonId = "";
-
+var selectingCancelReason;
 /**
  * 显示已点菜界面函数
  * @param {object} c  
@@ -31,6 +31,7 @@ uo.show = function(c){
 		type: 'show', 
 		renderTo: 'divUpdateOrder'
 	});
+	uo.table = c.table;
 	initOrderData(c.table);
 	initCancelReason();	
 };
@@ -90,15 +91,18 @@ function showKeyboardNumForUO(foodName, dishes){
 				"value = '" + cancelReasonData[x].reason + "' " +
 				"class = 'keyboardbutton reason' " +
 				"onclick = 'setReason(this)' " +
-				"id = 'btnReason" + x + "' " +
+				"id = 'btnReason" + cancelReasonData[x].id + "' " +
 				"style = 'margin: 0 0 5px 5px; width: 177px;'/>";
 	}
 	$("#divReasonForKeyboardNumForUO").html(htmlReason);
+	if(cancelReasonData.length > 0){
+		//默认选中第一个退菜原因
+		selectingReasonId = "btnReason" + cancelReasonData[0].id;
+		selectingCancelReason = cancelReasonData[0];
+//		selectingReasonName = $("#" + selectingReasonId).val();
+		$("#" + selectingReasonId).css("backgroundColor", "#F0A00A");
+	}
 	
-	//默认选中第一个退菜原因
-	selectingReasonId = "btnReason0";
-	selectingReasonName = $("#" + selectingReasonId).val();
-	$("#" + selectingReasonId).css("backgroundColor", "#F0A00A");
 	//设定输入框id
 	inputNumIdUO = 'txtNumForUO';
 	
@@ -132,7 +136,13 @@ function showKeyboardNumForUO(foodName, dishes){
  */
 function setReason(o){
 	//为全局变量（退菜原因）赋值
-	selectingReasonName = o.value;
+	var reasonId = o.id.substring(9);
+	for(x in cancelReasonData){
+		if(cancelReasonData[x].id == reasonId){
+			selectingCancelReason = cancelReasonData[x];
+			break;
+		}
+	}
 	//设置选中状态的背景色
 	$(".keyboardbutton.reason").css("backgroundColor", "#75B2F4");
     $("#" + o.id).css("backgroundColor", "#F0A00A");
@@ -176,7 +186,7 @@ $("#btnSubmitForKeyboardNumUO").click(function(){
 				"<td style = 'background: #FFA07A'>" + foodName + "</td>" +
 				"<td style = 'background: #FFA07A'>" + (-num).toFixed(2) + "</td>" +
 				"<td colspan = '7' style = 'background: #FFA07A'> " +
-				"退菜原因：" + selectingReasonName + "</td>" + 
+				"退菜原因：" + selectingCancelReason.reason + "</td>" + 
 						"</tr>";
 		
 		$("#" + rowId).after(htmlcancel);
@@ -185,9 +195,11 @@ $("#btnSubmitForKeyboardNumUO").click(function(){
 		uoCancelFood.foodName = foodName;
 		uoCancelFood.dishes = $("#" + rowId).find("td").eq(3).text();
 		uoCancelFood.count = -num;
-		uoCancelFood.reason = selectingReasonName;
+		uoCancelFood.reason = selectingCancelReason;
 		uoCancelFood.actualPrice = actualPrice;
 		uoCancelFood.totalPrice = totalPrice;
+//		alert(uoCancelFood.reason.id);
+
 		//加到退菜数组
 		uoCancelFoods.push(uoCancelFood);
 		//更改消费总额
@@ -196,7 +208,6 @@ $("#btnSubmitForKeyboardNumUO").click(function(){
 			totalPrice += uoCancelFoods[x].totalPrice;
 		}
 		$("#spanTotalPriceUO").html(totalPrice.toFixed(2) + "元");
-		
 		//关闭该界面
 		$("#divKeyboardNumForUO").hide(100);
 		$("#divHideForUO").hide();
@@ -305,21 +316,17 @@ function sureForUO(){
 		for(y in uoCancelFoods){
 			if(uoFood[x].id == uoCancelFoods[y].id && uoFood[x].tasteGroup.tastePref == uoCancelFoods[y].dishes){
 				uoFood[x].count = (uoFood[x].count + uoCancelFoods[y].count).toFixed(2);
-				uoFood[x].cancelReason = uoCancelFoods[y].reason;
+				uoFood[x].cancelReason = uoCancelFoods[y].reason.id;
 			}
 		}
 	}
 	uoCancelFoods = [];
 	uo.updateOrder = uoFood;
-	
-	//对更新的菜品进行提交
-	
-	
-	//对更改后的餐桌人数进行提交
+	uo.customNum = $("#customNumForUO").html().substring(5);	
+	//对更新的菜品和人数进行提交
+	submitUpdateOrderHandler(uoFood);
 	
 	
-	
-	toggleContentDisplay({type:'hide', renderTo:'divUpdateOrder'});
 }
 
 /**
@@ -375,8 +382,8 @@ function inputNumUO(o){
 	
 	//判断输入的人数是否合法
 	if(inputNumIdUO == "txtPeopleNumForUO"){
-		if(parseInt($("#" + inputNumIdUO).val()) > 999){
-			alert("输入的人数超过限制！");
+		if(parseInt($("#" + inputNumIdUO).val()) > 255){
+			alert("输入的人数不得超过255！");
 			inputNumValUO = "";
 			$("#" + inputNumIdUO).val(uoOther.order.customNum);
 		}
@@ -411,8 +418,8 @@ $(".addOneForKeyboardNumUO").click(function(){
 	}
 	//人数输入框
 	if(inputNumIdUO == "txtPeopleNumForUO"){
-		if(inputAddOne > 999){
-			inputNumValUO = 999;
+		if(inputAddOne > 255){
+			inputNumValUO = 255;
 		}else{
 			inputNumValUO = inputAddOne;
 		}
@@ -437,4 +444,69 @@ $(".deleteOneForKeyboardNumUO").click(function(){
 	$("#" + inputNumIdUO).focus();
 });
 
-
+/**
+ * 已点菜账单提交操作
+ */
+function submitUpdateOrderHandler(c){
+	var orderFoods = c;
+	if(orderFoods.length > 0){
+		var foodPara = '';
+		for ( var i = 0; i < orderFoods.length; i++) {
+			foodPara += ( i > 0 ? '<<sh>>' : '');
+			if (orderFoods[i].isTemporary) {
+				// 临时菜
+				alert("临时菜");
+			}else{
+				// 普通菜
+				var normalTaste = '', tmpTaste = '' , tasteGroup = orderFoods[i].tasteGroup;
+				for(var j = 0; j < tasteGroup.normalTasteContent.length; j++){
+					var t = tasteGroup.normalTasteContent[j];
+					normalTaste += ((j > 0 ? '<<stnt>>' : '') + (t.id + '<<stb>>' + t.alias + '<<stb>>' + t.cateValue));
+				}
+				if(tasteGroup.tmpTaste != null && typeof tasteGroup.tmpTaste != 'undefined'){
+					if(eval(tasteGroup.tmpTaste.id >= 0))
+						tmpTaste = tasteGroup.tmpTaste.price + '<<sttt>>' + tasteGroup.tmpTaste.name  + '<<sttt>>' + tasteGroup.tmpTaste.id+ '<<sttt>>' + tasteGroup.tmpTaste.alias; 				
+				}
+//				var reason = "";
+//				reason = orderFoods[i].cancelReason == null ? null : orderFoods[i].cancelReason;
+				foodPara = foodPara 
+						+ '['
+						+ 'false' + '<<sb>>' // 是否临时菜(false)
+						+ orderFoods[i].alias + '<<sb>>' // 菜品1编号
+						+ orderFoods[i].count + '<<sb>>' // 菜品1数量
+						+ (normalTaste + ' <<st>> ' + tmpTaste) + '<<sb>>'
+						+ orderFoods[i].kitchen.alias + '<<sb>>'// 厨房1编号
+						+ orderFoods[i].discount + '<<sb>>' // 菜品1折扣
+						+ orderFoods[i].isHangup + '<<sb>>'//是否叫起
+						+ orderFoods[i].cancelReason //退菜原因
+						+ ']';
+				
+			}
+		}	
+		
+		foodPara = '{' + foodPara + '}';	
+		var type = 2;
+		$.ajax({
+			url : '../InsertOrder.do',
+			type : 'post',
+			data : {
+				pin : pin,
+				tableID : uo.table.alias,
+				orderID : uoOther.order.id,
+				customNum : uo.customNum,
+				type : type,
+				foods : foodPara,
+				category : uoOther.order.categoryValue,
+				orderDate : uoOther.order.orderDate
+			},
+			success : function(data, status, xhr){
+				toggleContentDisplay({type:'hide', renderTo:'divUpdateOrder'});
+			},
+			error : function(request, status, err){
+				alert('ERR.');
+			}
+		});
+	}else if(orderFoods.length == 0){
+		alert("没有任何菜品，不能提交！");
+	}
+}

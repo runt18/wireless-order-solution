@@ -73,7 +73,7 @@ function showNorthForUpdateOrder(){
 			"<span style ='margin: 10px;'>账单号：" + uoOther.order.id + " </span>" +
 			"<span style ='margin: 10px;'>餐台号：" + uoOther.order.table.alias + " </span>" +
 			"<span style ='margin: 10px;'>餐台名： " + tableName + "</span>" +
-			"<span style ='margin: 10px;' id = 'customNumForUO'>用餐人数：" + customNum + " </span>" +			
+			"<span style ='margin: 10px;' id = 'customNumForUO'>用餐人数：" + customNum + "</span>" +			
 		"</div>";
 	$("#divNorthForUpdateOrder").html(html);
 }
