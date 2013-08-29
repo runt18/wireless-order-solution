@@ -42,10 +42,14 @@ var Templet = {
   			+ '<div>{tasteDisplay}</div>'
   			+ '<div style="text-align: right; padding-right: 5px;">¥:{totalPrice}</div>'
   			+ '</div>',
-  		boxTaste : '<div data-index={dataIndex} data-value={id} class="divCFCOAllFood-main-box" >'
-  			+ '{name}'
-  			+ '<div>¥:{price}</div>'
-  			+ '</div>'
+  	  	boxSelectTaste : '<div data-index={dataIndex} data-value={id} class="divCFCOAllFood-main-box" onClick="co.ot.insertTaste({event:this, tasteId:{id}})">'
+  	  		+ '{name}'
+  	  		+ '<div>{mark}:{markText}</div>'
+  	  		+ '</div>',
+  	  	boxNewTaste : '<div data-value={id} class="divCFCOAllFood-main-box" onClick="co.ot.deleteTaste({event:this, tasteId:{id}})">'
+  	  		+ '{name}'
+  	  		+ '<div>{mark}:{markText}</div>'
+  	  		+ '</div>'
 	},
 	uo : {
 		orderFood : '<tr data-index = {dataIndex} data-value = {id} id = "truoFood{dataIndex}" onclick = "selectUOFood(this)">'

@@ -18,7 +18,9 @@ function getDom(id){
 var co = {
 	table : {},
 	newFood : [],
-	ot : {}  // 口味操作包
+	ot : {
+		newTaste : []
+	}
 };
 //查看和修改账单操作包
 var uo = {
@@ -28,7 +30,7 @@ var uo = {
 </script>
 <script type="text/javascript" src="./js/Util.js"></script>
 <script type="text/javascript" src="./js/index.js"></script>
-<script type="text/javascript" src="../js/common/CompareFoodUtil.js"></script>
+<!-- <script type="text/javascript" src="../js/common/CompareFoodUtil.js"></script> -->
 </head>
 <body>
 <div  id = "divTableSelect" class = "content box-vertical" style = "z-index:999;" >
@@ -116,8 +118,10 @@ var uo = {
   		<div class="button-base" style="margin-right: 2px;" onclick = "createOrderForTS()">点菜</div>
   		<div class="button-base" style="margin-right: 2px;" onclick = "checkOnTS()">结账</div>
   		<div class="div-full">&nbsp;</div>
+  		<!-- 
   		<div class="button-base" style="margin-left: 2px;" onClick="toggleContentDisplay({type:'show', renderTo:'divUpdateOrder'})">divUpdateOrder</div>
 		<div class="button-base" style="margin-left: 2px;" onClick="co.show()">co.show()</div>
+		 -->
 	</div>
 	<div id="divFootForTableSelect">
 		<span style="margin-right: 30px; margin-left: 10px;">收银员：</span>	
@@ -202,7 +206,7 @@ var uo = {
 <div id="divCreateOrder" class="box-vertical content">
 	<div id="divNorthForCreateOrder" class="box-horizontal" style="margin-right: 2px;">
     	<div style="width: 218px; margin-right: 2px;">
-    		<div class="button-base" style="line-height: 30px; height: 60px; background: #FFD700; ">
+    		<div id="divNFCOTableBasicMsg" class="button-base" style="line-height: 30px; height: 60px; background: #FFD700; ">
     			<div>888</div>
     			<div>一路发</div>
     		</div>
@@ -228,10 +232,11 @@ var uo = {
     	<div id="divCFCOAllFood" class="div-full" style="overflow-y: auto;"></div>
   	</div>
   	<div id="divDescForCreateOrde" class="box-horizontal" style="">
-  		&nbsp;
+  		<div style="width: 300px">合计:</div>
+  		<div id="divDescForCreateOrde-padding-msg" style="-webkit-box-flex: 1; text-align: right; font-weight: bold;"></div>
   	</div>
   	<div id="divSouthForCreateOrde" class="box-horizontal" style="">
-  		<div class="button-base" style="margin-right: 2px;" onClick="toggleContentDisplay({type:'hide', renderTo:'divCreateOrder'})">返回</div>
+  		<div class="button-base" style="margin-right: 2px;" onClick="co.back()">返回</div>
   		<div class="button-base" style="margin-right: 2px;" onClick="Util.scroll({otype:'up', content:'divCFCONewFood', size:80})">上翻</div>
   		<div class="button-base" style="margin-right: 2px;" onClick="Util.scroll({otype:'down', content:'divCFCONewFood', size:80})">下翻</div>
   		<div class="div-full">&nbsp;</div>
@@ -245,24 +250,27 @@ var uo = {
 
 
 <div id="divOperateBoxForFoodTaste" >
-	<div class="box-horizontal" style="height: 513px;">
-		<div style="width: 490px;">1</div>
+	<div class="box-horizontal" style="height: 473px;">
+		<div class="box-vertical" style="width: 330px;">
+			<div class="button-base" style="width: 100%; line-height: 60px; height: 60px;">已选口味</div>
+			<div id="divCFOTHasTasteContent" style="width: 100%; -webkit-box-flex: 1; overflow-y: auto;"></div>
+		</div>
 		<div id="divCenterForOperateTaste" class="box-vertical" style="width: 310px; border-left: 1px solid #FFF;">
 			<div id="divCFOTTasteChange" class="box-horizontal" style="line-height: 60px;">
 				<div id="divButtonForCommonTaste" class="button-base" style="width: 103px;" onClick="co.ot.changeTaste({type:parseInt(this.getAttribute('data-value'))})" data-value=1>常用口味</div>
 				<div id="divButtonForAllTaste" class="button-base" style="width: 100px; margin: 0 1px 0 1px;" onClick="co.ot.changeTaste({type:parseInt(this.getAttribute('data-value'))})" data-value=2>所有口味</div>
 				<div id="divButtonForGuiGeTaste" class="button-base" style="width: 103px;" onClick="co.ot.changeTaste({type:parseInt(this.getAttribute('data-value'))})" data-value=3>规格</div>
 			</div>
-			<div id="divCFOTTasteContent" id="div" style="-webkit-box-flex: 1;"></div>
+			<div id="divCFOTTasteSelectContent" style="-webkit-box-flex: 1;"></div>
 		</div>
 	</div>
-	<div class="box-horizontal" style=" border-bottom: 1px solid #FFF; border-top: 1px solid #FFF; height: 25px; background: #FFD700;">
-  		&nbsp;
+	<div class="box-horizontal" style=" border-bottom: 1px solid #FFF; border-top: 1px solid #FFF; line-height: 25px; background: #FFD700;">
+  		<div id="divDescForOperateTaste-padding-msg" style="-webkit-box-flex: 1; text-align: right; font-weight: bold;"></div>
   	</div>
 	<div id="divSouthForOperateTaste" class="box-horizontal" style="">
-		<div class="button-base" style="margin-right: 2px;" onClick="Util.dialongDisplay({type:'hide', renderTo:'divOperateBoxForFoodTaste'});">返回</div>
+		<div class="button-base" style="margin-right: 2px;" onClick="co.ot.back()">返回</div>
 		<div class="div-full">&nbsp;</div>
-  		<div class="button-base" style="margin-left: 2px;">确定</div>
+  		<div class="button-base" style="margin-left: 2px;" onClick="co.ot.save()">确定</div>
   		<div class="button-base" style="margin-left: 2px;" onClick="co.ot.tp.getFirstPage()">首页</div>
   		<div class="button-base" style="margin-left: 2px;" onClick="co.ot.tp.getPreviousPage()">上一页</div>
   		<div class="button-base" style="margin-left: 2px;" onClick="co.ot.tp.getNextPage()">下一页</div>

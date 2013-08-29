@@ -59,16 +59,26 @@ co.show = function(c){
 	
 	$('#divCFCONewFood').css('height', $('#divCenterForCreateOrde').height());
 	
-	//alert(c.table)
+	co.table = c.table;
+//	alert(JSON.stringify(co.table))
+	$('#divNFCOTableBasicMsg').html('<div>{alias}</div><div>{name}</div>'.format({
+		alias : co.table.alias,
+		name : co.table.name
+	}));
+	
 };
 /**
- * 
+ * 菜品操作返回
  */
-co.hide = function(c){
+co.back = function(c){
 	toggleContentDisplay({
 		type:'hide', 
 		renderTo:'divCreateOrder'
 	});
+	//
+	co.table = null;
+	co.newFood = [];
+	$('#divCFCONewFood').html('');
 };
 /**
  * 添加菜品
@@ -136,7 +146,8 @@ co.ot.show = function(){
 		alert('请选中一道菜品');
 		return;
 	}
-	var data = co.newFood[sf.attr('data-index')];
+	var foodData = co.newFood[sf.attr('data-index')];
+	co.ot.foodData = foodData;
 	
 	Util.dialongDisplay({
 		type : 'show',
@@ -150,19 +161,33 @@ co.ot.show = function(){
 		co.ot.initBarForAllTaste();
 	}
 	if(typeof co.ot.ggp == 'undefined'){
-		co.ot.initBarForGuiGe();
+		co.ot.initBarForCate();
 	}
-	
 	co.ot.changeTaste({
-		foodData : data,
+		foodData : co.ot.foodData,
 		type : 1,
 		event : $('#divCFOTTasteChange > div[data-value=1]'),
 		change : true
 	});
+	//
+	co.ot.newTaste = typeof co.ot.foodData.tasteGroup == 'undefined' ? [] : co.ot.foodData.tasteGroup.normalTasteContent.slice(0);
+	co.ot.initNewTasteContent();
+};
+/**
+ * 口味操作返回
+ */
+co.ot.back = function(){
+	Util.dialongDisplay({
+		type:'hide', 
+		renderTo:'divOperateBoxForFoodTaste'
+	});
+	co.ot.foodData = null;
+	co.ot.newTaste = [];
+	$('#divCFOTHasTasteContent').html('');
 };
 
 /**
- * 
+ * 切换口味选择
  */
 co.ot.changeTaste = function(c){
 	if(c == null || typeof c.type != 'number'){
@@ -177,14 +202,11 @@ co.ot.changeTaste = function(c){
 	if(c.type == 1){
 		// 常用口味
 		co.ot.tp = co.ot.ctp;
-		if(typeof c.foodData == 'undefined'){
-			c.foodData = co.newFood[$('#divCFCONewFood > div[class*=div-newFood-select]').attr('data-index')];
-		}
 		$.ajax({
 			url : '../QueryFoodTaste.do',
 			type : 'post',
 			data : {
-				foodID : c.foodData.id,
+				foodID : co.ot.foodData.id,
 				pin : pin,
 				restaurantID : restaurantID
 			},
@@ -214,11 +236,100 @@ co.ot.changeTaste = function(c){
 		co.ot.tp.getFirstPage();
 	}else if(c.type == 3){
 		// 规格
-		co.ot.tp = co.ot.ggp;
+		co.ot.tp = co.ot.catep;
 		co.ot.tp.getFirstPage();
 	}
 };
 
+/**
+ * 添加新口味
+ */
+co.ot.insertTaste = function(c){
+	if(c == null || typeof c.tasteId != 'number'){
+		return;
+	}
+	var has = false;
+	var data = {};
+	for(var i = 0; i < co.ot.tp.getPageData().length; i++){
+		if(co.ot.tp.getPageData()[i].taste.id == c.tasteId){
+			data = co.ot.tp.getPageData()[i].taste;
+			// 
+			for(var j = 0; j < co.ot.newTaste.length; j++){
+				if(co.ot.newTaste[j].id == data.id){
+					has = true;
+					break;
+				}
+			}
+			break;
+		}
+	}
+	if(!has){
+		co.ot.newTaste.push(data);
+		data = null;
+	}
+	// 
+	co.ot.initNewTasteContent();
+};
+/**
+ * 删除口味
+ */
+co.ot.deleteTaste = function(c){
+	if(c == null || typeof c.tasteId != 'number'){
+		return;
+	}
+	for(var i = 0; i < co.ot.newTaste.length; i++){
+		if(co.ot.newTaste[i].id == c.tasteId){
+			co.ot.newTaste.splice(i, 1);
+			break;
+		}
+	}
+	//
+	co.ot.initNewTasteContent();
+};
+
+/**
+ * 保存口味
+ */
+co.ot.save = function(c){
+	var tasteGroup = co.ot.foodData.tasteGroup;
+	
+	if(typeof tasteGroup == 'undefined'){
+		tasteGroup = {
+			normalTaste : {}
+		};
+	}
+	if(typeof tasteGroup.normalTaste == 'undefined'){
+		tasteGroup.normalTaste = {};
+	}
+	
+	tasteGroup.normalTaste.name = '';
+	tasteGroup.normalTaste.price = 0;
+	tasteGroup.normalTasteContent = [];
+	
+	var temp = null;
+	for(var i = 0; i < co.ot.newTaste.length; i++){
+		temp = co.ot.newTaste[i];
+		tasteGroup.normalTasteContent.push(temp);
+		tasteGroup.normalTaste.name += (i > 0 ? ',' + temp.name : temp.name);
+		if(temp.cateValue == 0){
+			tasteGroup.normalTaste.price += temp.price;
+		}else if(temp.cateValue == 2){
+			tasteGroup.normalTaste.price += co.ot.foodData.price * temp.rate;
+		}
+	}
+	tasteGroup.tastePref = tasteGroup.normalTaste.name;
+	for(var i = 0; i < co.newFood.length; i++){
+		if(co.newFood[i].id == co.ot.foodData.id){
+			co.newFood[i].tasteGroup = tasteGroup;
+			break;
+		}
+	}
+	co.initNewFoodContent({
+		data : co.ot.foodData
+	});
+	//
+	co.ot.back();
+};
 
 
 

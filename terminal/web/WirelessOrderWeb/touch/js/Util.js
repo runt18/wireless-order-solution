@@ -17,6 +17,8 @@ Util.padding = function(c){
 		data : [],
 		length : 0,
 		pageData : [],
+		displayMsg : typeof c.displayMsg != 'undefined' ? c.displayMsg : '共{0}项, 每{1}/{2}页, 每页{3}项',
+		displayId : c.displayId,
 		isEmpty : function(){
 			return this.data == null || this.data.length <= 0;
 		},
@@ -26,26 +28,52 @@ Util.padding = function(c){
 		getPageData : function(){
 			return this.pageData;
 		},
-		init : function(c){
-			if(c == null || typeof c.data != 'object'){
-				return;
-			}
-			this.dom = getDom(this.renderTo);
-			this.clearContent();
-			var ch = this.dom.clientHeight, cw = this.dom.clientWidth;
-			this.limit = parseInt((ch / (70 + 5 + 3 * 2))) * parseInt((cw / (90 + 5 + 3 * 2)));
-			//
-			this.data = c.data;
-			//
-			this.length = this.data.length;
+		clear : function(){
+			this.start = 0;
+			this.limit = 20;
+			this.data = [];
+			this.length = 0;
+			this.pageData = [];
 		},
 		clearContent : function(){
 			if(this.dom){
-				this.dom.innerHTML = '';				
+				this.dom.innerHTML = '&nbsp;';
 			}
+			this.showMsg();
+		},
+		showMsg : function(){
+			if(this.displayId != null && this.displayId != ''){
+				var md = getDom(this.displayId);
+				if(md){
+					if(this.length > 0){
+						md.innerHTML = this.displayMsg.format(this.length,
+							parseInt(this.start / this.limit) + 1,
+							parseInt(this.length / this.limit) + (this.length % this.limit == 0 ? 0 : 1),
+							this.limit
+						);
+					}else{
+						md.innerHTML = '&nbsp;';
+					}
+				}
+				md = null;
+			}
+		},
+		init : function(ic){
+			ic = ic == null ? {data:[]} : ic;
+			//
+			this.dom = getDom(this.renderTo);
+			this.clearContent();
+			this.showMsg();
+			//
+			var ch = this.dom.clientHeight, cw = this.dom.clientWidth;
+			this.limit = parseInt((ch / (70 + 5 + 3 * 2))) * parseInt((cw / (90 + 5 + 3 * 2)));
+			//
+			this.data = typeof ic.data == 'undefined' ? [] : ic.data;
+			this.length = this.data.length;
 		},
 		initContent : function(c){
 			this.pageData = [];
+			this.clearContent();
 			if(!this.isEmpty()){
 				var html = '';
 				var start = this.start, limit = this.start > this.data.length && this.start + this.limit > this.data.length ? this.start + this.limit - this.data.length : this.limit;
@@ -62,9 +90,8 @@ Util.padding = function(c){
 				}
 				temp = null;
 				this.dom.innerHTML = html;
-			}else{
-				this.clearContent();
 			}
+			this.showMsg();
 		},
 		getFirstPage : function(){
 			this.start = 0;

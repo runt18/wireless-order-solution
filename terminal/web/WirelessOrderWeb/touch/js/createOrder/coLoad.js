@@ -2,6 +2,7 @@
 // 菜品分页包
 co.fp = new Util.padding({
 	renderTo : 'divCFCOAllFood',
+	displayId : 'divDescForCreateOrde-padding-msg',
 	templet : function(c){
 		return Templet.co.boxFood.format({
 			dataIndex : c.dataIndex,
@@ -27,7 +28,9 @@ co.initNewFoodContent = function(c){
 			count : temp.count.toFixed(2),
 			unitPrice : temp.unitPrice.toFixed(2),
 			totalPrice : (temp.count * temp.unitPrice).toFixed(2),
-			tasteDisplay : '口味一,口味二,口味三'
+			tasteDisplay : typeof temp.tasteGroup == 'undefined' 
+				|| typeof temp.tasteGroup.normalTasteContent == 'undefined' 
+					|| temp.tasteGroup.normalTasteContent.length <= 0 ? '' : temp.tasteGroup.tastePref
 		}));
 	}
 	temp = null;
@@ -75,6 +78,10 @@ co.insertFood = function(c){
 	}
 	if(!has){
 		data.count = 1;
+		data.tasteGroup = {
+			tastePref : '无口味',
+			normalTasteContent : []
+		};
 		co.newFood.push(data);
 	}
 	//
@@ -97,7 +104,6 @@ co.selectNewFood = function(c){
 		$(sl[i]).removeClass('div-newFood-select');
 	}
 	$(c.event).addClass('div-newFood-select');
-	
 };
 
 /**
@@ -171,13 +177,15 @@ co.initKitchenContent = function(c){
  */
 co.ot.initBarForCommomTaste = function(){
 	co.ot.ctp = new Util.padding({
-		renderTo : 'divCFOTTasteContent',
+		renderTo : 'divCFOTTasteSelectContent',
+		displayId : 'divDescForOperateTaste-padding-msg',
 		templet : function(c){
-			return Templet.co.boxTaste.format({
+			return Templet.co.boxSelectTaste.format({
 				dataIndex : c.dataIndex,
 				id : c.data.taste.id,
 				name : c.data.taste.name,
-				price : c.data.taste.price
+				mark : '¥',
+				markText : c.data.taste.price
 			});
 		}
 	});
@@ -194,13 +202,15 @@ co.ot.initBarForAllTaste = function(){
 	}
 	co.ot.atp = new Util.padding({
 		data : data,
-		renderTo : 'divCFOTTasteContent',
+		renderTo : 'divCFOTTasteSelectContent',
+		displayId : 'divDescForOperateTaste-padding-msg',
 		templet : function(c){
-			return Templet.co.boxTaste.format({
+			return Templet.co.boxSelectTaste.format({
 				dataIndex : c.dataIndex,
 				id : c.data.taste.id,
 				name : c.data.taste.name,
-				price : c.data.taste.price
+				mark : '¥',
+				markText : c.data.taste.price
 			});
 		}
 	});
@@ -209,25 +219,44 @@ co.ot.initBarForAllTaste = function(){
 /**
  * 
  */
-co.ot.initBarForGuiGe = function(){
+co.ot.initBarForCate = function(){
 	var data = [];
 	for(var i = 0; i < tasteData.root.length; i++){
 		if(tasteData.root[i].taste.cateValue == 2){
 			data.push(tasteData.root[i]);
 		}
 	}
-	co.ot.ggp = new Util.padding({
+	co.ot.catep = new Util.padding({
 		data : data,
-		renderTo : 'divCFOTTasteContent',
+		renderTo : 'divCFOTTasteSelectContent',
+		displayId : 'divDescForOperateTaste-padding-msg',
 		templet : function(c){
-			return Templet.co.boxTaste.format({
+			return Templet.co.boxSelectTaste.format({
 				dataIndex : c.dataIndex,
 				id : c.data.taste.id,
 				name : c.data.taste.name,
-				price : c.data.taste.price
+				mark : '比例',
+				markText : c.data.taste.rate
 			});
 		}
 	});
 	
 	data = null;
+};
+/**
+ * 
+ */
+co.ot.initNewTasteContent = function(){
+	var html = '', temp = null;
+	for(var i = 0; i < co.ot.newTaste.length; i++){
+		temp = co.ot.newTaste[i];
+		html += Templet.co.boxNewTaste.format({
+			id : temp.id,
+			name : temp.name,
+			mark : temp.cateValue == 0 ? '¥' : temp.cateValue == 2 ? '比例' : '',
+			markText : temp.cateValue == 0 ? temp.price : temp.cateValue == 2 ? temp.rate : '0.00'
+		});
+	}
+	temp = null;
+	getDom('divCFOTHasTasteContent').innerHTML = html;
 };
