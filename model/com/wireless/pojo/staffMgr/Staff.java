@@ -62,7 +62,7 @@ public class Staff implements Parcelable, Jsonable{
 	public static class DefAdminBuilder extends StaffInsertBuilder{
 		public DefAdminBuilder(){
 			setName("管理员");
-			setPwd("123");
+			setPwd("202cb962ac59075b964b07152d234b70");
 			setType(Type.RESERVED);
 			
 		}
