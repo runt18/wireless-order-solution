@@ -180,4 +180,88 @@ public class RestaurantDao {
 			throw new BusinessException(RestaurantError.UPDATE_RESTAURANT_FAIL);
 		}
 	}
+	
+	/**
+	 * Calculate and update the liveness to each restaurant.
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static void calcLiveness() throws SQLException{ 
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			
+			String sql;
+			//Get all the restaurants
+			sql = " SELECT id FROM " + Params.dbName + ".restaurant WHERE id > " + Restaurant.RESERVED_7;
+			dbCon.rs = dbCon.stmt.executeQuery(sql);
+			List<Restaurant> restaurants = new ArrayList<Restaurant>();
+			while(dbCon.rs.next()){
+				restaurants.add(new Restaurant(dbCon.rs.getInt("id")));
+			}
+			dbCon.rs.close();
+			
+			//Calculate the liveness to each restaurant
+			for(Restaurant restaurant : restaurants){
+				restaurant.setLiveness(calcLiveness(dbCon, restaurant.getId()));
+			}
+			
+			//Update all liveness to each restaurant
+			for(Restaurant restaurant : restaurants){
+				sql = " UPDATE " + Params.dbName + ".restaurant SET " +
+					  " liveness = " + restaurant.getLiveness() +
+					  " WHERE id = " + restaurant.getId();
+				dbCon.stmt.executeUpdate(sql);
+			}
+			
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Calculate the liveness to a specific restaurant.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param restaurantId
+	 * 			the restaurant id to calculate liveness
+	 * @return the liveness to this restaurant
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statment
+	 */
+	private static float calcLiveness(DBCon dbCon, int restaurantId) throws SQLException{
+		
+		dbCon.stmt.execute("SET @order_amount_threshold = 5");
+		dbCon.stmt.execute("SET @total_days = 10");
+		
+		String sql;
+		
+		sql = " SELECT ROUND(COUNT(*) / @total_days, 1) AS liveness FROM " +
+			  " ( SELECT COUNT(*) AS order_amount FROM " +
+			  Params.dbName + ".order_history " + " WHERE 1 = 1 " +
+			  " AND restaurant_id = " + restaurantId +
+			  " AND order_date BETWEEN DATE_SUB(CURDATE(), interval @total_days day) AND CURDATE() " +
+			  " GROUP BY DATE(order_date) " +
+			  " HAVING order_amount >= @order_amount_threshold " +
+			  " ) AS TMP ";
+		
+		dbCon.rs = dbCon.stmt.executeQuery(sql);
+		float liveness = 0;
+		if(dbCon.rs.next()){
+			liveness = dbCon.rs.getFloat("liveness");
+		}
+		dbCon.rs.close();
+		
+		return liveness;
+	}
 }
+
+
+
+
+
+
+
+
+
+

@@ -190,19 +190,6 @@ public class InsertOrder {
 						of.asFood().setPrice(detailFood.getPrice());
 						of.asFood().setKitchen(detailFood.getKitchen());
 						of.asFood().setChildFoods(detailFood.getChildFoods());
-//						Food[] detailFood = QueryMenu.getFoods(dbCon, "AND FOOD.food_alias=" + of.getAliasId() + " AND FOOD.restaurant_id=" + term.restaurantID, null);
-//						if(detailFood.length > 0){
-//							of.setFoodId(detailFood[0].getFoodId());
-//							of.setAliasId(detailFood[0].getAliasId());
-//							of.setRestaurantId(detailFood[0].getRestaurantId());
-//							of.setName(detailFood[0].getName());
-//							of.setStatus(detailFood[0].getStatus());
-//							of.setPrice(detailFood[0].getPrice());
-//							of.setKitchen(detailFood[0].getKitchen());
-//							of.setChildFoods(detailFood[0].getChildFoods());
-//						}else{
-//							throw new BusinessException("The food(alias_id=" + of.getAliasId() + ", restaurant_id=" + term.restaurantID + ") to query does NOT exit.", ProtocolError.MENU_EXPIRED);
-//						}
 						
 						//Get the details to normal tastes
 						if(of.hasNormalTaste()){
