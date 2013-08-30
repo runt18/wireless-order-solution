@@ -19,7 +19,6 @@ public class LoginFilter implements Filter{
 
 	@Override
 	public void destroy() {
-		// TODO Auto-generated method stub
 		
 	}
 
@@ -32,6 +31,16 @@ public class LoginFilter implements Filter{
 		//获取请求连接
 		String path = request.getRequestURI();
 		Map<String, String> params = new HashMap<String, String>();
+		
+		//FIXME 
+		//The code below just for print scheme port, should be removed in future
+		String url = path + "?" + request.getQueryString();
+		if(url.startsWith("/WirelessOrderWeb/OperatePrinter.do?skipVerify&dataSource=port") ||
+		   url.startsWith("/WirelessOrderWeb/OperatePrintFunc.do?skipVerify&dataSource=port")){
+			chain.doFilter(request, response);
+			return;
+		}
+		//-----------------------------------------------------------------------
 			
 		String skipVerify = null;
 		String isCookie = null;
@@ -109,7 +118,6 @@ public class LoginFilter implements Filter{
 
 	@Override
 	public void init(FilterConfig arg0) throws ServletException {
-		// TODO Auto-generated method stub
 		
 	}
 
