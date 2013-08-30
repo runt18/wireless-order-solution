@@ -372,4 +372,11 @@ ALTER TABLE `wireless_order_db`.`taste` DROP COLUMN `taste_alias`
 , DROP INDEX `ix_taste_alias_id` 
 , ADD INDEX `ix_restaurant_id` (`restaurant_id` ASC) ;
 
+-- -----------------------------------------------------
+-- Add the field 'birth_date' and 'liveness' to table 'restaurant'
+-- -----------------------------------------------------
+ALTER TABLE `wireless_order_db`.`restaurant` 
+ADD COLUMN `birth_date` DATE NULL DEFAULT NULL  AFTER `account` , 
+ADD COLUMN `liveness` FLOAT NOT NULL DEFAULT 0  AFTER `expire_date` ;
 
+UPDATE `wireless_order_db`.`restaurant` SET birth_date = '2013-01-01 00:00:00';
