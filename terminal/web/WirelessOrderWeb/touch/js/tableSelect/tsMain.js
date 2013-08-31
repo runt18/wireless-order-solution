@@ -1,37 +1,3 @@
-$(function(){
-	getTables();	
-});
-//当前页
-var pageNow = 1;
-//设置一页显示的数目
-var	limit;
-//全部餐桌
-var tables = [];
-//设置就餐状态餐桌的数组
-var busyTables = [];
-//设置空闲餐桌数组
-var freeTables = [];
-//当前状态下的被选中区域的餐桌数组
-var tempForRegion = [];
-//被选中区域的所有状态餐桌数组
-var tempForAllStatus = [];
-//临时餐桌数组
-var temp = [];
-//总页数
-var n;
-//定义存在餐桌的区域id数组
-var regionId = [];
-var region = [];
-//定义输入框id
-var inputNumId;
-//定义输入框的值
-var inputNumVal = "";
-//选中区域的id
-var selectingRegionId;
-//设置输入桌号界面的类型
-var typeForInputTableNum;
-//设置当前状态类型（busy， free, allStatus）
-var statusType = "";
 
 /**
  * 取得当前区域下不同状态的餐桌数组 
@@ -222,7 +188,7 @@ function inputNum(o){
 	$("#" + inputNumId).val(inputNumVal);
 	//判断人数是否超过限定
 	if(inputNumId == "txtPeopleNumForSM"){
-		if(parseInt(inputNumVal) > 999){
+		if(parseInt(inputNumVal) > 255){
 			alert("人数超过限定，请重新输入！");
 			inputNumVal = "";
 			$("#" + inputNumId).val(inputNumVal);
@@ -267,7 +233,10 @@ function renderToCreateOrder(tableNo, peopleNo){
 		$("#txtTableNumForTS").val(inputNumVal);
 		$("#txtPeopleNumForSM").val(inputNumVal);
 		co.show({
-			table : getTableBytableId(tableNo)
+			table : getTableBytableId(tableNo),
+			callback : function(){
+				initTables();
+			}
 		});
 	}else{
 		alert("没有该餐桌，请重新输入一个桌号！");
@@ -317,6 +286,14 @@ $("#btnSubmitForSelectTableNumTS").click(function(){
 function createOrderForTS(){
 	showSelectTableNumTS("createOrder");
 }
+
+/**
+ * 转台按钮
+ */
+function transTableForTS(){
+	
+}
+
 //点击工具栏上的结账按钮
 function checkOnTS(){
 	showSelectTableNumTS("check");
@@ -345,4 +322,23 @@ function showSelectTableNumTS(type){
 	inputNumId  = "txtTableNumForTS";
 }
 
+/**
+ * 定义分页函数
+ * @param {int} start 开始下标
+ * @param {int} limit 一页最多显示的数目
+ * @param {object} tempObject 需要分页的数组对象
+ * @param {boolean} isPaging 是否需要分页
+ * @returns {object} pageRoot 已经完成分页的数组对象
+ */
+function getPagingData(start, limit, tempObject, isPaging){
+    var pageRoot = [];
+    if(tempObject.length != 0 && isPaging){ 
+    	var dataIndex = start, dataSize = limit;		
+    	dataSize = (dataIndex + dataSize) > tempObject.length ? dataSize - ((dataIndex + dataSize) - tempObject.length) : dataSize;			
+    	pageRoot = tempObject.slice(dataIndex, dataIndex + dataSize);	
+    }else{
+    	pageRoot = tempObject;
+    }	
+	return pageRoot;
+}
 

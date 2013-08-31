@@ -1,78 +1,112 @@
+//当前页
+var pageNow = 1;
+//设置一页显示的数目
+var	limit;
+//全部餐桌
+var tables = [];
+//设置就餐餐桌数组
+var busyTables = [];
+//设置空闲餐桌数组
+var freeTables = [];
+//当前状态下的被选中区域的餐桌数组
+var tempForRegion = [];
+//被选中区域的所有状态餐桌数组
+var tempForAllStatus = [];
+//临时餐桌数组
+var temp = [];
+//总页数
+var n;
+//定义存在餐桌的区域id数组
+var regionId = [];
+var region = [];
+//定义输入框id
+var inputNumId;
+//定义输入框显示的值
+var inputNumVal = "";
+//选中区域的id
+var selectingRegionId;
+//设置输入桌号界面的类型
+var typeForInputTableNum;
+//设置当前状态类型（busy， free, allStatus）
+var statusType = "";
+
 /**
- * 定义分页函数
- * @param {int} start 开始下标
- * @param {int} limit 一页最多显示的数目
- * @param {object} tempObject 需要分页的数组对象
- * @param {boolean} isPaging 是否需要分页
- * @returns {object} pageRoot 已经完成分页的数组对象
+ * onload
  */
-function getPagingData(start, limit, tempObject, isPaging){
-    var pageRoot = [];
-    if(tempObject.length != 0 && isPaging){ 
-    	var dataIndex = start, dataSize = limit;		
-    	dataSize = (dataIndex + dataSize) > tempObject.length ? dataSize - ((dataIndex + dataSize) - tempObject.length) : dataSize;			
-    	pageRoot = tempObject.slice(dataIndex, dataIndex + dataSize);	
-    }else{
-    	pageRoot = tempObject;
-    }	
-	return pageRoot;
-}
+$(function(){
+	initTables();
+});
 
 /**
  * 初始化餐桌信息，保存到tables数组中
  * freeTables存放空闲餐桌，busyTables存放就餐餐桌
  */
-function getTables(){
-	$.get("/WirelessOrderWeb/QueryTable.do", {pin : 15}, function(result){
-		var tablesTemp; 
-		tablesTemp = eval("(" + result + ")");
-	    //把所有餐桌对象都放到本地数组tables中,freeTables存放空闲餐桌，busyTables存放就餐餐桌
-		for(x in tablesTemp.root){	
-			if(tablesTemp.root[x].statusValue == 0){
-				freeTables.push(tablesTemp.root[x]);
-			}else if(tablesTemp.root[x].statusValue == 1){
-				busyTables.push(tablesTemp.root[x]);
+function initTables(){
+		// 加载菜单数据
+		$.ajax({
+			url : '../QueryTable.do',
+			type : 'post',
+			data : {
+				pin : pin,
+				random : Math.random(),
+			},
+			success : function(data, status, xhr){
+				data = eval("(" + data + ")");
+				if(data.success){
+					//把所有餐桌对象都放到本地数组tables中,freeTables存放空闲餐桌，busyTables存放就餐餐桌
+					for(x in data.root){	
+						if(data.root[x].statusValue == 0){
+							freeTables.push(data.root[x]);
+						}else if(data.root[x].statusValue == 1){
+							busyTables.push(data.root[x]);
+						}
+						tables.push(data.root[x]);
+					}
+					//从tables数组中，遍历得到含有餐桌的区域数组region
+					region.push(tables[0].region);
+					regionId.push(tables[0].region.id);
+					for(x in tables){
+						var flag = false;
+						for(y in regionId){
+							if(regionId[y] == tables[x].region.id){		
+								flag = true;
+								break;
+							}			
+						}
+						if(!flag){
+							region.push(tables[x].region);
+							regionId.push(tables[x].region.id);
+						}
+					}
+					//添加区域信息
+					var regionHtml = "";
+					for(x in region){
+						regionHtml += "<div class='button-base regionSelect' id='region"+region[x].id+
+							"' style='margin-bottom: 2px;' onclick='addTables(this)'>"+region[x].name+"</div>";		
+					}
+					$("#divShowRegion").html(regionHtml);
+					//设置区域未选中状态的背景色（#D4F640）
+					$(".button-base.regionSelect").css("backgroundColor", "#D4F640");
+					//默认选中全部状态区域（#FFA07A）
+					$("#divAllArea").css("backgroundColor", "#FFA07A");
+					//默认显示全部状态下的全部区域
+					statusType = "allStatus";
+					tempForAllStatus = tables;
+					temp = tables;
+					//根据实际窗口的大小设置limit
+					var width = $("#divTableShowForSelect").width();
+					var height = $("#divTableShowForSelect").height() - 1;
+					limit = Math.floor(width/102) * Math.floor(height/82);
+					n = Math.ceil(temp.length/limit) ; 
+					showTable(temp, pageNow);
+				}else{
+					alert('初始化餐桌信息失败，请再刷新页面。');
+				}
+			},
+			error : function(request, status, err){
+				alert('初始化餐桌信息失败，请再次刷新页面。');
 			}
-			tables.push(tablesTemp.root[x]);
-		}
-		//从tables数组中，遍历得到含有餐桌的区域数组region
-		region.push(tables[0].region);
-		regionId.push(tables[0].region.id);
-		for(x in tables){
-			var flag = false;
-			for(y in regionId){
-				if(regionId[y] == tables[x].region.id){		
-					flag = true;
-					break;
-				}			
-			}
-			if(!flag){
-				region.push(tables[x].region);
-				regionId.push(tables[x].region.id);
-			}
-		}
-		//添加区域信息
-		var regionHtml = "";
-		for(x in region){
-			regionHtml += "<div class='button-base regionSelect' id='region"+region[x].id+
-				"' style='margin-bottom: 2px;' onclick='addTables(this)'>"+region[x].name+"</div>";		
-		}
-		$("#divShowRegion").html(regionHtml);
-		//设置区域未选中状态的背景色（#D4F640）
-		$(".button-base.regionSelect").css("backgroundColor", "#D4F640");
-		//默认选中全部状态区域（#FFA07A）
-		$("#divAllArea").css("backgroundColor", "#FFA07A");
-		//默认显示全部状态下的全部区域
-		statusType = "allStatus";
-		tempForAllStatus = tables;
-		temp = tables;
-		//根据实际窗口的大小设置limit
-		var width = $("#divTableShowForSelect").width();
-		var height = $("#divTableShowForSelect").height() - 1;
-		limit = Math.floor(width/102) * Math.floor(height/82);
-		n = Math.ceil(temp.length/limit) ; 
-		showTable(temp, pageNow);
-	});	
+		});	
 }
 
 /**
