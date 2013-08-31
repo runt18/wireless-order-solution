@@ -415,7 +415,8 @@ co.submit = function(){
 					msg : data.msg, 
 					fn : function(btn){
 						if(co.callback != null && typeof co.callback == 'function'){
-							co.callback();							
+							co.callback();
+							co.back();
 						}
 					}
 				});
