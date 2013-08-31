@@ -1,27 +1,7 @@
 $(function(){
 	
 });
-//存放账单菜品数组
-var uoFood = [];
-//存放退菜的数组
-var uoCancelFoods = [];
-//存放菜品相关信息
-var uoOther;
-//存放行号id
-var selectigRow = "";
-//存放退菜原因数据
-var cancelReasonData = [];
-//数字键盘输入框的显示值
-var inputNumValUO = "";
-//数字键盘输入框id
-var inputNumIdUO;
-//存放退菜数目
-var count;
-//选中的退菜原因
-//var selectingReasonName = "";
-//选中的退菜id
-var selectingReasonId = "";
-var selectingCancelReason;
+
 /**
  * 显示已点菜界面函数
  * @param {object} c  
@@ -79,11 +59,17 @@ function showKeyboardNumForUO(foodName, dishes){
 	$("#divHideForUO").show();
 	$("#divKeyboardNumForUO").show(100);	
 	var title = "";
-	title = foodName + "(" + dishes + ")";
+	title = "<div style = 'width: 50%; float: left;'>" + foodName + "(" + dishes + ")</div>" ;
+	title += "<div class = 'cancelReasonScroll' style = 'float: left; width: 50%; display: none'><input type = 'button' value = '上翻' " +
+	"class = 'keyboardbutton' onclick = 'scrollUp(\"divReasonForKeyboardNumForUO\")' " +
+	"style = 'height: 45px; width: 120px; margin-left: 40px;'/>" +
+	"<input type = 'button' value = '下翻' " +
+	"class = 'keyboardbutton' onclick = 'scrollDown(\"divReasonForKeyboardNumForUO\")' " +
+	"style = 'height: 45px; width: 120px; margin-left: 10px;'/></div>";
 	//初始化标题信息
 	$("#divTopForKeyboardNumForUO").html("<div style = 'font-size: 20px; " +
 			"font-weight: bold; color: #fff; " +
-			"margin: 15px 15px 0 100px;'>" + title + "</div>");
+			"margin: 5px 15px 5px 10px;'>" + title + "</div>");
 	//初始化退菜原因信息
 	var htmlReason = '';
 	for(x in cancelReasonData){
@@ -92,14 +78,16 @@ function showKeyboardNumForUO(foodName, dishes){
 				"class = 'keyboardbutton reason' " +
 				"onclick = 'setReason(this)' " +
 				"id = 'btnReason" + cancelReasonData[x].id + "' " +
-				"style = 'margin: 0 0 5px 5px; width: 177px;'/>";
+				"style = 'margin: 0 0 5px 8px; width: 165px;'/>";
+	}
+	if(cancelReasonData.length > 10){
+		$(".cancelReasonScroll").show();
 	}
 	$("#divReasonForKeyboardNumForUO").html(htmlReason);
 	if(cancelReasonData.length > 0){
 		//默认选中第一个退菜原因
 		selectingReasonId = "btnReason" + cancelReasonData[0].id;
 		selectingCancelReason = cancelReasonData[0];
-//		selectingReasonName = $("#" + selectingReasonId).val();
 		$("#" + selectingReasonId).css("backgroundColor", "#F0A00A");
 	}
 	
@@ -169,7 +157,7 @@ $("#btnSubmitForKeyboardNumUO").click(function(){
 	}else{
 		//退菜信息
 		var uoCancelFood = {
-				id : 0,
+				alias : 0,
 				foodName : "" ,
 				dishes : "" ,
 				count : 0 ,
@@ -191,15 +179,13 @@ $("#btnSubmitForKeyboardNumUO").click(function(){
 		
 		$("#" + rowId).after(htmlcancel);
 		//把相关数据加到退菜信息对象
-		uoCancelFood.id = document.getElementById(rowId).getAttribute("data-value");
+		uoCancelFood.alias = document.getElementById(rowId).getAttribute("data-value");
 		uoCancelFood.foodName = foodName;
 		uoCancelFood.dishes = $("#" + rowId).find("td").eq(3).text();
 		uoCancelFood.count = -num;
 		uoCancelFood.reason = selectingCancelReason;
 		uoCancelFood.actualPrice = actualPrice;
 		uoCancelFood.totalPrice = totalPrice;
-//		alert(uoCancelFood.reason.id);
-
 		//加到退菜数组
 		uoCancelFoods.push(uoCancelFood);
 		//更改消费总额
@@ -226,7 +212,6 @@ $("#btnSubmitForKeyboardNumUO").click(function(){
 		btnReasonToggle.bind("click", function(){
 			//调用取消退菜函数
 			cancelForCancelFood(rowId);
-			
 			//移除取消退菜事件
 			btnReasonToggle.unbind("click");
 			//把按钮的值由取消退菜改为退菜
@@ -247,14 +232,14 @@ $("#btnSubmitForKeyboardNumUO").click(function(){
  */
 function cancelForCancelFood(rowId){
 	var cancelIndex, dishes;
-	var foodId = document.getElementById(rowId).getAttribute("data-value");
+	var foodAlias = document.getElementById(rowId).getAttribute("data-value");
 	dishes = $("#" + rowId).find("td").eq(3).text();
 	//退菜行号，移除表格的退菜行
 	cancelIndex = $("#" + rowId).prevAll().length + 1;
 	$("#tabForUpdateOrder").find("tr").eq(cancelIndex).remove();
 	//从退菜数组中删掉被取消的退菜对象
 	for(x in uoCancelFoods){
-		if(uoCancelFoods[x].id == foodId && uoCancelFoods[x].dishes == dishes){
+		if(uoCancelFoods[x].alias == foodAlias && uoCancelFoods[x].dishes == dishes){
 			uoCancelFoods.splice(x, 1);
 			break;
 		}
@@ -314,7 +299,7 @@ $("#btnSubmitForPeopleKeyboardUO").click(function(){
 function sureForUO(){	
 	for(x in uoFood){
 		for(y in uoCancelFoods){
-			if(uoFood[x].id == uoCancelFoods[y].id && uoFood[x].tasteGroup.tastePref == uoCancelFoods[y].dishes){
+			if(uoFood[x].alias == uoCancelFoods[y].alias && uoFood[x].tasteGroup.tastePref == uoCancelFoods[y].dishes){
 				uoFood[x].count = (uoFood[x].count + uoCancelFoods[y].count).toFixed(2);
 				uoFood[x].cancelReason = uoCancelFoods[y].reason.id;
 			}
@@ -324,9 +309,7 @@ function sureForUO(){
 	uo.updateOrder = uoFood;
 	uo.customNum = $("#customNumForUO").html().substring(5);	
 	//对更新的菜品和人数进行提交
-	submitUpdateOrderHandler(uoFood);
-	
-	
+	submitUpdateOrderHandler(uoFood);	
 }
 
 /**
@@ -341,19 +324,19 @@ function cancelForUO(){
 /**
  * 下翻按钮
  */
-function nextRow(){
-	var scrollTop;
-	scrollTop = $("#divCenterForUpdateOrder").scrollTop() + 50;
-	$("#divCenterForUpdateOrder").scrollTop(scrollTop);
+function scrollDown(renderTo){
+	var scrollTop = 0;
+	scrollTop = $("#" + renderTo).scrollTop() + 50;
+	$("#" + renderTo).scrollTop(scrollTop);
 }
 
 /**
  * 上翻按钮
  */
-function preRow(){
+function scrollUp(renderTo){
 	var scrollTop;
-	scrollTop = $("#divCenterForUpdateOrder").scrollTop() - 50;
-	$("#divCenterForUpdateOrder").scrollTop(scrollTop);
+	scrollTop = $("#" + renderTo).scrollTop() - 50;
+	$("#" + renderTo).scrollTop(scrollTop);
 };
 
 /**
@@ -424,7 +407,6 @@ $(".addOneForKeyboardNumUO").click(function(){
 			inputNumValUO = inputAddOne;
 		}
 	}
-	
 	$("#" + inputNumIdUO).val(inputNumValUO);
 	$("#" + inputNumIdUO).focus();
 });
@@ -455,7 +437,20 @@ function submitUpdateOrderHandler(c){
 			foodPara += ( i > 0 ? '<<sh>>' : '');
 			if (orderFoods[i].isTemporary) {
 				// 临时菜
-				alert("临时菜");
+				var foodname = orderFoods[i].name;
+//				foodname = foodname.indexOf('<') > 0 ? foodname.substring(0,foodname.indexOf('<')) : foodname;
+				foodPara = foodPara 
+						+ '[' 
+						+ 'true' + '<<sb>>'// 是否临时菜(true)
+						+ orderFoods[i].alias + '<<sb>>' // 临时菜1编号
+						+ foodname + '<<sb>>' // 临时菜1名称
+						+ orderFoods[i].count + '<<sb>>' // 临时菜1数量
+						+ orderFoods[i].unitPrice + '<<sb>>' // 临时菜1单价(原料單價)
+						+ orderFoods[i].isHangup +'<<sb>>' // 菜品状态
+						+ '1' + '<<sb>>' // 菜品操作状态 1:已点菜 2:新点菜 3:反结账
+						+ orderFoods[i].kitchen.alias + '<<sb>>'	// 临时菜出单厨房
+						+ orderFoods[i].cancelReason //退菜原因
+						+ ']';
 			}else{
 				// 普通菜
 				var normalTaste = '', tmpTaste = '' , tasteGroup = orderFoods[i].tasteGroup;
@@ -467,8 +462,6 @@ function submitUpdateOrderHandler(c){
 					if(eval(tasteGroup.tmpTaste.id >= 0))
 						tmpTaste = tasteGroup.tmpTaste.price + '<<sttt>>' + tasteGroup.tmpTaste.name  + '<<sttt>>' + tasteGroup.tmpTaste.id+ '<<sttt>>' + tasteGroup.tmpTaste.alias; 				
 				}
-//				var reason = "";
-//				reason = orderFoods[i].cancelReason == null ? null : orderFoods[i].cancelReason;
 				foodPara = foodPara 
 						+ '['
 						+ 'false' + '<<sb>>' // 是否临时菜(false)
@@ -480,7 +473,6 @@ function submitUpdateOrderHandler(c){
 						+ orderFoods[i].isHangup + '<<sb>>'//是否叫起
 						+ orderFoods[i].cancelReason //退菜原因
 						+ ']';
-				
 			}
 		}	
 		

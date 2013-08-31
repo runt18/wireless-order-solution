@@ -1,3 +1,25 @@
+//存放账单菜品数组
+var uoFood = [];
+//存放退菜的数组
+var uoCancelFoods = [];
+//存放菜品相关信息
+var uoOther;
+//存放行号id
+var selectigRow = "";
+//存放退菜原因数据
+var cancelReasonData = [];
+//数字键盘输入框的显示值
+var inputNumValUO = "";
+//数字键盘输入框id
+var inputNumIdUO;
+//存放退菜数目
+var count;
+//选中的退菜原因
+//var selectingReasonName = "";
+//选中的退菜id
+var selectingReasonId = "";
+var selectingCancelReason;
+
 /**
  * 初始化菜单数据，存放在uoFood数组中
  * @param {object} data 餐桌对象
@@ -26,7 +48,6 @@ function initOrderData(data){
 				alert('初始化菜单数据失败.');
 			}
 		},
-		
 		error : function(request, status, err){
 			alert('初始化菜单数据失败.');
 		}
@@ -96,7 +117,7 @@ function showOrder(){
 	for(var i = 0; i < uoFood.length; i++){
 		html += Templet.uo.orderFood.format({
 			dataIndex : i + 1,
-			id : uoFood[i].id,
+			alias : uoFood[i].alias,
 			name : uoFood[i].name,
 			count : uoFood[i].count.toFixed(2),
 			tastePref : uoFood[i].tasteGroup.tastePref,
