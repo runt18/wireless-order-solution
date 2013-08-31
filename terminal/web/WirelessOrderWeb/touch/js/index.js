@@ -40,7 +40,10 @@ var Templet = {
 		newFood : '<div data-index={dataIndex} data-value={id} data-type="newFood-select" onClick="co.selectNewFood({event:this, foodId:{id}})">'
 			+ '<div style="line-height: 40px; ">{name} x {count}</div>'
   			+ '<div>{tasteDisplay}</div>'
-  			+ '<div style="text-align: right; padding-right: 5px;">¥:{totalPrice}</div>'
+  			+ '<div class="box-horizontal" style="text-align: right; padding-right: 5px;">'
+  				+ '<div style="color: #FF0000; -webkit-box-flex: 1;">{isHangup}</div>'
+  				+ '<div style="min-width: 100px;">¥:{totalPrice}</div>'
+  			+'</div>'
   			+ '</div>',
   	  	boxSelectTaste : '<div data-index={dataIndex} data-value={id} class="divCFCOAllFood-main-box" onClick="co.ot.insertTaste({event:this, tasteId:{id}})">'
   	  		+ '{name}'
@@ -85,6 +88,7 @@ function initFoodData(){
 			if(data.success){
 				for(var i = 0; i < data.root.length; i++){
 					data.root[i].kitchenId = data.root[i].kitchen.id;
+					data.root[i].kitchenAlias = data.root[i].kitchen.alias;
 					data.root[i].deptId = data.root[i].kitchen.dept.id;
 					delete data.root[i].kitchen;
 				}
@@ -234,5 +238,3 @@ function toggleContentDisplay(c){
 		el.addClass('content-hide');
 	}
 }
-
-

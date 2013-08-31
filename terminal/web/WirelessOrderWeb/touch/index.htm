@@ -121,6 +121,7 @@ var uo = {
   		<!-- 
   		<div class="button-base" style="margin-left: 2px;" onClick="toggleContentDisplay({type:'show', renderTo:'divUpdateOrder'})">divUpdateOrder</div>
 		<div class="button-base" style="margin-left: 2px;" onClick="co.show()">co.show()</div>
+		<div class="button-base" style="margin-left: 2px;" onClick="Util.msg.alert({msg:'', fn : function(btn){ }})">Util.msg.alert()</div>
 		 -->
 	</div>
 	<div id="divFootForTableSelect">
@@ -227,7 +228,8 @@ var uo = {
 	      	<div class="button-base" onClick="co.deleteFood()">删除</div>
 	      	<div class="button-base" onClick="co.ot.show()">口味</div>
 	      	<div class="button-base" >催菜</div>
-	      	<div class="button-base" onClick="aaaaaaa()">叫起</div>
+	      	<div class="button-base" onClick="">叫起</div>
+	      	<div class="button-base" onClick="">全单叫起</div>
     	</div>
     	<div id="divCFCOAllFood" class="div-full" style="overflow-y: auto;"></div>
   	</div>
@@ -240,7 +242,7 @@ var uo = {
   		<div class="button-base" style="margin-right: 2px;" onClick="Util.scroll({otype:'up', content:'divCFCONewFood', size:80})">上翻</div>
   		<div class="button-base" style="margin-right: 2px;" onClick="Util.scroll({otype:'down', content:'divCFCONewFood', size:80})">下翻</div>
   		<div class="div-full">&nbsp;</div>
-  		<div class="button-base" style="margin-left: 2px;">下单</div>
+  		<div class="button-base" style="margin-left: 2px;" onClick="co.submit()">下单</div>
   		<div class="button-base" style="margin-left: 2px;" onClick="co.fp.getFirstPage()">首页</div>
   		<div class="button-base" style="margin-left: 2px;" onClick="co.fp.getPreviousPage()">上一页</div>
   		<div class="button-base" style="margin-left: 2px;" onClick="co.fp.getNextPage()">下一页</div>

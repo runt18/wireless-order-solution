@@ -152,6 +152,8 @@ Util.scroll = function(c){
 /**
  * 
  * @param c
+ * 	renderTo
+ * 	type
  */
 Util.dialongDisplay = function(c){
 	if(c == null || typeof c == 'undefined' || typeof c.type == 'undefined'){
@@ -160,7 +162,7 @@ Util.dialongDisplay = function(c){
 	var el = $('#'+c.renderTo), lm = $('div[for='+c.renderTo+']');
 	if(!el){return;}
 	if(lm.length <= 0){
-		el.before('<div for="'+c.renderTo+'" style="opacity:0; position: absolute; width: 100%; height: 100%; background: #DDD;"></div>');
+		el.before('<div for="'+c.renderTo+'" style="opacity:0; position: absolute; top:0; left:0; width: 100%; height: 100%; background: #DDD;"></div>');
 		lm = $('div[for='+c.renderTo+']');
 	}
 	if($.trim(c.type) == 'show'){
@@ -181,5 +183,94 @@ Util.dialongDisplay = function(c){
 	}else if($.trim(c.type) == 'hide'){
 		el.addClass('dialong-hide');
 		lm.addClass('dialong-lm-hide');
+		if(typeof c.remove == 'boolean' && c.remove){
+			var interval = null;
+			interval = setInterval(function(){
+				el[0].parentNode.removeChild(el[0]);
+				lm[0].parentNode.removeChild(lm[0]);				
+				clearInterval(interval);
+				interval = null;
+			}, 500);
+		}
+	}
+};
+/**
+ * 
+ */
+Util.msg = {
+	event : [],
+	fireEvent : function(btn, id){
+		for(var i = 0; i < this.event.length; i++){
+			if(this.event[i].id == id && typeof this.event[i].fn == 'function'){
+				this.event[i].fn(btn);
+				break;
+			}
+		}
+	},
+	createContent : function(c){
+		var id = this.createId();
+		var content = '<div id="'+id+'" class="box-vertical msg-base">'
+			+ '<div data-type="title">'+(typeof c.title != 'string' || $.trim(c.title).length == 0 ? '提示' : c.title)+'</div>'
+			+ '<div data-type="content">'+c.msg+'</div>'
+			+ '<div data-type="button" class="box-horizontal">'
+				+ '<div class="div-full"></div>'
+				+ '<div class="button-base" style="width:150px;margin-right: 20px;" onClick="Util.msg.save({event:\'yes\', id:\''+id+'\'})">确定</div>'
+				+ '<div class="button-base" style="width:150px;" onClick="Util.msg.hide({event:\'back\', id:\''+id+'\'})">返回</div>'
+				+ '<div class="div-full"></div>'
+			+ '</div>'
+			+ '</div>';
+		return {
+			id : id,
+			content : content
+		};
+	},
+	createId : function(){
+		var id = null;
+		var dom = null;
+		while(true){
+			id = 'divMsg-' + parseInt(Math.random() * 10000);
+			dom = getDom(id);
+			if(!dom)
+				break;
+		}
+		return id;
+	},
+	save : function(c){
+		this.hide({
+			event : 'yes',
+			id : c.id
+		});
+	},
+	hide : function(c){
+		Util.dialongDisplay({
+			renderTo : c.id,
+			type : 'hide',
+			remove : true
+		});
+		this.fireEvent(c.event, c.id);
+		for(var i = 0; i < this.event.length; i++){
+			if(this.event[i].id == c.id){
+				this.event.splice(i, 1);
+				break;
+			}
+		}
+	},
+	alert : function(c){
+		var content = this.createContent({
+			title : c.title,
+			msg : c.msg,
+			fn : c.fn
+		});
+		document.body.insertAdjacentHTML('beforeEnd', content.content);
+		Util.dialongDisplay({
+			renderTo : content.id,
+			type : 'show'
+		});
+		if(typeof c.fn == 'function'){
+			this.event.push({
+				id : content.id,
+				fn : c.fn
+			});
+		}
 	}
 };

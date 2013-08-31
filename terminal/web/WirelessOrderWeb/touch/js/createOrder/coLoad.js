@@ -28,6 +28,7 @@ co.initNewFoodContent = function(c){
 			count : temp.count.toFixed(2),
 			unitPrice : temp.unitPrice.toFixed(2),
 			totalPrice : (temp.count * temp.unitPrice).toFixed(2),
+			isHangup : typeof c.data.isHangup == 'boolean' && c.data.isHangup ? '叫起' : '',
 			tasteDisplay : typeof temp.tasteGroup == 'undefined' 
 				|| typeof temp.tasteGroup.normalTasteContent == 'undefined' 
 					|| temp.tasteGroup.normalTasteContent.length <= 0 ? '' : temp.tasteGroup.tastePref

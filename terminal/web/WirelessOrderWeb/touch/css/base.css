@@ -134,3 +134,32 @@ body{ overflow: hidden; }
 	border: 1px solid green;
 	border-radius: 5px;
 }
+
+.msg-base{
+	min-width: 500px;
+	min-height: 200px;
+	width: 500px;
+	border: 1px solid #bbb;
+	background: #ddd;
+}
+
+.msg-base > div[data-type="title"]{
+	line-height: 60px;
+	font-size: 25px;
+	font-weight: bold;
+	text-align: center;
+}
+.msg-base > div[data-type="content"]{
+	width: 100%;
+	box-flex: 1; 
+	-webkit-box-flex: 1;
+	-moz-box-flex: 1;
+	background: #fff;
+	text-align: center;
+	font-size: 25px;
+	font-weight: bold; 
+}
+.msg-base > div[data-type="button"]{
+	width: 100%;
+	line-height: 60px;
+}

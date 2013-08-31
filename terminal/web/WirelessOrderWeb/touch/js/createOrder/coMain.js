@@ -60,6 +60,7 @@ co.show = function(c){
 	$('#divCFCONewFood').css('height', $('#divCenterForCreateOrde').height());
 	
 	co.table = c.table;
+	co.callback = typeof c.callback == 'function' ? c.callback : null;
 //	alert(JSON.stringify(co.table))
 	$('#divNFCOTableBasicMsg').html('<div>{alias}</div><div>{name}</div>'.format({
 		alias : co.table.alias,
@@ -78,6 +79,7 @@ co.back = function(c){
 	//
 	co.table = null;
 	co.newFood = [];
+	co.callback = null;
 	$('#divCFCONewFood').html('');
 };
 /**
@@ -331,5 +333,113 @@ co.ot.save = function(c){
 	co.ot.back();
 };
 
-
+/*** -------------------------------------------------- ***/
+/**
+ * 账单提交
+ */
+co.submit = function(){
+	if(co.newFood == null || typeof co.newFood == 'undefined' || co.newFood.length == 0){
+		Util.msg.alert({
+			title : '温馨提示',
+			msg : '请选择菜品后再继续操作.', 
+			fn : function(btn){
+				
+			}
+		});
+		return;
+	}
+//	alert(JSON.stringify(co.table));
+//	return;
+	
+	var foods = '';
+	var item = null;
+	for ( var i = 0; i < co.newFood.length; i++) {
+		item = co.newFood[i];
+		foods += ( i > 0 ? '<<sh>>' : '');
+		if (item.isTemporary) {
+			// 临时菜
+			foods = foods 
+					+ '['
+					+ 'true' + '<<sb>>'
+					+ item.alias + '<<sb>>'
+					+ item.name + '<<sb>>'
+					+ item.count + '<<sb>>'
+					+ item.unitPrice + '<<sb>>'
+					+ '<<sb>>'
+					+ item.isHangup + '<<sb>>'
+					+ item.kitchenAlias
+					+ ']';
+		}else{
+			// 普通菜
+			var normalTaste = '', tmpTaste = '' , tasteGroup = item.tasteGroup;
+			for(var j = 0; j < tasteGroup.normalTasteContent.length; j++){
+				var t = tasteGroup.normalTasteContent[j];
+				normalTaste += ((j > 0 ? '<<stnt>>' : '') + (t.id + '<<stb>>' + t.alias + '<<stb>>' + t.cateValue));
+			}
+			if(tasteGroup.tmpTaste != null && typeof tasteGroup.tmpTaste != 'undefined'){
+				if(eval(tasteGroup.tmpTaste.id >= 0))
+					tmpTaste = tasteGroup.tmpTaste.price + '<<sttt>>' + tasteGroup.tmpTaste.name  + '<<sttt>>' + tasteGroup.tmpTaste.id+ '<<sttt>>' + tasteGroup.tmpTaste.alias; 				
+			}
+			foods = foods 
+					+ '['
+					+ 'false' + '<<sb>>'
+					+ item.alias + '<<sb>>'
+					+ item.count + '<<sb>>'
+					+ (normalTaste + ' <<st>> ' + tmpTaste) + '<<sb>>'
+					+ item.kitchenAlias + '<<sb>>'
+					+ '1' + '<<sb>>'
+					+ item.isHangup
+					+ ']';
+		}
+	}	
+	
+	foods = '{' + foods + '}';
+	
+	$.ajax({
+		url : '../InsertOrder.do',
+		type : 'post',
+		data : {
+			'pin' : pin,
+			'tableID' : co.table.alias,
+			'customNum' : co.table.customNum,
+			'type' : co.table.statusValue == 0 ? 1 : 2,
+			'foods' : foods,
+			'category' :  co.table.categoryValue
+//			,'orderID' : _c.grid.order.id
+//			,'orderDate' : typeof(_c.grid.order) == 'undefined' ? '' : _c.grid.order.orderDate
+		},
+		success : function(data, status, xhr) {
+			if (data.success == true) {
+				Util.msg.alert({
+					title : data.title,
+					msg : data.msg, 
+					fn : function(btn){
+						if(co.callback != null && typeof co.callback == 'function'){
+							co.callback();							
+						}
+					}
+				});
+			} else {
+				Util.msg.alert({
+					title : data.title,
+					msg : data.msg, 
+					fn : function(btn){
+						
+					}
+				});
+			}
+		},
+		error : function(request, status, err) {
+			alert('err: '+err)
+//			var jr = JSON.parse(response.responseText);
+//			Util.msg.alert({
+//				title : jr.title,
+//				msg : jr.msg, 
+//				fn : function(btn){
+//					
+//				}
+//			});
+		}
+	});
+};
 
