@@ -366,7 +366,7 @@ co.submit = function(){
 					+ item.count + '<<sb>>'
 					+ item.unitPrice + '<<sb>>'
 					+ '<<sb>>'
-					+ item.isHangup + '<<sb>>'
+					+ (typeof item.isHangup != 'boolean' ? false : item.isHangup) + '<<sb>>'
 					+ item.kitchenAlias
 					+ ']';
 		}else{
@@ -388,7 +388,7 @@ co.submit = function(){
 					+ (normalTaste + ' <<st>> ' + tmpTaste) + '<<sb>>'
 					+ item.kitchenAlias + '<<sb>>'
 					+ '1' + '<<sb>>'
-					+ item.isHangup
+					+ (typeof item.isHangup != 'boolean' ? false : item.isHangup)
 					+ ']';
 		}
 	}	

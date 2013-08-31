@@ -17,10 +17,12 @@ co.fp = new Util.padding({
  * 初始化新点菜区域
  */
 co.initNewFoodContent = function(c){
-	var html = [];
+	var html = [], sumCount = 0, sumPrice = 0;
 	var temp = null;
 	for(var i = 0; i < co.newFood.length; i++){
 		temp = co.newFood[i];
+		sumCount += temp.count;
+		sumPrice += temp.count * temp.unitPrice;
 		html.push(Templet.co.newFood.format({
 			dataIndex : i,
 			id : temp.id,
@@ -35,6 +37,11 @@ co.initNewFoodContent = function(c){
 		}));
 	}
 	temp = null;
+	$('#divDescForCreateOrde div:first').html('总数量:{count}, 合计:{price}'.format({
+		count : sumCount.toFixed(2),
+		price : sumPrice.toFixed(2)
+	}));
+	
 	$('#divCFCONewFood').html(html.join(''));
 	if(c.data != null){
 		var select = $('#divCFCONewFood > div[data-value='+c.data.id+']');
