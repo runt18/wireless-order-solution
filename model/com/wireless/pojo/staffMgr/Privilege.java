@@ -2,13 +2,16 @@ package com.wireless.pojo.staffMgr;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import com.wireless.json.Jsonable;
 import com.wireless.parcel.Parcel;
 import com.wireless.parcel.Parcelable;
 import com.wireless.pojo.distMgr.Discount;
 
-public class Privilege implements Comparable<Privilege>, Parcelable{
+public class Privilege implements Comparable<Privilege>, Parcelable, Jsonable{
 
 	public static enum Cate{
 		FRONT_BUSINESS(1, "前台"),
@@ -220,4 +223,21 @@ public class Privilege implements Comparable<Privilege>, Parcelable{
 		}
 		
 	};
+
+	@Override
+	public Map<String, Object> toJsonMap(int flag) {
+		Map<String, Object> jm = new HashMap<String, Object>();
+		jm.put("id", this.id);
+		jm.put("codeValue", getCode().getVal());
+		jm.put("codeText", getCode().getDesc());
+		jm.put("restaurantId", this.restaurantId);
+		jm.put("discounts", this.discounts);
+		
+		return Collections.unmodifiableMap(jm);
+	}
+
+	@Override
+	public List<Object> toJsonList(int flag) {
+		return null;
+	}
 }

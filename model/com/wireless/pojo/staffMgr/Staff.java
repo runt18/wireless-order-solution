@@ -121,6 +121,42 @@ public class Staff implements Parcelable, Jsonable{
 	}
 	
 	
+	public static class StaffUpdateBuilder{
+		private int staffId;
+		private String staffName;
+		private String staffpwd;
+		private String mobile;
+		public int getStaffId() {
+			return staffId;
+		}
+		public void setStaffId(int staffId) {
+			this.staffId = staffId;
+		}
+		public String getStaffName() {
+			return staffName;
+		}
+		public void setStaffName(String staffName) {
+			this.staffName = staffName;
+		}
+		public String getStaffpwd() {
+			return staffpwd;
+		}
+		public void setStaffpwd(String staffpwd) {
+			this.staffpwd = staffpwd;
+		}
+		public String getMobile() {
+			return mobile;
+		}
+		public void setMobile(String mobile) {
+			this.mobile = mobile;
+		}
+		public Staff build(){
+			return new Staff(this);
+		}
+		
+	}
+	
+	
 	public Staff(){
 		
 	}
@@ -141,6 +177,13 @@ public class Staff implements Parcelable, Jsonable{
 		setName(builder.getName());
 		setPwd(builder.getPwd());
 		setType(builder.getType());
+	}
+	
+	public Staff(StaffUpdateBuilder builder){
+		setMobile(builder.getMobile());
+		setName(builder.getStaffName());
+		setPwd(builder.getStaffpwd());
+		setId(builder.getStaffId());
 	}
 	
 	public int getId() {
@@ -266,6 +309,7 @@ public class Staff implements Parcelable, Jsonable{
 		jm.put("typeValue", this.getType().getVal());
 		jm.put("typeText", this.getType().getDesc());
 		jm.put("role", this.getRole());
+		jm.put("roleText", this.getRole().getName());
 		
 		return Collections.unmodifiableMap(jm);
 	}
