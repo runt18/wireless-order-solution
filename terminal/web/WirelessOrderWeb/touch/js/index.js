@@ -40,11 +40,22 @@ var Templet = {
 		newFood : '<div data-index={dataIndex} data-value={id} data-type="newFood-select" onClick="co.selectNewFood({event:this, foodId:{id}})">'
 			+ '<div style="line-height: 40px; ">{name} x {count}</div>'
   			+ '<div>{tasteDisplay}</div>'
-  			+ '<div style="text-align: right; padding-right: 5px;">¥:{totalPrice}</div>'
-  			+ '</div>'
+  			+ '<div class="box-horizontal" style="text-align: right; padding-right: 5px;">'
+  				+ '<div style="color: #FF0000; -webkit-box-flex: 1;">{isHangup}</div>'
+  				+ '<div style="min-width: 100px;">¥:{totalPrice}</div>'
+  			+'</div>'
+  			+ '</div>',
+  	  	boxSelectTaste : '<div data-index={dataIndex} data-value={id} class="divCFCOAllFood-main-box" onClick="co.ot.insertTaste({event:this, tasteId:{id}})">'
+  	  		+ '{name}'
+  	  		+ '<div>{mark}:{markText}</div>'
+  	  		+ '</div>',
+  	  	boxNewTaste : '<div data-value={id} class="divCFCOAllFood-main-box" onClick="co.ot.deleteTaste({event:this, tasteId:{id}})">'
+  	  		+ '{name}'
+  	  		+ '<div>{mark}:{markText}</div>'
+  	  		+ '</div>'
 	},
 	uo : {
-		orderFood : '<tr data-index = {dataIndex} data-value = {alias} id = "truoFood{dataIndex}" onclick = "selectUOFood(this)">'
+		orderFood : '<tr data-index = {dataIndex} data-value = {id} id = "truoFood{dataIndex}" onclick = "selectUOFood(this)">'
 			+ 'data-type = "orderFood-select" >'
 			+ '<td>{dataIndex}</td>'
 			+ '<td>{name}</td>'
@@ -59,49 +70,6 @@ var Templet = {
 			+ '</tr>'
 	}
 };
-
-/**
- * 数字键盘
- */
-//var numericKeyboard = {
-//	layoutOne : '<div data-layout = "wrapper">'
-//			+ '<div data-layout = "header">'
-//			+ '<span data-type = "title" style = "color: white; font-weight: bold; font-size: 20px; "'
-//			+ 'margin-left: 20px;></span>'
-//			+ '</div>'
-//			+ '<div data-layout = "main" class = "box-horizontal">'
-//			+ '<div data-layout = "left">'
-//			+ ''
-//			
-//<div id = "divCenterForShowMessageTS" class = "box-horizontal">
-//<div id = "divLeftForShowMessageTS" >
-//	<span style = "font-size: 22px; font-weight: bold;">桌号：</span><input type = "text" id = "txtTableNumForSM" class = "desk-number" style = "background: yellow;"/>
-//	<span style = "font-size: 22px; font-weight: bold;">人数：</span><input type = "text" id = "txtPeopleNumForSM" class = "desk-number" style = "background: yellow;"/>
-//</div>
-//<div id = "divRightForShowMessageTS">
-//	<input type = "button" value = "选中" id = "selectTableNum" class = "keyboardbutton" />
-//	<input type = "button" value = "7" class = "keyboardbutton" onclick = "inputNum(this)"/>
-//	<input type = "button" value = "8" class = "keyboardbutton" onclick = "inputNum(this)"/>
-//	<input type = "button" value = "9" class = "keyboardbutton" onclick = "inputNum(this)"/>
-//	<input type = "button" value = "选中" id = "selectPeopleNum" class = "keyboardbutton" />
-//	<input type = "button" value = "4" class = "keyboardbutton" onclick = "inputNum(this)"/>
-//	<input type = "button" value = "5" class = "keyboardbutton" onclick = "inputNum(this)"/>
-//	<input type = "button" value = "6" class = "keyboardbutton" onclick = "inputNum(this)"/>
-//	<input type = "button" value = "0" class = "keyboardbutton" onclick = "inputNum(this)"/>
-//	<input type = "button" value = "1" class = "keyboardbutton" onclick = "inputNum(this)"/>
-//	<input type = "button" value = "2" class = "keyboardbutton" onclick = "inputNum(this)"/>
-//	<input type = "button" value = "3" class = "keyboardbutton" onclick = "inputNum(this)"/>
-//</div>
-//</div>
-//<div id = "divBottomForShowMessageTS">
-//<!--  
-//<input type = "button" value = "开台" class = "keyboardbutton" style = "width: 100px; margin-left: 140px;" onclick = "setEatingTable()"/>
-//-->
-//<input type = "button" value = "点菜" id = "btnRenderToCreateOrder" class = "keyboardbutton" style = "width: 100px; margin-left: 100px;" />
-//<input type = "button" value = "取消" id = "btnCancelForShowMessageTS" class = "keyboardbutton" style = "width: 100px; margin-left: 65px;"/>
-//</div>
-//</div>	
-//}
 
 /**
  * 初始化菜品数据
@@ -120,9 +88,7 @@ function initFoodData(){
 			if(data.success){
 				for(var i = 0; i < data.root.length; i++){
 					data.root[i].kitchenId = data.root[i].kitchen.id;
-/////////////////////////////////////////////////////////////////////////////					
 					data.root[i].kitchenAlias = data.root[i].kitchen.alias;
-					
 					data.root[i].deptId = data.root[i].kitchen.dept.id;
 					delete data.root[i].kitchen;
 				}
@@ -272,5 +238,3 @@ function toggleContentDisplay(c){
 		el.addClass('content-hide');
 	}
 }
-
-
