@@ -120,6 +120,9 @@ function initFoodData(){
 			if(data.success){
 				for(var i = 0; i < data.root.length; i++){
 					data.root[i].kitchenId = data.root[i].kitchen.id;
+/////////////////////////////////////////////////////////////////////////////					
+					data.root[i].kitchenAlias = data.root[i].kitchen.alias;
+					
 					data.root[i].deptId = data.root[i].kitchen.dept.id;
 					delete data.root[i].kitchen;
 				}
