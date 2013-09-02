@@ -1,9 +1,6 @@
 package com.wireless.lib.task;
 
-import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -11,6 +8,7 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -175,10 +173,12 @@ class ApkDownloadTask extends AsyncTask<Void, Void, BusinessException>{
 	private ProgressDialog mProgDialog;
 	private String mUrl;
 	private String mFileName;
-	private final String FILE_DIR = android.os.Environment.getExternalStorageDirectory().getPath() + "/digi-e/download/";
+	//private final String FILE_DIR = android.os.Environment.getExternalStorageDirectory().getPath() + "/digi-e/download/";
+	//private final File mDir;
 	
 	ApkDownloadTask(Context context, String url){
 		mContext = context;
+		//mDir = mContext.getDir("digi-e", Context.MODE_PRIVATE);
 		mUrl = url;
 	}
 	
@@ -196,6 +196,7 @@ class ApkDownloadTask extends AsyncTask<Void, Void, BusinessException>{
 		mProgDialog.show(); 
 	}
    
+	@SuppressLint("WorldReadableFiles")
 	@Override
 	protected BusinessException doInBackground(Void... params) {
 		
@@ -204,16 +205,6 @@ class ApkDownloadTask extends AsyncTask<Void, Void, BusinessException>{
 		HttpURLConnection conn = null;
 		mFileName = mUrl.substring(mUrl.lastIndexOf("/") + 1, mUrl.length());
 		try {
-			//create the file
-			File dir = new File(FILE_DIR);
-			if(!dir.exists()){
-				dir.mkdir();
-			}
-			File file = new File(FILE_DIR + mFileName);
-			if(file.exists()){
-				file.delete();
-			}
-			file.createNewFile();
 
 			//open the http URL and create the input stream
 			conn = (HttpURLConnection)new URL(mUrl).openConnection();
@@ -221,7 +212,8 @@ class ApkDownloadTask extends AsyncTask<Void, Void, BusinessException>{
 			//get the size to apk file
 			int fileSize = conn.getContentLength();
 			//open the file to store the apk file
-			fos = new BufferedOutputStream(new FileOutputStream(file));
+			mContext.deleteFile(mFileName);
+			fos = mContext.openFileOutput(mFileName, Context.MODE_WORLD_READABLE);
 			
 			final int BUF_SIZE = 100 * 1024;
 			byte[] buf = new byte[BUF_SIZE];
@@ -269,9 +261,8 @@ class ApkDownloadTask extends AsyncTask<Void, Void, BusinessException>{
 		}else{
 			// 得到Intent对象，其Action为ACTION_VIEW.
 			Intent intent = new Intent(Intent.ACTION_VIEW);  
-			// 同时Intent对象设置数据类型
-			intent.setDataAndType(Uri.fromFile(new File(FILE_DIR + mFileName)), "application/vnd.android.package-archive"); 
-			mContext.startActivity(intent);  				
+			intent.setDataAndType(Uri.fromFile(mContext.getFileStreamPath(mFileName)), "application/vnd.android.package-archive"); 
+			mContext.startActivity(intent);
 		}
 	}		
 	
