@@ -46,6 +46,8 @@ public class Restaurant implements Parcelable{
 	private String tele1;
 	private String tele2;
 	private String address;
+	private float liveness;
+	private long birthDate;
 	
 	public Restaurant(){
 		
@@ -127,6 +129,25 @@ public class Restaurant implements Parcelable{
 	
 	public void setAddress(String address) {
 		this.address = address;
+	}
+	
+	public float getLiveness(){
+		return this.liveness;
+	}
+	
+	public void setBirthDate(long birthDate){
+		this.birthDate = birthDate;
+	}
+	
+	public long getBirthDate(){
+		return this.birthDate;
+	}
+	
+	public void setLiveness(float liveness){
+		if(liveness < 0 || liveness > 1){
+			throw new IllegalArgumentException("The liveness must be ranged from 0 to 1.");
+		}
+		this.liveness = liveness;
 	}
 	
 	@Override

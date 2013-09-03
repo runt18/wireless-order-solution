@@ -51,9 +51,10 @@ public class Role implements Jsonable, Parcelable{
 		ADMIN(1, "管理员"),
 		BOSS(2, "老板"),
 		FINANCE(3, "财务"),
-		MANAGER(4, "部长"),
-		WAITER(5, "服务员"),
-		OTHER(6, "其他");
+		MANAGER(4, "店长"),
+		CASHIER(5, "收银"),
+		WAITER(6, "服务员"),
+		OTHER(7, "其他");
 		
 		private final int val;
 		private final String desc;
