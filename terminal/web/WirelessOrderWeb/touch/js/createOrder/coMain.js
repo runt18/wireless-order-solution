@@ -112,20 +112,37 @@ co.deleteFood = function(){
 co.operateFoodCount = function(c){
 	var foodContent = $('#divCFCONewFood > div[class*=div-newFood-select]');
 	if(foodContent.length != 1){
-		alert('请选中一道菜品');
+		Util.msg.alert({
+			msg : '请选中一道菜品'
+		});
 		return;
 	}
 	var data = co.newFood[foodContent.attr('data-index')];
 	if(typeof c.otype == 'string'){
 		if(c.otype.toLowerCase() == 'delete'){
-			co.newFood.splice(foodContent.attr('data-index'), 1);
+			Util.msg.alert({
+				title : '重要',
+				msg : '是否删除菜品?',
+				button : 'YESBACK',
+				fn : function(btn){
+					if(btn == 'yes'){
+						co.newFood.splice(foodContent.attr('data-index'), 1);
+						co.initNewFoodContent({
+							data : data
+						});
+					}
+				}
+			});
+			return;
 		}else if(c.otype.toLowerCase() == 'set'){
 			data.count = c.count;
 		}
 	}else{
 		var nc = data.count + c.count;
 		if(nc <= 0){
-			co.newFood.splice(foodContent.attr('data-index'), 1);
+			co.operateFoodCount({
+				otype : 'delete'
+			});
 		}else{
 			data.count = nc;
 		}
@@ -145,7 +162,9 @@ co.operateFoodCount = function(c){
 co.ot.show = function(){
 	var sf = $('#divCFCONewFood > div[class*=div-newFood-select]');
 	if(sf.length != 1){
-		alert('请选中一道菜品');
+		Util.msg.alert({
+			msg : '请选中一道菜品'
+		});
 		return;
 	}
 	var foodData = co.newFood[sf.attr('data-index')];
@@ -348,8 +367,6 @@ co.submit = function(){
 		});
 		return;
 	}
-//	alert(JSON.stringify(co.table));
-//	return;
 	
 	var foods = '';
 	var item = null;
@@ -392,9 +409,9 @@ co.submit = function(){
 					+ ']';
 		}
 	}	
-	
 	foods = '{' + foods + '}';
 	
+	Util.LM.show();
 	$.ajax({
 		url : '../InsertOrder.do',
 		type : 'post',
@@ -409,6 +426,7 @@ co.submit = function(){
 //			,'orderDate' : typeof(_c.grid.order) == 'undefined' ? '' : _c.grid.order.orderDate
 		},
 		success : function(data, status, xhr) {
+			Util.LM.hide();
 			if (data.success == true) {
 				Util.msg.alert({
 					title : data.title,
@@ -431,15 +449,8 @@ co.submit = function(){
 			}
 		},
 		error : function(request, status, err) {
+			Util.LM.hide();
 			alert('err: '+err)
-//			var jr = JSON.parse(response.responseText);
-//			Util.msg.alert({
-//				title : jr.title,
-//				msg : jr.msg, 
-//				fn : function(btn){
-//					
-//				}
-//			});
 		}
 	});
 };

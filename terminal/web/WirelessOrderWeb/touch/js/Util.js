@@ -214,8 +214,8 @@ Util.msg = {
 			+ '<div data-type="content">'+c.msg+'</div>'
 			+ '<div data-type="button" class="box-horizontal">'
 				+ '<div class="div-full"></div>'
-				+ '<div class="button-base" style="width:150px;margin-right: 20px;" onClick="Util.msg.save({event:\'yes\', id:\''+id+'\'})">确定</div>'
-				+ '<div class="button-base" style="width:150px;" onClick="Util.msg.hide({event:\'back\', id:\''+id+'\'})">返回</div>'
+				+ '<div class="button-base" style="width:150px;" onClick="Util.msg.save({event:\'yes\', id:\''+id+'\'})">确定</div>'
+				+ (typeof c.button == 'string' && c.button.toUpperCase() == 'YESBACK' ? '<div class="button-base" style="width:150px; margin-left:20px;" onClick="Util.msg.hide({event:\'back\', id:\''+id+'\'})">返回</div>' : '')
 				+ '<div class="div-full"></div>'
 			+ '</div>'
 			+ '</div>';
@@ -259,7 +259,8 @@ Util.msg = {
 		var content = this.createContent({
 			title : c.title,
 			msg : c.msg,
-			fn : c.fn
+			fn : c.fn,
+			button : c.button
 		});
 		document.body.insertAdjacentHTML('beforeEnd', content.content);
 		Util.dialongDisplay({
@@ -274,3 +275,52 @@ Util.msg = {
 		}
 	}
 };
+/**
+ * 
+ */
+Util.LM = (function(){
+	var $ = {
+		isDisplay : false,
+		id : 'lm-content-'+parseInt(Math.round(1-1000)),
+		dom : null
+	};
+	var initDocument = function(){
+		var el = '<div id="'+$.id+'" data-type="lm-content-circular">'
+				 	+ '<div data-type="lm-content-circular-1"></div>'
+				 	+ '<div data-type="lm-content-circular-2"></div>'
+				 	+ '<div data-type="lm-content-circular-3"></div>'
+				 	+ '<div data-type="lm-content-circular-4"></div>'
+				 	+ '<div data-type="lm-content-circular-5"></div>'
+				 	+ '<div data-type="lm-content-circular-6"></div>'
+				 	+ '<div data-type="lm-content-circular-7"></div>'
+				 	+ '<div data-type="lm-content-circular-8"></div>'
+				 + '</div>';
+		
+		document.body.insertAdjacentHTML('beforeEnd', el);
+		$.dom = document.getElementById($.id);
+		
+		$.isInit = true;
+	};
+	$.show = function(){
+		if(!this.dom || !document.getElementById(this.id)){
+			initDocument();
+		}
+		if(!this.isDisplay){
+			Util.dialongDisplay({
+				renderTo : this.id,
+				type : 'show'
+			});
+			this.isDisplay=true;
+		}
+	};
+	$.hide = function(){
+		if(this.dom && this.isDisplay){
+			Util.dialongDisplay({
+				renderTo : this.id,
+				type : 'hide'
+			});
+			this.isDisplay=false;
+		}
+	};
+	return $;
+})();

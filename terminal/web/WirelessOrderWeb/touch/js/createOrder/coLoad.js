@@ -37,10 +37,14 @@ co.initNewFoodContent = function(c){
 		}));
 	}
 	temp = null;
-	$('#divDescForCreateOrde div:first').html('总数量:{count}, 合计:{price}'.format({
-		count : sumCount.toFixed(2),
-		price : sumPrice.toFixed(2)
-	}));
+	if(sumCount > 0){
+		$('#divDescForCreateOrde div:first').html('总数量:{count}, 合计:{price}'.format({
+			count : sumCount.toFixed(2),
+			price : sumPrice.toFixed(2)
+		}));		
+	}else{
+		$('#divDescForCreateOrde div:first').html('');
+	}
 	
 	$('#divCFCONewFood').html(html.join(''));
 	if(c.data != null){
