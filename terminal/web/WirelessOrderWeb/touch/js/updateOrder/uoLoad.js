@@ -37,7 +37,8 @@ function initOrderData(data){
 		success : function(data, status, xhr){
 			uoFood = [];
 			if(data.success){
-				uo.order = data;
+				uo.order = data.other.order;
+				uo.order.orderFoods = data.root;
 				for(x in data.root){
 					uoFood.push(data.root[x]);
 				}
