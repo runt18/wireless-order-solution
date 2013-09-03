@@ -51,6 +51,9 @@ function initTables(){
 				random : Math.random(),
 			},
 			success : function(data, status, xhr){
+				tables = [];
+				busyTables = [];
+				freeTables = [];
 				data = eval("(" + data + ")");
 				if(data.success){
 					//把所有餐桌对象都放到本地数组tables中,freeTables存放空闲餐桌，busyTables存放就餐餐桌
@@ -134,7 +137,7 @@ function showTable(temp, pageNow){
 			"<div style = 'color: #462B77; font-size: 10px;'>" + pageRoot[x].alias + "</div>" + 
 			"</div>";
 		}
-		$("#divShowTableForSelect").html(tableHtml);
+		$("#divTableShowForSelect").html(tableHtml);
 		//把占用的餐桌背景色改为占用色（#FFFF00）
 		for(x in busyTables){
 			$("#divtable" + busyTables[x].alias).css("backgroundColor", "#FF0");
@@ -143,7 +146,7 @@ function showTable(temp, pageNow){
 		$("#spanAllPage").html("共" + n + "页");
 	}else{
 //		alert("该区域没有设置餐桌！");
-		$("#divShowTableForSelect").html("");
+		$("#divTableShowForSelect").html("");
 	}	
 }
 

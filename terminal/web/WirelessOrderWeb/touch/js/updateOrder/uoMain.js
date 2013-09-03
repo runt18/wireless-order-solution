@@ -56,8 +56,10 @@ function cancelFood(o){
  * @param {string} dishes 口味
  */
 function showKeyboardNumForUO(foodName, dishes){
-	$("#divHideForUO").show();
-	$("#divKeyboardNumForUO").show(100);	
+	Util.dialongDisplay({
+		type : 'show',
+		renderTo : 'divKeyboardNumForUO'
+	});
 	var title = "";
 	title = "<div style = 'width: 50%; float: left;'>" + foodName + "(" + dishes + ")</div>" ;
 	title += "<div class = 'cancelReasonScroll' style = 'float: left; width: 50%; display: none'><input type = 'button' value = '上翻' " +
@@ -73,12 +75,10 @@ function showKeyboardNumForUO(foodName, dishes){
 	//初始化退菜原因信息
 	var htmlReason = '';
 	for(x in cancelReasonData){
-		htmlReason += "<input type = 'button' " +
-				"value = '" + cancelReasonData[x].reason + "' " +
-				"class = 'keyboardbutton reason' " +
-				"onclick = 'setReason(this)' " +
+		htmlReason += "<div class = 'button-base reason' onclick = 'setReason(this)'" +
 				"id = 'btnReason" + cancelReasonData[x].id + "' " +
-				"style = 'margin: 0 0 5px 8px; width: 165px;'/>";
+				"style = 'margin: 0 0 5px 8px; height: 66px; width: 165px;'>" +
+				 cancelReasonData[x].reason + "</div>";
 	}
 	if(cancelReasonData.length > 10){
 		$(".cancelReasonScroll").show();
@@ -94,25 +94,16 @@ function showKeyboardNumForUO(foodName, dishes){
 	//设定输入框id
 	inputNumIdUO = 'txtNumForUO';
 	
-	//设置鼠标移到数字键盘上的移进移出效果
-	$(".keyboardbutton").mouseover(function(){
-		$(this).css("backgroundColor", "#FFD700");
-	});
-	$(".keyboardbutton").mouseout(function(){
-		$(this).css("backgroundColor", "#75B2F4");
-	});
-	
-	//取消退菜原因的鼠标效果
-	$(".keyboardbutton.reason").unbind("mouseout mouseover");
-	
 	//设定输入框的初始值和选中状态
 	$("#" + inputNumIdUO).val(count);
 	$("#" + inputNumIdUO).select();
 	
 	//点击取消界面按钮
 	$("#btnCloseForKeyboardNumUO").click(function(){
-		$("#divKeyboardNumForUO").hide(100);
-		$("#divHideForUO").hide();
+		Util.dialongDisplay({
+			type : 'hide',
+			renderTo : 'divKeyboardNumForUO'
+		});
 		inputNumValUO = "";
 		$("#" + inputNumIdUO).val(inputNumValUO);
 	});	
@@ -132,7 +123,7 @@ function setReason(o){
 		}
 	}
 	//设置选中状态的背景色
-	$(".keyboardbutton.reason").css("backgroundColor", "#75B2F4");
+	$(".button-base.reason").css("backgroundColor", "#4EEE99");
     $("#" + o.id).css("backgroundColor", "#F0A00A");
 }
 
@@ -145,12 +136,24 @@ $("#btnSubmitForKeyboardNumUO").click(function(){
 	var num = $("#" + inputNumIdUO).val();
 	num = parseFloat(num).toFixed(2);
 	if(num == 0){
-		alert("退菜数目不能为0或太小");
+		Util.msg.alert({
+			title : '温馨提示',
+			msg : '退菜数目不能为0或太小.', 
+			fn : function(btn){
+				
+			}
+		});
 		inputNumValUO = "";
 		$("#" + inputNumIdUO).val(count);
 		$("#" + inputNumIdUO).select();
 	}else if(num == 'NaN'){
-		alert("数字不合规范");
+		Util.msg.alert({
+			title : '温馨提示',
+			msg : '数字不合规范.', 
+			fn : function(btn){
+				
+			}
+		});
 		inputNumValUO = "";
 		$("#" + inputNumIdUO).val(count);
 		$("#" + inputNumIdUO).select();
@@ -195,19 +198,19 @@ $("#btnSubmitForKeyboardNumUO").click(function(){
 		}
 		$("#spanTotalPriceUO").html(totalPrice.toFixed(2) + "元");
 		//关闭该界面
-		$("#divKeyboardNumForUO").hide(100);
-		$("#divHideForUO").hide();
+		Util.dialongDisplay({
+			type : 'hide',
+			renderTo : 'divKeyboardNumForUO'
+		});
 		inputNumValUO = "";
 		$("#" + inputNumIdUO).val(inputNumValUO);
 		
 		//把按钮值由退菜改为取消退菜
 		var btnReasonToggle;
-		btnReasonToggle = $("#" + rowId).find("td").eq(7).find("input"); 
-		btnReasonToggle.val("取消退菜");
-		
+		btnReasonToggle = $("#" + rowId).find("td").eq(7).find("div"); 
+		btnReasonToggle.html("取消退菜");
 		//移除退菜事件绑定
 		btnReasonToggle.unbind("click");
-		
 		//绑定取消退菜事件
 		btnReasonToggle.bind("click", function(){
 			//调用取消退菜函数
@@ -215,7 +218,7 @@ $("#btnSubmitForKeyboardNumUO").click(function(){
 			//移除取消退菜事件
 			btnReasonToggle.unbind("click");
 			//把按钮的值由取消退菜改为退菜
-			btnReasonToggle.val("退菜");
+			btnReasonToggle.html("退菜");
 			//绑定退菜事件
 			btnReasonToggle.bind("click", function(){
 				//调用退菜函数
@@ -257,8 +260,12 @@ function cancelForCancelFood(rowId){
  */
 function showdivKeyboardPeopleForUO(){
 	//弹出人数输入框
-	$("#divHideForUO").show();
-	$("#divKeyboardPeopleForUO").show(100);
+//	$("#divHideForUO").show();
+//	$("#divKeyboardPeopleForUO").show(100);
+	Util.dialongDisplay({
+		type : 'show',
+		renderTo : 'divKeyboardPeopleForUO'
+	});
 	var title = "请输入餐桌人数";
 	$("#divTopForKeyboardPeopleForUO").html("<div style = 'font-size: 20px; " +
 			"font-weight: bold; color: #fff; " +
@@ -272,8 +279,12 @@ function showdivKeyboardPeopleForUO(){
 	
 	//取消按钮
 	$("#btnCloseForPeopleKeyboardUO").click(function(){
-		$("#divKeyboardPeopleForUO").hide(100);
-		$("#divHideForUO").hide();
+//		$("#divKeyboardPeopleForUO").hide(100);
+//		$("#divHideForUO").hide();
+		Util.dialongDisplay({
+			type : 'hide',
+			renderTo : 'divKeyboardPeopleForUO'
+		});
 		inputNumValUO = "";
 		$("#" + inputNumIdUO).val(inputNumValUO);
 	});	
@@ -284,8 +295,12 @@ $("#btnSubmitForPeopleKeyboardUO").click(function(){
 	var num;
 	num = parseInt($("#" + inputNumIdUO).val());
 	//关闭该界面
-	$("#divKeyboardPeopleForUO").hide(100);
-	$("#divHideForUO").hide();
+//	$("#divKeyboardPeopleForUO").hide(100);
+//	$("#divHideForUO").hide();
+	Util.dialongDisplay({
+		type : 'hide',
+		renderTo : 'divKeyboardPeopleForUO'
+	});
 	//清空输入框的显示信息
 	inputNumValUO = "";
 	$("#" + inputNumIdUO).val(inputNumValUO);
@@ -345,19 +360,31 @@ function scrollUp(renderTo){
  */
 function inputNumUO(o){
 	//设置输入框的显示值（原有值加上输入值）
-	inputNumValUO += o.value;
+	inputNumValUO += o.innerHTML;
 	$("#" + inputNumIdUO).val(inputNumValUO);
 	$("#" + inputNumIdUO).focus();
 	
 	//判断退菜数目是否合法
 	if(inputNumIdUO == "txtNumForUO"){
 		if(parseFloat($("#" + inputNumIdUO).val()) > count){
-			alert("退菜数不能超过点菜数！");
-			inputNumValUO = "";
-			$("#" + inputNumIdUO).val(count);
+			Util.msg.alert({
+				title : '温馨提示',
+				msg : '退菜数不能超过点菜数.', 
+				fn : function(btn){
+					inputNumValUO = "";
+					$("#" + inputNumIdUO).val(count);
+				}
+			});
+			
 		}
 		if(parseFloat($("#" + inputNumIdUO).val()) < 0){
-			alert("退菜数不能小于0！");
+			Util.msg.alert({
+				title : '温馨提示',
+				msg : '退菜数不能小于0.', 
+				fn : function(btn){
+					
+				}
+			});
 			inputNumValUO = "";
 			$("#" + inputNumIdUO).val(count);
 		}
@@ -366,12 +393,24 @@ function inputNumUO(o){
 	//判断输入的人数是否合法
 	if(inputNumIdUO == "txtPeopleNumForUO"){
 		if(parseInt($("#" + inputNumIdUO).val()) > 255){
-			alert("输入的人数不得超过255！");
+			Util.msg.alert({
+				title : '温馨提示',
+				msg : '输入的人数不得超过255.', 
+				fn : function(btn){
+					
+				}
+			});
 			inputNumValUO = "";
 			$("#" + inputNumIdUO).val(uoOther.order.customNum);
 		}
 		if(parseFloat($("#" + inputNumIdUO).val()) == 0){
-			alert("人数值不能为0！");
+			Util.msg.alert({
+				title : '温馨提示',
+				msg : '人数值不能为0.', 
+				fn : function(btn){
+					
+				}
+			});
 			inputNumValUO = "";
 			$("#" + inputNumIdUO).val(uoOther.order.customNum);
 		}
@@ -425,6 +464,19 @@ $(".deleteOneForKeyboardNumUO").click(function(){
 	$("#" + inputNumIdUO).val(inputNumValUO);
 	$("#" + inputNumIdUO).focus();
 });
+
+/**
+ * 工具栏点菜按钮
+ */
+function goToCreateOrder(){
+	co.show({
+		table : uo.table,
+		order : uoFood,
+		callback : function(){
+			initTables();
+		}
+	});
+}
 
 /**
  * 已点菜账单提交操作
@@ -495,10 +547,22 @@ function submitUpdateOrderHandler(c){
 				toggleContentDisplay({type:'hide', renderTo:'divUpdateOrder'});
 			},
 			error : function(request, status, err){
-				alert('ERR.');
+				Util.msg.alert({
+					title : '温馨提示',
+					msg : err, 
+					fn : function(btn){
+						
+					}
+				});
 			}
 		});
 	}else if(orderFoods.length == 0){
-		alert("没有任何菜品，不能提交！");
+		Util.msg.alert({
+			title : '温馨提示',
+			msg : '没有任何菜品，不能提交', 
+			fn : function(btn){
+				
+			}
+		});
 	}
 }

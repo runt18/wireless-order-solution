@@ -44,6 +44,9 @@ function initOrderData(data){
 				showNorthForUpdateOrder();
 				showOrder();
 				showDescForUpdateOrder();
+				
+				
+				
 			}else{
 				alert('初始化菜单数据失败.');
 			}
@@ -128,15 +131,6 @@ function showOrder(){
 		});
 	}
 	$("#divCenterForUpdateOrder table").html(html);
-	
-	//设置鼠标移到退菜按钮上的移进移出效果
-	$(".cancelFoodBtn").mouseover(function(){
-		$(this).css("backgroundColor", "#FFD700");
-	});
-	$(".cancelFoodBtn").mouseout(function(){
-		$(this).css("backgroundColor", "#75B2F4");
-	});	
-	
 	//为退菜按钮绑定退菜事件
 	$(".cancelFoodBtn").bind("click", function(){
 		cancelFood(this);

@@ -64,8 +64,7 @@ var Templet = {
 			+ '<td>{actualPrice}</td>'
 			+ '<td>{totalPrice}</td>'
 			+ '<td>{orderDateFormat}</td>'
-			+ '<td><input type = "button" value= "退菜" id = "btnuo{dataIndex}" ' 
-			+ 'class = "cancelFoodBtn" /></td>'
+			+ '<td><div class = "button-base cancelFoodBtn" id = "btnuo{dataIndex}">退菜</div></td>'
 			+ '<td>{waiter}</td>'
 			+ '</tr>'
 	}

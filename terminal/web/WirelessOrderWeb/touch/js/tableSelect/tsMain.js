@@ -119,12 +119,12 @@ $("#busyForTableSelect").click(function(){
 });
 
 //设置鼠标移到数字键盘上的移进移出效果
-$(".keyboardbutton").mouseover(function(){
-	$(this).css("backgroundColor", "#FFD700");
-});
-$(".keyboardbutton").mouseout(function(){
-	$(this).css("backgroundColor", "#75B2F4");
-});
+//$(".keyboardbutton").mouseover(function(){
+//	$(this).css("backgroundColor", "#FFD700");
+//});
+//$(".keyboardbutton").mouseout(function(){
+//	$(this).css("backgroundColor", "#75B2F4");
+//});
 
 /**
  * 选中一张餐桌
@@ -135,17 +135,25 @@ function selectTable(o){
 	tabMessage = document.getElementById(o.id).getAttribute("tableObject");
 	tableMessage = JSON.parse(tabMessage);
 	//判断是否为已点菜餐桌
-	if(tableMessage.statusText == "就餐"){		
+	if(tableMessage.statusText == "就餐"){	
 		uo.show({
 			table : getTableBytableId(o.id.substring(8, o.id.length))
 		});
 	}else{
-		$("#divHideForTableSelect").show();
-		$("#divShowMessageForTableSelect").show(100);
+//		$("#divHideForTableSelect").show();
+//		$("#divShowMessageForTableSelect").show(100);
+		Util.dialongDisplay({
+			type:'show', 
+			renderTo:'divShowMessageForTableSelect'
+		});
 		//关闭该界面
 		$("#btnCancelForShowMessageTS").click(function (){
-			$("#divShowMessageForTableSelect").hide(100);
-			$("#divHideForTableSelect").hide();
+//			$("#divShowMessageForTableSelect").hide(100);
+//			$("#divHideForTableSelect").hide();
+			Util.dialongDisplay({
+				type:'hide', 
+				renderTo:'divShowMessageForTableSelect'
+			});
 			inputNumVal = "";
 			$("#txtPeopleNumForSM").val("");
 		});
@@ -184,7 +192,7 @@ function selectTable(o){
  * @param {object} o
  */
 function inputNum(o){
-	inputNumVal += o.value;
+	inputNumVal += o.innerHTML;
 	$("#" + inputNumId).val(inputNumVal);
 	//判断人数是否超过限定
 	if(inputNumId == "txtPeopleNumForSM"){
@@ -226,9 +234,11 @@ $("#btnBackAllForSTNum").click(function(){
 //跳转到点菜界面
 function renderToCreateOrder(tableNo, peopleNo){
 	if(hasTable(tables, tableNo)){
-		$("#divSelectTableNumForTs").hide(100);
-		$("#divShowMessageForTableSelect").hide(100);
-		$("#divHideForTableSelect").hide();
+//		$("#divSelectTableNumForTs").hide(100);
+//		$("#divShowMessageForTableSelect").hide(100);
+//		$("#divHideForTableSelect").hide();
+		
+		
 		inputNumVal = "";
 		$("#txtTableNumForTS").val(inputNumVal);
 		$("#txtPeopleNumForSM").val(inputNumVal);
@@ -254,6 +264,10 @@ $("#btnRenderToCreateOrder").click(function(){
 		peopleNo = parseInt($("#txtPeopleNumForSM").val());
 	}	
 	renderToCreateOrder(tableNo, peopleNo);
+	Util.dialongDisplay({
+		type:'hide', 
+		renderTo:'divShowMessageForTableSelect'
+	});
 });
 
 //点击桌号选择页面的确定（点菜）按钮
@@ -268,6 +282,10 @@ $("#btnSubmitForSelectTableNumTS").click(function(){
 	}
 	if(typeForInputTableNum == "createOrder"){
 		renderToCreateOrder(tableNo, peopleNo);	
+		Util.dialongDisplay({
+			type:'hide', 
+			renderTo:'divSelectTableNumForTs'
+		});
 	}else if(typeForInputTableNum == "check"){
 		//判断该餐桌是否已点菜（下单）
 		if(hasTable(tables, tableNo)){
@@ -300,8 +318,12 @@ function checkOnTS(){
 }
 //弹出和关闭桌号选择界面
 function showSelectTableNumTS(type){
-	$("#divHideForTableSelect").show();
-	$("#divSelectTableNumForTs").show(100);
+//	$("#divHideForTableSelect").show();
+//	$("#divSelectTableNumForTs").show(100);
+	Util.dialongDisplay({
+		type : 'show',
+		renderTo : 'divSelectTableNumForTs'
+	});
 	typeForInputTableNum = type;
 	var title = "";
 	if(typeForInputTableNum == "createOrder"){
@@ -313,8 +335,12 @@ function showSelectTableNumTS(type){
 			"font-weight: bold; color: #fff; margin: 15px;'>" + title + "</div>");
 	//关闭该界面
 	$("#btnCloseForSelectTableNumTS").click(function(){
-		$("#divSelectTableNumForTs").hide(100);
-		$("#divHideForTableSelect").hide();
+//		$("#divSelectTableNumForTs").hide(100);
+//		$("#divHideForTableSelect").hide();
+		Util.dialongDisplay({
+			type : 'hide',
+			renderTo : 'divSelectTableNumForTs'
+		});
 		inputNumVal = "";
 		$("#txtTableNumForTS").val("");
 	});
