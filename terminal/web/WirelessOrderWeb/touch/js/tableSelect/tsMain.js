@@ -1,4 +1,3 @@
-
 /**
  * 取得当前区域下不同状态的餐桌数组 
  * @param {string} type 状态类型，分为空闲（free），就餐（busy），全部状态（allStatus）
@@ -67,7 +66,6 @@ function addTables(o){
     	    $("#" + o.id).css("backgroundColor", "#FFA07A");
     	} 
      }  
-    
     temp = tempForRegion;
     //如果没有餐桌，则改变区域选中色
     if(temp.length == 0){
@@ -118,14 +116,6 @@ $("#busyForTableSelect").click(function(){
     showTable(temp, pageNow);
 });
 
-//设置鼠标移到数字键盘上的移进移出效果
-//$(".keyboardbutton").mouseover(function(){
-//	$(this).css("backgroundColor", "#FFD700");
-//});
-//$(".keyboardbutton").mouseout(function(){
-//	$(this).css("backgroundColor", "#75B2F4");
-//});
-
 /**
  * 选中一张餐桌
  * @param {object} o 被选中的餐桌节点
@@ -140,16 +130,12 @@ function selectTable(o){
 			table : getTableBytableId(o.id.substring(8, o.id.length))
 		});
 	}else{
-//		$("#divHideForTableSelect").show();
-//		$("#divShowMessageForTableSelect").show(100);
 		Util.dialongDisplay({
 			type:'show', 
 			renderTo:'divShowMessageForTableSelect'
 		});
 		//关闭该界面
 		$("#btnCancelForShowMessageTS").click(function (){
-//			$("#divShowMessageForTableSelect").hide(100);
-//			$("#divHideForTableSelect").hide();
 			Util.dialongDisplay({
 				type:'hide', 
 				renderTo:'divShowMessageForTableSelect'
@@ -197,15 +183,28 @@ function inputNum(o){
 	//判断人数是否超过限定
 	if(inputNumId == "txtPeopleNumForSM"){
 		if(parseInt(inputNumVal) > 255){
-			alert("人数超过限定，请重新输入！");
+			Util.msg.alert({
+				title : '温馨提示',
+				msg : '人数超过限定，请重新输入.', 
+				fn : function(btn){
+					
+				}
+			});
 			inputNumVal = "";
 			$("#" + inputNumId).val(inputNumVal);
 		}
 	}
 	//判断桌号是否超过限定
-	if(inputNumId == "txtTableNumForSM" || inputNumId =="txtTableNumForTS"){
+	if(inputNumId == "txtTableNumForSM" || inputNumId =="txtTableNumForTS"
+		|| inputNumId == "txtOldTableForTS" || inputNumId == "txtNewTableForTS"){
 		if(parseInt(inputNumVal) > 65536){
-			alert("桌号超过限定，请重新输入！");
+			Util.msg.alert({
+				title : '温馨提示',
+				msg : '桌号超过限定，请重新输入.', 
+				fn : function(btn){
+					
+				}
+			});
 			inputNumVal = "";
 			$("#" + inputNumId).val(inputNumVal);
 		}
@@ -234,11 +233,6 @@ $("#btnBackAllForSTNum").click(function(){
 //跳转到点菜界面
 function renderToCreateOrder(tableNo, peopleNo){
 	if(hasTable(tables, tableNo)){
-//		$("#divSelectTableNumForTs").hide(100);
-//		$("#divShowMessageForTableSelect").hide(100);
-//		$("#divHideForTableSelect").hide();
-		
-		
 		inputNumVal = "";
 		$("#txtTableNumForTS").val(inputNumVal);
 		$("#txtPeopleNumForSM").val(inputNumVal);
@@ -249,7 +243,13 @@ function renderToCreateOrder(tableNo, peopleNo){
 			}
 		});
 	}else{
-		alert("没有该餐桌，请重新输入一个桌号！");
+		Util.msg.alert({
+			title : '温馨提示',
+			msg : '没有该餐桌，请重新输入一个桌号.', 
+			fn : function(btn){
+				
+			}
+		});
 	}	
 }
 
@@ -309,8 +309,127 @@ function createOrderForTS(){
  * 转台按钮
  */
 function transTableForTS(){
-	
+	Util.dialongDisplay({
+		type : 'show',
+		renderTo : 'divTransTableForTableSelect'
+	});
+	$("#txtOldTableForTS").focus();
+	inputNumId  = "txtOldTableForTS";
 }
+
+/**
+ * 确定转台操作
+ */
+ts.tt.submit = function(){
+	var oldTable = $("#txtOldTableForTS").val();
+	var newTable = $("#txtNewTableForTS").val();
+	var oldflag = false, newflag = true;
+	//判断餐桌是否符合条件
+	if(hasTable(tables, oldTable)){
+		if(getTableBytableId(oldTable).statusValue == 1){
+			oldflag = true;
+		}else{
+			Util.msg.alert({
+				title : '温馨提示',
+				msg : oldTable + '号桌不是就餐状态，不能转台.', 
+				fn : function(btn){
+					
+				}
+			});
+			return;
+		}
+	}else{
+		Util.msg.alert({
+			title : '温馨提示',
+			msg : '没有' + oldTable + '号桌，请重新输入一个桌号.', 
+			fn : function(btn){
+				
+			}
+		});
+	}
+	if(hasTable(tables, newTable)){
+		if(getTableBytableId(newTable).statusValue == 0){
+			newflag = true;
+		}else{
+			Util.msg.alert({
+				title : '温馨提示',
+				msg : newTable + '号桌不是空台，不能转台.', 
+				fn : function(btn){
+					
+				}
+			});
+			return;
+		}
+	}else{
+		Util.msg.alert({
+			title : '温馨提示',
+			msg : '没有' + newTable + '号桌，请重新输入一个桌号.', 
+			fn : function(btn){
+				
+			}
+		});
+	}
+	
+	//提交转台信息
+	if(oldflag && newflag){
+		
+	}else{
+		return;
+	}
+};
+
+
+/**
+ * 转台操作返回
+ */
+ts.tt.back = function(){
+	Util.dialongDisplay({
+		type : 'hide',
+		renderTo : 'divTransTableForTableSelect'
+	});
+};
+
+/**
+ * 选择输入框
+ */
+ts.selectInput = function(c){
+	var renderTo = c.renderTo;
+	inputNumId = renderTo;
+	inputNumVal = "";
+	inputNumVal += $("#" + inputNumId).val();
+};
+
+/**
+ * 选中
+ */
+ts.selectingTxt = function(c){
+	var renderTo = c.renderTo;
+	inputNumId = renderTo;
+	inputNumVal = "";
+	$("#" + inputNumId).select();
+};
+
+/**
+ * 清除一位数字
+ */
+ts.backOne = function(){
+	var tempNum;
+	tempNum = $("#" + inputNumId).val();
+	if(tempNum.length > 0){
+		inputNumVal = tempNum.substring(0, tempNum.length-1);
+		$("#" + inputNumId).val(inputNumVal);
+	}
+	$("#" + inputNumId).focus();	
+};
+
+/**
+ * 重置数字
+ */
+ts.backAll = function(){
+	inputNumVal = "";
+	$("#" + inputNumId).val(inputNumVal);
+	$("#" + inputNumId).focus();
+};
 
 //点击工具栏上的结账按钮
 function checkOnTS(){
@@ -318,8 +437,6 @@ function checkOnTS(){
 }
 //弹出和关闭桌号选择界面
 function showSelectTableNumTS(type){
-//	$("#divHideForTableSelect").show();
-//	$("#divSelectTableNumForTs").show(100);
 	Util.dialongDisplay({
 		type : 'show',
 		renderTo : 'divSelectTableNumForTs'
@@ -335,8 +452,6 @@ function showSelectTableNumTS(type){
 			"font-weight: bold; color: #fff; margin: 15px;'>" + title + "</div>");
 	//关闭该界面
 	$("#btnCloseForSelectTableNumTS").click(function(){
-//		$("#divSelectTableNumForTs").hide(100);
-//		$("#divHideForTableSelect").hide();
 		Util.dialongDisplay({
 			type : 'hide',
 			renderTo : 'divSelectTableNumForTs'
@@ -347,24 +462,3 @@ function showSelectTableNumTS(type){
 	$("#txtTableNumForTS").select();
 	inputNumId  = "txtTableNumForTS";
 }
-
-/**
- * 定义分页函数
- * @param {int} start 开始下标
- * @param {int} limit 一页最多显示的数目
- * @param {object} tempObject 需要分页的数组对象
- * @param {boolean} isPaging 是否需要分页
- * @returns {object} pageRoot 已经完成分页的数组对象
- */
-function getPagingData(start, limit, tempObject, isPaging){
-    var pageRoot = [];
-    if(tempObject.length != 0 && isPaging){ 
-    	var dataIndex = start, dataSize = limit;		
-    	dataSize = (dataIndex + dataSize) > tempObject.length ? dataSize - ((dataIndex + dataSize) - tempObject.length) : dataSize;			
-    	pageRoot = tempObject.slice(dataIndex, dataIndex + dataSize);	
-    }else{
-    	pageRoot = tempObject;
-    }	
-	return pageRoot;
-}
-

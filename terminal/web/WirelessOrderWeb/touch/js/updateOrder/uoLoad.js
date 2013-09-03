@@ -37,22 +37,32 @@ function initOrderData(data){
 		success : function(data, status, xhr){
 			uoFood = [];
 			if(data.success){
+				uo.order = data;
 				for(x in data.root){
 					uoFood.push(data.root[x]);
 				}
 				uoOther = data.other;
 				showNorthForUpdateOrder();
 				showOrder();
-				showDescForUpdateOrder();
-				
-				
-				
+				showDescForUpdateOrder();		
 			}else{
-				alert('初始化菜单数据失败.');
+				Util.msg.alert({
+					title : '温馨提示',
+					msg : '初始化菜单数据失败.', 
+					fn : function(btn){
+						
+					}
+				});
 			}
 		},
 		error : function(request, status, err){
-			alert('初始化菜单数据失败.');
+			Util.msg.alert({
+				title : '温馨提示',
+				msg : '初始化菜单数据失败.', 
+				fn : function(btn){
+					
+				}
+			});
 		}
 	});	
 }
@@ -76,7 +86,13 @@ function initCancelReason(){
 			}
 		},
 		error : function(request, status, err){
-			alert('初始化退菜原因失败.');
+			Util.msg.alert({
+				title : '温馨提示',
+				msg : '初始化退菜原因失败.', 
+				fn : function(btn){
+					
+				}
+			});
 		}
 	});
 }

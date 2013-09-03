@@ -140,12 +140,11 @@ $("#btnSubmitForKeyboardNumUO").click(function(){
 			title : '温馨提示',
 			msg : '退菜数目不能为0或太小.', 
 			fn : function(btn){
-				
+				inputNumValUO = "";
+				$("#" + inputNumIdUO).val(count);
+				$("#" + inputNumIdUO).select();
 			}
 		});
-		inputNumValUO = "";
-		$("#" + inputNumIdUO).val(count);
-		$("#" + inputNumIdUO).select();
 	}else if(num == 'NaN'){
 		Util.msg.alert({
 			title : '温馨提示',
@@ -204,7 +203,6 @@ $("#btnSubmitForKeyboardNumUO").click(function(){
 		});
 		inputNumValUO = "";
 		$("#" + inputNumIdUO).val(inputNumValUO);
-		
 		//把按钮值由退菜改为取消退菜
 		var btnReasonToggle;
 		btnReasonToggle = $("#" + rowId).find("td").eq(7).find("div"); 
@@ -260,8 +258,6 @@ function cancelForCancelFood(rowId){
  */
 function showdivKeyboardPeopleForUO(){
 	//弹出人数输入框
-//	$("#divHideForUO").show();
-//	$("#divKeyboardPeopleForUO").show(100);
 	Util.dialongDisplay({
 		type : 'show',
 		renderTo : 'divKeyboardPeopleForUO'
@@ -276,11 +272,8 @@ function showdivKeyboardPeopleForUO(){
 	$("#" + inputNumIdUO).val(inputNumValUO);
 	$("#" + inputNumIdUO).select();
 	inputNumValUO = "";
-	
 	//取消按钮
 	$("#btnCloseForPeopleKeyboardUO").click(function(){
-//		$("#divKeyboardPeopleForUO").hide(100);
-//		$("#divHideForUO").hide();
 		Util.dialongDisplay({
 			type : 'hide',
 			renderTo : 'divKeyboardPeopleForUO'
@@ -295,8 +288,6 @@ $("#btnSubmitForPeopleKeyboardUO").click(function(){
 	var num;
 	num = parseInt($("#" + inputNumIdUO).val());
 	//关闭该界面
-//	$("#divKeyboardPeopleForUO").hide(100);
-//	$("#divHideForUO").hide();
 	Util.dialongDisplay({
 		type : 'hide',
 		renderTo : 'divKeyboardPeopleForUO'
@@ -363,7 +354,6 @@ function inputNumUO(o){
 	inputNumValUO += o.innerHTML;
 	$("#" + inputNumIdUO).val(inputNumValUO);
 	$("#" + inputNumIdUO).focus();
-	
 	//判断退菜数目是否合法
 	if(inputNumIdUO == "txtNumForUO"){
 		if(parseFloat($("#" + inputNumIdUO).val()) > count){
@@ -375,7 +365,6 @@ function inputNumUO(o){
 					$("#" + inputNumIdUO).val(count);
 				}
 			});
-			
 		}
 		if(parseFloat($("#" + inputNumIdUO).val()) < 0){
 			Util.msg.alert({
@@ -389,7 +378,6 @@ function inputNumUO(o){
 			$("#" + inputNumIdUO).val(count);
 		}
 	}
-	
 	//判断输入的人数是否合法
 	if(inputNumIdUO == "txtPeopleNumForUO"){
 		if(parseInt($("#" + inputNumIdUO).val()) > 255){
@@ -471,7 +459,7 @@ $(".deleteOneForKeyboardNumUO").click(function(){
 function goToCreateOrder(){
 	co.show({
 		table : uo.table,
-		order : uoFood,
+		order : uo.order,
 		callback : function(){
 			initTables();
 		}
@@ -527,7 +515,6 @@ function submitUpdateOrderHandler(c){
 						+ ']';
 			}
 		}	
-		
 		foodPara = '{' + foodPara + '}';	
 		var type = 2;
 		$.ajax({
