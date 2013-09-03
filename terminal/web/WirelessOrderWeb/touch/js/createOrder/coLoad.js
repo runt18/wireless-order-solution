@@ -17,6 +17,7 @@ co.fp = new Util.padding({
  * 初始化新点菜区域
  */
 co.initNewFoodContent = function(c){
+	c = c == null ? {} : c;
 	var html = [], sumCount = 0, sumPrice = 0;
 	var temp = null;
 	for(var i = 0; i < co.newFood.length; i++){
@@ -30,7 +31,7 @@ co.initNewFoodContent = function(c){
 			count : temp.count.toFixed(2),
 			unitPrice : temp.unitPrice.toFixed(2),
 			totalPrice : (temp.count * temp.unitPrice).toFixed(2),
-			isHangup : typeof c.data.isHangup == 'boolean' && c.data.isHangup ? '叫起' : '',
+			isHangup : typeof temp.isHangup == 'boolean' && temp.isHangup ? '叫起' : '',
 			tasteDisplay : typeof temp.tasteGroup == 'undefined' 
 				|| typeof temp.tasteGroup.normalTasteContent == 'undefined' 
 					|| temp.tasteGroup.normalTasteContent.length <= 0 ? '' : temp.tasteGroup.tastePref
@@ -47,7 +48,7 @@ co.initNewFoodContent = function(c){
 	}
 	
 	$('#divCFCONewFood').html(html.join(''));
-	if(c.data != null){
+	if(c.data != null && typeof c.data != 'undefined'){
 		var select = $('#divCFCONewFood > div[data-value='+c.data.id+']');
 		if(select.length > 0){
 			select.addClass('div-newFood-select');

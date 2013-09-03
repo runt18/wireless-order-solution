@@ -85,12 +85,18 @@ function initFoodData(){
 		},
 		success : function(data, status, xhr){
 			if(data.success){
+				var tmpKitchen = null;
 				for(var i = 0; i < data.root.length; i++){
-					data.root[i].kitchenId = data.root[i].kitchen.id;
-					data.root[i].kitchenAlias = data.root[i].kitchen.alias;
-					data.root[i].deptId = data.root[i].kitchen.dept.id;
-					delete data.root[i].kitchen;
+					tmpKitchen = {
+						id : data.root[i].kitchen.id,
+						alias : data.root[i].kitchen.alias,
+						dept : {
+							id : data.root[i].kitchen.dept.id
+						}
+					};
+					data.root[i].kitchen = tmpKitchen;
 				}
+				tmpKitchen = null;
 				localStorage.setItem('foods', JSON.stringify(data));
 				foodData = data;
 				
@@ -116,7 +122,7 @@ function initFoodData(){
 								var temp = kitchenFoodData.root[j];
 								temp.foods = [];
 								for(var i = 0; i < tempFoodData.length; i++){
-									if(tempFoodData[i].kitchenId == temp.id){
+									if(tempFoodData[i].kitchen.id == temp.id){
 										temp.foods.push(tempFoodData[i]);
 									}
 								}

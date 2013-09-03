@@ -60,13 +60,12 @@ co.show = function(c){
 	$('#divCFCONewFood').css('height', $('#divCenterForCreateOrde').height());
 	
 	co.table = c.table;
+	co.order = typeof c.order != 'undefined' ? c.order : null;
 	co.callback = typeof c.callback == 'function' ? c.callback : null;
-//	alert(JSON.stringify(co.table))
 	$('#divNFCOTableBasicMsg').html('<div>{alias}</div><div>{name}</div>'.format({
 		alias : co.table.alias,
 		name : co.table.name
 	}));
-	
 };
 /**
  * 菜品操作返回
@@ -152,7 +151,41 @@ co.operateFoodCount = function(c){
 		data : data
 	});
 };
-
+/**
+ * 叫起
+ * params
+ *  type: 1:全单叫起 2:单个叫起
+ */
+co.foodHangup = function(c){
+	if(c == null || typeof c.type != 'number'){
+		return;
+	}
+	if(c.type == 1){
+		var isHangup = true;
+		for(var i = 0; i < co.newFood.length; i++){
+//			co.newFood[i].isHangup = typeof co.newFood[i].isHangup != 'boolean' ? true : co.newFood[i].isHangup ? co.newFood[i].isHangup : !co.newFood[i].isHangup;
+			if(i == 0){
+				isHangup = typeof co.newFood[i].isHangup != 'boolean' ? true : !co.newFood[0].isHangup;
+			}
+			co.newFood[i].isHangup = isHangup;
+		}
+		co.initNewFoodContent();
+	}else if(c.type == 2){
+		var foodContent = $('#divCFCONewFood > div[class*=div-newFood-select]');
+		if(foodContent.length != 1){
+			Util.msg.alert({
+				msg : '请选中一道菜品'
+			});
+			return;
+		}
+		var data = co.newFood[foodContent.attr('data-index')];
+		data.isHangup = typeof data.isHangup != 'boolean' ? true : !data.isHangup;;
+		co.initNewFoodContent({
+			data : data
+		});
+	}
+	
+};
 
 /*** -------------------------------------------------- ***/
 
@@ -357,6 +390,8 @@ co.ot.save = function(c){
  * 账单提交
  */
 co.submit = function(){
+//	alert(JSON.stringify(co.order.orderFoods))
+//	return;
 	if(co.newFood == null || typeof co.newFood == 'undefined' || co.newFood.length == 0){
 		Util.msg.alert({
 			title : '温馨提示',
@@ -368,10 +403,21 @@ co.submit = function(){
 		return;
 	}
 	
+	var foodData = [], isFree = true;
+	if(co.table.statusValue == 1){
+		isFree = false;
+		foodData = co.newFood.slice(0).concat(co.order.orderFoods.slice(0));
+	}else{
+		isFree = true;
+		foodData = co.newFood.slice(0);
+	}
+//	alert('foodData.length:  '+foodData.length)
+//	return;
+	
 	var foods = '';
 	var item = null;
-	for ( var i = 0; i < co.newFood.length; i++) {
-		item = co.newFood[i];
+	for ( var i = 0; i < foodData.length; i++) {
+		item = foodData[i];
 		foods += ( i > 0 ? '<<sh>>' : '');
 		if (item.isTemporary) {
 			// 临时菜
@@ -384,7 +430,7 @@ co.submit = function(){
 					+ item.unitPrice + '<<sb>>'
 					+ '<<sb>>'
 					+ (typeof item.isHangup != 'boolean' ? false : item.isHangup) + '<<sb>>'
-					+ item.kitchenAlias
+					+ item.kitchen.alias
 					+ ']';
 		}else{
 			// 普通菜
@@ -403,12 +449,13 @@ co.submit = function(){
 					+ item.alias + '<<sb>>'
 					+ item.count + '<<sb>>'
 					+ (normalTaste + ' <<st>> ' + tmpTaste) + '<<sb>>'
-					+ item.kitchenAlias + '<<sb>>'
+					+ item.kitchen.alias + '<<sb>>'
 					+ '1' + '<<sb>>'
 					+ (typeof item.isHangup != 'boolean' ? false : item.isHangup)
 					+ ']';
 		}
-	}	
+	}
+	item = null;
 	foods = '{' + foods + '}';
 	
 	Util.LM.show();
@@ -419,11 +466,11 @@ co.submit = function(){
 			'pin' : pin,
 			'tableID' : co.table.alias,
 			'customNum' : co.table.customNum,
-			'type' : co.table.statusValue == 0 ? 1 : 2,
+			'type' : isFree ? 1 : 2,
 			'foods' : foods,
 			'category' :  co.table.categoryValue
-//			,'orderID' : _c.grid.order.id
-//			,'orderDate' : typeof(_c.grid.order) == 'undefined' ? '' : _c.grid.order.orderDate
+			,'orderID' : isFree ? '' : co.order.id
+			,'orderDate' : isFree ? '' : co.order.orderDate
 		},
 		success : function(data, status, xhr) {
 			Util.LM.hide();
@@ -450,7 +497,10 @@ co.submit = function(){
 		},
 		error : function(request, status, err) {
 			Util.LM.hide();
-			alert('err: '+err)
+			Util.msg.alert({
+				title : '错误',
+				msg : err
+			});
 		}
 	});
 };
