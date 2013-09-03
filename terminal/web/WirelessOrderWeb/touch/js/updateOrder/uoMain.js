@@ -462,6 +462,7 @@ function goToCreateOrder(){
 		order : uo.order,
 		callback : function(){
 			initTables();
+			cancelForUO();
 		}
 	});
 }
