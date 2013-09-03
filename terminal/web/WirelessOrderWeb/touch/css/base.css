@@ -49,11 +49,11 @@ body{ overflow: hidden; }
 }
 @-webkit-keyframes content-hide-outDownBig{
 	0%{opacity:1; -webkit-transform:translateY(0);}
-	100%{opacity:0; -webkit-transform:translateY(100%);}
+	100%{opacity:0; -webkit-transform:translateY(100%); z-index:-1; }
 }
 @-moz-keyframes content-hide-outDownBig{
 	0%{opacity:1; -moz-transform:translateY(0);}
-	100%{opacity:0; -moz-transform:translateY(100%);}
+	100%{opacity:0; -moz-transform:translateY(100%); z-index:-1; }
 }
 
 .dialong-lm-show{
@@ -107,12 +107,12 @@ body{ overflow: hidden; }
 @-webkit-keyframes dl-bounceOut{
 	0%{opacity:1; -webkit-transform:scale(1);}
 	25%{opacity:1; -webkit-transform:scale(1.1);}
-	100%{opacity:0; -webkit-transform:scale(0);}
+	100%{opacity:0; -webkit-transform:scale(0); z-index:-1;}
 }
 @-moz-keyframes dl-bounceOut{
 	0%{opacity:1; -moz-transform:scale(1);}
 	25%{opacity:1; -moz-transform:scale(1.1);}
-	100%{opacity:0; -moz-transform:scale(0);}
+	100%{opacity:0; -moz-transform:scale(0); z-index:-1;}
 }
 
 .button-base{
