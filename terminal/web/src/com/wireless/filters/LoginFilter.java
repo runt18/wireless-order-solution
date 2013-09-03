@@ -45,7 +45,7 @@ public class LoginFilter implements Filter{
 		String skipVerify = null;
 		String isCookie = null;
 		
-		if(request.getQueryString() != null){
+		if(request.getQueryString() != null && (path.indexOf(".do") < 0)){
 			//获取url带的参数
 			String query = request.getQueryString();
 			String des = Encrypt.strDecode(query, "mi", null, null);
