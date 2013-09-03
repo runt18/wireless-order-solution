@@ -67,7 +67,13 @@ public class SellOutActivity extends FragmentActivity {
 
 		@Override
 		public void handleMessage(Message msg) {
+			
 			SellOutActivity activity = mActivity.get();
+			
+			if(activity.mOnSaleFoods == null || activity.mSellOutFoods == null){
+				return;
+			}
+			
 			SellOutFoodAdapter adapter;
 			activity.findViewById(R.id.button_OnSale_List).setPressed(false);
 			activity.findViewById(R.id.button_Sellout_List).setPressed(false);

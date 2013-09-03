@@ -132,6 +132,11 @@ public class KitchenFragment extends Fragment {
 					break;
 				}
 			}
+			
+			//如果该部门只有一个厨房, 则显示该厨房的菜品
+			if(fragment.mXpListView.getCount() == 1){
+				fragment.mXpListView.expandGroup(0);
+			}
 		}
 	}
 	
@@ -144,16 +149,17 @@ public class KitchenFragment extends Fragment {
  
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		View view =  inflater.inflate(R.layout.kitchen_fragment, container, false);
+		View view = inflater.inflate(R.layout.kitchen_fragment, container, false);
 		
 		mXpListView = (ExpandableListView) view.findViewById(R.id.expandableListView_kitchenFragment);
+		
 		//关闭组按钮
 		final ImageButton collapseBtn = (ImageButton) view.findViewById(R.id.imageButton_collaps_kitchenFgm);
 		collapseBtn.setOnClickListener(new OnClickListener(){
 			@Override
 			public void onClick(View v) {
 				//关闭当前组
-				int groupPosition  = (Integer) collapseBtn.getTag();
+				int groupPosition = (Integer)collapseBtn.getTag();
 				mXpListView.collapseGroup(groupPosition);
 				mXpListView.smoothScrollToPosition(0);
 			}
@@ -162,7 +168,7 @@ public class KitchenFragment extends Fragment {
 		//设置group展开侦听器，每次只打开一项
 		mXpListView.setOnGroupExpandListener(new OnGroupExpandListener() {
 			@Override
-			public void onGroupExpand( int groupPosition) {
+			public void onGroupExpand(int groupPosition) {
 				//关闭其它组
 				int groupCount = mXpListView.getExpandableListAdapter().getGroupCount();
 				for (int i = 0; i < groupCount; i++) {

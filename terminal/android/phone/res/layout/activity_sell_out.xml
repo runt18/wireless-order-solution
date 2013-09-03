@@ -78,6 +78,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@color/transparent"
+                android:scaleType="fitXY"
                 android:src="@drawable/sellout_on_sale_selector" />
 
             <TextView
@@ -90,7 +91,7 @@
                 android:paddingLeft="8dp"
                 android:paddingRight="8dp"
                 android:paddingTop="3dp"
-                android:text="11"
+                android:text="0"
                 android:textColor="@color/white" />
         </RelativeLayout>
 
@@ -104,6 +105,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@color/transparent"
+                android:scaleType="fitXY"
                 android:src="@drawable/sellout_off_sale_selector" />
 
             <TextView
@@ -116,7 +118,7 @@
                 android:paddingLeft="8dp"
                 android:paddingRight="8dp"
                 android:paddingTop="3dp"
-                android:text="11"
+                android:text="0"
                 android:textColor="@color/white" />
         </RelativeLayout>
     </LinearLayout>

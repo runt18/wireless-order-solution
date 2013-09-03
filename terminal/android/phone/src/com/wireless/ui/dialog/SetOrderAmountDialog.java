@@ -76,6 +76,7 @@ public class SetOrderAmountDialog extends DialogFragment{
 						Toast.makeText(getActivity(), "点菜数量不能超过255", Toast.LENGTH_SHORT).show();
 					}else{
 						amountEditTxt.setText(NumericUtil.float2String2(curNum));
+						amountEditTxt.selectAll();
 					}
 				}catch(NumberFormatException e){
 					
@@ -92,6 +93,7 @@ public class SetOrderAmountDialog extends DialogFragment{
 					float curNum = Float.parseFloat(amountEditTxt.getText().toString());
 					if(--curNum >= 1.0f){
 						amountEditTxt.setText(NumericUtil.float2String2(curNum));
+						amountEditTxt.selectAll();
 					}
 				}catch(NumberFormatException e){
 					 
@@ -148,6 +150,7 @@ public class SetOrderAmountDialog extends DialogFragment{
             	amountEditTxt.post(new Runnable() {
                     @Override
                     public void run() {
+                    	amountEditTxt.selectAll();
                         InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
                         imm.showSoftInput(amountEditTxt, InputMethodManager.SHOW_IMPLICIT);
                     }

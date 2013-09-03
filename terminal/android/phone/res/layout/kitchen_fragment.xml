@@ -13,11 +13,12 @@
 
         <LinearLayout
             android:id="@+id/linearLayout_kitchenFragment"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:orientation="horizontal" >
         </LinearLayout>
     </HorizontalScrollView>
+
     <ExpandableListView
         android:id="@+id/expandableListView_kitchenFragment"
         android:layout_width="match_parent"
@@ -26,9 +27,8 @@
         android:layout_below="@+id/horizontalScrollView1"
         android:fadingEdgeLength="2dp"
         android:groupIndicator="@drawable/kitchen_fragment_expander_group_selector" >
-
     </ExpandableListView>
-
+
     <ImageButton
         android:id="@+id/imageButton_collaps_kitchenFgm"
         android:layout_width="wrap_content"

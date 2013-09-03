@@ -178,6 +178,7 @@ public class TempFoodFragment extends Fragment {
 		isSent = true;
 		return mValidFoods;
 	}
+	
 	private class TempFoodAdapter extends BaseAdapter{
 		private ArrayList<OrderFood> mTempFoods;
 
@@ -284,50 +285,56 @@ public class TempFoodFragment extends Fragment {
 			holder.kitchenTextView.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View kitchenTextView) {
-					//设置弹出框
-					final PopupWindow popWnd = new PopupWindow(
-							inflater.inflate(R.layout.temp_food_fragment_popup_window, null),
-							180, LayoutParams.WRAP_CONTENT, true){
-
-						@Override
-						public void dismiss() {
-							if(food.getKitchen() != null && !mKitchens.isEmpty())
-								if(food.getKitchen().getName() == null)
-								{
-									food.asFood().setKitchen(mKitchens.get(0));
-									mTempFoods.set(position, food);
-									holder.refresh(food);
-								}
-							super.dismiss();
-						}
-					};
-					popWnd.setOutsideTouchable(true);
-					popWnd.setBackgroundDrawable(getResources().getDrawable(R.drawable.popup_small));
-					popWnd.update();
-
-					//弹出框的内容 
-					ListView popListView = (ListView) popWnd.getContentView().findViewById(R.id.listView_tempFood_pop);
-					popListView.setTag(kitchenTextView);
-					popListView.setAdapter(new PopupAdapter(mKitchens));
-					popListView.setCacheColorHint(Color.TRANSPARENT);
-					popListView.setOnItemClickListener(new OnItemClickListener(){
-						@Override
-						public void onItemClick(AdapterView<?> parent, View view, int p, long id) {
-							TextView kitchenTextView = (TextView) parent.getTag();
-							Kitchen kitchen = (Kitchen) view.getTag();
-							
-							ViewHolder holder  = (ViewHolder)kitchenTextView.getTag();
-							food.asFood().setKitchen(kitchen);
-							mTempFoods.set(position, food);
-							holder.refresh(food);
+					if(mKitchens.size() > 1){
+						//设置弹出框
+						final PopupWindow popWnd = new PopupWindow(
+								inflater.inflate(R.layout.temp_food_fragment_popup_window, null),
+								180, LayoutParams.WRAP_CONTENT, true){
+	
+							@Override
+							public void dismiss() {
+								if(food.getKitchen() != null && !mKitchens.isEmpty())
+									if(food.getKitchen().getName() == null)
+									{
+										food.asFood().setKitchen(mKitchens.get(0));
+										mTempFoods.set(position, food);
+										holder.refresh(food);
+									}
+								super.dismiss();
+							}
+						};
+						popWnd.setOutsideTouchable(true);
+						popWnd.setBackgroundDrawable(getResources().getDrawable(R.drawable.popup_small));
+						popWnd.update();
+	
+						//弹出框的内容 
+						ListView popListView = (ListView) popWnd.getContentView().findViewById(R.id.listView_tempFood_pop);
+						popListView.setTag(kitchenTextView);
+						popListView.setAdapter(new PopupAdapter(mKitchens));
+						popListView.setCacheColorHint(Color.TRANSPARENT);
+						popListView.setOnItemClickListener(new OnItemClickListener(){
+							@Override
+							public void onItemClick(AdapterView<?> parent, View view, int p, long id) {
+								TextView kitchenTextView = (TextView) parent.getTag();
+								Kitchen kitchen = (Kitchen) view.getTag();
+								
+								ViewHolder holder  = (ViewHolder)kitchenTextView.getTag();
+								food.asFood().setKitchen(kitchen);
+								mTempFoods.set(position, food);
+								holder.refresh(food);
+								popWnd.dismiss();
+							}
+						});
+						//点击显示弹窗，并传递信息
+						if(popWnd.isShowing()){
 							popWnd.dismiss();
+						}else{
+							popWnd.showAsDropDown(kitchenTextView);
 						}
-					});
-					//点击显示弹窗，并传递信息
-					if(popWnd.isShowing())
-						popWnd.dismiss();
-					else{
-						popWnd.showAsDropDown(kitchenTextView);
+						
+					}else if(mKitchens.size() == 1){
+						food.asFood().setKitchen(mKitchens.get(0));
+						holder.refresh(food);
 					}
 				}
 			});
