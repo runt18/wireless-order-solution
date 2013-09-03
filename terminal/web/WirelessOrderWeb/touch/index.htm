@@ -37,64 +37,6 @@ var uo = {
 	<div id="divMainForTableSelect" class = "box-horizontal">
 		<div id="divTableShowForSelect">
 			<div id = "divShowTableForSelect"></div>
-			<div id = "divShowMessageForTableSelect">
-				<div id = "divTopForShowMessageTS">
-					<span style = "color: white;"><strong>请输入桌号及人数</strong></span>
-				</div>
-				<div id = "divCenterForShowMessageTS" class = "box-horizontal">
-					<div id = "divLeftForShowMessageTS" >
-						<span style = "font-size: 22px; font-weight: bold;">桌号：</span><input type = "text" id = "txtTableNumForSM" class = "desk-number" style = "background: yellow;"/>
-						<span style = "font-size: 22px; font-weight: bold;">人数：</span><input type = "text" id = "txtPeopleNumForSM" class = "desk-number" style = "background: yellow;"/>
-					</div>
-					<div id = "divRightForShowMessageTS">
-						<input type = "button" value = "选中" id = "selectTableNum" class = "keyboardbutton" />
-						<input type = "button" value = "7" class = "keyboardbutton" onclick = "inputNum(this)"/>
-						<input type = "button" value = "8" class = "keyboardbutton" onclick = "inputNum(this)"/>
-						<input type = "button" value = "9" class = "keyboardbutton" onclick = "inputNum(this)"/>
-						<input type = "button" value = "选中" id = "selectPeopleNum" class = "keyboardbutton" />
-						<input type = "button" value = "4" class = "keyboardbutton" onclick = "inputNum(this)"/>
-						<input type = "button" value = "5" class = "keyboardbutton" onclick = "inputNum(this)"/>
-						<input type = "button" value = "6" class = "keyboardbutton" onclick = "inputNum(this)"/>
-						<input type = "button" value = "0" class = "keyboardbutton" onclick = "inputNum(this)"/>
-						<input type = "button" value = "1" class = "keyboardbutton" onclick = "inputNum(this)"/>
-						<input type = "button" value = "2" class = "keyboardbutton" onclick = "inputNum(this)"/>
-						<input type = "button" value = "3" class = "keyboardbutton" onclick = "inputNum(this)"/>
-					</div>
-				</div>
-				<div id = "divBottomForShowMessageTS">
-				<!--  
-					<input type = "button" value = "开台" class = "keyboardbutton" style = "width: 100px; margin-left: 140px;" onclick = "setEatingTable()"/>
-				 -->
-					<input type = "button" value = "点菜" id = "btnRenderToCreateOrder" class = "keyboardbutton" style = "width: 100px; margin-left: 100px;" />
-					<input type = "button" value = "取消" id = "btnCancelForShowMessageTS" class = "keyboardbutton" style = "width: 100px; margin-left: 65px;"/>
-				</div>
-			</div>	
-			<div id = "divHideForTableSelect"></div>	
-			<div id = "divSelectTableNumForTs">
-				<div id = "divTopForSelectTableNumTS"></div>
-				<div id = "divMainForSelectTableNumTS">
-					<div id = "divLeftForSelectTableNumTS">
-						<span style = "font-size: 30px; font-weight: bold; margin-left: 5px;">桌号：</span><input type = "text" id = "txtTableNumForTS"  class = "table-number" style = "background: #FFD700;"/>
-						<input type = "button" value = "7" class = "keyboardbutton" style = "margin: 5px 0 0 13px;" onclick = "inputNum(this)"/>
-						<input type = "button" value = "8" class = "keyboardbutton" style = "margin: 5px 0 0 5px;" onclick = "inputNum(this)"/>
-						<input type = "button" value = "9" class = "keyboardbutton" style = "margin: 5px 0 0 5px;" onclick = "inputNum(this)"/>
-						<input type = "button" value = "4" class = "keyboardbutton" style = "margin: 5px 0 0 13px;" onclick = "inputNum(this)"/>
-						<input type = "button" value = "5" class = "keyboardbutton" style = "margin: 5px 0 0 5px;" onclick = "inputNum(this)"/>
-						<input type = "button" value = "6" class = "keyboardbutton" style = "margin: 5px 0 0 5px;" onclick = "inputNum(this)"/>
-						<input type = "button" value = "1" class = "keyboardbutton" style = "margin: 5px 0 0 13px;" onclick = "inputNum(this)"/>
-						<input type = "button" value = "2" class = "keyboardbutton" style = "margin: 5px 0 0 5px;" onclick = "inputNum(this)"/>
-						<input type = "button" value = "3" class = "keyboardbutton" style = "margin: 5px 0 0 5px;" onclick = "inputNum(this)"/>
-						<input type = "button" value = "0" class = "keyboardbutton" style = "margin: 5px 0 0 13px; width: 156px;" onclick = "inputNum(this)"/>
-						<input type = "button" value = "00" class = "keyboardbutton" style = "margin: 5px 0 0 5px;" onclick = "inputNum(this)"/>
-					</div>
-					<div id = "divRightForSelectTableNumTS">
-						<input type = "button" value = "<--" id = "btnBackOneForSTNum" class = "keyboardbutton" style = "margin: 0 0 0 5px;" />
-						<input type = "button" value = "<<" id = "btnBackAllForSTNum" class = "keyboardbutton" style = "margin: 5px 0 0 5px;" />
-						<input type = "button" value = "关闭" id = "btnCloseForSelectTableNumTS" class = "keyboardbutton" style = "margin: 5px 0 0 5px;"/>
-						<input type = "button" value = "确定" id = "btnSubmitForSelectTableNumTS" class = "keyboardbutton" style = "margin: 5px 0 0 5px; height: 137px;"/>
-					</div>
-				</div>
-			</div>		
 		</div>
 		<div id="divToolRightForSelect" class="box-vertical" style = "line-height: 60px;">
 			<div  id = "divAllStatus" class="button-base" style="margin-bottom: 2px;" onclick="showStatus()">全部状态	</div>
@@ -108,17 +50,13 @@ var uo = {
 	</div>
 	<div id="divToolBottomForSelect" class="box-horizontal">
 	    <div class="button-base" style="margin-right: 2px;">退出</div>
-	    <div class="button-base" style="margin-right: 2px;" onclick="firstPage()">第一页</div>
+	    <div class="div-full">&nbsp;</div>
+	    <div class="button-base" style="margin-right: 2px;" onclick = "createOrderForTS()">点菜</div>
+  		<div class="button-base" style="margin-right: 2px;" onclick = "transTableForTS()">转台</div>
+	    <div class="button-base" style="margin-right: 2px;" onclick="firstPage()">首页</div>
 		<div class="button-base" style="margin-right: 2px;" onclick="frontPage()">上一页</div>
 		<div class="button-base" style="margin-right: 2px;" onclick="nextPage()">下一页</div>
-		<div class="button-base" style="margin-right: 2px;" onclick="lastPage()">末页</div>
-		<!-- 
-		<div class="button-base" style="margin-right: 2px;">开台</div>
-		 -->
-  		<div class="button-base" style="margin-right: 2px;" onclick = "createOrderForTS()">点菜</div>
-  		<div class="button-base" style="margin-right: 2px;" onclick = "transTableForTS()">转台</div>
-  		<div class="button-base" style="margin-right: 2px;" onclick = "checkOnTS()">结账</div>
-  		<div class="div-full">&nbsp;</div>
+		<div class="button-base" style="margin-right: 2px;" onclick="lastPage()">尾页</div>		
 	</div>
 	<div id="divFootForTableSelect">
 		<span style="margin-right: 30px; margin-left: 10px;">收银员：</span>	
@@ -129,6 +67,8 @@ var uo = {
 	</div>
 </div>
 
+
+
 <div id="divUpdateOrder" class="box-vertical content">
 	<div id = "divNorthForUpdateOrder">
 	</div>
@@ -136,67 +76,19 @@ var uo = {
 		<table id = "tabForUpdateOrder"></table>
 	</div>
 	<div id = "divHideForUO"></div>	
-	<div id = "divKeyboardNumForUO">
-		<div id = "divTopForKeyboardNumForUO"></div>
-		<div id = "divMainForKeyboardNumForUO">
-			<div id = "divLeftForKeyboardNumForUO">
-				<input type = "button" value = "+" class = "keyboardbutton addOneForKeyboardNumUO" style = "margin: 0 0 0 13px;" />
-				<input type = "text" id = "txtNumForUO"  class = "table-number" style = "margin-left: 5px; background: #FFD700;"/>
-				<input type = "button" value = "7" class = "keyboardbutton" style = "margin: 5px 0 0 13px;" onclick = "inputNumUO(this)"/>
-				<input type = "button" value = "8" class = "keyboardbutton" style = "margin: 5px 0 0 5px;" onclick = "inputNumUO(this)"/>
-				<input type = "button" value = "9" class = "keyboardbutton" style = "margin: 5px 0 0 5px;" onclick = "inputNumUO(this)"/>
-				<input type = "button" value = "4" class = "keyboardbutton" style = "margin: 5px 0 0 13px;" onclick = "inputNumUO(this)"/>
-				<input type = "button" value = "5" class = "keyboardbutton" style = "margin: 5px 0 0 5px;" onclick = "inputNumUO(this)"/>
-				<input type = "button" value = "6" class = "keyboardbutton" style = "margin: 5px 0 0 5px;" onclick = "inputNumUO(this)"/>
-				<input type = "button" value = "1" class = "keyboardbutton" style = "margin: 5px 0 0 13px;" onclick = "inputNumUO(this)"/>
-				<input type = "button" value = "2" class = "keyboardbutton" style = "margin: 5px 0 0 5px;" onclick = "inputNumUO(this)"/>
-				<input type = "button" value = "3" class = "keyboardbutton" style = "margin: 5px 0 0 5px;" onclick = "inputNumUO(this)"/>
-				<input type = "button" value = "确定" id = "btnSubmitForKeyboardNumUO" class = "keyboardbutton" style = "margin: 5px 0 0 13px; width: 156px;" />
-				<input type = "button" value = "取消" id = "btnCloseForKeyboardNumUO" class = "keyboardbutton" style = "margin: 5px 0 0 5px;" />
-			</div>
-			<div id = "divRightForKeyboardNumForUO">
-				<input type = "button" value = "-" class = "keyboardbutton deleteOneForKeyboardNumUO" style = "margin: 0 0 0 5px;" />
-				<input type = "button" value = "<<" class = "keyboardbutton btnBackAllForKeyboardNumUO" style = "margin: 5px 0 0 5px;" />
-				<input type = "button" value = "." class = "keyboardbutton" style = "margin: 5px 0 0 5px;" onclick = "inputNumUO(this)"/>
-				<input type = "button" value = "0" class = "keyboardbutton" style = "margin: 5px 0 0 5px; height: 137px;" onclick = "inputNumUO(this)"/>
-			</div>
-			<div id = "divReasonForKeyboardNumForUO"></div>
-		</div>
-	</div>	
-	<div id = "divKeyboardPeopleForUO">
-		<div id = "divTopForKeyboardPeopleForUO"></div>
-		<div id = "divMainForKeyboardPeopleForUO">
-			<div id = "divLeftForKeyboardPeopleForUO">
-				<input type = "button" value = "+" class = "keyboardbutton addOneForKeyboardNumUO" style = "margin: 0 0 0 13px;" />
-				<input type = "text" id = "txtPeopleNumForUO"  class = "table-number" style = "margin-left: 5px; background: #FFD700;"/>
-				<input type = "button" value = "7" class = "keyboardbutton" style = "margin: 5px 0 0 13px;" onclick = "inputNumUO(this)"/>
-				<input type = "button" value = "8" class = "keyboardbutton" style = "margin: 5px 0 0 5px;" onclick = "inputNumUO(this)"/>
-				<input type = "button" value = "9" class = "keyboardbutton" style = "margin: 5px 0 0 5px;" onclick = "inputNumUO(this)"/>
-				<input type = "button" value = "4" class = "keyboardbutton" style = "margin: 5px 0 0 13px;" onclick = "inputNumUO(this)"/>
-				<input type = "button" value = "5" class = "keyboardbutton" style = "margin: 5px 0 0 5px;" onclick = "inputNumUO(this)"/>
-				<input type = "button" value = "6" class = "keyboardbutton" style = "margin: 5px 0 0 5px;" onclick = "inputNumUO(this)"/>
-				<input type = "button" value = "1" class = "keyboardbutton" style = "margin: 5px 0 0 13px;" onclick = "inputNumUO(this)"/>
-				<input type = "button" value = "2" class = "keyboardbutton" style = "margin: 5px 0 0 5px;" onclick = "inputNumUO(this)"/>
-				<input type = "button" value = "3" class = "keyboardbutton" style = "margin: 5px 0 0 5px;" onclick = "inputNumUO(this)"/>
-				<input type = "button" value = "确定" id = "btnSubmitForPeopleKeyboardUO" class = "keyboardbutton " style = "margin: 5px 0 0 13px; width: 156px;" />
-				<input type = "button" value = "取消" id = "btnCloseForPeopleKeyboardUO" class = "keyboardbutton" style = "margin: 5px 0 0 5px;" />
-			</div>
-			<div id = "divRightForKeyboardPeopleForUO">
-				<input type = "button" value = "-" class = "keyboardbutton deleteOneForKeyboardNumUO" style = "margin: 0 0 0 5px;" />
-				<input type = "button" value = "<<" class = "keyboardbutton btnBackAllForKeyboardNumUO" style = "margin: 5px 0 0 5px;" />
-				<input type = "button" value = "00" class = "keyboardbutton" style = "margin: 5px 0 0 5px;" onclick = "inputNumUO(this)"/>
-				<input type = "button" value = "0" class = "keyboardbutton" style = "margin: 5px 0 0 5px; height: 137px;" onclick = "inputNumUO(this)"/>
-			</div>
-		</div>
-	</div>			
+	
+			
 	<div id = "divDescForUpdateOrder" class = "box-horizontal" style = "background: #FFD700;">
 	</div>
 	<div id = "divSouthForUpdateOrder" class="box-horizontal">
-  		<div class="button-base" style="margin-right: 2px;  margin-left: 300px;" onclick = "scrollUp('divCenterForUpdateOrder')">上翻</div>
-  		<div class="button-base" style="margin-right: 2px;" onclick = "scrollDown('divCenterForUpdateOrder')">下翻</div>
-  		<div class="button-base" style="margin-left: 2px;" onclick = "showdivKeyboardPeopleForUO()">人数</div>
+		<div class="button-base" style="margin-left: 2px;" onClick= "cancelForUO()">返回</div>
+  		<div class="div-full">&nbsp;</div>
   		<div class="button-base" style="margin-left: 2px;" onclick = "sureForUO()">确定</div>
-  		<div class="button-base" style="margin-left: 2px;" onClick= "cancelForUO()">取消</div>
+  		<div class="button-base" style="margin-left: 2px;" onclick = "showdivKeyboardPeopleForUO()">人数</div>
+  		<div class="button-base" style="margin-left: 2px;" onclick = "goToCreateOrder()">点菜</div>
+  		<div class="button-base" style="margin-left: 2px;" onclick = "checkOnTS()">暂结</div>
+  		<div class="button-base" style="margin-left: 2px;" onclick = "scrollUp('divCenterForUpdateOrder')">上翻</div>
+  		<div class="button-base" style="margin-left: 2px;" onclick = "scrollDown('divCenterForUpdateOrder')">下翻</div>
 	</div>
 </div>
 
@@ -246,6 +138,117 @@ var uo = {
   	</div>
 </div>
 
+<div id = "divSelectTableNumForTs">
+				<div id = "divTopForSelectTableNumTS"></div>
+				<div id = "divMainForSelectTableNumTS">
+					<div id = "divLeftForSelectTableNumTS">
+						<span style = "font-size: 25px; font-weight: bold; margin-left: 5px;">桌号：</span>
+						<input type = "text" id = "txtTableNumForTS"  class = "table-number" style = "background: #FFD700;"/>
+						<div class="button-base" onclick = "inputNum(this)">7</div>
+						<div class="button-base" onclick = "inputNum(this)">8</div>
+						<div class="button-base" onclick = "inputNum(this)">9</div>
+						<div class="button-base" onclick = "inputNum(this)">4</div>
+						<div class="button-base" onclick = "inputNum(this)">5</div>
+						<div class="button-base" onclick = "inputNum(this)">6</div>
+						<div class="button-base" onclick = "inputNum(this)">1</div>
+						<div class="button-base" onclick = "inputNum(this)">2</div>
+						<div class="button-base" onclick = "inputNum(this)">3</div>
+						<div class="button-base" onclick = "inputNum(this)" style = "width: 164px;">0</div>
+						<div class="button-base" onclick = "inputNum(this)">00</div>
+					</div>
+					<div id = "divRightForSelectTableNumTS">
+						<div class="button-base" id = "btnBackOneForSTNum" style = "margin-top: 1px;">&lt;--</div>
+						<div class="button-base" id = "btnBackAllForSTNum">&lt;&lt;</div>
+						<div class="button-base" id = "btnCloseForSelectTableNumTS">关闭</div>
+						<div class="button-base" id = "btnSubmitForSelectTableNumTS" style = "height: 130px;">确定</div>
+					</div>
+				</div>
+			</div>		
+
+<div id = "divShowMessageForTableSelect">
+				<div id = "divTopForShowMessageTS">
+					<span style = "color: white;"><strong>请输入桌号及人数</strong></span>
+				</div>
+				<div id = "divCenterForShowMessageTS" class = "box-horizontal">
+					<div id = "divLeftForShowMessageTS" >
+						<span style = "font-size: 22px; font-weight: bold;">桌号：</span><input type = "text" id = "txtTableNumForSM" class = "desk-number" style = "background: yellow;"/>
+						<span style = "font-size: 22px; font-weight: bold;">人数：</span><input type = "text" id = "txtPeopleNumForSM" class = "desk-number" style = "background: yellow;"/>
+					</div>
+					<div id = "divRightForShowMessageTS">
+						<div class="button-base" id = "selectTableNum">选中</div>
+						<div class="button-base" onclick = "inputNum(this)">7</div>
+						<div class="button-base" onclick = "inputNum(this)">8</div>
+						<div class="button-base" onclick = "inputNum(this)">9</div>
+						<div class="button-base" id = "selectPeopleNum">选中</div>
+						<div class="button-base" onclick = "inputNum(this)">4</div>
+						<div class="button-base" onclick = "inputNum(this)">5</div>
+						<div class="button-base" onclick = "inputNum(this)">6</div>
+						<div class="button-base" onclick = "inputNum(this)">0</div>
+						<div class="button-base" onclick = "inputNum(this)">1</div>
+						<div class="button-base" onclick = "inputNum(this)">2</div>
+						<div class="button-base" onclick = "inputNum(this)">3</div>
+					</div>
+				</div>
+				<div id = "divBottomForShowMessageTS">
+					<div class="button-base" id = "btnRenderToCreateOrder" style = "width: 100px; margin-left: 100px;">点菜</div>
+					<div class="button-base" id = "btnCancelForShowMessageTS" style = "width: 100px; margin-left: 65px;">取消</div>
+				</div>
+			</div>	
+
+	<div id = "divKeyboardNumForUO">
+		<div id = "divTopForKeyboardNumForUO"></div>
+		<div id = "divMainForKeyboardNumForUO">
+			<div id = "divLeftForKeyboardNumForUO">
+				<div class="button-base addOneForKeyboardNumUO" style = "margin: 0 0 0 2px;">+</div>				
+				<input type = "text" id = "txtNumForUO" class = "table-number" style = "margin-left: 9px; background: #FFD700;"/>
+				<div class="button-base" onclick = "inputNumUO(this)">7</div>
+				<div class="button-base" onclick = "inputNumUO(this)">8</div>
+				<div class="button-base" onclick = "inputNumUO(this)">9</div>
+				<div class="button-base" onclick = "inputNumUO(this)">4</div>
+				<div class="button-base" onclick = "inputNumUO(this)">5</div>
+				<div class="button-base" onclick = "inputNumUO(this)">6</div>
+				<div class="button-base" onclick = "inputNumUO(this)">1</div>
+				<div class="button-base" onclick = "inputNumUO(this)">2</div>
+				<div class="button-base" onclick = "inputNumUO(this)">3</div>
+				<div class="button-base" id = "btnSubmitForKeyboardNumUO" style = "width: 164px;">确定</div>
+				<div class="button-base" id = "btnCloseForKeyboardNumUO">取消</div>
+			</div>
+			<div id = "divRightForKeyboardNumForUO">
+				<div class="button-base deleteOneForKeyboardNumUO" style = "margin: 0 0 0 2px;">-</div>
+				<div class="button-base btnBackAllForKeyboardNumUO" style = "margin: 12px 0 5px 2px;">&lt;&lt;</div>
+				<div class="button-base" onclick = "inputNumUO(this)">.</div>
+				<div class="button-base" onclick = "inputNumUO(this)" style = "height: 130px; line-height: 130px;">0</div>
+			</div>
+			<div id = "divReasonForKeyboardNumForUO"></div>
+		</div>
+	</div>
+
+	<div id = "divKeyboardPeopleForUO">
+		<div id = "divTopForKeyboardPeopleForUO"></div>
+		<div id = "divMainForKeyboardPeopleForUO">
+			<div id = "divLeftForKeyboardPeopleForUO">
+				<div class="button-base addOneForKeyboardNumUO" style = "margin: 0 0 0 2px;">+</div>
+				<input type = "text" id = "txtPeopleNumForUO"  class = "table-number" style = "margin-left: 8px; background: #FFD700;"/>
+				<div class="button-base" onclick = "inputNumUO(this)">7</div>
+				<div class="button-base" onclick = "inputNumUO(this)">8</div>
+				<div class="button-base" onclick = "inputNumUO(this)">9</div>
+				<div class="button-base" onclick = "inputNumUO(this)">4</div>
+				<div class="button-base" onclick = "inputNumUO(this)">5</div>
+				<div class="button-base" onclick = "inputNumUO(this)">6</div>
+				<div class="button-base" onclick = "inputNumUO(this)">1</div>
+				<div class="button-base" onclick = "inputNumUO(this)">2</div>
+				<div class="button-base" onclick = "inputNumUO(this)">3</div>
+				<div class="button-base" id = "btnSubmitForPeopleKeyboardUO" class = "keyboardbutton " style = "width: 164px;">确定</div>
+				<div class="button-base" id = "btnCloseForPeopleKeyboardUO" class = "keyboardbutton">取消</div>
+			</div>
+			<div id = "divRightForKeyboardPeopleForUO">
+				<div class="button-base deleteOneForKeyboardNumUO" style = "margin: 0 0 0 2px;">-</div>
+				<div class="button-base btnBackAllForKeyboardNumUO" style = "margin: 12px 0 5px 2px;">&lt;&lt;</div>
+				<div class="button-base" onclick = "inputNumUO(this)">00</div>
+				<div class="button-base" onclick = "inputNumUO(this)" style = "height: 130px;">0</div>
+			</div>
+		</div>
+	</div>
 
 <div id="divOperateBoxForFoodTaste" >
 	<div class="box-horizontal" style="height: 473px;">
