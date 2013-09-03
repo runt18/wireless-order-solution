@@ -91,7 +91,7 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`role` (
   `restaurant_id` INT NOT NULL DEFAULT 0 ,
   `name` VARCHAR(45) NOT NULL DEFAULT '' ,
   `type` TINYINT NOT NULL DEFAULT 1 COMMENT 'the type to role as below.\n1 - 普通\n2 - 系统保留' ,
-  `cate` TINYINT NOT NULL DEFAULT 6 COMMENT 'the category to role as below.\n1 - 管理员\n2 - 老板\n3 - 财务\n4 - 部长\n5 - 服务员\n6 - 其他\n' ,
+  `cate` TINYINT NOT NULL DEFAULT 6 COMMENT 'the category to role as below.\n1 - 管理员\n2 - 老板\n3 - 财务\n4 - 店长\n5 - 收银员\n6 - 服务员\n7 - 其他\n' ,
   PRIMARY KEY (`role_id`) ,
   INDEX `ix_restaurant_id` (`restaurant_id` ASC) )
 ENGINE = InnoDB
@@ -120,18 +120,25 @@ INSERT INTO wireless_order_db.role
 SELECT id, '财务', 1, 3 FROM wireless_order_db.restaurant WHERE id > 10;
 
 -- -----------------------------------------------------
--- Insert a '部长' role to each restaurant
+-- Insert a '店长' role to each restaurant
 -- -----------------------------------------------------
 INSERT INTO wireless_order_db.role
 (`restaurant_id`, `name`, `type`, `cate`)
-SELECT id, '部长', 1, 4 FROM wireless_order_db.restaurant WHERE id > 10;
+SELECT id, '店长', 1, 4 FROM wireless_order_db.restaurant WHERE id > 10;
+
+-- -----------------------------------------------------
+-- Insert a '收银员' role to each restaurant
+-- -----------------------------------------------------
+INSERT INTO wireless_order_db.role
+(`restaurant_id`, `name`, `type`, `cate`)
+SELECT id, '收银员', 1, 5 FROM wireless_order_db.restaurant WHERE id > 10;
 
 -- -----------------------------------------------------
 -- Insert a '服务员' role to each restaurant
 -- -----------------------------------------------------
 INSERT INTO wireless_order_db.role
 (`restaurant_id`, `name`, `type`, `cate`)
-SELECT id, '服务员', 1, 5 FROM wireless_order_db.restaurant WHERE id > 10;
+SELECT id, '服务员', 1, 6 FROM wireless_order_db.restaurant WHERE id > 10;
 
 -- -----------------------------------------------------
 -- Table `wireless_order_db`.`staff`
@@ -164,13 +171,13 @@ JOIN wireless_order_db.role ROLE ON REST.id = ROLE.restaurant_id AND ROLE.cate =
 WHERE REST.id > 10;
 
 -- -----------------------------------------------------
--- Move the staff information and have them assigned a '服务员' role
+-- Move the staff information and have them assigned a '店长' role
 -- -----------------------------------------------------
 INSERT INTO wireless_order_db.staff2
 (`restaurant_id`, `role_id`, `name`, `pwd`, type)
 SELECT STAFF.restaurant_id, ROLE.role_id, STAFF.name, STAFF.pwd, 1
 FROM wireless_order_db.staff STAFF
-LEFT JOIN wireless_order_db.role ROLE ON STAFF.restaurant_id = ROLE.restaurant_id AND ROLE.cate = 5;
+LEFT JOIN wireless_order_db.role ROLE ON STAFF.restaurant_id = ROLE.restaurant_id AND ROLE.cate = 4;
 
 -- -----------------------------------------------------
 -- Add a field 'expire_date' to table 'restaurant'
@@ -234,7 +241,7 @@ DROP TABLE IF EXISTS `wireless_order_db`.`privilege` ;
 
 CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`privilege` (
   `pri_id` INT NOT NULL AUTO_INCREMENT ,
-  `pri_code` INT NOT NULL COMMENT 'the privilege code as below:\n1000 - 退菜\n1001 - 打折\n1002 - 赠送\n1003 - 反结帐\n2000 - 后台\n3000 - 库存\n4000 - 历史\n5000 - 会员\n6000 - 系统' ,
+  `pri_code` INT NOT NULL COMMENT 'the privilege code as below:\n1000 - 点菜\n1001 - 退菜\n1002 - 打折\n1003 - 赠送\n1004 - 反结帐\n1005 - 结帐\n1006 - 账单\n2000 - 后台\n3000 - 库存\n4000 - 历史\n5000 - 会员\n6000 - 系统' ,
   `cate` TINYINT NOT NULL COMMENT 'the category to privilege as below.\n1 - 前台\n2 - 后台\n3 - 库存\n4 - 历史\n5 - 会员\n6 - 系统' ,
   PRIMARY KEY (`pri_id`) ,
   INDEX `ix_privilege_code` (`pri_code` ASC) )
@@ -295,6 +302,17 @@ INSERT INTO wireless_order_db.privilege (`pri_code`, `cate`) VALUES (1003, 1);
 INSERT INTO wireless_order_db.privilege (`pri_code`, `cate`) VALUES (1004, 1);
 
 -- -----------------------------------------------------
+-- Insert a '结帐' privilege
+-- -----------------------------------------------------
+INSERT INTO wireless_order_db.privilege (`pri_code`, `cate`) VALUES (1005, 1);
+
+-- -----------------------------------------------------
+-- Insert a '账单' privilege
+-- -----------------------------------------------------
+INSERT INTO wireless_order_db.privilege (`pri_code`, `cate`) VALUES (1006, 1);
+
+
+-- -----------------------------------------------------
 -- Insert a '后台' privilege
 -- -----------------------------------------------------
 INSERT INTO wireless_order_db.privilege (`pri_code`, `cate`) VALUES (2000, 2);
@@ -341,15 +359,23 @@ FROM wireless_order_db.role R JOIN wireless_order_db.privilege P ON R.cate = 2;
 INSERT INTO wireless_order_db.role_privilege 
 (`role_id`, `pri_id`, `restaurant_id`)
 SELECT role_id, pri_id, restaurant_id
-FROM wireless_order_db.role R JOIN wireless_order_db.privilege P ON R.cate = 3 AND pri_code IN(1000, 1001, 1002, 1003, 1004, 2000, 3000, 4000, 5000);
+FROM wireless_order_db.role R JOIN wireless_order_db.privilege P ON R.cate = 3 AND pri_code IN(1000, 1001, 1002, 1003, 1004, 1005, 1006, 2000, 3000, 4000, 5000);
 
 -- -----------------------------------------------------
--- Add '前台'、'后台' privileges to '部长'
+-- Add '前台'、'后台' privileges to '店长'
 -- -----------------------------------------------------
 INSERT INTO wireless_order_db.role_privilege 
 (`role_id`, `pri_id`, `restaurant_id`)
 SELECT role_id, pri_id, restaurant_id
-FROM wireless_order_db.role R JOIN wireless_order_db.privilege P ON R.cate = 4 AND pri_code IN(1000, 1001, 1002, 1003, 1004, 2000);
+FROM wireless_order_db.role R JOIN wireless_order_db.privilege P ON R.cate = 4 AND pri_code IN(1000, 1001, 1002, 1003, 1004, 1005, 1006, 2000);
+
+-- -----------------------------------------------------
+-- Add '前台'privileges to '收银员'
+-- -----------------------------------------------------
+INSERT INTO wireless_order_db.role_privilege 
+(`role_id`, `pri_id`, `restaurant_id`)
+SELECT role_id, pri_id, restaurant_id
+FROM wireless_order_db.role R JOIN wireless_order_db.privilege P ON R.cate = 4 AND pri_code IN(1000, 1001, 1002, 1003, 1004, 1005, 1006);
 
 -- -----------------------------------------------------
 -- Add '前台' privileges to '服务员'
@@ -357,7 +383,7 @@ FROM wireless_order_db.role R JOIN wireless_order_db.privilege P ON R.cate = 4 A
 INSERT INTO wireless_order_db.role_privilege 
 (`role_id`, `pri_id`, `restaurant_id`)
 SELECT role_id, pri_id, restaurant_id
-FROM wireless_order_db.role R JOIN wireless_order_db.privilege P ON R.cate = 5 AND pri_code IN(1000, 1001, 1002, 1003, 1004);
+FROM wireless_order_db.role R JOIN wireless_order_db.privilege P ON R.cate = 5 AND pri_code IN(1000, 1001);
 
 -- -----------------------------------------------------
 -- Drop the field 'pwd', 'pwd2', 'pwd3', 'pwd4', 'pwd5' to table 'restaurant'
