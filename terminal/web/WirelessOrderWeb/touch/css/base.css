@@ -123,17 +123,6 @@ body{ overflow: hidden; }
 	font-weight: bold; 
 }
 .button-base:active{ background: #FFD700; }
-.keyboardbutton{
-	width: 72px;
-	height: 66px;
-	color: #A52A2A;
-	font-size: 23px;
-	font-weight: bold;
-	margin: 1px 0 1px 1px;
-	background-color: #75B2F4;
-	border: 1px solid green;
-	border-radius: 5px;
-}
 
 .msg-base{
 	min-width: 500px;
