@@ -22,7 +22,6 @@ function loginOnLoad() {
 			"type" : 0,
 			"isPaging" : false,
 			"isCombo" : false,
-			skipVerify : true
 		},
 		success : function(response, options) {
 			var resultJSON = Ext.util.JSON.decode(response.responseText);
