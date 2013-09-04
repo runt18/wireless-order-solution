@@ -158,7 +158,7 @@ public class PrinterDao {
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return getAllPrinters(dbCon, staff);
+			return getPrinters(dbCon, staff);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -199,6 +199,24 @@ public class PrinterDao {
 	 */
 	public static List<Printer> getPrinters(DBCon dbCon, Staff staff) throws SQLException{
 		return getPrinters(dbCon, staff, " AND enabled = 1 ");
+	}
+	
+	/**
+	 * Get the all printers along with associated print functions to a specified restaurant.
+	 * @param staff
+	 * 			the terminal
+	 * @return the printer to this specific restaurant
+	 * @throws SQLException
+	 * 			throws if the printer to delete does NOT exist
+	 */
+	public static List<Printer> getAllPrinters(Staff staff) throws SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return getPrinters(dbCon, staff, " ORDER BY enabled DESC");
+		}finally{
+			dbCon.disconnect();
+		}
 	}
 	
 	/**
