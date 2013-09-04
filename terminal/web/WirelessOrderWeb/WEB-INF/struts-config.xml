@@ -449,6 +449,18 @@
 				type = "com.wireless.Actions.login.VerifyStaffAction"
 				scope="request">
 		</action>
+		<action path="/QueryRole"
+				type = "com.wireless.Actions.roleMgr.QueryRoleAction"
+				scope="request">
+		</action>
+		<action path="/QueryPrivilege"
+				type = "com.wireless.Actions.roleMgr.QueryPrivilegeAction"
+				scope="request" parameter="dataSource">
+		</action>
+		<action path="/OperateRole"
+				type = "com.wireless.Actions.roleMgr.OperateRoleAction"
+				scope="request" parameter="dataSource">
+		</action>
 	</action-mappings>
 
 	<message-resources parameter="com.yourcompany.struts.ApplicationResources" />
