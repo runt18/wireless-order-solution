@@ -123,7 +123,7 @@ Ext.Ajax.request({
 	
 });
 
-
+var deptCount = 0, kitchenCount = 0, regionCount = 0;
 var addPrintFunc = new Ext.Window({
 	title : '添加方案',
 	id : 'addPrintFuncWin',
@@ -534,7 +534,11 @@ var addPrintFunc = new Ext.Window({
 				listeners : {
 					focus : function(){
 						//第一次初始化控件时,解决点击无效
-						Ext.getCmp('allKitchen').enable();
+						if(kitchenCount == 0){
+							Ext.getCmp('allKitchen').enable();
+							kitchenCount ++;
+						}
+						
 					},
 					check : function(checkbox, checked){
 						if(checked){
@@ -580,7 +584,10 @@ var addPrintFunc = new Ext.Window({
 				boxLabel : '所有部门',
 				listeners : {
 					focus : function(){
-						Ext.getCmp('allDept').enable();
+						if(deptCount == 0){
+							Ext.getCmp('allDept').enable();
+							deptCount ++;
+						}
 					},
 					check : function(checkbox, checked){
 						if(checked){
@@ -625,7 +632,10 @@ var addPrintFunc = new Ext.Window({
 				boxLabel : '所有区域',
 				listeners : {
 					focus : function(){
-						Ext.getCmp('allRegion').enable();
+						if(regionCount == 0){
+							Ext.getCmp('allRegion').enable();
+							regionCount ++;
+						}
 					},
 					check : function(checkbox, checked){
 						if(checked){
@@ -885,9 +895,9 @@ function printFuncOperactionHandler(c){
 		document.getElementById('radioOrder').checked = true;
 		Ext.getCmp('radioOrder').fireEvent('check', Ext.getCmp('radioOrder'), true);
 		//document.getElementsByName('dept')[0].checked = true;
-		Ext.getCmp('chkAllDept').fireEvent('check', Ext.getCmp('chkAllDept'), true);
+		Ext.getCmp('allKitchen').disable();
+		Ext.getCmp('allDept').disable();
 		Ext.getCmp('chkAllRegion').fireEvent('check', Ext.getCmp('chkAllRegion'), true);
-		Ext.getCmp('chkAllKitchen').fireEvent('check', Ext.getCmp('chkAllKitchen'), true);
 		
 		Ext.getDom('chkAllDept').checked = true;
 		Ext.getDom('chkAllRegion').checked = true;

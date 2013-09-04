@@ -1,5 +1,4 @@
 ﻿function loadAllStaff() {
-	alert('laile');
 	tasteData = {};
 	Ext.Ajax.request({
 		url : "../../QueryStaff.do",
@@ -10,7 +9,6 @@
 			"isCombo" : false
 		},
 		success : function(response, options) {
-			alert('jin');
 			var resultJSON = Ext.util.JSON.decode(response.responseText);
 			// 后台：[]
 			var rootData = resultJSON.root;
