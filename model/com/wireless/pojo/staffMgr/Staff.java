@@ -74,7 +74,7 @@ public class Staff implements Parcelable, Jsonable{
 		private String mobile;
 		private String name;
 		private String pwd;
-		private Type type;
+		private Type type = Type.NORMAL;
 		
 		
 		public int getRestaurantId() {
@@ -170,7 +170,7 @@ public class Staff implements Parcelable, Jsonable{
 		setRestaurantId(restaurantId);
 	}
 	
-	public Staff(StaffInsertBuilder builder){
+	private Staff(StaffInsertBuilder builder){
 		setRestaurantId(builder.getRestaurantId());
 		setRole(builder.getRole());
 		setMobile(builder.getMobile());
@@ -179,7 +179,7 @@ public class Staff implements Parcelable, Jsonable{
 		setType(builder.getType());
 	}
 	
-	public Staff(StaffUpdateBuilder builder){
+	private Staff(StaffUpdateBuilder builder){
 		setMobile(builder.getMobile());
 		setName(builder.getStaffName());
 		setPwd(builder.getStaffpwd());
@@ -309,7 +309,7 @@ public class Staff implements Parcelable, Jsonable{
 		jm.put("typeValue", this.getType().getVal());
 		jm.put("typeText", this.getType().getDesc());
 		jm.put("role", this.getRole());
-		jm.put("roleText", this.getRole().getName());
+		jm.put("roleName", this.getRole().getName());
 		
 		return Collections.unmodifiableMap(jm);
 	}

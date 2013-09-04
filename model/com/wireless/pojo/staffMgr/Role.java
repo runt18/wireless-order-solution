@@ -177,7 +177,7 @@ public class Role implements Jsonable, Parcelable{
 	public static class InsertBuilder{
 		private int restaurantId;
 		private String name;
-		private Type type;
+		private Type type = Type.NORMAL;
 		private Category categoty;
 		private List<Privilege> privileges = SortedList.newInstance();
 		
@@ -220,12 +220,53 @@ public class Role implements Jsonable, Parcelable{
 		
 	}
 	
-	
+	public static class UpdateRoleBuilder{
+		private int roleId;
+		private String name;
+		private List<Privilege> privileges = SortedList.newInstance();
+		public int getRoleId() {
+			return roleId;
+		}
+		public void setRoleId(int roleId) {
+			this.roleId = roleId;
+		}
+		public String getName() {
+			return name;
+		}
+		public void setName(String name) {
+			this.name = name;
+		}
+		public List<Privilege> getPrivileges() {
+			return privileges;
+		}
+		public void addPrivileges(Privilege privilege) {
+			this.privileges.add(privilege);
+		}
+		
+		public Role build(){
+			return new Role(this);
+		}
+		
+	}
 	
 	
 	
 	public Role(int id){
 		setId(id);
+	}
+	
+	private Role(InsertBuilder builder){
+		setCategory(builder.getCategoty());
+		setName(builder.getName());
+		setRestaurantId(builder.getRestaurantId());
+		setType(builder.getType());
+		this.privileges.addAll(builder.getPrivileges());
+	}
+	
+	private Role(UpdateRoleBuilder updateBuilder){
+		setId(updateBuilder.getRoleId());
+		setName(updateBuilder.getName());
+		this.privileges.addAll(updateBuilder.getPrivileges());
 	}
 	
 	public int getId() {
@@ -270,13 +311,21 @@ public class Role implements Jsonable, Parcelable{
 	public void setType(Type type){
 		this.type = type;
 	}
+	
+	public void clearPrivilege(){
+		privileges.clear();
+	}
+	
+	public void addAllPrivileges(List<Privilege> list){
+		privileges.addAll(list);
+	}
 
 	public List<Privilege> getPrivileges(){
 		return Collections.unmodifiableList(privileges);
 	}
 	
 	public void addPrivilege(Privilege privilege){
-		if(privilege != null){
+		if(privilege != null && !hasPrivilege(privilege.getCode())){
 			privileges.add(privilege);
 		}
 	}
@@ -285,13 +334,7 @@ public class Role implements Jsonable, Parcelable{
 		return privileges.contains(new Privilege(0, code, 0));
 	}
 	
-	public Role(InsertBuilder builder){
-		setCategory(builder.getCategoty());
-		setName(builder.getName());
-		setRestaurantId(builder.getRestaurantId());
-		setType(builder.getType());
-		this.privileges.addAll(builder.getPrivileges());
-	}
+
 	
 	@Override 
 	public int hashCode(){
