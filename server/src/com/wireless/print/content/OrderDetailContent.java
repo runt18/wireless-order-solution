@@ -105,7 +105,7 @@ public class OrderDetailContent extends ConcreteContent {
 		}
 		
 		
-		StringBuffer cancelReason = new StringBuffer();
+		StringBuilder cancelReason = new StringBuilder();
 		if(mPrintType == PType.PRINT_CANCELLED_FOOD && _parent.hasCancelReason()){
 			cancelReason.append("\r\n").append(new ExtraFormatDecorator("‘≠“Ú:" + _parent.getCancelReason().getReason(), 
 												    		 			mStyle, 

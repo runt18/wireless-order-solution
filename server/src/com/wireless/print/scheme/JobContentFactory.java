@@ -136,7 +136,7 @@ public class JobContentFactory {
 				}
 			}
 			
-			return new JobCombinationContent(jobContents);
+			return jobContents.isEmpty() ? null : new JobCombinationContent(jobContents);
 			
 		}else{
 			return null;
@@ -209,7 +209,7 @@ public class JobContentFactory {
 				}
 			}
 			
-			return new JobCombinationContent(jobContents);
+			return jobContents.isEmpty() ? null : new JobCombinationContent(jobContents);
 			
 		}else{
 			return null;
@@ -253,7 +253,7 @@ public class JobContentFactory {
 				}
 			}
 			
-			return new JobCombinationContent(jobContents);
+			return jobContents.isEmpty() ? null : new JobCombinationContent(jobContents);
 			
 		}finally{
 			dbCon.disconnect();
@@ -296,7 +296,7 @@ public class JobContentFactory {
 			}
 		}
 		
-		return new JobCombinationContent(jobContents);
+		return jobContents.isEmpty() ? null : new JobCombinationContent(jobContents);
 	}
 	
 	public Content createMemberReceiptContent(PType printType, Staff term, List<Printer> printers, int memberOperationId) throws BusinessException, SQLException{
@@ -327,7 +327,7 @@ public class JobContentFactory {
 			}
 		}
 		
-		return new JobCombinationContent(jobContents);
+		return jobContents.isEmpty() ? null : new JobCombinationContent(jobContents);
 	}
 	
 	public Content createTransContent(PType printType, Staff term, List<Printer> printers, int orderId, Table srcTbl, Table destTbl){
@@ -351,6 +351,6 @@ public class JobContentFactory {
 			}
 		}
 
-		return new JobCombinationContent(jobContents);
+		return jobContents.isEmpty() ? null : new JobCombinationContent(jobContents);
 	}
 }
