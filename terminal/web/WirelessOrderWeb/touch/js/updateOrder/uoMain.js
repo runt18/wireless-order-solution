@@ -532,7 +532,13 @@ function submitUpdateOrderHandler(c){
 				orderDate : uoOther.order.orderDate
 			},
 			success : function(data, status, xhr){
-				toggleContentDisplay({type:'hide', renderTo:'divUpdateOrder'});
+				Util.msg.alert({
+					title : data.title,
+					msg : data.msg, 
+					fn : function(btn){
+						toggleContentDisplay({type:'hide', renderTo:'divUpdateOrder'});
+					}
+				});
 			},
 			error : function(request, status, err){
 				Util.msg.alert({

@@ -54,6 +54,8 @@ function initTables(){
 				tables = [];
 				busyTables = [];
 				freeTables = [];
+				region = [];
+				regionId = [];
 				data = eval("(" + data + ")");
 				if(data.success){
 					//把所有餐桌对象都放到本地数组tables中,freeTables存放空闲餐桌，busyTables存放就餐餐桌
@@ -104,21 +106,15 @@ function initTables(){
 					showTable(temp, pageNow);
 				}else{
 					Util.msg.alert({
-						title : '温馨提示',
-						msg : '初始化餐桌信息失败，请再次刷新页面。', 
-						fn : function(btn){
-							
-						}
+						title : data.title,
+						msg : data.msg, 
 					});
 				}
 			},
 			error : function(request, status, err){
 				Util.msg.alert({
 					title : '温馨提示',
-					msg : '初始化餐桌信息失败，请再次刷新页面。', 
-					fn : function(btn){
-						
-					}
+					msg : err, 
 				});
 			}
 		});	

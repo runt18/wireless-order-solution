@@ -55,7 +55,7 @@ var Templet = {
   	  		+ '</div>'
 	},
 	uo : {
-		orderFood : '<tr data-index = {dataIndex} data-value = {id} id = "truoFood{dataIndex}" onclick = "selectUOFood(this)">'
+		orderFood : '<tr data-index = {dataIndex} data-value = {alias} id = "truoFood{dataIndex}" onclick = "selectUOFood(this)">'
 			+ 'data-type = "orderFood-select" >'
 			+ '<td>{dataIndex}</td>'
 			+ '<td>{name}</td>'

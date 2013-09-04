@@ -346,6 +346,7 @@ ts.tt.submit = function(){
 				
 			}
 		});
+		return;
 	}
 	if(hasTable(tables, newTable)){
 		if(getTableBytableId(newTable).statusValue == 0){
@@ -368,13 +369,43 @@ ts.tt.submit = function(){
 				
 			}
 		});
+		return;
 	}
 	
 	//提交转台信息
 	if(oldflag && newflag){
-		
-	}else{
-		return;
+		$.ajax({
+			url : '../TransTable.do',
+			type : 'post',
+			data : {
+				pin : pin,
+				oldTableAlias : oldTable,
+				newTableAlias : newTable
+			},
+			success : function(data, status, xhr){
+				if(data.success){
+					Util.msg.alert({
+						title : data.title,
+						msg : data.msg,
+						fn : function(btn){
+							ts.tt.back();
+							initTables();
+						}
+					});
+				}else{
+					Util.msg.alert({
+						title : data.title,
+						msg : data.msg,
+					});
+				}
+			},
+			err : function(request, status, err){
+				Util.msg.alert({
+					title : '温馨提示',
+					msg : err, 
+				});
+			}
+		});
 	}
 };
 
@@ -385,8 +416,11 @@ ts.tt.submit = function(){
 ts.tt.back = function(){
 	Util.dialongDisplay({
 		type : 'hide',
-		renderTo : 'divTransTableForTableSelect'
+		renderTo : 'divTransTableForTableSelect',
 	});
+	inputNumVal = '';
+	$("#txtOldTableForTS").val(inputNumVal);
+	$("#txtNewTableForTS").val(inputNumVal);
 };
 
 /**
