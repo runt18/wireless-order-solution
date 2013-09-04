@@ -115,12 +115,13 @@ public class QueryStaffAction extends Action {
 			if (isCombo.equals("true")) {
 				
 			} else {
+				jobject.setTotalProperty(staffList.size());
 				staffList = DataPaging.getPagingData(staffList, isPaging, index, pageSize);
 			}	
 			if(request.getAttribute("pin") != null){
 				other.put("pin", request.getAttribute("pin"));
 			}
-			jobject.setTotalProperty(staffList.size());
+			
 			jobject.setRoot(staffList);
 			jobject.setOther(other);
 			out.write(jobject.toString());
