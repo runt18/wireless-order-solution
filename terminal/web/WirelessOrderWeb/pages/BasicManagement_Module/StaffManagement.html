@@ -60,13 +60,14 @@
 
 	var currPageIndex = 0;
 	var currRowIndex = -1;
-	var pageRecordCount = 20;
+	var pageRecordCount = 15;
 	
 	var staffData = [];
+	var roleType = [[1, '管理員'], [2, '老板'], [3, '财务'], [4, '部长'], [5, '收银'], [6, '服务员'], [7, '其他']];
 	
 </script>
 
-<script type="text/javascript" src="../../js/BasicManagement/staffMgr/staffMgrLoad.js"></script>
+<!-- <script type="text/javascript" src="../../js/BasicManagement/staffMgr/staffMgrLoad.js"></script> -->
 <script type="text/javascript" src="../../js/BasicManagement/staffMgr/staffMgrMain.js"></script>
 
 <style type="text/css"> 
@@ -77,11 +78,10 @@
 </style> 
 
 </head>
-<body onload="staffMgrOnLoad()">
+<body>
 	<script type="text/javascript" src="../../extjs/examples.js"></script>
 
 	<!------------------- layout ------------------------>
-	<div id="west"></div>
 	<div id="north">
 		<p>icons here.</p>
 	</div>
