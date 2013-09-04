@@ -15,12 +15,13 @@ import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.distMgr.Discount;
 import com.wireless.pojo.staffMgr.Privilege;
-import com.wireless.pojo.staffMgr.Role;
 import com.wireless.pojo.staffMgr.Privilege.Code;
+import com.wireless.pojo.staffMgr.Role;
 import com.wireless.pojo.staffMgr.Role.Category;
 import com.wireless.pojo.staffMgr.Role.DefAdminInsertBuilder;
 import com.wireless.pojo.staffMgr.Role.InsertBuilder;
 import com.wireless.pojo.staffMgr.Role.Type;
+import com.wireless.pojo.staffMgr.Role.UpdateRoleBuilder;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.test.db.TestInit;
 
@@ -56,9 +57,9 @@ public class TestRoleDao {
 						int dcIndex = actual.getPrivileges().get(index).getDiscounts().indexOf(d);
 						if(dcIndex >= 0){
 							//折扣信息对比
-							Assert.assertEquals("discountId", d.getId(), actual.getPrivileges().get(index).getDiscounts().get(dcIndex));
-							Assert.assertEquals("discountName", d.getName(), actual.getPrivileges().get(index).getDiscounts().get(dcIndex));
-							Assert.assertEquals("restaurant_id", d.getRestaurantId(), actual.getPrivileges().get(index).getDiscounts().get(dcIndex));
+							Assert.assertEquals("discountId", d.getId(), actual.getPrivileges().get(index).getDiscounts().get(dcIndex).getId());
+							Assert.assertEquals("discountName", d.getName(), actual.getPrivileges().get(index).getDiscounts().get(dcIndex).getName());
+							Assert.assertEquals("restaurant_id", d.getRestaurantId(), actual.getPrivileges().get(index).getDiscounts().get(dcIndex).getRestaurantId());
 						}else{
 							Assert.assertEquals("the discount", false);
 						}
@@ -73,7 +74,7 @@ public class TestRoleDao {
 	@Test
 	public void TestRole() throws SQLException, BusinessException{
 		//get all privilege
-		List<Privilege> privileges = PrivilegeDao.getPrivileges(mStaff);
+		List<Privilege> privileges = PrivilegeDao.getPrivileges(mStaff, null, null);
 		//get all discount
 		List<Discount> discounts = DiscountDao.getDiscount(mStaff, null, null);
 		int roleId = 0, newRoleId = 0;
@@ -94,21 +95,21 @@ public class TestRoleDao {
 			compare(expected, actual);
 			
 			//创建新角色
-			int index;
 			InsertBuilder newBuilder = new InsertBuilder();
 			newBuilder.setName("副部长");
 			newBuilder.setRestaurantId(mStaff.getRestaurantId());
 			newBuilder.setCategoty(Category.OTHER);
 			newBuilder.setType(Type.NORMAL);
 			
-			
-			index = privileges.indexOf(new Privilege(Privilege.Code.FRONT_BUSINESS)); 
-			if(index >= 0){
-				newBuilder.addPrivileges(privileges.get(index));
+			for (Privilege privilege : privileges) {
+				if(privilege.getCode() == Privilege.Code.FRONT_BUSINESS){
+					newBuilder.addPrivileges(privilege);
+				}
 			}
-			index = privileges.indexOf(new Privilege(Privilege.Code.BASIC));
-			if(index >= 0){
-				newBuilder.addPrivileges(privileges.get(index));
+			for (Privilege privilege : privileges) {
+				if(privilege.getCode() == Privilege.Code.BASIC){
+					newBuilder.addPrivileges(privilege);
+				}
 			}
 			
 			newRoleId = RoleDao.insertRole(mStaff, newBuilder);
@@ -121,19 +122,35 @@ public class TestRoleDao {
 			compare(expected, actual);
 			
 			//修改角色信息
-			actual.setName("经理");
-			index = privileges.indexOf(new Privilege(Privilege.Code.DISCOUNT));
-			if(index >= 0){
-				for (Discount discount : discounts) {
-					privileges.get(index).addDiscount(discount);
+			UpdateRoleBuilder updateBuilder = new UpdateRoleBuilder();
+			updateBuilder.setName("经理");
+			updateBuilder.setRoleId(newRoleId);
+			for (Privilege privilege : privileges) {
+				if(privilege.getCode() == Privilege.Code.DISCOUNT){
+					privilege.setAllDiscount();
+					for (Discount discount : discounts) {
+						privilege.addDiscount(discount);
+					}
+					updateBuilder.addPrivileges(privilege);
+				}
+			}
+			for (Privilege privilege : privileges) {
+				if(privilege.getCode() == Privilege.Code.HISTORY){
+					updateBuilder.addPrivileges(privilege);
 				}
 			}
 			
-			RoleDao.updateRole(mStaff, actual);
 			
-			Role updateRole = RoleDao.getRoleById(mStaff, actual.getId());
+			RoleDao.updateRole(mStaff, updateBuilder.build());
 			
-			//compare
+			Role updateRole = RoleDao.getRoleById(mStaff, newRoleId);
+			
+			actual.setName("经理");
+			
+			actual.clearPrivilege();
+			
+			actual.addAllPrivileges(updateBuilder.getPrivileges());
+
 			compare(actual, updateRole);
 		}finally{
 			//删除角色

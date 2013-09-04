@@ -261,35 +261,37 @@ public class RoleDao {
 				" name = '" + role.getName() + "'" +
 				" WHERE role_id = " + role.getId();
 		dbCon.stmt.executeUpdate(sql);
-		//删除权限关联
-		String delRPSql = "DELETE FROM " + Params.dbName + ".role_privilege" +
-							" WHERE role_id = " + role.getId();
-		dbCon.stmt.executeUpdate(delRPSql);
-		//删除折扣关联
-		String delRDSql = "DELETE FROM " + Params.dbName + ".role_discount" + 
-							" WHERE role_id = " + role.getId();
-		dbCon.stmt.executeUpdate(delRDSql);
-		//重新关联权限和折扣
-		for (Privilege privilege : role.getPrivileges()) {
-			String pSql = "INSERT INTO " + Params.dbName + ".role_privilege(role_id, pri_id, restaurant_id) " +
-					" VALUES(" +
-					role.getId() + ", " +
-					privilege.getId() + ", " +
-					staff.getRestaurantId() + ")";
-			dbCon.stmt.executeUpdate(pSql);
+		if(!role.getPrivileges().isEmpty()){
 			
-			if(privilege.getCode() == Code.DISCOUNT){
-				for (Discount discount : privilege.getDiscounts()) {
-					String rdSql = "INSERT INTO " + Params.dbName + ".role_discount(role_id, discount_id) " +
-							" VALUES(" +
-							role.getId() + ", " +
-							discount.getId() + ")";
-					dbCon.stmt.executeUpdate(rdSql);
-					
+			//删除权限关联
+			String delRPSql = "DELETE FROM " + Params.dbName + ".role_privilege" +
+								" WHERE role_id = " + role.getId();
+			dbCon.stmt.executeUpdate(delRPSql);
+			//删除折扣关联
+			String delRDSql = "DELETE FROM " + Params.dbName + ".role_discount" + 
+								" WHERE role_id = " + role.getId();
+			dbCon.stmt.executeUpdate(delRDSql);
+			//重新关联权限和折扣
+			for (Privilege privilege : role.getPrivileges()) {
+				String pSql = "INSERT INTO " + Params.dbName + ".role_privilege(role_id, pri_id, restaurant_id) " +
+						" VALUES(" +
+						role.getId() + ", " +
+						privilege.getId() + ", " +
+						staff.getRestaurantId() + ")";
+				dbCon.stmt.executeUpdate(pSql);
+				
+				if(privilege.getCode() == Code.DISCOUNT){
+					for (Discount discount : privilege.getDiscounts()) {
+						String rdSql = "INSERT INTO " + Params.dbName + ".role_discount(role_id, discount_id) " +
+								" VALUES(" +
+								role.getId() + ", " +
+								discount.getId() + ")";
+						dbCon.stmt.executeUpdate(rdSql);
+						
+					}
 				}
 			}
 		}
-				
 	}
 	
 	/**

@@ -15,6 +15,7 @@ import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.staffMgr.Role;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.staffMgr.Staff.StaffInsertBuilder;
+import com.wireless.pojo.staffMgr.Staff.StaffUpdateBuilder;
 
 public class StaffDao {
 
@@ -292,11 +293,11 @@ public class StaffDao {
 	 * 			the staff to update
 	 * @throws SQLException
 	 */
-	public static void updateStaff(Staff staff) throws SQLException{
+	public static void updateStaff(StaffUpdateBuilder staff) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			updateStaff(dbCon, staff);
+			updateStaff(dbCon, staff.build());
 		}finally{
 			dbCon.disconnect();
 		}
