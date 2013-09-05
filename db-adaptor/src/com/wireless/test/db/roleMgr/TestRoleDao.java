@@ -18,7 +18,7 @@ import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.staffMgr.Privilege.Code;
 import com.wireless.pojo.staffMgr.Role;
 import com.wireless.pojo.staffMgr.Role.Category;
-import com.wireless.pojo.staffMgr.Role.DefAdminInsertBuilder;
+import com.wireless.pojo.staffMgr.Role.DefAdminBuilder;
 import com.wireless.pojo.staffMgr.Role.InsertBuilder;
 import com.wireless.pojo.staffMgr.Role.Type;
 import com.wireless.pojo.staffMgr.Role.UpdateRoleBuilder;
@@ -81,8 +81,7 @@ public class TestRoleDao {
 		
 		try{
 			//创建默认角色
-			DefAdminInsertBuilder builder = new DefAdminInsertBuilder();
-			builder.setRestaurantId(mStaff.getRestaurantId());
+			DefAdminBuilder builder = new DefAdminBuilder(mStaff.getRestaurantId());
 			
 			roleId = RoleDao.insertRole(mStaff, builder);
 			
@@ -95,9 +94,7 @@ public class TestRoleDao {
 			compare(expected, actual);
 			
 			//创建新角色
-			InsertBuilder newBuilder = new InsertBuilder();
-			newBuilder.setName("副部长");
-			newBuilder.setRestaurantId(mStaff.getRestaurantId());
+			InsertBuilder newBuilder = new InsertBuilder(mStaff.getRestaurantId(), "副部长");
 			newBuilder.setCategoty(Category.OTHER);
 			newBuilder.setType(Type.NORMAL);
 			

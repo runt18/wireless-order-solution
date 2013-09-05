@@ -4,13 +4,20 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.mysql.jdbc.Statement;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
+import com.wireless.db.staffMgr.RoleDao;
+import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.ProtocolError;
 import com.wireless.exception.RestaurantError;
+import com.wireless.pojo.inventoryMgr.MaterialCate;
+import com.wireless.pojo.ppMgr.PricePlan;
 import com.wireless.pojo.restaurantMgr.Restaurant;
+import com.wireless.pojo.staffMgr.Role;
 import com.wireless.pojo.staffMgr.Staff;
+import com.wireless.pojo.util.DateUtil;
 
 public class RestaurantDao {
 	
@@ -123,11 +130,226 @@ public class RestaurantDao {
 			restaurant.setTele1(dbCon.rs.getString("tele1"));
 			restaurant.setTele2(dbCon.rs.getString("tele2"));
 			restaurant.setAddress(dbCon.rs.getString("address"));
+			restaurant.setExpireDate(dbCon.rs.getTimestamp("expire_date").getTime());
+			restaurant.setBirthDate(dbCon.rs.getTimestamp("birth_date").getTime());
 			result.add(restaurant);
 		}
 		dbCon.rs.close();
 		
 		return result;
+	}
+	
+	/**
+	 * Insert the new restaurant and related information.
+	 * @param builder
+	 * 			the builder to new restaurant
+	 * @return the id to restaurant just inserted
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if the restaurant account to insert has been exist before 
+	 */
+	public static int insert(Restaurant.InsertBuilder builder) throws SQLException, BusinessException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			dbCon.conn.setAutoCommit(false);
+			
+			int restaurantId = insert(dbCon, builder);
+			dbCon.conn.commit();
+			
+			return restaurantId;
+			
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Insert the new restaurant and related information.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param builder
+	 * 			the builder to new restaurant
+	 * @return the id to restaurant just inserted
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if the restaurant account to insert has been exist before 
+	 */
+	public static int insert(DBCon dbCon, Restaurant.InsertBuilder builder) throws SQLException, BusinessException{
+		
+		Restaurant restaurant = builder.build();
+		
+		String sql;
+		//Check to whether the duplicated account exist
+		sql = " SELECT * FROM " + Params.dbName + ".restaurant WHERE account = '" + restaurant.getAccount() + "'";
+		dbCon.rs = dbCon.stmt.executeQuery(sql);
+		if(dbCon.rs.next()){
+			throw new BusinessException(RestaurantError.DUPLICATED_RESTAURANT_ACCOUNT);
+		}
+		dbCon.rs.close();
+		
+		//Create the new restaurant
+		sql = " INSERT INTO " + Params.dbName + ".restaurant " +
+			  " (account, birth_date, restaurant_name, restaurant_info, tele1, tele2, address, record_alive, expire_date) " +
+			  " VALUES(" +
+			  "'" + restaurant.getAccount() + "'," +
+			  "'" + DateUtil.format(restaurant.getBirthDate()) + "'," +
+			  "'" + restaurant.getName() + "'," +
+			  "'" + restaurant.getInfo() + "'," +
+			  "'" + restaurant.getTele1() + "'," +
+			  "'" + restaurant.getTele2() + "'," +
+			  "'" + restaurant.getAddress() + "'," +
+			  restaurant.getRecordAlive() + "," +
+			  "'" + DateUtil.format(restaurant.getExpireDate()) + "'" +			  
+			  " ) ";
+		
+		dbCon.stmt.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
+		dbCon.rs = dbCon.stmt.getGeneratedKeys();
+		if(dbCon.rs.next()){
+			restaurant.setId(dbCon.rs.getInt(1));
+		}else{
+			throw new SQLException("The id of printer is not generated successfully.");
+		}
+		dbCon.rs.close();
+		
+		//Insert '商品' material category
+		insertMaterialCate(dbCon, restaurant.getId());
+		
+		//Insert默认的活动价格方案
+		insertPricePlan(dbCon, restaurant.getId());
+		
+		//Insert the '大牌', '中牌', '例牌' and popular tastes
+		
+		//Insert the '无折扣'折扣方案
+		
+		//Insert the kitchens
+		
+		//Insert the departments
+		
+		//Insert the regions
+		
+		//Insert the tables
+		
+		//Insert the popular cancel reasons
+		
+		//Insert the staff
+		insertStaff(dbCon, restaurant.getId(), builder.getPwd());
+		
+		return restaurant.getId();
+	}
+	
+	private static void insertStaff(DBCon dbCon, int restaurantId, String pwd) throws SQLException{
+		Staff staff = new Staff();
+		staff.setRestaurantId(restaurantId);
+		//insert '管理员' role
+		int adminRoleId = RoleDao.insertRole(dbCon, staff, new Role.DefAdminBuilder(restaurantId));
+		//insert '管理员' staff
+		StaffDao.insertStaff(dbCon, new Staff.DefAdminBuilder(pwd, restaurantId, new Role(adminRoleId)));
+		//insert '老板' role
+		RoleDao.insertRole(dbCon, staff, new Role.DefBossBuilder(restaurantId));
+		//insert '财务' role
+		RoleDao.insertRole(dbCon, staff, new Role.DefFinanceBuilder(restaurantId));
+		//insert '店长' role
+		RoleDao.insertRole(dbCon, staff, new Role.DefManagerBuilder(restaurantId));
+		//insert '收银员' role
+		RoleDao.insertRole(dbCon, staff, new Role.DefCashierBuilder(restaurantId));
+		//insert '服务员' role
+		RoleDao.insertRole(dbCon, staff, new Role.DefWaiterBuilder(restaurantId));
+	}
+	
+	private static void insertMaterialCate(DBCon dbCon, int restaurantId) throws SQLException{
+		String sql;
+		sql = " INSERT INTO " + Params.dbName + ".material_cate " +
+			  "(`restaurant_id`, `name`, `type`)" +
+			  " VALUES(" +
+			  restaurantId + "," +
+			  "'" + MaterialCate.Type.GOOD.getText() + "'," +
+			  MaterialCate.Type.GOOD.getValue() +
+			  " ) ";
+		dbCon.stmt.executeUpdate(sql);
+	}
+	
+	private static void insertPricePlan(DBCon dbCon, int restaurantId) throws SQLException{
+		String sql;
+		sql = " INSERT INTO " + Params.dbName + ".price_plan " +
+			  "(`restaurant_id`, `name`, `status`)" +
+			  " VALUES(" +
+			  restaurantId + "," +
+			  "'默认方案'" + "," +
+			  PricePlan.Status.ACTIVITY.getVal() + 
+			  ")";
+		dbCon.stmt.executeUpdate(sql);
+	}
+	
+	public static void deleteById(int restaurantId) throws SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			dbCon.conn.setAutoCommit(false);
+			deleteById(dbCon, restaurantId);
+			dbCon.conn.commit();
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	public static void deleteById(DBCon dbCon, int restaurantId) throws SQLException{
+		String sql;
+		
+		//Delete the restaurant
+		sql = " DELETE FROM " + Params.dbName + ".restaurant WHERE id = " + restaurantId;
+		dbCon.stmt.executeUpdate(sql);
+		
+		//Delete '商品' material category
+		sql = " DELETE FROM " + Params.dbName + ".material_cate WHERE restaurant_id = " + restaurantId;
+		dbCon.stmt.executeUpdate(sql);
+		
+		//Delete 默认的活动价格方案
+		sql = " DELETE FROM " + Params.dbName + ".price_plan WHERE restaurant_id = " + restaurantId;
+		dbCon.stmt.executeUpdate(sql);
+		
+		//Delete the '大牌', '中牌', '例牌' and popular tastes
+		sql = " DELETE FROM " + Params.dbName + ".taste WHERE restaurant_id = " + restaurantId;
+		dbCon.stmt.executeUpdate(sql);
+		
+		//Delete the '无折扣'折扣方案
+		sql = " DELETE FROM " + Params.dbName + ".discount WHERE restaurant_id = " + restaurantId;
+		dbCon.stmt.executeUpdate(sql);
+		
+		//Delete the kitchens
+		sql = " DELETE FROM " + Params.dbName + ".kitchen WHERE restaurant_id = " + restaurantId;
+		dbCon.stmt.executeUpdate(sql);
+		
+		//Delete the departments
+		sql = " DELETE FROM " + Params.dbName + ".department WHERE restaurant_id = " + restaurantId;
+		dbCon.stmt.executeUpdate(sql);
+		
+		//Delete the regions
+		sql = " DELETE FROM " + Params.dbName + ".region WHERE restaurant_id = " + restaurantId;
+		dbCon.stmt.executeUpdate(sql);
+		
+		//Delete the tables
+		sql = " DELETE FROM " + Params.dbName + ".table WHERE restaurant_id = " + restaurantId;
+		dbCon.stmt.executeUpdate(sql);
+		
+		//Delete the popular cancel reasons
+		sql = " DELETE FROM " + Params.dbName + ".cancel_reason WHERE restaurant_id = " + restaurantId;
+		dbCon.stmt.executeUpdate(sql);
+		
+		//Delete the staff
+		sql = " DELETE FROM " + Params.dbName + ".staff WHERE restaurant_id = " + restaurantId;
+		dbCon.stmt.executeUpdate(sql);
+		
+		//Delete the role privileges
+		sql = " DELETE FROM " + Params.dbName + ".role_privilege WHERE restaurant_id = " + restaurantId;
+		dbCon.stmt.executeUpdate(sql);
+		
+		//Delete the role
+		sql = " DELETE FROM " + Params.dbName + ".role WHERE restaurant_id = " + restaurantId;
+		dbCon.stmt.executeUpdate(sql);
+		
 	}
 	
 	/**

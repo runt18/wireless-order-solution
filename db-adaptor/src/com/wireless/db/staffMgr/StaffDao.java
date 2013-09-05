@@ -274,7 +274,7 @@ public class StaffDao {
 					builder.getRole().getId() + ", " +
 					"'" + builder.getName() + "', " +
 					"'" + builder.getMobile() + "', " +
-					"'" + builder.getPwd() + "', " +
+					"MD5('" + builder.getPwd() + "'), " +
 					builder.getType().getVal() + ")";
 		dbCon.stmt.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
 		dbCon.rs = dbCon.stmt.getGeneratedKeys();

@@ -154,7 +154,7 @@ public class PrinterDao {
 	 * @throws SQLException
 	 * 			throws if the printer to delete does NOT exist
 	 */
-	public static List<Printer> getAllPrinters(Staff staff) throws SQLException{
+	public static List<Printer> getPrinters(Staff staff) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();

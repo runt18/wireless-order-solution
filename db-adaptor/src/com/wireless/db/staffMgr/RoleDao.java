@@ -71,7 +71,7 @@ public class RoleDao {
 		//Get the basic info to each role
 		sql = " SELECT role_id, restaurant_id, name, type, cate " +
 			  " FROM " + Params.dbName + ".role" +
-			  " WHERE restaurant_id = " + staff.getRestaurantId() +
+			  " WHERE restaurant_id = " + staff.getRestaurantId() + " " +
 			  (extraCond != null ? extraCond : " ") +
 			  (orderClause != null ? orderClause : "");
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
