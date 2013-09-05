@@ -236,12 +236,27 @@ function renderToCreateOrder(tableNo, peopleNo){
 		inputNumVal = "";
 		$("#txtTableNumForTS").val(inputNumVal);
 		$("#txtPeopleNumForSM").val(inputNumVal);
-		co.show({
-			table : getTableBytableId(tableNo),
-			callback : function(){
-				initTables();
-			}
-		});
+		if(getTableBytableId(tableNo).statusValue == 1){
+			Util.msg.alert({
+				title : '温馨提示',
+				msg : tableNo + '号桌已处于就餐状态，如需点菜，请到已点菜界面点菜。'
+			});
+		}else{
+			co.show({
+				table : getTableBytableId(tableNo),
+				callback : function(){
+					initTables();
+				}
+			});
+			Util.dialongDisplay({
+				type:'hide', 
+				renderTo:'divSelectTableNumForTs'
+			});
+			Util.dialongDisplay({
+				type:'hide', 
+				renderTo:'divShowMessageForTableSelect'
+			});
+		}
 	}else{
 		Util.msg.alert({
 			title : '温馨提示',
@@ -250,7 +265,7 @@ function renderToCreateOrder(tableNo, peopleNo){
 				
 			}
 		});
-	}	
+	}
 }
 
 //点击空台后弹出的点菜页面上的点菜按钮
@@ -264,10 +279,6 @@ $("#btnRenderToCreateOrder").click(function(){
 		peopleNo = parseInt($("#txtPeopleNumForSM").val());
 	}	
 	renderToCreateOrder(tableNo, peopleNo);
-	Util.dialongDisplay({
-		type:'hide', 
-		renderTo:'divShowMessageForTableSelect'
-	});
 });
 
 //点击桌号选择页面的确定（点菜）按钮
@@ -282,10 +293,6 @@ $("#btnSubmitForSelectTableNumTS").click(function(){
 	}
 	if(typeForInputTableNum == "createOrder"){
 		renderToCreateOrder(tableNo, peopleNo);	
-		Util.dialongDisplay({
-			type:'hide', 
-			renderTo:'divSelectTableNumForTs'
-		});
 	}else if(typeForInputTableNum == "check"){
 		//判断该餐桌是否已点菜（下单）
 		if(hasTable(tables, tableNo)){
@@ -399,9 +406,9 @@ ts.tt.submit = function(){
 					});
 				}
 			},
-			err : function(request, status, err){
+			error : function(request, status, err){
 				Util.msg.alert({
-					title : '温馨提示',
+					title : '错误',
 					msg : err, 
 				});
 			}

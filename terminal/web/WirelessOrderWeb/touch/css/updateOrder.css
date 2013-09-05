@@ -75,16 +75,16 @@
 }
 #divLeftForKeyboardNumForUO{
 	width: 262px;	
-	height: 370px;
+	height: 350px;
 	float: left;	
 }
 #divRightForKeyboardNumForUO{
-	height: 370px;
+	height: 350px;
 	float: left;
 	width: 87px;	
 }
 #divReasonForKeyboardNumForUO{
-	height: 370px;
+	height: 350px;
 	float: left;
 	width: 375px;
 	overflow-y: auto;

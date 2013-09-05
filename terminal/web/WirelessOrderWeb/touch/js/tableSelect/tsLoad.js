@@ -38,6 +38,11 @@ $(function(){
 });
 
 /**
+ * 定时器，定时刷新餐桌选择页面数据
+ */
+window.setInterval("initTables()", 240000);
+
+/**
  * 初始化餐桌信息，保存到tables数组中
  * freeTables存放空闲餐桌，busyTables存放就餐餐桌
  */
@@ -240,3 +245,14 @@ function nextPage(){
 		showTable(temp, pageNow);
 	}	
 }	
+
+
+
+
+
+
+
+
+
+
+

@@ -62,15 +62,14 @@ function showKeyboardNumForUO(foodName, dishes){
 	});
 	var title = "";
 	title = "<div style = 'width: 50%; float: left;'>" + foodName + "(" + dishes + ")</div>" ;
-	title += "<div class = 'cancelReasonScroll' style = 'float: left; width: 50%; display: none'><input type = 'button' value = '上翻' " +
-	"class = 'keyboardbutton' onclick = 'scrollUp(\"divReasonForKeyboardNumForUO\")' " +
-	"style = 'height: 45px; width: 120px; margin-left: 40px;'/>" +
-	"<input type = 'button' value = '下翻' " +
-	"class = 'keyboardbutton' onclick = 'scrollDown(\"divReasonForKeyboardNumForUO\")' " +
-	"style = 'height: 45px; width: 120px; margin-left: 10px;'/></div>";
+	title += "<div class = 'cancelReasonScroll' style = 'float: left; width: 50%; display: none'>" +
+	"<div class = 'button-base' style = 'height: 45px; width: 120px; margin-left: 20px;'" +
+	"onclick = 'scrollUp(\"divReasonForKeyboardNumForUO\")'>上翻</div>" +	
+	"<div class = 'button-base' style = 'height: 45px; width: 120px; margin-left: 50px;'" +
+	"onclick = 'scrollDown(\"divReasonForKeyboardNumForUO\")'>下翻</div>";
 	//初始化标题信息
 	$("#divTopForKeyboardNumForUO").html("<div style = 'font-size: 20px; " +
-			"font-weight: bold; color: #fff; " +
+			"font-weight: bold;" +
 			"margin: 5px 15px 5px 10px;'>" + title + "</div>");
 	//初始化退菜原因信息
 	var htmlReason = '';
@@ -80,7 +79,11 @@ function showKeyboardNumForUO(foodName, dishes){
 				"style = 'margin: 0 0 5px 8px; height: 66px; width: 165px;'>" +
 				 cancelReasonData[x].reason + "</div>";
 	}
-	if(cancelReasonData.length > 10){
+	htmlReason += htmlReason;
+	htmlReason += htmlReason;
+
+	if(cancelReasonData.length > 2){
+		
 		$(".cancelReasonScroll").show();
 	}
 	$("#divReasonForKeyboardNumForUO").html(htmlReason);
@@ -332,7 +335,7 @@ function cancelForUO(){
  */
 function scrollDown(renderTo){
 	var scrollTop = 0;
-	scrollTop = $("#" + renderTo).scrollTop() + 50;
+	scrollTop = $("#" + renderTo).scrollTop() + 70;
 	$("#" + renderTo).scrollTop(scrollTop);
 }
 
@@ -341,7 +344,7 @@ function scrollDown(renderTo){
  */
 function scrollUp(renderTo){
 	var scrollTop;
-	scrollTop = $("#" + renderTo).scrollTop() - 50;
+	scrollTop = $("#" + renderTo).scrollTop() - 70;
 	$("#" + renderTo).scrollTop(scrollTop);
 };
 
@@ -560,3 +563,67 @@ function submitUpdateOrderHandler(c){
 		});
 	}
 }
+
+/**
+ * 暂结
+ */
+function tempPayForUO(){
+	$.ajax({
+		url : '../PayOrder.do',
+		type : 'post',
+		data : {
+			pin : pin,
+			eraseQuota : uo.order.erasePrice,
+			orderID : uo.order.id,
+			payType : uo.order.settleTypeValue,
+			memberID : uo.order.member,
+			discountID : uo.order.discount.id,
+			payManner : uo.order.payTypeValue,
+			serviceRate : uo.order.serviceRate,
+			cashIncome : '-1',
+			comment : uo.order.comment,
+			pricePlanID : uo.order.pricePlan.id,
+			customNum : uo.order.customNum,
+			tempPay : true
+		},
+		dataType : 'text',
+		success : function(result, status, xhr){
+			result = eval("(" + result + ")");
+			if(result.success){
+				Util.msg.alert({
+					title : '操作成功',
+					msg : result.data
+				});
+			}else{
+				Util.msg.alert({
+					title : '错误',
+					msg : result.data
+				});
+			}
+		},
+		error : function(xhr, status, err){
+			Util.msg.alert({
+				title : '错误',
+				msg : err
+			});
+		}
+	});
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
