@@ -61,16 +61,12 @@ function showKeyboardNumForUO(foodName, dishes){
 		renderTo : 'divKeyboardNumForUO'
 	});
 	var title = "";
-	title = "<div style = 'width: 50%; float: left;'>" + foodName + "(" + dishes + ")</div>" ;
-	title += "<div class = 'cancelReasonScroll' style = 'float: left; width: 50%; display: none'>" +
-	"<div class = 'button-base' style = 'height: 45px; width: 120px; margin-left: 20px;'" +
-	"onclick = 'scrollUp(\"divReasonForKeyboardNumForUO\")'>上翻</div>" +	
-	"<div class = 'button-base' style = 'height: 45px; width: 120px; margin-left: 50px;'" +
-	"onclick = 'scrollDown(\"divReasonForKeyboardNumForUO\")'>下翻</div>";
+	title = "<div>" + foodName + "(" + dishes + ")</div>" ;
+	
 	//初始化标题信息
 	$("#divTopForKeyboardNumForUO").html("<div style = 'font-size: 20px; " +
-			"font-weight: bold;" +
-			"margin: 5px 15px 5px 10px;'>" + title + "</div>");
+			"font-weight: bold; color : white;" +
+			"margin: 10px 15px 5px 20px;'>" + title + "</div>");
 	//初始化退菜原因信息
 	var htmlReason = '';
 	for(x in cancelReasonData){
@@ -78,13 +74,6 @@ function showKeyboardNumForUO(foodName, dishes){
 				"id = 'btnReason" + cancelReasonData[x].id + "' " +
 				"style = 'margin: 0 0 5px 8px; height: 66px; width: 165px;'>" +
 				 cancelReasonData[x].reason + "</div>";
-	}
-	htmlReason += htmlReason;
-	htmlReason += htmlReason;
-
-	if(cancelReasonData.length > 2){
-		
-		$(".cancelReasonScroll").show();
 	}
 	$("#divReasonForKeyboardNumForUO").html(htmlReason);
 	if(cancelReasonData.length > 0){
@@ -305,29 +294,54 @@ $("#btnSubmitForPeopleKeyboardUO").click(function(){
 /**
  * 工具栏的确定按钮,对整个页面信息提交
  */
-function sureForUO(){	
-	for(x in uoFood){
-		for(y in uoCancelFoods){
-			if(uoFood[x].alias == uoCancelFoods[y].alias && uoFood[x].tasteGroup.tastePref == uoCancelFoods[y].dishes){
-				uoFood[x].count = (uoFood[x].count + uoCancelFoods[y].count).toFixed(2);
-				uoFood[x].cancelReason = uoCancelFoods[y].reason.id;
+function sureForUO(){
+	uo.customNum = $("#customNumForUO").html().substring(5);
+	//判断页面信息是否有改动
+	if(uoCancelFoods.length == 0 && uo.order.customNum == uo.customNum){
+		Util.msg.alert({
+			title : '温馨提示',
+			msg : '账单没有修改，不能提交', 
+		});
+	}else{
+		for(x in uoFood){
+			for(y in uoCancelFoods){
+				if(uoFood[x].alias == uoCancelFoods[y].alias && uoFood[x].tasteGroup.tastePref == uoCancelFoods[y].dishes){
+					uoFood[x].count = (uoFood[x].count + uoCancelFoods[y].count).toFixed(2);
+					uoFood[x].cancelReason = uoCancelFoods[y].reason.id;
+				}
 			}
 		}
+		uoCancelFoods = [];
+		uo.updateOrder = uoFood;
+		//对更新的菜品和人数进行提交
+		submitUpdateOrderHandler(uoFood);	
 	}
-	uoCancelFoods = [];
-	uo.updateOrder = uoFood;
-	uo.customNum = $("#customNumForUO").html().substring(5);	
-	//对更新的菜品和人数进行提交
-	submitUpdateOrderHandler(uoFood);	
 }
 
 /**
  * 工具栏的取消按钮,取消对该页面的修改操作
  */
 function cancelForUO(){	
-	uoCancelFoods = [];
-	uoFood = [];
-	toggleContentDisplay({type:'hide', renderTo:'divUpdateOrder'});
+	uo.customNum = $("#customNumForUO").html().substring(5);
+	//判断页面信息是否有改动
+	if(uoCancelFoods.length == 0 && uo.order.customNum == uo.customNum){
+		uoCancelFoods = [];
+		uoFood = [];
+		toggleContentDisplay({type:'hide', renderTo:'divUpdateOrder'});
+	}else{
+		Util.msg.alert({
+			title : '重要',
+			msg : '账单信息已修改，“确定”将不保存这些改动，是否确定？',
+			button : 'YESBACK',
+			fn : function(btn){
+				if(btn == 'yes'){
+					uoCancelFoods = [];
+					uoFood = [];
+					toggleContentDisplay({type:'hide', renderTo:'divUpdateOrder'});
+				}
+			}
+		});
+	}
 }
 
 /**
@@ -335,7 +349,7 @@ function cancelForUO(){
  */
 function scrollDown(renderTo){
 	var scrollTop = 0;
-	scrollTop = $("#" + renderTo).scrollTop() + 70;
+	scrollTop = $("#" + renderTo).scrollTop() + 50;
 	$("#" + renderTo).scrollTop(scrollTop);
 }
 
@@ -344,7 +358,7 @@ function scrollDown(renderTo){
  */
 function scrollUp(renderTo){
 	var scrollTop;
-	scrollTop = $("#" + renderTo).scrollTop() - 70;
+	scrollTop = $("#" + renderTo).scrollTop() - 50;
 	$("#" + renderTo).scrollTop(scrollTop);
 };
 
@@ -460,18 +474,27 @@ $(".deleteOneForKeyboardNumUO").click(function(){
  * 工具栏点菜按钮
  */
 function goToCreateOrder(){
-	co.show({
-		table : uo.table,
-		order : uo.order,
-		callback : function(){
-			initTables();
-			cancelForUO();
-		}
-	});
+	uo.customNum = $("#customNumForUO").html().substring(5);
+	//判断页面信息是否有改动
+	if(uoCancelFoods.length == 0 && uo.order.customNum == uo.customNum){
+		co.show({
+			table : uo.table,
+			order : uo.order,
+			callback : function(){
+				initTables();
+				cancelForUO();
+			}
+		});
+	}else{
+		Util.msg.alert({
+			title : '重要提示',
+			msg : '账单已经修改，请先做“确认修改”操作。'
+		});
+	}
 }
 
 /**
- * 已点菜账单提交操作
+ * 已点菜改单提交操作
  */
 function submitUpdateOrderHandler(c){
 	var orderFoods = c;
@@ -521,6 +544,7 @@ function submitUpdateOrderHandler(c){
 		}	
 		foodPara = '{' + foodPara + '}';	
 		var type = 2;
+		Util.LM.show();
 		$.ajax({
 			url : '../InsertOrder.do',
 			type : 'post',
@@ -535,6 +559,7 @@ function submitUpdateOrderHandler(c){
 				orderDate : uoOther.order.orderDate
 			},
 			success : function(data, status, xhr){
+				Util.LM.hide();
 				Util.msg.alert({
 					title : data.title,
 					msg : data.msg, 
@@ -544,6 +569,7 @@ function submitUpdateOrderHandler(c){
 				});
 			},
 			error : function(request, status, err){
+				Util.LM.hide();
 				Util.msg.alert({
 					title : '温馨提示',
 					msg : err, 
@@ -568,46 +594,58 @@ function submitUpdateOrderHandler(c){
  * 暂结
  */
 function tempPayForUO(){
-	$.ajax({
-		url : '../PayOrder.do',
-		type : 'post',
-		data : {
-			pin : pin,
-			eraseQuota : uo.order.erasePrice,
-			orderID : uo.order.id,
-			payType : uo.order.settleTypeValue,
-			memberID : uo.order.member,
-			discountID : uo.order.discount.id,
-			payManner : uo.order.payTypeValue,
-			serviceRate : uo.order.serviceRate,
-			cashIncome : '-1',
-			comment : uo.order.comment,
-			pricePlanID : uo.order.pricePlan.id,
-			customNum : uo.order.customNum,
-			tempPay : true
-		},
-		dataType : 'text',
-		success : function(result, status, xhr){
-			result = eval("(" + result + ")");
-			if(result.success){
-				Util.msg.alert({
-					title : '操作成功',
-					msg : result.data
-				});
-			}else{
+	uo.customNum = $("#customNumForUO").html().substring(5);
+	//判断页面信息是否有改动
+	if(uoCancelFoods.length == 0 && uo.order.customNum == uo.customNum){
+		Util.LM.show();
+		$.ajax({
+			url : '../PayOrder.do',
+			type : 'post',
+			data : {
+				pin : pin,
+				eraseQuota : uo.order.erasePrice,
+				orderID : uo.order.id,
+				payType : uo.order.settleTypeValue,
+				memberID : uo.order.member,
+				discountID : uo.order.discount.id,
+				payManner : uo.order.payTypeValue,
+				serviceRate : uo.order.serviceRate,
+				cashIncome : '-1',
+				comment : uo.order.comment,
+				pricePlanID : uo.order.pricePlan.id,
+				customNum : uo.order.customNum,
+				tempPay : true
+			},
+			dataType : 'text',
+			success : function(result, status, xhr){
+				Util.LM.hide();
+				result = eval("(" + result + ")");
+				if(result.success){
+					Util.msg.alert({
+						title : '操作成功',
+						msg : result.data
+					});
+				}else{
+					Util.msg.alert({
+						title : '错误',
+						msg : result.data
+					});
+				}
+			},
+			error : function(xhr, status, err){
+				Util.LM.hide();
 				Util.msg.alert({
 					title : '错误',
-					msg : result.data
+					msg : err
 				});
 			}
-		},
-		error : function(xhr, status, err){
-			Util.msg.alert({
-				title : '错误',
-				msg : err
-			});
-		}
-	});
+		});
+	}else{
+		Util.msg.alert({
+			title : '重要提示',
+			msg : '账单已经修改，请先做“确认修改”操作。'
+		});
+	}
 }
 
 

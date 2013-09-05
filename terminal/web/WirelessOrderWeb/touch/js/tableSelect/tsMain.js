@@ -63,6 +63,7 @@ function addTables(o){
     		tempForRegion.push(statusTable[x]);
     		$(".button-base.regionSelect").css("backgroundColor", "#D4F640");
     	    $("#divAllArea").css("backgroundColor", "#4EEE99");
+    	    ts.rn.selectingId = o.id;
     	    $("#" + o.id).css("backgroundColor", "#FFA07A");
     	} 
      }  
@@ -212,34 +213,24 @@ function inputNum(o){
 	$("#" + inputNumId).focus();	
 }
 
-//清除一位数字
-$("#btnBackOneForSTNum").click(function(){
-	var tempNum;
-	tempNum = $("#txtTableNumForTS").val();
-	if(tempNum.length > 0){
-		inputNumVal = tempNum.substring(0, tempNum.length-1);
-		$("#txtTableNumForTS").val(inputNumVal);
-	}
-	$("#" + inputNumId).focus();
-});
-
-//重置数字
-$("#btnBackAllForSTNum").click(function(){
-	inputNumVal = "";
-	$("#txtTableNumForTS").val(inputNumVal);
-	$("#" + inputNumId).focus();
-});
-
-//跳转到点菜界面
+//进入点菜界面
 function renderToCreateOrder(tableNo, peopleNo){
 	if(hasTable(tables, tableNo)){
 		inputNumVal = "";
 		$("#txtTableNumForTS").val(inputNumVal);
 		$("#txtPeopleNumForSM").val(inputNumVal);
 		if(getTableBytableId(tableNo).statusValue == 1){
-			Util.msg.alert({
-				title : '温馨提示',
-				msg : tableNo + '号桌已处于就餐状态，如需点菜，请到已点菜界面点菜。'
+			uo.show({
+				table : getTableBytableId(tableNo)
+			});
+			cancelForUO();
+			co.show({
+				table : uo.table,
+				order : uo.order,
+				callback : function(){
+					initTables();
+					cancelForUO();
+				}
 			});
 		}else{
 			co.show({
@@ -248,15 +239,15 @@ function renderToCreateOrder(tableNo, peopleNo){
 					initTables();
 				}
 			});
-			Util.dialongDisplay({
-				type:'hide', 
-				renderTo:'divSelectTableNumForTs'
-			});
-			Util.dialongDisplay({
-				type:'hide', 
-				renderTo:'divShowMessageForTableSelect'
-			});
 		}
+		Util.dialongDisplay({
+			type:'hide', 
+			renderTo:'divSelectTableNumForTs'
+		});
+		Util.dialongDisplay({
+			type:'hide', 
+			renderTo:'divShowMessageForTableSelect'
+		});
 	}else{
 		Util.msg.alert({
 			title : '温馨提示',
@@ -381,6 +372,7 @@ ts.tt.submit = function(){
 	
 	//提交转台信息
 	if(oldflag && newflag){
+		Util.LM.show();
 		$.ajax({
 			url : '../TransTable.do',
 			type : 'post',
@@ -390,6 +382,7 @@ ts.tt.submit = function(){
 				newTableAlias : newTable
 			},
 			success : function(data, status, xhr){
+				Util.LM.hide();
 				if(data.success){
 					Util.msg.alert({
 						title : data.title,
@@ -450,32 +443,11 @@ ts.selectingTxt = function(c){
 	$("#" + inputNumId).select();
 };
 
-/**
- * 清除一位数字
- */
-ts.backOne = function(){
-	var tempNum;
-	tempNum = $("#" + inputNumId).val();
-	if(tempNum.length > 0){
-		inputNumVal = tempNum.substring(0, tempNum.length-1);
-		$("#" + inputNumId).val(inputNumVal);
-	}
-	$("#" + inputNumId).focus();	
-};
-
-/**
- * 重置数字
- */
-ts.backAll = function(){
-	inputNumVal = "";
-	$("#" + inputNumId).val(inputNumVal);
-	$("#" + inputNumId).focus();
-};
-
 //点击工具栏上的结账按钮
 function checkOnTS(){
 	showSelectTableNumTS("check");
 }
+
 //弹出和关闭桌号选择界面
 function showSelectTableNumTS(type){
 	Util.dialongDisplay({
@@ -503,3 +475,26 @@ function showSelectTableNumTS(type){
 	$("#txtTableNumForTS").select();
 	inputNumId  = "txtTableNumForTS";
 }
+
+/**
+ * 清除一位数字
+ */
+ts.backOne = function(){
+	var tempNum;
+	tempNum = $("#" + inputNumId).val();
+	if(tempNum.length > 0){
+		inputNumVal = tempNum.substring(0, tempNum.length-1);
+		$("#" + inputNumId).val(inputNumVal);
+	}
+	$("#" + inputNumId).focus();	
+};
+
+/**
+ * 重置数字
+ */
+ts.backAll = function(){
+	inputNumVal = "";
+	$("#" + inputNumId).val(inputNumVal);
+	$("#" + inputNumId).focus();
+};
+

@@ -19,6 +19,7 @@ var count;
 //选中的退菜id
 var selectingReasonId = "";
 var selectingCancelReason;
+
 /**
  * 初始化菜单数据，存放在uoFood数组中
  * @param {object} data 餐桌对象

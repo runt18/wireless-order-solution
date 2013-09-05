@@ -23,8 +23,6 @@ var region = [];
 var inputNumId;
 //定义输入框显示的值
 var inputNumVal = "";
-//选中区域的id
-var selectingRegionId;
 //设置输入桌号界面的类型
 var typeForInputTableNum;
 //设置当前状态类型（busy， free, allStatus）
@@ -88,17 +86,29 @@ function initTables(){
 							regionId.push(tables[x].region.id);
 						}
 					}
-					//添加区域信息
-					var regionHtml = "";
-					for(x in region){
-						regionHtml += "<div class='button-base regionSelect' id='region"+region[x].id+
-							"' style='margin-bottom: 2px;' onclick='addTables(this)'>"+region[x].name+"</div>";		
-					}
-					$("#divShowRegion").html(regionHtml);
+//					for(var i = 2; i < 12; i++){
+//						region.push({"id" : i, "name" : "临时区域"+i});
+//					}
+					
+					ts.rn.selectingId = 'divAllArea';
+					ts.rn.pageNow = 1;
+					var regionH = $("#divToolRightForSelect").height() - 6 * 65;
+					ts.rn.limit = Math.floor(regionH/62);
+					ts.rn.pageCount = Math.ceil(region.length/ts.rn.limit);
+					showRegion(region, ts.rn.pageNow);
+					
+//					//添加区域信息
+//					var regionHtml = "";
+//					
+//					for(x in region){
+//						regionHtml += "<div class='button-base regionSelect' id='region"+region[x].id+
+//							"' style='margin-bottom: 2px;' onclick='addTables(this)'>"+region[x].name+"</div>";		
+//					}
+//					$("#divShowRegion").html(regionHtml);
 					//设置区域未选中状态的背景色（#D4F640）
-					$(".button-base.regionSelect").css("backgroundColor", "#D4F640");
+//					$(".button-base.regionSelect").css("backgroundColor", "#D4F640");
 					//默认选中全部状态区域（#FFA07A）
-					$("#divAllArea").css("backgroundColor", "#FFA07A");
+//					$("#divAllArea").css("backgroundColor", "#FFA07A");
 					//默认显示全部状态下的全部区域
 					statusType = "allStatus";
 					tempForAllStatus = tables;
@@ -123,6 +133,25 @@ function initTables(){
 				});
 			}
 		});	
+}
+
+/**
+ * 显示区域
+ */
+function showRegion(temp, pageNow){
+	//添加区域信息
+	var pageRegion;
+	var limit = ts.rn.limit;
+	pageRegion = getPagingData((pageNow-1) * limit, limit, temp, true);
+	var regionHtml = "";
+	for(x in pageRegion){
+		regionHtml += "<div class='button-base regionSelect' id='region"+pageRegion[x].id+
+			"' style='margin-bottom: 2px;' onclick='addTables(this)'>"+pageRegion[x].name+"</div>";		
+	}
+	$("#divShowRegion").html(regionHtml);
+	//设置区域未选中状态的背景色（#D4F640）
+	$(".button-base.regionSelect").css("backgroundColor", "#D4F640");
+	$("#" + ts.rn.selectingId).css("backgroundColor", "#FFA07A");
 }
 
 /**
@@ -155,8 +184,8 @@ function showTable(temp, pageNow){
 		for(x in busyTables){
 			$("#divtable" + busyTables[x].alias).css("backgroundColor", "#FF0");
 		}
-		$("#spanPageNow").html("第" + pageNow + "页");
-		$("#spanAllPage").html("共" + n + "页");
+		$("#spanPageNowTS").html("第" + pageNow + "页/");
+		$("#spanAllPageTS").html("共" + n + "页");
 	}else{
 		$("#divTableShowForSelect").html("");
 	}	
@@ -246,7 +275,29 @@ function nextPage(){
 	}	
 }	
 
+/**
+ * 区域上翻
+ */
+ts.rn.prePage = function(){
+	if(ts.rn.pageNow < 2){
+		return;
+	}else{
+		ts.rn.pageNow = ts.rn.pageNow - 1;
+		showRegion(region, ts.rn.pageNow);
+	}
+};
 
+/**
+ * 区域下翻
+ */
+ts.rn.nextPage = function(){
+	if(ts.rn.pageNow == ts.rn.pageCount || ts.rn.pageNow == ts.rn.pageCount){
+		return;
+	}else{
+		ts.rn.pageNow = ts.rn.pageNow + 1;
+		showRegion(region, ts.rn.pageNow);
+	}
+};
 
 
 
