@@ -60,36 +60,40 @@ public class Staff implements Parcelable, Jsonable{
 	
 
 	public static class DefAdminBuilder extends StaffInsertBuilder{
-		public DefAdminBuilder(){
-			setName("管理员");
-			setPwd("202cb962ac59075b964b07152d234b70");
+		
+		public final static String ADMIN = "管理员";
+		
+		public DefAdminBuilder(String pwd, int restaurantId, Role role){
+			super(ADMIN, pwd, restaurantId, role);
 			setType(Type.RESERVED);
-			
 		}
 	}
 	
 	public static class StaffInsertBuilder{
-		private int restaurantId;
-		private Role role;
+		private final int restaurantId;
+		private final Role role;
+		private final String name;
+		private final String pwd;
 		private String mobile;
-		private String name;
-		private String pwd;
 		private Type type = Type.NORMAL;
-		
+
+		public StaffInsertBuilder(String name, String pwd, int restaurantId, Role role){
+			this.name = name;
+			this.restaurantId = restaurantId;
+			this.role = role;
+			this.pwd = pwd;
+		}
 		
 		public int getRestaurantId() {
 			return restaurantId;
 		}
-		public void setRestaurantId(int restaurantId) {
-			this.restaurantId = restaurantId;
-		}
 		public Role getRole() {
 			return role;
 		}
-		public void setRole(Role role) {
-			this.role = role;
-		}
 		public String getMobile() {
+			if(mobile == null){
+				mobile = "";
+			}
 			return mobile;
 		}
 		public void setMobile(String mobile) {
@@ -98,14 +102,8 @@ public class Staff implements Parcelable, Jsonable{
 		public String getName() {
 			return name;
 		}
-		public void setName(String name) {
-			this.name = name;
-		}
 		public String getPwd() {
 			return pwd;
-		}
-		public void setPwd(String pwd) {
-			this.pwd = pwd;
 		}
 		public Type getType() {
 			return type;
@@ -222,6 +220,9 @@ public class Staff implements Parcelable, Jsonable{
 	}
 	
 	public String getMobile() {
+		if(mobile == null){
+			mobile = "";
+		}
 		return mobile;
 	}
 

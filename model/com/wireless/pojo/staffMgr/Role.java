@@ -93,9 +93,10 @@ public class Role implements Jsonable, Parcelable{
 		
 	}
 	
-	public static class DefAdminInsertBuilder extends InsertBuilder{
-		public DefAdminInsertBuilder(){
-			setName("管理员");
+	//The helper insert builder for '管理员'
+	public static class DefAdminBuilder extends InsertBuilder{
+		public DefAdminBuilder(int restaurantId){
+			super(restaurantId, Category.ADMIN.getDesc());
 			setType(Type.RESERVED);
 			setCategoty(Category.ADMIN);
 			
@@ -109,12 +110,15 @@ public class Role implements Jsonable, Parcelable{
 			addPrivileges(new Privilege(Privilege.Code.MEMBER));
 			addPrivileges(new Privilege(Privilege.Code.RE_PAID));
 			addPrivileges(new Privilege(Privilege.Code.SYSTEM));
+			addPrivileges(new Privilege(Privilege.Code.PAY));
+			addPrivileges(new Privilege(Privilege.Code.CHECK_ORDER));
 		}
 	}
 	
+	//The helper insert builder for '老板'
 	public static class DefBossBuilder extends InsertBuilder{
-		public DefBossBuilder(){
-			setName("老板");
+		public DefBossBuilder(int restaurantId){
+			super(restaurantId, Category.BOSS.getDesc());
 			setType(Type.RESERVED);
 			setCategoty(Category.BOSS);
 			addPrivileges(new Privilege(Privilege.Code.FRONT_BUSINESS));
@@ -127,12 +131,15 @@ public class Role implements Jsonable, Parcelable{
 			addPrivileges(new Privilege(Privilege.Code.MEMBER));
 			addPrivileges(new Privilege(Privilege.Code.RE_PAID));
 			addPrivileges(new Privilege(Privilege.Code.SYSTEM));
+			addPrivileges(new Privilege(Privilege.Code.PAY));
+			addPrivileges(new Privilege(Privilege.Code.CHECK_ORDER));
 		}
 	}
 	
+	//The helper insert builder for '财务'
 	public static class DefFinanceBuilder extends InsertBuilder{
-		public DefFinanceBuilder(){
-			setName("财务");
+		public DefFinanceBuilder(int restaurantId){
+			super(restaurantId, Category.FINANCE.getDesc());
 			setType(Type.NORMAL);
 			setCategoty(Category.FINANCE);
 			addPrivileges(new Privilege(Privilege.Code.FRONT_BUSINESS));
@@ -144,55 +151,72 @@ public class Role implements Jsonable, Parcelable{
 			addPrivileges(new Privilege(Privilege.Code.INVENTORY));
 			addPrivileges(new Privilege(Privilege.Code.MEMBER));
 			addPrivileges(new Privilege(Privilege.Code.RE_PAID));
+			addPrivileges(new Privilege(Privilege.Code.PAY));
+			addPrivileges(new Privilege(Privilege.Code.CHECK_ORDER));
 		}
 	}
 	
+	//The helper insert builder for '店长'
 	public static class DefManagerBuilder extends InsertBuilder{
-		public DefManagerBuilder(){
-			setName("部长");
+		public DefManagerBuilder(int restaurantId){
+			super(restaurantId, Category.MANAGER.getDesc());
 			setType(Type.NORMAL);
 			setCategoty(Category.MANAGER);
 			addPrivileges(new Privilege(Privilege.Code.FRONT_BUSINESS));
-			addPrivileges(new Privilege(Privilege.Code.BASIC));
 			addPrivileges(new Privilege(Privilege.Code.CANCEL_FOOD));
 			addPrivileges(new Privilege(Privilege.Code.DISCOUNT));
 			addPrivileges(new Privilege(Privilege.Code.GIFT));
 			addPrivileges(new Privilege(Privilege.Code.RE_PAID));
+			addPrivileges(new Privilege(Privilege.Code.PAY));
+			addPrivileges(new Privilege(Privilege.Code.CHECK_ORDER));
+			addPrivileges(new Privilege(Privilege.Code.BASIC));
 		}
 	}
 	
+	//The helper insert builder for '收银员'
+	public static class DefCashierBuilder extends InsertBuilder{
+		public DefCashierBuilder(int restaurantId){
+			super(restaurantId, Category.CASHIER.getDesc());
+			setType(Type.NORMAL);
+			setCategoty(Category.CASHIER);
+			addPrivileges(new Privilege(Privilege.Code.FRONT_BUSINESS));
+			addPrivileges(new Privilege(Privilege.Code.CANCEL_FOOD));
+			addPrivileges(new Privilege(Privilege.Code.DISCOUNT));
+			addPrivileges(new Privilege(Privilege.Code.GIFT));
+			addPrivileges(new Privilege(Privilege.Code.RE_PAID));
+			addPrivileges(new Privilege(Privilege.Code.PAY));
+			addPrivileges(new Privilege(Privilege.Code.CHECK_ORDER));
+		}
+	}
+	
+	//The helper insert builder for '服务员'
 	public static class DefWaiterBuilder extends InsertBuilder{
-		public DefWaiterBuilder(){
-			setName("服务员");
+		public DefWaiterBuilder(int restaurantId){
+			super(restaurantId, Category.WAITER.getDesc());
 			setType(Type.NORMAL);
 			setCategoty(Category.WAITER);
 			addPrivileges(new Privilege(Privilege.Code.FRONT_BUSINESS));
 			addPrivileges(new Privilege(Privilege.Code.CANCEL_FOOD));
-			addPrivileges(new Privilege(Privilege.Code.DISCOUNT));
-			addPrivileges(new Privilege(Privilege.Code.GIFT));
-			addPrivileges(new Privilege(Privilege.Code.RE_PAID));
 		}
 	}
 	
 	public static class InsertBuilder{
-		private int restaurantId;
-		private String name;
+		private final int restaurantId;
+		private final String name;
 		private Type type = Type.NORMAL;
 		private Category categoty;
 		private List<Privilege> privileges = SortedList.newInstance();
 		
+		public InsertBuilder(int restaurantId, String name){
+			this.restaurantId = restaurantId;
+			this.name = name;
+		}
 		
 		public int getRestaurantId() {
 			return restaurantId;
 		}
-		public void setRestaurantId(int restaurantId) {
-			this.restaurantId = restaurantId;
-		}
 		public String getName() {
 			return name;
-		}
-		public void setName(String name) {
-			this.name = name;
 		}
 		public Type getType() {
 			return type;

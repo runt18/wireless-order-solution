@@ -9,7 +9,7 @@ import com.wireless.json.Jsonable;
 
 public class MaterialCate implements Jsonable {
 	
-	public enum Type{
+	public static enum Type{
 		/**
 		 * value : 1
 		 * text : 商品

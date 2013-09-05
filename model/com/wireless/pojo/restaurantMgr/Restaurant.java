@@ -1,10 +1,68 @@
 package com.wireless.pojo.restaurantMgr;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
 import com.wireless.parcel.Parcel;
 import com.wireless.parcel.Parcelable;
+import com.wireless.pojo.util.DateUtil;
 
 
 public class Restaurant implements Parcelable{
+	
+	public static class InsertBuilder{
+		private final String account;
+		private final String restaurantName;
+		private final long expireDate;
+		private final String pwd;
+		private String restaurantInfo;
+		private RecordAlive recordAlive = RecordAlive.HALF_A_YEAR;
+		private String tele1;
+		private String tele2;
+		private String address;
+		
+		public InsertBuilder(String account, String restaurantName, long expireDate, String pwd){
+			this.account = account;
+			this.restaurantName = restaurantName;
+			this.expireDate = expireDate;
+			this.pwd = pwd;
+		}
+		
+		public InsertBuilder setRestaurantInfo(String info){
+			this.restaurantInfo = info;
+			return this;
+		}
+		
+		public InsertBuilder setRecordAlive(RecordAlive recordAlive){
+			this.recordAlive = recordAlive;
+			return this;
+		}
+		
+		public InsertBuilder setTele1(String tele1){
+			this.tele1 = tele1;
+			return this;
+		}
+		
+		public InsertBuilder setTele2(String tele2){
+			this.tele2 = tele2;
+			return this;
+		}
+		
+		public InsertBuilder setAddress(String address){
+			this.address = address;
+			return this;
+		}
+		
+		public String getPwd(){
+			return this.pwd;
+		}
+		
+		public Restaurant build(){
+			return new Restaurant(this);
+		}
+	}
 	
 	public final static byte RESTAURANT_PARCELABLE_COMPLEX = 0;
 	public final static byte RESTAURANT_PARCELABLE_SIMPLE = 1;
@@ -48,6 +106,7 @@ public class Restaurant implements Parcelable{
 	private String address;
 	private float liveness;
 	private long birthDate;
+	private long expireDate;
 	
 	public Restaurant(){
 		
@@ -55,6 +114,22 @@ public class Restaurant implements Parcelable{
 	
 	public Restaurant(int id){
 		this.id = id;
+	}
+	
+	private Restaurant(InsertBuilder builder){
+		setAccount(builder.account);
+		setName(builder.restaurantName);
+		setInfo(builder.restaurantInfo);
+		setRecordAlive(builder.recordAlive.getSeconds());
+		setTele1(builder.tele1);
+		setTele2(builder.tele2);
+		setAddress(builder.address);
+		setExpireDate(builder.expireDate);
+		String now = new SimpleDateFormat(DateUtil.Pattern.DATE.getPattern(), Locale.getDefault()).format(new Date());
+		try {
+			setBirthDate(new SimpleDateFormat(DateUtil.Pattern.DATE.getPattern(), Locale.getDefault()).parse(now).getTime());
+		} catch (ParseException ignored) {
+		}
 	}
 	
 	public int getId() {
@@ -108,6 +183,9 @@ public class Restaurant implements Parcelable{
 	}
 	
 	public String getTele1() {
+		if(tele1 == null){
+			tele1 = "";
+		}
 		return tele1;
 	}
 	
@@ -116,6 +194,9 @@ public class Restaurant implements Parcelable{
 	}
 	
 	public String getTele2() {
+		if(tele2 == null){
+			tele2 = "";
+		}
 		return tele2;
 	}
 	
@@ -124,6 +205,9 @@ public class Restaurant implements Parcelable{
 	}
 	
 	public String getAddress() {
+		if(address == null){
+			address = "";
+		}
 		return address;
 	}
 	
@@ -150,6 +234,14 @@ public class Restaurant implements Parcelable{
 		this.liveness = liveness;
 	}
 	
+	public long getExpireDate() {
+		return expireDate;
+	}
+
+	public void setExpireDate(long expireDate) {
+		this.expireDate = expireDate;
+	}
+
 	@Override
 	public int hashCode(){
 		return id * 31 + 17;
