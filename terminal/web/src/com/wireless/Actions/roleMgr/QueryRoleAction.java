@@ -28,7 +28,7 @@ public class QueryRoleAction extends Action{
 		try{
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
-			root = RoleDao.getRoles(staff, null, null);
+			root = RoleDao.getRoles(staff, null, " ORDER BY cate");
 		}catch(Exception e){
 			e.printStackTrace();
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, WebParams.TIP_CODE_EXCEPTION, WebParams.TIP_CONTENT_SQLEXCEPTION);

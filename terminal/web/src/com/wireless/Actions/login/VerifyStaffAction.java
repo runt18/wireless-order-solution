@@ -29,7 +29,7 @@ public class VerifyStaffAction extends Action{
 			
 		}catch(BusinessException e){
 			e.printStackTrace();
-			jobject.initTip(false, WebParams.TIP_TITLE_DEFAULT, e.getMessage());
+			jobject.initTip(false, WebParams.TIP_TITLE_DEFAULT, e.getCode(), e.getMessage());
 		}
 		finally{
 			response.getWriter().print(jobject.toString());

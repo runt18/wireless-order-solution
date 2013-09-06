@@ -29,24 +29,26 @@ public class QueryStaffAction extends Action {
 			throws Exception {
 
 		PrintWriter out = null;
-
+		String pin = (String) request.getAttribute("pin");
 		String start = request.getParameter("start");
 		String limit = request.getParameter("limit");
+		String isName =request.getParameter("isName");
 		
 		JObject jobject = new JObject();
 		List<Staff> staffList = new ArrayList<Staff>();
+		Staff name = new Staff();
 		int index = 0;
 		int pageSize = 0;
 		if (!(start == null)) {
 			index = Integer.parseInt(start);
 			pageSize = Integer.parseInt(limit);
 		}
-
+		
 
 		// 是否分頁
 		String isPaging = request.getParameter("isPaging");
 		// 是否combo
-		String isCombo = request.getParameter("isCombo");
+		//String isCombo = request.getParameter("isCombo");
 		Map<Object, Object> other = new HashMap<Object, Object>();
 		try {
 			// 解决后台中文传到前台乱码
@@ -96,7 +98,16 @@ public class QueryStaffAction extends Action {
 				// 全部
 				filterCondition = "";
 			}*/
-			staffList = StaffDao.getStaffs(Integer.parseInt(restaurantID));
+			if(pin != null && isName != null){
+				name = StaffDao.verify(Integer.parseInt(pin));
+				other.put("name", name.getName());
+			}else {
+				staffList = StaffDao.getStaffs(Integer.parseInt(restaurantID));
+				jobject.setTotalProperty(staffList.size());
+				staffList = DataPaging.getPagingData(staffList, isPaging, index, pageSize);
+				jobject.setRoot(staffList);
+			}
+			
 			
 			jobject.setMsg("normal");
 			
@@ -112,17 +123,6 @@ public class QueryStaffAction extends Action {
 			e.printStackTrace();
 			jobject.initTip(false, WebParams.TIP_TITLE_DEFAULT, e.getMessage());
 		} finally {
-			if (isCombo.equals("true")) {
-				
-			} else {
-				jobject.setTotalProperty(staffList.size());
-				staffList = DataPaging.getPagingData(staffList, isPaging, index, pageSize);
-			}	
-			if(request.getAttribute("pin") != null){
-				other.put("pin", request.getAttribute("pin"));
-			}
-			
-			jobject.setRoot(staffList);
 			jobject.setOther(other);
 			out.write(jobject.toString());
 		}

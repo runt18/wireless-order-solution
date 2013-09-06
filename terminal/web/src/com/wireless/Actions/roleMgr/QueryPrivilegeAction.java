@@ -127,29 +127,6 @@ public class QueryPrivilegeAction extends DispatchAction{
 					}
 					tree.append("{");
 
-					
-/*					if(root.get(i).getCode() == Code.DISCOUNT){
-						if(rolePrivilege.indexOf(root.get(i)) < 0){
-							tree.append("leaf:false");
-							StringBuilder children = new StringBuilder();
-							
-							for (int j = 0; j < root.get(i).getDiscounts().size(); j++) {
-								if(j>0){
-									children.append(",");
-								}
-								children.append("{");
-								children.append("leaf:true");
-								children.append(",text:'" + root.get(i).getDiscounts().get(j).getName() + "'");
-								children.append(",checked:false");
-								children.append(",discountId:'" + root.get(i).getDiscounts().get(j).getId() + "'");
-								children.append(",isDiscount:true");
-								children.append("}");
-							}
-							tree.append(",children : [" + children.toString() + "]");
-							tree.append(",checked:true");
-							continue;
-						}
-					}*/
 					int index = rolePrivilege.indexOf(root.get(i));
 					if(index >= 0){
 						if(root.get(i).getCode() == Code.DISCOUNT){
@@ -171,6 +148,9 @@ public class QueryPrivilegeAction extends DispatchAction{
 								}else{
 									int disIndex = rolePrivilege.get(index).getDiscounts().indexOf(root.get(i).getDiscounts().get(j));
 									if(disIndex >= 0){
+										if(root.get(i).getDiscounts().get(j).getStatus() == Discount.Status.RESERVED || root.get(i).getDiscounts().get(j).getStatus() == Discount.Status.DEFAULT_RESERVED){
+											children.append(",disabled:true");
+										}
 										children.append(",checked:true");
 									}else{
 										children.append(",checked:false");
@@ -199,7 +179,13 @@ public class QueryPrivilegeAction extends DispatchAction{
 								children.append("{");
 								children.append("leaf:true");
 								children.append(",text:'" + root.get(i).getDiscounts().get(j).getName() + "'");
-								children.append(",checked:false");
+								if(root.get(i).getDiscounts().get(j).getStatus() == Discount.Status.RESERVED || root.get(i).getDiscounts().get(j).getStatus() == Discount.Status.DEFAULT_RESERVED){
+									children.append(",checked:true");
+									children.append(",disabled:true");
+								}else{
+									children.append(",checked:false");
+								}
+								
 								children.append(",discountId:'" + root.get(i).getDiscounts().get(j).getId() + "'");
 								children.append(",isDiscount:true");
 								children.append("}");

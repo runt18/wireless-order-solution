@@ -15,7 +15,6 @@ import com.wireless.json.JObject;
 import com.wireless.pojo.staffMgr.Role;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.staffMgr.Staff.StaffInsertBuilder;
-import com.wireless.util.Util;
 import com.wireless.util.WebParams;
 
 public class InsertStaffAction extends Action {
@@ -33,16 +32,11 @@ public class InsertStaffAction extends Action {
 			// get the query condition
 			String staffName = request.getParameter("staffName");
 			String staffPwd = request.getParameter("staffPwd");
-			String pwdMd5 = Util.getMD5Str(staffPwd);
 			String roleId = request.getParameter("roleId");
 			String tele = request.getParameter("tele");
 			
-			StaffInsertBuilder builder = new StaffInsertBuilder();
+			StaffInsertBuilder builder = new StaffInsertBuilder(staffName, staffPwd, staff.getRestaurantId(), new Role(Integer.parseInt(roleId)));
 			builder.setMobile(tele);
-			builder.setName(staffName);
-			builder.setPwd(pwdMd5);
-			builder.setRestaurantId(staff.getRestaurantId());
-			builder.setRole(new Role(Integer.parseInt(roleId)));
 			
 			StaffDao.insertStaff(builder);
 			jobject.initTip(true, "添加成功");

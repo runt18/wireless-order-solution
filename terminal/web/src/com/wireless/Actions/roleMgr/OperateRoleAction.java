@@ -38,9 +38,7 @@ public class OperateRoleAction extends DispatchAction{
 		try{
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 
-			InsertBuilder builder = new InsertBuilder();
-			builder.setName(roleName);
-			builder.setRestaurantId(staff.getRestaurantId());
+			InsertBuilder builder = new InsertBuilder(staff.getRestaurantId(), roleName);
 			
 			if(modelId != null && !modelId.trim().isEmpty()){
 				Role model = RoleDao.getRoleById(staff, Integer.parseInt(modelId));
@@ -54,7 +52,10 @@ public class OperateRoleAction extends DispatchAction{
 			
 		}catch(SQLException e){
 			e.printStackTrace();
-			jobject.initTip(false, e.getMessage(), 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
+			jobject.initTip(false, WebParams.TIP_TITLE_WARNING, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
+		}catch(BusinessException e){
+			e.printStackTrace();
+			jobject.initTip(false,  9999, e.getMessage());
 		}finally{
 			response.getWriter().print(jobject.toString());
 		}
@@ -103,9 +104,6 @@ public class OperateRoleAction extends DispatchAction{
 		
 		
 		try{
-			if(privileges.trim().isEmpty()){
-				throw new BusinessException("未选择任何权限");
-			}
 			
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 		
@@ -120,7 +118,9 @@ public class OperateRoleAction extends DispatchAction{
 			if(privileges != null){
 				String[] privilegeArray = privileges.split(",");
 				for (String string : privilegeArray) {
-					newPId.add(string);
+					if(!string.isEmpty()){
+						newPId.add(string);
+					}
 				}
 				if(discounts != null && !discounts.trim().isEmpty()){
 					String[] discountArray = discounts.split(",");
