@@ -465,9 +465,10 @@ Ext.onReady(function(){
 		frame : true,
 		bodyStyle : 'backgroundColor:#FFFFFF; border:1px solid #99BBE8;',
 		loader : new Ext.tree.TreeLoader({
-			dataUrl : '../../QueryDeptTree.do?time=' + new Date(),
+			dataUrl : '../../QueryDeptTree.do?time='+new Date(),
 			baseParams : {
-				'restaurantID' : restaurantID
+				'restaurantID' : restaurantID,
+				//time : new Date()
 			}
 		}),
 		root : new Ext.tree.AsyncTreeNode({

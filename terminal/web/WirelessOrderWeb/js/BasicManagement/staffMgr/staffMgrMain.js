@@ -1,5 +1,50 @@
 ﻿
+function setParentNodeCheckState(node){
+	var parentNode = node.parentNode;  
+	if (parentNode != null) {  
+		var checkBox = parentNode.getUI().checkbox;  
+		var isAllChildChecked = true;  
+		var someChecked = false; 
+		var childCount = parentNode.childNodes.length;  
+		for (var i = 0; i < childCount; i++) {  
+			var child = parentNode.childNodes[i]; 
+			if (child.attributes.checked) { 
+				someChecked = true; 
+			}	else if (child.getUI().checkbox.indeterminate == true && child.getUI().checkbox.checked == false) { 
+				someChecked = true;  
+				isAllChildChecked = false; 
+				break; 
+			}else { 
+				isAllChildChecked = false; 
+			}  
+		}
+		
+		if (isAllChildChecked && someChecked) {
+			parentNode.attributes.checked = true;
+			if (checkBox != null) {
+				checkBox.indeterminate = false;
+				checkBox.checked = true;
+			}
+			
+		}else if (someChecked) {
+			parentNode.attributes.checked = false;
+			if (checkBox != null) {
+				checkBox.indeterminate = true;
+				checkBox.checked = false;
+			}
+			
+		}else{
+			parentNode.attributes.checked = false;
+			if (checkBox != null) {
+				checkBox.indeterminate = false;
+				checkBox.checked = false;
+			}
+		}
+		this.setParentNodeCheckState(parentNode);
+		
+	}
 
+}
 
 var changePwdWin = new Ext.Window({
 	layout : 'fit',
@@ -419,24 +464,6 @@ var referRoleComb = new Ext.form.ComboBox({
 	readOnly : true,
 });
 
-var roleCateComb = new Ext.form.ComboBox({
-	fieldLabel : '角色种类',
-	forceSelection : true,
-	width : 130,
-	id : 'combRoleCate',
-	store : new Ext.data.SimpleStore({
-		fields : [ 'value', 'text' ],
-		data : roleType
-	}),
-	valueField : 'value',
-	displayField : 'text',
-	typeAhead : true,
-	mode : 'local',
-	triggerAction : 'all',
-	selectOnFocus : true,
-	allowBlank : false,
-	readOnly : true,
-});
 
 
 
@@ -501,12 +528,9 @@ function operateStaff(c){
 		var confirmPsw = Ext.getCmp('txtStaffPwdConfirm');
 		Ext.getCmp('txtPhone').setValue(ss.data.mobile);
 		Ext.getCmp('txtStaffId').setValue(ss.data.staffID);
-		psw.setValue(ss.data.staffPassword);
-		confirmPsw.setValue(ss.data.staffPassword);
-		
-		Ext.getCmp('combChooseRole').setValue(ss.data.roleName);
-		
-		Ext.getCmp('combChooseRole').disable();
+		psw.setValue(encrypt);
+		confirmPsw.setValue(encrypt);
+		Ext.getCmp('combChooseRole').setValue(ss.data.role.id);
 		
 	}
 }
@@ -528,8 +552,7 @@ function operateRole(c){
 		var ss = roleGrid.getSelectionModel().getSelected();
 		Ext.getCmp('txtRoleName').setValue(ss.data.name);
 		Ext.getCmp('txtRoleId').setValue(ss.data.id);
-		Ext.getCmp('combRoleCate').setValue(ss.data.categoryText);
-		Ext.getCmp('combRoleCate').disable();
+		Ext.getCmp('combReferRole').setValue(ss.data.categoryText);
 		
 		Ext.getCmp('combReferRole').disable();
 		
@@ -553,6 +576,7 @@ function operateRole(c){
 								if(jr.success){
 									Ext.example.msg(jr.title, jr.msg);
 								}else{
+									jr['icon'] = Ext.MessageBox.WARNING;
 									Ext.ux.showMsg(jr);
 								}
 								
@@ -652,6 +676,9 @@ staffAddWin = new Ext.Window({
 				}
 				
 				if(staffAddPwd == staffAddPwdCon){
+					if(staffAddPwd == encrypt){
+						staffAddPwd = '';
+					}
 					Ext.Ajax.request({
 						url : '../../' + url,
 						params : {
@@ -716,12 +743,18 @@ staffAddWin = new Ext.Window({
 			
 			Ext.getCmp('combChooseRole').setValue('');
 			Ext.getCmp('combChooseRole').clearInvalid();
-			Ext.getCmp('combChooseRole').enable();
 			
 			Ext.getCmp('txtPhone').setValue('');
 
 		}
-	}
+	},
+	keys : [{
+		key : Ext.EventObject.ENTER,
+		scope : this,
+		fn : function(){
+			Ext.getCmp("btnSaveStaff").handler();
+		}
+	}]
 });
 
 
@@ -748,9 +781,6 @@ var roleAddWin = new Ext.Window({
 			id : 'txtRoleName',
 			allowBlank : false,
 			width : 130
-		}, roleCateComb, {
-			xtype : 'label',
-			html  : '&nbsp;'
 		}, referRoleComb]
 	}],
 	bbar : ['->',{
@@ -758,39 +788,40 @@ var roleAddWin = new Ext.Window({
 		id : 'btnAddRole',
 		iconCls : 'btn_save',
 		handler : function(){
-			var roleId = Ext.getCmp('txtRoleId').getValue();
-			var roleName = Ext.getCmp('txtRoleName').getValue();
-			var roleCate = Ext.getCmp('combRoleCate').getValue();
-			var roleModelId = Ext.getCmp('combReferRole').getValue();
-			var dataSource = '';
-			if(roleAddWin.operationType == 'insert'){
-				dataSource = 'insert';
-			}else if(roleAddWin.operationType == 'update'){
-				dataSource = 'update';
-			}
-			Ext.Ajax.request({
-				url : '../../OperateRole.do',
-				params : {
-					dataSource : dataSource,
-					roleName : roleName,
-					roleCate : roleCate,
-					roleId : roleId, 
-					modelId : roleModelId
-				},
-				success : function(res, opt){
-					Ext.getCmp('roleGrid').store.reload();
-					var jr = Ext.decode(res.responseText);
-					if(jr.success){
-						roleAddWin.hide();
-						Ext.example.msg(jr.title, jr.msg);
-					}else{
-						Ext.ux.showMsg(jr);
-					}
-				},
-				failure : function(res, opt){
-					Ext.ux.showMsg(Ext.decode(res.responseText));
+			if(Ext.getCmp('txtRoleName').isValid()){
+				var roleId = Ext.getCmp('txtRoleId').getValue();
+				var roleName = Ext.getCmp('txtRoleName').getValue();
+				var roleModelId = Ext.getCmp('combReferRole').getValue();
+				var dataSource = '';
+				if(roleAddWin.operationType == 'insert'){
+					dataSource = 'insert';
+				}else if(roleAddWin.operationType == 'update'){
+					dataSource = 'update';
 				}
-			});
+				Ext.Ajax.request({
+					url : '../../OperateRole.do',
+					params : {
+						dataSource : dataSource,
+						roleName : roleName,
+						roleId : roleId, 
+						modelId : roleModelId
+					},
+					success : function(res, opt){
+						Ext.getCmp('roleGrid').store.reload();
+						var jr = Ext.decode(res.responseText);
+						if(jr.success){
+							roleAddWin.hide();
+							Ext.example.msg(jr.title, jr.msg);
+						}else{
+							Ext.ux.showMsg(jr);
+						}
+					},
+					failure : function(res, opt){
+						Ext.ux.showMsg(Ext.decode(res.responseText));
+					}
+				});
+			}
+
 		}
 		
 	},{
@@ -806,16 +837,19 @@ var roleAddWin = new Ext.Window({
 			Ext.getCmp('txtRoleName').setValue('');
 			Ext.getCmp('txtRoleName').clearInvalid();
 			
-			Ext.getCmp('combRoleCate').setValue('');
-			Ext.getCmp('combRoleCate').clearInvalid();
-			Ext.getCmp('combRoleCate').enable();
-			
 			Ext.getCmp('combReferRole').setValue('');
 			Ext.getCmp('combReferRole').clearInvalid();
 			Ext.getCmp('combReferRole').enable();
 			
 		}
-	}
+	},
+	keys : [{
+		key : Ext.EventObject.ENTER,
+		scope : this,
+		fn : function(){
+			Ext.getCmp("btnAddRole").handler();
+		}
+	}]
 	
 });
 // -------------- layout ---------------
@@ -865,7 +899,7 @@ Ext.onReady(function() {
 		{
 			text : '添加',				
 			iconCls : 'btn_add',
-			id : 'btnSerach',
+			id : 'tbarAddStaff',
 			handler : function(){
 				operateStaff({otype : 'insert'});
 			}
@@ -896,7 +930,7 @@ Ext.onReady(function() {
 		},'->',{
 			text : '添加',				
 			iconCls : 'btn_add',
-			id : 'btnSerach',
+			id : 'tbarAddRole',
 			handler : function(){
 				operateRole({otype : 'insert'});
 			}
@@ -904,6 +938,13 @@ Ext.onReady(function() {
 		listeners : {
 			
 			rowclick : function(thiz, rowIndex, e){
+				if(thiz.getStore().getAt(rowIndex).get('name') == '管理员' || thiz.getStore().getAt(rowIndex).get('name') == '老板'){
+					privilegeTree.disable();
+				}else{
+					privilegeTree.enable();
+				}
+				Ext.getDom('roleTbarName').innerHTML = thiz.getStore().getAt(rowIndex).get('name'); 
+				
 				privilegeTree.loader.dataUrl = "../../QueryPrivilege.do";
 				privilegeTree.loader.baseParams = {dataSource : 'roleTree', roldId : thiz.getStore().getAt(rowIndex).get('id')};
 				privilegeTree.getRootNode().reload();
@@ -919,12 +960,14 @@ Ext.onReady(function() {
 		rootVisible : true,
 		autoScroll : true,
 		frame : true,
+		
 		bodyStyle : 'backgroundColor:#FFFFFF; border:1px solid #99BBE8;',
 		root : new Ext.tree.AsyncTreeNode({
             expanded: true,
             text : '权限列表',
             pId : '-2',
             leaf : false,
+           // checked : false,
 		}),
 		listeners : {
 			'checkchange':function(node, checked){
@@ -935,22 +978,28 @@ Ext.onReady(function() {
 					child.attributes.checked = checked; 
 					child.fireEvent('checkchange', child, checked); 
 				}); 
+				setParentNodeCheckState(node);
 			}
 		},
 		tbar :	[{
 			xtype : 'tbtext',
-			text : '权限管理'
-		}, '->',
-	     {
+			text : String.format(
+					Ext.ux.txtFormat.tbarName,
+					'roleTbarName','角色权限'
+			)
+		}, {
 			text : '刷新',
 			iconCls : 'btn_refresh',
 			handler : function(){
 				privilegeTree.getRootNode().reload();
 			}
-		},{
+		}, '->',{
 			text : '保存',
 			iconCls : 'btn_save',
 			handler : function(){
+				if(!roleGrid.getSelectionModel().getSelected()){
+					Ext.example.msg('提示', '还未选择角色');
+				}
 				var checkedNodes = privilegeTree.getChecked();
 				var discount = '', privilege = '';
 				for(var i=0;i<checkedNodes.length;i++){
@@ -980,12 +1029,14 @@ Ext.onReady(function() {
 						if(jr.success){
 							Ext.example.msg(jr.title, jr.msg);
 						}else{
-							Ext.ux.showMsg(jr);
+							Ext.example.msg(jr.title, jr.msg);
 						}
 						
 					},
 					failure : function(res, opt){
-						Ext.ux.showMsg(Ext.decode(res.responseText));
+						var jr = Ext.decode(res.responseText);
+						
+						Ext.ux.showMsg(jr);
 					}
 				});
 				
@@ -1001,6 +1052,26 @@ Ext.onReady(function() {
 		baseParams : {
 			restaurantID : restaurantID,
 			dataSource : 'tree'
+		},
+		listeners : {
+			load : function(thiz, node, res){
+				node.eachChild(function(child) { 
+					
+					var checked = child.attributes.checked;
+					child.ui.toggleCheck(checked);  
+					child.attributes.checked = checked;
+					//alert("chii"+child.childNodes.length);
+					if(child.hasChildNodes()){
+						child.expand();
+						child.eachChild(function(childSon) { 
+							checked = childSon.attributes.checked;
+							childSon.ui.toggleCheck(checked);  
+							childSon.attributes.checked = checked;
+							setParentNodeCheckState(childSon);
+						});
+					}
+				}); 
+			}
 		}
 	});
 	
@@ -1087,16 +1158,7 @@ Ext.onReady(function() {
 				}, 
 				logOutBut 
 			]
-		}),
-		keys : [
-		    {
-		    	key : Ext.EventObject.ENTER,
-				scope : this,
-				fn : function(){	
-					Ext.getCmp('btnSerach').handler(); 
-				}
-			}
-		]
+		})
 	});
 	getOperatorName("../../");
 	new Ext.Viewport({

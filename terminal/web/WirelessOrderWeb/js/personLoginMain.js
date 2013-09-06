@@ -491,7 +491,7 @@ Ext.onReady(function() {
 						url : '../OperateStaff.do',
 						params : {
 							pin : pin,
-							psw : pwdTrans,
+							pwd : pwdTrans,
 							restaurantID : restaurantID,
 							skipVerify : true
 						},
