@@ -112,6 +112,7 @@ public class QueryPrivilegeAction extends DispatchAction{
 		List<Privilege> rolePrivilege = new ArrayList<Privilege>();
 		try{
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			//根据id获取role
 			Role role = RoleDao.getRoleById(staff, Integer.parseInt(roleId));
 			if(role != null){
 				rolePrivilege = role.getPrivileges();
@@ -126,9 +127,9 @@ public class QueryPrivilegeAction extends DispatchAction{
 					}
 					tree.append("{");
 
-					int index = rolePrivilege.indexOf(root.get(i));
-					if(index >= 0){
-						if(root.get(i).getCode() == Code.DISCOUNT){
+					
+/*					if(root.get(i).getCode() == Code.DISCOUNT){
+						if(rolePrivilege.indexOf(root.get(i)) < 0){
 							tree.append("leaf:false");
 							StringBuilder children = new StringBuilder();
 							
@@ -139,12 +140,43 @@ public class QueryPrivilegeAction extends DispatchAction{
 								children.append("{");
 								children.append("leaf:true");
 								children.append(",text:'" + root.get(i).getDiscounts().get(j).getName() + "'");
-								int disIndex = rolePrivilege.get(index).getDiscounts().indexOf(root.get(i).getDiscounts().get(j));
-								if(disIndex >= 0){
+								children.append(",checked:false");
+								children.append(",discountId:'" + root.get(i).getDiscounts().get(j).getId() + "'");
+								children.append(",isDiscount:true");
+								children.append("}");
+							}
+							tree.append(",children : [" + children.toString() + "]");
+							tree.append(",checked:true");
+							continue;
+						}
+					}*/
+					int index = rolePrivilege.indexOf(root.get(i));
+					if(index >= 0){
+						if(root.get(i).getCode() == Code.DISCOUNT){
+
+							
+							tree.append("leaf:false");
+							StringBuilder children = new StringBuilder();
+							
+							for (int j = 0; j < root.get(i).getDiscounts().size(); j++) {
+								if(j>0){
+									children.append(",");
+								}
+								children.append("{");
+								children.append("leaf:true");
+								children.append(",text:'" + root.get(i).getDiscounts().get(j).getName() + "'");
+								//转折
+								if(rolePrivilege.get(index).getDiscounts().isEmpty()){
 									children.append(",checked:true");
 								}else{
-									children.append(",checked:false");
+									int disIndex = rolePrivilege.get(index).getDiscounts().indexOf(root.get(i).getDiscounts().get(j));
+									if(disIndex >= 0){
+										children.append(",checked:true");
+									}else{
+										children.append(",checked:false");
+									}
 								}
+
 								children.append(",isDiscount:true");
 								children.append(",discountId:'" + root.get(i).getDiscounts().get(j).getId() + "'");
 								children.append("}");

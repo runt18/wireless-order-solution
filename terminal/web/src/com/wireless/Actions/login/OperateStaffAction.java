@@ -20,13 +20,13 @@ public class OperateStaffAction extends Action{
 	public ActionForward execute(ActionMapping mapping, ActionForm form,HttpServletRequest request, HttpServletResponse response)throws Exception {
 				
 		String pin = request.getParameter("pin");
-		String psw = request.getParameter("psw");
+		String pwd = request.getParameter("pwd");
 		JObject jobject = new JObject();
 		try{
 			response.setContentType("text/json; charset=utf-8");
 			
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
-			if(staff.getPwd().equalsIgnoreCase(psw)){
+			if(staff.getPwd().equalsIgnoreCase(pwd)){
 				HttpSession session = request.getSession();
 				session.setAttribute("pin", pin);
 				

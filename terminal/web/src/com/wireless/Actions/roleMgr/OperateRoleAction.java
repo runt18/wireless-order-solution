@@ -22,7 +22,6 @@ import com.wireless.pojo.distMgr.Discount;
 import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.staffMgr.Privilege.Code;
 import com.wireless.pojo.staffMgr.Role;
-import com.wireless.pojo.staffMgr.Role.Category;
 import com.wireless.pojo.staffMgr.Role.InsertBuilder;
 import com.wireless.pojo.staffMgr.Role.UpdateRoleBuilder;
 import com.wireless.pojo.staffMgr.Staff;
@@ -33,7 +32,6 @@ public class OperateRoleAction extends DispatchAction{
 		response.setCharacterEncoding("UTF-8");
 		String pin = (String) request.getAttribute("pin");
 		String roleName = request.getParameter("roleName");
-		String roleCate = request.getParameter("roleCate");
 		String modelId = request.getParameter("modelId");
 		JObject jobject = new JObject();
 		
@@ -41,7 +39,6 @@ public class OperateRoleAction extends DispatchAction{
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 
 			InsertBuilder builder = new InsertBuilder();
-			builder.setCategoty(Category.valueOf(Integer.parseInt(roleCate)));
 			builder.setName(roleName);
 			builder.setRestaurantId(staff.getRestaurantId());
 			
@@ -101,12 +98,21 @@ public class OperateRoleAction extends DispatchAction{
 		String roleId = request.getParameter("roleId");
 		String privileges = request.getParameter("privileges");
 		String discounts = request.getParameter("discounts");
+		String isAllCount = "";
 		JObject jobject = new JObject();
 		
+		
 		try{
+			if(privileges.trim().isEmpty()){
+				throw new BusinessException("未选择任何权限");
+			}
+			
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 		
-			List<Privilege> privilegeList = PrivilegeDao.getPrivileges(staff, null, null);
+			List<Privilege> privilegeList = PrivilegeDao.getPrivileges(staff, null, " AND status != " + Discount.Status.MEMBER_TYPE.getVal());
+
+			
+			
 			List<String> newPId = new ArrayList<String>(); ;
 			
 			Role role = RoleDao.getRoleById(staff, Integer.parseInt(roleId));
@@ -117,11 +123,20 @@ public class OperateRoleAction extends DispatchAction{
 					newPId.add(string);
 				}
 				if(discounts != null && !discounts.trim().isEmpty()){
+					String[] discountArray = discounts.split(",");
 					for (Privilege privilege : privilegeList) {
 						if(privilege.getCode() == Code.DISCOUNT){
-							if( newPId.indexOf(privilege.getId()+"") < 0){
+							//判断是否全选了折扣
+							if(privilege.getDiscounts().size() == discountArray.length){
+								isAllCount = "true";
+							}
+							//选了部分折扣的情况
+							if( newPId.indexOf(privilege.getId()+"") < 0 && isAllCount.trim().isEmpty()){
 								newPId.add(privilege.getId()+"");
 							}
+/*							else if(newPId.indexOf(privilege.getId()+"") > 0 && !isAllCount.trim().isEmpty()){
+								newPId.remove(privilege.getId()+"");
+							}*/
 						}
 					}
 				}
@@ -129,13 +144,14 @@ public class OperateRoleAction extends DispatchAction{
 					
 					int index = privilegeList.indexOf(new Privilege(Integer.parseInt(pID)));
 					if(index >= 0){
-
-						if(privilegeList.get(index).getCode() == Code.DISCOUNT){
-							privilegeList.get(index).setAllDiscount();
-							String[] discountArray = discounts.split(",");
-							for (String dID : discountArray) {
-								Discount disc = DiscountDao.getPureDiscount(staff, " AND DIST.discount_id = " + dID, null).get(0);
-								privilegeList.get(index).addDiscount(disc);
+						if(isAllCount.trim().isEmpty()){
+							if(privilegeList.get(index).getCode() == Code.DISCOUNT){
+								privilegeList.get(index).setAllDiscount();
+								String[] discountArray = discounts.split(",");
+								for (String dID : discountArray) {
+									Discount disc = DiscountDao.getPureDiscount(staff, " AND DIST.discount_id = " + dID, null).get(0);
+									privilegeList.get(index).addDiscount(disc);
+								}
 							}
 						}
 						role.addPrivilege(privilegeList.get(index));
@@ -150,6 +166,9 @@ public class OperateRoleAction extends DispatchAction{
 		}catch(SQLException e){
 			e.printStackTrace();
 			jobject.initTip(false, e.getMessage(), 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
+		}catch(BusinessException e){
+			e.printStackTrace();
+			jobject.initTip(false, e.getMessage());
 		}finally{
 			response.getWriter().print(jobject.toString());
 		}
@@ -161,13 +180,22 @@ public class OperateRoleAction extends DispatchAction{
 	public ActionForward delete(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception{
 		response.setCharacterEncoding("UTF-8");
 		String roleId = request.getParameter("roleId");
+		String pin = (String) request.getAttribute("pin");
 		JObject jobject = new JObject();
 		try{
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			List<Staff> list = StaffDao.getStaffs(staff.getRestaurantId());
+			for (Staff s : list) {
+				if((s.getRole().getId()+"").equals(roleId)){
+					throw new BusinessException("删除失败, 此角色有员工在使用中");
+				}
+			}
+			
 			RoleDao.deleteRole(Integer.parseInt(roleId));
 			jobject.initTip(true, "删除成功");
-		}catch(Exception e){
+		}catch(BusinessException e){
 			e.printStackTrace();
-			jobject.initTip(false, e.getMessage(), 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
+			jobject.initTip(false, WebParams.TIP_TITLE_DEFAULT, e.getMessage());
 		}finally{
 			response.getWriter().print(jobject.toString());
 		}

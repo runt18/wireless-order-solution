@@ -30,14 +30,20 @@ public class UpdateStaffAction extends Action {
 			String staffId = request.getParameter("staffId");
 			String staffName = request.getParameter("staffName");
 			String staffPwd = request.getParameter("staffPwd");
+			
+			String roleId = request.getParameter("roleId");
 			String pwdMd5 = Util.getMD5Str(staffPwd);
 			String tele = request.getParameter("tele");
 			
 			StaffUpdateBuilder builder = new StaffUpdateBuilder();
 			builder.setStaffId(Integer.parseInt(staffId));
 			builder.setStaffName(staffName);
-			builder.setStaffpwd(pwdMd5);
+			if(!staffPwd.trim().isEmpty()){
+				builder.setStaffpwd(pwdMd5);
+			}
 			builder.setMobile(tele);
+			builder.setRoleId(Integer.parseInt(roleId));
+			
 			
 			StaffDao.updateStaff(builder);
 			
