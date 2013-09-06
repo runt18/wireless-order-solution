@@ -57,7 +57,7 @@
 		</init-param>
 		<init-param>
 			<param-name>db_host</param-name>
-			<param-value>127.0.0.1</param-value>
+			<param-value>192.168.157.100</param-value>
 		</init-param>
 		<init-param>
 			<param-name>db_port</param-name>
@@ -107,7 +107,7 @@
 		<url-pattern>*.do</url-pattern>
 	</servlet-mapping>
 	<session-config>
-		<session-timeout>1</session-timeout>       <!-- 单位：分钟 -->
+		<session-timeout>30</session-timeout>       <!-- 单位：分钟 -->
 	</session-config>
 
 	
