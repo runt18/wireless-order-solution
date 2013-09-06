@@ -16,16 +16,6 @@ import com.wireless.json.Jsonable;
 import com.wireless.util.DataPaging;
 import com.wireless.util.WebParams;
 
-/**
- * The parameters looks like below.
- * e.g. pin=0x1 & type=1 
- * pin : the pin the this terminal
- * type : "1" means to query foods 
- * 		  "2" means to query tastes
- * 		  "3" means to query kitchens
- * 		  "4" means to query depts
- */
-
 public class QueryMenuAction extends DispatchAction {
 	/**
 	 * 
