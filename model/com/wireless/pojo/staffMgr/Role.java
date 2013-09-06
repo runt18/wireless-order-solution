@@ -204,7 +204,7 @@ public class Role implements Jsonable, Parcelable{
 		private final int restaurantId;
 		private final String name;
 		private Type type = Type.NORMAL;
-		private Category categoty;
+		private Category categoty = Category.OTHER;
 		private List<Privilege> privileges = SortedList.newInstance();
 		
 		public InsertBuilder(int restaurantId, String name){
