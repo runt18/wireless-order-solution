@@ -70,8 +70,8 @@ body{ overflow: hidden; }
 	100%{opacity:.5; -moz-transform:scale(1);}
 }
 .dialong-lm-hide{
-	-webkit-animation: dl-lm-bounceOut .2s .01s ease both;
-	-moz-animation: dl-lm-bounceOut .2s .01s ease both;
+	-webkit-animation: dl-lm-bounceOut .3s .01s ease both;
+	-moz-animation: dl-lm-bounceOut .3s .01s ease both;
 }
 @-webkit-keyframes dl-lm-bounceOut{
 	0%{opacity:.5; -webkit-transform:scale(1);}
@@ -101,8 +101,8 @@ body{ overflow: hidden; }
 }
 
 .dialong-hide{
-	-webkit-animation: dl-bounceOut .3s .01s ease both;
-	-moz-animation: dl-bounceOut .3s .01s ease both;
+	-webkit-animation: dl-bounceOut .5s .01s ease both;
+	-moz-animation: dl-bounceOut .5s .01s ease both;
 }
 @-webkit-keyframes dl-bounceOut{
 	0%{opacity:1; -webkit-transform:scale(1);}

@@ -37,7 +37,6 @@ var uo = {
 </script>
 <script type="text/javascript" src="./js/Util.js"></script>
 <script type="text/javascript" src="./js/index.js"></script>
-<!-- <script type="text/javascript" src="../js/common/CompareFoodUtil.js"></script> -->
 </head>
 <body>
 <div  id = "divTableSelect" class = "content box-vertical" style = "z-index:999;" >
@@ -54,8 +53,8 @@ var uo = {
 			<div class="button-base" id = "divAllArea" style="margin-bottom: 2px;" onclick="addTables('allTable')">全部区域</div>
 			<div id="divShowRegion"></div>
 			<div class="div-full">&nbsp;</div>
-			<div class="button-base" style="margin-bottom: 2px;" onclick = "ts.rn.prePage()">区域上翻</div>
-			<div class="button-base" style="margin-bottom: 2px;" onclick = "ts.rn.nextPage()">区域下翻</div>
+			<div class="button-base" style="margin-bottom: 2px;" onclick = "ts.rn.prePage()">上翻</div>
+			<div class="button-base" style="margin-bottom: 2px;" onclick = "ts.rn.nextPage()">下翻</div>
 		</div>
 	</div>
 	<div id="divToolBottomForSelect" class="box-horizontal">
@@ -208,9 +207,9 @@ var uo = {
 	</div>
 	<div id = "divCenterForTransTableTS" class = "box-horizontal">
 		<div id = "divLeftForTransTableTS" >
-			<span style = "font-size: 20px; font-weight: bold; padding-right: 0;">桌号：</span>
+			<span style = "font-size: 20px; font-weight: bold; padding-right: 0; color: #FFF;">桌号：</span>
 			<input type = "text" id = "txtOldTableForTS" class = "desk-number" onclick = 'ts.selectInput({renderTo: this.id})'/>
-			<span style = "font-size: 20px; font-weight: bold;">转至：</span>
+			<span style = "font-size: 20px; font-weight: bold; color: #FFF;">转至：</span>
 			<input type = "text" id = "txtNewTableForTS" class = "desk-number" onclick = 'ts.selectInput({renderTo: this.id})'/>
 		</div>
 		<div id = "divRightForTransTableTS">
@@ -229,8 +228,8 @@ var uo = {
 		</div>
 	</div>
 	<div id = "divBottomForTransTableTS">
-		<div class="button-base" style = "width: 100px; margin-left: 130px;" onclick = "ts.tt.submit()">确定</div>
-		<div class="button-base" style = "width: 100px; margin-left: 65px;" onclick = "ts.tt.back()">返回</div>
+		<div class="button-base" style = "width: 150px; margin-left: 100px;" onclick = "ts.tt.submit()">确定</div>
+		<div class="button-base" style = "width: 150px; margin-left: 60px;" onclick = "ts.tt.back()">返回</div>
 	</div>
 </div>	
 
