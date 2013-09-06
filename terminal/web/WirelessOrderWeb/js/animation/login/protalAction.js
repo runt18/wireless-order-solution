@@ -11,10 +11,7 @@
 	$("#system").each(function() {
 		$(this).bind("click", function() {
 			if (!isPrompt) {
-				// 密码校验
-				//systemVerifyWin.show();
 				var href = "System_Module/SystemProtal.html?"+ strEncode('restaurantID=' + restaurantID, 'mi');
-				//isPrompt = true;
 				verifyStaff('../', 6000, href);
 				
 			}
@@ -35,9 +32,7 @@
 	$("#basicManagement").each(function() {
 		$(this).bind("click", function() {
 			if (!isPrompt) {
-				// 密码校验
 				var href = "BasicManagement_Module/BasicMgrProtal.html?" + strEncode("restaurantID=" + restaurantID, "mi");
-				//isPrompt = true;
 				verifyStaff('../', 2000, href);
 				
 			}
@@ -49,7 +44,6 @@
 			if (!isPrompt) {
 				var href = "InventoryManagement_Module/InventoryProtal.html?" + strEncode("restaurantID="+restaurantID, "mi");
 				verifyStaff('../', 3000, href);
-				//isPrompt = true;
 			}
 		});
 	});
@@ -59,7 +53,6 @@
 			if (!isPrompt) {
 				var href = 'History_Module/HistoryStatistics.html?'+ strEncode('restaurantID=' + restaurantID, 'mi');
 				verifyStaff('../', 4000, href);
-				//isPrompt = true;
 			}
 		});
 	});

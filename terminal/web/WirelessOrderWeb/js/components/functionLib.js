@@ -155,14 +155,30 @@ function getOperatorName(actionPath) {
 			"restaurantID" : restaurantID,
 			"type" : 0,
 			"isPaging" : false,
-			"isCombo" : false
+			"isName" : true
 		},
 		success : function(response, options) {
-			var staffData = [];
+
 			var operatorName = "";
-			var resultJSON = Ext.util.JSON.decode(response.responseText);
-			var rootData = resultJSON.root;
-			var pin = resultJSON.other.pin;
+			var jr = Ext.util.JSON.decode(response.responseText);
+			
+			if(jr.success){
+				if(jr.other.name != null){
+					operatorName = jr.other.name;
+				}
+				document.getElementById("optName").innerHTML = operatorName;
+			}else{
+				Ext.MessageBox.show({
+					msg : resultJSON.msg,
+					width : 300,
+					buttons : Ext.MessageBox.OK
+				});
+			}
+			
+			
+			
+			//var rootData = resultJSON.root;
+/*			var pin = resultJSON.other.pin;
 			if (rootData.length != 0) {
 				if (resultJSON.msg == "normal") {
 					staffData = rootData;
@@ -182,7 +198,7 @@ function getOperatorName(actionPath) {
 						buttons : Ext.MessageBox.OK
 					});
 				}
-			}
+			}*/
 		},
 		failure : function(response, options) {
 		}

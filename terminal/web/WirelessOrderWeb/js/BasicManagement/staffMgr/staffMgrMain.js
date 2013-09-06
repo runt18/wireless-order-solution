@@ -72,13 +72,15 @@ var changePwdWin = new Ext.Window({
 			inputType : 'password',
 			fieldLabel : '新密码',
 			id : 'txtNewPwd',
-			width : 160
+			width : 160,
+			allowBlank : false
 		}, {
 			xtype : 'textfield',
 			inputType : 'password',
 			fieldLabel : '确认新密码',
 			id : 'txtConfirmNewPwd',
-			width : 160
+			width : 160,
+			allowBlank : false
 		}, {
 			html : '<div style="margin-top:4px"><font id="errorMsgChangePwd" style="color:red;"> </font></div>'
 		}]
@@ -90,49 +92,54 @@ var changePwdWin = new Ext.Window({
 	    	id : 'btnSaveUpdatePassWord',
 	    	iconCls : 'btn_save',
 			handler : function() {
-				var oldPwd = Ext.getCmp('txtOldpwd').getValue();
-				var newPwd = Ext.getCmp('txtNewPwd').getValue();
-				var confirmPwd = Ext.getCmp('txtConfirmNewPwd').getValue();
-				
-				var staffID = staffStore.getAt(currRowIndex).get('staffID');
-				var password = staffStore.getAt(currRowIndex).get('staffPassword');
-				
-				if(password == MD5(oldPwd)){
-					if (newPwd == confirmPwd){
-						changePwdWin.hide();
-						
-						Ext.Ajax.request({
-							url : '../../UpdateStaff.do',
-							params : {
-								'staffName' : '管理员',
-								'staffId' : staffID,
-								'staffPwd' : newPwd
-							},
-							success : function(response, options) {
-								var jr = Ext.util.JSON.decode(response.responseText);
-								if (jr.success) {
-									staffStore.load({
-										params : {
-											start : 0,
-											limit : pageRecordCount
-										}
-									});
-									
-									Ext.ux.showMsg(jr);
-								} else {
-									Ext.ux.showMsg(jr);
-								}
-						},
-						failure : function(response, options) {
+				if(Ext.getCmp('txtNewPwd').isValid() && Ext.getCmp('txtConfirmNewPwd').isValid()){
+					var oldPwd = Ext.getCmp('txtOldpwd').getValue();
+					var newPwd = Ext.getCmp('txtNewPwd').getValue();
+					var confirmPwd = Ext.getCmp('txtConfirmNewPwd').getValue();
+					var ss = Ext.getCmp('staffGrid').getSelectionModel().getSelected();
+					
+					var staffID = staffStore.getAt(currRowIndex).get('staffID');
+					var password = staffStore.getAt(currRowIndex).get('staffPassword');
+					
+					if(password == MD5(oldPwd)){
+						if (newPwd == confirmPwd){
+							changePwdWin.hide();
 							
-						}
-					});
+							Ext.Ajax.request({
+								url : '../../UpdateStaff.do',
+								params : {
+									'staffName' : '管理员',
+									'staffId' : staffID,
+									'staffPwd' : newPwd,
+									'roleId' : ss.data.role.id
+								},
+								success : function(response, options) {
+									var jr = Ext.util.JSON.decode(response.responseText);
+									if (jr.success) {
+										staffStore.load({
+											params : {
+												start : 0,
+												limit : pageRecordCount
+											}
+										});
+										
+										Ext.ux.showMsg(jr);
+									} else {
+										Ext.ux.showMsg(jr);
+									}
+							},
+							failure : function(response, options) {
+								
+							}
+						});
+					} else {
+						Ext.example.msg('提示', '操作失败, 两次密码已一致, 请重新输入.');
+					}
 				} else {
-					Ext.example.msg('提示', '操作失败, 两次密码已一致, 请重新输入.');
+					Ext.example.msg('提示', '操作失败, 原密码不正确, 请重新输入.');
 				}
-			} else {
-				Ext.example.msg('提示', '操作失败, 原密码不正确, 请重新输入.');
-			}
+				}
+
 		}
 	}, {
 		text : '关闭',
@@ -146,11 +153,12 @@ var changePwdWin = new Ext.Window({
 	listeners : {
 		'show' : function(thiz) {
 			Ext.getCmp('txtOldpwd').setValue('');
+			
+			
 			Ext.getCmp('txtNewPwd').setValue('');
+			Ext.getCmp('txtNewPwd').clearInvalid();
 			Ext.getCmp('txtConfirmNewPwd').setValue('');
-
-			Ext.getDom('errorMsgChangePwd').innerHTML = ' ';
-
+			Ext.getCmp('txtConfirmNewPwd').clearInvalid();
 			var f = Ext.get('txtOldpwd');
 			f.focus.defer(true, 100); 
 		}
@@ -979,6 +987,12 @@ Ext.onReady(function() {
 					child.fireEvent('checkchange', child, checked); 
 				}); 
 				setParentNodeCheckState(node);
+				if(node.attributes.text == '折扣'){
+					if(!node.firstChild.attributes.checked){
+						node.firstChild.getUI().checkbox.checked = true;
+						node.firstChild.fireEvent('checkchange', node.firstChild, true); 
+					}
+				}
 			}
 		},
 		tbar :	[{
