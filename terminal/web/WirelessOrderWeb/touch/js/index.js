@@ -25,6 +25,14 @@ String.prototype.format = function(args){
     return result;
 };
 /**
+ * 
+ */
+String.prototype.trim = function(){
+	return this.replace(/(^\s*)|(\s*$)/g, ""); 
+};
+
+
+/**
  * 显示模板
  */
 var Templet = {
@@ -74,6 +82,7 @@ var Templet = {
  * 初始化菜品数据
  */
 function initFoodData(){
+	Util.LM.show();
 	// 加载菜品数据
 	$.ajax({
 		url : '../QueryMenu.do',
@@ -113,6 +122,7 @@ function initFoodData(){
 						restaurantID : restaurantID
 					},
 					success : function(data, status, xhr){
+						Util.LM.hide();
 						if(data.success){
 							kitchenData = {totalProperty:data.root.length, root:data.root.slice(0)};
 							kitchenFoodData = {totalProperty:data.root.length, root:data.root.slice(0)};
@@ -176,6 +186,7 @@ function initFoodData(){
 						}
 					},
 					error : function(request, status, err){
+						Util.LM.hide();
 						alert('初始化分厨数据失败.');
 					}
 				});
@@ -204,6 +215,7 @@ function initFoodData(){
 			});
 		},
 		error : function(request, status, err){
+			Util.LM.hide();
 			alert('初始化菜品数据失败.');
 		}
 	});

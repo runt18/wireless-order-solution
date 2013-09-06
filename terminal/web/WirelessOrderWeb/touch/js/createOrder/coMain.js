@@ -468,9 +468,9 @@ co.submit = function(){
 			'customNum' : co.table.customNum,
 			'type' : isFree ? 1 : 2,
 			'foods' : foods,
-			'category' :  co.table.categoryValue
-			,'orderID' : isFree ? '' : co.order.id
-			,'orderDate' : isFree ? '' : co.order.orderDate
+			'category' :  co.table.categoryValue,
+			'orderID' : isFree ? '' : co.order.id,
+			'orderDate' : isFree ? '' : co.order.orderDate
 		},
 		success : function(data, status, xhr) {
 			Util.LM.hide();

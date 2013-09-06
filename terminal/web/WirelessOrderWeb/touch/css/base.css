@@ -78,8 +78,8 @@ body{ overflow: hidden; }
 	100%{opacity:0; -webkit-transform:scale(0);}
 }
 @-moz-keyframes dl-lm-bounceOut{
-	0%{opacity:.5; -moz-transform:scale(1); display:none; }
-	100%{opacity:0; -moz-transform:scale(0); display:none; }
+	0%{opacity:.5; -moz-transform:scale(1); display:none; z-index:-1;}
+	100%{opacity:0; -moz-transform:scale(0); display:none; z-index:-1;}
 }
 
 .dialong-show{

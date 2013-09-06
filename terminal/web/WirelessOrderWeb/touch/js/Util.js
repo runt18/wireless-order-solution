@@ -17,7 +17,7 @@ Util.padding = function(c){
 		data : [],
 		length : 0,
 		pageData : [],
-		displayMsg : typeof c.displayMsg != 'undefined' ? c.displayMsg : '共{0}项, 每{1}/{2}页, 每页{3}项',
+		displayMsg : typeof c.displayMsg != 'undefined' ? c.displayMsg : '共{0}项, 第{1}/{2}页, 每页{3}项',
 		displayId : c.displayId,
 		isEmpty : function(){
 			return this.data == null || this.data.length <= 0;
