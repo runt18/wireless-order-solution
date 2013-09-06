@@ -3,9 +3,31 @@
 <web-app>
 	<display-name>WirelessOrderWeb</display-name>
 	<filter>
-		<filter-name>filter</filter-name>
-		<filter-class>com.wireless.filters.LoginFilter</filter-class>
-	</filter>
+		<filter-name>whiteList</filter-name>
+		<filter-class>com.wireless.filters.RequestFilter</filter-class>
+		<init-param>
+			<param-name>skipVerify</param-name>
+			<param-value>
+				/PersonLogin.html,
+				/PersonLoginTimeout.html,
+				/QueryStaff.do,
+				/OperateStaff.do
+			</param-value>
+		</init-param>
+		<init-param>
+			<param-name>redirectPath</param-name>
+			<param-value>/WirelessOrderWeb/pages/PersonLoginTimeout.html</param-value>
+		</init-param>
+	</filter>	
+	<filter-mapping>
+		<filter-name>whiteList</filter-name>
+		<url-pattern>/pages/*</url-pattern>
+	</filter-mapping>
+	<filter-mapping>
+		<filter-name>whiteList</filter-name>
+		<url-pattern>*.do</url-pattern>
+	</filter-mapping>
+<!--	
 	<filter-mapping>
 		<filter-name>filter</filter-name>
 		<url-pattern>/pages/*</url-pattern>
@@ -14,16 +36,14 @@
 		<filter-name>filter</filter-name>
 		<url-pattern>*.do</url-pattern>
 	</filter-mapping>
+-->
+	
 	<servlet>
 		<servlet-name>action</servlet-name>
 		<servlet-class>com.wireless.Actions.init.InitServlet</servlet-class>
 		<init-param>
 			<param-name>config</param-name>
 			<param-value>/WEB-INF/struts-config.xml</param-value>
-		</init-param>
-		<init-param>
-			<param-name>chainConfig</param-name>
-			<param-value>org/apache/struts/chain/chain-config.xml</param-value>
 		</init-param>
 		<init-param>
 			<param-name>debug</param-name>
@@ -40,7 +60,7 @@
 		</init-param>
 		<init-param>
 			<param-name>db_host</param-name>
-			<param-value>192.168.157.100</param-value>
+			<param-value>127.0.0.1</param-value>
 		</init-param>
 		<init-param>
 			<param-name>db_port</param-name>
@@ -52,7 +72,7 @@
 		</init-param>
 		<init-param>
 			<param-name>db_pwd</param-name>
-			<param-value>HelloZ315</param-value>
+			<param-value>root</param-value>
 		</init-param>
 		<!-- Below is the configuration parameters to socket -->
 		<init-param>
@@ -90,7 +110,7 @@
 		<url-pattern>*.do</url-pattern>
 	</servlet-mapping>
 	<session-config>
-		<session-timeout>30</session-timeout>       <!-- 单位：分钟 -->
+		<session-timeout>1</session-timeout>       <!-- 单位：分钟 -->
 	</session-config>
 
 	
