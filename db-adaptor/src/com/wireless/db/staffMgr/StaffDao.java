@@ -309,10 +309,15 @@ public class StaffDao {
 	 * @throws SQLException
 	 */
 	public static void updateStaff(DBCon dbCon, Staff staff) throws SQLException{
+		String psw = "";
+		if(!staff.getPwd().trim().isEmpty()){
+			psw = " pwd = '" + staff.getPwd() + "', ";
+		}
 		String sql = "UPDATE " + Params.dbName + ".staff " + 
 					" SET name = '" + staff.getName() + "', " +
 					" tele = '" + staff.getMobile() + "', " +
-					" pwd = '" + staff.getPwd() + "'" + 
+					psw + 
+					" role_id = '" + staff.getRole().getId() + "' " +
 					" WHERE staff_id = " + staff.getId();
 		
 		dbCon.stmt.executeUpdate(sql);
