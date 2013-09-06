@@ -240,7 +240,7 @@ public class RestaurantDao {
 		return restaurant.getId();
 	}
 	
-	private static void insertStaff(DBCon dbCon, int restaurantId, String pwd) throws SQLException{
+	private static void insertStaff(DBCon dbCon, int restaurantId, String pwd) throws SQLException, BusinessException{
 		Staff staff = new Staff();
 		staff.setRestaurantId(restaurantId);
 		//insert '管理员' role

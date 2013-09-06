@@ -26,7 +26,8 @@ public class PrivilegeDao {
 	public static List<Privilege> getPrivileges(DBCon dbCon, Staff staff, String extraCond, String otherClause) throws SQLException{
 		String sql = "SELECT pri_id, pri_code, cate FROM " + Params.dbName + ".privilege" +
 					" WHERE 1=1 " +
-					  (extraCond != null ? extraCond : "");
+					  (extraCond != null ? extraCond : "") +
+					" ORDER BY cate ";
 					dbCon.rs = dbCon.stmt.executeQuery(sql);
 		
 		List<Privilege> list = new ArrayList<Privilege>();

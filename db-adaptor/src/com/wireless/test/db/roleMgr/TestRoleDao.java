@@ -151,19 +151,13 @@ public class TestRoleDao {
 			compare(actual, updateRole);
 		}finally{
 			//删除角色
-			RoleDao.deleteRole(roleId);
-			RoleDao.deleteRole(newRoleId);
+			//RoleDao.deleteRole(roleId);
+			//RoleDao.deleteRole(newRoleId);
 		}
-
-		
-
-		
-		
-		
-		
-		
 		
 	}
+
+	
 	
 	
 }

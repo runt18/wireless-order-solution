@@ -158,8 +158,9 @@ public class RoleDao {
 	 * 			the detail of Role
 	 * @return	the id of Role just create
 	 * @throws SQLException
+	 * @throws BusinessException 
 	 */
-	public static int insertRole(Staff staff, InsertBuilder builder) throws SQLException{
+	public static int insertRole(Staff staff, InsertBuilder builder) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		
 		try{
@@ -176,8 +177,9 @@ public class RoleDao {
 	 * @param builder
 	 * @return
 	 * @throws SQLException
+	 * @throws BusinessException 
 	 */
-	public static int insertRole(DBCon dbCon, Staff staff, InsertBuilder builder) throws SQLException{
+	public static int insertRole(DBCon dbCon, Staff staff, InsertBuilder builder) throws SQLException, BusinessException{
 		String sql;
 		int roleId;
 		sql = "INSERT INTO " + Params.dbName + ".role(restaurant_id, name, type, cate) " +
@@ -201,6 +203,8 @@ public class RoleDao {
 						priCon.rs = priCon.stmt.executeQuery(selectPid);
 						if(priCon.rs.next()){
 							privilege.setId(priCon.rs.getInt("pri_id"));
+						}else{
+							throw new BusinessException("无此权限");
 						}
 					}finally{
 						priCon.disconnect();

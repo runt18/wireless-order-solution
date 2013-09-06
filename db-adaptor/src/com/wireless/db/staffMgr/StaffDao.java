@@ -215,9 +215,11 @@ public class StaffDao {
 		String sql = " SELECT "	+
 					 " STAFF.staff_id, STAFF.restaurant_id, STAFF.name, STAFF.role_id, STAFF.tele, STAFF.pwd, STAFF.type AS staff_type" +
 					 " FROM " + Params.dbName + ".staff STAFF " + " " +
-					 " WHERE 1 = 1 " +
+					 " LEFT JOIN " + Params.dbName + ".role ROLE " +
+					 " ON STAFF.role_id = ROLE.role_id " +
+					 " WHERE 1=1 " +
 					 (extraCond != null ? extraCond : " ") +
-					 (orderClause != null ? orderClause : " ORDER BY STAFF.staff_id ");
+					 (orderClause != null ? orderClause : " ORDER BY ROLE.cate, STAFF.staff_id ");
 		
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		
@@ -311,7 +313,7 @@ public class StaffDao {
 	public static void updateStaff(DBCon dbCon, Staff staff) throws SQLException{
 		String psw = "";
 		if(!staff.getPwd().trim().isEmpty()){
-			psw = " pwd = '" + staff.getPwd() + "', ";
+			psw = " pwd = MD5('" + staff.getPwd() + "'), ";
 		}
 		String sql = "UPDATE " + Params.dbName + ".staff " + 
 					" SET name = '" + staff.getName() + "', " +
