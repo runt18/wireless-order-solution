@@ -216,6 +216,14 @@ function inputNum(o){
 //进入点菜界面
 function renderToCreateOrder(tableNo, peopleNo){
 	if(hasTable(tables, tableNo)){
+		Util.dialongDisplay({
+		type:'hide', 
+		renderTo:'divSelectTableNumForTs'
+		});
+		Util.dialongDisplay({
+			type:'hide', 
+			renderTo:'divShowMessageForTableSelect'
+		});
 		inputNumVal = "";
 		$("#txtTableNumForTS").val(inputNumVal);
 		$("#txtPeopleNumForSM").val(inputNumVal);
@@ -239,15 +247,7 @@ function renderToCreateOrder(tableNo, peopleNo){
 					initTables();
 				}
 			});
-		}
-		Util.dialongDisplay({
-			type:'hide', 
-			renderTo:'divSelectTableNumForTs'
-		});
-		Util.dialongDisplay({
-			type:'hide', 
-			renderTo:'divShowMessageForTableSelect'
-		});
+		}		
 	}else{
 		Util.msg.alert({
 			title : '温馨提示',
@@ -284,6 +284,7 @@ $("#btnSubmitForSelectTableNumTS").click(function(){
 	}
 	if(typeForInputTableNum == "createOrder"){
 		renderToCreateOrder(tableNo, peopleNo);	
+		
 	}else if(typeForInputTableNum == "check"){
 		//判断该餐桌是否已点菜（下单）
 		if(hasTable(tables, tableNo)){
