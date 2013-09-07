@@ -6,6 +6,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.mysql.jdbc.Statement;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.deptMgr.KitchenDao;
@@ -22,7 +23,7 @@ public class DiscountDao {
 	/**
 	 * Get the discount along with its discount plan to a specified restaurant defined in {@link Staff}
 	 * and other extra condition. 
-	 * @param term
+	 * @param staff
 	 * 			the terminal
 	 * @param extraCond
 	 * 			the extra condition
@@ -32,11 +33,11 @@ public class DiscountDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static List<Discount> getDiscount(Staff term, String extraCond, String orderClause) throws SQLException{
+	public static List<Discount> getDiscount(Staff staff, String extraCond, String orderClause) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return getDiscount(dbCon, term, extraCond, orderClause);
+			return getDiscount(dbCon, staff, extraCond, orderClause);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -47,7 +48,7 @@ public class DiscountDao {
 	 * and other extra condition. 
 	 * @param dbCon
 	 * 			the database connection
-	 * @param term
+	 * @param staff
 	 * 			the terminal
 	 * @param extraCond
 	 * 			the extra condition
@@ -57,7 +58,7 @@ public class DiscountDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static List<Discount> getDiscount(DBCon dbCon, Staff term, String extraCond, String orderClause) throws SQLException{
+	public static List<Discount> getDiscount(DBCon dbCon, Staff staff, String extraCond, String orderClause) throws SQLException{
 		String sql;
 		sql = " SELECT " +
 			  " DIST.discount_id, DIST.restaurant_id, DIST.name AS dist_name, DIST.level, DIST.status AS dist_status, " +
@@ -73,7 +74,7 @@ public class DiscountDao {
 			  Params.dbName + ".kitchen KITCHEN " +
 			  " ON DIST_PLAN.kitchen_id = KITCHEN.kitchen_id " +
 			  " WHERE 1=1 " +
-			  " AND DIST.restaurant_id = " + term.getRestaurantId() +
+			  " AND DIST.restaurant_id = " + staff.getRestaurantId() +
 			  (extraCond == null ? "" : extraCond) + " " +
 			  (orderClause == null ? "" : orderClause);
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
@@ -97,7 +98,7 @@ public class DiscountDao {
 			float rate = dbCon.rs.getFloat("rate");
 			DiscountPlan plan = null;
 			if(dbCon.rs.getBoolean("has_plan") && rate != 1){
-				plan = new DiscountPlan(dbCon.rs.getInt("dist_plan_id"), kitchen,  rate);
+				plan = new DiscountPlan(dbCon.rs.getInt("dist_plan_id"), kitchen, rate);
 			}
 			
 			Discount discount = discounts.get(key);
@@ -592,6 +593,81 @@ public class DiscountDao {
 			dbCon.disconnect();
 		}
 		return count;
+	}
+	
+	/**
+	 * Insert a new discount along with the initial discount rate. 
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param builder
+	 * 			the new discount builder
+	 * @return the id to discount just inserted
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static int insert(Staff staff, Discount.InsertBuilder builder) throws SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			dbCon.conn.setAutoCommit(false);
+			
+			int discountId = insert(dbCon, staff, builder);
+			
+			dbCon.conn.commit();
+			
+			return discountId;
+			
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Insert a new discount along with the initial discount rate. 
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param builder
+	 * 			the new discount builder
+	 * @return the id to discount just inserted
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static int insert(DBCon dbCon, Staff staff, Discount.InsertBuilder builder) throws SQLException{
+		Discount discountToInsert = builder.build();
+		String sql;
+		//Insert the basic info of discount.
+		sql = " INSERT INTO " + Params.dbName + ".discount " +
+			  " (`restaurant_id`, `name`, `status`) " +
+			  " VALUES(" +
+			  discountToInsert.getRestaurantId() + "," +
+			  "'" + discountToInsert.getName() + "'," +
+			  discountToInsert.getStatus().getVal() +
+			  ")";
+		
+		dbCon.stmt.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
+		dbCon.rs = dbCon.stmt.getGeneratedKeys();
+		int discountId;
+		if(dbCon.rs.next()){
+			discountId = dbCon.rs.getInt(1);
+		}else{
+			throw new SQLException("Failed to generated the discount id.");
+		}
+	
+		//Insert each discount plan with the initial rate
+		sql = " INSERT INTO " +  Params.dbName + ".discount_plan "	+ 
+			  " (discount_id, kitchen_id, rate) ";
+		sql += " values";
+		int i = 0;
+		for(Kitchen k : KitchenDao.getKitchens(dbCon, staff, " AND KITCHEN.type = " + Kitchen.Type.NORMAL.getVal(), null)){
+			sql += ( i > 0 ? "," : "");
+			sql += ("(" + discountId + "," + k.getId() + "," + builder.getInitRate() + ")");
+			i++;
+		}
+		dbCon.stmt.executeUpdate(sql);
+		
+		return discountId;
 	}
 	
 }

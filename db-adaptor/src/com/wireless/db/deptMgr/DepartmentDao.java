@@ -115,18 +115,30 @@ public class DepartmentDao {
 		}
 	}
 	
-	public static void update(Staff term, Department deptToUpdate) throws SQLException, BusinessException{
-		DBCon dbCon = new DBCon();
-		try{
-			dbCon.connect();
-			update(dbCon, term, deptToUpdate);
-		}finally{
-			dbCon.disconnect();
-		}
+	/**
+	 * Insert a new department.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param builder
+	 * 			the builder to insert a new department
+	 * @return the id to department just inserted
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static short insert(DBCon dbCon, Department.InsertBuilder builder) throws SQLException{
+		Department deptToInsert = builder.build();
+		String sql;
+		sql = " INSERT INTO " + Params.dbName + ".department " +
+		      " (dept_id, restaurant_id, name, type) " +
+			  " VALUES(" +
+		      deptToInsert.getId() + "," +
+		      deptToInsert.getRestaurantId() + "," +
+			  "'" + deptToInsert.getName() + "'," +
+		      deptToInsert.getType().getVal() +
+		      ")";
+		
+		dbCon.stmt.executeUpdate(sql);
+		
+		return deptToInsert.getId();
 	}
-	
-	public static void update(DBCon dbCon, Staff term, Department deptToUpdate) throws SQLException, BusinessException{
-		//TODO
-	}
-	
 }

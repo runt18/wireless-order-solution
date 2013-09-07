@@ -340,7 +340,7 @@ public class TasteRefDao {
 			  " WHERE " +
 			  " FOOD_TASTE.food_id = FOOD.food_id " +
 			  " AND " +
-			  " FOOD.kitchen_alias <> " + Kitchen.KITCHEN_NULL +
+			  " FOOD.kitchen_alias <> " + Kitchen.KitchenAlias.KITCHEN_NULL.getAliasId() +
 			  " GROUP BY FOOD.kitchen_id, FOOD_TASTE.taste_id ";
 		dbCon.stmt.executeUpdate(sql);
 		

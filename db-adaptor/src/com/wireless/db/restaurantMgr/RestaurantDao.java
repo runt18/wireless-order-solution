@@ -7,16 +7,30 @@ import java.util.List;
 import com.mysql.jdbc.Statement;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
+import com.wireless.db.crMgr.CancelReasonDao;
+import com.wireless.db.deptMgr.DepartmentDao;
+import com.wireless.db.deptMgr.KitchenDao;
+import com.wireless.db.distMgr.DiscountDao;
+import com.wireless.db.regionMgr.RegionDao;
+import com.wireless.db.regionMgr.TableDao;
 import com.wireless.db.staffMgr.RoleDao;
 import com.wireless.db.staffMgr.StaffDao;
+import com.wireless.db.tasteMgr.TasteDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.ProtocolError;
 import com.wireless.exception.RestaurantError;
+import com.wireless.pojo.crMgr.CancelReason;
+import com.wireless.pojo.distMgr.Discount;
 import com.wireless.pojo.inventoryMgr.MaterialCate;
+import com.wireless.pojo.menuMgr.Department;
+import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.pojo.ppMgr.PricePlan;
+import com.wireless.pojo.regionMgr.Region;
+import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.staffMgr.Role;
 import com.wireless.pojo.staffMgr.Staff;
+import com.wireless.pojo.tasteMgr.Taste;
 import com.wireless.pojo.util.DateUtil;
 
 public class RestaurantDao {
@@ -153,13 +167,7 @@ public class RestaurantDao {
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			dbCon.conn.setAutoCommit(false);
-			
-			int restaurantId = insert(dbCon, builder);
-			dbCon.conn.commit();
-			
-			return restaurantId;
-			
+			return insert(dbCon, builder);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -181,72 +189,202 @@ public class RestaurantDao {
 		
 		Restaurant restaurant = builder.build();
 		
-		String sql;
-		//Check to whether the duplicated account exist
-		sql = " SELECT * FROM " + Params.dbName + ".restaurant WHERE account = '" + restaurant.getAccount() + "'";
-		dbCon.rs = dbCon.stmt.executeQuery(sql);
-		if(dbCon.rs.next()){
-			throw new BusinessException(RestaurantError.DUPLICATED_RESTAURANT_ACCOUNT);
+		try{
+			String sql;
+			//Check to whether the duplicated account exist
+			sql = " SELECT * FROM " + Params.dbName + ".restaurant WHERE account = '" + restaurant.getAccount() + "'";
+			dbCon.rs = dbCon.stmt.executeQuery(sql);
+			if(dbCon.rs.next()){
+				throw new BusinessException(RestaurantError.DUPLICATED_RESTAURANT_ACCOUNT);
+			}
+			dbCon.rs.close();
+			
+			//Create the new restaurant
+			sql = " INSERT INTO " + Params.dbName + ".restaurant " +
+				  " (account, birth_date, restaurant_name, restaurant_info, tele1, tele2, address, record_alive, expire_date) " +
+				  " VALUES(" +
+				  "'" + restaurant.getAccount() + "'," +
+				  "'" + DateUtil.format(restaurant.getBirthDate()) + "'," +
+				  "'" + restaurant.getName() + "'," +
+				  "'" + restaurant.getInfo() + "'," +
+				  "'" + restaurant.getTele1() + "'," +
+				  "'" + restaurant.getTele2() + "'," +
+				  "'" + restaurant.getAddress() + "'," +
+				  restaurant.getRecordAlive() + "," +
+				  "'" + DateUtil.format(restaurant.getExpireDate()) + "'" +			  
+				  " ) ";
+			
+			dbCon.stmt.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
+			dbCon.rs = dbCon.stmt.getGeneratedKeys();
+			if(dbCon.rs.next()){
+				restaurant.setId(dbCon.rs.getInt(1));
+			}else{
+				throw new SQLException("The id of printer is not generated successfully.");
+			}
+			dbCon.rs.close();
+			
+			//Insert the staff
+			Staff staff = initStaff(dbCon, restaurant.getId(), builder.getPwd());
+			
+			//Insert '商品' material category
+			initMaterialCate(dbCon, restaurant.getId());
+			
+			//Insert默认的活动价格方案
+			initPricePlan(dbCon, restaurant.getId());
+			
+			//Insert the '大牌', '中牌', '例牌' and popular tastes
+			initTastes(dbCon, staff);
+
+			//Insert the departments ranged from 1 to 10
+			initDepartment(dbCon, staff);
+
+			//Insert the kitchens ranged from 1 to 50
+			initKitchen(dbCon, staff);
+			
+			//Insert the regions ranged from 1 - 10
+			initRegion(dbCon, staff);
+			
+			//Insert the tables
+			initTable(dbCon, staff);
+			
+			//Insert the '无折扣'折扣方案
+			initDiscount(dbCon, staff);
+			
+			//Insert the popular cancel reasons
+			initCancelReason(dbCon, staff);
+			
+			return restaurant.getId();
+			
+		}catch(Exception e){
+			if(restaurant.getId() > Restaurant.RESERVED_7){
+				deleteById(restaurant.getId());
+			}
+			throw new SQLException(e);
 		}
-		dbCon.rs.close();
-		
-		//Create the new restaurant
-		sql = " INSERT INTO " + Params.dbName + ".restaurant " +
-			  " (account, birth_date, restaurant_name, restaurant_info, tele1, tele2, address, record_alive, expire_date) " +
-			  " VALUES(" +
-			  "'" + restaurant.getAccount() + "'," +
-			  "'" + DateUtil.format(restaurant.getBirthDate()) + "'," +
-			  "'" + restaurant.getName() + "'," +
-			  "'" + restaurant.getInfo() + "'," +
-			  "'" + restaurant.getTele1() + "'," +
-			  "'" + restaurant.getTele2() + "'," +
-			  "'" + restaurant.getAddress() + "'," +
-			  restaurant.getRecordAlive() + "," +
-			  "'" + DateUtil.format(restaurant.getExpireDate()) + "'" +			  
-			  " ) ";
-		
-		dbCon.stmt.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
-		dbCon.rs = dbCon.stmt.getGeneratedKeys();
-		if(dbCon.rs.next()){
-			restaurant.setId(dbCon.rs.getInt(1));
-		}else{
-			throw new SQLException("The id of printer is not generated successfully.");
-		}
-		dbCon.rs.close();
-		
-		//Insert '商品' material category
-		insertMaterialCate(dbCon, restaurant.getId());
-		
-		//Insert默认的活动价格方案
-		insertPricePlan(dbCon, restaurant.getId());
-		
-		//Insert the '大牌', '中牌', '例牌' and popular tastes
-		
-		//Insert the '无折扣'折扣方案
-		
-		//Insert the kitchens
-		
-		//Insert the departments
-		
-		//Insert the regions
-		
-		//Insert the tables
-		
-		//Insert the popular cancel reasons
-		
-		//Insert the staff
-		insertStaff(dbCon, restaurant.getId(), builder.getPwd());
-		
-		return restaurant.getId();
+
 	}
 	
-	private static void insertStaff(DBCon dbCon, int restaurantId, String pwd) throws SQLException, BusinessException{
+	private static void initCancelReason(DBCon dbCon, Staff staff) throws SQLException{
+		for(CancelReason.DefaultCR defCancelReason : CancelReason.DefaultCR.values()){
+			CancelReasonDao.insert(dbCon, staff, new CancelReason.InsertBuilder(staff.getRestaurantId(), defCancelReason.getReason()));
+		}
+	}
+	
+	private static void initTable(DBCon dbCon, Staff staff) throws SQLException, BusinessException{
+		TableDao.insert(staff, new Table.InsertBuilder(1, staff.getRestaurantId(), Region.RegionId.REGION_1.getId()));
+		TableDao.insert(staff, new Table.InsertBuilder(2, staff.getRestaurantId(), Region.RegionId.REGION_1.getId()));
+		TableDao.insert(staff, new Table.InsertBuilder(3, staff.getRestaurantId(), Region.RegionId.REGION_1.getId()));
+		TableDao.insert(staff, new Table.InsertBuilder(5, staff.getRestaurantId(), Region.RegionId.REGION_1.getId()));
+		TableDao.insert(staff, new Table.InsertBuilder(6, staff.getRestaurantId(), Region.RegionId.REGION_1.getId()));
+		TableDao.insert(staff, new Table.InsertBuilder(7, staff.getRestaurantId(), Region.RegionId.REGION_1.getId()));
+		TableDao.insert(staff, new Table.InsertBuilder(8, staff.getRestaurantId(), Region.RegionId.REGION_1.getId()));
+		TableDao.insert(staff, new Table.InsertBuilder(9, staff.getRestaurantId(), Region.RegionId.REGION_1.getId()));
+		TableDao.insert(staff, new Table.InsertBuilder(10, staff.getRestaurantId(), Region.RegionId.REGION_1.getId()));
+	}
+	
+	private static void initRegion(DBCon dbCon, Staff staff) throws SQLException{
+		RegionDao.insert(dbCon, staff, new Region.InsertBuilder(staff.getRestaurantId(), Region.RegionId.REGION_1));
+		RegionDao.insert(dbCon, staff, new Region.InsertBuilder(staff.getRestaurantId(), Region.RegionId.REGION_2));
+		RegionDao.insert(dbCon, staff, new Region.InsertBuilder(staff.getRestaurantId(), Region.RegionId.REGION_3));
+		RegionDao.insert(dbCon, staff, new Region.InsertBuilder(staff.getRestaurantId(), Region.RegionId.REGION_4));
+		RegionDao.insert(dbCon, staff, new Region.InsertBuilder(staff.getRestaurantId(), Region.RegionId.REGION_5));
+		RegionDao.insert(dbCon, staff, new Region.InsertBuilder(staff.getRestaurantId(), Region.RegionId.REGION_6));
+		RegionDao.insert(dbCon, staff, new Region.InsertBuilder(staff.getRestaurantId(), Region.RegionId.REGION_7));
+		RegionDao.insert(dbCon, staff, new Region.InsertBuilder(staff.getRestaurantId(), Region.RegionId.REGION_8));
+		RegionDao.insert(dbCon, staff, new Region.InsertBuilder(staff.getRestaurantId(), Region.RegionId.REGION_9));
+		RegionDao.insert(dbCon, staff, new Region.InsertBuilder(staff.getRestaurantId(), Region.RegionId.REGION_10));
+	}
+	
+	private static void initDepartment(DBCon dbCon, Staff staff) throws SQLException{
+		DepartmentDao.insert(dbCon, new Department.InsertBuilder(staff.getRestaurantId(), Department.DeptId.DEPT_1));
+		DepartmentDao.insert(dbCon, new Department.InsertBuilder(staff.getRestaurantId(), Department.DeptId.DEPT_2));
+		DepartmentDao.insert(dbCon, new Department.InsertBuilder(staff.getRestaurantId(), Department.DeptId.DEPT_3));
+		DepartmentDao.insert(dbCon, new Department.InsertBuilder(staff.getRestaurantId(), Department.DeptId.DEPT_4));
+		DepartmentDao.insert(dbCon, new Department.InsertBuilder(staff.getRestaurantId(), Department.DeptId.DEPT_5));
+		DepartmentDao.insert(dbCon, new Department.InsertBuilder(staff.getRestaurantId(), Department.DeptId.DEPT_6));
+		DepartmentDao.insert(dbCon, new Department.InsertBuilder(staff.getRestaurantId(), Department.DeptId.DEPT_7));
+		DepartmentDao.insert(dbCon, new Department.InsertBuilder(staff.getRestaurantId(), Department.DeptId.DEPT_8));
+		DepartmentDao.insert(dbCon, new Department.InsertBuilder(staff.getRestaurantId(), Department.DeptId.DEPT_9));
+		DepartmentDao.insert(dbCon, new Department.InsertBuilder(staff.getRestaurantId(), Department.DeptId.DEPT_10));
+		DepartmentDao.insert(dbCon, new Department.InsertBuilder(staff.getRestaurantId(), Department.DeptId.DEPT_TMP));
+		DepartmentDao.insert(dbCon, new Department.InsertBuilder(staff.getRestaurantId(), Department.DeptId.DEPT_NULL));
+	}
+	
+	private static void initKitchen(DBCon dbCon, Staff staff) throws SQLException{
+		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder(staff.getRestaurantId(), Kitchen.KitchenAlias.KITCHEN_1));
+		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder(staff.getRestaurantId(), Kitchen.KitchenAlias.KITCHEN_2));
+		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder(staff.getRestaurantId(), Kitchen.KitchenAlias.KITCHEN_3));
+		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder(staff.getRestaurantId(), Kitchen.KitchenAlias.KITCHEN_4));
+		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder(staff.getRestaurantId(), Kitchen.KitchenAlias.KITCHEN_5));
+		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder(staff.getRestaurantId(), Kitchen.KitchenAlias.KITCHEN_6));
+		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder(staff.getRestaurantId(), Kitchen.KitchenAlias.KITCHEN_7));
+		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder(staff.getRestaurantId(), Kitchen.KitchenAlias.KITCHEN_8));
+		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder(staff.getRestaurantId(), Kitchen.KitchenAlias.KITCHEN_9));
+		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder(staff.getRestaurantId(), Kitchen.KitchenAlias.KITCHEN_10));
+		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder(staff.getRestaurantId(), Kitchen.KitchenAlias.KITCHEN_11));
+		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder(staff.getRestaurantId(), Kitchen.KitchenAlias.KITCHEN_12));
+		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder(staff.getRestaurantId(), Kitchen.KitchenAlias.KITCHEN_13));
+		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder(staff.getRestaurantId(), Kitchen.KitchenAlias.KITCHEN_14));
+		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder(staff.getRestaurantId(), Kitchen.KitchenAlias.KITCHEN_15));
+		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder(staff.getRestaurantId(), Kitchen.KitchenAlias.KITCHEN_16));
+		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder(staff.getRestaurantId(), Kitchen.KitchenAlias.KITCHEN_17));
+		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder(staff.getRestaurantId(), Kitchen.KitchenAlias.KITCHEN_18));
+		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder(staff.getRestaurantId(), Kitchen.KitchenAlias.KITCHEN_19));
+		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder(staff.getRestaurantId(), Kitchen.KitchenAlias.KITCHEN_20));
+		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder(staff.getRestaurantId(), Kitchen.KitchenAlias.KITCHEN_21));
+		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder(staff.getRestaurantId(), Kitchen.KitchenAlias.KITCHEN_22));
+		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder(staff.getRestaurantId(), Kitchen.KitchenAlias.KITCHEN_23));
+		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder(staff.getRestaurantId(), Kitchen.KitchenAlias.KITCHEN_24));
+		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder(staff.getRestaurantId(), Kitchen.KitchenAlias.KITCHEN_25));
+		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder(staff.getRestaurantId(), Kitchen.KitchenAlias.KITCHEN_26));
+		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder(staff.getRestaurantId(), Kitchen.KitchenAlias.KITCHEN_27));
+		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder(staff.getRestaurantId(), Kitchen.KitchenAlias.KITCHEN_28));
+		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder(staff.getRestaurantId(), Kitchen.KitchenAlias.KITCHEN_29));
+		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder(staff.getRestaurantId(), Kitchen.KitchenAlias.KITCHEN_30));
+		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder(staff.getRestaurantId(), Kitchen.KitchenAlias.KITCHEN_31));
+		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder(staff.getRestaurantId(), Kitchen.KitchenAlias.KITCHEN_32));
+		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder(staff.getRestaurantId(), Kitchen.KitchenAlias.KITCHEN_33));
+		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder(staff.getRestaurantId(), Kitchen.KitchenAlias.KITCHEN_34));
+		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder(staff.getRestaurantId(), Kitchen.KitchenAlias.KITCHEN_35));
+		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder(staff.getRestaurantId(), Kitchen.KitchenAlias.KITCHEN_36));
+		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder(staff.getRestaurantId(), Kitchen.KitchenAlias.KITCHEN_37));
+		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder(staff.getRestaurantId(), Kitchen.KitchenAlias.KITCHEN_38));
+		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder(staff.getRestaurantId(), Kitchen.KitchenAlias.KITCHEN_39));
+		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder(staff.getRestaurantId(), Kitchen.KitchenAlias.KITCHEN_40));
+		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder(staff.getRestaurantId(), Kitchen.KitchenAlias.KITCHEN_41));
+		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder(staff.getRestaurantId(), Kitchen.KitchenAlias.KITCHEN_42));
+		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder(staff.getRestaurantId(), Kitchen.KitchenAlias.KITCHEN_43));
+		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder(staff.getRestaurantId(), Kitchen.KitchenAlias.KITCHEN_44));
+		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder(staff.getRestaurantId(), Kitchen.KitchenAlias.KITCHEN_45));
+		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder(staff.getRestaurantId(), Kitchen.KitchenAlias.KITCHEN_46));
+		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder(staff.getRestaurantId(), Kitchen.KitchenAlias.KITCHEN_47));
+		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder(staff.getRestaurantId(), Kitchen.KitchenAlias.KITCHEN_48));
+		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder(staff.getRestaurantId(), Kitchen.KitchenAlias.KITCHEN_49));
+		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder(staff.getRestaurantId(), Kitchen.KitchenAlias.KITCHEN_50));
+		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder(staff.getRestaurantId(), Kitchen.KitchenAlias.KITCHEN_TEMP));
+		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder(staff.getRestaurantId(), Kitchen.KitchenAlias.KITCHEN_NULL));
+	}
+	
+	private static void initDiscount(DBCon dbCon, Staff staff) throws SQLException{
+		DiscountDao.insert(dbCon, staff, new Discount.NotDiscountBuilder(staff.getRestaurantId()));
+	}
+	
+	private static void initTastes(DBCon dbCon, Staff staff) throws SQLException{
+		//Insert the '例牌'
+		TasteDao.insert(dbCon, staff, new Taste.RegularInsertBuilder(staff.getRestaurantId()));
+		//Insert the '中牌'
+		TasteDao.insert(dbCon, staff, new Taste.MediumInsertBuilder(staff.getRestaurantId()));
+		//Insert the '大牌'
+		TasteDao.insert(dbCon, staff, new Taste.LargeInsertBuilder(staff.getRestaurantId()));
+	}
+	
+	private static Staff initStaff(DBCon dbCon, int restaurantId, String pwd) throws SQLException, BusinessException{
 		Staff staff = new Staff();
 		staff.setRestaurantId(restaurantId);
 		//insert '管理员' role
 		int adminRoleId = RoleDao.insertRole(dbCon, staff, new Role.DefAdminBuilder(restaurantId));
 		//insert '管理员' staff
-		StaffDao.insertStaff(dbCon, new Staff.DefAdminBuilder(pwd, restaurantId, new Role(adminRoleId)));
+		int staffId = StaffDao.insertStaff(dbCon, new Staff.DefAdminBuilder(pwd, restaurantId, new Role(adminRoleId)));
 		//insert '老板' role
 		RoleDao.insertRole(dbCon, staff, new Role.DefBossBuilder(restaurantId));
 		//insert '财务' role
@@ -257,9 +395,15 @@ public class RestaurantDao {
 		RoleDao.insertRole(dbCon, staff, new Role.DefCashierBuilder(restaurantId));
 		//insert '服务员' role
 		RoleDao.insertRole(dbCon, staff, new Role.DefWaiterBuilder(restaurantId));
+		
+		staff = new Staff.DefAdminBuilder(pwd, restaurantId, new Role(adminRoleId)).build();
+		staff.setRestaurantId(restaurantId);
+		staff.setId(staffId);
+		
+		return staff;
 	}
 	
-	private static void insertMaterialCate(DBCon dbCon, int restaurantId) throws SQLException{
+	private static void initMaterialCate(DBCon dbCon, int restaurantId) throws SQLException{
 		String sql;
 		sql = " INSERT INTO " + Params.dbName + ".material_cate " +
 			  "(`restaurant_id`, `name`, `type`)" +
@@ -271,7 +415,7 @@ public class RestaurantDao {
 		dbCon.stmt.executeUpdate(sql);
 	}
 	
-	private static void insertPricePlan(DBCon dbCon, int restaurantId) throws SQLException{
+	private static void initPricePlan(DBCon dbCon, int restaurantId) throws SQLException{
 		String sql;
 		sql = " INSERT INTO " + Params.dbName + ".price_plan " +
 			  "(`restaurant_id`, `name`, `status`)" +
@@ -312,6 +456,11 @@ public class RestaurantDao {
 		
 		//Delete the '大牌', '中牌', '例牌' and popular tastes
 		sql = " DELETE FROM " + Params.dbName + ".taste WHERE restaurant_id = " + restaurantId;
+		dbCon.stmt.executeUpdate(sql);
+
+		//Delete the '无折扣'折扣方案
+		sql = " DELETE FROM " + Params.dbName + ".discount_plan WHERE discount_id IN " + 
+			  "( SELECT discount_id FROM " + Params.dbName + ".discount WHERE restaurant_id = " + restaurantId + ")";
 		dbCon.stmt.executeUpdate(sql);
 		
 		//Delete the '无折扣'折扣方案

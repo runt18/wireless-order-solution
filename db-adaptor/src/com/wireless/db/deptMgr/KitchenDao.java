@@ -4,6 +4,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.mysql.jdbc.Statement;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.exception.BusinessException;
@@ -128,8 +129,40 @@ public class KitchenDao {
 		}
 	}
 	
-	public static void update(DBCon dbCon, Staff term, Kitchen kitchenToUpdate) throws SQLException, BusinessException{
-		//TODO
+	/**
+	 * Insert a new kitchen.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param builder
+	 * 			the builder to insert a new kitchen
+	 * @return the id to kitchen just inserted
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static int insert(DBCon dbCon, Staff staff, Kitchen.InsertBuilder builder) throws SQLException{
+		String sql;
+		sql = " INSERT INTO " + Params.dbName + ".kitchen" +
+		      " (restaurant_id, kitchen_alias, name, type, dept_id) " +
+			  " VALUES ( " +
+		      builder.getRestaurantId() + "," +
+			  builder.getKitchenAlias() + "," +
+		      "'" + builder.getKitchenName() + "'," +
+			  builder.getType().getVal() + "," +
+			  builder.getDeptId().getVal() +
+		      " ) ";
+		
+		dbCon.stmt.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
+		dbCon.rs = dbCon.stmt.getGeneratedKeys();
+		int kitchenId = 0;
+		if(dbCon.rs.next()){
+			kitchenId = dbCon.rs.getInt(1);
+		}else{
+			throw new SQLException("Failed to generated the kitchen id.");
+		}
+		
+		return kitchenId;
 	}
 	
 }

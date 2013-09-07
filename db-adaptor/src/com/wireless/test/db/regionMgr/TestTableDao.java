@@ -52,7 +52,7 @@ public class TestTableDao {
 		Table.UpdateBuilder builder = new Table.UpdateBuilder(oriTbl.getTableId()).setMiniCost(20)
 																				  .setServiceRate(0.1f)
 																				  .setTableName("测试餐台")
-																				  .setRegionId(Region.REGION_1);
+																				  .setRegionId(Region.RegionId.REGION_1.getId());
 		Table expected = builder.build();
 		TableDao.updateById(mStaff, expected);
 		
@@ -74,7 +74,7 @@ public class TestTableDao {
 	public void testInsert() throws BusinessException, SQLException{
 		
 		//Create and insert a new table
-		Table.InsertBuilder builder = new Table.InsertBuilder(12345, mStaff.getRestaurantId(), Region.REGION_1).setMiniCost(200)
+		Table.InsertBuilder builder = new Table.InsertBuilder(12345, mStaff.getRestaurantId(), Region.RegionId.REGION_1.getId()).setMiniCost(200)
 								  																			 .setServiceRate(0.1f)
 								  																			 .setTableName("测试餐台");
 		

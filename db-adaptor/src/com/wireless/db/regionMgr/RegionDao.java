@@ -13,20 +13,67 @@ import com.wireless.pojo.staffMgr.Staff;
 public class RegionDao {
 
 	/**
+	 * Insert a new region.
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param builder
+	 * 			the builder to insert a new region
+	 * @return the id to region just inserted
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static short insert(Staff staff, Region.InsertBuilder builder) throws SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return insert(dbCon, staff, builder);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Insert a new region.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param builder
+	 * 			the builder to insert a new region
+	 * @return the id to region just inserted
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static short insert(DBCon dbCon, Staff staff, Region.InsertBuilder builder) throws SQLException{
+		Region regionToInsert = builder.build();
+		String sql;
+		sql = " INSERT INTO " + Params.dbName + ".region " + 
+			  " (restaurant_id, region_id, name) " +
+			  " VALUES (" +
+			  regionToInsert.getRestaurantId() + "," +
+			  regionToInsert.getRegionId() + "," +
+			  "'" + regionToInsert.getName() + "'" +
+			  ")";
+		dbCon.stmt.executeUpdate(sql);
+		
+		return regionToInsert.getRegionId();
+	}
+	
+	/**
 	 * Update a specified region.
-	 * @param region
+	 * @param builder
 	 * 			the region to update
 	 * @throws SQLException
 	 * 			if failed to execute any SQL statements
 	 * @throws BusinessException
 	 * 			if the region to update does NOT exist
 	 */
-	public static void update(Staff term, Region region) throws SQLException, BusinessException {
+	public static void update(Staff staff, Region.UpdateBuilder builder) throws SQLException, BusinessException {
 		DBCon dbCon = new DBCon();
 		try {
 			
 			dbCon.connect();
-			update(dbCon, term, region);
+			update(dbCon, staff, builder);
 			
 		} finally {
 			dbCon.disconnect();
@@ -37,20 +84,22 @@ public class RegionDao {
 	 * Update the region to a specified restaurant defined in {@link Staff}.
 	 * @param dbCon
 	 * 			the database connection
-	 * @param region
+	 * @param builder
 	 * 			the region to update
 	 * @throws SQLException
 	 * 			if failed to execute any SQL statements
 	 * @throws BusinessException
 	 * 			if the region to update does NOT exist
 	 */
-	public static void update(DBCon dbCon, Staff term, Region region) throws SQLException, BusinessException{
+	public static void update(DBCon dbCon, Staff staff, Region.UpdateBuilder builder) throws SQLException, BusinessException{
 		
 		String sql;
 		
+		Region region = builder.build();
+		
 		sql = " UPDATE " + Params.dbName + ".region " + 
 			  " SET name = '" + region.getName() + "'" +
-			  " WHERE restaurant_id = " + term.getRestaurantId() +
+			  " WHERE restaurant_id = " + staff.getRestaurantId() +
 			  " AND region_id = " + region.getRegionId();
 		
 		if (dbCon.stmt.executeUpdate(sql) == 0) {
@@ -60,22 +109,21 @@ public class RegionDao {
 	
 	/**
 	 * Get regions to a specified restaurant defined in terminal {@link Staff} and other extra condition.
-	 * 获取地区端子{@链接终端}和其他额外条件定义到指定的餐厅。
-	 * @param term
-	 * 			the terminal终端
+	 * @param staff
+	 * 			the terminal
 	 * @param extraCond
-	 * 			the extra condition额外条件
+	 * 			the extra condition
 	 * @param orderClause
 	 * 			the order clause
-	 * @return the list holding the region result 区域列表
+	 * @return the list holding the region result 
 	 * @throws SQLException
 	 * 			if failed to execute any SQL statement
 	 */
-	public static List<Region> getRegions(Staff term, String extraCond, String orderClause) throws SQLException {
+	public static List<Region> getRegions(Staff staff, String extraCond, String orderClause) throws SQLException {
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return getRegions(dbCon, term, extraCond, orderClause);
+			return getRegions(dbCon, staff, extraCond, orderClause);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -86,7 +134,7 @@ public class RegionDao {
 	 * Get regions to a specified restaurant defined in terminal {@link Staff} and other extra condition.
 	 * @param dbCon
 	 * 			the database connection
-	 * @param term
+	 * @param staff
 	 * 			the terminal
 	 * @param extraCond
 	 * 			the extra condition
@@ -96,13 +144,13 @@ public class RegionDao {
 	 * @throws SQLException
 	 * 			if failed to execute any SQL statement
 	 */
-	public static List<Region> getRegions(DBCon dbCon, Staff term, String extraCond, String orderClause) throws SQLException {
+	public static List<Region> getRegions(DBCon dbCon, Staff staff, String extraCond, String orderClause) throws SQLException {
 		List<Region> regions = new ArrayList<Region>();
 
 		String sql = " SELECT " 
 					+ " REGION.region_id, REGION.restaurant_id, REGION.name "
 					+ " FROM " + Params.dbName + ".region REGION"
-					+ " WHERE REGION.restaurant_id = " + term.getRestaurantId() + " "
+					+ " WHERE REGION.restaurant_id = " + staff.getRestaurantId() + " "
 					+ (extraCond == null ? "" : extraCond)
 					+ (orderClause == null ? "" : orderClause);
 		dbCon.rs = dbCon.stmt.executeQuery(sql);

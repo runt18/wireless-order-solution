@@ -18,7 +18,7 @@ public class TasteDao {
 	 * Get the tastes to the specified restaurant defined in {@link Staff} and category {@link Taste.Category}.
 	 * @param dbCon
 	 * 			the database connection
-	 * @param term
+	 * @param staff
 	 * 			the terminal
 	 * @param category
 	 * 			the category
@@ -26,15 +26,15 @@ public class TasteDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static List<Taste> getTasteByCategory(DBCon dbCon, Staff term, Taste.Category category) throws SQLException{
-		return getTastes(dbCon, term, " AND TASTE.category = " + category.getVal(), null);
+	public static List<Taste> getTasteByCategory(DBCon dbCon, Staff staff, Taste.Category category) throws SQLException{
+		return getTastes(dbCon, staff, " AND TASTE.category = " + category.getVal(), null);
 	}
 	
 	/**
 	 * Get the taste to the specified restaurant and taste id.
 	 * @param dbCon
 	 * 			the database connection
-	 * @param term	
+	 * @param staff	
 	 * 			the terminal
 	 * @param tasteid
 	 * 			the taste id
@@ -44,10 +44,10 @@ public class TasteDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static Taste getTasteById(DBCon dbCon, Staff term, int tasteId) throws SQLException, BusinessException{
-		List<Taste> tastes = TasteDao.getTastes(dbCon, term, " AND taste_id = " + tasteId, null);
+	public static Taste getTasteById(DBCon dbCon, Staff staff, int tasteId) throws SQLException, BusinessException{
+		List<Taste> tastes = TasteDao.getTastes(dbCon, staff, " AND taste_id = " + tasteId, null);
 		if(tastes.isEmpty()){
-			throw new BusinessException("The taste(taste_id = " + tasteId + ", restaurant_id = " + term.getRestaurantId() + ") is NOT found.");
+			throw new BusinessException("The taste(taste_id = " + tasteId + ", restaurant_id = " + staff.getRestaurantId() + ") is NOT found.");
 		}else{
 			return tastes.get(0);
 		}
@@ -55,7 +55,7 @@ public class TasteDao {
 	
 	/**
 	 * Get the taste to the specified restaurant and taste id.
-	 * @param term	
+	 * @param staff	
 	 * 			the terminal
 	 * @param tasteid
 	 * 			the taste id
@@ -65,11 +65,11 @@ public class TasteDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static Taste getTasteById(Staff term, int id) throws SQLException, BusinessException{
+	public static Taste getTasteById(Staff staff, int tasteId) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return TasteDao.getTasteById(dbCon, term, id);
+			return TasteDao.getTasteById(dbCon, staff, tasteId);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -79,7 +79,7 @@ public class TasteDao {
 	 * Get the tastes to the specified restaurant defined in {@link Staff} and other extra condition.
 	 * @param dbCon
 	 * 			the database connection
-	 * @param term
+	 * @param staff
 	 * 			the terminal
 	 * @param extraCond
 	 * 			the extra condition
@@ -89,14 +89,14 @@ public class TasteDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static List<Taste> getTastes(DBCon dbCon, Staff term, String extraCond, String orderClause) throws SQLException{
+	public static List<Taste> getTastes(DBCon dbCon, Staff staff, String extraCond, String orderClause) throws SQLException{
 		String sql = " SELECT " +
 				 	 " taste_id, restaurant_id, preference, " +
 				 	 " category, calc, rate, price, type " +
 				 	 " FROM " + 
 				 	 Params.dbName + ".taste TASTE " +
 				 	 " WHERE 1=1 " +
-				 	 " AND TASTE.restaurant_id = " + term.getRestaurantId() + " " +
+				 	 " AND TASTE.restaurant_id = " + staff.getRestaurantId() + " " +
 				 	 (extraCond == null ? "" : extraCond) + " " +
 				 	 (orderClause == null ? "" : orderClause);
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
@@ -122,17 +122,17 @@ public class TasteDao {
 	
 	/**
 	 * 
-	 * @param term
+	 * @param staff
 	 * @param extraCond
 	 * @param orderClause
 	 * @return
 	 * @throws SQLException
 	 */
-	public static List<Taste> getTastes(Staff term, String extraCond, String orderClause) throws SQLException{
+	public static List<Taste> getTastes(Staff staff, String extraCond, String orderClause) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return TasteDao.getTastes(dbCon, term, extraCond, orderClause);
+			return TasteDao.getTastes(dbCon, staff, extraCond, orderClause);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -155,14 +155,15 @@ public class TasteDao {
 		Taste tasteToInsert = builder.build();
 		
 		String insertSQL = "INSERT INTO " + Params.dbName + ".taste"
-						 + "( restaurant_id, preference, price, category, rate, calc )"
+						 + "( restaurant_id, preference, price, category, rate, calc, type )"
 						 + "VALUES("
 						 + tasteToInsert.getRestaurantId() + ","
 						 + "'" + tasteToInsert.getPreference() + "',"
 						 + tasteToInsert.getPrice() + ","
 						 + tasteToInsert.getCategory().getVal() + ","
 						 + tasteToInsert.getRate() + ","
-						 + tasteToInsert.getCalc().getVal()
+						 + tasteToInsert.getCalc().getVal() + "," 
+						 + tasteToInsert.getType().getVal() 
 						 + ")";
 		
 		dbCon.stmt.executeUpdate(insertSQL, Statement.RETURN_GENERATED_KEYS);
