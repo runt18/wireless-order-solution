@@ -144,6 +144,9 @@ public class QueryPrivilegeAction extends DispatchAction{
 								children.append(",text:'" + root.get(i).getDiscounts().get(j).getName() + "'");
 								//转折
 								if(rolePrivilege.get(index).getDiscounts().isEmpty()){
+									if(root.get(i).getDiscounts().get(j).getStatus() == Discount.Status.RESERVED || root.get(i).getDiscounts().get(j).getStatus() == Discount.Status.DEFAULT_RESERVED){
+										children.append(",disabled:true");
+									}
 									children.append(",checked:true");
 								}else{
 									int disIndex = rolePrivilege.get(index).getDiscounts().indexOf(root.get(i).getDiscounts().get(j));
