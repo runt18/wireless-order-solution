@@ -11,6 +11,50 @@ public class Discount implements Parcelable{
 	public final static byte DISCOUNT_PARCELABLE_COMPLEX = 0;
 	public final static byte DISCOUNT_PARCELABLE_SIMPLE = 1;
 	
+	//The helper class insert a '无折扣'
+	public static class NotDiscountBuilder extends InsertBuilder{
+		public final static String TAG = "无折扣";
+		public NotDiscountBuilder(int restaurantId){
+			super(TAG, restaurantId);
+			setStatus(Status.DEFAULT_RESERVED);
+			setInitRage(1);
+		}
+	}
+	
+	//The helper class to insert a new discount
+	public static class InsertBuilder{
+		private final String name;
+		private final int restaurantId;
+		private Status status = Status.NORMAL;
+		private float initRate = 1;
+		
+		public InsertBuilder(String name, int restaurantId){
+			this.name = name;
+			this.restaurantId = restaurantId;
+		}
+		
+		public InsertBuilder setStatus(Status status){
+			this.status = status;
+			return this;
+		}
+		
+		public InsertBuilder setInitRage(float rate){
+			if(rate < 0 || rate > 1){
+				throw new IllegalArgumentException("The initial rate must be ranged from 0 to 1.");
+			}
+			this.initRate = rate;
+			return this;
+		}
+		
+		public float getInitRate(){
+			return this.initRate;
+		}
+		
+		public Discount build(){
+			return new Discount(this);
+		}
+	}
+	
 	public static enum Status{
 		
 		NORMAL(0, "normal"),							// 一般类型
@@ -53,6 +97,12 @@ public class Discount implements Parcelable{
 	private int level;
 	private Status status = Status.NORMAL;
 	private List<DiscountPlan> plans = new ArrayList<DiscountPlan>();
+	
+	private Discount(InsertBuilder builder){
+		setName(builder.name);
+		setRestaurantId(builder.restaurantId);
+		setStatus(builder.status);
+	}
 	
 	public Discount(){
 		

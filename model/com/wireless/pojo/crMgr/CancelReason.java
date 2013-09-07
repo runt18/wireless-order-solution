@@ -20,6 +20,68 @@ public class CancelReason implements Parcelable, Jsonable{
 	private int id = NO_REASON;
 	private int restaurantId;
 	private String reason;
+
+	public static enum DefaultCR{
+		DEF_CR_1("上菜慢"),
+		DEF_CR_2("点错菜"),
+		DEF_CR_3("菜品停售"),
+		DEF_CR_4("菜品问题"),
+		DEF_CR_5("客人问题");
+		
+		private final String reason;
+		
+		DefaultCR(String reason){
+			this.reason = reason; 
+		}
+		
+		public String getReason(){
+			return reason;
+		}
+		
+		@Override
+		public String toString(){
+			return reason;
+		}
+	}
+	
+	//The helper class to insert a new cancel reason
+	public static class InsertBuilder{
+		private final int restaurantId;
+		private final String reason;
+		
+		public InsertBuilder(int restaurantId, String reason){
+			this.restaurantId = restaurantId;
+			this.reason = reason;
+		}
+		
+		public CancelReason build(){
+			return new CancelReason(this);
+		}
+	}
+	
+	public static class UpdateBuilder{
+		private final int id;
+		private final String reason;
+		
+		public UpdateBuilder(int id, String reason){
+			this.id = id;
+			this.reason = reason;
+		}
+		
+		public CancelReason build(){
+			return new CancelReason(this);
+		}
+	}
+	
+	private CancelReason(InsertBuilder builder){
+		this.restaurantId = builder.restaurantId;
+		this.reason = builder.reason;
+	}
+	
+	private CancelReason(UpdateBuilder builder){
+		this.id = builder.id;
+		this.reason = builder.reason;
+	}
 	
 	public CancelReason(){}
 	

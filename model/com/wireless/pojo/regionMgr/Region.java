@@ -21,16 +21,98 @@ public class Region implements Parcelable, Jsonable, Comparable<Region>{
 	private String name;
 	private int restaurantId;
 	
-	public final static short REGION_1 = 0;
-	public final static short REGION_2 = 1;
-	public final static short REGION_3 = 2;
-	public final static short REGION_4 = 3;
-	public final static short REGION_5 = 4;
-	public final static short REGION_6 = 5;
-	public final static short REGION_7 = 6;
-	public final static short REGION_8 = 7;
-	public final static short REGION_9 = 8;
-	public final static short REGION_10 = 9;
+	public static enum RegionId{
+		REGION_1(0, "大厅"),
+		REGION_2(1, "区域2"),
+		REGION_3(2, "区域3"),
+		REGION_4(3, "区域4"),
+		REGION_5(4, "区域5"),
+		REGION_6(5, "区域6"),
+		REGION_7(6, "区域7"),
+		REGION_8(7, "区域8"),
+		REGION_9(8, "区域9"),
+		REGION_10(9, "区域10");
+		
+		private final int id;
+		private final String name;
+		
+		RegionId(int id, String name){
+			this.id = id;
+			this.name = name;
+		}
+		
+		public short getId(){
+			return (short)this.id;
+		}
+		
+		public String getName(){
+			return this.name;
+		}
+		
+		public static RegionId valueOf(int id){
+			for(RegionId regionId : values()){
+				if(regionId.id == id){
+					return regionId;
+				}
+			}
+			throw new IllegalArgumentException("The region id(" + id + ")is invalid.");
+		}
+		
+		@Override
+		public String toString(){
+			return "region(id = " + id + ", name = " + name + ")";
+		}
+	}
+	
+	//The helper class to insert a new region
+	public static class InsertBuilder{
+		private final String name;
+		private final int restaurantId;
+		private final short regionId;
+		
+		public InsertBuilder(int restaurantId, RegionId regionId){
+			this(restaurantId, regionId, regionId.name);
+		}
+		
+		public InsertBuilder(int restaurantId, RegionId regionId, String name){
+			this.restaurantId = restaurantId;
+			this.name = name;
+			this.regionId = regionId.getId();
+		}
+		
+		public Region build(){
+			return new Region(this);
+		}
+	}
+	
+	//The helper class to update region
+	public static class UpdateBuilder{
+		private final String name;
+		private final int restaurantId;
+		private final short regionId;
+		
+		public UpdateBuilder(int restaurantId, RegionId regionId, String name){
+			this.restaurantId = restaurantId;
+			this.name = name;
+			this.regionId = regionId.getId();
+		}
+		
+		public Region build(){
+			return new Region(this);
+		}
+	}
+	
+	private Region(InsertBuilder builder){
+		this.restaurantId = builder.restaurantId;
+		this.name = builder.name;
+		this.id = builder.regionId;
+	}
+	
+	private Region(UpdateBuilder builder){
+		this.restaurantId = builder.restaurantId;
+		this.name = builder.name;
+		this.id = builder.regionId;
+	}
 	
 	public Region(){}
 	

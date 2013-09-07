@@ -15,27 +15,113 @@ public class Department implements Parcelable, Comparable<Department>, Jsonable{
 	public final static byte DEPT_PARCELABLE_COMPLEX = 0;
 	public final static byte DEPT_PARCELABLE_SIMPLE = 1;
 	
-	public final static short DEPT_TEMP = 253;
-	public final static short DEPT_ALL = 254;
-	public final static short DEPT_NULL = 255;
+	//The helper class to build a new department
+	public static class InsertBuilder{
+		private final int restaurantId;
+		private final short deptId;
+		private final String deptName;
+		private Type deptType = Type.NORMAL;
+		
+		public InsertBuilder(int restaurantId, DeptId deptId){
+			this.restaurantId = restaurantId;
+			this.deptId = deptId.getVal();
+			this.deptName = deptId.getDesc();
+			this.deptType = deptId.getType();
+		}
+		
+		public InsertBuilder(int restaurantId, DeptId deptId, String deptName){
+			this.restaurantId = restaurantId;
+			this.deptId = deptId.getVal();
+			this.deptName = deptName;
+		}
+		
+		public InsertBuilder setType(Type type){
+			this.deptType = type;
+			return this;
+		}
+		
+		public Department build(){
+			return new Department(this);
+		}
+	}
+	
+	public static enum DeptId{
+		DEPT_1(0, "部门1", Type.NORMAL),
+		DEPT_2(1, "部门2", Type.NORMAL),
+		DEPT_3(2, "部门3", Type.NORMAL),
+		DEPT_4(3, "部门4", Type.NORMAL),
+		DEPT_5(4, "部门5", Type.NORMAL),
+		DEPT_6(5, "部门6", Type.NORMAL),
+		DEPT_7(6, "部门7", Type.NORMAL),
+		DEPT_8(7, "部门8", Type.NORMAL),
+		DEPT_9(8, "部门9", Type.NORMAL),
+		DEPT_10(9, "部门10", Type.NORMAL),
+		DEPT_TMP(253, "临时部门", Type.RESERVED),
+		DEPT_ALL(254, "全部部门", Type.RESERVED),
+		DEPT_NULL(255, "空部门", Type.RESERVED);
+
+
+		private final int val;
+		private final String desc;
+		private final Type type;
+		
+		DeptId(int val, String desc, Type type){
+			this.val = val;
+			this.desc = desc;
+			this.type = type;
+		}
+		
+		public static DeptId valueOf(int val){
+			for(DeptId deptId : values()){
+				if(deptId.getVal() == val){
+					return deptId;
+				}
+			}
+			throw new IllegalArgumentException("The val(" + val + ") is invalid.");
+		}
+		
+		public short getVal(){
+			return (short)this.val;
+		}
+		
+		public String getDesc(){
+			return this.desc;
+		}
+		
+		public Type getType(){
+			return this.type;
+		}
+		
+		@Override
+		public String toString(){
+			return "(val = " + val + ",desc = " + desc + ",type = " + type.getDesc() + ")";
+		}
+	}
 	
 	public static enum Type{
-		NORMAL(0),
-		RESERVED(1);
+		NORMAL(0, "普通"),
+		RESERVED(1, "保留");
 		
 		private final int val;
-		private Type(int val){
+		private final String desc;
+		
+		private Type(int val, String desc){
 			this.val = val;
+			this.desc = desc;
 		}
 		
 		public int getVal(){
 			return this.val;
 		}
 		
+		public String getDesc(){
+			return this.desc;
+		}
+		
 		public static Type valueOf(int val){
-			for(Type status : values()){
-				if(status.val == val){
-					return status;
+			for(Type type : values()){
+				if(type.val == val){
+					return type;
 				}
 			}
 			throw new IllegalArgumentException("The department type(value = " + val + ") passed is invaild.");
@@ -43,11 +129,7 @@ public class Department implements Parcelable, Comparable<Department>, Jsonable{
 		
 		@Override
 		public String toString(){
-			if(this == NORMAL){
-				return "normal department";
-			}else{
-				return "reserved department";
-			}
+			return "Type(code = " + val + ",desc = " + desc + ")";
 		}
 	}
 	
@@ -55,6 +137,13 @@ public class Department implements Parcelable, Comparable<Department>, Jsonable{
 	private short deptId;
 	private String deptName;
 	private Type deptType = Type.NORMAL;
+
+	private Department(InsertBuilder builder){
+		this.restaurantId = builder.restaurantId;
+		this.deptId = builder.deptId;
+		this.deptName = builder.deptName;
+		this.deptType = builder.deptType;
+	}
 	
 	public Department(){
 		

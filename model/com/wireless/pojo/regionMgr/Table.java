@@ -86,7 +86,7 @@ public class Table implements Parcelable, Comparable<Table>, Jsonable{
 	public static class UpdateBuilder{
 		private final int tableId;
 		
-		private short regionId = Region.REGION_1;
+		private short regionId = Region.RegionId.REGION_1.getId();
 		private String tableName;
 		private int miniCost;
 		private float serviceRate;
@@ -324,7 +324,7 @@ public class Table implements Parcelable, Comparable<Table>, Jsonable{
 	
 	public Region getRegion() {
 		if(region == null){
-			region = new Region(Region.REGION_1);
+			region = new Region(Region.RegionId.REGION_1.getId());
 		}
 		return region;
 	}

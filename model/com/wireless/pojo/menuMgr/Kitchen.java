@@ -12,6 +12,59 @@ import com.wireless.parcel.Parcelable;
 
 public class Kitchen implements Parcelable, Comparable<Kitchen>, Jsonable{
 	
+	public static class InsertBuilder{
+		private final short kitchenAlias;
+		private final String kitchenName;
+		private final int restaurantId;
+		private Type type = Type.NORMAL;
+		private Department.DeptId deptId = Department.DeptId.DEPT_1;
+		
+		public InsertBuilder(int restaurantId, String kitchenName, short kitchenAlias){
+			this.restaurantId = restaurantId;
+			this.kitchenName = kitchenName;
+			this.kitchenAlias = kitchenAlias;
+		}
+		
+		public InsertBuilder(int restaurantId, KitchenAlias alias){
+			this(restaurantId, alias.getDesc(), alias.getAliasId());
+			this.type = alias.getType();
+		}
+		
+		public short getKitchenAlias(){
+			return kitchenAlias;
+		}
+		
+		public String getKitchenName(){
+			if(kitchenName == null){
+				return "";
+			}else{
+				return kitchenName;
+			}
+		}
+		
+		public int getRestaurantId(){
+			return this.restaurantId;
+		}
+		
+		public InsertBuilder setType(Type type){
+			this.type = type;
+			return this;
+		}
+		
+		public Type getType(){
+			return type;
+		}
+		
+		public InsertBuilder setDeptId(Department.DeptId deptId){
+			this.deptId = deptId;
+			return this;
+		}
+		
+		public Department.DeptId getDeptId(){
+			return this.deptId;
+		}
+	}
+	
 	public static class Builder{
 		private final String kitchenName;
 		private final short aliasId;
@@ -89,21 +142,79 @@ public class Kitchen implements Parcelable, Comparable<Kitchen>, Jsonable{
 	public final static byte KITCHEN_PARCELABLE_COMPLEX = 0;
 	public final static byte KITCHEN_PARCELABLE_SIMPLE = 1;
 	
-	public final static short KITCHEN_NULL = 255;
-	public final static short KITCHEN_FULL = 254;
-	public final static short KITCHEN_TEMP = 253;
+//	public final static short KITCHEN_NULL = 255;
+//	public final static short KITCHEN_FULL = 254;
+//	public final static short KITCHEN_TEMP = 253;
+	
+	public static enum KitchenAlias{
+		KITCHEN_1(0, "厨房1", Type.NORMAL), KITCHEN_2(1, "厨房2", Type.NORMAL), KITCHEN_3(2, "厨房3", Type.NORMAL), KITCHEN_4(3, "厨房4", Type.NORMAL), KITCHEN_5(4, "厨房5", Type.NORMAL),
+		KITCHEN_6(5, "厨房6", Type.NORMAL), KITCHEN_7(6, "厨房7", Type.NORMAL), KITCHEN_8(7, "厨房8", Type.NORMAL), KITCHEN_9(8, "厨房9", Type.NORMAL), KITCHEN_10(9, "厨房10", Type.NORMAL),
+		KITCHEN_11(10, "厨房11", Type.NORMAL), KITCHEN_12(11, "厨房12", Type.NORMAL), KITCHEN_13(12, "厨房13", Type.NORMAL), KITCHEN_14(13, "厨房14", Type.NORMAL), KITCHEN_15(14, "厨房15", Type.NORMAL),
+		KITCHEN_16(15, "厨房16", Type.NORMAL), KITCHEN_17(16, "厨房17", Type.NORMAL), KITCHEN_18(17, "厨房18", Type.NORMAL), KITCHEN_19(18, "厨房19", Type.NORMAL), KITCHEN_20(19, "厨房20", Type.NORMAL),
+		KITCHEN_21(20, "厨房21", Type.NORMAL), KITCHEN_22(21, "厨房22", Type.NORMAL), KITCHEN_23(22, "厨房23", Type.NORMAL), KITCHEN_24(23, "厨房24", Type.NORMAL), KITCHEN_25(24, "厨房25", Type.NORMAL),
+		KITCHEN_26(25, "厨房26", Type.NORMAL), KITCHEN_27(26, "厨房27", Type.NORMAL), KITCHEN_28(27, "厨房28", Type.NORMAL), KITCHEN_29(28, "厨房29", Type.NORMAL), KITCHEN_30(29, "厨房30", Type.NORMAL),
+		KITCHEN_31(30, "厨房31", Type.NORMAL), KITCHEN_32(31, "厨房32", Type.NORMAL), KITCHEN_33(32, "厨房33", Type.NORMAL), KITCHEN_34(33, "厨房34", Type.NORMAL), KITCHEN_35(34, "厨房35", Type.NORMAL),
+		KITCHEN_36(35, "厨房36", Type.NORMAL), KITCHEN_37(36, "厨房37", Type.NORMAL), KITCHEN_38(37, "厨房38", Type.NORMAL), KITCHEN_39(38, "厨房39", Type.NORMAL), KITCHEN_40(39, "厨房40", Type.NORMAL),
+		KITCHEN_41(40, "厨房41", Type.NORMAL), KITCHEN_42(41, "厨房42", Type.NORMAL), KITCHEN_43(42, "厨房43", Type.NORMAL), KITCHEN_44(43, "厨房44", Type.NORMAL), KITCHEN_45(44, "厨房45", Type.NORMAL),
+		KITCHEN_46(45, "厨房46", Type.NORMAL), KITCHEN_47(46, "厨房47", Type.NORMAL), KITCHEN_48(47, "厨房48", Type.NORMAL), KITCHEN_49(48, "厨房49", Type.NORMAL), KITCHEN_50(49, "厨房50", Type.NORMAL),
+		KITCHEN_TEMP(253, "临时厨房", Type.RESERVED),
+		KITCHEN_FULL(254, "全部厨房", Type.RESERVED),
+		KITCHEN_NULL(255, "空厨房", Type.RESERVED);
+		
+		private final int aliasId;
+		private final String desc;
+		private final Type type;
+		
+		KitchenAlias(int aliasId, String desc, Type type){
+			this.aliasId = aliasId;
+			this.desc = desc;
+			this.type = type;
+		}
+		
+		public short getAliasId(){
+			return (short)aliasId;
+		}
+		
+		public String getDesc(){
+			return desc;
+		}
+		
+		public Type getType(){
+			return type;
+		}
+		
+		public static KitchenAlias valueOf(int aliasId){
+			for(KitchenAlias alias : values()){
+				if(alias.aliasId == aliasId){
+					return alias;
+				}
+			}
+			throw new IllegalArgumentException("The alias id(" + aliasId + ") is invalid.");
+		}
+		
+		@Override
+		public String toString(){
+			return "(alias_id = " + aliasId + ", desc = " + desc + ", type = " + type.getDesc() + ")";
+		}
+	}
 	
 	public static enum Type{
-		NORMAL(0),
-		RESERVED(1);
+		NORMAL(0, "普通"),
+		RESERVED(1, "系统保留");
 		
 		private final int val;
-		private Type(int val){
+		private final String desc;
+		private Type(int val, String desc){
 			this.val = val;
+			this.desc = desc;
 		}
 		
 		public int getVal(){
 			return this.val;
+		}
+		
+		public String getDesc(){
+			return this.desc;
 		}
 		
 		public static Type valueOf(int val){
@@ -117,13 +228,7 @@ public class Kitchen implements Parcelable, Comparable<Kitchen>, Jsonable{
 		
 		@Override
 		public String toString(){
-			if(this == NORMAL){
-				return "normal kitchen";
-			}else if(this == RESERVED){
-				return "reserved kitchen";
-			}else{
-				return "unknown type";
-			}
+			return desc;
 		}
 	}
 	

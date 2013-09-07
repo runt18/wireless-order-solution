@@ -126,6 +126,37 @@ public class Taste implements Parcelable, Comparable<Taste>, Jsonable{
 		}
 	}
 	
+	//The helper class to insert '大牌'
+	public static class LargeInsertBuilder extends InsertBuilder{
+		public final static String PREF = "大牌";
+		public LargeInsertBuilder(int restaurantId){
+			super(restaurantId, PREF);
+			setCategory(Category.SPEC);
+			setType(Type.RESERVED);
+		}
+	}
+	
+	//The helper class to insert '中牌'
+	public static class MediumInsertBuilder extends InsertBuilder{
+		public final static String PREF = "中牌";
+		public MediumInsertBuilder(int restaurantId){
+			super(restaurantId, PREF);
+			setCategory(Category.SPEC);
+			setType(Type.RESERVED);
+		}
+	}
+	
+	//The helper class to insert '例牌'
+	public static class RegularInsertBuilder extends InsertBuilder{
+		public final static String PREF = "例牌";
+		public RegularInsertBuilder(int restaurantId){
+			super(restaurantId, PREF);
+			setCategory(Category.SPEC);
+			setType(Type.RESERVED);
+		}
+	}
+	
+	//The helper class to insert a new taste
 	public static class InsertBuilder{
 		private final String preference;				// 口味名称
 		private final int restaurantId;					// 餐厅编号
@@ -133,6 +164,7 @@ public class Taste implements Parcelable, Comparable<Taste>, Jsonable{
 		private float rate;								// 口味比例
 		private Category category = Category.TASTE;		// 口味类型    0:口味  1:做法     2:规格
 		private Calc calc = Calc.BY_PRICE;				// 口味计算方式          0:按价格     1:按比例
+		private Type type = Type.NORMAL;				// 类型
 		
 		public InsertBuilder(int restaurantId, String pref){
 			this.restaurantId = restaurantId;
@@ -162,6 +194,11 @@ public class Taste implements Parcelable, Comparable<Taste>, Jsonable{
 			}else if(this.category == Category.SPEC){
 				this.calc = Calc.BY_RATE;
 			}
+			return this;
+		}
+		
+		public InsertBuilder setType(Type type){
+			this.type = type;
 			return this;
 		}
 		
@@ -236,6 +273,7 @@ public class Taste implements Parcelable, Comparable<Taste>, Jsonable{
 		setRate(builder.rate);
 		setCategory(builder.category);
 		setCalc(builder.calc);
+		setType(builder.type);
 	}
 	
 	private Taste(UpdateBuilder builder){

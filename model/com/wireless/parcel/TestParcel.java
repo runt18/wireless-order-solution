@@ -158,8 +158,8 @@ public class TestParcel {
 	public void testComplexKitchenParcel(){
 		Kitchen kitchenToParcel = new Kitchen();
 		
-		kitchenToParcel.setAliasId(Kitchen.KITCHEN_FULL);
-		kitchenToParcel.getDept().setId(Department.DEPT_ALL);
+		kitchenToParcel.setAliasId(Kitchen.KitchenAlias.KITCHEN_NULL.getAliasId());
+		kitchenToParcel.getDept().setId(Department.DeptId.DEPT_ALL.getVal());
 		kitchenToParcel.setAllowTemp(true);
 		kitchenToParcel.setType(Kitchen.Type.NORMAL);
 		kitchenToParcel.setName("测试厨房");
@@ -193,7 +193,7 @@ public class TestParcel {
 	public void testComplexDeptParcel(){
 		Department deptToParcel = new Department();
 		
-		deptToParcel.setId(Department.DEPT_ALL);
+		deptToParcel.setId(Department.DeptId.DEPT_ALL.getVal());
 		deptToParcel.setType(Department.Type.RESERVED);
 		deptToParcel.setName("测试部门");
 		
@@ -310,7 +310,7 @@ public class TestParcel {
 	@Test
 	public void testComplexRegionParcel(){
 		Region expected = new Region();
-		expected.setRegionId(Region.REGION_10);
+		expected.setRegionId(Region.RegionId.REGION_10.getId());
 		expected.setName("测试区域");
 		
 		Parcel p = new Parcel();
@@ -332,7 +332,7 @@ public class TestParcel {
 		
 		expected.setTableAlias(100);
 		expected.setTableName("测试餐台");
-		expected.setRegion(new Region(Region.REGION_10));
+		expected.setRegion(new Region(Region.RegionId.REGION_10.getId()));
 		expected.setServiceRate(0.2f);
 		expected.setMinimumCost(23.4f);
 		expected.setStatus(Table.Status.IDLE);
