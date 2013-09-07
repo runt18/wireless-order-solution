@@ -820,6 +820,8 @@ var roleAddWin = new Ext.Window({
 						if(jr.success){
 							roleAddWin.hide();
 							Ext.example.msg(jr.title, jr.msg);
+							Ext.getCmp('roleGrid').getSelectionModel().selectFirstRow();
+							//Ext.getCmp('roleGrid').getSelectionModel().selectLastRow();
 						}else{
 							Ext.ux.showMsg(jr);
 						}
@@ -872,7 +874,7 @@ Ext.onReady(function() {
 		xtype : 'grid',
 		id : 'staffGrid',
 		anchor : '100%',
-		width : '65%',
+		width : '55%',
 		region : 'west',
 		frame : true,
 		margins : '0 0 0 0',
@@ -926,7 +928,7 @@ Ext.onReady(function() {
 		xtype : 'grid',
 		id : 'roleGrid',
 		anchor : '100%',
-		width : '21%',
+		width : '20%',
 		region : 'center',
 		frame : true,
 		margins : '0 0 0 0',
@@ -956,6 +958,9 @@ Ext.onReady(function() {
 				privilegeTree.loader.dataUrl = "../../QueryPrivilege.do";
 				privilegeTree.loader.baseParams = {dataSource : 'roleTree', roldId : thiz.getStore().getAt(rowIndex).get('id')};
 				privilegeTree.getRootNode().reload();
+			},
+			rowselect : function(sm, ri, ke, r){
+				alert(ri);
 			}
 		}
 	});
@@ -963,7 +968,7 @@ Ext.onReady(function() {
 	privilegeTree = new Ext.tree.TreePanel({
 		id : 'privilegeTree',   
 		region : 'east',
-		width : 200,
+		width : '23%',
 		border : false,
 		rootVisible : true,
 		autoScroll : true,
