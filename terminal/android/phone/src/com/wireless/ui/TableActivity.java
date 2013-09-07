@@ -225,34 +225,34 @@ public class TableActivity extends FragmentActivity implements OnTableSelectedLi
 				}else if(theActivity.mTableCond == FILTER_TABLE_BUSY && !t.isBusy()){
 					iter.remove();
 					
-				}else if(theActivity.mRegionCond == Region.REGION_1 && t.getRegion().getRegionId() != Region.REGION_1){
+				}else if(theActivity.mRegionCond == Region.RegionId.REGION_1.getId() && t.getRegion().getRegionId() != Region.RegionId.REGION_1.getId()){
 					iter.remove();
 					
-				}else if(theActivity.mRegionCond == Region.REGION_2 && t.getRegion().getRegionId() != Region.REGION_2){
+				}else if(theActivity.mRegionCond == Region.RegionId.REGION_2.getId() && t.getRegion().getRegionId() != Region.RegionId.REGION_2.getId()){
 					iter.remove();
 					
-				}else if(theActivity.mRegionCond == Region.REGION_3 && t.getRegion().getRegionId() != Region.REGION_3){
+				}else if(theActivity.mRegionCond == Region.RegionId.REGION_3.getId() && t.getRegion().getRegionId() != Region.RegionId.REGION_3.getId()){
 					iter.remove();
 					
-				}else if(theActivity.mRegionCond == Region.REGION_4 && t.getRegion().getRegionId() != Region.REGION_4){
+				}else if(theActivity.mRegionCond == Region.RegionId.REGION_4.getId() && t.getRegion().getRegionId() != Region.RegionId.REGION_4.getId()){
 					iter.remove();
 					
-				}else if(theActivity.mRegionCond == Region.REGION_5 && t.getRegion().getRegionId() != Region.REGION_5){
+				}else if(theActivity.mRegionCond == Region.RegionId.REGION_5.getId() && t.getRegion().getRegionId() != Region.RegionId.REGION_5.getId()){
 					iter.remove();
 					
-				}else if(theActivity.mRegionCond == Region.REGION_6 && t.getRegion().getRegionId() != Region.REGION_6){
+				}else if(theActivity.mRegionCond == Region.RegionId.REGION_6.getId() && t.getRegion().getRegionId() != Region.RegionId.REGION_6.getId()){
 					iter.remove();
 					
-				}else if(theActivity.mRegionCond == Region.REGION_7 && t.getRegion().getRegionId() != Region.REGION_7){
+				}else if(theActivity.mRegionCond == Region.RegionId.REGION_7.getId() && t.getRegion().getRegionId() != Region.RegionId.REGION_7.getId()){
 					iter.remove();
 					
-				}else if(theActivity.mRegionCond == Region.REGION_8 && t.getRegion().getRegionId() != Region.REGION_8){
+				}else if(theActivity.mRegionCond == Region.RegionId.REGION_8.getId() && t.getRegion().getRegionId() != Region.RegionId.REGION_8.getId()){
 					iter.remove();
 					
-				}else if(theActivity.mRegionCond == Region.REGION_9 && t.getRegion().getRegionId() != Region.REGION_9){
+				}else if(theActivity.mRegionCond == Region.RegionId.REGION_9.getId() && t.getRegion().getRegionId() != Region.RegionId.REGION_9.getId()){
 					iter.remove();
 					
-				}else if(theActivity.mRegionCond == Region.REGION_10 && t.getRegion().getRegionId() != Region.REGION_10){
+				}else if(theActivity.mRegionCond == Region.RegionId.REGION_10.getId() && t.getRegion().getRegionId() != Region.RegionId.REGION_10.getId()){
 					iter.remove();
 					
 				}else if(theActivity.mFilterCond.length() != 0){
@@ -265,34 +265,34 @@ public class TableActivity extends FragmentActivity implements OnTableSelectedLi
 			if(theActivity.mRegionCond == FILTER_REGION_ALL){
 				((TextView)theActivity.findViewById(R.id.toptitle)).setText(REGION_ALL_STR);
 				
-			}else if(theActivity.mRegionCond == Region.REGION_1){
+			}else if(theActivity.mRegionCond == Region.RegionId.REGION_1.getId()){
 				((TextView)theActivity.findViewById(R.id.toptitle)).setText(WirelessOrder.regions[0].getName());
 				
-			}else if(theActivity.mRegionCond == Region.REGION_2){
+			}else if(theActivity.mRegionCond == Region.RegionId.REGION_2.getId()){
 				((TextView)theActivity.findViewById(R.id.toptitle)).setText(WirelessOrder.regions[1].getName());
 				
-			}else if(theActivity.mRegionCond == Region.REGION_3){
+			}else if(theActivity.mRegionCond == Region.RegionId.REGION_3.getId()){
 				((TextView)theActivity.findViewById(R.id.toptitle)).setText(WirelessOrder.regions[2].getName());
 				
-			}else if(theActivity.mRegionCond == Region.REGION_4){
+			}else if(theActivity.mRegionCond == Region.RegionId.REGION_4.getId()){
 				((TextView)theActivity.findViewById(R.id.toptitle)).setText(WirelessOrder.regions[3].getName());
 				
-			}else if(theActivity.mRegionCond == Region.REGION_5){
+			}else if(theActivity.mRegionCond == Region.RegionId.REGION_5.getId()){
 				((TextView)theActivity.findViewById(R.id.toptitle)).setText(WirelessOrder.regions[4].getName());
 				
-			}else if(theActivity.mRegionCond == Region.REGION_6){
+			}else if(theActivity.mRegionCond == Region.RegionId.REGION_6.getId()){
 				((TextView)theActivity.findViewById(R.id.toptitle)).setText(WirelessOrder.regions[5].getName());
 				
-			}else if(theActivity.mRegionCond == Region.REGION_7){
+			}else if(theActivity.mRegionCond == Region.RegionId.REGION_7.getId()){
 				((TextView)theActivity.findViewById(R.id.toptitle)).setText(WirelessOrder.regions[6].getName());
 				
-			}else if(theActivity.mRegionCond == Region.REGION_8){
+			}else if(theActivity.mRegionCond == Region.RegionId.REGION_8.getId()){
 				((TextView)theActivity.findViewById(R.id.toptitle)).setText(WirelessOrder.regions[7].getName());
 				
-			}else if(theActivity.mRegionCond == Region.REGION_9){
+			}else if(theActivity.mRegionCond == Region.RegionId.REGION_9.getId()){
 				((TextView)theActivity.findViewById(R.id.toptitle)).setText(WirelessOrder.regions[8].getName());
 				
-			}else if(theActivity.mRegionCond == Region.REGION_10){
+			}else if(theActivity.mRegionCond == Region.RegionId.REGION_10.getId()){
 				((TextView)theActivity.findViewById(R.id.toptitle)).setText(WirelessOrder.regions[9].getName());
 				
 			}
