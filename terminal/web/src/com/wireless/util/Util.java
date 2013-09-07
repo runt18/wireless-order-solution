@@ -88,7 +88,7 @@ public class Util {
 				// extract the hang status to this temporary food
 				foods[i].setHangup(Boolean.parseBoolean(values[5]));
 				
-				foods[i].getKitchen().setAliasId(Kitchen.KITCHEN_TEMP);
+				foods[i].getKitchen().setAliasId(Kitchen.KitchenAlias.KITCHEN_TEMP.getAliasId());
 				// extract the flag to indicates whether the food is original or extra
 				if (Short.parseShort(values[6]) == EXTRA_ORDER_FOOD) {
 					//Generate an unique food id to temporary food if it is extra.

@@ -13,6 +13,7 @@ import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.regionMgr.Region;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.util.WebParams;
 
 public class OperateRegionAction extends DispatchAction{
@@ -36,11 +37,8 @@ public class OperateRegionAction extends DispatchAction{
 			String pin = (String)request.getAttribute("pin");
 			String id = request.getParameter("id");
 			String name = request.getParameter("name");
-			
-			Region region = new Region();
-			region.setRegionId(Short.valueOf(id));
-			region.setName(name.trim());
-			RegionDao.update(StaffDao.verify(Integer.parseInt(pin)), region);
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			RegionDao.update(staff, new Region.UpdateBuilder(staff.getRestaurantId(), Region.RegionId.valueOf(Short.valueOf(id)), name.trim()));
 			jobject.initTip(true, "操作成功, 已修改区域信息.");
 		}catch(BusinessException e){
 			e.printStackTrace();
