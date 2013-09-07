@@ -496,15 +496,7 @@ var privilegeStore = new Ext.data.Store({
 //权限复选框
 var privilegeSM = new Ext.grid.CheckboxSelectionModel({
 	handleMouseDown : Ext.emptyFn,
-	dataIndex : 'codeValue',
-	listeners : {
-		beforerowselect : function(SelectionModel, rowIndex, keepExisting,record ){
-			alert(record.data['codeValue']);
-		},
-		render : function(){
-			alert('haodongxi');
-		}
-	}
+	dataIndex : 'codeValue'
 });
 
 //权限列模型
@@ -959,9 +951,6 @@ Ext.onReady(function() {
 				privilegeTree.loader.dataUrl = "../../QueryPrivilege.do";
 				privilegeTree.loader.baseParams = {dataSource : 'roleTree', roldId : thiz.getStore().getAt(rowIndex).get('id')};
 				privilegeTree.getRootNode().reload();
-			},
-			rowselect : function(sm, ri, ke, r){
-				alert(ri);
 			}
 		}
 	});
