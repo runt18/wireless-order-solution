@@ -1551,34 +1551,34 @@ public class MainActivity extends Activity {
 		if(_curRegion < 0){
 			((Button)findViewById(R.id.bottomFirstBtn)).setBackgroundResource(R.drawable.av_r12_c28_2);
 			
-		}else if(_curRegion == Region.REGION_1){			
+		}else if(_curRegion == Region.RegionId.REGION_1.getId()){			
 			((Button)findViewById(R.id.region_1)).setBackgroundResource(R.drawable.av_r12_c28_2);
 			
-		}else if(_curRegion == Region.REGION_2){
+		}else if(_curRegion == Region.RegionId.REGION_2.getId()){
 			((Button)findViewById(R.id.region_2)).setBackgroundResource(R.drawable.av_r12_c28_2);
 			
-		}else if(_curRegion == Region.REGION_3){
+		}else if(_curRegion == Region.RegionId.REGION_3.getId()){
 			((Button)findViewById(R.id.region_3)).setBackgroundResource(R.drawable.av_r12_c28_2);
 			
-		}else if(_curRegion == Region.REGION_4){
+		}else if(_curRegion == Region.RegionId.REGION_4.getId()){
 			((Button)findViewById(R.id.region_4)).setBackgroundResource(R.drawable.av_r12_c28_2);
 			
-		}else if(_curRegion == Region.REGION_5){
+		}else if(_curRegion == Region.RegionId.REGION_5.getId()){
 			((Button)findViewById(R.id.region_5)).setBackgroundResource(R.drawable.av_r12_c28_2);
 			
-		}else if(_curRegion == Region.REGION_6){
+		}else if(_curRegion == Region.RegionId.REGION_6.getId()){
 			((Button)findViewById(R.id.region_6)).setBackgroundResource(R.drawable.av_r12_c28_2);
 			
-		}else if(_curRegion == Region.REGION_7){
+		}else if(_curRegion == Region.RegionId.REGION_7.getId()){
 			((Button)findViewById(R.id.region_7)).setBackgroundResource(R.drawable.av_r12_c28_2);
 			
-		}else if(_curRegion == Region.REGION_8){
+		}else if(_curRegion == Region.RegionId.REGION_8.getId()){
 			((Button)findViewById(R.id.region_8)).setBackgroundResource(R.drawable.av_r12_c28_2);
 			
-		}else if(_curRegion == Region.REGION_9){
+		}else if(_curRegion == Region.RegionId.REGION_9.getId()){
 			((Button)findViewById(R.id.region_9)).setBackgroundResource(R.drawable.av_r12_c28_2);
 			
-		}else if(_curRegion == Region.REGION_10){
+		}else if(_curRegion == Region.RegionId.REGION_10.getId()){
 			((Button)findViewById(R.id.region_10)).setBackgroundResource(R.drawable.av_r12_c28_2);
 			
 		}
