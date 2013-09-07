@@ -418,7 +418,7 @@ var staffColumnModel = new Ext.grid.ColumnModel([
 //角色列模型
 var roleModel = new Ext.grid.ColumnModel([
       {header : '角色名称', dataIndex : 'name', width : 90},
-      {header : '操作', dataIndex : 'roleOpt', width : 140, align : 'center', renderer : roleOpt}
+      {header : '操作', id : 'roleOpt', dataIndex : 'roleOpt', width : 150, align : 'center', renderer : roleOpt}
 ]);
 //角色Store
 var roleStore = new Ext.data.Store({
@@ -874,7 +874,7 @@ Ext.onReady(function() {
 		xtype : 'grid',
 		id : 'staffGrid',
 		anchor : '100%',
-		width : '55%',
+		width : '60%',
 		region : 'west',
 		frame : true,
 		margins : '0 0 0 0',
@@ -932,6 +932,7 @@ Ext.onReady(function() {
 		region : 'center',
 		frame : true,
 		margins : '0 0 0 0',
+		autoExpandColumn : 'roleOpt',
 		ds : roleStore,
 		cm : roleModel,
 		tbar : [{
@@ -968,7 +969,7 @@ Ext.onReady(function() {
 	privilegeTree = new Ext.tree.TreePanel({
 		id : 'privilegeTree',   
 		region : 'east',
-		width : '23%',
+		width : '18%',
 		border : false,
 		rootVisible : true,
 		autoScroll : true,
