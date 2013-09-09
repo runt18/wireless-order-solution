@@ -67,7 +67,7 @@ public class Restaurant implements Parcelable{
 	//The helper class to update a restaurant
 	public static class UpdateBuilder{
 		private final int id;
-		private String account;
+		private final String account;
 		private String restaurantName;
 		private long expireDate;
 		private String pwd;
@@ -77,13 +77,9 @@ public class Restaurant implements Parcelable{
 		private String tele2;
 		private String address;
 		
-		public UpdateBuilder(int id){
+		public UpdateBuilder(int id, String account){
 			this.id = id;
-		}
-		
-		public UpdateBuilder setAccount(String account){
 			this.account = account;
-			return this;
 		}
 		
 		public String getAccount(){

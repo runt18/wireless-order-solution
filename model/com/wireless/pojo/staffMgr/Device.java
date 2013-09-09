@@ -105,18 +105,24 @@ public class Device implements Parcelable{
 	
 	public static class UpdateBuilder{
 		
+		private final int id;
 		private final String deviceId;
 		private final int restaurantId;
 		private Model model;
 		private Status status;
 		
-		UpdateBuilder(String deviceId, int restaurantId){
+		UpdateBuilder(int id, String deviceId, int restaurantId){
+			this.id = id;
 			this.deviceId = deviceId;
 			this.restaurantId = restaurantId;
 		}
 		
+		public int getId(){
+			return this.id;
+		}
+		
 		public String getDeviceId(){
-			return this.deviceId;
+			return this.deviceId.trim().toUpperCase(Locale.getDefault());
 		}
 		
 		public int getRestaurantId(){
