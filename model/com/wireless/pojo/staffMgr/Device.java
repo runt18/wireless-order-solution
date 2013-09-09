@@ -111,7 +111,7 @@ public class Device implements Parcelable{
 		private Model model;
 		private Status status;
 		
-		UpdateBuilder(int id, String deviceId, int restaurantId){
+		public UpdateBuilder(int id, String deviceId, int restaurantId){
 			this.id = id;
 			this.deviceId = deviceId;
 			this.restaurantId = restaurantId;
