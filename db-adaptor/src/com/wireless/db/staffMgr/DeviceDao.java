@@ -3,6 +3,7 @@ package com.wireless.db.staffMgr;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import com.mysql.jdbc.Statement;
 import com.wireless.db.DBCon;
@@ -62,7 +63,8 @@ public class DeviceDao {
 	 * 			throws if the specific device to search does NOT exist
 	 */
 	public static Device getWorkingDeviceById(DBCon dbCon, String deviceId) throws SQLException, BusinessException{
-		List<Device> result = getDevices(dbCon, " AND DEV.device_id = '" + deviceId.trim() + "'" + " AND device_id_crc = CRC32(" + deviceId + ")" + " AND status = " + Device.Status.WORK.getVal(), null);
+		deviceId = deviceId.trim().toUpperCase(Locale.getDefault());
+		List<Device> result = getDevices(dbCon, " AND DEV.device_id = '" + deviceId + "'" + " AND device_id_crc = CRC32(" + deviceId + ")" + " AND status = " + Device.Status.WORK.getVal(), null);
 		if(result.isEmpty()){
 			throw new BusinessException(DeviceError.DEVICE_NOT_EXIST);
 		}else{
@@ -103,7 +105,49 @@ public class DeviceDao {
 	 * 			throws if the specific device to search does NOT exist
 	 */
 	public static Device getDeviceById(DBCon dbCon, String deviceId) throws SQLException, BusinessException{
-		List<Device> result = getDevices(dbCon, " AND DEV.device_id = '" + deviceId.trim() + "'" + " AND DEV.device_id_crc = CRC32(" + deviceId + ")", null);
+		deviceId = deviceId.trim().toUpperCase(Locale.getDefault());
+		List<Device> result = getDevices(dbCon, " AND DEV.device_id = '" + deviceId + "'" + " AND DEV.device_id_crc = CRC32('" + deviceId + "')", null);
+		if(result.isEmpty()){
+			throw new BusinessException(DeviceError.DEVICE_NOT_EXIST);
+		}else{
+			return result.get(0);
+		}
+	}
+	
+	/**
+	 * Get the device to specific device id.
+	 * @param id
+	 * 			the device id
+	 * @return the device to specific id
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if the specific device to search does NOT exist
+	 */
+	public static Device getDeviceById(int id) throws SQLException, BusinessException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return getDeviceById(dbCon, id);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Get the device to specific device id.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param deviceId
+	 * 			the device id
+	 * @return the device to specific id
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if the specific device to search does NOT exist
+	 */
+	public static Device getDeviceById(DBCon dbCon, int id) throws SQLException, BusinessException{
+		List<Device> result = getDevices(dbCon, " AND DEV.id = " + id, null);
 		if(result.isEmpty()){
 			throw new BusinessException(DeviceError.DEVICE_NOT_EXIST);
 		}else{
@@ -136,6 +180,26 @@ public class DeviceDao {
 	
 	/**
 	 * Insert a new device.
+	 * @param builder
+	 * 			the builder to new device
+	 * @return the id to the device just generated
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if the device id to insert has been EXIST before
+	 */
+	public static int insert(Device.InsertBuilder builder) throws SQLException, BusinessException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return insert(dbCon, builder);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Insert a new device.
 	 * @param dbCon
 	 * 			the database connection
 	 * @param builder
@@ -158,7 +222,7 @@ public class DeviceDao {
 			  " VALUES (" +
 			  device.getRestaurantId() + "," +
 			  "'" + device.getDeviceId() + "'," +
-			  "CRC32(" + device.getDeviceId() + ")," +
+			  "CRC32('" + device.getDeviceId() + "')," +
 			  device.getModel().getVal() + "," +
 			  device.getStatus().getVal() +
 			  " ) ";
@@ -215,7 +279,7 @@ public class DeviceDao {
 		
 		sql = " UPDATE " + Params.dbName + ".device SET " +
 			  " device_id = '" + builder.getDeviceId() + "'" +
-			  " ,device_id_crc = CRC32(" + builder.getDeviceId() + ")" +
+			  " ,device_id_crc = CRC32('" + builder.getDeviceId() + "')" +
 			  " ,restaurant_id = " + builder.getRestaurantId() + 
 			  (builder.getModel() != null ? " ,model_id = " + builder.getModel().getVal() : "") +
 			  (builder.getStatus() != null ? " ,status = " + builder.getStatus().getVal() : "") +
@@ -241,18 +305,37 @@ public class DeviceDao {
 	
 	/**
 	 * Delete the device to a specific device id.
-	 * @param dbCon
-	 * 			the database connection
-	 * @param deviceId
+	 * @param id
 	 * 			the device id to delete
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 * @throws BusinessException
 	 * 			throws if the device to this specific id does NOT exist
 	 */
-	public static void deleteById(DBCon dbCon, String deviceId) throws SQLException, BusinessException{
+	public static void deleteById(int id) throws SQLException, BusinessException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			deleteById(dbCon, id);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Delete the device to a specific device id.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param id
+	 * 			the device id to delete
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if the device to this specific id does NOT exist
+	 */
+	public static void deleteById(DBCon dbCon, int id) throws SQLException, BusinessException{
 		String sql;
-		sql = " DELETE FROM " + Params.dbName + ".device WHERE device_id = '" + deviceId.trim().toUpperCase() + "'";
+		sql = " DELETE FROM " + Params.dbName + ".device WHERE id = " + id + "";
 		if(dbCon.stmt.executeUpdate(sql) == 0){
 			throw new BusinessException(DeviceError.DEVICE_NOT_EXIST);
 		}
