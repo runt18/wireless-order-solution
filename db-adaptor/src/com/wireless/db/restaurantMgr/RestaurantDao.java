@@ -129,6 +129,7 @@ public class RestaurantDao {
 		
 		String sql = " SELECT * FROM " + Params.dbName + ".restaurant " +
 				 	 " WHERE 1 = 1 " +
+				 	 " AND id > " + Restaurant.RESERVED_7 + " " +
 				 	 (extraCond != null ? extraCond : "") + " " +
 				 	 (orderClause != null ? orderClause : "");
 		
