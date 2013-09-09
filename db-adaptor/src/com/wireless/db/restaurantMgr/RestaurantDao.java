@@ -123,6 +123,16 @@ public class RestaurantDao {
 		}
 	}
 	
+	public static List<Restaurant> getByCond(String extraCond, String orderClause) throws SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return getByCond(dbCon, extraCond, orderClause);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
 	private static List<Restaurant> getByCond(DBCon dbCon, String extraCond, String orderClause) throws SQLException{
 		
 		List<Restaurant> result = new ArrayList<Restaurant>();
@@ -145,8 +155,14 @@ public class RestaurantDao {
 			restaurant.setTele1(dbCon.rs.getString("tele1"));
 			restaurant.setTele2(dbCon.rs.getString("tele2"));
 			restaurant.setAddress(dbCon.rs.getString("address"));
-			restaurant.setExpireDate(dbCon.rs.getTimestamp("expire_date").getTime());
-			restaurant.setBirthDate(dbCon.rs.getTimestamp("birth_date").getTime());
+			if(dbCon.rs.getTimestamp("expire_date") != null){
+				restaurant.setExpireDate(dbCon.rs.getTimestamp("expire_date").getTime());
+			}
+			
+			if(dbCon.rs.getTimestamp("birth_date") != null){
+				restaurant.setBirthDate(dbCon.rs.getTimestamp("birth_date").getTime());
+			}
+
 			result.add(restaurant);
 		}
 		dbCon.rs.close();
