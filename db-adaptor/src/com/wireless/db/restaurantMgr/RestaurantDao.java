@@ -155,28 +155,6 @@ public class RestaurantDao {
 	}
 	
 	/**
-	 * Check to see whether the account is duplicated.
-	 * @param dbCon
-	 * 			the database connection
-	 * @param account
-	 * 			the account to check
-	 * @throws SQLException
-	 * 			throws if failed to execute any SQL statement
-	 * @throws BusinessException
-	 * 			throws if the account is duplicated
-	 */
-	private static void checkDuplicatedAccount(DBCon dbCon, String account) throws SQLException, BusinessException{
-		String sql;
-		//Check to whether the duplicated account exist
-		sql = " SELECT * FROM " + Params.dbName + ".restaurant WHERE account = '" + account + "'";
-		dbCon.rs = dbCon.stmt.executeQuery(sql);
-		if(dbCon.rs.next()){
-			throw new BusinessException(RestaurantError.DUPLICATED_RESTAURANT_ACCOUNT);
-		}
-		dbCon.rs.close();
-	}
-	
-	/**
 	 * Update a restaurant according to a builder.
 	 * @param builder
 	 * 			the builder to update a restaurant
@@ -209,7 +187,14 @@ public class RestaurantDao {
 	public static void update(DBCon dbCon, Restaurant.UpdateBuilder builder) throws SQLException, BusinessException{
 		
 		if(builder.getAccount() != null){
-			checkDuplicatedAccount(dbCon, builder.getAccount());
+			String sql;
+			//Check to whether the duplicated account exist
+			sql = " SELECT * FROM " + Params.dbName + ".restaurant WHERE account = '" + builder.getAccount() + "'" + " AND " + " id <> " + builder.getId();
+			dbCon.rs = dbCon.stmt.executeQuery(sql);
+			if(dbCon.rs.next()){
+				throw new BusinessException(RestaurantError.DUPLICATED_RESTAURANT_ACCOUNT);
+			}
+			dbCon.rs.close();
 		}
 		
 		String sql;
@@ -273,9 +258,16 @@ public class RestaurantDao {
 		Restaurant restaurant = builder.build();
 		
 		try{
-			checkDuplicatedAccount(dbCon, restaurant.getAccount());
 			
 			String sql;
+			//Check to whether the duplicated account exist
+			sql = " SELECT * FROM " + Params.dbName + ".restaurant WHERE account = '" + restaurant.getAccount() + "'";
+			dbCon.rs = dbCon.stmt.executeQuery(sql);
+			if(dbCon.rs.next()){
+				throw new BusinessException(RestaurantError.DUPLICATED_RESTAURANT_ACCOUNT);
+			}
+			dbCon.rs.close();
+			
 			//Create the new restaurant
 			sql = " INSERT INTO " + Params.dbName + ".restaurant " +
 				  " (account, birth_date, restaurant_name, restaurant_info, tele1, tele2, address, record_alive, expire_date) " +

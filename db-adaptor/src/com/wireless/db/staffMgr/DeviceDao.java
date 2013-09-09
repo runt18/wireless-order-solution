@@ -171,6 +171,23 @@ public class DeviceDao {
 		}
 	}
 	
+	/**
+	 * Update the device according to a specific id.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param deviceId
+	 * 			the device id to update
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if the device to this specific id does NOT exist
+	 */
+	public static void update(DBCon dbCon, Device.UpdateBuilder builder) throws SQLException, BusinessException{
+		//TODO
+		checkDeviceDuplicated(dbCon, builder.getDeviceId());
+		
+	}
+	
 	private static void checkDeviceDuplicated(DBCon dbCon, String deviceId) throws BusinessException, SQLException{
 		String sql;
 		sql = " SELECT id FROM " + Params.dbName + ".device WHERE device_id = '" + deviceId.trim().toUpperCase() + "'";
@@ -204,21 +221,6 @@ public class DeviceDao {
 	}
 
 	/**
-	 * Update the device according to a specific id.
-	 * @param dbCon
-	 * 			the database connection
-	 * @param deviceId
-	 * 			the device id to update
-	 * @throws SQLException
-	 * 			throws if failed to execute any SQL statement
-	 * @throws BusinessException
-	 * 			throws if the device to this specific id does NOT exist
-	 */
-	public static void updateById(DBCon dbCon, String deviceId) throws SQLException, BusinessException{
-		//TODO
-	}
-	
-	/**
 	 * FIXME
 	 * @param deviceId
 	 * @param pin
@@ -242,8 +244,7 @@ public class DeviceDao {
 			dbCon.rs.close();
 			
 			if(restaurantId > 0){
-				Device.InsertBuilder builder = new Device.InsertBuilder(deviceId)
-														 .setRestaurantId(restaurantId);
+				Device.InsertBuilder builder = new Device.InsertBuilder(deviceId, restaurantId);
 				insert(dbCon, builder);
 			}
 			

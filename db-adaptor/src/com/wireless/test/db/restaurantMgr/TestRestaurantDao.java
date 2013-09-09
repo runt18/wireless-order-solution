@@ -52,38 +52,6 @@ public class TestRestaurantDao {
 	}
 	
 	@Test
-	public void testQueryByID() throws BusinessException, SQLException{
-		
-		Staff staff = StaffDao.getStaffs(37).get(0);
-		
-		Restaurant oriRestaurant = RestaurantDao.getById(staff.getRestaurantId());
-		
-		Restaurant restToUpdate = new Restaurant();
-		restToUpdate.setId(oriRestaurant.getId());
-		restToUpdate.setAccount(oriRestaurant.getAccount());
-		restToUpdate.setName("测试名称");
-		restToUpdate.setAddress("测试地址");
-		restToUpdate.setInfo("测试信息");
-		restToUpdate.setTele1("测试电话1");
-		restToUpdate.setTele2("测试电话2");
-		
-		RestaurantDao.update(staff, restToUpdate);
-		
-		Restaurant restAfterUpdate = RestaurantDao.getById(staff.getRestaurantId());
-		
-		assertEquals("restaurant id", restToUpdate.getId(), restAfterUpdate.getId());
-		assertEquals("restaurant account", restToUpdate.getAccount(), restAfterUpdate.getAccount());
-		assertEquals("restaurant name", restToUpdate.getName(), restAfterUpdate.getName());
-		assertEquals("restaurant info", restToUpdate.getInfo(), restAfterUpdate.getInfo());
-		assertEquals("restaurant address", restToUpdate.getAddress(), restAfterUpdate.getAddress());
-		assertEquals("restaurant 1st tele", restToUpdate.getTele1(), restAfterUpdate.getTele1());
-		assertEquals("restaurant 2nd tele", restToUpdate.getTele2(), restAfterUpdate.getTele2());
-
-		//restore the original restaurant info
-		RestaurantDao.update(staff, oriRestaurant);
-	}
-	
-	@Test
 	public void testRestaurantDao() throws SQLException, ParseException, BusinessException{
 		int restaurantId = 0;
 		try{
