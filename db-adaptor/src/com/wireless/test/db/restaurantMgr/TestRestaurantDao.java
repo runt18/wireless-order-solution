@@ -37,6 +37,7 @@ import com.wireless.pojo.ppMgr.PricePlan;
 import com.wireless.pojo.regionMgr.Region;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.restaurantMgr.Restaurant;
+import com.wireless.pojo.restaurantMgr.Restaurant.RecordAlive;
 import com.wireless.pojo.staffMgr.Role;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.tasteMgr.Taste;
@@ -129,6 +130,31 @@ public class TestRestaurantDao {
 			
 			//Compare the popular cancel reason
 			compareCancelReason(staff, restaurantId);
+			
+			//Update a restaurant
+			Restaurant.UpdateBuilder updateBuilder = new Restaurant.UpdateBuilder(restaurantId)
+														 		   .setAccount("test2")
+														 		   .setPwd("test2@123")
+														 		   .setRestaurantInfo("测试信息2")
+														 		   .setAddress("测试地址2")
+														 		   .setTele1("测试号码2")
+														 		   .setTele2("测试号码2")
+														 		   .setRecordAlive(RecordAlive.ONE_YEAR)
+														 		   .setExpireDate(new SimpleDateFormat("yyyy-MM-dd").parse("2015-01-01").getTime());
+			
+			RestaurantDao.update(updateBuilder);
+			
+			actual.setAccount(updateBuilder.getAccount());
+			actual.setName(updateBuilder.getRestaurantName());
+			actual.setInfo(updateBuilder.getRestaurantInfo());
+			actual.setRecordAlive(updateBuilder.getRecordAlive());
+			actual.setTele1(updateBuilder.getTele1());
+			actual.setTele2(updateBuilder.getTele2());
+			actual.setAddress(updateBuilder.getAddress());
+			actual.setExpireDate(updateBuilder.getExpireDate());
+			
+			expected = RestaurantDao.getById(restaurantId);
+			compareRestaurant(expected, actual);
 			
 		}finally{
 			RestaurantDao.deleteById(restaurantId);

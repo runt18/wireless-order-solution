@@ -210,6 +210,24 @@ public class StaffDao {
 		return getStaffs(dbCon, " AND STAFF.restaurant_id = " + restaurantId, null);
 	}
 
+	/**
+	 * Get the staff to specific role category and restaurant
+	 * @param dbCon
+	 * 			the database connection
+	 * @param restaurantId
+	 * 			the restaurant id
+	 * @param cate
+	 * 			the role category
+	 * @return the staff to a specific role
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if the role to any staff does NOT exist
+	 */
+	public static List<Staff> getStaffsByRoleCategory(DBCon dbCon, int restaurantId, Role.Category cate) throws SQLException, BusinessException{
+		return getStaffs(dbCon, " AND STAFF.restaurant_id = " + restaurantId + " AND ROLE.cate = " + cate.getVal(), null);
+	}
+	
 	private static List<Staff> getStaffs(DBCon dbCon, String extraCond, String orderClause) throws SQLException, BusinessException{
 		
 		String sql = " SELECT "	+
@@ -289,41 +307,51 @@ public class StaffDao {
 					
 		return staffId;
 	}
-	/**
-	 * Update the information of staff.
-	 * @param staff
-	 * 			the staff to update
-	 * @throws SQLException
-	 */
-	public static void updateStaff(StaffUpdateBuilder staff) throws SQLException{
-		DBCon dbCon = new DBCon();
-		try{
-			dbCon.connect();
-			updateStaff(dbCon, staff.build());
-		}finally{
-			dbCon.disconnect();
-		}
-	}
+	
 	/**
 	 * Update the information of staff.
 	 * @param dbCon
 	 * @param staff
 	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException 
+	 * 			throws if the staff to update does NOT exist
 	 */
-	public static void updateStaff(DBCon dbCon, Staff staff) throws SQLException{
-		String psw = "";
-		if(!staff.getPwd().trim().isEmpty()){
-			psw = " pwd = MD5('" + staff.getPwd() + "'), ";
+	public static void updateStaff(StaffUpdateBuilder builder) throws SQLException, BusinessException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			updateStaff(dbCon, builder);
+		}finally{
+			dbCon.disconnect();
 		}
-		String sql = "UPDATE " + Params.dbName + ".staff " + 
-					" SET name = '" + staff.getName() + "', " +
-					" tele = '" + staff.getMobile() + "', " +
-					psw + 
-					" role_id = '" + staff.getRole().getId() + "' " +
-					" WHERE staff_id = " + staff.getId();
-		
-		dbCon.stmt.executeUpdate(sql);
 	}
+	
+	/**
+	 * Update the information of staff.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException 
+	 * 			throws if the staff to update does NOT exist
+	 */
+	public static void updateStaff(DBCon dbCon, StaffUpdateBuilder builder) throws SQLException, BusinessException{
+		String sql;
+		sql = " UPDATE " + Params.dbName + ".staff SET " + 
+			  " staff_id = " + builder.getStaffId() +
+			  (builder.getStaffName() != null ? " ,name = '" + builder.getStaffName() + "'" : "") +
+			  (builder.getMobile() != null ? " ,tele = '" + builder.getMobile() + "'" : "") +
+			  (builder.getStaffPwd() != null ? " ,pwd = MD5('" + builder.getStaffPwd() + "')" : "") +
+			  (builder.getRoleId() != 0 ? " ,role_id = " + builder.getRoleId() : "") +
+			  " WHERE staff_id = " + builder.getStaffId();
+		
+		if(dbCon.stmt.executeUpdate(sql) == 0){
+			throw new BusinessException(StaffError.STAFF_NOT_EXIST);
+		}
+	}
+	
 	/**
 	 * Delete the staff by ID.
 	 * @param staffId

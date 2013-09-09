@@ -154,6 +154,88 @@ public class RestaurantDao {
 	}
 	
 	/**
+	 * Check to see whether the account is duplicated.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param account
+	 * 			the account to check
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if the account is duplicated
+	 */
+	private static void checkDuplicatedAccount(DBCon dbCon, String account) throws SQLException, BusinessException{
+		String sql;
+		//Check to whether the duplicated account exist
+		sql = " SELECT * FROM " + Params.dbName + ".restaurant WHERE account = '" + account + "'";
+		dbCon.rs = dbCon.stmt.executeQuery(sql);
+		if(dbCon.rs.next()){
+			throw new BusinessException(RestaurantError.DUPLICATED_RESTAURANT_ACCOUNT);
+		}
+		dbCon.rs.close();
+	}
+	
+	/**
+	 * Update a restaurant according to a builder.
+	 * @param builder
+	 * 			the builder to update a restaurant
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if the restaurant to update does NOT exist
+	 */
+	public static void update(Restaurant.UpdateBuilder builder) throws SQLException, BusinessException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			update(dbCon, builder);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Update a restaurant according to a builder.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param builder
+	 * 			the builder to update a restaurant
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if the restaurant to update does NOT exist
+	 */
+	public static void update(DBCon dbCon, Restaurant.UpdateBuilder builder) throws SQLException, BusinessException{
+		
+		if(builder.getAccount() != null){
+			checkDuplicatedAccount(dbCon, builder.getAccount());
+		}
+		
+		String sql;
+		sql = " UPDATE " + Params.dbName + ".restaurant SET " +
+			  " id = " + builder.getId() +
+			  (builder.getAccount() != null ? " ,account = '" + builder.getAccount() + "'" : "") +
+			  (builder.getRestaurantName() != null ? " ,restaurant_name = '" + builder.getRestaurantName() + "'" : "") +
+			  (builder.getRestaurantInfo() != null ? " ,restaurant_info = '" + builder.getRestaurantInfo() + "'" : "") +
+			  (builder.getTele1() != null ? " ,tele1 = '" + builder.getTele1() + "'" : "") +
+			  (builder.getTele2() != null ? " ,tele2 = '" + builder.getTele2() + "'" : "") +
+			  (builder.getAddress() != null ? " ,address = '" + builder.getAddress() + "'" : "") +
+			  (builder.getRecordAlive() != null ? " ,record_alive = " + builder.getRecordAlive().getSeconds() + "" : "") +
+			  (builder.getExpireDate() != 0 ? " ,expire_date = '" + DateUtil.format(builder.getExpireDate()) + "'" : "") +
+			  " WHERE id = " + builder.getId();
+		
+		if(dbCon.stmt.executeUpdate(sql) == 0){
+			throw new BusinessException(RestaurantError.RESTAURANT_NOT_FOUND);
+		}
+		
+		//Update the password to administrator of restaurant.
+		Staff admin = StaffDao.getStaffsByRoleCategory(dbCon, builder.getId(), Role.Category.ADMIN).get(0);
+		Staff.StaffUpdateBuilder staffBuilder = new Staff.StaffUpdateBuilder(admin.getId())
+														 .setStaffPwd(builder.getPwd());
+		StaffDao.updateStaff(dbCon, staffBuilder);
+	}
+	
+	/**
 	 * Insert the new restaurant and related information.
 	 * @param builder
 	 * 			the builder to new restaurant
@@ -190,15 +272,9 @@ public class RestaurantDao {
 		Restaurant restaurant = builder.build();
 		
 		try{
-			String sql;
-			//Check to whether the duplicated account exist
-			sql = " SELECT * FROM " + Params.dbName + ".restaurant WHERE account = '" + restaurant.getAccount() + "'";
-			dbCon.rs = dbCon.stmt.executeQuery(sql);
-			if(dbCon.rs.next()){
-				throw new BusinessException(RestaurantError.DUPLICATED_RESTAURANT_ACCOUNT);
-			}
-			dbCon.rs.close();
+			checkDuplicatedAccount(dbCon, restaurant.getAccount());
 			
+			String sql;
 			//Create the new restaurant
 			sql = " INSERT INTO " + Params.dbName + ".restaurant " +
 				  " (account, birth_date, restaurant_name, restaurant_info, tele1, tele2, address, record_alive, expire_date) " +
