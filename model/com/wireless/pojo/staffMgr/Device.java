@@ -84,17 +84,13 @@ public class Device implements Parcelable{
 	
 	public static class InsertBuilder{
 		
-		private int restaurantId;
+		private final int restaurantId;
 		private Model model = Model.ANDROID;
 		private final String deviceId;
 		
-		public InsertBuilder(String deviceId){
+		public InsertBuilder(String deviceId, int restaurantId){
 			this.deviceId = deviceId;
-		}
-		
-		public InsertBuilder setRestaurantId(int restaurantId){
 			this.restaurantId = restaurantId;
-			return this;
 		}
 		
 		public InsertBuilder setModel(Model model){
@@ -110,17 +106,21 @@ public class Device implements Parcelable{
 	public static class UpdateBuilder{
 		
 		private final String deviceId;
-		private int restaurantId;
-		private Model model = Model.ANDROID;
-		private Status status = Status.WORK;
+		private final int restaurantId;
+		private Model model;
+		private Status status;
 		
-		UpdateBuilder(String deviceId){
+		UpdateBuilder(String deviceId, int restaurantId){
 			this.deviceId = deviceId;
+			this.restaurantId = restaurantId;
 		}
 		
-		public UpdateBuilder setRestaurantId(int restaurantId){
-			this.restaurantId = restaurantId;
-			return this;
+		public String getDeviceId(){
+			return this.deviceId;
+		}
+		
+		public int getRestaurantId(){
+			return this.restaurantId;
 		}
 		
 		public UpdateBuilder setModel(Model model){
@@ -128,13 +128,17 @@ public class Device implements Parcelable{
 			return this;
 		}
 		
+		public Model getModel(){
+			return this.model;
+		}
+		
 		public UpdateBuilder setStatus(Status status){
 			this.status = status;
 			return this;
 		}
 		
-		public Device build(){
-			return new Device(this);
+		public Status getStatus(){
+			return this.status;
 		}
 		
 	}
@@ -150,13 +154,6 @@ public class Device implements Parcelable{
 		setDeviceId(builder.deviceId);
 		setModel(builder.model);
 		setStatus(Status.WORK);
-	}
-	
-	private Device(UpdateBuilder builder){
-		setRestaurantId(builder.restaurantId);
-		setDeviceId(builder.deviceId);
-		setModel(builder.model);
-		setStatus(builder.status);
 	}
 	
 	public Device(String deviceId){
@@ -185,7 +182,7 @@ public class Device implements Parcelable{
 	
 	public String getDeviceId() {
 		if(deviceId == null){
-			deviceId = "";
+			return "";
 		}
 		return deviceId.trim().toUpperCase(Locale.getDefault());
 	}
@@ -199,7 +196,9 @@ public class Device implements Parcelable{
 	}
 	
 	public void setModel(Model model) {
-		this.model = model;
+		if(model != null){
+			this.model = model;
+		}
 	}
 	
 	public Status getStatus() {
@@ -207,7 +206,9 @@ public class Device implements Parcelable{
 	}
 	
 	public void setStatus(Status status) {
-		this.status = status;
+		if(status != null){
+			this.status = status;
+		}
 	}
 	
 	@Override
