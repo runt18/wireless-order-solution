@@ -13,7 +13,6 @@ import org.apache.struts.action.ActionMapping;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.json.JObject;
 import com.wireless.pojo.staffMgr.Staff.StaffUpdateBuilder;
-import com.wireless.util.Util;
 import com.wireless.util.WebParams;
 
 public class UpdateStaffAction extends Action {
@@ -32,18 +31,13 @@ public class UpdateStaffAction extends Action {
 			String staffPwd = request.getParameter("staffPwd");
 			
 			String roleId = request.getParameter("roleId");
-			String pwdMd5 = Util.getMD5Str(staffPwd);
 			String tele = request.getParameter("tele");
 			
-			StaffUpdateBuilder builder = new StaffUpdateBuilder();
-			builder.setStaffId(Integer.parseInt(staffId));
-			builder.setStaffName(staffName);
-			if(!staffPwd.trim().isEmpty()){
-				builder.setStaffpwd(pwdMd5);
-			}
-			builder.setMobile(tele);
-			builder.setRoleId(Integer.parseInt(roleId));
-			
+			StaffUpdateBuilder builder = new StaffUpdateBuilder(Integer.parseInt(staffId))
+											 .setStaffName(staffName)
+											 .setStaffPwd(staffPwd)
+											 .setMobile(tele)
+											 .setRoleId(Integer.parseInt(roleId));
 			
 			StaffDao.updateStaff(builder);
 			
