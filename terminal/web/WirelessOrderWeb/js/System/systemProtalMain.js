@@ -730,7 +730,7 @@ var resturantMgr = new Ext.Window({
 				var tel1 = Ext.getCmp('tel1').getValue();
 				var tel2 = Ext.getCmp('tel2').getValue();
 				Ext.Ajax.request({
-					   url: '../../RestaurantUpdate.do',
+					   url: '../../OperateRestaurant.do',
 					   success: function(response,options){
 						   var resultJSON = Ext.util.JSON.decode(response.responseText);
 						   if(resultJSON.all.success){
@@ -752,7 +752,8 @@ var resturantMgr = new Ext.Window({
 						   restaurant_info:restaurant_info,
 						   address:address,
 						   tel1:tel1,
-						   tel2:tel2
+						   tel2:tel2,
+						   dataSource : 'systemUpdate'
 					   }
 					});
 			},

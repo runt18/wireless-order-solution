@@ -94,5 +94,14 @@
 			}
 		});
 	});
+	
+	$("#managementCenter").each(function() {
+		$(this).bind("click", function() {
+			if (!isPrompt) {
+				location.href = "RestaurantMgr.html?"+strEncode("restaurantID="
+					+ restaurantID, "mi");
+			}
+		});
+	});
 
 };

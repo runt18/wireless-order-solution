@@ -317,5 +317,13 @@ function loginOnLoad() {
 			$(this).stop().css("background", "url(../../images/cancelReasonMgr.png) no-repeat 50%");
 		});
 	});
+	$("#managementCenter").each(function(){
+		$(this).hover(function(){
+			$(this).stop().css("background", "url(../../images/cancelReasonMgr_select.png) no-repeat 50%");
+		},
+		function(){
+			$(this).stop().css("background", "url(../../images/cancelReasonMgr.png) no-repeat 50%");
+		});
+	});
 	
 };

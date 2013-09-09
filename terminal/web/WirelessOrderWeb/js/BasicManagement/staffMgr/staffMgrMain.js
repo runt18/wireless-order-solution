@@ -218,6 +218,25 @@ var logOutBut = new Ext.ux.ImageButton({
 	}
 });
 
+var addStaff = new Ext.ux.ImageButton({
+	imgPath : '../../images/btnAddSupplier.png',
+	imgWidth : 50,
+	imgHeight : 50,
+	tooltip : '添加员工',
+	handler : function(){
+		operateStaff({otype : 'insert'});
+	}
+});
+
+var addRole = new Ext.ux.ImageButton({
+	imgPath : '../../images/btnAddSupplier.png',
+	imgWidth : 50,
+	imgHeight : 50,
+	tooltip : '添加角色',
+	handler : function(){
+		operateRole({otype : 'insert'});
+	}
+});
 
 
 
@@ -291,7 +310,7 @@ function deleteStaff(){
 	if(ss != null){
 		Ext.Msg.confirm(
 			'提示',
-			'是否刪除方案?',
+			'是否刪除' + ss.data.staffName + '?',
 			function(e){
 				if(e == 'yes'){
 					Ext.Ajax.request({
@@ -336,7 +355,7 @@ function staffOpt(value, cellmeta, record, rowIndex, columnIndex, store) {
 };
 function roleOpt(value, cellmeta, record, rowIndex, columnIndex, store) {
 	if(eval(record.get('categoryValue')) == 1 || eval(record.get('categoryValue') == 2)){
-		return '----';
+		return '系统保留';
 	}else{
 		return ''
 		+ "<a href = \"javascript:operateRole({otype:'update'})\">" + "<img src='../../images/Modify.png'/>修改</a>"
@@ -522,7 +541,7 @@ function operateStaff(c){
 		staffAddWin.show();
 		staffAddWin.operationType = c.otype;
 		staffAddWin.setTitle('修改员工');
-		
+		Ext.getCmp('txtStaffName').focus(true, 100);
 		Ext.getCmp('txtStaffName').setValue(ss.data.staffName);
 		var psw = Ext.getCmp('txtStaffPwd');
 		var confirmPsw = Ext.getCmp('txtStaffPwdConfirm');
@@ -544,9 +563,10 @@ function operateRole(c){
 		roleAddWin.show();
 		roleAddWin.operationType = c.otype;
 		roleAddWin.setTitle('添加角色');
-		
+		Ext.getCmp('txtRoleName').focus(true, 100);
 	}else if(c.otype == 'update'){
 		roleAddWin.show();
+		Ext.getCmp('txtRoleName').focus(true, 100);
 		roleAddWin.operationType = c.otype;
 		roleAddWin.setTitle('修改角色');
 		var ss = roleGrid.getSelectionModel().getSelected();
@@ -561,7 +581,7 @@ function operateRole(c){
 		if(ss != null){
 			Ext.Msg.confirm(
 				'提示',
-				'是否刪除方案?',
+				'是否刪除角色?',
 				function(e){
 					if(e == 'yes'){
 						Ext.Ajax.request({
@@ -575,6 +595,9 @@ function operateRole(c){
 								var jr = Ext.decode(res.responseText);
 								if(jr.success){
 									Ext.example.msg(jr.title, jr.msg);
+									Ext.getDom('roleTbarName').innerHTML = '角色权限';
+									privilegeTree.loader.baseParams = {dataSource : 'tree'};
+									privilegeTree.getRootNode().reload();
 								}else{
 									jr['icon'] = Ext.MessageBox.WARNING;
 									Ext.ux.showMsg(jr);
@@ -1158,12 +1181,14 @@ Ext.onReady(function() {
 		items : [ staffGrid, roleGrid, privilegeTree ],
 		tbar : new Ext.Toolbar({
 			height : 55,
-			items : [ 
-				'->', 
+			items : [addStaff, {
+				xtype : 'tbtext',
+				text : '&nbsp;&nbsp;&nbsp;'
+			}, addRole,'->', 
 				pushBackBut, 
 				{
-					text : '&nbsp;&nbsp;&nbsp;',
-					disabled : true
+					xtype : 'tbtext',
+					text : '&nbsp;&nbsp;&nbsp;'
 				}, 
 				logOutBut 
 			]
