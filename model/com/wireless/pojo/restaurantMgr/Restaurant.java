@@ -80,19 +80,45 @@ public class Restaurant implements Parcelable{
 	public static final int RESERVED_7 = 10;
 	
 	public static enum RecordAlive{
-		NEVER_EXPIRED(0),
-		THREE_MONTHS(3600 * 24 * 90),
-		HALF_A_YEAR(3600 * 24 * 180),
-		ONE_YEAR(3600 * 24 * 360);
+		NEVER_EXPIRED(1, 0, "无限期"),
+		THREE_MONTHS(2, 3600 * 24 * 90, "90天"),
+		HALF_A_YEAR(3, 3600 * 24 * 180, "180天"),
+		ONE_YEAR(4, 3600 * 24 * 360, "1年");
 		
+		private final int val;
 		private final int aliveSeconds;
+		private final String desc;
 		
-		RecordAlive(int aliveSeconds){
+		RecordAlive(int val, int aliveSeconds, String desc){
+			this.val = val;
 			this.aliveSeconds = aliveSeconds;
+			this.desc = desc;
+		}
+		
+		public static RecordAlive valueOf(int val){
+			for(RecordAlive recordAlive : values()){
+				if(recordAlive.val == val){
+					return recordAlive;
+				}
+			}
+			throw new IllegalArgumentException("The val(" + val + ") is invalid.");
+		}
+		
+		public int getVal(){
+			return val;
 		}
 		
 		public int getSeconds(){
 			return aliveSeconds;
+		}
+		
+		public String getDesc(){
+			return this.desc;
+		}
+		
+		@Override
+		public String toString(){
+			return "RecordAlive(val = " + val + ",desc = " + desc + ")";
 		}
 	}
 	
