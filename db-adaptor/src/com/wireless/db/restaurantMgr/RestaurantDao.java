@@ -186,18 +186,15 @@ public class RestaurantDao {
 	 */
 	public static void update(DBCon dbCon, Restaurant.UpdateBuilder builder) throws SQLException, BusinessException{
 		
-		if(builder.getAccount() != null){
-			String sql;
-			//Check to whether the duplicated account exist
-			sql = " SELECT * FROM " + Params.dbName + ".restaurant WHERE account = '" + builder.getAccount() + "'" + " AND " + " id <> " + builder.getId();
-			dbCon.rs = dbCon.stmt.executeQuery(sql);
-			if(dbCon.rs.next()){
-				throw new BusinessException(RestaurantError.DUPLICATED_RESTAURANT_ACCOUNT);
-			}
-			dbCon.rs.close();
-		}
-		
 		String sql;
+		//Check to whether the duplicated account exist
+		sql = " SELECT * FROM " + Params.dbName + ".restaurant WHERE account = '" + builder.getAccount() + "'" + " AND " + " id <> " + builder.getId();
+		dbCon.rs = dbCon.stmt.executeQuery(sql);
+		if(dbCon.rs.next()){
+			throw new BusinessException(RestaurantError.DUPLICATED_RESTAURANT_ACCOUNT);
+		}
+		dbCon.rs.close();
+		
 		sql = " UPDATE " + Params.dbName + ".restaurant SET " +
 			  " id = " + builder.getId() +
 			  (builder.getAccount() != null ? " ,account = '" + builder.getAccount() + "'" : "") +

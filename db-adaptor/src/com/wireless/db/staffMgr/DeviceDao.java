@@ -173,19 +173,57 @@ public class DeviceDao {
 	
 	/**
 	 * Update the device according to a specific id.
-	 * @param dbCon
-	 * 			the database connection
-	 * @param deviceId
-	 * 			the device id to update
+	 * @param builder
+	 * 			the builder to update a device
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 * @throws BusinessException
-	 * 			throws if the device to this specific id does NOT exist
+	 * 			throws if the device to update does NOT exist
+	 */
+	public static void update(Device.UpdateBuilder builder) throws SQLException, BusinessException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			update(dbCon, builder);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Update the device according to a specific id.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param builder
+	 * 			the builder to update a device
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if the device to update does NOT exist
 	 */
 	public static void update(DBCon dbCon, Device.UpdateBuilder builder) throws SQLException, BusinessException{
-		//TODO
-		checkDeviceDuplicated(dbCon, builder.getDeviceId());
+		String sql;
+		sql = " SELECT id FROM " + Params.dbName + ".device WHERE device_id = '" + builder.getDeviceId() + "'" + " AND " + " id <> " + builder.getId();
+		dbCon.rs = dbCon.stmt.executeQuery(sql);
+		try{
+			if(dbCon.rs.next()){
+				throw new BusinessException(DeviceError.DEVICE_ID_DUPLICATE);
+			}
+		}finally{
+			dbCon.rs.close();
+		}
 		
+		sql = " UPDATE " + Params.dbName + ".device SET " +
+			  " device_id = '" + builder.getDeviceId() + "'" +
+			  " ,device_id_crc = CRC32(" + builder.getDeviceId() + ")" +
+			  " ,restaurant_id = " + builder.getRestaurantId() + 
+			  (builder.getModel() != null ? " ,model_id = " + builder.getModel().getVal() : "") +
+			  (builder.getStatus() != null ? " ,status = " + builder.getStatus().getVal() : "") +
+			  " WHERE id = " + builder.getId();
+		
+		if(dbCon.stmt.executeUpdate(sql) == 0){
+			throw new BusinessException(DeviceError.DEVICE_NOT_EXIST);
+		}
 	}
 	
 	private static void checkDeviceDuplicated(DBCon dbCon, String deviceId) throws BusinessException, SQLException{

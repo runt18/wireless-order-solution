@@ -100,8 +100,7 @@ public class TestRestaurantDao {
 			compareCancelReason(staff, restaurantId);
 			
 			//Update a restaurant
-			Restaurant.UpdateBuilder updateBuilder = new Restaurant.UpdateBuilder(restaurantId)
-														 		   .setAccount("test2")
+			Restaurant.UpdateBuilder updateBuilder = new Restaurant.UpdateBuilder(restaurantId, "test2")
 														 		   .setPwd("test2@123")
 														 		   .setRestaurantInfo("测试信息2")
 														 		   .setAddress("测试地址2")
