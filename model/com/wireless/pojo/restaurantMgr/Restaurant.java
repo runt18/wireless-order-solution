@@ -2,15 +2,20 @@ package com.wireless.pojo.restaurantMgr;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
+import com.wireless.json.Jsonable;
 import com.wireless.parcel.Parcel;
 import com.wireless.parcel.Parcelable;
 import com.wireless.pojo.util.DateUtil;
 
 
-public class Restaurant implements Parcelable{
+public class Restaurant implements Parcelable, Jsonable{
 	
 	public static class InsertBuilder{
 		private final String account;
@@ -81,7 +86,7 @@ public class Restaurant implements Parcelable{
 			this.id = id;
 			this.account = account;
 		}
-		
+
 		public String getAccount(){
 			return this.account;
 		}
@@ -202,6 +207,15 @@ public class Restaurant implements Parcelable{
 				}
 			}
 			throw new IllegalArgumentException("The val(" + val + ") is invalid.");
+		}
+		
+		public static RecordAlive valueOfSeconds(int val){
+			for(RecordAlive recordAlive : values()){
+				if(recordAlive.aliveSeconds == val){
+					return recordAlive;
+				}
+			}
+			throw new IllegalArgumentException("The aliveSeconds(" + val + ") is invalid.");
 		}
 		
 		public int getVal(){
@@ -436,4 +450,27 @@ public class Restaurant implements Parcelable{
 			return new Restaurant();
 		}
 	};
+
+	@Override
+	public Map<String, Object> toJsonMap(int flag) {
+		Map<String, Object> jm = new HashMap<String, Object>();
+		jm.put("id", this.id);
+		jm.put("account", this.account);
+		jm.put("name", this.restaurantName);
+		jm.put("info", this.restaurantInfo);
+		jm.put("tele1", this.tele1);
+		jm.put("tele2", this.tele2);
+		jm.put("address", this.address);
+		jm.put("liveness", this.liveness);
+		jm.put("recordAliveValue", RecordAlive.valueOfSeconds(this.recordAlive).getVal());
+		jm.put("recordAliveText", RecordAlive.valueOfSeconds(this.recordAlive).getDesc());
+		jm.put("birthDate", DateUtil.formatToDate(this.birthDate));
+		jm.put("expireDate", DateUtil.formatToDate(this.expireDate));
+		return Collections.unmodifiableMap(jm);
+	}
+
+	@Override
+	public List<Object> toJsonList(int flag) {
+		return null;
+	}
 }
