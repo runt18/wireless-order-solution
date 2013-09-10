@@ -9,6 +9,7 @@ import com.wireless.exception.ErrorCode;
 import com.wireless.exception.ProtocolError;
 import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
+import com.wireless.pack.req.PrintOption;
 import com.wireless.pack.req.ReqPayOrder;
 import com.wireless.parcel.Parcel;
 import com.wireless.pojo.dishesOrder.Order;
@@ -17,14 +18,16 @@ import com.wireless.sccon.ServerConnector;
 
 public class PayOrderTask extends AsyncTask<Void, Void, Void>{
 	
-	protected byte mPayCate;
+	protected final byte mPayCate;
 	protected BusinessException mBusinessException;
-	protected Order mOrderToPay;
+	protected final Order mOrderToPay;
+	protected final PrintOption mPrintOption;
 	
 	private final Staff mStaff;
 	
-	public PayOrderTask(Staff staff, Order orderToPay, byte payCate){
+	public PayOrderTask(Staff staff, Order orderToPay, byte payCate, PrintOption printOption){
 		mOrderToPay = orderToPay;
+		mPrintOption = printOption;
 		mPayCate = payCate;
 		mStaff = staff;
 	}
@@ -37,7 +40,7 @@ public class PayOrderTask extends AsyncTask<Void, Void, Void>{
 
 		ProtocolPackage resp;
 		try {
-			resp = ServerConnector.instance().ask(new ReqPayOrder(mStaff, mOrderToPay, mPayCate));
+			resp = ServerConnector.instance().ask(new ReqPayOrder(mStaff, mOrderToPay, mPayCate, mPrintOption));
 			if (resp.header.type == Type.NAK) {
 
 				ErrorCode errCode = new Parcel(resp.body).readParcel(ErrorCode.CREATOR);
