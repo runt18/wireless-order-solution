@@ -30,7 +30,6 @@ function initOrderData(data){
 		url : '../QueryOrder.do',
 		type : 'post',
 		data : {
-			pin : pin,
 			restaurantID : restaurantID,
 			tableID : data.alias,			
 		},
@@ -76,7 +75,6 @@ function initCancelReason(){
 		url : '../QueryCancelReason.do',
 		type : 'post',
 		data : {
-			pin : pin,
 			restaurantID : restaurantID,
 		},
 		success : function(data, status, xhr){

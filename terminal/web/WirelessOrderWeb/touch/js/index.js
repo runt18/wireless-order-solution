@@ -36,12 +36,15 @@ String.prototype.trim = function(){
  * 显示模板
  */
 var Templet = {
+	ul : {
+		allStaff : '<div data-value={id} class="main-box-base" style="line-height: 70px; text-align: center;" onClick="changeStaff({event:this, type:1, staffId:{id}})">{name}</div>'
+	},
 	co : {
 		dept : '<div class="button-base" data-value={value} data-type="dept-select" '
 			+ 'onClick="co.initKitchenContent({event:this, deptId:{value}})">{text}</div>',
 		kitchen : '<div class="button-base" data-value={value} data-type="kitchen-select" '
 			+ 'onClick="co.findFoodByKitchen({event:this, kitchenId:{value}})">{text}</div>',
-		boxFood : '<div data-index={dataIndex} data-value={id} class="divCFCOAllFood-main-box" onClick="co.insertFood({foodId:{id}})">'
+		boxFood : '<div data-index={dataIndex} data-value={id} class="main-box-base" onClick="co.insertFood({foodId:{id}})">'
 			+ '{name}'
 			+ '<div>¥:{unitPrice}</div>'
 			+ '</div>',
@@ -53,11 +56,11 @@ var Templet = {
   				+ '<div style="min-width: 100px;">¥:{totalPrice}</div>'
   			+'</div>'
   			+ '</div>',
-  	  	boxSelectTaste : '<div data-index={dataIndex} data-value={id} class="divCFCOAllFood-main-box" onClick="co.ot.insertTaste({event:this, tasteId:{id}})">'
+  	  	boxSelectTaste : '<div data-index={dataIndex} data-value={id} class="main-box-base" onClick="co.ot.insertTaste({event:this, tasteId:{id}})">'
   	  		+ '{name}'
   	  		+ '<div>{mark}:{markText}</div>'
   	  		+ '</div>',
-  	  	boxNewTaste : '<div data-value={id} class="divCFCOAllFood-main-box" onClick="co.ot.deleteTaste({event:this, tasteId:{id}})">'
+  	  	boxNewTaste : '<div data-value={id} class="main-box-base" onClick="co.ot.deleteTaste({event:this, tasteId:{id}})">'
   	  		+ '{name}'
   	  		+ '<div>{mark}:{markText}</div>'
   	  		+ '</div>'
@@ -88,12 +91,32 @@ function initFoodData(){
 		url : '../QueryMenu.do',
 		type : 'post',
 		data : {
+			isCookie : true,
 			dataSource : 'foods',
-			pin : pin,
 			restaurantID : restaurantID
 		},
 		success : function(data, status, xhr){
 			if(data.success){
+				// 加载口味信息
+				$.ajax({
+					url : '../QueryMenu.do',
+					type : 'post',
+					data : {
+						dataSource : 'tastes',
+						restaurantID : restaurantID
+					},
+					success : function(data, status, xhr){
+						if(data.success){
+							tasteData = {totalProperty:data.root.length, root:data.root.slice(0)};
+						}else{
+							alert('初始化口味数据失败.');
+						}
+					},
+					error : function(request, status, err){
+						alert('初始化口味数据失败.');
+					}
+				});
+				
 				var tmpKitchen = null;
 				for(var i = 0; i < data.root.length; i++){
 					tmpKitchen = {
@@ -118,7 +141,6 @@ function initFoodData(){
 					type : 'post',
 					data : {
 						dataSource : 'kitchens',
-						pin : pin,
 						restaurantID : restaurantID
 					},
 					success : function(data, status, xhr){
@@ -191,28 +213,9 @@ function initFoodData(){
 					}
 				});
 			}else{
+				Util.LM.hide();
 				alert('初始化菜品数据失败.');
 			}
-			// 加载口味信息
-			$.ajax({
-				url : '../QueryMenu.do',
-				type : 'post',
-				data : {
-					dataSource : 'tastes',
-					pin : pin,
-					restaurantID : restaurantID
-				},
-				success : function(data, status, xhr){
-					if(data.success){
-						tasteData = {totalProperty:data.root.length, root:data.root.slice(0)};
-					}else{
-						alert('初始化口味数据失败.');
-					}
-				},
-				error : function(request, status, err){
-					alert('初始化口味数据失败.');
-				}
-			});
 		},
 		error : function(request, status, err){
 			Util.LM.hide();
@@ -222,18 +225,67 @@ function initFoodData(){
 }
 
 /**
+ * 初始化员工登陆界面
+ */
+function initStaffContent(c){
+	$.ajax({
+		url : '../QueryStaff.do',
+		data : {
+			restaurantID : restaurantID
+		},
+		success : function(data, status, xhr){
+			Util.LM.hide();
+			if(data.success){
+				Util.dialongDisplay({
+					renderTo : 'divUserLogin',
+					type : 'show',
+					isTop : true
+				});	
+				if(data.root.length > 18){
+					
+				}
+				var html = [];
+				for(var i = 0; i < data.root.length; i++){
+					html.push(Templet.ul.allStaff.format({
+						id : data.root[i].staffID,
+						name : data.root[i].staffName
+					}));
+				}
+				$('#divAllStaffForUserLogin').html(html.join(''));
+			}else{
+				Util.msg.alert({
+					msg : '获取餐厅员工信息失败, 请联系客服员.'
+				});
+			}
+		},
+		error : function(request, status, err){
+			Util.LM.hide();
+			Util.msg.alert({
+				msg : '获取餐厅员工信息失败, 请联系客服员.'
+			});
+		}
+	});
+}
+
+/**
  * onload
  */
 $(function(){
-	
-	initFoodData();
-	
-	$.getScript('./js/tableSelect/tsLoad.js');
-	
-	$.getScript('./js/tableSelect/tsMain.js');
-	
-	$.getScript('./js/updateOrder/uoLoad.js');
-	$.getScript('./js/updateOrder/uoMain.js');
+	Util.LM.show();
+	$.ajax({
+		url : '../VerifyLogin.do',
+		success : function(data, status, xhr){
+			if(data.success){
+				staffData = data.other.staff;
+				loginSuccessCallback();
+			}else{
+				initStaffContent();
+			}
+		},
+		error : function(request, status, error){
+			initStaffContent();
+		}
+	});
 });
 
 /**
@@ -255,6 +307,129 @@ function toggleContentDisplay(c){
 		el.addClass('content-hide');
 	}
 }
+/**
+ * 
+ * @param c
+ */
+function changeStaff(c){
+	if(c == null || typeof c.type != 'number'){
+		return;
+	}
+	var sl = $('#divAllStaffForUserLogin > div');
+	for(var i = 0; i< sl.length; i++){
+		$(sl[i]).removeClass('div-staff-select');
+	}
+	var pwd = getDom('txtStaffLoginPwd');
+	var name = getDom('spanStaffNameDisplay');
+	if(c.type == 1 && typeof c.staffId == 'number'){
+		$(c.event).addClass('div-staff-select');
+		name.innerHTML = c.event.innerText;
+		
+		pwd.focus();
+		pwd.select();
+	}else if(c.type == 2){
+		pwd.value = '';
+		name.innerHTML = '----';
+	}
+	pwd = null;
+	name = null;
+}
 
+/**
+ * 
+ */
+function setValueToPwd(c){
+	var pwd = getDom('txtStaffLoginPwd');
+	if(c.type === 1){
+		pwd.value = pwd.value.substring(0, pwd.value.length - 1);
+	}else if(c.type === 2){
+		pwd.value = '';
+	}else{
+		pwd.value = pwd.value + '' + c.value;
+	}
+	pwd.focus();
+}
 
-
+/**
+ * 登陆
+ */
+function staffLoginHandler(c){
+	var temp = null, staffId = 0, sl = $('#divAllStaffForUserLogin > div');
+	var pwd = getDom('txtStaffLoginPwd');
+	for(var i = 0; i< sl.length; i++){
+		temp = $(sl[i]);
+		if(temp.hasClass('div-staff-select')){
+			staffId = temp.attr('data-value');
+			break;
+		}
+	}
+	if(staffId == 0){
+		Util.msg.alert({
+			msg : '请选择一个员工.'
+		});
+		return;
+	}
+	if(pwd.value.length == 0){
+		Util.msg.alert({
+			msg : '请输入密码.'
+		});
+		return;
+	}
+	
+	Util.LM.show();
+	$.ajax({
+		url : '../OperateStaff.do',
+		data : {
+			pin : staffId,
+			pwd : MD5(pwd.value.trim())
+		},
+		success : function(data, status, xhr){
+			Util.LM.hide();
+			if(data.success){
+				staffData = {
+					staffID : staffId,
+					staffName : temp.html()
+				};
+				if(c.refresh === true){
+					loginSuccessCallback();
+				}else{
+					initTables();
+				}
+				Util.dialongDisplay({
+					renderTo : 'divUserLogin',
+					type : 'hide'
+				});
+			}else{
+				Util.msg.alert({
+					msg : data.msg
+				});
+			}
+		},
+		error : function(request, status, err){
+			Util.LM.hide();
+			Util.msg.alert({
+				msg : err
+			});
+		}
+	});
+}
+/**
+ * 
+ */
+function loginSuccessCallback(){
+	initFoodData();
+	
+	$.getScript('./js/tableSelect/tsLoad.js', function(){
+		toggleContentDisplay({
+			type:'show', 
+			renderTo:'divTableSelect'
+		});
+		initTables();
+		changeStaff({type:2});
+	});
+	
+	$.getScript('./js/tableSelect/tsMain.js');
+	
+	$.getScript('./js/updateOrder/uoLoad.js');
+	$.getScript('./js/updateOrder/uoMain.js');
+}

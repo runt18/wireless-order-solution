@@ -167,6 +167,7 @@ Util.dialongDisplay = function(c){
 	}
 	if($.trim(c.type) == 'show'){
 		el.css({
+			zIndex: 99999,
 			position: 'absolute',
 			top: '50%',
 			left: '50%',
@@ -178,11 +179,24 @@ Util.dialongDisplay = function(c){
 		if(lm.hasClass('dialong-lm-hide')){
 			lm.removeClass('dialong-lm-hide');			
 		}
+		if(lm.hasClass('dialong-lm-hide-top')){
+			lm.removeClass('dialong-lm-hide-top');			
+		}
+		if(typeof c.isTop == 'boolean' && typeof c.isTop){
+			lm.removeClass('dialong-lm-show');
+			lm.addClass('dialong-lm-show-top');
+		}else{
+			lm.removeClass('dialong-lm-show-top');
+			lm.addClass('dialong-lm-show');
+		}
 		el.addClass('dialong-show');
-		lm.addClass('dialong-lm-show');
 	}else if($.trim(c.type) == 'hide'){
 		el.addClass('dialong-hide');
-		lm.addClass('dialong-lm-hide');
+		if(typeof c.isTop == 'boolean' && typeof c.isTop){
+			lm.addClass('dialong-lm-hide-top');
+		}else{
+			lm.addClass('dialong-lm-hide');
+		}
 		if(typeof c.remove == 'boolean' && c.remove){
 			var interval = null;
 			interval = setInterval(function(){
@@ -215,7 +229,7 @@ Util.msg = {
 			+ '<div data-type="button" class="box-horizontal">'
 				+ '<div class="div-full"></div>'
 				+ '<div class="button-base" style="width:150px;" onClick="Util.msg.save({event:\'yes\', id:\''+id+'\'})">确定</div>'
-				+ (typeof c.button == 'string' && c.button.toUpperCase() == 'YESBACK' ? '<div class="button-base" style="width:150px; margin-left:20px;" onClick="Util.msg.hide({event:\'back\', id:\''+id+'\'})">返回</div>' : '')
+				+ (typeof c.buttons == 'string' && c.buttons.toUpperCase() == 'YESBACK' ? '<div class="button-base" style="width:150px; margin-left:20px;" onClick="Util.msg.hide({event:\'back\', id:\''+id+'\'})">返回</div>' : '')
 				+ '<div class="div-full"></div>'
 			+ '</div>'
 			+ '</div>';
@@ -260,7 +274,7 @@ Util.msg = {
 			title : c.title,
 			msg : c.msg,
 			fn : c.fn,
-			button : c.button
+			buttons : c.buttons
 		});
 		document.body.insertAdjacentHTML('beforeEnd', content.content);
 		Util.dialongDisplay({
@@ -324,3 +338,24 @@ Util.LM = (function(){
 	};
 	return $;
 })();
+
+/**
+ * 获取URL参数工具类
+ */
+function URLParaQuery() {
+	var name, value, i;
+	var str = location.href;
+	var num = str.indexOf("?");
+	str = str.substr(num + 1);
+	//"mi" is the key
+	str = strDecode(str, "mi");
+	var arrtmp = str.split("&");
+	for (i = 0; i < arrtmp.length; i++) {
+		num = arrtmp[i].indexOf("=");
+		if (num > 0) {
+			name = arrtmp[i].substring(0, num);
+			value = arrtmp[i].substr(num + 1);
+			this[name] = value;
+		}
+	}
+}

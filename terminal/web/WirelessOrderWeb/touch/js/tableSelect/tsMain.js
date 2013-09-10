@@ -378,7 +378,6 @@ ts.tt.submit = function(){
 			url : '../TransTable.do',
 			type : 'post',
 			data : {
-				pin : pin,
 				oldTableAlias : oldTable,
 				newTableAlias : newTable
 			},

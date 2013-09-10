@@ -29,13 +29,6 @@ var typeForInputTableNum;
 var statusType = "";
 
 /**
- * onload
- */
-$(function(){
-	initTables();
-});
-
-/**
  * 定时器，定时刷新餐桌选择页面数据
  */
 window.setInterval("initTables()", 240000);
@@ -45,12 +38,12 @@ window.setInterval("initTables()", 240000);
  * freeTables存放空闲餐桌，busyTables存放就餐餐桌
  */
 function initTables(){
+	$('#spanStaffNameForDisplayToTS').html(staffData.staffName);
 		// 加载菜单数据
 		$.ajax({
 			url : '../QueryTable.do',
 			type : 'post',
 			data : {
-				pin : pin,
 				random : Math.random(),
 			},
 			success : function(data, status, xhr){

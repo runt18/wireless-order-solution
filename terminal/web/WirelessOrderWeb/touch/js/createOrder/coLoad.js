@@ -91,6 +91,7 @@ co.insertFood = function(c){
 	}
 	if(!has){
 		data.count = 1;
+		data.isHangup = false;
 		data.tasteGroup = {
 			tastePref : '无口味',
 			normalTasteContent : []
@@ -101,6 +102,7 @@ co.insertFood = function(c){
 	co.initNewFoodContent({
 		data : data
 	});
+	data = null;
 };
 
 /**

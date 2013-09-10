@@ -4,12 +4,19 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>触摸屏点菜端</title>
 <link rel="stylesheet" href="./css/base.css">
+<link rel="stylesheet" href="./css/userLogin.css">
 <link rel="stylesheet" href="./css/tableSelect.css">
 <link rel="stylesheet" href="./css/updateOrder.css">
 <link rel="stylesheet" href="./css/createOrder.css">
 <script type="text/javascript" src="../jquery/jquery-1.8.2.min.js"></script>
+<script type="text/javascript" src="../js/components/Encrypt.js"></script>
+<script type="text/javascript" src="../js/components/md5.js"></script>
+<script type="text/javascript" src="./js/Util.js"></script>
+
 <script type="text/javascript">
-var pin = 15, restaurantID = 26;
+var request = new URLParaQuery();
+var pin = request['pin'], restaurantID = request['restaurantID'];
+var staffData = {staffID:0, staffName:''};
 var foodData = {}, kitchenFoodData = {}, kitchenData = {}, deptData = {root:[]}, tasteData = {};
 function getDom(id){
 	return document.getElementById(id);
@@ -35,11 +42,51 @@ var uo = {
 	updateOrder : []
 }
 </script>
-<script type="text/javascript" src="./js/Util.js"></script>
+<!-- <script type="text/javascript" src="./js/tableSelect/tsLoad.js"></script>
+<script type="text/javascript" src="./js/tableSelect/tsMain.js"></script>
+<script type="text/javascript" src="./js/updateOrder/uoLoad.js"></script>
+<script type="text/javascript" src="./js/updateOrder/uoMain.js"></script> -->
 <script type="text/javascript" src="./js/index.js"></script>
 </head>
 <body>
-<div  id = "divTableSelect" class = "content box-vertical" style = "z-index:999;" >
+
+<div class="content content-box-base" style="z-index:9990;">&nbsp;</div>
+
+<div id="divUserLogin" class="box-horizontal content-box-base">
+	<div class="box-vertical" style="width: 330px;">
+		<div id="divAllStaffForUserLogin" style="-webkit-box-flex: 1; overflow-y: auto;"></div>
+		<div></div>
+	</div>
+	<div class="box-vertical" style="-webkit-box-flex: 1;">
+		<div style="color: #FFF; font-weight: bold; font-size: 28px;">
+			<div style="line-height: 60px; height: 60px;">
+				员工:<span id="spanStaffNameDisplay">----</span>
+			</div>
+			<div style="line-height: 50px; height: 50px;">
+				密码:<input id="txtStaffLoginPwd" type="password" style="width: 150px; height: 50px; background: yellow; font-weight: bold; font-size: 28px;">
+			</div>
+		</div>
+		<div id="divKeyBoyForUserLogin" style="margin-top: 20px; -webkit-box-flex: 1;">
+			<div class="button-base" onClick="setValueToPwd({value:7})">7</div>
+			<div class="button-base" onClick="setValueToPwd({value:8})">8</div>
+			<div class="button-base" onClick="setValueToPwd({value:9})">9</div>
+			<div class="button-base" onClick="setValueToPwd({value:4})">4</div>
+			<div class="button-base" onClick="setValueToPwd({value:5})">5</div>
+			<div class="button-base" onClick="setValueToPwd({value:6})">6</div>
+			<div class="button-base" onClick="setValueToPwd({value:1})">1</div>
+			<div class="button-base" onClick="setValueToPwd({value:2})">2</div>
+			<div class="button-base" onClick="setValueToPwd({value:3})">3</div>
+			<div class="button-base" onClick="setValueToPwd({value:0})">0</div>
+			<div class="button-base" onClick="setValueToPwd({type:1})">&laquo;</div>
+			<div class="button-base" onClick="setValueToPwd({type:2})">&laquo;&laquo;</div>
+		</div>
+		<div class="button-base" style="line-height: 60px; width: 100%;" onClick="staffLoginHandler({refresh:true})">
+			登陆
+		</div>
+	</div>
+</div>
+
+<div  id = "divTableSelect" class = "content box-vertical">
 	<div id="divMainForTableSelect" class = "box-horizontal">
 		<div id="divTableShowForSelect">
 			<div id = "divShowTableForSelect"></div>
@@ -58,7 +105,7 @@ var uo = {
 		</div>
 	</div>
 	<div id="divToolBottomForSelect" class="box-horizontal">
-	    <div class="button-base" style="margin-right: 2px;">退出</div>
+	    <div class="button-base" style="margin-right: 2px;" onClick="initStaffContent()">注销</div>
 	    <div class="div-full">&nbsp;</div>
 	    <div class="button-base" style="margin-right: 2px;" onclick = "createOrderForTS()">点菜</div>
   		<div class="button-base" style="margin-right: 2px;" onclick = "transTableForTS()">转台</div>
@@ -68,7 +115,7 @@ var uo = {
 		<div class="button-base" style="margin-right: 2px;" onclick="lastPage()">尾页</div>		
 	</div>
 	<div id="divFootForTableSelect" class="box-horizontal">
-		<div style="margin: 0 10px">收银员：</div>	
+		<div style="margin: 0 10px">收银员：<span id="spanStaffNameForDisplayToTS"></span></div>	
 		<div class="div-full">&nbsp;</div>
 		<div id = "spanPageNowTS" style = "margin-right: 0px;"></div>
 		<div id = "spanAllPageTS" style= "margin-right: 120px;"></div>
@@ -142,7 +189,7 @@ var uo = {
   	</div>
 </div>
 
-<div id = "divSelectTableNumForTs">
+<div id = "divSelectTableNumForTs" class="content-box-base">
 	<div id = "divTopForSelectTableNumTS"></div>
 	<div id = "divMainForSelectTableNumTS">
 		<div id = "divLeftForSelectTableNumTS">
@@ -169,7 +216,7 @@ var uo = {
 	</div>
 </div>		
 
-<div id = "divShowMessageForTableSelect">
+<div id = "divShowMessageForTableSelect" class="content-box-base">
 	<div id = "divTopForShowMessageTS">
 		<span style = "color: white;"><strong>请输入桌号及人数</strong></span>
 	</div>
@@ -233,7 +280,7 @@ var uo = {
 	</div>
 </div>	
 
-<div id = "divKeyboardNumForUO">
+<div id = "divKeyboardNumForUO" class="content-box-base">
 	<div id = "divTopForKeyboardNumForUO"></div>
 	<div id = "divMainForKeyboardNumForUO">
 		<div id = "divLeftForKeyboardNumForUO">
@@ -261,7 +308,7 @@ var uo = {
 	</div>
 </div>
 
-<div id = "divKeyboardPeopleForUO">
+<div id = "divKeyboardPeopleForUO" class="content-box-base">
 	<div id = "divTopForKeyboardPeopleForUO"></div>
 	<div id = "divMainForKeyboardPeopleForUO">
 		<div id = "divLeftForKeyboardPeopleForUO">
@@ -288,7 +335,7 @@ var uo = {
 	</div>
 </div>
 
-<div id="divOperateBoxForFoodTaste" >
+<div id="divOperateBoxForFoodTaste" class="content-box-base">
 	<div class="box-horizontal" style="height: 473px;">
 		<div class="box-vertical" style="width: 330px;">
 			<div class="button-base" style="width: 100%; line-height: 60px; height: 60px;">已选口味</div>
@@ -304,7 +351,7 @@ var uo = {
 		</div>
 	</div>
 	<div class="box-horizontal" style=" border-bottom: 1px solid #FFF; border-top: 1px solid #FFF; line-height: 25px; background: #FFD700;">
-  		<div id="divDescForOperateTaste-padding-msg" style="-webkit-box-flex: 1; text-align: right; font-weight: bold;"></div>
+  		<div id="divDescForOperateTaste-padding-msg" style="-webkit-box-flex: 1; text-align: right; font-weight: bold;">&nbsp;</div>
   	</div>
 	<div id="divSouthForOperateTaste" class="box-horizontal" style="">
 		<div class="button-base" style="margin-right: 2px;" onClick="co.ot.back()">返回</div>

@@ -390,8 +390,6 @@ co.ot.save = function(c){
  * 账单提交
  */
 co.submit = function(){
-//	alert(JSON.stringify(co.order.orderFoods))
-//	return;
 	if(co.newFood == null || typeof co.newFood == 'undefined' || co.newFood.length == 0){
 		Util.msg.alert({
 			title : '温馨提示',
@@ -411,8 +409,6 @@ co.submit = function(){
 		isFree = true;
 		foodData = co.newFood.slice(0);
 	}
-//	alert('foodData.length:  '+foodData.length)
-//	return;
 	
 	var foods = '';
 	var item = null;
@@ -463,25 +459,32 @@ co.submit = function(){
 		url : '../InsertOrder.do',
 		type : 'post',
 		data : {
-			'pin' : pin,
-			'tableID' : co.table.alias,
-			'customNum' : co.table.customNum,
-			'type' : isFree ? 1 : 2,
-			'foods' : foods,
-			'category' :  co.table.categoryValue,
-			'orderID' : isFree ? '' : co.order.id,
-			'orderDate' : isFree ? '' : co.order.orderDate
+			pin : pin,
+			tableID : co.table.alias,
+			customNum : co.table.customNum,
+			type : isFree ? 1 : 2,
+			foods : foods,
+			category :  co.table.categoryValue,
+			orderID : isFree ? '' : co.order.id,
+			orderDate : isFree ? '' : co.order.orderDate
 		},
 		success : function(data, status, xhr) {
 			Util.LM.hide();
 			if (data.success == true) {
 				Util.msg.alert({
 					title : data.title,
-					msg : data.msg, 
+					msg : data.msg + '<br>是否退出登陆?',
+					buttons : 'YESBACK',
 					fn : function(btn){
-						if(co.callback != null && typeof co.callback == 'function'){
-							co.callback();
+						if(btn == 'yes'){
+							initStaffContent();
 							co.back();
+							cancelForUO();
+						}else{
+							if(co.callback != null && typeof co.callback == 'function'){
+								co.callback();
+								co.back();
+							}
 						}
 					}
 				});
