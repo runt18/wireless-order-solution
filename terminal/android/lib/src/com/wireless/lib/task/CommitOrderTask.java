@@ -9,6 +9,7 @@ import com.wireless.exception.ErrorCode;
 import com.wireless.exception.ProtocolError;
 import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
+import com.wireless.pack.req.PrintOption;
 import com.wireless.pack.req.ReqInsertOrder;
 import com.wireless.parcel.Parcel;
 import com.wireless.pojo.dishesOrder.Order;
@@ -23,19 +24,19 @@ public class CommitOrderTask extends AsyncTask<Void, Void, Void>{
 	
 	private final byte mType;
 	private final Staff mStaff;
-	private final byte mReserved;
+	private final PrintOption mPrintOption;
 	
-	public CommitOrderTask(Staff staff, Order reqOrder, byte type, byte reserved){
+	public CommitOrderTask(Staff staff, Order reqOrder, byte type, PrintOption printOption){
 		mReqOrder = reqOrder;
 		mType = type;
-		mReserved = reserved;
+		mPrintOption = printOption;
 		mStaff = staff;
 	}
 	
 	public CommitOrderTask(Staff staff, Order reqOrder, byte type){
 		mReqOrder = reqOrder;
 		mType = type;
-		mReserved = ReqInsertOrder.DO_PRINT;
+		mPrintOption = PrintOption.DO_PRINT;
 		mStaff = staff;
 	}
 	
@@ -49,7 +50,7 @@ public class CommitOrderTask extends AsyncTask<Void, Void, Void>{
 		String errMsg = null;
 		ErrorCode errCode = null;
 		try{
-			ProtocolPackage resp = ServerConnector.instance().ask(new ReqInsertOrder(mStaff, mReqOrder, mType, mReserved));
+			ProtocolPackage resp = ServerConnector.instance().ask(new ReqInsertOrder(mStaff, mReqOrder, mType, mPrintOption));
 			if(resp.header.type == Type.NAK){
 				
 				errCode = new Parcel(resp.body).readParcel(ErrorCode.CREATOR);
