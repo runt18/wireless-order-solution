@@ -8,6 +8,8 @@ import java.util.Map;
 import com.wireless.json.Jsonable;
 import com.wireless.parcel.Parcel;
 import com.wireless.parcel.Parcelable;
+import com.wireless.pojo.distMgr.Discount;
+import com.wireless.pojo.staffMgr.Privilege.Code;
 import com.wireless.pojo.util.SortedList;
 
 
@@ -343,7 +345,7 @@ public class Role implements Jsonable, Parcelable{
 	public void addAllPrivileges(List<Privilege> list){
 		privileges.addAll(list);
 	}
-
+	
 	public List<Privilege> getPrivileges(){
 		return Collections.unmodifiableList(privileges);
 	}
@@ -358,7 +360,23 @@ public class Role implements Jsonable, Parcelable{
 		return privileges.contains(new Privilege(0, code, 0));
 	}
 	
-
+	public List<Discount> getDiscounts(){
+		int index = privileges.indexOf(new Privilege(0, Code.DISCOUNT, 0));
+		if(index >= 0){
+			return privileges.get(index).getDiscounts();
+		}else{
+			return Discount.EMPTY_LIST;
+		}
+	}
+	
+	public Discount getDefaultDiscount(){
+		for(Discount discount : getDiscounts()){
+			if(discount.isDefault() || discount.isDefaultReserved()){
+				return discount;
+			}
+		}
+		return getDiscounts().get(0);
+	}
 	
 	@Override 
 	public int hashCode(){

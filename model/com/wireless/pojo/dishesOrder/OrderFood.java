@@ -515,17 +515,16 @@ public class OrderFood implements Parcelable, Comparable<OrderFood>, Jsonable {
 		dest.writeByte(flag);
 		dest.writeBoolean(this.isTemporary);
 		if(flag == OF_PARCELABLE_4_QUERY){
-			
-			if(this.isTemporary){
-				dest.writeString(mFood.getName());
-				dest.writeFloat(mFood.getPrice());
-				dest.writeParcel(mFood.getKitchen(), Kitchen.KITCHEN_PARCELABLE_SIMPLE);
-			}else{
+
+			if(!this.isTemporary){
 				dest.writeShort(mFood.getStatus());
 				dest.writeParcel(this.mTasteGroup, TasteGroup.TG_PARCELABLE_COMPLEX);
 			}
-			
+			dest.writeString(mFood.getName());
+			dest.writeFloat(mFood.getPrice());
+			dest.writeParcel(mFood.getKitchen(), Kitchen.KITCHEN_PARCELABLE_SIMPLE);
 			dest.writeShort(this.getAliasId());
+			dest.writeFloat(this.getDiscount());
 			dest.writeFloat(this.mCurCnt);
 			dest.writeBoolean(this.isHangup);
 			dest.writeLong(this.mOrderDate);
@@ -558,16 +557,16 @@ public class OrderFood implements Parcelable, Comparable<OrderFood>, Jsonable {
 		this.isTemporary = source.readBoolean();
 		
 		if(flag == OF_PARCELABLE_4_QUERY){
-			if(isTemporary){
-				mFood.setName(source.readString());
-				mFood.setPrice(source.readFloat());
-				mFood.setKitchen(source.readParcel(Kitchen.KITCHEN_CREATOR));
-			}else{
+			if(!isTemporary){
 				mFood.setStatus(source.readShort());
 				this.mTasteGroup = source.readParcel(TasteGroup.TG_CREATOR);
 			}
-			
+
+			mFood.setName(source.readString());
+			mFood.setPrice(source.readFloat());
+			mFood.setKitchen(source.readParcel(Kitchen.KITCHEN_CREATOR));
 			mFood.setAliasId(source.readShort());
+			this.setDiscount(source.readFloat());
 			this.mCurCnt = source.readFloat();
 			this.isHangup = source.readBoolean();
 			this.mOrderDate = source.readLong();

@@ -19,7 +19,7 @@ public class FoodMenu implements Parcelable{
 	public List<Taste> specs;				//规格
 	public List<Kitchen> kitchens;			//厨房
 	public List<Department> depts;			//部门
-	public List<Discount> discounts;		//折扣方案
+	private List<Discount> discounts;		//折扣方案
 	public List<CancelReason> reasons;		//退菜原因
 	
 	private FoodMenu(){}

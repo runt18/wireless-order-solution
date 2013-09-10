@@ -205,7 +205,7 @@ public class Privilege implements Comparable<Privilege>, Parcelable, Jsonable{
 	@Override
 	public void writeToParcel(Parcel dest, int flag) {
 		dest.writeInt(getCode().getVal());
-		dest.writeParcelList(discounts, Discount.DISCOUNT_PARCELABLE_SIMPLE);
+		dest.writeParcelList(discounts, Discount.DISCOUNT_PARCELABLE_COMPLEX);
 	}
 
 	@Override

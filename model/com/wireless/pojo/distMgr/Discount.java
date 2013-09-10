@@ -8,6 +8,8 @@ import com.wireless.parcel.Parcelable;
 
 public class Discount implements Parcelable{
 	
+	public final static List<Discount> EMPTY_LIST = new ArrayList<Discount>(0);
+	
 	public final static byte DISCOUNT_PARCELABLE_COMPLEX = 0;
 	public final static byte DISCOUNT_PARCELABLE_SIMPLE = 1;
 	
