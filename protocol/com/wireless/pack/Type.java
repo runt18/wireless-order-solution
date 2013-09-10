@@ -27,6 +27,7 @@ public final class Type{
 	public final static byte MAKE_FOOD_SELL_OUT = 19;
 	public final static byte MAKE_FOOD_ON_SALE = 20;
 	public final static byte MATCH_PIN = 21;
+	public final static byte PAY_TEMP_ORDER = 22;
 	
 	/* belong to OTA */
 	public final static byte CHECK_VER = 1;
