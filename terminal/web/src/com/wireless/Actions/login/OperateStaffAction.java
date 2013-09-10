@@ -31,7 +31,6 @@ public class OperateStaffAction extends Action{
 				session.setAttribute("pin", pin);
 				
 				Cookie cPin = new Cookie("pin", pin);
-				cPin.setMaxAge(24*60*60);
 				response.addCookie(cPin);
 			}else{
 				throw new BusinessException("密码输入错误!");
