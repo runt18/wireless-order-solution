@@ -1029,51 +1029,49 @@ Ext.onReady(function() {
 			text : '保存',
 			iconCls : 'btn_save',
 			handler : function(){
-				if(!roleGrid.getSelectionModel().getSelected()){
+				if(roleGrid.getSelectionModel().getSelected()){
+					var checkedNodes = privilegeTree.getChecked();
+					var discount = '', privilege = '';
+					for(var i=0;i<checkedNodes.length;i++){
+						if(checkedNodes[i].attributes.isDiscount){
+							if(discount != ''){
+								discount += ',';
+							}
+							discount += checkedNodes[i].attributes.discountId;
+						}else{
+							if(privilege != ''){
+								privilege += ',';
+							}
+							privilege += checkedNodes[i].attributes.pId;
+						}
+						
+					}
+					Ext.Ajax.request({
+						url : '../../OperateRole.do',
+						params : {
+							dataSource : 'updatePrivilege',
+							discounts : discount,
+							privileges : privilege,
+							roleId : roleGrid.getSelectionModel().getSelected().data.id
+						},
+						success : function(res, opt){
+							var jr = Ext.decode(res.responseText);
+							if(jr.success){
+								Ext.example.msg(jr.title, jr.msg);
+							}else{
+								Ext.example.msg(jr.title, jr.msg);
+							}
+							
+						},
+						failure : function(res, opt){
+							var jr = Ext.decode(res.responseText);
+							
+							Ext.ux.showMsg(jr);
+						}
+					});
+				}else{
 					Ext.example.msg('提示', '还未选择角色');
 				}
-				var checkedNodes = privilegeTree.getChecked();
-				var discount = '', privilege = '';
-				for(var i=0;i<checkedNodes.length;i++){
-					if(checkedNodes[i].attributes.isDiscount){
-						if(discount != ''){
-							discount += ',';
-						}
-						discount += checkedNodes[i].attributes.discountId;
-					}else{
-						if(privilege != ''){
-							privilege += ',';
-						}
-						privilege += checkedNodes[i].attributes.pId;
-					}
-					
-				}
-				Ext.Ajax.request({
-					url : '../../OperateRole.do',
-					params : {
-						dataSource : 'updatePrivilege',
-						discounts : discount,
-						privileges : privilege,
-						roleId : roleGrid.getSelectionModel().getSelected().data.id
-					},
-					success : function(res, opt){
-						var jr = Ext.decode(res.responseText);
-						if(jr.success){
-							Ext.example.msg(jr.title, jr.msg);
-						}else{
-							Ext.example.msg(jr.title, jr.msg);
-						}
-						
-					},
-					failure : function(res, opt){
-						var jr = Ext.decode(res.responseText);
-						
-						Ext.ux.showMsg(jr);
-					}
-				});
-				
-				
-				
 			}
 		}
 		 ]
