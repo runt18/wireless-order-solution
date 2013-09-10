@@ -91,12 +91,11 @@ public class TestStaffDao {
 			compare(expected, actual);
 			
 			//修改信息
-			StaffUpdateBuilder updateBuilder = new StaffUpdateBuilder();
+			StaffUpdateBuilder updateBuilder = new StaffUpdateBuilder(staffId);
 			
-			updateBuilder.setStaffpwd("321");
+			updateBuilder.setStaffPwd("321");
 			updateBuilder.setStaffName("佐助");
 			updateBuilder.setMobile("13433464033");
-			updateBuilder.setStaffId(staffId);
 			updateBuilder.setRoleId(staffRole.getId());
 			
 			StaffDao.updateStaff(updateBuilder);
