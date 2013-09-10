@@ -33,8 +33,7 @@ import com.wireless.exception.ProtocolError;
 import com.wireless.pack.Mode;
 import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
-import com.wireless.pack.req.ReqInsertOrder;
-import com.wireless.pack.req.ReqPayOrder;
+import com.wireless.pack.req.PrintOption;
 import com.wireless.pack.resp.RespACK;
 import com.wireless.pack.resp.RespNAK;
 import com.wireless.pack.resp.RespOTAUpdate;
@@ -196,7 +195,7 @@ class OrderHandler implements Runnable{
 					
 					insertedOrder = InsertOrder.exec(staff, insertedOrder);
 					
-					if(request.header.reserved == ReqInsertOrder.DO_PRINT){
+					if(request.header.reserved == PrintOption.DO_PRINT.getVal()){
 						new PrintHandler(staff)
 							.addContent(JobContentFactory.instance().createSummaryContent(PType.PRINT_ORDER, 
 							 																  staff, 
@@ -217,7 +216,7 @@ class OrderHandler implements Runnable{
 					DiffResult diffResult = UpdateOrder.execByID(staff, orderToUpdate);
 					List<Printer> printers = PrinterDao.getPrinters(staff);
 					
-					if(request.header.reserved == ReqInsertOrder.DO_PRINT){
+					if(request.header.reserved == PrintOption.DO_PRINT.getVal()){
 						
 						PrintHandler printHandler = new PrintHandler(staff);
 						
@@ -301,7 +300,7 @@ class OrderHandler implements Runnable{
 					CancelOrder.exec(staff, tblToCancel.getAliasId());
 					response = new RespACK(request.header);
 
-				}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.PAY_ORDER){
+				}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.PAY_ORDER || request.header.type == Type.PAY_TEMP_ORDER){
 					//handle the pay order request
 					Order orderToPay = new Parcel(request.body).readParcel(Order.CREATOR);
 					
@@ -311,14 +310,17 @@ class OrderHandler implements Runnable{
 					 * If pay order temporary, just only print the temporary receipt.
 					 * Otherwise perform the pay action and print receipt 
 					 */
-					if(request.header.reserved == ReqPayOrder.PAY_CATE_TEMP){
-						
-						new PrintHandler(staff)
-							.addContent(JobContentFactory.instance().createReceiptContent(PType.PRINT_TEMP_RECEIPT, 
+					if(request.header.type == Type.PAY_TEMP_ORDER){
+						if(request.header.reserved == PrintOption.DO_PRINT.getVal()){
+							new PrintHandler(staff)
+								.addContent(JobContentFactory.instance().createReceiptContent(PType.PRINT_TEMP_RECEIPT, 
 																							  staff,
 																							  printers,
-																							  PayOrder.calcByID(staff, orderToPay)))
-							.fireAsync();
+																							  PayOrder.execTmpById(staff, orderToPay)))
+								.fireAsync();
+						}else{
+							PayOrder.execTmpById(staff, orderToPay);
+						}
 						
 					}else{
 						
@@ -331,9 +333,9 @@ class OrderHandler implements Runnable{
 						//Perform to print the member receipt if settled by member.
 						if(order.isSettledByMember()){
 							printHandler.addContent(JobContentFactory.instance().createMemberReceiptContent(PType.PRINT_MEMBER_RECEIPT, 
-																												staff, 
-																												printers,
-																												order.getMemberOperationId()));
+																											staff, 
+																											printers,
+																											order.getMemberOperationId()));
 						}
 						
 						printHandler.fireAsync();
