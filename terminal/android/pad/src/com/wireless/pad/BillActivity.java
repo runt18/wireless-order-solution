@@ -20,7 +20,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.wireless.common.WirelessOrder;
-import com.wireless.pack.req.ReqPayOrder;
+import com.wireless.pack.Type;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.distMgr.Discount;
@@ -69,7 +69,7 @@ public class BillActivity extends Activity {
 		((ImageView)findViewById(R.id.normal)).setOnClickListener(new View.OnClickListener() {			
 			@Override
 			public void onClick(View arg0) {
-				showBillDialog(ReqPayOrder.PAY_CATE_NORMAL);
+				showBillDialog(Type.PAY_ORDER);
 			}
 		});
 		/**
@@ -78,7 +78,7 @@ public class BillActivity extends Activity {
 		((ImageView)findViewById(R.id.allowance)).setOnClickListener(new View.OnClickListener() {			
 			@Override
 			public void onClick(View arg0) {
-				showBillDialog(ReqPayOrder.PAY_CATE_TEMP);
+				showBillDialog(Type.PAY_TEMP_ORDER);
 			}
 		});
 
@@ -132,15 +132,7 @@ public class BillActivity extends Activity {
 				mOrderToPay = order;
 				
 				 //Apply discount in case of default
-				for(Discount discount : WirelessOrder.foodMenu.discounts){
-					if(discount.isDefault()){
-						mOrderToPay.setDiscount(discount);
-						break;
-					}else if(discount.isReserved()){
-						mOrderToPay.setDiscount(discount);
-					}
-				}
-				
+				mOrderToPay.setDiscount(WirelessOrder.loginStaff.getRole().getDefaultDiscount());
 				((TextView)findViewById(R.id.valueplatform)).setText(String.valueOf(mOrderToPay.getDestTbl().getAliasId()));
 				((TextView)findViewById(R.id.valuepeople)).setText(String.valueOf(mOrderToPay.getCustomNum()));
 				((BillFoodListView)findViewById(R.id.billListView)).notifyDataChanged(new ArrayList<OrderFood>(mOrderToPay.getOrderFoods()));
@@ -166,7 +158,7 @@ public class BillActivity extends Activity {
 		 */
 		@Override
 		protected void onPreExecute() {
-			mProgDialog = ProgressDialog.show(BillActivity.this, "", "提交" + mOrderToPay.getDestTbl().getAliasId() + "号台" + (mPayCate == ReqPayOrder.PAY_CATE_NORMAL ? "结帐" : "暂结") + "信息...请稍候", true);
+			mProgDialog = ProgressDialog.show(BillActivity.this, "", "提交" + mOrderToPay.getDestTbl().getAliasId() + "号台" + (mPayCate == Type.PAY_ORDER ? "结帐" : "暂结") + "信息...请稍候", true);
 			super.onPreExecute();
 		}
 
@@ -194,12 +186,12 @@ public class BillActivity extends Activity {
 				 * Back to main activity if perform to pay order.
 				 * Refresh the bill list if perform to pay temporary order.
 				 */
-				if(mPayCate == ReqPayOrder.PAY_CATE_NORMAL){
+				if(mPayCate == Type.PAY_ORDER){
 					BillActivity.this.finish();
 				}else{				
 					_handler.sendEmptyMessage(0);
 				}
-				Toast.makeText(BillActivity.this, mOrderToPay.getDestTbl().getAliasId() + "号台" + (mPayCate == ReqPayOrder.PAY_CATE_NORMAL ? "结帐" : "暂结") + "成功", Toast.LENGTH_SHORT).show();
+				Toast.makeText(BillActivity.this, mOrderToPay.getDestTbl().getAliasId() + "号台" + (mPayCate == Type.PAY_ORDER ? "结帐" : "暂结") + "成功", Toast.LENGTH_SHORT).show();
 				
 			}
 		}
@@ -245,7 +237,7 @@ public class BillActivity extends Activity {
 		
 		//根据discount数量添加Radio Button
 		RadioGroup radioGroup = (RadioGroup) view.findViewById(R.id.discountGroup);
-		for(Discount discount : WirelessOrder.foodMenu.discounts){
+		for(Discount discount : WirelessOrder.loginStaff.getRole().getDiscounts()){
 			RadioButton radioBtn = new RadioButton(BillActivity.this);
 			radioBtn.setTag(discount);
 			radioBtn.setTextColor(Color.BLACK);
@@ -268,7 +260,7 @@ public class BillActivity extends Activity {
 		}); 
 		
 		 new AlertDialog.Builder(this)
-		 	.setTitle(payCate == ReqPayOrder.PAY_CATE_NORMAL ? "结帐" : "暂结")
+		 	.setTitle(payCate == Type.PAY_ORDER ? "结帐" : "暂结")
 		 	.setView(view).setPositiveButton("确定", new DialogInterface.OnClickListener() {					
 				@Override
 				public void onClick(DialogInterface dialog, int which) {		
