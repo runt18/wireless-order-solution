@@ -49,39 +49,39 @@ public class SummaryContent extends ConcreteContent {
 		}
 		
 		if(mStyle == PStyle.PRINT_STYLE_58MM){
-			_template = _template.replace(PVar.ORDER_ID, Integer.toString(_order.getId()));
+			_template = _template.replace(PVar.ORDER_ID, Integer.toString(mOrder.getId()));
 			_template = _template.replace(PVar.WAITER_NAME, _waiter);
 			_template = _template.replace(PVar.PRINT_DATE, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
 			
 		}else if(mStyle == PStyle.PRINT_STYLE_80MM){
 			_template = _template.replace(PVar.VAR_3, 
-						new Grid2ItemsContent("账单号：" + _order.getId(), 
+						new Grid2ItemsContent("账单号：" + mOrder.getId(), 
 											  "时间：" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()), 
 											  getStyle()).toString());
 			_template = _template.replace(PVar.WAITER_NAME, _waiter);			
 		}
 		
-		if(_order.hasChildOrder()){
+		if(mOrder.hasChildOrder()){
 			StringBuffer tblInfo = new StringBuffer();
-			for(Order childOrder : _order.getChildOrder()){
-				tblInfo.append(childOrder.getDestTbl().getAliasId() + (childOrder.getDestTbl().getName().trim().length() == 0 ? "" : ("(" + _order.getDestTbl().getName() + ")"))).append(",");
+			for(Order childOrder : mOrder.getChildOrder()){
+				tblInfo.append(childOrder.getDestTbl().getAliasId() + (childOrder.getDestTbl().getName().trim().length() == 0 ? "" : ("(" + mOrder.getDestTbl().getName() + ")"))).append(",");
 			}
 			if(tblInfo.length() > 0){
 				tblInfo.deleteCharAt(tblInfo.length() - 1);
 			}
 			//replace the "$(var_5)"
-			_template = _template.replace(PVar.VAR_2, "餐台：" + tblInfo + "(共" + _order.getCustomNum() + "人)");
+			_template = _template.replace(PVar.VAR_2, "餐台：" + tblInfo + "(共" + mOrder.getCustomNum() + "人)");
 			
 		}else{
 		
 			_template = _template.replace(PVar.VAR_2, 
-							new Grid2ItemsContent("餐台：" + _order.getDestTbl().getAliasId() + (_order.getDestTbl().getName().length() == 0 ? "" : ("(" + _order.getDestTbl().getName() + ")")), 
-												  "人数：" + _order.getCustomNum(), 
+							new Grid2ItemsContent("餐台：" + mOrder.getDestTbl().getAliasId() + (mOrder.getDestTbl().getName().length() == 0 ? "" : ("(" + mOrder.getDestTbl().getName() + ")")), 
+												  "人数：" + mOrder.getCustomNum(), 
 												  getStyle()).toString());
 		}		
 		//generate the order food list and replace the $(var_1) with the ordered foods
 		_template = _template.replace(PVar.VAR_1, 
-									  new FoodListWithSepContent(_format, mPrintType, _order.getOrderFoods(), mStyle).toString());
+									  new FoodListWithSepContent(_format, mPrintType, mOrder.getOrderFoods(), mStyle).toString());
 		
 		return _template;
 	}

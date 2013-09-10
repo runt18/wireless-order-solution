@@ -52,4 +52,9 @@ public class ContentCombinator implements Content {
 		
 		return bytesToResult;
 	}
+
+	@Override
+	public int getId() {
+		return 0;
+	}
 }

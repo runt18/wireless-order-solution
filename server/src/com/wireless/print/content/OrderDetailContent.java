@@ -37,10 +37,10 @@ public class OrderDetailContent extends ConcreteContent {
 	public String toString(){
 		
 		String tblName;
-		if(_order.hasChildOrder()){
+		if(mOrder.hasChildOrder()){
 			tblName = "团体";
 		}else{
-			tblName = Integer.toString(_order.getDestTbl().getAliasId()) + ((_order.getDestTbl().getName().trim().length() == 0) ? "" : "(" + _order.getDestTbl().getName() + ")");
+			tblName = Integer.toString(mOrder.getDestTbl().getAliasId()) + ((mOrder.getDestTbl().getName().trim().length() == 0) ? "" : "(" + mOrder.getDestTbl().getName() + ")");
 		}
 		
 		//generate the title and replace the "$(title)" with it
@@ -73,26 +73,26 @@ public class OrderDetailContent extends ConcreteContent {
 
 		if(mStyle == PStyle.PRINT_STYLE_58MM){
 			_printTemplate = _printTemplate.replace(PVar.VAR_3, 
-												    "账单号：" + _order.getId() + "\r\n" + 
+												    "账单号：" + mOrder.getId() + "\r\n" + 
 												    "时间：" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
 			
 		}else if(mStyle == PStyle.PRINT_STYLE_80MM){
 			_printTemplate = _printTemplate.replace(PVar.VAR_3, 
-								new Grid2ItemsContent("账单号：" + _order.getId(), 
+								new Grid2ItemsContent("账单号：" + mOrder.getId(), 
 													  "时间：" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()), 
 													  getStyle()).toString());
 		}
 		
-		if(_order.hasChildOrder()){
+		if(mOrder.hasChildOrder()){
 			StringBuffer tblInfo = new StringBuffer();
-			for(Order childOrder : _order.getChildOrder()){
-				tblInfo.append(childOrder.getDestTbl().getAliasId() + (childOrder.getDestTbl().getName().trim().length() == 0 ? "" : ("(" + _order.getDestTbl().getName() + ")"))).append(",");
+			for(Order childOrder : mOrder.getChildOrder()){
+				tblInfo.append(childOrder.getDestTbl().getAliasId() + (childOrder.getDestTbl().getName().trim().length() == 0 ? "" : ("(" + mOrder.getDestTbl().getName() + ")"))).append(",");
 			}
 			if(tblInfo.length() > 0){
 				tblInfo.deleteCharAt(tblInfo.length() - 1);
 			}
 			//replace the "$(var_5)"
-			_printTemplate = _printTemplate.replace(PVar.VAR_2, "餐台：" + tblInfo + "(共" + _order.getCustomNum() + "人)");
+			_printTemplate = _printTemplate.replace(PVar.VAR_2, "餐台：" + tblInfo + "(共" + mOrder.getCustomNum() + "人)");
 			
 		}else{
 			_printTemplate = _printTemplate.replace(PVar.VAR_2, 

@@ -4,6 +4,7 @@ import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.client.member.MemberDao;
@@ -44,6 +45,8 @@ public class JobContentFactory {
 
 	private static class JobCombinationContent implements Content{
 
+		private static final AtomicInteger mIdGenerator = new AtomicInteger(0);
+		
 		private final ContentCombinator mCombinator = new ContentCombinator();
 		
 		JobCombinationContent(List<JobContent> jobContents){
@@ -60,6 +63,11 @@ public class JobContentFactory {
 					bytesToJobAmount[1] = (byte)((jobAmount & 0x0000FF00) >> 8);
 					return bytesToJobAmount;
 				}
+
+				@Override
+				public int getId() {
+					return 0;
+				}
 				
 			});
 			
@@ -70,6 +78,12 @@ public class JobContentFactory {
 		@Override
 		public byte[] toBytes() {
 			return mCombinator.toBytes();
+		}
+
+		@Override
+		public int getId() {
+			mIdGenerator.compareAndSet(Integer.MAX_VALUE, 0);
+			return mIdGenerator.incrementAndGet();
 		}
 		
 	}
@@ -99,7 +113,7 @@ public class JobContentFactory {
 						if(func.isDeptAll()){
 							//Generate the the summary to all departments.
 							jobContents.add(new JobContent(printer, func.getRepeat(), printType, 
-										   				   new SummaryContent(new Department(null, Department.DEPT_ALL, term.getRestaurantId(), Department.Type.RESERVED), 
+										   				   new SummaryContent(new Department(null, Department.DeptId.DEPT_ALL.getVal(), term.getRestaurantId(), Department.Type.RESERVED), 
 										   						   			  PFormat.RECEIPT_FORMAT_DEF, 
 										   						   			  order,
 										   						   			  term.getName(),
@@ -268,7 +282,7 @@ public class JobContentFactory {
 		
 		List<JobContent> jobContents = new ArrayList<JobContent>();
 		
-		Region regionToCompare = new Region(Region.REGION_1, "", term.getRestaurantId());
+		Region regionToCompare = new Region(Region.RegionId.REGION_1.getId(), "", term.getRestaurantId());
 		
 		for(Printer printer : printers){
 			for(PrintFunc func : printer.getPrintFuncs()){
@@ -303,7 +317,7 @@ public class JobContentFactory {
 		
 		List<JobContent> jobContents = new ArrayList<JobContent>();
 		
-		Region regionToCompare = new Region(Region.REGION_1, "", term.getRestaurantId());
+		Region regionToCompare = new Region(Region.RegionId.REGION_1.getId(), "", term.getRestaurantId());
 		
 		for(Printer printer : printers){
 			for(PrintFunc func : printer.getPrintFuncs()){
@@ -333,7 +347,7 @@ public class JobContentFactory {
 	public Content createTransContent(PType printType, Staff term, List<Printer> printers, int orderId, Table srcTbl, Table destTbl){
 		List<JobContent> jobContents = new ArrayList<JobContent>();
 		
-		Region regionToCompare = new Region(Region.REGION_1, "", term.getRestaurantId());
+		Region regionToCompare = new Region(Region.RegionId.REGION_1.getId(), "", term.getRestaurantId());
 		
 		for(Printer printer : printers){
 			for(PrintFunc func : printer.getPrintFuncs()){

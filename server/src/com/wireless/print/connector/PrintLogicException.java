@@ -1,4 +1,4 @@
-package com.wireless.server;
+package com.wireless.print.connector;
 
 public class PrintLogicException extends Exception {
 

@@ -23,9 +23,9 @@ public abstract class ConcreteContent implements Content {
 	final PStyle mStyle;
 	final PType mPrintType;
 	
-	final Order _order;
+	final Order mOrder;
 	final String _waiter;
-	
+
 	protected ConcreteContent(PStyle style){
 		mStyle = style;
 		if(style == PStyle.PRINT_STYLE_58MM){
@@ -41,7 +41,7 @@ public abstract class ConcreteContent implements Content {
 		
 		mPrintType = PType.PRINT_UNKNOWN;
 		_waiter = null;
-		_order = null;
+		mOrder = null;
 	}
 	
 	protected ConcreteContent(PType printType, PStyle style){
@@ -60,7 +60,7 @@ public abstract class ConcreteContent implements Content {
 		
 		mPrintType = printType;
 		_waiter = null;
-		_order = null;
+		mOrder = null;
 	}
 	
 	protected ConcreteContent(Order order, String waiter, PType printType, PStyle style){
@@ -77,12 +77,20 @@ public abstract class ConcreteContent implements Content {
 			mSeperatorLine = LINE_58MM;
 		}
 		
-		_order = new Order();
-		_order.copyFrom(order);
+		mOrder = new Order();
+		mOrder.copyFrom(order);
 		_waiter = waiter;
 		mPrintType = printType;
 	}
 	
+	
+	@Override
+	public int getId(){
+		//TODO
+		return 0;
+	}
+	
+	@Override
 	public byte[] toBytes(){
 		try{
 			return toString().getBytes("GBK");
