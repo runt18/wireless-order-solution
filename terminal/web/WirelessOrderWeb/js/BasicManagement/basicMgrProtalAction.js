@@ -103,5 +103,13 @@
 			}
 		});
 	});
+	$("#deviceMgr").each(function() {
+		$(this).bind("click", function() {
+			if (!isPrompt) {
+				location.href = "DeviceMgr.html?"+strEncode("restaurantID="
+					+ restaurantID, "mi");
+			}
+		});
+	});
 
 };

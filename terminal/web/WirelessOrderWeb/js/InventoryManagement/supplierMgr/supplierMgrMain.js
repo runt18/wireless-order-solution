@@ -488,7 +488,7 @@ Ext.onReady(function(){
 		title : '供应商管理',
 		region : 'center',//渲染到
 		layout : 'border',//布局
-		frame : true, //透明
+		frame : true, //边框
 		//子集
 		items : [supplierGrid],
 		tbar : new Ext.Toolbar({

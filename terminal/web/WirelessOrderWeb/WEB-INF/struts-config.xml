@@ -352,9 +352,9 @@
 			type="com.wireless.Actions.client.member.QueryMemberOperationSummaryAction"
 			scope="request" parameter="dataSource">
 		</action>
-		<action path="/RestaurantUpdate"
-			type="com.wireless.Actions.restaurantMgr.RestaurantUpdateAction"
-			scope="request">
+		<action path="/OperateRestaurant"
+			type="com.wireless.Actions.restaurantMgr.OperateRestaurantAction"
+			scope="request" parameter = "dataSource">
 		</action>
 		<action path="/RestaurantQueryByID"
 			type="com.wireless.Actions.restaurantMgr.RestaurantQueryByIDAction"
@@ -460,6 +460,14 @@
 		<action path="/OperateRole"
 				type = "com.wireless.Actions.roleMgr.OperateRoleAction"
 				scope="request" parameter="dataSource">
+		</action>
+		<action path="/QueryRestaurants"
+				type = "com.wireless.Actions.restaurantMgr.QueryRestaurantAction"
+				scope="request">
+		</action>
+		<action path="/VerifyLogin"
+				type = "com.wireless.Actions.login.VerifyLoginAction"
+				scope="request">
 		</action>
 	</action-mappings>
 
