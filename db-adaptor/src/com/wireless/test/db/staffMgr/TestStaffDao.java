@@ -110,8 +110,11 @@ public class TestStaffDao {
 			
 			
 		}finally{
-			//StaffDao.deleteStaff(adminId);
-			//StaffDao.deleteStaff(staffId);
+			StaffDao.deleteStaff(adminId);
+			StaffDao.deleteStaff(staffId);
+			
+			StaffDao.getStaffById(adminId);
+			StaffDao.getStaffById(staffId);
 		}
 
 		
