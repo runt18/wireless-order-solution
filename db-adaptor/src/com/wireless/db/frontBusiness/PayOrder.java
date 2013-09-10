@@ -23,9 +23,95 @@ import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.system.Setting;
 import com.wireless.util.DateType;
-//import com.wireless.dbObject.Setting;
 
 public class PayOrder {
+	
+	/**
+	 * Perform to pay a temporary order.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param orderToPay
+	 * 			the order to pay temporary
+	 * @return the order calculated
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException 
+	 * 			throws if the order to this id does NOT exist
+	 */
+	public static Order execTmpById(Staff staff, Order orderToPay) throws SQLException, BusinessException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return execTmpById(dbCon, staff, orderToPay);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Perform to pay a temporary order.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param orderToPay
+	 * 			the order to pay temporary
+	 * @return the order calculated
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException 
+	 * 			throws if the order to this id does NOT exist
+	 */
+	public static Order execTmpById(DBCon dbCon, Staff staff, Order orderToPay) throws SQLException, BusinessException{
+		return doTmpPayment(dbCon, staff, calcByID(dbCon, staff, orderToPay));
+	}
+	
+	private static Order doTmpPayment(DBCon dbCon, Staff staff, Order orderCalculated) throws SQLException{
+		
+		boolean isAutoCommit = dbCon.conn.getAutoCommit();
+		
+		try{
+			dbCon.conn.setAutoCommit(false);
+			
+			String sql;
+			//Update the discount to this order.
+			sql = " UPDATE " + Params.dbName + ".order SET " +
+				  " staff_id = " + staff.getId() + ", " +
+				  " waiter = '" + staff.getName() + "', " +
+				  " discount_id = " + orderCalculated.getDiscount().getId() + ", " +
+				  " status = " + Order.Status.UNPAID.getVal() + ", " + 
+			   	  " order_date = NOW() " + 
+				  " WHERE " +
+				  " id = " + orderCalculated.getId();
+				
+			dbCon.stmt.executeUpdate(sql);			
+
+			//Update each food's discount & unit price to this order.
+			for(OrderFood food : orderCalculated.getOrderFoods()){
+				sql = " UPDATE " + Params.dbName + ".order_food " +
+					  " SET " +
+					  " discount = " + food.getDiscount() + ", " +
+					  " unit_price = " + food.getPrice() +
+					  " WHERE order_id = " + orderCalculated.getId() + 
+					  " AND food_alias = " + food.getAliasId();
+				dbCon.stmt.executeUpdate(sql);				
+			}	
+			
+			dbCon.conn.commit();
+
+			return orderCalculated;
+			
+		}catch(SQLException e){
+			dbCon.conn.rollback();
+			throw e;
+		}finally{
+			dbCon.conn.setAutoCommit(isAutoCommit);
+		}
+
+	}
+	
 	
 	/**
 	 * Perform to pay an order along with the id and other pay condition.
@@ -454,22 +540,22 @@ public class PayOrder {
 	 * other condition.
 	 * @param dbCon
 	 * 			the database connection
-	 * @param term
-	 * 			the terminal
+	 * @param staff
+	 * 			the staff to perform this action
 	 * @param orderToPay
 	 * 			the order along with id and other condition
 	 * @return the order result after calculated
 	 * @throws BusinessException
-	 * 			Throws if the order to this id does NOT exist.
+	 * 			throws if the order to this id does NOT exist
 	 * @throws SQLException
-	 * 			Throws if failed to execute any SQL statement.
+	 * 			throws if failed to execute any SQL statement
 	 */
-	public static Order calcByID(DBCon dbCon, Staff term, Order orderToPay) throws BusinessException, SQLException{
+	public static Order calcByID(DBCon dbCon, Staff staff, Order orderToPay) throws BusinessException, SQLException{
 		
 		String sql;
 		
 		//Get the setting.
-		Setting setting = SystemDao.getSetting(dbCon, term.getRestaurantId());
+		Setting setting = SystemDao.getSetting(dbCon, staff.getRestaurantId());
 		
 		//Check to see whether has erase quota and the order exceed the erase quota.
 		if(setting.hasEraseQuota() && orderToPay.getErasePrice() > setting.getEraseQuota()){
@@ -477,7 +563,7 @@ public class PayOrder {
 		}
 		
 		//Get all the details of order to be calculated.
-		Order orderToCalc = OrderDao.getById(term, orderToPay.getId(), DateType.TODAY);
+		Order orderToCalc = OrderDao.getById(staff, orderToPay.getId(), DateType.TODAY);
 		
 		PricePlan oriPricePlan = orderToCalc.getPricePlan();
 		
@@ -485,15 +571,14 @@ public class PayOrder {
 		setOrderCalcParams(orderToCalc, orderToPay);
 		
 		//Get the discount to this order.
-		List<Discount> discount = DiscountDao.getDiscount(dbCon, 
-															term, 
-															" AND DIST.discount_id = " + orderToCalc.getDiscount().getId(),
-															null);
+		List<Discount> discount = DiscountDao.getDiscount(dbCon, staff, 
+														  " AND DIST.discount_id = " + orderToCalc.getDiscount().getId(),
+														  null);
 		if(!discount.isEmpty()){
 			orderToCalc.setDiscount(discount.get(0));
 		}else{
 			//Make use the default discount if the discount does NOT exist.
-			discount = DiscountDao.getDiscount(dbCon, term,
+			discount = DiscountDao.getDiscount(dbCon, staff,
 					   								" AND (DIST.status = " + Discount.Status.DEFAULT.getVal() + 
 					   								" OR " + " DIST.status = " + Discount.Status.DEFAULT_RESERVED.getVal() + ")",
 					   								null);
@@ -505,9 +590,9 @@ public class PayOrder {
 		//Get the details if the requested plan is set.
 		//Otherwise use the price plan which is active instead.
 		if(orderToCalc.hasPricePlan()){
-			orderToCalc.setPricePlan(PricePlanDao.getPricePlanById(dbCon, term,  orderToCalc.getPricePlan().getId()));
+			orderToCalc.setPricePlan(PricePlanDao.getPricePlanById(dbCon, staff,  orderToCalc.getPricePlan().getId()));
 		}else{
-			orderToCalc.setPricePlan(PricePlanDao.getActivePricePlan(dbCon, term));
+			orderToCalc.setPricePlan(PricePlanDao.getActivePricePlan(dbCon, staff));
 		}
 		
 		//Check to see whether the requested price plan is same as before.
@@ -540,7 +625,7 @@ public class PayOrder {
 				//Set the calculate parameters to each child order.
 				setOrderCalcParams(childOrder, orderToPay);
 				//Calculate each child order.
-				childOrder.copyFrom(calcByID(dbCon, term, childOrder));
+				childOrder.copyFrom(calcByID(dbCon, staff, childOrder));
 				//Accumulate the custom number.
 				orderToCalc.setCustomNum(orderToCalc.getCustomNum() + childOrder.getCustomNum());
 				//Accumulate the discount price.

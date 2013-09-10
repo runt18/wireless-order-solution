@@ -8,6 +8,7 @@ import java.util.List;
 import com.mysql.jdbc.Statement;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
+import com.wireless.db.distMgr.DiscountDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.StaffError;
 import com.wireless.pojo.distMgr.Discount;
@@ -107,20 +108,9 @@ public class RoleDao {
 			//Get the allowed discounts in case of the discount privilege
 			for(Privilege privilege : role.getPrivileges()){
 				if(privilege.getCode() == Code.DISCOUNT){
-					sql = " SELECT D.discount_id, D.restaurant_id, D.name, D.level, D.status "	+
-						  " FROM " + Params.dbName + ".role_discount RD " +
-						  " JOIN " + Params.dbName + ".discount D ON RD.discount_id = D.discount_id " +
-						  " WHERE RD.role_id = " + role.getId();
-					dbCon.rs = dbCon.stmt.executeQuery(sql);
-					while(dbCon.rs.next()){
-						Discount discount = new Discount(dbCon.rs.getInt("discount_id"));
-						discount.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
-						discount.setName(dbCon.rs.getString("name"));
-						discount.setLevel(dbCon.rs.getShort("level"));
-						discount.setStatus(dbCon.rs.getInt("status"));
+					for(Discount discount : DiscountDao.getDiscountByRole(dbCon, staff, role)){
 						privilege.addDiscount(discount);
 					}
-					dbCon.rs.close();
 				}
 			}
 		}

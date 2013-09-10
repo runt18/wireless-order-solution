@@ -1,10 +1,9 @@
 package com.wireless.test.db.staffMgr;
 
+import static org.junit.Assert.assertEquals;
 import java.beans.PropertyVetoException;
 import java.sql.SQLException;
 import java.util.List;
-
-import junit.framework.Assert;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -33,13 +32,13 @@ public class TestStaffDao {
 	}
 	
 	public void compare(Staff expected, Staff actual){
-		Assert.assertEquals("id", expected.getId(), actual.getId());
-		Assert.assertEquals("restaurantId", expected.getRestaurantId(), actual.getRestaurantId());
-		Assert.assertEquals("roleId", expected.getRole(), actual.getRole());
-		Assert.assertEquals("name", expected.getName(), actual.getName());
+		assertEquals("id", expected.getId(), actual.getId());
+		assertEquals("restaurantId", expected.getRestaurantId(), actual.getRestaurantId());
+		assertEquals("roleId", expected.getRole(), actual.getRole());
+		assertEquals("name", expected.getName(), actual.getName());
 		//Assert.assertEquals("tele", expected.getMobile(), actual.getMobile());
-		Assert.assertEquals("pwd", expected.getPwd(), actual.getPwd());
-		Assert.assertEquals("type", expected.getType(), actual.getType());
+		assertEquals("pwd", expected.getPwd(), actual.getPwd());
+		assertEquals("type", expected.getType(), actual.getType());
 	}
 	
 	@Test

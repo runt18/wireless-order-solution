@@ -517,6 +517,9 @@ public class RestaurantDao {
 			dbCon.conn.setAutoCommit(false);
 			deleteById(dbCon, restaurantId);
 			dbCon.conn.commit();
+		}catch(SQLException e){
+			dbCon.conn.rollback();
+			throw e;
 		}finally{
 			dbCon.disconnect();
 		}

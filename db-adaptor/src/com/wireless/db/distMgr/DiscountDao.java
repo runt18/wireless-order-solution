@@ -16,9 +16,55 @@ import com.wireless.pojo.distMgr.Discount;
 import com.wireless.pojo.distMgr.Discount.Status;
 import com.wireless.pojo.distMgr.DiscountPlan;
 import com.wireless.pojo.menuMgr.Kitchen;
+import com.wireless.pojo.staffMgr.Role;
 import com.wireless.pojo.staffMgr.Staff;
 
 public class DiscountDao {
+	
+	/**
+	 * Get the discounts to specific role.
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param role
+	 * 			the role to discounts
+	 * @return the discounts to a role staff
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static List<Discount> getDiscountByRole(Staff staff, Role role) throws SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return getDiscountByRole(dbCon, staff, role);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Get the discounts to specific role.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param role
+	 * 			the role to discounts
+	 * @return the discounts to a role staff
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static List<Discount> getDiscountByRole(DBCon dbCon, Staff staff, Role role) throws SQLException{
+		String sql;
+		sql = " SELECT discount_id FROM " + Params.dbName + ".role_discount WHERE role_id = " + role.getId();
+		dbCon.rs = dbCon.stmt.executeQuery(sql);
+		if(dbCon.rs.next()){
+			dbCon.rs.close();
+			return getDiscount(dbCon, staff, " AND DIST.discount_id IN (" + sql + ")", null);
+		}else{
+			dbCon.rs.close();
+			return getDiscount(dbCon, staff, null, null);
+		}
+	}
 	
 	/**
 	 * Get the discount along with its discount plan to a specified restaurant defined in {@link Staff}
