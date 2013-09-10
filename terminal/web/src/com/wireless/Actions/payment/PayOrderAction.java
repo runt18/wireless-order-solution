@@ -153,13 +153,13 @@ public class PayOrderAction extends Action{
 			 * If pay order temporary, just print the receipt.
 			 * Otherwise perform to pay order and print the receipt.
 			 */
-			byte payCate = ReqPayOrder.PAY_CATE_NORMAL;;
+			byte payCate = Type.PAY_ORDER;
 			tempPay = request.getParameter("tempPay");
 			if(tempPay != null){
 				if(Boolean.parseBoolean(tempPay)){
-					payCate = ReqPayOrder.PAY_CATE_TEMP;
+					payCate = Type.PAY_TEMP_ORDER;
 				}else{
-					payCate = ReqPayOrder.PAY_CATE_NORMAL;
+					payCate = Type.PAY_ORDER;
 				}				
 			}
 			
