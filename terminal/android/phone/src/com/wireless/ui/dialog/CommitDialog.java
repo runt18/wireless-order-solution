@@ -28,7 +28,6 @@ import com.wireless.common.WirelessOrder;
 import com.wireless.exception.ProtocolError;
 import com.wireless.pack.Type;
 import com.wireless.pack.req.PrintOption;
-import com.wireless.pack.req.ReqInsertOrder;
 import com.wireless.parcel.OrderParcel;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.OrderFood;
@@ -101,7 +100,7 @@ public class CommitDialog extends DialogFragment{
 				mIsPayOrder = false;
 				try{
 					short tableAlias = Short.parseShort(tableText.getText().toString());
-					new QueryAndCommitOrderTask(tableAlias, ReqInsertOrder.DO_NOT_PRINT).execute();
+					new QueryAndCommitOrderTask(tableAlias, PrintOption.DO_NOT_PRINT).execute();
 				}catch(NumberFormatException e){
 					Toast.makeText(getActivity(), "你输入的台号不正确，请重新输入", Toast.LENGTH_SHORT).show();
 				}
@@ -223,16 +222,16 @@ public class CommitDialog extends DialogFragment{
 
 		private ProgressDialog mProgDialog;
 	
-		private final byte mReserved;
+		private final PrintOption mPrintOption;
 		
 		QueryAndCommitOrderTask(int tableAlias){
 			super(WirelessOrder.loginStaff, tableAlias, WirelessOrder.foodMenu);
-			this.mReserved = ReqInsertOrder.DO_PRINT;
+			this.mPrintOption = PrintOption.DO_PRINT;
 		}
 		
-		QueryAndCommitOrderTask(int tableAlias, byte reserved){
+		QueryAndCommitOrderTask(int tableAlias, PrintOption printOption){
 			super(WirelessOrder.loginStaff, tableAlias, WirelessOrder.foodMenu);
-			this.mReserved = ReqInsertOrder.DO_NOT_PRINT;
+			this.mPrintOption = printOption;
 		}
 		
 		/**
@@ -258,7 +257,7 @@ public class CommitDialog extends DialogFragment{
 					//Perform to insert a new order in case of the activity_table is IDLE.
 					mOrderToCommit = mReqOrder;
 					mOrderToCommit.setDestTbl(new Table(mTblAlias));
-					new InsertOrderTask(mOrderToCommit, Type.INSERT_ORDER, mReserved).execute();						
+					new InsertOrderTask(mOrderToCommit, Type.INSERT_ORDER, mPrintOption).execute();						
 					
 				}else{
 					new AlertDialog.Builder(getActivity())
@@ -275,7 +274,7 @@ public class CommitDialog extends DialogFragment{
 				//Merge the original order and update if the activity_table is BUSY.
 				order.addFoods(mReqOrder.getOrderFoods());
 				mOrderToCommit = order;
-				new InsertOrderTask(mOrderToCommit, Type.UPDATE_ORDER, mReserved).execute();
+				new InsertOrderTask(mOrderToCommit, Type.UPDATE_ORDER, mPrintOption).execute();
 			}
 		}
 	}
@@ -287,8 +286,8 @@ public class CommitDialog extends DialogFragment{
 
 		private ProgressDialog mProgDialog;
 		
-		public InsertOrderTask(Order reqOrder, byte type, byte reserved) {
-			super(WirelessOrder.loginStaff, reqOrder, type, reserved);
+		public InsertOrderTask(Order reqOrder, byte type, PrintOption printOption) {
+			super(WirelessOrder.loginStaff, reqOrder, type, printOption);
 		}
 		
 		/**
