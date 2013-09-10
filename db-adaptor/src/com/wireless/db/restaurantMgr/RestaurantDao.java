@@ -155,6 +155,7 @@ public class RestaurantDao {
 			restaurant.setTele1(dbCon.rs.getString("tele1"));
 			restaurant.setTele2(dbCon.rs.getString("tele2"));
 			restaurant.setAddress(dbCon.rs.getString("address"));
+			restaurant.setLiveness(dbCon.rs.getFloat("liveness"));
 			if(dbCon.rs.getTimestamp("expire_date") != null){
 				restaurant.setExpireDate(dbCon.rs.getTimestamp("expire_date").getTime());
 			}
