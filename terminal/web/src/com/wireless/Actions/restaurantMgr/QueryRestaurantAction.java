@@ -36,9 +36,9 @@ public class QueryRestaurantAction extends Action{
 				if(expireDate != null && alive == null){
 					orderClause += (" ORDER BY expire_date" );
 				}else if(expireDate == null && alive != null){
-					orderClause += (" ORDER BY record_alive" );
+					orderClause += (" ORDER BY liveness" );
 				}else if(expireDate != null && alive != null){
-					orderClause += (" ORDER BY expire_date, record_alive" );
+					orderClause += (" ORDER BY expire_date, liveness" );
 				}
 				
 				
