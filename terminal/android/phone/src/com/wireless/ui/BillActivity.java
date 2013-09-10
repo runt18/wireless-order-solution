@@ -21,7 +21,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.wireless.common.WirelessOrder;
-import com.wireless.pack.req.ReqPayOrder;
+import com.wireless.pack.Type;
+import com.wireless.pack.req.PrintOption;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.distMgr.Discount;
@@ -96,19 +97,30 @@ public class BillActivity extends Activity {
 		/**
 		 * "结帐"Button
 		 */
-		((ImageView) findViewById(R.id.normal)).setOnClickListener(new View.OnClickListener() {
+		((ImageView) findViewById(R.id.btn_payOrder_Bill)).setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View arg0) {
-				showBillDialog(ReqPayOrder.PAY_CATE_NORMAL);
+				showBillDialog(Type.PAY_ORDER);
 			}
 		});
+		
 		/**
 		 * "暂结"Button
 		 */
-		((ImageView) findViewById(R.id.allowance)).setOnClickListener(new View.OnClickListener() {
+		((ImageView) findViewById(R.id.btn_payTmpOrder_Bill)).setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View arg0) {
-				showBillDialog(ReqPayOrder.PAY_CATE_TEMP);
+				showBillDialog(Type.PAY_TEMP_ORDER);
+			}
+		});
+		
+		/**
+		 * "折扣"Button
+		 */
+		((ImageView) findViewById(R.id.btn_discount_Bill)).setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View arg0) {
+				showDiscountDialog();
 			}
 		});
 
@@ -121,19 +133,33 @@ public class BillActivity extends Activity {
 
 		private ProgressDialog mProgDialog;
 
+		PayOrderTask(Order order, byte payCate, PrintOption printOption){
+			super(WirelessOrder.loginStaff, order, payCate, printOption);
+		}
+		
 		PayOrderTask(Order order, byte payCate) {
-			super(WirelessOrder.loginStaff, order, payCate);
+			super(WirelessOrder.loginStaff, order, payCate, PrintOption.DO_PRINT);
 		}
 
+		private String getPromptInfo(){
+			if(mPayCate == Type.PAY_ORDER){
+				return "结帐";
+			}else if(mPayCate == Type.PAY_TEMP_ORDER && mPrintOption == PrintOption.DO_PRINT){
+				return "暂结";
+			}else if(mPayCate == Type.PAY_TEMP_ORDER && mPrintOption == PrintOption.DO_NOT_PRINT){
+				return "打折";
+			}else{
+				return "";
+			}
+		}
+		
 		/**
 		 * 在执行请求结帐操作前显示提示信息
 		 */
 		@Override
 		protected void onPreExecute() {
-			mProgDialog = ProgressDialog.show(BillActivity.this, 
-											  "", 
-											  "提交"	+ mOrderToPay.getDestTbl().getAliasId() + "号台" + 
-											 (mPayCate == ReqPayOrder.PAY_CATE_NORMAL ? "结帐"	: "暂结") + "信息...请稍候",
+			mProgDialog = ProgressDialog.show(BillActivity.this, "", 
+											  "提交"	+ mOrderToPay.getDestTbl().getAliasId() + "号台" + getPromptInfo() + "信息...请稍候",
 											 true);
 		}
 
@@ -157,26 +183,65 @@ public class BillActivity extends Activity {
 				 * Back to main activity if perform to pay order. Refresh the
 				 * bill list if perform to pay temporary order.
 				 */
-				if (mPayCate == ReqPayOrder.PAY_CATE_NORMAL) {
+				if (mPayCate == Type.PAY_ORDER) {
 					BillActivity.this.finish();
 				} else {
 					mHandler.sendEmptyMessage(0);
 				}
 
 				Toast.makeText(BillActivity.this, 
-							  mOrderToPay.getDestTbl().getAliasId()	+ "号台" + (mPayCate == ReqPayOrder.PAY_CATE_NORMAL ? "结帐" : "暂结") + "成功", 
+							  mOrderToPay.getDestTbl().getAliasId()	+ "号台" + getPromptInfo() + "成功", 
 							  Toast.LENGTH_SHORT).show();
 
 			}
 		}
 	}
 
+	private void showDiscountDialog(){
+		// 取得自定义的view
+		View view = LayoutInflater.from(this).inflate(R.layout.billextand, null);
+		
+		((RadioGroup)view.findViewById(R.id.paymentGroup)).setVisibility(View.GONE);
+		
+		//根据discount数量添加Radio Button
+		RadioGroup discountsGroup = (RadioGroup) view.findViewById(R.id.discountGroup);
+		
+		// 折扣方式方式添加事件监听器
+		discountsGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+			@Override
+			public void onCheckedChanged(RadioGroup group, int checkedId) {
+				Discount distToUse = (Discount)group.findViewById(checkedId).getTag();
+				mOrderToPay.setDiscount(distToUse);
+			}
+		});
+		
+		for(Discount discount : WirelessOrder.loginStaff.getRole().getDiscounts()){
+			RadioButton radioBtn = new RadioButton(BillActivity.this);
+			radioBtn.setTag(discount);
+			radioBtn.setText(discount.getName());
+			discountsGroup.addView(radioBtn, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+			if(discount.equals(WirelessOrder.loginStaff.getRole().getDefaultDiscount())){
+				radioBtn.setChecked(true);
+			}
+		}
+		
+		new AlertDialog.Builder(this).setTitle("折扣")
+				.setView(view)
+				.setPositiveButton("打折", new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog,	int which) {
+						new PayOrderTask(mOrderToPay, Type.PAY_TEMP_ORDER, PrintOption.DO_NOT_PRINT).execute();
+					}
+				})
+				.setNegativeButton("取消", null)
+				.show();
+	}
+	
 	/**
 	 * 付款弹出框
-	 * 
 	 * @param payCate
 	 */
-	public void showBillDialog(final byte payCate) {
+	private void showBillDialog(final byte payCate) {
 
 		// 取得自定义的view
 		View view = LayoutInflater.from(this).inflate(R.layout.billextand, null);
@@ -190,11 +255,10 @@ public class BillActivity extends Activity {
 
 		} else if (mOrderToPay.isPayByCreditCard()) {
 			((RadioButton) view.findViewById(R.id.card)).setChecked(true);
-
 		}
 
 		// 付款方式添加事件监听器
-		((RadioGroup) view.findViewById(R.id.radioGroup1)).setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+		((RadioGroup) view.findViewById(R.id.paymentGroup)).setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
 
 			@Override
 			public void onCheckedChanged(RadioGroup group, int checkedId) {
@@ -210,29 +274,28 @@ public class BillActivity extends Activity {
 
 		//根据discount数量添加Radio Button
 		RadioGroup discountsGroup = (RadioGroup) view.findViewById(R.id.discountGroup);
-
-		for(Discount discount : WirelessOrder.foodMenu.discounts){
-			RadioButton radioBtn = new RadioButton(BillActivity.this);
-			radioBtn.setTag(discount);
-			radioBtn.setText(discount.getName());
-			discountsGroup.addView(radioBtn, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-			if(discount.equals(mOrderToPay.getDiscount())){
-				radioBtn.setChecked(true);
-			}
-		}
-
+		
 		// 折扣方式方式添加事件监听器
 		discountsGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
 			@Override
 			public void onCheckedChanged(RadioGroup group, int checkedId) {
-				Object obj = group.findViewById(checkedId).getTag();
-				if(obj != null){
-					mOrderToPay.setDiscount((Discount)obj);
-				}
+				Discount distToUse = (Discount)group.findViewById(checkedId).getTag();
+				mOrderToPay.setDiscount(distToUse);
 			}
 		});
+		
+		for(Discount discount : WirelessOrder.loginStaff.getRole().getDiscounts()){
+			RadioButton radioBtn = new RadioButton(BillActivity.this);
+			radioBtn.setTag(discount);
+			radioBtn.setText(discount.getName());
+			discountsGroup.addView(radioBtn, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+			if(discount.equals(WirelessOrder.loginStaff.getRole().getDefaultDiscount())){
+				radioBtn.setChecked(true);
+			}
+		}
 
-		new AlertDialog.Builder(this).setTitle(payCate == ReqPayOrder.PAY_CATE_NORMAL ? "结帐" : "暂结")
+
+		new AlertDialog.Builder(this).setTitle(payCate == Type.PAY_ORDER ? "结帐" : "暂结")
 			.setView(view)
 			.setPositiveButton("确定", new DialogInterface.OnClickListener() {
 				@Override
@@ -241,10 +304,10 @@ public class BillActivity extends Activity {
 					new PayOrderTask(mOrderToPay, payCate).execute();
 				}
 			})
-			.setNegativeButton("计算", new DialogInterface.OnClickListener() {
+			.setNegativeButton("打折", new DialogInterface.OnClickListener() {
 				@Override
 				public void onClick(DialogInterface dialog,	int which) {
-					mHandler.sendEmptyMessage(0);
+					new PayOrderTask(mOrderToPay, Type.PAY_TEMP_ORDER, PrintOption.DO_NOT_PRINT).execute();
 				}
 			})
 			.show();
@@ -298,16 +361,8 @@ public class BillActivity extends Activity {
 				
 				mOrderToPay = order;
 				
-				 //Apply discount in case of default
-				for(Discount discount : WirelessOrder.foodMenu.discounts){
-					if(discount.isDefault()){
-						mOrderToPay.setDiscount(discount);
-						break;
-					}else if(discount.isReserved()){
-						mOrderToPay.setDiscount(discount);
-					}
-				}
-				
+				//Apply discount in case of default
+				//mOrderToPay.setDiscount(WirelessOrder.loginStaff.getRole().getDefaultDiscount());
 				/**
 				 * 请求账单成功则更新相关的控件
 				 */

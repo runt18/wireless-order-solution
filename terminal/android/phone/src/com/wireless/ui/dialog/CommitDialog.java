@@ -27,12 +27,11 @@ import android.widget.Toast;
 import com.wireless.common.WirelessOrder;
 import com.wireless.exception.ProtocolError;
 import com.wireless.pack.Type;
+import com.wireless.pack.req.PrintOption;
 import com.wireless.pack.req.ReqInsertOrder;
-import com.wireless.pack.req.ReqPayOrder;
 import com.wireless.parcel.OrderParcel;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.OrderFood;
-import com.wireless.pojo.distMgr.Discount;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.util.NumericUtil;
 import com.wireless.ui.R;
@@ -325,12 +324,7 @@ public class CommitDialog extends DialogFragment{
 				//otherwise back to the main activity and show the message
 				if(mIsPayOrder){
 					//Set the default discount to committed order.
-					for(Discount discount : WirelessOrder.foodMenu.discounts){
-						if(discount.isDefault()){
-							mOrderToCommit.setDiscount(discount);
-							break;
-						}
-					}
+					mOrderToCommit.setDiscount(WirelessOrder.loginStaff.getRole().getDefaultDiscount());
 					new QueryOrderTask2(mOrderToCommit.getDestTbl().getAliasId()).execute();
 					
 				}else{
@@ -377,7 +371,7 @@ public class CommitDialog extends DialogFragment{
 				}).show();
 			}
 			else {
-				new PayOrderTask(result, ReqPayOrder.PAY_CATE_NORMAL).execute();
+				new PayOrderTask(result, Type.PAY_ORDER).execute();
 			}
 		}
 	}
@@ -389,7 +383,7 @@ public class CommitDialog extends DialogFragment{
 		private ProgressDialog mProgDialog;
 
 		PayOrderTask(Order order, byte payCate) {
-			super(WirelessOrder.loginStaff, order, payCate);
+			super(WirelessOrder.loginStaff, order, payCate, PrintOption.DO_PRINT);
 		}
 
 		/**
@@ -400,7 +394,7 @@ public class CommitDialog extends DialogFragment{
 			mProgDialog = ProgressDialog.show(getActivity(), 
 											  "", 
 											  "提交"	+ mOrderToPay.getDestTbl().getAliasId() + "号台" + 
-											 (mPayCate == ReqPayOrder.PAY_CATE_NORMAL ? "结帐"	: "暂结") + "信息...请稍候",
+											 (mPayCate == Type.PAY_ORDER ? "结帐"	: "暂结") + "信息...请稍候",
 											 true);
 		}
 
@@ -432,7 +426,7 @@ public class CommitDialog extends DialogFragment{
 			} else {
 
 				Toast.makeText(getActivity(), 
-							  mOrderToPay.getDestTbl().getAliasId()	+ "号台提交并" + (mPayCate == ReqPayOrder.PAY_CATE_NORMAL ? "结帐" : "暂结") + "成功", 
+							  mOrderToPay.getDestTbl().getAliasId()	+ "号台提交并" + (mPayCate == Type.PAY_ORDER ? "结帐" : "暂结") + "成功", 
 							  Toast.LENGTH_SHORT).show();
 				dismiss();
 				getActivity().finish();	

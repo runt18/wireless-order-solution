@@ -22,7 +22,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.wireless.common.WirelessOrder;
-import com.wireless.pack.req.ReqPayOrder;
+import com.wireless.pack.Type;
+import com.wireless.pack.req.PrintOption;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.distMgr.Discount;
@@ -46,9 +47,6 @@ public class TableDetailActivity extends Activity {
 		
 		mBillFoodListView = (BillFoodListView)findViewById(R.id.billListView_table_detail);
 		
-		/*
-		 * get id and order from last activity
-		 */
 		mTblAlias = getIntent().getIntExtra(KEY_TABLE_ID, -1);
 	
 		TextView titleTextView = (TextView) findViewById(R.id.toptitle);
@@ -76,22 +74,23 @@ public class TableDetailActivity extends Activity {
 		((ImageView) findViewById(R.id.normal_table_detail)).setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View arg0) {
-				showBillDialog(ReqPayOrder.PAY_CATE_NORMAL);
+				showBillDialog(Type.PAY_ORDER);
 			}
 		});
+		
 		/**
-		 * "暂结"Button
+		 * "打折"Button
 		 */
 		((ImageView) findViewById(R.id.allowance_table_detail)).setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View arg0) {
-				showBillDialog(ReqPayOrder.PAY_CATE_TEMP);
+				showBillDialog(Type.PAY_TEMP_ORDER);
 			}
 			
 		});
 		
-		/*
-		 * change order button
+		/**
+		 * "改单"Button
 		 */
 		((ImageView)findViewById(R.id.order_table_detail)).setOnClickListener(new View.OnClickListener() {
 			
@@ -143,8 +142,8 @@ public class TableDetailActivity extends Activity {
 
 		private ProgressDialog _progDialog;
 
-		public PayOrderTask(Order orderToPay, byte payCate) {
-			super(WirelessOrder.loginStaff, orderToPay, payCate);
+		public PayOrderTask(Order orderToPay, byte payCate, PrintOption printOption) {
+			super(WirelessOrder.loginStaff, orderToPay, payCate, printOption);
 		}
 		
 		/**
@@ -155,7 +154,7 @@ public class TableDetailActivity extends Activity {
 			_progDialog = ProgressDialog.show(TableDetailActivity.this, 
 											  "", 
 											  "提交"	+ mOrderToPay.getDestTbl().getAliasId() + "号台" + 
-											 (mPayCate == ReqPayOrder.PAY_CATE_NORMAL ? "结帐"	: "暂结") + "信息...请稍候",
+											 (mPayCate == Type.PAY_ORDER ? "结帐" : "暂结") + "信息...请稍候",
 											 true);
 		}
 
@@ -179,14 +178,14 @@ public class TableDetailActivity extends Activity {
 				 * Back to main activity if perform to pay order. Refresh the
 				 * bill list if perform to pay temporary order.
 				 */
-				if (mPayCate == ReqPayOrder.PAY_CATE_NORMAL) {
+				if (mPayCate == Type.PAY_ORDER) {
 					TableDetailActivity.this.finish();
 				} else {
 					mHandler.sendEmptyMessage(0);
 				}
 
 				Toast.makeText(TableDetailActivity.this, 
-							   mOrderToPay.getDestTbl().getAliasId()	+ "号台" + (mPayCate == ReqPayOrder.PAY_CATE_NORMAL ? "结帐" : "暂结") + "成功", 
+							   mOrderToPay.getDestTbl().getAliasId()	+ "号台" + (mPayCate == Type.PAY_ORDER ? "结帐" : "暂结") + "成功", 
 							   Toast.LENGTH_SHORT).show();
 
 			}
@@ -215,7 +214,7 @@ public class TableDetailActivity extends Activity {
 		}
 
 		// 付款方式添加事件监听器
-		((RadioGroup) view.findViewById(R.id.radioGroup1)).setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+		((RadioGroup) view.findViewById(R.id.paymentGroup)).setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
 
 			@Override
 			public void onCheckedChanged(RadioGroup group, int checkedId) {
@@ -229,18 +228,10 @@ public class TableDetailActivity extends Activity {
 			}
 		});
 		
+		
 		//根据discount数量添加Radio Button
 		RadioGroup radioGroup = (RadioGroup) view.findViewById(R.id.discountGroup);
-		for(Discount discount : WirelessOrder.foodMenu.discounts){
-			RadioButton radioBtn = new RadioButton(TableDetailActivity.this);
-			radioBtn.setTag(discount);
-			radioBtn.setText(discount.getName());
-			radioGroup.addView(radioBtn, LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-			if(discount.equals(mOrderToPay.getDiscount())){
-				radioBtn.setChecked(true);
-			}
-		}
-
+		
 		// 折扣方式方式添加事件监听器
 		radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
 			@Override
@@ -249,20 +240,30 @@ public class TableDetailActivity extends Activity {
 				mOrderToPay.setDiscount((Discount)obj);
 			}
 		});
+		
+		for(Discount discount : WirelessOrder.loginStaff.getRole().getDiscounts()){
+			RadioButton radioBtn = new RadioButton(TableDetailActivity.this);
+			radioBtn.setTag(discount);
+			radioBtn.setText(discount.getName());
+			radioGroup.addView(radioBtn, LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+			if(discount.equals(WirelessOrder.loginStaff.getRole().getDefaultDiscount())){
+				radioBtn.setChecked(true);
+			}
+		}
 
-		new AlertDialog.Builder(this).setTitle(payCate == ReqPayOrder.PAY_CATE_NORMAL ? "结帐" : "暂结")
+		new AlertDialog.Builder(this).setTitle(payCate == Type.PAY_ORDER ? "结帐" : "暂结")
 			.setView(view)
 			.setPositiveButton("确定", new DialogInterface.OnClickListener() {
 				@Override
 				public void onClick(DialogInterface dialog,	int which) {
 					// 执行结账异步线程
-					new PayOrderTask(mOrderToPay, payCate).execute();
+					new PayOrderTask(mOrderToPay, payCate, PrintOption.DO_PRINT).execute();
 				}
 			})
-			.setNegativeButton("计算", new DialogInterface.OnClickListener() {
+			.setNegativeButton("打折", new DialogInterface.OnClickListener() {
 				@Override
 				public void onClick(DialogInterface dialog,	int which) {
-					mHandler.sendEmptyMessage(0);
+					new PayOrderTask(mOrderToPay, Type.PAY_TEMP_ORDER, PrintOption.DO_NOT_PRINT).execute();
 				}
 			})
 			.show();
@@ -315,18 +316,6 @@ public class TableDetailActivity extends Activity {
 			} else{
 				
 				mOrderToPay = order;
-				
-				/**
-				 * 设置默认折扣
-				 */
-				for(Discount discount : WirelessOrder.foodMenu.discounts){
-					if(discount.isDefault()){
-						mOrderToPay.setDiscount(discount);
-						break;
-					}else if(discount.isReserved()){
-						mOrderToPay.setDiscount(discount);
-					}
-				}
 				
 				/**
 				 * 请求账单成功则更新相关的控件

@@ -102,7 +102,7 @@
         android:background="@drawable/bg03" >
 
         <ImageView
-            android:id="@+id/normal"
+            android:id="@+id/btn_payOrder_Bill"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
@@ -111,13 +111,22 @@
             android:src="@drawable/normal_selector" />
 
         <ImageView
-            android:id="@+id/allowance"
+            android:id="@+id/btn_payTmpOrder_Bill"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="false"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:src="@drawable/rebate_selector" />
+
+        <ImageView
+            android:id="@+id/btn_discount_Bill"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
-            android:layout_marginRight="50dip"
-            android:src="@drawable/rebate_selector" />
+            android:layout_marginRight="50dp"
+            android:src="@drawable/discount_selector" />
     </RelativeLayout>
 
     <RelativeLayout
