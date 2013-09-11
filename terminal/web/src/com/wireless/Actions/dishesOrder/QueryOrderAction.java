@@ -91,7 +91,7 @@ public class QueryOrderAction extends Action {
 					if(tid != null && !tid.trim().isEmpty()){
 						order = PayOrder.calcByTable(staff, order);
 					} else if (oid != null && !oid.trim().isEmpty()){
-						order = PayOrder.calcByID(staff, order);
+						order = PayOrder.calcById(staff, order);
 					}
 				}
 			}

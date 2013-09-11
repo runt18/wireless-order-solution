@@ -122,10 +122,10 @@ public class UpdateOrderAction2 extends Action{
 			//get the food string to this order
 			orderToUpdate.setOrderFoods(Util.toFoodArray(request.getParameter("foods")));
 			
-			Staff staff = StaffDao.verify(Integer.parseInt(pin), Privilege.Code.RE_PAID);
+			Staff staff = StaffDao.verify(Integer.parseInt(pin), Privilege.Code.RE_PAYMENT);
 			
 			UpdateOrder.execByID(staff, orderToUpdate);
-			PayOrder.execByID(staff, orderToUpdate);
+			PayOrder.execById(staff, orderToUpdate);
 			
 			jsonResp = jsonResp.replace("$(result)", "true");	
 			jsonResp = jsonResp.replace("$(value)", orderID + "号账单修改成功");

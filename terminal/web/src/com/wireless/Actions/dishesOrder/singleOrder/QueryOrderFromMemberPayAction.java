@@ -45,7 +45,7 @@ public class QueryOrderFromMemberPayAction extends Action{
 			com.wireless.pojo.dishesOrder.Order no = new com.wireless.pojo.dishesOrder.Order();
 			no.setId(Integer.valueOf(orderID));
 			no.setDiscount(new Discount(Integer.valueOf(m.getMemberType().getDiscount().getId())));
-			no = PayOrder.calcByID(staff, no);
+			no = PayOrder.calcById(staff, no);
 			
 			m.getMemberType().setDiscount(no.getDiscount());
 			if(m.getMemberType().getDiscountType() == MemberType.DiscountType.DISCOUNT_ENTIRE){

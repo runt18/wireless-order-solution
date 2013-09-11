@@ -86,7 +86,7 @@ public class QueryOrderGroupAction extends Action{
 					calcOrder.setCustomNum(Short.valueOf(customNum));
 				}
 				if(calcOrder.isUnpaid()){
-					calcOrder = PayOrder.calcByID(staff, calcOrder);
+					calcOrder = PayOrder.calcById(staff, calcOrder);
 				}else{
 					calcOrder = OrderDao.getById(staff, Integer.valueOf(orderID), DateType.valueOf(queryType));
 				}
