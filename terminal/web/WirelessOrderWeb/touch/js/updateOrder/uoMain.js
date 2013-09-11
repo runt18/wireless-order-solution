@@ -7,13 +7,15 @@ $(function(){
  * @param {object} c  
  */
 uo.show = function(c){
-	toggleContentDisplay({
-		type: 'show', 
-		renderTo: 'divUpdateOrder'
-	});
+	if(c.type == null || typeof c.type == 'undefined'){
+		toggleContentDisplay({
+			type: 'show', 
+			renderTo: 'divUpdateOrder'
+		});
+		initCancelReason();	
+	}
 	uo.table = c.table;
 	initOrderData(c.table);
-	initCancelReason();	
 };
 
 /**
@@ -66,7 +68,7 @@ function showKeyboardNumForUO(foodName, dishes){
 	//初始化标题信息
 	$("#divTopForKeyboardNumForUO").html("<div style = 'font-size: 20px; " +
 			"font-weight: bold; color : white;" +
-			"margin: 10px 15px 5px 20px;'>" + title + "</div>");
+			"text-align : center; line-height : 40px;'>" + title + "</div>");
 	//初始化退菜原因信息
 	var htmlReason = '';
 	for(x in cancelReasonData){
@@ -123,7 +125,7 @@ function setReason(o){
  * 退菜信息框的确定按钮,确定退菜,
  * 并向退菜数组添加退菜对象
  */
-$("#btnSubmitForKeyboardNumUO").click(function(){
+uo.cf.save = function(){
 	//取得退菜数目并进行判定
 	var num = $("#" + inputNumIdUO).val();
 	num = parseFloat(num).toFixed(2);
@@ -216,8 +218,8 @@ $("#btnSubmitForKeyboardNumUO").click(function(){
 			});
 		});
 		
-	};	
-});
+	}
+};
 
 /**
  * 取消退菜
@@ -332,7 +334,7 @@ function cancelForUO(){
 		Util.msg.alert({
 			title : '重要',
 			msg : '账单信息已修改，“确定”将不保存这些改动，是否确定？',
-			button : 'YESBACK',
+			buttons : 'YESBACK',
 			fn : function(btn){
 				if(btn == 'yes'){
 					uoCancelFoods = [];
@@ -343,24 +345,6 @@ function cancelForUO(){
 		});
 	}
 }
-
-/**
- * 下翻按钮
- */
-function scrollDown(renderTo){
-	var scrollTop = 0;
-	scrollTop = $("#" + renderTo).scrollTop() + 50;
-	$("#" + renderTo).scrollTop(scrollTop);
-}
-
-/**
- * 上翻按钮
- */
-function scrollUp(renderTo){
-	var scrollTop;
-	scrollTop = $("#" + renderTo).scrollTop() - 50;
-	$("#" + renderTo).scrollTop(scrollTop);
-};
 
 /**
  * 数字键点击事件
