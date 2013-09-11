@@ -133,12 +133,12 @@ var uo = {
 	<div id = "divDescForUpdateOrder" class = "box-horizontal" style = "background: #FFD700;">
 	</div>
 	<div id = "divSouthForUpdateOrder" class="box-horizontal">
-		<div class="button-base" style="margin-left: 2px;" onClick= "cancelForUO()">返回</div>
+		<div class="button-base" style="margin-left: 2px;" onClick= "uo.cancelForUO()">返回</div>
   		<div class="div-full">&nbsp;</div>
-  		<div class="button-base" style="margin-left: 2px;" onclick = "sureForUO()">确认修改</div>
-  		<div class="button-base" style="margin-left: 2px;" onclick = "showdivKeyboardPeopleForUO()">人数</div>
-  		<div class="button-base" style="margin-left: 2px;" onclick = "goToCreateOrder()">点菜</div>
-  		<div class="button-base" style="margin-left: 2px;" onclick = "tempPayForUO()">暂结</div>
+  		<div class="button-base" style="margin-left: 2px;" onclick = "uo.saveForUO()">确认修改</div>
+  		<div class="button-base" style="margin-left: 2px;" onclick = "uo.showdivKeyboardPeopleForUO()">人数</div>
+  		<div class="button-base" style="margin-left: 2px;" onclick = "uo.goToCreateOrder()">点菜</div>
+  		<div class="button-base" style="margin-left: 2px;" onclick = "uo.tempPayForUO()">暂结</div>
   		<div class="button-base" style="margin-left: 2px;" onclick = "Util.scroll({otype: 'up', content: 'divCenterForUpdateOrder', size: 80})">上翻</div>
   		<div class="button-base" style="margin-left: 2px;" onclick = "Util.scroll({otype: 'down', content: 'divCenterForUpdateOrder', size: 80})">下翻</div>
 	</div>
@@ -212,7 +212,7 @@ var uo = {
 			<div class="button-base" style = "margin-top: 1px;" onclick = "ts.backOne()">&lt;--</div>
 			<div class="button-base" onclick = "ts.backAll()">&lt;&lt;</div>
 			<div class="button-base" id = "btnCloseForSelectTableNumTS">关闭</div>
-			<div class="button-base" id = "btnSubmitForSelectTableNumTS" style = "height: 130px; line-height: 130px;">确定</div>
+			<div class="button-base" style = "height: 130px; line-height: 130px;" onclick = "ts.submitForSelectTableNumTS()">确定</div>
 		</div>
 	</div>
 </div>		
@@ -244,7 +244,7 @@ var uo = {
 		</div>
 	</div>
 	<div id = "divBottomForShowMessageTS">
-		<div class="button-base" id = "btnRenderToCreateOrder" style = "width: 100px; margin-left: 130px;">点菜</div>
+		<div class="button-base" style = "width: 100px; margin-left: 130px;" onclick = "ts.createOrderForShowMessageTS()">点菜</div>
 		<div class="button-base" id = "btnCancelForShowMessageTS" style = "width: 100px; margin-left: 65px;">返回</div>
 	</div>
 </div>	
@@ -285,7 +285,7 @@ var uo = {
 	<div id = "divTopForKeyboardNumForUO"></div>
 	<div id = "divMainForKeyboardNumForUO">
 		<div id = "divLeftForKeyboardNumForUO">
-			<div class="button-base addOneForKeyboardNumUO" style = "margin: 0 0 0 2px;">+</div>				
+			<div class="button-base" style = "margin: 0 0 0 2px;" onclick = "uo.addOneNum()">+</div>				
 			<input type = "text" id = "txtNumForUO" class = "table-number" style = "margin-left: 9px;"/>
 			<div class="button-base" onclick = "inputNumUO(this)">7</div>
 			<div class="button-base" onclick = "inputNumUO(this)">8</div>
@@ -300,8 +300,8 @@ var uo = {
 			<div class="button-base" id = "btnCloseForKeyboardNumUO">取消</div>
 		</div>
 		<div id = "divRightForKeyboardNumForUO">
-			<div class="button-base deleteOneForKeyboardNumUO" style = "margin: 0 0 0 2px;">-</div>
-			<div class="button-base btnBackAllForKeyboardNumUO" style = "margin: 12px 0 5px 2px;">&lt;&lt;</div>
+			<div class="button-base" style = "margin: 0 0 0 2px;" onclick = "uo.cutOne()">-</div>
+			<div class="button-base" style = "margin: 12px 0 5px 2px;" onclick = "uo.backAll()">&lt;&lt;</div>
 			<div class="button-base" onclick = "inputNumUO(this)">.</div>
 			<div class="button-base" onclick = "inputNumUO(this)" style = "height: 130px; line-height: 130px;">0</div>
 		</div>
@@ -313,7 +313,7 @@ var uo = {
 	<div id = "divTopForKeyboardPeopleForUO"></div>
 	<div id = "divMainForKeyboardPeopleForUO">
 		<div id = "divLeftForKeyboardPeopleForUO">
-			<div class="button-base addOneForKeyboardNumUO" style = "margin: 0 0 0 2px;">+</div>
+			<div class="button-base" style = "margin: 0 0 0 2px;" onclick = "uo.addOneNum()">+</div>
 			<input type = "text" id = "txtPeopleNumForUO"  class = "table-number" style = "margin-left: 8px;"/>
 			<div class="button-base" onclick = "inputNumUO(this)">7</div>
 			<div class="button-base" onclick = "inputNumUO(this)">8</div>
@@ -324,12 +324,12 @@ var uo = {
 			<div class="button-base" onclick = "inputNumUO(this)">1</div>
 			<div class="button-base" onclick = "inputNumUO(this)">2</div>
 			<div class="button-base" onclick = "inputNumUO(this)">3</div>
-			<div class="button-base" id = "btnSubmitForPeopleKeyboardUO" class = "keyboardbutton " style = "width: 164px;">确定</div>
+			<div class="button-base" class = "keyboardbutton" style = "width: 164px;" onclick = "uo.saveForChangePeople()">确定</div>
 			<div class="button-base" id = "btnCloseForPeopleKeyboardUO" class = "keyboardbutton">取消</div>
 		</div>
 		<div id = "divRightForKeyboardPeopleForUO">
-			<div class="button-base deleteOneForKeyboardNumUO" style = "margin: 0 0 0 2px;">-</div>
-			<div class="button-base btnBackAllForKeyboardNumUO" style = "margin: 12px 0 5px 2px;">&lt;&lt;</div>
+			<div class="button-base" style = "margin: 0 0 0 2px;" onclick = "uo.cutOne()">-</div>
+			<div class="button-base" style = "margin: 12px 0 5px 2px;" onclick = "uo.backAll()">&lt;&lt;</div>
 			<div class="button-base" onclick = "inputNumUO(this)">00</div>
 			<div class="button-base" onclick = "inputNumUO(this)" style = "height: 130px;">0</div>
 		</div>

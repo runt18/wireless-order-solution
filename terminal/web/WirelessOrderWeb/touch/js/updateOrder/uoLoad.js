@@ -164,5 +164,5 @@ function showDescForUpdateOrder(){
 	"<span style = 'margin-left: 50px;'>消费总额：</span>" + "<span id = 'spanTotalPriceUO'></span>" +	
 	"</div>";
 	$("#divDescForUpdateOrder").html(html);
-	$("#spanTotalPriceUO").html(getTotalPriceUO().toFixed(2) + "元");
+	$("#spanTotalPriceUO").html(uo.getTotalPriceUO().toFixed(2) + "元");
 }

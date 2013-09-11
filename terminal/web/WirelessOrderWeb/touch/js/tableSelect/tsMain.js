@@ -217,9 +217,10 @@ function renderToCreateOrder(tableNo, peopleNo){
 		});
 	}
 }
-
-//点击空台后弹出的点菜页面上的点菜按钮
-$("#btnRenderToCreateOrder").click(function(){
+/**
+ * 桌号人数界面的点菜按钮
+ */
+ts.createOrderForShowMessageTS = function(){
 	var tableNo;
 	var peopleNo;
 	tableNo = parseInt($("#txtTableNumForSM").val());
@@ -229,10 +230,24 @@ $("#btnRenderToCreateOrder").click(function(){
 		peopleNo = parseInt($("#txtPeopleNumForSM").val());
 	}	
 	renderToCreateOrder(tableNo, peopleNo);
-});
+};
+//点击空台后弹出的点菜页面上的点菜按钮
+//$("#btnRenderToCreateOrder").click(function(){
+//	var tableNo;
+//	var peopleNo;
+//	tableNo = parseInt($("#txtTableNumForSM").val());
+//	if($("#txtPeopleNumForSM").val() == ""){
+//		peopleNo = 0;
+//	}else{
+//		peopleNo = parseInt($("#txtPeopleNumForSM").val());
+//	}	
+//	renderToCreateOrder(tableNo, peopleNo);
+//});
 
-//点击桌号选择页面的确定（点菜）按钮
-$("#btnSubmitForSelectTableNumTS").click(function(){
+/**
+ *桌号输入页面的确定按钮
+ */
+ts.submitForSelectTableNumTS = function(){
 	//获得餐桌号
 	var tableNo;
 	var peopleNo = 0;
@@ -255,7 +270,32 @@ $("#btnSubmitForSelectTableNumTS").click(function(){
 			alert("没有该餐桌，请重新输入一个桌号！");
 		}
 	}	
-});
+};
+//点击桌号选择页面的确定（点菜）按钮
+//$("#btnSubmitForSelectTableNumTS").click(function(){
+//	//获得餐桌号
+//	var tableNo;
+//	var peopleNo = 0;
+//	if($("#txtTableNumForTS") == ""){
+//		tableNo = -1;
+//	}else{
+//		tableNo = parseInt($("#txtTableNumForTS").val());
+//	}
+//	if(typeForInputTableNum == "createOrder"){
+//		renderToCreateOrder(tableNo, peopleNo);	
+//	}else if(typeForInputTableNum == "check"){
+//		//判断该餐桌是否已点菜（下单）
+//		if(hasTable(tables, tableNo)){
+//			if(hasTable(busyTables, tableNo)){
+//				alert(tableNo + "号餐桌已点菜，可以结账");
+//			}else{
+//				alert("该餐桌未点菜，不能结账");
+//			}
+//		}else{
+//			alert("没有该餐桌，请重新输入一个桌号！");
+//		}
+//	}	
+//});
 
 //点击工具栏上的点菜按钮，弹出桌号选择框，能够转到点菜页面
 function createOrderForTS(){

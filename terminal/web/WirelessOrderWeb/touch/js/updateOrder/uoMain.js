@@ -22,13 +22,13 @@ uo.show = function(c){
  * 取得初始的消费总额
  * @returns {number} totalPriceUO
  */
-function getTotalPriceUO(){
+uo.getTotalPriceUO = function(){
 	var totalPriceUO = 0;
 	for(x in uoFood){
 		totalPriceUO += uoFood[x].count * uoFood[x].actualPrice;
 	}
 	return totalPriceUO;
-}
+};
 
 /**
  * 设置所选择的行号id
@@ -185,7 +185,7 @@ uo.cf.save = function(){
 		//加到退菜数组
 		uoCancelFoods.push(uoCancelFood);
 		//更改消费总额
-		var totalPrice = getTotalPriceUO();
+		var totalPrice = uo.getTotalPriceUO();
 		for(x in uoCancelFoods){
 			totalPrice += uoCancelFoods[x].totalPrice;
 		}
@@ -240,7 +240,7 @@ function cancelForCancelFood(rowId){
 		}
 	}
 	//修改退菜总额
-	var totalPrice = getTotalPriceUO();
+	var totalPrice = uo.getTotalPriceUO();
 	for(x in uoCancelFoods){
 		totalPrice += uoCancelFoods[x].totalPrice;
 	}
@@ -250,7 +250,7 @@ function cancelForCancelFood(rowId){
 /**
  * 餐桌人数修改框
  */
-function showdivKeyboardPeopleForUO(){
+uo.showdivKeyboardPeopleForUO = function(){
 	//弹出人数输入框
 	Util.dialongDisplay({
 		type : 'show',
@@ -275,10 +275,12 @@ function showdivKeyboardPeopleForUO(){
 		inputNumValUO = "";
 		$("#" + inputNumIdUO).val(inputNumValUO);
 	});	
-}
+};
 
-//确定修改餐桌人数
-$("#btnSubmitForPeopleKeyboardUO").click(function(){
+/**
+ * 确定修改餐桌人数
+ */
+uo.saveForChangePeople = function(){
 	var num;
 	num = parseInt($("#" + inputNumIdUO).val());
 	//关闭该界面
@@ -290,13 +292,13 @@ $("#btnSubmitForPeopleKeyboardUO").click(function(){
 	inputNumValUO = "";
 	$("#" + inputNumIdUO).val(inputNumValUO);
 	//更改页面端的的人数
-	$("#customNumForUO").html("用餐人数：" + num);			
-});
+	$("#customNumForUO").html("用餐人数：" + num);	
+};
 
 /**
  * 工具栏的确定按钮,对整个页面信息提交
  */
-function sureForUO(){
+uo.saveForUO = function(){
 	uo.customNum = $("#customNumForUO").html().substring(5);
 	//判断页面信息是否有改动
 	if(uoCancelFoods.length == 0 && uo.order.customNum == uo.customNum){
@@ -316,14 +318,14 @@ function sureForUO(){
 		uoCancelFoods = [];
 		uo.updateOrder = uoFood;
 		//对更新的菜品和人数进行提交
-		submitUpdateOrderHandler(uoFood);	
+		uo.submitUpdateOrderHandler(uoFood);	
 	}
-}
+};
 
 /**
  * 工具栏的取消按钮,取消对该页面的修改操作
  */
-function cancelForUO(){	
+uo.cancelForUO = function(){	
 	uo.customNum = $("#customNumForUO").html().substring(5);
 	//判断页面信息是否有改动
 	if(uoCancelFoods.length == 0 && uo.order.customNum == uo.customNum){
@@ -344,7 +346,7 @@ function cancelForUO(){
 			}
 		});
 	}
-}
+};
 
 /**
  * 数字键点击事件
@@ -406,15 +408,20 @@ function inputNumUO(o){
 	}
 }
 
-//重置数字
-$(".btnBackAllForKeyboardNumUO").click(function(){
+/**
+ * 重置数字
+ */
+uo.backAll = function(){
 	inputNumValUO = "";
 	$("#" + inputNumIdUO).val(inputNumValUO);
 	$("#" + inputNumIdUO).focus();
-});
+};
 
-//加一按钮
-$(".addOneForKeyboardNumUO").click(function(){
+
+/**
+ * 加一按钮
+ */
+uo.addOneNum = function(){
 	if($("#" + inputNumIdUO).val() == ""){
 		$("#" + inputNumIdUO).val(0);
 	}
@@ -437,10 +444,12 @@ $(".addOneForKeyboardNumUO").click(function(){
 	}
 	$("#" + inputNumIdUO).val(inputNumValUO);
 	$("#" + inputNumIdUO).focus();
-});
+};
 
-//减一按钮
-$(".deleteOneForKeyboardNumUO").click(function(){
+/**
+ * 减一按钮
+ */
+uo.cutOne = function(){
 	if($("#" + inputNumIdUO).val() == ""){
 		$("#" + inputNumIdUO).val(0);
 	}
@@ -452,12 +461,12 @@ $(".deleteOneForKeyboardNumUO").click(function(){
 	}
 	$("#" + inputNumIdUO).val(inputNumValUO);
 	$("#" + inputNumIdUO).focus();
-});
+};
 
 /**
  * 工具栏点菜按钮
  */
-function goToCreateOrder(){
+uo.goToCreateOrder = function(){
 	uo.customNum = $("#customNumForUO").html().substring(5);
 	//判断页面信息是否有改动
 	if(uoCancelFoods.length == 0 && uo.order.customNum == uo.customNum){
@@ -466,7 +475,7 @@ function goToCreateOrder(){
 			order : uo.order,
 			callback : function(){
 				initTables();
-				cancelForUO();
+				uo.cancelForUO();
 			}
 		});
 	}else{
@@ -475,12 +484,12 @@ function goToCreateOrder(){
 			msg : '账单已经修改，请先做“确认修改”操作。'
 		});
 	}
-}
+};
 
 /**
  * 已点菜改单提交操作
  */
-function submitUpdateOrderHandler(c){
+uo.submitUpdateOrderHandler = function(c){
 	var orderFoods = c;
 	if(orderFoods.length > 0){
 		var foodPara = '';
@@ -489,7 +498,6 @@ function submitUpdateOrderHandler(c){
 			if (orderFoods[i].isTemporary) {
 				// 临时菜
 				var foodname = orderFoods[i].name;
-//				foodname = foodname.indexOf('<') > 0 ? foodname.substring(0,foodname.indexOf('<')) : foodname;
 				foodPara = foodPara 
 						+ '[' 
 						+ 'true' + '<<sb>>'// 是否临时菜(true)
@@ -572,12 +580,12 @@ function submitUpdateOrderHandler(c){
 			}
 		});
 	}
-}
+};
 
 /**
  * 暂结
  */
-function tempPayForUO(){
+uo.tempPayForUO = function(){
 	uo.customNum = $("#customNumForUO").html().substring(5);
 	//判断页面信息是否有改动
 	if(uoCancelFoods.length == 0 && uo.order.customNum == uo.customNum){
@@ -630,22 +638,4 @@ function tempPayForUO(){
 			msg : '账单已经修改，请先做“确认修改”操作。'
 		});
 	}
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+};

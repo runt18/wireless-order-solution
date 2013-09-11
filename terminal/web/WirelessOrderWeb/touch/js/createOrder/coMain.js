@@ -479,7 +479,7 @@ co.submit = function(){
 						if(btn == 'yes'){
 							initStaffContent();
 							co.back();
-							cancelForUO();
+							uo.cancelForUO();
 						}else{
 							if(co.callback != null && typeof co.callback == 'function'){
 								co.callback();

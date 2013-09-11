@@ -105,7 +105,8 @@ function initTables(){
 					$("#freeForTableSelect").css("backgroundColor", "#D4F640");
 					tempForAllStatus = tables;
 					temp = tables;
-					showTable(temp);				}else{
+					showTable(temp);
+				}else{
 					Util.msg.alert({
 						title : data.title,
 						msg : data.msg, 
