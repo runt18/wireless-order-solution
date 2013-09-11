@@ -23,7 +23,7 @@ public class QueryRestaurantAction extends Action{
 		String start = request.getParameter("start");
 		String limit = request.getParameter("limit");
 		String isPaging = request.getParameter("isPaging");
-		String account = request.getParameter("account");
+		String account = request.getParameter("name");
 		String expireDate = request.getParameter("expireDate");
 		String alive = request.getParameter("alive");
 		List<Restaurant> list = null;
@@ -31,7 +31,7 @@ public class QueryRestaurantAction extends Action{
 		String extraCond = "", orderClause = "";
 		try{
 			if(account != null && !account.trim().isEmpty()){
-				extraCond += (" AND account like '%" + account + "%' ");
+				extraCond += (" AND restaurant_name like '%" + account + "%' ");
 			}else if(expireDate != null || alive != null){
 				if(expireDate != null && alive == null){
 					orderClause += (" ORDER BY expire_date" );
