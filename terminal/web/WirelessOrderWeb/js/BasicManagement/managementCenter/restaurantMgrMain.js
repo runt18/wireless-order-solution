@@ -438,7 +438,7 @@ Ext.onReady(function(){
 	});
 	
 	var centerPanel = new Ext.Panel({
-		title : 'Digi-e管理中心',
+		title : '管理中心',
 		id : 'mgrPanel',
 		region : 'center',
 		layout : 'border',
