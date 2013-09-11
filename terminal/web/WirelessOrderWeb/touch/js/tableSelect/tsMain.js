@@ -31,7 +31,6 @@ function getStatusTables(type, tempTables){
  * @param {object} o 
  */
 function addTables(o){
-    pageNow = 1;
     //把当前区域餐桌数组清空
     temp = [];
     tempForAllStatus = [];
@@ -74,8 +73,7 @@ function addTables(o){
 	    $("#divAllArea").css("backgroundColor", "#4EEE99");
 	    $("#" + o.id).css("backgroundColor", "#FFA07A");
     }
-    n = Math.ceil(temp.length/limit) ;      
-    showTable(temp, pageNow);
+    showTable(temp);
 }
 
 /**
@@ -87,10 +85,8 @@ function showStatus(){
 	$("#busyForTableSelect").css("backgroundColor", "#D4F640");
 	$("#freeForTableSelect").css("backgroundColor", "#D4F640");
 	statusType = "allStatus";
-	pageNow = 1;
 	temp = tempForAllStatus;
-	n = Math.ceil(temp.length/limit) ;      
-    showTable(temp, pageNow);
+	showTable(temp);
 }
 
 //点击空闲状态按钮
@@ -99,10 +95,8 @@ $("#freeForTableSelect").click(function(){
 	$("#busyForTableSelect").css("backgroundColor", "#D4F640");
 	$("#divAllStatus").css("backgroundColor", "#4EEE99");
 	statusType = "free";
-	pageNow = 1;
 	temp = getStatusTables("free", tempForAllStatus);
-	n = Math.ceil(temp.length/limit) ;      
-    showTable(temp, pageNow);
+	showTable(temp);
 });
 
 //点击就餐状态按钮
@@ -111,29 +105,25 @@ $("#busyForTableSelect").click(function(){
 	$("#freeForTableSelect").css("backgroundColor", "#D4F640");
 	$("#divAllStatus").css("backgroundColor", "#4EEE99");
 	statusType = "busy";
-	pageNow = 1;
 	temp = getStatusTables("busy", tempForAllStatus);
-	n = Math.ceil(temp.length/limit) ;      
-    showTable(temp, pageNow);
+	showTable(temp);
 });
 
 /**
  * 选中一张餐桌
- * @param {object} o 被选中的餐桌节点
+ * @param c
  */
-function selectTable(o){
-	var tableMessage, tabMessage;
-	tabMessage = document.getElementById(o.id).getAttribute("tableObject");
-	tableMessage = JSON.parse(tabMessage);
+ts.selectTable = function(c){
+	var table = getTableByAlias(c.tableAlias);
 	//判断是否为已点菜餐桌
-	if(tableMessage.statusText == "就餐"){	
+	if(table.statusText == "就餐"){	
 		uo.show({
-			table : getTableBytableId(o.id.substring(8, o.id.length))
+			table : getTableByAlias(c.tableAlias)
 		});
 	}else{
 		Util.dialongDisplay({
-			type:'show', 
-			renderTo:'divShowMessageForTableSelect'
+			type : 'show', 
+			renderTo : 'divShowMessageForTableSelect',
 		});
 		//关闭该界面
 		$("#btnCancelForShowMessageTS").click(function (){
@@ -144,35 +134,11 @@ function selectTable(o){
 			inputNumVal = "";
 			$("#txtPeopleNumForSM").val("");
 		});
-		$("#txtTableNumForSM").val(tableMessage.alias);
+		$("#txtTableNumForSM").val(table.alias);
 		$("#txtPeopleNumForSM").select();
 		inputNumId  = "txtPeopleNumForSM";
-		//点击选中按钮，选择桌号输入框
-		$("#selectTableNum").click(function(){
-			$("#txtTableNumForSM").select();
-			inputNumId  = "txtTableNumForSM";
-			inputNumVal = "";
-		});
-		//点击选中按钮，选择人数输入框
-		$("#selectPeopleNum").click(function(){
-			$("#txtPeopleNumForSM").select();
-			inputNumId  = "txtPeopleNumForSM";
-			inputNumVal = "";
-		});
-		//直接点击桌号 输入框
-		$("#txtTableNumForSM").click(function(){
-			inputNumId  = "txtTableNumForSM";
-			inputNumVal = "";
-			inputNumVal += $("#" + inputNumId).val();
-		});
-		//直接点击人数 输入框
-		$("#txtPeopleNumForSM").click(function(){
-			inputNumId  = "txtPeopleNumForSM";
-			inputNumVal = "";
-			inputNumVal += $("#" + inputNumId).val();
-		});
 	}	
-}
+};
 
 /**
  * 点击数字键盘上的数字，对输入框进行输入
@@ -187,9 +153,6 @@ function inputNum(o){
 			Util.msg.alert({
 				title : '温馨提示',
 				msg : '人数超过限定，请重新输入.', 
-				fn : function(btn){
-					
-				}
 			});
 			inputNumVal = "";
 			$("#" + inputNumId).val(inputNumVal);
@@ -202,9 +165,6 @@ function inputNum(o){
 			Util.msg.alert({
 				title : '温馨提示',
 				msg : '桌号超过限定，请重新输入.', 
-				fn : function(btn){
-					
-				}
 			});
 			inputNumVal = "";
 			$("#" + inputNumId).val(inputNumVal);
@@ -227,22 +187,21 @@ function renderToCreateOrder(tableNo, peopleNo){
 		inputNumVal = "";
 		$("#txtTableNumForTS").val(inputNumVal);
 		$("#txtPeopleNumForSM").val(inputNumVal);
-		if(getTableBytableId(tableNo).statusValue == 1){
+		if(getTableByAlias(tableNo).statusValue == 1){
 			uo.show({
-				table : getTableBytableId(tableNo)
+				table : getTableByAlias(tableNo),
+				type : 'createOrder'
 			});
-			cancelForUO();
 			co.show({
 				table : uo.table,
 				order : uo.order,
 				callback : function(){
 					initTables();
-					cancelForUO();
 				}
 			});
 		}else{
 			co.show({
-				table : getTableBytableId(tableNo),
+				table : getTableByAlias(tableNo),
 				callback : function(){
 					initTables();
 				}
@@ -284,7 +243,6 @@ $("#btnSubmitForSelectTableNumTS").click(function(){
 	}
 	if(typeForInputTableNum == "createOrder"){
 		renderToCreateOrder(tableNo, peopleNo);	
-		
 	}else if(typeForInputTableNum == "check"){
 		//判断该餐桌是否已点菜（下单）
 		if(hasTable(tables, tableNo)){
@@ -325,7 +283,7 @@ ts.tt.submit = function(){
 	var oldflag = false, newflag = true;
 	//判断餐桌是否符合条件
 	if(hasTable(tables, oldTable)){
-		if(getTableBytableId(oldTable).statusValue == 1){
+		if(getTableByAlias(oldTable).statusValue == 1){
 			oldflag = true;
 		}else{
 			Util.msg.alert({
@@ -348,15 +306,12 @@ ts.tt.submit = function(){
 		return;
 	}
 	if(hasTable(tables, newTable)){
-		if(getTableBytableId(newTable).statusValue == 0){
+		if(getTableByAlias(newTable).statusValue == 0){
 			newflag = true;
 		}else{
 			Util.msg.alert({
 				title : '温馨提示',
 				msg : newTable + '号桌不是空台，不能转台.', 
-				fn : function(btn){
-					
-				}
 			});
 			return;
 		}
@@ -364,13 +319,9 @@ ts.tt.submit = function(){
 		Util.msg.alert({
 			title : '温馨提示',
 			msg : '没有' + newTable + '号桌，请重新输入一个桌号.', 
-			fn : function(btn){
-				
-			}
 		});
 		return;
 	}
-	
 	//提交转台信息
 	if(oldflag && newflag){
 		Util.LM.show();
