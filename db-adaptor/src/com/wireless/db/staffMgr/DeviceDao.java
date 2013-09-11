@@ -154,13 +154,24 @@ public class DeviceDao {
 			return result.get(0);
 		}
 	}
+
+	public static List<Device> getDevices(String extraCond, String orderClause) throws SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return getDevices(dbCon, extraCond, orderClause);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
 	
 	private static List<Device> getDevices(DBCon dbCon, String extraCond, String orderClause) throws SQLException{
 		List<Device> result = new ArrayList<Device>();
 		
 		String sql;
-		sql = " SELECT id, restaurant_id, device_id, model_id, status FROM " + 
-		      Params.dbName + ".device DEV" +
+		sql = " SELECT DEV.id, restaurant_id, device_id, model_id, status, restaurant_name FROM " + 
+		      Params.dbName + ".device DEV " + "INNER JOIN " + Params.dbName + ".restaurant RES " +
+		      " ON DEV.restaurant_id = RES.id " +
 			  " WHERE 1 = 1 " +
 		      (extraCond != null ? extraCond : " ") +
 		      (orderClause != null ? orderClause : "");
@@ -171,6 +182,7 @@ public class DeviceDao {
 			device.setModel(Model.valueOf(dbCon.rs.getInt("model_id")));
 			device.setStatus(Status.valueOf(dbCon.rs.getInt("status")));
 			device.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
+			device.setRestaurantName(dbCon.rs.getString("restaurant_name"));
 			result.add(device);
 		}
 		dbCon.rs.close();
