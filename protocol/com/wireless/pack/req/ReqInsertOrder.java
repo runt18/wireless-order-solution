@@ -7,24 +7,21 @@ import com.wireless.pojo.staffMgr.Staff;
 
 public class ReqInsertOrder extends RequestPackage {
 
-	public final static byte DO_PRINT = 0;
-	public final static byte DO_NOT_PRINT = 1;
-	
 	/**
 	 * Make the insert or update order request package
 	 * @param reqOrder the order detail information
 	 * @param type indicates insert or update request
 	 * @param reserved indicates whether to print or NOT
 	 */
-	public ReqInsertOrder(Staff staff, Order reqOrder, byte type, byte reserved){
+	public ReqInsertOrder(Staff staff, Order reqOrder, byte type, PrintOption printOption){
 		
 		super(staff);
 		
-		check(reqOrder, type, reserved);
+		check(reqOrder, type, printOption);
 		
 		header.mode = Mode.ORDER_BUSSINESS;
 		header.type = type;
-		header.reserved = reserved;
+		header.reserved = printOption.getVal();
 
 		fillBody(reqOrder, Order.ORDER_PARCELABLE_4_COMMIT);
 	}
@@ -35,7 +32,7 @@ public class ReqInsertOrder extends RequestPackage {
 	 * @param type indicates insert or update request
 	 */
 	public ReqInsertOrder(Staff staff, Order reqOrder, byte type){
-		this(staff, reqOrder, type, DO_PRINT);
+		this(staff, reqOrder, type, PrintOption.DO_PRINT);
 	}	
 	
 	/**
@@ -46,10 +43,7 @@ public class ReqInsertOrder extends RequestPackage {
 		this(staff, reqOrder, Type.INSERT_ORDER);
 	}	
 	
-	private void check(Order reqOrder, byte type, byte reserved){
-		if(reserved != DO_PRINT && reserved != DO_NOT_PRINT){
-			throw new IllegalArgumentException("The reserved(val = " + reserved + ") is invalid.");
-		}
+	private void check(Order reqOrder, byte type, PrintOption printOption){
 		
 		if(type == Type.INSERT_ORDER){
 			if(reqOrder.getDestTbl() == null){
