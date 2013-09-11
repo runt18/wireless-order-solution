@@ -35,12 +35,6 @@
 	var isVerified = false;
 
 	var Request = new URLParaQuery();
-	var isNewAccess;
-	if (Request["isNewAccess"] == undefined) {
-		isNewAccess = true;
-	} else {
-		isNewAccess = false;
-	}
 
 	var currPin;
 	if (Request["pin"] == undefined) {
@@ -50,7 +44,6 @@
 		currPin = Request["pin"];
 	} */
 	
-	var isPrompt = false;
 </script>
 
 <script type="text/javascript" src="../js/animation/login/protalAction.js"></script>
