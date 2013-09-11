@@ -54,11 +54,9 @@ public class PayOrderTask extends AsyncTask<Void, Void, Void>{
 				} else if (errCode.equals(ProtocolError.TABLE_IDLE)) {
 					mBusinessException = new BusinessException(mOrderToPay.getDestTbl().getAliasId() + "号台的账单已结帐或删除，请与餐厅负责人确认。", errCode);
 					
-				} else if (errCode.equals(ProtocolError.PRINT_FAIL)) {
-					mBusinessException = new BusinessException(mOrderToPay.getDestTbl().getAliasId() + "号结帐打印未成功，请与餐厅负责人确认。", errCode);
-					
 				} else {
-					mBusinessException = new BusinessException(mOrderToPay.getDestTbl().getAliasId() + "号台结帐未成功，请重新结帐");
+					//mBusinessException = new BusinessException(mOrderToPay.getDestTbl().getAliasId() + "号台结帐未成功，请重新结帐");
+					mBusinessException = new BusinessException(errCode);
 				}
 			}
 
