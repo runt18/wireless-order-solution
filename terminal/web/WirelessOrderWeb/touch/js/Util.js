@@ -76,7 +76,7 @@ Util.padding = function(c){
 			this.clearContent();
 			if(!this.isEmpty()){
 				var html = '';
-				var start = this.start, limit = this.start > this.data.length && this.start + this.limit > this.data.length ? this.start + this.limit - this.data.length : this.limit;
+				var start = this.start, limit = this.data.length >= this.start + this.limit ? this.limit : this.limit - (this.start + this.limit -this.data.length);
 				var temp = null;
 				for(var i = 0; i < limit; i++){
 					temp = this.data[start+i];
@@ -85,7 +85,7 @@ Util.padding = function(c){
 						html += this.templet({
 							dataIndex : i,
 							data : temp
-						});				
+						});	
 					}
 				}
 				temp = null;
@@ -149,6 +149,7 @@ Util.scroll = function(c){
 		}
 	}
 };
+
 /**
  * 
  * @param c
