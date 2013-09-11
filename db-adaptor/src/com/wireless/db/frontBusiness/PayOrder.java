@@ -13,6 +13,7 @@ import com.wireless.db.regionMgr.TableDao;
 import com.wireless.db.system.SystemDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.ProtocolError;
+import com.wireless.exception.StaffError;
 import com.wireless.pojo.client.Member;
 import com.wireless.pojo.client.MemberOperation;
 import com.wireless.pojo.dishesOrder.Order;
@@ -20,6 +21,7 @@ import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.distMgr.Discount;
 import com.wireless.pojo.ppMgr.PricePlan;
 import com.wireless.pojo.regionMgr.Table;
+import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.system.Setting;
 import com.wireless.util.DateType;
@@ -65,7 +67,7 @@ public class PayOrder {
 	 * 			throws if the order to this id does NOT exist
 	 */
 	public static Order execTmpById(DBCon dbCon, Staff staff, Order orderToPay) throws SQLException, BusinessException{
-		return doTmpPayment(dbCon, staff, calcByID(dbCon, staff, orderToPay));
+		return doTmpPayment(dbCon, staff, calcById(dbCon, staff, orderToPay));
 	}
 	
 	private static Order doTmpPayment(DBCon dbCon, Staff staff, Order orderCalculated) throws SQLException{
@@ -117,7 +119,7 @@ public class PayOrder {
 	 * Perform to pay an order along with the id and other pay condition.
 	 * 
 	 * @param staff
-	 * 			the terminal
+	 * 			the staff to perform this action
 	 * @param orderToPay
 	 * 			the order to pay along with id and other pay condition
 	 * @return Order completed pay order information to paid order
@@ -129,11 +131,11 @@ public class PayOrder {
 	 * @throws SQLException
 	 *             throws if fail to execute any SQL statement
 	 */
-	public static Order execByID(Staff staff, Order orderToPay) throws BusinessException, SQLException{
+	public static Order execById(Staff staff, Order orderToPay) throws BusinessException, SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return execByID(dbCon, staff, orderToPay);
+			return execById(dbCon, staff, orderToPay);
 			
 		}finally{
 			dbCon.disconnect();
@@ -146,22 +148,32 @@ public class PayOrder {
 	 * @param dbCon
 	 * 			the database connection
 	 * @param staff
-	 * 			the terminal
+	 * 			the staff to perform this action
 	 * @param orderToPay
 	 * 			the order to pay along with id and other pay condition
 	 * @return Order completed pay order information to paid order
 	 * @throws BusinessException
-	 *             Throws if one of the cases below.<br>
-	 *             - The terminal is NOT attached to any restaurant.<br>
-	 *             - The terminal is expired.<br>
-	 *             - The order to be paid repeat.<br>
-	 *             - The order to query does NOT exist.
+	 *             throws if one of the cases below<br>
+	 *             - the terminal is NOT attached to any restaurant<br>
+	 *             - the terminal is expired<br>
+	 *             - the order to be paid repeat<br>
+	 *             - the order to query does NOT exist<br>
+	 *             - the staff has no privilege for payment in case of order unpaid<br>
+	 *             - the staff has no privilege for re-payment in case of order paid
 	 * @throws SQLException
 	 *             throws if fail to execute any SQL statement
 	 */
-	public static Order execByID(DBCon dbCon, Staff staff, Order orderToPay) throws BusinessException, SQLException{
-		
-		return doPayment(dbCon, staff, doPrepare(dbCon, staff, orderToPay));
+	public static Order execById(DBCon dbCon, Staff staff, Order orderToPay) throws BusinessException, SQLException{
+		Order.Status status = OrderDao.getStatusById(dbCon, staff, orderToPay.getId());
+		if(status == Order.Status.UNPAID && !staff.getRole().hasPrivilege(Privilege.Code.PAYMENT)){
+			throw new BusinessException(StaffError.PAYMENT_NOT_ALLOW);
+			
+		}else if(status == Order.Status.PAID || status == Order.Status.REPAID && !staff.getRole().hasPrivilege(Privilege.Code.RE_PAYMENT)){
+			throw new BusinessException(StaffError.RE_PAYMENT_NOT_ALLOW);
+			
+		}else{
+			return doPayment(dbCon, staff, doPrepare(dbCon, staff, orderToPay));
+		}
 		
 	}
 	
@@ -181,7 +193,7 @@ public class PayOrder {
 	 */
 	private static Order doPrepare(DBCon dbCon, Staff staff, Order orderToPay) throws BusinessException, SQLException{
 		int customNum = orderToPay.getCustomNum();
-		Order orderCalculated = calcByID(dbCon, staff, orderToPay);
+		Order orderCalculated = calcById(dbCon, staff, orderToPay);
 		orderCalculated.setCustomNum(customNum);
 		
 		if(orderCalculated.isSettledByMember()){
@@ -399,8 +411,8 @@ public class PayOrder {
 	
 	/**
 	 * Calculate the order details according to the specific table defined in order regardless of merged status. 
-	 * @param term
-	 * 			the terminal 
+	 * @param staff
+	 * 			the staff to perform this action 
 	 * @param orderToPay
 	 * 			the order with table and other condition referring to {@link ReqPayOrderParser}
 	 * @return the order after calculated
@@ -411,11 +423,11 @@ public class PayOrder {
 	 * @throws SQLException
 	 * 			Throws if failed to execute any SQL statement.
 	 */
-	public static Order calcByTable(Staff term, Order orderToPay) throws BusinessException, SQLException{
+	public static Order calcByTable(Staff staff, Order orderToPay) throws BusinessException, SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return calcByTable(dbCon, term, orderToPay);
+			return calcByTable(dbCon, staff, orderToPay);
 			
 		}finally{
 			dbCon.disconnect();
@@ -426,8 +438,8 @@ public class PayOrder {
 	 * Calculate the order details according to the specific table defined in order regardless of merged status. 
 	 * @param dbCon
 	 * 			the database connection
-	 * @param term
-	 * 			the terminal 
+	 * @param staff
+	 * 			the staff to perform this action 
 	 * @param orderToPay
 	 * 			the order along with table and other condition referring to {@link ReqPayOrderParser}
 	 * @return the order result after calculated
@@ -438,11 +450,11 @@ public class PayOrder {
 	 * @throws SQLException
 	 * 			Throws if failed to execute any SQL statement.
 	 */
-	public static Order calcByTable(DBCon dbCon, Staff term, Order orderToPay) throws BusinessException, SQLException{
+	public static Order calcByTable(DBCon dbCon, Staff staff, Order orderToPay) throws BusinessException, SQLException{
 		
-		orderToPay.setId(OrderDao.getOrderIdByUnPaidTable(dbCon, TableDao.getTableByAlias(dbCon, term, orderToPay.getDestTbl().getAliasId()))[0]);			
+		orderToPay.setId(OrderDao.getOrderIdByUnPaidTable(dbCon, TableDao.getTableByAlias(dbCon, staff, orderToPay.getDestTbl().getAliasId()))[0]);			
 		
-		return calcByID(dbCon, term, orderToPay);		
+		return calcById(dbCon, staff, orderToPay);		
 
 	}
 	
@@ -451,8 +463,8 @@ public class PayOrder {
 	 * and other condition referring to {@link ReqPayOrderParser}.
 	 * If the table is merged, perform to get its parent order,
 	 * otherwise get the order of its own.
-	 * @param term
-	 * 			the terminal 
+	 * @param staff
+	 * 			the staff to perform this action 
 	 * @param orderToPay
 	 * 			the order along with table and other condition referring to {@link ReqPayOrderParser}
 	 * @return the order result after calculated
@@ -463,12 +475,12 @@ public class PayOrder {
 	 * @throws SQLException
 	 * 			Throws if failed to execute any SQL statement.
 	 */
-	public static Order calcByTableDync(Staff term, Order orderToPay) throws BusinessException, SQLException{
+	public static Order calcByTableDync(Staff staff, Order orderToPay) throws BusinessException, SQLException{
 		
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return calcByTableDync(dbCon, term, orderToPay);
+			return calcByTableDync(dbCon, staff, orderToPay);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -482,8 +494,8 @@ public class PayOrder {
 	 * otherwise get the order of its own.
 	 * @param dbCon
 	 * 			the database connection
-	 * @param term
-	 * 			the terminal 
+	 * @param staff
+	 * 			the staff to perform this action 
 	 * @param orderToPay
 	 * 			the order along with table and other condition referring to {@link ReqPayOrderParser}
 	 * @return the order result after calculated
@@ -494,10 +506,10 @@ public class PayOrder {
 	 * @throws SQLException
 	 * 			Throws if failed to execute any SQL statement.
 	 */
-	public static Order calcByTableDync(DBCon dbCon, Staff term, Order orderToPay) throws BusinessException, SQLException{
+	public static Order calcByTableDync(DBCon dbCon, Staff staff, Order orderToPay) throws BusinessException, SQLException{
 		
 		//Get the details of table to be calculated.
-		Table tblToCalc = TableDao.getTableByAlias(dbCon, term, orderToPay.getDestTbl().getAliasId());
+		Table tblToCalc = TableDao.getTableByAlias(dbCon, staff, orderToPay.getDestTbl().getAliasId());
 		
 		//If the table is merged, get its parent order.
 		//Otherwise get the order of its own.
@@ -508,15 +520,15 @@ public class PayOrder {
 			orderToPay.setId(unpaidId[0]);			
 		}
 		
-		return calcByID(dbCon, term, orderToPay);		
+		return calcById(dbCon, staff, orderToPay);		
 
 	}
 	
 	/**
 	 * Calculate the details to the order according to id and
 	 * other condition.
-	 * @param term
-	 * 			the terminal
+	 * @param staff
+	 * 			the staff to perform this action
 	 * @param orderToPay
 	 * 			the order along with id and other condition
 	 * @return the order result after calculated
@@ -525,11 +537,11 @@ public class PayOrder {
 	 * @throws SQLException
 	 * 			Throws if failed to execute any SQL statement.
 	 */
-	public static Order calcByID(Staff term, Order orderToPay) throws BusinessException, SQLException{
+	public static Order calcById(Staff staff, Order orderToPay) throws BusinessException, SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return calcByID(dbCon, term, orderToPay);
+			return calcById(dbCon, staff, orderToPay);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -547,10 +559,11 @@ public class PayOrder {
 	 * @return the order result after calculated
 	 * @throws BusinessException
 	 * 			throws if the order to this id does NOT exist
+	 * 			throws if the staff has no privilege to make use of the requested discount
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static Order calcByID(DBCon dbCon, Staff staff, Order orderToPay) throws BusinessException, SQLException{
+	public static Order calcById(DBCon dbCon, Staff staff, Order orderToPay) throws BusinessException, SQLException{
 		
 		String sql;
 		
@@ -569,21 +582,19 @@ public class PayOrder {
 		
 		//Set the order calculate parameters.
 		setOrderCalcParams(orderToCalc, orderToPay);
+
 		
-		//Get the discount to this order.
-		List<Discount> discount = DiscountDao.getDiscount(dbCon, staff, 
-														  " AND DIST.discount_id = " + orderToCalc.getDiscount().getId(),
-														  null);
-		if(!discount.isEmpty()){
-			orderToCalc.setDiscount(discount.get(0));
+		if(orderToCalc.getDiscount().equals(orderToPay.getDiscount())){
+			orderToCalc.setDiscount(DiscountDao.getDiscountById(dbCon, staff, orderToPay.getDiscount().getId()));
 		}else{
-			//Make use the default discount if the discount does NOT exist.
-			discount = DiscountDao.getDiscount(dbCon, staff,
-					   								" AND (DIST.status = " + Discount.Status.DEFAULT.getVal() + 
-					   								" OR " + " DIST.status = " + Discount.Status.DEFAULT_RESERVED.getVal() + ")",
-					   								null);
-			if(!discount.isEmpty()){
-				orderToCalc.setDiscount(discount.get(0));
+			//Get the discounts to role owned by staff
+			//and check to see whether the staff is permitted to make use of the discount.
+			List<Discount> discounts = DiscountDao.getDiscountByRole(dbCon, staff, staff.getRole());
+			int index = discounts.indexOf(orderToCalc.getDiscount());
+			if(index < 0){
+				throw new BusinessException(StaffError.DISCOUNT_NOT_ALLOW);
+			}else{
+				orderToCalc.setDiscount(discounts.get(index));
 			}
 		}
 
@@ -625,7 +636,7 @@ public class PayOrder {
 				//Set the calculate parameters to each child order.
 				setOrderCalcParams(childOrder, orderToPay);
 				//Calculate each child order.
-				childOrder.copyFrom(calcByID(dbCon, staff, childOrder));
+				childOrder.copyFrom(calcById(dbCon, staff, childOrder));
 				//Accumulate the custom number.
 				orderToCalc.setCustomNum(orderToCalc.getCustomNum() + childOrder.getCustomNum());
 				//Accumulate the discount price.

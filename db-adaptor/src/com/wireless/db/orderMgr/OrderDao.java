@@ -21,6 +21,33 @@ import com.wireless.util.DateType;
 public class OrderDao {
 
 	/**
+	 * Get the status to a specific order.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param orderId
+	 * 			the order id 
+	 * @return the status to this order
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if the order to check does NOT exist
+	 */
+	public static Order.Status getStatusById(DBCon dbCon, Staff staff, int orderId) throws SQLException, BusinessException{
+		String sql;
+		sql = " SELECT status FROM " + Params.dbName + ".order WHERE id = " + orderId;
+		dbCon.rs = dbCon.stmt.executeQuery(sql);
+		if(dbCon.rs.next()){
+			int status = dbCon.rs.getInt("status");
+			dbCon.rs.close();
+			return Order.Status.valueOf(status);
+		}else{
+			throw new BusinessException(ProtocolError.ORDER_NOT_EXIST);
+		}
+	}
+	
+	/**
 	 * Get the unpaid order detail information to the specific restaurant and table 
 	 * regardless of the merged status.
 	 * 

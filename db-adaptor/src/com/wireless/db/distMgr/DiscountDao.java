@@ -67,6 +67,51 @@ public class DiscountDao {
 	}
 	
 	/**
+	 * Get the discount according to a specific id.
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param discountId
+	 * 			the discount id
+	 * @return the discount to this id
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if the discount to this id does NOT exist
+	 */
+	public static Discount getDiscountById(Staff staff, int discountId) throws SQLException, BusinessException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return getDiscountById(dbCon, staff, discountId);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Get the discount according to a specific id.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param discountId
+	 * 			the discount id
+	 * @return the discount to this id
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if the discount to this id does NOT exist
+	 */
+	public static Discount getDiscountById(DBCon dbCon, Staff staff, int discountId) throws SQLException, BusinessException{
+		List<Discount> result = getDiscount(dbCon, staff, " AND DIST.discount_id = " + discountId, null);
+		if(result.isEmpty()){
+			throw new BusinessException("The discount(id = " + discountId + ") is NOT found.");
+		}else{
+			return result.get(0);
+		}
+	}
+	
+	/**
 	 * Get the discount along with its discount plan to a specified restaurant defined in {@link Staff}
 	 * and other extra condition. 
 	 * @param staff
