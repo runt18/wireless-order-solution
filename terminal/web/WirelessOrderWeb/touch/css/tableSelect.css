@@ -119,5 +119,8 @@
 .table-base:active{
 	background: #4CB848;
 }
+.table-busy{
+	background-color: #FF0;
+}
 
 
