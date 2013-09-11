@@ -208,9 +208,9 @@ function getOperatorName(actionPath) {
  * 验证员工权限
  * @param actionPath 	相对路径
  * @param code 			权限码
- * @param href 			跳转的页面
+ * @param callback 		验证成功后执行的操作
  */
-function verifyStaff(actionPath, code, href){
+function verifyStaff(actionPath, code, callback){
 	Ext.Ajax.request({
 		url : actionPath + "VerifyStaff.do",
 		params : {
@@ -220,7 +220,12 @@ function verifyStaff(actionPath, code, href){
 		success : function(res, opt){
 			var jr = Ext.decode(res.responseText);
 			if(jr.success){
-				location.href = href;
+				if(typeof callback == 'string'){
+					location.href = callback;
+				}else if(typeof callback == 'function'){
+					callback();
+				}
+					
 			}else{
 				jr['icon'] = Ext.MessageBox.WARNING;
 				Ext.ux.showMsg(jr);
