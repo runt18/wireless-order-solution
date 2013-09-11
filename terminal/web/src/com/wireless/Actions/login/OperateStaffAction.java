@@ -1,5 +1,8 @@
 package com.wireless.Actions.login;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -32,6 +35,10 @@ public class OperateStaffAction extends Action{
 				
 				Cookie cPin = new Cookie("pin", pin);
 				response.addCookie(cPin);
+				Map<Object, Object> other = new HashMap<Object, Object>();
+				other.put("staff", staff);
+				jobject.setOther(other);
+				jobject.initTip(true, "登陆成功");
 			}else{
 				throw new BusinessException("密码输入错误!");
 			}
