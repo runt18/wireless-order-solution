@@ -33,11 +33,13 @@ function initOrderData(data){
 			restaurantID : restaurantID,
 			tableID : data.alias,			
 		},
+		async : false,
 		success : function(data, status, xhr){
 			uoFood = [];
 			if(data.success){
 				uo.order = data.other.order;
 				uo.order.orderFoods = data.root;
+//				alert(JSON.stringify(uo.order.orderFoods));
 				for(x in data.root){
 					uoFood.push(data.root[x]);
 				}
