@@ -10,6 +10,7 @@
 			<param-value>
 				/PersonLogin.html,
 				/PersonLoginTimeout.html,
+				/VerifyLogin.do,
 				/QueryStaff.do,
 				/OperateStaff.do
 			</param-value>
@@ -24,16 +25,7 @@
 		<filter-name>whiteList</filter-name>
 		<url-pattern>*.do</url-pattern>
 	</filter-mapping>
-<!--	
-	<filter-mapping>
-		<filter-name>filter</filter-name>
-		<url-pattern>/pages/*</url-pattern>
-	</filter-mapping>
-	<filter-mapping>
-		<filter-name>filter</filter-name>
-		<url-pattern>*.do</url-pattern>
-	</filter-mapping>
--->
+
 	
 	<servlet>
 		<servlet-name>action</servlet-name>
