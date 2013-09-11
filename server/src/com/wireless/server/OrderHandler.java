@@ -324,7 +324,7 @@ class OrderHandler implements Runnable{
 						
 					}else{
 						
-						final Order order = PayOrder.execByID(staff, orderToPay);
+						final Order order = PayOrder.execById(staff, orderToPay);
 						
 						PrintHandler printHandler = new PrintHandler(staff);
 						
