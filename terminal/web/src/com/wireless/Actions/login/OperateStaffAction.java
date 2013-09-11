@@ -17,7 +17,6 @@ import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.staffMgr.Staff;
-import com.wireless.util.WebParams;
 
 public class OperateStaffAction extends Action{
 	public ActionForward execute(ActionMapping mapping, ActionForm form,HttpServletRequest request, HttpServletResponse response)throws Exception {
@@ -46,10 +45,10 @@ public class OperateStaffAction extends Action{
 
 		}catch(BusinessException e){
 			e.printStackTrace();
-			jobject.initTip(false, WebParams.TIP_TITLE_DEFAULT, e.getCode(), e.getMessage());
+			jobject.initTip(e);
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip(false, e.getMessage(), 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
+			jobject.initTip(e);
 		}finally{
 			response.getWriter().print(jobject.toString());
 		}

@@ -12,7 +12,6 @@ import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.staffMgr.Privilege.Code;
-import com.wireless.util.WebParams;
 
 public class VerifyStaffAction extends Action{
 
@@ -29,7 +28,9 @@ public class VerifyStaffAction extends Action{
 			
 		}catch(BusinessException e){
 			e.printStackTrace();
-			jobject.initTip(false, WebParams.TIP_TITLE_DEFAULT, e.getCode(), e.getMessage());
+			jobject.initTip(e);
+		}catch(Exception e){
+			
 		}
 		finally{
 			response.getWriter().print(jobject.toString());
