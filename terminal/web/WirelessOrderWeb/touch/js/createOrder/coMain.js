@@ -22,7 +22,7 @@ co.findFoodByKitchen = function(c){
 			for(var i = 0; i < kitchenData.root.length; i++){
 				temp = kitchenData.root[i];
 				if(temp.dept.id == parseInt(dl[0].getAttribute('data-value'))){
-					tempFoodData = tempFoodData.concat(temp.foods);					
+					tempFoodData = tempFoodData.concat(temp.foods);		
 				}
 			}
 		}
@@ -122,7 +122,7 @@ co.operateFoodCount = function(c){
 			Util.msg.alert({
 				title : '重要',
 				msg : '是否删除菜品?',
-				button : 'YESBACK',
+				buttons : 'YESBACK',
 				fn : function(btn){
 					if(btn == 'yes'){
 						co.newFood.splice(foodContent.attr('data-index'), 1);
