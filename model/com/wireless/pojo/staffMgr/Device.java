@@ -1,12 +1,17 @@
 package com.wireless.pojo.staffMgr;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
+import com.wireless.json.Jsonable;
 import com.wireless.parcel.Parcel;
 import com.wireless.parcel.Parcelable;
 
 
-public class Device implements Parcelable{
+public class Device implements Parcelable, Jsonable{
 
 	public final static int DEVICE_PARCELABLE_SIMPLE = 0;
 	public final static int DEVICE_PARCELABLE_COMPLEX = 1;
@@ -151,6 +156,7 @@ public class Device implements Parcelable{
 	
 	private int id;
 	private int restaurantId;
+	private String restaurantName;
 	private String deviceId;
 	private Model model = Model.ANDROID;
 	private Status status = Status.IDLE;
@@ -178,6 +184,18 @@ public class Device implements Parcelable{
 		this.id = id;
 	}
 	
+	
+	public String getRestaurantName() {
+		if(restaurantName == null){
+			return "";
+		}
+		return restaurantName;
+	}
+
+	public void setRestaurantName(String restaurantName) {
+		this.restaurantName = restaurantName;
+	}
+
 	public int getRestaurantId() {
 		return restaurantId;
 	}
@@ -265,4 +283,23 @@ public class Device implements Parcelable{
 		}
 		
 	};
+
+	@Override
+	public Map<String, Object> toJsonMap(int flag) {
+		Map<String, Object> jm = new HashMap<String, Object>();
+		jm.put("id", this.id);
+		jm.put("restaurantId", this.restaurantId);
+		jm.put("restaurantText", this.restaurantName);
+		jm.put("deviceId", this.deviceId);
+		jm.put("modelValue", this.model.getVal());
+		jm.put("modelText", this.model.getDesc());
+		jm.put("statusValue", this.status.getVal());
+		jm.put("statusText", this.status.getDesc());
+		return Collections.unmodifiableMap(jm);
+	}
+
+	@Override
+	public List<Object> toJsonList(int flag) {
+		return null;
+	}
 }
