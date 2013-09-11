@@ -35,11 +35,12 @@ var co = {
 		newTaste : []
 	}
 };
-//查看和修改账单操作包
+//查看和修改账单操作包,cf为cancelFood缩写
 var uo = {
 	order : {},
 	table : {},
-	updateOrder : []
+	updateOrder : [],
+	cf : {}
 }
 </script>
 <!-- <script type="text/javascript" src="./js/tableSelect/tsLoad.js"></script>
@@ -295,7 +296,7 @@ var uo = {
 			<div class="button-base" onclick = "inputNumUO(this)">1</div>
 			<div class="button-base" onclick = "inputNumUO(this)">2</div>
 			<div class="button-base" onclick = "inputNumUO(this)">3</div>
-			<div class="button-base" id = "btnSubmitForKeyboardNumUO" style = "width: 164px;">确定</div>
+			<div class="button-base" id = "btnSubmitForKeyboardNumUO" style = "width: 164px;" onclick = "uo.cf.save()">确定</div>
 			<div class="button-base" id = "btnCloseForKeyboardNumUO">取消</div>
 		</div>
 		<div id = "divRightForKeyboardNumForUO">
