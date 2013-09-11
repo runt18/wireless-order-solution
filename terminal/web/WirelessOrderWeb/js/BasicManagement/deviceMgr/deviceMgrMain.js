@@ -211,6 +211,26 @@ var addDeviceWin = new Ext.Window({
 			}]
 				
 		}]
+	}],
+	listeners : {
+		show : function(){
+			var pin = Ext.getCmp('txtDeviceId');
+			var rId = Ext.getCmp('txtDeviceRId');
+			pin.setValue('');
+			pin.clearInvalid();
+			rId.setValue('');
+			rId.clearInvalid();
+			
+			Ext.getDom('rdoAndroid').checked = true;
+			Ext.getDom('rdoRecordAlive').checked = true;
+		}
+	},
+	keys : [{
+		key : Ext.EventObject.ENTER,
+		scope : this,
+		fn : function(){
+			Ext.getCmp('btnAddDevice').handler();
+		}
 	}]
 });
 
@@ -315,7 +335,7 @@ var cm = new Ext.grid.ColumnModel([
 	{header : '所属餐厅', dataIndex : 'restaurantText', width : 200},
 	{header : '型号', dataIndex : 'modelText', width : 200},
 	{header : '状态', dataIndex : 'statusText', width : 200},
-	{header : '操作', dataIndex : 'optDevice', id : 'optDevice', renderer : optDevice, width : 200}
+	{header : '操作', dataIndex : 'optDevice', align: 'center', id : 'optDevice', renderer : optDevice, width : 200}
 ]);
 var deviceGrid;
 Ext.onReady(function(){

@@ -385,6 +385,11 @@ Ext.onReady(function(){
 				xtype : 'textfield',
 				id : 'txtSearchName',
 				width : 120,
+				listeners : {
+					focus : function(thiz){
+						thiz.focus(true, 100);
+					}
+				}
 			},{
 				xtype : 'tbtext',
 				text : '&nbsp;&nbsp;'
@@ -417,7 +422,7 @@ Ext.onReady(function(){
 						alive = 'true';
 					}
 					
-					store.baseParams['account'] = Ext.getCmp('txtSearchName').getValue();
+					store.baseParams['name'] = Ext.getCmp('txtSearchName').getValue();
 					store.load({
 						params : {
 							expireDate : expireDate,
