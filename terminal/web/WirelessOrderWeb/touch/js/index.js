@@ -39,6 +39,13 @@ var Templet = {
 	ul : {
 		allStaff : '<div data-value={id} class="main-box-base" style="line-height: 70px; text-align: center;" onClick="changeStaff({event:this, type:1, staffId:{id}})">{name}</div>'
 	},
+	ts : {
+		boxTable : '<div data-index = {dataIndex} data-alias = {alias} class = {dataClass}'
+			+ 'onclick = "ts.selectTable({event : this, tableAlias : {alias}})">'
+			+ '<div style = "margin-top : 25px; font-weight : bold;">{tableName}</div>'
+			+ '<div style = "color: #462B77; font-size: 10px;">{alias}</div>'
+			+ '</div>',
+	},
 	co : {
 		dept : '<div class="button-base" data-value={value} data-type="dept-select" '
 			+ 'onClick="co.initKitchenContent({event:this, deptId:{value}})">{text}</div>',
