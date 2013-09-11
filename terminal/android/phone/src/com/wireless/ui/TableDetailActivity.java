@@ -246,9 +246,6 @@ public class TableDetailActivity extends Activity {
 			radioBtn.setTag(discount);
 			radioBtn.setText(discount.getName());
 			radioGroup.addView(radioBtn, LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-			if(discount.equals(WirelessOrder.loginStaff.getRole().getDefaultDiscount())){
-				radioBtn.setChecked(true);
-			}
 		}
 
 		new AlertDialog.Builder(this).setTitle(payCate == Type.PAY_ORDER ? "结帐" : "暂结")
@@ -260,12 +257,7 @@ public class TableDetailActivity extends Activity {
 					new PayOrderTask(mOrderToPay, payCate, PrintOption.DO_PRINT).execute();
 				}
 			})
-			.setNegativeButton("打折", new DialogInterface.OnClickListener() {
-				@Override
-				public void onClick(DialogInterface dialog,	int which) {
-					new PayOrderTask(mOrderToPay, Type.PAY_TEMP_ORDER, PrintOption.DO_NOT_PRINT).execute();
-				}
-			})
+			.setNegativeButton("取消", null)
 			.show();
 
 	}

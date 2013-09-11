@@ -206,14 +206,14 @@ public class AskCancelAmountDialog extends DialogFragment {
 					dismiss();
 					
 				}catch(BusinessException e){
-					if(e.getErrCode().equals(StaffError.PERMISSION_NOT_ALLOW)){
-						Toast.makeText(getActivity(), "对不起, 你没有退菜的权限", Toast.LENGTH_LONG).show();
+					if(e.getErrCode().equals(StaffError.CANCEL_FOOD_NOT_ALLOW)){
+						Toast.makeText(getActivity(), "对不起, 你没有退菜的权限", Toast.LENGTH_SHORT).show();
 					}else{
-						Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_LONG).show();
+						Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_SHORT).show();
 					}
 					
 				}catch(NumberFormatException e){
-					Toast.makeText(getActivity(), "你输入删菜数量不正确", Toast.LENGTH_LONG).show();
+					Toast.makeText(getActivity(), "你输入删菜数量不正确", Toast.LENGTH_SHORT).show();
 				}
 				
 			}

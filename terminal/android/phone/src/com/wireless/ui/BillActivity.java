@@ -220,9 +220,6 @@ public class BillActivity extends Activity {
 			radioBtn.setTag(discount);
 			radioBtn.setText(discount.getName());
 			discountsGroup.addView(radioBtn, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-			if(discount.equals(WirelessOrder.loginStaff.getRole().getDefaultDiscount())){
-				radioBtn.setChecked(true);
-			}
 		}
 		
 		new AlertDialog.Builder(this).setTitle("’€ø€")
@@ -289,9 +286,6 @@ public class BillActivity extends Activity {
 			radioBtn.setTag(discount);
 			radioBtn.setText(discount.getName());
 			discountsGroup.addView(radioBtn, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-			if(discount.equals(WirelessOrder.loginStaff.getRole().getDefaultDiscount())){
-				radioBtn.setChecked(true);
-			}
 		}
 
 
@@ -304,12 +298,7 @@ public class BillActivity extends Activity {
 					new PayOrderTask(mOrderToPay, payCate).execute();
 				}
 			})
-			.setNegativeButton("¥Ú’€", new DialogInterface.OnClickListener() {
-				@Override
-				public void onClick(DialogInterface dialog,	int which) {
-					new PayOrderTask(mOrderToPay, Type.PAY_TEMP_ORDER, PrintOption.DO_NOT_PRINT).execute();
-				}
-			})
+			.setNegativeButton("»°œ˚", null)
 			.show();
 
 	}
