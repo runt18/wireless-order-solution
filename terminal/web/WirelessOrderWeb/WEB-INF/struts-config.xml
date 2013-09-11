@@ -469,6 +469,15 @@
 				type = "com.wireless.Actions.login.VerifyLoginAction"
 				scope="request">
 		</action>
+		<action path="/QueryDevice"
+				type = "com.wireless.Actions.deviceMgr.QueryDeviceAction"
+				scope="request">
+		</action>
+		<action path="/OperateDevice"
+				type = "com.wireless.Actions.deviceMgr.OperateDeviceAction"
+				scope="request" parameter="dataSource">
+		</action>
+		
 	</action-mappings>
 
 	<message-resources parameter="com.yourcompany.struts.ApplicationResources" />
