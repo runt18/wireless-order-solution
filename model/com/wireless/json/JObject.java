@@ -1,11 +1,13 @@
 package com.wireless.json;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.wireless.exception.BusinessException;
 import com.wireless.util.WebParams;
 
 public class JObject implements Jsonable {
@@ -49,6 +51,8 @@ public class JObject implements Jsonable {
 		this.msg = msg;
 	}
 	
+	
+	
 	/*-------------------------     initTip   --------------------------------*/
 	public void initTip(String msg){
 		this.msg = msg;
@@ -68,6 +72,18 @@ public class JObject implements Jsonable {
 		this.code = code;
 		this.msg = msg;
 	}
+	public void initTip(BusinessException e){
+		this.initTip(false, WebParams.TIP_TITLE_DEFAULT, e.getCode(), e.getMessage());
+	}
+	public void initTip(SQLException e){
+		this.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, e.getMessage());
+	}
+	
+	public void initTip(Exception e){
+		this.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
+	}
+	
+
 	
 	/*-------------------------     config     --------------------------------*/
 	@Override
