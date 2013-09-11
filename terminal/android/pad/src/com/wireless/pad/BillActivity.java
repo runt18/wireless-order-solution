@@ -21,6 +21,7 @@ import android.widget.Toast;
 
 import com.wireless.common.WirelessOrder;
 import com.wireless.pack.Type;
+import com.wireless.pack.req.PrintOption;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.distMgr.Discount;
@@ -150,7 +151,7 @@ public class BillActivity extends Activity {
 		private ProgressDialog mProgDialog;
 		
 		PayOrderTask(Order order, byte payCate){
-			super(WirelessOrder.loginStaff, order, payCate);
+			super(WirelessOrder.loginStaff, order, payCate, PrintOption.DO_PRINT);
 		}
 		
 		/**
