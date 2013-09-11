@@ -46,7 +46,7 @@ var billVerifyWin = new Ext.Window({
 			}
 			
 			billVerifyWin.hide();
-			isPrompt = false;
+			
 			billVerifyWin.findById("billVerifyPwd").setValue("");
 
 			Ext.Ajax.request({
@@ -76,7 +76,7 @@ var billVerifyWin = new Ext.Window({
 		text : "取消",
 		handler : function() {
 			billVerifyWin.hide();
-			isPrompt = false;
+			
 			billVerifyWin.findById("billVerifyPwd").setValue("");
 		}
 	}],
@@ -124,7 +124,7 @@ shiftVerifyWin = new Ext.Window({
 			}
 			
 			shiftVerifyWin.hide();
-			isPrompt = false;
+			
 			shiftVerifyWin.findById("shiftVerifyPwd").setValue("");
 
 			// 密碼校驗
@@ -144,7 +144,6 @@ shiftVerifyWin = new Ext.Window({
 								var resultJSON = Ext.util.JSON.decode(response.responseText);
 								if (resultJSON.success == true){
 									shiftWin.show();
-									isPrompt = true;
 									
 									// update the shift data
 									// 后台：["开始日期","结帐日期","账单数","现金金额","现金实收","刷卡金额",
@@ -208,7 +207,7 @@ shiftVerifyWin = new Ext.Window({
 		text : "取消",
 		handler : function(){
 			shiftVerifyWin.hide();
-			isPrompt = false;
+			
 			shiftVerifyWin.findById("shiftVerifyPwd").setValue("");
 		}
 	}],
@@ -260,7 +259,7 @@ var unShiftBillWarnWin = new Ext.Window({
 		text : "确定",
 		handler : function() {
 			unShiftBillWarnWin.hide();
-			isPrompt = false;
+			
 			
 			doDailySettle();
 		}
@@ -268,7 +267,7 @@ var unShiftBillWarnWin = new Ext.Window({
 		text : "取消",
 		handler : function() {
 			unShiftBillWarnWin.hide();
-			isPrompt = false;
+			
 		}
 	} ]
 });
@@ -309,7 +308,7 @@ dailyConfirmWin = new Ext.Window({
 			}
 			
 			dailyConfirmWin.hide();
-			isPrompt = false;
+			
 			
 			Ext.Ajax.request({
 				url : "../../VerifyPwd.do",
@@ -329,15 +328,14 @@ dailyConfirmWin = new Ext.Window({
 									if (rootData[0].text == "NoUnShift") {
 										// 沒剩帳單
 										dailyConfirmWin.hide();
-										isPrompt = false;
+										
 										doDailySettle();
 									} else {
 										// 有剩帳單
 										dailyConfirmWin.hide();
-										isPrompt = false;
+										
 										document.getElementById("unShiftBillWarnMsg").innerHTML = rootData[0].text;
 										unShiftBillWarnWin.show();
-										isPrompt = true;
 									}
 								} else {
 									Ext.MessageBox.show({
@@ -372,7 +370,7 @@ dailyConfirmWin = new Ext.Window({
 		text : "取消",
 		handler : function() {
 			dailyConfirmWin.hide();
-			isPrompt = false;
+			
 			dailyConfirmWin.findById("dailySettleVerifyPwd").setValue("");
 		}
 	}],
@@ -699,7 +697,7 @@ Ext.onReady(function() {
 		imgHeight : 50,
 		tooltip : "返回",
 		handler : function(btn) {
-			location.href = "../PersonLogin.html?"+ strEncode('restaurantID=' + restaurantID + '&isNewAccess=false', 'mi');
+			location.href = "../PersonLogin.html?"+ strEncode('restaurantID=' + restaurantID, 'mi');
 		}
 	});
 

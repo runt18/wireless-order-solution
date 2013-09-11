@@ -11,7 +11,7 @@
 				imgHeight : 50,
 				tooltip : '返回',
 				handler : function(e){
-					location.href = '../PersonLogin.html?'+ strEncode('restaurantID=' + restaurantID + '&isNewAccess=false', 'mi');
+					location.href = '../PersonLogin.html?'+ strEncode('restaurantID=' + restaurantID, 'mi');
 				}
 			}), {
 				xtype : 'tbtext',

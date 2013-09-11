@@ -39,7 +39,6 @@ var menuVerifyWin = new Ext.Window({
 			}
 			
 			menuVerifyWin.hide();
-			isPrompt = false;
 			menuVerifyWin.findById("menuVerifyPwd").setValue("");
 
 			Ext.Ajax.request({
@@ -69,7 +68,6 @@ var menuVerifyWin = new Ext.Window({
 		text : "取消",
 		handler : function() {
 			menuVerifyWin.hide();
-			isPrompt = false;
 			menuVerifyWin.findById("menuVerifyPwd").setValue("");
 		}
 	}],
@@ -126,7 +124,6 @@ var historyVerifyWin = new Ext.Window({
 			}
 			
 			historyVerifyWin.hide();
-			isPrompt = false;
 			Ext.Ajax.request({
 				url : "../VerifyPwd.do",
 				params : {
@@ -154,7 +151,7 @@ var historyVerifyWin = new Ext.Window({
 		text : "取消",
 		handler : function() {
 			historyVerifyWin.hide();
-			isPrompt = false;
+			
 			historyVerifyWin.findById("historyVerifyPwd")
 					.setValue("");
 		}
@@ -209,7 +206,7 @@ var inventoryVerifyWin = new Ext.Window({
 				pwdTrans = inventoryVerifyPwd;
 			}
 			inventoryVerifyWin.hide();
-			isPrompt = false;
+			
 			inventoryVerifyWin.findById("inventoryVerifyPwd").setValue("");			
 			
 			Ext.Ajax.request({
@@ -239,7 +236,7 @@ var inventoryVerifyWin = new Ext.Window({
 		text : "取消",
 		handler : function() {
 			inventoryVerifyWin.hide();
-			isPrompt = false;
+			
 			inventoryVerifyWin.findById("inventoryVerifyPwd")
 					.setValue("");
 		}
@@ -293,7 +290,7 @@ var systemVerifyWin = new Ext.Window({
 				pwdTrans = systemVerifyPwd;
 			}
 			systemVerifyWin.hide();
-			isPrompt = false;
+			
 			systemVerifyWin.findById("systemVerifyPwd").setValue("");				
 			
 			Ext.Ajax.request({
@@ -323,7 +320,7 @@ var systemVerifyWin = new Ext.Window({
 		text : "取消",
 		handler : function() {
 			systemVerifyWin.hide();
-			isPrompt = false;
+			
 			systemVerifyWin.findById("systemVerifyPwd")
 					.setValue("");
 		}
@@ -375,7 +372,7 @@ var memberVerifyWin = new Ext.Window({
 				pwdTrans = memberVerifyPwd;
 			}
 			memberVerifyWin.hide();
-			isPrompt = false;
+			
 			Ext.getCmp("memberVerifyPwd").setValue();				
 			
 			Ext.Ajax.request({
@@ -404,7 +401,7 @@ var memberVerifyWin = new Ext.Window({
 		text : "取消",
 		handler : function() {
 			memberVerifyWin.hide();
-			isPrompt = false;
+			
 			Ext.getCmp("memberVerifyPwd").setValue("");
 		}
 	}],
@@ -498,7 +495,7 @@ Ext.onReady(function() {
 						success : function(res, opt) {
 							var jr = Ext.decode(res.responseText);
 							if(jr.success){
-								getOperatorName("../");
+								document.getElementById("optName").innerHTML = jr.other.staff.staffName;
 								isVerified = true;
 								
 								personLoginWin.hide();

@@ -1,19 +1,14 @@
 ﻿var protalFuncReg = function() {
 	$("#order").each(function(){
 		$(this).bind("click", function(){
-			if (!isPrompt){
 				location.href = "TableSelect.html?"+ strEncode('restaurantID=' + restaurantID, 'mi');
-			}
 		});
 	});
 
 	$("#bill").each(function() {
 		$(this).bind("click", function() {
-			if (!isPrompt) {
 				// 密码校验
 				billVerifyWin.show();
-				isPrompt = true;
-			}
 		});
 	});
 

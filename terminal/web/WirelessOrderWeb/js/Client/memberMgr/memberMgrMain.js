@@ -54,7 +54,7 @@ var btnPushBack = new Ext.ux.ImageButton({
 	imgHeight : 50,
 	tooltip : '返回',
 	handler : function(e){
-		location.href = './ClientMain.html?'+ strEncode('restaurantID=' + restaurantID + '&isNewAccess=false', 'mi');
+		location.href = './ClientMain.html?'+ strEncode('restaurantID=' + restaurantID, 'mi');
 	}
 });
 

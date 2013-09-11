@@ -4,11 +4,8 @@
 				$(this).bind(
 						"click",
 						function() {
-							if (!isPrompt) {
-								// 密码設置
-								passwordConfigWin.show();
-								isPrompt = true;
-							}
+							// 密码設置
+							passwordConfigWin.show();
 						});
 			});
 

@@ -15,10 +15,7 @@ var regionStatBut = new Ext.ux.ImageButton({
 	imgHeight : 50,
 	tooltip : "区域统计",
 	handler : function(btn) {
-		if (!isPrompt) {
-			isPrompt = true;
-			regionStatWin.show();
-		}
+		regionStatWin.show();
 	}
 });
 
@@ -28,10 +25,7 @@ var discountStatBut = new Ext.ux.ImageButton({
 	imgHeight : 50,
 	tooltip : "折扣统计",
 	handler : function(btn) {
-		if (!isPrompt) {
-			isPrompt = true;
-			discountStatWin.show();
-		}
+		discountStatWin.show();
 	}
 });
 
@@ -140,7 +134,7 @@ var pushBackBut = new Ext.ux.ImageButton({
 	imgHeight : 50,
 	tooltip : "返回",
 	handler : function(btn) {
-		location.href = '../PersonLogin.html?'+ strEncode('restaurantID=' + restaurantID + '&isNewAccess=false', 'mi');
+		location.href = '../PersonLogin.html?'+ strEncode('restaurantID=' + restaurantID, 'mi');
 	}
 });
 

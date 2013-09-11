@@ -303,7 +303,7 @@ var passwordConfigWin = new Ext.Window({
 							Ext.getDom("errorMsgChangePwd").innerHTML = "密码并未修改";
 						} else {
 							passwordConfigWin.hide();
-							isPrompt = false;
+							
 							
 							if (adminLock == "YES") {
 								adminPwd = "<special_message:not_change>";
@@ -780,7 +780,7 @@ Ext.onReady(function() {
 		imgHeight : 50,
 		tooltip : "返回",
 		handler : function(btn) {
-			location.href = "../PersonLogin.html?"+ strEncode('restaurantID=' + restaurantID + '&isNewAccess=false', 'mi');
+			location.href = "../PersonLogin.html?"+ strEncode('restaurantID=' + restaurantID, 'mi');
 		}
 	});
 	

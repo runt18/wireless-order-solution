@@ -6,7 +6,7 @@
 		imgHeight : 50,
 		tooltip : "返回",
 		handler : function(btn) {
-			location.href = "../PersonLogin.html?"+ strEncode('restaurantID=' + restaurantID + '&isNewAccess=false', 'mi');
+			location.href = "../PersonLogin.html?"+ strEncode('restaurantID=' + restaurantID, 'mi');
 		}
 	});
 

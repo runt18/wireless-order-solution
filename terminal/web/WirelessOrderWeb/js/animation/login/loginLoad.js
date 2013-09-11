@@ -19,12 +19,11 @@ function loginOnLoad() {
 		success : function(res, opt) {
 			var jr = Ext.decode(res.responseText);
 			if(jr.success){
-				getOperatorName("../");
+				document.getElementById("optName").innerHTML = jr.other.staff.staffName;
 			}else{
 				Ext.Ajax.request({
 					url : "../QueryStaff.do",
 					params : {
-						"skipVerify" : 1,
 						"restaurantID" : restaurantID,
 						"type" : 0,
 						"isPaging" : false,
@@ -53,12 +52,7 @@ function loginOnLoad() {
 								}
 
 								emplStore.reload();
-								if (isNewAccess) {
-									personLoginWin.show();
-								} else {
-									//currPin = Request["pin"];
-									isVerified = true;
-								}
+								personLoginWin.show();
 							} else {
 								Ext.MessageBox.show({
 									msg : resultJSON.msg,

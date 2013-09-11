@@ -60,7 +60,7 @@
 //								currPageIndex = toolbar.readPage(toolbar
 //										.getPageData());
 //
-//								isPrompt = false;
+//								
 //								settingWin.hide();
 //
 //								var giftQuota = settingWin.findById(
@@ -118,7 +118,7 @@
 //					}, {
 //						text : "取消",
 //						handler : function() {
-//							isPrompt = false;
+//							
 //							settingWin.hide();
 //						}
 //					} ],
@@ -147,7 +147,7 @@
 //					f.focus.defer(100, f); // 为什么这样才可以！？！？
 //				},
 //				"hide" : function(thiz) {
-//					isPrompt = false;
+//					
 //				}
 //			}
 //		});

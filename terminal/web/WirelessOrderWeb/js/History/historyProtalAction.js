@@ -4,9 +4,7 @@
 				$(this).bind(
 						"click",
 						function() {
-							if (!isPrompt) {
-								location.href = "HistoryStatistics.html?"+ strEncode('restaurantID=' + restaurantID, 'mi');
-							}
+							location.href = "HistoryStatistics.html?"+ strEncode('restaurantID=' + restaurantID, 'mi');
 						});
 			});
 
