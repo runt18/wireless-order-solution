@@ -1,7 +1,3 @@
-//当前页
-var pageNow = 1;
-//设置一页显示的数目
-var	limit;
 //全部餐桌
 var tables = [];
 //设置就餐餐桌数组
@@ -14,8 +10,6 @@ var tempForRegion = [];
 var tempForAllStatus = [];
 //临时餐桌数组
 var temp = [];
-//总页数
-var n;
 //定义存在餐桌的区域id数组
 var regionId = [];
 var region = [];
@@ -32,6 +26,22 @@ var statusType = "";
  * 定时器，定时刷新餐桌选择页面数据
  */
 window.setInterval("initTables()", 240000);
+
+/**
+ * 餐桌分页包
+ */
+ts.tp = new Util.padding({
+	renderTo : 'divTableShowForSelect',
+	displayId : 'divDescForTableSelect-padding-msg',
+	templet : function(c){
+		return Templet.ts.boxTable.format({
+			dataIndex : c.dataIndex,
+			alias : c.data.alias,
+			tableName : c.data.name == "" || typeof c.data.name != 'string' ? c.data.alias + "号桌" : c.data.name,
+			dataClass : c.data.statusValue == '1' ? "\"table-base table-busy\"" : "\"table-base\""
+		});
+	}
+});
 
 /**
  * 初始化餐桌信息，保存到tables数组中
@@ -82,37 +92,20 @@ function initTables(){
 //					for(var i = 2; i < 12; i++){
 //						region.push({"id" : i, "name" : "临时区域"+i});
 //					}
-					
 					ts.rn.selectingId = 'divAllArea';
 					ts.rn.pageNow = 1;
 					var regionH = $("#divToolRightForSelect").height() - 6 * 65;
 					ts.rn.limit = Math.floor(regionH/62);
 					ts.rn.pageCount = Math.ceil(region.length/ts.rn.limit);
 					showRegion(region, ts.rn.pageNow);
-					
-//					//添加区域信息
-//					var regionHtml = "";
-//					
-//					for(x in region){
-//						regionHtml += "<div class='button-base regionSelect' id='region"+region[x].id+
-//							"' style='margin-bottom: 2px;' onclick='addTables(this)'>"+region[x].name+"</div>";		
-//					}
-//					$("#divShowRegion").html(regionHtml);
-					//设置区域未选中状态的背景色（#D4F640）
-//					$(".button-base.regionSelect").css("backgroundColor", "#D4F640");
-					//默认选中全部状态区域（#FFA07A）
-//					$("#divAllArea").css("backgroundColor", "#FFA07A");
 					//默认显示全部状态下的全部区域
 					statusType = "allStatus";
+					$("#divAllStatus").css("backgroundColor", "#FFA07A");
+					$("#busyForTableSelect").css("backgroundColor", "#D4F640");
+					$("#freeForTableSelect").css("backgroundColor", "#D4F640");
 					tempForAllStatus = tables;
 					temp = tables;
-					//根据实际窗口的大小设置limit
-					var width = $("#divTableShowForSelect").width();
-					var height = $("#divTableShowForSelect").height() - 1;
-					limit = Math.floor(width/102) * Math.floor(height/82);
-					n = Math.ceil(temp.length/limit) ; 
-					showTable(temp, pageNow);
-				}else{
+					showTable(temp);				}else{
 					Util.msg.alert({
 						title : data.title,
 						msg : data.msg, 
@@ -150,35 +143,13 @@ function showRegion(temp, pageNow){
 /**
  * 显示餐桌
  * @param {object} temp 需要显示的餐桌数组
- * @param {int} pageNow 当前页数
  */
-function showTable(temp, pageNow){	
+function showTable(temp){	
 	if(temp.length != 0){
-		var tableHtml = "";
-		var pageRoot = [];
-		var start = (pageNow-1) * limit;
-		var tableName;
-		pageRoot = getPagingData(start, limit, temp, true);
-		for(x in pageRoot){
-			if(pageRoot[x].name ==""){
-				tableName = pageRoot[x].alias + "号桌";
-			}else{
-				tableName = pageRoot[x].name;
-			}
-			tableHtml += "<div class = 'table-base' tableObject = " + JSON.stringify(pageRoot[x]) + " id = 'divtable" + pageRoot[x].alias +
-			"' onclick = 'selectTable(this)'> " + 
-			"<div style = 'margin-top: 25px; font-weight: bold;'>" + 
-			tableName + "</div>" + 
-			"<div style = 'color: #462B77; font-size: 10px;'>" + pageRoot[x].alias + "</div>" + 
-			"</div>";
-		}
-		$("#divTableShowForSelect").html(tableHtml);
-		//把占用的餐桌背景色改为占用色（#FFFF00）
-		for(x in busyTables){
-			$("#divtable" + busyTables[x].alias).css("backgroundColor", "#FF0");
-		}
-		$("#spanPageNowTS").html("第" + pageNow + "页/");
-		$("#spanAllPageTS").html("共" + n + "页");
+		ts.tp.init({
+		    data : temp
+		});
+		ts.tp.getFirstPage();
 	}else{
 		$("#divTableShowForSelect").html("");
 	}	
@@ -195,13 +166,13 @@ function hasTable(tableObject, tableNo){
 }
 
 /**
- * 根据餐桌id，返回餐桌对象
- * @param {int} tableId
+ * 根据餐桌alias，返回餐桌对象
+ * @param {int} tableAlias
  * @returns {object} 
  */
-function getTableBytableId(tableId){
+function getTableByAlias(tableAlias){
 	for(x in tables){
-		if(tables[x].alias == tableId){
+		if(tables[x].alias == tableAlias){
 			return tables[x];		
 		}
 	}
@@ -227,52 +198,12 @@ function getPagingData(start, limit, tempObject, isPaging){
 	return pageRoot;
 }
 
-//显示第一页
-function firstPage(){
-	if(temp.length != 0){
-		pageNow = 1;
-		showTable(temp, pageNow);
-	}
-}
-
-//显示最后一页
-function lastPage(){
-	if(temp.length != 0){
-		pageNow = n;
-		showTable(temp, pageNow);
-	}
-}
-
-//显示上一页
-function frontPage(){	
-	if(temp.length != 0){
-		if(pageNow == 1){
-			return;
-		}else{
-			pageNow --;
-		}
-		showTable(temp, pageNow);
-	}	
-}
-
-//显示下一页信息
-function nextPage(){
-	//判断是否为最后一页
-	if(temp.length != 0){
-		if(pageNow == n){
-			return;
-		}else{
-			pageNow ++;
-		}		
-		showTable(temp, pageNow);
-	}	
-}	
 
 /**
  * 区域上翻
  */
 ts.rn.prePage = function(){
-	if(ts.rn.pageNow < 2){
+	if(ts.rn.pageNow <= 1){
 		return;
 	}else{
 		ts.rn.pageNow = ts.rn.pageNow - 1;
@@ -291,12 +222,3 @@ ts.rn.nextPage = function(){
 		showRegion(region, ts.rn.pageNow);
 	}
 };
-
-
-
-
-
-
-
-
-
