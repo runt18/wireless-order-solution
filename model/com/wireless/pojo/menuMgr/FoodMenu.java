@@ -55,7 +55,7 @@ public class FoodMenu implements Parcelable{
 		specs = source.readParcelList(Taste.TASTE_CREATOR);
 		kitchens = source.readParcelList(Kitchen.KITCHEN_CREATOR);
 		depts = source.readParcelList(Department.DEPT_CREATOR);
-		discounts = source.readParcelList(Discount.DISCOUNT_CREATOR);
+		discounts = source.readParcelList(Discount.CREATOR);
 		reasons = source.readParcelList(CancelReason.CR_CREATOR);
 		deal();
 	}

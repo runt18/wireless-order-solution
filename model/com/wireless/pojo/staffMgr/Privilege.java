@@ -57,8 +57,8 @@ public class Privilege implements Comparable<Privilege>, Parcelable, Jsonable{
 		CANCEL_FOOD(1001, Cate.FRONT_BUSINESS, "退菜"),
 		DISCOUNT(1002, Cate.FRONT_BUSINESS, "折扣"),
 		GIFT(1003, Cate.FRONT_BUSINESS, "赠送"),
-		RE_PAID(1004, Cate.FRONT_BUSINESS, "反结帐"),
-		PAY(1005, Cate.FRONT_BUSINESS, "结帐"),
+		RE_PAYMENT(1004, Cate.FRONT_BUSINESS, "反结帐"),
+		PAYMENT(1005, Cate.FRONT_BUSINESS, "结帐"),
 		CHECK_ORDER(1006, Cate.FRONT_BUSINESS, "账单"),
 		BASIC(2000, Cate.BASIC, "后台"),
 		INVENTORY(3000, Cate.INVENTORY, "库存"),
@@ -212,7 +212,7 @@ public class Privilege implements Comparable<Privilege>, Parcelable, Jsonable{
 	public void createFromParcel(Parcel source) {
 		setCode(Code.valueOf(source.readInt()));
 		discounts.clear();
-		discounts.addAll(source.readParcelList(Discount.DISCOUNT_CREATOR));
+		discounts.addAll(source.readParcelList(Discount.CREATOR));
 	}
 
 	public final static Parcelable.Creator<Privilege> CREATOR = new Parcelable.Creator<Privilege>(){

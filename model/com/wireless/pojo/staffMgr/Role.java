@@ -110,9 +110,9 @@ public class Role implements Jsonable, Parcelable{
 			addPrivileges(new Privilege(Privilege.Code.HISTORY));
 			addPrivileges(new Privilege(Privilege.Code.INVENTORY));
 			addPrivileges(new Privilege(Privilege.Code.MEMBER));
-			addPrivileges(new Privilege(Privilege.Code.RE_PAID));
+			addPrivileges(new Privilege(Privilege.Code.RE_PAYMENT));
 			addPrivileges(new Privilege(Privilege.Code.SYSTEM));
-			addPrivileges(new Privilege(Privilege.Code.PAY));
+			addPrivileges(new Privilege(Privilege.Code.PAYMENT));
 			addPrivileges(new Privilege(Privilege.Code.CHECK_ORDER));
 		}
 	}
@@ -131,9 +131,9 @@ public class Role implements Jsonable, Parcelable{
 			addPrivileges(new Privilege(Privilege.Code.HISTORY));
 			addPrivileges(new Privilege(Privilege.Code.INVENTORY));
 			addPrivileges(new Privilege(Privilege.Code.MEMBER));
-			addPrivileges(new Privilege(Privilege.Code.RE_PAID));
+			addPrivileges(new Privilege(Privilege.Code.RE_PAYMENT));
 			addPrivileges(new Privilege(Privilege.Code.SYSTEM));
-			addPrivileges(new Privilege(Privilege.Code.PAY));
+			addPrivileges(new Privilege(Privilege.Code.PAYMENT));
 			addPrivileges(new Privilege(Privilege.Code.CHECK_ORDER));
 		}
 	}
@@ -152,8 +152,8 @@ public class Role implements Jsonable, Parcelable{
 			addPrivileges(new Privilege(Privilege.Code.HISTORY));
 			addPrivileges(new Privilege(Privilege.Code.INVENTORY));
 			addPrivileges(new Privilege(Privilege.Code.MEMBER));
-			addPrivileges(new Privilege(Privilege.Code.RE_PAID));
-			addPrivileges(new Privilege(Privilege.Code.PAY));
+			addPrivileges(new Privilege(Privilege.Code.RE_PAYMENT));
+			addPrivileges(new Privilege(Privilege.Code.PAYMENT));
 			addPrivileges(new Privilege(Privilege.Code.CHECK_ORDER));
 		}
 	}
@@ -168,8 +168,8 @@ public class Role implements Jsonable, Parcelable{
 			addPrivileges(new Privilege(Privilege.Code.CANCEL_FOOD));
 			addPrivileges(new Privilege(Privilege.Code.DISCOUNT));
 			addPrivileges(new Privilege(Privilege.Code.GIFT));
-			addPrivileges(new Privilege(Privilege.Code.RE_PAID));
-			addPrivileges(new Privilege(Privilege.Code.PAY));
+			addPrivileges(new Privilege(Privilege.Code.RE_PAYMENT));
+			addPrivileges(new Privilege(Privilege.Code.PAYMENT));
 			addPrivileges(new Privilege(Privilege.Code.CHECK_ORDER));
 			addPrivileges(new Privilege(Privilege.Code.BASIC));
 		}
@@ -185,8 +185,8 @@ public class Role implements Jsonable, Parcelable{
 			addPrivileges(new Privilege(Privilege.Code.CANCEL_FOOD));
 			addPrivileges(new Privilege(Privilege.Code.DISCOUNT));
 			addPrivileges(new Privilege(Privilege.Code.GIFT));
-			addPrivileges(new Privilege(Privilege.Code.RE_PAID));
-			addPrivileges(new Privilege(Privilege.Code.PAY));
+			addPrivileges(new Privilege(Privilege.Code.RE_PAYMENT));
+			addPrivileges(new Privilege(Privilege.Code.PAYMENT));
 			addPrivileges(new Privilege(Privilege.Code.CHECK_ORDER));
 		}
 	}

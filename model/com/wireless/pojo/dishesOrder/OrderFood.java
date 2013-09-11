@@ -149,7 +149,7 @@ public class OrderFood implements Parcelable, Comparable<OrderFood>, Jsonable {
 				throw new IllegalArgumentException("The count(" + countToRemove + ") to remove should be positive.");
 			}
 		}else{
-			throw new BusinessException(StaffError.PERMISSION_NOT_ALLOW);
+			throw new BusinessException(StaffError.CANCEL_FOOD_NOT_ALLOW);
 		}
 	}
 	
@@ -597,7 +597,7 @@ public class OrderFood implements Parcelable, Comparable<OrderFood>, Jsonable {
 		}
 	}
 	
-	public static Parcelable.Creator<OrderFood> OF_CREATOR = new Parcelable.Creator<OrderFood>() {
+	public static Parcelable.Creator<OrderFood> CREATOR = new Parcelable.Creator<OrderFood>() {
 		
 		public OrderFood[] newInstance(int size) {
 			return new OrderFood[size];

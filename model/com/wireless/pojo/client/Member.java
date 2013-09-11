@@ -555,7 +555,7 @@ public class Member implements Parcelable, Jsonable{
 		}
 	}
 	
-	public final static Parcelable.Creator<Member> MEMBER_CREATOR = new Parcelable.Creator<Member>() {
+	public final static Parcelable.Creator<Member> CREATOR = new Parcelable.Creator<Member>() {
 		
 		public Member[] newInstance(int size) {
 			return new Member[size];

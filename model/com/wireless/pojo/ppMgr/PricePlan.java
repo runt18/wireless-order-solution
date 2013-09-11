@@ -142,7 +142,7 @@ public class PricePlan implements Parcelable, Jsonable{
 		}
 	}
 	
-	public final static Parcelable.Creator<PricePlan> PP_CREATOR = new Parcelable.Creator<PricePlan>() {
+	public final static Parcelable.Creator<PricePlan> CREATOR = new Parcelable.Creator<PricePlan>() {
 		
 		public PricePlan[] newInstance(int size) {
 			return new PricePlan[size];

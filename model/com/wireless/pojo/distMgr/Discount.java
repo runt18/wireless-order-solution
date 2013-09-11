@@ -248,7 +248,7 @@ public class Discount implements Parcelable{
 		}
 	}
 	
-	public final static Parcelable.Creator<Discount> DISCOUNT_CREATOR = new Parcelable.Creator<Discount>() {
+	public final static Parcelable.Creator<Discount> CREATOR = new Parcelable.Creator<Discount>() {
 		
 		public Discount[] newInstance(int size) {
 			return new Discount[size];
