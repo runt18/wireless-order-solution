@@ -469,6 +469,10 @@
 				type = "com.wireless.Actions.login.VerifyLoginAction"
 				scope="request">
 		</action>
+		<action path="/LoginOut"
+				type = "com.wireless.Actions.login.LoginOutAction"
+				scope="request">
+		</action>
 		<action path="/QueryDevice"
 				type = "com.wireless.Actions.deviceMgr.QueryDeviceAction"
 				scope="request">
