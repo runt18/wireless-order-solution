@@ -2,7 +2,9 @@
 	$("#frontBusiness").each(function(){
 		$(this).bind("click", function() {
 			var href =  "FrontBusiness_Module/FrontBusinessProtal.html?"+ strEncode('restaurantID=' + restaurantID, 'mi');
-			verifyStaff('../', 1000, href);
+			verifyStaff('../', 1000, function(){
+				location.href = href;
+			});
 		});
 	});
 
@@ -21,6 +23,7 @@
 			Ext.Ajax.request({
 				url : '../LoginOut.do',
 				success : function(){
+					verifyLogin();
 					personLoginWin.show();
 				},
 				failure : function(){

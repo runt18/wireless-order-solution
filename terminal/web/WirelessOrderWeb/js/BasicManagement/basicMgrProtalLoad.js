@@ -273,14 +273,6 @@ function loginOnLoad() {
 		});
 	});
 
-	$("#staffMgr").each(function(){
-		$(this).hover(function(){
-			$(this).stop().css("background", "url(../../images/staffMgr_select.png) no-repeat 50%");
-		},
-		function(){
-			$(this).stop().css("background", "url(../../images/staffMgr.png) no-repeat 50%");
-		});
-	});
 	
 	$("#discountMgr").each(function(){
 		$(this).hover(function(){

@@ -15,6 +15,13 @@ function loginOnLoad() {
 		resturantMgr.show();
 	};
 	
+	$("#staffMgr").each(function() {
+		$(this).bind("click", function() {
+				location.href = "StaffManagement.html?"+ strEncode('restaurantID=' + restaurantID, 'mi');
+		});
+	});
+
+	
 	// update the operator name
 	getOperatorName("../../");
 
@@ -84,5 +91,16 @@ function loginOnLoad() {
 			$(this).stop().css("background", "url(../../images/resturantMgr_02.png) no-repeat 50%");
 		});
 	});
+	
+
+	$("#staffMgr").each(function(){
+		$(this).hover(function(){
+			$(this).stop().css("background", "url(../../images/staffMgr_select.png) no-repeat 50%");
+		},
+		function(){
+			$(this).stop().css("background", "url(../../images/staffMgr.png) no-repeat 50%");
+		});
+	});
+	
 	
 };

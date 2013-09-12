@@ -41,12 +41,6 @@
 		});
 	});
 	
-	$("#staffMgr").each(function() {
-		$(this).bind("click", function() {
-				location.href = "StaffManagement.html?"+ strEncode('restaurantID=' + restaurantID, 'mi');
-		});
-	});
-	
 	$("#discountMgr").each(function() {
 		$(this).bind("click", function() {
 				location.href = "DiscountManagement.html?"+ strEncode('restaurantID=' + restaurantID, 'mi');

@@ -1,19 +1,5 @@
-﻿// on page load function
-function loginOnLoad() {
-
-	var Request = new URLParaQuery();
-	restaurantID = Request["restaurantID"];
-	// for local test
-	if (restaurantID == undefined) {
-		restaurantID = "18";
-	}
-
-	// protal function register
-	protalFuncReg();
-
-	// emplData: [pin，姓名，密码]
-	// 后台格式：{success:true,
-	// data:'[0x1,"张宁远","d7a7b87838c6e3853f3f6d3bdc836a7c"]，[0x2,"李颖宜","6718853969f567306e3c753c32d3b88d"]'}
+﻿
+function verifyLogin(){
 	Ext.Ajax.request({
 		url : "../VerifyLogin.do",
 		success : function(res, opt) {
@@ -71,8 +57,29 @@ function loginOnLoad() {
 			
 		}
 	});
+}
 	
 
+
+
+// on page load function
+function loginOnLoad() {
+
+	var Request = new URLParaQuery();
+	restaurantID = Request["restaurantID"];
+	// for local test
+	if (restaurantID == undefined) {
+		restaurantID = "18";
+	}
+
+	// protal function register
+	protalFuncReg();
+
+	// emplData: [pin，姓名，密码]
+	// 后台格式：{success:true,
+	// data:'[0x1,"张宁远","d7a7b87838c6e3853f3f6d3bdc836a7c"]，[0x2,"李颖宜","6718853969f567306e3c753c32d3b88d"]'}
+
+	verifyLogin();
 
 	// update the operator name
 /*	if (currPin != "") {
