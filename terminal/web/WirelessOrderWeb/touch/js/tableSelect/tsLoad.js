@@ -22,26 +22,28 @@ var typeForInputTableNum;
 //设置当前状态类型（busy， free, allStatus）
 var statusType = "";
 
+$(function(){
+	/**
+	 * 餐桌分页包
+	 */
+	ts.tp = new Util.padding({
+		renderTo : 'divTableShowForSelect',
+		displayId : 'divDescForTableSelect-padding-msg',
+		templet : function(c){
+			return Templet.ts.boxTable.format({
+				dataIndex : c.dataIndex,
+				alias : c.data.alias,
+				tableName : c.data.name == "" || typeof c.data.name != 'string' ? c.data.alias + "号桌" : c.data.name,
+				dataClass : c.data.statusValue == '1' ? "\"table-base table-busy\"" : "\"table-base\""
+			});
+		}
+	});
+});
+
 /**
  * 定时器，定时刷新餐桌选择页面数据
  */
 window.setInterval("initTables()", 240000);
-
-/**
- * 餐桌分页包
- */
-ts.tp = new Util.padding({
-	renderTo : 'divTableShowForSelect',
-	displayId : 'divDescForTableSelect-padding-msg',
-	templet : function(c){
-		return Templet.ts.boxTable.format({
-			dataIndex : c.dataIndex,
-			alias : c.data.alias,
-			tableName : c.data.name == "" || typeof c.data.name != 'string' ? c.data.alias + "号桌" : c.data.name,
-			dataClass : c.data.statusValue == '1' ? "\"table-base table-busy\"" : "\"table-base\""
-		});
-	}
-});
 
 /**
  * 初始化餐桌信息，保存到tables数组中
@@ -49,77 +51,74 @@ ts.tp = new Util.padding({
  */
 function initTables(){
 	$('#spanStaffNameForDisplayToTS').html(staffData.staffName);
-		// 加载菜单数据
-		$.ajax({
-			url : '../QueryTable.do',
-			type : 'post',
-			data : {
-				random : Math.random(),
-			},
-			success : function(data, status, xhr){
-				tables = [];
-				busyTables = [];
-				freeTables = [];
-				region = [];
-				regionId = [];
-				data = eval("(" + data + ")");
-				if(data.success){
-					//把所有餐桌对象都放到本地数组tables中,freeTables存放空闲餐桌，busyTables存放就餐餐桌
-					for(x in data.root){	
-						if(data.root[x].statusValue == 0){
-							freeTables.push(data.root[x]);
-						}else if(data.root[x].statusValue == 1){
-							busyTables.push(data.root[x]);
-						}
-						tables.push(data.root[x]);
+	// 加载菜单数据
+	$.ajax({
+		url : '../QueryTable.do',
+		type : 'post',
+		data : {
+			random : Math.random(),
+		},
+		success : function(data, status, xhr){
+			tables = [];
+			busyTables = [];
+			freeTables = [];
+			region = [];
+			regionId = [];
+			data = eval("(" + data + ")");
+			if(data.success){
+				//把所有餐桌对象都放到本地数组tables中,freeTables存放空闲餐桌，busyTables存放就餐餐桌
+				for(x in data.root){	
+					if(data.root[x].statusValue == 0){
+						freeTables.push(data.root[x]);
+					}else if(data.root[x].statusValue == 1){
+						busyTables.push(data.root[x]);
 					}
-					//从tables数组中，遍历得到含有餐桌的区域数组region
-					region.push(tables[0].region);
-					regionId.push(tables[0].region.id);
-					for(x in tables){
-						var flag = false;
-						for(y in regionId){
-							if(regionId[y] == tables[x].region.id){		
-								flag = true;
-								break;
-							}			
-						}
-						if(!flag){
-							region.push(tables[x].region);
-							regionId.push(tables[x].region.id);
-						}
-					}
-//					for(var i = 2; i < 12; i++){
-//						region.push({"id" : i, "name" : "临时区域"+i});
-//					}
-					ts.rn.selectingId = 'divAllArea';
-					ts.rn.pageNow = 1;
-					var regionH = $("#divToolRightForSelect").height() - 6 * 65;
-					ts.rn.limit = Math.floor(regionH/62);
-					ts.rn.pageCount = Math.ceil(region.length/ts.rn.limit);
-					showRegion(region, ts.rn.pageNow);
-					//默认显示全部状态下的全部区域
-					statusType = "allStatus";
-					$("#divAllStatus").css("backgroundColor", "#FFA07A");
-					$("#busyForTableSelect").css("backgroundColor", "#D4F640");
-					$("#freeForTableSelect").css("backgroundColor", "#D4F640");
-					tempForAllStatus = tables;
-					temp = tables;
-					showTable(temp);
-				}else{
-					Util.msg.alert({
-						title : data.title,
-						msg : data.msg, 
-					});
+					tables.push(data.root[x]);
 				}
-			},
-			error : function(request, status, err){
+				//从tables数组中，遍历得到含有餐桌的区域数组region
+				region.push(tables[0].region);
+				regionId.push(tables[0].region.id);
+				for(x in tables){
+					var flag = false;
+					for(y in regionId){
+						if(regionId[y] == tables[x].region.id){		
+							flag = true;
+							break;
+						}			
+					}
+					if(!flag){
+						region.push(tables[x].region);
+						regionId.push(tables[x].region.id);
+					}
+				}
+				ts.rn.selectingId = 'divAllArea';
+				ts.rn.pageNow = 1;
+				var regionH = $("#divToolRightForSelect").height() - 6 * 65;
+				ts.rn.limit = Math.floor(regionH/62);
+				ts.rn.pageCount = Math.ceil(region.length/ts.rn.limit);
+				showRegion(region, ts.rn.pageNow);
+				//默认显示全部状态下的全部区域
+				statusType = "allStatus";
+				$("#divAllStatus").css("backgroundColor", "#FFA07A");
+				$("#busyForTableSelect").css("backgroundColor", "#D4F640");
+				$("#freeForTableSelect").css("backgroundColor", "#D4F640");
+				tempForAllStatus = tables;
+				temp = tables;
+				showTable(temp);
+			}else{
 				Util.msg.alert({
-					title : '温馨提示',
-					msg : err, 
+					title : data.title,
+					msg : data.msg, 
 				});
 			}
-		});	
+		},
+		error : function(request, status, err){
+			Util.msg.alert({
+				title : '温馨提示',
+				msg : err, 
+			});
+		}
+	});	
 }
 
 /**

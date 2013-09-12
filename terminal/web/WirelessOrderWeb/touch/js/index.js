@@ -245,6 +245,7 @@ function initStaffContent(c){
 		success : function(data, status, xhr){
 			Util.LM.hide();
 			if(data.success){
+				ln.restaurant = data.other.restaurant;
 				Util.dialongDisplay({
 					renderTo : 'divUserLogin',
 					type : 'show',
@@ -287,7 +288,7 @@ $(function(){
 			if(data.success){
 				staffData = data.other.staff;
 				loginSuccessCallback();
-			}else{
+			}else{	
 				initStaffContent();
 			}
 		},
@@ -428,19 +429,12 @@ function staffLoginHandler(c){
 function loginSuccessCallback(){
 	initFoodData();
 	
-	$.getScript('./js/tableSelect/tsLoad.js', function(){
-		toggleContentDisplay({
-			type:'show', 
-			renderTo:'divTableSelect'
-		});
-		initTables();
-		changeStaff({type:2});
+	toggleContentDisplay({
+		type:'show', 
+		renderTo:'divTableSelect'
 	});
-	
-	$.getScript('./js/tableSelect/tsMain.js');
-	
-	$.getScript('./js/updateOrder/uoLoad.js');
-	$.getScript('./js/updateOrder/uoMain.js');
+	initTables();
+	changeStaff({type:2});
 }
 /**
  * 

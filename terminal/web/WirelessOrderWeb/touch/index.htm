@@ -21,6 +21,10 @@ var foodData = {}, kitchenFoodData = {}, kitchenData = {}, deptData = {root:[]},
 function getDom(id){
 	return document.getElementById(id);
 }
+//登录操作包
+var ln = {
+	restaurant : {}
+}
 //餐桌选择包,tt：转台, rn: 区域
 var ts = {
 	table : {},
@@ -43,16 +47,15 @@ var uo = {
 	cf : {}
 }
 </script>
-<!-- <script type="text/javascript" src="./js/tableSelect/tsLoad.js"></script>
+<script type="text/javascript" src="./js/tableSelect/tsLoad.js"></script>
 <script type="text/javascript" src="./js/tableSelect/tsMain.js"></script>
 <script type="text/javascript" src="./js/updateOrder/uoLoad.js"></script>
-<script type="text/javascript" src="./js/updateOrder/uoMain.js"></script> -->
+<script type="text/javascript" src="./js/updateOrder/uoMain.js"></script>
 <script type="text/javascript" src="./js/index.js"></script>
 </head>
-<body>
+<body style = "background : url(../images/book.png)">
 
-<div class="content content-box-base" style="z-index:9990;">&nbsp;</div>
-
+<div class="content content-box-base" style="z-index:9990;"></div>
 <div id="divUserLogin" class="box-horizontal content-box-base">
 	<div class="box-vertical" style="width: 330px;">
 		<div id="divAllStaffForUserLogin" style="-webkit-box-flex: 1; overflow-y: auto;"></div>
