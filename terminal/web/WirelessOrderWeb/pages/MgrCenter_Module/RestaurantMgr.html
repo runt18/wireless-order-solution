@@ -24,7 +24,6 @@
 <script type="text/javascript" src="../../js/components/md5.js"></script>
 <script type="text/javascript" src="../../js/components/Encrypt.js"></script>
 <script type="text/javascript" src="../../js/components/functionLib.js"></script>
-<script type="text/javascript" src="../../extjs/examples.js"></script>
 
 <script type="text/javascript">
 	Ext.onReady(function(){
@@ -32,15 +31,16 @@
 	});
 	var Request = new URLParaQuery();
 	var restaurantID = Request["restaurantID"];
-	var filterTypeDate = [[0, '全部'], [1, '餐厅编号'], [2, '餐厅名称']];
+	var encrypt = 'oxthi9';
 </script>
 
-<script type="text/javascript" src="../../js/BasicManagement/deviceMgr/deviceMgrMain.js"></script>
-
+<script type="text/javascript" src="../../js/BasicManagement/managementCenter/restaurantMgrMain.js"></script>
 </head>
 <body>
+<script type="text/javascript" src="../../extjs/examples.js"></script>
 <div id = "north"></div>
 <div id = "center"></div>
 <div id = "south"></div>
+
 </body>
 </html>
