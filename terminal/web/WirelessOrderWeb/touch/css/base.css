@@ -193,6 +193,13 @@ body{ overflow: hidden; }
 	font-size: 25px;
 	font-weight: bold; 
 }
+.msg-base > div[data-type="time"]{
+	width: 100%;
+	line-height: 20px;
+	text-align: center;
+	color: red;
+	background-color: #fff;
+}
 .msg-base > div[data-type="button"]{
 	width: 100%;
 	line-height: 60px;

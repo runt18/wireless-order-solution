@@ -19,7 +19,7 @@
 }
 #divSelectDeptForOrder{
 	width: 100%; 
-	overflow-y: auto;
+	overflow: hide;
 	height: 60px;
 }
 
@@ -29,7 +29,7 @@
 }
 #divSelectKitchenForOrder{
 	width: 100%; 
-	overflow-y: auto;
+	overflow: hide;
 	margin-top: 1px;
 	height: 60px;
 }
