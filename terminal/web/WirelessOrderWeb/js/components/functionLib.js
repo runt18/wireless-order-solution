@@ -164,7 +164,7 @@ function getOperatorName(actionPath) {
 			
 			if(jr.success){
 				if(jr.other.name != null){
-					operatorName = jr.other.name;
+					operatorName = jr.other.staff.staffName;
 				}
 				document.getElementById("optName").innerHTML = operatorName;
 			}else{
