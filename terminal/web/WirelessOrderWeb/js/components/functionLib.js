@@ -163,7 +163,7 @@ function getOperatorName(actionPath) {
 			var jr = Ext.util.JSON.decode(response.responseText);
 			
 			if(jr.success){
-				if(jr.other.name != null){
+				if(jr.other.staff != null){
 					operatorName = jr.other.staff.staffName;
 				}
 				document.getElementById("optName").innerHTML = operatorName;

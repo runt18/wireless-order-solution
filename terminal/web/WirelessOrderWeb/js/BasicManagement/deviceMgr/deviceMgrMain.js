@@ -5,7 +5,7 @@ var pushBackBut = new Ext.ux.ImageButton({
 	imgHeight : 50,
 	tooltip : '返回',
 	handler : function(btn){
-		location.href = 'BasicMgrProtal.html?' + strEncode("restaurantID="+restaurantID, "mi");
+		location.href = '../MgrCenter.html';
 	}
 });
 
@@ -124,7 +124,7 @@ var addDeviceWin = new Ext.Window({
 		}, {
 			xtype : 'textfield',
 			id : 'txtDeviceId',
-			fieldLabel : 'PIN',
+			fieldLabel : '设备编号',
 			width : 140,
 			allowBlank : false
 		}, {
@@ -337,6 +337,47 @@ var cm = new Ext.grid.ColumnModel([
 	{header : '状态', dataIndex : 'statusText', width : 200},
 	{header : '操作', dataIndex : 'optDevice', align: 'center', id : 'optDevice', renderer : optDevice, width : 200}
 ]);
+var filterComb = new Ext.form.ComboBox({
+	fidldLabel : '过滤',
+	forceSelection : true,
+	width : 100,
+	value : '全部',
+	id : 'comboFilter',
+	store : new Ext.data.SimpleStore({
+		fields : [ 'value', 'text' ],
+		data : filterTypeDate
+	}),
+	valueField : 'value',
+	displayField : 'text',
+	typeAhead : true,
+	mode : 'local',
+	triggerAction : 'all',
+	selectOnFocus : true,
+	allowBlank : false,
+	readOnly : true,
+	listeners : {
+		select : function(combo, record, index){
+			var rId = Ext.getCmp('txtRestaurantId');
+			var rName = Ext.getCmp('txtRestaurantName');
+			rId.setValue('');
+			rName.setValue('');
+			if(index == 0){
+				rId.setVisible(false);
+				rName.setVisible(false);
+			}else if (index == 1){
+				rId.setVisible(true);
+				rName.setVisible(false);
+				
+			}else if(index == 2){
+				rId.setVisible(false);
+				rName.setVisible(true);
+			};
+		}
+	}
+	
+});
+
+
 var deviceGrid;
 Ext.onReady(function(){
 	Ext.BLANK_IMAGE_URL = '../../extjs/resources/images/default/s.gif';
@@ -359,18 +400,33 @@ Ext.onReady(function(){
 		tbar : new Ext.Toolbar({
 			items : [{
 				xtype : 'tbtext',
-				text : '餐厅编号: '
+				text : '过滤: '
+			},{xtype : 'tbtext',text : '&nbsp;&nbsp;'},
+			filterComb,
+			{xtype : 'tbtext',text : '&nbsp;&nbsp;'},
+			{
+				xtype : 'textfield',
+				id : 'txtRestaurantId',
+				width : 120,
+				hidden : true
 			},{
 				xtype : 'textfield',
-				id : 'restaurantId',
-				width : 120
+				id : 'txtRestaurantName',
+				width : 120,
+				hidden : true,
+				listeners : {
+					focus : function(thiz){
+						thiz.focus(true, 100);
+					}
+				}
 			}, '->', {
 				id : 'btnSearch',
 				text : '搜索',
 				iconCls : 'btn_search',
 				handler : function(){
 					var store = deviceGrid.getStore();
-					store.baseParams['rId'] = Ext.getCmp('restaurantId').getValue();
+					store.baseParams['rId'] = Ext.getCmp('txtRestaurantId').getValue();
+					store.baseParams['rName'] = Ext.getCmp('txtRestaurantName').getValue();
 					store.load();
 				}
 			}]
@@ -410,7 +466,7 @@ Ext.onReady(function(){
 		items : [{
 			region : 'north',
 			bodyStyle : 'background-color:#DFE8F6;',
-			html : "<h4 style='padding:10px;font-size:150%;float:left;'>无线点餐网页终端</h4>" +
+			html : "<h4 style='padding:10px;font-size:150%;float:left;'>Digi-e管理中心</h4>" +
 				"<div id='optName' class='optName'></div>",
 			height : 50,
 			border : false,

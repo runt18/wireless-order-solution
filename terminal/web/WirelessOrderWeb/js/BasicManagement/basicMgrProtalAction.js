@@ -66,18 +66,5 @@
 					+ restaurantID, "mi");
 		});
 	});
-	
-	$("#managementCenter").each(function() {
-		$(this).bind("click", function() {
-				location.href = "RestaurantMgr.html?"+strEncode("restaurantID="
-					+ restaurantID, "mi");
-		});
-	});
-	$("#deviceMgr").each(function() {
-		$(this).bind("click", function() {
-				location.href = "DeviceMgr.html?"+strEncode("restaurantID="
-					+ restaurantID, "mi");
-		});
-	});
 
 };

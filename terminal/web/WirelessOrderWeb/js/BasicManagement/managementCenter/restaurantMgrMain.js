@@ -4,7 +4,7 @@ var pushBackBut = new Ext.ux.ImageButton({
 	imgHeight : 50,
 	tooltip : '返回',
 	handler : function(btn){
-		location.href = 'BasicMgrProtal.html?'+strEncode("restaurantID=" + restaurantID, "mi");
+		location.href = '../MgrCenter.html';
 	}
 });
 
@@ -470,7 +470,7 @@ Ext.onReady(function(){
 		items : [{
 			region : 'north',
 			bodyStyle : 'background-color:#DFE8F6;',
-			html : "<h4 style='padding:10px;font-size:150%;float:left;'>无线点餐网页终端</h4><div id='optName' class='optName'></div>",
+			html : "<h4 style='padding:10px;font-size:150%;float:left;'>Digi-e管理中心</h4><div id='optName' class='optName'></div>",
 			height : 50,
 			border : false,
 			margins : '0 0 0 0'
