@@ -23,7 +23,6 @@ import com.wireless.json.JObject;
 import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.util.DataPaging;
-import com.wireless.util.WebParams;
 
 public class QueryStaffAction extends Action {
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
@@ -117,16 +116,16 @@ public class QueryStaffAction extends Action {
 			jobject.setMsg("normal");
 			
 
+		}catch (BusinessException e){
+			e.printStackTrace();
+			jobject.initTip(e);
 		} catch (SQLException e) {
 			e.printStackTrace();
-			jobject.initTip(false, "数据库请求发生错误，请确认网络是否连接正常");
+			jobject.initTip(e);
 
 		} catch (IOException e) {
 			e.printStackTrace();
 			jobject.initTip(false, "未处理异常");
-		}catch (BusinessException e){
-			e.printStackTrace();
-			jobject.initTip(false, WebParams.TIP_TITLE_DEFAULT, e.getMessage());
 		} finally {
 			jobject.setOther(other);
 			out.write(jobject.toString());
