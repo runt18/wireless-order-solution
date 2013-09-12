@@ -93,8 +93,8 @@ var uo = {
 		<div id="divToolRightForSelect" class="box-vertical" style = "line-height: 60px;">
 			<div  id = "divAllStatus" class="button-base" style="margin-bottom: 2px;" onclick="showStatus()">全部状态	</div>
 			<div id = "divStatus" style =  " display: none; margin-bottom: 2px;">
-					<div class="button-base" id = "freeForTableSelect" style = "margin-bottom: 2px; background-color: #F1C40D">空闲</div>
-					<div class="button-base" id = "busyForTableSelect" style = "margin-bottom: 2px; background-color: #F1C40D">就餐</div>
+					<div class="button-base" id = "freeForTableSelect" style = "margin-bottom: 2px; background-color: #F1C40D" onclick = "ts.selectFreeStatus()">空闲</div>
+					<div class="button-base" id = "busyForTableSelect" style = "margin-bottom: 2px; background-color: #F1C40D" onclick = "ts.selectBusyStatus()">就餐</div>
 			</div>
 			<div class="button-base" id = "divAllArea" style="margin-bottom: 2px;" onclick="addTables('allTable')">全部区域</div>
 			<div id="divShowRegion"></div>
