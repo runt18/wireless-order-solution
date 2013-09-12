@@ -219,16 +219,15 @@ function verifyStaff(actionPath, code, callback){
 		},
 		success : function(res, opt){
 			var jr = Ext.decode(res.responseText);
-			if(jr.success){
-				if(typeof callback == 'string'){
+			if(typeof callback == 'function'){
+				callback(jr);
+			}else if(typeof callback == 'string'){
+				if(jr.success){
 					location.href = callback;
-				}else if(typeof callback == 'function'){
-					callback();
+				}else{
+					jr['icon'] = Ext.MessageBox.WARNING;
+					Ext.ux.showMsg(jr);
 				}
-					
-			}else{
-				jr['icon'] = Ext.MessageBox.WARNING;
-				Ext.ux.showMsg(jr);
 			}
 		},
 		failure : function(res, opt){
