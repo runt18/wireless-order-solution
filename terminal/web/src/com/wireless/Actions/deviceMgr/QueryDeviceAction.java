@@ -14,7 +14,6 @@ import org.apache.struts.action.ActionMapping;
 import com.wireless.db.staffMgr.DeviceDao;
 import com.wireless.json.JObject;
 import com.wireless.pojo.staffMgr.Device;
-import com.wireless.util.WebParams;
 
 public class QueryDeviceAction extends Action{
 
@@ -24,11 +23,13 @@ public class QueryDeviceAction extends Action{
 		JObject jobject = new JObject();
 		List<Device> devices ;
 		String rId = request.getParameter("rId");
-		
+		String rName = request.getParameter("rName");
 		String extraCond = "", orderClause = null;
 		try{
-			if(rId != null){
-				extraCond += " AND restaurant_id = " + rId;
+			if(rId != null && !rId.trim().isEmpty()){
+				extraCond += " AND DEV.restaurant_id = " + rId;
+			}else if(rName != null && !rName.trim().isEmpty()){
+				extraCond += " AND RES.restaurant_name LIKE '%" + rName + "%' ";
 			}
 			devices = DeviceDao.getDevices(extraCond, orderClause);
 			
@@ -38,10 +39,10 @@ public class QueryDeviceAction extends Action{
 			
 		}catch(SQLException e){
 			e.printStackTrace();
-			jobject.initTip(false, "数据库请求发生错误，请确认网络是否连接正常");
+			jobject.initTip(e);
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
+			jobject.initTip(e);
 		}finally{
 			response.getWriter().print(jobject.toString());
 		}
