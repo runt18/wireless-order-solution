@@ -16,9 +16,11 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
+import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
+import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.util.DataPaging;
 import com.wireless.util.WebParams;
@@ -103,9 +105,12 @@ public class QueryStaffAction extends Action {
 				other.put("staff", staff);
 			}else {
 				staffList = StaffDao.getStaffs(Integer.parseInt(restaurantID));
+				Restaurant restaurant = RestaurantDao.getById(Integer.parseInt(restaurantID));
+				other.put("restaurant", restaurant);
 				jobject.setTotalProperty(staffList.size());
 				staffList = DataPaging.getPagingData(staffList, isPaging, index, pageSize);
 				jobject.setRoot(staffList);
+				jobject.setOther(other);
 			}
 			
 			
