@@ -114,6 +114,7 @@ function initFoodData(){
 					},
 					success : function(data, status, xhr){
 						if(data.success){
+							tasteData = {};
 							tasteData = {totalProperty:data.root.length, root:data.root.slice(0)};
 						}else{
 							alert('初始化口味数据失败.');
@@ -153,6 +154,7 @@ function initFoodData(){
 					success : function(data, status, xhr){
 						Util.LM.hide();
 						if(data.success){
+							deptData = {root:[]};
 							kitchenData = {totalProperty:data.root.length, root:data.root.slice(0)};
 							kitchenFoodData = {totalProperty:data.root.length, root:data.root.slice(0)};
 							var tempFoodData = foodData.root.slice(0);
@@ -439,4 +441,16 @@ function loginSuccessCallback(){
 	
 	$.getScript('./js/updateOrder/uoLoad.js');
 	$.getScript('./js/updateOrder/uoMain.js');
+}
+/**
+ * 
+ */
+function logout(){
+	Util.LM.show();
+	$.ajax({
+		url : '../LoginOut.do',
+		success : function(data, status, xhr){
+			initStaffContent();
+		}	
+	});
 }
