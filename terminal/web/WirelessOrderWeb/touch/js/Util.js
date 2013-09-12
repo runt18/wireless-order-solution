@@ -214,10 +214,28 @@ Util.dialongDisplay = function(c){
  */
 Util.msg = {
 	event : [],
+	interval : [],
 	fireEvent : function(btn, id){
 		for(var i = 0; i < this.event.length; i++){
 			if(this.event[i].id == id && typeof this.event[i].fn == 'function'){
 				this.event[i].fn(btn);
+				break;
+			}
+		}
+	},
+	clearEvent : function(id){
+		for(var i = 0; i < this.event.length; i++){
+			if(this.event[i].id == id){
+				this.event.splice(i, 1);
+				break;
+			}
+		}
+	},
+	clearInterval : function(id){
+		for(var i = 0; i < this.interval.length; i++){
+			if(this.interval[i].id == id){
+				clearInterval(this.interval[i].interval);
+				this.interval.splice(i, 1);
 				break;
 			}
 		}
@@ -227,6 +245,7 @@ Util.msg = {
 		var content = '<div id="'+id+'" class="box-vertical msg-base">'
 			+ '<div data-type="title">'+(typeof c.title != 'string' || $.trim(c.title).length == 0 ? '提示' : c.title)+'</div>'
 			+ '<div data-type="content">'+c.msg+'</div>'
+			+ (typeof c.time == 'number' ? '<div data-type="time">&nbsp;</div>' : '')
 			+ '<div data-type="button" class="box-horizontal">'
 				+ '<div class="div-full"></div>'
 				+ '<div class="button-base" style="width:150px;" onClick="Util.msg.save({event:\'yes\', id:\''+id+'\'})">确定</div>'
@@ -248,6 +267,7 @@ Util.msg = {
 			if(!dom)
 				break;
 		}
+		dom = null;
 		return id;
 	},
 	save : function(c){
@@ -263,30 +283,51 @@ Util.msg = {
 			remove : true
 		});
 		this.fireEvent(c.event, c.id);
-		for(var i = 0; i < this.event.length; i++){
-			if(this.event[i].id == c.id){
-				this.event.splice(i, 1);
-				break;
-			}
-		}
+		this.clearEvent(c.id);
+		this.clearInterval(c.id);
 	},
 	alert : function(c){
 		var content = this.createContent({
 			title : c.title,
 			msg : c.msg,
 			fn : c.fn,
-			buttons : c.buttons
+			buttons : c.buttons,
+			time : c.time
 		});
 		document.body.insertAdjacentHTML('beforeEnd', content.content);
 		Util.dialongDisplay({
 			renderTo : content.id,
 			type : 'show'
 		});
-		if(typeof c.fn == 'function'){
-			this.event.push({
+		if(typeof c.time == 'number'){
+			var to = null, t = c.time;
+			to = setInterval(function(){
+				if(t == 0){
+					Util.msg.clearInterval(c.id);
+					Util.msg.hide({
+						event : 'back', 
+						id : content.id
+					});
+					if(typeof c.timeout == 'function'){
+						c.timeout();
+					}
+					to = null;
+					return;
+				}
+				$('#'+content.id+' > div[data-type=time]').html(t + ' 秒后自动关闭.');
+				t--;
+			}, 1000);
+			this.interval.push({
 				id : content.id,
-				fn : c.fn
+				interval : to
 			});
+		}else{
+			if(typeof c.fn == 'function'){
+				this.event.push({
+					id : content.id,
+					fn : c.fn
+				});
+			}
 		}
 	}
 };
