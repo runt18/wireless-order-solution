@@ -1,5 +1,6 @@
 package com.wireless.Actions.login;
 
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -14,7 +15,6 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.staffMgr.StaffDao;
-import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.staffMgr.Staff;
 
@@ -39,11 +39,11 @@ public class OperateStaffAction extends Action{
 				jobject.setOther(other);
 				jobject.initTip(true, "登陆成功");
 			}else{
-				throw new BusinessException("密码输入错误!");
+				jobject.initTip(false, "密码输入错误");
 			}
 			
 
-		}catch(BusinessException e){
+		}catch(SQLException e){
 			e.printStackTrace();
 			jobject.initTip(e);
 		}catch(Exception e){
