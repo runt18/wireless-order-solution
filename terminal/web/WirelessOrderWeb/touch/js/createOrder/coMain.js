@@ -473,19 +473,13 @@ co.submit = function(){
 			if (data.success == true) {
 				Util.msg.alert({
 					title : data.title,
-					msg : data.msg + '<br>是否退出登陆?',
-					buttons : 'YESBACK',
-					fn : function(btn){
-						if(btn == 'yes'){
-							initStaffContent();
-							co.back();
-							uo.cancelForUO();
-						}else{
-							if(co.callback != null && typeof co.callback == 'function'){
-								co.callback();
-								co.back();
-							}
+					msg : data.msg,
+					time : 3,
+					timeout : function(btn){
+						if(co.callback != null && typeof co.callback == 'function'){
+							co.callback();
 						}
+						co.back();
 					}
 				});
 			} else {
