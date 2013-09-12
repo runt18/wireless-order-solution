@@ -14,31 +14,39 @@ import org.apache.struts.actions.DispatchAction;
 import com.wireless.db.staffMgr.PrivilegeDao;
 import com.wireless.db.staffMgr.RoleDao;
 import com.wireless.db.staffMgr.StaffDao;
+import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.distMgr.Discount;
 import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.staffMgr.Privilege.Code;
 import com.wireless.pojo.staffMgr.Role;
 import com.wireless.pojo.staffMgr.Staff;
-import com.wireless.util.WebParams;
 
 public class QueryPrivilegeAction extends DispatchAction{
 
 	public ActionForward normal(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception{
 		response.setCharacterEncoding("UTF-8");
 		JObject jobject = new JObject();
-		List<Privilege> root = null;
 		String pin = (String) request.getAttribute("pin");
+		String roleId = request.getParameter("roldId");
+		List<Privilege> rolePrivilege = new ArrayList<Privilege>();
 		try{
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
-			root = PrivilegeDao.getPrivileges(staff, null, null);
+			//根据id获取role
+			Role role = RoleDao.getRoleById(staff, Integer.parseInt(roleId));
+			if(role != null){
+				rolePrivilege = role.getPrivileges();
+			}
+		}catch(BusinessException e){
+			e.printStackTrace();
+			jobject.initTip(e);
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, WebParams.TIP_CODE_EXCEPTION, WebParams.TIP_CONTENT_SQLEXCEPTION);
+			jobject.initTip(e);
 		}finally{
-			if(root != null){
-				jobject.setTotalProperty(root.size());
-				jobject.setRoot(root);
+			if(!rolePrivilege.isEmpty()){
+				jobject.setTotalProperty(rolePrivilege.size());
+				jobject.setRoot(rolePrivilege);
 				
 			}
 			response.getWriter().print(jobject.toString());

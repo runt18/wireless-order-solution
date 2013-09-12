@@ -36,7 +36,7 @@ public class QueryStaffAction extends Action {
 		
 		JObject jobject = new JObject();
 		List<Staff> staffList = new ArrayList<Staff>();
-		Staff name = new Staff();
+		Staff staff = new Staff();
 		int index = 0;
 		int pageSize = 0;
 		if (!(start == null)) {
@@ -99,8 +99,8 @@ public class QueryStaffAction extends Action {
 				filterCondition = "";
 			}*/
 			if(pin != null && isName != null){
-				name = StaffDao.verify(Integer.parseInt(pin));
-				other.put("name", name.getName());
+				staff = StaffDao.verify(Integer.parseInt(pin));
+				other.put("staff", staff);
 			}else {
 				staffList = StaffDao.getStaffs(Integer.parseInt(restaurantID));
 				jobject.setTotalProperty(staffList.size());
