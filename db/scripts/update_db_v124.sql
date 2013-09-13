@@ -406,3 +406,9 @@ ADD COLUMN `birth_date` DATE NULL DEFAULT NULL  AFTER `account` ,
 ADD COLUMN `liveness` FLOAT NOT NULL DEFAULT 0  AFTER `expire_date` ;
 
 UPDATE `wireless_order_db`.`restaurant` SET birth_date = '2013-01-01 00:00:00';
+
+-- -----------------------------------------------------
+-- Drop the view `restaurant_view` & 'terminal_view'
+-- -----------------------------------------------------
+DROP VIEW IF EXISTS restaurant_view;
+DROP VIEW IF EXISTS terminal_view;
