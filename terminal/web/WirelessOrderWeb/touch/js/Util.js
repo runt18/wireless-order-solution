@@ -186,16 +186,6 @@ Util.dialongDisplay = function(c){
 		if(typeof c.isTop == 'boolean' && typeof c.isTop){
 			lm.removeClass('dialong-lm-show');
 			lm.addClass('dialong-lm-show-top');
-			lm.css("background", 'url(../images/login-bgd.jpg) no-repeat');
-			lm.css("backgroundSize", 'cover');
-			var html = "<div class = 'box-vertical'>"
-					+ "<div style = 'line-height : 150px; font-size : 50px; font-weight: bold; margin-left : 80px;'>"
-					+ "<span style = 'color : red'>" + ln.restaurant.name + "</span>餐馆欢迎您</div>"
-					+ "<div class = 'div-full' style='-webkit-box-flex: 1;'></div>"
-					+ "<div style = 'line-height : 100px'>智易科技：www.digi-e.com</div>"
-					+ "</div>";
-			lm.html(html);
-			
 		}else{
 			lm.removeClass('dialong-lm-show-top');
 			lm.addClass('dialong-lm-show');

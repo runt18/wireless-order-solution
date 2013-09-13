@@ -83,14 +83,7 @@
 	height: 60px;
 	line-height: 60px;
 }
-#divFootForTableSelect{
-	margin-top: 5px; 
-	font-size: 15px; 
-	font-weight: bold; 
-	color: #A27600;
-	height: 18px;
-	width: 100%;
-}
+
 .desk-number{
 	height: 59px; 
 	width:110px; 
@@ -105,19 +98,6 @@
 	font-size: 28px;
 	padding-left: 2px;
 	background-color: yellow;
-}
-
-.table-base{
-	margin: 5px;
-	float: left;
-	width: 90px;
-	height: 70px;
-	border:1px solid #333;
-	background-color: #87CEEA;
-	text-align: center;
-}
-.table-base:active{
-	background: #4CB848;
 }
 .table-busy{
 	background-color: #FF0;

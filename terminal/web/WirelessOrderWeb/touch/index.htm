@@ -53,7 +53,7 @@ var uo = {
 <script type="text/javascript" src="./js/updateOrder/uoMain.js"></script>
 <script type="text/javascript" src="./js/index.js"></script>
 </head>
-<body style = "background : url(../images/book.png)">
+<body>
 
 <div class="content content-box-base" style="z-index:9990;"></div>
 <div id="divUserLogin" class="box-horizontal content-box-base">
@@ -106,8 +106,10 @@ var uo = {
 			<div class="button-base" style="margin-bottom: 2px;" onclick = "ts.rn.nextPage()">下翻</div>
 		</div>
 	</div>
-  	<div id="divDescForTableSelect" class="box-horizontal" style=" border-bottom: 1px solid #FFF; border-top: 1px solid #FFF; line-height: 25px; background: #FFD700;">
-  		<div id="divDescForTableSelect-padding-msg" style="-webkit-box-flex: 1; text-align: right; font-weight: bold;"></div>
+  	<div id="divDescForTableSelect" class="box-horizontal" style="font-weight: bold; border-bottom: 1px solid #FFF; border-top: 1px solid #FFF; line-height: 25px; background: #FFD700;">
+  		<div style="margin: 0 10px; font-size : 15px;">操作员：<span id="spanStaffNameForDisplayToTS"></span></div>	
+		<div class="div-full"></div>
+  		<div id="divDescForTableSelect-padding-msg" style="text-align: right;"></div>
   	</div>
 	<div id="divToolBottomForSelect" class="box-horizontal">
 	    <div class="button-base" style="margin-right: 2px;" onClick="logout()">注销</div>
@@ -118,12 +120,6 @@ var uo = {
 		<div class="button-base" style="margin-right: 2px;" onclick="ts.tp.getPreviousPage()">上一页</div>
 		<div class="button-base" style="margin-right: 2px;" onclick="ts.tp.getNextPage()">下一页</div>
 		<div class="button-base" style="margin-right: 2px;" onclick="ts.tp.getLastPage()">尾页</div>		
-	</div>
-	<div id="divFootForTableSelect" class="box-horizontal">
-		<div style="margin: 0 10px">收银员：<span id="spanStaffNameForDisplayToTS"></span></div>	
-		<div class="div-full"></div>
-		<div id = "spanPageNowTS" style = "margin-right: 0px;"></div>
-		<div id = "spanAllPageTS" style= "margin-right: 120px;"></div>
 	</div>
 </div>
 

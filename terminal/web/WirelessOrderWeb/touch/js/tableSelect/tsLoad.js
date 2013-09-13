@@ -33,8 +33,9 @@ $(function(){
 			return Templet.ts.boxTable.format({
 				dataIndex : c.dataIndex,
 				alias : c.data.alias,
+				dataClass : c.data.statusValue == '1' ? "\"main-box-base table-busy\"" : "\"main-box-base\"",
 				tableName : c.data.name == "" || typeof c.data.name != 'string' ? c.data.alias + "号桌" : c.data.name,
-				dataClass : c.data.statusValue == '1' ? "\"table-base table-busy\"" : "\"table-base\""
+				customNum : c.data.statusValue == 1 ? c.data.customNum + '人用餐' : '',
 			});
 		}
 	});

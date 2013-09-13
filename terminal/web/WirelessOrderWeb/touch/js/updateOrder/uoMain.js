@@ -557,6 +557,7 @@ uo.submitUpdateOrderHandler = function(c){
 					msg : data.msg, 
 					fn : function(btn){
 						toggleContentDisplay({type:'hide', renderTo:'divUpdateOrder'});
+						initTables();
 					}
 				});
 			},

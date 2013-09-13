@@ -40,10 +40,11 @@ var Templet = {
 		allStaff : '<div data-value={id} class="main-box-base" style="line-height: 70px; text-align: center;" onClick="changeStaff({event:this, type:1, staffId:{id}})">{name}</div>'
 	},
 	ts : {
-		boxTable : '<div data-index = {dataIndex} data-alias = {alias} class = {dataClass}'
+		boxTable : '<div data-index = {dataIndex} data-alias = {alias} class = {dataClass} style = "text-align : center;" '
 			+ 'onclick = "ts.selectTable({event : this, tableAlias : {alias}})">'
-			+ '<div style = "margin-top : 25px; font-weight : bold;">{tableName}</div>'
+			+ '<div style = "font-weight : bold; margin-top : 20px;">{tableName}</div>'
 			+ '<div style = "color: #462B77; font-size: 10px;">{alias}</div>'
+			+ '<div style = "font-size: 10px; text-align : right;"><span style = "color : red;">{customNum}</span></div>'
 			+ '</div>',
 	},
 	co : {
@@ -251,6 +252,20 @@ function initStaffContent(c){
 					type : 'show',
 					isTop : true
 				});	
+				var el = $("#divUserLogin");
+				el.before('<div forbg="divUserLogin" style="position: absolute; top:0; left:0; width: 100%; height: 100%;"></div>');
+				var bg = $('div[forbg = divUserLogin]');
+				bg.css("background", 'url(../images/login_bg.jpg) no-repeat');
+				bg.css("backgroundSize", 'cover');
+				var html = "<div class = 'box-vertical' style = 'width : 100%; height: 100%'>"
+						+ "<div style = 'line-height : 100px; font-size : 50px; font-weight: bold; margin-left : 80px;'>"
+						+ "<span style = 'color : red'>" + ln.restaurant.name + "</span>欢迎您</div>"
+						+ "<div class = 'div-full'></div>"
+						+ "<div style = 'line-height : 100px; text-align : right; margin-right : 100px; font-size : 20px;'>" 
+						+ "智易科技：www.digi-e.com</div>"
+						+ "</div>";
+				bg.html(html);
+				bg.addClass('dialong-lm-show-top');
 				if(data.root.length > 18){
 					
 				}
@@ -409,6 +424,8 @@ function staffLoginHandler(c){
 					renderTo : 'divUserLogin',
 					type : 'hide'
 				});
+				var bg = $('div[forbg = divUserLogin]');
+				bg.addClass('dialong-lm-hide-top');
 			}else{
 				Util.msg.alert({
 					msg : data.msg
