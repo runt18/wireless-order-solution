@@ -89,6 +89,15 @@ public class RequestFilter implements Filter{
 			}
 			
 			String pin = null;
+			Cookie c = null;
+			Cookie[] cookies = request.getCookies();
+			if(cookies != null){
+				for (Cookie cookie : cookies) {
+					if(cookie.getName().equalsIgnoreCase("pin")){
+						c = cookie;
+					}
+				}
+			}
 			//是否用cookie
 			if(isCookie == null){
 				pin = (String)request.getSession().getAttribute("pin");
@@ -97,7 +106,10 @@ public class RequestFilter implements Filter{
 	                    response.addHeader("sessionstatus", "timeout");  
 	                }else{
 	                	response.sendRedirect(DEFREDIRECT + "?" + Encrypt.strEncode("restaurantID="+params.get("restaurantID"), "mi", null, null));
+	
 	                }
+                	c.setMaxAge(0);
+                	response.addCookie(c);
 					
 				}else{
 					request.setAttribute("pin", pin);
@@ -105,7 +117,7 @@ public class RequestFilter implements Filter{
 				}
 				
 			}else{
-				Cookie[] cookies = request.getCookies();
+				/*Cookie[] cookies = request.getCookies();
 				if(cookies != null){
 					for (Cookie cookie : cookies) {
 						if(cookie.getName().equalsIgnoreCase("pin")){
@@ -114,7 +126,10 @@ public class RequestFilter implements Filter{
 							chain.doFilter(request, response);
 						}
 					}
-				}
+				}*/
+				pin = c.getValue();
+				request.setAttribute("pin", pin);
+				chain.doFilter(request, response);
 			}
 		}
 		

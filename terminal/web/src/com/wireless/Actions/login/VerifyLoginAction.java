@@ -27,7 +27,7 @@ public class VerifyLoginAction extends Action {
 			Cookie[] cookies = request.getCookies();
 			if(cookies != null){
 				for (Cookie cookie : cookies) {
-					if(cookie.getName().equalsIgnoreCase("pin")){
+					if(cookie.getName().equals("pin")){
 						Staff staff = StaffDao.verify(Integer.parseInt(cookie.getValue()));
 						Map<Object, Object> other = new HashMap<Object, Object>();
 						other.put("staff", staff);

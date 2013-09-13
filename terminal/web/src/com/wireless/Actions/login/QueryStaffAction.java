@@ -60,45 +60,6 @@ public class QueryStaffAction extends Action {
 				
 			restaurantID = request.getParameter("restaurantID");
 			
-			// get the type to filter
-/*			int type = Integer.parseInt(request.getParameter("type"));
-
-			// get the operator to filter
-			String ope = request.getParameter("ope");
-			if (ope != null) {
-				int opeType = Integer.parseInt(ope);
-
-				if (opeType == 1) {
-					ope = "=";
-				} else if (opeType == 2) {
-					ope = ">=";
-				} else if (opeType == 3) {
-					ope = "<=";
-				} else {
-					// 不可能到这里
-					ope = "=";
-				}
-			} else {
-				// 不可能到这里
-				ope = "";
-			}*/
-
-			// get the value to filter
-/*			String filterVal = request.getParameter("value");
-
-			// combine the operator and filter value
-			String filterCondition = null;
-			// [ "0", "全部" ], [ "1", "编号" ], [ "2", "姓名" ]
-			if (type == 1) {
-				// 按编号
-				filterCondition = " AND staff_alias " + ope + filterVal;
-			} else if (type == 2) {
-				// 按姓名
-				filterCondition = " AND name like '%" + filterVal + "%'";
-			} else {
-				// 全部
-				filterCondition = "";
-			}*/
 			if(pin != null && isName != null){
 				staff = StaffDao.verify(Integer.parseInt(pin));
 				other.put("staff", staff);
