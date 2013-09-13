@@ -475,12 +475,6 @@ co.submit = function(){
 					title : data.title,
 					msg : data.msg,
 					time : 3,
-					timeout : function(){
-						if(co.callback != null && typeof co.callback == 'function'){
-							co.callback();
-						}
-						co.back();
-					},
 					fn : function(btn){
 						if(co.callback != null && typeof co.callback == 'function'){
 							co.callback();

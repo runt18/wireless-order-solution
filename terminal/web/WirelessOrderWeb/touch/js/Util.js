@@ -299,18 +299,21 @@ Util.msg = {
 			renderTo : content.id,
 			type : 'show'
 		});
+		if(typeof c.fn == 'function'){
+			this.event.push({
+				id : content.id,
+				fn : c.fn
+			});
+		}
 		if(typeof c.time == 'number'){
 			var to = null, t = c.time;
 			to = setInterval(function(){
 				if(t == 0){
 					Util.msg.clearInterval(c.id);
 					Util.msg.hide({
-						event : 'back', 
+						event : 'yes', 
 						id : content.id
 					});
-					if(typeof c.timeout == 'function'){
-						c.timeout();
-					}
 					to = null;
 					return;
 				}
@@ -321,13 +324,6 @@ Util.msg = {
 				id : content.id,
 				interval : to
 			});
-		}else{
-			if(typeof c.fn == 'function'){
-				this.event.push({
-					id : content.id,
-					fn : c.fn
-				});
-			}
 		}
 	}
 };
