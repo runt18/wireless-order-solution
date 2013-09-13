@@ -157,6 +157,7 @@ function inputNum(o){
 			Util.msg.alert({
 				title : '温馨提示',
 				msg : '人数超过限定，请重新输入.', 
+				time : 2,
 			});
 			inputNumVal = "";
 			$("#" + inputNumId).val(inputNumVal);
@@ -169,6 +170,7 @@ function inputNum(o){
 			Util.msg.alert({
 				title : '温馨提示',
 				msg : '桌号超过限定，请重新输入.', 
+				time : 2,
 			});
 			inputNumVal = "";
 			$("#" + inputNumId).val(inputNumVal);
@@ -217,6 +219,7 @@ function renderToCreateOrder(tableNo, peopleNo){
 		Util.msg.alert({
 			title : '温馨提示',
 			msg : '没有该餐桌，请重新输入一个桌号.', 
+			time : 2,
 			fn : function(btn){
 				
 			}
@@ -299,9 +302,7 @@ ts.tt.submit = function(){
 			Util.msg.alert({
 				title : '温馨提示',
 				msg : oldTable + '号桌不是就餐状态，不能转台.', 
-				fn : function(btn){
-					
-				}
+				time : 2,
 			});
 			return;
 		}
@@ -309,9 +310,7 @@ ts.tt.submit = function(){
 		Util.msg.alert({
 			title : '温馨提示',
 			msg : '没有' + oldTable + '号桌，请重新输入一个桌号.', 
-			fn : function(btn){
-				
-			}
+			time : 2,
 		});
 		return;
 	}
@@ -322,6 +321,7 @@ ts.tt.submit = function(){
 			Util.msg.alert({
 				title : '温馨提示',
 				msg : newTable + '号桌不是空台，不能转台.', 
+				time : 2,
 			});
 			return;
 		}
@@ -329,6 +329,7 @@ ts.tt.submit = function(){
 		Util.msg.alert({
 			title : '温馨提示',
 			msg : '没有' + newTable + '号桌，请重新输入一个桌号.', 
+			time : 2,
 		});
 		return;
 	}
@@ -348,6 +349,11 @@ ts.tt.submit = function(){
 					Util.msg.alert({
 						title : data.title,
 						msg : data.msg,
+						time : 3,
+						timeout : function(){
+							ts.tt.back();
+							initTables();
+						},
 						fn : function(btn){
 							ts.tt.back();
 							initTables();
@@ -447,7 +453,7 @@ ts.backOne = function(){
 		inputNumVal = tempNum.substring(0, tempNum.length-1);
 		$("#" + inputNumId).val(inputNumVal);
 	}
-	$("#" + inputNumId).focus();	
+	$("#" + inputNumId).focus();
 };
 
 /**

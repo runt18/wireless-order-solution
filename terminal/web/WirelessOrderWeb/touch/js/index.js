@@ -44,7 +44,7 @@ var Templet = {
 			+ 'onclick = "ts.selectTable({event : this, tableAlias : {alias}})">'
 			+ '<div style = "font-weight : bold; margin-top : 20px;">{tableName}</div>'
 			+ '<div style = "color: #462B77; font-size: 10px;">{alias}</div>'
-			+ '<div style = "font-size: 10px; text-align : right;"><span style = "color : red;">{customNum}</span></div>'
+//			+ '<div style = "font-size: 10px; text-align : right;"><span style = "color : red;">{customNum}</span></div>'
 			+ '</div>',
 	},
 	co : {
@@ -265,6 +265,9 @@ function initStaffContent(c){
 						+ "智易科技：www.digi-e.com</div>"
 						+ "</div>";
 				bg.html(html);
+				if(bg.hasClass('dialong-lm-hide-top')){
+					bg.removeClass('dialong-lm-hide-top');
+				}
 				bg.addClass('dialong-lm-show-top');
 				if(data.root.length > 18){
 					
@@ -425,6 +428,9 @@ function staffLoginHandler(c){
 					type : 'hide'
 				});
 				var bg = $('div[forbg = divUserLogin]');
+				if(bg.hasClass('dialong-lm-show-top')){
+					bg.removeClass('dialong-lm-show-top');
+				}
 				bg.addClass('dialong-lm-hide-top');
 			}else{
 				Util.msg.alert({

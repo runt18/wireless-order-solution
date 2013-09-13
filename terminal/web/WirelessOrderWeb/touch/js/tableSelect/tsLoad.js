@@ -35,16 +35,16 @@ $(function(){
 				alias : c.data.alias,
 				dataClass : c.data.statusValue == '1' ? "\"main-box-base table-busy\"" : "\"main-box-base\"",
 				tableName : c.data.name == "" || typeof c.data.name != 'string' ? c.data.alias + "号桌" : c.data.name,
-				customNum : c.data.statusValue == 1 ? c.data.customNum + '人用餐' : '',
+//				customNum : c.data.statusValue == 1 ? c.data.customNum + '人用餐' : '',
 			});
 		}
 	});
+	
+	/**
+	 * 定时器，定时刷新餐桌选择页面数据
+	 */
+	window.setInterval("initTables()", 240000);
 });
-
-/**
- * 定时器，定时刷新餐桌选择页面数据
- */
-window.setInterval("initTables()", 240000);
 
 /**
  * 初始化餐桌信息，保存到tables数组中
