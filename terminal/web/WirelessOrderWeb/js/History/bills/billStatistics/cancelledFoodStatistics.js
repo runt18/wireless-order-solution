@@ -159,6 +159,37 @@ function cancelFoodDetailsStatPanelInit(){
 					}
 				});
 			}
+		},{
+			text : '导出',
+			id : 'btnExportExcel',
+			iconCls : 'icon_tb_exoprt_excel',
+			handler : function(){
+				var bd = beginDate.getValue();
+				var ed = endDate.getValue();
+				var sn = cfdsTree.getSelectionModel().getSelectedNode();
+				if(bd == '' && ed == '' ){
+					Ext.example.msg('提示', '未选择日期, 无法导出数据');
+					return;
+				}else if(bd != '' && ed == ''){
+					Ext.ux.checkDuft(true, beginDate.getId(), endDate.getId());
+				}else if(bd == '' && ed != ''){
+					Ext.ux.checkDuft(false, beginDate.getId(), endDate.getId());
+				}
+				
+				var url = '../../{0}?deptID={1}&dateBeg={2}&dateEnd={3}&reasonID={4}&dataSource={5}&isPaging=false&qtype=2&otype=0&dtype=1';
+				
+				url = String.format(
+					url,
+					'ExportHistoryStatisticsToExecl.do',
+					(sn != null ? sn.attributes.deptID : -1),
+					beginDate.getValue().format('Y-m-d 00:00:00'),
+					endDate.getValue().format('Y-m-d 23:59:59'),
+					reasonCombo.getValue(),
+					'cancelledFood'
+				);
+				window.location = url;
+
+			}
 		}]
 	});
 	var cfdsGrid = createGridPanel(

@@ -18,6 +18,9 @@ var logOutBut = new Ext.ux.ImageButton({
 	}
 });
 
+function onLoad(){
+	Ext.getCmp('grid').getStore().load();
+}
 
 var suppllierGridTbar;
 Ext.onReady(function(){
@@ -104,7 +107,7 @@ Ext.onReady(function(){
 	    tbar : costAnalyzeGridTbar,
 	    bbar : pagingBar
 	});
-	ds.load();
+	
 
 	costAnalyzeGrid.region = 'center';
 	
