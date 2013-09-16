@@ -2,6 +2,7 @@ package com.wireless.fragment;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -163,8 +164,20 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 				groupMap.put(ITEM_IS_ORI_FOOD, true);
 				groupData.add(groupMap);
 				
+				//有退菜的菜品显示在最上面
+				Comparator<OrderFood> comp = new Comparator<OrderFood>(){
+					@Override
+					public int compare(OrderFood lhs, OrderFood rhs) {
+						if(lhs.getDelta() > rhs.getDelta()){
+							return -1;
+						}else{
+							return 0;
+						}
+					}
+				};
+				
 				List<Map<String, ?>> pickedFoodDatas = new ArrayList<Map<String, ?>>();
-				for(OrderFood f : ofFgm.mOriOrder.getOrderFoods()){
+				for(OrderFood f : ofFgm.mOriOrder.getOrderFoods(comp)){
 					if(f.getCount() != 0f){
 						HashMap<String, Object> map = new HashMap<String, Object>();
 						map.put(ITEM_IS_ORI_FOOD, true);
