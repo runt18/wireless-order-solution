@@ -2,6 +2,7 @@ package com.wireless.Actions.login;
 
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.Cookie;
@@ -16,19 +17,37 @@ import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.json.JObject;
+import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.staffMgr.Staff;
 
 public class OperateStaffAction extends Action{
 	public ActionForward execute(ActionMapping mapping, ActionForm form,HttpServletRequest request, HttpServletResponse response)throws Exception {
 				
 		String pin = request.getParameter("pin");
+		String name = request.getParameter("name");
 		String pwd = request.getParameter("pwd");
 		JObject jobject = new JObject();
 		try{
 			response.setContentType("text/json; charset=utf-8");
-			
-			Staff staff = StaffDao.verify(Integer.parseInt(pin));
-			if(staff.getPwd().equalsIgnoreCase(pwd)){
+			Staff staff = null;
+			if(pin != null){
+				staff = StaffDao.verify(Integer.parseInt(pin));
+			}else{
+				List<Staff> list = StaffDao.getStaffs(Restaurant.ADMIN);
+				if(!list.isEmpty()){
+					for (Staff s : list) {
+						if(s.getName().equals(name)){
+							staff = s;
+						}
+					}
+					if(staff == null){
+						jobject.initTip(false, "账号输入错误");
+					}
+				}
+			}
+			 
+			if(staff.getPwd().equals(pwd)){
+				pin = staff.getId()+"";
 				HttpSession session = request.getSession();
 				session.setAttribute("pin", pin);
 				

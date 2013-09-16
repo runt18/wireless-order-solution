@@ -23,15 +23,18 @@ public class QueryRestaurantAction extends Action{
 		String start = request.getParameter("start");
 		String limit = request.getParameter("limit");
 		String isPaging = request.getParameter("isPaging");
-		String account = request.getParameter("name");
+		String name = request.getParameter("name");
+		String account = request.getParameter("account");
 		String expireDate = request.getParameter("expireDate");
 		String alive = request.getParameter("alive");
 		List<Restaurant> list = null;
 		JObject jobject = new JObject();
 		String extraCond = "", orderClause = "";
 		try{
-			if(account != null && !account.trim().isEmpty()){
-				extraCond += (" AND restaurant_name like '%" + account + "%' ");
+			if(name != null && !name.trim().isEmpty()){
+				extraCond += (" AND restaurant_name like '%" + name + "%' ");
+			}else if(account != null && !account.trim().isEmpty()){
+				extraCond = " AND account = '" + account + "' " ;
 			}else if(expireDate != null || alive != null){
 				if(expireDate != null && alive == null){
 					orderClause += (" ORDER BY expire_date" );
@@ -43,6 +46,7 @@ public class QueryRestaurantAction extends Action{
 				
 				
 			}
+
 			list = RestaurantDao.getByCond(extraCond, orderClause);
 			if(!list.isEmpty()){
 				jobject.setTotalProperty(list.size());

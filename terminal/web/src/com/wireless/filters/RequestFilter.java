@@ -48,7 +48,7 @@ public class RequestFilter implements Filter{
 		HttpServletResponse response = (HttpServletResponse)servletResponse;
 		String requestPath = request.getRequestURI();
 		if(check(requestPath)){
-			String pin = (String)request.getSession().getAttribute("pin");
+			String pin =  (String) request.getSession().getAttribute("pin");
 			if(pin != null){
 				request.setAttribute("pin", pin);
 			}
@@ -100,7 +100,7 @@ public class RequestFilter implements Filter{
 			}
 			//是否用cookie
 			if(isCookie == null){
-				pin = (String)request.getSession().getAttribute("pin");
+				pin = (String) request.getSession().getAttribute("pin");
 				if(pin == null){
 					if (request.getHeader("x-requested-with") != null && request.getHeader("x-requested-with").equalsIgnoreCase("XMLHttpRequest")) {  
 	                    response.addHeader("sessionstatus", "timeout");  
@@ -110,8 +110,9 @@ public class RequestFilter implements Filter{
 	                }
 					if(c!=null){
 						c.setMaxAge(0);
+						response.addCookie(c);
 					}
-                	response.addCookie(c);
+                	
 					
 				}else{
 					request.setAttribute("pin", pin);
