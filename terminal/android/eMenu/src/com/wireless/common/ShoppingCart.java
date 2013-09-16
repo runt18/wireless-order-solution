@@ -83,7 +83,7 @@ public final class ShoppingCart {
 			reqOrder.setId(mOriOrder.getId());
 			reqOrder.setOrderDate(mOriOrder.getOrderDate());
 			if(hasNewOrder()){
-				reqOrder.addFoods(mNewOrder.getOrderFoods());
+				reqOrder.addFoods(mNewOrder.getOrderFoods(), WirelessOrder.loginStaff);
 			}
 			new CommitOrderTask(reqOrder, Type.UPDATE_ORDER, commitListener).execute();
 			
@@ -176,7 +176,7 @@ public final class ShoppingCart {
 			mNewOrder = new Order();
 		}
 		for(OrderFood extraFood : extraFoods){
-			mNewOrder.addFood(extraFood);
+			mNewOrder.addFood(extraFood, WirelessOrder.loginStaff);
 		}
 		notifyFoodsChanged();
 	}
@@ -198,7 +198,7 @@ public final class ShoppingCart {
 			foodToAdd.makeTasteGroup();
 		}
 		
-		mNewOrder.addFood(new OrderFood(foodToAdd));
+		mNewOrder.addFood(new OrderFood(foodToAdd), WirelessOrder.loginStaff);
 		notifyFoodsChanged();
 	}
 
