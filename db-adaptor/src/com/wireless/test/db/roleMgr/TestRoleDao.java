@@ -99,7 +99,7 @@ public class TestRoleDao {
 			newBuilder.setType(Type.NORMAL);
 			
 			for (Privilege privilege : privileges) {
-				if(privilege.getCode() == Privilege.Code.FRONT_BUSINESS){
+				if(privilege.getCode() == Privilege.Code.ADD_FOOD){
 					newBuilder.addPrivileges(privilege);
 				}
 			}

@@ -16,11 +16,13 @@ import com.wireless.db.regionMgr.TableDao;
 import com.wireless.db.tasteMgr.TasteDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.ProtocolError;
+import com.wireless.exception.StaffError;
 import com.wireless.pojo.crMgr.CancelReason;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.regionMgr.Table;
+import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.tasteMgr.Taste;
 import com.wireless.pojo.tasteMgr.TasteGroup;
@@ -157,16 +159,24 @@ public class UpdateOrder {
 	 * @param newOrder
 	 * @return the difference between original order and the new
  	 * @throws BusinessException 
- 	 * 			Throws if one of the cases below.<br>
- 	 * 			- The order to this id does NOT exist.<br>
-	 * 	        - The order to this id is expired.<br>
-	 * 			- The table of new order to update is BUSY.<br>
+ 	 * 			throws if one of the cases below<br>
+ 	 * 			- the order to this id does NOT exist<br>
+	 * 	        - the order to this id is expired<br>
+	 * 			- the table of new order to update is BUSY<br>
+	 * 			- the staff has no privilege to add the food<br>
+	 * 			- the staff has no privilege to cancel the food<br>
+	 * 			- the staff has no privilege to present the food
 	 * @throws SQLException
 	 * 			Throws if failed to execute any SQL statement.
 	 * 
 	 * @see DiffResult
 	 */
 	private static DiffResult doPrepare(DBCon dbCon, Staff staff, Order newOrder) throws BusinessException, SQLException{
+		
+		//Check to see whether the staff has the privilege to add the food 
+		if(!staff.getRole().hasPrivilege(Privilege.Code.ADD_FOOD)){
+			throw new BusinessException(StaffError.ORDER_NOT_ALLOW);
+		}
 		
 		Order oriOrder = OrderDao.getById(dbCon, staff, newOrder.getId(), DateType.TODAY);
 		
@@ -197,7 +207,22 @@ public class UpdateOrder {
 		//newOrder.setRegion(QueryRegion.execByTbl(dbCon, term, newOrder.getDestTbl().getAliasId()));
 		
 		//Calculate the difference between the original and new order.
-		return diff(oriOrder, newOrder);
+		DiffResult diffResult = diff(oriOrder, newOrder);
+		
+		//Check to see whether the staff has privilege to cancel the food
+		if(!diffResult.cancelledFoods.isEmpty() && !staff.getRole().hasPrivilege(Privilege.Code.CANCEL_FOOD)){
+			throw new BusinessException(StaffError.CANCEL_FOOD_NOT_ALLOW);
+			
+		}else if(!diffResult.extraFoods.isEmpty()){
+			//Check to see whether the staff has privilege to present the food
+			for(OrderFood extraFood : diffResult.extraFoods){
+				if(extraFood.asFood().isGift() && !staff.getRole().hasPrivilege(Privilege.Code.GIFT)){
+					throw new BusinessException(StaffError.GIFT_NOT_ALLOW);
+				}
+			}
+		}
+		
+		return diffResult;
 	}
 	
 	/**

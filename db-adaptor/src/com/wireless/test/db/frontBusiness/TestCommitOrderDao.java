@@ -62,11 +62,11 @@ public class TestCommitOrderDao {
 		OrderFood of;
 		of = new OrderFood(foods.get(0));
 		of.setCount(1.35f);
-		expectedOrder.addFood(of);
+		expectedOrder.addFood(of, mStaff);
 		
 		of = new OrderFood(foods.get(1));
 		of.setCount(2.35f);
-		expectedOrder.addFood(of);
+		expectedOrder.addFood(of, mStaff);
 		
 		//---------------------------------------------------------------
 		//Insert a new order
@@ -82,11 +82,11 @@ public class TestCommitOrderDao {
 		
 		of = new OrderFood(foods.get(1));
 		of.setCount(1.35f);
-		expectedOrder.addFood(of);
+		expectedOrder.addFood(of, mStaff);
 		
 		of = new OrderFood(foods.get(2));
 		of.setCount(2.35f);
-		expectedOrder.addFood(of);
+		expectedOrder.addFood(of, mStaff);
 		
 		UpdateOrder.execByID(mStaff, expectedOrder);
 		
@@ -100,11 +100,11 @@ public class TestCommitOrderDao {
 		
 		of = new OrderFood(foods.get(0));
 		of.setCount(1.35f);
-		expectedOrder.addFood(of);
+		expectedOrder.addFood(of, mStaff);
 		
 		of = new OrderFood(foods.get(1));
 		of.setCount(2.35f);
-		expectedOrder.addFood(of);
+		expectedOrder.addFood(of, mStaff);
 		
 		UpdateOrder.execByID(mStaff, expectedOrder);
 		

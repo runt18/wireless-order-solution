@@ -13,10 +13,12 @@ import com.wireless.db.regionMgr.TableDao;
 import com.wireless.db.tasteMgr.TasteDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.ProtocolError;
+import com.wireless.exception.StaffError;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.regionMgr.Table;
+import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.tasteMgr.Taste;
 import com.wireless.pojo.tasteMgr.TasteGroup;
@@ -152,17 +154,24 @@ public class InsertOrder {
 	 * 			the order along with basic insert parameters
 	 * @return the completed order details to insert
 	 * @throws BusinessException
-	 *          Throws if one of cases below.<br>
-	 *          - The terminal is NOT attached to any restaurant.<br>
-	 *          - The terminal is expired.<br>
-	 *          - The table associated with this order does NOT exist.<br>
-	 *          - The table associated with this order is NOT idle.<br>
-	 *          - Any food query to insert does NOT exist.<br>
-	 *          - Any food to this order does NOT exist.<br>
+	 *          throws if one of cases below<br>
+	 *          - the terminal is NOT attached to any restaurant<br>
+	 *          - the terminal is expired<br>
+	 *          - the table associated with this order does NOT exist<br>
+	 *          - the table associated with this order is NOT idle<br>
+	 *          - any food query to insert does NOT exist<br>
+	 *          - any food to this order does NOT exist<br>
+	 *          - the staff has no privilege to add the food<br>
+	 *          - the staff has no privilege to present the food
 	 * @throws SQLException
 	 * 			Throws if failed to execute any SQL statements.
 	 */
 	private static void doPrepare(DBCon dbCon, Staff staff, Order orderToInsert) throws BusinessException, SQLException{
+		
+		//Check to see whether the staff has the privilege to add the food 
+		if(!staff.getRole().hasPrivilege(Privilege.Code.ADD_FOOD)){
+			throw new BusinessException(StaffError.ORDER_NOT_ALLOW);
+		}
 		
 		orderToInsert.setDestTbl(TableDao.getTableByAlias(dbCon, staff, orderToInsert.getDestTbl().getAliasId()));
 		
@@ -190,6 +199,11 @@ public class InsertOrder {
 						of.asFood().setPrice(detailFood.getPrice());
 						of.asFood().setKitchen(detailFood.getKitchen());
 						of.asFood().setChildFoods(detailFood.getChildFoods());
+						
+						//Check to see whether the staff has the privilege to present the food.
+						if(of.asFood().isGift() && !staff.getRole().hasPrivilege(Privilege.Code.GIFT)){
+							throw new BusinessException(StaffError.GIFT_NOT_ALLOW);
+						}
 						
 						//Get the details to normal tastes
 						if(of.hasNormalTaste()){
