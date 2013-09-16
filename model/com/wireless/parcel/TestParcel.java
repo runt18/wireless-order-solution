@@ -1,11 +1,12 @@
 package com.wireless.parcel;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import static org.junit.Assert.*;
-
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.wireless.exception.BusinessException;
@@ -23,11 +24,19 @@ import com.wireless.pojo.ppMgr.PricePlan;
 import com.wireless.pojo.regionMgr.Region;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.restaurantMgr.Restaurant;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.tasteMgr.Taste;
 import com.wireless.pojo.tasteMgr.TasteGroup;
 
 public class TestParcel {
 
+	private static Staff mStaff;
+	
+	@BeforeClass
+	public static void init(){
+		mStaff = new Staff();
+	}
+	
 	@Test
 	public void testComplexFoodParcel(){
 		Food foodToParcel = new Food();
@@ -535,7 +544,7 @@ public class TestParcel {
 		tmpTaste.setPrice(2.3f);
 		foods[0].getTasteGroup().setTmpTaste(tmpTaste);
 		
-		orderToParcel.addFood(foods[0]);
+		orderToParcel.addFood(foods[0], mStaff);
 		
 		//2nd order food
 		foods[1].setTemp(false);
@@ -545,7 +554,7 @@ public class TestParcel {
 		foods[1].setOrderDate(new Date().getTime());
 		foods[1].setWaiter("张宁远");
 		
-		orderToParcel.addFood(foods[1]);
+		orderToParcel.addFood(foods[1], mStaff);
 		
 		Parcel p = new Parcel();
 		orderToParcel.writeToParcel(p, Order.ORDER_PARCELABLE_4_QUERY);

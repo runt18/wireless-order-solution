@@ -102,7 +102,7 @@ public class Role implements Jsonable, Parcelable{
 			setType(Type.RESERVED);
 			setCategoty(Category.ADMIN);
 			
-			addPrivileges(new Privilege(Privilege.Code.FRONT_BUSINESS));
+			addPrivileges(new Privilege(Privilege.Code.ADD_FOOD));
 			addPrivileges(new Privilege(Privilege.Code.BASIC));
 			addPrivileges(new Privilege(Privilege.Code.CANCEL_FOOD));
 			addPrivileges(new Privilege(Privilege.Code.DISCOUNT));
@@ -123,7 +123,7 @@ public class Role implements Jsonable, Parcelable{
 			super(restaurantId, Category.BOSS.getDesc());
 			setType(Type.RESERVED);
 			setCategoty(Category.BOSS);
-			addPrivileges(new Privilege(Privilege.Code.FRONT_BUSINESS));
+			addPrivileges(new Privilege(Privilege.Code.ADD_FOOD));
 			addPrivileges(new Privilege(Privilege.Code.BASIC));
 			addPrivileges(new Privilege(Privilege.Code.CANCEL_FOOD));
 			addPrivileges(new Privilege(Privilege.Code.DISCOUNT));
@@ -144,7 +144,7 @@ public class Role implements Jsonable, Parcelable{
 			super(restaurantId, Category.FINANCE.getDesc());
 			setType(Type.NORMAL);
 			setCategoty(Category.FINANCE);
-			addPrivileges(new Privilege(Privilege.Code.FRONT_BUSINESS));
+			addPrivileges(new Privilege(Privilege.Code.ADD_FOOD));
 			addPrivileges(new Privilege(Privilege.Code.BASIC));
 			addPrivileges(new Privilege(Privilege.Code.CANCEL_FOOD));
 			addPrivileges(new Privilege(Privilege.Code.DISCOUNT));
@@ -164,7 +164,7 @@ public class Role implements Jsonable, Parcelable{
 			super(restaurantId, Category.MANAGER.getDesc());
 			setType(Type.NORMAL);
 			setCategoty(Category.MANAGER);
-			addPrivileges(new Privilege(Privilege.Code.FRONT_BUSINESS));
+			addPrivileges(new Privilege(Privilege.Code.ADD_FOOD));
 			addPrivileges(new Privilege(Privilege.Code.CANCEL_FOOD));
 			addPrivileges(new Privilege(Privilege.Code.DISCOUNT));
 			addPrivileges(new Privilege(Privilege.Code.GIFT));
@@ -181,7 +181,7 @@ public class Role implements Jsonable, Parcelable{
 			super(restaurantId, Category.CASHIER.getDesc());
 			setType(Type.NORMAL);
 			setCategoty(Category.CASHIER);
-			addPrivileges(new Privilege(Privilege.Code.FRONT_BUSINESS));
+			addPrivileges(new Privilege(Privilege.Code.ADD_FOOD));
 			addPrivileges(new Privilege(Privilege.Code.CANCEL_FOOD));
 			addPrivileges(new Privilege(Privilege.Code.DISCOUNT));
 			addPrivileges(new Privilege(Privilege.Code.GIFT));
@@ -197,7 +197,7 @@ public class Role implements Jsonable, Parcelable{
 			super(restaurantId, Category.WAITER.getDesc());
 			setType(Type.NORMAL);
 			setCategoty(Category.WAITER);
-			addPrivileges(new Privilege(Privilege.Code.FRONT_BUSINESS));
+			addPrivileges(new Privilege(Privilege.Code.ADD_FOOD));
 			addPrivileges(new Privilege(Privilege.Code.CANCEL_FOOD));
 		}
 	}

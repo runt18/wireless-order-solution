@@ -12,7 +12,7 @@ public class StaffError extends ErrorEnum{
 	public static final ErrorCode RE_PAYMENT_NOT_ALLOW = build(7605, "你没有反结帐的权限");
 	public static final ErrorCode CANCEL_FOOD_NOT_ALLOW = build(7606, "你没有使用退菜的权限");
 	public static final ErrorCode GIFT_NOT_ALLOW = build(7607, "你没有使用赠送的权限");
-
+	public static final ErrorCode ORDER_NOT_ALLOW = build(7608, "你没有点菜的权限");
 	
 	private StaffError(){
 		
