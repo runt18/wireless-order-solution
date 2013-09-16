@@ -682,7 +682,11 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 			
 			//如果有新点菜，则添加进账单
 			if(!mNewFoodList.isEmpty()){
-				reqOrder.addFoods(mNewFoodList);
+				try{
+					reqOrder.addFoods(mNewFoodList, WirelessOrder.loginStaff);
+				}catch(BusinessException e){
+					Toast.makeText(OrderFoodFragment.this.getActivity(), e.getMessage(), Toast.LENGTH_SHORT).show();
+				}
 			}
 			
 			return reqOrder;

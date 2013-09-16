@@ -25,6 +25,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.wireless.common.WirelessOrder;
+import com.wireless.exception.BusinessException;
 import com.wireless.exception.ProtocolError;
 import com.wireless.pack.Type;
 import com.wireless.pack.req.PrintOption;
@@ -272,9 +273,13 @@ public class CommitDialog extends DialogFragment{
 				}
 			}else{
 				//Merge the original order and update if the activity_table is BUSY.
-				order.addFoods(mReqOrder.getOrderFoods());
-				mOrderToCommit = order;
-				new InsertOrderTask(mOrderToCommit, Type.UPDATE_ORDER, mPrintOption).execute();
+				try{
+					order.addFoods(mReqOrder.getOrderFoods(), WirelessOrder.loginStaff);
+					mOrderToCommit = order;
+					new InsertOrderTask(mOrderToCommit, Type.UPDATE_ORDER, mPrintOption).execute();
+				}catch(BusinessException e){
+					Toast.makeText(CommitDialog.this.getActivity(), e.getMessage(), Toast.LENGTH_SHORT).show();
+				}
 			}
 		}
 	}

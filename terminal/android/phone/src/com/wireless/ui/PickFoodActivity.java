@@ -18,6 +18,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.wireless.common.Params;
+import com.wireless.common.WirelessOrder;
 import com.wireless.exception.BusinessException;
 import com.wireless.fragment.KitchenFragment;
 import com.wireless.fragment.PickFoodFragment;
@@ -245,7 +246,7 @@ public class PickFoodActivity extends FragmentActivity
 			for(OrderFood f:tempFoods)
 			{
 				try {
-					mTmpOrder.addFood(f);
+					mTmpOrder.addFood(f, WirelessOrder.loginStaff);
 				} catch (BusinessException e) {
 					Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
 				}
@@ -267,7 +268,7 @@ public class PickFoodActivity extends FragmentActivity
 	@Override
 	public void onFoodPicked(OrderFood food) {
 		try{
-			mTmpOrder.addFood(food);
+			mTmpOrder.addFood(food, WirelessOrder.loginStaff);
 			
 			Toast.makeText(this, "添加"	+ (food.isHangup() ? "并叫起\"" : "\"") + food.toString() + "\"" +
 								 NumericUtil.float2String2(food.getCount()) + "份", Toast.LENGTH_SHORT).show();
