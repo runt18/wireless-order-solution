@@ -423,7 +423,7 @@ staffStore.load({
 var staffColumnModel = new Ext.grid.ColumnModel([ 
      new Ext.grid.RowNumberer(), 
     {header : '员工名称', dataIndex : 'staffName'},
-    {header : '联系电话', dataIndex : 'mobile'},
+    {header : '联系电话', dataIndex : 'mobile', hidden: true},
     {header : '角色', dataIndex : 'roleName'},
 	{
     	id : 'staffOpt',
@@ -671,7 +671,8 @@ staffAddWin = new Ext.Window({
 			fieldLabel : '员工电话',
 			width : 160,
 			regex : Ext.ux.RegText.phone.reg,
-			regexText : Ext.ux.RegText.phone.error
+			regexText : Ext.ux.RegText.phone.error,
+			disabled : true
 		}, chooseRoleComb]
 	}],
 	bbar : ['->',{

@@ -150,8 +150,7 @@ var restaurantAddWin = new Ext.Window({
 			width : 140,
 			id : 'txtTele1',
 			regex : Ext.ux.RegText.phone.reg,
-			regexText : Ext.ux.RegText.phone.error,
-			disabled : true
+			regexText : Ext.ux.RegText.phone.error
 			
 		},{
 			xtype : 'textfield',
@@ -159,14 +158,13 @@ var restaurantAddWin = new Ext.Window({
 			width : 140,
 			id : 'txtTele2',
 			regex : Ext.ux.RegText.phone.reg,
-			regexText : Ext.ux.RegText.phone.error,
-			disabled : true
+			regexText : Ext.ux.RegText.phone.error
 				
 		},{
 			xtype : 'textfield',
 			fieldLabel : '地址',
 			width : 220,
-			id : 'txtAddress',
+			id : 'txtAddress'
 			
 		},{
 			xtype : 'datefield',
@@ -181,7 +179,7 @@ var restaurantAddWin = new Ext.Window({
 			frame : false,
 			defaults : {
 				columnWidth : .18,
-				labelWidth : 40,
+				labelWidth : 40
 			},
 			items : [{
 				columnWidth : .25,
