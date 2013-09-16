@@ -8,9 +8,14 @@
 		<init-param>
 			<param-name>skipVerify</param-name>
 			<param-value>
+				/Login.html,
+				/LoginAdmin.html,
+				/QueryRestaurants.do,
 				/PersonLogin.html,
 				/PersonLoginTimeout.html,
+				/MgrCenter.html,
 				/VerifyLogin.do,
+				/LoginOut.do,
 				/QueryStaff.do,
 				/OperateStaff.do
 			</param-value>
@@ -49,7 +54,7 @@
 		</init-param>
 		<init-param>
 			<param-name>db_host</param-name>
-			<param-value>192.168.157.100</param-value>
+			<param-value>127.0.0.1</param-value>
 		</init-param>
 		<init-param>
 			<param-name>db_port</param-name>
