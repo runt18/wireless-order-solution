@@ -1,6 +1,9 @@
 package com.wireless.Actions.exportExecl;
 
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -23,12 +26,16 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
 import com.wireless.db.billStatistics.BusinessStatisticsDao;
+import com.wireless.db.billStatistics.QueryCancelledFood;
 import com.wireless.db.billStatistics.QuerySaleDetails;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.stockMgr.StockActionDao;
+import com.wireless.exception.BusinessException;
 import com.wireless.pojo.billStatistics.BusinessStatistics;
 import com.wireless.pojo.billStatistics.BusinessStatisticsByDept;
+import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.billStatistics.SalesDetail;
+import com.wireless.pojo.dishesOrder.CancelledFood;
 import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.pojo.staffMgr.Staff;
@@ -1297,7 +1304,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 		sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, 3));
 		
 		//冻结行
-		sheet.createFreezePane(0, 6, 0, 6);
+		sheet.createFreezePane(0, 7, 0, 7);
 		
 		//报表头
 		row = sheet.createRow(0);
@@ -1416,6 +1423,195 @@ public class HistoryStatisticsAction extends DispatchAction{
 		
 		return null;
 		
+	}
+	
+	public ActionForward cancelledFood(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws UnsupportedEncodingException, Exception, SQLException, BusinessException{
+		request.setCharacterEncoding("UTF-8");
+		response.setCharacterEncoding("UTF-8");
+		response.setContentType("application/vnd.ms-excel;");
+		List<CancelledFood> list = new ArrayList<CancelledFood>();
+		//Object sum = null;
+		
+		String pin = (String)request.getAttribute("pin");
+		//String isPaging = request.getParameter("isPaging");
+/*		String limit = request.getParameter("limit");
+		String start = request.getParameter("start");*/
+		
+		//String qtype = request.getParameter("qtype");
+		String otype = request.getParameter("otype");
+		String dtype = request.getParameter("dtype");
+		String dateBeg = request.getParameter("dateBeg");
+		String dateEnd = request.getParameter("dateEnd");
+		String deptID = request.getParameter("deptID");
+		String reasonID = request.getParameter("reasonID");
+		
+		if(otype == null || otype.trim().isEmpty()){
+			otype = QueryCancelledFood.ORDER_BY_COUNT + "";
+		}
+		if(deptID == null || deptID.trim().isEmpty()){
+			deptID = "-1";
+		}
+		if(reasonID == null || reasonID.trim().isEmpty()){
+			reasonID = "-1";
+		}
+		Integer ot = Integer.valueOf(otype), dt = Integer.valueOf(dtype);
+		Integer did = Integer.valueOf(deptID), rid = Integer.valueOf(reasonID);
+		
+		DutyRange queryDate = new DutyRange(dateBeg, dateEnd);
+		Staff staff = StaffDao.verify(Integer.parseInt(pin));
+		
+		
+		list = QueryCancelledFood.getCancelledFoodDetail(staff, queryDate, dt, ot, did, rid);
+		CancelledFood tempSum = new CancelledFood();
+		if(list != null && list.size() > 0){
+			CancelledFood tempItem = null;
+			for(int i = 0; i < list.size(); i++){
+				tempItem = list.get(i);
+				tempSum.setCount(tempSum.getCount() + tempItem.getCount());
+				tempSum.setTotalPrice(tempSum.getTotalPrice() + tempItem.getTotalPrice());
+			}
+			
+			//list = DataPaging.getPagingData(list, isPaging, start, limit);
+			//list.add(tempSum);
+		}
+		
+		String title = "退菜明细表";
+		//标题
+		response.addHeader("Content-Disposition", "attachment;filename=" + new String( ("退菜明细表.xls").getBytes("GBK"),  "ISO8859_1"));
+		HSSFWorkbook wb = new HSSFWorkbook();
+		HSSFSheet sheet = wb.createSheet(title);
+		HSSFRow row = null;
+		HSSFCell cell = null;
+		initParams(wb);
+		
+		sheet.setColumnWidth(0, 3800);
+		sheet.setColumnWidth(1, 3500);
+		sheet.setColumnWidth(2, 3300);
+		sheet.setColumnWidth(3, 3000);
+		sheet.setColumnWidth(4, 2300);
+		sheet.setColumnWidth(5, 3000);
+		sheet.setColumnWidth(6, 3000);
+		sheet.setColumnWidth(7, 3200);
+		sheet.setColumnWidth(8, 7000);
+		
+		
+		//冻结行
+		sheet.createFreezePane(0, 4, 0, 4);
+		
+		//合并单元格
+		sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, 8));
+
+		//报表头
+		row = sheet.createRow(0);
+		row.setHeight((short) 550);
+		
+		cell = row.createCell(0);
+		cell.setCellValue(title);
+		cell.setCellStyle(titleStyle);
+		
+		row = sheet.createRow(sheet.getLastRowNum() + 1);
+		row.setHeight((short) 350);
+		
+		cell = row.createCell(0);
+		
+		cell.setCellValue("总数量: " + tempSum.getCount() + "         总金额 :" + tempSum.getTotalPrice());
+		cell.setCellStyle(strStyle);
+		
+		sheet.addMergedRegion(new CellRangeAddress(sheet.getLastRowNum(), sheet.getLastRowNum(), 0, 8));
+		
+		//空白
+		row = sheet.createRow(sheet.getLastRowNum() + 1);
+		row.setHeight((short) 350);
+		sheet.addMergedRegion(new CellRangeAddress(sheet.getLastRowNum(), sheet.getLastRowNum(), 0, 8));
+		
+		row = sheet.createRow(sheet.getLastRowNum() + 1);
+		row.setHeight((short) 350);
+		
+		cell = row.createCell(0);
+		cell.setCellValue("日期");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell(row.getLastCellNum());
+		cell.setCellValue("菜名");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell(row.getLastCellNum());
+		cell.setCellValue("部门");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell(row.getLastCellNum());
+		cell.setCellValue("账单号");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell(row.getLastCellNum());
+		cell.setCellValue("单价");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell(row.getLastCellNum());
+		cell.setCellValue("退菜数量");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell(row.getLastCellNum());
+		cell.setCellValue("退菜金额");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell(row.getLastCellNum());
+		cell.setCellValue("操作人");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell(row.getLastCellNum());
+		cell.setCellValue("退菜原因");
+		cell.setCellStyle(headerStyle);
+		
+		
+		for (CancelledFood cf : list) {
+			row = sheet.createRow(sheet.getLastRowNum());
+			row.setHeight((short) 350);
+			
+			cell = row.createCell(0);
+			cell.setCellValue(cf.getOrderDate());
+			cell.setCellStyle(strStyle);
+			
+			cell = row.createCell(row.getLastCellNum());
+			cell.setCellValue(cf.getFoodName());
+			cell.setCellStyle(strStyle);
+			
+			cell = row.createCell(row.getLastCellNum());
+			cell.setCellValue(cf.getDeptName());
+			cell.setCellStyle(strStyle);
+			
+			cell = row.createCell(row.getLastCellNum());
+			cell.setCellValue(cf.getOrderID());
+			cell.setCellStyle(strStyle);
+			
+			cell = row.createCell(row.getLastCellNum());
+			cell.setCellValue(cf.getUnitPrice());
+			cell.setCellStyle(numStyle);
+			
+			cell = row.createCell(row.getLastCellNum());
+			cell.setCellValue(cf.getCount());
+			cell.setCellStyle(numStyle);
+			
+			cell = row.createCell(row.getLastCellNum());
+			cell.setCellValue(cf.getTotalPrice());
+			cell.setCellStyle(numStyle);
+			
+			cell = row.createCell(row.getLastCellNum());
+			cell.setCellValue(cf.getWaiter());
+			cell.setCellStyle(strStyle);
+			
+			cell = row.createCell(row.getLastCellNum());
+			cell.setCellValue(cf.getReason());
+			cell.setCellStyle(strStyle);
+	
+			
+		}
+		OutputStream os = response.getOutputStream();
+		wb.write(os);
+		os.flush();
+		os.close();
+		
+		return null;
 	}
 	
 }

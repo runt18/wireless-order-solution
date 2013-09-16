@@ -22,22 +22,26 @@ public class VerifyLoginAction extends Action {
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception{
 		response.setContentType("text/json; charset=utf-8");
 		JObject jobject = new JObject();
-		
+		Map<Object, Object> other = new HashMap<Object, Object>();
 		try{        
 			Cookie[] cookies = request.getCookies();
 			if(cookies != null){
 				for (Cookie cookie : cookies) {
 					if(cookie.getName().equals("pin")){
 						Staff staff = StaffDao.verify(Integer.parseInt(cookie.getValue()));
-						Map<Object, Object> other = new HashMap<Object, Object>();
+						
 						other.put("staff", staff);
 						jobject.setOther(other);
 						jobject.initTip(true, "true");
 						break;
-					}else{
-						jobject.initTip(false, "false");
 					}
 				}
+				if(other.isEmpty()){
+					jobject.initTip(false, "false");
+				}
+			}
+			else{
+				jobject.initTip(false, "false");
 			}
 			
 		}catch(BusinessException e){

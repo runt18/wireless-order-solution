@@ -93,7 +93,7 @@ public class RequestFilter implements Filter{
 			Cookie[] cookies = request.getCookies();
 			if(cookies != null){
 				for (Cookie cookie : cookies) {
-					if(cookie.getName().equalsIgnoreCase("pin")){
+					if(cookie.getName().equals("pin")){
 						c = cookie;
 					}
 				}
@@ -108,7 +108,9 @@ public class RequestFilter implements Filter{
 	                	response.sendRedirect(DEFREDIRECT + "?" + Encrypt.strEncode("restaurantID="+params.get("restaurantID"), "mi", null, null));
 	
 	                }
-                	c.setMaxAge(0);
+					if(c!=null){
+						c.setMaxAge(0);
+					}
                 	response.addCookie(c);
 					
 				}else{
