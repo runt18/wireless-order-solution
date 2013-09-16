@@ -29,7 +29,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.wireless.common.WirelessOrder;
+import com.wireless.exception.StaffError;
 import com.wireless.pojo.menuMgr.Food;
+import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.util.NumericUtil;
 import com.wireless.ui.R;
 import com.wireless.ui.dialog.AskOrderAmountDialog;
@@ -111,13 +113,14 @@ public class PickFoodFragment extends Fragment{
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 				Food food = (Food) view.getTag();
-				if(!food.isSellOut()){
-					((TextView)view.findViewById(R.id.textView_sellout_pickFoodFgm_item)).setVisibility(View.GONE);
-					AskOrderAmountDialog.newInstance(food, getId()).show(getFragmentManager(), AskOrderAmountDialog.TAG);
-					//new AskOrderAmountDialog(getActivity(), food, mFoodPickedListener, searchTxtView).show();
-				}else{
-					((TextView)view.findViewById(R.id.textView_sellout_pickFoodFgm_item)).setVisibility(View.VISIBLE);
+				if(food.isGift() && !WirelessOrder.loginStaff.getRole().hasPrivilege(Privilege.Code.GIFT)){
+					Toast.makeText(getActivity(), StaffError.GIFT_NOT_ALLOW.getDesc(), Toast.LENGTH_SHORT).show();
+					
+				}else if(food.isSellOut()){
 					Toast.makeText(getActivity(), food.getName() + "已售罄", Toast.LENGTH_SHORT).show();
+					
+				}else{
+					AskOrderAmountDialog.newInstance(food, getId()).show(getFragmentManager(), AskOrderAmountDialog.TAG);
 				}
 			}
         });
@@ -247,8 +250,15 @@ public class PickFoodFragment extends Fragment{
 			//设置售罄的显示
 			if(food.isSellOut()){
 				((TextView)view.findViewById(R.id.textView_sellout_pickFoodFgm_item)).setVisibility(View.VISIBLE);
+				((TextView)view.findViewById(R.id.textView_sellout_pickFoodFgm_item)).setText("停");
+				((TextView)view.findViewById(R.id.textView_sellout_pickFoodFgm_item)).setTextColor(getResources().getColor(R.color.red));
+				
+			}else if(food.isGift()){
+				((TextView)view.findViewById(R.id.textView_sellout_pickFoodFgm_item)).setVisibility(View.VISIBLE);
+				((TextView)view.findViewById(R.id.textView_sellout_pickFoodFgm_item)).setText("赠");
+				((TextView)view.findViewById(R.id.textView_sellout_pickFoodFgm_item)).setTextColor(getResources().getColor(R.color.maroon));
 			}else{
-				((TextView)view.findViewById(R.id.textView_sellout_pickFoodFgm_item)).setVisibility(View.INVISIBLE);
+				((TextView)view.findViewById(R.id.textView_sellout_pickFoodFgm_item)).setVisibility(View.GONE);
 			}
 			
 			return view;

@@ -14,7 +14,7 @@
             android:layout_width="99dp"
             android:layout_height="79dp"
             android:src="@drawable/kitchen_fragment_xplistview_item_item_selector" />
-
+
         <TextView
             android:id="@+id/textView_foodName_pickFoodFragment_item"
             android:layout_width="wrap_content"
@@ -26,7 +26,7 @@
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:textColor="@color/black"
             android:textSize="19sp" />
-
+
         <TextView
             android:id="@+id/textView1"
             android:layout_width="wrap_content"
@@ -37,7 +37,7 @@
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:textColor="@color/blue"
             android:textSize="13sp" />
-
+
         <TextView
             android:id="@+id/textView_price_pickFoodFragment_item"
             android:layout_width="wrap_content"
@@ -71,18 +71,20 @@
             android:layout_centerVertical="true"
             android:text="停"
             android:textAppearance="?android:attr/textAppearanceLarge"
-            android:textColor="@color/red"
+            android:textColor="@color/maroon"
             android:textSize="26sp"
-            android:visibility="gone" />
-
-<!--         <LinearLayout
+            android:visibility="visible" />
+
+        <!--
+             <LinearLayout
             android:id="@+id/linearLayout_pickFood_fgm_item"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_above="@+id/textView1"
             android:layout_alignParentLeft="true" >
 
-        </LinearLayout> -->
+        </LinearLayout>
+        -->
 
     </RelativeLayout>
 
