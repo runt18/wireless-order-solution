@@ -68,7 +68,7 @@ public class CommitOrderTask extends AsyncTask<Void, Void, Void>{
 					errMsg = mReqOrder.getDestTbl().getAliasId() + "号台是就餐状态，不能转台。";
 					
 				}else{
-					errMsg = mReqOrder.getDestTbl().getAliasId() + "号台下/改单失败，请重新提交改单。";
+					errMsg = errCode.getDesc();
 				}
 			}
 		}catch(IOException e){
