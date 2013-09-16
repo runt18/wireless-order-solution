@@ -145,13 +145,13 @@
   					},
   					success : function(data, status, xhr){
   						if(data.success){
-  							location.href = '/WirelessOrderWeb/pages/MgrCenter.html';
+  							location.href = './MgrCenter.html';
   						}else{
   							alert('密码输入错误');
   						}
   					},
   					error : function(request, status, err){
-  						alert('账号输入错误');
+  						alert('数据库连接失败');
   					}
   				}); 
  			} else{

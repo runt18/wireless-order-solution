@@ -142,7 +142,7 @@
   					success : function(data, status, xhr){
   						var jr = jQuery.parseJSON(data)
   						if(jr.success){
-  							location.href = '/WirelessOrderWeb/pages/PersonLogin.html?'+strEncode('restaurantID='+jr.root[0].id, 'mi');
+  							location.href = './PersonLogin.html?'+strEncode('restaurantID='+jr.root[0].id, 'mi');
   						}else{
   							alert('账号输入错误');
   						}
