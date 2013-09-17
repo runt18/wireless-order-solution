@@ -1469,8 +1469,17 @@ void PServer::portPrinter(IPReport* pReport){
 
 		// Specify an HTTP server.
 		if( hSession ){
-			hConnect = WinHttpConnect( hSession, _T("e-tones.net"), 10080, 0 );
-			//hConnect = WinHttpConnect( hSession, _T("localhost"), 8080, 0 );
+			//get the remote IP address, port, account and password from the config XML configuration file
+			wstring serv_name = Util::s2ws(TiXmlHandle(&g_Conf).FirstChildElement(ConfTags::CONF_ROOT).FirstChildElement(ConfTags::REMOTE).Element()->Attribute(ConfTags::REMOTE_IP));
+			int port = 10080;
+			if(serv_name == _T("e-tones.net")){
+				port = 10080;
+			}else if(serv_name == _T("localhost") || serv_name == _T("127.0.0.1")){
+				port = 8080;
+			}else{
+				port = 80;
+			}
+			hConnect = WinHttpConnect( hSession, serv_name.c_str(), port, 0 );
 		}
 	
 		wostringstream wos;
