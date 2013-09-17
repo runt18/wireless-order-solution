@@ -302,8 +302,8 @@ public class OrderDao {
 	 * 
 	 * @param dbCon
 	 *            the database connection
-	 * @param term
-	 * 			  the terminal
+	 * @param staff
+	 * 			  the staff to perform this action
 	 * @param extraCond
 	 *            the extra condition to query
 	 * @param orderClause
@@ -314,9 +314,9 @@ public class OrderDao {
 	 * @throws SQLException
 	 *             throws if fail to execute any SQL statement
 	 */
-	public static List<Order> getByCond(DBCon dbCon, Staff term, String extraCond, String orderClause, DateType dateType) throws SQLException{
+	public static List<Order> getByCond(DBCon dbCon, Staff staff, String extraCond, String orderClause, DateType dateType) throws SQLException{
 
-		List<Order> result = getPureOrder(dbCon, term, extraCond, orderClause, dateType);
+		List<Order> result = getPureOrder(dbCon, staff, extraCond, orderClause, dateType);
 		
 		for(Order eachOrder : result){
 			
@@ -408,8 +408,8 @@ public class OrderDao {
 	 * Get the pure order according to specified restaurant and extra condition.
 	 * @param dbCon
 	 * 			the database connection
-	 * @param term
-	 * 			the terminal
+	 * @param staff
+	 * 			the staff to perform this action
 	 * @param extraCond
 	 * 			the extra condition
 	 * @param orderClause
@@ -420,7 +420,7 @@ public class OrderDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static List<Order> getPureOrder(DBCon dbCon, Staff term, String extraCond, String orderClause, DateType dateType) throws SQLException{
+	public static List<Order> getPureOrder(DBCon dbCon, Staff staff, String extraCond, String orderClause, DateType dateType) throws SQLException{
 		String sql;
 		if(dateType == DateType.TODAY){
 			sql = " SELECT " +
@@ -428,17 +428,20 @@ public class OrderDao {
 				  " T.minimum_cost, T.service_rate AS tbl_service_rate, T.status AS table_status, " +
 				  " O.region_id, O.region_name, O.restaurant_id, " +
 				  " O.member_id, O.member_operation_id, " +
-				  " O.settle_type, O.pay_type, O.category, O.status, O.discount_id, O.service_rate, O.comment, " +
+				  " O.settle_type, O.pay_type, O.category, O.status, O.service_rate, O.comment, " +
+				  " O.discount_id, DIST.name AS discount_name, " +
 				  " O.gift_price, O.cancel_price, O.discount_price, O.repaid_price, O.erase_price, O.total_price, O.actual_price, " +
 				  " PP.price_plan_id, PP.name AS price_plan_name, PP.status AS price_plan_status " +
 				  " FROM " + 
 				  Params.dbName + ".order O " +
 				  " LEFT JOIN " + Params.dbName + ".table T " +
 				  " ON O.table_id = T.table_id " +
+				  " LEFT JOIN " + Params.dbName + ".discount DIST " +
+				  " ON O.discount_id = DIST.discount_id " +
 				  " LEFT JOIN " + Params.dbName + ".price_plan PP " +
 				  " ON O.price_plan_id = PP.price_plan_id " +
 				  " WHERE 1 = 1 " + 
-				  " AND O.restaurant_id = " + term.getRestaurantId() + " " +
+				  " AND O.restaurant_id = " + staff.getRestaurantId() + " " +
 				  (extraCond != null ? extraCond : "") + " " +
 				  (orderClause != null ? orderClause : "");
 			
@@ -451,7 +454,7 @@ public class OrderDao {
 				  " OH.gift_price, OH.cancel_price, OH.discount_price, OH.repaid_price, OH.erase_price, OH.total_price, OH.actual_price " +
 				  " FROM " + Params.dbName + ".order_history OH " + 
 				  " WHERE 1 = 1 " + 
-				  " AND OH.restaurant_id = " + term.getRestaurantId() + " " +
+				  " AND OH.restaurant_id = " + staff.getRestaurantId() + " " +
 				  (extraCond != null ? extraCond : "") + " " +
 				  (orderClause != null ? orderClause : "");
 		}else{
@@ -492,7 +495,13 @@ public class OrderDao {
 
 			orderInfo.setCustomNum(dbCon.rs.getShort("custom_num"));
 			orderInfo.setCategory(dbCon.rs.getShort("category"));
-			orderInfo.setDiscount(new Discount(dbCon.rs.getInt("discount_id")));
+			
+			Discount discount = new Discount(dbCon.rs.getInt("discount_id"));
+			if(dateType == DateType.TODAY){
+				discount.setName(dbCon.rs.getString("discount_name"));
+			}
+			orderInfo.setDiscount(discount);
+			
 			orderInfo.setPaymentType(dbCon.rs.getShort("pay_type"));
 			orderInfo.setSettleType(dbCon.rs.getShort("settle_type"));
 			if(orderInfo.isSettledByMember()){
