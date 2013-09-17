@@ -103,14 +103,14 @@ COMMENT = 'describe the role information' ;
 -- -----------------------------------------------------
 INSERT INTO wireless_order_db.role
 (`restaurant_id`, `name`, `type`, `cate`)
-SELECT id, '管理员', 2, 1 FROM wireless_order_db.restaurant WHERE id > 10;
+SELECT id, '管理员', 2, 1 FROM wireless_order_db.restaurant;
 
 -- -----------------------------------------------------
 -- Insert a '老板' role to each restaurant
 -- -----------------------------------------------------
 INSERT INTO wireless_order_db.role
 (`restaurant_id`, `name`, `type`, `cate`)
-SELECT id, '老板', 2, 2 FROM wireless_order_db.restaurant WHERE id > 10;
+SELECT id, '老板', 2, 2 FROM wireless_order_db.restaurant;
 
 -- -----------------------------------------------------
 -- Insert a '财务' role to each restaurant
@@ -412,3 +412,33 @@ UPDATE `wireless_order_db`.`restaurant` SET birth_date = '2013-01-01 00:00:00';
 -- -----------------------------------------------------
 DROP VIEW IF EXISTS restaurant_view;
 DROP VIEW IF EXISTS terminal_view;
+
+-- -----------------------------------------------------
+-- Insert a 'root' staff to admin restaurant whose role is '管理员'
+-- -----------------------------------------------------
+INSERT INTO wireless_order_db.staff
+(`restaurant_id`, `role_id`, `name`, `pwd`, type)
+SELECT REST.id, ROLE.role_id, 'root', MD5('Digie@123'), 2 
+FROM wireless_order_db.restaurant REST 
+JOIN wireless_order_db.role ROLE ON REST.id = ROLE.restaurant_id AND ROLE.cate = 1
+WHERE REST.id = 1;
+
+-- -----------------------------------------------------
+-- Insert a 'vincent' staff to admin restaurant whose role is '老板'
+-- -----------------------------------------------------
+INSERT INTO wireless_order_db.staff
+(`restaurant_id`, `role_id`, `name`, `pwd`, type)
+SELECT REST.id, ROLE.role_id, 'vincent', MD5('Fuck@315'), 2 
+FROM wireless_order_db.restaurant REST 
+JOIN wireless_order_db.role ROLE ON REST.id = ROLE.restaurant_id AND ROLE.cate = 2
+WHERE REST.id = 1;
+
+-- -----------------------------------------------------
+-- Insert a 'vincent' staff to admin restaurant whose role is '老板'
+-- -----------------------------------------------------
+INSERT INTO wireless_order_db.staff
+(`restaurant_id`, `role_id`, `name`, `pwd`, type)
+SELECT REST.id, ROLE.role_id, 'macro', MD5('macro@123'), 2 
+FROM wireless_order_db.restaurant REST 
+JOIN wireless_order_db.role ROLE ON REST.id = ROLE.restaurant_id AND ROLE.cate = 2
+WHERE REST.id = 1;
