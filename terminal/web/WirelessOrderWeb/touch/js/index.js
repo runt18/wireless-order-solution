@@ -46,6 +46,8 @@ var Templet = {
 			+ '<div style = "color: #462B77; font-size: 10px;">{alias}</div>'
 //			+ '<div style = "font-size: 10px; text-align : right;"><span style = "color : red;">{customNum}</span></div>'
 			+ '</div>',
+		region : '<div class="button-base" data-value={value} data-type="region-select" '
+			+ 'onClick="co.findTableByRegion({event:this, regionId:{value}})">{text}</div>',
 	},
 	co : {
 		dept : '<div class="button-base" data-value={value} data-type="dept-select" '
@@ -421,7 +423,7 @@ function staffLoginHandler(c){
 				if(c.refresh === true){
 					loginSuccessCallback();
 				}else{
-					initTables();
+					initTableData();
 				}
 				Util.dialongDisplay({
 					renderTo : 'divUserLogin',
@@ -456,7 +458,7 @@ function loginSuccessCallback(){
 		type:'show', 
 		renderTo:'divTableSelect'
 	});
-	initTables();
+	initTableData();
 	changeStaff({type:2});
 }
 /**

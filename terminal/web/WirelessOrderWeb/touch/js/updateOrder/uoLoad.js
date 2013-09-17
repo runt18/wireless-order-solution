@@ -51,9 +51,7 @@ function initOrderData(data){
 				Util.msg.alert({
 					title : '温馨提示',
 					msg : '初始化菜单数据失败.', 
-					fn : function(btn){
-						
-					}
+					time : 3,
 				});
 			}
 		},
@@ -61,9 +59,7 @@ function initOrderData(data){
 			Util.msg.alert({
 				title : '温馨提示',
 				msg : '初始化菜单数据失败.', 
-				fn : function(btn){
-					
-				}
+				time : 3,
 			});
 		}
 	});	
@@ -90,9 +86,7 @@ function initCancelReason(){
 			Util.msg.alert({
 				title : '温馨提示',
 				msg : '初始化退菜原因失败.', 
-				fn : function(btn){
-					
-				}
+				time : 3,
 			});
 		}
 	});

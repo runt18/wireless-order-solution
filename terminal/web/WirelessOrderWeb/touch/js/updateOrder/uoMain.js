@@ -133,6 +133,7 @@ uo.cf.save = function(){
 		Util.msg.alert({
 			title : '温馨提示',
 			msg : '退菜数目不能为0或太小.', 
+			time : 2,
 			fn : function(btn){
 				inputNumValUO = "";
 				$("#" + inputNumIdUO).val(count);
@@ -143,9 +144,7 @@ uo.cf.save = function(){
 		Util.msg.alert({
 			title : '温馨提示',
 			msg : '数字不合规范.', 
-			fn : function(btn){
-				
-			}
+			time : 2,
 		});
 		inputNumValUO = "";
 		$("#" + inputNumIdUO).val(count);
@@ -305,6 +304,7 @@ uo.saveForUO = function(){
 		Util.msg.alert({
 			title : '温馨提示',
 			msg : '账单没有修改，不能提交', 
+			time : 3,
 		});
 	}else{
 		for(x in uoFood){
@@ -363,6 +363,7 @@ function inputNumUO(o){
 			Util.msg.alert({
 				title : '温馨提示',
 				msg : '退菜数不能超过点菜数.', 
+				time : 3,
 				fn : function(btn){
 					inputNumValUO = "";
 					$("#" + inputNumIdUO).val(count);
@@ -373,9 +374,7 @@ function inputNumUO(o){
 			Util.msg.alert({
 				title : '温馨提示',
 				msg : '退菜数不能小于0.', 
-				fn : function(btn){
-					
-				}
+				time : 3,
 			});
 			inputNumValUO = "";
 			$("#" + inputNumIdUO).val(count);
@@ -387,9 +386,7 @@ function inputNumUO(o){
 			Util.msg.alert({
 				title : '温馨提示',
 				msg : '输入的人数不得超过255.', 
-				fn : function(btn){
-					
-				}
+				time : 3,
 			});
 			inputNumValUO = "";
 			$("#" + inputNumIdUO).val(uoOther.order.customNum);
@@ -398,9 +395,7 @@ function inputNumUO(o){
 			Util.msg.alert({
 				title : '温馨提示',
 				msg : '人数值不能为0.', 
-				fn : function(btn){
-					
-				}
+				time : 3,
 			});
 			inputNumValUO = "";
 			$("#" + inputNumIdUO).val(uoOther.order.customNum);
@@ -474,14 +469,15 @@ uo.goToCreateOrder = function(){
 			table : uo.table,
 			order : uo.order,
 			callback : function(){
-				initTables();
+				initTableData();
 				uo.cancelForUO();
 			}
 		});
 	}else{
 		Util.msg.alert({
 			title : '重要提示',
-			msg : '账单已经修改，请先做“确认修改”操作。'
+			msg : '账单已经修改，请先做“确认修改”操作。',
+			time : 3,
 		});
 	}
 };
@@ -555,9 +551,10 @@ uo.submitUpdateOrderHandler = function(c){
 				Util.msg.alert({
 					title : data.title,
 					msg : data.msg, 
+					time : 3,
 					fn : function(btn){
 						toggleContentDisplay({type:'hide', renderTo:'divUpdateOrder'});
-						initTables();
+						initTableData();
 					}
 				});
 			},
@@ -566,9 +563,7 @@ uo.submitUpdateOrderHandler = function(c){
 				Util.msg.alert({
 					title : '温馨提示',
 					msg : err, 
-					fn : function(btn){
-						
-					}
+					time : 3,
 				});
 			}
 		});
@@ -576,9 +571,7 @@ uo.submitUpdateOrderHandler = function(c){
 		Util.msg.alert({
 			title : '温馨提示',
 			msg : '没有任何菜品，不能提交', 
-			fn : function(btn){
-				
-			}
+			time : 3,
 		});
 	}
 };
@@ -616,12 +609,14 @@ uo.tempPayForUO = function(){
 				if(result.success){
 					Util.msg.alert({
 						title : '操作成功',
-						msg : result.data
+						msg : result.data,
+						time : 3,
 					});
 				}else{
 					Util.msg.alert({
 						title : '错误',
-						msg : result.data
+						msg : result.data,
+						time : 3,
 					});
 				}
 			},
@@ -629,14 +624,16 @@ uo.tempPayForUO = function(){
 				Util.LM.hide();
 				Util.msg.alert({
 					title : '错误',
-					msg : err
+					msg : err,
+					time : 3,
 				});
 			}
 		});
 	}else{
 		Util.msg.alert({
 			title : '重要提示',
-			msg : '账单已经修改，请先做“确认修改”操作。'
+			msg : '账单已经修改，请先做“确认修改”操作。',
+			time : 3,
 		});
 	}
 };

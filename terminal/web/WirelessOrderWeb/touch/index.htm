@@ -17,6 +17,7 @@
 var request = new URLParaQuery();
 var pin = request['pin'], restaurantID = request['restaurantID'];
 var staffData = {staffID:0, staffName:''};
+var tableData = {}, regionData = {};
 var foodData = {}, kitchenFoodData = {}, kitchenData = {}, deptData = {root:[]}, tasteData = {};
 function getDom(id){
 	return document.getElementById(id);
@@ -100,14 +101,14 @@ var uo = {
 					<div class="button-base" id = "busyForTableSelect" style = "margin-bottom: 2px; background-color: #F1C40D" onclick = "ts.selectBusyStatus()">就餐</div>
 			</div>
 			<div class="button-base" id = "divAllArea" style="margin-bottom: 2px;" onclick="addTables('allTable')">全部区域</div>
-			<div id="divShowRegion"></div>
+			<div id="divSelectRegionForTS"></div>
 			<div class="div-full">&nbsp;</div>
 			<div class="button-base" style="margin-bottom: 2px;" onclick = "ts.rn.prePage()">上翻</div>
 			<div class="button-base" style="margin-bottom: 2px;" onclick = "ts.rn.nextPage()">下翻</div>
 		</div>
 	</div>
   	<div id="divDescForTableSelect" class="box-horizontal" style="font-weight: bold; border-bottom: 1px solid #FFF; border-top: 1px solid #FFF; line-height: 25px; background: #FFD700;">
-  		<div style="margin: 0 10px; font-size : 15px;">操作员：<span id="spanStaffNameForDisplayToTS"></span></div>	
+  		<div style="margin: 0 10px; font-size : 15px;">服务员：<span id="spanStaffNameForDisplayToTS"></span></div>	
 		<div class="div-full"></div>
   		<div id="divDescForTableSelect-padding-msg" style="text-align: right;"></div>
   	</div>

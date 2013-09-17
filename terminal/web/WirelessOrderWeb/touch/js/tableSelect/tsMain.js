@@ -202,7 +202,7 @@ function renderToCreateOrder(tableNo, peopleNo){
 				table : uo.table,
 				order : uo.order,
 				callback : function(){
-					initTables();
+					initTableData();
 				}
 			});
 		}else{
@@ -211,7 +211,7 @@ function renderToCreateOrder(tableNo, peopleNo){
 			co.show({
 				table : theTable,
 				callback : function(){
-					initTables();
+					initTableData();
 				}
 			});
 		}		
@@ -220,9 +220,6 @@ function renderToCreateOrder(tableNo, peopleNo){
 			title : '温馨提示',
 			msg : '没有该餐桌，请重新输入一个桌号.', 
 			time : 2,
-			fn : function(btn){
-				
-			}
 		});
 	}
 }
@@ -350,19 +347,16 @@ ts.tt.submit = function(){
 						title : data.title,
 						msg : data.msg,
 						time : 3,
-						timeout : function(){
-							ts.tt.back();
-							initTables();
-						},
 						fn : function(btn){
 							ts.tt.back();
-							initTables();
+							initTableData();
 						}
 					});
 				}else{
 					Util.msg.alert({
 						title : data.title,
 						msg : data.msg,
+						time : 2,
 					});
 				}
 			},
@@ -370,6 +364,7 @@ ts.tt.submit = function(){
 				Util.msg.alert({
 					title : '错误',
 					msg : err, 
+					time : 2,
 				});
 			}
 		});

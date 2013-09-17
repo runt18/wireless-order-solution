@@ -43,14 +43,14 @@ $(function(){
 	/**
 	 * 定时器，定时刷新餐桌选择页面数据
 	 */
-	window.setInterval("initTables()", 240000);
+	window.setInterval("initTableData()", 240000);
 });
 
 /**
  * 初始化餐桌信息，保存到tables数组中
  * freeTables存放空闲餐桌，busyTables存放就餐餐桌
  */
-function initTables(){
+function initTableData(){
 	$('#spanStaffNameForDisplayToTS').html(staffData.staffName);
 	// 加载菜单数据
 	$.ajax({
@@ -63,14 +63,17 @@ function initTables(){
 			tables = [];
 			busyTables = [];
 			freeTables = [];
-			region = [];
 			regionId = [];
+			region = [];
+//			tableData = {};
+//			regionData = {};
 			data = eval("(" + data + ")");
 			if(data.success){
 				//把所有餐桌对象都放到本地数组tables中,freeTables存放空闲餐桌，busyTables存放就餐餐桌
 				for(x in data.root){	
 					if(data.root[x].statusValue == 0){
 						freeTables.push(data.root[x]);
+						
 					}else if(data.root[x].statusValue == 1){
 						busyTables.push(data.root[x]);
 					}
@@ -109,7 +112,8 @@ function initTables(){
 			}else{
 				Util.msg.alert({
 					title : data.title,
-					msg : data.msg, 
+					msg : data.msg,
+					time : 2,
 				});
 			}
 		},
@@ -117,6 +121,7 @@ function initTables(){
 			Util.msg.alert({
 				title : '温馨提示',
 				msg : err, 
+				time : 2,
 			});
 		}
 	});	
@@ -135,11 +140,52 @@ function showRegion(temp, pageNow){
 		regionHtml += "<div class='button-base regionSelect' id='region"+pageRegion[x].id+
 			"' style='margin-bottom: 2px;' onclick='addTables(this)'>"+pageRegion[x].name+"</div>";		
 	}
-	$("#divShowRegion").html(regionHtml);
+	$("#divSelectRegionForTS").html(regionHtml);
 	//设置区域未选中状态的背景色（#D4F640）
 	$(".button-base.regionSelect").css("backgroundColor", "#D4F640");
 	$("#" + ts.rn.selectingId).css("backgroundColor", "#FFA07A");
 }
+
+///**
+// * 初始化区域选择
+// * @param c
+// */
+//ts.initRegionContent = function(c){
+//	var rc = getDom('divSelectRegionForTS');
+//	var html = Templet.ts.region.format({
+//		value : -1,
+//		text : '全部分厨'
+//	});
+//	var tempTableData = []; // 菜品数据
+//	var temp = null;
+//	for(var i = 0; i < kitchenData.root.length; i++){
+//		temp = kitchenData.root[i];
+//		if(typeof c.deptId == 'number' && c.deptId != -1){
+//			if(temp.dept.id == c.deptId){
+//				html += Templet.co.kitchen.format({
+//					value : temp.id,
+//					text : temp.name
+//				});
+//				tempFoodData = tempFoodData.concat(temp.foods);
+//			}
+//		}else{
+//			if(temp.dept.id != -1){
+//				html += Templet.co.kitchen.format({
+//					value : temp.id,
+//					text : temp.name
+//				});
+//				tempFoodData = tempFoodData.concat(temp.foods);
+//			}
+//		}
+//	}
+//	temp = null;
+//	kc.innerHTML = html;
+//	//
+//	co.fp.init({
+//		data : tempFoodData
+//	});
+//	co.fp.getFirstPage();
+//};
 
 /**
  * 显示餐桌
