@@ -17,7 +17,6 @@ import com.wireless.db.staffMgr.RoleDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.tasteMgr.TasteDao;
 import com.wireless.exception.BusinessException;
-import com.wireless.exception.ProtocolError;
 import com.wireless.exception.RestaurantError;
 import com.wireless.pojo.crMgr.CancelReason;
 import com.wireless.pojo.distMgr.Discount;
@@ -117,7 +116,7 @@ public class RestaurantDao {
 	public static Restaurant getByAccount(DBCon dbCon, String account) throws SQLException, BusinessException{
 		List<Restaurant> result = getByCond(dbCon, " AND account = '" + account + "'", null);
 		if(result.isEmpty()){
-			throw new BusinessException(ProtocolError.ACCOUNT_NOT_EXIST);
+			throw new BusinessException(RestaurantError.RESTAURANT_NOT_FOUND);
 		}else{
 			return result.get(0);
 		}
