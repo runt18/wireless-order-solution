@@ -22,7 +22,7 @@ public class RequestFilter implements Filter{
 
 	private static final String SKIPVERIFY = "skipVerify";
 	private List<String> skipVerifyList = new ArrayList<String>();
-	private static final String DEFREDIRECT = "/WirelessOrderWeb/pages/PersonLoginTimeout.html";
+	private static final String DEFREDIRECT = "./pages/PersonLoginTimeout.html";
 	
 	private boolean check(String path){
 		if(skipVerifyList == null || skipVerifyList.size() <= 0){
@@ -57,8 +57,8 @@ public class RequestFilter implements Filter{
 			//FIXME 
 			//The code below just for print scheme port, should be removed in future
 			String url = requestPath + "?" + request.getQueryString();
-			if(url.startsWith("/WirelessOrderWeb/OperatePrinter.do?skipVerify&dataSource=port") ||
-			   url.startsWith("/WirelessOrderWeb/OperatePrintFunc.do?skipVerify&dataSource=port")){
+			if(url.contains("/OperatePrinter.do?skipVerify&dataSource=port") ||
+			   url.contains("/OperatePrintFunc.do?skipVerify&dataSource=port")){
 				chain.doFilter(request, response);
 				return;
 			}
