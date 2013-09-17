@@ -35,17 +35,18 @@ public class RequestFilter implements Filter{
 		}
 		return false;
 	}
+	
 	@Override
 	public void destroy() {
-		// TODO Auto-generated method stub
 		
 	} 
 
 	@Override
-	public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse,
-			FilterChain chain) throws IOException, ServletException {
+	public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain chain) throws IOException, ServletException {
+		
 		HttpServletRequest request = (HttpServletRequest)servletRequest;
 		HttpServletResponse response = (HttpServletResponse)servletResponse;
+		
 		String requestPath = request.getRequestURI();
 		if(check(requestPath)){
 			String pin =  (String) request.getSession().getAttribute("pin");
@@ -103,7 +104,8 @@ public class RequestFilter implements Filter{
 				pin = (String) request.getSession().getAttribute("pin");
 				if(pin == null){
 					if (request.getHeader("x-requested-with") != null && request.getHeader("x-requested-with").equalsIgnoreCase("XMLHttpRequest")) {  
-	                    response.addHeader("sessionstatus", "timeout");  
+	                    response.addHeader("sessionstatus", "timeout");
+	                    response.addHeader("root_path",	request.getContextPath());
 	                }else{
 	                	response.sendRedirect(DEFREDIRECT + "?" + Encrypt.strEncode("restaurantID="+params.get("restaurantID"), "mi", null, null));
 	
