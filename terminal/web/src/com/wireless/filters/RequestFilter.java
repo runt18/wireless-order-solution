@@ -22,7 +22,7 @@ public class RequestFilter implements Filter{
 
 	private static final String SKIPVERIFY = "skipVerify";
 	private List<String> skipVerifyList = new ArrayList<String>();
-	private static final String DEFREDIRECT = "./pages/PersonLoginTimeout.html";
+	private static final String DEFREDIRECT = "/pages/PersonLoginTimeout.html";
 	
 	private boolean check(String path){
 		for (String skip : skipVerifyList) {
@@ -101,10 +101,10 @@ public class RequestFilter implements Filter{
 				pin = (String) request.getSession().getAttribute("pin");
 				if(pin == null){
 					if (request.getHeader("x-requested-with") != null && request.getHeader("x-requested-with").equalsIgnoreCase("XMLHttpRequest")) {  
-	                    response.addHeader("sessionstatus", "timeout");
+	                    response.addHeader("session_status", "timeout");
 	                    response.addHeader("root_path",	request.getContextPath());
 	                }else{
-	                	response.sendRedirect(DEFREDIRECT + "?" + Encrypt.strEncode("restaurantID="+params.get("restaurantID"), "mi", null, null));
+	                	response.sendRedirect(request.getContextPath() + DEFREDIRECT + "?" + Encrypt.strEncode("restaurantID="+params.get("restaurantID"), "mi", null, null));
 	
 	                }
 					if(c!=null){

@@ -34,6 +34,8 @@ public class QueryStaffAction extends Action {
 		String start = request.getParameter("start");
 		String limit = request.getParameter("limit");
 		String isName =request.getParameter("isName");
+		String name = request.getParameter("name");
+		String cate = request.getParameter("cate");
 		
 		JObject jobject = new JObject();
 		List<Staff> staffList = new ArrayList<Staff>();
@@ -51,6 +53,7 @@ public class QueryStaffAction extends Action {
 		// 是否combo
 		//String isCombo = request.getParameter("isCombo");
 		Map<Object, Object> other = new HashMap<Object, Object>();
+		
 		try {
 			// 解决后台中文传到前台乱码
 			response.setContentType("text/json; charset=utf-8");
@@ -59,12 +62,18 @@ public class QueryStaffAction extends Action {
 			String restaurantID ;
 				
 			restaurantID = request.getParameter("restaurantID");
-			
+			String extraCond = "  AND STAFF.restaurant_id = " + restaurantID;
 			if(pin != null && isName != null){
 				staff = StaffDao.verify(Integer.parseInt(pin));
 				other.put("staff", staff);
 			}else {
-				staffList = StaffDao.getStaffs(Integer.parseInt(restaurantID));
+				if(name != null && !name.trim().isEmpty()){
+					extraCond += " AND STAFF.name like '%" + name + "%'";
+				}else if(cate != null && !cate.trim().isEmpty()){
+					extraCond += " AND STAFF.role_id = " + cate;
+				}
+				
+				staffList = StaffDao.getStaffs(extraCond);
 				Restaurant restaurant = RestaurantDao.getById(Integer.parseInt(restaurantID));
 				other.put("restaurant", restaurant);
 				jobject.setTotalProperty(staffList.size());
