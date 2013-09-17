@@ -160,7 +160,6 @@ function initTasteGrid(){
 		'../../QueryTaste.do',
 		[
 			[true, false, false, true], 
-			['编号', 'alias'],
 			['名称', 'name'],
 			['价格', 'price',,'right','Ext.ux.txtFormat.gridDou'],
 			['比例', 'rate',,'right','Ext.ux.txtFormat.gridDou'],
@@ -199,12 +198,14 @@ function initTasteOperatorWin(){
 			items : [{
 				xtype:'hidden',
 				id:'hideTasteId'
-			}, {
+			}, 
+			{
 				xtype : 'numberfield',
 				fieldLabel : '编号',
 				id : 'numTasteAlias',
 				allowBlank : false,
 				width : 160,
+				disabled : true,
 				validator : function(v) {
 					if (v < 1 || v > 65535 || eval(v.indexOf('.')) != -1) {
 						return '自定口味编号范围在 1 至 65535 之间, 且为整数.';
@@ -212,7 +213,8 @@ function initTasteOperatorWin(){
 						return true;
 					}
 				}
-			}, {
+			}, 
+			{
 				xtype : 'textfield',
 				fieldLabel : '名称',
 				id : 'txtTasteName',
@@ -311,9 +313,6 @@ function initTasteOperatorWin(){
 				var tasteRate = Ext.getCmp('numTasteRate');
 				var tasteCate = Ext.getCmp('comboTasteCate');
 				
-				if(!tasteAlias.isValid() || !tasteName.isValid()){
-					return;
-				}
 				if(tasteCate.getValue() == 0){
 					if(!tastePrice.isValid()){
 						return;
@@ -334,7 +333,6 @@ function initTasteOperatorWin(){
 						'dataSource' : tasteOperatorWin.otype.toLowerCase(),
 						
 						id : tasteId.getValue(),
-						alias : tasteAlias.getValue(),
 						name : tasteName.getValue(),
 						price : tastePrice.getValue(),
 						rate : tasteRate.getValue(),

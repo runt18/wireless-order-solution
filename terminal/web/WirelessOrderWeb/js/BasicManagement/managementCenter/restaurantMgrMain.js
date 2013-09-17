@@ -78,6 +78,9 @@ var restaurantAddWin = new Ext.Window({
 							restaurantAddWin.hide();
 							Ext.example.msg(jr.title, jr.msg);
 							Ext.getCmp('grid').store.reload();
+						}else{
+							jr['icon'] = Ext.MessageBox.WARNING;
+							Ext.ux.showMsg(jr);
 						}
 					},
 					failure : function(res, opt){

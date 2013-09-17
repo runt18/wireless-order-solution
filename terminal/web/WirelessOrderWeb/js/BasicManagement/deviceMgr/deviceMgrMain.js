@@ -198,7 +198,7 @@ var addDeviceWin = new Ext.Window({
 					name : 'device',
 					inputValue : 2,
 					hideLabel : true,
-					boxLabel : 'IOS'
+					boxLabel : 'iOS'
 				}]
 			},{
 				items : [{

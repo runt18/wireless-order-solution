@@ -1,11 +1,6 @@
 ﻿// on page load function
 function loginOnLoad() {
 	
-	Ext.getDom('passwordConfig').onclick = function(){		
-		passwordConfigWin.show();
-		passwordConfigWin.center();
-	};
-	
 	Ext.getDom('formatPrice').onclick = function(){		
 		formatPrice.show();
 		formatPrice.center();
@@ -65,14 +60,6 @@ function loginOnLoad() {
 	});
 	
 	// mouse over & mouse off -- heightlight the icon
-	$("#passwordConfig").each(function() {
-		$(this).hover(function() {
-			$(this).stop().css("background", "url(../../images/passwordConfig_select.png) no-repeat 50%");
-		},
-		function() {
-			$(this).stop().css("background", "url(../../images/passwordConfig.png) no-repeat 50%");
-		});
-	});
 	
 	$("#formatPrice").each(function() {
 		$(this).hover(function() {
