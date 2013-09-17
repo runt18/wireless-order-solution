@@ -153,9 +153,6 @@
 		<action path="/UpdateStaff" type="com.wireless.Actions.staffMgr.UpdateStaffAction"
 			scope="request">
 		</action>
-		<action path="/ResetStaffPassword"
-			type="com.wireless.Actions.staffMgr.ResetPwdStaffAction" scope="request">
-		</action>
 		<action path="/DailySettleCheck"
 			type="com.wireless.Actions.dailySettle.DailySettleCheckAction" scope="request">
 		</action>
