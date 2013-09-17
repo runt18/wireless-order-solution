@@ -176,19 +176,19 @@ public class StaffDao {
 	
 	/**
 	 * Get the staffs to a specific restaurant.
-	 * @param restaurantId
-	 * 			the restaurant id
+	 * @param extraCond
+	 * 			the extra condition
 	 * @return the staffs to this restaurant
 	 * @throws SQLException
 	 * 			throws if failed execute any SQL statement
 	 * @throws BusinessException 
 	 * 			throws if the role to any staff does NOT exist
 	 */
-	public static List<Staff> getStaffs(int restaurantId) throws SQLException, BusinessException{
+	public static List<Staff> getStaffs(String extraCond) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return getStaffs(dbCon, restaurantId);
+			return getStaffs(dbCon, extraCond);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -206,8 +206,8 @@ public class StaffDao {
 	 * @throws BusinessException 
 	 * 			throws if the role to any staff does NOT exist
 	 */
-	public static List<Staff> getStaffs(DBCon dbCon, int restaurantId) throws SQLException, BusinessException{
-		return getStaffs(dbCon, " AND STAFF.restaurant_id = " + restaurantId, null);
+	public static List<Staff> getStaffs(DBCon dbCon, String extraCond) throws SQLException, BusinessException{
+		return getStaffs(dbCon, extraCond, null);
 	}
 
 	/**
