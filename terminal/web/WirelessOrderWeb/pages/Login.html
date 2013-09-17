@@ -47,11 +47,11 @@
 		width: 310px;
 	}
 	.loginBox .loginInput:FOCUS {
-		border: 1px solid #B7D4EA;
+		border: 2px solid #B7D4EA;
 		box-shadow: 0 0 8px #B7D4EA;
 	}
 	.loginBox .loginBtn {
-		background-image: linear-gradient(to bottom, #B5DEF2, #85CFEE);
+		background-color : #85CFEE;
 		border: 1px solid #98CCE7;
 		border-radius: 20px;
 		box-shadow:inset rgba(255,255,255,0.6) 0 1px 1px, rgba(0,0,0,0.1) 0 1px 1px;
@@ -62,6 +62,7 @@
 		padding: 5px 14px;
 	}
 	.loginBox .loginBtn:HOVER {
+		background-color : #B5DEF2;
 		background-image: linear-gradient(to top, #B5DEF2, #85CFEE);
 	}
 	.loginBox a.forgetLink {
@@ -80,6 +81,11 @@
 	}
 	.loginBox label[for="remember"] {
 		font: 11px Arial;
+	}
+	.head{
+		height : 50px;
+		background-image: url("../images/zhiyi.jpg") !important;
+		
 	}
 	</style>
 </head>
@@ -107,7 +113,7 @@
 		</div>
 
 	</div>
-<div align="center">	
+<div align="center" style="margin-bottom: 5px">	
 	<div id="postBar"><span style=" font-size: small">版权所有(c) 2011 广州鼎鼎信息科技有限公司 · 智易科技</span></div>
 </div>	
 <script type="text/javascript">
@@ -130,7 +136,12 @@
 	}     
 	document.onload = validteCode();  
 	$(function(){
-
+		$('#name').focus();
+		$('#form').keydown(function(e){
+			if(e.keyCode == 13){
+				$('#login').click();
+			}
+		});
  		$('#login').click(function(){
 
   			if($('#password').val() == vCode){
