@@ -180,17 +180,14 @@ public class PayOrderAction extends Action{
 			}else if(resp.header.type == Type.NAK){
 				jsonResp = jsonResp.replace("$(result)", "false");
 				ErrorCode errCode = new Parcel(resp.body).readParcel(ErrorCode.CREATOR);
-				if(errCode.equals(ProtocolError.TERMINAL_NOT_ATTACHED)){
-					jsonResp = jsonResp.replace("$(value)", "没有获取到餐厅信息，请重新确认");
-					
-				}else if(errCode.equals(ProtocolError.ORDER_NOT_EXIST)){					
+				if(errCode.equals(ProtocolError.ORDER_NOT_EXIST)){					
 					jsonResp = jsonResp.replace("$(value)", orderToPay.getId() + "号账单信息不存在，请重新确认");
 					
 				}else if(errCode.equals(ProtocolError.ORDER_BE_REPEAT_PAID)){
 					jsonResp = jsonResp.replace("$(value)", orderToPay.getId() + "号账单已结帐，请重新确认");
 					
 				}else{
-					jsonResp = jsonResp.replace("$(value)", orderToPay.getId() + "号账单结帐失败，请重新确认");
+					jsonResp = jsonResp.replace("$(value)", errCode.getDesc());
 				}
 				
 			}else{

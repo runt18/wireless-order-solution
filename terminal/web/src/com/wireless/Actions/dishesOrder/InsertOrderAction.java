@@ -118,9 +118,7 @@ public class InsertOrderAction extends Action{
 				
 			}else if(resp.header.type == Type.NAK){
 				ErrorCode errCode = new Parcel(resp.body).readParcel(ErrorCode.CREATOR);
-				if(errCode.equals(ProtocolError.TERMINAL_NOT_ATTACHED)){
-					jobject.initTip(false, ProtocolError.TERMINAL_NOT_ATTACHED.getCode(), "没有获取到餐厅信息，请重新确认.");
-				}else if(errCode.equals(ProtocolError.TABLE_NOT_EXIST)){					
+				if(errCode.equals(ProtocolError.TABLE_NOT_EXIST)){					
 					jobject.initTip(false, ProtocolError.TABLE_NOT_EXIST.getCode(), (orderToInsert.getDestTbl().getAliasId() + "号餐台信息不存在，请重新确认."));
 				}else if(errCode.equals(ProtocolError.TABLE_BUSY)){
 					jobject.initTip(false, ProtocolError.TABLE_BUSY.getCode(), (orderToInsert.getDestTbl().getAliasId() + "号餐台正在就餐，可能已下单，请重新确认."));
@@ -131,7 +129,7 @@ public class InsertOrderAction extends Action{
 				}else if(errCode.equals(ProtocolError.TABLE_IDLE)){
 					jobject.initTip(false, ProtocolError.TABLE_IDLE.getCode(), "该账单已结账或已删除.");
 				}else{
-					jobject.initTip(false, (orderToInsert.getDestTbl().getAliasId() + "号餐台" + orderType + "失败，请重新确认."));
+					jobject.initTip(false, errCode.getDesc());
 				}
 			}else{
 				jobject.initTip(false, (orderToInsert.getDestTbl().getAliasId() + "号餐台" + orderType + "不成功，请重新确认."));
