@@ -91,9 +91,12 @@ public class OperateRestaurantAction extends DispatchAction {
 			RestaurantDao.update(builder);
 			
 			jobject.initTip(true, "修改成功");
+		}catch(BusinessException e){
+			e.printStackTrace();
+			jobject.initTip(e);
 		}catch(SQLException e){
 			e.printStackTrace();
-			jobject.initTip(false, e.getMessage());
+			jobject.initTip(false, "含有非法字符");
 		}finally{
 			response.getWriter().print(jobject.toString());
 		}
