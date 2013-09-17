@@ -6,7 +6,6 @@ import android.os.AsyncTask;
 
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.ErrorCode;
-import com.wireless.exception.ErrorEnum;
 import com.wireless.exception.ProtocolError;
 import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
@@ -71,14 +70,8 @@ public class QueryOrderTask extends AsyncTask<Void, Void, Order>{
 				}else if(errCode.equals(ProtocolError.TABLE_NOT_EXIST)) {
 					mBusinessException = new BusinessException(mTblAlias + "号台信息不存在", errCode);
 
-				}else if(errCode.equals(ProtocolError.TERMINAL_NOT_ATTACHED)) {
-					mBusinessException = new BusinessException("终端没有登记到餐厅，请联系管理人员。", errCode);
-
-				}else if(errCode.equals(ProtocolError.TERMINAL_EXPIRED)) {
-					mBusinessException = new BusinessException("终端已过期，请联系管理人员。", errCode);
-
 				}else{
-					mBusinessException = new BusinessException("未确定的异常错误(" + resp.header.reserved + ")", ErrorEnum.UNKNOWN);
+					mBusinessException = new BusinessException(errCode);
 				}
 			}
 		}catch(IOException e){

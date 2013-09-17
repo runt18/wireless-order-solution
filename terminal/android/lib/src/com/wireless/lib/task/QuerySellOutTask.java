@@ -8,7 +8,6 @@ import android.os.AsyncTask;
 
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.ErrorCode;
-import com.wireless.exception.ProtocolError;
 import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
 import com.wireless.pack.req.ReqQuerySellOut;
@@ -39,7 +38,6 @@ public class QuerySellOutTask extends AsyncTask<Void, Void, Food[]>{
 		List<Food> sellOutFoods = new ArrayList<Food>();
 		
 		try{
-			String errMsg;
 			ProtocolPackage resp = ServerConnector.instance().ask(new ReqQuerySellOut(mStaff));
 			if(resp.header.type == Type.ACK){
 				sellOutFoods.addAll(new Parcel(resp.body).readParcelList(Food.CREATOR));
@@ -55,20 +53,9 @@ public class QuerySellOutTask extends AsyncTask<Void, Void, Food[]>{
 						f.setSellOut(true);
 					}
 				}
-					
 				
 			}else{
-				ErrorCode errCode = new Parcel(resp.body).readParcel(ErrorCode.CREATOR);
-				if(errCode.equals(ProtocolError.TERMINAL_NOT_ATTACHED)) {
-					errMsg = "终端没有登记到餐厅，请联系管理人员。";
-					
-				}else if(errCode.equals(ProtocolError.TERMINAL_EXPIRED)) {
-					errMsg = "终端已过期，请联系管理人员。";
-					
-				}else{
-					errMsg = "获取沽清列表失败。";
-				}
-				mProtocolException = new BusinessException(errMsg);
+				mProtocolException = new BusinessException(new Parcel(resp.body).readParcel(ErrorCode.CREATOR));
 			}
 		}catch(IOException e){
 			mProtocolException = new BusinessException(e.getMessage());

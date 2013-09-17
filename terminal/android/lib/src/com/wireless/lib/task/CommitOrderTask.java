@@ -55,10 +55,7 @@ public class CommitOrderTask extends AsyncTask<Void, Void, Void>{
 				
 				errCode = new Parcel(resp.body).readParcel(ErrorCode.CREATOR);
 				
-				if(errCode.equals(ProtocolError.MENU_EXPIRED)){
-					errMsg = "菜谱有更新，请更新菜谱后再重新改单。"; 
-					
-				}else if(errCode.equals(ProtocolError.ORDER_EXPIRED)){
+				if(errCode.equals(ProtocolError.ORDER_EXPIRED)){
 					errMsg = "账单已更新，请重新刷新数据或退出。";
 					
 				}else if(errCode.equals(ProtocolError.ORDER_NOT_EXIST)){			

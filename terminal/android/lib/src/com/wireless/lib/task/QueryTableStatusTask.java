@@ -48,18 +48,10 @@ public class QueryTableStatusTask extends AsyncTask<Void, Void, Table.Status>{
 				
 			}else{
 				ErrorCode errCode = new Parcel(resp.body).readParcel(ErrorCode.CREATOR);
-				if(errCode.equals(ProtocolError.TERMINAL_NOT_ATTACHED)) {
-					mErrMsg = "终端没有登记到餐厅，请联系管理人员。";
-					
-				}else if(errCode.equals(ProtocolError.TERMINAL_EXPIRED)) {
-					mErrMsg = "终端已过期，请联系管理人员。";
-					
-				}else if(errCode.equals(ProtocolError.TABLE_NOT_EXIST)){
+				if(errCode.equals(ProtocolError.TABLE_NOT_EXIST)){
 					mErrMsg = mTblToQuery.getAliasId() + "号餐台信息不存在";
-					
 				}else{
-					mErrMsg = "读取餐台状态信息失败";
-					
+					mErrMsg = errCode.getDesc();
 				}
 			}					
 			

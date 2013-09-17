@@ -6,7 +6,6 @@ import android.os.AsyncTask;
 
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.ErrorCode;
-import com.wireless.exception.ProtocolError;
 import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
 import com.wireless.pack.req.ReqQueryMenu;
@@ -34,25 +33,12 @@ public class QueryMenuTask extends AsyncTask<Void, Void, FoodMenu>{
 		
 		FoodMenu foodMenu = null;
 		
-		String errMsg;
-		
 		try{
 			ProtocolPackage resp = ServerConnector.instance().ask(new ReqQueryMenu(mStaff));
 			if(resp.header.type == Type.ACK){
 				foodMenu = new Parcel(resp.body).readParcel(FoodMenu.CREATOR);
-				
 			}else{
-				ErrorCode errCode = new Parcel(resp.body).readParcel(ErrorCode.CREATOR);
-				if(errCode.equals(ProtocolError.TERMINAL_NOT_ATTACHED)) {
-					errMsg = "终端没有登记到餐厅，请联系管理人员。";
-					
-				}else if(errCode.equals(ProtocolError.TERMINAL_EXPIRED)) {
-					errMsg = "终端已过期，请联系管理人员。";
-					
-				}else{
-					errMsg = "菜谱下载失败，请检查网络信号或重新连接。";
-				}
-				mProtocolException = new BusinessException(errMsg, errCode);
+				mProtocolException = new BusinessException(new Parcel(resp.body).readParcel(ErrorCode.CREATOR));
 			}
 		}catch(IOException e){
 			mProtocolException = new BusinessException(e.getMessage());
