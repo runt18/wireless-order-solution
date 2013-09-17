@@ -1,5 +1,5 @@
 <!DOCTYPE HTML>
-<html lang="en-US">
+<html>
 <head>
 	<meta charset="UTF-8">
 	<title>无线点餐网页终端登录</title>
@@ -51,8 +51,7 @@
 		box-shadow: 0 0 8px #B7D4EA;
 	}
 	.loginBox .loginBtn {
-		background-image: -webkit-linear-gradient(to top, #B5DEF2, #85CFEE);
-		background-image: -moz-linear-gradient(to bottom, #B5DEF2, #85CFEE);
+		background-image: linear-gradient(to bottom, #B5DEF2, #85CFEE);
 		border: 1px solid #98CCE7;
 		border-radius: 20px;
 		box-shadow:inset rgba(255,255,255,0.6) 0 1px 1px, rgba(0,0,0,0.1) 0 1px 1px;
@@ -63,8 +62,7 @@
 		padding: 5px 14px;
 	}
 	.loginBox .loginBtn:HOVER {
-		background-image: -moz-linear-gradient(to top, #B5DEF2, #85CFEE);
-		background-image: -webkit-linear-gradient(to top, #B5DEF2, #85CFEE);
+		background-image: linear-gradient(to top, #B5DEF2, #85CFEE);
 	}
 	.loginBox a.forgetLink {
 		color: #ABABAB;
@@ -91,18 +89,21 @@
 	<div class="wrapper">
 
 		<div class="loginBox">
-
+		<form id="form">
 			<div class="loginBoxCenter">
 				<p><label for="username">会员账号：</label></p>
 				<p><input id="name" name="mbName" class="loginInput" autofocus="autofocus" required="required" autocomplete="off" placeholder="请输入账号" value="" /></p>
-				<div id="divCode" onmousedown="validteCode()" style="cursor: pointer;background-color: White;  width:52px; height:16px; padding:5px; text-align:center; vertical-align:middle; letter-spacing:5px; border:solid 1px blue">  
-   				<span></span><span ></span><span ></span><span ></span></div> 
+
 				<p><label for="password">验证码：</label></p>
 				<p><input type="password" id="password" name="password" class="loginInput" required="required" placeholder="请输入验证码" value="" /></p>
+				<div id="divCode" onmousedown="validteCode()" style="cursor: pointer;background-color: White;  width:52px; height:16px; padding:5px; text-align:center; vertical-align:middle; letter-spacing:5px; border:solid 1px blue">  
+   				<span></span><span ></span><span ></span><span ></span></div> 
 			</div>
 			<div class="loginBoxButtons">
-				<button id="login" class="loginBtn">进入web点菜系统</button>
+				<input type="button" class="loginBtn" id="login" value="进入web点菜系统">
+				<!-- <button id="login" class="loginBtn">进入web点菜系统</button> -->
 			</div>
+		</form>
 		</div>
 
 	</div>
