@@ -25,9 +25,6 @@ public class RequestFilter implements Filter{
 	private static final String DEFREDIRECT = "./pages/PersonLoginTimeout.html";
 	
 	private boolean check(String path){
-		if(skipVerifyList == null || skipVerifyList.size() <= 0){
-			return false;
-		}
 		for (String skip : skipVerifyList) {
 			if(path.indexOf(skip) > -1){
 				return true;
