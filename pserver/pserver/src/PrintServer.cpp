@@ -1467,6 +1467,8 @@ void PServer::portPrinter(IPReport* pReport){
 			WINHTTP_NO_PROXY_NAME, 
 			WINHTTP_NO_PROXY_BYPASS, 0 );
 
+		wstring root = _T("/web-term/");
+
 		// Specify an HTTP server.
 		if( hSession ){
 			//get the remote IP address, port, account and password from the config XML configuration file
@@ -1476,6 +1478,7 @@ void PServer::portPrinter(IPReport* pReport){
 				port = 10080;
 			}else if(serv_name == _T("localhost") || serv_name == _T("127.0.0.1")){
 				port = 8080;
+				root = _T("/WirelessOrderWeb/");
 			}else{
 				port = 80;
 			}
@@ -1483,7 +1486,7 @@ void PServer::portPrinter(IPReport* pReport){
 		}
 	
 		wostringstream wos;
-		wos << _T("/WirelessOrderWeb/OperatePrinter.do?skipVerify&dataSource=port")
+		wos << root << _T("OperatePrinter.do?skipVerify&dataSource=port")
 			<< _T("&account=") << account
 			<< _T("&printerName=") + (*it)->name 
 			<< _T("&style=") << (*it)->style;
@@ -1631,7 +1634,7 @@ void PServer::portPrinter(IPReport* pReport){
 			}
 
 			wostringstream wos;
-			wos << _T("/WirelessOrderWeb/OperatePrintFunc.do?skipVerify&dataSource=port") 
+			wos << root << _T("OperatePrintFunc.do?skipVerify&dataSource=port") 
 				<< _T("&account=") << account
 				<< _T("&printerName=") + (*it)->name 
 				<< _T("&repeat=") << iter_func->repeat
