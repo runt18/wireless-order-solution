@@ -25,6 +25,7 @@ var restaurantAddWin = new Ext.Window({
 	resizable : false,
 	modal : true,
 	autoHeight : true,
+	width : 360,
 	bbar : ['->', {
 		text : '保存',
 		id : 'btnAddRestaurant',
@@ -152,16 +153,16 @@ var restaurantAddWin = new Ext.Window({
 			fieldLabel : '电话1',
 			width : 140,
 			id : 'txtTele1',
-			regex : Ext.ux.RegText.phone.reg,
-			regexText : Ext.ux.RegText.phone.error
+			regex : Ext.ux.RegText.tel.reg,
+			regexText : Ext.ux.RegText.tel.error
 			
 		},{
 			xtype : 'textfield',
 			fieldLabel : '电话2',
 			width : 140,
 			id : 'txtTele2',
-			regex : Ext.ux.RegText.phone.reg,
-			regexText : Ext.ux.RegText.phone.error
+			regex : Ext.ux.RegText.tel.reg,
+			regexText : Ext.ux.RegText.tel.error
 				
 		},{
 			xtype : 'textfield',
@@ -174,6 +175,7 @@ var restaurantAddWin = new Ext.Window({
 			fieldLabel : '账号有效期',
 			id : 'dataExpireDate',
 			format : 'Y-m-d',
+			width : 100,
 			allowBlank : false
 		},{
 			layout : 'column',
@@ -195,7 +197,7 @@ var restaurantAddWin = new Ext.Window({
 					id : 'rdoRecordAlive',
 					inputValue : 2,
 					hideLabel : true,
-					checked : true,
+
 					boxLabel : '90天'
 				}]
 			}, {
@@ -204,6 +206,7 @@ var restaurantAddWin = new Ext.Window({
 					name : 'recordAlive',
 					inputValue : 3,
 					hideLabel : true,
+					checked : true,
 					boxLabel : '180天&nbsp;'
 				}]
 			},{
@@ -268,8 +271,8 @@ function optRestaurant(){
 }
 
 function hideAddress(v){
-	if(v.length > 10){
-		return v.substring(0,10)+'...';
+	if(v.length > 7){
+		return v.substring(0,7)+'...';
 	}else{
 		return v;
 	}
@@ -282,6 +285,9 @@ function optRestaurantHandler(c){
 			restaurantAddWin.operationType = c.otype;
 			restaurantAddWin.show();
 			restaurantAddWin.center();
+			var date = new Date();
+			date.setFullYear(date.getFullYear() + 1);
+			Ext.getCmp('dataExpireDate').setValue(date);
 			Ext.getCmp('txtAccount').focus(true, 100);
 		}else if(c.otype == 'update'){
 			var data = Ext.getCmp('grid').getSelectionModel().getSelected().data;
@@ -298,6 +304,7 @@ function optRestaurantHandler(c){
 			Ext.getCmp('txtTele2').setValue(data.tele2);
 			Ext.getCmp('txtAddress').setValue(data.address);
 			Ext.getCmp('dataExpireDate').setValue(data.expireDate);
+			Ext.getCmp('txtInfo').setValue(data.info);
 			Ext.getCmp('txtAccount').focus(true, 100);
 			var dates = document.getElementsByName('recordAlive');
 			for ( var i = 0; i < dates.length; i++) {
@@ -363,7 +370,7 @@ Ext.onReady(function(){
 		{header : '电话1', dataIndex : 'tele1'},
 		{header : '电话2', dataIndex : 'tele2'},
 		{header : '地址', dataIndex : 'address', renderer : hideAddress},
-		{header : '餐厅信息', dataIndex : 'info'},
+		{header : '餐厅信息', dataIndex : 'info', renderer : hideAddress},
 		{header : '账单有效期', dataIndex : 'recordAliveText'},
 		{header : '操作', dataIndex : 'optRestaurant', id : 'optRestaurant', align : 'center', renderer : optRestaurant}
 		

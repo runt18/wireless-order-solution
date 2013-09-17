@@ -392,7 +392,7 @@ var staffStore = new Ext.data.Store({
 	baseParams:{
 		"restaurantID" : restaurantID,
 		"type" : 0,
-		"isPaging" : true,
+		"isPaging" : false,
 		"isCombo" : false
 	}
 });
@@ -473,7 +473,7 @@ var chooseRoleComb = new Ext.form.ComboBox({
 	triggerAction : 'all',
 	selectOnFocus : true,
 	allowBlank : false,
-	readOnly : true,
+	readOnly : true
 });
 
 var referRoleComb = new Ext.form.ComboBox({
@@ -491,7 +491,26 @@ var referRoleComb = new Ext.form.ComboBox({
 	readOnly : true,
 });
 
-
+var searchRoleComb = new Ext.form.ComboBox({
+	forceSelection : true,
+	width : 120,
+	id : 'combSearchRole',
+	store : roleStore,
+	valueField : 'id',
+	displayField : 'name',
+	typeAhead : true,
+	mode : 'local',
+	triggerAction : 'all',
+	selectOnFocus : true,
+	readOnly : true,
+	hidden : true,
+	listeners : {
+		select : function(){
+			Ext.getCmp('btnSearch').handler();
+		
+		}
+	}
+});
 
 
 //权限Store
@@ -536,6 +555,7 @@ function operateStaff(c){
 		staffAddWin.show();
 		staffAddWin.center();
 		Ext.getCmp('txtStaffName').focus(true, 100);
+		
 	}else if(c.otype == 'update'){
 		var ss = Ext.getCmp('staffGrid').getSelectionModel().getSelected();
 		staffAddWin.show();
@@ -878,8 +898,54 @@ var roleAddWin = new Ext.Window({
 	}]
 	
 });
+
+var filterComb = new Ext.form.ComboBox({
+	forceSelection : true,
+	width : 100,
+	value : '全部',
+	id : 'comboFilter',
+	store : new Ext.data.SimpleStore({
+		fields : [ 'value', 'text' ],
+		data : filterTypeDate
+	}),
+	valueField : 'value',
+	displayField : 'text',
+	typeAhead : true,
+	mode : 'local',
+	triggerAction : 'all',
+	selectOnFocus : true,
+	allowBlank : false,
+	readOnly : true,
+	listeners : {
+		select : function(combo, record, index){
+			var name = Ext.getCmp('txtSearchName');
+			
+			if(index == 0){
+				name.setVisible(false);
+				name.setValue('');
+				searchRoleComb.setVisible(false);
+				searchRoleComb.setValue('');
+				
+			}else if (index == 1){
+				name.setValue('');
+				searchRoleComb.setValue('');
+				name.setVisible(true);
+				searchRoleComb.setVisible(false);
+				
+			}else if(index == 2){
+				name.setValue('');
+				searchRoleComb.setValue('');
+				name.setVisible(false);
+				searchRoleComb.setVisible(true);
+			};
+		}
+	}
+	
+});
 // -------------- layout ---------------
 var staffGrid, roleGrid, privilegeTree;
+var selectChange = false;
+var selected, beforeSelected = null;
 Ext.onReady(function() {
 	// 解决ext中文传入后台变问号问题
 	Ext.lib.Ajax.defaultPostHeader += '; charset=utf-8';
@@ -919,10 +985,27 @@ Ext.onReady(function() {
 			}
 		},
 		tbar : [{
-			xtype : 'tbtext',
-			text : '员工管理'
-		},'->',
-		{
+				xtype : 'tbtext',
+				text : '过滤: '
+			},{xtype : 'tbtext',text : '&nbsp;&nbsp;'},
+			filterComb,
+			{xtype : 'tbtext',text : '&nbsp;&nbsp;'},
+			{
+				xtype : 'textfield',
+				id : 'txtSearchName',
+				width : 120,
+				hidden : true
+			},searchRoleComb,'->', {
+				id : 'btnSearch',
+				text : '搜索',
+				iconCls : 'btn_search',
+				handler : function(){
+					var store = staffGrid.getStore();
+					store.baseParams['name'] = Ext.getCmp('txtSearchName').getValue();
+					store.baseParams['cate'] = Ext.getCmp('combSearchRole').getValue();
+					store.load();
+				}
+			},{
 			text : '添加',				
 			iconCls : 'btn_add',
 			id : 'tbarAddStaff',
@@ -930,13 +1013,13 @@ Ext.onReady(function() {
 				operateStaff({otype : 'insert'});
 			}
 		}],
-		bbar : new Ext.PagingToolbar({
-			pageSize : pageRecordCount,
-			store : staffStore,
-			displayInfo : true,
-			displayMsg : '显示第 {0} 条到 {1} 条记录，共 {2} 条',
-			emptyMsg : '没有记录'
-		})
+		keys : [{
+			key : Ext.EventObject.ENTER,
+			scope : this,
+			fn : function(){
+				Ext.getCmp('btnSearch').handler();
+			}
+		}]
 
 	});
 	
@@ -963,18 +1046,44 @@ Ext.onReady(function() {
 			}
 		}],
 		listeners : {
-			
 			rowclick : function(thiz, rowIndex, e){
-				if(thiz.getStore().getAt(rowIndex).get('name') == '管理员' || thiz.getStore().getAt(rowIndex).get('name') == '老板'){
-					privilegeTree.disable();
+				selected = thiz.getStore().getAt(rowIndex).get('id');
+				if(selectChange){
+					Ext.Msg.confirm('提示', '是否保存权限的修改?', function(e){
+						if(e == "yes"){
+							Ext.getCmp('savePrivilage').handler();
+						}else{
+							selectChange = false;
+							Ext.getDom('change').innerHTML = '&nbsp;';
+						}
+						beforeSelected = selected;
+						if(thiz.getStore().getAt(rowIndex).get('name') == '管理员' || thiz.getStore().getAt(rowIndex).get('name') == '老板'){
+							privilegeTree.disable();
+						}else{
+							privilegeTree.enable();
+						}
+						Ext.getDom('roleTbarName').innerHTML = thiz.getStore().getAt(rowIndex).get('name'); 
+						
+						privilegeTree.loader.dataUrl = "../../QueryPrivilege.do";
+						privilegeTree.loader.baseParams = {dataSource : 'roleTree', roldId : thiz.getStore().getAt(rowIndex).get('id')};
+						privilegeTree.getRootNode().reload();
+						
+					});
 				}else{
-					privilegeTree.enable();
+					if(thiz.getStore().getAt(rowIndex).get('name') == '管理员' || thiz.getStore().getAt(rowIndex).get('name') == '老板'){
+						privilegeTree.disable();
+					}else{
+						privilegeTree.enable();
+					}
+					Ext.getDom('roleTbarName').innerHTML = thiz.getStore().getAt(rowIndex).get('name'); 
+					
+					privilegeTree.loader.dataUrl = "../../QueryPrivilege.do";
+					privilegeTree.loader.baseParams = {dataSource : 'roleTree', roldId : thiz.getStore().getAt(rowIndex).get('id')};
+					privilegeTree.getRootNode().reload();
+					beforeSelected = selected;
 				}
-				Ext.getDom('roleTbarName').innerHTML = thiz.getStore().getAt(rowIndex).get('name'); 
 				
-				privilegeTree.loader.dataUrl = "../../QueryPrivilege.do";
-				privilegeTree.loader.baseParams = {dataSource : 'roleTree', roldId : thiz.getStore().getAt(rowIndex).get('id')};
-				privilegeTree.getRootNode().reload();
+
 			}
 		}
 	});
@@ -998,6 +1107,8 @@ Ext.onReady(function() {
 		}),
 		listeners : {
 			'checkchange':function(node, checked){
+				selectChange = true;
+				Ext.getDom('change').innerHTML = '*';
 				node.expand(); 
 				node.attributes.checked = checked; 
 				node.eachChild(function(child) { 
@@ -1018,9 +1129,12 @@ Ext.onReady(function() {
 			xtype : 'tbtext',
 			text : String.format(
 					Ext.ux.txtFormat.tbarName,
-					'roleTbarName','角色权限'
+					'change', '&nbsp;','roleTbarName','角色权限'
 			)
 		}, {
+			xtype : 'tbtext',
+			text : '&nbsp;'
+		},{
 			text : '刷新',
 			iconCls : 'btn_refresh',
 			handler : function(){
@@ -1028,8 +1142,11 @@ Ext.onReady(function() {
 			}
 		}, '->',{
 			text : '保存',
+			id : 'savePrivilage',
 			iconCls : 'btn_save',
 			handler : function(){
+				selectChange = false;
+				Ext.getDom('change').innerHTML = '&nbsp;';
 				if(roleGrid.getSelectionModel().getSelected()){
 					var checkedNodes = privilegeTree.getChecked();
 					var discount = '', privilege = '';
@@ -1053,7 +1170,7 @@ Ext.onReady(function() {
 							dataSource : 'updatePrivilege',
 							discounts : discount,
 							privileges : privilege,
-							roleId : roleGrid.getSelectionModel().getSelected().data.id
+							roleId : beforeSelected == null?roleGrid.getSelectionModel().getSelected().data.id : beforeSelected
 						},
 						success : function(res, opt){
 							var jr = Ext.decode(res.responseText);

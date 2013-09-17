@@ -9,14 +9,15 @@ Ext.onReady(function() {
  */
 Ext.Ajax.on('requestcomplete',checkUserSessionStatus, this);     
 function checkUserSessionStatus(conn,response,options){     
-   //Ext重新封装了response对象     
-    if(response.getResponseHeader.sessionstatus){ 
+   //Ext重新封装了response对象
+
+    if(response.getResponseHeader.session_status){ 
   		var interval = 3;
 		var action = '<br>&nbsp;&nbsp;&nbsp;<span id="returnInterval" style="color:red;"></span>&nbsp;之后自动跳转';
 		new Ext.util.TaskRunner().start({
 			run: function(){
 				if(interval < 1){
-					location.href = '/WirelessOrderWeb/pages/PersonLogin.html?'+strEncode('restaurantID='+restaurantID, 'mi');								
+					location.href = response.getResponseHeader.root_path + '/pages/PersonLogin.html?'+strEncode('restaurantID='+restaurantID, 'mi');								
 				}
 				Ext.getDom('returnInterval').innerHTML = interval;
 				interval--;
@@ -31,7 +32,7 @@ function checkUserSessionStatus(conn,response,options){
 			closable : false,
 			fn : function(btn){
 				if(btn == 'ok'){
-					location.href = '/WirelessOrderWeb/pages/PersonLogin.html?'+strEncode('restaurantID='+restaurantID, 'mi');
+					location.href = response.getResponseHeader.root_path + '/pages/PersonLogin.html?'+strEncode('restaurantID='+restaurantID, 'mi');
 				}
 			}
 		});

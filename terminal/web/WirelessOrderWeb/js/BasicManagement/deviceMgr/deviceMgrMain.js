@@ -21,7 +21,7 @@ var logOutBut = new Ext.ux.ImageButton({
 
 var addDeviceBut = new Ext.ux.ImageButton({
 	imgPath : '../../images/btnAddSupplier.png',
-	imgwidth : 50,
+	imgWidth : 50,
 	imgHeight : 50,
 	tooltip : '添加',
 	handler : function(){
