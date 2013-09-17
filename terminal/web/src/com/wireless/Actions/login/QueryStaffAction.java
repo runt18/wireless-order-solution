@@ -62,18 +62,20 @@ public class QueryStaffAction extends Action {
 			String restaurantID ;
 				
 			restaurantID = request.getParameter("restaurantID");
-			String extraCond = "  AND STAFF.restaurant_id = " + restaurantID;
-			if(pin != null && isName != null){
+			if(pin != null){
 				staff = StaffDao.verify(Integer.parseInt(pin));
+			}
+			if(isName != null){
 				other.put("staff", staff);
 			}else {
 				if(name != null && !name.trim().isEmpty()){
-					extraCond += " AND STAFF.name like '%" + name + "%'";
+					staffList = StaffDao.getStaffsByName(staff, name);
 				}else if(cate != null && !cate.trim().isEmpty()){
-					extraCond += " AND STAFF.role_id = " + cate;
+					staffList = StaffDao.getStaffsByRoleId(staff, Integer.parseInt(cate));
+				}else{
+					staffList = StaffDao.getStaffs(Integer.parseInt(restaurantID));
 				}
 				
-				staffList = StaffDao.getStaffs(extraCond);
 				Restaurant restaurant = RestaurantDao.getById(Integer.parseInt(restaurantID));
 				other.put("restaurant", restaurant);
 				jobject.setTotalProperty(staffList.size());

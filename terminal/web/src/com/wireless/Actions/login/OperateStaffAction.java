@@ -33,7 +33,7 @@ public class OperateStaffAction extends Action{
 			if(pin != null){
 				staff = StaffDao.verify(Integer.parseInt(pin));
 			}else{
-				List<Staff> list = StaffDao.getStaffs("  AND STAFF.restaurant_id = " + Restaurant.ADMIN);
+				List<Staff> list = StaffDao.getStaffs(Restaurant.ADMIN);
 				if(!list.isEmpty()){
 					for (Staff s : list) {
 						if(s.getName().equals(name)){
