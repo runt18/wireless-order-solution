@@ -176,19 +176,19 @@ public class StaffDao {
 	
 	/**
 	 * Get the staffs to a specific restaurant.
-	 * @param extraCond
-	 * 			the extra condition
+	 * @param restaurantId
+	 * 			the restaurant id
 	 * @return the staffs to this restaurant
 	 * @throws SQLException
 	 * 			throws if failed execute any SQL statement
 	 * @throws BusinessException 
 	 * 			throws if the role to any staff does NOT exist
 	 */
-	public static List<Staff> getStaffs(String extraCond) throws SQLException, BusinessException{
+	public static List<Staff> getStaffs(int restaurantId) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return getStaffs(dbCon, extraCond);
+			return getStaffs(dbCon, restaurantId);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -206,8 +206,36 @@ public class StaffDao {
 	 * @throws BusinessException 
 	 * 			throws if the role to any staff does NOT exist
 	 */
-	public static List<Staff> getStaffs(DBCon dbCon, String extraCond) throws SQLException, BusinessException{
-		return getStaffs(dbCon, extraCond, null);
+	public static List<Staff> getStaffs(DBCon dbCon, int restaurantId) throws SQLException, BusinessException{
+		return getStaffs(dbCon, " AND STAFF.restaurant_id = " + restaurantId, null);
+	}
+	
+	public static List<Staff> getStaffsByName(Staff staff, String staffName) throws SQLException, BusinessException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return getStaffsByName(dbCon, staff, staffName);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	public static List<Staff> getStaffsByName(DBCon dbCon, Staff staff, String staffName) throws SQLException, BusinessException{
+		return getStaffs(dbCon, " AND STAFF.restaurant_id = " + staff.getRestaurantId() + " AND STAFF.name like '%" + staffName + "%'", null);
+	}
+	
+	public static List<Staff> getStaffsByRoleId(Staff staff, int roleId) throws SQLException, BusinessException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return getStaffsByRoleId(dbCon, staff, roleId);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	public static List<Staff> getStaffsByRoleId(DBCon dbCon, Staff staff, int roleId) throws SQLException, BusinessException{
+		return getStaffs(dbCon, " AND STAFF.restaurant_id = " + staff.getRestaurantId() + " AND STAFF.role_id = " + roleId , null);
 	}
 
 	/**
