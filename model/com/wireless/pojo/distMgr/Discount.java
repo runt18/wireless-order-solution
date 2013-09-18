@@ -1,12 +1,16 @@
 package com.wireless.pojo.distMgr;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
+import com.wireless.json.Jsonable;
 import com.wireless.parcel.Parcel;
 import com.wireless.parcel.Parcelable;
 
-public class Discount implements Parcelable{
+public class Discount implements Jsonable, Parcelable{
 	
 	public final static List<Discount> EMPTY_LIST = new ArrayList<Discount>(0);
 	
@@ -258,5 +262,23 @@ public class Discount implements Parcelable{
 			return new Discount();
 		}
 	};
+
+	@Override
+	public Map<String, Object> toJsonMap(int flag) {
+		LinkedHashMap<String, Object> jm = new LinkedHashMap<String, Object>();
+		jm.put("id", this.id);
+		jm.put("name", this.name);
+		jm.put("rid", this.restaurantID);
+		jm.put("level", this.level);
+		jm.put("status", this.status.getVal());
+		jm.put("isDefault", this.isDefault() || this.isDefaultReserved());
+		
+		return Collections.unmodifiableMap(jm);
+	}
+
+	@Override
+	public List<Object> toJsonList(int flag) {
+		return null;
+	}
 
 }
