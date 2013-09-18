@@ -564,7 +564,7 @@ public class PickTasteActivity extends Activity{
 				view = convertView;
 			}
 			//set name to taste
-			((TextView)view.findViewById(R.id.foodname)).setText(mTastes.get(position).getPreference());
+			((TextView)view.findViewById(R.id.txtView_dummy_foodItem)).setText(mTastes.get(position).getPreference());
 			//set the price to taste
 			if(mTastes.get(position).isCalcByRate()){
 				((TextView)view.findViewById(R.id.txtView_1stKey_foodItem)).setText("±ÈÀý£º");
