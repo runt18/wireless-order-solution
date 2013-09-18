@@ -100,16 +100,17 @@ public class RequestFilter implements Filter{
 			if(isCookie == null){
 				pin = (String) request.getSession().getAttribute("pin");
 				if(pin == null){
+					if(c!=null){
+						c.setMaxAge(0);
+						response.addCookie(c);
+					}
 					if (request.getHeader("x-requested-with") != null && request.getHeader("x-requested-with").equalsIgnoreCase("XMLHttpRequest")) {  
 	                    response.addHeader("session_status", "timeout");
 	                    response.addHeader("root_path",	request.getContextPath());
 	                }else{
 	                	response.sendRedirect(request.getContextPath() + DEFREDIRECT + "?" + Encrypt.strEncode("restaurantID="+params.get("restaurantID"), "mi", null, null));
 	                }
-					if(c!=null){
-						c.setMaxAge(0);
-						response.addCookie(c);
-					}
+
 				}else{
 					request.setAttribute("pin", pin);
 					chain.doFilter(request, response);

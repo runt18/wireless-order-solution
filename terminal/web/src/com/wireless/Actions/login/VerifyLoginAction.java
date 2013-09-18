@@ -3,7 +3,6 @@ package com.wireless.Actions.login;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -24,7 +23,7 @@ public class VerifyLoginAction extends Action {
 		JObject jobject = new JObject();
 		Map<Object, Object> other = new HashMap<Object, Object>();
 		try{        
-			Cookie[] cookies = request.getCookies();
+/*			Cookie[] cookies = request.getCookies();
 			if(cookies != null){
 				for (Cookie cookie : cookies) {
 					if(cookie.getName().equals("pin")){
@@ -39,6 +38,14 @@ public class VerifyLoginAction extends Action {
 				if(other.isEmpty()){
 					jobject.initTip(false, "false");
 				}
+			}*/
+			String pin = (String) request.getSession().getAttribute("pin");
+			if(pin != null){
+				Staff staff = StaffDao.verify(Integer.parseInt(pin));
+				
+				other.put("staff", staff);
+				jobject.setOther(other);
+				jobject.initTip(true, "true");
 			}
 			else{
 				jobject.initTip(false, "false");
