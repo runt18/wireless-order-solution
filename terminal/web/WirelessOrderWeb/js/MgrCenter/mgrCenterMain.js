@@ -7,10 +7,10 @@ function loginOnLoad() {
 	protalFuncReg();
 	$("#deviceMgr").each(function() {
 		$(this).hover(function() {
-			$(this).stop().css("background", "url(../images/resturantMgr_01.png) no-repeat 50%");
+			$(this).stop().css("background", "url(../images/deviceMgr_select.png) no-repeat 50%");
 		},
 		function() {
-			$(this).stop().css("background", "url(../images/resturantMgr_02.png) no-repeat 50%");
+			$(this).stop().css("background", "url(../images/deviceMgr.png) no-repeat 50%");
 		});
 	});
 

@@ -20,7 +20,7 @@ var logOutBut = new Ext.ux.ImageButton({
 });
 
 var addDeviceBut = new Ext.ux.ImageButton({
-	imgPath : '../../images/btnAddSupplier.png',
+	imgPath : '../../images/btnAddDevice.png',
 	imgWidth : 50,
 	imgHeight : 50,
 	tooltip : '添加',
@@ -79,7 +79,8 @@ var addDeviceWin = new Ext.Window({
 						deviceId : pin.getValue(),
 						rId : rId.getValue(),
 						status : valid,
-						model : model
+						model : model,
+						isCookie : true
 					},
 					success : function(res, opt){
 						var jr = Ext.decode(res.responseText);
@@ -271,7 +272,8 @@ function operateDevice(c){
 						url : '../../OperateDevice.do',
 						params : {
 							id : Ext.getCmp('grid').getSelectionModel().getSelected().data.id,
-							dataSource : 'delete'
+							dataSource : 'delete',
+							isCookie : true
 						},
 						success : function(res, opt){
 							var jr = Ext.decode(res.responseText);
@@ -303,6 +305,9 @@ var ds = new Ext.data.Store({
 	proxy : new Ext.data.HttpProxy({
 		url : '../../QueryDevice.do'
 	}),
+	baseParams : {
+		isCookie : true
+	},
 	reader : new Ext.data.JsonReader({
 		totalProperty : 'totalProperty',
 		root : 'root'

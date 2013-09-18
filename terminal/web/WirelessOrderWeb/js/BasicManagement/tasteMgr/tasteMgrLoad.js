@@ -6,7 +6,7 @@
 	id : 'filter',
 	store : new Ext.data.SimpleStore({
 		fields : [ 'value', 'text' ],
-		data : [[0, '全部'],[1, '编号'],[2, '价格'],[3, '名称'], [4, '类型']]
+		data : [[0, '全部'],[2, '价格'],[3, '名称'], [4, '类型']]
 	}),
 	valueField : 'value',
 	displayField : 'text',
@@ -29,7 +29,7 @@
 				cn.setVisible(false);
 				tasteTypeComb.setVisible(false);
 				conditionType = '';
-			}else if(index == 1 || index == 2){
+			}else if(index == 1){
 				oCombo.setVisible(true);
 				ct.setVisible(false);
 				cn.setVisible(true);
@@ -37,14 +37,14 @@
 				oCombo.setValue(1);
 				cn.setValue();
 				conditionType = cn.getId();
-			}else if(index == 3){
+			}else if(index == 2){
 				oCombo.setVisible(false);
 				ct.setVisible(true);
 				cn.setVisible(false);
 				tasteTypeComb.setVisible(false);
 				ct.setValue();
 				conditionType = ct.getId();
-			}else if(index == 4){
+			}else if(index == 3){
 				oCombo.setVisible(false);
 				ct.setVisible(false);
 				cn.setVisible(false);
@@ -200,21 +200,6 @@ function initTasteOperatorWin(){
 				id:'hideTasteId'
 			}, 
 			{
-				xtype : 'numberfield',
-				fieldLabel : '编号',
-				id : 'numTasteAlias',
-				allowBlank : false,
-				width : 160,
-				disabled : true,
-				validator : function(v) {
-					if (v < 1 || v > 65535 || eval(v.indexOf('.')) != -1) {
-						return '自定口味编号范围在 1 至 65535 之间, 且为整数.';
-					} else {
-						return true;
-					}
-				}
-			}, 
-			{
 				xtype : 'textfield',
 				fieldLabel : '名称',
 				id : 'txtTasteName',
@@ -307,7 +292,6 @@ function initTasteOperatorWin(){
 	    	iconCls : 'btn_save',
 			handler : function() {
 				var tasteId = Ext.getCmp('hideTasteId');
-				var tasteAlias = Ext.getCmp('numTasteAlias');
 				var tasteName = Ext.getCmp('txtTasteName');
 				var tastePrice = Ext.getCmp('numTastePrice');
 				var tasteRate = Ext.getCmp('numTasteRate');

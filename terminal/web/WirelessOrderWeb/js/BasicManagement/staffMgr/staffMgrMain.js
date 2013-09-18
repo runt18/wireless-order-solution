@@ -219,7 +219,7 @@ var logOutBut = new Ext.ux.ImageButton({
 });
 
 var addStaff = new Ext.ux.ImageButton({
-	imgPath : '../../images/btnAddSupplier.png',
+	imgPath : '../../images/btnAddSaff.png',
 	imgWidth : 50,
 	imgHeight : 50,
 	tooltip : '添加员工',
@@ -229,7 +229,7 @@ var addStaff = new Ext.ux.ImageButton({
 });
 
 var addRole = new Ext.ux.ImageButton({
-	imgPath : '../../images/btnAddSupplier.png',
+	imgPath : '../../images/btnAddRole.png',
 	imgWidth : 50,
 	imgHeight : 50,
 	tooltip : '添加角色',
@@ -488,7 +488,7 @@ var referRoleComb = new Ext.form.ComboBox({
 	mode : 'local',
 	triggerAction : 'all',
 	selectOnFocus : true,
-	readOnly : true,
+	readOnly : true
 });
 
 var searchRoleComb = new Ext.form.ComboBox({

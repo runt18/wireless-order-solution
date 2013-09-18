@@ -18,6 +18,16 @@ var logOutBut = new Ext.ux.ImageButton({
 	}
 });
 
+var addRestaurant = new Ext.ux.ImageButton({
+	imgPath : '../../images/btnAddRestaurant.png',
+	imgWidth : 50,
+	imgHeight : 50,
+	tooltip : '添加餐厅',
+	handler : function(btn){
+		optRestaurantHandler({otype : 'insert'});
+	}
+});
+
 var restaurantAddWin = new Ext.Window({
 	title : '创建餐厅',
 	id : 'restaurantAddWin',
@@ -71,7 +81,8 @@ var restaurantAddWin = new Ext.Window({
 						address : address,
 						recordAlive : recordAlive,
 						expireDate : expireDate.getValue().format('Y-m-d'),
-						dataSource : dataSource
+						dataSource : dataSource,
+						isCookie : true
 					},
 					success : function(res, opt){
 						var jr = Ext.decode(res.responseText);
@@ -327,6 +338,9 @@ Ext.onReady(function(){
 		proxy : new Ext.data.HttpProxy({
 			url : '../../QueryRestaurants.do'
 		}),
+		baseParams : {
+			isCookie : true
+		},
 		reader : new Ext.data.JsonReader({
 			totalProperty : 'totalProperty',
 			root : 'root'
@@ -459,12 +473,9 @@ Ext.onReady(function(){
 		items : [restaurantPanel],
 		tbar : new Ext.Toolbar({
 			height : 55,
-			items : [{
-				text : '创建餐厅',
-				handler : function(){
-					optRestaurantHandler({otype : 'insert'});
-				}
-			},'->',
+			items : [
+				addRestaurant,
+				'->',
 			    pushBackBut, 
 			    {xtype:'tbtext',text:'&nbsp;&nbsp;'},
 				logOutBut 

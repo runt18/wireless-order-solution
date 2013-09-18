@@ -17,6 +17,26 @@ var logOutBut = new Ext.ux.ImageButton({
 		
 	}
 });
+
+var addPrinter = new Ext.ux.ImageButton({
+	imgPath : '../../images/btnAddprinter.png',
+	imgWidth : 50,
+	imgHeight : 50,
+	tooltip : '添加打印机',
+	handler : function(btn){
+		operatePrinterHandler({otype : 'insert'});
+	}
+});
+
+var addPrintScheme = new Ext.ux.ImageButton({
+	imgPath : '../../images/btnAddPrintScheme.png',
+	imgWidth : 50,
+	imgHeight : 50,
+	tooltip : '添加打印机方案',
+	handler : function(btn){
+		printFuncOperactionHandler({type : 'insert'});
+	}
+});
  
 //var json = {items : [{xtype : "checkbox", name : 'pType',boxLabel : '下单详细',hideLabel : true,inputValue : 2}]};
 
@@ -1258,21 +1278,10 @@ Ext.onReady(function(){
 		items : [printerTree, printFuncGrid],
 		tbar : new Ext.Toolbar({
 			height : 55,
-			items : [{
-			    	text : '添加打印机',
-			    	handler : function(){
-			    		operatePrinterHandler({otype : 'insert'});
-			    	}
-					    		
-				},
+			items : [
+				addPrinter,
 			    {xtype:'tbtext',text:'&nbsp;&nbsp;'},
-			    {
-			    	text : '添加方案',
-			    	handler : function(){
-			    		printFuncOperactionHandler({type : 'insert'});
-			    	}
-			    		
-			    },
+			    addPrintScheme,
 			    '->',
 			    pushBackBut, 
 			    {xtype:'tbtext',text:'&nbsp;&nbsp;'},
