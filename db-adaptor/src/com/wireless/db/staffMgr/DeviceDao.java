@@ -64,7 +64,7 @@ public class DeviceDao {
 	 */
 	public static Device getWorkingDeviceById(DBCon dbCon, String deviceId) throws SQLException, BusinessException{
 		deviceId = deviceId.trim().toUpperCase(Locale.getDefault());
-		List<Device> result = getDevices(dbCon, " AND DEV.device_id = '" + deviceId + "'" + " AND device_id_crc = CRC32(" + deviceId + ")" + " AND status = " + Device.Status.WORK.getVal(), null);
+		List<Device> result = getDevices(dbCon, " AND DEV.device_id = '" + deviceId + "'" + " AND device_id_crc = CRC32('" + deviceId + "')" + " AND status = " + Device.Status.WORK.getVal(), null);
 		if(result.isEmpty()){
 			throw new BusinessException(DeviceError.DEVICE_NOT_EXIST);
 		}else{
