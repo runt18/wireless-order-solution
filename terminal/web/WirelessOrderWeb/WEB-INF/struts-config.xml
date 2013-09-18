@@ -478,7 +478,10 @@
 				type = "com.wireless.Actions.deviceMgr.OperateDeviceAction"
 				scope="request" parameter="dataSource">
 		</action>
-		
+		<action path="/QueryDiscount"
+			type = "com.wireless.Actions.distMgr.discount.QueryDiscountAction"
+			scope="request" parameter="dataSource">
+		</action>
 	</action-mappings>
 
 	<message-resources parameter="com.yourcompany.struts.ApplicationResources" />
