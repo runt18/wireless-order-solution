@@ -168,7 +168,7 @@ public class PayOrder {
 		if(status == Order.Status.UNPAID && !staff.getRole().hasPrivilege(Privilege.Code.PAYMENT)){
 			throw new BusinessException(StaffError.PAYMENT_NOT_ALLOW);
 			
-		}else if(status == Order.Status.PAID || status == Order.Status.REPAID && !staff.getRole().hasPrivilege(Privilege.Code.RE_PAYMENT)){
+		}else if((status == Order.Status.PAID || status == Order.Status.REPAID) && !staff.getRole().hasPrivilege(Privilege.Code.RE_PAYMENT)){
 			throw new BusinessException(StaffError.RE_PAYMENT_NOT_ALLOW);
 			
 		}else{
