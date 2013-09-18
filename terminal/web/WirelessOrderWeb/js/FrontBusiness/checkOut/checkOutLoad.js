@@ -155,7 +155,7 @@ function loadTableData(_c){
 	}
 	var eraseQuota = document.getElementById("txtEraseQuota").value;
 	var serviceRate = document.getElementById("serviceCharge").value;
-	var customNum = document.getElementById("numCustomNum").value;
+	var customNum = Ext.getCmp("numCustomNum").getValue();
 	eraseQuota = typeof eraseQuota != 'undefined' && eval(eraseQuota >= 0) ? eraseQuota : 0;
 	serviceRate = typeof serviceRate != 'undefined' && eval(serviceRate >= 0) ? serviceRate : 0;
 	customNum = typeof customNum != 'undefined' && eval(customNum > 0) ? customNum : 0;
