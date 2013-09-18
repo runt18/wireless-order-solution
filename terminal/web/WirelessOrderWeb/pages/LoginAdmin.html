@@ -5,14 +5,14 @@
 	<title>无线点餐网页终端登录</title>
 	<style type="text/css">
 	html {
-		background-color: #E9EEF0
+		background-image: url("../images/loginBackground.jpg");
 	}
 	.wrapper {
-		margin: 140px auto;
+		margin: 70px auto;
 		width: 884px;
 	}
 	.loginBox {
-		background-color: #FEFEFE;
+		background-color: #F0F4F6;
 		border: 1px solid #BfD6E1;
 		border-radius: 5px;
 		color: #444;
@@ -28,7 +28,7 @@
 		margin-bottom: 10px
 	}
 	.loginBox .loginBoxButtons {
-		background-color: #F0F4F6;
+		background-color: #FEFEFE;
 		border-top: 1px solid #FFF;
 		border-bottom-left-radius: 5px;
 		border-bottom-right-radius: 5px;
@@ -91,7 +91,7 @@
 	<div class="wrapper">
 
 		<div class="loginBox">
-
+			<form id="form">
 			<div class="loginBoxCenter">
 				<p><label for="username">会员账号：</label></p>
 				<p><input id="name" name="mbName" class="loginInput" autofocus="autofocus" required="required" autocomplete="off" placeholder="请输入账号" value="" /></p>
@@ -103,9 +103,11 @@
 				<div id="divCode" onmousedown="validteCode()" style="cursor: pointer;background-color: White;  width:52px; height:16px; padding:5px; text-align:center; vertical-align:middle; letter-spacing:5px; border:solid 1px blue">  
    				<span></span><span ></span><span ></span><span ></span></div> 
 			</div>
+
 			<div class="loginBoxButtons">
-				<button id="login" class="loginBtn">进入web点菜系统</button>
+				<input type="button" class="loginBtn" id="login" value="进入管理中心">
 			</div>
+			</form>
 		</div>
 
 	</div>
@@ -132,7 +134,12 @@
 	}     
 	document.onload = validteCode();  
 	$(function(){
-
+		$('#name').focus();
+		$('#form').keydown(function(e){
+			if(e.keyCode == 13){
+				$('#login').click();
+			}
+		});
  		$('#login').click(function(){
 
   			if($('#verifyC').val() == vCode){

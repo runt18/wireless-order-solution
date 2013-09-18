@@ -5,14 +5,14 @@
 	<title>无线点餐网页终端登录</title>
 	<style type="text/css">
 	html {
-		background-color: #E9EEF0
+		background-image: url("../images/blue3.jpg");
 	}
 	.wrapper {
-		margin: 140px auto;
+		margin: 80px auto;
 		width: 884px;
 	}
 	.loginBox {
-		background-color: #FEFEFE;
+		background-color: #F0F4F6;
 		border: 1px solid #BfD6E1;
 		border-radius: 5px;
 		color: #444;
@@ -28,7 +28,7 @@
 		margin-bottom: 10px
 	}
 	.loginBox .loginBoxButtons {
-		background-color: #F0F4F6;
+		background-color: #FEFEFE;
 		border-top: 1px solid #FFF;
 		border-bottom-left-radius: 5px;
 		border-bottom-right-radius: 5px;
@@ -92,8 +92,8 @@
 <script type="text/javascript" src="../jquery/jquery-1.8.2.min.js"></script>
 <script type="text/javascript" src="../js/components/Encrypt.js"></script>
 <body>
+	<div style="margin-top: 20px; margin-left: 10px; font-size:50px;font-weight: bolder;font-family: 方正隶书简体;color: white;">智易餐饮管理平台</div>
 	<div class="wrapper">
-
 		<div class="loginBox">
 		<form id="form">
 			<div class="loginBoxCenter">
@@ -154,7 +154,12 @@
   					success : function(data, status, xhr){
   						var jr = jQuery.parseJSON(data)
   						if(jr.success){
-  							location.href = './PersonLogin.html?'+strEncode('restaurantID='+jr.root[0].id, 'mi');
+  							if(jr.root == ''){
+  								alert('账号输入错误');
+  							}else{
+  								location.href = './PersonLogin.html?'+strEncode('restaurantID='+jr.root[0].id, 'mi');	
+  							}
+  							
   						}else{
   							alert('账号输入错误');
   						}
