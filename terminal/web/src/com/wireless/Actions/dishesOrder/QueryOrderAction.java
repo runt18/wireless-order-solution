@@ -88,11 +88,11 @@ public class QueryOrderAction extends Action {
 					if(customNum != null && !customNum.trim().isEmpty() && Integer.valueOf(customNum.trim()) > 0){
 						order.setCustomNum(Short.valueOf(customNum));
 					}
-					if(tid != null && !tid.trim().isEmpty()){
-						order = PayOrder.calcByTable(staff, order);
-					} else if (oid != null && !oid.trim().isEmpty()){
-						order = PayOrder.calcById(staff, order);
-					}
+				}
+				if(tid != null && !tid.trim().isEmpty()){
+					order = PayOrder.calcByTable(staff, order);
+				} else if (oid != null && !oid.trim().isEmpty()){
+					order = PayOrder.calcById(staff, order);
 				}
 			}
 			

@@ -105,14 +105,11 @@ public class RequestFilter implements Filter{
 	                    response.addHeader("root_path",	request.getContextPath());
 	                }else{
 	                	response.sendRedirect(request.getContextPath() + DEFREDIRECT + "?" + Encrypt.strEncode("restaurantID="+params.get("restaurantID"), "mi", null, null));
-	
 	                }
 					if(c!=null){
 						c.setMaxAge(0);
 						response.addCookie(c);
 					}
-                	
-					
 				}else{
 					request.setAttribute("pin", pin);
 					chain.doFilter(request, response);

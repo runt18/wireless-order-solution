@@ -28,7 +28,7 @@ public class QueryPrivilegeAction extends DispatchAction{
 		response.setCharacterEncoding("UTF-8");
 		JObject jobject = new JObject();
 		String pin = (String) request.getAttribute("pin");
-		String roleId = request.getParameter("roldId");
+		String roleId = request.getParameter("roleId");
 		List<Privilege> rolePrivilege = new ArrayList<Privilege>();
 		try{
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
@@ -114,7 +114,7 @@ public class QueryPrivilegeAction extends DispatchAction{
 	public ActionForward roleTree(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception{
 		response.setCharacterEncoding("UTF-8");
 		String pin = (String) request.getAttribute("pin");
-		String roleId = request.getParameter("roldId");
+		String roleId = request.getParameter("roleId");
 		StringBuilder tree = new StringBuilder();
 		List<Privilege> root = null;
 		List<Privilege> rolePrivilege = new ArrayList<Privilege>();
@@ -215,8 +215,6 @@ public class QueryPrivilegeAction extends DispatchAction{
 				}
 				tree.append("]");
 			}
-			
-			
 		}catch(Exception e){
 			e.printStackTrace();
 		}finally{
