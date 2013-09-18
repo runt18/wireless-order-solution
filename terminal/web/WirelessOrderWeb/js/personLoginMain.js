@@ -461,7 +461,13 @@ Ext.onReady(function() {
 			selectOnFocus : true,
 			blankText : '请选择一位员工',
 			emptyText : '请选择',
-			allowBlank : false
+			allowBlank : false,
+			listeners : {
+				select : function(){
+					Ext.getCmp('empPassword').setValue('');
+					Ext.getCmp('empPassword').focus(true, 100);
+				}
+			}
 		}, {
 			xtype : "textfield",
 			inputType : "password",
