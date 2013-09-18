@@ -84,18 +84,20 @@ function loadPricePlanData(_c){
  */
 function loadOrderBasicMsg(){
 	document.getElementById("serviceCharge").value = orderMsg.serviceRate * 100;
-	var actualCount = document.getElementById("actualCount").value;
+//	var actualCount = document.getElementById("actualCount").value;
 	document.getElementById("totalCount").innerHTML = parseFloat(orderMsg.totalPrice).toFixed(2);
 	document.getElementById("shouldPay").innerHTML = parseFloat(orderMsg.actualPrice).toFixed(2);
 	document.getElementById("forFree").innerHTML = parseFloat(orderMsg.giftPrice).toFixed(2);
 	document.getElementById("spanCancelFoodAmount").innerHTML = parseFloat(orderMsg.cancelPrice).toFixed(2);
 	var change = '0.00';
 	
-	if(actualCount == '' || actualCount < orderMsg.actualPrice){
-		document.getElementById("actualCount").value = parseFloat(orderMsg.actualPrice).toFixed(2);
-	}else{
-		change = parseFloat(actualCount - orderMsg.actualPrice).toFixed(2);
-	}
+//	if(actualCount == '' || actualCount < orderMsg.actualPrice){
+//		document.getElementById("actualCount").value = parseFloat(orderMsg.actualPrice).toFixed(2);
+//	}else{
+//		change = parseFloat(actualCount - orderMsg.actualPrice).toFixed(2);
+//	}
+	document.getElementById("actualCount").value = parseFloat(orderMsg.actualPrice).toFixed(2);
+	
 	document.getElementById("change").innerHTML = change;
 	Ext.getCmp('numCustomNum').setValue(orderMsg.customNum >= 0 ? orderMsg.customNum : 0);
 	if(eval(orderMsg.category != 4)){

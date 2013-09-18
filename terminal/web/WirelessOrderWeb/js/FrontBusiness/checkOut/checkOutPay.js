@@ -3,8 +3,8 @@
  */
 var paySubmit = function(submitType) {
 	// 强制计算后再结账
-	refreshCheckOutData({
-		callback : function(){
+//	refreshCheckOutData({
+//		callback : function(){
 			if(!checkOutListRefresh()){
 				return;
 			}
@@ -175,8 +175,8 @@ var paySubmit = function(submitType) {
 					});
 				}
 			});	
-		}
-	});
+//		}
+//	});
 };
 
 /**
