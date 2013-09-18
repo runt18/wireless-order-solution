@@ -26,10 +26,6 @@
 <link rel="stylesheet" type="text/css" href="../../css/header.css" />
 
 <script type="text/javascript">
-	Ext.onReady(function() {
-		Ext.BLANK_IMAGE_URL = "../../extjs/resources/images/default/s.gif";
-	});
-	
 	var Request = new URLParaQuery();
 	var restaurantID = Request["restaurantID"];
 	var tableCategory = Request["category"];
@@ -46,11 +42,8 @@
 	var dishesDisplayData = []; // all dishes display data 
 	var dishesDisplayDataShow = []; // all dishes display data for show in page
 	
-	var tasteMenuData = {};
-	var commonTasteData = {};
-	var allTasteData = {};
-	var ggTasteData = {};
-	
+	var tasteMenuData = {}, commonTasteData = {}, allTasteData = {}, ggTasteData = {};
+		
 	// 格式：[{編號,描述,價錢或比例,計算方式}]
 	var choosenTaset = [];
 	// 格式：[{編號,描述}]
@@ -59,8 +52,8 @@
 
 	// taste
 	var dishesCount = -1; // the dish count user input, in order to keep the same between tabs
-	var orderSingleData = {totalProperty:0 ,root:[]};
-	var orderGroupData = {totalProperty:0 ,root:[]};
+	var orderSingleData = {totalProperty:0,root:[]};
+	var orderGroupData = {totalProperty:0,root:[]};
 	var orderIsChanged = false; // if the order is changed
 
 	var kitchenData = [];
@@ -94,21 +87,6 @@
 		<p>建设中......</p>
 	</div>
 
-
-
-	<!-- table status 
-	<div id="tableStatusDO" style="padding-left: 5px">
-		<img title="桌号" src='../images/TableID.png' style='float: left;' />
-		<div id="tblNbrDivTS" class="tableStatusChar">100&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
-		<img title="人数" src='../images/DinnerAmount.png' style='float: left;' />
-		<div id="perCountDivTS" class="tableStatusChar">
-			<input id="perCountInput" type="text" value="1" />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-		</div>
-		<img title="最低消费" id="minCostImgTS" src='../images/DinnerAmount.png'
-			style='float: left;' />
-		<div id="minCostDivTS" class="tableStatusChar">0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
-	</div>
--->
 	<div id="tableStatusTableNbr" style="padding-left: 5px;  vertical-align : middle;">
 		<img title="桌号" src='../../images/TableID.png' style='float: left;'/>
 		<div id="tblNbrDivTS" class="tableStatusChar">100&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
@@ -117,13 +95,7 @@
 	<div id="tableStatusPerCount" style="padding-left: 5px">
 		<img title="人数" src='../../images/DinnerAmount.png' style='float: left;' />
 	</div>
-
-	<!--
-	<div id="perCountDivTS" class="tableStatusChar">
-		<input id="perCountInput" type="text" value="1" />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-	</div>
- -->
-
+	
 	<div id="tableStatusDynamic" style="padding-left: 5px">
 		<img title="最低消费" id="minCostImgTS" src='../../images/minCost.png'
 			style='float: left;' />
