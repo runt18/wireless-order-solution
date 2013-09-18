@@ -26,33 +26,6 @@ function deselectTable() {
 							"url(../../images/table_on_merge.gif) no-repeat");
 					}
 				}
-				/*
-				if (tableStatusListTSDisplay[i].category == CATE_NULL
-						&& tableStatusListTSDisplay[i].status == TABLE_IDLE) {
-					$("#table" + selectedTable).css("background",
-							"url(../../images/table_null_normal.png) no-repeat");
-				} else if (tableStatusListTSDisplay[i].category == CATE_NORMAL
-						&& tableStatusListTSDisplay[i].status == TABLE_BUSY) {
-					$("#table" + selectedTable).css("background",
-							"url(../../images/table_on_normal.png) no-repeat");
-				} else if (tableStatusListTSDisplay[i].category == CATE_MERGER_TABLE
-						&& tableStatusListTSDisplay[i].status == TABLE_BUSY) {
-					$("#table" + selectedTable).css("background",
-							"url(../../images/table_on_merge.gif) no-repeat");
-				} else if (tableStatusListTSDisplay[i].category == CATE_TAKE_OUT
-						&& tableStatusListTSDisplay[i].status == TABLE_BUSY) {
-					$("#table" + selectedTable).css("background",
-							"url(../../images/table_on_package.gif) no-repeat");
-				} else if (tableStatusListTSDisplay[i].category == CATE_JOIN_TABLE
-						&& tableStatusListTSDisplay[i].status == TABLE_BUSY) {
-					$("#table" + selectedTable).css("background",
-							"url(../../images/table_on_separate.png) no-repeat");
-				} else if (tableStatusListTSDisplay[i].category == CATE_GROUP_TABLE
-						&& tableStatusListTSDisplay[i].status == TABLE_BUSY) {
-					$("#table" + selectedTable).css("background",
-							"url(../../images/table_on_merge.gif) no-repeat");
-				}
-				*/
 				
 				selectedTable = "";
 				break;
@@ -82,27 +55,6 @@ function selectTable(tableNbr) {
 					document.getElementById("table" + tableNbr).style["background"] = "url(../../images/table_on_merge_selected.png) no-repeat";
 				}
 			}
-			/*
-			if (tableStatusListTSDisplay[i].category == CATE_NULL
-					&& tableStatusListTSDisplay[i].status == TABLE_IDLE) {
-				document.getElementById("table" + tableNbr).style["background"] = "url(../../images/table_null_normal_selected.png) no-repeat";
-			} else if (tableStatusListTSDisplay[i].category == CATE_NORMAL
-					&& tableStatusListTSDisplay[i].status == TABLE_BUSY) {
-				document.getElementById("table" + tableNbr).style["background"] = "url(../../images/table_on_normal_selected.png) no-repeat";
-			} else if (tableStatusListTSDisplay[i].category == CATE_MERGER_TABLE
-					&& tableStatusListTSDisplay[i].status == TABLE_BUSY) {
-				document.getElementById("table" + tableNbr).style["background"] = "url(../../images/table_on_merge_selected.png) no-repeat";
-			} else if (tableStatusListTSDisplay[i].category == CATE_TAKE_OUT
-					&& tableStatusListTSDisplay[i].status == TABLE_BUSY) {
-				document.getElementById("table" + tableNbr).style["background"] = "url(../../images/table_on_package_selected.png) no-repeat";
-			} else if (tableStatusListTSDisplay[i].category == CATE_JOIN_TABLE
-					&& tableStatusListTSDisplay[i].status == TABLE_BUSY) {
-				document.getElementById("table" + tableNbr).style["background"] = "url(../../images/table_on_separate_selected.png) no-repeat";
-			} else if (tableStatusListTSDisplay[i].category == CATE_GROUP_TABLE
-					&& tableStatusListTSDisplay[i].status == TABLE_BUSY) {
-				document.getElementById("table" + tableNbr).style["background"] = "url(../../images/table_on_merge_selected.png) no-repeat";
-			}
-			*/
 			selectedTable = tableNbr;
 			break;
 		}
@@ -250,27 +202,6 @@ function tableListReflash(node) {
 					liNode.className = "merge_on";
 				}
 			}
-			
-/*			if (tableStatusListTSDisplay[j].category == CATE_NULL
-					&& tableStatusListTSDisplay[j].status == TABLE_IDLE) {
-				liNode.className = "normal_null";
-			} else if (tableStatusListTSDisplay[j].category == CATE_NORMAL
-					&& tableStatusListTSDisplay[j].status == TABLE_BUSY) {
-				liNode.className = "normal_on";
-			} else if (tableStatusListTSDisplay[j].category == CATE_MERGER_TABLE
-					&& tableStatusListTSDisplay[j].status == TABLE_BUSY) {
-				liNode.className = "merge_on";
-			} else if (tableStatusListTSDisplay[j].category == CATE_TAKE_OUT
-					&& tableStatusListTSDisplay[j].status == TABLE_BUSY) {
-				liNode.className = "package_on";
-			} else if (tableStatusListTSDisplay[j].category == CATE_JOIN_TABLE
-					&& tableStatusListTSDisplay[j].status == TABLE_BUSY) {
-				liNode.className = "separate_on";
-			} else if (tableStatusListTSDisplay[j].category == CATE_GROUP_TABLE
-					&& tableStatusListTSDisplay[j].status == TABLE_BUSY) {
-				liNode.className = "merge_on";
-			}
-*/
 			liNode.innerHTML = tempData.name + "<br>" + tempData.alias;
 			ulNode.appendChild(liNode);
 			indexInRow = indexInRow + 1;
@@ -330,13 +261,23 @@ function tableListReflash(node) {
 				temp = tableStatusListTSDisplay[i];
 				if (temp.alias == selectedTable) {
 					if (temp.statusValue == TABLE_IDLE) {
-						location.href = "OrderMain.html?"+ strEncode('restaurantID=' + restaurantID
-								+ "&tableAliasID=" + selectedTable
-								+ "&ts=0"
-								+ "&category=1"
-								+ "&minCost=" + temp.minimumCost
-								+ "&serviceRate=" + temp.serviceRate
-								, 'mi');
+						var lm = new Ext.LoadMask(document.body, {
+							msg : '正在验证权限, 请稍等......'
+						});
+						lm.show();
+						verifyStaff('../../', '1000', function(res){
+							if(res.success){
+								location.href = "OrderMain.html?"+ strEncode('restaurantID=' + restaurantID
+										+ "&ts=0"
+										+ "&tableAliasID=" + selectedTable
+										+ "&category=" + CATE_NORMAL
+										, 'mi');
+							}else{
+								lm.hide();
+								res['icon'] = Ext.MessageBox.WARNING;
+								Ext.ux.showMsg(res);
+							}
+						});
 					} else {
 						location.href = "CheckOut.html?"+ strEncode('restaurantID=' + restaurantID+ "&tableID=" + selectedTable, 'mi');
 					}

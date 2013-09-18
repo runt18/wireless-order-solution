@@ -41,8 +41,6 @@ function tableSelectOnLoad() {
 		regionTree.getRootNode().reload();
 	}
 	
-	getOperatorName("../../");
-
 	// 随机刷新, 利用时间戳为服务器减压
 	var x = 1000 * 60 * 5, y = 1000 * 60 * 3;
 	var rand = parseInt(Math.random() * (x - y + 1) + y);

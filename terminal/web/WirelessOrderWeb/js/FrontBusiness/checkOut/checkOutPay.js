@@ -19,9 +19,7 @@ var paySubmit = function(submitType) {
 			var serviceRate = document.getElementById("serviceCharge").value;
 			var eraseQuota = document.getElementById("txtEraseQuota").value;
 			var submitPrice = -1;
-			var discount = Ext.getCmp('comboDiscount');
-			var cpricePlan = Ext.getCmp('comboPricePlan');
-
+			
 			var payManner = -1;
 			var tempPay;
 
@@ -68,18 +66,17 @@ var paySubmit = function(submitType) {
 			Ext.Ajax.request({
 				url : "../../PayOrder.do",
 				params : {
-					
 					"orderID" : orderMsg.id,
 					"cashIncome" : submitPrice,
 					"payType" : payType,
-					'discountID' : discount.getValue(),
+					'discountID' : calcDiscountID,
 					"payManner" : payManner,
 					"tempPay" : tempPay,
 					"memberID" : actualMemberID,
 					"comment" : Ext.getCmp("remark").getValue(),
 					"serviceRate" : serviceRate,
 					'eraseQuota' : eraseQuota,
-					'pricePlanID' : cpricePlan.getValue(),
+					'pricePlanID' : calcPricePlanID,
 					'customNum' : Ext.getCmp('numCustomNum').getValue()
 				},
 				success : function(response, options) {
@@ -199,7 +196,9 @@ function checkOutListRefresh(){
 		return true;
 	}
 }
-
+/**
+ * 
+ */
 function memberPay(){
 	var bindMemberWin = Ext.getCmp('co_bindMemberWin');
 	if(!bindMemberWin){

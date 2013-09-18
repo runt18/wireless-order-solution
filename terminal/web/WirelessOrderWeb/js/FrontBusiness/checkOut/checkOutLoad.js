@@ -6,32 +6,33 @@ function loadDiscountData(_c){
 		_c = {};
 	}
 	Ext.Ajax.request({
-		url : '../../QueryDiscountTree.do',
+		url : '../../QueryDiscount.do',
 		params : {
-			
+			isCookie : true,
+			dataSource : 'role',
+			roleId : _c.staff.role.id,
 			restaurantID : restaurantID
 		},
 		success : function(response, options) {
-			var jr = eval(response.responseText);
+			var jr = Ext.decode(response.responseText);
 			checkOutForm.buttons[7].setDisabled(false);
-			discountData = jr;
+			discountData = jr.root;
 			var discount = Ext.getCmp('comboDiscount');
-			var defaultsID = '';
 			discount.store.loadData({root:discountData});
 			
 			// 设置默认显示折扣方案
 			for(var i = 0; i < discountData.length; i++){
 				if(eval(discountData[i].isDefault == 1)){
-					defaultsID = discountData[i].discountID;
+					defaultsID = discountData[i].id;
 					break;
 				}else if(eval(discountData[i].status == 2)){
-					defaultsID = discountData[i].discountID;
+					defaultsID = discountData[i].id;
 				}
 			}
-			if(defaultsID != null && typeof defaultsID != 'undefined' && defaultsID != ''){
-				discount.setValue(defaultsID);
-				discount.fireEvent('select', discount, null, null);
-			}
+//			if(defaultsID != null && typeof defaultsID != 'undefined' && defaultsID != ''){
+//				discount.setValue(defaultsID);
+//				discount.fireEvent('select', discount, null, null);
+//			}
 		},
 		failure : function(response, options) {
 			checkOutForm.buttons[7].setDisabled(false);
@@ -89,7 +90,7 @@ function loadOrderBasicMsg(){
 	document.getElementById("forFree").innerHTML = parseFloat(orderMsg.giftPrice).toFixed(2);
 	document.getElementById("spanCancelFoodAmount").innerHTML = parseFloat(orderMsg.cancelPrice).toFixed(2);
 	var change = '0.00';
-//	alert(Ext.encode(orderMsg))
+	
 	if(actualCount == '' || actualCount < orderMsg.acturalPrice){
 		document.getElementById("actualCount").value = parseFloat(orderMsg.actualPrice).toFixed(2);
 	}else{
@@ -103,11 +104,6 @@ function loadOrderBasicMsg(){
 	if(eval(orderMsg.category != 4) && eval(orderMsg.cancelPrice > 0)){
 		Ext.getDom('spanSeeCancelFoodAmount').style.visibility = 'inherit';		
 	}
-//	checkOutCenterPanel.setTitle('结账 -- 账单号:<font color="red">' + orderMsg.id + '</font>');
-//	if(orderMsg.category != 4){
-//		checkOutCenterPanel.setTitle(checkOutCenterPanel.title + ' -- 餐桌号:<font color="red">' + orderMsg.tableAlias + '</font>');
-//	}
-	
 	checkOutMainPanel.setTitle('结账 -- 账单号:<font color="red">' + orderMsg.id + '</font>');
 	if(orderMsg.category != 4){
 		checkOutMainPanel.setTitle(checkOutMainPanel.title + ' -- 餐桌号:<font color="red">' + orderMsg.table.alias + '</font>');
@@ -169,11 +165,11 @@ function loadTableData(_c){
 	Ext.Ajax.request({
 		url : "../../QueryOrder.do",
 		params : {
-			
+			isCookie : true,
 			restaurantID : restaurantID,
 			tableID : tableID,
 			orderID : orderID,
-			calc : true,
+			calc : typeof _c.calc == 'boolean' ? _c.calc : true,
 			discountID : calcDiscountID,
 			pricePlanID : calcPricePlanID,
 			eraseQuota : eraseQuota,
@@ -187,10 +183,10 @@ function loadTableData(_c){
 				setFormButtonStatus(false);
 				// 加载已点菜
 				checkOutData = jr;
-				// 加载价格方案
-//				loadPricePlanData();
 				// 加载显示账单基础信息
 				orderMsg = jr.other.order;
+				calcDiscountID = orderMsg.discount.id; // i
+				calcPricePlanID = orderMsg.pricePlan.id; // i
 				loadOrderBasicMsg();
 				// 
 				checkOutGrid.getStore().loadData(checkOutData);
@@ -226,8 +222,8 @@ function loadTableGroupData(_c){
 	Ext.Ajax.request({
 		url : "../../QueryOrderGroup.do",
 		params : {
-			queryType : 0, ////////
-			
+			isCookie : true,
+			queryType : 0, 
 			restaurantID : restaurantID,
 			status : 0,
 			tableID : tableID,
@@ -247,10 +243,10 @@ function loadTableGroupData(_c){
 				checkOutForm.buttons[0].setDisabled(true);
 				// 加载已点菜
 				checkOutData = jr;
-				// 加载价格方案
-//				loadPricePlanData();
 				// 加载账单基础汇总信息
 				orderMsg = jr.other.order;
+				calcDiscountID = orderMsg.discount.id; // i
+				calcPricePlanID = orderMsg.pricePlan.id; // i
 				loadOrderBasicMsg();
 				// 生成账单组信息
 				var activeTab = null;
@@ -287,9 +283,6 @@ function loadTableGroupData(_c){
 							    ['时间', 'orderDateFormat', 130],
 							    ['服务员', 'waiter', 80]
 							],
-//							['displayFoodName', 'foodName', 'tastePref', 'tastePrice', 'count', 'unitPrice',
-//							 'discount', 'totalPrice', 'orderDateFormat', 'waiter', 'special','recommend',
-//							 'weight', 'stop','gift','currPrice','combination','temporary','tmpTastePrice'],
 							OrderFoodRecord.getKeys(),
 						    [['restaurantID', restaurantID]],
 						    30,
@@ -366,16 +359,20 @@ function refreshCheckOutData(_c){
 }
 
 function checkOutOnLoad() {	
-	getOperatorName("../../");
+	getOperatorName("../../", function(staff){
+		// 加载折扣方案
+		loadDiscountData({
+			staff : staff
+		});		
+	});
 	// 加载系统设置
 	loadSystemSetting();
-	// 加载折扣方案
-	loadDiscountData();
 	// 加载价格方案
 	loadPricePlanData();
-	// 加载主数据体
-//	refreshCheckOutData();
-
+	//
+	loadTableData({
+		calc : false
+	});
 };
 
 function createCancelFoodDetail(_data){

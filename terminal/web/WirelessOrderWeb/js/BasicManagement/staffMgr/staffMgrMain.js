@@ -1065,7 +1065,7 @@ Ext.onReady(function() {
 						Ext.getDom('roleTbarName').innerHTML = thiz.getStore().getAt(rowIndex).get('name'); 
 						
 						privilegeTree.loader.dataUrl = "../../QueryPrivilege.do";
-						privilegeTree.loader.baseParams = {dataSource : 'roleTree', roldId : thiz.getStore().getAt(rowIndex).get('id')};
+						privilegeTree.loader.baseParams = {dataSource : 'roleTree', roleId : thiz.getStore().getAt(rowIndex).get('id')};
 						privilegeTree.getRootNode().reload();
 						
 					});
@@ -1078,12 +1078,10 @@ Ext.onReady(function() {
 					Ext.getDom('roleTbarName').innerHTML = thiz.getStore().getAt(rowIndex).get('name'); 
 					
 					privilegeTree.loader.dataUrl = "../../QueryPrivilege.do";
-					privilegeTree.loader.baseParams = {dataSource : 'roleTree', roldId : thiz.getStore().getAt(rowIndex).get('id')};
+					privilegeTree.loader.baseParams = {dataSource : 'roleTree', roleId : thiz.getStore().getAt(rowIndex).get('id')};
 					privilegeTree.getRootNode().reload();
 					beforeSelected = selected;
 				}
-				
-
 			}
 		}
 	});

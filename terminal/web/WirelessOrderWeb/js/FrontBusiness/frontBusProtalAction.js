@@ -5,12 +5,24 @@
 		});
 	});
 
-	$("#bill").each(function() {
-		$(this).bind("click", function() {
-				// 密码校验
-				billVerifyWin.show();
-		});
-	});
+	bindActiveEvent('bill', 
+		'url(../../images/bill_select.png) no-repeat 50%',
+		'url(../../images/bill.png) no-repeat 50%',
+		function(){
+			var lm = new Ext.LoadMask(document.body, {
+				msg : '正在验证权限, 请稍等......'
+			});
+			lm.show();
+			verifyStaff('../../', '1006', function(res){
+				if(res.success){
+					location.href = "Bills.html?"+ strEncode('restaurantID=' + restaurantID, 'mi');					
+				}else{
+					res['icon'] = Ext.MessageBox.WARNING;
+					Ext.ux.showMsg(res);
+				}
+			});
+		}
+	);
 
 	$("#shift").each(function(){
 		$(this).bind("click", function(){
@@ -73,6 +85,34 @@
 					});
 				}
 			});
+		});
+	});
+	
+	// mouse over & mouse off -- heightlight the icon
+	$("#order").each(function(){
+		$(this).hover(function(){
+			$(this).stop().css("background", "url(../../images/order_select.png) no-repeat 50%");
+		},
+		function(){
+			$(this).stop().css("background", "url(../../images/order.png) no-repeat 50%");
+		});
+	});
+
+	$("#shift").each(function(){
+		$(this).hover(function(){
+			$(this).stop().css("background", "url(../../images/shift_selected.png) no-repeat 50%");
+		},
+		function(){
+			$(this).stop().css("background", "url(../../images/shift.png) no-repeat 50%");
+		});
+	});
+	
+	$("#dailySettle").each(function(){
+		$(this).hover(function(){
+			$(this).stop().css("background", "url(../../images/dailySettle_select.png) no-repeat 50%");
+		},
+		function(){
+			$(this).stop().css("background", "url(../../images/dailySettle.png) no-repeat 50%");
 		});
 	});
 };

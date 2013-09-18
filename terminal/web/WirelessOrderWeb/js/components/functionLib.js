@@ -149,7 +149,7 @@ Ext.grid.CheckColumn.prototype = {
 };
 
 //获取操作人姓名, 此函数要求页面上有operatorName,restaurantID全局变量；有id为optName的div
-function getOperatorName(actionPath) {
+function getOperatorName(actionPath, callback) {
 	Ext.Ajax.request({
 		url : actionPath + "QueryStaff.do",
 		params : {
@@ -159,47 +159,18 @@ function getOperatorName(actionPath) {
 			"isName" : true
 		},
 		success : function(response, options) {
-
-			var operatorName = "";
 			var jr = Ext.util.JSON.decode(response.responseText);
-			
 			if(jr.success){
 				if(jr.other.staff != null){
-					operatorName = jr.other.staff.staffName;
-				}
-				document.getElementById("optName").innerHTML = operatorName;
-			}else{
-				Ext.MessageBox.show({
-					msg : resultJSON.msg,
-					width : 300,
-					buttons : Ext.MessageBox.OK
-				});
-			}
-			
-			
-			
-			//var rootData = resultJSON.root;
-/*			var pin = resultJSON.other.pin;
-			if (rootData.length != 0) {
-				if (resultJSON.msg == "normal") {
-					staffData = rootData;
-
-					for ( var i = 0; i < staffData.length; i++) {
-						// find the name
-						if (staffData[i].staffID == pin) {
-							operatorName = staffData[i].staffName;
-						}
+					document.getElementById("optName").innerHTML = jr.other.staff.staffName;
+					if(typeof callback == 'function'){
+						callback(jr.other.staff);
 					}
-					// update the page
-					document.getElementById("optName").innerHTML = operatorName;
-				} else {
-					Ext.MessageBox.show({
-						msg : resultJSON.msg,
-						width : 300,
-						buttons : Ext.MessageBox.OK
-					});
 				}
-			}*/
+			}else{
+				jr.icon = Ext.MessageBox.OK;
+				Ext.ux.showMsg(jr);
+			}
 		},
 		failure : function(response, options) {
 		}

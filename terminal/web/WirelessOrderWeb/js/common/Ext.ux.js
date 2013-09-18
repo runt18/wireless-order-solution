@@ -390,7 +390,7 @@ function createGridPanel(id, title, height, width, url, cmData, readerData,
  * 
  */
 Ext.ux.showMsg = function(msg){
-	if(msg == null || typeof(msg) == 'undefined'){
+	if(msg == null || typeof msg == 'undefined'){
 		return false;
 	}
 	if(msg.success){

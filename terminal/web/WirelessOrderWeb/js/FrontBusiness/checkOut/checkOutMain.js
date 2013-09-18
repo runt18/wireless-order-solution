@@ -23,10 +23,10 @@ var checkOutMainPanelTbar = new Ext.Toolbar({
 		forceSelection : true,
 		store : new Ext.data.JsonStore({
 			root : 'root',
-			fields : [ 'discountID', 'discountName']
+			fields : [ 'id', 'name']
 		}),
-		valueField : 'discountID',
-		displayField : 'discountName',
+		valueField : 'id',
+		displayField : 'name',
 		typeAhead : true,
 		mode : 'local',
 		triggerAction : 'all',
@@ -208,38 +208,15 @@ var checkOutCenterPanel = new Ext.Panel({
 });
 
 Ext.onReady(function() {
-	Ext.lib.Ajax.defaultPostHeader += '; charset=utf-8';
-	Ext.QuickTips.init();
-	
-	var centerPanelCO = new Ext.Panel({
+	initMainView(null, new Ext.Panel({
 		id : 'centerPanelDO',
 		region : 'center',
 		border : false,
 		margins : '0 0 0 0',
 		layout : 'border',
 		items : [ checkOutCenterPanel ]
-	});
+	}), null);
 	
-	new Ext.Viewport({
-		layout : 'border',
-		items : [{
-			region : 'north',
-		    bodyStyle : 'background-color:#DFE8F6;',
-			html : '<h4 style="padding:10px;font-size:150%;float:left;">无线点餐网页终端</h4><div id="optName" class="optName"></div>',
-			height : 50,
-			border : false,
-			margins : '0 0 0 0'
-		},
-		centerPanelCO,
-		{
-			region : 'south',
-			height : 30,
-			layout : 'form',
-			frame : true,
-			border : false,
-			html : '<div style="font-size:11pt; text-align:center;"><b>版权所有(c) 2011 智易科技</b></div>'
-		}]
-	});
 	
 	if(eval(category == 4)){
 		tableGroupTab = new Ext.TabPanel({
@@ -301,7 +278,7 @@ Ext.onReady(function() {
 	
 });
 
-setFormButtonStatus = function(_s){
+function setFormButtonStatus(_s){
 	checkOutForm.buttons[0].setDisabled(_s);
 	checkOutForm.buttons[1].setDisabled(_s);
 	checkOutForm.buttons[2].setDisabled(_s);

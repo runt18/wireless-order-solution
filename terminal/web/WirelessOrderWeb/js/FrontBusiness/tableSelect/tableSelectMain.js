@@ -9,26 +9,32 @@
 			for ( var i = 0; i < tableStatusListTSDisplay.length; i++) {
 				temp = tableStatusListTSDisplay[i];
 				if (temp.alias == selectedTable) {
-					if (temp.statusValue == TABLE_BUSY) {
-						location.href = "OrderMain.html?"+ strEncode('restaurantID=' + restaurantID
-								+ "&tableAliasID=" + temp.alias
-								+ "&ts=1" 
-								+ "&personCount=" + temp.customNum
-								+ "&category=" + temp.categoryValue
-								+ "&minCost=" + temp.minCost
-								+ "&serviceRate=" + temp.serviceRate
-								, 'mi');
-					} else if (temp.statusValue == TABLE_IDLE) {
-						location.href = "OrderMain.html?"+ strEncode('restaurantID=' + restaurantID
-								+ "&ts=0"
-								+ "&tableAliasID=" + selectedTable
-								+ "&personCount=1"
-								+ "&category=" + CATE_NORMAL
-								+ "&minCost=" + temp.minimumCost
-								+ "&serviceRate=" + temp.serviceRat
-								, 'mi')
-;
-					}
+					var lm = new Ext.LoadMask(document.body, {
+						msg : '正在验证权限, 请稍等......'
+					});
+					lm.show();
+					verifyStaff('../../', '1000', function(res){
+						if(res.success){
+							if (temp.statusValue == TABLE_BUSY) {
+								location.href = "OrderMain.html?" + strEncode('restaurantID=' + restaurantID
+										+ "&tableAliasID=" + temp.alias
+										+ "&ts=1" 
+										+ "&personCount=" + temp.customNum
+										+ "&category=" + temp.categoryValue
+										, 'mi');
+							} else if (temp.statusValue == TABLE_IDLE) {
+								location.href = "OrderMain.html?" + strEncode('restaurantID=' + restaurantID
+										+ "&ts=0"
+										+ "&tableAliasID=" + selectedTable
+										+ "&category=" + CATE_NORMAL
+										, 'mi');
+							}
+						}else{
+							lm.hide();
+							res['icon'] = Ext.MessageBox.WARNING;
+							Ext.ux.showMsg(res);
+						}
+					});
 					break;
 				}
 			}
@@ -1258,25 +1264,6 @@ Ext.onReady(function() {
 		items : [ tableSelectNorthPanel, tableSelectCenterPanel, tableSelectWestPanel]
 	});
 
-	new Ext.Viewport({
-		layout : "border",
-		id : "viewport",
-		items : [{
-			region : "north",
-			bodyStyle : "background-color:#DFE8F6;",
-			html : "<h4 style='padding:10px;font-size:150%;float:left;'>无线点餐网页终端</h4><div id='optName' class='optName'></div>",
-			height : 50,
-			border : false,
-			margins : '0 0 0 0'
-		},
-		centerTabPanel,
-		{
-			region : "south",
-			height : 30,
-			layout : "form",
-			frame : true,
-			border : false,
-			html : "<div style='font-size:11pt; text-align:center;'><b>版权所有(c) 2011 智易科技</b></div>"
-		} ]
-	});
+	initMainView(null, centerTabPanel, null);
+	getOperatorName("../../");
 });
