@@ -322,7 +322,6 @@ var btnOrderDetail = new Ext.ux.ImageButton({
 			selTabContentWin.center();
 			var tpStore = selTabContentGrid.getStore();
 			tpStore.baseParams.tableAlias = selTabContent.alias;
-			tpStore.baseParams.pin = pin;
 			tpStore.baseParams.queryType = 'TodayByTbl';
 			tpStore.baseParams.restaurantID = restaurantID;
 			tpStore.load({

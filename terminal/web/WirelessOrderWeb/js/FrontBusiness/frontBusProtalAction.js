@@ -14,6 +14,7 @@
 			});
 			lm.show();
 			verifyStaff('../../', '1006', function(res){
+				lm.hide();
 				if(res.success){
 					location.href = "Bills.html?"+ strEncode('restaurantID=' + restaurantID, 'mi');					
 				}else{

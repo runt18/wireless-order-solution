@@ -91,7 +91,7 @@ function loadOrderBasicMsg(){
 	document.getElementById("spanCancelFoodAmount").innerHTML = parseFloat(orderMsg.cancelPrice).toFixed(2);
 	var change = '0.00';
 	
-	if(actualCount == '' || actualCount < orderMsg.acturalPrice){
+	if(actualCount == '' || actualCount < orderMsg.actualPrice){
 		document.getElementById("actualCount").value = parseFloat(orderMsg.actualPrice).toFixed(2);
 	}else{
 		change = parseFloat(actualCount - orderMsg.actualPrice).toFixed(2);
