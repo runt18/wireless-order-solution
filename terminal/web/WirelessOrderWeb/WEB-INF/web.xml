@@ -8,16 +8,23 @@
 		<init-param>
 			<param-name>skipVerify</param-name>
 			<param-value>
-				/Login.html,
-				/LoginAdmin.html,
 				/QueryRestaurants.do,
-				/PersonLogin.html,
-				/PersonLoginTimeout.html,
-				/MgrCenter.html,
 				/VerifyLogin.do,
 				/LoginOut.do,
 				/QueryStaff.do,
-				/OperateStaff.do
+				/OperateStaff.do,
+				/QueryOTA.do,
+				/Login.html,
+				/LoginAdmin.html,
+				/PersonLogin.html,
+				/PersonLoginTimeout.html,
+				/BillModify.html,
+				/Bills.html,
+				/CheckOut.html,
+				/OrderMain.html,
+				/TableSelect.html,
+				/DeviceMgr.html,
+				/RestaurantMgr.html
 			</param-value>
 		</init-param>
 
@@ -104,7 +111,7 @@
 		<url-pattern>*.do</url-pattern>
 	</servlet-mapping>
 	<session-config>
-		<session-timeout>30</session-timeout>       <!-- 单位：分钟 -->
+		<session-timeout>1</session-timeout>       <!-- 单位：分钟 -->
 	</session-config>
 
 	
