@@ -18,11 +18,13 @@
 				/LoginAdmin.html,
 				/PersonLogin.html,
 				/PersonLoginTimeout.html,
+				/FrontBusinessProtal.html,
 				/BillModify.html,
 				/Bills.html,
 				/CheckOut.html,
 				/OrderMain.html,
 				/TableSelect.html,
+				/MgrCenter.html,
 				/DeviceMgr.html,
 				/RestaurantMgr.html
 			</param-value>
