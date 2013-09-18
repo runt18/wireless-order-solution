@@ -85,10 +85,8 @@ var changePwdWin = new Ext.Window({
 			html : '<div style="margin-top:4px"><font id="errorMsgChangePwd" style="color:red;"> </font></div>'
 		}]
 	}],
-	bbar : [
-		'->',
-		{
-			text : '保存',
+	bbar : [ '->', {
+		text : '保存',
 	    	id : 'btnSaveUpdatePassWord',
 	    	iconCls : 'btn_save',
 			handler : function() {
@@ -108,6 +106,7 @@ var changePwdWin = new Ext.Window({
 							Ext.Ajax.request({
 								url : '../../UpdateStaff.do',
 								params : {
+									isCookie : true,
 									'staffName' : '管理员',
 									'staffId' : staffID,
 									'staffPwd' : newPwd,
@@ -138,8 +137,7 @@ var changePwdWin = new Ext.Window({
 				} else {
 					Ext.example.msg('提示', '操作失败, 原密码不正确, 请重新输入.');
 				}
-				}
-
+			}
 		}
 	}, {
 		text : '关闭',
@@ -148,13 +146,10 @@ var changePwdWin = new Ext.Window({
 		handler : function() {
 			changePwdWin.hide();
 		}
-	}
-	],
+	}],
 	listeners : {
 		'show' : function(thiz) {
 			Ext.getCmp('txtOldpwd').setValue('');
-			
-			
 			Ext.getCmp('txtNewPwd').setValue('');
 			Ext.getCmp('txtNewPwd').clearInvalid();
 			Ext.getCmp('txtConfirmNewPwd').setValue('');
@@ -190,7 +185,6 @@ var pushBackBut = new Ext.ux.ImageButton({
 				isChange = true;
 			}
 		});
-		
 		if (isChange) {
 			Ext.MessageBox.show({
 				msg : '修改尚未保存，是否确认返回？',
@@ -238,73 +232,6 @@ var addRole = new Ext.ux.ImageButton({
 	}
 });
 
-
-
-
-
-/*var searchForm = new Ext.Panel({
-	border : false,
-	width : 130,
-	id : 'searchForm',
-	items : [{
-		xtype : 'textfield',
-		hideLabel : true,
-		id : 'conditionText',
-		allowBlank : false,
-		width : 120
-	}]
-});
-
-// operator function
-function staffDeleteHandler(rowIndex){
-	Ext.MessageBox.show({
-		msg : '确定删除？',
-		width : 300,
-		buttons : Ext.MessageBox.YESNO,
-		fn : function(btn) {
-			if (btn == 'yes') {
-				var staffID = staffStore.getAt(rowIndex).get('staffID');
-
-				Ext.Ajax.request({
-					url : '../../DeleteStaff.do',
-					params : {
-						
-						'staffID' : staffID
-					},
-					success : function(response, options) {
-						var resultJSON = Ext.util.JSON.decode(response.responseText);
-						if (resultJSON.success == true) {
-//							loadAllStaff();
-							staffStore.load({
-								params : {
-									start : 0,
-									limit : pageRecordCount
-								}
-							});
-							Ext.example.msg('提示', resultJSON.data);
-						} else {
-							var dataInfo = resultJSON.data;
-							Ext.MessageBox.show({
-								msg : dataInfo,
-								width : 300,
-								buttons : Ext.MessageBox.OK
-							});
-						}
-					},
-					failure : function(response, options) {
-						var resultJSON = Ext.util.JSON.decode(response.responseText);
-						Ext.MessageBox.show({
-							msg : resultJSON.data,
-							width : 300,
-							buttons : Ext.MessageBox.OK
-						});
-					}
-				});
-			}
-		}
-	});
-};*/
-
 function deleteStaff(){
 	var ss = Ext.getCmp('staffGrid').getSelectionModel().getSelected();
 	if(ss != null){
@@ -316,6 +243,7 @@ function deleteStaff(){
 					Ext.Ajax.request({
 						url : '../../DeleteStaff.do',
 						params : {
+							isCookie : true,
 							staffId : ss.data.staffID
 						},
 						success : function(res, opt){
@@ -338,7 +266,6 @@ function deleteStaff(){
 
 	}
 }
-
 
 function changePwdHandler(rowIndex) {
 	changePwdWin.show();
@@ -390,6 +317,7 @@ var staffStore = new Ext.data.Store({
 		name : 'roleName'
 	} ]),
 	baseParams:{
+		isCookie : true,
 		"restaurantID" : restaurantID,
 		"type" : 0,
 		"isPaging" : false,
@@ -402,22 +330,6 @@ staffStore.load({
 		limit : pageRecordCount
 	}
 });
-
-/*var noLimitCheckColumn = new Ext.grid.CheckColumn({
-	header : '是否限制额度',
-	dataIndex : 'noLimit',
-	align : 'center',
-	width : 60,
-	renderer : function(v, p, record) {
-		if(eval(record.get('type') == 1)){
-			return '系统保留';
-		}else{
-			p.css += ' x-grid3-check-col-td';
-			return '<div id="' + this.id + '" class="x-grid3-check-col'
-					+ (v ? '-on' : '') + '">&#160;</div>';
-		}
-	}
-});*/
 
 // 2，员工列模型
 var staffColumnModel = new Ext.grid.ColumnModel([ 
@@ -607,6 +519,7 @@ function operateRole(c){
 						Ext.Ajax.request({
 							url : '../../OperateRole.do',
 							params : {
+								isCookie : true,
 								roleId : ss.data.id,
 								dataSource : 'delete'
 							},
@@ -631,7 +544,6 @@ function operateRole(c){
 					}
 				}
 			);
-
 		}
 	}
 }
@@ -726,6 +638,7 @@ staffAddWin = new Ext.Window({
 					Ext.Ajax.request({
 						url : '../../' + url,
 						params : {
+							isCookie : true,
 							'staffName' : staffName,
 							'staffPwd' : staffAddPwd,
 							'roleId' : roleId,
@@ -845,6 +758,7 @@ var roleAddWin = new Ext.Window({
 				Ext.Ajax.request({
 					url : '../../OperateRole.do',
 					params : {
+						isCookie : true,
 						dataSource : dataSource,
 						roleName : roleName,
 						roleId : roleId, 
@@ -867,9 +781,7 @@ var roleAddWin = new Ext.Window({
 					}
 				});
 			}
-
 		}
-		
 	},{
 		text : '取消',
 		id : 'btnClose',
@@ -886,7 +798,6 @@ var roleAddWin = new Ext.Window({
 			Ext.getCmp('combReferRole').setValue('');
 			Ext.getCmp('combReferRole').clearInvalid();
 			Ext.getCmp('combReferRole').enable();
-			
 		}
 	},
 	keys : [{
@@ -947,11 +858,6 @@ var staffGrid, roleGrid, privilegeTree;
 var selectChange = false;
 var selected, beforeSelected = null;
 Ext.onReady(function() {
-	// 解决ext中文传入后台变问号问题
-	Ext.lib.Ajax.defaultPostHeader += '; charset=utf-8';
-	Ext.QuickTips.init();
-
-	// ---------------------表格--------------------------
 	staffGrid = new Ext.grid.GridPanel({
 		xtype : 'grid',
 		id : 'staffGrid',
@@ -959,16 +865,11 @@ Ext.onReady(function() {
 		width : '60%',
 		region : 'west',
 		frame : true,
-		margins : '0 0 0 0',
 		ds : staffStore,
 		cm : staffColumnModel,
 		autoExpandColumn : 'staffOpt',
 		autoScroll : true,
 		loadMask : { msg : '数据加载中，请稍等...' },
-		//plugins : noLimitCheckColumn,
-/*		sm : new Ext.grid.RowSelectionModel({
-			singleSelect : true
-		}),*/
 		viewConfig : {
 			forceFit : true
 		},
@@ -1030,7 +931,6 @@ Ext.onReady(function() {
 		width : '20%',
 		region : 'center',
 		frame : true,
-		margins : '0 0 0 0',
 		autoExpandColumn : 'roleOpt',
 		ds : roleStore,
 		cm : roleModel,
@@ -1165,6 +1065,7 @@ Ext.onReady(function() {
 					Ext.Ajax.request({
 						url : '../../OperateRole.do',
 						params : {
+							isCookie : true,
 							dataSource : 'updatePrivilege',
 							discounts : discount,
 							privileges : privilege,
@@ -1196,6 +1097,7 @@ Ext.onReady(function() {
 	privilegeTree.loader = new Ext.tree.TreeLoader({
 		dataUrl : '../../QueryPrivilege.do',
 		baseParams : {
+			isCookie : true,
 			restaurantID : restaurantID,
 			dataSource : 'tree'
 		},
@@ -1221,72 +1123,6 @@ Ext.onReady(function() {
 		}
 	});
 	
-	
-/*	staffGrid.getStore().on('beforeload', function() {
-		
-		var queryType = Ext.getCmp('filter').getValue();
-		var searchValue = Ext.getCmp(conditionType);
-		var queryOperator = 0, queryValue = '';		
-		
-		if(queryType == '全部' || queryType == 0 || !searchValue || searchValue.getValue().toString().trim() == '' ){	
-			queryType = 0;
-			queryValue = '';
-		}else{
-			queryOperator = Ext.getCmp('operator').getValue();
-			if (queryOperator == '等于') {
-				queryOperator = 1;
-			}
-			queryValue = searchValue.getValue().toString().trim();
-		}
-		
-		this.baseParams = {
-			'restaurantID' : restaurantID,
-			'type' : queryType,
-			'ope' : queryOperator,
-			'value' : queryValue,
-			'isPaging' : true,
-			'isCombo' : false
-		};
-	});*/
-
-	// 为store配置load监听器(即load完后动作)
-/*	staffGrid.getStore().on('load', function() {
-		if (staffGrid.getStore().getTotalCount() != 0) {
-			var msg = this.getAt(0).get('message');
-			if (msg != 'normal') {
-				Ext.MessageBox.show({
-					msg : msg,
-					width : 300,
-					buttons : Ext.MessageBox.OK
-				});
-				this.removeAll();
-			} else {
-				
-			}
-		}
-	});*/
-
-/*	staffGrid.on('beforeedit', function(e){
-		if (e.record.get('noLimit') == true && e.field == 'staffQuota') {
-			e.cancel = true;
-		}
-	});
-	
-	staffGrid.on('afteredit', function(e){
-		if (e.field == 'noLimit') {
-			if (e.record.get('noLimit') == true) {
-				e.record.set('staffQuota', -1);
-			}else{
-				if (e.record.get('quotaOrig') > 0) {
-					e.record.set('staffQuota', e.record.get('quotaOrig'));
-				}else{
-					e.record.set('staffQuota', 0);
-				}
-			}
-		}
-	});*/
-	
-	// ---------------------end 表格--------------------------
 	var centerPanel = new Ext.Panel({
 		title : '员工操作',
 		region : 'center',
