@@ -133,7 +133,6 @@ function operatorWinData(c){
 		return;
 	}
 	var tasteId = Ext.getCmp('hideTasteId');
-	var tasteAlias = Ext.getCmp('numTasteAlias');
 	var tasteName = Ext.getCmp('txtTasteName');
 	var tastePrice = Ext.getCmp('numTastePrice');
 	var tasteRate = Ext.getCmp('numTasteRate');
@@ -141,7 +140,6 @@ function operatorWinData(c){
 	
 	if(c.otype == Ext.ux.otype['set']){
 		tasteId.setValue(c.data['id']);
-		tasteAlias.setValue(c.data['alias']);
 		tasteName.setValue(c.data['name']);
 		tasteCate.setValue(typeof c.data['cateValue'] == 'undefined' ? 0 : c.data['cateValue']);
 		tasteCate.fireEvent('select', tasteCate);
@@ -153,14 +151,12 @@ function operatorWinData(c){
 		tastePrice.setValue(typeof c.data['price'] == 'undefined' ? 0 : c.data['price']);
 		tasteRate.setValue(typeof c.data['rate'] == 'undefined' ? 0 : c.data['rate']);
 		
-		tasteAlias.clearInvalid();
 		tasteName.clearInvalid();
 		tastePrice.clearInvalid();
 		tasteRate.clearInvalid();
 	}else if(c.otype == Ext.ux.otype['get']){
 		c.data = {
 			id : tasteId.getValue(),
-			alias : tasteAlias.getValue(),
 			name : tasteName.getValue(),
 			price : tastePrice.getValue(),
 			rate : tasteRate.getValue(),
