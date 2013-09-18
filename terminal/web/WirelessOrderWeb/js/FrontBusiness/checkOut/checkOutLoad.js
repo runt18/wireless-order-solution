@@ -120,6 +120,7 @@ function loadSystemSetting(_c){
 	Ext.Ajax.request({
 		url : '../../QuerySystemSetting.do',
 		params : {
+			isCookie : true,
 			"restaurantID" : restaurantID
 		},
 		success : function(response, options) {

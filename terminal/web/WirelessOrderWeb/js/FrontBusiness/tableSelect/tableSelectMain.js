@@ -85,11 +85,10 @@ var orderDeleteImgBut = new Ext.ux.ImageButton({
 					if (temp.statusValue == TABLE_IDLE) {
 						Ext.example.msg('提示', '<font color="red">操作失败, 此桌没有下单, 不能删单.</font>');
 					} else {
-						//dishPushBackWin.show();
 						Ext.Ajax.request({
 							url : "../../CancelOrder.do",
 							params : {
-								
+								isCookie : true,
 								"tableAlias" : selectedTable
 							},
 							success : function(response, options) {
@@ -180,7 +179,6 @@ var btnPayOrderGroup = new Ext.ux.ImageButton({
 	imgHeight : 50,
 	tooltip : "合单结账",
 	handler : function(btn) {
-		
 		Ext.Msg.show({
 			title : '温馨提示',
 			msg : '此功能正在维护中, 请稍候再试.谢谢.',
@@ -1037,7 +1035,7 @@ Ext.onReady(function() {
 							Ext.Ajax.request({
 								url : "../../CancelOrder.do",
 								params : {
-									
+									isCookie : true,
 									"tableAlias" : selectedTable
 								},
 								success : function(response, options) {

@@ -213,6 +213,7 @@ var allFoodTabPanelGridTbar = new Ext.Toolbar({
 				Ext.Ajax.request({
 					url : '../../QueryMenu.do',
 					params : {
+						isCookie : true,
 						dataSource : 'kitchens',
 						restaurantID : restaurantID
 					},
@@ -342,6 +343,7 @@ function billModifyOnLoad() {
 	Ext.Ajax.request({
 		url : '../../QuerySystemSetting.do',
 		params : {
+			isCookie : true,
 			"restaurantID" : restaurantID
 		},
 		success : function(res, opt){
@@ -364,7 +366,7 @@ function billModifyOnLoad() {
 	Ext.Ajax.request({
 		url : "../../QueryOrder.do",
 		params : {
-			
+			isCookie : true,
 			restaurantID : restaurantID,
 			orderID : orderID,
 			queryType: 'Today'
@@ -391,7 +393,7 @@ function billModifyOnLoad() {
 				Ext.Ajax.request({
 					url : '../../QueryDiscountTree.do',
 					params : {
-						
+						isCookie : true,
 						restaurantID : restaurantID
 					},
 					success : function(res, opt) {
@@ -400,7 +402,7 @@ function billModifyOnLoad() {
 						Ext.Ajax.request({
 							url : '../../QueryDiscountPlan.do',
 							params : {
-								
+								isCookie : true,
 								restaurantID : restaurantID
 							},
 							success : function(res, opt){

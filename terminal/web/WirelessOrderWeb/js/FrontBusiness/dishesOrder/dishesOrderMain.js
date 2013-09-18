@@ -106,7 +106,6 @@ var allTasteGridForTabPanel = new Ext.grid.GridPanel({
 	title : '所有口味',
 	id : 'allTasteGridForTabPanel',
 	trackMouseOver : true,
-//	frame : true,
 	loadMask : { msg: '数据请求中,请稍等......' },
 	viewConfig : {
 		forceFit : true
@@ -134,7 +133,6 @@ var ggForTabPanel = new Ext.grid.GridPanel({
 	title : '规格',
 	id : 'ggForTabPanel',
 	trackMouseOver : true,
-//	frame : true,
 	loadMask : { msg: '数据请求中,请稍等......' },
 	viewConfig : {
 		forceFit : true
@@ -194,7 +192,6 @@ var haveTasteGrid = new Ext.grid.GridPanel({
 	]),
 	ds : new Ext.data.JsonStore({
 		root : 'root',
-//		fields : ['tasteID', 'tasteAliasID', 'tasteName', 'tastePrice', 'tasteRate', 'tasteCalcFormat', 'tasteCategory']
 		fields : FoodTasteRecord.getKeys()
 	})
 });
@@ -387,6 +384,7 @@ var allFoodTabPanelGridTbar = new Ext.Toolbar({
 				Ext.Ajax.request({
 					url : '../../QueryMenu.do',
 					params : {
+						isCookie : true,
 						dataSource : 'kitchens',
 						restaurantID : restaurantID
 					},

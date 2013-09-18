@@ -3,6 +3,7 @@
 	Ext.Ajax.request({
 		url : "../../QueryMenu.do",
 		params : {
+			isCookie : true,
 			dataSource : 'foods',
 			restaurantID : restaurantID,
 			type : 1
@@ -23,8 +24,8 @@ function loadAddKitchens() {
 	Ext.Ajax.request({
 		url : "../../QueryKitchen.do",
 		params : {
-			dataSource : "normal",
-			
+			isCookie : true,
+			dataSource : "normal"
 		},
 		success : function(response, options) {
 			var resultJSON = Ext.decode(response.responseText);
@@ -52,6 +53,7 @@ function loadAllStaff() {
 	Ext.Ajax.request({
 		url : "../../QueryStaff.do",
 		params : {
+			isCookie : true,
 			"restaurantID" : restaurantID,
 			"type" : 0,
 			"isPaging" : false,
@@ -93,8 +95,8 @@ function loadShiftDuty(){
 	Ext.Ajax.request({
 		url : '../../DutyRangeStat.do',
 		params : {
-			dataSource : 'today',
-			
+			isCookie : true,
+			dataSource : 'today'
 		},
 		success : function(res, opt){
 			var jr = Ext.decode(res.responseText);

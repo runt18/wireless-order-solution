@@ -8,7 +8,7 @@
 	Ext.Ajax.request({
 		url : "../../QueryTable.do",
 		params : {
-			
+			isCookie : true,
 			"type" : 0,
 			"isPaging" : false,
 			"isCombo" : false

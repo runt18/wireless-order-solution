@@ -66,6 +66,7 @@ var paySubmit = function(submitType) {
 			Ext.Ajax.request({
 				url : "../../PayOrder.do",
 				params : {
+					isCookie : true,
 					"orderID" : orderMsg.id,
 					"cashIncome" : submitPrice,
 					"payType" : payType,

@@ -384,8 +384,8 @@ function memberPointConsume(c){
 		Ext.Ajax.request({
 			url : '../../OperateMember.do',
 			params : {
+				isCookie : true,
 				dataSource : 'consumePoint',
-				
 				memberId : memberPointConsumeWin.member['id'],
 				point : consumePoint.getValue()
 			},

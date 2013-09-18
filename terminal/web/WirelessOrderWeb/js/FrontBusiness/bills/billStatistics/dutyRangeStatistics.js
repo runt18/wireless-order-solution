@@ -8,7 +8,7 @@
 	Ext.Ajax.request({
 		url : '../../PrintOrder.do',
 		params : {
-			
+			isCookie : true,
 			'printType' : 5,
 			'onDuty' : gs['onDutyFormat'],
 			'offDuty' : gs['offDutyFormat']

@@ -60,6 +60,9 @@ shiftVerifyWin = new Ext.Window({
 						// 交班信息
 						Ext.Ajax.request({
 							url : "../../QueryShift.do",
+							params : {
+								isCookie : true
+							},
 							success : function(response, options){
 								var resultJSON = Ext.util.JSON.decode(response.responseText);
 								if (resultJSON.success == true){
@@ -143,6 +146,9 @@ shiftVerifyWin = new Ext.Window({
 doDailySettle = function() {
 	Ext.Ajax.request({
 		url : "../../DailySettleExec.do",
+		params : {
+			isCookie : true
+		},
 		success : function(response, options) {
 			var resultJSON = Ext.util.JSON.decode(response.responseText);
 			if (eval(resultJSON.success == true)) {
@@ -241,6 +247,9 @@ dailyConfirmWin = new Ext.Window({
 					if (resultJSON.success == true) {
 						Ext.Ajax.request({
 							url : "../../DailySettleCheck.do",
+							params : {
+								isCookie : true
+							},
 							success : function(response, options) {
 								var resultJSON = Ext.util.JSON.decode(response.responseText);
 								var rootData = resultJSON.root;
@@ -303,7 +312,6 @@ dailyConfirmWin = new Ext.Window({
 });
 
 var dailySettleCheckDetpGrid = new Ext.grid.GridPanel({
-//	border : false,
 	layout : "fit",
 	ds : new Ext.data.JsonStore({
 		fields : ['deptName', 'deptDiscount', 'deptGift', 'deptAmount']
@@ -386,6 +394,7 @@ var dailySettleCheckTableWin = new Ext.Window({
 						Ext.Ajax.request({
 							url : "../../DoShift.do",
 							params : {
+								isCookie : true,
 								onDuty : shiftCheckDate.onDuty,
 								offDuty : shiftCheckDate.offDuty
 							},
@@ -430,6 +439,7 @@ var dailySettleCheckTableWin = new Ext.Window({
 				params : {
 					onDuty : shiftCheckDate.onDuty,
 					offDuty : shiftCheckDate.offDuty,
+					isCookie : true,
 					'printType' : e == null ? 4 : 5
 				},
 				success : function(response, options) {
@@ -461,6 +471,9 @@ var dailySettleCheckTableWin = new Ext.Window({
 						// 未交班帳單檢查
 						Ext.Ajax.request({
 							url : "../../DailySettleCheck.do",
+							params : {
+								isCookie : true
+							},
 							success : function(response, options) {
 								var resultJSON = Ext.util.JSON.decode(response.responseText);
 								if (eval(resultJSON.success == true)) {
@@ -604,11 +617,7 @@ var dailySettleCheckTableWin = new Ext.Window({
 });
 
 // ---------------------------------------------------------------------------
-
 Ext.onReady(function() {
-	// 解决ext中文传入后台变问号问题
-	Ext.lib.Ajax.defaultPostHeader += '; charset=utf-8';
-	Ext.QuickTips.init();
 
 	// ******************************************************************************************************
 	var pushBackBut = new Ext.ux.ImageButton({

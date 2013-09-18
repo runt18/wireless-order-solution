@@ -396,8 +396,6 @@ function addOrderGroupFoodHandler(_c){
 	}
 };
 
-
-
 /* ================================================== */
 /**
  * 
@@ -655,7 +653,7 @@ function refreshOrderHandler(){
 	Ext.Ajax.request({
 		url : '../../QueryOrder.do',
 		params : {
-			
+			isCookie : true,
 			'tableID' : tableAliasID
 		},
 		success : function(response, options) {
@@ -792,7 +790,7 @@ function submitSingleOrderHandler(_c){
 		Ext.Ajax.request({
 			url : '../../InsertOrder.do',
 			params : {
-				
+				isCookie : true,
 				'tableID' : tableAliasID,
 				'orderID' : _c.grid.order.id,
 				'customNum' : 1,
@@ -859,8 +857,8 @@ function submitOrderGroupHandler(_c){
 	Ext.Ajax.request({
 		url : '../../UpdateOrderGroup.do',
 		params : {
+			isCookie : true,
 			'dataSource' : 'updateOrder',
-			
 			'restaurantID' : restaurantID,
 			'parentOrderID' : orderGroupData.root[0].id,
 			'type' : tableStatus == 1 ? 'update' : 'insert',

@@ -1,9 +1,7 @@
 ﻿function tableStuLoad() {
 	if(isFree){
-//		centerPanel.setTitle('操作类型: <font color="red">新下单</font>');
 		orderPanel.setTitle('已点菜列表 -- 操作类型: <font color="red">新下单</font>');
 	}else{
-//		centerPanel.setTitle('操作类型: <font color="red">改单</font>');
 		orderPanel.setTitle('已点菜列表 -- 操作类型: <font color="red">改单</font>');
 	}
 	if (isGroup) {
@@ -19,6 +17,7 @@ function tasteOnLoad() {
 	Ext.Ajax.request({
 		url : '../../QueryMenu.do',
 		params : {
+			isCookie : true,
 			dataSource : 'tastes',
 			restaurantID : restaurantID,
 			type : 2
@@ -101,7 +100,7 @@ function loadOrderGroupData(){
 	Ext.Ajax.request({
 		url : '../../QueryOrderGroup.do',
 		params : {
-			
+			isCookie : true,
 			'restaurantID' : restaurantID,
 			'queryType' : 0,
 			'childTableAliasID' : tableAliasID,
@@ -329,7 +328,7 @@ function createOrderFoodGridPanelTbar(){
 							Ext.Ajax.request({
 								url : '../../PrintOrder.do',
 								params : {
-									
+									isCookie : true,
 									'tableID' : tableAliasID,
 									'printType' : 1
 								},
@@ -362,7 +361,7 @@ function createOrderFoodGridPanelTbar(){
 										Ext.Ajax.request({
 											url : '../../PrintOrder.do',
 											params : {
-												
+												isCookie : true,
 												'tableID' : tableAliasID,
 												'printType' : 2
 											},
@@ -534,7 +533,7 @@ function initPasswordWin(){
 					Ext.Ajax.request({
 						url : '../../VerifyPwd.do',
 						params : {
-							
+							isCookie : true,
 							'type' : 5,
 							'pwd' : pwdTrans
 						},

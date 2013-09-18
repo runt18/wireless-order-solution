@@ -275,7 +275,7 @@ function submitOrderHandler(_c){
 		Ext.Ajax.request({
 			url : "../../UpdateOrder2.do",
 			params : {
-				
+				isCookie : true,
 				"orderID" : orderedGrid.order["id"],
 				'tableAlias' : orderedGrid.order.table.alias,
 				"category" : orderedGrid.order["categoryValue"],

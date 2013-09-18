@@ -365,7 +365,7 @@ function printBillFunc(orderID) {
 	Ext.Ajax.request({
 		url : '../../PrintOrder.do',
 		params : {
-			
+			isCookie : true,
 			'orderID' : orderID,
 			'printType' : 3
 		},
