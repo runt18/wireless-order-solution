@@ -185,7 +185,7 @@ public class PayOrder {
 	 * @return
 	 * @throws BusinessException
 	 * 			Throws if one of cases below.
-	 * 			<li>Failed to calculate the order referred to {@link PayOrder#calcByID}
+	 * 			<li>Failed to calculate the order referred to {@link PayOrder#calcById}
 	 * 			<li>The consume price exceeds total balance to this member account in case of normal consumption.
 	 * 		    <li>Perform the repaid consumption.
 	 * @throws SQLException
