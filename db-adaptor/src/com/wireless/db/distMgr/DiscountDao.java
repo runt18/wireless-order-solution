@@ -22,6 +22,43 @@ import com.wireless.pojo.staffMgr.Staff;
 public class DiscountDao {
 	
 	/**
+	 * Get the default the discount to a specific restaurant.
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @return the default discount to this restaurant
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static Discount getDefaultDiscount(Staff staff) throws SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return getDefaultDiscount(dbCon, staff);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Get the default the discount to a specific restaurant.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @return the default discount to this restaurant
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static Discount getDefaultDiscount(DBCon dbCon, Staff staff) throws SQLException{
+		List<Discount> result = getDiscount(dbCon, staff, " AND DIST.status IN( " + Discount.Status.DEFAULT.getVal() + "," + Discount.Status.DEFAULT_RESERVED.getVal() + ")", null);
+		if(result.isEmpty()){
+			return getDiscount(dbCon, staff, " AND DIST.status = " + Discount.Status.RESERVED.getVal(), null).get(0);
+		}else{
+			return result.get(0);
+		}
+	}
+	
+	/**
 	 * Get the discounts to specific role.
 	 * @param staff
 	 * 			the staff to perform this action

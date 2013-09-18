@@ -7,6 +7,7 @@ import java.util.List;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.deptMgr.KitchenDao;
+import com.wireless.db.distMgr.DiscountDao;
 import com.wireless.db.menuMgr.FoodDao;
 import com.wireless.db.menuMgr.PricePlanDao;
 import com.wireless.db.regionMgr.TableDao;
@@ -220,8 +221,11 @@ public class InsertOrder {
 				}
 			}
 
-			//Get the price plan which is active to this restaurant
+			//Set the active price plan.
 			orderToInsert.setPricePlan(PricePlanDao.getActivePricePlan(dbCon, staff));
+			
+			//Set the default discount.
+			orderToInsert.setDiscount(DiscountDao.getDefaultDiscount(dbCon, staff));
 			
 		}else if(orderToInsert.getDestTbl().isBusy()){
 			throw new BusinessException("The " + orderToInsert.getDestTbl() + " to insert order is BUSY.", ProtocolError.TABLE_BUSY);
@@ -246,17 +250,16 @@ public class InsertOrder {
 	 * 			Throws if failed to execute any SQL statements.
 	 */
 	private static void doInsert(DBCon dbCon, Staff staff, Order orderToInsert) throws SQLException{
-		
+
 		String sql; 
 
 		/**
 		 * Insert to 'order' table.
 		 */
 		sql = " INSERT INTO `" + Params.dbName + "`.`order` (" +
-			  " `id`, `restaurant_id`, `category`, `region_id`, `region_name`, " +
+			  " `restaurant_id`, `category`, `region_id`, `region_name`, " +
 			  " `table_id`, `table_alias`, `table_name`, " +
-			  " `birth_date`, `order_date`, `custom_num`, `staff_id`, `waiter`, `price_plan_id`) VALUES (" +
-			  " NULL, " + 
+			  " `birth_date`, `order_date`, `custom_num`, `staff_id`, `waiter`, `discount_id`, `price_plan_id`) VALUES (" +
 			  orderToInsert.getDestTbl().getRestaurantId() + ", " + 
 			  orderToInsert.getCategory().getVal() + ", " +
 			  orderToInsert.getRegion().getRegionId() + ", '" +
@@ -269,6 +272,7 @@ public class InsertOrder {
 			  orderToInsert.getCustomNum() + ", " +
 			  staff.getId() + ", " +
 			  "'" + staff.getName() + "'" + ", " +
+			  orderToInsert.getDiscount().getId() + "," +
 			  orderToInsert.getPricePlan().getId() + ")";
 		dbCon.stmt.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
 		//get the generated id to order 
