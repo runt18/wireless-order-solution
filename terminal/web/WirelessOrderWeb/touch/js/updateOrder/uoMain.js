@@ -612,6 +612,7 @@ uo.tempPayForUO = function(){
 						msg : result.data,
 						time : 3,
 					});
+					initOrderData(uo.table);
 				}else{
 					Util.msg.alert({
 						title : '错误',

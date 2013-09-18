@@ -237,6 +237,22 @@ function initFoodData(){
 }
 
 /**
+ * 初始化餐厅登陆界面
+ */
+function initRestaurantContent(){
+	Util.dialongDisplay({
+		renderTo : 'divRestaurantLogin',
+		type : 'show',
+		isTop : true
+	});
+	if (document.cookie != ""){
+		var restaurantAccount = getcookie("restaurantAccount");
+		$("#txtRestaurantAccount").val(restaurantAccount);
+	}
+}
+
+
+/**
  * 初始化员工登陆界面
  */
 function initStaffContent(c){
@@ -301,21 +317,41 @@ function initStaffContent(c){
  * onload
  */
 $(function(){
-	Util.LM.show();
-	$.ajax({
-		url : '../VerifyLogin.do',
-		success : function(data, status, xhr){
-			if(data.success){
-				staffData = data.other.staff;
-				loginSuccessCallback();
-			}else{	
-				initStaffContent();
-			}
-		},
-		error : function(request, status, error){
-			initStaffContent();
-		}
-	});
+//	if (document.cookie != "") {   
+//		restaurantID = JSON.parse(getcookie("restaurant")).id;
+//		Util.LM.show();
+//		$.ajax({
+//			url : '../VerifyLogin.do',
+//			success : function(data, status, xhr){
+//				if(data.success){
+//					staffData = data.other.staff;
+//					loginSuccessCallback();
+//				}else{	
+//					initStaffContent();
+//				}
+//			},
+//			error : function(request, status, error){
+//				initStaffContent();
+//			}
+//		});
+//	}else{
+		initRestaurantContent();
+//	} 
+//	Util.LM.show();
+//	$.ajax({
+//		url : '../VerifyLogin.do',
+//		success : function(data, status, xhr){
+//			if(data.success){
+//				staffData = data.other.staff;
+//				loginSuccessCallback();
+//			}else{	
+//				initStaffContent();
+//			}
+//		},
+//		error : function(request, status, error){
+//			initStaffContent();
+//		}
+//	});
 });
 
 /**
@@ -381,6 +417,72 @@ function setValueToPwd(c){
 }
 
 /**
+ * 餐厅登录
+ */
+function restaurantLoginHandler(){
+	var account = getDom('txtRestaurantAccount');
+	if(account.value.length == 0){
+		Util.msg.alert({
+			msg : '请输入餐厅帐号.'
+		});
+		return;
+	}
+	Util.LM.show();
+	$.ajax({
+		url : '../QueryRestaurants.do',
+		data : {
+			account : account.value,
+		},
+		dataType : 'json',
+		success : function(data, status, xhr){
+			Util.LM.hide();
+			if(data.success){
+				if(data.root.length != 0){
+					setcookie("restaurantAccount", data.root[0].account);
+					Util.dialongDisplay({
+						renderTo : 'divRestaurantLogin',
+						type : 'hide',
+					});
+					ln.restaurant = data.root[0];
+					restaurantID = ln.restaurant.id;
+					Util.LM.show();
+					initStaffContent();
+//					$.ajax({
+//						url : '../VerifyLogin.do',
+//						success : function(data, status, xhr){
+//							if(data.success){
+//								staffData = data.other.staff;
+//								loginSuccessCallback();
+//							}else{	
+//								initStaffContent();
+//							}
+//						},
+//						error : function(request, status, error){
+//							initStaffContent();
+//						}
+//					});
+				}else{
+					Util.msg.alert({
+						title : "温馨提示" ,
+						msg : "餐厅帐号错误,请检查后重新输入"
+					});
+				}
+			}else{
+				Util.msg.alert({
+					msg : data.msg
+				});
+			}
+		},
+		error : function(request, status, err){
+			Util.LM.hide();
+			Util.msg.alert({
+				msg : err
+			});
+		}
+	});
+}
+
+/**
  * 登陆
  */
 function staffLoginHandler(c){
@@ -416,6 +518,9 @@ function staffLoginHandler(c){
 		success : function(data, status, xhr){
 			Util.LM.hide();
 			if(data.success){
+				
+				pin = staffId;
+				
 				staffData = {
 					staffID : staffId,
 					staffName : temp.html()

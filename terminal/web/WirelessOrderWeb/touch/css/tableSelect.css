@@ -84,6 +84,11 @@
 	line-height: 60px;
 }
 
+.div-region-select{
+	color: #fff;
+	background: #228B22 !important;
+}
+
 .desk-number{
 	height: 59px; 
 	width:110px; 

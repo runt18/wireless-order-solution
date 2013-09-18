@@ -14,17 +14,20 @@
 <script type="text/javascript" src="./js/Util.js"></script>
 
 <script type="text/javascript">
+//登录操作包
+var ln = {
+	restaurant : {}
+}
+var pin = 0,  restaurantID = ln.restaurant.id;
+/*
 var request = new URLParaQuery();
 var pin = request['pin'], restaurantID = request['restaurantID'];
+*/
 var staffData = {staffID:0, staffName:''};
 var tableData = {}, regionData = {};
 var foodData = {}, kitchenFoodData = {}, kitchenData = {}, deptData = {root:[]}, tasteData = {};
 function getDom(id){
 	return document.getElementById(id);
-}
-//登录操作包
-var ln = {
-	restaurant : {}
 }
 //餐桌选择包,tt：转台, rn: 区域
 var ts = {
@@ -56,6 +59,17 @@ var uo = {
 </head>
 <body>
 
+<div id = "divRestaurantLogin" class="content-box-base">
+	<div style = "color : yellow; text-align : center; font-weight: bold; font-size: 20px; margin : 30px 0 0 0;">
+		请输入餐厅帐号
+	</div>
+	<div style = "color : #fff; font-weight: bold; font-size: 28px; margin : 30px 0 30px 100px;">
+		餐厅帐号：<input id= "txtRestaurantAccount" type = "text" style="width: 150px; height: 50px; background: yellow; font-weight: bold; font-size: 28px;"/>
+	</div>
+	<div class="button-base" style="line-height: 60px; margin-top : 50px; width: 100%;" onClick="restaurantLoginHandler()">
+		登陆
+	</div>
+</div>
 <div class="content content-box-base" style="z-index:9990;"></div>
 <div id="divUserLogin" class="box-horizontal content-box-base">
 	<div class="box-vertical" style="width: 330px;">
