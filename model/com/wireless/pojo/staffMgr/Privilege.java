@@ -59,7 +59,7 @@ public class Privilege implements Comparable<Privilege>, Parcelable, Jsonable{
 		GIFT(1003, Cate.FRONT_BUSINESS, "赠送"),
 		RE_PAYMENT(1004, Cate.FRONT_BUSINESS, "反结帐"),
 		PAYMENT(1005, Cate.FRONT_BUSINESS, "结帐"),
-		CHECK_ORDER(1006, Cate.FRONT_BUSINESS, "账单"),
+		CHECK_ORDER(1006, Cate.FRONT_BUSINESS, "查看账单"),
 		BASIC(2000, Cate.BASIC, "后台"),
 		INVENTORY(3000, Cate.INVENTORY, "库存"),
 		HISTORY(4000, Cate.HISTORY, "历史"),

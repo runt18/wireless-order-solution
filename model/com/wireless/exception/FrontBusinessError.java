@@ -7,6 +7,8 @@ public class FrontBusinessError extends ErrorEnum {
 	 * 
 	 */
 	public static final ErrorCode DUTY_RANGE_INVALID = build(9199, "操作失败, 时间不正确, 请重新输入后再操作.");
+	public static final ErrorCode RECEVIED_CASH_INSUFFICIENT = build(9198, "操作失败, 收款金额小于应收金额");
+	public static final ErrorCode EXCEED_ERASE_QUOTA = build(9197, "操作失败, 抹数金额超过上限");
 	
 	private FrontBusinessError(){
 		
