@@ -12,7 +12,7 @@ import com.wireless.db.orderMgr.OrderDao;
 import com.wireless.db.regionMgr.TableDao;
 import com.wireless.db.system.SystemDao;
 import com.wireless.exception.BusinessException;
-import com.wireless.exception.ProtocolError;
+import com.wireless.exception.FrontBusinessError;
 import com.wireless.exception.StaffError;
 import com.wireless.pojo.client.Member;
 import com.wireless.pojo.client.MemberOperation;
@@ -184,17 +184,22 @@ public class PayOrder {
 	 * @param orderToPay
 	 * @return
 	 * @throws BusinessException
-	 * 			Throws if one of cases below.
-	 * 			<li>Failed to calculate the order referred to {@link PayOrder#calcById}
-	 * 			<li>The consume price exceeds total balance to this member account in case of normal consumption.
-	 * 		    <li>Perform the repaid consumption.
+	 * 			throws if one of cases below
+	 * 			<li>failed to calculate the order referred to {@link PayOrder#calcById}
+	 * 			<li>the consume price exceeds total balance to this member account in case of normal consumption.
+	 * 		    <li>perform the member repaid consumption.
 	 * @throws SQLException
-	 * 			Throws if failed to execute any SQL statements.
+	 * 			throws if failed to execute any SQL statements
 	 */
 	private static Order doPrepare(DBCon dbCon, Staff staff, Order orderToPay) throws BusinessException, SQLException{
 		int customNum = orderToPay.getCustomNum();
 		Order orderCalculated = calcById(dbCon, staff, orderToPay);
 		orderCalculated.setCustomNum(customNum);
+		
+		//Set the received cash if less than actual price.
+		if(orderCalculated.isPayByCash() && orderCalculated.getReceivedCash() < orderCalculated.getActualPrice()){
+			orderCalculated.setReceivedCash(orderCalculated.getActualPrice());
+		}
 		
 		if(orderCalculated.isSettledByMember()){
 			
@@ -572,7 +577,7 @@ public class PayOrder {
 		
 		//Check to see whether has erase quota and the order exceed the erase quota.
 		if(setting.hasEraseQuota() && orderToPay.getErasePrice() > setting.getEraseQuota()){
-			throw new BusinessException("The order(id=" + orderToPay.getId() + ") exceeds the erase quota.", ProtocolError.EXCEED_ERASE_QUOTA);
+			throw new BusinessException(FrontBusinessError.EXCEED_ERASE_QUOTA);
 		}
 		
 		//Get all the details of order to be calculated.
@@ -583,7 +588,6 @@ public class PayOrder {
 		//Set the order calculate parameters.
 		setOrderCalcParams(orderToCalc, orderToPay);
 
-		
 		if(orderToCalc.getDiscount().equals(orderToPay.getDiscount())){
 			orderToCalc.setDiscount(DiscountDao.getDiscountById(dbCon, staff, orderToPay.getDiscount().getId()));
 		}else{
