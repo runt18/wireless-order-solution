@@ -47,7 +47,7 @@ var Templet = {
 //			+ '<div style = "font-size: 10px; text-align : right;"><span style = "color : red;">{customNum}</span></div>'
 			+ '</div>',
 		region : '<div class="button-base" data-value={value} data-type="region-select" '
-			+ 'onClick="co.findTableByRegion({event:this, regionId:{value}})">{text}</div>',
+			+ 'onClick="ts.findTableByRegion({event:this, regionId:{value}})">{text}</div>',
 	},
 	co : {
 		dept : '<div class="button-base" data-value={value} data-type="dept-select" '
@@ -112,6 +112,7 @@ function initFoodData(){
 					url : '../QueryMenu.do',
 					type : 'post',
 					data : {
+						isCookie : true,
 						dataSource : 'tastes',
 						restaurantID : restaurantID
 					},
@@ -151,6 +152,7 @@ function initFoodData(){
 					url : '../QueryMenu.do',
 					type : 'post',
 					data : {
+						isCookie : true,
 						dataSource : 'kitchens',
 						restaurantID : restaurantID
 					},
@@ -249,6 +251,23 @@ function initRestaurantContent(){
 		var restaurantAccount = getcookie("restaurantAccount");
 		$("#txtRestaurantAccount").val(restaurantAccount);
 	}
+//	var el = $("#divRestaurantLogin");
+//	el.before('<div forbg="divRestaurantLogin" style="position: absolute; top:0; left:0; width: 100%; height: 100%;"></div>');
+//	var bg = $('div[forbg = divRestaurantLogin]');
+//	bg.css("background", 'url(../images/login_bg.jpg) no-repeat');
+//	bg.css("backgroundSize", 'cover');
+//	var html = "<div class = 'box-vertical' style = 'width : 100%; height: 100%'>"
+//			+ "<div style = 'line-height : 100px; font-size : 50px; font-weight: bold; margin-left : 80px;'>"
+//			+ "<span style = 'color : blue'>欢迎使用触摸屏点菜系统</span></div>"
+//			+ "<div class = 'div-full'></div>"
+//			+ "<div style = 'line-height : 100px; text-align : right; margin-right : 100px; font-size : 20px;'>" 
+//			+ "智易科技：www.digi-e.com</div>"
+//			+ "</div>";
+//	bg.html(html);
+//	if(bg.hasClass('dialong-lm-hide-top')){
+//		bg.removeClass('dialong-lm-hide-top');
+//	}
+//	bg.addClass('dialong-lm-show-top');
 }
 
 
@@ -259,12 +278,13 @@ function initStaffContent(c){
 	$.ajax({
 		url : '../QueryStaff.do',
 		data : {
+			isCookie : true,
 			restaurantID : restaurantID
 		},
 		success : function(data, status, xhr){
 			Util.LM.hide();
 			if(data.success){
-				ln.restaurant = data.other.restaurant;
+//				ln.restaurant = data.other.restaurant;
 				Util.dialongDisplay({
 					renderTo : 'divUserLogin',
 					type : 'show',
@@ -317,41 +337,7 @@ function initStaffContent(c){
  * onload
  */
 $(function(){
-//	if (document.cookie != "") {   
-//		restaurantID = JSON.parse(getcookie("restaurant")).id;
-//		Util.LM.show();
-//		$.ajax({
-//			url : '../VerifyLogin.do',
-//			success : function(data, status, xhr){
-//				if(data.success){
-//					staffData = data.other.staff;
-//					loginSuccessCallback();
-//				}else{	
-//					initStaffContent();
-//				}
-//			},
-//			error : function(request, status, error){
-//				initStaffContent();
-//			}
-//		});
-//	}else{
-		initRestaurantContent();
-//	} 
-//	Util.LM.show();
-//	$.ajax({
-//		url : '../VerifyLogin.do',
-//		success : function(data, status, xhr){
-//			if(data.success){
-//				staffData = data.other.staff;
-//				loginSuccessCallback();
-//			}else{	
-//				initStaffContent();
-//			}
-//		},
-//		error : function(request, status, error){
-//			initStaffContent();
-//		}
-//	});
+	initRestaurantContent();
 });
 
 /**
@@ -431,6 +417,7 @@ function restaurantLoginHandler(){
 	$.ajax({
 		url : '../QueryRestaurants.do',
 		data : {
+			isCookie : true,
 			account : account.value,
 		},
 		dataType : 'json',
@@ -443,6 +430,11 @@ function restaurantLoginHandler(){
 						renderTo : 'divRestaurantLogin',
 						type : 'hide',
 					});
+//					var bg = $('div[forbg = divRestaurantLogin]');
+//					if(bg.hasClass('dialong-lm-show-top')){
+//						bg.removeClass('dialong-lm-show-top');
+//					}
+//					bg.addClass('dialong-lm-hide-top');
 					ln.restaurant = data.root[0];
 					restaurantID = ln.restaurant.id;
 					Util.LM.show();
@@ -464,7 +456,8 @@ function restaurantLoginHandler(){
 				}else{
 					Util.msg.alert({
 						title : "温馨提示" ,
-						msg : "餐厅帐号错误,请检查后重新输入"
+						msg : "餐厅帐号错误,请检查后重新输入",
+						time : 3
 					});
 				}
 			}else{
@@ -513,6 +506,7 @@ function staffLoginHandler(c){
 		url : '../OperateStaff.do',
 		data : {
 			pin : staffId,
+			isCookie : true,
 			pwd : MD5(pwd.value.trim())
 		},
 		success : function(data, status, xhr){

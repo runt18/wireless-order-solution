@@ -262,6 +262,7 @@ co.ot.changeTaste = function(c){
 			data : {
 				foodID : co.ot.foodData.id,
 				pin : pin,
+				isCookie : true,
 				restaurantID : restaurantID
 			},
 			success : function(data, status, xhr){
@@ -460,6 +461,7 @@ co.submit = function(){
 		type : 'post',
 		data : {
 			pin : pin,
+			isCookie : true,
 			tableID : co.table.alias,
 			customNum : co.table.customNum,
 			type : isFree ? 1 : 2,

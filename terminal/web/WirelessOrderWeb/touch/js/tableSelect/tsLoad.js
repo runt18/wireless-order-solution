@@ -58,6 +58,7 @@ function initTableData(){
 		type : 'post',
 		data : {
 			random : Math.random(),
+			isCookie : true,
 		},
 		success : function(data, status, xhr){
 			tables = [];
@@ -156,7 +157,7 @@ function showRegion(temp, pageNow){
 //		value : -1,
 //		text : '全部分厨'
 //	});
-//	var tempTableData = []; // 菜品数据
+//	var tempTableData = []; // 餐桌数据
 //	var temp = null;
 //	for(var i = 0; i < kitchenData.root.length; i++){
 //		temp = kitchenData.root[i];

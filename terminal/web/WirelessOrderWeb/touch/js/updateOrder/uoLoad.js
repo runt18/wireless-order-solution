@@ -31,6 +31,7 @@ function initOrderData(data){
 		type : 'post',
 		data : {
 			restaurantID : restaurantID,
+			isCookie : true,
 			tableID : data.alias,			
 		},
 		async : false,
@@ -73,6 +74,7 @@ function initCancelReason(){
 		url : '../QueryCancelReason.do',
 		type : 'post',
 		data : {
+			isCookie : true,
 			restaurantID : restaurantID,
 		},
 		success : function(data, status, xhr){
