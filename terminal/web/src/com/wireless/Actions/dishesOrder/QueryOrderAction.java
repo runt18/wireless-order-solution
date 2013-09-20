@@ -80,14 +80,18 @@ public class QueryOrderAction extends Action {
 					if(eraseQuota != null && !eraseQuota.trim().isEmpty()){
 						order.setErasePrice(Integer.valueOf(eraseQuota));
 					}
-					if(serviceRate != null && !serviceRate.trim().isEmpty() && Float.valueOf(serviceRate.trim()) > 0){
-						order.setServiceRate(Float.valueOf(serviceRate) / 100);
-					}else{
-						order.setServiceRate(order.getDestTbl().getServiceRate());
-					}
 					if(customNum != null && !customNum.trim().isEmpty() && Integer.valueOf(customNum.trim()) > 0){
 						order.setCustomNum(Short.valueOf(customNum));
 					}
+				}
+				if(serviceRate != null && !serviceRate.trim().isEmpty()){
+					if(Float.valueOf(serviceRate.trim()) > 0){
+						order.setServiceRate(Float.valueOf(serviceRate) / 100);						
+					}else{
+						order.setServiceRate(0);						
+					}
+				}else{
+					order.setServiceRate(order.getDestTbl().getServiceRate());
 				}
 				if(tid != null && !tid.trim().isEmpty()){
 					order = PayOrder.calcByTable(staff, order);
