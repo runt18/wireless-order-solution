@@ -672,7 +672,7 @@ public class OrderFood implements Parcelable, Comparable<OrderFood>, Jsonable {
 		float price = 0;
 		if(list != null && !list.isEmpty()){
 			for(OrderFood temp : list){
-				price += temp.getPrice();
+				price += temp.calcPriceWithTaste();
 			}
 		}
 		return price;
