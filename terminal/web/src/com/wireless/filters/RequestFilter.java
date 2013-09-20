@@ -101,6 +101,7 @@ public class RequestFilter implements Filter{
 					
 				}
 			}
+			
 			//是否用cookie
 			if(isCookie == null){
 				pin = (String) request.getSession().getAttribute("pin");
@@ -114,7 +115,7 @@ public class RequestFilter implements Filter{
 	                    response.addHeader("root_path",	request.getContextPath());
 	                }else{
 	                	if(comeFrom != null){
-	                		response.sendRedirect(request.getContextPath() + Staff.ComeFrom.valueOf(Integer.parseInt(comeFrom.getValue())) 
+	                		response.sendRedirect(request.getContextPath() + Staff.RequestSource.valueOf(Integer.parseInt(comeFrom.getValue())).getRedirect()
 	                							  + "?" + Encrypt.strEncode("restaurantID="+params.get("restaurantID"), "mi", null, null));
 	                	}
 	                	
