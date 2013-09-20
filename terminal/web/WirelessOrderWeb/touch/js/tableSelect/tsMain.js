@@ -118,30 +118,48 @@ ts.selectBusyStatus = function(){
  * @param c
  */
 ts.selectTable = function(c){
-	var table = getTableByAlias(c.tableAlias);
-	//判断是否为已点菜餐桌
-	if(table.statusText == "就餐"){	
-		uo.show({
-			table : getTableByAlias(c.tableAlias)
-		});
-	}else{
-		Util.dialongDisplay({
-			type : 'show', 
-			renderTo : 'divShowMessageForTableSelect',
-		});
-		//关闭该界面
-		$("#btnCancelForShowMessageTS").click(function (){
-			Util.dialongDisplay({
-				type:'hide', 
-				renderTo:'divShowMessageForTableSelect'
+//	var table = getTableByAlias(c.tableAlias);
+	var table = updateTable({alias : c.tableAlias});
+	if(table != null){
+		//判断是否为已点菜餐桌
+		if(table.statusText == "就餐"){	
+			//判断餐桌是否已经改变状态
+			if(!$(c.event).hasClass('table-busy')){
+				initTableData();
+			}
+			uo.show({
+				table : table
 			});
-			inputNumVal = "";
-			$("#txtPeopleNumForSM").val("");
+		}else{
+			//判断餐桌是否已经改变状态
+			if($(c.event).hasClass('table-busy')){
+				initTableData();
+			}
+			Util.dialongDisplay({
+				type : 'show', 
+				renderTo : 'divShowMessageForTableSelect',
+			});
+			//关闭该界面
+			$("#btnCancelForShowMessageTS").click(function (){
+				Util.dialongDisplay({
+					type:'hide', 
+					renderTo:'divShowMessageForTableSelect'
+				});
+				inputNumVal = "";
+				$("#txtPeopleNumForSM").val("");
+			});
+			$("#txtTableNumForSM").val(table.alias);
+			$("#txtPeopleNumForSM").select();
+			inputNumId  = "txtPeopleNumForSM";
+		}	
+	}else{
+		Util.msg.alert({
+			title : '温馨提示',
+			msg : '更新餐桌信息失败，请刷新后重试', 
+			time : 2,
 		});
-		$("#txtTableNumForSM").val(table.alias);
-		$("#txtPeopleNumForSM").select();
-		inputNumId  = "txtPeopleNumForSM";
-	}	
+	}
+	
 };
 
 /**

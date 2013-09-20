@@ -129,6 +129,43 @@ function initTableData(){
 }
 
 /**
+ * 根据alias,返回table的最新状态
+ */
+function updateTable(c){
+	var table = null;
+	$.ajax({
+		url : '../QueryTable.do',
+		type : 'post',
+		data : {
+			alias : c.alias,
+			random : Math.random(),
+			isCookie : true,
+		},
+		async : false,
+		success : function(data, status, xhr){
+			data = eval("(" + data + ")");
+			if(data.success){
+				table = data.root[0];
+			}else{
+				Util.msg.alert({
+					title : data.title,
+					msg : data.msg,
+					time : 2,
+				});
+			}
+		},
+		error : function(request, status, err){
+			Util.msg.alert({
+				title : '温馨提示',
+				msg : err, 
+				time : 2,
+			});
+		}
+	});
+	return table;
+}
+
+/**
  * 显示区域
  */
 function showRegion(temp, pageNow){
