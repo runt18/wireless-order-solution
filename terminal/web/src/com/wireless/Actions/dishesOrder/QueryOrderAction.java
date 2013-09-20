@@ -83,12 +83,12 @@ public class QueryOrderAction extends Action {
 					if(customNum != null && !customNum.trim().isEmpty() && Integer.valueOf(customNum.trim()) > 0){
 						order.setCustomNum(Short.valueOf(customNum));
 					}
-				}
-				if(serviceRate != null && !serviceRate.trim().isEmpty()){
-					if(Float.valueOf(serviceRate.trim()) > 0){
-						order.setServiceRate(Float.valueOf(serviceRate) / 100);						
-					}else{
-						order.setServiceRate(0);						
+					if(serviceRate != null && !serviceRate.trim().isEmpty()){
+						if(Float.valueOf(serviceRate.trim()) > 0){
+							order.setServiceRate(Float.valueOf(serviceRate) / 100);						
+						}else{
+							order.setServiceRate(0);						
+						}
 					}
 				}else{
 					order.setServiceRate(order.getDestTbl().getServiceRate());
