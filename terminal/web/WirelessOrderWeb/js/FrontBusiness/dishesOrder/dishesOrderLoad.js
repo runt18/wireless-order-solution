@@ -501,14 +501,15 @@ function initPasswordWin(){
 			resizable : false,
 			closable : false,
 			width : 180,
-			height : 125,
+			height : 95,
 			layout : 'fit',
 			items : [{
 				xtype : 'form',
 				layout : 'form',
 				frame : true,
 				labelWidth : 40,
-				items : [numCount, txtPassword]
+//				items : [numCount, txtPassword]
+				items : [numCount]
 			}],
 			bbar : ['->', {
 				text : '确定',
@@ -517,59 +518,70 @@ function initPasswordWin(){
 					if(!numCount.isValid()){
 						return;
 					}
-					var pwdTrans;
-					if(txtPassword.getRawValue() == ''){
-						pwdTrans = '';
+					if (isGroup) {
+						orderOrderDeleteFoodOperationHandler({
+							count : (numCount.getValue() * -1)
+						});
 					}else{
-						pwdTrans = MD5(txtPassword.getValue());
+						orderSingleDeleteFoodOperationHandler({
+							grid : orderSingleGridPanel,
+							count : (numCount.getValue() * -1)
+						});
 					}
-					var mask = new Ext.LoadMask(document.body, {
-					    msg  : '正在验证密码, 请稍等......',
-					    disabled : false,
-					    removeMask : true
-					});
-					
-					mask.show();
-					Ext.Ajax.request({
-						url : '../../VerifyPwd.do',
-						params : {
-							isCookie : true,
-							'type' : 5,
-							'pwd' : pwdTrans
-						},
-						success : function(response, options) {
-							var jr = Ext.decode(response.responseText);
-							if(jr.success){
-								winValidPassword.hide();
-								if (isGroup) {
-									orderOrderDeleteFoodOperationHandler({
-										count : (numCount.getValue() * -1)
-									});
-								}else{
-									orderSingleDeleteFoodOperationHandler({
-										grid : orderSingleGridPanel,
-										count : (numCount.getValue() * -1)
-									});
-								}
-							}else{
-								Ext.MessageBox.show({
-									msg : jr.data,
-									width : 300,
-									buttons : Ext.MessageBox.OK
-								});
-							}
-							mask.hide();
-						},
-						failure : function(response, options) {
-							var jr = Ext.decode(response.responseText);
-							mask.hide();
-							Ext.MessageBox.show({
-								msg : jr.data,
-								width : 300,
-								buttons : Ext.MessageBox.OK
-							});
-						}
-					});
+					winValidPassword.hide();
+//					var pwdTrans;
+//					if(txtPassword.getRawValue() == ''){
+//						pwdTrans = '';
+//					}else{
+//						pwdTrans = MD5(txtPassword.getValue());
+//					}
+//					var mask = new Ext.LoadMask(document.body, {
+//					    msg  : '正在验证密码, 请稍等......',
+//					    disabled : false,
+//					    removeMask : true
+//					});
+//					
+//					mask.show();
+//					Ext.Ajax.request({
+//						url : '../../VerifyPwd.do',
+//						params : {
+//							isCookie : true,
+//							'type' : 5,
+//							'pwd' : pwdTrans
+//						},
+//						success : function(response, options) {
+//							var jr = Ext.decode(response.responseText);
+//							if(jr.success){
+//								winValidPassword.hide();
+//								if (isGroup) {
+//									orderOrderDeleteFoodOperationHandler({
+//										count : (numCount.getValue() * -1)
+//									});
+//								}else{
+//									orderSingleDeleteFoodOperationHandler({
+//										grid : orderSingleGridPanel,
+//										count : (numCount.getValue() * -1)
+//									});
+//								}
+//							}else{
+//								Ext.MessageBox.show({
+//									msg : jr.data,
+//									width : 300,
+//									buttons : Ext.MessageBox.OK
+//								});
+//							}
+//							mask.hide();
+//						},
+//						failure : function(response, options) {
+//							var jr = Ext.decode(response.responseText);
+//							mask.hide();
+//							Ext.MessageBox.show({
+//								msg : jr.data,
+//								width : 300,
+//								buttons : Ext.MessageBox.OK
+//							});
+//						}
+//					});
 				}
 			}, {
 				text : '关闭',

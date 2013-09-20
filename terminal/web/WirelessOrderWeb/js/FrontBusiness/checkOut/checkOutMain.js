@@ -89,7 +89,7 @@ var checkOutForm = new Ext.form.FormPanel({
 	{
 		layout : 'column',
 		border : false,
-		items : [ {
+		items : [{
 			html : '<div>&nbsp;&nbsp;</div>',
 			id : 'placeHolderCOF3',
 			width : 150
