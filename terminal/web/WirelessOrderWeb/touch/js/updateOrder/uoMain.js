@@ -538,7 +538,6 @@ uo.submitUpdateOrderHandler = function(c){
 			type : 'post',
 			data : {
 				pin : pin,
-				isCookie : true,
 				tableID : uo.table.alias,
 				orderID : uoOther.order.id,
 				customNum : uo.customNum,
@@ -590,7 +589,6 @@ uo.tempPayForUO = function(){
 			type : 'post',
 			data : {
 				pin : pin,
-				isCookie : true,
 				eraseQuota : uo.order.erasePrice,
 				orderID : uo.order.id,
 				payType : uo.order.settleTypeValue,

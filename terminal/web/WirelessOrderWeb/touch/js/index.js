@@ -101,7 +101,6 @@ function initFoodData(){
 		url : '../QueryMenu.do',
 		type : 'post',
 		data : {
-			isCookie : true,
 			dataSource : 'foods',
 			restaurantID : restaurantID
 		},
@@ -112,7 +111,6 @@ function initFoodData(){
 					url : '../QueryMenu.do',
 					type : 'post',
 					data : {
-						isCookie : true,
 						dataSource : 'tastes',
 						restaurantID : restaurantID
 					},
@@ -152,7 +150,6 @@ function initFoodData(){
 					url : '../QueryMenu.do',
 					type : 'post',
 					data : {
-						isCookie : true,
 						dataSource : 'kitchens',
 						restaurantID : restaurantID
 					},
@@ -504,7 +501,6 @@ function staffLoginHandler(c){
 		url : '../OperateStaff.do',
 		data : {
 			pin : staffId,
-			isCookie : true,
 			pwd : MD5(pwd.value.trim())
 		},
 		success : function(data, status, xhr){

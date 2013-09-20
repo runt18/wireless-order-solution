@@ -58,7 +58,6 @@ function initTableData(){
 		type : 'post',
 		data : {
 			random : Math.random(),
-			isCookie : true,
 		},
 		success : function(data, status, xhr){
 			tables = [];
@@ -139,7 +138,6 @@ function updateTable(c){
 		data : {
 			alias : c.alias,
 			random : Math.random(),
-			isCookie : true,
 		},
 		async : false,
 		success : function(data, status, xhr){

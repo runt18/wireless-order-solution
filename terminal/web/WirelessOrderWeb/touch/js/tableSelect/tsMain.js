@@ -356,7 +356,6 @@ ts.tt.submit = function(){
 			type : 'post',
 			data : {
 				oldTableAlias : oldTable,
-				isCookie : true,
 				newTableAlias : newTable
 			},
 			success : function(data, status, xhr){
