@@ -228,7 +228,7 @@ public class PickFoodFragment extends Fragment{
 
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent) {
-			View view ;
+			View view;
 			if(convertView == null){
 				view = LayoutInflater.from(parent.getContext()).inflate(R.layout.pick_food_fragment_item, null);
 			}else{
