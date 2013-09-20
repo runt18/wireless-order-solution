@@ -1,4 +1,21 @@
 // 工具包
+
+$.ajaxSetup({ 
+		 contentType:"application/x-www-form-urlencoded;charset=utf-8", 
+         complete:function(XMLHttpRequest,textStatus){ 
+         	alert('jinlai');
+			//通过XMLHttpRequest取得响应头
+         	alert(XMLHttpRequest.getResponseHeader("session_status"));
+             if(XMLHttpRequest.getResponseHeader("session_status")){  
+					//如果超时就重新登录
+             		alert('logout');
+                    logout();
+             } 
+         }
+  });
+
+
+
 var Util = {};
 /**
  * 分页工具

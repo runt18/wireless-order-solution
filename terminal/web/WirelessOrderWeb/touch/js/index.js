@@ -258,6 +258,7 @@ function initStaffContent(c){
 	$.ajax({
 		url : '../QueryStaff.do',
 		data : {
+			isCookie : true,
 			restaurantID : restaurantID
 		},
 		success : function(data, status, xhr){
@@ -501,6 +502,7 @@ function staffLoginHandler(c){
 		url : '../OperateStaff.do',
 		data : {
 			pin : staffId,
+			comeFrom : 3,
 			pwd : MD5(pwd.value.trim())
 		},
 		success : function(data, status, xhr){
