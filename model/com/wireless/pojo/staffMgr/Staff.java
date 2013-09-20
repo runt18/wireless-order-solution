@@ -43,6 +43,50 @@ public class Staff implements Parcelable, Jsonable{
 		}
 	}
 	
+	
+	public static enum RequestSource{
+		BASIC(1, "后台", "/pages/PersonLoginTimeout.html"),
+		FRONT(2, "前台",  ""),
+		TOUCH(3, "触摸屏", "touch");
+		
+		private final int val;
+		private final String desc;
+		private final String redirect;
+		
+		RequestSource(int val, String desc, String redirect){
+			this.val = val;
+			this.desc = desc;
+			this.redirect = redirect;
+		}
+		
+		public static RequestSource valueOf(int val){
+			for(RequestSource from : values()){
+				if(from.val == val){
+					return from;
+				}
+			}
+			throw new IllegalArgumentException("The ComeFrom(val = " + val + ") is invalid.");
+		}
+		
+		public int getVal(){
+			return val;
+		}
+		
+		public String getDesc(){
+			return desc;
+		}
+		
+		public String  getRedirect() {
+			return redirect;
+		}
+		
+		@Override
+		public String toString(){
+			return "(val : " + this.val + ",desc : " + this.desc + ",redirect : " + this.redirect + ")";
+		}
+		
+	}
+	
 	//the id to this staff
 	private int id = 0;
 	//the restaurant id this staff
