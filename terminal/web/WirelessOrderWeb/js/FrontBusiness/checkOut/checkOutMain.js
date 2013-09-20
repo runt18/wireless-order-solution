@@ -39,7 +39,7 @@ var checkOutMainPanelTbar = new Ext.Toolbar({
 		}
 	}, {
 		xtype : 'tbtext',
-		text : '&nbsp;&nbsp;当前折扣方案:&nbsp;<sapn id="spanDisplayCurrentDiscount" style="color: rgb(21, 66, 139);font-weight: bold;">&nbsp;&nbsp;</span>'
+		text : '&nbsp;&nbsp;当前折扣方案:&nbsp;<span id="spanDisplayCurrentDiscount" style="color:rgb(21, 66, 139); font-weight:bold;">&nbsp;&nbsp;</span>'
 	}, {
 		xtype : 'tbtext',
 		text : '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;价格方案:&nbsp;&nbsp;'

@@ -85,7 +85,7 @@ function loadPricePlanData(_c){
 function loadOrderBasicMsg(){
 	calcDiscountID = orderMsg.discount.id; // i
 	calcPricePlanID = orderMsg.pricePlan.id; // i
-	Ext.getDom('spanDisplayCurrentDiscount').innerHTML = orderMsg.discount.name;
+	document.getElementById('spanDisplayCurrentDiscount').innerHTML = orderMsg.discount.name;
 	
 	document.getElementById("serviceCharge").value = orderMsg.serviceRate * 100;
 //	var actualCount = document.getElementById("actualCount").value;
