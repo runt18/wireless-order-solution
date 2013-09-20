@@ -16,13 +16,14 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.util.Encrypt;
 
 public class RequestFilter implements Filter{
 
 	private static final String SKIPVERIFY = "skipVerify";
 	private List<String> skipVerifyList = new ArrayList<String>();
-	private static final String DEFREDIRECT = "/pages/PersonLoginTimeout.html";
+	//private static final String DEFREDIRECT = "/pages/PersonLoginTimeout.html";
 	
 	private boolean check(String path){
 		for (String skip : skipVerifyList) {
@@ -88,27 +89,35 @@ public class RequestFilter implements Filter{
 			
 			String pin = null;
 			Cookie c = null;
+			Cookie comeFrom = null;
 			Cookie[] cookies = request.getCookies();
 			if(cookies != null){
 				for (Cookie cookie : cookies) {
 					if(cookie.getName().equals("pin")){
 						c = cookie;
+					}else if(cookie.getName().equals("comeFrom")){
+						comeFrom = cookie;
 					}
+					
 				}
 			}
 			//是否用cookie
 			if(isCookie == null){
 				pin = (String) request.getSession().getAttribute("pin");
 				if(pin == null){
-					if(c!=null){
+/*					if(c!=null){
 						c.setMaxAge(0);
 						response.addCookie(c);
-					}
+					}*/
 					if (request.getHeader("x-requested-with") != null && request.getHeader("x-requested-with").equalsIgnoreCase("XMLHttpRequest")) {  
-	                    response.addHeader("session_status", "timeout");
+	                    response.setHeader("session_status", "timeout");
 	                    response.addHeader("root_path",	request.getContextPath());
 	                }else{
-	                	response.sendRedirect(request.getContextPath() + DEFREDIRECT + "?" + Encrypt.strEncode("restaurantID="+params.get("restaurantID"), "mi", null, null));
+	                	if(comeFrom != null){
+	                		response.sendRedirect(request.getContextPath() + Staff.ComeFrom.valueOf(Integer.parseInt(comeFrom.getValue())) 
+	                							  + "?" + Encrypt.strEncode("restaurantID="+params.get("restaurantID"), "mi", null, null));
+	                	}
+	                	
 	                }
 
 				}else{
@@ -127,8 +136,10 @@ public class RequestFilter implements Filter{
 						}
 					}
 				}*/
-				pin = c.getValue();
-				request.setAttribute("pin", pin);
+				if(c != null){
+					pin = c.getValue();
+					request.setAttribute("pin", pin);
+				}
 				chain.doFilter(request, response);
 			}
 		}

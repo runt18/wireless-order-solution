@@ -26,6 +26,7 @@ public class OperateStaffAction extends Action{
 		String pin = request.getParameter("pin");
 		String name = request.getParameter("name");
 		String pwd = request.getParameter("pwd");
+		String comeFrom = request.getParameter("comeFrom");
 		JObject jobject = new JObject();
 		try{
 			response.setContentType("text/json; charset=utf-8");
@@ -52,7 +53,9 @@ public class OperateStaffAction extends Action{
 				session.setAttribute("pin", pin);
 				
 				Cookie cPin = new Cookie("pin", pin);
+				Cookie cFrom = new Cookie("comeFrom", comeFrom);
 				response.addCookie(cPin);
+				response.addCookie(cFrom);
 				Map<Object, Object> other = new HashMap<Object, Object>();
 				other.put("staff", staff);
 				jobject.setOther(other);
