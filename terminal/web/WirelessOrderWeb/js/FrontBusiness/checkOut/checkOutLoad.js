@@ -83,6 +83,10 @@ function loadPricePlanData(_c){
  * 加载账单基础汇总信息
  */
 function loadOrderBasicMsg(){
+	calcDiscountID = orderMsg.discount.id; // i
+	calcPricePlanID = orderMsg.pricePlan.id; // i
+	Ext.getDom('spanDisplayCurrentDiscount').innerHTML = orderMsg.discount.name;
+	
 	document.getElementById("serviceCharge").value = orderMsg.serviceRate * 100;
 //	var actualCount = document.getElementById("actualCount").value;
 	document.getElementById("totalCount").innerHTML = parseFloat(orderMsg.totalPrice).toFixed(2);
@@ -188,8 +192,7 @@ function loadTableData(_c){
 				checkOutData = jr;
 				// 加载显示账单基础信息
 				orderMsg = jr.other.order;
-				calcDiscountID = orderMsg.discount.id; // i
-				calcPricePlanID = orderMsg.pricePlan.id; // i
+				
 				loadOrderBasicMsg();
 				// 
 				checkOutGrid.getStore().loadData(checkOutData);
@@ -248,8 +251,7 @@ function loadTableGroupData(_c){
 				checkOutData = jr;
 				// 加载账单基础汇总信息
 				orderMsg = jr.other.order;
-				calcDiscountID = orderMsg.discount.id; // i
-				calcPricePlanID = orderMsg.pricePlan.id; // i
+				//
 				loadOrderBasicMsg();
 				// 生成账单组信息
 				var activeTab = null;

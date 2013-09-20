@@ -9,19 +9,20 @@
 		'url(../../images/bill_select.png) no-repeat 50%',
 		'url(../../images/bill.png) no-repeat 50%',
 		function(){
-			var lm = new Ext.LoadMask(document.body, {
-				msg : '正在验证权限, 请稍等......'
-			});
-			lm.show();
-			verifyStaff('../../', '1006', function(res){
-				lm.hide();
-				if(res.success){
-					location.href = "Bills.html?"+ strEncode('restaurantID=' + restaurantID, 'mi');					
-				}else{
-					res['icon'] = Ext.MessageBox.WARNING;
-					Ext.ux.showMsg(res);
-				}
-			});
+			location.href = "Bills.html?"+ strEncode('restaurantID=' + restaurantID, 'mi');
+//			var lm = new Ext.LoadMask(document.body, {
+//				msg : '正在验证权限, 请稍等......'
+//			});
+//			lm.show();
+//			verifyStaff('../../', '1006', function(res){
+//				lm.hide();
+//				if(res.success){
+//					location.href = "Bills.html?"+ strEncode('restaurantID=' + restaurantID, 'mi');
+//				}else{
+//					res['icon'] = Ext.MessageBox.WARNING;
+//					Ext.ux.showMsg(res);
+//				}
+//			});
 		}
 	);
 

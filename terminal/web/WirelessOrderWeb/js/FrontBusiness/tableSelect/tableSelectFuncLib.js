@@ -261,23 +261,23 @@ function tableListReflash(node) {
 				temp = tableStatusListTSDisplay[i];
 				if (temp.alias == selectedTable) {
 					if (temp.statusValue == TABLE_IDLE) {
-						var lm = new Ext.LoadMask(document.body, {
-							msg : '正在验证权限, 请稍等......'
-						});
-						lm.show();
-						verifyStaff('../../', '1000', function(res){
-							if(res.success){
+//						var lm = new Ext.LoadMask(document.body, {
+//							msg : '正在验证权限, 请稍等......'
+//						});
+//						lm.show();
+//						verifyStaff('../../', '1000', function(res){
+//							if(res.success){
 								location.href = "OrderMain.html?"+ strEncode('restaurantID=' + restaurantID
 										+ "&ts=0"
 										+ "&tableAliasID=" + selectedTable
 										+ "&category=" + CATE_NORMAL
 										, 'mi');
-							}else{
-								lm.hide();
-								res['icon'] = Ext.MessageBox.WARNING;
-								Ext.ux.showMsg(res);
-							}
-						});
+//							}else{
+//								lm.hide();
+//								res['icon'] = Ext.MessageBox.WARNING;
+//								Ext.ux.showMsg(res);
+//							}
+//						});
 					} else {
 						location.href = "CheckOut.html?"+ strEncode('restaurantID=' + restaurantID+ "&tableID=" + selectedTable, 'mi');
 					}

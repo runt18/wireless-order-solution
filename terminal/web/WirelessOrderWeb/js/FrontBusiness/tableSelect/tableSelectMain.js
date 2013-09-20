@@ -9,12 +9,12 @@
 			for ( var i = 0; i < tableStatusListTSDisplay.length; i++) {
 				temp = tableStatusListTSDisplay[i];
 				if (temp.alias == selectedTable) {
-					var lm = new Ext.LoadMask(document.body, {
-						msg : '正在验证权限, 请稍等......'
-					});
-					lm.show();
-					verifyStaff('../../', '1000', function(res){
-						if(res.success){
+//					var lm = new Ext.LoadMask(document.body, {
+//						msg : '正在验证权限, 请稍等......'
+//					});
+//					lm.show();
+//					verifyStaff('../../', '1000', function(res){
+//						if(res.success){
 							if (temp.statusValue == TABLE_BUSY) {
 								location.href = "OrderMain.html?" + strEncode('restaurantID=' + restaurantID
 										+ "&tableAliasID=" + temp.alias
@@ -29,12 +29,12 @@
 										+ "&category=" + CATE_NORMAL
 										, 'mi');
 							}
-						}else{
-							lm.hide();
-							res['icon'] = Ext.MessageBox.WARNING;
-							Ext.ux.showMsg(res);
-						}
-					});
+//						}else{
+//							lm.hide();
+//							res['icon'] = Ext.MessageBox.WARNING;
+//							Ext.ux.showMsg(res);
+//						}
+//					});
 					break;
 				}
 			}
