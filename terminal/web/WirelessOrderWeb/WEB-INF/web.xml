@@ -11,7 +11,7 @@
 				/QueryRestaurants.do,
 				/VerifyLogin.do,
 				/LoginOut.do,
-				/QueryStaff.do,
+
 				/OperateStaff.do,
 				/QueryOTA.do,
 				/Login.html,
@@ -26,7 +26,12 @@
 				/TableSelect.html,
 				/MgrCenter.html,
 				/DeviceMgr.html,
-				/RestaurantMgr.html
+				/RestaurantMgr.html,
+				
+				/controlMember.jsp,
+				/memberOperation.jsp,
+				/recharge.jsp,
+				/businessStatistics.jsp
 			</param-value>
 		</init-param>
 
