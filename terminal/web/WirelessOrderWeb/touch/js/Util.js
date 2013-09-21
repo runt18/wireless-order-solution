@@ -1,12 +1,12 @@
 // 工具包
 
 $.ajaxSetup({ 
-		 contentType:"application/x-www-form-urlencoded;charset=utf-8", 
+		 contentType:"application/x-www-form-urlencoded;charset=utf-8",
+		 global : true,
          complete:function(XMLHttpRequest,textStatus){ 
 			//通过XMLHttpRequest取得响应头
              if(XMLHttpRequest.getResponseHeader("session_status")){  
 					//如果超时就重新登录
-             		alert('logout');
                     logout();
              } 
          }
