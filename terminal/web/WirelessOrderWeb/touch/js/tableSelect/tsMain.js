@@ -292,6 +292,14 @@ function createOrderForTS(){
 }
 
 /**
+ * 刷新
+ */
+function reFreshForTS(){
+	initTableData();
+	initFoodData();
+}
+
+/**
  * 转台按钮
  */
 function transTableForTS(){

@@ -257,9 +257,6 @@ uo.showdivKeyboardPeopleForUO = function(c){
 			renderTo : 'divKeyboardPeopleForUO'
 		});
 		$("#divRightForKeyboardPeopleForUO > div[class*=isDot]").html(".");
-		$("#divLeftForKeyboardPeopleForUO > div[class*=isSave]").bind("click", function(){
-			uo.saveForChangePeople();
-		});
 		var title = "请输入菜品数量";
 		$("#divTopForKeyboardPeopleForUO").html("<div style = 'font-size: 20px; " +
 				"font-weight: bold; color: #fff; " +
@@ -276,9 +273,13 @@ uo.showdivKeyboardPeopleForUO = function(c){
 				type : 'hide',
 				renderTo : 'divKeyboardPeopleForUO'
 			});
+			$("#divLeftForKeyboardPeopleForUO > div[class*=isSave]").unbind("click");
 			inputNumValUO = "";
 			$("#" + inputNumIdUO).val(inputNumValUO);
 		});	
+		$("#divLeftForKeyboardPeopleForUO > div[class*=isSave]").bind("click", function(){
+			co.saveForSetFood({data : c.data});
+		});
 	}else if(c.type == "setCountForPeople"){
 		//弹出人数输入框
 		Util.dialongDisplay({
@@ -326,6 +327,7 @@ uo.saveForChangePeople = function(){
 	$("#" + inputNumIdUO).val(inputNumValUO);
 	//更改页面端的的人数
 	$("#customNumForUO").html("用餐人数：" + num);	
+	$("#divLeftForKeyboardPeopleForUO > div[class*=isSave]").unbind("click");
 };
 
 /**

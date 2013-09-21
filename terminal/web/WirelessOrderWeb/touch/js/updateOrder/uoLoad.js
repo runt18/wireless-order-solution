@@ -49,8 +49,8 @@ function initOrderData(data){
 				showDescForUpdateOrder();		
 			}else{
 				Util.msg.alert({
-					title : '温馨提示',
-					msg : '初始化菜单数据失败.', 
+					title : data.title,
+					msg : data.msg, 
 					time : 3,
 				});
 			}

@@ -116,8 +116,25 @@ co.cutFood = function(){
  *设置菜品数量
  */
 co.setFood = function(){
-	uo.showdivKeyboardPeopleForUO({type : "setFood"});
+	co.operateFoodCount({
+		otype : 'set',
+	});
 };
+co.saveForSetFood = function(c){
+	var count = parseFloat($("#" + inputNumIdUO).val());
+	c.data.count = count;
+	co.initNewFoodContent({
+		data : c.data
+	});
+	Util.dialongDisplay({
+		type : 'hide',
+		renderTo : 'divKeyboardPeopleForUO'
+	});
+	$("#divLeftForKeyboardPeopleForUO > div[class*=isSave]").unbind("click");
+	inputNumValUO = "";
+	$("#" + inputNumIdUO).val(inputNumValUO);
+};
+
 /**
  * 删除菜品
  */
@@ -155,7 +172,16 @@ co.operateFoodCount = function(c){
 			});
 			return;
 		}else if(c.otype.toLowerCase() == 'set'){
-			data.count = c.count;
+			uo.showdivKeyboardPeopleForUO({type : "setFood", data : data});
+//			$("#divLeftForKeyboardPeopleForUO > div[class*=isSave]").bind("click", function(){
+//				co.saveForSetFood({data : data});
+//				var count = $("#" + inputNumIdUO).val();
+//				data.count = count;
+//			});
+//			var num = 12;
+//			data.count = num;
+//			data.count = c.count;
+			return;
 		}
 	}else{
 		var nc = data.count + c.count;
@@ -410,7 +436,7 @@ co.ot.save = function(c){
 /**
  * 账单提交
  */
-co.submit = function(){
+co.submit = function(c){
 	if(co.newFood == null || typeof co.newFood == 'undefined' || co.newFood.length == 0){
 		Util.msg.alert({
 			title : '温馨提示',
@@ -487,7 +513,8 @@ co.submit = function(){
 			foods : foods,
 			category :  co.table.categoryValue,
 			orderID : isFree ? '' : co.order.id,
-			orderDate : isFree ? '' : co.order.orderDate
+			orderDate : isFree ? '' : co.order.orderDate,
+			notPrint : c.notPrint
 		},
 		success : function(data, status, xhr) {
 			Util.LM.hide();
