@@ -249,31 +249,65 @@ function cancelForCancelFood(rowId){
 /**
  * 餐桌人数修改框
  */
-uo.showdivKeyboardPeopleForUO = function(){
-	//弹出人数输入框
-	Util.dialongDisplay({
-		type : 'show',
-		renderTo : 'divKeyboardPeopleForUO'
-	});
-	var title = "请输入餐桌人数";
-	$("#divTopForKeyboardPeopleForUO").html("<div style = 'font-size: 20px; " +
-			"font-weight: bold; color: #fff; " +
-			"margin: 15px 15px 0 100px;'>" + title + "</div>");
-	//设定输入框的id和初始显示信息
-	inputNumIdUO = 'txtPeopleNumForUO';
-	inputNumValUO = $("#customNumForUO").html().substring(5);
-	$("#" + inputNumIdUO).val(inputNumValUO);
-	$("#" + inputNumIdUO).select();
-	inputNumValUO = "";
-	//取消按钮
-	$("#btnCloseForPeopleKeyboardUO").click(function(){
+uo.showdivKeyboardPeopleForUO = function(c){
+	if(c.type == "setFood"){
+		//弹出菜品数量输入框
 		Util.dialongDisplay({
-			type : 'hide',
+			type : 'show',
 			renderTo : 'divKeyboardPeopleForUO'
 		});
-		inputNumValUO = "";
+		$("#divRightForKeyboardPeopleForUO > div[class*=isDot]").html(".");
+		$("#divLeftForKeyboardPeopleForUO > div[class*=isSave]").bind("click", function(){
+			uo.saveForChangePeople();
+		});
+		var title = "请输入菜品数量";
+		$("#divTopForKeyboardPeopleForUO").html("<div style = 'font-size: 20px; " +
+				"font-weight: bold; color: #fff; " +
+				"margin: 15px 15px 0 100px;'>" + title + "</div>");
+		//设定输入框的id和初始显示信息
+		inputNumIdUO = 'txtPeopleNumForUO';
+		inputNumValUO = 1;
 		$("#" + inputNumIdUO).val(inputNumValUO);
-	});	
+		$("#" + inputNumIdUO).select();
+		inputNumValUO = "";
+		//取消按钮
+		$("#btnCloseForPeopleKeyboardUO").click(function(){
+			Util.dialongDisplay({
+				type : 'hide',
+				renderTo : 'divKeyboardPeopleForUO'
+			});
+			inputNumValUO = "";
+			$("#" + inputNumIdUO).val(inputNumValUO);
+		});	
+	}else if(c.type == "setCountForPeople"){
+		//弹出人数输入框
+		Util.dialongDisplay({
+			type : 'show',
+			renderTo : 'divKeyboardPeopleForUO'
+		});
+		var title = "请输入餐桌人数";
+		$("#divTopForKeyboardPeopleForUO").html("<div style = 'font-size: 20px; " +
+				"font-weight: bold; color: #fff; " +
+				"margin: 15px 15px 0 100px;'>" + title + "</div>");
+		//设定输入框的id和初始显示信息
+		inputNumIdUO = 'txtPeopleNumForUO';
+		inputNumValUO = $("#customNumForUO").html().substring(5);
+		$("#" + inputNumIdUO).val(inputNumValUO);
+		$("#" + inputNumIdUO).select();
+		inputNumValUO = "";
+		//取消按钮
+		$("#btnCloseForPeopleKeyboardUO").click(function(){
+			Util.dialongDisplay({
+				type : 'hide',
+				renderTo : 'divKeyboardPeopleForUO'
+			});
+			inputNumValUO = "";
+			$("#" + inputNumIdUO).val(inputNumValUO);
+		});	
+		$("#divLeftForKeyboardPeopleForUO > div[class*=isSave]").bind("click", function(){
+			uo.saveForChangePeople();
+		});
+	}
 };
 
 /**
@@ -385,11 +419,11 @@ function inputNumUO(o){
 		if(parseInt($("#" + inputNumIdUO).val()) > 255){
 			Util.msg.alert({
 				title : '温馨提示',
-				msg : '输入的人数不得超过255.', 
+				msg : '数目不能超过255.', 
 				time : 3,
 			});
 			inputNumValUO = "";
-			$("#" + inputNumIdUO).val(uoOther.order.customNum);
+			$("#" + inputNumIdUO).val(1);
 		}
 		if(parseFloat($("#" + inputNumIdUO).val()) == 0){
 			Util.msg.alert({
@@ -398,7 +432,7 @@ function inputNumUO(o){
 				time : 3,
 			});
 			inputNumValUO = "";
-			$("#" + inputNumIdUO).val(uoOther.order.customNum);
+			$("#" + inputNumIdUO).val(1);
 		}
 	}
 }

@@ -152,13 +152,14 @@ ts.selectTable = function(c){
 			$("#txtPeopleNumForSM").select();
 			inputNumId  = "txtPeopleNumForSM";
 		}	
-	}else{
-		Util.msg.alert({
-			title : '温馨提示',
-			msg : '更新餐桌信息失败，请刷新后重试', 
-			time : 2,
-		});
 	}
+//	else{
+//		Util.msg.alert({
+//			title : '温馨提示',
+//			msg : '更新餐桌信息失败，请刷新后重试', 
+//			time : 2,
+//		});
+//	}
 	
 };
 

@@ -150,7 +150,7 @@ var uo = {
 		<div class="button-base" style="margin-left: 2px; width: 120px;" onClick= "uo.cancelForUO()">返回</div>
   		<div class="div-full">&nbsp;</div>
   		<div class="button-base" style="margin-left: 2px; width: 120px;" onclick = "uo.saveForUO()">确认修改</div>
-  		<div class="button-base" style="margin-left: 2px;" onclick = "uo.showdivKeyboardPeopleForUO()">人数</div>
+  		<div class="button-base" style="margin-left: 2px;" onclick = "uo.showdivKeyboardPeopleForUO({type : 'setCountForPeople'})">人数</div>
   		<div class="button-base" style="margin-left: 2px;" onclick = "uo.goToCreateOrder()">点菜</div>
   		<div class="button-base" style="margin-left: 2px;" onclick = "uo.tempPayForUO()">暂结</div>
   		<div class="button-base" style="margin-left: 2px;" onclick = "Util.scroll({otype: 'up', content: 'divCenterForUpdateOrder', size: 80})">上翻</div>
@@ -179,6 +179,7 @@ var uo = {
     	<div id="divCFCOHandler" style="">
 	      	<div class="button-base" onClick="co.addFood()" style="">数量+1</div>
 	      	<div class="button-base" onClick="co.cutFood()">数量-1</div>
+	      	<div class="button-base" onClick="co.setFood()">数量=</div>
 	      	<div class="button-base" onClick="co.deleteFood()">删除</div>
 	      	<div class="button-base" onClick="co.ot.show()">口味</div>
 	      	<!-- <div class="button-base" >催菜</div> -->
@@ -338,13 +339,13 @@ var uo = {
 			<div class="button-base" onclick = "inputNumUO(this)">1</div>
 			<div class="button-base" onclick = "inputNumUO(this)">2</div>
 			<div class="button-base" onclick = "inputNumUO(this)">3</div>
-			<div class="button-base" class = "keyboardbutton" style = "width: 164px;" onclick = "uo.saveForChangePeople()">确定</div>
+			<div class="button-base isSave" class = "keyboardbutton" style = "width: 164px;" onclick = "uo.saveForChangePeople()">确定</div>
 			<div class="button-base" id = "btnCloseForPeopleKeyboardUO" class = "keyboardbutton">取消</div>
 		</div>
 		<div id = "divRightForKeyboardPeopleForUO">
 			<div class="button-base" style = "margin: 0 0 0 2px;" onclick = "uo.cutOne()">-</div>
 			<div class="button-base" style = "margin: 12px 0 5px 2px;" onclick = "uo.backAll()">&lt;&lt;</div>
-			<div class="button-base" onclick = "inputNumUO(this)">00</div>
+			<div class="button-base isDot" onclick = "inputNumUO(this)">00</div>
 			<div class="button-base" onclick = "inputNumUO(this)" style = "height: 130px; line-height: 130px;">0</div>
 		</div>
 	</div>

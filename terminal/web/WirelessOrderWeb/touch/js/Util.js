@@ -3,9 +3,7 @@
 $.ajaxSetup({ 
 		 contentType:"application/x-www-form-urlencoded;charset=utf-8", 
          complete:function(XMLHttpRequest,textStatus){ 
-         	alert('jinlai');
 			//通过XMLHttpRequest取得响应头
-         	alert(XMLHttpRequest.getResponseHeader("session_status"));
              if(XMLHttpRequest.getResponseHeader("session_status")){  
 					//如果超时就重新登录
              		alert('logout');
@@ -419,7 +417,7 @@ function URLParaQuery() {
  * cookies操作
  */
 function setcookie(name,value){  
-    var Days = 30;  
+    var Days = 30 * 12;  
     var exp  = new Date();  
     exp.setTime(exp.getTime() + Days*24*60*60*1000);  
     document.cookie = name + "="+ escape (value) + ";expires=" + exp.toGMTString();  

@@ -54,7 +54,7 @@ var Templet = {
 			+ 'onClick="co.initKitchenContent({event:this, deptId:{value}})">{text}</div>',
 		kitchen : '<div class="button-base" data-value={value} data-type="kitchen-select" '
 			+ 'onClick="co.findFoodByKitchen({event:this, kitchenId:{value}})">{text}</div>',
-		boxFood : '<div data-index={dataIndex} data-value={id} class="main-box-base" onClick="co.insertFood({foodId:{id}})">'
+		boxFood : '<div  style = "text-align: center;" data-index={dataIndex} data-value={id} class="main-box-base" onClick="co.insertFood({foodId:{id}})">'
 			+ '{name}'
 			+ '<div>¥:{unitPrice}</div>'
 			+ '</div>',
@@ -379,8 +379,9 @@ function changeStaff(c){
 		$(c.event).addClass('div-staff-select');
 		name.innerHTML = c.event.innerText;
 		
-		pwd.focus();
-		pwd.select();
+		pwd.value = '';
+//		pwd.focus();
+//		pwd.select();
 	}else if(c.type == 2){
 		pwd.value = '';
 		name.innerHTML = '----';

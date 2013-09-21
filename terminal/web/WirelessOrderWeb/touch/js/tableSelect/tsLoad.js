@@ -67,7 +67,7 @@ function initTableData(){
 			region = [];
 //			tableData = {};
 //			regionData = {};
-			data = eval("(" + data + ")");
+//			data = eval("(" + data + ")");
 			if(data.success){
 				//把所有餐桌对象都放到本地数组tables中,freeTables存放空闲餐桌，busyTables存放就餐餐桌
 				for(x in data.root){	
@@ -141,16 +141,18 @@ function updateTable(c){
 		},
 		async : false,
 		success : function(data, status, xhr){
-			data = eval("(" + data + ")");
+//			data = eval("(" + data + ")");
+//			data = JSON.parse(data);
 			if(data.success){
 				table = data.root[0];
-			}else{
-				Util.msg.alert({
-					title : data.title,
-					msg : data.msg,
-					time : 2,
-				});
 			}
+//			else{
+//				Util.msg.alert({
+//					title : data.title,
+//					msg : data.msg,
+//					time : 2,
+//				});
+//			}
 		},
 		error : function(request, status, err){
 			Util.msg.alert({

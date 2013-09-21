@@ -98,6 +98,12 @@ co.cutFood = function(){
 	});
 };
 /**
+ *设置菜品数量
+ */
+co.setFood = function(){
+	uo.showdivKeyboardPeopleForUO({type : "setFood"});
+};
+/**
  * 删除菜品
  */
 co.deleteFood = function(){
