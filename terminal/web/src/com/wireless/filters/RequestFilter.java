@@ -127,16 +127,6 @@ public class RequestFilter implements Filter{
 				}
 				
 			}else{
-				/*Cookie[] cookies = request.getCookies();
-				if(cookies != null){
-					for (Cookie cookie : cookies) {
-						if(cookie.getName().equalsIgnoreCase("pin")){
-							pin = cookie.getValue();
-							request.setAttribute("pin", pin);
-							chain.doFilter(request, response);
-						}
-					}
-				}*/
 				if(c != null){
 					pin = c.getValue();
 					request.setAttribute("pin", pin);
