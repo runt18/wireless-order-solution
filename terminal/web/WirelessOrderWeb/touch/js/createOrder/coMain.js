@@ -173,14 +173,6 @@ co.operateFoodCount = function(c){
 			return;
 		}else if(c.otype.toLowerCase() == 'set'){
 			uo.showdivKeyboardPeopleForUO({type : "setFood", data : data});
-//			$("#divLeftForKeyboardPeopleForUO > div[class*=isSave]").bind("click", function(){
-//				co.saveForSetFood({data : data});
-//				var count = $("#" + inputNumIdUO).val();
-//				data.count = count;
-//			});
-//			var num = 12;
-//			data.count = num;
-//			data.count = c.count;
 			return;
 		}
 	}else{
@@ -415,10 +407,11 @@ co.ot.save = function(c){
 		if(temp.cateValue == 0){
 			tasteGroup.normalTaste.price += temp.price;
 		}else if(temp.cateValue == 2){
-			tasteGroup.normalTaste.price += co.ot.foodData.price * temp.rate;
+			tasteGroup.normalTaste.price += co.ot.foodData.unitPrice * (1 + temp.rate);
 		}
 	}
 	tasteGroup.tastePref = tasteGroup.normalTaste.name;
+	tasteGroup.price = tasteGroup.normalTaste.price;
 	for(var i = 0; i < co.newFood.length; i++){
 		if(co.newFood[i].id == co.ot.foodData.id){
 			co.newFood[i].tasteGroup = tasteGroup;
@@ -430,6 +423,7 @@ co.ot.save = function(c){
 	});
 	//
 	co.ot.back();
+	tasteGroup = null;
 };
 
 /*** -------------------------------------------------- ***/

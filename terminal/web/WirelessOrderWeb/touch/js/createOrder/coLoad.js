@@ -1,36 +1,22 @@
-
-//// 菜品分页包
-//co.fp = new Util.padding({
-//	renderTo : 'divCFCOAllFood',
-//	displayId : 'divDescForCreateOrde-padding-msg',
-//	templet : function(c){
-//		return Templet.co.boxFood.format({
-//			dataIndex : c.dataIndex,
-//			id : c.data.id,
-//			name : c.data.name,
-//			unitPrice : c.data.unitPrice
-//		});
-//	}
-//});
-
 /**
  * 初始化新点菜区域
  */
 co.initNewFoodContent = function(c){
 	c = c == null ? {} : c;
 	var html = [], sumCount = 0, sumPrice = 0;
-	var temp = null;
+	var temp = null, tempUnitPrice = 0;
 	for(var i = 0; i < co.newFood.length; i++){
 		temp = co.newFood[i];
+		tempUnitPrice = typeof temp.tasteGroup.price != 'number' ? 0 : parseFloat(temp.unitPrice + temp.tasteGroup.price);
 		sumCount += temp.count;
-		sumPrice += temp.count * temp.unitPrice;
+		sumPrice += temp.count * tempUnitPrice;
 		html.push(Templet.co.newFood.format({
 			dataIndex : i,
 			id : temp.id,
 			name : temp.name,
 			count : temp.count.toFixed(2),
-			unitPrice : temp.unitPrice.toFixed(2),
-			totalPrice : (temp.count * temp.unitPrice).toFixed(2),
+			unitPrice : tempUnitPrice.toFixed(2),
+			totalPrice : tempUnitPrice.toFixed(2),
 			isHangup : typeof temp.isHangup == 'boolean' && temp.isHangup ? '叫起' : '',
 			tasteDisplay : typeof temp.tasteGroup == 'undefined' 
 				|| typeof temp.tasteGroup.normalTasteContent == 'undefined' 
@@ -38,6 +24,7 @@ co.initNewFoodContent = function(c){
 		}));
 	}
 	temp = null;
+	tempUnitPrice = null;
 	if(sumCount > 0){
 		$('#divDescForCreateOrde div:first').html('总数量:{count}, 合计:{price}'.format({
 			count : sumCount.toFixed(2),
@@ -94,6 +81,7 @@ co.insertFood = function(c){
 		data.isHangup = false;
 		data.tasteGroup = {
 			tastePref : '无口味',
+			price : 0,
 			normalTasteContent : []
 		};
 		co.newFood.push(data);
