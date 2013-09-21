@@ -50,7 +50,7 @@ co.findFoodByKitchen = function(c){
  */
 co.show = function(c){
 	// 菜品分页包
-	if(!co){
+	if(!co.fp){
 		co.fp = new Util.padding({
 			renderTo : 'divCFCOAllFood',
 			displayId : 'divDescForCreateOrde-padding-msg',
