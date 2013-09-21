@@ -1,17 +1,17 @@
 
-// 菜品分页包
-co.fp = new Util.padding({
-	renderTo : 'divCFCOAllFood',
-	displayId : 'divDescForCreateOrde-padding-msg',
-	templet : function(c){
-		return Templet.co.boxFood.format({
-			dataIndex : c.dataIndex,
-			id : c.data.id,
-			name : c.data.name,
-			unitPrice : c.data.unitPrice
-		});
-	}
-});
+//// 菜品分页包
+//co.fp = new Util.padding({
+//	renderTo : 'divCFCOAllFood',
+//	displayId : 'divDescForCreateOrde-padding-msg',
+//	templet : function(c){
+//		return Templet.co.boxFood.format({
+//			dataIndex : c.dataIndex,
+//			id : c.data.id,
+//			name : c.data.name,
+//			unitPrice : c.data.unitPrice
+//		});
+//	}
+//});
 
 /**
  * 初始化新点菜区域

@@ -49,6 +49,21 @@ co.findFoodByKitchen = function(c){
  * 
  */
 co.show = function(c){
+	// 菜品分页包
+	if(!co){
+		co.fp = new Util.padding({
+			renderTo : 'divCFCOAllFood',
+			displayId : 'divDescForCreateOrde-padding-msg',
+			templet : function(c){
+				return Templet.co.boxFood.format({
+					dataIndex : c.dataIndex,
+					id : c.data.id,
+					name : c.data.name,
+					unitPrice : c.data.unitPrice
+				});
+			}
+		});
+	}
 	toggleContentDisplay({
 		type:'show', 
 		renderTo:'divCreateOrder'

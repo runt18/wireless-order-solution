@@ -142,8 +142,8 @@ function initFoodData(){
 				localStorage.setItem('foods', JSON.stringify(data));
 				foodData = data;
 				
-				$.getScript('./js/createOrder/coLoad.js');
-				$.getScript('./js/createOrder/coMain.js');
+//				$.getScript('./js/createOrder/coLoad.js');
+//				$.getScript('./js/createOrder/coMain.js');
 				
 				// 加载部门数据,分厨数据
 				$.ajax({

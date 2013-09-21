@@ -5,7 +5,7 @@ $.ajaxSetup({
 		 global : true,
          complete:function(XMLHttpRequest,textStatus){ 
 			//通过XMLHttpRequest取得响应头
-             if(XMLHttpRequest.getResponseHeader("session_status")){  
+             if(XMLHttpRequest.getResponseHeader("session_status")){ 
                     logout();
              } 
          }
