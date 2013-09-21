@@ -6,7 +6,6 @@ $.ajaxSetup({
          complete:function(XMLHttpRequest,textStatus){ 
 			//通过XMLHttpRequest取得响应头
              if(XMLHttpRequest.getResponseHeader("session_status")){  
-					//如果超时就重新登录
                     logout();
              } 
          }
