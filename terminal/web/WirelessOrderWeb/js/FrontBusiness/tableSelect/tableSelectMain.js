@@ -9,12 +9,47 @@
 			for ( var i = 0; i < tableStatusListTSDisplay.length; i++) {
 				temp = tableStatusListTSDisplay[i];
 				if (temp.alias == selectedTable) {
-//					var lm = new Ext.LoadMask(document.body, {
-//						msg : '正在验证权限, 请稍等......'
-//					});
-//					lm.show();
-//					verifyStaff('../../', '1000', function(res){
-//						if(res.success){
+					var lm = new Ext.LoadMask(document.body, {
+						msg : '正在验证权限, 请稍等......'
+					});
+					lm.show();
+					Ext.Ajax.request({
+						url : "../../VerifyStaff.do",
+						params : {
+							isCookie : true,
+							restaurantID : restaurantID,
+							code : 1000
+						},
+						success : function(res, opt){
+							var jr = Ext.decode(res.responseText);
+							if(jr.success){
+								if (temp.statusValue == TABLE_BUSY) {
+									location.href = "OrderMain.html?" + strEncode('restaurantID=' + restaurantID
+											+ "&tableAliasID=" + temp.alias
+											+ "&ts=1" 
+											+ "&personCount=" + temp.customNum
+											+ "&category=" + temp.categoryValue
+											, 'mi');
+								} else if (temp.statusValue == TABLE_IDLE) {
+									location.href = "OrderMain.html?" + strEncode('restaurantID=' + restaurantID
+											+ "&ts=0"
+											+ "&tableAliasID=" + selectedTable
+											+ "&category=" + CATE_NORMAL
+											, 'mi');
+								}
+							}else{
+								lm.hide();
+								jr['icon'] = Ext.MessageBox.WARNING;
+								Ext.ux.showMsg(jr);
+							}
+						},
+						failure : function(res, opt){
+							Ext.ux.showMsg(Ext.decode(res.responseText));
+						}
+					});
+					
+/*					verifyStaff('../../', '1000', function(res){
+						if(res.success){
 							if (temp.statusValue == TABLE_BUSY) {
 								location.href = "OrderMain.html?" + strEncode('restaurantID=' + restaurantID
 										+ "&tableAliasID=" + temp.alias
@@ -29,12 +64,12 @@
 										+ "&category=" + CATE_NORMAL
 										, 'mi');
 							}
-//						}else{
-//							lm.hide();
-//							res['icon'] = Ext.MessageBox.WARNING;
-//							Ext.ux.showMsg(res);
-//						}
-//					});
+						}else{
+							lm.hide();
+							res['icon'] = Ext.MessageBox.WARNING;
+							Ext.ux.showMsg(res);
+						}
+					});*/
 					break;
 				}
 			}
@@ -228,7 +263,7 @@ var btnOrderDetail = new Ext.ux.ImageButton({
 					    ['名称','name',130],
 					    ['单价','unitPrice',60, 'right', 'Ext.ux.txtFormat.gridDou'],
 					    ['数量','count', 60, 'right', 'Ext.ux.txtFormat.gridDou'], 
-					    ['总价','totalPrice', 60, 'right', 'Ext.ux.txtFormat.gridDou'],
+//					    ['折扣','discount',60, 'right', 'Ext.ux.txtFormat.gridDou'],
 					    ['口味','tasteGroup.tastePref'],
 					    ['口味价钱','tasteGroup.tastePrice', 60, 'right', 'Ext.ux.txtFormat.gridDou'],
 					    ['厨房','kitchen.name', 60],
@@ -236,7 +271,7 @@ var btnOrderDetail = new Ext.ux.ImageButton({
 					    ['退菜原因', 'cancelReason.reason']
 					],
 					OrderFoodRecord.getKeys(),
-					[['queryType', 'TodayByTbl'], ['tableAlias', selTabContent.alias], ['restaurantID', restaurantID]],
+					[ ['queryType', 'TodayByTbl'], ['tableAlias', selTabContent.alias], ['restaurantID', restaurantID]],
 					pageSize,
 					''
 				);
@@ -256,7 +291,7 @@ var btnOrderDetail = new Ext.ux.ImageButton({
 					if(jr.root.length > 0){
 						store.add(new OrderFoodRecord({
 							orderDateFormat : '汇总',
-							totalPrice : jr.other.sum.totalPrice,
+							unitPrice : jr.other.sum.totalPrice,
 							count : jr.other.sum.totalCount
 						}));
 					}
@@ -266,16 +301,15 @@ var btnOrderDetail = new Ext.ux.ImageButton({
 					sumRow.style.color = 'green';
 					gv.getCell(store.getCount()-1, 1).style.fontSize = '15px';
 					gv.getCell(store.getCount()-1, 1).style.fontWeight = 'bold';
+					gv.getCell(store.getCount()-1, 3).style.fontSize = '15px';
+					gv.getCell(store.getCount()-1, 3).style.fontWeight = 'bold';
 					gv.getCell(store.getCount()-1, 4).style.fontSize = '15px';
 					gv.getCell(store.getCount()-1, 4).style.fontWeight = 'bold';
-					gv.getCell(store.getCount()-1, 5).style.fontSize = '15px';
-					gv.getCell(store.getCount()-1, 5).style.fontWeight = 'bold';
 					gv.getCell(store.getCount()-1, 2).innerHTML = '';
-					gv.getCell(store.getCount()-1, 3).innerHTML = '';
+					gv.getCell(store.getCount()-1, 5).innerHTML = '';
 					gv.getCell(store.getCount()-1, 6).innerHTML = '';
 					gv.getCell(store.getCount()-1, 7).innerHTML = '';
 					gv.getCell(store.getCount()-1, 8).innerHTML = '';
-					gv.getCell(store.getCount()-1, 9).innerHTML = '';
 				});
 			}
 			
@@ -703,7 +737,7 @@ Ext.onReady(function() {
 				columnWidth : .5,
 				xtype : 'form',
 				labelWidth : 30,
-				border : false,
+				border : false
 			},
 			items : [{
 				items : [{
@@ -1189,14 +1223,14 @@ Ext.onReady(function() {
 				url : "../../QueryRegion.do",
 				baseParams : {
 					dataSource : 'tree',
-					
+					isCookie : true
 				},
 				listeners : {
 					load : function(){
 						regionTree.expandAll();
 					}
 				}
-			}),
+			})
 		}),
 		rootVisible : true,
 		border : false,
@@ -1236,8 +1270,8 @@ Ext.onReady(function() {
 			{text : "&nbsp;&nbsp;&nbsp;", xtype : 'tbtext'}, 
 			checkOutImgBut, 
 			{text : "&nbsp;&nbsp;&nbsp;", xtype : 'tbtext'}, 
-//			orderDeleteImgBut, 
-//			{text : "&nbsp;&nbsp;&nbsp;", xtype : 'tbtext'}, 
+			orderDeleteImgBut, 
+			{text : "&nbsp;&nbsp;&nbsp;", xtype : 'tbtext'}, 
 			tableChangeImgBut, 
 			{text : "&nbsp;&nbsp;&nbsp;", xtype : 'tbtext'}, 
 			tableSepImgBut, 
@@ -1263,5 +1297,5 @@ Ext.onReady(function() {
 	});
 
 	initMainView(null, centerTabPanel, null);
-	getOperatorName("../../");
+	//getOperatorName("../../");
 });

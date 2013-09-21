@@ -461,7 +461,7 @@ var allFoodTabPanelGrid = createGridPanel(
 		['价格', 'unitPrice', 70, 'right', 'Ext.ux.txtFormat.gridDou']
 	],
 	FoodBasicRecord.getKeys(),
-	[ ['dataSource', 'foods'], ['restaurantID', restaurantID], ['isPaging', true]],
+	[ ['dataSource', 'foods'], ['restaurantID', restaurantID], ['isPaging', true], ['isCookie', true]],
 	GRID_PADDING_LIMIT_30,
 	'',
 	allFoodTabPanelGridTbar
@@ -577,6 +577,7 @@ var tempFoodTabPanel = new Ext.Panel({
 						Ext.Ajax.request({
 							url : '../../QueryMenu.do',
 							params : {
+								isCookie : true,
 								dataSource : 'kitchens',
 								restaurantID : restaurantID,
 								isAllowTemp : true

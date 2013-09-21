@@ -52,6 +52,7 @@ function loadPricePlanData(_c){
 	Ext.Ajax.request({
 		url : '../../QueryFoodPricePlanByOrder.do',
 		params : {
+			isCookie : true,
 			restaurantID : restaurantID,
 			idList : typeof  checkOutData.other != 'undefined' ? checkOutData.other.idList : ''
 		},
