@@ -236,7 +236,7 @@ var btnOrderDetail = new Ext.ux.ImageButton({
 					    ['退菜原因', 'cancelReason.reason']
 					],
 					OrderFoodRecord.getKeys(),
-					[ ['queryType', 'TodayByTbl'], ['tableAlias', selTabContent.alias], ['restaurantID', restaurantID]],
+					[['queryType', 'TodayByTbl'], ['tableAlias', selTabContent.alias], ['restaurantID', restaurantID]],
 					pageSize,
 					''
 				);
