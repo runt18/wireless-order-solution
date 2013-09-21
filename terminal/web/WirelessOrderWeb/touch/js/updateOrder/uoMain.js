@@ -25,7 +25,7 @@ uo.show = function(c){
 uo.getTotalPriceUO = function(){
 	var totalPriceUO = 0;
 	for(x in uoFood){
-		totalPriceUO += uoFood[x].count * uoFood[x].actualPrice;
+		totalPriceUO += uoFood[x].count * (uoFood[x].actualPrice + uoFood[x].tasteGroup.tastePrice);
 	}
 	return totalPriceUO;
 };

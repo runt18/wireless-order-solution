@@ -17,8 +17,6 @@ var region = [];
 var inputNumId;
 //定义输入框显示的值
 var inputNumVal = "";
-//设置输入桌号界面的类型
-var typeForInputTableNum;
 //设置当前状态类型（busy， free, allStatus）
 var statusType = "";
 

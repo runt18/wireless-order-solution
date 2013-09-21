@@ -270,25 +270,12 @@ ts.submitForSelectTableNumTS = function(){
 	}else{
 		tableNo = parseInt($("#txtTableNumForTS").val());
 	}
-	if(typeForInputTableNum == "createOrder"){
-		renderToCreateOrder(tableNo, peopleNo);	
-	}else if(typeForInputTableNum == "check"){
-		//判断该餐桌是否已点菜（下单）
-		if(hasTable(tables, tableNo)){
-			if(hasTable(busyTables, tableNo)){
-				alert(tableNo + "号餐桌已点菜，可以结账");
-			}else{
-				alert("该餐桌未点菜，不能结账");
-			}
-		}else{
-			alert("没有该餐桌，请重新输入一个桌号！");
-		}
-	}	
+	renderToCreateOrder(tableNo, peopleNo);	
 };
 
 //点击工具栏上的点菜按钮，弹出桌号选择框，能够转到点菜页面
 function createOrderForTS(){
-	showSelectTableNumTS("createOrder");
+	showSelectTableNumTS();
 }
 
 /**
@@ -432,24 +419,14 @@ ts.selectingTxt = function(c){
 	$("#" + inputNumId).select();
 };
 
-//点击工具栏上的结账按钮
-function checkOnTS(){
-	showSelectTableNumTS("check");
-}
-
 //弹出和关闭桌号选择界面
-function showSelectTableNumTS(type){
+function showSelectTableNumTS(){
 	Util.dialongDisplay({
 		type : 'show',
 		renderTo : 'divSelectTableNumForTs'
 	});
-	typeForInputTableNum = type;
 	var title = "";
-	if(typeForInputTableNum == "createOrder"){
-		title = "请输入桌号，确定进入点菜界面";
-	}else if(typeForInputTableNum == "check"){
-		title = "请输入结账桌号";
-	}
+	title = "请输入桌号，确定进入点菜界面";
 	$("#divTopForSelectTableNumTS").html("<div style = 'font-size: 20px; " +
 			"font-weight: bold; color: #fff; margin: 15px;'>" + title + "</div>");
 	//关闭该界面

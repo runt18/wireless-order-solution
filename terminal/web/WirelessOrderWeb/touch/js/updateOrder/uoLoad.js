@@ -20,6 +20,10 @@ var count;
 var selectingReasonId = "";
 var selectingCancelReason;
 
+$(function(){
+	
+});
+
 /**
  * 初始化菜单数据，存放在uoFood数组中
  * @param {object} data 餐桌对象
@@ -135,7 +139,7 @@ function showOrder(){
 			name : uoFood[i].name,
 			count : uoFood[i].count.toFixed(2),
 			tastePref : uoFood[i].tasteGroup.tastePref,
-			actualPrice : uoFood[i].actualPrice.toFixed(2),
+			actualPrice : (uoFood[i].actualPrice + uoFood[i].tasteGroup.tastePrice).toFixed(2),
 			totalPrice : uoFood[i].totalPrice.toFixed(2),
 			orderDateFormat : uoFood[i].orderDateFormat,
 			waiter : uoFood[i].waiter 
