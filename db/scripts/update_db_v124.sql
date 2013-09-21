@@ -442,3 +442,12 @@ SELECT REST.id, ROLE.role_id, 'macro', MD5('macro@123'), 2
 FROM wireless_order_db.restaurant REST 
 JOIN wireless_order_db.role ROLE ON REST.id = ROLE.restaurant_id AND ROLE.cate = 2
 WHERE REST.id = 1;
+
+-- -----------------------------------------------------
+-- Update the discount to each unpaid order to default
+-- -----------------------------------------------------
+UPDATE wireless_order_db.order O SET
+discount_id = 
+( SELECT discount_id FROM wireless_order_db.discount D WHERE
+((D.status = 2 OR D.status = 3) OR (D.status = 1 AND D.name = '无折扣')) AND O.restaurant_id = D.restaurant_id)
+WHERE O.status = 0 AND restaurant_id <> 1;
