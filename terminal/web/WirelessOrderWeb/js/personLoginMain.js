@@ -493,10 +493,10 @@ Ext.onReady(function() {
 					Ext.Ajax.request({
 						url : '../OperateStaff.do',
 						params : {
+							comeFrom : 1,
 							pin : pin,
 							pwd : pwdTrans,
-							restaurantID : restaurantID,
-							skipVerify : true
+							restaurantID : restaurantID
 						},
 						success : function(res, opt) {
 							var jr = Ext.decode(res.responseText);
