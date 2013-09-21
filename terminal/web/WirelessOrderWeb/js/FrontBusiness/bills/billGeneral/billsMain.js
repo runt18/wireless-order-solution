@@ -137,7 +137,7 @@ var viewBillWin = new Ext.Window({
 			Ext.Ajax.request({
 				url : '../../QueryOrder.do',
 				params : {
-					
+					isCookie : true,
 					'orderID' : billID,
 					'queryType' : 'Today'
 				},
@@ -227,7 +227,7 @@ var billDetailGrid = createGridPanel(
 	    ['退菜原因', 'cancelReason.reason']
 	],
 	OrderFoodRecord.getKeys(),
-	[ ['queryType', 'Today']],
+	[ ['queryType', 'Today'], ['isCookie', true]],
 	'',
 	''
 );
@@ -317,7 +317,7 @@ var billDetailWin = new Ext.Window({
 						    ['退菜原因', 'cancelReason']
 						],
 						OrderFoodRecord.getKeys(),
-					    [ ['orderID', sd.childOrder[i].id], ['queryType', 'Today']],
+					    [ ['orderID', sd.childOrder[i].id], ['queryType', 'Today'], ['isCookie', true]],
 					    billDetailpageRecordCount,
 					    ''
 					);
@@ -696,7 +696,7 @@ Ext.onReady(function(){
 			['操作', 'operator', 270, 'center', 'billOpt']
 		],
 		OrderRecord.getKeys(),
-		[['isPaging', true], ['restaurantID', restaurantID]],
+		[['isPaging', true], ['restaurantID', restaurantID], ['isCookie', true]],
 		GRID_PADDING_LIMIT_20,
 		'',
 		billsGridTbar

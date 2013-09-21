@@ -105,6 +105,7 @@ Ext.onReady(function(){
 				Ext.Ajax.request({
 					url : '../../QueryMemberType.do?',
 					params : {
+						isCookie : true,
 						dataSource : 'normal',
 						restaurantID : restaurantID
 					},
@@ -251,7 +252,7 @@ Ext.onReady(function(){
 			['操作人', 'staffName', 60]
 		],
 		MemberOperationRecord.getKeys(),
-		[ ['isPaging', true], ['restaurantID', restaurantID]],
+		[ ['isPaging', true], ['restaurantID', restaurantID], ['isCookie', true]],
 		GRID_PADDING_LIMIT_20,
 		'',
 		cdd_mo_tbar

@@ -1297,5 +1297,5 @@ Ext.onReady(function() {
 	});
 
 	initMainView(null, centerTabPanel, null);
-	//getOperatorName("../../");
+	getOperatorName("../../");
 });

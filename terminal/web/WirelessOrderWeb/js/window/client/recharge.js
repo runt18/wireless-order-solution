@@ -294,7 +294,7 @@ function rechargeLoadMemberData(c){
 	Ext.Ajax.request({
 		url : '../../QueryMember.do',
 		params : {
-			
+			isCookie : true,
 			dataSource : 'normal',
 			mobile : c.read == 1 ? mobile.getValue() : '',
 			memberCard : c.read == 2 ? card.getValue() : ''
@@ -427,7 +427,7 @@ function rechargeControlCenter(_c){
 		url : '../../OperateMember.do',
 		params : {
 			dataSource : 'charge',
-			
+			isCookie : true,
 			memberID : rechargeOperateData.id,
 			rechargeMoney : rechargeMoney.getValue(),
 			rechargeType : rechargeType.getValue(),

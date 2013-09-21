@@ -31,7 +31,7 @@
 			Ext.Ajax.request({
 				url : '../../QueryDailySettleByNow.do',
 				params : {
-					
+					isCookie : true,
 					queryType : 0
 				},
 				success : function(res, opt){
@@ -63,7 +63,7 @@
 			Ext.Ajax.request({
 				url : '../../QueryDailySettleByNow.do',
 				params : {
-					
+					isCookie : true,
 					queryType : 1
 				},
 				success : function(res, opt){

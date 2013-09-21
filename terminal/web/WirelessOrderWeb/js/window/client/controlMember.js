@@ -61,7 +61,7 @@ Ext.onReady(function(){
 				readOnly : true,
 				forceSelection : true,
 				store : new Ext.data.JsonStore({
-					url: '../../QueryMemberType.do?dataSource=normal&restaurantID=' + restaurantID,
+					url: '../../QueryMemberType.do?dataSource=normal&isCookie=true&restaurantID=' + restaurantID,
 					root : 'root',
 					fields : ['id', 'name', 'attributeValue']
 				}),
@@ -347,10 +347,10 @@ function operateMemberHandler(c){
 		c.setButtonStatus(true);
 	}
 	Ext.Ajax.request({
-		url : '../../OperateMember.do',
+		url : '../../OperateMember.do',                                                                            
 		params : {
 			dataSource : cm_obj.otype.toLowerCase(),
-			
+			isCookie : true,
 			id : Ext.getCmp('cm_numberMemberId').getValue(),
 			name : memberName.getValue(),
 			mobile : memberMobile.getValue(),

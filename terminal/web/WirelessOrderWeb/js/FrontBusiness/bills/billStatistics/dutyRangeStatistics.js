@@ -122,7 +122,7 @@ function dutyRangePanelInit(){
 	     ['操作','Operation', 100, 'center', 'dutyRangePanelOperationRenderer']
 		],
 		['staff.name', 'onDuty', 'offDuty', 'onDutyFormat', 'offDutyFormat'],
-		[ ['dataSource', 'today']],
+		[ ['dataSource', 'today'], ['isCookie', true]],
 		0,
 		null,
 		dutyRangePanelTbar

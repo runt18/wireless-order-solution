@@ -507,6 +507,7 @@ var dailySettleCheckTableWin = new Ext.Window({
 			Ext.Ajax.request({
 				url : "../../PrintOrder.do",
 				params : {
+					isCookie : true,
 					onDuty : shiftCheckDate.onDuty,
 					offDuty : shiftCheckDate.offDuty,
 					'printType' : e == null ? 6 : 5

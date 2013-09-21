@@ -134,7 +134,7 @@ function orderFoodStatPanelInit(){
 				}else{
 					duty.setValue(shiftDutyOfToday.root[0]['duty']);
 				}
-				var url = '../../{0}?pin={1}&restaurantID={2}&dataSource={3}&onDuty={4}&offDuty={5}&deptID={6}&foodName={7}';
+				var url = '../../{0}?pin={1}&restaurantID={2}&dataSource={3}&onDuty={4}&offDuty={5}&deptID={6}&foodName={7}&isCookie=true';
 				url = String.format(
 						url, 
 						'ExportTodayStatisticsToExecl.do', 
@@ -165,7 +165,7 @@ function orderFoodStatPanelInit(){
          ['赠送额','gifted',,'right','Ext.ux.txtFormat.gridDou']
 		],
 		SalesSubStatRecord.getKeys().concat(['food', 'food.name']),
-		[ ['isPaging', true], ['restaurantID', restaurantID], ['dataType', 0], ['queryType', 1]],
+		[ ['isPaging', true], ['restaurantID', restaurantID], ['dataType', 0], ['queryType', 1], ['isCookie', true]],
 		15,
 		'',
 		orderFoodStatPanelGridTbar
@@ -238,7 +238,7 @@ function kitchenStatPanelInit(){
 						duty.setValue(shiftDutyOfToday.root[0]['duty']);
 					}
 				}
-				var url = '../../{0}?pin={1}&restaurantID={2}&dataSource={3}&onDuty={4}&offDuty={5}&deptID={6}';
+				var url = '../../{0}?pin={1}&restaurantID={2}&dataSource={3}&onDuty={4}&offDuty={5}&deptID={6}&isCookie=true';
 				url = String.format(
 						url, 
 						'ExportTodayStatisticsToExecl.do', 
@@ -267,7 +267,7 @@ function kitchenStatPanelInit(){
 	     ['dept.id','dept.id', 10]
 		],
 		SalesSubStatRecord.getKeys().concat(['kitchen', 'kitchen.name', 'dept', 'dept.id', 'dept.name']),
-		[ ['restaurantID', restaurantID], ['dataType', 0], ['queryType', 2]],
+		[ ['restaurantID', restaurantID], ['dataType', 0], ['queryType', 2], ['isCookie', true]],
 		15,
 		{
 			name : 'dept.id',
@@ -330,7 +330,7 @@ function deptStatPanelInit(){
 						duty.setValue(shiftDutyOfToday.root[0]['duty']);
 					}
 				}
-				var url = '../../{0}?pin={1}&restaurantID={2}&dataSource={3}&onDuty={4}&offDuty={5}&deptID={6}';
+				var url = '../../{0}?pin={1}&restaurantID={2}&dataSource={3}&onDuty={4}&offDuty={5}&deptID={6}&isCookie=true';
 				url = String.format(
 						url, 
 						'ExportTodayStatisticsToExecl.do', 
@@ -358,7 +358,7 @@ function deptStatPanelInit(){
 	     ['赠送额','gifted',,'right','Ext.ux.txtFormat.gridDou']
 		],
 		SalesSubStatRecord.getKeys().concat(['dept', 'dept.id', 'dept.name']),
-		[ ['restaurantID', restaurantID], ['dataType', 0]],
+		[ ['restaurantID', restaurantID], ['dataType', 0], ['isCookie', true]],
 		30,
 		null,
 		deptStatPanelGridTbar

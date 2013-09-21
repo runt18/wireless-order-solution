@@ -116,7 +116,7 @@ Ext.onReady(function(){
 						params : {
 							dataSource : dataSource,
 							queryPattern : queryPattern,
-							
+							isCookie : true,
 							restaurantID : restaurantID,
 							onDuty : paramsOnDuty,
 							offDuty : paramsOffDuty
@@ -223,7 +223,7 @@ Ext.onReady(function(){
 					}else{
 						return;
 					}
-					var url = '../../{0}?pin={1}&restaurantID={2}&dataSource={3}&onDuty={4}&offDuty={5}&queryPattern={6}&dataType={7}';
+					var url = '../../{0}?pin={1}&restaurantID={2}&dataSource={3}&onDuty={4}&offDuty={5}&queryPattern={6}&dataType={7}&isCookie=true';
 					url = String.format(
 							url, 
 							'ExportHistoryStatisticsToExecl.do', 
