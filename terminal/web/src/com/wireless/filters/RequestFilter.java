@@ -66,7 +66,7 @@ public class RequestFilter implements Filter{
 			String isCookie = null;
 			Map<String, String> params = new HashMap<String, String>();
 			
-			if(request.getQueryString() != null && (requestPath.indexOf(".do") < 0)){
+			if(request.getQueryString() != null && (requestPath.indexOf(".do") < 0) && (requestPath.indexOf(".jsp") < 0)){
 				//获取url带的参数
 				String query = request.getQueryString();
 				String des = Encrypt.strDecode(query, "mi", null, null);
