@@ -18,6 +18,7 @@ import com.wireless.exception.ErrorCode;
 import com.wireless.exception.ProtocolError;
 import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
+import com.wireless.pack.req.PrintOption;
 import com.wireless.pack.req.ReqInsertOrder;
 import com.wireless.parcel.Parcel;
 import com.wireless.pojo.dishesOrder.Order;
@@ -100,10 +101,13 @@ public class InsertOrderAction extends Action{
 			}
 			orderToInsert.setOrderFoods(Util.toFoodArray(request.getParameter("foods")));
 			
+			String notPrint = request.getParameter("notPrint");
 			ProtocolPackage resp = ServerConnector.instance().ask(
 										new ReqInsertOrder(staff,
-														   orderToInsert,
-														   (type == 1) ? Type.INSERT_ORDER : Type.UPDATE_ORDER));
+											orderToInsert,
+											(type == 1) ? Type.INSERT_ORDER : Type.UPDATE_ORDER,
+											notPrint != null && Boolean.valueOf(notPrint) ? PrintOption.DO_NOT_PRINT : PrintOption.DO_PRINT
+										));
 			
 			if(resp.header.type == Type.ACK){
 				if(orderToInsert.isNormal()){
