@@ -67,7 +67,7 @@
 	hourOfDay, minute, second
 	e.g. "2, 0, 0" means the task would be executed on 2:00:00am every day 
 	-->
-	<daily_settlement>16,33,0</daily_settlement>
+	<daily_settlement>9,46,0</daily_settlement>
 	<!-- the OTA server address and port -->
 	<OTA>
 		<host>42.121.54.177</host>
