@@ -14,8 +14,9 @@ uo.show = function(c){
 		});
 		initCancelReason();	
 	}
+	initOrderData({table : c.table});
 	uo.table = c.table;
-	initOrderData(c.table);
+//	uo.callback = typeof c.callback == 'function' ? c.callback : null;
 };
 
 /**
@@ -648,7 +649,7 @@ uo.tempPayForUO = function(){
 						msg : result.data,
 						time : 3,
 					});
-					initOrderData(uo.table);
+					initOrderData({table : uo.table});
 				}else{
 					Util.msg.alert({
 						title : '错误',

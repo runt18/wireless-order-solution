@@ -28,29 +28,35 @@ $(function(){
  * 初始化菜单数据，存放在uoFood数组中
  * @param {object} data 餐桌对象
  */
-function initOrderData(data){
+function initOrderData(c){
 	// 加载菜单数据
 	$.ajax({
 		url : '../QueryOrder.do',
 		type : 'post',
 		data : {
 			restaurantID : restaurantID,
-			tableID : data.alias,			
+			tableID : c.table.alias,			
 		},
-		async : false,
+//		async : false,
 		success : function(data, status, xhr){
 			uoFood = [];
 			if(data.success){
 				uo.order = data.other.order;
+				uo.table = c.table;
 				uo.order.orderFoods = data.root;
-//				alert(JSON.stringify(uo.order.orderFoods));
 				for(x in data.root){
 					uoFood.push(data.root[x]);
 				}
 				uoOther = data.other;
 				showNorthForUpdateOrder();
 				showOrder();
-				showDescForUpdateOrder();		
+				showDescForUpdateOrder();
+			    c.createrOrder == 'createrOrder' ? co.show({
+					table : uo.table,
+					order : uo.order,
+					callback : function(){
+						initTableData();
+					}}) : null;
 			}else{
 				Util.msg.alert({
 					title : data.title,

@@ -118,8 +118,16 @@ ts.selectBusyStatus = function(){
  * @param c
  */
 ts.selectTable = function(c){
-//	var table = getTableByAlias(c.tableAlias);
-	var table = updateTable({alias : c.tableAlias});
+	updateTable({
+		alias : c.tableAlias, 
+	});
+};
+
+/**
+ * 当选中餐桌时，依据餐桌状态处理餐桌
+ */
+function handleTableForTS(c){
+	var table = c.table;
 	if(table != null){
 		//判断是否为已点菜餐桌
 		if(table.statusText == "就餐"){	
@@ -153,15 +161,7 @@ ts.selectTable = function(c){
 			inputNumId  = "txtPeopleNumForSM";
 		}	
 	}
-//	else{
-//		Util.msg.alert({
-//			title : '温馨提示',
-//			msg : '更新餐桌信息失败，请刷新后重试', 
-//			time : 2,
-//		});
-//	}
-	
-};
+}
 
 /**
  * 点击数字键盘上的数字，对输入框进行输入
@@ -213,17 +213,32 @@ function renderToCreateOrder(tableNo, peopleNo){
 		$("#txtTableNumForTS").val(inputNumVal);
 		$("#txtPeopleNumForSM").val(inputNumVal);
 		if(getTableByAlias(tableNo).statusValue == 1){
-			uo.show({
+//			uo.show({
+//				table : getTableByAlias(tableNo),
+//				type : 'createOrder',
+//			});
+//			co.show({
+//				table : uo.table,
+//				order : uo.order,
+//				callback : function(){
+//					initTableData();
+//				}
+//			});
+//			uo.show({
+//				table : getTableByAlias(tableNo),
+//				type : 'createOrder',
+//			});
+			initOrderData({
 				table : getTableByAlias(tableNo),
-				type : 'createOrder'
+				createrOrder : 'createrOrder'
 			});
-			co.show({
-				table : uo.table,
-				order : uo.order,
-				callback : function(){
-					initTableData();
-				}
-			});
+//			co.show({
+//				table : uo.table,
+//				order : uo.order,
+//				callback : function(){
+//					initTableData();
+//				}
+//			});
 		}else{
 			var theTable = getTableByAlias(tableNo);
 			theTable.customNum = peopleNo;

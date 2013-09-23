@@ -244,10 +244,6 @@ function initRestaurantContent(){
 		type : 'show',
 		isTop : true
 	});
-//	if (document.cookie != ""){
-//		var restaurantAccount = getcookie("restaurantAccount");
-//		$("#txtRestaurantAccount").val(restaurantAccount);
-//	}
 }
 
 
@@ -319,7 +315,6 @@ function initStaffContent(c){
 $(function(){
 	if (getcookie("restaurant") != ""){
 		var restaurant = JSON.parse(getcookie("restaurant"));
-//		$("#txtRestaurantAccount").val(restaurant.account);
 		ln.restaurant = restaurant;
 		restaurantID = restaurant.id;
 		$.ajax({
@@ -330,6 +325,7 @@ $(function(){
 					loginSuccessCallback();
 				}else{	
 					initStaffContent();
+					window.clearInterval();
 				}
 			},
 			error : function(request, status, error){
@@ -378,7 +374,6 @@ function changeStaff(c){
 	if(c.type == 1 && typeof c.staffId == 'number'){
 		$(c.event).addClass('div-staff-select');
 		name.innerHTML = c.event.innerText;
-		
 		pwd.value = '';
 //		pwd.focus();
 //		pwd.select();
@@ -436,20 +431,6 @@ function restaurantLoginHandler(){
 					restaurantID = ln.restaurant.id;
 					Util.LM.show();
 					initStaffContent();
-//					$.ajax({
-//						url : '../VerifyLogin.do',
-//						success : function(data, status, xhr){
-//							if(data.success){
-//								staffData = data.other.staff;
-//								loginSuccessCallback();
-//							}else{	
-//								initStaffContent();
-//							}
-//						},
-//						error : function(request, status, error){
-//							initStaffContent();
-//						}
-//					});
 				}else{
 					Util.msg.alert({
 						title : "温馨提示" ,

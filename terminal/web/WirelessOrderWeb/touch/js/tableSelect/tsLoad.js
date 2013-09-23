@@ -49,6 +49,7 @@ $(function(){
  * freeTables存放空闲餐桌，busyTables存放就餐餐桌
  */
 function initTableData(){
+//	alert("TTT");
 	$('#spanStaffNameForDisplayToTS').html(staffData.staffName);
 	// 加载菜单数据
 	$.ajax({
@@ -63,9 +64,6 @@ function initTableData(){
 			freeTables = [];
 			regionId = [];
 			region = [];
-//			tableData = {};
-//			regionData = {};
-//			data = eval("(" + data + ")");
 			if(data.success){
 				//把所有餐桌对象都放到本地数组tables中,freeTables存放空闲餐桌，busyTables存放就餐餐桌
 				for(x in data.root){	
@@ -137,20 +135,12 @@ function updateTable(c){
 			alias : c.alias,
 			random : Math.random(),
 		},
-		async : false,
+//		async : false,
 		success : function(data, status, xhr){
-//			data = eval("(" + data + ")");
-//			data = JSON.parse(data);
 			if(data.success){
 				table = data.root[0];
 			}
-//			else{
-//				Util.msg.alert({
-//					title : data.title,
-//					msg : data.msg,
-//					time : 2,
-//				});
-//			}
+			handleTableForTS({table : table});
 		},
 		error : function(request, status, err){
 			Util.msg.alert({
@@ -160,7 +150,7 @@ function updateTable(c){
 			});
 		}
 	});
-	return table;
+//	return table;
 }
 
 /**
@@ -181,47 +171,6 @@ function showRegion(temp, pageNow){
 	$(".button-base.regionSelect").css("backgroundColor", "#D4F640");
 	$("#" + ts.rn.selectingId).css("backgroundColor", "#FFA07A");
 }
-
-///**
-// * 初始化区域选择
-// * @param c
-// */
-//ts.initRegionContent = function(c){
-//	var rc = getDom('divSelectRegionForTS');
-//	var html = Templet.ts.region.format({
-//		value : -1,
-//		text : '全部分厨'
-//	});
-//	var tempTableData = []; // 餐桌数据
-//	var temp = null;
-//	for(var i = 0; i < kitchenData.root.length; i++){
-//		temp = kitchenData.root[i];
-//		if(typeof c.deptId == 'number' && c.deptId != -1){
-//			if(temp.dept.id == c.deptId){
-//				html += Templet.co.kitchen.format({
-//					value : temp.id,
-//					text : temp.name
-//				});
-//				tempFoodData = tempFoodData.concat(temp.foods);
-//			}
-//		}else{
-//			if(temp.dept.id != -1){
-//				html += Templet.co.kitchen.format({
-//					value : temp.id,
-//					text : temp.name
-//				});
-//				tempFoodData = tempFoodData.concat(temp.foods);
-//			}
-//		}
-//	}
-//	temp = null;
-//	kc.innerHTML = html;
-//	//
-//	co.fp.init({
-//		data : tempFoodData
-//	});
-//	co.fp.getFirstPage();
-//};
 
 /**
  * 显示餐桌
