@@ -1474,7 +1474,7 @@ void PServer::portPrinter(IPReport* pReport){
 			//get the remote IP address, port, account and password from the config XML configuration file
 			wstring serv_name = Util::s2ws(TiXmlHandle(&g_Conf).FirstChildElement(ConfTags::CONF_ROOT).FirstChildElement(ConfTags::REMOTE).Element()->Attribute(ConfTags::REMOTE_IP));
 			int port = 10080;
-			if(serv_name == _T("e-tones.net")){
+			if(serv_name == _T("e-tones.net") || serv_name == _T("www.e-tones.net")){
 				port = 10080;
 			}else if(serv_name == _T("localhost") || serv_name == _T("127.0.0.1")){
 				port = 8080;
