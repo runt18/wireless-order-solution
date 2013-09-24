@@ -36,12 +36,6 @@ public class FoodDetailContent extends ConcreteContent {
 			taste = "-" + _food.getTasteGroup().getTastePref();
 		}
 		_format = _format.replace(PVar.FOOD_TASTE, taste == null ? "" : taste);				
-//		if(_food.hasTaste()){
-//			taste = "-" + _food.getTastePref();
-//			_format = _format.replace(PVar.FOOD_TASTE, taste);				
-//		}else{
-//			_format = _format.replace(PVar.FOOD_TASTE, "");
-//		}
 
 		String combo;
 		if(_food.asFood().isCombo()){

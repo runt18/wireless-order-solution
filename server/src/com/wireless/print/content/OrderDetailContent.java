@@ -116,7 +116,7 @@ public class OrderDetailContent extends ConcreteContent {
 			//generate the order food detail info and replace the $(var_1) with it
 			_printTemplate = _printTemplate.replace(PVar.VAR_1,
 													new ExtraFormatDecorator(
-														new FoodDetailContent(PFormat.RECEIPT_FORMAT_DEF, _parent, mStyle),
+														new FoodDetailContent(PFormat.FROMAT_NO_DISCOUNT, _parent, mStyle),
 														ExtraFormatDecorator.LARGE_FONT_3X).toString() + cancelReason);
 			
 		}else{

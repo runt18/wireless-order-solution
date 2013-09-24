@@ -48,7 +48,7 @@ public class FoodListWithSepContent extends ConcreteContent {
 		}
 		sep.insert(0, "\r\n").insert(sep.length(), "\r\n");
 		
-		StringBuffer var = new StringBuffer();
+		StringBuilder var = new StringBuilder();
 		int cnt = 0;
 		for(OrderFood of : mFoods){
 			if(of.asFood().isCombo()){

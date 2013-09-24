@@ -114,7 +114,7 @@ public class JobContentFactory {
 							//Generate the the summary to all departments.
 							jobContents.add(new JobContent(printer, func.getRepeat(), printType, 
 										   				   new SummaryContent(new Department(null, Department.DeptId.DEPT_ALL.getVal(), term.getRestaurantId(), Department.Type.RESERVED), 
-										   						   			  PFormat.RECEIPT_FORMAT_DEF, 
+										   						   			  PFormat.FROMAT_NO_DISCOUNT, 
 										   						   			  order,
 										   						   			  term.getName(),
 										   						   			  printType, 
@@ -136,7 +136,7 @@ public class JobContentFactory {
 									orderToDept.setOrderFoods(orderFoods);
 									jobContents.add(new JobContent(printer, func.getRepeat(), printType,
 								   				   new SummaryContent(dept, 
-								   						   			  PFormat.RECEIPT_FORMAT_DEF, 
+								   						   			  PFormat.FROMAT_NO_DISCOUNT, 
 								   						   			  orderToDept,
 								   						   			  term.getName(),
 								   						   			  printType, 
