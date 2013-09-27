@@ -75,20 +75,20 @@ public class MemberDao {
 	 */
 	public static List<Member> getMember(DBCon dbCon, Map<Object, Object> params) throws SQLException{
 		List<Member> result = new ArrayList<Member>();
-		String querySQL = " SELECT "
+		String sql = " SELECT "
 			+ " M.member_id, M.restaurant_id, M.point, M.used_point, "
 			+ " M.base_balance, M.extra_balance, M.consumption_amount, M.used_balance,"
 			+ " M.total_consumption, M.total_point, M.total_charge, " 
 			+ " M.member_card, M.name AS member_name, M.sex, M.create_date, "
 			+ " M.tele, M.mobile, M.birthday, M.id_card, M.company, M.taste_pref, M.taboo, M.contact_addr, M.comment, "
-			+ " MT.member_type_id, MT.discount_id, MT.discount_type, MT.charge_rate, MT.exchange_rate, " 
+			+ " MT.member_type_id, MT.charge_rate, MT.exchange_rate, " 
 			+ " MT.name AS member_type_name, MT.attribute, MT.initial_point "
 			+ " FROM " 
 			+ Params.dbName + ".member M " 
 			+ " JOIN " + Params.dbName + ".member_type MT ON M.member_type_id = MT.member_type_id " 
 			+ " WHERE 1=1 ";
-		querySQL = SQLUtil.bindSQLParams(querySQL, params);
-		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
+		sql = SQLUtil.bindSQLParams(sql, params);
+		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		while(dbCon.rs.next()){
 			Member member = new Member();
 			member.setId(dbCon.rs.getInt("member_id"));
@@ -122,8 +122,6 @@ public class MemberDao {
 			
 			MemberType memberType = new MemberType();
 			memberType.setTypeId(dbCon.rs.getInt("member_type_id"));
-			memberType.setDiscount(new Discount(dbCon.rs.getInt("discount_id")));
-			memberType.setDiscountType(dbCon.rs.getInt("discount_type"));
 			memberType.setExchangeRate(dbCon.rs.getFloat("exchange_rate"));
 			memberType.setChargeRate(dbCon.rs.getFloat("charge_rate"));
 			memberType.setName(dbCon.rs.getString("member_type_name"));
@@ -133,6 +131,21 @@ public class MemberDao {
 			
 			result.add(member);
 		}
+		dbCon.rs.close();
+		
+		for(Member m : result){
+			sql = " SELECT discount_id, type FROM " + Params.dbName + ".member_type_discount WHERE member_type_id = " + m.getMemberType().getTypeId();
+			dbCon.rs = dbCon.stmt.executeQuery(sql);
+			while(dbCon.rs.next()){
+				Discount discount = new Discount(dbCon.rs.getInt("discount_id"));
+				m.getMemberType().addDiscount(discount);
+				if(MemberType.DiscountType.valueOf(dbCon.rs.getInt("type")) == MemberType.DiscountType.DEFAULT){
+					m.getMemberType().setDefaultDiscount(discount);
+				}
+			}
+			dbCon.rs.close();
+		}
+		
 		return result;
 	}
 	
@@ -382,7 +395,7 @@ public class MemberDao {
 	
 	/**
 	 * Insert a new member.
-	 * @param term
+	 * @param staff
 	 * 			the terminal
 	 * @param builder
 	 * 			the builder to new member
@@ -394,11 +407,11 @@ public class MemberDao {
 	 * 			the mobile to new member has been exist before<br>
 	 * 			the card to new member has been exist before
 	 */
-	public static int insert(Staff term, Member.InsertBuilder builder) throws SQLException, BusinessException{
+	public static int insert(Staff staff, Member.InsertBuilder builder) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return MemberDao.insert(dbCon, term, builder);
+			return MemberDao.insert(dbCon, staff, builder);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -406,7 +419,7 @@ public class MemberDao {
 	
 	/**
 	 * Update a member.
-	 * @param term
+	 * @param staff
 	 * 			the terminal
 	 * @param builder
 	 * 			the builder to update member
@@ -418,7 +431,7 @@ public class MemberDao {
 	 * 			the card to new member has been exist before<br>
 	 * 			the member to update does NOT exist
 	 */
-	public static void update(DBCon dbCon, Staff term, Member.UpdateBuilder builder) throws SQLException, BusinessException{
+	public static void update(DBCon dbCon, Staff staff, Member.UpdateBuilder builder) throws SQLException, BusinessException{
 		Member member = builder.build();
 		// 旧会员类型是充值属性, 修改为优惠属性时, 检查是否还有余额, 有则不允许修改
 		Member old = MemberDao.getMemberById(member.getId());
@@ -453,7 +466,7 @@ public class MemberDao {
 	
 	/**
 	 * Update a member.
-	 * @param term
+	 * @param staff
 	 * 			the terminal
 	 * @param builder
 	 * 			the builder to update member
@@ -465,11 +478,11 @@ public class MemberDao {
 	 * 			the card to new member has been exist before<br>
 	 * 			the member to update does NOT exist
 	 */
-	public static void update(Staff term, Member.UpdateBuilder builder) throws SQLException, BusinessException{
+	public static void update(Staff staff, Member.UpdateBuilder builder) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			update(dbCon, term, builder);
+			update(dbCon, staff, builder);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -477,19 +490,19 @@ public class MemberDao {
 	
 	/**
 	 * Delete the member and associated member operation (today & history) according to id
-	 * @param term
+	 * @param staff
 	 * 			the terminal
 	 * @param memberId
 	 * 			the member id to delete
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static void deleteById(Staff term, int memberId) throws SQLException {
+	public static void deleteById(Staff staff, int memberId) throws SQLException {
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
 			dbCon.conn.setAutoCommit(false);
-			MemberDao.deleteById(dbCon, term, memberId);
+			MemberDao.deleteById(dbCon, staff, memberId);
 			dbCon.conn.commit();
 			
 		}catch(SQLException e){

@@ -59,6 +59,54 @@ public class DiscountDao {
 	}
 	
 	/**
+	 * Get the discounts to specific member type.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param memberTypeId
+	 * 			the id to member type
+	 * @return the discounts to this member type
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if the member type does NOT exist
+	 */
+	public static List<Discount> getDiscountByMemberType(DBCon dbCon, Staff staff, int memberTypeId) throws SQLException, BusinessException{
+		String sql;
+		sql = " SELECT discount_id FROM " + Params.dbName + ".member_type_discount WHERE member_type_id = " + memberTypeId;
+		dbCon.rs = dbCon.stmt.executeQuery(sql);
+		if(dbCon.rs.next()){
+			dbCon.rs.close();
+			return getDiscount(dbCon, staff, " AND DIST.discount_id IN (" + sql + ")", null);
+		}else{
+			return new ArrayList<Discount>(0);
+		}
+	}
+	
+	/**
+	 * Get the discounts to specific member type.
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param memberTypeId
+	 * 			the id to member type
+	 * @return the discounts to this member type
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if the member type does NOT exist
+	 */
+	public static List<Discount> getDiscountByMemberType(Staff staff, int memberTypeId) throws SQLException, BusinessException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return getDiscountByMemberType(dbCon, staff, memberTypeId);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
 	 * Get the discounts to specific role.
 	 * @param staff
 	 * 			the staff to perform this action

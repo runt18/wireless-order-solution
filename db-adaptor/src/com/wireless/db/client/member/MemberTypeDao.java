@@ -1,72 +1,94 @@
 package com.wireless.db.client.member;
 
 import java.sql.SQLException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
+import com.mysql.jdbc.Statement;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.distMgr.DiscountDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.MemberError;
 import com.wireless.pojo.client.MemberType;
-import com.wireless.pojo.client.MemberType.DiscountType;
 import com.wireless.pojo.distMgr.Discount;
-import com.wireless.pojo.distMgr.Discount.Status;
-import com.wireless.pojo.distMgr.DiscountPlan;
-import com.wireless.util.SQLUtil;
+import com.wireless.pojo.staffMgr.Staff;
 
 public class MemberTypeDao {
 
 	/**
-	 * 
+	 * Insert a new member type.
 	 * @param dbCon
-	 * @param mt
-	 * @return
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param builder
+	 * 			the builder to insert a new member type
+	 * @return the id to member type just inserted
 	 * @throws SQLException
-	 * @throws BusinessException
+	 * 			throws if failed to execute any SQL statement
 	 */
-	public static int insertMemberType(DBCon dbCon, MemberType mt) throws SQLException, BusinessException{
-		int count = 0;
-		// 生成全单折扣方案
-		if(mt.getDiscountType() == DiscountType.DISCOUNT_ENTIRE){
-			MemberTypeDao.createDiscount(dbCon, mt);
-		}
+	public static int insert(DBCon dbCon, Staff staff, MemberType.InsertBuilder builder) throws SQLException{
+		MemberType mt = builder.build();
 		// 插入新数据
 		String sql = " INSERT INTO " + Params.dbName + ".member_type " 
-				   + " ( restaurant_id, name, discount_id, discount_type, exchange_rate, charge_rate, attribute, initial_point )"
+				   + " ( restaurant_id, name, exchange_rate, charge_rate, attribute, initial_point )"
 				   + " VALUES("
 				   + mt.getRestaurantId() + ","	
 				   + "'" + mt.getName() + "'," 
-				   + mt.getDiscount().getId() + "," 
-				   + mt.getDiscountType().getVal() + ","
 				   + mt.getExchangeRate() + ","	
 				   + mt.getChargeRate() + "," 
 				   + mt.getAttribute().getVal() + "," 
 				   + mt.getInitialPoint()
 				   + ")";
-		count = dbCon.stmt.executeUpdate(sql);
-		return count;
+		
+		dbCon.stmt.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
+		dbCon.rs = dbCon.stmt.getGeneratedKeys();
+		if(dbCon.rs.next()){
+			mt.setTypeId(dbCon.rs.getInt(1));
+		}else{
+			throw new SQLException("Failed to generated the discount id.");
+		}
+		
+		//Insert the discounts associated with this member type.
+		for(Discount discount : mt.getDiscounts()){
+			sql = " INSERT INTO " + Params.dbName + ".member_type_discount" +
+				  " (`member_type_id`, `discount_id`, `type`) " +
+				  " VALUES (" +
+				  mt.getTypeId() + "," +
+				  discount.getId() + "," +
+				  MemberType.DiscountType.NORMAL.getVal() + 
+				  ")";
+			dbCon.stmt.executeUpdate(sql);
+		}
+
+		//Update the default discount.
+		sql = " UPDATE " + Params.dbName + ".member_type_discount" +
+			  " SET type = " + MemberType.DiscountType.DEFAULT.getVal() +
+			  " WHERE member_type_id = " + mt.getTypeId() +
+			  " AND discount_id = " + mt.getDefaultDiscount().getId();
+		dbCon.stmt.executeUpdate(sql);
+
+		return mt.getTypeId();
 	}
 	
 	/**
-	 * 
-	 * @param mt
-	 * @return
+	 * Insert a new member type.
+	 * @param builder
+	 * 			the builder to insert a new member type
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @return the id to member type just inserted
 	 * @throws SQLException
-	 * @throws BusinessException
+	 * 			throws if failed to execute any SQL statement
 	 */
-	public static int insertMemberType(MemberType mt) throws SQLException, BusinessException{
+	public static int insert(Staff staff, MemberType.InsertBuilder builder) throws SQLException{
 		DBCon dbCon = new DBCon();
 		int count = 0;
 		try{
 			dbCon.connect();
 			dbCon.conn.setAutoCommit(false);
-			count = insertMemberType(dbCon, mt);
+			count = insert(dbCon, staff, builder);
 			dbCon.conn.commit();
 		}catch(SQLException e){
 			dbCon.conn.rollback();
@@ -78,90 +100,48 @@ public class MemberTypeDao {
 	}
 	
 	/**
-	 * 生成全单折扣方案
+	 * Delete a member type according to specific id
 	 * @param dbCon
-	 * @param mt
-	 * @throws SQLException
+	 * 			the database connection
+	 * @param memberTypeId
+	 * 			the member type id to delete
+	 * @param staff
+	 * 			the staff to perform this action
 	 * @throws BusinessException
-	 */
-	private static void createDiscount(DBCon dbCon, MemberType mt) throws SQLException, BusinessException{
-		Discount dp = new Discount();
-		DiscountPlan dpp = new DiscountPlan();
-		
-		dp.setName(mt.getRestaurantId() + "_QDZK_" + mt.getName() + "_" + new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()) + "" );
-		dp.setRestaurantId(mt.getRestaurantId());
-		dp.setLevel(0);
-		dp.setStatus(Status.MEMBER_TYPE);
-		
-		dpp.setRate(Float.valueOf(String.valueOf(mt.getDiscountRate())));
-		
-		// 生成全单折扣方案信息, 并回写全单折扣方案编号
-		if(DiscountDao.insertDiscountBody(dbCon, dp, dpp) > 0){
-			dbCon.rs = dbCon.stmt.executeQuery("SELECT discount_id FROM " +  Params.dbName + ".discount WHERE restaurant_id = " + mt.getRestaurantId() + " ORDER BY discount_id DESC LIMIT 0,1");
-			if(dbCon.rs != null && dbCon.rs.next()){
-				mt.getDiscount().setId(dbCon.rs.getInt("discount_id"));
-			}
-		}else{
-			throw new BusinessException(MemberError.TYPE_SET_ORDER_DISCOUNT);
-		}
-	}
-	
-	/**
-	 * 
-	 * @param dbCon
-	 * @param mt
-	 * @return
-	 * @throws BusinessException
+	 * 			throws if the member type does NOT exist
 	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
 	 */
-	public static int deleteMemberType(DBCon dbCon, MemberType mt) throws BusinessException, SQLException{
-		int count = 0;
-		String querySQL = "";
-		String deleteSQL = "";
+	public static void deleteById(DBCon dbCon, Staff staff, int memberTypeId) throws BusinessException, SQLException{
+		String sql;
+		//Delete the discounts associated with this member type.
+		sql = " DELETE FROM " + Params.dbName + ".member_type_discount WHERE member_type_id = " + memberTypeId;
+		dbCon.stmt.executeUpdate(sql);
 		
-		// 检查该类型下是否还有会员
-		querySQL = "SELECT count(restaurant_id) AS count FROM " + Params.dbName + ".member WHERE restaurant_id = " + mt.getRestaurantId() + " AND member_type_id = " + mt.getTypeId();
-		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
-		if(dbCon.rs != null && dbCon.rs.next() && dbCon.rs.getInt("count") > 0){
+		//Delete the member type.
+		sql = " DELETE FROM " + Params.dbName + ".member_type WHERE member_type_id = " + memberTypeId;
+		if(dbCon.stmt.executeUpdate(sql) == 0){
 			throw new BusinessException(MemberError.TYPE_DELETE_ISNOT_EMPTY);
 		}
-		
-		// 删除全单折扣方案相关信息
-		if(mt.getDiscountType() == DiscountType.DISCOUNT_ENTIRE){
-			querySQL = "SELECT count(restaurant_id) AS count FROM " + Params.dbName + ".discount WHERE restaurant_id = " + mt.getRestaurantId() + " AND discount_id = " + mt.getDiscount().getId() + " AND status = " + Status.MEMBER_TYPE.getVal();
-			dbCon.rs = dbCon.stmt.executeQuery(querySQL);
-			if(dbCon.rs != null && dbCon.rs.next() && dbCon.rs.getInt("count") > 0){
-				deleteSQL = "DELETE FROM " + Params.dbName + ".discount WHERE discount_id = " + mt.getDiscount().getId() + " AND restaurant_id = " + mt.getRestaurantId()  + " AND status = " + Status.MEMBER_TYPE.getVal();
-				if(dbCon.stmt.executeUpdate(deleteSQL) > 0){
-					deleteSQL = "DELETE FROM " + Params.dbName + ".discount_plan WHERE discount_id = " + mt.getDiscount().getId();
-					dbCon.stmt.executeUpdate(deleteSQL);
-				}
-			}
-		}
-		
-		// 删除会员类型
-		deleteSQL = "DELETE FROM " + Params.dbName + ".member_type WHERE member_type_id = " + mt.getTypeId() + " AND restaurant_id = " + mt.getRestaurantId();
-		count = dbCon.stmt.executeUpdate(deleteSQL);
-		return count;
 	}
 	
 	/**
-	 * 
-	 * @param mt
-	 * @return
+	 * Delete a member type according to specific id
+	 * @param memberTypeId
+	 * 			the member type id to delete
+	 * @param staff
+	 * 			the staff to perform this action
 	 * @throws BusinessException
+	 * 			throws if the member type does NOT exist
 	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
 	 */
-	public static int deleteMemberType(MemberType mt) throws BusinessException, SQLException {
+	public static void deleteById(Staff staff, int memberTypeId) throws BusinessException, SQLException {
 		DBCon dbCon = new DBCon();
-		int count = 0;
 		try{
 			dbCon.connect();
 			dbCon.conn.setAutoCommit(false);
-			count = MemberTypeDao.deleteMemberType(dbCon, mt);
-			if(count == 0){
-				throw new BusinessException(MemberError.TYPE_DELETE);
-			}
+			deleteById(dbCon, staff, memberTypeId);
 			dbCon.conn.commit();
 		}catch(BusinessException e){
 			dbCon.conn.rollback();
@@ -172,86 +152,78 @@ public class MemberTypeDao {
 		}finally{
 			dbCon.disconnect();
 		}
-		return count;
 	}
-	
+
 	/**
-	 * 
+	 * Update the member type.
 	 * @param dbCon
-	 * @param mt
-	 * @return
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param builder
+	 * 			the builder to update a member type
 	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
 	 * @throws BusinessException
+	 * 			throws if the member type to update does NOT exist
 	 */
-	public static int updateMemberType(DBCon dbCon, MemberType mt) throws SQLException, BusinessException{
-		int count = 0;
-		
-		// 获取原来会员类型信息
-		MemberType oriMemberType = getMemberTypeById(dbCon, mt.getTypeId());
-		
+	public static void update(DBCon dbCon, Staff staff, MemberType.UpdateBuilder builder) throws SQLException, BusinessException{
 		String sql;
+		// 更新数据
+		sql = " UPDATE " + Params.dbName + ".member_type SET " +
+			  (builder.isNameChanged() ? " name = '" + builder.getName() + "', " : "") +
+			  (builder.isExchangRateChanged() ? " exchange_rate = " + builder.getExchangeRate() + ", " : "") +
+			  (builder.isChargeRateChanged() ? " charge_rate = " + builder.getChargeRate() + ", " : "") + 
+			  (builder.isAttributeChanged() ? " attribute = " + builder.getAttribute().getVal() + "," : "") + 
+			  (builder.isInitialPointChanged() ? " initial_point = " + builder.getInitialPoint() : "") +
+			  " WHERE restaurant_id = " + staff.getRestaurantId() +
+			  " AND member_type_id = " + builder.getId();
+		if(dbCon.stmt.executeUpdate(sql) == 0){
+			throw new BusinessException(MemberError.MEMBER_TYPE_NOT_EXIST);
+		}
 		
-		if(oriMemberType.getDiscountType() == DiscountType.DISCOUNT_ENTIRE && mt.getDiscountType() == DiscountType.DISCOUNT_PLAN){
-			//全单折扣->折扣方案
+		if(builder.isDiscountChanged()){
+			sql = " DELETE FROM " + Params.dbName + ".member_type_discount WHERE member_type_id = " + builder.getId();
+			dbCon.stmt.executeUpdate(sql);
 			
-			//删除原来全单折扣方案
-			sql = " DELETE FROM " + Params.dbName + ".discount WHERE discount_id = " + oriMemberType.getDiscount().getId();
-			if(dbCon.stmt.executeUpdate(sql) > 0){
-				sql = " DELETE FROM " + Params.dbName + ".discount_plan WHERE discount_id = " + oriMemberType.getDiscount().getId();
+			//Insert the discounts associated with this member type.
+			for(Discount discount : builder.getDiscounts()){
+				sql = " INSERT INTO " + Params.dbName + ".member_type_discount" +
+					  " (`member_type_id`, `discount_id`, `type`) " +
+					  " VALUES (" +
+					  builder.getId() + "," +
+					  discount.getId() + "," +
+					  MemberType.DiscountType.NORMAL.getVal() + "," +
+					  ")";
 				dbCon.stmt.executeUpdate(sql);
 			}
-			
-		}else if(oriMemberType.getDiscountType() == DiscountType.DISCOUNT_ENTIRE && mt.getDiscountType() == DiscountType.DISCOUNT_ENTIRE){
-			//全单折扣->全单折扣
-			
-			//更新相应的全单折扣方案中的折扣率
-			sql = " UPDATE " + Params.dbName + ".discount_plan SET rate = " + mt.getDiscountRate() + " WHERE discount_id = " + oriMemberType.getDiscount().getId();
-			if(dbCon.stmt.executeUpdate(sql) == 0){
-				throw new BusinessException(MemberError.TYPE_SET_ORDER_DISCOUNT);
-			}
-			
-		}else if(oriMemberType.getDiscountType() == DiscountType.DISCOUNT_PLAN && mt.getDiscountType() == DiscountType.DISCOUNT_PLAN){
-			//折扣方案->折扣方案
-			
-		}else if(oriMemberType.getDiscountType() == DiscountType.DISCOUNT_PLAN && mt.getDiscountType() == DiscountType.DISCOUNT_ENTIRE){
-			//折扣方案->全单折扣
-			
-			//生成全单折扣方案
-			MemberTypeDao.createDiscount(dbCon, mt);
+
+			//Update the default discount.
+			sql = " UPDATE " + Params.dbName + ".member_type_discount" +
+				  " SET type = " + MemberType.DiscountType.DEFAULT.getVal() +
+				  " WHERE member_type_id = " + builder.getId() +
+				  " AND discount_id = " + builder.getDefaultDiscount().getId();
+			dbCon.stmt.executeUpdate(sql);
 		}
-		
-		// 更新数据
-		sql = " UPDATE " + Params.dbName + ".member_type SET " 
-			+ " name = '" + mt.getName() + "', " 
-			+ " discount_id = " + mt.getDiscount().getId() + ", " 
-			+ " discount_type = " + mt.getDiscountType().getVal() + ", " 
-			+ " exchange_rate = " + mt.getExchangeRate() + ", "
-			+ " charge_rate = " + mt.getChargeRate() + ", " 
-			+ " attribute = " + mt.getAttribute().getVal() + "," 
-			+ " initial_point = " + mt.getInitialPoint()
-			+ " WHERE restaurant_id = " + mt.getRestaurantId() 
-			+ " AND member_type_id = " + mt.getTypeId();
-		count = dbCon.stmt.executeUpdate(sql);
-		return count;
 	}
 	
 	/**
-	 * 
-	 * @param mt
-	 * @return
+	 * Update the member type.
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param builder
+	 * 			the builder to update a member type
 	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
 	 * @throws BusinessException
+	 * 			throws if the member type to update does NOT exist
 	 */
-	public static int updateMemberType(MemberType mt) throws SQLException, BusinessException{
+	public static void update(Staff staff, MemberType.UpdateBuilder builder) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
-		int count = 0;
 		try{
 			dbCon.connect();
 			dbCon.conn.setAutoCommit(false);
-			count = MemberTypeDao.updateMemberType(dbCon, mt);
-			if(count == 0){
-				throw new BusinessException(MemberError.TYPE_UPDATE);
-			}
+			MemberTypeDao.update(dbCon, staff, builder);
 			dbCon.conn.commit();
 		}catch(BusinessException e){
 			dbCon.conn.rollback();
@@ -262,63 +234,81 @@ public class MemberTypeDao {
 		}finally{
 			dbCon.disconnect();
 		}
-		return count;
 	}
 	
 	/**
-	 * 
+	 * Get the member type according to specific extra condition and order clause.
 	 * @param dbCon
-	 * @param params
-	 * @return
+	 * 			the database connection
+	 * @param extraCond
+	 * 			the extra condition
+	 * @param orderClause	
+	 * 			the order clause
+	 * @return the result list
 	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException 
+	 * 			throws if any discount associated with the member type is NOT found
 	 */
-	public static List<MemberType> getMemberType(DBCon dbCon, Map<Object, Object> params) throws SQLException{
-		List<MemberType> list = new ArrayList<MemberType>();
-		String sql = " SELECT " 
-				   + " A.member_type_id, A.restaurant_id, A.name, A.discount_id, A.discount_type, A.charge_rate, A.exchange_rate, A.attribute, A.initial_point, "
-				   + " CASE WHEN A.discount_type = 1 THEN ( SELECT t2.rate FROM " + Params.dbName + ".discount t1, " + Params.dbName + ".discount_plan t2 WHERE t1.discount_id = t2.discount_id  AND t1.discount_id = A.discount_id LIMIT 0,1) ELSE 0 END AS discount_rate, "
-				   + " B.name discount_name, B.status discount_status " 
-				   + " FROM " + Params.dbName + ".member_type A LEFT JOIN discount B ON A.discount_id = B.discount_id " 
-				   + " WHERE 1=1 ";
-		sql = SQLUtil.bindSQLParams(sql, params);
+	public static List<MemberType> getMemberType(DBCon dbCon, Staff staff, String extraCond, String orderClause) throws SQLException, BusinessException{
+		List<MemberType> result = new ArrayList<MemberType>();
+		String sql;
+		sql = " SELECT " +
+			  " member_type_id, restaurant_id, exchange_rate, charge_rate, name, attribute, initial_point " +
+			  " FROM " + Params.dbName + ".member_type MT " +
+			  " WHERE 1 = 1 " +
+			  " AND MT.restaurant_id = " + staff.getRestaurantId() +
+			  (extraCond != null ? extraCond : " ") +
+			  (orderClause != null ? orderClause : "");
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
-		MemberType mt = null;
-		while(dbCon.rs != null && dbCon.rs.next()){
-			mt = new MemberType();
+		
+		while(dbCon.rs.next()){
+			MemberType mt = new MemberType();
 			
 			mt.setTypeId(dbCon.rs.getInt("member_type_id"));
 			mt.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
 			mt.setName(dbCon.rs.getString("name"));
-			mt.setDiscountRate(dbCon.rs.getFloat("discount_rate"));
-			mt.setDiscountType(dbCon.rs.getInt("discount_type"));
 			mt.setChargeRate(dbCon.rs.getFloat("charge_rate"));
 			mt.setExchangeRate(dbCon.rs.getFloat("exchange_rate"));
 			mt.setAttribute(dbCon.rs.getInt("attribute"));
 			mt.setInitialPoint(dbCon.rs.getInt("initial_point"));
 			
-			Discount discount = new Discount();
-			discount.setId(dbCon.rs.getInt("discount_id"));
-			discount.setName(dbCon.rs.getString("discount_name"));
-			discount.setStatus(dbCon.rs.getInt("discount_status"));
-			mt.setDiscount(discount);
-			
-			list.add(mt);
-			mt = null;
+			result.add(mt);
 		}
-		return list;
+		dbCon.rs.close();
+		
+		for(MemberType eachType : result){
+			sql = " SELECT discount_id, type FROM " + Params.dbName + ".member_type_discount WHERE member_type_id = " + eachType.getTypeId();
+			dbCon.rs = dbCon.stmt.executeQuery(sql);
+			while(dbCon.rs.next()){
+				Discount distToMemberType = DiscountDao.getDiscountById(staff, dbCon.rs.getInt("discount_id"));
+				eachType.addDiscount(distToMemberType);
+				if(MemberType.DiscountType.valueOf(dbCon.rs.getInt("type")) == MemberType.DiscountType.DEFAULT){
+					eachType.setDefaultDiscount(distToMemberType);
+				}
+			}
+			dbCon.rs.close();
+		}
+		return result;
 	}
 	
 	/**
-	 * 
-	 * @param params
-	 * @return
+	 * Get the member type according to specific extra condition and order clause.
+	 * @param extraCond
+	 * 			the extra condition
+	 * @param orderClause	
+	 * 			the order clause
+	 * @return the result list
 	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException 
+	 * 			throws if any discount associated with the member type is NOT found
 	 */
-	public static List<MemberType> getMemberType(Map<Object, Object> params) throws SQLException{
+	public static List<MemberType> getMemberType(Staff staff, String extraCond, String orderClause) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return MemberTypeDao.getMemberType(dbCon, params);
+			return MemberTypeDao.getMemberType(dbCon, staff, extraCond, orderClause);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -328,6 +318,8 @@ public class MemberTypeDao {
 	 * Get the member type according to a specified id
 	 * @param dbCon
 	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
 	 * @param id
 	 * 			the member type id
 	 * @return	the member type to a specified id
@@ -336,12 +328,10 @@ public class MemberTypeDao {
 	 * @throws BusinessException
 	 * 			throws if the member type to this specified id is NOT found
 	 */
-	public static MemberType getMemberTypeById(DBCon dbCon, int id) throws SQLException, BusinessException{
-		Map<Object, Object> params = new HashMap<Object, Object>();
-		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND A.member_type_id = " + id);
-		List<MemberType> list = MemberTypeDao.getMemberType(dbCon, params);
+	public static MemberType getMemberTypeById(DBCon dbCon, Staff staff, int id) throws SQLException, BusinessException{
+		List<MemberType> list = MemberTypeDao.getMemberType(dbCon, staff, " AND MT.member_type_id = " + id, null);
 		if(list.isEmpty()){
-			throw new BusinessException("The member type(id = " + id + ") is NOT found.");
+			throw new BusinessException(MemberError.MEMBER_TYPE_NOT_EXIST);
 		}else{
 			return list.get(0);
 		}
@@ -351,17 +341,19 @@ public class MemberTypeDao {
 	 * Get the member type according to a specified id
 	 * @param id
 	 * 			the member type id
+	 * @param staff
+	 * 			the staff to perform this action
 	 * @return	the member type to a specified id
 	 * @throws SQLException
 	 * 			throws if fails to execute any SQL statements
 	 * @throws BusinessException
 	 * 			throws if the member type to this specified id is NOT found
 	 */
-	public static MemberType getMemberTypeById(int id) throws SQLException, BusinessException{
+	public static MemberType getMemberTypeById(Staff staff, int id) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return MemberTypeDao.getMemberTypeById(dbCon, id);
+			return MemberTypeDao.getMemberTypeById(dbCon, staff, id);
 		}finally{
 			dbCon.disconnect();
 		}

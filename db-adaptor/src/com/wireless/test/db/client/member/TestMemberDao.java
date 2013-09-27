@@ -5,9 +5,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.beans.PropertyVetoException;
 import java.sql.SQLException;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -27,7 +25,6 @@ import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.DateUtil;
 import com.wireless.test.db.TestInit;
-import com.wireless.util.SQLUtil;
 
 public class TestMemberDao {
 	
@@ -95,9 +92,7 @@ public class TestMemberDao {
 	
 	@Test
 	public void testMemberBasicOperation() throws BusinessException, SQLException{
-		Map<Object, Object> params = new HashMap<Object, Object>();
-		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND A.restaurant_id = " + mStaff.getRestaurantId());
-		List<MemberType> list = MemberTypeDao.getMemberType(params);
+		List<MemberType> list = MemberTypeDao.getMemberType(mStaff, " AND A.restaurant_id = " + mStaff.getRestaurantId(), null);
 		
 		MemberType memberType = null;
 		if(list.isEmpty()){
