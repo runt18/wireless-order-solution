@@ -44,14 +44,14 @@ public class QueryOrderFromMemberPayAction extends Action{
 			
 			com.wireless.pojo.dishesOrder.Order no = new com.wireless.pojo.dishesOrder.Order();
 			no.setId(Integer.valueOf(orderID));
-			no.setDiscount(new Discount(Integer.valueOf(m.getMemberType().getDiscount().getId())));
+			no.setDiscount(new Discount(Integer.valueOf(m.getMemberType().getDefaultDiscount().getId())));
 			no = PayOrder.calcById(staff, no);
 			
-			m.getMemberType().setDiscount(no.getDiscount());
+			m.getMemberType().setDefaultDiscount(no.getDiscount());
 			if(m.getMemberType().getDiscountType() == MemberType.DiscountType.DISCOUNT_ENTIRE){
 				m.getMemberType().setDiscountRate(no.getDiscount().getPlans().get(0).getRate());
 			}
-			m.getMemberType().getDiscount().setPlans(null);
+			m.getMemberType().getDefaultDiscount().setPlans(null);
 			jobject.getOther().put("member", m);
 			jobject.getOther().put("newOrder", no);
 		}catch(BusinessException e){

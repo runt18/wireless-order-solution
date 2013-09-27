@@ -71,13 +71,13 @@ public class OperateMemberTypeAction extends DispatchAction{
 					jobject.initTip(false, WebParams.TIP_TITLE_ERROE, 9971, "操作失败, 获取折扣方案信息失败.");
 					return null;
 				}
-				mt.getDiscount().setId(Integer.valueOf(discountID));
+				mt.getDefaultDiscount().setId(Integer.valueOf(discountID));
 			}else{
 				jobject.initTip(false, WebParams.TIP_TITLE_ERROE, 9973, "操作失败, 折扣信息不完整, 请检查\"折扣方式\"相关信息.");
 				return null;
 			}
 			
-			MemberTypeDao.insertMemberType(mt);
+			MemberTypeDao.insert(mt);
 			jobject.initTip(true, "操作成功, 已添加新会员类型.");
 		}catch(BusinessException e){
 			e.printStackTrace();
@@ -135,14 +135,14 @@ public class OperateMemberTypeAction extends DispatchAction{
 					jobject.initTip(false, WebParams.TIP_TITLE_ERROE, 9972, "操作失败, 获取\"折扣率\"信息失败.");
 					return null;
 				}
-				mt.getDiscount().setId(Integer.valueOf(discountID));
+				mt.getDefaultDiscount().setId(Integer.valueOf(discountID));
 				mt.setDiscountRate(Float.valueOf(discountRate));				
 			}else if(DiscountType.valueOf(Integer.parseInt(discountType)) == DiscountType.DISCOUNT_PLAN){
 				if(discountID == null || discountID.trim().isEmpty()){
 					jobject.initTip(false, WebParams.TIP_TITLE_ERROE, 9971, "操作失败, 获取\"折扣方案\"信息失败.");
 					return null;
 				}
-				mt.getDiscount().setId(Integer.valueOf(discountID));
+				mt.getDefaultDiscount().setId(Integer.valueOf(discountID));
 			}else{
 				jobject.initTip(false, WebParams.TIP_TITLE_ERROE, 9973, "操作失败, 折扣信息不完整, 请检查\"折扣方式\"相关信息.");
 				return null;
@@ -193,9 +193,9 @@ public class OperateMemberTypeAction extends DispatchAction{
 			mt.setRestaurantId(Integer.valueOf(restaurantID));
 			mt.setTypeId(Integer.valueOf(typeID));
 			mt.setDiscountType(Integer.valueOf(discountType));
-			mt.getDiscount().setId(Integer.valueOf(discountID));
+			mt.getDefaultDiscount().setId(Integer.valueOf(discountID));
 			
-			MemberTypeDao.deleteMemberType(mt);
+			MemberTypeDao.deleteById(mt);
 			jobject.initTip(true, "操作成功, 已删除会员类型相关信息.");
 			
 		}catch(BusinessException e){
