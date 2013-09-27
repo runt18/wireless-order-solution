@@ -10,7 +10,7 @@ import com.wireless.json.Jsonable;
 import com.wireless.parcel.Parcel;
 import com.wireless.parcel.Parcelable;
 
-public class Discount implements Jsonable, Parcelable{
+public class Discount implements Jsonable, Parcelable, Comparable<Discount>{
 	
 	public final static List<Discount> EMPTY_LIST = new ArrayList<Discount>(0);
 	
@@ -279,6 +279,17 @@ public class Discount implements Jsonable, Parcelable{
 	@Override
 	public List<Object> toJsonList(int flag) {
 		return null;
+	}
+
+	@Override
+	public int compareTo(Discount discount) {
+		if(getId() > discount.getId()){
+			return 1;
+		}else if(getId() < discount.getId()){
+			return -1;
+		}else{
+			return 0;
+		}
 	}
 
 }

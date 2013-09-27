@@ -1,5 +1,6 @@
 package com.wireless.pojo.client;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -9,6 +10,41 @@ import com.wireless.json.Jsonable;
 import com.wireless.pojo.distMgr.Discount;
 
 public class MemberType implements Jsonable{
+	
+	public static enum DiscountType{
+		NORMAL(1, "普通"),
+		DEFAULT(2, "默认");
+		
+		private final int val;
+		private final String desc;
+		
+		DiscountType(int val, String desc){
+			this.val = val;
+			this.desc = desc;
+		}
+		
+		public static DiscountType valueOf(int val){
+			for(DiscountType type : values()){
+				if(type.val == val){
+					return type;
+				}
+			}
+			throw new IllegalArgumentException("The val(" + val + ") is invalid.");
+		}
+		
+		public int getVal(){
+			return val;
+		}
+		
+		public String getDesc(){
+			return desc;
+		}
+		
+		@Override
+		public String toString(){
+			return desc;
+		}
+	}
 	
 	public static enum Attribute{
 		
@@ -48,55 +84,211 @@ public class MemberType implements Jsonable{
 		}
 	}
 	
-	public static enum DiscountType{
-		DISCOUNT_PLAN(0, "折扣方案"),
-		DISCOUNT_ENTIRE(1, "全单折扣");
+	//The helper class to insert a member type
+	public static class InsertBuilder{
+		private final int restaurantId;
+		private final String name;
+		private final Discount defaultDiscount;
 		
-		private final int val;
-		private final String desc;
-		
-		DiscountType(int val, String desc){
-			this.val = val;
-			this.desc = desc;
+		private List<Discount> discounts = new ArrayList<Discount>();
+		private float exchangeRate = 1;
+		private float chargeRate = 1;
+		private Attribute attribute = Attribute.POINT;
+		private int initialPoint = 0;
+
+		public InsertBuilder(int restaurantId, String name, Discount defaultDiscount){
+			this.restaurantId = restaurantId;
+			this.name = name;
+			discounts.add(defaultDiscount);
+			this.defaultDiscount = defaultDiscount;
 		}
-		
-		@Override
-		public String toString(){
-			return "discount type(val = " + val + ",desc = " + desc + ")";
-		}
-		
-		public static DiscountType valueOf(int val){
-			for(DiscountType type : values()){
-				if(type.val == val){
-					return type;
-				}
+
+		public InsertBuilder addDiscount(Discount discount){
+			if(!discounts.contains(discount)){
+				discounts.add(discount);
 			}
-			throw new IllegalArgumentException("The discount type(val = " + val + ") is invalid.");
+			return this;
 		}
 		
-		public int getVal(){
-			return val;
+		public InsertBuilder setExchangeRate(float exchangeRate){
+			if(exchangeRate < 0){
+				throw new IllegalArgumentException();
+			}else{
+				this.exchangeRate = exchangeRate;
+			}
+			return this;
 		}
 		
-		public String getDesc(){
-			return desc;
+		public InsertBuilder setChargeRate(float chargeRate){
+			if(chargeRate < 0){
+				throw new IllegalArgumentException();
+			}else{
+				this.chargeRate = chargeRate;
+			}
+			return this;
+		}
+		
+		public InsertBuilder setAttribute(Attribute attribute){
+			this.attribute = attribute;
+			return this;
+		}
+		
+		public InsertBuilder setInitialPoint(int initialPoint){
+			this.initialPoint = initialPoint;
+			return this;
+		}
+		
+		public MemberType build(){
+			return new MemberType(this);
+		}
+	}
+	
+	public static class UpdateBuilder{
+		private final int id;
+		
+		private String name;
+		private Discount defaultDiscount;
+		private List<Discount> discounts = new ArrayList<Discount>();
+		private float exchangeRate = -1;
+		private float chargeRate = -1;
+		private Attribute attribute;
+		private int initialPoint = -1;
+		
+		public UpdateBuilder(int id){
+			this.id = id;
+		}
+		
+		public int getId(){
+			return this.id;
+		}
+		
+		public UpdateBuilder setName(String name){
+			this.name = name;
+			return this;
+		}
+		
+		public String getName(){
+			return this.name;
+		}
+		
+		public boolean isNameChanged(){
+			return name != null;
+		}
+		
+		public UpdateBuilder setDefaultDiscount(Discount discount){
+			this.defaultDiscount = discount;
+			addDiscount(discount);
+			return this;
+		}
+		
+		public Discount getDefaultDiscount(){
+			return this.defaultDiscount;
+		}
+		
+		public UpdateBuilder addDiscount(Discount discount){
+			if(!discounts.contains(discount)){
+				discounts.add(discount);
+			}
+			return this;
+		}
+		
+		public List<Discount> getDiscounts(){
+			return this.discounts;
+		}
+		
+		public boolean isDiscountChanged(){
+			return discounts.isEmpty();
+		}
+		
+		public UpdateBuilder setExchangeRate(float exchangeRate){
+			if(exchangeRate < 0){
+				throw new IllegalArgumentException();
+			}else{
+				this.exchangeRate = exchangeRate;
+			}
+			return this;
+		}
+		
+		public float getExchangeRate(){
+			return exchangeRate;
+		}
+		
+		public boolean isExchangRateChanged(){
+			return exchangeRate >= 0;
+		}
+		
+		public UpdateBuilder setChargeRate(float chargeRate){
+			if(chargeRate < 0){
+				throw new IllegalArgumentException();
+			}else{
+				this.chargeRate = chargeRate;
+			}
+			return this;
+		}
+		
+		public float getChargeRate(){
+			return chargeRate;
+		}
+		
+		public boolean isChargeRateChanged(){
+			return chargeRate >= 0;
+		}
+		
+		public UpdateBuilder setAttribute(Attribute attribute){
+			this.attribute = attribute;
+			return this;
+		}
+		
+		public Attribute getAttribute(){
+			return this.attribute;
+		}
+		
+		public boolean isAttributeChanged(){
+			return attribute != null;
+		}
+		
+		public UpdateBuilder setInitialPoint(int initialPoint){
+			if(initialPoint < 0){
+				throw new IllegalArgumentException();
+			}else{
+				this.initialPoint = initialPoint;
+			}
+			return this;
+		}
+		
+		public int getInitialPoint(){
+			return this.initialPoint;
+		}
+		
+		public boolean isInitialPointChanged(){
+			return initialPoint >= 0;
 		}
 	}
 	
 	private int typeId;
 	private int restaurantId;
 	private String name;
-	private Discount discount;
-	private DiscountType discountType;
-	private float discountRate;
+	private List<Discount> discounts = new ArrayList<Discount>();
+	private Discount defaultDiscount;
 	private float exchangeRate;
 	private float chargeRate;
 	private Attribute attribute;
 	private int initialPoint;
 	
 	
+	private MemberType(InsertBuilder builder){
+		setRestaurantId(builder.restaurantId);
+		setName(builder.name);
+		setDiscounts(builder.discounts);
+		setDefaultDiscount(builder.defaultDiscount);
+		setExchangeRate(builder.exchangeRate);
+		setChargeRate(builder.chargeRate);
+		setAttribute(builder.attribute);
+		setInitialPoint(builder.initialPoint);
+	}
+	
 	public MemberType(){
-		this.discount = new Discount();
+		this.defaultDiscount = new Discount();
 	}
 	
 	public int getInitialPoint() {
@@ -110,53 +302,65 @@ public class MemberType implements Jsonable{
 	public int getTypeId() {
 		return typeId;
 	}
+	
 	public void setTypeId(int typeId) {
 		this.typeId = typeId;
 	}
+	
 	public int getRestaurantId() {
 		return restaurantId;
 	}
+	
 	public void setRestaurantId(int restaurantId) {
 		this.restaurantId = restaurantId;
 	}
+	
 	public String getName() {
 		return name;
 	}
+	
 	public void setName(String name) {
 		this.name = name;
 	}
-	public Discount getDiscount() {
-		return discount;
-	}
-	public void setDiscount(Discount discount) {
-		this.discount = discount;
-	}
-	public DiscountType getDiscountType() {
-		return discountType;
+	
+	public List<Discount> getDiscounts(){
+		return Collections.unmodifiableList(this.discounts);
 	}
 	
-	public void setDiscountType(DiscountType discountType){
-		this.discountType = discountType;
+	public void setDiscounts(List<Discount> discounts){
+		if(discounts != null){
+			discounts.clear();
+			discounts.addAll(discounts);
+		}
 	}
 	
-	public void setDiscountType(int val) {
-		this.discountType = DiscountType.valueOf(val);
+	public void addDiscount(Discount discount){
+		if(!discounts.contains(discount)){
+			discounts.add(discount);
+		}
 	}
-	public float getDiscountRate() {
-		return discountRate;
+	
+	public Discount getDefaultDiscount() {
+		return defaultDiscount;
 	}
-	public void setDiscountRate(float discountRate) {
-		this.discountRate = discountRate;
+	
+	public void setDefaultDiscount(Discount defaultDiscount) {
+		addDiscount(defaultDiscount);
+		this.defaultDiscount = defaultDiscount;
 	}
+	
 	public float getChargeRate() {
 		return chargeRate;
 	}
+	
 	public void setChargeRate(float chargeRate) {
 		this.chargeRate = chargeRate;
 	}
+	
 	public float getExchangeRate() {
 		return exchangeRate;
 	}
+	
 	public void setExchangeRate(float exchangeRate) {
 		this.exchangeRate = exchangeRate;
 	}
@@ -164,9 +368,11 @@ public class MemberType implements Jsonable{
 	public Attribute getAttribute() {
 		return this.attribute;
 	}
+	
 	public void setAttribute(Attribute attribute) {
 		this.attribute = attribute;
 	}
+	
 	public void setAttribute(int attributeVal) {
 		this.attribute = Attribute.valueOf(attributeVal);
 	}
@@ -198,20 +404,20 @@ public class MemberType implements Jsonable{
 		jm.put("id", this.typeId);
 		jm.put("rid", this.restaurantId);
 		jm.put("name", this.name);
-		jm.put("discountRate", this.discountRate);
+		//jm.put("discountRate", this.discountRate);
 		jm.put("exchangeRate", this.exchangeRate);
 		jm.put("chargeRate", this.chargeRate);
 		jm.put("initialPoint", this.initialPoint);
-		if(this.discountType != null){
-			jm.put("discountTypeText", this.discountType.getDesc());			
-			jm.put("discountTypeValue", this.discountType.getVal());
-		}
+//		if(this.discountType != null){
+//			jm.put("discountTypeText", this.discountType.getDesc());			
+//			jm.put("discountTypeValue", this.discountType.getVal());
+//		}
 		if(this.attribute != null){
 			jm.put("attributeText", this.attribute.getDesc());			
 			jm.put("attributeValue", this.attribute.getVal());
 		}
-		if(this.discount != null){
-			jm.put("discount", this.discount);
+		if(this.defaultDiscount != null){
+			jm.put("discount", this.defaultDiscount);
 		}
 		
 		return Collections.unmodifiableMap(jm);
