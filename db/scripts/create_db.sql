@@ -118,6 +118,7 @@ DROP TABLE IF EXISTS `wireless_order_db`.`restaurant` ;
 CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`restaurant` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'the id to this restaurant, id 1 indicates the root user, id 2 indicates idle-repository, id 3 indicates discarded-repository' ,
   `account` VARCHAR(45) NOT NULL COMMENT 'the account for the restaurant to log in' ,
+  `birth_date` DATETIME NULL ,
   `restaurant_name` VARCHAR(50) NOT NULL DEFAULT '' COMMENT 'the restaurant name ' ,
   `restaurant_info` VARCHAR(300) NOT NULL DEFAULT '' COMMENT 'the restaurant info' ,
   `tele1` VARCHAR(45) NOT NULL DEFAULT '' COMMENT 'One of the telephones to this restaurant.' ,
@@ -125,6 +126,7 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`restaurant` (
   `address` VARCHAR(70) NOT NULL DEFAULT '' COMMENT 'The address to this restaurant.' ,
   `record_alive` BIGINT NOT NULL DEFAULT 0 COMMENT 'Indicates how long the order record of this restaurant can be persisted. It\'s represented in second. Value 0 means the records never expire.' ,
   `expire_date` DATETIME NULL DEFAULT NULL ,
+  `live_ness` FLOAT NOT NULL DEFAULT 0 ,
   PRIMARY KEY (`id`, `account`) ,
   UNIQUE INDEX `account_UNIQUE` (`account` ASC) )
 ENGINE = InnoDB
@@ -240,8 +242,6 @@ DROP TABLE IF EXISTS `wireless_order_db`.`member_type` ;
 CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`member_type` (
   `member_type_id` INT NOT NULL AUTO_INCREMENT COMMENT 'the id to member type' ,
   `restaurant_id` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the restaurant id to this member type' ,
-  `discount_id` INT UNSIGNED NOT NULL COMMENT 'the discount id this member type uses' ,
-  `discount_type` TINYINT NOT NULL DEFAULT 0 COMMENT 'the discount type is as below.\n0 - discount plan\n1 - entire ' ,
   `exchange_rate` FLOAT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the exchange rate used to transfer the price to point' ,
   `charge_rate` FLOAT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the charge rate used to transfer money to balance' ,
   `name` VARCHAR(45) NOT NULL COMMENT 'the name to this member type' ,
@@ -566,6 +566,8 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`member` (
   `restaurant_id` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'the restaurant id to this member' ,
   `member_type_id` INT NOT NULL COMMENT 'the type this member belongs to' ,
   `member_card` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the card this member owns' ,
+  `liveness` FLOAT NULL DEFAULT 0 ,
+  `last_consumption` DATETIME NULL ,
   `consumption_amount` INT NULL DEFAULT 0 ,
   `total_consumption` FLOAT NULL DEFAULT 0 ,
   `total_point` INT NULL DEFAULT 0 ,
@@ -1193,7 +1195,7 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`role` (
   `restaurant_id` INT NOT NULL DEFAULT 0 ,
   `name` VARCHAR(45) NOT NULL DEFAULT '' ,
   `type` TINYINT NOT NULL DEFAULT 1 COMMENT 'the type to role as below.\n1 - 普通\n2 - 系统保留' ,
-  `cate` TINYINT NOT NULL DEFAULT 6 COMMENT 'the category to role as below.\n1 - 管理员\n2 - 老板\n3 - 财务\n4 - 部长\n5 - 服务员\n6 - 其他\n' ,
+  `cate` TINYINT NOT NULL DEFAULT 6 COMMENT 'the category to role as below.\n1 - 管理员\n2 - 老板\n3 - 财务\n4 - 店长\n5 - 收银员\n6 - 服务员\n7 - 其他\n' ,
   PRIMARY KEY (`role_id`) ,
   INDEX `ix_restaurant_id` (`restaurant_id` ASC) )
 ENGINE = InnoDB
@@ -1248,7 +1250,7 @@ DROP TABLE IF EXISTS `wireless_order_db`.`privilege` ;
 
 CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`privilege` (
   `pri_id` INT NOT NULL AUTO_INCREMENT ,
-  `pri_code` INT NOT NULL COMMENT 'the privilege code as below:\n1000 - 退菜\n1001 - 打折\n1002 - 赠送\n1003 - 反结帐\n2000 - 后台\n3000 - 库存\n4000 - 历史\n5000 - 会员\n6000 - 系统' ,
+  `pri_code` INT NOT NULL COMMENT 'the privilege code as below:\n1000 - 点菜\n1001 - 退菜\n1002 - 打折\n1003 - 赠送\n1004 - 反结帐\n1005 - 结帐\n1006 - 账单\n2000 - 后台\n3000 - 库存\n4000 - 历史\n5000 - 会员\n6000 - 系统' ,
   `cate` TINYINT NOT NULL COMMENT 'the category to privilege as below.\n1 - 前台\n2 - 后台\n3 - 库存\n4 - 历史\n5 - 会员\n6 - 系统' ,
   PRIMARY KEY (`pri_id`) ,
   INDEX `ix_privilege_code` (`pri_code` ASC) )
@@ -1284,6 +1286,44 @@ CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`role_discount` (
 ENGINE = InnoDB;
 
 
+-- -----------------------------------------------------
+-- Table `wireless_order_db`.`member_type_discount`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `wireless_order_db`.`member_type_discount` ;
+
+CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`member_type_discount` (
+  `member_type_id` INT NOT NULL ,
+  `discount_id` INT NOT NULL ,
+  `type` TINYINT NOT NULL DEFAULT 1 COMMENT 'the type to this member discount as below.\n1 - 普通\n2 - 默认' ,
+  PRIMARY KEY (`member_type_id`, `discount_id`) )
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
+
+-- -----------------------------------------------------
+-- Table `wireless_order_db`.`member_favor_food`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `wireless_order_db`.`member_favor_food` ;
+
+CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`member_favor_food` (
+)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
+
+-- -----------------------------------------------------
+-- Table `wireless_order_db`.`interested_member`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `wireless_order_db`.`interested_member` ;
+
+CREATE  TABLE IF NOT EXISTS `wireless_order_db`.`interested_member` (
+  `staff_id` INT NOT NULL ,
+  `member_id` INT NOT NULL ,
+  PRIMARY KEY (`staff_id`, `member_id`) )
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
+
 
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
@@ -1309,19 +1349,6 @@ INSERT INTO `wireless_order_db`.`restaurant` (`id`, `pwd`, `account`, `restauran
 INSERT INTO `wireless_order_db`.`restaurant` (`id`, `pwd`, `account`, `restaurant_name`, `record_alive`) VALUES ('10', MD5('reserved@123'), 'reserved7', 'reserved7', '0');
 COMMIT;
 SET AUTOCOMMIT=1;
-
--- -----------------------------------------------------
--- View`restaurant_view`
--- -----------------------------------------------------
-DROP VIEW IF EXISTS restaurant_view;
-
-CREATE VIEW `restaurant_view` AS select `r`.`id` AS `id`,`r`.`account` AS `account`,`r`.`restaurant_name` AS `restaurant_name`,`r`.`tele1` AS `tele1`,`r`.`tele2` AS `tele2`,`r`.`address` AS `address`,`r`.`restaurant_info` AS `restaurant_info`,`r`.`record_alive` AS `record_alive`,(select count(`order`.`id`) from `order` where (`order`.`restaurant_id` = `r`.`id`)) AS `order_num`,(select count(`order_history`.`id`) from `order_history` where (`order_history`.`restaurant_id` = `r`.`id`)) AS `order_history_num`,(select count(`terminal`.`pin`) from `terminal` where ((`terminal`.`restaurant_id` = `r`.`id`) and (`terminal`.`model_id` <= 0x7f))) AS `terminal_num`,(select count(`terminal`.`pin`) from `terminal` where ((`terminal`.`restaurant_id` = `r`.`id`) and (`terminal`.`model_id` > 0x7f))) AS `terminal_virtual_num`,(select count(`food`.`food_id`) from `food` where (`food`.`restaurant_id` = `r`.`id`)) AS `food_num`,(select count(`table`.`table_id`) from `table` where (`table`.`restaurant_id` = `r`.`id`)) AS `table_num`,(select count(`order`.`id`) from `order` where ((`order`.`restaurant_id` = `r`.`id`) and (`order`.`total_price` is not null))) AS `order_paid`,(select count(`order_history`.`id`) from `order_history` where ((`order_history`.`restaurant_id` = `r`.`id`) and (`order_history`.`total_price` is not null))) AS `order_history_paid`,(select count(`table`.`table_id`) from `table` where ((`table`.`restaurant_id` = `r`.`id`) and exists(select 1 from `order` where ((`order`.`table_alias` = `table`.`table_alias`) and isnull(`order`.`total_price`) and (`order`.`restaurant_id` = `r`.`id`))))) AS `table_using` from `restaurant` `r`;
-
--- -----------------------------------------------------
--- View`terminal_view`
--- -----------------------------------------------------
-DROP VIEW IF EXISTS terminal_view;
-CREATE VIEW `terminal_view` AS select `t`.`pin` AS `pin`,`t`.`restaurant_id` AS `restaurant_id`,`r`.`restaurant_name` AS `restaurant_name`,`t`.`model_name` AS `model_name`,`t`.`model_id` AS `model_id`,(case `t`.`model_id` when 0 then 'BlackBerry' when 1 then 'Android' when 2 then 'iPhone' when 3 then 'WindowsMobile' end) AS `model_id_name`,`t`.`entry_date` AS `entry_date`,`t`.`discard_date` AS `discard_date`,format((((`t`.`idle_duration` / 3600) / 24) / 30),1) AS `idle_month`,format((((`t`.`work_duration` / 3600) / 24) / 30),1) AS `work_month`,`t`.`expire_date` AS `expire_date`,(case when (`t`.`restaurant_id` = 2) then '空闲' when (`t`.`restaurant_id` = 3) then '废弃' when ((`t`.`restaurant_id` > 10) and (now() <= `t`.`expire_date`)) then '使用' when ((`t`.`restaurant_id` > 10) and (now() > `t`.`expire_date`)) then '过期' end) AS `status`,format(((`t`.`work_duration` / (`t`.`work_duration` + `t`.`idle_duration`)) * 100),0) AS `use_rate`,`t`.`owner_name` AS `owner_name`,`t`.`idle_duration` AS `idle_duration`,`t`.`work_duration` AS `work_duration` from (`terminal` `t` left join `restaurant` `r` on((`t`.`restaurant_id` = `r`.`id`)));
 
 
 
