@@ -17,6 +17,7 @@ import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.client.Member;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.util.SQLUtil;
 import com.wireless.util.WebParams;
 
@@ -43,7 +44,7 @@ public class QueryMemberAction extends DispatchAction {
 		String limit = request.getParameter("limit");
 		try{
 			String pin = (String)request.getAttribute("pin");
-			StaffDao.verify(Integer.parseInt(pin));
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
 			String extraCond = " ", orderClause = " ";
 			String id = request.getParameter("id");
@@ -121,10 +122,9 @@ public class QueryMemberAction extends DispatchAction {
 				countSet.put(SQLUtil.SQL_PARAMS_EXTRA, extraCond);
 				jobject.setTotalProperty(MemberDao.getMemberCount(countSet));
 				// 分页
-				paramsSet.put(SQLUtil.SQL_PARAMS_LIMIT_OFFSET, start);
-				paramsSet.put(SQLUtil.SQL_PARAMS_LIMIT_ROWCOUNT, limit);
+				orderClause += " LIMIT " + start + "," + limit;
 			}
-			list = MemberDao.getMember(paramsSet);
+			list = MemberDao.getMember(staff, extraCond, orderClause);
 			jobject.setRoot(list);
 			
 		}catch(BusinessException e){

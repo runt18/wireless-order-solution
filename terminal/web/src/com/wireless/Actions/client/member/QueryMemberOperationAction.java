@@ -18,6 +18,7 @@ import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.client.MemberOperation;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.util.DateType;
 import com.wireless.util.SQLUtil;
 import com.wireless.util.WebParams;
@@ -37,7 +38,7 @@ public class QueryMemberOperationAction extends Action{
 		try{
 			
 			String pin = (String)request.getAttribute("pin");
-			StaffDao.verify(Integer.parseInt(pin));
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
 			String restaurantID = request.getParameter("restaurantID");
 			String dataSource = request.getParameter("dataSource");
@@ -94,7 +95,7 @@ public class QueryMemberOperationAction extends Action{
 			}
 			if(list != null){
 				for(MemberOperation temp : list){
-					temp.setMember(MemberDao.getMemberById(temp.getMemberId()));
+					temp.setMember(MemberDao.getMemberById(staff, temp.getMemberId()));
 				}
 			}
 			jobject.setRoot(list);

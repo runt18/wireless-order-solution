@@ -19,6 +19,7 @@ import com.wireless.json.JObject;
 import com.wireless.pojo.client.MOSummary;
 import com.wireless.pojo.client.MemberOperation;
 import com.wireless.pojo.client.MemberOperation.OperationType;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.util.DateType;
 import com.wireless.util.SQLUtil;
 import com.wireless.util.WebParams;
@@ -37,7 +38,7 @@ public class QueryMemberOperationSummaryAction extends DispatchAction{
 		JObject jobject = new JObject();
 		try{
 			String pin = (String)request.getAttribute("pin");
-			StaffDao.verify(Integer.parseInt(pin));
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
 			String restaurantID = request.getParameter("restaurantID");
 			String dataSource = request.getParameter("dataSource");
@@ -81,7 +82,7 @@ public class QueryMemberOperationSummaryAction extends DispatchAction{
 					params.put(SQLUtil.SQL_PARAMS_LIMIT_ROWCOUNT, Integer.valueOf(limit));
 				}
 				params.put(SQLUtil.SQL_PARAMS_ORDERBY, define(ot));
-				list = MemberOperationDao.getSummaryByHistory(params);
+				list = MemberOperationDao.getSummaryByHistory(staff, params);
 			}else if(DateType.getType(dataSource).isToday()){
 				if(isPaging != null && Boolean.valueOf(isPaging)){
 					jobject.setTotalProperty(MemberOperationDao.getSummaryByTodayCount(params));
@@ -90,7 +91,7 @@ public class QueryMemberOperationSummaryAction extends DispatchAction{
 					params.put(SQLUtil.SQL_PARAMS_LIMIT_ROWCOUNT, Integer.valueOf(limit));
 				}
 				params.put(SQLUtil.SQL_PARAMS_ORDERBY, define(ot));
-				list = MemberOperationDao.getSummaryByToday(params);
+				list = MemberOperationDao.getSummaryByToday(staff, params);
 			}
 			
 			jobject.setRoot(list);

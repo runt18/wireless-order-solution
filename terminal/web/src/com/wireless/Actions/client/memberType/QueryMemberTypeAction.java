@@ -1,9 +1,7 @@
 package com.wireless.Actions.client.memberType;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -18,7 +16,7 @@ import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.client.MemberType;
-import com.wireless.util.SQLUtil;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.util.WebParams;
 
 public class QueryMemberTypeAction extends DispatchAction {
@@ -43,7 +41,7 @@ public class QueryMemberTypeAction extends DispatchAction {
 		try{
 			
 			String pin = (String)request.getAttribute("pin");
-			StaffDao.verify(Integer.parseInt(pin));
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
 			String restaurantID = request.getParameter("restaurantID");
 			String name = request.getParameter("name");
@@ -61,10 +59,7 @@ public class QueryMemberTypeAction extends DispatchAction {
 				extraCond += (" AND A.attribute = " + attr);
 			}
 			
-			Map<Object, Object> paramsSet = new HashMap<Object, Object>();
-			paramsSet.put(SQLUtil.SQL_PARAMS_EXTRA, extraCond);
-			paramsSet.put(SQLUtil.SQL_PARAMS_ORDERBY, " ORDER BY A.member_type_id ");
-			list = MemberTypeDao.getMemberType(paramsSet);
+			list = MemberTypeDao.getMemberType(staff, extraCond, " ORDER BY MT.member_type_id ");
 			
 		}catch(BusinessException e){
 			e.printStackTrace();
@@ -96,13 +91,10 @@ public class QueryMemberTypeAction extends DispatchAction {
 			throws Exception {
 		request.setCharacterEncoding("UTF-8");
 		response.setCharacterEncoding("UTF-8");
-		StringBuffer tsb = new StringBuffer();
+		StringBuilder tsb = new StringBuilder();
 		try{
-			String restaurantId = request.getParameter("restaurantId");
-			Map<Object, Object> paramsSet = new HashMap<Object, Object>();
-			paramsSet.put(SQLUtil.SQL_PARAMS_EXTRA, " AND A.restaurant_id = " + restaurantId);
-			paramsSet.put(SQLUtil.SQL_PARAMS_ORDERBY, " ORDER BY A.member_type_id ");
-			List<MemberType> list = MemberTypeDao.getMemberType(paramsSet);
+			String pin = (String)request.getAttribute("pin");
+			List<MemberType> list = MemberTypeDao.getMemberType(StaffDao.verify(Integer.parseInt(pin)), null, " ORDER BY MT.member_type_id ");
 			MemberType item = null;
 			
 			StringBuilder change = new StringBuilder(), point = new StringBuilder();
