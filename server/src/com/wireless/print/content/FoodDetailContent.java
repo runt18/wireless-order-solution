@@ -29,7 +29,12 @@ public class FoodDetailContent extends ConcreteContent {
 		
 		_format = _format.replace(PVar.FOOD_NAME, _food.getName());
 		_format = _format.replace(PVar.FOOD_AMOUNT, "(" + NumericUtil.float2String2(_food.getCount()) + ")");
-		String foodPrice = NumericUtil.CURRENCY_SIGN + NumericUtil.float2String(_food.calcPriceWithTaste());
+		String foodPrice;
+		if(_format.contains(PVar.FOOD_DISCOUNT)){
+			foodPrice = NumericUtil.CURRENCY_SIGN + NumericUtil.float2String(_food.calcPriceWithTaste());
+		}else{
+			foodPrice = NumericUtil.CURRENCY_SIGN + NumericUtil.float2String(_food.calcPriceBeforeDiscount());
+		}
 		
 		String taste = null;
 		if(_food.hasTaste()){
