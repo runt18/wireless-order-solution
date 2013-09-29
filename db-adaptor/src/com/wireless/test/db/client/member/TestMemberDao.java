@@ -34,7 +34,7 @@ public class TestMemberDao {
 	public static void initDbParam() throws PropertyVetoException, BusinessException{
 		TestInit.init();
 		try {
-			mStaff = StaffDao.getStaffs(37).get(0);
+			mStaff = StaffDao.getStaffs(63).get(0);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -92,7 +92,7 @@ public class TestMemberDao {
 	
 	@Test
 	public void testMemberBasicOperation() throws BusinessException, SQLException{
-		List<MemberType> list = MemberTypeDao.getMemberType(mStaff, " AND A.restaurant_id = " + mStaff.getRestaurantId(), null);
+		List<MemberType> list = MemberTypeDao.getMemberType(mStaff, null, null);
 		
 		MemberType memberType = null;
 		if(list.isEmpty()){
@@ -122,7 +122,7 @@ public class TestMemberDao {
 			//Set the initial point to expected member
 			expect.setPoint(memberType.getInitialPoint());
 			
-			Member actual = MemberDao.getMemberById(memberId);
+			Member actual = MemberDao.getMemberById(mStaff, memberId);
 			
 			//Compare the member just inserted
 			compareMember(expect, actual);
@@ -145,7 +145,7 @@ public class TestMemberDao {
 			//Set the initial point to expected member
 			expect.setPoint(memberType.getInitialPoint());
 			
-			actual = MemberDao.getMemberById(memberId);
+			actual = MemberDao.getMemberById(mStaff, memberId);
 			
 			//Compare the member after update
 			compareMember(expect, actual);
@@ -170,7 +170,7 @@ public class TestMemberDao {
 			MemberDao.deleteById(mStaff, memberId);
 			//Check to see whether the member is deleted
 			try{
-				MemberDao.getMemberById(memberId);
+				MemberDao.getMemberById(mStaff, memberId);
 				assertTrue("failed to delete member", false);
 			}catch(BusinessException ignored){}
 			
@@ -185,7 +185,7 @@ public class TestMemberDao {
 		MemberOperation mo = MemberDao.charge(mStaff, expect.getId(), 100, ChargeType.CASH);
 		expect.charge(100, ChargeType.CASH);
 		
-		compareMember(expect, MemberDao.getMemberById(expect.getId()));
+		compareMember(expect, MemberDao.getMemberById(mStaff, expect.getId()));
 		compareMemberOperation(mo, MemberOperationDao.getTodayById(mo.getId()));
 	}
 	
@@ -197,14 +197,14 @@ public class TestMemberDao {
 		MemberOperation mo = MemberDao.consume(mStaff, expect.getId(), 50, Order.PayType.MEMBER, 10);
 		expect.consume(50, Order.PayType.MEMBER);
 		
-		compareMember(expect, MemberDao.getMemberById(expect.getId()));
+		compareMember(expect, MemberDao.getMemberById(mStaff, expect.getId()));
 		compareMemberOperation(mo, MemberOperationDao.getTodayById(mo.getId()));
 		
 		//使用现金消费
 		mo = MemberDao.consume(mStaff, expect.getId(), 50, Order.PayType.CASH, 10);
 		expect.consume(50, Order.PayType.CASH);
 		
-		compareMember(expect, MemberDao.getMemberById(expect.getId()));
+		compareMember(expect, MemberDao.getMemberById(mStaff, expect.getId()));
 		compareMemberOperation(mo, MemberOperationDao.getTodayById(mo.getId()));
 			
 	}
@@ -213,7 +213,7 @@ public class TestMemberDao {
 		MemberOperation mo = MemberDao.pointConsume(mStaff, expect.getId(), 20);
 		expect.pointConsume(20);
 		
-		compareMember(expect, MemberDao.getMemberById(expect.getId()));
+		compareMember(expect, MemberDao.getMemberById(mStaff, expect.getId()));
 		compareMemberOperation(mo, MemberOperationDao.getTodayById(mo.getId()));
 	}
 	
@@ -221,7 +221,7 @@ public class TestMemberDao {
 		MemberOperation mo = MemberDao.adjustPoint(mStaff, expect.getId(), 10, AdjustType.INCREASE);
 		expect.adjustPoint(10, AdjustType.INCREASE);
 		
-		compareMember(expect, MemberDao.getMemberById(expect.getId()));
+		compareMember(expect, MemberDao.getMemberById(mStaff, expect.getId()));
 		compareMemberOperation(mo, MemberOperationDao.getTodayById(mo.getId()));
 	}
 	
@@ -229,7 +229,7 @@ public class TestMemberDao {
 		MemberOperation mo = MemberDao.adjustBalance(mStaff, expect.getId(), 10);
 		expect.adjustBalance(10);
 		
-		compareMember(expect, MemberDao.getMemberById(expect.getId()));
+		compareMember(expect, MemberDao.getMemberById(mStaff, expect.getId()));
 		compareMemberOperation(mo, MemberOperationDao.getTodayById(mo.getId()));
 	}
 }

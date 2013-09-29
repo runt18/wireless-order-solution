@@ -3,7 +3,6 @@ package com.wireless.db.client.member;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -66,28 +65,35 @@ public class MemberDao {
 	
 	
 	/**
-	 * Get member by extra condition
+	 * Get member by extra condition.
 	 * @param dbCon
-	 * @param params
-	 * @return the list holding the  result
+	 * 			the database connection
+	 * @param extraCond
+	 * 			the extra condition
+	 * @param orderClause
+	 * 			the order clause 
+	 * @return the list holding the result
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static List<Member> getMember(DBCon dbCon, Map<Object, Object> params) throws SQLException{
+	public static List<Member> getMember(DBCon dbCon, Staff staff, String extraCond, String orderClause) throws SQLException{
 		List<Member> result = new ArrayList<Member>();
-		String sql = " SELECT "
-			+ " M.member_id, M.restaurant_id, M.point, M.used_point, "
-			+ " M.base_balance, M.extra_balance, M.consumption_amount, M.used_balance,"
-			+ " M.total_consumption, M.total_point, M.total_charge, " 
-			+ " M.member_card, M.name AS member_name, M.sex, M.create_date, "
-			+ " M.tele, M.mobile, M.birthday, M.id_card, M.company, M.taste_pref, M.taboo, M.contact_addr, M.comment, "
-			+ " MT.member_type_id, MT.charge_rate, MT.exchange_rate, " 
-			+ " MT.name AS member_type_name, MT.attribute, MT.initial_point "
-			+ " FROM " 
-			+ Params.dbName + ".member M " 
-			+ " JOIN " + Params.dbName + ".member_type MT ON M.member_type_id = MT.member_type_id " 
-			+ " WHERE 1=1 ";
-		sql = SQLUtil.bindSQLParams(sql, params);
+		String sql;
+		sql = " SELECT "	+
+			  " M.member_id, M.restaurant_id, M.point, M.used_point, " +
+			  " M.base_balance, M.extra_balance, M.consumption_amount, M.used_balance," +
+			  " M.total_consumption, M.total_point, M.total_charge, " +
+			  " M.member_card, M.name AS member_name, M.sex, M.create_date, " +
+			  " M.tele, M.mobile, M.birthday, M.id_card, M.company, M.taste_pref, M.taboo, M.contact_addr, M.comment, "	+
+			  " MT.member_type_id, MT.charge_rate, MT.exchange_rate, " +
+			  " MT.name AS member_type_name, MT.attribute, MT.initial_point " +
+			  " FROM " + Params.dbName + ".member M " +
+			  " JOIN " + Params.dbName + ".member_type MT ON M.member_type_id = MT.member_type_id "	+
+			  " WHERE 1=1 "	+
+			  " AND M.restaurant_id = " + staff.getRestaurantId() +
+			  (extraCond != null ? extraCond : " ") +
+			  (orderClause != null ? orderClause : "");
+			
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		while(dbCon.rs.next()){
 			Member member = new Member();
@@ -133,14 +139,14 @@ public class MemberDao {
 		}
 		dbCon.rs.close();
 		
-		for(Member m : result){
-			sql = " SELECT discount_id, type FROM " + Params.dbName + ".member_type_discount WHERE member_type_id = " + m.getMemberType().getTypeId();
+		for(Member eachMember : result){
+			sql = " SELECT discount_id, type FROM " + Params.dbName + ".member_type_discount WHERE member_type_id = " + eachMember.getMemberType().getTypeId();
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
 			while(dbCon.rs.next()){
 				Discount discount = new Discount(dbCon.rs.getInt("discount_id"));
-				m.getMemberType().addDiscount(discount);
+				eachMember.getMemberType().addDiscount(discount);
 				if(MemberType.DiscountType.valueOf(dbCon.rs.getInt("type")) == MemberType.DiscountType.DEFAULT){
-					m.getMemberType().setDefaultDiscount(discount);
+					eachMember.getMemberType().setDefaultDiscount(discount);
 				}
 			}
 			dbCon.rs.close();
@@ -151,17 +157,19 @@ public class MemberDao {
 	
 	/**
 	 * Get member by extra condition
-	 * @param dbCon
-	 * @param params
-	 * @return the list holding the  result
+	 * @param extraCond
+	 * 			the extra condition
+	 * @param orderClause
+	 * 			the order clause 
+	 * @return the list holding the result
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static List<Member> getMember(Map<Object, Object> params) throws SQLException, BusinessException{
+	public static List<Member> getMember(Staff staff, String extraCond, String orderClause) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return MemberDao.getMember(dbCon, params);
+			return MemberDao.getMember(dbCon, staff, extraCond, orderClause);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -169,19 +177,21 @@ public class MemberDao {
 	
 	/**
 	 * Get the member according to member id.
-	 * @param dbCon
-	 * @param id
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param memberId
+	 * 			the member id to search
 	 * @return the member associated with this id
 	 * @throws BusinessException
-	 * 			Throws if the member to this id is NOT found.
+	 * 			throws if the member to this id is NOT found
 	 * @throws SQLException
-	 * 			Throws if failed to execute any SQL statement.
+	 * 			throws if failed to execute any SQL statement
 	 */
-	public static Member getMemberById(int id) throws BusinessException, SQLException{
+	public static Member getMemberById(Staff staff, int memberId) throws BusinessException, SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return MemberDao.getMemberById(dbCon, id);
+			return MemberDao.getMemberById(dbCon, staff, memberId);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -191,6 +201,8 @@ public class MemberDao {
 	 * Get the member according to member id.
 	 * @param dbCon
 	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
 	 * @param memberId
 	 * 			the member id to search
 	 * @return the member associated with this id
@@ -199,10 +211,8 @@ public class MemberDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static Member getMemberById(DBCon dbCon, int memberId) throws BusinessException, SQLException{
-		Map<Object, Object> params = new HashMap<Object, Object>();
-		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.member_id = " + memberId);
-		List<Member> ml = MemberDao.getMember(dbCon, params);
+	public static Member getMemberById(DBCon dbCon, Staff staff, int memberId) throws BusinessException, SQLException{
+		List<Member> ml = MemberDao.getMember(dbCon, staff, " AND M.member_id = " + memberId, null);
 		if(ml.isEmpty()){
 			throw new BusinessException(MemberError.MEMBER_NOT_EXIST);
 		}else{
@@ -213,7 +223,7 @@ public class MemberDao {
 	/**
 	 * Get the member according to card.
 	 * @param dbCon
-	 * @param term
+	 * @param staff
 	 * @param cardAlias
 	 * @return the member owns the card
 	 * @throws SQLException
@@ -221,10 +231,8 @@ public class MemberDao {
 	 * @throws BusinessException
 	 * 			throws the member to this card does NOT exist
 	 */
-	public static Member getMemberByCard(DBCon dbCon, Staff term, String cardAlias) throws SQLException, BusinessException{
-		Map<Object, Object> params = new HashMap<Object, Object>();
-		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + term.getRestaurantId() + " AND M.member_card = '" + cardAlias + "'");
-		List<Member> ml = MemberDao.getMember(dbCon, params);
+	public static Member getMemberByCard(DBCon dbCon, Staff staff, String cardAlias) throws SQLException, BusinessException{
+		List<Member> ml = MemberDao.getMember(dbCon, staff, " AND M.member_card = '" + cardAlias + "'", null);
 		if(ml.isEmpty()){
 			throw new BusinessException(MemberError.MEMBER_NOT_EXIST);
 		}else{
@@ -234,7 +242,7 @@ public class MemberDao {
 	
 	/**
 	 * Get the member according to card.
-	 * @param term
+	 * @param staff
 	 * @param cardAlias
 	 * @return the member owns the card
 	 * @throws SQLException
@@ -242,11 +250,11 @@ public class MemberDao {
 	 * @throws BusinessException
 	 * 			throws the member to this card does NOT exist
 	 */
-	public static Member getMemberByCard(Staff term, String cardAlias) throws SQLException, BusinessException{
+	public static Member getMemberByCard(Staff staff, String cardAlias) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return getMemberByCard(dbCon, term, cardAlias);
+			return getMemberByCard(dbCon, staff, cardAlias);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -256,7 +264,7 @@ public class MemberDao {
 	 * Get the member according to mobile
 	 * @param dbCon
 	 * 			the database connection
-	 * @param term
+	 * @param staff
 	 * 			the term
 	 * @param mobile
 	 * 			the mobile
@@ -266,10 +274,8 @@ public class MemberDao {
 	 * @throws BusinessException
 	 * 			throws if the member to this mobile does NOT exist
 	 */
-	public static Member getMemberByMobile(DBCon dbCon, Staff term, String mobile) throws SQLException, BusinessException{
-		Map<Object, Object> params = new HashMap<Object, Object>();
-		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND M.restaurant_id = " + term.getRestaurantId() + " AND M.mobile = '" + mobile + "'");
-		List<Member> result = MemberDao.getMember(dbCon, params);
+	public static Member getMemberByMobile(DBCon dbCon, Staff staff, String mobile) throws SQLException, BusinessException{
+		List<Member> result = MemberDao.getMember(dbCon, staff, " AND M.mobile = '" + mobile + "'", null);
 		if(result.isEmpty()){
 			throw new BusinessException(MemberError.MEMBER_NOT_EXIST);
 		}else{
@@ -434,7 +440,7 @@ public class MemberDao {
 	public static void update(DBCon dbCon, Staff staff, Member.UpdateBuilder builder) throws SQLException, BusinessException{
 		Member member = builder.build();
 		// 旧会员类型是充值属性, 修改为优惠属性时, 检查是否还有余额, 有则不允许修改
-		Member old = MemberDao.getMemberById(member.getId());
+		Member old = MemberDao.getMemberById(staff, member.getId());
 		if(member.getMemberType().getAttribute() != old.getMemberType().getAttribute() 
 				&& old.getMemberType().getAttribute() == MemberType.Attribute.CHARGE){
 			if(old.getTotalBalance() > 0){
@@ -545,7 +551,8 @@ public class MemberDao {
 	 * Perform the consume operation to a member.
 	 * @param dbCon	
 	 * 			the database connection
-	 * @param term	
+	 * @param staff	
+	 * 			the staff to perform this action
 	 * @param memberId 
 	 * 			the id to member account
 	 * @param consumePrice	
@@ -562,9 +569,9 @@ public class MemberDao {
 	 *			1 - the consume price exceeds total balance to this member account<br>
 	 *			2 - the member account to consume is NOT found.
 	 */
-	public static MemberOperation consume(DBCon dbCon, Staff term, int memberId, float consumePrice, Order.PayType payType, int orderId) throws SQLException, BusinessException{
+	public static MemberOperation consume(DBCon dbCon, Staff staff, int memberId, float consumePrice, Order.PayType payType, int orderId) throws SQLException, BusinessException{
 		
-		Member member = getMemberById(dbCon, memberId);
+		Member member = getMemberById(dbCon, staff, memberId);
 		
 		//Perform the consume operation and get the related member operation.
 		MemberOperation mo = member.consume(consumePrice, payType);
@@ -573,7 +580,7 @@ public class MemberDao {
 		mo.setOrderId(orderId);
 		
 		//Insert the member operation to this consumption operation.
-		MemberOperationDao.insert(dbCon, term, mo);
+		MemberOperationDao.insert(dbCon, staff, mo);
 		
 		//Update the base & extra balance and point.
 		String sql = " UPDATE " + Params.dbName + ".member SET" 
@@ -634,8 +641,8 @@ public class MemberDao {
 	 * Perform the charge operation to a member account.
 	 * @param dbCon
 	 * 			the database connection
-	 * @param term
-	 * 			the terminal 
+	 * @param staff
+	 * 			the staff to perform this action 
 	 * @param memberId
 	 * 			the id of member account to be charged.
 	 * @param chargeMoney
@@ -648,19 +655,19 @@ public class MemberDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statements
 	 */
-	public static MemberOperation charge(DBCon dbCon, Staff term, int memberId, float chargeMoney, ChargeType chargeType) throws BusinessException, SQLException{
+	public static MemberOperation charge(DBCon dbCon, Staff staff, int memberId, float chargeMoney, ChargeType chargeType) throws BusinessException, SQLException{
 		
 		if(chargeMoney < 0){
 			throw new IllegalArgumentException("The amount of charge money(amount = " + chargeMoney + ") must be more than zero");
 		}
 		
-		Member member = getMemberById(dbCon, memberId);
+		Member member = getMemberById(dbCon, staff, memberId);
 		
 		//Perform the charge operation and get the related member operation.
 		MemberOperation mo = member.charge(chargeMoney, chargeType);
 		
 		//Insert the member operation to this charge operation.
-		MemberOperationDao.insert(dbCon, term, mo);
+		MemberOperationDao.insert(dbCon, staff, mo);
 		
 		//Update the base & extra balance and point.
 		String sql = " UPDATE " + Params.dbName + ".member SET" +
@@ -713,8 +720,8 @@ public class MemberDao {
 	 * Perform to point consumption
 	 * @param dbCon
 	 * 			the database connection
-	 * @param term
-	 * 			the terminal
+	 * @param staff
+	 * 			the staff to perform this action
 	 * @param memberId
 	 * 			the id to member to perform point consumption
 	 * @param pointConsume
@@ -725,19 +732,19 @@ public class MemberDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static MemberOperation pointConsume(DBCon dbCon, Staff term, int memberId, int pointConsume) throws BusinessException, SQLException{
+	public static MemberOperation pointConsume(DBCon dbCon, Staff staff, int memberId, int pointConsume) throws BusinessException, SQLException{
 		
 		if(pointConsume < 0){
 			throw new IllegalArgumentException("The amount of point to consume(amount = " + pointConsume + ") must be more than zero");
 		}
 		
-		Member member = getMemberById(dbCon, memberId);
+		Member member = getMemberById(dbCon, staff, memberId);
 		
 		//Perform the point consumption and get the related member operation.
 		MemberOperation mo = member.pointConsume(pointConsume);
 				
 		//Insert the member operation to this point consumption.
-		MemberOperationDao.insert(dbCon, term, mo);
+		MemberOperationDao.insert(dbCon, staff, mo);
 		
 		//Update the point.
 		String sql = " UPDATE " + Params.dbName + ".member SET" +
@@ -751,8 +758,8 @@ public class MemberDao {
 	
 	/**
 	 * Perform to point consumption
-	 * @param term
-	 * 			the terminal
+	 * @param staff
+	 * 			the staff to perform this action
 	 * @param memberId
 	 * 			the id to member to perform point consumption
 	 * @param pointConsume
@@ -763,12 +770,12 @@ public class MemberDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static MemberOperation pointConsume(Staff term, int memberId, int pointConsume) throws BusinessException, SQLException{
+	public static MemberOperation pointConsume(Staff staff, int memberId, int pointConsume) throws BusinessException, SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
 			dbCon.conn.setAutoCommit(false);
-			MemberOperation mo = MemberDao.pointConsume(dbCon, term, memberId, pointConsume);
+			MemberOperation mo = MemberDao.pointConsume(dbCon, staff, memberId, pointConsume);
 			dbCon.conn.commit();
 			return mo;
 			
@@ -820,8 +827,8 @@ public class MemberDao {
 	
 	/**
 	 * Perform to adjust the point to a specified member.
-	 * @param term
-	 * 			the terminal
+	 * @param staff
+	 * 			the staff to perform this action
 	 * @param memberId
 	 * 			the member to adjust point
 	 * @param deltaPoint
@@ -832,9 +839,9 @@ public class MemberDao {
 	 * @throws BusinessException
 	 * 			throws if the member to this id is NOT found
 	 */
-	public static MemberOperation adjustPoint(DBCon dbCon, Staff term, int memberId, int deltaPoint, Member.AdjustType adjust) throws SQLException, BusinessException{
+	public static MemberOperation adjustPoint(DBCon dbCon, Staff staff, int memberId, int deltaPoint, Member.AdjustType adjust) throws SQLException, BusinessException{
 		
-		Member member = getMemberById(dbCon, memberId);
+		Member member = getMemberById(dbCon, staff, memberId);
 		
 		if(adjust == Member.AdjustType.INCREASE){
 			deltaPoint = Math.abs(deltaPoint);
@@ -846,7 +853,7 @@ public class MemberDao {
 		MemberOperation mo = member.adjustPoint(deltaPoint, adjust);
 				
 		//Insert the member operation to this point consumption.
-		MemberOperationDao.insert(dbCon, term, mo);
+		MemberOperationDao.insert(dbCon, staff, mo);
 		
 		//Update the point.
 		String sql = " UPDATE " + Params.dbName + ".member SET" +
@@ -897,8 +904,8 @@ public class MemberDao {
 	 * Perform to adjust balance to a specified member. 
 	 * @param dbCon
 	 * 			the database
-	 * @param term
-	 * 			the terminal
+	 * @param staff
+	 * 			the staff to perform this action
 	 * @param memberId
 	 * 			the member to adjust balance
 	 * @param deltaBalance
@@ -909,14 +916,14 @@ public class MemberDao {
 	 * @throws BusinessException
 	 * 			throws if the member to this id is NOT found
 	 */
-	public static MemberOperation adjustBalance(DBCon dbCon, Staff term, int memberId, float deltaBalance) throws SQLException, BusinessException{
-		Member member = getMemberById(dbCon, memberId);
+	public static MemberOperation adjustBalance(DBCon dbCon, Staff staff, int memberId, float deltaBalance) throws SQLException, BusinessException{
+		Member member = getMemberById(dbCon, staff, memberId);
 		
 		//Perform the point adjust and get the related member operation.
 		MemberOperation mo = member.adjustBalance(deltaBalance);
 				
 		//Insert the member operation to this point consumption.
-		MemberOperationDao.insert(dbCon, term, mo);
+		MemberOperationDao.insert(dbCon, staff, mo);
 		
 		//Update the point.
 		String sql = " UPDATE " + Params.dbName + ".member SET" +

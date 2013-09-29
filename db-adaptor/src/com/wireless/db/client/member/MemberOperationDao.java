@@ -585,7 +585,7 @@ public class MemberOperationDao {
 	 * @throws BusinessException
 	 * @throws SQLException
 	 */
-	public static List<MOSummary> getSummaryByToday(DBCon dbCon, Map<Object, Object> params) throws BusinessException, SQLException{
+	public static List<MOSummary> getSummaryByToday(DBCon dbCon, Staff staff, Map<Object, Object> params) throws BusinessException, SQLException{
 		List<MOSummary> list = new ArrayList<MOSummary>();
 		MOSummary item = null;
 		String querySQL = "SELECT"
@@ -603,7 +603,7 @@ public class MemberOperationDao {
 		ResultSet rs = stmt.executeQuery(querySQL);
 		while(rs != null && rs.next()){
 			item = new MOSummary();
-			item.setMember(MemberDao.getMemberById(dbCon, rs.getInt("member_id")));
+			item.setMember(MemberDao.getMemberById(dbCon, staff, rs.getInt("member_id")));
 			item.setChargeMoney(rs.getFloat("charge_money"));
 			item.setConsumeAmount(rs.getInt("consume_amount"));
 			item.setPayMoney(rs.getFloat("pay_money"));
@@ -629,11 +629,11 @@ public class MemberOperationDao {
 	 * @throws BusinessException
 	 * @throws SQLException
 	 */
-	public static List<MOSummary> getSummaryByToday(Map<Object, Object> params) throws BusinessException, SQLException{
+	public static List<MOSummary> getSummaryByToday(Staff staff, Map<Object, Object> params) throws BusinessException, SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return MemberOperationDao.getSummaryByToday(dbCon, params);
+			return MemberOperationDao.getSummaryByToday(dbCon, staff, params);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -685,7 +685,7 @@ public class MemberOperationDao {
 	 * @throws BusinessException
 	 * @throws SQLException
 	 */
-	public static List<MOSummary> getSummaryByHistory(DBCon dbCon, Map<Object, Object> params) throws BusinessException, SQLException{
+	public static List<MOSummary> getSummaryByHistory(DBCon dbCon, Staff staff, Map<Object, Object> params) throws BusinessException, SQLException{
 		List<MOSummary> list = new ArrayList<MOSummary>();
 		MOSummary item = null;
 		String querySQL = "SELECT"
@@ -703,7 +703,7 @@ public class MemberOperationDao {
 		ResultSet rs = stmt.executeQuery(querySQL);
 		while(rs != null && rs.next()){
 			item = new MOSummary();
-			item.setMember(MemberDao.getMemberById(dbCon, rs.getInt("member_id")));
+			item.setMember(MemberDao.getMemberById(dbCon, staff, rs.getInt("member_id")));
 			item.setChargeMoney(rs.getFloat("charge_money"));
 			item.setConsumeAmount(rs.getInt("consume_amount"));
 			item.setPayMoney(rs.getFloat("pay_money"));
@@ -729,11 +729,11 @@ public class MemberOperationDao {
 	 * @throws BusinessException
 	 * @throws SQLException
 	 */
-	public static List<MOSummary> getSummaryByHistory(Map<Object, Object> params) throws BusinessException, SQLException{
+	public static List<MOSummary> getSummaryByHistory(Staff staff, Map<Object, Object> params) throws BusinessException, SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return MemberOperationDao.getSummaryByHistory(dbCon, params);
+			return MemberOperationDao.getSummaryByHistory(dbCon, staff, params);
 		}finally{
 			dbCon.disconnect();
 		}
