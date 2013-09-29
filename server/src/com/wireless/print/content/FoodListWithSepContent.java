@@ -35,7 +35,7 @@ public class FoodListWithSepContent extends ConcreteContent {
 	@Override
 	public String toString(){
 		//generate the separator
-		StringBuffer sep = new StringBuffer();
+		StringBuilder sep = new StringBuilder();
 		if(mStyle == PStyle.PRINT_STYLE_58MM){
 			for(int i = 0; i < LEN_58MM; i++){
 				sep.append('-');

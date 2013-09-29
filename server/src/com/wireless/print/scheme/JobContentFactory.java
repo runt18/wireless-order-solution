@@ -313,11 +313,11 @@ public class JobContentFactory {
 		return jobContents.isEmpty() ? null : new JobCombinationContent(jobContents);
 	}
 	
-	public Content createMemberReceiptContent(PType printType, Staff term, List<Printer> printers, int memberOperationId) throws BusinessException, SQLException{
+	public Content createMemberReceiptContent(PType printType, Staff staff, List<Printer> printers, int memberOperationId) throws BusinessException, SQLException{
 		
 		List<JobContent> jobContents = new ArrayList<JobContent>();
 		
-		Region regionToCompare = new Region(Region.RegionId.REGION_1.getId(), "", term.getRestaurantId());
+		Region regionToCompare = new Region(Region.RegionId.REGION_1.getId(), "", staff.getRestaurantId());
 		
 		for(Printer printer : printers){
 			for(PrintFunc func : printer.getPrintFuncs()){
@@ -326,14 +326,14 @@ public class JobContentFactory {
 					MemberOperation mo = MemberOperationDao.getTodayById(memberOperationId);
 					
 					if(mo != null){
-						Member member = MemberDao.getMemberById(mo.getMemberId());
+						Member member = MemberDao.getMemberById(staff, mo.getMemberId());
 						//Print the member receipt only if member type belongs to charge.
 						if(member.getMemberType().getAttribute() == Attribute.CHARGE){
 							
-							mo.setMember(MemberDao.getMemberById(mo.getMemberId()));
-							Restaurant restaurant = RestaurantDao.getById(term.getRestaurantId());
+							mo.setMember(MemberDao.getMemberById(staff, mo.getMemberId()));
+							Restaurant restaurant = RestaurantDao.getById(staff.getRestaurantId());
 							jobContents.add(new JobContent(printer, func.getRepeat(), printType,
-														   new MemberReceiptContent(restaurant, term.getName(), mo, printType, printer.getStyle())));
+														   new MemberReceiptContent(restaurant, staff.getName(), mo, printType, printer.getStyle())));
 
 						}
 					}					
