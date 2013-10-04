@@ -8,6 +8,7 @@ import java.text.SimpleDateFormat;
 
 import org.tiling.scheduling.SchedulerTask;
 
+import com.wireless.db.client.member.MemberDao;
 import com.wireless.db.foodAssociation.CalcFoodAssociationDao;
 import com.wireless.db.foodStatistics.CalcFoodStatisticsDao;
 import com.wireless.db.frontBusiness.DailySettleDao;
@@ -57,14 +58,14 @@ public class DailySettlementTask extends SchedulerTask{
 			CalcFoodAssociationDao.exec();
 			elapsedTime = System.currentTimeMillis() - beginTime;
 			
-			taskInfo.append("info : The food association takes " + elapsedTime / 1000 + " sec.").append(sep);
+			taskInfo.append("info : The calculation to food association takes " + elapsedTime / 1000 + " sec.").append(sep);
 			
 			//Perform to calculate food statistics.
 			beginTime = System.currentTimeMillis();
 			int nRows = CalcFoodStatisticsDao.exec();
 			elapsedTime = System.currentTimeMillis() - beginTime;
 			
-			taskInfo.append("info : The statistics to " + nRows + " foods is calculated and takes " + elapsedTime / 1000 + " sec.").append(sep);
+			taskInfo.append("info : The calculation to " + nRows + " food's statistics takes " + elapsedTime / 1000 + " sec.").append(sep);
 			
 			//Perform to calculate restaurant liveness.
 			beginTime = System.currentTimeMillis();
@@ -72,6 +73,20 @@ public class DailySettlementTask extends SchedulerTask{
 			elapsedTime = System.currentTimeMillis() - beginTime;
 			
 			taskInfo.append("info : The calculation to restaurant liveness takes " + elapsedTime / 1000 + " sec.").append(sep);
+			
+			//Perform to calculate member favor foods.
+			beginTime = System.currentTimeMillis();
+			MemberDao.calcFavorFoods();
+			elapsedTime = System.currentTimeMillis() - beginTime;
+			
+			taskInfo.append("info : The calculation to member favor foods takes " + elapsedTime / 1000 + " sec.").append(sep);
+			
+			//Perform to calculate member recommended foods.
+			beginTime = System.currentTimeMillis();
+			MemberDao.calcRecommendFoods();
+			elapsedTime = System.currentTimeMillis() - beginTime;
+			
+			taskInfo.append("info : The calculation to member recommended foods takes " + elapsedTime / 1000 + " sec.").append(sep);
 			
 		}catch(SQLException e){
 			taskInfo.append("error : " + e.getMessage()).append(sep);
