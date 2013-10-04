@@ -935,5 +935,145 @@ public class MemberDao {
 		
 		return mo;
 	}
+	
+	/**
+	 * Calculate most favor foods to each member.
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static void calcFavorFoods() throws SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			calcFavorFoods(dbCon);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Calculate most favor foods to each member.
+	 * @param dbCon
+	 * 			the database connection
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static void calcFavorFoods(DBCon dbCon) throws SQLException{
+		String sql;
+		//Delete all the original member favor foods.
+		sql = " DELETE FROM " + Params.dbName + ".member_favor_food";
+		dbCon.stmt.executeUpdate(sql);
+		
+		//Calculate the favor foods to each member.
+		sql = " SELECT MOH.member_id " +
+			  " FROM " + Params.dbName + ".member_operation_history MOH " +
+			  " JOIN " + Params.dbName + ".member M ON M.member_id = MOH.member_id " +
+			  " GROUP  BY member_id ";
+		List<Integer> memberIds = new ArrayList<Integer>();
+		dbCon.rs = dbCon.stmt.executeQuery(sql);
+		while(dbCon.rs.next()){
+			memberIds.add(dbCon.rs.getInt("member_id"));
+		}
+		dbCon.rs.close();
+		for(Integer memberId : memberIds){
+			calcFavorFoods(dbCon, memberId);
+		}
+	}
+	
+	/**
+	 * Calculate the favor foods to a specific food.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param memberId
+	 * 			the member to calculate favor foods
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	private static void calcFavorFoods(DBCon dbCon, int memberId) throws SQLException{
+		String sql;
+		sql = " INSERT INTO " + Params.dbName + ".member_favor_food " +
+			  " (`member_id`, `food_id`, `point`) " +
+			  " SELECT MOH.member_id, OFH.food_id, FS.weight * COUNT(*) AS point " +
+			  " FROM " + Params.dbName + ".order_food_history OFH " +
+			  " JOIN " + Params.dbName + ".member_operation_history MOH " + 
+			  " ON OFH.order_id = MOH.order_id " + " AND " + " MOH.member_id = " + memberId +
+			  " JOIN " + Params.dbName + ".food_statistics FS ON OFH.food_id = FS.food_id " +
+			  " GROUP BY OFH.food_id " +
+			  " HAVING point <> 0 " +
+			  " ORDER BY point DESC " + 
+			  " LIMIT 10 ";
+		dbCon.stmt.executeUpdate(sql);
+	}
 
+	/**
+	 * Calculate the recommended foods to each member.
+	 * @throws SQLException	
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static void calcRecommendFoods() throws SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			calcRecommendFoods(dbCon);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Calculate the recommended foods to each member.
+	 * @param dbCon
+	 * 			the database connection 
+	 * @throws SQLException	
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static void calcRecommendFoods(DBCon dbCon) throws SQLException{
+		String sql;
+		//Delete all the original member recommended foods.
+		sql = " DELETE FROM " + Params.dbName + ".member_recommend_food";
+		dbCon.stmt.executeUpdate(sql);
+		
+		//Calculate the recommended foods to each member.
+		sql = " SELECT MOH.member_id " +
+			  " FROM " + Params.dbName + ".member_operation_history MOH " +
+			  " JOIN " + Params.dbName + ".member M ON MOH.member_id = M.member_id " +
+			  " GROUP BY member_id ";
+		List<Integer> memberIds = new ArrayList<Integer>();
+		dbCon.rs = dbCon.stmt.executeQuery(sql);
+		while(dbCon.rs.next()){
+			memberIds.add(dbCon.rs.getInt("member_id"));
+		}
+		dbCon.rs.close();
+		
+		for(int memberId : memberIds){
+			calcRecommnedFoods(dbCon, memberId);
+		}
+	}
+	
+	/**
+	 * Calculate the recommended foods to a specific member.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param memberId
+	 * 			the member to calculate its recommended foods
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	private static void calcRecommnedFoods(DBCon dbCon, int memberId) throws SQLException{
+		String sql;
+		sql = " INSERT INTO " + Params.dbName + ".member_recommend_food " +
+			  " (`member_id`, `food_id`, `point`) " +
+			  " SELECT MAX(MFF.member_id) AS member_id, FA.associated_food_id, " +
+			  " MAX(FA.associated_amount * MFF.point * FS.weight) AS associated_point " +
+			  " FROM " + Params.dbName + ".food_association FA " +
+			  " JOIN " + Params.dbName + ".member_favor_food MFF ON MFF.food_id = FA.food_id " +
+			  " JOIN " + Params.dbName + ".food_statistics FS ON FS.food_id = FA.associated_food_id " +
+			  " WHERE 1 = 1 " +
+			  " AND MFF.member_id = " + memberId +
+			  " AND FA.associated_food_id NOT IN (SELECT food_id FROM wireless_order_db.member_favor_food WHERE member_id = " + memberId + ") " +
+			  " GROUP BY FA.associated_food_id " +
+			  " ORDER BY associated_point DESC " +
+			  " LIMIT 10 ";
+		dbCon.stmt.executeUpdate(sql);
+	} 
 }

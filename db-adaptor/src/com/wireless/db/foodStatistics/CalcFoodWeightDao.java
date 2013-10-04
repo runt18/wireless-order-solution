@@ -51,7 +51,7 @@ public class CalcFoodWeightDao {
 			//Calculate the food weight to each food to this restaurant.
 			sql = " SELECT " +
 				  " A.food_id, " +
-				  " (COUNT(A.order_id) / @order_amount * LOG10(@order_amount / COUNT(A.order_id))) AS weight " +
+				  " (COUNT(A.order_id) / @order_amount * LOG(@order_amount / COUNT(A.order_id))) AS weight " +
 				  " FROM " + 
 				  " ((SELECT " +
 				  " order_id, food_id " + " FROM " + Params.dbName + ".order_food_history " +
@@ -59,6 +59,9 @@ public class CalcFoodWeightDao {
 				  " food_id IN ( " +
 				  " SELECT food_id FROM " + Params.dbName + ".food" + " WHERE " +
 				  " restaurant_id = " + restaurantId + " AND " + 
+				  " name NOT LIKE '送%' " + " AND " +
+				  " name NOT LIKE '赠送%' " + " AND " + 
+				  " name NOT LIKE '配%' " + " AND " +
 				  " name NOT LIKE '白饭%' " + " AND " +
 				  " name NOT LIKE '%打包%' " + " AND " +
 				  " name NOT LIKE '%茶位%' " + " AND " +

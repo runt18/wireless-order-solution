@@ -85,21 +85,22 @@ public class PayOrder {
 				  " discount_id = " + orderCalculated.getDiscount().getId() + ", " +
 				  " status = " + Order.Status.UNPAID.getVal() + ", " + 
 			   	  " order_date = NOW() " + 
-				  " WHERE " +
-				  " id = " + orderCalculated.getId();
+				  " WHERE 1 = 1 " +
+				  " AND id = " + orderCalculated.getId() +
+				  " AND status = " + Order.Status.UNPAID.getVal();
 				
-			dbCon.stmt.executeUpdate(sql);			
-
-			//Update each food's discount & unit price to this order.
-			for(OrderFood food : orderCalculated.getOrderFoods()){
-				sql = " UPDATE " + Params.dbName + ".order_food " +
-					  " SET " +
-					  " discount = " + food.getDiscount() + ", " +
-					  " unit_price = " + food.getPrice() +
-					  " WHERE order_id = " + orderCalculated.getId() + 
-					  " AND food_alias = " + food.getAliasId();
-				dbCon.stmt.executeUpdate(sql);				
-			}	
+			if(dbCon.stmt.executeUpdate(sql) > 0 ){			
+				//Update each food's discount & unit price to this order.
+				for(OrderFood food : orderCalculated.getOrderFoods()){
+					sql = " UPDATE " + Params.dbName + ".order_food " +
+						  " SET " +
+						  " discount = " + food.getDiscount() + ", " +
+						  " unit_price = " + food.getPrice() +
+						  " WHERE order_id = " + orderCalculated.getId() + 
+						  " AND food_alias = " + food.getAliasId();
+					dbCon.stmt.executeUpdate(sql);				
+				}	
+			}
 			
 			dbCon.conn.commit();
 

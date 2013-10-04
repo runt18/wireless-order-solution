@@ -52,7 +52,7 @@ public class CalcFoodAssociationDao {
 		
 		//Get the id to orders contained the food
 		sql = " SELECT order_id FROM " + Params.dbName + ".order_food_history " +
-			  " WHERE " + " food_id = " + foodId + " GROUP BY food_id ";
+			  " WHERE " + " food_id = " + foodId + " GROUP BY order_id ";
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		
 		StringBuilder orderIdCond = new StringBuilder();
