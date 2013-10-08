@@ -263,9 +263,7 @@ public class MemberTypeDao {
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		
 		while(dbCon.rs.next()){
-			MemberType mt = new MemberType();
-			
-			mt.setTypeId(dbCon.rs.getInt("member_type_id"));
+			MemberType mt = new MemberType(dbCon.rs.getInt("member_type_id"));
 			mt.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
 			mt.setName(dbCon.rs.getString("name"));
 			mt.setChargeRate(dbCon.rs.getFloat("charge_rate"));

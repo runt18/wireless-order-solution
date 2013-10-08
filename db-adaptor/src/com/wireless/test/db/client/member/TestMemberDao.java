@@ -10,12 +10,14 @@ import java.util.List;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import com.wireless.db.client.member.MemberCommentDao;
 import com.wireless.db.client.member.MemberDao;
 import com.wireless.db.client.member.MemberOperationDao;
 import com.wireless.db.client.member.MemberTypeDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.client.Member;
+import com.wireless.pojo.client.MemberComment;
 import com.wireless.pojo.client.Member.AdjustType;
 import com.wireless.pojo.client.Member.Sex;
 import com.wireless.pojo.client.MemberOperation;
@@ -62,10 +64,25 @@ public class TestMemberDao {
 		assertEquals("member id card", expected.getIdCard(), actual.getIdCard());
 		assertEquals("member birthday", expected.getBirthday(), actual.getBirthday());
 		assertEquals("member company", expected.getCompany(), actual.getCompany());
-		assertEquals("member taste pref", expected.getTastePref(), actual.getTastePref());
-		assertEquals("member taboo", expected.getTaboo(), actual.getTaboo());
 		assertEquals("member contact address", expected.getContactAddress(), actual.getContactAddress());
-		assertEquals("member comment", expected.getComment(), actual.getComment());
+		
+		assertEquals("public comment - size", expected.getPublicComments().size(), actual.getPublicComments().size());
+		for(int i = 0; i < expected.getPublicComments().size(); i++){
+			assertEquals("public comment - staff id", expected.getPublicComments().get(i).getStaff().getId(), actual.getPublicComments().get(i).getStaff().getId());
+			assertEquals("public comment - member id", expected.getPublicComments().get(i).getMember().getId(), actual.getPublicComments().get(i).getMember().getId());
+			assertEquals("public comment - type", expected.getPublicComments().get(i).getType().getVal(), actual.getPublicComments().get(i).getType().getVal());
+			assertEquals("public comment - comment", expected.getPublicComments().get(i).getComment(), actual.getPublicComments().get(i).getComment());
+			assertEquals("public comment - last modified", Math.abs(expected.getPublicComments().get(i).getLastModified() - actual.getPublicComments().get(i).getLastModified()) / 5000, 0);
+		}
+		
+		assertEquals("private comment", expected.hasPrivateComment(), actual.hasPrivateComment());
+		if(expected.hasPrivateComment()){
+			assertEquals("private comment - staff id", expected.getPrivateComment().getStaff().getId(), actual.getPrivateComment().getStaff().getId());
+			assertEquals("private comment - member id", expected.getPrivateComment().getMember().getId(), actual.getPrivateComment().getMember().getId());
+			assertEquals("private comment - type", expected.getPrivateComment().getType().getVal(), actual.getPrivateComment().getType().getVal());
+			assertEquals("private comment - comment", expected.getPrivateComment().getComment(), actual.getPrivateComment().getComment());
+			assertEquals("private comment - last modified", Math.abs(expected.getPrivateComment().getLastModified() - actual.getPrivateComment().getLastModified()) / 5000, 0);
+		}
 	}
 	
 	private void compareMemberOperation(MemberOperation expected, MemberOperation actual){
@@ -101,26 +118,49 @@ public class TestMemberDao {
 			memberType = list.get(0);
 		}
 		
-		//Insert a new member
-		Member.InsertBuilder builder = new Member.InsertBuilder(mStaff.getRestaurantId(), "张三", "13694260534", memberType.getTypeId(), Sex.FEMALE)
-												 .setBirthday(DateUtil.parseDate("1981-03-15"))
-												 .setCompany("Digie Co.,Ltd")
-												 .setContactAddr("广州市东圃镇晨晖商务大厦")
-												 .setIdCard("440711198103154818")
-												 .setMemberCard("100010000")
-												 .setTaboo("嫉妒咸鱼")
-												 .setTastePref("喜欢甜品")
-												 .setTele("020-87453214");
-		
-		int memberId = MemberDao.insert(mStaff, builder);
+		int memberId = 0;
 		
 		try{
+			
+			//Insert a new member
+			Member.InsertBuilder builder = new Member.InsertBuilder(mStaff.getRestaurantId(), "张三", "13694260535", memberType.getTypeId(), Sex.FEMALE)
+													 .setBirthday(DateUtil.parseDate("1981-03-15"))
+													 .setCompany("Digie Co.,Ltd")
+													 .setContactAddr("广州市东圃镇晨晖商务大厦")
+													 .setIdCard("440711198103154818")
+													 .setMemberCard("100010000")
+													 .setPrivateComment("嫉妒咸鱼")
+													 .setPublicComment("喜欢甜品")
+													 .setTele("020-87453214");
+			
+			memberId = MemberDao.insert(mStaff, builder);
+			
+			//Commit a private comment to member just inserted
+			MemberComment.CommitBuilder privateCommentBuilder = MemberComment.CommitBuilder.newPrivateBuilder(mStaff.getId(), memberId, "张老板好客，大方");
+			
+			MemberCommentDao.commit(mStaff, privateCommentBuilder);
+			
+			//Commit a public comment to member just inserted
+			MemberComment.CommitBuilder publicCommentBuilder = MemberComment.CommitBuilder.newPublicBuilder(mStaff.getId(), memberId, "张老板是高富帅！！！");
+			
+			MemberCommentDao.commit(mStaff, publicCommentBuilder);
+			
 			Member expect = builder.build();
 			expect.setId(memberId);
 			expect.setMemberType(memberType);
 			expect.setPoint(memberType.getInitialPoint());
 			//Set the initial point to expected member
 			expect.setPoint(memberType.getInitialPoint());
+			//Set the private member comment
+			MemberComment privateComment = privateCommentBuilder.build();
+			privateComment.setLastModified(System.currentTimeMillis());
+			expect.setPrivateComment(privateComment);
+			//Set the last public member comment since the staff and member id NOT be set in insert builder
+			expect.getPublicComments().get(expect.getPublicComments().size() - 1).setStaff(mStaff);
+			expect.getPublicComments().get(expect.getPublicComments().size() - 1).setMember(new Member(memberId));
+			expect.getPublicComments().get(expect.getPublicComments().size() - 1).setLastModified(System.currentTimeMillis());
+			//Set the public member comment
+			expect.addPublicComment(publicCommentBuilder.build());
 			
 			Member actual = MemberDao.getMemberById(mStaff, memberId);
 			
@@ -128,22 +168,47 @@ public class TestMemberDao {
 			compareMember(expect, actual);
 			
 			//Update the member just inserted
-			Member.UpdateBuilder updateBuilder = new Member.UpdateBuilder(memberId, mStaff.getRestaurantId(), "李四", "18520590931", memberType.getTypeId(), Sex.MALE)
+			Member.UpdateBuilder updateBuilder = new Member.UpdateBuilder(memberId, mStaff.getRestaurantId())
+														   .setName("李四")
+														   .setMobile("18520590931")
+														   .setMemberTypeId(memberType.getTypeId())
+														   .setSex(Sex.MALE)
 														   .setBirthday(DateUtil.parseDate("1987-06-29"))
 														   .setCompany("DingDing Tech")
 														   .setContactAddr("广州市萝岗区科学城")
 														   .setIdCard("4101234789965412")
 														   .setMemberCard("1000100001")
-														   .setTaboo("咩都要")
-														   .setTastePref("垃圾桶")
+														   .setPrivateComment("咩都要")
+														   .setPublicComment("垃圾桶")
 														   .setTele("0750-3399559");
 			MemberDao.update(mStaff, updateBuilder);
+			
+			//Commit a private comment to member just inserted
+			privateCommentBuilder = MemberComment.CommitBuilder.newPrivateBuilder(mStaff.getId(), memberId, "老板小气。。。抠门");
+			
+			MemberCommentDao.commit(mStaff, privateCommentBuilder);
+			
+			//Commit a public comment to member just inserted
+			publicCommentBuilder = MemberComment.CommitBuilder.newPublicBuilder(mStaff.getId(), memberId, "张老板是白富美！！！");
+			
+			MemberCommentDao.commit(mStaff, publicCommentBuilder);
+			
 			expect = updateBuilder.build();
 			expect.setId(memberId);
 			expect.setRestaurantId(mStaff.getRestaurantId());
 			expect.setMemberType(memberType);
 			//Set the initial point to expected member
 			expect.setPoint(memberType.getInitialPoint());
+			//Set the private member comment
+			privateComment = privateCommentBuilder.build();
+			privateComment.setLastModified(System.currentTimeMillis());
+			expect.setPrivateComment(privateComment);
+			//Set the last public member comment since the staff and member id NOT be set in insert builder
+			expect.getPublicComments().get(expect.getPublicComments().size() - 1).setStaff(mStaff);
+			expect.getPublicComments().get(expect.getPublicComments().size() - 1).setMember(new Member(memberId));
+			expect.getPublicComments().get(expect.getPublicComments().size() - 1).setLastModified(System.currentTimeMillis());
+			//Set the public member comment
+			expect.addPublicComment(publicCommentBuilder.build());
 			
 			actual = MemberDao.getMemberById(mStaff, memberId);
 			
@@ -166,17 +231,25 @@ public class TestMemberDao {
 			testAdjustBalance(expect);
 			
 		}finally{
-			//Delete the member 
-			MemberDao.deleteById(mStaff, memberId);
-			//Check to see whether the member is deleted
-			try{
-				MemberDao.getMemberById(mStaff, memberId);
-				assertTrue("failed to delete member", false);
-			}catch(BusinessException ignored){}
-			
-			//Check to see whether the associated member operations are deleted
-			assertTrue("failed to delete today member operation", MemberOperationDao.getTodayByMemberId(memberId).isEmpty());
-			assertTrue("failed to delete history member operation", MemberOperationDao.getHistoryByMemberId(memberId).isEmpty());
+			if(memberId != 0){
+				//Delete the member 
+				MemberDao.deleteById(mStaff, memberId);
+				//Check to see whether the member is deleted
+				try{
+					MemberDao.getMemberById(mStaff, memberId);
+					assertTrue("failed to delete member", false);
+				}catch(BusinessException ignored){}
+				
+				//Check to see whether the private member comment is deleted
+				assertEquals("failed to delete member private comment", "", MemberCommentDao.getPrivateCommentByMember(mStaff, new Member(memberId)).getComment());
+				
+				//Check to see whether the private member comments are deleted
+				assertTrue("failed to delete member public comments", MemberCommentDao.getPublicCommentByMember(mStaff, new Member(memberId)).isEmpty());
+				
+				//Check to see whether the associated member operations are deleted
+				assertTrue("failed to delete today member operation", MemberOperationDao.getTodayByMemberId(memberId).isEmpty());
+				assertTrue("failed to delete history member operation", MemberOperationDao.getHistoryByMemberId(memberId).isEmpty());
+			}
 		}
 
 	}
