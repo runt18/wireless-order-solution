@@ -118,22 +118,20 @@ public class OperateMemberAction extends DispatchAction{
 			
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
-			Member.UpdateBuilder ub = new Member.UpdateBuilder(Integer.valueOf(id), 
-				staff.getRestaurantId(), 
-				name, 
-				mobile, 
-				Integer.valueOf(memberTypeId), 
-				Member.Sex.valueOf(Integer.valueOf(sex))
-			);
-			ub.setBirthday(birthday)
-			  .setMemberCard(memberCard)
-			  .setTele(tele)
-			  .setIdCard(idCard)
-			  .setCompany(company)
-			  .setTastePref(tastePref)
-			  .setTaboo(taboo)
-			  .setContactAddr(addr)
-			  .setComment(comment);
+			Member.UpdateBuilder ub = new Member.UpdateBuilder(Integer.valueOf(id), staff.getRestaurantId())
+											    .setName(name)
+											    .setMobile(mobile)
+											    .setMemberTypeId(Integer.valueOf(memberTypeId))
+											    .setSex(Member.Sex.valueOf(Integer.valueOf(sex)))
+											    .setBirthday(birthday)
+											    .setMemberCard(memberCard)
+											    .setTele(tele)
+											    .setIdCard(idCard)
+											    .setCompany(company)
+											    .setTastePref(tastePref)
+											    .setTaboo(taboo)
+											    .setContactAddr(addr)
+											    .setComment(comment);
 			
 			MemberDao.update(staff, ub);
 			jobject.initTip(true, "操作成功, 会员资料已修改.");
