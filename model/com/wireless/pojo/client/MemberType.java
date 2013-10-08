@@ -269,7 +269,7 @@ public class MemberType implements Jsonable{
 	private int restaurantId;
 	private String name;
 	private List<Discount> discounts = new ArrayList<Discount>();
-	private Discount defaultDiscount;
+	private Discount defaultDiscount = new Discount();
 	private float exchangeRate;
 	private float chargeRate;
 	private Attribute attribute;
@@ -287,8 +287,8 @@ public class MemberType implements Jsonable{
 		setInitialPoint(builder.initialPoint);
 	}
 	
-	public MemberType(){
-		this.defaultDiscount = new Discount();
+	public MemberType(int memberTypeId){
+		setTypeId(memberTypeId);
 	}
 	
 	public int getInitialPoint() {

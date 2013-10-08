@@ -73,6 +73,16 @@ public class DateUtil {
 	 * @param pattern
 	 * @return
 	 */
+	public static String format(long date, Pattern pattern){
+		return new SimpleDateFormat(pattern.getPattern(), Locale.getDefault()).format(date);
+	}
+	
+	/**
+	 * 
+	 * @param date
+	 * @param pattern
+	 * @return
+	 */
 	public static String format(long date, String pattern){
 		return new SimpleDateFormat(pattern, Locale.getDefault()).format(date);
 	}

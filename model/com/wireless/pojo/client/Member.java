@@ -1,6 +1,7 @@
 package com.wireless.pojo.client;
 
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,6 +15,7 @@ import com.wireless.pojo.client.MemberOperation.ChargeType;
 import com.wireless.pojo.client.MemberOperation.OperationType;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.util.DateUtil;
+import com.wireless.pojo.util.SortedList;
 
 public class Member implements Parcelable, Jsonable{
 	
@@ -103,8 +105,7 @@ public class Member implements Parcelable, Jsonable{
 			this.data.setRestaurantId(restaurantId);
 			this.data.setName(name);
 			this.data.setMobile(mobile);
-			this.data.setMemberType(new MemberType());
-			this.data.getMemberType().setTypeId(memberTypeId);
+			this.data.setMemberType(new MemberType(memberTypeId));
 			this.data.setSex(sex);
 		}
 		
@@ -132,12 +133,12 @@ public class Member implements Parcelable, Jsonable{
 			this.data.setCompany(company);
 			return this;
 		}
-		public InsertBuilder setTastePref(String tastePref){
-			this.data.setTastePref(tastePref);
+		public InsertBuilder setPrivateComment(String comment){
+			this.data.setPrivateComment(MemberComment.newPrivateComment(null, null, comment));
 			return this;
 		}
-		public InsertBuilder setTaboo(String taboo){
-			this.data.setTaboo(taboo);
+		public InsertBuilder setPublicComment(String comment){
+			this.data.addPublicComment(MemberComment.newPublicComment(null, null, comment));
 			return this;
 		}
 		public InsertBuilder setContactAddr(String addr){
@@ -148,71 +149,151 @@ public class Member implements Parcelable, Jsonable{
 			this.data.setMemberCard(card);
 			return this;
 		}
-		public InsertBuilder setComment(String comment){
-			this.data.setComment(comment);
-			return this;
-		}
 		public Member build(){
 			return this.data;
 		}
 	}
 	
 	public static class UpdateBuilder{
-		private Member data;
-		public UpdateBuilder(int memberId, int restaurantId, String name, String mobile, int memberTypeId, Sex sex){
-			this.data = new Member();
-			this.data.setId(memberId);
-			this.data.setRestaurantId(restaurantId);
-			this.data.setName(name);
-			this.data.setMobile(mobile);
-			this.data.setMemberType(new MemberType());
-			this.data.getMemberType().setTypeId(memberTypeId);
-			this.data.setSex(sex);
+		
+		private final int memberId;
+		private final int restaurantId;
+		
+		private String name;				// 客户名称
+		private Sex sex;					// 性别
+		private String tele;				// 电话
+		private String mobile;				// 手机
+		private long birthday;				// 生日
+		private String idCard;				// 身份证
+		private String company;				// 公司
+		private String contactAddress;		// 联系地址
+		private int memberTypeId = -1;		// 会员类型编号
+		private String memberCard;			// 会员卡号
+		private String privateComment;		// 私人评论
+		private String publicComment;		// 公开评论
+		
+		public UpdateBuilder(int memberId, int restaurantId){
+			this.memberId = memberId;
+			this.restaurantId = restaurantId;
+		}
+		
+		public UpdateBuilder setName(String name){
+			this.name = name;
+			return this;
+		}
+		
+		public boolean isNameChanged(){
+			return this.name != null;
+		}
+		
+		public UpdateBuilder setMobile(String mobile){
+			this.mobile = mobile;
+			return this;
+		}
+		
+		public boolean isMobileChanged(){
+			return this.mobile != null;
+		}
+		
+		public UpdateBuilder setMemberTypeId(int memberTypeId){
+			this.memberTypeId = memberTypeId;
+			return this;
+		}
+		
+		public boolean isMemberTypeChanged(){
+			return this.memberTypeId >= 0;
+		}
+		
+		public UpdateBuilder setSex(Sex sex){
+			this.sex = sex;
+			return this;
+		}
+		
+		public boolean isSexChanged(){
+			return this.sex != null;
 		}
 		
 		public UpdateBuilder setTele(String tele){
-			this.data.setTele(tele);
-			return this;
-		}
-		public UpdateBuilder setBirthday(long birthday){
-			this.data.setBirthday(birthday);
-			return this;
-		}
-		public UpdateBuilder setBirthday(String birthday){
-			this.data.setBirthday(birthday);
-			return this;
-		}
-		public UpdateBuilder setIdCard(String idCard){
-			this.data.setIdCard(idCard);
-			return this;
-		}
-		public UpdateBuilder setCompany(String company){
-			this.data.setCompany(company);
-			return this;
-		}
-		public UpdateBuilder setTastePref(String tastePref){
-			this.data.setTastePref(tastePref);
-			return this;
-		}
-		public UpdateBuilder setTaboo(String taboo){
-			this.data.setTaboo(taboo);
-			return this;
-		}
-		public UpdateBuilder setContactAddr(String addr){
-			this.data.setContactAddress(addr);
-			return this;
-		}
-		public UpdateBuilder setMemberCard(String card){
-			this.data.setMemberCard(card);
-			return this;
-		}
-		public UpdateBuilder setComment(String comment){
-			this.data.setComment(comment);
+			this.tele = tele;
 			return this;
 		}
 		
+		public boolean isTeleChanged(){
+			return this.tele != null;
+		}
+		
+		public UpdateBuilder setBirthday(String birthday){
+			if(birthday != null){
+				this.birthday = DateUtil.parseDate(birthday);
+			}
+			return this;
+		}
+		
+		public UpdateBuilder setBirthday(long birthday){
+			this.birthday = birthday;
+			return this;
+		}
+		
+		public boolean isBirthdayChanged(){
+			return this.birthday != 0;
+		}
+		
+		public UpdateBuilder setIdCard(String idCard){
+			this.idCard = idCard;
+			return this;
+		}
+		
+		public boolean isIdChardChanged(){
+			return this.idCard != null;
+		}
+		
+		public UpdateBuilder setCompany(String company){
+			this.company = company;
+			return this;
+		}
+		
+		public boolean isCompanyChanged(){
+			return this.company != null;
+		}
+		
+		public UpdateBuilder setPrivateComment(String comment){
+			this.privateComment = comment;
+			return this;
+		}
+		
+		public boolean isPrivateCommentChanged(){
+			return this.privateComment != null;
+		}
+		
+		public UpdateBuilder setPublicComment(String comment){
+			this.publicComment = comment;
+			return this;
+		}
+		
+		public boolean isPublicCommentChanged(){
+			return this.publicComment != null;
+		}
+		
+		public UpdateBuilder setContactAddr(String addr){
+			this.contactAddress = addr;
+			return this;
+		}
+		
+		public boolean isContactAddrChanged(){
+			return this.contactAddress != null;
+		}
+		
+		public UpdateBuilder setMemberCard(String card){
+			this.memberCard = card;
+			return this;
+		}
+		
+		public boolean isMemberCardChanged(){
+			return this.memberCard != null;
+		}
+		
 		public Member build(){
-			return this.data;
+			return new Member(this);
 		}
 	}
 	
@@ -235,13 +316,27 @@ public class Member implements Parcelable, Jsonable{
 	private long birthday;				// 生日
 	private String idCard;				// 身份证
 	private String company;				// 公司
-	private String tastePref;			// 口味
-	private String taboo;				// 忌讳
 	private String contactAddress;		// 联系地址
-	private String comment;				// 备注
 	private long createDate;			// 创建时间
 	private MemberType memberType;		// 会员类型
 	private String memberCard;			// 会员卡号
+	
+	//会员的公开评论
+	private SortedList<MemberComment> publicComments = SortedList.newInstance(new Comparator<MemberComment>(){
+		@Override
+		public int compare(MemberComment arg0, MemberComment arg1) {
+			//按评论时间倒序
+			if(arg0.getLastModified() > arg1.getLastModified()){
+				return -1;
+			}else if(arg0.getLastModified() < arg1.getLastModified()){
+				return 1;
+			}else{
+				return 0;
+			}
+		}	
+	
+	});
+	private MemberComment privateComment;	//某个员工的私有评论
 	
 	public Member(){
 		
@@ -251,38 +346,78 @@ public class Member implements Parcelable, Jsonable{
 		this.id = id;
 	}
 	
-	/**
-	 * 
-	 * @param id
-	 * @param baseBalance
-	 * @param extraBalance
-	 * @param comment
-	 * @return
-	 */
-	public static Member buildToBalance(int id, float baseBalance, float extraBalance, String comment){
-		Member updateBalance = new Member();
-		updateBalance.setId(id);
-		updateBalance.setBaseBalance(baseBalance);
-		updateBalance.setExtraBalance(extraBalance);
-		updateBalance.setComment(comment);
-		return updateBalance;
+	private Member(UpdateBuilder builder){
+		
+		setId(builder.memberId);
+		setRestaurantId(builder.restaurantId);
+		
+		if(builder.isNameChanged()){
+			setName(builder.name);
+		}
+		if(builder.isSexChanged()){
+			setSex(builder.sex);
+		}
+		if(builder.isMobileChanged()){
+			setMobile(builder.mobile);
+		}
+		if(builder.isBirthdayChanged()){
+			setBirthday(builder.birthday);
+		}
+		if(builder.isIdChardChanged()){
+			setIdCard(builder.idCard);
+		}
+		if(builder.isCompanyChanged()){
+			setCompany(builder.company);
+		}
+		if(builder.isContactAddrChanged()){
+			setContactAddress(builder.contactAddress);
+		}
+		if(builder.isMemberTypeChanged()){
+			setMemberType(new MemberType(builder.memberTypeId));
+		}
+		if(builder.isMemberCardChanged()){
+			setMemberCard(builder.memberCard);
+		}
+		if(builder.isPublicCommentChanged()){
+			addPublicComment(MemberComment.newPublicComment(null, new Member(builder.memberId), builder.publicComment));
+		}
+		if(builder.isPrivateCommentChanged()){
+			setPrivateComment(MemberComment.newPrivateComment(null, new Member(builder.memberId), builder.privateComment));
+		}
 	}
 	
-	/**
-	 * 
-	 * @param id
-	 * @param point
-	 * @param staffID
-	 * @param comment
-	 * @return
-	 */
-	public static Member buildToPoint(int id, int point, String comment){
-		Member updateBalance = new Member();
-		updateBalance.setId(id);
-		updateBalance.setPoint(point);
-		updateBalance.setComment(comment);
-		return updateBalance;
-	}
+//	/**
+//	 * 
+//	 * @param id
+//	 * @param baseBalance
+//	 * @param extraBalance
+//	 * @param comment
+//	 * @return
+//	 */
+//	public static Member buildToBalance(int id, float baseBalance, float extraBalance, String comment){
+//		Member updateBalance = new Member();
+//		updateBalance.setId(id);
+//		updateBalance.setBaseBalance(baseBalance);
+//		updateBalance.setExtraBalance(extraBalance);
+//		updateBalance.setComment(comment);
+//		return updateBalance;
+//	}
+//	
+//	/**
+//	 * 
+//	 * @param id
+//	 * @param point
+//	 * @param staffID
+//	 * @param comment
+//	 * @return
+//	 */
+//	public static Member buildToPoint(int id, int point, String comment){
+//		Member updateBalance = new Member();
+//		updateBalance.setId(id);
+//		updateBalance.setPoint(point);
+//		updateBalance.setComment(comment);
+//		return updateBalance;
+//	}
 	
 	/**
 	 * Check to see whether the balance of member account is enough for consumption in case of paid by member.
@@ -595,10 +730,10 @@ public class Member implements Parcelable, Jsonable{
 		jm.put("birthdayFormat", DateUtil.format(this.birthday));
 		jm.put("idCard", this.idCard);
 		jm.put("company", this.company);
-		jm.put("tastePref", this.tastePref);
-		jm.put("taboo", this.taboo);
+		//jm.put("tastePref", this.tastePref);
+		//jm.put("taboo", this.taboo);
 		jm.put("contactAddress", this.contactAddress);
-		jm.put("comment", this.comment);
+		//jm.put("comment", this.comment);
 		jm.put("createDate", this.createDate);
 		jm.put("createDateFormat", DateUtil.format(this.createDate));
 		jm.put("memberCard", this.memberCard);
@@ -645,7 +780,7 @@ public class Member implements Parcelable, Jsonable{
 	}
 	public MemberType getMemberType() {
 		if(memberType == null){
-			memberType = new MemberType();
+			memberType = new MemberType(0);
 		}
 		return memberType;
 	}
@@ -659,7 +794,7 @@ public class Member implements Parcelable, Jsonable{
 	}
 	public String getMemberCard() {
 		if(memberCard == null){
-			memberCard = "";
+			return "";
 		}
 		return memberCard;
 	}
@@ -682,6 +817,9 @@ public class Member implements Parcelable, Jsonable{
 		this.sex = Sex.valueOf(sexVal);
 	}
 	public String getTele() {
+		if(tele == null){
+			return "";
+		}
 		return tele;
 	}
 	public void setTele(String tele) {
@@ -708,7 +846,7 @@ public class Member implements Parcelable, Jsonable{
 	}
 	public String getIdCard() {
 		if(idCard == null){
-			idCard = "";
+			return "";
 		}
 		return idCard;
 	}
@@ -717,48 +855,21 @@ public class Member implements Parcelable, Jsonable{
 	}
 	public String getCompany() {
 		if(company == null){
-			company = "";
+			return "";
 		}
 		return company;
 	}
 	public void setCompany(String company) {
 		this.company = company;
 	}
-	public String getTastePref() {
-		if(tastePref == null){
-			tastePref = "";
-		}
-		return tastePref;
-	}
-	public void setTastePref(String tastePref) {
-		this.tastePref = tastePref;
-	}
-	public String getTaboo() {
-		if(taboo == null){
-			taboo = "";
-		}
-		return taboo;
-	}
-	public void setTaboo(String taboo) {
-		this.taboo = taboo;
-	}
 	public String getContactAddress() {
 		if(contactAddress == null){
-			contactAddress = "";
+			return "";
 		}
 		return contactAddress;
 	}
 	public void setContactAddress(String contactAddress) {
 		this.contactAddress = contactAddress;
-	}
-	public String getComment() {
-		if(comment == null){
-			comment = "";
-		}
-		return comment;
-	}
-	public void setComment(String comment) {
-		this.comment = comment;
 	}
 	public long getCreateDate() {
 		return createDate;
@@ -807,6 +918,51 @@ public class Member implements Parcelable, Jsonable{
 
 	public void setTotalCharge(float totalCharge) {
 		this.totalCharge = totalCharge;
+	}
+	
+	public void addPublicComment(MemberComment comment){
+		if(comment != null){
+			for(MemberComment publicComment : publicComments){
+				if(publicComment.equals(comment)){
+					publicComment.setComment(comment.getComment());
+					return;
+				}
+			}
+			this.publicComments.add(comment);
+		}
+	}
+	
+	public void setPublicComments(List<MemberComment> comments){
+		if(comments != null){
+			this.publicComments.clear();
+			this.publicComments.addAll(comments);
+		}
+	}
+	
+	public List<MemberComment> getPublicComments(){
+		return Collections.unmodifiableList(this.publicComments);
+	}
+	
+	public boolean hasPublicComments(){
+		return this.publicComments.size() != 0;
+	}
+	
+	public void setPrivateComment(MemberComment comment){
+		if(comment != null){
+			this.privateComment = comment;
+		}
+	}
+	
+	public MemberComment getPrivateComment(){
+		if(this.privateComment != null){
+			return this.privateComment;
+		}else{
+			return MemberComment.newPrivateComment(null, this, "");
+		}
+	}
+	
+	public boolean hasPrivateComment(){
+		return this.privateComment != null;
 	}
 	
 }

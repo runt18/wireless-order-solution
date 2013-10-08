@@ -335,6 +335,11 @@ public class Staff implements Parcelable, Jsonable{
 		}
 	}
 	
+	@Override
+	public String toString(){
+		return "staff(id = " + getId() + ",name = " + getName() + ")";
+	}
+	
 	public void writeToParcel(Parcel dest, int flag) {
 		dest.writeByte(flag);
 		if(flag == ST_PARCELABLE_SIMPLE){
