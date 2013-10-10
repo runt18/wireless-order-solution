@@ -14,29 +14,25 @@
 <script type="text/javascript" src="./js/Util.js"></script>
 
 <script type="text/javascript">
-var pin = 0,  restaurantID = 0;
-/*
-var request = new URLParaQuery();
-var pin = request['pin'], restaurantID = request['restaurantID'];
-*/
-var staffData = {staffID:0, staffName:''};
-var tableData = {}, regionData = {};
-var foodData = {}, kitchenFoodData = {}, kitchenData = {}, deptData = {root:[]}, tasteData = {};
+var pin=0,  restaurantID=0;
+var staffData={staffID:0, staffName:''};
+var tableData={}, regionData={};
+var foodData={}, kitchenFoodData={}, kitchenData={}, deptData={root:[]}, tasteData={}, allowTempKitchen={};
 function getDom(id){
 	return document.getElementById(id);
 }
 //登录操作包
-var ln = {
+var ln={
 	restaurant : {}
 }
 //餐桌选择包,tt：转台, rn: 区域
-var ts = {
+var ts={
 	table : {},
 	rn : {},
 	tt : {}	
 }
 //下单操作包
-var co = {
+var co={
 	table : {},
 	newFood : [],
 	ot : {
@@ -44,7 +40,7 @@ var co = {
 	}
 };
 //查看和修改账单操作包,cf为cancelFood缩写
-var uo = {
+var uo={
 	order : {},
 	table : {},
 	updateOrder : [],
@@ -57,28 +53,30 @@ var uo = {
 <script type="text/javascript" src="./js/updateOrder/uoMain.js"></script>
 <script type="text/javascript" src="./js/createOrder/coLoad.js"></script>
 <script type="text/javascript" src="./js/createOrder/coMain.js"></script>
+<script type="text/javascript" src="./js/createOrder/coOther.js"></script>
 <script type="text/javascript" src="./js/index.js"></script>
 </head>
 <body>
 
-<div id = "divRestaurantLogin" class="content-box-base">
-	<div style = "color : yellow; text-align : center; font-weight: bold; font-size: 20px; margin : 30px 0 0 0;">
+<div id="divRestaurantLogin" class="content-box-base">
+	<div style="color : yellow; text-align : center; font-weight: bold; font-size: 20px; margin : 30px 0 0 0;">
 		请输入餐厅帐号
 	</div>
-	<div style = "color : #fff; font-weight: bold; font-size: 28px; margin : 30px 0 30px 100px;">
-		餐厅帐号：<input id= "txtRestaurantAccount" type = "text" style="width: 150px; height: 50px; background: yellow; font-weight: bold; font-size: 28px;"/>
+	<div style="color : #fff; font-weight: bold; font-size: 28px; margin : 30px 0 30px 100px;">
+		餐厅帐号：<input id= "txtRestaurantAccount" type="text" style="width: 150px; height: 50px; background: yellow; font-weight: bold; font-size: 28px;"/>
 	</div>
 	<div class="button-base" style="line-height: 60px; margin-top : 50px; width: 100%;" onClick="restaurantLoginHandler()">
 		登陆
 	</div>
 </div>
 <div class="content content-box-base" style="z-index:9990;"></div>
+
 <div id="divUserLogin" class="box-horizontal content-box-base">
 	<div class="box-vertical" style="width: 330px;">
 		<div id="divAllStaffForUserLogin" style="-webkit-box-flex: 1; overflow-y: auto;"></div>
 		<div></div>
 	</div>
-	<div class="box-vertical" style="-webkit-box-flex: 1;">
+	<div class="box-vertical div-full">
 		<div style="color: #FFF; font-weight: bold; font-size: 28px;">
 			<div style="line-height: 60px; height: 60px;">
 				员工:<span id="spanStaffNameDisplay">----</span>
@@ -107,20 +105,20 @@ var uo = {
 	</div>
 </div>
 
-<div  id = "divTableSelect" class = "content box-vertical">
-	<div id="divMainForTableSelect" class = "box-horizontal">
+<div id="divTableSelect" class="content box-vertical">
+	<div id="divMainForTableSelect" class="box-horizontal">
 		<div id="divTableShowForSelect"></div>
-		<div id="divToolRightForSelect" class="box-vertical" style = "line-height: 60px;">
-			<div  id = "divAllStatus" class="button-base" style="margin-bottom: 2px;" onclick="showStatus()">全部状态	</div>
-			<div id = "divStatus" style =  " display: none; margin-bottom: 2px;">
-					<div class="button-base" id = "freeForTableSelect" style = "margin-bottom: 2px; background-color: #F1C40D" onclick = "ts.selectFreeStatus()">空闲</div>
-					<div class="button-base" id = "busyForTableSelect" style = "margin-bottom: 2px; background-color: #F1C40D" onclick = "ts.selectBusyStatus()">就餐</div>
+		<div id="divToolRightForSelect" class="box-vertical" style="line-height: 60px;">
+			<div  id="divAllStatus" class="button-base" style="margin-bottom: 2px;" onClick="showStatus()">全部状态</div>
+			<div id="divStatus" style= " display: none; margin-bottom: 2px;">
+					<div class="button-base" id="freeForTableSelect" style="margin-bottom: 2px; background-color: #F1C40D" onClick="ts.selectFreeStatus()">空闲</div>
+					<div class="button-base" id="busyForTableSelect" style="margin-bottom: 2px; background-color: #F1C40D" onClick="ts.selectBusyStatus()">就餐</div>
 			</div>
-			<div class="button-base" id = "divAllArea" style="margin-bottom: 2px;" onclick="addTables('allTable')">全部区域</div>
+			<div class="button-base" id="divAllArea" style="margin-bottom: 2px;" onClick="addTables('allTable')">全部区域</div>
 			<div id="divSelectRegionForTS"></div>
 			<div class="div-full">&nbsp;</div>
-			<div class="button-base" style="margin-bottom: 2px;" onclick = "ts.rn.prePage()">上翻</div>
-			<div class="button-base" style="margin-bottom: 2px;" onclick = "ts.rn.nextPage()">下翻</div>
+			<div class="button-base" style="margin-bottom: 2px;" onClick="ts.rn.prePage()">上翻</div>
+			<div class="button-base" style="margin-bottom: 2px;" onClick="ts.rn.nextPage()">下翻</div>
 		</div>
 	</div>
   	<div id="divDescForTableSelect" class="box-horizontal" style="font-weight: bold; border-bottom: 1px solid #FFF; border-top: 1px solid #FFF; line-height: 25px; background: #FFD700;">
@@ -131,33 +129,33 @@ var uo = {
 	<div id="divToolBottomForSelect" class="box-horizontal">
 	    <div class="button-base" style="margin-right: 2px; width: 120px;" onClick="logout()">注销</div>
 	    <div class="div-full"></div>
-	    <div class="button-base" style="margin-right: 2px; width: 120px;" onclick = "createOrderForTS()">点菜</div>
-	    <div class="button-base" style="margin-right: 2px;" onclick = "reFreshForTS()">刷新</div>
-  		<div class="button-base" style="margin-right: 2px;" onclick = "transTableForTS()">转台</div>
-	    <div class="button-base" style="margin-right: 2px;" onclick="ts.tp.getFirstPage()">首页</div>
-		<div class="button-base" style="margin-right: 2px;" onclick="ts.tp.getPreviousPage()">上一页</div>
-		<div class="button-base" style="margin-right: 2px;" onclick="ts.tp.getNextPage()">下一页</div>
-		<div class="button-base" style="margin-right: 2px;" onclick="ts.tp.getLastPage()">尾页</div>		
+	    <div class="button-base" style="margin-left: 2px; width: 120px;" onClick="createOrderForTS()">点菜</div>
+	    <div class="button-base" style="margin-left: 2px;" onClick="reFreshForTS()">刷新</div>
+  		<div class="button-base" style="margin-left: 2px;" onClick="transTableForTS()">转台</div>
+	    <!-- <div class="button-base" style="margin-left: 2px;" onClick="ts.tp.getFirstPage()">首页</div> -->
+		<div class="button-base" style="margin-left: 2px;" onClick="ts.tp.getPreviousPage()">上一页</div>
+		<div class="button-base" style="margin-left: 2px;" onClick="ts.tp.getNextPage()">下一页</div>
+		<!-- <div class="button-base" style="margin-left: 2px;" onClick="ts.tp.getLastPage()">尾页</div> -->		
 	</div>
 </div>
 
 <div id="divUpdateOrder" class="box-vertical content">
-	<div id = "divNorthForUpdateOrder">
+	<div id="divNorthForUpdateOrder">
 	</div>
-	<div id = "divCenterForUpdateOrder">
-		<table id = "tabForUpdateOrder"></table>
+	<div id="divCenterForUpdateOrder">
+		<table id="tabForUpdateOrder"></table>
 	</div>
-	<div id = "divDescForUpdateOrder" class = "box-horizontal" style = "background: #FFD700;">
+	<div id="divDescForUpdateOrder" class="box-horizontal" style="background: #FFD700;">
 	</div>
-	<div id = "divSouthForUpdateOrder" class="box-horizontal">
+	<div id="divSouthForUpdateOrder" class="box-horizontal">
 		<div class="button-base" style="margin-left: 2px; width: 120px;" onClick= "uo.cancelForUO()">返回</div>
   		<div class="div-full">&nbsp;</div>
-  		<div class="button-base" style="margin-left: 2px; width: 120px;" onclick = "uo.saveForUO()">确认修改</div>
-  		<div class="button-base" style="margin-left: 2px;" onclick = "uo.showdivKeyboardPeopleForUO({type : 'setCountForPeople'})">人数</div>
-  		<div class="button-base" style="margin-left: 2px;" onclick = "uo.goToCreateOrder()">点菜</div>
-  		<div class="button-base" style="margin-left: 2px;" onclick = "uo.tempPayForUO()">暂结</div>
-  		<div class="button-base" style="margin-left: 2px;" onclick = "Util.scroll({otype: 'up', content: 'divCenterForUpdateOrder', size: 80})">上翻</div>
-  		<div class="button-base" style="margin-left: 2px;" onclick = "Util.scroll({otype: 'down', content: 'divCenterForUpdateOrder', size: 80})">下翻</div>
+  		<div class="button-base" style="margin-left: 2px; width: 120px;" onClick="uo.saveForUO()">确认修改</div>
+  		<div class="button-base" style="margin-left: 2px;" onClick="uo.showdivKeyboardPeopleForUO({type : 'setCountForPeople'})">人数</div>
+  		<div class="button-base" style="margin-left: 2px;" onClick="uo.goToCreateOrder()">点菜</div>
+  		<div class="button-base" style="margin-left: 2px;" onClick="uo.tempPayForUO()">暂结</div>
+  		<div class="button-base" style="margin-left: 2px;" onClick="Util.scroll({otype: 'up', content: 'divCenterForUpdateOrder', size: 80})">上翻</div>
+  		<div class="button-base" style="margin-left: 2px;" onClick="Util.scroll({otype: 'down', content: 'divCenterForUpdateOrder', size: 80})">下翻</div>
 	</div>
 </div>
 
@@ -172,12 +170,12 @@ var uo = {
     			已点菜
     		</div>
 		</div>
-		<div class="div-full" style="">
-			<div id="divSelectDeptForOrder" class="box-horizontal" style=""> </div>
-			<div id="divSelectKitchenForOrder" class="box-horizontal" style=""> </div>
+		<div class="div-full">
+			<div id="divSelectDeptForOrder" class="box-horizontal" > </div>
+			<div id="divSelectKitchenForOrder" class="box-horizontal"> </div>
 		</div>
   	</div>
-  	<div id="divCenterForCreateOrde" class="box-horizontal" style="">
+  	<div id="divCenterForCreateOrde" class="box-horizontal">
   		<div id="divCFCONewFood" style=""> </div>
     	<div id="divCFCOHandler" style="">
 	      	<div class="button-base" onClick="co.addFood()" style="">数量+1</div>
@@ -191,9 +189,9 @@ var uo = {
     	</div>
     	<div id="divCFCOAllFood" class="div-full" style="overflow-y: auto;"></div>
   	</div>
-  	<div id="divDescForCreateOrde" class="box-horizontal" style="">
+  	<div id="divDescForCreateOrde" class="box-horizontal">
   		<div style="width: 300px;">&nbsp;</div>
-  		<div id="divDescForCreateOrde-padding-msg" style="-webkit-box-flex: 1; "></div>
+  		<div id="divDescForCreateOrde-padding-msg" class="div-full"></div>
   	</div>
   	<div id="divSouthForCreateOrde" class="box-horizontal" style="">
   		<div class="button-base" style="margin-right: 2px; width: 120px;" onClick="co.back()">返回</div>
@@ -202,157 +200,13 @@ var uo = {
   		<div class="div-full">&nbsp;</div>
   		<div class="button-base" style="margin-left: 2px; width: 120px;" onClick="co.submit({notPrint : false})">下单</div>
   		<div class="button-base" style="margin-left: 2px; width: 120px;" onClick="co.submit({notPrint : true})">下单不打印</div>
-  		<div class="button-base" style="margin-left: 2px;" onClick="co.fp.getFirstPage()">首页</div>
+  		<div class="button-base" style="margin-left: 2px;" onClick="co.s.entry()">搜索</div>
+  		<div class="button-base" style="margin-left: 2px;" onClick="co.tf.entry()">临时菜</div>
+  		<!-- <div class="button-base" style="margin-left: 2px;" onClick="co.fp.getFirstPage()">首页</div> -->
   		<div class="button-base" style="margin-left: 2px;" onClick="co.fp.getPreviousPage()">上一页</div>
   		<div class="button-base" style="margin-left: 2px;" onClick="co.fp.getNextPage()">下一页</div>
-  		<div class="button-base" style="margin-left: 2px;" onClick="co.fp.getLastPage()">尾页</div>
+  		<!-- <div class="button-base" style="margin-left: 2px;" onClick="co.fp.getLastPage()">尾页</div> -->
   	</div>
-</div>
-
-<div id = "divSelectTableNumForTs" class="content-box-base">
-	<div id = "divTopForSelectTableNumTS"></div>
-	<div id = "divMainForSelectTableNumTS">
-		<div id = "divLeftForSelectTableNumTS">
-			<span style = "font-size: 25px; font-weight: bold; margin-left: 5px;">桌号：</span>
-			<input type = "text" id = "txtTableNumForTS"  class = "table-number" style = "background: #FFD700;"/>
-			<div class="button-base" onclick = "inputNum(this)">7</div>
-			<div class="button-base" onclick = "inputNum(this)">8</div>
-			<div class="button-base" onclick = "inputNum(this)">9</div>
-			<div class="button-base" onclick = "inputNum(this)">4</div>
-			<div class="button-base" onclick = "inputNum(this)">5</div>
-			<div class="button-base" onclick = "inputNum(this)">6</div>
-			<div class="button-base" onclick = "inputNum(this)">1</div>
-			<div class="button-base" onclick = "inputNum(this)">2</div>
-			<div class="button-base" onclick = "inputNum(this)">3</div>
-			<div class="button-base" onclick = "inputNum(this)" style = "width: 164px;">0</div>
-			<div class="button-base" onclick = "inputNum(this)">00</div>
-		</div>
-		<div id = "divRightForSelectTableNumTS">
-			<div class="button-base" style = "margin-top: 1px;" onclick = "ts.backOne()">&lt;--</div>
-			<div class="button-base" onclick = "ts.backAll()">&lt;&lt;</div>
-			<div class="button-base" id = "btnCloseForSelectTableNumTS">关闭</div>
-			<div class="button-base" style = "height: 130px; line-height: 130px;" onclick = "ts.submitForSelectTableNumTS()">确定</div>
-		</div>
-	</div>
-</div>		
-
-<div id = "divShowMessageForTableSelect" class="content-box-base">
-	<div id = "divTopForShowMessageTS">
-		<span style = "color: white;"><strong>请输入桌号及人数</strong></span>
-	</div>
-	<div id = "divCenterForShowMessageTS" class = "box-horizontal">
-		<div id = "divLeftForShowMessageTS" >
-			<span style = "font-size: 22px; font-weight: bold;">桌号：</span>
-			<input type = "text" id = "txtTableNumForSM" class = "desk-number" onclick = 'ts.selectInput({renderTo: this.id})'/>
-			<span style = "font-size: 22px; font-weight: bold;">人数：</span>
-			<input type = "text" id = "txtPeopleNumForSM" class = "desk-number" onclick = 'ts.selectInput({renderTo: this.id})'/>
-		</div>
-		<div id = "divRightForShowMessageTS">
-			<div class="button-base" onclick = "ts.selectingTxt({renderTo : 'txtTableNumForSM'})">选中</div>
-			<div class="button-base" onclick = "inputNum(this)">7</div>
-			<div class="button-base" onclick = "inputNum(this)">8</div>
-			<div class="button-base" onclick = "inputNum(this)">9</div>
-			<div class="button-base" onclick = "ts.selectingTxt({renderTo : 'txtPeopleNumForSM'})">选中</div>
-			<div class="button-base" onclick = "inputNum(this)">4</div>
-			<div class="button-base" onclick = "inputNum(this)">5</div>
-			<div class="button-base" onclick = "inputNum(this)">6</div>
-			<div class="button-base" onclick = "inputNum(this)">0</div>
-			<div class="button-base" onclick = "inputNum(this)">1</div>
-			<div class="button-base" onclick = "inputNum(this)">2</div>
-			<div class="button-base" onclick = "inputNum(this)">3</div>
-		</div>
-	</div>
-	<div id = "divBottomForShowMessageTS">
-		<div class="button-base" style = "width: 130px; margin-left: 100px;" onclick = "ts.createOrderForShowMessageTS()">点菜</div>
-		<div class="button-base" id = "btnCancelForShowMessageTS" style = "width: 130px; margin-left: 65px;">返回</div>
-	</div>
-</div>	
-
-<div id = "divTransTableForTableSelect">
-	<div id = "divTopForTransTableTS">
-		<span style = "color: white;"><strong>请输入转台所需要的桌号：</strong></span>
-	</div>
-	<div id = "divCenterForTransTableTS" class = "box-horizontal">
-		<div id = "divLeftForTransTableTS" >
-			<span style = "font-size: 20px; font-weight: bold; padding-right: 0; color: #FFF;">桌号：</span>
-			<input type = "text" id = "txtOldTableForTS" class = "desk-number" onclick = 'ts.selectInput({renderTo: this.id})'/>
-			<span style = "font-size: 20px; font-weight: bold; color: #FFF;">转至：</span>
-			<input type = "text" id = "txtNewTableForTS" class = "desk-number" onclick = 'ts.selectInput({renderTo: this.id})'/>
-		</div>
-		<div id = "divRightForTransTableTS">
-			<div class="button-base" onclick = "ts.selectingTxt({renderTo : 'txtOldTableForTS'})">选中</div>
-			<div class="button-base" onclick = "inputNum(this)">7</div>
-			<div class="button-base" onclick = "inputNum(this)">8</div>
-			<div class="button-base" onclick = "inputNum(this)">9</div>
-			<div class="button-base" onclick = "ts.selectingTxt({renderTo : 'txtNewTableForTS'})">选中</div>
-			<div class="button-base" onclick = "inputNum(this)">4</div>
-			<div class="button-base" onclick = "inputNum(this)">5</div>
-			<div class="button-base" onclick = "inputNum(this)">6</div>
-			<div class="button-base" onclick = "inputNum(this)">0</div>
-			<div class="button-base" onclick = "inputNum(this)">1</div>
-			<div class="button-base" onclick = "inputNum(this)">2</div>
-			<div class="button-base" onclick = "inputNum(this)">3</div>
-		</div>
-	</div>
-	<div id = "divBottomForTransTableTS">
-		<div class="button-base" style = "width: 150px; margin-left: 100px;" onclick = "ts.tt.submit()">确定</div>
-		<div class="button-base" style = "width: 150px; margin-left: 60px;" onclick = "ts.tt.back()">返回</div>
-	</div>
-</div>	
-
-<div id = "divKeyboardNumForUO" class="content-box-base">
-	<div id = "divTopForKeyboardNumForUO"></div>
-	<div id = "divMainForKeyboardNumForUO">
-		<div id = "divLeftForKeyboardNumForUO">
-			<div class="button-base" style = "margin: 0 0 0 2px;" onclick = "uo.addOneNum()">+</div>				
-			<input type = "text" id = "txtNumForUO" class = "table-number" style = "margin-left: 9px;"/>
-			<div class="button-base" onclick = "inputNumUO(this)">7</div>
-			<div class="button-base" onclick = "inputNumUO(this)">8</div>
-			<div class="button-base" onclick = "inputNumUO(this)">9</div>
-			<div class="button-base" onclick = "inputNumUO(this)">4</div>
-			<div class="button-base" onclick = "inputNumUO(this)">5</div>
-			<div class="button-base" onclick = "inputNumUO(this)">6</div>
-			<div class="button-base" onclick = "inputNumUO(this)">1</div>
-			<div class="button-base" onclick = "inputNumUO(this)">2</div>
-			<div class="button-base" onclick = "inputNumUO(this)">3</div>
-			<div class="button-base" id = "btnSubmitForKeyboardNumUO" style = "width: 164px;" onclick = "uo.cf.save()">确定</div>
-			<div class="button-base" id = "btnCloseForKeyboardNumUO">取消</div>
-		</div>
-		<div id = "divRightForKeyboardNumForUO">
-			<div class="button-base" style = "margin: 0 0 0 2px;" onclick = "uo.cutOne()">-</div>
-			<div class="button-base" style = "margin: 12px 0 5px 2px;" onclick = "uo.backAll()">&lt;&lt;</div>
-			<div class="button-base" onclick = "inputNumUO(this)">.</div>
-			<div class="button-base" onclick = "inputNumUO(this)" style = "height: 130px; line-height: 130px;">0</div>
-		</div>
-		<div id = "divReasonForKeyboardNumForUO"></div>
-	</div>
-</div>
-
-<div id = "divKeyboardPeopleForUO" class="content-box-base">
-	<div id = "divTopForKeyboardPeopleForUO"></div>
-	<div id = "divMainForKeyboardPeopleForUO">
-		<div id = "divLeftForKeyboardPeopleForUO">
-			<div class="button-base" style = "margin: 0 0 0 2px;" onclick = "uo.addOneNum()">+</div>
-			<input type = "text" id = "txtPeopleNumForUO"  class = "table-number" style = "margin-left: 8px;"/>
-			<div class="button-base" onclick = "inputNumUO(this)">7</div>
-			<div class="button-base" onclick = "inputNumUO(this)">8</div>
-			<div class="button-base" onclick = "inputNumUO(this)">9</div>
-			<div class="button-base" onclick = "inputNumUO(this)">4</div>
-			<div class="button-base" onclick = "inputNumUO(this)">5</div>
-			<div class="button-base" onclick = "inputNumUO(this)">6</div>
-			<div class="button-base" onclick = "inputNumUO(this)">1</div>
-			<div class="button-base" onclick = "inputNumUO(this)">2</div>
-			<div class="button-base" onclick = "inputNumUO(this)">3</div>
-			<div class="button-base isSave" class = "keyboardbutton" style = "width: 164px;">确定</div>
-			<div class="button-base" id = "btnCloseForPeopleKeyboardUO" class = "keyboardbutton">取消</div>
-		</div>
-		<div id = "divRightForKeyboardPeopleForUO">
-			<div class="button-base" style = "margin: 0 0 0 2px;" onclick = "uo.cutOne()">-</div>
-			<div class="button-base" style = "margin: 12px 0 5px 2px;" onclick = "uo.backAll()">&lt;&lt;</div>
-			<div class="button-base isDot" onclick = "inputNumUO(this)">00</div>
-			<div class="button-base" onclick = "inputNumUO(this)" style = "height: 130px; line-height: 130px;">0</div>
-		</div>
-	</div>
 </div>
 
 <div id="divOperateBoxForFoodTaste" class="content-box-base">
@@ -367,20 +221,219 @@ var uo = {
 				<div id="divButtonForAllTaste" class="button-base" style="width: 100px; margin: 0 1px 0 1px;" onClick="co.ot.changeTaste({type:parseInt(this.getAttribute('data-value'))})" data-value=2>所有口味</div>
 				<div id="divButtonForGuiGeTaste" class="button-base" style="width: 103px;" onClick="co.ot.changeTaste({type:parseInt(this.getAttribute('data-value'))})" data-value=3>规格</div>
 			</div>
-			<div id="divCFOTTasteSelectContent" style="-webkit-box-flex: 1;"></div>
+			<div id="divCFOTTasteSelectContent" class="div-full"></div>
 		</div>
 	</div>
 	<div class="box-horizontal" style=" border-bottom: 1px solid #FFF; border-top: 1px solid #FFF; line-height: 25px; background: #FFD700;">
-  		<div id="divDescForOperateTaste-padding-msg" style="-webkit-box-flex: 1; text-align: right; font-weight: bold;">&nbsp;</div>
+  		<div id="divDescForOperateTaste-padding-msg" class="div-full" style="text-align: right; font-weight: bold;">&nbsp;</div>
   	</div>
 	<div id="divSouthForOperateTaste" class="box-horizontal" style="">
 		<div class="button-base" style="margin-right: 2px;" onClick="co.ot.back()">返回</div>
 		<div class="div-full">&nbsp;</div>
   		<div class="button-base" style="margin-left: 2px;" onClick="co.ot.save()">确定</div>
-  		<div class="button-base" style="margin-left: 2px;" onClick="co.ot.tp.getFirstPage()">首页</div>
+  		<!-- <div class="button-base" style="margin-left: 2px;" onClick="co.ot.tp.getFirstPage()">首页</div> -->
   		<div class="button-base" style="margin-left: 2px;" onClick="co.ot.tp.getPreviousPage()">上一页</div>
   		<div class="button-base" style="margin-left: 2px;" onClick="co.ot.tp.getNextPage()">下一页</div>
-  		<div class="button-base" style="margin-left: 2px;" onClick="co.ot.tp.getLastPage()">尾页</div>
+  		<!-- <div class="button-base" style="margin-left: 2px;" onClick="co.ot.tp.getLastPage()">尾页</div> -->
+	</div>
+</div>
+
+<div id="divSearchToolbarForCreateOrder" class="box-vertical" style="position: absolute; display:none; height: 60px; left:0; bottom: -60px; width:100%;">
+	<div class="box-horizontal" style="height: 60px; background-color: #4682B4; ">
+		<div class="div-full">&nbsp;</div>
+		<div style="margin-left: 2px; font-weight: bold; font-size: 35px;">
+			菜名:<input id="txtSearchFileForCreateOrder" type="text" style="width: 300px; height: 56px; font-weight: bold; font-size: 35px; background-color: yellow;">
+		</div>
+		<div class="button-base" style="margin-left: 2px;" onClick="co.s.valueBack()">&laquo;</div>
+		<div class="button-base" style="margin-left: 2px;" onClick="co.s.clear()">&laquo;&laquo;</div>
+		<div class="button-base" style="margin-left: 2px;" onClick="co.s.select()">选中</div>
+		<div class="button-base" style="margin-left: 2px;" onClick="co.s.end()">关闭</div>
+	</div>
+</div>
+
+<div id="divTempFoodForCreateOrder" class="box-vertical content-box-base">
+	<div class="box-vertical" style="width: 100%;" >
+		<div style="-webkit-box-flex: 1; color: #fff; font-weight: bold; font-size: 28px;">
+			<div style="line-height:65px;">菜名:<input id="txtNameForCOTF" type="text" onFocus="co.tf.setKeyDom(this)"></div>
+			<div style="line-height:65px;">
+				价钱:<input id="txtPriceForCOTF" type="text" onFocus="co.tf.setKeyDom(this)">
+				数量:<input id="txtCountForCOTF" type="text" value="1" onFocus="co.tf.setKeyDom(this)">
+			</div>
+		</div>
+	</div>
+	<div class="box-horizontal div-full">
+		<div class="box-vertical div-full" style="width:330px; margin:5px 0 0 10px; ">
+			<div class="button-base" style="width: 310px; line-height: 60px; height:60px;">分厨</div>
+			<div id="divKitchenSelectForCOTF" class="div-full" style="overflow-y: auto;">&nbsp;</div>
+		</div>
+		<div class="box-vertical" style="margin:0 0 0 10px; width: 260px;">
+			<div class="div-full" id="divKeyBoyForCOTF">
+				<div class="button-base" onClick="co.tf.keyBoy({value:7})">7</div>
+				<div class="button-base" onClick="co.tf.keyBoy({value:8})">8</div>
+				<div class="button-base" onClick="co.tf.keyBoy({value:9})">9</div>
+				<div class="button-base" onClick="co.tf.keyBoy({value:4})">4</div>
+				<div class="button-base" onClick="co.tf.keyBoy({value:5})">5</div>
+				<div class="button-base" onClick="co.tf.keyBoy({value:6})">6</div>
+				<div class="button-base" onClick="co.tf.keyBoy({value:1})">1</div>
+				<div class="button-base" onClick="co.tf.keyBoy({value:2})">2</div>
+				<div class="button-base" onClick="co.tf.keyBoy({value:3})">3</div>
+				<div class="button-base" onClick="co.tf.keyBoy({value:0})">0</div>
+				<div class="button-base" onClick="co.tf.keyBoy({value:'.'})">.</div>
+				<div class="button-base" onClick="co.tf.keyBoy({value:'00'})">00</div>
+				<div class="button-base" onClick="co.tf.keyBoy({type:1})">&laquo;</div>
+				<div class="button-base" onClick="co.tf.keyBoy({type:2})">&laquo;&laquo;</div>
+			</div>
+		</div>
+	</div>
+	<div class="box-horizontal" style="line-height:60px; width: 100%;">
+		<div class="button-base" style="line-height: 60px; width: 49%;" onClick="co.tf.save()">确定</div>
+		<div class="button-base" style="line-height: 60px; width: 49%; margin-left: 2%;" onClick="co.tf.back()">返回</div>
+	</div>
+</div>
+
+<div id="divSelectTableNumForTs" class="content-box-base">
+	<div id="divTopForSelectTableNumTS"></div>
+	<div id="divMainForSelectTableNumTS">
+		<div id="divLeftForSelectTableNumTS">
+			<span style="font-size: 25px; font-weight: bold; margin-left: 5px;">桌号：</span>
+			<input type="text" id="txtTableNumForTS" class="table-number"/>
+			<div class="button-base" onClick="inputNum(this)">7</div>
+			<div class="button-base" onClick="inputNum(this)">8</div>
+			<div class="button-base" onClick="inputNum(this)">9</div>
+			<div class="button-base" onClick="inputNum(this)">4</div>
+			<div class="button-base" onClick="inputNum(this)">5</div>
+			<div class="button-base" onClick="inputNum(this)">6</div>
+			<div class="button-base" onClick="inputNum(this)">1</div>
+			<div class="button-base" onClick="inputNum(this)">2</div>
+			<div class="button-base" onClick="inputNum(this)">3</div>
+			<div class="button-base" onClick="inputNum(this)" style="width: 164px;">0</div>
+			<div class="button-base" onClick="inputNum(this)">00</div>
+		</div>
+		<div id="divRightForSelectTableNumTS">
+			<div class="button-base" style="margin-top: 1px;" onClick="ts.backOne()">&lt;--</div>
+			<div class="button-base" onClick="ts.backAll()">&lt;&lt;</div>
+			<div class="button-base" id="btnCloseForSelectTableNumTS">关闭</div>
+			<div class="button-base" style="height: 130px; line-height: 130px;" onClick="ts.submitForSelectTableNumTS()">确定</div>
+		</div>
+	</div>
+</div>		
+
+<div id="divShowMessageForTableSelect" class="content-box-base">
+	<div id="divTopForShowMessageTS">
+		<span style="color: white;"><strong>请输入桌号及人数</strong></span>
+	</div>
+	<div id="divCenterForShowMessageTS" class="box-horizontal">
+		<div id="divLeftForShowMessageTS" >
+			<span style="font-size: 20px; font-weight: bold;">桌号：</span>
+			<input type="text" id="txtTableNumForSM" class="desk-number" onClick='ts.selectInput({renderTo: this.id})'/>
+			<span style="font-size: 20px; font-weight: bold;">人数：</span>
+			<input type="text" id="txtPeopleNumForSM" class="desk-number" onClick='ts.selectInput({renderTo: this.id})'/>
+		</div>
+		<div id="divRightForShowMessageTS">
+			<div class="button-base" onClick="ts.selectingTxt({renderTo : 'txtTableNumForSM'})">选中</div>
+			<div class="button-base" onClick="inputNum(this)">7</div>
+			<div class="button-base" onClick="inputNum(this)">8</div>
+			<div class="button-base" onClick="inputNum(this)">9</div>
+			<div class="button-base" onClick="ts.selectingTxt({renderTo : 'txtPeopleNumForSM'})">选中</div>
+			<div class="button-base" onClick="inputNum(this)">4</div>
+			<div class="button-base" onClick="inputNum(this)">5</div>
+			<div class="button-base" onClick="inputNum(this)">6</div>
+			<div class="button-base" onClick="inputNum(this)">0</div>
+			<div class="button-base" onClick="inputNum(this)">1</div>
+			<div class="button-base" onClick="inputNum(this)">2</div>
+			<div class="button-base" onClick="inputNum(this)">3</div>
+		</div>
+	</div>
+	<div id="divBottomForShowMessageTS">
+		<div class="button-base" style="width: 130px; margin-left: 100px;" onClick="ts.createOrderForShowMessageTS()">点菜</div>
+		<div class="button-base" id="btnCancelForShowMessageTS" style="width: 130px; margin-left: 65px;">返回</div>
+	</div>
+</div>	
+
+<div id="divTransTableForTableSelect">
+	<div id="divTopForTransTableTS">
+		<span style="color: white;"><strong>请输入转台所需要的桌号：</strong></span>
+	</div>
+	<div id="divCenterForTransTableTS" class="box-horizontal">
+		<div id="divLeftForTransTableTS" >
+			<span style="font-size: 20px; font-weight: bold; padding-right: 0; color: #FFF;">桌号：</span>
+			<input type="text" id="txtOldTableForTS" class="desk-number" onClick='ts.selectInput({renderTo: this.id})'/>
+			<span style="font-size: 20px; font-weight: bold; color: #FFF;">转至：</span>
+			<input type="text" id="txtNewTableForTS" class="desk-number" onClick='ts.selectInput({renderTo: this.id})'/>
+		</div>
+		<div id="divRightForTransTableTS">
+			<div class="button-base" onClick="ts.selectingTxt({renderTo : 'txtOldTableForTS'})">选中</div>
+			<div class="button-base" onClick="inputNum(this)">7</div>
+			<div class="button-base" onClick="inputNum(this)">8</div>
+			<div class="button-base" onClick="inputNum(this)">9</div>
+			<div class="button-base" onClick="ts.selectingTxt({renderTo : 'txtNewTableForTS'})">选中</div>
+			<div class="button-base" onClick="inputNum(this)">4</div>
+			<div class="button-base" onClick="inputNum(this)">5</div>
+			<div class="button-base" onClick="inputNum(this)">6</div>
+			<div class="button-base" onClick="inputNum(this)">0</div>
+			<div class="button-base" onClick="inputNum(this)">1</div>
+			<div class="button-base" onClick="inputNum(this)">2</div>
+			<div class="button-base" onClick="inputNum(this)">3</div>
+		</div>
+	</div>
+	<div id="divBottomForTransTableTS">
+		<div class="button-base" style="width: 150px; margin-left: 100px;" onClick="ts.tt.submit()">确定</div>
+		<div class="button-base" style="width: 150px; margin-left: 60px;" onClick="ts.tt.back()">返回</div>
+	</div>
+</div>	
+
+<div id="divKeyboardNumForUO" class="content-box-base">
+	<div id="divTopForKeyboardNumForUO"></div>
+	<div id="divMainForKeyboardNumForUO">
+		<div id="divLeftForKeyboardNumForUO">
+			<div class="button-base" style="margin: 0 0 0 2px;" onClick="uo.addOneNum()">+</div>				
+			<input type="text" id="txtNumForUO" class="table-number" style="margin-left: 9px;"/>
+			<div class="button-base" onClick="inputNumUO(this)">7</div>
+			<div class="button-base" onClick="inputNumUO(this)">8</div>
+			<div class="button-base" onClick="inputNumUO(this)">9</div>
+			<div class="button-base" onClick="inputNumUO(this)">4</div>
+			<div class="button-base" onClick="inputNumUO(this)">5</div>
+			<div class="button-base" onClick="inputNumUO(this)">6</div>
+			<div class="button-base" onClick="inputNumUO(this)">1</div>
+			<div class="button-base" onClick="inputNumUO(this)">2</div>
+			<div class="button-base" onClick="inputNumUO(this)">3</div>
+			<div class="button-base" id="btnSubmitForKeyboardNumUO" style="width: 164px;" onClick="uo.cf.save()">确定</div>
+			<div class="button-base" id="btnCloseForKeyboardNumUO">取消</div>
+		</div>
+		<div id="divRightForKeyboardNumForUO">
+			<div class="button-base" style="margin: 0 0 0 2px;" onClick="uo.cutOne()">-</div>
+			<div class="button-base" style="margin: 12px 0 5px 2px;" onClick="uo.backAll()">&lt;&lt;</div>
+			<div class="button-base" onClick="inputNumUO(this)">.</div>
+			<div class="button-base" onClick="inputNumUO(this)" style="height: 130px; line-height: 130px;">0</div>
+		</div>
+		<div id="divReasonForKeyboardNumForUO"></div>
+	</div>
+</div>
+
+<div id="divKeyboardPeopleForUO" class="content-box-base">
+	<div id="divTopForKeyboardPeopleForUO"></div>
+	<div id="divMainForKeyboardPeopleForUO">
+		<div id="divLeftForKeyboardPeopleForUO">
+			<div class="button-base" style="margin: 0 0 0 2px;" onClick="uo.addOneNum()">+</div>
+			<input type="text" id="txtPeopleNumForUO"  class="table-number" style="margin-left: 8px;"/>
+			<div class="button-base" onClick="inputNumUO(this)">7</div>
+			<div class="button-base" onClick="inputNumUO(this)">8</div>
+			<div class="button-base" onClick="inputNumUO(this)">9</div>
+			<div class="button-base" onClick="inputNumUO(this)">4</div>
+			<div class="button-base" onClick="inputNumUO(this)">5</div>
+			<div class="button-base" onClick="inputNumUO(this)">6</div>
+			<div class="button-base" onClick="inputNumUO(this)">1</div>
+			<div class="button-base" onClick="inputNumUO(this)">2</div>
+			<div class="button-base" onClick="inputNumUO(this)">3</div>
+			<div class="button-base isSave" class="keyboardbutton" style="width: 164px;">确定</div>
+			<div class="button-base" id="btnCloseForPeopleKeyboardUO" class="keyboardbutton">取消</div>
+		</div>
+		<div id="divRightForKeyboardPeopleForUO">
+			<div class="button-base" style="margin: 0 0 0 2px;" onClick="uo.cutOne()">-</div>
+			<div class="button-base" style="margin: 12px 0 5px 2px;" onClick="uo.backAll()">&lt;&lt;</div>
+			<div class="button-base isDot" onClick="inputNumUO(this)">00</div>
+			<div class="button-base" onClick="inputNumUO(this)" style="height: 130px; line-height: 130px;">0</div>
+		</div>
 	</div>
 </div>
 

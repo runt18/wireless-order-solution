@@ -1,50 +1,15 @@
 /**
- * 
- * @param args
- * @returns {String}
- */
-String.prototype.format = function(args){
-    var result = this;
-    if (arguments.length > 0){    
-        if (arguments.length == 1 && typeof args == "object"){
-            for(var key in args) {
-                if(args[key] != undefined){
-                    var reg = new RegExp("({" + key + "})", "g");
-                    result = result.replace(reg, args[key]);
-                }
-            }
-        }else{
-        	for(var i = 0; i < arguments.length; i++){
-        		if (arguments[i] != undefined) {
-        			var reg= new RegExp("({)" + i + "(})", "g");
-        			result = result.replace(reg, arguments[i]);
-                }
-            }
-        }
-    }
-    return result;
-};
-/**
- * 
- */
-String.prototype.trim = function(){
-	return this.replace(/(^\s*)|(\s*$)/g, ""); 
-};
-
-
-/**
  * 显示模板
  */
-var Templet = {
+var Templet={
 	ul : {
 		allStaff : '<div data-value={id} class="main-box-base" style="line-height: 70px; text-align: center;" onClick="changeStaff({event:this, type:1, staffId:{id}})">{name}</div>'
 	},
 	ts : {
-		boxTable : '<div data-index = {dataIndex} data-alias = {alias} class = {dataClass} style = "text-align : center;" '
-			+ 'onclick = "ts.selectTable({event : this, tableAlias : {alias}})">'
-			+ '<div style = "font-weight : bold; margin-top : 20px;">{tableName}</div>'
-			+ '<div style = "color: #462B77; font-size: 10px;">{alias}</div>'
-//			+ '<div style = "font-size: 10px; text-align : right;"><span style = "color : red;">{customNum}</span></div>'
+		boxTable : '<div data-index={dataIndex} data-alias={alias} class={dataClass} style="text-align : center;" '
+			+ 'onclick="ts.selectTable({event : this, tableAlias : {alias}})">'
+			+ '<div style="font-weight : bold; margin-top : 20px;">{tableName}</div>'
+			+ '<div style="color: #462B77; font-size: 10px;">{alias}</div>'
 			+ '</div>',
 		region : '<div class="button-base" data-value={value} data-type="region-select" '
 			+ 'onClick="ts.findTableByRegion({event:this, regionId:{value}})">{text}</div>',
@@ -54,7 +19,7 @@ var Templet = {
 			+ 'onClick="co.initKitchenContent({event:this, deptId:{value}})">{text}</div>',
 		kitchen : '<div class="button-base" data-value={value} data-type="kitchen-select" '
 			+ 'onClick="co.findFoodByKitchen({event:this, kitchenId:{value}})">{text}</div>',
-		boxFood : '<div  style = "text-align: center;" data-index={dataIndex} data-value={id} class="main-box-base" onClick="co.insertFood({foodId:{id}})">'
+		boxFood : '<div data-index={dataIndex} data-value={id} class="main-box-base" onClick="{click}">'
 			+ '{name}'
 			+ '<div>¥:{unitPrice}</div>'
 			+ '</div>',
@@ -76,8 +41,8 @@ var Templet = {
   	  		+ '</div>'
 	},
 	uo : {
-		orderFood : '<tr data-index = {dataIndex} data-value = {alias} id = "truoFood{dataIndex}" onclick = "selectUOFood(this)">'
-			+ 'data-type = "orderFood-select" >'
+		orderFood : '<tr data-index={dataIndex} data-value={alias} id="truoFood{dataIndex}" onclick="selectUOFood(this)">'
+			+ 'data-type="orderFood-select" >'
 			+ '<td>{dataIndex}</td>'
 			+ '<td>{name}</td>'
 			+ '<td>{count}</td>'
@@ -85,7 +50,7 @@ var Templet = {
 			+ '<td>{actualPrice}</td>'
 			+ '<td>{totalPrice}</td>'
 			+ '<td>{orderDateFormat}</td>'
-			+ '<td><div class = "button-base cancelFoodBtn" id = "btnuo{dataIndex}">退菜</div></td>'
+			+ '<td><div class="button-base cancelFoodBtn" id="btnuo{dataIndex}">退菜</div></td>'
 			+ '<td>{waiter}</td>'
 			+ '</tr>'
 	}
@@ -116,8 +81,8 @@ function initFoodData(){
 					},
 					success : function(data, status, xhr){
 						if(data.success){
-							tasteData = {};
-							tasteData = {totalProperty:data.root.length, root:data.root.slice(0)};
+							tasteData={};
+							tasteData={totalProperty:data.root.length, root:data.root.slice(0)};
 						}else{
 							alert('初始化口味数据失败.');
 						}
@@ -127,23 +92,20 @@ function initFoodData(){
 					}
 				});
 				
-				var tmpKitchen = null;
-				for(var i = 0; i < data.root.length; i++){
-					tmpKitchen = {
+				var tmpKitchen=null;
+				for(var i=0; i < data.root.length; i++){
+					tmpKitchen={
 						id : data.root[i].kitchen.id,
 						alias : data.root[i].kitchen.alias,
 						dept : {
 							id : data.root[i].kitchen.dept.id
 						}
 					};
-					data.root[i].kitchen = tmpKitchen;
+					data.root[i].kitchen=tmpKitchen;
 				}
-				tmpKitchen = null;
+				tmpKitchen=null;
 				localStorage.setItem('foods', JSON.stringify(data));
-				foodData = data;
-				
-//				$.getScript('./js/createOrder/coLoad.js');
-//				$.getScript('./js/createOrder/coMain.js');
+				foodData=data;
 				
 				// 加载部门数据,分厨数据
 				$.ajax({
@@ -156,30 +118,30 @@ function initFoodData(){
 					success : function(data, status, xhr){
 						Util.LM.hide();
 						if(data.success){
-							deptData = {root:[]};
-							kitchenData = {totalProperty:data.root.length, root:data.root.slice(0)};
-							kitchenFoodData = {totalProperty:data.root.length, root:data.root.slice(0)};
-							var tempFoodData = foodData.root.slice(0);
+							deptData={root:[]};
+							kitchenData={totalProperty:data.root.length, root:data.root.slice(0)};
+							kitchenFoodData={totalProperty:data.root.length, root:data.root.slice(0)};
+							var tempFoodData=foodData.root.slice(0);
 							deptData.root.push(kitchenData.root[0].dept);
-							for(var j = 0; j < kitchenFoodData.root.length; j++){
-								var temp = kitchenFoodData.root[j];
-								temp.foods = [];
-								for(var i = 0; i < tempFoodData.length; i++){
+							for(var j=0; j < kitchenFoodData.root.length; j++){
+								var temp=kitchenFoodData.root[j];
+								temp.foods=[];
+								for(var i=0; i < tempFoodData.length; i++){
 									if(tempFoodData[i].kitchen.id == temp.id){
 										temp.foods.push(tempFoodData[i]);
 									}
 								}
-								var hasDept = false;
-								for(var i = 0; i < deptData.root.length; i++){
+								var hasDept=false;
+								for(var i=0; i < deptData.root.length; i++){
 									if(deptData.root[i].id == temp.dept.id){
-										hasDept = true;
+										hasDept=true;
 									}
 								}
 								if(!hasDept){
 									deptData.root.push(temp.dept);
 								}
 							}
-							deptData.totalProperty = deptData.root.length;
+							deptData.totalProperty=deptData.root.length;
 							deptData.root.unshift({
 								id : -1,
 								name : '全部部门'
@@ -201,9 +163,9 @@ function initFoodData(){
 								foods : foodData.root.slice(0)
 							});
 							// 清理多余数据
-							for(var i = kitchenFoodData.root.length - 1; i >= 0; i--){
+							for(var i=kitchenFoodData.root.length - 1; i >= 0; i--){
 								if(kitchenFoodData.root[i].foods.length <= 0){
-									for(var k = kitchenData.root.length - 1; k >= 0; k--){
+									for(var k=kitchenData.root.length - 1; k >= 0; k--){
 										if(kitchenData.root[k].id == kitchenFoodData.root[i].id){
 											kitchenFoodData.root.splice(i, 1);
 											kitchenData.root.splice(k, 1);
@@ -223,6 +185,28 @@ function initFoodData(){
 						alert('初始化分厨数据失败.');
 					}
 				});
+				
+				// 加载临时菜打印分厨
+				$.ajax({
+					url : '../QueryMenu.do',
+					type : 'post',
+					data : {
+						dataSource : 'kitchens',
+						isAllowTemp : true,
+						restaurantID : restaurantID
+					},
+					success : function(data, status, xhr){
+						if(data.success){
+							allowTempKitchen = data;
+						}else{
+							alert('临时菜打印分厨数据失败.');
+						}
+					},
+					error : function(request, status, err){
+						alert('临时菜打印分厨数据失败.');
+					}
+				});
+				
 			}else{
 				Util.LM.hide();
 				alert('初始化菜品数据失败.');
@@ -260,22 +244,22 @@ function initStaffContent(c){
 		success : function(data, status, xhr){
 			Util.LM.hide();
 			if(data.success){
-				ln.restaurant = data.other.restaurant;
+				ln.restaurant=data.other.restaurant;
 				Util.dialongDisplay({
 					renderTo : 'divUserLogin',
 					type : 'show',
 					isTop : true
 				});	
-				var el = $("#divUserLogin");
+				var el=$("#divUserLogin");
 				el.before('<div forbg="divUserLogin" style="position: absolute; top:0; left:0; width: 100%; height: 100%;"></div>');
-				var bg = $('div[forbg = divUserLogin]');
+				var bg=$('div[forbg=divUserLogin]');
 				bg.css("background", 'url(../images/login_bg.jpg) no-repeat');
 				bg.css("backgroundSize", 'cover');
-				var html = "<div class = 'box-vertical' style = 'width : 100%; height: 100%'>"
-						+ "<div style = 'line-height : 100px; font-size : 50px; font-weight: bold; margin-left : 80px;'>"
-						+ "<span style = 'color : red'>" + ln.restaurant.name + "</span>欢迎您</div>"
-						+ "<div class = 'div-full'></div>"
-						+ "<div style = 'line-height : 100px; text-align : right; margin-right : 100px; font-size : 20px;'>" 
+				var html="<div class='box-vertical' style='width : 100%; height: 100%'>"
+						+ "<div style='line-height : 100px; font-size : 50px; font-weight: bold; margin-left : 80px;'>"
+						+ "<span style='color : red'>" + ln.restaurant.name + "</span>欢迎您</div>"
+						+ "<div class='div-full'></div>"
+						+ "<div style='line-height : 100px; text-align : right; margin-right : 100px; font-size : 20px;'>" 
 						+ "智易科技：www.digi-e.com</div>"
 						+ "</div>";
 				bg.html(html);
@@ -286,8 +270,8 @@ function initStaffContent(c){
 				if(data.root.length > 18){
 					
 				}
-				var html = [];
-				for(var i = 0; i < data.root.length; i++){
+				var html=[];
+				for(var i=0; i < data.root.length; i++){
 					html.push(Templet.ul.allStaff.format({
 						id : data.root[i].staffID,
 						name : data.root[i].staffName
@@ -335,28 +319,8 @@ $(function(){
 	}else{
 		initRestaurantContent();
 	}
-	
 });
 
-/**
- * 
- * @param c
- */
-function toggleContentDisplay(c){
-	if(c == null || typeof c == 'undefined' || typeof c.type == 'undefined'){
-		return;
-	}
-	var el = $('#'+c.renderTo);
-	if(!el){return;}
-	if($.trim(c.type) == 'show'){
-		if(el.hasClass('content-hide')){
-			el.removeClass('content-hide');
-		}
-		el.addClass('content-show');
-	}else if($.trim(c.type) == 'hide'){
-		el.addClass('content-hide');
-	}
-}
 /**
  * 
  * @param c
@@ -365,37 +329,35 @@ function changeStaff(c){
 	if(c == null || typeof c.type != 'number'){
 		return;
 	}
-	var sl = $('#divAllStaffForUserLogin > div');
-	for(var i = 0; i< sl.length; i++){
+	var sl=$('#divAllStaffForUserLogin > div');
+	for(var i=0; i< sl.length; i++){
 		$(sl[i]).removeClass('div-staff-select');
 	}
-	var pwd = getDom('txtStaffLoginPwd');
-	var name = getDom('spanStaffNameDisplay');
+	var pwd=getDom('txtStaffLoginPwd');
+	var name=getDom('spanStaffNameDisplay');
 	if(c.type == 1 && typeof c.staffId == 'number'){
 		$(c.event).addClass('div-staff-select');
 		name.innerHTML = c.event.innerText;
 		pwd.value = '';
-//		pwd.focus();
-//		pwd.select();
 	}else if(c.type == 2){
-		pwd.value = '';
-		name.innerHTML = '----';
+		pwd.value='';
+		name.innerHTML='----';
 	}
-	pwd = null;
-	name = null;
+	pwd=null;
+	name=null;
 }
 
 /**
  * 
  */
 function setValueToPwd(c){
-	var pwd = getDom('txtStaffLoginPwd');
+	var pwd=getDom('txtStaffLoginPwd');
 	if(c.type === 1){
-		pwd.value = pwd.value.substring(0, pwd.value.length - 1);
+		pwd.value=pwd.value.substring(0, pwd.value.length - 1);
 	}else if(c.type === 2){
-		pwd.value = '';
+		pwd.value='';
 	}else{
-		pwd.value = pwd.value + '' + c.value;
+		pwd.value=pwd.value + '' + c.value;
 	}
 	pwd.focus();
 }
@@ -404,7 +366,7 @@ function setValueToPwd(c){
  * 餐厅登录
  */
 function restaurantLoginHandler(){
-	var account = getDom('txtRestaurantAccount');
+	var account=getDom('txtRestaurantAccount');
 	if(account.value.length == 0){
 		Util.msg.alert({
 			msg : '请输入餐厅帐号.'
@@ -427,8 +389,8 @@ function restaurantLoginHandler(){
 						renderTo : 'divRestaurantLogin',
 						type : 'hide',
 					});
-					ln.restaurant = data.root[0];
-					restaurantID = ln.restaurant.id;
+					ln.restaurant=data.root[0];
+					restaurantID=ln.restaurant.id;
 					Util.LM.show();
 					initStaffContent();
 				}else{
@@ -457,12 +419,12 @@ function restaurantLoginHandler(){
  * 登陆
  */
 function staffLoginHandler(c){
-	var temp = null, staffId = 0, sl = $('#divAllStaffForUserLogin > div');
-	var pwd = getDom('txtStaffLoginPwd');
-	for(var i = 0; i< sl.length; i++){
-		temp = $(sl[i]);
+	var temp=null, staffId=0, sl=$('#divAllStaffForUserLogin > div');
+	var pwd=getDom('txtStaffLoginPwd');
+	for(var i=0; i< sl.length; i++){
+		temp=$(sl[i]);
 		if(temp.hasClass('div-staff-select')){
-			staffId = temp.attr('data-value');
+			staffId=temp.attr('data-value');
 			break;
 		}
 	}
@@ -491,9 +453,9 @@ function staffLoginHandler(c){
 			Util.LM.hide();
 			if(data.success){
 				
-				pin = staffId;
+				pin=staffId;
 				
-				staffData = {
+				staffData={
 					staffID : staffId,
 					staffName : temp.html()
 				};
@@ -506,7 +468,7 @@ function staffLoginHandler(c){
 					renderTo : 'divUserLogin',
 					type : 'hide'
 				});
-				var bg = $('div[forbg = divUserLogin]');
+				var bg=$('div[forbg=divUserLogin]');
 				if(bg.hasClass('dialong-lm-show-top')){
 					bg.removeClass('dialong-lm-show-top');
 				}
@@ -531,7 +493,7 @@ function staffLoginHandler(c){
 function loginSuccessCallback(){
 	initFoodData();
 	
-	toggleContentDisplay({
+	Util.toggleContentDisplay({
 		type:'show', 
 		renderTo:'divTableSelect'
 	});
@@ -550,3 +512,11 @@ function logout(){
 		}	
 	});
 }
+
+function test(){
+	alert(3);
+	window.open('','_parent',''); 
+	window.close();
+}
+
+

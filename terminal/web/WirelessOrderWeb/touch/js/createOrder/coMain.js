@@ -1,51 +1,4 @@
 /**
- * 分厨选菜
- */
-co.findFoodByKitchen = function(c){
-	c = c == null || typeof c == 'undefined' ? {} : c;
-	//
-	var sl = $('#divSelectKitchenForOrder > div[data-type=kitchen-select]');
-	for(var i = 0; i < sl.length; i++){
-		$(sl[i]).removeClass('div-deptOrKitchen-select');
-	}
-	$(c.event).addClass('div-deptOrKitchen-select');
-	
-	var tempFoodData = [];
-	var temp = null;
-	if(c.kitchenId == -1){
-		var dl = $('.div-deptOrKitchen-select[data-type=dept-select]');
-		if(dl.length == 0){
-			for(var i = 0; i < kitchenData.root.length; i++){
-				tempFoodData = tempFoodData.concat(kitchenData.root[i].foods);
-			}
-		}else{
-			for(var i = 0; i < kitchenData.root.length; i++){
-				temp = kitchenData.root[i];
-				if(temp.dept.id == parseInt(dl[0].getAttribute('data-value'))){
-					tempFoodData = tempFoodData.concat(temp.foods);		
-				}
-			}
-		}
-	}else{
-		for(var i = 0; i < kitchenData.root.length; i++){
-			temp = kitchenData.root[i];
-			if(typeof c.kitchenId == 'number' && c.kitchenId != -1){
-				if(temp.id == c.kitchenId){
-					tempFoodData = tempFoodData.concat(temp.foods);
-				}
-			}else{
-				tempFoodData.concat();
-			}
-		}
-	}
-	temp = null;
-	// 
-	co.fp.init({
-		data : tempFoodData
-	});
-	co.fp.getFirstPage();
-};
-/**
  * 
  */
 co.show = function(c){
@@ -59,12 +12,13 @@ co.show = function(c){
 					dataIndex : c.dataIndex,
 					id : c.data.id,
 					name : c.data.name,
-					unitPrice : c.data.unitPrice
+					unitPrice : c.data.unitPrice,
+					click : 'co.insertFood({foodId:'+c.data.id+'})'
 				});
 			}
 		});
 	}
-	toggleContentDisplay({
+	Util.toggleContentDisplay({
 		type:'show', 
 		renderTo:'divCreateOrder'
 	});
@@ -86,7 +40,7 @@ co.show = function(c){
  * 菜品操作返回
  */
 co.back = function(c){
-	toggleContentDisplay({
+	Util.toggleContentDisplay({
 		type:'hide', 
 		renderTo:'divCreateOrder'
 	});
@@ -94,8 +48,79 @@ co.back = function(c){
 	co.table = null;
 	co.newFood = [];
 	co.callback = null;
-	$('#divCFCONewFood').html('');
+	co.initNewFoodContent();
 };
+
+/**
+ * 点菜
+ */
+co.insertFood = function(c){
+	if(c == null || typeof c.foodId != 'number'){
+		return;
+	}
+	//
+	var data = null;
+//	for(var i = 0; i < co.fp.getPageData().length; i++){
+//		if(co.fp.getPageData()[i].id == c.foodId){
+//			data = co.fp.getPageData()[i];
+//			break;
+//		}
+//	}
+	for(var i = 0; i < foodData.root.length; i++){
+		if(foodData.root[i].id == c.foodId){
+			data = (foodData.root.concat()[i]);
+			break;
+		}
+	}
+	if(data == null){
+		alert('添加菜品失败, 程序异常, 请刷新后重试或联系客服人员');
+		return;
+	}
+	//
+	var has = false;
+	for(var i = 0; i < co.newFood.length; i++){
+		if(co.newFood[i].id == data.id){
+			has = true;
+			co.newFood[i].count++;
+			break;
+		}
+	}
+	if(!has){
+		data.count = 1;
+		data.isHangup = false;
+		data.tasteGroup = {
+			tastePref : '无口味',
+			price : 0,
+			normalTasteContent : []
+		};
+		co.newFood.push(data);
+	}
+	//
+	co.initNewFoodContent({
+		data : data
+	});
+	data = null;
+	if(typeof c.callback == 'function'){
+		c.callback();
+	}
+};
+
+/**
+ * 选中菜品
+ */
+co.selectNewFood = function(c){
+	if(c == null || typeof c.foodId != 'number'){
+		return;
+	}
+	
+	//
+	var sl = $('div[data-type=newFood-select]');
+	for(var i = 0; i < sl.length; i++){
+		$(sl[i]).removeClass('div-newFood-select');
+	}
+	$(c.event).addClass('div-newFood-select');
+};
+
 /**
  * 添加菜品
  */
@@ -235,11 +260,17 @@ co.ot.show = function(){
 	var sf = $('#divCFCONewFood > div[class*=div-newFood-select]');
 	if(sf.length != 1){
 		Util.msg.alert({
-			msg : '请选中一道菜品'
+			msg : '请选中一道菜品.'
 		});
 		return;
 	}
 	var foodData = co.newFood[sf.attr('data-index')];
+	if(typeof foodData.isTemporary == 'boolean' && foodData.isTemporary){
+		Util.msg.alert({
+			msg : '临时菜不能选择口味.'
+		});
+		return;
+	}
 	co.ot.foodData = foodData;
 	
 	Util.dialongDisplay({
@@ -426,6 +457,7 @@ co.ot.save = function(c){
 	tasteGroup = null;
 };
 
+
 /*** -------------------------------------------------- ***/
 /**
  * 账单提交
@@ -465,8 +497,8 @@ co.submit = function(c){
 					+ item.name + '<<sb>>'
 					+ item.count + '<<sb>>'
 					+ item.unitPrice + '<<sb>>'
-					+ '<<sb>>'
 					+ (typeof item.isHangup != 'boolean' ? false : item.isHangup) + '<<sb>>'
+					+ '1<<sb>>'
 					+ item.kitchen.alias
 					+ ']';
 		}else{

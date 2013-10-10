@@ -1,18 +1,48 @@
-// 工具包
+$.ajaxSetup({
+	contentType:"application/x-www-form-urlencoded;charset=utf-8",
+	global : true,
+	complete:function(XMLHttpRequest,textStatus){ 
+		//通过XMLHttpRequest取得响应头
+		if(XMLHttpRequest.getResponseHeader("session_status")){ 
+			logout();
+		} 
+	}
+});
 
-$.ajaxSetup({ 
-		 contentType:"application/x-www-form-urlencoded;charset=utf-8",
-		 global : true,
-         complete:function(XMLHttpRequest,textStatus){ 
-			//通过XMLHttpRequest取得响应头
-             if(XMLHttpRequest.getResponseHeader("session_status")){ 
-                    logout();
-             } 
-         }
-  });
+/**
+ * 
+ * @param args
+ * @returns {String}
+ */
+String.prototype.format = function(args){
+    var result = this;
+    if (arguments.length > 0){    
+        if (arguments.length == 1 && typeof args == "object"){
+            for(var key in args) {
+                if(args[key] != undefined){
+                    var reg = new RegExp("({" + key + "})", "g");
+                    result = result.replace(reg, args[key]);
+                }
+            }
+        }else{
+        	for(var i = 0; i < arguments.length; i++){
+        		if (arguments[i] != undefined) {
+        			var reg= new RegExp("({)" + i + "(})", "g");
+        			result = result.replace(reg, arguments[i]);
+                }
+            }
+        }
+    }
+    return result;
+};
+/**
+ * 
+ */
+String.prototype.trim = function(){
+	return this.replace(/(^\s*)|(\s*$)/g, ""); 
+};
 
-
-
+//工具包
 var Util = {};
 /**
  * 分页工具
@@ -82,8 +112,11 @@ Util.padding = function(c){
 			var ch = this.dom.clientHeight, cw = this.dom.clientWidth;
 			this.limit = parseInt((ch / (70 + 5 + 3 * 2))) * parseInt((cw / (90 + 5 + 3 * 2)));
 			//
-			this.data = typeof ic.data == 'undefined' ? [] : ic.data;
+			this.data = ic.data == null || typeof ic.data == 'undefined' ? [] : ic.data;
 			this.length = this.data.length;
+			if(typeof ic.callback == 'function'){
+				ic.callback();
+			}
 		},
 		initContent : function(c){
 			this.pageData = [];
@@ -133,7 +166,8 @@ Util.padding = function(c){
 		}
 	};
 	obj.init({
-		data : c.data
+		data : c.data,
+		callback : c.callback
 	});
 	return obj;
 };
@@ -344,6 +378,47 @@ Util.msg = {
 /**
  * 
  */
+Util.toggleDisplay = function(c){
+	if(c == null || typeof c == 'undefined' || typeof c.type == 'undefined'){
+		return;
+	}
+	var el = $('#'+c.el);
+	if(!el){return;}
+	if($.trim(c.type) == 'show'){
+		if(el.hasClass(c.hideCls)){
+			el.removeClass(c.hideCls);
+		}
+		el.addClass(c.showCls);
+	}else if($.trim(c.type) == 'hide'){
+		el.addClass(c.hideCls);
+	}
+};
+/**
+ * 
+ */
+Util.toggleContentDisplay = function(c){
+	Util.toggleDisplay({
+		showCls : 'content-show',
+		hideCls : 'content-hide',
+		el : c.renderTo,
+		type : c.type
+	});
+};
+/**
+ * 
+ */
+Util.toggleToolbarDisplay = function(c){
+	Util.toggleDisplay({
+		showCls : 'toolbar-show',
+		hideCls : 'toolbar-hide',
+		el : c.el,
+		type : c.type
+	});
+};
+
+/**
+ * 
+ */
 Util.LM = (function(){
 	var $ = {
 		isDisplay : false,
@@ -392,27 +467,6 @@ Util.LM = (function(){
 })();
 
 /**
- * 获取URL参数工具类
- */
-function URLParaQuery() {
-	var name, value, i;
-	var str = location.href;
-	var num = str.indexOf("?");
-	str = str.substr(num + 1);
-	//"mi" is the key
-	str = strDecode(str, "mi");
-	var arrtmp = str.split("&");
-	for (i = 0; i < arrtmp.length; i++) {
-		num = arrtmp[i].indexOf("=");
-		if (num > 0) {
-			name = arrtmp[i].substring(0, num);
-			value = arrtmp[i].substr(num + 1);
-			this[name] = value;
-		}
-	}
-}
-
-/**
  * cookies操作
  */
 function setcookie(name,value){  
@@ -420,8 +474,8 @@ function setcookie(name,value){
     var exp  = new Date();  
     exp.setTime(exp.getTime() + Days*24*60*60*1000);  
     document.cookie = name + "="+ escape (value) + ";expires=" + exp.toGMTString();  
-}  
-  
+}
+
 function getcookie(name){  
     var arr = document.cookie.match(new RegExp("(^| )"+name+"=([^;]*)(;|$)"));   
     if(arr != null){  
@@ -429,30 +483,11 @@ function getcookie(name){
     }else{  
         return "";  
     }  
-}  
-  
+}
+
 function delcookie(name){  
     var exp = new Date();   
     exp.setTime(exp.getTime() - 1);  
     var cval=getCookie(name);  
     if(cval!=null) document.cookie= name + "="+cval+";expires="+exp.toGMTString();  
-}  
-  
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+}

@@ -65,19 +65,7 @@
 #divCFCOAllFood{
 	
 }
-/*
-.divCFCOAllFood-main-box{
-	width: 90px;
-	height: 70px;
-	margin: 5px 0 0 5px;
-	float: left;
-	background: #87CEEA;
-	font-weight: bold;
-	font-size: 16px;
-	padding: 3px;
-}
-.divCFCOAllFood-main-box:active{ background: #FFD700; }
-*/
+
 .div-deptOrKitchen-select{
 	line-height: 60px;
 	color: #fff;
@@ -112,12 +100,47 @@
 	border: 1px solid #FFF;
 }
 
-
 #divSouthForOperateTaste{
 	width:100%;
 	line-height: 60px;
 }
 
+#divSearchToolbarForCreateOrder > div{
+	line-height: 60px;
+}
 
+#divTempFoodForCreateOrder{
+	width: 600px;
+	height: 550px;
+	background: #4682B4;
+	border: 2px solid #FFF;
+}
 
+#txtNameForCOTF{
+	width: 492px;
+}
+#txtPriceForCOTF, #txtCountForCOTF{
+	width: 190px;
+}
 
+#divKeyBoyForCOTF > div{
+	width: 80px;
+	line-height: 60px;
+	float: left;
+	margin-top: 5px;
+	margin-right: 5px;
+	font-weight: bold;
+	font-size: 28px;
+}
+
+#divKitchenSelectForCOTF > div[class="main-box-base"]{
+	text-align: center;
+	line-height: 70px;
+}
+
+.div-tempFood-select{
+	color: #fff;
+	background: #228B22 !important;
+	line-height: 70px;
+	text-align: center;
+}

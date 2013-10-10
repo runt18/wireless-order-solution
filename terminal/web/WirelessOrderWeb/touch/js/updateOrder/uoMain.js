@@ -1,14 +1,10 @@
-$(function(){
-	
-});
-
 /**
  * 显示已点菜界面函数
  * @param {object} c  
  */
 uo.show = function(c){
 	if(c.type == null || typeof c.type == 'undefined'){
-		toggleContentDisplay({
+		Util.toggleContentDisplay({
 			type: 'show', 
 			renderTo: 'divUpdateOrder'
 		});
@@ -368,7 +364,7 @@ uo.cancelForUO = function(){
 	if(uoCancelFoods.length == 0 && uo.order.customNum == uo.customNum){
 		uoCancelFoods = [];
 		uoFood = [];
-		toggleContentDisplay({type:'hide', renderTo:'divUpdateOrder'});
+		Util.toggleContentDisplay({type:'hide', renderTo:'divUpdateOrder'});
 	}else{
 		Util.msg.alert({
 			title : '重要',
@@ -378,7 +374,7 @@ uo.cancelForUO = function(){
 				if(btn == 'yes'){
 					uoCancelFoods = [];
 					uoFood = [];
-					toggleContentDisplay({type:'hide', renderTo:'divUpdateOrder'});
+					Util.toggleContentDisplay({type:'hide', renderTo:'divUpdateOrder'});
 				}
 			}
 		});
@@ -590,7 +586,7 @@ uo.submitUpdateOrderHandler = function(c){
 					msg : data.msg, 
 					time : 3,
 					fn : function(btn){
-						toggleContentDisplay({type:'hide', renderTo:'divUpdateOrder'});
+						Util.toggleContentDisplay({type:'hide', renderTo:'divUpdateOrder'});
 						initTableData();
 					}
 				});

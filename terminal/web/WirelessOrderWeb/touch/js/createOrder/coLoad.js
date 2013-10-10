@@ -3,6 +3,10 @@
  */
 co.initNewFoodContent = function(c){
 	c = c == null ? {} : c;
+	if(typeof c.record != 'undefined'){
+		co.newFood.push(c.record);
+		c.data = c.record;
+	}
 	var html = [], sumCount = 0, sumPrice = 0;
 	var temp = null, tempUnitPrice = 0;
 	for(var i = 0; i < co.newFood.length; i++){
@@ -46,67 +50,6 @@ co.initNewFoodContent = function(c){
 	}else{
 		getDom('divCFCONewFood').scrollTop = 0;
 	}
-};
-
-/**
- * 点菜
- */
-co.insertFood = function(c){
-	if(c == null || typeof c.foodId != 'number'){
-		return;
-	}
-	//
-	var data = null;
-	for(var i = 0; i < co.fp.getPageData().length; i++){
-		if(co.fp.getPageData()[i].id == c.foodId){
-			data = co.fp.getPageData()[i];
-			break;
-		}
-	}
-	if(data == null){
-		alert('添加菜品失败, 程序异常, 请刷新后重试或联系客服人员');
-		return;
-	}
-	//
-	var has = false;
-	for(var i = 0; i < co.newFood.length; i++){
-		if(co.newFood[i].id == data.id){
-			has = true;
-			co.newFood[i].count++;
-			break;
-		}
-	}
-	if(!has){
-		data.count = 1;
-		data.isHangup = false;
-		data.tasteGroup = {
-			tastePref : '无口味',
-			price : 0,
-			normalTasteContent : []
-		};
-		co.newFood.push(data);
-	}
-	//
-	co.initNewFoodContent({
-		data : data
-	});
-	data = null;
-};
-
-/**
- * 选中菜品
- */
-co.selectNewFood = function(c){
-	if(c == null || typeof c.foodId != 'number'){
-		return;
-	}
-	
-	//
-	var sl = $('div[data-type=newFood-select]');
-	for(var i = 0; i < sl.length; i++){
-		$(sl[i]).removeClass('div-newFood-select');
-	}
-	$(c.event).addClass('div-newFood-select');
 };
 
 /**
@@ -262,4 +205,52 @@ co.ot.initNewTasteContent = function(){
 	}
 	temp = null;
 	getDom('divCFOTHasTasteContent').innerHTML = html;
+};
+
+/**
+ * 分厨选菜
+ */
+co.findFoodByKitchen = function(c){
+	c = c == null || typeof c == 'undefined' ? {} : c;
+	//
+	var sl = $('#divSelectKitchenForOrder > div[data-type=kitchen-select]');
+	for(var i = 0; i < sl.length; i++){
+		$(sl[i]).removeClass('div-deptOrKitchen-select');
+	}
+	$(c.event).addClass('div-deptOrKitchen-select');
+	
+	var tempFoodData = [];
+	var temp = null;
+	if(c.kitchenId == -1){
+		var dl = $('.div-deptOrKitchen-select[data-type=dept-select]');
+		if(dl.length == 0){
+			for(var i = 0; i < kitchenData.root.length; i++){
+				tempFoodData = tempFoodData.concat(kitchenData.root[i].foods);
+			}
+		}else{
+			for(var i = 0; i < kitchenData.root.length; i++){
+				temp = kitchenData.root[i];
+				if(temp.dept.id == parseInt(dl[0].getAttribute('data-value'))){
+					tempFoodData = tempFoodData.concat(temp.foods);		
+				}
+			}
+		}
+	}else{
+		for(var i = 0; i < kitchenData.root.length; i++){
+			temp = kitchenData.root[i];
+			if(typeof c.kitchenId == 'number' && c.kitchenId != -1){
+				if(temp.id == c.kitchenId){
+					tempFoodData = tempFoodData.concat(temp.foods);
+				}
+			}else{
+				tempFoodData.concat();
+			}
+		}
+	}
+	temp = null;
+	// 
+	co.fp.init({
+		data : tempFoodData
+	});
+	co.fp.getFirstPage();
 };
