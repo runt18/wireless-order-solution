@@ -27,3 +27,21 @@
 .shiftInfo {
 	font-weight: bold;
 }
+
+
+.tab_icon {
+     background-image:url(../images/icon_tb_setting.png) !important; 
+}
+.tab_home {
+     background-image:url(../images/home.jpg) !important; 
+}
+.font{
+	font-size: 18px;
+	font-weight: bold;
+	margin-top: 3px;
+}
+.tFont{
+	font-size: 20px;
+	font-weight: bolder;
+	margin-top: 2px;
+}
