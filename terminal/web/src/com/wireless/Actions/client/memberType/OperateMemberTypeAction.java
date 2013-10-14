@@ -3,7 +3,6 @@ package com.wireless.Actions.client.memberType;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import net.sf.json.JSONObject;
 
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -13,10 +12,11 @@ import org.apache.struts.actions.DispatchAction;
 import com.wireless.db.client.member.MemberTypeDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
+import com.wireless.json.JObject;
 import com.wireless.pojo.client.MemberType;
-import com.wireless.pojo.client.MemberType.DiscountType;
-import com.wireless.util.JObject;
-import com.wireless.util.WebParams;
+import com.wireless.pojo.client.MemberType.Attribute;
+import com.wireless.pojo.distMgr.Discount;
+import com.wireless.pojo.staffMgr.Staff;
 
 public class OperateMemberTypeAction extends DispatchAction{
 	
@@ -38,19 +38,19 @@ public class OperateMemberTypeAction extends DispatchAction{
 		try{
 			
 			String pin = (String)request.getAttribute("pin");
-			StaffDao.verify(Integer.parseInt(pin));
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
 			String restaurantID = request.getParameter("restaurantID");
 			String typeName = request.getParameter("typeName");
 			String discountID = request.getParameter("discountID");
-			String discountRate  =request.getParameter("discountRate");
-			String discountType = request.getParameter("discountType");
+/*			String discountRate  =request.getParameter("discountRate");
+			String discountType = request.getParameter("discountType");*/
 			String exchangeRate = request.getParameter("exchangeRate");
 			String initialPoint = request.getParameter("initialPoint");
 			String chargeRate = request.getParameter("chargeRate");
 			String attr = request.getParameter("attr");
 			
-			MemberType mt = new MemberType();
+/*			MemberType mt = new MemberType();
 			
 			mt.setRestaurantId(Integer.valueOf(restaurantID));
 			mt.setName(typeName == null ? "" : typeName.trim());
@@ -75,19 +75,25 @@ public class OperateMemberTypeAction extends DispatchAction{
 			}else{
 				jobject.initTip(false, WebParams.TIP_TITLE_ERROE, 9973, "操作失败, 折扣信息不完整, 请检查\"折扣方式\"相关信息.");
 				return null;
-			}
+			}*/
 			
-			MemberTypeDao.insert(mt);
+			
+			MemberType.InsertBuilder insert = new MemberType.InsertBuilder(Integer.valueOf(restaurantID), typeName.trim(), new Discount(Integer.valueOf(discountID)));
+			insert.setAttribute(Attribute.valueOf(Integer.valueOf(attr)));
+			insert.setChargeRate(Float.valueOf(chargeRate));
+			insert.setExchangeRate(Float.valueOf(exchangeRate));
+			insert.setInitialPoint(Integer.valueOf(initialPoint));
+			
+			MemberTypeDao.insert(staff, insert);
 			jobject.initTip(true, "操作成功, 已添加新会员类型.");
 		}catch(BusinessException e){
 			e.printStackTrace();
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getCode(), e.getDesc());
+			jobject.initTip(e);
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
+			jobject.initTip(e);
 		}finally{
-			JSONObject json = JSONObject.fromObject(jobject);
-			response.getWriter().print(json.toString());
+			response.getWriter().print(jobject.toString());
 		}
 		return null;
 	}
@@ -108,18 +114,42 @@ public class OperateMemberTypeAction extends DispatchAction{
 		response.setCharacterEncoding("UTF-8");
 		JObject jobject = new JObject();
 		try{
-			String restaurantID = request.getParameter("restaurantID");
+			String pin = (String)request.getAttribute("pin");
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			
+			//String restaurantID = request.getParameter("restaurantID");
 			String typeID = request.getParameter("typeID");
 			String typeName = request.getParameter("typeName");
 			String discountID = request.getParameter("discountID");
-			String discountRate  =request.getParameter("discountRate");
-			String discountType = request.getParameter("discountType");
+/*			String discountRate  =request.getParameter("discountRate");
+			String discountType = request.getParameter("discountType");*/
 			String initialPoint = request.getParameter("initialPoint");
 			String exchangeRate = request.getParameter("exchangeRate");
 			String chargeRate = request.getParameter("chargeRate");
 			String attr = request.getParameter("attr");
 			
-			MemberType mt = new MemberType();
+			
+			MemberType.UpdateBuilder update = new MemberType.UpdateBuilder(Integer.valueOf(typeID));
+			
+			if(attr != null && !attr.trim().isEmpty()){
+				update.setAttribute(Attribute.valueOf(Integer.valueOf(attr)));
+			}
+			if(exchangeRate != null && !exchangeRate.trim().isEmpty()){
+				update.setChargeRate(Float.valueOf(chargeRate));
+			}
+			if(discountID != null && !discountID.trim().isEmpty()){
+				update.setDefaultDiscount(new Discount(Integer.valueOf(discountID)));
+			}
+			if(chargeRate != null && !chargeRate.trim().isEmpty()){
+				update.setChargeRate(Float.valueOf(chargeRate));
+			}
+			if(initialPoint != null && !initialPoint.trim().isEmpty()){
+				update.setInitialPoint(Integer.valueOf(initialPoint));
+			}
+			if(typeName != null && !typeName.trim().isEmpty()){
+				update.setName(typeName);
+			}
+/*			MemberType mt = new MemberType();
 			
 			mt.setRestaurantId(Integer.valueOf(restaurantID));
 			mt.setTypeId(Integer.valueOf(typeID));
@@ -146,19 +176,18 @@ public class OperateMemberTypeAction extends DispatchAction{
 			}else{
 				jobject.initTip(false, WebParams.TIP_TITLE_ERROE, 9973, "操作失败, 折扣信息不完整, 请检查\"折扣方式\"相关信息.");
 				return null;
-			}
+			}*/
 			
-			MemberTypeDao.updateMemberType(mt);
+			MemberTypeDao.update(staff, update);
 			jobject.initTip(true, "操作成功, 已修改会员类型信息.");
 		}catch(BusinessException e){
 			e.printStackTrace();
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getCode(), e.getDesc());
+			jobject.initTip(e);
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
+			jobject.initTip(e);
 		}finally{
-			JSONObject json = JSONObject.fromObject(jobject);
-			response.getWriter().print(json.toString());
+			response.getWriter().print(jobject.toString());
 		}
 		return null;
 	}
@@ -179,12 +208,15 @@ public class OperateMemberTypeAction extends DispatchAction{
 		response.setCharacterEncoding("UTF-8");
 		JObject jobject = new JObject();
 		try{
-			String restaurantID = request.getParameter("restaurantID");
-			String typeID = request.getParameter("typeID");
-			String discountType = request.getParameter("discountType");
-			String discountID = request.getParameter("discountID");
+			String pin = (String)request.getAttribute("pin");
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
-			if(restaurantID == null || typeID == null || discountID == null || discountType == null){
+			//String restaurantID = request.getParameter("restaurantID");
+			String typeID = request.getParameter("typeID");
+/*			String discountType = request.getParameter("discountType");
+			String discountID = request.getParameter("discountID");*/
+			
+/*			if(restaurantID == null || typeID == null || discountID == null || discountType == null){
 				jobject.initTip(false, WebParams.TIP_TITLE_ERROE, 9970, "操作失败, 会员类型相关信息不完整.");
 				return null;
 			}
@@ -194,19 +226,18 @@ public class OperateMemberTypeAction extends DispatchAction{
 			mt.setTypeId(Integer.valueOf(typeID));
 			mt.setDiscountType(Integer.valueOf(discountType));
 			mt.getDefaultDiscount().setId(Integer.valueOf(discountID));
-			
-			MemberTypeDao.deleteById(mt);
+			*/
+			MemberTypeDao.deleteById(staff, Integer.parseInt(typeID));
 			jobject.initTip(true, "操作成功, 已删除会员类型相关信息.");
 			
 		}catch(BusinessException e){
 			e.printStackTrace();
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getCode(), e.getDesc());
+			jobject.initTip(e);
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
+			jobject.initTip(e);
 		}finally{
-			JSONObject json = JSONObject.fromObject(jobject);
-			response.getWriter().print(json.toString());
+			response.getWriter().print(jobject.toString());
 		}
 		return null;
 	}

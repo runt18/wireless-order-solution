@@ -24,6 +24,9 @@ public class RequestFilter implements Filter{
 	private static final String SKIPVERIFY = "skipVerify";
 	private List<String> skipVerifyList = new ArrayList<String>();
 	//private static final String DEFREDIRECT = "/pages/PersonLoginTimeout.html";
+	private static final String KEYS = "mi";
+	
+	
 	
 	private boolean check(String path){
 		for (String skip : skipVerifyList) {
@@ -69,7 +72,7 @@ public class RequestFilter implements Filter{
 			if(request.getQueryString() != null && (requestPath.indexOf(".do") < 0) && (requestPath.indexOf(".jsp") < 0)){
 				//获取url带的参数
 				String query = request.getQueryString();
-				String des = Encrypt.strDecode(query, "mi", null, null);
+				String des = Encrypt.strDecode(query, KEYS, null, null);
 				
 				String[] urlParam = des.split("&");
 				//分解参数
@@ -116,7 +119,7 @@ public class RequestFilter implements Filter{
 	                }else{
 	                	if(comeFrom != null){
 	                		response.sendRedirect(request.getContextPath() + Staff.RequestSource.valueOf(Integer.parseInt(comeFrom.getValue())).getRedirect()
-	                							  + "?" + Encrypt.strEncode("restaurantID="+params.get("restaurantID"), "mi", null, null));
+	                							  + "?" + Encrypt.strEncode("restaurantID="+params.get("restaurantID"), KEYS, null, null));
 	                	}
 	                	
 	                }

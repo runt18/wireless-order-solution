@@ -16,6 +16,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.staffMgr.StaffDao;
+import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.staffMgr.Staff;
@@ -65,6 +66,9 @@ public class OperateStaffAction extends Action{
 			}
 			
 
+		}catch(BusinessException e){
+			e.printStackTrace();
+			jobject.initTip(e);
 		}catch(SQLException e){
 			e.printStackTrace();
 			jobject.initTip(e);
