@@ -14,7 +14,7 @@ public class Encrypt {
 		//必需的密钥
 		String fKey = "mi"; 
 		
-		String data = "321";
+		String data = "restaurantID=26";
 		String strs = Encrypt.strEncode(data, fKey, null, null);
 		System.out.println(strs);
 		String decs = Encrypt.strDecode("0E48522F6C587BC4AC67C2D942E17F88876410898ABBCC8BC43674801A1F65F1", fKey, null, null);
