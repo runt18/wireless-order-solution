@@ -4,28 +4,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>无线点餐网页终端</title>
 
-<link rel="stylesheet" type="text/css" href="../../extjs/resources/css/ext-all.css" />
-<script type="text/javascript" src="../../extjs/ext-base.js"></script>
-<script type="text/javascript" src="../../extjs/ext-all.js"></script>
-
-<link rel="stylesheet" type="text/css" href="../../extjs/ext-patch.css" />
-<link rel="stylesheet" type="text/css" href="../../css/myExt.css" />
-<link rel="stylesheet" type="text/css" href="../../css/header.css" />
-<link rel="stylesheet" type="text/css" href="../../css/main.css" />
-
-<script type="text/javascript" src="../../extjs/ext-lang-zh_CN.js"></script>
-<script type="text/javascript" src="../../js/common/Ext.ux.js"></script>
-<script type="text/javascript" src="../../js/common/Ext.ux.check.js"></script>
-
-<script type="text/javascript" src="../../js/components/Ext.ux.ImageButton.js"></script>
-<script type="text/javascript" src="../../js/components/Encrypt.js"></script>
-<script type="text/javascript" src="../../js/components/functionLib.js"></script>
-
 <script type="text/javascript">
-	var Request = new URLParaQuery(); 
-	var restaurantID = Request["restaurantID"];
-	
-	
 	var memberTypeData = {root:[]};
 	var memberAttributeData = [[0, '充值属性'], [2, '优惠属性']];
 	var discountData = [];
@@ -38,13 +17,10 @@
 	var memberTypeTree, memberBasicGrid, memberBasicWin, adjustPointWin;
 </script>
 
-<script type="text/javascript" src="../../js/Client/memberMgr/memberMgrLoad.js"></script>
 <script type="text/javascript" src="../../js/Client/memberMgr/memberMgrMain.js"></script>
 
 </head>
 <body> 
-<script type="text/javascript" src="../../js/Client/memberMgr/memberMgrLib.js"></script>
-<script type="text/javascript" src="../../extjs/examples.js"></script>
-
+	<div id="divMember"></div>
 </body>
 </html>

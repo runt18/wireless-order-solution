@@ -1,0 +1,212 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>无线点餐网页终端</title>
+
+<link rel="stylesheet" type="text/css" href="../../extjs/resources/css/ext-all.css" />
+<link rel="stylesheet" type="text/css" href="../../css/myExt.css" />
+<link rel="stylesheet" type="text/css" href="../../css/main.css" />
+<link rel="stylesheet" type="text/css" href="../../extjs/ext-patch.css" />
+
+<script type="text/javascript" src="../../extjs/ext-base.js"></script>
+<script type="text/javascript" src="../../extjs/ext-all.js"></script>
+<script type="text/javascript" src="../../extjs/ext-lang-zh_CN.js"></script>
+<script type="text/javascript" src="../../jquery/jquery-1.8.2.min.js"></script>
+
+<script type="text/javascript" src="../../js/components/Ext.ux.ImageButton.js"></script>
+<script type="text/javascript" src="../../js/common/Ext.ux.js"></script>
+<script type="text/javascript" src="../../js/common/Ext.ux.check.js"></script>
+<script type="text/javascript" src="../../js/components/md5.js"></script>
+<script type="text/javascript" src="../../js/components/Encrypt.js"></script>
+<script type="text/javascript" src="../../js/components/functionLib.js"></script>
+<script type="text/javascript" src="../../extjs/examples.js"></script>
+
+<script type="text/javascript" src="../../js/basicMgrMain.js"></script>
+
+<link rel="stylesheet" type="text/css" href="../../css/header.css" />
+<link rel="stylesheet" type="text/css" href="../../css/systemSetting.css" />
+
+
+<script type="text/javascript">
+var Request = new URLParaQuery();
+var restaurantID = Request['restaurantID'];
+var index = 0;
+function addTab(id, title, url){
+	var tab = tabs.getComponent(id);
+	if(!tab){
+	    tab = tabs.add({
+	    	id : id,
+	        title: title,
+	        iconCls: 'tab_icon',
+	        autoLoad : {
+	        	url : '../'+url,
+	        	scripts : true,
+	        	params : strEncode("restaurantID=" + restaurantID, "mi")
+	        },
+	        //html: '<iframe scrolling="auto" frameborder="0" width="100%" height="100%" src="' + url + '?'+ strEncode("restaurantID=" + restaurantID, "mi") + '"></iframe>',
+	        closable:true,
+	        listeners : {
+	        	resize : function(e,w,h){
+ 	        		if(Ext.getCmp('panelReport')){
+	        			Ext.getCmp('panelReport').setWidth(w);
+	        		}
+	        		if(Ext.getCmp('panelSupplier')){
+	        			Ext.getCmp('panelSupplier').setWidth(w);
+	        		}
+	        	}
+	        }
+	    });
+	}
+	tabs.setActiveTab(tab);
+ 	if(tabs.items.length > 6){
+		tabs.remove(tabs.getComponent(1), true);
+	} 
+
+}
+
+var tabs = new Ext.TabPanel({
+    region:'center',
+    id : 'tabs',
+    deferredRender:false,
+    activeTab:0,
+    border : false,
+    defaults: {autoScroll:true},
+    enableTabScroll:true,
+    minTabWidth: 115,
+    items:[{
+        contentEl:'center',
+        title: '主页', 
+        icon: '../../images/home.jpg',
+        iconCls : 'tab_home'
+    }],
+    plugins: new Ext.ux.TabCloseMenu(),
+    listeners : {
+    	tabchange : function(thiz, t){
+/*     		//alert('tab'+t.getEl().getWidth());
+    		index ++;
+     		if(index > 0){
+        		if(Ext.getCmp('panelSupplier') != undefined){
+        			alert('tab'+t.getEl().getWidth());
+        			Ext.getCmp('panelSupplier').setWidth(t.getEl().getWidth());
+        		}
+    		}  */
+
+    		
+    	}
+    }
+    
+});
+Ext.onReady(function(){
+	Ext.BLANK_IMAGE_URL = '../../extjs/resources/images/default/s.gif';
+    //Ext.state.Manager.setProvider(new Ext.state.CookieProvider());
+
+	var tree = new Ext.tree.TreePanel({
+		region : 'center',
+		id : 'tree',
+		width : 320,
+		border : false,
+		rootVisible : false,
+		frame : true,
+		autoScroll : true,
+		bodyStyle : 'backgroundColor:#FFFFFF; border:1px solid #99BBE8;padding-left: 10px;',
+		root : new Ext.tree.AsyncTreeNode({
+			expanded : true,
+			text : '全部',
+			leaf : false,
+			printerId : -1,
+			border : true
+		}),
+		listeners : {
+			click : function(e){
+				if(!e.hasChildNodes()){
+					var id = e.attributes.mId;
+					var title = e.attributes.text;
+					var url = e.attributes.url;
+					if(url != ""){
+						addTab(id, title, url);
+					}else{
+						if(e.attributes.mId == "monthSettle"){
+							monthSettleHandler();
+						}else if(e.attributes.mId == "cancelReason"){
+							cancelReasonWin.show();
+							Ext.getCmp('btnRefreshCRGrid').handler();
+						}else if(e.attributes.mId == "formatPrice"){
+							formatPrice.show();
+							formatPrice.center();
+						}else if(e.attributes.mId == "resturantMgr"){
+							resturantMgr.show();
+						}
+						
+					}
+					
+				}
+
+			}
+		}
+	});
+ 	tree.loader = new Ext.tree.TreeLoader({
+		dataUrl : '../../QueryPrivilege.do',
+		baseParams : {
+			dataSource : 'pageTree'
+		}
+	}); 
+	
+    new Ext.Viewport({
+        layout : 'border',
+        items : [{
+                region : 'north',
+				bodyStyle : 'background-color:#DFE8F6;',
+				html : "<h4 style='padding:10px;font-size:150%;float:left;'>无线点餐网页终端</h4>" +
+					"<div id='divLoginOut' class='loginOut' style='width: 40px;height: 41px;'><img id='btnLoginOut' src='../../images/ResLogout.png' width='40' height='40' /> </div>"+
+					"<div class='optName'><img id='btnUser' src='../../images/user.png' width='30' height='30' style='vertical-align:bottom;' /><font id='optName'></font></div>",
+				height : 50,
+				margins : '0 0 0 0',
+				collapsible : false
+            },{
+            	region : 'west',
+            	id : 'west',
+            	title : '功能列表',
+            	width : 200,
+            	layout : 'border',
+                collapsible: true,
+                collapsed : true,
+                margins:'0 0 0 5',
+				items : [tree]
+            },
+            tabs
+/*             ,{
+    			region : 'south',
+    			height : 30,
+    			frame : true,
+    			border : false,
+    			html : '<div style="font-size:11pt; text-align:center;"><b>版权所有(c) 2011 智易科技</b></div>'
+			}  */
+         ]
+    });
+    getOperatorName('../../');
+    initCancelReasonWin();
+    
+     Ext.get('btnLoginOut').on('click', function(){
+		Ext.Ajax.request({
+			url : '../../LoginOut.do',
+			success : function(){
+				location.href = '../Login.html';
+			},
+			failure : function(){
+				
+			}
+		});
+    }); 
+    
+});	
+</script>
+</head>
+<body>
+
+  <div id="west"></div>
+  <div id="center" >
+        <p><b>Done reading me? Close me by clicking the X in the top right corner.</b></p>
+        <p>Vestibulum semper. Nullam non odio. Aliquam quam. Mauris eu lectus </p>
+  </div>
+</body>
+</html>

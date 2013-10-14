@@ -3,29 +3,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>无线点餐网页终端</title>
-
-<link rel="stylesheet" type="text/css" href="../../extjs/resources/css/ext-all.css" />
-<link rel="stylesheet" type="text/css" href="../../css/myExt.css" />
-<link rel="stylesheet" type="text/css" href="../../extjs/ext-patch.css" />
-<script type="text/javascript" src="../../extjs/ext-base.js"></script>
-<script type="text/javascript" src="../../extjs/ext-all.js"></script>
-<script type="text/javascript" src="../../extjs/ext-lang-zh_CN.js"></script>
-
-<script type="text/javascript" src="../../js/common/Ext.ux.js"></script>
-<script type="text/javascript" src="../../js/common/Ext.ux.check.js"></script>
-
-<link rel="stylesheet" type="text/css" href="../../css/header.css" />
-
-<script type="text/javascript" src="../../js/components/Ext.ux.ImageButton.js"></script>
-<script type="text/javascript" src="../../js/components/Encrypt.js"></script>
-<script type="text/javascript" src="../../js/components/functionLib.js"></script>
-
 <script type="text/javascript">
-	var Request = new URLParaQuery(); 
-	
-	var restaurantID = Request["restaurantID"];
-	
-	
 	var programData = {root:[]};
 	var discountData = {};
 	
@@ -37,12 +15,12 @@
 	};
 </script>
 
-<script type="text/javascript" src="../../js/BasicManagement/discountMgr/discountMgrLoad.js"></script>
 <script type="text/javascript" src="../../js/BasicManagement/discountMgr/discountMgrMain.js"></script>
  
 </head>
 
-<body onload="discountMgrLoad()"> 
-	<script type="text/javascript" src="../../extjs/examples.js"></script>
+<body> 
+
+	<div id="divDiscount"></div>
 </body>
 </html>

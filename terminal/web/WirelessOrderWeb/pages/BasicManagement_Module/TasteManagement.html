@@ -4,27 +4,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>无线点餐网页终端</title>
 
-<link rel="stylesheet" type="text/css" href="../../extjs/resources/css/ext-all.css" />
-<link rel="stylesheet" type="text/css" href="../../css/myExt.css" />
-<link rel="stylesheet" type="text/css" href="../../extjs/ext-patch.css" />
-<script type="text/javascript" src="../../extjs/ext-base.js"></script>
-<script type="text/javascript" src="../../extjs/ext-all.js"></script>
-<script type="text/javascript" src="../../js/common/Ext.ux.js"></script>
-<script type="text/javascript" src="../../js/common/Ext.ux.check.js"></script>
-<script type="text/javascript" src="../../extjs/ext-lang-zh_CN.js"></script>
-
-<link rel="stylesheet" type="text/css" href="../../css/systemSetting.css" />
-<link rel="stylesheet" type="text/css" href="../../css/header.css" />
-
-<script type="text/javascript" src="../../js/components/Ext.ux.ImageButton.js"></script>
-<script type="text/javascript" src="../../js/components/Encrypt.js"></script>
-<script type="text/javascript" src="../../js/components/functionLib.js"></script>
-
 <script type="text/javascript">
-	var Request = new URLParaQuery();
-	var restaurantID = Request["restaurantID"];
-	
-	
 	var conditionType = '';
 
 	var currPageIndex = 0;
@@ -36,7 +16,6 @@
 	var tasteTypeData = [[0, '口味'], [2, '规格']];
 </script>
 
-<script type="text/javascript" src="../../js/BasicManagement/tasteMgr/tasteMgrLoad.js"></script>
 <script type="text/javascript" src="../../js/BasicManagement/tasteMgr/tasteMgrMain.js"></script>
 
 <style type="text/css"> 
@@ -53,7 +32,7 @@
 </style> 
 
 </head>
-<body onload="tasteMgrOnLoad()">
-	<script type="text/javascript" src="../../extjs/examples.js"></script>
+<body>
+	<div id="divTaste"></div>
 </body>
 </html>

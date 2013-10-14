@@ -3,30 +3,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>无线点餐网页终端</title>
-
-<link id="personal" rel="stylesheet" type="text/css" href="../../extjs/resources/css/ext-all.css" />
-<link rel="stylesheet" type="text/css" href="../../css/myExt.css" />
-<link rel="stylesheet" type="text/css" href="../../extjs/ext-patch.css" />
-<script type="text/javascript" src="../../extjs/ext-base.js"></script>
-<script type="text/javascript" src="../../extjs/ext-all.js"></script>
-<script type="text/javascript" src="../../js/common/Ext.ux.js"></script>
-<script type="text/javascript" src="../../js/common/Ext.ux.check.js"></script>
-
-<script type="text/javascript" src="../../extjs/ext-lang-zh_CN.js"></script>
-
-<link rel="stylesheet" type="text/css" href="../../css/header.css" />
-
-<script type="text/javascript" src="../../jquery/jquery-1.8.2.min.js"></script>
-
-<!-- components -->
-<script type="text/javascript" src="../../js/components/Ext.ux.ImageButton.js"></script>
-<script type="text/javascript" src="../../js/components/Encrypt.js"></script>
-<script type="text/javascript" src="../../js/components/functionLib.js"></script>
-
 <script type="text/javascript">
-	var Request = new URLParaQuery();
-	var restaurantID = Request["restaurantID"];
-	
 
 	var currPageIndex = 0;
 	var currRowIndex = -1;
@@ -69,19 +46,12 @@
 </script>
 
 <script type="text/javascript"
-	src="../../js/BasicManagement/menuMgr/menuMgrLoad.js"></script>
-<script type="text/javascript"
-	src="../../js/BasicManagement/menuMgr/menuMgrBasic.js"></script>
-<script type="text/javascript"
-	src="../../js/BasicManagement/menuMgr/menuMgrTaste.js"></script>
-<script type="text/javascript"
-	src="../../js/BasicManagement/menuMgr/menuMgrCombination.js"></script>
-<script type="text/javascript"
 	src="../../js/BasicManagement/menuMgr/menuMgrMain.js"></script>
 
+
 </head>
-<body onload="menuMgrOnLoad()">
-	<script type="text/javascript" src="../../js/BasicManagement/menuMgr/menuFuncLib.js"></script>
-	<script type="text/javascript" src="../../extjs/examples.js"></script>
+<body>
+
+	<div id='divMenu'></div>
 </body>
 </html>

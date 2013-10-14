@@ -19,7 +19,7 @@
 		color: #444;
 		font: 14px 'Microsoft YaHei','微软雅黑';
 		margin: 0 auto;
-		width: 388px
+		width: 375px
 	}
 	.loginBox .loginBoxCenter {
 		border-bottom: 1px solid #DDE0E8;
@@ -45,7 +45,7 @@
 		font: 12px 'Microsoft YaHei','微软雅黑';
 		padding: 8px 14px;
 		margin-bottom: 8px;
-		width: 310px;
+		width: 280px;
 	}
 	.loginBox .loginInput:FOCUS {
 		border: 2px solid #B7D4EA;
@@ -84,17 +84,34 @@
 		font: 11px Arial;
 	}
 
+	.styled-select select { 
+ 		background: transparent; 
+		width: 335px; 
+		font-size: 20px;
+		font-weight : bold;
+		padding-top : 2px;
+		border: 1px solid #ccc; 
+		height: 34px; 
+		-webkit-appearance: none;  
+	} 
+	.styled-select {
+	   width: 310px;
+	   height: 34px;
+	   overflow: hidden;
+	   background: url(../images/select_image.jpg) no-repeat right;
+	}
 	</style>
 </head>
 <script type="text/javascript" src="../jquery/jquery-1.8.2.min.js"></script>
 <script type="text/javascript" src="../js/components/Encrypt.js"></script>
+<script type="text/javascript" src="../js/components/md5.js"></script>
 <body>
 <div><img alt="" src="../images/background.jpg" style="width:100%;"></div>
 <div style="position:absolute; top:0px;left:0px; width:100%">
 	<div style="margin-top: 20px; margin-left: 10px; font-size:50px;font-weight: bolder;font-family: 方正隶书简体;color: #545454;">智易餐饮管理平台</div>
 	<div class="wrapper">
 		<div class="loginBox">
-		<form id="form">
+		<form id="form" style="">
 			<div class="loginBoxCenter">
 				<p><label for="username">会员账号：</label></p>
 				<p><input id="name" name="mbName" class="loginInput" autofocus="autofocus" required="required" autocomplete="off" placeholder="请输入账号" value="" /></p>
@@ -105,17 +122,83 @@
    				<span></span><span ></span><span ></span><span ></span></div> 
 			</div>
 			<div class="loginBoxButtons">
-				<input type="button" class="loginBtn" id="login" value="进入web点菜系统">
+				<input type="checkbox" id="rememberRestaurant" style="margin-left: 140px">记住餐厅?
+				<input type="button" class="loginBtn" id="login" value="登录餐厅">
 				<!-- <button id="login" class="loginBtn">进入web点菜系统</button> -->
 			</div>
 		</form>
+		<form id="staffForm" style="display : none;">
+			<div class="loginBoxCenter">
+				<p><label>员工账号：</label></p>
+				<div class="styled-select"> 
+					<select id="selectStaff" ><option>&nbsp;</option> </select>
+				
+				</div>
+				<p><label>密码：</label></p>
+				<p><input type="password" id="pwd" class="loginInput" required="required" autocomplete="off" placeholder="请输入密码" value="" /></p>
+			</div>
+			<div class="loginBoxButtons">
+				<input type="button" class="loginBtn" id="loginFront" value="进入web点菜" style="margin-left: 70px;"> <input type="button" class="loginBtn" id="loginBasic" value="进入系统后台" >
+			</div>
+		</form>
+		
 		</div>
 
 	</div>
 <div align="center" style="margin-bottom: 5px;">	
 	<div id="postBar"><span style=" font-size: small">版权所有(c) 2011 广州鼎鼎信息科技有限公司 · 智易科技</span></div>
 </div>	
+
 <script type="text/javascript">
+
+function getCookie(cookiename) {
+	var result;
+	var mycookie = document.cookie;
+	var start2 = mycookie.indexOf(cookiename + "=");
+	if (start2 > -1) {
+		start = mycookie.indexOf("=", start2) + 1;
+		var end = mycookie.indexOf(";", start);
+	
+		if (end == -1) {
+			end = mycookie.length;
+		}
+		//截取cookie
+		result = unescape(mycookie.substring(start, end));
+	}
+	return result;
+}
+
+function setCookie(cookiename, cookievalue, days) {
+	var date = new Date();
+	date.setTime(date.getTime() + Number(days) * 3600 * 1000 * 24);
+	document.cookie = cookiename + "=" + cookievalue + "; path=/;expires = " + date.toGMTString();
+}
+</script>
+<script type="text/javascript">
+	
+	var id = getCookie('restaurant');
+	function getStaff(restaurantID){
+		$.post('../QueryStaff.do', {
+				isCookie : true,
+				"restaurantID" : restaurantID,
+				"type" : 0,
+				"isPaging" : false,
+				"isCombo" : false
+			}, function(res){
+				for(var i=0; i<res.root.length; i++ ){
+					$('#selectStaff').append("<option value="+res.root[i].staffID+">"+res.root[i].staffName+"</option>");
+				}
+			}
+		);
+	}
+	
+ 	if(getCookie('restaurant')){
+		$('#form').hide();
+		$('#staffForm').show(function(){
+			getStaff(getCookie('restaurant'));
+		});
+	}
+	
 	var vCode = "";
 	function validteCode()     
 	{     
@@ -136,11 +219,7 @@
 	document.onload = validteCode();  
 	$(function(){
 		$('#name').focus();
-		$('#form').keydown(function(e){
-			if(e.keyCode == 13){
-				$('#login').click();
-			}
-		});
+
  		$('#login').click(function(){
 
   			if($('#password').val() == vCode){
@@ -151,12 +230,17 @@
   						account : $('#name').val()
   					},
   					success : function(data, status, xhr){
-  						var jr = jQuery.parseJSON(data)
+  						var jr = jQuery.parseJSON(data);
   						if(jr.success){
   							if(jr.root == ''){
   								alert('账号输入错误');
   							}else{
-  								location.href = './PersonLogin.html?'+strEncode('restaurantID='+jr.root[0].id, 'mi');	
+  								$('#form').hide();
+  								$('#staffForm').show();
+  								if($('#rememberRestaurant').is(':checked')){
+  	 								setCookie('restaurant', jr.root[0].id, 30);
+  								}
+  								getStaff(jr.root[0].id);
   							}
   							
   						}else{
@@ -172,8 +256,26 @@
  			}
 
 		}); 
+ 		
+ 		$('#selectStaff').change(function(){
+ 			$('#pwd').focus();
+ 		});
+ 		
+ 		$('#loginBasic').click(function(){
+ 			$.post('../OperateStaff.do', {
+				pin : $('#selectStaff').val(),
+				pwd : MD5($('#pwd').val()),
+				restaurantID : id
+ 			}, function(result){
+ 				if(result.success){
+ 					location.href = 'Mgr/DigieBasic.html?'+strEncode('restaurantID='+ getCookie('restaurant'), KEYS);
+ 				}else{
+ 					alert(result.msg);
+ 				}
+ 			});
+ 			
+ 		});
 	});
-	
 </script>
 </div>
 </body>
