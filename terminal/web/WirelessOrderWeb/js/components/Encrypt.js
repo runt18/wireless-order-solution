@@ -1,14 +1,17 @@
 /*
-*(1).加密: 
-*  第一步:strEncode(data,firstKey,secondKey,thirdKey);
-*(2).解密:
-*  第一步:strDecode(data,firstKey,secondKey,thirdKey);
+*(1).锟斤拷锟斤拷: 
+*  锟斤拷一锟斤拷:strEncode(data,firstKey,secondKey,thirdKey);
+*(2).锟斤拷锟斤拷:
+*  锟斤拷一锟斤拷:strDecode(data,firstKey,secondKey,thirdKey);
 */
 /*
 * encrypt the string to string made up of hex
 * return the encrypted string
 */
-/*加密的函数,三个密钥*/
+//瀵嗛挜
+KEYS = "mi";
+
+//鍔犲瘑鏂规硶
 function strEncode(data,firstKey,secondKey,thirdKey){
  var leng = data.length;
  var encData = "";
@@ -171,7 +174,7 @@ function strEncode(data,firstKey,secondKey,thirdKey){
 *
 * return  the original string  
 */
-/*解密的函数,三个密钥(解密密钥同加密密钥)*/
+//瑙ｅ瘑鏂规硶
 function strDecode(data,firstKey,secondKey,thirdKey){
  var leng = data.length;
  var decStr = "";

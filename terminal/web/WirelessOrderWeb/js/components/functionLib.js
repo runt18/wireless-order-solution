@@ -17,7 +17,7 @@ function checkUserSessionStatus(conn,response,options){
 		new Ext.util.TaskRunner().start({
 			run: function(){
 				if(interval < 1){
-					location.href = response.getResponseHeader.root_path + '/pages/PersonLogin.html?'+strEncode('restaurantID='+restaurantID, 'mi');								
+					location.href = response.getResponseHeader.root_path + '/pages/Login.html';								
 				}
 				Ext.getDom('returnInterval').innerHTML = interval;
 				interval--;
@@ -32,7 +32,7 @@ function checkUserSessionStatus(conn,response,options){
 			closable : false,
 			fn : function(btn){
 				if(btn == 'ok'){
-					location.href = response.getResponseHeader.root_path + '/pages/PersonLogin.html?'+strEncode('restaurantID='+restaurantID, 'mi');
+					location.href = response.getResponseHeader.root_path + '/pages/Login.html';
 				}
 			}
 		});
@@ -71,6 +71,7 @@ Ext.ux.otype = {
 	'get' : 'GET', 'GET' : 'GET'
 };
 
+
 //从url获取当前桌信息
 function URLParaQuery() {
 	var name, value, i;
@@ -78,7 +79,7 @@ function URLParaQuery() {
 	var num = str.indexOf("?");
 	str = str.substr(num + 1);
 	//"mi" is the key
-	str = strDecode(str, "mi");
+	str = strDecode(str, KEYS);
 	var arrtmp = str.split("&");
 	for (i = 0; i < arrtmp.length; i++) {
 		num = arrtmp[i].indexOf("=");

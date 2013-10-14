@@ -22,26 +22,6 @@ var btnAddDiscount = new Ext.ux.ImageButton({
 	}
 });
 
-var pushBackBut = new Ext.ux.ImageButton({
-	imgPath : '../../images/UserLogout.png',
-	imgWidth : 50,
-	imgHeight : 50,
-	tooltip : '返回',
-	handler : function(btn){
-		location.href = 'BasicMgrProtal.html?'+ strEncode('restaurantID=' + restaurantID, 'mi');
-	}
-});
-
-var logOutBut = new Ext.ux.ImageButton({
-	imgPath : '../../images/ResLogout.png',
-	imgWidth : 50,
-	imgHeight : 50,
-	tooltip : '登出',
-	handler : function(btn){
-		
-	}
-});
-
 function programOperationHandler(c){
 	if(c == null || typeof(c) == 'undefined' || typeof(c.type) == 'undefined'){
 		return;
@@ -207,6 +187,18 @@ var addProgramWin;
 var addDiscountWin;
 var updateDiscountRateWin;
 Ext.onReady(function(){
+	Ext.Ajax.request({
+		url : '../../QueryKitchen.do',
+		params : {
+			dataSource : 'normal',
+			restaurantID : restaurantID,
+			isPaging : false
+		},
+		success : function(res, opt){
+			discountData = Ext.decode(res.responseText);
+		}
+	});
+	
 	var programTreeTbar = new Ext.Toolbar({
 		items : [{
 			xtype : 'tbtext',
@@ -449,9 +441,11 @@ Ext.onReady(function(){
 		updateDisocuntOperationHandler();
 	});
 	
-	var centerPanel = new Ext.Panel({
+	new Ext.Panel({
 		title : '折扣方案管理',
-		region : 'center',
+		renderTo : 'divDiscount',
+		width : parseInt(Ext.getDom('divDiscount').parentElement.style.width.replace(/px/g,'')),
+		height : parseInt(Ext.getDom('divDiscount').parentElement.style.height.replace(/px/g,'')),
 		layout : 'border',
 		frame : true,
 		items : [programTree, discountGrid],
@@ -461,21 +455,10 @@ Ext.onReady(function(){
 			    {xtype:'tbtext',text:'&nbsp;&nbsp;'},
 			    btnAddProgram,
 			    {xtype:'tbtext',text:'&nbsp;&nbsp;'},
-			    btnAddDiscount,
-			    {xtype:'tbtext',text:'&nbsp;&nbsp;'},
-			    '->', 
-			    pushBackBut, 
-			    {
-					text : '&nbsp;&nbsp;&nbsp;',
-					disabled : true
-				}, 
-				logOutBut 
+			    btnAddDiscount
 			]
 		})
 	});
-	
-	initMainView(null, centerPanel, null);
-	getOperatorName("../../");
 	
 	if(!addProgramWin){
 		addProgramWin = new Ext.Window({

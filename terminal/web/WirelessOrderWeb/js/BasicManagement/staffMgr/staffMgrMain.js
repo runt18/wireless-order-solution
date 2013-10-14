@@ -1000,7 +1000,7 @@ Ext.onReady(function() {
             expanded: true,
             text : '权限列表',
             pId : '-2',
-            leaf : false,
+            leaf : false
            // checked : false,
 		}),
 		listeners : {
@@ -1123,47 +1123,20 @@ Ext.onReady(function() {
 		}
 	});
 	
-	var centerPanel = new Ext.Panel({
-		title : '员工操作',
-		region : 'center',
+	new Ext.Panel({
+		renderTo : 'divStaff',
+		width : parseInt(Ext.getDom('divStaff').parentElement.style.width.replace(/px/g,'')),
+		height : parseInt(Ext.getDom('divStaff').parentElement.style.height.replace(/px/g,'')),
 		layout : 'border',
-		frame : true,
 		items : [ staffGrid, roleGrid, privilegeTree ],
 		tbar : new Ext.Toolbar({
 			height : 55,
 			items : [addStaff, {
 				xtype : 'tbtext',
 				text : '&nbsp;&nbsp;&nbsp;'
-			}, addRole,'->', 
-				pushBackBut, 
-				{
-					xtype : 'tbtext',
-					text : '&nbsp;&nbsp;&nbsp;'
-				}, 
-				logOutBut 
+			}, addRole
 			]
 		})
-	});
-	getOperatorName("../../");
-	new Ext.Viewport({
-		layout : 'border',
-		id : 'viewport',
-		items : [{
-			region : 'north',
-			bodyStyle : 'background-color:#DFE8F6;',
-			html : '<h4 style="padding:10px;font-size:150%;float:left;">无线点餐网页终端</h4><div id="optName" class="optName"></div>',
-			height : 50,
-			border : false,
-			margins : '0 0 0 0'
-		},
-		centerPanel,
-		{
-			region : 'south',
-			height : 30,
-			frame : true,
-			border : false,
-			html : '<div style="font-size:11pt; text-align:center;"><b>版权所有(c) 2011 智易科技</b></div>'
-		}]
 	});
 
 });

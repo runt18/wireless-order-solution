@@ -545,6 +545,55 @@ Ext.ux.createRocord = function(o, r){
     };
     return f;
 };
+
+/**
+ * tab右键关闭
+ */
+Ext.ux.TabCloseMenu = function(){
+    var tabs = null, menu = null, ctxItem = null;
+    this.init = function(tp){
+        tabs = tp;
+        tabs.on('contextmenu', onContextMenu);
+    };
+
+    function onContextMenu(ts, item, e){
+        if(!menu){ // create context menu on first right click
+            menu = new Ext.menu.Menu({
+            	items : [{
+                id: tabs.id + '-close',
+                text: '关闭当前',
+                handler : function(){
+                    tabs.remove(ctxItem);
+                }
+            },{
+                id: tabs.id + '-close-others',
+                text: '关闭其他',
+                handler : function(){
+                    tabs.items.each(function(item){
+                        if(item.closable && item != ctxItem){
+                            tabs.remove(item);
+                        }
+                    });
+                }
+            }],
+            ignoreParentClicks : true
+            });
+        }
+        ctxItem = item;
+        var items = menu.items;
+        items.get(tabs.id + '-close').setDisabled(!item.closable);
+        var disableOthers = true;
+        tabs.items.each(function(){
+            if(this != item && this.closable){
+                disableOthers = false;
+                return false;
+            }
+        });
+        items.get(tabs.id + '-close-others').setDisabled(disableOthers);
+        menu.showAt(e.getPoint());
+    }
+};
+
 Ext.ux.cr = Ext.ux.createRocord;
 
 var TableRecord = Ext.ux.cr(['id', 'alias', 'rid', 'name', 'customNum', 'minimumCost', 'serviceRate', 'categoryValue',

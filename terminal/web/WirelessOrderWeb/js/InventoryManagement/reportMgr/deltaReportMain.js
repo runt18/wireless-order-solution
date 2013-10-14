@@ -1,22 +1,3 @@
-var pushBackBut = new Ext.ux.ImageButton({
-	imgPath : '../../images/UserLogout.png',
-	imgWidth : 50,
-	imgHeight : 50,
-	tooltip : '返回',
-	handler : function(btn){
-		location.href = 'InventoryProtal.html?'+ strEncode('restaurantID=' + restaurantID, 'mi');
-	}
-});
-
-var logOutBut = new Ext.ux.ImageButton({
-	imgPath : '../../images/ResLogout.png',
-	imgWidth : 50,
-	imgHeight : 50,
-	tooltip : '登出',
-	handler : function(btn){
-		
-	}
-});
 var materialTypeDate = [[1,'商品'],[2,'原料']];
 var materialTypeComb = new Ext.form.ComboBox({
 	forceSelection : true,
@@ -168,12 +149,12 @@ Ext.onReady(function(){
 	
 	var cm = new Ext.grid.ColumnModel([
 	       new Ext.grid.RowNumberer(),
-	       {header: '品项名称 ', dataIndex: 'material.name', width: 180},
-	       {header: '初期数量', dataIndex: 'primeAmount', width: 180},
-	       {header: '期末数量', dataIndex: 'endAmount', width: 180},
-	       {header: '理论消耗', dataIndex: 'expectAmount', width: 180},
-	       {header: '实际消耗', dataIndex: 'actualAmount', width: 180},
-	       {header: '差异数', dataIndex: 'deltaAmount', width: 180}
+	       {header: '品项名称 ', dataIndex: 'material.name'},
+	       {header: '初期数量', dataIndex: 'primeAmount'},
+	       {header: '期末数量', dataIndex: 'endAmount'},
+	       {header: '理论消耗', dataIndex: 'expectAmount'},
+	       {header: '实际消耗', dataIndex: 'actualAmount'},
+	       {header: '差异数', dataIndex: 'deltaAmount'}
 	]);
 	cm.defaultSortable = true;
 	
@@ -266,6 +247,9 @@ Ext.onReady(function(){
 		frame : true,
 		store : ds,
 		cm : cm,
+		viewConfig : {
+			forceFit : true		
+		},
 		tbar : deltaReportBar,
 		bbar : pagingBar
 	});
@@ -279,7 +263,7 @@ Ext.onReady(function(){
 		title : '部门信息',
 		id : 'deptTree',   
 		region : 'west',
-		width : 200,
+		width : 170,
 		border : false,
 		rootVisible : true,
 		autoScroll : true,
@@ -340,22 +324,12 @@ Ext.onReady(function(){
 
 	});
 	
-	var deltaReport = new Ext.Panel({
-		title : '报表管理',
-		region : 'center',
+	new Ext.Panel({
+		renderTo : 'divDeltaReport',
+		width : parseInt(Ext.getDom('divDeltaReport').parentElement.style.width.replace(/px/g,'')),
+		height : parseInt(Ext.getDom('divDeltaReport').parentElement.style.height.replace(/px/g,'')),
 		layout : 'border',
-		frame : true,
 		items : [deptTree, deltaReportGrid],
-		tbar : new Ext.Toolbar({
-			height : 55,
-			items : [
-		         {xtype: 'tbtext', text: '&nbsp;&nbsp;'},
-		         '->',
-		         pushBackBut,
-		         {xtype: 'tbtext', text: '&nbsp;&nbsp;'},
-		         logOutBut
-			]
-		}),
 		keys : [{
 			key : Ext.EventObject.ENTER,
 			scope : this,
@@ -364,25 +338,4 @@ Ext.onReady(function(){
 			}
 		}]
 	});
-	getOperatorName("../../");
-	new Ext.Viewport({
-		layout : 'border',
-		id : 'viewport',
-		items : 
-		[{
-			region : 'north',
-			bodyStyle : 'background-color:#DFE8F6;',
-			html : "<h4 style='padding:10px;font-size:150%;float:left;'>无线点餐网页终端</h4><div id='optName' class='optName'></div>",
-			height : 50,
-			border : false,
-			margins : '0 0 0 0'
-		},deltaReport,{
-			region : 'south',
-			height : 30,
-			frame : true,
-			html : '<div style="font-size:11pt; text-align:center;"><b>版权所有(c) 2011 智易科技</b></div>'
-		}]
-	});
-	
-	
 });

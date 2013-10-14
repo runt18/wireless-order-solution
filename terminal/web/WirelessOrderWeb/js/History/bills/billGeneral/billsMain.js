@@ -1,4 +1,81 @@
-﻿/* ---------------------------------------------------------------- */
+﻿
+//------------------lib
+function billQueryHandler() {
+	var sType = searchType, sValue = '', sOperator = '', sAdditionFilter = 0;
+	var onDuty = '', offDuty = '';
+	if(sType == 0){
+		sValue = '';
+		searchOperator = '';
+	}else if(sType == 4){
+		var temp = searchValue.split(searchSubSplitSymbol);
+		onDuty = Ext.getCmp(temp[0]).getValue().format('Y-m-d 00:00:00');
+		offDuty = Ext.getCmp(temp[1]).getValue().format('Y-m-d 23:59:59');
+		sValue = onDuty + '<split>' + offDuty;
+	}else if(searchType == 9){
+		sValue = '';
+	}else{
+		sValue = searchValue != '' ? Ext.getCmp(searchValue).getValue() : '';
+		sOperator = searchOperator != '' ? Ext.getCmp(searchOperator).getValue() : '';
+		if(typeof sValue == 'string' && sValue == ''){
+			sType = 0;
+			sValue = '';
+		}
+	}
+	sAdditionFilter = Ext.getCmp(searchAdditionFilter).inputValue;	
+	var gs = billsGrid.getStore();
+	gs.baseParams['isPaging'] = true;
+	gs.baseParams['restaurantID'] = restaurantID;
+	
+	gs.baseParams['type'] = sType;
+	gs.baseParams['ope'] = sOperator;
+	gs.baseParams['value'] = sValue;
+	gs.baseParams['havingCond'] = sAdditionFilter;
+	gs.load({
+		params : {
+			start : 0,
+			limit : GRID_PADDING_LIMIT_20
+		}
+	});
+};
+
+//----------------------load
+function loadAddKitchens() {
+	kitchenMultSelectData = [];
+	Ext.Ajax.request({
+		url : "../../QueryKitchen.do",
+		params : {
+			"dataSource" : "normal",
+			
+			"isPaging" : false
+		},
+		success : function(response, options) {
+			var resultJSON = Ext.util.JSON.decode(response.responseText);
+			var rootData = resultJSON.root;
+			for ( var i = 0; i < rootData.length; i++) {
+				kitchenMultSelectData.push([
+				    rootData[i].kitchenAlias,
+					rootData[i].kitchenName, 
+					rootData[i].kitchenID 
+				]);
+			}
+		},
+		failure : function(response, options) {
+			Ext.MessageBox.show({
+				msg : " Unknown page error ",
+				width : 300,
+				buttons : Ext.MessageBox.OK
+			});
+		}
+	});
+}
+
+// on page load function
+function billHistoryOnLoad() {
+	// data init
+	loadAddKitchens();
+};
+//-----------
+/* ---------------------------------------------------------------- */
 var btnCancelledFood = new Ext.ux.ImageButton({
 	imgPath : '../../images/cancelledFoodStatis.png',
 	imgWidth : 50,
@@ -782,11 +859,13 @@ Ext.onReady(function() {
 	}];
 	
 	// --------------------------------------------------------------------------
-	var centerPanel = new Ext.Panel({
-		title : '历史账单管理',
-		region : 'center',
+	new Ext.Panel({
+		//title : '历史账单管理',
+		renderTo : 'divHistoryStatistics',
+		width : parseInt(Ext.getDom('divHistoryStatistics').parentElement.style.width.replace(/px/g,'')),
+		height : parseInt(Ext.getDom('divHistoryStatistics').parentElement.style.height.replace(/px/g,'')),
+		//region : 'center',
 		layout : 'fit',
-		frame : true,
 		items : [ {
 			layout : 'border',
 			items : [billsGrid]
@@ -805,15 +884,11 @@ Ext.onReady(function() {
 			{xtype:'tbtext',text:'&nbsp;&nbsp;&nbsp;'},
 			receivablesStatBut,
 			{xtype:'tbtext',text:'&nbsp;&nbsp;&nbsp;'},
-			btnSalesSub,
-			'->', 
-			pushBackBut,
-			{xtype:'tbtext',text:'&nbsp;&nbsp;&nbsp;'},
-			logOutBut 
+			btnSalesSub
 			]
 		})
 	});
-
-	initMainView(null, centerPanel, null);
-	getOperatorName("../../");
+	billHistoryOnLoad();
+/*	initMainView(null, centerPanel, null);
+	getOperatorName("../../");*/
 });

@@ -115,26 +115,6 @@ function stockDetailHandler(orderID) {
 	billDetailWin.center();
 };
 
-var pushBackBut = new Ext.ux.ImageButton({
-	imgPath : '../../images/UserLogout.png',
-	imgWidth : 50,
-	imgHeight : 50,
-	tooltip : '返回',
-	handler : function(btn){
-		location.href = 'InventoryProtal.html?'+ strEncode('restaurantID=' + restaurantID, 'mi');
-	}
-});
-
-var logOutBut = new Ext.ux.ImageButton({
-	imgPath : '../../images/ResLogout.png',
-	imgWidth : 50,
-	imgHeight : 50,
-	tooltip : '登出',
-	handler : function(btn){
-		
-	}
-});
-
 var materialTypeDate = [[1,'商品'],[2,'原料']];
 var materialTypeComb = new Ext.form.ComboBox({
 	forceSelection : true,
@@ -285,16 +265,16 @@ Ext.onReady(function(){
 	var cm = new Ext.grid.ColumnModel([
 	         new Ext.grid.RowNumberer(),
 	         {header:'id', dataIndex:'id', hidden: true },
-	         {header:'日期', dataIndex:'date', width:100},
-	         {header:'单号', dataIndex:'oriStockId', width:130},
+	         {header:'日期', dataIndex:'date'},
+	         {header:'单号', dataIndex:'oriStockId'},
 	         {header:'部门', dataIndex:'dept', width:160},
 	         {header:'入库类型', dataIndex:'stockInSubType', width:100},
-	         {header:'入库数量', dataIndex:'stockInAmount', width:100},
-	         {header:'入库金额', dataIndex:'stockInMoney', width:100},
+	         {header:'入库数量', dataIndex:'stockInAmount'},
+	         {header:'入库金额', dataIndex:'stockInMoney'},
 	         {header:'出库类型', dataIndex:'stockOutSubType', width:100},
-	         {header:'出库数量', dataIndex:'stockOutAmount', width:100 },
-	         {header:'出库金额', dataIndex:'stockOutMoney', width:100},
-	         {header:'结存数量', dataIndex:'remaining', width:100}]);
+	         {header:'出库数量', dataIndex:'stockOutAmount'},
+	         {header:'出库金额', dataIndex:'stockOutMoney'},
+	         {header:'结存数量', dataIndex:'remaining'}]);
 	
 	cm.defaultSortable = true;
 	//var data = {root: [{"id":426,"stockInSubType":"","remaining":3,"stockOutAmount":10,"stockInMoney":"1231231","oriStockId":"","stockOutMoney":15,"stockOutSubType":"盘亏","dept":"甜甜蜜蜜","date":"2013-07-02 12:03:45","stockInAmount":""}]};
@@ -458,7 +438,7 @@ Ext.onReady(function(){
 		title : '部门信息',
 		id : 'deptTree',
 		region : 'west',
-		width : 200,
+		width : 160,
 		border : false,
 		rootVisible : true,
 		autoScroll : true,
@@ -467,7 +447,7 @@ Ext.onReady(function(){
 		loader : new Ext.tree.TreeLoader({
 			dataUrl : '../../QueryDeptTree.do?time='+new Date(),
 			baseParams : {
-				'restaurantID' : restaurantID,
+				'restaurantID' : restaurantID
 				//time : new Date()
 			}
 		}),
@@ -539,6 +519,9 @@ Ext.onReady(function(){
 		frame : true,
 		store : ds,
 		cm : cm,
+		viewConfig : {
+			forceFit : true
+		},
 		tbar : detailReportBar,
 		bbar : pagingBar,
 		listeners : {
@@ -563,24 +546,14 @@ Ext.onReady(function(){
 
 	});
 	//ds.load({params:{start:0, limit:13}});
-   var stockDetailReport = new Ext.Panel({
-		title : '报表管理',
-		region : 'center',//渲染到
+   new Ext.Panel({
+		renderTo : 'divStockDetail',
+		width : parseInt(Ext.getDom('divStockDetail').parentElement.style.width.replace(/px/g,'')),
+		height : parseInt(Ext.getDom('divStockDetail').parentElement.style.height.replace(/px/g,'')),
 		layout : 'border',//布局
-		frame : true, 
 		//margins : '5 5 5 5',
 		//子集
 		items : [stockDetailReportTree,stockDetailReportGrid],
-		tbar : new Ext.Toolbar({
-			height : 55,
-			items : [
-			    {xtype:'tbtext',text:'&nbsp;&nbsp;'},
-			    '->',
-			    pushBackBut, 
-			    {xtype:'tbtext',text:'&nbsp;&nbsp;'},
-				logOutBut 
-			]
-		}),
 		keys : [{
 			key : Ext.EventObject.ENTER,
 			scope : this,
@@ -589,27 +562,4 @@ Ext.onReady(function(){
 			}
 		}]
 	});
-   getOperatorName("../../");
-	new Ext.Viewport({
-		layout : 'border',
-		id : 'viewport',
-		items : 
-		[{
-			region : 'north',
-			bodyStyle : 'background-color:#DFE8F6;',
-			html : "<h4 style='padding:10px;font-size:150%;float:left;'>无线点餐网页终端</h4><div id='optName' class='optName'></div>",
-			height : 50,
-			border : false,
-			margins : '0 0 0 0'
-		},stockDetailReport,{
-			region : 'south',
-			height : 30,
-			frame : true,
-			html : '<div style="font-size:11pt; text-align:center;"><b>版权所有(c) 2011 智易科技</b></div>'
-		}]
-	});
-	
-	
-	
-	
 });

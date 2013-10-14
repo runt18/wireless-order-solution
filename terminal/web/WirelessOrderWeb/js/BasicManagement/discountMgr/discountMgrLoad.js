@@ -4,7 +4,7 @@
 		params : {
 			dataSource : 'normal',
 			restaurantID : restaurantID,
-			isPaging : false,
+			isPaging : false
 			
 		},
 		success : function(res, opt){

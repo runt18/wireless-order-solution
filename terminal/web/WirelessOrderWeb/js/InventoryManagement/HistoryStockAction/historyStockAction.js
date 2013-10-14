@@ -177,27 +177,6 @@ var stockActionWin = new Ext.Window({
 });
 
 
-
-var pushBackBut = new Ext.ux.ImageButton({
-	imgPath : '../../images/UserLogout.png',
-	imgWidth : 50,
-	imgHeight : 50,
-	tooltip : '返回',
-	handler : function(btn){
-		location.href = 'InventoryProtal.html?'+ strEncode('restaurantID=' + restaurantID, 'mi');
-	}
-});
-
-var logOutBut = new Ext.ux.ImageButton({
-	imgPath : '../../images/ResLogout.png',
-	imgWidth : 50,
-	imgHeight : 50,
-	tooltip : '登出',
-	handler : function(btn){
-		
-	}
-});
-
 function showDetail(){
 	var txtStockIn = Ext.getCmp('displayPanelForDeptIn');
 	var txtStockOut = Ext.getCmp('displayPanelForDeptOut');
@@ -273,7 +252,7 @@ Ext.onReady(function(){
 	Ext.form.Field.prototype.msgTarget = 'side';
 	
 	function stockOperateRenderer(){
-		return '<a href="javascript:showDetail()">查看</a>';
+		return '<a href="javascript:showDetail()">查看</a>&nbsp;&nbsp;&nbsp;';
 	}
 	
 	function stockTypeRenderer(v, m, r, ri, ci, s){
@@ -312,20 +291,20 @@ Ext.onReady(function(){
 	var cm = new Ext.grid.ColumnModel([
 	                                   
 	    new Ext.grid.RowNumberer(),
-	    {header: '货单编号', dataIndex: 'id', width: 70},
+	    {header: '货单编号', dataIndex: 'id'},
 	    {header: '货单类型', width:110, renderer: stockTypeRenderer},
-	    {header: '货品类型', dataIndex: 'cateTypeText', width:75},
-	    {header: '原始单号', dataIndex: 'oriStockId', width:90},
+	    {header: '货品类型', dataIndex: 'cateTypeText'},
+	    {header: '原始单号', dataIndex: 'oriStockId'},
 	    {header: '时间', dataIndex: 'oriStockDateFormat', width:100},
 	    {header: '出货仓/供应商', renderer: stockOutRenderer, width:100},
 	    {header: '收货仓/供应商', dataIndex: 'stockInRenderer', renderer: stockInRenderer, width:100},
-	    {header: '数量', dataIndex: 'amount', width:90, align: 'center', renderer: Ext.ux.txtFormat.gridDou},
-	    {header: '应收金额', dataIndex: 'price', width:100, align: 'center', renderer: Ext.ux.txtFormat.gridDou},
+	    {header: '数量', dataIndex: 'amount', align: 'center', renderer: Ext.ux.txtFormat.gridDou},
+	    {header: '应收金额', dataIndex: 'price', align: 'center', renderer: Ext.ux.txtFormat.gridDou},
 	    {header: '实际金额', dataIndex: 'actualPrice', width:100, align: 'center', renderer: Ext.ux.txtFormat.gridDou},
 	    {header: '审核人', dataIndex: 'approverName', width:80, align: 'center'},
 	    {header: '审核状态', dataIndex: 'statusText', align: 'center', width:70},
 	    {header: '制单人', dataIndex: 'operatorName', width:80, align: 'center'},
-	    {header: '操作', align: 'center', width:140, dataIndex: 'stockOperateRenderer', renderer: stockOperateRenderer}
+	    {header: '操作', id:'operation', dataIndex: 'stockOperateRenderer', renderer: stockOperateRenderer, width : 100}
 	]);
 	
 	var ds = new Ext.data.Store({
@@ -556,7 +535,7 @@ Ext.onReady(function(){
 						Ext.Ajax.request({
 							url : '../../QueryDept.do',
 							params : {
-								dataSource : 'normal',
+								dataSource : 'normal'
 								
 							},
 							success : function(res, opt){
@@ -656,6 +635,10 @@ Ext.onReady(function(){
 		frame : true,
 		cm : cm,
 		store : ds,
+		autoExpandColumn : 'operation',
+		viewConfig : {
+			forceFit : true
+		},
 		tbar : new Ext.Toolbar({
 			items : [
 			         {xtype : 'tbtext', text : '&nbsp;&nbsp;&nbsp;货单编号/原始单号: '},
@@ -813,21 +796,12 @@ Ext.onReady(function(){
 	
 	
 	stockActionGrid.region = 'center';
-	var stockActionPanel = new Ext.Panel({
-		title : '历史库单',
-		region : 'center',
+	new Ext.Panel({
+		renderTo : 'divHistoryStock',
+		width : parseInt(Ext.getDom('divHistoryStock').parentElement.style.width.replace(/px/g,'')),
+		height : parseInt(Ext.getDom('divHistoryStock').parentElement.style.height.replace(/px/g,'')),
 		layout : 'border',
-		frame : true,
 		items : [stockActionGrid],
-		tbar : new Ext.Toolbar({
-			height : 55,
-			items : [
-			      '->',
-			      pushBackBut,
-			      {xtype : 'tbtext', text : '&nbsp;&nbsp;'},
-			      logOutBut
-			         ]
-		}),
 		keys : [{
 			key : Ext.EventObject.ENTER,
 			scope : this,
@@ -837,31 +811,4 @@ Ext.onReady(function(){
 		}]
 		
 	});
-
-	new Ext.Viewport({
-		id : 'viewport',
-		layout : 'border',
-		items : [{
-			region : 'north',
-			bodyStyle : 'background-color:#DFE8F6;',
-			html : '<h4 style="padding:10px;font-size:150%;float:left;">无线点餐网页终端</h4>'+
-				"<div id='optName' class='optName'></div>",
-			height : 50,
-			border : false,
-			margins : '0 0 0 0'
-		},stockActionPanel,
-		{
-			region : 'south',
-			height : 30,
-			frame : true,
-			html : '<div style="font-size:11pt; text-align:center;"><b>版权所有(c) 2011 智易科技</b></div>'
-			
-		}]
-	});
-	
-	
-	
-	
-	
-	
 });

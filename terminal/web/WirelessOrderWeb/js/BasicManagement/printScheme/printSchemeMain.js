@@ -1,22 +1,3 @@
-var pushBackBut = new Ext.ux.ImageButton({
-	imgPath : '../../images/UserLogout.png',
-	imgWidth : 50,
-	imgHeight : 50,
-	tooltip : '返回',
-	handler : function(btn){
-		location.href = 'BasicMgrProtal.html?'+strEncode("restaurantID=" + restaurantID, "mi");
-	}
-});
-
-var logOutBut = new Ext.ux.ImageButton({
-	imgPath : '../../images/ResLogout.png',
-	imgWidth : 50,
-	imgHeight : 50,
-	tooltip : '登出',
-	handler : function(btn){
-		
-	}
-});
 
 var addPrinter = new Ext.ux.ImageButton({
 	imgPath : '../../images/btnAddprinter.png',
@@ -47,7 +28,7 @@ var addPrintScheme = new Ext.ux.ImageButton({
 Ext.Ajax.request({
 	url : '../../QueryKitchen.do',
 	params : {
-		dataSource : 'normal',
+		dataSource : 'normal'
 	},
 	success : function(res, opt){
 		var jr = Ext.decode(res.responseText);
@@ -81,7 +62,7 @@ Ext.Ajax.request({
 Ext.Ajax.request({
 	url : '../../QueryDept.do',
 	params : {
-		dataSource : 'normal',
+		dataSource : 'normal'
 	},
 	success : function(res, opt){
 		var jr = Ext.decode(res.responseText);
@@ -93,6 +74,9 @@ Ext.Ajax.request({
 				var c = {items : [{xtype : "checkbox", name : "dept",boxLabel : d.name , hideLabel : true, inputValue :  d.id }]};
 				
 				Ext.getCmp('allDept').add(c);
+				if((i+1)%6 == 0){
+					Ext.getCmp('allDept').add({columnWidth : 1});
+				}
 				Ext.getCmp('allDept').doLayout();
 			
 			}
@@ -112,7 +96,7 @@ Ext.Ajax.request({
 Ext.Ajax.request({
 	url : '../../QueryRegion.do',
 	params : {
-		dataSource : 'normal',
+		dataSource : 'normal'
 	},
 	success : function(res, opt){
 		var jr = Ext.decode(res.responseText);
@@ -365,7 +349,7 @@ var addPrintFunc = new Ext.Window({
 		defaults : {
 			columnWidth : .16,
 			layout : 'form',
-			labelWidth : 70,
+			labelWidth : 70
 		},
 		items : [{
 			columnWidth : 0.4,
@@ -398,7 +382,7 @@ var addPrintFunc = new Ext.Window({
 		defaults : {
 			columnWidth : .16,
 			layout : 'form',
-			labelWidth : 70,
+			labelWidth : 70
 		},
 		items : [{
 			columnWidth : 1,
@@ -449,7 +433,7 @@ var addPrintFunc = new Ext.Window({
 						if(checked){
 							showPanel(thiz.inputValue);
 						}
-					},
+					}
 				}
 			}]
 		},{
@@ -538,7 +522,7 @@ var addPrintFunc = new Ext.Window({
 		defaults : {
 			columnWidth : .16,
 			layout : 'form',
-			labelWidth : 70,
+			labelWidth : 70
 		},
 		items : [{
 			columnWidth : 1,
@@ -579,7 +563,7 @@ var addPrintFunc = new Ext.Window({
 			defaults : {
 				columnWidth : .16,
 				layout : 'form',
-				labelWidth : 70,
+				labelWidth : 70
 			}
 		}]
 	},{
@@ -589,7 +573,7 @@ var addPrintFunc = new Ext.Window({
 		defaults : {
 			columnWidth : .16,
 			layout : 'form',
-			labelWidth : 70,
+			labelWidth : 70
 		},
 		items : [{
 			columnWidth : 1,
@@ -627,7 +611,7 @@ var addPrintFunc = new Ext.Window({
 			defaults : {
 				columnWidth : .16,
 				layout : 'form',
-				labelWidth : 70,
+				labelWidth : 70
 			}
 		}]
 	},{
@@ -637,7 +621,7 @@ var addPrintFunc = new Ext.Window({
 		defaults : {
 			columnWidth : .16,
 			layout : 'form',
-			labelWidth : 70,
+			labelWidth : 70
 		},
 		items : [{
 			columnWidth : 1,
@@ -675,7 +659,7 @@ var addPrintFunc = new Ext.Window({
 			defaults : {
 				columnWidth : .16,
 				layout : 'form',
-				labelWidth : 70,
+				labelWidth : 70
 			}
 		}]
 	}]
@@ -825,13 +809,13 @@ var printerWin = new Ext.Window({
 				inputValue : 'true',
 				hideLabel : true,
 				checked : true,
-				boxLabel : '可用',
+				boxLabel : '可用'
 			},{
 				id : 'unEnabled',
 				name : 'isEnabled',
 				inputValue : 'false',
 				hideLabel : true,
-				boxLabel : '停用',
+				boxLabel : '停用'
 			}]
 		}]
 	}]
@@ -1124,6 +1108,7 @@ Ext.onReady(function(){
 		border : true,
 		rootVisible : false,
 		frame : true,
+		cls : 'font',
 		bodyStyle : 'backgroundColor:#FFFFFF; border:1px solid #99BBE8;',
 		tbar : new Ext.Toolbar({
 			height : 26,
@@ -1150,7 +1135,7 @@ Ext.onReady(function(){
 		}),
 		
 		loader : new Ext.tree.TreeLoader({
-			dataUrl : '../../QueryPrinterTree.do',
+			dataUrl : '../../QueryPrinterTree.do'
 		}),
 		root : new Ext.tree.AsyncTreeNode({
 			expanded : true,
@@ -1215,12 +1200,12 @@ Ext.onReady(function(){
 	
 	var cm = new Ext.grid.ColumnModel([
 		new Ext.grid.RowNumberer(),
-		{header : '功能', dataIndex : 'pTypeText', width : 100},
+		{header : '功能', dataIndex : 'pTypeText'},
 		{header : '厨房', dataIndex : 'kitchens', width : 280, renderer : tooLength},
 		{header : '部门', dataIndex : 'dept', width : 220},
 		{header : '区域', dataIndex : 'regions', width : 256, renderer : tooLength},
-		{header : '打印数', dataIndex : 'repeat', width : 80},
-		{header : '操作',dataIndex : 'opt', renderer : opt, width : 100}
+		{header : '打印数', dataIndex : 'repeat'},
+		{header : '操作', id:'operation', dataIndex : 'opt', renderer : opt}
 	]);
 	
 	cm.defaultSortable = true;
@@ -1251,6 +1236,10 @@ Ext.onReady(function(){
 		frame : true,
 		cm : cm,
 		store : ds,
+		autoExpandColumn : 'operation',
+		viewConfig : {
+			forceFit : true
+		},
 		tbar : new Ext.Toolbar({
 			items : [
 		 		{
@@ -1269,10 +1258,12 @@ Ext.onReady(function(){
 		}
 	});
 	
-	var printPanel = new Ext.Panel({
+	new Ext.Panel({
 		title : '打印配置',
 		id : 'printPanel',
-		region : 'center',
+		renderTo : 'divPrint',
+		width : parseInt(Ext.getDom('divPrint').parentElement.style.width.replace(/px/g,'')),
+		height : parseInt(Ext.getDom('divPrint').parentElement.style.height.replace(/px/g,'')),
 		layout : 'border',
 		frame : true,
 		items : [printerTree, printFuncGrid],
@@ -1281,35 +1272,10 @@ Ext.onReady(function(){
 			items : [
 				addPrinter,
 			    {xtype:'tbtext',text:'&nbsp;&nbsp;'},
-			    addPrintScheme,
-			    '->',
-			    pushBackBut, 
-			    {xtype:'tbtext',text:'&nbsp;&nbsp;'},
-				logOutBut 
+			    addPrintScheme
 			]
 		})
 		
 	});
-	getOperatorName("../../");
-	new Ext.Viewport({
-		layout : 'border',
-		id : 'viewport',
-		items : 
-		[{
-			region : 'north',
-			bodyStyle : 'background-color:#DFE8F6;',
-			html : "<h4 style='padding:10px;font-size:150%;float:left;'>无线点餐网页终端</h4><div id='optName' class='optName'></div>",
-			height : 50,
-			border : false,
-			margins : '0 0 0 0'
-		},printPanel,{
-			region : 'south',
-			height : 30,
-			frame : true,
-			html : '<div style="font-size:11pt; text-align:center;"><b>版权所有(c) 2011 智易科技</b></div>'
-		}]
-	});
-	
-	
 	
 });

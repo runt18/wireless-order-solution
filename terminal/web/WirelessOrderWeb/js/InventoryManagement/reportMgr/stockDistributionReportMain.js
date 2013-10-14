@@ -1,22 +1,3 @@
-var pushBackBut = new Ext.ux.ImageButton({
-	imgPath : "../../images/UserLogout.png",
-	imgWidth : 50,
-	imgHeight : 50,
-	tooltip : "返回",
-	handler : function(btn){
-		location.href = "InventoryProtal.html?"+ strEncode('restaurantID=' + restaurantID, 'mi');
-	}
-});
-
-var logOutBut = new Ext.ux.ImageButton({
-	imgPath : "../../images/ResLogout.png",
-	imgWidth : 50,
-	imgHeight : 50,
-	tooltip : "登出",
-	handler : function(btn){
-		
-	}
-});
 
 var materialTypeDate = [[1,'商品'],[2,'原料']];
 var materialTypeComb = new Ext.form.ComboBox({
@@ -326,43 +307,14 @@ Ext.onReady(function(){
 	});
 	ds.load({params:{start:0,limit:13}});
 	
-	var stockDetailReport = new Ext.Panel({
-		title : '报表管理',
-		region : 'center',//渲染到
+	new Ext.Panel({
+		renderTo : 'divStockDistribution',
+		width : parseInt(Ext.getDom('divStockDistribution').parentElement.style.width.replace(/px/g,'')),
+		height : parseInt(Ext.getDom('divStockDistribution').parentElement.style.height.replace(/px/g,'')),
 		layout : 'border',//布局
-		frame : true, 
 		//margins : '5 5 5 5',
 		//子集
-		items : [deptTree, stockDistributionGrid],
-		tbar : new Ext.Toolbar({
-			height : 55,
-			items : [
-			    {xtype:'tbtext',text:'&nbsp;&nbsp;'},
-			    '->',
-			    pushBackBut, 
-			    {xtype:'tbtext',text:'&nbsp;&nbsp;'},
-				logOutBut 
-			]
-		})
-	});
-	getOperatorName("../../");
-	new Ext.Viewport({
-		layout : 'border',
-		id : 'viewport',
-		items : 
-		[{
-			region : 'north',
-			bodyStyle : 'background-color:#DFE8F6;',
-			html : "<h4 style='padding:10px;font-size:150%;float:left;'>无线点餐网页终端</h4><div id='optName' class='optName'></div>",
-			height : 50,
-			border : false,
-			margins : '0 0 0 0'
-		},stockDetailReport,{
-			region : 'south',
-			height : 30,
-			frame : true,
-			html : '<div style="font-size:11pt; text-align:center;"><b>版权所有(c) 2011 智易科技</b></div>'
-		}]
+		items : [deptTree, stockDistributionGrid]
 	});
 });
 

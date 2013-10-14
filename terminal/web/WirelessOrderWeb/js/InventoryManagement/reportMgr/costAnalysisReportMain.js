@@ -1,22 +1,3 @@
-var pushBackBut = new Ext.ux.ImageButton({
-	imgPath : '../../images/UserLogout.png',
-	imgWidth : 50,
-	imgHeight : 50,
-	tooltip : '返回',
-	handler : function(btn){
-		location.href = 'InventoryProtal.html?'+ strEncode('restaurantID=' + restaurantID, 'mi');
-	}
-});
-
-var logOutBut = new Ext.ux.ImageButton({
-	imgPath : '../../images/ResLogout.png',
-	imgWidth : 50,
-	imgHeight : 50,
-	tooltip : '登出',
-	handler : function(btn){
-		
-	}
-});
 
 function onLoad(){
 	Ext.getCmp('grid').getStore().load();
@@ -30,16 +11,16 @@ Ext.onReady(function(){
 	
 	var cm = new Ext.grid.ColumnModel([
        new Ext.grid.RowNumberer(),
-       {header: '部门 ', dataIndex: 'deptName', width: 130},
-       {header: '期初余额', dataIndex: 'primeMoney', width: 130},
-       {header: '领料金额', dataIndex: 'useMaterialMoney', width: 130},
-       {header: '退料金额', dataIndex: 'stockOutMoney', width: 130},
-       {header: '拨出金额', dataIndex: 'stockOutTransferMoney', width: 130},
-       {header: '期末金额', dataIndex: 'endMoney', width: 130},
-       {header: '成本金额', dataIndex: 'costMoney', width: 130},
-       {header: '销售金额', dataIndex: 'salesMoney', width : 130},
-       {header: '毛利额', dataIndex: 'profit', width: 130},
-       {header: '毛利率', dataIndex: 'profitRate', width: 130}
+       {header: '部门 ', dataIndex: 'deptName', width:120},
+       {header: '期初余额', dataIndex: 'primeMoney'},
+       {header: '领料金额', dataIndex: 'useMaterialMoney'},
+       {header: '退料金额', dataIndex: 'stockOutMoney'},
+       {header: '拨出金额', dataIndex: 'stockOutTransferMoney'},
+       {header: '期末金额', dataIndex: 'endMoney'},
+       {header: '成本金额', dataIndex: 'costMoney'},
+       {header: '销售金额', dataIndex: 'salesMoney', width:130},
+       {header: '毛利额', dataIndex: 'profit', width:130},
+       {header: '毛利率', dataIndex: 'profitRate', id : 'rate', width:130}
 	]);
 	cm.defaultSortable = true;
 	
@@ -104,6 +85,9 @@ Ext.onReady(function(){
 	    	msg : "数据加载中，请稍等..."
 	    },
 	    cm : cm,
+	    viewConfig : {
+	    	forceFit : true
+	    },
 	    tbar : costAnalyzeGridTbar,
 	    bbar : pagingBar
 	});
@@ -111,23 +95,13 @@ Ext.onReady(function(){
 
 	costAnalyzeGrid.region = 'center';
 	
-	var costAnalyzePanel = new Ext.Panel({
-		title : '报表管理',
-		region : 'center',
+	new Ext.Panel({
+		renderTo : 'divCostAnalysis',
+		width : parseInt(Ext.getDom('divCostAnalysis').parentElement.style.width.replace(/px/g,'')),
+		height : parseInt(Ext.getDom('divCostAnalysis').parentElement.style.height.replace(/px/g,'')),
 		layout : 'border',
-		frame : true, 
 		//子集
 		items : [costAnalyzeGrid],
-		tbar : new Ext.Toolbar({
-			height : 55,
-			items : [
-			    {xtype:'tbtext',text:'&nbsp;&nbsp;'},
-			    '->',
-			    pushBackBut, 
-			    {xtype:'tbtext',text:'&nbsp;&nbsp;'},
-				logOutBut 
-			]
-		}),
 		keys : [{
 			key : Ext.EventObject.ENTER,
 			scope : this,
@@ -136,26 +110,6 @@ Ext.onReady(function(){
 			}
 		}]
 	});
-	getOperatorName("../../");
-	new Ext.Viewport({
-		layout : 'border',
-		id : 'viewport',
-		items : 
-		[{
-			region : 'north',
-			bodyStyle : 'background-color:#DFE8F6;',
-			html : "<h4 style='padding:10px;font-size:150%;float:left;'>无线点餐网页终端</h4><div id='optName' class='optName'></div>",
-			height : 50,
-			border : false,
-			margins : '0 0 0 0'
-		},costAnalyzePanel,
-		{
-			region : 'south',
-			height : 30,
-			frame : true,
-			html : '<div style="font-size:11pt; text-align:center;"><b>版权所有(c) 2011 智易科技</b></div>'
-		}]
-	});
 	
-	
+	onLoad();
 });	

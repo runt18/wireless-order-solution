@@ -1,4 +1,3 @@
-getOperatorName("../../");
 var addSupplier;
 
 addSupplier = new Ext.Window({
@@ -7,11 +6,76 @@ addSupplier = new Ext.Window({
 	resizable : true, //大小调整
 	modal : true,
 	width : 260,
+	bbar : [{
+			xtype : 'tbtext',
+			text : '  '
+		},'->',{
+			text : '保存',
+			id : 'btnSaveSupplier',
+			iconCls : 'btn_save',
+			handler : function(e){
+				var sId = Ext.getCmp('txtSId').getValue();
+				var sName = Ext.getCmp('txtSName').getValue();
+				var sTele = Ext.getCmp('txtSTele').getValue();
+				var sAddr = Ext.getCmp('txtSAddr').getValue();
+				var sContact = Ext.getCmp('txtSContact').getValue();
+				var sComment = Ext.getCmp('txtSComment').getValue();
+				
+				var actionUrl = '';
+				if(!Ext.getCmp('txtSName').isValid() || !Ext.getCmp('txtSTele').isValid() || !Ext.getCmp('txtSContact').isValid()){
+					return;
+				}
+				if(addSupplier.operationType == 'insert'){
+					
+					actionUrl = '../../InsertSupplier.do';
+				}
+				else if(addSupplier.operationType == 'update'){
+					actionUrl = '../../UpdateSupplier.do';
+				}
+				else return;
+				
+				Ext.Ajax.request({
+					url : actionUrl,
+					params : {
+						
+						supplierID : sId,
+						supplierName : sName,
+						tele : sTele,
+						addr : sAddr,
+						contact : sContact,
+						comment : sComment
+					},
+					success : function(res, opt){
+						Ext.getCmp('grid').store.reload();
+						var jr = Ext.util.JSON.decode(res.responseText);
+						if(jr.success){
+							addSupplier.hide();
+							Ext.example.msg(jr.title, jr.msg);
+						}else{
+							Ext.ux.showMsg(jr);
+						}
+						
+					},
+					failure : function(res, opt){
+						Ext.ux.showMsg(Ext.util.JSON.decode(res.responseText));
+					}
+					
+				});
+			} 
+		},{
+			text : '关闭',
+			id : 'btnCloseSupplier',
+			iconCls : 'btn_close',
+			handler : function(e){
+				addSupplier.hide();
+			}
+	}],
 	items : [{
 		xtype : 'form',
 		layout : 'form',
 		frame : true,
-		labelWidth : 65,
+		border : true,
+		labelWidth : 68,
 		items : [{
 			xtype : 'textfield',
 			id : 'txtSId',
@@ -76,71 +140,8 @@ addSupplier = new Ext.Window({
 					return '写上评价';
 				}
 			} 
-		}],
-		bbar : [{
-			xtype : 'tbtext',
-			text : '  '
-		},'->',{
-			text : '保存',
-			id : 'btnSaveSupplier',
-			iconCls : 'btn_save',
-			handler : function(e){
-				var sId = Ext.getCmp('txtSId').getValue();
-				var sName = Ext.getCmp('txtSName').getValue();
-				var sTele = Ext.getCmp('txtSTele').getValue();
-				var sAddr = Ext.getCmp('txtSAddr').getValue();
-				var sContact = Ext.getCmp('txtSContact').getValue();
-				var sComment = Ext.getCmp('txtSComment').getValue();
-				
-				var actionUrl = '';
-				if(!Ext.getCmp('txtSName').isValid() || !Ext.getCmp('txtSTele').isValid() || !Ext.getCmp('txtSContact').isValid()){
-					return;
-				}
-				if(addSupplier.operationType == 'insert'){
-					
-					actionUrl = '../../InsertSupplier.do';
-				}
-				else if(addSupplier.operationType == 'update'){
-					actionUrl = '../../UpdateSupplier.do';
-				}
-				else return;
-				
-				Ext.Ajax.request({
-					url : actionUrl,
-					params : {
-						
-						supplierID : sId,
-						supplierName : sName,
-						tele : sTele,
-						addr : sAddr,
-						contact : sContact,
-						comment : sComment
-					},
-					success : function(res, opt){
-						Ext.getCmp('grid').store.reload();
-						var jr = Ext.util.JSON.decode(res.responseText);
-						if(jr.success){
-							addSupplier.hide();
-							Ext.example.msg(jr.title, jr.msg);
-						}else{
-							Ext.ux.showMsg(jr);
-						}
-						
-					},
-					failure : function(res, opt){
-						Ext.ux.showMsg(Ext.util.JSON.decode(res.responseText));
-					}
-					
-				});
-			} 
-		},{
-			text : '关闭',
-			id : 'btnCloseSupplier',
-			iconCls : 'btn_close',
-			handler : function(e){
-				addSupplier.hide();
-			}
 		}]
+
 	}],
 	listeners : {
 		'show' : function(thiz){
@@ -161,10 +162,7 @@ addSupplier = new Ext.Window({
 				var fn = Ext.getCmp('txtSName');
 				fn.focus.defer(100, fn);
 			}
-			
-			
 		}
-		
 	},
 	keys : [{
 		key : Ext.EventObject.ENTER,
@@ -175,27 +173,6 @@ addSupplier = new Ext.Window({
 	}]
 		
 });
-
-var pushBackBut = new Ext.ux.ImageButton({
-	imgPath : '../../images/UserLogout.png',
-	imgWidth : 50,
-	imgHeight : 50,
-	tooltip : '返回',
-	handler : function(btn){
-		location.href = 'InventoryProtal.html?' + strEncode("restaurantID="+restaurantID, "mi");
-	}
-});
-
-var logOutBut = new Ext.ux.ImageButton({
-	imgPath : '../../images/ResLogout.png',
-	imgWidth : 50,
-	imgHeight : 50,
-	tooltip : '登出',
-	handler : function(btn){
-		
-	}
-});
-
 
 var filterTypeDate = [[0,'全部'],[1,'供应商名称'],[2,'联系电话'],[3,'联系人']];
 var filterComb = new Ext.form.ComboBox({
@@ -327,16 +304,6 @@ Ext.onReady(function(){
 	Ext.BLANK_IMAGE_URL = '../../extjs/resources/images/default/s.gif';
 	Ext.QuickTips.init();
 	Ext.form.Field.prototype.msgTarget = 'side';
-	var btnAddSupplier = new Ext.ux.ImageButton({
-		imgPath : '../../images/btnAddSupplier.png',
-		imgWidth : 50,
-		imgHeight : 50,
-		tooltip : '添加供应商',
-		handler : function(e){
-			supplierOperactionHandler({type:'insert'});
-	
-		}
-	});
 	//设置列默认值
 	supplierOpt = function(){
 		return "<a href = \"javascript:supplierOperactionHandler({type:'update'})\">" + "<img src='../../images/Modify.png'/>修改</a>"
@@ -347,12 +314,12 @@ Ext.onReady(function(){
 	//定义列模型
 	var cm = new Ext.grid.ColumnModel([
 	       new Ext.grid.RowNumberer(),
-		   {header:'供应商名称',dataIndex:'name',width:210},
-		   {header:'联系方式',dataIndex:'tele',width:210},
-		   {header:'地址',dataIndex:'addr',width:230},
-		   {header:'联系人',dataIndex:'contact',width:210},
-		   {header:'备注',dataIndex:'comment',width:200},
-		   {header:'操作',align:'center',dataIndex:'supplierOpt',renderer : supplierOpt,width:253}
+		   {header:'供应商名称',dataIndex:'name'},
+		   {header:'联系方式',dataIndex:'tele'},
+		   {header:'地址',dataIndex:'addr'},
+		   {header:'联系人',dataIndex:'contact'},
+		   {header:'备注',dataIndex:'comment'},
+		   {header:'操作',align:'center',dataIndex:'supplierOpt',renderer : supplierOpt}
 	       ]);
 	  	cm.defaultSortable = true;
 	                               	
@@ -388,7 +355,7 @@ Ext.onReady(function(){
 
 	
 	
-	
+
 	var suppllierGridTbar = new Ext.Toolbar({
 		items : [
 		{ xtype:'tbtext', text:'过滤:'},
@@ -477,6 +444,9 @@ Ext.onReady(function(){
 		    frame : true,
 		    store : ds,
 		    cm : cm,
+		    viewConfig : {
+		    	forceFit : true
+		    },
 		    tbar : suppllierGridTbar,
 		    bbar : pagingBar
 		});
@@ -484,24 +454,15 @@ Ext.onReady(function(){
 
 	supplierGrid.region = 'center';
 	
-	var supplierPanel = new Ext.Panel({
-		title : '供应商管理',
-		region : 'center',//渲染到
+	new Ext.Panel({
+		renderTo : 'divSupplier',//渲染到
+		//solve不跟随窗口的变化而变化
+		width : parseInt(Ext.getDom('divSupplier').parentElement.style.width.replace(/px/g,'')),
+		height : parseInt(Ext.getDom('divSupplier').parentElement.style.height.replace(/px/g,'')),
 		layout : 'border',//布局
 		frame : true, //边框
 		//子集
 		items : [supplierGrid],
-		tbar : new Ext.Toolbar({
-			height : 55,
-			items : [
-			    {xtype:'tbtext',text:'&nbsp;&nbsp;'},
-			    btnAddSupplier,
-			    '->',
-			    pushBackBut, 
-			    {xtype:'tbtext',text:'&nbsp;&nbsp;'},
-				logOutBut 
-			]
-		}),
 		keys : [{
 			key : Ext.EventObject.ENTER,
 			scope : this,
@@ -510,28 +471,6 @@ Ext.onReady(function(){
 			}
 		}]
 	});
-	
-	new Ext.Viewport({
-		layout : 'border',
-		id : 'viewport',
-		items : 
-		[{
-			region : 'north',
-			bodyStyle : 'background-color:#DFE8F6;',
-			html : "<h4 style='padding:10px;font-size:150%;float:left;'>无线点餐网页终端</h4>" +
-				"<div id='optName' class='optName'></div>",
-			height : 50,
-			border : false,
-			margins : '0 0 0 0'
-		},supplierPanel,
-		{
-			region : 'south',
-			height : 30,
-			frame : true,
-			html : '<div style="font-size:11pt; text-align:center;"><b>版权所有(c) 2011 智易科技</b></div>'
-		}]
-	});
-
 
 });
 

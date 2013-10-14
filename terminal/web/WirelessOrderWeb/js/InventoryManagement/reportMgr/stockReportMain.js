@@ -93,23 +93,23 @@ Ext.onReady(function(){
 	//定义列模型
 	var cm = new Ext.grid.ColumnModel([
          new Ext.grid.RowNumberer(),
-         {header:'品行编号', dataIndex:'materialId', width:63},
-         {header:'品行名称', dataIndex:'materialName', width:100},
-         {header:'期初数量', dataIndex:'primeAmount', width:63, renderer:totalStyle},
-         {header:'入库采购', dataIndex:'stockIn', width:63},
-         {header:'入库调拨', dataIndex:'stockInTransfer', width:63},
-         {header:'入库报溢', dataIndex:'stockSpill', width:63},
-         {header:'入库盘盈', dataIndex:'stockTakeMore', width:63},
-         {header:'入库小计', dataIndex:'stockInAmount', width:63, renderer:amountStyle},
-         {header:'出库退货', dataIndex:'stockOut', width:63},
-         {header:'出库调拨', dataIndex:'stockOutTransfer', width:63},
-         {header:'出库报损', dataIndex:'stockDamage', width:63},
-         {header:'出库盘亏', dataIndex:'stockTakeLess', width:63},
-         {header:'出库消耗', dataIndex:'useUp', width:63},
-         {header:'出库小计', dataIndex:'stockOutAmount', width:63, renderer:amountStyle},
-         {header:'期末数量', dataIndex:'finalAmount', width:63, renderer:totalStyle},
-         {header:'期末单价', dataIndex:'finalPrice', width:63},
-         {header:'期末金额', dataIndex:'finalMoney', width:63, renderer:totalStyle}]);
+         {header:'品行编号', dataIndex:'materialId'},
+         {header:'品行名称', dataIndex:'materialName'},
+         {header:'期初数量', dataIndex:'primeAmount', renderer:totalStyle},
+         {header:'入库采购', dataIndex:'stockIn'},
+         {header:'入库调拨', dataIndex:'stockInTransfer'},
+         {header:'入库报溢', dataIndex:'stockSpill'},
+         {header:'入库盘盈', dataIndex:'stockTakeMore'},
+         {header:'入库小计', dataIndex:'stockInAmount', renderer:amountStyle},
+         {header:'出库退货', dataIndex:'stockOut'},
+         {header:'出库调拨', dataIndex:'stockOutTransfer'},
+         {header:'出库报损', dataIndex:'stockDamage'},
+         {header:'出库盘亏', dataIndex:'stockTakeLess'},
+         {header:'出库消耗', dataIndex:'useUp'},
+         {header:'出库小计', dataIndex:'stockOutAmount', renderer:amountStyle},
+         {header:'期末数量', dataIndex:'finalAmount', renderer:totalStyle},
+         {header:'期末单价', dataIndex:'finalPrice'},
+         {header:'期末金额', dataIndex:'finalMoney', renderer:totalStyle}]);
 	 cm.defaultSortable = true;
 			
 			
@@ -228,7 +228,7 @@ Ext.onReady(function(){
 		title : '货品类型',
 		id : 'tree',
 		region : 'west',
-		width : '200',
+		width : 160,
 		border : false,
 		frame : true, //采用渲染
 		rootVisible : true,//显示根节点 
@@ -294,10 +294,11 @@ Ext.onReady(function(){
 		id : 'grid',
 		region : 'center',
 		height : '500',
-		border : true,
-		frame : true,
 		store : ds,
 		cm : cm,
+		viewConfig : {
+			forceFit : true
+		},
 		tbar : stockTakeTbar,
 		bbar : pagingBar
 
@@ -338,42 +339,15 @@ Ext.onReady(function(){
 	ds.load({params:{start:0,limit:10}});
 	
 	
-    var stockReport = new Ext.Panel({
-		title : '报表管理',
-		region : 'center',//渲染到
+    new Ext.Panel({
+		id : 'panelReport',
+		//region : 'center',//渲染到
+		width : parseInt(Ext.getDom('divPanel').parentElement.style.width.replace(/px/g,'')),
+		height : parseInt(Ext.getDom('divPanel').parentElement.style.height.replace(/px/g,'')),
+		renderTo : 'divPanel',
 		layout : 'border',//布局
-		frame : true, 
 		//margins : '5 5 5 5',
 		//子集
-		items : [stockReportTree,stockReportGrid],
-		tbar : new Ext.Toolbar({
-			height : 55,
-			items : [
-			    {xtype:'tbtext',text:'&nbsp;&nbsp;'},
-			    '->',
-			    pushBackBut, 
-			    {xtype:'tbtext',text:'&nbsp;&nbsp;'},
-				logOutBut 
-			]
-		})
-	});
-    getOperatorName("../../");
-	new Ext.Viewport({
-		layout : 'border',
-		id : 'viewport',
-		items : 
-		[{
-			region : 'north',
-			bodyStyle : 'background-color:#DFE8F6;',
-			html : "<h4 style='padding:10px;font-size:150%;float:left;'>无线点餐网页终端</h4><div id='optName' class='optName'></div>",
-			height : 50,
-			border : false,
-			margins : '0 0 0 0'
-		},stockReport,{
-			region : 'south',
-			height : 30,
-			frame : true,
-			html : '<div style="font-size:11pt; text-align:center;"><b>版权所有(c) 2011 智易科技</b></div>'
-		}]
+		items : [stockReportTree,stockReportGrid]
 	});
 });

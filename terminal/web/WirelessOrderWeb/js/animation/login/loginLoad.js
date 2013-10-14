@@ -14,7 +14,7 @@ function verifyLogin(){
 						"restaurantID" : restaurantID,
 						"type" : 0,
 						"isPaging" : false,
-						"isCombo" : false,
+						"isCombo" : false
 					},
 					success : function(response, options) {
 						var resultJSON = Ext.util.JSON.decode(response.responseText);
