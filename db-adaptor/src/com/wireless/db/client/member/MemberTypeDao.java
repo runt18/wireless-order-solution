@@ -182,9 +182,9 @@ public class MemberTypeDao {
 			throw new BusinessException(MemberError.MEMBER_TYPE_NOT_EXIST);
 		}
 		
-		if(builder.isDiscountChanged()){
+		if(builder.isDiscountChanged() || builder.isDefaultDiscountChanged()){
 			sql = " DELETE FROM " + Params.dbName + ".member_type_discount WHERE member_type_id = " + builder.getId();
-			dbCon.stmt.executeUpdate(sql);
+			dbCon.stmt.executeUpdate(sql); 
 			
 			//Insert the discounts associated with this member type.
 			for(Discount discount : builder.getDiscounts()){
@@ -193,7 +193,7 @@ public class MemberTypeDao {
 					  " VALUES (" +
 					  builder.getId() + "," +
 					  discount.getId() + "," +
-					  MemberType.DiscountType.NORMAL.getVal() + "," +
+					  MemberType.DiscountType.NORMAL.getVal() +
 					  ")";
 				dbCon.stmt.executeUpdate(sql);
 			}
