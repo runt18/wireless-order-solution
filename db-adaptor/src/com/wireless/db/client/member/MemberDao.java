@@ -577,6 +577,10 @@ public class MemberDao {
 	 */
 	public static void deleteById(DBCon dbCon, Staff term, int memberId) throws SQLException{
 		String sql;
+		//Delete the interested member.
+		sql = " DELETE FROM " + Params.dbName + ".interested_member WHERE member_id = " + memberId;
+		dbCon.stmt.executeUpdate(sql);
+		
 		//Delete the member comment.
 		sql = " DELETE FROM " + Params.dbName + ".member_comment WHERE member_id = " + memberId;
 		dbCon.stmt.executeUpdate(sql);
@@ -593,6 +597,90 @@ public class MemberDao {
 		sql = " DELETE FROM " + Params.dbName + ".member WHERE member_id = " + memberId;
 		dbCon.stmt.executeUpdate(sql);
 		
+	}
+	
+	/**
+	 * Perform to be interested in specific member.
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param memberId
+	 * 			the member to be interested in
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static void interestedIn(Staff staff, int memberId) throws SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			interestedIn(dbCon, staff, memberId);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Perform to be interested in specific member.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param memberId
+	 * 			the member to be interested in
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static void interestedIn(DBCon dbCon, Staff staff, int memberId) throws SQLException{
+		String sql;
+		sql = " SELECT * FROM " + Params.dbName + ".interested_member WHERE member_id = " + memberId + " AND " + " staff_id = " + staff.getId();
+		dbCon.rs = dbCon.stmt.executeQuery(sql);
+		if(!dbCon.rs.next()){
+			sql = " INSERT INTO " + Params.dbName + ".interested_member " +
+				  " (`staff_id`, `member_id`, `start_date`) " + 
+				  " VALUES (" +
+				  staff.getId() + "," +
+				  memberId + "," +
+				  "NOW()" + 
+				  " ) ";
+			dbCon.stmt.executeUpdate(sql);
+		}
+		
+		dbCon.rs.close();
+	}
+	
+	/**
+	 * Cancel interested in the specific member
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param memberId
+	 * 			the member to cancel interested
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static void cancelInterestedIn(Staff staff, int memberId) throws SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			cancelInterestedIn(dbCon, staff, memberId);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Cancel interested in the specific member
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param memberId
+	 * 			the member to cancel interested
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static void cancelInterestedIn(DBCon dbCon, Staff staff, int memberId) throws SQLException{
+		String sql;
+		sql = " DELETE FROM " + Params.dbName + ".interested_member WHERE member_id = " + memberId + " AND " + " staff_id = " + staff.getId();
+		dbCon.stmt.executeUpdate(sql);
 	}
 	
 	/**
