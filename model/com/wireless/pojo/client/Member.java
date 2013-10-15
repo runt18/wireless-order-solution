@@ -17,7 +17,7 @@ import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.util.DateUtil;
 import com.wireless.pojo.util.SortedList;
 
-public class Member implements Parcelable, Jsonable{
+public class Member implements Parcelable, Jsonable, Comparable<Member>{
 	
 	public static final int MEMBER_PARCELABLE_SIMPLE = 0;
 	public static final int MEMBER_PARCELABLE_COMPLEX = 1;
@@ -671,7 +671,11 @@ public class Member implements Parcelable, Jsonable{
 	public void writeToParcel(Parcel dest, int flag) {
 		dest.writeByte(flag);
 		if(flag == MEMBER_PARCELABLE_SIMPLE){
-			dest.writeInt(this.id);
+			dest.writeInt(this.getId());
+			dest.writeString(this.getName());
+			dest.writeString(this.getMobile());
+			dest.writeString(this.getMemberCard());
+			dest.writeInt(this.getConsumptionAmount());
 			
 		}else if(flag == MEMBER_PARCELABLE_COMPLEX){
 			
@@ -683,7 +687,11 @@ public class Member implements Parcelable, Jsonable{
 	public void createFromParcel(Parcel source) {
 		short flag = source.readByte();
 		if(flag == MEMBER_PARCELABLE_SIMPLE){
-			this.id = source.readInt();
+			setId(source.readInt());
+			setName(source.readString());
+			setMobile(source.readString());
+			setMemberCard(source.readString());
+			setConsumptionAmount(source.readInt());
 			
 		}else if(flag == MEMBER_PARCELABLE_COMPLEX){
 			
@@ -745,98 +753,126 @@ public class Member implements Parcelable, Jsonable{
 	public List<Object> toJsonList(int flag) {
 		return null;
 	}
+	
 	public float getTotalBalance(){
 		return this.baseBalance + this.extraBalance;
 	}
+	
 	public int getId() {
 		return id;
 	}
+	
 	public void setId(int id) {
 		this.id = id;
 	}
+	
 	public int getRestaurantId() {
 		return restaurantId;
 	}
+	
 	public void setRestaurantId(int restaurantId) {
 		this.restaurantId = restaurantId;
 	}
+	
 	public float getBaseBalance() {
 		return baseBalance;
 	}
+	
 	public void setBaseBalance(float baseBalance) {
 		this.baseBalance = baseBalance;
 	}
+	
 	public float getExtraBalance() {
 		return extraBalance;
 	}
+	
 	public void setExtraBalance(float extraBalance) {
 		this.extraBalance = extraBalance;
 	}
+	
 	public int getPoint() {
 		return point;
 	}
+	
 	public void setPoint(int point) {
 		this.point = point;
 	}
+	
 	public MemberType getMemberType() {
 		if(memberType == null){
 			memberType = new MemberType(0);
 		}
 		return memberType;
 	}
+	
 	public void setMemberType(MemberType memberType) {
 		if(memberType != null){
 			this.memberType = memberType;
 		}
 	}
+	
 	public boolean hasMemberCard(){
 		return getMemberCard().length() != 0;
 	}
+	
 	public String getMemberCard() {
 		if(memberCard == null){
 			return "";
 		}
 		return memberCard;
 	}
+	
 	public void setMemberCard(String memberCard) {
 		this.memberCard = memberCard;
 	}
+	
 	public String getName() {
-		return name;
+		return name.trim();
 	}
+	
 	public void setName(String name) {
-		this.name = name;
+		this.name = name.trim();
 	}
+	
 	public Sex getSex() {
 		return sex;
 	}
+	
 	public void setSex(Sex sex){
 		this.sex = sex;
 	}
+	
 	public void setSex(int sexVal) {
 		this.sex = Sex.valueOf(sexVal);
 	}
+	
 	public String getTele() {
 		if(tele == null){
 			return "";
 		}
 		return tele;
 	}
+	
 	public void setTele(String tele) {
 		this.tele = tele;
 	}
+	
 	public String getMobile() {
 		return mobile;
 	}
+	
 	public void setMobile(String mobile) {
 		this.mobile = mobile;
 	}
+	
 	public long getBirthday() {
 		return birthday;
 	}
+	
 	public void setBirthday(long birthday) {
 		this.birthday = birthday;
 	}
+	
 	public void setBirthday(String birthday) {
 		if(birthday != null && birthday.trim().length() > 0){
 			this.birthday = DateUtil.parseDate(birthday);
@@ -844,54 +880,68 @@ public class Member implements Parcelable, Jsonable{
 			this.birthday = 0;
 		}
 	}
+	
 	public String getIdCard() {
 		if(idCard == null){
 			return "";
 		}
 		return idCard;
 	}
+	
 	public void setIdCard(String idCard) {
 		this.idCard = idCard;
 	}
+	
 	public String getCompany() {
 		if(company == null){
 			return "";
 		}
 		return company;
 	}
+	
 	public void setCompany(String company) {
 		this.company = company;
 	}
+	
 	public String getContactAddress() {
 		if(contactAddress == null){
 			return "";
 		}
 		return contactAddress;
 	}
+	
 	public void setContactAddress(String contactAddress) {
 		this.contactAddress = contactAddress;
 	}
+	
 	public long getCreateDate() {
 		return createDate;
 	}
+	
 	public void setCreateDate(long createDate) {
 		this.createDate = createDate;
 	}
+	
 	public float getUsedBalance(){
 		return this.usedBalance;
 	}
+	
 	public void setUsedBalance(float usedBalance){
 		this.usedBalance = usedBalance;
 	}
+	
 	public int getUsedPoint(){
 		return this.usedPoint;
 	}
+	
 	public void setUsedPoint(int usedPoint){
 		this.usedPoint = usedPoint;
 	}
+	
 	public int getConsumptionAmount() {
 		return consumptionAmount;
 	}
+	
 	public void setConsumptionAmount(int consumptionAmount) {
 		this.consumptionAmount = consumptionAmount;
 	}
@@ -963,6 +1013,17 @@ public class Member implements Parcelable, Jsonable{
 	
 	public boolean hasPrivateComment(){
 		return this.privateComment != null;
+	}
+
+	@Override
+	public int compareTo(Member arg0) {
+		if(getId() > arg0.getId()){
+			return 1;
+		}else if(getId() < arg0.getId()){
+			return -1;
+		}else{
+			return 0;
+		}
 	}
 	
 }

@@ -7,9 +7,14 @@ import java.util.List;
 import java.util.Map;
 
 import com.wireless.json.Jsonable;
+import com.wireless.parcel.Parcel;
+import com.wireless.parcel.Parcelable;
 import com.wireless.pojo.distMgr.Discount;
 
-public class MemberType implements Jsonable{
+public class MemberType implements Jsonable, Parcelable{
+	
+	public static final int MEMBER_TYPE_PARCELABLE_SIMPLE = 0;
+	public static final int MEMBER_TYPE_PARCELABLE_COMPLEX = 1;
 	
 	public static enum DiscountType{
 		NORMAL(1, "普通"),
@@ -435,4 +440,38 @@ public class MemberType implements Jsonable{
 		return null;
 	}
 
+	@Override
+	public void writeToParcel(Parcel dest, int flag) {
+		dest.writeByte(flag);
+		if(flag == MEMBER_TYPE_PARCELABLE_SIMPLE){
+			dest.writeInt(this.getTypeId());
+			dest.writeString(this.getName());
+			
+		}else if(flag == MEMBER_TYPE_PARCELABLE_COMPLEX){
+			
+		}		
+	}
+
+	@Override
+	public void createFromParcel(Parcel source) {
+		int flag = source.readByte();
+		if(flag == MEMBER_TYPE_PARCELABLE_SIMPLE){
+			setTypeId(source.readInt());
+			setName(source.readString());
+			
+		}else if(flag == MEMBER_TYPE_PARCELABLE_COMPLEX){
+			
+		}
+	}
+
+	public final static Parcelable.Creator<MemberType> CREATOR = new Parcelable.Creator<MemberType>() {
+		
+		public MemberType[] newInstance(int size) {
+			return new MemberType[size];
+		}
+		
+		public MemberType newInstance() {
+			return new MemberType(0);
+		}
+	};
 }
