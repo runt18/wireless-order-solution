@@ -112,9 +112,7 @@ public class SellOutActivity extends FragmentActivity {
 		super.onCreate(savedInstanceState);
 		this.setContentView(R.layout.activity_sell_out);
 		
-		/*
-		 * 返回Button和标题
-		 */
+		//返回Button和标题
 		TextView title = (TextView) findViewById(R.id.toptitle);
 		title.setVisibility(View.VISIBLE);
 		title.setText("快速沽清");

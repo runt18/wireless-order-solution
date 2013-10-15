@@ -225,7 +225,8 @@ public class MainActivity extends FragmentActivity implements OnTableSelectedLis
 					break;
 					
 				case 8:
-					intent = new Intent(MainActivity.this, AboutActivity.class);
+					//¹ØÓÚ
+					intent = new Intent(MainActivity.this, MemberListActivity.class);
 					startActivity(intent);
 					break;
 				}
