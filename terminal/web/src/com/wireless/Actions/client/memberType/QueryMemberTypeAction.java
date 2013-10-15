@@ -43,20 +43,16 @@ public class QueryMemberTypeAction extends DispatchAction {
 			String pin = (String)request.getAttribute("pin");
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
-			String restaurantID = request.getParameter("restaurantID");
 			String name = request.getParameter("name");
-			String discountType = request.getParameter("discountType");
 			String attr = request.getParameter("attr");
 			
-			String extraCond = (" AND A.restaurant_id = " + restaurantID);
+			String extraCond = "";
 			if(name != null && !name.trim().isEmpty()){
-				extraCond += (" AND A.name like '%" + name.trim() + "%' ");
+				extraCond += (" AND MT.name like '%" + name.trim() + "%' ");
 			}
-			if(discountType != null && !discountType.trim().isEmpty() && !discountType.equals("-1")){
-				extraCond += (" AND A.discount_type = " + discountType);
-			}
+			
 			if(attr != null && !attr.trim().isEmpty()){
-				extraCond += (" AND A.attribute = " + attr);
+				extraCond += (" AND MT.attribute = " + attr);
 			}
 			
 			list = MemberTypeDao.getMemberType(staff, extraCond, " ORDER BY MT.member_type_id ");

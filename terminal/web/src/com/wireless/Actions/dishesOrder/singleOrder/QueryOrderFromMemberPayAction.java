@@ -14,7 +14,6 @@ import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.client.Member;
-import com.wireless.pojo.client.MemberType;
 import com.wireless.pojo.distMgr.Discount;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.util.WebParams;
@@ -48,9 +47,9 @@ public class QueryOrderFromMemberPayAction extends Action{
 			no = PayOrder.calcById(staff, no);
 			
 			m.getMemberType().setDefaultDiscount(no.getDiscount());
-			if(m.getMemberType().getDiscountType() == MemberType.DiscountType.DISCOUNT_ENTIRE){
+/*			if(m.getMemberType().getDiscountType() == MemberType.DiscountType.DISCOUNT_ENTIRE){
 				m.getMemberType().setDiscountRate(no.getDiscount().getPlans().get(0).getRate());
-			}
+			}*/
 			m.getMemberType().getDefaultDiscount().setPlans(null);
 			jobject.getOther().put("member", m);
 			jobject.getOther().put("newOrder", no);

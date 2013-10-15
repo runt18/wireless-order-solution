@@ -49,6 +49,15 @@ public class OperateMemberTypeAction extends DispatchAction{
 			String initialPoint = request.getParameter("initialPoint");
 			String chargeRate = request.getParameter("chargeRate");
 			String attr = request.getParameter("attr");
+			String memberDiscountCheckeds = request.getParameter("memberDiscountCheckeds");
+			
+			String[] mDiscountCheckedList = null;
+			
+			if(!memberDiscountCheckeds.trim().isEmpty()){
+				mDiscountCheckedList = memberDiscountCheckeds.split(",");
+			}else{
+				mDiscountCheckedList = new String[0];
+			}
 			
 /*			MemberType mt = new MemberType();
 			
@@ -83,6 +92,11 @@ public class OperateMemberTypeAction extends DispatchAction{
 			insert.setChargeRate(Float.valueOf(chargeRate));
 			insert.setExchangeRate(Float.valueOf(exchangeRate));
 			insert.setInitialPoint(Integer.valueOf(initialPoint));
+			
+			for (String s : mDiscountCheckedList) {
+				insert.addDiscount(new Discount(Integer.parseInt(s)));
+			}
+			
 			
 			MemberTypeDao.insert(staff, insert);
 			jobject.initTip(true, "操作成功, 已添加新会员类型.");
@@ -127,7 +141,15 @@ public class OperateMemberTypeAction extends DispatchAction{
 			String exchangeRate = request.getParameter("exchangeRate");
 			String chargeRate = request.getParameter("chargeRate");
 			String attr = request.getParameter("attr");
+			String memberDiscountCheckeds = request.getParameter("memberDiscountCheckeds");
 			
+			String[] mDiscountCheckedList = null;
+			
+			if(memberDiscountCheckeds.trim().isEmpty()){
+				mDiscountCheckedList = memberDiscountCheckeds.split(",");
+			}else{
+				mDiscountCheckedList = new String[0];
+			}
 			
 			MemberType.UpdateBuilder update = new MemberType.UpdateBuilder(Integer.valueOf(typeID));
 			
@@ -148,6 +170,9 @@ public class OperateMemberTypeAction extends DispatchAction{
 			}
 			if(typeName != null && !typeName.trim().isEmpty()){
 				update.setName(typeName);
+			}
+			for (String s : mDiscountCheckedList) {
+				update.addDiscount(new Discount(Integer.parseInt(s)));
 			}
 /*			MemberType mt = new MemberType();
 			
