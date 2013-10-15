@@ -11,6 +11,7 @@ import java.net.Socket;
 import java.sql.SQLException;
 import java.util.List;
 
+import com.wireless.db.client.member.MemberDao;
 import com.wireless.db.foodAssociation.QueryFoodAssociationDao;
 import com.wireless.db.foodGroup.CalcFoodGroupDao;
 import com.wireless.db.frontBusiness.CancelOrder;
@@ -39,6 +40,7 @@ import com.wireless.pack.resp.RespNAK;
 import com.wireless.pack.resp.RespOTAUpdate;
 import com.wireless.pack.resp.RespPackage;
 import com.wireless.parcel.Parcel;
+import com.wireless.pojo.client.Member;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.foodGroup.Pager;
 import com.wireless.pojo.menuMgr.Food;
@@ -97,14 +99,6 @@ class OrderHandler implements Runnable{
 				//handle the query staff request
 				Device device = DeviceDao.getWorkingDeviceById(new Parcel(request.body).readParcel(Device.CREATOR).getDeviceId());
 				response = new RespPackage(request.header, StaffDao.getStaffs(device.getRestaurantId()), Staff.ST_PARCELABLE_COMPLEX);
-				
-			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.MATCH_PIN){
-				//FIXME
-				Parcel p = new Parcel(request.body);
-				String deviceId = p.readString();
-				String pin = p.readString();
-				DeviceDao.insert(deviceId, pin);
-				response = new RespACK(request.header);
 				
 			}else{
 				
@@ -397,6 +391,25 @@ class OrderHandler implements Runnable{
 					//handle the query food group
 					List<Pager> pagers = CalcFoodGroupDao.calc(staff);
 					response = new RespPackage(request.header, pagers, 0);
+					
+				}else if(request.header.mode == Mode.MEMBER && request.header.type == Type.QUERY_MEMBER){
+					//handle the request to query member
+					response = new RespPackage(request.header, MemberDao.getMember(staff, null, null), Member.MEMBER_PARCELABLE_SIMPLE);
+					
+				}else if(request.header.mode == Mode.MEMBER && request.header.type == Type.QUERY_INTERESTED_MEMBER){
+					//handle the request to query interested member
+					String extraCond = " AND M.member_id IN( SELECT member_id FROM interested_member WHERE staff_id = " + staff.getId() + ")";
+					response = new RespPackage(request.header, MemberDao.getMember(staff, extraCond, null), Member.MEMBER_PARCELABLE_SIMPLE);
+					
+				}else if(request.header.mode == Mode.MEMBER && request.header.type == Type.INTERESTED_IN_MEMBER){
+					//handle the request to be interested in specific member
+					MemberDao.interestedIn(staff, new Parcel(request.body).readParcel(Member.CREATOR).getId());
+					response = new RespACK(request.header);
+					
+				}else if(request.header.mode == Mode.MEMBER && request.header.type == Type.CANCEL_INTERESTED_IN_MEMBER){
+					//handle the request to cancel interested in specific member
+					MemberDao.cancelInterestedIn(staff, new Parcel(request.body).readParcel(Member.CREATOR).getId());
+					response = new RespACK(request.header);
 				}
 			}
 			
