@@ -44,12 +44,35 @@ function dataInit(){
 		},
 		success : function(res, opt){
 			discountData = eval(res.responseText);
+
 		},
 		failure : function(res, opt){
 			Ext.ux.showMsg(Ext.decode(res.responseText));
 		}
 	});
 };
+
+function getChecked(checkeds, checkBoxs){
+	for (var i = 0; i < checkBoxs.length; i++) {
+		if(checkBoxs[i].checked){
+			if(checkeds == ""){
+				checkeds += checkBoxs[i].value;
+			}else{
+				checkeds += "," + checkBoxs[i].value;
+			}
+		}
+	}
+	return checkeds;
+}
+
+function checkLabel(t){
+	if(t.length > 4){
+		var after = t.substring(0, 3);
+		return after+'...';
+	}else{
+		return t;
+	}
+}
 /**
  * 
  */
@@ -59,7 +82,7 @@ function memberTypeWinInit(){
 		closable : false,
 		modal : true,
 		resizable : false,
-		width : 235,
+		width : 245,
 		items : [{
 			xtype : 'form',
 			layout : 'form',
@@ -166,6 +189,28 @@ function memberTypeWinInit(){
 				style : 'color:green;font-szie:12px;',
 				text : '说明:  如充值实收  100.00元  可当  150.00元  (基本金额100.00,赠送金额50.00),则充值比率为  1:1.5,充值比率输入  1.5, 默认 1 '
 			}, {
+				
+			}, {
+				xtype : 'form',
+				layout : 'column',
+				id : 'formMemberDiscount',
+				frame : true,
+				width : 220,
+				defaults : {
+					columnWidth : .333,
+					layout : 'form',
+					labelWidth : 80
+				},
+				items : [{
+					columnWidth : 1,
+					xtype : 'label',
+					id : 'txtTest',
+					style : 'text-align:left;padding-bottom:3px;',
+					text : '折扣方案:'
+					
+				}]
+				
+			}, {
 				xtype : 'combo',
 				id : 'comboDiscount',
 				fieldLabel : '默认方案' + Ext.ux.txtFormat.xh,
@@ -181,7 +226,20 @@ function memberTypeWinInit(){
 				typeAhead : true,
 				mode : 'local',
 				triggerAction : 'all',
-				selectOnFocus : true
+				selectOnFocus : true,
+				listeners : {
+					focus  : function(thiz){
+						var mDiscountSelectedList = []; 
+						var mDiscountSelecteds = document.getElementsByName('memberDiscount');
+						for (var i = 0; i < mDiscountSelecteds.length; i++) {
+							if(mDiscountSelecteds[i].checked){
+								mDiscountSelectedList.push({'discountID':mDiscountSelecteds[i].value,'text':mDiscountSelecteds[i].nextSibling.innerHTML});
+							}
+							
+						}
+						thiz.store.loadData(mDiscountSelectedList);
+					}
+				}
 			}]
 		}],
 		bbar : ['->', {
@@ -201,6 +259,7 @@ function memberTypeWinInit(){
 						|| !initialPoint.isValid() || !attribute.isValid()){
 					return;
 				}
+				var memberDiscountCheckeds = "";
 				
 				var save = Ext.getCmp('btnSaveMemberType');
 				var close = Ext.getCmp('btnCloseMemberType');
@@ -218,7 +277,8 @@ function memberTypeWinInit(){
 						exchangeRate : exchangeRate.getValue(),
 						initialPoint : initialPoint.getValue(),
 						chargeRate : chargeRate.getValue(),
-						attr : attribute.getValue()
+						attr : attribute.getValue(),
+						memberDiscountCheckeds : getChecked(memberDiscountCheckeds, document.getElementsByName('memberDiscount'))
 					},
 					success : function(res, opt){
 						var jr = Ext.decode(res.responseText);
@@ -249,7 +309,29 @@ function memberTypeWinInit(){
 		}],
 		listeners : {
 			show : function(e){
-				Ext.getCmp('comboDiscount').store.loadData(discountData);
+				if(document.getElementsByName('memberDiscount').length == 0){
+					for (var i = 0; i < discountData.length; i++) {
+						var c = {items : [{
+							xtype : "checkbox", 
+							name : "memberDiscount",
+							boxLabel : checkLabel(discountData[i].text) , 
+							hideLabel : true, 
+							inputValue :  discountData[i].discountID,
+							listeners : {
+								check : function(){
+									Ext.getCmp('comboDiscount').setValue();
+									Ext.getCmp('comboDiscount').clearInvalid();
+								}
+							}
+						}]};
+						Ext.getCmp('formMemberDiscount').add(c);
+						//solveIE自动换行时格式错乱
+						if((i+1)%6 == 0){
+							Ext.getCmp('formMemberDiscount').add({columnWidth : 1});
+						}
+						Ext.getCmp('formMemberDiscount').doLayout();
+					}
+				}
 			}
 		},
 		keys : [{
@@ -424,13 +506,11 @@ function initMemberTypeGrid(){
 			['充值比率', 'chargeRate',,'right', 'function(v, md, r){ if(r.get("attributeValue") == 0){ return Ext.ux.txtFormat.gridDou(v); }else{ return "-"; } }'],
 			['初始积分', 'initialPoint',,'right', 'Ext.ux.txtFormat.gridDou'],
 			['积分比率', 'exchangeRate',,'right', 'Ext.ux.txtFormat.gridDou'],
-			['折扣方式', 'discountTypeText'],
-			['折扣率', 'discountRate',,'right', 'discountRateRenderer'],
 			['折扣方案', 'discount.name',,, 'discountRenderer'],
 			['操作', 'operation', 200, 'center', 'memberTypeRenderer']
 		],
 		['id','name','chargeRate','exchangeRate','discountTypeValue', 'discountTypeText','discountRate','attributeValue',
-		 'discount', 'discount.id', 'discount.name', 'discount.status', 'initialPoint'],
+		 'discount', 'discount.id', 'discount.name', 'discount.status', 'initialPoint', 'discounts'],
 		[ ['isPaging', true], ['restaurantID', restaurantID], ['dataSource', 'normal']],
 		30,
 		'',
@@ -488,6 +568,12 @@ function memberTypeOperationHandler(c){
 			exchangeRate : 1.00,
 			initialPoint : 0
 		});
+		var discounts = document.getElementsByName('memberDiscount');
+		for (var i = 0; i < discounts.length; i++) {
+			if(discounts[i].checked){
+				discounts[i].checked = false;
+			}
+		}
 	}else if(c.type == mtObj.operation['update']){
 		var sd = Ext.ux.getSelData(memberTypeGrid);
 		if(!sd){
@@ -499,6 +585,15 @@ function memberTypeOperationHandler(c){
 		memberTypeWin.center();
 		
 		bindMemberTypeData(sd);
+		
+		var discounts = document.getElementsByName('memberDiscount');
+		for (var i = 0; i < sd['discounts'].length; i++) {
+			for (var j = 0; j < discounts.length; j++) {
+				if(sd['discounts'][i].id == discounts[j].value){
+					discounts[j].checked = true;
+				}
+			}
+		}
 	}else if(c.type == mtObj.operation['delete']){
 		var sd = Ext.ux.getSelData(memberTypeGrid.getId());
 		if(!sd){
@@ -547,16 +642,13 @@ function bindMemberTypeData(d){
 	var chargeRate = Ext.getCmp('numChargeRate');
 	var exchangeRate = Ext.getCmp('numExchangeRate');
 	var initialPoint = Ext.getCmp('numInitialPoint');
-	//var discountType = Ext.getCmp('comboDiscountType');
 	var discount = Ext.getCmp('comboDiscount');
-	//var discountRate = Ext.getCmp('numDiscountRate');
 	var attribute = Ext.getCmp('comboAttribute');
 	
 	typeID.setValue(d['id']);
 	typeName.setValue(d['name']);
 	exchangeRate.setValue(d['exchangeRate']);
 	initialPoint.setValue(typeof d['initialPoint'] != 'undefined' ? d['initialPoint'] : 0);
-	///discountType.setValue(d['discountTypeValue']);
 	
 	if(typeof d['attributeValue'] == 'undefined'){
 		attribute.setValue(1);
@@ -565,31 +657,14 @@ function bindMemberTypeData(d){
 	}
 	attribute.fireEvent('select', attribute);
 	chargeRate.setValue(d['chargeRate']);
+	discount.setValue(d['discount.id']);
 	
-/*	if(d['discountTypeValue'] == 0){
-		discountRate.setValue();
-		discountRate.setDisabled(true);
-		discount.setValue(d['discount']['id']);
-		discount.setDisabled(false);
-	}else if(d['discountTypeValue'] == 1){
-		discountRate.setValue(d['discountRate']);
-		discountRate.setDisabled(false);
-		discount.setValue();
-		discount.setDisabled(true);
-	}else{
-		discountRate.setValue();
-		discount.setValue();
-		discountRate.setDisabled(true);
-		discount.setDisabled(true);
-	}*/
 	
 	typeID.clearInvalid();
 	typeName.clearInvalid();
 	chargeRate.clearInvalid();
 	initialPoint.clearInvalid();
 	attribute.clearInvalid();
-/*	discountType.clearInvalid();
-	discountRate.clearInvalid();*/
 	discount.clearInvalid();
 };
 
@@ -611,6 +686,7 @@ Ext.onReady(function(){
 	});
 	 
 	memberTypeWinInit();
+
 	/*
 	var menu = new Ext.menu.Menu({
 		items : [{

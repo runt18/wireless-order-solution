@@ -2853,7 +2853,7 @@ Ext.onReady(function() {
 	new Ext.Panel({
 		renderTo : 'divMenu',
 		layout : 'fit',
-		width : parseInt(Ext.getDom('divMenu').parentElement.style.width.replace(/px/g,'')),
+		//width : parseInt(Ext.getDom('divMenu').parentElement.style.width.replace(/px/g,'')),
 		height : parseInt(Ext.getDom('divMenu').parentElement.style.height.replace(/px/g,'')),
 		items : [ {
 			layout : 'border',

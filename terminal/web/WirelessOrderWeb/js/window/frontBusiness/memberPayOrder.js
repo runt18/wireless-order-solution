@@ -259,16 +259,8 @@ function memberPayOrderToBindData(_c){
 	extraBalance.setValue(member['extraBalance']);
 	customNum.setValue(typeof newOrder['customNum'] == 'undefined' || newOrder['customNum'] < 1 ? 1 : newOrder['customNum']);
 	
-	if(eval(memberType['discountTypeValue'] == 0)){
-		discount.setValue(discountMsg['name']);
-		discountRate.setValue('--');
-	}else if(eval(memberType['discountTypeValue'] == 1)){
-		discount.setValue('全单折扣');
-		discountRate.setValue(memberType['discountRate']);
-	}else{
-		discount.setValue();
-		discountRate.setValue();
-	}
+	discount.setValue(discountMsg['name']);
+	discountRate.setValue('--');
 	
 	payManner.setDisabled(true);
 	if(memberType['attributeValue'] == 1){
