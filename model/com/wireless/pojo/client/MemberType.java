@@ -200,6 +200,10 @@ public class MemberType implements Jsonable{
 			return discounts.isEmpty();
 		}
 		
+		public boolean isDefaultDiscountChanged(){
+			return defaultDiscount != null;
+		}
+		
 		public UpdateBuilder setExchangeRate(float exchangeRate){
 			if(exchangeRate < 0){
 				throw new IllegalArgumentException();
@@ -329,8 +333,8 @@ public class MemberType implements Jsonable{
 	
 	public void setDiscounts(List<Discount> discounts){
 		if(discounts != null){
-			discounts.clear();
-			discounts.addAll(discounts);
+			this.discounts.clear();
+			this.discounts.addAll(discounts);
 		}
 	}
 	
@@ -418,6 +422,9 @@ public class MemberType implements Jsonable{
 		}
 		if(this.defaultDiscount != null){
 			jm.put("discount", this.defaultDiscount);
+		}
+		if(!this.discounts.isEmpty()){
+			jm.put("discounts", this.discounts);
 		}
 		
 		return Collections.unmodifiableMap(jm);
