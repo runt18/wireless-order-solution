@@ -52,10 +52,9 @@ public class OperateMemberAction extends DispatchAction{
 			String tele = request.getParameter("telt");
 			String idCard = request.getParameter("idCard");
 			String company = request.getParameter("company");
-			String tastePref = request.getParameter("tastePref");
-			String taboo = request.getParameter("taboo");
 			String addr = request.getParameter("addr");
-			String comment = request.getParameter("comment");
+			String privateComment = request.getParameter("privateComment");
+			String publicComment = request.getParameter("publicComment");
 			
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
@@ -65,10 +64,9 @@ public class OperateMemberAction extends DispatchAction{
 			  .setTele(tele)
 			  .setIdCard(idCard)
 			  .setCompany(company)
-			  .setTastePref(tastePref)
-			  .setTaboo(taboo)
-			  .setContactAddr(addr)
-			  .setComment(comment);
+			  .setPrivateComment(privateComment)
+			  .setPublicComment(publicComment)
+			  .setContactAddr(addr);
 			
 			MemberDao.insert(staff, ib);
 			jobject.initTip(true, "操作成功, 新会员资料已添加.");
@@ -110,11 +108,10 @@ public class OperateMemberAction extends DispatchAction{
 			String birthday = request.getParameter("birthday");
 			String tele = request.getParameter("telt");
 			String idCard = request.getParameter("idCard");
-			String company = request.getParameter("company");
-			String tastePref = request.getParameter("tastePref");
-			String taboo = request.getParameter("taboo");
 			String addr = request.getParameter("addr");
-			String comment = request.getParameter("comment");
+			String privateComment = request.getParameter("privateComment");
+			//String publicComment = request.getParameter("publicComment");
+			String phonePublicComment = request.getParameter("phonePublicComment");
 			
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
@@ -127,11 +124,11 @@ public class OperateMemberAction extends DispatchAction{
 											    .setMemberCard(memberCard)
 											    .setTele(tele)
 											    .setIdCard(idCard)
-											    .setCompany(company)
-											    .setTastePref(tastePref)
-											    .setTaboo(taboo)
-											    .setContactAddr(addr)
-											    .setComment(comment);
+											    .setPrivateComment(privateComment)
+											    .setContactAddr(addr);
+			if(phonePublicComment != null && !phonePublicComment.isEmpty()){
+				ub.setPublicComment(phonePublicComment);
+			}
 			
 			MemberDao.update(staff, ub);
 			jobject.initTip(true, "操作成功, 会员资料已修改.");
