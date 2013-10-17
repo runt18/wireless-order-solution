@@ -35,6 +35,7 @@ function memberOperationHandler(c){
 		}
 		memberBasicWin.setTitle('修改会员资料');
 		memberBasicWin.show();
+
 	}else if(c.type == Ext.ux.otype['delete']){
 		var data = Ext.ux.getSelData(memberBasicGrid);
 		if(!data){
@@ -746,6 +747,8 @@ function gridInit(){
 		memberBasicGridTbar
 	);	
 	memberBasicGrid.region = 'center';
+	
+	
 	memberBasicGrid.on('render', function(e){
 		Ext.getCmp('btnSearchMember').handler();
 	});
@@ -796,7 +799,7 @@ function winInit(){
 				
 				thiz.center();
 				thiz.load({
-					url : '../window/client/controlMember.jsp',
+					url : '../window/client/controlMember.jsp', 
 					scripts : true,
 					params : {
 						otype : memberBasicWin.otype

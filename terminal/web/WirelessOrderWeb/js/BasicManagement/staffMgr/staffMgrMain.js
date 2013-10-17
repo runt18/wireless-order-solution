@@ -1125,7 +1125,7 @@ Ext.onReady(function() {
 	
 	new Ext.Panel({
 		renderTo : 'divStaff',
-		width : parseInt(Ext.getDom('divStaff').parentElement.style.width.replace(/px/g,'')),
+		//width : parseInt(Ext.getDom('divStaff').parentElement.style.width.replace(/px/g,'')),
 		height : parseInt(Ext.getDom('divStaff').parentElement.style.height.replace(/px/g,'')),
 		layout : 'border',
 		items : [ staffGrid, roleGrid, privilegeTree ],

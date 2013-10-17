@@ -439,7 +439,7 @@ Ext.onReady(function(){
 	var supplierGrid = new Ext.grid.GridPanel({
 			title : '供应商列表',
 			id : 'grid',
-		    height : '500',
+		    //height : '500',
 		    border : true,
 		    frame : true,
 		    store : ds,
@@ -457,9 +457,9 @@ Ext.onReady(function(){
 	new Ext.Panel({
 		renderTo : 'divSupplier',//渲染到
 		//solve不跟随窗口的变化而变化
-		width : parseInt(Ext.getDom('divSupplier').parentElement.style.width.replace(/px/g,'')),
+		//width : parseInt(Ext.getDom('divSupplier').parentElement.style.width.replace(/px/g,'')),
 		height : parseInt(Ext.getDom('divSupplier').parentElement.style.height.replace(/px/g,'')),
-		layout : 'border',//布局
+		layout:'fit',
 		frame : true, //边框
 		//子集
 		items : [supplierGrid],

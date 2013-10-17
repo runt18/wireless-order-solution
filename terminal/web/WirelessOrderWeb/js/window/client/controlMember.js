@@ -122,7 +122,8 @@ Ext.onReady(function(){
 				id : 'cm_txtMemberCompany',
 				fieldLabel : '公司'
 			}]
-		}, {
+		}, 
+/*		{
 			items : [{
 				id : 'cm_txtMemberTastePref',
 				fieldLabel : '口味'
@@ -132,7 +133,8 @@ Ext.onReady(function(){
 				id : 'cm_txtMemberTaboo',
 				fieldLabel : '忌讳'
 			}]
-		}, {
+		}, */
+		{
 			columnWidth : 1,
 			items : [{
 				id : 'cm_txtMemberContactAddress',
@@ -142,8 +144,15 @@ Ext.onReady(function(){
 		}, {
 			columnWidth : 1,
 			items : [{
-				id : 'cm_txtMemberComment',
-				fieldLabel : '备注',
+				id : 'cm_txtMemberPublicComment',
+				fieldLabel : '公有评论',
+				width : 520
+			}]
+		}, {
+			columnWidth : 1,
+			items : [{
+				id : 'cm_txtMemberPrivateComment',
+				fieldLabel : '私有评论',
 				width : 520
 			}]
 		}, {
@@ -217,10 +226,7 @@ function cm_operationMemberData(c){
 	var tele = Ext.getCmp('cm_txtMemberTele');
 	var idCard = Ext.getCmp('cm_txtMemberIDCard');
 	var company = Ext.getCmp('cm_txtMemberCompany');
-	var tastePref = Ext.getCmp('cm_txtMemberTastePref');
-	var taboo = Ext.getCmp('cm_txtMemberTaboo');
 	var addr = Ext.getCmp('cm_txtMemberContactAddress');
-	var comment = Ext.getCmp('cm_txtMemberComment');
 	
 	var totalBalance = Ext.getCmp('cm_numberTotalBalance');
 	var baseBalance = Ext.getCmp('cm_numberBaseBalance');
@@ -228,6 +234,9 @@ function cm_operationMemberData(c){
 	var usedBalance = Ext.getCmp('cm_numberUsedBalance');
 	var point = Ext.getCmp('cm_numberMmeberPoint');
 	var usedPoint = Ext.getCmp('cm_numberUserPoint');
+	
+	var publicComment = Ext.getCmp('cm_txtMemberPublicComment');
+	var privateComment = Ext.getCmp('cm_txtMemberPrivateComment');
 	
 	if(c.type.toUpperCase() == Ext.ux.otype['set'].toUpperCase()){
 		data = c.data == null || typeof c.data == 'undefined' ? {} : c.data;
@@ -244,10 +253,7 @@ function cm_operationMemberData(c){
 		tele.setValue(data['tele']);
 		idCard.setValue(data['idCard']);
 		company.setValue(data['company']);
-		tastePref.setValue(data['tastePref']);
-		taboo.setValue(data['taboo']);
 		addr.setValue(data['contactAddress']);
-		comment.setValue(data['comment']);
 		
 		totalBalance.setValue(data['totalBalance']);
 		baseBalance.setValue(data['baseBalance']);
@@ -256,6 +262,22 @@ function cm_operationMemberData(c){
 		point.setValue(data['point']);
 		usedPoint.setValue(data['usedPoint']);
 		
+		if(!data['privateComment']){
+			privateComment.setValue();
+		}else{
+			privateComment.setValue(data['privateComment'].comment);
+		}
+		
+		if(!data['publicComment']){
+			publicComment.setValue();
+		}else{
+			var comments = "";
+			for (var i = 0; i < data['publicComment'].length; i++) {
+				comments += data['publicComment'][i].comment + "  ";
+			}
+			publicComment.setValue(comments);
+		}
+
 		if(typeof data['memberType'] != 'undefined'){
 			var task = {
 				run: function(){
@@ -269,6 +291,14 @@ function cm_operationMemberData(c){
 			Ext.TaskMgr.start(task);
 		}else{
 			memberType.setValue();
+		}
+		
+		if(data['name']){
+			publicComment.getEl().dom.readOnly = true;
+			privateComment.getEl().dom.readOnly = true;
+		}else{
+			publicComment.getEl().dom.readOnly = false;
+			privateComment.getEl().dom.readOnly = false;
 		}
 	}else if(c.type.toUpperCase() == Ext.ux.otype['get'].toUpperCase()){
 		data = {
@@ -361,10 +391,9 @@ function operateMemberHandler(c){
 			telt : Ext.getCmp('cm_txtMemberTele').getValue(),
 			idCard : Ext.getCmp('cm_txtMemberIDCard').getValue(),
 			company : Ext.getCmp('cm_txtMemberCompany').getValue(),
-			tastePref : Ext.getCmp('cm_txtMemberTastePref').getValue(),
-			taboo : Ext.getCmp('cm_txtMemberTaboo').getValue(),
 			addr : Ext.getCmp('cm_txtMemberContactAddress').getValue(),
-			comment : Ext.getCmp('cm_txtMemberComment').getValue()
+			privateComment : Ext.getCmp('cm_txtMemberPrivateComment').getValue(),
+			publicComment : Ext.getCmp('cm_txtMemberPublicComment').getValue()
 		},
 		success : function(res, opt){
 			c.setButtonStatus(false);
