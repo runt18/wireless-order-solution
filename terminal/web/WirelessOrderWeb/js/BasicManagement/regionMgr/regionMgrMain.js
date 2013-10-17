@@ -527,26 +527,6 @@ var btnAddTable = new Ext.ux.ImageButton({
 	}
 });
 
-var btnGetBack = new Ext.ux.ImageButton({
-	imgPath : '../../images/UserLogout.png',
-	imgWidth : 50,
-	imgHeight : 50,
-	tooltip : '返回',
-	handler : function(btn){
-		location.href = 'BasicMgrProtal.html?'+ strEncode('restaurantID=' + restaurantID, 'mi');
-	}
-});
-
-var btnLoginOut = new Ext.ux.ImageButton({
-	imgPath : '../../images/ResLogout.png',
-	imgWidth : 50,
-	imgHeight : 50,
-	tooltip : '登出',
-	handler : function(btn){
-		
-	}
-});
-
 Ext.onReady(function(){
 	//
 	initTree();
@@ -566,10 +546,7 @@ Ext.onReady(function(){
 		items : [regionTree, tableBasicGrid],
 		tbar : new Ext.Toolbar({
 			height : 55,
-			items : [btnAddTable, '->', btnGetBack, {
-			    xtype : 'tbtext',
-				text : '&nbsp;&nbsp;'
-			}, btnLoginOut ]
+			items : [btnAddTable]
 		})
 	});
 	
