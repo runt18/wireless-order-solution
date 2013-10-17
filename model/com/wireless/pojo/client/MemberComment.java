@@ -1,8 +1,15 @@
 package com.wireless.pojo.client;
 
-import com.wireless.pojo.staffMgr.Staff;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
-public class MemberComment {
+import com.wireless.json.Jsonable;
+import com.wireless.pojo.staffMgr.Staff;
+import com.wireless.pojo.util.DateUtil;
+
+public class MemberComment implements Jsonable{
 
 	public static enum Type{
 		PUBLIC(1, "公开"),
@@ -176,12 +183,30 @@ public class MemberComment {
 		}else{
 			return getStaffId() == ((MemberComment)obj).getStaffId() &&
 				   getMemberId() == ((MemberComment)obj).getMemberId() &&
-				   getType() == ((MemberComment)obj).getType();
+				   getType() == ((MemberComment)obj).getType() &&
+				   getComment().equals(((MemberComment)obj).getComment());
 		}
 	}
 	
 	@Override
 	public String toString(){
 		return this.comment;
+	}
+
+	@Override
+	public Map<String, Object> toJsonMap(int flag) {
+		Map<String, Object> jm = new LinkedHashMap<String, Object>();
+		jm.put("staffId", this.staff.getId());
+		jm.put("memberId", this.member.getId());
+		jm.put("comment", this.comment);
+		jm.put("typeText", this.type.getDesc());
+		jm.put("typeValue", this.type.getVal());
+		jm.put("lastModified", DateUtil.formatToDate(this.lastModified));
+		return Collections.unmodifiableMap(jm);
+	}
+
+	@Override
+	public List<Object> toJsonList(int flag) {
+		return null;
 	}
 }

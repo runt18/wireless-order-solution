@@ -745,7 +745,8 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 		jm.put("createDate", this.createDate);
 		jm.put("createDateFormat", DateUtil.format(this.createDate));
 		jm.put("memberCard", this.memberCard);
-		
+		jm.put("publicComment", this.publicComments);
+		jm.put("privateComment", this.privateComment);
 		return Collections.unmodifiableMap(jm);
 	}
 
@@ -1012,7 +1013,7 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 	}
 	
 	public boolean hasPrivateComment(){
-		return this.privateComment != null;
+		return this.privateComment != null && this.privateComment.getComment() != "";
 	}
 
 	@Override
