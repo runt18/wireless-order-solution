@@ -1,6 +1,7 @@
 package com.wireless.ui;
 
 import java.lang.ref.WeakReference;
+import java.util.List;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -22,12 +23,17 @@ import com.wireless.common.Params;
 import com.wireless.fragment.KitchenFragment;
 import com.wireless.fragment.OrderFoodFragment;
 import com.wireless.fragment.OrderFoodFragment.OnButtonClickedListener;
+import com.wireless.fragment.OrderFoodFragment.OnOrderChangedListener;
 import com.wireless.fragment.PickFoodFragment;
+import com.wireless.parcel.OrderParcel;
+import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.ui.dialog.AskOrderAmountDialog.OnFoodPickedListener;
 import com.wireless.ui.dialog.CommitDialog;
 
-public class QuickPickActivity extends FragmentActivity implements OnFoodPickedListener, OnButtonClickedListener{
+public class QuickPickActivity extends FragmentActivity implements OnFoodPickedListener, 
+																   OnButtonClickedListener,
+																   OnOrderChangedListener{
 	//每个点菜方式的标签
 	private static final int NUMBER_FRAGMENT = 6320;
 	private static final int KITCHEN_FRAGMENT = 6321;
@@ -106,17 +112,6 @@ public class QuickPickActivity extends FragmentActivity implements OnFoodPickedL
 				//创建OrderFoodFragment
 				activity.findViewById(R.id.frameLayout_container_quickPick).setVisibility(View.INVISIBLE);
 				activity.findViewById(R.id.frameLayout_orderFood_quickPick).setVisibility(View.VISIBLE);
-				
-				//OrderFoodFragment的"点菜"Button
-//				ExpandableListView listView = (ExpandableListView)((OrderFoodFragment)activity.getSupportFragmentManager().findFragmentById(R.id.fgm_orderFood_quickPick)).getView().findViewById(R.id.expandableListView_orderActivity);
-//				listView.getExpandableListAdapter()
-//				orderImgView.setOnClickListener(new OnClickListener(){
-//					@Override
-//					public void onClick(View v) {
-//						activity.switchToOrderView();
-//					}
-//					
-//				});
 				
 				activity.mLastView = ORDER_FOOD_FRAGMENT;
 				mTitleTextView.setText("已点菜");
@@ -200,6 +195,12 @@ public class QuickPickActivity extends FragmentActivity implements OnFoodPickedL
 			}
 		});
 
+		//将菜品添加到"已点菜"
+		OrderParcel orderParcel = getIntent().getParcelableExtra(OrderParcel.KEY_VALUE);
+		if(orderParcel != null){
+			((OrderFoodFragment)getSupportFragmentManager().findFragmentById(R.id.fgm_orderFood_quickPick)).addFoods(orderParcel.asOrder().getOrderFoods());
+		}
+		
 		//编号
 		((ImageButton) findViewById(R.id.imageButton_num_quickPick)).setOnClickListener(new OnClickListener(){
 			@Override
@@ -285,8 +286,21 @@ public class QuickPickActivity extends FragmentActivity implements OnFoodPickedL
 	}
 
 	@Override
-	public void OnPickFoodClicked() {
+	public void onPickFoodClicked() {
 		switchToOrderView();		
+	}
+
+	@Override
+	public void onOrderChanged(Order oriOrder, List<OrderFood> newFoodList) {
+		
+		TextView txtViewAmount = (TextView)findViewById(R.id.txtView_amount_right);
+
+		if(newFoodList.isEmpty()){
+			txtViewAmount.setVisibility(View.GONE);
+		}else{
+			txtViewAmount.setVisibility(View.VISIBLE);
+			txtViewAmount.setText(newFoodList.size() + "");
+		}
 	}
 
 }

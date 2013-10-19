@@ -6,6 +6,7 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.view.LayoutInflater;
@@ -34,6 +35,7 @@ import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.util.NumericUtil;
+import com.wireless.ui.MainActivity;
 import com.wireless.ui.R;
 
 
@@ -333,7 +335,10 @@ public class CommitDialog extends DialogFragment{
 					
 				}else{
 					dismiss();
-					getActivity().finish();						
+					//直接返回到MainActivity
+					Intent intent = new Intent(getActivity(), MainActivity.class);
+					intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+					getActivity().startActivity(intent);
 					Toast.makeText(getActivity(), mReqOrder.getDestTbl().getAliasId() + "号台下单成功。", Toast.LENGTH_SHORT).show();
 				}
 			}
@@ -433,7 +438,10 @@ public class CommitDialog extends DialogFragment{
 							  mOrderToPay.getDestTbl().getAliasId()	+ "号台提交并" + (mPayCate == Type.PAY_ORDER ? "结帐" : "暂结") + "成功", 
 							  Toast.LENGTH_SHORT).show();
 				dismiss();
-				getActivity().finish();	
+				//直接返回到MainActivity
+				Intent intent = new Intent(getActivity(), MainActivity.class);
+				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+				getActivity().startActivity(intent);
 			}
 		}
 	}

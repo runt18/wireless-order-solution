@@ -61,7 +61,7 @@ public class MainActivity extends FragmentActivity implements OnTableSelectedLis
 	private static final int REDRAW_RESTAURANT = 2;
 	private static final int REDRAW_STAFF_LOGIN = 3;
 	
-	private Staff _staffLogin;
+	private Staff mStaffLogin;
 
 	/**
 	 * 请求菜谱和餐厅信息后，更新到相关的界面控件
@@ -95,9 +95,9 @@ public class MainActivity extends FragmentActivity implements OnTableSelectedLis
 					billBoard.setText(WirelessOrder.restaurant.getInfo().replaceAll("\n", ""));
 					
 					TextView userName = (TextView)mActivity.get().findViewById(R.id.username);
-					if(mActivity.get()._staffLogin != null){
-						if(mActivity.get()._staffLogin.getName().length() != 0){
-							userName.setText(WirelessOrder.restaurant.getName() + "(" + mActivity.get()._staffLogin.getName() + ")");							
+					if(mActivity.get().mStaffLogin != null){
+						if(mActivity.get().mStaffLogin.getName().length() != 0){
+							userName.setText(WirelessOrder.restaurant.getName() + "(" + mActivity.get().mStaffLogin.getName() + ")");							
 						}else{
 							userName.setText(WirelessOrder.restaurant.getName());							
 						}
@@ -255,14 +255,14 @@ public class MainActivity extends FragmentActivity implements OnTableSelectedLis
 				 * Directly login with the previous staff account if user does NOT logout before.
 				 * Otherwise show the login dialog. 
 				 */
-				_staffLogin = null;
+				mStaffLogin = null;
 				for(Staff staff : WirelessOrder.staffs){
 					if(staff.getId() == loginStaffId){
-						_staffLogin = staff;
+						mStaffLogin = staff;
 					}
 				}
-				if(_staffLogin != null){
-					WirelessOrder.loginStaff = _staffLogin;
+				if(mStaffLogin != null){
+					WirelessOrder.loginStaff = mStaffLogin;
 				}else{
 					showDialog(DIALOG_STAFF_LOGIN);
 				}
@@ -563,8 +563,8 @@ public class MainActivity extends FragmentActivity implements OnTableSelectedLis
 			staffLstView.setOnItemClickListener(new OnItemClickListener() {
 				@Override
 				public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-					_staffLogin = WirelessOrder.staffs.get(position);
-					staffTxtView.setText(_staffLogin.getName());
+					mStaffLogin = WirelessOrder.staffs.get(position);
+					staffTxtView.setText(mStaffLogin.getName());
 				   _popupWindow.dismiss();
 				}
 			});
@@ -587,15 +587,15 @@ public class MainActivity extends FragmentActivity implements OnTableSelectedLis
 						if(staffTxtView.getText().toString().equals("")){
 							errTxtView.setText("账号不能为空");
 							
-						}else if(_staffLogin.getPwd().equals(toHexString(digester.digest()))){
+						}else if(mStaffLogin.getPwd().equals(toHexString(digester.digest()))){
 							//保存staff pin到文件里面
 							Editor editor = getSharedPreferences(Params.PREFS_NAME, Context.MODE_PRIVATE).edit();//获取编辑器
-							editor.putLong(Params.STAFF_LOGIN_ID, _staffLogin.getId());
+							editor.putLong(Params.STAFF_LOGIN_ID, mStaffLogin.getId());
 							//提交修改
 							editor.commit();	
 							_handler.sendEmptyMessage(REDRAW_RESTAURANT);
 							//set the pin generator according to the staff login
-							WirelessOrder.loginStaff = _staffLogin;
+							WirelessOrder.loginStaff = mStaffLogin;
 							dismiss();
 							
 						}else{		

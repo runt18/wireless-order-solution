@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Locale;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -22,8 +23,6 @@ import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -33,6 +32,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.wireless.common.WirelessOrder;
+import com.wireless.parcel.MemberParcel;
 import com.wireless.pojo.client.Member;
 import com.wireless.pojo.util.SortedList;
 
@@ -160,7 +160,7 @@ public class MemberListActivity extends FragmentActivity {
 		//返回Button和标题
 		TextView title = (TextView) findViewById(R.id.toptitle);
 		title.setVisibility(View.VISIBLE);
-		title.setText("会员信息");
+		title.setText("会员列表");
 
 		TextView left = (TextView) findViewById(R.id.textView_left);
 		left.setText("返回");
@@ -240,13 +240,6 @@ public class MemberListActivity extends FragmentActivity {
 		
 		mMemberListView = (ListView) findViewById(R.id.listView_memberList);
 		
-		mMemberListView.setOnItemClickListener(new OnItemClickListener(){
-			@Override
-			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-				//TODO Jump to member detail activity
-			}
-		});
-		
 		//滚动时隐藏soft-keyboard
 		mMemberListView.setOnScrollListener(new OnScrollListener() {
 
@@ -300,6 +293,21 @@ public class MemberListActivity extends FragmentActivity {
 			}
 			
 			final Member member = mMembers.get(position);
+			
+			layout.setOnClickListener(new OnClickListener(){
+
+				@Override
+				public void onClick(View v) {
+					//TODO
+					//跳转到会员信息Activity
+					Intent intent = new Intent(MemberListActivity.this, MemberDetailActivity.class);
+					Bundle bundle = new Bundle();
+					bundle.putParcelable(MemberParcel.KEY_VALUE, new MemberParcel(member));
+					intent.putExtras(bundle);
+					startActivity(intent);
+				}
+				
+			});
 			
 			//"关注"or"取消关注"Button
 			final Button button = (Button)layout.findViewById(R.id.button_interestedIn_memberList_listItem);

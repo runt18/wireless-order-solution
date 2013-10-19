@@ -1,5 +1,7 @@
 package com.wireless.ui;
 
+import java.util.List;
+
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
@@ -17,12 +19,12 @@ import android.widget.Toast;
 import com.wireless.common.WirelessOrder;
 import com.wireless.exception.ProtocolError;
 import com.wireless.fragment.OrderFoodFragment;
-import com.wireless.fragment.OrderFoodFragment.OnQueryOrderListener;
+import com.wireless.fragment.OrderFoodFragment.OnOrderChangedListener;
 import com.wireless.pack.Type;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.OrderFood;
 
-public class OrderActivity extends FragmentActivity implements OnQueryOrderListener{
+public class OrderActivity extends FragmentActivity implements OnOrderChangedListener{
 	
 	public static final String KEY_TABLE_ID = "TableAmount";
 	
@@ -143,14 +145,6 @@ public class OrderActivity extends FragmentActivity implements OnQueryOrderListe
 		}
 	}
 
-	@Override
-	public void OnPostQueryOrder(Order oriOrder) {
-		//set the table ID
-		((EditText)findViewById(R.id.editText_orderActivity_tableNum)).setText(Integer.toString(oriOrder.getDestTbl().getAliasId()));
-		//set the amount of customer
-		((EditText)findViewById(R.id.editText_orderActivity_customerNum)).setText(Integer.toString(oriOrder.getCustomNum()));	
-	}
-	
 	private class CommitOrderTask extends com.wireless.lib.task.CommitOrderTask{
 
 		private ProgressDialog mProgressDialog;
@@ -223,6 +217,15 @@ public class OrderActivity extends FragmentActivity implements OnQueryOrderListe
 				}
 			}	
 		}
+	}
+
+	@Override
+	public void onOrderChanged(Order oriOrder, List<OrderFood> newFoodList) {
+		//set the table ID
+		((EditText)findViewById(R.id.editText_orderActivity_tableNum)).setText(Integer.toString(oriOrder.getDestTbl().getAliasId()));
+		//set the amount of customer
+		((EditText)findViewById(R.id.editText_orderActivity_customerNum)).setText(Integer.toString(oriOrder.getCustomNum()));	
+
 	}
 	
 }

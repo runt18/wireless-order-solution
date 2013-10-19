@@ -54,16 +54,16 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 														   OnAmountChangedListener{
 
 	public static interface OnButtonClickedListener{
-		public void OnPickFoodClicked();
+		public void onPickFoodClicked();
 	}
 	
-	public static interface OnQueryOrderListener{
-		public void OnPostQueryOrder(Order oriOrder);
+	public static interface OnOrderChangedListener{
+		public void onOrderChanged(Order oriOrder, List<OrderFood> newFoodList);
 	}
-	
-	private OnQueryOrderListener mQueryOrderListener;
 	
 	private OnButtonClickedListener mBtnClickedListener;
+	
+	private OnOrderChangedListener mOrderChangedListener;
 	
 	public final static int PICK_FOOD = 0;
 	public final static int PICK_TASTE = 1;
@@ -123,12 +123,9 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 		private static final int[] GROUP_ITEM_ID = { R.id.grounname };
 		
 		private WeakReference<OrderFoodFragment> mFragment;
-		private ExpandableListView mListView;
 
 		FoodListHandler(OrderFoodFragment fragment) {
 			mFragment = new WeakReference<OrderFoodFragment>(fragment);
-			
-			mListView = (ExpandableListView) fragment.getView().findViewById(R.id.expandableListView_orderActivity);
 		}
 
 		@Override
@@ -210,13 +207,20 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 					groupData, R.layout.dropgrounpitem, GROUP_ITEM_TAGS, GROUP_ITEM_ID, 
 					childData, R.layout.order_activity_child_item, ITEM_TAGS, ITEM_TARGETS);
 			
-			mListView.setAdapter(adapter);
+			ExpandableListView listView = (ExpandableListView) mFragment.get().getView().findViewById(R.id.expandableListView_orderActivity);
+			listView.setAdapter(adapter);
 			
 			for(int i = 0; i < groupData.size(); i++){
-				mListView.expandGroup(i);
+				listView.expandGroup(i);
 			}
 			
 			calcTotal();
+			
+			//回调通知Order发生变化
+			if(mFragment.get().mOrderChangedListener != null){
+				mFragment.get().mOrderChangedListener.onOrderChanged(mFragment.get().mOriOrder,
+																	 mFragment.get().mNewFoodList);
+			}
 		}
 		
 		private void calcTotal(){
@@ -476,7 +480,7 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 					@Override
 					public void onClick(View v) {
 						if(mBtnClickedListener != null){
-							mBtnClickedListener.OnPickFoodClicked();
+							mBtnClickedListener.onPickFoodClicked();
 						}else{
 							// 跳转到选菜Activity
 							Intent intent = new Intent(getActivity(), PickFoodActivity.class);
@@ -592,24 +596,30 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 	}
 	
 	@Override
-	public View onCreateView (LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
-		
-		return inflater.inflate(R.layout.order_food_activity, null);
-		
-	}
-	
-	@Override
 	public void onAttach(Activity activity){
 		super.onAttach(activity);
 		
 		try{
-			mQueryOrderListener = (OnQueryOrderListener)activity;
+			mBtnClickedListener = (OnButtonClickedListener)activity;
 		}catch(ClassCastException ignored){}
 		
 		try{
-			mBtnClickedListener = (OnButtonClickedListener)activity;
+			mOrderChangedListener = (OnOrderChangedListener)activity;
 		}catch(ClassCastException ignored){}
+		
 	}
+
+	@Override
+	public void onCreate(Bundle savedInstanceState){
+		super.onCreate(savedInstanceState);
+		mFoodListHandler = new FoodListHandler(this);
+	}
+	
+	@Override
+	public View onCreateView (LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
+		return inflater.inflate(R.layout.order_food_activity, null);
+	}
+
 	
 	@Override
 	public void onActivityCreated (Bundle savedInstanceState){
@@ -618,7 +628,6 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 		//执行请求更新沽清菜品
 		new QuerySellOutTask().execute();
 		
-		mFoodListHandler = new FoodListHandler(this);
 		Bundle bundle = getArguments();
 		if(bundle != null){
 			int tableAlias = bundle.getInt(TBL_ALIAS_KEY);
@@ -785,10 +794,6 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 				
 				mOriOrder = order;
 				
-				if(mQueryOrderListener != null){
-					mQueryOrderListener.OnPostQueryOrder(mOriOrder);
-				}
-
 				//更新沽清菜品
 				new QuerySellOutTask().execute();
 			}		

@@ -47,7 +47,7 @@ public class PickFoodActivity extends FragmentActivity
 	private ViewHandler mViewHandler;
 	
 	//通过临时账单保存新点菜
-	private Order mTmpOrder = new Order();;
+	private Order mTmpOrder = new Order();
 
 	private static class ViewHandler extends Handler{
 		private WeakReference<PickFoodActivity> mActivity;
