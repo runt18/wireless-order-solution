@@ -1,5 +1,6 @@
 package com.wireless.pojo.client;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
@@ -14,6 +15,7 @@ import com.wireless.parcel.Parcelable;
 import com.wireless.pojo.client.MemberOperation.ChargeType;
 import com.wireless.pojo.client.MemberOperation.OperationType;
 import com.wireless.pojo.dishesOrder.Order;
+import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.util.DateUtil;
 import com.wireless.pojo.util.SortedList;
 
@@ -304,6 +306,7 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 	private float totalCharge;			// 累计充值额
 	private float usedBalance;			// 累计会员余额消费
 	private int consumptionAmount;		// 累计消费次数
+	private long lastConsumption;		// 最近一次消费时间
 	private float baseBalance;			// 基础余额
 	private float extraBalance;			// 额外余额
 	private int usedPoint;				// 累计使用积分
@@ -320,6 +323,10 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 	private long createDate;			// 创建时间
 	private MemberType memberType;		// 会员类型
 	private String memberCard;			// 会员卡号
+	//Ta喜欢的菜品
+	private List<Food> favorFoods = new ArrayList<Food>();
+	//向Ta推荐的菜品
+	private List<Food> recommendFoods = new ArrayList<Food>();
 	
 	//会员的公开评论
 	private SortedList<MemberComment> publicComments = SortedList.newInstance(new Comparator<MemberComment>(){
@@ -678,7 +685,15 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 			dest.writeInt(this.getConsumptionAmount());
 			
 		}else if(flag == MEMBER_PARCELABLE_COMPLEX){
-			
+			dest.writeParcel(this.memberType, MemberType.MEMBER_TYPE_PARCELABLE_COMPLEX);
+			dest.writeInt(this.getId());
+			dest.writeString(this.getName());
+			dest.writeString(this.getMobile());
+			dest.writeString(this.getMemberCard());
+			dest.writeInt(this.getConsumptionAmount());
+			dest.writeLong(this.getLastConsumption());
+			dest.writeParcelList(this.favorFoods, Food.FOOD_PARCELABLE_SIMPLE);
+			dest.writeParcelList(this.recommendFoods, Food.FOOD_PARCELABLE_SIMPLE);
 		}
 		
 	}
@@ -694,7 +709,15 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 			setConsumptionAmount(source.readInt());
 			
 		}else if(flag == MEMBER_PARCELABLE_COMPLEX){
-			
+			setMemberType(source.readParcel(MemberType.CREATOR));
+			setId(source.readInt());
+			setName(source.readString());
+			setMobile(source.readString());
+			setMemberCard(source.readString());
+			setConsumptionAmount(source.readInt());
+			setLastConsumption(source.readLong());
+			setFavorFoods(source.readParcelList(Food.CREATOR));
+			setRecommendFoods(source.readParcelList(Food.CREATOR));
 		}
 	}
 	
@@ -947,6 +970,14 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 		this.consumptionAmount = consumptionAmount;
 	}
 
+	public long getLastConsumption(){
+		return this.lastConsumption;
+	}
+	
+	public void setLastConsumption(long lastConsumption){
+		this.lastConsumption = lastConsumption;
+	}
+	
 	public float getTotalConsumption() {
 		return totalConsumption;
 	}
@@ -1016,6 +1047,40 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 		return this.privateComment != null && this.privateComment.getComment() != "";
 	}
 
+	public List<Food> getFavorFoods(){
+		return Collections.unmodifiableList(this.favorFoods);
+	}
+	
+	public void setFavorFoods(List<Food> favorFoods){
+		if(favorFoods != null){
+			this.favorFoods.clear();
+			this.favorFoods.addAll(favorFoods);
+		}
+	}
+	
+	public void addFavorFood(Food favorFood){
+		if(favorFood != null){
+			favorFoods.add(favorFood);
+		}
+	}
+	
+	public List<Food> getRecommendFoods(){
+		return Collections.unmodifiableList(this.recommendFoods);
+	}
+	
+	public void addRecommendFood(Food recommendFood){
+		if(recommendFood != null){
+			this.recommendFoods.add(recommendFood);
+		}
+	}
+	
+	public void setRecommendFoods(List<Food> recommendFoods){
+		if(recommendFoods != null){
+			this.recommendFoods.clear();
+			this.recommendFoods.addAll(recommendFoods);
+		}
+	}
+	
 	@Override
 	public int compareTo(Member arg0) {
 		if(getId() > arg0.getId()){

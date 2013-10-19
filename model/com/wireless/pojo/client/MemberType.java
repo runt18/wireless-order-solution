@@ -448,7 +448,8 @@ public class MemberType implements Jsonable, Parcelable{
 			dest.writeString(this.getName());
 			
 		}else if(flag == MEMBER_TYPE_PARCELABLE_COMPLEX){
-			
+			dest.writeInt(this.getTypeId());
+			dest.writeString(this.getName());
 		}		
 	}
 
@@ -460,7 +461,8 @@ public class MemberType implements Jsonable, Parcelable{
 			setName(source.readString());
 			
 		}else if(flag == MEMBER_TYPE_PARCELABLE_COMPLEX){
-			
+			setTypeId(source.readInt());
+			setName(source.readString());
 		}
 	}
 

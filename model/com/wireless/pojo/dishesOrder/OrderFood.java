@@ -269,6 +269,11 @@ public class OrderFood implements Parcelable, Comparable<OrderFood>, Jsonable {
 		mFood.copyFrom(src);
 	}
 
+	public OrderFood(Food src, float amount){
+		mFood.copyFrom(src);
+		setCount(amount);
+	}
+	
 	public OrderFood(OrderFood src){
 		mFood.copyFrom(src.mFood);
 		this.mOrderDate = src.mOrderDate;
