@@ -410,6 +410,9 @@ class OrderHandler implements Runnable{
 					//handle the request to cancel interested in specific member
 					MemberDao.cancelInterestedIn(staff, new Parcel(request.body).readParcel(Member.CREATOR).getId());
 					response = new RespACK(request.header);
+				}else if(request.header.mode == Mode.MEMBER && request.header.type == Type.QUERY_MEMBER_DETAIL){
+					//handle the request to query member detail
+					response = new RespPackage(request.header, MemberDao.getMemberById(staff, new Parcel(request.body).readParcel(Member.CREATOR).getId()), Member.MEMBER_PARCELABLE_COMPLEX);
 				}
 			}
 			
