@@ -326,7 +326,6 @@ Ext.onReady(function(){
 	
 	new Ext.Panel({
 		renderTo : 'divDeltaReport',
-		width : parseInt(Ext.getDom('divDeltaReport').parentElement.style.width.replace(/px/g,'')),
 		height : parseInt(Ext.getDom('divDeltaReport').parentElement.style.height.replace(/px/g,'')),
 		layout : 'border',
 		items : [deptTree, deltaReportGrid],

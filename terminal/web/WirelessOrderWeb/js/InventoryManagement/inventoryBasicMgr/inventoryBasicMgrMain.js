@@ -652,17 +652,18 @@ Ext.onReady(function(){
 	
 	new Ext.Panel({
 		renderTo : 'divMaterial',
+		id : 'materialPanel',
 		layout : 'border',
-		width : parseInt(Ext.getDom('divMaterial').parentElement.style.width.replace(/px/g,'')),
+		//width : parseInt(Ext.getDom('divMaterial').parentElement.style.width.replace(/px/g,'')),
 		height : parseInt(Ext.getDom('divMaterial').parentElement.style.height.replace(/px/g,'')),
 		frame : true,
-		items : [materialCateTree, materialBasicGrid],
-		tbar : new Ext.Toolbar({
+		items : [materialCateTree, materialBasicGrid]
+/*		tbar : new Ext.Toolbar({
 			height : 55,
 			items : [btnAddMaterialCate, {
 			    xtype : 'tbtext',
 				text : '&nbsp;&nbsp;'
 			}, btnAddMaterial]
-		})
+		})*/
 	});
 });

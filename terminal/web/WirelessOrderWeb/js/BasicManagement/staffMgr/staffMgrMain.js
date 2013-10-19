@@ -861,8 +861,7 @@ Ext.onReady(function() {
 	staffGrid = new Ext.grid.GridPanel({
 		xtype : 'grid',
 		id : 'staffGrid',
-		anchor : '100%',
-		width : '60%',
+		width : 300,
 		region : 'west',
 		frame : true,
 		ds : staffStore,
@@ -926,7 +925,7 @@ Ext.onReady(function() {
 	
 	roleGrid = new Ext.grid.GridPanel({
 		xtype : 'grid',
-		id : 'roleGrid',
+		//id : 'roleGrid',
 		anchor : '100%',
 		width : '20%',
 		region : 'center',

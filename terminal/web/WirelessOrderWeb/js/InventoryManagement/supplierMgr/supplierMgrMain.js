@@ -456,10 +456,11 @@ Ext.onReady(function(){
 	
 	new Ext.Panel({
 		renderTo : 'divSupplier',//渲染到
+		id : 'supplierPanel',
 		//solve不跟随窗口的变化而变化
 		//width : parseInt(Ext.getDom('divSupplier').parentElement.style.width.replace(/px/g,'')),
 		height : parseInt(Ext.getDom('divSupplier').parentElement.style.height.replace(/px/g,'')),
-		layout:'fit',
+		layout:'border',
 		frame : true, //边框
 		//子集
 		items : [supplierGrid],

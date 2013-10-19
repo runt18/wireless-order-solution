@@ -53,7 +53,7 @@ Ext.onReady(function(){
 			xtype : 'panel',
 			layout : 'column',
 			defaults : {
-				xtype : 'panel',
+				//xtype : 'panel',
 				layout : 'form',
 				labelWidth : 80,
 				labelAlign : 'right',
@@ -224,20 +224,6 @@ Ext.onReady(function(){
 					disabled : true
 				}]
 			}, {
-				items : [{
-					xtype : 'textfield',
-					id : 'rd_txtMemberTastePref',
-					fieldLabel : '口味',
-					disabled : true
-				}]
-			}, {
-				items : [{
-					xtype : 'textfield',
-					id : 'rd_txtMemberTaboo',
-					fieldLabel : '忌讳',
-					disabled : true
-				}]
-			}, {
 				columnWidth : 1,
 				items : [{
 					xtype : 'textfield',
@@ -342,8 +328,6 @@ function rechargeBindMemberData(data){
 	var birthday = Ext.getCmp('rd_txtMemberBirthday');
 	var IDCard = Ext.getCmp('rd_txtMemberIDCard');
 	var company = Ext.getCmp('rd_txtMemberCompany');
-	var tastePref = Ext.getCmp('rd_txtMemberTastePref');
-	var taboo = Ext.getCmp('rd_txtMemberTaboo');
 	var contactAddress = Ext.getCmp('rd_txtMemberContactAddress');
 	var comment = Ext.getCmp('rd_txtMemberComment');
 	
@@ -376,8 +360,6 @@ function rechargeBindMemberData(data){
 	birthday.setValue(data['birthdayFormat']);
 	IDCard.setValue(data['idCard']);
 	company.setValue(data['company']);
-	tastePref.setValue(data['tastePref']);
-	taboo.setValue(data['taboo']);
 	contactAddress.setValue(data['contactAddress']);
 	comment.setValue(data['comment']);
 	

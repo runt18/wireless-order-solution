@@ -64,6 +64,7 @@ Ext.onReady(function(){
 		layout : 'border',
 		items : [{
 			region : 'west',
+			width : '50%',
 			frame : true,
 			contentEl : 'businessStatisticsSummaryInformation'
 		}, {
