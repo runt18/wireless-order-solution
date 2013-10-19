@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@android:color/transparent"
+    android:orientation="vertical" >
+
+    <LinearLayout
+        android:id="@+id/linearLayout_title_memberDetailItem"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical" >
+
+        <ImageView
+            android:layout_width="22.0dip"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="0.0dip"
+            android:layout_marginRight="10.0dip"
+            android:src="@drawable/i_drag" />
+
+        <TextView
+            android:id="@+id/txtView_desc_memberDetailItem"
+            android:layout_width="0.0dip"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="1.0"
+            android:gravity="left|center"
+            android:singleLine="true"
+            android:textSize="14.0sp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_vertical"
+            android:gravity="left|center"
+            android:singleLine="true"
+            android:textSize="12.0sp" />
+
+        <ImageView
+            android:id="@+id/imgView_arrow_memberDetailItem"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="10.0dip"
+            android:src="@drawable/arrow_down" />
+    </LinearLayout>
+
+    <GridView
+        android:id="@+id/gridView_memberDetailItem"
+        android:layout_width="match_parent"
+        android:layout_height="90dp"
+        android:horizontalSpacing="1dp"
+        android:numColumns="3"
+        android:verticalSpacing="1dp" >
+    </GridView>
+
+</LinearLayout>

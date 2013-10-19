@@ -2,10 +2,10 @@
 <CheckBox xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:background="@drawable/ask_dialog_item_selector"
+    android:background="@drawable/member_detail_food_selector"
     android:button="@null"
     android:gravity="center"
-    android:height="50dp"
+    android:height="40dp"
     android:width="60dp" >
 
 </CheckBox>
