@@ -29,6 +29,13 @@ public final class Type{
 	public final static byte MATCH_PIN = 21;
 	public final static byte PAY_TEMP_ORDER = 22;
 	
+	/* belong to member */
+	public final static byte QUERY_MEMBER = 1;
+	public final static byte QUERY_INTERESTED_MEMBER = 2;
+	public final static byte QUERY_MEMBER_DETAIL = 3;
+	public final static byte INTERESTED_IN_MEMBER = 4;
+	public final static byte CANCEL_INTERESTED_IN_MEMBER = 5;
+	
 	/* belong to OTA */
 	public final static byte CHECK_VER = 1;
 	public final static byte UPDATE_SYS = 2;
