@@ -305,4 +305,14 @@ public class TestMemberDao {
 		compareMember(expect, MemberDao.getMemberById(mStaff, expect.getId()));
 		compareMemberOperation(mo, MemberOperationDao.getTodayById(mo.getId()));
 	}
+	
+	@Test
+	public void testCalcFavorFoods() throws SQLException{
+		MemberDao.calcFavorFoods();
+	}
+	
+	@Test
+	public void testCalcRecommendFoods() throws SQLException{
+		MemberDao.calcRecommendFoods();
+	}
 }

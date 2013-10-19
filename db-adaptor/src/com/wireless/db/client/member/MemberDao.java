@@ -18,6 +18,7 @@ import com.wireless.pojo.client.MemberOperation.ChargeType;
 import com.wireless.pojo.client.MemberType;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.distMgr.Discount;
+import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.DateUtil;
 import com.wireless.util.SQLUtil;
@@ -82,7 +83,7 @@ public class MemberDao {
 		String sql;
 		sql = " SELECT "	+
 			  " M.member_id, M.restaurant_id, M.point, M.used_point, " +
-			  " M.base_balance, M.extra_balance, M.consumption_amount, M.used_balance," +
+			  " M.base_balance, M.extra_balance, M.consumption_amount, M.last_consumption, M.used_balance," +
 			  " M.total_consumption, M.total_point, M.total_charge, " +
 			  " M.member_card, M.name AS member_name, M.sex, M.create_date, " +
 			  " M.tele, M.mobile, M.birthday, M.id_card, M.company, M.contact_addr, M.comment, "	+
@@ -104,6 +105,7 @@ public class MemberDao {
 			member.setExtraBalance(dbCon.rs.getFloat("extra_balance"));
 			member.setUsedBalance(dbCon.rs.getFloat("used_balance"));
 			member.setConsumptionAmount(dbCon.rs.getInt("consumption_amount"));
+			member.setLastConsumption(dbCon.rs.getLong("last_consumption"));
 			member.setUsedPoint(dbCon.rs.getInt("used_point"));
 			member.setPoint(dbCon.rs.getInt("point"));
 			member.setTotalConsumption(dbCon.rs.getFloat("total_consumption"));
@@ -154,6 +156,42 @@ public class MemberDao {
 			
 			//Get the private comment to each member
 			eachMember.setPrivateComment(MemberCommentDao.getPrivateCommentByMember(dbCon, staff, eachMember));
+			
+			//Get the favor foods to each member
+			sql = " SELECT " +
+				  " F.food_id, F.food_alias, F.name, F.restaurant_id " +
+				  " FROM " + Params.dbName + ".member_favor_food MFF " +
+				  " JOIN " + Params.dbName + ".food F ON MFF.food_id = F.food_id " +
+				  " WHERE MFF.member_id = " + eachMember.getId() +
+				  " ORDER BY point DESC ";
+			dbCon.rs = dbCon.stmt.executeQuery(sql);
+			while(dbCon.rs.next()){
+				Food favorFood = new Food();
+				favorFood.setFoodId(dbCon.rs.getLong("food_id"));
+				favorFood.setAliasId(dbCon.rs.getInt("food_alias"));
+				favorFood.setName(dbCon.rs.getString("name"));
+				favorFood.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
+				eachMember.addFavorFood(favorFood);
+			}
+			dbCon.rs.close();
+			
+			//Get the recommend foods to each member
+			sql = " SELECT " +
+				  " F.food_id, F.food_alias, F.name, F.restaurant_id " +
+				  " FROM " + Params.dbName + ".member_recommend_food MRF " +
+				  " JOIN " + Params.dbName + ".food F ON MRF.food_id = F.food_id " +
+				  " WHERE MRF.member_id = " + eachMember.getId() +
+				  " ORDER BY point DESC ";
+			dbCon.rs = dbCon.stmt.executeQuery(sql);
+			while(dbCon.rs.next()){
+				Food recommendFood = new Food();
+				recommendFood.setFoodId(dbCon.rs.getLong("food_id"));
+				recommendFood.setAliasId(dbCon.rs.getInt("food_alias"));
+				recommendFood.setName(dbCon.rs.getString("name"));
+				recommendFood.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
+				eachMember.addRecommendFood(recommendFood);
+			}
+			dbCon.rs.close();
 		}
 		
 		return result;
