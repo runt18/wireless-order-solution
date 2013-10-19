@@ -30,7 +30,8 @@
 <script type="text/javascript">
 var Request = new URLParaQuery();
 var restaurantID = Request['restaurantID'];
-var index = 0;
+var tabIndex = 0;
+
 function addTab(id, title, url){
 	var tab = tabs.getComponent(id);
 	if(!tab){
@@ -47,12 +48,17 @@ function addTab(id, title, url){
 	        closable:true,
 	        listeners : {
 	        	resize : function(e,w,h){
- 	        		if(Ext.getCmp('panelReport')){
-	        			Ext.getCmp('panelReport').setWidth(w);
-	        		}
-	        		if(Ext.getCmp('panelSupplier')){
-	        			Ext.getCmp('panelSupplier').setWidth(w);
-	        		}
+	        		
+	        		//改变之前未加载, 不能获取
+	        		//alert(e.getEl().first().first().dom.firstChild);
+	        		//A计划
+ 	        		if(tabIndex != 0){
+ 	        			var p = e.getEl().first('div').first('div').first('div').first('div');
+	        			//alert(p.id);
+	        			Ext.getCmp(p.id).setWidth(w);
+	        			
+	        		} 
+ 	        		tabIndex ++;
 	        	}
 	        }
 	    });
@@ -79,21 +85,7 @@ var tabs = new Ext.TabPanel({
         icon: '../../images/home.jpg',
         iconCls : 'tab_home'
     }],
-    plugins: new Ext.ux.TabCloseMenu(),
-    listeners : {
-    	tabchange : function(thiz, t){
-/*     		//alert('tab'+t.getEl().getWidth());
-    		index ++;
-     		if(index > 0){
-        		if(Ext.getCmp('panelSupplier') != undefined){
-        			alert('tab'+t.getEl().getWidth());
-        			Ext.getCmp('panelSupplier').setWidth(t.getEl().getWidth());
-        		}
-    		}  */
-
-    		
-    	}
-    }
+    plugins: new Ext.ux.TabCloseMenu()
     
 });
 Ext.onReady(function(){
@@ -169,7 +161,7 @@ Ext.onReady(function(){
             	width : 200,
             	layout : 'border',
                 collapsible: true,
-                collapsed : true,
+               // collapsed : true,
                 margins:'0 0 0 5',
 				items : [tree]
             },
