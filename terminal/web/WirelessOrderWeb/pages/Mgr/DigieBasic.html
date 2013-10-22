@@ -56,7 +56,7 @@ function addTab(id, title, url){
  	        			var p = e.getEl().first('div').first('div').first('div').first('div');
 	        			//alert(p.id);
 	        			Ext.getCmp(p.id).setWidth(w);
-	        			
+	        			Ext.getCmp(p.id).setHeight(h);
 	        		} 
  	        		tabIndex ++;
 	        	}
@@ -190,6 +190,9 @@ Ext.onReady(function(){
 		});
     }); 
     
+     
+     
+     
 });	
 </script>
 </head>
