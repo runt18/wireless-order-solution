@@ -58,12 +58,12 @@ public class QueryFoodAssociationDao {
 		/**
 		 * Calculate point to each associated food, and sort it in descending order.
 		 * The calculation rule is as below,
-		 * point = associated_amount * weight
+		 * point = similarity * weight
 		 * where weight is equal or greater than zero.
 		 */
 		String sql;
 		sql = " SELECT " +
-			  " FA.associated_food_id, FA.associated_amount * FS.weight AS point " +
+			  " FA.associated_food_id, FA.similarity * FS.weight AS point " +
 			  " FROM " +
 			  Params.dbName + ".food_association FA " +
 			  " JOIN " + Params.dbName + ".food_statistics FS" + 

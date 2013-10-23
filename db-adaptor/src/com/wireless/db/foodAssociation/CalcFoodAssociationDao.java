@@ -32,27 +32,27 @@ public class CalcFoodAssociationDao {
 		List<Food> foods = FoodDao.getPureFoods(dbCon, null, null);		
 		
 		for(Food f : foods){
-			exec(dbCon, f.getFoodId());
+			exec(dbCon, f);
 		}
 	}
 	
-	public static void exec(long foodId) throws SQLException{
+	public static void exec(Food food) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			exec(dbCon, foodId);
+			exec(dbCon, food);
 		}finally{
 			dbCon.disconnect();
 		}
 	}
 	
-	public static void exec(DBCon dbCon, long foodId) throws SQLException{
+	public static void exec(DBCon dbCon, Food food) throws SQLException{
 		
 		String sql;
 		
 		//Get the id to orders contained the food
 		sql = " SELECT order_id FROM " + Params.dbName + ".order_food_history " +
-			  " WHERE " + " food_id = " + foodId + " GROUP BY order_id ";
+			  " WHERE " + " food_id = " + food.getFoodId() + " GROUP BY order_id ";
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		
 		StringBuilder orderIdCond = new StringBuilder();
@@ -72,20 +72,74 @@ public class CalcFoodAssociationDao {
 //				  " food_id = " + foodId;
 //			dbCon.stmt.executeUpdate(sql);
 			
-			//Calculate the top 10 most associated food.
+			//Get the total order amount to this restaurant.
+//			int totalOrderAmount = 0;
+//			
+//			sql = " SELECT COUNT(*) " + " FROM " + Params.dbName + ".order_history " + " WHERE " + " restaurant_id = " + food.getRestaurantId();
+//			dbCon.rs = dbCon.stmt.executeQuery(sql);
+//			if(dbCon.rs.next()){
+//				totalOrderAmount = dbCon.rs.getInt(1);
+//			}
+//			dbCon.rs.close();
+//			
+//			sql = " SET @total_order_amount = " + totalOrderAmount + ";";
+//			dbCon.stmt.execute(sql);
+//			
+//			//Calculate the top 10 most associated food.
+//			sql = " INSERT INTO " + Params.dbName + ".food_association" +
+//				  " (`food_id`, `associated_food_id`, `associated_amount`, `joint_probability`) " +
+//				  " SELECT " +
+//				  food.getFoodId() + "," +
+//				  " food_id AS associated_food_id, COUNT(food_id) AS associated_amount, " +
+//				  " COUNT(food_id) / @total_order_amount AS joint_probability " +
+//				  " FROM " +
+//				  " (( SELECT " + " order_id, food_id " + " FROM " + Params.dbName + ".order_food_history" +
+//				  " WHERE " + " order_id " + " IN ( " + orderIdCond + " ) " +
+//				  " GROUP BY " + " order_id, food_id ) " + " AS A ) " +
+//				  " WHERE food_id <> " + food.getFoodId() +
+//				  " GROUP BY " + " food_id " +
+//				  " ORDER BY associated_amount DESC " +
+//				  " LIMIT 10 ";
+//			dbCon.stmt.executeUpdate(sql);
+			
+			sql = " SET @food_id_to_calc = " + food.getFoodId() + ";";
+			dbCon.stmt.execute(sql);
+			
+			//Get the total order amount to this restaurant.
+			sql = " SELECT @total_order_amount := COUNT(*) FROM wireless_order_db.order_history WHERE restaurant_id IN (" + food.getRestaurantId() + "); ";
+			dbCon.stmt.execute(sql);
+			
+			//Get the probability to food.
+			sql = " SELECT @food_probability := probability FROM wireless_order_db.food_statistics WHERE food_id = @food_id_to_calc; ";
+			dbCon.stmt.execute(sql);
+			
+			//Calculate the similarity between food and its associated one.
 			sql = " INSERT INTO " + Params.dbName + ".food_association" +
-				  " (`food_id`, `associated_food_id`, `associated_amount`) " +
-				  " SELECT " +
-				  foodId + "," +
-				  " food_id AS associated_food_id, COUNT(food_id) AS associated_amount " +
-				  " FROM " +
-				  " (( SELECT " + " order_id, food_id " + " FROM " + Params.dbName + ".order_food_history" +
-				  " WHERE " + " order_id " + " IN ( " + orderIdCond + " ) " +
-				  " GROUP BY " + " order_id, food_id ) " + " AS A ) " +
-				  " WHERE food_id <> " + foodId +
-				  " GROUP BY " + " food_id " +
-				  " ORDER BY associated_amount DESC " +
-				  " LIMIT 10 ";
+				   " (`food_id`, `associated_food_id`, `associated_amount`, `joint_probability`, `similarity`) " +
+				   " SELECT " +
+				   " @food_id_to_calc, associated_food_id, COUNT(associated_food_id) AS associated_amount, " + 
+				   " COUNT(associated_food_id) / @total_order_amount AS joint_probability, " +
+				   " (COUNT(associated_food_id) / @total_order_amount) / SQRT(@food_probability * FS.probability) AS similarity " +
+				   " FROM (( " +
+				   " SELECT order_id, food_id AS associated_food_id FROM wireless_order_db.order_food_history WHERE order_id IN (" + orderIdCond + ") GROUP BY order_id, associated_food_id " +
+				   " ) AS A) " +
+				   " JOIN wireless_order_db.food_statistics FS ON A.associated_food_id = FS.food_id " +
+				   " WHERE associated_food_id <> @food_id_to_calc " +
+				   " GROUP BY A.associated_food_id " +
+				   " HAVING similarity IS NOT NULL " +
+				   " ORDER BY similarity DESC " +
+				   " LIMIT 20; ";
+			
+			dbCon.stmt.executeUpdate(sql);
+
+			//Get the max similarity to the food.
+			sql = " SELECT @max_similarity := MAX(similarity) FROM " + Params.dbName + ".food_association WHERE food_id = @food_id_to_calc";
+			dbCon.stmt.execute(sql);
+			
+			//Normalize the similarity.
+			sql = " UPDATE " + Params.dbName + ".food_association SET " +
+				  " similarity = similarity / @max_similarity " +
+				  " WHERE food_id = @food_id_to_calc";
 			dbCon.stmt.executeUpdate(sql);
 		}
 		

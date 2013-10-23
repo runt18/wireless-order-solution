@@ -34,27 +34,40 @@ public class CalcFoodWeightDao {
 	public static void exec(DBCon dbCon, int restaurantId) throws SQLException{
 		String sql;
 		
-		//Get the order amount to this restaurant.
-		int orderAmount = 0;
+		//Get the total order amount to this restaurant.
+		int totalOrderAmount = 0;
 		
 		sql = " SELECT COUNT(*) " + " FROM " + Params.dbName + ".order_history " + " WHERE " + " restaurant_id = " + restaurantId;
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		if(dbCon.rs.next()){
-			orderAmount = dbCon.rs.getInt(1);
+			totalOrderAmount = dbCon.rs.getInt(1);
 		}
 		dbCon.rs.close();
 		
-		if(orderAmount > 0){
-			sql = " SET @order_amount = " + orderAmount + ";";
+		if(totalOrderAmount > 0){
+			sql = " SET @total_order_amount = " + totalOrderAmount + ";";
 			dbCon.stmt.execute(sql);
 			
-			//Calculate the food weight to each food to this restaurant.
+			//Calculate the total order food amount to this restaurant.
+			sql = " SELECT SUM(order_count) FROM " + Params.dbName + ".order_food_history WHERE restaurant_id = " + restaurantId;
+			dbCon.rs = dbCon.stmt.executeQuery(sql);
+			int totalOrderFoodAmount = 0;
+			if(dbCon.rs.next()){
+				totalOrderFoodAmount = dbCon.rs.getInt(1);
+			}
+			dbCon.rs.close();
+			
+			sql = " SET @total_order_food_amount = " + totalOrderFoodAmount;
+			dbCon.stmt.execute(sql);
+			
+			//Calculate the food weight to each food to this restaurant using TF-IDF.
 			sql = " SELECT " +
 				  " A.food_id, " +
-				  " (COUNT(A.order_id) / @order_amount * LOG(@order_amount / COUNT(A.order_id))) AS weight " +
+				  " COUNT(A.order_id) / @total_order_amount AS probability, " +
+				  " (SUM(A.order_food_amount) / @total_order_food_amount * LOG(@total_order_amount / COUNT(A.order_id))) AS weight " +
 				  " FROM " + 
 				  " ((SELECT " +
-				  " order_id, food_id " + " FROM " + Params.dbName + ".order_food_history " +
+				  " order_id, food_id, SUM(order_count) AS order_food_amount " + " FROM " + Params.dbName + ".order_food_history " +
 				  " WHERE " + 
 				  " food_id IN ( " +
 				  " SELECT food_id FROM " + Params.dbName + ".food" + " WHERE " +
@@ -79,11 +92,13 @@ public class CalcFoodWeightDao {
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
 			while(dbCon.rs.next()){
 				final int foodId = dbCon.rs.getInt("food_id");
+				final float probability = dbCon.rs.getFloat("probability");
 				final float weight = dbCon.rs.getFloat("weight");
 				
-				//Insert the weight of each food to this restaurant.
-				sql = " UPDATE " + Params.dbName + ".food_statistics " +
-					  " SET weight = " + weight + 
+				//Insert the probability & weight of each food to this restaurant.
+				sql = " UPDATE " + Params.dbName + ".food_statistics SET " +
+					  " weight = " + weight +
+					  " ,probability = " + probability +
 					  " WHERE " +
 					  " food_id = " + foodId;
 				dbCon.stmt.addBatch(sql);

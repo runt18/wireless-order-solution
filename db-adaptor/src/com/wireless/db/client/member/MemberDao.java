@@ -1143,7 +1143,7 @@ public class MemberDao {
 		sql = " SELECT MOH.member_id " +
 			  " FROM " + Params.dbName + ".member_operation_history MOH " +
 			  " JOIN " + Params.dbName + ".member M ON M.member_id = MOH.member_id " +
-			  " GROUP  BY member_id ";
+			  " GROUP BY member_id ";
 		List<Integer> memberIds = new ArrayList<Integer>();
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		while(dbCon.rs.next()){
@@ -1177,6 +1177,16 @@ public class MemberDao {
 			  " HAVING point <> 0 " +
 			  " ORDER BY point DESC " + 
 			  " LIMIT 10 ";
+		dbCon.stmt.executeUpdate(sql);
+		
+		//Get the max point from member favor foods
+		sql = " SELECT @max_favor_food_point := MAX(point) FROM " + Params.dbName + ".member_favor_food WHERE member_id = " + memberId;
+		dbCon.stmt.execute(sql);
+		
+		//将喜欢度归一化
+		sql = " UPDATE " + Params.dbName + ".member_favor_food SET " +
+			  " point = point / @max_favor_food_point " +
+			  " WHERE member_id = " + memberId;
 		dbCon.stmt.executeUpdate(sql);
 	}
 
@@ -1239,10 +1249,9 @@ public class MemberDao {
 		sql = " INSERT INTO " + Params.dbName + ".member_recommend_food " +
 			  " (`member_id`, `food_id`, `point`) " +
 			  " SELECT MAX(MFF.member_id) AS member_id, FA.associated_food_id, " +
-			  " MAX(FA.associated_amount * MFF.point * FS.weight) AS associated_point " +
+			  " SUM(FA.similarity * MFF.point) AS associated_point " +
 			  " FROM " + Params.dbName + ".food_association FA " +
 			  " JOIN " + Params.dbName + ".member_favor_food MFF ON MFF.food_id = FA.food_id " +
-			  " JOIN " + Params.dbName + ".food_statistics FS ON FS.food_id = FA.associated_food_id " +
 			  " WHERE 1 = 1 " +
 			  " AND MFF.member_id = " + memberId +
 			  " AND FA.associated_food_id NOT IN (SELECT food_id FROM wireless_order_db.member_favor_food WHERE member_id = " + memberId + ") " +
