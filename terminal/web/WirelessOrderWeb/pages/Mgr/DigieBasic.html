@@ -47,6 +47,9 @@ function addTab(id, title, url){
 	        //html: '<iframe scrolling="auto" frameborder="0" width="100%" height="100%" src="' + url + '?'+ strEncode("restaurantID=" + restaurantID, "mi") + '"></iframe>',
 	        closable:true,
 	        listeners : {
+	        	render : function(){
+	        		tabIndex = 0;
+	        	},
 	        	resize : function(e,w,h){
 	        		
 	        		//改变之前未加载, 不能获取
@@ -54,9 +57,9 @@ function addTab(id, title, url){
 	        		//A计划
  	        		if(tabIndex != 0){
  	        			var p = e.getEl().first('div').first('div').first('div').first('div');
-	        			//alert(p.id);
 	        			Ext.getCmp(p.id).setWidth(w);
 	        			Ext.getCmp(p.id).setHeight(h);
+
 	        		} 
  	        		tabIndex ++;
 	        	}
@@ -189,9 +192,6 @@ Ext.onReady(function(){
 			}
 		});
     }); 
-    
-     
-     
      
 });	
 </script>

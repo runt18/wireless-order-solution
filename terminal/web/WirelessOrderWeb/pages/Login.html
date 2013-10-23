@@ -175,7 +175,7 @@ function setCookie(cookiename, cookievalue, days) {
 }
 </script>
 <script type="text/javascript">
-	
+	var getRestaurantID;
 	var id = getCookie('restaurant');
 	function getStaff(restaurantID){
 		$.post('../QueryStaff.do', {
@@ -235,6 +235,7 @@ function setCookie(cookiename, cookievalue, days) {
   							if(jr.root == ''){
   								alert('账号输入错误');
   							}else{
+  								getRestaurantID = jr.root[0].id;
   								$('#form').hide();
   								$('#staffForm').show();
   								if($('#rememberRestaurant').is(':checked')){
@@ -265,10 +266,10 @@ function setCookie(cookiename, cookievalue, days) {
  			$.post('../OperateStaff.do', {
 				pin : $('#selectStaff').val(),
 				pwd : MD5($('#pwd').val()),
-				restaurantID : id
+				restaurantID : getRestaurantID
  			}, function(result){
  				if(result.success){
- 					location.href = 'Mgr/DigieBasic.html?'+strEncode('restaurantID='+ getCookie('restaurant'), KEYS);
+ 					location.href = 'Mgr/DigieBasic.html?'+strEncode('restaurantID='+ getRestaurantID, KEYS);
  				}else{
  					alert(result.msg);
  				}
