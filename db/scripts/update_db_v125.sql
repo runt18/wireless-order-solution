@@ -111,4 +111,31 @@ CREATE TABLE IF NOT EXISTS `wireless_order_db`.`member_comment` (
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8;
 
+-- -----------------------------------------------------
+-- Table `wireless_order_db`.`weixin_restaurant`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `wireless_order_db`.`weixin_restaurant` ;
+
+CREATE TABLE IF NOT EXISTS `wireless_order_db`.`weixin_restaurant` (
+  `weixin_serial` VARCHAR(45) NOT NULL,
+  `restaurant_id` INT NOT NULL,
+  `weixin_serial_crc` INT NOT NULL,
+  INDEX `ix_finance_crc` (`weixin_serial_crc` ASC))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
+-- -----------------------------------------------------
+-- Add the field 'joint_probability' & 'mutual_info' to table 'food_association'
+-- -----------------------------------------------------
+ALTER TABLE `wireless_order_db`.`food_association` 
+ADD COLUMN `joint_probability` FLOAT NOT NULL DEFAULT 0 AFTER `associated_amount`,
+ADD COLUMN `similarity` FLOAT NOT NULL DEFAULT 0 AFTER `joint_probability`;
+
+-- -----------------------------------------------------
+-- Add the field 'probability' to table 'food_statistics'
+-- -----------------------------------------------------
+ALTER TABLE `wireless_order_db`.`food_statistics` 
+ADD COLUMN `probability` FLOAT NOT NULL DEFAULT 0 AFTER `order_cnt`;
+
+
 SET SQL_SAFE_UPDATES = @OLD_SAFE_UPDATES;
