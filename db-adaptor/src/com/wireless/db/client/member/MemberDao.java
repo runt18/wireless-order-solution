@@ -105,7 +105,10 @@ public class MemberDao {
 			member.setExtraBalance(dbCon.rs.getFloat("extra_balance"));
 			member.setUsedBalance(dbCon.rs.getFloat("used_balance"));
 			member.setConsumptionAmount(dbCon.rs.getInt("consumption_amount"));
-			member.setLastConsumption(dbCon.rs.getLong("last_consumption"));
+			Timestamp ts = dbCon.rs.getTimestamp("last_consumption");
+			if(ts != null){
+				member.setLastConsumption(ts.getTime());
+			}
 			member.setUsedPoint(dbCon.rs.getInt("used_point"));
 			member.setPoint(dbCon.rs.getInt("point"));
 			member.setTotalConsumption(dbCon.rs.getFloat("total_consumption"));
@@ -117,7 +120,6 @@ public class MemberDao {
 			member.setCreateDate(dbCon.rs.getTimestamp("create_date").getTime());
 			member.setTele(dbCon.rs.getString("tele"));
 			member.setMobile(dbCon.rs.getString("mobile"));
-			Timestamp ts;
 			ts = dbCon.rs.getTimestamp("birthday");
 			if(ts != null){
 				member.setBirthday(ts.getTime());

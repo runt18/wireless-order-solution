@@ -85,7 +85,7 @@ public class MemberCommentDao {
 	 * 			throws if failed to execute any SQL statement
 	 */
 	public static MemberComment getPrivateCommentByMember(DBCon dbCon, Staff staff, Member member) throws SQLException{
-		List<MemberComment> results = getComments(dbCon, staff, "AND MC.member_id = " + member.getId() + " AND MC.type = " + Type.PRIVATE.getVal(), null);
+		List<MemberComment> results = getComments(dbCon, staff, " AND MC.staff_id = " + staff.getId() + " AND MC.member_id = " + member.getId() + " AND MC.type = " + Type.PRIVATE.getVal(), null);
 		if(results.isEmpty()){
 			return MemberComment.newPrivateComment(staff, member, "");
 		}else{
@@ -106,10 +106,10 @@ public class MemberCommentDao {
 	private static List<MemberComment> getComments(DBCon dbCon, Staff staff, String extraCond, String orderClause) throws SQLException{ 
 		String sql;
 		sql = " SELECT " +
-			  " MC.staff_id, MC.member_id, MC.type, MC.comment, MC.last_modified " +
+			  " S.staff_id, S.name, MC.member_id, MC.type, MC.comment, MC.last_modified " +
 			  " FROM " + Params.dbName + ".member_comment MC " +
+			  " JOIN " + Params.dbName + ".staff S ON MC.staff_id = S.staff_id " +
 			  " WHERE 1 = 1 " +
-			  " AND MC.staff_id = " + staff.getId() + " " +
 			  (extraCond != null ? extraCond : "") + " " +
 			  (orderClause != null ? orderClause : "");
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
@@ -117,7 +117,7 @@ public class MemberCommentDao {
 		List<MemberComment> comments = new ArrayList<MemberComment>();
 		while(dbCon.rs.next()){
 			if(MemberComment.Type.valueOf(dbCon.rs.getInt("type")) == MemberComment.Type.PUBLIC){
-				MemberComment comment = MemberComment.newPublicComment(new Staff(dbCon.rs.getInt("staff_id")),
+				MemberComment comment = MemberComment.newPublicComment(new Staff(dbCon.rs.getInt("staff_id"), dbCon.rs.getString("name")),
 						  											   new Member(dbCon.rs.getInt("member_id")),
 						  											   dbCon.rs.getString("comment"));
 				comment.setLastModified(dbCon.rs.getTimestamp("last_modified").getTime());
