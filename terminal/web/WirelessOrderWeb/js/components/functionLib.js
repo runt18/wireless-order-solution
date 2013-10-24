@@ -11,7 +11,7 @@ Ext.Ajax.on('requestcomplete',checkUserSessionStatus, this);
 function checkUserSessionStatus(conn,response,options){     
    //Ext重新封装了response对象
 
-    if(response.getResponseHeader.session_status){ 
+    if(response.getResponseHeader && response.getResponseHeader.session_status){ 
   		var interval = 3;
 		var action = '<br>&nbsp;&nbsp;&nbsp;<span id="returnInterval" style="color:red;"></span>&nbsp;之后自动跳转';
 		new Ext.util.TaskRunner().start({
