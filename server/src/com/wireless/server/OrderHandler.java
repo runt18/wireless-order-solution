@@ -11,6 +11,7 @@ import java.net.Socket;
 import java.sql.SQLException;
 import java.util.List;
 
+import com.wireless.db.client.member.MemberCommentDao;
 import com.wireless.db.client.member.MemberDao;
 import com.wireless.db.foodAssociation.QueryFoodAssociationDao;
 import com.wireless.db.foodGroup.CalcFoodGroupDao;
@@ -41,6 +42,8 @@ import com.wireless.pack.resp.RespOTAUpdate;
 import com.wireless.pack.resp.RespPackage;
 import com.wireless.parcel.Parcel;
 import com.wireless.pojo.client.Member;
+import com.wireless.pojo.client.MemberComment;
+import com.wireless.pojo.client.MemberComment.CommitBuilder;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.foodGroup.Pager;
 import com.wireless.pojo.menuMgr.Food;
@@ -410,13 +413,22 @@ class OrderHandler implements Runnable{
 					//handle the request to cancel interested in specific member
 					MemberDao.cancelInterestedIn(staff, new Parcel(request.body).readParcel(Member.CREATOR).getId());
 					response = new RespACK(request.header);
+					
 				}else if(request.header.mode == Mode.MEMBER && request.header.type == Type.QUERY_MEMBER_DETAIL){
 					//handle the request to query member detail
 					response = new RespPackage(request.header, MemberDao.getMemberById(staff, new Parcel(request.body).readParcel(Member.CREATOR).getId()), Member.MEMBER_PARCELABLE_COMPLEX);
+					
+				}else if(request.header.mode == Mode.MEMBER && request.header.type == Type.COMMIT_MEMBER_COMMENT){
+					//handle the request to commit member comment
+					MemberComment comment = new Parcel(request.body).readParcel(MemberComment.CREATOR);
+					if(comment.isPublic()){
+						MemberCommentDao.commit(staff, CommitBuilder.newPublicBuilder(staff.getId(), comment.getMember().getId(), comment.getComment()));
+					}else{
+						MemberCommentDao.commit(staff, CommitBuilder.newPrivateBuilder(staff.getId(), comment.getMember().getId(), comment.getComment()));
+					}
+					response = new RespACK(request.header);
 				}
 			}
-			
-
 
 			//send the response to terminal
 			response.writeToStream(out);
