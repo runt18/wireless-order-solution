@@ -35,6 +35,7 @@ public final class Type{
 	public final static byte QUERY_MEMBER_DETAIL = 3;
 	public final static byte INTERESTED_IN_MEMBER = 4;
 	public final static byte CANCEL_INTERESTED_IN_MEMBER = 5;
+	public final static byte COMMIT_MEMBER_COMMENT = 6;
 	
 	/* belong to OTA */
 	public final static byte CHECK_VER = 1;
