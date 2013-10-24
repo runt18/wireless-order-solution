@@ -694,6 +694,8 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 			dest.writeLong(this.getLastConsumption());
 			dest.writeParcelList(this.favorFoods, Food.FOOD_PARCELABLE_SIMPLE);
 			dest.writeParcelList(this.recommendFoods, Food.FOOD_PARCELABLE_SIMPLE);
+			dest.writeParcel(this.privateComment, 0);
+			dest.writeParcelList(this.publicComments, 0);
 		}
 		
 	}
@@ -718,6 +720,8 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 			setLastConsumption(source.readLong());
 			setFavorFoods(source.readParcelList(Food.CREATOR));
 			setRecommendFoods(source.readParcelList(Food.CREATOR));
+			setPrivateComment(source.readParcel(MemberComment.CREATOR));
+			setPublicComments(source.readParcelList(MemberComment.CREATOR));
 		}
 	}
 	
@@ -851,11 +855,17 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 	}
 	
 	public String getName() {
-		return name.trim();
+		if(name == null){
+			return "";
+		}else{
+			return name.trim();
+		}
 	}
 	
 	public void setName(String name) {
-		this.name = name.trim();
+		if(name != null){
+			this.name = name.trim();
+		}
 	}
 	
 	public Sex getSex() {
@@ -1044,7 +1054,7 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 	}
 	
 	public boolean hasPrivateComment(){
-		return this.privateComment != null && this.privateComment.getComment() != "";
+		return this.privateComment != null && this.privateComment.getComment().trim().length() != 0;
 	}
 
 	public List<Food> getFavorFoods(){

@@ -6,10 +6,12 @@ import java.util.List;
 import java.util.Map;
 
 import com.wireless.json.Jsonable;
+import com.wireless.parcel.Parcel;
+import com.wireless.parcel.Parcelable;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.DateUtil;
 
-public class MemberComment implements Jsonable{
+public class MemberComment implements Jsonable, Parcelable{
 
 	public static enum Type{
 		PUBLIC(1, "公开"),
@@ -135,6 +137,14 @@ public class MemberComment implements Jsonable{
 	public Type getType(){
 		return type;
 	}
+
+	public boolean isPublic(){
+		return type == Type.PUBLIC;
+	}
+	
+	public boolean isPrivate(){
+		return type == Type.PRIVATE;
+	}
 	
 	public void setType(Type type){
 		this.type = type;
@@ -209,4 +219,34 @@ public class MemberComment implements Jsonable{
 	public List<Object> toJsonList(int flag) {
 		return null;
 	}
+
+	@Override
+	public void writeToParcel(Parcel dest, int flag) {
+		dest.writeString(this.getComment());
+		dest.writeLong(this.getLastModified());
+		dest.writeByte(this.getType().getVal());
+		dest.writeParcel(this.getStaff(), Staff.ST_PARCELABLE_SIMPLE);
+		dest.writeParcel(this.getMember(), Member.MEMBER_PARCELABLE_SIMPLE);
+	}
+
+	@Override
+	public void createFromParcel(Parcel source) {
+		setComment(source.readString());
+		setLastModified(source.readLong());
+		setType(Type.valueOf(source.readByte()));
+		setStaff(source.readParcel(Staff.CREATOR));
+		setMember(source.readParcel(Member.CREATOR));
+	}
+	
+	public final static Parcelable.Creator<MemberComment> CREATOR = new Parcelable.Creator<MemberComment>() {
+		
+		public MemberComment[] newInstance(int size) {
+			return new MemberComment[size];
+		}
+		
+		public MemberComment newInstance() {
+			return new MemberComment();
+		}
+	};
+
 }

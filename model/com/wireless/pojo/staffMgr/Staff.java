@@ -232,9 +232,9 @@ public class Staff implements Parcelable, Jsonable{
 		setId(id);
 	}
 	
-	public Staff(String name, int restaurantId){
+	public Staff(int id, String name){
+		setId(id);
 		setName(name);
-		setRestaurantId(restaurantId);
 	}
 	
 	private Staff(StaffInsertBuilder builder){
@@ -343,6 +343,8 @@ public class Staff implements Parcelable, Jsonable{
 	public void writeToParcel(Parcel dest, int flag) {
 		dest.writeByte(flag);
 		if(flag == ST_PARCELABLE_SIMPLE){
+			dest.writeString(this.name);
+			dest.writeInt(this.id);
 			
 		}else if(flag == ST_PARCELABLE_COMPLEX){
 			dest.writeString(this.name);
@@ -356,6 +358,8 @@ public class Staff implements Parcelable, Jsonable{
 	public void createFromParcel(Parcel source) {
 		short flag = source.readByte();
 		if(flag == ST_PARCELABLE_SIMPLE){
+			this.name = source.readString();
+			this.id = source.readInt();
 			
 		}else if(flag == ST_PARCELABLE_COMPLEX){
 			this.name = source.readString();
@@ -366,7 +370,7 @@ public class Staff implements Parcelable, Jsonable{
 		}
 	}
 	
-	public final static Parcelable.Creator<Staff> ST_CREATOR = new Parcelable.Creator<Staff>() {
+	public final static Parcelable.Creator<Staff> CREATOR = new Parcelable.Creator<Staff>() {
 		
 		public Staff[] newInstance(int size) {
 			return new Staff[size];
