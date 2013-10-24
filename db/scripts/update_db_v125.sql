@@ -9,10 +9,18 @@ USE wireless_order_db;
 ALTER TABLE `wireless_order_db`.`member_type` DROP COLUMN `discount_type` , DROP COLUMN `discount_id` ;
 
 -- -----------------------------------------------------
--- Add the field 'liveness' & 'member_card'
+-- Add the field 'last_consumption' to table 'member'
 -- -----------------------------------------------------
-ALTER TABLE `wireless_order_db`.`member` ADD COLUMN `liveness` FLOAT NULL DEFAULT 0  AFTER `member_card` , 
-ADD COLUMN `last_consumption` DATETIME NULL DEFAULT NULL  AFTER `liveness` ;
+ALTER TABLE `wireless_order_db`.`member` ADD COLUMN `last_consumption` DATETIME NULL DEFAULT NULL  AFTER `member_card` ;
+
+-- -----------------------------------------------------
+-- Update the field 'last_consumption' according to the records of 'member_operation_history'
+-- -----------------------------------------------------
+UPDATE 
+wireless_order_db.member M,
+(SELECT member_id, MAX(operate_date) AS last_consumption FROM wireless_order_db.member_operation_history WHERE operate_type = 2 GROUP BY member_id) AS A
+SET M.last_consumption = A.last_consumption
+WHERE M.member_id = A.member_id;
 
 -- -----------------------------------------------------
 -- Table `wireless_order_db`.`member_type_discount`
