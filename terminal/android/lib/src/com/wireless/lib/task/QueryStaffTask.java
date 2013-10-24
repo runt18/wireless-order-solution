@@ -44,7 +44,7 @@ public class QueryStaffTask extends AsyncTask<Void, Void, List<Staff>>{
 			if(deviceId != null){
 				ProtocolPackage resp = ServerConnector.instance().ask(new ReqQueryStaff(new Device(deviceId)));
 				if(resp.header.type == Type.ACK){
-					staffs.addAll(new Parcel(resp.body).readParcelList(Staff.ST_CREATOR));
+					staffs.addAll(new Parcel(resp.body).readParcelList(Staff.CREATOR));
 					
 				}else{
 					ErrorCode errCode = new Parcel(resp.body).readParcel(ErrorCode.CREATOR);
