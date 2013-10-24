@@ -1,24 +1,31 @@
 package com.wireless.ui;
 
 import java.lang.ref.WeakReference;
+import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.Locale;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.FragmentActivity;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
+import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -26,17 +33,23 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import com.wireless.common.WirelessOrder;
 import com.wireless.exception.BusinessException;
 import com.wireless.parcel.MemberParcel;
 import com.wireless.parcel.OrderParcel;
 import com.wireless.pojo.client.Member;
+import com.wireless.pojo.client.MemberComment;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.menuMgr.Food;
 
 public class MemberDetailActivity extends FragmentActivity {
+	
+	private final int MEMBER_FAVOR_TAB = 0;
+	private final int MEMBER_COMMENT_TAB = 1;
+	private int mCurrentTab = MEMBER_FAVOR_TAB;
 	
 	public final static String KEY_MEMBER_ID = "KEY_MEMBER_ID";
 	
@@ -45,6 +58,8 @@ public class MemberDetailActivity extends FragmentActivity {
 	private Member mMember;
 	
 	private QueryMemberDetailTask mQueryMemberDetailTask;
+	
+	private CommitMemberCommentTask mCommitMemberCommentTask;
 	
 	private Handler mRefreshMemberDetailHandler;
 	
@@ -91,73 +106,149 @@ public class MemberDetailActivity extends FragmentActivity {
 			((TextView)theActivity.findViewById(R.id.txtView_type_memberDetail)).setText(theActivity.mMember.getMemberType().getName());
 			//设置电话号码
 			((TextView)theActivity.findViewById(R.id.txtView_mobile_memberDetail)).setText(theActivity.mMember.getMobile());
-			//设置光顾次数
-			((TextView)theActivity.findViewById(R.id.txtView_content_1_memberDetail)).setText("光顾" + theActivity.mMember.getConsumptionAmount() + "次");
-			//FIXME 设置最近一次消费
-			((TextView)theActivity.findViewById(R.id.txtView_content_2_memberDetail)).setText("最近一次光顾在10月1日");
+			//FIXME 
+			if(theActivity.mMember.getConsumptionAmount() > 0){
+				//设置光顾次数
+				((TextView)theActivity.findViewById(R.id.txtView_content_1_memberDetail)).setText("光顾" + theActivity.mMember.getConsumptionAmount() + "次");
+				//设置最近一次消费
+				((TextView)theActivity.findViewById(R.id.txtView_content_2_memberDetail)).setText("最近一次光顾在" + new SimpleDateFormat("M月d日", Locale.getDefault()).format(theActivity.mMember.getLastConsumption()));
+			}else{
+				((TextView)theActivity.findViewById(R.id.txtView_content_1_memberDetail)).setText("Ta还没光顾过你哦");
+				((TextView)theActivity.findViewById(R.id.txtView_content_2_memberDetail)).setText("");
+			}
 			
-			ListView memberDetailListView = (ListView)theActivity.findViewById(R.id.listView_memberDetail);
-			memberDetailListView.setAdapter(new BaseAdapter(){
+			theActivity.findViewById(R.id.listView_favorFood_memberDetail).setVisibility(View.GONE);
+			theActivity.findViewById(R.id.button_favorFood_memberDetail).setPressed(false);
+			
+			theActivity.findViewById(R.id.relativeLayout_comment_memberDetail).setVisibility(View.GONE);
+			theActivity.findViewById(R.id.button_comment_memberDetail).setPressed(false);
+			
+			if(msg.what == theActivity.MEMBER_FAVOR_TAB){ //刷新"喜好"
+				theActivity.mCurrentTab = theActivity.MEMBER_FAVOR_TAB;
+				theActivity.findViewById(R.id.button_favorFood_memberDetail).setPressed(true);
 
-				@Override
-				public int getCount() {
-					return 2;
-				}
-
-				@Override
-				public Object getItem(int position) {
-					return null;
-				}
-
-				@Override
-				public long getItemId(int position) {
-					return position;
-				}
-
-				@Override
-				public View getView(int position, View convertView, ViewGroup parent) {
-					final View layout;
-					if(convertView == null){
-						layout = LayoutInflater.from(theActivity.getApplicationContext()).inflate(R.layout.member_detail_item, null);
-					}else{
-						layout = convertView;
+				ListView memberDetailListView = (ListView)theActivity.findViewById(R.id.listView_favorFood_memberDetail);
+				memberDetailListView.setVisibility(View.VISIBLE);
+				memberDetailListView.setAdapter(new BaseAdapter(){
+	
+					@Override
+					public int getCount() {
+						return 2;
 					}
-
-					final GridView foodGridView = (GridView)layout.findViewById(R.id.gridView_memberDetailItem);
-
-					if(position == 0){
-						((TextView)layout.findViewById(R.id.txtView_desc_memberDetailItem)).setText("Ta喜欢的菜品");
-						foodGridView.setAdapter(theActivity.new FoodAdaptor(theActivity.mMember.getFavorFoods()));
-						
-					}else if(position == 1){
-						((TextView)layout.findViewById(R.id.txtView_desc_memberDetailItem)).setText("向Ta推荐");
-						foodGridView.setAdapter(theActivity.new FoodAdaptor(theActivity.mMember.getRecommendFoods()));
+	
+					@Override
+					public Object getItem(int position) {
+						return null;
 					}
-					
-					((LinearLayout)layout.findViewById(R.id.linearLayout_title_memberDetailItem)).setOnClickListener(new OnClickListener(){
-
-						@Override
-						public void onClick(View v) {
-							ImageView arrowImgView = (ImageView)layout.findViewById(R.id.imgView_arrow_memberDetailItem);
+	
+					@Override
+					public long getItemId(int position) {
+						return position;
+					}
+	
+					@Override
+					public View getView(int position, View convertView, ViewGroup parent) {
+						final View layout;
+						if(convertView == null){
+							layout = LayoutInflater.from(theActivity.getApplicationContext()).inflate(R.layout.member_detail_item, null);
+						}else{
+							layout = convertView;
+						}
+	
+						final GridView foodGridView = (GridView)layout.findViewById(R.id.gridView_memberDetailItem);
+	
+						if(position == 0){
+							((TextView)layout.findViewById(R.id.txtView_desc_memberDetailItem)).setText("Ta喜欢的菜品");
+							foodGridView.setAdapter(theActivity.new FoodAdaptor(theActivity.mMember.getFavorFoods()));
 							
-							if(foodGridView.isEnabled()){
-								arrowImgView.setImageResource(R.drawable.arrow_up);
-								foodGridView.setVisibility(View.GONE);
-								foodGridView.setEnabled(false);
-							}else{
-								arrowImgView.setImageResource(R.drawable.arrow_down);
-								foodGridView.setVisibility(View.VISIBLE);
-								foodGridView.setEnabled(true);
-							}
+						}else if(position == 1){
+							((TextView)layout.findViewById(R.id.txtView_desc_memberDetailItem)).setText("向Ta推荐");
+							foodGridView.setAdapter(theActivity.new FoodAdaptor(theActivity.mMember.getRecommendFoods()));
 						}
 						
-					});
-			
-					
-					return layout;
-				}
+						((LinearLayout)layout.findViewById(R.id.linearLayout_title_memberDetailItem)).setOnClickListener(new OnClickListener(){
+	
+							@Override
+							public void onClick(View v) {
+								ImageView arrowImgView = (ImageView)layout.findViewById(R.id.imgView_arrow_memberDetailItem);
+								
+								if(foodGridView.isEnabled()){
+									arrowImgView.setImageResource(R.drawable.arrow_up);
+									foodGridView.setVisibility(View.GONE);
+									foodGridView.setEnabled(false);
+								}else{
+									arrowImgView.setImageResource(R.drawable.arrow_down);
+									foodGridView.setVisibility(View.VISIBLE);
+									foodGridView.setEnabled(true);
+								}
+							}
+							
+						});
 				
-			});
+						
+						return layout;
+					}
+					
+				});
+				
+			}else if(msg.what == theActivity.MEMBER_COMMENT_TAB){	
+				theActivity.mCurrentTab = theActivity.MEMBER_COMMENT_TAB;
+				//刷新"评论"Tab
+				theActivity.findViewById(R.id.relativeLayout_comment_memberDetail).setVisibility(View.VISIBLE);
+				theActivity.findViewById(R.id.button_comment_memberDetail).setPressed(true);
+				
+				ListView publicCommentListView = (ListView)theActivity.findViewById(R.id.listView_publicComment_memberDetail);
+				//刷新公开评论
+				publicCommentListView.setAdapter(new BaseAdapter(){
+					
+					List<MemberComment> mComments = theActivity.mMember.getPublicComments();
+					
+					@Override
+					public int getCount() {
+						return mComments.size();
+					}
+	
+					@Override
+					public Object getItem(int position) {
+						return null;
+					}
+	
+					@Override
+					public long getItemId(int position) {
+						return position;
+					}
+	
+					@Override
+					public View getView(int position, View convertView, ViewGroup parent) {
+						final TextView txtView;
+						if(convertView == null){
+							txtView = new TextView(theActivity);
+							txtView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
+							txtView.setTextColor(theActivity.getResources().getColor(R.color.white));
+						}else{
+							txtView = (TextView)convertView;
+						}
+	
+						MemberComment comment = mComments.get(position);
+						txtView.setText(comment.getStaff().getName() + " " +
+										new SimpleDateFormat("MM月dd日", Locale.getDefault()).format(comment.getLastModified()) + "说 " +
+										comment.getComment());
+						
+						return txtView;
+					}
+					
+				});
+				
+				//刷新私人评论
+				if(theActivity.mMember.hasPrivateComment()){
+					((TextView)theActivity.findViewById(R.id.txtView_privateCmment_memberDetail))
+											.setText("我" +
+												     new SimpleDateFormat("MM月dd日", Locale.getDefault()).format(theActivity.mMember.getPrivateComment().getLastModified()) + "说 " +
+													 theActivity.mMember.getPrivateComment().getComment());
+				}else{
+					((TextView)theActivity.findViewById(R.id.txtView_privateCmment_memberDetail)).setText("您还没有评论过Ta哦");
+				}
+			}
 		}
 	}
 	
@@ -216,12 +307,99 @@ public class MemberDetailActivity extends FragmentActivity {
 
 		//初始化点菜数量的刷新Handler
 		mRefreshOrderAmountHandler = new RefreshOrderAmountHandler(this);
+		
+		//"喜好"Button
+		View favorBtn = findViewById(R.id.button_favorFood_memberDetail);
+		favorBtn.setPressed(true);
+		favorBtn.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				mRefreshMemberDetailHandler.sendEmptyMessage(MEMBER_FAVOR_TAB);
+			}
+		});
+		
+		//"评论"Button
+		View commentBtn = findViewById(R.id.button_comment_memberDetail);
+		commentBtn.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				mRefreshMemberDetailHandler.sendEmptyMessage(MEMBER_COMMENT_TAB);
+			}
+		});
+		
+		//"公开/私人"评论开关
+		final ToggleButton toggleBtnPublic = (ToggleButton)findViewById(R.id.toggleButton_setPublic_memberDetail);
+		
+		//"发表"Button
+		((Button)findViewById(R.id.button_commitComment_memberDetail)).setOnClickListener(new OnClickListener(){
+			@Override
+			public void onClick(View v) {
+				String commentValue = ((EditText)findViewById(R.id.editText_commitComment_memberDetail)).getText().toString().trim();
+				if(commentValue.length() != 0){
+					if(toggleBtnPublic.isChecked()){
+						mCommitMemberCommentTask = new CommitMemberCommentTask(MemberComment.CommitBuilder.newPublicBuilder(WirelessOrder.loginStaff.getId(), 
+								  																							mMember.getId(),
+								  																							commentValue));
+					}else{
+						mCommitMemberCommentTask = new CommitMemberCommentTask(MemberComment.CommitBuilder.newPrivateBuilder(WirelessOrder.loginStaff.getId(), 
+																															 mMember.getId(),
+																															 commentValue));
+					}
+					mCommitMemberCommentTask.execute();
+				}else{
+					Toast.makeText(MemberDetailActivity.this, "还没有输入任何评论哦", Toast.LENGTH_SHORT).show();
+				}
+			}
+		});
 	}
 	
 	@Override
 	public void onDestroy(){
 		super.onDestroy();
-		mQueryMemberDetailTask.cancel(true);
+		if(mQueryMemberDetailTask != null){
+			mQueryMemberDetailTask.cancel(true);
+		}
+		if(mCommitMemberCommentTask != null){
+			mCommitMemberCommentTask.cancel(true);
+		}
+	}
+	
+	/**
+	 * 提交评论请求
+	 */
+	private class CommitMemberCommentTask extends com.wireless.lib.task.CommitMemberCommentTask{
+		
+		private ProgressDialog _progDialog;
+		
+		CommitMemberCommentTask(MemberComment.CommitBuilder builder){
+			super(WirelessOrder.loginStaff, builder);
+		}
+		
+		@Override
+		protected void onPreExecute(){
+			_progDialog = ProgressDialog.show(MemberDetailActivity.this, "", "正在发表评论...请稍候", true);
+		}
+		
+		@Override
+		protected void onPostExecute(Void args){
+			//make the progress dialog disappeared
+			_progDialog.dismiss();
+			
+			if(mBusinessException != null){
+				new AlertDialog.Builder(MemberDetailActivity.this)
+							   .setTitle("提示")
+							   .setMessage(mBusinessException.getMessage())
+							   .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+								   	public void onClick(DialogInterface dialog, int id) {
+								   		dialog.dismiss();
+								   	}
+							   }).show();
+				
+			}else{
+				mQueryMemberDetailTask = new QueryMemberDetailTask(mMember);
+				mQueryMemberDetailTask.execute();
+			}
+		}
 	}
 	
 	/**
@@ -261,7 +439,12 @@ public class MemberDetailActivity extends FragmentActivity {
 							   }).show();
 				
 			}else{
-				mRefreshMemberDetailHandler.sendEmptyMessage(0);
+				//隐藏软键盘
+				EditText editTxtComment = (EditText)findViewById(R.id.editText_commitComment_memberDetail);
+				editTxtComment.setText("");
+				((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(editTxtComment.getWindowToken(), 0);
+				//重新请求更新页面
+				mRefreshMemberDetailHandler.sendEmptyMessage(mCurrentTab);
 			}
 		}
 	}

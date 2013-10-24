@@ -78,8 +78,8 @@ public class MemberListActivity extends FragmentActivity {
 			activity.findViewById(R.id.button_interested_memberList).setPressed(false);
 			
 			//设置底部数量显示
-			((TextView)activity.findViewById(R.id.txtView_amount_allMember)).setText("" + activity.mMembers.size());
-			((TextView)activity.findViewById(R.id.txtView_amount_interestedMember)).setText("" + activity.mInterestedMember.size());
+			((TextView)activity.findViewById(R.id.txtView_allMemberAmount_memberList)).setText("" + activity.mMembers.size());
+			((TextView)activity.findViewById(R.id.txtView_interestedMemberAmount_memberList)).setText("" + activity.mInterestedMember.size());
 			
 			switch(msg.what){
 			case ALL_MEMBER_PAGE:
@@ -298,7 +298,6 @@ public class MemberListActivity extends FragmentActivity {
 
 				@Override
 				public void onClick(View v) {
-					//TODO
 					//跳转到会员信息Activity
 					Intent intent = new Intent(MemberListActivity.this, MemberDetailActivity.class);
 					Bundle bundle = new Bundle();
@@ -354,12 +353,22 @@ public class MemberListActivity extends FragmentActivity {
 	 */
 	private class QueryMemberTask extends com.wireless.lib.task.QueryMemberTask{
 		
+		@Override
+		protected void onPreExecute(){
+			findViewById(R.id.progressBar_allMember_memberList).setVisibility(View.VISIBLE);
+			findViewById(R.id.txtView_allMemberAmount_memberList).setVisibility(View.GONE);
+		}
+		
 		QueryMemberTask(){
 			super(WirelessOrder.loginStaff);
 		}
 		
 		@Override
 		protected void onPostExecute(List<Member> members){
+			
+			findViewById(R.id.progressBar_allMember_memberList).setVisibility(View.GONE);
+			findViewById(R.id.txtView_allMemberAmount_memberList).setVisibility(View.VISIBLE);
+			
 			if(mBusinessException != null){
 				Toast.makeText(MemberListActivity.this, "会员列表更新失败", Toast.LENGTH_SHORT).show();				
 			}else{
@@ -380,7 +389,17 @@ public class MemberListActivity extends FragmentActivity {
 		}
 		
 		@Override
+		protected void onPreExecute(){
+			findViewById(R.id.progressBar_interestedMember_memberList).setVisibility(View.VISIBLE);
+			findViewById(R.id.txtView_interestedMemberAmount_memberList).setVisibility(View.GONE);
+		}
+		
+		@Override
 		protected void onPostExecute(List<Member> members){
+
+			findViewById(R.id.progressBar_interestedMember_memberList).setVisibility(View.GONE);
+			findViewById(R.id.txtView_interestedMemberAmount_memberList).setVisibility(View.VISIBLE);
+
 			if(mBusinessException != null){
 				Toast.makeText(MemberListActivity.this, "关注的会员列表更新失败", Toast.LENGTH_SHORT).show();				
 			}else{
