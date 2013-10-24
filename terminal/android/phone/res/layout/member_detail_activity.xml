@@ -67,15 +67,138 @@
             android:text="最近一次光顾在10月1日"
             android:textColor="@color/white"
             android:textSize="20sp" />
-
     </RelativeLayout>
 
-    <ListView
-        android:id="@+id/listView_memberDetail"
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="10dp"
-        android:background="@drawable/weather_next_bg" >
-    </ListView>
+        android:layout_marginTop="10dp" >
+
+        <ListView
+            android:id="@+id/listView_favorFood_memberDetail"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_above="@+id/linearLayout_below_memberDetail"
+            android:background="@drawable/weather_next_bg"
+            android:visibility="visible" >
+        </ListView>
+
+        <RelativeLayout
+            android:id="@+id/relativeLayout_comment_memberDetail"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_above="@+id/linearLayout_below_memberDetail"
+            android:visibility="gone" >
+
+            <TextView
+                android:id="@+id/txtView_publicCmment_memberDetail"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="大家评论"
+                android:textColor="@color/yellow"
+                android:textSize="12sp" />
+
+            <ListView
+                android:id="@+id/listView_publicComment_memberDetail"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_above="@+id/txtView_privateCmmentTip_memberDetail"
+                android:layout_below="@+id/txtView_publicCmment_memberDetail" >
+            </ListView>
+
+            <TextView
+                android:id="@+id/txtView_privateCmmentTip_memberDetail"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_above="@+id/txtView_privateCmment_memberDetail"
+                android:text="我的评论"
+                android:textColor="@color/yellow"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/txtView_privateCmment_memberDetail"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_above="@+id/relativeLayout_commitComment_memberDetail"
+                android:text="我 10月15日 说ta &quot;欠他一顿饭和一支红酒，下次记得&quot;"
+                android:textColor="@color/white"
+                android:singleLine="true"
+                android:textSize="15sp" />
+
+            <RelativeLayout
+                android:id="@+id/relativeLayout_commitComment_memberDetail"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_marginTop="5dp" >
+
+                <EditText
+                    android:id="@+id/editText_commitComment_memberDetail"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_toLeftOf="@+id/toggleButton_setPublic_memberDetail"
+                    android:gravity="center_vertical"
+                    android:hint="填写对Ta的评论哦" />
+
+                <Button
+                    android:id="@+id/button_commitComment_memberDetail"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignBottom="@+id/editText_commitComment_memberDetail"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginBottom="4dp"
+                    android:layout_marginTop="4dp"
+                    android:text="发表" />
+
+                <ToggleButton
+                    android:id="@+id/toggleButton_setPublic_memberDetail"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignBottom="@+id/button_commitComment_memberDetail"
+                    android:layout_alignTop="@+id/button_commitComment_memberDetail"
+                    android:layout_toLeftOf="@+id/button_commitComment_memberDetail"
+                    android:textOff="私人"
+                    android:textOn="公开" />
+            </RelativeLayout>
+        </RelativeLayout>
+
+        <LinearLayout
+            android:id="@+id/linearLayout_below_memberDetail"
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:layout_alignParentBottom="true"
+            android:baselineAligned="false"
+            android:gravity="center"
+            android:weightSum="2" >
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1" >
+
+                <ImageButton
+                    android:id="@+id/button_favorFood_memberDetail"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/transparent"
+                    android:scaleType="fitXY"
+                    android:src="@drawable/sellout_on_sale_selector" />
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1" >
+
+                <ImageButton
+                    android:id="@+id/button_comment_memberDetail"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/transparent"
+                    android:scaleType="fitXY"
+                    android:src="@drawable/sellout_off_sale_selector" />
+            </RelativeLayout>
+        </LinearLayout>
+    </RelativeLayout>
 
 </LinearLayout>
