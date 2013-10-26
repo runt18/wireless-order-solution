@@ -52,7 +52,7 @@ public class ShiftContent extends ConcreteContent {
 		}
 		
 		//generate the shift detail string
-		StringBuffer var1 = new StringBuffer();
+		StringBuilder var1 = new StringBuilder();
 		var1.append(new Grid4ItemsContent(new String[]{"收款", "账单数", "金额", "实收"}, pos4Item, mPrintType, mStyle) + "\r\n");
 		
 		var1.append(new Grid4ItemsContent(
@@ -98,7 +98,7 @@ public class ShiftContent extends ConcreteContent {
 		//replace the $(var_1) with the shift detail
 		_template = _template.replace(PVar.VAR_1, var1);		
 		
-		StringBuffer var2 = new StringBuffer();
+		StringBuilder var2 = new StringBuilder();
 		var2.append(new Grid2ItemsContent("折扣金额：" + _shiftDetail.getDiscountIncome(), pos2Item, "账单数：" + _shiftDetail.getDiscountAmount(), getStyle()) + SEP);
 		var2.append(new Grid2ItemsContent("赠送金额：" + _shiftDetail.getGiftIncome(), pos2Item, "账单数：" + _shiftDetail.getGiftAmount(), getStyle()) + SEP);
 		var2.append(new Grid2ItemsContent("退菜金额：" + _shiftDetail.getCancelIncome(), pos2Item, "账单数：" + _shiftDetail.getCancelAmount(), getStyle()) + SEP);
@@ -111,7 +111,7 @@ public class ShiftContent extends ConcreteContent {
 		_template = _template.replace(PVar.VAR_2, var2);
 
 		
-		StringBuffer var3 = new StringBuffer();
+		StringBuilder var3 = new StringBuilder();
 		var3.append(new Grid4ItemsContent(new String[]{ "部门", "折扣", "赠送", "金额" }, pos4Item, mPrintType, mStyle).toString());
 		for(IncomeByDept deptIncome : _shiftDetail.getDeptIncome()){
 			var3.append("\r\n");

@@ -62,7 +62,7 @@ public class SummaryContent extends ConcreteContent {
 		}
 		
 		if(mOrder.hasChildOrder()){
-			StringBuffer tblInfo = new StringBuffer();
+			StringBuilder tblInfo = new StringBuilder();
 			for(Order childOrder : mOrder.getChildOrder()){
 				tblInfo.append(childOrder.getDestTbl().getAliasId() + (childOrder.getDestTbl().getName().trim().length() == 0 ? "" : ("(" + mOrder.getDestTbl().getName() + ")"))).append(",");
 			}

@@ -20,7 +20,7 @@ public class ComboDetail4ListContent extends ConcreteContent {
 	@Override
 	public String toString(){
 		if(_food.asFood().isCombo()){
-			StringBuffer var = new StringBuffer();
+			StringBuilder var = new StringBuilder();
 			var.append(new FoodDetailContent(_format, _food, mStyle).toString());
 			for(Food subFood : _food.asFood().getChildFoods()){
 				var.append("\r\n").append(" |-").append(subFood.getName() + "(" + NumericUtil.float2String2(subFood.getAmount() * _food.getCount()) + ")");

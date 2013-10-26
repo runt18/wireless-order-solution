@@ -30,7 +30,7 @@ public class FoodListContent extends ConcreteContent {
 	 */
 	@Override
 	public String toString(){
-		StringBuffer var = new StringBuffer();
+		StringBuilder var = new StringBuilder();
 		int cnt = 0;
 		for(OrderFood of : _foods){
 			if(of.asFood().isCombo()){

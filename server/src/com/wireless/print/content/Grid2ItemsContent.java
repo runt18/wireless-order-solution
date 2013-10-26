@@ -48,7 +48,7 @@ public class Grid2ItemsContent extends ConcreteContent {
 				nSpace = mPos - mItem1.getBytes("GBK").length;
 			}
 
-			StringBuffer space = new StringBuffer();
+			StringBuilder space = new StringBuilder();
 			for(int i = 0; i < nSpace; i++){
 				space.append(" ");
 			}

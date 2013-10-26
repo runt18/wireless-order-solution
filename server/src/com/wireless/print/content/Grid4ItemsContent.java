@@ -39,19 +39,19 @@ public class Grid4ItemsContent extends ConcreteContent {
 //		}
 		
 		try{
-			StringBuffer space1 = new StringBuffer();
+			StringBuilder space1 = new StringBuilder();
 			int nSpace = _pos[0] - _items[0].getBytes("GBK").length;
 			for(int i = 0; i < nSpace; i++){
 				space1.append(" ");
 			}
 			
-			StringBuffer space2 = new StringBuffer();
+			StringBuilder space2 = new StringBuilder();
 			nSpace = _pos[1] - _items[0].getBytes("GBK").length - space1.length() - _items[1].getBytes("GBK").length;
 			for(int i = 0; i < nSpace; i++){
 				space2.append(" ");
 			}
 			
-			StringBuffer space3 = new StringBuffer();
+			StringBuilder space3 = new StringBuilder();
 			nSpace = _pos[2] - _items[0].getBytes("GBK").length - space1.length() - _items[1].getBytes("GBK").length - space2.length() - _items[2].getBytes("GBK").length;
 			for(int i = 0; i < nSpace; i++){
 				space3.append(" ");

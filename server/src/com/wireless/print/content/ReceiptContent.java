@@ -89,7 +89,7 @@ public class ReceiptContent extends ConcreteContent {
 		//replace the "$(waiter)"
 		_template = _template.replace(PVar.WAITER_NAME, _waiter);
 		
-		StringBuffer tblInfo = new StringBuffer();
+		StringBuilder tblInfo = new StringBuilder();
 		if(mOrder.hasChildOrder()){
 			for(Order childOrder : mOrder.getChildOrder()){
 				tblInfo.append(childOrder.getDestTbl().getAliasId() + (childOrder.getDestTbl().getName().trim().length() == 0 ? "" : ("(" + mOrder.getDestTbl().getName() + ")"))).append(",");
@@ -163,7 +163,7 @@ public class ReceiptContent extends ConcreteContent {
 			line2 = "";
 		}
 
-		StringBuffer line3 = new StringBuffer();
+		StringBuilder line3 = new StringBuilder();
 		Float discount = mOrder.calcDiscountPrice();
 		if(discount != 0){
 			line3.append("’€ø€£∫" + NumericUtil.CURRENCY_SIGN + NumericUtil.float2String(discount));

@@ -24,7 +24,7 @@ public class MemberReceiptContent extends ConcreteContent {
 	
 	@Override
 	public String toString(){
-		StringBuffer s = new StringBuffer();
+		StringBuilder s = new StringBuilder();
 		
 		s.append(new ExtraFormatDecorator(
 					new CenterAlignedDecorator(mRestaurant.getName(), getStyle()), ExtraFormatDecorator.LARGE_FONT_1X)).append(SEP);

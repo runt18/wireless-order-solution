@@ -23,7 +23,7 @@ public class RightAlignedDecorator extends ConcreteContentDecorator {
 			 * and replace the $(space_left) with it.
 			 */
 			int leftSpaceAmt = mLen - _content.toString().getBytes("GBK").length;
-			StringBuffer space = new StringBuffer();
+			StringBuilder space = new StringBuilder();
 			for(int i = 0; i < leftSpaceAmt; i++){
 				space.append(' ');
 			}
