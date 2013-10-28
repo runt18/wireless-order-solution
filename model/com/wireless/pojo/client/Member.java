@@ -323,6 +323,7 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 	private long createDate;			// 创建时间
 	private MemberType memberType;		// 会员类型
 	private String memberCard;			// 会员卡号
+	private boolean attentioned = false;
 	//Ta喜欢的菜品
 	private List<Food> favorFoods = new ArrayList<Food>();
 	//向Ta推荐的菜品
@@ -527,7 +528,7 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 	 * 			the charge type referred to {@link ChargeType}
 	 * @return the member operation to this charge
 	 */
-	public MemberOperation charge(float chargeMoney, ChargeType chargeType){
+	public MemberOperation charge(float chargeMoney, float deltaMoney, ChargeType chargeType){
 		
 		MemberOperation mo = MemberOperation.newMO(getId(), getName(), getMobile(), getMemberCard());
 		
@@ -535,15 +536,39 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 		mo.setChargeMoney(chargeMoney);
 		mo.setChargeType(chargeType);
 		
-		float deltaBase = chargeMoney;
-		float deltaExtra = chargeMoney * Math.abs(getMemberType().getChargeRate() - 1);
+		//float deltaBase = chargeMoney;
+		//float deltaExtra = chargeMoney * Math.abs(getMemberType().getChargeRate() - 1);
 
 		totalCharge += chargeMoney;
-		baseBalance += deltaBase;
-		extraBalance += deltaExtra;
+		baseBalance += chargeMoney;
+		extraBalance += deltaMoney;
 		
-		mo.setDeltaBaseMoney(deltaBase);
-		mo.setDeltaExtraMoney(deltaExtra);
+		mo.setDeltaBaseMoney(chargeMoney);
+		mo.setDeltaExtraMoney(deltaMoney);
+		
+		mo.setRemainingBaseMoney(baseBalance);
+		mo.setRemainingExtraMoney(extraBalance);
+		mo.setRemainingPoint(point);
+		
+		return mo;
+	}
+	
+	
+	public MemberOperation takeMoney(float takeMoney, float deltaMoney){
+		MemberOperation mo = MemberOperation.newMO(getId(), getName(), getMobile(), getMemberCard());
+		
+		mo.setOperationType(OperationType.TAKE_MONEY);
+		mo.setChargeType(ChargeType.CASH);
+		mo.setChargeMoney(-takeMoney);
+		
+		//float deltaBase = takeMoney;
+		//float deltaExtra = takeMoney * Math.abs(getMemberType().getChargeRate() - 1);
+
+		baseBalance -= takeMoney;
+		extraBalance -= deltaMoney;
+		
+		mo.setDeltaBaseMoney(-takeMoney);
+		mo.setDeltaExtraMoney(-deltaMoney);
 		
 		mo.setRemainingBaseMoney(baseBalance);
 		mo.setRemainingExtraMoney(extraBalance);
@@ -694,8 +719,6 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 			dest.writeLong(this.getLastConsumption());
 			dest.writeParcelList(this.favorFoods, Food.FOOD_PARCELABLE_SIMPLE);
 			dest.writeParcelList(this.recommendFoods, Food.FOOD_PARCELABLE_SIMPLE);
-			dest.writeParcel(this.privateComment, 0);
-			dest.writeParcelList(this.publicComments, 0);
 		}
 		
 	}
@@ -720,8 +743,6 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 			setLastConsumption(source.readLong());
 			setFavorFoods(source.readParcelList(Food.CREATOR));
 			setRecommendFoods(source.readParcelList(Food.CREATOR));
-			setPrivateComment(source.readParcel(MemberComment.CREATOR));
-			setPublicComments(source.readParcelList(MemberComment.CREATOR));
 		}
 	}
 	
@@ -774,6 +795,7 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 		jm.put("memberCard", this.memberCard);
 		jm.put("publicComment", this.publicComments);
 		jm.put("privateComment", this.privateComment);
+		jm.put("acctendtioned", this.attentioned);
 		return Collections.unmodifiableMap(jm);
 	}
 
@@ -856,16 +878,13 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 	
 	public String getName() {
 		if(name == null){
-			return "";
-		}else{
-			return name.trim();
+			name = "";
 		}
+		return name.trim();
 	}
 	
 	public void setName(String name) {
-		if(name != null){
-			this.name = name.trim();
-		}
+		this.name = name.trim();
 	}
 	
 	public Sex getSex() {
@@ -1054,7 +1073,7 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 	}
 	
 	public boolean hasPrivateComment(){
-		return this.privateComment != null && this.privateComment.getComment().trim().length() != 0;
+		return this.privateComment != null && this.privateComment.getComment() != "";
 	}
 
 	public List<Food> getFavorFoods(){
@@ -1090,7 +1109,14 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 			this.recommendFoods.addAll(recommendFoods);
 		}
 	}
-	
+	public boolean getAttentioned() {
+		return attentioned;
+	}
+
+	public void setAttentioned(boolean attentioned) {
+		this.attentioned = attentioned;
+	}
+
 	@Override
 	public int compareTo(Member arg0) {
 		if(getId() > arg0.getId()){

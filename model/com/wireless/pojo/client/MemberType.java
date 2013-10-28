@@ -54,7 +54,8 @@ public class MemberType implements Jsonable, Parcelable{
 	public static enum Attribute{
 		
 		CHARGE(0, "充值"),		//充值
-		POINT(1, "积分");		//积分
+		POINT(1, "积分"),		//积分
+		INTERESTED(2, "关注");
 		//COUPON(2);			//优惠
 		
 		private final int val;

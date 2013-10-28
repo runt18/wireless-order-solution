@@ -8,6 +8,7 @@ public class PlanError extends ErrorEnum{
 	public static final ErrorCode DISCOUNT_DELETE_FAIL = build(9498, "操作失败, 删除折扣方案基础信息失败, 该方案不存在或已被删除.");
 	public static final ErrorCode DISCOUNT_UPDATE_FAIL = build(9497, "操作失败, 更新折扣方案基础信息失败, 请检查数据内容是否正确.");
 	public static final ErrorCode DISCOUNT_DELETE_HAS_KITCHEN = build(9496, "操作失败, 该方案下还有分厨折扣信息, 不允许删除.");
+	public static final ErrorCode DISCOUNT_DELETE_HAS_MEMBER = build(9497, "操作失败, 该方案有会员在使用, 不允许删除.");
 	
 	public static final ErrorCode DISCOUNT_PLAN_INSERT_FAIL = build(9479, "操作失败, 添加分厨折扣方案信息失败, 请检查数据内容是否正确.");
 	public static final ErrorCode DISCOUNT_PLAN_DELETE_FAIL = build(9478, "操作失败, 删除分厨折扣方案信息失败, 该方案不存在或已被删除.");

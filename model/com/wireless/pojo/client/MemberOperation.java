@@ -1,5 +1,6 @@
 package com.wireless.pojo.client;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -13,21 +14,24 @@ public class MemberOperation implements Jsonable {
 	
 	/**
 	 * 操作类型
-	 * 1-充值,  2-消费,  3-积分消费,  4-积分调整,  5-金额调整
+	 * 1-充值,  2-消费,  3-积分消费,  4-积分调整,  5-金额调整,	6-取款
 	 * @author WuZY
 	 */
 	public static enum OperationType{
-		CHARGE(			1, 	"充值", 			"CZ"), 
-		CONSUME(		2, 	"消费", 			"XF"),
-		POINT_CONSUME(	3, 	"积分消费",		"JFXF"),
-		POINT_ADJUST(	4, 	"积分调整", 		"JFTZ"),
-		BALANCE_ADJUST(	5, 	"金额调整", 		"CZTZ");
+		CHARGE(		2,	1, 	"充值", 			"CZ"), 
+		CONSUME(		1, 2, 	"消费", 			"XF"),
+		POINT_CONSUME(3,	3, 	"积分消费",		"JFXF"),
+		POINT_ADJUST(	3, 4, 	"积分调整", 		"JFTZ"),
+		BALANCE_ADJUST(4,	5, 	"金额调整", 		"CZTZ"),
+		TAKE_MONEY(	2, 6, 	"取款",  	    "QK");
 		
+		private final int type;
 		private final int value;			//
 		private final String name;			//
 		private final String prefix; 	//流水号前缀
 		
-		OperationType(int value, String name, String prefix){
+		OperationType(int type, int value, String name, String prefix){
+			this.type = type;
 			this.value = value;
 			this.name = name;
 			this.prefix = prefix;
@@ -48,6 +52,17 @@ public class MemberOperation implements Jsonable {
 			throw new IllegalArgumentException("The operation value(val = " + val + ") passed is invalid.");
 		}
 		
+		public static List<OperationType> typeOf(int type){
+			List<OperationType> list = new ArrayList<OperationType>();
+			for(OperationType ot : values()){
+				if(ot.getType() == type){
+					list.add(ot);
+				}
+			}
+			return list;
+			//throw new IllegalArgumentException("The operation value(val = " + type + ") passed is invalid.");
+		}
+		
 		public int getValue() {
 			return value;
 		}
@@ -58,6 +73,10 @@ public class MemberOperation implements Jsonable {
 		
 		public String getPrefix() {
 			return prefix;
+		}
+		
+		public int getType(){
+			return type;
 		}
 	}
 	
@@ -122,8 +141,10 @@ public class MemberOperation implements Jsonable {
 	private int orderId;
 	private ChargeType chargeType;
 	private float chargeMoney;
+	private float takeMoney;
 	private float deltaBaseMoney;
 	private float deltaExtraMoney;
+	//private float deltaTotalMoney = this.deltaBaseMoney + this.deltaExtraMoney;
 	private int deltaPoint;
 	private float remainingBaseMoney;
 	private float remainingExtraMoney;
@@ -145,12 +166,13 @@ public class MemberOperation implements Jsonable {
 		return mo;
 	}
 	
-	public float getDeltaTotalMoney(){
-		return this.deltaBaseMoney + this.deltaExtraMoney;
-	}
+/*	public float getDeltaTotalMoney(){
+		return this.deltaTotalMoney;
+		
+	}*/
 	
 	public float getRemainingTotalMoney(){
-		return this.remainingBaseMoney + this.remainingExtraMoney;
+		return this.remainingExtraMoney;
 	}
 	
 	@Override
@@ -169,7 +191,7 @@ public class MemberOperation implements Jsonable {
 		jm.put("remainingExtraMoney", this.remainingExtraMoney);
 		jm.put("remainingPoint", this.remainingPoint);
 		jm.put("comment", this.comment);
-		jm.put("deltaTotalMoney", this.getDeltaTotalMoney());
+		//jm.put("deltaTotalMoney", this.getDeltaTotalMoney());
 		jm.put("remainingTotalMoney", this.getRemainingTotalMoney());
 		jm.put("operateDateFormat", DateUtil.format(this.operateDate));
 		if(this.member != null){
@@ -188,6 +210,7 @@ public class MemberOperation implements Jsonable {
 			jm.put("chargeTypeText", this.chargeType.getName());
 			jm.put("chargeTypeValue", this.chargeType.getValue());
 			jm.put("chargeMoney", this.chargeMoney);
+			jm.put("takeMoney", this.takeMoney);
 		}
 		
 		return Collections.unmodifiableMap(jm);
@@ -382,10 +405,22 @@ public class MemberOperation implements Jsonable {
 	public void setDeltaPoint(int deltaPoint) {
 		this.deltaPoint = deltaPoint;
 	}
+	
+/*	public void setDeltaTotalMoney(float deltaTotalMoney){
+		this.deltaTotalMoney = deltaTotalMoney;
+	}*/
 	public int getRemainingPoint() {
 		return remainingPoint;
 	}
 	
+	public float getTakeMoney() {
+		return takeMoney;
+	}
+
+	public void setTakeMoney(float takeMoney) {
+		this.takeMoney = takeMoney;
+	}
+
 	public void setRemainingPoint(int remainingPoint) {
 		this.remainingPoint = remainingPoint;
 	}
