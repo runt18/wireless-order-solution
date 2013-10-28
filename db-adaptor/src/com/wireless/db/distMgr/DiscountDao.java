@@ -572,10 +572,10 @@ public class DiscountDao {
 	 */
 	public static int deleteDiscount(DBCon dbCon, Discount pojo) throws BusinessException, SQLException{
 		int count = 0;
-		String selectSQL = "SELECT count(discount_id) count FROM " +  Params.dbName + ".discount_plan WHERE discount_id = " + pojo.getId();
+		String selectSQL = "SELECT count(discount_id) count FROM " +  Params.dbName + ".member_type_discount WHERE discount_id = " + pojo.getId();
 		dbCon.rs = dbCon.stmt.executeQuery(selectSQL);
 		if(dbCon.rs != null && dbCon.rs.next() && dbCon.rs.getInt("count") > 0){
-			throw new BusinessException(PlanError.DISCOUNT_DELETE_HAS_KITCHEN);
+			throw new BusinessException(PlanError.DISCOUNT_DELETE_HAS_MEMBER);
 		}
 		String deleteSQL = "DELETE FROM " +  Params.dbName + ".discount " + " WHERE restaurant_id = " + pojo.getRestaurantId() + " AND discount_id = " + pojo.getId();
 		count = dbCon.stmt.executeUpdate(deleteSQL);
@@ -638,7 +638,7 @@ public class DiscountDao {
 		int count = 0;
 		try{
 			dbCon.connect();
-			count = DiscountDao.insertDiscountPlan(new DBCon(), pojo);
+			count = DiscountDao.insertDiscountPlan(dbCon, pojo);
 			if(count == 0){
 				throw new BusinessException(PlanError.DISCOUNT_PLAN_INSERT_FAIL);
 			}

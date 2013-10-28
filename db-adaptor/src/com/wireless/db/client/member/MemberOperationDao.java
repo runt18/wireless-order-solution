@@ -71,8 +71,8 @@ public class MemberOperationDao {
 						   (mo.getOperationType() == OperationType.CONSUME ? mo.getPayType().getVal() : "NULL") + "," +
 						   (mo.getOperationType() == OperationType.CONSUME ? mo.getPayMoney() : "NULL") + "," + 
 						   (mo.getOperationType() == OperationType.CONSUME ? mo.getOrderId() : "NULL") + "," +
-						   (mo.getOperationType() == OperationType.CHARGE ? mo.getChargeType().getValue() : "NULL") + "," + 
-						   (mo.getOperationType() == OperationType.CHARGE ? mo.getChargeMoney() : "NULL") + "," + 
+						   (mo.getOperationType() == OperationType.CHARGE ? mo.getChargeType().getValue() : (mo.getOperationType() == OperationType.TAKE_MONEY ? mo.getChargeType().getValue() : "NULL")) + "," + 
+						   (mo.getOperationType() == OperationType.CHARGE ? mo.getChargeMoney() : (mo.getOperationType() == OperationType.TAKE_MONEY ? mo.getChargeMoney() : "NULL")) + "," +
 						   mo.getDeltaBaseMoney() + "," + 
 						   mo.getDeltaExtraMoney() + "," + 
 						   mo.getDeltaPoint() + ","	+ 
@@ -219,12 +219,13 @@ public class MemberOperationDao {
 				mo.setPayMoney(dbCon.rs.getFloat("pay_money"));
 				mo.setOrderId(dbCon.rs.getInt("order_id"));
 			}
-			if(mo.getOperationType() == OperationType.CHARGE){
+			if(mo.getOperationType() == OperationType.CHARGE || mo.getOperationType() == OperationType.TAKE_MONEY){
 				mo.setChargeType(dbCon.rs.getShort("charge_type"));
 				mo.setChargeMoney(dbCon.rs.getFloat("charge_money"));
 			}
 			mo.setDeltaBaseMoney(dbCon.rs.getFloat("delta_base_money"));
 			mo.setDeltaExtraMoney(dbCon.rs.getFloat("delta_extra_money"));
+			//mo.setDeltaTotalMoney(dbCon.rs.getFloat("delta_base_money"));
 			mo.setDeltaPoint(dbCon.rs.getInt("delta_point"));
 			mo.setRemainingBaseMoney(dbCon.rs.getFloat("remaining_base_money"));
 			mo.setRemainingExtraMoney(dbCon.rs.getFloat("remaining_extra_money"));

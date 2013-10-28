@@ -114,6 +114,11 @@ public class MemberTypeDao {
 	 */
 	public static void deleteById(DBCon dbCon, Staff staff, int memberTypeId) throws BusinessException, SQLException{
 		String sql;
+		sql = "SELECT COUNT(*) FROM " + Params.dbName + ".member WHERE restaurant_id = " + staff.getRestaurantId() + " AND member_type_id = " + memberTypeId;
+		dbCon.rs = dbCon.stmt.executeQuery(sql);
+		if(dbCon.rs.next()){
+			throw new BusinessException(MemberError.TYPE_DELETE_ISNOT_EMPTY);
+		}
 		//Delete the discounts associated with this member type.
 		sql = " DELETE FROM " + Params.dbName + ".member_type_discount WHERE member_type_id = " + memberTypeId;
 		dbCon.stmt.executeUpdate(sql);

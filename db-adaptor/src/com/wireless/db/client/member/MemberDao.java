@@ -35,8 +35,9 @@ public class MemberDao {
 	public static int getMemberCount(DBCon dbCon, Map<Object, Object> params) throws SQLException{
 		int count = 0;
 		String querySQL = "SELECT COUNT(M.member_id) "
-				+ " FROM " + Params.dbName + ".member M " 
-				+ " JOIN " + Params.dbName + ".member_type MT ON M.member_type_id = MT.member_type_id " 
+				+ " FROM (" + Params.dbName + ".member M " 
+				+ " JOIN " + Params.dbName + ".member_type MT ON M.member_type_id = MT.member_type_id) " 
+				+ " JOIN " + Params.dbName + ".interested_member IM ON M.member_id = IM.member_id " 
 				+ " WHERE 1=1 ";
 		querySQL = SQLUtil.bindSQLParams(querySQL, params);
 		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
@@ -89,8 +90,9 @@ public class MemberDao {
 			  " M.tele, M.mobile, M.birthday, M.id_card, M.company, M.contact_addr, M.comment, "	+
 			  " MT.member_type_id, MT.charge_rate, MT.exchange_rate, " +
 			  " MT.name AS member_type_name, MT.attribute, MT.initial_point " +
-			  " FROM " + Params.dbName + ".member M " +
-			  " JOIN " + Params.dbName + ".member_type MT ON M.member_type_id = MT.member_type_id "	+
+			  " FROM (" + Params.dbName + ".member M " +
+			  " JOIN " + Params.dbName + ".member_type MT ON M.member_type_id = MT.member_type_id) "	+
+			  " LEFT JOIN " + Params.dbName + ".interested_member IM ON M.member_id = IM.member_id " +
 			  " WHERE 1=1 "	+
 			  " AND M.restaurant_id = " + staff.getRestaurantId() +
 			  (extraCond != null ? extraCond : " ") +
@@ -140,6 +142,14 @@ public class MemberDao {
 		}
 		dbCon.rs.close();
 		
+		List<Integer> mIds = new ArrayList<Integer>();
+		sql = "SELECT staff_id,member_id,start_date FROM " + Params.dbName + ".interested_member WHERE staff_id = " + staff.getId();
+		dbCon.rs = dbCon.stmt.executeQuery(sql);
+		while(dbCon.rs.next()){
+			mIds.add(dbCon.rs.getInt("member_id"));
+		}
+		
+		dbCon.rs.close();
 		for(Member eachMember : result){
 			//Get the discounts to each member
 			sql = " SELECT discount_id, type FROM " + Params.dbName + ".member_type_discount WHERE member_type_id = " + eachMember.getMemberType().getTypeId();
@@ -194,6 +204,15 @@ public class MemberDao {
 				eachMember.addRecommendFood(recommendFood);
 			}
 			dbCon.rs.close();
+			
+			if(!mIds.isEmpty()){
+				for (Integer integer : mIds) {
+					if(eachMember.getId() == integer){
+						eachMember.setAttentioned(true);
+						break;
+					}
+				}
+			}
 		}
 		
 		return result;
@@ -832,7 +851,7 @@ public class MemberDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statements
 	 */
-	public static MemberOperation charge(DBCon dbCon, Staff staff, int memberId, float chargeMoney, ChargeType chargeType) throws BusinessException, SQLException{
+	public static MemberOperation charge(DBCon dbCon, Staff staff, int memberId, float chargeMoney, float deltaMoney, ChargeType chargeType) throws BusinessException, SQLException{
 		
 		if(chargeMoney < 0){
 			throw new IllegalArgumentException("The amount of charge money(amount = " + chargeMoney + ") must be more than zero");
@@ -841,7 +860,7 @@ public class MemberDao {
 		Member member = getMemberById(dbCon, staff, memberId);
 		
 		//Perform the charge operation and get the related member operation.
-		MemberOperation mo = member.charge(chargeMoney, chargeType);
+		MemberOperation mo = member.charge(chargeMoney, deltaMoney, chargeType);
 		
 		//Insert the member operation to this charge operation.
 		MemberOperationDao.insert(dbCon, staff, mo);
@@ -873,12 +892,12 @@ public class MemberDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statements
 	 */
-	public static MemberOperation charge(Staff term, int memberId, float chargeMoney, ChargeType chargeType) throws BusinessException, SQLException{
+	public static MemberOperation charge(Staff term, int memberId, float chargeMoney, float deltaMoney, ChargeType chargeType) throws BusinessException, SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
 			dbCon.conn.setAutoCommit(false);
-			MemberOperation mo = MemberDao.charge(dbCon, term, memberId, chargeMoney, chargeType);
+			MemberOperation mo = MemberDao.charge(dbCon, term, memberId, chargeMoney, deltaMoney, chargeType);
 			dbCon.conn.commit();
 			return mo;
 			
@@ -892,7 +911,75 @@ public class MemberDao {
 			dbCon.disconnect();
 		}
 	}
+	/**
+	 * Perform the charge operation to a member account.
+	 * @param dbCon
+	 * @param staff
+	 * @param memberId
+	 * @param takeMoney
+	 * @param chargeType
+	 * @return
+	 * @throws BusinessException
+	 * @throws SQLException
+	 */
+	public static MemberOperation takeMoney(DBCon dbCon, Staff staff, int memberId, float takeMoney, float deltaMoney) throws BusinessException, SQLException{
+		if(takeMoney < 0){
+			throw new IllegalArgumentException("The amount of take money(amount = " + takeMoney + ") must be more than zero");
+		}
+		Member member = getMemberById(dbCon, staff, memberId);
+		
+		MemberOperation mo = member.takeMoney(takeMoney, deltaMoney);
+		
+		if(mo.getRemainingBaseMoney() < 0){
+			throw new BusinessException("无足够余额取款");
+		}
+		
+		MemberOperationDao.insert(dbCon, staff, mo);
+		
+		String sql = " UPDATE " + Params.dbName + ".member SET" +
+				 " base_balance = " + member.getBaseBalance() + ", " +
+				 " extra_balance = " + member.getExtraBalance() + "," + 
+				 " total_charge = " + member.getTotalCharge() + 
+				 " WHERE member_id = " + memberId;
+		dbCon.stmt.executeUpdate(sql);
+		
+		return mo;
+		
+	}
 	
+	/**
+	 * Perform the charge operation to a member account.
+	 * @param term
+	 * 			the staff
+	 * @param memberId
+	 * 			the id of member account
+	 * @param takeMoney
+	 * 			the amount of take Money
+	 * @return	the member operation to this take Money.
+	 * @throws BusinessException
+	 * 			throw if the member id to search is NOT found 
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statements
+	 */
+	public static MemberOperation takeMoney(Staff term, int memberId, float takeMoney, float deltaMoney) throws BusinessException, SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			dbCon.conn.setAutoCommit(false);
+			MemberOperation mo = MemberDao.takeMoney(dbCon, term, memberId, takeMoney, deltaMoney);
+			dbCon.conn.commit();
+			return mo;
+			
+		}catch(BusinessException e){
+			dbCon.conn.rollback();
+			throw e;	
+		}catch(SQLException e){
+			dbCon.conn.rollback();
+			throw e;
+		}finally{
+			dbCon.disconnect();
+		}
+	}
 	/**
 	 * Perform to point consumption
 	 * @param dbCon
