@@ -117,17 +117,17 @@
 				<p><input id="name" name="mbName" class="loginInput" autofocus="autofocus" required="required" autocomplete="off" placeholder="请输入账号" value="" /></p>
 
 				<p><label for="password">验证码：</label></p>
-				<p><input type="password" id="password" name="password" class="loginInput" required="required" placeholder="请输入验证码" value="" /></p>
+				<p><input id="validCode" name="validCode" class="loginInput" required="required" placeholder="请输入验证码" value="" /></p>
 				<div id="divCode" onmousedown="validteCode()" style="cursor: pointer;background-color: White;  width:52px; height:16px; padding:5px; text-align:center; vertical-align:middle; letter-spacing:5px; border:solid 1px blue">  
    				<span></span><span ></span><span ></span><span ></span></div> 
 			</div>
 			<div class="loginBoxButtons">
-				<input type="checkbox" id="rememberRestaurant" style="margin-left: 140px">记住餐厅?
+				<input type="checkbox" id="rememberRestaurant" style="margin-left: 140px">记住餐厅
 				<input type="button" class="loginBtn" id="login" value="登录餐厅">
 				<!-- <button id="login" class="loginBtn">进入web点菜系统</button> -->
 			</div>
 		</form>
-		<form id="staffForm" style="display : none;">
+		<form id="staffForm" style="display: none">
 			<div class="loginBoxCenter">
 				<p><label>员工账号：</label></p>
 				<div class="styled-select"> 
@@ -135,7 +135,7 @@
 				
 				</div>
 				<p><label>密码：</label></p>
-				<p><input type="password" id="pwd" class="loginInput" required="required" autocomplete="off" placeholder="请输入密码" value="" /></p>
+				<p><input type="password" id="pwd" class="loginInput" placeholder="请输入密码" value="" /></p>
 			</div>
 			<div class="loginBoxButtons">
 				<input type="button" class="loginBtn" id="loginFront" value="进入web点菜" style="margin-left: 70px;"> <input type="button" class="loginBtn" id="loginBasic" value="进入系统后台" >
@@ -222,7 +222,7 @@ function setCookie(cookiename, cookievalue, days) {
 
  		$('#login').click(function(){
 
-  			if($('#password').val() == vCode){
+  			if($('#validCode').val() == vCode){
   	 			$.ajax({
   					url : '../QueryRestaurants.do',
   					type : 'post',
@@ -265,8 +265,7 @@ function setCookie(cookiename, cookievalue, days) {
  		$('#loginBasic').click(function(){
  			$.post('../OperateStaff.do', {
 				pin : $('#selectStaff').val(),
-				pwd : MD5($('#pwd').val()),
-				restaurantID : getRestaurantID
+				pwd : MD5($('#pwd').val())
  			}, function(result){
  				if(result.success){
  					location.href = 'Mgr/DigieBasic.html?'+strEncode('restaurantID='+ getRestaurantID, KEYS);
@@ -276,6 +275,12 @@ function setCookie(cookiename, cookievalue, days) {
  			});
  			
  		});
+ 		
+  		$('#validCode').keydown(function(e){
+ 			if(e.keyCode == 13){
+ 				$('#login').click();
+ 			}
+ 		}); 
 	});
 </script>
 </div>

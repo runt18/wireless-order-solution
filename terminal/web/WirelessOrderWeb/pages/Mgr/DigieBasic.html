@@ -28,8 +28,7 @@
 
 
 <script type="text/javascript">
-var Request = new URLParaQuery();
-var restaurantID = Request['restaurantID'];
+var restaurantID;
 var tabIndex = 0;
 
 function addTab(id, title, url){
@@ -94,7 +93,9 @@ var tabs = new Ext.TabPanel({
 Ext.onReady(function(){
 	Ext.BLANK_IMAGE_URL = '../../extjs/resources/images/default/s.gif';
     //Ext.state.Manager.setProvider(new Ext.state.CookieProvider());
-
+    getOperatorName('../../', function(staff){
+    	restaurantID = staff.restaurantId;
+    });
 	var tree = new Ext.tree.TreePanel({
 		region : 'center',
 		id : 'tree',
@@ -178,7 +179,7 @@ Ext.onReady(function(){
 			}  */
          ]
     });
-    getOperatorName('../../');
+
     initCancelReasonWin();
     
      Ext.get('btnLoginOut').on('click', function(){
