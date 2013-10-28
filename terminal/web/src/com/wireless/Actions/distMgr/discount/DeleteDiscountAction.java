@@ -12,9 +12,8 @@ import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.distMgr.DiscountDao;
 import com.wireless.exception.BusinessException;
+import com.wireless.json.JObject;
 import com.wireless.pojo.distMgr.Discount;
-import com.wireless.util.JObject;
-import com.wireless.util.WebParams;
 
 public class DeleteDiscountAction extends Action{
 
@@ -40,9 +39,9 @@ public class DeleteDiscountAction extends Action{
 			jobject.initTip(true, "操作成功, 已删除选中方案信息.");
 			
 		}catch(BusinessException e){
-			jobject.initTip(false, WebParams.TIP_TITLE_WARNING, 9997, "操作失败, 该方案下有分厨折扣,不允许删除!");
+			jobject.initTip(e);
 		}catch(Exception e){
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
+			jobject.initTip(e);
 			e.printStackTrace();
 		}finally{
 			JSONObject json = JSONObject.fromObject(jobject);

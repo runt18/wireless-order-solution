@@ -17,6 +17,7 @@ import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.client.Member;
+import com.wireless.pojo.client.MemberType.Attribute;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.util.SQLUtil;
 import com.wireless.util.WebParams;
@@ -85,8 +86,11 @@ public class QueryMemberAction extends DispatchAction {
 					extraCond += (" AND MT.member_type_id = " + memberType);
 				
 				if(memberTypeAttr != null && !memberTypeAttr.trim().isEmpty())
-					extraCond += (" AND MT.attribute = " + memberTypeAttr);
-				
+					if(Attribute.valueOf(Integer.parseInt(memberTypeAttr)) == Attribute.INTERESTED){
+						extraCond += (" AND IM.staff_id = " + pin);
+					}else{
+						extraCond += (" AND MT.attribute = " + memberTypeAttr);
+					}
 				if(name != null && !name.trim().isEmpty())
 					extraCond += (" AND M.name like '%" + name.trim() + "%'");
 				

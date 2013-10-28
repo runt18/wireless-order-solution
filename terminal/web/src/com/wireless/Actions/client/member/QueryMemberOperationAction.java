@@ -18,6 +18,7 @@ import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.client.MemberOperation;
+import com.wireless.pojo.client.MemberOperation.OperationType;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.util.DateType;
 import com.wireless.util.SQLUtil;
@@ -44,10 +45,12 @@ public class QueryMemberOperationAction extends Action{
 			String dataSource = request.getParameter("dataSource");
 			String memberMobile = request.getParameter("memberMobile");
 			String memberCard = request.getParameter("memberCard");
+			String memberName = request.getParameter("memberName");
 			String memberType = request.getParameter("memberType");
 			String operateType = request.getParameter("operateType");
 			String onDuty = request.getParameter("onDuty");
 			String offDuty = request.getParameter("offDuty");
+			String total = request.getParameter("total");
 			
 			String extraCond = null, orderClause = null;
 			extraCond = " AND MO.restaurant_id = " + restaurantID;
@@ -58,11 +61,26 @@ public class QueryMemberOperationAction extends Action{
 			if(memberCard != null && !memberCard.trim().isEmpty()){
 				extraCond += (" AND MO.member_card like '%" + memberCard.trim() + "%'");
 			}
+			if(memberName != null && !memberName.trim().isEmpty()){
+				extraCond += (" AND MO.member_name like '%" + memberName.trim() + "%'");
+			}
 			if(memberType != null && !memberType.trim().isEmpty()){
 				extraCond += (" AND M.member_type_id = " + memberType);
 			}
 			if(operateType != null && !operateType.trim().isEmpty() && Integer.valueOf(operateType) > 0){
-				extraCond += (" AND MO.operate_type = " + operateType);
+				List<OperationType> types = OperationType.typeOf(Integer.parseInt(operateType));
+				String extra = "";
+				for (int i = 0; i < types.size(); i++) {
+					if(i == 0){
+						extra += " MO.operate_type = " + types.get(i).getValue();
+					}else{
+						extra += " OR MO.operate_type = " + types.get(i).getValue();
+					}
+				}
+				if(Integer.parseInt(operateType) == OperationType.POINT_ADJUST.getType()){
+					extra += " OR MO.operate_type = " + OperationType.CONSUME.getValue();
+				}
+				extraCond += " AND(" + extra + ")";
 			}
 			
 			orderClause = " ORDER BY MO.operate_date ";
@@ -93,10 +111,29 @@ public class QueryMemberOperationAction extends Action{
 			}else if(DateType.getValue(dataSource) == DateType.HISTORY.getValue()){
 				list = MemberOperationDao.getHistory(paramsSet);
 			}
-			if(list != null){
+			if(list != null && !list.isEmpty()){
+				MemberOperation sum = MemberOperation.newMO(-10, "", "", "");
+				sum.setChargeType(list.get(0).getChargeType());
+				sum.setComment(list.get(0).getComment());
+				sum.setOperationType(list.get(0).getOperationType());
+				sum.setPayType(list.get(0).getPayType());
+				sum.setOperateSeq(list.get(0).getOperateSeq());
+				sum.setStaffName(list.get(0).getStaffName());
 				for(MemberOperation temp : list){
 					temp.setMember(MemberDao.getMemberById(staff, temp.getMemberId()));
+					
+					sum.setDeltaTotalMoney(temp.getDeltaTotalMoney() + sum.getDeltaTotalMoney());
+					sum.setChargeMoney(temp.getChargeMoney() + sum.getChargeMoney());
+					sum.setPayMoney(temp.getPayMoney() + sum.getPayMoney());
+					sum.setDeltaPoint(temp.getDeltaPoint() + sum.getDeltaPoint());
 				}
+				
+				if(total != null){
+					sum.setMember(list.get(0).getMember());
+					list.add(sum);
+				}
+				
+	
 			}
 			jobject.setRoot(list);
 			

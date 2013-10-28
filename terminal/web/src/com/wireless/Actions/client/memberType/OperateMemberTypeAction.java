@@ -236,22 +236,7 @@ public class OperateMemberTypeAction extends DispatchAction{
 			String pin = (String)request.getAttribute("pin");
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
-			//String restaurantID = request.getParameter("restaurantID");
 			String typeID = request.getParameter("typeID");
-/*			String discountType = request.getParameter("discountType");
-			String discountID = request.getParameter("discountID");*/
-			
-/*			if(restaurantID == null || typeID == null || discountID == null || discountType == null){
-				jobject.initTip(false, WebParams.TIP_TITLE_ERROE, 9970, "操作失败, 会员类型相关信息不完整.");
-				return null;
-			}
-			
-			MemberType mt = new MemberType();
-			mt.setRestaurantId(Integer.valueOf(restaurantID));
-			mt.setTypeId(Integer.valueOf(typeID));
-			mt.setDiscountType(Integer.valueOf(discountType));
-			mt.getDefaultDiscount().setId(Integer.valueOf(discountID));
-			*/
 			MemberTypeDao.deleteById(staff, Integer.parseInt(typeID));
 			jobject.initTip(true, "操作成功, 已删除会员类型相关信息.");
 			

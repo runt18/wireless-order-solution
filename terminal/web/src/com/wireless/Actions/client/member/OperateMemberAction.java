@@ -1,6 +1,7 @@
 package com.wireless.Actions.client.member;
 
 import java.io.IOException;
+import java.sql.SQLException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -196,12 +197,17 @@ public class OperateMemberAction extends DispatchAction{
 			String pin = (String)request.getAttribute("pin");
 			String memberID = request.getParameter("memberID");
 			String rechargeMoney = request.getParameter("rechargeMoney");
+			String payMannerMoney = request.getParameter("payMannerMoney");
 			String rechargeType = request.getParameter("rechargeType");
+			String comment = request.getParameter("comment");
 			String isPrint = request.getParameter("isPrint");
 			
 			final Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
-			MemberOperation mo = MemberDao.charge(staff, Integer.valueOf(memberID), Float.valueOf(rechargeMoney), ChargeType.valueOf(Integer.valueOf(rechargeType)));
+			MemberOperation mo = MemberDao.charge(staff, Integer.valueOf(memberID), Float.valueOf(payMannerMoney), Float.valueOf(rechargeMoney), ChargeType.valueOf(Integer.valueOf(rechargeType)));
+			if(comment != null){
+				mo.setComment(comment);
+			}
 			if(mo == null || mo.getId() == 0){
 				jobject.initTip(false, WebParams.TIP_TITLE_ERROE, 9998, "操作失败, 会员充值未成功, 未知错误, 请联系客服人员.");
 			}else{
@@ -229,6 +235,67 @@ public class OperateMemberAction extends DispatchAction{
 		}catch(Exception e){
 			e.printStackTrace();
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, WebParams.TIP_CODE_EXCEPTION, WebParams.TIP_CONTENT_SQLEXCEPTION);
+		}finally{
+			response.getWriter().print(jobject.toString());
+		}
+		return null;
+	}
+	/**
+	 * 取款
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward takeMoney(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception{
+		request.setCharacterEncoding("UTF-8");
+		response.setCharacterEncoding("UTF-8");
+		
+		JObject jobject = new JObject();
+		
+		try{
+			String pin = (String)request.getAttribute("pin");
+			String memberID = request.getParameter("memberID");
+			String rechargeMoney = request.getParameter("takeMoney");
+			String payMannerMoney = request.getParameter("payMannerMoney");
+			String comment = request.getParameter("comment");
+			String isPrint = request.getParameter("isPrint");
+			
+			final Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			
+			MemberOperation mo = MemberDao.takeMoney(staff, Integer.valueOf(memberID), Float.valueOf(payMannerMoney), Float.valueOf(rechargeMoney));
+			if(comment != null){
+				mo.setComment(comment);
+			}
+			if(mo == null || mo.getId() == 0){
+				jobject.initTip(false, WebParams.TIP_TITLE_ERROE, 9998, "操作失败, 会员取款未成功, 未知错误, 请联系客服人员.");
+			}else{
+				jobject.initTip(true, "操作成功, 会员取款成功.");
+				if(isPrint != null && Boolean.valueOf(isPrint)){
+					try{
+						ReqPrintContent reqPrintContent = ReqPrintContent.buildReqPrintMemberReceipt(staff, mo.getId());
+						if(reqPrintContent != null){
+							ProtocolPackage resp = ServerConnector.instance().ask(reqPrintContent);
+							if(resp.header.type == Type.ACK){
+								jobject.setMsg(jobject.getMsg() + "打印取款信息成功.");
+							}else{
+								jobject.setMsg(jobject.getMsg() + "打印取款信息失败.");
+							}
+						}
+					}catch(IOException e){
+						e.printStackTrace();
+						jobject.setMsg(jobject.getMsg() + " 打印操作请求失败, 请联系客服人员.");
+					}
+				}
+			}
+		}catch(BusinessException e){	
+			e.printStackTrace();
+			jobject.initTip(e);
+		}catch(Exception e){
+			e.printStackTrace();
+			jobject.initTip(e);
 		}finally{
 			response.getWriter().print(jobject.toString());
 		}
@@ -300,6 +367,39 @@ public class OperateMemberAction extends DispatchAction{
 		}catch(Exception e){
 			e.printStackTrace();
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, WebParams.TIP_CODE_EXCEPTION, WebParams.TIP_CONTENT_SQLEXCEPTION);
+		}finally{
+			response.getWriter().print(jobject.toString());
+		}
+		return null;
+	}
+	
+	
+	public ActionForward interestedMember(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception{
+		request.setCharacterEncoding("UTF-8");
+		response.setCharacterEncoding("UTF-8");
+		JObject jobject = new JObject();
+		try{
+			String pin = (String)request.getAttribute("pin");
+			String attendtion = request.getParameter("attendtion");
+			String memberId = request.getParameter("memberId");
+			
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			if(Integer.parseInt(attendtion) == 0){
+				MemberDao.cancelInterestedIn(staff, Integer.parseInt(memberId));
+				jobject.initTip(true, "取消成功");
+			}else{
+				MemberDao.interestedIn(staff, Integer.parseInt(memberId));
+				jobject.initTip(true, "关注成功");
+			}
+		}catch(BusinessException e){
+			e.printStackTrace();
+			jobject.initTip(e);
+		}catch(SQLException e){
+			e.printStackTrace();
+			jobject.initTip(e);
+		}catch(Exception e){
+			e.printStackTrace();
+			jobject.initTip(e);
 		}finally{
 			response.getWriter().print(jobject.toString());
 		}

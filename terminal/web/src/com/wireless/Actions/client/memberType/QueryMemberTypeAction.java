@@ -93,7 +93,7 @@ public class QueryMemberTypeAction extends DispatchAction {
 			List<MemberType> list = MemberTypeDao.getMemberType(StaffDao.verify(Integer.parseInt(pin)), null, " ORDER BY MT.member_type_id ");
 			MemberType item = null;
 			
-			StringBuilder change = new StringBuilder(), point = new StringBuilder();
+			StringBuilder change = new StringBuilder(), point = new StringBuilder(), interested = new StringBuilder();
 			change.append("{")
 				  .append("text:'充值属性'")
 				  .append(",attr:"+MemberType.Attribute.CHARGE.getVal())
@@ -119,7 +119,13 @@ public class QueryMemberTypeAction extends DispatchAction {
 			}
 			change.append("]}");
 			point.append("]}");
-			tsb.append("[").append(change).append(",").append(point).append("]");
+			interested.append("{")
+					 .append("text:'关注的会员'")
+					 .append(",attr:"+MemberType.Attribute.INTERESTED.getVal())
+					 .append(",leaf:true")
+					 .append("}");
+			
+			tsb.append("[").append(change).append(",").append(point).append(",").append(interested).append("]");
 		}catch(Exception e){
 			e.printStackTrace();
 		}finally{
