@@ -13,29 +13,29 @@ function cdd_remainingPointRenderer(v, md, r, ri, ci, store){
 	}
 }
 function cdd_deltaTotalMoneyRenderer(v, md, r, ri, ci, store){
-	if(v == 1 || v == 2 || v == 5){
+	if(v == 1 || v == 2 || v == 5 || v== 6){
 		if(v == 2 && r.get('member')['memberType']['attributeValue'] == 1){
 			return '--';
 		}else{
-			return Ext.ux.txtFormat.gridDou(r.get('deltaTotalMoney'));			
+			return Ext.ux.txtFormat.gridDou(r.get('deltaExtraMoney'));			
 		}
 	}else{
 		return '--';
 	}
 }
 function cdd_remainingTotalMoneyRenderer(v, md, r, ri, ci, store){
-	if(v == 1 || v == 2 || v == 5){
+	if(v == 1 || v == 2 || v == 5 || v == 6){
 		if(v == 2 && r.get('member')['memberType']['attributeValue'] == 1){
 			return '--';
 		}else{
-			return Ext.ux.txtFormat.gridDou(r.get('remainingTotalMoney'));			
+			return Ext.ux.txtFormat.gridDou(r.get('remainingExtraMoney'));			
 		}
 	}else{
 		return '--';
 	}
 }
 function cdd_payMoneyRenderer(v, md, r, ri, ci, store){
-	if(v == 1){
+	if(v == 1 || v == 6){
 		return Ext.ux.txtFormat.gridDou(r.get('chargeMoney'));
 	}else if(v == 2 || v == 5){
 		return Ext.ux.txtFormat.gridDou(r.get('payMoney'));
@@ -44,7 +44,7 @@ function cdd_payMoneyRenderer(v, md, r, ri, ci, store){
 	}
 }
 function cdd_payTypeRenderer(v, md, r, ri, ci, store){
-	if(v == 1){
+	if(v == 1 || v == 6){
 		return r.get('chargeTypeText');
 	}else if(v == 2 || v == 5){
 		return r.get('payTypeText');
@@ -69,7 +69,7 @@ Ext.onReady(function(){
 		value : -1,
 		store : new Ext.data.SimpleStore({
 			fields : ['value', 'text'],
-			data : [[-1, '全部'], [1, '充值'], [2, '消费'], [3, '积分消费'], [4, '积分调整'], [5, '金额调整']]
+			data : [[-1, '全部'], [1, '消费'], [2, '充值'], [3, '积分']]
 		}),
 		valueField : 'value',
 		displayField : 'text',
@@ -80,6 +80,12 @@ Ext.onReady(function(){
 		allowBlank : false,
 		listeners : {
 			select : function(){
+				cdd_mo_grid.getColumnModel().setRenderer(4, cdd_deltaPointRenderer);
+				cdd_mo_grid.getColumnModel().setRenderer(5, cdd_remainingPointRenderer);
+				cdd_mo_grid.getColumnModel().setRenderer(6, cdd_deltaTotalMoneyRenderer);
+				cdd_mo_grid.getColumnModel().setRenderer(7, cdd_remainingTotalMoneyRenderer);
+				cdd_mo_grid.getColumnModel().setRenderer(8, cdd_payMoneyRenderer);
+				
 				cdd_searchMemberOperation();
 			}
 		}
@@ -206,9 +212,6 @@ Ext.onReady(function(){
 			text : '&nbsp;&nbsp;操作类型:'
 		}, cdd_search_comboOperateType, {
 			xtype : 'tbtext',
-			text : '&nbsp;&nbsp;会员类型:'
-		}, cdd_search_memberType, {
-			xtype : 'tbtext',
 			text : '&nbsp;&nbsp;手机号码:'
 		}, cdd_search_memerbMobile,{
 			xtype : 'tbtext',
@@ -244,9 +247,9 @@ Ext.onReady(function(){
 			['会员名称', 'member.name', 60],
 			['变动积分', 'operateTypeValue', 60, 'right', 'cdd_deltaPointRenderer'],
 			['剩余积分', 'operateTypeValue', 60, 'right', 'cdd_remainingPointRenderer'],
+			['收款金额', 'operateTypeValue', 60, 'right', 'cdd_payMoneyRenderer'],
 			['变动金额', 'operateTypeValue', 60, 'right', 'cdd_deltaTotalMoneyRenderer'],
 			['剩余金额', 'operateTypeValue', 60, 'right', 'cdd_remainingTotalMoneyRenderer'],
-			['收款金额', 'operateTypeValue', 60, 'right', 'cdd_payMoneyRenderer'],
 			['收款方式', 'operateTypeValue', 60, 'center', 'cdd_payTypeRenderer'],
 			['操作时间', 'operateDateFormat'],
 			['操作人', 'staffName', 60]
@@ -262,8 +265,27 @@ Ext.onReady(function(){
 	cdd_mo_grid.on('render', function(thiz){
 		cdd_searchMemberOperation();
 	});
-	cdd_mo_grid.getStore().on('load', function(){
-//		cdd_search_memerbCard.setValue();
+	cdd_mo_grid.getStore().on('beforeload', function(){
+		if(cdd_search_comboOperateType.getValue() == 1){
+			cdd_mo_grid.getColumnModel().setRenderer(4, function(){
+				return '--';
+			});
+			cdd_mo_grid.getColumnModel().setRenderer(5, function(){
+				return '--';
+			});
+		}
+		if(cdd_search_comboOperateType.getValue() == 3){
+			cdd_mo_grid.getColumnModel().setRenderer(6, function(){
+				return '--';
+			});
+			cdd_mo_grid.getColumnModel().setRenderer(7, function(){
+				return '--';
+			});
+			cdd_mo_grid.getColumnModel().setRenderer(8, function(){
+				return '--';
+			});
+		}
+
 	});
 	cdd_panelMemberOperationContent = new Ext.Panel({
 		renderTo : 'divMemberOperationContent',

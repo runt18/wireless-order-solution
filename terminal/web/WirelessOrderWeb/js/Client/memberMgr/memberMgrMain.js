@@ -18,12 +18,24 @@ function deleteMemberHandler(){
 	});
 };
 
+function attentionHandler(){
+	memberOperationHandler({
+		type : 'attend'
+	});
+}
+
+function cancelAttentionHandler(){
+	memberOperationHandler({
+		type : 'cancel'
+	});
+}
+
 function memberOperationHandler(c){
+	
 	if(c == null || typeof c == 'undefined' || typeof c.type == 'undefined'){
 		return;
 	}
 	memberBasicWin.otype = c.type;
-	
 	if(c.type == Ext.ux.otype['insert']){
 		memberBasicWin.setTitle('添加会员资料');
 		memberBasicWin.show();
@@ -36,6 +48,52 @@ function memberOperationHandler(c){
 		memberBasicWin.setTitle('修改会员资料');
 		memberBasicWin.show();
 
+	}else if(c.type == 'attend'){
+		var data = Ext.ux.getSelData(memberBasicGrid);
+		Ext.Ajax.request({
+			url : '../../OperateMember.do',
+			params : {
+				dataSource : 'interestedMember',
+				attendtion : 1,
+				memberId : data['id']
+			},
+			success : function(res, opt){
+				var jr = Ext.decode(res.responseText);
+				if(jr.success){
+					Ext.example.msg(jr.title, jr.msg);
+					memberBasicGrid.getStore().reload();
+				}else{
+					Ext.ux.showMsg(jr);
+				}
+			},
+			failure : function(res, opt){
+				Ext.ux.showMsg(Ext.decode(res.responseText));
+			}
+		});
+	
+	}else if(c.type == 'cancel'){
+		var data = Ext.ux.getSelData(memberBasicGrid);
+		Ext.Ajax.request({
+			url : '../../OperateMember.do',
+			params : {
+				dataSource : 'interestedMember',
+				attendtion : 0,
+				memberId : data['id']
+			},
+			success : function(res, opt){
+				var jr = Ext.decode(res.responseText);
+				if(jr.success){
+					Ext.example.msg(jr.title, jr.msg);
+					memberBasicGrid.getStore().reload();
+				}else{
+					Ext.ux.showMsg(jr);
+				}
+			},
+			failure : function(res, opt){
+				Ext.ux.showMsg(Ext.decode(res.responseText));
+			}
+		});
+	
 	}else if(c.type == Ext.ux.otype['delete']){
 		var data = Ext.ux.getSelData(memberBasicGrid);
 		if(!data){
@@ -144,6 +202,82 @@ function initRechargeWin(){
 		});
 	}
 }
+
+/**
+ * 会员取款
+ */
+function initTakeMoneyWin(){
+	var takeMoneyWin = Ext.getCmp('takeMoneyWin');
+	if(!takeMoneyWin){
+		takeMoneyWin = new Ext.Window({
+			id : 'takeMoneyWin',
+			title : '会员取款',
+			closable : false,
+			modal : true,
+			resizable : false,
+			width : 650,
+			height : 275,
+			keys : [{
+				key : Ext.EventObject.ESC,
+				scope : this,
+				fn : function(){
+					takeMoneyWin.hide();
+				}
+			}],
+			listeners : {
+				hide : function(thiz){
+					thiz.body.update('');
+				},
+				show : function(thiz){
+					var data = Ext.ux.getSelData(memberBasicGrid);
+					var mobile = data != false && data['memberType']['attributeValue'] == 0 ? data['mobile'] : '';
+					thiz.center();
+					thiz.load({
+						url : '../window/client/takeMoney.jsp',
+						scripts : true,
+						params : {
+							memberMobile : mobile
+						}
+					});
+				}
+			},
+			bbar : [{
+				xtype : 'checkbox',
+				id : 'chbPrintTakeMoney',
+				checked : true,
+				boxLabel : '打印取款信息'
+			}, '->', {
+				text : '取款',
+				iconCls : 'icon_tb_recharge',
+				handler : function(){
+					// 跨域调用取款方法
+					takeMoneyControlCenter({
+						isPrint : Ext.getCmp('chbPrintTakeMoney').getValue(),
+						callback : function(_c){
+							takeMoneyWin.hide();
+							var st = Ext.getCmp('comboMemberSearchType');
+							st.setValue(2);
+							st.fireEvent('select', st, null, null);
+							var n = Ext.getCmp('numberSearchValueByNumber');
+							n.setValue(_c.data.memberCard);
+							Ext.getCmp('btnSearchMember').handler();
+						}
+					});
+				}
+			}, {
+				text : '关闭',
+				iconCls : 'btn_close',
+				handler : function(){
+					takeMoneyWin.hide();
+				}
+			}]
+			
+		});
+	}
+}
+
+
+
 /**
  * 充值
  * @returns
@@ -152,19 +286,24 @@ function rechargeHandler(){
 	initRechargeWin();
 	Ext.getCmp('rechargeWin').show();
 }
+
+function takeMoneyHandler(){
+	initTakeMoneyWin();
+	Ext.getCmp('takeMoneyWin').show();
+}
+var	mr_queryMemberOperationWin;
 /**
  * 会员操作明细
  */
-function queryMemberOperationHandler(){
+function queryMemberOperationHandler(title, url, params){
 	var mr_queryMemberOperationWin = Ext.getCmp('mr_queryMemberOperationWin');
 	if(!mr_queryMemberOperationWin){
-		mr_queryMemberOperationWin = new Ext.Window({
+	mr_queryMemberOperationWin = new Ext.Window({
 			id : 'mr_queryMemberOperationWin',
-			title : '会员操作明细',
 			modal : true,
 			closable : false,
 			resizable : false,
-			width : 1200,
+			width : 1100,
 			height : 500,
 			keys : [{
 				key : Ext.EventObject.ESC,
@@ -183,24 +322,20 @@ function queryMemberOperationHandler(){
 			listeners : {
 				hide : function(thiz){
 					thiz.body.update('');
-				},
-				show : function(thiz){
-					var data = Ext.ux.getSelData(memberBasicGrid);
-					thiz.center();
-					thiz.load({
-						url : '../window/client/memberOperation.jsp',
-						scripts : true,
-						params : {
-							memberMobile : !data ? '' : data['mobile'],
-							modal : true
-						}
-					});
 				}
 			}
 		});
 	}
+
 	mr_queryMemberOperationWin.show();
+	mr_queryMemberOperationWin.setTitle(title);
+	mr_queryMemberOperationWin.load({
+		url : url,
+		scripts : true,
+		params : params
+	});
 }
+
 /**
  * 会员操作汇总
  */
@@ -474,13 +609,27 @@ memberStatusRenderer = function(v){
 		}
 	}
 };
+function memberOperationSend(){
+	var data = Ext.ux.getSelData(memberBasicGrid);
+	var mobile = data != false ? data['mobile'] : '';
+	queryMemberOperationHandler('会员操作明细', '../window/client/memberOperation.jsp', { memberMobile : mobile, modal : true});
+} 
+
 memberOperationRenderer = function(val, m, record){
+	var attendtion;
+	if(record.data['acctendtioned']){
+		attendtion = '<a href="javascript:cancelAttentionHandler()">取消关注</a>';
+	}else{
+		attendtion = '<a href="javascript:attentionHandler()">添加关注</a>';
+	}
 	return ''
 		+ '<a href="javascript:updateMemberHandler()">修改</a>'
 		+ '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
 		+ '<a href="javascript:deleteMemberHandler()">删除</a>'
 		+ '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
-		+ '<a href="javascript:queryMemberOperationHandler()">操作明细</a>';
+		+ '<a href="javascript:memberOperationSend() ">操作明细</a>'
+		+ '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
+		+ attendtion;
 //		+ '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
 //		+ '<a href="javascript:adjustPoint()">积分调整</a>';
 };
@@ -649,8 +798,13 @@ function gridInit(){
 						gs.baseParams['memberType'] = '';
 						gs.baseParams['memberTypeAttr'] = memberTypeNode.attributes.attr;
 					}else{
-						gs.baseParams['memberType'] = memberTypeNode.attributes.memberTypeId;
-						gs.baseParams['memberTypeAttr'] = '';
+						if(memberTypeNode.attributes.attr){
+							gs.baseParams['memberType'] = '';
+							gs.baseParams['memberTypeAttr'] = memberTypeNode.attributes.attr;
+						}else{
+							gs.baseParams['memberType'] = memberTypeNode.attributes.memberTypeId;
+							gs.baseParams['memberTypeAttr'] = '';
+						}
 					}
 				}else{
 					gs.baseParams['memberType'] = '';
@@ -712,6 +866,12 @@ function gridInit(){
 				rechargeHandler();
 			}
 		}, {
+			text : '取款',
+			iconCls : 'btn_edit',
+			handler : function(){
+				takeMoneyHandler();
+			}
+		}, {
 			text : '积分调整',
 			iconCls : 'icon_tb_setting',
 			handler : function(e){
@@ -735,10 +895,10 @@ function gridInit(){
 			['累计积分', 'totalPoint',,'right', 'Ext.ux.txtFormat.gridDou'],
 			['当前积分', 'point',,'right', 'Ext.ux.txtFormat.gridDou'],
 			['充值额', 'totalCharge',,'right', 'Ext.ux.txtFormat.gridDou'],
-			['余额', 'totalBalance',,'right', 'Ext.ux.txtFormat.gridDou'],
-			['手机号码', 'mobile'],
-			['会员卡号', 'memberCard'],
-			['操作', 'operation', 230, 'center', 'memberOperationRenderer']
+			['余额', 'extraBalance',,'right', 'Ext.ux.txtFormat.gridDou'],
+			['手机号码', 'mobile', 125],
+			['会员卡号', 'memberCard', 125],
+			['操作', 'operation', 270, 'center', 'memberOperationRenderer']
 		],
 		MemberBasicRecord.getKeys(),
 		[['isPaging', true], ['restaurantID', restaurantID],  ['dataSource', 'normal']],
@@ -878,23 +1038,13 @@ var btnRecharge = new Ext.ux.ImageButton({
 	}
 });
 
-var btnConsumeDetail = new Ext.ux.ImageButton({
-	imgPath : '../../images/btnConsumeDetail.png',
+var btnTakeMoney = new Ext.ux.ImageButton({
+	imgPath : '',
 	imgWidth : 50,
 	imgHeight : 50,
-	tooltip : '消费明细',
+	tooltip : '取款',
 	handler : function(e){
-		queryMemberOperationHandler();
-	}
-});
-
-var btnConsumeSummary = new Ext.ux.ImageButton({
-	imgPath : '../../images/btnConsumeSummary.png',
-	imgWidth : 50,
-	imgHeight : 50,
-	tooltip : '消费汇总',
-	handler : function(e){
-		queryMemberOperationSummaryHandler();
+		takeMoneyHandler();
 	}
 });
 
@@ -908,6 +1058,39 @@ var btnAdjustPoint = new Ext.ux.ImageButton({
 	}
 });
 
+var btnConsumeSummary = new Ext.ux.ImageButton({
+	imgPath : '../../images/btnConsumeSummary.png',
+	imgWidth : 50,
+	imgHeight : 50,
+	tooltip : '消费汇总',
+	handler : function(e){
+		queryMemberOperationSummaryHandler();
+	}
+});
+
+var btnConsumeDetail = new Ext.ux.ImageButton({
+	imgPath : '../../images/btnConsumeDetail.png',
+	imgWidth : 50,
+	imgHeight : 50,
+	tooltip : '消费明细',
+	handler : function(e){
+		queryMemberOperationHandler('会员消费明细', '../Client_Module/MemberConsumeDetails.html', {
+			modal : true
+		});
+	}
+});
+
+var btnRechargeDetail = new Ext.ux.ImageButton({
+	imgPath : '',
+	imgWidth : 50,
+	imgHeight : 50,
+	tooltip : '充值明细',
+	handler : function(e){
+		queryMemberOperationHandler('会员充值明细', '../Client_Module/MemberRechargeDetails.html', {
+			modal : true
+		});
+	}
+});
 
 /**********************************************************************/
 Ext.onReady(function(){
@@ -916,7 +1099,8 @@ Ext.onReady(function(){
 	
 	new Ext.Panel({
 		renderTo : 'divMember',
-		width : parseInt(Ext.getDom('divMember').parentElement.style.width.replace(/px/g,'')),
+		id : 'memberMgrPanel',
+		//width : parseInt(Ext.getDom('divMember').parentElement.style.width.replace(/px/g,'')),
 		height : parseInt(Ext.getDom('divMember').parentElement.style.height.replace(/px/g,'')),
 		layout : 'border',
 		items : [memberTypeTree, memberBasicGrid],
@@ -929,11 +1113,15 @@ Ext.onReady(function(){
 			    {xtype : 'tbtext', text : '&nbsp;&nbsp;'},
 			    btnRecharge,
 			    {xtype : 'tbtext', text : '&nbsp;&nbsp;'},
-			    btnConsumeDetail,
+			    btnTakeMoney,
+			    {xtype : 'tbtext', text : '&nbsp;&nbsp;'},
+			    btnAdjustPoint,
 			    {xtype : 'tbtext', text : '&nbsp;&nbsp;'},
 			    btnConsumeSummary,
 			    {xtype : 'tbtext', text : '&nbsp;&nbsp;'},
-			    btnAdjustPoint
+			    btnConsumeDetail,
+			    {xtype : 'tbtext', text : '&nbsp;&nbsp;'},
+			    btnRechargeDetail
 			]
 		})
 	});

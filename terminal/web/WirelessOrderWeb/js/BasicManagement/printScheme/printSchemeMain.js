@@ -24,7 +24,13 @@ var addPrintScheme = new Ext.ux.ImageButton({
 /*var jsons = '{items : [{xtype : "checkbox", name : "pType",boxLabel : "cccc", hideLabel : true, inputValue : ' + id + '}]},' + 
 			'{items : [{xtype : "checkbox", name : "pType",boxLabel : "hhhh", hideLabel : true, inputValue : ' + id + '}]},' +
 			'{items : [{xtype : "checkbox", name : "pType",boxLabel : "gggg", hideLabel : true, inputValue : ' + id + '}]}';*/
-
+function formatName(v){
+	if(v.length > 6){
+		
+		v = v.substring(0, 5) + "...";
+	}
+	return v;
+}
 Ext.Ajax.request({
 	url : '../../QueryKitchen.do',
 	params : {
@@ -37,7 +43,7 @@ Ext.Ajax.request({
 			for ( var i = 0; i < jr.root.length; i++) {
 				
 				var k = jr.root[i];
-				var c = {items : [{xtype : "checkbox", name : "kitchen",boxLabel : k.name , hideLabel : true, inputValue :  k.alias }]};
+				var c = {items : [{xtype : "checkbox", name : "kitchen",boxLabel : formatName(k.name) , hideLabel : true, inputValue : k.alias }]};
 				
 				Ext.getCmp('allKitchen').add(c);
 				//solveIE自动换行时格式错乱
@@ -105,7 +111,7 @@ Ext.Ajax.request({
 			for ( var i = 0; i < jr.root.length; i++) {
 
 				var r = jr.root[i];
-				var c = {items : [{xtype : "checkbox", name : "region", boxLabel : r.name , hideLabel : true, inputValue :  r.id }]};
+				var c = {items : [{xtype : "checkbox", name : "region", boxLabel : formatName(r.name) , hideLabel : true, inputValue :  r.id }]};
 
 				Ext.getCmp('allRegion').add(c);
 				if((i+1)%6 == 0){
@@ -1205,7 +1211,7 @@ Ext.onReady(function(){
 		{header : '部门', dataIndex : 'dept', width : 220},
 		{header : '区域', dataIndex : 'regions', width : 256, renderer : tooLength},
 		{header : '打印数', dataIndex : 'repeat'},
-		{header : '操作', id:'operation', dataIndex : 'opt', renderer : opt}
+		{header : '操作', id:'operation', dataIndex : 'opt', renderer : opt, width : 160}
 	]);
 	
 	cm.defaultSortable = true;

@@ -1,12 +1,13 @@
 var rd_rechargeSreachMemberCardWin;
 var rechargeOperateData;
 Ext.onReady(function(){
-	var pe = Ext.query('#divMemberRechargeContent')[0].parentElement;
+
+	var pe = Ext.query('#divMemberTakeMoney')[0].parentElement;
 	var mw = parseInt(pe.style.width);
 	var mh = parseInt(pe.style.height);
 	var memeberMobile = new Ext.form.NumberField({
 		xtype : 'numberfield',
-		id : 'rd_numMemberMobileForRecharge',
+		id : 'tm_numMemberMobileForTakeMoney',
 		fieldLabel : '手机号码' + Ext.ux.txtFormat.xh,
 		disabled : false,
 		listeners : {
@@ -15,19 +16,20 @@ Ext.onReady(function(){
 					key : Ext.EventObject.ENTER,
 					scope : this,
 					fn : function(){
-						rechargeLoadMemberData({read:1});
+						takeMoneyLoadMemberData({read:1});
 					}
 				}]);
-				if(rd_rechargeMemberMobile != null && rd_rechargeMemberMobile != '' && rd_rechargeMemberMobile != 'null'){
-					thiz.setValue(rd_rechargeMemberMobile);
-					rechargeLoadMemberData({read:1});
+				if(tm_rechargeMemberMobile != null && tm_rechargeMemberMobile != '' && tm_rechargeMemberMobile != 'null'){
+					thiz.setValue(tm_rechargeMemberMobile);
+					takeMoneyLoadMemberData({read:1});
 				}
 			}
 		}
 	});
-	var memeberCard = {
+	
+	var memberCard = {
 		xtype : 'numberfield',
-		id : 'rd_numMemberCardForRecharge',
+		id : 'tm_numMemberCardForTakeMoney',
 		fieldLabel : '会员卡号',
 		disabled : false,
 		blankText : '会员卡不能为空, 请刷卡.',
@@ -37,7 +39,7 @@ Ext.onReady(function(){
 					key : Ext.EventObject.ENTER,
 					scope : this,
 					fn : function(){
-						rechargeLoadMemberData({read:2});
+						takeMoneyLoadMemberData({read:2});
 					}
 				}]);
 			}
@@ -45,7 +47,7 @@ Ext.onReady(function(){
 	};
 	
 	new Ext.Panel({
-		renderTo : 'divMemberRechargeContent',
+		renderTo : 'divMemberTakeMoney',
 		width : mw,
 		height : mh,
 		frame : true,
@@ -66,45 +68,64 @@ Ext.onReady(function(){
 			items : [{
 				items : [memeberMobile]
 			}, {
-				items : [memeberCard]
-			}, {
+				items : [memberCard]
+			}, 
+			{
 				xtype : 'panel',
 				columnWidth : .3,
 				html : ['<div class="x-form-item" >',
-				    '<input type="button" value="读手机号码" onClick="rechsargeLoadMemberData({read:1})" style="cursor:pointer; width:80px;" />',
+				    '<input type="button" value="读手机号码" onClick="takeMoneyLoadMemberData({read:1});" style="cursor:pointer; width:80px;" />',
 				    '&nbsp;&nbsp;',
-				    '<input type="button" value="读会员卡" onClick="rechargeLoadMemberData({read:2})" style="cursor:pointer; width:80px;" />',
+				    '<input type="button" value="读会员卡" onClick="takeMoneyLoadMemberData({read:2})" style="cursor:pointer; width:80px;" />',
 				    '</div>'
 				].join('')
-			},{
+			},
+/*			{
+				columnWidth : .15,
 				items : [{
-					id : 'rd_numTotalBalance',
+					xtype : 'button',
+					text : '读手机号码',
+					handler : function(){
+						takeMoneyLoadMemberData({read:1});
+					}
+				}]
+
+			},
+			{
+				columnWidth : .15,
+				items : [{
+					xtype : 'button',
+					text : '读会员卡',
+					handler : function(){
+						takeMoneyLoadMemberData({read:2});
+					}
+				}]
+
+			},*/
+			{
+				columnWidth : 1
+			},
+			{
+				items : [{
+					id : 'tm_numTotalBalance',
 					fieldLabel : '总余额',
 					disabled : true
 				}]
-			}, {	
+			}, {
 				items : [{
-					id : 'rd_numBaseBalance',
+					id : 'tm_numBaseBalance',
 					fieldLabel : '基础余额',
 					disabled : true
 				}]
 			}, {
 				items : [{
-					id : 'rd_numTotalPoint',
+					id : 'tm_numTotalPoint',
 					fieldLabel : '当前积分',
 					disabled : true
 				}]
-			},
-/*			{
+			}, {
 				items : [{
-					id : 'rd_numExtraBalance',
-					fieldLabel : '赠送余额',
-					disabled : true
-				}]
-			}, */
-			{
-				items : [{
-					id : 'rd_numPayMannerMoney',
+					id : 'tm_numPayMannerMoney',
 					fieldLabel : '收款金额' + Ext.ux.txtFormat.xh,
 					allowBlank : false,
 					listeners : {
@@ -120,10 +141,11 @@ Ext.onReady(function(){
 									thiz.setValue(parseInt(iv));
 									
 									var rm = thiz.getValue();
-									var pmm = Ext.getCmp('rd_numRechargeMoney');
-									//var gm = Ext.getCmp('rd_numGiftMoney');
-									//var gp = Ext.getCmp('rd_numGiftPoint');
+									var pmm = Ext.getCmp('tm_numTakeMoney');
+									//var gm = Ext.getCmp('tm_numGiftMoney');
+									//var gp = Ext.getCmp('tm_numGiftPoint');
 									var tempMT = rechargeOperateData.memberType;
+									
 									pmm.setValue(Math.round(rm * tempMT.chargeRate));
 									//gm.setValue(parseInt(rm * Math.abs((tempMT.chargeRate - 1))));
 									//gp.setValue(Math.round(rm * tempMT.exchangeRate));
@@ -134,52 +156,16 @@ Ext.onReady(function(){
 				}]
 			}, {
 				items : [{
-					id : 'rd_numRechargeMoney',
-					fieldLabel : '充值金额' + Ext.ux.txtFormat.xh,
+					id : 'tm_numTakeMoney',
+					fieldLabel : '取款金额' + Ext.ux.txtFormat.xh,
 					allowBlank : false
 					//disabled : true
 				}]
-			}, 
-/*			{
-				items : [{
-					id : 'rd_numGiftMoney',
-					fieldLabel : '赠送金额',
-					disabled : true
-				}]
-			}, */
-			{
-				items : [{
-					xtype : 'combo',
-					id : 'rd_comboRechargeType',
-					fieldLabel : '收款方式' + Ext.ux.txtFormat.xh,
-					readOnly : true,
-					forceSelection : true,
-					value : 1,
-					store : new Ext.data.SimpleStore({
-						fields : ['text', 'value'],
-						data : [['现金', 1], ['刷卡', 2]]
-					}),
-					valueField : 'value',
-					displayField : 'text',
-					typeAhead : true,
-					mode : 'local',
-					triggerAction : 'all',
-					selectOnFocus : true,
-					allowBlank : false
-				}]
-			}, 
-/*			{
-				items : [{
-					id : 'rd_numGiftPoint',
-					fieldLabel : '赠送积分',
-					disabled : true
-				}]
-			}, */
-			{
+			}, {
 				columnWidth : 1,
 				items : [{
 					xtype : 'textfield',
-					id : 'rd_txtRechargeComment',
+					id : 'tm_txtTakeMoneyComment',
 					fieldLabel : '备注',
 					width : 520
 				}]
@@ -189,42 +175,42 @@ Ext.onReady(function(){
 			}, {
 				items : [{
 					xtype : 'textfield',
-					id : 'rd_txtMemberName',
+					id : 'tm_txtMemberName',
 					fieldLabel : '会员名称',
 					disabled : true
 				}]
 			}, {
 				items : [{
 					xtype : 'textfield',
-					id : 'rd_txtMmeberType',
+					id : 'tm_txtMmeberType',
 					fieldLabel : '会员类别',
 					disabled : true
 				}]
 			}, {
 				items : [{
 					xtype : 'textfield',
-					id : 'rd_txtMemberSex',
+					id : 'tm_txtMemberSex',
 					fieldLabel : '性别',
 					disabled : true
 				}]
 			}, {
 				items : [{
 					xtype : 'textfield',
-					id : 'rd_txtMemberBirthday',
+					id : 'tm_txtMemberBirthday',
 					fieldLabel : '生日',
 					disabled : true
 				}]
 			}, {
 				items : [{
 					xtype : 'textfield',
-					id : 'rd_txtMemberIDCard',
+					id : 'tm_txtMemberIDCard',
 					fieldLabel : '身份证',
 					disabled : true
 				}]
 			}, {
 				items : [{
 					xtype : 'textfield',
-					id : 'rd_txtMemberCompany',
+					id : 'tm_txtMemberCompany',
 					fieldLabel : '公司',
 					disabled : true
 				}]
@@ -232,33 +218,22 @@ Ext.onReady(function(){
 				columnWidth : 1,
 				items : [{
 					xtype : 'textfield',
-					id : 'rd_txtMemberContactAddress',
+					id : 'tm_txtMemberContactAddress',
 					fieldLabel : '联系地址',
-					width : 520,
-					disabled : true
-				}]
-			}, {
-				columnWidth : 1,
-				items : [{
-					xtype : 'textfield',
-					id : 'rd_txtMemberComment',
-					fieldLabel : '备注',
 					width : 520,
 					disabled : true
 				}]
 			}]
 		}]
 	});
-});
-/**
- * 
- * @param c
- */
-function rechargeLoadMemberData(c){
+	
+});	
+function takeMoneyLoadMemberData(c){
+	
 	c = c == null || typeof c == 'undefined' ? {} : c;
 	
-	var mobile = Ext.getCmp('rd_numMemberMobileForRecharge');
-	var card = Ext.getCmp('rd_numMemberCardForRecharge');
+	var mobile = Ext.getCmp('tm_numMemberMobileForTakeMoney');
+	var card = Ext.getCmp('tm_numMemberCardForTakeMoney');
 	if(typeof c.read != 'number'){
 		Ext.example.msg('提示', '操作失败, 程序异常, 请联系客服人员.');
 		return;			
@@ -277,11 +252,11 @@ function rechargeLoadMemberData(c){
 		return;
 	}
 	
-	var rd_mask_load_recharge = new Ext.LoadMask(document.body, {
-		msg : '正在读卡, 请稍后......',
+	var tm_mask_load_recharge = new Ext.LoadMask(document.body, {
+		msg : '正在读取, 请稍后......',
 		remove : true
 	});
-	rd_mask_load_recharge.show();
+	tm_mask_load_recharge.show();
 	Ext.Ajax.request({
 		url : '../../QueryMember.do',
 		params : {
@@ -298,10 +273,10 @@ function rechargeLoadMemberData(c){
 					if(rechargeOperateData.memberType.attributeValue == 0){
 						Ext.example.msg('提示', '会员信息读取成功.');
 						rechargeBindMemberData(rechargeOperateData);
-						Ext.getCmp('rd_numPayMannerMoney').focus(100, true);
-						Ext.getCmp('rd_numRechargeMoney').clearInvalid();
+						Ext.getCmp('tm_numPayMannerMoney').focus(100, true);
+						Ext.getCmp('tm_numTakeMoney').clearInvalid();
 					}else{
-						Ext.example.msg('提示', '非充值属性会员不允许充值, 请重新刷卡.');
+						Ext.example.msg('提示', '非充值属性会员不允许取款, 请重新刷卡.');
 						rechargeOperateData = null;
 						rechargeBindMemberData();
 					}
@@ -313,40 +288,40 @@ function rechargeLoadMemberData(c){
 			}else{
 				Ext.ux.showMsg(jr);
 			}
-			rd_mask_load_recharge.hide();
+			tm_mask_load_recharge.hide();
 		},
 		failure : function(res, opt){
-			rd_mask_load_recharge.hide();
+			tm_mask_load_recharge.hide();
 			Ext.ux.showMsg(Ext.decode(res.responseText));
 		}
 	});
-}
+}	
 
 function rechargeBindMemberData(data){
-	var mobile = Ext.getCmp('rd_numMemberMobileForRecharge');
-	var memberCard = Ext.getCmp('rd_numMemberCardForRecharge');
-	var totalBalance = Ext.getCmp('rd_numTotalBalance');
-	var baseBalance = Ext.getCmp('rd_numBaseBalance');
-	//var extraBalance = Ext.getCmp('rd_numExtraBalance');
-	var totalPoint = Ext.getCmp('rd_numTotalPoint');
-	var name = Ext.getCmp('rd_txtMemberName');
-	var memberType = Ext.getCmp('rd_txtMmeberType');
-	var sex = Ext.getCmp('rd_txtMemberSex');
-	var birthday = Ext.getCmp('rd_txtMemberBirthday');
-	var IDCard = Ext.getCmp('rd_txtMemberIDCard');
-	var company = Ext.getCmp('rd_txtMemberCompany');
-	var contactAddress = Ext.getCmp('rd_txtMemberContactAddress');
-	var comment = Ext.getCmp('rd_txtMemberComment');
+	var mobile = Ext.getCmp('tm_numMemberMobileForTakeMoney');
+	var memberCard = Ext.getCmp('tm_numMemberCardForTakeMoney');
+	var totalBalance = Ext.getCmp('tm_numTotalBalance');
+	var baseBalance = Ext.getCmp('tm_numBaseBalance');
+	//var extraBalance = Ext.getCmp('tm_numExtraBalance');
+	var totalPoint = Ext.getCmp('tm_numTotalPoint');
+	var name = Ext.getCmp('tm_txtMemberName');
+	var memberType = Ext.getCmp('tm_txtMmeberType');
+	var sex = Ext.getCmp('tm_txtMemberSex');
+	var birthday = Ext.getCmp('tm_txtMemberBirthday');
+	var IDCard = Ext.getCmp('tm_txtMemberIDCard');
+	var company = Ext.getCmp('tm_txtMemberCompany');
+	var contactAddress = Ext.getCmp('tm_txtMemberContactAddress');
+	//var comment = Ext.getCmp('tm_txtMemberComment');
 	
-	var rechargeMoney = Ext.getCmp('rd_numRechargeMoney');
-	var rechargeType = Ext.getCmp('rd_comboRechargeType');
-	var rechargePayMannerMoney = Ext.getCmp('rd_numPayMannerMoney');
-	var rechargeComment = Ext.getCmp('rd_txtRechargeComment');
-	//var rechargeGiftMoney = Ext.getCmp('rd_numGiftMoney');
-	//var rechargeGiftPoint = Ext.getCmp('rd_numGiftPoint');
+	var rechargeMoney = Ext.getCmp('tm_numTakeMoney');
+	//var rechargeType = Ext.getCmp('tm_comboTakeMoneyType');
+	var rechargePayMannerMoney = Ext.getCmp('tm_numPayMannerMoney');
+	var rechargeComment = Ext.getCmp('tm_txtTakeMoneyComment');
+	//var rechargeGiftMoney = Ext.getCmp('tm_numGiftMoney');
+	//var rechargeGiftPoint = Ext.getCmp('tm_numGiftPoint');
 	
 	rechargeMoney.setValue();
-	rechargeType.setValue(1);
+	//rechargeType.setValue(1);
 	rechargePayMannerMoney.setValue();
 	rechargeComment.setValue();
 	//rechargeGiftMoney.setValue();
@@ -368,15 +343,14 @@ function rechargeBindMemberData(data){
 	IDCard.setValue(data['idCard']);
 	company.setValue(data['company']);
 	contactAddress.setValue(data['contactAddress']);
-	comment.setValue(data['comment']);
+	//comment.setValue(data['comment']);
 	
 }
-
 /**
- * 充值
+ * 取款
  * @param _c
  */
-function rechargeControlCenter(_c){
+function takeMoneyControlCenter(_c){
 	_c = _c == null || typeof _c == 'undefined' ? {} : _c;
 	
 	if(rechargeOperateData == null || typeof rechargeOperateData == 'undefined'){
@@ -389,11 +363,11 @@ function rechargeControlCenter(_c){
 		return;
 	}
 	
-	var memberMobile = Ext.getCmp('rd_numMemberMobileForRecharge');
-	var rechargeMoney = Ext.getCmp('rd_numRechargeMoney');
-	var rechargeType = Ext.getCmp('rd_comboRechargeType');
-	var payMannerMoney = Ext.getCmp('rd_numPayMannerMoney');
-	var comment = Ext.getCmp('rd_txtRechargeComment');
+	var memberMobile = Ext.getCmp('tm_numMemberMobileForTakeMoney');
+	var rechargeMoney = Ext.getCmp('tm_numTakeMoney');
+	//var rechargeType = Ext.getCmp('tm_comboTakeMoneyType');
+	var payMannerMoney = Ext.getCmp('tm_numPayMannerMoney');
+	var comment = Ext.getCmp('tm_txtTakeMoneyComment');
 	
 	if(!memberMobile.isValid()){
 		return;
@@ -402,12 +376,12 @@ function rechargeControlCenter(_c){
 		Ext.example.msg('提示', '会员信息已改变, 请重新读取信息.');
 		return;
 	}
-	if(!rechargeMoney.isValid() || !payMannerMoney.isValid() || !rechargeType.isValid()){
+	if(!rechargeMoney.isValid() || !payMannerMoney.isValid()){
 		return;
 	}
 	
 	var mask = new Ext.LoadMask(document.body, {
-		msg : '正在充值, 请稍候......',
+		msg : '正在取款, 请稍候......',
 		remove : true
 	});
 	mask.show();
@@ -415,11 +389,11 @@ function rechargeControlCenter(_c){
 	Ext.Ajax.request({
 		url : '../../OperateMember.do',
 		params : {
-			dataSource : 'charge',
+			dataSource : 'takeMoney',
 			isCookie : true,
 			memberID : rechargeOperateData.id,
-			rechargeMoney : rechargeMoney.getValue(),
-			rechargeType : rechargeType.getValue(),
+			takeMoney : rechargeMoney.getValue(),
+			//rechargeType : rechargeType.getValue(),
 			payMannerMoney : payMannerMoney.getValue(),
 			comment : comment.getValue(),
 			isPrint : typeof _c.isPrint == 'boolean' ? _c.isPrint : true
@@ -429,12 +403,12 @@ function rechargeControlCenter(_c){
 			var jr = Ext.decode(res.responseText);
 			if(jr.success){
 				if(typeof _c.reload == 'boolean' && _c.reload){
-//					rechargeLoadMemberData({});
+//					takeMoneyLoadMemberData({});
 				}
 				Ext.example.msg(jr.title, jr.msg);
 				if(typeof _c.callback == 'function'){
 					jr.data = {
-						memberCard : Ext.getCmp('rd_numMemberCardForRecharge').getValue()	
+						memberCard : Ext.getCmp('tm_numMemberCardForTakeMoney').getValue()	
 					};
 					_c.callback(jr);
 				}
@@ -448,3 +422,4 @@ function rechargeControlCenter(_c){
 		}
 	});
 }
+	

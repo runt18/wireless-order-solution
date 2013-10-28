@@ -334,14 +334,14 @@ staffStore.load({
 // 2，员工列模型
 var staffColumnModel = new Ext.grid.ColumnModel([ 
      new Ext.grid.RowNumberer(), 
-    {header : '员工名称', dataIndex : 'staffName'},
+    {header : '员工名称', dataIndex : 'staffName', width : 150},
     {header : '联系电话', dataIndex : 'mobile', hidden: true},
-    {header : '角色', dataIndex : 'roleName'},
+    {header : '角色', dataIndex : 'roleName', width : 150},
 	{
     	id : 'staffOpt',
 		header : '操作',
 		dataIndex : 'staffOpt',
-		width : 150,
+		width : 200,
 		align : 'center',
 		renderer : staffOpt
 	} ]);
@@ -861,7 +861,7 @@ Ext.onReady(function() {
 	staffGrid = new Ext.grid.GridPanel({
 		xtype : 'grid',
 		id : 'staffGrid',
-		width : 300,
+		width : 500,
 		region : 'west',
 		frame : true,
 		ds : staffStore,
@@ -925,9 +925,8 @@ Ext.onReady(function() {
 	
 	roleGrid = new Ext.grid.GridPanel({
 		xtype : 'grid',
-		//id : 'roleGrid',
+		id : 'roleGrid',
 		anchor : '100%',
-		width : '20%',
 		region : 'center',
 		frame : true,
 		autoExpandColumn : 'roleOpt',

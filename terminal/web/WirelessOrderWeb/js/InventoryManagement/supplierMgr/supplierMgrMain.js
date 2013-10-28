@@ -76,6 +76,7 @@ addSupplier = new Ext.Window({
 		frame : true,
 		border : true,
 		labelWidth : 68,
+		height : 163,
 		items : [{
 			xtype : 'textfield',
 			id : 'txtSId',
@@ -458,7 +459,7 @@ Ext.onReady(function(){
 		renderTo : 'divSupplier',//渲染到
 		id : 'supplierPanel',
 		//solve不跟随窗口的变化而变化
-		//width : parseInt(Ext.getDom('divSupplier').parentElement.style.width.replace(/px/g,'')),
+		width : parseInt(Ext.getDom('divSupplier').parentElement.style.width.replace(/px/g,'')),
 		height : parseInt(Ext.getDom('divSupplier').parentElement.style.height.replace(/px/g,'')),
 		layout:'border',
 		frame : true, //边框

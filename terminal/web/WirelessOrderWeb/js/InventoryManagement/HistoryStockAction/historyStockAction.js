@@ -298,9 +298,9 @@ Ext.onReady(function(){
 	    {header: '时间', dataIndex: 'oriStockDateFormat', width:100},
 	    {header: '出货仓/供应商', renderer: stockOutRenderer, width:100},
 	    {header: '收货仓/供应商', dataIndex: 'stockInRenderer', renderer: stockInRenderer, width:100},
-	    {header: '数量', dataIndex: 'amount', align: 'center', renderer: Ext.ux.txtFormat.gridDou},
-	    {header: '应收金额', dataIndex: 'price', align: 'center', renderer: Ext.ux.txtFormat.gridDou},
-	    {header: '实际金额', dataIndex: 'actualPrice', width:100, align: 'center', renderer: Ext.ux.txtFormat.gridDou},
+	    {header: '数量', dataIndex: 'amount', align: 'right', renderer: Ext.ux.txtFormat.gridDou},
+	    {header: '应收金额', dataIndex: 'price', align: 'right', renderer: Ext.ux.txtFormat.gridDou},
+	    {header: '实际金额', dataIndex: 'actualPrice', width:100, align: 'right', renderer: Ext.ux.txtFormat.gridDou},
 	    {header: '审核人', dataIndex: 'approverName', width:80, align: 'center'},
 	    {header: '审核状态', dataIndex: 'statusText', align: 'center', width:70},
 	    {header: '制单人', dataIndex: 'operatorName', width:80, align: 'center'},
@@ -352,11 +352,11 @@ Ext.onReady(function(){
 				if(store.getCount() > 0){
 					sumRow = stockActionGrid.getView().getRow(store.getCount() - 1);	
 					sumRow.style.backgroundColor = '#EEEEEE';			
-					sumRow.style.color = 'green';
 					for(var i = 0; i < stockActionGrid.getColumnModel().getColumnCount(); i++){
-						var sumRow = stockActionGrid.getView().getCell(store.getCount() - 1, i);
-						sumRow.style.fontSize = '15px';
-						sumRow.style.fontWeight = 'bold';					
+						var sumCell = stockActionGrid.getView().getCell(store.getCount() - 1, i);
+						sumCell.style.fontSize = '15px';
+						sumCell.style.fontWeight = 'bold';
+						sumCell.style.color = 'green';
 					}
 					stockActionGrid.getView().getCell(store.getCount()-1, 1).innerHTML = '汇总';
 					stockActionGrid.getView().getCell(store.getCount()-1, 2).innerHTML = '--';

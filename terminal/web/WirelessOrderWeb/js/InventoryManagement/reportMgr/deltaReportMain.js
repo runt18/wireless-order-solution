@@ -241,7 +241,7 @@ Ext.onReady(function(){
 	
 	var deltaReportGrid = new Ext.grid.GridPanel({
 		title : '消耗差异表',
-		id : 'deltaReport',
+		//id : 'deltaReport',
 		region : 'center',
 		border : true,
 		frame : true,
