@@ -144,7 +144,6 @@ public class MemberOperation implements Jsonable {
 	private float takeMoney;
 	private float deltaBaseMoney;
 	private float deltaExtraMoney;
-	//private float deltaTotalMoney = this.deltaBaseMoney + this.deltaExtraMoney;
 	private int deltaPoint;
 	private float remainingBaseMoney;
 	private float remainingExtraMoney;
@@ -166,13 +165,13 @@ public class MemberOperation implements Jsonable {
 		return mo;
 	}
 	
-/*	public float getDeltaTotalMoney(){
-		return this.deltaTotalMoney;
+	public float getDeltaTotalMoney(){
+		return this.deltaBaseMoney + this.deltaExtraMoney;
 		
-	}*/
+	}
 	
 	public float getRemainingTotalMoney(){
-		return this.remainingExtraMoney;
+		return this.remainingExtraMoney + this.remainingBaseMoney;
 	}
 	
 	@Override
@@ -191,7 +190,7 @@ public class MemberOperation implements Jsonable {
 		jm.put("remainingExtraMoney", this.remainingExtraMoney);
 		jm.put("remainingPoint", this.remainingPoint);
 		jm.put("comment", this.comment);
-		//jm.put("deltaTotalMoney", this.getDeltaTotalMoney());
+		jm.put("deltaTotalMoney", this.getDeltaTotalMoney());
 		jm.put("remainingTotalMoney", this.getRemainingTotalMoney());
 		jm.put("operateDateFormat", DateUtil.format(this.operateDate));
 		if(this.member != null){
@@ -407,7 +406,6 @@ public class MemberOperation implements Jsonable {
 	}
 	
 /*	public void setDeltaTotalMoney(float deltaTotalMoney){
-		this.deltaTotalMoney = deltaTotalMoney;
 	}*/
 	public int getRemainingPoint() {
 		return remainingPoint;

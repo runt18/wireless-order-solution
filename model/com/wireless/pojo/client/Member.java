@@ -541,10 +541,10 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 
 		totalCharge += chargeMoney;
 		baseBalance += chargeMoney;
-		extraBalance += deltaMoney;
+		extraBalance += (deltaMoney - chargeMoney);
 		
 		mo.setDeltaBaseMoney(chargeMoney);
-		mo.setDeltaExtraMoney(deltaMoney);
+		mo.setDeltaExtraMoney(deltaMoney - chargeMoney);
 		
 		mo.setRemainingBaseMoney(baseBalance);
 		mo.setRemainingExtraMoney(extraBalance);
@@ -565,10 +565,10 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 		//float deltaExtra = takeMoney * Math.abs(getMemberType().getChargeRate() - 1);
 
 		baseBalance -= takeMoney;
-		extraBalance -= deltaMoney;
+		extraBalance -= (deltaMoney - takeMoney);
 		
 		mo.setDeltaBaseMoney(-takeMoney);
-		mo.setDeltaExtraMoney(-deltaMoney);
+		mo.setDeltaExtraMoney(-(deltaMoney-takeMoney));
 		
 		mo.setRemainingBaseMoney(baseBalance);
 		mo.setRemainingExtraMoney(extraBalance);
