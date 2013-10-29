@@ -30,20 +30,25 @@ public class QueryOrderFromMemberPayAction extends Action{
 		try{
 			String pin = (String)request.getAttribute("pin");
 			String orderID = request.getParameter("orderID");
+			String discountId = request.getParameter("discountId");
 			String st = request.getParameter("st");
 			String sv = request.getParameter("sv");
 			
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
-			Member m = null;
-			if(st.trim().equals("mobile")){
+			Member m = new Member();
+			if(st != null && st.trim().equals("mobile")){
 				m = MemberDao.getMemberByMobile(staff, sv);
-			}else if(st.trim().equals("card")){
+			}else if(st != null && st.trim().equals("card")){
 				m = MemberDao.getMemberByCard(staff, sv);				
 			}
 			
 			com.wireless.pojo.dishesOrder.Order no = new com.wireless.pojo.dishesOrder.Order();
 			no.setId(Integer.valueOf(orderID));
-			no.setDiscount(new Discount(Integer.valueOf(m.getMemberType().getDefaultDiscount().getId())));
+			if(discountId != null && !discountId.trim().isEmpty()){
+				no.setDiscount(new Discount(Integer.valueOf(discountId)));
+			}else{
+				no.setDiscount(new Discount(Integer.valueOf(m.getMemberType().getDefaultDiscount().getId())));
+			}
 			no = PayOrder.calcById(staff, no);
 			
 			m.getMemberType().setDefaultDiscount(no.getDiscount());

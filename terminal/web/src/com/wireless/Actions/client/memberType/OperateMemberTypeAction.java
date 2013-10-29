@@ -145,7 +145,7 @@ public class OperateMemberTypeAction extends DispatchAction{
 			
 			String[] mDiscountCheckedList = null;
 			
-			if(memberDiscountCheckeds.trim().isEmpty()){
+			if(!memberDiscountCheckeds.trim().isEmpty()){
 				mDiscountCheckedList = memberDiscountCheckeds.split(",");
 			}else{
 				mDiscountCheckedList = new String[0];
