@@ -152,10 +152,14 @@ public class MemberDao {
 		dbCon.rs.close();
 		for(Member eachMember : result){
 			//Get the discounts to each member
-			sql = " SELECT discount_id, type FROM " + Params.dbName + ".member_type_discount WHERE member_type_id = " + eachMember.getMemberType().getTypeId();
+			sql = " SELECT MD.discount_id, MD.type, D.name FROM " + Params.dbName + ".member_type_discount MD " +
+					" JOIN " + Params.dbName + ".discount D " +
+					" ON MD.discount_id = D.discount_id " +
+					" WHERE member_type_id = " + eachMember.getMemberType().getTypeId();
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
 			while(dbCon.rs.next()){
-				Discount discount = new Discount(dbCon.rs.getInt("discount_id"));
+				Discount discount = new Discount(dbCon.rs.getInt("MD.discount_id"));
+				discount.setName(dbCon.rs.getString("D.name"));
 				eachMember.getMemberType().addDiscount(discount);
 				if(MemberType.DiscountType.valueOf(dbCon.rs.getInt("type")) == MemberType.DiscountType.DEFAULT){
 					eachMember.getMemberType().setDefaultDiscount(discount);
