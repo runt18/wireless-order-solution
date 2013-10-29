@@ -71,7 +71,6 @@ Ext.onReady(function(){
 			}
 	});
 	
-	
 	new Ext.Panel({
 		renderTo : 'divMemberPayOrderContent',
 		width : mw,
@@ -158,12 +157,57 @@ Ext.onReady(function(){
 					id : 'mpo_txtTotalPointForPayOrder',
 					fieldLabel : '剩余积分'
 				}]
-			}, {
+			}, 
+/*			{
 				items : [{
 					id : 'mpo_txtDiscountForPayOrder',
 					fieldLabel : '折扣方案'
 				}]
-			}, {
+			}, */
+			{
+				items : [{
+					xtype : 'combo',
+					id : 'mpo_txtDiscountForPayOrder',
+					readOnly : true,
+					forceSelection : true,
+					disabled : false,
+					fieldLabel : '折扣方案',
+					store : new Ext.data.SimpleStore({
+						fields : [ 'value', 'text' ]
+					}),
+					valueField : 'value',
+					displayField : 'text',
+					typeAhead : true,
+					mode : 'local',
+					triggerAction : 'all',
+					selectOnFocus : true,
+					listeners : {
+						select : function(thiz){
+							Ext.Ajax.request({
+								url : '../../QueryOrderFromMemberPay.do',
+								params : {
+									
+									discountId : thiz.getValue(),
+									orderID : orderID
+								},
+								success : function(res, opt){
+									var jr = Ext.decode(res.responseText);
+									if(jr.success){
+										var no = jr.other.newOrder;	
+										Ext.getCmp('mpo_txtMemberPriceForPayOrder').setValue(no['actualPrice'].toFixed(2));
+									}else{
+										Ext.example.msg(jr.title, jr.msg);
+									}
+								},
+								failure : function(res, opt){
+									Ext.ux.showMsg(Ext.decode(res.responseText));
+								}
+							});
+						}
+					}
+				}]
+			},
+			{
 				items : [{
 					id : 'mpo_txtDiscountRateForPayOrder',
 					fieldLabel : '折扣率'
@@ -233,7 +277,7 @@ function memberPayOrderToBindData(_c){
 	var totalPoint = Ext.getCmp('mpo_txtTotalPointForPayOrder');
 	var baseBalance = Ext.getCmp('mpo_txtBaseBalanceForPayOrder');
 	var extraBalance = Ext.getCmp('mpo_txtExtraBalanceForPayOrder');
-	var discount = Ext.getCmp('mpo_txtDiscountForPayOrder');
+	var discountCbo = Ext.getCmp('mpo_txtDiscountForPayOrder');
 	var discountRate = Ext.getCmp('mpo_txtDiscountRateForPayOrder');
 	var orderPrice = Ext.getCmp('mpo_txtOrderPriceForPayOrder');
 	var memberPrice = Ext.getCmp('mpo_txtMemberPriceForPayOrder');
@@ -246,7 +290,7 @@ function memberPayOrderToBindData(_c){
 	var member = typeof data.member == 'undefined' ? {} : data.member;
 	var memberType = typeof member.memberType == 'undefined' ? {} : member.memberType;
 	var discountMsg = typeof memberType.discount == 'undefined' ? {} : memberType.discount;
-	
+	var discountMsgs = typeof memberType.discounts == 'undefined' ? {discounts:[{id:-1, name:'全部'}]} : memberType.discounts;
 	var newOrder = typeof data.newOrder == 'undefined' ? {} : data.newOrder;
 	
 	mobile.setValue(member['mobile']);
@@ -258,15 +302,23 @@ function memberPayOrderToBindData(_c){
 	baseBalance.setValue(member['baseBalance']);
 	extraBalance.setValue(member['extraBalance']);
 	customNum.setValue(typeof newOrder['customNum'] == 'undefined' || newOrder['customNum'] < 1 ? 1 : newOrder['customNum']);
-	
-	discount.setValue(discountMsg['name']);
+
 	discountRate.setValue('--');
+	
+	var discounts = [];
+	for (var i = 0; i < discountMsgs.length; i++) {
+		discounts.push([discountMsgs[i].id, discountMsgs[i].name]);
+	}
+	
+	discountCbo.store.loadData(discounts);
+	discountCbo.setValue(discountMsg['id']);
 	
 	payManner.setDisabled(true);
 	if(memberType['attributeValue'] == 1){
 		payManner.store.loadData([mpo_payMannerData[0], mpo_payMannerData[1]]);
 		payManner.setValue(1);
 		payManner.setDisabled(false);
+
 	}else if(memberType['attributeValue'] == 0){
 		payManner.store.loadData([mpo_payMannerData[2]]);
 		payManner.setValue(3);
