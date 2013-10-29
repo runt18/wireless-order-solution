@@ -255,16 +255,16 @@ public class TestMemberDao {
 	}
 	
 	private void testCharge(Member expect) throws BusinessException, SQLException{
-		MemberOperation mo = MemberDao.charge(mStaff, expect.getId(), 100, ChargeType.CASH);
-		expect.charge(100, ChargeType.CASH);
+		MemberOperation mo = MemberDao.charge(mStaff, expect.getId(), 100, 120, ChargeType.CASH);
+		expect.charge(100, 120, ChargeType.CASH);
 		
 		compareMember(expect, MemberDao.getMemberById(mStaff, expect.getId()));
 		compareMemberOperation(mo, MemberOperationDao.getTodayById(mo.getId()));
 	}
 	
 	private void testConsume(Member expect) throws BusinessException, SQLException{
-		MemberDao.charge(mStaff, expect.getId(), 100, ChargeType.CASH);
-		expect.charge(100, ChargeType.CASH);
+		MemberDao.charge(mStaff, expect.getId(), 100, 120, ChargeType.CASH);
+		expect.charge(100, 120, ChargeType.CASH);
 		
 		//使用会员卡余额消费
 		MemberOperation mo = MemberDao.consume(mStaff, expect.getId(), 50, Order.PayType.MEMBER, 10);
