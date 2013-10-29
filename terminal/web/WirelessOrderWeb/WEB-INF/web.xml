@@ -8,6 +8,9 @@
 		<init-param>
 			<param-name>skipVerify</param-name>
 			<param-value>
+				/WXEntry.do,
+				/QueryFood_q.do,
+				
 				/QueryRestaurants.do,
 				/VerifyLogin.do,
 				/LoginOut.do,
@@ -68,7 +71,7 @@
 		</init-param>
 		<init-param>
 			<param-name>db_host</param-name>
-			<param-value>192.168.157.100</param-value>
+			<param-value>127.0.0.1</param-value>
 		</init-param>
 		<init-param>
 			<param-name>db_port</param-name>
@@ -80,7 +83,7 @@
 		</init-param>
 		<init-param>
 			<param-name>db_pwd</param-name>
-			<param-value>HelloZ315</param-value>
+			<param-value>q123123</param-value>
 		</init-param>
 		<!-- Below is the configuration parameters to socket -->
 		<init-param>
@@ -93,15 +96,15 @@
 		</init-param>
 		<init-param>
 			<param-name>imageBrowseDefaultFile</param-name>
-			<param-value>http://192.168.1.63:8080/WirelessOrderWeb/images/nophoto.jpg</param-value>
+			<param-value>http://192.168.1.103:8080/WirelessOrderWeb/images/nophoto.jpg</param-value>
 		</init-param>
 		<init-param>
 			<param-name>imageBrowsePath</param-name>
-			<param-value>http://192.168.1.63:8080/WirelessOrderWeb/images/upload</param-value>
+			<param-value>http://192.168.1.103:8080/WirelessOrderWeb/images/upload</param-value>
 		</init-param>
 		<init-param>
 			<param-name>imageUploadPath</param-name>
-			<param-value>F:\JavaDemo\.metadata\.plugins\org.eclipse.wst.server.core\tmp0\wtpwebapps\WirelessOrderWeb\images\upload</param-value>
+			<param-value>F:\JavaDemo\.metadata\.plugins\org.eclipse.wst.server.core\tmp1\wtpwebapps\WirelessOrderWeb\images\upload</param-value>
 		</init-param>
 		<init-param>
 			<param-name>imageUploadMaxSize</param-name>
@@ -111,6 +114,26 @@
 			<param-name>imageUploadType</param-name>
 			<param-value>jpg,gif,png,bmp</param-value>
 		</init-param>
+		<init-param>
+			<param-name>OSS_ACCESS_ID</param-name>
+			<param-value>IGQwqbvEgaqwN2dz</param-value>
+		</init-param>
+		<init-param>
+			<param-name>OSS_ACCESS_KEY</param-name>
+			<param-value>8YbGpZupP8fCiGTU9Zvm5aDdh9GlbS</param-value>
+		</init-param>
+		<init-param>
+			<param-name>OSS_ENDPOINT</param-name>
+			<param-value>http://oss.aliyuncs.com</param-value>
+		</init-param>
+		<init-param>
+			<param-name>OSS_UPLOADPOINT</param-name>
+			<param-value>http://oss-internal.aliyuncs.com</param-value>
+		</init-param>
+		<init-param>
+			<param-name>OSS_BUCKET_IMAGE</param-name>
+			<param-value>digie-image</param-value>
+		</init-param>
 		<load-on-startup>0</load-on-startup>
 	</servlet>
 	<servlet-mapping>
@@ -118,9 +141,8 @@
 		<url-pattern>*.do</url-pattern>
 	</servlet-mapping>
 	<session-config>
-		<session-timeout>1</session-timeout>       <!-- 单位：分钟 -->
+		<session-timeout>30</session-timeout>       <!-- 单位：分钟 -->
 	</session-config>
-
 	
 	<welcome-file-list>
 		<welcome-file>index.html</welcome-file>
@@ -129,6 +151,6 @@
 		<welcome-file>default.html</welcome-file>
 		<welcome-file>default.htm</welcome-file>
 		<welcome-file>default.jsp</welcome-file>
-		<welcome-file>pages/TableSelect.html</welcome-file>
+		<welcome-file>pages/PersonLogin.html</welcome-file>
 	</welcome-file-list>
 </web-app>
