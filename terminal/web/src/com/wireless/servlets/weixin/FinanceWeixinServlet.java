@@ -103,8 +103,8 @@ public class FinanceWeixinServlet extends HttpServlet {
 				mit.setFromUserName(msg.getToUserName());
 				mit.setToUserName(msg.getFromUserName()); 
 				mit.setCreateTime(msg.getCreateTime());
-				mit.addItem(d1);
 				mit.addItem(d2);
+				mit.addItem(d1);
 				mit.setFuncFlag("0");  
 				session.callback(mit);
 				
@@ -116,4 +116,5 @@ public class FinanceWeixinServlet extends HttpServlet {
 		session.process(is, os);//处理微信消息 
 		session.close();//关闭Session
 	}
+	
 }

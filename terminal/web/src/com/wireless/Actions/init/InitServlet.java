@@ -8,6 +8,7 @@ import org.apache.struts.action.ActionServlet;
 
 import com.wireless.db.DBCon;
 import com.wireless.sccon.ServerConnector;
+import com.wireless.util.OSSUtil;
 
 public class InitServlet extends ActionServlet {
 
@@ -25,6 +26,10 @@ public class InitServlet extends ActionServlet {
 					   getServletConfig().getInitParameter("db_name"),
 					   getServletConfig().getInitParameter("db_user"), 
 					   getServletConfig().getInitParameter("db_pwd"));
+			
+			OSSUtil.init(getServletConfig().getInitParameter("OSS_ACCESS_ID"),
+					   getServletConfig().getInitParameter("OSS_ACCESS_KEY"), 
+					   getServletConfig().getInitParameter("OSS_BUCKET_IMAGE"));
 		} catch (PropertyVetoException e) {
 			throw new ServletException(e);
 		}
