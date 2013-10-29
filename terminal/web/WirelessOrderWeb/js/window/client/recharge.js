@@ -357,7 +357,7 @@ function rechargeBindMemberData(data){
 	
 	mobile.setValue(data['mobile']);
 	memberCard.setValue(data['memberCard']);
-	totalBalance.setValue(data['extraBalance']);
+	totalBalance.setValue(data['totalBalance']);
 	baseBalance.setValue(data['baseBalance']);
 	//extraBalance.setValue(data['extraBalance']);
 	totalPoint.setValue(data['point']);

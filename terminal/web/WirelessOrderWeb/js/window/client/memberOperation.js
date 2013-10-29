@@ -17,7 +17,7 @@ function cdd_deltaTotalMoneyRenderer(v, md, r, ri, ci, store){
 		if(v == 2 && r.get('member')['memberType']['attributeValue'] == 1){
 			return '--';
 		}else{
-			return Ext.ux.txtFormat.gridDou(r.get('deltaExtraMoney'));			
+			return Ext.ux.txtFormat.gridDou(r.get('deltaTotalMoney'));			
 		}
 	}else{
 		return '--';
@@ -28,7 +28,7 @@ function cdd_remainingTotalMoneyRenderer(v, md, r, ri, ci, store){
 		if(v == 2 && r.get('member')['memberType']['attributeValue'] == 1){
 			return '--';
 		}else{
-			return Ext.ux.txtFormat.gridDou(r.get('remainingExtraMoney'));			
+			return Ext.ux.txtFormat.gridDou(r.get('remainingTotalMoney'));			
 		}
 	}else{
 		return '--';
@@ -82,9 +82,9 @@ Ext.onReady(function(){
 			select : function(){
 				cdd_mo_grid.getColumnModel().setRenderer(4, cdd_deltaPointRenderer);
 				cdd_mo_grid.getColumnModel().setRenderer(5, cdd_remainingPointRenderer);
-				cdd_mo_grid.getColumnModel().setRenderer(6, cdd_deltaTotalMoneyRenderer);
-				cdd_mo_grid.getColumnModel().setRenderer(7, cdd_remainingTotalMoneyRenderer);
-				cdd_mo_grid.getColumnModel().setRenderer(8, cdd_payMoneyRenderer);
+				cdd_mo_grid.getColumnModel().setRenderer(6, cdd_payMoneyRenderer);
+				cdd_mo_grid.getColumnModel().setRenderer(7, cdd_deltaTotalMoneyRenderer);
+				cdd_mo_grid.getColumnModel().setRenderer(8, cdd_remainingTotalMoneyRenderer);
 				
 				cdd_searchMemberOperation();
 			}

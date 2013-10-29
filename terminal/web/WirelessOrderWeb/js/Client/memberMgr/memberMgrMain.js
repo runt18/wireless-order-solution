@@ -895,7 +895,7 @@ function gridInit(){
 			['累计积分', 'totalPoint',,'right', 'Ext.ux.txtFormat.gridDou'],
 			['当前积分', 'point',,'right', 'Ext.ux.txtFormat.gridDou'],
 			['充值额', 'totalCharge',,'right', 'Ext.ux.txtFormat.gridDou'],
-			['余额', 'extraBalance',,'right', 'Ext.ux.txtFormat.gridDou'],
+			['余额', 'totalBalance',,'right', 'Ext.ux.txtFormat.gridDou'],
 			['手机号码', 'mobile', 125],
 			['会员卡号', 'memberCard', 125],
 			['操作', 'operation', 270, 'center', 'memberOperationRenderer']
