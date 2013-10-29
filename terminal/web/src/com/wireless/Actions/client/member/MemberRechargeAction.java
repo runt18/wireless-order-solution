@@ -37,12 +37,13 @@ public class MemberRechargeAction extends Action{
 			String pin = (String)request.getAttribute("pin");
 			String memberID = request.getParameter("memberID");
 			String rechargeMoney = request.getParameter("rechargeMoney");
+			String payMoney = request.getParameter("payMoney");
 			String rechargeType = request.getParameter("rechargeType");
 			String isPrint = request.getParameter("isPrint");
 			
 			final Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
-			MemberOperation mo = MemberDao.charge(staff, Integer.valueOf(memberID), Float.valueOf(rechargeMoney), ChargeType.valueOf(Integer.valueOf(rechargeType)));
+			MemberOperation mo = MemberDao.charge(staff, Integer.valueOf(memberID), Float.valueOf(payMoney), Float.valueOf(rechargeMoney), ChargeType.valueOf(Integer.valueOf(rechargeType)));
 			if(mo == null || mo.getId() == 0){
 				jobject.initTip(false, WebParams.TIP_TITLE_ERROE, 9998, "操作失败, 会员充值未成功, 未知错误, 请联系客服人员.");
 			}else{
