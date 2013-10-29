@@ -482,6 +482,16 @@
 			type = "com.wireless.Actions.distMgr.discount.QueryDiscountAction"
 			scope="request" parameter="dataSource">
 		</action>
+		
+		<action path="/WXEntry"
+			type="com.wireless.Actions.weixin.EntryAction"
+			scope="request">
+		</action>
+		
+		<action path="/QueryFood_q"
+			type = "com.wireless.Actions.weixin.query.QueryFoodAction"
+			scope="request" parameter="dataSource">
+		</action>
 	</action-mappings>
 
 	<message-resources parameter="com.yourcompany.struts.ApplicationResources" />
