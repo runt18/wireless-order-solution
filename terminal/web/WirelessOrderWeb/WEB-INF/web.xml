@@ -123,12 +123,12 @@
 			<param-value>8YbGpZupP8fCiGTU9Zvm5aDdh9GlbS</param-value>
 		</init-param>
 		<init-param>
-			<param-name>OSS_ENDPOINT</param-name>
+			<param-name>OSS_INNER_POINT</param-name>
 			<param-value>http://oss.aliyuncs.com</param-value>
 		</init-param>
 		<init-param>
-			<param-name>OSS_UPLOADPOINT</param-name>
-			<param-value>http://oss-internal.aliyuncs.com</param-value>
+			<param-name>OSS_OUTER_POINT</param-name>
+			<param-value>http://oss.aliyuncs.com</param-value>
 		</init-param>
 		<init-param>
 			<param-name>OSS_BUCKET_IMAGE</param-name>
