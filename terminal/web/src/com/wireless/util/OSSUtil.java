@@ -100,9 +100,7 @@ public class OSSUtil {
 	private static void ensureBucketImage() throws OSSException, ClientException{
 		if(imgClientInner == null)
 			throw new NullPointerException("错误: 未初始化客户端内网连接池.");
-		if (!imgClientInner.doesBucketExist(BUCKET_IMAGE)){
-			imgClientInner.createBucket(BUCKET_IMAGE);
-		}
+		ensureBucket(imgClientInner, BUCKET_IMAGE);
 		imgClientInner.setBucketAcl(BUCKET_IMAGE, CannedAccessControlList.PublicRead);
 		imgListRequest = new ListObjectsRequest(BUCKET_IMAGE);
 		imgListRequest.setMaxKeys(500);
@@ -142,9 +140,9 @@ public class OSSUtil {
     public static void uploadFile(OSSClient client, String bucketName, String key, File file, ObjectMetadata objectMeta) 
     		throws OSSException, ClientException, NullPointerException, IOException{
     	if(file != null && file.exists()){
+    		ensureBucket(client, bucketName);
     		if(objectMeta == null)
     			objectMeta = new ObjectMetadata();
-    		ensureBucket(client, bucketName);
     		objectMeta.setContentLength(file.length());
     		InputStream inputStream = new FileInputStream(file);
     		client.putObject(bucketName, key, inputStream, objectMeta);
@@ -223,6 +221,8 @@ public class OSSUtil {
         objectMeta.setContentLength(out.size());
 		checkContentType(objectMeta, key);
     	imgClientInner.putObject(BUCKET_IMAGE, key, fis, objectMeta);
+    	IOUtils.safeClose(fis);
+    	IOUtils.safeClose(out);
 	}
 	
     /**
