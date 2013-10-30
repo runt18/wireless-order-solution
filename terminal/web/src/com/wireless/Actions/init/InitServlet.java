@@ -31,11 +31,11 @@ public class InitServlet extends ActionServlet {
 			throw new ServletException(e);
 		}
 		try {
-			OSSUtil.init(getServletConfig().getInitParameter("OSS_ACCESS_ID"),
-					getServletConfig().getInitParameter("OSS_ACCESS_KEY"), 
-					getServletConfig().getInitParameter("OSS_BUCKET_IMAGE"));
-			OSSUtil.initClient(getServletConfig().getInitParameter("OSS_INNER_POINT"),
-					getServletConfig().getInitParameter("OSS_OUTER_POINT"));
+			OSSUtil.init(getServletConfig().getInitParameter("oss_access_id"),
+					getServletConfig().getInitParameter("oss_access_key"), 
+					getServletConfig().getInitParameter("oss_bucket_image"));
+			OSSUtil.initClient(getServletConfig().getInitParameter("oss_inner_point"),
+					getServletConfig().getInitParameter("oss_outer_point"));
 		} catch (Exception e) {
 			throw new ServletException(e);
 		}
