@@ -30,12 +30,12 @@ public class OSSUtil {
     private static String INNER_POINT;
 //    private static String OUTER_POINT;
     
-    private static String BUCKET_IMAGE;
+    public static String BUCKET_IMAGE;
     private static OSSClient imgClientInner;
 //    private static OSSClient imgClientOuter;
     private static ListObjectsRequest imgListRequest;
     
-    private static OSSClient clientInner;
+    public static OSSClient clientInner;
     
     /**
      * 初始化客户端连接池基础信息
@@ -151,21 +151,17 @@ public class OSSUtil {
     		throw new NullPointerException("错误: 上传文件不能为空.");
     	}
     }
-    
-    /**
-     * 上传文件
-     * @param client
-     * @param bucketName	
-     * @param key
-     * @param path
-     * @throws OSSException
-     * @throws ClientException
-     * @throws NullPointerException
-     * @throws IOException
-     */
     public static void uploadFile(OSSClient client, String bucketName, String key, String path) 
     		throws OSSException, ClientException, NullPointerException, IOException{
     	uploadFile(client, bucketName, key, new File(path), null);
+    }
+    public static void uploadFile(String bucketName, String key, File file, ObjectMetadata objectMeta) 
+    		throws OSSException, ClientException, NullPointerException, IOException{
+    	uploadFile(clientInner, bucketName, key, file, objectMeta);
+    }
+    public static void uploadFile(String bucketName, String key, String path) 
+    		throws OSSException, ClientException, NullPointerException, IOException{
+    	uploadFile(clientInner, bucketName, key, new File(path), null);
     }
     
     /**
