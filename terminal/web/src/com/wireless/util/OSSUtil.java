@@ -57,6 +57,7 @@ public class OSSUtil {
      * 	外网连接地址
      */
     public static void initClient(String innerPoint, String outerPoint) throws Exception{
+    	INNER_POINT = innerPoint;
     	clientInner = new OSSClient(INNER_POINT, ACCESS_ID, ACCESS_KEY);
     	System.out.println("信息: 其他文件处理客户端内网连接池初始化成功.");
     	imgClientInner = new OSSClient(INNER_POINT, ACCESS_ID, ACCESS_KEY);
@@ -349,5 +350,5 @@ public class OSSUtil {
     public static void downloadImage(String key) throws Exception{
     	downloadImage(key, null, null);
     }
-	
+    
 }
