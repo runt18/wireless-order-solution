@@ -1,8 +1,10 @@
 package com.wireless.util;
 
 import java.io.BufferedOutputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -22,7 +24,7 @@ import com.aliyun.openservices.oss.model.ObjectMetadata;
 
 public class OSSUtil {
 	
-private OSSUtil(){}
+	private OSSUtil(){}
 	
 	private static String ACCESS_ID;
     private static String ACCESS_KEY;
@@ -33,6 +35,8 @@ private OSSUtil(){}
     private static OSSClient imgClientInner;
 //    private static OSSClient imgClientOuter;
     private static ListObjectsRequest imgListRequest;
+    
+    private static OSSClient clientInner;
     
     /**
      * 初始化客户端连接池基础信息
@@ -54,6 +58,7 @@ private OSSUtil(){}
      * 	外网连接地址
      */
     public static void initClient(String innerPoint, String outerPoint) throws Exception{
+    	clientInner = new OSSClient(INNER_POINT, ACCESS_ID, ACCESS_KEY);
     	System.out.println("信息: 其他文件处理客户端内网连接池初始化成功.");
     	imgClientInner = new OSSClient(INNER_POINT, ACCESS_ID, ACCESS_KEY);
     	System.out.println("信息: 图片处理客户端内网连接池初始化成功.");
@@ -68,9 +73,32 @@ private OSSUtil(){}
     
     /**
      * 
-     * @throws Exception
+     * @param bucketName
+     * @throws OSSException
+     * @throws ClientException
      */
-	private static void ensureBucketImage() throws Exception{
+	private static void ensureBucket(String bucketName) throws OSSException, ClientException{
+    	ensureBucket(clientInner, bucketName);
+    }
+	
+	/**
+     * 创建自定义 bucket
+     * @param bucketName
+     * @throws OSSException
+     * @throws ClientException
+     */
+	private static void ensureBucket(OSSClient client, String bucketName) throws OSSException, ClientException{
+    	if (!client.doesBucketExist(bucketName)){
+    		client.createBucket(bucketName);
+		}
+    }
+    
+    /**
+     * 
+     * @throws OSSException
+     * @throws ClientException
+     */
+	private static void ensureBucketImage() throws OSSException, ClientException{
 		if(imgClientInner == null)
 			throw new NullPointerException("错误: 未初始化客户端内网连接池.");
 		if (!imgClientInner.doesBucketExist(BUCKET_IMAGE)){
@@ -117,6 +145,7 @@ private OSSUtil(){}
     	if(file != null && file.exists()){
     		if(objectMeta == null)
     			objectMeta = new ObjectMetadata();
+    		ensureBucket(client, bucketName);
     		objectMeta.setContentLength(file.length());
     		InputStream inputStream = new FileInputStream(file);
     		client.putObject(bucketName, key, inputStream, objectMeta);
@@ -191,8 +220,13 @@ private OSSUtil(){}
     public static void uploadImage(InputStream fis, String key) throws OSSException, ClientException,
 			NullPointerException, IOException{
     	ObjectMetadata objectMeta = new ObjectMetadata();
-		checkContentType(objectMeta, key);
-    	imgClientInner.putObject(BUCKET_IMAGE, key, fis, objectMeta);
+        ByteArrayOutputStream out = changeStreamToOut(fis);
+        objectMeta.setContentLength(out.size());
+        System.out.println("333   "+out.size());
+//		checkContentType(objectMeta, key);
+//    	imgClientInner.putObject(BUCKET_IMAGE, key, fis, objectMeta);
+        IOUtils.safeClose(out);
+        IOUtils.safeClose(fis);
 	}
 	
     /**
@@ -256,6 +290,25 @@ private OSSUtil(){}
     	return imgClientInner.getObject(new GetObjectRequest(BUCKET_IMAGE, key)).getObjectContent();
     }
     
+    private static ByteArrayOutputStream changeStreamToOut(InputStream in) throws IOException{
+    	ByteArrayOutputStream out = new ByteArrayOutputStream();
+        int ch;
+        while ((ch = in.read()) != -1) {   
+        	out.write(ch);   
+        }
+        return out;
+    }
+    
+    /**
+     * 
+     * @param key
+     * @return
+     * @throws Exception
+     */
+    public static OutputStream getImageToOutputStream(String key) throws Exception{
+    	return changeStreamToOut(imgClientInner.getObject(new GetObjectRequest(BUCKET_IMAGE, key)).getObjectContent());
+    }
+    
     /**
      * 下载图片
      * @param key
@@ -303,6 +356,5 @@ private OSSUtil(){}
     public static void downloadImage(String key) throws Exception{
     	downloadImage(key, null, null);
     }
-	
 	
 }

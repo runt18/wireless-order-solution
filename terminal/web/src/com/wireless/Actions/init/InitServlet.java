@@ -27,10 +27,16 @@ public class InitServlet extends ActionServlet {
 					   getServletConfig().getInitParameter("db_user"), 
 					   getServletConfig().getInitParameter("db_pwd"));
 			
-			OSSUtil.init(getServletConfig().getInitParameter("OSS_ACCESS_ID"),
-					   getServletConfig().getInitParameter("OSS_ACCESS_KEY"), 
-					   getServletConfig().getInitParameter("OSS_BUCKET_IMAGE"));
 		} catch (PropertyVetoException e) {
+			throw new ServletException(e);
+		}
+		try {
+			OSSUtil.init(getServletConfig().getInitParameter("OSS_ACCESS_ID"),
+					getServletConfig().getInitParameter("OSS_ACCESS_KEY"), 
+					getServletConfig().getInitParameter("OSS_BUCKET_IMAGE"));
+			OSSUtil.initClient(getServletConfig().getInitParameter("OSS_INNER_POINT"),
+					getServletConfig().getInitParameter("OSS_OUTER_POINT"));
+		} catch (Exception e) {
 			throw new ServletException(e);
 		}
 		ServerConnector.instance().setNetAddr(getServletConfig().getInitParameter("socket_host"));
