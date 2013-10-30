@@ -287,7 +287,7 @@ public class OSSUtil {
     	return imgClientInner.getObject(new GetObjectRequest(BUCKET_IMAGE, key)).getObjectContent();
     }
     
-    private static ByteArrayOutputStream changeStreamToOut(InputStream in) throws IOException{
+    public static ByteArrayOutputStream changeStreamToOut(InputStream in) throws IOException{
     	ByteArrayOutputStream out = new ByteArrayOutputStream();
         int ch;
         while ((ch = in.read()) != -1) {   
