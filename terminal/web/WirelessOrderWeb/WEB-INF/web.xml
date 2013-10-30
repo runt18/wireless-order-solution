@@ -115,23 +115,23 @@
 			<param-value>jpg,gif,png,bmp</param-value>
 		</init-param>
 		<init-param>
-			<param-name>OSS_ACCESS_ID</param-name>
+			<param-name>oss_access_id</param-name>
 			<param-value>IGQwqbvEgaqwN2dz</param-value>
 		</init-param>
 		<init-param>
-			<param-name>OSS_ACCESS_KEY</param-name>
+			<param-name>oss_access_key</param-name>
 			<param-value>8YbGpZupP8fCiGTU9Zvm5aDdh9GlbS</param-value>
 		</init-param>
 		<init-param>
-			<param-name>OSS_INNER_POINT</param-name>
+			<param-name>oss_inner_point</param-name>
 			<param-value>http://oss.aliyuncs.com</param-value>
 		</init-param>
 		<init-param>
-			<param-name>OSS_OUTER_POINT</param-name>
+			<param-name>oss_outer_point</param-name>
 			<param-value>http://oss.aliyuncs.com</param-value>
 		</init-param>
 		<init-param>
-			<param-name>OSS_BUCKET_IMAGE</param-name>
+			<param-name>oss_bucket_image</param-name>
 			<param-value>digie-image</param-value>
 		</init-param>
 		<load-on-startup>0</load-on-startup>
