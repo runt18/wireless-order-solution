@@ -77,7 +77,7 @@ public class OSSUtil {
      * @throws OSSException
      * @throws ClientException
      */
-	private static void ensureBucket(String bucketName) throws OSSException, ClientException{
+	public static void ensureBucket(String bucketName) throws OSSException, ClientException{
     	ensureBucket(clientInner, bucketName);
     }
 	
@@ -87,7 +87,7 @@ public class OSSUtil {
      * @throws OSSException
      * @throws ClientException
      */
-	private static void ensureBucket(OSSClient client, String bucketName) throws OSSException, ClientException{
+	public static void ensureBucket(OSSClient client, String bucketName) throws OSSException, ClientException{
     	if (!client.doesBucketExist(bucketName)){
     		client.createBucket(bucketName);
 		}
