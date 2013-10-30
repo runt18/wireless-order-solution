@@ -89,6 +89,7 @@ public class OSSUtil {
 	public static void ensureBucket(OSSClient client, String bucketName) throws OSSException, ClientException{
     	if (!client.doesBucketExist(bucketName)){
     		client.createBucket(bucketName);
+    		client.setBucketAcl(bucketName, CannedAccessControlList.PublicRead);
 		}
     }
     
