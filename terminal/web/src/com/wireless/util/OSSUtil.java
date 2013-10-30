@@ -222,11 +222,8 @@ public class OSSUtil {
     	ObjectMetadata objectMeta = new ObjectMetadata();
         ByteArrayOutputStream out = changeStreamToOut(fis);
         objectMeta.setContentLength(out.size());
-        System.out.println("333   "+out.size());
-//		checkContentType(objectMeta, key);
-//    	imgClientInner.putObject(BUCKET_IMAGE, key, fis, objectMeta);
-        IOUtils.safeClose(out);
-        IOUtils.safeClose(fis);
+		checkContentType(objectMeta, key);
+    	imgClientInner.putObject(BUCKET_IMAGE, key, fis, objectMeta);
 	}
 	
     /**
