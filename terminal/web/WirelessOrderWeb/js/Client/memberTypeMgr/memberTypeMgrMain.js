@@ -589,19 +589,21 @@ function memberTypeOperationHandler(c){
 			return;
 		}
 		memberTypeWin.setTitle('修改会员类型');
-		memberTypeWin.show();
-		memberTypeWin.center();
-		
-		bindMemberTypeData(sd);
-		
+		var mDiscountSelectedList = []; 
 		var discounts = document.getElementsByName('memberDiscount');
 		for (var i = 0; i < sd['discounts'].length; i++) {
 			for (var j = 0; j < discounts.length; j++) {
 				if(sd['discounts'][i].id == discounts[j].value){
 					discounts[j].checked = true;
+					mDiscountSelectedList.push({'discountID':sd['discounts'][i].id,'text':sd['discounts'][i].name});
 				}
 			}
 		}
+		Ext.getCmp('comboDiscount').store.loadData(mDiscountSelectedList)
+		bindMemberTypeData(sd);
+		
+		memberTypeWin.show();
+		memberTypeWin.center();
 	}else if(c.type == mtObj.operation['delete']){
 		var sd = Ext.ux.getSelData(memberTypeGrid.getId());
 		if(!sd){
