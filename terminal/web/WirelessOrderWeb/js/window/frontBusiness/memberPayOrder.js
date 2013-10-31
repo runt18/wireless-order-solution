@@ -201,7 +201,11 @@ Ext.onReady(function(){
 								success : function(res, opt){
 									var jr = Ext.decode(res.responseText);
 									if(jr.success){
-										var no = jr.other.newOrder;	
+										var no = jr.other.newOrder;
+										jr.other.member = mpo_memberDetailData.member; 
+										memberPayOrderToBindData({
+											data : jr
+										});	
 										mpo_memberDetailData.newOrder = no;
 										Ext.getCmp('mpo_txtMemberPriceForPayOrder').setValue(no['actualPrice'].toFixed(2));
 										Ext.getDom('mpo_txtPayMoneyForPayOrder').value = no['actualPrice'].toFixed(2);
@@ -218,6 +222,7 @@ Ext.onReady(function(){
 				}]
 			},
 			{
+				hidden : true,
 				items : [{
 					id : 'mpo_txtDiscountRateForPayOrder',
 					fieldLabel : '折扣率'
@@ -315,8 +320,11 @@ function memberPayOrderToBindData(_c){
 		discounts.push([discountMsgs[i].id, discountMsgs[i].name]);
 	}
 	
-	discountCbo.store.loadData(discounts);
-	discountCbo.setValue(discountMsg['id']);
+	if(discountCbo.getValue() == ""){
+		discountCbo.store.loadData(discounts);
+		discountCbo.setValue(discountMsg['id']);
+	}
+
 	
 	payManner.setDisabled(true);
 	if(memberType['attributeValue'] == 1){

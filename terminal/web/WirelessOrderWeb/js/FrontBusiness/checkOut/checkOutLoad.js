@@ -352,8 +352,10 @@ function refreshCheckOutData(_c){
 		}
 		
 		if(eval(category == 4)){
+			
 			loadTableGroupData(_c);
 		}else{
+			alert('4w');
 			loadTableData(_c);
 		}
 	}else{

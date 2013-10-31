@@ -1,6 +1,11 @@
 function cdd_deltaPointRenderer(v, md, r, ri, ci, store){
 	if(v == 2 || v == 3 || v == 4){
-		return parseInt(r.get('deltaPoint'));
+		var deltaPoint = parseInt(r.get('deltaPoint'));
+		if(deltaPoint < 0){
+			return "<font color='red' size='4'>"+ deltaPoint + "</font>";
+		}else{
+			return "<font color='green' size='4'>"+ deltaPoint + "</font>";
+		}
 	}else{
 		return '--';
 	}
@@ -17,7 +22,12 @@ function cdd_deltaTotalMoneyRenderer(v, md, r, ri, ci, store){
 		if(v == 2 && r.get('member')['memberType']['attributeValue'] == 1){
 			return '--';
 		}else{
-			return Ext.ux.txtFormat.gridDou(r.get('deltaTotalMoney'));			
+			var deltaTotalMoney = parseInt(r.get('deltaTotalMoney'));
+			if(deltaTotalMoney < 0){
+				return "<font color='red' size='4'>"+ Ext.ux.txtFormat.gridDou(deltaTotalMoney) + "</font>";
+			}else{
+				return "<font color='green' size='4'>"+ Ext.ux.txtFormat.gridDou(deltaTotalMoney) + "</font>";
+			}
 		}
 	}else{
 		return '--';

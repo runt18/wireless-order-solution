@@ -108,13 +108,13 @@ Ext.onReady(function(){
 			{
 				items : [{
 					id : 'tm_numTotalBalance',
-					fieldLabel : '总余额',
+					fieldLabel : '账户余额',
 					disabled : true
 				}]
 			}, {
 				items : [{
 					id : 'tm_numBaseBalance',
-					fieldLabel : '基础余额',
+					fieldLabel : '充值余额',
 					disabled : true
 				}]
 			}, {
@@ -126,7 +126,7 @@ Ext.onReady(function(){
 			}, {
 				items : [{
 					id : 'tm_numPayMannerMoney',
-					fieldLabel : '收款金额' + Ext.ux.txtFormat.xh,
+					fieldLabel : '退款金额' + Ext.ux.txtFormat.xh,
 					allowBlank : false,
 					listeners : {
 						render : function(thiz){

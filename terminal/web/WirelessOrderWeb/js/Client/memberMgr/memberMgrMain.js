@@ -612,7 +612,8 @@ memberStatusRenderer = function(v){
 function memberOperationSend(){
 	var data = Ext.ux.getSelData(memberBasicGrid);
 	var mobile = data != false ? data['mobile'] : '';
-	queryMemberOperationHandler('会员操作明细', '../window/client/memberOperation.jsp', { memberMobile : mobile, modal : true});
+	var title = '会员操作明细 --> ' + data.name;
+	queryMemberOperationHandler(title, '../window/client/memberOperation.jsp', { memberMobile : mobile, modal : true});
 } 
 
 memberOperationRenderer = function(val, m, record){

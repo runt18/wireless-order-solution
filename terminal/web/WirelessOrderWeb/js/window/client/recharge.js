@@ -79,13 +79,13 @@ Ext.onReady(function(){
 			},{
 				items : [{
 					id : 'rd_numTotalBalance',
-					fieldLabel : '总余额',
+					fieldLabel : '账户余额',
 					disabled : true
 				}]
 			}, {	
 				items : [{
 					id : 'rd_numBaseBalance',
-					fieldLabel : '基础余额',
+					fieldLabel : '充值余额',
 					disabled : true
 				}]
 			}, {

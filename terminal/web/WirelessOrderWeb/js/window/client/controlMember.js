@@ -265,19 +265,26 @@ function cm_operationMemberData(c){
 		
 		if(!data['privateComment']){
 			privateComment.setValue();
+			privateComment.enable();
 		}else{
 			privateComment.setValue(data['privateComment'].comment);
+			privateComment.disable();
 		}
 		
 		if(!data['publicComment']){
 			publicComment.setValue();
+			publicComment.enable();
 		}else{
 			var comments = "";
 			for (var i = 0; i < data['publicComment'].length; i++) {
 				comments += data['publicComment'][i].comment + "  ";
 			}
 			publicComment.setValue(comments);
+			publicComment.disable();
 		}
+		
+
+
 
 		if(typeof data['memberType'] != 'undefined'){
 			var task = {
@@ -351,8 +358,10 @@ function operateMemberHandler(c){
 	var memberMobile = Ext.getCmp('cm_txtMemberMobile');
 	var memberSex = Ext.getCmp('cm_comboMemberSex');
 	var birthday = Ext.getCmp('cm_dateMemberBirthday');
-	
+
 	if(cm_obj.otype.toLowerCase() == Ext.ux.otype['update'].toLowerCase()){
+		publicComment.disable();
+		privateComment.disable();
 		// 验证旧类型为充值属性
 		if(c.data['memberType']['attributeValue'] == 0){
 			for(var i = 0; i < membetType.store.getCount(); i++){
