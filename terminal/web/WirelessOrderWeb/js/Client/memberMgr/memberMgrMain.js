@@ -143,7 +143,7 @@ function initRechargeWin(){
 			closable : false,
 			modal : true,
 			resizable : false,
-			width : 650,
+			width : 680,
 			height : 350,
 			keys : [{
 				key : Ext.EventObject.ESC,
@@ -215,7 +215,7 @@ function initTakeMoneyWin(){
 			closable : false,
 			modal : true,
 			resizable : false,
-			width : 650,
+			width : 680,
 			height : 275,
 			keys : [{
 				key : Ext.EventObject.ESC,
@@ -894,7 +894,7 @@ function gridInit(){
 			['消费总额', 'totalConsumption',,'right', 'Ext.ux.txtFormat.gridDou'],
 			['累计积分', 'totalPoint',,'right', 'Ext.ux.txtFormat.gridDou'],
 			['当前积分', 'point',,'right', 'Ext.ux.txtFormat.gridDou'],
-			['充值额', 'totalCharge',,'right', 'Ext.ux.txtFormat.gridDou'],
+			['总充值额', 'totalCharge',,'right', 'Ext.ux.txtFormat.gridDou'],
 			['余额', 'totalBalance',,'right', 'Ext.ux.txtFormat.gridDou'],
 			['手机号码', 'mobile', 125],
 			['会员卡号', 'memberCard', 125],
@@ -927,7 +927,7 @@ function gridInit(){
 function winInit(){
 	memberBasicWin = new Ext.Window({
 		title : '&nbsp;',
-		width : 650,
+		width : 660,
 		height : 296,
 		modal : true,
 		resizable : false,

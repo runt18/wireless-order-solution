@@ -425,7 +425,7 @@ Ext.onReady(function(){
 				text : '货单类型:'
 			}, {
 				xtype : 'combo',
-				id : 'comboSearchForStockType',
+				id : 'hsa_comboSearchForStockType',
 				readOnly : true,
 				forceSelection : true,
 				width : 100,
@@ -651,7 +651,7 @@ Ext.onReady(function(){
 				    	 handler : function(e){
 				    		 var beginDate = Ext.getCmp('beginDate');
 				    		 var endDate = Ext.getCmp('endDate');
-				    		 var st = Ext.getCmp('comboSearchForStockType');
+				    		 var st = Ext.getCmp('hsa_comboSearchForStockType');
 				    		 var subType = Ext.getCmp('comboSearchForSubType');
 				    		 var cate = Ext.getCmp('comboSearchForCateType');
 				    		 var dept = Ext.getCmp('comboSearchForDept');
@@ -756,7 +756,7 @@ Ext.onReady(function(){
 				    		stockActionGrid.syncSize();
 				    		stockActionPanel.doLayout();
 				    		
-				    		Ext.getCmp('comboSearchForStockType').setValue(-1);
+				    		Ext.getCmp('hsa_comboSearchForStockType').setValue(-1);
 				    		Ext.getCmp('comboSearchForSubType').store.loadData('');
 				    		Ext.getCmp('comboSearchForSubType').setValue();
 				    		Ext.getCmp('comboSearchForCateType').setValue(-1);

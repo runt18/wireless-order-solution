@@ -837,12 +837,13 @@ updateTasteHandler = function(c){
 
 //-------------------------------
 var basicOperationPanel = new Ext.Panel({
+	width : 918,
 	frame : true,
 	border : false,
 	layout : 'fit',
 	items : [{
 		layout : 'column',
-		height : 700,
+		height : 550,
 		items : [{
 			columnWidth : .35,
 		 	layout : 'column',
@@ -2397,6 +2398,7 @@ function initMenuGrid(){
 }
 
 function initFoodOperationWin(){
+	foodOperationWin = Ext.getCmp('foodOperationWin');
 	if(!foodOperationWin){
 		foodOperationWin = new Ext.Window({
 			id : 'foodOperationWin',
@@ -2405,8 +2407,8 @@ function initFoodOperationWin(){
 			collapsed : true,
 			modal : true,
 			resizable : false,
-			width : 900,
-			height : 545,
+			width : 920,
+			height : 551,
 			layout : 'fit',
 			keys : [{
 				key : Ext.EventObject.ESC,
@@ -2513,6 +2515,7 @@ function initFoodOperationWin(){
 			items : [{
 				xtype : 'tabpanel',
 		    	id : 'foodOperationWinTab',
+		    	width : 919,
 		    	border : false,
 		    	activeTab : 0,
 		    	defaults : {

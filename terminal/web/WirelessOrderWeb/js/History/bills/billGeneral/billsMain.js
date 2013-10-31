@@ -267,81 +267,85 @@ var viewBillAddPanel = new Ext.Panel({
 	} ]
 });
 
-var viewBillWin = new Ext.Window({
-	layout : 'fit',
-	title : '查看账单',
-	width : 500,
-	height : 500,
-	resizable : false,
-	closable : false,
-	modal : true,
-	items : [ {
-		layout : 'border',
-		border : false,
-		items : [ viewBillGenPanel, viewBillGrid, viewBillAddPanel ]
-	} ],
-	bbar : ['->', {
-		text : '关闭',
-		iconCls : 'btn_close',
-		handler : function() {
-			viewBillWin.hide();
-		}
-	}],
-	keys : [{
-		key : Ext.EventObject.ESC,
-		scope : this,
-		fn : function(){
-			viewBillWin.hide();
-		}
-	}],
-	listeners : {
-		hide : function(thiz) {
-			viewBillData = null;
-			viewBillGrid.getStore().removeAll();
-		},
-		show : function(thiz) {
-			var data = Ext.ux.getSelData(billsGrid);
-			var orderID = data['id'];
-			
-			document.getElementById('billIDBV').innerHTML = orderID;
-			document.getElementById('billTypeBV').innerHTML = data['categoryText'];
-			document.getElementById('tableNbrBV').innerHTML = data['table.alias'];
-			document.getElementById('personNbrBV').innerHTML = data['customNum'];
-			document.getElementById('billDateBV').innerHTML = data['orderDateFormat'];
-			document.getElementById('payTypeBV').innerHTML = data['settleTypeText'];
-			document.getElementById('payMannerBV').innerHTML = data['payTypeText'];
-			document.getElementById('serviceRateBV').innerHTML = data['serviceRate'] + '％';
-			document.getElementById('forFreeBV').innerHTML = '￥' + data['giftPrice'].toFixed(2);
-			document.getElementById('shouldPayBV').innerHTML = '￥' + data['totalPrice'].toFixed(2);
-			document.getElementById('actrualPayBV').innerHTML = '￥' + data['actualPrice'].toFixed(2);
-			document.getElementById('discountBV').innerHTML = '￥' + data['discountPrice'].toFixed(2);
-			document.getElementById('erasePuotaPriceBV').innerHTML = '￥' + data['erasePrice'].toFixed(2);
-			document.getElementById('cancelPriceBV').innerHTML = '￥' + data['cancelPrice'].toFixed(2);
-
-			Ext.Ajax.request({
-				url : '../../QueryOrder.do',
-				params : {
-					
-					'orderID' : orderID,
-					'queryType' : 'History'
-				},
-				success : function(response, options) {
-					var jr = Ext.decode(response.responseText);
-					if (jr.success == true) {
-						viewBillData = jr;
-						viewBillGrid.getStore().loadData(viewBillData);
-					} else {
-						Ext.ux.showMsg(jr);
+var viewBillWin = Ext.getCmp('history_viewBillWin');
+if(!viewBillWin){
+	viewBillWin = new Ext.Window({
+		id : 'history_viewBillWin',
+		layout : 'fit',
+		title : '查看账单',
+		width : 500,
+		height : 500,
+		resizable : false,
+		closable : false,
+		modal : true,
+		items : [ {
+			layout : 'border',
+			border : false,
+			items : [ viewBillGenPanel, viewBillGrid, viewBillAddPanel ]
+		} ],
+		bbar : ['->', {
+			text : '关闭',
+			iconCls : 'btn_close',
+			handler : function() {
+				viewBillWin.hide();
+			}
+		}],
+		keys : [{
+			key : Ext.EventObject.ESC,
+			scope : this,
+			fn : function(){
+				viewBillWin.hide();
+			}
+		}],
+		listeners : {
+			hide : function(thiz) {
+				viewBillData = null;
+				viewBillGrid.getStore().removeAll();
+			},
+			show : function(thiz) {
+				var data = Ext.ux.getSelData(billsGrid);
+				var orderID = data['id'];
+				
+				document.getElementById('billIDBV').innerHTML = orderID;
+				document.getElementById('billTypeBV').innerHTML = data['categoryText'];
+				document.getElementById('tableNbrBV').innerHTML = data['table.alias'];
+				document.getElementById('personNbrBV').innerHTML = data['customNum'];
+				document.getElementById('billDateBV').innerHTML = data['orderDateFormat'];
+				document.getElementById('payTypeBV').innerHTML = data['settleTypeText'];
+				document.getElementById('payMannerBV').innerHTML = data['payTypeText'];
+				document.getElementById('serviceRateBV').innerHTML = data['serviceRate'] + '％';
+				document.getElementById('forFreeBV').innerHTML = '￥' + data['giftPrice'].toFixed(2);
+				document.getElementById('shouldPayBV').innerHTML = '￥' + data['totalPrice'].toFixed(2);
+				document.getElementById('actrualPayBV').innerHTML = '￥' + data['actualPrice'].toFixed(2);
+				document.getElementById('discountBV').innerHTML = '￥' + data['discountPrice'].toFixed(2);
+				document.getElementById('erasePuotaPriceBV').innerHTML = '￥' + data['erasePrice'].toFixed(2);
+				document.getElementById('cancelPriceBV').innerHTML = '￥' + data['cancelPrice'].toFixed(2);
+	
+				Ext.Ajax.request({
+					url : '../../QueryOrder.do',
+					params : {
+						
+						'orderID' : orderID,
+						'queryType' : 'History'
+					},
+					success : function(response, options) {
+						var jr = Ext.decode(response.responseText);
+						if (jr.success == true) {
+							viewBillData = jr;
+							viewBillGrid.getStore().loadData(viewBillData);
+						} else {
+							Ext.ux.showMsg(jr);
+						}
+					},
+					failure : function(response, options) {
+						var jr = Ext.decode(response.responseText);
+						Ext.ux.showMsg(jr);	
 					}
-				},
-				failure : function(response, options) {
-					var jr = Ext.decode(response.responseText);
-					Ext.ux.showMsg(jr);	
-				}
-			});
+				});
+			}
 		}
-	}
-});
+	});
+}
 
 function billViewHandler() {
 	viewBillWin.show();

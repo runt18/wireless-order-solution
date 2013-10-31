@@ -820,7 +820,7 @@ function initControl(){
 			allowBlank : false,
 			listeners : {
 				select : function(thiz){
-					var subType = Ext.getCmp('comboSearchForSubType');
+					var subType = Ext.getCmp('sam_comboSearchForSubType');
 					if(thiz.getValue() == 1){
 						subType.store.loadData(stockInDate);
 						subType.setValue(-1);
@@ -836,7 +836,7 @@ function initControl(){
 			text : '&nbsp;&nbsp;业务类型:'
 		}, {
 			xtype : 'combo',
-			id : 'comboSearchForSubType',
+			id : 'sam_comboSearchForSubType',
 			readOnly : true,
 			forceSelection : true,
 			width : 100,
@@ -1012,7 +1012,7 @@ function initControl(){
 			iconCls : 'btn_refresh',
 			handler : function(){
 				Ext.getCmp('comboSearchForStockType').setValue(1);
-				Ext.getCmp('comboSearchForSubType').setValue(-1);
+				Ext.getCmp('sam_comboSearchForSubType').setValue(-1);
 				Ext.getCmp('comboSearchForCateType').setValue(1);
 				Ext.getCmp('comboSearchForDept').setValue(-1);
 				Ext.getCmp('comboSearchForStockStatus').setValue(-1);
@@ -1032,7 +1032,7 @@ function initControl(){
 				var oriStockId = Ext.getCmp('comboSearchForOriStockId');
 				var status = Ext.getCmp('comboSearchForStockStatus');
 				var supplier = Ext.getCmp('comboSearchForSupplier');
-				var subType = Ext.getCmp('comboSearchForSubType');
+				var subType = Ext.getCmp('sam_comboSearchForSubType');
 				
 				var gs = stockBasicGrid.getStore();
 				gs.baseParams['stockType'] = st.getValue();
@@ -1131,181 +1131,183 @@ function initControl(){
 			stockBasicGrid.getView().getCell(store.getCount()-1, 14).innerHTML = '--';
 		}
 	});
-	
-	firstStepPanel = new Ext.Panel({
-    	mt : '操作货单共二步, <span style="color:#000;">现为第一步:选择单据类型</font>',
-        index : 0,
-        frame : true,
-        items : [{
-        	xtype : 'fieldset',
-        	title : '入库单',
-        	layout : 'column',
-        	height : Ext.isIE ? 150 : 138,
-        	items : [{
-        		columnWidth : .2,
-        		items : [{
-        			html : '&nbsp;'
-        		}, {
-        			layout : 'form',
-            		hidden : true,
-            		items : [{
-            			xtype : 'radio',
-    	        		inputValue : [1,1,7],
-    	        		name : 'radioStockOrderType',
-    	        		hideLabel : true,
-    	        		boxLabel : '商品盘盈'
-            		}, {
-            			xtype : 'radio',
-    	        		inputValue : [2,1,8],
-    	        		name : 'radioStockOrderType',
-    	        		hideLabel : true,
-    	        		boxLabel : '商品盘亏'
-            		}, {
-            			xtype : 'radio',
-    	        		inputValue : [2,1,9],
-    	        		name : 'radioStockOrderType',
-    	        		hideLabel : true,
-    	        		boxLabel : '商品消耗'
-            		}, {
-            			xtype : 'radio',
-    	        		inputValue : [2,2,7],
-    	        		name : 'radioStockOrderType',
-    	        		hideLabel : true,
-    	        		boxLabel : '原料盘盈'
-            		}, {
-            			xtype : 'radio',
-    	        		inputValue : [2,2,8],
-    	        		name : 'radioStockOrderType',
-    	        		hideLabel : true,
-    	        		boxLabel : '原料盘亏'
-            		}, {
-            			xtype : 'radio',
-    	        		inputValue : [2,2,9],
-    	        		name : 'radioStockOrderType',
-    	        		hideLabel : true,
-    	        		boxLabel : '原料消耗'
-            		}]
-        		}]
-        	}, {
-	        	columnWidth : .15,
+	if(!firstStepPanel){
+		firstStepPanel = new Ext.Panel({
+	    	mt : '操作货单共二步, <span style="color:#000;">现为第一步:选择单据类型</font>',
+	        index : 0,
+	        frame : true,
+	        items : [{
 	        	xtype : 'fieldset',
-	        	title : '商品入库',
-	        	height : Ext.isIE ? 100 : 115,
-	        	bodyStyle : 'padding:3px 0px 0px 10px; ',
+	        	title : '入库单',
+	        	layout : 'column',
+	        	height : Ext.isIE ? 150 : 138,
 	        	items : [{
-	        		xtype : 'radio',
-	        		inputValue : [1,1,1],
-	        		name : 'radioStockOrderType',
-	        		hideLabel : true,
-	        		boxLabel : '商品采购'
+	        		columnWidth : .2,
+	        		items : [{
+	        			html : '&nbsp;'
+	        		}, {
+	        			layout : 'form',
+	            		hidden : true,
+	            		items : [{
+	            			xtype : 'radio',
+	    	        		inputValue : [1,1,7],
+	    	        		name : 'radioStockOrderType',
+	    	        		hideLabel : true,
+	    	        		boxLabel : '商品盘盈'
+	            		}, {
+	            			xtype : 'radio',
+	    	        		inputValue : [2,1,8],
+	    	        		name : 'radioStockOrderType',
+	    	        		hideLabel : true,
+	    	        		boxLabel : '商品盘亏'
+	            		}, {
+	            			xtype : 'radio',
+	    	        		inputValue : [2,1,9],
+	    	        		name : 'radioStockOrderType',
+	    	        		hideLabel : true,
+	    	        		boxLabel : '商品消耗'
+	            		}, {
+	            			xtype : 'radio',
+	    	        		inputValue : [2,2,7],
+	    	        		name : 'radioStockOrderType',
+	    	        		hideLabel : true,
+	    	        		boxLabel : '原料盘盈'
+	            		}, {
+	            			xtype : 'radio',
+	    	        		inputValue : [2,2,8],
+	    	        		name : 'radioStockOrderType',
+	    	        		hideLabel : true,
+	    	        		boxLabel : '原料盘亏'
+	            		}, {
+	            			xtype : 'radio',
+	    	        		inputValue : [2,2,9],
+	    	        		name : 'radioStockOrderType',
+	    	        		hideLabel : true,
+	    	        		boxLabel : '原料消耗'
+	            		}]
+	        		}]
 	        	}, {
-	        		xtype : 'radio',
-	        		inputValue : [1,1,2],
-	        		name : 'radioStockOrderType',
-	        		hideLabel : true,
-	        		boxLabel : '商品调拨'
-	        	}, {
-	        		xtype : 'radio',
-	        		inputValue : [1,1,3],
-	        		name : 'radioStockOrderType',
-	        		hideLabel : true,
-	        		boxLabel : '商品报溢'
-	        	}]
+		        	columnWidth : .15,
+		        	xtype : 'fieldset',
+		        	title : '商品入库',
+		        	height : Ext.isIE ? 100 : 115,
+		        	bodyStyle : 'padding:3px 0px 0px 10px; ',
+		        	items : [{
+		        		xtype : 'radio',
+		        		inputValue : [1,1,1],
+		        		name : 'radioStockOrderType',
+		        		hideLabel : true,
+		        		boxLabel : '商品采购'
+		        	}, {
+		        		xtype : 'radio',
+		        		inputValue : [1,1,2],
+		        		name : 'radioStockOrderType',
+		        		hideLabel : true,
+		        		boxLabel : '商品调拨'
+		        	}, {
+		        		xtype : 'radio',
+		        		inputValue : [1,1,3],
+		        		name : 'radioStockOrderType',
+		        		hideLabel : true,
+		        		boxLabel : '商品报溢'
+		        	}]
+		        }, {
+		        	columnWidth : .25,
+		        	html : '&nbsp;'
+		        }, {
+		        	columnWidth : .15,
+		        	xtype : 'fieldset',
+		        	bodyStyle : 'padding:3px 0px 0px 10px; ',
+		        	title : '原料入库',
+		        	height : Ext.isIE ? 100 : 115,
+		        	items : [{
+		        		xtype : 'radio',
+		        		inputValue : [1,2,1],
+		        		name : 'radioStockOrderType',
+		        		hideLabel : true,
+		        		boxLabel : '原料采购'
+		        	}, {
+		        		xtype : 'radio',
+		        		inputValue : [1,2,2],
+		        		name : 'radioStockOrderType',
+		        		hideLabel : true,
+		        		boxLabel : '原料调拨'
+		        	}, {
+	//	        		hidden : true,
+	//	        		hideParent : true,
+		        		xtype : 'radio',
+		        		inputValue : [1,2,3],
+		        		name : 'radioStockOrderType',
+		        		hideLabel : true,
+		        		boxLabel : '原料报溢'
+		        	}]
+		        }]
 	        }, {
-	        	columnWidth : .25,
-	        	html : '&nbsp;'
-	        }, {
-	        	columnWidth : .15,
 	        	xtype : 'fieldset',
-	        	bodyStyle : 'padding:3px 0px 0px 10px; ',
-	        	title : '原料入库',
-	        	height : Ext.isIE ? 100 : 115,
+	        	title : '出库单',
+	        	layout : 'column',
+	        	height : Ext.isIE ? 150 : 138,
 	        	items : [{
-	        		xtype : 'radio',
-	        		inputValue : [1,2,1],
-	        		name : 'radioStockOrderType',
-	        		hideLabel : true,
-	        		boxLabel : '原料采购'
+	        		columnWidth : .2,
+	        		html : '&nbsp;'
 	        	}, {
-	        		xtype : 'radio',
-	        		inputValue : [1,2,2],
-	        		name : 'radioStockOrderType',
-	        		hideLabel : true,
-	        		boxLabel : '原料调拨'
+		        	columnWidth : .15,
+		        	xtype : 'fieldset',
+		        	title : '商品出库',
+		        	height : Ext.isIE ? 100 : 115,
+		        	bodyStyle : 'padding:3px 0px 0px 10px; ',
+		        	items : [{
+		        		xtype : 'radio',
+		        		inputValue : [2,1,4],
+		        		name : 'radioStockOrderType',
+		        		hideLabel : true,
+		        		boxLabel : '商品退货'
+		        	}, {
+		        		xtype : 'radio',
+		        		inputValue : [2,1,5],
+		        		name : 'radioStockOrderType',
+		        		hideLabel : true,
+		        		boxLabel : '商品调拨'
+		        	}, {
+		        		xtype : 'radio',
+		        		inputValue : [2,1,6],
+		        		name : 'radioStockOrderType',
+		        		hideLabel : true,
+		        		boxLabel : '商品报损'
+		        	}]
+		        }, {
+	        		columnWidth : .25,
+	        		html : '&nbsp;'
 	        	}, {
-//	        		hidden : true,
-//	        		hideParent : true,
-	        		xtype : 'radio',
-	        		inputValue : [1,2,3],
-	        		name : 'radioStockOrderType',
-	        		hideLabel : true,
-	        		boxLabel : '原料报溢'
-	        	}]
+		        	columnWidth : .15,
+		        	xtype : 'fieldset',
+		        	bodyStyle : 'padding:3px 0px 0px 10px; ',
+		        	title : '原料出库',
+		        	height : Ext.isIE ? 100 : 115,
+		        	items : [{
+		        		xtype : 'radio',
+		        		inputValue : [2,2,4],
+		        		name : 'radioStockOrderType',
+		        		hideLabel : true,
+		        		boxLabel : '原料退货'
+		        	}, {
+		        		xtype : 'radio',
+		        		inputValue : [2,2,5],
+		        		name : 'radioStockOrderType',
+		        		hideLabel : true,
+		        		boxLabel : '原料调拨'
+		        	}, {
+		        		xtype : 'radio',
+		        		inputValue : [2,2,6],
+		        		name : 'radioStockOrderType',
+		        		hideLabel : true,
+		        		boxLabel : '原料报损'
+		        	}]
+		        }]
 	        }]
-        }, {
-        	xtype : 'fieldset',
-        	title : '出库单',
-        	layout : 'column',
-        	height : Ext.isIE ? 150 : 138,
-        	items : [{
-        		columnWidth : .2,
-        		html : '&nbsp;'
-        	}, {
-	        	columnWidth : .15,
-	        	xtype : 'fieldset',
-	        	title : '商品出库',
-	        	height : Ext.isIE ? 100 : 115,
-	        	bodyStyle : 'padding:3px 0px 0px 10px; ',
-	        	items : [{
-	        		xtype : 'radio',
-	        		inputValue : [2,1,4],
-	        		name : 'radioStockOrderType',
-	        		hideLabel : true,
-	        		boxLabel : '商品退货'
-	        	}, {
-	        		xtype : 'radio',
-	        		inputValue : [2,1,5],
-	        		name : 'radioStockOrderType',
-	        		hideLabel : true,
-	        		boxLabel : '商品调拨'
-	        	}, {
-	        		xtype : 'radio',
-	        		inputValue : [2,1,6],
-	        		name : 'radioStockOrderType',
-	        		hideLabel : true,
-	        		boxLabel : '商品报损'
-	        	}]
-	        }, {
-        		columnWidth : .25,
-        		html : '&nbsp;'
-        	}, {
-	        	columnWidth : .15,
-	        	xtype : 'fieldset',
-	        	bodyStyle : 'padding:3px 0px 0px 10px; ',
-	        	title : '原料出库',
-	        	height : Ext.isIE ? 100 : 115,
-	        	items : [{
-	        		xtype : 'radio',
-	        		inputValue : [2,2,4],
-	        		name : 'radioStockOrderType',
-	        		hideLabel : true,
-	        		boxLabel : '原料退货'
-	        	}, {
-	        		xtype : 'radio',
-	        		inputValue : [2,2,5],
-	        		name : 'radioStockOrderType',
-	        		hideLabel : true,
-	        		boxLabel : '原料调拨'
-	        	}, {
-	        		xtype : 'radio',
-	        		inputValue : [2,2,6],
-	        		name : 'radioStockOrderType',
-	        		hideLabel : true,
-	        		boxLabel : '原料报损'
-	        	}]
-	        }]
-        }]
-    });
+	    });
+	}
+
 	
 	var secondStepPanelNorth = {
 		title : '货单基础信息',
@@ -1539,7 +1541,7 @@ function initControl(){
         layout : 'form',
     	region : 'west',
     	frame : true,
-    	width : 200,
+    	width : 220,
     	labelWidth : 60,
     	defaults : {
     		width : 120
@@ -1765,101 +1767,107 @@ function initControl(){
     	}]
 	});*/
 	
-	var secondStepPanel = new Ext.Panel({
-    	mt : '操作货单共二步, <span style="color:#000;">现为第二步:填写单据信息</font>',
-        index : 1,
-        layout : 'border',
-        width : '100%',
-        items : [secondStepPanelNorth, secondStepPanelCenter, secondStepPanelWest, secondStepPanelSouth]
-    });
-	
-	stockTaskNavWin = new Ext.Window({
-		id : 'stockTaskNavWin',
-		//title : '新增货单共二步, <span style="color:#000;">现为第一步:选择单据类型</font>',
-		width : 900,
-		height : 500,
-		modal : true,
-		closable : false,
-		resizable : false,
-	    layout : 'card',
-	    activeItem : 0,
-	    defaults : {
-	        border:false
-	    },
-	    bbar: ['->', {
-	    	text : '上一步',
-	    	id : 'btnPreviousForStockNav',
-	    	iconCls : 'btn_previous',
-	    	change : -1,
-	    	disabled : true,
-	    	handler : function(e){
-	    		stockTaskNavHandler(e);
-	    	}
-	    }, {
-    		text : '下一步',
-    		id : 'btnNextForStockNav',
-    		iconCls : 'btn_next',
-    		change : 1,
-    		handler : function(e){
-    			stockTaskNavHandler(e);
-	    	}
-    	}, {
-    		text : '审核',
-    		iconCls : 'btn_refresh',
-    		id : 'btnAuditStockAction',
-    		hidden : true,
-    		handler : function(){
-    			auditStockActionHandler();
-    		}
-    	}, {
-    		text : '取消',
-    		iconCls : 'btn_cancel',
-    		handler : function(){
-    			Ext.getCmp('numSelectPriceForStockAction').setDisabled(false);
-    			Ext.getCmp('numSelectPriceForStockAction').getEl().up('.x-form-item').setDisplayed(true); 
-				Ext.getCmp('secondStepPanelSouth').setDisabled(false);
-				var column = Ext.getCmp('secondStepPanelCenter').getColumnModel();
-				column.setHidden(3, false);
-				column.setHidden(4, false);
-				column.setRenderer(3, stockDetailPriceRenderer);
-    			stockTaskNavWin.hide();
-    		}
-    	}],
-    	keys : [{
-    		key : Ext.EventObject.ESC,
-    		scope : this,
-    		fn : function(){
-    			stockTaskNavWin.hide();
-    		}
-    	}],
-    	items: [firstStepPanel, secondStepPanel],
-	    listeners : {
-	    	show : function(thiz){
-	    		thiz.center();
-	    	},
-	    	hide : function(thiz){
-	    		/***** 重置操作导航 *****/
-	    		// 设置默认页
-	    		thiz.getLayout().setActiveItem(0);
-	    		// 恢复导航按钮
-	    		stockTaskNavWin.stockType = null;
-	    		var btnPrevious = Ext.getCmp('btnPreviousForStockNav');
-	    		var btnNext = Ext.getCmp('btnNextForStockNav');
-	    		btnPrevious.setDisabled(true);
-	    		btnNext.setDisabled(false);
-	    		btnNext.setText('下一步');
-	    		// 清空已入库单类型
-	    		var sot = Ext.query('input[name=radioStockOrderType]');
-	    		for(var i = 0; i < sot.length; i++){
-	    			sot[i].checked = false;
+	var secondStepPanel = Ext.getCmp('stock_secondStepPanel');
+	if(!secondStepPanel){
+		secondStepPanel = new Ext.Panel({
+			id : 'stock_secondStepPanel',
+	    	mt : '操作货单共二步, <span style="color:#000;">现为第二步:填写单据信息</font>',
+	        index : 1,
+	        layout : 'border',
+	        width : '100%',
+	        items : [secondStepPanelNorth, secondStepPanelCenter, secondStepPanelWest, secondStepPanelSouth]
+	    });
+	}
+	if(!stockTaskNavWin){
+		stockTaskNavWin = new Ext.Window({
+			id : 'stockTaskNavWin',
+			//title : '新增货单共二步, <span style="color:#000;">现为第一步:选择单据类型</font>',
+			width : 900,
+			height : 500,
+			modal : true,
+			closable : false,
+			resizable : false,
+		    layout : 'card',
+		    activeItem : 0,
+		    defaults : {
+		        border:false
+		    },
+		    bbar: ['->', {
+		    	text : '上一步',
+		    	id : 'btnPreviousForStockNav',
+		    	iconCls : 'btn_previous',
+		    	change : -1,
+		    	disabled : true,
+		    	handler : function(e){
+		    		stockTaskNavHandler(e);
+		    	}
+		    }, {
+	    		text : '下一步',
+	    		id : 'btnNextForStockNav',
+	    		iconCls : 'btn_next',
+	    		change : 1,
+	    		handler : function(e){
+	    			stockTaskNavHandler(e);
+		    	}
+	    	}, {
+	    		text : '审核',
+	    		iconCls : 'btn_refresh',
+	    		id : 'btnAuditStockAction',
+	    		hidden : true,
+	    		handler : function(){
+	    			auditStockActionHandler();
 	    		}
-	    		// 清空单据基础信息
-	    		operateStockActionBasic({
-	    			otype : Ext.ux.otype['set']
-	    		});
-	    	}
-	    }
-	});
+	    	}, {
+	    		text : '取消',
+	    		iconCls : 'btn_cancel',
+	    		handler : function(){
+	    			Ext.getCmp('numSelectPriceForStockAction').setDisabled(false);
+	    			Ext.getCmp('numSelectPriceForStockAction').getEl().up('.x-form-item').setDisplayed(true); 
+					Ext.getCmp('secondStepPanelSouth').setDisabled(false);
+					var column = Ext.getCmp('secondStepPanelCenter').getColumnModel();
+					column.setHidden(3, false);
+					column.setHidden(4, false);
+					column.setRenderer(3, stockDetailPriceRenderer);
+	    			stockTaskNavWin.hide();
+	    		}
+	    	}],
+	    	keys : [{
+	    		key : Ext.EventObject.ESC,
+	    		scope : this,
+	    		fn : function(){
+	    			stockTaskNavWin.hide();
+	    		}
+	    	}],
+	    	items: [firstStepPanel, secondStepPanel],
+		    listeners : {
+		    	show : function(thiz){
+		    		thiz.center();
+		    	},
+		    	hide : function(thiz){
+		    		/***** 重置操作导航 *****/
+		    		// 设置默认页
+		    		thiz.getLayout().setActiveItem(0);
+		    		// 恢复导航按钮
+		    		stockTaskNavWin.stockType = null;
+		    		var btnPrevious = Ext.getCmp('btnPreviousForStockNav');
+		    		var btnNext = Ext.getCmp('btnNextForStockNav');
+		    		btnPrevious.setDisabled(true);
+		    		btnNext.setDisabled(false);
+		    		btnNext.setText('下一步');
+		    		// 清空已入库单类型
+		    		var sot = Ext.query('input[name=radioStockOrderType]');
+		    		for(var i = 0; i < sot.length; i++){
+		    			sot[i].checked = false;
+		    		}
+		    		// 清空单据基础信息
+		    		operateStockActionBasic({
+		    			otype : Ext.ux.otype['set']
+		    		});
+		    	}
+		    }
+		});
+	}
+
 	
 	menuStockDetailPrice = new Ext.menu.Menu({
 		id : 'menuStockDetailPrice',

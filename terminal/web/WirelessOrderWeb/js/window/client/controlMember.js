@@ -17,6 +17,7 @@ Ext.onReady(function(){
 		frame : true,
 		border : false,
 		layout : 'column',
+		width : 660,
 		defaults : {
 			xtype : 'form',
 			layout : 'form',
@@ -139,21 +140,21 @@ Ext.onReady(function(){
 			items : [{
 				id : 'cm_txtMemberContactAddress',
 				fieldLabel : '联系地址',
-				width : 520
+				width : 535
 			}]
 		}, {
 			columnWidth : 1,
 			items : [{
 				id : 'cm_txtMemberPublicComment',
 				fieldLabel : '公有评论',
-				width : 520
+				width : 535
 			}]
 		}, {
 			columnWidth : 1,
 			items : [{
 				id : 'cm_txtMemberPrivateComment',
 				fieldLabel : '私有评论',
-				width : 520
+				width : 535
 			}]
 		}, {
 			columnWidth : 1,

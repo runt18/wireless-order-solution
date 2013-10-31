@@ -777,131 +777,130 @@ function initWin(){
 	);
 	stockTakeWinCenter.region = 'center';
 	
-	stockTakeWin = new Ext.Window({
-		takeContent : {
-			dept : '',
-			cateType : '',
-			cateId : ''
-		},
-		title : '查看盘点任务',
-		width : 900,
-		height : 500,
-		modal : true,
-		resize : false,
-		closable : false,
-		layout : 'border',
-		items : [stockTakeWinNorth, stockTakeWinCenter],
-		bbar : ['->', {
-			text : '保存',
-			id : 'btnSaveStockTake',
-			iconCls : 'btn_save',
-			handler : function(){
-				var id = Ext.getCmp('hideStockTakeId');
-				var dept = Ext.getCmp('comboStockTakeDept');
-				var cate = Ext.getCmp('comboMaterialCate');
-				var cateId = Ext.getCmp('comboMaterialCateId');
-				var comment = Ext.getCmp('txtStockTakeComment');
-				
-				if(!dept.isValid() || !cate.isValid() || !cateId.isValid()){
-					return;
-				}
-				
-				var detail = '';
-				for(var i = 0; i < stockTakeWinCenter.getStore().getCount(); i++){
-					var temp = stockTakeWinCenter.getStore().getAt(i);
-					if(i > 0){
-						detail += '<sp>';
-					}
-					detail += (temp.get('material')['id'] + '<spst>' + temp.get('actualAmount'));
-				}
-				if(detail == ''){
-					Ext.example.msg('提示', '操作失败, 请填写盘点货品信息.');
-					return;
-				}
-				
-				var btnSave = Ext.getCmp('btnSaveStockTake');
-				var btnCancel = Ext.getCmp('btnCancelStockTake');
-				
-				btnSave.setDisabled(true);
-				btnCancel.setDisabled(true);
-				Ext.Ajax.request({
-					url : '../../OperateStockTake.do',
-					params : {
-						dataSource : stockTakeWin.otype.toLowerCase(),
-						
-						id : id.getValue(),
-						dept : dept.getValue(),
-						cateType : cate.getValue(),
-						cateId : cateId.getValue() > 0 && cateId.getRawValue() ? cateId.getValue() : '',
-						comment : comment.getValue(),
-						detail : detail
-					},
-					success : function(res, opt){
-						btnSave.setDisabled(false);
-						btnCancel.setDisabled(false);
-						var jr = Ext.decode(res.responseText);
-						if(jr.success){
-							stockTakeWin.hide();
-							Ext.example.msg(jr.title, jr.msg);
-							Ext.getCmp('btnSearchForStockTake').handler();
-						}else{
-							Ext.ux.showMsg(jr);
-						}
-					},
-					failure : function(res, opt){
-						btnSave.setDisabled(false);
-						btnCancel.setDisabled(false);
-						Ext.ux.showMsg(Ext.decode(res.responseText));
-					}
-				});
-			}
-		},{
-			text : '审核',
-			id : 'btnAuditStockTake',
-			iconCls : 'btn_save',
-			handler : function(){
-				var data = Ext.ux.getSelData(stockTakeGrid);
-				auditStockTakeHandlerCenter({
-					msg : '是否审核盘点任务',
-					data : data
-				});
-			}
-		}, {
-			text : '取消',
-			id : 'btnCancelStockTake',
-			iconCls : 'btn_cancel',
-			handler : function(){
-				stockTakeWin.hide();
-			}
-		}],
-		keys : [{
-			key : Ext.EventObject.ESC,
-			scope : this,
-			fn : function(){
-				stockTakeWin.hide();
-			}
-		}],
-		listeners : {
-			hide : function(){
-				stockTakeWin.takeContent = {
-					dept : '',
-					cateType : '',
-					cateId : ''
-				};
-/*				var material = Ext.getCmp('comboSelectMaterialForStockTake');
-				material.setValue();
-				material.store.removeAll();
-				material.store.loadData({root:[]});
-    			Ext.getCmp('numActualAmountForStockAction').setValue();*/
+	if(!stockTakeWin){
+		stockTakeWin = new Ext.Window({
+			takeContent : {
+				dept : '',
+				cateType : '',
+				cateId : ''
 			},
-			show : function(thiz){
-				thiz.center();
+			title : '查看盘点任务',
+			width : 900,
+			height : 500,
+			modal : true,
+			resize : false,
+			closable : false,
+			layout : 'border',
+			items : [stockTakeWinNorth, stockTakeWinCenter],
+			bbar : ['->', {
+				text : '保存',
+				id : 'btnSaveStockTake',
+				iconCls : 'btn_save',
+				handler : function(){
+					var id = Ext.getCmp('hideStockTakeId');
+					var dept = Ext.getCmp('comboStockTakeDept');
+					var cate = Ext.getCmp('comboMaterialCate');
+					var cateId = Ext.getCmp('comboMaterialCateId');
+					var comment = Ext.getCmp('txtStockTakeComment');
+					
+					if(!dept.isValid() || !cate.isValid() || !cateId.isValid()){
+						return;
+					}
+					
+					var detail = '';
+					for(var i = 0; i < stockTakeWinCenter.getStore().getCount(); i++){
+						var temp = stockTakeWinCenter.getStore().getAt(i);
+						if(i > 0){
+							detail += '<sp>';
+						}
+						detail += (temp.get('material')['id'] + '<spst>' + temp.get('actualAmount'));
+					}
+					if(detail == ''){
+						Ext.example.msg('提示', '操作失败, 请填写盘点货品信息.');
+						return;
+					}
+					
+					var btnSave = Ext.getCmp('btnSaveStockTake');
+					var btnCancel = Ext.getCmp('btnCancelStockTake');
+					
+					btnSave.setDisabled(true);
+					btnCancel.setDisabled(true);
+					Ext.Ajax.request({
+						url : '../../OperateStockTake.do',
+						params : {
+							dataSource : stockTakeWin.otype.toLowerCase(),
+							
+							id : id.getValue(),
+							dept : dept.getValue(),
+							cateType : cate.getValue(),
+							cateId : cateId.getValue() > 0 && cateId.getRawValue() ? cateId.getValue() : '',
+							comment : comment.getValue(),
+							detail : detail
+						},
+						success : function(res, opt){
+							btnSave.setDisabled(false);
+							btnCancel.setDisabled(false);
+							var jr = Ext.decode(res.responseText);
+							if(jr.success){
+								stockTakeWin.hide();
+								Ext.example.msg(jr.title, jr.msg);
+								Ext.getCmp('btnSearchForStockTake').handler();
+							}else{
+								Ext.ux.showMsg(jr);
+							}
+						},
+						failure : function(res, opt){
+							btnSave.setDisabled(false);
+							btnCancel.setDisabled(false);
+							Ext.ux.showMsg(Ext.decode(res.responseText));
+						}
+					});
+				}
+			},{
+				text : '审核',
+				id : 'btnAuditStockTake',
+				iconCls : 'btn_save',
+				handler : function(){
+					var data = Ext.ux.getSelData(stockTakeGrid);
+					auditStockTakeHandlerCenter({
+						msg : '是否审核盘点任务',
+						data : data
+					});
+				}
+			}, {
+				text : '取消',
+				id : 'btnCancelStockTake',
+				iconCls : 'btn_cancel',
+				handler : function(){
+					stockTakeWin.hide();
+				}
+			}],
+			keys : [{
+				key : Ext.EventObject.ESC,
+				scope : this,
+				fn : function(){
+					stockTakeWin.hide();
+				}
+			}],
+			listeners : {
+				hide : function(){
+					stockTakeWin.takeContent = {
+						dept : '',
+						cateType : '',
+						cateId : ''
+					};
+	/*				var material = Ext.getCmp('comboSelectMaterialForStockTake');
+					material.setValue();
+					material.store.removeAll();
+					material.store.loadData({root:[]});
+	    			Ext.getCmp('numActualAmountForStockAction').setValue();*/
+				},
+				show : function(thiz){
+					thiz.center();
+				}
 			}
-		}
-	});
-
-	
-	
+		});
+	}
 }
 /**
  * 

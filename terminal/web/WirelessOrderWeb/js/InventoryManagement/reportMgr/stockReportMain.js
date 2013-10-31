@@ -155,7 +155,7 @@ Ext.onReady(function(){
 		{xtype : 'tbtext', text : '&nbsp;&nbsp;'},
 		{
 			xtype : 'datefield',
-			id : 'beginDate',
+			id : 'sr_beginDate',
 			allowBlank : false,
 			format : 'Y-m-d',
 			value : date,
@@ -167,7 +167,7 @@ Ext.onReady(function(){
 			text : ' 至 '
 		}, {
 			xtype : 'datefield',
-			id : 'endDate',
+			id : 'sr_endDate',
 			allowBlank : false,
 			format : 'Y-m-d',
 			value : new Date(),
@@ -196,8 +196,8 @@ Ext.onReady(function(){
 				if(materialComb.getValue() != ''){
 					materialId = materialComb.getValue();
 				}
-				sgs.baseParams['beginDate'] = Ext.getCmp('beginDate').getValue().format('Y-m-d');
-				sgs.baseParams['endDate'] = Ext.getCmp('endDate').getValue().format('Y-m-d');
+				sgs.baseParams['beginDate'] = Ext.getCmp('sr_beginDate').getValue().format('Y-m-d');
+				sgs.baseParams['endDate'] = Ext.getCmp('sr_endDate').getValue().format('Y-m-d');
 				
 				//load两种加载方式,远程和本地
 				sgs.load({

@@ -1,179 +1,182 @@
-var addSupplier;
-
-addSupplier = new Ext.Window({
-	title : '添加供应商',
-	closable : false, //是否可关闭
-	resizable : true, //大小调整
-	modal : true,
-	width : 260,
-	bbar : [{
-			xtype : 'tbtext',
-			text : '  '
-		},'->',{
-			text : '保存',
-			id : 'btnSaveSupplier',
-			iconCls : 'btn_save',
-			handler : function(e){
-				var sId = Ext.getCmp('txtSId').getValue();
-				var sName = Ext.getCmp('txtSName').getValue();
-				var sTele = Ext.getCmp('txtSTele').getValue();
-				var sAddr = Ext.getCmp('txtSAddr').getValue();
-				var sContact = Ext.getCmp('txtSContact').getValue();
-				var sComment = Ext.getCmp('txtSComment').getValue();
-				
-				var actionUrl = '';
-				if(!Ext.getCmp('txtSName').isValid() || !Ext.getCmp('txtSTele').isValid() || !Ext.getCmp('txtSContact').isValid()){
-					return;
-				}
-				if(addSupplier.operationType == 'insert'){
+var addSupplier = Ext.getCmp('supplier_addSupplier');
+if(!addSupplier){
+	addSupplier = new Ext.Window({
+		id : 'supplier_addSupplier',
+		title : '添加供应商',
+		closable : false, //是否可关闭
+		resizable : true, //大小调整
+		modal : true,
+		width : 260,
+		bbar : [{
+				xtype : 'tbtext',
+				text : '  '
+			},'->',{
+				text : '保存',
+				id : 'btnSaveSupplier',
+				iconCls : 'btn_save',
+				handler : function(e){
+					var sId = Ext.getCmp('txtSId').getValue();
+					var sName = Ext.getCmp('txtSName').getValue();
+					var sTele = Ext.getCmp('txtSTele').getValue();
+					var sAddr = Ext.getCmp('txtSAddr').getValue();
+					var sContact = Ext.getCmp('txtSContact').getValue();
+					var sComment = Ext.getCmp('txtSComment').getValue();
 					
-					actionUrl = '../../InsertSupplier.do';
-				}
-				else if(addSupplier.operationType == 'update'){
-					actionUrl = '../../UpdateSupplier.do';
-				}
-				else return;
-				
-				Ext.Ajax.request({
-					url : actionUrl,
-					params : {
+					var actionUrl = '';
+					if(!Ext.getCmp('txtSName').isValid() || !Ext.getCmp('txtSTele').isValid() || !Ext.getCmp('txtSContact').isValid()){
+						return;
+					}
+					if(addSupplier.operationType == 'insert'){
 						
-						supplierID : sId,
-						supplierName : sName,
-						tele : sTele,
-						addr : sAddr,
-						contact : sContact,
-						comment : sComment
-					},
-					success : function(res, opt){
-						Ext.getCmp('grid').store.reload();
-						var jr = Ext.util.JSON.decode(res.responseText);
-						if(jr.success){
-							addSupplier.hide();
-							Ext.example.msg(jr.title, jr.msg);
-						}else{
-							Ext.ux.showMsg(jr);
+						actionUrl = '../../InsertSupplier.do';
+					}
+					else if(addSupplier.operationType == 'update'){
+						actionUrl = '../../UpdateSupplier.do';
+					}
+					else return;
+					
+					Ext.Ajax.request({
+						url : actionUrl,
+						params : {
+							
+							supplierID : sId,
+							supplierName : sName,
+							tele : sTele,
+							addr : sAddr,
+							contact : sContact,
+							comment : sComment
+						},
+						success : function(res, opt){
+							Ext.getCmp('grid').store.reload();
+							var jr = Ext.util.JSON.decode(res.responseText);
+							if(jr.success){
+								addSupplier.hide();
+								Ext.example.msg(jr.title, jr.msg);
+							}else{
+								Ext.ux.showMsg(jr);
+							}
+							
+						},
+						failure : function(res, opt){
+							Ext.ux.showMsg(Ext.util.JSON.decode(res.responseText));
 						}
 						
-					},
-					failure : function(res, opt){
-						Ext.ux.showMsg(Ext.util.JSON.decode(res.responseText));
-					}
-					
-				});
-			} 
-		},{
-			text : '关闭',
-			id : 'btnCloseSupplier',
-			iconCls : 'btn_close',
-			handler : function(e){
-				addSupplier.hide();
-			}
-	}],
-	items : [{
-		xtype : 'form',
-		layout : 'form',
-		frame : true,
-		border : true,
-		labelWidth : 68,
-		height : 163,
+					});
+				} 
+			},{
+				text : '关闭',
+				id : 'btnCloseSupplier',
+				iconCls : 'btn_close',
+				handler : function(e){
+					addSupplier.hide();
+				}
+		}],
 		items : [{
-			xtype : 'textfield',
-			id : 'txtSId',
-			hideLabel : true,
-			hidden : true
-		},{
-			xtype : 'textfield',
-			id : 'txtSName',
-			width : 130,
-			fieldLabel : '供应商名称',
-			allowBlank : false
-		},{
-			xtype : 'textfield',
-			id : 'txtSTele',
-			width : 130,
-			fieldLabel : '联系方式',
-			allowBlank : false,
-			regex : Ext.ux.RegText.phone.reg,
-			regexText : Ext.ux.RegText.phone.error,
-			validator : function(v){
-				if(Ext.util.Format.trim(v).length > 0){
-					return true;
-				}else{
-					return '联系方式不允许为空';
+			xtype : 'form',
+			layout : 'form',
+			frame : true,
+			border : true,
+			labelWidth : 68,
+			height : 163,
+			items : [{
+				xtype : 'textfield',
+				id : 'txtSId',
+				hideLabel : true,
+				hidden : true
+			},{
+				xtype : 'textfield',
+				id : 'txtSName',
+				width : 130,
+				fieldLabel : '供应商名称',
+				allowBlank : false
+			},{
+				xtype : 'textfield',
+				id : 'txtSTele',
+				width : 130,
+				fieldLabel : '联系方式',
+				allowBlank : false,
+				regex : Ext.ux.RegText.phone.reg,
+				regexText : Ext.ux.RegText.phone.error,
+				validator : function(v){
+					if(Ext.util.Format.trim(v).length > 0){
+						return true;
+					}else{
+						return '联系方式不允许为空';
+					}
+				}
+				
+			},{
+				xtype : 'textfield',
+				id : 'txtSContact',
+				width : 130,
+				fieldLabel : '联系人',
+				allowBlank : false,
+				validator : function(v){
+					if(Ext.util.Format.trim(v).length > 0){
+						return true;
+					}else{
+						return '联系人不能为空';
+					}
+				}
+			},{
+				xtype : 'textfield',
+				id : 'txtSAddr',
+				width : 130,
+				fieldLabel : '地址',
+				validator : function(v){
+					if(Ext.util.Format.trim(v).length > 0){
+						return true;
+					}else{
+						return '地址不能为空';
+					}
+				}
+			},{
+				xtype : 'textfield',
+				id : 'txtSComment',
+				width : 130,
+				fieldLabel : '备注',
+				validator : function(v){
+					if(Ext.util.Format.trim(v).length > 0 ){
+						return true;
+					}else{
+						return '写上评价';
+					}
+				} 
+			}]
+	
+		}],
+		listeners : {
+			'show' : function(thiz){
+				if(addSupplier.operationType == 'insert'){
+					Ext.getCmp('txtSName').setValue('');
+					Ext.getCmp('txtSName').clearInvalid();
+					
+					Ext.getCmp('txtSTele').setValue('');
+					Ext.getCmp('txtSTele').clearInvalid();
+					
+					Ext.getCmp('txtSAddr').setValue('');
+	
+					Ext.getCmp('txtSContact').setValue('');
+					Ext.getCmp('txtSContact').clearInvalid();
+					
+					Ext.getCmp('txtSComment').setValue('');
+					
+					var fn = Ext.getCmp('txtSName');
+					fn.focus.defer(100, fn);
 				}
 			}
-			
-		},{
-			xtype : 'textfield',
-			id : 'txtSContact',
-			width : 130,
-			fieldLabel : '联系人',
-			allowBlank : false,
-			validator : function(v){
-				if(Ext.util.Format.trim(v).length > 0){
-					return true;
-				}else{
-					return '联系人不能为空';
-				}
+		},
+		keys : [{
+			key : Ext.EventObject.ENTER,
+			scope : this,
+			fn : function(){
+				Ext.getCmp("btnSaveSupplier").handler();
 			}
-		},{
-			xtype : 'textfield',
-			id : 'txtSAddr',
-			width : 130,
-			fieldLabel : '地址',
-			validator : function(v){
-				if(Ext.util.Format.trim(v).length > 0){
-					return true;
-				}else{
-					return '地址不能为空';
-				}
-			}
-		},{
-			xtype : 'textfield',
-			id : 'txtSComment',
-			width : 130,
-			fieldLabel : '备注',
-			validator : function(v){
-				if(Ext.util.Format.trim(v).length > 0 ){
-					return true;
-				}else{
-					return '写上评价';
-				}
-			} 
 		}]
+			
+	});
+}
 
-	}],
-	listeners : {
-		'show' : function(thiz){
-			if(addSupplier.operationType == 'insert'){
-				Ext.getCmp('txtSName').setValue('');
-				Ext.getCmp('txtSName').clearInvalid();
-				
-				Ext.getCmp('txtSTele').setValue('');
-				Ext.getCmp('txtSTele').clearInvalid();
-				
-				Ext.getCmp('txtSAddr').setValue('');
-
-				Ext.getCmp('txtSContact').setValue('');
-				Ext.getCmp('txtSContact').clearInvalid();
-				
-				Ext.getCmp('txtSComment').setValue('');
-				
-				var fn = Ext.getCmp('txtSName');
-				fn.focus.defer(100, fn);
-			}
-		}
-	},
-	keys : [{
-		key : Ext.EventObject.ENTER,
-		scope : this,
-		fn : function(){
-			Ext.getCmp("btnSaveSupplier").handler();
-		}
-	}]
-		
-});
 
 var filterTypeDate = [[0,'全部'],[1,'供应商名称'],[2,'联系电话'],[3,'联系人']];
 var filterComb = new Ext.form.ComboBox({

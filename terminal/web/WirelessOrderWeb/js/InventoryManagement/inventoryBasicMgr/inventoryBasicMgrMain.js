@@ -245,11 +245,12 @@ function initOperateMaterialWin(){
 			modal : true,
 			resizable : false,
 			closable : false,
-			width : 230,
+			width : 250,
 			items : [{
 				xtype : 'form',
 				layout : 'form',
 				labelWidth : 65,
+				width : 250,
 				frame : true,
 				defaults : {
 					width : 130
@@ -465,7 +466,6 @@ function initControl(){
 		height : 26,
 		items : ['->', {
 			text : '添加',
-			hidden : true,
 			iconCls : 'btn_add',
 			handler : function(){
 				operateMaterialCateHandler({otype:Ext.ux.otype['insert']});

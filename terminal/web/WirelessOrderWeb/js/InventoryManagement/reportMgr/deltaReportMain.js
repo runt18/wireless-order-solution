@@ -106,7 +106,7 @@ var materialComb = new Ext.form.ComboBox({
 	width : 100,
 	listWidth : 250,
 	maxheight : 300,
-	id : 'comboMaterial',
+	id : 'dr_comboMaterial',
 	store : materialStore,
 	valueField : 'id',
 	displayField : 'name',
@@ -194,7 +194,7 @@ Ext.onReady(function(){
 		{ xtype:'tbtext', text:'日期:'},
 		{
 			xtype : 'datefield',
-			id : 'beginDate',
+			id : 'dr_beginDate',
 			allowBlank : false,
 			format : 'Y-m',
 			value : date,
@@ -221,11 +221,11 @@ Ext.onReady(function(){
 				var sn = deptTree.getSelectionModel().getSelectedNode();
 				//Ext.MessageBox.alert(sn.attributes.deptID);
 				var sgs = deltaReportGrid.getStore();
-				sgs.baseParams['beginDate'] = Ext.getCmp('beginDate').getValue().format('Y-m');
+				sgs.baseParams['beginDate'] = Ext.getCmp('dr_beginDate').getValue().format('Y-m');
 				sgs.baseParams['deptId'] = !sn ? deptID : sn.attributes.deptID;
 				sgs.baseParams['cateType'] = Ext.getCmp('comboMaterialType').getValue();
 				sgs.baseParams['cateId'] = Ext.getCmp('comboMaterialCate').getValue();
-				sgs.baseParams['materialId'] = Ext.getCmp('comboMaterial').getValue();
+				sgs.baseParams['materialId'] = Ext.getCmp('dr_comboMaterial').getValue();
 				//load两种加载方式,远程和本地
 				sgs.load({
 					params : {

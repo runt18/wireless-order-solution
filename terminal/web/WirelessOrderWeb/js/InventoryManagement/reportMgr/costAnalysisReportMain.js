@@ -48,7 +48,7 @@ Ext.onReady(function(){
 		{ xtype:'tbtext', text:'日期:'},
 		{
 			xtype : 'datefield',
-			id : 'beginDate',
+			id : 'car_beginDate',
 			allowBlank : false,
 			format : 'Y-m',
 			value : date,
@@ -60,7 +60,7 @@ Ext.onReady(function(){
 			iconCls : 'btn_search',
 			handler : function(){
 				var gs = costAnalyzeGrid.getStore();
-				gs.baseParams['beginDate'] = Ext.getCmp('beginDate').getValue().format('Y-m');
+				gs.baseParams['beginDate'] = Ext.getCmp('car_beginDate').getValue().format('Y-m');
 				gs.load();
 			}
 		}]

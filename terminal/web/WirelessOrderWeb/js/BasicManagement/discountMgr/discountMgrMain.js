@@ -460,17 +460,20 @@ Ext.onReady(function(){
 		})
 	});
 	
+	addProgramWin = Ext.getCmp('dm_addProgramWin');
 	if(!addProgramWin){
 		addProgramWin = new Ext.Window({
+			id : 'dm_addProgramWin',
 			title : '添加方案',
 			closable : false,
 			resizable : false,
 			modal : true,
-			width : 230,
+			width : 243,
 			items : [{
 				xtype : 'form',
 				layout : 'form',
 				frame : true,
+				width : 242,
 				labelWidth : 65,
 				items : [{
 					xtype : 'hidden',
@@ -660,12 +663,16 @@ Ext.onReady(function(){
 			closable : false,
 			resizable : false,
 			modal : true,
-			width : 230,
+			width : 235,
 			items : [{
 				xtype : 'form',
 				layout : 'form',
 				frame : true,
 				labelWidth : 65,
+				width : 234,
+				defaults : {
+					width : 130
+				},
 				items : [{
 					xtype : 'hidden',
 					id : 'hideDiscountPlanID'
@@ -673,7 +680,6 @@ Ext.onReady(function(){
  	    	    	xtype : 'combo',
  	    	    	id : 'comboProgram',
  	    	    	fieldLabel : '方案名称',
- 	    	    	width : 130,
  	    	    	store : new Ext.data.JsonStore({
  	    	    		root : 'root',
 						fields : [ 'discountID', 'discountName' ]
@@ -691,7 +697,6 @@ Ext.onReady(function(){
  	    	    	xtype : 'combo',
  	    	    	id : 'comboKitchen',
  	    	    	fieldLabel : '分厨名称',
- 	    	    	width : 130,
  	    	    	store : new Ext.data.JsonStore({
  	    	    		root : 'root',
 						fields : [ 'id', 'name' ]
@@ -708,7 +713,6 @@ Ext.onReady(function(){
  	    	    }, {
  	    	    	xtype : 'numberfield',
  	    	    	id : 'numKitchenRate',
- 	    	    	width : 130,
  	    	    	fieldLabel : '折扣率',
  	    	    	allowBlank : true,
  	    	    	selectOnFocus : true,

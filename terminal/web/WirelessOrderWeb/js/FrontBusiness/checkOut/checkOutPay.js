@@ -222,6 +222,7 @@ function memberPay(){
 				text : '暂结',
 				handler : function(e){
 					if(memberPayOrderHandler){
+						Ext.getCmp('mpo_txtDiscountForPayOrder').fireEvent('select', Ext.getCmp('mpo_txtDiscountForPayOrder'));
 						memberPayOrderHandler({
 							tempPay : true,
 							
@@ -249,6 +250,7 @@ function memberPay(){
 				text : '结账',
 				handler : function(e){
 					if(memberPayOrderHandler){
+						Ext.getCmp('mpo_txtDiscountForPayOrder').fireEvent('select', Ext.getCmp('mpo_txtDiscountForPayOrder'));
 						memberPayOrderHandler({
 							tempPay : false,
 							

@@ -4,7 +4,7 @@ var materialTypeComb = new Ext.form.ComboBox({
 	fidldLabel : '类型:',
 	forceSelection : true,
 	width : 110,
-	id : 'materialType',
+	id : 'sdir_materialType',
 	value : 1,
 	store : new Ext.data.SimpleStore({
 		fields : [ 'value', 'text' ],
@@ -56,7 +56,7 @@ var materialCateComb = new Ext.form.ComboBox({
 	fidldLabel : '类别:',
 	forceSelection : true,
 	width : 110,
-	id : 'materialCate',
+	id : 'sdir_materialCate',
 	store : materialCateStore,
 	valueField : 'id',
 	displayField : 'name',
@@ -104,7 +104,7 @@ var materialComb = new Ext.form.ComboBox({
 	listWidth : 250,
 	height : 200,
 	maxHeight : 300,
-	id : 'materialId',
+	id : 'sdir_materialId',
 	store : materialStore,
 	valueField : 'id',
 	displayField : 'name',
@@ -268,9 +268,9 @@ Ext.onReady(function(){
 					
 					var stockds = stockDistributionGrid.getStore();
 					stockds.baseParams['deptId'] = !sn ? deptID : sn.attributes.deptID;
-					stockds.baseParams['cateType'] = Ext.getCmp('materialType').getValue();
-					stockds.baseParams['cateId'] = Ext.getCmp('materialCate').getValue();
-					stockds.baseParams['materialId'] = Ext.getCmp('materialId').getValue();
+					stockds.baseParams['cateType'] = Ext.getCmp('sdir_materialType').getValue();
+					stockds.baseParams['cateId'] = Ext.getCmp('sdir_materialCate').getValue();
+					stockds.baseParams['materialId'] = Ext.getCmp('sdir_materialId').getValue();
 					stockds.load({
 						params : {
 							start : 0,

@@ -310,7 +310,7 @@ Ext.onReady(function(){
 		{ xtype:'tbtext', text:'日期:'},
 		{
 			xtype : 'datefield',
-			id : 'beginDate',
+			id : 'sdr_beginDate',
 			allowBlank : false,
 			format : 'Y-m-d',
 			value : date,
@@ -322,7 +322,7 @@ Ext.onReady(function(){
 			text : ' 至 '
 		}, {
 			xtype : 'datefield',
-			id : 'endDate',
+			id : 'sdr_endDate',
 			allowBlank : false,
 			format : 'Y-m-d',
 			value : new Date(),
@@ -342,7 +342,7 @@ Ext.onReady(function(){
 			text : '货单类型:'
 		}, {
 			xtype : 'combo',
-			id : 'comboSearchForStockType',
+			id : 'sdr_comboSearchForStockType',
 			readOnly : true,
 			forceSelection : true,
 			width : 100,
@@ -360,7 +360,7 @@ Ext.onReady(function(){
 			allowBlank : false,
 			listeners : {
 				select : function(thiz){
-					var subType = Ext.getCmp('comboSearchForSubType');
+					var subType = Ext.getCmp('sdr_comboSearchForSubType');
 					if(thiz.getValue() == 1){
 						subType.store.loadData(stockInDate);
 						subType.setValue(1);
@@ -379,7 +379,7 @@ Ext.onReady(function(){
 			text : '业务类型:'
 		}, {
 			xtype : 'combo',
-			id : 'comboSearchForSubType',
+			id : 'sdr_comboSearchForSubType',
 			readOnly : true,
 			forceSelection : true,
 			width : 100,
@@ -408,12 +408,12 @@ Ext.onReady(function(){
 				var sn = stockDetailReportTree.getSelectionModel().getSelectedNode();
 				//Ext.MessageBox.alert(sn.attributes.deptID);
 				var sgs = stockDetailReportGrid.getStore();
-				sgs.baseParams['beginDate'] = Ext.getCmp('beginDate').getValue().format('Y-m-d');
-				sgs.baseParams['endDate'] = Ext.getCmp('endDate').getValue().format('Y-m-d');
+				sgs.baseParams['sdr_beginDate'] = Ext.getCmp('sdr_beginDate').getValue().format('Y-m-d');
+				sgs.baseParams['sdr_endDate'] = Ext.getCmp('sdr_endDate').getValue().format('Y-m-d');
 				sgs.baseParams['deptId'] = !sn ? deptID : sn.attributes.deptID;
 				sgs.baseParams['materialId'] = Ext.getCmp('materialId').getValue();
-				sgs.baseParams['stockType'] = Ext.getCmp('comboSearchForStockType').getValue();
-				sgs.baseParams['subType'] = Ext.getCmp('comboSearchForSubType').getValue();
+				sgs.baseParams['stockType'] = Ext.getCmp('sdr_comboSearchForStockType').getValue();
+				sgs.baseParams['subType'] = Ext.getCmp('sdr_comboSearchForSubType').getValue();
 				//load两种加载方式,远程和本地
 				sgs.load({
 					params : {

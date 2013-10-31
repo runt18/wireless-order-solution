@@ -114,7 +114,7 @@ Ext.onReady(function(){
 									var iv = thiz.getValue();
 									iv = parseInt(iv);
 									if(iv < 1)
-										iv = 1;
+										iv = 0;
 									if(iv > 100000)
 										iv = 100000;
 									thiz.setValue(parseInt(iv));
@@ -181,7 +181,7 @@ Ext.onReady(function(){
 					xtype : 'textfield',
 					id : 'rd_txtRechargeComment',
 					fieldLabel : '备注',
-					width : 520
+					width : 540
 				}]
 			}, {
 				columnWidth : 1,
@@ -234,7 +234,7 @@ Ext.onReady(function(){
 					xtype : 'textfield',
 					id : 'rd_txtMemberContactAddress',
 					fieldLabel : '联系地址',
-					width : 520,
+					width : 540,
 					disabled : true
 				}]
 			}, {
@@ -243,7 +243,7 @@ Ext.onReady(function(){
 					xtype : 'textfield',
 					id : 'rd_txtMemberComment',
 					fieldLabel : '备注',
-					width : 520,
+					width : 540,
 					disabled : true
 				}]
 			}]

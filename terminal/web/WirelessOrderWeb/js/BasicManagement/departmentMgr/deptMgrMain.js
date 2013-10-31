@@ -8,16 +8,19 @@ function updateKitchen(){
 		Ext.example.msg('提示', '请选中一个分厨再进行操作.');
 		return;
 	}
+	updateKitchenWin = Ext.getCmp('dept_updateKitchenWin');
 	if(!updateKitchenWin){
 		updateKitchenWin = new Ext.Window({
+			id : 'dept_updateKitchenWin',
 			title : '修改分厨信息',
 			closable : false,
 			resizable : false,
 			modal : true,
-			width : 230,			
+			width : 245,			
 			items : [{
 				xtype : 'form',
 				layout : 'form',
+				width : 245,
 				labelWidth : 65,
 				frame : true,
 				items : [{

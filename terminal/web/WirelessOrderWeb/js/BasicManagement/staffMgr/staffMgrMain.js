@@ -46,119 +46,122 @@ function setParentNodeCheckState(node){
 
 }
 
-var changePwdWin = new Ext.Window({
-	layout : 'fit',
-	title : '重置密码',
-	width : 265,
-	height : 150,
-	closeAction : 'hide',
-	closable : false,
-	resizable : false,
-	modal : true,
-	items : [{
-		layout : 'form',
-		id : 'changePwdWin',
-		labelWidth : 70,
-		border : false,
-		frame : true,
+if(!changePwdWin){
+	changePwdWin = new Ext.Window({
+		layout : 'fit',
+		title : '重置密码',
+		width : 265,
+		height : 150,
+		closeAction : 'hide',
+		closable : false,
+		resizable : false,
+		modal : true,
 		items : [{
-			xtype : 'textfield',
-			inputType : 'password',
-			fieldLabel : '原密码',
-			id : 'txtOldpwd',
-			width : 160
-		}, {
-			xtype : 'textfield',
-			inputType : 'password',
-			fieldLabel : '新密码',
-			id : 'txtNewPwd',
-			width : 160,
-			allowBlank : false
-		}, {
-			xtype : 'textfield',
-			inputType : 'password',
-			fieldLabel : '确认新密码',
-			id : 'txtConfirmNewPwd',
-			width : 160,
-			allowBlank : false
-		}, {
-			html : '<div style="margin-top:4px"><font id="errorMsgChangePwd" style="color:red;"> </font></div>'
-		}]
-	}],
-	bbar : [ '->', {
-		text : '保存',
-	    	id : 'btnSaveUpdatePassWord',
-	    	iconCls : 'btn_save',
-			handler : function() {
-				if(Ext.getCmp('txtNewPwd').isValid() && Ext.getCmp('txtConfirmNewPwd').isValid()){
-					var oldPwd = Ext.getCmp('txtOldpwd').getValue();
-					var newPwd = Ext.getCmp('txtNewPwd').getValue();
-					var confirmPwd = Ext.getCmp('txtConfirmNewPwd').getValue();
-					var ss = Ext.getCmp('staffGrid').getSelectionModel().getSelected();
-					
-					var staffID = staffStore.getAt(currRowIndex).get('staffID');
-					var password = staffStore.getAt(currRowIndex).get('staffPassword');
-					
-					if(password == MD5(oldPwd)){
-						if (newPwd == confirmPwd){
-							changePwdWin.hide();
-							
-							Ext.Ajax.request({
-								url : '../../UpdateStaff.do',
-								params : {
-									isCookie : true,
-									'staffName' : '管理员',
-									'staffId' : staffID,
-									'staffPwd' : newPwd,
-									'roleId' : ss.data.role.id
-								},
-								success : function(response, options) {
-									var jr = Ext.util.JSON.decode(response.responseText);
-									if (jr.success) {
-										staffStore.load({
-											params : {
-												start : 0,
-												limit : pageRecordCount
-											}
-										});
-										
-										Ext.ux.showMsg(jr);
-									} else {
-										Ext.ux.showMsg(jr);
-									}
-							},
-							failure : function(response, options) {
+			layout : 'form',
+			id : 'changePwdWin',
+			labelWidth : 70,
+			border : false,
+			frame : true,
+			items : [{
+				xtype : 'textfield',
+				inputType : 'password',
+				fieldLabel : '原密码',
+				id : 'txtOldpwd',
+				width : 160
+			}, {
+				xtype : 'textfield',
+				inputType : 'password',
+				fieldLabel : '新密码',
+				id : 'txtNewPwd',
+				width : 160,
+				allowBlank : false
+			}, {
+				xtype : 'textfield',
+				inputType : 'password',
+				fieldLabel : '确认新密码',
+				id : 'txtConfirmNewPwd',
+				width : 160,
+				allowBlank : false
+			}, {
+				html : '<div style="margin-top:4px"><font id="errorMsgChangePwd" style="color:red;"> </font></div>'
+			}]
+		}],
+		bbar : [ '->', {
+			text : '保存',
+		    	id : 'btnSaveUpdatePassWord',
+		    	iconCls : 'btn_save',
+				handler : function() {
+					if(Ext.getCmp('txtNewPwd').isValid() && Ext.getCmp('txtConfirmNewPwd').isValid()){
+						var oldPwd = Ext.getCmp('txtOldpwd').getValue();
+						var newPwd = Ext.getCmp('txtNewPwd').getValue();
+						var confirmPwd = Ext.getCmp('txtConfirmNewPwd').getValue();
+						var ss = Ext.getCmp('staffGrid').getSelectionModel().getSelected();
+						
+						var staffID = staffStore.getAt(currRowIndex).get('staffID');
+						var password = staffStore.getAt(currRowIndex).get('staffPassword');
+						
+						if(password == MD5(oldPwd)){
+							if (newPwd == confirmPwd){
+								changePwdWin.hide();
 								
-							}
-						});
+								Ext.Ajax.request({
+									url : '../../UpdateStaff.do',
+									params : {
+										isCookie : true,
+										'staffName' : '管理员',
+										'staffId' : staffID,
+										'staffPwd' : newPwd,
+										'roleId' : ss.data.role.id
+									},
+									success : function(response, options) {
+										var jr = Ext.util.JSON.decode(response.responseText);
+										if (jr.success) {
+											staffStore.load({
+												params : {
+													start : 0,
+													limit : pageRecordCount
+												}
+											});
+											
+											Ext.ux.showMsg(jr);
+										} else {
+											Ext.ux.showMsg(jr);
+										}
+								},
+								failure : function(response, options) {
+									
+								}
+							});
+						} else {
+							Ext.example.msg('提示', '操作失败, 两次密码已一致, 请重新输入.');
+						}
 					} else {
-						Ext.example.msg('提示', '操作失败, 两次密码已一致, 请重新输入.');
+						Ext.example.msg('提示', '操作失败, 原密码不正确, 请重新输入.');
 					}
-				} else {
-					Ext.example.msg('提示', '操作失败, 原密码不正确, 请重新输入.');
 				}
 			}
+		}, {
+			text : '关闭',
+			id : 'btnCloseUpdatePassWord',
+			iconCls : 'btn_close',
+			handler : function() {
+				changePwdWin.hide();
+			}
+		}],
+		listeners : {
+			'show' : function(thiz) {
+				Ext.getCmp('txtOldpwd').setValue('');
+				Ext.getCmp('txtNewPwd').setValue('');
+				Ext.getCmp('txtNewPwd').clearInvalid();
+				Ext.getCmp('txtConfirmNewPwd').setValue('');
+				Ext.getCmp('txtConfirmNewPwd').clearInvalid();
+				var f = Ext.get('txtOldpwd');
+				f.focus.defer(true, 100); 
+			}
 		}
-	}, {
-		text : '关闭',
-		id : 'btnCloseUpdatePassWord',
-		iconCls : 'btn_close',
-		handler : function() {
-			changePwdWin.hide();
-		}
-	}],
-	listeners : {
-		'show' : function(thiz) {
-			Ext.getCmp('txtOldpwd').setValue('');
-			Ext.getCmp('txtNewPwd').setValue('');
-			Ext.getCmp('txtNewPwd').clearInvalid();
-			Ext.getCmp('txtConfirmNewPwd').setValue('');
-			Ext.getCmp('txtConfirmNewPwd').clearInvalid();
-			var f = Ext.get('txtOldpwd');
-			f.focus.defer(true, 100); 
-		}
-	}
-});
+	});
+}
+
 
 // --------------------------------------------------------------------------
 /*var staffAddBut = new Ext.ux.ImageButton({
@@ -549,266 +552,274 @@ function operateRole(c){
 }
 
 //----------------- 添加員工  --------------------
-staffAddWin = new Ext.Window({
-	title : '添加员工',
-	width : 260,
-	closeAction : 'hide',
-	modal : true,
-	resizable : false,
-	closable : false,
-	items : [{
-		layout : 'form',
-		id : 'staffAddWin',
-		labelWidth : 60,
-		border : false,
-		frame : true,
+if(!staffAddWin){
+	staffAddWin = new Ext.Window({
+		title : '添加员工',
+		width : 280,
+		closeAction : 'hide',
+		modal : true,
+		resizable : false,
+		closable : false,
 		items : [{
-			xtype : 'textfield',
-			id : 'txtStaffId',
-			hideLabel : true,
-			hidden : true
-		},{
-			xtype : 'textfield',
-			fieldLabel : '姓名',
-			id : 'txtStaffName',
-			allowBlank : false,
-			width : 160
-		}, {
-			xtype : 'textfield',
-			inputType : 'password',
-			fieldLabel : '密码',
-			id : 'txtStaffPwd',
-			allowBlank : false,
-			width : 160,
-			listeners : {
-				focus : function(thiz){
-					thiz.focus(true, 100);
+			layout : 'form',
+			id : 'staffAddWin',
+			width : 280,
+			labelWidth : 60,
+			border : false,
+			frame : true,
+			items : [{
+				xtype : 'textfield',
+				id : 'txtStaffId',
+				hideLabel : true,
+				hidden : true
+			},{
+				xtype : 'textfield',
+				fieldLabel : '姓名',
+				id : 'txtStaffName',
+				allowBlank : false,
+				width : 160
+			}, {
+				xtype : 'textfield',
+				inputType : 'password',
+				fieldLabel : '密码',
+				id : 'txtStaffPwd',
+				allowBlank : false,
+				width : 160,
+				listeners : {
+					focus : function(thiz){
+						thiz.focus(true, 100);
+					}
+				}
+			}, {
+				xtype : 'textfield',
+				inputType : 'password',
+				fieldLabel : '确认密码',
+				id : 'txtStaffPwdConfirm',	
+				allowBlank : false,
+				width : 160,
+				listeners : {
+					focus : function(thiz){
+						thiz.focus(true, 100);
+					}
+				}
+			}, {
+				xtype : 'textfield',
+				id : 'txtPhone',
+				fieldLabel : '员工电话',
+				width : 160,
+				regex : Ext.ux.RegText.phone.reg,
+				regexText : Ext.ux.RegText.phone.error,
+				disabled : true
+			}, chooseRoleComb]
+		}],
+		bbar : ['->',{
+			text : '确定',
+			id : 'btnSaveStaff',
+			iconCls : 'btn_save',
+			handler : function(){
+				
+				if (Ext.getCmp('txtStaffName').isValid()
+						&& Ext.getCmp('txtStaffPwd').isValid()
+						&& Ext.getCmp('txtStaffPwdConfirm').isValid() && Ext.getCmp('txtPhone').isValid()) {
+	
+					var staffName = Ext.getCmp('txtStaffName').getValue();
+					var staffAddPwd = Ext.getCmp('txtStaffPwd').getValue();
+					var staffAddPwdCon = Ext.getCmp('txtStaffPwdConfirm').getValue();
+					var roleId = Ext.getCmp('combChooseRole').getValue();
+					var tele = Ext.getCmp('txtPhone').getValue();
+					var staffId = Ext.getCmp('txtStaffId').getValue();
+					var url = '';
+					
+					if(staffAddWin.operationType == 'insert'){
+						url = 'InsertStaff.do';
+					}else if(staffAddWin.operationType == 'update'){
+						url = 'UpdateStaff.do';
+					}
+					
+					if(staffAddPwd == staffAddPwdCon){
+						if(staffAddPwd == encrypt){
+							staffAddPwd = '';
+						}
+						Ext.Ajax.request({
+							url : '../../' + url,
+							params : {
+								isCookie : true,
+								'staffName' : staffName,
+								'staffPwd' : staffAddPwd,
+								'roleId' : roleId,
+								'tele' : tele,
+								'staffId' : staffId
+							},
+							success : function(response, options) {
+								var jr = Ext.util.JSON.decode(response.responseText);
+								if(jr.success){
+									staffStore.load({
+										params : {
+											start : 0,
+											limit : pageRecordCount
+										}
+									});
+	
+									Ext.ux.showMsg(jr);
+									staffAddWin.hide();
+								}else{
+									Ext.ux.showMsg(jr);
+								}
+							},
+							failure : function(response, options) {
+								
+							}
+						});
+					}else{
+						Ext.MessageBox.show({
+							title : '提示',
+							msg : '确认密码不一致',
+							icon : Ext.MessageBox.WARNING,
+							buttons : Ext.Msg.OK,
+							closable : false
+						});
+					}
+	
+				}else{
+					return
 				}
 			}
 		}, {
-			xtype : 'textfield',
-			inputType : 'password',
-			fieldLabel : '确认密码',
-			id : 'txtStaffPwdConfirm',	
-			allowBlank : false,
-			width : 160,
-			listeners : {
-				focus : function(thiz){
-					thiz.focus(true, 100);
-				}
+			text : '取消',
+			id : 'btnCloseStaff',
+			iconCls : 'btn_close',
+			handler : function(){
+				staffAddWin.hide();
 			}
-		}, {
-			xtype : 'textfield',
-			id : 'txtPhone',
-			fieldLabel : '员工电话',
-			width : 160,
-			regex : Ext.ux.RegText.phone.reg,
-			regexText : Ext.ux.RegText.phone.error,
-			disabled : true
-		}, chooseRoleComb]
-	}],
-	bbar : ['->',{
-		text : '确定',
-		id : 'btnSaveStaff',
-		iconCls : 'btn_save',
-		handler : function(){
-			
-			if (Ext.getCmp('txtStaffName').isValid()
-					&& Ext.getCmp('txtStaffPwd').isValid()
-					&& Ext.getCmp('txtStaffPwdConfirm').isValid() && Ext.getCmp('txtPhone').isValid()) {
+		}],
+		listeners : {
+			'show' : function(thiz){
+				Ext.getCmp('txtStaffName').setValue('');
+				Ext.getCmp('txtStaffName').clearInvalid();
+	
+				Ext.getCmp('txtStaffPwd').setValue('');
+				Ext.getCmp('txtStaffPwd').clearInvalid();
+	
+				Ext.getCmp('txtStaffPwdConfirm').setValue('');
+				Ext.getCmp('txtStaffPwdConfirm').clearInvalid();
+				
+				Ext.getCmp('combChooseRole').setValue('');
+				Ext.getCmp('combChooseRole').clearInvalid();
+				
+				Ext.getCmp('txtPhone').setValue('');
+	
+			}
+		},
+		keys : [{
+			key : Ext.EventObject.ENTER,
+			scope : this,
+			fn : function(){
+				Ext.getCmp("btnSaveStaff").handler();
+			}
+		}]
+	});
+	
+}
 
-				var staffName = Ext.getCmp('txtStaffName').getValue();
-				var staffAddPwd = Ext.getCmp('txtStaffPwd').getValue();
-				var staffAddPwdCon = Ext.getCmp('txtStaffPwdConfirm').getValue();
-				var roleId = Ext.getCmp('combChooseRole').getValue();
-				var tele = Ext.getCmp('txtPhone').getValue();
-				var staffId = Ext.getCmp('txtStaffId').getValue();
-				var url = '';
-				
-				if(staffAddWin.operationType == 'insert'){
-					url = 'InsertStaff.do';
-				}else if(staffAddWin.operationType == 'update'){
-					url = 'UpdateStaff.do';
-				}
-				
-				if(staffAddPwd == staffAddPwdCon){
-					if(staffAddPwd == encrypt){
-						staffAddPwd = '';
+
+if(!roleAddWin){
+	roleAddWin = new Ext.Window({
+		title : '添加角色',
+		width : 280,
+		modal : true,
+		resizable : false,
+		closable : false,
+		items : [{
+			layout : 'form',
+			id : 'roleAddWin',
+			labelWidth : 60,
+			width : 280,
+			border : false,
+			frame : true,
+			items : [{
+				xtype : 'textfield',
+				id : 'txtRoleId',
+				hideLabel : true,
+				hidden : true
+			},{
+				xtype : 'textfield',
+				fieldLabel : '角色名称',
+				id : 'txtRoleName',
+				allowBlank : false,
+				width : 130
+			}, referRoleComb]
+		}],
+		bbar : ['->',{
+			text : '确定',
+			id : 'btnAddRole',
+			iconCls : 'btn_save',
+			handler : function(){
+				if(Ext.getCmp('txtRoleName').isValid()){
+					var roleId = Ext.getCmp('txtRoleId').getValue();
+					var roleName = Ext.getCmp('txtRoleName').getValue();
+					var roleModelId = Ext.getCmp('combReferRole').getValue();
+					var dataSource = '';
+					if(roleAddWin.operationType == 'insert'){
+						dataSource = 'insert';
+					}else if(roleAddWin.operationType == 'update'){
+						dataSource = 'update';
 					}
 					Ext.Ajax.request({
-						url : '../../' + url,
+						url : '../../OperateRole.do',
 						params : {
 							isCookie : true,
-							'staffName' : staffName,
-							'staffPwd' : staffAddPwd,
-							'roleId' : roleId,
-							'tele' : tele,
-							'staffId' : staffId
+							dataSource : dataSource,
+							roleName : roleName,
+							roleId : roleId, 
+							modelId : roleModelId
 						},
-						success : function(response, options) {
-							var jr = Ext.util.JSON.decode(response.responseText);
+						success : function(res, opt){
+							Ext.getCmp('roleGrid').store.reload();
+							var jr = Ext.decode(res.responseText);
 							if(jr.success){
-								staffStore.load({
-									params : {
-										start : 0,
-										limit : pageRecordCount
-									}
-								});
-
-								Ext.ux.showMsg(jr);
-								staffAddWin.hide();
+								roleAddWin.hide();
+								Ext.example.msg(jr.title, jr.msg);
+								Ext.getCmp('roleGrid').getSelectionModel().selectFirstRow();
+								//Ext.getCmp('roleGrid').getSelectionModel().selectLastRow();
 							}else{
 								Ext.ux.showMsg(jr);
 							}
 						},
-						failure : function(response, options) {
-							
+						failure : function(res, opt){
+							Ext.ux.showMsg(Ext.decode(res.responseText));
 						}
 					});
-				}else{
-					Ext.MessageBox.show({
-						title : '提示',
-						msg : '确认密码不一致',
-						icon : Ext.MessageBox.WARNING,
-						buttons : Ext.Msg.OK,
-						closable : false
-					});
 				}
-
-			}else{
-				return
 			}
-		}
-	}, {
-		text : '取消',
-		id : 'btnCloseStaff',
-		iconCls : 'btn_close',
-		handler : function(){
-			staffAddWin.hide();
-		}
-	}],
-	listeners : {
-		'show' : function(thiz){
-			Ext.getCmp('txtStaffName').setValue('');
-			Ext.getCmp('txtStaffName').clearInvalid();
-
-			Ext.getCmp('txtStaffPwd').setValue('');
-			Ext.getCmp('txtStaffPwd').clearInvalid();
-
-			Ext.getCmp('txtStaffPwdConfirm').setValue('');
-			Ext.getCmp('txtStaffPwdConfirm').clearInvalid();
-			
-			Ext.getCmp('combChooseRole').setValue('');
-			Ext.getCmp('combChooseRole').clearInvalid();
-			
-			Ext.getCmp('txtPhone').setValue('');
-
-		}
-	},
-	keys : [{
-		key : Ext.EventObject.ENTER,
-		scope : this,
-		fn : function(){
-			Ext.getCmp("btnSaveStaff").handler();
-		}
-	}]
-});
-
-
-var roleAddWin = new Ext.Window({
-	title : '添加角色',
-	width : 260,
-	modal : true,
-	resizable : false,
-	closable : false,
-	items : [{
-		layout : 'form',
-		id : 'roleAddWin',
-		labelWidth : 60,
-		border : false,
-		frame : true,
-		items : [{
-			xtype : 'textfield',
-			id : 'txtRoleId',
-			hideLabel : true,
-			hidden : true
 		},{
-			xtype : 'textfield',
-			fieldLabel : '角色名称',
-			id : 'txtRoleName',
-			allowBlank : false,
-			width : 130
-		}, referRoleComb]
-	}],
-	bbar : ['->',{
-		text : '确定',
-		id : 'btnAddRole',
-		iconCls : 'btn_save',
-		handler : function(){
-			if(Ext.getCmp('txtRoleName').isValid()){
-				var roleId = Ext.getCmp('txtRoleId').getValue();
-				var roleName = Ext.getCmp('txtRoleName').getValue();
-				var roleModelId = Ext.getCmp('combReferRole').getValue();
-				var dataSource = '';
-				if(roleAddWin.operationType == 'insert'){
-					dataSource = 'insert';
-				}else if(roleAddWin.operationType == 'update'){
-					dataSource = 'update';
-				}
-				Ext.Ajax.request({
-					url : '../../OperateRole.do',
-					params : {
-						isCookie : true,
-						dataSource : dataSource,
-						roleName : roleName,
-						roleId : roleId, 
-						modelId : roleModelId
-					},
-					success : function(res, opt){
-						Ext.getCmp('roleGrid').store.reload();
-						var jr = Ext.decode(res.responseText);
-						if(jr.success){
-							roleAddWin.hide();
-							Ext.example.msg(jr.title, jr.msg);
-							Ext.getCmp('roleGrid').getSelectionModel().selectFirstRow();
-							//Ext.getCmp('roleGrid').getSelectionModel().selectLastRow();
-						}else{
-							Ext.ux.showMsg(jr);
-						}
-					},
-					failure : function(res, opt){
-						Ext.ux.showMsg(Ext.decode(res.responseText));
-					}
-				});
+			text : '取消',
+			id : 'btnClose',
+			iconCls : 'btn_close',
+			handler : function(){
+				roleAddWin.hide();
 			}
-		}
-	},{
-		text : '取消',
-		id : 'btnClose',
-		iconCls : 'btn_close',
-		handler : function(){
-			roleAddWin.hide();
-		}
-	}],
-	listeners : {
-		show : function(){
-			Ext.getCmp('txtRoleName').setValue('');
-			Ext.getCmp('txtRoleName').clearInvalid();
-			
-			Ext.getCmp('combReferRole').setValue('');
-			Ext.getCmp('combReferRole').clearInvalid();
-			Ext.getCmp('combReferRole').enable();
-		}
-	},
-	keys : [{
-		key : Ext.EventObject.ENTER,
-		scope : this,
-		fn : function(){
-			Ext.getCmp("btnAddRole").handler();
-		}
-	}]
-	
-});
+		}],
+		listeners : {
+			show : function(){
+				Ext.getCmp('txtRoleName').setValue('');
+				Ext.getCmp('txtRoleName').clearInvalid();
+				
+				Ext.getCmp('combReferRole').setValue('');
+				Ext.getCmp('combReferRole').clearInvalid();
+				Ext.getCmp('combReferRole').enable();
+			}
+		},
+		keys : [{
+			key : Ext.EventObject.ENTER,
+			scope : this,
+			fn : function(){
+				Ext.getCmp("btnAddRole").handler();
+			}
+		}]
+		
+	});
+}
+
 
 var filterComb = new Ext.form.ComboBox({
 	forceSelection : true,

@@ -373,146 +373,151 @@ function initGrid(){
  * 
  */
 function initWin(){
-	tableBasicWin = new Ext.Window({
-		title : '&nbsp;',
-		closable : false,
-		modal : true,
-		resizeble : false,
-		width : 250,
-		keys : [{
-			key : Ext.EventObject.ESC,
-			scope : this,
-			fn : function(){
-				tableBasicWin.hide();
-			}
-		}],
-		items : [{
-			layout : 'form',
-			labelWidth : 60,
-			frame : true,
-			defaults : {
-				width : 150
-			},
+	tableBasicWin = Ext.getCmp('region_tableBasicWin');
+	if(!tableBasicWin){
+		tableBasicWin = new Ext.Window({
+			id : 'region_tableBasicWin',
+			title : '&nbsp;',
+			closable : false,
+			modal : true,
+			resizeble : false,
+			width : 270,
+			keys : [{
+				key : Ext.EventObject.ESC,
+				scope : this,
+				fn : function(){
+					tableBasicWin.hide();
+				}
+			}],
 			items : [{
-				xtype : 'hidden',
-				id : 'hideTableId'
-			}, {
-				xtype : 'numberfield',
-				id : 'numTableAlias',
-				fieldLabel : '编号',
-				allowBlank : false,
-				disabled : true
-			}, {
-				xtype : 'textfield',
-				id : 'txtTableName',
-				fieldLabel : '名称'
-			}, {
-				xtype : 'combo',
-				id : 'comboTableRegion',
-				fieldLabel : '所属区域',
-				forceSelection : true,
-				store : new Ext.data.SimpleStore({
-					fields : ['value', 'text']
-				}),
-				valueField : 'value',
-				displayField : 'text',
-				typeAhead : true,
-				mode : 'local',
-				triggerAction : 'all',
-				selectOnFocus : true,
-				allowBlank : false
-			}, {
-				xtype : 'numberfield',
-				id : 'numMinimumCost',
-				fieldLabel : '最低消费',
-				allowBlank : false,
-				minValue : 0,
-				value : 0
-			}, {
-				xtype : 'numberfield',
-				id : 'numServiceRate',
-				fieldLabel : '服务费率',
-				allowBlank : false,
-				value : 0,
-				validator : function(v){
-					if(v < 0 || v > 1){
-						return "服务费率在 0.00 至 1.00 之间.";
-					}else{
-						return true;
+				layout : 'form',
+				labelWidth : 60,
+				width : 270,
+				frame : true,
+				defaults : {
+					width : 150
+				},
+				items : [{
+					xtype : 'hidden',
+					id : 'hideTableId'
+				}, {
+					xtype : 'numberfield',
+					id : 'numTableAlias',
+					fieldLabel : '编号',
+					allowBlank : false,
+					disabled : true
+				}, {
+					xtype : 'textfield',
+					id : 'txtTableName',
+					fieldLabel : '名称'
+				}, {
+					xtype : 'combo',
+					id : 'comboTableRegion',
+					fieldLabel : '所属区域',
+					forceSelection : true,
+					store : new Ext.data.SimpleStore({
+						fields : ['value', 'text']
+					}),
+					valueField : 'value',
+					displayField : 'text',
+					typeAhead : true,
+					mode : 'local',
+					triggerAction : 'all',
+					selectOnFocus : true,
+					allowBlank : false
+				}, {
+					xtype : 'numberfield',
+					id : 'numMinimumCost',
+					fieldLabel : '最低消费',
+					allowBlank : false,
+					minValue : 0,
+					value : 0
+				}, {
+					xtype : 'numberfield',
+					id : 'numServiceRate',
+					fieldLabel : '服务费率',
+					allowBlank : false,
+					value : 0,
+					validator : function(v){
+						if(v < 0 || v > 1){
+							return "服务费率在 0.00 至 1.00 之间.";
+						}else{
+							return true;
+						}
 					}
+				}]
+			}],
+			keys : [{
+				key : Ext.EventObject.ENTER,
+				scope : this,
+				fn : function(){
+					Ext.getCmp('btnSaveOperateTable').handler();
 				}
-			}]
-		}],
-		keys : [{
-			key : Ext.EventObject.ENTER,
-			scope : this,
-			fn : function(){
-				Ext.getCmp('btnSaveOperateTable').handler();
-			}
-		}, {
-			key : Ext.EventObject.ESC,
-			scope : this,
-			fn : function(){
-				tableBasicWin.hide();
-			}
-		}],
-		bbar : ['->', {
-			text : '保存',
-			id : 'btnSaveOperateTable',
-			iconCls : 'btn_save',
-			handler : function(){
-				var id = Ext.getCmp('hideTableId');
-				var alias = Ext.getCmp('numTableAlias');
-				var name = Ext.getCmp('txtTableName');
-				var region = Ext.getCmp('comboTableRegion');
-				var minimumCost = Ext.getCmp('numMinimumCost');
-				var serviceRate = Ext.getCmp('numServiceRate');
-				
-				if(!region.isValid() || !minimumCost.isValid() || !serviceRate.isValid()){
-					return;
+			}, {
+				key : Ext.EventObject.ESC,
+				scope : this,
+				fn : function(){
+					tableBasicWin.hide();
 				}
-				if(tableBasicWin.otype == Ext.ux.otype['insert']){
-					if(!alias.isValid()){
+			}],
+			bbar : ['->', {
+				text : '保存',
+				id : 'btnSaveOperateTable',
+				iconCls : 'btn_save',
+				handler : function(){
+					var id = Ext.getCmp('hideTableId');
+					var alias = Ext.getCmp('numTableAlias');
+					var name = Ext.getCmp('txtTableName');
+					var region = Ext.getCmp('comboTableRegion');
+					var minimumCost = Ext.getCmp('numMinimumCost');
+					var serviceRate = Ext.getCmp('numServiceRate');
+					
+					if(!region.isValid() || !minimumCost.isValid() || !serviceRate.isValid()){
 						return;
 					}
-				}
-				
-				Ext.Ajax.request({
-					url : '../../OperateTable.do',
-					params : {
-						dataSource : tableBasicWin.otype.toLowerCase(),
-						
-						alias : alias.getValue(),
-						id : id.getValue(),
-						name : name.getValue(),
-						regionId : region.getValue(),
-						minimumCost : minimumCost.getValue(),
-						serviceRate : serviceRate.getValue()
-					},
-					success : function(res, opt){
-						var jr = Ext.decode(res.responseText);
-						if(jr.success){
-							tableBasicWin.hide();
-							Ext.example.msg(jr.title, jr.msg);
-							Ext.getCmp('btnSearchForTable').handler();
-						}else{
-							Ext.ux.showMsg(jr);
+					if(tableBasicWin.otype == Ext.ux.otype['insert']){
+						if(!alias.isValid()){
+							return;
 						}
-					},
-					failure : function(res, opt){
-						Ext.ux.showMsg(Ext.decode(res.responseText));
 					}
-				});
-				
-			}
-		}, {
-			text : '取消',
-			iconCls : 'btn_cancel',
-			handler : function(){
-				tableBasicWin.hide();
-			}
-		}]
-	});
+					
+					Ext.Ajax.request({
+						url : '../../OperateTable.do',
+						params : {
+							dataSource : tableBasicWin.otype.toLowerCase(),
+							
+							alias : alias.getValue(),
+							id : id.getValue(),
+							name : name.getValue(),
+							regionId : region.getValue(),
+							minimumCost : minimumCost.getValue(),
+							serviceRate : serviceRate.getValue()
+						},
+						success : function(res, opt){
+							var jr = Ext.decode(res.responseText);
+							if(jr.success){
+								tableBasicWin.hide();
+								Ext.example.msg(jr.title, jr.msg);
+								Ext.getCmp('btnSearchForTable').handler();
+							}else{
+								Ext.ux.showMsg(jr);
+							}
+						},
+						failure : function(res, opt){
+							Ext.ux.showMsg(Ext.decode(res.responseText));
+						}
+					});
+					
+				}
+			}, {
+				text : '取消',
+				iconCls : 'btn_cancel',
+				handler : function(){
+					tableBasicWin.hide();
+				}
+			}]
+		});
+	}
 	tableBasicWin.render(document.body);
 }
 
