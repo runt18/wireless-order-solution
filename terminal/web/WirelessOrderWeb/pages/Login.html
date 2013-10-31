@@ -276,6 +276,20 @@ function setCookie(cookiename, cookievalue, days) {
  			
  		});
  		
+ 		$('#loginFront').click(function(){
+ 			$.post('../OperateStaff.do', {
+				pin : $('#selectStaff').val(),
+				pwd : MD5($('#pwd').val())
+ 			}, function(result){
+ 				if(result.success){
+ 					location.href = 'PersonLogin.html?'+strEncode('restaurantID='+ getRestaurantID, KEYS);
+ 				}else{
+ 					alert(result.msg);
+ 				}
+ 			});
+ 			
+ 		});
+ 		
   		$('#validCode').keydown(function(e){
  			if(e.keyCode == 13){
  				$('#login').click();
