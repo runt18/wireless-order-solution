@@ -77,7 +77,7 @@ function checkLabel(t){
  * 
  */
 function memberTypeWinInit(){
-	memberTypeWin = Ext.getCmp('mtm_memberTypeWin');
+	//memberTypeWin = Ext.getCmp('mtm_memberTypeWin');
 	if(!memberTypeWin){
 		memberTypeWin = new Ext.Window({
 			id : 'mtm_memberTypeWin',
@@ -119,7 +119,7 @@ function memberTypeWinInit(){
 					selectOnFocus : true
 				}, {
 					xtype : 'label',
-					autoWidth : true,
+					width : 240,
 					style : 'color:green;font-szie:12px;',
 					text : '说明:  使用会员结账时, 消费金额兑换积分的利率, 如金额 100 元兑换 150 积分, 则输入 1.5, 默认 1.'
 				}, {
@@ -324,6 +324,10 @@ function memberTypeWinInit(){
 								hideLabel : true, 
 								inputValue :  discountData[i].discountID,
 								listeners : {
+									focus : function(){
+										Ext.getCmp('comboDiscount').setValue();
+										Ext.getCmp('comboDiscount').clearInvalid();
+									},
 									check : function(){
 										Ext.getCmp('comboDiscount').setValue();
 										Ext.getCmp('comboDiscount').clearInvalid();
@@ -336,6 +340,14 @@ function memberTypeWinInit(){
 								Ext.getCmp('formMemberDiscount').add({columnWidth : 1});
 							}
 							Ext.getCmp('formMemberDiscount').doLayout();
+						}
+					}
+				},
+				hide : function(){
+					var discounts = document.getElementsByName('memberDiscount');
+					for (var i = 0; i < discounts.length; i++) {
+						if(discounts[i].checked){
+							discounts[i].checked = false;
 						}
 					}
 				}
@@ -576,12 +588,6 @@ function memberTypeOperationHandler(c){
 			exchangeRate : 1.00,
 			initialPoint : 0
 		});
-		var discounts = document.getElementsByName('memberDiscount');
-		for (var i = 0; i < discounts.length; i++) {
-			if(discounts[i].checked){
-				discounts[i].checked = false;
-			}
-		}
 	}else if(c.type == mtObj.operation['update']){
 		var sd = Ext.ux.getSelData(memberTypeGrid);
 		if(!sd){
@@ -589,20 +595,29 @@ function memberTypeOperationHandler(c){
 			return;
 		}
 		memberTypeWin.setTitle('修改会员类型');
-		var mDiscountSelectedList = []; 
+		memberTypeWin.show();
+		
 		var discounts = document.getElementsByName('memberDiscount');
 		for (var i = 0; i < sd['discounts'].length; i++) {
 			for (var j = 0; j < discounts.length; j++) {
 				if(sd['discounts'][i].id == discounts[j].value){
+					
 					discounts[j].checked = true;
-					mDiscountSelectedList.push({'discountID':sd['discounts'][i].id,'text':sd['discounts'][i].name});
 				}
 			}
 		}
-		Ext.getCmp('comboDiscount').store.loadData(mDiscountSelectedList)
+		var mDiscountSelectedList = []; 
+		var mDiscountSelecteds = document.getElementsByName('memberDiscount');
+		for (var i = 0; i < mDiscountSelecteds.length; i++) {
+			if(mDiscountSelecteds[i].checked){
+				mDiscountSelectedList.push({'discountID':mDiscountSelecteds[i].value,'text':mDiscountSelecteds[i].nextSibling.innerHTML});
+			}
+			
+		}
+		Ext.getCmp('comboDiscount').store.loadData(mDiscountSelectedList);
+		
 		bindMemberTypeData(sd);
 		
-		memberTypeWin.show();
 		memberTypeWin.center();
 	}else if(c.type == mtObj.operation['delete']){
 		var sd = Ext.ux.getSelData(memberTypeGrid.getId());
@@ -685,6 +700,7 @@ Ext.onReady(function(){
 	dataInit();
 	//
 	initMemberTypeGrid();
+	memberTypeWinInit();
 	
 	new Ext.Panel({
 		renderTo : 'divMemberType',
@@ -695,7 +711,7 @@ Ext.onReady(function(){
 		autoScroll : true
 	});
 	 
-	memberTypeWinInit();
+	
 
 	/*
 	var menu = new Ext.menu.Menu({

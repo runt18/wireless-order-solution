@@ -798,7 +798,7 @@ function gridInit(){
 						gs.baseParams['memberType'] = '';
 						gs.baseParams['memberTypeAttr'] = memberTypeNode.attributes.attr;
 					}else{
-						if(memberTypeNode.attributes.attr){
+						if(memberTypeNode.attributes.attr >= 0){
 							gs.baseParams['memberType'] = '';
 							gs.baseParams['memberTypeAttr'] = memberTypeNode.attributes.attr;
 						}else{
