@@ -112,75 +112,11 @@ public class BusinessReceiptsStatisticsAction extends Action {
 			e.printStackTrace();
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
 		}finally{
-			List<BusinessStatistics> root = new ArrayList<BusinessStatistics>(incomesByEachDay.size());
-
-			BusinessStatistics bs = new BusinessStatistics();
-			for(IncomeByEachDay temp : incomesByEachDay){
-				bs.setOnDuty(DateUtil.parseDate(temp.getDate()));
-				bs.setOffDuty(DateUtil.parseDate(temp.getDate()));
-				bs.setCashAmount(temp.getIncomeByPay().getCashAmount());
-				bs.setCashIncome2(temp.getIncomeByPay().getCashActual());
-				bs.setCreditCardAmount(temp.getIncomeByPay().getCreditCardAmount());
-				bs.setCreditCardIncome2(temp.getIncomeByPay().getCreditCardActual());
-				bs.setSignAmount(temp.getIncomeByPay().getSignAmount());
-				bs.setSignIncome2(temp.getIncomeByPay().getSignActual());
-				bs.setHangAmount(temp.getIncomeByPay().getHangAmount());
-				bs.setHangIncome2(temp.getIncomeByPay().getHangActual());
-				
-				bs.setEraseAmount(temp.getIncomeByErase().getEraseAmount());
-				bs.setEraseIncome(temp.getIncomeByErase().getTotalErase());
-				
-				bs.setDiscountAmount(temp.getIncomeByDiscount().getDiscountAmount());
-				bs.setDiscountIncome(temp.getIncomeByDiscount().getTotalDiscount());
-				
-				bs.setGiftAmount(temp.getIncomeByGift().getGiftAmount());
-				bs.setGiftIncome(temp.getIncomeByGift().getTotalGift());
-				
-				bs.setCancelAmount(temp.getIncomeByCancel().getCancelAmount());
-				bs.setCancelIncome(temp.getIncomeByCancel().getTotalCancel());
-				
-				bs.setPaidIncome(temp.getIncomeByRepaid().getRepaidAmount());
-				
-				bs.setTotalPrice(temp.getIncomeByPay().getTotalIncome());
-				bs.setTotalPrice2(temp.getIncomeByPay().getTotalActual());
-				
-				bs.setOrderAmount(temp.getIncomeByPay().getOrderAmount());
-				root.add(bs);
-			}
-			
-			jobject.setTotalProperty(root.size());
-			
-			BusinessStatistics sum = new BusinessStatistics();
-			for(BusinessStatistics temp : root){
-				sum.setCashAmount(sum.getCashAmount() + temp.getCashAmount());
-				sum.setCashIncome2(sum.getCashIncome2() + temp.getCashIncome2());
-				sum.setCreditCardAmount(sum.getCreditCardAmount() + temp.getCreditCardAmount());
-				sum.setCreditCardIncome2(sum.getCreditCardIncome2() + temp.getCreditCardIncome2());
-				sum.setSignAmount(sum.getSignAmount() + temp.getSignAmount());
-				sum.setSignIncome2(sum.getSignIncome2() + temp.getSignIncome2());
-				sum.setHangAmount(sum.getHangAmount() + temp.getHangAmount());
-				sum.setHangIncome2(sum.getHangIncome2() + temp.getHangIncome2());
-				
-				sum.setEraseAmount(sum.getEraseAmount() + temp.getEraseAmount());
-				sum.setEraseIncome(sum.getEraseIncome() + temp.getEraseIncome());
-				sum.setDiscountAmount(sum.getDiscountAmount() + temp.getDiscountAmount());
-				sum.setDiscountIncome(sum.getDiscountIncome() + temp.getDiscountIncome());
-				sum.setGiftAmount(sum.getGiftAmount() + temp.getGiftAmount());
-				sum.setGiftIncome(sum.getGiftIncome() + temp.getGiftIncome());
-				sum.setCancelAmount(sum.getCancelAmount() + temp.getCancelAmount());
-				sum.setCancelIncome(sum.getCancelIncome() + temp.getCancelIncome());
-				sum.setPaidIncome(sum.getPaidIncome() + temp.getPaidIncome());
-				
-				sum.setTotalPrice(sum.getTotalPrice() + temp.getTotalPrice());
-				sum.setTotalPrice2(sum.getTotalPrice2() + temp.getTotalPrice2());
-				
-				sum.setOrderAmount(sum.getOrderAmount() + temp.getOrderAmount());
-			}
-			root = DataPaging.getPagingData(root, isPaging, start, limit);
-			root.add(sum);
-			jobject.setRoot(root);
-			JSONObject json = JSONObject.fromObject(jobject);
-			response.getWriter().print(json.toString());
+//			root = DataPaging.getPagingData(root, isPaging, start, limit);
+//			root.add(sum);
+//			jobject.setRoot(root);
+//			JSONObject json = JSONObject.fromObject(jobject);
+//			response.getWriter().print(json.toString());
 		}
 		return null;
 	}
