@@ -157,7 +157,7 @@ public class OperateMemberTypeAction extends DispatchAction{
 				update.setAttribute(Attribute.valueOf(Integer.valueOf(attr)));
 			}
 			if(exchangeRate != null && !exchangeRate.trim().isEmpty()){
-				update.setChargeRate(Float.valueOf(chargeRate));
+				update.setExchangeRate(Float.valueOf(exchangeRate));
 			}
 			if(discountID != null && !discountID.trim().isEmpty()){
 				update.setDefaultDiscount(new Discount(Integer.valueOf(discountID)));
