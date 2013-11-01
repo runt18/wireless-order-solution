@@ -67,8 +67,8 @@ function getChecked(checkeds, checkBoxs){
 
 function checkLabel(t){
 	if(t.length > 4){
-		var after = t.substring(0, 3);
-		return after+'...';
+		var after = t.substring(0, 4);
+		return after;
 	}else{
 		return t;
 	}
@@ -119,7 +119,7 @@ function memberTypeWinInit(){
 					selectOnFocus : true
 				}, {
 					xtype : 'label',
-					width : 240,
+					width : 200,
 					style : 'color:green;font-szie:12px;',
 					text : '说明:  使用会员结账时, 消费金额兑换积分的利率, 如金额 100 元兑换 150 积分, 则输入 1.5, 默认 1.'
 				}, {
@@ -262,7 +262,7 @@ function memberTypeWinInit(){
 					var attribute = Ext.getCmp('comboAttribute');
 					
 					if(!typeName.isValid() || !chargeRate.isValid() || !exchangeRate.isValid() 
-							|| !initialPoint.isValid() || !attribute.isValid()){
+							|| !initialPoint.isValid() || !attribute.isValid() || !discount.isValid()){
 						return;
 					}
 					var memberDiscountCheckeds = "";

@@ -19,10 +19,11 @@ function initOperateMaterialCateWin(){
 			modal : true,
 			resizable : false,
 			closable : false,
-			width : 230,
+			width : 250,
 			items : [{
 				xtype : 'form',
 				layout : 'form',
+				width : 250,
 				labelWidth : 65,
 				frame : true,
 				items : [cateId, cateName]

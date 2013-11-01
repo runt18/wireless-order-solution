@@ -27,7 +27,7 @@ var addPrintScheme = new Ext.ux.ImageButton({
 function formatName(v){
 	if(v.length > 6){
 		
-		v = v.substring(0, 5) + "...";
+		v = v.substring(0, 6);
 	}
 	return v;
 }

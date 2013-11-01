@@ -239,7 +239,11 @@ function stockTaskNavHandler(e){
 			// 切换步骤
 			stockTaskNavWin.getLayout().setActiveItem(index);
 			var smfos = Ext.getCmp('comboSelectMaterialForStockAction');
+			var stockActionDate = Ext.getCmp('datetOriStockDateForStockActionBasic');
+			stockActionDate.clearInvalid();
+			
 			smfos.setValue();
+			smfos.clearInvalid();
 			smfos.store.load({
 				params : {
 					cateType : stockTaskNavWin.stockType.split(',')[1]
