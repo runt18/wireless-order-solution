@@ -2,7 +2,8 @@ package com.wireless.pojo.billStatistics;
 
 
 public class IncomeByPay{
-	private int mOrderAmount;			//总账单数
+	
+	public final static IncomeByPay DUMMY = new IncomeByPay();
 	
 	private int mCashAmount;			//现金账单数
 	private float mCashIncome;			//现金金额
@@ -24,15 +25,12 @@ public class IncomeByPay{
 	private float mHangIncome;			//挂账金额
 	private float mHangActual;			//挂账实收
 	
-	private float mTotalIncome;			//合计金额
-	private float mTotalActual;			//合计实收
-	
-	public void setOrderAmount(int orderAmount){
-		this.mOrderAmount = orderAmount;
-	}
-	
 	public int getOrderAmount(){
-		return this.mOrderAmount;
+		return getCashAmount() + 
+			   getCreditCardAmount() + 
+			   getMemberCardAmount() + 
+			   getHangAmount() +
+			   getSignAmount();
 	}
 	
 	public void setCashAmount(int cashAmount){
@@ -83,7 +81,7 @@ public class IncomeByPay{
 		this.mCreditCardActual = creditCardActual;
 	}
 
-	public int getMemeberCardAmount() {
+	public int getMemberCardAmount() {
 		return mMemeberCardAmount;
 	}
 
@@ -156,18 +154,19 @@ public class IncomeByPay{
 	}
 
 	public float getTotalActual() {
-		return mTotalActual;
-	}
-
-	public void setTotalActual(float totalActual) {
-		this.mTotalActual = totalActual;
+		return getCashActual() + 
+			   getCreditCardActual() + 
+			   getMemberCardActual() + 
+			   getSignActual() + 
+			   getHangActual();
 	}
 
 	public float getTotalIncome() {
-		return mTotalIncome;
+		return getTotalIncome() + 
+			   getCreditCardIncome() + 
+			   getMemberCardIncome() + 
+			   getSignIncome() + 
+			   getHangIncome();
 	}
 
-	public void setTotalIncome(float totalIncome) {
-		this.mTotalIncome = totalIncome;
-	}
 }

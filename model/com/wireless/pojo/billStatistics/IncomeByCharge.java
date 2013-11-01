@@ -2,6 +2,8 @@ package com.wireless.pojo.billStatistics;
 
 public class IncomeByCharge {
 
+	public final static IncomeByCharge DUMMY = new IncomeByCharge();
+	
 	private float cash;
 	private float creditCard;
 	

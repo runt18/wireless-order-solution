@@ -1,19 +1,19 @@
 package com.wireless.pojo.billStatistics;
 
-import com.wireless.pojo.system.SystemStaff;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.DateUtil;
 
 public class DutyRange {
 	
 	private long onDuty;		// 开始时间
 	private long offDuty;		// 结束时间
-	private SystemStaff staff;		// 操作人
+	private Staff staff;		// 操作人
 	
 	public DutyRange(){
 		
 	}
 	
-	public DutyRange(long onDuty, long offDuty, SystemStaff staff){
+	public DutyRange(long onDuty, long offDuty, Staff staff){
 		this.onDuty = onDuty;
 		this.offDuty = offDuty;
 		this.staff = staff;
@@ -25,7 +25,7 @@ public class DutyRange {
 		this.staff = null;
 	}
 	
-	public DutyRange(String onDuty, String offDuty, SystemStaff staff){
+	public DutyRange(String onDuty, String offDuty, Staff staff){
 		this.onDuty = DateUtil.parseDate(onDuty);
 		this.offDuty = DateUtil.parseDate(offDuty);
 		this.staff = staff;
@@ -38,11 +38,11 @@ public class DutyRange {
 	}
 	
 	public String getOnDutyFormat() {
-		return DateUtil.format(onDuty);
+		return DateUtil.format(onDuty, DateUtil.Pattern.DATE_TIME);
 	}
 	
 	public String getOffDutyFormat() {
-		return DateUtil.format(offDuty);
+		return DateUtil.format(offDuty, DateUtil.Pattern.DATE_TIME);
 	}
 	
 	public long getOnDuty() {
@@ -57,10 +57,10 @@ public class DutyRange {
 	public void setOffDuty(long offDuty) {
 		this.offDuty = offDuty;
 	}
-	public SystemStaff getStaff() {
+	public Staff getStaff() {
 		return staff;
 	}
-	public void setStaff(SystemStaff staff) {
+	public void setStaff(Staff staff) {
 		this.staff = staff;
 	}
 	

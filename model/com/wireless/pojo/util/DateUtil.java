@@ -54,8 +54,8 @@ public class DateUtil {
 	 * @param pattern
 	 * @return
 	 */
-	public static String format(Date date, String pattern){
-		return new SimpleDateFormat(pattern, Locale.getDefault()).format(date);
+	public static String format(Date date, Pattern pattern){
+		return new SimpleDateFormat(pattern.getPattern(), Locale.getDefault()).format(date);
 	}
 	
 	/**
@@ -93,7 +93,7 @@ public class DateUtil {
 	 * @return
 	 */
 	public static String formatToDate(Date date){
-		return DateUtil.format(date, Pattern.DATE.getPattern());
+		return DateUtil.format(date, Pattern.DATE);
 	}
 	
 	/**

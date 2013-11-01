@@ -2,6 +2,8 @@ package com.wireless.pojo.billStatistics;
 
 public class IncomeByService {
 	
+	public final static IncomeByService DUMMY = new IncomeByService();
+	
 	private int mServiceAmount;		//服务费账单数
 	private float mTotalService;	//服务费金额
 	
