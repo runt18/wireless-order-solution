@@ -27,16 +27,6 @@ public class Grid4ItemsContent extends ConcreteContent {
 	 */
 	@Override
 	public String toString(){
-//		int pos_1 = 10, pos_2 = 17, pos_3 = 25;
-//		if(_style == PStyle.PRINT_STYLE_58MM){
-//			pos_1 = 8;
-//			pos_2 = 15;
-//			pos_3 = 24;
-//		}else if(_style == PStyle.PRINT_STYLE_80MM){
-//			pos_1 = 12;
-//			pos_2 = 24;
-//			pos_3 = 36;
-//		}
 		
 		try{
 			StringBuilder space1 = new StringBuilder();

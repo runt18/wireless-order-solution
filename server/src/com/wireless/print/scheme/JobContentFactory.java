@@ -296,10 +296,10 @@ public class JobContentFactory {
 						 * Get the details to daily settlement from history ,
 						 * since records to today has been moved to history before printing daily settlement receipt. 
 						 */
-						shiftDetail = QueryShiftDao.exec(term, sdf.format(onDuty), sdf.format(offDuty), QueryShiftDao.QUERY_HISTORY);
+						shiftDetail = QueryShiftDao.exec(term, sdf.format(onDuty), sdf.format(offDuty), DateType.HISTORY);
 						
 					}else{
-						shiftDetail = QueryShiftDao.exec(term, sdf.format(onDuty), sdf.format(offDuty), QueryShiftDao.QUERY_TODAY);
+						shiftDetail = QueryShiftDao.exec(term, sdf.format(onDuty), sdf.format(offDuty), DateType.TODAY);
 					}
 					jobContents.add(new JobContent(printer, func.getRepeat(), printType,
 												   new ShiftContent(shiftDetail, 
