@@ -10,7 +10,7 @@
 			<param-value>
 				/WXEntry.do,
 				/QueryFood_q.do,
-				
+
 				/QueryRestaurants.do,
 				/VerifyLogin.do,
 				/LoginOut.do,
@@ -30,7 +30,7 @@
 				/MgrCenter.html,
 				/DeviceMgr.html,
 				/RestaurantMgr.html,
-				
+
 				/controlMember.jsp,
 				/memberOperation.jsp,
 				/recharge.jsp,
@@ -38,7 +38,7 @@
 			</param-value>
 		</init-param>
 
-	</filter>	
+	</filter>
 	<filter-mapping>
 		<filter-name>whiteList</filter-name>
 		<url-pattern>/pages/*</url-pattern>
@@ -71,7 +71,7 @@
 		</init-param>
 		<init-param>
 			<param-name>db_host</param-name>
-			<param-value>127.0.0.1</param-value>
+			<param-value>192.168.110.100</param-value>
 		</init-param>
 		<init-param>
 			<param-name>db_port</param-name>
@@ -83,7 +83,7 @@
 		</init-param>
 		<init-param>
 			<param-name>db_pwd</param-name>
-			<param-value>q123123</param-value>
+			<param-value>HelloZ315</param-value>
 		</init-param>
 		<!-- Below is the configuration parameters to socket -->
 		<init-param>
@@ -116,34 +116,51 @@
 		</init-param>
 		<init-param>
 			<param-name>oss_access_id</param-name>
-			<param-value>IGQwqbvEgaqwN2dz</param-value>
+			<param-value>EEuoN1hz4wIVy05K</param-value>
 		</init-param>
 		<init-param>
 			<param-name>oss_access_key</param-name>
-			<param-value>8YbGpZupP8fCiGTU9Zvm5aDdh9GlbS</param-value>
+			<param-value>BBBNdSPgc2es4X7CN9BMtmMIOCAjoP</param-value>
 		</init-param>
 		<init-param>
 			<param-name>oss_inner_point</param-name>
-			<param-value>http://oss.aliyuncs.com</param-value>
+			<param-value>oss.aliyuncs.com</param-value>
 		</init-param>
 		<init-param>
 			<param-name>oss_outer_point</param-name>
-			<param-value>http://oss.aliyuncs.com</param-value>
+			<param-value>oss.aliyuncs.com</param-value>
 		</init-param>
 		<init-param>
 			<param-name>oss_bucket_image</param-name>
-			<param-value>digie-image</param-value>
+			<param-value>food-image</param-value>
 		</init-param>
 		<load-on-startup>0</load-on-startup>
 	</servlet>
+
+	<servlet>
+		<servlet-name>finance</servlet-name>
+		<servlet-class>com.wireless.servlets.weixin.FinanceWeixinServlet</servlet-class>
+		<init-param>
+			<param-name>image_tmp_path</param-name>
+			<param-value>/home/yzhang/www/eMenu/images/</param-value>
+			<description>the temp storage path for image to weixin finance</description>
+		</init-param>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>finance</servlet-name>
+		<url-pattern>/finance</url-pattern>
+	</servlet-mapping>
+
 	<servlet-mapping>
 		<servlet-name>action</servlet-name>
 		<url-pattern>*.do</url-pattern>
 	</servlet-mapping>
+
 	<session-config>
 		<session-timeout>30</session-timeout>       <!-- 单位：分钟 -->
 	</session-config>
-	
+
 	<welcome-file-list>
 		<welcome-file>index.html</welcome-file>
 		<welcome-file>index.htm</welcome-file>
