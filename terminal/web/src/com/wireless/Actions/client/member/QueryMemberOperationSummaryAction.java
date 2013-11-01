@@ -20,7 +20,6 @@ import com.wireless.pojo.client.MOSummary;
 import com.wireless.pojo.client.MemberOperation;
 import com.wireless.pojo.client.MemberOperation.OperationType;
 import com.wireless.pojo.staffMgr.Staff;
-import com.wireless.util.DateType;
 import com.wireless.util.SQLUtil;
 import com.wireless.util.WebParams;
 
@@ -74,7 +73,8 @@ public class QueryMemberOperationSummaryAction extends DispatchAction{
 			
 			Map<Object, Object> params = new LinkedHashMap<Object, Object>();
 			params.put(SQLUtil.SQL_PARAMS_EXTRA, extra);
-			if(DateType.getType(dataSource) != null && DateType.getType(dataSource).isHistory()){
+			//if(DateType.getType(dataSource) != null && DateType.getType(dataSource).isHistory()){
+			if(dataSource.equalsIgnoreCase("history")){
 				if(isPaging != null && Boolean.valueOf(isPaging)){
 					jobject.setTotalProperty(MemberOperationDao.getSummaryByHistoryCount(params));
 					
@@ -83,7 +83,8 @@ public class QueryMemberOperationSummaryAction extends DispatchAction{
 				}
 				params.put(SQLUtil.SQL_PARAMS_ORDERBY, define(ot));
 				list = MemberOperationDao.getSummaryByHistory(staff, params);
-			}else if(DateType.getType(dataSource).isToday()){
+			//}else if(DateType.getType(dataSource).isToday()){
+			}else if(dataSource.equalsIgnoreCase("today")){
 				if(isPaging != null && Boolean.valueOf(isPaging)){
 					jobject.setTotalProperty(MemberOperationDao.getSummaryByTodayCount(params));
 					

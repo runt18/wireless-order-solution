@@ -126,7 +126,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 				offDuty,
 				did,
 				QuerySaleDetails.ORDER_BY_SALES,
-				1,
+				DateType.HISTORY,
 				foodName);
 		
 		HSSFWorkbook wb = new HSSFWorkbook();
@@ -313,17 +313,17 @@ public class HistoryStatisticsAction extends DispatchAction{
 		request.setCharacterEncoding("UTF-8");
 		response.setCharacterEncoding("UTF-8");
 		response.setContentType("application/vnd.ms-excel;");
-		response.addHeader("Content-Disposition","attachment;filename=" + new String(("分厨銷售统计(" + DateType.HISTORY.getName() + ").xls").getBytes("GBK"), "ISO8859_1"));
+		response.addHeader("Content-Disposition","attachment;filename=" + new String(("分厨銷售统计(" + DateType.HISTORY.getDesc() + ").xls").getBytes("GBK"), "ISO8859_1"));
 		
 		String pin = (String)request.getAttribute("pin");
 		String onDuty = request.getParameter("onDuty");
 		String offDuty = request.getParameter("offDuty");
 		
 		Staff staff = StaffDao.verify(Integer.parseInt(pin));
-		SalesDetail[] list = QuerySaleDetails.execByKitchen(staff, onDuty, offDuty, 1);
+		SalesDetail[] list = QuerySaleDetails.execByKitchen(staff, onDuty, offDuty, DateType.HISTORY);
 		
 		HSSFWorkbook wb = new HSSFWorkbook();
-		HSSFSheet sheet = wb.createSheet("分厨销售统计(" + DateType.HISTORY.getName() + ")");
+		HSSFSheet sheet = wb.createSheet("分厨销售统计(" + DateType.HISTORY.getDesc() + ")");
 		HSSFRow row = null;
 		HSSFCell cell = null;
 		// 初始化参数,重要
@@ -343,7 +343,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 		row = sheet.createRow(0);
 		row.setHeight((short) 550);
 		cell = row.createCell(0);
-		cell.setCellValue("分厨销售统计(" + DateType.HISTORY.getName() + ")");
+		cell.setCellValue("分厨销售统计(" + DateType.HISTORY.getDesc() + ")");
 		cell.setCellStyle(titleStyle);
 				
 		// *****
@@ -489,7 +489,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 		String offDuty = request.getParameter("offDuty");
 		
 		Staff staff = StaffDao.verify(Integer.parseInt(pin));
-		SalesDetail[] list = QuerySaleDetails.execByDept(staff, onDuty, offDuty, 1);
+		SalesDetail[] list = QuerySaleDetails.execByDept(staff, onDuty, offDuty, DateType.HISTORY);
 		
 		HSSFWorkbook wb = new HSSFWorkbook();
 		HSSFSheet sheet = wb.createSheet("部门销售统计(历史)");
@@ -898,7 +898,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 			return null;
 		}
 		
-		response.addHeader("Content-Disposition","attachment;filename=" + new String(("营业汇总(" + dt.getName() + ").xls").getBytes("GBK"), "ISO8859_1"));
+		response.addHeader("Content-Disposition","attachment;filename=" + new String(("营业汇总(" + dt.getDesc() + ").xls").getBytes("GBK"), "ISO8859_1"));
 		
 		Map<Object, Object> params = new HashMap<Object, Object>();
 		params.put(dt, dt.getValue());
@@ -913,7 +913,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 		
 		// 创建execl主页
 		HSSFWorkbook wb = new HSSFWorkbook();
-		HSSFSheet sheet = wb.createSheet("营业汇总(" + dt.getName() + ")");
+		HSSFSheet sheet = wb.createSheet("营业汇总(" + dt.getDesc() + ")");
 		HSSFRow row = null;
 		HSSFCell cell = null;
 		// 初始化参数,重要
@@ -936,7 +936,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 		row = sheet.createRow(0);
 		row.setHeight((short) 550);
 		cell = row.createCell(0);
-		cell.setCellValue("营业汇总(" + dt.getName() + ")");
+		cell.setCellValue("营业汇总(" + dt.getDesc() + ")");
 		cell.setCellStyle(titleStyle);
 		// *****
 		// 摘要
@@ -1454,7 +1454,8 @@ public class HistoryStatisticsAction extends DispatchAction{
 		if(reasonID == null || reasonID.trim().isEmpty()){
 			reasonID = "-1";
 		}
-		Integer ot = Integer.valueOf(otype), dt = Integer.valueOf(dtype);
+		Integer ot = Integer.valueOf(otype);
+		DateType dt = DateType.valueOf(Integer.valueOf(dtype));
 		Integer did = Integer.valueOf(deptID), rid = Integer.valueOf(reasonID);
 		
 		DutyRange queryDate = new DutyRange(dateBeg, dateEnd);

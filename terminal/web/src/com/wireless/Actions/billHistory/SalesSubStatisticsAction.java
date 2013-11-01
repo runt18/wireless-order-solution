@@ -19,6 +19,7 @@ import com.wireless.json.JObject;
 import com.wireless.pojo.billStatistics.SalesDetail;
 import com.wireless.pojo.menuMgr.Food;
 import com.wireless.util.DataPaging;
+import com.wireless.util.DateType;
 import com.wireless.util.WebParams;
 
 public class SalesSubStatisticsAction extends Action {
@@ -76,16 +77,13 @@ public class SalesSubStatisticsAction extends Action {
 			orderType = orderType != null && orderType.length() > 0 ? orderType.trim() : "1";
 			deptID = deptID != null && deptID.length() > 0 ? deptID.trim() : "-1";
 			
-			Integer qt = Integer.valueOf(queryType), ot = Integer.valueOf(orderType), dt = Integer.valueOf(dataType);
+			Integer qt = Integer.valueOf(queryType), ot = Integer.valueOf(orderType);
+			DateType dt = DateType.valueOf(Integer.valueOf(dataType));
 			
-			if(dt == 0){
-				dt = QuerySaleDetails.QUERY_TODAY;
-			}else if(dt == 1){
+				
+			if(dt.isHistory()){
 				dateBeg = dateBeg != null && dateBeg.length() > 0 ? dateBeg.trim() + " 00:00:00" : "";
 				dateEnd = dateEnd != null && dateEnd.length() > 0 ? dateEnd.trim() + " 23:59:59" : "";
-				dt = QuerySaleDetails.QUERY_HISTORY;
-			}else{
-				return null;
 			}
 			
 			if(qt == QuerySaleDetails.QUERY_BY_DEPT){

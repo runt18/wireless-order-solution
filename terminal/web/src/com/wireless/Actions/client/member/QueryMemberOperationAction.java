@@ -20,7 +20,6 @@ import com.wireless.json.JObject;
 import com.wireless.pojo.client.MemberOperation;
 import com.wireless.pojo.client.MemberOperation.OperationType;
 import com.wireless.pojo.staffMgr.Staff;
-import com.wireless.util.DateType;
 import com.wireless.util.SQLUtil;
 import com.wireless.util.WebParams;
 
@@ -88,11 +87,11 @@ public class QueryMemberOperationAction extends Action{
 			Map<Object, Object> paramsSet = new HashMap<Object, Object>(), countSet = null;
 			if(isPaging != null && isPaging.trim().equals("true")){
 				countSet = new HashMap<Object, Object>();
-				if(DateType.getValue(dataSource) == DateType.TODAY.getValue()){
+				if(dataSource.equalsIgnoreCase("today")){
 					countSet.put(SQLUtil.SQL_PARAMS_EXTRA, extraCond);
 					countSet.put(SQLUtil.SQL_PARAMS_ORDERBY, orderClause);
 					jobject.setTotalProperty(MemberOperationDao.getTodayCount(countSet));
-				}else if(DateType.getValue(dataSource) == DateType.HISTORY.getValue()){
+				}else if(dataSource.equalsIgnoreCase("history")){
 					if(onDuty != null && !onDuty.trim().isEmpty() && offDuty != null && !offDuty.trim().isEmpty()){
 						extraCond += (" AND MO.operate_date >= '" + onDuty + "'");
 						extraCond += (" AND MO.operate_date <= '" + offDuty + "'");
@@ -106,11 +105,13 @@ public class QueryMemberOperationAction extends Action{
 			}
 			paramsSet.put(SQLUtil.SQL_PARAMS_EXTRA, extraCond);
 			paramsSet.put(SQLUtil.SQL_PARAMS_ORDERBY, orderClause);
-			if(DateType.getValue(dataSource) == DateType.TODAY.getValue()){
+			
+			if(dataSource.equalsIgnoreCase("today")){
 				list = MemberOperationDao.getToday(paramsSet);
-			}else if(DateType.getValue(dataSource) == DateType.HISTORY.getValue()){
+			}else if(dataSource.equalsIgnoreCase("history")){
 				list = MemberOperationDao.getHistory(paramsSet);
 			}
+			
 			if(list != null && !list.isEmpty()){
 				MemberOperation sum = MemberOperation.newMO(-10, "", "", "");
 				sum.setChargeType(list.get(0).getChargeType());

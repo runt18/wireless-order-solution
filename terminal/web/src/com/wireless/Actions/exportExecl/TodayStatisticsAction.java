@@ -82,7 +82,7 @@ public class TodayStatisticsAction extends DispatchAction{
 		request.setCharacterEncoding("UTF-8");
 		response.setCharacterEncoding("UTF-8");
 		response.setContentType("application/vnd.ms-excel;");
-		response.addHeader("Content-Disposition","attachment;filename=" + new String(("菜品销售明细(" + DateType.TODAY.getName() + ").xls").getBytes("GBK"), "ISO8859_1"));
+		response.addHeader("Content-Disposition","attachment;filename=" + new String(("菜品销售明细(" + DateType.TODAY.getDesc() + ").xls").getBytes("GBK"), "ISO8859_1"));
 		
 		String pin = (String)request.getAttribute("pin");
 		String onDuty = request.getParameter("onDuty");
@@ -108,12 +108,12 @@ public class TodayStatisticsAction extends DispatchAction{
 				offDuty,
 				did,
 				QuerySaleDetails.ORDER_BY_SALES,
-				DateType.TODAY.getValue(),
+				DateType.TODAY,
 				foodName
 		);
 		
 		HSSFWorkbook wb = new HSSFWorkbook();
-		HSSFSheet sheet = wb.createSheet("菜品销售明细(" + DateType.TODAY.getName() + ")");
+		HSSFSheet sheet = wb.createSheet("菜品销售明细(" + DateType.TODAY.getDesc() + ")");
 		HSSFRow row = null;
 		HSSFCell cell = null;
 		// ******
@@ -134,7 +134,7 @@ public class TodayStatisticsAction extends DispatchAction{
 		row = sheet.createRow(0);
 		row.setHeight((short) 550);
 		cell = row.createCell(0);
-		cell.setCellValue("菜品销售明细(" + DateType.TODAY.getName() + ")");
+		cell.setCellValue("菜品销售明细(" + DateType.TODAY.getDesc() + ")");
 		cell.setCellStyle(titleStyle);
 		
 		// 摘要
@@ -242,17 +242,17 @@ public class TodayStatisticsAction extends DispatchAction{
 		request.setCharacterEncoding("UTF-8");
 		response.setCharacterEncoding("UTF-8");
 		response.setContentType("application/vnd.ms-excel;");
-		response.addHeader("Content-Disposition","attachment;filename=" + new String(("分厨銷售统计(" + DateType.TODAY.getName() + ").xls").getBytes("GBK"), "ISO8859_1"));
+		response.addHeader("Content-Disposition","attachment;filename=" + new String(("分厨銷售统计(" + DateType.TODAY.getDesc() + ").xls").getBytes("GBK"), "ISO8859_1"));
 		
 		String pin = (String)request.getAttribute("pin");
 		String onDuty = request.getParameter("onDuty");
 		String offDuty = request.getParameter("offDuty");
 		
 		Staff staff = StaffDao.verify(Integer.parseInt(pin));
-		SalesDetail[] list = QuerySaleDetails.execByKitchen(staff, onDuty, offDuty, DateType.TODAY.getValue());
+		SalesDetail[] list = QuerySaleDetails.execByKitchen(staff, onDuty, offDuty, DateType.TODAY);
 		
 		HSSFWorkbook wb = new HSSFWorkbook();
-		HSSFSheet sheet = wb.createSheet("分厨销售统计(" + DateType.HISTORY.getName() + ")");
+		HSSFSheet sheet = wb.createSheet("分厨销售统计(" + DateType.HISTORY.getDesc() + ")");
 		HSSFRow row = null;
 		HSSFCell cell = null;
 		// 初始化参数,重要
@@ -268,7 +268,7 @@ public class TodayStatisticsAction extends DispatchAction{
 		row = sheet.createRow(0);
 		row.setHeight((short) 550);
 		cell = row.createCell(0);
-		cell.setCellValue("分厨销售统计(" + DateType.HISTORY.getName() + ")");
+		cell.setCellValue("分厨销售统计(" + DateType.HISTORY.getDesc() + ")");
 		cell.setCellStyle(titleStyle);
 				
 		// *****
@@ -375,17 +375,17 @@ public class TodayStatisticsAction extends DispatchAction{
 		request.setCharacterEncoding("UTF-8");
 		response.setCharacterEncoding("UTF-8");
 		response.setContentType("application/vnd.ms-excel;");
-		response.addHeader("Content-Disposition","attachment;filename=" + new String(("部门销售统计(" + DateType.TODAY.getName() + ").xls").getBytes("GBK"), "ISO8859_1"));
+		response.addHeader("Content-Disposition","attachment;filename=" + new String(("部门销售统计(" + DateType.TODAY.getDesc() + ").xls").getBytes("GBK"), "ISO8859_1"));
 		
 		String pin = (String)request.getAttribute("pin");
 		String onDuty = request.getParameter("onDuty");
 		String offDuty = request.getParameter("offDuty");
 		
 		Staff staff = StaffDao.verify(Integer.parseInt(pin));
-		SalesDetail[] list = QuerySaleDetails.execByDept(staff, onDuty, offDuty, DateType.TODAY.getValue());
+		SalesDetail[] list = QuerySaleDetails.execByDept(staff, onDuty, offDuty, DateType.TODAY);
 		
 		HSSFWorkbook wb = new HSSFWorkbook();
-		HSSFSheet sheet = wb.createSheet("部门销售统计(" + DateType.HISTORY.getName() + ")");
+		HSSFSheet sheet = wb.createSheet("部门销售统计(" + DateType.HISTORY.getDesc() + ")");
 		HSSFRow row = null;
 		HSSFCell cell = null;
 		// 初始化参数,重要
@@ -401,7 +401,7 @@ public class TodayStatisticsAction extends DispatchAction{
 		row = sheet.createRow(0);
 		row.setHeight((short) 550);
 		cell = row.createCell(0);
-		cell.setCellValue("部门销售统计(" + DateType.HISTORY.getName() + ")");
+		cell.setCellValue("部门销售统计(" + DateType.HISTORY.getDesc() + ")");
 		cell.setCellStyle(titleStyle);
 				
 		// *****

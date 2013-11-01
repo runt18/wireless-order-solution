@@ -24,6 +24,7 @@ import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.billStatistics.IncomeByDept;
 import com.wireless.pojo.billStatistics.ShiftDetail;
+import com.wireless.util.DateType;
 
 public class DailySettleStatDetailAction extends Action {
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
@@ -63,7 +64,7 @@ public class DailySettleStatDetailAction extends Action {
 			result = QueryShiftDao.exec(dbCon, 
 										StaffDao.verify(dbCon, Integer.parseInt(pin)), 
 										onDuty, offDuty,
-										QueryShiftDao.QUERY_HISTORY);
+										DateType.HISTORY);
 
 			/**
 			 */

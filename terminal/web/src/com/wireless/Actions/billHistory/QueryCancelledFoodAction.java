@@ -26,6 +26,7 @@ import com.wireless.pojo.dishesOrder.CancelledFood;
 import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.util.DataPaging;
+import com.wireless.util.DateType;
 import com.wireless.util.JObject;
 import com.wireless.util.WebParams;
 
@@ -81,7 +82,8 @@ public class QueryCancelledFoodAction extends Action {
 			if(reasonID == null || reasonID.trim().isEmpty()){
 				reasonID = "-1";
 			}
-			Integer qt = Integer.valueOf(qtype), ot = Integer.valueOf(otype), dt = Integer.valueOf(dtype);
+			Integer qt = Integer.valueOf(qtype), ot = Integer.valueOf(otype); 
+			DateType dt = DateType.valueOf(Integer.valueOf(dtype));
 			Integer did = Integer.valueOf(deptID), rid = Integer.valueOf(reasonID);
 			
 			DutyRange queryDate = new DutyRange(dateBeg, dateEnd);
