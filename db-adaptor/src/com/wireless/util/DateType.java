@@ -8,37 +8,37 @@ public enum DateType {
 	HISTORY(1, "历史");
 	
 	private final int type;
-	private final String name;
+	private final String desc;
 	
 	private DateType(int type, String name){
 		this.type = type;
-		this.name = name;
+		this.desc = name;
 	}
 	
 	public int getValue(){
 		return type;
 	}
 	
-	public String getName(){
-		return name;
+	public String getDesc(){
+		return desc;
 	}
 	
 	/**
-	 * 
+	 * @deprecated
 	 * @param params
 	 * @return
 	 */
-	public static int getValue(Map<Object, Object> params){
+	public static DateType getValue(Map<Object, Object> params){
 		if(params.get(DateType.TODAY) != null)
-			return DateType.TODAY.getValue();
+			return DateType.TODAY;
 		if(params.get(DateType.HISTORY) != null)
-			return DateType.HISTORY.getValue();
+			return DateType.HISTORY;
 		else
-			return -1;
+			return null;
 	}
 	
 	/**
-	 * 
+	 * @deprecated
 	 * @param type
 	 * @return
 	 */
@@ -52,7 +52,7 @@ public enum DateType {
 	}
 	
 	/**
-	 * 
+	 * @deprecated
 	 * @param params
 	 * @return
 	 */
@@ -66,7 +66,7 @@ public enum DateType {
 	}
 	
 	/**
-	 * 
+	 * @deprecated
 	 * @param params
 	 * @return
 	 */
@@ -80,7 +80,7 @@ public enum DateType {
 	}
 	
 	/**
-	 * 
+	 * @deprecated
 	 * @param type
 	 * @return
 	 */
@@ -97,18 +97,10 @@ public enum DateType {
 		}
 	}
 	
-	/**
-	 * 
-	 * @return
-	 */
 	public boolean isToday(){
 		return this == DateType.TODAY;
 	}
 	
-	/**
-	 * 
-	 * @return
-	 */
 	public boolean isHistory(){
 		return this == DateType.HISTORY;
 	}
@@ -120,6 +112,11 @@ public enum DateType {
 			}
 		}
 		throw new IllegalArgumentException("The type(val = " + type + ") is invalid.");
+	}
+	
+	@Override
+	public String toString(){
+		return "DateType(val = " + getValue() + ", desc = " + getDesc() + ")";
 	}
 	
 }

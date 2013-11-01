@@ -3,9 +3,7 @@ package com.wireless.db.shift;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.TimeZone;
 
 import com.wireless.db.DBCon;
@@ -24,14 +22,9 @@ import com.wireless.pojo.billStatistics.IncomeByRepaid;
 import com.wireless.pojo.billStatistics.IncomeByService;
 import com.wireless.pojo.billStatistics.ShiftDetail;
 import com.wireless.pojo.staffMgr.Staff;
-import com.wireless.pojo.system.Shift;
 import com.wireless.util.DateType;
-import com.wireless.util.SQLUtil;
 
 public class QueryShiftDao {
-	
-	public final static int QUERY_TODAY = CalcBillStatisticsDao.QUERY_TODAY;
-	public final static int QUERY_HISTORY = CalcBillStatisticsDao.QUERY_HISTORY;
 	
 	/**
 	 * Perform to query the shift information through now to last daily settlement.
@@ -100,7 +93,7 @@ public class QueryShiftDao {
 		sdf.setTimeZone(TimeZone.getTimeZone("GMT+8"));
 		String offDuty = sdf.format(System.currentTimeMillis());
 		
-		return exec(dbCon, staff, onDuty, offDuty, CalcBillStatisticsDao.QUERY_TODAY);
+		return exec(dbCon, staff, onDuty, offDuty, DateType.TODAY);
 	}
 	
 	/**
@@ -177,7 +170,7 @@ public class QueryShiftDao {
 		sdf.setTimeZone(TimeZone.getTimeZone("GMT+8"));
 		String offDuty = sdf.format(System.currentTimeMillis());
 		
-		return exec(dbCon, staff, onDuty, offDuty, CalcBillStatisticsDao.QUERY_TODAY);
+		return exec(dbCon, staff, onDuty, offDuty, DateType.TODAY);
 
 	}
 	
@@ -210,7 +203,7 @@ public class QueryShiftDao {
 		sdf.setTimeZone(TimeZone.getTimeZone("GMT+8"));
 		String offDuty = sdf.format(System.currentTimeMillis());
 		
-		return exec(dbCon, staff, onDuty, offDuty, CalcBillStatisticsDao.QUERY_TODAY);
+		return exec(dbCon, staff, onDuty, offDuty, DateType.TODAY);
 
 	}
 	
@@ -218,8 +211,8 @@ public class QueryShiftDao {
 	 * Generate the details to shift within the on & off duty date.
 	 * @param dbCon
 	 * 			the database connection
-	 * @param term
-	 * 			the terminal to request
+	 * @param staff
+	 * 			the staff to request
 	 * @param onDuty
 	 * 			the date to be on duty
 	 * @param offDuty
@@ -233,11 +226,11 @@ public class QueryShiftDao {
 	 * @throws SQLException
 	 * 			throws if fail to execute any SQL statement
 	 */
-	public static ShiftDetail exec(Staff term, String onDuty, String offDuty, int queryType) throws SQLException{
+	public static ShiftDetail exec(Staff staff, String onDuty, String offDuty, DateType queryType) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return exec(dbCon, term, onDuty, offDuty, queryType);
+			return exec(dbCon, staff, onDuty, offDuty, queryType);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -248,8 +241,8 @@ public class QueryShiftDao {
 	 * Note that database should be connected before invoking this method.
 	 * @param dbCon
 	 * 			the database connection
-	 * @param term
-	 * 			the terminal to request
+	 * @param staff
+	 * 			the staff to request
 	 * @param onDuty
 	 * 			the date to be on duty
 	 * @param offDuty
@@ -263,14 +256,14 @@ public class QueryShiftDao {
 	 * @throws SQLException
 	 * 			throws if fail to execute any SQL statement
 	 */
-	public static ShiftDetail exec(DBCon dbCon, Staff term, String onDuty, String offDuty, int queryType) throws SQLException{
+	public static ShiftDetail exec(DBCon dbCon, Staff staff, String onDuty, String offDuty, DateType queryType) throws SQLException{
 		
 		ShiftDetail result = new ShiftDetail();
 		result.setOnDuty(onDuty);
 		result.setOffDuty(offDuty);
 		
 		//Calculate the general income
-		IncomeByPay incomeByPay = CalcBillStatisticsDao.calcIncomeByPayType(dbCon, term, new DutyRange(onDuty, offDuty), queryType);
+		IncomeByPay incomeByPay = CalcBillStatisticsDao.calcIncomeByPayType(dbCon, staff, new DutyRange(onDuty, offDuty), queryType);
 		
 		result.setCashAmount(incomeByPay.getCashAmount());
 		result.setCashTotalIncome(incomeByPay.getCashIncome());
@@ -280,7 +273,7 @@ public class QueryShiftDao {
 		result.setCreditTotalIncome(incomeByPay.getCreditCardIncome());
 		result.setCreditActualIncome(incomeByPay.getCreditCardActual());
 				
-		result.setMemberCardAmount(incomeByPay.getMemeberCardAmount());
+		result.setMemberCardAmount(incomeByPay.getMemberCardAmount());
 		result.setMemberTotalIncome(incomeByPay.getMemberCardIncome());
 		result.setMemberActualIncome(incomeByPay.getMemberCardActual());
 				
@@ -296,166 +289,47 @@ public class QueryShiftDao {
 		result.setTotalActual(incomeByPay.getTotalActual());
 		
 		//Calculate the total & amount to erase price
-		IncomeByErase incomeByErase = CalcBillStatisticsDao.calcErasePrice(dbCon, term, new DutyRange(onDuty, offDuty), queryType);
+		IncomeByErase incomeByErase = CalcBillStatisticsDao.calcErasePrice(dbCon, staff, new DutyRange(onDuty, offDuty), queryType);
 		result.setEraseAmount(incomeByErase.getEraseAmount());
 		result.setEraseIncome(incomeByErase.getTotalErase());
 		//-----------------------------
 		
 		//Get the total & amount to discount price
-		IncomeByDiscount incomeByDiscount = CalcBillStatisticsDao.calcDiscountPrice(dbCon, term, new DutyRange(onDuty, offDuty), queryType);
+		IncomeByDiscount incomeByDiscount = CalcBillStatisticsDao.calcDiscountPrice(dbCon, staff, new DutyRange(onDuty, offDuty), queryType);
 		result.setDiscountAmount(incomeByDiscount.getDiscountAmount());
 		result.setDiscountIncome(incomeByDiscount.getTotalDiscount());	
 
 		
 		//Get the total & amount to gift price
-		IncomeByGift incomeByGift = CalcBillStatisticsDao.calcGiftPrice(dbCon, term, new DutyRange(onDuty, offDuty),  queryType);
+		IncomeByGift incomeByGift = CalcBillStatisticsDao.calcGiftPrice(dbCon, staff, new DutyRange(onDuty, offDuty),  queryType);
 		result.setGiftAmount(incomeByGift.getGiftAmount());
 		result.setGiftIncome(incomeByGift.getTotalGift());
 		
 		//Get the total & amount to cancel price
-		IncomeByCancel incomeByCancel = CalcBillStatisticsDao.calcCancelPrice(dbCon, term, new DutyRange(onDuty, offDuty), queryType);
+		IncomeByCancel incomeByCancel = CalcBillStatisticsDao.calcCancelPrice(dbCon, staff, new DutyRange(onDuty, offDuty), queryType);
 		result.setCancelAmount(incomeByCancel.getCancelAmount());
 		result.setCancelIncome(incomeByCancel.getTotalCancel());
 		
 		//Get the total & amount to repaid order
-		IncomeByRepaid incomeByRepaid = CalcBillStatisticsDao.calcRepaidPrice(dbCon, term, new DutyRange(onDuty, offDuty), queryType);
+		IncomeByRepaid incomeByRepaid = CalcBillStatisticsDao.calcRepaidPrice(dbCon, staff, new DutyRange(onDuty, offDuty), queryType);
 		result.setPaidAmount(incomeByRepaid.getRepaidAmount());
 		result.setPaidIncome(incomeByRepaid.getTotalRepaid());
 		
 		//Get the total & amount to order with service
-		IncomeByService incomeByService = CalcBillStatisticsDao.calcServicePrice(dbCon, term, new DutyRange(onDuty, offDuty), queryType);
+		IncomeByService incomeByService = CalcBillStatisticsDao.calcServicePrice(dbCon, staff, new DutyRange(onDuty, offDuty), queryType);
 		result.setServiceAmount(incomeByService.getServiceAmount());
 		result.setServiceIncome(incomeByService.getTotalService());
 		
 		//Get the charge income by both cash and credit card
-		IncomeByCharge incomeByCharge = CalcBillStatisticsDao.calcIncomeByCharge(dbCon, term, new DutyRange(onDuty, offDuty), queryType);
+		IncomeByCharge incomeByCharge = CalcBillStatisticsDao.calcIncomeByCharge(dbCon, staff, new DutyRange(onDuty, offDuty), queryType);
 		result.setChargeByCash(incomeByCharge.getCash());
 		result.setChargeByCreditCard(incomeByCharge.getCreditCard());
 		
 		//Get the gift, discount & total to each department during this period.
-		List<IncomeByDept> incomeByDept = CalcBillStatisticsDao.calcIncomeByDept(dbCon, term, new DutyRange(onDuty, offDuty), null, queryType);
+		List<IncomeByDept> incomeByDept = CalcBillStatisticsDao.calcIncomeByDept(dbCon, staff, new DutyRange(onDuty, offDuty), null, queryType);
 		result.setDeptIncome(incomeByDept);
 		
 		return result;
-	}
-	
-	/**
-	 * today
-	 * @param dbCon
-	 * @param params
-	 * @return
-	 * @throws Exception
-	 */
-	public static List<Shift> getShiftByToday(DBCon dbCon, Map<Object, Object> params) throws Exception{
-		List<Shift> list = new ArrayList<Shift>();
-		Shift item = null;
-		String querySQL = "SELECT id, restaurant_id, name, on_duty, off_duty "
-						+ " FROM shift WHERE 1=1 ";
-		querySQL = SQLUtil.bindSQLParams(querySQL, params);
-		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
-		while(dbCon.rs != null && dbCon.rs.next()){
-			item = new Shift();
-			item.setId(dbCon.rs.getInt("id"));
-			item.setRestaurantID(dbCon.rs.getInt("restaurant_id"));
-			item.setName(dbCon.rs.getString("name"));
-			item.setOnDuft(dbCon.rs.getDate("on_duty").getTime());
-			item.setOffDuft(dbCon.rs.getDate("off_duty").getTime());
-			list.add(item);
-			item = null;
-		}
-		return list;
-	}
-	
-	/**
-	 * today
-	 * @param params
-	 * @return
-	 * @throws Exception
-	 */
-	public static List<Shift> getShiftByToday(Map<Object, Object> params) throws Exception{
-		DBCon dbCon = new DBCon();
-		List<Shift> list = null;
-		try{
-			dbCon.connect();
-			list = QueryShiftDao.getShiftByToday(dbCon, params);
-		}catch(Exception e){
-			throw e;
-		}finally{
-			dbCon.disconnect();
-		}
-		return list;
-	}
-	
-	/**
-	 * history
-	 * @param dbCon
-	 * @param params
-	 * @return
-	 * @throws Exception
-	 */
-	public static List<Shift> getShiftByHistory(DBCon dbCon, Map<Object, Object> params) throws Exception{
-		List<Shift> list = null;
-		
-		return list;
-	}
-	
-	/**
-	 * history
-	 * @param params
-	 * @return
-	 * @throws Exception
-	 */
-	public static List<Shift> getShiftByHistory(Map<Object, Object> params) throws Exception{
-		DBCon dbCon = new DBCon();
-		List<Shift> list = null;
-		try{
-			dbCon.connect();
-			list = QueryShiftDao.getShiftByHistory(dbCon, params);
-		}catch(Exception e){
-			throw e;
-		}finally{
-			dbCon.disconnect();
-		}
-		return list;
-	}
-	
-	/**
-	 * 
-	 * @param dbCon
-	 * @param params
-	 * @return
-	 * @throws Exception
-	 */
-	public static List<Shift> getShift(DBCon dbCon, Map<Object, Object> params) throws Exception{
-		List<Shift> list = null;
-		if(!DateType.hasType(params)){
-			if(DateType.getType(params) == DateType.TODAY){
-				list = QueryShiftDao.getShiftByToday(dbCon, params);
-			}else if(DateType.getType(params) == DateType.HISTORY){
-				list = QueryShiftDao.getShiftByHistory(dbCon, params);
-			}
-		}
-		return list;
-	}
-	
-	/**
-	 * 
-	 * @param params
-	 * @return
-	 * @throws Exception
-	 */
-	public static List<Shift> getShift(Map<Object, Object> params) throws Exception{
-		DBCon dbCon = new DBCon();
-		List<Shift> list = null;
-		try{
-			dbCon.connect();
-			list = QueryShiftDao.getShift(dbCon, params);
-		}catch(Exception e){
-			throw e;
-		}finally{
-			dbCon.disconnect();
-		}
-		return list;
 	}
 	
 }

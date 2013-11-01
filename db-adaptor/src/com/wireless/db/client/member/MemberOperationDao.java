@@ -43,7 +43,7 @@ public class MemberOperationDao {
 		//Build the operate date and sequence.
 		Date now = new Date();
 		mo.setOperateDate(now.getTime());
-		mo.setOperateSeq(mo.getOperationType().getPrefix().concat(DateUtil.format(now, Pattern.MO_SEQ.getPattern())));
+		mo.setOperateSeq(mo.getOperationType().getPrefix().concat(DateUtil.format(now, Pattern.MO_SEQ)));
 		
 		mo.setRestaurantId(term.getRestaurantId());
 		mo.setStaffID(term.getId());

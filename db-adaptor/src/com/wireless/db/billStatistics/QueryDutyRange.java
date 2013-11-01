@@ -13,7 +13,6 @@ import com.wireless.exception.BusinessException;
 import com.wireless.exception.SystemError;
 import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.staffMgr.Staff;
-import com.wireless.pojo.system.SystemStaff;
 import com.wireless.util.DateType;
 import com.wireless.util.SQLUtil;
 
@@ -25,19 +24,18 @@ public class QueryDutyRange {
 	 * and the off duty to duty range is the latest date.
 	 * @param dbCon
 	 * 			the database connection
-	 * @param term
+	 * @param staff
 	 * 			the terminal to query
 	 * @param onDuty
 	 * 			the on duty
 	 * @param offDuty
 	 * 			the off duty 
-	 * @return	
-	 * 			the result to duty range,
+	 * @return	the result to duty range,
 	 * 			return null if no corresponding daily settle record exist within this period
 	 * @throws SQLException
 	 * 			throws if any error occurred while execute any SQL statements.
 	 */
-	public static DutyRange exec(DBCon dbCon, Staff term, String onDuty, String offDuty) throws SQLException{
+	public static DutyRange exec(DBCon dbCon, Staff staff, String onDuty, String offDuty) throws SQLException{
 		try{
 			String sql;
 			sql = " SELECT MIN(on_duty) AS on_duty, MAX(off_duty) AS off_duty FROM "
@@ -45,30 +43,23 @@ public class QueryDutyRange {
 					+ ".daily_settle_history "
 					+ " WHERE "
 					+ " restaurant_id = "
-					+ term.getRestaurantId()
+					+ staff.getRestaurantId()
 					+ " AND "
 					+ " off_duty BETWEEN "
 					+ "'" + onDuty + "'"
 					+ " AND "
-					+ "'" + offDuty + "'";
+					+ "'" + offDuty + "'"  
+					+ " GROUP BY restaurant_id ";
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
 			if(dbCon.rs.next()){
 				
 				java.sql.Timestamp onDutyTimeStamp = dbCon.rs.getTimestamp("on_duty");
 				String onDutyString;
-				if(onDutyTimeStamp == null){
-					return null;
-				}else{
-					onDutyString = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(onDutyTimeStamp.getTime());
-				}
+				onDutyString = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(onDutyTimeStamp.getTime());
 				
 				java.sql.Timestamp offDutyTimeStamp = dbCon.rs.getTimestamp("off_duty");
 				String offDutyString;
-				if(offDutyTimeStamp == null){
-					return null;
-				}else{
-					offDutyString = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(offDutyTimeStamp.getTime());
-				}			
+				offDutyString = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(offDutyTimeStamp.getTime());
 				
 				return new DutyRange(onDutyString, offDutyString);
 				
@@ -109,11 +100,9 @@ public class QueryDutyRange {
 	 * @throws Exception
 	 */
 	public static List<DutyRange> getDutyRangeByToday(DBCon dbCon, int staffId) throws Exception{
-		List<DutyRange> list = new ArrayList<DutyRange>();
-		DutyRange item = null;
-		SystemStaff staff = null;
+		List<DutyRange> result = new ArrayList<DutyRange>();
 		
-		Staff term = StaffDao.getStaffById(dbCon, staffId);
+		Staff staff = StaffDao.getStaffById(dbCon, staffId);
 //		String selectSQL = "SELECT name, DATE_FORMAT(on_duty,'%Y-%m-%d %T') AS on_duty, DATE_FORMAT(off_duty,'%Y-%m-%d %T') AS off_duty "
 //						+ " FROM "
 //						+ " ("
@@ -128,28 +117,25 @@ public class QueryDutyRange {
 		String querySQL = "SELECT name, on_duty, off_duty "
 				+ " FROM "
 				+ " ("
-				+ " (SELECT '全天' AS name, (SELECT IFNULL(MAX(off_duty), '1970-01-01 00:00:00') FROM " + Params.dbName + ".daily_settle_history WHERE restaurant_id = " + term.getRestaurantId() + ") AS on_duty, NOW() AS off_duty) "
+				+ " (SELECT '全天' AS name, (SELECT IFNULL(MAX(off_duty), '1970-01-01 00:00:00') FROM " + Params.dbName + ".daily_settle_history WHERE restaurant_id = " + staff.getRestaurantId() + ") AS on_duty, NOW() AS off_duty) "
 				+ " UNION ALL"
-				+ " (SELECT name, on_duty, off_duty FROM " + Params.dbName + ".shift WHERE restaurant_id = " + term.getRestaurantId() + " ORDER BY off_duty)"
+				+ " (SELECT name, on_duty, off_duty FROM " + Params.dbName + ".shift WHERE restaurant_id = " + staff.getRestaurantId() + " ORDER BY off_duty)"
 				+ " UNION ALL"
-				+ " (SELECT * FROM (SELECT '本班次' AS name, (SELECT off_duty FROM " + Params.dbName + ".shift WHERE restaurant_id = " + term.getRestaurantId() + " ORDER BY off_duty DESC LIMIT 0,1) AS on_duty, NOW() AS off_duty) TT WHERE on_duty IS NOT NULL) "
+				+ " (SELECT * FROM (SELECT '本班次' AS name, (SELECT off_duty FROM " + Params.dbName + ".shift WHERE restaurant_id = " + staff.getRestaurantId() + " ORDER BY off_duty DESC LIMIT 0,1) AS on_duty, NOW() AS off_duty) TT WHERE on_duty IS NOT NULL) "
 				+ " ) "
 				+ " T";
 		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
-		while(dbCon.rs != null && dbCon.rs.next()){
-			item = new DutyRange();
-			staff = new SystemStaff();
-			staff.setTerminal(null);
-			staff.setName(dbCon.rs.getString("name"));
-			item.setStaff(staff);
+		while(dbCon.rs.next()){
+			DutyRange item = new DutyRange();
+			item.setStaff(new Staff(0, dbCon.rs.getString("name")));
 			item.setOnDuty(dbCon.rs.getTimestamp("on_duty").getTime());
 			item.setOffDuty(dbCon.rs.getTimestamp("off_duty").getTime());
 			
-			list.add(item);
-			item = null;
+			result.add(item);
 		}
+		dbCon.rs.close();
 		
-		return list;
+		return result;
 	}
 	
 	/**
@@ -182,7 +168,6 @@ public class QueryDutyRange {
 	private static List<DutyRange> getDutyRangeByHistory(DBCon dbCon, Map<Object, Object> params) throws Exception {
 		List<DutyRange> list = new ArrayList<DutyRange>();
 		DutyRange item = null;
-		SystemStaff staff = null;
 		
 		String querySQL = "SELECT SH.restaurant_id, SH.id, SH.name, SH.on_duty, SH.off_duty"
 						+ " FROM shift_history SH"
@@ -191,10 +176,6 @@ public class QueryDutyRange {
 		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
 		while(dbCon.rs != null && dbCon.rs.next()){
 			item = new DutyRange();
-			staff = new SystemStaff();
-			staff.setTerminal(null);
-			staff.setName(dbCon.rs.getString("name"));
-			item.setStaff(staff);
 			item.setOnDuty(dbCon.rs.getTimestamp("on_duty").getTime());
 			item.setOffDuty(dbCon.rs.getTimestamp("off_duty").getTime());
 			

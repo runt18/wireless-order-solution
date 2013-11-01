@@ -22,6 +22,7 @@ import com.wireless.pojo.billStatistics.IncomeByKitchen;
 import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.test.db.TestInit;
+import com.wireless.util.DateType;
 
 public class TestCalcBillStatisticsDao {
 	@BeforeClass
@@ -36,7 +37,7 @@ public class TestCalcBillStatisticsDao {
 		
 		DutyRange range = new DutyRange("2012-12-10 23:40:04", "2012-12-26 23:49:36"); 
 		
-		List<IncomeByKitchen> kitchenIncomes = CalcBillStatisticsDao.calcIncomeByKitchen(staff, range, null, CalcBillStatisticsDao.QUERY_HISTORY);
+		List<IncomeByKitchen> kitchenIncomes = CalcBillStatisticsDao.calcIncomeByKitchen(staff, range, null, DateType.HISTORY);
 		
 		HashMap<Department, IncomeByDept> deptIncomeByKitchen = new HashMap<Department, IncomeByDept>();
 		for(IncomeByKitchen kitchenIncome : kitchenIncomes){
@@ -54,7 +55,7 @@ public class TestCalcBillStatisticsDao {
 			}
 		}
 		
-		List<IncomeByDept> deptIncomes = CalcBillStatisticsDao.calcIncomeByDept(staff, range, null, CalcBillStatisticsDao.QUERY_HISTORY);
+		List<IncomeByDept> deptIncomes = CalcBillStatisticsDao.calcIncomeByDept(staff, range, null, DateType.HISTORY);
 		
 		if(deptIncomeByKitchen.size() != deptIncomes.size()){
 			//Check if the amount of department income is the same as before.
@@ -82,7 +83,7 @@ public class TestCalcBillStatisticsDao {
 		
 		DutyRange range = new DutyRange("2012-12-25 23:40:04", "2012-12-26 23:49:36"); 
 		
-		List<IncomeByFood> foodIncomes = CalcBillStatisticsDao.calcIncomeByFood(staff, range, null, CalcBillStatisticsDao.QUERY_HISTORY);
+		List<IncomeByFood> foodIncomes = CalcBillStatisticsDao.calcIncomeByFood(staff, range, null, DateType.HISTORY);
 		
 		HashMap<Department, IncomeByDept> deptIncomeByFood = new HashMap<Department, IncomeByDept>();
 		for(IncomeByFood foodIncome : foodIncomes){
@@ -100,7 +101,7 @@ public class TestCalcBillStatisticsDao {
 			}
 		}
 		
-		List<IncomeByDept> deptIncomes = CalcBillStatisticsDao.calcIncomeByDept(staff, range, null, CalcBillStatisticsDao.QUERY_HISTORY);
+		List<IncomeByDept> deptIncomes = CalcBillStatisticsDao.calcIncomeByDept(staff, range, null, DateType.HISTORY);
 		
 		if(deptIncomeByFood.size() != deptIncomes.size()){
 			//Check if the amount of department income is the same as before.
@@ -127,9 +128,9 @@ public class TestCalcBillStatisticsDao {
 		
 		DutyRange range = new DutyRange("2012-12-10 23:40:04", "2012-12-26 23:49:36"); 
 		
-		List<CancelIncomeByReason> cancelByReason = CalcBillStatisticsDao.calcCancelIncomeByReason(staff, range, null, CalcBillStatisticsDao.QUERY_HISTORY);
+		List<CancelIncomeByReason> cancelByReason = CalcBillStatisticsDao.calcCancelIncomeByReason(staff, range, null, DateType.HISTORY);
 		
-		IncomeByCancel cancelIncome = CalcBillStatisticsDao.calcCancelPrice(staff, range, CalcBillStatisticsDao.QUERY_HISTORY);
+		IncomeByCancel cancelIncome = CalcBillStatisticsDao.calcCancelPrice(staff, range, DateType.HISTORY);
 		
 		float totalCancel = 0;
 		for(CancelIncomeByReason cancelByEachReason : cancelByReason){
@@ -145,9 +146,9 @@ public class TestCalcBillStatisticsDao {
 		
 		DutyRange range = new DutyRange("2012-12-10 23:40:04", "2012-12-26 23:49:36"); 
 		
-		List<CancelIncomeByDept> cancelByDept = CalcBillStatisticsDao.calcCancelIncomeByDept(staff, range, null, CalcBillStatisticsDao.QUERY_HISTORY);
+		List<CancelIncomeByDept> cancelByDept = CalcBillStatisticsDao.calcCancelIncomeByDept(staff, range, null, DateType.HISTORY);
 		
-		IncomeByCancel cancelIncome = CalcBillStatisticsDao.calcCancelPrice(staff, range, CalcBillStatisticsDao.QUERY_HISTORY);
+		IncomeByCancel cancelIncome = CalcBillStatisticsDao.calcCancelPrice(staff, range, DateType.HISTORY);
 		
 		float totalCancel = 0;
 		for(CancelIncomeByDept cancelByEachDept : cancelByDept){

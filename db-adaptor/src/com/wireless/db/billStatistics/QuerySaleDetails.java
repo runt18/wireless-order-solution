@@ -19,11 +19,9 @@ import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.pojo.staffMgr.Staff;
+import com.wireless.util.DateType;
 
 public class QuerySaleDetails {
-	
-	public final static int QUERY_TODAY = CalcBillStatisticsDao.QUERY_TODAY;			//查询当日账单
-	public final static int QUERY_HISTORY = CalcBillStatisticsDao.QUERY_HISTORY;		//查询历史账单
 	
 	public final static int QUERY_BY_DEPT = 0;		//按部门显示
 	public final static int QUERY_BY_FOOD = 1;		//按菜品显示
@@ -34,18 +32,18 @@ public class QuerySaleDetails {
 	
 	/**
 	 * 
-	 * @param term
+	 * @param staff
 	 * @param onDuty
 	 * @param offDuty
 	 * @param queryType
 	 * @return
 	 * @throws SQLException
 	 */
-	public static SalesDetail[] execByDept(Staff term, String onDuty, String offDuty, int queryType) throws SQLException{
+	public static SalesDetail[] execByDept(Staff staff, String onDuty, String offDuty, DateType queryType) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return execByDept(dbCon, term, onDuty, offDuty, queryType);
+			return execByDept(dbCon, staff, onDuty, offDuty, queryType);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -55,7 +53,7 @@ public class QuerySaleDetails {
 	 * Get the sales details to each department.
 	 * @param dbCon
 	 * 			the database connection
-	 * @param term
+	 * @param staff
 	 * 			the terminal to query
 	 * @param onDuty
 	 * 			the on duty to query
@@ -68,25 +66,25 @@ public class QuerySaleDetails {
 	 * @throws SQLException
 	 * 			throws if any error occurred while execute any SQL statements.
 	 */
-	public static SalesDetail[] execByDept(DBCon dbCon, Staff term, String onDuty, String offDuty, int queryType) throws SQLException{
+	public static SalesDetail[] execByDept(DBCon dbCon, Staff staff, String onDuty, String offDuty, DateType queryType) throws SQLException{
 		List<IncomeByDept> deptIncomes;
 
-		if(queryType == QUERY_HISTORY){
+		if(queryType.isHistory()){
 			
 			/**
 			 * Get the duty range between on and off duty date
 			 */
-			DutyRange dutyRange = QueryDutyRange.exec(dbCon, term, onDuty, offDuty);
+			DutyRange dutyRange = QueryDutyRange.exec(dbCon, staff, onDuty, offDuty);
 			
 			if(dutyRange == null){
 				return new SalesDetail[0];
 			}
 			
 			//Calculate the incomes to each department.
-			deptIncomes = CalcBillStatisticsDao.calcIncomeByDept(dbCon, term, dutyRange, null, queryType);
+			deptIncomes = CalcBillStatisticsDao.calcIncomeByDept(dbCon, staff, dutyRange, null, queryType);
 		}else{
 			//Calculate the incomes to each department.
-			deptIncomes = CalcBillStatisticsDao.calcIncomeByDept(dbCon, term, new DutyRange(onDuty, offDuty), null, queryType);
+			deptIncomes = CalcBillStatisticsDao.calcIncomeByDept(dbCon, staff, new DutyRange(onDuty, offDuty), null, queryType);
 		}
 		
 		HashMap<Department, SalesDetail> deptSalesDetail = new HashMap<Department, SalesDetail>();
@@ -164,18 +162,18 @@ public class QuerySaleDetails {
 
 	/**
 	 * 
-	 * @param term
+	 * @param staff
 	 * @param onDuty
 	 * @param offDuty
 	 * @param queryType
 	 * @return
 	 * @throws SQLException
 	 */
-	public static SalesDetail[] execByKitchen(Staff term, String onDuty, String offDuty, int queryType) throws SQLException{
+	public static SalesDetail[] execByKitchen(Staff staff, String onDuty, String offDuty, DateType queryType) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return execByKitchen(dbCon, term, onDuty, offDuty, queryType);
+			return execByKitchen(dbCon, staff, onDuty, offDuty, queryType);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -191,11 +189,11 @@ public class QuerySaleDetails {
 	 * @return
 	 * @throws SQLException
 	 */
-	public static SalesDetail[] execByKitchen(DBCon dbCon, Staff term, String onDuty, String offDuty, int queryType) throws SQLException{
+	public static SalesDetail[] execByKitchen(DBCon dbCon, Staff term, String onDuty, String offDuty, DateType queryType) throws SQLException{
 		
 		List<IncomeByKitchen> kitchenIncomes;
 
-		if(queryType == QUERY_HISTORY){
+		if(queryType.isHistory()){
 			
 			/**
 			 * Get the duty range between on and off duty date
@@ -289,7 +287,7 @@ public class QuerySaleDetails {
 	 * @return
 	 * @throws SQLException
 	 */
-	public static SalesDetail[] execByFood(Staff term, String onDuty, String offDuty, int[] deptID, int orderType, int queryType, String foodName) throws SQLException{
+	public static SalesDetail[] execByFood(Staff term, String onDuty, String offDuty, int[] deptID, int orderType, DateType queryType, String foodName) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -319,9 +317,9 @@ public class QuerySaleDetails {
 	 * @throws SQLException
 	 * 			throws if any error occurred while execute any SQL statements.
 	 */
-	public static SalesDetail[] execByFood(DBCon dbCon, Staff term, String onDuty, String offDuty, int[] deptID, int orderType, int queryType, String foodName) throws SQLException{
+	public static SalesDetail[] execByFood(DBCon dbCon, Staff term, String onDuty, String offDuty, int[] deptID, int orderType, DateType queryType, String foodName) throws SQLException{
 		
-		StringBuffer deptCond = new StringBuffer();
+		StringBuilder deptCond = new StringBuilder();
 		if(deptID.length != 0){
 			for(int i = 0; i < deptID.length; i++){
 				if(i == 0){
@@ -334,7 +332,7 @@ public class QuerySaleDetails {
 		
 		List<IncomeByFood> foodIncomes;
 		
-		if(queryType == QUERY_HISTORY){
+		if(queryType.isHistory()){
 			
 			/**
 			 * Get the duty range between on and off duty date

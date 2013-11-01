@@ -32,6 +32,7 @@ import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.pojo.staffMgr.Staff;
+import com.wireless.util.DateType;
 
 public class CalcBillStatisticsDao {
 
@@ -46,22 +47,19 @@ public class CalcBillStatisticsDao {
 	private final static String TBL_TASTE_GROUP_HISTORY = "taste_group_history";
 	private final static String TBL_MEMBER_OPERATION_HISTORY = "member_operation_history";
 	
-	public final static int QUERY_TODAY = 0;
-	public final static int QUERY_HISTORY = 1;
-	
 	/**
 	 * 
-	 * @param term
+	 * @param staff
 	 * @param range
 	 * @param queryType
 	 * @return
 	 * @throws SQLException
 	 */
-	public static IncomeByPay calcIncomeByPayType(Staff term, DutyRange range, int queryType) throws SQLException{	
+	public static IncomeByPay calcIncomeByPayType(Staff staff, DutyRange range, DateType queryType) throws SQLException{	
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return calcIncomeByPayType(dbCon, term, range, queryType);
+			return calcIncomeByPayType(dbCon, staff, range, queryType);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -70,19 +68,19 @@ public class CalcBillStatisticsDao {
 	/**
 	 * 
 	 * @param dbCon
-	 * @param term
+	 * @param staff
 	 * @param range
 	 * @param queryType
 	 * @return
 	 * @throws SQLException
 	 */
-	public static IncomeByPay calcIncomeByPayType(DBCon dbCon, Staff term, DutyRange range, int queryType) throws SQLException{		
+	public static IncomeByPay calcIncomeByPayType(DBCon dbCon, Staff staff, DutyRange range, DateType queryType) throws SQLException{		
 		
 		String orderTbl = null;
-		if(queryType == QUERY_HISTORY){
+		if(queryType.isHistory()){
 			orderTbl = TBL_ORDER_HISTORY;
 			
-		}else if(queryType == QUERY_TODAY){
+		}else if(queryType.isToday()){
 			orderTbl = TBL_ORDER_TODAY;
 			
 		}else{
@@ -98,7 +96,7 @@ public class CalcBillStatisticsDao {
 			  " FROM " +
 			  Params.dbName + "." + orderTbl +
 			  " WHERE 1 = 1 " +
-			  " AND restaurant_id = " + term.getRestaurantId() + 
+			  " AND restaurant_id = " + staff.getRestaurantId() + 
 			  " AND order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +
 			  " AND (status = " + Order.Status.PAID.getVal() + " OR " + " status = " + Order.Status.REPAID.getVal() + ")"  +
 			  " GROUP BY " +
@@ -137,40 +135,22 @@ public class CalcBillStatisticsDao {
 		}
 		dbCon.rs.close();
 		
-		incomeByPay.setOrderAmount(incomeByPay.getCashAmount() + 
-								   incomeByPay.getCreditCardAmount() + 
-								   incomeByPay.getMemeberCardAmount() + 
-								   incomeByPay.getHangAmount() +
-								   incomeByPay.getSignAmount());
-		
-		incomeByPay.setTotalIncome(incomeByPay.getTotalIncome() + 
-								   incomeByPay.getCreditCardIncome() + 
-								   incomeByPay.getMemberCardIncome() + 
-								   incomeByPay.getSignIncome() + 
-								   incomeByPay.getHangIncome());
-		
-		incomeByPay.setTotalActual(incomeByPay.getCashActual() + 
-								   incomeByPay.getCreditCardActual() + 
-								   incomeByPay.getMemberCardActual() + 
-								   incomeByPay.getSignActual() + 
-								   incomeByPay.getHangActual());
-		
 		return incomeByPay;
 	}
 	
 	/**
 	 * 
-	 * @param term
+	 * @param staff
 	 * @param range
 	 * @param queryType
 	 * @return
 	 * @throws SQLException
 	 */
-	public static IncomeByErase calcErasePrice(Staff term, DutyRange range, int queryType) throws SQLException{
+	public static IncomeByErase calcErasePrice(Staff staff, DutyRange range, DateType queryType) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return calcErasePrice(dbCon, term, range, queryType);
+			return calcErasePrice(dbCon, staff, range, queryType);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -179,19 +159,19 @@ public class CalcBillStatisticsDao {
 	/**
 	 * 
 	 * @param dbCon
-	 * @param term
+	 * @param staff
 	 * @param range
 	 * @param queryType
 	 * @return
 	 * @throws SQLException
 	 */
-	public static IncomeByErase calcErasePrice(DBCon dbCon, Staff term, DutyRange range, int queryType) throws SQLException{
+	public static IncomeByErase calcErasePrice(DBCon dbCon, Staff staff, DutyRange range, DateType queryType) throws SQLException{
 		
 		String orderTbl = null;
-		if(queryType == QUERY_HISTORY){
+		if(queryType.isHistory()){
 			orderTbl = TBL_ORDER_HISTORY;
 			
-		}else if(queryType == QUERY_TODAY){
+		}else if(queryType.isToday()){
 			orderTbl = TBL_ORDER_TODAY;
 			
 		}else{
@@ -206,7 +186,7 @@ public class CalcBillStatisticsDao {
 			  " FROM " +
 			  Params.dbName + "." + orderTbl +
 			  " WHERE 1 = 1 " +
-			  " AND restaurant_id = " + term.getRestaurantId() +
+			  " AND restaurant_id = " + staff.getRestaurantId() +
 			  " AND order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +
 			  " AND erase_price > 0 ";
 		
@@ -223,17 +203,17 @@ public class CalcBillStatisticsDao {
 	
 	/**
 	 * 
-	 * @param term
+	 * @param staff
 	 * @param range
 	 * @param queryType
 	 * @return
 	 * @throws SQLException
 	 */
-	public static IncomeByDiscount calcDiscountPrice(Staff term, DutyRange range, int queryType) throws SQLException{
+	public static IncomeByDiscount calcDiscountPrice(Staff staff, DutyRange range, DateType queryType) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return calcDiscountPrice(dbCon, term, range, queryType);
+			return calcDiscountPrice(dbCon, staff, range, queryType);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -242,19 +222,19 @@ public class CalcBillStatisticsDao {
 	/**
 	 * 
 	 * @param dbCon
-	 * @param term
+	 * @param staff
 	 * @param range
 	 * @param queryType
 	 * @return
 	 * @throws SQLException
 	 */
-	public static IncomeByDiscount calcDiscountPrice(DBCon dbCon, Staff term, DutyRange range, int queryType) throws SQLException{
+	public static IncomeByDiscount calcDiscountPrice(DBCon dbCon, Staff staff, DutyRange range, DateType queryType) throws SQLException{
 		
 		String orderTbl = null;
-		if(queryType == QUERY_HISTORY){
+		if(queryType.isHistory()){
 			orderTbl = TBL_ORDER_HISTORY;
 			
-		}else if(queryType == QUERY_TODAY){
+		}else if(queryType.isToday()){
 			orderTbl = TBL_ORDER_TODAY;
 			
 		}else{
@@ -268,7 +248,7 @@ public class CalcBillStatisticsDao {
 			  " FROM " +
 			  Params.dbName + "." + orderTbl +
 			  " WHERE 1 = 1 " +
-			  " AND restaurant_id = " + term.getRestaurantId() +
+			  " AND restaurant_id = " + staff.getRestaurantId() +
 			  " AND order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +
 			  " AND discount_price > 0 ";
 			
@@ -285,17 +265,17 @@ public class CalcBillStatisticsDao {
 	
 	/**
 	 * 
-	 * @param term
+	 * @param staff
 	 * @param range
 	 * @param queryType
 	 * @return
 	 * @throws SQLException
 	 */
-	public static IncomeByGift calcGiftPrice(Staff term, DutyRange range, int queryType) throws SQLException{
+	public static IncomeByGift calcGiftPrice(Staff staff, DutyRange range, DateType queryType) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return calcGiftPrice(dbCon, term, range, queryType);
+			return calcGiftPrice(dbCon, staff, range, queryType);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -304,18 +284,18 @@ public class CalcBillStatisticsDao {
 	/**
 	 * 
 	 * @param dbCon
-	 * @param term
+	 * @param staff
 	 * @param range
 	 * @param queryType
 	 * @return
 	 * @throws SQLException
 	 */
-	public static IncomeByGift calcGiftPrice(DBCon dbCon, Staff term, DutyRange range, int queryType) throws SQLException{
+	public static IncomeByGift calcGiftPrice(DBCon dbCon, Staff staff, DutyRange range, DateType queryType) throws SQLException{
 		String orderTbl = null;
-		if(queryType == QUERY_HISTORY){
+		if(queryType.isHistory()){
 			orderTbl = TBL_ORDER_HISTORY;
 			
-		}else if(queryType == QUERY_TODAY){
+		}else if(queryType.isToday()){
 			orderTbl = TBL_ORDER_TODAY;
 			
 		}else{
@@ -328,7 +308,7 @@ public class CalcBillStatisticsDao {
 		      " FROM " +
 		      Params.dbName + "." + orderTbl +
 		      " WHERE 1 = 1 " +
-		      " AND restaurant_id = " + term.getRestaurantId() +
+		      " AND restaurant_id = " + staff.getRestaurantId() +
 		      " AND order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +
 			  " AND gift_price > 0 ";
 			
@@ -345,17 +325,17 @@ public class CalcBillStatisticsDao {
 	
 	/**
 	 * 
-	 * @param term
+	 * @param staff
 	 * @param range
 	 * @param queryType
 	 * @return
 	 * @throws SQLException
 	 */
-	public static IncomeByCancel calcCancelPrice(Staff term, DutyRange range, int queryType) throws SQLException{
+	public static IncomeByCancel calcCancelPrice(Staff staff, DutyRange range, DateType queryType) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return calcCancelPrice(dbCon, term, range, queryType);
+			return calcCancelPrice(dbCon, staff, range, queryType);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -364,19 +344,19 @@ public class CalcBillStatisticsDao {
 	/**
 	 * 
 	 * @param dbCon
-	 * @param term
+	 * @param staff
 	 * @param range
 	 * @param queryType
 	 * @return
 	 * @throws SQLException
 	 */
-	public static IncomeByCancel calcCancelPrice(DBCon dbCon, Staff term, DutyRange range, int queryType) throws SQLException{
+	public static IncomeByCancel calcCancelPrice(DBCon dbCon, Staff staff, DutyRange range, DateType queryType) throws SQLException{
 		
 		String orderTbl = null;
-		if(queryType == QUERY_HISTORY){
+		if(queryType.isHistory()){
 			orderTbl = TBL_ORDER_HISTORY;
 			
-		}else if(queryType == QUERY_TODAY){
+		}else if(queryType.isToday()){
 			orderTbl = TBL_ORDER_TODAY;
 			
 		}else{
@@ -390,7 +370,7 @@ public class CalcBillStatisticsDao {
 		      " FROM " +
 		      Params.dbName + "." + orderTbl +
 		      " WHERE 1 = 1 " +
-		      " AND restaurant_id = " + term.getRestaurantId() +
+		      " AND restaurant_id = " + staff.getRestaurantId() +
 		      " AND order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +
 			  " AND cancel_price > 0 ";
 			
@@ -407,17 +387,17 @@ public class CalcBillStatisticsDao {
 
 	/**
 	 * 
-	 * @param term
+	 * @param staff
 	 * @param range
 	 * @param queryType
 	 * @return
 	 * @throws SQLException
 	 */
-	public static IncomeByRepaid calcRepaidPrice(Staff term, DutyRange range, int queryType) throws SQLException{
+	public static IncomeByRepaid calcRepaidPrice(Staff staff, DutyRange range, DateType queryType) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return calcRepaidPrice(dbCon, term, range, queryType);
+			return calcRepaidPrice(dbCon, staff, range, queryType);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -426,18 +406,18 @@ public class CalcBillStatisticsDao {
 	/**
 	 * 
 	 * @param dbCon
-	 * @param term
+	 * @param staff
 	 * @param range
 	 * @param queryType
 	 * @return
 	 * @throws SQLException
 	 */
-	public static IncomeByRepaid calcRepaidPrice(DBCon dbCon, Staff term, DutyRange range, int queryType) throws SQLException{
+	public static IncomeByRepaid calcRepaidPrice(DBCon dbCon, Staff staff, DutyRange range, DateType queryType) throws SQLException{
 		String orderTbl = null;
-		if(queryType == QUERY_HISTORY){
+		if(queryType.isHistory()){
 			orderTbl = TBL_ORDER_HISTORY;
 			
-		}else if(queryType == QUERY_TODAY){
+		}else if(queryType.isToday()){
 			orderTbl = TBL_ORDER_TODAY;
 			
 		}else{
@@ -450,7 +430,7 @@ public class CalcBillStatisticsDao {
 		      " FROM " +
 		      Params.dbName + "." + orderTbl +
 		      " WHERE 1 = 1 " +
-		      " AND restaurant_id = " + term.getRestaurantId() +
+		      " AND restaurant_id = " + staff.getRestaurantId() +
 		      " AND order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +
 			  " AND status = " + Order.Status.REPAID.getVal();
 			
@@ -467,17 +447,17 @@ public class CalcBillStatisticsDao {
 	
 	/**
 	 * 
-	 * @param term
+	 * @param staff
 	 * @param range
 	 * @param queryType
 	 * @return
 	 * @throws SQLException
 	 */
-	public static IncomeByService calcServicePrice(Staff term, DutyRange range, int queryType) throws SQLException{
+	public static IncomeByService calcServicePrice(Staff staff, DutyRange range, DateType queryType) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return calcServicePrice(dbCon, term, range, queryType);
+			return calcServicePrice(dbCon, staff, range, queryType);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -486,18 +466,18 @@ public class CalcBillStatisticsDao {
 	/**
 	 * 
 	 * @param dbCon
-	 * @param term
+	 * @param staff
 	 * @param range
 	 * @param queryType
 	 * @return
 	 * @throws SQLException
 	 */
-	public static IncomeByService calcServicePrice(DBCon dbCon, Staff term, DutyRange range, int queryType) throws SQLException{
+	public static IncomeByService calcServicePrice(DBCon dbCon, Staff staff, DutyRange range, DateType queryType) throws SQLException{
 		String orderTbl = null;
-		if(queryType == QUERY_HISTORY){
+		if(queryType.isHistory()){
 			orderTbl = TBL_ORDER_HISTORY;
 			
-		}else if(queryType == QUERY_TODAY){
+		}else if(queryType.isToday()){
 			orderTbl = TBL_ORDER_TODAY;
 			
 		}else{
@@ -511,7 +491,7 @@ public class CalcBillStatisticsDao {
 			  " FROM " +
 			  Params.dbName + "." + orderTbl +
 			  " WHERE 1 = 1 " +
-			  " AND restaurant_id = " + term.getRestaurantId() +
+			  " AND restaurant_id = " + staff.getRestaurantId() +
 			  " AND order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +
 			  " AND service_rate > 0 ";
 				
@@ -528,17 +508,17 @@ public class CalcBillStatisticsDao {
 	
 	/**
 	 * 
-	 * @param term
+	 * @param staff
 	 * @param range
 	 * @param queryType
 	 * @return
 	 * @throws SQLException
 	 */
-	public static List<IncomeByDept> calcIncomeByDept(Staff term, DutyRange range, String extraCond, int queryType) throws SQLException{
+	public static List<IncomeByDept> calcIncomeByDept(Staff staff, DutyRange range, String extraCond, DateType queryType) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return calcIncomeByDept(dbCon, term, range, extraCond, queryType);
+			return calcIncomeByDept(dbCon, staff, range, extraCond, queryType);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -547,24 +527,24 @@ public class CalcBillStatisticsDao {
 	/**
 	 * 
 	 * @param dbCon
-	 * @param term
+	 * @param staff
 	 * @param range
 	 * @param queryType
 	 * @return
 	 * @throws SQLException
 	 */
-	public static List<IncomeByDept> calcIncomeByDept(DBCon dbCon, Staff term, DutyRange range, String extraCond, int queryType) throws SQLException{
+	public static List<IncomeByDept> calcIncomeByDept(DBCon dbCon, Staff staff, DutyRange range, String extraCond, DateType queryType) throws SQLException{
 		String orderTbl = null;
 		String orderFoodTbl = null;
 		String orderGrpTbl = null;
 		String tasteGrpTbl = null;
-		if(queryType == QUERY_HISTORY){
+		if(queryType.isHistory()){
 			orderTbl = TBL_ORDER_HISTORY;
 			orderFoodTbl = TBL_ORDER_FOOD_HISTORY;
 			orderGrpTbl = TBL_ORDER_GROUP_HISTORY;
 			tasteGrpTbl = TBL_TASTE_GROUP_HISTORY;
 			
-		}else if(queryType == QUERY_TODAY){
+		}else if(queryType.isToday()){
 			orderTbl = TBL_ORDER_TODAY;
 			orderFoodTbl = TBL_ORDER_FOOD_TODAY;
 			orderGrpTbl = TBL_ORDER_GROUP_TODAY;
@@ -596,7 +576,7 @@ public class CalcBillStatisticsDao {
 				  Params.dbName + "." + orderFoodTbl + " OF " + 
 				  " JOIN " + "(" + " SELECT id, order_date FROM " + Params.dbName + "." + orderTbl + 
 				  			 	   " WHERE 1 = 1 " +
-				  			 	   " AND " + " restaurant_id = " + term.getRestaurantId() + 
+				  			 	   " AND " + " restaurant_id = " + staff.getRestaurantId() + 
 				  			 	   " AND " + " status <> " + Order.Status.UNPAID.getVal() +
 				  			 	   " AND " + " category <> " + Order.Category.MERGER_TBL.getVal() +
 				  			 	   " UNION " +
@@ -604,7 +584,7 @@ public class CalcBillStatisticsDao {
 				  			 	   " FROM " + Params.dbName + "." + orderGrpTbl + " OG " +
 				  			 	   " JOIN " + Params.dbName + "." + orderTbl + " O " + " ON OG.order_id = O.id " +
 				  			 	   " WHERE 1 = 1 " +
-				  			 	   " AND " + " O.restaurant_id = " + term.getRestaurantId() +
+				  			 	   " AND " + " O.restaurant_id = " + staff.getRestaurantId() +
 				  			 	   " AND " + " O.status <> " + Order.Status.UNPAID.getVal() + 
 				  			 	   " AND " + " O.category = " + Order.Category.MERGER_TBL.getVal() +
 				  			 ") AS O " + " ON OF.order_id = O.id " +
@@ -637,18 +617,18 @@ public class CalcBillStatisticsDao {
 	
 	/**
 	 * 
-	 * @param term
+	 * @param staff
 	 * @param range
 	 * @param extraCond
 	 * @param queryType
 	 * @return
 	 * @throws SQLException
 	 */
-	public static List<IncomeByKitchen> calcIncomeByKitchen(Staff term, DutyRange range, String extraCond, int queryType) throws SQLException{
+	public static List<IncomeByKitchen> calcIncomeByKitchen(Staff staff, DutyRange range, String extraCond, DateType queryType) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return calcIncomeByKitchen(dbCon, term, range, extraCond, queryType);
+			return calcIncomeByKitchen(dbCon, staff, range, extraCond, queryType);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -658,25 +638,25 @@ public class CalcBillStatisticsDao {
 	/**
 	 * 
 	 * @param dbCon
-	 * @param term
+	 * @param staff
 	 * @param range
 	 * @param extraCond
 	 * @param queryType
 	 * @return
 	 * @throws SQLException
 	 */
-	public static List<IncomeByKitchen> calcIncomeByKitchen(DBCon dbCon, Staff term, DutyRange range, String extraCond, int queryType) throws SQLException{
+	public static List<IncomeByKitchen> calcIncomeByKitchen(DBCon dbCon, Staff staff, DutyRange range, String extraCond, DateType queryType) throws SQLException{
 		String orderTbl = null;
 		String orderFoodTbl = null;
 		String orderGrpTbl = null;
 		String tasteGrpTbl = null;
-		if(queryType == QUERY_HISTORY){
+		if(queryType.isHistory()){
 			orderTbl = TBL_ORDER_HISTORY;
 			orderFoodTbl = TBL_ORDER_FOOD_HISTORY;
 			orderGrpTbl = TBL_ORDER_GROUP_HISTORY;
 			tasteGrpTbl = TBL_TASTE_GROUP_HISTORY;
 			
-		}else if(queryType == QUERY_TODAY){
+		}else if(queryType.isToday()){
 			orderTbl = TBL_ORDER_TODAY;
 			orderFoodTbl = TBL_ORDER_FOOD_TODAY;
 			orderGrpTbl = TBL_ORDER_GROUP_TODAY;
@@ -709,7 +689,7 @@ public class CalcBillStatisticsDao {
 				  Params.dbName + "." + orderFoodTbl + " OF " + 
 				  " JOIN " + "(" + " SELECT id, order_date FROM " + Params.dbName + "." + orderTbl + 
 				  			 	   " WHERE 1 = 1 " +
-				  			 	   " AND " + " restaurant_id = " + term.getRestaurantId() + 
+				  			 	   " AND " + " restaurant_id = " + staff.getRestaurantId() + 
 				  			 	   " AND " + " status <> " + Order.Status.UNPAID.getVal() +
 				  			 	   " AND " + " category <> " + Order.Category.MERGER_TBL.getVal() +
 				  			 	   " UNION " +
@@ -717,7 +697,7 @@ public class CalcBillStatisticsDao {
 				  			 	   " FROM " + Params.dbName + "." + orderGrpTbl + " OG " +
 				  			 	   " JOIN " + Params.dbName + "." + orderTbl + " O " + " ON OG.order_id = O.id " +
 				  			 	   " WHERE 1 = 1 " +
-				  			 	   " AND " + " O.restaurant_id = " + term.getRestaurantId() +
+				  			 	   " AND " + " O.restaurant_id = " + staff.getRestaurantId() +
 				  			 	   " AND " + " O.status <> " + Order.Status.UNPAID.getVal() + 
 				  			 	   " AND " + " O.category = " + Order.Category.MERGER_TBL.getVal() +
 				  			 ") AS O " + " ON OF.order_id = O.id " +
@@ -755,11 +735,11 @@ public class CalcBillStatisticsDao {
 		return kitchenIncomes;
 	}
 	
-	public static List<IncomeByFood> calcIncomeByFood(Staff term, DutyRange range, String extraCond, int queryType) throws SQLException{
+	public static List<IncomeByFood> calcIncomeByFood(Staff staff, DutyRange range, String extraCond, DateType queryType) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return calcIncomeByFood(dbCon, term, range, extraCond, queryType);
+			return calcIncomeByFood(dbCon, staff, range, extraCond, queryType);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -768,25 +748,25 @@ public class CalcBillStatisticsDao {
 	/**
 	 * 
 	 * @param dbCon
-	 * @param term
+	 * @param staff
 	 * @param range
 	 * @param extraCond
 	 * @param queryType
 	 * @return
 	 * @throws SQLException
 	 */
-	public static List<IncomeByFood> calcIncomeByFood(DBCon dbCon, Staff term, DutyRange range, String extraCond, int queryType) throws SQLException{
+	public static List<IncomeByFood> calcIncomeByFood(DBCon dbCon, Staff staff, DutyRange range, String extraCond, DateType queryType) throws SQLException{
 		String orderTbl = null;
 		String orderFoodTbl = null;
 		String orderGrpTbl = null;
 		String tasteGrpTbl = null;
-		if(queryType == QUERY_HISTORY){
+		if(queryType.isHistory()){
 			orderTbl = TBL_ORDER_HISTORY;
 			orderFoodTbl = TBL_ORDER_FOOD_HISTORY;
 			orderGrpTbl = TBL_ORDER_GROUP_HISTORY;
 			tasteGrpTbl = TBL_TASTE_GROUP_HISTORY;
 			
-		}else if(queryType == QUERY_TODAY){
+		}else if(queryType.isToday()){
 			orderTbl = TBL_ORDER_TODAY;
 			orderFoodTbl = TBL_ORDER_FOOD_TODAY;
 			orderGrpTbl = TBL_ORDER_GROUP_TODAY;
@@ -812,7 +792,7 @@ public class CalcBillStatisticsDao {
 			  Params.dbName + "." + orderFoodTbl + " OF " + 
 			  " JOIN " + "(" + " SELECT id, order_date FROM " + Params.dbName + "." + orderTbl + 
 			  			 	   " WHERE 1 = 1 " +
-			  			 	   " AND " + " restaurant_id = " + term.getRestaurantId() + 
+			  			 	   " AND " + " restaurant_id = " + staff.getRestaurantId() + 
 			  			 	   " AND " + " status <> " + Order.Status.UNPAID.getVal() +
 			  			 	   " AND " + " category <> " + Order.Category.MERGER_TBL.getVal() +
 			  			 	   " UNION " +
@@ -820,7 +800,7 @@ public class CalcBillStatisticsDao {
 			  			 	   " FROM " + Params.dbName + "." + orderGrpTbl + " OG " +
 			  			 	   " JOIN " + Params.dbName + "." + orderTbl + " O " + " ON OG.order_id = O.id " +
 			  			 	   " WHERE 1 = 1 " +
-			  			 	   " AND " + " O.restaurant_id = " + term.getRestaurantId() +
+			  			 	   " AND " + " O.restaurant_id = " + staff.getRestaurantId() +
 			  			 	   " AND " + " O.status <> " + Order.Status.UNPAID.getVal() + 
 			  			 	   " AND " + " O.category = " + Order.Category.MERGER_TBL.getVal() +
 			  			 ") AS O " + " ON OF.order_id = O.id " +
@@ -870,18 +850,18 @@ public class CalcBillStatisticsDao {
 
 	/**
 	 * 
-	 * @param term
+	 * @param staff
 	 * @param range
 	 * @param extraCond
 	 * @param queryType
 	 * @return
 	 * @throws SQLException
 	 */
-	public static List<CancelIncomeByDept> calcCancelIncomeByDept(Staff term, DutyRange range, String extraCond, int queryType) throws SQLException{
+	public static List<CancelIncomeByDept> calcCancelIncomeByDept(Staff staff, DutyRange range, String extraCond, DateType queryType) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return calcCancelIncomeByDept(dbCon, term, range, extraCond, queryType);
+			return calcCancelIncomeByDept(dbCon, staff, range, extraCond, queryType);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -890,16 +870,16 @@ public class CalcBillStatisticsDao {
 	/**
 	 * 
 	 * @param dbCon
-	 * @param term
+	 * @param staff
 	 * @param range
 	 * @param extraCond
 	 * @param queryType
 	 * @return
 	 * @throws SQLException
 	 */
-	public static List<CancelIncomeByDept> calcCancelIncomeByDept(DBCon dbCon, Staff term, DutyRange range, String extraCond, int queryType) throws SQLException{
+	public static List<CancelIncomeByDept> calcCancelIncomeByDept(DBCon dbCon, Staff staff, DutyRange range, String extraCond, DateType queryType) throws SQLException{
 		HashMap<Department, CancelIncomeByDept> result = new HashMap<Department, CancelIncomeByDept>();
-		List<CancelIncomeByDeptAndReason> list = getCancelIncomeByDeptAndReason(dbCon, term, range, extraCond, queryType);
+		List<CancelIncomeByDeptAndReason> list = getCancelIncomeByDeptAndReason(dbCon, staff, range, extraCond, queryType);
 		for(CancelIncomeByDeptAndReason income : list){
 			CancelIncomeByDept incomeByDept = result.get(income.getDept());
 			if(incomeByDept != null){
@@ -920,18 +900,18 @@ public class CalcBillStatisticsDao {
 	
 	/**
 	 * 
-	 * @param term
+	 * @param staff
 	 * @param range
 	 * @param extraCond
 	 * @param queryType
 	 * @return
 	 * @throws SQLException
 	 */
-	public static List<CancelIncomeByReason> calcCancelIncomeByReason(Staff term, DutyRange range, String extraCond, int queryType) throws SQLException{
+	public static List<CancelIncomeByReason> calcCancelIncomeByReason(Staff staff, DutyRange range, String extraCond, DateType queryType) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return calcCancelIncomeByReason(dbCon, term, range, extraCond, queryType);
+			return calcCancelIncomeByReason(dbCon, staff, range, extraCond, queryType);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -940,16 +920,16 @@ public class CalcBillStatisticsDao {
 	/**
 	 * 
 	 * @param dbCon
-	 * @param term
+	 * @param staff
 	 * @param range
 	 * @param extraCond
 	 * @param queryType
 	 * @return
 	 * @throws SQLException
 	 */
-	public static List<CancelIncomeByReason> calcCancelIncomeByReason(DBCon dbCon, Staff term, DutyRange range, String extraCond, int queryType) throws SQLException{
+	public static List<CancelIncomeByReason> calcCancelIncomeByReason(DBCon dbCon, Staff staff, DutyRange range, String extraCond, DateType queryType) throws SQLException{
 		HashMap<CancelReason, CancelIncomeByReason> result = new HashMap<CancelReason, CancelIncomeByReason>();
-		List<CancelIncomeByDeptAndReason> list = getCancelIncomeByDeptAndReason(dbCon, term, range, extraCond, queryType);
+		List<CancelIncomeByDeptAndReason> list = getCancelIncomeByDeptAndReason(dbCon, staff, range, extraCond, queryType);
 		for(CancelIncomeByDeptAndReason income : list){
 			CancelIncomeByReason incomeByReason = result.get(income.getReason());
 			if(incomeByReason != null){
@@ -970,21 +950,21 @@ public class CalcBillStatisticsDao {
 	/**
 	 * 
 	 * @param dbCon
-	 * @param term
+	 * @param staff
 	 * @param range
 	 * @param extraCond
 	 * @param queryType
 	 * @return
 	 * @throws SQLException
 	 */
-	 static List<CancelIncomeByDeptAndReason> getCancelIncomeByDeptAndReason(DBCon dbCon, Staff term, DutyRange range, String extraCond, int queryType) throws SQLException{
+	 static List<CancelIncomeByDeptAndReason> getCancelIncomeByDeptAndReason(DBCon dbCon, Staff staff, DutyRange range, String extraCond, DateType queryType) throws SQLException{
 		String orderFoodTbl = null;
 		String tasteGrpTbl = null;
-		if(queryType == QUERY_HISTORY){
+		if(queryType.isHistory()){
 			orderFoodTbl = TBL_ORDER_FOOD_HISTORY;
 			tasteGrpTbl = TBL_TASTE_GROUP_HISTORY;
 			
-		}else if(queryType == QUERY_TODAY){
+		}else if(queryType.isToday()){
 			orderFoodTbl = TBL_ORDER_FOOD_TODAY;
 			tasteGrpTbl = TBL_TASTE_GROUP_TODAY;
 			
@@ -1005,7 +985,7 @@ public class CalcBillStatisticsDao {
 			  " JOIN " + Params.dbName + ".department DEPT " + " ON OF.dept_id = DEPT.dept_id AND OF.restaurant_id = DEPT.restaurant_id " +
 			  " WHERE 1 = 1 " +
 			  (extraCond == null ? "" : extraCond) +
-			  " AND OF.restaurant_id = " + term.getRestaurantId() +
+			  " AND OF.restaurant_id = " + staff.getRestaurantId() +
 			  " AND OF.order_count < 0 " +
 			  " AND OF.order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" + 
 			  " GROUP BY OF.dept_id, OF.cancel_reason_id " +
@@ -1031,18 +1011,18 @@ public class CalcBillStatisticsDao {
 	
 	 /**
 	  * Calculate the charge income.
-	  * @param term
+	  * @param staff
 	  * @param range
 	  * @param queryType
 	  * @return the income by charge refer to {@link IncomeByCharge}
 	  * @throws SQLException
 	  * 			if failed to execute any SQL statement
 	  */
-	 public static IncomeByCharge calcIncomeByCharge(Staff term, DutyRange range, int queryType) throws SQLException{
+	 public static IncomeByCharge calcIncomeByCharge(Staff staff, DutyRange range, DateType queryType) throws SQLException{
 		 DBCon dbCon = new DBCon();
 		 try{
 			 dbCon.connect();
-			 return calcIncomeByCharge(dbCon, term, range, queryType);
+			 return calcIncomeByCharge(dbCon, staff, range, queryType);
 		 }finally{
 			 dbCon.disconnect();
 		 }
@@ -1051,16 +1031,16 @@ public class CalcBillStatisticsDao {
 	 /**
 	  * Calculate the charge income.
 	  * @param dbCon
-	  * @param term
+	  * @param staff
 	  * @param range
 	  * @param queryType
 	  * @return the income by charge refer to {@link IncomeByCharge}
 	  * @throws SQLException
 	  * 			if failed to execute any SQL statement
 	  */
-	 public static IncomeByCharge calcIncomeByCharge(DBCon dbCon, Staff term, DutyRange range, int queryType) throws SQLException{
+	 public static IncomeByCharge calcIncomeByCharge(DBCon dbCon, Staff staff, DutyRange range, DateType queryType) throws SQLException{
 		 String moTbl;
-		 if(queryType == QUERY_TODAY){
+		 if(queryType.isToday()){
 			 moTbl = TBL_MEMBER_OPERATION;
 		 }else{
 			 moTbl = TBL_MEMBER_OPERATION_HISTORY;
