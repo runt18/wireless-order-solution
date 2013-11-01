@@ -8,6 +8,7 @@ import org.apache.struts.action.ActionServlet;
 
 import com.wireless.db.DBCon;
 import com.wireless.sccon.ServerConnector;
+import com.wireless.util.OSSParams;
 import com.wireless.util.OSSUtil;
 
 public class InitServlet extends ActionServlet {
@@ -30,17 +31,25 @@ public class InitServlet extends ActionServlet {
 		} catch (PropertyVetoException e) {
 			throw new ServletException(e);
 		}
+		
+		
 		try {
-			OSSUtil.init(getServletConfig().getInitParameter("oss_access_id"),
-					getServletConfig().getInitParameter("oss_access_key"), 
-					getServletConfig().getInitParameter("oss_bucket_image"));
-			OSSUtil.initClient(getServletConfig().getInitParameter("oss_inner_point"),
-					getServletConfig().getInitParameter("oss_outer_point"));
+			
+			OSSParams.init(getServletConfig().getInitParameter("oss_access_id"),
+					   	   getServletConfig().getInitParameter("oss_access_key"), 
+					   	   getServletConfig().getInitParameter("oss_inner_point"), 
+					   	   getServletConfig().getInitParameter("oss_outer_point"));
+			
+			OSSUtil.init(OSSParams.instance(), 
+						 getServletConfig().getInitParameter("oss_bucket_image"));
+			
 		} catch (Exception e) {
 			throw new ServletException(e);
 		}
+		
 		ServerConnector.instance().setNetAddr(getServletConfig().getInitParameter("socket_host"));
 		ServerConnector.instance().setNetPort(Integer.parseInt(getServletConfig().getInitParameter("socket_port")));
+		
 		super.init();
 	}
 }

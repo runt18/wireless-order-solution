@@ -25,11 +25,6 @@ public class OSSUtil {
 	
 	private OSSUtil(){}
 	
-	private static String ACCESS_ID;
-    private static String ACCESS_KEY;
-    private static String INNER_POINT;
-//    private static String OUTER_POINT;
-    
     public static String BUCKET_IMAGE;
     private static OSSClient imgClientInner;
 //    private static OSSClient imgClientOuter;
@@ -43,30 +38,12 @@ public class OSSUtil {
      * @param key
      * @param bucketImage
      */
-    public static void init(String id, String key, String bucketImage){
-    	ACCESS_ID = id;
-    	ACCESS_KEY = key;
+    public static void init(OSSParams params, String bucketImage){
     	BUCKET_IMAGE = bucketImage;
-    }
-    
-    /**
-     * 初始化客户端连接池
-     * @param innerPoint
-     * 	内网连接地址
-     * @param outerPoint
-     * 	外网连接地址
-     */
-    public static void initClient(String innerPoint, String outerPoint) throws Exception{
-    	INNER_POINT = innerPoint;
-    	clientInner = new OSSClient(INNER_POINT, ACCESS_ID, ACCESS_KEY);
+    	clientInner = new OSSClient("http://" + params.OSS_INNER_POINT, params.ACCESS_OSS_ID, params.ACCESS_OSS_KEY);
     	System.out.println("信息: 其他文件处理客户端内网连接池初始化成功.");
-    	imgClientInner = new OSSClient(INNER_POINT, ACCESS_ID, ACCESS_KEY);
+    	imgClientInner = new OSSClient("http://" + params.OSS_INNER_POINT, params.ACCESS_OSS_ID, params.ACCESS_OSS_KEY);
     	System.out.println("信息: 图片处理客户端内网连接池初始化成功.");
-    	
-//    	OUTER_POINT = outerPoint;
-//    	imgClientOuter = new OSSClient(OUTER_POINT, ACCESS_ID, ACCESS_KEY);
-//    	System.out.println("信息: 图片处理客户端外网连接池初始化成功.");
-    	
     	ensureBucketImage();
     	System.out.println("信息: BUCKET_IMAGE 初始化成功.");
     }

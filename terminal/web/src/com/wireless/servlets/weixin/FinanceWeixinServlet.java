@@ -61,6 +61,7 @@ import com.wireless.pojo.billStatistics.ShiftDetail;
 import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.util.DateUtil;
 import com.wireless.util.DateType;
+import com.wireless.util.OSSParams;
 import com.wireless.util.OSSUtil;
 
 public class FinanceWeixinServlet extends HttpServlet {
@@ -73,8 +74,6 @@ public class FinanceWeixinServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
 	private String imgTmpPath;
-	
-	private String ossUrlDomain;
 	
 	//TOKEN 是你在微信平台开发模式中设置的哦
 	public static final String TOKEN = "xxx";
@@ -132,7 +131,6 @@ public class FinanceWeixinServlet extends HttpServlet {
 		
 		InputStream is = request.getInputStream();
 		OutputStream os = response.getOutputStream();
-		ossUrlDomain = request.getSession().getServletContext().getInitParameter("oss_url_domain");
 		
 		final DefaultSession session = DefaultSession.newInstance(); 
 		
@@ -338,13 +336,13 @@ public class FinanceWeixinServlet extends HttpServlet {
 			
 			fileJpg = new File(imgTmpPath + fileNameJpg);
 			fosJpg = new FileOutputStream(fileJpg);
-			ChartUtilities.writeChartAsJPEG(fosJpg, 1, createChart(msg), 320, 280, null);
+			ChartUtilities.writeChartAsJPEG(fosJpg, 1, createChart(msg), 360, 280, null);
 			
 			final String bucketName = "weixin-finance";
 			
 			OSSUtil.uploadFile(bucketName, fileNameJpg, fileJpg, null);
 			
-			Data4Item d1 = new Data4Item("最近5天营业额", "走势图", "http://" + bucketName + "." + ossUrlDomain + "/" + fileNameJpg + "?" + System.currentTimeMillis(), ""); 
+			Data4Item d1 = new Data4Item("最近5天营业额", "走势图", "http://" + bucketName + "." + OSSParams.instance().OSS_OUTER_POINT + "/" + fileNameJpg + "?" + System.currentTimeMillis(), ""); 
 			Data4Item d2 = new Data4Item("雨林博客", "测试描述", "http://www.yl-blog.com/template/ylblog/images/logo.png", "www.yl-blog.com"); 
 			      
 			mit.setFromUserName(msg.getToUserName());
