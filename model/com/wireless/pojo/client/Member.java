@@ -783,7 +783,7 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 		jm.put("tele", this.tele);
 		jm.put("mobile", this.mobile);
 		jm.put("birthday", this.birthday);
-		jm.put("birthdayFormat", DateUtil.format(this.birthday));
+		jm.put("birthdayFormat", this.birthday != 0 ? DateUtil.formatToDate(this.birthday) : "");
 		jm.put("idCard", this.idCard);
 		jm.put("company", this.company);
 		//jm.put("tastePref", this.tastePref);
