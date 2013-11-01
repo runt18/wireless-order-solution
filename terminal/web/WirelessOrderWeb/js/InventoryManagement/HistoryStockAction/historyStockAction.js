@@ -293,18 +293,18 @@ Ext.onReady(function(){
 	    new Ext.grid.RowNumberer(),
 	    {header: '货单编号', dataIndex: 'id'},
 	    {header: '货单类型', width:110, renderer: stockTypeRenderer},
-	    {header: '货品类型', dataIndex: 'cateTypeText'},
+	    {header: '货品类型', dataIndex: 'cateTypeText', width:60},
 	    {header: '原始单号', dataIndex: 'oriStockId'},
 	    {header: '时间', dataIndex: 'oriStockDateFormat', width:100},
 	    {header: '出货仓/供应商', renderer: stockOutRenderer, width:100},
 	    {header: '收货仓/供应商', dataIndex: 'stockInRenderer', renderer: stockInRenderer, width:100},
-	    {header: '数量', dataIndex: 'amount', align: 'right', renderer: Ext.ux.txtFormat.gridDou},
-	    {header: '应收金额', dataIndex: 'price', align: 'right', renderer: Ext.ux.txtFormat.gridDou},
+	    {header: '数量', dataIndex: 'amount', align: 'right', width:80, renderer: Ext.ux.txtFormat.gridDou},
+	    {header: '应收金额', dataIndex: 'price', align: 'right', width:80, renderer: Ext.ux.txtFormat.gridDou},
 	    {header: '实际金额', dataIndex: 'actualPrice', width:100, align: 'right', renderer: Ext.ux.txtFormat.gridDou},
 	    {header: '审核人', dataIndex: 'approverName', width:80, align: 'center'},
 	    {header: '审核状态', dataIndex: 'statusText', align: 'center', width:70},
 	    {header: '制单人', dataIndex: 'operatorName', width:80, align: 'center'},
-	    {header: '操作', id:'operation', dataIndex: 'stockOperateRenderer', renderer: stockOperateRenderer, width : 100}
+	    {header: '操作', id:'operation', dataIndex: 'stockOperateRenderer' , width : 100, renderer: stockOperateRenderer}
 	]);
 	
 	var ds = new Ext.data.Store({
@@ -635,7 +635,7 @@ Ext.onReady(function(){
 		frame : true,
 		cm : cm,
 		store : ds,
-		autoExpandColumn : 'operation',
+		//autoExpandColumn : 'operation',
 		viewConfig : {
 			forceFit : true
 		},

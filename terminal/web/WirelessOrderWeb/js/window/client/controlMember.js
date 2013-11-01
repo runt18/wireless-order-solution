@@ -164,7 +164,7 @@ Ext.onReady(function(){
 			items : [{
 				xtype : 'numberfield',
 				id : 'cm_numberTotalBalance',
-				fieldLabel : '总余额',
+				fieldLabel : '账户余额',
 				disabled : true,
 				value : 0.00
 			}]
@@ -172,11 +172,12 @@ Ext.onReady(function(){
 			items : [{
 				xtype : 'numberfield',
 				id : 'cm_numberBaseBalance',
-				fieldLabel : '基础余额',
+				fieldLabel : '基本余额',
 				disabled : true,
 				value : 0.00
 			}]
 		}, {
+			hidden : true,
 			items : [{
 				xtype : 'numberfield',
 				id : 'cm_numberExtraBalance',
@@ -256,7 +257,8 @@ function cm_operationMemberData(c){
 		company.setValue(data['company']);
 		addr.setValue(data['contactAddress']);
 		
-		totalBalance.setValue(data['totalBalance']);
+		//totalBalance.setValue(parseFloat(data['totalBalance']).toFixed(2));
+		totalBalance.setValue(parseFloat(data['totalBalance']).toFixed(2));
 		baseBalance.setValue(data['baseBalance']);
 		extraBalance.setValue(data['extraBalance']);
 		usedBalance.setValue(data['usedBalance']);
@@ -360,8 +362,6 @@ function operateMemberHandler(c){
 	var birthday = Ext.getCmp('cm_dateMemberBirthday');
 
 	if(cm_obj.otype.toLowerCase() == Ext.ux.otype['update'].toLowerCase()){
-		publicComment.disable();
-		privateComment.disable();
 		// 验证旧类型为充值属性
 		if(c.data['memberType']['attributeValue'] == 0){
 			for(var i = 0; i < membetType.store.getCount(); i++){

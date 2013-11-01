@@ -247,13 +247,18 @@ viewBillGrid.region = 'center';
 
 var viewBillGenPanel = new Ext.Panel({
 	region : 'north',
-	height : 125,
+	height : 130,
 	frame : true,
 	border : false,
 	items : [ {
 		border : false,
 		contentEl : 'billView'
-	} ]
+	} ],
+	listeners : {
+		render : function(){
+			Ext.get('billView').show();
+		}
+	}
 });
 
 var viewBillAddPanel = new Ext.Panel({
@@ -264,7 +269,12 @@ var viewBillAddPanel = new Ext.Panel({
 	items : [ {
 		border : false,
 		contentEl : 'billViewAddInfo'
-	} ]
+	} ],
+	listeners : {
+		render : function(){
+			Ext.get('billViewAddInfo').show();
+		}
+	}
 });
 
 var viewBillWin = Ext.getCmp('history_viewBillWin');
@@ -282,6 +292,7 @@ if(!viewBillWin){
 			layout : 'border',
 			border : false,
 			items : [ viewBillGenPanel, viewBillGrid, viewBillAddPanel ]
+			//items : [viewBillGrid]
 		} ],
 		bbar : ['->', {
 			text : '关闭',
@@ -840,7 +851,7 @@ Ext.onReady(function() {
 			['应收', 'totalPrice',,'right', 'Ext.ux.txtFormat.gridDou'],
 			['实收', 'actualPrice',,'right', 'Ext.ux.txtFormat.gridDou'],
 			['状态', 'statusText',,'center', 'function(v,m,r){if(r.get("statusValue")==2){return \'<font color=\"#FF0000\">反结账</font>\';}else{return v;}}'],
-			['操作', 'operator', 270, 'center', 'billOpt']
+			['操作', 'operator', 180, 'center', 'billOpt']
 		],
 		OrderRecord.getKeys(),
 		[['isPaging', true], ['restaurantID', restaurantID]],

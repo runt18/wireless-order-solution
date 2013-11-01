@@ -58,7 +58,7 @@ function stockTaskNavHandler(e){
 		if(index == 1){
 			/***** 第二步, 根据用户选择入库单类型设置相关信息 *****/
 			// stockTypeList -> [[0]出入库类型, [1]货品类型, [2]货单类型]
-			var titleDom = Ext.getCmp('displayPanelForStockTitle');
+			var titleDom = Ext.getCmp('displayPanelForStockActionTitle');
 			var deptInDom = Ext.getCmp('displayPanelForDeptIn');
 			var supplierDom = Ext.getCmp('displayPanelForSupplier');
 			var deptOutDom = Ext.getCmp('displayPanelForDeptOut');
@@ -1315,7 +1315,7 @@ function initControl(){
     	height : 120,
     	frame : true,
     	items : [{
-    		id : 'displayPanelForStockTitle',
+    		id : 'displayPanelForStockActionTitle',
     		height : 30,
     		bodyStyle : 'font-size:18px;text-align:center;',
     		html : '-----'
