@@ -161,20 +161,20 @@ public class IncomeByEachDay implements Jsonable{
 	public Map<String, Object> toJsonMap(int flag) {
 		Map<String, Object> jm = new HashMap<String, Object>();
 		jm.put("offDutyToDate", this.date);
-		jm.put("totalActual", this.incomeByPay.getTotalActual());
-		jm.put("totalIncome", this.incomeByPay.getTotalIncome());
+		jm.put("totalActual", this.incomeByPay == null ? 0 : this.incomeByPay.getTotalActual());
+		jm.put("totalIncome", this.incomeByPay == null ? 0 : this.incomeByPay.getTotalIncome());
 		jm.put("orderAmount", this.getTotalAmount());
-		jm.put("cashIncome2", this.incomeByPay.getCashActual());
-		jm.put("cashAmount", this.incomeByPay.getCashAmount());
-		jm.put("creditCardIncome2", this.incomeByPay.getCreditCardActual());
-		jm.put("creditCardAmount", this.incomeByPay.getCreditCardAmount());
-		jm.put("hangIncome2", this.incomeByPay.getHangActual());
-		jm.put("hangAmount", this.incomeByPay.getHangAmount());
-		jm.put("signIncome2", this.incomeByPay.getSignActual());
-		jm.put("signAmount", this.incomeByPay.getSignAmount());
+		jm.put("cashIncome2", this.incomeByPay == null ? 0 : this.incomeByPay.getCashActual());
+		jm.put("cashAmount", this.incomeByPay == null ? 0 : this.incomeByPay.getCashAmount());
+		jm.put("creditCardIncome2", this.incomeByPay == null ? 0 : this.incomeByPay.getCreditCardActual());
+		jm.put("creditCardAmount", this.incomeByPay == null ? 0 : this.incomeByPay.getCreditCardAmount());
+		jm.put("hangIncome2", this.incomeByPay == null ? 0 : this.incomeByPay.getHangActual());
+		jm.put("hangAmount", this.incomeByPay == null ? 0 : this.incomeByPay.getHangAmount());
+		jm.put("signIncome2", this.incomeByPay == null ? 0 : this.incomeByPay.getSignActual());
+		jm.put("signAmount", this.incomeByPay == null ? 0 : this.incomeByPay.getSignAmount());
 		jm.put("discountIncome", this.getIncomeByDiscount().getTotalDiscount());
 		jm.put("giftIncome", this.getIncomeByGift().getTotalGift());
-		jm.put("cancelIncome", this.getIncomeByCancel());
+		jm.put("cancelIncome", this.getIncomeByCancel().getTotalCancel());
 		jm.put("eraseIncome", this.getIncomeByErase().getTotalErase());
 		jm.put("paidIncome", this.getIncomeByRepaid().getTotalRepaid());
 		
