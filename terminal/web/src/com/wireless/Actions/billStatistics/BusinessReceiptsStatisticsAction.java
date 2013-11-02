@@ -6,8 +6,6 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import net.sf.json.JSONObject;
-
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -15,11 +13,9 @@ import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.billStatistics.QueryIncomeStatisticsDao;
 import com.wireless.db.staffMgr.StaffDao;
-import com.wireless.pojo.billStatistics.BusinessStatistics;
+import com.wireless.json.JObject;
 import com.wireless.pojo.billStatistics.IncomeByEachDay;
-import com.wireless.pojo.util.DateUtil;
 import com.wireless.util.DataPaging;
-import com.wireless.util.JObject;
 import com.wireless.util.WebParams;
 
 public class BusinessReceiptsStatisticsAction extends Action {
@@ -112,11 +108,26 @@ public class BusinessReceiptsStatisticsAction extends Action {
 			e.printStackTrace();
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
 		}finally{
-//			root = DataPaging.getPagingData(root, isPaging, start, limit);
-//			root.add(sum);
-//			jobject.setRoot(root);
-//			JSONObject json = JSONObject.fromObject(jobject);
-//			response.getWriter().print(json.toString());
+			IncomeByEachDay total = new IncomeByEachDay(start);
+			for (IncomeByEachDay eachDay : incomesByEachDay) {
+				total.getIncomeByPay().setCashActual(eachDay.getIncomeByPay().getCashActual() + total.getIncomeByPay().getCashActual());
+				total.getIncomeByPay().setCashAmount(eachDay.getIncomeByPay().getCashAmount() + total.getIncomeByPay().getCashAmount());
+				total.getIncomeByPay().setCreditCardActual(eachDay.getIncomeByPay().getCreditCardActual() + total.getIncomeByPay().getCreditCardActual());
+				total.getIncomeByPay().setCreditCardAmount(eachDay.getIncomeByPay().getCreditCardAmount() + total.getIncomeByPay().getCreditCardAmount());
+				total.getIncomeByPay().setHangActual(eachDay.getIncomeByPay().getHangActual() + total.getIncomeByPay().getHangActual());
+				total.getIncomeByPay().setHangAmount(eachDay.getIncomeByPay().getHangAmount() + total.getIncomeByPay().getHangAmount());
+				total.getIncomeByPay().setSignActual(eachDay.getIncomeByPay().getSignActual() + total.getIncomeByPay().getSignActual());
+				total.getIncomeByPay().setSignAmount(eachDay.getIncomeByPay().getSignAmount() + total.getIncomeByPay().getSignAmount());
+				total.getIncomeByCancel().setTotalCancel(eachDay.getIncomeByCancel().getTotalCancel() + total.getIncomeByCancel().getTotalCancel());
+				total.getIncomeByDiscount().setTotalDiscount(eachDay.getIncomeByDiscount().getDiscountAmount() + total.getIncomeByDiscount().getTotalDiscount());
+				total.getIncomeByErase().setErasePrice(eachDay.getIncomeByErase().getEraseAmount() + total.getIncomeByErase().getTotalErase());
+				total.getIncomeByGift().setTotalGift(eachDay.getIncomeByGift().getGiftAmount() + total.getIncomeByGift().getTotalGift());
+				total.getIncomeByRepaid().setTotalRepaid(eachDay.getIncomeByRepaid().getRepaidAmount() + total.getIncomeByRepaid().getTotalRepaid());
+			}
+			incomesByEachDay = DataPaging.getPagingData(incomesByEachDay, isPaging, start, limit);
+			incomesByEachDay.add(total);
+			jobject.setRoot(incomesByEachDay);
+			response.getWriter().print(jobject.toString());
 		}
 		return null;
 	}
