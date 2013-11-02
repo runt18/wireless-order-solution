@@ -1114,11 +1114,11 @@ function initControl(){
 		if(store.getCount() > 0){
 			sumRow = stockBasicGrid.getView().getRow(store.getCount() - 1);	
 			sumRow.style.backgroundColor = '#EEEEEE';			
-			sumRow.style.color = 'green';
 			for(var i = 0; i < stockBasicGrid.getColumnModel().getColumnCount(); i++){
-				var sumRow = stockBasicGrid.getView().getCell(store.getCount() - 1, i);
-				sumRow.style.fontSize = '15px';
-				sumRow.style.fontWeight = 'bold';					
+				var sumCell = stockBasicGrid.getView().getCell(store.getCount() - 1, i);
+				sumCell.style.fontSize = '15px';
+				sumCell.style.fontWeight = 'bold';
+				sumCell.style.color = 'green';
 			}
 			stockBasicGrid.getView().getCell(store.getCount()-1, 1).innerHTML = '汇总';
 			stockBasicGrid.getView().getCell(store.getCount()-1, 2).innerHTML = '--';

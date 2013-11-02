@@ -46,9 +46,9 @@
 	}, {
 		name : "eraseIncome"
 	}, {
-		name : "totalPrice"
+		name : "totalIncome"
 	}, {
-		name : "totalPrice2"
+		name : "totalActual"
 	}]),
 	listeners : {
 		load : function(thiz, rs, options){
@@ -74,7 +74,7 @@
 			onDuty.innerHTML = Ext.getCmp('receivablesStaticBeginDate').getValue().format('Y-m-d');
 			offDuty.innerHTML = Ext.getCmp('receivablesStaticEndDate').getValue().format('Y-m-d');
 			
-			totalPrice.innerHTML = sr.get('totalPrice2').toFixed(2);
+			totalPrice.innerHTML = sr.get('totalActual').toFixed(2);
 			orderAmount.innerHTML = sr.get('orderAmount');
 			
 			cashIncome.innerHTML = sr.get('cashIncome2').toFixed(2);
@@ -99,13 +99,13 @@ var receivablesStatResultColumnModel = new Ext.grid.ColumnModel([
 		width : 100
 	}, {
 		header : '应收',
-		dataIndex : 'totalPrice',
+		dataIndex : 'totalIncome',
 		renderer : Ext.ux.txtFormat.gridDou,
 		align : 'right',
 		width : 100
 	}, {
 		header : '实收',
-		dataIndex : 'totalPrice2',
+		dataIndex : 'totalActual',
 		renderer : Ext.ux.txtFormat.gridDou,
 		align : 'right',
 		width : 100

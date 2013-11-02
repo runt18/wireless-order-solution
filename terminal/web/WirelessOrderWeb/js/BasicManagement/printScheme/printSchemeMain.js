@@ -32,7 +32,7 @@ function formatName(v){
 	return v;
 }
 
-function loadInformation(){
+function loadKitchenCheckbox(){
 	Ext.Ajax.request({
 		url : '../../QueryKitchen.do',
 		params : {
@@ -65,6 +65,10 @@ function loadInformation(){
 			Ext.ux.showMsg(Ext.decode(res.responseText));
 		}
 	});
+	
+}
+
+function loadInformation(){
 	Ext.Ajax.request({
 		url : '../../QueryDept.do',
 		params : {
@@ -145,6 +149,11 @@ if(!addPrintFunc){
 		modal : true,
 		width : 670,
 		autoHeight : true,
+		listeners : {
+			show : function(){
+				loadKitchenCheckbox();
+			}		
+		},
 		bbar : [{
 			text : '应用',
 			id : 'btnSaveNext',
