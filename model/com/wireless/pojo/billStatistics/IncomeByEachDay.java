@@ -1,6 +1,14 @@
 package com.wireless.pojo.billStatistics;
 
-public class IncomeByEachDay {
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import com.wireless.json.Jsonable;
+import com.wireless.pojo.util.DateUtil;
+
+public class IncomeByEachDay implements Jsonable{
 
 	private final String date;
 	
@@ -123,5 +131,58 @@ public class IncomeByEachDay {
 	
 	public void setIncomeByCharge(IncomeByCharge incomeByCharge) {
 		this.incomeByCharge = incomeByCharge;
+	}
+	
+	@Override 
+	public String toString(){
+		return "IncomeEachDay : " +
+				"date " + this.date +
+				", totalActual" + this.getTotalActual() +
+				", totalAmount" + this.getTotalAmount();
+	}
+	
+	@Override
+	public boolean equals(Object obj){
+		if(obj == null || !(obj instanceof IncomeByEachDay)){
+			return false;
+		}else{
+			return this.date == ((IncomeByEachDay) obj).date;
+		}
+	}
+
+	@Override
+	public int hashCode() {
+		int result = 17;
+		result = (int) (result * 31 + DateUtil.parseDate(date));
+		return result;
+	}
+	
+	@Override
+	public Map<String, Object> toJsonMap(int flag) {
+		Map<String, Object> jm = new HashMap<String, Object>();
+		jm.put("offDutyToDate", this.date);
+		jm.put("totalActual", this.incomeByPay.getTotalActual());
+		jm.put("totalIncome", this.incomeByPay.getTotalIncome());
+		jm.put("orderAmount", this.getTotalAmount());
+		jm.put("cashIncome2", this.incomeByPay.getCashActual());
+		jm.put("cashAmount", this.incomeByPay.getCashAmount());
+		jm.put("creditCardIncome2", this.incomeByPay.getCreditCardActual());
+		jm.put("creditCardAmount", this.incomeByPay.getCreditCardAmount());
+		jm.put("hangIncome2", this.incomeByPay.getHangActual());
+		jm.put("hangAmount", this.incomeByPay.getHangAmount());
+		jm.put("signIncome2", this.incomeByPay.getSignActual());
+		jm.put("signAmount", this.incomeByPay.getSignAmount());
+		jm.put("discountIncome", this.getIncomeByDiscount().getTotalDiscount());
+		jm.put("giftIncome", this.getIncomeByGift().getTotalGift());
+		jm.put("cancelIncome", this.getIncomeByCancel());
+		jm.put("eraseIncome", this.getIncomeByErase().getTotalErase());
+		jm.put("paidIncome", this.getIncomeByRepaid().getTotalRepaid());
+		
+		return Collections.unmodifiableMap(jm);
+	}
+
+	@Override
+	public List<Object> toJsonList(int flag) {
+		return null;
 	}
 }
