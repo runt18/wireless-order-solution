@@ -92,9 +92,11 @@ public class BusinessReceiptsStatisticsAction extends Action {
 		
 		request.setCharacterEncoding("UTF-8");
 		response.setCharacterEncoding("UTF-8");
+		
 		String isPaging = request.getParameter("isPaging");
 		String start = request.getParameter("start");
 		String limit = request.getParameter("limit");
+		System.out.println(start);
 		JObject jobject = new JObject();
 		List<IncomeByEachDay> incomesByEachDay = new ArrayList<IncomeByEachDay>();
 		try{
@@ -108,25 +110,31 @@ public class BusinessReceiptsStatisticsAction extends Action {
 			e.printStackTrace();
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
 		}finally{
-			IncomeByEachDay total = new IncomeByEachDay(start);
-			for (IncomeByEachDay eachDay : incomesByEachDay) {
-				total.getIncomeByPay().setCashActual(eachDay.getIncomeByPay().getCashActual() + total.getIncomeByPay().getCashActual());
-				total.getIncomeByPay().setCashAmount(eachDay.getIncomeByPay().getCashAmount() + total.getIncomeByPay().getCashAmount());
-				total.getIncomeByPay().setCreditCardActual(eachDay.getIncomeByPay().getCreditCardActual() + total.getIncomeByPay().getCreditCardActual());
-				total.getIncomeByPay().setCreditCardAmount(eachDay.getIncomeByPay().getCreditCardAmount() + total.getIncomeByPay().getCreditCardAmount());
-				total.getIncomeByPay().setHangActual(eachDay.getIncomeByPay().getHangActual() + total.getIncomeByPay().getHangActual());
-				total.getIncomeByPay().setHangAmount(eachDay.getIncomeByPay().getHangAmount() + total.getIncomeByPay().getHangAmount());
-				total.getIncomeByPay().setSignActual(eachDay.getIncomeByPay().getSignActual() + total.getIncomeByPay().getSignActual());
-				total.getIncomeByPay().setSignAmount(eachDay.getIncomeByPay().getSignAmount() + total.getIncomeByPay().getSignAmount());
-				total.getIncomeByCancel().setTotalCancel(eachDay.getIncomeByCancel().getTotalCancel() + total.getIncomeByCancel().getTotalCancel());
-				total.getIncomeByDiscount().setTotalDiscount(eachDay.getIncomeByDiscount().getDiscountAmount() + total.getIncomeByDiscount().getTotalDiscount());
-				total.getIncomeByErase().setErasePrice(eachDay.getIncomeByErase().getEraseAmount() + total.getIncomeByErase().getTotalErase());
-				total.getIncomeByGift().setTotalGift(eachDay.getIncomeByGift().getGiftAmount() + total.getIncomeByGift().getTotalGift());
-				total.getIncomeByRepaid().setTotalRepaid(eachDay.getIncomeByRepaid().getRepaidAmount() + total.getIncomeByRepaid().getTotalRepaid());
+			System.out.println(incomesByEachDay.size() + "pa"+ incomesByEachDay.get(0).getIncomeByPay());
+			if(incomesByEachDay.size() == 1 && incomesByEachDay.get(0).getIncomeByPay() == null){
+				jobject.setRoot(null);
+				
+			}else{
+				IncomeByEachDay total = new IncomeByEachDay(start);
+				for (IncomeByEachDay eachDay : incomesByEachDay) {
+					total.getIncomeByPay().setCashActual(eachDay.getIncomeByPay().getCashActual() + total.getIncomeByPay().getCashActual());
+					total.getIncomeByPay().setCashAmount(eachDay.getIncomeByPay().getCashAmount() + total.getIncomeByPay().getCashAmount());
+					total.getIncomeByPay().setCreditCardActual(eachDay.getIncomeByPay().getCreditCardActual() + total.getIncomeByPay().getCreditCardActual());
+					total.getIncomeByPay().setCreditCardAmount(eachDay.getIncomeByPay().getCreditCardAmount() + total.getIncomeByPay().getCreditCardAmount());
+					total.getIncomeByPay().setHangActual(eachDay.getIncomeByPay().getHangActual() + total.getIncomeByPay().getHangActual());
+					total.getIncomeByPay().setHangAmount(eachDay.getIncomeByPay().getHangAmount() + total.getIncomeByPay().getHangAmount());
+					total.getIncomeByPay().setSignActual(eachDay.getIncomeByPay().getSignActual() + total.getIncomeByPay().getSignActual());
+					total.getIncomeByPay().setSignAmount(eachDay.getIncomeByPay().getSignAmount() + total.getIncomeByPay().getSignAmount());
+					total.getIncomeByCancel().setTotalCancel(eachDay.getIncomeByCancel().getTotalCancel() + total.getIncomeByCancel().getTotalCancel());
+					total.getIncomeByDiscount().setTotalDiscount(eachDay.getIncomeByDiscount().getDiscountAmount() + total.getIncomeByDiscount().getTotalDiscount());
+					total.getIncomeByErase().setErasePrice(eachDay.getIncomeByErase().getEraseAmount() + total.getIncomeByErase().getTotalErase());
+					total.getIncomeByGift().setTotalGift(eachDay.getIncomeByGift().getGiftAmount() + total.getIncomeByGift().getTotalGift());
+					total.getIncomeByRepaid().setTotalRepaid(eachDay.getIncomeByRepaid().getRepaidAmount() + total.getIncomeByRepaid().getTotalRepaid());
+				}
+				incomesByEachDay = DataPaging.getPagingData(incomesByEachDay, isPaging, start, limit);
+				incomesByEachDay.add(total);
+				jobject.setRoot(incomesByEachDay);
 			}
-			incomesByEachDay = DataPaging.getPagingData(incomesByEachDay, isPaging, start, limit);
-			incomesByEachDay.add(total);
-			jobject.setRoot(incomesByEachDay);
 			response.getWriter().print(jobject.toString());
 		}
 		return null;
