@@ -335,6 +335,9 @@ public class RestaurantDao {
 			//Insert the popular cancel reasons
 			initCancelReason(dbCon, staff);
 			
+			//Insert the setting
+			initSetting(dbCon, staff);
+			
 			return restaurant.getId();
 			
 		}catch(Exception e){
@@ -344,6 +347,22 @@ public class RestaurantDao {
 			throw new SQLException(e);
 		}
 
+	}
+	
+	private static void initSetting(DBCon dbCon, Staff staff) throws SQLException{
+		String sql;
+		
+		sql = " INSERT INTO " + Params.dbName + ".setting " +
+			  " (`restaurant_id`) " +
+			  " VALUES( " +
+			  staff.getRestaurantId() +
+			  ")";
+		dbCon.stmt.executeUpdate(sql);
+		//插入当前月份的第一天作为当前库存的会计月份
+		sql = " UPDATE " + Params.dbName + ".setting SET " +
+			  " current_material_month = DATE_SUB(CURDATE(), INTERVAL DAY(CURDATE()) - 1 DAY) " +
+			  " WHERE restaurant_id = " + staff.getRestaurantId();
+		dbCon.stmt.executeUpdate(sql);
 	}
 	
 	private static void initCancelReason(DBCon dbCon, Staff staff) throws SQLException{
