@@ -34,6 +34,10 @@
 	}, {
 		name : "signIncome2"
 	}, {
+		name : "memberAmount"
+	}, {
+		name : "memberActual"
+	}, {
 		name : "paidIncome"
 	}, {
 		name : "discountIncome"
@@ -68,6 +72,8 @@
 			var hangAmount = Ext.getDom('panelOfReceivablesStatSumHangAmount');
 			var signIncome = Ext.getDom('panelOfReceivablesStatSumSignIncome');
 			var signAmount = Ext.getDom('panelOfReceivablesStatSumSignAmount');
+			var memberActual = Ext.getDom('panelOfReceivablesStatSumMemberActual');
+			var memberAmount = Ext.getDom('panelOfReceivablesStatSumMemberAmount');
 //			var eraseIncome = Ext.getDom('panelOfReceivablesStatSumEraseIncome');
 //			var erasAmount = Ext.getDom('panelOfReceivablesStatSumEraseAmount');
 			
@@ -85,6 +91,8 @@
 			hangAmount.innerHTML = sr.get('hangAmount');
 			signIncome.innerHTML = sr.get('signIncome2').toFixed(2);
 			signAmount.innerHTML = sr.get('signAmount');
+			memberActual.innerHTML = sr.get('memberActual').toFixed(2);
+			memberAmount.innerHTML = sr.get('memberAmount');
 //			eraseIncome.innerHTML = sr.get('eraseIncome').toFixed(2);
 //			erasAmount.innerHTML = sr.get('eraseAmount');
 		}
@@ -123,6 +131,12 @@ var receivablesStatResultColumnModel = new Ext.grid.ColumnModel([
 	}, {
 		header : '刷卡',
 		dataIndex : 'creditCardIncome2',
+		renderer : Ext.ux.txtFormat.gridDou,
+		align : 'right',
+		width : 70
+	}, {
+		header : '会员',
+		dataIndex : 'memberActual',
 		renderer : Ext.ux.txtFormat.gridDou,
 		align : 'right',
 		width : 70
@@ -388,6 +402,20 @@ var receivablesStatResultSummaryPanel = new Ext.Panel({
 		}, {
 			items : [{
 				style : 'color:#15428B;text-align:left;',
+				html : '会员单总额:'
+			}]
+		}, {
+			items : [{
+				style : 'text-align:right;',
+				id : 'panelOfReceivablesStatSumMemberActual',
+				html : '----'
+			}]
+		}, {
+			columnWidth : .01,
+			html : '&nbsp;'
+		}, {
+			items : [{
+				style : 'color:#15428B;text-align:left;',
 				html : '挂账单总额:'
 			}]
 		}, {
@@ -486,6 +514,20 @@ var receivablesStatResultSummaryPanel = new Ext.Panel({
 			items : [{
 				style : 'text-align:right;',
 				id : 'panelOfReceivablesStatSumCreditCardAmount',
+				html : '----'
+			}]
+		}, {
+			columnWidth : .01,
+			html : '&nbsp;'
+		}, {
+			items : [{
+				style : 'color:#15428B;text-align:left;',
+				html : '会员单总数:'
+			}]
+		}, {
+			items : [{
+				style : 'text-align:right;',
+				id : 'panelOfReceivablesStatSumMemberAmount',
 				html : '----'
 			}]
 		}, {

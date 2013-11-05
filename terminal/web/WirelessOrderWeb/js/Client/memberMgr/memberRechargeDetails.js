@@ -185,7 +185,44 @@ Ext.onReady(function(){
 				mrd_searchMemberOperation();
 			}
 			
-		}]
+		}, '-', {
+				text : '导出',
+//				hidden : true,
+				iconCls : 'icon_tb_exoprt_excel',
+				handler : function(){
+					var radio = document.getElementsByName('mrd_search_radioDataSource');
+					var dataSource = 'today';
+					for(var i = 0; i < radio.length; i++){
+						if(radio[i].checked == true){
+							dataSource = radio[i].value;
+							break;
+						}
+					}
+					var onDuty = '', offDuty = '';
+					if(dataSource == 'history'){
+						if(!mrd_search_onDuty.isValid() || !mrd_search_offDuty.isValid()){
+							Ext.example.msg('提示', '操作失败, 请选择搜索时间段.');
+							return;
+						}
+						onDuty = mrd_search_onDuty.getValue().format('Y-m-d 00:00:00');
+						offDuty = mrd_search_offDuty.getValue().format('Y-m-d 23:59:59');
+					}
+					var memberType = mrd_search_memberType.getRawValue() != '' ? mrd_search_memberType.getValue() : '';
+					var url = '../../{0}?memberType={1}&memberMobile={2}&dataSource={3}&onDuty={4}&offDuty={5}&memberName={6}&dataSources={7}&operateType=2';
+					url = String.format(
+							url, 
+							'ExportHistoryStatisticsToExecl.do', 
+							memberType > 0 ? memberType : '', 
+							mrd_search_memerbMobile.getValue(), 
+							'rechargeDetail',
+							onDuty,
+							offDuty,
+							mrd_search_memberName.getValue(),
+							dataSource
+						);
+					window.location = url;
+				}
+			}]
 	});
 	mrd_mo_grid = createGridPanel(
 		'mrd_mo_grid',
