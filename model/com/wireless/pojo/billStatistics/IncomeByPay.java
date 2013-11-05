@@ -162,7 +162,7 @@ public class IncomeByPay{
 	}
 
 	public float getTotalIncome() {
-		return getTotalIncome() + 
+		return getCashIncome() + 
 			   getCreditCardIncome() + 
 			   getMemberCardIncome() + 
 			   getSignIncome() + 

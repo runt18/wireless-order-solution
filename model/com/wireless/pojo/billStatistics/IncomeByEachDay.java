@@ -172,6 +172,8 @@ public class IncomeByEachDay implements Jsonable{
 		jm.put("hangAmount", this.incomeByPay == null ? 0 : this.incomeByPay.getHangAmount());
 		jm.put("signIncome2", this.incomeByPay == null ? 0 : this.incomeByPay.getSignActual());
 		jm.put("signAmount", this.incomeByPay == null ? 0 : this.incomeByPay.getSignAmount());
+		jm.put("memberAmount", this.incomeByPay == null ? 0 : this.incomeByPay.getMemberCardAmount());
+		jm.put("memberActual", this.incomeByPay == null ? 0 : this.incomeByPay.getMemberCardActual());
 		jm.put("discountIncome", this.getIncomeByDiscount().getTotalDiscount());
 		jm.put("giftIncome", this.getIncomeByGift().getTotalGift());
 		jm.put("cancelIncome", this.getIncomeByCancel().getTotalCancel());
