@@ -225,25 +225,30 @@ var logOutBut = new Ext.ux.ImageButton({
 	}
 });
 
-var viewBillGrid = createGridPanel(
-	'',
-	'已点菜',
-	'',
-    '',
-    '',
-    [
-	    [true, false, false, false], 
-	    ['菜名', 'name', 130] , 
-	    ['口味', 'tasteGroup.tastePref', 100],
-	    ['数量', 'count', 50, 'right', 'Ext.ux.txtFormat.gridDou'],
-	    ['折扣', 'discount', 50, 'right', 'Ext.ux.txtFormat.gridDou'],
-	    ['金额', 'totalPrice', 100, 'right', 'Ext.ux.txtFormat.gridDou']
-	],
-	OrderFoodRecord.getKeys(),
-    [],
-    0
-);
-viewBillGrid.region = 'center';
+var history_viewBillGrid;
+	if(!history_viewBillGrid){
+		history_viewBillGrid = createGridPanel(
+			'',
+			'已点菜',
+			'',
+		    '',
+		    '',
+		    [
+			    [true, false, false, false], 
+			    ['菜名', 'name', 130] , 
+			    ['口味', 'tasteGroup.tastePref', 100],
+			    ['数量', 'count', 50, 'right', 'Ext.ux.txtFormat.gridDou'],
+			    ['折扣', 'discount', 50, 'right', 'Ext.ux.txtFormat.gridDou'],
+			    ['金额', 'totalPrice', 100, 'right', 'Ext.ux.txtFormat.gridDou']
+			],
+			OrderFoodRecord.getKeys(),
+		    [],
+		    0
+		);
+	}
+
+
+history_viewBillGrid.region = 'center';
 
 var viewBillGenPanel = new Ext.Panel({
 	region : 'north',
@@ -452,7 +457,7 @@ if(!viewBillWin){
 		items : [ {
 			layout : 'border',
 			border : false,
-			items : [ viewBillGenPanel, viewBillGrid, viewBillAddPanel ]
+			items : [ viewBillGenPanel, history_viewBillGrid, viewBillAddPanel ]
 			//items : [viewBillGrid]
 		} ],
 		bbar : ['->', {
@@ -472,7 +477,7 @@ if(!viewBillWin){
 		listeners : {
 			hide : function(thiz) {
 				viewBillData = null;
-				viewBillGrid.getStore().removeAll();
+				history_viewBillGrid.getStore().removeAll();
 			},
 			show : function(thiz) {
 				var data = Ext.ux.getSelData(billsGrid);
@@ -504,7 +509,7 @@ if(!viewBillWin){
 						var jr = Ext.decode(response.responseText);
 						if (jr.success == true) {
 							viewBillData = jr;
-							viewBillGrid.getStore().loadData(viewBillData);
+							history_viewBillGrid.getStore().loadData(viewBillData);
 						} else {
 							Ext.ux.showMsg(jr);
 						}
