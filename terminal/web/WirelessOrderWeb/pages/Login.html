@@ -178,18 +178,18 @@ function setCookie(cookiename, cookievalue, days) {
 	var getRestaurantID;
 	var id = getCookie('restaurant');
 	function getStaff(restaurantID){
-		$.post('../QueryStaff.do', {
+ 		$.post('../QueryStaff.do', {
 				isCookie : true,
 				"restaurantID" : restaurantID,
 				"type" : 0,
 				"isPaging" : false,
 				"isCombo" : false
 			}, function(res){
-				for(var i=0; i<res.root.length; i++ ){
+ 				for(var i=0; i<res.root.length; i++ ){
 					$('#selectStaff').append("<option value="+res.root[i].staffID+">"+res.root[i].staffName+"</option>");
-				}
+				} 
 			}
-		);
+		); 
 	}
 	
  	if(getCookie('restaurant')){
