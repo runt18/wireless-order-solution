@@ -3,6 +3,7 @@ package com.wireless.Actions.exportExecl;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.sql.SQLException;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -28,6 +29,8 @@ import org.apache.struts.actions.DispatchAction;
 import com.wireless.db.billStatistics.BusinessStatisticsDao;
 import com.wireless.db.billStatistics.QueryCancelledFood;
 import com.wireless.db.billStatistics.QuerySaleDetails;
+import com.wireless.db.client.member.MemberDao;
+import com.wireless.db.client.member.MemberOperationDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.stockMgr.StockActionDao;
 import com.wireless.exception.BusinessException;
@@ -35,6 +38,8 @@ import com.wireless.pojo.billStatistics.BusinessStatistics;
 import com.wireless.pojo.billStatistics.BusinessStatisticsByDept;
 import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.billStatistics.SalesDetail;
+import com.wireless.pojo.client.MemberOperation;
+import com.wireless.pojo.client.MemberOperation.OperationType;
 import com.wireless.pojo.dishesOrder.CancelledFood;
 import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.menuMgr.Kitchen;
@@ -45,6 +50,7 @@ import com.wireless.pojo.stockMgr.StockAction.SubType;
 import com.wireless.pojo.stockMgr.StockActionDetail;
 import com.wireless.pojo.util.DateUtil;
 import com.wireless.util.DateType;
+import com.wireless.util.SQLUtil;
 
 @SuppressWarnings("deprecation")
 public class HistoryStatisticsAction extends DispatchAction{
@@ -1424,6 +1430,482 @@ public class HistoryStatisticsAction extends DispatchAction{
 		return null;
 		
 	}
+	public ActionForward rechargeDetail(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws UnsupportedEncodingException, Exception, SQLException, BusinessException{
+		request.setCharacterEncoding("UTF-8");
+		response.setCharacterEncoding("UTF-8");
+		response.setContentType("application/vnd.ms-excel;");
+		
+		String pin = (String)request.getAttribute("pin");
+		Staff staff = StaffDao.verify(Integer.parseInt(pin));
+		
+		//String restaurantID = request.getParameter("restaurantID");
+		String dataSource = request.getParameter("dataSources");
+		String memberMobile = request.getParameter("memberMobile");
+		String memberCard = request.getParameter("memberCard");
+		String memberName = request.getParameter("memberName");
+		String memberType = request.getParameter("memberType");
+		String operateType = request.getParameter("operateType");
+		String onDuty = request.getParameter("onDuty");
+		String offDuty = request.getParameter("offDuty");
+		//String total = request.getParameter("total");
+		
+		List<MemberOperation> list = null;
+		String extraCond = null, orderClause = null;
+		extraCond = " AND MO.restaurant_id = " + staff.getRestaurantId();
+		
+		if(memberMobile != null && !memberMobile.trim().isEmpty()){
+			extraCond += (" AND MO.member_mobile like '%" + memberMobile.trim() + "%'");
+		}
+		if(memberCard != null && !memberCard.trim().isEmpty()){
+			extraCond += (" AND MO.member_card like '%" + memberCard.trim() + "%'");
+		}
+		if(memberName != null && !memberName.trim().isEmpty()){
+			extraCond += (" AND MO.member_name like '%" + memberName.trim() + "%'");
+		}
+		if(memberType != null && !memberType.trim().isEmpty()){
+			extraCond += (" AND M.member_type_id = " + memberType);
+		}
+		if(operateType != null && !operateType.trim().isEmpty() && Integer.valueOf(operateType) > 0){
+			List<OperationType> types = OperationType.typeOf(Integer.parseInt(operateType));
+			String extra = "";
+			for (int i = 0; i < types.size(); i++) {
+				if(i == 0){
+					extra += " MO.operate_type = " + types.get(i).getValue();
+				}else{
+					extra += " OR MO.operate_type = " + types.get(i).getValue();
+				}
+			}
+			if(Integer.parseInt(operateType) == OperationType.POINT_ADJUST.getType()){
+				extra += " OR MO.operate_type = " + OperationType.CONSUME.getValue();
+			}
+			extraCond += " AND(" + extra + ")";
+		}
+		
+		orderClause = " ORDER BY MO.operate_date ";
+		
+		Map<Object, Object> paramsSet = new HashMap<Object, Object>(), countSet = null;
+		countSet = new HashMap<Object, Object>();
+		if(dataSource.equalsIgnoreCase("today")){
+			countSet.put(SQLUtil.SQL_PARAMS_EXTRA, extraCond);
+			countSet.put(SQLUtil.SQL_PARAMS_ORDERBY, orderClause);
+		}else if(dataSource.equalsIgnoreCase("history")){
+			if(onDuty != null && !onDuty.trim().isEmpty() && offDuty != null && !offDuty.trim().isEmpty()){
+				extraCond += (" AND MO.operate_date >= '" + onDuty + "'");
+				extraCond += (" AND MO.operate_date <= '" + offDuty + "'");
+			}
+			countSet.put(SQLUtil.SQL_PARAMS_EXTRA, extraCond);
+			countSet.put(SQLUtil.SQL_PARAMS_ORDERBY, orderClause);
+		}
+		paramsSet.put(SQLUtil.SQL_PARAMS_EXTRA, extraCond);
+		paramsSet.put(SQLUtil.SQL_PARAMS_ORDERBY, orderClause);
+		
+		if(dataSource.equalsIgnoreCase("today")){
+			list = MemberOperationDao.getToday(paramsSet);
+		}else if(dataSource.equalsIgnoreCase("history")){
+			list = MemberOperationDao.getHistory(paramsSet);
+		}
+		MemberOperation sum = MemberOperation.newMO(-10, "", "", "");
+		if(list != null && !list.isEmpty()){
+			sum.setChargeType(list.get(0).getChargeType());
+			sum.setComment(list.get(0).getComment());
+			sum.setOperationType(list.get(0).getOperationType());
+			sum.setPayType(list.get(0).getPayType());
+			sum.setOperateSeq(list.get(0).getOperateSeq());
+			sum.setStaffName(list.get(0).getStaffName());
+			for(MemberOperation temp : list){
+				temp.setMember(MemberDao.getMemberById(staff, temp.getMemberId()));
+				
+				sum.setDeltaBaseMoney(temp.getDeltaBaseMoney() + sum.getDeltaBaseMoney());
+				sum.setDeltaExtraMoney(temp.getDeltaExtraMoney() + sum.getDeltaExtraMoney());
+				sum.setChargeMoney(temp.getChargeMoney() + sum.getChargeMoney());
+				sum.setPayMoney(temp.getPayMoney() + sum.getPayMoney());
+				sum.setDeltaPoint(temp.getDeltaPoint() + sum.getDeltaPoint());
+			}
+		}
+		
+		DecimalFormat df = new DecimalFormat("#.00");
+		String title = "会员充值明细表";
+		//标题
+		response.addHeader("Content-Disposition", "attachment;filename=" + new String( ("会员充值明细表.xls").getBytes("GBK"),  "ISO8859_1"));
+		HSSFWorkbook wb = new HSSFWorkbook();
+		HSSFSheet sheet = wb.createSheet(title);
+		HSSFRow row = null;
+		HSSFCell cell = null;
+		initParams(wb);
+		
+		sheet.setColumnWidth(0, 3800);
+		sheet.setColumnWidth(1, 3000);
+		sheet.setColumnWidth(2, 3300);
+		sheet.setColumnWidth(3, 4000);
+		sheet.setColumnWidth(4, 3000);
+		sheet.setColumnWidth(5, 3000);
+		sheet.setColumnWidth(6, 6000);
+		sheet.setColumnWidth(7, 4000);
+		
+		//冻结行
+		sheet.createFreezePane(0, 5, 0, 5);
+		
+		//报表头
+		row = sheet.createRow(0);
+		row.setHeight((short) 550);
+		
+		cell = row.createCell(0);
+		cell.setCellValue(title);
+		cell.setCellStyle(titleStyle);
+		
+		//合并单元格
+		sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, 7));
+		
+		row = sheet.createRow(sheet.getLastRowNum() + 1);
+		row.setHeight((short) 350);
+		
+		cell = row.createCell(0);
+		
+		String date;
+		if(dataSource.equals("today")){
+			date = "当日";
+		}else{
+			date = onDuty + "  至  " + offDuty;
+		}
+		cell.setCellValue("统计时间: " + date );
+		cell.setCellStyle(strStyle);
+		
+		sheet.addMergedRegion(new CellRangeAddress(sheet.getLastRowNum(), sheet.getLastRowNum(), 0, 7));
+		
+		row = sheet.createRow(sheet.getLastRowNum() + 1);
+		row.setHeight((short) 350);
+		
+		cell = row.createCell(0);
+		
+		cell.setCellValue("总收款金额: " + df.format(sum.getChargeMoney()) + "         总充值额 :" + df.format(sum.getDeltaTotalMoney()));
+		cell.setCellStyle(strStyle);
+		
+		sheet.addMergedRegion(new CellRangeAddress(sheet.getLastRowNum(), sheet.getLastRowNum(), 0, 7));
+		
+		//空白
+		row = sheet.createRow(sheet.getLastRowNum() + 1);
+		row.setHeight((short) 350);
+		sheet.addMergedRegion(new CellRangeAddress(sheet.getLastRowNum(), sheet.getLastRowNum(), 0, 7));
+		
+		//列头
+		row = sheet.createRow(sheet.getLastRowNum() + 1);
+		row.setHeight((short) 350);
+		
+		cell = row.createCell(0);
+		cell.setCellValue("会员名称");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell(row.getLastCellNum());
+		cell.setCellValue("会员类型");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell(row.getLastCellNum());
+		cell.setCellValue("实收/实退");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell(row.getLastCellNum());
+		cell.setCellValue("充值/退款");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell(row.getLastCellNum());
+		cell.setCellValue("收款方式");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell(row.getLastCellNum());
+		cell.setCellValue("操作人");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell(row.getLastCellNum());
+		cell.setCellValue("操作时间");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell(row.getLastCellNum());
+		cell.setCellValue("操作类型");
+		cell.setCellStyle(headerStyle);
+		
+		for (MemberOperation mo : list) {
+			row = sheet.createRow(sheet.getLastRowNum() + 1);
+			row.setHeight((short) 350);
+			
+			cell = row.createCell(0);
+			cell.setCellValue(mo.getMemberName());
+			cell.setCellStyle(strStyle);
+			
+			cell = row.createCell(row.getLastCellNum());
+			cell.setCellValue(mo.getMember().getMemberType().getName());
+			cell.setCellStyle(strStyle);
+			
+			cell = row.createCell(row.getLastCellNum());
+			cell.setCellValue(df.format(mo.getChargeMoney()));
+			cell.setCellStyle(numStyle);
+			
+			cell = row.createCell(row.getLastCellNum());
+			cell.setCellValue(df.format(mo.getDeltaTotalMoney()));
+			cell.setCellStyle(numStyle);
+			
+			cell = row.createCell(row.getLastCellNum());
+			cell.setCellValue(mo.getChargeType() == null ? "现金" : mo.getChargeType().getName());
+			cell.setCellStyle(strStyle);
+			
+			cell = row.createCell(row.getLastCellNum());
+			cell.setCellValue(mo.getStaffName());
+			cell.setCellStyle(strStyle);
+			
+			cell = row.createCell(row.getLastCellNum());
+			cell.setCellValue(mo.getOperateDateFormat());
+			cell.setCellStyle(strStyle);
+			
+			cell = row.createCell(row.getLastCellNum());
+			cell.setCellValue(mo.getOperationTypeText());
+			cell.setCellStyle(strStyle);
+		}
+		
+		OutputStream os = response.getOutputStream();
+		wb.write(os);
+		os.flush();
+		os.close();
+		
+		return null;
+	}
+	
+	public ActionForward consumeDetail(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws UnsupportedEncodingException, Exception, SQLException, BusinessException{
+		request.setCharacterEncoding("UTF-8");
+		response.setCharacterEncoding("UTF-8");
+		response.setContentType("application/vnd.ms-excel;");
+		
+		String pin = (String)request.getAttribute("pin");
+		Staff staff = StaffDao.verify(Integer.parseInt(pin));
+		
+		//String restaurantID = request.getParameter("restaurantID");
+		String dataSource = request.getParameter("dataSources");
+		String memberMobile = request.getParameter("memberMobile");
+		String memberCard = request.getParameter("memberCard");
+		String memberName = request.getParameter("memberName");
+		String memberType = request.getParameter("memberType");
+		String operateType = request.getParameter("operateType");
+		String onDuty = request.getParameter("onDuty");
+		String offDuty = request.getParameter("offDuty");
+		//String total = request.getParameter("total");
+		
+		List<MemberOperation> list = null;
+		String extraCond = null, orderClause = null;
+		extraCond = " AND MO.restaurant_id = " + staff.getRestaurantId();
+		
+		if(memberMobile != null && !memberMobile.trim().isEmpty()){
+			extraCond += (" AND MO.member_mobile like '%" + memberMobile.trim() + "%'");
+		}
+		if(memberCard != null && !memberCard.trim().isEmpty()){
+			extraCond += (" AND MO.member_card like '%" + memberCard.trim() + "%'");
+		}
+		if(memberName != null && !memberName.trim().isEmpty()){
+			extraCond += (" AND MO.member_name like '%" + memberName.trim() + "%'");
+		}
+		if(memberType != null && !memberType.trim().isEmpty()){
+			extraCond += (" AND M.member_type_id = " + memberType);
+		}
+		if(operateType != null && !operateType.trim().isEmpty() && Integer.valueOf(operateType) > 0){
+			List<OperationType> types = OperationType.typeOf(Integer.parseInt(operateType));
+			String extra = "";
+			for (int i = 0; i < types.size(); i++) {
+				if(i == 0){
+					extra += " MO.operate_type = " + types.get(i).getValue();
+				}else{
+					extra += " OR MO.operate_type = " + types.get(i).getValue();
+				}
+			}
+			if(Integer.parseInt(operateType) == OperationType.POINT_ADJUST.getType()){
+				extra += " OR MO.operate_type = " + OperationType.CONSUME.getValue();
+			}
+			extraCond += " AND(" + extra + ")";
+		}
+		
+		orderClause = " ORDER BY MO.operate_date ";
+		
+		Map<Object, Object> paramsSet = new HashMap<Object, Object>(), countSet = null;
+		countSet = new HashMap<Object, Object>();
+		if(dataSource.equalsIgnoreCase("today")){
+			countSet.put(SQLUtil.SQL_PARAMS_EXTRA, extraCond);
+			countSet.put(SQLUtil.SQL_PARAMS_ORDERBY, orderClause);
+		}else if(dataSource.equalsIgnoreCase("history")){
+			if(onDuty != null && !onDuty.trim().isEmpty() && offDuty != null && !offDuty.trim().isEmpty()){
+				extraCond += (" AND MO.operate_date >= '" + onDuty + "'");
+				extraCond += (" AND MO.operate_date <= '" + offDuty + "'");
+			}
+			countSet.put(SQLUtil.SQL_PARAMS_EXTRA, extraCond);
+			countSet.put(SQLUtil.SQL_PARAMS_ORDERBY, orderClause);
+		}
+		paramsSet.put(SQLUtil.SQL_PARAMS_EXTRA, extraCond);
+		paramsSet.put(SQLUtil.SQL_PARAMS_ORDERBY, orderClause);
+		
+		if(dataSource.equalsIgnoreCase("today")){
+			list = MemberOperationDao.getToday(paramsSet);
+		}else if(dataSource.equalsIgnoreCase("history")){
+			list = MemberOperationDao.getHistory(paramsSet);
+		}
+		MemberOperation sum = MemberOperation.newMO(-10, "", "", "");
+		if(list != null && !list.isEmpty()){
+			sum.setChargeType(list.get(0).getChargeType());
+			sum.setComment(list.get(0).getComment());
+			sum.setOperationType(list.get(0).getOperationType());
+			sum.setPayType(list.get(0).getPayType());
+			sum.setOperateSeq(list.get(0).getOperateSeq());
+			sum.setStaffName(list.get(0).getStaffName());
+			for(MemberOperation temp : list){
+				temp.setMember(MemberDao.getMemberById(staff, temp.getMemberId()));
+				
+				sum.setDeltaBaseMoney(temp.getDeltaBaseMoney() + sum.getDeltaBaseMoney());
+				sum.setDeltaExtraMoney(temp.getDeltaExtraMoney() + sum.getDeltaExtraMoney());
+				sum.setChargeMoney(temp.getChargeMoney() + sum.getChargeMoney());
+				sum.setPayMoney(temp.getPayMoney() + sum.getPayMoney());
+				sum.setDeltaPoint(temp.getDeltaPoint() + sum.getDeltaPoint());
+			}
+		}
+		
+		DecimalFormat df = new DecimalFormat("#.00");
+		String title = "会员消费明细表";
+		//标题
+		response.addHeader("Content-Disposition", "attachment;filename=" + new String( ("会员消费表明细.xls").getBytes("GBK"),  "ISO8859_1"));
+		HSSFWorkbook wb = new HSSFWorkbook();
+		HSSFSheet sheet = wb.createSheet(title);
+		HSSFRow row = null;
+		HSSFCell cell = null;
+		initParams(wb);
+		
+		sheet.setColumnWidth(0, 3800);
+		sheet.setColumnWidth(1, 6000);
+		sheet.setColumnWidth(2, 3300);
+		sheet.setColumnWidth(3, 4000);
+		sheet.setColumnWidth(4, 3000);
+		sheet.setColumnWidth(5, 3000);
+		sheet.setColumnWidth(6, 3000);
+		sheet.setColumnWidth(7, 6000);
+		
+		//冻结行
+		sheet.createFreezePane(0, 5, 0, 5);
+		
+		//报表头
+		row = sheet.createRow(0);
+		row.setHeight((short) 550);
+		
+		cell = row.createCell(0);
+		cell.setCellValue(title);
+		cell.setCellStyle(titleStyle);
+		
+		//合并单元格
+		sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, 7));
+		
+		row = sheet.createRow(sheet.getLastRowNum() + 1);
+		row.setHeight((short) 350);
+		
+		cell = row.createCell(0);
+		
+		String date;
+		if(dataSource.equals("today")){
+			date = "当日";
+		}else{
+			date = onDuty + "  至  " + offDuty;
+		}
+		cell.setCellValue("统计时间: " + date );
+		cell.setCellStyle(strStyle);
+		
+		sheet.addMergedRegion(new CellRangeAddress(sheet.getLastRowNum(), sheet.getLastRowNum(), 0, 7));
+		
+		row = sheet.createRow(sheet.getLastRowNum() + 1);
+		row.setHeight((short) 350);
+		
+		cell = row.createCell(0);
+		
+		cell.setCellValue("总金额: " + df.format(sum.getPayMoney()) + "         总积分 :" + sum.getDeltaPoint());
+		cell.setCellStyle(strStyle);
+		
+		sheet.addMergedRegion(new CellRangeAddress(sheet.getLastRowNum(), sheet.getLastRowNum(), 0, 7));
+		
+		//空白
+		row = sheet.createRow(sheet.getLastRowNum() + 1);
+		row.setHeight((short) 350);
+		sheet.addMergedRegion(new CellRangeAddress(sheet.getLastRowNum(), sheet.getLastRowNum(), 0, 7));
+		
+		//列头
+		row = sheet.createRow(sheet.getLastRowNum() + 1);
+		row.setHeight((short) 350);
+		
+		cell = row.createCell(0);
+		cell.setCellValue("单据号");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell(row.getLastCellNum());
+		cell.setCellValue("消费时间");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell(row.getLastCellNum());
+		cell.setCellValue("会员名称");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell(row.getLastCellNum());
+		cell.setCellValue("会员类型");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell(row.getLastCellNum());
+		cell.setCellValue("消费金额");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell(row.getLastCellNum());
+		cell.setCellValue("所得积分");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell(row.getLastCellNum());
+		cell.setCellValue("操作人");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell(row.getLastCellNum());
+		cell.setCellValue("备注");
+		cell.setCellStyle(headerStyle);
+		
+		for (MemberOperation mo : list) {
+			row = sheet.createRow(sheet.getLastRowNum() + 1);
+			row.setHeight((short) 350);
+			
+			cell = row.createCell(0);
+			cell.setCellValue(mo.getOrderId());
+			cell.setCellStyle(strStyle);
+			
+			cell = row.createCell(row.getLastCellNum());
+			cell.setCellValue(mo.getOperateDateFormat());
+			cell.setCellStyle(strStyle);
+			
+			cell = row.createCell(row.getLastCellNum());
+			cell.setCellValue(mo.getMemberName());
+			cell.setCellStyle(strStyle);
+			
+			cell = row.createCell(row.getLastCellNum());
+			cell.setCellValue(mo.getMember().getMemberType().getName());
+			cell.setCellStyle(strStyle);
+			
+			cell = row.createCell(row.getLastCellNum());
+			cell.setCellValue(df.format(mo.getPayMoney()));
+			cell.setCellStyle(numStyle);
+			
+			cell = row.createCell(row.getLastCellNum());
+			cell.setCellValue(df.format(mo.getDeltaPoint()));
+			cell.setCellStyle(numStyle);
+			
+			cell = row.createCell(row.getLastCellNum());
+			cell.setCellValue(mo.getStaffName());
+			cell.setCellStyle(strStyle);
+			
+			cell = row.createCell(row.getLastCellNum());
+			cell.setCellValue(mo.getComment());
+			cell.setCellStyle(strStyle);
+		}
+		
+		OutputStream os = response.getOutputStream();
+		wb.write(os);
+		os.flush();
+		os.close();
+		
+		return null;
+	}
+	
 	
 	public ActionForward cancelledFood(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws UnsupportedEncodingException, Exception, SQLException, BusinessException{
 		request.setCharacterEncoding("UTF-8");
@@ -1499,9 +1981,6 @@ public class HistoryStatisticsAction extends DispatchAction{
 		//冻结行
 		sheet.createFreezePane(0, 4, 0, 4);
 		
-		//合并单元格
-		sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, 8));
-
 		//报表头
 		row = sheet.createRow(0);
 		row.setHeight((short) 550);
@@ -1509,6 +1988,9 @@ public class HistoryStatisticsAction extends DispatchAction{
 		cell = row.createCell(0);
 		cell.setCellValue(title);
 		cell.setCellStyle(titleStyle);
+		
+		//合并单元格
+		sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, 8));
 		
 		row = sheet.createRow(sheet.getLastRowNum() + 1);
 		row.setHeight((short) 350);

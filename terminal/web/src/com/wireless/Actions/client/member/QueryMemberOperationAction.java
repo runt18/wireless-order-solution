@@ -123,7 +123,8 @@ public class QueryMemberOperationAction extends Action{
 				for(MemberOperation temp : list){
 					temp.setMember(MemberDao.getMemberById(staff, temp.getMemberId()));
 					
-					//sum.setDeltaTotalMoney(temp.getDeltaTotalMoney() + sum.getDeltaTotalMoney());
+					sum.setDeltaBaseMoney(temp.getDeltaBaseMoney() + sum.getDeltaBaseMoney());
+					sum.setDeltaExtraMoney(temp.getDeltaExtraMoney() + sum.getDeltaExtraMoney());
 					sum.setChargeMoney(temp.getChargeMoney() + sum.getChargeMoney());
 					sum.setPayMoney(temp.getPayMoney() + sum.getPayMoney());
 					sum.setDeltaPoint(temp.getDeltaPoint() + sum.getDeltaPoint());
