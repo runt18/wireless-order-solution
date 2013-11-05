@@ -73,7 +73,7 @@ public class QueryIncomeStatisticsDao {
 												  DateUtil.format(dateBegin, DateUtil.Pattern.DATE_TIME), 
 												  DateUtil.format(c.getTime(), DateUtil.Pattern.DATE_TIME));
 			
-			IncomeByEachDay income = new IncomeByEachDay(DateUtil.format(c.getTime(), DateUtil.Pattern.DATE));
+			IncomeByEachDay income = new IncomeByEachDay(DateUtil.format(dateBegin, DateUtil.Pattern.DATE));
 			
 			if(range != null){
 				

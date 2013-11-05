@@ -45,9 +45,9 @@ public class QueryDutyRange {
 					+ " restaurant_id = "
 					+ staff.getRestaurantId()
 					+ " AND "
-					+ " off_duty BETWEEN "
+					+ " off_duty >= "
 					+ "'" + onDuty + "'"
-					+ " AND "
+					+ " AND off_duty <= "
 					+ "'" + offDuty + "'"  
 					+ " GROUP BY restaurant_id ";
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
