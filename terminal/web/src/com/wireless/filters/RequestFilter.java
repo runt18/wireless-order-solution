@@ -12,11 +12,9 @@ import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.util.Encrypt;
 
 public class RequestFilter implements Filter{
@@ -66,7 +64,7 @@ public class RequestFilter implements Filter{
 			}
 			//-----------------------------------------------------------------------
 			
-			String isCookie = null;
+			//String isCookie = null;
 			Map<String, String> params = new HashMap<String, String>();
 			
 			if(request.getQueryString() != null && (requestPath.indexOf(".do") < 0) && (requestPath.indexOf(".jsp") < 0)){
@@ -87,11 +85,11 @@ public class RequestFilter implements Filter{
 				
 			}else{
 				//获取ajax参数
-				isCookie = request.getParameter("isCookie");
+				//isCookie = request.getParameter("isCookie");
 			}
 			
 			String pin = null;
-			Cookie c = null;
+/*			Cookie c = null;
 			Cookie comeFrom = null;
 			Cookie[] cookies = request.getCookies();
 			if(cookies != null){
@@ -103,39 +101,39 @@ public class RequestFilter implements Filter{
 					}
 					
 				}
-			}
+			}*/
 			
 			//是否用cookie
-			if(isCookie == null){
-				pin = (String) request.getSession().getAttribute("pin");
-				if(pin == null){
+			//if(isCookie == null){
+			pin = (String) request.getSession().getAttribute("pin");
+			if(pin == null){
 /*					if(c!=null){
 						c.setMaxAge(0);
 						response.addCookie(c);
 					}*/
-					if (request.getHeader("x-requested-with") != null && request.getHeader("x-requested-with").equalsIgnoreCase("XMLHttpRequest")) {  
-	                    response.setHeader("session_status", "timeout");
-	                    response.addHeader("root_path",	request.getContextPath());
-	                }else{
-	                	if(comeFrom != null){
-	                		response.sendRedirect(request.getContextPath() + Staff.RequestSource.valueOf(Integer.parseInt(comeFrom.getValue())).getRedirect()
-	                							  + "?" + Encrypt.strEncode("restaurantID="+params.get("restaurantID"), KEYS, null, null));
-	                	}
-	                	
-	                }
+				if (request.getHeader("x-requested-with") != null && request.getHeader("x-requested-with").equalsIgnoreCase("XMLHttpRequest")) {  
+                    response.setHeader("session_status", "timeout");
+                    response.addHeader("root_path",	request.getContextPath());
+                    chain.doFilter(request, response);
+                }else{
+/*                	if(comeFrom != null){
+                		response.sendRedirect(request.getContextPath() + Staff.RequestSource.valueOf(Integer.parseInt(comeFrom.getValue())).getRedirect()
+                							  + "?" + Encrypt.strEncode("restaurantID="+params.get("restaurantID"), KEYS, null, null));
+                	}*/
+                }
 
-				}else{
-					request.setAttribute("pin", pin);
-					chain.doFilter(request, response);
-				}
-				
 			}else{
+				request.setAttribute("pin", pin);
+				chain.doFilter(request, response);
+			}
+				
+/*			}else{
 				if(c != null){
 					pin = c.getValue();
 					request.setAttribute("pin", pin);
 				}
 				chain.doFilter(request, response);
-			}
+			}*/
 		}
 		
 	}
