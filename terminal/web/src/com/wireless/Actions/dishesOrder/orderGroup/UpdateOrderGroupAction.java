@@ -48,7 +48,7 @@ public class UpdateOrderGroupAction extends DispatchAction{
 		response.setCharacterEncoding("UTF-8");
 		JObject jobject = new JObject();
 		try{
-			String restaurantID = request.getParameter("restaurantID");
+			String restaurantID = (String)request.getAttribute("restaurantID");
 			String pin = (String)request.getAttribute("pin");
 			String rq = request.getParameter("tables");
 			String otype = request.getParameter("otype");

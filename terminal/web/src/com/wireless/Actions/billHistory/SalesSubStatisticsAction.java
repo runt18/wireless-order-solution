@@ -63,7 +63,7 @@ public class SalesSubStatisticsAction extends Action {
 			 * 
 			 */
 			String pin = (String)request.getAttribute("pin");
-			String restaurantId = request.getParameter("restaurantID");		
+			String restaurantId = (String)request.getAttribute("restaurantID");		
 			String dateBeg = request.getParameter("dateBeg");
 			String dateEnd = request.getParameter("dateEnd");
 			String orderType = request.getParameter("orderType");

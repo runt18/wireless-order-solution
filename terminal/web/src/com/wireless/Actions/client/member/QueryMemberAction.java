@@ -49,7 +49,7 @@ public class QueryMemberAction extends DispatchAction {
 			
 			String extraCond = " ", orderClause = " ";
 			String id = request.getParameter("id");
-			String restaurantID = request.getParameter("restaurantID");
+			String restaurantID = (String)request.getAttribute("restaurantID");
 			String memberType = request.getParameter("memberType");
 			String memberTypeAttr = request.getParameter("memberTypeAttr");
 			String name = request.getParameter("name");

@@ -2048,7 +2048,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 		
 		
 		for (CancelledFood cf : list) {
-			row = sheet.createRow(sheet.getLastRowNum());
+			row = sheet.createRow(sheet.getLastRowNum() + 1);
 			row.setHeight((short) 350);
 			
 			cell = row.createCell(0);

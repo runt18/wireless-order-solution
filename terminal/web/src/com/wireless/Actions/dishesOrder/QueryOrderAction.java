@@ -45,7 +45,7 @@ public class QueryOrderAction extends Action {
 			 */
 			String pin = (String)request.getAttribute("pin");
 			String queryType = request.getParameter("queryType");
-			String restaurantID = request.getParameter("restaurantID");
+			String restaurantID = (String)request.getAttribute("restaurantID");
 			String tid = request.getParameter("tableID");
 			String oid = request.getParameter("orderID");
 			String calc = request.getParameter("calc");

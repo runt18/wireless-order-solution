@@ -40,13 +40,14 @@ public class QueryMemberOperationAction extends Action{
 			String pin = (String)request.getAttribute("pin");
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
-			String restaurantID = request.getParameter("restaurantID");
+			String restaurantID = (String)request.getAttribute("restaurantID");
 			String dataSource = request.getParameter("dataSource");
 			String memberMobile = request.getParameter("memberMobile");
 			String memberCard = request.getParameter("memberCard");
 			String memberName = request.getParameter("memberName");
 			String memberType = request.getParameter("memberType");
 			String operateType = request.getParameter("operateType");
+			String detailOperate = request.getParameter("detailOperate");
 			String onDuty = request.getParameter("onDuty");
 			String offDuty = request.getParameter("offDuty");
 			String total = request.getParameter("total");
@@ -66,20 +67,25 @@ public class QueryMemberOperationAction extends Action{
 			if(memberType != null && !memberType.trim().isEmpty()){
 				extraCond += (" AND M.member_type_id = " + memberType);
 			}
-			if(operateType != null && !operateType.trim().isEmpty() && Integer.valueOf(operateType) > 0){
-				List<OperationType> types = OperationType.typeOf(Integer.parseInt(operateType));
-				String extra = "";
-				for (int i = 0; i < types.size(); i++) {
-					if(i == 0){
-						extra += " MO.operate_type = " + types.get(i).getValue();
-					}else{
-						extra += " OR MO.operate_type = " + types.get(i).getValue();
+
+			if(detailOperate != null && !detailOperate.trim().isEmpty() && Integer.valueOf(detailOperate) > 0){
+				extraCond += (" AND MO.operate_type = " + detailOperate);
+			}else{
+				if(operateType != null && !operateType.trim().isEmpty() && Integer.valueOf(operateType) > 0){
+					List<OperationType> types = OperationType.typeOf(Integer.parseInt(operateType));
+					String extra = "";
+					for (int i = 0; i < types.size(); i++) {
+						if(i == 0){
+							extra += " MO.operate_type = " + types.get(i).getValue();
+						}else{
+							extra += " OR MO.operate_type = " + types.get(i).getValue();
+						}
 					}
+					if(Integer.parseInt(operateType) == OperationType.POINT_ADJUST.getType()){
+						extra += " OR MO.operate_type = " + OperationType.CONSUME.getValue();
+					}
+					extraCond += " AND(" + extra + ")";
 				}
-				if(Integer.parseInt(operateType) == OperationType.POINT_ADJUST.getType()){
-					extra += " OR MO.operate_type = " + OperationType.CONSUME.getValue();
-				}
-				extraCond += " AND(" + extra + ")";
 			}
 			
 			orderClause = " ORDER BY MO.operate_date ";

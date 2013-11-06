@@ -24,7 +24,7 @@ public class QuerySystemSettingAction extends Action{
 		SystemSetting set = null;
 		try{
 			
-			String restaurantID = request.getParameter("restaurantID");
+			String restaurantID = (String) request.getAttribute("restaurantID");
 			if(restaurantID == null || restaurantID.trim().length() == 0){
 				jobject.initTip(false, "操作失败,获取餐厅编号失败!");
 				return null;

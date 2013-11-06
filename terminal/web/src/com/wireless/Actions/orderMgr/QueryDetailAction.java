@@ -40,7 +40,7 @@ public class QueryDetailAction extends Action {
 			StaffDao.verify(Integer.parseInt(pin));
 			
 			String orderID = request.getParameter("orderID");
-			String restaurantID = request.getParameter("restaurantID");
+			String restaurantID = (String)request.getAttribute("restaurantID");
 			String talias = request.getParameter("tableAlias");
 			String queryType = request.getParameter("queryType");
 			

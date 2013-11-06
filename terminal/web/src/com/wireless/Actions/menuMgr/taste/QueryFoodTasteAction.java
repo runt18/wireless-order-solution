@@ -23,7 +23,7 @@ public class QueryFoodTasteAction extends Action{
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
 		String foodID = request.getParameter("foodID");
-		String restaurantID = request.getParameter("restaurantID");
+		String restaurantID = (String)request.getAttribute("restaurantID");
 		JObject jobject = new JObject();
 		List<FoodTaste> list = null;
 		

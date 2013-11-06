@@ -37,7 +37,7 @@ public class QueryDiscountPlanAction extends Action{
 			String pin = (String)request.getAttribute("pin");
 			StaffDao.verify(Integer.parseInt(pin));
 			
-			String restaurantID = request.getParameter("restaurantID");
+			String restaurantID = (String)request.getAttribute("restaurantID");
 			String discountID = request.getParameter("discountID");
 			String kitchenName = request.getParameter("kitchenName");
 			String extraCond = "";

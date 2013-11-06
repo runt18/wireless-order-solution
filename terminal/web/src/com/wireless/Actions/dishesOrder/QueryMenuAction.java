@@ -35,8 +35,7 @@ public class QueryMenuAction extends DispatchAction {
 		String start = request.getParameter("start");
 		String limit = request.getParameter("limit");
 		try {
-			
-			String restaurantID = request.getParameter("restaurantID");
+			String restaurantID = (String)request.getAttribute("restaurantID");
 			String cond = null;
 			String orderBy = null;
 			
@@ -99,7 +98,7 @@ public class QueryMenuAction extends DispatchAction {
 		String limit = request.getParameter("limit");
 		
 		try{
-			String restaurantID = request.getParameter("restaurantID");
+			String restaurantID = (String)request.getAttribute("restaurantID");
 			try{
 				Integer.parseInt(restaurantID);
 			}catch(NumberFormatException e){
@@ -139,7 +138,7 @@ public class QueryMenuAction extends DispatchAction {
 		String limit = request.getParameter("limit");
 		
 		try{
-			String restaurantID = request.getParameter("restaurantID");
+			String restaurantID = (String)request.getAttribute("restaurantID");
 			String cond = "";
 			try{
 				Integer.parseInt(restaurantID);
@@ -186,7 +185,7 @@ public class QueryMenuAction extends DispatchAction {
 		String limit = request.getParameter("limit");
 		
 		try{
-			String restaurantID = request.getParameter("restaurantID");
+			String restaurantID = (String)request.getAttribute("restaurantID");
 			try{
 				Integer.parseInt(restaurantID);
 			}catch(NumberFormatException e){

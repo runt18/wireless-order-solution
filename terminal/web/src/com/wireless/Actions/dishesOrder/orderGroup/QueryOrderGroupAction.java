@@ -39,7 +39,7 @@ public class QueryOrderGroupAction extends Action{
 		Order item = null;
 		try{
 			String pin = (String)request.getAttribute("pin");
-			String restaurantID = request.getParameter("restaurantID");
+			String restaurantID = (String)request.getAttribute("restaurantID");
 			String queryType = request.getParameter("queryType");
 			String orderID = request.getParameter("orderID");
 			String childTableAliasID = request.getParameter("childTableAliasID");

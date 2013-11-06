@@ -52,6 +52,7 @@ public class OperateStaffAction extends Action{
 				pin = staff.getId()+"";
 				HttpSession session = request.getSession();
 				session.setAttribute("pin", pin);
+				session.setAttribute("restaurantID", staff.getRestaurantId()+"");
 				
 				Cookie cPin = new Cookie("pin", pin);
 				Cookie cFrom = new Cookie("comeFrom", comeFrom);

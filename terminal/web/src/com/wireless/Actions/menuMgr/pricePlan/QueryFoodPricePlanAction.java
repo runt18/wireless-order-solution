@@ -44,7 +44,7 @@ public class QueryFoodPricePlanAction extends Action {
 			
 			String extra = "", orderBy = null;
 			orderBy = " ORDER BY B.food_alias ";
-			String restaurantID = request.getParameter("restaurantID");
+			String restaurantID = (String)request.getAttribute("restaurantID");
 			String searchType = request.getParameter("searchType");
 			String searchOperator = request.getParameter("searchOperator");
 			String searchValue = request.getParameter("searchValue");

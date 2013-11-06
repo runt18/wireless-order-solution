@@ -21,7 +21,7 @@ public class QueryDeptTreeAction extends Action{
 		
 		StringBuffer jsonSB = new StringBuffer();
 		try{
-			String restaurantID = request.getParameter("restaurantID");
+			String restaurantID = (String)request.getAttribute("restaurantID");
 			if(restaurantID == null){
 				return null;
 			}

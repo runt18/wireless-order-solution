@@ -128,6 +128,7 @@ public class RequestFilter implements Filter{
 
 			}else{
 				request.setAttribute("pin", pin);
+				request.setAttribute("restaurantID", (String) request.getSession().getAttribute("restaurantID"));
 				chain.doFilter(request, response);
 			}
 				
