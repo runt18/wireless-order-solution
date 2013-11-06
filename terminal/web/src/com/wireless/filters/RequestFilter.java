@@ -110,17 +110,21 @@ public class RequestFilter implements Filter{
 /*					if(c!=null){
 						c.setMaxAge(0);
 						response.addCookie(c);
+				
 					}*/
 				if (request.getHeader("x-requested-with") != null && request.getHeader("x-requested-with").equalsIgnoreCase("XMLHttpRequest")) {  
                     response.setHeader("session_status", "timeout");
                     response.addHeader("root_path",	request.getContextPath());
-                    chain.doFilter(request, response);
-                }else{
-/*                	if(comeFrom != null){
-                		response.sendRedirect(request.getContextPath() + Staff.RequestSource.valueOf(Integer.parseInt(comeFrom.getValue())).getRedirect()
-                							  + "?" + Encrypt.strEncode("restaurantID="+params.get("restaurantID"), KEYS, null, null));
-                	}*/
+                    if(requestPath.indexOf("QueryStaff.do") > 0){
+                    	chain.doFilter(request, response);
+                    }
                 }
+//				else{
+//                	if(comeFrom != null){
+//                		response.sendRedirect(request.getContextPath() + Staff.RequestSource.valueOf(Integer.parseInt(comeFrom.getValue())).getRedirect()
+//                							  + "?" + Encrypt.strEncode("restaurantID="+params.get("restaurantID"), KEYS, null, null));
+//                	}
+//                }
 
 			}else{
 				request.setAttribute("pin", pin);
