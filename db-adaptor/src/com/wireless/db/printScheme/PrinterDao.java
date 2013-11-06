@@ -213,7 +213,7 @@ public class PrinterDao {
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return getPrinters(dbCon, staff, " ORDER BY enabled DESC");
+			return getPrinters(dbCon, staff, " ORDER BY enabled DESC, CONVERT(`name` USING GBK) ASC");
 		}finally{
 			dbCon.disconnect();
 		}
