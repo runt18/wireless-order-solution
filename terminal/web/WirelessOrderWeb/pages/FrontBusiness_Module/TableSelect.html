@@ -24,6 +24,7 @@
 	<script type="text/javascript" src="../../js/components/functionLib.js"></script>
 	
 	<link rel="stylesheet" type="text/css" href="../../css/header.css" />
+	<link rel="stylesheet" type="text/css" href="../../css/systemSetting.css" />
 	<link rel="stylesheet" type="text/css" href="../../css/tableList.css" />
 	<link rel="stylesheet" type="text/css" href="../../css/tableStatus.css" />
 	
@@ -57,6 +58,17 @@
 		var selectedStatus = null;
 		
 		var ts_controlMemberWin, ts_queryMemberOperationWin, memberPointConsumeWin;
+		
+		
+		var shiftStartTiem = "";
+		var shiftEndTiem = "";
+
+		var emplData = [];
+		var emplComboData = [];
+		
+		var shiftCheckDate = {};
+		
+		var omsg = '';
 	</script>
 	
 	<script type="text/javascript"
@@ -114,6 +126,260 @@
 			style="float: left; cursor: pointer;" onClick="switchTableStatus(0)" />
 		<div id="freeTblDivTS" class="tableStatusChar">000</div>
 	</div>
+	
+	
+<!------------------- shift ------------------------>
+<!-- 	<div id="shiftDiv">
+		<table border="1" id="shiftContent">
+			<tr>
+				<td id="shiftTitleCheck">交班对帐单</td>
+			</tr>
+			<tr>
+				<td>
+					<table>
+						<tr>
+							<td><table>
+									<tr>
+										<td style="width: 23px" />
+										<td class="shiftInfo">交班人：</td>
+										<td id="shiftOperator">fuck</td>
+										<td style="width: 120px" />
+										<td class="shiftInfo">帐单数：</td>
+										<td id="shiftBillCount">888</td>
+									</tr>
+								</table></td>
+
+						</tr>
+						<tr>
+							<td><table>
+									<tr>
+										<td style="width: 23px; height: 30px" />
+										<td class="shiftInfo">开始时间：</td>
+										<td id="shiftStartTime">2011-07-11 8:04:04</td>
+									</tr>
+									<tr>
+										<td style="width: 23px; height: 30px" />
+										<td class="shiftInfo">结束时间：</td>
+										<td id="shiftEndTime">2011-07-11 12:14:33</td>
+									</tr>
+								</table>
+							</td>
+						</tr>
+					</table></td>
+			</tr>
+			<tr>
+				<td><table>
+						<tr>
+							<td style="width: 27px; height: 30px" />
+							<td style="width: 140px" class="shiftInfo">收款方式</td>
+							<td style="width: 140px" class="shiftInfo">金额</td>
+							<td style="width: 140px" class="shiftInfo">实收</td>
+						</tr>
+						<tr>
+							<td style="width: 27px; height: 30px" />
+							<td class="shiftInfo">现金</td>
+							<td id="amount1">1243.43</td>
+							<td id="actual1">1243</td>
+						</tr>
+						<tr>
+							<td style="width: 27px; height: 30px" />
+							<td class="shiftInfo">刷卡</td>
+							<td id="amount2">1243.43</td>
+							<td id="actual2">1243</td>
+						</tr>
+						<tr>
+							<td style="width: 27px; height: 30px" />
+							<td class="shiftInfo">会员卡</td>
+							<td id="amount3">1243.43</td>
+							<td id="actual3">1243</td>
+						</tr>
+						<tr>
+							<td style="width: 27px; height: 30px" />
+							<td class="shiftInfo">签单</td>
+							<td id="amount4">1243.43</td>
+							<td id="actual4">1243</td>
+						</tr>
+						<tr>
+							<td style="width: 27px; height: 30px" />
+							<td class="shiftInfo">挂账</td>
+							<td id="amount5">1243.43</td>
+							<td id="actual5">1243</td>
+						</tr>
+					</table>
+				</td>
+			</tr>
+			<tr>
+				<td><table>
+						<tr>
+							<td style="width: 27px; height: 30px" />
+							<td style="width: 60px" class="shiftInfo">实收：</td>
+							<td style="width: 70px" id="payAmt">210</td>
+							<td style="width: 60px" class="shiftInfo">赠送：</td>
+							<td style="width: 70px" id="freeAmt">210</td>
+							<td style="width: 60px" class="shiftInfo">折扣：</td>
+							<td style="width: 70px" id="discountAmt">210</td>
+						</tr>
+					</table>
+				</td>
+			</tr>
+		</table>
+	</div>
+-->
+	<div id="unShiftBillWarnDiv">
+		<div style="font-size: 21px;" id="unShiftBillWarnMsg"></div>
+	</div>
+	
+	<div id="shiftCheckTableDiv">
+		<table border="1" id="shiftContentCheck">
+			<tr>
+				<td id="shiftTitle">日结表</td>
+			</tr>
+			<tr>
+				<td>
+					<table>
+						<tr>
+							<td>
+								<table>
+									<tr>
+										<td style="width: 15px" />
+										<td class="shiftInfo">交班人：</td>
+										<td id="shiftOperatorCheck">----</td>
+										<td style="width: 120px" />
+										<td class="shiftInfo">帐单总数：</td>
+										<td id="shiftBillCountCheck">8888</td>
+									</tr>
+								</table>
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<table>
+									<tr>
+										<td style="width: 15px; height: 20px" />
+										<td class="shiftInfo">开始时间：</td>
+										<td id="shiftStartTimeCheck">2000-01-01 00:00:00</td>
+									</tr>
+									<tr>
+										<td style="height: 20px" />
+										<td class="shiftInfo">结束时间：</td>
+										<td id="shiftEndTimeCheck">2000-01-01 00:00:00</td>
+									</tr>
+								</table>
+							</td>
+						</tr>
+					</table>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<table>
+						<tr>
+							<td style="width: 30px; height: 20px" />
+							<td style="width: 140px;" class="shiftInfo">收款方式</td>
+							<td style="width: 140px; text-align:right;" class="shiftInfo">账单数</td>
+							<td style="width: 140px; text-align:right;" class="shiftInfo">金额</td>
+							<td style="width: 140px; text-align:right;" class="shiftInfo">实收</td>
+						</tr>
+						<tr>
+							<td style="height: 20px" />
+							<td class="shiftInfo">现金</td>
+							<td style="text-align:right;" id="billCount1Check">8888</td>
+							<td style="text-align:right;" id="amount1Check">8888.88</td>
+							<td style="text-align:right;" id="actual1Check">8888.88</td>
+						</tr>
+						<tr>
+							<td style="height: 20px" />
+							<td class="shiftInfo">刷卡</td>
+							<td style="text-align:right;" id="billCount2Check">8888</td>
+							<td style="text-align:right;" id="amount2Check">8888.88</td>
+							<td style="text-align:right;" id="actual2Check">8888.88</td>
+						</tr>
+						<tr>
+							<td style="height: 20px" />
+							<td class="shiftInfo">会员卡</td>
+							<td style="text-align:right;" id="billCount3Check">8888</td>
+							<td style="text-align:right;" id="amount3Check">8888.88</td>
+							<td style="text-align:right;" id="actual3Check">8888.88</td>
+						</tr>
+						<tr>
+							<td style="height: 20px" />
+							<td class="shiftInfo">签单</td>
+							<td style="text-align:right;" id="billCount4Check">8888</td>
+							<td style="text-align:right;" id="amount4Check">8888.88</td>
+							<td style="text-align:right;" id="actual4Check">8888.88</td>
+						</tr>
+						<tr>
+							<td style="height: 20px" />
+							<td class="shiftInfo">挂账</td>
+							<td style="text-align:right;" id="billCount5Check">8888</td>
+							<td style="text-align:right;" id="amount5Check">8888.88</td>
+							<td style="text-align:right;" id="actual5Check">8888.88</td>
+						</tr>
+						<tr>
+							<td style="height: 20px" />
+							<td class="shiftInfo">合计：</td>
+							<td style="text-align:right;" id="billCountSumCheck">8888</td>
+							<td style="text-align:right;" id="amountSumCheck">8888.88</td>
+							<td style="text-align:right;" id="actualSumCheck">8888.88</td>
+						</tr>
+					</table>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<table>
+						<tr>
+							<td style="width: 20px; height: 20px" />
+							<td style="width: 120px;" class="shiftInfo">抹数金额：</td>
+							<td style="width: 70px; text-align:right;" id="eraseAmountCheck">8888.88</td>
+							<td style="width: 20px; height: 20px" />
+							<td style="width: 120px;" class="shiftInfo">抹数账单数：</td>
+							<td style="width: 70px; text-align:right;" id="eraseIncomeCheck">8888</td>
+						</tr>
+						<tr>
+							<td style="width: 20px; height: 20px" />
+							<td style="width: 120px;" class="shiftInfo">折扣金额：</td>
+							<td style="width: 70px; text-align:right;" id="discountAmountCheck">8888.88</td>
+							<td style="width: 20px; height: 20px" />
+							<td style="width: 120px;" class="shiftInfo">折扣账单数：</td>
+							<td style="width: 70px; text-align:right;" id="discountBillCountCheck">8888</td>
+						</tr>
+						<tr>
+							<td style="height: 20px" />
+							<td class="shiftInfo">赠送金额：</td>
+							<td style="text-align:right;" id="giftAmountCheck">8888.88</td>
+							<td style="width: 20px;" />
+							<td class="shiftInfo">赠送账单数：</td>
+							<td style="text-align:right;" id="giftBillCountCheck">8888</td>
+						</tr>
+						<tr>
+							<td style="height: 20px" />
+							<td class="shiftInfo">退菜金额：</td>
+							<td style="text-align:right;" id="returnAmountCheck">8888.88</td>
+							<td style="width: 20px;" />
+							<td class="shiftInfo">退菜账单数：</td>
+							<td style="text-align:right;" id="returnBillCountCheck">8888</td>
+						</tr>
+						<tr>
+							<td style="height: 20px" />
+							<td class="shiftInfo">反结帐金额：</td>
+							<td style="text-align:right;" id="repayAmountCheck">8888.88</td>
+							<td style="width: 20px;" />
+							<td class="shiftInfo">反结帐账单数：</td>
+							<td style="text-align:right;" id="repayBillCountCheck">8888</td>
+						</tr>
+						<tr>
+							<td style="height: 20px" />
+							<td class="shiftInfo">服务费收入：</td>
+							<td style="text-align:right;" id="serviceAmountCheck">8888</td>
+						</tr>
+					</table>
+				</td>
+			</tr>
+		</table>
+	</div> 
+	
+	
 	
 </body>
 </html>
