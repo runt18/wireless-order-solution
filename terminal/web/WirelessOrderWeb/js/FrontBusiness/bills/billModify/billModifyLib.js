@@ -318,7 +318,7 @@ function submitOrderHandler(_c){
 											width : 300,
 											buttons : Ext.MessageBox.OK,
 											fn : function() {
-												location.href = "Bills.html?"+ strEncode('restaurantID=' + restaurantID, 'mi');
+												location.href = "Bills.html";
 											}
 										});
 									},
@@ -328,7 +328,7 @@ function submitOrderHandler(_c){
 									}
 								});
 							} else {
-								location.href = "Bills.html?"+ strEncode('restaurantID=' + restaurantID, 'mi');
+								location.href = "Bills.html";
 							}
 						}
 					});

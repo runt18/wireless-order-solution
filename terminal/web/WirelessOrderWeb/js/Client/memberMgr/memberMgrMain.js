@@ -303,7 +303,7 @@ function queryMemberOperationHandler(title, url, params){
 			modal : true,
 			closable : false,
 			resizable : false,
-			width : 1100,
+			width : 1200,
 			height : 500,
 			keys : [{
 				key : Ext.EventObject.ESC,
@@ -340,7 +340,9 @@ function queryMemberOperationHandler(title, url, params){
  * 会员操作汇总
  */
 function queryMemberOperationSummaryHandler(){
-	var mr_queryMemberConsumeSummaryWin = Ext.getCmp('mr_queryMemberConsumeSummaryWin');
+	var title = '会员操作明细';
+	queryMemberOperationHandler(title, '../window/client/memberOperation.jsp', {modal : true});
+	/*var mr_queryMemberConsumeSummaryWin = Ext.getCmp('mr_queryMemberConsumeSummaryWin');
 	if(!mr_queryMemberConsumeSummaryWin){
 		mr_queryMemberConsumeSummaryWin = new Ext.Window({
 			id : 'mr_queryMemberConsumeSummaryWin',
@@ -383,7 +385,7 @@ function queryMemberOperationSummaryHandler(){
 			}
 		});
 	}
-	mr_queryMemberConsumeSummaryWin.show();
+	mr_queryMemberConsumeSummaryWin.show();*/
 };
 /**
  * 
@@ -1063,7 +1065,7 @@ var btnConsumeSummary = new Ext.ux.ImageButton({
 	imgPath : '../../images/btnConsumeSummary.png',
 	imgWidth : 50,
 	imgHeight : 50,
-	tooltip : '消费汇总',
+	tooltip : '操作明细',
 	handler : function(e){
 		queryMemberOperationSummaryHandler();
 	}

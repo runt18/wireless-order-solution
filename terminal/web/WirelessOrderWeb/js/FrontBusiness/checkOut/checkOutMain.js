@@ -179,7 +179,7 @@ var checkOutForm = new Ext.form.FormPanel({
 		disabled : true,
 		handler : function() {
 			//var Request = new URLParaQuery();
-			location.href = 'TableSelect.html?'+ strEncode('restaurantID=' + restaurantID, "mi");
+			location.href = 'TableSelect.html';
 		}
 	}],
 	listeners : {

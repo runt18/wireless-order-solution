@@ -24,7 +24,7 @@ var pushBackBut = new Ext.ux.ImageButton({
 	imgHeight : 50,
 	tooltip : '返回',
 	handler : function(btn) {
-		location.href = 'FrontBusinessProtal.html?'+ strEncode('restaurantID=' + restaurantID, 'mi');
+		location.href = 'TableSelect.html';
 	}
 });
 
@@ -760,8 +760,7 @@ Ext.onReady(function(){
 			{
 				xtype:'tbtext',
 				text:'&nbsp;&nbsp;&nbsp;'
-			}, 
-			logOutBut 
+			}
 			]
 		})
 	});

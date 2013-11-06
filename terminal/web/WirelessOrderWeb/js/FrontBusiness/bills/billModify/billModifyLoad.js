@@ -88,7 +88,7 @@ orderedGrid.buttons = [new Ext.Button({
 	},
 	handler : function() {
 		if (orderIsChanged == false) {
-			location.href = "Bills.html?"+ strEncode('restaurantID=' + restaurantID, 'mi');
+			location.href = "Bills.html";
 		} else {
 			Ext.MessageBox.show({
 				msg : "账单修改还未提交，是否确认返回？",
@@ -96,7 +96,7 @@ orderedGrid.buttons = [new Ext.Button({
 				buttons : Ext.MessageBox.YESNO,
 				fn : function(btn) {
 					if (btn == "yes") {
-						location.href = "Bills.html?"+ strEncode('restaurantID=' + restaurantID, 'mi');
+						location.href = "Bills.html";
 					}
 				}
 			});

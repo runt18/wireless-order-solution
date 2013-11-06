@@ -131,7 +131,7 @@ var paySubmit = function(submitType) {
 									text : '确&nbsp;&nbsp;定',
 									handler : function(e){
 										if (submitType != 6) {
-											location.href = "TableSelect.html?"+ strEncode('restaurantID=' + restaurantID, 'mi');
+											location.href = "TableSelect.html";
 										}
 									},
 									listeners : {
@@ -145,7 +145,7 @@ var paySubmit = function(submitType) {
 										new Ext.util.TaskRunner().start({
 											run: function(){
 												if(interval < 1){
-													location.href = "TableSelect.html?"+ strEncode('restaurantID=' + restaurantID, 'mi');
+													location.href = "TableSelect.html";
 												}
 												Ext.getDom('returnInterval').innerHTML = interval;
 												interval--;
@@ -305,7 +305,7 @@ function memberPay(){
 											text : '确&nbsp;&nbsp;定',
 											width : 200,
 											handler : function(e){
-												location.href = "TableSelect.html?"+ strEncode('restaurantID=' + restaurantID, 'mi');
+												location.href = "TableSelect.html";
 											}
 										}],
 										listeners : {
@@ -313,7 +313,7 @@ function memberPay(){
 												new Ext.util.TaskRunner().start({
 													run: function(){
 														if(interval < 1){
-															location.href = "TableSelect.html?"+ strEncode('restaurantID=' + restaurantID, 'mi');
+															location.href = "TableSelect.html";
 														}
 														Ext.getDom('returnInterval').innerHTML = interval;
 														interval--;

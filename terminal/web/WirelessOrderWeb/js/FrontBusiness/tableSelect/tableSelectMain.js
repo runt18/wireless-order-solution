@@ -1,4 +1,5 @@
-﻿var dishesOrderImgBut = new Ext.ux.ImageButton({
+﻿
+var dishesOrderImgBut = new Ext.ux.ImageButton({
 	imgPath : "../../images/InsertOrder.png",
 	imgWidth : 50,
 	imgHeight : 50,
@@ -9,43 +10,43 @@
 			for ( var i = 0; i < tableStatusListTSDisplay.length; i++) {
 				temp = tableStatusListTSDisplay[i];
 				if (temp.alias == selectedTable) {
-					if (temp.statusValue == TABLE_BUSY) {
-						location.href = "OrderMain.html?" + strEncode('restaurantID=' + restaurantID
-								+ "&tableAliasID=" + temp.alias
-								+ "&ts=1" 
-								+ "&personCount=" + temp.customNum
-								+ "&category=" + temp.categoryValue
-								, 'mi');
-					} else if (temp.statusValue == TABLE_IDLE) {
-						location.href = "OrderMain.html?" + strEncode('restaurantID=' + restaurantID
-								+ "&ts=0"
-								+ "&tableAliasID=" + selectedTable
-								+ "&category=" + CATE_NORMAL
-								, 'mi');
-					}
-					
-/*					verifyStaff('../../', '1000', function(res){
-						if(res.success){
-							if (temp.statusValue == TABLE_BUSY) {
-								location.href = "OrderMain.html?" + strEncode('restaurantID=' + restaurantID
-										+ "&tableAliasID=" + temp.alias
-										+ "&ts=1" 
-										+ "&personCount=" + temp.customNum
-										+ "&category=" + temp.categoryValue
-										, 'mi');
-							} else if (temp.statusValue == TABLE_IDLE) {
-								location.href = "OrderMain.html?" + strEncode('restaurantID=' + restaurantID
-										+ "&ts=0"
-										+ "&tableAliasID=" + selectedTable
-										+ "&category=" + CATE_NORMAL
-										, 'mi');
+					var lm = new Ext.LoadMask(document.body, {
+						msg : '正在验证权限, 请稍等......'
+					});
+					lm.show();
+					Ext.Ajax.request({
+						url : "../../VerifyStaff.do",
+						params : {
+							isCookie : true,
+							code : 1000
+						},
+						success : function(res, opt){
+							var jr = Ext.decode(res.responseText);
+							if(jr.success){
+								if (temp.statusValue == TABLE_BUSY) {
+									location.href = "OrderMain.html?" + strEncode('restaurantID=' + restaurantID
+											+ "&tableAliasID=" + temp.alias
+											+ "&ts=1" 
+											+ "&personCount=" + temp.customNum
+											+ "&category=" + temp.categoryValue
+											, 'mi');
+								} else if (temp.statusValue == TABLE_IDLE) {
+									location.href = "OrderMain.html?" + strEncode('restaurantID=' + restaurantID
+											+ "&ts=0"
+											+ "&tableAliasID=" + selectedTable
+											+ "&category=" + CATE_NORMAL
+											, 'mi');
+								}
+							}else{
+								lm.hide();
+								jr['icon'] = Ext.MessageBox.WARNING;
+								Ext.ux.showMsg(jr);
 							}
-						}else{
-							lm.hide();
-							res['icon'] = Ext.MessageBox.WARNING;
-							Ext.ux.showMsg(res);
+						},
+						failure : function(res, opt){
+							Ext.ux.showMsg(Ext.decode(res.responseText));
 						}
-					});*/
+					});
 					break;
 				}
 			}
@@ -203,7 +204,122 @@ var btnPayOrderGroup = new Ext.ux.ImageButton({
 		});
 	}
 });
-		
+
+var shiftBut = new Ext.ux.ImageButton({
+	imgPath : "../../images/shift.png",
+	imgWidth : 50,
+	imgHeight : 50,
+	tooltip : "交班",
+	handler : function(btn) {
+		Ext.Ajax.request({
+			url : '../../QueryDailySettleByNow.do',
+			params : {
+				isCookie : true,
+				queryType : 0
+			},
+			success : function(res, opt){
+				var jr = Ext.util.JSON.decode(res.responseText);
+				if(jr.success){
+					shiftCheckDate = jr;
+					shiftCheckDate.otype = 0;
+					dailySettleCheckTableWin.show();
+					dailySettleCheckTableWin.center();
+				}else{
+					Ext.Msg.show({
+						title : '错误',
+						msg : '加载交班信息失败.'
+					});
+				}
+			},
+			failure : function(res, opt){
+				Ext.Msg.show({
+					title : '错误',
+					msg : '加载交班信息失败.'
+				});
+			}
+		});
+	}
+});
+
+var dailySettleBut = new Ext.ux.ImageButton({
+	imgPath : "../../images/dailySettle.png",
+	imgWidth : 50,
+	imgHeight : 50,
+	tooltip : "日结",
+	handler : function(btn) {
+			Ext.Ajax.request({
+				url : '../../QueryDailySettleByNow.do',
+				params : {
+					isCookie : true,
+					queryType : 1
+				},
+				success : function(res, opt){
+					var jr = Ext.util.JSON.decode(res.responseText);
+					if(jr.success){
+						shiftCheckDate = jr;
+						shiftCheckDate.otype = 1;
+						dailySettleCheckTableWin.show();
+						dailySettleCheckTableWin.center();
+					}else{
+						Ext.Msg.show({
+							title : '错误',
+							msg : '加载日结信息失败.'
+						});
+					}
+				},
+				failure : function(res, opt){
+					Ext.Msg.show({
+						title : '错误',
+						msg : '加载日结信息失败.'
+					});
+				}
+			});
+	}
+});
+
+var billsBut = new Ext.ux.ImageButton({
+	imgPath : "../../images/bill.png",
+	imgWidth : 50,
+	imgHeight : 50,
+	tooltip : "账单",
+	handler : function(btn) {
+		location.href = "Bills.html";
+/*		var front_billsWin = Ext.getCmp('front_billsWin');
+		if(!front_billsWin){
+			front_billsWin = new Ext.Window({
+				id : 'front_billsWin',
+				title : '当日账单管理',
+				closable : false,
+				modal : true,
+				resizable : false,
+				width : 1080,
+				//height : 350,
+				listeners : {
+					hide : function(thiz){
+						thiz.body.update('');
+					},
+					show : function(thiz){
+						thiz.center();
+						thiz.load({
+							url : 'Bills.html',
+							scripts : true
+						});
+					}
+				},
+				bbar : ['->',{
+					text : '关闭',
+					iconCls : 'btn_close',
+					handler : function(e){
+						front_billsWin.hide();
+					}
+				}]
+			});
+		}
+		front_billsWin.show();*/
+	}
+});
+
+
 var selTabContentGrid = null;
 var selTabContentWin = null;
 var btnOrderDetail = new Ext.ux.ImageButton({
@@ -362,7 +478,7 @@ var btnMemberRecharge = new Ext.ux.ImageButton({
 				closable : false,
 				modal : true,
 				resizable : false,
-				width : 650,
+				width : 680,
 				height : 350,
 				listeners : {
 					hide : function(thiz){
@@ -671,23 +787,21 @@ var btnMemberPointConsume = new Ext.ux.ImageButton({
 	}
 });
 
-
-var pushBackBut = new Ext.ux.ImageButton({
-	imgPath : "../../images/UserLogout.png",
-	imgWidth : 50,
-	imgHeight : 50,
-	tooltip : "返回",
-	handler : function(btn) {
-		location.href = "FrontBusinessProtal.html?"+ strEncode('restaurantID=' + restaurantID, 'mi');
-	}
-});
-
 var logOutBut = new Ext.ux.ImageButton({
 	imgPath : "../../images/ResLogout.png",
 	imgWidth : 50,
 	imgHeight : 50,
 	tooltip : "登出",
 	handler : function(btn) {
+		Ext.Ajax.request({
+			url : '../../LoginOut.do',
+			success : function(){
+				location.href = '../Login.html';
+			},
+			failure : function(){
+				
+			}
+		});
 	}
 });	
 
@@ -696,7 +810,377 @@ getIsPaidDisplay = function(_val){
 };
 
 var regionTree, dishPushBackWin, tableChangeWin;
+
+//-------------------交班, 日结-----------
+
+doDailySettle = function() {
+	Ext.Ajax.request({
+		url : "../../DailySettleExec.do",
+		params : {
+			isCookie : true
+		},
+		success : function(response, options) {
+			var resultJSON = Ext.util.JSON.decode(response.responseText);
+			if (eval(resultJSON.success == true)) {
+				omsg = resultJSON.msg;
+				Ext.getCmp('btnRiJieDaYin').handler(null);
+			} else {
+				Ext.ux.showMsg(resultJSON);
+			}
+		},
+		failure : function(response, options) {
+			Ext.MessageBox.show({
+				msg : " Unknown page error ",
+				width : 300,
+				buttons : Ext.MessageBox.OK
+			});
+		}
+	});
+};
+var unShiftBillWarnWin = new Ext.Window({
+	layout : "fit",
+	width : 300,
+	height : 200,
+	closeAction : "hide",
+	resizable : false,
+	closable : false,
+	items : [ {
+		border : false,
+		frame : true,
+		contentEl : "unShiftBillWarnDiv"
+	} ],
+	buttonAlign : 'center',
+	buttons : [ {
+		text : "确定",
+		handler : function() {
+			unShiftBillWarnWin.hide();
+			
+			
+			doDailySettle();
+		}
+	}, {
+		text : "取消",
+		handler : function() {
+			unShiftBillWarnWin.hide();
+			
+		}
+	} ]
+});
+var dailySettleCheckDetpGrid = new Ext.grid.GridPanel({
+	layout : "fit",
+	ds : new Ext.data.JsonStore({
+		fields : ['deptName', 'deptDiscount', 'deptGift', 'deptAmount']
+	}),
+	cm : new Ext.grid.ColumnModel([
+	    new Ext.grid.RowNumberer(), 
+	    {
+	    	header : "部门",
+	        dataIndex : "deptName",
+	        width : 100
+	    }, {
+	    	header : "折扣",
+	    	dataIndex : "deptDiscount",
+	    	width : 100,
+	    	align : 'right',
+	    	renderer : function(val){
+	    		return val.toFixed(2);
+	        }
+	    }, {
+	    	header : "赠送",
+	    	dataIndex : "deptGift",
+	        width : 100,
+	        align : 'right',
+	        renderer : function(val){
+	            return val.toFixed(2);
+	        }
+	    }, {
+	    	header : "金额",
+	    	dataIndex : "deptAmount",
+	    	width : 100,
+	    	align : 'right',
+	    	renderer : function(val){
+	    		return val.toFixed(2);
+	        }
+	    } 
+	]),
+	viewConfig : {
+		forceFit : true
+	}
+});
+var dailySettleCheckDetpPanel = new Ext.Panel({
+	region : "center",
+	layout : "fit",
+	frame : true,
+	items : dailySettleCheckDetpGrid
+});
+
+var dailySettleCheckTablePanel = new Ext.Panel({
+	frame : true,
+	region : "north",
+	height : 440,
+	items : [ {
+		border : false,
+		contentEl : "shiftCheckTableDiv"
+	} ]
+});
+
+
+var dailySettleCheckTableWin = new Ext.Window({
+	layout : "border",
+	width : 450,
+	height : 600,
+	closeAction : "hide",
+	resizable : false,
+	closable : false,
+	modal : true,
+	items : [ dailySettleCheckTablePanel, dailySettleCheckDetpPanel ],
+	buttonAlign : 'center',
+	buttons : [{
+		text : "交班",
+		id : 'btnJiaoBan',
+		handler : function() {
+			Ext.MessageBox.show({
+				msg : "确认进行交班？",
+				width : 300,
+				buttons : Ext.MessageBox.YESNO,
+				fn : function(btn){
+					if(btn == "yes"){
+						Ext.Ajax.request({
+							url : "../../DoShift.do",
+							params : {
+								isCookie : true,
+								onDuty : shiftCheckDate.onDuty,
+								offDuty : shiftCheckDate.offDuty
+							},
+							success : function(response, options) {
+								var resultJSON = Ext.util.JSON.decode(response.responseText);
+								if (resultJSON.success == true) {
+									omsg = resultJSON.data;
+									Ext.getCmp('btnJiaoBanDaYin').handler(null);
+								} else {
+									Ext.MessageBox.show({
+										msg : resultJSON.data,
+										width : 300,
+										buttons : Ext.MessageBox.OK
+									});
+								}
+							},
+							failure : function(response, options) {
+								var resultJSON = Ext.util.JSON.decode(response.responseText);
+								Ext.MessageBox.show({
+									msg : resultJSON.data,
+									width : 300,
+									buttons : Ext.MessageBox.OK
+								});
+							}
+						});
+					}
+				}
+			});
+			
+		}
+	}, {
+		text : '打印',
+		id : 'btnJiaoBanDaYin',
+		handler : function(e){
+			var tempMask = new Ext.LoadMask(document.body, {
+				msg : '正在打印请稍候.......',
+				remove : true
+			});
+			tempMask.show();
+			Ext.Ajax.request({
+				url : "../../PrintOrder.do",
+				params : {
+					onDuty : shiftCheckDate.onDuty,
+					offDuty : shiftCheckDate.offDuty,
+					isCookie : true,
+					'printType' : e == null ? 4 : 5
+				},
+				success : function(response, options) {
+					tempMask.hide();
+					var resultJSON = Ext.util.JSON.decode(response.responseText);
+					Ext.example.msg('提示', (resultJSON.msg + (omsg.length > 0 ? ('<br/>'+omsg) : '')));
+					if(omsg.length > 0)
+						dailySettleCheckTableWin.hide();
+					omsg = '';
+				},
+				failure : function(response, options) {
+					tempMask.hide();
+					Ext.ux.showMsg(Ext.decode(response.responseText));
+				}
+			});
+		}
+	}, {
+		text : "日结",
+		id : 'btnRiJie',
+		handler : function() {
+			Ext.MessageBox.show({
+				msg : "确认进行日结？",
+				width : 300,
+				buttons : Ext.MessageBox.YESNO,
+				fn : function(btn) {
+					if (btn == "yes") {
+						dailySettleCheckTableWin.hide();
+						
+						// 未交班帳單檢查
+						Ext.Ajax.request({
+							url : "../../DailySettleCheck.do",
+							params : {
+								isCookie : true
+							},
+							success : function(response, options) {
+								var resultJSON = Ext.util.JSON.decode(response.responseText);
+								if (eval(resultJSON.success == true)) {
+									doDailySettle();
+								} else {
+									document.getElementById("unShiftBillWarnMsg").innerHTML = resultJSON.msg;
+									unShiftBillWarnWin.show();
+								}
+							},
+							failure : function(response, options) {
+								Ext.MessageBox.show({
+									msg : " Unknown page error ",
+									width : 300,
+									buttons : Ext.MessageBox.OK
+								});
+							}
+						});
+					}
+				}
+			});
+		}
+	}, {
+		text : '打印',
+		id : 'btnRiJieDaYin',
+		handler : function(e){
+			var tempMask = new Ext.LoadMask(document.body, {
+				msg : '正在打印请稍候.......',
+				remove : true
+			});
+			tempMask.show();
+			Ext.Ajax.request({
+				url : "../../PrintOrder.do",
+				params : {
+					isCookie : true,
+					onDuty : shiftCheckDate.onDuty,
+					offDuty : shiftCheckDate.offDuty,
+					'printType' : e == null ? 6 : 5
+				},
+				success : function(response, options) {
+					tempMask.hide();
+					var jr = Ext.util.JSON.decode(response.responseText);
+					Ext.example.msg('提示', (jr.msg + (omsg.length > 0 ? ('<br/>'+omsg) : '')));
+					if(omsg.length > 0)
+						dailySettleCheckTableWin.hide();
+					omsg = '';
+				},
+				failure : function(response, options) {
+					tempMask.hide();
+					Ext.ux.showMsg(Ext.decode(response.responseText));
+				}
+			});
+		}
+	}, {
+		text : "关闭",
+		handler : function(){
+			dailySettleCheckTableWin.hide();
+		}
+	}],
+	listeners : {
+		show : function(thiz){
+			var btnJiaoBan = Ext.getCmp('btnJiaoBan');
+			var btnJiaoBanDaYin = Ext.getCmp('btnJiaoBanDaYin');
+			var btnRiJie = Ext.getCmp('btnRiJie');
+			var btnRiJieDaYin = Ext.getCmp('btnRiJieDaYin');
+			if(shiftCheckDate.otype == 0){
+				Ext.getDom('shiftTitle').innerHTML = '交班表';
+				btnJiaoBan.setVisible(true);
+				btnJiaoBanDaYin.setVisible(true);
+				btnRiJie.setVisible(false);
+				btnRiJieDaYin.setVisible(false);
+			}else if(shiftCheckDate.otype == 1){
+				Ext.getDom('shiftTitle').innerHTML = '日结表';
+				btnJiaoBan.setVisible(false);
+				btnJiaoBanDaYin.setVisible(false);
+				btnRiJie.setVisible(true);
+				btnRiJieDaYin.setVisible(true);
+			}else{
+				thiz.hide();
+				return;
+			}
+			
+			Ext.getDom('shiftOperatorCheck').innerHTML = Ext.getDom('optName').innerHTML;
+			Ext.getDom('shiftBillCountCheck').innerHTML = shiftCheckDate.allBillCount;
+			Ext.getDom('shiftStartTimeCheck').innerHTML = shiftCheckDate.onDuty;
+			Ext.getDom('shiftEndTimeCheck').innerHTML = shiftCheckDate.offDuty;
+			
+			Ext.getDom('billCount1Check').innerHTML = shiftCheckDate.cashBillCount;
+			Ext.getDom('amount1Check').innerHTML = shiftCheckDate.cashAmount.toFixed(2);
+			Ext.getDom('actual1Check').innerHTML = shiftCheckDate.cashActual.toFixed(2);
+			
+			Ext.getDom('billCount2Check').innerHTML = shiftCheckDate.creditBillCount;
+			Ext.getDom('amount2Check').innerHTML = shiftCheckDate.creditAmount.toFixed(2);
+			Ext.getDom('actual2Check').innerHTML = shiftCheckDate.creditActual.toFixed(2);
+			
+			Ext.getDom('billCount3Check').innerHTML = shiftCheckDate.memberBillCount;
+			Ext.getDom('amount3Check').innerHTML = shiftCheckDate.memberAmount.toFixed(2);
+			Ext.getDom('actual3Check').innerHTML = shiftCheckDate.memberActual.toFixed(2);
+			
+			Ext.getDom('billCount4Check').innerHTML = shiftCheckDate.signBillCount;
+			Ext.getDom('amount4Check').innerHTML = shiftCheckDate.signAmount.toFixed(2);
+			Ext.getDom('actual4Check').innerHTML = shiftCheckDate.signActual.toFixed(2);
+			
+			Ext.getDom('billCount5Check').innerHTML = shiftCheckDate.hangBillCount;
+			Ext.getDom('amount5Check').innerHTML = shiftCheckDate.hangAmount.toFixed(2);
+			Ext.getDom('actual5Check').innerHTML = shiftCheckDate.hangActual.toFixed(2);
+			
+			Ext.getDom('billCountSumCheck').innerHTML = shiftCheckDate.allBillCount;
+			Ext.getDom('amountSumCheck').innerHTML = (shiftCheckDate.cashAmount 
+														+ shiftCheckDate.creditAmount
+														+ shiftCheckDate.memberAmount
+														+ shiftCheckDate.signAmount+
+														+ shiftCheckDate.hangAmount).toFixed(2);
+			Ext.getDom('actualSumCheck').innerHTML = (shiftCheckDate.cashActual
+														+ shiftCheckDate.creditActual
+														+ shiftCheckDate.memberActual
+														+ shiftCheckDate.signActual
+														+ shiftCheckDate.hangActual).toFixed(2);
+			
+			Ext.getDom('eraseAmountCheck').innerHTML = shiftCheckDate.eraseAmount.toFixed(2);
+			Ext.getDom('eraseIncomeCheck').innerHTML = shiftCheckDate.eraseBillCount;
+			
+			Ext.getDom('discountAmountCheck').innerHTML = shiftCheckDate.discountAmount.toFixed(2);
+			Ext.getDom('discountBillCountCheck').innerHTML = shiftCheckDate.discountBillCount;
+			
+			Ext.getDom('giftAmountCheck').innerHTML = shiftCheckDate.discountAmount.toFixed(2);
+			Ext.getDom('giftBillCountCheck').innerHTML = shiftCheckDate.discountBillCount;
+			
+			Ext.getDom('giftAmountCheck').innerHTML = shiftCheckDate.giftAmount.toFixed(2);
+			Ext.getDom('giftBillCountCheck').innerHTML = shiftCheckDate.giftBillCount;
+			
+			Ext.getDom('returnAmountCheck').innerHTML = shiftCheckDate.returnAmount.toFixed(2);
+			Ext.getDom('returnBillCountCheck').innerHTML = shiftCheckDate.returnBillCount;
+			
+			Ext.getDom('repayAmountCheck').innerHTML = shiftCheckDate.repayAmount.toFixed(2);
+			Ext.getDom('repayBillCountCheck').innerHTML = shiftCheckDate.repayBillCount;
+			
+			Ext.getDom('serviceAmountCheck').innerHTML = shiftCheckDate.serviceAmount.toFixed(2);
+			
+			dailySettleCheckDetpGrid.getStore().loadData(shiftCheckDate.deptInfos);
+		}
+	}
+});
+
+//-----------------------------------
+
+
+
+
+
 Ext.onReady(function() {
+	getOperatorName('../../', function(staff){
+    	//restaurantID = staff.restaurantId;
+    });
 	tableChangeWin = new Ext.Window({
 		title : '转台',
 		layout : "fit",
@@ -1246,8 +1730,8 @@ Ext.onReady(function() {
 			{text : "&nbsp;&nbsp;&nbsp;", xtype : 'tbtext'}, 
 			checkOutImgBut, 
 			{text : "&nbsp;&nbsp;&nbsp;", xtype : 'tbtext'}, 
-//			orderDeleteImgBut, 
-//			{text : "&nbsp;&nbsp;&nbsp;", xtype : 'tbtext'}, 
+			orderDeleteImgBut, 
+			{text : "&nbsp;&nbsp;&nbsp;", xtype : 'tbtext'}, 
 			tableChangeImgBut, 
 			{text : "&nbsp;&nbsp;&nbsp;", xtype : 'tbtext'}, 
 			tableSepImgBut, 
@@ -1263,9 +1747,13 @@ Ext.onReady(function() {
 			btnQueryConsumeDetail,
 			{text : "&nbsp;&nbsp;&nbsp;", xtype : 'tbtext' },			
 			btnMemberPointConsume,
+			{text : "&nbsp;&nbsp;&nbsp;", xtype : 'tbtext' },			
+			shiftBut,
+			{text : "&nbsp;&nbsp;&nbsp;", xtype : 'tbtext' },			
+			dailySettleBut,
+			{text : "&nbsp;&nbsp;&nbsp;", xtype : 'tbtext' },			
+			billsBut,
 			"->",
-			pushBackBut, 
-			{text : "&nbsp;&nbsp;&nbsp;", xtype : 'tbtext' }, 
 			logOutBut ]
 		}),
 		layout : "border",
@@ -1273,5 +1761,5 @@ Ext.onReady(function() {
 	});
 
 	initMainView(null, centerTabPanel, null);
-	getOperatorName("../../");
+	//getOperatorName("../../");
 });

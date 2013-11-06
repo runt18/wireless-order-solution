@@ -133,7 +133,7 @@ if(!changePwdWin){
 								}
 							});
 						} else {
-							Ext.example.msg('提示', '操作失败, 两次密码已一致, 请重新输入.');
+							Ext.example.msg('提示', '操作失败, 两次密码不一致, 请重新输入.');
 						}
 					} else {
 						Ext.example.msg('提示', '操作失败, 原密码不正确, 请重新输入.');

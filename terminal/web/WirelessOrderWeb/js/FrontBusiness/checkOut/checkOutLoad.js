@@ -355,7 +355,6 @@ function refreshCheckOutData(_c){
 			
 			loadTableGroupData(_c);
 		}else{
-			alert('4w');
 			loadTableData(_c);
 		}
 	}else{

@@ -19,7 +19,7 @@ function cdd_remainingPointRenderer(v, md, r, ri, ci, store){
 }
 function cdd_deltaTotalMoneyRenderer(v, md, r, ri, ci, store){
 	if(v == 1 || v == 2 || v == 5 || v== 6){
-		if(v == 2 && r.get('member')['memberType']['attributeValue'] == 1){
+		if(v == 2){
 			return '--';
 		}else{
 			var deltaTotalMoney = parseInt(r.get('deltaTotalMoney'));
@@ -34,7 +34,7 @@ function cdd_deltaTotalMoneyRenderer(v, md, r, ri, ci, store){
 	}
 }
 function cdd_remainingTotalMoneyRenderer(v, md, r, ri, ci, store){
-	if(v == 1 || v == 2 || v == 5 || v == 6){
+	if(v == 1 || v == 2 || v == 6){
 		if(v == 2 && r.get('member')['memberType']['attributeValue'] == 1){
 			return '--';
 		}else{
@@ -296,6 +296,11 @@ Ext.onReady(function(){
 			});
 		}
 
+	});
+	cdd_mo_grid.getStore().on('load', function(thiz){
+		if(thiz.getCount() > 0 && cdd_search_memerbMobile.getValue() != ''){
+			Ext.getCmp('mr_queryMemberOperationWin').setTitle('会员操作明细 --> ' + thiz.getAt(0).get('member').name);
+		}
 	});
 	cdd_panelMemberOperationContent = new Ext.Panel({
 		renderTo : 'divMemberOperationContent',

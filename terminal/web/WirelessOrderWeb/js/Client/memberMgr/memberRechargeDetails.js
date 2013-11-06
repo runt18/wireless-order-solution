@@ -1,5 +1,5 @@
 var mrd_mo_grid, mrd_panelMemberOperationContent;
-var mrd_search_comboOperateType, mrd_search_memberType, mrd_search_memerbMobile, mrd_search_memerbCard
+var mrd_search_comboOperateType, mrd_search_memberType, mrd_search_comboOperateType, mrd_search_memerbMobile, mrd_search_memerbCard
 	,mrd_search_onDuty, mrd_search_offDuty, mrd_search_memberName;
 var mrd_modal = true;
 Ext.onReady(function(){
@@ -7,7 +7,7 @@ Ext.onReady(function(){
 	var mw = parseInt(pe.style.width);
 	var mh = parseInt(pe.style.height);
 	
-/*	mrd_search_comboOperateType = new Ext.form.ComboBox({
+	mrd_search_comboOperateType = new Ext.form.ComboBox({
 		xtype : 'combo',
 		id : 'mrd_search_comboOperateType',
 		readOnly : true,
@@ -16,7 +16,7 @@ Ext.onReady(function(){
 		value : -1,
 		store : new Ext.data.SimpleStore({
 			fields : ['value', 'text'],
-			data : [[-1, '全部'], [1, '充值'], [2, '消费'], [3, '积分消费'], [4, '积分调整'], [5, '金额调整']]
+			data : [[-1, '全部'], [1, '充值'], [6, '取款']]
 		}),
 		valueField : 'value',
 		displayField : 'text',
@@ -30,7 +30,7 @@ Ext.onReady(function(){
 				mrd_searchMemberOperation();
 			}
 		}
-	});*/
+	});
 	mrd_search_memberType = new Ext.form.ComboBox({
 		id : 'mrd_search_memberType',
 		width : 90,
@@ -155,14 +155,15 @@ Ext.onReady(function(){
 			xtype : 'tbtext',
 			text : (mrd_modal ? '&nbsp;至&nbsp;' : ' ')
 		}, mrd_search_offDuty, 
-/*		{
-			xtype : 'tbtext',
-			text : '&nbsp;&nbsp;操作类型:'
-		}, mrd_search_comboOperateType,*/ 
 		{
 			xtype : 'tbtext',
 			text : '&nbsp;&nbsp;会员类型:'
-		}, mrd_search_memberType, {
+		}, mrd_search_memberType,
+		{
+			xtype : 'tbtext',
+			text : '&nbsp;&nbsp;操作类型:'
+		}, mrd_search_comboOperateType, 
+		{
 			xtype : 'tbtext',
 			text : '&nbsp;&nbsp;手机号码:'
 		}, mrd_search_memerbMobile,{
@@ -178,7 +179,7 @@ Ext.onReady(function(){
 			text : '重置',
 			iconCls : 'btn_refresh',
 			handler : function(e){
-				//mrd_search_comboOperateType.setValue(-1);
+				mrd_search_comboOperateType.setValue(-1);
 				mrd_search_memberType.setValue(-1);
 				mrd_search_memerbMobile.setValue();
 				mrd_search_memberName.setValue();
@@ -317,7 +318,6 @@ function mrd_searchMemberOperation(){
 		offDuty = mrd_search_offDuty.getValue().format('Y-m-d 23:59:59');
 	}
 	var memberType = mrd_search_memberType.getRawValue() != '' ? mrd_search_memberType.getValue() : '';
-	//var operateType = mrd_search_comboOperateType.getRawValue() != '' ? mrd_search_comboOperateType.getValue() : '';
 	
 	var gs = mrd_mo_grid.getStore();
 	gs.baseParams['dataSource'] = dataSource;
@@ -325,6 +325,7 @@ function mrd_searchMemberOperation(){
 	gs.baseParams['memberMobile'] = mrd_search_memerbMobile.getValue();
 	gs.baseParams['memberName'] = mrd_search_memberName.getValue();
 	gs.baseParams['operateType'] = 2;
+	gs.baseParams['detailOperate'] = mrd_search_comboOperateType.getRawValue() != '' ? mrd_search_comboOperateType.getValue() : '';
 	gs.baseParams['onDuty'] = onDuty;
 	gs.baseParams['offDuty'] = offDuty;
 	gs.baseParams['total'] = true;

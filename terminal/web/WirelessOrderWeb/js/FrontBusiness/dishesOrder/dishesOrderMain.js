@@ -5,7 +5,7 @@
 	tooltip : "返回",
 	handler : function(btn) {
 		if (orderIsChanged == false) {
-			location.href = 'TableSelect.html?'+ strEncode('restaurantID=' + restaurantID, 'mi');
+			location.href = 'TableSelect.html';
 		} else {
 			Ext.MessageBox.show({
 				msg : '下/改单还未提交，是否确认退出？',
@@ -13,7 +13,7 @@
 				buttons : Ext.MessageBox.YESNO,
 				fn : function(btn) {
 					if (btn == 'yes') {
-						location.href = 'TableSelect.html?'+ strEncode('restaurantID=' + restaurantID, 'mi');
+						location.href = 'TableSelect.html';
 					}
 				}
 			});
@@ -665,7 +665,7 @@ var orderPanel = new Ext.Panel({
 		text : '提交',
 		handler : function() {
 			submitOrderHandler({
-				href : 'TableSelect.html?'+ strEncode('restaurantID=' + restaurantID, "mi")
+				href : 'TableSelect.html'
 			});
 		}
 	}, {
@@ -691,7 +691,7 @@ var orderPanel = new Ext.Panel({
 		text : '返回',
 		handler : function() {
 			if (orderIsChanged == false) {
-				location.href = 'TableSelect.html?'+ strEncode('restaurantID=' + restaurantID, 'mi');
+				location.href = 'TableSelect.html';
 			} else {
 				Ext.MessageBox.show({
 					msg : '下/改单还未提交，是否确认退出？',
@@ -699,7 +699,7 @@ var orderPanel = new Ext.Panel({
 					buttons : Ext.MessageBox.YESNO,
 					fn : function(btn) {
 						if (btn == 'yes') {
-							location.href = 'TableSelect.html?'+ strEncode('restaurantID=' + restaurantID, 'mi');
+							location.href = 'TableSelect.html';
 						}
 					}
 				});

@@ -261,24 +261,36 @@ function tableListReflash(node) {
 				temp = tableStatusListTSDisplay[i];
 				if (temp.alias == selectedTable) {
 					if (temp.statusValue == TABLE_IDLE) {
-						location.href = "OrderMain.html?"+ strEncode('restaurantID=' + restaurantID
-								+ "&ts=0"
-								+ "&tableAliasID=" + selectedTable
-								+ "&category=" + CATE_NORMAL
-								, 'mi');
-/*						verifyStaff('../../', '1000', function(res){
-							if(res.success){
-								location.href = "OrderMain.html?"+ strEncode('restaurantID=' + restaurantID
-										+ "&ts=0"
-										+ "&tableAliasID=" + selectedTable
-										+ "&category=" + CATE_NORMAL
-										, 'mi');
-							}else{
-								lm.hide();
-								res['icon'] = Ext.MessageBox.WARNING;
-								Ext.ux.showMsg(res);
+						var lm = new Ext.LoadMask(document.body, {
+							msg : '正在验证权限, 请稍等......'
+						});
+						lm.show();
+						
+						Ext.Ajax.request({
+							url : "../../VerifyStaff.do",
+							params : {
+								isCookie : true,
+								code : 1000
+							},
+							success : function(res, opt){
+								var jr = Ext.decode(res.responseText);
+								if(jr.success){
+									location.href = "OrderMain.html?"+ strEncode('restaurantID=' + restaurantID
+											+ "&ts=0"
+											+ "&tableAliasID=" + selectedTable
+											+ "&category=" + CATE_NORMAL
+											, 'mi');
+								}else{
+									lm.hide();
+									jr['icon'] = Ext.MessageBox.WARNING;
+									Ext.ux.showMsg(jr);
+								}
+							},
+							failure : function(res, opt){
+								Ext.ux.showMsg(Ext.decode(res.responseText));
 							}
-						});*/
+						});
+
 					} else {
 						location.href = "CheckOut.html?"+ strEncode('restaurantID=' + restaurantID+ "&tableID=" + selectedTable, 'mi');
 					}

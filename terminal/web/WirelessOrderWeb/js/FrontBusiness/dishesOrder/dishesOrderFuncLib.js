@@ -691,7 +691,7 @@ function refreshOrderHandler(){
  * 根据返回做错误码作相关操作
  */
 function refreshOrder(res){
-	var href = 'TableSelect.html?'+ strEncode('restaurantID=' + restaurantID, "mi");
+	var href = 'TableSelect.html';
 	if(eval(res.code == 14)){
 		Ext.MessageBox.confirm('警告', '账单信息已更新,是否刷新已点菜并继续操作?否则返回.', function(btn){
 			if(btn == 'yes'){
@@ -720,7 +720,7 @@ function refreshOrder(res){
 			buttons : Ext.MessageBox.OK,
 			fn : function(){
 				if(submitType != 6){
-					location.href = "TableSelect.html?"+ strEncode('restaurantID=' + restaurantID, 'mi');
+					location.href = "TableSelect.html";
 				}
 			}
 		});
