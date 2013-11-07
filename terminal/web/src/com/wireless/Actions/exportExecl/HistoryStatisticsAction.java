@@ -1430,6 +1430,18 @@ public class HistoryStatisticsAction extends DispatchAction{
 		return null;
 		
 	}
+	/**
+	 * 充值明细
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws UnsupportedEncodingException
+	 * @throws Exception
+	 * @throws SQLException
+	 * @throws BusinessException
+	 */
 	public ActionForward rechargeDetail(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws UnsupportedEncodingException, Exception, SQLException, BusinessException{
 		request.setCharacterEncoding("UTF-8");
 		response.setCharacterEncoding("UTF-8");
@@ -1447,6 +1459,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 		String operateType = request.getParameter("operateType");
 		String onDuty = request.getParameter("onDuty");
 		String offDuty = request.getParameter("offDuty");
+		String detailOperate = request.getParameter("detailOperate");
 		//String total = request.getParameter("total");
 		
 		List<MemberOperation> list = null;
@@ -1465,22 +1478,25 @@ public class HistoryStatisticsAction extends DispatchAction{
 		if(memberType != null && !memberType.trim().isEmpty()){
 			extraCond += (" AND M.member_type_id = " + memberType);
 		}
-		if(operateType != null && !operateType.trim().isEmpty() && Integer.valueOf(operateType) > 0){
-			List<OperationType> types = OperationType.typeOf(Integer.parseInt(operateType));
-			String extra = "";
-			for (int i = 0; i < types.size(); i++) {
-				if(i == 0){
-					extra += " MO.operate_type = " + types.get(i).getValue();
-				}else{
-					extra += " OR MO.operate_type = " + types.get(i).getValue();
+		if(detailOperate != null && !detailOperate.trim().isEmpty() && Integer.valueOf(detailOperate) > 0){
+			extraCond += (" AND MO.operate_type = " + detailOperate);
+		}else{
+			if(operateType != null && !operateType.trim().isEmpty() && Integer.valueOf(operateType) > 0){
+				List<OperationType> types = OperationType.typeOf(Integer.parseInt(operateType));
+				String extra = "";
+				for (int i = 0; i < types.size(); i++) {
+					if(i == 0){
+						extra += " MO.operate_type = " + types.get(i).getValue();
+					}else{
+						extra += " OR MO.operate_type = " + types.get(i).getValue();
+					}
 				}
+				if(Integer.parseInt(operateType) == OperationType.POINT_ADJUST.getType()){
+					extra += " OR MO.operate_type = " + OperationType.CONSUME.getValue();
+				}
+				extraCond += " AND(" + extra + ")";
 			}
-			if(Integer.parseInt(operateType) == OperationType.POINT_ADJUST.getType()){
-				extra += " OR MO.operate_type = " + OperationType.CONSUME.getValue();
-			}
-			extraCond += " AND(" + extra + ")";
 		}
-		
 		orderClause = " ORDER BY MO.operate_date ";
 		
 		Map<Object, Object> paramsSet = new HashMap<Object, Object>(), countSet = null;
@@ -1668,6 +1684,18 @@ public class HistoryStatisticsAction extends DispatchAction{
 		return null;
 	}
 	
+	/**
+	 * 消费明细
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws UnsupportedEncodingException
+	 * @throws Exception
+	 * @throws SQLException
+	 * @throws BusinessException
+	 */
 	public ActionForward consumeDetail(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws UnsupportedEncodingException, Exception, SQLException, BusinessException{
 		request.setCharacterEncoding("UTF-8");
 		response.setCharacterEncoding("UTF-8");
