@@ -161,8 +161,9 @@ function showOrder(){
 function showDescForUpdateOrder(){
 	var html="";
 	html="<div>" +
-	"<span style='margin-left: 500px;'>总数量：" + uoFood.length + "</span>" +
-	"<span style='margin-left: 50px;'>合计：</span>" + "<span id='spanTotalPriceUO'></span>" +	
+	"<span style='margin-left: 300px;'>当前折扣：<font style='color:red;'>" + uo.order.discount.name + "</font></span>" +
+	"<span style='margin-left: 100px;'>总数量：<font style='color:red;'>" + uoFood.length + "</font></span>" +
+	"<span style='margin-left: 50px;'>合计：</span>" + "<span id='spanTotalPriceUO' style='color:red;'></span>" +	
 	"</div>";
 	$("#divDescForUpdateOrder").html(html);
 	$("#spanTotalPriceUO").html(uo.getTotalPriceUO().toFixed(2));

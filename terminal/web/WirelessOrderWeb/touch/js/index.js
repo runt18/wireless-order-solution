@@ -310,7 +310,7 @@ $(function(){
 					loginSuccessCallback();
 				}else{	
 					initStaffContent();
-					window.clearInterval();
+//					window.clearInterval();
 				}
 			},
 			error : function(request, status, error){
