@@ -67,6 +67,8 @@ public class QueryStaffAction extends Action {
 			}
 			if(isName != null){
 				other.put("staff", staff);
+				Restaurant restaurant = RestaurantDao.getById(Integer.parseInt((String) request.getSession().getAttribute("restaurantID")));
+				other.put("restaurant", restaurant);
 			}else {
 				if(name != null && !name.trim().isEmpty()){
 					staffList = StaffDao.getStaffsByName(staff, name);
@@ -75,16 +77,13 @@ public class QueryStaffAction extends Action {
 				}else{
 					staffList = StaffDao.getStaffs(Integer.parseInt(restaurantID));
 				}
-				
 				Restaurant restaurant = RestaurantDao.getById(Integer.parseInt(restaurantID));
 				other.put("restaurant", restaurant);
 				jobject.setTotalProperty(staffList.size());
 				staffList = DataPaging.getPagingData(staffList, isPaging, index, pageSize);
 				jobject.setRoot(staffList);
-				jobject.setOther(other);
 			}
-			
-			
+
 			jobject.setMsg("normal");
 			
 

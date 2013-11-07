@@ -115,9 +115,6 @@ public class RequestFilter implements Filter{
 				if (request.getHeader("x-requested-with") != null && request.getHeader("x-requested-with").equalsIgnoreCase("XMLHttpRequest")) {  
                     response.setHeader("session_status", "timeout");
                     response.addHeader("root_path",	request.getContextPath());
-                    if(requestPath.indexOf("QueryStaff.do") > 0){
-                    	chain.doFilter(request, response);
-                    }
                 }
 //				else{
 //                	if(comeFrom != null){

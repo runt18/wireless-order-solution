@@ -26,18 +26,20 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
-import com.wireless.db.billStatistics.BusinessStatisticsDao;
 import com.wireless.db.billStatistics.QueryCancelledFood;
+import com.wireless.db.billStatistics.QueryIncomeStatisticsDao;
 import com.wireless.db.billStatistics.QuerySaleDetails;
 import com.wireless.db.client.member.MemberDao;
 import com.wireless.db.client.member.MemberOperationDao;
+import com.wireless.db.shift.QueryShiftDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.stockMgr.StockActionDao;
 import com.wireless.exception.BusinessException;
-import com.wireless.pojo.billStatistics.BusinessStatistics;
-import com.wireless.pojo.billStatistics.BusinessStatisticsByDept;
 import com.wireless.pojo.billStatistics.DutyRange;
+import com.wireless.pojo.billStatistics.IncomeByDept;
+import com.wireless.pojo.billStatistics.IncomeByEachDay;
 import com.wireless.pojo.billStatistics.SalesDetail;
+import com.wireless.pojo.billStatistics.ShiftDetail;
 import com.wireless.pojo.client.MemberOperation;
 import com.wireless.pojo.client.MemberOperation.OperationType;
 import com.wireless.pojo.dishesOrder.CancelledFood;
@@ -668,7 +670,11 @@ public class HistoryStatisticsAction extends DispatchAction{
 		params.put("offDuty", offDuty);
 		
 		Staff staff = StaffDao.verify(Integer.parseInt(pin));
-		List<BusinessStatistics> root = BusinessStatisticsDao.getBusinessReceiptsStatisticsByHistory(params);
+		
+		List<IncomeByEachDay> incomesByEachDay = new ArrayList<IncomeByEachDay>();
+		incomesByEachDay.addAll(QueryIncomeStatisticsDao.getIncomeByEachDay(StaffDao.verify(Integer.parseInt(pin)), onDuty, offDuty));
+		
+		
 //		BusinessStatistics sum = new BusinessStatistics();
 		
 		// 创建execl主页
@@ -693,6 +699,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 		sheet.setColumnWidth(10, 3000);
 		sheet.setColumnWidth(11, 3000);
 		sheet.setColumnWidth(12, 3000);
+		sheet.setColumnWidth(13, 3000);
 		
 		// 报表头
 		sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, 12));
@@ -751,6 +758,10 @@ public class HistoryStatisticsAction extends DispatchAction{
 		cell.setCellStyle(headerStyle);
 		
 		cell = row.createCell(row.getLastCellNum());
+		cell.setCellValue("会员");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell(row.getLastCellNum());
 		cell.setCellValue("挂账");
 		cell.setCellStyle(headerStyle);
 		
@@ -778,23 +789,23 @@ public class HistoryStatisticsAction extends DispatchAction{
 		cell.setCellValue("反结账");
 		cell.setCellStyle(headerStyle);
 		
-		if(root != null && root.size() > 0){
-			for(BusinessStatistics item : root){
+		if(incomesByEachDay != null && incomesByEachDay.size() > 0){
+			for(IncomeByEachDay item : incomesByEachDay){
 				row = sheet.createRow(sheet.getLastRowNum() + 1);
 				row.setHeight((short) 350);
 				
 				// ***
 				cell = row.createCell(0);
-				cell.setCellValue(item.getOnDutyToDate());
+				cell.setCellValue(item.getDate());
 				cell.setCellStyle(strStyle);
 				
 				// ***
 				cell = row.createCell(row.getLastCellNum());
-				cell.setCellValue(item.getTotalPrice());
+				cell.setCellValue(item.getIncomeByPay().getTotalIncome());
 				cell.setCellStyle(numStyle);
 				
 				cell = row.createCell(row.getLastCellNum());
-				cell.setCellValue(item.getTotalPrice2());
+				cell.setCellValue(item.getIncomeByPay().getTotalActual());
 				cell.setCellStyle(numStyle);
 				
 				HSSFCellStyle ts = wb.createCellStyle();
@@ -803,43 +814,47 @@ public class HistoryStatisticsAction extends DispatchAction{
 				ts.setDataFormat(wb.createDataFormat().getFormat("0"));
 				
 				cell = row.createCell(row.getLastCellNum());
-				cell.setCellValue(item.getOrderAmount());
+				cell.setCellValue(item.getTotalAmount());
 				cell.setCellStyle(ts);
 				
 				cell = row.createCell(row.getLastCellNum());
-				cell.setCellValue(item.getCashIncome2());
+				cell.setCellValue(item.getIncomeByPay().getCashActual());
 				cell.setCellStyle(numStyle);
 				
 				cell = row.createCell(row.getLastCellNum());
-				cell.setCellValue(item.getCreditCardIncome2());
+				cell.setCellValue(item.getIncomeByPay().getCreditCardActual());
 				cell.setCellStyle(numStyle);
 				
 				cell = row.createCell(row.getLastCellNum());
-				cell.setCellValue(item.getHangIncome2());
+				cell.setCellValue(item.getIncomeByPay().getMemberCardActual());
 				cell.setCellStyle(numStyle);
 				
 				cell = row.createCell(row.getLastCellNum());
-				cell.setCellValue(item.getSignIncome2());
+				cell.setCellValue(item.getIncomeByPay().getHangActual());
 				cell.setCellStyle(numStyle);
 				
 				cell = row.createCell(row.getLastCellNum());
-				cell.setCellValue(item.getDiscountIncome());
+				cell.setCellValue(item.getIncomeByPay().getSignActual());
 				cell.setCellStyle(numStyle);
 				
 				cell = row.createCell(row.getLastCellNum());
-				cell.setCellValue(item.getGiftIncome());
+				cell.setCellValue(item.getIncomeByDiscount().getTotalDiscount());
 				cell.setCellStyle(numStyle);
 				
 				cell = row.createCell(row.getLastCellNum());
-				cell.setCellValue(item.getCancelIncome());
+				cell.setCellValue(item.getIncomeByGift().getTotalGift());
 				cell.setCellStyle(numStyle);
 				
 				cell = row.createCell(row.getLastCellNum());
-				cell.setCellValue(item.getEraseIncome());
+				cell.setCellValue(item.getIncomeByCancel().getTotalCancel());
 				cell.setCellStyle(numStyle);
 				
 				cell = row.createCell(row.getLastCellNum());
-				cell.setCellValue(item.getPaidIncome());
+				cell.setCellValue(item.getIncomeByErase().getTotalErase());
+				cell.setCellStyle(numStyle);
+				
+				cell = row.createCell(row.getLastCellNum());
+				cell.setCellValue(item.getIncomeByRepaid().getTotalRepaid());
 				cell.setCellStyle(numStyle);
 				
 //				sum.setCashAmount(sum.getCashAmount() + item.getCashAmount());
@@ -893,29 +908,29 @@ public class HistoryStatisticsAction extends DispatchAction{
 		response.setContentType("application/vnd.ms-excel;");
 		
 		String pin = (String)request.getAttribute("pin");
-		String restaurantID = request.getParameter("restaurantID");
+		//String restaurantID = request.getParameter("restaurantID");
 		String onDuty = request.getParameter("onDuty");
 		String offDuty = request.getParameter("offDuty");
-		String queryPattern = request.getParameter("queryPattern");
+		//String queryPattern = request.getParameter("queryPattern");
 		String dataType = request.getParameter("dataType");
 		
-		DateType dt = DateType.getType(dataType);
+		DateType dt = DateType.HISTORY;
 		if(dataType == null || dt == null){
 			return null;
 		}
 		
 		response.addHeader("Content-Disposition","attachment;filename=" + new String(("营业汇总(" + dt.getDesc() + ").xls").getBytes("GBK"), "ISO8859_1"));
 		
-		Map<Object, Object> params = new HashMap<Object, Object>();
+/*		Map<Object, Object> params = new HashMap<Object, Object>();
 		params.put(dt, dt.getValue());
 		params.put("pin", pin);
 		params.put("restaurantID", restaurantID);
 		params.put("onDuty", onDuty);
 		params.put("offDuty", offDuty);
-		params.put("queryPattern", queryPattern);
+		params.put("queryPattern", queryPattern);*/
 		
 		Staff staff = StaffDao.verify(Integer.parseInt(pin));
-		BusinessStatistics business = BusinessStatisticsDao.getBusinessStatistics(params);
+		ShiftDetail business = QueryShiftDao.exec(staff, onDuty, offDuty, DateType.HISTORY);
 		
 		// 创建execl主页
 		HSSFWorkbook wb = new HSSFWorkbook();
@@ -998,11 +1013,11 @@ public class HistoryStatisticsAction extends DispatchAction{
 		cell.setCellValue(business.getCancelAmount());
 		
 		cell = row.createCell(row.getLastCellNum());
-		cell.setCellValue(business.getCashIncome());
+		cell.setCellValue(business.getCashTotalIncome());
 		cell.setCellStyle(numStyle);
 		
 		cell = row.createCell(row.getLastCellNum());
-		cell.setCellValue(business.getCashIncome2());
+		cell.setCellValue(business.getCashActualIncome());
 		cell.setCellStyle(numStyle);
 		
 		// 刷卡
@@ -1017,11 +1032,11 @@ public class HistoryStatisticsAction extends DispatchAction{
 		cell.setCellValue(business.getCreditCardAmount());
 		
 		cell = row.createCell(row.getLastCellNum());
-		cell.setCellValue(business.getCreditCardIncome());
+		cell.setCellValue(business.getCreditTotalIncome());
 		cell.setCellStyle(numStyle);
 		
 		cell = row.createCell(row.getLastCellNum());
-		cell.setCellValue(business.getCreditCardIncome2());
+		cell.setCellValue(business.getCreditActualIncome());
 		cell.setCellStyle(numStyle);
 		
 		// 会员卡
@@ -1036,11 +1051,11 @@ public class HistoryStatisticsAction extends DispatchAction{
 		cell.setCellValue(business.getMemberCardAmount());
 		
 		cell = row.createCell(row.getLastCellNum());
-		cell.setCellValue(business.getMemberCardIncome());
+		cell.setCellValue(business.getMemberTotalIncome());
 		cell.setCellStyle(numStyle);
 		
 		cell = row.createCell(row.getLastCellNum());
-		cell.setCellValue(business.getMemberCardIncome2());
+		cell.setCellValue(business.getMemberActualIncome());
 		cell.setCellStyle(numStyle);
 		
 		// 签单
@@ -1055,11 +1070,11 @@ public class HistoryStatisticsAction extends DispatchAction{
 		cell.setCellValue(business.getSignAmount());
 		
 		cell = row.createCell(row.getLastCellNum());
-		cell.setCellValue(business.getSignIncome());
+		cell.setCellValue(business.getSignTotalIncome());
 		cell.setCellStyle(numStyle);
 		
 		cell = row.createCell(row.getLastCellNum());
-		cell.setCellValue(business.getSignIncome2());
+		cell.setCellValue(business.getSignActualIncome());
 		cell.setCellStyle(numStyle);
 		
 		// 挂账
@@ -1074,11 +1089,11 @@ public class HistoryStatisticsAction extends DispatchAction{
 		cell.setCellValue(business.getHangAmount());
 		
 		cell = row.createCell(row.getLastCellNum());
-		cell.setCellValue(business.getHangIncome());
+		cell.setCellValue(business.getHangTotalIncome());
 		cell.setCellStyle(numStyle);
 		
 		cell = row.createCell(row.getLastCellNum());
-		cell.setCellValue(business.getHangIncome2());
+		cell.setCellValue(business.getHangActualIncome());
 		cell.setCellStyle(numStyle);
 		
 		// 合计
@@ -1093,19 +1108,11 @@ public class HistoryStatisticsAction extends DispatchAction{
 		cell.setCellValue(business.getOrderAmount());
 		
 		cell = row.createCell(row.getLastCellNum());
-		cell.setCellValue(business.getCashIncome()
-						+ business.getCreditCardIncome()
-						+ business.getMemberCardIncome()
-						+ business.getSignIncome()
-						+ business.getHangIncome());
+		cell.setCellValue(business.getTotalIncome());
 		cell.setCellStyle(numStyle);
 		
 		cell = row.createCell(row.getLastCellNum());
-		cell.setCellValue(business.getCashIncome2()
-				+ business.getCreditCardIncome2()
-				+ business.getMemberCardIncome2()
-				+ business.getSignIncome2()
-				+ business.getHangIncome2());
+		cell.setCellValue(business.getTotalActual());
 		cell.setCellStyle(numStyle);
 		
 		row = sheet.createRow(sheet.getLastRowNum() + 1);
@@ -1237,11 +1244,11 @@ public class HistoryStatisticsAction extends DispatchAction{
 		cell.setCellValue("应收总额");
 		cell.setCellStyle(headerStyle);
 		
-		if(business != null && business.getDeptStat() != null){
-			sheet.addMergedRegion(new CellRangeAddress(4, business.getDeptStat().size() + 4, 4, 4));
-			BusinessStatisticsByDept item = null;
-			for(int i = 0; i < business.getDeptStat().size(); i++){
-				 item = business.getDeptStat().get(i);
+		if(business != null && business.getDeptIncome() != null){
+			sheet.addMergedRegion(new CellRangeAddress(4, business.getDeptIncome().size() + 4, 4, 4));
+			IncomeByDept item = null;
+			for(int i = 0; i < business.getDeptIncome().size(); i++){
+				 item = business.getDeptIncome().get(i);
 				 row = sheet.getRow(i + 5);
 				 
 				 cell = row.createCell(5);
@@ -1249,11 +1256,11 @@ public class HistoryStatisticsAction extends DispatchAction{
 				 cell.setCellStyle(strStyle);
 				 
 				 cell = row.createCell(row.getLastCellNum());
-				 cell.setCellValue(item.getDiscountPrice());
+				 cell.setCellValue(item.getDiscount());
 				 cell.setCellStyle(numStyle);
 				 
 				 cell = row.createCell(row.getLastCellNum());
-				 cell.setCellValue(item.getGiftPrice());
+				 cell.setCellValue(item.getGift());
 				 cell.setCellStyle(numStyle);
 				 
 				 cell = row.createCell(row.getLastCellNum());

@@ -150,7 +150,41 @@ public class QueryPrivilegeAction extends DispatchAction{
 					tree.append(",children : [" + children.toString() + "]");
 					tree.append("},");
 				}
-				
+				if(privilege.getCode() == Code.MEMBER){
+					tree.append("{");
+					tree.append("leaf:false");
+					tree.append(",expanded:true");
+					tree.append(",id:'memberMgr'");
+					tree.append(",text:'会员'");
+					tree.append(",cls:'tFont'");
+					StringBuilder children = new StringBuilder();
+					for (int i = 0; i < Page.Member.values().length; i++) {
+						if(i > 0){
+							children.append(",");
+						}
+						children.append("{leaf:true, text:'" + Page.Member.values()[i].getDesc() + "', mId:'" +Page.Member.values()[i].getMgrId() + "', cls:'font', url:'" + Page.Member.values()[i].getUrl() + "'}");
+					}
+					tree.append(",children : [" + children.toString() + "]");
+					tree.append("},");
+				}
+				if(privilege.getCode() == Code.HISTORY){
+					tree.append("{");
+					tree.append("leaf:false");
+					tree.append(",expanded:true");
+					tree.append(",id:'historyMgr'");
+					tree.append(",text:'历史'");
+					tree.append(",cls:'tFont'");
+					StringBuilder children = new StringBuilder();
+					for (int i = 0; i < Page.History.values().length; i++) {
+						if(i > 0){
+							children.append(",");
+						}
+						children.append("{leaf:true, text:'" + Page.History.values()[i].getDesc() + "', mId:'" +Page.History.values()[i].getMgrId() + "', cls:'font', url:'" + Page.History.values()[i].getUrl() + "'}");
+					}
+
+					tree.append(",children : [" + children.toString() + "]");
+					tree.append("},");
+				}
 				if(privilege.getCode() == Code.INVENTORY){
 					tree.append("{");
 					tree.append("leaf:false");
@@ -169,26 +203,10 @@ public class QueryPrivilegeAction extends DispatchAction{
 					tree.append(",children : [" + children.toString() + "]");
 					tree.append("},");
 				}
-				if(privilege.getCode() == Code.HISTORY){
-					tree.append("{");
-					tree.append("leaf:false");
-					tree.append(",id:'historyMgr'");
-					tree.append(",text:'历史'");
-					tree.append(",cls:'tFont'");
-					StringBuilder children = new StringBuilder();
-					for (int i = 0; i < Page.History.values().length; i++) {
-						if(i > 0){
-							children.append(",");
-						}
-						children.append("{leaf:true, text:'" + Page.History.values()[i].getDesc() + "', mId:'" +Page.History.values()[i].getMgrId() + "', cls:'font', url:'" + Page.History.values()[i].getUrl() + "'}");
-					}
-
-					tree.append(",children : [" + children.toString() + "]");
-					tree.append("},");
-				}
 				if(privilege.getCode() == Code.SYSTEM){
 					tree.append("{");
 					tree.append("leaf:false");
+					tree.append(",expanded:true");
 					tree.append(",id:'systemMgr'");
 					tree.append(",text:'系统'");
 					tree.append(",cls:'tFont'");
@@ -198,23 +216,6 @@ public class QueryPrivilegeAction extends DispatchAction{
 							children.append(",");
 						}
 						children.append("{leaf:true, text:'" + Page.System.values()[i].getDesc() + "', mId:'" +Page.System.values()[i].getMgrId() + "', cls:'font', url:'" + Page.System.values()[i].getUrl() + "'}");
-					}
-					tree.append(",children : [" + children.toString() + "]");
-					tree.append("},");
-				}
-				if(privilege.getCode() == Code.MEMBER){
-					tree.append("{");
-					tree.append("leaf:false");
-					tree.append(",expanded:true");
-					tree.append(",id:'memberMgr'");
-					tree.append(",text:'会员'");
-					tree.append(",cls:'tFont'");
-					StringBuilder children = new StringBuilder();
-					for (int i = 0; i < Page.Member.values().length; i++) {
-						if(i > 0){
-							children.append(",");
-						}
-						children.append("{leaf:true, text:'" + Page.Member.values()[i].getDesc() + "', mId:'" +Page.Member.values()[i].getMgrId() + "', cls:'font', url:'" + Page.Member.values()[i].getUrl() + "'}");
 					}
 					tree.append(",children : [" + children.toString() + "]");
 					tree.append("},");

@@ -6,19 +6,17 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import net.sf.json.JSONObject;
-
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
-import com.wireless.db.billStatistics.BusinessStatisticsDao;
+import com.wireless.db.shift.QueryShiftDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
-import com.wireless.pojo.billStatistics.BusinessStatistics;
+import com.wireless.json.JObject;
+import com.wireless.pojo.billStatistics.ShiftDetail;
 import com.wireless.util.DateType;
-import com.wireless.util.JObject;
 import com.wireless.util.WebParams;
 
 public class BusinessStatisticsAction extends DispatchAction {
@@ -44,37 +42,37 @@ public class BusinessStatisticsAction extends DispatchAction {
 			
 			StaffDao.verify(Integer.parseInt(pin));
 			
-			String restaurantID = request.getParameter("restaurantID");
+			//String restaurantID = request.getParameter("restaurantID");
 			String onDuty = request.getParameter("onDuty");
 			String offDuty = request.getParameter("offDuty");
-			String queryPattern = request.getParameter("queryPattern");
+			//String queryPattern = request.getParameter("queryPattern");
 			
-			Map<Object, Object> params = new HashMap<Object, Object>();
+/*			Map<Object, Object> params = new HashMap<Object, Object>();
 			params.put(DateType.HISTORY, DateType.HISTORY.getValue());
 			params.put("pin", pin);
 			params.put("restaurantID", restaurantID);
 			params.put("onDuty", onDuty);
 			params.put("offDuty", offDuty);
-			params.put("queryPattern", queryPattern);
+			params.put("queryPattern", queryPattern);*/
 			
-			BusinessStatistics business = BusinessStatisticsDao.getBusinessStatistics(params);
-			if(business != null){
-				jobject.getOther().put("business", business);
+			ShiftDetail sdetail = QueryShiftDao.exec(StaffDao.verify(Integer.parseInt(pin)), onDuty, offDuty, DateType.HISTORY);
+			
+			if(sdetail != null){
+				jobject.getOther().put("business", sdetail);
 			}else{
 				jobject.initTip(false, WebParams.TIP_TITLE_DEFAULT, 1111, "操作成功, 该时间段没有记录, 请重新查询.");
 			}
 			
 		}catch(BusinessException e){
 			e.printStackTrace();
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getCode(), e.getDesc());
+			jobject.initTip(e);
 			
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
+			jobject.initTip(e);
 			
 		}finally{
-			JSONObject json = JSONObject.fromObject(jobject);
-			response.getWriter().print(json.toString());
+			response.getWriter().print(jobject.toString());
 		}
 		return null;
 	}
@@ -110,18 +108,24 @@ public class BusinessStatisticsAction extends DispatchAction {
 			params.put("offDuty", offDuty);
 			params.put("queryPattern", queryPattern);
 			
-			BusinessStatistics business = BusinessStatisticsDao.getBusinessStatistics(params);
-			if(business != null){
-				jobject.getOther().put("business", business);
+			ShiftDetail sdetail = QueryShiftDao.exec(StaffDao.verify(Integer.parseInt(pin)), onDuty, offDuty, DateType.TODAY);
+			
+			if(sdetail != null){
+				jobject.getOther().put("business", sdetail);
 			}else{
 				jobject.initTip(false, WebParams.TIP_TITLE_DEFAULT, 1111, "操作成功, 该时间段没有记录, 请重新查询.");
 			}
+			
+		}catch(BusinessException e){
+			e.printStackTrace();
+			jobject.initTip(e);
+			
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
+			jobject.initTip(e);
+			
 		}finally{
-			JSONObject json = JSONObject.fromObject(jobject);
-			response.getWriter().print(json.toString());
+			response.getWriter().print(jobject.toString());
 		}
 		return null;
 	}
