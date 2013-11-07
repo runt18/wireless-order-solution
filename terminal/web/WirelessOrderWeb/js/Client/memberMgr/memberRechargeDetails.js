@@ -209,7 +209,7 @@ Ext.onReady(function(){
 						offDuty = mrd_search_offDuty.getValue().format('Y-m-d 23:59:59');
 					}
 					var memberType = mrd_search_memberType.getRawValue() != '' ? mrd_search_memberType.getValue() : '';
-					var url = '../../{0}?memberType={1}&memberMobile={2}&dataSource={3}&onDuty={4}&offDuty={5}&memberName={6}&dataSources={7}&operateType=2';
+					var url = '../../{0}?memberType={1}&memberMobile={2}&dataSource={3}&onDuty={4}&offDuty={5}&memberName={6}&dataSources={7}&detailOperate={8}&operateType=2';
 					url = String.format(
 							url, 
 							'ExportHistoryStatisticsToExecl.do', 
@@ -219,7 +219,8 @@ Ext.onReady(function(){
 							onDuty,
 							offDuty,
 							mrd_search_memberName.getValue(),
-							dataSource
+							dataSource,
+							mrd_search_comboOperateType.getRawValue() != '' ? mrd_search_comboOperateType.getValue() : ''
 						);
 					window.location = url;
 				}
