@@ -20,7 +20,7 @@ import com.wireless.pojo.system.DailySettle;
 import com.wireless.pojo.util.DateUtil;
 import com.wireless.util.DateType;
 
-public class BusinessStatisticsDao {
+class BusinessStatisticsDao {
 	
 	/**
 	 * 

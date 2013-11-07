@@ -74,7 +74,6 @@ public class QueryIncomeStatisticsDao {
 												  DateUtil.format(c.getTime(), DateUtil.Pattern.DATE_TIME));
 			
 			IncomeByEachDay income = new IncomeByEachDay(DateUtil.format(dateBegin, DateUtil.Pattern.DATE));
-			
 			if(range != null){
 				
 				//Calculate the general income

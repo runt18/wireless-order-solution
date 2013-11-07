@@ -287,6 +287,7 @@ public class QueryShiftDao {
 		
 		result.setOrderAmount(incomeByPay.getOrderAmount());
 		result.setTotalActual(incomeByPay.getTotalActual());
+		result.setTotalIncome(incomeByPay.getTotalIncome());
 		
 		//Calculate the total & amount to erase price
 		IncomeByErase incomeByErase = CalcBillStatisticsDao.calcErasePrice(dbCon, staff, new DutyRange(onDuty, offDuty), queryType);
