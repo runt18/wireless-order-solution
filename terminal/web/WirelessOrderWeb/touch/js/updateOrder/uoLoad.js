@@ -33,7 +33,6 @@ function initOrderData(c){
 			restaurantID : restaurantID,
 			tableID : c.table.alias,			
 		},
-//		async : false,
 		success : function(data, status, xhr){
 			uoFood=[];
 			if(data.success){
@@ -59,7 +58,7 @@ function initOrderData(c){
 				Util.msg.alert({
 					title : data.title,
 					msg : data.msg, 
-					time : 3,
+					time : 3
 				});
 			}
 		},
@@ -67,7 +66,7 @@ function initOrderData(c){
 			Util.msg.alert({
 				title : '温馨提示',
 				msg : '初始化菜单数据失败.', 
-				time : 3,
+				time : 3
 			});
 		}
 	});	
@@ -81,7 +80,7 @@ function initCancelReason(){
 		url : '../QueryCancelReason.do',
 		type : 'post',
 		data : {
-			restaurantID : restaurantID,
+			restaurantID : restaurantID
 		},
 		success : function(data, status, xhr){
 			cancelReasonData=[];
@@ -94,7 +93,7 @@ function initCancelReason(){
 			Util.msg.alert({
 				title : '温馨提示',
 				msg : '初始化退菜原因失败.', 
-				time : 3,
+				time : 3
 			});
 		}
 	});

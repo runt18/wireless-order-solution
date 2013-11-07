@@ -12,7 +12,6 @@ uo.show = function(c){
 	}
 	initOrderData({table : c.table});
 	uo.table = c.table;
-//	uo.callback = typeof c.callback == 'function' ? c.callback : null;
 };
 
 /**
@@ -22,7 +21,7 @@ uo.show = function(c){
 uo.getTotalPriceUO = function(){
 	var totalPriceUO = 0;
 	for(x in uoFood){
-		totalPriceUO += uoFood[x].count * (uoFood[x].actualPrice + uoFood[x].tasteGroup.tastePrice);
+		totalPriceUO += uoFood[x].count * (uoFood[x].actualPrice + uoFood[x].tasteGroup.tastePrice) * uoFood[x].discount;
 	}
 	return totalPriceUO;
 };
@@ -141,7 +140,7 @@ uo.cf.save = function(){
 		Util.msg.alert({
 			title : '温馨提示',
 			msg : '数字不合规范.', 
-			time : 2,
+			time : 2
 		});
 		inputNumValUO = "";
 		$("#" + inputNumIdUO).val(count);
@@ -155,7 +154,7 @@ uo.cf.save = function(){
 				count : 0 ,
 				reason : "" ,
 				actualPrice : "",
-				totalPrice : "",
+				totalPrice : ""
 			};
 		var rowId, htmlcancel = "", foodName, actualPrice,  totalPrice;
 		rowId = selectigRow;
@@ -407,7 +406,7 @@ function inputNumUO(o){
 			Util.msg.alert({
 				title : '温馨提示',
 				msg : '退菜数不能小于0.', 
-				time : 3,
+				time : 3
 			});
 			inputNumValUO = "";
 			$("#" + inputNumIdUO).val(count);
@@ -419,7 +418,7 @@ function inputNumUO(o){
 			Util.msg.alert({
 				title : '温馨提示',
 				msg : '数目不能超过255.', 
-				time : 3,
+				time : 3
 			});
 			inputNumValUO = "";
 			$("#" + inputNumIdUO).val(1);
@@ -428,7 +427,7 @@ function inputNumUO(o){
 			Util.msg.alert({
 				title : '温馨提示',
 				msg : '人数值不能为0.', 
-				time : 3,
+				time : 3
 			});
 			inputNumValUO = "";
 			$("#" + inputNumIdUO).val(1);
@@ -510,7 +509,7 @@ uo.goToCreateOrder = function(){
 		Util.msg.alert({
 			title : '重要提示',
 			msg : '账单已经修改，请先做“确认修改”操作。',
-			time : 3,
+			time : 3
 		});
 	}
 };
@@ -596,7 +595,7 @@ uo.submitUpdateOrderHandler = function(c){
 				Util.msg.alert({
 					title : '温馨提示',
 					msg : err, 
-					time : 3,
+					time : 3
 				});
 			}
 		});
@@ -604,7 +603,7 @@ uo.submitUpdateOrderHandler = function(c){
 		Util.msg.alert({
 			title : '温馨提示',
 			msg : '没有任何菜品，不能提交', 
-			time : 3,
+			time : 3
 		});
 	}
 };
@@ -612,7 +611,8 @@ uo.submitUpdateOrderHandler = function(c){
 /**
  * 暂结
  */
-uo.tempPayForUO = function(){
+uo.tempPayForUO = function(c){
+	c = c == null ? {} : c;
 	uo.customNum = $("#customNumForUO").html().substring(5);
 	//判断页面信息是否有改动
 	if(uoCancelFoods.length == 0 && uo.order.customNum == uo.customNum){
@@ -626,14 +626,15 @@ uo.tempPayForUO = function(){
 				orderID : uo.order.id,
 				payType : uo.order.settleTypeValue,
 				memberID : uo.order.member,
-				discountID : uo.order.discount.id,
 				payManner : uo.order.payTypeValue,
 				serviceRate : uo.order.serviceRate,
 				cashIncome : '-1',
 				comment : uo.order.comment,
 				pricePlanID : uo.order.pricePlan.id,
 				customNum : uo.order.customNum,
-				tempPay : true
+				discountID : typeof c.discountId != 'undefined' ? c.discountId : uo.order.discount.id,
+				tempPay : true,
+				isPrint : typeof c.isPrint == 'boolean' ? c.isPrint : true
 			},
 			dataType : 'text',
 			success : function(result, status, xhr){
@@ -644,13 +645,14 @@ uo.tempPayForUO = function(){
 						title : '操作成功',
 						msg : result.data,
 						time : 3,
+						callback : typeof c.callback == 'function' ? c.callback(result) : null
 					});
 					initOrderData({table : uo.table});
 				}else{
 					Util.msg.alert({
 						title : '错误',
 						msg : result.data,
-						time : 3,
+						time : 3
 					});
 				}
 			},
@@ -659,7 +661,7 @@ uo.tempPayForUO = function(){
 				Util.msg.alert({
 					title : '错误',
 					msg : err,
-					time : 3,
+					time : 3
 				});
 			}
 		});
@@ -667,7 +669,103 @@ uo.tempPayForUO = function(){
 		Util.msg.alert({
 			title : '重要提示',
 			msg : '账单已经修改，请先做“确认修改”操作。',
-			time : 3,
+			time : 3
 		});
 	}
 };
+
+/**
+ * 设置折扣
+ */
+uo.cd = {
+	el : 'divChangeDiscountForUpdateOrder',
+	data : [],
+	isRequest : false,
+	selectClass : 'uo-div-select-kitchen',
+	initContent : function(c){
+		var temp = null, html = [];
+		for(var i = 0; i < this.data.length; i++){
+			temp = this.data[i];
+			html.push(Templet.uo.changeDiscount.format({
+				id : temp.id,
+				name : temp.name
+			}));
+		}
+		$('#{0} > div[addr=centent]'.format(this.el)).html(html.join(''));
+		temp = null, html = null;
+	},
+	show : function(){
+		if(this.isRequest === true) return;
+		
+		Util.LM.show();
+		this.isRequest = true;
+		$.ajax({
+			url : '../QueryDiscount.do',
+			data : {
+				dataSource : 'role',
+				roleId : staffData.role.id
+			},
+			dataType : 'json',
+			success : function(data, status, xhr){
+				this.isRequest = false;
+				Util.LM.hide();
+				if(data.success && data.root.length > 0){
+					Util.dialongDisplay({
+						renderTo : uo.cd.el,
+						type : 'show'
+					});
+					uo.cd.data = data.root;
+					uo.cd.initContent();
+				}else{
+					Util.msg.alert({
+						title : '提示',
+						msg : '没有折扣信息.',
+						time : 3,
+					});
+				}
+			},
+			error : function(xhr, status, err){
+				this.isRequest = false;
+				Util.LM.hide();
+				Util.msg.alert({
+					title : '错误',
+					msg : '加载折扣信息失败.',
+					time : 3,
+				});
+			}
+		});
+	},
+	back : function(){
+		uo.cd.data = [];
+		uo.cd.initContent();
+		this.isRequest = false;
+		Util.dialongDisplay({
+			renderTo : this.el,
+			type : 'hide'
+		});
+	},
+	select : function(c){
+		var temp = null, list = $('#{0} > div[addr=centent] > div'.format(this.el));
+		for(var i = 0; i < list.length; i++){
+			temp = $(list[i]);
+			if(parseInt(temp.attr('data-value')) === c.id){
+				temp.addClass(this.selectClass);
+			}else{
+				temp.removeClass(this.selectClass);
+			}
+		}
+	},
+	save : function(c){
+		var select = $('#{0} > div[addr=centent] > div[class*={1}]'.format(this.el, this.selectClass));
+		if(select.length != 1) return;
+		select = select[0];
+		uo.tempPayForUO({
+			discountId : select.getAttribute('data-value'),
+			isPrint : false,
+			callback : function(data){
+				uo.cd.back();
+			}
+		});
+	}
+};
+

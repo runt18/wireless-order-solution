@@ -52,7 +52,8 @@ var Templet={
 			+ '<td>{orderDateFormat}</td>'
 			+ '<td><div class="button-base cancelFoodBtn" id="btnuo{dataIndex}">退菜</div></td>'
 			+ '<td>{waiter}</td>'
-			+ '</tr>'
+			+ '</tr>',
+		changeDiscount : '<div data-value={id} class="main-box-base" onClick="uo.cd.select({id:{id}})">{name}</div>'
 	}
 };
 
@@ -452,13 +453,8 @@ function staffLoginHandler(c){
 		success : function(data, status, xhr){
 			Util.LM.hide();
 			if(data.success){
-				
-				pin=staffId;
-				
-				staffData={
-					staffID : staffId,
-					staffName : temp.html()
-				};
+				pin = staffId;
+				staffData = data.other.staff;
 				if(c.refresh === true){
 					loginSuccessCallback();
 				}else{
@@ -468,7 +464,7 @@ function staffLoginHandler(c){
 					renderTo : 'divUserLogin',
 					type : 'hide'
 				});
-				var bg=$('div[forbg=divUserLogin]');
+				var bg = $('div[forbg=divUserLogin]');
 				if(bg.hasClass('dialong-lm-show-top')){
 					bg.removeClass('dialong-lm-show-top');
 				}
@@ -512,11 +508,4 @@ function logout(){
 		}	
 	});
 }
-
-function test(){
-	alert(3);
-	window.open('','_parent',''); 
-	window.close();
-}
-
 

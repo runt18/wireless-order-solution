@@ -1,4 +1,4 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE html>
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
@@ -145,18 +145,29 @@ var uo={
 	<div id="divCenterForUpdateOrder">
 		<table id="tabForUpdateOrder"></table>
 	</div>
-	<div id="divDescForUpdateOrder" class="box-horizontal" style="background: #FFD700;">
+	<div id="divDescForUpdateOrder" class="div-desc">
 	</div>
 	<div id="divSouthForUpdateOrder" class="box-horizontal">
 		<div class="button-base" style="margin-left: 2px; width: 120px;" onClick= "uo.cancelForUO()">返回</div>
   		<div class="div-full">&nbsp;</div>
-  		<div class="button-base" style="margin-left: 2px; width: 120px;" onClick="uo.saveForUO()">确认修改</div>
+  		<div class="button-base" style="margin-left: 2px; width: 120px;" onClick="uo.saveForUO()">确定修改</div>
+  		<div class="button-base" style="margin-left: 2px;" onClick="uo.cd.show()">折扣</div>
   		<div class="button-base" style="margin-left: 2px;" onClick="uo.showdivKeyboardPeopleForUO({type : 'setCountForPeople'})">人数</div>
   		<div class="button-base" style="margin-left: 2px;" onClick="uo.goToCreateOrder()">点菜</div>
   		<div class="button-base" style="margin-left: 2px;" onClick="uo.tempPayForUO()">暂结</div>
   		<div class="button-base" style="margin-left: 2px;" onClick="Util.scroll({otype: 'up', content: 'divCenterForUpdateOrder', size: 80})">上翻</div>
   		<div class="button-base" style="margin-left: 2px;" onClick="Util.scroll({otype: 'down', content: 'divCenterForUpdateOrder', size: 80})">下翻</div>
 	</div>
+</div>
+
+<div id="divChangeDiscountForUpdateOrder" class="content-box-base box-vertical">
+	<div addr="centent" class="div-full" style=""></div>
+	<div class="div-desc">&nbsp;</div>
+	<div addr="south" class="box-horizontal" style="">
+  		<div class="button-base" style="margin-right: 2px; width: 120px;" onClick="uo.cd.back()">返回</div>
+  		<div class="div-full">&nbsp;</div>
+  		<div class="button-base" style="margin-left: 2px; width: 120px;" onClick="uo.cd.save()">确定</div>
+  	</div>
 </div>
 
 <div id="divCreateOrder" class="box-vertical content">
