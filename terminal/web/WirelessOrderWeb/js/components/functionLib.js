@@ -165,6 +165,7 @@ function getOperatorName(actionPath, callback) {
 			if(jr.success){
 				if(jr.other.staff != null){
 					document.getElementById("optName").innerHTML = jr.other.staff.staffName;
+					document.getElementById("restaurantName").innerHTML = jr.other.restaurant.name;
 					if(typeof callback == 'function'){
 						callback(jr.other.staff);
 					}
@@ -227,7 +228,7 @@ function initMainView(west, center, east){
 		items : [{
 			region : 'north',
 	    	bodyStyle : 'background-color:#DFE8F6;',
-			html : '<h4 style="padding:10px;font-size:150%;float:left;">无线点餐网页终端</h4><div id="optName" class="optName"></div>',
+			html : '<h4 id="restaurantName" style="padding:10px;font-size:150%;float:left;">无线点餐网页终端</h4><div id="optName" class="optName"></div>',
 			height : 50,
 			border : false,
 			margins : '0 0 0 0'

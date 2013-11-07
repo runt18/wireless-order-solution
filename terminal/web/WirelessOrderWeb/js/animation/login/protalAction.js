@@ -46,7 +46,7 @@
 	$("#inventoryManagement").each(function() {
 		$(this).bind("click", function() {
 			var href = "InventoryManagement_Module/InventoryProtal.html?" + strEncode("restaurantID="+restaurantID, "mi");
-			verifyStaff('../', 3000, href);
+			verifyStaff('../', 5000, href);
 		});
 	});
 
@@ -60,7 +60,7 @@
 	$("#member").each(function() {
 		$(this).bind("click", function() {
 			var href = 'Client_Module/ClientMain.html?'+ strEncode('restaurantID=' + restaurantID, 'mi');
-			verifyStaff('../', 5000, href);
+			verifyStaff('../', 3000, href);
 		});
 	});
 };

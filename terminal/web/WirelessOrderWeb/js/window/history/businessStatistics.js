@@ -139,44 +139,37 @@ Ext.onReady(function(){
 										)
 									);
 								}
+								alert(trContent);
 								var table = String.format('<table border="1" class="tb_base">{0}{1}</table>', title, trContent);
 								Ext.getCmp('businessStatisticsSummaryInformationCenterPanel').body.update(table);
 								
-								Ext.getDom('bssiOnDuty').innerHTML = business.onDutyToSimple;
-								Ext.getDom('bssiOffDuty').innerHTML = business.offDutyToSimple;
+								Ext.getDom('bssiOnDuty').innerHTML = paramsOnDuty;
+								Ext.getDom('bssiOffDuty').innerHTML = paramsOffDuty;
 								Ext.getDom('bssiOrderAmount').innerHTML = business.orderAmount;
-								//
+								
 								Ext.getDom('bssiCashAmount').innerHTML = business.cashAmount;
-								Ext.getDom('bssiCashIncome').innerHTML = business.cashIncome.toFixed(2);
+								Ext.getDom('bssiCashIncome').innerHTML = business.cashIncome2.toFixed(2);
 								Ext.getDom('bssiCashIncome2').innerHTML = business.cashIncome2.toFixed(2);
 								
 								Ext.getDom('bssiCreditCardAmount').innerHTML = business.creditCardAmount;
-								Ext.getDom('bssiCreditCardIncome').innerHTML = business.creditCardIncome.toFixed(2);
+								Ext.getDom('bssiCreditCardIncome').innerHTML = business.creditCardIncome2.toFixed(2);
 								Ext.getDom('bssiCreditCardIncome2').innerHTML = business.creditCardIncome2.toFixed(2);
 								
-								Ext.getDom('bssiMemeberCardAmount').innerHTML = business.memberCardAmount;
-								Ext.getDom('bssiMemeberCardIncome').innerHTML = business.memberCardIncome.toFixed(2);
-								Ext.getDom('bssiMemeberCardIncome2').innerHTML = business.memberCardIncome2.toFixed(2);
+								Ext.getDom('bssiMemeberCardAmount').innerHTML = business.memberAmount;
+								Ext.getDom('bssiMemeberCardIncome').innerHTML = business.memberActual.toFixed(2);
+								Ext.getDom('bssiMemeberCardIncome2').innerHTML = business.memberActual.toFixed(2);
 								
 								Ext.getDom('bssiSignAmount').innerHTML = business.signAmount;
-								Ext.getDom('bssiSignIncome').innerHTML = business.signIncome.toFixed(2);
+								Ext.getDom('bssiSignIncome').innerHTML = business.signIncome2.toFixed(2);
 								Ext.getDom('bssiSignIncome2').innerHTML = business.signIncome2.toFixed(2);
 								
 								Ext.getDom('bssiHangAmount').innerHTML = business.hangAmount;
-								Ext.getDom('bssiHangIncome').innerHTML = business.hangIncome.toFixed(2);
+								Ext.getDom('bssiHangIncome').innerHTML = business.hangIncome2.toFixed(2);
 								Ext.getDom('bssiHangIncome2').innerHTML = business.hangIncome2.toFixed(2);
 								//
 								Ext.getDom('bssiSumAmount').innerHTML = business.orderAmount;
-								Ext.getDom('bssiSumIncome').innerHTML = parseFloat(business.cashIncome
-																		+ business.creditCardIncome
-																		+ business.memberCardIncome
-																		+ business.signIncome
-																		+ business.hangIncome).toFixed(2);
-								Ext.getDom('bssiSumIncome2').innerHTML = parseFloat(business.cashIncome2
-																		+ business.creditCardIncome2
-																		+ business.memberCardIncome2
-																		+ business.signIncome2
-																		+ business.hangIncome2).toFixed(2);
+								Ext.getDom('bssiSumIncome').innerHTML = business.totalIncome.toFixed(2);
+								Ext.getDom('bssiSumIncome2').innerHTML = business.totalActual.toFixed(2);
 								
 								Ext.getDom('bssiEraseAmount').innerHTML = business.eraseAmount;
 								Ext.getDom('bssiEraseIncome').innerHTML = business.eraseIncome.toFixed(2);
@@ -193,6 +186,7 @@ Ext.onReady(function(){
 								Ext.getDom('bssiPaidAmount').innerHTML = business.paidAmount;
 								Ext.getDom('bssiPaidIncome').innerHTML = business.paidIncome.toFixed(2);
 								
+								Ext.getDom('bssiServiceAmount').innerHTML = business.serviceAmount;
 								Ext.getDom('bssiServiceIncome').innerHTML = business.serviceIncome.toFixed(2);
 								
 							}else{
