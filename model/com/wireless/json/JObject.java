@@ -112,6 +112,11 @@ public class JObject implements Jsonable {
 		return jp.toString();
 	}
 	
+	public String toString(int flag) {
+		JsonPackage jp = new JsonPackage(this, flag, Jsonable.Type.PAIR);
+		return jp.toString();
+	}
+	
 	public String toString(Jsonable.Type type) {
 		JsonPackage jp = new JsonPackage(this, 0, type);
 		return jp.toString();

@@ -1,8 +1,14 @@
 package com.wireless.pojo.billStatistics;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import com.wireless.json.Jsonable;
 import com.wireless.pojo.menuMgr.Department;
 
-public class IncomeByDept {
+public class IncomeByDept implements Jsonable{
 
 	private Department mDept;				//某个部门的信息
 	private float mGiftPrice;				//某个部门的赠送额
@@ -50,6 +56,21 @@ public class IncomeByDept {
 	
 	public void setIncome(float income) {
 		this.mIncome = income;
+	}
+
+	@Override
+	public Map<String, Object> toJsonMap(int flag) {
+		Map<String, Object> jm = new HashMap<String, Object>();
+		jm.put("dept", this.mDept);
+		jm.put("discountPrice", this.mDiscountPrice);
+		jm.put("giftPrice", this.mGiftPrice);
+		jm.put("income", this.mIncome);
+		return Collections.unmodifiableMap(jm);
+	}
+
+	@Override
+	public List<Object> toJsonList(int flag) {
+		return null;
 	}
 	
 }

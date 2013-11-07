@@ -1,8 +1,14 @@
 package com.wireless.pojo.billStatistics;
 
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-public class ShiftDetail{
+import com.wireless.json.Jsonable;
+import com.wireless.pojo.util.DateUtil;
+
+public class ShiftDetail implements Jsonable{
 	private String onDuty;				//开始时间
 	private String offDuty;				//结束时间
 	
@@ -29,6 +35,7 @@ public class ShiftDetail{
 	private float hangActualIncome;		//挂账实收
 	
 	private float totalActual;			//合计实收金额
+	private float totalIncome;			//合计实收金额
 	
 	private int discountAmount;			//折扣账单数
 	private float discountIncome;		//合计折扣金额
@@ -322,5 +329,91 @@ public class ShiftDetail{
 
 	public void setChargeByCreditCard(float chargeByCreditCard) {
 		this.chargeByCreditCard = chargeByCreditCard;
+	}
+	public float getTotalIncome() {
+		return totalIncome;
+	}
+
+	public void setTotalIncome(float totalIncome) {
+		this.totalIncome = totalIncome;
+	}
+
+	@Override 
+	public String toString(){
+		return "ShiftDetail : " +
+				"orderAmount " + this.orderAmount +
+				"onDuty" + this.onDuty +
+				"offDuty" + this.offDuty;
+	}
+	
+	@Override
+	public boolean equals(Object obj){
+		if(obj == null || !(obj instanceof ShiftDetail)){
+			return false;
+		}else{
+			return this.offDuty == ((ShiftDetail) obj).offDuty && this.onDuty == ((ShiftDetail) obj).onDuty;
+		}
+	}
+
+	@Override
+	public int hashCode() {
+		int result = 17;
+		result = (int) (result * 31 + DateUtil.parseDate(offDuty));
+		return result;
+	}
+
+	@Override
+	public Map<String, Object> toJsonMap(int flag) {
+		Map<String, Object> jm = new HashMap<String, Object>();
+		jm.put("paramsOnDuty", this.onDuty);
+		jm.put("paramsOnDuty", this.offDuty);
+		jm.put("totalActual", this.getTotalActual());
+		jm.put("totalIncome", this.getTotalIncome());
+		jm.put("orderAmount", this.orderAmount);
+		
+		jm.put("cashIncome2", this.getCashActualIncome());
+		jm.put("cashAmount", this.getCashAmount());
+		
+		jm.put("creditCardIncome2", this.getCreditActualIncome());
+		jm.put("creditCardAmount", this.getCreditCardAmount());
+		
+		jm.put("hangIncome2", this.getHangActualIncome());
+		jm.put("hangAmount", this.getHangAmount());
+		
+		jm.put("signIncome2", this.getSignActualIncome());
+		jm.put("signAmount", this.getSignAmount());
+		
+		jm.put("memberAmount", this.getMemberCardAmount());
+		jm.put("memberActual", this.getMemberActualIncome());
+		
+		jm.put("discountIncome", this.getDiscountIncome());
+		
+		jm.put("giftIncome", this.getGiftIncome());
+		
+		jm.put("cancelIncome", this.getCancelIncome());
+		
+		jm.put("eraseIncome", this.getEraseIncome());
+		
+		jm.put("paidIncome", this.getPaidIncome());
+		jm.put("serviceAmount", this.getServiceAmount());
+		jm.put("serviceIncome", this.getServiceIncome());
+		
+		jm.put("deptStat", this.getDeptIncome());
+		jm.put("paidAmount", this.getPaidAmount());
+		jm.put("eraseAmount", this.getEraseAmount());
+		jm.put("cancelAmount", this.getCancelAmount());
+		jm.put("giftAmount", this.getGiftAmount());
+		jm.put("discountAmount", this.getDiscountAmount());
+		jm.put("signIncome", this.getSignTotalIncome());
+		jm.put("hangIncome", this.getHangTotalIncome());
+		jm.put("creditCardIncome", this.getCreditTotalIncome());
+		jm.put("cashIncome", this.getCashTotalIncome());
+		jm.put("memberIncome", this.getMemberTotalIncome());
+		return Collections.unmodifiableMap(jm);
+	}
+
+	@Override
+	public List<Object> toJsonList(int flag) {
+		return null;
 	}
 }

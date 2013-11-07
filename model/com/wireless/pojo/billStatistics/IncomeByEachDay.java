@@ -20,6 +20,7 @@ public class IncomeByEachDay implements Jsonable{
 	private IncomeByRepaid incomeByRepaid;
 	private IncomeByService incomeByService;
 	private IncomeByCharge incomeByCharge;
+	private List<BusinessStatisticsByDept> deptStat;
 	
 	public IncomeByEachDay(String date){
 		this.date = date;
@@ -133,6 +134,13 @@ public class IncomeByEachDay implements Jsonable{
 		this.incomeByCharge = incomeByCharge;
 	}
 	
+	public List<BusinessStatisticsByDept> getDeptStat() {
+		return deptStat;
+	}
+	public void setDeptStat(List<BusinessStatisticsByDept> deptStat) {
+		this.deptStat = deptStat;
+	}
+	
 	@Override 
 	public String toString(){
 		return "IncomeEachDay : " +
@@ -164,22 +172,45 @@ public class IncomeByEachDay implements Jsonable{
 		jm.put("totalActual", this.incomeByPay == null ? 0 : this.incomeByPay.getTotalActual());
 		jm.put("totalIncome", this.incomeByPay == null ? 0 : this.incomeByPay.getTotalIncome());
 		jm.put("orderAmount", this.getTotalAmount());
+		
 		jm.put("cashIncome2", this.incomeByPay == null ? 0 : this.incomeByPay.getCashActual());
 		jm.put("cashAmount", this.incomeByPay == null ? 0 : this.incomeByPay.getCashAmount());
+		
 		jm.put("creditCardIncome2", this.incomeByPay == null ? 0 : this.incomeByPay.getCreditCardActual());
 		jm.put("creditCardAmount", this.incomeByPay == null ? 0 : this.incomeByPay.getCreditCardAmount());
+		
 		jm.put("hangIncome2", this.incomeByPay == null ? 0 : this.incomeByPay.getHangActual());
 		jm.put("hangAmount", this.incomeByPay == null ? 0 : this.incomeByPay.getHangAmount());
+		
 		jm.put("signIncome2", this.incomeByPay == null ? 0 : this.incomeByPay.getSignActual());
 		jm.put("signAmount", this.incomeByPay == null ? 0 : this.incomeByPay.getSignAmount());
+		
 		jm.put("memberAmount", this.incomeByPay == null ? 0 : this.incomeByPay.getMemberCardAmount());
 		jm.put("memberActual", this.incomeByPay == null ? 0 : this.incomeByPay.getMemberCardActual());
+		
 		jm.put("discountIncome", this.getIncomeByDiscount().getTotalDiscount());
+		
 		jm.put("giftIncome", this.getIncomeByGift().getTotalGift());
+		
 		jm.put("cancelIncome", this.getIncomeByCancel().getTotalCancel());
+		
 		jm.put("eraseIncome", this.getIncomeByErase().getTotalErase());
+		
 		jm.put("paidIncome", this.getIncomeByRepaid().getTotalRepaid());
 		
+		if(flag > 0){
+			jm.put("deptStat", this.deptStat);
+			jm.put("paidAmount", this.getIncomeByRepaid().getRepaidAmount());
+			jm.put("eraseAmount", this.getIncomeByErase().getEraseAmount());
+			jm.put("cancelAmount", this.getIncomeByCancel().getCancelAmount());
+			jm.put("giftAmount", this.getIncomeByGift().getGiftAmount());
+			jm.put("discountAmount", this.getIncomeByDiscount().getDiscountAmount());
+			jm.put("signIncome", this.incomeByPay == null ? 0 : this.incomeByPay.getSignIncome());
+			jm.put("hangIncome", this.incomeByPay == null ? 0 : this.incomeByPay.getHangIncome());
+			jm.put("creditCardIncome", this.incomeByPay == null ? 0 : this.incomeByPay.getCreditCardIncome());
+			jm.put("cashIncome", this.incomeByPay == null ? 0 : this.incomeByPay.getCashIncome());
+			jm.put("memberIncome", this.incomeByPay == null ? 0 : this.incomeByPay.getMemberCardIncome());
+		}
 		return Collections.unmodifiableMap(jm);
 	}
 
