@@ -17,6 +17,7 @@ import com.wireless.exception.ErrorCode;
 import com.wireless.exception.ProtocolError;
 import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
+import com.wireless.pack.req.PrintOption;
 import com.wireless.pack.req.ReqPayOrder;
 import com.wireless.parcel.Parcel;
 import com.wireless.pojo.client.Member;
@@ -163,7 +164,15 @@ public class PayOrderAction extends Action{
 				}				
 			}
 			
-			ProtocolPackage resp = ServerConnector.instance().ask(new ReqPayOrder(staff, orderToPay, payCate));
+			/**
+			 * 
+			 */
+			PrintOption po = PrintOption.DO_PRINT;
+			String isPrint = request.getParameter("isPrint");
+			if(isPrint != null && !isPrint.trim().isEmpty() && !Boolean.valueOf(isPrint.trim()))
+				po = PrintOption.DO_NOT_PRINT;
+				
+			ProtocolPackage resp = ServerConnector.instance().ask(new ReqPayOrder(staff, orderToPay, payCate, po));
 			
 			if(resp.header.type == Type.ACK){
 				jsonResp = jsonResp.replace("$(result)", "true");
@@ -214,6 +223,8 @@ public class PayOrderAction extends Action{
 			//just for debug
 			//System.out.println(jsonResp);
 			out.write(jsonResp);
+			out.flush();
+			out.close();
 		}
 
 		return null;
