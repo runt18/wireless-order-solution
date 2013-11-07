@@ -291,7 +291,7 @@ Util.msg = {
 	createContent : function(c){
 		var id = this.createId();
 		var content = '<div id="'+id+'" class="box-vertical msg-base">'
-			+ '<div data-type="title">'+(typeof c.title != 'string' || $.trim(c.title).length == 0 ? '提示' : c.title)+'</div>'
+			+ '<div data-type="title">'+(typeof c.title != 'string' || $.trim(c.title).length == 0 ? '温馨提示' : c.title)+'</div>'
 			+ '<div data-type="content">'+c.msg+'</div>'
 			+ (typeof c.time == 'number' ? '<div data-type="time">&nbsp;</div>' : '')
 			+ '<div data-type="button" class="box-horizontal">'

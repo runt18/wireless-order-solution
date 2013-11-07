@@ -642,8 +642,7 @@ uo.tempPayForUO = function(c){
 				result = eval("(" + result + ")");
 				if(result.success){
 					Util.msg.alert({
-						title : '操作成功',
-						msg : result.data,
+						msg : '操作成功',
 						time : 3,
 						callback : typeof c.callback == 'function' ? c.callback(result) : null
 					});
