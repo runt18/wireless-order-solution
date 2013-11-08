@@ -213,8 +213,8 @@ public class DailySettleDao {
 	 * Note that the database should be connected before invoking this method.
 	 * @param dbCon
 	 *            the database connection
-	 * @param term
-	 * 			  the terminal with both user name and restaurant id
+	 * @param staff
+	 * 			  the staff with both user name and restaurant id
 	 * @param type
 	 * 			  indicates whether the daily settle is manual or automation
 	 * @return the result to daily settle
@@ -222,18 +222,18 @@ public class DailySettleDao {
 	 *             throws if fail to execute any SQL statement
 	 * @throws BusinessException
 	 */
-	public static Result exec(DBCon dbCon, Staff term, SettleType type) throws SQLException, BusinessException{
+	public static Result exec(DBCon dbCon, Staff staff, SettleType type) throws SQLException, BusinessException{
 		Result result = new Result();
 		
 		//Perform food material consumption
 		List<StockAction.AuditBuilder> auditBuilders = new ArrayList<StockAction.AuditBuilder>();
 		
 		//生成每个部门的商品和原料出库消耗单
-		for(Department dept : DepartmentDao.getDepartments(term, null, null)){
+		for(Department dept : DepartmentDao.getDepartments(staff, null, null)){
 			
 			for(MaterialCate.Type cateType : MaterialCate.Type.values()){
 				
-				StockAction.InsertBuilder builder = StockAction.InsertBuilder.newUseUp(term.getRestaurantId(), dept, cateType);
+				StockAction.InsertBuilder builder = StockAction.InsertBuilder.newUseUp(staff.getRestaurantId(), dept, cateType);
 				
 				String sql;
 				
@@ -247,7 +247,7 @@ public class DailySettleDao {
 				      " JOIN " + Params.dbName + ".material M ON FM.material_id = M.material_id " +
 					  " JOIN " + Params.dbName + ".material_cate MC ON M.cate_id = MC.cate_id " +
 					  " WHERE 1 = 1 " +
-					  " AND O.restaurant_id = " + term.getRestaurantId() +
+					  " AND O.restaurant_id = " + staff.getRestaurantId() +
 					  " AND O.status <> " + Order.Status.UNPAID.getVal() +
 					  " AND OF.dept_id = " + dept.getId() +
 					  " AND MC.type = " + cateType.getValue() +
@@ -267,16 +267,16 @@ public class DailySettleDao {
 				
 				//如果存在出库消耗单则插入
 				if(!builder.getStockActionDetails().isEmpty()){
-					auditBuilders.add(StockAction.AuditBuilder.newStockActionAudit(StockActionDao.insertStockAction(term, builder)));
+					auditBuilders.add(StockAction.AuditBuilder.newStockActionAudit(StockActionDao.insertStockAction(staff, builder)));
 				}
 			}
 			
 		}
 		
 		//如果有盘点任务正在进行，则不审核出入库消耗单
-		if(!StockActionDao.isStockTakeChecking(dbCon, term)){
+		if(!StockActionDao.isStockTakeChecking(dbCon, staff)){
 			for(AuditBuilder auditBuilder : auditBuilders){
-				StockActionDao.auditStockAction(term, auditBuilder);
+				StockActionDao.auditStockAction(staff, auditBuilder);
 			}
 		}
 		
@@ -289,7 +289,7 @@ public class DailySettleDao {
 		 */
 		sql = " SELECT MAX(off_duty) FROM " + Params.dbName + ".daily_settle_history " +
 			  " WHERE " +
-			  " restaurant_id = " + term.getRestaurantId();
+			  " restaurant_id = " + staff.getRestaurantId();
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		if(dbCon.rs.next()){
 			Timestamp offDuty = dbCon.rs.getTimestamp(1);
@@ -309,7 +309,7 @@ public class DailySettleDao {
 		sql = " SELECT id, category FROM " + Params.dbName + ".order " +
 			  " WHERE " +
 			  " (status = " + Order.Status.PAID.getVal() + " OR " + " status = " + Order.Status.REPAID.getVal() + ")" +
-			 (term.getRestaurantId() < 0 ? "" : "AND restaurant_id=" + term.getRestaurantId());
+			 (staff.getRestaurantId() < 0 ? "" : "AND restaurant_id=" + staff.getRestaurantId());
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		while(dbCon.rs.next()){
 			
@@ -347,7 +347,7 @@ public class DailySettleDao {
 		//get the amount to shift record
 		sql = " SELECT COUNT(*) FROM " + Params.dbName + ".shift " +
 			  " WHERE 1=1 " +
-			  (term.getRestaurantId() < 0 ? "AND restaurant_id <> " + Restaurant.ADMIN : "AND restaurant_id=" + term.getRestaurantId());
+			  (staff.getRestaurantId() < 0 ? "AND restaurant_id <> " + Restaurant.ADMIN : "AND restaurant_id=" + staff.getRestaurantId());
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		if(dbCon.rs.next()){
 			result.setTotalShift(dbCon.rs.getInt(1));
@@ -518,13 +518,13 @@ public class DailySettleDao {
 			//Move the shift record from 'shift' to 'shift_history'.
 			sql = " INSERT INTO " + Params.dbName + ".shift_history (" + shiftItem + ") " +
 				  " SELECT " + shiftItem + " FROM " + Params.dbName + ".shift " +
-				  " WHERE " + (term.getRestaurantId() < 0 ? "" : "restaurant_id=" + term.getRestaurantId());
+				  " WHERE " + (staff.getRestaurantId() < 0 ? "" : "restaurant_id=" + staff.getRestaurantId());
 			dbCon.stmt.executeUpdate(sql);
 			
 			//Create the daily settle record
 			sql = " INSERT INTO " + Params.dbName + ".daily_settle_history (`restaurant_id`, `name`, `on_duty`, `off_duty`) VALUES (" +
-				  term.getRestaurantId() + ", " +
-				  "'" + (term.getName() == null ? "" : term.getName()) + "', " +
+				  staff.getRestaurantId() + ", " +
+				  "'" + (staff.getName() == null ? "" : staff.getName()) + "', " +
 				  onDuty + ", " +
 				  " NOW() " +
 				  " ) ";
@@ -595,7 +595,7 @@ public class DailySettleDao {
 			}
 			
 			//Delete the shift record from "shift".
-			sql = " DELETE FROM " + Params.dbName + ".shift WHERE " + (term.getRestaurantId() < 0 ? "" : "restaurant_id=" + term.getRestaurantId());
+			sql = " DELETE FROM " + Params.dbName + ".shift WHERE " + (staff.getRestaurantId() < 0 ? "" : "restaurant_id=" + staff.getRestaurantId());
 			dbCon.stmt.executeUpdate(sql);
 			
 			//Delete the member operation 

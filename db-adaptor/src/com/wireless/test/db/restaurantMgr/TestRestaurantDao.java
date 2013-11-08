@@ -7,6 +7,7 @@ import java.beans.PropertyVetoException;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,6 +26,7 @@ import com.wireless.db.regionMgr.TableDao;
 import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.db.staffMgr.RoleDao;
 import com.wireless.db.staffMgr.StaffDao;
+import com.wireless.db.system.SystemDao;
 import com.wireless.db.tasteMgr.TasteDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.crMgr.CancelReason;
@@ -41,6 +43,7 @@ import com.wireless.pojo.restaurantMgr.Restaurant.RecordAlive;
 import com.wireless.pojo.staffMgr.Role;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.tasteMgr.Taste;
+import com.wireless.pojo.util.DateUtil;
 import com.wireless.test.db.TestInit;
 import com.wireless.util.SQLUtil;
 
@@ -99,6 +102,9 @@ public class TestRestaurantDao {
 			//Compare the popular cancel reason
 			compareCancelReason(staff, restaurantId);
 			
+			//Compare the current material month
+			compareCurrentMaterialMonth(staff);
+			
 			//Update a restaurant
 			Restaurant.UpdateBuilder updateBuilder = new Restaurant.UpdateBuilder(restaurantId, "test2")
 														 		   .setPwd("test2@123")
@@ -126,6 +132,15 @@ public class TestRestaurantDao {
 		}finally{
 			RestaurantDao.deleteById(restaurantId);
 		}
+	}
+	
+	private void compareCurrentMaterialMonth(Staff staff) throws SQLException{
+		Calendar c = Calendar.getInstance();
+		c.add(Calendar.MONTH, 0);
+		c.set(Calendar.DAY_OF_MONTH, 1);
+		assertEquals("current material month", 
+					 DateUtil.format(c.getTimeInMillis(), DateUtil.Pattern.DATE), 
+					 DateUtil.format(SystemDao.getCurrentMonth(staff), DateUtil.Pattern.DATE));
 	}
 	
 	private void compareCancelReason(Staff staff, int restaurantId) throws SQLException{

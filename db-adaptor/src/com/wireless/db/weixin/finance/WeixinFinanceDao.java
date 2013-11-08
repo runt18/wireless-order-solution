@@ -54,7 +54,7 @@ public class WeixinFinanceDao {
 		String sql;
 
 //		//Check to see whether the weixin serial has exist before
-//		sql = " SELECT restaurant_id FROM " + Params.dbName + ".weixin_restaurant " +
+//		sql = " SELECT restaurant_id FROM " + Params.dbName + ".weixin_finance " +
 //			  " WHERE weixin_serial_crc = CRC32('" + weixinSerial + "')" +
 //			  " AND weixin_serial = '" + weixinSerial + "'";
 //		dbCon.rs = dbCon.stmt.executeQuery(sql);
@@ -65,7 +65,7 @@ public class WeixinFinanceDao {
 //		dbCon.rs.close();
 
 		//Delete the previous bind relationship.
-		sql = " DELETE FROM " + Params.dbName + ".weixin_restaurant " +
+		sql = " DELETE FROM " + Params.dbName + ".weixin_finance " +
 			  " WHERE weixin_serial_crc = CRC32('" + weixinSerial + "')" +
 			  " AND weixin_serial = '" + weixinSerial + "'";
 		dbCon.stmt.executeUpdate(sql);
@@ -87,12 +87,13 @@ public class WeixinFinanceDao {
 		dbCon.rs.close();
 		
 		//Insert the binding between weixin serial and restaurant
-		sql = " INSERT INTO " + Params.dbName + ".weixin_restaurant" +
-			  "(`weixin_serial`, `restaurant_id`, `weixin_serial_crc`)" +
+		sql = " INSERT INTO " + Params.dbName + ".weixin_finance" +
+			  "(`weixin_serial`, `restaurant_id`, `weixin_serial_crc`, `bind_date`)" +
 			  " VALUES(" +
 			  "'" + weixinSerial + "'," +
 			  restaurantId + "," +
-			  "CRC32('" + weixinSerial + "')" +
+			  "CRC32('" + weixinSerial + "')," +
+			  " NOW() " +
 			  ")";
 		dbCon.stmt.executeUpdate(sql);
 	}
@@ -131,7 +132,7 @@ public class WeixinFinanceDao {
 	 */
 	public static int getRestaurantIdByWeixin(DBCon dbCon, String weixinSerial) throws SQLException, BusinessException{
 		String sql;
-		sql = " SELECT restaurant_id FROM " + Params.dbName + ".weixin_restaurant " +
+		sql = " SELECT restaurant_id FROM " + Params.dbName + ".weixin_finance " +
 			  " WHERE weixin_serial_crc = CRC32('" + weixinSerial + "')" +
 			  " AND weixin_serial = '" + weixinSerial + "'";
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
