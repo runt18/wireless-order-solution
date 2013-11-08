@@ -20,6 +20,7 @@ public enum ErrorType {
 	 *  STAFF : 7600 - 7649 
 	 *  DEVICE : 7550 - 7599 
 	 *  WEIXIN_FINANCE : 7500 - 7549 
+	 *  WEIXIN_RESTAURANT : 7550 - 7599
 	 */
 	UNKNOWN(1, "unknown"),
 	PROTOCOL(2, "protocol"),
@@ -39,7 +40,8 @@ public enum ErrorType {
 	PRINT_SCHEME(16, "print scheme"),
 	STAFF(17, "staff"),
 	DEVICE(18, "device"),
-	WEIXIN_FINANCE(19, "weixin_finance");
+	WEIXIN_FINANCE(19, "weixin_finance"),
+	WEIXIN_RESTAURANT(20, "weixin_restaurant");
 	
 	private final String desc;
 	
