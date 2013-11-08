@@ -33,6 +33,6 @@ public class TestWeixinRestaurantDao {
 		
 		WeixinRestaurantDao.bind(WEIXIN_RESTAURANT_SERIAL, account);
 		Assert.assertTrue("weixin serial is bound to restaurant account", WeixinRestaurantDao.isBound(WEIXIN_RESTAURANT_SERIAL));
-
+		Assert.assertEquals("restaurant bound to weixin serial", RestaurantDao.getByAccount(account).getId(), WeixinRestaurantDao.getRestaurantIdByWeixin(WEIXIN_RESTAURANT_SERIAL));
 	}
 }
