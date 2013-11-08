@@ -14,7 +14,8 @@ import org.apache.struts.action.ActionMapping;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.staffMgr.Staff;
-import com.wireless.util.WebParams;
+import com.wireless.util.OSSParams;
+import com.wireless.util.OSSUtil;
 
 public class QueryOTAction extends Action {
 
@@ -53,7 +54,7 @@ public class QueryOTAction extends Action {
 				int pin = Integer.parseInt(request.getParameter("pin"));
 				Staff staff = StaffDao.getStaffById(pin);
 				// 获取图片操作路径(物理路径)
-				String url = getServlet().getInitParameter(WebParams.IMAGE_BROWSE_PATH) + "/" + staff.getRestaurantId() + "/";
+				String url = "http://" + OSSUtil.BUCKET_IMAGE + "." + OSSParams.instance().OSS_OUTER_POINT + "/" + staff.getRestaurantId() + "/";
 				result = result.replace("$(result)", "true").replace("$(value)", url);
 			}			
 			
