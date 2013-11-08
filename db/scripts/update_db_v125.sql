@@ -120,19 +120,6 @@ ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8;
 
 -- -----------------------------------------------------
--- Table `wireless_order_db`.`weixin_restaurant`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `wireless_order_db`.`weixin_restaurant` ;
-
-CREATE TABLE IF NOT EXISTS `wireless_order_db`.`weixin_restaurant` (
-  `weixin_serial` VARCHAR(45) NOT NULL,
-  `restaurant_id` INT NOT NULL,
-  `weixin_serial_crc` INT NOT NULL,
-  INDEX `ix_finance_crc` (`weixin_serial_crc` ASC))
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8;
-
--- -----------------------------------------------------
 -- Add the field 'joint_probability' & 'mutual_info' to table 'food_association'
 -- -----------------------------------------------------
 ALTER TABLE `wireless_order_db`.`food_association` 
@@ -144,6 +131,58 @@ ADD COLUMN `similarity` FLOAT NOT NULL DEFAULT 0 AFTER `joint_probability`;
 -- -----------------------------------------------------
 ALTER TABLE `wireless_order_db`.`food_statistics` 
 ADD COLUMN `probability` FLOAT NOT NULL DEFAULT 0 AFTER `order_cnt`;
+
+-- -----------------------------------------------------
+-- Table `wireless_order_db`.`weixin_finance`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `wireless_order_db`.`weixin_finance` ;
+
+CREATE TABLE IF NOT EXISTS `wireless_order_db`.`weixin_finance` (
+  `weixin_serial` VARCHAR(45) NOT NULL,
+  `restaurant_id` INT NOT NULL,
+  `weixin_serial_crc` BIGINT NOT NULL,
+  `bind_date` DATETIME NOT NULL,
+  INDEX `ix_finance_crc` (`weixin_serial_crc` ASC))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
+
+-- -----------------------------------------------------
+-- Table `wireless_order_db`.`weixin_member`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `wireless_order_db`.`weixin_member` ;
+
+CREATE TABLE IF NOT EXISTS `wireless_order_db`.`weixin_member` (
+  `weixin_serial` VARCHAR(45) NOT NULL,
+  `weixin_serial_crc` BIGINT NOT NULL,
+  `restaurant_id` INT NOT NULL,
+  `member_id` INT NOT NULL,
+  `interest_date` DATETIME NULL,
+  `bind_date` DATETIME NULL,
+  `cancel_date` DATETIME NULL,
+  `status` TINYINT NOT NULL DEFAULT 1 COMMENT 'the status to weixin member as below.\n1 - 已关注\n2 - 已绑定\n3 - 取消关注',
+  INDEX `ix_weixin_serial_crc` (`weixin_serial_crc` ASC),
+  INDEX `ix_member_id` (`member_id` ASC),
+  INDEX `ix_restaurant_id` (`restaurant_id` ASC))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
+
+-- -----------------------------------------------------
+-- Table `wireless_order_db`.`weixin_restaurant`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `wireless_order_db`.`weixin_restaurant` ;
+
+CREATE TABLE IF NOT EXISTS `wireless_order_db`.`weixin_restaurant` (
+  `weixin_serial` VARCHAR(45) NULL DEFAULT NULL,
+  `weixin_serial_crc` BIGINT NULL DEFAULT NULL,
+  `restaurant_id` INT NOT NULL,
+  `bind_date` DATETIME NULL DEFAULT NULL,
+  `status` TINYINT NOT NULL DEFAULT 1 COMMENT 'the status as below.\n1 - 已验证\n2 - 已绑定',
+  INDEX `ix_weixin_serial_crc` (`weixin_serial_crc` ASC),
+  INDEX `ix_restaurant_id` (`restaurant_id` ASC))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
 
 
 SET SQL_SAFE_UPDATES = @OLD_SAFE_UPDATES;
