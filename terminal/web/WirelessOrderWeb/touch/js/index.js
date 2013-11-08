@@ -82,8 +82,8 @@ function initFoodData(){
 					},
 					success : function(data, status, xhr){
 						if(data.success){
-							tasteData={};
-							tasteData={totalProperty:data.root.length, root:data.root.slice(0)};
+							tasteData = {};
+							tasteData = {totalProperty:data.root.length, root:data.root.slice(0)};
 						}else{
 							alert('初始化口味数据失败.');
 						}
@@ -102,11 +102,16 @@ function initFoodData(){
 							id : data.root[i].kitchen.dept.id
 						}
 					};
-					data.root[i].kitchen=tmpKitchen;
+					data.root[i].kitchen = tmpKitchen;
 				}
-				tmpKitchen=null;
-				localStorage.setItem('foods', JSON.stringify(data));
-				foodData=data;
+				tmpKitchen = null;
+//				localStorage.setItem('foods', JSON.stringify(data));
+				foodData = {root:[]};
+				for(var i = 0; i < data.root.length; i++){
+					if(data.root[i].status != 4)
+						foodData.root.push(data.root[i]);
+				}
+				foodData.totalProperty = foodData.root.length;
 				
 				// 加载部门数据,分厨数据
 				$.ajax({
@@ -119,10 +124,10 @@ function initFoodData(){
 					success : function(data, status, xhr){
 						Util.LM.hide();
 						if(data.success){
-							deptData={root:[]};
-							kitchenData={totalProperty:data.root.length, root:data.root.slice(0)};
-							kitchenFoodData={totalProperty:data.root.length, root:data.root.slice(0)};
-							var tempFoodData=foodData.root.slice(0);
+							deptData = {root:[]};
+							kitchenData = {totalProperty:data.root.length, root:data.root.slice(0)};
+							kitchenFoodData = {totalProperty:data.root.length, root:data.root.slice(0)};
+							var tempFoodData = foodData.root.slice(0);
 							deptData.root.push(kitchenData.root[0].dept);
 							for(var j=0; j < kitchenFoodData.root.length; j++){
 								var temp=kitchenFoodData.root[j];
@@ -142,7 +147,7 @@ function initFoodData(){
 									deptData.root.push(temp.dept);
 								}
 							}
-							deptData.totalProperty=deptData.root.length;
+							deptData.totalProperty = deptData.root.length;
 							deptData.root.unshift({
 								id : -1,
 								name : '全部部门'
@@ -164,7 +169,7 @@ function initFoodData(){
 								foods : foodData.root.slice(0)
 							});
 							// 清理多余数据
-							for(var i=kitchenFoodData.root.length - 1; i >= 0; i--){
+							for(var i = kitchenFoodData.root.length - 1; i >= 0; i--){
 								if(kitchenFoodData.root[i].foods.length <= 0){
 									for(var k=kitchenData.root.length - 1; k >= 0; k--){
 										if(kitchenData.root[k].id == kitchenFoodData.root[i].id){
@@ -175,8 +180,8 @@ function initFoodData(){
 									}
 								}
 							}
-							localStorage.setItem('dept', JSON.stringify(deptData));
-							localStorage.setItem('kitchen', JSON.stringify(kitchenData));
+//							localStorage.setItem('dept', JSON.stringify(deptData));
+//							localStorage.setItem('kitchen', JSON.stringify(kitchenData));
 						}else{
 							alert('初始化分厨数据失败.');
 						}
@@ -200,11 +205,11 @@ function initFoodData(){
 						if(data.success){
 							allowTempKitchen = data;
 						}else{
-							alert('临时菜打印分厨数据失败.');
+							alert('初始化临时菜打印分厨数据失败.');
 						}
 					},
 					error : function(request, status, err){
-						alert('临时菜打印分厨数据失败.');
+						alert('初始化临时菜打印分厨数据失败.');
 					}
 				});
 				
