@@ -68,7 +68,7 @@ var addDeviceWin = new Ext.Window({
 					dataSource = 'insert';
 				}else{
 					dataSource = 'update';
-					id = Ext.getCmp('grid').getSelectionModel().getSelected().data.id;
+					id = Ext.getCmp('device_grid').getSelectionModel().getSelected().data.id;
 				}
 				
 				Ext.Ajax.request({
@@ -87,7 +87,7 @@ var addDeviceWin = new Ext.Window({
 						if(jr.success){
 							Ext.example.msg(jr.title, jr.msg);
 							addDeviceWin.hide();
-							Ext.getCmp('grid').store.reload();
+							Ext.getCmp('device_grid').store.reload();
 						}else{
 							Ext.ux.showMsg(jr);
 						}
@@ -247,7 +247,7 @@ function operateDevice(c){
 			addDeviceWin.show();
 			addDeviceWin.operationType = c.otype;
 			addDeviceWin.setTitle('修改终端');
-			var ss = Ext.getCmp('grid').getSelectionModel().getSelected();
+			var ss = Ext.getCmp('device_grid').getSelectionModel().getSelected();
 			Ext.getCmp('txtDeviceId').setValue(ss.data.deviceId);
 			Ext.getCmp('txtDeviceRId').setValue(ss.data.restaurantId);
 			
@@ -271,7 +271,7 @@ function operateDevice(c){
 					Ext.Ajax.request({
 						url : '../../OperateDevice.do',
 						params : {
-							id : Ext.getCmp('grid').getSelectionModel().getSelected().data.id,
+							id : Ext.getCmp('device_grid').getSelectionModel().getSelected().data.id,
 							dataSource : 'delete',
 							isCookie : true
 						},
@@ -279,7 +279,7 @@ function operateDevice(c){
 							var jr = Ext.decode(res.responseText);
 							if(jr.success){
 								Ext.example.msg(jr.title, jr.msg);
-								Ext.getCmp('grid').store.reload();
+								Ext.getCmp('device_grid').store.reload();
 							}
 						},
 						failure : function(){
@@ -390,7 +390,7 @@ Ext.onReady(function(){
 	
 	deviceGrid = new Ext.grid.GridPanel({
 		title : 'Digi-e管理中心 - 终端管理',
-		id : 'grid',
+		id : 'device_grid',
 		height : '500',
 		region : 'center',
 		border : true,

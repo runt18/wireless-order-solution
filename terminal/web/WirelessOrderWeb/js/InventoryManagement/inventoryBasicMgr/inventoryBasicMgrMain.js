@@ -223,7 +223,7 @@ function initOperateMaterialWin(){
 			fieldLabel : '原料名称',
 			allowBlank : false
 		});
-		var materialCate = new Ext.form.ComboBox({
+		var initMaterialCate = new Ext.form.ComboBox({
 			id : 'txtMaterialCate',
 			fieldLabel : '所属类别',
 		    store : new Ext.data.JsonStore({
@@ -256,7 +256,7 @@ function initOperateMaterialWin(){
 				defaults : {
 					width : 130
 				},
-				items : [materialId, materialName, materialCate]
+				items : [materialId, materialName, initMaterialCate]
 			}],
 			keys : [{
 				key : Ext.EventObject.ESC,
@@ -284,7 +284,7 @@ function initOperateMaterialWin(){
 					}else{
 						return;
 					}
-					if(!materialName.isValid() || !materialCate.isValid()){
+					if(!materialName.isValid() || !initMaterialCate.isValid()){
 						return;
 					}
 					Ext.Ajax.request({
@@ -295,7 +295,7 @@ function initOperateMaterialWin(){
 							restaurantID : restaurantID,
 							id : materialId.getValue(),
 							name : materialName.getValue(),
-							cateId : materialCate.getValue()
+							cateId : initMaterialCate.getValue()
 						},
 						success : function(res, opt){
 							var jr = Ext.decode(res.responseText);
@@ -331,7 +331,7 @@ function initOperateMaterialWin(){
 					}else{
 						return;
 					}
-					if(!materialName.isValid() || !materialCate.isValid()){
+					if(!materialName.isValid() || !initMaterialCate.isValid()){
 						return;
 					}
 					Ext.Ajax.request({
@@ -342,7 +342,7 @@ function initOperateMaterialWin(){
 							restaurantID : restaurantID,
 							id : materialId.getValue(),
 							name : materialName.getValue(),
-							cateId : materialCate.getValue()
+							cateId : initMaterialCate.getValue()
 						},
 						success : function(res, opt){
 							var jr = Ext.decode(res.responseText);
@@ -370,7 +370,7 @@ function initOperateMaterialWin(){
 			listeners : {
 				show : function(thiz){
 					thiz.center();
-					materialCate.store.loadData(materialCateData);
+					initMaterialCate.store.loadData(materialCateData);
 					
 				}
 			}

@@ -301,7 +301,7 @@ Ext.onReady(function(){
 	});
 	stockStateGrid = new Ext.grid.GridPanel({
 		title : '库存分布汇总',
-		id : 'grid',
+		id : 'stock_state_grid',
 		region : 'center',
 		height : '500',
 		border : true,

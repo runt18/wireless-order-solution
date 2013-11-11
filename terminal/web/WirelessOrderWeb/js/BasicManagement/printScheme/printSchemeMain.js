@@ -232,7 +232,7 @@ if(!addPrintFunc){
 					success : function(res, opt){
 						var jr = Ext.decode(res.responseText);
 						if(jr.success){
-							Ext.getCmp('grid').store.reload();
+							Ext.getCmp('printFunc_grid').store.reload();
 							Ext.example.msg(jr.title, jr.msg);
 						}else{
 							Ext.ux.showMsg(jr);
@@ -314,7 +314,7 @@ if(!addPrintFunc){
 					dataSource = 'insert';
 				}
 				else if(addPrintFunc.operationType == 'update'){
-					var ss = Ext.getCmp('grid').getSelectionModel().getSelected();
+					var ss = Ext.getCmp('printFunc_grid').getSelectionModel().getSelected();
 					funcId = ss.data.printFuncId;
 					dataSource = 'update';
 				}
@@ -850,7 +850,7 @@ if(!printerWin){
 
 
 function deletePrintFuncOperationHandler(){
-	var ss = Ext.getCmp('grid').getSelectionModel().getSelected();
+	var ss = Ext.getCmp('printFunc_grid').getSelectionModel().getSelected();
 	if(ss != null){
 		Ext.Msg.confirm(
 			'提示',
@@ -866,7 +866,7 @@ function deletePrintFuncOperationHandler(){
 						success : function(res, opt){
 							var jr = Ext.decode(res.responseText);
 							if(jr.success){
-								Ext.getCmp('grid').store.reload();
+								Ext.getCmp('printFunc_grid').store.reload();
 								Ext.example.msg(jr.title, jr.msg);
 							}else{
 								Ext.ux.showMsg(jr);
@@ -936,7 +936,7 @@ function printFuncOperactionHandler(c){
 		
 		
 	}else{
-		var ss = Ext.getCmp('grid').getSelectionModel().getSelected();
+		var ss = Ext.getCmp('printFunc_grid').getSelectionModel().getSelected();
 		
 		if(ss == null){
 			Ext.MessageBox.alert('提示', '请选中一个方案再进行操作.');
@@ -1255,7 +1255,7 @@ Ext.onReady(function(){
 	
 	var printFuncGrid = new Ext.grid.GridPanel({
 		title : '打印方案',
-		id : 'grid',
+		id : 'printFunc_grid',
 		region : 'center',
 		height : '500',
 		border : true,

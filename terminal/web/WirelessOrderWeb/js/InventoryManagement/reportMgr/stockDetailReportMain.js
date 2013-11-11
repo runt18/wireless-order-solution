@@ -60,10 +60,10 @@ var stockForm = new Ext.form.FormPanel({
 
 var stockDetail = new Ext.grid.ColumnModel([
 	 new Ext.grid.RowNumberer(),
-	 {header:'品项名称', dataIndex:'materialName', width:140},
-	 {header:'数量', dataIndex:'amount', width:140},
-	 {header:'单价', dataIndex:'price', width:140},
-	 {header:'结存数量', dataIndex:'remaining', width:140}
+	 {header:'品项名称', dataIndex:'materialName', width:160},
+	 {header:'数量', dataIndex:'amount', width:140, align:'right'},
+	 {header:'单价', dataIndex:'price', width:120, align:'right', renderer : 'Ext.ux.txtFormat.gridDou'},
+	 {header:'结存数量', dataIndex:'remaining', width:140, align:'right'}
 ]);
 
 stockDetail.defaultSortable = true;
@@ -408,8 +408,8 @@ Ext.onReady(function(){
 				var sn = stockDetailReportTree.getSelectionModel().getSelectedNode();
 				//Ext.MessageBox.alert(sn.attributes.deptID);
 				var sgs = stockDetailReportGrid.getStore();
-				sgs.baseParams['sdr_beginDate'] = Ext.getCmp('sdr_beginDate').getValue().format('Y-m-d');
-				sgs.baseParams['sdr_endDate'] = Ext.getCmp('sdr_endDate').getValue().format('Y-m-d');
+				sgs.baseParams['beginDate'] = Ext.getCmp('sdr_beginDate').getValue().format('Y-m-d');
+				sgs.baseParams['endDate'] = Ext.getCmp('sdr_endDate').getValue().format('Y-m-d');
 				sgs.baseParams['deptId'] = !sn ? deptID : sn.attributes.deptID;
 				sgs.baseParams['materialId'] = Ext.getCmp('materialId').getValue();
 				sgs.baseParams['stockType'] = Ext.getCmp('sdr_comboSearchForStockType').getValue();
@@ -512,7 +512,7 @@ Ext.onReady(function(){
 
 	var stockDetailReportGrid = new Ext.grid.GridPanel({
 		title : '进销存明细',
-		id : 'grid',
+		id : 'stock_detail_grid',
 		region : 'center',
 		height : '500',
 		border : true,

@@ -442,7 +442,7 @@ Ext.onReady(function(){
 
 	var supplierGrid = new Ext.grid.GridPanel({
 			title : '供应商列表',
-			id : 'grid',
+			id : 'supplier_grid',
 		    //height : '500',
 		    border : true,
 		    frame : true,

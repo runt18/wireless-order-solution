@@ -1,6 +1,6 @@
 
 function onLoad(){
-	Ext.getCmp('grid').getStore().load();
+	Ext.getCmp('cost_analysis').getStore().load();
 }
 
 var suppllierGridTbar;
@@ -76,7 +76,7 @@ Ext.onReady(function(){
 	
 	var costAnalyzeGrid = new Ext.grid.GridPanel({
 		title : '成本分析表',
-		id : 'grid',
+		id : 'cost_analysis',
 	    height : '500',
 	    border : true,
 	    frame : true,

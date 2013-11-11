@@ -21,6 +21,41 @@ var logOutBut = new Ext.ux.ImageButton({
 	}
 });
 
+var deptStore = new Ext.data.Store({
+	//proxy : new Ext.data.MemoryProxy(data),
+	proxy : new Ext.data.HttpProxy({url:'../../QueryDept.do'}),
+	reader : new Ext.data.JsonReader({totalProperty:'totalProperty', root : 'root'}, [
+	         {name : 'id'},
+	         {name : 'name'}
+	])
+});
+
+deptStore.load({  
+    params: { 
+    	dataSource : 'normal'
+    }  
+});
+
+var deptComb = new Ext.form.ComboBox({
+	forceSelection : true,
+	width : 110,
+	maxheight : 300,
+	id : 'comboDept',
+	store : deptStore,
+	valueField : 'id',
+	displayField : 'name',
+	typeAhead : true,
+	mode : 'local',
+	triggerAction : 'all',
+	selectOnFocus : true,
+	listeners : {
+		select : function(){
+			Ext.getCmp('btnSearch').handler();		
+		}
+		
+	}
+});
+
 var materialStore = new Ext.data.Store({
 	//proxy : new Ext.data.MemoryProxy(data),
 	proxy : new Ext.data.HttpProxy({url:'../../QueryMaterial.do?restaurantID=' + restaurantID}),
@@ -85,31 +120,31 @@ Ext.onReady(function(){
 	
 
 	totalStyle = function(v){
-		return "<font color='red' size='4'>"+ v + "</font>" ;
+		return "<font color='red' size='3'>"+ Ext.ux.txtFormat.gridDou(v) + "</font>" ;
 	};
 	amountStyle = function(v){
-		return "<font color='green' size='4'>"+ v + "</font>" ;
+		return "<font color='green' size='3'>"+ Ext.ux.txtFormat.gridDou(v) + "</font>" ;
 	};
 	//定义列模型
 	var cm = new Ext.grid.ColumnModel([
          new Ext.grid.RowNumberer(),
          {header:'品行编号', dataIndex:'materialId'},
-         {header:'品行名称', dataIndex:'materialName'},
-         {header:'期初数量', dataIndex:'primeAmount', renderer:totalStyle},
-         {header:'入库采购', dataIndex:'stockIn'},
-         {header:'入库调拨', dataIndex:'stockInTransfer'},
-         {header:'入库报溢', dataIndex:'stockSpill'},
-         {header:'入库盘盈', dataIndex:'stockTakeMore'},
-         {header:'入库小计', dataIndex:'stockInAmount', renderer:amountStyle},
-         {header:'出库退货', dataIndex:'stockOut'},
-         {header:'出库调拨', dataIndex:'stockOutTransfer'},
-         {header:'出库报损', dataIndex:'stockDamage'},
-         {header:'出库盘亏', dataIndex:'stockTakeLess'},
-         {header:'出库消耗', dataIndex:'useUp'},
-         {header:'出库小计', dataIndex:'stockOutAmount', renderer:amountStyle},
-         {header:'期末数量', dataIndex:'finalAmount', renderer:totalStyle},
-         {header:'期末单价', dataIndex:'finalPrice'},
-         {header:'期末金额', dataIndex:'finalMoney', renderer:totalStyle}]);
+         {header:'品行名称', dataIndex:'materialName',align:'left'},
+         {header:'期初数量', dataIndex:'primeAmount', align:'right', renderer:totalStyle},
+         {header:'入库采购', dataIndex:'stockIn', align:'right'},
+         {header:'入库调拨', dataIndex:'stockInTransfer', align:'right'},
+         {header:'入库报溢', dataIndex:'stockSpill', align:'right'},
+         {header:'入库盘盈', dataIndex:'stockTakeMore', align:'right'},
+         {header:'入库小计', dataIndex:'stockInAmount', align:'right', renderer:amountStyle},
+         {header:'出库退货', dataIndex:'stockOut', align:'right'},
+         {header:'出库调拨', dataIndex:'stockOutTransfer', align:'right'},
+         {header:'出库报损', dataIndex:'stockDamage', align:'right'},
+         {header:'出库盘亏', dataIndex:'stockTakeLess', align:'right'},
+         {header:'出库消耗', dataIndex:'useUp', align:'right'},
+         {header:'出库小计', dataIndex:'stockOutAmount', align:'right', renderer:amountStyle},
+         {header:'期末数量', dataIndex:'finalAmount', align:'right', renderer:totalStyle},
+         {header:'期末单价', dataIndex:'finalPrice', align:'right', renderer:''},
+         {header:'期末金额', dataIndex:'finalMoney', align:'right', renderer:totalStyle}]);
 	 cm.defaultSortable = true;
 			
 			
@@ -176,6 +211,9 @@ Ext.onReady(function(){
 		}, {xtype:'tbtext', text:'&nbsp;&nbsp;'},
 		{ xtype:'tbtext', text:'品项:'},
 		materialComb,
+		{xtype:'tbtext', text:'&nbsp;&nbsp;'},
+		{ xtype:'tbtext', text:'部门:'},
+		deptComb,
 		'->', {
 			text : '搜索',
 			id : 'btnSearch',
@@ -203,10 +241,11 @@ Ext.onReady(function(){
 				sgs.load({
 					params : {
 						start : 0,
-						limit : 10,
+						limit : 17,
 						cateType : cateType,
 						cateId : cateId,
-						materialId : materialId
+						materialId : materialId,
+						deptId : deptComb.getValue()
 					}
 				});
 			}
@@ -215,7 +254,7 @@ Ext.onReady(function(){
 	});
 	
 	var pagingBar = new Ext.PagingToolbar({
-		pageSize : 10,
+		pageSize : 17,
 		store : ds,
 		displayInfo : true,
 		displayMsg : '显示第 {0} 条到 {1} 条记录，共 {2} 条',
@@ -291,14 +330,16 @@ Ext.onReady(function(){
 	
 	var stockReportGrid = new Ext.grid.GridPanel({
 		title : '进销存汇总',
-		id : 'grid',
+		id : 'stock_report_grid',
 		region : 'center',
+//		width : 1400,
 		height : '500',
 		store : ds,
 		cm : cm,
-		viewConfig : {
+/*		viewConfig : {
 			forceFit : true
-		},
+		},*/
+		loadMask : { msg: '数据请求中,请稍等......' },
 		tbar : stockTakeTbar,
 		bbar : pagingBar
 
@@ -336,18 +377,16 @@ Ext.onReady(function(){
 		}
 	});
 	
-	ds.load({params:{start:0,limit:10}});
-	
-	
     new Ext.Panel({
 		id : 'panelReport',
-		//region : 'center',//渲染到
-		width : parseInt(Ext.getDom('divPanel').parentElement.style.width.replace(/px/g,'')),
-		height : parseInt(Ext.getDom('divPanel').parentElement.style.height.replace(/px/g,'')),
-		renderTo : 'divPanel',
+		renderTo : 'divStockReport',
+		//width : parseInt(Ext.getDom('divStockReport').parentElement.style.width.replace(/px/g,'')),
+		height : parseInt(Ext.getDom('divStockReport').parentElement.style.height.replace(/px/g,'')),
 		layout : 'border',//布局
 		//margins : '5 5 5 5',
 		//子集
 		items : [stockReportTree,stockReportGrid]
 	});
+	
+	ds.load({params:{start:0,limit:17}});
 });
