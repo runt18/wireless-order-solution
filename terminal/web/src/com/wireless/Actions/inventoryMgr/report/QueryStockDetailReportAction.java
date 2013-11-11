@@ -1,6 +1,5 @@
 package com.wireless.Actions.inventoryMgr.report;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -37,31 +36,23 @@ public class QueryStockDetailReportAction extends Action{
 			String endDate = request.getParameter("endDate");
 			String materialId = request.getParameter("materialId");
 			String deptId = request.getParameter("deptId");
-			String stockType = request.getParameter("stockType");
+			//String stockType = request.getParameter("stockType");
 			String subType = request.getParameter("subType");
-			String extra = "";
-			if(materialId == null){
-				stockDetailReports = new ArrayList<StockDetailReport>();
-			}else if(deptId == null){
-				roots = StockDetailReportDao.getStockDetailReportByDateCount(staff, beginDate, endDate, Integer.parseInt(materialId), null);
-				stockDetailReports = StockDetailReportDao.getStockDetailReportByDate(staff, beginDate, endDate, Integer.parseInt(materialId), " LIMIT " + Integer.parseInt(start) + ", " + Integer.parseInt(limit));
-			}else if((deptId.trim().isEmpty() || deptId.equals("-1")) && stockType.equals("-1")){
-				roots = StockDetailReportDao.getStockDetailReportByDateCount(staff, beginDate, endDate, Integer.parseInt(materialId), null);
-				stockDetailReports = StockDetailReportDao.getStockDetailReportByDate(staff, beginDate, endDate, Integer.parseInt(materialId), " LIMIT " + Integer.parseInt(start) + ", " + Integer.parseInt(limit));
-			}else if(stockType != null && !stockType.equals("-1") && !deptId.equals("-1")){
-				extra = " AND S.ori_stock_date >= '" + beginDate + "' AND S.ori_stock_date <= '" + endDate + "'" + " AND (S.dept_in =" + deptId + " OR S.dept_out =" + deptId + ")" + " AND S.type = " + stockType + " AND S.sub_type = " + subType;
-				roots = StockDetailReportDao.getStockDetailReportCount(staff, Integer.parseInt(materialId), extra, null);
-				stockDetailReports = StockDetailReportDao.getStockDetailReport(staff, Integer.parseInt(materialId), extra, " LIMIT " + Integer.parseInt(start) + ", " + Integer.parseInt(limit));
-			}else if(stockType != null && !stockType.equals("-1") && deptId.equals("-1")){
-				extra = " AND S.ori_stock_date >= '" + beginDate + "' AND S.ori_stock_date <= '" + endDate + "'" + " AND S.type = " + stockType + " AND S.sub_type = " + subType;
-				roots = StockDetailReportDao.getStockDetailReportCount(staff, Integer.parseInt(materialId), extra, null);
-				stockDetailReports = StockDetailReportDao.getStockDetailReport(staff, Integer.parseInt(materialId), extra, " LIMIT " + Integer.parseInt(start) + ", " + Integer.parseInt(limit));
-			}else if(stockType.equals("-1") && !deptId.equals("-1")){
-				extra = " AND S.ori_stock_date >= '" + beginDate + "' AND S.ori_stock_date <= '" + endDate + "'" + " AND (S.dept_in =" + deptId + " OR S.dept_out =" + deptId + ")";
-				roots = StockDetailReportDao.getStockDetailReportCount(staff, Integer.parseInt(materialId), extra, null);
-				stockDetailReports = StockDetailReportDao.getStockDetailReport(staff, Integer.parseInt(materialId), extra, " LIMIT " + Integer.parseInt(start) + ", " + Integer.parseInt(limit));
+			String extra = " AND S.ori_stock_date >= '" + beginDate + "' AND S.ori_stock_date <= '" + endDate + "'";
+			
+			
+			if(subType != null && !subType.isEmpty()){
+				extra += " AND S.sub_type = " + subType;
 			}
-			//stockDetailReports = StockDetailReportDao.getStockDetailReportByDate(beginDate, endDate, Integer.parseInt(materialId), null);
+				
+			if(deptId.equals("-1")){
+				stockDetailReports = StockDetailReportDao.getStockDetailReport(staff, Integer.parseInt(materialId), extra, " LIMIT " + Integer.parseInt(start) + ", " + Integer.parseInt(limit));
+			}else{
+				extra += " AND (S.dept_in =" + deptId + " OR S.dept_out =" + deptId + ")";
+				stockDetailReports = StockDetailReportDao.getStockDetailReportByDept(staff, Integer.parseInt(materialId), extra, " LIMIT " + Integer.parseInt(start) + ", " + Integer.parseInt(limit), Integer.parseInt(deptId));
+			}
+			
+			roots = StockDetailReportDao.getStockDetailReportCount(staff, Integer.parseInt(materialId), extra, null);
 		}catch(BusinessException e){
 			e.printStackTrace();
 			jobject.initTip(false, e.getMessage(), e.getCode(), e.getDesc());

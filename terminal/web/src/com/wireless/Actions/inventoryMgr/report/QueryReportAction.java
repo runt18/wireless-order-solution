@@ -38,6 +38,7 @@ public class QueryReportAction extends Action {
 			String cateType = request.getParameter("cateType");
 			String cateId = request.getParameter("cateId");
 			String materialId = request.getParameter("materialId");
+			String deptId = request.getParameter("deptId");
 			
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			//String orderClause = " LIMIT " + Integer.parseInt(start) + ", " + Integer.parseInt(limit);
@@ -53,15 +54,18 @@ public class QueryReportAction extends Action {
 				Calendar c = Calendar.getInstance();
 				c.setTime(new Date());
 				c.add(Calendar.MONTH, -1);
-				stockReports = StockReportDao.getStockCollectByTime(staff, sdf.format(c.getTime()), sdf.format(new Date()), null);
+				stockReports = StockReportDao.getStockCollectByTime(staff, sdf.format(c.getTime()), sdf.format(new Date()), extra, null);
 				
 			}else{
+/*				if(deptId != null && !deptId.isEmpty()){
+					extra += " AND (S.dept_in = " + deptId +" OR S.dept_out = " + deptId + ")";
+				}
 				if(!materialId.equals("-1") && !materialId.trim().isEmpty()){
 					extra += " AND M.material_id = " + materialId;
 					stockReports = StockReportDao.getStockCollectByTypes(staff, beginDate, endDate, extra, null);
 				}else{
 					if(cateType.trim().isEmpty() && cateId.trim().isEmpty()){
-						stockReports = StockReportDao.getStockCollectByTime(staff, beginDate, endDate, null);
+						stockReports = StockReportDao.getStockCollectByTime(staff, beginDate, endDate, extra, null);
 					}else if(!cateType.trim().isEmpty() && cateId.trim().isEmpty()){
 						extra += " AND S.cate_type = " + cateType;
 						stockReports = StockReportDao.getStockCollectByTypes(staff, beginDate, endDate, extra, null);
@@ -69,6 +73,23 @@ public class QueryReportAction extends Action {
 						extra += " AND M.cate_id = " + cateId; 
 						stockReports = StockReportDao.getStockCollectByTypes(staff, beginDate, endDate, extra, null);
 					}
+				}*/
+				if(!materialId.equals("-1") && !materialId.trim().isEmpty()){
+					extra += " AND M.material_id = " + materialId;
+				}
+				if(cateType.trim().isEmpty() && cateId.trim().isEmpty()){
+					
+				}else if(!cateType.trim().isEmpty() && cateId.trim().isEmpty()){
+					extra += " AND S.cate_type = " + cateType;
+				}else{
+					extra += " AND M.cate_id = " + cateId; 
+				}
+				
+				if(deptId != null && !deptId.isEmpty() && !deptId.equals("-1")){
+					extra += " AND (S.dept_in = " + deptId +" OR S.dept_out = " + deptId + ")";
+					stockReports = StockReportDao.getStockCollectByDept(staff, beginDate, endDate, extra, null, Integer.parseInt(deptId));
+				}else{
+					stockReports = StockReportDao.getStockCollectByTypes(staff, beginDate, endDate, extra, null);
 				}
 			}
 
@@ -86,7 +107,7 @@ public class QueryReportAction extends Action {
 					tatalMoney += stockReport.getFinalMoney();
 				}
 				StockReport totalStockReport = new StockReport();
-				totalStockReport.setFinalMoney((float)(Math.round(tatalMoney * 100)) / 100);
+				totalStockReport.setFinalMoney(tatalMoney);
 				stockReportPage.add(totalStockReport);
 			}
 			jobject.setTotalProperty(roots);
