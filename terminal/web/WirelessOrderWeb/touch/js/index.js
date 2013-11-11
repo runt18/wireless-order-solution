@@ -256,19 +256,22 @@ function initStaffContent(c){
 					type : 'show',
 					isTop : true
 				});	
-				var el=$("#divUserLogin");
-				el.before('<div forbg="divUserLogin" style="position: absolute; top:0; left:0; width: 100%; height: 100%;"></div>');
-				var bg=$('div[forbg=divUserLogin]');
-				bg.css("background", 'url(../images/login_bg.jpg) no-repeat');
-				bg.css("backgroundSize", 'cover');
-				var html="<div class='box-vertical' style='width : 100%; height: 100%'>"
+				var el = $("#divUserLogin");
+				var bg = $('div[forbg=divUserLogin]');
+				if(bg.length <= 0){
+					el.before('<div forbg="divUserLogin" style="position: absolute; top:0; left:0; width: 100%; height: 100%;"></div>');
+					bg = $('div[forbg=divUserLogin]');
+					bg.css("background", 'url(../images/login_bg.jpg) no-repeat');
+					bg.css("backgroundSize", 'cover');
+					var html="<div class='box-vertical' style='width : 100%; height: 100%'>"
 						+ "<div style='line-height : 100px; font-size : 50px; font-weight: bold; margin-left : 80px;'>"
 						+ "<span style='color : red'>" + ln.restaurant.name + "</span>欢迎您</div>"
 						+ "<div class='div-full'></div>"
 						+ "<div style='line-height : 100px; text-align : right; margin-right : 100px; font-size : 20px;'>" 
 						+ "智易科技：www.digi-e.com</div>"
 						+ "</div>";
-				bg.html(html);
+					bg.html(html);
+				}
 				if(bg.hasClass('dialong-lm-hide-top')){
 					bg.removeClass('dialong-lm-hide-top');
 				}
@@ -492,6 +495,8 @@ function staffLoginHandler(c){
  * 
  */
 function loginSuccessCallback(){
+//	alert(foodData.root)
+	
 	initFoodData();
 	
 	Util.toggleContentDisplay({
@@ -510,7 +515,7 @@ function logout(){
 		url : '../LoginOut.do',
 		success : function(data, status, xhr){
 			initStaffContent();
-		}	
+		}
 	});
 }
 
