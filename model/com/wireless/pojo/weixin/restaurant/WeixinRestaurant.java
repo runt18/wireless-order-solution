@@ -74,4 +74,23 @@ public class WeixinRestaurant {
 	public void setStatus(Status status) {
 		this.status = status;
 	}
+	
+	@Override
+	public int hashCode(){
+		return getWeixinSerial().hashCode();
+	}
+	
+	@Override 
+	public boolean equals(Object obj){
+		if(obj == null || !(obj instanceof WeixinRestaurant)){
+			return false;
+		}else{
+			return getWeixinSerial().equals(((WeixinRestaurant)obj).getWeixinSerial());
+		}
+	}
+	
+	@Override
+	public String toString(){
+		return "weixin_restaurant(" + getWeixinSerial() + "," + getRestaurant().getId() + ")";
+	}
 }

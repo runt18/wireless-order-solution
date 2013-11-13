@@ -21,6 +21,8 @@ public enum ErrorType {
 	 *  DEVICE : 7550 - 7599 
 	 *  WEIXIN_FINANCE : 7500 - 7549 
 	 *  WEIXIN_RESTAURANT : 7550 - 7599
+	 *  WEIXIN_MEMBER : 7400 - 7449
+	 *  SMS : 7450 - 7499
 	 */
 	UNKNOWN(1, "unknown"),
 	PROTOCOL(2, "protocol"),
@@ -41,7 +43,9 @@ public enum ErrorType {
 	STAFF(17, "staff"),
 	DEVICE(18, "device"),
 	WEIXIN_FINANCE(19, "weixin_finance"),
-	WEIXIN_RESTAURANT(20, "weixin_restaurant");
+	WEIXIN_RESTAURANT(20, "weixin_restaurant"),
+	WEIXIN_MEMBER(21, "weixin_member"),
+	SMS(22, "sms");
 	
 	private final String desc;
 	
