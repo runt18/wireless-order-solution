@@ -14,6 +14,7 @@ import com.wireless.exception.FoodError;
 import com.wireless.exception.MaterialError;
 import com.wireless.pojo.inventoryMgr.Material;
 import com.wireless.pojo.inventoryMgr.MaterialCate;
+import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.DateUtil;
 import com.wireless.util.PinyinUtil;
@@ -300,4 +301,60 @@ public class MaterialDao {
 		return good;
 	}
 	
+	/**
+	 * Get monthSettle materials  
+	 * @param dbCon
+	 * @param staff
+	 * @param extraCond
+	 * @param otherClause
+	 * @return
+	 * @throws SQLException
+	 */
+	public static List<Material> getMonthSettleMaterial(DBCon dbCon, Staff staff, String extraCond, String otherClause) throws SQLException{
+		String sql;
+		List<Material> materials = new ArrayList<Material>();
+		try{
+			sql = "SELECT M.material_id, M.name, M.price FROM " + Params.dbName + ".food F " +
+					" JOIN " + Params.dbName + ".food_material FM ON FM.food_id = F.food_id " +
+					" JOIN " + Params.dbName + ".material M ON M.material_id = FM.material_id " +
+					" WHERE F.restaurant_id = " + staff.getRestaurantId() +
+					" AND F.stock_status = " + Food.StockStatus.GOOD.getVal() +
+			  		 (extraCond == null ? "" : extraCond) + " " +
+			  		 (otherClause == null ? "" : otherClause);
+			
+			dbCon.rs = dbCon.stmt.executeQuery(sql);
+			
+			while (dbCon.rs != null && dbCon.rs.next()) {
+				Material m = new Material();
+				m.setId(dbCon.rs.getInt("material_id"));
+				m.setName(dbCon.rs.getString("name"));
+				m.setPrice(dbCon.rs.getFloat("price"));
+				
+				materials.add(m);
+			}
+		}catch(SQLException e){
+			e.printStackTrace();
+			throw new SQLException("Failed to get the materials");
+		}
+		return materials;
+	}
+	
+	/**
+	 * Get monthSettle materials.
+	 * @param staff
+	 * @param extraCond
+	 * @param otherClause
+	 * @return
+	 * @throws SQLException
+	 */
+	public static List<Material> getMonthSettleMaterial(Staff staff, String extraCond, String otherClause) throws SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return getMonthSettleMaterial(dbCon, staff, extraCond, otherClause);
+		}finally{
+			dbCon.disconnect();
+		}
+		
+	}
 }

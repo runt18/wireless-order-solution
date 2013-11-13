@@ -42,7 +42,7 @@ public class TestStockReport {
 		String end = "2013-07-01";
 		
 		List<StockReport> stockReports = null;
-		stockReports = StockReportDao.getStockCollectByTime(mStaff, begin, end, null);
+		stockReports = StockReportDao.getStockCollectByTime(mStaff, begin, end, null, null);
 		
 		/*		CateType cateType = CateType.MATERIAL;
 		if(cateType == null){
