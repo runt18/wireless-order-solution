@@ -123,7 +123,12 @@ Ext.onReady(function(){
 						addTab(id, title, url);
 					}else{
 						if(e.attributes.mId == "monthSettle"){
-							monthSettleHandler();
+/* 							url = 'InventoryManagement_Module/MonthSettle.html';
+							id = 'monthSettleMgr';
+							title = '月结操作';
+							addTab(id, title, url); */
+							monthSettleWin.show();
+							//monthSettleHandler();
 						}else if(e.attributes.mId == "cancelReason"){
 							cancelReasonWin.show();
 							Ext.getCmp('btnRefreshCRGrid').handler();
