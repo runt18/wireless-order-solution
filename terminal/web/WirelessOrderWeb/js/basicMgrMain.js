@@ -91,7 +91,7 @@ var monthSettleWin = new Ext.Window({
 	title : '月结操作',
 	id : 'winMonthSettle',
 	width : 700,
-	autoHeight : true,
+	height : 215,
 	closable : false,
 	resizable : false,
 	modal : true,
