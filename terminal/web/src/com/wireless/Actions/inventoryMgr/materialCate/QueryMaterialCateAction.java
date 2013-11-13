@@ -12,11 +12,15 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
+import com.wireless.db.deptMgr.KitchenDao;
 import com.wireless.db.inventoryMgr.MaterialCateDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.inventoryMgr.MaterialCate;
+import com.wireless.pojo.menuMgr.Food;
+import com.wireless.pojo.menuMgr.Kitchen;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.util.DataPaging;
 import com.wireless.util.SQLUtil;
 import com.wireless.util.WebParams;
@@ -126,5 +130,97 @@ public class QueryMaterialCateAction extends DispatchAction{
 		
 		return null;
 	}
-
+	
+	/**
+	 * MonthSettle tree
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward monthSettleTree(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		request.setCharacterEncoding("UTF-8");
+		response.setCharacterEncoding("UTF-8");
+		JObject jobject = new JObject();
+		List<MaterialCate> list = null;
+		MaterialCate item = null;
+		List<Kitchen> kitchens = null;
+		Kitchen kitchen = null;
+		
+		StringBuilder tree = new StringBuilder();
+		StringBuilder inventory = new StringBuilder();
+		StringBuilder goods = new StringBuilder();
+		try{
+			String restaurantID = (String) request.getAttribute("restaurantID");
+			String pin = (String)request.getAttribute("pin");
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			
+			String extra = "";
+			extra = " AND MC.restaurant_id = " + restaurantID;
+			extra += (" AND MC.type = 2");
+			
+			Map<Object, Object> params = new LinkedHashMap<Object, Object>();
+			params.put(SQLUtil.SQL_PARAMS_EXTRA, extra);
+			list = MaterialCateDao.getContent(params);
+			
+			kitchens = KitchenDao.getMonthSettleKitchen(staff, null, " GROUP BY K.kitchen_id");
+			
+			tree.append("[");
+			
+			tree.append("{");
+			tree.append("leaf:false");
+			tree.append(",expanded:true");
+			tree.append(",mType:" + Food.StockStatus.MATERIAL.getVal());
+			tree.append(",type:" + MaterialCate.Type.MATERIAL.getValue());
+			tree.append(",text:'原料'");
+			for(int i = 0; i < list.size(); i++){
+				item = list.get(i);
+				if(i>0)
+					inventory.append(",");	
+				inventory.append("{");
+				inventory.append("leaf:true");
+				inventory.append(",text:'" + item.getName() + "'");
+				inventory.append(",cateId:" + item.getId());
+				inventory.append(",name:'" + item.getName() + "'");
+				inventory.append(",mType:" + Food.StockStatus.MATERIAL.getVal());
+				inventory.append("}");
+			}
+			tree.append(",children : [" + inventory.toString() + "]");
+			tree.append("},");
+			
+			tree.append("{");
+			tree.append("leaf:false");
+			tree.append(",expanded:true");
+			tree.append(",type: " + + MaterialCate.Type.GOOD.getValue());
+			tree.append(",text:'商品'");
+			tree.append(",mType:" + Food.StockStatus.GOOD.getVal());
+			for(int i = 0; i < kitchens.size(); i++){
+				kitchen = kitchens.get(i);
+				if(i>0)
+					goods.append(",");	
+				goods.append("{");
+				goods.append("leaf:true");
+				goods.append(",text:'" + kitchen.getName() + "'");
+				goods.append(",cateId:" + kitchen.getId());
+				goods.append(",name:'" + kitchen.getName() + "'");
+				goods.append(",mType:" + Food.StockStatus.GOOD.getVal());
+				goods.append("}");
+			}
+			tree.append(",children : [" + goods.toString() + "]");
+			tree.append("}");
+			
+			tree.append("]");
+			
+		}catch(Exception e){
+			jobject.initTip(e);
+			e.printStackTrace();
+		}finally{
+			response.getWriter().print(tree.toString());
+		}
+		return null;
+	}
 }

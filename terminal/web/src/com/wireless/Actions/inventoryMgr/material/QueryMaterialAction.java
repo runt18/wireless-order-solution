@@ -1,5 +1,6 @@
 package com.wireless.Actions.inventoryMgr.material;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -19,6 +20,7 @@ import com.wireless.db.stockMgr.MaterialDeptDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.inventoryMgr.Material;
+import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.stockMgr.StockTakeDetail;
 import com.wireless.util.DataPaging;
@@ -84,7 +86,73 @@ public class QueryMaterialAction extends DispatchAction{
 	}
 	
 	
-	
+	/**
+	 * Get monthSettle materials
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward monthSettleMaterial(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		request.setCharacterEncoding("UTF-8");
+		response.setCharacterEncoding("UTF-8");
+		JObject jobject = new JObject();
+		String mType = request.getParameter("mType");
+		String type = request.getParameter("type");
+		String restaurantID = (String) request.getAttribute("restaurantID");
+		String cateId = request.getParameter("cateId");
+		
+		List<Material> root = null;
+		String extra = "AND M.restaurant_id = " + restaurantID;
+		try{
+			String pin = (String)request.getAttribute("pin");
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			if(Food.StockStatus.MATERIAL.getVal() == Integer.parseInt(mType)){
+				if(type != null && !type.trim().isEmpty()){
+					extra += (" AND MC.type = " + type);
+				}
+				
+				if(cateId != null && !cateId.trim().isEmpty()){
+					extra += (" AND MC.cate_id = " + cateId);
+				}
+				
+				Map<Object, Object> params = new LinkedHashMap<Object, Object>();
+				params.put(SQLUtil.SQL_PARAMS_EXTRA, extra);
+				
+				root = MaterialDao.getContent(params);
+			}else if(Food.StockStatus.GOOD.getVal() == Integer.parseInt(mType)){
+				if(type != null && !type.trim().isEmpty()){
+					extra = null;
+				}else{
+					if(cateId != null && !cateId.trim().isEmpty()){
+						extra = " AND F.kitchen_id = " + cateId;
+					}
+				}
+				root = MaterialDao.getMonthSettleMaterial(staff, extra, null);
+			}else{
+				Map<Object, Object> params = new LinkedHashMap<Object, Object>();
+				params.put(SQLUtil.SQL_PARAMS_EXTRA, extra);
+				
+				root = MaterialDao.getContent(params);
+			}
+			jobject.setRoot(root);
+		}catch(BusinessException e){
+			jobject.initTip(e);
+			e.printStackTrace();
+		}catch(SQLException e){
+			jobject.initTip(e);
+			e.printStackTrace();
+		}catch(Exception e){
+			e.printStackTrace();
+		}finally{
+			response.getWriter().print(jobject.toString());
+		}
+		return null;
+	}
 	
 	/**
 	 * 

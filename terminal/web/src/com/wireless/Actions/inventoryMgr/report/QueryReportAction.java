@@ -1,6 +1,7 @@
 package com.wireless.Actions.inventoryMgr.report;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -43,7 +44,7 @@ public class QueryReportAction extends Action {
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			//String orderClause = " LIMIT " + Integer.parseInt(start) + ", " + Integer.parseInt(limit);
 			List<StockReport> stockReports = null ;
-			List<StockReport> stockReportPage = null ;
+			List<StockReport> stockReportPage = new ArrayList<StockReport>() ;
 			int roots = 0;
 			String extra = "";
 			extra += " AND S.status = " + Status.AUDIT.getVal();
@@ -93,7 +94,7 @@ public class QueryReportAction extends Action {
 				}
 			}
 
-			if(stockReports == null){
+			if(stockReports == null || stockReports.isEmpty()){
 				roots = 0;
 			}else{
 				roots = stockReports.size();
