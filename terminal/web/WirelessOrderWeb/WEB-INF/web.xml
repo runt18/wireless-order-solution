@@ -16,7 +16,9 @@
 				/LoginOut.do,
 
 				/OperateStaff.do,
+				/QueryStaff.do,
 				/QueryOTA.do,
+				
 				/Login.html,
 				/LoginAdmin.html,
 				/PersonLogin.html,
