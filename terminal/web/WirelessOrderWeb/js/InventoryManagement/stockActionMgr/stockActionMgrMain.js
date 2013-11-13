@@ -337,7 +337,7 @@ function stockTaskNavHandler(e){
 							}
 							stockTaskNavWin.hide();
 							Ext.getCmp('comboSearchForStockType').setValue(stockType);
-							Ext.getCmp('comboSearchForCateType').setValue(stockCate);
+							Ext.getCmp('sam_comboSearchForCateType').setValue(stockCate);
 							
 							Ext.getCmp('btnSearchForStockBasicMsg').handler();
 							
@@ -865,7 +865,7 @@ function initControl(){
 			text : '&nbsp;&nbsp;货品类型:'
 		}, {
 			xtype : 'combo',
-			id : 'comboSearchForCateType',
+			id : 'sam_comboSearchForCateType',
 			readOnly : true,
 			forceSelection : true,
 			width : 100,
@@ -891,7 +891,7 @@ function initControl(){
 			text : '&nbsp;&nbsp;仓库:'
 		}, {
 			xtype : 'combo',
-			id : 'comboSearchForDept',
+			id : 'sam_comboSearchForDept',
 			fieldLabel : '仓库',
 			width : 100,
 			readOnly : true,
@@ -939,7 +939,7 @@ function initControl(){
 			text : '&nbsp;&nbsp;审核状态:'
 		}, {
 			xtype : 'combo',
-			id : 'comboSearchForStockStatus',
+			id : 'sam_comboSearchForStockStatus',
 			readOnly : true,
 			forceSelection : true,
 			width : 100,
@@ -965,7 +965,7 @@ function initControl(){
 			text : '&nbsp;&nbsp;供应商:'
 		}, {
 			xtype : 'combo',
-			id : 'comboSearchForSupplier',
+			id : 'sam_comboSearchForSupplier',
 			readOnly : true,
 			forceSelection : true,
 			width : 103,
@@ -1017,10 +1017,10 @@ function initControl(){
 			handler : function(){
 				Ext.getCmp('comboSearchForStockType').setValue(1);
 				Ext.getCmp('sam_comboSearchForSubType').setValue(-1);
-				Ext.getCmp('comboSearchForCateType').setValue(1);
-				Ext.getCmp('comboSearchForDept').setValue(-1);
-				Ext.getCmp('comboSearchForStockStatus').setValue(-1);
-				Ext.getCmp('comboSearchForSupplier').setValue(-1);
+				Ext.getCmp('sam_comboSearchForCateType').setValue(1);
+				Ext.getCmp('sam_comboSearchForDept').setValue(-1);
+				Ext.getCmp('sam_comboSearchForStockStatus').setValue(-1);
+				Ext.getCmp('sam_comboSearchForSupplier').setValue(-1);
 				Ext.getCmp('comboSearchForOriStockId').setValue();
 				Ext.getCmp('btnSearchForStockBasicMsg').handler();
 				//location.reload(false);
@@ -1031,11 +1031,11 @@ function initControl(){
 			iconCls : 'btn_search',
 			handler : function(e){
 				var st = Ext.getCmp('comboSearchForStockType');
-				var cate = Ext.getCmp('comboSearchForCateType');
-				var dept = Ext.getCmp('comboSearchForDept');
+				var cate = Ext.getCmp('sam_comboSearchForCateType');
+				var dept = Ext.getCmp('sam_comboSearchForDept');
 				var oriStockId = Ext.getCmp('comboSearchForOriStockId');
-				var status = Ext.getCmp('comboSearchForStockStatus');
-				var supplier = Ext.getCmp('comboSearchForSupplier');
+				var status = Ext.getCmp('sam_comboSearchForStockStatus');
+				var supplier = Ext.getCmp('sam_comboSearchForSupplier');
 				var subType = Ext.getCmp('sam_comboSearchForSubType');
 				
 				var gs = stockBasicGrid.getStore();

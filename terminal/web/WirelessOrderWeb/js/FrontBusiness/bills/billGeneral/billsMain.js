@@ -382,12 +382,12 @@ function printBillFunc(orderID) {
 
 
 // ------------------ north ------------------------
-var filterTypeComb = new Ext.form.ComboBox({
+var f_bills_filterTypeComb = new Ext.form.ComboBox({
 	fieldLabel : '过滤',
 	forceSelection : true,
 	width : 100,
 	value : '全部',
-	id : 'filter',
+	id : 'front_bill_filter',
 	store : new Ext.data.SimpleStore({
 		fields : [ 'value', 'text' ],
 		data :  [[0, '全部'], [1, '帐单号'], [2, '流水号'], [3, '台号'], [4, '时间'], [5, '金额'], [6, '实收'], [7, '类型'], [8, '结帐方式']]
@@ -511,7 +511,7 @@ Ext.onReady(function(){
 			text : '过滤:'
 		}, 
 		{ xtype:'tbtext', text:'&nbsp;&nbsp;'},
-		filterTypeComb,
+		f_bills_filterTypeComb,
 		{ xtype:'tbtext', text:'&nbsp;&nbsp;'},
 		{
 			xtype : 'combo',

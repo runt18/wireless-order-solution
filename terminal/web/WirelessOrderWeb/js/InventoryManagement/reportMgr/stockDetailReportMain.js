@@ -62,7 +62,7 @@ var stockDetail = new Ext.grid.ColumnModel([
 	 new Ext.grid.RowNumberer(),
 	 {header:'品项名称', dataIndex:'materialName', width:160},
 	 {header:'数量', dataIndex:'amount', width:140, align:'right'},
-	 {header:'单价', dataIndex:'price', width:120, align:'right', renderer : 'Ext.ux.txtFormat.gridDou'},
+	 {header:'单价', dataIndex:'price', width:120, align:'right', renderer : renderFormat},
 	 {header:'结存数量', dataIndex:'remaining', width:140, align:'right'}
 ]);
 
@@ -252,6 +252,13 @@ var materialComb = new Ext.form.ComboBox({
 	}
 });
 
+function renderFormat(v){
+	if(typeof(v) != 'string'){
+		v = Ext.ux.txtFormat.gridDou(v);
+	}
+	return v;
+}
+
 var stockDetailReportTree;	
 var stockInDate = [[1, '采购'], [2, '入库调拨'], [3, '报溢'], [7, '盘盈']];
 var stockOutDate = [[4, '退货'], [5, '出库调拨'], [6, '报损'], [8, '盘亏'], [9, '消耗']];
@@ -269,12 +276,12 @@ Ext.onReady(function(){
 	         {header:'单号', dataIndex:'oriStockId'},
 	         {header:'部门', dataIndex:'dept', width:160},
 	         {header:'入库类型', dataIndex:'stockInSubType', width:100},
-	         {header:'入库数量', dataIndex:'stockInAmount'},
-	         {header:'入库金额', dataIndex:'stockInMoney'},
+	         {header:'入库数量', dataIndex:'stockInAmount', align : 'right', renderer : renderFormat},
+	         {header:'入库金额', dataIndex:'stockInMoney', align : 'right', renderer : renderFormat},
 	         {header:'出库类型', dataIndex:'stockOutSubType', width:100},
-	         {header:'出库数量', dataIndex:'stockOutAmount'},
-	         {header:'出库金额', dataIndex:'stockOutMoney'},
-	         {header:'结存数量', dataIndex:'remaining'}]);
+	         {header:'出库数量', dataIndex:'stockOutAmount', align : 'right', renderer : renderFormat},
+	         {header:'出库金额', dataIndex:'stockOutMoney', align : 'right', renderer : renderFormat},
+	         {header:'结存数量', dataIndex:'remaining', align : 'right', renderer : renderFormat}]);
 	
 	cm.defaultSortable = true;
 	//var data = {root: [{"id":426,"stockInSubType":"","remaining":3,"stockOutAmount":10,"stockInMoney":"1231231","oriStockId":"","stockOutMoney":15,"stockOutSubType":"盘亏","dept":"甜甜蜜蜜","date":"2013-07-02 12:03:45","stockInAmount":""}]};
@@ -418,7 +425,7 @@ Ext.onReady(function(){
 				sgs.load({
 					params : {
 						start : 0,
-						limit : 13
+						limit : limitCount
 					}
 				});
 			}
@@ -427,7 +434,7 @@ Ext.onReady(function(){
 	});
 	
 	var pagingBar = new Ext.PagingToolbar({
-		pageSize : 13,
+		pageSize : limitCount,
 		store : ds,
 		displayInfo : true,
 		displayMsg : '显示第 {0} 条到 {1} 条记录，共 {2} 条',
@@ -545,7 +552,7 @@ Ext.onReady(function(){
 		}
 
 	});
-	//ds.load({params:{start:0, limit:13}});
+	//ds.load({params:{start:0, limit:limitCount}});
    new Ext.Panel({
 		renderTo : 'divStockDetail',
 		width : parseInt(Ext.getDom('divStockDetail').parentElement.style.width.replace(/px/g,'')),

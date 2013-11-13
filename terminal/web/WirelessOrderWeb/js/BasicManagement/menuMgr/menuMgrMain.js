@@ -14,7 +14,7 @@ function searchMenuHandler(){
 	if(sn && sn.attributes.alias >= 0)
 		baseParams['kitchen'] = sn.attributes.alias;
 	// 编号, 名称, 拼音, 价钱, 库存管理
-	var queryType = Ext.getCmp('filter').getValue();
+	var queryType = Ext.getCmp('menu_filter').getValue();
 	if(queryType != '全部' && queryType != 0){	
 		if(queryType == 1){
 			baseParams['alias'] = Ext.getCmp('numfieldForGridSearch').getValue();
@@ -2244,7 +2244,7 @@ function initMenuGrid(){
 			}, { 
 				xtype:'tbtext', 
 				text:'过滤:'
-			}, filterTypeComb, { 
+			}, menu_filterTypeComb, { 
 				xtype:'tbtext', 
 				text:'&nbsp;&nbsp;'
 			}, {
@@ -2694,12 +2694,12 @@ var logOutBut = new Ext.ux.ImageButton({
 	}
 });
 
-var filterTypeComb = new Ext.form.ComboBox({
+var menu_filterTypeComb = new Ext.form.ComboBox({
 	forceSelection : true,
 	readOnly : true,
 	width : 100,
 	value : '全部',
-	id : 'filter',
+	id : 'menu_filter',
 	store : new Ext.data.SimpleStore({
 		fields : [ 'value', 'text' ],
 		data : [[0, '全部'], [1, '编号'], [2, '名称'],/* [3, '拼音'],*/ [4, '价格']/*, [5, '厨房']*/, [6, '库存管理']]

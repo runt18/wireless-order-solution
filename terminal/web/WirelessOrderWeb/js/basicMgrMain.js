@@ -9,9 +9,39 @@ var settle = {
 	border : false,
 	bodyStyle : 'font-size:30px;text-align:center;',
 	html : '<div align="center" ><br><br>当前会计月份 : <label id="labCurrentMonth" style="color:green"> </label>&nbsp;月<br> 未审核的库单 : <label id="labStockAction" style="color:red" >0</label>&nbsp;张</br>' +
-			'未审核的盘点 : <label id="labStockTake" style="color:red" >0</label>&nbsp;张</div>'
+			'未审核的盘点 : <label id="labStockTake" style="color:red" >0</label>&nbsp;张</div>',
+	buttons:[{
+		text : '月结',
+		handler: function() {
+		 	var stockActionCount = Ext.getDom('labStockAction').innerHTML;
+		 	var stockTakeCount = Ext.getDom('labStockTake').innerHTML;
+		 	if(eval(stockActionCount + '+' + stockTakeCount) > 0){
+		 		Ext.MessageBox.alert('提示', '还有未审核的库单或盘点单');
+		 	}else{
+		 		Ext.Ajax.request({
+		 			url : '../../UpdateCurrentMonth.do',
+		 			params : {
+		 				
+		 			},
+		 			success : function(res, opt){
+						var jr = Ext.decode(res.responseText);
+						if(jr.success){
+							Ext.ux.showMsg(jr);
+							monthSettleWin.hide();
+						}else{
+							Ext.ux.showMsg(jr);
+						}
+					},
+					failure : function(res, opt){
+						Ext.ux.showMsg(Ext.decode(res.responseText));
+					}
+		 		});
+		 	
+		 	}
+		}
+	}]
 };
-var form = new Ext.form.FormPanel({
+/*var form = new Ext.form.FormPanel({
 	height : 200,
 	width : 400,
 	region : 'center',
@@ -56,21 +86,44 @@ var form = new Ext.form.FormPanel({
 		}
 	}
 	]
-});
+});*/
 var monthSettleWin = new Ext.Window({
 	title : '月结操作',
 	id : 'winMonthSettle',
-	layout : 'border',
-	width : 500,
-	height : 350,
+	width : 700,
+	autoHeight : true,
 	closable : false,
 	resizable : false,
 	modal : true,
-	items : [form]
+	listeners : {
+		show : function(thiz){
+			thiz.center();
+			thiz.load({
+				url : '../InventoryManagement_Module/MonthSettle.html',
+				scripts : true,
+				params : {
+					loadPage : true
+				}
+			});
+		}
+	},
+	bbar : ['->',{
+		text : '月结',
+		iconCls : 'btn_save',
+		handler : function(){
+			monthSettleHandler();
+		}
+	},{
+		text : '取消',
+		iconCls : 'btn_close',
+		handler : function(){
+			monthSettleWin.hide();		
+		}
+	}]
 });
 
 
-function monthSettleHandler(){
+function monthSettleHandlers(){
 	monthSettleWin.show();
 	Ext.Ajax.request({
 		url : '../../QuerySystemSetting.do',

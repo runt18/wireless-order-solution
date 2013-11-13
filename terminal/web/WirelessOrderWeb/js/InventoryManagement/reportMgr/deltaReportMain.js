@@ -18,7 +18,7 @@ var materialTypeComb = new Ext.form.ComboBox({
 	listeners : {
         select : function(combo, record, index){ 
         	
-        	materialCateComb.reset();
+        	drm_materialCateComb.reset();
         	materialComb.allowBlank = true;
         	materialComb.reset();
         	materialCateStore.load({  
@@ -54,10 +54,10 @@ materialCateStore.load({
     	dataSource : 'normal'
     }
 }); 
-var materialCateComb = new Ext.form.ComboBox({
+var drm_materialCateComb = new Ext.form.ComboBox({
 	forceSelection : true,
 	width : 90,
-	id : 'comboMaterialCate',
+	id : 'drm_comboMaterialCate',
 	store : materialCateStore,
 	valueField : 'id',
 	displayField : 'name',
@@ -106,7 +106,7 @@ var materialComb = new Ext.form.ComboBox({
 	width : 100,
 	listWidth : 250,
 	maxheight : 300,
-	id : 'dr_comboMaterial',
+	id : 'drm_comboMaterial',
 	store : materialStore,
 	valueField : 'id',
 	displayField : 'name',
@@ -143,10 +143,6 @@ var materialComb = new Ext.form.ComboBox({
 });
 var deptTree;
 Ext.onReady(function(){
-	Ext.BLANK_IMAGE_URL = '../../extjs/resources/images/default/s.gif';
-	Ext.QuickTips.init();
-	Ext.form.Field.prototype.msgTarget = 'side';
-	
 	var cm = new Ext.grid.ColumnModel([
 	       new Ext.grid.RowNumberer(),
 	       {header: '品项名称 ', dataIndex: 'material.name'},
@@ -205,7 +201,7 @@ Ext.onReady(function(){
 		{xtype : 'tbtext', text : '类型:'},
 		materialTypeComb,
 		{xtype : 'tbtext', text : '类别:'},
-		materialCateComb,
+		drm_materialCateComb,
 		{xtype : 'tbtext', text : '货品:'},
 		materialComb,
 		'->', {
@@ -224,8 +220,8 @@ Ext.onReady(function(){
 				sgs.baseParams['beginDate'] = Ext.getCmp('dr_beginDate').getValue().format('Y-m');
 				sgs.baseParams['deptId'] = !sn ? deptID : sn.attributes.deptID;
 				sgs.baseParams['cateType'] = Ext.getCmp('comboMaterialType').getValue();
-				sgs.baseParams['cateId'] = Ext.getCmp('comboMaterialCate').getValue();
-				sgs.baseParams['materialId'] = Ext.getCmp('dr_comboMaterial').getValue();
+				sgs.baseParams['cateId'] = Ext.getCmp('drm_comboMaterialCate').getValue();
+				sgs.baseParams['materialId'] = Ext.getCmp('drm_comboMaterial').getValue();
 				//load两种加载方式,远程和本地
 				sgs.load({
 					params : {
@@ -234,7 +230,7 @@ Ext.onReady(function(){
 					}
 				});
 			}
-		},{xtype : 'tbtext', text : '&nbsp;&nbsp;'}
+		}
 		]
 	});
 	

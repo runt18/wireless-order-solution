@@ -701,12 +701,12 @@ function printBillFunc(rowInd) {
 	});
 };
 
-var filterTypeComb = new Ext.form.ComboBox({
+var h_bills_filterTypeComb = new Ext.form.ComboBox({
 	fieldLabel : '过滤',
 	forceSelection : true,
 	width : 100,
 	value : '全部',
-	id : 'filter',
+	id : 'history_bill_filter',
 	store : new Ext.data.SimpleStore({
 		fields : [ 'value', 'text' ],
 		data :  [[0, '全部'], [1, '帐单号'], [2, '流水号'], [3, '台号'], [4, '日期'], [5, '类型'], 
@@ -820,7 +820,7 @@ Ext.onReady(function() {
 			text : '过滤:'
 		}, 
 		{ xtype:'tbtext', text:'&nbsp;&nbsp;'},
-		filterTypeComb,
+		h_bills_filterTypeComb,
 		{ xtype:'tbtext', text:'&nbsp;&nbsp;'},
 		{
 			xtype : 'combo',
@@ -1027,8 +1027,8 @@ Ext.onReady(function() {
 	);
 	billsGrid.region = 'center';
 	billsGrid.on('render', function(){
-		filterTypeComb.setValue(9);
-		filterTypeComb.fireEvent('select', filterTypeComb, null, 9);
+		h_bills_filterTypeComb.setValue(9);
+		h_bills_filterTypeComb.fireEvent('select', h_bills_filterTypeComb, null, 9);
 		billQueryHandler();
 	});
 	billsGrid.keys = [{

@@ -379,7 +379,7 @@ function initMemberTypeGrid(){
 			text : '过滤:'
 		}, {
 			xtype : 'combo',
-			id : 'comboSearchType',
+			id : 'mtm_comboSearchType',
 			readOnly : true,
 			forceSelection : true,
 			width : 80,
@@ -478,7 +478,7 @@ function initMemberTypeGrid(){
 			id : 'btnSearchMemberType',
 			iconCls : 'btn_search',
 			handler : function(e){
-				var searchType = Ext.getCmp('comboSearchType').getValue();
+				var searchType = Ext.getCmp('mtm_comboSearchType').getValue();
 				var searchValue = Ext.getCmp(mtObj.searchValue);
 				
 				var gs = memberTypeGrid.getStore();

@@ -70,6 +70,38 @@ function loadKitchenCheckbox(){
 
 function loadInformation(){
 	Ext.Ajax.request({
+		url : '../../QueryKitchen.do',
+		params : {
+			dataSource : 'normal'
+		},
+		success : function(res, opt){
+			var jr = Ext.decode(res.responseText);
+			
+			if(jr.success){
+				for ( var i = 0; i < jr.root.length; i++) {
+					
+					var k = jr.root[i];
+					var c = {items : [{xtype : "checkbox", name : "kitchen",boxLabel : formatName(k.name) , hideLabel : true, inputValue : k.alias }]};
+					
+					Ext.getCmp('allKitchen').add(c);
+					//solveIE自动换行时格式错乱
+					if((i+1)%6 == 0){
+						Ext.getCmp('allKitchen').add({columnWidth : 1});
+					}
+					Ext.getCmp('allKitchen').doLayout();
+				
+				}
+				
+			}else{
+				Ext.ux.showMsg(jr);
+			}
+	
+		},
+		failure : function(res, opt){
+			Ext.ux.showMsg(Ext.decode(res.responseText));
+		}
+	});
+	Ext.Ajax.request({
 		url : '../../QueryDept.do',
 		params : {
 			dataSource : 'normal'
@@ -151,7 +183,7 @@ if(!addPrintFunc){
 		autoHeight : true,
 		listeners : {
 			show : function(){
-				loadKitchenCheckbox();
+				//loadKitchenCheckbox();
 			}		
 		},
 		bbar : [{

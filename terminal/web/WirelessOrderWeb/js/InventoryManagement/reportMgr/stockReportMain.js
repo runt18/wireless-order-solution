@@ -21,7 +21,7 @@ var logOutBut = new Ext.ux.ImageButton({
 	}
 });
 
-var deptStore = new Ext.data.Store({
+/*var deptStore = new Ext.data.Store({
 	//proxy : new Ext.data.MemoryProxy(data),
 	proxy : new Ext.data.HttpProxy({url:'../../QueryDept.do'}),
 	reader : new Ext.data.JsonReader({totalProperty:'totalProperty', root : 'root'}, [
@@ -34,14 +34,16 @@ deptStore.load({
     params: { 
     	dataSource : 'normal'
     }  
-});
+});*/
 
 var deptComb = new Ext.form.ComboBox({
 	forceSelection : true,
 	width : 110,
 	maxheight : 300,
 	id : 'comboDept',
-	store : deptStore,
+	store : new Ext.data.SimpleStore({
+		fields : ['id', 'name']
+	}),
 	valueField : 'id',
 	displayField : 'name',
 	typeAhead : true,
@@ -49,6 +51,27 @@ var deptComb = new Ext.form.ComboBox({
 	triggerAction : 'all',
 	selectOnFocus : true,
 	listeners : {
+		render : function(thiz){
+			var data = [[-1,'全部']];
+			Ext.Ajax.request({
+				url : '../../QueryDept.do',
+				params: { 
+			    	dataSource : 'normal'
+			    }, 
+				success : function(res, opt){
+					var jr = Ext.decode(res.responseText);
+					for(var i = 0; i < jr.root.length; i++){
+						data.push([jr.root[i]['id'], jr.root[i]['name']]);
+					}
+					thiz.store.loadData(data);
+					thiz.setValue(-1);
+				},
+				fialure : function(res, opt){
+					thiz.store.loadData(data);
+					thiz.setValue(-1);
+				}
+			});
+		},
 		select : function(){
 			Ext.getCmp('btnSearch').handler();		
 		}
@@ -129,7 +152,7 @@ Ext.onReady(function(){
 	var cm = new Ext.grid.ColumnModel([
          new Ext.grid.RowNumberer(),
          {header:'品行编号', dataIndex:'materialId'},
-         {header:'品行名称', dataIndex:'materialName',align:'left'},
+         {header:'品行名称', dataIndex:'materialName',align:'left', width : 130},
          {header:'期初数量', dataIndex:'primeAmount', align:'right', renderer:totalStyle},
          {header:'入库采购', dataIndex:'stockIn', align:'right'},
          {header:'入库调拨', dataIndex:'stockInTransfer', align:'right'},

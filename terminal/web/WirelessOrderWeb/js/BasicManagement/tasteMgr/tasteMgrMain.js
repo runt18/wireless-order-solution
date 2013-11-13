@@ -1,10 +1,10 @@
 ﻿//-----------------load
-var filterTypeComb = new Ext.form.ComboBox({
+var taste_filterTypeComb = new Ext.form.ComboBox({
 	fieldLabel : '过滤',
 	forceSelection : true,
 	width : 100,
 	value : 0,
-	id : 'filter',
+	id : 'tasteFilter',
 	store : new Ext.data.SimpleStore({
 		fields : [ 'value', 'text' ],
 		data : [[0, '全部'],[2, '价格'],[3, '名称'], [4, '类型']]
@@ -74,7 +74,7 @@ function initTasteGrid(){
 		items : [ { 
 			xtype:'tbtext',
 			text:'过滤:'
-		}, filterTypeComb, { 
+		}, taste_filterTypeComb, { 
 			xtype:'tbtext', 
 			text:'&nbsp;&nbsp;'
 		}, {
@@ -139,10 +139,10 @@ function initTasteGrid(){
 				var gs = tasteGrid.getStore();
 				gs.baseParams['ope'] = oCombo.getValue();
 				
-				gs.baseParams['alias'] = filterTypeComb.getValue() == 1 ? sn.getValue() : '';
-				gs.baseParams['price'] = filterTypeComb.getValue() == 2 ? sn.getValue() : '';
-				gs.baseParams['name'] = filterTypeComb.getValue() == 3 ? st.getValue() : '';
-				gs.baseParams['cate'] = filterTypeComb.getValue() == 4 ? cate.getValue() : '';					
+				gs.baseParams['alias'] = taste_filterTypeComb.getValue() == 1 ? sn.getValue() : '';
+				gs.baseParams['price'] = taste_filterTypeComb.getValue() == 2 ? sn.getValue() : '';
+				gs.baseParams['name'] = taste_filterTypeComb.getValue() == 3 ? st.getValue() : '';
+				gs.baseParams['cate'] = taste_filterTypeComb.getValue() == 4 ? cate.getValue() : '';					
 				
 				gs.load({
 					params : {

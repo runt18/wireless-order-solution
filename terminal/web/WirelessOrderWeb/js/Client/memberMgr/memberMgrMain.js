@@ -183,7 +183,7 @@ function initRechargeWin(){
 						isPrint : Ext.getCmp('chbPrintRecharge').getValue(),
 						callback : function(_c){
 							rechargeWin.hide();
-							var st = Ext.getCmp('comboMemberSearchType');
+							var st = Ext.getCmp('mr_comboMemberSearchType');
 							st.setValue(2);
 							st.fireEvent('select', st, null, null);
 							var n = Ext.getCmp('numberSearchValueByNumber');
@@ -255,7 +255,7 @@ function initTakeMoneyWin(){
 						isPrint : Ext.getCmp('chbPrintTakeMoney').getValue(),
 						callback : function(_c){
 							takeMoneyWin.hide();
-							var st = Ext.getCmp('comboMemberSearchType');
+							var st = Ext.getCmp('mr_comboMemberSearchType');
 							st.setValue(2);
 							st.fireEvent('select', st, null, null);
 							var n = Ext.getCmp('numberSearchValueByNumber');
@@ -711,7 +711,7 @@ function gridInit(){
 		}, {
 			disabled : false,
 			xtype : 'combo',
-			id : 'comboMemberSearchType',
+			id : 'mr_comboMemberSearchType',
 			fieldLabel : '过滤',
 			readOnly : true,
 			forceSelection : true,
@@ -791,7 +791,7 @@ function gridInit(){
 			iconCls : 'btn_search',
 			handler : function(){
 				var memberTypeNode = memberTypeTree.getSelectionModel().getSelectedNode();
-				var searchType = Ext.getCmp('comboMemberSearchType').getValue();
+				var searchType = Ext.getCmp('mr_comboMemberSearchType').getValue();
 				var searchValue = Ext.getCmp(mObj.searchValue) ? Ext.getCmp(mObj.searchValue).getValue() : '';
 				
 				var gs = memberBasicGrid.getStore();
@@ -838,7 +838,7 @@ function gridInit(){
 			handler : function(e){
 				Ext.getCmp('btnRefreshMemberType').handler();
 				Ext.getCmp('btnSearchMember').handler();
-				var st = Ext.getCmp('comboMemberSearchType');
+				var st = Ext.getCmp('mr_comboMemberSearchType');
 				st.setValue(0);
 				st.fireEvent('select', st, null, null);
 			}
