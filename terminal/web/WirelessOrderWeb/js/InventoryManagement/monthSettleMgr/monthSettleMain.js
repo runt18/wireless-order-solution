@@ -1,18 +1,97 @@
 
 
 function monthSettleHandler(){
-	alert('ok');
+	var stockActionCount = Ext.getDom('labStockAction').innerHTML;
+ 	var stockTakeCount = Ext.getDom('labStockTake').innerHTML;
+ 	if(eval(stockActionCount + '+' + stockTakeCount) > 0){
+ 		Ext.MessageBox.alert('提示', '还有未审核的库单或盘点单');
+ 	}else{
+ 		Ext.Ajax.request({
+ 			url : '../../UpdateCurrentMonth.do',
+ 			params : {
+ 				
+ 			},
+ 			success : function(res, opt){
+				var jr = Ext.decode(res.responseText);
+				if(jr.success){
+					Ext.ux.showMsg(jr);
+					monthSettleWin.hide();
+				}else{
+					Ext.ux.showMsg(jr);
+				}
+			},
+			failure : function(res, opt){
+				Ext.ux.showMsg(Ext.decode(res.responseText));
+			}
+ 		});
+ 	
+ 	}
 }
 
-function showMaterialPanel(){
-	Ext.getDom('btn_materialCost').value = "成本调整↑";
-}
+function showMonthSettleDetail(){
+	Ext.Ajax.request({
+		url : '../../QuerySystemSetting.do',
+		params : {
+			restaurantID : restaurantID
+		},
+		success : function(res, opt){
+			var jr = Ext.decode(res.responseText);
+			if(jr.success){
+				//alert(jr.other.systemSetting.setting.intCurrentMonth);
+				Ext.getDom('labCurrentMonth').innerHTML = jr.other.systemSetting.setting.intCurrentMonth;
+			}else{
+				Ext.ux.showMsg(jr);
+			}
+		},
+		failure : function(res, opt){
+			Ext.ux.showMsg(Ext.decode(res.responseText));
+		}
+	});
+	Ext.Ajax.request({
+		url : '../../QueryStockTake.do',
+		params : {
+			
+			status : 1
+		},
+		success : function(res, opt){
+			var jr = Ext.decode(res.responseText);
+			if(jr.success){
+				Ext.getDom('labStockTake').innerHTML = jr.totalProperty;
+			}else{
+				Ext.ux.showMsg(jr);
+			}
+		},
+		failure : function(res, opt){
+			Ext.ux.showMsg(Ext.decode(res.responseText));
+		}
+	});
+	Ext.Ajax.request({
+		url : '../../QueryStockAction.do',
+		params : {
+			
+			status : 1
+		},
+		success : function(res, opt){
+			var jr = Ext.decode(res.responseText);
+			if(jr.success){
+				Ext.getDom('labStockAction').innerHTML = jr.totalProperty;
+			}else{
+				Ext.ux.showMsg(jr);
+			}
+		},
+		failure : function(res, opt){
+			Ext.ux.showMsg(Ext.decode(res.reponseText));
+		}
+	});
 
+}
 
 function priceDeltaRenderer(v, m, r, ri, ci, s){
-	var deltaAmount = r.get('material.price') - r.get('material.actualPrice');
+/*	alert(r.get('price'));
+	var deltaAmount = r.get('price');
 	deltaAmount = deltaAmount < 0 ? "<font color='red' size='4'>" + Ext.ux.txtFormat.gridDou(Math.abs(deltaAmount)) + "</font>" : "<font color='green' size='4'>" + Ext.ux.txtFormat.gridDou(Math.abs(deltaAmount)) + "</font>";
-	return deltaAmount+"";
+	return deltaAmount+"";*/
+	return v + 2;
 }
 
 var settle = {
@@ -36,7 +115,7 @@ Ext.onReady(function(){
 	       {header: '品项名称 ', dataIndex: 'name'},
 	       {header: '当前单价', dataIndex: 'price', align: 'right', editor: new Ext.form.NumberField({allowBlank: false })},
 	       {header: '单价', hidden : true, dataIndex: 'price'},
-	       {header: '变化点', dataIndex: 'price', align: 'right', renderer: 'priceDeltaRenderer'}
+	       {header: '变化点', dataIndex: 'price', align: 'right', renderer: priceDeltaRenderer}
 	]);
 	cm.defaultSortable = true;
 	
@@ -142,22 +221,47 @@ Ext.onReady(function(){
 	
 	var monthSettleCenterPanel = new Ext.Panel({
 		id : 'monthSettleCenterPanel',
-		title : '成本调整',
+		title : '成本调整' + '&nbsp;&nbsp;<span style="color:green; font-weight:bold; font-size:13px;">(有未审核的库单或盘点单时不能调整)</span>',
 		region : 'center',
 		layout : 'border',
 		border : false,
 		height : 300,
 		//disabled : true,
 		collapsible : true,
-		//collapsed : true,
-		items : [monthSettleTree, msm_monthSettleGrid]
+		titleCollapse : true,
+		collapsed : true,
+		items : [monthSettleTree, msm_monthSettleGrid],
+		listeners : {
+			beforeexpand : function(p){
+				var stockActionCount = Ext.getDom('labStockAction').innerHTML;
+			 	var stockTakeCount = Ext.getDom('labStockTake').innerHTML;
+			 	if(eval(stockActionCount + '+' + stockTakeCount) > 0){
+			 		//Ext.MessageBox.alert('提示', '还有未审核的库单或盘点单');
+			 		return false;
+			 	}
+			},
+			expand : function(p){
+				Ext.getCmp('winMonthSettle').setHeight(700);
+				Ext.getCmp('winMonthSettle').center();
+			},
+			collapse : function(){
+				Ext.getCmp('winMonthSettle').setHeight(215);
+				Ext.getCmp('winMonthSettle').center();
+			}
+		}
 	});
 	
 	new Ext.Panel({
 		renderTo : 'divMonthSettle',
-		height : parseInt(Ext.getDom('divMonthSettle').parentElement.style.height.replace(/px/g,'')),
+		id : 'monthSettlePanel',
+		height : 645,
 		layout : 'border',
 		items : [settle, monthSettleCenterPanel],
+		listeners : {
+			render : function(){
+				showMonthSettleDetail();
+			}
+		},
 		keys : [{
 			key : Ext.EventObject.ESC,
 			scope : this,

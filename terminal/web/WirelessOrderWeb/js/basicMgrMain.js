@@ -122,66 +122,6 @@ var monthSettleWin = new Ext.Window({
 	}]
 });
 
-
-function monthSettleHandlers(){
-	monthSettleWin.show();
-	Ext.Ajax.request({
-		url : '../../QuerySystemSetting.do',
-		params : {
-			restaurantID : restaurantID
-		},
-		success : function(res, opt){
-			var jr = Ext.decode(res.responseText);
-			if(jr.success){
-				//alert(jr.other.systemSetting.setting.intCurrentMonth);
-				Ext.getDom('labCurrentMonth').innerHTML = jr.other.systemSetting.setting.intCurrentMonth;
-			}else{
-				Ext.ux.showMsg(jr);
-			}
-		},
-		failure : function(res, opt){
-			Ext.ux.showMsg(Ext.decode(res.responseText));
-		}
-	});
-	Ext.Ajax.request({
-		url : '../../QueryStockTake.do',
-		params : {
-			
-			status : 1
-		},
-		success : function(res, opt){
-			var jr = Ext.decode(res.responseText);
-			if(jr.success){
-				Ext.getDom('labStockTake').innerHTML = jr.totalProperty;
-			}else{
-				Ext.ux.showMsg(jr);
-			}
-		},
-		failure : function(res, opt){
-			Ext.ux.showMsg(Ext.decode(res.responseText));
-		}
-	});
-	Ext.Ajax.request({
-		url : '../../QueryStockAction.do',
-		params : {
-			
-			status : 1
-		},
-		success : function(res, opt){
-			var jr = Ext.decode(res.responseText);
-			if(jr.success){
-				Ext.getDom('labStockAction').innerHTML = jr.totalProperty;
-			}else{
-				Ext.ux.showMsg(jr);
-			}
-		},
-		failure : function(res, opt){
-			Ext.ux.showMsg(Ext.decode(res.reponseText));
-		}
-	});
-
-}
-
 //--------------------退菜原因--------------
 var bmObj = {};
 bmObj.operation = {

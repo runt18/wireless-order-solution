@@ -453,6 +453,12 @@ if(!addPrintFunc){
 							if(checked){
 								showPanel(thiz.inputValue);
 							}
+						},
+						focus : function(thiz){
+							thiz.getEl().dom.checked = true;
+						},
+						show : function(){
+							alert('show');
 						}
 					}
 				}]
@@ -956,6 +962,7 @@ function printFuncOperactionHandler(c){
 		
 		document.getElementById('radioOrder').checked = true;
 		Ext.getCmp('radioOrder').fireEvent('check', Ext.getCmp('radioOrder'), true);
+		Ext.getCmp('radioOrder').fireEvent('focus', Ext.getCmp('radioOrder'));
 		//document.getElementsByName('dept')[0].checked = true;
 		Ext.getCmp('allKitchen').disable();
 		Ext.getCmp('allDept').disable();
