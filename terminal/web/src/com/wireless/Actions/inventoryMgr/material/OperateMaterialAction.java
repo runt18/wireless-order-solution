@@ -1,5 +1,7 @@
 package com.wireless.Actions.inventoryMgr.material;
 
+import java.sql.SQLException;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -123,5 +125,56 @@ public class OperateMaterialAction extends DispatchAction {
 		}
 		return null;
 	}
+	
+	public ActionForward monthSettleMaterial(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		request.setCharacterEncoding("UTF-8");
+		response.setCharacterEncoding("UTF-8");
+		String editData = request.getParameter("editData");
+		try{
+			String pin = (String)request.getAttribute("pin");
+			String restaurantID =  (String) request.getAttribute("restaurantID");
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			
+			String[] materialRecords = editData.split("<li>");
+			for (String record : materialRecords) {
+				
+				String material[] = record.split(",");
+				Material m = new Material();
+				m.setId(Integer.parseInt(material[0]));
+				m.setDelta(Float.parseFloat(material[1]));
+				m.setLastModStaff(staff.getName());
+				m.setRestaurantId(Integer.parseInt(restaurantID));
+				MaterialDao.update(m);
+			}
+		}catch(SQLException e){	
+			e.printStackTrace();
+			
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	public ActionForward cancelMonthSettle(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		try{
+			String restaurantID =  (String) request.getAttribute("restaurantID");
+			Material m = new Material();
+			m.setId(-10);
+			m.setRestaurantId(Integer.parseInt(restaurantID));
+			MaterialDao.update(m);
+			
+		}catch(SQLException e){	
+			e.printStackTrace();
+			
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
 	
 }
