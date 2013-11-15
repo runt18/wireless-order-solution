@@ -354,8 +354,8 @@ public class MemberDao {
 	 * Get the member according to mobile.
 	 * @param dbCon
 	 * 			the database connection
-	 * @param term
-	 * 			the terminal
+	 * @param staff
+	 * 			the staff to perform this action
 	 * @param mobile
 	 * 			the mobile
 	 * @return the member matched this mobile
@@ -364,11 +364,11 @@ public class MemberDao {
 	 * @throws BusinessException
 	 * 			throws if the member to this mobile does NOT exist
 	 */
-	public static Member getMemberByMobile(Staff term, String mobile) throws SQLException, BusinessException{
+	public static Member getMemberByMobile(Staff staff, String mobile) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return getMemberByMobile(dbCon, term, mobile);
+			return getMemberByMobile(dbCon, staff, mobile);
 		}finally{
 			dbCon.disconnect();
 		}

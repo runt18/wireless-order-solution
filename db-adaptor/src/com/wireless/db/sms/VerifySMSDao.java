@@ -187,9 +187,9 @@ public class VerifySMSDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 * @throws BusinessException
-	 * 			throws if the sms to verify is invalid
-	 * 			throws if the sms has been expired
-	 * 			throws if the code is NOT matched
+	 * 			throws if the sms to verify is invalid<br>
+	 * 			throws if the sms has been expired<br>
+	 * 			throws if the code is NOT matched<br>
 	 */
 	public static void verify(DBCon dbCon, VerifySMS.VerifyBuilder builder) throws SQLException, BusinessException{
 		VerifySMS verifySms = builder.build();

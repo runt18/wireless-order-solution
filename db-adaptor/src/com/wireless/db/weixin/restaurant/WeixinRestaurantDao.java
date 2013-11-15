@@ -123,25 +123,7 @@ public class WeixinRestaurantDao {
 	}
 	
 	/**
-	 * Check if the weixin serial has has been bound.
-	 * @param weixinRestaurantSerial
-	 * 			the weixin serial to check
-	 * @return true if the weixin serial has been bound, otherwise false
-	 * @throws SQLException
-	 * 			throws if failed to execute any SQL statement
-	 */
-	public static boolean isBound(String weixinRestaurantSerial) throws SQLException{
-		DBCon dbCon = new DBCon();
-		try{
-			dbCon.connect();
-			return isBound(dbCon, weixinRestaurantSerial);
-		}finally{
-			dbCon.disconnect();
-		}
-	}
-	
-	/**
-	 * Check if the weixin serial has has been bound.
+	 * Check if the weixin serial has has been bound with the restaurant account.
 	 * @param dbCon
 	 * 			the database connection
 	 * @param weixinRestaurantSerial
@@ -149,14 +131,39 @@ public class WeixinRestaurantDao {
 	 * @return true if the weixin serial has been bound, otherwise false
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException 
+	 * 			throws if the restaurant account does NOT exist 
 	 */
-	public static boolean isBound(DBCon dbCon, String weixinRestaurantSerial) throws SQLException{
-		//Check to see whether the weixin serial has been bound.
+	public static boolean isBound(String weixinRestaurantSerial, String account) throws SQLException, BusinessException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return isBound(dbCon, weixinRestaurantSerial, account);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Check if the weixin serial has has been bound with the restaurant account.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param weixinRestaurantSerial
+	 * 			the weixin serial to check
+	 * @return true if the weixin serial has been bound, otherwise false
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException 
+	 * 			throws if the restaurant account does NOT exist 
+	 */
+	public static boolean isBound(DBCon dbCon, String weixinRestaurantSerial, String account) throws SQLException, BusinessException{
+		//Check to see whether the weixin serial has been bound with the account.
 		String sql;
 		sql = " SELECT restaurant_id FROM " + Params.dbName + ".weixin_restaurant " +
 			  " WHERE weixin_serial_crc = CRC32('" + weixinRestaurantSerial + "')" +
 			  " AND weixin_serial = '" + weixinRestaurantSerial + "'" +
-			  " AND status = " + WeixinRestaurant.Status.BOUND.getVal();
+			  " AND status = " + WeixinRestaurant.Status.BOUND.getVal() +
+			  " AND restaurant_id = ( SELECT id FROM " + Params.dbName + ".restaurant WHERE account = '" + account + "' )";
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		
 		boolean isBound = false;;
@@ -205,17 +212,25 @@ public class WeixinRestaurantDao {
 	 * 			throws if the account does NOT exist
 	 */
 	public static void bind(DBCon dbCon, String weixinRestaurantSerial, String account) throws SQLException, BusinessException{
-		if(!isBound(dbCon, weixinRestaurantSerial)){
+		if(!isBound(dbCon, weixinRestaurantSerial, account)){
 			Restaurant restaurant = RestaurantDao.getByAccount(dbCon, account);
 			String sql;
+			
+			sql = " DELETE FROM " + Params.dbName + ".weixin_restaurant " +
+				  " WHERE 1 = 1 " +
+				  " AND (weixin_serial_crc = CRC32('" + weixinRestaurantSerial + "')" +
+				  " AND weixin_serial = '" + weixinRestaurantSerial + "')" +
+				  " OR restaurant_id = " + restaurant.getId();
+			dbCon.stmt.executeUpdate(sql);
+			
 			sql = " INSERT INTO " + Params.dbName + ".weixin_restaurant " +
-				  " (`weixin_serial`, `weixin_serial_crc`, `restaurant_id`, `status`, `bind_date`) " +
-				  " VALUES( " +
+				  " (`weixin_serial`, `weixin_serial_crc`, `restaurant_id`, `bind_date`, `status`) " +
+				  " VALUES(" +
 				  "'" + weixinRestaurantSerial + "'," +
 				  "CRC32('" + weixinRestaurantSerial + "')," +
 				  restaurant.getId() + "," +
-				  WeixinRestaurant.Status.BOUND.getVal() + "," +
-				  "NOW()" +
+				  "NOW()," +
+				  WeixinRestaurant.Status.BOUND.getVal() +
 				  ")";
 			dbCon.stmt.executeUpdate(sql);
 		}
@@ -225,7 +240,7 @@ public class WeixinRestaurantDao {
 	 * Get the restaurant id according to its weixin serial.
 	 * @param weixinRestaurantSerial
 	 * 			the weixin serial to restaurant
-	 * @return the restaurant id to its weixin serial
+	 * @return the restaurant id this weixin restaurant serial belongs to
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 * @throws BusinessException
@@ -246,7 +261,7 @@ public class WeixinRestaurantDao {
 	 * 			the database connection
 	 * @param weixinRestaurantSerial
 	 * 			the weixin serial to restaurant
-	 * @return the restaurant id to its weixin serial
+	 * @return the restaurant id this weixin restaurant serial belongs to
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 * @throws BusinessException
