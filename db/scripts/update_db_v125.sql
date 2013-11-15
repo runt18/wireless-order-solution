@@ -156,7 +156,7 @@ CREATE TABLE IF NOT EXISTS `wireless_order_db`.`weixin_member` (
   `weixin_serial` VARCHAR(45) NOT NULL,
   `weixin_serial_crc` BIGINT NOT NULL,
   `restaurant_id` INT NOT NULL,
-  `member_id` INT NOT NULL,
+  `member_id` INT NOT NULL DEFAULT 0,
   `interest_date` DATETIME NULL,
   `bind_date` DATETIME NULL,
   `cancel_date` DATETIME NULL,
@@ -184,5 +184,18 @@ CREATE TABLE IF NOT EXISTS `wireless_order_db`.`weixin_restaurant` (
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8;
 
+-- -----------------------------------------------------
+-- Table `wireless_order_db`.`verify_sms`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `wireless_order_db`.`verify_sms` ;
+
+CREATE TABLE IF NOT EXISTS `wireless_order_db`.`verify_sms` (
+  `sms_id` INT NOT NULL AUTO_INCREMENT,
+  `code` INT NOT NULL,
+  `created` DATETIME NOT NULL,
+  `expired` DATETIME NOT NULL,
+  PRIMARY KEY (`sms_id`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
 
 SET SQL_SAFE_UPDATES = @OLD_SAFE_UPDATES;
