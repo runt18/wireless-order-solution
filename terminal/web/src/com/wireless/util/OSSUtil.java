@@ -1,5 +1,6 @@
 package com.wireless.util;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -149,36 +150,26 @@ public class OSSUtil {
      * @throws OSSException
      * @throws ClientException
      * @throws IOException 
-     * @throws NullPointerException 
      */
-    public static void uploadImage(File file) throws OSSException, ClientException, 
-    		NullPointerException, IOException{
+    public static void uploadImage(File file, String key) 
+    		throws OSSException, ClientException, IOException{
 		if(file != null && file.exists()){
-			if(file.isDirectory()){
-				for(File temp : file.listFiles()){
-					uploadImage(temp);
-				}
-			}else{
+			if(file.isFile()){
 				ObjectMetadata objectMeta = new ObjectMetadata();
 				checkContentType(objectMeta, file.getName());
 				objectMeta.setContentLength(file.length());
-				uploadFile(imgClientInner, BUCKET_IMAGE, file.getName(), file, objectMeta);
+				uploadFile(imgClientInner, BUCKET_IMAGE, key != null && !key.trim().isEmpty() ? key : file.getName(), file, objectMeta);
 			}
 		}
 	}
-    
-    /**
-     * 上传图片
-     * @param path	图片文件绝对路径
-     * @throws OSSException
-     * @throws ClientException
-     * @throws IOException 
-     * @throws NullPointerException 
-     */
-    public static void uploadImage(String path) throws OSSException, ClientException,
-    		NullPointerException, IOException{
-    	uploadImage(new File(path));
+    public static void uploadImage(String path) 
+    		throws OSSException, ClientException, IOException{
+    	uploadImage(path, null);
     }
+    public static void uploadImage(String path, String key) 
+    		throws OSSException, ClientException, IOException{
+    	uploadImage(new File(path), key);
+	}
     
     /**
      * 上传图片
@@ -186,18 +177,14 @@ public class OSSUtil {
      * @param key	图片名称
      * @throws OSSException
      * @throws ClientException
-     * @throws NullPointerException
      * @throws IOException
      */
-    public static void uploadImage(InputStream fis, String key) throws OSSException, ClientException,
-			NullPointerException, IOException{
+    public static void uploadImage(InputStream fis, String key) 
+    		throws OSSException, ClientException, IOException{
     	ObjectMetadata objectMeta = new ObjectMetadata();
-        ByteArrayOutputStream out = changeStreamToOut(fis);
-        objectMeta.setContentLength(out.size());
+    	objectMeta.setContentLength(fis.available());
 		checkContentType(objectMeta, key);
     	imgClientInner.putObject(BUCKET_IMAGE, key, fis, objectMeta);
-    	IOUtils.safeClose(fis);
-    	IOUtils.safeClose(out);
 	}
 	
     /**
@@ -262,9 +249,10 @@ public class OSSUtil {
     }
     
     public static ByteArrayOutputStream changeStreamToOut(InputStream in) throws IOException{
+    	BufferedInputStream temp = new BufferedInputStream(in);
     	ByteArrayOutputStream out = new ByteArrayOutputStream();
         int ch;
-        while ((ch = in.read()) != -1) {   
+        while ((ch = temp.read()) != -1) {   
         	out.write(ch);   
         }
         return out;
@@ -277,7 +265,7 @@ public class OSSUtil {
      * @throws Exception
      */
     public static OutputStream getImageToOutputStream(String key) throws Exception{
-    	return changeStreamToOut(imgClientInner.getObject(new GetObjectRequest(BUCKET_IMAGE, key)).getObjectContent());
+    	return changeStreamToOut(getImage(key));
     }
     
     /**
