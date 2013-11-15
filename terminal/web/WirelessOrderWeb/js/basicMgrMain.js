@@ -117,7 +117,13 @@ var monthSettleWin = new Ext.Window({
 		text : '取消',
 		iconCls : 'btn_close',
 		handler : function(){
-			monthSettleWin.hide();		
+			monthSettleWin.hide();	
+			Ext.Ajax.request({
+				url : '../../OperateMaterial.do',
+				params : {
+					dataSource : 'cancelMonthSettle'
+				}
+			});
 		}
 	}]
 });

@@ -87,11 +87,7 @@ function showMonthSettleDetail(){
 }
 
 function priceDeltaRenderer(v, m, r, ri, ci, s){
-/*	alert(r.get('price'));
-	var deltaAmount = r.get('price');
-	deltaAmount = deltaAmount < 0 ? "<font color='red' size='4'>" + Ext.ux.txtFormat.gridDou(Math.abs(deltaAmount)) + "</font>" : "<font color='green' size='4'>" + Ext.ux.txtFormat.gridDou(Math.abs(deltaAmount)) + "</font>";
-	return deltaAmount+"";*/
-	return v + 2;
+	return v = v < 0 ? "<font color='red' size='4'>" + Ext.ux.txtFormat.gridDou(v) + "</font>" : v > 0 ? "<font color='green' size='4'>" + '+' + Ext.ux.txtFormat.gridDou(v) + "</font>" : "<font color='green' size='4'>0.00&nbsp;&nbsp;</font>";
 }
 
 var settle = {
@@ -108,14 +104,17 @@ var settle = {
 
 var monthSettleTree, msm_monthSettleGrid;
 var LIMIT_20 = 20;
+var previousType, presentType;
+var edit = false;
+var editData = '';
 Ext.onReady(function(){
 	
 	var cm = new Ext.grid.ColumnModel([
 	       new Ext.grid.RowNumberer(),
 	       {header: '品项名称 ', dataIndex: 'name'},
-	       {header: '当前单价', dataIndex: 'price', align: 'right', editor: new Ext.form.NumberField({allowBlank: false })},
-	       {header: '单价', hidden : true, dataIndex: 'price'},
-	       {header: '变化点', dataIndex: 'price', align: 'right', renderer: priceDeltaRenderer}
+	       {header: '当前单价', dataIndex: 'presentPrice', align: 'right', editor: new Ext.form.NumberField({allowBlank: false }), renderer: Ext.ux.txtFormat.gridDou},
+	       //{header: '单价', hidden : true, dataIndex: 'price'},
+	       {header: '变化点', dataIndex: 'delta', align: 'right', renderer: priceDeltaRenderer}
 	]);
 	cm.defaultSortable = true;
 	
@@ -124,8 +123,9 @@ Ext.onReady(function(){
 		reader : new Ext.data.JsonReader({totalProperty: 'totalProperty', root:'root'},[
 				{name: 'id'},
 				{name: 'name'},
-				{name: 'price'}
-				//{name: 'deltaPrice'}
+				{name: 'price'},
+				{name: 'presentPrice'},
+				{name: 'delta'}
 		]),
 		baseParams : {
 			dataSource : 'monthSettleMaterial'
@@ -144,6 +144,15 @@ Ext.onReady(function(){
 		autoSizeColumns: true,
 		viewConfig : {
 			forceFit : true		
+		},
+		listeners : {
+			afteredit : function(e){
+				e.record.set('delta', e.record.get('presentPrice') - e.record.get('price'));
+				if(editData != ''){
+					editData += '<li>';
+				}
+				editData += (e.record.data['id'] + ',' + e.record.data['delta']);
+			}
 		}
 	});
 	
@@ -195,6 +204,16 @@ Ext.onReady(function(){
 		}),
 		listeners : {
 			dblclick : function(e){
+				if(editData != ''){
+					Ext.Ajax.request({
+						url : '../../OperateMaterial.do',
+						params : {
+							dataSource : 'monthSettleMaterial',
+							editData : editData
+						}
+					});
+					editData = '';
+				}
 				msm_monthSettleGrid.setTitle('货品列表' + '&nbsp;&nbsp;<span style="color:green; font-weight:bold; font-size:13px;">' + e.text + '</span>');
 				msm_monthSettleGrid.getStore().load({
 					params : {
@@ -236,12 +255,11 @@ Ext.onReady(function(){
 				var stockActionCount = Ext.getDom('labStockAction').innerHTML;
 			 	var stockTakeCount = Ext.getDom('labStockTake').innerHTML;
 			 	if(eval(stockActionCount + '+' + stockTakeCount) > 0){
-			 		//Ext.MessageBox.alert('提示', '还有未审核的库单或盘点单');
 			 		return false;
 			 	}
 			},
 			expand : function(p){
-				Ext.getCmp('winMonthSettle').setHeight(700);
+				Ext.getCmp('winMonthSettle').setHeight(600);
 				Ext.getCmp('winMonthSettle').center();
 			},
 			collapse : function(){
