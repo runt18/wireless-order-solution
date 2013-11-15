@@ -198,4 +198,46 @@ CREATE TABLE IF NOT EXISTS `wireless_order_db`.`verify_sms` (
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8;
 
+-- -----------------------------------------------------
+-- Table `wireless_order_db`.`monthly_balance`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `wireless_order_db`.`monthly_balance` ;
+
+CREATE TABLE IF NOT EXISTS `wireless_order_db`.`monthly_balance` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `restaurant_id` INT NOT NULL,
+  `staff` VARCHAR(45) NOT NULL,
+  `month` DATE NOT NULL,
+  PRIMARY KEY (`id`),
+  INDEX `ix_restaurant_id` (`restaurant_id` ASC))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
+
+-- -----------------------------------------------------
+-- Table `wireless_order_db`.`monthly_balance_detail`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `wireless_order_db`.`monthly_balance_detail` ;
+
+CREATE TABLE IF NOT EXISTS `wireless_order_db`.`monthly_balance_detail` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `monthly_balance_id` INT NOT NULL,
+  `restaurant_id` INT NOT NULL,
+  `dept_id` INT NOT NULL,
+  `dept_name` VARCHAR(45) NOT NULL,
+  `opening_balance` FLOAT NOT NULL DEFAULT 0,
+  `ending_balance` FLOAT NOT NULL DEFAULT 0,
+  PRIMARY KEY (`id`),
+  INDEX `ix_monthly_balance_id` (`monthly_balance_id` ASC),
+  INDEX `ix_restaurant_id` (`restaurant_id` ASC),
+  INDEX `ix_dept_id` (`dept_id` ASC))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
+-- -----------------------------------------------------
+-- Add the field 'delta' to table 'material'
+-- -----------------------------------------------------
+ALTER TABLE `wireless_order_db`.`material` 
+ADD COLUMN `delta` FLOAT NOT NULL DEFAULT 0 AFTER `price`;
+
 SET SQL_SAFE_UPDATES = @OLD_SAFE_UPDATES;
