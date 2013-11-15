@@ -123,12 +123,34 @@ Ext.onReady(function(){
 						addTab(id, title, url);
 					}else{
 						if(e.attributes.mId == "monthSettle"){
-/* 							url = 'InventoryManagement_Module/MonthSettle.html';
-							id = 'monthSettleMgr';
-							title = '月结操作';
-							addTab(id, title, url); */
-							monthSettleWin.show();
-							//monthSettleHandler();
+							var date = new Date();
+							var presentMonth = date.getMonth() + 1;
+							Ext.Ajax.request({
+								url : '../../QuerySystemSetting.do',
+								params : {
+									restaurantID : restaurantID
+								},
+								success : function(res, opt){
+									var jr = Ext.decode(res.responseText);
+									if(jr.success){
+										//alert(jr.other.systemSetting.setting.intCurrentMonth);
+										var month = jr.other.systemSetting.setting.intCurrentMonth;
+										if(presentMonth - month == 0){
+											Ext.MessageBox.alert('提示', '当前月份不能月结, 请于下月初月结');
+										}else if(presentMonth - month > 0){
+											monthSettleWin.show();
+										}else{
+											Ext.ux.showMsg({title : '警告', msg : '系统时间错误, 请与客服联系'});
+										}
+									}else{
+										Ext.ux.showMsg(jr);
+									}
+								},
+								failure : function(res, opt){
+									Ext.ux.showMsg(Ext.decode(res.responseText));
+								}
+							});
+							
 						}else if(e.attributes.mId == "cancelReason"){
 							cancelReasonWin.show();
 							Ext.getCmp('btnRefreshCRGrid').handler();
