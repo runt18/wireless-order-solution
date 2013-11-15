@@ -1,5 +1,6 @@
 package com.wireless.pojo.inventoryMgr;
 
+import java.text.DecimalFormat;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -41,6 +42,7 @@ public class Material implements Jsonable {
 	private int restaurantId;
 	private MaterialCate cate;
 	private float price;
+	private float delta;
 	private float stock;
 	private String name;
 	private String lastModStaff;
@@ -112,6 +114,12 @@ public class Material implements Jsonable {
 	public void setPrice(float price) {
 		this.price = price;
 	}
+	public float getDelta() {
+		return delta;
+	}
+	public void setDelta(float delta) {
+		this.delta = delta;
+	}
 	public float getStock() {
 		return stock;
 	}
@@ -177,11 +185,14 @@ public class Material implements Jsonable {
 	
 	@Override
 	public Map<String, Object> toJsonMap(int flag) {
+		DecimalFormat df = new DecimalFormat("#.00");
 		Map<String, Object> jm = new LinkedHashMap<String, Object>();
 		jm.put("id", this.getId());
 		jm.put("pinyin", this.getPinyin());
 		jm.put("rid", this.getRestaurantId());
-		jm.put("price", this.getPrice());
+		jm.put("price", df.format(this.getPrice()));
+		jm.put("presentPrice", df.format(this.getPrice() + this.getDelta()));
+		jm.put("delta", this.getDelta());
 		jm.put("name", this.getName());
 		jm.put("stock", this.getStock());
 		jm.put("lastModStaff", this.getLastModStaff());
