@@ -16,6 +16,40 @@ public class MemberType implements Jsonable, Parcelable{
 	public static final int MEMBER_TYPE_PARCELABLE_SIMPLE = 0;
 	public static final int MEMBER_TYPE_PARCELABLE_COMPLEX = 1;
 	
+	public static enum Type{
+		NORMAL(1, "普通"),
+		WEIXIN(2, "微信");
+		
+		private final int val;
+		private final String desc;
+		Type(int val, String desc){
+			this.val = val;
+			this.desc = desc;
+		}
+		
+		public static Type valueOf(int val){
+			for(Type type : values()){
+				if(type.val == val){
+					return type;
+				}
+			}
+			throw new IllegalArgumentException("The type(" + val + ") is invalid.");
+		}
+		
+		public int getVal(){
+			return this.val;
+		}
+		
+		public String getDesc(){
+			return this.desc;
+		}
+		
+		@Override 
+		public String toString(){
+			return this.desc;
+		}
+	}
+	
 	public static enum DiscountType{
 		NORMAL(1, "普通"),
 		DEFAULT(2, "默认");
@@ -96,6 +130,7 @@ public class MemberType implements Jsonable, Parcelable{
 		private final String name;
 		private final Discount defaultDiscount;
 		
+		private Type type = Type.NORMAL;
 		private List<Discount> discounts = new ArrayList<Discount>();
 		private float exchangeRate = 1;
 		private float chargeRate = 1;
@@ -109,6 +144,11 @@ public class MemberType implements Jsonable, Parcelable{
 			this.defaultDiscount = defaultDiscount;
 		}
 
+		public InsertBuilder setType(Type type){
+			this.type = type;
+			return this;
+		}
+		
 		public InsertBuilder addDiscount(Discount discount){
 			if(!discounts.contains(discount)){
 				discounts.add(discount);
@@ -278,6 +318,7 @@ public class MemberType implements Jsonable, Parcelable{
 	private int typeId;
 	private int restaurantId;
 	private String name;
+	private Type type = Type.NORMAL;
 	private List<Discount> discounts = new ArrayList<Discount>();
 	private Discount defaultDiscount = new Discount();
 	private float exchangeRate;
@@ -289,6 +330,7 @@ public class MemberType implements Jsonable, Parcelable{
 	private MemberType(InsertBuilder builder){
 		setRestaurantId(builder.restaurantId);
 		setName(builder.name);
+		setType(builder.type);
 		setDiscounts(builder.discounts);
 		setDefaultDiscount(builder.defaultDiscount);
 		setExchangeRate(builder.exchangeRate);
@@ -331,6 +373,14 @@ public class MemberType implements Jsonable, Parcelable{
 	
 	public void setName(String name) {
 		this.name = name;
+	}
+	
+	public Type getType(){
+		return this.type;
+	}
+	
+	public void setType(Type type){
+		this.type = type;
 	}
 	
 	public List<Discount> getDiscounts(){

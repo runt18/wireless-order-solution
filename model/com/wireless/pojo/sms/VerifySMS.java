@@ -26,6 +26,11 @@ public class VerifySMS {
 		public String getDesc(){
 			return this.desc;
 		}
+		
+		@Override
+		public String toString(){
+			return this.desc;
+		}
 	}
 	
 	public static class InsertBuilder{
