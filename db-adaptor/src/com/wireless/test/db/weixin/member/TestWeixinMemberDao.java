@@ -17,6 +17,7 @@ import com.wireless.db.weixin.CalcWeixinSignature;
 import com.wireless.db.weixin.member.WeixinMemberDao;
 import com.wireless.db.weixin.restaurant.WeixinRestaurantDao;
 import com.wireless.exception.BusinessException;
+import com.wireless.exception.WeixinMemberError;
 import com.wireless.pojo.client.Member;
 import com.wireless.pojo.client.MemberType;
 import com.wireless.pojo.restaurantMgr.Restaurant;
@@ -83,11 +84,11 @@ public class TestWeixinMemberDao {
 			
 		}finally{
 			WeixinMemberDao.cancel(WEIXIN_MEMBER_SERIAL, WEIXIN_RESTAURANT_SERIAL);
-//			try{
-//				WeixinMemberDao.getRestaurantIdByWeixin(WEIXIN_MEMBER_SERIAL);
-//			}catch(BusinessException e){
-//				Assert.assertEquals("failed to cancel weixin member", WeixinMemberError.WEIXIN_MEMBER_NOT_INTEREST, e.getErrCode());
-//			}
+			try{
+				WeixinMemberDao.getBoundMemberIdByWeixin(WEIXIN_MEMBER_SERIAL, WEIXIN_RESTAURANT_SERIAL);
+			}catch(BusinessException e){
+				Assert.assertEquals("failed to cancel weixin member", WeixinMemberError.WEIXIN_MEMBER_NOT_BOUND, e.getErrCode());
+			}
 		}
 	}
 }
