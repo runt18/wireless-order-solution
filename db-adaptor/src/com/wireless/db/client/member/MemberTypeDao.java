@@ -32,10 +32,11 @@ public class MemberTypeDao {
 		MemberType mt = builder.build();
 		// 插入新数据
 		String sql = " INSERT INTO " + Params.dbName + ".member_type " 
-				   + " ( restaurant_id, name, exchange_rate, charge_rate, attribute, initial_point )"
+				   + " ( restaurant_id, name, type, exchange_rate, charge_rate, attribute, initial_point )"
 				   + " VALUES("
 				   + mt.getRestaurantId() + ","	
-				   + "'" + mt.getName() + "'," 
+				   + "'" + mt.getName() + "',"
+				   + mt.getType().getVal() + "," +
 				   + mt.getExchangeRate() + ","	
 				   + mt.getChargeRate() + "," 
 				   + mt.getAttribute().getVal() + "," 
@@ -114,7 +115,7 @@ public class MemberTypeDao {
 	 */
 	public static void deleteById(DBCon dbCon, Staff staff, int memberTypeId) throws BusinessException, SQLException{
 		String sql;
-		sql = "SELECT COUNT(*) FROM " + Params.dbName + ".member WHERE restaurant_id = " + staff.getRestaurantId() + " AND member_type_id = " + memberTypeId;
+		sql = "SELECT * FROM " + Params.dbName + ".member WHERE restaurant_id = " + staff.getRestaurantId() + " AND member_type_id = " + memberTypeId;
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		if(dbCon.rs.next()){
 			throw new BusinessException(MemberError.TYPE_DELETE_ISNOT_EMPTY);
@@ -259,7 +260,7 @@ public class MemberTypeDao {
 		List<MemberType> result = new ArrayList<MemberType>();
 		String sql;
 		sql = " SELECT " +
-			  " member_type_id, restaurant_id, exchange_rate, charge_rate, name, attribute, initial_point " +
+			  " member_type_id, restaurant_id, exchange_rate, charge_rate, name, attribute, initial_point, type " +
 			  " FROM " + Params.dbName + ".member_type MT " +
 			  " WHERE 1 = 1 " +
 			  " AND MT.restaurant_id = " + staff.getRestaurantId() +
@@ -271,6 +272,7 @@ public class MemberTypeDao {
 			MemberType mt = new MemberType(dbCon.rs.getInt("member_type_id"));
 			mt.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
 			mt.setName(dbCon.rs.getString("name"));
+			mt.setType(MemberType.Type.valueOf(dbCon.rs.getInt("type")));
 			mt.setChargeRate(dbCon.rs.getFloat("charge_rate"));
 			mt.setExchangeRate(dbCon.rs.getFloat("exchange_rate"));
 			mt.setAttribute(dbCon.rs.getInt("attribute"));
@@ -359,6 +361,47 @@ public class MemberTypeDao {
 			return MemberTypeDao.getMemberTypeById(dbCon, staff, id);
 		}finally{
 			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Get the member type belongs to weixin.
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @return the member type to weixin
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if the member type does NOT exist
+	 */
+	public static MemberType getWeixinMemberType(Staff staff) throws SQLException, BusinessException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return getWeixinMemberType(dbCon, staff);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Get the member type belongs to weixin.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @return the member type to weixin
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if the member type does NOT exist
+	 */
+	public static MemberType getWeixinMemberType(DBCon dbCon, Staff staff) throws SQLException, BusinessException{
+		List<MemberType> list = MemberTypeDao.getMemberType(dbCon, staff, " AND MT.type = " + MemberType.Type.WEIXIN.getVal(), null);
+		if(list.isEmpty()){
+			throw new BusinessException(MemberError.MEMBER_TYPE_NOT_EXIST);
+		}else{
+			return list.get(0);
 		}
 	}
 }

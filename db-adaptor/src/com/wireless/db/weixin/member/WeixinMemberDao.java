@@ -176,17 +176,18 @@ public class WeixinMemberDao {
 	 * 			the weixin to bind
 	 * @param weixinRestaurantSerial
 	 * 			the weixin restaurant serial
+	 * @return the id to member just inserted
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 * @throws BusinessException	
 	 * 			throws if failed to insert the new member<br>
 	 * 			throws if the weixin serial has NOT been interested before
 	 */
-	public static void bindNewMember(Member.InsertBuilder builder, String weixinMemberSerial, String weixinRestaurantSerial) throws SQLException, BusinessException{
+	public static int bindNewMember(Member.InsertBuilder builder, String weixinMemberSerial, String weixinRestaurantSerial) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			bindNewMember(dbCon, builder, weixinMemberSerial, weixinRestaurantSerial);
+			return bindNewMember(dbCon, builder, weixinMemberSerial, weixinRestaurantSerial);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -202,13 +203,14 @@ public class WeixinMemberDao {
 	 * 			the weixin to bind
 	 * @param weixinRestaurantSerial
 	 * 			the weixin restaurant serial
+	 * @return the id to member just inserted  
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 * @throws BusinessException	
 	 * 			throws if failed to insert the new member<br>
 	 * 			throws if the weixin serial has NOT been interested before
 	 */
-	public static void bindNewMember(DBCon dbCon, Member.InsertBuilder builder, String weixinMemberSerial, String weixinRestaurantSerial) throws SQLException, BusinessException{
+	public static int bindNewMember(DBCon dbCon, Member.InsertBuilder builder, String weixinMemberSerial, String weixinRestaurantSerial) throws SQLException, BusinessException{
 		
 		int restaurantId = WeixinRestaurantDao.getRestaurantIdByWeixin(dbCon, weixinRestaurantSerial);
 		int memberId = MemberDao.insert(dbCon, StaffDao.getStaffs(dbCon, restaurantId).get(0), builder);
@@ -225,6 +227,7 @@ public class WeixinMemberDao {
 		if(dbCon.stmt.executeUpdate(sql) == 0){
 			throw new BusinessException(WeixinMemberError.WEIXIN_MEMBER_NOT_INTEREST);
 		}
+		return memberId;
 	}
 	
 	/**

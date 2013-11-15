@@ -37,6 +37,7 @@ public class TestMemberTypeDao {
 	private void compare(MemberType expected, MemberType actual){
 		assertEquals("member type id", expected.getTypeId(), actual.getTypeId());
 		assertEquals("member type name", expected.getName(), actual.getName());
+		assertEquals("type to member type", expected.getType(), actual.getType());
 		assertEquals("member type attribute", expected.getAttribute().getVal(), actual.getAttribute().getVal());
 		assertEquals("member type charge rate", expected.getChargeRate(), actual.getChargeRate(), 0.01);
 		assertEquals("member type exchange rate", expected.getExchangeRate(), actual.getExchangeRate(), 0.01);
@@ -91,6 +92,9 @@ public class TestMemberTypeDao {
 			}
 			if(updateBuilder.isDiscountChanged()){
 				expected.setDiscounts(updateBuilder.getDiscounts());
+			}
+			if(updateBuilder.isDefaultDiscountChanged()){
+				expected.setDefaultDiscount(updateBuilder.getDefaultDiscount());
 			}
 			MemberTypeDao.update(mStaff, updateBuilder);
 			

@@ -89,7 +89,7 @@ public class MemberDao {
 			  " M.member_card, M.name AS member_name, M.sex, M.create_date, " +
 			  " M.tele, M.mobile, M.birthday, M.id_card, M.company, M.contact_addr, M.comment, "	+
 			  " MT.member_type_id, MT.charge_rate, MT.exchange_rate, " +
-			  " MT.name AS member_type_name, MT.attribute, MT.initial_point " +
+			  " MT.name AS member_type_name, MT.type, MT.attribute, MT.initial_point " +
 			  " FROM (" + Params.dbName + ".member M " +
 			  " JOIN " + Params.dbName + ".member_type MT ON M.member_type_id = MT.member_type_id) "	+
 			  " LEFT JOIN " + Params.dbName + ".interested_member IM ON M.member_id = IM.member_id " +
@@ -134,6 +134,7 @@ public class MemberDao {
 			memberType.setExchangeRate(dbCon.rs.getFloat("exchange_rate"));
 			memberType.setChargeRate(dbCon.rs.getFloat("charge_rate"));
 			memberType.setName(dbCon.rs.getString("member_type_name"));
+			memberType.setType(MemberType.Type.valueOf(dbCon.rs.getInt("type")));
 			memberType.setAttribute(dbCon.rs.getInt("attribute"));
 			memberType.setInitialPoint(dbCon.rs.getInt("initial_point"));
 			member.setMemberType(memberType);
@@ -539,7 +540,8 @@ public class MemberDao {
 		checkValid(dbCon, member);
 		
 		String updateSQL = " UPDATE " + Params.dbName + ".member SET " 
-			+ (builder.isNameChanged() ? " name = '" + member.getName() + "'" : "")
+			+ " member_id = " + member.getId()  
+			+ (builder.isNameChanged() ? " ,name = '" + member.getName() + "'" : "")
 			+ (builder.isMobileChanged() ? " ,mobile = " + "'" + member.getMobile() + "'" : "") 
 			+ (builder.isMemberTypeChanged() ? " ,member_type_id = " + member.getMemberType().getTypeId() : "")
 			+ (builder.isMemberCardChanged() ? " ,member_card = '" + member.getMemberCard() + "'" : "") 
