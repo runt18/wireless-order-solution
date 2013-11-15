@@ -133,6 +133,19 @@ ALTER TABLE `wireless_order_db`.`food_statistics`
 ADD COLUMN `probability` FLOAT NOT NULL DEFAULT 0 AFTER `order_cnt`;
 
 -- -----------------------------------------------------
+-- Add the field 'type' to table 'member_type'
+-- -----------------------------------------------------
+ALTER TABLE `wireless_order_db`.`member_type` 
+ADD COLUMN `type` TINYINT NOT NULL DEFAULT 1 COMMENT 'the type as below\n1 - normal\n2 - reserved' AFTER `initial_point`;
+
+-- -----------------------------------------------------
+-- Insert the reserved member type to each restaurant
+-- -----------------------------------------------------
+INSERT INTO `wireless_order_db`.`member_type`
+(`restaurant_id`, `name`, `type`)
+SELECT id, '微信会员', 2 FROM `wireless_order_db`.`restaurant` WHERE id > 10;
+
+-- -----------------------------------------------------
 -- Table `wireless_order_db`.`weixin_finance`
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `wireless_order_db`.`weixin_finance` ;
@@ -159,8 +172,7 @@ CREATE TABLE IF NOT EXISTS `wireless_order_db`.`weixin_member` (
   `member_id` INT NOT NULL DEFAULT 0,
   `interest_date` DATETIME NULL,
   `bind_date` DATETIME NULL,
-  `cancel_date` DATETIME NULL,
-  `status` TINYINT NOT NULL DEFAULT 1 COMMENT 'the status to weixin member as below.\n1 - 已关注\n2 - 已绑定\n3 - 取消关注',
+  `status` TINYINT NOT NULL DEFAULT 1 COMMENT 'the status to weixin member as below.\n1 - 已关注\n2 - 已绑定\n',
   INDEX `ix_weixin_serial_crc` (`weixin_serial_crc` ASC),
   INDEX `ix_member_id` (`member_id` ASC),
   INDEX `ix_restaurant_id` (`restaurant_id` ASC))
