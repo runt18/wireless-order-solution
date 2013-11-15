@@ -31,7 +31,7 @@ public class MaterialDao {
 	public static List<Material> getContent(DBCon dbCon, Map<Object, Object> params) throws SQLException{
 		List<Material> list = new ArrayList<Material>();
 		Material item = null;
-		String querySQL = "SELECT M.material_id, M.restaurant_id, M.price, M.stock, M.name, M.status, M.last_mod_staff, M.last_mod_date,"
+		String querySQL = "SELECT M.material_id, M.restaurant_id, M.price, M.delta, M.stock, M.name, M.status, M.last_mod_staff, M.last_mod_date,"
 						+ " MC.cate_id, MC.name cate_name, MC.type cate_type"
 						+ " FROM material_cate MC, material M "
 						+ " WHERE MC.restaurant_id = M.restaurant_id "
@@ -43,6 +43,7 @@ public class MaterialDao {
 			item.setId(dbCon.rs.getInt("material_id"));
 			item.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
 			item.setPrice(dbCon.rs.getFloat("price"));
+			item.setDelta(dbCon.rs.getFloat("delta"));
 			item.setStock(dbCon.rs.getFloat("stock"));
 			item.setName(dbCon.rs.getString("name"));
 			item.setLastModDate(dbCon.rs.getTimestamp("last_mod_date").getTime());
@@ -160,16 +161,30 @@ public class MaterialDao {
 	public static int update(DBCon dbCon, Material m) throws SQLException{
 		int count = 0;
 		String updateSQL;
+		if(m.getId() < 0){
 			updateSQL = "UPDATE " + Params.dbName + ".material SET "
-					 + " cate_id = " + m.getCate().getId() 
-					 + " ,price = " + m.getPrice()
-					 + " ,stock = " + m.getStock()
-					 + " ,name = '" + m.getName() + "'"
-					 + " ,last_mod_staff = '" + m.getLastModStaff() + "'"
-					 + " ,last_mod_date = '" + DateUtil.format(new Date().getTime()) + "'"
-					 + " WHERE material_id = " + m.getId()
-					 + " AND restaurant_id = " + m.getRestaurantId();
-
+					 + " delta = 0 "
+					 + " WHERE restaurant_id = " + m.getRestaurantId();
+		}else{
+			if(m.getDelta() != 0){
+				updateSQL = "UPDATE " + Params.dbName + ".material SET "
+						 + " delta = " + m.getDelta()
+						 + " ,last_mod_staff = '" + m.getLastModStaff() + "'"
+						 + " ,last_mod_date = '" + DateUtil.format(new Date().getTime()) + "'"
+						 + " WHERE material_id = " + m.getId()
+						 + " AND restaurant_id = " + m.getRestaurantId();
+			}else{
+				updateSQL = "UPDATE " + Params.dbName + ".material SET "
+						 + " cate_id = " + m.getCate().getId() 
+						 + " ,price = " + m.getPrice()
+						 + " ,stock = " + m.getStock()
+						 + " ,name = '" + m.getName() + "'"
+						 + " ,last_mod_staff = '" + m.getLastModStaff() + "'"
+						 + " ,last_mod_date = '" + DateUtil.format(new Date().getTime()) + "'"
+						 + " WHERE material_id = " + m.getId()
+						 + " AND restaurant_id = " + m.getRestaurantId();
+			}
+		}
 		count = dbCon.stmt.executeUpdate(updateSQL);
 		return count;
 	}
@@ -314,7 +329,7 @@ public class MaterialDao {
 		String sql;
 		List<Material> materials = new ArrayList<Material>();
 		try{
-			sql = "SELECT M.material_id, M.name, M.price FROM " + Params.dbName + ".food F " +
+			sql = "SELECT M.material_id, M.name, M.price, M.delta FROM " + Params.dbName + ".food F " +
 					" JOIN " + Params.dbName + ".food_material FM ON FM.food_id = F.food_id " +
 					" JOIN " + Params.dbName + ".material M ON M.material_id = FM.material_id " +
 					" WHERE F.restaurant_id = " + staff.getRestaurantId() +
@@ -329,7 +344,7 @@ public class MaterialDao {
 				m.setId(dbCon.rs.getInt("material_id"));
 				m.setName(dbCon.rs.getString("name"));
 				m.setPrice(dbCon.rs.getFloat("price"));
-				
+				m.setDelta(dbCon.rs.getFloat("delta"));
 				materials.add(m);
 			}
 		}catch(SQLException e){
@@ -357,4 +372,7 @@ public class MaterialDao {
 		}
 		
 	}
+	
+	
+	
 }
