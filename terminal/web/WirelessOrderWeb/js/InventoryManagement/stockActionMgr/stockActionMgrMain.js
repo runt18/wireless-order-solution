@@ -1521,11 +1521,11 @@ function initControl(){
 			amount += secondStepPanelCenter.getStore().getAt(i).get('amount');
 		}
 		Ext.getDom('txtTotalAmount').value = amount;
-		Ext.getDom('txtTotalPrice').value = totalPrice;
+		Ext.getDom('txtTotalPrice').value = totalPrice.toFixed(2);
 		if(txtActualPrice.indexOf('$') > 0){
 			Ext.getDom('txtActualPrice').value = txtActualPrice.substring(0, (txtActualPrice.length-1));
 		}else{
-			Ext.getDom('txtActualPrice').value = totalPrice;
+			Ext.getDom('txtActualPrice').value = totalPrice.toFixed(2);
 		}
 		
 	});
