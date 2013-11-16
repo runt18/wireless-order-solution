@@ -150,9 +150,10 @@ public class BusinessReceiptsStatisticsAction extends Action {
 				total.setIncomeByPay(payTotal);
 				total.setIncomeByRepaid(repaidTotal);
 				
+				jobject.setTotalProperty(incomesByEachDay.size());
 				incomesByEachDay = DataPaging.getPagingData(incomesByEachDay, isPaging, start, limit);
 				
-				jobject.setTotalProperty(incomesByEachDay.size());
+				
 				incomesByEachDay.add(total);
 				jobject.setRoot(incomesByEachDay);
 			}

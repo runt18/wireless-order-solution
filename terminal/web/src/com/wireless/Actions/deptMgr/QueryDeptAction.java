@@ -1,6 +1,9 @@
 package com.wireless.Actions.deptMgr;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -26,7 +29,37 @@ public class QueryDeptAction extends DispatchAction{
 			throws Exception {
 		request.setCharacterEncoding("UTF-8");
 		response.setCharacterEncoding("UTF-8");
+		JObject jobject = new JObject();
+		List<String> xz = new ArrayList<String>();
+		xz.add("one");
+		xz.add("two");
+		xz.add("thrid");
+		String xz1 = "['one', 'tow', 'thrid']";
+		String xdata1 = "[{name: 'good', data: [9, 78, 89]}]";
 		
+		List<Integer> data1 = new ArrayList<Integer>();
+		data1.add(2);
+		data1.add(4);
+		data1.add(7);
+		List<Integer> data2 = new ArrayList<Integer>();
+		data2.add(9);
+		data2.add(18);
+		data2.add(89);
+		
+		Map<String, List<Integer>> xdata = new HashMap<String, List<Integer>>();
+		
+		xdata.put("good", data1);
+		xdata.put("bed", data2);
+		
+		
+		
+		
+		Map<Object, Object> chart = new HashMap<Object, Object>();
+		chart.put("xz", xz1);
+		chart.put("xdata", xdata1);
+		jobject.setOther(chart);
+		
+		response.getWriter().print(jobject.toString());
 		return null;
 	}
 	

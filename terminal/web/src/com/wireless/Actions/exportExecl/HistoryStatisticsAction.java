@@ -2002,15 +2002,15 @@ public class HistoryStatisticsAction extends DispatchAction{
 		HSSFCell cell = null;
 		initParams(wb);
 		
-		sheet.setColumnWidth(0, 3800);
-		sheet.setColumnWidth(1, 3500);
+		sheet.setColumnWidth(0, 5000);
+		sheet.setColumnWidth(1, 7000);
 		sheet.setColumnWidth(2, 3300);
 		sheet.setColumnWidth(3, 3000);
 		sheet.setColumnWidth(4, 2300);
 		sheet.setColumnWidth(5, 3000);
 		sheet.setColumnWidth(6, 3000);
 		sheet.setColumnWidth(7, 3200);
-		sheet.setColumnWidth(8, 7000);
+		sheet.setColumnWidth(8, 6000);
 		
 		
 		//冻结行
@@ -2087,7 +2087,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 			row.setHeight((short) 350);
 			
 			cell = row.createCell(0);
-			cell.setCellValue(cf.getOrderDate());
+			cell.setCellValue(cf.getOrderDateFormat());
 			cell.setCellStyle(strStyle);
 			
 			cell = row.createCell(row.getLastCellNum());
@@ -2121,7 +2121,6 @@ public class HistoryStatisticsAction extends DispatchAction{
 			cell = row.createCell(row.getLastCellNum());
 			cell.setCellValue(cf.getReason());
 			cell.setCellStyle(strStyle);
-	
 			
 		}
 		OutputStream os = response.getOutputStream();
