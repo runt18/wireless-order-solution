@@ -143,6 +143,7 @@ public class MemberDao {
 		}
 		dbCon.rs.close();
 		
+		//获取关注的会员
 		List<Integer> mIds = new ArrayList<Integer>();
 		sql = "SELECT staff_id,member_id,start_date FROM " + Params.dbName + ".interested_member WHERE staff_id = " + staff.getId();
 		dbCon.rs = dbCon.stmt.executeQuery(sql);

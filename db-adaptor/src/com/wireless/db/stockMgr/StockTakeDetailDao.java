@@ -122,7 +122,7 @@ public class StockTakeDetailDao {
 				(orderClause == null ? "" : orderClause);
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		
-		if(dbCon.rs.next()){
+		while(dbCon.rs.next()){
 			StockTakeDetail sTakeDetail = new StockTakeDetail();
 			sTakeDetail.setId(dbCon.rs.getInt("id"));
 			sTakeDetail.setStockTakeId(dbCon.rs.getInt("stock_take_id"));
