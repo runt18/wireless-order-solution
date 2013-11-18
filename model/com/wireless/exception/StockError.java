@@ -5,9 +5,9 @@ public class StockError extends ErrorEnum{
 	/**
 	 * codeRange : 7750 - 7999
 	 * stockAction :  7950 - 7999
-	 * stockActionDetail : 7900 - 7949
+	 * stockActionDetail, stockTakeDetail : 7900 - 7949
 	 * stockTake : 7850 - 7899
-	 * stockTakeDetail : 7800 - 7849
+	 *  : 7800 - 7849
 	 * materialDept : 7750 - 7799
 	 */
 	/*stockAction 7950 - 7999*/
@@ -21,10 +21,6 @@ public class StockError extends ErrorEnum{
 	public static final ErrorCode STOCKACTION_UPDATE = build(7992, "操作失败, 修改失败, 此库单不存在.");
 	public static final ErrorCode STOCKACTION_CURRENTMONTH_UPDATE = build(7991, "操作失败, 月结失败, 还有未审核的库存单.");
 	public static final ErrorCode STOCKACTION_INSERT = build(7990, "操作失败, 添加失败, 正在盘点中,不能新增库单.");
-	/*stockActionDetail 7900 - 7949*/
-	public static final ErrorCode STOCKACTION_DETAIL_SELECT = build(7949, "操作失败, 查找失败, 此库存明细单不存在.");
-	public static final ErrorCode STOCKACTION_DETAIL_UPDATE = build(7948, "操作失败, 修改失败, 此库存明细单不存在.");
-	public static final ErrorCode STOCKACTION_DETAIL_DELETE = build(7947, "操作失败, 删除失败, 此库存明细单不存在.");
 	/*stockTake 7850 - 7899*/
 	public static final ErrorCode STOCKTAKE_SELECT = build(7899, "操作失败, 查找失败, 此盘点单不存在.");
 	public static final ErrorCode STOCKTAKE_DELETE = build(7898, "操作失败, 删除失败, 此盘点单不存在.");
@@ -43,11 +39,18 @@ public class StockError extends ErrorEnum{
 	public static final ErrorCode STOCKTAKE_NOT_MATERIAL = build(7846, "操作失败, 添加失败, 选了小类时,只能盘点这个小类下的原料或商品.");
 	public static final ErrorCode STOCKTAKE_DETAIL_NOT_STOCKTAKE = build(7845, "操作失败, 审核失败, 还有盘漏的货品.");
 	public static final ErrorCode STOCKTAKE_NOT_MATERIAL_TYPE = build(7844, "操作失败, 添加失败, 只能盘点原料或商品其中一个下的货品.");
+	public static final ErrorCode STOCKACTION_DETAIL_SELECT = build(7829, "操作失败, 查找失败, 此库存明细单不存在.");
+	public static final ErrorCode STOCKACTION_DETAIL_UPDATE = build(7928, "操作失败, 修改失败, 此库存明细单不存在.");
+	public static final ErrorCode STOCKACTION_DETAIL_DELETE = build(7927, "操作失败, 删除失败, 此库存明细单不存在.");
 	/*materialDept 7750 - 7799*/
 	public static final ErrorCode MATERIAL_DEPT_ADD = build(7799, "操作失败, 查找失败, 此部门下还没添加这个原料.");
 	public static final ErrorCode MATERIAL_DEPT_UPDATE = build(7798, "操作失败, 修改失败, 部门与材料没有这个匹配记录.");
 	public static final ErrorCode MATERIAL_DEPT_EXIST = build(7797, "操作失败, 添加失败, 同部门之间不需要调拨.");
 	public static final ErrorCode MATERIAL_DEPT_UPDATE_EXIST = build(7796, "操作失败, 修改失败, 同部门之间不需要调拨.");
+	/*monthlyBalance 7900 - 7949*/
+	public static final ErrorCode MONTHLY_BALANCE_NOT_EXIST = build(7949, "操作失败, 查找失败, 无此月结记录");
+	public static final ErrorCode MONTHLY_BALANCE_ADD = build(7948, "操作失败, 添加失败, 数据库异常");
+	
 	private StockError(){
 		
 	}
