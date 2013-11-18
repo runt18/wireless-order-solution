@@ -1595,7 +1595,7 @@ function basicOperationBasicHandler(c){
 			isCombination = true;
 			for(var i = 0; i < cfg.getStore().getCount(); i++){
 				comboContent += (i > 0 ? '<split>' : '');
-				comboContent += (cfg.getStore().getAt(i).get('foodID') + ',' + cfg.getStore().getAt(i).get('amount'));
+				comboContent += (cfg.getStore().getAt(i).get('id') + ',' + cfg.getStore().getAt(i).get('amount'));
 			}
 		}
 	}else if(c.type == mmObj.operation.update){
