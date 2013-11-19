@@ -62,7 +62,7 @@ public class MonthlyBalanceDetail implements Jsonable{
 	
 	
 	public static class InsertBuilder{
-		private MonthlyBalanceDetail data;
+		private MonthlyBalanceDetail data = new MonthlyBalanceDetail();
 		public InsertBuilder(int deptId, float openingBalance, float endingBalance){
 			this.data.setDeptId(deptId);
 			this.data.setOpeningBalance(openingBalance);

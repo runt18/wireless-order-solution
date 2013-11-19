@@ -1,5 +1,6 @@
 package com.wireless.pojo.stockMgr;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -14,7 +15,7 @@ public class MonthlyBalance implements Jsonable{
 	private int restaurantId;
 	private String StaffName;
 	private long month;
-	private List<MonthlyBalanceDetail> details;
+	private List<MonthlyBalanceDetail> details = new ArrayList<MonthlyBalanceDetail>();
 	
 	
 	
@@ -55,7 +56,7 @@ public class MonthlyBalance implements Jsonable{
 
 
 	public static class InsertBuilder{
-		private MonthlyBalance data;
+		private MonthlyBalance data = new MonthlyBalance();
 		public InsertBuilder(int restaurantId, String staffName, long month){
 			this.data.setMonth(month);
 			this.data.setRestaurantId(restaurantId);
