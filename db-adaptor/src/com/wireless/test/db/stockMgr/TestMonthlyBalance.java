@@ -11,6 +11,7 @@ import org.junit.Test;
 
 import com.wireless.db.deptMgr.DepartmentDao;
 import com.wireless.db.staffMgr.StaffDao;
+import com.wireless.db.stockMgr.CostAnalyzeReportDao;
 import com.wireless.db.stockMgr.MonthlyBalanceDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.menuMgr.Department;
@@ -60,13 +61,20 @@ public class TestMonthlyBalance {
 		int monthlyBalanceId = 0;
 		
 		try{
-			//新建月结记录
 			
 			List<Department> depts = DepartmentDao.getDepartments(mStaff, null, null);
 			
 			MonthlyBalance.InsertBuilder build = new InsertBuilder(mStaff.getRestaurantId(), mStaff.getName(), DateUtil.parseDate("2013-11-01"));
+			float openingBalance, endingBalance;
+			//获取每个部门的期初和期末余额
+			openingBalance = CostAnalyzeReportDao.getBalance("2013-11-01", depts.get(0).getId());
+			endingBalance = CostAnalyzeReportDao.getBalance("2013-11-31 23:59:59", depts.get(0).getId());
+			build.addMonthlyBalanceDetail(new MonthlyBalanceDetail.InsertBuilder(depts.get(0).getId(), openingBalance, endingBalance).setDeptName(depts.get(0).getName()).setRestaurantId(mStaff.getRestaurantId()).build());
 			
-			MonthlyBalanceDetail.InsertBuilder detailBuild = new MonthlyBalanceDetail.InsertBuilder(depts.get(0).getId(), 900, 80);
+			openingBalance = CostAnalyzeReportDao.getBalance("2013-11-01", depts.get(1).getId());
+			endingBalance = CostAnalyzeReportDao.getBalance("2013-11-31 23:59:59", depts.get(1).getId());
+			build.addMonthlyBalanceDetail(new MonthlyBalanceDetail.InsertBuilder(depts.get(1).getId(), openingBalance, endingBalance).setDeptName(depts.get(1).getName()).setRestaurantId(mStaff.getRestaurantId()).build());
+			//新建月结记录
 			monthlyBalanceId = MonthlyBalanceDao.insert(build);
 			
 			MonthlyBalance expected = build.build();
@@ -82,7 +90,7 @@ public class TestMonthlyBalance {
 				MonthlyBalanceDao.delete(monthlyBalanceId);
 				try{
 					MonthlyBalanceDao.getMonthlyBalanceById(monthlyBalanceId);
-					assertEquals("failed to delete monthlyBalance", false);
+					assertEquals("failed to get monthlyBalance", false);
 				}catch(BusinessException ignored){}
 			}
 		}
