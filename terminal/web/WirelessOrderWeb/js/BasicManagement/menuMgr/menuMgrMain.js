@@ -292,6 +292,7 @@ var combinationFoodGrid = new Ext.grid.EditorGridPanel({
 	title : '<center>已关联菜品<font color="red">(关联菜品即可设为套菜,否则留空)</font></center>',
 	id : 'combinationFoodGrid',
 	columnWidth : .55,
+	height : (Ext.isIE ? 425 : 410),
 	loadMask : { msg: '数据请求中，请稍后...' },
 	frame : true,
 	trackMouseOver : true,
@@ -593,7 +594,7 @@ var commonTasteGrid = new Ext.grid.EditorGridPanel({
 	title : '<center>已关联口味</center>',
 	id : 'commonTasteGrid',
 	columnWidth : .55,
-//	height : (Ext.isIE ? 405 : 400),
+	height : (Ext.isIE ? 405 : 400),
 	loadMask : { msg: '数据请求中，请稍后...' },
 	frame : true,
 	trackMouseOver : true,
@@ -1160,7 +1161,7 @@ var basicOperationPanel = new Ext.Panel({
 		 	defaults : {
 		 		xtype : 'panel',
 		 		layout : 'form',
-		 		labelWidth : 30
+		 		labelWidth : 35
 		 	},
 		 	items : [{
 		 		columnWidth : 1,
@@ -1169,7 +1170,7 @@ var basicOperationPanel = new Ext.Panel({
 		 			id : 'txtBasicForFoodName',
 		 			fieldLabel : '菜名',
 		 			allowBlank : false,
-		 			width : 255
+		 			width : 260
 		 		}]
 		 	}, {
 		 		columnWidth : .5,
@@ -1195,7 +1196,7 @@ var basicOperationPanel = new Ext.Panel({
 		 			xtype : 'textfield',
 		 			id : 'txtBasicForPinyin',
 		 			fieldLabel : '拼音',
-		 			width : 103,
+		 			width : 100,
 		 			validator : function(v){
 		 				if(/^[a-zA-Z]+$/.test(v)){
 		 					return true;
@@ -1384,7 +1385,7 @@ var basicOperationPanel = new Ext.Panel({
 		 	    	}
 		 	    }, {
 		 	    	xtype : 'panel',
-		 	    	columnWidth : .15,
+		 	    	columnWidth : .14,
 		 	    	items : [{
 		 	    		xtype : 'button',
 		 	    		id : 'btnUploadFoodImage',
@@ -1427,7 +1428,7 @@ var basicOperationPanel = new Ext.Panel({
 		 	    	 }]
 		 	    }, {
 		 	    	xtype : 'panel',
-		 	    	columnWidth : .15,
+		 	    	columnWidth : .14,
 		 	    	items : [{
 		 	    		xtype : 'button',
 		 	        	id : 'btnDeleteFoodImage',
@@ -2407,8 +2408,8 @@ function initFoodOperationWin(){
 			collapsed : true,
 			modal : true,
 			resizable : false,
-			width : 920,
-			height : 551,
+			width : 940,
+			height : Ext.isIE ? null : 551,
 			layout : 'fit',
 			keys : [{
 				key : Ext.EventObject.ESC,
@@ -2515,7 +2516,8 @@ function initFoodOperationWin(){
 			items : [{
 				xtype : 'tabpanel',
 		    	id : 'foodOperationWinTab',
-		    	width : 919,
+		    	width : 930,
+		    	height : Ext.isIE ? 500 : null,
 		    	border : false,
 		    	activeTab : 0,
 		    	defaults : {

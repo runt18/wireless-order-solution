@@ -171,7 +171,7 @@ function loadInformation(){
 
 var deptCount = 0, kitchenCount = 0, regionCount = 0;
 var addPrintFunc = Ext.getCmp('addPrintFuncWin');
-if(!addPrintFunc){
+if(2){
 	loadInformation();
 	addPrintFunc = new Ext.Window({
 		title : '添加方案',
@@ -453,13 +453,12 @@ if(!addPrintFunc){
 							if(checked){
 								showPanel(thiz.inputValue);
 							}
-						},
-						focus : function(thiz){
-							thiz.getEl().dom.checked = true;
-						},
-						show : function(){
-							alert('show');
 						}
+/*						,
+						focus : function(thiz){
+							thiz.fireEvent('check', thiz, true);
+							thiz.getEl().dom.checked = true;
+						}*/
 					}
 				}]
 			},{
@@ -481,6 +480,7 @@ if(!addPrintFunc){
 			},{
 				items : [{
 					xtype : 'radio',
+					id : 'cancelFoodRadio',
 					name : 'pType',
 					inputValue : 8,
 					hideLabel : true,
@@ -962,7 +962,8 @@ function printFuncOperactionHandler(c){
 		
 		document.getElementById('radioOrder').checked = true;
 		Ext.getCmp('radioOrder').fireEvent('check', Ext.getCmp('radioOrder'), true);
-		Ext.getCmp('radioOrder').fireEvent('focus', Ext.getCmp('radioOrder'));
+//		Ext.getCmp('cancelFoodRadio').getEl().dom.checked = true;
+//		Ext.getCmp('radioOrder').fireEvent('focus', Ext.getCmp('radioOrder'));
 		//document.getElementsByName('dept')[0].checked = true;
 		Ext.getCmp('allKitchen').disable();
 		Ext.getCmp('allDept').disable();
