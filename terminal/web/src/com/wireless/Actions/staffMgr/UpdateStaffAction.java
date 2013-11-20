@@ -11,9 +11,11 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.staffMgr.StaffDao;
+import com.wireless.exception.BusinessException;
+import com.wireless.exception.StaffError;
 import com.wireless.json.JObject;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.staffMgr.Staff.StaffUpdateBuilder;
-import com.wireless.util.WebParams;
 
 public class UpdateStaffAction extends Action {
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
@@ -28,25 +30,36 @@ public class UpdateStaffAction extends Action {
 			// get parameter
 			String staffId = request.getParameter("staffId");
 			String staffName = request.getParameter("staffName");
+			String oldPwd = request.getParameter("oldPwd");
 			String staffPwd = request.getParameter("staffPwd");
 			
 			String roleId = request.getParameter("roleId");
 			String tele = request.getParameter("tele");
 			
-			StaffUpdateBuilder builder = new StaffUpdateBuilder(Integer.parseInt(staffId))
-											 .setStaffName(staffName)
-											 .setStaffPwd(staffPwd)
-											 .setMobile(tele)
-											 .setRoleId(Integer.parseInt(roleId));
+			if(oldPwd != null && !oldPwd.trim().isEmpty()){
+				Staff staff = StaffDao.verify(Integer.parseInt(staffId));
+				if(!staff.getPwd().equals(oldPwd)){
+					throw new BusinessException(StaffError.VERIFY_PWD);
+				}
+			}
 			
+			StaffUpdateBuilder builder = new StaffUpdateBuilder(Integer.parseInt(staffId))
+			 .setStaffName(staffName)
+			 .setStaffPwd(staffPwd)
+			 .setMobile(tele)
+			 .setRoleId(Integer.parseInt(roleId));
+
 			StaffDao.updateStaff(builder);
 			
 			jobject.initTip(true, "修改成功");
 			
-			
-		} catch (SQLException e) {
+		}catch (BusinessException e) {
 			e.printStackTrace();
-			jobject.initTip(false, e.getMessage(), 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
+			jobject.initTip(e);
+
+		}catch (SQLException e) {
+			e.printStackTrace();
+			jobject.initTip(e);
 
 		}finally {
 			response.getWriter().print(jobject.toString());

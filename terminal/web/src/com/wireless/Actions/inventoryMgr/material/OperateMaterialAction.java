@@ -15,6 +15,7 @@ import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.inventoryMgr.Material;
+import com.wireless.pojo.inventoryMgr.Material.MonthlyChangeTypeUpdateBuilder;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.util.WebParams;
 
@@ -126,7 +127,7 @@ public class OperateMaterialAction extends DispatchAction {
 		return null;
 	}
 	
-	public ActionForward monthSettleMaterial(ActionMapping mapping, ActionForm form,
+	public ActionForward monthSettleChangeType(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
 		request.setCharacterEncoding("UTF-8");
@@ -141,12 +142,11 @@ public class OperateMaterialAction extends DispatchAction {
 			for (String record : materialRecords) {
 				
 				String material[] = record.split(",");
-				Material m = new Material();
-				m.setId(Integer.parseInt(material[0]));
-				m.setDelta(Float.parseFloat(material[1]));
-				m.setLastModStaff(staff.getName());
-				m.setRestaurantId(Integer.parseInt(restaurantID));
-				MaterialDao.update(m);
+				Material.MonthlyChangeTypeUpdateBuilder build = new MonthlyChangeTypeUpdateBuilder(Integer.parseInt(material[0]));
+				build.setDelta(Float.parseFloat(material[1]));
+				build.setLastModStaff(staff.getName());
+				build.setRestaurantId(Integer.parseInt(restaurantID));
+				MaterialDao.updateDelta(build);
 			}
 		}catch(SQLException e){	
 			e.printStackTrace();
@@ -162,10 +162,23 @@ public class OperateMaterialAction extends DispatchAction {
 			throws Exception {
 		try{
 			String restaurantID =  (String) request.getAttribute("restaurantID");
-			Material m = new Material();
-			m.setId(-10);
-			m.setRestaurantId(Integer.parseInt(restaurantID));
-			MaterialDao.update(m);
+			MaterialDao.canelMonthly(Integer.parseInt(restaurantID));
+			
+		}catch(SQLException e){	
+			e.printStackTrace();
+			
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	public ActionForward monthSettleMaterial(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		try{
+			String restaurantID =  (String) request.getAttribute("restaurantID");
+			MaterialDao.updateMonthly(Integer.parseInt(restaurantID));
 			
 		}catch(SQLException e){	
 			e.printStackTrace();

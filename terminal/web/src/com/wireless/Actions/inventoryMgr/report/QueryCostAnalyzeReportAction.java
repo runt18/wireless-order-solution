@@ -45,7 +45,7 @@ public class QueryCostAnalyzeReportAction extends Action {
 				c.add(Calendar.MONTH, -1);
 				beginDate = sdf.format(c.getTime());
 				int day = c.getActualMaximum(Calendar.DAY_OF_MONTH);
-				endDate = c.get(Calendar.YEAR) + "-" + (c.get(Calendar.MONTH)+1) + "-" + day;
+				endDate = c.get(Calendar.YEAR) + "-" + (c.get(Calendar.MONTH)+1) + "-" + day + " 23:59:59";
 				list = CostAnalyzeReportDao.getCostAnalyzes(staff, beginDate, endDate, null);
 			}else{
 				endDate = beginDate + "-31 23:59:59";
