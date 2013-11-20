@@ -4,7 +4,7 @@ if(!addSupplier){
 		id : 'supplier_addSupplier',
 		title : '添加供应商',
 		closable : false, //是否可关闭
-		resizable : true, //大小调整
+		resizable : false, //大小调整
 		modal : true,
 		width : 260,
 		bbar : [{
@@ -72,14 +72,13 @@ if(!addSupplier){
 				}
 		}],
 		items : [{
-			xtype : 'form',
 			layout : 'form',
 			frame : true,
 			border : true,
 			labelWidth : 68,
-			height : 163,
+			height : Ext.isIE ? 150 : null,
 			items : [{
-				xtype : 'textfield',
+				xtype : 'hidden',
 				id : 'txtSId',
 				hideLabel : true,
 				hidden : true
