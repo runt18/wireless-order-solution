@@ -87,6 +87,21 @@ public class Material implements Jsonable {
 		init(id, restaurantId, cateId, 0, 0, name, lastModStaff, 0, Status.valueOf(status));
 	}
 	
+	public Material(MonthlyChangeTypeUpdateBuilder builder){
+		setId(builder.id);
+		setDelta(builder.delta);
+		setLastModStaff(builder.lastModStaff);
+		setRestaurantId(builder.restaurantId);
+	}
+	
+	public Material(MonthlyUpdateBuilder builder){
+		setId(builder.id);
+		setDelta(builder.delta);
+		setPrice(builder.price);
+		setLastModStaff(builder.lastModStaff);
+		setRestaurantId(builder.restaurantId);
+	}
+	
 	public int getId() {
 		return id;
 	}
@@ -177,6 +192,93 @@ public class Material implements Jsonable {
 		this.price = (float)(Math.round(avgPrice * 100)) / 100;;
 	}
 	
+	
+	public static class MonthlyChangeTypeUpdateBuilder{
+		private final int id;
+		
+		private int restaurantId;
+		private float delta;
+		private String lastModStaff;
+		public int getRestaurantId() {
+			return restaurantId;
+		}
+		public MonthlyChangeTypeUpdateBuilder setRestaurantId(int restaurantId) {
+			this.restaurantId = restaurantId;
+			return this;
+		}
+		public float getDelta() {
+			return delta;
+		}
+		public MonthlyChangeTypeUpdateBuilder setDelta(float delta) {
+			this.delta = delta;
+			return this;
+		}
+		public String getLastModStaff() {
+			return lastModStaff;
+		}
+		public MonthlyChangeTypeUpdateBuilder setLastModStaff(String lastModStaff) {
+			this.lastModStaff = lastModStaff;
+			return this;
+		}
+		public int getId() {
+			return id;
+		}
+		
+		public MonthlyChangeTypeUpdateBuilder(int id){
+			this.id = id;
+		}
+		
+		public Material build(){
+			return new Material(this);
+		}
+		
+	}
+	
+	public static class MonthlyUpdateBuilder{
+		private final int id;
+		
+		private int restaurantId;
+		private float delta;
+		private float price;
+		private String lastModStaff;
+		public int getRestaurantId() {
+			return restaurantId;
+		}
+		public MonthlyUpdateBuilder setRestaurantId(int restaurantId) {
+			this.restaurantId = restaurantId;
+			return this;
+		}
+		public float getDelta() {
+			return delta;
+		}
+		public MonthlyUpdateBuilder setDelta(float delta) {
+			this.delta = delta;
+			return this;
+		}
+		public MonthlyUpdateBuilder setPrice(float price){
+			this.price = price;
+			return this;
+		}
+		public String getLastModStaff() {
+			return lastModStaff;
+		}
+		public MonthlyUpdateBuilder setLastModStaff(String lastModStaff) {
+			this.lastModStaff = lastModStaff;
+			return this;
+		}
+		public int getId() {
+			return id;
+		}
+		
+		public MonthlyUpdateBuilder(int id){
+			this.id = id;
+		}
+		
+		public Material build(){
+			return new Material(this);
+		}
+		
+	}
 	
 	@Override
 	public String toString() {

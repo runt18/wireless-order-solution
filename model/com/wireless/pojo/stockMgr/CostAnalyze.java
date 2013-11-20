@@ -19,11 +19,18 @@ public class CostAnalyze implements Jsonable{
 	private float stockOutTransferMoney;
 	private float endMoney;
 	private float costMoney;
-	private float salesMoney;
+	private float salesMoney = 0;
 	private float profit;
 	private float profitRate;
 	
 	
+	public CostAnalyze(){
+		
+	}
+	
+	public CostAnalyze(int id){
+		this.deptId = id;
+	}
 	
 	public int getDeptId() {
 		return deptId;
