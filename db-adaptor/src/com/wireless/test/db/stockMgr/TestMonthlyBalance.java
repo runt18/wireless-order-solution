@@ -78,8 +78,6 @@ public class TestMonthlyBalance {
 			MonthlyBalance expected = build.build();
 			expected.setId(monthlyBalanceId);
 			
-
-			
 			MonthlyBalance actual = MonthlyBalanceDao.getMonthlyBalanceById(monthlyBalanceId);
 			
 			for (int i = 0; i < actual.getDetails().size(); i++) {
