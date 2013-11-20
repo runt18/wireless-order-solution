@@ -43,14 +43,14 @@ public class TestMonthlyBalance {
 		assertEquals("month", expected.getMonth(), actual.getMonth());
 		for (MonthlyBalanceDetail detail : expected.getDetails()) {
 			int index = actual.getDetails().indexOf(detail);
-			if(index > 0){
+			if(index >= 0){
 				assertEquals("detailId", detail.getId(), actual.getDetails().get(index).getId());
 				assertEquals("monthlyBalanceId", detail.getMonthlyBalanceId(), actual.getDetails().get(index).getMonthlyBalanceId());
 				assertEquals("deptId", detail.getDeptId(), actual.getDetails().get(index).getDeptId());
 				assertEquals("opening_balance", detail.getOpeningBalance(), actual.getDetails().get(index).getOpeningBalance(), 0.001);
 				assertEquals("ending_balance", detail.getEndingBalance(), actual.getDetails().get(index).getEndingBalance(), 0.001);
 			}else{
-				assertEquals("monthly_balance_id", false);
+				assertEquals("monthly_balance_detail", false);
 			}
 		}
 	}
@@ -78,7 +78,13 @@ public class TestMonthlyBalance {
 			MonthlyBalance expected = build.build();
 			expected.setId(monthlyBalanceId);
 			
+
+			
 			MonthlyBalance actual = MonthlyBalanceDao.getMonthlyBalanceById(monthlyBalanceId);
+			
+			for (int i = 0; i < actual.getDetails().size(); i++) {
+				expected.getDetails().get(i).setId(actual.getDetails().get(i).getId());
+			}
 			
 			//比较
 			compare(expected, actual);
