@@ -13,6 +13,7 @@ import com.wireless.exception.BusinessException;
 import com.wireless.exception.FoodError;
 import com.wireless.exception.MaterialError;
 import com.wireless.pojo.inventoryMgr.Material;
+import com.wireless.pojo.inventoryMgr.Material.MonthlyChangeTypeUpdateBuilder;
 import com.wireless.pojo.inventoryMgr.MaterialCate;
 import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.staffMgr.Staff;
@@ -161,32 +162,109 @@ public class MaterialDao {
 	public static int update(DBCon dbCon, Material m) throws SQLException{
 		int count = 0;
 		String updateSQL;
-		if(m.getId() < 0){
-			updateSQL = "UPDATE " + Params.dbName + ".material SET "
-					 + " delta = 0 "
-					 + " WHERE restaurant_id = " + m.getRestaurantId();
-		}else{
-			if(m.getDelta() != 0){
-				updateSQL = "UPDATE " + Params.dbName + ".material SET "
-						 + " delta = " + m.getDelta()
-						 + " ,last_mod_staff = '" + m.getLastModStaff() + "'"
-						 + " ,last_mod_date = '" + DateUtil.format(new Date().getTime()) + "'"
-						 + " WHERE material_id = " + m.getId()
-						 + " AND restaurant_id = " + m.getRestaurantId();
-			}else{
-				updateSQL = "UPDATE " + Params.dbName + ".material SET "
-						 + " cate_id = " + m.getCate().getId() 
-						 + " ,price = " + m.getPrice()
-						 + " ,stock = " + m.getStock()
-						 + " ,name = '" + m.getName() + "'"
-						 + " ,last_mod_staff = '" + m.getLastModStaff() + "'"
-						 + " ,last_mod_date = '" + DateUtil.format(new Date().getTime()) + "'"
-						 + " WHERE material_id = " + m.getId()
-						 + " AND restaurant_id = " + m.getRestaurantId();
-			}
-		}
+		updateSQL = "UPDATE " + Params.dbName + ".material SET "
+				 + " cate_id = " + m.getCate().getId() 
+				 + " ,price = " + m.getPrice()
+				 + " ,stock = " + m.getStock()
+				 + " ,name = '" + m.getName() + "'"
+				 + " ,last_mod_staff = '" + m.getLastModStaff() + "'"
+				 + " ,last_mod_date = '" + DateUtil.format(new Date().getTime()) + "'"
+				 + " WHERE material_id = " + m.getId()
+				 + " AND restaurant_id = " + m.getRestaurantId();
 		count = dbCon.stmt.executeUpdate(updateSQL);
 		return count;
+	}
+	
+	/**
+	 * Cancel MonthlySettle.
+	 * @param restaurantId
+	 * @throws SQLException
+	 */
+	public static void canelMonthly(int restaurantId) throws SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			canelMonthly(dbCon, restaurantId);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Cancel MonthlySettle.
+	 * @param dbCon
+	 * @param restaurantId
+	 * @throws SQLException
+	 */
+	public static void canelMonthly(DBCon dbCon, int restaurantId) throws SQLException{
+		String updateSQL = "UPDATE " + Params.dbName + ".material SET "
+				 + " delta = 0 "
+				 + " WHERE restaurant_id = " + restaurantId;
+		
+		dbCon.stmt.executeUpdate(updateSQL);
+	}
+	
+	/**
+	 * Update the delta when change type.
+	 * @param builder
+	 * 				the detail of material
+	 * @throws SQLException
+	 */
+	public static void updateDelta(MonthlyChangeTypeUpdateBuilder builder) throws SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			updateDelta(dbCon, builder);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Update the delta when change type.
+	 * @param dbCon
+	 * @param builder
+	 * @throws SQLException
+	 */
+	public static void updateDelta(DBCon dbCon, MonthlyChangeTypeUpdateBuilder builder) throws SQLException{
+		Material m = builder.build();
+		String updateSQL = "UPDATE " + Params.dbName + ".material SET "
+				 + " delta = " + m.getDelta()
+				 + " ,last_mod_staff = '" + m.getLastModStaff() + "'"
+				 + " ,last_mod_date = '" + DateUtil.format(new Date().getTime()) + "'"
+				 + " WHERE material_id = " + m.getId()
+				 + " AND restaurant_id = " + m.getRestaurantId();
+		dbCon.stmt.executeUpdate(updateSQL);
+	}
+	
+	/**
+	 * Update the price.
+	 * @param restaurantId
+	 * @throws SQLException
+	 */
+	public static void updateMonthly(int restaurantId) throws SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			updateMonthly(dbCon, restaurantId);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Update the price.
+	 * @param dbCon
+	 * @param restaurantId
+	 * @throws SQLException
+	 */
+	public static void updateMonthly(DBCon dbCon, int restaurantId) throws SQLException{
+		String updateSQL = "UPDATE " + Params.dbName + ".material SET "
+				 + " price = (price + delta)" 
+				 + " ,delta = 0 "
+				 + " WHERE delta <> 0 " 
+				 + " AND restaurant_id = " + restaurantId;
+		dbCon.stmt.executeUpdate(updateSQL);
 	}
 	
 	/**
