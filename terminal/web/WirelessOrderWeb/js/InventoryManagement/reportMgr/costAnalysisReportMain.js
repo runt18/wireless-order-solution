@@ -5,22 +5,19 @@ function onLoad(){
 
 var suppllierGridTbar;
 Ext.onReady(function(){
-	Ext.BLANK_IMAGE_URL = '../../extjs/resources/images/default/s.gif';
-	Ext.QuickTips.init();
-	Ext.form.Field.prototype.msgTarget = 'side';
-	
 	var cm = new Ext.grid.ColumnModel([
        new Ext.grid.RowNumberer(),
-       {header: '部门 ', dataIndex: 'deptName', width:120},
-       {header: '期初余额', dataIndex: 'primeMoney'},
-       {header: '领料金额', dataIndex: 'useMaterialMoney'},
-       {header: '退料金额', dataIndex: 'stockOutMoney'},
-       {header: '拨出金额', dataIndex: 'stockOutTransferMoney'},
-       {header: '期末金额', dataIndex: 'endMoney'},
-       {header: '成本金额', dataIndex: 'costMoney'},
-       {header: '销售金额', dataIndex: 'salesMoney', width:130},
-       {header: '毛利额', dataIndex: 'profit', width:130},
-       {header: '毛利率', dataIndex: 'profitRate', id : 'rate', width:130}
+       {header: '部门 ', dataIndex: 'deptName'},
+       {header: '期初余额', dataIndex: 'primeMoney', align : 'right', renderer : Ext.ux.txtFormat.gridDou},
+       {header: '领料金额', dataIndex: 'useMaterialMoney', align : 'right', renderer : Ext.ux.txtFormat.gridDou},
+       {header: '退料金额', dataIndex: 'stockOutMoney', align : 'right', renderer : Ext.ux.txtFormat.gridDou},
+       {header: '拨出金额', dataIndex: 'stockOutTransferMoney', align : 'right', renderer : Ext.ux.txtFormat.gridDou},
+       {header: '期末金额', dataIndex: 'endMoney', align : 'right', renderer : Ext.ux.txtFormat.gridDou},
+       {header: '成本金额', dataIndex: 'costMoney', align : 'right', renderer : Ext.ux.txtFormat.gridDou},
+       {header: '销售金额', dataIndex: 'salesMoney', align : 'right', renderer : Ext.ux.txtFormat.gridDou},
+       {header: '毛利额', dataIndex: 'profit', align : 'right', renderer : Ext.ux.txtFormat.gridDou},
+       {header: '毛利率', dataIndex: 'profitRate', align : 'right', renderer : Ext.ux.txtFormat.gridDou}
+        
 	]);
 	cm.defaultSortable = true;
 	
@@ -85,6 +82,7 @@ Ext.onReady(function(){
 	    	msg : "数据加载中，请稍等..."
 	    },
 	    cm : cm,
+	    //autoSizeColumns: true,
 	    viewConfig : {
 	    	forceFit : true
 	    },
@@ -97,7 +95,7 @@ Ext.onReady(function(){
 	
 	new Ext.Panel({
 		renderTo : 'divCostAnalysis',
-		width : parseInt(Ext.getDom('divCostAnalysis').parentElement.style.width.replace(/px/g,'')),
+		//width : parseInt(Ext.getDom('divCostAnalysis').parentElement.style.width.replace(/px/g,'')),
 		height : parseInt(Ext.getDom('divCostAnalysis').parentElement.style.height.replace(/px/g,'')),
 		layout : 'border',
 		//子集

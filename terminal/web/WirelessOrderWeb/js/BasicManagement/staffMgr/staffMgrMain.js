@@ -98,9 +98,9 @@ if(!changePwdWin){
 						var ss = Ext.getCmp('staffGrid').getSelectionModel().getSelected();
 						
 						var staffID = staffStore.getAt(currRowIndex).get('staffID');
-						var password = staffStore.getAt(currRowIndex).get('staffPassword');
+						//var password = staffStore.getAt(currRowIndex).get('staffPassword');
 						
-						if(password == MD5(oldPwd)){
+//						if(password == MD5(oldPwd)){
 							if (newPwd == confirmPwd){
 								changePwdWin.hide();
 								
@@ -109,6 +109,7 @@ if(!changePwdWin){
 									params : {
 										isCookie : true,
 										'staffName' : '管理员',
+										'oldPwd' : MD5(oldPwd),
 										'staffId' : staffID,
 										'staffPwd' : newPwd,
 										'roleId' : ss.data.role.id
@@ -135,9 +136,9 @@ if(!changePwdWin){
 						} else {
 							Ext.example.msg('提示', '操作失败, 两次密码不一致, 请重新输入.');
 						}
-					} else {
+/*					} else {
 						Ext.example.msg('提示', '操作失败, 原密码不正确, 请重新输入.');
-					}
+					}*/
 				}
 			}
 		}, {
@@ -306,8 +307,6 @@ var staffStore = new Ext.data.Store({
 		name : 'staffName'
 	}, {
 		name : 'mobile'
-	},{
-		name : 'staffPassword'
 	}, {
 		name : 'restaurantId'
 	},{
@@ -388,7 +387,12 @@ var chooseRoleComb = new Ext.form.ComboBox({
 	triggerAction : 'all',
 	selectOnFocus : true,
 	allowBlank : false,
-	readOnly : true
+	readOnly : true,
+	listeners : {
+		render : function(thiz){
+			roleStore.remove(roleStore.getAt(0));
+		}	
+	}
 });
 
 var referRoleComb = new Ext.form.ComboBox({
@@ -403,7 +407,12 @@ var referRoleComb = new Ext.form.ComboBox({
 	mode : 'local',
 	triggerAction : 'all',
 	selectOnFocus : true,
-	readOnly : true
+	readOnly : true,
+		listeners : {
+		render : function(thiz){
+			roleStore.reload();
+		}	
+	}
 });
 
 var searchRoleComb = new Ext.form.ComboBox({

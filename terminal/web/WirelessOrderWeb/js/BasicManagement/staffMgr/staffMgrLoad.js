@@ -34,7 +34,6 @@
 			}
 		},
 		failure : function(response, options) {
-			alert('wc');
 			Ext.MessageBox.show({
 				msg : " Unknown page error ",
 				width : 300,

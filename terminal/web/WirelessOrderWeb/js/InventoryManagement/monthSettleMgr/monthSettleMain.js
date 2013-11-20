@@ -1,4 +1,33 @@
 
+function operateMaterialPrice(){
+	Ext.Ajax.request({
+		url : '../../OperateMaterial.do',
+		params : {
+			dataSource : 'monthSettleMaterial'
+		},
+		success : function(res, opt){
+			Ext.Ajax.request({
+	 			url : '../../UpdateCurrentMonth.do',
+	 			success : function(res, opt){
+					var jr = Ext.decode(res.responseText);
+					if(jr.success){
+						Ext.ux.showMsg(jr);
+						monthSettleWin.hide();
+					}else{
+						Ext.ux.showMsg(jr);
+					}
+				},
+				failure : function(res, opt){
+					Ext.ux.showMsg(Ext.decode(res.responseText));
+				}
+	 		});
+		},
+		failure : function(res, opt){
+			Ext.ux.showMsg(Ext.decode(res.responseText));
+		}
+	});
+}
+
 
 function monthSettleHandler(){
 	var stockActionCount = Ext.getDom('labStockAction').innerHTML;
@@ -6,24 +35,22 @@ function monthSettleHandler(){
  	if(eval(stockActionCount + '+' + stockTakeCount) > 0){
  		Ext.MessageBox.alert('提示', '还有未审核的库单或盘点单');
  	}else{
- 		Ext.Ajax.request({
- 			url : '../../UpdateCurrentMonth.do',
- 			params : {
- 				
- 			},
- 			success : function(res, opt){
-				var jr = Ext.decode(res.responseText);
-				if(jr.success){
-					Ext.ux.showMsg(jr);
-					monthSettleWin.hide();
-				}else{
-					Ext.ux.showMsg(jr);
+		if(editData != ''){
+			Ext.Ajax.request({
+				url : '../../OperateMaterial.do',
+				params : {
+					dataSource : 'monthSettleChangeType',
+					editData : editData
+				},
+				success : function(){
+					operateMaterialPrice();
 				}
-			},
-			failure : function(res, opt){
-				Ext.ux.showMsg(Ext.decode(res.responseText));
-			}
- 		});
+			});
+			editData = '';
+		}else{
+			operateMaterialPrice();
+		}
+
  	
  	}
 }
@@ -151,7 +178,7 @@ Ext.onReady(function(){
 				if(editData != ''){
 					editData += '<li>';
 				}
-				editData += (e.record.data['id'] + ',' + e.record.data['delta']);
+				editData += (e.record.data['id'] + ',' + e.record.data['delta'] + ',' + e.record.data['price']);
 			}
 		}
 	});
@@ -208,7 +235,7 @@ Ext.onReady(function(){
 					Ext.Ajax.request({
 						url : '../../OperateMaterial.do',
 						params : {
-							dataSource : 'monthSettleMaterial',
+							dataSource : 'monthSettleChangeType',
 							editData : editData
 						}
 					});
