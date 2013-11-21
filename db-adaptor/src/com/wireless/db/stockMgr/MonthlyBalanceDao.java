@@ -1,7 +1,10 @@
 package com.wireless.db.stockMgr;
 
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -9,8 +12,12 @@ import java.util.Map;
 import com.mysql.jdbc.Statement;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
+import com.wireless.db.deptMgr.DepartmentDao;
+import com.wireless.db.system.SystemDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.StockError;
+import com.wireless.pojo.menuMgr.Department;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.stockMgr.MonthlyBalance;
 import com.wireless.pojo.stockMgr.MonthlyBalanceDetail;
 import com.wireless.pojo.util.DateUtil;
@@ -26,7 +33,33 @@ public class MonthlyBalanceDao {
 	 * 			the id of monthlyBalance
 	 * @throws SQLException
 	 */
-	public static int insert(DBCon dbCon, MonthlyBalance monthlyBalance) throws SQLException{
+	public static int insert(DBCon dbCon, MonthlyBalance monthlyBalance, Staff staff) throws SQLException{
+		
+		Calendar c = Calendar.getInstance();
+		String beginDate, endDate;
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+		//获取当前月
+		long current = SystemDao.getCurrentMonth(staff);
+		
+		c.setTime(new Date(current));
+		beginDate = sdf.format(c.getTime());
+		
+		monthlyBalance.setMonth(current);
+		//获取这个月中最后一天
+		int day = c.getActualMaximum(Calendar.DAY_OF_MONTH);
+		//格式化期末时间
+		endDate = c.get(Calendar.YEAR) + "-" + (c.get(Calendar.MONTH)+1) + "-" + day + " 23:59:59";
+		
+		List<Department> depts = DepartmentDao.getDepartments(staff, null, null);
+		
+		float openingBalance, endingBalance;
+		//获取每个部门的期初和期末余额
+		for (Department dept : depts) {
+			openingBalance = CostAnalyzeReportDao.getBalance(beginDate, dept.getId());
+			endingBalance = CostAnalyzeReportDao.getBalance(endDate, dept.getId());
+			monthlyBalance.addDetails(new MonthlyBalanceDetail.InsertBuilder(dept.getId(), openingBalance, endingBalance).setDeptName(dept.getName()).setRestaurantId(staff.getRestaurantId()).build());
+		}
+		
 		String sql = "INSERT INTO " + Params.dbName + ".monthly_balance(restaurant_id, staff, month) VALUES (" +
 					monthlyBalance.getRestaurantId() + ", " +
 					"'" + monthlyBalance.getStaffName() + "', " + 
@@ -55,13 +88,13 @@ public class MonthlyBalanceDao {
 	 * 			the id of monthlyBalance
 	 * @throws SQLException
 	 */
-	public static int insert(MonthlyBalance.InsertBuilder build) throws SQLException{
+	public static int insert(MonthlyBalance.InsertBuilder build, Staff staff) throws SQLException{
 		DBCon dbCon = new DBCon();
 		dbCon.connect();
 		int id;
 		try{
 			dbCon.conn.setAutoCommit(false);
-			id = insert(dbCon, build.build());
+			id = insert(dbCon, build.build(), staff);
 			dbCon.conn.commit();
 		}catch(SQLException e){
 			dbCon.conn.rollback();
@@ -103,7 +136,7 @@ public class MonthlyBalanceDao {
 	 * @return	list of MonthlyBalance
 	 * @throws SQLException
 	 */
-	public static List<MonthlyBalance> getMonthlyBalance(String extraCond, String otherClause) throws SQLException{
+	private static List<MonthlyBalance> getMonthlyBalance(String extraCond, String otherClause) throws SQLException{
 		DBCon dbCon = new DBCon();
 		dbCon.connect();
 		try{
@@ -121,7 +154,7 @@ public class MonthlyBalanceDao {
 	 * @return
 	 * @throws SQLException
 	 */
-	public static List<MonthlyBalance> getMonthlyBalance(DBCon dbCon, String extraCond, String otherClause) throws SQLException{
+	private static List<MonthlyBalance> getMonthlyBalance(DBCon dbCon, String extraCond, String otherClause) throws SQLException{
 		String sql = "SELECT MB.id, MB.restaurant_id, MB.staff, MB.month, MBD.id as mbd_id, MBD.dept_id, MBD.dept_name, MBD.opening_balance, MBD.ending_balance FROM " + Params.dbName + ".monthly_balance MB " +
 					" JOIN " + Params.dbName + ".monthly_balance_detail MBD ON MB.id = MBD.monthly_balance_id " +
 					" WHERE 1=1 " +

@@ -4,22 +4,18 @@ import static org.junit.Assert.assertEquals;
 
 import java.beans.PropertyVetoException;
 import java.sql.SQLException;
-import java.util.List;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.wireless.db.deptMgr.DepartmentDao;
 import com.wireless.db.staffMgr.StaffDao;
-import com.wireless.db.stockMgr.CostAnalyzeReportDao;
 import com.wireless.db.stockMgr.MonthlyBalanceDao;
+import com.wireless.db.system.SystemDao;
 import com.wireless.exception.BusinessException;
-import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.stockMgr.MonthlyBalance;
 import com.wireless.pojo.stockMgr.MonthlyBalance.InsertBuilder;
 import com.wireless.pojo.stockMgr.MonthlyBalanceDetail;
-import com.wireless.pojo.util.DateUtil;
 import com.wireless.test.db.TestInit;
 
 public class TestMonthlyBalance {
@@ -48,7 +44,7 @@ public class TestMonthlyBalance {
 				assertEquals("monthlyBalanceId", detail.getMonthlyBalanceId(), actual.getDetails().get(index).getMonthlyBalanceId());
 				assertEquals("deptId", detail.getDeptId(), actual.getDetails().get(index).getDeptId());
 				assertEquals("opening_balance", detail.getOpeningBalance(), actual.getDetails().get(index).getOpeningBalance(), 0.001);
-				assertEquals("ending_balance", detail.getEndingBalance(), actual.getDetails().get(index).getEndingBalance(), 0.001);
+				assertEquals("ending_balance", detail.getEndingBalance(), actual.getDetails().get(index).getEndingBalance(), 0.01);
 			}else{
 				assertEquals("monthly_balance_detail", false);
 			}
@@ -61,24 +57,19 @@ public class TestMonthlyBalance {
 		int monthlyBalanceId = 0;
 		
 		try{
-			
-			List<Department> depts = DepartmentDao.getDepartments(mStaff, null, null);
-			
-			MonthlyBalance.InsertBuilder build = new InsertBuilder(mStaff.getRestaurantId(), mStaff.getName(), DateUtil.parseDate("2013-11-01"));
-			float openingBalance, endingBalance;
-			//获取每个部门的期初和期末余额
-			for (Department dept : depts) {
-				openingBalance = CostAnalyzeReportDao.getBalance("2013-11-01", dept.getId());
-				endingBalance = CostAnalyzeReportDao.getBalance("2013-11-31 23:59:59", dept.getId());
-				build.addMonthlyBalanceDetail(new MonthlyBalanceDetail.InsertBuilder(dept.getId(), openingBalance, endingBalance).setDeptName(dept.getName()).setRestaurantId(mStaff.getRestaurantId()).build());
-			}
+			long current = SystemDao.getCurrentMonth(mStaff);
 			//新建月结记录
-			monthlyBalanceId = MonthlyBalanceDao.insert(build);
+			MonthlyBalance.InsertBuilder build = new InsertBuilder(mStaff.getRestaurantId(), mStaff.getName());
+			
+			build.setMonth(current);
+			
+			monthlyBalanceId = MonthlyBalanceDao.insert(build, mStaff);
 			
 			MonthlyBalance expected = build.build();
-			expected.setId(monthlyBalanceId);
 			
 			MonthlyBalance actual = MonthlyBalanceDao.getMonthlyBalanceById(monthlyBalanceId);
+			
+			expected.setId(monthlyBalanceId);
 			
 			for (int i = 0; i < actual.getDetails().size(); i++) {
 				expected.getDetails().get(i).setId(actual.getDetails().get(i).getId());
