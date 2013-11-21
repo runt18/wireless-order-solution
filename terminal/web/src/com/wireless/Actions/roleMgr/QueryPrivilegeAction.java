@@ -162,7 +162,7 @@ public class QueryPrivilegeAction extends DispatchAction{
 						if(i > 0){
 							children.append(",");
 						}
-						children.append("{leaf:true, text:'" + Page.Member.values()[i].getDesc() + "', mId:'" +Page.Member.values()[i].getMgrId() + "', cls:'font', url:'" + Page.Member.values()[i].getUrl() + "'}");
+						children.append("{leaf:true," + "icon:'" + Page.Member.values()[i].getImage() +"'" + ", text:'" + Page.Member.values()[i].getDesc() + "', mId:'" +Page.Member.values()[i].getMgrId() + "', cls:'font', url:'" + Page.Member.values()[i].getUrl() + "'}");
 					}
 					tree.append(",children : [" + children.toString() + "]");
 					tree.append("},");
@@ -179,7 +179,7 @@ public class QueryPrivilegeAction extends DispatchAction{
 						if(i > 0){
 							children.append(",");
 						}
-						children.append("{leaf:true, text:'" + Page.History.values()[i].getDesc() + "', mId:'" +Page.History.values()[i].getMgrId() + "', cls:'font', url:'" + Page.History.values()[i].getUrl() + "'}");
+						children.append("{leaf:true," + "icon:'" + Page.History.values()[i].getImage() +"'" + ", text:'" + Page.History.values()[i].getDesc() + "', mId:'" +Page.History.values()[i].getMgrId() + "', cls:'font', url:'" + Page.History.values()[i].getUrl() + "'}");
 					}
 
 					tree.append(",children : [" + children.toString() + "]");
@@ -197,7 +197,7 @@ public class QueryPrivilegeAction extends DispatchAction{
 						if(i > 0){
 							children.append(",");
 						}
-						children.append("{leaf:true," + (Page.Stock.values()[i].getUrl().isEmpty()?"id:'" +Page.Stock.values()[i].getMgrId() + "'," : "") + " text:'" + Page.Stock.values()[i].getDesc() + "', mId:'" +Page.Stock.values()[i].getMgrId() + "', cls:'font', url:'" + Page.Stock.values()[i].getUrl() + "'}");
+						children.append("{leaf:true," + (Page.Stock.values()[i].getUrl().isEmpty()?"id:'" +Page.Stock.values()[i].getMgrId() + "'," : "") + " text:'" + Page.Stock.values()[i].getDesc() + "'," + "icon:'" + Page.Stock.values()[i].getImage() +"'" + ", mId:'" +Page.Stock.values()[i].getMgrId() + "', cls:'font', url:'" + Page.Stock.values()[i].getUrl() + "'}");
 					}
 
 					tree.append(",children : [" + children.toString() + "]");
@@ -215,7 +215,7 @@ public class QueryPrivilegeAction extends DispatchAction{
 						if(i > 0){
 							children.append(",");
 						}
-						children.append("{leaf:true, text:'" + Page.System.values()[i].getDesc() + "', mId:'" +Page.System.values()[i].getMgrId() + "', cls:'font', url:'" + Page.System.values()[i].getUrl() + "'}");
+						children.append("{leaf:true," + "icon:'" + Page.System.values()[i].getImage() +"'" + ", text:'" + Page.System.values()[i].getDesc() + "', mId:'" +Page.System.values()[i].getMgrId() + "', cls:'font', url:'" + Page.System.values()[i].getUrl() + "'}");
 					}
 					tree.append(",children : [" + children.toString() + "]");
 					tree.append("},");
