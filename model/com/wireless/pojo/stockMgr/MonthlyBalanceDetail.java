@@ -99,7 +99,8 @@ public class MonthlyBalanceDetail implements Jsonable{
 		if(obj == null || !(obj instanceof MonthlyBalanceDetail)){
 			return false;
 		}else{
-			return this.id == ((MonthlyBalanceDetail)obj).id;
+			return this.id == ((MonthlyBalanceDetail)obj).id 
+					&& this.deptId == ((MonthlyBalanceDetail)obj).deptId;
 		}
 	}
 	

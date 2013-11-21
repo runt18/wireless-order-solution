@@ -1,13 +1,14 @@
 package com.wireless.pojo.stockMgr;
 
-import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import com.wireless.json.Jsonable;
 import com.wireless.pojo.util.DateUtil;
+import com.wireless.pojo.util.SortedList;
 
 public class MonthlyBalance implements Jsonable{
 
@@ -15,7 +16,20 @@ public class MonthlyBalance implements Jsonable{
 	private int restaurantId;
 	private String StaffName;
 	private long month;
-	private List<MonthlyBalanceDetail> details = new ArrayList<MonthlyBalanceDetail>();
+	private List<MonthlyBalanceDetail> details = SortedList.newInstance(new Comparator<MonthlyBalanceDetail>(){
+		@Override
+		public int compare(MonthlyBalanceDetail arg0, MonthlyBalanceDetail arg1) {
+			// 按部门id排序
+			if(arg0.getDeptId() > arg1.getDeptId()){
+				return -1;
+			}else if(arg0.getDeptId() < arg1.getDeptId()){
+				return 1;
+			}else{
+				return 0;
+			}
+		}	
+	
+	});
 	
 	
 	
@@ -44,31 +58,39 @@ public class MonthlyBalance implements Jsonable{
 		this.month = month;
 	}
 	public List<MonthlyBalanceDetail> getDetails() {
-		return details;
+		return Collections.unmodifiableList(this.details);
 	}
 	public void setDetails(List<MonthlyBalanceDetail> details) {
-		this.details = details;
+		if(details != null){
+			this.details.clear();
+			this.details.addAll(details);
+		}
 	}
-	public void addDetails(MonthlyBalanceDetail detail) {
-		this.details.add(detail);
+	public void addDetails(MonthlyBalanceDetail monthDetail) {
+		if(monthDetail != null && !this.details.contains(monthDetail)){
+			this.details.add(monthDetail);
+		}
+		
 	}
-
-
 
 	public static class InsertBuilder{
 		private MonthlyBalance data = new MonthlyBalance();
-		public InsertBuilder(int restaurantId, String staffName, long month){
-			this.data.setMonth(month);
+		public InsertBuilder(int restaurantId, String staffName){
 			this.data.setRestaurantId(restaurantId);
 			this.data.setStaffName(staffName);
 		}
+		public void setMonth(long month){
+			this.data.setMonth(month);
+		}
 		
 		public List<MonthlyBalanceDetail> getMonthlyBalanceDetail(){
-			return this.data.details;
+			return Collections.unmodifiableList(this.data.details);
 		}
 		
 		public void addMonthlyBalanceDetail(MonthlyBalanceDetail detail){
-			this.data.details.add(detail);
+			if(!this.data.details.contains(detail)){
+				this.data.details.add(detail);
+			}
 		}
 		
 		public MonthlyBalance build(){
