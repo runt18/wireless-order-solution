@@ -113,10 +113,10 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 		};
 		
 		private static final int[] ITEM_TARGETS = {
-			R.id.foodname,
-			R.id.accountvalue,
-			R.id.pricevalue,
-			R.id.taste//口味显示
+			R.id.txtView_foodName_orderChildItem,		//菜名
+			R.id.txtView_amountValue_orderChildItem,	//数量
+			R.id.txtView_priceValue_orderChildItem,		//价钱
+			R.id.txtView_taste_orderChildItem			//口味显示
 		};
 		
 		private static final String[] GROUP_ITEM_TAGS = { ITEM_GROUP_NAME };
@@ -145,7 +145,7 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 					HashMap<String, Object> map = new HashMap<String, Object>();
 					map.put(ITEM_FOOD_NAME, f.getName());
 					map.put(ITEM_FOOD_COUNT, String.valueOf(f.getCount()));
-					map.put(ITEM_FOOD_SUM_PRICE, NumericUtil.CURRENCY_SIGN + NumericUtil.float2String2(f.calcPriceWithTaste()));
+					map.put(ITEM_FOOD_SUM_PRICE, NumericUtil.CURRENCY_SIGN + NumericUtil.float2String2(f.calcPriceBeforeDiscount()));
 					map.put(ITEM_FOOD_TASTE, f.hasTaste() ? f.getTasteGroup().getTastePref() : TasteGroup.NO_TASTE_PREF);
 					map.put(ITEM_THE_FOOD, f);
 					newFoodDatas.add(map);
@@ -180,7 +180,7 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 						map.put(ITEM_IS_ORI_FOOD, true);
 						map.put(ITEM_FOOD_NAME, f.getName());
 						map.put(ITEM_FOOD_COUNT, String.valueOf(f.getCount()));
-						map.put(ITEM_FOOD_SUM_PRICE, NumericUtil.CURRENCY_SIGN + NumericUtil.float2String2(f.calcPriceWithTaste()));
+						map.put(ITEM_FOOD_SUM_PRICE, NumericUtil.CURRENCY_SIGN + NumericUtil.float2String2(f.calcPriceBeforeDiscount()));
 						map.put(ITEM_FOOD_TASTE, f.hasTaste() ? f.getTasteGroup().getTastePref() : TasteGroup.NO_TASTE_PREF);
 						map.put(ITEM_THE_FOOD, f);
 						pickedFoodDatas.add(map);
@@ -228,11 +228,11 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 			
 			float totalPrice = 0;
 			if(!fragment.mNewFoodList.isEmpty()){
-				totalPrice += new Order(fragment.mNewFoodList).calcTotalPrice();
+				totalPrice += new Order(fragment.mNewFoodList).calcPriceBeforeDiscount();
 				((TextView) fragment.getView().findViewById(R.id.textView_orderActivity_newCount)).setText(String.valueOf(fragment.mNewFoodList.size()));
 			}
 			if(fragment.mOriOrder != null && fragment.mOriOrder.hasOrderFood()){
-				totalPrice += fragment.mOriOrder.calcTotalPrice();
+				totalPrice += fragment.mOriOrder.calcPriceBeforeDiscount();
 				((TextView) fragment.getView().findViewById(R.id.textView_orderActivity_pickedCount)).setText(String.valueOf(fragment.mOriOrder.getOrderFoods().size()));
 			}
 			
@@ -316,7 +316,7 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 				comboStatus = "";
 			}
 			
-			((TextView) layout.findViewById(R.id.foodname)).setText(comboStatus + tempStatus + hangStatus + hurriedStatus + food.getName() + status);
+			((TextView) layout.findViewById(R.id.txtView_foodName_orderChildItem)).setText(comboStatus + tempStatus + hangStatus + hurriedStatus + food.getName() + status);
 			
 			//如果是新点菜
 			if(!map.containsKey(ITEM_IS_ORI_FOOD)){
@@ -400,7 +400,7 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 					cancelFoodImgView.setVisibility(View.INVISIBLE);
 					hurriedImgView.setVisibility(View.INVISIBLE);
 					
-					((TextView) layout.findViewById(R.id.accountvalue)).setText(NumericUtil.float2String2(food.getDelta()));
+					((TextView) layout.findViewById(R.id.txtView_amountValue_orderChildItem)).setText(NumericUtil.float2String2(food.getDelta()));
 					layout.findViewById(R.id.view_OrderFoodListView_childItem).setVisibility(View.VISIBLE);
 					//取消退菜按钮
 					restoreBtn.setVisibility(View.VISIBLE); 
@@ -423,7 +423,7 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 					
 					restoreBtn.setVisibility(View.INVISIBLE);
 					//show the order amount to each food
-					((TextView) layout.findViewById(R.id.accountvalue)).setText(NumericUtil.float2String2(food.getCount()));
+					((TextView) layout.findViewById(R.id.txtView_amountValue_orderChildItem)).setText(NumericUtil.float2String2(food.getCount()));
 					layout.findViewById(R.id.view_OrderFoodListView_childItem).setVisibility(View.INVISIBLE);
 					//"退菜"操作
 					cancelFoodImgView.setOnClickListener(new View.OnClickListener() {				

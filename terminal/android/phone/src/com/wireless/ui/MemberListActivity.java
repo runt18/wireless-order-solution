@@ -46,7 +46,7 @@ public class MemberListActivity extends FragmentActivity {
 	private String mConditionFilter;
 	
 	private List<Member> mMembers;
-	private SortedList<Member> mInterestedMember;
+	private SortedList<Member> mInterestedMembers;
 	
 	private MemberListHandler mMemberListHandler;
 	
@@ -69,7 +69,7 @@ public class MemberListActivity extends FragmentActivity {
 			
 			MemberListActivity activity = mActivity.get();
 			
-			if(activity.mMembers == null || activity.mInterestedMember== null){
+			if(activity.mMembers == null || activity.mInterestedMembers == null){
 				return;
 			}
 			
@@ -79,7 +79,7 @@ public class MemberListActivity extends FragmentActivity {
 			
 			//设置底部数量显示
 			((TextView)activity.findViewById(R.id.txtView_allMemberAmount_memberList)).setText("" + activity.mMembers.size());
-			((TextView)activity.findViewById(R.id.txtView_interestedMemberAmount_memberList)).setText("" + activity.mInterestedMember.size());
+			((TextView)activity.findViewById(R.id.txtView_interestedMemberAmount_memberList)).setText("" + activity.mInterestedMembers.size());
 			
 			switch(msg.what){
 			case ALL_MEMBER_PAGE:
@@ -89,7 +89,7 @@ public class MemberListActivity extends FragmentActivity {
 				break;
 			case INTERESTED_MEMBER_PAGE:
 				activity.mCurrentPage = INTERESTED_MEMBER_PAGE;
-				adapter = activity.new MemberListAdapter(filter(activity.mInterestedMember, activity.mConditionFilter));
+				adapter = activity.new MemberListAdapter(filter(activity.mInterestedMembers, activity.mConditionFilter));
 				activity.findViewById(R.id.button_interested_memberList).setPressed(true);
 				break;
 			default:
@@ -255,6 +255,17 @@ public class MemberListActivity extends FragmentActivity {
 	}
 	
 	@Override
+	public void onRestart(){
+		super.onRestart();
+		EditText searchEdtText = ((EditText) findViewById(R.id.txtView_search_memberList));
+		if(searchEdtText.getText().toString().length() == 0){
+			mMemberListHandler.sendEmptyMessage(mCurrentPage);
+		}else{
+			searchEdtText.setText("");;
+		}
+	}
+	
+	@Override
 	public void onDestroy(){
 		super.onDestroy();
 		mQueryMemberTask.cancel(true);
@@ -314,14 +325,14 @@ public class MemberListActivity extends FragmentActivity {
 
 				public void onClick(View v) {
 					if(mCurrentPage == ALL_MEMBER_PAGE){
-						if(!mInterestedMember.containsElement(member)){
-							mInterestedMember.add(member);
+						if(!mInterestedMembers.containsElement(member)){
+							mInterestedMembers.add(member);
 							button.setBackgroundResource(R.drawable.member_list_has_interested_selector);
 							new InterestedInMemberTask(member).execute();
 						}
 					}else if(mCurrentPage == INTERESTED_MEMBER_PAGE){
-						if(mInterestedMember.containsElement(member)){
-							mInterestedMember.removeElement(member);
+						if(mInterestedMembers.containsElement(member)){
+							mInterestedMembers.removeElement(member);
 							mMemberListHandler.sendEmptyMessage(INTERESTED_MEMBER_PAGE);
 							new CancelInterestedInMemberTask(member).execute();
 						}
@@ -331,7 +342,7 @@ public class MemberListActivity extends FragmentActivity {
 			});
 			
 			if(mCurrentPage == ALL_MEMBER_PAGE){
-				if(mInterestedMember.containsElement(mMembers.get(position))){
+				if(mInterestedMembers.containsElement(mMembers.get(position))){
 					button.setBackgroundResource(R.drawable.member_list_has_interested_selector);
 				}else{
 					button.setBackgroundResource(R.drawable.member_list_interested_selector);
@@ -340,10 +351,12 @@ public class MemberListActivity extends FragmentActivity {
 				button.setBackgroundResource(R.drawable.member_list_not_interested_selector);
 			}
 			
-			//设置姓名和电话
+			//设置姓名,会员类型,电话
 			((TextView)layout.findViewById(R.id.txtView_name_memberList_listItem)).setText(mMembers.get(position).getName());
 			((TextView)layout.findViewById(R.id.txtView_tele_memberList_listItem)).setText(mMembers.get(position).getMobile());
-			
+			((TextView)layout.findViewById(R.id.txtView_type_memberList_listItem)).setText(mMembers.get(position).getMemberType().getName());
+			((TextView)layout.findViewById(R.id.txtView_consumptionAmount_memberList_listItem)).setText(mMembers.get(position).getConsumptionAmount() + "次光顾");
+
 			return layout;
 		}
 	}
@@ -404,7 +417,7 @@ public class MemberListActivity extends FragmentActivity {
 				Toast.makeText(MemberListActivity.this, "关注的会员列表更新失败", Toast.LENGTH_SHORT).show();				
 			}else{
 				Toast.makeText(MemberListActivity.this, "关注的会员列表更新成功", Toast.LENGTH_SHORT).show();
-				mInterestedMember = SortedList.newInstance(members);
+				mInterestedMembers = SortedList.newInstance(members);
 				mMemberListHandler.sendEmptyMessage(mCurrentPage);
 			}
 		}

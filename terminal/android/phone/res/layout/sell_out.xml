@@ -1,30 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent" >
-
-    <include
-        android:id="@+id/topbar"
-        layout="@layout/topbar" />
-
-    <ListView
-        android:id="@+id/listView_sell_out"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_below="@+id/topbar" >
-
-    </ListView>
-
-    <TextView
-        android:id="@+id/textView_hintText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="false"
-        android:layout_marginTop="150dp"
-        android:text="没有沽清项"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:visibility="gone" />
-
-</RelativeLayout>

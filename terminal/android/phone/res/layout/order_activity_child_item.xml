@@ -6,27 +6,26 @@
     android:minHeight="70dip" >
 
     <TextView
-        android:id="@+id/foodname"
+        android:id="@+id/txtView_foodName_orderChildItem"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="10dip"
-        android:text="1"
+        android:text="菜名"
         android:textColor="#000000"
         android:textSize="20sp"
         android:textStyle="bold"
         android:typeface="sans" />
 
     <RelativeLayout
-        android:id="@+id/r1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
-        android:layout_below="@id/foodname"
+        android:layout_below="@id/txtView_foodName_orderChildItem"
         android:layout_marginLeft="10dip"
-        android:layout_toLeftOf="@+id/r2" >
+        android:layout_toLeftOf="@+id/releativeLayout_right_orderChildItem" >
 
         <TextView
-            android:id="@+id/account"
+            android:id="@+id/txtView_amount_orderChildItem"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="数量:"
@@ -34,42 +33,43 @@
             android:textSize="18sp" />
 
         <TextView
-            android:id="@+id/accountvalue"
+            android:id="@+id/txtView_amountValue_orderChildItem"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_toRightOf="@id/account"
+            android:layout_toRightOf="@id/txtView_amount_orderChildItem"
             android:textColor="#FF6600"
             android:textSize="18sp" />
 
         <TextView
-            android:id="@+id/price"
+            android:id="@+id/txtView_price_orderChildItem"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="10dip"
-            android:layout_toRightOf="@id/accountvalue"
+            android:layout_toRightOf="@id/txtView_amountValue_orderChildItem"
             android:text="价钱:"
             android:textColor="#000000"
             android:textSize="18sp" />
 
         <TextView
-            android:id="@+id/pricevalue"
+            android:id="@+id/txtView_priceValue_orderChildItem"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_toRightOf="@id/price"
+            android:layout_toRightOf="@id/txtView_price_orderChildItem"
             android:textColor="#FF6600"
             android:textSize="18sp" />
 
         <TextView
-            android:id="@+id/taste"
+            android:id="@+id/txtView_taste_orderChildItem"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/account"
+            android:layout_below="@id/txtView_amount_orderChildItem"
             android:textColor="#FF0000"
+            android:text="无口味"
             android:textSize="18sp" />
     </RelativeLayout>
 
     <RelativeLayout
-        android:id="@+id/r2"
+        android:id="@+id/releativeLayout_right_orderChildItem"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
@@ -106,9 +106,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
-        android:layout_alignTop="@+id/r2"
+        android:layout_alignTop="@+id/releativeLayout_right_orderChildItem"
         android:layout_marginTop="12dp"
-        android:layout_toLeftOf="@+id/r2"
+        android:layout_toLeftOf="@+id/releativeLayout_right_orderChildItem"
         android:background="@drawable/retreat_food"
         android:visibility="gone" />
 

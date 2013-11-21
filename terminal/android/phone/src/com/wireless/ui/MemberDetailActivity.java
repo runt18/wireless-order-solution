@@ -2,6 +2,7 @@ package com.wireless.ui;
 
 import java.lang.ref.WeakReference;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -28,8 +29,6 @@ import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageButton;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -106,7 +105,6 @@ public class MemberDetailActivity extends FragmentActivity {
 			((TextView)theActivity.findViewById(R.id.txtView_type_memberDetail)).setText(theActivity.mMember.getMemberType().getName());
 			//设置电话号码
 			((TextView)theActivity.findViewById(R.id.txtView_mobile_memberDetail)).setText(theActivity.mMember.getMobile());
-			//FIXME 
 			if(theActivity.mMember.getConsumptionAmount() > 0){
 				//设置光顾次数
 				((TextView)theActivity.findViewById(R.id.txtView_content_1_memberDetail)).setText("光顾" + theActivity.mMember.getConsumptionAmount() + "次");
@@ -117,7 +115,7 @@ public class MemberDetailActivity extends FragmentActivity {
 				((TextView)theActivity.findViewById(R.id.txtView_content_2_memberDetail)).setText("");
 			}
 			
-			theActivity.findViewById(R.id.listView_favorFood_memberDetail).setVisibility(View.GONE);
+			theActivity.findViewById(R.id.relativeLayout_favorFood_memberDetail).setVisibility(View.GONE);
 			theActivity.findViewById(R.id.button_favorFood_memberDetail).setPressed(false);
 			
 			theActivity.findViewById(R.id.relativeLayout_comment_memberDetail).setVisibility(View.GONE);
@@ -125,71 +123,15 @@ public class MemberDetailActivity extends FragmentActivity {
 			
 			if(msg.what == theActivity.MEMBER_FAVOR_TAB){ //刷新"喜好"
 				theActivity.mCurrentTab = theActivity.MEMBER_FAVOR_TAB;
+				theActivity.findViewById(R.id.relativeLayout_favorFood_memberDetail).setVisibility(View.VISIBLE);
 				theActivity.findViewById(R.id.button_favorFood_memberDetail).setPressed(true);
 
-				ListView memberDetailListView = (ListView)theActivity.findViewById(R.id.listView_favorFood_memberDetail);
-				memberDetailListView.setVisibility(View.VISIBLE);
-				memberDetailListView.setAdapter(new BaseAdapter(){
-	
-					@Override
-					public int getCount() {
-						return 2;
-					}
-	
-					@Override
-					public Object getItem(int position) {
-						return null;
-					}
-	
-					@Override
-					public long getItemId(int position) {
-						return position;
-					}
-	
-					@Override
-					public View getView(int position, View convertView, ViewGroup parent) {
-						final View layout;
-						if(convertView == null){
-							layout = LayoutInflater.from(theActivity.getApplicationContext()).inflate(R.layout.member_detail_item, null);
-						}else{
-							layout = convertView;
-						}
-	
-						final GridView foodGridView = (GridView)layout.findViewById(R.id.gridView_memberDetailItem);
-	
-						if(position == 0){
-							((TextView)layout.findViewById(R.id.txtView_desc_memberDetailItem)).setText("Ta喜欢的菜品");
-							foodGridView.setAdapter(theActivity.new FoodAdaptor(theActivity.mMember.getFavorFoods()));
-							
-						}else if(position == 1){
-							((TextView)layout.findViewById(R.id.txtView_desc_memberDetailItem)).setText("向Ta推荐");
-							foodGridView.setAdapter(theActivity.new FoodAdaptor(theActivity.mMember.getRecommendFoods()));
-						}
-						
-						((LinearLayout)layout.findViewById(R.id.linearLayout_title_memberDetailItem)).setOnClickListener(new OnClickListener(){
-	
-							@Override
-							public void onClick(View v) {
-								ImageView arrowImgView = (ImageView)layout.findViewById(R.id.imgView_arrow_memberDetailItem);
-								
-								if(foodGridView.isEnabled()){
-									arrowImgView.setImageResource(R.drawable.arrow_up);
-									foodGridView.setVisibility(View.GONE);
-									foodGridView.setEnabled(false);
-								}else{
-									arrowImgView.setImageResource(R.drawable.arrow_down);
-									foodGridView.setVisibility(View.VISIBLE);
-									foodGridView.setEnabled(true);
-								}
-							}
-							
-						});
-				
-						
-						return layout;
-					}
-					
-				});
+				//刷新"Ta喜欢的菜品"
+				((TextView)theActivity.findViewById(R.id.linearLayout_favor_memberDetail).findViewById(R.id.txtView_desc_memberDetailItemBar)).setText("Ta喜欢的菜品");
+				((GridView)theActivity.findViewById(R.id.gridView_favor_memberDetail)).setAdapter(theActivity.new FoodAdaptor(theActivity.mMember.getFavorFoods()));
+				//刷新"向Ta推荐"
+				((TextView)theActivity.findViewById(R.id.linearLayout_recommend_memberDetail).findViewById(R.id.txtView_desc_memberDetailItemBar)).setText("向Ta推荐");
+				((GridView)theActivity.findViewById(R.id.gridView_recommend_memberDetail)).setAdapter(theActivity.new FoodAdaptor(theActivity.mMember.getRecommendFoods()));
 				
 			}else if(msg.what == theActivity.MEMBER_COMMENT_TAB){	
 				theActivity.mCurrentTab = theActivity.MEMBER_COMMENT_TAB;
@@ -197,15 +139,22 @@ public class MemberDetailActivity extends FragmentActivity {
 				theActivity.findViewById(R.id.relativeLayout_comment_memberDetail).setVisibility(View.VISIBLE);
 				theActivity.findViewById(R.id.button_comment_memberDetail).setPressed(true);
 				
+				((TextView)theActivity.findViewById(R.id.linearLayout_publicComment_memberDetail).findViewById(R.id.txtView_desc_memberDetailItemBar)).setText("大家评论");
+				((TextView)theActivity.findViewById(R.id.linearLayout_privateComment_memberDetail).findViewById(R.id.txtView_desc_memberDetailItemBar)).setText("我的评论");
+				
 				ListView publicCommentListView = (ListView)theActivity.findViewById(R.id.listView_publicComment_memberDetail);
 				//刷新公开评论
+				final List<MemberComment> comments = new ArrayList<MemberComment>();
+				for(MemberComment comment : theActivity.mMember.getPublicComments()){
+					if(comment.getComment().trim().length() > 0){
+						comments.add(comment);
+					}
+				}
 				publicCommentListView.setAdapter(new BaseAdapter(){
-					
-					List<MemberComment> mComments = theActivity.mMember.getPublicComments();
 					
 					@Override
 					public int getCount() {
-						return mComments.size();
+						return comments.size();
 					}
 	
 					@Override
@@ -224,12 +173,13 @@ public class MemberDetailActivity extends FragmentActivity {
 						if(convertView == null){
 							txtView = new TextView(theActivity);
 							txtView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
-							txtView.setTextColor(theActivity.getResources().getColor(R.color.white));
+							txtView.setTextColor(theActivity.getResources().getColor(R.color.brown));
+							txtView.setSingleLine(true);
 						}else{
 							txtView = (TextView)convertView;
 						}
 	
-						MemberComment comment = mComments.get(position);
+						MemberComment comment = comments.get(position);
 						txtView.setText(comment.getStaff().getName() + " " +
 										new SimpleDateFormat("MM月dd日", Locale.getDefault()).format(comment.getLastModified()) + "说 " +
 										comment.getComment());
@@ -334,23 +284,25 @@ public class MemberDetailActivity extends FragmentActivity {
 		((Button)findViewById(R.id.button_commitComment_memberDetail)).setOnClickListener(new OnClickListener(){
 			@Override
 			public void onClick(View v) {
-				String commentValue = ((EditText)findViewById(R.id.editText_commitComment_memberDetail)).getText().toString().trim();
-				if(commentValue.length() != 0){
-					if(toggleBtnPublic.isChecked()){
-						mCommitMemberCommentTask = new CommitMemberCommentTask(MemberComment.CommitBuilder.newPublicBuilder(WirelessOrder.loginStaff.getId(), 
-								  																							mMember.getId(),
-								  																							commentValue));
-					}else{
-						mCommitMemberCommentTask = new CommitMemberCommentTask(MemberComment.CommitBuilder.newPrivateBuilder(WirelessOrder.loginStaff.getId(), 
-																															 mMember.getId(),
-																															 commentValue));
-					}
-					mCommitMemberCommentTask.execute();
+				String commentValue = ((EditText)findViewById(R.id.editText_commitComment_memberDetail)).getText().toString();
+				if(toggleBtnPublic.isChecked()){
+					mCommitMemberCommentTask = new CommitMemberCommentTask(MemberComment.CommitBuilder.newPublicBuilder(WirelessOrder.loginStaff.getId(), 
+							  																							mMember.getId(),
+							  																							commentValue));
 				}else{
-					Toast.makeText(MemberDetailActivity.this, "还没有输入任何评论哦", Toast.LENGTH_SHORT).show();
+					mCommitMemberCommentTask = new CommitMemberCommentTask(MemberComment.CommitBuilder.newPrivateBuilder(WirelessOrder.loginStaff.getId(), 
+																														 mMember.getId(),
+																														 commentValue));
 				}
+				mCommitMemberCommentTask.execute();
 			}
 		});
+	}
+	
+	@Override
+	public void onRestart(){
+		super.onRestart();
+		mRefreshMemberDetailHandler.sendEmptyMessage(mCurrentTab);
 	}
 	
 	@Override
@@ -496,16 +448,15 @@ public class MemberDetailActivity extends FragmentActivity {
 					if(buttonView.isChecked()){
 						try {
 							mQuickOrder.addFood(new OrderFood(f, 1), WirelessOrder.loginStaff);
-							Toast.makeText(MemberDetailActivity.this, "添加" + f.getName(), Toast.LENGTH_SHORT).show();
-						} catch (BusinessException ignored) {}
+							//Toast.makeText(MemberDetailActivity.this, "添加" + f.getName(), Toast.LENGTH_SHORT).show();
+							buttonView.setBackgroundColor(getResources().getColor(R.color.orange));
+						} catch (BusinessException e) {
+							Toast.makeText(MemberDetailActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+						}
 						
-						buttonView.setBackgroundColor(getResources().getColor(R.color.orange));
 					}else{
-						try {
-							mQuickOrder.remove(new OrderFood(f, 1), WirelessOrder.loginStaff);
-							Toast.makeText(MemberDetailActivity.this, "删除" + f.getName(), Toast.LENGTH_SHORT).show();
-						} catch (BusinessException ignored) {}
-						
+						mQuickOrder.delete(new OrderFood(f, 1));
+						//Toast.makeText(MemberDetailActivity.this, "删除" + f.getName(), Toast.LENGTH_SHORT).show();
 						buttonView.setBackgroundColor(getResources().getColor(R.color.brown));
 					}
 					mRefreshOrderAmountHandler.sendEmptyMessage(0);

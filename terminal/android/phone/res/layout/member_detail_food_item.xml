@@ -6,6 +6,7 @@
     android:button="@null"
     android:gravity="center"
     android:height="40dp"
-    android:width="60dp" >
+    android:width="60dp"
+    android:textColor="@color/white" >
 
 </CheckBox>

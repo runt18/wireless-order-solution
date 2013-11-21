@@ -2,8 +2,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:clickable="true"
-    android:background="@drawable/table_item_selector" >
+    android:background="@drawable/table_item_selector"
+    android:clickable="true" >
 
     <Button
         android:id="@+id/button_interestedIn_memberList_listItem"
@@ -14,7 +14,7 @@
         android:padding="4dp" />
 
     <RelativeLayout
-        android:id="@+id/relativeLayout1"
+        android:id="@+id/relativeLayout_1stLine_memberListItem"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_toLeftOf="@+id/button_interestedIn_memberList_listItem" >
@@ -27,6 +27,19 @@
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:textColor="@color/black"
             android:typeface="sans" />
+
+        <TextView
+            android:id="@+id/txtView_type_memberList_listItem"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@+id/txtView_name_memberList_listItem"
+            android:layout_marginLeft="10dp"
+            android:layout_toRightOf="@+id/txtView_name_memberList_listItem"
+            android:text="FVip"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textColor="@color/brown"
+            android:textSize="13sp"
+            android:typeface="sans" />
     </RelativeLayout>
 
     <TextView
@@ -34,9 +47,21 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
-        android:layout_below="@+id/relativeLayout1"
-        android:text="电话"
+        android:layout_below="@+id/relativeLayout_1stLine_memberListItem"
+        android:text="13300008888"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:textColor="#FF6600" />
+
+    <TextView
+        android:id="@+id/txtView_consumptionAmount_memberList_listItem"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/txtView_tele_memberList_listItem"
+        android:layout_marginLeft="10dp"
+        android:layout_toRightOf="@+id/txtView_tele_memberList_listItem"
+        android:text="消费48次"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="@color/brown"
+        android:textSize="13sp" />
 
 </RelativeLayout>

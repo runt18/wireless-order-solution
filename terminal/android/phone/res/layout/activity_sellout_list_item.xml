@@ -16,7 +16,7 @@
         android:textSize="30sp" />
 
     <RelativeLayout
-        android:id="@+id/relativeLayout1"
+        android:id="@+id/relativeLayout_sellOut_listItem"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_toLeftOf="@+id/button_sellOut_listItem" >
@@ -45,7 +45,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
-        android:layout_below="@+id/relativeLayout1"
+        android:layout_below="@+id/relativeLayout_sellOut_listItem"
         android:text="价钱"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:textColor="#FF6600" />

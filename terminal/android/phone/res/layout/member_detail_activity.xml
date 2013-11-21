@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:background="@drawable/member_detail_bg"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
     android:orientation="vertical" >
 
     <include
@@ -10,119 +9,175 @@
         layout="@layout/topbar" />
 
     <RelativeLayout
-        android:id="@+id/relativeLayout_general_memberDetail"
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content" >
 
-        <TextView
-            android:id="@+id/txtView_name_memberDetail"
+        <View
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="20dp"
-            android:layout_marginTop="10dp"
-            android:text="Vincent"
-            android:textColor="@color/white"
-            android:textSize="50sp" />
+            android:layout_alignBottom="@+id/relativeLayout_general_memberDetail"
+            android:layout_alignLeft="@id/relativeLayout_general_memberDetail"
+            android:layout_alignRight="@id/relativeLayout_general_memberDetail"
+            android:layout_alignTop="@id/relativeLayout_general_memberDetail"
+            android:background="@drawable/member_detail_bg" />
 
-        <TextView
-            android:id="@+id/txtView_type_memberDetail"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignBottom="@+id/txtView_name_memberDetail"
-            android:layout_marginBottom="10dp"
-            android:layout_marginLeft="10dp"
-            android:layout_toRightOf="@+id/txtView_name_memberDetail"
-            android:text="金卡会员"
-            android:textColor="@color/white"
-            android:textSize="20sp" />
+        <RelativeLayout
+            android:id="@id/relativeLayout_general_memberDetail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" >
 
-        <TextView
-            android:id="@+id/txtView_mobile_memberDetail"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignLeft="@+id/txtView_name_memberDetail"
-            android:layout_below="@+id/txtView_name_memberDetail"
-            android:layout_marginLeft="10dp"
-            android:text="13694260535"
-            android:textColor="@color/white"
-            android:textSize="15sp" />
+            <TextView
+                android:id="@+id/txtView_name_memberDetail"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:layout_marginTop="10dp"
+                android:text="Vincent"
+                android:textColor="#FFD700"
+                android:textSize="50sp" />
 
-        <TextView
-            android:id="@+id/txtView_content_1_memberDetail"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignLeft="@+id/txtView_mobile_memberDetail"
-            android:layout_below="@+id/txtView_mobile_memberDetail"
-            android:layout_marginTop="10dp"
-            android:text="光顾38次"
-            android:textColor="@color/white"
-            android:textSize="20sp" />
+            <TextView
+                android:id="@+id/txtView_type_memberDetail"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBottom="@+id/txtView_name_memberDetail"
+                android:layout_marginBottom="10dp"
+                android:layout_marginLeft="10dp"
+                android:layout_toRightOf="@+id/txtView_name_memberDetail"
+                android:text="金卡会员"
+                android:textColor="#FFD700"
+                android:textSize="20sp" />
 
-        <TextView
-            android:id="@+id/txtView_content_2_memberDetail"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignLeft="@+id/txtView_content_1_memberDetail"
-            android:layout_below="@+id/txtView_content_1_memberDetail"
-            android:text="最近一次光顾在10月1日"
-            android:textColor="@color/white"
-            android:textSize="20sp" />
+            <TextView
+                android:id="@+id/txtView_mobile_memberDetail"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignLeft="@+id/txtView_name_memberDetail"
+                android:layout_below="@+id/txtView_name_memberDetail"
+                android:layout_marginLeft="5dp"
+                android:text="13694260535"
+                android:textColor="#FFF8DC"
+                android:textSize="15sp" />
+
+            <TextView
+                android:id="@+id/txtView_content_1_memberDetail"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignLeft="@+id/txtView_mobile_memberDetail"
+                android:layout_below="@+id/txtView_mobile_memberDetail"
+                android:layout_marginTop="10dp"
+                android:text="光顾38次"
+                android:textColor="#FFF8DC"
+                android:textSize="20sp" />
+
+            <TextView
+                android:id="@+id/txtView_content_2_memberDetail"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignLeft="@+id/txtView_content_1_memberDetail"
+                android:layout_below="@+id/txtView_content_1_memberDetail"
+                android:text="最近一次光顾在10月1日"
+                android:textColor="#FFF8DC"
+                android:textSize="20sp" />
+        </RelativeLayout>
     </RelativeLayout>
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginTop="10dp" >
+        android:layout_height="match_parent" >
 
-        <ListView
-            android:id="@+id/listView_favorFood_memberDetail"
+        <LinearLayout
+            android:id="@+id/relativeLayout_favorFood_memberDetail"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_above="@+id/linearLayout_below_memberDetail"
-            android:background="@drawable/weather_next_bg"
+            android:background="#FFF8DC"
+            android:orientation="vertical"
             android:visibility="visible" >
-        </ListView>
+
+            <include
+                android:id="@+id/linearLayout_favor_memberDetail"
+                layout="@layout/member_detail_item_bar" />
+
+            <GridView
+                android:id="@+id/gridView_favor_memberDetail"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:horizontalSpacing="1dp"
+                android:numColumns="3"
+                android:verticalSpacing="1dp" >
+            </GridView>
+
+            <View
+                android:id="@+id/view_line_memberDetail"
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:background="@color/green"
+                android:visibility="visible" />
+
+            <include
+                android:id="@+id/linearLayout_recommend_memberDetail"
+                layout="@layout/member_detail_item_bar" />
+
+            <GridView
+                android:id="@+id/gridView_recommend_memberDetail"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:horizontalSpacing="1dp"
+                android:numColumns="3"
+                android:verticalSpacing="1dp" >
+            </GridView>
+        </LinearLayout>
 
         <RelativeLayout
             android:id="@+id/relativeLayout_comment_memberDetail"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_above="@+id/linearLayout_below_memberDetail"
+            android:background="#FFF8DC"
             android:visibility="gone" >
 
-            <TextView
-                android:id="@+id/txtView_publicCmment_memberDetail"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="大家评论"
-                android:textColor="@color/yellow"
-                android:textSize="12sp" />
+            <include
+                android:id="@+id/linearLayout_publicComment_memberDetail"
+                layout="@layout/member_detail_item_bar" />
 
             <ListView
                 android:id="@+id/listView_publicComment_memberDetail"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_above="@+id/txtView_privateCmmentTip_memberDetail"
-                android:layout_below="@+id/txtView_publicCmment_memberDetail" >
+                android:layout_above="@+id/view_commentLine_memberDetail"
+                android:layout_below="@+id/linearLayout_publicComment_memberDetail" >
             </ListView>
 
-            <TextView
-                android:id="@+id/txtView_privateCmmentTip_memberDetail"
+            <View
+                android:id="@+id/view_commentLine_memberDetail"
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:layout_above="@+id/linearLayout_privateCommentBar_memberDetail"
+                android:layout_centerHorizontal="false"
+                android:layout_centerVertical="true"
+                android:background="@color/green"
+                android:visibility="visible" />
+
+            <LinearLayout
+                android:id="@+id/linearLayout_privateCommentBar_memberDetail"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_above="@+id/txtView_privateCmment_memberDetail"
-                android:text="我的评论"
-                android:textColor="@color/yellow"
-                android:textSize="12sp" />
+                android:layout_above="@+id/txtView_privateCmment_memberDetail" >
+
+                <include
+                    android:id="@+id/linearLayout_privateComment_memberDetail"
+                    layout="@layout/member_detail_item_bar" />
+            </LinearLayout>
 
             <TextView
                 android:id="@+id/txtView_privateCmment_memberDetail"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_above="@+id/relativeLayout_commitComment_memberDetail"
-                android:text="我 10月15日 说ta &quot;欠他一顿饭和一支红酒，下次记得&quot;"
-                android:textColor="@color/white"
                 android:singleLine="true"
+                android:text="我 10月15日 说ta &quot;欠他一顿饭和一支红酒，下次记得&quot;"
+                android:textColor="@color/brown"
                 android:textSize="15sp" />
 
             <RelativeLayout
@@ -138,7 +193,7 @@
                     android:layout_height="wrap_content"
                     android:layout_toLeftOf="@+id/toggleButton_setPublic_memberDetail"
                     android:gravity="center_vertical"
-                    android:hint="填写对Ta的评论哦" />
+                    android:hint="填写评论" />
 
                 <Button
                     android:id="@+id/button_commitComment_memberDetail"
