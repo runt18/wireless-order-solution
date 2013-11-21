@@ -32,42 +32,6 @@ function formatName(v){
 	return v;
 }
 
-function loadKitchenCheckbox(){
-	Ext.Ajax.request({
-		url : '../../QueryKitchen.do',
-		params : {
-			dataSource : 'normal'
-		},
-		success : function(res, opt){
-			var jr = Ext.decode(res.responseText);
-			
-			if(jr.success){
-				for ( var i = 0; i < jr.root.length; i++) {
-					
-					var k = jr.root[i];
-					var c = {items : [{xtype : "checkbox", name : "kitchen",boxLabel : formatName(k.name) , hideLabel : true, inputValue : k.alias }]};
-					
-					Ext.getCmp('allKitchen').add(c);
-					//solveIE自动换行时格式错乱
-					if((i+1)%6 == 0){
-						Ext.getCmp('allKitchen').add({columnWidth : 1});
-					}
-					Ext.getCmp('allKitchen').doLayout();
-				
-				}
-				
-			}else{
-				Ext.ux.showMsg(jr);
-			}
-	
-		},
-		failure : function(res, opt){
-			Ext.ux.showMsg(Ext.decode(res.responseText));
-		}
-	});
-	
-}
-
 function loadInformation(){
 	Ext.Ajax.request({
 		url : '../../QueryKitchen.do',
@@ -169,9 +133,8 @@ function loadInformation(){
 }
 
 
-var deptCount = 0, kitchenCount = 0, regionCount = 0;
-var addPrintFunc = Ext.getCmp('addPrintFuncWin');
-if(2){
+var addPrintFunc ;
+function init(){
 	loadInformation();
 	addPrintFunc = new Ext.Window({
 		title : '添加方案',
@@ -182,8 +145,8 @@ if(2){
 		width : 670,
 		autoHeight : true,
 		listeners : {
-			show : function(){
-				//loadKitchenCheckbox();
+			show : function(thiz){
+				thiz.doLayout();
 			}		
 		},
 		bbar : [{
@@ -375,7 +338,8 @@ if(2){
 						}else{
 							Ext.ux.showMsg(jr);
 						}
-						addPrintFunc.hide();
+						addPrintFunc.close();
+						init();
 					},
 					failure : function(res, opt){
 						Ext.ux.showMsg(Ext.decode(res.responseText));
@@ -390,7 +354,8 @@ if(2){
 			id : 'btnCloseFunc',
 			iconCls : 'btn_close',
 			handler : function(){
-				addPrintFunc.hide();
+				addPrintFunc.close();
+				init();
 			}
 		}],
 		items : [{
@@ -454,11 +419,6 @@ if(2){
 								showPanel(thiz.inputValue);
 							}
 						}
-/*						,
-						focus : function(thiz){
-							thiz.fireEvent('check', thiz, true);
-							thiz.getEl().dom.checked = true;
-						}*/
 					}
 				}]
 			},{
@@ -595,11 +555,7 @@ if(2){
 					listeners : {
 						focus : function(){
 							//第一次初始化控件时,解决点击无效
-							if(kitchenCount == 0){
-								Ext.getCmp('allKitchen').enable();
-								kitchenCount ++;
-							}
-							
+							Ext.getCmp('allKitchen').enable();
 						},
 						check : function(checkbox, checked){
 							if(checked){
@@ -645,10 +601,7 @@ if(2){
 					boxLabel : '所有部门',
 					listeners : {
 						focus : function(){
-							if(deptCount == 0){
-								Ext.getCmp('allDept').enable();
-								deptCount ++;
-							}
+							Ext.getCmp('allDept').enable();
 						},
 						check : function(checkbox, checked){
 							if(checked){
@@ -693,10 +646,7 @@ if(2){
 					boxLabel : '所有区域',
 					listeners : {
 						focus : function(){
-							if(regionCount == 0){
-								Ext.getCmp('allRegion').enable();
-								regionCount ++;
-							}
+							Ext.getCmp('allRegion').enable();
 						},
 						check : function(checkbox, checked){
 							if(checked){
@@ -742,6 +692,9 @@ function showPanel(v){
 	}
 	//solve切换时格式错乱
 	Ext.getCmp('addPrintFuncWin').center();
+	//solve IE切换时, bbar高度不变
+	Ext.getCmp('addPrintFuncWin').getBottomToolbar().hide();
+	Ext.getCmp('addPrintFuncWin').getBottomToolbar().show();
 
 } 
 
@@ -930,6 +883,9 @@ function deletePrintFuncOperationHandler(){
 function printFuncOperactionHandler(c){
 	if(c.type == 'undefined'){
 		return;
+	}
+	if(!Ext.getCmp('addPrintFuncWin')){
+		init();
 	}
 	var pType = document.getElementsByName('pType');
 	var kitchen = document.getElementsByName('kitchen');
@@ -1153,9 +1109,7 @@ function operatePrinterHandler(c){
 
 var printerTree;
 Ext.onReady(function(){
-	Ext.BLANK_IMAGE_URL = '../../extjs/resources/images/default/s.gif';
-	Ext.QuickTips.init();
-	Ext.form.Field.prototype.msgTarget = 'side';
+	init();
 	
 	var opt = function(){
 		return "<a href = \"javascript:printFuncOperactionHandler({type : 'update'})\">" + "<img src='../../images/Modify.png'/>修改</a>"

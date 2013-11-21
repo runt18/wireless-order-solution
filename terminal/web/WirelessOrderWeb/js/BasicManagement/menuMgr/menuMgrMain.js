@@ -835,321 +835,9 @@ updateTasteHandler = function(c){
 	});
 };
 
-
-//-------------------------------
-var basicOperationPanel = new Ext.Panel({
-	width : 918,
-	frame : true,
-	border : false,
-	layout : 'fit',
-	items : [{
-		layout : 'column',
-		height : 550,
-		items : [{
-			columnWidth : .35,
-		 	layout : 'column',
-		 	defaults : {
-		 		xtype : 'panel',
-		 		layout : 'form',
-		 		labelWidth : 35
-		 	},
-		 	items : [{
-		 		columnWidth : 1,
-		 		items : [{
-		 			xtype : 'textfield',
-		 			id : 'txtBasicForFoodName',
-		 			fieldLabel : '菜名',
-		 			allowBlank : false,
-		 			width : 255
-		 		}]
-		 	}, {
-		 		columnWidth : .5,
-		 		items : [{
-		 			xtype : 'numberfield',
-		 	    	id : 'numBasicForFoodAliasID',
-		 	    	fieldLabel : '编号',
-		 	    	maxValue : 65535,
-		 	    	minValue : 1,
-		 	    	allowBlank : false,
-		 	    	width : 100,
-		 	    	validator : function(v){
-		 	    		if(v > 0 && v <= 65535 && v.indexOf('.') == -1){
-		 	    	    	return true;
-		 	    	    }else{
-		 	    	    	return '编号需在 1  至 65535 之间,且为整数!';
-		 	    	    }
-		 	    	}
-		 		}]
-		 	}, {
-		 		columnWidth : .5,
-		 		items : [{
-		 			xtype : 'textfield',
-		 			id : 'txtBasicForPinyin',
-		 			fieldLabel : '拼音',
-		 			width : 103,
-		 			validator : function(v){
-		 				if(/^[a-zA-Z]+$/.test(v)){
-		 					return true;
-		 	    	    }else{
-		 	    	    	return '只能输入拼音,不区分大小写!';
-		 	    	    }
-		 	    	}
-		 		}]
-		 	}, {
-		 		columnWidth : .5,
-		 	    items : [{
-		 	    	xtype : 'numberfield',
-		 	    	id : 'numBasicForPrice',
-		 	    	style : 'text-align:right;',
-		 	    	fieldLabel : '价格',
-		 	    	decimalPrecision : 2,
-		 	    	allowBlank : false,
-		 	    	maxValue : 99999.99,
-		 	    	minValue : 0.00,
-		 	    	width : 100,
-		 	    	validator : function(v){
-		 	    		if(v >= 0.00 && v <= 99999.99){
-		 	    	    	return true;
-		 	    	    }else{
-		 	    	    	return '价格需在 0.00  至 99999.99 之间!';
-		 	    	    }
-		 	    	}
-		 	    }]
-		 	}, {
-		 		columnWidth : .5,
-		 	    items : [{
-		 	    	xtype : 'combo',
-		 	       	id : 'cmbBasicForKitchenAlias',
-		 	    	fieldLabel : '厨房',
-		 	    	width : 86,
-		 	    	listWidth : 99,
-		 	    	store : new Ext.data.JsonStore({
-						fields : [ 'alias', 'name' ]
-					}),
-					valueField : 'alias',
-					displayField : 'name',
-					mode : 'local',
-					triggerAction : 'all',
-					typeAhead : true,
-					selectOnFocus : true,
-					forceSelection : true,
-					allowBlank : false,
-					readOnly : true
-		 	    }]
-		 	}, {
-		 		columnWidth : 1,
-		 		xtype : 'panel',
-		 		id : 'txtFoodPriceExplain',
-		 		height : 20,
-		 		html : '<a href="javascript:fppOperation()">说明:此价格对应当前活动的价格方案,点击查看其他方案</a>'
-		 	}, {
-		 		columnWidth : 1,
-		 	    items : [{
-		 	    	xtype : 'textarea',
-		 	    	id : 'txtBasicForDesc',
-		 	    	fieldLabel : '简介',
-		 	    	width : 253,
-		 	    	height : 150,
-		 	    	maxLength : 500,
-		 	    	maxLengthText : '简介最多输入500字,可以为空.'
-		 	    }]
-		 	}, {
-		 		columnWidth : .13,
-		 	    items : [{html:'状态:'}]
-		 	}, {
-		 		columnWidth : .2,
-		 	    items : [{
-		 	    	xtype : 'checkbox',
-		 	    	id : 'chbForBasicSpecial',
-		 	    	hideLabel : true,
-		 	    	boxLabel : '<img title="特价" src="../../images/icon_tip_te.png"></img>'
-		 	    }]
-		 	}, {
-		 		columnWidth : .2,
-		 	    items : [{
-		 	    	xtype : 'checkbox',
-		 	    	id : 'chbForBasicRecommend',
-		 	    	hideLabel : true,
-		 	    	boxLabel : '<img title="推荐" src="../../images/icon_tip_jian.png"></img>'
-		 	    }]
-		 	}, {
-		 		columnWidth : .2,
-		 	    items : [{
-		 	    	xtype : 'checkbox',
-		 	    	id : 'chbForBasicFree',
-		 	    	hideLabel : true,
-		 	    	boxLabel : '<img title="赠送" src="../../images/forFree.png"></img>'
-		 	    }]
-		 	}, {
-		 		columnWidth : .2,
-		 	    items : [{
-		 	    	xtype : 'checkbox',
-		 	    	id : 'chbForBasicStop',
-		 	    	hideLabel : true,
-		 	    	boxLabel : '<img title="停售" src="../../images/icon_tip_ting.png"></img>'
-		 	   	}]
-		 	}, {
-		 		columnWidth : .13,
-		 	    items : [{html:'&nbsp;&nbsp;&nbsp;&nbsp;'}]
-		 	}, {
-		 		columnWidth : .2,
-		 	    items : [{
-		 	    	xtype : 'checkbox',
-		 	    	id : 'chbForBasicCurrPrice',
-		 	    	hideLabel : true,
-		 	    	boxLabel : '<img title="时价" src="../../images/currPrice.png"></img>'
-		 	    }]
-		 	}, {
-		 		columnWidth : .2,
-		 	    items : [{
-		 	    	xtype : 'checkbox',
-		 	    	id : 'chbForBasicHot',
-		 	    	hideLabel : true,
-		 	    	boxLabel : '<img title="热销" src="../../images/hot.png"></img>'
-		 	    }]
-		 	}, {
-		 		columnWidth : .2,
-		 	    items : [{
-		 	    	xtype : 'checkbox',
-		 	    	id : 'chbForBasicWeight',
-		 	    	hideLabel : true,
-		 	    	boxLabel : '<img title="热销" src="../../images/weight.png"></img>'
-		 	    }]
-		 	}, {
-		 		columnWidth : .5,
-		 		labelWidth : 55,
-		 		items : [{
-		 	    	xtype : 'combo',
-		 	    	id : 'comboBasicForStockStatus',
-		 	    	fieldLabel : '库存管理',
-		 	    	width : 66,
-		 	    	listWidth : Ext.isIE ? 79 : 83,
-		 	    	store : new Ext.data.SimpleStore({
-						fields : ['value', 'text'],
-						data : stockStatusData
-					}),
-					valueField : 'value',
-					displayField : 'text',
-					mode : 'local',
-					triggerAction : 'all',
-					typeAhead : true,
-					selectOnFocus : true,
-					forceSelection : true,
-					allowBlank : false,
-					readOnly : true
-		 	    }]
-		 	}]
-		}, {
-			columnWidth : .65,
-			labelWidth : 60,
-			items : [ new Ext.BoxComponent({
-				xtype : 'box',
-		 	    id : 'foodBasicImg',
-		 	    name : 'foodBasicImg',
-		 	    width : 555,
-		 	    height : 420,
-		 	    autoEl : {
-		 	    	tag : 'img',
-		 	    	title : '菜品图预览.',
-		 	    	style : 'filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(sizingMethod=scale); width:555; height:420; cursor:hand;'
-		 	    }
-			}), {
-				tag : 'div',
-		 	    height : 10
-		 	}, {
-		 		xtype : 'panel',
-		 	    layout : 'column',
-		 	    items : [{
-		 	    	xtype : 'form',
-		 	    	layout : 'form',
-		 	    	labelWidth : 60,
-		 	    	columnWidth : .7,
-		 	    	url : '../../ImageFileUpload.do',
-		 	    	id : 'imgFileUploadForm',
-		 	    	fileUpload : true,
-		 	    	items : [{}],
-		 	    	listeners : {
-		 	    		render : function(e){
-		 	    			Ext.getDom(e.getId()).setAttribute('enctype', 'multipart/form-data');
-			 	  		}
-		 	    	}
-		 	    }, {
-		 	    	xtype : 'panel',
-		 	    	columnWidth : .15,
-		 	    	items : [{
-		 	    		xtype : 'button',
-		 	    		id : 'btnUploadFoodImage',
-		 	        	text : '上传图片',
-		 	        	handler : function(e){
-		 	        		var check = true;
-		 	        		var img = '';
-		 	        		if(Ext.isIE){
-		 	        			var file = Ext.getDom('txtImgFile');
-		 	        			file.select();
-		 	        			img = document.selection.createRange().text;
-		 	        		}else{
-		 	        			var file = Ext.getDom('txtImgFile'); 
-				 	        	img = file.value;
-		 	        		}
-		 	        		if(typeof(img) != 'undefined' && img.length > 0){
-		 	        			var index = img.lastIndexOf('.');
-				 	        	var type = img.substring(index+1, img.length);
-				 	        	check = false;
-				 	        	for(var i = 0; i < imgTypeTmp.length; i++){
-				 	        		if(type.toLowerCase() == imgTypeTmp[i].toLowerCase()){
-				 	        			check = true;
-					 	        	   	break;
-					 	        	}
-				 	        	}
-		 	        		}else{
-		 	        			check = false;
-		 	        		}
-		 	        		 
-		 	        		if(check){
-		 	        			var selData = Ext.ux.getSelData('menuMgrGrid');
-				 	        	selData.arrt = {
-				 	        	    type : mmObj.operation.img.upload
-				 	        	};
-				 	        	uploadFoodImage(selData);
-		 	        		}else{
-		 	        			Ext.example.msg('提示', '上传图片失败,未选择图片或图片类型正确.');
-		 	        		}
-		 	        	 }
-		 	    	 }]
-		 	    }, {
-		 	    	xtype : 'panel',
-		 	    	columnWidth : .15,
-		 	    	items : [{
-		 	    		xtype : 'button',
-		 	        	id : 'btnDeleteFoodImage',
-		 	        	text : '删除图片',
-		 	        	handler : function(e){
-		 	        		var selData = Ext.ux.getSelData('menuMgrGrid');
-		 	        		if(!selData)
-		 	        			return;
-		 	        	    
-		 	        		if(selData.img.indexOf('nophoto.jpg') != -1){
-		 	        			Ext.example.msg('提示', '该菜品没有图片,无需删除.');
-		 	        			return;
-		 	        		}
-		 	        		 
-		 	        		Ext.Msg.confirm('提示', '是否确定删除菜品图片?', function(e){
-		 	        			if(e == 'yes'){
-		 	        				selData.arrt = {
-		 	        				    type : mmObj.operation.img.del
-			 	       				};
-		 	        				uploadFoodImage(selData);
-		 	        			 }
-		 	        		}, this);
-		 	        	}
-		 	    	}]
-		 		}]
-			}]
-		}]
-	}]
-});
 //----------------basic
 var basicOperationPanel = new Ext.Panel({
+	id : 'basicOperationPanel',
 	frame : true,
 	border : false,
 	layout : 'fit',
@@ -1365,11 +1053,13 @@ var basicOperationPanel = new Ext.Panel({
 		 	    }
 			}), {
 				tag : 'div',
-		 	    height : 10
+		 	    height : Ext.isIE ? null : 10
 		 	}, {
 		 		xtype : 'panel',
 		 	    layout : 'column',
 		 	    items : [{
+		 	    	columnWidth : 1
+		 	    },{
 		 	    	xtype : 'form',
 		 	    	layout : 'form',
 		 	    	labelWidth : 60,
@@ -1800,7 +1490,8 @@ function refreshFoodImageMsg(){
 	}
 	imgFile = getImageFile();
 	imgForm.add(imgFile);
-	imgForm.doLayout(true);
+	imgForm.doLayout();
+	Ext.getCmp('basicOperationPanel').doLayout();
 	//Ext.getCmp('testimg').doLayout();
 };
 
@@ -1817,11 +1508,11 @@ function getImageFile(){
 		inputType : 'file',
 		listeners : {
 			render : function(e){
-				if(Ext.isIE){
-					e.el.dom.size = 45;
+/*				if(Ext.isIE){
+					e.el.dom.size = 30;
 				}else{
 					e.el.dom.size = 40;
-				}
+				}*/
 				Ext.get('txtImgFile').on('change', function(){
 					try{
 						if(Ext.isIE){
