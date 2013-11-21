@@ -221,11 +221,12 @@ public class OrderActivity extends FragmentActivity implements OnOrderChangedLis
 
 	@Override
 	public void onOrderChanged(Order oriOrder, List<OrderFood> newFoodList) {
-		//set the table ID
-		((EditText)findViewById(R.id.editText_orderActivity_tableNum)).setText(Integer.toString(oriOrder.getDestTbl().getAliasId()));
-		//set the amount of customer
-		((EditText)findViewById(R.id.editText_orderActivity_customerNum)).setText(Integer.toString(oriOrder.getCustomNum()));	
-
+		if(oriOrder != null){
+			//set the table ID
+			((EditText)findViewById(R.id.editText_orderActivity_tableNum)).setText(Integer.toString(oriOrder.getDestTbl().getAliasId()));
+			//set the amount of customer
+			((EditText)findViewById(R.id.editText_orderActivity_customerNum)).setText(Integer.toString(oriOrder.getCustomNum()));	
+		}
 	}
 	
 }

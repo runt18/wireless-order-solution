@@ -73,8 +73,8 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 	
 	// 列表项的显示标签
 	private static final String ITEM_FOOD_NAME = "item_food_name";
-	private static final String ITEM_FOOD_SUM_PRICE = "item_new_food_price";
-	private static final String ITEM_FOOD_COUNT = "item_food_count";
+	private static final String ITEM_FOOD_PRICE = "item_new_food_price";
+	private static final String ITEM_FOOD_AMOUNT = "item_food_count";
 	private static final String ITEM_FOOD_OFFSET = "item_food_offset";
 	private static final String ITEM_FOOD_TASTE = "item_food_taste";
 	private static final String ITEM_THE_FOOD = "item_the_food";
@@ -107,8 +107,8 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 		
 		private static final String[] ITEM_TAGS = { 
 			ITEM_FOOD_NAME,
-			ITEM_FOOD_COUNT, 
-			ITEM_FOOD_SUM_PRICE,
+			ITEM_FOOD_AMOUNT, 
+			ITEM_FOOD_PRICE,
 			ITEM_FOOD_TASTE
 		};
 		
@@ -120,7 +120,7 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 		};
 		
 		private static final String[] GROUP_ITEM_TAGS = { ITEM_GROUP_NAME };
-		private static final int[] GROUP_ITEM_ID = { R.id.grounname };
+		private static final int[] GROUP_ITEM_ID = { R.id.txtView_name_orderDropGroup };
 		
 		private WeakReference<OrderFoodFragment> mFragment;
 
@@ -144,8 +144,8 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 				for(OrderFood f : ofFgm.mNewFoodList){
 					HashMap<String, Object> map = new HashMap<String, Object>();
 					map.put(ITEM_FOOD_NAME, f.getName());
-					map.put(ITEM_FOOD_COUNT, String.valueOf(f.getCount()));
-					map.put(ITEM_FOOD_SUM_PRICE, NumericUtil.CURRENCY_SIGN + NumericUtil.float2String2(f.calcPriceBeforeDiscount()));
+					map.put(ITEM_FOOD_AMOUNT, String.valueOf(f.getCount()));
+					map.put(ITEM_FOOD_PRICE, NumericUtil.CURRENCY_SIGN + NumericUtil.float2String2(f.calcPriceBeforeDiscount()));
 					map.put(ITEM_FOOD_TASTE, f.hasTaste() ? f.getTasteGroup().getTastePref() : TasteGroup.NO_TASTE_PREF);
 					map.put(ITEM_THE_FOOD, f);
 					newFoodDatas.add(map);
@@ -179,8 +179,8 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 						HashMap<String, Object> map = new HashMap<String, Object>();
 						map.put(ITEM_IS_ORI_FOOD, true);
 						map.put(ITEM_FOOD_NAME, f.getName());
-						map.put(ITEM_FOOD_COUNT, String.valueOf(f.getCount()));
-						map.put(ITEM_FOOD_SUM_PRICE, NumericUtil.CURRENCY_SIGN + NumericUtil.float2String2(f.calcPriceBeforeDiscount()));
+						map.put(ITEM_FOOD_AMOUNT, String.valueOf(f.getCount()));
+						map.put(ITEM_FOOD_PRICE, NumericUtil.CURRENCY_SIGN + NumericUtil.float2String2(f.calcPriceBeforeDiscount()));
 						map.put(ITEM_FOOD_TASTE, f.hasTaste() ? f.getTasteGroup().getTastePref() : TasteGroup.NO_TASTE_PREF);
 						map.put(ITEM_THE_FOOD, f);
 						pickedFoodDatas.add(map);
@@ -190,8 +190,8 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 						HashMap<String, Object> map = new HashMap<String, Object>();
 						map.put(ITEM_IS_ORI_FOOD, true);
 						map.put(ITEM_FOOD_NAME, f.getName()); 
-						map.put(ITEM_FOOD_COUNT, String.valueOf(f.getCount()));
-						map.put(ITEM_FOOD_SUM_PRICE, NumericUtil.float2String2(f.calcPriceWithTaste()));
+						map.put(ITEM_FOOD_AMOUNT, String.valueOf(f.getCount()));
+						map.put(ITEM_FOOD_PRICE, NumericUtil.float2String2(f.calcPriceWithTaste()));
 						map.put(ITEM_FOOD_TASTE, f.hasCancelReason() ? f.getCancelReason().getReason() : "没有退菜原因");
 						map.put(ITEM_THE_FOOD, f);
 						map.put(ITEM_IS_OFFSET, true);
@@ -204,7 +204,7 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 			}
 			
 			FoodExpandableAdapter adapter = ofFgm.new FoodExpandableAdapter(ofFgm.getActivity(), 
-					groupData, R.layout.dropgrounpitem, GROUP_ITEM_TAGS, GROUP_ITEM_ID, 
+					groupData, R.layout.order_activity_drop_group, GROUP_ITEM_TAGS, GROUP_ITEM_ID, 
 					childData, R.layout.order_activity_child_item, ITEM_TAGS, ITEM_TARGETS);
 			
 			ExpandableListView listView = (ExpandableListView) mFragment.get().getView().findViewById(R.id.expandableListView_orderActivity);
@@ -463,8 +463,8 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 				 * 已点菜的Group不需要显示Button
 				 */
 				layout.findViewById(R.id.button_orderActivity_opera).setVisibility(View.GONE);
-				((ImageView)layout.findViewById(R.id.orderimage)).setVisibility(View.INVISIBLE);
-				((ImageView) layout.findViewById(R.id.operateimage)).setVisibility(View.INVISIBLE);
+				((ImageView)layout.findViewById(R.id.imgView_right_orderDropGroup)).setVisibility(View.INVISIBLE);
+				((ImageView) layout.findViewById(R.id.imgView_left_orderDropGroup)).setVisibility(View.INVISIBLE);
 				
 			}else{
 
@@ -472,7 +472,7 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 				 * 新点菜的Group显示"点菜"、"全单"Button
 				 */
 				//点菜Button
-				ImageView orderImg = (ImageView)layout.findViewById(R.id.orderimage);
+				ImageView orderImg = (ImageView)layout.findViewById(R.id.imgView_right_orderDropGroup);
 				orderImg.setVisibility(View.VISIBLE);
 				orderImg.setBackgroundResource(R.drawable.order_selector);
 				
