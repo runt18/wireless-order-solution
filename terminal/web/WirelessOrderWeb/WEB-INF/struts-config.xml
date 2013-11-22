@@ -426,7 +426,10 @@
 			scope="request">
 		</action>
 		<action path="/UpdateCurrentMonth"
-			type="com.wireless.Actions.system.UpdateCurrentMonthAction" scope="request">
+			type="com.wireless.Actions.inventoryMgr.monthlySettle.UpdateCurrentMonthAction" scope="request">
+		</action>
+		<action path="/QueryCurrentMonth"
+			type="com.wireless.Actions.inventoryMgr.monthlySettle.QueryCurrentMonthAction" scope="request">
 		</action>
 		<action path="/QueryPrinterTree"
 			type="com.wireless.Actions.printScheme.QueryPrinterTreeAction" scope="request">
