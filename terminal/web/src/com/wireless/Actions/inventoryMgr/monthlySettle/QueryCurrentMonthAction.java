@@ -1,10 +1,10 @@
 package com.wireless.Actions.inventoryMgr.monthlySettle;
 
 import java.sql.SQLException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -17,6 +17,7 @@ import org.apache.struts.action.ActionMapping;
 import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.db.stockMgr.MonthlyBalanceDao;
 import com.wireless.exception.BusinessException;
+import com.wireless.exception.StockError;
 import com.wireless.json.JObject;
 import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.stockMgr.MonthlyBalance;
@@ -29,20 +30,40 @@ public class QueryCurrentMonthAction extends Action{
 		response.setContentType("text/json; charset=utf-8");
 		JObject jobject = new JObject();
 		String restaurantID = (String) request.getAttribute("restaurantID");
-		Map<Object, Object> map = new HashMap<Object, Object>();
-		Calendar c = Calendar.getInstance();
-		int month;
+		int m = 0;
+		DateFormat df = new SimpleDateFormat("yyyy-MM");  
+		
+		Calendar presentMonth = Calendar.getInstance();
+		Calendar accountMonth = Calendar.getInstance();
+		
+		presentMonth.setTime(df.parse(df.format(new Date())));
+		
 		try{
 			MonthlyBalance monthly = MonthlyBalanceDao.getCurrentMonthByRestaurant(Integer.parseInt(restaurantID));
-			if(monthly != null){
-				c.setTime(new Date(monthly.getMonth()));
-				month = (c.get(Calendar.MONTH)+1);
+			if(monthly.getId() > 0){
+				accountMonth.setTime(df.parse(df.format(new Date(monthly.getMonth()))));
+				while(presentMonth.after(accountMonth)){
+					m ++;
+					presentMonth.add(Calendar.MONTH, -1);
+				}
+				if(m >= 2){
+					jobject.initTip(true, (accountMonth.get(Calendar.MONTH)+2)+"");
+				}else{
+					throw new BusinessException(StockError.NOT_MONTHLY_BALANCE);
+				}
 			}else{
 				Restaurant restaurant = RestaurantDao.getById(Integer.parseInt(restaurantID));
-				c.setTime(new Date(restaurant.getBirthDate()));
-				month = (c.get(Calendar.MONTH)+1);
+				accountMonth.setTime(df.parse(df.format(new Date(restaurant.getBirthDate()))));
+				while(presentMonth.after(accountMonth)){
+					m ++;
+					presentMonth.add(Calendar.MONTH, -1);
+				}
+				if(m >= 1){
+					jobject.initTip(true, (accountMonth.get(Calendar.MONTH)+1)+"");
+				}else{
+					throw new BusinessException(StockError.NOT_MONTHLY_BALANCE);
+				}
 			}
-			map.put("month", month);
 		}catch(BusinessException e){
 			e.printStackTrace();
 			jobject.initTip(e);
@@ -50,7 +71,6 @@ public class QueryCurrentMonthAction extends Action{
 			e.printStackTrace();
 			jobject.initTip(e);
 		}finally{
-			jobject.setOther(map);
 			response.getWriter().print(jobject.toString());
 		}
 		return null;
