@@ -487,9 +487,21 @@
 			type="com.wireless.Actions.weixin.EntryAction"
 			scope="request">
 		</action>
-		
 		<action path="/QueryFood_q"
 			type = "com.wireless.Actions.weixin.query.QueryFoodAction"
+			scope="request" parameter="dataSource">
+		</action>
+		<action path="/WXOperateMember"
+			type="com.wireless.Actions.weixin.query.WXOperateMemberAction"
+			scope="request" parameter="dataSource">
+		</action>
+		
+		<action path="/QueryBillboard"
+			type="com.wireless.Actions.system.QueryBillboardAction"
+			scope="request" parameter="dataSource">
+		</action>
+		<action path="/OperateBillboard"
+			type="com.wireless.Actions.system.OperateBillboardAction"
 			scope="request" parameter="dataSource">
 		</action>
 	</action-mappings>
