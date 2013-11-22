@@ -125,23 +125,25 @@ Ext.onReady(function(){
 							var date = new Date();
 							var presentMonth = date.getMonth() + 1;
 							Ext.Ajax.request({
-								url : '../../QuerySystemSetting.do',
+								url : '../../QueryCurrentMonth.do',
 								params : {
 									restaurantID : restaurantID
 								},
 								success : function(res, opt){
 									var jr = Ext.decode(res.responseText);
 									if(jr.success){
-										//alert(jr.other.systemSetting.setting.intCurrentMonth);
-										var month = jr.other.systemSetting.setting.intCurrentMonth;
+										monthSettleWin.show();
+/* 										//alert(jr.other.systemSetting.setting.intCurrentMonth);
+										var month = jr.other.month;
 										if(presentMonth - month == 0){
 											Ext.MessageBox.alert('提示', '当前会计月份已月结, 请于下月初进行操作');
 										}else if(presentMonth - month > 0){
 											monthSettleWin.show();
 										}else{
 											Ext.ux.showMsg({title : '警告', msg : '系统时间错误, 请与客服联系'});
-										}
+										} */
 									}else{
+										jr['icon'] = Ext.Msg.WARNING; 
 										Ext.ux.showMsg(jr);
 									}
 								},
