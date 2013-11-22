@@ -161,10 +161,8 @@ Ext.onReady(function(){
 	
 	msm_monthSettleGrid = new Ext.grid.EditorGridPanel({
 		title : '货品列表',
-		//id : 'deltaReport',
+		id : 'msm_monthSettleGrid',
 		region : 'center',
-/*		border : true,
-		frame : true,*/
 		store : ds,
 		cm : cm,
 		clicksToEdit: 1,
@@ -191,8 +189,6 @@ Ext.onReady(function(){
 		id : 'msm_materialTypeTree',   
 		region : 'west',
 		width : 170,
-/*		border : false,
-		frame : true,*/
 		rootVisible : true,
 		autoScroll : true,
 		bodyStyle : 'backgroundColor:#FFFFFF; border:1px solid #99BBE8;',
@@ -271,11 +267,9 @@ Ext.onReady(function(){
 		region : 'center',
 		layout : 'border',
 		border : false,
-		height : 300,
-		//disabled : true,
 		collapsible : true,
 		titleCollapse : true,
-		collapsed : true,
+//		collapsed : true,
 		items : [monthSettleTree, msm_monthSettleGrid],
 		listeners : {
 			beforeexpand : function(p){
@@ -286,12 +280,16 @@ Ext.onReady(function(){
 			 	}
 			},
 			expand : function(p){
-				Ext.getCmp('winMonthSettle').setHeight(600);
+				Ext.getCmp('winMonthSettle').setHeight(Ext.isIE ? 610 : 600);
 				Ext.getCmp('winMonthSettle').center();
+				Ext.getCmp('winMonthSettle').getBottomToolbar().hide();
+				Ext.getCmp('winMonthSettle').getBottomToolbar().show();
 			},
 			collapse : function(){
-				Ext.getCmp('winMonthSettle').setHeight(215);
+				Ext.getCmp('winMonthSettle').setHeight(Ext.isIE ? 225 : 215);
 				Ext.getCmp('winMonthSettle').center();
+				Ext.getCmp('winMonthSettle').getBottomToolbar().hide();
+				Ext.getCmp('winMonthSettle').getBottomToolbar().show();
 			}
 		}
 	});
@@ -299,7 +297,7 @@ Ext.onReady(function(){
 	new Ext.Panel({
 		renderTo : 'divMonthSettle',
 		id : 'monthSettlePanel',
-		height : 645,
+		height : 545,
 		layout : 'border',
 		items : [settle, monthSettleCenterPanel],
 		listeners : {
@@ -315,6 +313,8 @@ Ext.onReady(function(){
 			}
 		}]
 	});
+	
+	Ext.getCmp('monthSettleCenterPanel').collapse();
 });
 
 
