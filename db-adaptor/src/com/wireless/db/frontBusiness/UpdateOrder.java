@@ -10,6 +10,7 @@ import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.crMgr.CancelReasonDao;
 import com.wireless.db.deptMgr.KitchenDao;
+import com.wireless.db.distMgr.DiscountDao;
 import com.wireless.db.menuMgr.FoodDao;
 import com.wireless.db.orderMgr.OrderDao;
 import com.wireless.db.regionMgr.TableDao;
@@ -67,12 +68,12 @@ public class UpdateOrder {
 	 * @throws SQLException
 	 *             Throws if fail to execute any SQL statement.
 	 */
-	public static DiffResult execByID(Staff staff, Order orderToUpdate) throws BusinessException, SQLException{
+	public static DiffResult execById(Staff staff, Order orderToUpdate) throws BusinessException, SQLException{
 		DBCon dbCon = new DBCon();	
 		
 		try{
 			dbCon.connect();
-			return execByID(dbCon, staff, orderToUpdate);
+			return execById(dbCon, staff, orderToUpdate);
 
 		}finally{
 			dbCon.disconnect();
@@ -103,7 +104,7 @@ public class UpdateOrder {
 	 * @throws SQLException
 	 *             Throws if fail to execute any SQL statement.
 	 */
-	public static DiffResult execByID(DBCon dbCon, Staff staff, Order newOrder) throws BusinessException, SQLException{
+	public static DiffResult execById(DBCon dbCon, Staff staff, Order newOrder) throws BusinessException, SQLException{
 		
 		boolean isAutoCommit = dbCon.conn.getAutoCommit();
 		
@@ -142,7 +143,7 @@ public class UpdateOrder {
 	 * 	        - The order to this id is expired.<br>
 	 * 			- The table of new order to update is BUSY.<br>
 	 * @throws SQLException
-	 * 			Throws if failed to execute any SQL statement.
+	 * 			throws if failed to execute any SQL statement
 	 * 
 	 * @see DiffResult
 	 */
@@ -167,7 +168,7 @@ public class UpdateOrder {
 	 * 			- the staff has no privilege to cancel the food<br>
 	 * 			- the staff has no privilege to present the food
 	 * @throws SQLException
-	 * 			Throws if failed to execute any SQL statement.
+	 * 			throws if failed to execute any SQL statement
 	 * 
 	 * @see DiffResult
 	 */
@@ -203,8 +204,8 @@ public class UpdateOrder {
 			fillFoodDetail(dbCon, staff, of);
 		}
 		
-		//Get the region detail associated with the new order.
-		//newOrder.setRegion(QueryRegion.execByTbl(dbCon, term, newOrder.getDestTbl().getAliasId()));
+		//Set the default discount to new order
+		newOrder.setDiscount(DiscountDao.getDefaultDiscount(dbCon, staff));
 		
 		//Calculate the difference between the original and new order.
 		DiffResult diffResult = diff(oriOrder, newOrder);

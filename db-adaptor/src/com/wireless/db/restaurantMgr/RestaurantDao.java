@@ -7,6 +7,7 @@ import java.util.List;
 import com.mysql.jdbc.Statement;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
+import com.wireless.db.client.member.MemberTypeDao;
 import com.wireless.db.crMgr.CancelReasonDao;
 import com.wireless.db.deptMgr.DepartmentDao;
 import com.wireless.db.deptMgr.KitchenDao;
@@ -18,6 +19,7 @@ import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.tasteMgr.TasteDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.RestaurantError;
+import com.wireless.pojo.client.MemberType;
 import com.wireless.pojo.crMgr.CancelReason;
 import com.wireless.pojo.distMgr.Discount;
 import com.wireless.pojo.inventoryMgr.MaterialCate;
@@ -338,6 +340,9 @@ public class RestaurantDao {
 			//Insert the setting
 			initSetting(dbCon, staff);
 			
+			//Insert a weixin member type
+			initMemberType(dbCon, staff);
+			
 			return restaurant.getId();
 			
 		}catch(Exception e){
@@ -349,6 +354,14 @@ public class RestaurantDao {
 
 	}
 	
+	private static void initMemberType(DBCon dbCon, Staff staff) throws SQLException{
+		MemberType.InsertBuilder builder = new MemberType.InsertBuilder(staff.getRestaurantId(), 
+																		"微信会员", 
+																		DiscountDao.getDefaultDiscount(dbCon, staff))
+														 .setType(MemberType.Type.WEIXIN);
+		MemberTypeDao.insert(dbCon, staff, builder);
+	}
+	
 	private static void initSetting(DBCon dbCon, Staff staff) throws SQLException{
 		String sql;
 		
@@ -357,11 +370,6 @@ public class RestaurantDao {
 			  " VALUES( " +
 			  staff.getRestaurantId() +
 			  ")";
-		dbCon.stmt.executeUpdate(sql);
-		//插入当前月份的第一天作为当前库存的会计月份
-		sql = " UPDATE " + Params.dbName + ".setting SET " +
-			  " current_material_month = DATE_SUB(CURDATE(), INTERVAL DAY(CURDATE()) - 1 DAY) " +
-			  " WHERE restaurant_id = " + staff.getRestaurantId();
 		dbCon.stmt.executeUpdate(sql);
 	}
 	
@@ -605,6 +613,10 @@ public class RestaurantDao {
 		
 		//Delete the setting
 		sql = " DELETE FROM " + Params.dbName + ".setting WHERE restaurant_id = " + restaurantId;
+		dbCon.stmt.executeUpdate(sql);
+		
+		//Delete the member type
+		sql = " DELETE FROM " + Params.dbName + ".member_type WHERE restaurant_id = " + restaurantId;
 		dbCon.stmt.executeUpdate(sql);
 	}
 	

@@ -7,7 +7,6 @@ import java.beans.PropertyVetoException;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,6 +14,7 @@ import java.util.Map;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import com.wireless.db.client.member.MemberTypeDao;
 import com.wireless.db.crMgr.CancelReasonDao;
 import com.wireless.db.deptMgr.DepartmentDao;
 import com.wireless.db.deptMgr.KitchenDao;
@@ -43,7 +43,6 @@ import com.wireless.pojo.restaurantMgr.Restaurant.RecordAlive;
 import com.wireless.pojo.staffMgr.Role;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.tasteMgr.Taste;
-import com.wireless.pojo.util.DateUtil;
 import com.wireless.test.db.TestInit;
 import com.wireless.util.SQLUtil;
 
@@ -102,8 +101,11 @@ public class TestRestaurantDao {
 			//Compare the popular cancel reason
 			compareCancelReason(staff, restaurantId);
 			
-			//Compare the current material month
-			compareCurrentMaterialMonth(staff);
+			//Compare the setting
+			compareSetting(staff);
+			
+			//Compare the member type
+			compareMemberType(staff);
 			
 			//Update a restaurant
 			Restaurant.UpdateBuilder updateBuilder = new Restaurant.UpdateBuilder(restaurantId, "test2")
@@ -134,13 +136,16 @@ public class TestRestaurantDao {
 		}
 	}
 	
-	private void compareCurrentMaterialMonth(Staff staff) throws SQLException{
-		Calendar c = Calendar.getInstance();
-		c.add(Calendar.MONTH, 0);
-		c.set(Calendar.DAY_OF_MONTH, 1);
-		assertEquals("current material month", 
-					 DateUtil.format(c.getTimeInMillis(), DateUtil.Pattern.DATE), 
-					 DateUtil.format(SystemDao.getCurrentMonth(staff), DateUtil.Pattern.DATE));
+	private void compareMemberType(Staff staff) throws SQLException{
+		try{
+			MemberTypeDao.getWeixinMemberType(staff);
+		}catch(BusinessException e){
+			assertTrue("failed to insert a weixin member type", false);
+		}
+	}
+	
+	private void compareSetting(Staff staff) throws SQLException, BusinessException{
+		assertEquals("setting", SystemDao.getSetting(staff.getRestaurantId()).getRestaurantID(), staff.getRestaurantId());
 	}
 	
 	private void compareCancelReason(Staff staff, int restaurantId) throws SQLException{

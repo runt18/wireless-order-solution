@@ -3,7 +3,6 @@ package com.wireless.db.system;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -110,9 +109,9 @@ public class SystemDao {
 		Map<Object, Object> params = new HashMap<Object, Object>();
 		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND B.restaurant_id = " + term.getRestaurantId());
 		
-		Setting setting = SystemDao.getSystemSetting(params).get(0).getSetting();
+		//Setting setting = SystemDao.getSystemSetting(params).get(0).getSetting();
 		Calendar c = Calendar.getInstance();
-		c.setTime(new Date(setting.getLongCurrentMonth()));
+		//c.setTime(new Date(setting.getLongCurrentMonth()));
 		//给日期增加一个工作月
 		c.add(Calendar.MONTH, +1);
 		String sql = "UPDATE " + Params.dbName + ".setting SET " +
@@ -134,7 +133,7 @@ public class SystemDao {
 		List<SystemSetting> list = new ArrayList<SystemSetting>();
 		SystemSetting item = null;
 		String querySQL = "SELECT A.id restaurant_id, A.restaurant_name, A.restaurant_info, A.record_alive, " 
-				   + " B.setting_id, B.price_tail, B.receipt_style, B.erase_quota, B.current_material_month "
+				   + " B.setting_id, B.price_tail, B.receipt_style, B.erase_quota "
 				   + " FROM " + Params.dbName + ".restaurant A, " + Params.dbName + ".setting B "
 				   + " WHERE A.id = B.restaurant_id ";
 		querySQL = SQLUtil.bindSQLParams(querySQL, params);
@@ -154,9 +153,6 @@ public class SystemDao {
 			setting.setPriceTail(dbCon.rs.getInt("price_tail"));
 			setting.setReceiptStyle((int)dbCon.rs.getLong("receipt_style"));
 			setting.setEraseQuota(dbCon.rs.getInt("erase_quota"));
-			if(dbCon.rs.getTimestamp("current_material_month") != null){
-				setting.setCurrentMonth(dbCon.rs.getTimestamp("current_material_month").getTime());
-			}
 			
 			list.add(item);
 			item = null;

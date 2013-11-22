@@ -88,7 +88,7 @@ public class TestCommitOrderDao {
 		of.setCount(2.35f);
 		expectedOrder.addFood(of, mStaff);
 		
-		UpdateOrder.execByID(mStaff, expectedOrder);
+		UpdateOrder.execById(mStaff, expectedOrder);
 		
 		actualOrder = OrderDao.getById(mStaff, actualOrder.getId(), DateType.TODAY);
 		
@@ -106,7 +106,7 @@ public class TestCommitOrderDao {
 		of.setCount(2.35f);
 		expectedOrder.addFood(of, mStaff);
 		
-		UpdateOrder.execByID(mStaff, expectedOrder);
+		UpdateOrder.execById(mStaff, expectedOrder);
 		
 		actualOrder = OrderDao.getById(mStaff, actualOrder.getId(), DateType.TODAY);
 		
