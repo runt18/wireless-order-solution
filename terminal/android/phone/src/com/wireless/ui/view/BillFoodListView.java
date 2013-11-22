@@ -62,7 +62,7 @@ public class BillFoodListView extends ListView {
 		public View getView(int position, View convertView, ViewGroup parent) {
 			View view;
 			if(convertView == null){
-				view = LayoutInflater.from(getContext()).inflate(R.layout.billitem, null);
+				view = LayoutInflater.from(getContext()).inflate(R.layout.bill_activity_food_item, null);
 			}else{
 				view = convertView;
 			}
@@ -96,12 +96,12 @@ public class BillFoodListView extends ListView {
 			if(status.length() != 0){
 				status = "(" + status + ")";
 			}
-			((TextView)view.findViewById(R.id.foodName)).setText(food.toString() + status);
-			((TextView)view.findViewById(R.id.discountValue)).setText(food.getDiscount() == 1 ? "" : "(" + food.getDiscount() * 10 + "уш)");
-			((TextView)view.findViewById(R.id.accountValue)).setText(Float.toString(_foods.get(position).getCount()));
-			((TextView)view.findViewById(R.id.priceValue)).setText(NumericUtil.CURRENCY_SIGN + Float.toString(_foods.get(position).calcPriceWithTaste()));
-			((TextView)view.findViewById(R.id.operatorValue)).setText(_foods.get(position).getWaiter());
-			((TextView)view.findViewById(R.id.orderDate)).setText(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(_foods.get(position).getOrderDate()));
+			((TextView)view.findViewById(R.id.txtView_foodName_billItem)).setText(food.toString() + status);
+			((TextView)view.findViewById(R.id.txtView_discountValue_billItem)).setText(food.getDiscount() == 1 ? "" : "(" + food.getDiscount() * 10 + "уш)");
+			((TextView)view.findViewById(R.id.txtView_amountValue_billItem)).setText(Float.toString(_foods.get(position).getCount()));
+			((TextView)view.findViewById(R.id.txtView_priceValue_billItem)).setText(NumericUtil.CURRENCY_SIGN + Float.toString(_foods.get(position).calcPriceWithTaste()));
+			((TextView)view.findViewById(R.id.txtView_staffValue_billItem)).setText(_foods.get(position).getWaiter());
+			((TextView)view.findViewById(R.id.txtView_dateValue_billItem)).setText(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(_foods.get(position).getOrderDate()));
 			
 			return view;
 		}

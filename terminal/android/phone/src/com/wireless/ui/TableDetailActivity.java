@@ -42,10 +42,10 @@ public class TableDetailActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.table_detail);
+		setContentView(R.layout.bill_activity);
 		mHandler = new DiscountHandler(this);
 		
-		mBillFoodListView = (BillFoodListView)findViewById(R.id.billListView_table_detail);
+		mBillFoodListView = (BillFoodListView)findViewById(R.id.listView_food_bill);
 		
 		mTblAlias = getIntent().getIntExtra(KEY_TABLE_ID, -1);
 	
@@ -125,13 +125,13 @@ public class TableDetailActivity extends Activity {
 
 			theActivity.mBillFoodListView.notifyDataChanged(new ArrayList<OrderFood>(theActivity.mOrderToPay.getOrderFoods()));
 			//set the discount price
-			((TextView) theActivity.findViewById(R.id.discountPriceTxtView_table_detail)).setText(NumericUtil.CURRENCY_SIGN	+ Float.toString(theActivity.mOrderToPay.calcDiscountPrice()));
+			((TextView) theActivity.findViewById(R.id.txtView_discountValue_bill)).setText(NumericUtil.CURRENCY_SIGN	+ Float.toString(theActivity.mOrderToPay.calcDiscountPrice()));
 			//set the actual price
-			((TextView) theActivity.findViewById(R.id.actualPriceTxtView_table_detail)).setText(NumericUtil.CURRENCY_SIGN + Float.toString(Math.round(theActivity.mOrderToPay.calcTotalPrice())));
+			((TextView) theActivity.findViewById(R.id.txtView_actualValue_bill)).setText(NumericUtil.CURRENCY_SIGN + Float.toString(Math.round(theActivity.mOrderToPay.calcTotalPrice())));
 			//set the activity_table ID
-			((TextView) theActivity.findViewById(R.id.valueplatform_table_detail)).setText(String.valueOf(theActivity.mOrderToPay.getDestTbl().getAliasId()));
+			((TextView) theActivity.findViewById(R.id.txtView_tableAlias_bill)).setText(String.valueOf(theActivity.mOrderToPay.getDestTbl().getAliasId()));
 			//set the amount of customer
-			((TextView) theActivity.findViewById(R.id.valuepeople_table_detail)).setText(String.valueOf(theActivity.mOrderToPay.getCustomNum()));
+			((TextView) theActivity.findViewById(R.id.txtView_peopleValue_bill)).setText(String.valueOf(theActivity.mOrderToPay.getCustomNum()));
 		}
 	};
 	
@@ -199,27 +199,27 @@ public class TableDetailActivity extends Activity {
 	public void showBillDialog(final byte payCate) {
 
 		// 取得自定义的view
-		View view = LayoutInflater.from(this).inflate(R.layout.billextand, null);
+		View view = LayoutInflater.from(this).inflate(R.layout.bill_activity_pay_cate, null);
 
 		// 设置为一般的结帐方式
 		mOrderToPay.setSettleType(Order.SettleType.NORMAL);
 
 		// 根据付款方式显示"现金"或"刷卡"
 		if (mOrderToPay.isPayByCash()) {
-			((RadioButton) view.findViewById(R.id.cash)).setChecked(true);
+			((RadioButton) view.findViewById(R.id.radioButton_cash_payBill)).setChecked(true);
 
 		} else if (mOrderToPay.isPayByCreditCard()) {
-			((RadioButton) view.findViewById(R.id.card)).setChecked(true);
+			((RadioButton) view.findViewById(R.id.radioButton_creditCard_payBill)).setChecked(true);
 
 		}
 
 		// 付款方式添加事件监听器
-		((RadioGroup) view.findViewById(R.id.paymentGroup)).setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+		((RadioGroup) view.findViewById(R.id.radioGroup_payCate_payBill)).setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
 
 			@Override
 			public void onCheckedChanged(RadioGroup group, int checkedId) {
 
-				if (checkedId == R.id.cash) {
+				if (checkedId == R.id.radioButton_cash_payBill) {
 					mOrderToPay.setPaymentType(Order.PayType.CASH);
 				} else {
 					mOrderToPay.setPaymentType(Order.PayType.CREDIT_CARD);
@@ -230,7 +230,7 @@ public class TableDetailActivity extends Activity {
 		
 		
 		//根据discount数量添加Radio Button
-		RadioGroup radioGroup = (RadioGroup) view.findViewById(R.id.discountGroup);
+		RadioGroup radioGroup = (RadioGroup) view.findViewById(R.id.radioGroup_discount_payBill);
 		
 		// 折扣方式方式添加事件监听器
 		radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
