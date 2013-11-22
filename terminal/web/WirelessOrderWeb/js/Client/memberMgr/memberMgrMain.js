@@ -1042,7 +1042,7 @@ var btnRecharge = new Ext.ux.ImageButton({
 });
 
 var btnTakeMoney = new Ext.ux.ImageButton({
-	imgPath : '',
+	imgPath : '../../images/btnTakeMoney.png',
 	imgWidth : 50,
 	imgHeight : 50,
 	tooltip : '取款',
@@ -1084,7 +1084,7 @@ var btnConsumeDetail = new Ext.ux.ImageButton({
 });
 
 var btnRechargeDetail = new Ext.ux.ImageButton({
-	imgPath : '',
+	imgPath : '../../images/btnRechargeDetails.png',
 	imgWidth : 50,
 	imgHeight : 50,
 	tooltip : '充值明细',

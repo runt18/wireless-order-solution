@@ -146,11 +146,11 @@ Ext.onReady(function(){
 	var cm = new Ext.grid.ColumnModel([
 	       new Ext.grid.RowNumberer(),
 	       {header: '品项名称 ', dataIndex: 'material.name'},
-	       {header: '初期数量', dataIndex: 'primeAmount'},
-	       {header: '期末数量', dataIndex: 'endAmount'},
-	       {header: '理论消耗', dataIndex: 'expectAmount'},
-	       {header: '实际消耗', dataIndex: 'actualAmount'},
-	       {header: '差异数', dataIndex: 'deltaAmount'}
+	       {header: '初期数量', dataIndex: 'primeAmount', align : 'right', renderer : Ext.ux.txtFormat.gridDou},
+	       {header: '期末数量', dataIndex: 'endAmount', align : 'right', renderer : Ext.ux.txtFormat.gridDou},
+	       {header: '理论消耗', dataIndex: 'expectAmount', align : 'right', renderer : Ext.ux.txtFormat.gridDou},
+	       {header: '实际消耗', dataIndex: 'actualAmount', align : 'right', renderer : Ext.ux.txtFormat.gridDou},
+	       {header: '差异数', dataIndex: 'deltaAmount', align : 'right', renderer : Ext.ux.txtFormat.gridDou}
 	]);
 	cm.defaultSortable = true;
 	
@@ -209,10 +209,6 @@ Ext.onReady(function(){
 			id : 'btnSearch',
 			iconCls : 'btn_search',
 			handler : function(){
-/*				materialComb.allowBlank = false;
-				if(!Ext.getCmp('comboMaterial').isValid()){
-					return;
-				}*/
 				var deptID = '-1';
 				var sn = deptTree.getSelectionModel().getSelectedNode();
 				//Ext.MessageBox.alert(sn.attributes.deptID);

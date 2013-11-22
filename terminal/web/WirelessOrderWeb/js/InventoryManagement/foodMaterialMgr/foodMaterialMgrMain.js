@@ -214,7 +214,7 @@ function initControl(){
 			['厨房', 'kitchen.name', 60]
 		],
 		FoodBasicRecord.getKeys(),
-		[['isPaging', true],  ['restaurantId', restaurantID], ['stockStatus', 3]],
+		[['isPaging', true],  ['restaurantId', restaurantID], ['stockStatus', 1]],
 		GRID_PADDING_LIMIT_20,
 		'',
 		foodBasicGridTbar

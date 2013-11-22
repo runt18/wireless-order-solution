@@ -50,22 +50,19 @@ function monthSettleHandler(){
 		}else{
 			operateMaterialPrice();
 		}
-
- 	
  	}
 }
 
 function showMonthSettleDetail(){
 	Ext.Ajax.request({
-		url : '../../QuerySystemSetting.do',
+		url : '../../QueryCurrentMonth.do',
 		params : {
 			restaurantID : restaurantID
 		},
 		success : function(res, opt){
 			var jr = Ext.decode(res.responseText);
 			if(jr.success){
-				//alert(jr.other.systemSetting.setting.intCurrentMonth);
-				Ext.getDom('labCurrentMonth').innerHTML = jr.other.systemSetting.setting.intCurrentMonth;
+				Ext.getDom('labCurrentMonth').innerHTML = jr.msg;
 			}else{
 				Ext.ux.showMsg(jr);
 			}
