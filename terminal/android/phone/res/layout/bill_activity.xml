@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
     android:background="@drawable/bgcolor" >
 
     <include
@@ -9,14 +9,14 @@
         layout="@layout/topbar" />
 
     <RelativeLayout
-        android:id="@+id/restitle"
-        android:layout_width="fill_parent"
+        android:id="@+id/relativeLayout_top_bill"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/top"
         android:background="@drawable/bg02" >
 
         <TextView
-            android:id="@+id/platform_table_detail"
+            android:id="@+id/platform"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
@@ -27,57 +27,55 @@
         </TextView>
 
         <TextView
-            android:id="@+id/valueplatform_table_detail"
+            android:id="@+id/txtView_tableAlias_bill"
             android:layout_width="90dip"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:layout_marginLeft="5dip"
-            android:layout_toRightOf="@id/platform_table_detail"
+            android:layout_toRightOf="@id/platform"
             android:background="#00000000"
             android:focusable="true"
             android:focusableInTouchMode="true"
-            android:inputType="numberSigned|text"
             android:textColor="#000000"
             android:textSize="20sp" >
         </TextView>
 
         <TextView
-            android:id="@+id/people_table_detail"
+            android:id="@+id/txtView_people_bill"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:layout_marginLeft="110dip"
-            android:layout_toRightOf="@+id/platform_table_detail"
+            android:layout_toRightOf="@id/platform"
             android:text="人数:"
             android:textColor="#000000"
             android:textSize="20sp" >
         </TextView>
 
         <TextView
-            android:id="@+id/valuepeople_table_detail"
+            android:id="@+id/txtView_peopleValue_bill"
             android:layout_width="100dip"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:layout_marginLeft="3dip"
-            android:layout_toRightOf="@id/people_table_detail"
+            android:layout_toRightOf="@id/txtView_people_bill"
             android:background="#00000000"
             android:focusable="true"
             android:focusableInTouchMode="true"
-            android:inputType="numberSigned|text"
             android:textColor="#000000"
             android:textSize="20sp" >
         </TextView>
     </RelativeLayout>
 
     <RelativeLayout
-        android:id="@+id/t_line"
-        android:layout_width="fill_parent"
+        android:id="@+id/relativeLayout_top2_bill"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/restitle"
+        android:layout_below="@id/relativeLayout_top_bill"
         android:background="@drawable/bg04" >
 
         <ImageView
-            android:id="@+id/up_table_detail"
+            android:id="@+id/imgView_up_bill"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
@@ -85,23 +83,23 @@
             android:src="@drawable/point" />
 
         <TextView
-            android:id="@+id/ordermenu_table_detail"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:layout_marginLeft="15dip"
-            android:layout_toRightOf="@id/up_table_detail"
+            android:layout_toRightOf="@id/imgView_up_bill"
             android:text="已点菜"
             android:textColor="#000000"
             android:textSize="20sp" />
     </RelativeLayout>
 
     <RelativeLayout
-        android:id="@+id/bottom"
+        android:id="@+id/relativeLayout_bottom4Detail_bill"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:background="@drawable/bg03" >
+        android:background="@drawable/bg03"
+        android:visibility="gone" >
 
         <ImageView
             android:id="@+id/normal_table_detail"
@@ -131,16 +129,51 @@
             android:src="@drawable/change_order_selector" />
 
     </RelativeLayout>
+    
+    <RelativeLayout
+        android:id="@+id/relativeLayout_bottom_bill"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="@drawable/bg03" >
+
+        <ImageView
+            android:id="@+id/btn_payOrder_Bill"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="50dip"
+            android:src="@drawable/normal_selector" />
+
+        <ImageView
+            android:id="@+id/btn_payTmpOrder_Bill"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="false"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:src="@drawable/rebate_selector" />
+
+        <ImageView
+            android:id="@+id/btn_discount_Bill"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="50dp"
+            android:src="@drawable/discount_selector" />
+    </RelativeLayout>
 
     <RelativeLayout
-        android:id="@+id/mybill"
-        android:layout_width="fill_parent"
+        android:id="@+id/relativeLayout_bottom2_bill"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_above="@id/bottom"
+        android:layout_above="@id/relativeLayout_bottom_bill"
         android:background="@drawable/bg02" >
 
         <TextView
-            android:id="@+id/handsel_table_detail"
+            android:id="@+id/txtView_discount_bill"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
@@ -151,36 +184,36 @@
         </TextView>
 
         <TextView
-            android:id="@+id/discountPriceTxtView_table_detail"
+            android:id="@+id/txtView_discountValue_bill"
             android:layout_width="90dip"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:layout_marginLeft="5dip"
-            android:layout_toRightOf="@id/handsel_table_detail"
+            android:layout_toRightOf="@id/txtView_discount_bill"
             android:background="#00000000"
             android:textColor="#0000ff"
             android:textSize="20sp" >
         </TextView>
 
         <TextView
-            android:id="@+id/confirmed_table_detail"
+            android:id="@+id/txtView_actual_bill"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:layout_marginLeft="110dip"
-            android:layout_toRightOf="@id/handsel_table_detail"
+            android:layout_toRightOf="@id/txtView_discount_bill"
             android:text="实收:"
             android:textColor="#000000"
             android:textSize="20sp" >
         </TextView>
 
         <TextView
-            android:id="@+id/actualPriceTxtView_table_detail"
+            android:id="@+id/txtView_actualValue_bill"
             android:layout_width="100dip"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:layout_marginLeft="3dip"
-            android:layout_toRightOf="@id/confirmed_table_detail"
+            android:layout_toRightOf="@id/txtView_actual_bill"
             android:background="#00000000"
             android:textColor="#0000ff"
             android:textSize="20sp" >
@@ -188,18 +221,18 @@
     </RelativeLayout>
 
     <ImageView
-        android:id="@+id/myline_table_detail"
-        android:layout_width="fill_parent"
+        android:id="@+id/imgView_line_bill"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_above="@id/mybill"
+        android:layout_above="@id/relativeLayout_bottom2_bill"
         android:src="@drawable/line" />
 
     <com.wireless.ui.view.BillFoodListView
-        android:id="@+id/billListView_table_detail"
-        android:layout_width="fill_parent"
+        android:id="@+id/listView_food_bill"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_above="@id/myline_table_detail"
-        android:layout_below="@id/t_line"
+        android:layout_above="@id/imgView_line_bill"
+        android:layout_below="@id/relativeLayout_top2_bill"
         android:cacheColorHint="#00000000"
         android:divider="@drawable/line" >
     </com.wireless.ui.view.BillFoodListView>

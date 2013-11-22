@@ -1,18 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
     android:background="#FFFFFF"
     android:orientation="vertical" >
 
     <RelativeLayout
-        android:id="@+id/r1"
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:minHeight="40dip" >
 
         <ImageView
-            android:id="@+id/imagemanner"
+            android:id="@+id/imgView_payCate_payBill"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
@@ -24,25 +23,25 @@
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:layout_marginLeft="10dip"
-            android:layout_toRightOf="@id/imagemanner"
+            android:layout_toRightOf="@id/imgView_payCate_payBill"
             android:text="付款方式"
             android:textColor="#000000"
             android:textSize="18sp" />
     </RelativeLayout>
 
     <ImageView
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:src="@drawable/line" />
 
     <RadioGroup
-        android:id="@+id/paymentGroup"
-        android:layout_width="fill_parent"
+        android:id="@+id/radioGroup_payCate_payBill"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical" >
 
         <RadioButton
-            android:id="@+id/cash"
+            android:id="@+id/radioButton_cash_payBill"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:checked="true"
@@ -51,7 +50,7 @@
             android:textSize="18sp" />
 
         <RadioButton
-            android:id="@+id/card"
+            android:id="@+id/radioButton_creditCard_payBill"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="刷卡"
@@ -60,18 +59,17 @@
     </RadioGroup>
 
     <ImageView
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:src="@drawable/line" />
 
     <RelativeLayout
-        android:id="@+id/r2"
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:minHeight="40dip" >
 
         <ImageView
-            android:id="@+id/imagediscount"
+            android:id="@+id/imgView_discount_payBill"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
@@ -83,24 +81,23 @@
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:layout_marginLeft="10dip"
-            android:layout_toRightOf="@id/imagediscount"
+            android:layout_toRightOf="@id/imgView_discount_payBill"
             android:text="折扣方式"
             android:textColor="#000000"
             android:textSize="18sp" />
     </RelativeLayout>
 
     <ImageView
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:src="@drawable/line" />
 
     <ScrollView
-        android:id="@+id/scrollView1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" >
 
         <RadioGroup
-            android:id="@+id/discountGroup"
+            android:id="@+id/radioGroup_discount_payBill"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical" >

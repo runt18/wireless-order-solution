@@ -11,7 +11,7 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="10dip"
         android:text="菜名"
-        android:textColor="#000000"
+        android:textColor="#483D8B"
         android:textSize="20sp"
         android:textStyle="bold"
         android:typeface="sans" />
