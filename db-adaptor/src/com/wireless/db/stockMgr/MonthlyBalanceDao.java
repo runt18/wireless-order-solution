@@ -5,7 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -13,10 +13,11 @@ import com.mysql.jdbc.Statement;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.deptMgr.DepartmentDao;
-import com.wireless.db.system.SystemDao;
+import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.StockError;
 import com.wireless.pojo.menuMgr.Department;
+import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.stockMgr.MonthlyBalance;
 import com.wireless.pojo.stockMgr.MonthlyBalanceDetail;
@@ -32,19 +33,26 @@ public class MonthlyBalanceDao {
 	 * @return	
 	 * 			the id of monthlyBalance
 	 * @throws SQLException
+	 * @throws BusinessException 
 	 */
-	public static int insert(DBCon dbCon, MonthlyBalance monthlyBalance, Staff staff) throws SQLException{
+	public static int insert(DBCon dbCon, MonthlyBalance monthlyBalance, Staff staff) throws SQLException, BusinessException{
 		
 		Calendar c = Calendar.getInstance();
 		String beginDate, endDate;
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 		//获取当前月
-		long current = SystemDao.getCurrentMonth(staff);
-		
-		c.setTime(new Date(current));
+		MonthlyBalance monthly = MonthlyBalanceDao.getCurrentMonthByRestaurant(staff.getRestaurantId());
+
+		if(monthly.getId() > 0){
+			c.setTime(new Date(monthly.getMonth()));
+			c.add(Calendar.MONTH, 1);
+		}else{
+			Restaurant restaurant = RestaurantDao.getById(staff.getRestaurantId());
+			c.setTime(new Date(restaurant.getBirthDate()));
+		}
 		beginDate = sdf.format(c.getTime());
 		
-		monthlyBalance.setMonth(current);
+		monthlyBalance.setMonth(c.getTime().getTime());
 		//获取这个月中最后一天
 		int day = c.getActualMaximum(Calendar.DAY_OF_MONTH);
 		//格式化期末时间
@@ -87,8 +95,9 @@ public class MonthlyBalanceDao {
 	 * @return
 	 * 			the id of monthlyBalance
 	 * @throws SQLException
+	 * @throws BusinessException 
 	 */
-	public static int insert(MonthlyBalance.InsertBuilder build, Staff staff) throws SQLException{
+	public static int insert(MonthlyBalance.InsertBuilder build, Staff staff) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		dbCon.connect();
 		int id;
@@ -163,7 +172,7 @@ public class MonthlyBalanceDao {
 		
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		
-		Map<MonthlyBalance, MonthlyBalance> result = new HashMap<MonthlyBalance, MonthlyBalance>();
+		Map<MonthlyBalance, MonthlyBalance> result = new LinkedHashMap<MonthlyBalance, MonthlyBalance>();
 		while(dbCon.rs.next()){
 			MonthlyBalance mb = new MonthlyBalance();
 			MonthlyBalanceDetail mbd = new MonthlyBalanceDetail();
@@ -187,7 +196,6 @@ public class MonthlyBalanceDao {
 				result.get(mb).addDetails(mbd);
 			}
 		}
-		
 		return result.values().size() > 0 ? new ArrayList<MonthlyBalance>(result.values()) : new ArrayList<MonthlyBalance>();
 	}
 	
@@ -225,14 +233,25 @@ public class MonthlyBalanceDao {
 		DBCon dbCon = new DBCon();
 		dbCon.connect();
 		try{
-			List<MonthlyBalance> list = getMonthlyBalance(" AND MB.restaurant_id = " + restaurant, null);
-			if(!list.isEmpty()){
-				return list.get(0);
-			}else{
-				return null;
-			}
+			return getCurrentMonthByRestaurant(dbCon, restaurant);
 		}finally{
 			dbCon.disconnect();
 		}
+	}
+	
+	public static MonthlyBalance getCurrentMonthByRestaurant(DBCon dbCon, int restaurant) throws SQLException{
+		String sql = "SELECT MAX(month) month FROM " + Params.dbName + ".monthly_balance " + 
+						" WHERE restaurant_id = " + restaurant ;
+		
+		dbCon.rs = dbCon.stmt.executeQuery(sql);
+		MonthlyBalance m = new MonthlyBalance();
+		if(dbCon.rs.next()){
+			if(dbCon.rs.getString("month") != null){
+				m.setMonth(DateUtil.parseDate(dbCon.rs.getString("month"))) ;
+			}else{
+				m.setId(-1);
+			};
+		}
+		return m;
 	}
 }
