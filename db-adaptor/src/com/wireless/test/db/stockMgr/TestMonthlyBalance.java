@@ -61,8 +61,6 @@ public class TestMonthlyBalance {
 			//新建月结记录
 			MonthlyBalance.InsertBuilder build = new InsertBuilder(mStaff.getRestaurantId(), mStaff.getName());
 			
-			build.setMonth(current);
-			
 			monthlyBalanceId = MonthlyBalanceDao.insert(build, mStaff);
 			
 			MonthlyBalance expected = build.build();
@@ -70,6 +68,8 @@ public class TestMonthlyBalance {
 			MonthlyBalance actual = MonthlyBalanceDao.getMonthlyBalanceById(monthlyBalanceId);
 			
 			expected.setId(monthlyBalanceId);
+			
+			expected.setMonth(current);
 			
 			for (int i = 0; i < actual.getDetails().size(); i++) {
 				expected.getDetails().get(i).setId(actual.getDetails().get(i).getId());

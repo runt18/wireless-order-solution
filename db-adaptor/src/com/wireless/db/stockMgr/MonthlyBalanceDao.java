@@ -212,4 +212,27 @@ public class MonthlyBalanceDao {
 			dbCon.disconnect();
 		}
 	}
+	
+	/**
+	 * Get current by restaurant
+	 * @param restaurant
+	 * 			the restaurant id
+	 * @return
+	 * @throws SQLException
+	 * @throws BusinessException
+	 */
+	public static MonthlyBalance getCurrentMonthByRestaurant(int restaurant) throws SQLException, BusinessException{
+		DBCon dbCon = new DBCon();
+		dbCon.connect();
+		try{
+			List<MonthlyBalance> list = getMonthlyBalance(" AND MB.restaurant_id = " + restaurant, null);
+			if(!list.isEmpty()){
+				return list.get(0);
+			}else{
+				return null;
+			}
+		}finally{
+			dbCon.disconnect();
+		}
+	}
 }
