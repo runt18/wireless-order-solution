@@ -38,7 +38,7 @@ public class QueryCancelReasonAction extends Action{
 			StaffDao.verify(Integer.parseInt(pin));
 			
 			String extra = "", orderBy = null;
-			String restaurantID = request.getParameter("restaurantID");
+			String restaurantID = (String) request.getAttribute("restaurantID");
 			extra += (" AND A.restaurant_id = " + restaurantID);
 			
 			Map<Object, Object> params = new HashMap<Object, Object>();
