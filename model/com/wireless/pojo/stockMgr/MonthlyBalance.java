@@ -79,10 +79,6 @@ public class MonthlyBalance implements Jsonable{
 			this.data.setRestaurantId(restaurantId);
 			this.data.setStaffName(staffName);
 		}
-		public void setMonth(long month){
-			this.data.setMonth(month);
-		}
-		
 		public List<MonthlyBalanceDetail> getMonthlyBalanceDetail(){
 			return Collections.unmodifiableList(this.data.details);
 		}
