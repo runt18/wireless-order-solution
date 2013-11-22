@@ -9,7 +9,7 @@
 		overflow-y: hidden; overflow-x: auto;
 	}
 	.wrapper {
-		margin: 69px auto 33px auto;
+		margin: 100px auto 33px auto;
 		width: 884px;
 	}
 	.loginBox {
@@ -100,12 +100,63 @@
 	   overflow: hidden;
 	   background: url(../images/select_image.jpg) no-repeat right;
 	}
+	.info-box{
+		z-index: 9999;
+		position: absolute;
+		height: 150px; 
+		width: 350px; 
+		border: 1px solid #ddd;
+		top: 185px;
+		background: #f9f9f9;
+		font-size: 13px;
+		display: none;
+	}
+	.info-box > div[data-type=title]{
+		width: 100%;
+		line-height: 20px;
+		text-align: center;
+		font-size: 15px;
+		font-weight: bold;
+		padding:3px 0 3px 0;
+		border-bottom: 1px solid #ddd;
+	}
+	.info-box > div[data-type=list]{
+		height: 124px;
+	}
+	.info-box > div[data-type=list] > marquee{
+		height: 100%;
+	}
+	.info-box-list{
+		border-bottom: 1px dotted #ccc;
+		padding: 10px;
+	}
 	</style>
 </head>
 <script type="text/javascript" src="../jquery/jquery-1.8.2.min.js"></script>
 <script type="text/javascript" src="../js/components/Encrypt.js"></script>
 <script type="text/javascript" src="../js/components/md5.js"></script>
 <body>
+
+<div id="divInfoBox" class="info-box" >
+<div data-type="title">公告</div>
+<div id="marqueeInfoList" data-type="list">
+</div>
+<!-- <marquee direction="up" onmouseover="this.stop()" onmouseout="this.start()" scrollamount="3">
+<div class="info-box-list" >
+<table style="width:100%;">
+	<tr>
+		<td style="width:50%;">发布时间:</td>
+		<td style="width:50%;">类型:</td>
+	</tr>
+	<tr> <td colspan="2" style="width:100%;">标题:</td> </tr>
+	<tr> <td colspan="2" style="width:100%;">内容:</td> </tr>
+</table>
+</div>
+</marquee>
+ -->
+
+</div>
+
 <div><img alt="" src="../images/background.jpg" style="width:100%;"></div>
 <div style="position:absolute; top:0px;left:0px; width:100%">
 	<div style="margin-top: 20px; margin-left: 10px; font-size:50px;font-weight: bolder;font-family: 方正隶书简体;color: #545454;">智易餐饮管理平台</div>
@@ -150,7 +201,6 @@
 </div>	
 
 <script type="text/javascript">
-
 function getCookie(cookiename) {
 	var result;
 	var mycookie = document.cookie;
@@ -218,6 +268,44 @@ function setCookie(cookiename, cookievalue, days) {
 	}     
 	document.onload = validteCode();  
 	$(function(){
+		// 加载公告信息
+		$.ajax({
+			url : '../QueryBillboard.do',
+			data : {
+				dataSource : 'loginInfo'
+			},
+			dataType : 'json',
+			success : function(data, status, xhr){
+				//alert(data)
+				if(data.success && data.root.length > 0){
+					var infoList = $('#marqueeInfoList')
+					var infoBox = $('#divInfoBox');
+					
+					var html = [], temp = null;
+					for(var i = 0; i < data.root.length; i++){
+						temp = data.root[i];
+						html.push(
+							'<div class="info-box-list" >',
+							'<table style="width:100%;">',
+								'<tr>',
+									'<td style="width:60%; "><span style="font-weight: bold;">发布时间:</span>&nbsp;' + temp['createdFormat'] + '</td>',
+									'<td style="width:40%; "><span style="font-weight: bold;">类型:</span>&nbsp;' + temp['typeDesc'] + '</td>',
+								'</tr>',
+								'<tr> <td colspan="2" style="width:100%; "><span style="font-weight: bold;">标题:</span>&nbsp;' + temp['title'] + '</td> </tr>',
+								'<tr> <td colspan="2" style="width:100%;"><span style="font-weight: bold;">内容:</span>&nbsp;' + temp['desc'] + '</td> </tr>',
+							'</table></div>'
+						);
+					}
+					
+					infoBox.css('display', 'block');
+					infoList.html('<marquee direction="up" onmouseover="this.stop()" onmouseout="this.start()" scrollamount="3">' + html.join('') + '</marquee>');
+					
+				}
+			},
+			error : function(request, status, err){
+			}
+		});
+		
 		$('#name').focus();
 
  		$('#login').click(function(){
