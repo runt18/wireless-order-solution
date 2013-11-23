@@ -240,13 +240,14 @@ public class MonthlyBalanceDao {
 	}
 	
 	public static MonthlyBalance getCurrentMonthByRestaurant(DBCon dbCon, int restaurant) throws SQLException{
-		String sql = "SELECT MAX(month) month FROM " + Params.dbName + ".monthly_balance " + 
+		String sql = "SELECT id, MAX(month) month FROM " + Params.dbName + ".monthly_balance " + 
 						" WHERE restaurant_id = " + restaurant ;
 		
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		MonthlyBalance m = new MonthlyBalance();
 		if(dbCon.rs.next()){
 			if(dbCon.rs.getString("month") != null){
+				m.setId(dbCon.rs.getInt("id"));
 				m.setMonth(DateUtil.parseDate(dbCon.rs.getString("month"))) ;
 			}else{
 				m.setId(-1);
