@@ -41,15 +41,9 @@ public class MonthlyBalanceDao {
 		String beginDate, endDate;
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 		//获取当前月
-		MonthlyBalance monthly = MonthlyBalanceDao.getCurrentMonthByRestaurant(staff.getRestaurantId());
-
-		if(monthly.getId() > 0){
-			c.setTime(new Date(monthly.getMonth()));
-			c.add(Calendar.MONTH, 1);
-		}else{
-			Restaurant restaurant = RestaurantDao.getById(staff.getRestaurantId());
-			c.setTime(new Date(restaurant.getBirthDate()));
-		}
+		long monthly = MonthlyBalanceDao.getCurrentMonthTimeByRestaurant(staff.getRestaurantId());
+		c.setTime(new Date(monthly));
+		
 		beginDate = sdf.format(c.getTime());
 		
 		monthlyBalance.setMonth(c.getTime().getTime());
@@ -239,8 +233,24 @@ public class MonthlyBalanceDao {
 		}
 	}
 	
+	public static long getCurrentMonthTimeByRestaurant(int restaurant) throws SQLException, BusinessException{
+		DBCon dbCon = new DBCon();
+		dbCon.connect();
+		try{
+			MonthlyBalance m = getCurrentMonthByRestaurant(dbCon, restaurant);
+			if(m.getId() > 0){
+				return m.getMonth();
+			}else{
+				Restaurant r = RestaurantDao.getById(dbCon, restaurant);
+				return r.getBirthDate();
+			}
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
 	public static MonthlyBalance getCurrentMonthByRestaurant(DBCon dbCon, int restaurant) throws SQLException{
-		String sql = "SELECT id, MAX(month) month FROM " + Params.dbName + ".monthly_balance " + 
+		String sql = "SELECT id, MAX(date_add(month, interval 1 MONTH)) month FROM " + Params.dbName + ".monthly_balance " + 
 						" WHERE restaurant_id = " + restaurant ;
 		
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
