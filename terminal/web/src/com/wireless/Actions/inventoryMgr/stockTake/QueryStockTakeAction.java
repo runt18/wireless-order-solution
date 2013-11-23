@@ -12,8 +12,8 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.staffMgr.StaffDao;
+import com.wireless.db.stockMgr.MonthlyBalanceDao;
 import com.wireless.db.stockMgr.StockTakeDao;
-import com.wireless.db.system.SystemDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.staffMgr.Staff;
@@ -43,7 +43,7 @@ public class QueryStockTakeAction extends Action{
 				extraCond += " AND ST.status = " + status;
 			}
 			// 只能查询当前会计月份数据
-			String curmonth = new SimpleDateFormat("yyyy-MM").format(SystemDao.getCurrentMonth(staff));
+			String curmonth = new SimpleDateFormat("yyyy-MM").format(MonthlyBalanceDao.getCurrentMonthTimeByRestaurant(staff.getRestaurantId()));
 			extraCond += (" AND ST.start_date BETWEEN '" + curmonth + "-01' AND '" + curmonth + "-31' ");
 			
 			orderClause += (" ORDER BY ST.status, ST.start_date ");

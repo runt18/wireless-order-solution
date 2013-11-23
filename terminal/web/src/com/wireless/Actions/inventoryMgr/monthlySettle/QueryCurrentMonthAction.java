@@ -38,7 +38,6 @@ public class QueryCurrentMonthAction extends Action{
 		try{
 			//获取最近月结时间
 			long monthly = MonthlyBalanceDao.getCurrentMonthTimeByRestaurant(Integer.parseInt(restaurantID));
-//			if(monthly.getId() > 0){
 			accountMonth.setTime(df.parse(df.format(new Date(monthly))));
 			while(presentMonth.after(accountMonth)){
 				m ++;
@@ -49,19 +48,6 @@ public class QueryCurrentMonthAction extends Action{
 			}else{
 				throw new BusinessException(StockError.NOT_MONTHLY_BALANCE);
 			}
-//			}else{
-//				Restaurant restaurant = RestaurantDao.getById(Integer.parseInt(restaurantID));
-//				accountMonth.setTime(df.parse(df.format(new Date(restaurant.getBirthDate()))));
-//				while(presentMonth.after(accountMonth)){
-//					m ++;
-//					presentMonth.add(Calendar.MONTH, -1);
-//				}
-//				if(m >= 1){
-//					jobject.initTip(true, (accountMonth.get(Calendar.MONTH)+1)+"");
-//				}else{
-//					throw new BusinessException(StockError.NOT_MONTHLY_BALANCE);
-//				}
-//			}
 		}catch(BusinessException e){
 			e.printStackTrace();
 			jobject.initTip(e);
