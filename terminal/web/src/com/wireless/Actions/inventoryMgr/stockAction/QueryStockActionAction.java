@@ -12,8 +12,8 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.staffMgr.StaffDao;
+import com.wireless.db.stockMgr.MonthlyBalanceDao;
 import com.wireless.db.stockMgr.StockActionDao;
-import com.wireless.db.system.SystemDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.staffMgr.Staff;
@@ -50,7 +50,8 @@ public class QueryStockActionAction extends Action{
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
 			String extraCond = "", orderClause = "";
-			String curmonth = new SimpleDateFormat("yyyy-MM").format(SystemDao.getCurrentMonth(staff));
+			long monthly = MonthlyBalanceDao.getCurrentMonthTimeByRestaurant(staff.getRestaurantId());
+			String curmonth = new SimpleDateFormat("yyyy-MM").format(monthly);
 			if(isHistory == null || !Boolean.valueOf(isHistory)){
 				// 只能查询当前会计月份数据
 				extraCond += (" AND S.ori_stock_date BETWEEN '" + curmonth + "-01' AND '" + curmonth + "-31' ");

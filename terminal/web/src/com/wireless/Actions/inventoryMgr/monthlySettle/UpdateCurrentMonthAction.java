@@ -10,7 +10,6 @@ import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.stockMgr.MonthlyBalanceDao;
-import com.wireless.db.system.SystemDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.staffMgr.Staff;
@@ -34,7 +33,6 @@ public class UpdateCurrentMonthAction extends Action{
 
 			MonthlyBalanceDao.insert(build, staff);
 			
-			SystemDao.updateCurrentMonth(staff);
 			jobject.initTip(true, "操作成功, 已经月结.");
 		}catch(BusinessException e){
 			jobject.initTip(e);
