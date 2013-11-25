@@ -10,7 +10,6 @@ import org.junit.Test;
 
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.stockMgr.MonthlyBalanceDao;
-import com.wireless.db.system.SystemDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.stockMgr.MonthlyBalance;
@@ -57,7 +56,7 @@ public class TestMonthlyBalance {
 		int monthlyBalanceId = 0;
 		
 		try{
-			long current = SystemDao.getCurrentMonth(mStaff);
+			long current = MonthlyBalanceDao.getCurrentMonthTimeByRestaurant(mStaff.getRestaurantId());
 			//新建月结记录
 			MonthlyBalance.InsertBuilder build = new InsertBuilder(mStaff.getRestaurantId(), mStaff.getName());
 			

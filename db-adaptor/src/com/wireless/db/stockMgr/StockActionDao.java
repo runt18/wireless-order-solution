@@ -47,16 +47,8 @@ public class StockActionDao {
 			throw new BusinessException(StockError.MATERIAL_DEPT_EXIST);
 		}
 		//获取当前工作月
-//		long currentDate = 0;
 		Calendar c = Calendar.getInstance();
 		c.setTime(new Date());
-/*		String selectSetting = "SELECT setting_id, current_material_month FROM "+ Params.dbName + ".setting WHERE restaurant_id = " + term.getRestaurantId();
-		dbCon.rs = dbCon.stmt.executeQuery(selectSetting);
-		if(dbCon.rs.next()){
-				currentDate = dbCon.rs.getTimestamp("current_material_month").getTime();
-				c.setTime(new Date(currentDate));
-		}
-		dbCon.rs.close();*/
 		
 		//获取月份最大天数
 		int day = c.getActualMaximum(Calendar.DAY_OF_MONTH);
@@ -312,16 +304,8 @@ public class StockActionDao {
 			throw new BusinessException(StockError.MATERIAL_DEPT_UPDATE_EXIST);
 		}
 		//获取当前工作月
-//		long currentDate = 0;
 		Calendar c = Calendar.getInstance();
 		c.setTime(new Date());
-/*		String selectSetting = "SELECT setting_id, current_material_month FROM "+ Params.dbName + ".setting WHERE restaurant_id = " + term.getRestaurantId();
-		dbCon.rs = dbCon.stmt.executeQuery(selectSetting);
-		if(dbCon.rs.next()){
-				currentDate = dbCon.rs.getTimestamp("current_material_month").getTime();
-				c.setTime(new Date(currentDate));
-		}
-		dbCon.rs.close();*/
 		//获取月份最大天数
 		int day = c.getActualMaximum(Calendar.DAY_OF_MONTH);
 		

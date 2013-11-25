@@ -9,6 +9,7 @@ import java.util.Map;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
+import com.wireless.db.stockMgr.MonthlyBalanceDao;
 import com.wireless.db.stockMgr.StockActionDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.StockError;
@@ -451,8 +452,9 @@ public class SystemDao {
 	 * @return
 	 * @throws SQLException
 	 * 			if failed to execute any SQL statement
+	 * @throws BusinessException 
 	 */
-	public static long getCurrentMonth(Staff term) throws SQLException{
+	public static long getCurrentMonth(Staff term) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -469,16 +471,10 @@ public class SystemDao {
 	 * @return
 	 * @throws SQLException
 	 * 			if failed to execute any SQL statement
+	 * @throws BusinessException 
 	 */
-	public static long getCurrentMonth(DBCon dbCon, Staff term) throws SQLException{
-		long currentDate = 0;
-		String selectSetting = "SELECT setting_id, current_material_month FROM "+ Params.dbName + ".setting WHERE restaurant_id = " + term.getRestaurantId();
-		dbCon.rs = dbCon.stmt.executeQuery(selectSetting);
-		if(dbCon.rs.next()){
-			if(dbCon.rs.getTimestamp("current_material_month") != null){
-				currentDate = dbCon.rs.getTimestamp("current_material_month").getTime();
-			}
-		}
+	public static long getCurrentMonth(DBCon dbCon, Staff term) throws SQLException, BusinessException{
+		long currentDate = MonthlyBalanceDao.getCurrentMonthTimeByRestaurant(term.getRestaurantId());
 		return currentDate;
 		
 		
