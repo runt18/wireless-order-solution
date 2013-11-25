@@ -168,7 +168,7 @@ Ext.onReady(function(){
 	});
 
 	var pagingBar = new Ext.PagingToolbar({
-		pageSize : 13,
+		pageSize : PAGE_LIME,
 		store : ds,
 		displayInfo : true,
 		displayMsg : '显示第 {0} 条到 {1} 条记录，共 {2} 条',
@@ -222,7 +222,7 @@ Ext.onReady(function(){
 				sgs.load({
 					params : {
 						start : 0,
-						limit : 13
+						limit : PAGE_LIME
 					}
 				});
 			}
@@ -239,6 +239,9 @@ Ext.onReady(function(){
 		frame : true,
 		store : ds,
 		cm : cm,
+		loadMask : {
+			msg : "数据加载中, 请稍候...."
+		},
 		viewConfig : {
 			forceFit : true		
 		},
@@ -248,7 +251,7 @@ Ext.onReady(function(){
 	
 	
 	ds.load({
-		params:{start:0, limit:13}
+		params:{start:0, limit:PAGE_LIME}
 	});
 	
 	deptTree = new Ext.tree.TreePanel({

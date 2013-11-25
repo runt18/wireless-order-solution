@@ -382,7 +382,7 @@ Ext.onReady(function(){
 
 	var pagingBar = new Ext.PagingToolbar({
 	   id : 'paging',
-	   pageSize : 10,
+	   pageSize : PAGE_LIME,
 	   store : ds,	
 	   displayInfo : true,	
 	   displayMsg : "显示第 {0} 条到 {1} 条记录，共 {2} 条",
@@ -687,7 +687,7 @@ Ext.onReady(function(){
 							 gs.load({
 								params : {
 									start : 0,
-									limit : 10,
+									limit : PAGE_LIME,
 									isHistory : 'true'
 								}
 							 });
@@ -788,7 +788,7 @@ Ext.onReady(function(){
 	ds.load({
 		params:{
 			start:0, 
-			limit:10,
+			limit:PAGE_LIME,
 			isPaging: 'true',
 			isHistory : 'true'
 		}
