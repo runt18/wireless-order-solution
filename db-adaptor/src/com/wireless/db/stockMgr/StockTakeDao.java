@@ -16,7 +16,6 @@ import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.inventoryMgr.MaterialCateDao;
 import com.wireless.db.inventoryMgr.MaterialDao;
-import com.wireless.db.system.SystemDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.StockError;
 import com.wireless.pojo.inventoryMgr.Material;
@@ -193,7 +192,7 @@ public class StockTakeDao {
 	 */
 	public static boolean beforeInsertStockTake(Staff term) throws SQLException, BusinessException{
 		long currentDate = 0;
-		currentDate = SystemDao.getCurrentMonth(term);
+		currentDate = MonthlyBalanceDao.getCurrentMonthTimeByRestaurant(term.getRestaurantId());
 		Calendar c = Calendar.getInstance();
 		c.setTime(new Date(currentDate));
 		c.add(Calendar.MONTH, +1);
@@ -269,8 +268,6 @@ public class StockTakeDao {
 			tDetail.setStockTakeId(builder.getId());
 			StockTakeDetailDao.insertstockTakeDetail(dbCon, term, tDetail);
 		}
-
-		
 	}
 	/**
 	 * Update the StockTake according to stockTakeId and InsertStockTakeBuilder.
