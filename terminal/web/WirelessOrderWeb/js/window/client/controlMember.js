@@ -17,7 +17,7 @@ Ext.onReady(function(){
 		frame : true,
 		border : false,
 		layout : 'column',
-		width : 660,
+		width : 670,
 		defaults : {
 			xtype : 'form',
 			layout : 'form',
@@ -30,6 +30,7 @@ Ext.onReady(function(){
 			}
 		},
 		items : [{
+			columnWidth : 1,
 			items : [{
 				xtype : 'hidden',
 				id : 'cm_numberMemberId',

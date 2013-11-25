@@ -354,7 +354,7 @@ Ext.onReady(function(){
 					sumRow.style.backgroundColor = '#EEEEEE';			
 					for(var i = 0; i < stockActionGrid.getColumnModel().getColumnCount(); i++){
 						var sumCell = stockActionGrid.getView().getCell(store.getCount() - 1, i);
-						sumCell.style.fontSize = '15px';
+						sumCell.style.fontSize = '13px';
 						sumCell.style.fontWeight = 'bold';
 						sumCell.style.color = 'green';
 					}

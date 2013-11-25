@@ -211,9 +211,9 @@ Ext.onReady(function(){
 	var stockDetail = new Ext.grid.ColumnModel([
 		{header:'部门', dataIndex:'dept.name', width:220},
 		{header:'品项名称', dataIndex:'materialName', width:220, hidden:true},
-		{header:'数量', dataIndex:'stock', width:220},
-		{header:'成本单价', dataIndex:'price', width:220},
-		{header:'成本金额', dataIndex:'cost', width:220}
+		{header:'数量', dataIndex:'stock', width:220, align: 'right', renderer : Ext.ux.txtFormat.gridDou},
+		{header:'成本单价', dataIndex:'price', width:220, align: 'right', renderer : Ext.ux.txtFormat.gridDou},
+		{header:'成本金额', dataIndex:'cost', width:220, align: 'right', renderer : Ext.ux.txtFormat.gridDou}
 	                                            
 	    ]);
 	    stockDetail.defaultSortable = true;

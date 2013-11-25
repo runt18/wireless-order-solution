@@ -1324,6 +1324,9 @@ function initControl(){
     		bodyStyle : 'font-size:18px;text-align:center;',
     		html : '-----'
     	}, {
+    				xtype : 'hidden',
+    				id : 'hideStockActionId'
+    			},{
     		xtype : 'panel',
     		layout : 'column',
     		defaults : {
@@ -1331,15 +1334,10 @@ function initControl(){
     			layout : 'form',
     			style : 'width:218px;',
     			labelWidth : 60,
-    			columnWidth : .25,
+    			columnWidth : .24,
     			defaults : { width : 120 }
     		},
     		items : [{
-    			items : [{
-    				xtype : 'hidden',
-    				id : 'hideStockActionId'
-    			}]
-    		}, {
     			id : 'displayPanelForDeptIn',
     			items : [{
     				id : 'comboDeptInForStockActionBasic',

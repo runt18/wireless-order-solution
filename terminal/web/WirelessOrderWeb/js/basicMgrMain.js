@@ -675,25 +675,24 @@ var resturantMgr = new Ext.Window({
     plain       : true,
     listeners:{
 		 "show":function(){
-/*			 Ext.Ajax.request({
-				   url: '../../RestaurantQueryByID.do',
+			 Ext.Ajax.request({
+				   url: '../../QueryRestaurants.do',
 				   success: function(response,options){
 					   var resultJSON = Ext.util.JSON.decode(response.responseText);
-					   if(resultJSON.all.success){
-						   Ext.getCmp('restaurant_name').setValue(resultJSON.all.restaurant_name);
-						   Ext.getCmp('restaurant_info').setValue(resultJSON.all.restaurant_info);
-						   Ext.getCmp('address').setValue(resultJSON.all.address);
-						   Ext.getCmp('tel1').setValue(resultJSON.all.tele1);
-						   Ext.getCmp('tel2').setValue(resultJSON.all.tele2);   
+					   if(resultJSON.success){
+						   Ext.getCmp('restaurant_info').setValue(resultJSON.root[0].restaurant_info);
+						   Ext.getCmp('address').setValue(resultJSON.root[0].address);
+						   Ext.getCmp('tel1').setValue(resultJSON.root[0].tele1);
+						   Ext.getCmp('tel2').setValue(resultJSON.root[0].tele2);   
 					   } 
 				   },
 				   failure: function(response,options){
 					   
 				   },
 				   params: {
-					   restaurantID:restaurantID
+					   byId:true
 				   }
-				});*/
+				});
 		 }
 	  },
     items:[
@@ -748,7 +747,6 @@ var resturantMgr = new Ext.Window({
 			text :'保存',
 			iconCls : 'btn_save',
 			handler:function(){
-				var restaurant_name = Ext.getCmp('restaurant_name').getValue();
 				var restaurant_info = Ext.getCmp('restaurant_info').getValue();
 				var address = Ext.getCmp('address').getValue();
 				var tel1 = Ext.getCmp('tel1').getValue();
@@ -759,7 +757,6 @@ var resturantMgr = new Ext.Window({
 						   var resultJSON = Ext.util.JSON.decode(response.responseText);
 						   if(resultJSON.all.success){
 							   resturantMgr.hide();
-							   Ext.getCmp('restaurant_name').setValue("");
 							   Ext.getCmp('restaurant_info').setValue("");
 							   Ext.getCmp('address').setValue("");
 							   Ext.getCmp('tel1').setValue("");
@@ -772,7 +769,6 @@ var resturantMgr = new Ext.Window({
 					   },
 					   params: {
 						   restaurantID:restaurantID,
-						   restaurant_name:restaurant_name,
 						   restaurant_info:restaurant_info,
 						   address:address,
 						   tel1:tel1,

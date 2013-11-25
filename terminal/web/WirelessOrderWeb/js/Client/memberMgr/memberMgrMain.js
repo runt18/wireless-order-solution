@@ -931,7 +931,7 @@ function winInit(){
 	memberBasicWin = new Ext.Window({
 		title : '&nbsp;',
 		width : 660,
-		height : 296,
+		height : Ext.isIE ? 330 : 296,
 		modal : true,
 		resizable : false,
 		closable : false,

@@ -505,6 +505,11 @@ function initWin(){
     		bodyStyle : 'font-size:18px;text-align:center;',
     		html : '原料盘点单'
     	}, {
+			items : [{
+				xtype : 'hidden',
+				id : 'hideStockTakeId'
+			}]
+    	}, {
     		xtype : 'panel',
     		layout : 'column',
     		defaults : {
@@ -516,11 +521,6 @@ function initWin(){
     			defaults : { width : 120 }
     		},
     		items : [{
-    			items : [{
-    				xtype : 'hidden',
-    				id : 'hideStockTakeId'
-    			}]
-    		}, {
     			items : [{
     				xtype : 'combo',
     				id : 'comboStockTakeDept',

@@ -73,11 +73,11 @@ function checkLabel(t){
 		return t;
 	}
 }
+
 /**
  * 
  */
 function memberTypeWinInit(){
-	//memberTypeWin = Ext.getCmp('mtm_memberTypeWin');
 	if(!memberTypeWin){
 		memberTypeWin = new Ext.Window({
 			id : 'mtm_memberTypeWin',
@@ -197,7 +197,7 @@ function memberTypeWinInit(){
 				}, {
 					
 				}, {
-					xtype : 'form',
+					xtype : 'panel',
 					layout : 'column',
 					id : 'formMemberDiscount',
 					frame : true,
@@ -574,9 +574,7 @@ function memberTypeOperationHandler(c){
 		return;
 	}
 	memberTypeWin.otype = c.type;
-	
 	if(c.type == mtObj.operation['insert']){
-		
 		memberTypeWin.setTitle('添加会员类型');
 		memberTypeWin.show();
 		memberTypeWin.center();
@@ -588,6 +586,7 @@ function memberTypeOperationHandler(c){
 			exchangeRate : 1.00,
 			initialPoint : 0
 		});
+		
 	}else if(c.type == mtObj.operation['update']){
 		var sd = Ext.ux.getSelData(memberTypeGrid);
 		if(!sd){
