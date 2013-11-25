@@ -21,7 +21,6 @@ import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.stockMgr.StockTakeDetail;
-import com.wireless.util.WebParams;
 
 public class QueryDeltaReportAction extends Action{
 
@@ -75,16 +74,17 @@ public class QueryDeltaReportAction extends Action{
 				deptId = "-1";
 			}
 
+			int count = StockDeltaReportDao.deltaReportCount(staff, beginDate, endDate, deptId, extra);
 
 			deltaReports = StockDeltaReportDao.deltaReport(staff, beginDate, endDate, deptId, extra, orderClause);
-			jobject.setTotalProperty(deltaReports.size());
+			jobject.setTotalProperty(count);
 			jobject.setRoot(deltaReports);
 		}catch(BusinessException e){
 			e.printStackTrace();
-			jobject.initTip(false, e.getMessage(), e.getCode(), e.getDesc());
+			jobject.initTip(e);
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip(false, e.getMessage(), 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
+			jobject.initTip(e);
 		}finally{
 			response.getWriter().print(jobject.toString());
 		}	
