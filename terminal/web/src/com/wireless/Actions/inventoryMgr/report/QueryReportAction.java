@@ -51,7 +51,7 @@ public class QueryReportAction extends Action {
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 			if(beginDate == null || cateType == null){
 					
-/*				long current = SystemDao.getCurrentMonth(mTerminal);*/
+/*				long current = MonthlyBalanceDao.getCurrentMonthTimeByRestaurant(staff.getRestaurantId());*/
 				Calendar c = Calendar.getInstance();
 				c.setTime(new Date());
 				c.add(Calendar.MONTH, -1);

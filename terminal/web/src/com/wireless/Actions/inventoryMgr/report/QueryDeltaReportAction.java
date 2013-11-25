@@ -15,8 +15,8 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.staffMgr.StaffDao;
+import com.wireless.db.stockMgr.MonthlyBalanceDao;
 import com.wireless.db.stockMgr.StockDeltaReportDao;
-import com.wireless.db.system.SystemDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.staffMgr.Staff;
@@ -47,7 +47,7 @@ public class QueryDeltaReportAction extends Action{
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 			if(beginDate == null){
 				
-				long current = SystemDao.getCurrentMonth(staff);
+				long current = MonthlyBalanceDao.getCurrentMonthTimeByRestaurant(staff.getRestaurantId());
 				Calendar c = Calendar.getInstance();
 				c.setTime(new Date(current));
 				c.add(Calendar.MONTH, -1);

@@ -16,7 +16,7 @@ import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.stockMgr.CostAnalyzeReportDao;
-import com.wireless.db.system.SystemDao;
+import com.wireless.db.stockMgr.MonthlyBalanceDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.staffMgr.Staff;
@@ -39,7 +39,7 @@ public class QueryCostAnalyzeReportAction extends Action {
 			Calendar c = Calendar.getInstance();
 			if(beginDate == null){
 				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-				long current = SystemDao.getCurrentMonth(staff);
+				long current = MonthlyBalanceDao.getCurrentMonthTimeByRestaurant(staff.getRestaurantId());
 				
 				c.setTime(new Date(current));
 				c.add(Calendar.MONTH, -1);

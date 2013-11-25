@@ -49,8 +49,12 @@ public class RequestFilter implements Filter{
 		String requestPath = request.getRequestURI();
 		if(check(requestPath)){
 			String pin =  (String) request.getSession().getAttribute("pin");
+			String restaurantID =  (String) request.getSession().getAttribute("restaurantID");
 			if(pin != null){
 				request.setAttribute("pin", pin);
+			}
+			if(restaurantID != null){
+				request.setAttribute("restaurantID", restaurantID);
 			}
 			chain.doFilter(request, response);
 		}else{

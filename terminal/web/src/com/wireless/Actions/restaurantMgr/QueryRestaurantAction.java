@@ -1,5 +1,6 @@
 package com.wireless.Actions.restaurantMgr;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -27,7 +28,9 @@ public class QueryRestaurantAction extends Action{
 		String account = request.getParameter("account");
 		String expireDate = request.getParameter("expireDate");
 		String alive = request.getParameter("alive");
-		List<Restaurant> list = null;
+		String byId = request.getParameter("byId");
+		List<Restaurant> list = new ArrayList<Restaurant>();
+		Restaurant restaurant= null;
 		JObject jobject = new JObject();
 		String extraCond = "", orderClause = "";
 		try{
@@ -43,14 +46,18 @@ public class QueryRestaurantAction extends Action{
 				}else if(expireDate != null && alive != null){
 					orderClause += (" ORDER BY expire_date, liveness" );
 				}
-				
-				
 			}
-
-			list = RestaurantDao.getByCond(extraCond, orderClause);
-			if(!list.isEmpty()){
-				jobject.setTotalProperty(list.size());
-				list = DataPaging.getPagingData(list, isPaging, start, limit);
+			
+			if(Boolean.parseBoolean(byId)){
+				System.out.println(Integer.parseInt((String) request.getAttribute("restaurantID")));
+				restaurant = RestaurantDao.getById(Integer.parseInt((String) request.getAttribute("restaurantID")));
+				list.add(restaurant);
+			}else{
+				list = RestaurantDao.getByCond(extraCond, orderClause);
+				if(!list.isEmpty()){
+					jobject.setTotalProperty(list.size());
+					list = DataPaging.getPagingData(list, isPaging, start, limit);
+				}
 			}
 			jobject.setRoot(list);
 		}finally{
