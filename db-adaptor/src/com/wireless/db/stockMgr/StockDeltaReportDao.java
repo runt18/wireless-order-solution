@@ -19,6 +19,30 @@ import com.wireless.pojo.stockMgr.StockAction.SubType;
 
 public class StockDeltaReportDao {
 
+
+	
+	public static int deltaReportCount(Staff term, String begin, String end, String dept, String extraCond) throws SQLException, BusinessException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return deltaReportCount(dbCon, term, begin, end, dept, extraCond);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	public static int deltaReportCount(DBCon dbCon, Staff term, String begin, String end, String dept, String extraCond) throws SQLException, BusinessException{
+		List<StockReport> stockReports;
+		if(dept.equals("-1")){
+			stockReports = StockReportDao.getStockCollect(dbCon, term, begin, end, extraCond, null);
+		}else{
+			
+			stockReports = getStockCollect(dbCon, term, begin, end, dept, extraCond, null);
+		}
+		return stockReports.size();
+		
+	}
+	
 	public static List<StockTakeDetail> deltaReport(Staff term, String begin, String end, String dept, String extraCond, String orderClause) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
@@ -38,7 +62,7 @@ public class StockDeltaReportDao {
 			stockReports = StockReportDao.getStockCollect(dbCon, term, begin, end, extraCond, orderClause);
 		}else{
 			
-			stockReports = getStockCollect(dbCon, term, begin, end, dept, extraCond, null);
+			stockReports = getStockCollect(dbCon, term, begin, end, dept, extraCond, orderClause);
 		}
 		
 		for (StockReport stockReport : stockReports) {

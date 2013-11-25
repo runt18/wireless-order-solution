@@ -659,7 +659,6 @@ public class RestaurantDao {
 	private static void update(DBCon dbCon, Staff term, Restaurant restaurant) throws SQLException, BusinessException{
 		String sql = " UPDATE " + Params.dbName + ".restaurant SET " +
 					 " restaurant_info = '" + restaurant.getInfo() + "'," +
-					 " restaurant_name = '" + restaurant.getName() + "'," +
 					 " address = '" + restaurant.getAddress() + "'," +
 					 " restaurant.tele1 = '" + restaurant.getTele1() + "'," +
 					 " restaurant.tele2 = '" + restaurant.getTele2() + "' " +
