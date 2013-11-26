@@ -49,6 +49,7 @@ public class Material implements Jsonable {
 	private long lastModDate;
 	private Status status;
 	private String pinyin;
+	private boolean isGood = false;
 	
 	void init(int id, int restaurantId, int cateId, float price, float stock, String name, String lastModStaff, long lastModDate, Status status){
 		this.id = id;
@@ -123,6 +124,9 @@ public class Material implements Jsonable {
 	public void setCate(int id, String name) {
 		this.cate = new MaterialCate(id, this.restaurantId, name);
 	}
+	public void setCate(int id, String name, int type) {
+		this.cate = new MaterialCate(id, this.restaurantId, name, MaterialCate.Type.valueOf(type));
+	}
 	public float getPrice() {
 		return price;
 	}
@@ -182,6 +186,12 @@ public class Material implements Jsonable {
 	}
 	
 	
+	public boolean isGood() {
+		return isGood;
+	}
+	public void setGood(boolean isGood) {
+		this.isGood = isGood;
+	}
 	public void stockInAvgPrice(float detailPrice, float detailAmount){
 		float avgPrice = (this.stock * this.price + detailPrice * detailAmount) / (this.stock + detailAmount);
 		this.price = (float)(Math.round(avgPrice * 100)) / 100;
@@ -304,11 +314,14 @@ public class Material implements Jsonable {
 		if(this.cate != null){
 			jm.put("cateId", this.getCate().getId());
 			jm.put("cateName", this.getCate().getName());
+			jm.put("cateType", this.getCate().getType().getValue());
 		}
 		if(this.status != null){
 			jm.put("statusValue", this.getStatus().getValue());
 			jm.put("statusText", this.getStatus().getText());
 		}
+		//记录当前价格是否修改
+		jm.put("isGood", this.isGood);
 		
 		return Collections.unmodifiableMap(jm);
 	}
