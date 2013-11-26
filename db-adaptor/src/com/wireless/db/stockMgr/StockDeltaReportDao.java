@@ -32,14 +32,9 @@ public class StockDeltaReportDao {
 	}
 	
 	public static int deltaReportCount(DBCon dbCon, Staff term, String begin, String end, String dept, String extraCond) throws SQLException, BusinessException{
-		List<StockReport> stockReports;
-		if(dept.equals("-1")){
-			stockReports = StockReportDao.getStockCollect(dbCon, term, begin, end, extraCond, null);
-		}else{
-			
-			stockReports = getStockCollect(dbCon, term, begin, end, dept, extraCond, null);
-		}
-		return stockReports.size();
+		List<StockTakeDetail> stockTakeDetails = new ArrayList<StockTakeDetail>();
+		stockTakeDetails = deltaReport(dbCon, term, begin, end, dept, extraCond, null);
+		return stockTakeDetails.size();
 		
 	}
 	
@@ -103,23 +98,11 @@ public class StockDeltaReportDao {
 						" INNER JOIN " + Params.dbName + ".material as M ON M.material_id = D.material_id) " +
 						" INNER JOIN " + Params.dbName + ".material_cate as MC ON MC.cate_id = M.cate_id " +
 						" WHERE S.restaurant_id = " + term.getRestaurantId() + 
-						" AND S.dept_in = " + dept  +
+						" AND (S.dept_in = " + dept  + " OR S.dept_out = " + dept + ")" + 
 						" AND S.ori_stock_date <= '" + end + " 23:59:59' AND S.ori_stock_date >= '" + begin + "'" +
 						(extraCond == null ? "" : extraCond) +
 						" GROUP BY S.sub_type, D.material_id " +
-						(orderClause == null ? "" : orderClause) + 
-						" UNION" + 
-						" SELECT S.sub_type, S.dept_in, S.dept_out, D.material_id, D.name, SUM(D.amount) as amount FROM ((" +
-						Params.dbName + ".stock_action as S " +  
-						" INNER JOIN " + Params.dbName + ".stock_action_detail as D ON S.id = D.stock_action_id) " +
-						" INNER JOIN " + Params.dbName + ".material as M ON M.material_id = D.material_id) " +
-						" INNER JOIN " + Params.dbName + ".material_cate as MC ON MC.cate_id = M.cate_id " +
-						" WHERE S.restaurant_id = " + term.getRestaurantId() + 
-						" AND S.dept_out = " + dept  +
-						" AND S.ori_stock_date <= '" + end + " 23:59:59' AND S.ori_stock_date >= '" + begin + "'" +
-						(extraCond == null ? "" : extraCond) +
-						" GROUP BY S.sub_type, D.material_id " +
-						(orderClause == null ? "" : orderClause) ;
+						(orderClause == null ? "" : orderClause);
 						
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		Map<Integer, StockReport> result = new HashMap<Integer, StockReport>();
