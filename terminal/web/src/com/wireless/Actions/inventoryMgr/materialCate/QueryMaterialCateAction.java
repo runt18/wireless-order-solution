@@ -184,9 +184,11 @@ public class QueryMaterialCateAction extends DispatchAction{
 				inventory.append("{");
 				inventory.append("leaf:true");
 				inventory.append(",text:'" + item.getName() + "'");
+				inventory.append(",mText:'" + item.getName() + "'");
 				inventory.append(",cateId:" + item.getId());
 				inventory.append(",name:'" + item.getName() + "'");
 				inventory.append(",mType:" + Food.StockStatus.MATERIAL.getVal());
+				inventory.append(",changes: 0 ");
 				inventory.append("}");
 			}
 			tree.append(",children : [" + inventory.toString() + "]");
@@ -205,9 +207,11 @@ public class QueryMaterialCateAction extends DispatchAction{
 				goods.append("{");
 				goods.append("leaf:true");
 				goods.append(",text:'" + kitchen.getName() + "'");
+				goods.append(",mText:'" + kitchen.getName() + "'");
 				goods.append(",cateId:" + kitchen.getId());
 				goods.append(",name:'" + kitchen.getName() + "'");
 				goods.append(",mType:" + Food.StockStatus.GOOD.getVal());
+				goods.append(",changes: 0 ");
 				goods.append("}");
 			}
 			tree.append(",children : [" + goods.toString() + "]");

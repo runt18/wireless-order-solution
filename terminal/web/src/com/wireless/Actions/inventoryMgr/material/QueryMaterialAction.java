@@ -134,10 +134,7 @@ public class QueryMaterialAction extends DispatchAction{
 				}
 				root = MaterialDao.getMonthSettleMaterial(staff, extra, null);
 			}else{
-				Map<Object, Object> params = new LinkedHashMap<Object, Object>();
-				params.put(SQLUtil.SQL_PARAMS_EXTRA, extra);
-				
-				root = MaterialDao.getContent(params);
+				root = MaterialDao.getAllMonthSettleMaterial(staff.getRestaurantId());
 			}
 			jobject.setRoot(root);
 		}catch(BusinessException e){
