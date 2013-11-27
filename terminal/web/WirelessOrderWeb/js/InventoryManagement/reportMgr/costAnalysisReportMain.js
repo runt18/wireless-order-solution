@@ -8,15 +8,15 @@ Ext.onReady(function(){
 	var cm = new Ext.grid.ColumnModel([
        new Ext.grid.RowNumberer(),
        {header: '部门 ', dataIndex: 'deptName'},
-       {header: '期初余额', dataIndex: 'primeMoney', align : 'right', renderer : Ext.ux.txtFormat.gridDou},
+       {header: '期初余额', dataIndex: 'primeMoney', align : 'right',  renderer : Ext.ux.txtFormat.gridDou},
        {header: '领料金额', dataIndex: 'useMaterialMoney', align : 'right', renderer : Ext.ux.txtFormat.gridDou},
        {header: '退料金额', dataIndex: 'stockOutMoney', align : 'right', renderer : Ext.ux.txtFormat.gridDou},
-       {header: '拨出金额', dataIndex: 'stockOutTransferMoney', align : 'right', renderer : Ext.ux.txtFormat.gridDou},
-       {header: '期末金额', dataIndex: 'endMoney', align : 'right', renderer : Ext.ux.txtFormat.gridDou},
-       {header: '成本金额', dataIndex: 'costMoney', align : 'right', renderer : Ext.ux.txtFormat.gridDou},
-       {header: '销售金额', dataIndex: 'salesMoney', align : 'right', renderer : Ext.ux.txtFormat.gridDou},
-       {header: '毛利额', dataIndex: 'profit', align : 'right', renderer : Ext.ux.txtFormat.gridDou},
-       {header: '毛利率', dataIndex: 'profitRate', align : 'right', renderer : Ext.ux.txtFormat.gridDou}
+       {header: '拨出金额', dataIndex: 'stockOutTransferMoney', align : 'right', width : 120, renderer : Ext.ux.txtFormat.gridDou},
+       {header: '期末金额', dataIndex: 'endMoney', align : 'right', width : 130, renderer : Ext.ux.txtFormat.gridDou},
+       {header: '成本金额', dataIndex: 'costMoney', align : 'right', width : 130, renderer : Ext.ux.txtFormat.gridDou},
+       {header: '销售金额', dataIndex: 'salesMoney', align : 'right', width : 130, renderer : Ext.ux.txtFormat.gridDou},
+       {header: '毛利额', dataIndex: 'profit', align : 'right', width : 150, renderer : Ext.ux.txtFormat.gridDou},
+       {header: '毛利率', id: 'profitRate', dataIndex: 'profitRate', align : 'right', renderer : Ext.ux.txtFormat.percent}
         
 	]);
 	cm.defaultSortable = true;
@@ -82,10 +82,11 @@ Ext.onReady(function(){
 	    	msg : "数据加载中，请稍等..."
 	    },
 	    cm : cm,
-	    //autoSizeColumns: true,
-	    viewConfig : {
-	    	forceFit : true
-	    },
+	    autoExpandColumn : 'profitRate',
+	    autoExpandMax : 200,
+//	    viewConfig : {
+//	    	forceFit : true
+//	    },
 	    tbar : costAnalyzeGridTbar,
 	    bbar : pagingBar
 	});

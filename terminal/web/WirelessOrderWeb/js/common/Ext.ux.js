@@ -28,6 +28,9 @@ Ext.ux.txtFormat = {
 		r = String.format('{0}-{1}-{2} {3}:{4}:{5}', nd.getFullYear(), nd.getMonth(), nd.getDaysInMonth(),
 				nd.getHours(), nd.getMinutes(), nd.getSeconds());
 		return r;
+	},
+	percent : function(v){
+		return v.toFixed(2) * 100 + '%&nbsp;&nbsp;';
 	}
 };
 

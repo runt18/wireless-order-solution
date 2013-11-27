@@ -1,4 +1,10 @@
 
+function priceReject(){
+	var egc = Ext.getCmp('msm_monthSettleGrid').getSelectionModel().getSelected();
+	egc.set('presentPrice', egc.get('price'));
+	msm_monthSettleGrid.fireEvent('afteredit', {record: egc});
+}
+
 function priceChange(record){
 	var treeRoot = monthSettleTree.getRootNode().childNodes;
 	var mType = "";
@@ -22,27 +28,41 @@ function priceChange(record){
 				}
 			}
 		}
-
-
 	}
-	if(mType.attributes.changes == 0){
+	if(!record.get('changed') && load != 0){
 		if(record.get('delta') != 0){
-			mType.attributes.changes = mType.attributes.changes + 1;
-			mType.setText(mType.attributes.mText + '<span style="color:red; font-weight:bold; font-size:14px;">*</span>' + mType.attributes.changes);
+			mType.attributes.changes ++;
+			hasChange ++;
+			mType.setText(mType.attributes.mText + '<span style="color:red; font-weight:bold; font-size:14px;">(' + mType.attributes.changes + ')</span>');
+			record.set('changed', true);
 		}
 	}else{
-		if(record.get('delta') != 0){
-			mType.attributes.changes = mType.attributes.changes + 1;
-			mType.setText(mType.attributes.mText + '<span style="color:red; font-weight:bold; font-size:14px;">*</span>' + mType.attributes.changes);
-		}else{
-			mType.attributes.changes = mType.attributes.changes - 1;
-			if(mType.attributes.changes == 0){
-				mType.setText(mType.attributes.mText);
-			}else{
-				mType.setText(mType.attributes.mText + '<span style="color:red; font-weight:bold; font-size:14px;">*</span>' + mType.attributes.changes);
+		
+		if(record.get('changed') && load == 0 ){
+			mType.attributes.changes ++;
+			hasChange ++;
+			mType.setText(mType.attributes.mText + '<span style="color:red; font-weight:bold; font-size:14px;">(' + mType.attributes.changes + ')</span>');
+			return;
+		}else if(record.get('changed')){
+			if(record.get('delta') == 0){
+				mType.attributes.changes --;
+				hasChange --;
+				if(mType.attributes.changes == 0 ){
+					mType.setText(mType.attributes.mText);
+					record.set('changed', false);
+				}else{
+					mType.setText(mType.attributes.mText + '<span style="color:red; font-weight:bold; font-size:14px;">(' + mType.attributes.changes + ')</span>');
+					record.set('changed', true);
+				}
 			}
 		}
 	}
+	if(hasChange == 0){
+		monthSettleTree.getRootNode().setText(monthSettleTree.getRootNode().attributes.mText);	
+	}else{
+		monthSettleTree.getRootNode().setText(monthSettleTree.getRootNode().attributes.mText + '<span style="color:red; font-weight:bold; font-size:14px;">*</span>');
+	}
+
 }
 
 function operateMaterialPrice(){
@@ -158,6 +178,16 @@ function showMonthSettleDetail(){
 
 function priceDeltaRenderer(v, m, r, ri, ci, s){
 	return v = v < 0 ? "<font color='red' size='4'>" + Ext.ux.txtFormat.gridDou(v) + "</font>" : v > 0 ? "<font color='green' size='4'>" + '+' + Ext.ux.txtFormat.gridDou(v) + "</font>" : "<font color='green' size='4'>0.00&nbsp;&nbsp;</font>";
+	
+}
+
+function priceRejectRenderer(v, m, r, ri, ci, s){
+	if(r.get('delta') != 0){
+		return v + '&nbsp;&nbsp;<a href="javascript:priceReject();"><img src="../../images/btnReject.png" title="恢复原价"/></a>';
+	}else{
+		return v;
+	}
+	
 }
 
 var settle = {
@@ -198,6 +228,7 @@ Ext.onReady(function(){
 		root : new Ext.tree.AsyncTreeNode({
 			expanded : true,
 			text : '全部种类',
+			mText : '全部种类',
 	        leaf : false,
 	        border : true,
 	        mType : '1',
@@ -230,37 +261,46 @@ Ext.onReady(function(){
 						params : {
 							dataSource : 'monthSettleChangeType',
 							editData : editData
+						},
+						success : function(){
+							msm_monthSettleGrid.getStore().load({
+								params : {
+									type : e.attributes.type,
+									mType : e.attributes.mType,
+									cateId : e.attributes.cateId
+								}
+							});
 						}
 					});
 					editData = '';
+				}else{
+					msm_monthSettleGrid.getStore().load({
+						params : {
+							type : e.attributes.type,
+							mType : e.attributes.mType,
+							cateId : e.attributes.cateId
+						}
+					});
 				}
 				msm_monthSettleGrid.setTitle('货品列表' + '&nbsp;&nbsp;<span style="color:green; font-weight:bold; font-size:13px;">' + e.text + '</span>');
-				msm_monthSettleGrid.getStore().load({
-					params : {
-						type : e.attributes.type,
-						mType : e.attributes.mType,
-						cateId : e.attributes.cateId
-					}
-				});
+
 			}
 		},
 		tbar :	[
 		     '->',
 		     {
-					text : '刷新',
-					iconCls : 'btn_refresh',
-					handler : function(){
-						monthSettleTree.getRootNode().reload();
-					}
+				text : '刷新',
+				iconCls : 'btn_refresh',
+				handler : function(){
+					monthSettleTree.getRootNode().reload();
+				}
 			}
 		 ]
-			
-
 	});
 	
 	var cm = new Ext.grid.ColumnModel([
 	       new Ext.grid.RowNumberer(),
-	       {header: '品项名称 ', dataIndex: 'name'},
+	       {header: '品项名称 ', dataIndex: 'name', renderer : priceRejectRenderer},
 	       {header: '当前单价', dataIndex: 'presentPrice', align: 'right', editor: new Ext.form.NumberField({allowBlank: false }), renderer: Ext.ux.txtFormat.gridDou},
 	       //{header: '单价', hidden : true, dataIndex: 'price'},
 	       {header: '变化点', dataIndex: 'delta', align: 'right', renderer: priceDeltaRenderer}
@@ -278,7 +318,8 @@ Ext.onReady(function(){
 				{name: 'change'},
 				{name: 'cateId'},
 				{name: 'cateType'},
-				{name: 'isGood'}
+				{name: 'isGood'},
+				{name: 'changed'}
 		]),
 		baseParams : {
 			dataSource : 'monthSettleMaterial'
@@ -296,6 +337,9 @@ Ext.onReady(function(){
 		viewConfig : {
 			forceFit : true		
 		},
+		selModel : new Ext.grid.RowSelectionModel({  
+            singleSelect : false  
+        }),
 		listeners : {
 			afteredit : function(e){
 				e.record.set('delta', e.record.get('presentPrice') - e.record.get('price'));
@@ -327,16 +371,19 @@ Ext.onReady(function(){
 			 	if(eval(stockActionCount + '+' + stockTakeCount) > 0){
 			 		return false;
 			 	}
-			 	var ds = msm_monthSettleGrid.getStore();
-			 	for (var i = 0; i < ds.getCount(); i++) {
-			 		priceChange(ds.getAt(i));
-			 	}
 			},
 			expand : function(p){
 				Ext.getCmp('winMonthSettle').setHeight(Ext.isIE ? 610 : 600);
 				Ext.getCmp('winMonthSettle').center();
 				Ext.getCmp('winMonthSettle').getBottomToolbar().hide();
 				Ext.getCmp('winMonthSettle').getBottomToolbar().show();
+			 	if(load == 0){
+			 		var ds = msm_monthSettleGrid.getStore();
+				 	for (var i = 0; i < ds.getCount(); i++) {
+				 		priceChange(ds.getAt(i));
+				 	}
+			 	}
+			 	load ++;
 			},
 			collapse : function(){
 				Ext.getCmp('winMonthSettle').setHeight(Ext.isIE ? 225 : 215);
