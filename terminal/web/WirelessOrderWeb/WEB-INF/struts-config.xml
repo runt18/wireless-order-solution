@@ -351,7 +351,7 @@
 		</action>
 		<action path="/OperateRestaurant"
 			type="com.wireless.Actions.restaurantMgr.OperateRestaurantAction"
-			scope="request" parameter = "dataSource">
+			scope="request" parameter="dataSource">
 		</action>
 		<action path="/RestaurantQueryByID"
 			type="com.wireless.Actions.restaurantMgr.RestaurantQueryByIDAction"
@@ -426,10 +426,12 @@
 			scope="request">
 		</action>
 		<action path="/UpdateCurrentMonth"
-			type="com.wireless.Actions.inventoryMgr.monthlySettle.UpdateCurrentMonthAction" scope="request">
+			type="com.wireless.Actions.inventoryMgr.monthlySettle.UpdateCurrentMonthAction"
+			scope="request">
 		</action>
 		<action path="/QueryCurrentMonth"
-			type="com.wireless.Actions.inventoryMgr.monthlySettle.QueryCurrentMonthAction" scope="request">
+			type="com.wireless.Actions.inventoryMgr.monthlySettle.QueryCurrentMonthAction"
+			scope="request">
 		</action>
 		<action path="/QueryPrinterTree"
 			type="com.wireless.Actions.printScheme.QueryPrinterTreeAction" scope="request">
@@ -445,67 +447,62 @@
 			type="com.wireless.Actions.printScheme.OperatePrinterAction" scope="request"
 			parameter="dataSource">
 		</action>
-		<action path="/VerifyStaff"
-				type = "com.wireless.Actions.login.VerifyStaffAction"
-				scope="request">
+		<action path="/VerifyStaff" type="com.wireless.Actions.login.VerifyStaffAction"
+			scope="request">
 		</action>
-		<action path="/QueryRole"
-				type = "com.wireless.Actions.roleMgr.QueryRoleAction"
-				scope="request">
+		<action path="/QueryRole" type="com.wireless.Actions.roleMgr.QueryRoleAction"
+			scope="request">
 		</action>
 		<action path="/QueryPrivilege"
-				type = "com.wireless.Actions.roleMgr.QueryPrivilegeAction"
-				scope="request" parameter="dataSource">
+			type="com.wireless.Actions.roleMgr.QueryPrivilegeAction" scope="request"
+			parameter="dataSource">
 		</action>
-		<action path="/OperateRole"
-				type = "com.wireless.Actions.roleMgr.OperateRoleAction"
-				scope="request" parameter="dataSource">
-		</action>
-		<action path="/QueryRestaurants"
-				type = "com.wireless.Actions.restaurantMgr.QueryRestaurantAction"
-				scope="request">
-		</action>
-		<action path="/VerifyLogin"
-				type = "com.wireless.Actions.login.VerifyLoginAction"
-				scope="request">
-		</action>
-		<action path="/LoginOut"
-				type = "com.wireless.Actions.login.LoginOutAction"
-				scope="request">
-		</action>
-		<action path="/QueryDevice"
-				type = "com.wireless.Actions.deviceMgr.QueryDeviceAction"
-				scope="request">
-		</action>
-		<action path="/OperateDevice"
-				type = "com.wireless.Actions.deviceMgr.OperateDeviceAction"
-				scope="request" parameter="dataSource">
-		</action>
-		<action path="/QueryDiscount"
-			type = "com.wireless.Actions.distMgr.discount.QueryDiscountAction"
+		<action path="/OperateRole" type="com.wireless.Actions.roleMgr.OperateRoleAction"
 			scope="request" parameter="dataSource">
 		</action>
-		
-		<action path="/WXEntry"
-			type="com.wireless.Actions.weixin.EntryAction"
+		<action path="/QueryRestaurants"
+			type="com.wireless.Actions.restaurantMgr.QueryRestaurantAction"
+			scope="request">
+		</action>
+		<action path="/VerifyLogin" type="com.wireless.Actions.login.VerifyLoginAction"
+			scope="request">
+		</action>
+		<action path="/LoginOut" type="com.wireless.Actions.login.LoginOutAction"
+			scope="request">
+		</action>
+		<action path="/QueryDevice" type="com.wireless.Actions.deviceMgr.QueryDeviceAction"
+			scope="request">
+		</action>
+		<action path="/OperateDevice"
+			type="com.wireless.Actions.deviceMgr.OperateDeviceAction" scope="request"
+			parameter="dataSource">
+		</action>
+		<action path="/QueryDiscount"
+			type="com.wireless.Actions.distMgr.discount.QueryDiscountAction"
+			scope="request" parameter="dataSource">
+		</action>
+
+		<action path="/WXEntry" type="com.wireless.Actions.weixin.EntryAction"
 			scope="request">
 		</action>
 		<action path="/QueryFood_q"
-			type = "com.wireless.Actions.weixin.query.QueryFoodAction"
-			scope="request" parameter="dataSource">
+			type="com.wireless.Actions.weixin.query.QueryFoodAction" scope="request"
+			parameter="dataSource">
 		</action>
 		<action path="/WXOperateMember"
-			type="com.wireless.Actions.weixin.query.WXOperateMemberAction"
-			scope="request" parameter="dataSource">
+			type="com.wireless.Actions.weixin.query.WXOperateMemberAction" scope="request"
+			parameter="dataSource">
 		</action>
-		
-		<action path="/QueryBillboard"
-			type="com.wireless.Actions.system.QueryBillboardAction"
+
+		<action path="/QueryBillboard" type="com.wireless.Actions.system.QueryBillboardAction"
 			scope="request" parameter="dataSource">
 		</action>
 		<action path="/OperateBillboard"
-			type="com.wireless.Actions.system.OperateBillboardAction"
-			scope="request" parameter="dataSource">
+			type="com.wireless.Actions.system.OperateBillboardAction" scope="request"
+			parameter="dataSource">
+		</action>
+		<action path="/FinanceWeixin" type="com.wireless.Actions.weixin.FinanceWeixinAction"
+			scope="request">
 		</action>
 	</action-mappings>
 

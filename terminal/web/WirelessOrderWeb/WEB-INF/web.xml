@@ -10,7 +10,8 @@
 			<param-value>
 				/WXEntry.do,
 				/QueryFood_q.do,
-
+				/FinanceWeixin.do,
+				
 				/QueryRestaurants.do,
 				/VerifyLogin.do,
 				/LoginOut.do,
@@ -76,7 +77,7 @@
 		</init-param>
 		<init-param>
 			<param-name>db_host</param-name>
-			<param-value>127.0.0.1</param-value>
+			<param-value>192.168.110.100</param-value>
 		</init-param>
 		<init-param>
 			<param-name>db_port</param-name>
@@ -88,7 +89,7 @@
 		</init-param>
 		<init-param>
 			<param-name>db_pwd</param-name>
-			<param-value>root</param-value>
+			<param-value>HelloZ315</param-value>
 		</init-param>
 		<!-- Below is the configuration parameters to socket -->
 		<init-param>
@@ -101,15 +102,7 @@
 		</init-param>
 		<init-param>
 			<param-name>imageBrowseDefaultFile</param-name>
-			<param-value>http://127.0.0.1:8080/WirelessOrderWeb/images/nophoto.jpg</param-value>
-		</init-param>
-		<init-param>
-			<param-name>imageBrowsePath</param-name>
-			<param-value>http://127.0.0.1:8080/WirelessOrderWeb/images/upload</param-value>
-		</init-param>
-		<init-param>
-			<param-name>imageUploadPath</param-name>
-			<param-value>F:\JavaDemo\.metadata\.plugins\org.eclipse.wst.server.core\tmp1\wtpwebapps\WirelessOrderWeb\images\upload</param-value>
+			<param-value>http://food-image-test.oss.aliyuncs.com/nophoto.jpg</param-value>
 		</init-param>
 		<init-param>
 			<param-name>imageUploadMaxSize</param-name>
@@ -121,11 +114,11 @@
 		</init-param>
 		<init-param>
 			<param-name>oss_access_id</param-name>
-			<param-value>EEuoN1hz4wIVy05K</param-value>
+			<param-value>KMLtoTwkG5Jqaapu</param-value>
 		</init-param>
 		<init-param>
 			<param-name>oss_access_key</param-name>
-			<param-value>BBBNdSPgc2es4X7CN9BMtmMIOCAjoP</param-value>
+			<param-value>VZtrdLaO6WFcJQrvffO9XBPVpbKGRP</param-value>
 		</init-param>
 		<init-param>
 			<param-name>oss_inner_point</param-name>
@@ -137,7 +130,7 @@
 		</init-param>
 		<init-param>
 			<param-name>oss_bucket_image</param-name>
-			<param-value>food-image</param-value>
+			<param-value>food-image-test</param-value>
 		</init-param>
 		<load-on-startup>0</load-on-startup>
 	</servlet>
@@ -145,11 +138,6 @@
 	<servlet>
 		<servlet-name>finance</servlet-name>
 		<servlet-class>com.wireless.servlets.weixin.FinanceWeixinServlet</servlet-class>
-		<init-param>
-			<param-name>image_tmp_path</param-name>
-			<param-value>/home/yzhang/www/eMenu/images/</param-value>
-			<description>the temp storage path for image to weixin finance</description>
-		</init-param>
 	</servlet>
 
 	<servlet-mapping>
