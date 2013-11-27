@@ -1,11 +1,11 @@
-package com.wireless.servlets.weixin;
+package com.wireless.Actions.weixin;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.geom.Ellipse2D;
-import java.io.File;
-import java.io.FileOutputStream;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -19,12 +19,14 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
 
-import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.struts.action.Action;
+import org.apache.struts.action.ActionForm;
+import org.apache.struts.action.ActionForward;
+import org.apache.struts.action.ActionMapping;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
@@ -48,6 +50,7 @@ import org.marker.weixin.msg.Msg4Event;
 import org.marker.weixin.msg.Msg4ImageText;
 import org.marker.weixin.msg.Msg4Text;
 
+import com.aliyun.openservices.oss.model.ObjectMetadata;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.billStatistics.QueryIncomeStatisticsDao;
@@ -60,37 +63,32 @@ import com.wireless.pojo.billStatistics.IncomeByEachDay;
 import com.wireless.pojo.billStatistics.ShiftDetail;
 import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.util.DateUtil;
+import com.wireless.pojo.util.NumericUtil;
 import com.wireless.util.DateType;
 import com.wireless.util.OSSParams;
 import com.wireless.util.OSSUtil;
 
-public class FinanceWeixinServlet extends HttpServlet {
-
-	private final static int WEIXIN_CONTENT_LENGTH = 12;
+public class FinanceWeixinAction extends Action {
 	
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-
-	private String imgTmpPath;
+	private final static int WEIXIN_CONTENT_LENGTH = 12;
 	
 	//TOKEN 是你在微信平台开发模式中设置的哦
 	public static final String TOKEN = "xxx";
 
 	@Override
-	public void init(ServletConfig servletConfig) throws ServletException{
-		imgTmpPath = servletConfig.getInitParameter("image_tmp_path");
+	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+		if(request.getMethod().equalsIgnoreCase("get")){
+			doGet(request, response);
+		}else if(request.getMethod().equalsIgnoreCase("post")){
+			doPost(request, response);
+		}
+		return null;
 	}
 	
 	/**
 	 * 处理微信服务器验证
-	 * 
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
-	 *      response)
 	 */
-	@Override
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	private void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		String signature = request.getParameter("signature");	// 微信加密签名
 		String timestamp = request.getParameter("timestamp");	// 时间戳
 		String nonce = request.getParameter("nonce");			// 随机数
@@ -123,11 +121,8 @@ public class FinanceWeixinServlet extends HttpServlet {
 	
 	/**
 	 * 处理微信服务器发过来的各种消息，包括：文本、图片、地理位置、音乐等等
-	 * 
-	 * 
 	 */
-	@Override
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	private void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		
 		InputStream is = request.getInputStream();
 		OutputStream os = response.getOutputStream();
@@ -321,35 +316,67 @@ public class FinanceWeixinServlet extends HttpServlet {
 	 * 生成今日关注信息
 	 * @param msg
 	 * @return
+	 * @throws SQLException 
 	 * @throws IOException 
 	 */
 	private Msg doFocusedStatistics(Msg4Text msg) {
 
 		Msg4ImageText mit = new Msg4ImageText();
 		
-		FileOutputStream fosJpg = null;
+		//FileOutputStream fosJpg = null;
 		
-		File fileJpg = null;
+		//File fileJpg = null;
+		
+		DBCon dbCon = null;
 		
 		try{
+			dbCon = new DBCon();
+			
+			dbCon.connect();
+			
+			int restaurantId = WeixinFinanceDao.getRestaurantIdByWeixin(dbCon, msg.getFromUserName());
+			//FIXME
+			List<IncomeByEachDay> incomes = QueryIncomeStatisticsDao.getIncomeByEachDay(StaffDao.getStaffs(dbCon, restaurantId).get(0), 
+														//DateUtil.format(c.getTimeInMillis(), DateUtil.Pattern.DATE),
+														//DateUtil.format(System.currentTimeMillis(), DateUtil.Pattern.DATE));
+														"2013-08-1",
+														"2013-08-5");
+			
 			final String fileNameJpg = "trend_chart_" + msg.getFromUserName() + ".jpg";
 			
-			fileJpg = new File(imgTmpPath + fileNameJpg);
-			fosJpg = new FileOutputStream(fileJpg);
-			ChartUtilities.writeChartAsJPEG(fosJpg, 1, createChart(msg), 360, 280, null);
+			ByteArrayOutputStream bosJpg = new ByteArrayOutputStream();
+			ChartUtilities.writeChartAsJPEG(bosJpg, 1, createChart(msg, incomes), 360, 280, null);
 			
+			//FIXME the bucket name should be config
 			final String bucketName = "weixin-finance";
 			
-			OSSUtil.uploadFile(bucketName, fileNameJpg, fileJpg, null);
+			ByteArrayInputStream bisJpg = new ByteArrayInputStream(bosJpg.toByteArray());
+	    	ObjectMetadata objectMeta = new ObjectMetadata();
+	    	objectMeta.setContentLength(bisJpg.available());
+	    	OSSUtil.clientInner.putObject(bucketName, fileNameJpg, bisJpg, objectMeta);
+	    	
+			//OSSUtil.uploadFile(bucketName, fileNameJpg, fileJpg, null);
 			
-			Data4Item d1 = new Data4Item("最近5天营业额", "走势图", "http://" + bucketName + "." + OSSParams.instance().OSS_OUTER_POINT + "/" + fileNameJpg + "?" + System.currentTimeMillis(), ""); 
-			Data4Item d2 = new Data4Item("雨林博客", "测试描述", "http://www.yl-blog.com/template/ylblog/images/logo.png", "www.yl-blog.com"); 
+			Data4Item d1 = new Data4Item("最近5天营业额", "走势图", "http://" + bucketName + "." + OSSParams.instance().OSS_OUTER_POINT + "/" + fileNameJpg + "?" + System.currentTimeMillis(), "");
+			
+			Data4Item d2 = new Data4Item("最近一天营业额：" + NumericUtil.CURRENCY_SIGN + NumericUtil.float2String2(incomes.get(incomes.size() - 1).getIncomeByPay().getTotalActual()), 
+										 "", "http://www.yl-blog.com/template/ylblog/images/logo.png", ""); 
+
+			
+			float averageIncome = 0;
+			for(IncomeByEachDay incomeEachDay : incomes){
+				averageIncome += incomeEachDay.getIncomeByPay().getTotalActual();
+			}
+			averageIncome = averageIncome / 5;
+			Data4Item d3 = new Data4Item("近5天平均营业额：" + NumericUtil.CURRENCY_SIGN + NumericUtil.float2String2(averageIncome), 
+					 "", "http://www.yl-blog.com/template/ylblog/images/logo.png", ""); 
 			      
 			mit.setFromUserName(msg.getToUserName());
 			mit.setToUserName(msg.getFromUserName()); 
 			mit.setCreateTime(msg.getCreateTime());
 			mit.addItem(d1);
 			mit.addItem(d2);
+			mit.addItem(d3);
 
 			return mit;
 			
@@ -362,14 +389,17 @@ public class FinanceWeixinServlet extends HttpServlet {
 			return rmsg;
 			
 		}finally{
-			try {
-				if(fosJpg != null){
-					fosJpg.close();
-				}
-			} catch (IOException ignored) {	}
-			
-			if(fileJpg != null){
-				fileJpg.delete();
+//			try {
+//				if(fosJpg != null){
+//					fosJpg.close();
+//				}
+//			} catch (IOException ignored) {	}
+//			
+//			if(fileJpg != null){
+//				fileJpg.delete();
+//			}
+			if(dbCon != null){
+				dbCon.disconnect();
 			}
 			
 		}
@@ -383,33 +413,19 @@ public class FinanceWeixinServlet extends HttpServlet {
 	 * @throws BusinessException 
 	 * @throws ParseException 
 	 */
-	public CategoryDataset createDataSet(Msg4Text msg) throws SQLException, BusinessException, ParseException {
-		DBCon dbCon = new DBCon();
-		try{
-			dbCon.connect();
+	public CategoryDataset createDataSet(Msg4Text msg, List<IncomeByEachDay> incomes) throws SQLException, BusinessException, ParseException {
 			
-			int restaurantId = WeixinFinanceDao.getRestaurantIdByWeixin(dbCon, msg.getFromUserName());
-
-			Calendar c = Calendar.getInstance();
-			c.add(Calendar.DATE, -5);
-			//FIXME
-			List<IncomeByEachDay> incomes = QueryIncomeStatisticsDao.getIncomeByEachDay(StaffDao.getStaffs(restaurantId).get(0), 
-														//DateUtil.format(c.getTimeInMillis(), DateUtil.Pattern.DATE),
-														//DateUtil.format(System.currentTimeMillis(), DateUtil.Pattern.DATE));
-														"2013-08-1",
-														"2013-08-5");
-			// 实例化DefaultCategoryDataset对象
-			DefaultCategoryDataset dataSet = new DefaultCategoryDataset();
-			for(IncomeByEachDay incomeByEachDay : incomes){
-				dataSet.addValue(incomeByEachDay.getTotalActual(),	//类别
-								 "最近5天营业额",					//图例名称
-								 new SimpleDateFormat("d号").format(DateUtil.parseDate(incomeByEachDay.getDate(), DateUtil.Pattern.DATE)));
-			}
-			
-			return dataSet;
-		}finally{
-			dbCon.disconnect();
+		Calendar c = Calendar.getInstance();
+		c.add(Calendar.DATE, -5);
+		// 实例化DefaultCategoryDataset对象
+		DefaultCategoryDataset dataSet = new DefaultCategoryDataset();
+		for(IncomeByEachDay incomeByEachDay : incomes){
+			dataSet.addValue(incomeByEachDay.getTotalActual(),	//类别
+							 "最近5天营业额",					//图例名称
+							 new SimpleDateFormat("d号").format(DateUtil.parseDate(incomeByEachDay.getDate(), DateUtil.Pattern.DATE)));
 		}
+		
+		return dataSet;
 	}
 
 	/**
@@ -420,7 +436,7 @@ public class FinanceWeixinServlet extends HttpServlet {
 	 * @throws BusinessException 
 	 * @throws SQLException 
 	 */
-	public JFreeChart createChart(Msg4Text msg) throws SQLException, BusinessException, ParseException {
+	public JFreeChart createChart(Msg4Text msg, List<IncomeByEachDay> incomes) throws SQLException, BusinessException, ParseException {
 		// 字体
 		final Font PLOT_FONT = new Font("宋体", Font.BOLD, 15);
 		
@@ -428,7 +444,7 @@ public class FinanceWeixinServlet extends HttpServlet {
 		chart = ChartFactory.createLineChart("", // 图表标题
 				"", // X轴标题
 				"", // Y轴标题
-				createDataSet(msg), // 绘图数据集
+				createDataSet(msg, incomes), // 绘图数据集
 				PlotOrientation.VERTICAL, // 绘制方向
 				true, // 是否显示图例
 				true, // 是否采用标准生成器

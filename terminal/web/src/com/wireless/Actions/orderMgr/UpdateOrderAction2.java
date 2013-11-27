@@ -124,7 +124,7 @@ public class UpdateOrderAction2 extends Action{
 			
 			Staff staff = StaffDao.verify(Integer.parseInt(pin), Privilege.Code.RE_PAYMENT);
 			
-			UpdateOrder.execByID(staff, orderToUpdate);
+			UpdateOrder.execById(staff, orderToUpdate);
 			PayOrder.execById(staff, orderToUpdate);
 			
 			jsonResp = jsonResp.replace("$(result)", "true");	
