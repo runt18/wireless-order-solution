@@ -559,8 +559,10 @@ public class StockActionDao {
 
 						
 						material = MaterialDao.getById(materialDept.getMaterialId());
-						//计算加权平均价格
-						material.stockInAvgPrice(sActionDetail.getPrice(), sActionDetail.getAmount());
+						//计算加权平均价格(只针对入库)
+						if(updateStockAction.getSubType() == SubType.STOCK_IN){
+							material.stockInAvgPrice(sActionDetail.getPrice(), sActionDetail.getAmount());
+						}
 						//入库单增加总库存
 						material.plusStock(sActionDetail.getAmount());		
 						//更新原料表
@@ -637,8 +639,10 @@ public class StockActionDao {
 							//更新剩余数量
 							sActionDetail.setDeptOutRemaining(materialDept.getStock());
 						}
-						//计算加权平均价格
-						material.stockOutAvgPrice(sActionDetail.getPrice(), sActionDetail.getAmount());
+						//计算加权平均价格(针对出库)
+						if(updateStockAction.getSubType() == SubType.STOCK_OUT){
+							material.stockOutAvgPrice(sActionDetail.getPrice(), sActionDetail.getAmount());
+						}
 						//出库单减少总库存
 						material.cutStock(sActionDetail.getAmount());
 						//更新原料表

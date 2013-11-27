@@ -463,7 +463,8 @@ public class MaterialDao {
 						+ " LEFT JOIN " + Params.dbName + ".food F ON F.food_id = FM.food_id " 
 						+ " WHERE MC.restaurant_id = M.restaurant_id "
 						+ " AND MC.cate_id = M.cate_id " 
-						+ " AND M.restaurant_id = " + restaurant;
+						+ " AND M.restaurant_id = " + restaurant
+						+ " ORDER BY ABS(delta) DESC";
 		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
 		while(dbCon.rs != null && dbCon.rs.next()){
 			item = new Material();
