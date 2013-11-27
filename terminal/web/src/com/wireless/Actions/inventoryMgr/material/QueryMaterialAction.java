@@ -122,6 +122,7 @@ public class QueryMaterialAction extends DispatchAction{
 				
 				Map<Object, Object> params = new LinkedHashMap<Object, Object>();
 				params.put(SQLUtil.SQL_PARAMS_EXTRA, extra);
+				params.put(SQLUtil.SQL_PARAMS_ORDERBY, " ORDER BY ABS(delta) DESC");
 				
 				root = MaterialDao.getContent(params);
 			}else if(Food.StockStatus.GOOD.getVal() == Integer.parseInt(mType)){
@@ -132,7 +133,7 @@ public class QueryMaterialAction extends DispatchAction{
 						extra = " AND F.kitchen_id = " + cateId;
 					}
 				}
-				root = MaterialDao.getMonthSettleMaterial(staff, extra, null);
+				root = MaterialDao.getMonthSettleMaterial(staff, extra, " ORDER BY ABS(delta) DESC");
 			}else{
 				root = MaterialDao.getAllMonthSettleMaterial(staff.getRestaurantId());
 			}
