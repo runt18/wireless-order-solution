@@ -321,6 +321,7 @@ public class Material implements Jsonable {
 			jm.put("statusText", this.getStatus().getText());
 		}
 		//记录当前价格是否修改
+		jm.put("changed", this.delta != 0 ? true : false);
 		jm.put("isGood", this.isGood);
 		
 		return Collections.unmodifiableMap(jm);
