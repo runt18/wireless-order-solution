@@ -168,7 +168,7 @@
 				<p><input id="name" name="mbName" class="loginInput" autofocus="autofocus" required="required" autocomplete="off" placeholder="请输入账号" value="" /></p>
 
 				<p><label for="password">验证码：</label></p>
-				<p><input id="validCode" name="validCode" class="loginInput" required="required" placeholder="请输入验证码" value="" /></p>
+				<p><input id="validCode" name="validCode" class="loginInput" placeholder="请输入验证码" value="" /></p>
 				<div id="divCode" onmousedown="validteCode()" style="cursor: pointer;background-color: White;  width:52px; height:16px; padding:5px; text-align:center; vertical-align:middle; letter-spacing:5px; border:solid 1px blue">  
    				<span></span><span ></span><span ></span><span ></span></div> 
 			</div>
@@ -269,6 +269,7 @@ function setCookie(cookiename, cookievalue, days) {
 	document.onload = validteCode();  
 	$(function(){
 		// 加载公告信息
+		$('#validCode').val("");
 		$.ajax({
 			url : '../QueryBillboard.do',
 			data : {
@@ -276,7 +277,6 @@ function setCookie(cookiename, cookievalue, days) {
 			},
 			dataType : 'json',
 			success : function(data, status, xhr){
-				//alert(data)
 				if(data.success && data.root.length > 0){
 					var infoList = $('#marqueeInfoList')
 					var infoBox = $('#divInfoBox');
@@ -347,6 +347,7 @@ function setCookie(cookiename, cookievalue, days) {
 		}); 
  		
  		$('#selectStaff').change(function(){
+ 			$('#pwd').val("");
  			$('#pwd').focus();
  		});
  		
