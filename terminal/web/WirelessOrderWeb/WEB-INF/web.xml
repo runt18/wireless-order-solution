@@ -11,7 +11,7 @@
 				/WXEntry.do,
 				/QueryFood_q.do,
 				/FinanceWeixin.do,
-				
+
 				/QueryRestaurants.do,
 				/VerifyLogin.do,
 				/LoginOut.do,
@@ -19,7 +19,7 @@
 				/OperateStaff.do,
 				/QueryStaff.do,
 				/QueryOTA.do,
-				
+
 				/Login.html,
 				/LoginAdmin.html,
 				/PersonLogin.html,
@@ -54,7 +54,7 @@
 		<url-pattern>*.do</url-pattern>
 	</filter-mapping>
 
-	
+
 	<servlet>
 		<servlet-name>action</servlet-name>
 		<servlet-class>com.wireless.Actions.init.InitServlet</servlet-class>
@@ -132,18 +132,12 @@
 			<param-name>oss_bucket_image</param-name>
 			<param-value>food-image-test</param-value>
 		</init-param>
+		<init-param>
+			<param-name>oss_bucket_finance</param-name>
+			<param-value>weixin-finance-test</param-value>
+		</init-param>
 		<load-on-startup>0</load-on-startup>
 	</servlet>
-
-	<servlet>
-		<servlet-name>finance</servlet-name>
-		<servlet-class>com.wireless.servlets.weixin.FinanceWeixinServlet</servlet-class>
-	</servlet>
-
-	<servlet-mapping>
-		<servlet-name>finance</servlet-name>
-		<url-pattern>/finance</url-pattern>
-	</servlet-mapping>
 
 	<servlet-mapping>
 		<servlet-name>action</servlet-name>
