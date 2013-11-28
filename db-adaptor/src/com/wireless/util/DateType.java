@@ -1,6 +1,5 @@
 package com.wireless.util;
 
-import java.util.Map;
 
 public enum DateType {
 	
@@ -21,80 +20,6 @@ public enum DateType {
 	
 	public String getDesc(){
 		return desc;
-	}
-	
-	/**
-	 * @deprecated
-	 * @param params
-	 * @return
-	 */
-	public static DateType getValue(Map<Object, Object> params){
-		if(params.get(DateType.TODAY) != null)
-			return DateType.TODAY;
-		if(params.get(DateType.HISTORY) != null)
-			return DateType.HISTORY;
-		else
-			return null;
-	}
-	
-	/**
-	 * @deprecated
-	 * @param type
-	 * @return
-	 */
-	public static int getValue(String type){
-		DateType dt = getType(type);
-		if(dt == null){
-			return -1;
-		}else{
-			return dt.getValue();
-		}
-	}
-	
-	/**
-	 * @deprecated
-	 * @param params
-	 * @return
-	 */
-	public static boolean hasType(Map<Object, Object> params){
-		if(params.get(DateType.TODAY) != null)
-			return true;
-		if(params.get(DateType.HISTORY) != null)
-			return true;
-		else
-			return false;
-	}
-	
-	/**
-	 * @deprecated
-	 * @param params
-	 * @return
-	 */
-	public static DateType getType(Map<Object, Object> params){
-		if(params.get(DateType.TODAY) != null)
-			return DateType.TODAY;
-		if(params.get(DateType.HISTORY) != null)
-			return DateType.HISTORY;
-		else
-			return null;
-	}
-	
-	/**
-	 * @deprecated
-	 * @param type
-	 * @return
-	 */
-	public static DateType getType(String type){
-		if(type != null && !type.trim().isEmpty()){
-			if(type.trim().toUpperCase().equals(DateType.TODAY.toString().toUpperCase()))
-				return DateType.TODAY;
-			else if(type.trim().toUpperCase().equals(DateType.HISTORY.toString().toUpperCase()))
-				return DateType.HISTORY;
-			else
-				return null;
-		}else{
-			return null;
-		}
 	}
 	
 	public boolean isToday(){
