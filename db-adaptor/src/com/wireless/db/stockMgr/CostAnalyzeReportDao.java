@@ -87,7 +87,7 @@ public class CostAnalyzeReportDao {
 			extra = " AND S.dept_out = " + dept.getId() + " AND (S.sub_type = " + SubType.STOCK_OUT_TRANSFER.getVal() + " OR S.sub_type = " + SubType.STOCK_IN_TRANSFER.getVal() + ") ";
 			costAnalyze.setStockOutTransferMoney(getMoney(dbCon, term, extraCond + extra, orderClause));
 			//成本金额
-			costAnalyze.setCostMoney(costAnalyze.getPrimeMoney() + costAnalyze.getPickMaterialMoney() - costAnalyze.getStockOutMoney() - costAnalyze.getStockOutTransferMoney());
+			costAnalyze.setCostMoney(costAnalyze.getPrimeMoney() + costAnalyze.getPickMaterialMoney() - costAnalyze.getStockOutMoney() - costAnalyze.getStockOutTransferMoney() - costAnalyze.getEndMoney());
 			
 			costAnalyzes.add(costAnalyze);
 		}

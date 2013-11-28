@@ -101,7 +101,7 @@ public class QueryShiftGeneralDao {
 	 * 			throws if failed to execute any SQL statement
 	 */
 	public static List<ShiftGeneral> getByRange(DBCon dbCon, Staff staff, String onDuty, String offDuty) throws SQLException{
-		return getByCond(dbCon, staff, "AND SH.on_duty >= '" + onDuty + "' AND SH.off_duty <= '" + offDuty + "'", null);
+		return getByCond(dbCon, staff, " AND SH.on_duty >= '" + onDuty + "' AND SH.off_duty <= '" + offDuty + "'", null);
 	}
 	
 	private static List<ShiftGeneral> getByCond(DBCon dbCon, Staff staff, String extraCond, String orderClause) throws SQLException{
@@ -120,8 +120,8 @@ public class QueryShiftGeneralDao {
 			ShiftGeneral shiftGeneral = new ShiftGeneral(dbCon.rs.getInt("id"));
 			shiftGeneral.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
 			shiftGeneral.setStaffName(dbCon.rs.getString("name"));
-			shiftGeneral.setOnDuty(dbCon.rs.getLong("on_duty"));
-			shiftGeneral.setOffDuty(dbCon.rs.getLong("off_duty"));
+			shiftGeneral.setOnDuty(dbCon.rs.getTimestamp("on_duty").getTime());
+			shiftGeneral.setOffDuty(dbCon.rs.getTimestamp("off_duty").getTime());
 			result.add(shiftGeneral);
 		}
 		dbCon.rs.close();

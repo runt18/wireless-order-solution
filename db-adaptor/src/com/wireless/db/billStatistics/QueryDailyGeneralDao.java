@@ -48,7 +48,7 @@ public class QueryDailyGeneralDao {
 	 * 			throws if failed to execute any SQL statement
 	 */
 	public static List<ShiftGeneral> getByRange(DBCon dbCon, Staff staff, String onDuty, String offDuty) throws SQLException{
-		return getByCond(dbCon, staff, "AND DSH.on_duty >= '" + onDuty + "' AND DSH.off_duty <= '" + offDuty + "'", null);
+		return getByCond(dbCon, staff, " AND DSH.on_duty >= '" + onDuty + "' AND DSH.off_duty <= '" + offDuty + "'", null);
 	}
 	
 	private static List<ShiftGeneral> getByCond(DBCon dbCon, Staff staff, String extraCond, String orderClause) throws SQLException{
@@ -57,7 +57,7 @@ public class QueryDailyGeneralDao {
 			  " DSH.restaurant_id, DSH.id, DSH.name, DSH.on_duty, DSH.off_duty " + 
 			  " FROM daily_settle_history DSH "	+
 			  " WHERE 1 = 1 " +
-			  " AND DSH.restaurant_id = " + staff.getRestaurantId() +
+			  " AND DSH.restaurant_id = " + staff.getRestaurantId() + " " +
 			  (extraCond != null ? extraCond : " ") +
 			  (orderClause != null ? orderClause : "");
 		
@@ -67,8 +67,8 @@ public class QueryDailyGeneralDao {
 			ShiftGeneral shiftGeneral = new ShiftGeneral(dbCon.rs.getInt("id"));
 			shiftGeneral.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
 			shiftGeneral.setStaffName(dbCon.rs.getString("name"));
-			shiftGeneral.setOnDuty(dbCon.rs.getLong("on_duty"));
-			shiftGeneral.setOffDuty(dbCon.rs.getLong("off_duty"));
+			shiftGeneral.setOnDuty(dbCon.rs.getTimestamp("on_duty").getTime());
+			shiftGeneral.setOffDuty(dbCon.rs.getTimestamp("off_duty").getTime());
 			result.add(shiftGeneral);
 		}
 		dbCon.rs.close();
