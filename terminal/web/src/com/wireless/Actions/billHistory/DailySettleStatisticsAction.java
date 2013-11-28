@@ -14,10 +14,10 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
+import com.wireless.db.billStatistics.QueryDailyGeneralDao;
 import com.wireless.db.staffMgr.StaffDao;
-import com.wireless.db.system.SystemDao;
 import com.wireless.exception.BusinessException;
-import com.wireless.pojo.system.DailySettle;
+import com.wireless.pojo.billStatistics.ShiftGeneral;
 import com.wireless.util.DataPaging;
 import com.wireless.util.JObject;
 import com.wireless.util.SQLUtil;
@@ -36,7 +36,7 @@ public class DailySettleStatisticsAction extends Action {
 		String start = request.getParameter("start");
 		String limit = request.getParameter("limit");
 		
-		List<DailySettle> list = null;
+		List<ShiftGeneral> list = null;
 		
 		try{
 			
@@ -53,7 +53,8 @@ public class DailySettleStatisticsAction extends Action {
 			
 			Map<Object, Object> paramsSet = new HashMap<Object, Object>();
 			paramsSet.put(SQLUtil.SQL_PARAMS_EXTRA, extra);
-			list = SystemDao.getDailySettle(paramsSet);
+			//FIXME
+			list = QueryDailyGeneralDao.getByRange(StaffDao.verify(Integer.parseInt(pin)), onDuty, offDuty);
 			
 		}catch(BusinessException e){
 			e.printStackTrace();
