@@ -78,14 +78,14 @@ Ext.onReady(function(){
 				].join('')
 			},{
 				items : [{
-					id : 'rd_numTotalBalance',
-					fieldLabel : '账户余额',
+					id : 'rd_numBaseBalance',
+					fieldLabel : '收款总额',
 					disabled : true
 				}]
 			}, {	
 				items : [{
-					id : 'rd_numBaseBalance',
-					fieldLabel : '充值余额',
+					id : 'rd_numTotalBalance',
+					fieldLabel : '账户余额',
 					disabled : true
 				}]
 			}, {
@@ -105,7 +105,7 @@ Ext.onReady(function(){
 			{
 				items : [{
 					id : 'rd_numPayMannerMoney',
-					fieldLabel : '收款金额' + Ext.ux.txtFormat.xh,
+					fieldLabel : '实收金额' + Ext.ux.txtFormat.xh,
 					allowBlank : false,
 					listeners : {
 						render : function(thiz){
@@ -135,7 +135,7 @@ Ext.onReady(function(){
 			}, {
 				items : [{
 					id : 'rd_numRechargeMoney',
-					fieldLabel : '充值金额' + Ext.ux.txtFormat.xh,
+					fieldLabel : '账户充额' + Ext.ux.txtFormat.xh,
 					allowBlank : false
 					//disabled : true
 				}]

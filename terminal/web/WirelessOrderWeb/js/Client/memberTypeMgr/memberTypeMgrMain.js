@@ -28,11 +28,18 @@ function memberAttributeRenderer(val){
 		}
 	}
 };
-function memberTypeRenderer(){
-	return ''
-		   + '<a href="javascript:updateMemberTypeHandler()">修改</a>'
-		   + '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
-		   + '<a href="javascript:deleteMemberTypeHandler()">删除</a>';
+function memberTypeRenderer(v,m,r){
+	//微信会员不可删除
+	if(r.get('type') == 2){
+		return ''
+	   + '<a href="javascript:updateMemberTypeHandler()">修改</a>';
+	}else{
+		return ''
+	   + '<a href="javascript:updateMemberTypeHandler()">修改</a>'
+	   + '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
+	   + '<a href="javascript:deleteMemberTypeHandler()">删除</a>';
+	}
+
 };
 
 function dataInit(){
@@ -66,8 +73,8 @@ function getChecked(checkeds, checkBoxs){
 }
 
 function checkLabel(t){
-	if(t.length > 4){
-		var after = t.substring(0, 4);
+	if(t.length > 5){
+		var after = t.substring(0, 5);
 		return after;
 	}else{
 		return t;
@@ -85,12 +92,12 @@ function memberTypeWinInit(){
 			closable : false,
 			modal : true,
 			resizable : false,
-			width : 250,
+			width : 275,
 			items : [{
 				xtype : 'form',
 				layout : 'form',
 				frame : true,
-				width : 248,
+				width : 275,
 				labelWidth : 70,
 				labelAlign : 'right',
 				defaults : {
@@ -175,7 +182,7 @@ function memberTypeWinInit(){
 				}, {
 					xtype : 'label',
 					autoWidth : true,
-					style : 'color:green;font-szie:12px;',
+					style : 'color:green;font-szie:12px;width : 250px',
 					text : '说明:  所有属性都可使用积分功能, 积分类型只使用该会员类型的折扣信息, 充值则可使用会员资料中基本金额、赠送金额等更多信息'
 				}, {
 					xtype : 'numberfield',
@@ -201,7 +208,7 @@ function memberTypeWinInit(){
 					layout : 'column',
 					id : 'formMemberDiscount',
 					frame : true,
-					width : 220,
+					width : 255,
 					defaults : {
 						columnWidth : .333,
 						layout : 'form',
@@ -216,7 +223,7 @@ function memberTypeWinInit(){
 						
 					}]
 					
-				}, {
+				},{
 					xtype : 'combo',
 					id : 'comboDiscount',
 					fieldLabel : '默认方案' + Ext.ux.txtFormat.xh,
@@ -311,6 +318,7 @@ function memberTypeWinInit(){
 				iconCls : 'btn_close',
 				handler : function(e){
 					memberTypeWin.hide();
+					Ext.getCmp('txtTypeName').enable();
 				}
 			}],
 			listeners : {
@@ -529,7 +537,7 @@ function initMemberTypeGrid(){
 			['折扣方案', 'discount.name',,, 'discountRenderer'],
 			['操作', 'operation', 200, 'center', 'memberTypeRenderer']
 		],
-		['id','name','chargeRate','exchangeRate','discountTypeValue', 'discountTypeText','discountRate','attributeValue',
+		['id','name','chargeRate','exchangeRate','discountTypeValue', 'discountTypeText','type','attributeValue',
 		 'discount', 'discount.id', 'discount.name', 'discount.status', 'initialPoint', 'discounts'],
 		[ ['isPaging', true], ['restaurantID', restaurantID], ['dataSource', 'normal']],
 		30,
@@ -671,6 +679,10 @@ function bindMemberTypeData(d){
 	
 	typeID.setValue(d['id']);
 	typeName.setValue(d['name']);
+	//是微信就不能该名字
+	if(d['type'] == 2){
+		typeName.disable();
+	}
 	exchangeRate.setValue(d['exchangeRate']);
 	initialPoint.setValue(typeof d['initialPoint'] != 'undefined' ? d['initialPoint'] : 0);
 	

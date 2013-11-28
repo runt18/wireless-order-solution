@@ -104,7 +104,7 @@ function loadShiftDuty(){
 			for(var i = 0; i < jr.root.length; i++){
 				bd.root.push(jr.root[i]);
 				bd.root[i].duty = jr.root[i].onDutyFormat + salesSubSplitSymbol + jr.root[i].offDutyFormat;
-				bd.root[i].displayMsg = (jr.root[i].onDutyFormat + ' -- ' + jr.root[i].offDutyFormat + ' (' + jr.root[i].staff.name + ')');
+				bd.root[i].displayMsg = (jr.root[i].onDutyFormat + ' -- ' + jr.root[i].offDutyFormat + ' (' + jr.root[i].staffName + ')');
 			}
 			shiftDutyOfToday = bd;
 		},
