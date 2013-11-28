@@ -464,7 +464,7 @@ public class MemberType implements Jsonable, Parcelable{
 		jm.put("id", this.typeId);
 		jm.put("rid", this.restaurantId);
 		jm.put("name", this.name);
-		//jm.put("discountRate", this.discountRate);
+		jm.put("type", this.type.getVal());
 		jm.put("exchangeRate", this.exchangeRate);
 		jm.put("chargeRate", this.chargeRate);
 		jm.put("initialPoint", this.initialPoint);
