@@ -106,7 +106,7 @@ public class OSSUtil {
     }
     
 	/**
-	 * 
+	 * 普通文件
 	 * @param client
 	 * @param bucketName
 	 * @param key
@@ -143,6 +143,30 @@ public class OSSUtil {
     		throws OSSException, ClientException, NullPointerException, IOException{
     	uploadFile(clientInner, bucketName, key, new File(path), null);
     }
+    /**
+     * 文件流
+     * @param client
+     * @param bucketName
+     * @param key
+     * @param fis
+     * @param objectMeta
+     * @throws OSSException
+     * @throws ClientException
+     * @throws IOException
+     */
+    public static void uploadFile(OSSClient client, String bucketName, String key, InputStream fis, ObjectMetadata objectMeta)
+    		throws OSSException, ClientException, IOException{
+    	objectMeta.setContentLength(fis.available());
+    	client.putObject(BUCKET_IMAGE, key, fis, objectMeta);
+	}
+    public static void uploadFile(String bucketName, String key, InputStream fis)
+    		throws OSSException, ClientException, IOException{
+    	ObjectMetadata objectMeta =  new ObjectMetadata();
+    	objectMeta.setContentLength(fis.available());
+    	uploadFile(clientInner, bucketName, key, fis, objectMeta);
+    }
+    
+    
     
     /**
      * 上传图片
