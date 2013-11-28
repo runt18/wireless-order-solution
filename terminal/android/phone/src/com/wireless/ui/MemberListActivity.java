@@ -327,7 +327,7 @@ public class MemberListActivity extends FragmentActivity {
 					if(mCurrentPage == ALL_MEMBER_PAGE){
 						if(!mInterestedMembers.containsElement(member)){
 							mInterestedMembers.add(member);
-							button.setBackgroundResource(R.drawable.member_list_has_interested_selector);
+							button.setBackgroundResource(R.drawable.member_has_interested);
 							new InterestedInMemberTask(member).execute();
 						}
 					}else if(mCurrentPage == INTERESTED_MEMBER_PAGE){
@@ -343,12 +343,12 @@ public class MemberListActivity extends FragmentActivity {
 			
 			if(mCurrentPage == ALL_MEMBER_PAGE){
 				if(mInterestedMembers.containsElement(mMembers.get(position))){
-					button.setBackgroundResource(R.drawable.member_list_has_interested_selector);
+					button.setBackgroundResource(R.drawable.member_has_interested);
 				}else{
 					button.setBackgroundResource(R.drawable.member_list_interested_selector);
 				}
 			}else if(mCurrentPage == INTERESTED_MEMBER_PAGE){
-				button.setBackgroundResource(R.drawable.member_list_not_interested_selector);
+				button.setBackgroundResource(R.drawable.member_list_has_interested_selector);
 			}
 			
 			//设置姓名,会员类型,电话
