@@ -149,4 +149,28 @@ public class BillBoardDao {
 		}
 	}
 	
+	/**
+	 * 
+	 * @param dbCon
+	 * @param id
+	 * @throws SQLException
+	 * @throws BusinessException
+	 */
+	public static void delete(DBCon dbCon, int id) throws SQLException, BusinessException{
+		String deleteSQL = "DELETE FROM billboard WHERE billboard_id = " + id;
+		if(dbCon.stmt.executeUpdate(deleteSQL) == 0){
+			throw new BusinessException("操作失败, 该记录不存在或已删除.");
+		}
+	}
+	public static void delete(int id) throws SQLException, BusinessException{
+		DBCon dbCon = null;
+		try{
+			dbCon = new DBCon();
+			dbCon.connect();
+			delete(dbCon, id);
+		}finally{
+			if(dbCon != null) dbCon.disconnect();
+		}
+	}
+	
 }
