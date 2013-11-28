@@ -1,8 +1,6 @@
 package com.wireless.Actions.billStatistics;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -14,11 +12,11 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
-import com.wireless.db.billStatistics.QueryDutyRange;
+import com.wireless.db.billStatistics.QueryShiftGeneralDao;
+import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
-import com.wireless.pojo.billStatistics.DutyRange;
+import com.wireless.pojo.billStatistics.ShiftGeneral;
 import com.wireless.util.DataPaging;
-import com.wireless.util.DateType;
 import com.wireless.util.JObject;
 import com.wireless.util.WebParams;
 
@@ -39,10 +37,11 @@ public class DutyRangeStatisticsAction extends DispatchAction {
 		request.setCharacterEncoding("UTF-8");
 		response.setCharacterEncoding("UTF-8");
 		JObject jobject = new JObject();
-		List<DutyRange> list = null;
+		List<ShiftGeneral> list = null;
 		try{
 			String pin = (String)request.getAttribute("pin");
-			list = QueryDutyRange.getDutyRangeByToday(Integer.parseInt(pin));
+			//FIXME
+			list = QueryShiftGeneralDao.getToday(StaffDao.verify(Integer.parseInt(pin)));
 		}catch(Exception e){
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, "操作失败, 数据库操作请求发生错误!");
 			e.printStackTrace();
@@ -69,26 +68,16 @@ public class DutyRangeStatisticsAction extends DispatchAction {
 		request.setCharacterEncoding("UTF-8");
 		response.setCharacterEncoding("UTF-8");
 		JObject jobject = new JObject();
-		List<DutyRange> list = null;
+		List<ShiftGeneral> list = null;
 		String isPaging = request.getParameter("isPaging");
 		String start = request.getParameter("start");
 		String limit = request.getParameter("limit");
 		try{
 			String pin = (String)request.getAttribute("pin");
-			String restaurantID = request.getParameter("restaurantID");
 			String onDuty = request.getParameter("onDuty");
 			String offDuty = request.getParameter("offDuty");
-			
-			Map<Object, Object> paramsSet = new HashMap<Object, Object>();
-			paramsSet.put(DateType.HISTORY, DateType.HISTORY.getValue());
-//			paramsSet.put(SQLUtil.SQL_PARAMS_LIMIT_OFFSET, start);
-//			paramsSet.put(SQLUtil.SQL_PARAMS_LIMIT_ROWCOUNT, limit);
-			paramsSet.put("pin", pin);
-			paramsSet.put("restaurantID", restaurantID);
-			paramsSet.put("onDuty", onDuty);
-			paramsSet.put("offDuty", offDuty);
-			
-			list = QueryDutyRange.getDutyRange(paramsSet);
+			//FIXME
+			list = QueryShiftGeneralDao.getByRange(StaffDao.verify(Integer.parseInt(pin)), onDuty, offDuty);
 			
 		}catch(BusinessException e){	
 			e.printStackTrace();

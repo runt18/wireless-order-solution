@@ -31,7 +31,7 @@ public class OSSUtil {
 //    private static OSSClient imgClientOuter;
     private static ListObjectsRequest imgListRequest;
     
-    public static OSSClient clientInner;
+    private static OSSClient clientInner;
     
     /**
      * 初始化客户端连接池基础信息
@@ -106,7 +106,7 @@ public class OSSUtil {
     }
     
 	/**
-	 * 普通文件
+	 * 
 	 * @param client
 	 * @param bucketName
 	 * @param key
@@ -131,42 +131,28 @@ public class OSSUtil {
     		throw new NullPointerException("错误: 上传文件不能为空.");
     	}
     }
+    
     public static void uploadFile(OSSClient client, String bucketName, String key, String path) 
     		throws OSSException, ClientException, NullPointerException, IOException{
     	uploadFile(client, bucketName, key, new File(path), null);
     }
+    
     public static void uploadFile(String bucketName, String key, File file, ObjectMetadata objectMeta) 
     		throws OSSException, ClientException, NullPointerException, IOException{
     	uploadFile(clientInner, bucketName, key, file, objectMeta);
     }
+    
     public static void uploadFile(String bucketName, String key, String path) 
     		throws OSSException, ClientException, NullPointerException, IOException{
     	uploadFile(clientInner, bucketName, key, new File(path), null);
     }
-    /**
-     * 文件流
-     * @param client
-     * @param bucketName
-     * @param key
-     * @param fis
-     * @param objectMeta
-     * @throws OSSException
-     * @throws ClientException
-     * @throws IOException
-     */
-    public static void uploadFile(OSSClient client, String bucketName, String key, InputStream fis, ObjectMetadata objectMeta)
-    		throws OSSException, ClientException, IOException{
-    	objectMeta.setContentLength(fis.available());
-    	client.putObject(BUCKET_IMAGE, key, fis, objectMeta);
-	}
-    public static void uploadFile(String bucketName, String key, InputStream fis)
-    		throws OSSException, ClientException, IOException{
-    	ObjectMetadata objectMeta =  new ObjectMetadata();
-    	objectMeta.setContentLength(fis.available());
-    	uploadFile(clientInner, bucketName, key, fis, objectMeta);
+    
+    public static void upload(InputStream is, String bucketName, String key) throws IOException{
+    	ObjectMetadata objectMeta = new ObjectMetadata();
+    	objectMeta.setContentLength(is.available());
+    	ensureBucket(clientInner, bucketName);
+    	clientInner.putObject(bucketName, key, is, objectMeta);
     }
-    
-    
     
     /**
      * 上传图片

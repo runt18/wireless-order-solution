@@ -82,20 +82,17 @@ public class EntryAction extends Action{
 					mit.addItem(baidu);
 					mit.addItem(google);
 					
-					mit.setFuncFlag("0");  
 					session.callback(mit);
 				}else if(COMMAND_HELP.equals(msg.getContent())){
 					Msg4Text rmsg =	new Msg4Text();
 					rmsg.setFromUserName(msg.getToUserName());
 					rmsg.setToUserName(msg.getFromUserName());
-					rmsg.setFuncFlag("0");
 					rmsg.setContent("餐厅编号:"+rid+"\nToUserName(openID):"+msg.getToUserName()+"\nFromUserName(开发者微信号):"+msg.getFromUserName());
 					session.callback(rmsg);
 				}else{
 					Msg4Text rmsg =	new Msg4Text();
 					rmsg.setFromUserName(msg.getToUserName());
 					rmsg.setToUserName(msg.getFromUserName());
-					rmsg.setFuncFlag("0");
 					rmsg.setContent(new StringBuilder().append("未知命令\n")
 							.append("输入【h】获取帮助信息\n")
 							.append("输入【m】获得主菜单")

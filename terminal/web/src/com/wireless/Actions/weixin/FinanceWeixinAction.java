@@ -50,7 +50,6 @@ import org.marker.weixin.msg.Msg4Event;
 import org.marker.weixin.msg.Msg4ImageText;
 import org.marker.weixin.msg.Msg4Text;
 
-import com.aliyun.openservices.oss.model.ObjectMetadata;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.billStatistics.QueryIncomeStatisticsDao;
@@ -59,6 +58,7 @@ import com.wireless.db.shift.QueryShiftDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.weixin.finance.WeixinFinanceDao;
 import com.wireless.exception.BusinessException;
+import com.wireless.pojo.billStatistics.IncomeByDept;
 import com.wireless.pojo.billStatistics.IncomeByEachDay;
 import com.wireless.pojo.billStatistics.ShiftDetail;
 import com.wireless.pojo.restaurantMgr.Restaurant;
@@ -70,7 +70,9 @@ import com.wireless.util.OSSUtil;
 
 public class FinanceWeixinAction extends Action {
 	
-	private final static int WEIXIN_CONTENT_LENGTH = 12;
+	private final static int WEIXIN_CONTENT_LENGTH = 32;
+	
+	private String financeBucket;
 	
 	//TOKEN 是你在微信平台开发模式中设置的哦
 	public static final String TOKEN = "xxx";
@@ -80,6 +82,7 @@ public class FinanceWeixinAction extends Action {
 		if(request.getMethod().equalsIgnoreCase("get")){
 			doGet(request, response);
 		}else if(request.getMethod().equalsIgnoreCase("post")){
+			financeBucket = getServlet().getInitParameter("oss_bucket_finance");
 			doPost(request, response);
 		}
 		return null;
@@ -157,7 +160,7 @@ public class FinanceWeixinAction extends Action {
 					//查看最近日结信息
 					session.callback(doCheckRecentDailySettlement(msg));
 					
-				}else if(opeCodes[0].equals("jr")){
+				}else if(opeCodes[0].equals("yy")){
 					//查看今日关注
 					session.callback(doFocusedStatistics(msg));
 					
@@ -165,19 +168,6 @@ public class FinanceWeixinAction extends Action {
 					//显示使用说明
 					session.callback(doManual(msg));
 				}
-				
-				//回复一条消息
-//				Data4Item d1 = new Data4Item("蘑菇建站系统", "测试描述", "http://cms.yl-blog.com/themes/blue/images/logo.png", "cms.yl-blog.com"); 
-//				Data4Item d2 = new Data4Item("雨林博客", "测试描述", "http://www.yl-blog.com/template/ylblog/images/logo.png", "www.yl-blog.com"); 
-//				      
-//				Msg4ImageText mit = new Msg4ImageText();
-//				mit.setFromUserName(msg.getToUserName());
-//				mit.setToUserName(msg.getFromUserName()); 
-//				mit.setCreateTime(msg.getCreateTime());
-//				mit.addItem(d1);
-//				mit.addItem(d2);
-//				mit.setFuncFlag("0");  
-//				session.callback(mit);
 				
 			}
 		});
@@ -258,12 +248,31 @@ public class FinanceWeixinAction extends Action {
 				content.append("餐厅:" + RestaurantDao.getById(dbCon, restaurantId).getName() + "\n");
 				content.append("开始时间:" + new SimpleDateFormat("M月d日 HH:mm").format(onDuty) + "\n");
 				content.append("结束时间:" + new SimpleDateFormat("M月d日 HH:mm").format(offDuty) + "\n");
+				
 				content.append("-----------------\n")
 					   .append(grid3Item(new String[]{"收款", "账单数", "金额"}, new int[]{10, 20}) + "\n")
-					   .append(grid3Item(new String[]{"现金", Integer.toString(detail.getCashAmount()), Float.toString(detail.getCashActualIncome())}, new int[]{10, 20}) + "\n")
-					   .append(grid3Item(new String[]{"刷卡", Integer.toString(detail.getCreditCardAmount()), Float.toString(detail.getCreditActualIncome())}, new int[]{10, 20}) + "\n");
+					   .append(grid3Item(new String[]{"现金", Integer.toString(detail.getCashAmount()), NumericUtil.CURRENCY_SIGN + NumericUtil.float2String2(detail.getCashActualIncome())}, new int[]{10, 16}) + "\n")
+					   .append(grid3Item(new String[]{"刷卡", Integer.toString(detail.getCreditCardAmount()), NumericUtil.CURRENCY_SIGN + NumericUtil.float2String2(detail.getCreditActualIncome())}, new int[]{10, 16}) + "\n");
+				
+				if(detail.getMemberCardAmount() > 0){
+					content.append(grid3Item(new String[]{"会员", Integer.toString(detail.getMemberCardAmount()), NumericUtil.CURRENCY_SIGN + NumericUtil.float2String2(detail.getMemberActualIncome())}, new int[]{10, 16}) + "\n");
+				}
+				if(detail.getSignAmount() > 0){
+					content.append(grid3Item(new String[]{"签单", Integer.toString(detail.getSignAmount()), NumericUtil.CURRENCY_SIGN + NumericUtil.float2String2(detail.getSignActualIncome())}, new int[]{10, 16}) + "\n");
+				}
+				if(detail.getHangAmount() > 0){
+					content.append(grid3Item(new String[]{"挂账", Integer.toString(detail.getHangAmount()), NumericUtil.CURRENCY_SIGN + NumericUtil.float2String2(detail.getHangActualIncome())}, new int[]{10, 16}) + "\n");
+				}
+				
+				content.append("-----------------"
+						+ "\n").append(grid2Item("部门", "销售额", 18) + "\n");
+				for(IncomeByDept incomeByDept : detail.getDeptIncome()){
+					content.append(grid2Item(incomeByDept.getDept().getName(), NumericUtil.CURRENCY_SIGN + NumericUtil.float2String2(incomeByDept.getIncome()), 16)).append("\n");
+					
+				}
+
 				content.append("-----------------\n")
-					   .append(rightAligned("实收总额:" + Float.toString(detail.getTotalActual())) + "\n");
+					   .append("实收总额：" + NumericUtil.CURRENCY_SIGN + NumericUtil.float2String2(detail.getTotalActual()) + "\n");
 				
 				rmsg.setContent(content.toString());
 				
@@ -303,10 +312,10 @@ public class FinanceWeixinAction extends Action {
 			   .append("输入：bd  帐号名  密码\n");
 		content.append("--------2--------\n")
 			   .append("描述：查看最近日结\n")
-			   .append("输入：rj 或 日结\n");
+			   .append("输入：rj\n");
 		content.append("--------3--------\n")
-		   	   .append("描述：查看今天关注\n")
-		   	   .append("输入：jr 或 今日\n");
+		   	   .append("描述：查看近5天营业信息\n")
+		   	   .append("输入：yy\n");
 
 		rmsg.setContent(content.toString());
 		return rmsg;
@@ -323,10 +332,6 @@ public class FinanceWeixinAction extends Action {
 
 		Msg4ImageText mit = new Msg4ImageText();
 		
-		//FileOutputStream fosJpg = null;
-		
-		//File fileJpg = null;
-		
 		DBCon dbCon = null;
 		
 		try{
@@ -335,29 +340,28 @@ public class FinanceWeixinAction extends Action {
 			dbCon.connect();
 			
 			int restaurantId = WeixinFinanceDao.getRestaurantIdByWeixin(dbCon, msg.getFromUserName());
-			//FIXME
+			Calendar c = Calendar.getInstance();
+			c.setTimeInMillis(System.currentTimeMillis());
+			c.add(Calendar.DAY_OF_MONTH, -4);
+			
 			List<IncomeByEachDay> incomes = QueryIncomeStatisticsDao.getIncomeByEachDay(StaffDao.getStaffs(dbCon, restaurantId).get(0), 
-														//DateUtil.format(c.getTimeInMillis(), DateUtil.Pattern.DATE),
-														//DateUtil.format(System.currentTimeMillis(), DateUtil.Pattern.DATE));
-														"2013-08-1",
-														"2013-08-5");
+														DateUtil.format(c.getTimeInMillis(), DateUtil.Pattern.DATE),
+														DateUtil.format(System.currentTimeMillis(), DateUtil.Pattern.DATE)
+														//"2013-08-1",
+														//"2013-08-5"
+														);
 			
 			final String fileNameJpg = "trend_chart_" + msg.getFromUserName() + ".jpg";
 			
 			ByteArrayOutputStream bosJpg = new ByteArrayOutputStream();
 			ChartUtilities.writeChartAsJPEG(bosJpg, 1, createChart(msg, incomes), 360, 280, null);
 			
-			//FIXME the bucket name should be config
-			final String bucketName = "weixin-finance";
-			
 			ByteArrayInputStream bisJpg = new ByteArrayInputStream(bosJpg.toByteArray());
-	    	ObjectMetadata objectMeta = new ObjectMetadata();
-	    	objectMeta.setContentLength(bisJpg.available());
-	    	OSSUtil.clientInner.putObject(bucketName, fileNameJpg, bisJpg, objectMeta);
-	    	
-			//OSSUtil.uploadFile(bucketName, fileNameJpg, fileJpg, null);
+			OSSUtil.upload(bisJpg, financeBucket, fileNameJpg);
+			bosJpg.close();
+	    	bisJpg.close();
 			
-			Data4Item d1 = new Data4Item("最近5天营业额", "走势图", "http://" + bucketName + "." + OSSParams.instance().OSS_OUTER_POINT + "/" + fileNameJpg + "?" + System.currentTimeMillis(), "");
+			Data4Item d1 = new Data4Item("最近5天营业额", "走势图", "http://" + financeBucket + "." + OSSParams.instance().OSS_OUTER_POINT + "/" + fileNameJpg + "?" + System.currentTimeMillis(), "");
 			
 			Data4Item d2 = new Data4Item("最近一天营业额：" + NumericUtil.CURRENCY_SIGN + NumericUtil.float2String2(incomes.get(incomes.size() - 1).getIncomeByPay().getTotalActual()), 
 										 "", "http://www.yl-blog.com/template/ylblog/images/logo.png", ""); 
@@ -367,9 +371,9 @@ public class FinanceWeixinAction extends Action {
 			for(IncomeByEachDay incomeEachDay : incomes){
 				averageIncome += incomeEachDay.getIncomeByPay().getTotalActual();
 			}
-			averageIncome = averageIncome / 5;
+			averageIncome = averageIncome / incomes.size();
 			Data4Item d3 = new Data4Item("近5天平均营业额：" + NumericUtil.CURRENCY_SIGN + NumericUtil.float2String2(averageIncome), 
-					 "", "http://www.yl-blog.com/template/ylblog/images/logo.png", ""); 
+					 					 "", "http://www.yl-blog.com/template/ylblog/images/logo.png", ""); 
 			      
 			mit.setFromUserName(msg.getToUserName());
 			mit.setToUserName(msg.getFromUserName()); 
@@ -384,20 +388,11 @@ public class FinanceWeixinAction extends Action {
 			Msg4Text rmsg =	new Msg4Text();
 			rmsg.setFromUserName(msg.getToUserName());
 			rmsg.setToUserName(msg.getFromUserName());
-			//rmsg.setContent(e.getMessage());
-			rmsg.setContent("对不起,暂时不能生成今日关注信息哦:-(");
+			rmsg.setContent(e.getMessage());
+			//rmsg.setContent("对不起,暂时不能生成今日关注信息哦:-(");
 			return rmsg;
 			
 		}finally{
-//			try {
-//				if(fosJpg != null){
-//					fosJpg.close();
-//				}
-//			} catch (IOException ignored) {	}
-//			
-//			if(fileJpg != null){
-//				fileJpg.delete();
-//			}
 			if(dbCon != null){
 				dbCon.disconnect();
 			}
@@ -513,7 +508,7 @@ public class FinanceWeixinAction extends Action {
 			int leftSpaceAmt = (WEIXIN_CONTENT_LENGTH - content.getBytes("GBK").length) / 2;
 			StringBuilder space = new StringBuilder();
 			for(int i = 0; i < leftSpaceAmt; i++){
-				space.append('\b');
+				space.append(" ");
 			}
 			var = var.replace("$(space_left)", space);
 			
@@ -525,6 +520,7 @@ public class FinanceWeixinAction extends Action {
 		return var;
 	}
 	
+	@SuppressWarnings("unused")
 	private String rightAligned(String content){
 		String var = "$(space_left)$(value)";
 		try{
@@ -535,7 +531,7 @@ public class FinanceWeixinAction extends Action {
 			int leftSpaceAmt = WEIXIN_CONTENT_LENGTH - content.getBytes("GBK").length;
 			StringBuilder space = new StringBuilder();
 			for(int i = 0; i < leftSpaceAmt; i++){
-				space.append("\b");
+				space.append(" ");
 			}
 			var = var.replace("$(space_left)", space);
 			
@@ -564,6 +560,29 @@ public class FinanceWeixinAction extends Action {
 			}
 			
 			return items[0] + space1 + items[1] + space2 + items[2];
+			
+		}catch(UnsupportedEncodingException e){
+			return "Unsupported Encoding";
+		}
+	}
+	
+	private String grid2Item(String item1, String item2, int pos){
+		try{
+			
+			int nSpace;
+			if(pos < 0){
+				nSpace = WEIXIN_CONTENT_LENGTH - 
+						 item1.getBytes("GBK").length - 
+						 item2.getBytes("GBK").length - 1;
+			}else{
+				nSpace = pos - item1.getBytes("GBK").length;
+			}
+			StringBuilder space = new StringBuilder();
+			for(int i = 0; i < nSpace; i++){
+				space.append(" ");
+			}
+			
+			return item1 + space + item2;
 			
 		}catch(UnsupportedEncodingException e){
 			return "Unsupported Encoding";
