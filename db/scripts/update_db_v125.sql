@@ -139,11 +139,20 @@ ALTER TABLE `wireless_order_db`.`member_type`
 ADD COLUMN `type` TINYINT NOT NULL DEFAULT 1 COMMENT 'the type as below\n1 - normal\n2 - reserved' AFTER `initial_point`;
 
 -- -----------------------------------------------------
--- Insert the reserved member type to each restaurant
+-- Insert the reserved weixin member type to each restaurant
 -- -----------------------------------------------------
 INSERT INTO `wireless_order_db`.`member_type`
 (`restaurant_id`, `name`, `type`)
 SELECT id, '微信会员', 2 FROM `wireless_order_db`.`restaurant` WHERE id > 10;
+
+-- -----------------------------------------------------
+-- Insert the discount to each weixin member type
+-- -----------------------------------------------------
+INSERT INTO wireless_order_db.member_type_discount
+(`member_type_id`, `discount_id`, `type`)
+SELECT MT.member_type_id, D.discount_id, 2 FROM wireless_order_db.member_type MT
+JOIN wireless_order_db.discount D ON MT.restaurant_id = D.restaurant_id AND (D.status = 2 OR D.status = 3)
+WHERE MT.type = 2;
 
 -- -----------------------------------------------------
 -- Table `wireless_order_db`.`weixin_finance`
@@ -251,5 +260,36 @@ DEFAULT CHARACTER SET = utf8;
 -- -----------------------------------------------------
 ALTER TABLE `wireless_order_db`.`material` 
 ADD COLUMN `delta` FLOAT NOT NULL DEFAULT 0 AFTER `price`;
+
+-- -----------------------------------------------------
+-- Table `wireless_order_db`.`billboard`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `wireless_order_db`.`billboard` ;
+
+CREATE TABLE IF NOT EXISTS `wireless_order_db`.`billboard` (
+  `billboard_id` INT NOT NULL AUTO_INCREMENT,
+  `restaurant_id` INT NOT NULL,
+  `title` VARCHAR(45) NOT NULL,
+  `desc` VARCHAR(500) NULL DEFAULT NULL,
+  `created` DATETIME NOT NULL,
+  `expired` DATETIME NOT NULL,
+  `type` TINYINT NOT NULL DEFAULT 1 COMMENT 'the type as below.\n1 - system\n2 - restaurant',
+  PRIMARY KEY (`billboard_id`),
+  INDEX `ix_restaurant_id` (`restaurant_id` ASC))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
+-- -----------------------------------------------------
+-- Drop the field 'current_material_month' in table 'setting'
+-- -----------------------------------------------------
+ALTER TABLE `wireless_order_db`.`setting` DROP COLUMN `current_material_month`;
+
+-- -----------------------------------------------------
+-- Update the role to staff whose type is normal and role is admin to boss
+-- -----------------------------------------------------
+UPDATE wireless_order_db.staff S 
+JOIN wireless_order_db.role R ON S.role_id = R.role_id 
+SET S.role_id = (SELECT role_id FROM wireless_order_db.role WHERE restaurant_id = S.restaurant_id AND cate = 2)
+WHERE S.type <> 2 AND R.cate = 1;
 
 SET SQL_SAFE_UPDATES = @OLD_SAFE_UPDATES;
