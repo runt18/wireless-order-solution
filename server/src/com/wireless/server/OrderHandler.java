@@ -210,7 +210,7 @@ class OrderHandler implements Runnable{
 				}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.UPDATE_ORDER){
 					//handle update order request
 					Order orderToUpdate = new Parcel(request.body).readParcel(Order.CREATOR);
-					DiffResult diffResult = UpdateOrder.execByID(staff, orderToUpdate);
+					DiffResult diffResult = UpdateOrder.execById(staff, orderToUpdate);
 					List<Printer> printers = PrinterDao.getPrinters(staff);
 					
 					if(request.header.reserved == PrintOption.DO_PRINT.getVal()){
