@@ -403,7 +403,7 @@ function operateMaterialHandler(c){
 		materialCate.clearInvalid();
 		materialCate.setDisabled(false);
 	}else if(c.otype == Ext.ux.otype['update']){
-		var data = Ext.ux.getSelData(materialBasicGrid);
+		var data = Ext.ux.getSelData(inventory_materialBasicGrid);
 		if(!data){
 			Ext.example.msg('提示', '请选中一条原料信息再进行操作.');
 			return;
@@ -416,7 +416,7 @@ function operateMaterialHandler(c){
 		
 		materialCate.setDisabled(true);
 	}else if(c.otype == Ext.ux.otype['delete']){
-		var data = Ext.ux.getSelData(materialBasicGrid);
+		var data = Ext.ux.getSelData(inventory_materialBasicGrid);
 		if(!data){
 			Ext.example.msg('提示', '请选中一条原料信息再进行操作.');
 			return;
@@ -565,7 +565,7 @@ function initControl(){
 			handler : function(){
 				var sn = materialCateTree.getSelectionModel().getSelectedNode();
 				var name = Ext.getCmp('txtSearchForMaterialName');
-				var gs = materialBasicGrid.getStore();
+				var gs = inventory_materialBasicGrid.getStore();
 				gs.baseParams['cateId'] = (sn == null || !sn || sn.attributes.cateId == -1 ? '' : sn.attributes.cateId);
 				gs.baseParams['name'] = name.getValue();
 				gs.load({
@@ -595,22 +595,22 @@ function initControl(){
 			}
 		}]
 	});
-	materialBasicGrid = createGridPanel(
-		'materialBasicGrid',
+	inventory_materialBasicGrid = createGridPanel(
+		'inventory_materialBasicGrid',
 		'原料信息',
 		'',
 		'',
 		'../../QueryMaterial.do',
 		[
 			[true, false, false, true], 
-			['原料名称', 'name'],
+			['原料名称', 'name', 150],
 			['所属类别', 'cateName'],
 			['总数量', 'stock'],
 			['单位成本', 'price'],
 			['状态', 'statusText'],
 			['最后修改人', 'lastModStaff'],
 			['最后修改时间', 'lastModDateFormat', 150],
-			['操作', 'operate', 200, 'center', 'materialBasicGridOperateRenderer']
+			['操作', 'operate', 150, 'center', 'materialBasicGridOperateRenderer']
 		],
 		['id', 'name', 'cateId', 'cateName', 'stock', 'price', 'statusValue', 'statusText',
 		 'lastModStaff', 'lastModDate', 'lastModDateFormat'],
@@ -619,8 +619,8 @@ function initControl(){
 		'',
 		materialBasicGridTbar
 	);
-	materialBasicGrid.region = 'center';
-	materialBasicGrid.on('rowdblclick', function(){
+	inventory_materialBasicGrid.region = 'center';
+	inventory_materialBasicGrid.on('rowdblclick', function(){
 		operateMaterialHandler({otype:Ext.ux.otype['update']});		
 	});
 }
@@ -658,7 +658,7 @@ Ext.onReady(function(){
 		//width : parseInt(Ext.getDom('divMaterial').parentElement.style.width.replace(/px/g,'')),
 		height : parseInt(Ext.getDom('divMaterial').parentElement.style.height.replace(/px/g,'')),
 		frame : true,
-		items : [materialCateTree, materialBasicGrid]
+		items : [materialCateTree, inventory_materialBasicGrid]
 /*		tbar : new Ext.Toolbar({
 			height : 55,
 			items : [btnAddMaterialCate, {
