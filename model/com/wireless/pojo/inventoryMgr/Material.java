@@ -297,7 +297,7 @@ public class Material implements Jsonable {
 	
 	@Override
 	public Map<String, Object> toJsonMap(int flag) {
-		DecimalFormat df = new DecimalFormat("#.00");
+		DecimalFormat df = new DecimalFormat("0.00");
 		Map<String, Object> jm = new LinkedHashMap<String, Object>();
 		jm.put("id", this.getId());
 		jm.put("pinyin", this.getPinyin());
