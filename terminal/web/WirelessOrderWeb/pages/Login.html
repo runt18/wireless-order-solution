@@ -268,8 +268,8 @@ function setCookie(cookiename, cookievalue, days) {
 	}     
 	document.onload = validteCode();  
 	$(function(){
-		// 加载公告信息
 		$('#validCode').val("");
+		// 加载公告信息
 		$.ajax({
 			url : '../QueryBillboard.do',
 			data : {
