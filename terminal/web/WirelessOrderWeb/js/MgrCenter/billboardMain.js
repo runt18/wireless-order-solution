@@ -207,7 +207,45 @@ function operateBillboard(c){
 		winBillboard.initData.set(data);
 		winBillboard.show();
 	}else if(c.otype == 'delete'){
-		
+		var data = Ext.ux.getSelData(billboradGrid);
+		if(!data){
+			Ext.ux.showMsg({
+				msg : '请选中一条记录再进行操作.'
+			});
+			return;
+		}
+		Ext.Msg.show({
+			title : '重要',
+			msg : '是否删除公告信息?(不可恢复)',
+			buttons : Ext.Msg.YESNO,
+			fn : function(btn){
+				if(btn == 'yes'){
+					var mask = new Ext.LoadMask(document.body, {
+						msg : '操作请求中, 请稍候...'
+					});
+					mask.show();
+					Ext.Ajax.request({
+						url : '../../OperateBillboard.do',
+						params : {
+							dataSource : 'delete',
+							id : data['id']
+						},
+						success : function(response, options){
+							mask.hide();
+							var jr = Ext.decode(response.responseText);
+							Ext.ux.showMsg(jr);
+							if(jr.success){
+								Ext.getCmp('btnSearchForBillboardGrid').handler();
+							}
+						},
+						failure : function(response, options){
+							mask.hide();
+							Ext.ux.showMsg(Ext.decode(response.responseText));
+						}
+					});
+				}
+			}
+		});
 	}
 }
 

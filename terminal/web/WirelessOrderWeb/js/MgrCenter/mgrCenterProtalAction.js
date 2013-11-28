@@ -15,8 +15,8 @@ var protalFuncReg = function() {
 	});
 	
 	bindActiveEvent("billboardMgr",
-		"url(../images/deviceMgr_select.png) no-repeat 50%",
-		"url(../images/deviceMgr.png) no-repeat 50%",
+		"url(../images/billboard_select.png) no-repeat 50%",
+		"url(../images/billboard.png) no-repeat 50%",
 		"MgrCenter_Module/BillboardMgr.html"
 	);
 };
