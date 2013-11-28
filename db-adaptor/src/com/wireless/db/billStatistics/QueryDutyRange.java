@@ -33,7 +33,7 @@ public class QueryDutyRange {
 	 * @return	the result to duty range,
 	 * 			return null if no corresponding daily settle record exist within this period
 	 * @throws SQLException
-	 * 			throws if any error occurred while execute any SQL statements.
+	 * 			throws if any error occurred while execute any SQL statements
 	 */
 	public static DutyRange exec(DBCon dbCon, Staff staff, String onDuty, String offDuty) throws SQLException{
 		try{
@@ -73,18 +73,25 @@ public class QueryDutyRange {
 	}
 	
 	/**
-	 * 
-	 * @param pin
+	 * Get the records to daily settle history whose off duty is between on and off duty(two input parameters),
+	 * The on duty to duty range is the earliest date of those daily settle history record,
+	 * and the off duty to duty range is the latest date.
+	 * @param staff
+	 * 			the terminal to query
 	 * @param onDuty
+	 * 			the on duty
 	 * @param offDuty
-	 * @return
-	 * @throws Exception
+	 * 			the off duty 
+	 * @return	the result to duty range,
+	 * 			return null if no corresponding daily settle record exist within this period
+	 * @throws SQLException
+	 * 			throws if any error occurred while execute any SQL statements
 	 */
-	public static DutyRange exec(int staffId, String onDuty, String offDuty) throws Exception{
+	public static DutyRange exec(Staff staff, String onDuty, String offDuty) throws Exception{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return QueryDutyRange.exec(dbCon, StaffDao.getStaffById(dbCon, staffId), onDuty, offDuty);
+			return QueryDutyRange.exec(dbCon, staff, onDuty, offDuty);
 		}catch(Exception e){
 			throw e;
 		}finally{
@@ -99,7 +106,7 @@ public class QueryDutyRange {
 	 * @return
 	 * @throws Exception
 	 */
-	public static List<DutyRange> getDutyRangeByToday(DBCon dbCon, int staffId) throws Exception{
+	private static List<DutyRange> getDutyRangeByToday(DBCon dbCon, int staffId) throws Exception{
 		List<DutyRange> result = new ArrayList<DutyRange>();
 		
 		Staff staff = StaffDao.getStaffById(dbCon, staffId);
@@ -144,7 +151,7 @@ public class QueryDutyRange {
 	 * @return
 	 * @throws Exception
 	 */
-	public static List<DutyRange> getDutyRangeByToday(int staffId) throws Exception{
+	private static List<DutyRange> getDutyRangeByToday(int staffId) throws Exception{
 		DBCon dbCon = new DBCon();
 		List<DutyRange> list = null;
 		try{
@@ -192,7 +199,7 @@ public class QueryDutyRange {
 	 * @return
 	 * @throws Exception
 	 */
-	public static List<DutyRange> getDutyRangeByHistory(Map<Object, Object> params) throws Exception{
+	private static List<DutyRange> getDutyRangeByHistory(Map<Object, Object> params) throws Exception{
 		DBCon dbCon = new DBCon();
 		List<DutyRange> list = null;
 		try{
@@ -213,7 +220,7 @@ public class QueryDutyRange {
 	 * @return
 	 * @throws Exception
 	 */
-	public static List<DutyRange> getDutyRange(DBCon dbCon, Map<Object, Object> params) throws Exception{
+	private static List<DutyRange> getDutyRange(DBCon dbCon, Map<Object, Object> params) throws Exception{
 		List<DutyRange> list = null;
 		if(DateType.getType(params) == DateType.TODAY){
 			Object pin = params.get("pin");
@@ -247,7 +254,7 @@ public class QueryDutyRange {
 	 * @return
 	 * @throws Exception
 	 */
-	public static List<DutyRange> getDutyRange(Map<Object, Object> params) throws Exception{
+	private static List<DutyRange> getDutyRange(Map<Object, Object> params) throws Exception{
 		DBCon dbCon = new DBCon();
 		List<DutyRange> list = null;
 		try{
