@@ -1,13 +1,9 @@
 package com.wireless.Actions.billHistory;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import net.sf.json.JSONObject;
 
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
@@ -17,10 +13,9 @@ import org.apache.struts.action.ActionMapping;
 import com.wireless.db.billStatistics.QueryDailyGeneralDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
+import com.wireless.json.JObject;
 import com.wireless.pojo.billStatistics.ShiftGeneral;
 import com.wireless.util.DataPaging;
-import com.wireless.util.JObject;
-import com.wireless.util.SQLUtil;
 import com.wireless.util.WebParams;
 
 public class DailySettleStatisticsAction extends Action {
@@ -43,16 +38,8 @@ public class DailySettleStatisticsAction extends Action {
 			String pin = (String)request.getAttribute("pin");
 			StaffDao.verify(Integer.parseInt(pin));
 			
-			String restaurantID = request.getParameter("restaurantID");
 			String onDuty = request.getParameter("onDuty");
 			String offDuty = request.getParameter("offDuty");
-			String extra = "";
-			
-			extra += (" AND A.restaurant_id = " + restaurantID);
-			extra += (" AND A.off_duty BETWEEN '" + onDuty + "' AND '" + offDuty + "' ");
-			
-			Map<Object, Object> paramsSet = new HashMap<Object, Object>();
-			paramsSet.put(SQLUtil.SQL_PARAMS_EXTRA, extra);
 			//FIXME
 			list = QueryDailyGeneralDao.getByRange(StaffDao.verify(Integer.parseInt(pin)), onDuty, offDuty);
 			
@@ -68,8 +55,7 @@ public class DailySettleStatisticsAction extends Action {
 				jobject.setTotalProperty(list.size());
 				jobject.setRoot(DataPaging.getPagingData(list, isPaging, start, limit));
 			}
-			JSONObject json = JSONObject.fromObject(jobject);
-			response.getWriter().print(json.toString());
+			response.getWriter().print(jobject.toString());
 		}
 		
 		return null;

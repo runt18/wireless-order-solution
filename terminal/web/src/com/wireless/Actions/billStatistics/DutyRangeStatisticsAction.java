@@ -5,8 +5,6 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import net.sf.json.JSONObject;
-
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
@@ -15,9 +13,9 @@ import org.apache.struts.actions.DispatchAction;
 import com.wireless.db.billStatistics.QueryShiftGeneralDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
+import com.wireless.json.JObject;
 import com.wireless.pojo.billStatistics.ShiftGeneral;
 import com.wireless.util.DataPaging;
-import com.wireless.util.JObject;
 import com.wireless.util.WebParams;
 
 public class DutyRangeStatisticsAction extends DispatchAction {
@@ -40,15 +38,13 @@ public class DutyRangeStatisticsAction extends DispatchAction {
 		List<ShiftGeneral> list = null;
 		try{
 			String pin = (String)request.getAttribute("pin");
-			//FIXME
 			list = QueryShiftGeneralDao.getToday(StaffDao.verify(Integer.parseInt(pin)));
 		}catch(Exception e){
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, "操作失败, 数据库操作请求发生错误!");
 			e.printStackTrace();
 		}finally{
 			jobject.setRoot(list);
-			JSONObject json = JSONObject.fromObject(jobject);
-			response.getWriter().print(json.toString());
+			response.getWriter().print(jobject.toString());
 		}
 		return null;
 	}
@@ -76,7 +72,6 @@ public class DutyRangeStatisticsAction extends DispatchAction {
 			String pin = (String)request.getAttribute("pin");
 			String onDuty = request.getParameter("onDuty");
 			String offDuty = request.getParameter("offDuty");
-			//FIXME
 			list = QueryShiftGeneralDao.getByRange(StaffDao.verify(Integer.parseInt(pin)), onDuty, offDuty);
 			
 		}catch(BusinessException e){	
@@ -90,8 +85,7 @@ public class DutyRangeStatisticsAction extends DispatchAction {
 				jobject.setTotalProperty(list.size());
 				jobject.setRoot(DataPaging.getPagingData(list, isPaging, start, limit));
 			}
-			JSONObject json = JSONObject.fromObject(jobject);
-			response.getWriter().print(json.toString());
+			response.getWriter().print(jobject.toString());
 		}
 		return null;
 	}
