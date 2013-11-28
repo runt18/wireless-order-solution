@@ -237,7 +237,7 @@
                     android:layout_height="wrap_content"
                     android:background="@color/transparent"
                     android:scaleType="fitXY"
-                    android:src="@drawable/sellout_on_sale_selector" />
+                    android:src="@drawable/member_favor_selector" />
             </RelativeLayout>
 
             <RelativeLayout
@@ -251,7 +251,7 @@
                     android:layout_height="wrap_content"
                     android:background="@color/transparent"
                     android:scaleType="fitXY"
-                    android:src="@drawable/sellout_off_sale_selector" />
+                    android:src="@drawable/member_comment_selector" />
             </RelativeLayout>
         </LinearLayout>
     </RelativeLayout>

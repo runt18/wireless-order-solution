@@ -58,21 +58,6 @@
         android:visibility="gone" />
 
     <TextView
-        android:id="@+id/txtView_amount_right"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignRight="@+id/btn_right"
-        android:layout_alignTop="@+id/btn_right"
-        android:background="@drawable/hint"
-        android:paddingLeft="8dp"
-        android:paddingRight="8dp"
-        android:paddingTop="3dp"
-        android:layout_marginRight="-8dp"
-        android:layout_marginTop="-3dp"
-        android:visibility="gone"
-        android:textColor="@color/white" />
-
-    <TextView
         android:id="@+id/textView_left"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -81,6 +66,36 @@
         android:layout_marginLeft="18dp"
         android:textColor="#FFFFFF"
         android:textSize="18sp"
+        android:visibility="gone" />
+
+    <TextView
+        android:id="@+id/txtView_amount_right_topBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignRight="@+id/btn_right"
+        android:layout_alignTop="@+id/btn_right"
+        android:layout_marginRight="-8dp"
+        android:layout_marginTop="-3dp"
+        android:background="@drawable/hint"
+        android:paddingLeft="8dp"
+        android:paddingRight="8dp"
+        android:paddingTop="3dp"
+        android:textColor="@color/white"
+        android:visibility="gone" />
+
+    <TextView
+        android:id="@+id/txtView_amount_left_topBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignRight="@+id/btn_left"
+        android:layout_alignTop="@+id/btn_left"
+        android:layout_marginRight="-8dp"
+        android:layout_marginTop="-3dp"
+        android:background="@drawable/hint"
+        android:paddingLeft="8dp"
+        android:paddingRight="8dp"
+        android:paddingTop="3dp"
+        android:textColor="@color/white"
         android:visibility="gone" />
 
     <ImageButton

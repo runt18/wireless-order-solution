@@ -79,7 +79,7 @@
                 android:layout_height="wrap_content"
                 android:background="@color/transparent"
                 android:scaleType="fitXY"
-                android:src="@drawable/sellout_on_sale_selector" />
+                android:src="@drawable/member_all_selector" />
 
             <TextView
                 android:id="@+id/txtView_allMemberAmount_memberList"
@@ -114,7 +114,7 @@
                 android:layout_height="wrap_content"
                 android:background="@color/transparent"
                 android:scaleType="fitXY"
-                android:src="@drawable/sellout_off_sale_selector" />
+                android:src="@drawable/member_interested_selector" />
 
             <TextView
                 android:id="@+id/txtView_interestedMemberAmount_memberList"
