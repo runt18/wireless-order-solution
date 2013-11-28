@@ -337,9 +337,7 @@ Ext.onReady(function(){
 		viewConfig : {
 			forceFit : true		
 		},
-		selModel : new Ext.grid.RowSelectionModel({  
-            singleSelect : false  
-        }),
+		selModel : new Ext.grid.RowSelectionModel(),
 		listeners : {
 			afteredit : function(e){
 				e.record.set('delta', e.record.get('presentPrice') - e.record.get('price'));
