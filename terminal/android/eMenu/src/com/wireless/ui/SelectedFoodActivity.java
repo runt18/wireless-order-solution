@@ -410,13 +410,14 @@ public class SelectedFoodActivity extends Activity implements
 					final View stateHurrySignal = layout.findViewById(R.id.imageView_pickedFood_hurry_item);  	
 					Button deleteBtn = (Button) layout.findViewById(R.id.button_delete_pickedFood_list_item);
 					//催菜状态显示
-					if(orderFood.isHurried())
+					if(orderFood.isHurried()){
 						stateHurrySignal.setVisibility(View.VISIBLE);
-					else stateHurrySignal.setVisibility(View.INVISIBLE);
+					}else{
+						stateHurrySignal.setVisibility(View.INVISIBLE);
+					}
 
 					//已点菜部分
-					if(map.containsKey(ITEM_IS_ORI_FOOD))
-					{
+					if(map.containsKey(ITEM_IS_ORI_FOOD)){
 						//删菜按钮
 						//已点菜显示退菜
 						deleteBtn.setText("退菜");
@@ -449,8 +450,8 @@ public class SelectedFoodActivity extends Activity implements
 						});
 
 						//如果是退菜
-						if(map.containsKey(ITEM_IS_OFFSET))
-						{
+						if(map.containsKey(ITEM_IS_OFFSET)){
+							
 							hurryBtn.setVisibility(View.INVISIBLE);
 							(layout.findViewById(R.id.view_pickedFood_cancel_line)).setVisibility(View.VISIBLE);
 							countEditText.setText(map.get(ITEM_FOOD_OFFSET).toString());
@@ -770,7 +771,6 @@ public class SelectedFoodActivity extends Activity implements
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_selected_food);
-		//XXX
 		mImageFetcher = new ImageFetcher(this, 400, 300);
 
 		//根据不同的分辨率设置对话框大小 
@@ -1008,43 +1008,40 @@ public class SelectedFoodActivity extends Activity implements
 			super(SelectedFoodActivity.this);
 
 			final Context context = SelectedFoodActivity.this;
-			View view = LayoutInflater.from(context).inflate(
-					R.layout.delete_count_dialog, null);
+			View view = LayoutInflater.from(context).inflate(R.layout.delete_count_dialog, null);
 			setContentView(view);
 			this.setTitle("请输入" + method + "的数量");
 
 			// 删除数量默认为此菜品的点菜数量
-			final EditText countEdtTxt = (EditText) view
-					.findViewById(R.id.editText_count_deleteCount);
+			final EditText countEdtTxt = (EditText) view.findViewById(R.id.editText_count_deleteCount);
 			countEdtTxt.setText(NumericUtil.float2String2(selectedFood.getCount()));
 			countEdtTxt.selectAll();
+			
 			// 增加数量
-			((ImageButton) view
-					.findViewById(R.id.imageButton_plus_deleteCount_dialog))
-					.setOnClickListener(new View.OnClickListener() {
-						@Override
-						public void onClick(View v) {
-							if (!countEdtTxt.getText().toString().equals("")) {
-								float curNum = Float.parseFloat(countEdtTxt
-										.getText().toString());
-								countEdtTxt.setText(NumericUtil
-										.float2String2(++curNum));
-							}
+			((ImageButton) view.findViewById(R.id.imageButton_plus_deleteCount_dialog))
+				.setOnClickListener(new View.OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						if (!countEdtTxt.getText().toString().equals("")) {
+							float curNum = Float.parseFloat(countEdtTxt
+									.getText().toString());
+							countEdtTxt.setText(NumericUtil
+									.float2String2(++curNum));
 						}
-					});
+					}
+			});
 			// 减少数量
-			((ImageButton) findViewById(R.id.imageButton_minus_deleteCount_dialog))
-					.setOnClickListener(new View.OnClickListener() {
-						@Override
-						public void onClick(View v) {
-							if (!countEdtTxt.getText().toString().equals("")) {
-								float curNum = Float.parseFloat(countEdtTxt.getText().toString());
-								if (--curNum >= 1) {
-									countEdtTxt.setText(NumericUtil.float2String2(curNum));
-								}
-							}
+			((ImageButton) findViewById(R.id.imageButton_minus_deleteCount_dialog)).setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					if (!countEdtTxt.getText().toString().equals("")) {
+						float curNum = Float.parseFloat(countEdtTxt.getText().toString());
+						if (--curNum >= 1) {
+							countEdtTxt.setText(NumericUtil.float2String2(curNum));
 						}
-					});
+					}
+				}
+			});
 
 			// "确定"Button
 			Button okBtn = (Button) view.findViewById(R.id.button_confirm_deleteCount);
@@ -1060,9 +1057,9 @@ public class SelectedFoodActivity extends Activity implements
 							/**
 							 * 如果数量相等，则从列表中删除此菜
 							 */
-							if (method.equals(DELETE))
+							if (method.equals(DELETE)){
 								ShoppingCart.instance().remove(selectedFood, WirelessOrder.loginStaff);
-							else if (method.equals(RETREAT)) {
+							}else if (method.equals(RETREAT)) {
 								selectedFood.removeCount(cancelAmount, WirelessOrder.loginStaff);
 							}
 
@@ -1073,11 +1070,9 @@ public class SelectedFoodActivity extends Activity implements
 							} else {
 								mFoodListHandler.sendEmptyMessage(SelectedFoodActivity.LIST_CHANGED);
 								dismiss();
-								Toast.makeText(
-										context,
-										method + "\"" + selectedFood.toString()
-												+ "\"" + cancelAmount + "份成功",
-										Toast.LENGTH_SHORT).show();
+								Toast.makeText(context,	
+											   method + "\"" + selectedFood.toString() + "\"" + cancelAmount + "份成功",
+											   Toast.LENGTH_SHORT).show();
 							}
 
 						} else if (foodAmount > cancelAmount) {
@@ -1085,34 +1080,29 @@ public class SelectedFoodActivity extends Activity implements
 							 * 如果删除数量少于已点数量，则相应减去删除数量
 							 */
 							selectedFood.removeCount(cancelAmount, WirelessOrder.loginStaff);
-							mFoodListHandler
-									.sendEmptyMessage(SelectedFoodActivity.LIST_CHANGED);
+							mFoodListHandler.sendEmptyMessage(SelectedFoodActivity.LIST_CHANGED);
 							dismiss();
-							Toast.makeText(
-									context,
-									method + "\"" + selectedFood.toString()
-											+ "\"" + cancelAmount + "份成功",
-									Toast.LENGTH_SHORT).show();
+							Toast.makeText(context,
+										   method + "\"" + selectedFood.toString() + "\"" + cancelAmount + "份成功",
+										   Toast.LENGTH_SHORT).show();
 
 						} else {
 							Toast.makeText(context,
-									"输入的" + method + "数量大于已点数量, 请重新输入",
-									Toast.LENGTH_SHORT).show();
+										  "输入的" + method + "数量大于已点数量, 请重新输入",
+										  Toast.LENGTH_SHORT).show();
 						}
 
 					} catch (NumberFormatException e) {
-						Toast.makeText(context, "你输入的" + method + "数量不正确",
-								Toast.LENGTH_SHORT).show();
+						Toast.makeText(context, "你输入的" + method + "数量不正确", Toast.LENGTH_SHORT).show();
 					} catch (BusinessException e) {
-						e.printStackTrace();
+						Toast.makeText(context, e.getMessage(), Toast.LENGTH_SHORT).show();
 					}
 
 				}
 			});
 
 			// "取消"Button
-			Button cancelBtn = (Button) view
-					.findViewById(R.id.button_cancel_deleteCount);
+			Button cancelBtn = (Button) view.findViewById(R.id.button_cancel_deleteCount);
 			cancelBtn.setText("取消");
 			cancelBtn.setOnClickListener(new View.OnClickListener() {
 				@Override
