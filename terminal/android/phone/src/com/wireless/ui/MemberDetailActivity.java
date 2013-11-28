@@ -75,7 +75,7 @@ public class MemberDetailActivity extends FragmentActivity {
 		public void handleMessage(Message msg){
 			final MemberDetailActivity theActivity = mActivity.get();
 			
-			TextView txtViewAmount = ((TextView)theActivity.findViewById(R.id.txtView_amount_right));
+			TextView txtViewAmount = ((TextView)theActivity.findViewById(R.id.txtView_amount_right_topBar));
 			if(theActivity.mQuickOrder.getOrderFoods().isEmpty()){
 				txtViewAmount.setVisibility(View.GONE);
 			}else{

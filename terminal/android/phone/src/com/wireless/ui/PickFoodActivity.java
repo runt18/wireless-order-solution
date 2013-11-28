@@ -270,9 +270,13 @@ public class PickFoodActivity extends FragmentActivity
 		try{
 			mTmpOrder.addFood(food, WirelessOrder.loginStaff);
 			
+			TextView amountTxtView = ((TextView)findViewById(R.id.txtView_amount_left_topBar));
+			amountTxtView.setVisibility(View.VISIBLE);
+			amountTxtView.setText(mTmpOrder.getOrderFoods().size() + "");
+			
 			Toast.makeText(this, "添加"	+ (food.isHangup() ? "并叫起\"" : "\"") + food.toString() + "\"" +
 								 NumericUtil.float2String2(food.getCount()) + "份", Toast.LENGTH_SHORT).show();
-			
+
 		}catch(BusinessException e){
 			Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
 		}

@@ -293,7 +293,7 @@ public class QuickPickActivity extends FragmentActivity implements OnFoodPickedL
 	@Override
 	public void onOrderChanged(Order oriOrder, List<OrderFood> newFoodList) {
 		
-		TextView txtViewAmount = (TextView)findViewById(R.id.txtView_amount_right);
+		TextView txtViewAmount = (TextView)findViewById(R.id.txtView_amount_right_topBar);
 
 		if(newFoodList.isEmpty()){
 			txtViewAmount.setVisibility(View.GONE);
