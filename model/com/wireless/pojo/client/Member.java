@@ -708,6 +708,7 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 			dest.writeString(this.getMobile());
 			dest.writeString(this.getMemberCard());
 			dest.writeInt(this.getConsumptionAmount());
+			dest.writeParcel(this.memberType, MemberType.MEMBER_TYPE_PARCELABLE_SIMPLE);
 			
 		}else if(flag == MEMBER_PARCELABLE_COMPLEX){
 			dest.writeParcel(this.memberType, MemberType.MEMBER_TYPE_PARCELABLE_COMPLEX);
@@ -717,6 +718,8 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 			dest.writeString(this.getMemberCard());
 			dest.writeInt(this.getConsumptionAmount());
 			dest.writeLong(this.getLastConsumption());
+			dest.writeParcelList(this.publicComments, 0);
+			dest.writeParcel(this.privateComment, 0);
 			dest.writeParcelList(this.favorFoods, Food.FOOD_PARCELABLE_SIMPLE);
 			dest.writeParcelList(this.recommendFoods, Food.FOOD_PARCELABLE_SIMPLE);
 		}
@@ -732,6 +735,7 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 			setMobile(source.readString());
 			setMemberCard(source.readString());
 			setConsumptionAmount(source.readInt());
+			setMemberType(source.readParcel(MemberType.CREATOR));
 			
 		}else if(flag == MEMBER_PARCELABLE_COMPLEX){
 			setMemberType(source.readParcel(MemberType.CREATOR));
@@ -741,6 +745,8 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 			setMemberCard(source.readString());
 			setConsumptionAmount(source.readInt());
 			setLastConsumption(source.readLong());
+			setPublicComments(source.readParcelList(MemberComment.CREATOR));
+			setPrivateComment(source.readParcel(MemberComment.CREATOR));
 			setFavorFoods(source.readParcelList(Food.CREATOR));
 			setRecommendFoods(source.readParcelList(Food.CREATOR));
 		}
@@ -1073,7 +1079,7 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 	}
 	
 	public boolean hasPrivateComment(){
-		return this.privateComment != null && this.privateComment.getComment() != "";
+		return this.privateComment != null && !this.privateComment.getComment().trim().equals("");
 	}
 
 	public List<Food> getFavorFoods(){

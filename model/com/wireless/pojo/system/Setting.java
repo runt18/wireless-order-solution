@@ -1,14 +1,11 @@
 package com.wireless.pojo.system;
 
-import java.util.Calendar;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import com.wireless.json.Jsonable;
-import com.wireless.pojo.util.DateUtil;
 
 public class Setting implements Jsonable{
 	/* 结帐单显示的选项设置  */
@@ -122,25 +119,7 @@ public class Setting implements Jsonable{
 	private Tail priceTail = Tail.NO_ACTION;	// 金额尾数处理方式  0:不处理  1:抹零 2:四舍五入
 	private int receiptStyle;  
 	private int eraseQuota;
-	private long currentMonth;
 	
-	
-	public long getLongCurrentMonth() {
-		return currentMonth;
-	}
-	public int getIntCurrentMonth(){
-		Calendar c = Calendar.getInstance();
-		c.setTime(new Date(currentMonth));
-		
-		return (c.get(Calendar.MONTH)+1);
-	}
-	public String getStringCurrentMonth(){
-		return DateUtil.formatToDate(currentMonth);
-	}
-	
-	public void setCurrentMonth(long currentMonth) {
-		this.currentMonth = currentMonth;
-	}
 	public int getId() {
 		return id;
 	}
@@ -193,10 +172,10 @@ public class Setting implements Jsonable{
 		jm.put("priceTail", this.getPriceTail());
 		jm.put("receiptStyle", this.getReceiptStyle());
 		jm.put("eraseQuota", this.getEraseQuota());
-		jm.put("currentMonth", this.getLongCurrentMonth());
-		
-		jm.put("intCurrentMonth", this.getIntCurrentMonth());
-		jm.put("stringCurrentMonth", this.getStringCurrentMonth());
+//		jm.put("currentMonth", this.getLongCurrentMonth());
+//		
+//		jm.put("intCurrentMonth", this.getIntCurrentMonth());
+//		jm.put("stringCurrentMonth", this.getStringCurrentMonth());
 		return Collections.unmodifiableMap(jm);
 	}
 	@Override
