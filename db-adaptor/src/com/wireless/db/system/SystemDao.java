@@ -286,7 +286,7 @@ public class SystemDao {
 	 * @return
 	 * @throws SQLException
 	 */
-	public static List<DailySettle> getDailySettle(DBCon dbCon, Map<Object, Object> params) throws SQLException{
+	private static List<DailySettle> getDailySettle(DBCon dbCon, Map<Object, Object> params) throws SQLException{
 		List<DailySettle> list = new ArrayList<DailySettle>();
 		DailySettle item = null;
 		StringBuffer ridContent = new StringBuffer();
@@ -318,22 +318,6 @@ public class SystemDao {
 			item = null;
 		}
 		return list;
-	}
-	
-	/**
-	 * 
-	 * @param params
-	 * @return
-	 * @throws SQLException
-	 */
-	public static List<DailySettle> getDailySettle(Map<Object, Object> params) throws SQLException{
-		DBCon dbCon = new DBCon();
-		try{
-			dbCon.connect();
-			return SystemDao.getDailySettle(dbCon, params);
-		}finally{
-			dbCon.disconnect();
-		}
 	}
 	
 	/**
