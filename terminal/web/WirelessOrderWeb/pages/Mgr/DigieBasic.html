@@ -84,7 +84,7 @@ var tabs = new Ext.TabPanel({
     items:[{
         contentEl:'center',
         title: '主页', 
-        icon: '../../images/home.jpg',
+        icon: '../../images/home.png',
         iconCls : 'tab_home'
     }],
     plugins: new Ext.ux.TabCloseMenu()
@@ -134,15 +134,6 @@ Ext.onReady(function(){
 									var jr = Ext.decode(res.responseText);
 									if(jr.success){
 										monthSettleWin.show();
-/* 										//alert(jr.other.systemSetting.setting.intCurrentMonth);
-										var month = jr.other.month;
-										if(presentMonth - month == 0){
-											Ext.MessageBox.alert('提示', '当前会计月份已月结, 请于下月初进行操作');
-										}else if(presentMonth - month > 0){
-											monthSettleWin.show();
-										}else{
-											Ext.ux.showMsg({title : '警告', msg : '系统时间错误, 请与客服联系'});
-										} */
 									}else{
 										jr['icon'] = Ext.Msg.WARNING; 
 										Ext.ux.showMsg(jr);
@@ -227,12 +218,10 @@ Ext.onReady(function(){
 });	
 </script>
 </head>
-<body>
+<body >
 
   <div id="west"></div>
   <div id="center" >
-        <p><b>Done reading me? Close me by clicking the X in the top right corner.</b></p>
-        <p>Vestibulum semper. Nullam non odio. Aliquam quam. Mauris eu lectus </p>
-  </div>
+  <img alt="" src="../../images/home_page.jpg" style="width:100%;height: 100%"></div>
 </body>
 </html>
