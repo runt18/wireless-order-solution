@@ -1490,25 +1490,28 @@ function initControl(){
     		}]
     	}]
     };
+    
+	if(!secondStepPanelCenter){
+		secondStepPanelCenter = createGridPanel(
+			'secondStepPanelCenter',
+			'货品列表',
+			'',
+			'',
+			'',
+			[
+				[true, false, false, false], 
+				['品名', 'material.name', 130],
+				['数量', 'amount',130,'right', 'stockDetailTotalCountRenderer'],
+				['单价', 'price',80,'right', 'stockDetailPriceRenderer'],
+				['总价', 'totalPrice',80,'right', 'stockDetailTotalPriceRenderer']
+			],
+			StockDetailRecord.getKeys(),
+			[['isPaging', true],  ['restaurantId', restaurantID], ['stockStatus', 3]],
+			GRID_PADDING_LIMIT_20,
+			''
+		);
+	}
 
-	secondStepPanelCenter = createGridPanel(
-		'secondStepPanelCenter',
-		'货品列表',
-		'',
-		'',
-		'',
-		[
-			[true, false, false, false], 
-			['品名', 'material.name', 130],
-			['数量', 'amount',130,'right', 'stockDetailTotalCountRenderer'],
-			['单价', 'price',80,'right', 'stockDetailPriceRenderer'],
-			['总价', 'totalPrice',80,'right', 'stockDetailTotalPriceRenderer']
-		],
-		StockDetailRecord.getKeys(),
-		[['isPaging', true],  ['restaurantId', restaurantID], ['stockStatus', 3]],
-		GRID_PADDING_LIMIT_20,
-		''
-	);
 	secondStepPanelCenter.region = 'center';
 	secondStepPanelCenter.getStore().on('load', function(thiz, rs){
 		var totalPrice = 0, amount = 0;
