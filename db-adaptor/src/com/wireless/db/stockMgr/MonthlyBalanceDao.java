@@ -57,8 +57,21 @@ public class MonthlyBalanceDao {
 		float openingBalance, endingBalance;
 		//获取每个部门的期初和期末余额
 		for (Department dept : depts) {
-			openingBalance = CostAnalyzeReportDao.getBalance(beginDate, dept.getId());
-			endingBalance = CostAnalyzeReportDao.getBalance(endDate, dept.getId());
+			String endAmount = "SELECT MBD.ending_balance FROM " + Params.dbName + ".monthly_balance MB" +
+					" JOIN " + Params.dbName + ".monthly_balance_detail MBD ON MB.id = MBD.monthly_balance_id " +
+					" WHERE MB.restaurant_id = " + staff.getRestaurantId() + 
+					" AND MB.month <= '" + beginDate + "'" +
+					" AND MBD.dept_id = " + dept.getId() + 
+					" ORDER BY MB.id DESC LIMIT 0,1";
+			dbCon.rs = dbCon.stmt.executeQuery(endAmount);
+			if(dbCon.rs.next()){
+				openingBalance = dbCon.rs.getFloat("ending_balance");
+			}else{
+				openingBalance = CostAnalyzeReportDao.getBalance(beginDate, dept.getId(), staff.getRestaurantId());
+			}
+		
+			dbCon.rs.close();
+			endingBalance = CostAnalyzeReportDao.getBalance(endDate, dept.getId(), staff.getRestaurantId());
 			monthlyBalance.addDetails(new MonthlyBalanceDetail.InsertBuilder(dept.getId(), openingBalance, endingBalance).setDeptName(dept.getName()).setRestaurantId(staff.getRestaurantId()).build());
 		}
 		

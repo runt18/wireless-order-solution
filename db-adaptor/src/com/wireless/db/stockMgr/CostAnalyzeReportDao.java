@@ -180,43 +180,53 @@ public class CostAnalyzeReportDao {
 	 * @return
 	 * @throws SQLException
 	 */
-	public static float getBalance(String data, int deptId) throws SQLException{
+	public static float getBalance(String data, int deptId, int restaurantId) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return getBalance(dbCon, data, deptId);
+			return getBalance(dbCon, data, deptId, restaurantId);
 		}finally{
 			dbCon.disconnect();
 		}
 	}
 	
-	public static float getBalance(DBCon dbCon, String data, int deptId) throws SQLException{
-		String endAmount = "SELECT S.sub_type, S.dept_in, S.dept_out, D.remaining, ROUND(D.dept_in_remaining * M.price, 2) as dept_in_money, ROUND(D.dept_out_remaining * M.price, 2) as dept_out_money, D.price FROM " + Params.dbName + ".stock_action as S " + 
-							" INNER JOIN " + Params.dbName + ".stock_action_detail as D ON S.id = D.stock_action_id " +
-							" JOIN " + Params.dbName + ".material M ON M.material_id = D.material_id " +
-							" WHERE 1 = 1 " +
-							" AND (S.dept_in = " + deptId + " OR S.dept_out = " + deptId + ") " +
-							" AND S.ori_stock_date <= '" + data + "'" + 
-							" AND S.status = " + Status.AUDIT.getVal() +
-							" ORDER BY D.id DESC LIMIT 0,1";
-		dbCon.rs = dbCon.stmt.executeQuery(endAmount);
+	public static float getBalance(DBCon dbCon, String data, int deptId, int restaurantId) throws SQLException{
 		float endMoney = 0;
-		if(dbCon.rs.next()){
-			SubType actionSubType = SubType.valueOf(dbCon.rs.getInt("sub_type"));
-			if(actionSubType == SubType.STOCK_IN || actionSubType == SubType.MORE || actionSubType == SubType.SPILL){
-				endMoney += dbCon.rs.getFloat("dept_in_money");
-			}else if(actionSubType == SubType.STOCK_IN_TRANSFER || actionSubType == SubType.STOCK_OUT_TRANSFER){
-				if(deptId == dbCon.rs.getInt("dept_in")){
-					endMoney += dbCon.rs.getFloat("dept_in_money");
+		String dept_material = "SELECT material_id, dept_id FROM " + Params.dbName + ".material_dept " +
+								" WHERE restaurant_id = " + restaurantId +
+								" AND dept_id = " + deptId;
+		dbCon.rs = dbCon.stmt.executeQuery(dept_material);
+		while(dbCon.rs.next()){
+			String endAmount = "SELECT S.sub_type, S.dept_in, S.dept_out, D.remaining, ROUND(D.dept_in_remaining * M.price, 2) as dept_in_money, ROUND(D.dept_out_remaining * M.price, 2) as dept_out_money, D.price FROM " + Params.dbName + ".stock_action as S " + 
+					" INNER JOIN " + Params.dbName + ".stock_action_detail as D ON S.id = D.stock_action_id " +
+					" JOIN " + Params.dbName + ".material M ON M.material_id = D.material_id " +
+					" WHERE 1 = 1 " +
+					" AND (S.dept_in = " + deptId + " OR S.dept_out = " + deptId + ") " +
+					" AND S.ori_stock_date <= '" + data + "'" + 
+					" AND S.status = " + Status.AUDIT.getVal() +
+					" AND D.material_id = " + dbCon.rs.getInt("material_id") +
+					" ORDER BY D.id DESC LIMIT 0,1";
+			DBCon balance = new DBCon();
+			balance.connect();
+			balance.rs = balance.stmt.executeQuery(endAmount);
+			
+			if(balance.rs.next()){
+				SubType actionSubType = SubType.valueOf(balance.rs.getInt("sub_type"));
+				if(actionSubType == SubType.STOCK_IN || actionSubType == SubType.MORE || actionSubType == SubType.SPILL){
+					endMoney += balance.rs.getFloat("dept_in_money");
+				}else if(actionSubType == SubType.STOCK_IN_TRANSFER || actionSubType == SubType.STOCK_OUT_TRANSFER){
+					if(deptId == balance.rs.getInt("dept_in")){
+						endMoney += balance.rs.getFloat("dept_in_money");
+					}else{
+						endMoney += balance.rs.getFloat("dept_out_money");
+					}
+					
 				}else{
-					endMoney += dbCon.rs.getFloat("dept_out_money");
+					endMoney += balance.rs.getFloat("dept_out_money");
 				}
-				
-			}else{
-				endMoney += dbCon.rs.getFloat("dept_out_money");
 			}
+			balance.disconnect();
 		}
-		
 		return endMoney;
 	}
 }

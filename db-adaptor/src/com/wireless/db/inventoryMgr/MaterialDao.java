@@ -460,7 +460,7 @@ public class MaterialDao {
 						+ " MC.cate_id, MC.name cate_name, MC.type cate_type"
 						+ " FROM material_cate MC, material M "
 						+ " LEFT JOIN " + Params.dbName + ".food_material FM ON FM.material_id = M.material_id " 
-						+ " LEFT JOIN " + Params.dbName + ".food F ON F.food_id = FM.food_id " 
+						+ " LEFT JOIN " + Params.dbName + ".food F ON F.food_id = FM.food_id AND F.stock_status < " + Food.StockStatus.MATERIAL.getVal() + " " 
 						+ " WHERE MC.restaurant_id = M.restaurant_id "
 						+ " AND MC.cate_id = M.cate_id " 
 						+ " AND M.restaurant_id = " + restaurant
