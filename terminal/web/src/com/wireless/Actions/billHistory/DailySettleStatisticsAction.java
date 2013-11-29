@@ -40,7 +40,6 @@ public class DailySettleStatisticsAction extends Action {
 			
 			String onDuty = request.getParameter("onDuty");
 			String offDuty = request.getParameter("offDuty");
-			//FIXME
 			list = QueryDailyGeneralDao.getByRange(StaffDao.verify(Integer.parseInt(pin)), onDuty, offDuty);
 			
 		}catch(BusinessException e){

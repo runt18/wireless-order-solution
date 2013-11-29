@@ -38,7 +38,7 @@ public class QueryStockDetailReportAction extends Action{
 			String deptId = request.getParameter("deptId");
 			//String stockType = request.getParameter("stockType");
 			String subType = request.getParameter("subType");
-			String extra = " AND S.ori_stock_date >= '" + beginDate + "' AND S.ori_stock_date <= '" + endDate + "'";
+			String extra = " AND S.ori_stock_date >= '" + beginDate + "' AND S.ori_stock_date <= '" + endDate + " 23:59:59'";
 			
 			
 			if(subType != null && !subType.isEmpty()){
