@@ -204,8 +204,10 @@ public class UpdateOrder {
 			fillFoodDetail(dbCon, staff, of);
 		}
 		
-		//Set the default discount to new order
-		newOrder.setDiscount(DiscountDao.getDefaultDiscount(dbCon, staff));
+		//Set the default discount to new order if original order is unpaid
+		if(oriOrder.isUnpaid()){
+			newOrder.setDiscount(DiscountDao.getDefaultDiscount(dbCon, staff));
+		}
 		
 		//Calculate the difference between the original and new order.
 		DiffResult diffResult = diff(oriOrder, newOrder);
