@@ -23,20 +23,20 @@ var dishesOrderImgBut = new Ext.ux.ImageButton({
 //						success : function(res, opt){
 //							var jr = Ext.decode(res.responseText);
 //							if(jr.success){
-//								if (temp.statusValue == TABLE_BUSY) {
+								if (temp.statusValue == TABLE_BUSY) {
 									location.href = "OrderMain.html?" + strEncode('restaurantID=' + restaurantID
 											+ "&tableAliasID=" + temp.alias
 											+ "&ts=1" 
 											+ "&personCount=" + temp.customNum
 											+ "&category=" + temp.categoryValue
 											, 'mi');
-//								} else if (temp.statusValue == TABLE_IDLE) {
+								} else if (temp.statusValue == TABLE_IDLE) {
 									location.href = "OrderMain.html?" + strEncode('restaurantID=' + restaurantID
 											+ "&ts=0"
 											+ "&tableAliasID=" + selectedTable
 											+ "&category=" + CATE_NORMAL
 											, 'mi');
-//								}
+								}
 //							}else{
 //								lm.hide();
 //								jr['icon'] = Ext.MessageBox.WARNING;
