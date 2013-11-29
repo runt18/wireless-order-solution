@@ -139,7 +139,6 @@ Ext.onReady(function(){
 										)
 									);
 								}
-								alert(trContent);
 								var table = String.format('<table border="1" class="tb_base">{0}{1}</table>', title, trContent);
 								Ext.getCmp('businessStatisticsSummaryInformationCenterPanel').body.update(table);
 								
