@@ -405,7 +405,7 @@ Ext.ux.showMsg = function(msg){
 			msg : msg.msg,
 			autoWidth : true,
 			buttons : Ext.Msg.OK,
-			icon : typeof msg.icon != 'undefined' ? msg.icon : Ext.Msg.ERROR,
+			icon : typeof msg.icon != 'undefined' ? msg.icon : Ext.Msg.WARNING,
 			fn : msg.callBack != null && typeof msg.callBack == 'function' ? msg.callBack : null
 		});		
 	}

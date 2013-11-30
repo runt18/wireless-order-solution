@@ -142,8 +142,8 @@ Ext.onReady(function(){
 								var table = String.format('<table border="1" class="tb_base">{0}{1}</table>', title, trContent);
 								Ext.getCmp('businessStatisticsSummaryInformationCenterPanel').body.update(table);
 								
-								Ext.getDom('bssiOnDuty').innerHTML = paramsOnDuty;
-								Ext.getDom('bssiOffDuty').innerHTML = paramsOffDuty;
+								Ext.getDom('bssiOnDuty').innerHTML = beginDate.getRawValue();
+								Ext.getDom('bssiOffDuty').innerHTML = endDate.getRawValue();
 								Ext.getDom('bssiOrderAmount').innerHTML = business.orderAmount;
 								
 								Ext.getDom('bssiCashAmount').innerHTML = business.cashAmount;
