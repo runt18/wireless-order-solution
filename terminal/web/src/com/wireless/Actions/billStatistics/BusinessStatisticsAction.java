@@ -11,11 +11,14 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
+import com.wireless.db.billStatistics.QueryDutyRange;
 import com.wireless.db.shift.QueryShiftDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
+import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.billStatistics.ShiftDetail;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.util.DateType;
 import com.wireless.util.WebParams;
 
@@ -40,24 +43,15 @@ public class BusinessStatisticsAction extends DispatchAction {
 		try{
 			String pin = (String)request.getAttribute("pin");
 			
-			StaffDao.verify(Integer.parseInt(pin));
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
-			//String restaurantID = request.getParameter("restaurantID");
 			String onDuty = request.getParameter("onDuty");
 			String offDuty = request.getParameter("offDuty");
-			//String queryPattern = request.getParameter("queryPattern");
 			
-/*			Map<Object, Object> params = new HashMap<Object, Object>();
-			params.put(DateType.HISTORY, DateType.HISTORY.getValue());
-			params.put("pin", pin);
-			params.put("restaurantID", restaurantID);
-			params.put("onDuty", onDuty);
-			params.put("offDuty", offDuty);
-			params.put("queryPattern", queryPattern);*/
+			DutyRange range = QueryDutyRange.exec(staff, onDuty, offDuty);
 			
-			ShiftDetail sdetail = QueryShiftDao.exec(StaffDao.verify(Integer.parseInt(pin)), onDuty, offDuty, DateType.HISTORY);
-			
-			if(sdetail != null){
+			if(range != null){
+				ShiftDetail sdetail = QueryShiftDao.exec(staff, range.getOnDutyFormat(), range.getOffDutyFormat(), DateType.HISTORY);
 				jobject.getOther().put("business", sdetail);
 			}else{
 				jobject.initTip(false, WebParams.TIP_TITLE_DEFAULT, 1111, "操作成功, 该时间段没有记录, 请重新查询.");

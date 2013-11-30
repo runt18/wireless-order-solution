@@ -13,10 +13,12 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
+import com.wireless.db.billStatistics.QueryIncomeStatisticsDao;
 import com.wireless.db.deptMgr.DepartmentDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
+import com.wireless.pojo.billStatistics.IncomeByEachDay;
 import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.util.DataPaging;
@@ -31,16 +33,27 @@ public class QueryDeptAction extends DispatchAction{
 		response.setCharacterEncoding("UTF-8");
 		JObject jobject = new JObject();
 		List<String> xz = new ArrayList<String>();
-		xz.add("one");
-		xz.add("two");
-		xz.add("thrid");
-		String xz1 = "['one', 'tow', 'thrid']";
-		String xdata1 = "[{name: 'good', data: [9, 78, 89]}]";
+		xz.add("\'one\'");
+		xz.add("\'two\'");
+		xz.add("\'thrid\'");
+		xz.add("\'four\'");
+		xz.add("\'fire\'");
+		xz.add("\'six\'");
+		xz.add("\'seven\'");
+//		String xz1 = "['one', 'tow', 'thrid']";
+//		String xdata1 = "[{name: 'good', data: [9, 78, 89]}]";
+
 		
 		List<Integer> data1 = new ArrayList<Integer>();
 		data1.add(2);
 		data1.add(4);
 		data1.add(7);
+		data1.add(18);
+		data1.add(56);
+		data1.add(78);
+		data1.add(90);
+
+		
 		List<Integer> data2 = new ArrayList<Integer>();
 		data2.add(9);
 		data2.add(18);
@@ -54,12 +67,28 @@ public class QueryDeptAction extends DispatchAction{
 		
 		
 		
-		Map<Object, Object> chart = new HashMap<Object, Object>();
-		chart.put("xz", xz1);
-		chart.put("xdata", xdata1);
-		jobject.setOther(chart);
+
 		
-		response.getWriter().print(jobject.toString());
+		
+		
+		
+
+//---------------------------	
+		
+		String pin = (String)request.getAttribute("pin");
+		List<IncomeByEachDay> incomesByEachDay = new ArrayList<IncomeByEachDay>();
+		incomesByEachDay.addAll(QueryIncomeStatisticsDao.getIncomeByEachDay(StaffDao.verify(Integer.parseInt(pin)), "2013-11-22 00:00:00", "2013-11-29 23:59:59"));
+		
+		List<String> xAxis = new ArrayList<String>();
+		List<Float> data = new ArrayList<Float>();
+		for (IncomeByEachDay e : incomesByEachDay) {
+			xAxis.add("\'"+e.getDate()+"\'");
+			data.add(e.getIncomeByPay().getTotalActual());
+		}
+		
+		String str = "";
+		str += "{\"title\":\"实收总额\",\"xAxis\":"+xAxis+",\"ser\":{\"name\":\'统计\', \"data\" : "+data+"}}";
+		response.getWriter().print(str.toString());
 		return null;
 	}
 	
