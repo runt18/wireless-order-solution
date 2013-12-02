@@ -20,7 +20,6 @@ public class IncomeByEachDay implements Jsonable{
 	private IncomeByRepaid incomeByRepaid;
 	private IncomeByService incomeByService;
 	private IncomeByCharge incomeByCharge;
-	private List<BusinessStatisticsByDept> deptStat;
 	
 	public IncomeByEachDay(String date){
 		this.date = date;
@@ -134,13 +133,6 @@ public class IncomeByEachDay implements Jsonable{
 		this.incomeByCharge = incomeByCharge;
 	}
 	
-	public List<BusinessStatisticsByDept> getDeptStat() {
-		return deptStat;
-	}
-	public void setDeptStat(List<BusinessStatisticsByDept> deptStat) {
-		this.deptStat = deptStat;
-	}
-	
 	@Override 
 	public String toString(){
 		return "IncomeEachDay : " +
@@ -199,7 +191,6 @@ public class IncomeByEachDay implements Jsonable{
 		jm.put("paidIncome", this.getIncomeByRepaid().getTotalRepaid());
 		
 		if(flag > 0){
-			jm.put("deptStat", this.deptStat);
 			jm.put("paidAmount", this.getIncomeByRepaid().getRepaidAmount());
 			jm.put("eraseAmount", this.getIncomeByErase().getEraseAmount());
 			jm.put("cancelAmount", this.getIncomeByCancel().getCancelAmount());
