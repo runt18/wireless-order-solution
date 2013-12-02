@@ -50,7 +50,7 @@ public class BusinessStatisticsAction extends DispatchAction {
 			
 			String dutyRange = request.getParameter("dutyRange");
 			ShiftDetail sdetail = new ShiftDetail();
-			if(dutyRange != null && !dutyRange.trim().isEmpty()){
+			if(!dutyRange.equals("null") && !dutyRange.trim().isEmpty()){
 				DutyRange range = QueryDutyRange.exec(staff, onDuty, offDuty);
 				
 				if(range != null){
