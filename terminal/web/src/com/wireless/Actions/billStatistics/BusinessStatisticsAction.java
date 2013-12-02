@@ -48,15 +48,21 @@ public class BusinessStatisticsAction extends DispatchAction {
 			String onDuty = request.getParameter("onDuty");
 			String offDuty = request.getParameter("offDuty");
 			
-			DutyRange range = QueryDutyRange.exec(staff, onDuty, offDuty);
-			
-			if(range != null){
-				ShiftDetail sdetail = QueryShiftDao.exec(staff, range.getOnDutyFormat(), range.getOffDutyFormat(), DateType.HISTORY);
-				jobject.getOther().put("business", sdetail);
+			String dutyRange = request.getParameter("dutyRange");
+			ShiftDetail sdetail = new ShiftDetail();
+			if(dutyRange != null && !dutyRange.trim().isEmpty()){
+				DutyRange range = QueryDutyRange.exec(staff, onDuty, offDuty);
+				
+				if(range != null){
+					sdetail = QueryShiftDao.exec(staff, range.getOnDutyFormat(), range.getOffDutyFormat(), DateType.HISTORY);
+					
+				}else{
+					jobject.initTip(false, WebParams.TIP_TITLE_DEFAULT, 1111, "操作成功, 该时间段没有记录, 请重新查询.");
+				}
 			}else{
-				jobject.initTip(false, WebParams.TIP_TITLE_DEFAULT, 1111, "操作成功, 该时间段没有记录, 请重新查询.");
+				sdetail = QueryShiftDao.exec(staff, onDuty, offDuty, DateType.HISTORY);
 			}
-			
+			jobject.getOther().put("business", sdetail);
 		}catch(BusinessException e){
 			e.printStackTrace();
 			jobject.initTip(e);
@@ -66,6 +72,7 @@ public class BusinessStatisticsAction extends DispatchAction {
 			jobject.initTip(e);
 			
 		}finally{
+			
 			response.getWriter().print(jobject.toString());
 		}
 		return null;
