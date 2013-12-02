@@ -170,7 +170,8 @@ var businessStatBut = new Ext.ux.ImageButton({
 							text : '功能加载中, 请稍后......',
 							params : {
 								d : '_' + new Date().getTime(),
-								dataSource : 'history'
+								dataSource : 'history',
+								dutyRange : "range"
 							}
 						});
 					}

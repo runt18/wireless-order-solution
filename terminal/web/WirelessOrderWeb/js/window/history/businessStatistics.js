@@ -121,7 +121,7 @@ Ext.onReady(function(){
 							restaurantID : restaurantID,
 							onDuty : paramsOnDuty,
 							offDuty : paramsOffDuty,
-							dutyRange : true
+							dutyRange : dutyRange
 						},
 						success : function(response, options) {
 							var jr = Ext.decode(response.responseText);
@@ -143,8 +143,14 @@ Ext.onReady(function(){
 								var table = String.format('<table border="1" class="tb_base">{0}{1}</table>', title, trContent);
 								Ext.getCmp('businessStatisticsSummaryInformationCenterPanel').body.update(table);
 								
-								Ext.getDom('bssiOnDuty').innerHTML = beginDate.getRawValue();
-								Ext.getDom('bssiOffDuty').innerHTML = endDate.getRawValue();
+								if(dutyRange == "range"){
+									Ext.getDom('bssiOnDuty').innerHTML = beginDate.getValue().format('Y-m-d');
+								    Ext.getDom('bssiOffDuty').innerHTML = endDate.getValue().format('Y-m-d');
+								}else{
+									Ext.getDom('bssiOnDuty').innerHTML = business.paramsOnDuty;
+									Ext.getDom('bssiOffDuty').innerHTML = business.paramsOffDuty;
+								}
+
 								Ext.getDom('bssiOrderAmount').innerHTML = business.orderAmount;
 								
 								Ext.getDom('bssiCashAmount').innerHTML = business.cashAmount;
