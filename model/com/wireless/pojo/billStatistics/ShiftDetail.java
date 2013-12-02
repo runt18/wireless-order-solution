@@ -366,7 +366,7 @@ public class ShiftDetail implements Jsonable{
 	public Map<String, Object> toJsonMap(int flag) {
 		Map<String, Object> jm = new HashMap<String, Object>();
 		jm.put("paramsOnDuty", this.onDuty);
-		jm.put("paramsOnDuty", this.offDuty);
+		jm.put("paramsOffDuty", this.offDuty);
 		jm.put("totalActual", this.getTotalActual());
 		jm.put("totalIncome", this.getTotalIncome());
 		jm.put("orderAmount", this.orderAmount);
