@@ -269,9 +269,9 @@ public class MonthlyBalanceDao {
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		MonthlyBalance m = new MonthlyBalance();
 		if(dbCon.rs.next()){
-			if(dbCon.rs.getString("month") != null){
+			if(dbCon.rs.getTimestamp("month") != null){
 				m.setId(dbCon.rs.getInt("id"));
-				m.setMonth(DateUtil.parseDate(dbCon.rs.getString("month"))) ;
+				m.setMonth(dbCon.rs.getTimestamp("month").getTime()) ;
 			}else{
 				m.setId(-1);
 			};

@@ -63,7 +63,12 @@ public class StockActionDao {
 		long maxDate = 0;
 		dbCon.rs = dbCon.stmt.executeQuery(selectMaxDate);
 		if(dbCon.rs.next()){
-			maxDate = dbCon.rs.getTimestamp("date").getTime();
+			if(dbCon.rs.getTimestamp("date") != null){
+				maxDate = dbCon.rs.getTimestamp("date").getTime();
+			}else{
+				maxDate = MonthlyBalanceDao.getCurrentMonthTimeByRestaurant(term.getRestaurantId());
+			}
+			
 		}
 		dbCon.rs.close();
 		
