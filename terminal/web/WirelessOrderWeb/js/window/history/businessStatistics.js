@@ -120,7 +120,8 @@ Ext.onReady(function(){
 							isCookie : true,
 							restaurantID : restaurantID,
 							onDuty : paramsOnDuty,
-							offDuty : paramsOffDuty
+							offDuty : paramsOffDuty,
+							dutyRange : true
 						},
 						success : function(response, options) {
 							var jr = Ext.decode(response.responseText);
