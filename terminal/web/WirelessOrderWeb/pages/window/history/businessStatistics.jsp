@@ -10,11 +10,12 @@
 		var queryPattern = <%=request.getParameter("queryPattern") %>;
 		
 		dataSource = dataSource != 'null' && (dataSource == 'today' || dataSource == 'history') ? dataSource : 'today';
-		
+		var dutyRange = '<%=request.getParameter("dutyRange") %>';
 		queryPattern = queryPattern == null ? 1 : parseInt(queryPattern);
 		if(queryPattern == 2){
 			var onDuty = '<%=request.getParameter("onDuty") %>';
 			var offDuty = '<%=request.getParameter("offDuty") %>';
+			
 			if(onDuty != 'null' && offDuty != 'null'){
 				onDuty = new Date(parseInt(onDuty));
 				offDuty =  new Date(parseInt(offDuty));
