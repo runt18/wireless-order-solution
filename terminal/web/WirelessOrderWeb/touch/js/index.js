@@ -108,7 +108,7 @@ function initFoodData(){
 //				localStorage.setItem('foods', JSON.stringify(data));
 				foodData = {root:[]};
 				for(var i = 0; i < data.root.length; i++){
-					if(data.root[i].status != 4)
+					if((data.root[i].status & 1 << 2) == 0)
 						foodData.root.push(data.root[i]);
 				}
 				foodData.totalProperty = foodData.root.length;

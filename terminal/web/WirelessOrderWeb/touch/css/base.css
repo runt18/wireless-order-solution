@@ -191,7 +191,6 @@ div[data-type="lm-content-circular"] > div{
 	width: 15px;	
 	height: 15px;	
 	-webkit-border-radius: 10px;
-	-moz-border-radius: 10px;
 	-webkit-animation-name: bounce_circular;
  	-webkit-animation-duration: 0.7s;
  	-webkit-animation-iteration-count: infinite;
