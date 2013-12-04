@@ -83,7 +83,7 @@ var checkOutImgBut = new Ext.ux.ImageButton({
 	}
 });
 				
-var orderDeleteImgBut = new Ext.ux.ImageButton({
+/*var orderDeleteImgBut = new Ext.ux.ImageButton({
 	imgPath : "../../images/DeleteOrder.png",
 	imgWidth : 50,
 	imgHeight : 50,
@@ -134,7 +134,7 @@ var orderDeleteImgBut = new Ext.ux.ImageButton({
 			Ext.example.msg('提示', '<font color="green">操作失败, 请先选择餐台.</font>');
 		}
 	}
-});				
+});	*/			
 
 var tableChangeImgBut = new Ext.ux.ImageButton({
 	imgPath : "../../images/TableChange.png",
@@ -1730,8 +1730,8 @@ Ext.onReady(function() {
 			{text : "&nbsp;&nbsp;&nbsp;", xtype : 'tbtext'}, 
 			checkOutImgBut, 
 			{text : "&nbsp;&nbsp;&nbsp;", xtype : 'tbtext'}, 
-			orderDeleteImgBut, 
-			{text : "&nbsp;&nbsp;&nbsp;", xtype : 'tbtext'}, 
+//			orderDeleteImgBut, 
+//			{text : "&nbsp;&nbsp;&nbsp;", xtype : 'tbtext'}, 
 			tableChangeImgBut, 
 			{text : "&nbsp;&nbsp;&nbsp;", xtype : 'tbtext'}, 
 			tableSepImgBut, 
