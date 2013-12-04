@@ -4,10 +4,11 @@
 	<meta http-equiv="cache-control" content="no-cache">
 	
 	<title>会员充值</title>
+	<script type="text/javascript" src="../../js/window/client/recharge.js"></script>
 	<script type="text/javascript">
 		var rd_rechargeMemberMobile = '<%=request.getParameter("memberMobile") %>';
 	</script>
-	<script type="text/javascript" src="../../js/window/client/recharge.js"></script>
+
 	
 </head>
 <body>
