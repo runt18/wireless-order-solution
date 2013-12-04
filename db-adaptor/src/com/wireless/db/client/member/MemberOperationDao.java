@@ -438,7 +438,7 @@ public class MemberOperationDao {
 				mo.setPayMoney(dbCon.rs.getFloat("pay_money"));
 				mo.setOrderId(dbCon.rs.getInt("order_id"));
 			}
-			if(mo.getOperationType() == OperationType.CHARGE){
+			if(mo.getOperationType() == OperationType.CHARGE || mo.getOperationType() == OperationType.TAKE_MONEY){
 				mo.setChargeType(dbCon.rs.getShort("charge_type"));
 				mo.setChargeMoney(dbCon.rs.getFloat("charge_money"));
 			}
