@@ -366,10 +366,11 @@ function memberPayOrderToLoadData(c){
 		}
 		sv = moblie.getValue();
 	}else if(c.otype == 'card'){
+		
 		if(typeof c.memberCard != 'undefined'){
 			memberCard.setValue(_c.memberCard);
 		}else{
-			if(!memberCard.isValid()){
+			if(memberCard.getValue() == ""){
 				return;
 			}
 			sv = memberCard.getValue();

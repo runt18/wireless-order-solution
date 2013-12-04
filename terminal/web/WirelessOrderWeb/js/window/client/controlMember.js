@@ -361,7 +361,8 @@ function operateMemberHandler(c){
 	var memberMobile = Ext.getCmp('cm_txtMemberMobile');
 	var memberSex = Ext.getCmp('cm_comboMemberSex');
 	var birthday = Ext.getCmp('cm_dateMemberBirthday');
-
+	var memberCard = Ext.getCmp('cm_numberMemberCard');
+	
 	if(cm_obj.otype.toLowerCase() == Ext.ux.otype['update'].toLowerCase()){
 		// 验证旧类型为充值属性
 		if(c.data['memberType']['attributeValue'] == 0){
@@ -380,7 +381,7 @@ function operateMemberHandler(c){
 	}
 	
 	if(!memberName.isValid() || !memberMobile.isValid() 
-		|| !membetType.isValid() || !memberSex.isValid()){
+		|| !membetType.isValid() || !memberSex.isValid() || !memberCard.isValid()){
 		return;
 	}
 	
