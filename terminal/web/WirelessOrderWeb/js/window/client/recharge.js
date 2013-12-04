@@ -71,7 +71,7 @@ Ext.onReady(function(){
 				xtype : 'panel',
 				columnWidth : .3,
 				html : ['<div class="x-form-item" >',
-				    '<input type="button" value="读手机号码" onClick="rechsargeLoadMemberData({read:1})" style="cursor:pointer; width:80px;" />',
+				    '<input type="button" value="读手机号码" onClick="rechargeLoadMemberData({read:1})" style="cursor:pointer; width:80px;" />',
 				    '&nbsp;&nbsp;',
 				    '<input type="button" value="读会员卡" onClick="rechargeLoadMemberData({read:2})" style="cursor:pointer; width:80px;" />',
 				    '</div>'
