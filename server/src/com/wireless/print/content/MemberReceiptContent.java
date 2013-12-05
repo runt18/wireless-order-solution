@@ -51,7 +51,9 @@ public class MemberReceiptContent extends ConcreteContent {
 		
 		s.append("会员姓名：" + mMo.getMember().getName()).append(SEP);
 		
-		s.append("会员卡号：" + mMo.getMemberCard()).append(SEP);
+		if(!mMo.getMemberCard().isEmpty()){
+			s.append("会员卡号：" + mMo.getMemberCard()).append(SEP);
+		}
 
 		
 		if(mMo.getOperationType() == OperationType.CONSUME){
@@ -66,14 +68,19 @@ public class MemberReceiptContent extends ConcreteContent {
 			
 		}else if(mMo.getOperationType() == OperationType.CHARGE){
 			
-			s.append(new Grid2ItemsContent("本次充值：" + NumericUtil.float2String(mMo.getChargeMoney()),
-					   					   "本次积分：" + mMo.getDeltaPoint(),
+			s.append(new Grid2ItemsContent("实收金额：" + NumericUtil.float2String2(mMo.getChargeMoney()),
+					   					   "账户充额：" + NumericUtil.float2String2(mMo.getDeltaBaseMoney() + mMo.getDeltaExtraMoney()),
 					   					   getStyle())).append(SEP);
 
-			s.append(new Grid2ItemsContent("可用余额：" + (mMo.getRemainingBaseMoney() + mMo.getRemainingExtraMoney()),
-								   		   "可用积分：" + mMo.getRemainingPoint(),
-								   		   getStyle())).append(SEP);
+			s.append(new RightAlignedDecorator("账户余额：" + NumericUtil.float2String2(mMo.getRemainingBaseMoney() + mMo.getRemainingExtraMoney()), getStyle())).append(SEP);
 			
+		}else if(mMo.getOperationType() == OperationType.REFUND){
+			
+			s.append(new Grid2ItemsContent("实退金额：" + NumericUtil.float2String2(Math.abs(mMo.getChargeMoney())),
+					   					   "账户扣额：" + NumericUtil.float2String2(Math.abs(mMo.getDeltaBaseMoney() + mMo.getDeltaExtraMoney())),
+					   					   getStyle())).append(SEP);
+
+			s.append(new RightAlignedDecorator("账户余额：" + NumericUtil.float2String2(mMo.getRemainingBaseMoney() + mMo.getRemainingExtraMoney()), getStyle())).append(SEP);
 		}
 
 		s.append(SEP).append(SEP).append(SEP).append(SEP).append(SEP).append(CUT);

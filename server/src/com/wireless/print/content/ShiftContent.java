@@ -1,5 +1,6 @@
 package com.wireless.print.content;
 
+import com.wireless.pojo.billStatistics.IncomeByCharge;
 import com.wireless.pojo.billStatistics.IncomeByDept;
 import com.wireless.pojo.billStatistics.ShiftDetail;
 import com.wireless.pojo.printScheme.PStyle;
@@ -10,13 +11,13 @@ import com.wireless.server.WirelessSocketServer;
 
 public class ShiftContent extends ConcreteContent {
 
-	private final ShiftDetail _shiftDetail;
-	private String _template;
+	private final ShiftDetail mShiftDetail;
+	private String mTemplate;
 	
 	public ShiftContent(ShiftDetail shiftDetail, String waiter, PType printType, PStyle style) {
 		super(null, waiter, printType, style);
-		_shiftDetail = shiftDetail;
-		_template = WirelessSocketServer.printTemplates.get(PType.PRINT_SHIFT_RECEIPT).get(style);
+		mShiftDetail = shiftDetail;
+		mTemplate = WirelessSocketServer.printTemplates.get(PType.PRINT_SHIFT_RECEIPT).get(style);
 	}
 
 	@Override
@@ -24,21 +25,23 @@ public class ShiftContent extends ConcreteContent {
 		
 		if(mPrintType == PType.PRINT_DAILY_SETTLE_RECEIPT || mPrintType == PType.PRINT_HISTORY_DAILY_SETTLE_RECEIPT){
 			//replace the "$(title)" with "日结单"
-			_template = _template.replace(PVar.TITLE, new CenterAlignedDecorator("日结单", mStyle).toString());
+			mTemplate = mTemplate.replace(PVar.TITLE, new ExtraFormatDecorator(  
+														new CenterAlignedDecorator("日结单", getStyle()).toString(), getStyle(), ExtraFormatDecorator.LARGE_FONT_1X).toString());
 			
 		}else{
 			//replace the "$(title)" with "交班对账单"
-			_template = _template.replace(PVar.TITLE, new CenterAlignedDecorator("交班对账单", mStyle).toString());	
+			mTemplate = mTemplate.replace(PVar.TITLE, new ExtraFormatDecorator(  
+														new CenterAlignedDecorator("交班对账单", getStyle()).toString(), getStyle(), ExtraFormatDecorator.LARGE_FONT_1X).toString());	
 		}
 		
 		//replace $(order_amount) 
-		_template = _template.replace("$(order_amount)", Integer.toString(_shiftDetail.getOrderAmount()));
+		mTemplate = mTemplate.replace("$(order_amount)", Integer.toString(mShiftDetail.getOrderAmount()));
 		//replace $(waiter)
-		_template = _template.replace(PVar.WAITER_NAME, _waiter);
+		mTemplate = mTemplate.replace(PVar.WAITER_NAME, _waiter);
 		//replace $(on_duty)
-		_template = _template.replace("$(on_duty)", _shiftDetail.getOnDuty());
+		mTemplate = mTemplate.replace("$(on_duty)", mShiftDetail.getOnDuty());
 		//replace $(off_duty)
-		_template = _template.replace("$(off_duty)", _shiftDetail.getOffDuty());
+		mTemplate = mTemplate.replace("$(off_duty)", mShiftDetail.getOffDuty());
 		
 		int pos4Item[] = {8, 15, 24};
 		int pos2Item = 19;
@@ -57,63 +60,63 @@ public class ShiftContent extends ConcreteContent {
 		
 		var1.append(new Grid4ItemsContent(
 				new String[]{"现金", 
-				 		     Integer.toString(_shiftDetail.getCashAmount()), 
-							 Float.toString(_shiftDetail.getCashTotalIncome()), 
-							 Float.toString(_shiftDetail.getCashActualIncome())
+				 		     Integer.toString(mShiftDetail.getCashAmount()), 
+							 Float.toString(mShiftDetail.getCashTotalIncome()), 
+							 Float.toString(mShiftDetail.getCashActualIncome())
 							}, 
 				pos4Item, mPrintType, mStyle).toString() + "\r\n");
 		
 		var1.append(new Grid4ItemsContent(
 				new String[]{"刷卡", 
-				 		     Integer.toString(_shiftDetail.getCreditCardAmount()), 
-							 Float.toString(_shiftDetail.getCreditTotalIncome()), 
-							 Float.toString(_shiftDetail.getCreditActualIncome())
+				 		     Integer.toString(mShiftDetail.getCreditCardAmount()), 
+							 Float.toString(mShiftDetail.getCreditTotalIncome()), 
+							 Float.toString(mShiftDetail.getCreditActualIncome())
 							}, 
 				pos4Item, mPrintType, mStyle).toString() + "\r\n");
 		
 		var1.append(new Grid4ItemsContent(
 				new String[]{"会员", 
-							 Integer.toString(_shiftDetail.getMemberCardAmount()), 
-							 Float.toString(_shiftDetail.getMemberTotalIncome()), 
-							 Float.toString(_shiftDetail.getMemberActualIncome())
+							 Integer.toString(mShiftDetail.getMemberCardAmount()), 
+							 Float.toString(mShiftDetail.getMemberTotalIncome()), 
+							 Float.toString(mShiftDetail.getMemberActualIncome())
 							}, 
 				pos4Item, mPrintType, mStyle).toString() + "\r\n");
 		
 		var1.append(new Grid4ItemsContent(
 				new String[]{"签单", 
-							 Integer.toString(_shiftDetail.getSignAmount()), 
-							 Float.toString(_shiftDetail.getSignTotalIncome()), 
-							 Float.toString(_shiftDetail.getSignActualIncome())
+							 Integer.toString(mShiftDetail.getSignAmount()), 
+							 Float.toString(mShiftDetail.getSignTotalIncome()), 
+							 Float.toString(mShiftDetail.getSignActualIncome())
 							}, 
 				pos4Item, mPrintType, mStyle).toString() + "\r\n");
 		
 		var1.append(new Grid4ItemsContent(
 				new String[]{"挂账", 
-							 Integer.toString(_shiftDetail.getHangAmount()), 
-							 Float.toString(_shiftDetail.getHangTotalIncome()), 
-							 Float.toString(_shiftDetail.getHangActualIncome())
+							 Integer.toString(mShiftDetail.getHangAmount()), 
+							 Float.toString(mShiftDetail.getHangTotalIncome()), 
+							 Float.toString(mShiftDetail.getHangActualIncome())
 							 }, 
 				pos4Item, mPrintType, mStyle).toString());
 		
 		//replace the $(var_1) with the shift detail
-		_template = _template.replace(PVar.VAR_1, var1);		
+		mTemplate = mTemplate.replace(PVar.VAR_1, var1);		
 		
 		StringBuilder var2 = new StringBuilder();
-		var2.append(new Grid2ItemsContent("折扣金额：" + _shiftDetail.getDiscountIncome(), pos2Item, "账单数：" + _shiftDetail.getDiscountAmount(), getStyle()) + SEP);
-		var2.append(new Grid2ItemsContent("赠送金额：" + _shiftDetail.getGiftIncome(), pos2Item, "账单数：" + _shiftDetail.getGiftAmount(), getStyle()) + SEP);
-		var2.append(new Grid2ItemsContent("退菜金额：" + _shiftDetail.getCancelIncome(), pos2Item, "账单数：" + _shiftDetail.getCancelAmount(), getStyle()) + SEP);
-		var2.append(new Grid2ItemsContent("抹数金额：" + _shiftDetail.getEraseIncome(), pos2Item, "账单数：" + _shiftDetail.getEraseAmount(), getStyle()) + SEP);
-		var2.append(new Grid2ItemsContent("反结帐金额：" + _shiftDetail.getPaidIncome(), pos2Item, "帐单数：" + _shiftDetail.getPaidAmount(), getStyle()) + SEP);
-		var2.append(new Grid2ItemsContent("服务费金额：" + _shiftDetail.getServiceIncome(), pos2Item, "账单数：" + _shiftDetail.getServiceAmount(), getStyle()) + SEP);
-		var2.append(mSeperatorLine + "会员充值" + SEP);
-		var2.append(new Grid2ItemsContent("现金：" + _shiftDetail.getChargeByCash(), pos2Item, "刷卡：" + _shiftDetail.getChargeByCreditCard(), getStyle()));
+		var2.append(new Grid2ItemsContent("折扣金额：" + mShiftDetail.getDiscountIncome(), pos2Item, "账单数：" + mShiftDetail.getDiscountAmount(), getStyle()) + SEP);
+		var2.append(new Grid2ItemsContent("赠送金额：" + mShiftDetail.getGiftIncome(), pos2Item, "账单数：" + mShiftDetail.getGiftAmount(), getStyle()) + SEP);
+		var2.append(new Grid2ItemsContent("退菜金额：" + mShiftDetail.getCancelIncome(), pos2Item, "账单数：" + mShiftDetail.getCancelAmount(), getStyle()) + SEP);
+		var2.append(new Grid2ItemsContent("抹数金额：" + mShiftDetail.getEraseIncome(), pos2Item, "账单数：" + mShiftDetail.getEraseAmount(), getStyle()) + SEP);
+		var2.append(new Grid2ItemsContent("反结帐金额：" + mShiftDetail.getPaidIncome(), pos2Item, "帐单数：" + mShiftDetail.getPaidAmount(), getStyle()) + SEP);
+		var2.append(new Grid2ItemsContent("服务费金额：" + mShiftDetail.getServiceIncome(), pos2Item, "账单数：" + mShiftDetail.getServiceAmount(), getStyle()) + SEP);
+//		var2.append(mSeperatorLine + "会员充值" + SEP);
+//		var2.append(new Grid2ItemsContent("现金：" + mShiftDetail.getChargeByCash(), pos2Item, "刷卡：" + mShiftDetail.getChargeByCreditCard(), getStyle()));
 		//replace the $(var_2) with the shift detail
-		_template = _template.replace(PVar.VAR_2, var2);
+		mTemplate = mTemplate.replace(PVar.VAR_2, var2);
 
 		
 		StringBuilder var3 = new StringBuilder();
 		var3.append(new Grid4ItemsContent(new String[]{ "部门", "折扣", "赠送", "金额" }, pos4Item, mPrintType, mStyle).toString());
-		for(IncomeByDept deptIncome : _shiftDetail.getDeptIncome()){
+		for(IncomeByDept deptIncome : mShiftDetail.getDeptIncome()){
 			var3.append("\r\n");
 			var3.append(new Grid4ItemsContent(
 					new String[]{ deptIncome.getDept().getName(), 
@@ -125,12 +128,40 @@ public class ShiftContent extends ConcreteContent {
 
 		}
 		//replace the $(var_3) with the shift detail
-		_template = _template.replace(PVar.VAR_3, var3);
+		mTemplate = mTemplate.replace(PVar.VAR_3, var3);
 		
 		//replace the $(var_4) with the shift detail
-		_template = _template.replace(PVar.VAR_4, new RightAlignedDecorator("实收总额：" + NumericUtil.CURRENCY_SIGN + NumericUtil.float2String(_shiftDetail.getTotalActual()), mStyle).toString());
+		mTemplate = mTemplate.replace(PVar.VAR_4, new ExtraFormatDecorator( 
+													new RightAlignedDecorator("实收总额：" + NumericUtil.CURRENCY_SIGN + NumericUtil.float2String(mShiftDetail.getTotalActual()), mStyle).toString(),
+														mStyle, ExtraFormatDecorator.LARGE_FONT_1X).toString());
 		
-		return _template;
+		IncomeByCharge incomeByCharge = mShiftDetail.getIncomeByCharge();
+		if(incomeByCharge.getTotalAccountCharge() != 0 || incomeByCharge.getTotalAccountRefund() != 0){
+			StringBuilder chargeStat = new StringBuilder();
+			
+			chargeStat.append(mSeperatorLine);
+			if(incomeByCharge.getChargeAmount() > 0){
+				chargeStat.append(new CenterAlignedDecorator("会员充值(" + incomeByCharge.getChargeAmount() + "次)", getStyle()).toString()).append(SEP);
+			}else{
+				chargeStat.append(new CenterAlignedDecorator("会员充值", getStyle()).toString()).append(SEP);
+			}
+			chargeStat.append(new Grid2ItemsContent("实收金额：" + incomeByCharge.getTotalActualCharge(), "账户充额：" + incomeByCharge.getTotalAccountCharge(), getStyle())).append(SEP);
+			chargeStat.append("现金实收：" + incomeByCharge.getActualCashCharge()).append(SEP);
+			chargeStat.append("刷卡实收：" + incomeByCharge.getActualCreditCardCharge()).append(SEP);
+			chargeStat.append(SEP);
+			if(incomeByCharge.getRefundAmount() > 0){
+				chargeStat.append(new CenterAlignedDecorator("会员退款(" + incomeByCharge.getRefundAmount() + "次)", getStyle()).toString()).append(SEP);
+			}else{
+				chargeStat.append(new CenterAlignedDecorator("会员退款", getStyle()).toString()).append(SEP);
+			}
+			chargeStat.append(new Grid2ItemsContent("实退金额：" + incomeByCharge.getTotalActualRefund(), "账户扣额：" + incomeByCharge.getTotalAccountRefund(), getStyle())).append(SEP);
+			
+			mTemplate = mTemplate.replace(PVar.VAR_5, chargeStat.toString());
+		}else{
+			mTemplate = mTemplate.replace(PVar.VAR_5, "");
+		}
+		
+		return mTemplate;
 		
 	}
 	
