@@ -554,10 +554,10 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 	}
 	
 	
-	public MemberOperation takeMoney(float takeMoney, float deltaMoney){
+	public MemberOperation refund(float takeMoney, float deltaMoney){
 		MemberOperation mo = MemberOperation.newMO(getId(), getName(), getMobile(), getMemberCard());
 		
-		mo.setOperationType(OperationType.TAKE_MONEY);
+		mo.setOperationType(OperationType.REFUND);
 		mo.setChargeType(ChargeType.CASH);
 		mo.setChargeMoney(-takeMoney);
 		
@@ -1039,8 +1039,14 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 	
 	public void addPublicComment(MemberComment comment){
 		if(comment != null){
+			if(comment.getType() != MemberComment.Type.PUBLIC){
+				throw new IllegalArgumentException("The comment should be public.");
+			}
+			if(comment.getMemberId() != this.id){
+				throw new IllegalArgumentException("The comment does NOT belong to this member.");
+			}
 			for(MemberComment publicComment : publicComments){
-				if(publicComment.equals(comment)){
+				if(comment.getStaffId() == publicComment.getStaffId()){
 					publicComment.setComment(comment.getComment());
 					return;
 				}

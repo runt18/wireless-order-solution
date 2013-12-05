@@ -55,8 +55,7 @@ public class ShiftDetail implements Jsonable{
 	private int eraseAmount;			//抹数账单数
 	private float eraseIncome;			//抹数金额
 	
-	private float chargeByCash;			//会员充值额(现金)
-	private float chargeByCreditCard;	//会员充值额(刷卡)
+	private IncomeByCharge incomeByCharge; 	//会员充值信息
 	
 	private List<IncomeByDept> deptIncome;	//所有部门营业额
 
@@ -315,21 +314,14 @@ public class ShiftDetail implements Jsonable{
 		this.deptIncome = deptIncome;
 	}
 
-	public float getChargeByCash() {
-		return chargeByCash;
+	public void setIncomeByCharge(IncomeByCharge incomeByCharge){
+		this.incomeByCharge = incomeByCharge;
 	}
 
-	public void setChargeByCash(float chargeByCash) {
-		this.chargeByCash = chargeByCash;
+	public IncomeByCharge getIncomeByCharge(){
+		return this.incomeByCharge;
 	}
-
-	public float getChargeByCreditCard() {
-		return chargeByCreditCard;
-	}
-
-	public void setChargeByCreditCard(float chargeByCreditCard) {
-		this.chargeByCreditCard = chargeByCreditCard;
-	}
+	
 	public float getTotalIncome() {
 		return totalIncome;
 	}
