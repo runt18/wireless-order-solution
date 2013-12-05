@@ -194,10 +194,18 @@ public class FinanceWeixinAction extends Action {
 		try{
 			WeixinFinanceDao.bindRestaurant(msg.getFromUserName(), account, pwd);
 			Restaurant restaurant = RestaurantDao.getByAccount(account);
-			rmsg.setContent("恭喜您, 已成功绑定'" + restaurant.getName() + "':-)\n" +
-						    "1 - 绑定餐厅\n" + "bd 帐号 密码\n" +
-							"2 - 查看最近日结信息\n" + "rj\n" +
-						    "3 - 查看今日关注信息\n" + "jr");
+			StringBuilder content = new StringBuilder();
+			content.append("恭喜您, 已成功绑定'" + restaurant.getName() + "':-)\n" );
+			content.append("--------1--------\n")
+			   	   .append("描述：绑定餐厅\n")
+			   	   .append("输入：bd  帐号名  密码\n");
+			content.append("--------2--------\n")
+			   	   .append("描述：查看最近日结\n")
+			   	   .append("输入：rj\n");
+			content.append("--------3--------\n")
+		   	       .append("描述：查看近5天营业信息\n")
+		   	       .append("输入：yy\n");
+			rmsg.setContent(content.toString());
 			return rmsg;
 			
 		}catch(BusinessException e){
@@ -306,7 +314,7 @@ public class FinanceWeixinAction extends Action {
 		rmsg.setFromUserName(msg.getToUserName());
 		rmsg.setToUserName(msg.getFromUserName());
 		StringBuilder content = new StringBuilder();
-		content.append("       使用说明     \n");
+		content.append(centerAligned("使用说明") + "\n");
 		content.append("--------1--------\n")
 			   .append("描述：绑定餐厅\n")
 			   .append("输入：bd  帐号名  密码\n");

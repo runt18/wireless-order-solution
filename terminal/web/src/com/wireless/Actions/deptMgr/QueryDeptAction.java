@@ -31,7 +31,6 @@ public class QueryDeptAction extends DispatchAction{
 			throws Exception {
 		request.setCharacterEncoding("UTF-8");
 		response.setCharacterEncoding("UTF-8");
-		JObject jobject = new JObject();
 		List<String> xz = new ArrayList<String>();
 		xz.add("\'one\'");
 		xz.add("\'two\'");

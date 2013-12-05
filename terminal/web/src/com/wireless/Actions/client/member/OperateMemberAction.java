@@ -265,7 +265,7 @@ public class OperateMemberAction extends DispatchAction{
 			
 			final Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
-			MemberOperation mo = MemberDao.takeMoney(staff, Integer.valueOf(memberID), Float.valueOf(payMannerMoney), Float.valueOf(rechargeMoney));
+			MemberOperation mo = MemberDao.refund(staff, Integer.valueOf(memberID), Float.valueOf(payMannerMoney), Float.valueOf(rechargeMoney));
 			if(comment != null){
 				mo.setComment(comment);
 			}
