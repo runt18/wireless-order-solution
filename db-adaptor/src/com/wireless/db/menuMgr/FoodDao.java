@@ -644,7 +644,7 @@ public class FoodDao {
 					 " FOOD.restaurant_id, FOOD.food_id, FOOD.food_alias, FOOD.stock_status, " +
 					 " FOOD.name, FPP.unit_price, FOOD.kitchen_alias, FOOD.status, FOOD.pinyin, FOOD.taste_ref_type, " +
 					 " FOOD.desc, FOOD.img, " +
-					 " FOOD_STATISTICS.order_cnt, " +
+					 " FOOD.order_amount, " +
 					 " KITCHEN.kitchen_id, KITCHEN.kitchen_alias, KITCHEN.name AS kitchen_name, " +
 					 " KITCHEN.type AS kitchen_type , KITCHEN.is_allow_temp AS is_allow_temp, " +
 					 " DEPT.dept_id, DEPT.name AS dept_name, DEPT.type AS dept_type " +
@@ -654,9 +654,6 @@ public class FoodDao {
 					 " ON FOOD.restaurant_id = PP.restaurant_id AND PP.status = " + PricePlan.Status.ACTIVITY.getVal() +
 					 " INNER JOIN " + Params.dbName + ".food_price_plan FPP " +
 					 " ON PP.price_plan_id = FPP.price_plan_id AND FOOD.food_id = FPP.food_id " +
-					 " LEFT OUTER JOIN " +
-					 Params.dbName + ".food_statistics FOOD_STATISTICS " +
-					 " ON FOOD.food_id = FOOD_STATISTICS.food_id " +
 					 " LEFT OUTER JOIN " +
 					 Params.dbName + ".kitchen KITCHEN " +
 					 " ON FOOD.kitchen_id = KITCHEN.kitchen_id " +
@@ -677,7 +674,7 @@ public class FoodDao {
 	 				   		   dbCon.rs.getInt("food_alias"),
 	 				   		   dbCon.rs.getString("name"),
 	 				   		   dbCon.rs.getFloat("unit_price"),
-	 				   		   new FoodStatistics(dbCon.rs.getInt("order_cnt")),
+	 				   		   new FoodStatistics(dbCon.rs.getInt("order_amount")),
 	 				   		   dbCon.rs.getShort("status"),
 	 				   		   dbCon.rs.getString("pinyin"),
 	 				   		   null,

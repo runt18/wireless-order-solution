@@ -33,22 +33,20 @@ public class CalcFoodStatisticsDao {
 	 * 			Throws if failed to execute the SQL statement.
 	 */
 	public static int exec(DBCon dbCon) throws SQLException{
-		String sql;
 		
 		int nRows = 0;
 		
 		try{
 			//dbCon.conn.setAutoCommit(false);
 			
-			sql = " DELETE FROM " + Params.dbName + ".food_statistics";
+			String sql;
 			
-			dbCon.stmt.executeUpdate(sql);
-			
-			sql = " INSERT INTO " + Params.dbName + ".food_statistics" +
-				  " (`food_id`, `order_cnt`, `weight`) " +
-				  " SELECT " + " food_id, 0, 0 " + " FROM " + Params.dbName + ".food ";
-			
-			nRows = dbCon.stmt.executeUpdate(sql);
+			sql = " SELECT COUNT(*) FROM " + Params.dbName + ".food";
+			dbCon.rs = dbCon.stmt.executeQuery(sql);
+			if(dbCon.rs.next()){
+				nRows = dbCon.rs.getInt(1);
+			}
+			dbCon.rs.close();
 			
 			//Calculate the order count to each food
 			CalcOrderCntDao.exec(dbCon);

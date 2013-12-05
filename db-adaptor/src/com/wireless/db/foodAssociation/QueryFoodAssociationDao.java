@@ -63,14 +63,14 @@ public class QueryFoodAssociationDao {
 		 */
 		String sql;
 		sql = " SELECT " +
-			  " FA.associated_food_id, FA.similarity * FS.weight AS point " +
+			  " FA.associated_food_id, FA.similarity * F.weight AS point " +
 			  " FROM " +
 			  Params.dbName + ".food_association FA " +
-			  " JOIN " + Params.dbName + ".food_statistics FS" + 
+			  " JOIN " + Params.dbName + ".food F" + 
 			  " ON " + 
-			  " FS.food_id = FA.associated_food_id " + 
+			  " F.food_id = FA.associated_food_id " + 
 			  " AND " +
-			  " FS.weight > 0 " +
+			  " F.weight > 0 " +
 			  " WHERE " +
 			  " FA.food_id = " + foodToAssociated.getFoodId() +
 			  " ORDER BY point DESC ";

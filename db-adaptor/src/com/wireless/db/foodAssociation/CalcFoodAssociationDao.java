@@ -110,7 +110,7 @@ public class CalcFoodAssociationDao {
 			dbCon.stmt.execute(sql);
 			
 			//Get the probability to food.
-			sql = " SELECT @food_probability := probability FROM wireless_order_db.food_statistics WHERE food_id = @food_id_to_calc; ";
+			sql = " SELECT @food_probability := probability FROM wireless_order_db.food WHERE food_id = @food_id_to_calc; ";
 			dbCon.stmt.execute(sql);
 			
 			//Calculate the similarity between food and its associated one.
@@ -119,11 +119,11 @@ public class CalcFoodAssociationDao {
 				   " SELECT " +
 				   " @food_id_to_calc, associated_food_id, COUNT(associated_food_id) AS associated_amount, " + 
 				   " COUNT(associated_food_id) / @total_order_amount AS joint_probability, " +
-				   " (COUNT(associated_food_id) / @total_order_amount) / SQRT(@food_probability * FS.probability) AS similarity " +
+				   " (COUNT(associated_food_id) / @total_order_amount) / SQRT(@food_probability * F.probability) AS similarity " +
 				   " FROM (( " +
 				   " SELECT order_id, food_id AS associated_food_id FROM wireless_order_db.order_food_history WHERE order_id IN (" + orderIdCond + ") GROUP BY order_id, associated_food_id " +
 				   " ) AS A) " +
-				   " JOIN wireless_order_db.food_statistics FS ON A.associated_food_id = FS.food_id " +
+				   " JOIN wireless_order_db.food F ON A.associated_food_id = F.food_id " +
 				   " WHERE associated_food_id <> @food_id_to_calc " +
 				   " GROUP BY A.associated_food_id " +
 				   " HAVING similarity IS NOT NULL " +

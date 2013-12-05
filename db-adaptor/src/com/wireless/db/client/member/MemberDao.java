@@ -1280,11 +1280,11 @@ public class MemberDao {
 		String sql;
 		sql = " INSERT INTO " + Params.dbName + ".member_favor_food " +
 			  " (`member_id`, `food_id`, `point`) " +
-			  " SELECT MOH.member_id, OFH.food_id, FS.weight * COUNT(*) AS point " +
+			  " SELECT MOH.member_id, OFH.food_id, F.weight * COUNT(*) AS point " +
 			  " FROM " + Params.dbName + ".order_food_history OFH " +
 			  " JOIN " + Params.dbName + ".member_operation_history MOH " + 
 			  " ON OFH.order_id = MOH.order_id " + " AND " + " MOH.member_id = " + memberId +
-			  " JOIN " + Params.dbName + ".food_statistics FS ON OFH.food_id = FS.food_id " +
+			  " JOIN " + Params.dbName + ".food F ON OFH.food_id = F.food_id " +
 			  " GROUP BY OFH.food_id " +
 			  " HAVING point <> 0 " +
 			  " ORDER BY point DESC " + 

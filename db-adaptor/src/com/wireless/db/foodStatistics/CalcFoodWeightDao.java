@@ -96,7 +96,7 @@ public class CalcFoodWeightDao {
 				final float weight = dbCon.rs.getFloat("weight");
 				
 				//Insert the probability & weight of each food to this restaurant.
-				sql = " UPDATE " + Params.dbName + ".food_statistics SET " +
+				sql = " UPDATE " + Params.dbName + ".food SET " +
 					  " weight = " + weight +
 					  " ,probability = " + probability +
 					  " WHERE " +
