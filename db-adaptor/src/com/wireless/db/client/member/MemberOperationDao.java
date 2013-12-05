@@ -71,8 +71,8 @@ public class MemberOperationDao {
 						   (mo.getOperationType() == OperationType.CONSUME ? mo.getPayType().getVal() : "NULL") + "," +
 						   (mo.getOperationType() == OperationType.CONSUME ? mo.getPayMoney() : "NULL") + "," + 
 						   (mo.getOperationType() == OperationType.CONSUME ? mo.getOrderId() : "NULL") + "," +
-						   (mo.getOperationType() == OperationType.CHARGE ? mo.getChargeType().getValue() : (mo.getOperationType() == OperationType.TAKE_MONEY ? mo.getChargeType().getValue() : "NULL")) + "," + 
-						   (mo.getOperationType() == OperationType.CHARGE ? mo.getChargeMoney() : (mo.getOperationType() == OperationType.TAKE_MONEY ? mo.getChargeMoney() : "NULL")) + "," +
+						   (mo.getOperationType() == OperationType.CHARGE ? mo.getChargeType().getValue() : (mo.getOperationType() == OperationType.REFUND ? mo.getChargeType().getValue() : "NULL")) + "," + 
+						   (mo.getOperationType() == OperationType.CHARGE ? mo.getChargeMoney() : (mo.getOperationType() == OperationType.REFUND ? mo.getChargeMoney() : "NULL")) + "," +
 						   mo.getDeltaBaseMoney() + "," + 
 						   mo.getDeltaExtraMoney() + "," + 
 						   mo.getDeltaPoint() + ","	+ 
@@ -219,7 +219,7 @@ public class MemberOperationDao {
 				mo.setPayMoney(dbCon.rs.getFloat("pay_money"));
 				mo.setOrderId(dbCon.rs.getInt("order_id"));
 			}
-			if(mo.getOperationType() == OperationType.CHARGE || mo.getOperationType() == OperationType.TAKE_MONEY){
+			if(mo.getOperationType() == OperationType.CHARGE || mo.getOperationType() == OperationType.REFUND){
 				mo.setChargeType(dbCon.rs.getShort("charge_type"));
 				mo.setChargeMoney(dbCon.rs.getFloat("charge_money"));
 			}
@@ -438,7 +438,7 @@ public class MemberOperationDao {
 				mo.setPayMoney(dbCon.rs.getFloat("pay_money"));
 				mo.setOrderId(dbCon.rs.getInt("order_id"));
 			}
-			if(mo.getOperationType() == OperationType.CHARGE || mo.getOperationType() == OperationType.TAKE_MONEY){
+			if(mo.getOperationType() == OperationType.CHARGE || mo.getOperationType() == OperationType.REFUND){
 				mo.setChargeType(dbCon.rs.getShort("charge_type"));
 				mo.setChargeMoney(dbCon.rs.getFloat("charge_money"));
 			}

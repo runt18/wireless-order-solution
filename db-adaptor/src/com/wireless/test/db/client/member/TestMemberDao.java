@@ -17,9 +17,9 @@ import com.wireless.db.client.member.MemberTypeDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.client.Member;
-import com.wireless.pojo.client.MemberComment;
 import com.wireless.pojo.client.Member.AdjustType;
 import com.wireless.pojo.client.Member.Sex;
+import com.wireless.pojo.client.MemberComment;
 import com.wireless.pojo.client.MemberOperation;
 import com.wireless.pojo.client.MemberOperation.ChargeType;
 import com.wireless.pojo.client.MemberType;
@@ -257,6 +257,8 @@ public class TestMemberDao {
 	private void testCharge(Member expect) throws BusinessException, SQLException{
 		MemberOperation mo = MemberDao.charge(mStaff, expect.getId(), 100, 120, ChargeType.CASH);
 		expect.charge(100, 120, ChargeType.CASH);
+		
+		//CalcBillStatisticsDao.calcIncomeByCharge(mStaff, range, DateType.TODAY);
 		
 		compareMember(expect, MemberDao.getMemberById(mStaff, expect.getId()));
 		compareMemberOperation(mo, MemberOperationDao.getTodayById(mo.getId()));

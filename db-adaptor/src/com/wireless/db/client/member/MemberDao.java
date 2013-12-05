@@ -850,6 +850,8 @@ public class MemberDao {
 	 * 			the id of member account to be charged.
 	 * @param chargeMoney
 	 * 			the amount of charge money
+	 * @param accountMoney
+	 * 			the amount of account money
 	 * @param chargeType
 	 * 			the charge type referred to {@link Member.ChargeType}
 	 * @return the member operation to this charge.
@@ -858,7 +860,7 @@ public class MemberDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statements
 	 */
-	public static MemberOperation charge(DBCon dbCon, Staff staff, int memberId, float chargeMoney, float deltaMoney, ChargeType chargeType) throws BusinessException, SQLException{
+	public static MemberOperation charge(DBCon dbCon, Staff staff, int memberId, float chargeMoney, float accountMoney, ChargeType chargeType) throws BusinessException, SQLException{
 		
 		if(chargeMoney < 0){
 			throw new IllegalArgumentException("The amount of charge money(amount = " + chargeMoney + ") must be more than zero");
@@ -867,7 +869,7 @@ public class MemberDao {
 		Member member = getMemberById(dbCon, staff, memberId);
 		
 		//Perform the charge operation and get the related member operation.
-		MemberOperation mo = member.charge(chargeMoney, deltaMoney, chargeType);
+		MemberOperation mo = member.charge(chargeMoney, accountMoney, chargeType);
 		
 		//Insert the member operation to this charge operation.
 		MemberOperationDao.insert(dbCon, staff, mo);
@@ -885,12 +887,14 @@ public class MemberDao {
 	
 	/**
 	 * Perform the charge operation to a member account.
-	 * @param term
-	 * 			the terminal 
+	 * @param staff
+	 * 			the staff to perform this action 
 	 * @param memberId
 	 * 			the id of member account to be charged.
 	 * @param chargeMoney
 	 * 			the amount of charge money
+	 * @param accountMoney
+	 * 			the amount of account money
 	 * @param chargeType
 	 * 			the charge type referred to {@link Member.ChargeType}
 	 * @return the member operation to this charge.
@@ -899,12 +903,12 @@ public class MemberDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statements
 	 */
-	public static MemberOperation charge(Staff term, int memberId, float chargeMoney, float deltaMoney, ChargeType chargeType) throws BusinessException, SQLException{
+	public static MemberOperation charge(Staff staff, int memberId, float chargeMoney, float accountMoney, ChargeType chargeType) throws BusinessException, SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
 			dbCon.conn.setAutoCommit(false);
-			MemberOperation mo = MemberDao.charge(dbCon, term, memberId, chargeMoney, deltaMoney, chargeType);
+			MemberOperation mo = MemberDao.charge(dbCon, staff, memberId, chargeMoney, accountMoney, chargeType);
 			dbCon.conn.commit();
 			return mo;
 			
@@ -918,24 +922,32 @@ public class MemberDao {
 			dbCon.disconnect();
 		}
 	}
+	
 	/**
-	 * Perform the charge operation to a member account.
+	 * Perform the refund operation to a specific member account.
 	 * @param dbCon
+	 * 			the database connection
 	 * @param staff
+	 * 			the staff to perform this action
 	 * @param memberId
-	 * @param takeMoney
-	 * @param chargeType
-	 * @return
+	 * 			the id to member account
+	 * @param refundMoney
+	 * 			the refund money
+	 * @param accountMoney
+	 * 			the account money
+	 * @return the member operation to refund
 	 * @throws BusinessException
+	 * 			throws if insufficient to refund
 	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
 	 */
-	public static MemberOperation takeMoney(DBCon dbCon, Staff staff, int memberId, float takeMoney, float deltaMoney) throws BusinessException, SQLException{
-		if(takeMoney < 0){
-			throw new IllegalArgumentException("The amount of take money(amount = " + takeMoney + ") must be more than zero");
+	public static MemberOperation refund(DBCon dbCon, Staff staff, int memberId, float refundMoney, float accountMoney) throws BusinessException, SQLException{
+		if(refundMoney < 0){
+			throw new IllegalArgumentException("The amount of take money(amount = " + refundMoney + ") must be more than zero");
 		}
 		Member member = getMemberById(dbCon, staff, memberId);
 		
-		MemberOperation mo = member.takeMoney(takeMoney, deltaMoney);
+		MemberOperation mo = member.refund(refundMoney, accountMoney);
 		
 		if(mo.getRemainingBaseMoney() < 0){
 			throw new BusinessException("无足够余额取款");
@@ -955,25 +967,29 @@ public class MemberDao {
 	}
 	
 	/**
-	 * Perform the charge operation to a member account.
-	 * @param term
-	 * 			the staff
+	 * Perform the refund operation to a specific member account.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
 	 * @param memberId
-	 * 			the id of member account
-	 * @param takeMoney
-	 * 			the amount of take Money
-	 * @return	the member operation to this take Money.
+	 * 			the id to member account
+	 * @param refundMoney
+	 * 			the refund money
+	 * @param accountMoney
+	 * 			the account money
+	 * @return the member operation to refund
 	 * @throws BusinessException
-	 * 			throw if the member id to search is NOT found 
+	 * 			throws if insufficient to refund
 	 * @throws SQLException
-	 * 			throws if failed to execute any SQL statements
+	 * 			throws if failed to execute any SQL statement
 	 */
-	public static MemberOperation takeMoney(Staff term, int memberId, float takeMoney, float deltaMoney) throws BusinessException, SQLException{
+	public static MemberOperation refund(Staff staff, int memberId, float refundMoney, float accountMoney) throws BusinessException, SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
 			dbCon.conn.setAutoCommit(false);
-			MemberOperation mo = MemberDao.takeMoney(dbCon, term, memberId, takeMoney, deltaMoney);
+			MemberOperation mo = MemberDao.refund(dbCon, staff, memberId, refundMoney, accountMoney);
 			dbCon.conn.commit();
 			return mo;
 			

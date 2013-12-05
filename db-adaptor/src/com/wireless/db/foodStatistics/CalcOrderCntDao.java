@@ -13,7 +13,6 @@ public class CalcOrderCntDao {
 	 * @throws SQLException
 	 * 			Throws if failed to execute the SQL statement.
 	 */
-
 	public static void exec() throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{

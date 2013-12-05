@@ -12,7 +12,6 @@ import com.wireless.db.billStatistics.CalcBillStatisticsDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.billStatistics.IncomeByCancel;
-import com.wireless.pojo.billStatistics.IncomeByCharge;
 import com.wireless.pojo.billStatistics.IncomeByDept;
 import com.wireless.pojo.billStatistics.IncomeByDiscount;
 import com.wireless.pojo.billStatistics.IncomeByErase;
@@ -321,10 +320,8 @@ public class QueryShiftDao {
 		result.setServiceAmount(incomeByService.getServiceAmount());
 		result.setServiceIncome(incomeByService.getTotalService());
 		
-		//Get the charge income by both cash and credit card
-		IncomeByCharge incomeByCharge = CalcBillStatisticsDao.calcIncomeByCharge(dbCon, staff, new DutyRange(onDuty, offDuty), queryType);
-		result.setChargeByCash(incomeByCharge.getCash());
-		result.setChargeByCreditCard(incomeByCharge.getCreditCard());
+		//Get the income by charge
+		result.setIncomeByCharge(CalcBillStatisticsDao.calcIncomeByCharge(dbCon, staff, new DutyRange(onDuty, offDuty), queryType));
 		
 		//Get the gift, discount & total to each department during this period.
 		List<IncomeByDept> incomeByDept = CalcBillStatisticsDao.calcIncomeByDept(dbCon, staff, new DutyRange(onDuty, offDuty), null, queryType);

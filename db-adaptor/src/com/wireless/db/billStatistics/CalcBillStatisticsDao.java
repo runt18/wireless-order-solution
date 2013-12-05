@@ -1048,10 +1048,12 @@ public class CalcBillStatisticsDao {
 		 
 		 String sql;
 		 
-		 // Calculate the total charge money by cash 
+		 // Calculate the charge money. 
 		 sql = " SELECT " +
-		 	   " SUM(IF(charge_type = " + ChargeType.CASH.getValue() + ", charge_money, 0)) AS total_charge_by_cash, " +
-		 	   " SUM(IF(charge_type = " + ChargeType.CREDIT_CARD.getValue() + ", charge_money, 0)) AS total_charge_by_card " +
+			   " COUNT(*) AS charge_amount, " +
+			   " SUM(delta_base_money + delta_extra_money) AS total_account_charge, " +
+		 	   " SUM(IF(charge_type = " + ChargeType.CASH.getValue() + ", charge_money, 0)) AS total_actual_charge_by_cash, " +
+		 	   " SUM(IF(charge_type = " + ChargeType.CREDIT_CARD.getValue() + ", charge_money, 0)) AS total_actual_charge_by_card " +
 			   " FROM " + Params.dbName + "." + moTbl +
 			   " WHERE " +
 			   " operate_type = " + OperationType.CHARGE.getValue() +
@@ -1063,11 +1065,32 @@ public class CalcBillStatisticsDao {
 		 IncomeByCharge incomeByCharge = new IncomeByCharge();
 		 
 		 if(dbCon.rs.next()){
-			 incomeByCharge.setCash(dbCon.rs.getFloat("total_charge_by_cash"));
-			 incomeByCharge.setCreditCard(dbCon.rs.getFloat("total_charge_by_card"));
+			 incomeByCharge.setChargeAmount(dbCon.rs.getInt("charge_amount"));
+			 incomeByCharge.setActualCashCharge(dbCon.rs.getFloat("total_actual_charge_by_cash"));
+			 incomeByCharge.setActualCreditCardCharge(dbCon.rs.getFloat("total_actual_charge_by_card"));
+			 incomeByCharge.setTotalAccountCharge(dbCon.rs.getFloat("total_account_charge"));
 		 }
 		 
 		 dbCon.rs.close();
+		 
+		 // Calculate the refund. 
+		 sql = " SELECT " +
+			   " COUNT(*) AS refund_amount, " +
+			   " SUM(delta_base_money + delta_extra_money) AS total_account_refund, " +
+		 	   " SUM(charge_money) AS total_actual_refund " +
+			   " FROM " + Params.dbName + "." + moTbl +
+			   " WHERE " +
+			   " operate_type = " + OperationType.REFUND.getValue() +
+			   " AND " +
+			   " operate_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'";
+		 
+		 dbCon.rs = dbCon.stmt.executeQuery(sql);
+		 
+		 if(dbCon.rs.next()){
+			 incomeByCharge.setRefundAmount(dbCon.rs.getInt("refund_amount"));
+			 incomeByCharge.setTotalActualRefund(Math.abs(dbCon.rs.getFloat("total_actual_refund")));
+			 incomeByCharge.setTotalAccountRefund(Math.abs(dbCon.rs.getFloat("total_account_refund")));
+		 }
 		 
 		 return incomeByCharge;
 		 
