@@ -546,7 +546,7 @@ var btnControlMember = new Ext.ux.ImageButton({
 							url : '../window/client/controlMember.jsp',
 							scripts : true,
 							params : {
-								
+								otype : 'insert'
 							}
 						});
 					}
