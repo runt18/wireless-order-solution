@@ -68,13 +68,13 @@
 					<input id="serviceCharge" type="text" value="0" style="width: 50px;"></input>
 				</td>
 				<td>%</td>
-				<td style="width: 60px;">&nbsp;</td>
-				<td>应收：￥</td>
-				<td><div id="totalCount"></div></td>
-				<td style="width: 60px;">&nbsp;</td>
-				<td>赠送：￥</td>
-				<td><div id="forFree"></div></td>
-				<td style="width: 60px;">&nbsp;</td>
+				<td style="width: 20px;">&nbsp;</td>
+				<td rowspan="2" style="font-size:30px;">实收：￥<span id="shouldPay" style="color:rgb(21, 66, 139); font-weight: bold;"></span></td>
+				<td style="width: 20px;">&nbsp;</td>
+				<td>应收：￥<span id="totalCount"></span></td>
+				<td style="width: 20px;">&nbsp;</td>
+				<td>赠送：￥<span id="forFree"></span></td>
+				<td style="width: 20px;">&nbsp;</td>
 				<td colspan="4">
 					<div id="div_showEraseQuota" style="display: none;">
 						抹数金额：￥
@@ -88,22 +88,21 @@
 			<tr>
 				<td>收款：￥</td>
 				<td><input id="actualCount" type="text" style="width: 50px;"></input></td>
-				<td>&nbsp;&nbsp;&nbsp;</td>
-				<td style="width: 60px;">&nbsp;</td>
-				<td>实收：￥</td>
-				<td><div id="shouldPay"></div></td>
-				<td style="width: 60px;">&nbsp;</td>
-				<td>找零：￥</td>
-				<td><div id="change"></div></td>
-				<td style="width: 60px;">&nbsp;</td>
+				<td colspan="2">&nbsp;&nbsp;&nbsp;</td>
+				<td style="width: 20px;">&nbsp;</td>
+				<td>数量：￥<span id="spanSumFoodCount"></span></td>
+				<td style="width: 20px;">&nbsp;</td>
+				<td>找零：￥<span id="change"></span></td>
+				<td style="width: 20px;">&nbsp;</td>
 				<td>退菜金额：￥</td>
 				<td><span id="spanCancelFoodAmount"></span><span id="spanSeeCancelFoodAmount" style="visibility:hidden;">&nbsp;<a href="javascript:showCancelFoodDetail()" >查看</a></span></td>
-				<td style="width: 60px;">&nbsp;</td>
+				<td style="width: 20px;">&nbsp;</td>
 				<td>
 					<input type="button" value="计算" style="width: 80px;" onclick="refreshCheckOutData()"></input>
 				</td>
 			</tr>
 		</table>
 	</div>
+	
 </body>
 </html>
