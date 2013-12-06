@@ -110,7 +110,7 @@ public class SellOutActivity extends FragmentActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		this.setContentView(R.layout.activity_sell_out);
+		this.setContentView(R.layout.sell_out_activity);
 		
 		//返回Button和标题
 		TextView title = (TextView) findViewById(R.id.toptitle);
@@ -270,7 +270,7 @@ public class SellOutActivity extends FragmentActivity {
 		public View getView(int position, View convertView, ViewGroup parent) {
 			final View layout;
 			if(convertView == null){
-				layout = LayoutInflater.from(getApplicationContext()).inflate(R.layout.activity_sellout_list_item, null);
+				layout = LayoutInflater.from(getApplicationContext()).inflate(R.layout.sellout_list_item, null);
 			}else{
 				layout = convertView;
 			}

@@ -158,7 +158,7 @@ public class PickFoodActivity extends FragmentActivity
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.pick_food);
+		setContentView(R.layout.pick_food_activity);
 		
 		mViewHandler = new ViewHandler(this);
 		

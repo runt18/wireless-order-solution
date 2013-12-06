@@ -107,7 +107,7 @@ public class PickFoodFragment extends Fragment{
         	searchTxtView.setHint("请输入文字或拼音搜索");
         }
         
-        mGridView = (GridView) view.findViewById(R.id.gridView_numberFragment);
+        mGridView = (GridView) view.findViewById(R.id.gridView_foods_pickFoodFragment);
         //设置点菜侦听
         mGridView.setOnItemClickListener(new OnItemClickListener(){
 			@Override
@@ -164,7 +164,7 @@ public class PickFoodFragment extends Fragment{
 		});
         
 		//删除搜索条件按钮
-		((ImageButton) view.findViewById(R.id.imageButton_delete_numberFragment)).setOnClickListener(new OnClickListener(){
+		((ImageButton) view.findViewById(R.id.imageButton_delete_pickFoodFragment)).setOnClickListener(new OnClickListener(){
 			@Override
 			public void onClick(View v) {
 				searchTxtView.setText("");
