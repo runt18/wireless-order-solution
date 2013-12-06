@@ -237,11 +237,11 @@ public class TasteDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static void update(Staff term, Taste.UpdateBuilder builder) throws BusinessException, SQLException{
+	public static void update(Staff staff, Taste.UpdateBuilder builder) throws BusinessException, SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			TasteDao.update(dbCon, term, builder);
+			TasteDao.update(dbCon, staff, builder);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -260,10 +260,10 @@ public class TasteDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static void delete(DBCon dbCon, Staff term, int id) throws SQLException, BusinessException{
+	public static void delete(DBCon dbCon, Staff staff, int id) throws SQLException, BusinessException{
 		String deleteSQL = "DELETE FROM " + Params.dbName + ".taste"
 			+ " WHERE taste_id = " + id
-			+ " AND restaurant_id = " + term.getRestaurantId();
+			+ " AND restaurant_id = " + staff.getRestaurantId();
 		if(dbCon.stmt.executeUpdate(deleteSQL) == 0){
 			throw new BusinessException(TasteError.DELETE_FAIL);
 		}
@@ -280,11 +280,11 @@ public class TasteDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static void delete(Staff term, int id) throws BusinessException, SQLException{
+	public static void delete(Staff staff, int id) throws BusinessException, SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			TasteDao.delete(dbCon, term, id);
+			TasteDao.delete(dbCon, staff, id);
 		}finally{
 			dbCon.disconnect();
 		}
