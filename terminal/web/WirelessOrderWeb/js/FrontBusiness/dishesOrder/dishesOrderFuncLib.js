@@ -791,13 +791,14 @@ function submitSingleOrderHandler(_c){
 			url : '../../InsertOrder.do',
 			params : {
 				isCookie : true,
-				'tableID' : tableAliasID,
-				'orderID' : _c.grid.order.id,
-				'customNum' : 1,
-				'type' : type,
-				'foods' : foodPara,
-				'category' : tableCategory,
-				'orderDate' : typeof(_c.grid.order) == 'undefined' ? '' : _c.grid.order.orderDate
+				tableID : tableAliasID,
+				orderID : _c.grid.order.id,
+				customNum : 1,
+				type : type,
+				foods : foodPara,
+				category : tableCategory,
+				orderDate : (typeof _c.grid.order == 'undefined' ? '' : _c.grid.order.orderDate),
+				notPrint : _c.notPrint === true ? true : false
 			},
 			success : function(response, options) {
 				var jr = Ext.util.JSON.decode(response.responseText);
@@ -906,6 +907,7 @@ function setButtonDisabled(s){
 		orderPanel.buttons[1].setDisabled(s);
 		orderPanel.buttons[2].setDisabled(s);
 		orderPanel.buttons[3].setDisabled(s);
+		orderPanel.buttons[4].setDisabled(s);
 	}
 }
 

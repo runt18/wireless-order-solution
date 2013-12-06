@@ -360,6 +360,7 @@ var allFoodTabPanelGridTbar = new Ext.Toolbar({
 	}, new Ext.form.ComboBox({
 		xtype : 'combo',
 		id : 'comSearchKitchen',
+		maxHeight : 500,
 	    width : 100,
 	    listWidth : 100,
 	    value : -1,
@@ -669,6 +670,20 @@ var orderPanel = new Ext.Panel({
 			});
 		}
 	}, {
+		text : '提交不打印',
+		handler : function() {
+			var href = '';
+			if(isGroup){
+				href = 'CheckOut.html?'+ strEncode('restaurantID=' + restaurantID + '&orderID=' + orderID + '&category=' + tableCategory, 'mi');
+			}else{
+				href = 'CheckOut.html?'+ strEncode('restaurantID=' + restaurantID + '&tableID=' + tableAliasID+ '&personCount=1', 'mi');
+			}
+			submitOrderHandler({
+				notPrint : true,
+				href : href			
+			});
+		}
+	}, {
 		text : '提交&结帐',
 		handler : function() {
 			var href = '';
@@ -713,7 +728,6 @@ var dishesOrderNorthPanel = new Ext.Panel({
 	region : 'north',
 	height : 40,
 	border : false,
-//	layout : 'form',
 	frame : true
 });
 
@@ -723,7 +737,6 @@ Ext.onReady(function() {
 	var menuTabPanel = new Ext.TabPanel({
 		id : 'menuTabPanel',
 		activeItem : 0,
-//		items : [allFoodTabPanel, tempFoodTabPanel],
 		items : [allFoodTabPanel],
 		listeners : {
 			beforerender : function(thiz){

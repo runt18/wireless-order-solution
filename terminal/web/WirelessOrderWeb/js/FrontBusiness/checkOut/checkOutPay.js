@@ -164,7 +164,8 @@ var paySubmit = function(submitType) {
 							buttons : Ext.MessageBox.OK
 						});
 					}
-					checkOutForm.buttons[7].setDisabled(false);
+//					checkOutForm.buttons[7].setDisabled(false);
+					setFormButtonStatus(false);
 				},
 				failure : function(response, options) {
 					setFormButtonStatus(false);

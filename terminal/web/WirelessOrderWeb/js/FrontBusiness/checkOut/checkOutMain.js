@@ -279,6 +279,15 @@ Ext.onReady(function() {
 		checkOutMainPanel.doLayout();
 	}
 	
+	
+	new Ext.KeyMap(document.body, [{
+		key: 107,
+		scope : this,
+		fn: function(){
+			paySubmit(1);
+		}
+	}]);
+	
 });
 
 function setFormButtonStatus(_s){
@@ -290,4 +299,8 @@ function setFormButtonStatus(_s){
 	checkOutForm.buttons[5].setDisabled(_s);
 	checkOutForm.buttons[6].setDisabled(_s);
 	checkOutForm.buttons[7].setDisabled(_s);
+	var btnSave = Ext.getCmp('btnSaveForConfirmCashPayWin');
+	if(btnSave) btnSave.setDisabled(_s);
+	var btnClose = Ext.getCmp('btnCloseForConfirmCashPayWin');
+	if(btnClose) btnClose.setDisabled(_s);
 };

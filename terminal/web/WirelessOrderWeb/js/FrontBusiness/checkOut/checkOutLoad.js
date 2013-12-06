@@ -104,13 +104,20 @@ function loadOrderBasicMsg(){
 	document.getElementById("actualCount").value = parseFloat(orderMsg.actualPrice).toFixed(2);
 	
 	document.getElementById("change").innerHTML = change;
-	Ext.getCmp('numCustomNum').setValue(orderMsg.customNum >= 0 ? orderMsg.customNum : 0);
+	Ext.getCmp('numCustomNum').setValue(orderMsg.customNum > 0 ? orderMsg.customNum : 1);
 	if(eval(orderMsg.category != 4)){
 		Ext.getCmp('numCustomNum').setDisabled(false);
 	}
 	if(eval(orderMsg.category != 4) && eval(orderMsg.cancelPrice > 0)){
 		Ext.getDom('spanSeeCancelFoodAmount').style.visibility = 'inherit';		
 	}
+	
+	var sumFoodCount = 0;
+	for(var i = 0; i < checkOutData.root.length; i++){
+		sumFoodCount += checkOutData.root[i].count;
+	}
+	document.getElementById("spanSumFoodCount").innerHTML = sumFoodCount.toFixed(2);;
+	
 	checkOutMainPanel.setTitle('结账 -- 账单号:<font color="red">' + orderMsg.id + '</font>');
 	if(orderMsg.category != 4){
 		checkOutMainPanel.setTitle(checkOutMainPanel.title + ' -- 餐桌号:<font color="red">' + orderMsg.table.alias + '</font>');
