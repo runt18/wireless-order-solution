@@ -11,7 +11,9 @@ import android.support.v4.app.DialogFragment;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.BaseAdapter;
@@ -86,6 +88,19 @@ public class AskOrderAmountDialog extends DialogFragment{
         final View view = inflater.inflate(R.layout.ask_order_amount_dialog, container, false);
         
         final EditText countEditText = (EditText)view.findViewById(R.id.editText_askOrderAmount_amount);
+        
+        //点击数量EditText后全选内容并弹出软键盘
+        countEditText.setOnTouchListener(new OnTouchListener(){
+			@Override
+			public boolean onTouch(View v, MotionEvent event) {
+				countEditText.selectAll();
+				InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+			    imm.showSoftInput(v, 0);
+				return true;
+			}
+        	
+        });
+        
 		//数量加按钮
 		((ImageButton)view.findViewById(R.id.button_askOrderAmount_plus)).setOnClickListener(new View.OnClickListener(){
 

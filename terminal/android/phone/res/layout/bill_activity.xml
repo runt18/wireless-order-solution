@@ -102,7 +102,7 @@
         android:visibility="gone" >
 
         <ImageView
-            android:id="@+id/normal_table_detail"
+            android:id="@+id/imgView_payOrder_bill"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
@@ -111,7 +111,7 @@
             android:src="@drawable/normal_selector" />
 
         <ImageView
-            android:id="@+id/allowance_table_detail"
+            android:id="@+id/imgView_payTmpOrder_bill"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="false"
@@ -120,7 +120,7 @@
             android:src="@drawable/rebate_selector" />
 
         <ImageView
-            android:id="@+id/order_table_detail"
+            android:id="@+id/imgView_chgOrder_bill"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"

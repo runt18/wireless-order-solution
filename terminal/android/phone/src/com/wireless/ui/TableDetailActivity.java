@@ -68,10 +68,13 @@ public class TableDetailActivity extends Activity {
 			}
 		});
 		
+		findViewById(R.id.relativeLayout_bottom_bill).setVisibility(View.INVISIBLE);
+		findViewById(R.id.relativeLayout_bottom4Detail_bill).setVisibility(View.VISIBLE);
+		
 		/**
 		 * "结帐"Button
 		 */
-		((ImageView) findViewById(R.id.normal_table_detail)).setOnClickListener(new View.OnClickListener() {
+		((ImageView) findViewById(R.id.imgView_payOrder_bill)).setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View arg0) {
 				showBillDialog(Type.PAY_ORDER);
@@ -79,9 +82,9 @@ public class TableDetailActivity extends Activity {
 		});
 		
 		/**
-		 * "打折"Button
+		 * "暂结"Button
 		 */
-		((ImageView) findViewById(R.id.allowance_table_detail)).setOnClickListener(new View.OnClickListener() {
+		((ImageView) findViewById(R.id.imgView_payTmpOrder_bill)).setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View arg0) {
 				showBillDialog(Type.PAY_TEMP_ORDER);
@@ -92,7 +95,7 @@ public class TableDetailActivity extends Activity {
 		/**
 		 * "改单"Button
 		 */
-		((ImageView)findViewById(R.id.order_table_detail)).setOnClickListener(new View.OnClickListener() {
+		((ImageView)findViewById(R.id.imgView_chgOrder_bill)).setOnClickListener(new View.OnClickListener() {
 			
 			@Override
 			public void onClick(View v) {
