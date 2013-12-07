@@ -56,7 +56,7 @@ public class KitchenFragment extends Fragment {
 			final KitchenFragment fragment = mFragment.get();
 			
 			if(mDeptLayout == null){
-				mDeptLayout = (LinearLayout)fragment.getView().findViewById(R.id.linearLayout_kitchenFragment);
+				mDeptLayout = (LinearLayout)fragment.getView().findViewById(R.id.linearLayout_top_kitchenFragment);
 			}
 			
 			//添加所有部门
@@ -64,7 +64,7 @@ public class KitchenFragment extends Fragment {
 			int i = 0;
 			for(Department dept : WirelessOrder.foodMenu.depts){
 				//解析跟图层
-				RelativeLayout view = (RelativeLayout) LayoutInflater.from(fragment.getActivity()).inflate(R.layout.kitchen_fragment_dept_item, null);
+				RelativeLayout view = (RelativeLayout) LayoutInflater.from(fragment.getActivity()).inflate(R.layout.pick_food_by_kitchen_fgm_dept_item, null);
 				
 				//解析子图层并设置颜色
 				final RelativeLayout childView = (RelativeLayout) view.findViewById(R.id.relativeLayout_child_kcFgm);
@@ -149,7 +149,7 @@ public class KitchenFragment extends Fragment {
  
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		View view = inflater.inflate(R.layout.kitchen_fragment, container, false);
+		View view = inflater.inflate(R.layout.pick_food_by_kitchen_fgm, container, false);
 		
 		mXpListView = (ExpandableListView) view.findViewById(R.id.expandableListView_kitchenFragment);
 		
@@ -273,10 +273,10 @@ public class KitchenFragment extends Fragment {
 			if(convertView != null){
 				view = convertView;
 			}else{
-				view = View.inflate(getActivity(), R.layout.kitchen_fragment_xplistview_group_item, null);
+				view = View.inflate(getActivity(), R.layout.pick_food_by_kitchen_fgm_xplv_group_item, null);
 			}
 			
-			view.setBackgroundResource(R.drawable.kitchen_fragment_group_selector);
+			view.setBackgroundResource(R.drawable.kitchen_fgm_group_selector);
 			
 			//设置厨房名
 			((TextView) view.findViewById(R.id.textView_name_kitchenFragment_xp_group_item))
@@ -295,7 +295,7 @@ public class KitchenFragment extends Fragment {
 			if(convertView != null){
 				view = convertView;
 			}else{
-				view = View.inflate(getActivity(), R.layout.kitchen_fragment_xp_listview_child_item, null);
+				view = View.inflate(getActivity(), R.layout.pick_food_by_kitchen_fgm_xplv_child_item, null);
 			}
 			
 			//设置该行的GridView
@@ -359,7 +359,7 @@ public class KitchenFragment extends Fragment {
 		public View getView(int position, View convertView, ViewGroup parent) {
 			final View view;
 			if(convertView == null){
-				view = View.inflate(getActivity(), R.layout.pick_food_fragment_item, null);
+				view = View.inflate(getActivity(), R.layout.pick_food_by_pinyin_fgm_item, null);
 			}else{
 				view = convertView;
 			}

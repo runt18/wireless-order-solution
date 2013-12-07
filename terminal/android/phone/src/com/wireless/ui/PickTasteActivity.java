@@ -4,12 +4,13 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentTransaction;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -29,16 +30,66 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.wireless.common.WirelessOrder;
+import com.wireless.fragment.PickFoodFragment;
+import com.wireless.fragment.PopTasteFragment;
 import com.wireless.parcel.OrderFoodParcel;
 import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.tasteMgr.Taste;
 import com.wireless.pojo.util.NumericUtil;
-import com.wireless.ui.view.ScrollLayout;
-import com.wireless.ui.view.ScrollLayout.OnViewChangedListener;
 
-public class PickTasteActivity extends Activity{
+public class PickTasteActivity extends FragmentActivity{
+	
+	//每个口味方式的标签
+	private static final int POP_TASTE_FRAGMENT = 0;		//常用
+	private static final int ALL_TASTE_FRAGMENT = 1;		//口味
+	private static final int PINZHU_FRAGMENT = 2;			//品注
+
+	private int mCurFg = -1;
 	
 	private Handler _handler; 
+	
+	private Handler mViewHandler;
+	
+	private static class ViewHandler extends Handler{
+		private final WeakReference<PickTasteActivity> mActivity;
+		private final TextView mTitleTextView;
+		
+		ViewHandler(PickTasteActivity activity){
+			mActivity = new WeakReference<PickTasteActivity>(activity);
+			mTitleTextView = (TextView) activity.findViewById(R.id.toptitle);
+		}
+		
+		@Override
+		public void handleMessage(Message msg) {
+			PickTasteActivity activity = mActivity.get();
+			FragmentTransaction fgTrans = activity.getSupportFragmentManager().beginTransaction();
+
+			((LinearLayout)activity.findViewById(R.id.linearLayout_pop_pickTaste)).setBackgroundResource(R.drawable.tab_bg_unselected);
+			((LinearLayout)activity.findViewById(R.id.linearLayout_taste_pickTaste)).setBackgroundResource(R.drawable.tab_bg_unselected);
+			((LinearLayout)activity.findViewById(R.id.linearLayout_pinzhu_pickTaste)).setBackgroundResource(R.drawable.tab_bg_unselected);
+			
+			if(msg.what == POP_TASTE_FRAGMENT && activity.mCurFg != POP_TASTE_FRAGMENT){
+				mTitleTextView.setText("常用口味");
+				((LinearLayout)activity.findViewById(R.id.linearLayout_pop_pickTaste)).setBackgroundResource(R.drawable.tab_bg_selected);
+				activity.mCurFg = POP_TASTE_FRAGMENT;
+				//TODO jump to pop taste fragment
+				fgTrans.replace(R.id.frameLayout_container_pickTaste, PopTasteFragment.newInstance(activity.mSelectedFood.asFood())).commit();
+
+			}else if(msg.what == ALL_TASTE_FRAGMENT && activity.mCurFg != ALL_TASTE_FRAGMENT){
+				mTitleTextView.setText("全部口味");
+				((LinearLayout)activity.findViewById(R.id.linearLayout_taste_pickTaste)).setBackgroundResource(R.drawable.tab_bg_selected);
+				activity.mCurFg = ALL_TASTE_FRAGMENT;
+				//TODO
+				
+			}else if(msg.what == PINZHU_FRAGMENT && activity.mCurFg != PINZHU_FRAGMENT){
+				mTitleTextView.setText("品注");
+				((LinearLayout)activity.findViewById(R.id.linearLayout_pinzhu_pickTaste)).setBackgroundResource(R.drawable.tab_bg_selected);
+				activity.mCurFg = PINZHU_FRAGMENT;
+				//TODO
+				
+			}
+		}
+	}
 	
 	private static class TasteHandler extends Handler{
 		
@@ -51,7 +102,7 @@ public class PickTasteActivity extends Activity{
 		@Override
 		public void handleMessage(Message message){
 			final PickTasteActivity theActivity = mActivity.get();
-			((TextView)theActivity.findViewById(R.id.foodTasteTxtView)).setText(theActivity.mSelectedFood.toString());
+			((TextView)theActivity.findViewById(R.id.txtView_foodTaste_pickTaste)).setText(theActivity.mSelectedFood.toString());
 		}
 	};
 	
@@ -83,7 +134,7 @@ public class PickTasteActivity extends Activity{
 		if(getIntent().getBooleanExtra(PICK_ALL_ORDER_TASTE, false)){
 			isAllOrderTaste = true;
 		}
-		setContentView(R.layout.tastetable);
+		setContentView(R.layout.pick_taste_activity);
 		
 		TextView title = (TextView) findViewById(R.id.toptitle);
 		title.setVisibility(View.VISIBLE);
@@ -104,91 +155,80 @@ public class PickTasteActivity extends Activity{
 			}
 		});
 		
-		final ScrollLayout tasteScrollLayout = (ScrollLayout)findViewById(R.id.tasteScrollLayout);
-		//常用View
-		tasteScrollLayout.addView(setupPopularView());
-		//口味View
-		tasteScrollLayout.addView(setupTasteView());
-		//规格View
-		tasteScrollLayout.addView(setupSpecView());
-		//品注View
-		if(!isAllOrderTaste)
-			tasteScrollLayout.addView(setupPinZhuView());
+//		final ScrollLayout tasteScrollLayout = (ScrollLayout)findViewById(R.id.tasteScrollLayout);
+//		//常用View
+//		tasteScrollLayout.addView(setupPopularView());
+//		//口味View
+//		tasteScrollLayout.addView(setupTasteView());
+//		//规格View
+//		tasteScrollLayout.addView(setupSpecView());
+//		//品注View
+//		if(!isAllOrderTaste)
+//			tasteScrollLayout.addView(setupPinZhuView());
+//		
+//		tasteScrollLayout.setOnViewChangedListener(new OnViewChangedListener() {			
+//			@Override
+//			public void onViewChanged(int curScreen, View parent, View curView) {
+//				String tag = curView.getTag().toString();
+//				((TextView)findViewById(R.id.toptitle)).setText(tag);
+//				
+//				((LinearLayout)findViewById(R.id.popTasteLayout)).setBackgroundResource(R.drawable.tab_bg_unselected);
+//				((LinearLayout)findViewById(R.id.tasteLayout)).setBackgroundResource(R.drawable.tab_bg_unselected);
+//				((LinearLayout)findViewById(R.id.styleLayout)).setBackgroundResource(R.drawable.tab_bg_unselected);
+//				((LinearLayout)findViewById(R.id.specLayout)).setBackgroundResource(R.drawable.tab_bg_unselected);
+//				((LinearLayout)findViewById(R.id.pinzhuLayout)).setBackgroundResource(R.drawable.tab_bg_unselected);
+//				
+//				
+//				if(tag.equals(TAG_POP_TASTE)){
+//					((LinearLayout)findViewById(R.id.popTasteLayout)).setBackgroundResource(R.drawable.tab_bg_selected);
+//					
+//				}else if(tag.equals(TAG_TASTE)){
+//					((LinearLayout)findViewById(R.id.tasteLayout)).setBackgroundResource(R.drawable.tab_bg_selected);
+//					
+//				}else if(tag.equals(TAG_STYLE)){
+//					((LinearLayout)findViewById(R.id.styleLayout)).setBackgroundResource(R.drawable.tab_bg_selected);
+//					
+//				}else if(tag.equals(TAG_SPEC)){
+//					((LinearLayout)findViewById(R.id.specLayout)).setBackgroundResource(R.drawable.tab_bg_selected);
+//
+//				}else if(tag.equals(TAG_PINZHU)){
+//					((LinearLayout)findViewById(R.id.pinzhuLayout)).setBackgroundResource(R.drawable.tab_bg_selected);
+//
+//				}
+//			}
+//		});
 		
-		tasteScrollLayout.setOnViewChangedListener(new OnViewChangedListener() {			
-			@Override
-			public void onViewChanged(int curScreen, View parent, View curView) {
-				String tag = curView.getTag().toString();
-				((TextView)findViewById(R.id.toptitle)).setText(tag);
-				
-				((LinearLayout)findViewById(R.id.popTasteLayout)).setBackgroundResource(R.drawable.tab_bg_unselected);
-				((LinearLayout)findViewById(R.id.tasteLayout)).setBackgroundResource(R.drawable.tab_bg_unselected);
-				((LinearLayout)findViewById(R.id.styleLayout)).setBackgroundResource(R.drawable.tab_bg_unselected);
-				((LinearLayout)findViewById(R.id.specLayout)).setBackgroundResource(R.drawable.tab_bg_unselected);
-				((LinearLayout)findViewById(R.id.pinzhuLayout)).setBackgroundResource(R.drawable.tab_bg_unselected);
-				
-				
-				if(tag.equals(TAG_POP_TASTE)){
-					((LinearLayout)findViewById(R.id.popTasteLayout)).setBackgroundResource(R.drawable.tab_bg_selected);
-					
-				}else if(tag.equals(TAG_TASTE)){
-					((LinearLayout)findViewById(R.id.tasteLayout)).setBackgroundResource(R.drawable.tab_bg_selected);
-					
-				}else if(tag.equals(TAG_STYLE)){
-					((LinearLayout)findViewById(R.id.styleLayout)).setBackgroundResource(R.drawable.tab_bg_selected);
-					
-				}else if(tag.equals(TAG_SPEC)){
-					((LinearLayout)findViewById(R.id.specLayout)).setBackgroundResource(R.drawable.tab_bg_selected);
-
-				}else if(tag.equals(TAG_PINZHU)){
-					((LinearLayout)findViewById(R.id.pinzhuLayout)).setBackgroundResource(R.drawable.tab_bg_selected);
-
-				}
-			}
-		});
+		mViewHandler = new ViewHandler(this);
 		
 		//常用Button
-		((LinearLayout)findViewById(R.id.popTasteLayout)).setOnClickListener(new View.OnClickListener() {			
+		((LinearLayout)findViewById(R.id.linearLayout_pop_pickTaste)).setOnClickListener(new View.OnClickListener() {			
 			@Override
 			public void onClick(View v) {
-				tasteScrollLayout.setToScreen(0);
+				mViewHandler.sendEmptyMessage(POP_TASTE_FRAGMENT);
 			}
 		});
 		
 		//口味Button
-		((LinearLayout)findViewById(R.id.tasteLayout)).setOnClickListener(new View.OnClickListener() {			
+		((LinearLayout)findViewById(R.id.linearLayout_taste_pickTaste)).setOnClickListener(new View.OnClickListener() {			
 			@Override
 			public void onClick(View v) {
-				tasteScrollLayout.setToScreen(1);
+				mViewHandler.sendEmptyMessage(ALL_TASTE_FRAGMENT);
 			}
 		});
 		
-		//规格Button
-		((LinearLayout)findViewById(R.id.specLayout)).setOnClickListener(new View.OnClickListener() {			
-			@Override
-			public void onClick(View v) {
-				tasteScrollLayout.setToScreen(2);
-			}
-		});
 		
 		//品注Button
 		if(!isAllOrderTaste){
-			((LinearLayout)findViewById(R.id.pinzhuLayout)).setOnClickListener(new View.OnClickListener() {			
+			((LinearLayout)findViewById(R.id.linearLayout_pinzhu_pickTaste)).setOnClickListener(new View.OnClickListener() {			
 				@Override
 				public void onClick(View v) {
-					tasteScrollLayout.setToScreen(3);
+					mViewHandler.sendEmptyMessage(PINZHU_FRAGMENT);
 				}
 			});
 		}else {
-			((LinearLayout)findViewById(R.id.pinzhuLayout)).setVisibility(View.GONE);
+			((LinearLayout)findViewById(R.id.linearLayout_pinzhu_pickTaste)).setVisibility(View.GONE);
 		}
 			
-		if(mSelectedFood.asFood().hasPopTastes()){
-			tasteScrollLayout.setToScreen(0);
-		}else{
-			tasteScrollLayout.setToScreen(1);			
-		}
-		
 		_handler = new TasteHandler(this);
 		_handler.sendEmptyMessage(0);	
 		
@@ -196,18 +236,21 @@ public class PickTasteActivity extends Activity{
 		//根据传入的信息打开不同页面
 		if(initTag != null){
 			if(initTag.equals(TAG_TASTE)){
-				tasteScrollLayout.post(new Runnable() {
+				mViewHandler.post(new Runnable() {
 					@Override
 					public void run() {
-						((LinearLayout)findViewById(R.id.tasteLayout)).performClick();
+						if(mSelectedFood.asFood().hasPopTastes()){
+							mViewHandler.sendEmptyMessage(POP_TASTE_FRAGMENT);
+						}else{
+							mViewHandler.sendEmptyMessage(ALL_TASTE_FRAGMENT);
+						}
 					}
 				});
 			} else if(initTag.equals(TAG_PINZHU)){
-				tasteScrollLayout.post(new Runnable() {
-					
+				mViewHandler.post(new Runnable() {
 					@Override
 					public void run() {
-						((LinearLayout)findViewById(R.id.pinzhuLayout)).performClick();
+						mViewHandler.sendEmptyMessage(PINZHU_FRAGMENT);
 					}
 				});
 			}
@@ -328,7 +371,7 @@ public class PickTasteActivity extends Activity{
 	
 	
 	//设置做法View
-	public View setupStyleView(){
+	private View setupStyleView(){
 		View styleView = LayoutInflater.from(PickTasteActivity.this).inflate(R.layout.style, null);
     	final ListView styleLstView = (ListView)styleView.findViewById(R.id.styleLstView);
     	((EditText)styleView.findViewById(R.id.stylesearch)).setText("");
@@ -384,7 +427,7 @@ public class PickTasteActivity extends Activity{
 	}
 	
 	//设置规格View
-	public View setupSpecView(){
+	private View setupSpecView(){
 		
 		View specView = LayoutInflater.from(PickTasteActivity.this).inflate(R.layout.specs, null);
 				
@@ -439,7 +482,7 @@ public class PickTasteActivity extends Activity{
 	}
 	
 	//设置品注View
-	public View setupPinZhuView(){
+	private View setupPinZhuView(){
 		View pinZhuView = LayoutInflater.from(PickTasteActivity.this).inflate(R.layout.pinzhu, null);
 		
 		final EditText pinZhuEdtTxt = ((EditText)pinZhuView.findViewById(R.id.pinZhuEdtTxt));

@@ -11,14 +11,14 @@
         android:id="@+id/frameLayout_container_pickFood"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/bottom"
+        android:layout_above="@+id/linearLayout_bottom_pickFood"
         android:layout_alignParentLeft="true"
         android:layout_below="@+id/top"
         android:background="@color/white" >
     </FrameLayout>
 
     <LinearLayout
-        android:id="@+id/bottom"
+        android:id="@+id/linearLayout_bottom_pickFood"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"

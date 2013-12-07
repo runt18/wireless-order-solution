@@ -41,7 +41,7 @@ public class PickFoodFragment extends Fragment{
 	
 	private static final String PICK_FOOD_FRAGMENT_TYPE_KEY = "pickFoodFragmentTag";
 	private static final int PICK_FOOD_FRAGMENT_NUMBER = 0;
-	private static final int PICK_FOOD_FRAGMENT_SPELL = 1;
+	private static final int PICK_FOOD_FRAGMENT_PINYIN = 1;
 
 	private FoodAdapter mAdapter;
 	private FoodHandler mHandler ;
@@ -80,7 +80,7 @@ public class PickFoodFragment extends Fragment{
 	public static PickFoodFragment newInstanceByPinyin(){
 		PickFoodFragment fgm = new PickFoodFragment();
 		Bundle args = new Bundle();
-		args.putInt(PickFoodFragment.PICK_FOOD_FRAGMENT_TYPE_KEY, PickFoodFragment.PICK_FOOD_FRAGMENT_SPELL);
+		args.putInt(PickFoodFragment.PICK_FOOD_FRAGMENT_TYPE_KEY, PickFoodFragment.PICK_FOOD_FRAGMENT_PINYIN);
 		fgm.setArguments(args);
 		return fgm;
 	}
@@ -93,11 +93,11 @@ public class PickFoodFragment extends Fragment{
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		View view = inflater.inflate(R.layout.pick_food_fragment, container, false);
+		View view = inflater.inflate(R.layout.pick_food_by_pinyin_fgm, container, false);
 		Bundle args = getArguments();
 		
 		//搜索框
-        final EditText searchTxtView = (EditText)view.findViewById(R.id.editText_pickFoodFragment);
+        final EditText searchTxtView = (EditText)view.findViewById(R.id.editText_search_pickFoodFragment);
         //设置输入类型
         if(args.getInt(PICK_FOOD_FRAGMENT_TYPE_KEY) == PICK_FOOD_FRAGMENT_NUMBER){
         	searchTxtView.setInputType(InputType.TYPE_CLASS_NUMBER);
@@ -230,7 +230,7 @@ public class PickFoodFragment extends Fragment{
 		public View getView(int position, View convertView, ViewGroup parent) {
 			View view;
 			if(convertView == null){
-				view = LayoutInflater.from(parent.getContext()).inflate(R.layout.pick_food_fragment_item, null);
+				view = LayoutInflater.from(parent.getContext()).inflate(R.layout.pick_food_by_pinyin_fgm_item, null);
 			}else{
 				view = convertView;
 			}

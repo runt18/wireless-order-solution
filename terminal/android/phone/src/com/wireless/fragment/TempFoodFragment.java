@@ -96,7 +96,7 @@ public class TempFoodFragment extends Fragment {
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		View view = inflater.inflate(R.layout.temp_food_fragment, null);
+		View view = inflater.inflate(R.layout.pick_food_by_temp_fgm, null);
 		
 		final ListView tempFoodView = (ListView) view.findViewById(R.id.listView_tempFood_fgm) ;
 		
@@ -228,7 +228,7 @@ public class TempFoodFragment extends Fragment {
 			final LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 			//初始化view 和 holder 
 			if(view == null){
-				view = inflater.inflate(R.layout.temp_food_item, null);
+				view = inflater.inflate(R.layout.pick_food_by_temp_item, null);
 				holder = new ViewHolder();
 
 				holder.foodNameEditText = (EditText)view.findViewById(R.id.editText_foodName_tempFood_item);
@@ -288,7 +288,7 @@ public class TempFoodFragment extends Fragment {
 					if(mKitchens.size() > 1){
 						//设置弹出框
 						final PopupWindow popWnd = new PopupWindow(
-								inflater.inflate(R.layout.temp_food_fragment_popup_window, null),
+								inflater.inflate(R.layout.pick_food_by_temp_fgm_popup_wnd, null),
 								180, LayoutParams.WRAP_CONTENT, true){
 	
 							@Override
@@ -473,7 +473,7 @@ public class TempFoodFragment extends Fragment {
 
 			if(convertView == null){
 				final LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-				view = inflater.inflate(R.layout.temp_food_fragment_pop_list_item, null);
+				view = inflater.inflate(R.layout.pick_food_by_temp_fgm_pop_list_item, null);
 			}else{
 				view = convertView;
 			}

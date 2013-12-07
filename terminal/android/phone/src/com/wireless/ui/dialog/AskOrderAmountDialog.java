@@ -349,7 +349,7 @@ public class AskOrderAmountDialog extends DialogFragment{
    				}
    				
    				//Clear up the text to search box
-				View srchEditText = getFragmentManager().findFragmentById(mParentId).getView().findViewById(R.id.editText_pickFoodFragment);
+				View srchEditText = getFragmentManager().findFragmentById(mParentId).getView().findViewById(R.id.editText_search_pickFoodFragment);
 				if(srchEditText != null){
 					((EditText)srchEditText).setText("");
 				}

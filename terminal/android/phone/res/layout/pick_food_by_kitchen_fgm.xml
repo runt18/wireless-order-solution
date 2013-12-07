@@ -5,14 +5,14 @@
     android:background="@color/white" >
 
     <HorizontalScrollView
-        android:id="@+id/horizontalScrollView1"
+        android:id="@+id/hsv_top_kitchenFragment"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true" >
 
         <LinearLayout
-            android:id="@+id/linearLayout_kitchenFragment"
+            android:id="@+id/linearLayout_top_kitchenFragment"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:orientation="horizontal" >
@@ -24,9 +24,9 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_alignParentLeft="true"
-        android:layout_below="@+id/horizontalScrollView1"
+        android:layout_below="@+id/hsv_top_kitchenFragment"
         android:fadingEdgeLength="2dp"
-        android:groupIndicator="@drawable/kitchen_fragment_expander_group_selector" >
+        android:groupIndicator="@drawable/kitchen_fgm_xp_group_selector" >
     </ExpandableListView>
 
     <ImageButton

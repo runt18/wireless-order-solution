@@ -13,7 +13,7 @@
             android:id="@+id/imageView_pickFoodFragment_item"
             android:layout_width="99dp"
             android:layout_height="79dp"
-            android:src="@drawable/kitchen_fragment_xplistview_item_item_selector" />
+            android:src="@drawable/kitchen_fgm_xplv_item_selector" />
 
         <TextView
             android:id="@+id/textView_foodName_pickFoodFragment_item"

@@ -33,10 +33,10 @@ public class PickFoodActivity extends FragmentActivity
 							  implements OnFoodPickedListener{
 	
 	//每个点菜方式的标签
-	private static final int PICK_FOOD_FRAGMENT = 1320;	//编号
+	private static final int NUMBER_FRAGMENT = 1320;	//编号
 	private static final int KITCHEN_FRAGMENT = 1321;	//分厨
 	private static final int PINYIN_FRAGMENT = 1322;	//拼音
-	private static final int TEMP_FOOD_FRAGMENT = 1323;
+	private static final int TEMP_FOOD_FRAGMENT = 1323;	//临时菜
 
 	private static final int DEFAULT_FRAGMENT = PINYIN_FRAGMENT;
 	
@@ -54,7 +54,7 @@ public class PickFoodActivity extends FragmentActivity
 		private TextView mTitleTextView;
 		private ImageButton mNumBtn;
 		private ImageButton mKitchenBtn;
-		private ImageButton mSpellBtn;
+		private ImageButton mPinyinBtn;
 		private ImageButton mTempBtn;
 		
 		ViewHandler(PickFoodActivity activity)
@@ -65,7 +65,7 @@ public class PickFoodActivity extends FragmentActivity
 			
 			mNumBtn = (ImageButton) activity.findViewById(R.id.imageButton_num_pickFood);
 			mKitchenBtn = (ImageButton) activity.findViewById(R.id.imageButton_kitchen_pickFood);
-			mSpellBtn = (ImageButton) activity.findViewById(R.id.imageButton_spell_pickFood);
+			mPinyinBtn = (ImageButton) activity.findViewById(R.id.imageButton_spell_pickFood);
 			mTempBtn = (ImageButton) activity.findViewById(R.id.imageButton_tempFood_pickFood);
 		}
 		
@@ -76,14 +76,14 @@ public class PickFoodActivity extends FragmentActivity
 
 			switch(msg.what){
 			
-			case PICK_FOOD_FRAGMENT:
-				if(mActivity.get().mCurFg != PICK_FOOD_FRAGMENT){
+			case NUMBER_FRAGMENT:
+				if(mActivity.get().mCurFg != NUMBER_FRAGMENT){
 					//创建新菜品选择fragment, 替换原本的fragment
 					fgTrans.replace(R.id.frameLayout_container_pickFood, PickFoodFragment.newInstanceByNum()).commit();
 					
 					mTitleTextView.setText("点菜 - 编号");
-					setLastCate(PICK_FOOD_FRAGMENT);
-					mActivity.get().mCurFg = PICK_FOOD_FRAGMENT;
+					setLastCate(NUMBER_FRAGMENT);
+					mActivity.get().mCurFg = NUMBER_FRAGMENT;
 				}
 				break;
 				
@@ -125,7 +125,7 @@ public class PickFoodActivity extends FragmentActivity
 			//还原按样式
 			mNumBtn.setImageResource(R.drawable.number_btn);
 			mKitchenBtn.setImageResource(R.drawable.kitchen);
-			mSpellBtn.setImageResource(R.drawable.pinyin);
+			mPinyinBtn.setImageResource(R.drawable.pinyin);
 			mTempBtn.setImageResource(R.drawable.linshicai);
 
 			//切换点菜方式时，保存当前的点菜模式
@@ -133,7 +133,7 @@ public class PickFoodActivity extends FragmentActivity
 			
 			switch(cate)
 			{
-			case PICK_FOOD_FRAGMENT:
+			case NUMBER_FRAGMENT:
 				editor.putInt(Params.LAST_PICK_CATE, Params.PICK_BY_NUMBER);
 				mNumBtn.setImageResource(R.drawable.number_btn_down);
 				break;
@@ -143,7 +143,7 @@ public class PickFoodActivity extends FragmentActivity
 				break;
 			case PINYIN_FRAGMENT:
 				editor.putInt(Params.LAST_PICK_CATE, Params.PICK_BY_PINYIN);
-				mSpellBtn.setImageResource(R.drawable.pinyin_down);
+				mPinyinBtn.setImageResource(R.drawable.pinyin_down);
 				break;
 			case TEMP_FOOD_FRAGMENT:
 //				editor.putInt(Params.LAST_PICK_CATE, 5);
@@ -181,7 +181,7 @@ public class PickFoodActivity extends FragmentActivity
 		((ImageButton) findViewById(R.id.imageButton_num_pickFood)).setOnClickListener(new OnClickListener(){
 			@Override
 			public void onClick(View v) {
-				mViewHandler.sendEmptyMessage(PICK_FOOD_FRAGMENT);
+				mViewHandler.sendEmptyMessage(NUMBER_FRAGMENT);
 			}
 		});
 		//分厨
@@ -214,7 +214,7 @@ public class PickFoodActivity extends FragmentActivity
 		switch(lastPickCate)
 		{
 		case Params.PICK_BY_NUMBER:
-			mViewHandler.sendEmptyMessage(PICK_FOOD_FRAGMENT);
+			mViewHandler.sendEmptyMessage(NUMBER_FRAGMENT);
 			break;
 		case Params.PICK_BY_KITCHEN:
 			mViewHandler.sendEmptyMessage(KITCHEN_FRAGMENT);
