@@ -23,6 +23,7 @@
 
 <script type="text/javascript" src="../../js/basicMgrMain.js"></script>
 
+
 <link rel="stylesheet" type="text/css" href="../../css/header.css" />
 <link rel="stylesheet" type="text/css" href="../../css/systemSetting.css" />
 
@@ -30,7 +31,32 @@
 <script type="text/javascript">
 var restaurantID;
 var tabIndex = 0;
+//收款统计
+var receivablesStaticRecordCount = 10;
 
+//销售统计
+	// kitchen
+	var kitchenStaticBeginDate;
+	var kitchenStaticEndDate;
+	var kitchenStaticString = "";
+	var kitchenMultSelectData = [];
+	var kitchenStaticRecordCount = 10;
+	// dept
+	var deptStaticBeginDate;
+	var deptStaticEndDate;
+	var deptStaticString = "";
+	var deptMultSelectData = [];
+	var deptStaticRecordCount = 10;
+	// region
+	var businessStaticBeginDate;
+	var businessStaticEndDate;
+	var businessMultSelectData = [];
+	var businessStaticRecordCount = 10;
+	
+	var salesSubWin, salesSubWinTabPanel, orderFoodStatPanel, orderFoodStatPanelDeptTree, kitchenStatPanel, deptStatPanel;
+//退菜统计
+	var cancelFoodStatWin, cancelFoodStatWinTabPanel, cancelFoodDetailsStatPanel, cancelFoodByDeptStatPanel, cancelFoodByReasonStatPanel;
+	
 function addTab(id, title, url){
 	var tab = tabs.getComponent(id);
 	if(!tab){
@@ -55,9 +81,10 @@ function addTab(id, title, url){
 	        		//A计划
  	        		if(tabIndex != 0){
  	        			var p = e.getEl().first('div').first('div').first('div').first('div');
-	        			Ext.getCmp(p.id).setWidth(w);
-	        			Ext.getCmp(p.id).setHeight(h);
-
+ 	        			if(p != null && Ext.getCmp(p.id)){
+ 		        			Ext.getCmp(p.id).setWidth(w);
+ 		        			Ext.getCmp(p.id).setHeight(h);
+ 	        			}
 	        		} 
  	        		tabIndex ++;
 	        	}
@@ -135,7 +162,6 @@ Ext.onReady(function(){
 									if(jr.success){
 										monthSettleWin.show();
 									}else{
-										jr['icon'] = Ext.Msg.WARNING; 
 										Ext.ux.showMsg(jr);
 									}
 								},
@@ -152,6 +178,63 @@ Ext.onReady(function(){
 							formatPrice.center();
 						}else if(e.attributes.mId == "resturantMgr"){
 							resturantMgr.show();
+						}else if(e.attributes.mId == "businessStat"){
+							var businessStatWin = Ext.getCmp('businessStatWin');
+							if(!businessStatWin){
+								businessStatWin = new Ext.Window({
+									title : '营业统计 -- <font style="color:green;">历史</font>',
+									id : 'businessStatWin',
+									width : 885,
+									height : 555,
+									closable : false,
+									modal : true,
+									resizable : false,	
+									layout: 'fit',
+									bbar : ['->', {
+										text : '关闭',
+										iconCls : 'btn_close',
+										handler : function(){
+											businessStatWin.hide();
+										}
+									}],
+									keys : [{
+										key : Ext.EventObject.ESC,
+										scope : this,
+										fn : function(){
+											businessStatWin.hide();
+										}
+									}],
+									listeners : {
+										hide : function(thiz){
+											thiz.body.update('');
+										},
+										show : function(thiz){
+											thiz.load({
+												autoLoad : false,
+												url : '../window/history/businessStatistics.jsp',
+												scripts : true,
+												nocache : true,
+												text : '功能加载中, 请稍后......',
+												params : {
+													d : '_' + new Date().getTime(),
+													dataSource : 'history',
+													dutyRange : "range"
+												}
+											});
+										}
+									}
+								});
+							}
+							businessStatWin.show();
+							businessStatWin.center();
+						}else if(e.attributes.mId == "businessReceiptsStatistics"){
+							receivablesStatResultWin.show();
+							receivablesStatResultWin.center();
+						}else if(e.attributes.mId == "salesSubStatistics"){
+							salesSub();
+							salesSubWinTabPanel.setActiveTab(orderFoodStatPanel);
+						}else if(e.attributes.mId == "cancelledFood"){
+							cancelledFood();
 						}
 						
 					}
@@ -217,6 +300,9 @@ Ext.onReady(function(){
      
 });	
 </script>
+<script type="text/javascript" src="../../js/History/bills/billStatistics/businessReceipsStatistics.js"></script>
+<script type="text/javascript" src="../../js/History/bills/billStatistics/salesSubStatistics.js"></script>
+<script type="text/javascript" src="../../js/History/bills/billStatistics/cancelledFoodStatistics.js"></script>	
 </head>
 <body >
 
