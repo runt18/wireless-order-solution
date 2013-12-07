@@ -1571,11 +1571,11 @@ Ext.onReady(function() {
 											+ "&category=" + CATE_NORMAL
 											, 'mi');
 								} else if (temp.statusValue == TABLE_IDLE) {
-//									location.href = "OrderMain.html?" + strEncode('restaurantID=' + restaurantID
-//											+ "&ts=0"
-//											+ "&tableAliasID=" + alias.getValue()
-//											+ "&category=" + CATE_NORMAL
-//											, 'mi');
+									location.href = "OrderMain.html?" + strEncode('restaurantID=' + restaurantID
+											+ "&ts=0"
+											+ "&tableAliasID=" + alias.getValue()
+											+ "&category=" + CATE_NORMAL
+											, 'mi');
 //										alias.selectText();
 //										Ext.example.msg('提示', '该餐台已结账, 请重新输入.');
 								}
