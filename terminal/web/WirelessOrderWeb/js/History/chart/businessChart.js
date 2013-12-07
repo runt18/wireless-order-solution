@@ -82,12 +82,9 @@ function each(x){
 }
 
 function showChart(time){
-	$("#div_showDetail").hide();
-	$.mobile.loadingMessageTextVisible = true;
-	$.mobile.showPageLoadingMsg('a', "正在加载数据...");
+	$("#loading").show();
 	$.post('../../BusinessReceiptsStatistics.do', {dataSource : 'chart', time : time==null?7:time}, function(data){
-		
-		$.mobile.hidePageLoadingMsg();
+		$("#loading").hide();
 		var jdata = $.parseJSON(data);
 		details = jdata.root;
 		//console.debug(jdata.other.chart)
