@@ -1,15 +1,19 @@
 package com.wireless.Actions.billStatistics;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.apache.struts.actions.DispatchAction;
 
 import com.wireless.db.billStatistics.QueryIncomeStatisticsDao;
 import com.wireless.db.staffMgr.StaffDao;
@@ -21,9 +25,10 @@ import com.wireless.pojo.billStatistics.IncomeByErase;
 import com.wireless.pojo.billStatistics.IncomeByGift;
 import com.wireless.pojo.billStatistics.IncomeByPay;
 import com.wireless.pojo.billStatistics.IncomeByRepaid;
+import com.wireless.pojo.util.DateUtil;
 import com.wireless.util.DataPaging;
 
-public class BusinessReceiptsStatisticsAction extends Action {
+public class BusinessReceiptsStatisticsAction extends DispatchAction {
 	
 //	public ActionForward execute(ActionMapping mapping, ActionForm form,
 //			HttpServletRequest request, HttpServletResponse response)
@@ -91,7 +96,7 @@ public class BusinessReceiptsStatisticsAction extends Action {
 //		return null;
 //	}
 	
-	public ActionForward execute(ActionMapping mapping, ActionForm form,
+	public ActionForward normal(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
 		
@@ -161,4 +166,54 @@ public class BusinessReceiptsStatisticsAction extends Action {
 		}
 		return null;
 	}
+	
+	public ActionForward chart(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		request.setCharacterEncoding("UTF-8");
+		response.setCharacterEncoding("UTF-8");
+		String time = request.getParameter("time");
+		JObject jobject = new JObject();
+		Calendar c = Calendar.getInstance();
+		Date endDate = new Date();
+		
+		if(Integer.parseInt(time) == 7){
+			c.add(Calendar.DATE, -6);
+		}else if(Integer.parseInt(time) == 14){
+			c.add(Calendar.DATE, -13);
+		}else if(Integer.parseInt(time) == 30){
+			c.add(Calendar.MONTH, -1);
+		}
+		
+		List<IncomeByEachDay> incomesByEachDay = new ArrayList<IncomeByEachDay>();
+		try{
+			String pin = (String)request.getAttribute("pin");
+			incomesByEachDay.addAll(QueryIncomeStatisticsDao.getIncomeByEachDay(StaffDao.verify(Integer.parseInt(pin)), DateUtil.format(c.getTime()), DateUtil.format(endDate)));
+			
+			jobject.setRoot(incomesByEachDay);
+			
+			List<String> xAxis = new ArrayList<String>();
+			List<Float> data = new ArrayList<Float>();
+			float totalMoney = 0, totalCount = 0;
+			int count = 0;
+			for (IncomeByEachDay e : incomesByEachDay) {
+				xAxis.add("\'"+e.getDate()+"\'");
+				data.add(e.getIncomeByPay().getTotalActual());
+				totalMoney += e.getIncomeByPay().getTotalActual();
+				totalCount += e.getTotalAmount();
+				count ++ ;
+			}
+			Map<Object, Object> map = new HashMap<Object, Object>();
+			String chartData = "{\"xAxis\":" + xAxis + ",\"totalMoney\" : " + totalMoney + ",\"avgMoney\" : " + Math.round((totalMoney/count)*100)/100 + ", \"avgCount\" : " + Math.round((totalCount/count)*100)/100 + ",\"ser\":{\"name\":\'统计\', \"data\" : " + data + "}}";
+			map.put("chart", chartData);
+			jobject.setOther(map);
+		}catch(Exception e){
+			e.printStackTrace();
+			jobject.initTip(e);
+		}finally{
+			response.getWriter().print(jobject.toString());
+		}
+		return null;
+	}
+	
 }
