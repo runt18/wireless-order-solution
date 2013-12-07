@@ -1,5 +1,7 @@
 package com.wireless.pojo.billStatistics;
 
+import com.wireless.pojo.util.NumericUtil;
+
 
 public class IncomeByPay{
 	
@@ -154,19 +156,19 @@ public class IncomeByPay{
 	}
 
 	public float getTotalActual() {
-		return getCashActual() + 
-			   getCreditCardActual() + 
-			   getMemberCardActual() + 
-			   getSignActual() + 
-			   getHangActual();
+		return NumericUtil.roundFloat(getCashActual() + 
+									getCreditCardActual() + 
+									getMemberCardActual() + 
+									getSignActual() + 
+									getHangActual());
 	}
 
 	public float getTotalIncome() {
-		return getCashIncome() + 
-			   getCreditCardIncome() + 
-			   getMemberCardIncome() + 
-			   getSignIncome() + 
-			   getHangIncome();
+		return NumericUtil.roundFloat(getCashIncome() + 
+								   getCreditCardIncome() + 
+								   getMemberCardIncome() + 
+								   getSignIncome() + 
+								   getHangIncome());
 	}
 
 }
