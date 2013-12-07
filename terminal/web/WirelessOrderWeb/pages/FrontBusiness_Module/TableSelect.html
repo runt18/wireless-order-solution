@@ -90,8 +90,7 @@
 	<div id="tableListRegionInfo" class="regionInfo">
 		<span id="listRegionName">全部区域</span>
 	</div>
-	<div id="tableDisplay"
-		style="padding: 0px; margin: 0 auto; width: 1000px;">
+	<div id="tableDisplay" style="padding: 0px; margin: 0 auto; width: 1000px;">
 		<div class="side_btn" id="left_btn"></div>
 		<div id="wrap">
 			<div id="list"></div>
@@ -115,7 +114,8 @@
 	</div>
 	
 	<!--    table summary infomation   -->
-	<div id="tableSumInfo">
+	<div id="tableSumInfo" style="width: 100%; text-align: center;">
+		<input type="button" value="快速操作餐台(+)" onclick="keyboardFN()" style="height: 31px; width: 200px; float: left; margin: 0 50px 0 50px;" >
 		<img title="总台数,点击查看" src='../../images/table-idle.png'
 			style="float: left; cursor: pointer;" onClick="switchTableStatus(-1)"  />
 		<div id="allTblDivTS" class="tableStatusChar">000&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
