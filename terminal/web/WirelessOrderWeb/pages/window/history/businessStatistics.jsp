@@ -15,7 +15,6 @@
 		if(queryPattern == 2 || queryPattern == 3){
 			var onDuty = '<%=request.getParameter("onDuty") %>';
 			var offDuty = '<%=request.getParameter("offDuty") %>';
-			
 			if(onDuty != 'null' && offDuty != 'null'){
 				onDuty = new Date(parseInt(onDuty));
 				offDuty =  new Date(parseInt(offDuty));
