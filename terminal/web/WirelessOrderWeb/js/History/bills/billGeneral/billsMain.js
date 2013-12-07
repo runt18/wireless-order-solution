@@ -76,7 +76,7 @@ function billHistoryOnLoad() {
 };
 //-----------
 /* ---------------------------------------------------------------- */
-var btnCancelledFood = new Ext.ux.ImageButton({
+/*var btnCancelledFood = new Ext.ux.ImageButton({
 	imgPath : '../../images/cancelledFoodStatis.png',
 	imgWidth : 50,
 	imgHeight : 50,
@@ -84,7 +84,7 @@ var btnCancelledFood = new Ext.ux.ImageButton({
 	handler : function(btn) {
 		cancelledFood();
 	}
-});
+});*/
 
 var regionStatBut = new Ext.ux.ImageButton({
 	imgPath : "../../images/regionStatis.png",
@@ -123,85 +123,6 @@ var dailySettleStatBut = new Ext.ux.ImageButton({
 	tooltip : "日结记录",
 	handler : function(btn) {
 		dailySettleStat();
-	}
-});
-
-var businessStatBut = new Ext.ux.ImageButton({
-	imgPath : "../../images/businessStatis.png",
-	imgWidth : 50,
-	imgHeight : 50,
-	tooltip : "营业统计",
-	handler : function(btn) {
-		var businessStatWin = Ext.getCmp('businessStatWin');
-		if(!businessStatWin){
-			businessStatWin = new Ext.Window({
-				title : '营业统计 -- <font style="color:green;">历史</font>',
-				id : 'businessStatWin',
-				width : 885,
-				height : 555,
-				closable : false,
-				modal : true,
-				resizable : false,	
-				layout: 'fit',
-				bbar : ['->', {
-					text : '关闭',
-					iconCls : 'btn_close',
-					handler : function(){
-						businessStatWin.hide();
-					}
-				}],
-				keys : [{
-					key : Ext.EventObject.ESC,
-					scope : this,
-					fn : function(){
-						businessStatWin.hide();
-					}
-				}],
-				listeners : {
-					hide : function(thiz){
-						thiz.body.update('');
-					},
-					show : function(thiz){
-						thiz.load({
-							autoLoad : false,
-							url : '../window/history/businessStatistics.jsp',
-							scripts : true,
-							nocache : true,
-							text : '功能加载中, 请稍后......',
-							params : {
-								d : '_' + new Date().getTime(),
-								dataSource : 'history',
-								dutyRange : "range"
-							}
-						});
-					}
-				}
-			});
-		}
-		businessStatWin.show();
-		businessStatWin.center();
-	}
-});
-
-var receivablesStatBut = new Ext.ux.ImageButton({
-	imgPath : "../../images/businessReceips.png",
-	imgWidth : 50,
-	imgHeight : 50,
-	tooltip : "收款统计",
-	handler : function(btn) {
-		receivablesStatResultWin.show();
-		receivablesStatResultWin.center();
-	}
-});
-
-var btnSalesSub = new Ext.ux.ImageButton({
-	imgPath : '../../images/salesStat.png',
-	imgWidth : 50,
-	imgHeight : 50,
-	tooltip : '销售统计',
-	handler : function(btn) {
-		salesSub();
-		salesSubWinTabPanel.setActiveTab(orderFoodStatPanel);
 	}
 });
 
@@ -1056,17 +977,9 @@ Ext.onReady(function() {
 			height : 55,
 			items : [
 			{xtype:'tbtext',text:'&nbsp;'},
-			btnCancelledFood,
-			{xtype:'tbtext',text:'&nbsp;&nbsp;&nbsp;'},
 			shiftStatBut, 
 			{xtype:'tbtext',text:'&nbsp;&nbsp;&nbsp;'},
-			dailySettleStatBut,
-			{xtype:'tbtext',text:'&nbsp;&nbsp;&nbsp;'},
-			businessStatBut, 
-			{xtype:'tbtext',text:'&nbsp;&nbsp;&nbsp;'},
-			receivablesStatBut,
-			{xtype:'tbtext',text:'&nbsp;&nbsp;&nbsp;'},
-			btnSalesSub
+			dailySettleStatBut
 			]
 		})
 	});

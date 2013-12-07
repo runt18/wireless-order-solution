@@ -627,11 +627,11 @@ memberOperationRenderer = function(val, m, record){
 	}
 	return ''
 		+ '<a href="javascript:updateMemberHandler()">修改</a>'
-		+ '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
+		+ '&nbsp;&nbsp;&nbsp;&nbsp;'
 		+ '<a href="javascript:deleteMemberHandler()">删除</a>'
-		+ '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
+		+ '&nbsp;&nbsp;&nbsp;&nbsp;'
 		+ '<a href="javascript:memberOperationSend() ">操作明细</a>'
-		+ '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
+		+ '&nbsp;&nbsp;&nbsp;&nbsp;'
 		+ attendtion;
 //		+ '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
 //		+ '<a href="javascript:adjustPoint()">积分调整</a>';
@@ -654,7 +654,7 @@ function treeInit(){
 	memberTypeTree = new Ext.tree.TreePanel({
 		title : '会员类型',
 		region : 'west',
-		width : 200,
+		width : 180,
 		border : true,
 		rootVisible : true,
 		autoScroll : true,
