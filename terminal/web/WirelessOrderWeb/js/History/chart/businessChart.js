@@ -16,8 +16,16 @@ function print(obj){
         return e;
     }
 }
+function NewDate(str) { 
+	str = str.split('-'); 
+	var date = new Date(); 
+	date.setUTCFullYear(str[0], str[1] - 1, str[2]); 
+	date.setUTCHours(0, 0, 0, 0); 
+	return date; 
+} 
+
 function each(x){
-	var date = new Date(x).getTime();
+	var date = NewDate(x).getTime();
 	businessStatWin = new Ext.Window({
 		title : '营业统计 -- <font style="color:green;">历史</font>',
 		id : 'businessDetailWin',
@@ -115,7 +123,7 @@ function showChart(time){
 	        },
 	        labels: {
 	        	items : [{
-	        		html : '<b>总单收入:' + chartData.totalMoney + ' 元</b><br><b>日均收入:' + chartData.avgMoney + ' 元</b><br><b>日均账单:' + chartData.avgCount + ' 张</b>',
+	        		html : '<b>总营业额:' + chartData.totalMoney + ' 元</b><br><b>日均收入:' + chartData.avgMoney + ' 元</b><br><b>日均账单:' + chartData.avgCount + ' 张</b>',
 		        	style : {left:'900px', top: '0px'}
 	        	}]
 	        },
