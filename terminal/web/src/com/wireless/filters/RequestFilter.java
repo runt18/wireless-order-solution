@@ -58,7 +58,7 @@ public class RequestFilter implements Filter{
 			}
 			chain.doFilter(request, response);
 		}else{
-			//FIXME 
+			//FIXME
 			//The code below just for print scheme port, should be removed in future
 			String url = requestPath + "?" + request.getQueryString();
 			if(url.contains("/OperatePrinter.do?skipVerify&dataSource=port") ||
@@ -87,35 +87,12 @@ public class RequestFilter implements Filter{
 					}
 				}
 				
-			}else{
-				//获取ajax参数
-				//isCookie = request.getParameter("isCookie");
 			}
 			
 			String pin = null;
-/*			Cookie c = null;
-			Cookie comeFrom = null;
-			Cookie[] cookies = request.getCookies();
-			if(cookies != null){
-				for (Cookie cookie : cookies) {
-					if(cookie.getName().equals("pin")){
-						c = cookie;
-					}else if(cookie.getName().equals("comeFrom")){
-						comeFrom = cookie;
-					}
-					
-				}
-			}*/
-			
-			//是否用cookie
-			//if(isCookie == null){
 			pin = (String) request.getSession().getAttribute("pin");
 			if(pin == null){
-/*					if(c!=null){
-						c.setMaxAge(0);
-						response.addCookie(c);
-				
-					}*/
+				servletResponse.getWriter().print("Did not pass the whitelist");
 				if (request.getHeader("x-requested-with") != null && request.getHeader("x-requested-with").equalsIgnoreCase("XMLHttpRequest")) {  
                     response.setHeader("session_status", "timeout");
                     response.addHeader("root_path",	request.getContextPath());
@@ -133,13 +110,6 @@ public class RequestFilter implements Filter{
 				chain.doFilter(request, response);
 			}
 				
-/*			}else{
-				if(c != null){
-					pin = c.getValue();
-					request.setAttribute("pin", pin);
-				}
-				chain.doFilter(request, response);
-			}*/
 		}
 		
 	}
