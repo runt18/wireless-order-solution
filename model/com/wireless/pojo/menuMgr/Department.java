@@ -56,6 +56,7 @@ public class Department implements Parcelable, Comparable<Department>, Jsonable{
 		DEPT_8(7, "部门8", Type.NORMAL),
 		DEPT_9(8, "部门9", Type.NORMAL),
 		DEPT_10(9, "部门10", Type.NORMAL),
+		DEPT_WAREHOUSE(252, "总仓", Type.RESERVED),
 		DEPT_TMP(253, "临时部门", Type.RESERVED),
 		DEPT_ALL(254, "全部部门", Type.RESERVED),
 		DEPT_NULL(255, "空部门", Type.RESERVED);
