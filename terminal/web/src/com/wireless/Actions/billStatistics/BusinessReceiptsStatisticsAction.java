@@ -194,17 +194,21 @@ public class BusinessReceiptsStatisticsAction extends DispatchAction {
 			
 			List<String> xAxis = new ArrayList<String>();
 			List<Float> data = new ArrayList<Float>();
+			List<Integer> countList = new ArrayList<Integer>();
 			float totalMoney = 0, totalCount = 0;
 			int count = 0;
 			for (IncomeByEachDay e : incomesByEachDay) {
 				xAxis.add("\'"+e.getDate()+"\'");
 				data.add(e.getIncomeByPay().getTotalActual());
+				countList.add(e.getTotalAmount());
 				totalMoney += e.getIncomeByPay().getTotalActual();
 				totalCount += e.getTotalAmount();
 				count ++ ;
 			}
+			
 			Map<Object, Object> map = new HashMap<Object, Object>();
-			String chartData = "{\"xAxis\":" + xAxis + ",\"totalMoney\" : " + totalMoney + ",\"avgMoney\" : " + Math.round((totalMoney/count)*100)/100 + ", \"avgCount\" : " + Math.round((totalCount/count)*100)/100 + ",\"ser\":{\"name\":\'统计\', \"data\" : " + data + "}}";
+			String chartData = "{\"xAxis\":" + xAxis + ",\"totalMoney\" : " + totalMoney + ",\"avgMoney\" : " + Math.round((totalMoney/count)*100)/100 + ", \"avgCount\" : " + Math.round((totalCount/count)*100)/100 + 
+								",\"ser\":[{\"name\":\'营业额\', \"data\" : " + data + "},{\"name\":\'账单数\', \"data\":" + countList + "}]}";
 			map.put("chart", chartData);
 			jobject.setOther(map);
 		}catch(Exception e){

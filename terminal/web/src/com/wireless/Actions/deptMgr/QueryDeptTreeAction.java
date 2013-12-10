@@ -10,6 +10,7 @@ import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
+import com.wireless.pojo.menuMgr.Department;
 
 public class QueryDeptTreeAction extends Action{
 	
@@ -17,6 +18,11 @@ public class QueryDeptTreeAction extends Action{
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
 		response.setContentType("text/json; charset=utf-8");
+		String warehouse = request.getParameter("warehouse");
+		String extra = "";
+		if(warehouse == null || warehouse.isEmpty()){
+			extra = " AND dept_id <> " + Department.DeptId.DEPT_WAREHOUSE.getVal();
+		}
 		DBCon dbCon = new DBCon();
 		
 		StringBuffer jsonSB = new StringBuffer();
@@ -29,7 +35,8 @@ public class QueryDeptTreeAction extends Action{
 					+ " FROM " 
 					+ Params.dbName + ".department " 
 					+ " WHERE restaurant_id = " + restaurantID 
-					+ " AND dept_id <> 253 AND dept_id <> 255 "
+					+ " AND dept_id <> " + Department.DeptId.DEPT_TMP.getVal() + " AND dept_id <> " + Department.DeptId.DEPT_NULL.getVal() 
+					+ extra
 					+ " ORDER BY dept_id ";
 			
 			dbCon.connect();
