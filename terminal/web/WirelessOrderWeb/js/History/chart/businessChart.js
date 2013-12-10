@@ -93,6 +93,7 @@ function showChart(time){
 	$("#loading").show();
 	$.post('../../BusinessReceiptsStatistics.do', {dataSource : 'chart', time : time==null?7:time}, function(data){
 		$("#loading").hide();
+//		alert();
 		var jdata = $.parseJSON(data);
 		details = jdata.root;
 		//console.debug(jdata.other.chart)
@@ -124,7 +125,7 @@ function showChart(time){
 	        labels: {
 	        	items : [{
 	        		html : '<b>总营业额:' + chartData.totalMoney + ' 元</b><br><b>日均收入:' + chartData.avgMoney + ' 元</b><br><b>日均账单:' + chartData.avgCount + ' 张</b>',
-		        	style : {left:'900px', top: '0px'}
+		        	style : {left:($('#container').width()*0.70), top: '0px'}
 	        	}]
 	        },
 	        xAxis: {
@@ -148,8 +149,8 @@ function showChart(time){
 	        },
 	        tooltip: {
                 formatter: function() {
-                    return '<b>营业额:</b><br/>'+
-                        this.x +': '+ '<b>'+this.y+'</b> 元';
+                    return '<b>' + this.series.name + '</b><br/>'+
+                        this.x +': '+ '<b>'+this.y+'</b> ';
                 }
 	        },
 	        legend: {
@@ -158,10 +159,11 @@ function showChart(time){
 	            verticalAlign: 'middle',
 	            borderWidth: 0
 	        },
-	        series : [{  
-	            name: chartData.ser.name,  
-	            data: chartData.ser.data
-	        }],
+//	        series : [{  
+//	            name: chartData.ser.name,  
+//	            data: chartData.ser.data
+//	        }],
+	        series : chartData.ser,
 	        exporting : {
 	        	enabled : false
 	        },

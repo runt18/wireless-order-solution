@@ -454,8 +454,8 @@ Ext.onReady(function(){
 		loader : new Ext.tree.TreeLoader({
 			dataUrl : '../../QueryDeptTree.do?time='+new Date(),
 			baseParams : {
-				'restaurantID' : restaurantID
-				//time : new Date()
+				'restaurantID' : restaurantID,
+				warehouse : true
 			}
 		}),
 		root : new Ext.tree.AsyncTreeNode({
