@@ -192,7 +192,7 @@ public class TestRestaurantDao {
 	}
 	
 	private void compareDept(Staff staff, int restaurantId) throws SQLException{
-		List<Department> depts = DepartmentDao.getDepartments(staff, null, null);
+		List<Department> depts = DepartmentDao.getDepartmentsForWarehouse(staff);
 		for(Department d : depts){
 			Department.DeptId deptId = Department.DeptId.valueOf(d.getId());
 			assertEquals("department id", d.getId(), deptId.getVal());

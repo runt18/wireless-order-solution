@@ -50,7 +50,7 @@ public class TestMaterialDept {
 	@Test
 	public void testInsertMaterialDept() throws SQLException, BusinessException{
 		Department dept;
-		List<Department> depts = DepartmentDao.getDepartments(mStaff, null, null);
+		List<Department> depts = DepartmentDao.getDepartmentsForWarehouse(mStaff);
 		if(depts.isEmpty()){
 			throw new BusinessException(DeptError.DEPT_NOT_EXIST);
 		}else{

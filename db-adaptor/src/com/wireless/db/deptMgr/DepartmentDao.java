@@ -24,15 +24,6 @@ public class DepartmentDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static List<Department> getDepartments(Staff term, String extraCond, String orderClause) throws SQLException{
-		DBCon dbCon = new DBCon();
-		try{
-			dbCon.connect();
-			return getDepartments(dbCon, term, extraCond, orderClause);
-		}finally{
-			dbCon.disconnect();
-		}
-	}
 	
 	/**
 	 * Get the department to a specified restaurant defined in {@link Staff} and other extra condition.
@@ -48,12 +39,12 @@ public class DepartmentDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static List<Department> getDepartments(DBCon dbCon, Staff term, String extraCond, String orderClause) throws SQLException{
+	private static List<Department> getDepartments(DBCon dbCon, Staff term, String extraCond, String orderClause) throws SQLException{
 		
 		List<Department> result = new ArrayList<Department>();
 		
 		String sql = " SELECT dept_id, name, restaurant_id, type FROM " + Params.dbName + ".department DEPT " +
-					 " WHERE 1 = 1 AND DEPT.dept_id <> 253 AND DEPT.dept_id <> 255 " +
+					 " WHERE 1 = 1 AND DEPT.dept_id <> " + Department.DeptId.DEPT_TMP.getVal() + " AND DEPT.dept_id <> " + Department.DeptId.DEPT_NULL.getVal() +
 					 " AND DEPT.restaurant_id = " + term.getRestaurantId() +
 					 (extraCond != null ? extraCond : "") + " " +
 					 (orderClause != null ? orderClause : "");
@@ -68,6 +59,35 @@ public class DepartmentDao {
 		dbCon.rs.close();
 		
 		return result;
+	}
+	
+	
+	public static List<Department> getDepartmentsForDept(DBCon dbCon, Staff term) throws SQLException{
+		return getDepartments(dbCon, term, " AND DEPT.dept_id <> " + Department.DeptId.DEPT_WAREHOUSE.getVal(), null);
+	}
+	
+	public static List<Department> getDepartmentsForDept(Staff term) throws SQLException{
+		DBCon dbCon = new DBCon();
+		dbCon.connect();
+		try{
+			return getDepartmentsForDept(dbCon, term);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	public static List<Department> getDepartmentsForWarehouse(DBCon dbCon, Staff term) throws SQLException{
+		return getDepartments(dbCon, term, null, null);
+	}
+	
+	public static List<Department> getDepartmentsForWarehouse(Staff term) throws SQLException{
+		DBCon dbCon = new DBCon();
+		dbCon.connect();
+		try{
+			return getDepartmentsForWarehouse(dbCon, term);
+		}finally{
+			dbCon.disconnect();
+		}
 	}
 	
 	/**
