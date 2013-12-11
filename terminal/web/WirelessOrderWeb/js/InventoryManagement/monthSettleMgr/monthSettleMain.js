@@ -72,13 +72,14 @@ function operateMaterialPrice(){
 			dataSource : 'monthSettleMaterial'
 		},
 		success : function(res, opt){
+			monthSettleWin.hide();
 			Ext.Ajax.request({
 	 			url : '../../UpdateCurrentMonth.do',
 	 			success : function(res, opt){
 					var jr = Ext.decode(res.responseText);
 					if(jr.success){
 						Ext.ux.showMsg(jr);
-						monthSettleWin.hide();
+						
 					}else{
 						Ext.ux.showMsg(jr);
 					}
