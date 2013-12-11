@@ -1,6 +1,7 @@
 package com.wireless.db.stockMgr;
 
 import java.sql.SQLException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -33,15 +34,17 @@ public class MonthlyBalanceDao {
 	 * 			the id of monthlyBalance
 	 * @throws SQLException
 	 * @throws BusinessException 
+	 * @throws ParseException 
 	 */
-	public static int insert(DBCon dbCon, MonthlyBalance monthlyBalance, Staff staff) throws SQLException, BusinessException{
+	public static int insert(DBCon dbCon, MonthlyBalance monthlyBalance, Staff staff) throws SQLException, BusinessException, ParseException{
 		
 		Calendar c = Calendar.getInstance();
 		String beginDate, endDate;
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+		SimpleDateFormat firstDay = new SimpleDateFormat("yyyy-MM-01");
 		//获取当前月
 		long monthly = MonthlyBalanceDao.getCurrentMonthTimeByRestaurant(staff.getRestaurantId());
-		c.setTime(new Date(monthly));
+		c.setTime(firstDay.parse(firstDay.format(new Date(monthly))));
 		
 		beginDate = sdf.format(c.getTime());
 		
@@ -102,8 +105,9 @@ public class MonthlyBalanceDao {
 	 * 			the id of monthlyBalance
 	 * @throws SQLException
 	 * @throws BusinessException 
+	 * @throws ParseException 
 	 */
-	public static int insert(MonthlyBalance.InsertBuilder build, Staff staff) throws SQLException, BusinessException{
+	public static int insert(MonthlyBalance.InsertBuilder build, Staff staff) throws SQLException, BusinessException, ParseException{
 		DBCon dbCon = new DBCon();
 		dbCon.connect();
 		int id;
