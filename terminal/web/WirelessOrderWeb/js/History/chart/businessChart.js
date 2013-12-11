@@ -73,20 +73,6 @@ function each(x){
 	});
 	businessStatWin.show();
 	businessStatWin.center();
-/*	$.each(details, function(i){
-
-		if(details[i].offDutyToDate == x){
-			$("tr").remove();
-			var secendTr = "<tr><td>日期:</td><td>" + x + "</td><td>应收:</td><td>" + details[i].totalIncome + "元</td><td>实收:</td><td>" + details[i].totalActual + "元</td><td>账单数:</td><td>" + details[i].orderAmount + "</td>"
-					+ "<td>现金</td><td>" + details[i].cashIncome2 + "元</td><td>刷卡:</td><td>" + details[i].creditCardIncome2 + "元</td><td>会员:</td><td>" + details[i].memberActual + "元</td></tr>"
-					+ "<tr><td>挂账:</td><td>" + details[i].hangIncome2 + "元</td>"
-					+ "<td>签单:</td><td>" + details[i].signIncome2 + "元</td><td>折扣:</td><td>" + details[i].discountIncome + "元</td><td>赠送:</td><td>" + details[i].giftIncome + "元</td><td>退菜:</td><td>" + details[i].cancelIncome + "元</td>"
-					+ "<td>抹数:</td><td>" + details[i].eraseIncome + "元</td><td>反结账:</td><td>" + details[i].paidIncome + "元</td></tr>";
-				
-			$("#table_showDetail").append(secendTr);
-			$("#div_showDetail").show();
-		}
-	});*/
 }
 
 function showChart(time){
@@ -151,12 +137,6 @@ function showChart(time){
                         this.x +': '+ '<b>'+this.y+'</b> ';
                 }
 	        },
-//	        legend: {
-//	            layout: 'vertical',
-//	            align: 'right',
-//	            verticalAlign: 'middle',
-//	            borderWidth: 0
-//	        },
 //	        series : [{  
 //	            name: chartData.ser.name,  
 //	            data: chartData.ser.data
