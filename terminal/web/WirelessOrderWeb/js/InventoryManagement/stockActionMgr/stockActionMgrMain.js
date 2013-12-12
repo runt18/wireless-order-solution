@@ -506,7 +506,7 @@ function insertStockActionHandler(){
 				stockTaskNavWin.center();
 				stockTaskNavWin.show();
 				stockTaskNavWin.setTitle(stockTaskNavWin.getLayout().activeItem.mt);
-				Ext.getCmp('secondStepPanelWest').setDisabled(false);
+				Ext.getCmp('sam_secondStepPanelWest').setDisabled(false);
 			}else{
 				Ext.ux.showMsg(jr);
 			}
@@ -542,10 +542,10 @@ function updateStockActionHandler(){
 		
 		if(data['subTypeValue'] == 9){
 			Ext.getCmp('btnNextForStockNav').setDisabled(true);
-			Ext.getCmp('secondStepPanelWest').setDisabled(true);
+			Ext.getCmp('sam_secondStepPanelWest').setDisabled(true);
 			Ext.getCmp('btnAuditStockAction').hide();
 		}else{
-			Ext.getCmp('secondStepPanelWest').setDisabled(false);
+			Ext.getCmp('sam_secondStepPanelWest').setDisabled(false);
 			Ext.getCmp('btnAuditStockAction').show();
 		}
 	}else{
@@ -557,9 +557,10 @@ function updateStockActionHandler(){
 		});
 		Ext.getCmp('btnPreviousForStockNav').setDisabled(true);
 		Ext.getCmp('btnNextForStockNav').setDisabled(true);
-		Ext.getCmp('secondStepPanelWest').setDisabled(true);
+		Ext.getCmp('sam_secondStepPanelWest').setDisabled(true);
 		Ext.getDom('txtActualPrice').disabled = true;
 		Ext.getCmp('btnAuditStockAction').hide();
+		Ext.getCmp('datetOriStockDateForStockActionBasic').clearInvalid();
 	}
 }
 /**
@@ -725,6 +726,27 @@ function getCurrentDay(){
 			Ext.ux.showMsg(Ext.decode(res.responseText));
 		}
 		
+	});
+}
+
+function showCurrentMonth(){
+	Ext.Ajax.request({
+		url : '../../QueryCurrentMonth.do',
+		params : {
+			restaurantID : restaurantID
+		},
+		success : function(res, opt){
+			var jr = Ext.decode(res.responseText);
+			if(jr.success){
+				Ext.getDom('labCurrentMonth').innerHTML = jr.msg;
+			}else{
+				var date = new Date();
+				Ext.getDom('labCurrentMonth').innerHTML = (date.getMonth() + 1);
+			}
+		},
+		failure : function(res, opt){
+			Ext.ux.showMsg(Ext.decode(res.responseText));
+		}
 	});
 }
 //--------------
@@ -1335,182 +1357,187 @@ function initControl(){
 	        }]
 	    });
 	}
-	var secondStepPanelNorth = new Ext.Panel({
-		title : '货单基础信息',
-    	region : 'north',
-    	height : 120,
-    	frame : true,
-    	items : [{
-    		id : 'displayPanelForStockActionTitle',
-    		height : 30,
-    		bodyStyle : 'font-size:18px;text-align:center;',
-    		html : '-----'
-	    	}, {
-				xtype : 'hidden',
-				id : 'hideStockActionId'
-	    	},{
-	    		xtype : 'panel',
-	    		layout : 'column',
-	    		defaults : {
-    			xtype : 'form',
-    			layout : 'form',
-    			style : 'width:218px;',
-    			labelWidth : 60,
-    			columnWidth : .24,
-    			defaults : { width : 120 }
-    		},
-    		items : [{
-    			id : 'displayPanelForDeptIn',
-    			items : [{
-    				id : 'comboDeptInForStockActionBasic',
-    				xtype : 'combo',
-    				fieldLabel : '收货仓',
-    				readOnly : true,
-    				forceSelection : true,
-    				width : 103,
-    				listWidth : 120,
-    				store : new Ext.data.JsonStore({
-    					url: '../../QueryDept.do?',
-    					baseParams : {
-    						dataSource : 'normal'
-    						
-    					},
-    					root : 'root',
-    					fields : DeptRecord.getKeys()
-    				}),
-    				valueField : 'id',
-    				displayField : 'name',
-    				typeAhead : true,
-    				mode : 'local',
-    				triggerAction : 'all',
-    				selectOnFocus : true,
-    				allowBlank : false,
-    				blankText : '收货仓不允许为空.',
-    				listeners : {
-    					render : function(thiz){
-    						thiz.store.load();
-    					}
-    				}
-    			}]
-    		}, {
-    			id : 'displayPanelForSupplier',
-    			items : [{
-    				id : 'comboSupplierForStockActionBasic',
-    				xtype : 'combo',
-    				fieldLabel : '供应商',
-    				readOnly : true,
-    				forceSelection : true,
-    				width : 103,
-    				listWidth : 120,
-    				store : new Ext.data.JsonStore({
-    					url: '../../QuerySupplier.do',
-    					root : 'root',
-    					fields : SupplierRecord.getKeys()
-    				}),
-    				valueField : 'supplierID',
-    				displayField : 'name',
-    				typeAhead : true,
-    				mode : 'local',
-    				triggerAction : 'all',
-    				selectOnFocus : true,
-    				allowBlank : false,
-    				blankText : '供应商不允许为空.',
-    				listeners : {
-    					render : function(thiz){
-    						thiz.store.load();
-    					}
-    				}
-    			}]
-    		}, {
-    			id : 'displayPanelForDeptOut',
-    			items : [{
-    				id : 'comboDeptOutForStockActionBasic',
-    				xtype : 'combo',
-    				fieldLabel : '出货仓',
-    				readOnly : true,
-    				forceSelection : true,
-    				width : 103,
-    				listWidth : 120,
-    				store : new Ext.data.JsonStore({
-    					url: '../../QueryDept.do?',
-    					baseParams : {
-    						dataSource : 'normal'
-    						
-    					},
-    					root : 'root',
-    					fields : DeptRecord.getKeys()
-    				}),
-    				valueField : 'id',
-    				displayField : 'name',
-    				typeAhead : true,
-    				mode : 'local',
-    				triggerAction : 'all',
-    				selectOnFocus : true,
-    				allowBlank : false,
-    				blankText : '收货仓不允许为空.',
-    				listeners : {
-    					render : function(thiz){
-    						thiz.store.load();
-    					}
-    				}
-    			}]
-    		}, {
-    			items : [{
-    				id : 'txtOriStockIdForStockActionBasic',
-    				xtype : 'textfield',
-    				fieldLabel : '原始单号'
-    			}]
-    		}, {
-    			items : [{
-				id : 'datetOriStockDateForStockActionBasic',
-				xtype : 'datefield',
-				width : 103,
-				fieldLabel : '日期',
-				format : 'Y-m-d',
-				readOnly : true,
-				allowBlank : false,
-				blankText : '日期不能为空, 且小于当前会计月月底并大于该月最后一次盘点时间.'
-			}]
-    		}, {
-    			columnWidth : 1,
-    			style : 'width:100%;',
-    			items : [{
-    				id : 'txtCommentForStockActionBasic',
-    				xtype : 'textfield',
-    				width : 774,
-    				fieldLabel : '备注'
-    			}]
-    		}, {
-    			items : [{
-    				id : 'txtSpproverNameForStockActionBasic',
-    				xtype : 'textfield',
-    				fieldLabel : '审核人',
-    				disabled : true
-    			}]
-    		}, {
-    			items : [{
-    				id : 'dateSpproverDateForStockActionBasic',
-    				xtype : 'textfield',
-    				fieldLabel : '审核日期',
-    				disabled : true
-    			}]
-    		}, {
-    			items : [{
-    				id : 'txtOperatorNameForStockActionBasic',
-    				xtype : 'textfield',
-    				fieldLabel : '制单人',
-    				disabled : true
-    			}]
-    		}, {
-    			items : [{
-    				id : 'dateOperatorDateForStockActionBasic',
-    				xtype : 'textfield',
-    				fieldLabel : '制单日期',
-    				disabled : true
-    			}]
-    		}]
-    	}]
-    });
+	var secondStepPanelNorth = Ext.getCmp('sam_secondStepPanelNorth');
+	if(!secondStepPanelNorth){
+		secondStepPanelNorth = new Ext.Panel({
+			title : '货单基础信息',
+			id : 'sam_secondStepPanelNorth',
+	    	region : 'north',
+	    	height : 120,
+	    	frame : true,
+	    	items : [{
+	    		id : 'displayPanelForStockActionTitle',
+	    		height : 30,
+	    		bodyStyle : 'font-size:18px;text-align:center;',
+	    		html : '-----'
+		    	}, {
+					xtype : 'hidden',
+					id : 'hideStockActionId'
+		    	},{
+		    		xtype : 'panel',
+		    		layout : 'column',
+		    		defaults : {
+	    			xtype : 'form',
+	    			layout : 'form',
+	    			style : 'width:218px;',
+	    			labelWidth : 60,
+	    			columnWidth : .24,
+	    			defaults : { width : 120 }
+	    		},
+	    		items : [{
+	    			id : 'displayPanelForDeptIn',
+	    			items : [{
+	    				id : 'comboDeptInForStockActionBasic',
+	    				xtype : 'combo',
+	    				fieldLabel : '收货仓',
+	    				readOnly : true,
+	    				forceSelection : true,
+	    				width : 103,
+	    				listWidth : 120,
+	    				store : new Ext.data.JsonStore({
+	    					url: '../../QueryDept.do?',
+	    					baseParams : {
+	    						dataSource : 'normal'
+	    						
+	    					},
+	    					root : 'root',
+	    					fields : DeptRecord.getKeys()
+	    				}),
+	    				valueField : 'id',
+	    				displayField : 'name',
+	    				typeAhead : true,
+	    				mode : 'local',
+	    				triggerAction : 'all',
+	    				selectOnFocus : true,
+	    				allowBlank : false,
+	    				blankText : '收货仓不允许为空.',
+	    				listeners : {
+	    					render : function(thiz){
+	    						thiz.store.load();
+	    					}
+	    				}
+	    			}]
+	    		}, {
+	    			id : 'displayPanelForSupplier',
+	    			items : [{
+	    				id : 'comboSupplierForStockActionBasic',
+	    				xtype : 'combo',
+	    				fieldLabel : '供应商',
+	    				readOnly : true,
+	    				forceSelection : true,
+	    				width : 103,
+	    				listWidth : 120,
+	    				store : new Ext.data.JsonStore({
+	    					url: '../../QuerySupplier.do',
+	    					root : 'root',
+	    					fields : SupplierRecord.getKeys()
+	    				}),
+	    				valueField : 'supplierID',
+	    				displayField : 'name',
+	    				typeAhead : true,
+	    				mode : 'local',
+	    				triggerAction : 'all',
+	    				selectOnFocus : true,
+	    				allowBlank : false,
+	    				blankText : '供应商不允许为空.',
+	    				listeners : {
+	    					render : function(thiz){
+	    						thiz.store.load();
+	    					}
+	    				}
+	    			}]
+	    		}, {
+	    			id : 'displayPanelForDeptOut',
+	    			items : [{
+	    				id : 'comboDeptOutForStockActionBasic',
+	    				xtype : 'combo',
+	    				fieldLabel : '出货仓',
+	    				readOnly : true,
+	    				forceSelection : true,
+	    				width : 103,
+	    				listWidth : 120,
+	    				store : new Ext.data.JsonStore({
+	    					url: '../../QueryDept.do?',
+	    					baseParams : {
+	    						dataSource : 'normal'
+	    						
+	    					},
+	    					root : 'root',
+	    					fields : DeptRecord.getKeys()
+	    				}),
+	    				valueField : 'id',
+	    				displayField : 'name',
+	    				typeAhead : true,
+	    				mode : 'local',
+	    				triggerAction : 'all',
+	    				selectOnFocus : true,
+	    				allowBlank : false,
+	    				blankText : '收货仓不允许为空.',
+	    				listeners : {
+	    					render : function(thiz){
+	    						thiz.store.load();
+	    					}
+	    				}
+	    			}]
+	    		}, {
+	    			items : [{
+	    				id : 'txtOriStockIdForStockActionBasic',
+	    				xtype : 'textfield',
+	    				fieldLabel : '原始单号'
+	    			}]
+	    		}, {
+	    			items : [{
+					id : 'datetOriStockDateForStockActionBasic',
+					xtype : 'datefield',
+					width : 103,
+					fieldLabel : '日期',
+					format : 'Y-m-d',
+					readOnly : true,
+					allowBlank : false,
+					blankText : '日期不能为空, 且小于当前会计月月底并大于该月最后一次盘点时间.'
+				}]
+	    		}, {
+	    			columnWidth : 1,
+	    			style : 'width:100%;',
+	    			items : [{
+	    				id : 'txtCommentForStockActionBasic',
+	    				xtype : 'textfield',
+	    				width : 774,
+	    				fieldLabel : '备注'
+	    			}]
+	    		}, {
+	    			items : [{
+	    				id : 'txtSpproverNameForStockActionBasic',
+	    				xtype : 'textfield',
+	    				fieldLabel : '审核人',
+	    				disabled : true
+	    			}]
+	    		}, {
+	    			items : [{
+	    				id : 'dateSpproverDateForStockActionBasic',
+	    				xtype : 'textfield',
+	    				fieldLabel : '审核日期',
+	    				disabled : true
+	    			}]
+	    		}, {
+	    			items : [{
+	    				id : 'txtOperatorNameForStockActionBasic',
+	    				xtype : 'textfield',
+	    				fieldLabel : '制单人',
+	    				disabled : true
+	    			}]
+	    		}, {
+	    			items : [{
+	    				id : 'dateOperatorDateForStockActionBasic',
+	    				xtype : 'textfield',
+	    				fieldLabel : '制单日期',
+	    				disabled : true
+	    			}]
+	    		}]
+	    	}]
+	    });
+	}
+
     
 	if(!secondStepPanelCenter){
 		secondStepPanelCenter = createGridPanel(
@@ -1561,193 +1588,201 @@ function initControl(){
 		secondStepPanelCenter.getStore().fireEvent('load', thiz, rs);
 	});
 	
-	var secondStepPanelWest = new Ext.Panel({
-        title : '添加货品',
-        id : 'secondStepPanelWest',
-        layout : 'form',
-    	region : 'west',
-    	frame : true,
-    	width : 220,
-    	labelWidth : 60,
-    	defaults : {
-    		width : 120
-    	},
-    	items : [{
-			xtype : 'combo',
-			id : 'comboSelectMaterialForStockAction',
-			fieldLabel : '货品',
-			forceSelection : true,
-			width : 103,
-			listWidth : 250,
-			height : 200,
-			maxHeight : 300,
-			store : new Ext.data.JsonStore({
-				url : '../../QueryMaterial.do',
-				baseParams : {
-					dataSource : 'normal',
-					
-					restaurantID : restaurantID
-				},
-				root : 'root',
-				fields : MaterialRecord.getKeys()
-			}),
-			valueField : 'id',
-			displayField : 'name',
-			typeAhead : true,
-			mode : 'local',
-			triggerAction : 'all',
-			selectOnFocus : true,
-			allowBlank : false,
-			tpl:'<tpl for=".">' 
-				+ '<div class="x-combo-list-item" style="height:18px;">'
-				+ '{id} -- {name} -- {pinyin}'
-				+ '</div>'
-				+ '</tpl>',
-			listeners : {
-				beforequery : function(e){ 
-					var combo = e.combo; 
-					if(!e.forceAll){ 
-						var value = e.query; 
-						combo.store.filterBy(function(record,id){
-							return record.get('name').indexOf(value) != -1 
-									|| (record.get('id')+'').indexOf(value) != -1 
-									|| record.get('pinyin').indexOf(value.toUpperCase()) != -1;
-						}); 
-						combo.expand(); 
-						combo.select(0, true);
-						return false; 
-					}
-				},
-				select : function(thiz){
-//					var newRecord = null;
-//	    			for(var i=0, temp=thiz.store, sv=thiz.getValue(); i<temp.getCount(); i++){
-//	    				if(temp.getAt(i).get('id') == sv){
-//	    					newRecord = temp.getAt(i);
-//	    					break;
-//	    				}
-//	    			}
-					var price = Ext.getCmp('numSelectPriceForStockAction');
-	    			var count = Ext.getCmp('numSelectCountForStockAction');
-					var stockTypeList = stockTaskNavWin.stockType.split(',');
-					var stockSubType = stockTypeList[2];
-					if(stockSubType == 3 || stockSubType == 6 || stockSubType == 2 || stockSubType == 5){
-						Ext.Ajax.request({
-							url : '../../QueryMaterial.do',
-							params : {
-								dataSource : 'normal',
-								
-								restaurantID : restaurantID,
-								materialId : thiz.getValue()
-							},
-							success : function(res, opt){
-							var jr = Ext.decode(res.responseText);
-								if(jr.success){
-									price.setValue(jr.root[0].price);
-									price.setDisabled(true);
-								}else{
-									Ext.ux.showMsg(jr);
+	var secondStepPanelWest = Ext.getCmp('sam_secondStepPanelWest');
+	if(!secondStepPanelWest){
+		secondStepPanelWest = new Ext.Panel({
+	        title : '添加货品',
+	        id : 'sam_secondStepPanelWest',
+	        layout : 'form',
+	    	region : 'west',
+	    	frame : true,
+	    	width : 220,
+	    	labelWidth : 60,
+	    	defaults : {
+	    		width : 120
+	    	},
+	    	items : [{
+				xtype : 'combo',
+				id : 'comboSelectMaterialForStockAction',
+				fieldLabel : '货品',
+				forceSelection : true,
+				width : 103,
+				listWidth : 250,
+				height : 200,
+				maxHeight : 300,
+				store : new Ext.data.JsonStore({
+					url : '../../QueryMaterial.do',
+					baseParams : {
+						dataSource : 'normal',
+						
+						restaurantID : restaurantID
+					},
+					root : 'root',
+					fields : MaterialRecord.getKeys()
+				}),
+				valueField : 'id',
+				displayField : 'name',
+				typeAhead : true,
+				mode : 'local',
+				triggerAction : 'all',
+				selectOnFocus : true,
+				allowBlank : false,
+				tpl:'<tpl for=".">' 
+					+ '<div class="x-combo-list-item" style="height:18px;">'
+					+ '{id} -- {name} -- {pinyin}'
+					+ '</div>'
+					+ '</tpl>',
+				listeners : {
+					beforequery : function(e){ 
+						var combo = e.combo; 
+						if(!e.forceAll){ 
+							var value = e.query; 
+							combo.store.filterBy(function(record,id){
+								return record.get('name').indexOf(value) != -1 
+										|| (record.get('id')+'').indexOf(value) != -1 
+										|| record.get('pinyin').indexOf(value.toUpperCase()) != -1;
+							}); 
+							combo.expand(); 
+							combo.select(0, true);
+							return false; 
+						}
+					},
+					select : function(thiz){
+	//					var newRecord = null;
+	//	    			for(var i=0, temp=thiz.store, sv=thiz.getValue(); i<temp.getCount(); i++){
+	//	    				if(temp.getAt(i).get('id') == sv){
+	//	    					newRecord = temp.getAt(i);
+	//	    					break;
+	//	    				}
+	//	    			}
+						var price = Ext.getCmp('numSelectPriceForStockAction');
+		    			var count = Ext.getCmp('numSelectCountForStockAction');
+						var stockTypeList = stockTaskNavWin.stockType.split(',');
+						var stockSubType = stockTypeList[2];
+						if(stockSubType == 3 || stockSubType == 6 || stockSubType == 2 || stockSubType == 5){
+							Ext.Ajax.request({
+								url : '../../QueryMaterial.do',
+								params : {
+									dataSource : 'normal',
+									
+									restaurantID : restaurantID,
+									materialId : thiz.getValue()
+								},
+								success : function(res, opt){
+								var jr = Ext.decode(res.responseText);
+									if(jr.success){
+										price.setValue(jr.root[0].price);
+										price.setDisabled(true);
+									}else{
+										Ext.ux.showMsg(jr);
+									}
+								},
+								failure : function(res, opt){
+									Ext.ux.showMsg(Ext.decode(res.responseText));
 								}
-							},
-							failure : function(res, opt){
-								Ext.ux.showMsg(Ext.decode(res.responseText));
-							}
-						});
-					}else{
-						price.setValue(0);
+							});
+						}else{
+							price.setValue(0);
+						}
+	
+		    			count.setValue(1);
+		    			count.focus(true, 100);
 					}
-
-	    			count.setValue(1);
-	    			count.focus(true, 100);
 				}
-			}
-		}, {
-			id : 'numSelectCountForStockAction',
-    		xtype : 'numberfield',
-    		fieldLabel : '数量',
-    		maxValue : 65535,
-    		allowBlank : false
-    	},
-    	{
-    		id : 'numSelectPriceForStockAction',
-    		fieldLabel : '单价',
-    		xtype : 'numberfield',
-    		allowBlank : false,
-    		listeners : {
-    			focus : function(thiz){
-					 Ext.getCmp('numSelectPriceForStockAction').focus(true, 100);
-    			}
-    		}
-    	}],
-    	buttonAlign : 'center',
-    	buttons : [{
-    		text : '添加',
-    		handler : function(e){
-    			var material = Ext.getCmp('comboSelectMaterialForStockAction');
-    			var amount = Ext.getCmp('numSelectCountForStockAction');
-    			var price = Ext.getCmp('numSelectPriceForStockAction');
-    			var stockTypeList = stockTaskNavWin.stockType.split(',');
-    			var subType = stockTypeList[2];
-    			if(subType != 2 && subType != 5){
-    				if(!material.isValid() || !amount.isValid() || !price.isValid()){
-	    				Ext.example.msg('提示', '请输入货品单价.');
-	    				price.focus(price, 100);
-	    				return;
-    				}
-    			}
+			}, {
+				id : 'numSelectCountForStockAction',
+	    		xtype : 'numberfield',
+	    		fieldLabel : '数量',
+	    		maxValue : 65535,
+	    		allowBlank : false
+	    	},
+	    	{
+	    		id : 'numSelectPriceForStockAction',
+	    		fieldLabel : '单价',
+	    		xtype : 'numberfield',
+	    		allowBlank : false,
+	    		listeners : {
+	    			focus : function(thiz){
+						 Ext.getCmp('numSelectPriceForStockAction').focus(true, 100);
+	    			}
+	    		}
+	    	}],
+	    	buttonAlign : 'center',
+	    	buttons : [{
+	    		text : '添加',
+	    		handler : function(e){
+	    			var material = Ext.getCmp('comboSelectMaterialForStockAction');
+	    			var amount = Ext.getCmp('numSelectCountForStockAction');
+	    			var price = Ext.getCmp('numSelectPriceForStockAction');
+	    			var stockTypeList = stockTaskNavWin.stockType.split(',');
+	    			var subType = stockTypeList[2];
+	    			if(subType != 2 && subType != 5){
+	    				if(!material.isValid() || !amount.isValid() || !price.isValid()){
+		    				Ext.example.msg('提示', '请输入货品单价.');
+		    				price.focus(price, 100);
+		    				return;
+	    				}
+	    			}
+	
+	    			var newRecord = null;
+	    			for(var i=0, temp=material.store, sv=material.getValue(); i<temp.getCount(); i++){
+	    				if(temp.getAt(i).get('id') == sv){
+	    					newRecord = temp.getAt(i);
+	    					break;
+	    				}
+	    			}
+	    			
+	    			var detail = secondStepPanelCenter.getStore();
+	    			var has = false;
+	    			for(var i=0; i < detail.getCount(); i++){
+	    				if(detail.getAt(i).get('material.id') == newRecord.get('id')){
+	    					detail.getAt(i).set('amount', detail.getAt(i).get('amount') + amount.getValue());
+	    					detail.getAt(i).set('price', price.getValue());
+	    					has = true;
+	    					break;
+	    				}
+	    			}
+	    			if(!has){
+	    				detail.add(new StockDetailRecord({
+	    					material : newRecord.data,
+	    					id : newRecord.get('id'),
+	    					'material.id' : newRecord.get('id'),
+	    					'material.cateName' : newRecord.get('cateName'),
+	    					'material.name' : newRecord.get('name'),
+	    					amount : amount.getValue(),
+	    					price : price.getValue()
+	    				}));
+	    			}
+	    		}
+	    	}, {
+	    		text : '重置',
+	    		hidden : true,
+	    		handler : function(e){
+	    			var material = Ext.getCmp('comboSelectMaterialForStockAction');
+	    			var amount = Ext.getCmp('numSelectCountForStockAction');
+	    			var price = Ext.getCmp('numSelectPriceForStockAction');
+	    			material.setValue();
+	    			amount.setValue();
+	    			price.setValue();
+	    		}
+	    	}]
+	    });
+	}
 
-    			var newRecord = null;
-    			for(var i=0, temp=material.store, sv=material.getValue(); i<temp.getCount(); i++){
-    				if(temp.getAt(i).get('id') == sv){
-    					newRecord = temp.getAt(i);
-    					break;
-    				}
-    			}
-    			
-    			var detail = secondStepPanelCenter.getStore();
-    			var has = false;
-    			for(var i=0; i < detail.getCount(); i++){
-    				if(detail.getAt(i).get('material.id') == newRecord.get('id')){
-    					detail.getAt(i).set('amount', detail.getAt(i).get('amount') + amount.getValue());
-    					detail.getAt(i).set('price', price.getValue());
-    					has = true;
-    					break;
-    				}
-    			}
-    			if(!has){
-    				detail.add(new StockDetailRecord({
-    					material : newRecord.data,
-    					id : newRecord.get('id'),
-    					'material.id' : newRecord.get('id'),
-    					'material.cateName' : newRecord.get('cateName'),
-    					'material.name' : newRecord.get('name'),
-    					amount : amount.getValue(),
-    					price : price.getValue()
-    				}));
-    			}
-    		}
-    	}, {
-    		text : '重置',
-    		hidden : true,
-    		handler : function(e){
-    			var material = Ext.getCmp('comboSelectMaterialForStockAction');
-    			var amount = Ext.getCmp('numSelectCountForStockAction');
-    			var price = Ext.getCmp('numSelectPriceForStockAction');
-    			material.setValue();
-    			amount.setValue();
-    			price.setValue();
-    		}
-    	}]
-    });
-	var secondStepPanelSouth = new Ext.Panel({
-		id : 'secondStepPanelSouth',
-		region : 'south',
-		frame : true,
-		height : 30,
-		bodyStyle : 'font-size:18px;text-align:center;',
-		html : '总数量小计:<input id="txtTotalAmount" type="text" disabled="disabled" style="height: 20px;width:90px;font-size :18px;font-weight: bolder;" />' +
-			'&nbsp;&nbsp;&nbsp; 总金额:<input id="txtTotalPrice" type="text" disabled="disabled" style="height: 20px;width:90px;font-size :18px;font-weight: bolder;" />' +
-			'&nbsp;&nbsp;&nbsp;<label id="labActualPrice" >实际金额:</label><input id="txtActualPrice" disabled="disabled" type="text" style=" height: 20px;width:90px;font-size :18px;font-weight: bolder; color:red"/>'
-	});
+	var secondStepPanelSouth = Ext.getCmp('secondStepPanelSouth');
+	if(!secondStepPanelSouth){
+		secondStepPanelSouth = new Ext.Panel({
+			id : 'secondStepPanelSouth',
+			region : 'south',
+			frame : true,
+			height : 30,
+			bodyStyle : 'font-size:18px;text-align:center;',
+			html : '总数量小计:<input id="txtTotalAmount" type="text" disabled="disabled" style="height: 20px;width:90px;font-size :18px;font-weight: bolder;" />' +
+				'&nbsp;&nbsp;&nbsp; 总金额:<input id="txtTotalPrice" type="text" disabled="disabled" style="height: 20px;width:90px;font-size :18px;font-weight: bolder;" />' +
+				'&nbsp;&nbsp;&nbsp;<label id="labActualPrice" >实际金额:</label><input id="txtActualPrice" disabled="disabled" type="text" style=" height: 20px;width:90px;font-size :18px;font-weight: bolder; color:red"/>'
+		});
+	}
+
 	
 	var secondStepPanel = Ext.getCmp('stock_secondStepPanel');
 	if(!secondStepPanel){
@@ -1757,22 +1792,6 @@ function initControl(){
 	        index : 1,
 	        width : '100%',
 	        layout : 'border',
-//	        items : [{
-//	        	xtype : 'panel',
-//	        	region : 'west',
-//	        	id : 'test_panelWest',
-//	        	width : 200,
-//	        	html : 'west'
-//	        }, {
-//	        	xtype : 'panel',
-//	        	region :'center',
-//	        	html : 'center'
-//	        }],
-	        listeners : {
-	        	render : function(){
-	        		alert('ok');
-	        	}
-	        },
 	        items : [secondStepPanelNorth, secondStepPanelCenter, secondStepPanelWest, secondStepPanelSouth]
 	    });
 	}
@@ -1806,7 +1825,7 @@ function initControl(){
 	    		change : 1,
 	    		handler : function(e){
 	    			stockTaskNavHandler(e);
-	    			Ext.getCmp('secondStepPanelWest').setWidth(220);
+	    			Ext.getCmp('sam_secondStepPanelWest').setWidth(220);
 	    			Ext.getCmp('stock_secondStepPanel').doLayout();
 	    			
 		    	}
@@ -2031,10 +2050,11 @@ var btnLoginOut = new Ext.ux.ImageButton({
 
 Ext.onReady(function(){
 	//
+	getCurrentDay();
 	initControl();
 	
 	new Ext.Panel({
-		title : '库存任务管理',
+		title : '库存任务管理' + '&nbsp;&nbsp;<label style="color:#800000;font-weight:bold">当前会计月份是&nbsp;<label id="labCurrentMonth" style="color:green;font-weight: bold;font-size:15px"> </label>&nbsp;月</label>' ,
 		renderTo : 'divStockAction',
 		width : parseInt(Ext.getDom('divStockAction').parentElement.style.width.replace(/px/g,'')),
 		height : parseInt(Ext.getDom('divStockAction').parentElement.style.height.replace(/px/g,'')),
@@ -2046,6 +2066,7 @@ Ext.onReady(function(){
 			items : [btnAddStockOrder]
 		})
 	});
+	showCurrentMonth();
 	stockTaskNavWin.render(document.body);
 	
 	Ext.getCmp('comboDeptInForStockActionBasic').store.load();
