@@ -738,10 +738,10 @@ function showCurrentMonth(){
 		success : function(res, opt){
 			var jr = Ext.decode(res.responseText);
 			if(jr.success){
-				Ext.getDom('labCurrentMonth').innerHTML = jr.msg;
+				Ext.getDom('sam_labCurrentMonth').innerHTML = jr.msg;
 			}else{
 				var date = new Date();
-				Ext.getDom('labCurrentMonth').innerHTML = (date.getMonth() + 1);
+				Ext.getDom('sam_labCurrentMonth').innerHTML = (date.getMonth() + 1);
 			}
 		},
 		failure : function(res, opt){
@@ -2054,7 +2054,7 @@ Ext.onReady(function(){
 	initControl();
 	
 	new Ext.Panel({
-		title : '库存任务管理' + '&nbsp;&nbsp;<label style="color:#800000;font-weight:bold">当前会计月份是&nbsp;<label id="labCurrentMonth" style="color:green;font-weight: bold;font-size:15px"> </label>&nbsp;月</label>' ,
+		title : '库存任务管理' + '&nbsp;&nbsp;<label style="color:#800000;font-weight:bold">当前会计月份是&nbsp;<label id="sam_labCurrentMonth" style="color:green;font-weight: bold;font-size:15px"> </label>&nbsp;月</label>' ,
 		renderTo : 'divStockAction',
 		width : parseInt(Ext.getDom('divStockAction').parentElement.style.width.replace(/px/g,'')),
 		height : parseInt(Ext.getDom('divStockAction').parentElement.style.height.replace(/px/g,'')),
