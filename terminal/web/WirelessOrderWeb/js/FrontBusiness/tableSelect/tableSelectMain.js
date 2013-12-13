@@ -1149,11 +1149,7 @@ var dailySettleCheckTableWin = new Ext.Window({
 });
 
 //-----------------------------------
-
-
-
-
-
+var keyboardFN;
 Ext.onReady(function() {
 	getOperatorName('../../', function(staff){
     	//restaurantID = staff.restaurantId;
@@ -1281,174 +1277,6 @@ Ext.onReady(function() {
 				tableChangeWin.findById("tableChangeOutput").setValue(selectedTable);
 				tableChangeWin.findById("tableChangeInput").setValue("");
 				var f = Ext.get("tableChangeInput");
-				f.focus.defer(100, f);
-			}
-		}
-	});
-	
-	// ***************tableSelectNorthPanel******************
-	// soft key board
-	var softKBKeyHandlerTS = function(relateItemId, number) {
-		var currValue = tableSelectNorthPanel.findById(relateItemId).getValue();
-		tableSelectNorthPanel.findById(relateItemId).setValue(currValue + "" + number);
-	};
-	
-	softKeyBoardTS = new Ext.Window({
-		layout : "fit",
-		width : 117,
-		height : 118,
-		closeAction : "hide",
-		resizable : false,
-		// closable : false,
-		x : 56,
-		y : 146,
-		items : [{
-			layout : "form",
-			labelSeparator : '：',
-			labelWidth : 40,
-			frame : true,
-			buttonAlign : "left",
-			items : [{
-				layout : "column",
-				border : false,
-				items : [{
-					layout : "form",
-					width : 30,
-					border : false,
-					items : [{
-						text : "1",
-						xtype : "button",
-						handler : function() {
-							softKBKeyHandlerTS("tableNumber", "1");
-							tableKeyboardSelect();
-						}
-					}]
-				}, {
-					layout : "form",
-					width : 30,
-					border : false,
-					items : [{
-						text : "2",
-						xtype : "button",
-						handler : function() {
-							softKBKeyHandlerTS("tableNumber", "2");
-							tableKeyboardSelect();
-						}
-					}]
-				}, {
-					layout : "form",
-					width : 30,
-					border : false,
-					items : [{
-						text : "3",
-						xtype : "button",
-						handler : function() {
-							softKBKeyHandlerTS("tableNumber", "3");
-							tableKeyboardSelect();
-						}
-					}]
-				}, {
-					layout : "form",
-					width : 30,
-					border : false,
-					items : [{
-						text : "4",
-						xtype : "button",
-						handler : function(){
-							softKBKeyHandlerTS("tableNumber", "4");
-							tableKeyboardSelect();
-						}
-					}]
-				}, {
-					layout : "form",
-					width : 30,
-					border : false,
-					items : [{
-						text : "5",
-						xtype : "button",
-						handler : function(){
-							softKBKeyHandlerTS("tableNumber", "5");
-							tableKeyboardSelect();
-						}
-					}]
-				}, {
-					layout : "form",
-					width : 30,
-					border : false,
-					items : [ {
-						text : "6",
-						xtype : "button",
-						handler : function(){
-							softKBKeyHandlerTS("tableNumber", "6");
-							tableKeyboardSelect();
-						}
-					} ]
-				}, {
-					layout : "form",
-					width : 30,
-					border : false,
-					items : [ {
-						text : "7",
-						xtype : "button",
-						handler : function() {
-							softKBKeyHandlerTS("tableNumber", "7");
-							tableKeyboardSelect();
-						}
-					} ]
-				}, {
-					layout : "form",
-					width : 30,
-					border : false,
-					items : [ {
-						text : "8",
-						xtype : "button",
-						handler : function() {
-							softKBKeyHandlerTS("tableNumber", "8");
-							tableKeyboardSelect();
-						}
-					} ]
-				}, {
-					layout : "form",
-					width : 30,
-					border : false,
-					items : [ {
-						text : "9",
-						xtype : "button",
-						handler : function() {
-							softKBKeyHandlerTS("tableNumber", "9");
-							tableKeyboardSelect();
-						}
-					} ]
-				}, {
-					layout : "form",
-					width : 30,
-					border : false,
-					items : [ {
-						text : "0",
-						xtype : "button",
-						handler : function() {
-							softKBKeyHandlerTS("tableNumber", "0");
-							tableKeyboardSelect();
-						}
-					} ]
-				}, {
-					layout : "form",
-					width : 60,
-					border : false,
-					items : [ {
-						text : "&nbsp;清 空&nbsp;",
-						xtype : "button",
-						handler : function() {
-							tableSelectNorthPanel.findById("tableNumber").setValue("");
-							tableKeyboardSelect();
-						}
-					} ]
-				} ]
-			} ]
-		} ],
-		listeners : {
-			show : function(thiz) {
-				var f = Ext.get("tableNumber");
 				f.focus.defer(100, f);
 			}
 		}
@@ -1582,41 +1410,11 @@ Ext.onReady(function() {
 		region : "north",
 		frame : true,
 		height : 45,
-		labelSeparator : '：',
 		labelWidth : 30,
 		border : false,
-		items : [ {
-			border : false,
-			layout : "form",
-			items : [ {
-				layout : "column",
-				border : false,
-				anchor : '98%',
-				labelSeparator : '：',
-				items : [ {
-					layout : "form",
-					width : 185,
-					labelWidth : 30,
-					style : "padding-top:7px;padding-left:15px;",
-					border : false,
-					items : [ {
-						xtype : "numberfield",
-						fieldLabel : "<b>桌号</b>",
-						name : "tableNumber",
-						id : "tableNumber",
-						anchor : "90%",
-						listeners : {
-							focus : function(thiz) {
-								softKeyBoardTS.show();
-							}
-						}
-					} ]
-				}, {
-					width : 800,
-					contentEl : "tableSumInfo"
-				} ]
-			} ]
-		} ]
+		items : [{
+			contentEl : "tableSumInfo"
+		}]
 	});
 
 	// ***************tableSelectCenterPanel******************
@@ -1740,156 +1538,160 @@ Ext.onReady(function() {
 	initMainView(null, centerTabPanel, null);
 	//getOperatorName("../../");
 	
+	keyboardFN = function(){
+		var inputAliasWin = Ext.getCmp('inputAliasWin');
+		if(!inputAliasWin){
+			var alias = new Ext.form.NumberField({
+				xtype : 'numberfield',
+				hideLabel : true,
+				style : 'line-height: 100px; font-size: 100px; font-weight: bold; text-align: center; color: red;',
+				width : 350,
+				height : 110,
+				maxValue : 65535,
+				minValue : 1,
+				allowBlank : false,
+				listeners : {
+					render : function(thiz){
+						thiz.getEl().dom.setAttribute("maxLength", 5);
+					}
+				}
+			});
+			var btnPlus = new Ext.Button({
+				text : '点菜(+)',
+				handler : function(){
+					if (alias.isValid()) {
+						var temp = null, has = false;
+						for ( var i = 0; i < tableStatusListTSDisplay.length; i++) {
+							temp = tableStatusListTSDisplay[i];
+							if (temp.alias == alias.getValue()) {
+								if (temp.statusValue == TABLE_BUSY) {
+									location.href = "OrderMain.html?"+ strEncode('restaurantID=' + restaurantID
+											+ "&ts=" + TABLE_BUSY
+											+ "&tableAliasID=" + alias.getValue()
+											+ "&category=" + CATE_NORMAL
+											, 'mi');
+								} else if (temp.statusValue == TABLE_IDLE) {
+									location.href = "OrderMain.html?" + strEncode('restaurantID=' + restaurantID
+											+ "&ts=0"
+											+ "&tableAliasID=" + alias.getValue()
+											+ "&category=" + CATE_NORMAL
+											, 'mi');
+//										alias.selectText();
+//										Ext.example.msg('提示', '该餐台已结账, 请重新输入.');
+								}
+								has = true;
+								break;
+							}
+						}
+						if(!has){
+							alias.selectText();
+							Ext.example.msg('提示', '该餐台号不存在, 请重新输入.');
+						}
+					}else{
+						alias.selectText();
+						Ext.example.msg('提示', '请先输入正确餐台号(1~65535).');
+					}
+				},
+				listeners : {
+					render : function(thiz){
+						thiz.getEl().setWidth(100, true);
+					}
+				}
+			});
+			var btnSave = new Ext.Button({
+				text : '结账(ENTER)',
+				handler : function(){
+					if (alias.isValid()) {
+						var temp = null, has = false;
+						for ( var i = 0; i < tableStatusListTSDisplay.length; i++) {
+							temp = tableStatusListTSDisplay[i];
+							if (temp.alias == alias.getValue()) {
+								if (temp.statusValue == TABLE_BUSY) {
+									location.href = "CheckOut.html?"
+										+ strEncode('restaurantID=' + restaurantID
+												+ "&tableID=" + alias.getValue(), 
+										'mi');
+								} else if (temp.statusValue == TABLE_IDLE) {
+									alias.selectText();
+									Ext.example.msg('提示', '该餐台已结账, 请重新输入.');
+								}
+								has = true;
+								break;
+							}
+						}
+						if(!has){
+							alias.selectText();
+							Ext.example.msg('提示', '该餐台号不存在, 请重新输入.');
+						}
+					}else{
+						alias.selectText();
+						Ext.example.msg('提示', '请先输入正确餐台号(1~65535).');
+					}
+				},
+				listeners : {
+					render : function(thiz){
+						thiz.getEl().setWidth(100, true);
+					}
+				}
+			});
+			var btnClose = new Ext.Button({
+				text : '关闭(ESC)',
+				handler : function(){ inputAliasWin.hide(); },
+				listeners : {
+					render : function(thiz){
+						thiz.getEl().setWidth(100, true);
+					}
+				}
+			});
+			inputAliasWin = new Ext.Window({
+				id : 'inputAliasWin',
+				title : '请输入餐台编号',
+				modal : true,
+				resiza : false,
+				closable : false,
+				items : [{
+					layout : 'form',
+					frame : true,
+					items : [alias],
+					buttonAlign : 'center',
+					buttons : [btnPlus, btnSave, btnClose]
+				}],
+				keys : [{
+					key : Ext.EventObject.ESC,
+					scope : this,
+					fn : function(){
+						inputAliasWin.hide();
+					}
+				}, {
+					key : Ext.EventObject.ENTER,
+					scope : this,
+					fn : function(){
+						btnSave.handler();
+					}
+				}, {
+					key : 107,
+					scope : this,
+					fn : function(){
+						btnPlus.handler();
+					}
+				}],
+				listeners : {
+					show : function(){
+						alias.setValue();
+						alias.clearInvalid();
+						alias.focus(alias, 100);
+					}
+				}
+			});
+		}
+		inputAliasWin.show();
+	};
+	
 	new Ext.KeyMap(document.body, [{
 		key: 107,
 		scope : this,
 		fn: function(){
-			var inputAliasWin = Ext.getCmp('inputAliasWin');
-			if(!inputAliasWin){
-				var alias = new Ext.form.NumberField({
-					xtype : 'numberfield',
-					hideLabel : true,
-					style : 'line-height: 100px; font-size: 100px; font-weight: bold; text-align: center; color: red;',
-					width : 350,
-					height : 110,
-					maxValue : 65535,
-					minValue : 1,
-					allowBlank : false,
-					listeners : {
-						render : function(thiz){
-							thiz.getEl().dom.setAttribute("maxLength", 5);
-						}
-					}
-				});
-				var btnPlus = new Ext.Button({
-					text : '点菜(+)',
-					handler : function(){
-						if (alias.isValid()) {
-							var temp = null, has = false;
-							for ( var i = 0; i < tableStatusListTSDisplay.length; i++) {
-								temp = tableStatusListTSDisplay[i];
-								if (temp.alias == alias.getValue()) {
-									if (temp.statusValue == TABLE_BUSY) {
-										location.href = "OrderMain.html?"+ strEncode('restaurantID=' + restaurantID
-												+ "&ts=" + TABLE_BUSY
-												+ "&tableAliasID=" + alias.getValue()
-												+ "&category=" + CATE_NORMAL
-												, 'mi');
-									} else if (temp.statusValue == TABLE_IDLE) {
-										alias.selectText();
-										Ext.example.msg('提示', '该餐台已结账, 请重新输入.');
-									}
-									has = true;
-									break;
-								}
-							}
-							if(!has){
-								alias.selectText();
-								Ext.example.msg('提示', '该餐台号不存在, 请重新输入.');
-							}
-						}else{
-							alias.selectText();
-							Ext.example.msg('提示', '请先输入正确餐台号(1~65535).');
-						}
-					},
-					listeners : {
-						render : function(thiz){
-							thiz.getEl().setWidth(100, true);
-						}
-					}
-				});
-				var btnSave = new Ext.Button({
-					text : '结账(ENTER)',
-					handler : function(){
-						if (alias.isValid()) {
-							var temp = null, has = false;
-							for ( var i = 0; i < tableStatusListTSDisplay.length; i++) {
-								temp = tableStatusListTSDisplay[i];
-								if (temp.alias == alias.getValue()) {
-									if (temp.statusValue == TABLE_BUSY) {
-										location.href = "CheckOut.html?"
-											+ strEncode('restaurantID=' + restaurantID
-													+ "&tableID=" + alias.getValue(), 
-											'mi');
-									} else if (temp.statusValue == TABLE_IDLE) {
-//										location.href = "OrderMain.html?"+ strEncode('restaurantID=' + restaurantID
-//												+ "&ts=0"
-//												+ "&tableAliasID=" + alias.getValue()
-//												+ "&category=" + CATE_NORMAL
-//												, 'mi');
-										alias.selectText();
-										Ext.example.msg('提示', '该餐台已结账, 请重新输入.');
-									}
-									has = true;
-									break;
-								}
-							}
-							if(!has){
-								alias.selectText();
-								Ext.example.msg('提示', '该餐台号不存在, 请重新输入.');
-							}
-						}else{
-							alias.selectText();
-							Ext.example.msg('提示', '请先输入正确餐台号(1~65535).');
-						}
-					},
-					listeners : {
-						render : function(thiz){
-							thiz.getEl().setWidth(100, true);
-						}
-					}
-				});
-				var btnClose = new Ext.Button({
-					text : '关闭(ESC)',
-					handler : function(){ inputAliasWin.hide(); },
-					listeners : {
-						render : function(thiz){
-							thiz.getEl().setWidth(100, true);
-						}
-					}
-				});
-				inputAliasWin = new Ext.Window({
-					id : 'inputAliasWin',
-					title : '请输入餐台编号',
-					modal : true,
-					resiza : false,
-					closable : false,
-					items : [{
-						layout : 'form',
-						frame : true,
-						items : [alias],
-						buttonAlign : 'center',
-						buttons : [btnPlus, btnSave, btnClose]
-					}],
-					keys : [{
-						key : Ext.EventObject.ESC,
-						scope : this,
-						fn : function(){
-							inputAliasWin.hide();
-						}
-					}, {
-						key : Ext.EventObject.ENTER,
-						scope : this,
-						fn : function(){
-							btnSave.handler();
-						}
-					}, {
-						key : 107,
-						scope : this,
-						fn : function(){
-							btnPlus.handler();
-						}
-					}],
-					listeners : {
-						show : function(){
-							alias.setValue();
-							alias.clearInvalid();
-							alias.focus(alias, 100);
-						}
-					}
-				});
-			}
-			inputAliasWin.show();
+			keyboardFN();
 		}
 	}]);
 });

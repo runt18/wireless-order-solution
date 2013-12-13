@@ -3,7 +3,7 @@
 		url : "../../BusinessReceiptsStatistics.do"
 	}),
 	baseParams : {
-		
+		dataSource : 'normal',
 		restaurantID : restaurantID,
 		isPaging : true,
 		StatisticsType : 'History'

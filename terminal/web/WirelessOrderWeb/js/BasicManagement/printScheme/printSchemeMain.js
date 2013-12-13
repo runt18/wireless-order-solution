@@ -68,7 +68,8 @@ function loadInformation(){
 	Ext.Ajax.request({
 		url : '../../QueryDept.do',
 		params : {
-			dataSource : 'normal'
+			dataSource : 'normal',
+			isDept : true
 		},
 		success : function(res, opt){
 			var jr = Ext.decode(res.responseText);

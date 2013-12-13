@@ -699,41 +699,41 @@ Ext.onReady(function(){
 				    	 id : 'btnHeightSearch',
 				    	 handler : function(){
 
-				    		 Ext.Ajax.request({
-				    				url : '../../QuerySystemSetting.do',
-				    				params : {
-				    					restaurantID : restaurantID
-				    				},
-				    				success : function(res, opt){
-				    					var jr = Ext.decode(res.responseText);
-				    					if(jr.success){
-				    						var maxDate, date;
-											var md = jr.other.systemSetting.setting.stringCurrentMonth;
-											var d = jr.other.systemSetting.setting.stringCurrentMonth;
-											if(navigator.userAgent.indexOf("Firefox")>0){ 
-												maxDate = new Date(md);
-												date = new Date(d);
-											} else{
-
-												maxDate = new Date(md.replace(/-/,"/"));
-												date = new Date(d.replace(/-/,"/"));
-											}
-				    						Ext.getCmp('endDate').setValue(maxDate);
-				    						Ext.getCmp('endDate').maxValue = maxDate;
-				    						Ext.getCmp('beginDate').maxValue = maxDate;
-				    						date.setMonth(date.getMonth() - 1);
-	
-				    						Ext.getCmp('beginDate').setValue(date);
-				    						
-				    					}else{
-				    						Ext.ux.showMsg(jr);
-				    					}
-	
-				    				},
-				    				failure : function(res, opt){
-				    					Ext.ux.showMsg(Ext.decode(res.responseText));
-				    				}
-				    			});
+//				    		 Ext.Ajax.request({
+//				    				url : '../../QuerySystemSetting.do',
+//				    				params : {
+//				    					restaurantID : restaurantID
+//				    				},
+//				    				success : function(res, opt){
+//				    					var jr = Ext.decode(res.responseText);
+//				    					if(jr.success){
+//				    						var maxDate, date;
+//											var md = jr.other.systemSetting.setting.stringCurrentMonth;
+//											var d = jr.other.systemSetting.setting.stringCurrentMonth;
+//											if(navigator.userAgent.indexOf("Firefox")>0){ 
+//												maxDate = new Date(md);
+//												date = new Date(d);
+//											} else{
+//
+//												maxDate = new Date(md.replace(/-/,"/"));
+//												date = new Date(d.replace(/-/,"/"));
+//											}
+//				    						Ext.getCmp('endDate').setValue(maxDate);
+//				    						Ext.getCmp('endDate').maxValue = maxDate;
+//				    						Ext.getCmp('beginDate').maxValue = maxDate;
+//				    						date.setMonth(date.getMonth() - 1);
+//	
+//				    						Ext.getCmp('beginDate').setValue(date);
+//				    						
+//				    					}else{
+//				    						Ext.ux.showMsg(jr);
+//				    					}
+//	
+//				    				},
+//				    				failure : function(res, opt){
+//				    					Ext.ux.showMsg(Ext.decode(res.responseText));
+//				    				}
+//				    			});
 					    		Ext.getCmp('btnHeightSearch').hide();
 					    		Ext.getCmp('btnCommonSearch').show();
 					    		

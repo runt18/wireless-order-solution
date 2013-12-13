@@ -830,11 +830,11 @@ if(!roleAddWin){
 }
 
 
-var filterComb = new Ext.form.ComboBox({
+var spm_filterComb = new Ext.form.ComboBox({
 	forceSelection : true,
 	width : 100,
 	value : '全部',
-	id : 'comboFilter',
+	id : 'spm_comboFilter',
 	store : new Ext.data.SimpleStore({
 		fields : [ 'value', 'text' ],
 		data : filterTypeDate
@@ -908,7 +908,7 @@ Ext.onReady(function() {
 				xtype : 'tbtext',
 				text : '过滤: '
 			},{xtype : 'tbtext',text : '&nbsp;&nbsp;'},
-			filterComb,
+			spm_filterComb,
 			{xtype : 'tbtext',text : '&nbsp;&nbsp;'},
 			{
 				xtype : 'textfield',

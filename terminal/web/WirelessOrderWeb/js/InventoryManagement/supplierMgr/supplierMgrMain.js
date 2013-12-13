@@ -47,7 +47,7 @@ if(!addSupplier){
 							comment : sComment
 						},
 						success : function(res, opt){
-							Ext.getCmp('grid').store.reload();
+							Ext.getCmp('supplier_grid').store.reload();
 							var jr = Ext.util.JSON.decode(res.responseText);
 							if(jr.success){
 								addSupplier.hide();
@@ -244,7 +244,7 @@ supplierOperactionHandler = function(c){
 		addSupplier.setTitle('添加供应商');
 	}
 	else if(c.type == 'update'){
-		var sn = Ext.getCmp('grid').getSelectionModel().getSelected(); 
+		var sn = Ext.getCmp('supplier_grid').getSelectionModel().getSelected(); 
 		if(sn == null){
 			Ext.MessageBox.alert('提示', '请选中一个供应商再进行操作.');
 			return;
@@ -263,7 +263,7 @@ supplierOperactionHandler = function(c){
 };
 
 deleteSupplierOperationHandler = function(){
-	var sd = Ext.getCmp('grid').getSelectionModel().getSelected();
+	var sd = Ext.getCmp('supplier_grid').getSelectionModel().getSelected();
 /*	var sd = Ext.getCmp('grid').selModel.selections;
 	Ext.MessageBox.alert('sd',sd.items[0].data.supplierID);*/
 	if(sd != null){
@@ -278,7 +278,7 @@ deleteSupplierOperationHandler = function(){
 								supplierId : sd.data.supplierID
 							},
 							success : function(res, opt){
-								Ext.getCmp('grid').store.reload();
+								Ext.getCmp('supplier_grid').store.reload();
 								var jr = Ext.util.JSON.decode(res.responseText);
 								if(jr.success){
 									Ext.example.msg(jr.title, jr.msg);
@@ -414,7 +414,7 @@ Ext.onReady(function(){
 			text : '修改',
 			iconCls : 'btn_edit',
 			handler : function(){
-				var sd = Ext.getCmp('grid').getSelectionModel().getSelected;
+				var sd = Ext.getCmp('supplier_grid').getSelectionModel().getSelected;
 				if(sd != null){
 					supplierOperactionHandler({type:'update'});
 					

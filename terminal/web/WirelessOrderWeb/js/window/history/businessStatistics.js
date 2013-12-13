@@ -107,6 +107,9 @@ Ext.onReady(function(){
 					}else if(queryPattern == 2){
 						paramsOnDuty = onDuty.format('Y-m-d H:i:s');
 						paramsOffDuty = offDuty.format('Y-m-d H:i:s');
+					}else if(queryPattern == 3){
+						paramsOnDuty = onDuty.format('Y-m-d 00:00:00');
+						paramsOffDuty = offDuty.format('Y-m-d 23:59:59');
 					}else{
 						return;
 					}
@@ -246,7 +249,7 @@ Ext.onReady(function(){
 					dateCombo.setDisabled(false);
 					beginDate.setDisabled(false);
 					endDate.setDisabled(false);
-				}else if(queryPattern == 2){
+				}else if(queryPattern == 2 || queryPattern == 3){
 					beginDate.setValue(onDuty);
 					endDate.setValue(offDuty);
 					Ext.getCmp('btnSearchForBusinessStatisticsSummaryInformation').handler();

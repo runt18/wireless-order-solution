@@ -139,7 +139,7 @@ var checkOutForm = new Ext.form.FormPanel({
 			memberPay();
 		}
 	},{
-		text : '现金结账',
+		text : '现金结账(+)',
 		disabled : true,
 		handler : function() {
 			paySubmit(1);

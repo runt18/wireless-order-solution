@@ -172,7 +172,7 @@
 		</action>
 		<action path="/BusinessReceiptsStatistics"
 			type="com.wireless.Actions.billStatistics.BusinessReceiptsStatisticsAction"
-			scope="request">
+			scope="request" parameter="dataSource">
 		</action>
 		<action path="/BusinessStatistics"
 			type="com.wireless.Actions.billStatistics.BusinessStatisticsAction"
