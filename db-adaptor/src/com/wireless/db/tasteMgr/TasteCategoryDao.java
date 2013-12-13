@@ -51,10 +51,11 @@ public class TasteCategoryDao {
 		TasteCategory tasteCategory = builder.build();
 		String sql;
 		sql = " INSERT INTO " + Params.dbName + ".taste_category" +
-			  "(`restaurant_id`, `name`, `type`) VALUES (" +
+			  "(`restaurant_id`, `name`, `type`, `status`) VALUES (" +
 			  staff.getRestaurantId() + "," +
 			  "'" + tasteCategory.getName() + "'," +
-			  tasteCategory.getType().getVal() +
+			  tasteCategory.getType().getVal() + "," +
+			  tasteCategory.getStatus().getVal() +
 			  " ) ";
 		dbCon.stmt.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
 		dbCon.rs = dbCon.stmt.getGeneratedKeys();
@@ -144,11 +145,15 @@ public class TasteCategoryDao {
 	 * 			throws if failed to execute any SQL statement
 	 * @throws BusinessException
 	 * 			throws if the category to delete does NOT exist 
+	 * 			throws if the taste to this category has been exist
 	 */
 	public static void delete(DBCon dbCon, Staff staff, int categoryId) throws SQLException, BusinessException{
 		String sql;
 		
-		//TODO check to whether the taste to this category does exist
+		//Check to see whether the taste to this category does exist
+		if(TasteDao.getTasteAmountByCategory(dbCon, staff, categoryId) > 0){
+			throw new BusinessException(TasteError.TASTE_NOT_CLEAN_UP);
+		}
 		
 		sql = " DELETE FROM " + Params.dbName + ".taste_category WHERE category_id = " + categoryId;
 		if(dbCon.stmt.executeUpdate(sql) == 0){
@@ -249,6 +254,7 @@ public class TasteCategoryDao {
 			tc.setName(dbCon.rs.getString("name"));
 			tc.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
 			tc.setType(TasteCategory.Type.valueOf(dbCon.rs.getInt("type")));
+			tc.setStatus(TasteCategory.Status.valueOf(dbCon.rs.getInt("status")));
 			result.add(tc);
 		}
 		dbCon.rs.close();

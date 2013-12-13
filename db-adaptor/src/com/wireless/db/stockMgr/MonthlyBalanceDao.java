@@ -54,7 +54,7 @@ public class MonthlyBalanceDao {
 		//格式化期末时间
 		endDate = c.get(Calendar.YEAR) + "-" + (c.get(Calendar.MONTH)+1) + "-" + day + " 23:59:59";
 		
-		List<Department> depts = DepartmentDao.getDepartmentsForDept(staff);
+		List<Department> depts = DepartmentDao.getNormalDepartments(staff);
 		
 		float openingBalance, endingBalance;
 		//获取每个部门的期初和期末余额

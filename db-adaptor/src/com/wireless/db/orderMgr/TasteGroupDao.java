@@ -10,6 +10,7 @@ import java.util.Map;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.pojo.tasteMgr.Taste;
+import com.wireless.pojo.tasteMgr.TasteCategory;
 import com.wireless.pojo.tasteMgr.TasteGroup;
 
 public class TasteGroupDao {
@@ -108,7 +109,7 @@ public class TasteGroupDao {
 			  " TG.normal_taste_group_id, TG.normal_taste_pref, TG.normal_taste_price, " +
 			  " CASE WHEN (TG.tmp_taste_id IS NULL) THEN 0 ELSE 1 END AS has_tmp_taste, " +
 			  " TG.tmp_taste_id, TG.tmp_taste_pref, TG.tmp_taste_price, " +
-			  " NTG.taste_id, TASTE.restaurant_id, TASTE.category, TASTE.price, TASTE.preference " +
+			  " NTG.taste_id, TASTE.restaurant_id, TASTE.category_id, TASTE.price, TASTE.preference " +
 			  " FROM " +
 			  Params.dbName + ".taste_group TG " + 
 			  " JOIN " +
@@ -142,7 +143,7 @@ public class TasteGroupDao {
 				if(rs.getInt("normal_taste_group_id") != TasteGroup.EMPTY_NORMAL_TASTE_GROUP_ID){
 					Taste normalDetail = new Taste();
 					normalDetail.setTasteId(rs.getInt("taste_id"));
-					normalDetail.setCategory(rs.getShort("category"));
+					normalDetail.setCategory(new TasteCategory(rs.getShort("category_id")));
 					normalDetail.setRestaurantId(rs.getInt("restaurant_id"));
 					normalDetail.setPrice(rs.getFloat("price"));
 					normalDetail.setPreference(rs.getString("preference"));
@@ -172,7 +173,7 @@ public class TasteGroupDao {
 				if(rs.getInt("normal_taste_group_id") != TasteGroup.EMPTY_NORMAL_TASTE_GROUP_ID){
 					Taste normalDetail = new Taste();
 					normalDetail.setTasteId(rs.getInt("taste_id"));
-					normalDetail.setCategory(rs.getShort("category"));
+					normalDetail.setCategory(new TasteCategory(rs.getShort("category_id")));
 					normalDetail.setRestaurantId(rs.getInt("restaurant_id"));
 					normalDetail.setPrice(rs.getFloat("price"));
 					normalDetail.setPreference(rs.getString("preference"));

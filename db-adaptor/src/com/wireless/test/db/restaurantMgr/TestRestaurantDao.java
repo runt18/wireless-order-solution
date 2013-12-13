@@ -27,6 +27,7 @@ import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.db.staffMgr.RoleDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.system.SystemDao;
+import com.wireless.db.tasteMgr.TasteCategoryDao;
 import com.wireless.db.tasteMgr.TasteDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.crMgr.CancelReason;
@@ -43,6 +44,7 @@ import com.wireless.pojo.restaurantMgr.Restaurant.RecordAlive;
 import com.wireless.pojo.staffMgr.Role;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.tasteMgr.Taste;
+import com.wireless.pojo.tasteMgr.TasteCategory;
 import com.wireless.test.db.TestInit;
 import com.wireless.util.SQLUtil;
 
@@ -191,8 +193,8 @@ public class TestRestaurantDao {
 		}
 	}
 	
-	private void compareDept(Staff staff, int restaurantId) throws SQLException{
-		List<Department> depts = DepartmentDao.getDepartmentsForWarehouse(staff);
+	private void compareDept(Staff staff, int restaurantId) throws SQLException, BusinessException{
+		List<Department> depts = DepartmentDao.getDepartments4Inventory(staff);
 		for(Department d : depts){
 			Department.DeptId deptId = Department.DeptId.valueOf(d.getId());
 			assertEquals("department id", d.getId(), deptId.getVal());
@@ -229,12 +231,18 @@ public class TestRestaurantDao {
 	}
 	
 	private void compareTastes(Staff staff, int restaurantId) throws SQLException{
+		TasteCategory specCategory = TasteCategoryDao.get(staff).get(0);
+		assertEquals("the restaurant id to spec category", specCategory.getRestaurantId(), restaurantId);
+		assertEquals("the name to spec category", specCategory.getName(), TasteCategory.SpecInsertBuilder.NAME);
+		assertEquals("the type to spec category", specCategory.getType(), TasteCategory.Type.RESERVED);
+		assertEquals("the status to spec category", specCategory.getStatus(), TasteCategory.Status.SPEC);
+		
 		List<Taste> tastes = TasteDao.getTastes(staff, null, null);
 		for(Taste spec : tastes){
 			if(spec.getPreference().equals(Taste.RegularInsertBuilder.PREF) ||
 			   spec.getPreference().equals(Taste.MediumInsertBuilder.PREF)	||
 			   spec.getPreference().equals(Taste.LargeInsertBuilder.PREF)){
-				assertEquals(spec.getPreference() + "'s category", spec.getCategory().getVal(), Taste.Category.SPEC.getVal());
+				assertEquals(spec.getPreference() + "'s category", spec.getCategory().getId(), specCategory.getId());
 				assertEquals(spec.getPreference() + "'s calc type", spec.getCalc().getVal(), Taste.Calc.BY_RATE.getVal());
 				assertEquals(spec.getPreference() + "'s type", spec.getType().getVal(), Taste.Type.RESERVED.getVal());
 			}else{

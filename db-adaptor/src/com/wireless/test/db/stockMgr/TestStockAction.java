@@ -284,7 +284,7 @@ public class TestStockAction {
 			supplier = suppliers.get(0);
 		}
 		Department deptIn;
-		List<Department> depts = DepartmentDao.getDepartmentsForWarehouse(mStaff);
+		List<Department> depts = DepartmentDao.getDepartments4Inventory(mStaff);
 		if(depts.isEmpty()){
 			throw new BusinessException(DeptError.DEPT_NOT_EXIST);
 		}else{
@@ -317,7 +317,7 @@ public class TestStockAction {
 
 		Department deptIn;
 		Department deptOut;
-		List<Department> depts = DepartmentDao.getDepartmentsForWarehouse(mStaff);
+		List<Department> depts = DepartmentDao.getDepartments4Inventory(mStaff);
 		if(depts.isEmpty()){
 			throw new BusinessException(DeptError.DEPT_NOT_EXIST);
 		}else{
@@ -347,7 +347,7 @@ public class TestStockAction {
 	@Test
 	public void testSpill() throws BusinessException, SQLException{
 		Department deptIn;
-		List<Department> depts = DepartmentDao.getDepartmentsForWarehouse(mStaff);
+		List<Department> depts = DepartmentDao.getDepartments4Inventory(mStaff);
 		if(depts.isEmpty()){
 			throw new BusinessException(DeptError.DEPT_NOT_EXIST);
 		}else{
@@ -384,7 +384,7 @@ public class TestStockAction {
 			supplier = suppliers.get(0);
 		}
 		Department deptOut;
-		List<Department> depts = DepartmentDao.getDepartmentsForWarehouse(mStaff);
+		List<Department> depts = DepartmentDao.getDepartments4Inventory(mStaff);
 		if(depts.isEmpty()){
 			throw new BusinessException(DeptError.DEPT_NOT_EXIST);
 		}else{
@@ -417,7 +417,7 @@ public class TestStockAction {
 
 		Department deptIn;
 		Department deptOut;
-		List<Department> depts = DepartmentDao.getDepartmentsForWarehouse(mStaff);
+		List<Department> depts = DepartmentDao.getDepartments4Inventory(mStaff);
 		if(depts.isEmpty()){
 			throw new BusinessException(DeptError.DEPT_NOT_EXIST);
 		}else{
@@ -449,7 +449,7 @@ public class TestStockAction {
 	@Test
 	public void testDamage() throws BusinessException, SQLException{
 		Department deptIn;
-		List<Department> depts = DepartmentDao.getDepartmentsForWarehouse(mStaff);
+		List<Department> depts = DepartmentDao.getDepartments4Inventory(mStaff);
 		if(depts.isEmpty()){
 			throw new BusinessException(DeptError.DEPT_NOT_EXIST);
 		}else{
@@ -481,7 +481,7 @@ public class TestStockAction {
 	public void testUseUp() throws BusinessException, SQLException{
 		StockActionDao.getStockAndDetail(mStaff, null, null);
 		Department deptIn;
-		List<Department> depts = DepartmentDao.getDepartmentsForWarehouse(mStaff);
+		List<Department> depts = DepartmentDao.getDepartments4Inventory(mStaff);
 		if(depts.isEmpty()){
 			throw new BusinessException(DeptError.DEPT_NOT_EXIST);
 		}else{

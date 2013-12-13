@@ -11,11 +11,98 @@ import com.wireless.exception.BusinessException;
 import com.wireless.exception.TasteError;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.tasteMgr.Taste;
+import com.wireless.pojo.tasteMgr.TasteCategory;
 
 public class TasteDao {
 
 	/**
-	 * Get the tastes to the specified restaurant defined in {@link Staff} and category {@link Taste.Category}.
+	 * Get the all taste amount.
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @return the amount to all taste
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static int getAllTasteAmount(Staff staff, int categoryId) throws SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return getAllTasteAmount(dbCon, staff);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Get the all taste amount.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @return the amount to all taste
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static int getAllTasteAmount(DBCon dbCon, Staff staff) throws SQLException{
+		return getTasteAmount(dbCon, staff, null);
+	}
+	
+	/**
+	 * Get the taste amount to specific category.
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param categoryId
+	 * 			the taste category id
+	 * @return the amount to specific taste category
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static int getTasteAmountByCategory(Staff staff, int categoryId) throws SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return getTasteAmountByCategory(dbCon, staff, categoryId);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Get the taste amount to specific category.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param categoryId
+	 * 			the taste category id
+	 * @return the amount to specific taste category
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static int getTasteAmountByCategory(DBCon dbCon, Staff staff, int categoryId) throws SQLException{
+		return getTasteAmount(dbCon, staff, "AND category_id = " + categoryId);
+	}
+	
+	private static int getTasteAmount(DBCon dbCon, Staff staff, String extraCond) throws SQLException{
+		String sql;
+		sql = " SELECT COUNT(*) FROM " + Params.dbName + ".taste " +
+			  " WHERE 1 = 1 " +
+			  " AND restaurant_id = " + staff.getRestaurantId() + " " + 
+			  (extraCond != null ? extraCond : "");
+		dbCon.rs = dbCon.stmt.executeQuery(sql);
+		try{
+			if(dbCon.rs.next()){
+				return dbCon.rs.getInt(1);
+			}else{
+				return 0;
+			}
+		}finally{
+			dbCon.rs.close();
+		}
+	}
+	
+	/**
+	 * Get the tastes to the specified restaurant and category.
 	 * @param dbCon
 	 * 			the database connection
 	 * @param staff
@@ -26,8 +113,8 @@ public class TasteDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static List<Taste> getTasteByCategory(DBCon dbCon, Staff staff, Taste.Category category) throws SQLException{
-		return getTastes(dbCon, staff, " AND TASTE.category = " + category.getVal(), null);
+	public static List<Taste> getTasteByCategory(DBCon dbCon, Staff staff, int categoryId) throws SQLException{
+		return getTastes(dbCon, staff, " AND TASTE.category_id = " + categoryId, null);
 	}
 	
 	/**
@@ -47,7 +134,7 @@ public class TasteDao {
 	public static Taste getTasteById(DBCon dbCon, Staff staff, int tasteId) throws SQLException, BusinessException{
 		List<Taste> tastes = TasteDao.getTastes(dbCon, staff, " AND taste_id = " + tasteId, null);
 		if(tastes.isEmpty()){
-			throw new BusinessException("The taste(taste_id = " + tasteId + ", restaurant_id = " + staff.getRestaurantId() + ") is NOT found.");
+			throw new BusinessException(TasteError.TASTE_NOT_EXIST);
 		}else{
 			return tastes.get(0);
 		}
@@ -92,7 +179,7 @@ public class TasteDao {
 	public static List<Taste> getTastes(DBCon dbCon, Staff staff, String extraCond, String orderClause) throws SQLException{
 		String sql = " SELECT " +
 				 	 " taste_id, restaurant_id, preference, " +
-				 	 " category, calc, rate, price, type " +
+				 	 " category_id, calc, rate, price, type " +
 				 	 " FROM " + 
 				 	 Params.dbName + ".taste TASTE " +
 				 	 " WHERE 1=1 " +
@@ -107,7 +194,7 @@ public class TasteDao {
 								    dbCon.rs.getInt("restaurant_id"));
 			
 			taste.setPreference(dbCon.rs.getString("preference"));
-			taste.setCategory(dbCon.rs.getShort("category"));
+			taste.setCategory(new TasteCategory(dbCon.rs.getInt("category_id")));
 			taste.setCalc(dbCon.rs.getShort("calc"));
 			taste.setRate(dbCon.rs.getFloat("rate"));
 			taste.setPrice(dbCon.rs.getFloat("price"));
@@ -155,12 +242,12 @@ public class TasteDao {
 		Taste tasteToInsert = builder.build();
 		
 		String insertSQL = "INSERT INTO " + Params.dbName + ".taste"
-						 + "( restaurant_id, preference, price, category, rate, calc, type )"
+						 + "( restaurant_id, preference, price, category_id, rate, calc, type )"
 						 + "VALUES("
 						 + tasteToInsert.getRestaurantId() + ","
 						 + "'" + tasteToInsert.getPreference() + "',"
 						 + tasteToInsert.getPrice() + ","
-						 + tasteToInsert.getCategory().getVal() + ","
+						 + tasteToInsert.getCategory().getId() + ","
 						 + tasteToInsert.getRate() + ","
 						 + tasteToInsert.getCalc().getVal() + "," 
 						 + tasteToInsert.getType().getVal() 
@@ -212,17 +299,19 @@ public class TasteDao {
 		
 		Taste tasteToUpdate = builder.build();
 		
-		String updateSQL = " UPDATE " + Params.dbName + ".taste SET "
-						 + " preference = '" + tasteToUpdate.getPreference() + "',"
-						 + " rate = " + tasteToUpdate.getRate() + ","
-						 + " calc = " + tasteToUpdate.getCalc().getVal() + ","
-						 + " price = " + tasteToUpdate.getPrice() + ","
-						 + " category = " + tasteToUpdate.getCategory().getVal() 
-						 + " WHERE restaurant_id = " + staff.getRestaurantId() 
-						 + " AND taste_id = " + tasteToUpdate.getTasteId();
+		String sql;
+		sql = " UPDATE " + Params.dbName + ".taste SET " +
+			  " taste_id = " + tasteToUpdate.getTasteId() + 
+			  (builder.isPrefChanged() ? " ,preference = '" + tasteToUpdate.getPreference() + "'" : "") +
+			  (builder.isRateChanged() ? " ,rate = " + tasteToUpdate.getRate() : "") +
+			  (builder.isPriceChanged() ?" ,price = " + tasteToUpdate.getPrice() : "") +
+			  (builder.isCategoryChanged() ? " ,category = " + tasteToUpdate.getCategory().getId() : "") +
+			  (builder.isCategoryChanged() ? " ,calc = " + tasteToUpdate.getCalc().getVal() : "") +
+			  " WHERE restaurant_id = " + staff.getRestaurantId() +
+			  " AND taste_id = " + tasteToUpdate.getTasteId();
 		
-		if(dbCon.stmt.executeUpdate(updateSQL) == 0){
-			throw new BusinessException(TasteError.UPDATE_FAIL);
+		if(dbCon.stmt.executeUpdate(sql) == 0){
+			throw new BusinessException(TasteError.TASTE_NOT_EXIST);
 		}
 	}
 	
@@ -265,7 +354,7 @@ public class TasteDao {
 			+ " WHERE taste_id = " + id
 			+ " AND restaurant_id = " + staff.getRestaurantId();
 		if(dbCon.stmt.executeUpdate(deleteSQL) == 0){
-			throw new BusinessException(TasteError.DELETE_FAIL);
+			throw new BusinessException(TasteError.TASTE_NOT_EXIST);
 		}
 	}
 	

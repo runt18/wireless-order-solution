@@ -52,7 +52,7 @@ public class QueryMenu {
 							TasteDao.getTasteByCategory(dbCon, term, Taste.Category.STYLE),
 							TasteDao.getTasteByCategory(dbCon, term, Taste.Category.SPEC),
 							KitchenDao.getKitchens(dbCon, term, " AND KITCHEN.type = " + Kitchen.Type.NORMAL.getVal(), null),
-			    			DepartmentDao.getDepartmentsForDept(dbCon, term),
+			    			DepartmentDao.getNormalDepartments(dbCon, term),
 			    			DiscountDao.getDiscount(dbCon, term, null, null),
 			    			CancelReasonDao.getReasons(dbCon, term, null, null));
 	}

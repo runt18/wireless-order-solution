@@ -60,6 +60,7 @@ public class TestTasteCategoryDao {
 		Assert.assertEquals("id to taste cateogry", expected.getId(), actual.getId());
 		Assert.assertEquals("restaurant id to taste category", expected.getRestaurantId(), actual.getRestaurantId());
 		Assert.assertEquals("type to taste category", expected.getType(), actual.getType());
+		Assert.assertEquals("status to taste category", expected.getStatus(), actual.getStatus());
 		Assert.assertEquals("name to taste category", expected.getName(), actual.getName());
 	}
 }

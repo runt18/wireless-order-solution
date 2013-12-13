@@ -229,7 +229,7 @@ public class DailySettleDao {
 		List<StockAction.AuditBuilder> auditBuilders = new ArrayList<StockAction.AuditBuilder>();
 		
 		//生成每个部门的商品和原料出库消耗单
-		for(Department dept : DepartmentDao.getDepartmentsForDept(staff)){
+		for(Department dept : DepartmentDao.getNormalDepartments(staff)){
 			
 			for(MaterialCate.Type cateType : MaterialCate.Type.values()){
 				

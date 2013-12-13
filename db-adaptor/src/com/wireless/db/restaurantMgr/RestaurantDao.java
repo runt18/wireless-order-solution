@@ -16,6 +16,7 @@ import com.wireless.db.regionMgr.RegionDao;
 import com.wireless.db.regionMgr.TableDao;
 import com.wireless.db.staffMgr.RoleDao;
 import com.wireless.db.staffMgr.StaffDao;
+import com.wireless.db.tasteMgr.TasteCategoryDao;
 import com.wireless.db.tasteMgr.TasteDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.RestaurantError;
@@ -32,6 +33,7 @@ import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.staffMgr.Role;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.tasteMgr.Taste;
+import com.wireless.pojo.tasteMgr.TasteCategory;
 import com.wireless.pojo.util.DateUtil;
 
 public class RestaurantDao {
@@ -417,6 +419,7 @@ public class RestaurantDao {
 		DepartmentDao.insert(dbCon, new Department.InsertBuilder(staff.getRestaurantId(), Department.DeptId.DEPT_10));
 		DepartmentDao.insert(dbCon, new Department.InsertBuilder(staff.getRestaurantId(), Department.DeptId.DEPT_TMP));
 		DepartmentDao.insert(dbCon, new Department.InsertBuilder(staff.getRestaurantId(), Department.DeptId.DEPT_NULL));
+		DepartmentDao.insert(dbCon, new Department.InsertBuilder(staff.getRestaurantId(), Department.DeptId.DEPT_WAREHOUSE));
 	}
 	
 	private static void initKitchen(DBCon dbCon, Staff staff) throws SQLException{
@@ -478,13 +481,17 @@ public class RestaurantDao {
 		DiscountDao.insert(dbCon, staff, new Discount.NotDiscountBuilder(staff.getRestaurantId()));
 	}
 	
-	private static void initTastes(DBCon dbCon, Staff staff) throws SQLException{
+	private static void initTastes(DBCon dbCon, Staff staff) throws SQLException, BusinessException{
+		//Insert the '规格'
+		int categoryId = TasteCategoryDao.insert(dbCon, staff, new TasteCategory.SpecInsertBuilder(staff.getRestaurantId()));
+		
+		TasteCategory spec = TasteCategoryDao.getById(dbCon, staff, categoryId);
 		//Insert the '例牌'
-		TasteDao.insert(dbCon, staff, new Taste.RegularInsertBuilder(staff.getRestaurantId()));
+		TasteDao.insert(dbCon, staff, new Taste.RegularInsertBuilder(staff.getRestaurantId(), spec));
 		//Insert the '中牌'
-		TasteDao.insert(dbCon, staff, new Taste.MediumInsertBuilder(staff.getRestaurantId()));
+		TasteDao.insert(dbCon, staff, new Taste.MediumInsertBuilder(staff.getRestaurantId(), spec));
 		//Insert the '大牌'
-		TasteDao.insert(dbCon, staff, new Taste.LargeInsertBuilder(staff.getRestaurantId()));
+		TasteDao.insert(dbCon, staff, new Taste.LargeInsertBuilder(staff.getRestaurantId(), spec));
 	}
 	
 	private static Staff initStaff(DBCon dbCon, int restaurantId, String pwd) throws SQLException, BusinessException{
@@ -613,6 +620,11 @@ public class RestaurantDao {
 		
 		//Delete the setting
 		sql = " DELETE FROM " + Params.dbName + ".setting WHERE restaurant_id = " + restaurantId;
+		dbCon.stmt.executeUpdate(sql);
+		
+		//Delete the member type discount
+		sql = " DELETE FROM " + Params.dbName + ".member_type_discount WHERE member_type_id IN (" +
+			  " SELECT member_type_id FROM " + Params.dbName + ".member_type WHERE restaurant_id = " + restaurantId + ")";
 		dbCon.stmt.executeUpdate(sql);
 		
 		//Delete the member type
