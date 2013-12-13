@@ -33,7 +33,7 @@ public class CostAnalyzeReportDao {
 	public static List<CostAnalyze> getCostAnalyzes(DBCon dbCon, Staff term, String begin, String end, String orderClause) throws SQLException, BusinessException{
 		List<CostAnalyze> costAnalyzes = new ArrayList<CostAnalyze>();
 		List<MaterialDept> materialDepts;
-		List<Department> departments = DepartmentDao.getDepartments(dbCon, term, null, null);
+		List<Department> departments = DepartmentDao.getNormalDepartments(dbCon, term);
 		String extra;
 		String extraCond = " AND S.ori_stock_date >= '" + begin + "' AND S.ori_stock_date <= '" + end + "'";
 		

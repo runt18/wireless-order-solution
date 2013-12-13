@@ -10,7 +10,6 @@ import com.wireless.db.distMgr.DiscountDao;
 import com.wireless.db.menuMgr.FoodDao;
 import com.wireless.db.tasteMgr.TasteDao;
 import com.wireless.exception.BusinessException;
-import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.menuMgr.FoodMenu;
 import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.pojo.staffMgr.Staff;
@@ -53,7 +52,7 @@ public class QueryMenu {
 							TasteDao.getTasteByCategory(dbCon, term, Taste.Category.STYLE),
 							TasteDao.getTasteByCategory(dbCon, term, Taste.Category.SPEC),
 							KitchenDao.getKitchens(dbCon, term, " AND KITCHEN.type = " + Kitchen.Type.NORMAL.getVal(), null),
-			    			DepartmentDao.getDepartments(dbCon, term, " AND DEPT.type = " + Department.Type.NORMAL.getVal(), null),
+			    			DepartmentDao.getNormalDepartments(dbCon, term),
 			    			DiscountDao.getDiscount(dbCon, term, null, null),
 			    			CancelReasonDao.getReasons(dbCon, term, null, null));
 	}

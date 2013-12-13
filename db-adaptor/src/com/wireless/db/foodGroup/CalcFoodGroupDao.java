@@ -52,7 +52,7 @@ public class CalcFoodGroupDao {
 	 */
 	public static List<Pager> calc(DBCon dbCon, Staff term) throws SQLException{
 		
-		List<Department> depts = DepartmentDao.getDepartments(dbCon, term, null, null);
+		List<Department> depts = DepartmentDao.getNormalDepartments(dbCon, term);
 		
 		List<Pager> pagers = new ArrayList<Pager>();
 		for(Department dept : depts){

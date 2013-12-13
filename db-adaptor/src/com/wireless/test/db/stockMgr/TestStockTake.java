@@ -131,7 +131,7 @@ public class TestStockTake {
 
 		
 		Department dept;
-		List<Department> depts = DepartmentDao.getDepartments(mStaff, null, null);
+		List<Department> depts = DepartmentDao.getDepartments4Inventory(mStaff);
 		if(depts.isEmpty()){
 			throw new BusinessException(DeptError.DEPT_NOT_EXIST);
 		}else{

@@ -417,6 +417,7 @@ public class RestaurantDao {
 		DepartmentDao.insert(dbCon, new Department.InsertBuilder(staff.getRestaurantId(), Department.DeptId.DEPT_10));
 		DepartmentDao.insert(dbCon, new Department.InsertBuilder(staff.getRestaurantId(), Department.DeptId.DEPT_TMP));
 		DepartmentDao.insert(dbCon, new Department.InsertBuilder(staff.getRestaurantId(), Department.DeptId.DEPT_NULL));
+		DepartmentDao.insert(dbCon, new Department.InsertBuilder(staff.getRestaurantId(), Department.DeptId.DEPT_WAREHOUSE));
 	}
 	
 	private static void initKitchen(DBCon dbCon, Staff staff) throws SQLException{

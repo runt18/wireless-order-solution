@@ -50,7 +50,7 @@ public class StockError extends ErrorEnum{
 	/*monthlyBalance 7900 - 7949*/
 	public static final ErrorCode MONTHLY_BALANCE_NOT_EXIST = build(7949, "操作失败, 查找失败, 无此月结记录");
 	public static final ErrorCode MONTHLY_BALANCE_ADD = build(7948, "操作失败, 添加失败, 数据库异常");
-	public static final ErrorCode NOT_MONTHLY_BALANCE = build(7947, "当前会计月份已月结, 请于下月初进行操作");
+	public static final ErrorCode NOT_MONTHLY_BALANCE = build(7947, "当前月份不能月结, 请于下月初进行操作");
 	
 	private StockError(){
 		

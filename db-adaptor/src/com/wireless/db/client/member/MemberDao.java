@@ -37,7 +37,7 @@ public class MemberDao {
 		String querySQL = "SELECT COUNT(M.member_id) "
 				+ " FROM (" + Params.dbName + ".member M " 
 				+ " JOIN " + Params.dbName + ".member_type MT ON M.member_type_id = MT.member_type_id) " 
-				+ " JOIN " + Params.dbName + ".interested_member IM ON M.member_id = IM.member_id " 
+				+ " LEFT JOIN " + Params.dbName + ".interested_member IM ON M.member_id = IM.member_id " 
 				+ " WHERE 1=1 ";
 		querySQL = SQLUtil.bindSQLParams(querySQL, params);
 		dbCon.rs = dbCon.stmt.executeQuery(querySQL);

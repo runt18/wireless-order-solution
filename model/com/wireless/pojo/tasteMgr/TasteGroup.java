@@ -340,6 +340,16 @@ public class TasteGroup implements Parcelable, Jsonable{
 		this.mTmpTaste = tmpTaste;
 	}
 	
+	public boolean contains(Taste taste){
+		if(mTastes.containsElement(taste)){
+			return true;
+		}else if(mSpecs.containsElement(taste)){
+			return true;
+		}else{
+			return false;
+		}
+	}
+	
 	public OrderFood getAttachedFood(){
 		return mAttachedOrderFood;
 	}

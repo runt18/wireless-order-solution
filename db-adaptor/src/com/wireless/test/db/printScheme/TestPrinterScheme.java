@@ -82,7 +82,7 @@ public class TestPrinterScheme {
 		try{
 			dbCon.connect();
 			
-			List<Department> depts = DepartmentDao.getDepartments(dbCon, mStaff, null, null);
+			List<Department> depts = DepartmentDao.getNormalDepartments(dbCon, mStaff);
 			List<Kitchen> kitchens = KitchenDao.getKitchens(dbCon, mStaff, null, null);
 			List<Region> regions = RegionDao.getRegions(dbCon, mStaff, null, null);
 			

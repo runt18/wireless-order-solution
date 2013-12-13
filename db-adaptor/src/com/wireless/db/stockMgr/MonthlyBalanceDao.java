@@ -1,6 +1,7 @@
 package com.wireless.db.stockMgr;
 
 import java.sql.SQLException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -13,14 +14,13 @@ import com.mysql.jdbc.Statement;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.deptMgr.DepartmentDao;
-import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.StockError;
 import com.wireless.pojo.menuMgr.Department;
-import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.stockMgr.MonthlyBalance;
 import com.wireless.pojo.stockMgr.MonthlyBalanceDetail;
+import com.wireless.pojo.stockMgr.StockAction;
 import com.wireless.pojo.util.DateUtil;
 
 public class MonthlyBalanceDao {
@@ -34,15 +34,17 @@ public class MonthlyBalanceDao {
 	 * 			the id of monthlyBalance
 	 * @throws SQLException
 	 * @throws BusinessException 
+	 * @throws ParseException 
 	 */
-	public static int insert(DBCon dbCon, MonthlyBalance monthlyBalance, Staff staff) throws SQLException, BusinessException{
+	public static int insert(DBCon dbCon, MonthlyBalance monthlyBalance, Staff staff) throws SQLException, BusinessException, ParseException{
 		
 		Calendar c = Calendar.getInstance();
 		String beginDate, endDate;
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+		SimpleDateFormat firstDay = new SimpleDateFormat("yyyy-MM-01");
 		//获取当前月
 		long monthly = MonthlyBalanceDao.getCurrentMonthTimeByRestaurant(staff.getRestaurantId());
-		c.setTime(new Date(monthly));
+		c.setTime(firstDay.parse(firstDay.format(new Date(monthly))));
 		
 		beginDate = sdf.format(c.getTime());
 		
@@ -52,7 +54,7 @@ public class MonthlyBalanceDao {
 		//格式化期末时间
 		endDate = c.get(Calendar.YEAR) + "-" + (c.get(Calendar.MONTH)+1) + "-" + day + " 23:59:59";
 		
-		List<Department> depts = DepartmentDao.getDepartments(staff, null, null);
+		List<Department> depts = DepartmentDao.getNormalDepartments(staff);
 		
 		float openingBalance, endingBalance;
 		//获取每个部门的期初和期末余额
@@ -103,8 +105,9 @@ public class MonthlyBalanceDao {
 	 * 			the id of monthlyBalance
 	 * @throws SQLException
 	 * @throws BusinessException 
+	 * @throws ParseException 
 	 */
-	public static int insert(MonthlyBalance.InsertBuilder build, Staff staff) throws SQLException, BusinessException{
+	public static int insert(MonthlyBalance.InsertBuilder build, Staff staff) throws SQLException, BusinessException, ParseException{
 		DBCon dbCon = new DBCon();
 		dbCon.connect();
 		int id;
@@ -254,8 +257,15 @@ public class MonthlyBalanceDao {
 			if(m.getId() > 0){
 				return m.getMonth();
 			}else{
-				Restaurant r = RestaurantDao.getById(dbCon, restaurant);
-				return r.getBirthDate();
+				//Restaurant r = RestaurantDao.getById(dbCon, restaurant);
+				Staff staff = new Staff();
+				staff.setRestaurantId(restaurant);
+				List<StockAction> list = StockActionDao.getStockActions(dbCon, staff, " AND sub_type <> " + StockAction.SubType.USE_UP.getVal() , " ORDER BY birth_date LIMIT 0,1");
+				if(list.isEmpty()){
+					return new Date().getTime();
+				}else{
+					return list.get(0).getBirthDate();
+				}
 			}
 		}finally{
 			dbCon.disconnect();

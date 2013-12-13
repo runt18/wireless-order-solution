@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 
 import java.beans.PropertyVetoException;
 import java.sql.SQLException;
+import java.text.ParseException;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -51,7 +52,7 @@ public class TestMonthlyBalance {
 	}
 	
 	@Test
-	public void testMonthlyBalanceDao() throws SQLException, BusinessException{
+	public void testMonthlyBalanceDao() throws SQLException, BusinessException, ParseException{
 		
 		int monthlyBalanceId = 0;
 		

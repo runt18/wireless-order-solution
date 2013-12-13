@@ -761,7 +761,7 @@ public class StockActionDao {
 			StockAction stockAction = new StockAction();
 			stockAction.setId(dbCon.rs.getInt("id"));
 			stockAction.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
-			stockAction.setBirthDate(dbCon.rs.getLong("birth_date"));
+			stockAction.setBirthDate(dbCon.rs.getTimestamp("birth_date").getTime());
 			stockAction.setOriStockId(dbCon.rs.getString("ori_stock_id"));
 			stockAction.setOriStockDate(dbCon.rs.getTimestamp("ori_stock_date").getTime());
 			stockAction.getDeptIn().setId(dbCon.rs.getShort("dept_in"));
