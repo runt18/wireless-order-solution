@@ -45,9 +45,9 @@ public class QueryDeptAction extends DispatchAction{
 			String pin = (String)request.getAttribute("pin");
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			if(isDept != null && !isDept.isEmpty()){
-				root = DepartmentDao.getDepartmentsForDept(staff);
+				root = DepartmentDao.getNormalDepartments(staff);
 			}else{
-				root = DepartmentDao.getDepartmentsForWarehouse(staff);
+				root = DepartmentDao.getDepartments4Inventory(staff);
 			}
 		}catch(BusinessException e){
 			e.printStackTrace();
