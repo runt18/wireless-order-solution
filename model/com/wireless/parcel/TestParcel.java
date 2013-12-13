@@ -26,6 +26,7 @@ import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.tasteMgr.Taste;
+import com.wireless.pojo.tasteMgr.TasteCategory;
 import com.wireless.pojo.tasteMgr.TasteGroup;
 
 public class TestParcel {
@@ -124,7 +125,7 @@ public class TestParcel {
 		Taste tasteToParcel = new Taste();
 		
 		tasteToParcel.setTasteId(1);
-		tasteToParcel.setCategory(Taste.Category.STYLE);
+		tasteToParcel.setCategory(new TasteCategory(1));
 		tasteToParcel.setCalc(Taste.Calc.BY_RATE);
 		tasteToParcel.setType(Taste.Type.RESERVED);
 		tasteToParcel.setPrice(2.3f);
@@ -144,7 +145,7 @@ public class TestParcel {
 		assertEquals("taste alias id", tasteToParcel.getTasteId(), parcelableTaste.getTasteId());
 		
 		//Check the taste category
-		assertEquals("taste category", tasteToParcel.getCategory().getVal(), parcelableTaste.getCategory().getVal());
+		assertEquals("taste category", tasteToParcel.getCategory().getId(), parcelableTaste.getCategory().getId());
 		
 		//Check the taste calculate type
 		assertEquals("taste calculate type", tasteToParcel.getCalc().getVal(), parcelableTaste.getCalc().getVal());

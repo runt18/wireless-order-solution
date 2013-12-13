@@ -160,6 +160,7 @@ public class Department implements Parcelable, Comparable<Department>, Jsonable{
 		this.restaurantId = restaurantId;
 		this.deptId = deptId;
 		this.deptName = deptName;
+		this.deptType = type;
 	}
 	
 	public int getRestaurantId() {
