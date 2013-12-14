@@ -26,6 +26,7 @@ import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.tasteMgr.Taste;
+import com.wireless.pojo.tasteMgr.TasteCategory;
 import com.wireless.sccon.ServerConnector;
 import com.wireless.util.JObject;
 import com.wireless.util.WebParams;
@@ -160,7 +161,7 @@ public class UpdateOrderGroupAction extends DispatchAction{
 							tasteToAdd = new Taste();
 							tasteToAdd.setTasteId(tgContent.getJSONObject(ti).getInt("tasteID"));
 							tasteToAdd.setTasteId(tgContent.getJSONObject(ti).getInt("tasteAliasID"));
-							tasteToAdd.setCategory((short) tgContent.getJSONObject(ti).getInt("tasteCategory"));
+							tasteToAdd.setCategory(new TasteCategory(tgContent.getJSONObject(ti).getInt("tasteCategory")));
 							of.getTasteGroup().addTaste(tasteToAdd);							
 						}
 					}
