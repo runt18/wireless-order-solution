@@ -19,6 +19,7 @@ import com.wireless.pojo.menuMgr.FoodTaste;
 import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.pojo.ppMgr.PricePlan;
 import com.wireless.pojo.tasteMgr.Taste;
+import com.wireless.pojo.tasteMgr.TasteCategory;
 import com.wireless.util.SQLUtil;
 
 public class MenuDao {
@@ -232,7 +233,7 @@ public class MenuDao {
 		try{
 			dbCon.connect();
 			String querySQL = "SELECT "
-							+ " A.taste_id, A.restaurant_id, A.preference, A.price, A.category, A.rate, A.calc, A.type "
+							+ " A.taste_id, A.restaurant_id, A.preference, A.price, A.category_id, A.rate, A.calc, A.type "
 							+ " FROM " + Params.dbName + ".taste A "
 							+ " WHERE 1=1 "
 							+ (cond != null && cond.trim().length() > 0 ? " " + cond : "")
@@ -244,7 +245,7 @@ public class MenuDao {
 				taste.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
 				taste.setPreference(dbCon.rs.getString("preference"));
 				taste.setPrice(dbCon.rs.getFloat("price"));
-				taste.setCategory(dbCon.rs.getInt("category"));
+				taste.setCategory(new TasteCategory(dbCon.rs.getInt("category_id")));
 				taste.setRate(dbCon.rs.getFloat("rate"));
 				taste.setCalc(dbCon.rs.getInt("calc"));
 				taste.setType(dbCon.rs.getInt("type"));

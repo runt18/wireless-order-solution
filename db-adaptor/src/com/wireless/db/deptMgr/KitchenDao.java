@@ -18,8 +18,8 @@ public class KitchenDao {
 	
 	/**
 	 * Get the kitchens to a specified restaurant defined in {@link Staff} and other extra condition.
-	 * @param term
-	 * 			the terminal
+	 * @param staff
+	 * 			the staff to perform this action
 	 * @param extraCond
 	 * 			the extra condition
 	 * @param orderClause
@@ -28,11 +28,11 @@ public class KitchenDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static List<Kitchen> getKitchens(Staff term, String extraCond, String orderClause) throws SQLException{
+	public static List<Kitchen> getKitchens(Staff staff, String extraCond, String orderClause) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return getKitchens(dbCon, term, extraCond, orderClause);
+			return getKitchens(dbCon, staff, extraCond, orderClause);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -42,8 +42,8 @@ public class KitchenDao {
 	 * Get the kitchens to a specified restaurant defined in {@link Staff} and other extra condition.
 	 * @param dbCon
 	 * 			the database connection
-	 * @param term
-	 * 			the terminal
+	 * @param staff
+	 * 			the staff to perform this action
 	 * @param extraCond
 	 * 			the extra condition
 	 * @param orderClause
@@ -52,7 +52,7 @@ public class KitchenDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static List<Kitchen> getKitchens(DBCon dbCon, Staff term, String extraCond, String orderClause) throws SQLException{
+	public static List<Kitchen> getKitchens(DBCon dbCon, Staff staff, String extraCond, String orderClause) throws SQLException{
 		List<Kitchen> kitchens = new ArrayList<Kitchen>();
 		String sql = " SELECT " +
 					 " KITCHEN.restaurant_id, KITCHEN.kitchen_id, KITCHEN.kitchen_alias, " +
@@ -63,7 +63,7 @@ public class KitchenDao {
 					 Params.dbName + ".department DEPT " +
 					 " ON KITCHEN.dept_id = DEPT.dept_id AND KITCHEN.restaurant_id = DEPT.restaurant_id " +
 			  		 " WHERE 1=1 " +
-					 " AND KITCHEN.restaurant_id = " + term.getRestaurantId() +
+					 " AND KITCHEN.restaurant_id = " + staff.getRestaurantId() +
 			  		 (extraCond == null ? "" : extraCond) + " " +
 			  		 (orderClause == null ? "" : orderClause);
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
@@ -81,6 +81,38 @@ public class KitchenDao {
 		
 		return kitchens;
 		
+	}
+	
+	/**
+	 * Get the normal kitchens to a specific restaurant.
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @return the normal kitchens to specific restaurant
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statment
+	 */
+	public static List<Kitchen> getNormalKitchens(Staff staff) throws SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return getNormalKitchens(dbCon, staff);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Get the normal kitchens to a specific restaurant.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @return the normal kitchens to specific restaurant
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statment
+	 */
+	public static List<Kitchen> getNormalKitchens(DBCon dbCon, Staff staff) throws SQLException{
+		return getKitchens(dbCon, staff, " AND KITCHEN.type = " + Kitchen.Type.NORMAL.getVal(), null);
 	}
 	
 	/**

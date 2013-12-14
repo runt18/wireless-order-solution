@@ -475,9 +475,9 @@ public class UpdateOrder {
 					taste.copyFrom(TasteDao.getTasteById(dbCon, staff, taste.getTasteId()));
 				}
 				
-				//Get the detail to each specs.
-				for(Taste spec : foodToFill.getTasteGroup().getSpecs()){
-					spec.copyFrom(TasteDao.getTasteById(dbCon, staff, spec.getTasteId()));
+				//Get the detail to each spec.
+				if(foodToFill.getTasteGroup().hasSpec()){
+					foodToFill.getTasteGroup().getSpec().copyFrom(TasteDao.getTasteById(dbCon, staff, foodToFill.getTasteGroup().getSpec().getTasteId()));
 				}
 			}			
 	

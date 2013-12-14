@@ -482,7 +482,7 @@ public class RestaurantDao {
 	}
 	
 	private static void initTastes(DBCon dbCon, Staff staff) throws SQLException, BusinessException{
-		//Insert the '规格'
+		//Insert the '规格' category
 		int categoryId = TasteCategoryDao.insert(dbCon, staff, new TasteCategory.SpecInsertBuilder(staff.getRestaurantId()));
 		
 		TasteCategory spec = TasteCategoryDao.getById(dbCon, staff, categoryId);
@@ -492,6 +492,9 @@ public class RestaurantDao {
 		TasteDao.insert(dbCon, staff, new Taste.MediumInsertBuilder(staff.getRestaurantId(), spec));
 		//Insert the '大牌'
 		TasteDao.insert(dbCon, staff, new Taste.LargeInsertBuilder(staff.getRestaurantId(), spec));
+		
+		//Insert the '口味' category
+		TasteCategoryDao.insert(dbCon, staff, new TasteCategory.InsertBuilder(staff.getRestaurantId(), "口味"));
 	}
 	
 	private static Staff initStaff(DBCon dbCon, int restaurantId, String pwd) throws SQLException, BusinessException{

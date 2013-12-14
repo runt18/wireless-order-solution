@@ -237,6 +237,12 @@ public class TestRestaurantDao {
 		assertEquals("the type to spec category", specCategory.getType(), TasteCategory.Type.RESERVED);
 		assertEquals("the status to spec category", specCategory.getStatus(), TasteCategory.Status.SPEC);
 		
+		TasteCategory tasteCategory = TasteCategoryDao.get(staff).get(1);
+		assertEquals("the restaurant id to spec category", tasteCategory.getRestaurantId(), restaurantId);
+		assertEquals("the name to spec category", tasteCategory.getName(), "口味");
+		assertEquals("the type to spec category", tasteCategory.getType(), TasteCategory.Type.NORMAL);
+		assertEquals("the status to spec category", tasteCategory.getStatus(), TasteCategory.Status.TASTE);
+		
 		List<Taste> tastes = TasteDao.getTastes(staff, null, null);
 		for(Taste spec : tastes){
 			if(spec.getPreference().equals(Taste.RegularInsertBuilder.PREF) ||

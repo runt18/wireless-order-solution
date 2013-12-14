@@ -8,28 +8,27 @@ import com.wireless.db.deptMgr.DepartmentDao;
 import com.wireless.db.deptMgr.KitchenDao;
 import com.wireless.db.distMgr.DiscountDao;
 import com.wireless.db.menuMgr.FoodDao;
+import com.wireless.db.tasteMgr.TasteCategoryDao;
 import com.wireless.db.tasteMgr.TasteDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.menuMgr.FoodMenu;
-import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.pojo.staffMgr.Staff;
-import com.wireless.pojo.tasteMgr.Taste;
 
 public class QueryMenu {
 
 	/**
 	 * Get the food menu according to the specific restaurant.
-	 * @param mRestaurantID
-	 * 			The restaurant id.
+	 * @param staff
+	 * 			the staff to perform this action
 	 * @return the food menu
 	 * @throws SQLException
-	 * 			Throws if fail to execute any SQL statement.
+	 * 			throws if fail to execute any SQL statement
 	 */
-	public static FoodMenu exec(Staff term) throws BusinessException, SQLException{
+	public static FoodMenu exec(Staff staff) throws BusinessException, SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return exec(dbCon, term);
+			return exec(dbCon, staff);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -39,22 +38,21 @@ public class QueryMenu {
 	 * Get the food menu according to the specific restaurant.
 	 * Note that the database should be connected before invoking this method.
 	 * @param dbCon
-	 * 			The database connection.
-	 * @param term
-	 * 			The terminal to query.
+	 * 			the database connection
+	 * @param staff
+	 * 			The staff to perform this action
 	 * @return the food menu
 	 * @throws SQLException
-	 * 			Throws if fail to execute any SQL statement.
+	 * 			throws if fail to execute any SQL statement
 	 */
-	public static FoodMenu exec(DBCon dbCon, Staff term) throws SQLException{
-		return new FoodMenu(FoodDao.getFoods(dbCon, term, null, null), 
-							TasteDao.getTasteByCategory(dbCon, term, Taste.Category.TASTE),
-							TasteDao.getTasteByCategory(dbCon, term, Taste.Category.STYLE),
-							TasteDao.getTasteByCategory(dbCon, term, Taste.Category.SPEC),
-							KitchenDao.getKitchens(dbCon, term, " AND KITCHEN.type = " + Kitchen.Type.NORMAL.getVal(), null),
-			    			DepartmentDao.getNormalDepartments(dbCon, term),
-			    			DiscountDao.getDiscount(dbCon, term, null, null),
-			    			CancelReasonDao.getReasons(dbCon, term, null, null));
+	public static FoodMenu exec(DBCon dbCon, Staff staff) throws SQLException{
+		return new FoodMenu(FoodDao.getFoods(dbCon, staff, null, null),
+						    TasteCategoryDao.get(dbCon, staff),
+							TasteDao.getTastes(dbCon, staff, null, null),
+							KitchenDao.getNormalKitchens(dbCon, staff),
+			    			DepartmentDao.getNormalDepartments(dbCon, staff),
+			    			DiscountDao.getDiscount(dbCon, staff, null, null),
+			    			CancelReasonDao.getReasons(dbCon, staff, null, null));
 	}
 	
 }

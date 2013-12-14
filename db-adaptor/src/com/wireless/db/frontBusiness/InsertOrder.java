@@ -206,15 +206,15 @@ public class InsertOrder {
 							throw new BusinessException(StaffError.GIFT_NOT_ALLOW);
 						}
 						
-						//Get the details to normal tastes
+						//Get the details to normal tastes.
 						if(of.hasNormalTaste()){
-							//Get the detail to each taste
+							//Get the detail to each taste.
 							for(Taste t : of.getTasteGroup().getTastes()){
 								t.copyFrom(TasteDao.getTasteById(dbCon, staff, t.getTasteId()));
 							}
 							//Get the detail to each spec.
-							for(Taste spec : of.getTasteGroup().getSpecs()){
-								spec.copyFrom(TasteDao.getTasteById(dbCon, staff, spec.getTasteId()));
+							if(of.getTasteGroup().hasSpec()){
+								of.getTasteGroup().getSpec().copyFrom(TasteDao.getTasteById(dbCon, staff, of.getTasteGroup().getSpec().getTasteId()));
 							}
 						}
 					}					
