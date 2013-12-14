@@ -223,6 +223,11 @@ public class TasteCategory implements Parcelable{
 	}
 
 	@Override
+	public String toString(){
+		return "taste category(id=" + getId() + ",name=" + getName() + ")";
+	}
+	
+	@Override
 	public void writeToParcel(Parcel dest, int flag) {
 		dest.writeByte(flag);
 		if(flag == TASTE_CATE_PARCELABLE_SIMPLE){

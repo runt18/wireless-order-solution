@@ -10,13 +10,13 @@ import com.wireless.parcel.Parcelable;
 import com.wireless.pojo.crMgr.CancelReason;
 import com.wireless.pojo.distMgr.Discount;
 import com.wireless.pojo.tasteMgr.Taste;
+import com.wireless.pojo.tasteMgr.TasteCategory;
 import com.wireless.pojo.util.SortedList;
 
 public class FoodMenu implements Parcelable{
 	public FoodList foods;			 		//菜品
+	public List<TasteCategory> categorys;	//口味类型
 	public List<Taste> tastes;			 	//口味
-	public List<Taste> styles;				//做法
-	public List<Taste> specs;				//规格
 	public List<Kitchen> kitchens;			//厨房
 	public List<Department> depts;			//部门
 	private List<Discount> discounts;		//折扣方案
@@ -24,11 +24,10 @@ public class FoodMenu implements Parcelable{
 	
 	private FoodMenu(){}
 	
-	public FoodMenu(List<Food> foods, List<Taste> tastes, List<Taste> styles, List<Taste> specs, List<Kitchen> kitchens, List<Department> depts, List<Discount> discounts, List<CancelReason> reasons){
+	public FoodMenu(List<Food> foods, List<TasteCategory> categorys, List<Taste> tastes, List<Kitchen> kitchens, List<Department> depts, List<Discount> discounts, List<CancelReason> reasons){
 		this.foods = new FoodList(foods);
+		this.categorys = categorys;
 		this.tastes = tastes;
-		this.styles = styles;
-		this.specs = specs;
 		this.kitchens = kitchens;
 		this.depts = depts;
 		this.discounts = discounts;
@@ -38,9 +37,8 @@ public class FoodMenu implements Parcelable{
 	@Override
 	public void writeToParcel(Parcel dest, int flag) {
 		dest.writeParcelList(this.foods, Food.FOOD_PARCELABLE_COMPLEX);
+		dest.writeParcelList(this.categorys, TasteCategory.TASTE_CATE_PARCELABLE_COMPLEX);
 		dest.writeParcelList(this.tastes, Taste.TASTE_PARCELABLE_COMPLEX);
-		dest.writeParcelList(this.styles, Taste.TASTE_PARCELABLE_COMPLEX);
-		dest.writeParcelList(this.specs, Taste.TASTE_PARCELABLE_COMPLEX);
 		dest.writeParcelList(this.kitchens, Kitchen.KITCHEN_PARCELABLE_COMPLEX);
 		dest.writeParcelList(this.depts, Department.DEPT_PARCELABLE_COMPLEX);
 		dest.writeParcelList(this.discounts, Discount.DISCOUNT_PARCELABLE_COMPLEX);
@@ -50,9 +48,8 @@ public class FoodMenu implements Parcelable{
 	@Override
 	public void createFromParcel(Parcel source) {
 		foods = new FoodList(source.readParcelList(Food.CREATOR));
+		categorys = source.readParcelList(TasteCategory.CREATOR);
 		tastes = source.readParcelList(Taste.TASTE_CREATOR);
-		styles = source.readParcelList(Taste.TASTE_CREATOR);
-		specs = source.readParcelList(Taste.TASTE_CREATOR);
 		kitchens = source.readParcelList(Kitchen.KITCHEN_CREATOR);
 		depts = source.readParcelList(Department.DEPT_CREATOR);
 		discounts = source.readParcelList(Discount.CREATOR);
@@ -93,9 +90,13 @@ public class FoodMenu implements Parcelable{
 			eachKitchen.setDept(depts.get(depts.indexOf(eachKitchen.getDept())));
 		}
 		
+		this.categorys = Collections.unmodifiableList(categorys);
 		this.tastes = Collections.unmodifiableList(SortedList.newInstance(tastes));
-		this.styles = Collections.unmodifiableList(SortedList.newInstance(styles));
-		this.specs = Collections.unmodifiableList(SortedList.newInstance(specs));
+		
+		//Set the category to each taste.
+		for(Taste t : tastes){
+			t.setCategory(categorys.get(categorys.indexOf(t.getCategory().getId())));
+		}
 		
 		for(Food eachFood : foods){
 			
@@ -110,8 +111,6 @@ public class FoodMenu implements Parcelable{
 			if(eachFood.hasPopTastes()){
 				for(Taste popTaste : eachFood.getPopTastes()){
 					popTaste.copyFrom(tastes.get(tastes.indexOf(popTaste)));
-					popTaste.copyFrom(styles.get(styles.indexOf(popTaste)));
-					popTaste.copyFrom(specs.get(specs.indexOf(popTaste)));
 				}
 			}
 

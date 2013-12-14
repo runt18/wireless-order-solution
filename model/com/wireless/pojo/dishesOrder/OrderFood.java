@@ -193,7 +193,7 @@ public class OrderFood implements Parcelable, Comparable<OrderFood>, Jsonable {
 	 * @return true if the order food has taste, otherwise false
 	 */
 	public boolean hasTaste(){
-		return mTasteGroup == null ? false : mTasteGroup.hasTaste();
+		return mTasteGroup == null ? false : mTasteGroup.hasPreference();
 	}
 	
 	/**
@@ -218,7 +218,7 @@ public class OrderFood implements Parcelable, Comparable<OrderFood>, Jsonable {
 	 */	
 	public float calcPriceBeforeDiscount(){
 		if(mFood.isWeigh()){
-			return NumericUtil.roundFloat(getUnitPriceWithTaste() * getCount()  + (hasTaste() ? mTasteGroup.getTastePrice() : 0));			
+			return NumericUtil.roundFloat(getUnitPriceWithTaste() * getCount()  + (hasTaste() ? mTasteGroup.getPrice() : 0));			
 		}else{
 			return NumericUtil.roundFloat(getUnitPriceWithTaste() * getCount());
 		}
@@ -232,7 +232,7 @@ public class OrderFood implements Parcelable, Comparable<OrderFood>, Jsonable {
 	 * @return the unit price represented as a Float
 	 */
 	public float getUnitPriceWithTaste(){
-		return NumericUtil.roundFloat(mFood.getPrice() + (!hasTaste() || mFood.isWeigh() ? 0 : mTasteGroup.getTastePrice()));
+		return NumericUtil.roundFloat(mFood.getPrice() + (!hasTaste() || mFood.isWeigh() ? 0 : mTasteGroup.getPrice()));
 	}
 	
 	/**
@@ -242,7 +242,7 @@ public class OrderFood implements Parcelable, Comparable<OrderFood>, Jsonable {
 	 */
 	public float calcPriceWithTaste(){
 		if(mFood.isWeigh()){
-			return NumericUtil.roundFloat((getUnitPriceWithTaste() * getCount() + (hasTaste() ? mTasteGroup.getTastePrice() : 0)) * getDiscount());			
+			return NumericUtil.roundFloat((getUnitPriceWithTaste() * getCount() + (hasTaste() ? mTasteGroup.getPrice() : 0)) * getDiscount());			
 		}else{
 			return NumericUtil.roundFloat(getUnitPriceWithTaste() * getCount()  * getDiscount());	
 		}
@@ -255,7 +255,7 @@ public class OrderFood implements Parcelable, Comparable<OrderFood>, Jsonable {
 	 */
 	public float calcDiscountPrice(){
 		if(getDiscount() != 1){
-			return NumericUtil.roundFloat((mFood.getPrice() + (mTasteGroup == null ? 0 : mTasteGroup.getTastePrice())) * getCount() * (1 - getDiscount()));
+			return NumericUtil.roundFloat((mFood.getPrice() + (mTasteGroup == null ? 0 : mTasteGroup.getPrice())) * getCount() * (1 - getDiscount()));
 		}else{
 			return 0;
 		}
