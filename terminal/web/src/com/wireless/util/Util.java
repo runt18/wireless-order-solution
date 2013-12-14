@@ -12,6 +12,7 @@ import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.pojo.tasteMgr.Taste;
+import com.wireless.pojo.tasteMgr.TasteCategory;
 
 public class Util {
 	public static String toOrderCate(int type) {
@@ -133,7 +134,7 @@ public class Util {
 								Taste it = new Taste();
 								it.setTasteId(Integer.valueOf(taste[0]));
 								it.setTasteId(Integer.valueOf(taste[1]));
-								it.setCategory(Short.valueOf(taste[2]));
+								it.setCategory(new TasteCategory(Short.valueOf(taste[2])));
 								foods[i].getTasteGroup().addTaste(it);
 							}
 						}
