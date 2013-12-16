@@ -9,16 +9,6 @@ var pushBackBut = new Ext.ux.ImageButton({
 	}
 });
 
-var logOutBut = new Ext.ux.ImageButton({
-	imgPath : '../../images/ResLogout.png',
-	imgWidth : 50,
-	imgHeight : 50,
-	tooltip : '登出',
-	handler : function(btn){
-		
-	}
-});
-
 var addDeviceBut = new Ext.ux.ImageButton({
 	imgPath : '../../images/btnAddDevice.png',
 	imgWidth : 50,
@@ -38,7 +28,72 @@ var addDeviceWin = new Ext.Window({
 	modal : true,
 	autoHeight : true,
 	width : 290,
-	bbar : ['->', {
+	bbar : [{
+		text : '应用',
+		id : 'btnAddDevice',
+		iconCls : 'btn_app',
+		handler : function(){
+			var pin = Ext.getCmp('txtDeviceId');
+			var rId = Ext.getCmp('txtDeviceRId');
+			if(pin.isValid() && rId.isValid()){
+				var valid = null;
+				var model = null;
+				var id = '';
+				var status = document.getElementsByName("status");
+				var device = document.getElementsByName("device");
+				var dataSource;
+				for ( var i = 0; i < status.length; i++) {
+					if(status[i].checked){
+						valid = status[i].value;
+					}
+				}
+				
+				for ( var i = 0; i < device.length; i++) {
+					if(device[i].checked){
+						model = device[i].value;
+					}
+				}
+				
+				if(addDeviceWin.operationType == 'insert'){
+					dataSource = 'insert';
+				}else{
+					dataSource = 'update';
+					id = Ext.getCmp('device_grid').getSelectionModel().getSelected().data.id;
+				}
+				
+				Ext.Ajax.request({
+					url : '../../OperateDevice.do',
+					params : {
+						dataSource : dataSource,
+						id : id,
+						deviceId : pin.getValue(),
+						rId : rId.getValue(),
+						status : valid,
+						model : model
+					},
+					success : function(res, opt){
+						var jr = Ext.decode(res.responseText);
+						if(jr.success){
+							Ext.example.msg(jr.title, jr.msg);
+							pin.setValue('');
+							pin.clearInvalid();
+							rId.setValue('');
+							rId.clearInvalid();
+							
+							Ext.getDom('rdoAndroid').checked = true;
+							Ext.getDom('rdoRecordAlive').checked = true;
+							pin.focus(true, 100);
+						}else{
+							Ext.ux.showMsg(jr);
+						}
+					},
+					failure : function(res, opt){
+						Ext.ux.showMsg(Ext.decode(res.responseText));
+					}
+				});
+			}
+		}
+	},'->', {
 		text : '保存',
 		id : 'btnAddDevice',
 		iconCls : 'btn_save',
@@ -79,8 +134,7 @@ var addDeviceWin = new Ext.Window({
 						deviceId : pin.getValue(),
 						rId : rId.getValue(),
 						status : valid,
-						model : model,
-						isCookie : true
+						model : model
 					},
 					success : function(res, opt){
 						var jr = Ext.decode(res.responseText);
@@ -93,12 +147,9 @@ var addDeviceWin = new Ext.Window({
 						}
 					},
 					failure : function(res, opt){
-						
+						Ext.ux.showMsg(Ext.decode(res.responseText));
 					}
 				});
-				
-				
-				
 			}
 		}
 		
@@ -108,6 +159,7 @@ var addDeviceWin = new Ext.Window({
 		iconCls : 'btn_close',
 		handler : function(){
 			addDeviceWin.hide();
+			Ext.getCmp('device_grid').store.reload();
 		}
 	}],
 	items : [{
@@ -141,7 +193,7 @@ var addDeviceWin = new Ext.Window({
 			frame : false,
 			defaults : {
 				columnWidth : .33,
-				labelWidth : 40,
+				labelWidth : 40
 			},
 			items : [{
 				columnWidth : .3,
@@ -175,7 +227,7 @@ var addDeviceWin = new Ext.Window({
 			frame : false,
 			defaults : {
 				columnWidth : .21,
-				labelWidth : 40,
+				labelWidth : 40
 			},
 			items : [{
 				columnWidth : .3,
@@ -224,6 +276,7 @@ var addDeviceWin = new Ext.Window({
 			
 			Ext.getDom('rdoAndroid').checked = true;
 			Ext.getDom('rdoRecordAlive').checked = true;
+			pin.focus(true, 100);
 		}
 	},
 	keys : [{
@@ -234,8 +287,6 @@ var addDeviceWin = new Ext.Window({
 		}
 	}]
 });
-
-
 
 function operateDevice(c){
 	if(c.otype != 'undefind'){
@@ -301,6 +352,10 @@ function optDevice(){
 			+ "<a href=\"javascript:operateDevice({otype : 'delete'})\">" + "<img src='../../images/del.png' />删除</a>";
 }
 
+function restaurantRender(v, m, r, ri, ci, s){
+	return v + "(" + r.get('restaurantId') +")";
+}
+
 var ds = new Ext.data.Store({
 	proxy : new Ext.data.HttpProxy({
 		url : '../../QueryDevice.do'
@@ -337,7 +392,7 @@ ds.load();
 var cm = new Ext.grid.ColumnModel([
 	new Ext.grid.RowNumberer(),
 	{header : '设备编号', dataIndex : 'deviceId', width : 200},
-	{header : '所属餐厅', dataIndex : 'restaurantText', width : 200},
+	{header : '所属餐厅', dataIndex : 'restaurantText', width : 200, renderer : restaurantRender},
 	{header : '型号', dataIndex : 'modelText', width : 200},
 	{header : '状态', dataIndex : 'statusText', width : 200},
 	{header : '操作', dataIndex : 'optDevice', align: 'center', id : 'optDevice', renderer : optDevice, width : 200}
@@ -459,10 +514,9 @@ Ext.onReady(function(){
 			    addDeviceBut,
 			    '->',
 			    pushBackBut, 
-			    {xtype:'tbtext',text:'&nbsp;&nbsp;'},
-				logOutBut 
+			    {xtype:'tbtext',text:'&nbsp;&nbsp;'}
 			]
-		}),
+		})
 	});
 	
 	new Ext.Viewport({
@@ -471,8 +525,8 @@ Ext.onReady(function(){
 		items : [{
 			region : 'north',
 			bodyStyle : 'background-color:#DFE8F6;',
-			html : "<h4 style='padding:10px;font-size:150%;float:left;'>Digi-e管理中心</h4>" +
-				"<div id='optName' class='optName'></div>",
+			html : "<h4 style='padding:10px;font-size:150%;float:left;'>Digi-e管理中心</h4><div id='optName' class='optName'></div>" + 
+					"<div id='divLoginOut' class='loginOut' style='width: 40px;height: 41px;'><img id='btnLoginOut' src='../../images/ResLogout.png' width='40' height='40' /> </div>",
 			height : 50,
 			border : false,
 			margins : '0 0 0 0'
@@ -483,4 +537,16 @@ Ext.onReady(function(){
 			html : '<div style="font-size:11pt; text-align:center;"><b>版权所有(c) 2011 智易科技</b></div>'
 		}]
 	});
+	
+	Ext.get('btnLoginOut').on('click', function(){
+		Ext.Ajax.request({
+			url : '../../LoginOut.do',
+			success : function(){
+				location.href = '../LoginAdmin.html';
+			},
+			failure : function(){
+				
+			}
+		});
+    }); 
 });

@@ -9,7 +9,7 @@
 });
 
 var btnSalesSub = new Ext.ux.ImageButton({
-	imgPath : '../../images/salesStat.png',
+	imgPath : '../../images/salesStatForDaily.png',
 	imgWidth : 50,
 	imgHeight : 50,
 	tooltip : '销售统计',
