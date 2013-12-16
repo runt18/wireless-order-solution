@@ -478,7 +478,7 @@ allFoodTabPanelGrid.getStore().on('load', function(thiz, records){
 		Ext.ux.formatFoodName(records[i], 'displayFoodName', 'name');
 	}
 });
-allFoodTabPanelGrid.on('rowdblclick', function(thiz, ri, e){
+allFoodTabPanelGrid.on('rowclick', function(thiz, ri, e){
 	addOrderFoodHandler({
 		grid : thiz,
 		rowIndex : ri
