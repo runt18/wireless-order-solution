@@ -30,7 +30,7 @@ function dutyRangeStatDetalHandler(){
 		var dutyRangeStatWin = Ext.getCmp('dutyRangeStatWin');
 		if(!dutyRangeStatWin){
 			dutyRangeStatWin = new Ext.Window({
-				title : '营业统计 -- <font style="color:green;">当日</font> -- 交班人:&nbsp;<font style="color:red;">' + gs['staff.name'] + '</font>',
+				title : '营业统计 -- <font style="color:green;">当日</font> -- 交班人:&nbsp;<font style="color:red;">' + gs['staffName'] + '</font>',
 				id : 'dutyRangeStatWin',
 				width : 885,
 				height : 555,
