@@ -414,7 +414,7 @@ function operateMaterialHandler(c){
 		materialName.setValue(data['name']);
 		materialCate.setValue(data['cateId']);
 		
-		materialCate.setDisabled(true);
+		//materialCate.setDisabled(true);
 	}else if(c.otype == Ext.ux.otype['delete']){
 		var data = Ext.ux.getSelData(inventory_materialBasicGrid);
 		if(!data){
