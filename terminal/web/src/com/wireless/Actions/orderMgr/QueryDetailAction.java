@@ -17,6 +17,7 @@ import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.regionMgr.Table;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.util.DataPaging;
 import com.wireless.util.WebParams;
 
@@ -37,7 +38,7 @@ public class QueryDetailAction extends Action {
 		try{
 			
 			String pin = (String)request.getAttribute("pin");
-			StaffDao.verify(Integer.parseInt(pin));
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
 			String orderID = request.getParameter("orderID");
 			String restaurantID = (String)request.getAttribute("restaurantID");
@@ -45,14 +46,14 @@ public class QueryDetailAction extends Action {
 			String queryType = request.getParameter("queryType");
 			
 			if (queryType.equals("Today")) {
-				list = OrderFoodDao.getSingleDetailToday(" AND OF.order_id=" + orderID, " ORDER BY OF.order_date ");
+				list = OrderFoodDao.getSingleDetailToday(staff, " AND OF.order_id=" + orderID, " ORDER BY OF.order_date ");
 			}else if (queryType.equals("TodayByTbl")) {
 				Table t = new Table();
 				t.setRestaurantId(Integer.valueOf(restaurantID));
 				t.setTableAlias(Integer.valueOf(talias));
-				list = OrderFoodDao.getSingleDetailTodayByTable(null,null,t);
+				list = OrderFoodDao.getSingleDetailTodayByTable(staff, null, null, t);
 			}else {
-				list = OrderFoodDao.getSingleDetailHistory(" AND OFH.order_id=" + orderID, " ORDER BY OFH.order_date ");
+				list = OrderFoodDao.getSingleDetailHistory(staff, " AND OFH.order_id=" + orderID, " ORDER BY OFH.order_date ");
 			}
 		}catch(BusinessException e){
 			e.printStackTrace();

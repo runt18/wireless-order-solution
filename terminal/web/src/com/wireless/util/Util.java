@@ -135,7 +135,7 @@ public class Util {
 								it.setTasteId(Integer.valueOf(taste[0]));
 								it.setTasteId(Integer.valueOf(taste[1]));
 								it.setCategory(new TasteCategory(Short.valueOf(taste[2])));
-								foods[i].getTasteGroup().addTaste(it);
+								foods[i].addTaste(it);
 							}
 						}
 					}

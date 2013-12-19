@@ -162,7 +162,7 @@ public class UpdateOrderGroupAction extends DispatchAction{
 							tasteToAdd.setTasteId(tgContent.getJSONObject(ti).getInt("tasteID"));
 							tasteToAdd.setTasteId(tgContent.getJSONObject(ti).getInt("tasteAliasID"));
 							tasteToAdd.setCategory(new TasteCategory(tgContent.getJSONObject(ti).getInt("tasteCategory")));
-							of.getTasteGroup().addTaste(tasteToAdd);							
+							of.addTaste(tasteToAdd);							
 						}
 					}
 					if(ttObj != null && !ttObj.toString().equals("null")){
