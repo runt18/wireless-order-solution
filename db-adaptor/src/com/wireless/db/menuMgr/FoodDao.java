@@ -910,8 +910,9 @@ public class FoodDao {
 		while(dbCon.rs.next()){
 			Food f = foods.get(dbCon.rs.getLong("food_id"));
 			if(f != null){
-				f.addPopTaste(new Taste(dbCon.rs.getInt("taste_id"),
-						   				dbCon.rs.getInt("restaurant_id")));
+				Taste t = new Taste(dbCon.rs.getInt("taste_id"));
+				t.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
+				f.addPopTaste(t);
 			}
 		}
 		

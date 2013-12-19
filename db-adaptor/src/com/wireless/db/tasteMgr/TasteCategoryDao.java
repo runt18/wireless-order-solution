@@ -16,6 +16,62 @@ import com.wireless.pojo.tasteMgr.TasteCategory;
 public class TasteCategoryDao {
 
 	/**
+	 * Swap the display id between two taste category.
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param builder
+	 * 			the swap display builder
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if the taste category to swap does NOT exist
+	 */
+	public static void swap(Staff staff, TasteCategory.SwapDisplayBuilder builder) throws SQLException, BusinessException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			dbCon.conn.setAutoCommit(false);
+			swap(dbCon, staff, builder);
+			dbCon.conn.commit();
+		}catch(Exception e){
+			dbCon.conn.rollback();
+			throw e;
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Swap the display id between two taste category.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param builder
+	 * 			the swap display builder
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if the taste category to swap does NOT exist
+	 */
+	public static void swap(DBCon dbCon, Staff staff, TasteCategory.SwapDisplayBuilder builder) throws SQLException, BusinessException{
+		TasteCategory tcA = getById(dbCon, staff, builder.getIdA());
+		TasteCategory tcB = getById(dbCon, staff, builder.getIdB());
+		
+		String sql;
+		
+		sql = " UPDATE " + Params.dbName + ".taste_category SET " +
+			  " display_id = " + tcB.getDisplayId() +
+			  " WHERE category_id = " + tcA.getId();
+		dbCon.stmt.executeUpdate(sql);
+		
+		sql = " UPDATE " + Params.dbName + ".taste_category SET " +
+			  " display_id = " + tcA.getDisplayId() +
+			  " WHERE category_id = " + tcB.getId();
+		dbCon.stmt.executeUpdate(sql);
+	}
+	
+	/**
 	 * Insert a new taste category.
 	 * @param staff
 	 * 			the staff to perform this action
@@ -50,19 +106,31 @@ public class TasteCategoryDao {
 	public static int insert(DBCon dbCon, Staff staff, TasteCategory.InsertBuilder builder) throws SQLException{
 		TasteCategory tasteCategory = builder.build();
 		String sql;
+		
+		//Calculate the display id.
+		sql = " SELECT IFNULL(MAX(display_id), 0) + 1 FROM " + Params.dbName + ".taste_category WHERE restaurant_id = " + staff.getRestaurantId();
+		dbCon.rs = dbCon.stmt.executeQuery(sql);
+		int displayId = 0;
+		if(dbCon.rs.next()){
+			displayId = dbCon.rs.getInt(1);
+		}
+		dbCon.rs.close();
+		
+		//Insert a new taste category.
 		sql = " INSERT INTO " + Params.dbName + ".taste_category" +
-			  "(`restaurant_id`, `name`, `type`, `status`) VALUES (" +
+			  "(`restaurant_id`, `name`, `type`, `status`, `display_id`) VALUES (" +
 			  staff.getRestaurantId() + "," +
 			  "'" + tasteCategory.getName() + "'," +
 			  tasteCategory.getType().getVal() + "," +
-			  tasteCategory.getStatus().getVal() +
+			  tasteCategory.getStatus().getVal() + ", " +
+			  displayId +
 			  " ) ";
 		dbCon.stmt.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
 		dbCon.rs = dbCon.stmt.getGeneratedKeys();
 		if(dbCon.rs.next()){
 			return dbCon.rs.getInt(1);
 		}else{
-			throw new SQLException("The id of taste is not generated successfully.");
+			throw new SQLException("The id of taste category is not generated successfully.");
 		}
 	}
 	
@@ -244,7 +312,7 @@ public class TasteCategoryDao {
 			  " WHERE 1 = 1 " +
 			  " AND restaurant_id = " + staff.getRestaurantId() + " " +
 			  (extraCond != null ? extraCond : " ") +
-			  (orderClause != null ? orderClause : "");
+			  (orderClause != null ? orderClause : " ORDER BY display_id ");
 		
 		List<TasteCategory> result = new ArrayList<TasteCategory>();
 		
@@ -255,6 +323,7 @@ public class TasteCategoryDao {
 			tc.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
 			tc.setType(TasteCategory.Type.valueOf(dbCon.rs.getInt("type")));
 			tc.setStatus(TasteCategory.Status.valueOf(dbCon.rs.getInt("status")));
+			tc.setDisplayId(dbCon.rs.getInt("display_id"));
 			result.add(tc);
 		}
 		dbCon.rs.close();

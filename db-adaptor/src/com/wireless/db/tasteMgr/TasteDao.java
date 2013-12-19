@@ -112,8 +112,10 @@ public class TasteDao {
 	 * @return the list holding the result to taste
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException 
+	 * 			throws if the category to any taste does NOT exist 
 	 */
-	public static List<Taste> getTasteByCategory(DBCon dbCon, Staff staff, int categoryId) throws SQLException{
+	public static List<Taste> getTasteByCategory(DBCon dbCon, Staff staff, int categoryId) throws SQLException, BusinessException{
 		return getTastes(dbCon, staff, " AND TASTE.category_id = " + categoryId, null);
 	}
 	
@@ -175,8 +177,10 @@ public class TasteDao {
 	 * @return the list holding the result to taste
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException 
+	 * 			throws if the category to any taste does NOT exist 
 	 */
-	public static List<Taste> getTastes(DBCon dbCon, Staff staff, String extraCond, String orderClause) throws SQLException{
+	public static List<Taste> getTastes(DBCon dbCon, Staff staff, String extraCond, String orderClause) throws SQLException, BusinessException{
 		String sql = " SELECT " +
 				 	 " taste_id, restaurant_id, preference, " +
 				 	 " category_id, calc, rate, price, type " +
@@ -190,9 +194,8 @@ public class TasteDao {
 		ArrayList<Taste> tastes = new ArrayList<Taste>();
 		while(dbCon.rs.next()){
 			
-			Taste taste = new Taste(dbCon.rs.getInt("taste_id"),
-								    dbCon.rs.getInt("restaurant_id"));
-			
+			Taste taste = new Taste(dbCon.rs.getInt("taste_id"));
+			taste.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
 			taste.setPreference(dbCon.rs.getString("preference"));
 			taste.setCategory(new TasteCategory(dbCon.rs.getInt("category_id")));
 			taste.setCalc(dbCon.rs.getShort("calc"));
@@ -204,18 +207,28 @@ public class TasteDao {
 		}
 		dbCon.rs.close();
 	
+		for(Taste t : tastes){
+			t.getCategory().copyFrom(TasteCategoryDao.getById(dbCon, staff, t.getCategory().getId()));
+		}
+		
 		return tastes;
 	}
 	
 	/**
-	 * 
+	 * Get the tastes to the specified restaurant defined in {@link Staff} and other extra condition.
 	 * @param staff
+	 * 			the terminal
 	 * @param extraCond
+	 * 			the extra condition
 	 * @param orderClause
-	 * @return
+	 * 			the order clause
+	 * @return the list holding the result to taste
 	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException 
+	 * 			throws if the category to any taste does NOT exist 
 	 */
-	public static List<Taste> getTastes(Staff staff, String extraCond, String orderClause) throws SQLException{
+	public static List<Taste> getTastes(Staff staff, String extraCond, String orderClause) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();

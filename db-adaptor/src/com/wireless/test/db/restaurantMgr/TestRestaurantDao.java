@@ -230,7 +230,7 @@ public class TestRestaurantDao {
 		}
 	}
 	
-	private void compareTastes(Staff staff, int restaurantId) throws SQLException{
+	private void compareTastes(Staff staff, int restaurantId) throws SQLException, BusinessException{
 		TasteCategory specCategory = TasteCategoryDao.get(staff).get(0);
 		assertEquals("the restaurant id to spec category", specCategory.getRestaurantId(), restaurantId);
 		assertEquals("the name to spec category", specCategory.getName(), TasteCategory.SpecInsertBuilder.NAME);

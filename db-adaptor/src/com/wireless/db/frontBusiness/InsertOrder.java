@@ -300,7 +300,7 @@ public class InsertOrder {
 		for(OrderFood foodToInsert : orderToInsert.getOrderFoods()){
 			
 
-			if(foodToInsert.hasTaste()){
+			if(foodToInsert.hasTasteGroup()){
 				
 				TasteGroup tg = foodToInsert.getTasteGroup();
 				
@@ -372,7 +372,7 @@ public class InsertOrder {
 				  foodToInsert.getName() + "', " +
 				  foodToInsert.asFood().getStatus() + ", " +
 				  foodToInsert.getDiscount() + ", " +
-				  (foodToInsert.hasTaste() ? foodToInsert.getTasteGroup().getGroupId() : TasteGroup.EMPTY_TASTE_GROUP_ID) + ", " +
+				  (foodToInsert.hasTasteGroup() ? foodToInsert.getTasteGroup().getGroupId() : TasteGroup.EMPTY_TASTE_GROUP_ID) + ", " +
 				  foodToInsert.getKitchen().getDept().getId() + ", " +
 				  foodToInsert.getKitchen().getId() + ", " +
 				  foodToInsert.getKitchen().getAliasId() + ", " + 

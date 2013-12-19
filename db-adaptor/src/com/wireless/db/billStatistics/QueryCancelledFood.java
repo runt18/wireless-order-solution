@@ -8,6 +8,7 @@ import java.util.List;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.orderMgr.OrderFoodDao;
+import com.wireless.exception.BusinessException;
 import com.wireless.pojo.billStatistics.CancelIncomeByDept;
 import com.wireless.pojo.billStatistics.CancelIncomeByDept.IncomeByEachReason;
 import com.wireless.pojo.billStatistics.CancelIncomeByReason;
@@ -296,48 +297,54 @@ public class QueryCancelledFood {
 	
 	/**
 	 * 
-	 * @param term
+	 * @param staff
 	 * @param range
 	 * @param queryType
 	 * @param orderBy
 	 * @param deptID
 	 * @return
 	 * @throws SQLException
+	 * @throws BusinessException 
 	 */
-	public static List<CancelledFood> getCancelledFoodDetail(Staff term, DutyRange range, DateType queryType, int orderBy, Integer deptID, Integer reasonID) throws SQLException{
+	public static List<CancelledFood> getCancelledFoodDetail(Staff staff, DutyRange range, DateType queryType, int orderBy, Integer deptID, Integer reasonID) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return getCancelledFoodDetail(dbCon, term, range, queryType, orderBy, deptID, reasonID);
+			return getCancelledFoodDetail(dbCon, staff, range, queryType, orderBy, deptID, reasonID);
 		}finally{
 			dbCon.disconnect();
 		}
 	}
-	
+
 	/**
 	 * 
-	 * @param pin
-	 * @param duty
+	 * @param dbCon
+	 * @param staff
+	 * @param range
+	 * @param queryType
 	 * @param orderBy
 	 * @param deptID
+	 * @param reasonID
 	 * @return
+	 * @throws SQLException
+	 * @throws BusinessException
 	 */
-	public static List<CancelledFood> getCancelledFoodDetail(DBCon dbCon, Staff term, DutyRange range, DateType queryType, int orderBy, Integer deptID, Integer reasonID) throws SQLException{
+	public static List<CancelledFood> getCancelledFoodDetail(DBCon dbCon, Staff staff, DutyRange range, DateType queryType, int orderBy, Integer deptID, Integer reasonID) throws SQLException, BusinessException{
 		List<CancelledFood> list = new ArrayList<CancelledFood>();
 		List<OrderFood> cancelFoods;
 		
 		if(queryType.isHistory()){
-			cancelFoods = OrderFoodDao.getSingleDetailHistory(dbCon, " AND OFH.order_count < 0 " +
+			cancelFoods = OrderFoodDao.getSingleDetailHistory(dbCon, staff, " AND OFH.order_count < 0 " +
 																   (deptID != null && deptID >= 0 ? " AND OFH.dept_id = " + deptID : "") +
 																   (reasonID != null && reasonID > 0 ? " AND OFH.cancel_reason_id = " + reasonID : "") +
-																   " AND OFH.restaurant_id = " + term.getRestaurantId() +
+																   " AND OFH.restaurant_id = " + staff.getRestaurantId() +
 																   " AND OFH.order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'", 
 																   " ORDER BY OFH.order_date ASC ");
 		}else if(queryType.isToday()){
-			cancelFoods = OrderFoodDao.getSingleDetailToday(dbCon, " AND OF.order_count < 0 " +
+			cancelFoods = OrderFoodDao.getSingleDetailToday(dbCon, staff, " AND OF.order_count < 0 " +
 																 (deptID != null && deptID >= 0 ? " AND OFH.dept_id = " + deptID : "") +
 					   									   	      (reasonID != null && reasonID > 0 ? " AND OFH.cancel_reason_id = " + reasonID : "") +
-																 " AND OF.restaurant_id = " + term.getRestaurantId() +
+																 " AND OF.restaurant_id = " + staff.getRestaurantId() +
 					   											 " AND OF.order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'", 
 					   									  		 " ORDER BY OF.order_date ASC ");
 		}else{

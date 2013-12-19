@@ -246,8 +246,8 @@ public class OrderDao {
 	 * 
 	 * @param dbCon
 	 *            the database connection
-	 * @param term
-	 * 			  the terminal
+	 * @param staff
+	 * 			  the staff to perform this action
 	 * @param orderId
 	 *            the order id to query
 	 * @param dateType
@@ -258,14 +258,14 @@ public class OrderDao {
 	 * @throws SQLException
 	 *             Throws if fail to execute any SQL statement
 	 */
-	public static Order getWithChildDetailById(DBCon dbCon, Staff term, int orderId, DateType dateType) throws BusinessException, SQLException{
-		Order result = getById(dbCon, term, orderId, dateType);
+	public static Order getWithChildDetailById(DBCon dbCon, Staff staff, int orderId, DateType dateType) throws BusinessException, SQLException{
+		Order result = getById(dbCon, staff, orderId, dateType);
 		if(result.isMerged() && result.hasChildOrder()){
 			for(Order childOrder : result.getChildOrder()){
 				if(dateType == DateType.TODAY){
-					childOrder.setOrderFoods(OrderFoodDao.getDetailToday(dbCon, "AND O.id = " + childOrder.getId(), null));
+					childOrder.setOrderFoods(OrderFoodDao.getDetailToday(dbCon, staff, "AND O.id = " + childOrder.getId(), null));
 				}else if(dateType == DateType.HISTORY){
-					childOrder.setOrderFoods(OrderFoodDao.getDetailHistory(dbCon, "AND OH.id = " + childOrder.getId(), null));
+					childOrder.setOrderFoods(OrderFoodDao.getDetailHistory(dbCon, staff, "AND OH.id = " + childOrder.getId(), null));
 				}
 
 			}
@@ -286,8 +286,10 @@ public class OrderDao {
 	 * @return the list holding the result to each order detail information
 	 * @throws SQLException
 	 *             throws if fail to execute any SQL statement
+	 * @throws BusinessException 
+	 * 			   throws if any associated taste group is NOT found
 	 */
-	public static List<Order> getByCond(Staff term, String extraCond, String orderClause, DateType dateType) throws SQLException{
+	public static List<Order> getByCond(Staff term, String extraCond, String orderClause, DateType dateType) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -313,8 +315,10 @@ public class OrderDao {
 	 * @return the list holding the result to each order detail information
 	 * @throws SQLException
 	 *             throws if fail to execute any SQL statement
+	 * @throws BusinessException 
+	 * 			   throws if any associated taste group is NOT found
 	 */
-	public static List<Order> getByCond(DBCon dbCon, Staff staff, String extraCond, String orderClause, DateType dateType) throws SQLException{
+	public static List<Order> getByCond(DBCon dbCon, Staff staff, String extraCond, String orderClause, DateType dateType) throws SQLException, BusinessException{
 
 		List<Order> result = getPureOrder(dbCon, staff, extraCond, orderClause, dateType);
 		
@@ -394,9 +398,9 @@ public class OrderDao {
 			 */
 			if(childOrderIds.length() != 0){
 				if(dateType == DateType.TODAY){
-					eachOrder.setOrderFoods(OrderFoodDao.getDetailToday(dbCon, " AND OF.order_id IN(" + childOrderIds + ")", "ORDER BY pay_datetime"));					
+					eachOrder.setOrderFoods(OrderFoodDao.getDetailToday(dbCon, staff, " AND OF.order_id IN(" + childOrderIds + ")", "ORDER BY pay_datetime"));					
 				}else if(dateType == DateType.HISTORY){
-					eachOrder.setOrderFoods(OrderFoodDao.getDetailHistory(dbCon, " AND OFH.order_id IN(" + childOrderIds + ")", "ORDER BY pay_datetime"));
+					eachOrder.setOrderFoods(OrderFoodDao.getDetailHistory(dbCon, staff, " AND OFH.order_id IN(" + childOrderIds + ")", "ORDER BY pay_datetime"));
 				} 
 			}
 		}

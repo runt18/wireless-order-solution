@@ -27,6 +27,8 @@ public class OrderFoodDao {
 	
 	/**
 	 * Get each single detail from order to today according to the specific table. 
+	 * @param staff
+	 * 			  the staff to perform this action
 	 * @param extraCond
 	 *            the extra condition to search the foods
 	 * @param orderClause
@@ -35,11 +37,11 @@ public class OrderFoodDao {
 	 * @throws SQLException
 	 *             throws if fail to execute the SQL statement
 	 */
-	public static List<OrderFood> getSingleDetailTodayByTable(String extraCond, String orderClause, Table tbl) throws BusinessException, SQLException {
+	public static List<OrderFood> getSingleDetailTodayByTable(Staff staff, String extraCond, String orderClause, Table tbl) throws BusinessException, SQLException {
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return getSingleDetailTodayByTable(dbCon, extraCond, orderClause, tbl);
+			return getSingleDetailTodayByTable(dbCon, staff, extraCond, orderClause, tbl);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -49,6 +51,8 @@ public class OrderFoodDao {
 	 * Get each single detail from order to today according to the specific table. 
 	 * @param dbCon
 	 *            the database connection
+	 * @param staff
+	 * 			  the staff to perform this action
 	 * @param extraCond
 	 *            the extra condition to search the foods
 	 * @param orderClause
@@ -57,15 +61,17 @@ public class OrderFoodDao {
 	 * @throws SQLException
 	 *             throws if fail to execute the SQL statement
 	 */
-	public static List<OrderFood> getSingleDetailTodayByTable(DBCon dbCon, String extraCond, String orderClause, Table tbl) throws BusinessException, SQLException {
+	public static List<OrderFood> getSingleDetailTodayByTable(DBCon dbCon, Staff staff, String extraCond, String orderClause, Table tbl) throws BusinessException, SQLException {
 		int orderId = OrderDao.getOrderIdByUnPaidTable(dbCon, tbl)[0];
-		return getSingleDetailToday(dbCon, " AND OF.order_id = " + orderId + (extraCond != null ? extraCond : " "), orderClause);
+		return getSingleDetailToday(dbCon, staff, " AND OF.order_id = " + orderId + (extraCond != null ? extraCond : " "), orderClause);
 	}
 	
 	/**
 	 * Get each single detail from order to today. 
 	 * @param dbCon
 	 *            the database connection
+	 * @param staff
+	 * 			  the staff to perform this action
 	 * @param extraCond
 	 *            the extra condition to search the foods
 	 * @param orderClause
@@ -73,8 +79,10 @@ public class OrderFoodDao {
 	 * @return the list of order holding each single detail
 	 * @throws SQLException
 	 *             throws if fail to execute the SQL statement
+	 * @throws BusinessException 
+	 * 			   throws if any associated taste group is NOT found
 	 */
-	public static List<OrderFood> getSingleDetailToday(DBCon dbCon, String extraCond, String orderClause) throws SQLException {
+	public static List<OrderFood> getSingleDetailToday(DBCon dbCon, Staff staff, String extraCond, String orderClause) throws SQLException, BusinessException {
 		String sql;
 
 		sql = "SELECT OF.order_id, OF.food_alias, OF.taste_group_id, OF.is_temporary, " +
@@ -138,14 +146,11 @@ public class OrderFoodDao {
 		}
 		dbCon.rs.close();
 		/**
-		 * Get the taste group to order food which has taste
+		 * Get the taste group to order food which has taste group
 		 */
 		for(OrderFood orderFood : orderFoods){
-			if(orderFood.getTasteGroup() != null){
-				List<TasteGroup> tasteGroups = TasteGroupDao.getToday(dbCon, "AND TG.taste_group_id=" + orderFood.getTasteGroup().getGroupId(), null);
-				if(!tasteGroups.isEmpty()){
-					orderFood.setTasteGroup(tasteGroups.get(0));
-				}
+			if(orderFood.hasTasteGroup()){
+				orderFood.setTasteGroup(TasteGroupDao.getTodayById(dbCon, staff, orderFood.getTasteGroup().getGroupId()));
 			}
 		}
 		
@@ -162,11 +167,11 @@ public class OrderFoodDao {
 	 * @throws SQLException
 	 *             throws if fail to execute the SQL statement
 	 */
-	public static List<OrderFood> getSingleDetailToday(String extraCond, String orderClause) throws Exception {
+	public static List<OrderFood> getSingleDetailToday(Staff staff, String extraCond, String orderClause) throws Exception {
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return OrderFoodDao.getSingleDetailToday(dbCon, extraCond, orderClause);
+			return OrderFoodDao.getSingleDetailToday(dbCon, staff, extraCond, orderClause);
 		}catch(Exception e){
 			throw e;
 		}finally{
@@ -179,6 +184,8 @@ public class OrderFoodDao {
 	 * Get each single detail from order to history. 
 	 * @param dbCon
 	 *            the database connection
+	 * @param staff
+	 * 			  the staff to perform this action
 	 * @param extraCond
 	 *            the extra condition to search the foods
 	 * @param orderClause
@@ -186,8 +193,10 @@ public class OrderFoodDao {
 	 * @return the list of order holding each single detail
 	 * @throws SQLException
 	 *             throws if fail to execute the SQL statement.
+	 * @throws BusinessException 
+	 * 			   throws if any associated taste group does NOT exist
 	 */
-	public static List<OrderFood> getSingleDetailHistory(DBCon dbCon, String extraCond, String orderClause) throws SQLException {
+	public static List<OrderFood> getSingleDetailHistory(DBCon dbCon, Staff staff, String extraCond, String orderClause) throws SQLException, BusinessException {
 		String sql;
 
 		sql = "SELECT OFH.order_id, OFH.food_alias, OFH.taste_group_id, OFH.is_temporary, " +
@@ -253,11 +262,8 @@ public class OrderFoodDao {
 		 * Get the taste group to order food which has taste
 		 */
 		for(OrderFood orderFood : orderFoods){
-			if(orderFood.getTasteGroup() != null){
-				List<TasteGroup> tasteGroups = TasteGroupDao.getHistory(dbCon, "AND TG.taste_group_id=" + orderFood.getTasteGroup().getGroupId(), null);
-				if(!tasteGroups.isEmpty()){
-					orderFood.setTasteGroup(tasteGroups.get(0));
-				}
+			if(orderFood.hasTasteGroup()){
+				orderFood.setTasteGroup(TasteGroupDao.getHistoryById(dbCon, staff, orderFood.getTasteGroup().getGroupId()));
 			}
 		}
 		
@@ -266,6 +272,10 @@ public class OrderFoodDao {
 	
 	/**
 	 * Get each single detail from order to history. 
+	 * @param dbCon
+	 *            the database connection
+	 * @param staff
+	 * 			  the staff to perform this action
 	 * @param extraCond
 	 *            the extra condition to search the foods
 	 * @param orderClause
@@ -273,12 +283,14 @@ public class OrderFoodDao {
 	 * @return the list of order holding each single detail
 	 * @throws SQLException
 	 *             throws if fail to execute the SQL statement.
+	 * @throws BusinessException 
+	 * 			   throws if any associated taste group does NOT exist
 	 */
-	public static List<OrderFood> getSingleDetailHistory(String extraCond, String orderClause) throws Exception {
+	public static List<OrderFood> getSingleDetailHistory(Staff staff, String extraCond, String orderClause) throws Exception {
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return OrderFoodDao.getSingleDetailHistory(dbCon, extraCond, orderClause);
+			return OrderFoodDao.getSingleDetailHistory(dbCon, staff, extraCond, orderClause);
 		}catch(Exception e){
 			throw e;
 		}finally{
@@ -293,6 +305,8 @@ public class OrderFoodDao {
 	 * 
 	 * @param dbCon
 	 *            the database connection
+	 * @param staff
+	 * 			  the staff to perform this action
 	 * @param extraCond
 	 *            the extra condition to search the foods
 	 * @param orderClause
@@ -300,8 +314,10 @@ public class OrderFoodDao {
 	 * @return an array of foods
 	 * @throws SQLException
 	 *             throws if fail to execute the SQL statement
+	 * @throws BusinessException 
+	 * 				throws if the any associated taste group is NOT found
 	 */
-	public static List<OrderFood> getDetailToday(DBCon dbCon, String extraCond,	String orderClause) throws SQLException {
+	public static List<OrderFood> getDetailToday(DBCon dbCon, Staff staff, String extraCond, String orderClause) throws SQLException, BusinessException {
 		String sql;
 
 		sql = "SELECT OF.order_id, OF.food_alias, OF.taste_group_id, OF.is_temporary, " +
@@ -351,11 +367,8 @@ public class OrderFoodDao {
 		 * Get the taste group to order food which has taste
 		 */
 		for(OrderFood orderFood : orderFoods){
-			if(orderFood.getTasteGroup() != null){
-				List<TasteGroup> tasteGroups = TasteGroupDao.getToday(dbCon, "AND TG.taste_group_id=" + orderFood.getTasteGroup().getGroupId(), null);
-				if(!tasteGroups.isEmpty()){
-					orderFood.setTasteGroup(tasteGroups.get(0));
-				}
+			if(orderFood.hasTasteGroup()){
+				orderFood.setTasteGroup(TasteGroupDao.getTodayById(dbCon, staff, orderFood.getTasteGroup().getGroupId()));
 			}
 		}
 		
@@ -363,17 +376,27 @@ public class OrderFoodDao {
 	}
 	
 	/**
+	 * Create the foods from database table 'order_food' according an extra
+	 * condition. Note that the database should be connected before invoking
+	 * this method.
 	 * 
+	 * @param staff
+	 * 			  the staff to perform this action
 	 * @param extraCond
+	 *            the extra condition to search the foods
 	 * @param orderClause
-	 * @return
-	 * @throws Exception
+	 *            the order clause to search the foods
+	 * @return an array of foods
+	 * @throws SQLException
+	 *             throws if fail to execute the SQL statement
+	 * @throws BusinessException 
+	 * 				throws if the any associated taste group is NOT found
 	 */
-	public static List<OrderFood> getDetailToday(String extraCond, String orderClause) throws Exception {
+	public static List<OrderFood> getDetailToday(Staff staff, String extraCond, String orderClause) throws Exception {
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return OrderFoodDao.getDetailToday(dbCon, extraCond, orderClause);
+			return OrderFoodDao.getDetailToday(dbCon, staff, extraCond, orderClause);
 		}catch(Exception e){
 			throw e;
 		}finally{
@@ -388,6 +411,8 @@ public class OrderFoodDao {
 	 * 
 	 * @param dbCon
 	 *            the database connection
+	 * @param staff
+	 * 			  the staff to perform this action
 	 * @param extraCond
 	 *            the extra condition to search the foods
 	 * @param orderClause
@@ -395,8 +420,10 @@ public class OrderFoodDao {
 	 * @return an array of foods
 	 * @throws SQLException
 	 *             throws if fail to execute the SQL statement
+	 * @throws BusinessException 
+	 * 			   throws if any associated taste group does NOT exist
 	 */
-	public static List<OrderFood> getDetailHistory(DBCon dbCon, String extraCond, String orderClause) throws SQLException {
+	public static List<OrderFood> getDetailHistory(DBCon dbCon, Staff staff, String extraCond, String orderClause) throws SQLException, BusinessException {
 		String sql;
 
 		sql = "SELECT OFH.order_id, OFH.food_alias, OFH.taste_group_id, OFH.is_temporary, " +
@@ -444,11 +471,8 @@ public class OrderFoodDao {
 		 * Get the taste group to order food which has taste
 		 */
 		for(OrderFood orderFood : orderFoods){
-			if(orderFood.getTasteGroup() != null){
-				List<TasteGroup> tasteGroups = TasteGroupDao.getHistory(dbCon, "AND TG.taste_group_id=" + orderFood.getTasteGroup().getGroupId(), null);
-				if(!tasteGroups.isEmpty()){
-					orderFood.setTasteGroup(tasteGroups.get(0));
-				}
+			if(orderFood.hasTasteGroup()){
+				orderFood.setTasteGroup(TasteGroupDao.getHistoryById(dbCon, staff, orderFood.getTasteGroup().getGroupId()));
 			}
 		}
 		
@@ -456,17 +480,24 @@ public class OrderFoodDao {
 	}
 	
 	/**
-	 * 
+	 * Get the foods from database table 'order_food_history' according an extra condition.
+	 * @param staff
+	 * 			  the staff to perform this action
 	 * @param extraCond
+	 *            the extra condition to search the foods
 	 * @param orderClause
-	 * @return
-	 * @throws Exception
+	 *            the order clause to search the foods
+	 * @return an array of foods
+	 * @throws SQLException
+	 *             throws if fail to execute the SQL statement
+	 * @throws BusinessException 
+	 * 			   throws if any associated taste group does NOT exist
 	 */
-	public static List<OrderFood> getDetailHistory(String extraCond, String orderClause) throws Exception {
+	public static List<OrderFood> getDetailHistory(Staff staff, String extraCond, String orderClause) throws Exception {
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return OrderFoodDao.getDetailHistory(dbCon, extraCond, orderClause);
+			return OrderFoodDao.getDetailHistory(dbCon, staff, extraCond, orderClause);
 		}catch(Exception e){
 			throw e;
 		}finally{

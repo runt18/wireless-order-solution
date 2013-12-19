@@ -256,7 +256,7 @@ public class UpdateOrder {
 			/**
 			 * Insert the taste group info if containing taste and the extra taste group is new
 			 */
-			if(extraFood.hasTaste() && extraFood.getTasteGroup().getGroupId() == TasteGroup.NEW_TASTE_GROUP_ID){
+			if(extraFood.hasTasteGroup() && extraFood.getTasteGroup().getGroupId() == TasteGroup.NEW_TASTE_GROUP_ID){
 				
 				TasteGroup tg = extraFood.getTasteGroup();					
 				/**
@@ -325,7 +325,7 @@ public class UpdateOrder {
 				  extraFood.getName() + "', " + 
 				  extraFood.asFood().getStatus() + ", " +
 				  extraFood.getDiscount() + ", " +
-				  (extraFood.hasTaste() ? extraFood.getTasteGroup().getGroupId() : TasteGroup.EMPTY_TASTE_GROUP_ID) + ", " +
+				  (extraFood.hasTasteGroup() ? extraFood.getTasteGroup().getGroupId() : TasteGroup.EMPTY_TASTE_GROUP_ID) + ", " +
 				  extraFood.getKitchen().getDept().getId() + ", " +
 				  extraFood.getKitchen().getId() + ", " +
 				  extraFood.getKitchen().getAliasId() + ", " + 
@@ -356,7 +356,7 @@ public class UpdateOrder {
 				  "'" + cancelledFood.getName() + "', " + 
 				  cancelledFood.asFood().getStatus() + ", " +
 				  cancelledFood.getDiscount() + ", " +
-				  (cancelledFood.hasTaste() ? cancelledFood.getTasteGroup().getGroupId() : TasteGroup.EMPTY_TASTE_GROUP_ID) + ", " +
+				  (cancelledFood.hasTasteGroup() ? cancelledFood.getTasteGroup().getGroupId() : TasteGroup.EMPTY_TASTE_GROUP_ID) + ", " +
 				  (cancelledFood.hasCancelReason() ? cancelledFood.getCancelReason().getId() : CancelReason.NO_REASON) + ", " +
 				  (cancelledFood.hasCancelReason() ? "'" + cancelledFood.getCancelReason().getReason() + "'" : "NULL") + ", " +
 				  cancelledFood.getKitchen().getDept().getId() + ", " +
@@ -559,7 +559,7 @@ public class UpdateOrder {
 		}
 		
 		for(OrderFood newExtraFood : newFoods){
-			if(newExtraFood.hasTaste()){
+			if(newExtraFood.hasTasteGroup()){
 				newExtraFood.getTasteGroup().setGroupId(TasteGroup.NEW_TASTE_GROUP_ID);
 			}
 			result.extraFoods.add(newExtraFood);
