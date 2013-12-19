@@ -18,6 +18,23 @@ public class TasteCategory implements Parcelable{
 		}
 	}
 	
+	public static class SwapDisplayBuilder{
+		private final int idA;
+		private final int idB;
+		SwapDisplayBuilder(int idA, int idB){
+			this.idA = idA;
+			this.idB = idB;
+		}
+		
+		public int getIdA(){
+			return idA;
+		}
+		
+		public int getIdB(){
+			return idB;
+		}
+	}
+	
 	public static class InsertBuilder{
 		private final int restaurantId;
 		private final String name;
@@ -133,6 +150,7 @@ public class TasteCategory implements Parcelable{
 	
 	private int id;
 	private int restaurantId;
+	private int displayId;
 	private String name;
 	private Type type;
 	private Status status;
@@ -173,6 +191,14 @@ public class TasteCategory implements Parcelable{
 		this.restaurantId = restaurantId;
 	}
 
+	public void setDisplayId(int displayId){
+		this.displayId = displayId;
+	}
+	
+	public int getDisplayId(){
+		return this.displayId;
+	}
+	
 	public String getName() {
 		if(name == null){
 			return "";
@@ -206,6 +232,16 @@ public class TasteCategory implements Parcelable{
 	
 	public boolean isSpec(){
 		return status == Status.SPEC;
+	}
+	
+	public void copyFrom(TasteCategory src){
+		if(src != null && src != this){
+			setId(src.getId());
+			setName(src.getName());
+			setRestaurantId(src.getRestaurantId());
+			setStatus(src.getStatus());
+			setType(src.getType());
+		}
 	}
 	
 	@Override 

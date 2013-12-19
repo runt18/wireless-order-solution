@@ -82,11 +82,15 @@ public class TasteGroup implements Parcelable, Jsonable{
 			}
 			
 		}else if(tasteToAdd.isSpec()){
-			mSpec = tasteToAdd;
-			return true;
+			if(mSpec != null && mSpec.equals(tasteToAdd)){
+				return false;
+			}else{
+				mSpec = tasteToAdd;
+				return true;
+			}
 						
 		}else{
-			return false;
+			throw new IllegalArgumentException("The taste to add should belong to taste or spec.");
 		}
 	}
 	
@@ -115,7 +119,9 @@ public class TasteGroup implements Parcelable, Jsonable{
 		for(Taste taste : mTastes){
 			hashCode = hashCode * 31 + taste.hashCode();
 		}
-		hashCode = hashCode * 31 + mSpec.hashCode();
+		if(hasSpec()){
+			hashCode = hashCode * 31 + mSpec.hashCode();
+		}
 		return hashCode * 31 + (mTmpTaste != null ? mTmpTaste.hashCode() : 0);		
 	}
 	
@@ -144,7 +150,17 @@ public class TasteGroup implements Parcelable, Jsonable{
 	 * @return true if the normal tastes to these two taste group is the same, otherwise false
 	 */
 	public boolean equalsByNormal(TasteGroup tg){
-		return mTastes.equals(tg.mTastes) && mSpec.equals(tg.mSpec);
+		return mTastes.equals(tg.mTastes) && equalsBySpec(tg);
+	}
+	
+	private boolean equalsBySpec(TasteGroup tg){
+		if(hasSpec() && tg.hasSpec()){
+			return mSpec.equals(tg.mSpec);
+		}else if(!hasSpec() && !tg.hasSpec()){
+			return true;
+		}else{
+			return false;
+		}
 	}
 	
 	/**
@@ -220,7 +236,7 @@ public class TasteGroup implements Parcelable, Jsonable{
 				}
 			}
 
-			if(hasTmpTaste()){
+			if(hasSpec()){
 				if(tastePref.length() == 0){
 					tastePref.append(mSpec.getPreference());
 				}else{
@@ -288,7 +304,7 @@ public class TasteGroup implements Parcelable, Jsonable{
 	
 	public boolean hasNormalTaste(){
 		if(hasCalc){
-			return mNormalTaste != null;
+			return true;
 		}else{
 			return hasTaste() || hasSpec();
 		}
@@ -321,7 +337,9 @@ public class TasteGroup implements Parcelable, Jsonable{
 	public List<Taste> getNormalTastes(){
 		List<Taste> normal = SortedList.newInstance();
 		normal.addAll(mTastes);
-		normal.add(mSpec);
+		if(hasSpec()){
+			normal.add(mSpec);
+		}
 		return normal;
 	}
 	
@@ -336,8 +354,8 @@ public class TasteGroup implements Parcelable, Jsonable{
 	public boolean contains(Taste taste){
 		if(mTastes.containsElement(taste)){
 			return true;
-		}else if(mSpec.equals(taste)){
-			return true;
+		}else if(hasSpec()){
+			return mSpec.equals(taste);
 		}else{
 			return false;
 		}

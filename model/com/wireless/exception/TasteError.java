@@ -10,6 +10,7 @@ public class TasteError extends ErrorEnum{
 	public static final ErrorCode TASTE_NOT_EXIST = build(8897, "查找的口味不存在");
 	public static final ErrorCode TASTE_CATE_NOT_EXIST = build(8896, "查找的口味类型不存在");
 	public static final ErrorCode TASTE_NOT_CLEAN_UP = build(8895, "口味类型下还有数据, 不能删除");
+	public static final ErrorCode TASTE_GROUP_NOT_EXIST = build(8894, "查找的口味组不存在");
 	
 	private TasteError(){
 		

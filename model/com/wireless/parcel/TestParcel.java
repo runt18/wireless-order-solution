@@ -52,16 +52,16 @@ public class TestParcel {
 		foodToParcel.setStatistics(new FoodStatistics(15367));
 		
 		List<Taste> popTastes = new ArrayList<Taste>();
-		popTastes.add(new Taste(1, 0));
-		popTastes.add(new Taste(2, 0));
-		popTastes.add(new Taste(3, 0));
-		popTastes.add(new Taste(4, 0));
-		popTastes.add(new Taste(5, 0));
-		popTastes.add(new Taste(6, 0));
-		popTastes.add(new Taste(7, 0));
-		popTastes.add(new Taste(8, 0));
-		popTastes.add(new Taste(9, 0));
-		popTastes.add(new Taste(10, 0));
+		popTastes.add(new Taste(1));
+		popTastes.add(new Taste(2));
+		popTastes.add(new Taste(3));
+		popTastes.add(new Taste(4));
+		popTastes.add(new Taste(5));
+		popTastes.add(new Taste(6));
+		popTastes.add(new Taste(7));
+		popTastes.add(new Taste(8));
+		popTastes.add(new Taste(9));
+		popTastes.add(new Taste(10));
 		foodToParcel.setPopTastes(popTastes);
 		
 		List<Food> childFoods = new ArrayList<Food>();
@@ -386,11 +386,11 @@ public class TestParcel {
 		
 		tgToParcel.setGroupId(100);
 		
-		tgToParcel.addTaste(new Taste(100, 0));
-		tgToParcel.addTaste(new Taste(101, 0));
-		tgToParcel.addTaste(new Taste(102, 0));
-		tgToParcel.addTaste(new Taste(103, 0));
-		tgToParcel.addTaste(new Taste(104, 0));
+		tgToParcel.addTaste(new Taste(100));
+		tgToParcel.addTaste(new Taste(101));
+		tgToParcel.addTaste(new Taste(102));
+		tgToParcel.addTaste(new Taste(103));
+		tgToParcel.addTaste(new Taste(104));
 		
 		Taste tmpTaste = new Taste();
 		tmpTaste.setTasteId(302);
@@ -431,11 +431,11 @@ public class TestParcel {
 		
 		orderFoodToParcel.getTasteGroup().setGroupId(100);
 		
-		orderFoodToParcel.getTasteGroup().addTaste(new Taste(100, 0));
-		orderFoodToParcel.getTasteGroup().addTaste(new Taste(101, 0));
-		orderFoodToParcel.getTasteGroup().addTaste(new Taste(102, 0));
-		orderFoodToParcel.getTasteGroup().addTaste(new Taste(103, 0));
-		orderFoodToParcel.getTasteGroup().addTaste(new Taste(104, 0));
+		orderFoodToParcel.getTasteGroup().addTaste(new Taste(100));
+		orderFoodToParcel.getTasteGroup().addTaste(new Taste(101));
+		orderFoodToParcel.getTasteGroup().addTaste(new Taste(102));
+		orderFoodToParcel.getTasteGroup().addTaste(new Taste(103));
+		orderFoodToParcel.getTasteGroup().addTaste(new Taste(104));
 		
 		Taste tmpTaste = new Taste();
 		tmpTaste.setTasteId(302);
@@ -533,11 +533,11 @@ public class TestParcel {
 		
 		foods[0].getTasteGroup().setGroupId(100);
 		
-		foods[0].getTasteGroup().addTaste(new Taste(100, 0));
-		foods[0].getTasteGroup().addTaste(new Taste(101, 0));
-		foods[0].getTasteGroup().addTaste(new Taste(102, 0));
-		foods[0].getTasteGroup().addTaste(new Taste(103, 0));
-		foods[0].getTasteGroup().addTaste(new Taste(104, 0));
+		foods[0].getTasteGroup().addTaste(new Taste(100));
+		foods[0].getTasteGroup().addTaste(new Taste(101));
+		foods[0].getTasteGroup().addTaste(new Taste(102));
+		foods[0].getTasteGroup().addTaste(new Taste(103));
+		foods[0].getTasteGroup().addTaste(new Taste(104));
 		
 		Taste tmpTaste = new Taste();
 		tmpTaste.setTasteId(302);
@@ -606,11 +606,11 @@ public class TestParcel {
 		
 		orderFoodToParcel.getTasteGroup().setGroupId(100);
 		
-		orderFoodToParcel.getTasteGroup().addTaste(new Taste(100, 0));
-		orderFoodToParcel.getTasteGroup().addTaste(new Taste(101, 0));
-		orderFoodToParcel.getTasteGroup().addTaste(new Taste(102, 0));
-		orderFoodToParcel.getTasteGroup().addTaste(new Taste(103, 0));
-		orderFoodToParcel.getTasteGroup().addTaste(new Taste(104, 0));
+		orderFoodToParcel.getTasteGroup().addTaste(new Taste(100));
+		orderFoodToParcel.getTasteGroup().addTaste(new Taste(101));
+		orderFoodToParcel.getTasteGroup().addTaste(new Taste(102));
+		orderFoodToParcel.getTasteGroup().addTaste(new Taste(103));
+		orderFoodToParcel.getTasteGroup().addTaste(new Taste(104));
 		
 		Taste tmpTaste = new Taste();
 		tmpTaste.setTasteId(302);

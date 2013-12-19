@@ -95,7 +95,7 @@ public class FoodMenu implements Parcelable{
 		
 		//Set the category to each taste.
 		for(Taste t : tastes){
-			t.setCategory(categorys.get(categorys.indexOf(t.getCategory().getId())));
+			t.setCategory(categorys.get(categorys.indexOf(t.getCategory())));
 		}
 		
 		for(Food eachFood : foods){

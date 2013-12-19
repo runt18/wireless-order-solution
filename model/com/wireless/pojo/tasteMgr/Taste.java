@@ -286,9 +286,8 @@ public class Taste implements Parcelable, Comparable<Taste>, Jsonable{
 	
 	public Taste(){ }
 	
-	public Taste(int tasteId, int restaurantId){
+	public Taste(int tasteId){
 		this.tasteId = tasteId;
-		this.restaurantId = restaurantId;
 	}
 	
 	public int getRestaurantId() {

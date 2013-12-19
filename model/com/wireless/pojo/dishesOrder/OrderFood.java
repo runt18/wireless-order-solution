@@ -189,10 +189,10 @@ public class OrderFood implements Parcelable, Comparable<OrderFood>, Jsonable {
 	}
 	
 	/**
-	 * Check to see if the order food has taste(either normal taste or temporary taste).
+	 * Check to see if the order food has taste group(either normal taste or temporary taste).
 	 * @return true if the order food has taste, otherwise false
 	 */
-	public boolean hasTaste(){
+	public boolean hasTasteGroup(){
 		return mTasteGroup == null ? false : mTasteGroup.hasPreference();
 	}
 	
@@ -218,7 +218,7 @@ public class OrderFood implements Parcelable, Comparable<OrderFood>, Jsonable {
 	 */	
 	public float calcPriceBeforeDiscount(){
 		if(mFood.isWeigh()){
-			return NumericUtil.roundFloat(getUnitPriceWithTaste() * getCount()  + (hasTaste() ? mTasteGroup.getPrice() : 0));			
+			return NumericUtil.roundFloat(getUnitPriceWithTaste() * getCount()  + (hasTasteGroup() ? mTasteGroup.getPrice() : 0));			
 		}else{
 			return NumericUtil.roundFloat(getUnitPriceWithTaste() * getCount());
 		}
@@ -232,7 +232,7 @@ public class OrderFood implements Parcelable, Comparable<OrderFood>, Jsonable {
 	 * @return the unit price represented as a Float
 	 */
 	public float getUnitPriceWithTaste(){
-		return NumericUtil.roundFloat(mFood.getPrice() + (!hasTaste() || mFood.isWeigh() ? 0 : mTasteGroup.getPrice()));
+		return NumericUtil.roundFloat(mFood.getPrice() + (!hasTasteGroup() || mFood.isWeigh() ? 0 : mTasteGroup.getPrice()));
 	}
 	
 	/**
@@ -242,7 +242,7 @@ public class OrderFood implements Parcelable, Comparable<OrderFood>, Jsonable {
 	 */
 	public float calcPriceWithTaste(){
 		if(mFood.isWeigh()){
-			return NumericUtil.roundFloat((getUnitPriceWithTaste() * getCount() + (hasTaste() ? mTasteGroup.getPrice() : 0)) * getDiscount());			
+			return NumericUtil.roundFloat((getUnitPriceWithTaste() * getCount() + (hasTasteGroup() ? mTasteGroup.getPrice() : 0)) * getDiscount());			
 		}else{
 			return NumericUtil.roundFloat(getUnitPriceWithTaste() * getCount()  * getDiscount());	
 		}
@@ -300,13 +300,8 @@ public class OrderFood implements Parcelable, Comparable<OrderFood>, Jsonable {
 		return mTasteGroup;
 	}
 	
-	public TasteGroup makeTasteGroup(Taste[] normal, Taste tmp){
-		mTasteGroup = new TasteGroup(this, normal, tmp);
-		return mTasteGroup;
-	}
-	
-	public TasteGroup makeTasteGroup(int groupID, Taste normal, Taste tmp){
-		mTasteGroup = new TasteGroup(groupID, normal, tmp);
+	public TasteGroup makeTasteGroup(int groupId, Taste normal, Taste tmp){
+		mTasteGroup = new TasteGroup(groupId, normal, tmp);
 		return mTasteGroup;
 	}
 	
@@ -315,16 +310,35 @@ public class OrderFood implements Parcelable, Comparable<OrderFood>, Jsonable {
 	}
 	
 	public TasteGroup getTasteGroup(){
-		if(mTasteGroup == null){
-			makeTasteGroup();
-		}
 		return mTasteGroup;
 	}
-	
+
 	public void setTasteGroup(TasteGroup tg){
 		if(tg != null){
 			mTasteGroup = tg;
 			mTasteGroup.setAttachedFood(this);
+		}
+	}
+
+	public boolean addTaste(Taste tasteToAdd){
+		if(mTasteGroup == null){
+			makeTasteGroup();
+		}
+		return mTasteGroup.addTaste(tasteToAdd);
+	}
+	
+	public void setTmpTaste(Taste tmpTaste){
+		if(mTasteGroup == null){
+			makeTasteGroup();
+		}
+		mTasteGroup.setTmpTaste(tmpTaste);
+	}
+	
+	public boolean removeTaste(Taste tasteToRemove){
+		if(mTasteGroup != null){
+			return mTasteGroup.removeTaste(tasteToRemove);
+		}else{
+			return false;
 		}
 	}
 	
@@ -451,10 +465,10 @@ public class OrderFood implements Parcelable, Comparable<OrderFood>, Jsonable {
 	 * @return true if the taste group is the same, otherwise false
 	 */
 	boolean equalsByTasteGroup(OrderFood food){
-		if(hasTaste() && food.hasTaste()){
+		if(hasTasteGroup() && food.hasTasteGroup()){
 			return mTasteGroup.equals(food.mTasteGroup);
 			
-		}else if(!hasTaste() && !food.hasTaste()){
+		}else if(!hasTasteGroup() && !food.hasTasteGroup()){
 			return true;
 			
 		}else{
@@ -512,7 +526,7 @@ public class OrderFood implements Parcelable, Comparable<OrderFood>, Jsonable {
 	 */
 	@Override
 	public String toString(){
-		return mFood.getName() + (hasTaste() ? ("-" + mTasteGroup.toString()) : "");
+		return mFood.getName() + (hasTasteGroup() ? ("-" + mTasteGroup.toString()) : "");
 	}
 	
 	@Override
