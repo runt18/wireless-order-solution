@@ -345,16 +345,22 @@ function orderGroupFoodCountOperationHandler(_c){
  */
 function addOrderSingleFoodHandler(_c){
 	var r = _c.grid.getStore().getAt(_c.rowIndex);
-	if(Ext.ux.cfs.isStop(r.get('status'))){
-		Ext.example.msg('提示', '该菜品已停售,请重新选择.');
+	if(!r){
+		Ext.example.msg('提示', '该编号菜品信息不在当前展示列表, 请重新输入.');
+	}else if(Ext.ux.cfs.isStop(r.get('status'))){
+		Ext.example.msg('提示', '该菜品已停售, 请重新选择.');
 	}else{
 		bindGridData({
 			grid : orderSingleGridPanel,
 			record : r,
+			count : _c.count,
 			callBack : function(e, c){
 				orderGroupDisplayRefresh({
 					control : e
 				});
+				if(typeof _c.callback == 'function'){
+					_c.callback(r);
+				}
 			}
 		});
 	}

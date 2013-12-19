@@ -2,6 +2,7 @@
  * 
  */
 var paySubmit = function(submitType) {
+	if(isPaying == true){ return; }
 	// 强制计算后再结账
 //	refreshCheckOutData({
 //		callback : function(){
@@ -63,6 +64,7 @@ var paySubmit = function(submitType) {
 			if (!canSubmit) {
 				return false;
 			}
+			isPaying = true;
 			Ext.Ajax.request({
 				url : "../../PayOrder.do",
 				params : {
@@ -81,6 +83,7 @@ var paySubmit = function(submitType) {
 					'customNum' : Ext.getCmp('numCustomNum').getValue()
 				},
 				success : function(response, options) {
+					isPaying = false;
 					var resultJSON = Ext.decode(response.responseText);
 					var dataInfo = resultJSON.data;
 					
@@ -168,6 +171,7 @@ var paySubmit = function(submitType) {
 					setFormButtonStatus(false);
 				},
 				failure : function(response, options) {
+					isPaying = false;
 					setFormButtonStatus(false);
 					Ext.MessageBox.show({
 						msg : "Unknow page error",

@@ -169,7 +169,7 @@ var checkOutForm = new Ext.form.FormPanel({
 			paySubmit(5);
 		}
 	}, {
-		text : '暂结',
+		text : '暂结(-)',
 		disabled : true,
 		handler : function() {
 			paySubmit(6);
@@ -285,6 +285,12 @@ Ext.onReady(function() {
 		scope : this,
 		fn: function(){
 			paySubmit(1);
+		}
+	}, {
+		key: 109,
+		scope : this,
+		fn: function(){
+			paySubmit(6);
 		}
 	}]);
 	

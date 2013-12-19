@@ -723,6 +723,166 @@ var orderPanel = new Ext.Panel({
 	}]
 });
 
+function initKeyBoardEvent(){
+	
+	var foodAlias = new Ext.form.NumberField({
+		xtype : 'numberfield',
+		columnWidth : .49,
+		height : 110,
+		style : 'line-height: 100px; font-size: 100px; font-weight: bold; text-align: left; color: red;',
+		allowBlank : false,
+		listeners : {
+			render : function(thiz){
+				thiz.getEl().dom.setAttribute('maxLength', 5);
+			}
+		}
+	});
+	var foodCount = new Ext.form.NumberField({
+		xtype : 'numberfield',
+		columnWidth : .49,
+		height : 110,
+		style : 'line-height: 100px; font-size: 100px; font-weight: bold; text-align: left; color: red;',
+		allowBlank : false,
+		listeners : {
+			render : function(thiz){
+				thiz.getEl().dom.setAttribute('maxLength', 3);
+			}
+		}
+	});
+	
+	var btnSaveForQAWin = new Ext.Button({
+		text : '保存再录(+)',
+		handler : function(thiz){
+//			alert(thiz.text)
+			if(!foodAlias.isValid() || !foodCount.isValid()){
+				return;
+			}
+			
+			var ri = null, gs = allFoodTabPanelGrid.getStore();
+			for(var i = 0; i < gs.getCount(); i++){
+				if(gs.getAt(i).get('alias') == foodAlias.getValue()){
+					ri = i;
+					break;
+				}
+			}
+			
+			if(ri && ri >= 0){
+				addOrderFoodHandler({
+					grid : allFoodTabPanelGrid,
+					rowIndex : ri,
+					count : foodCount.getValue(),
+					callback : function(){
+						Ext.example.msg('提示', '添加成功.');
+						foodAlias.setValue();
+						foodCount.setValue();
+						foodAlias.clearInvalid();
+						foodCount.clearInvalid();
+						
+						foodAlias.focus(foodAlias, 100);
+					}
+				});
+			}else{
+				Ext.example.msg('提示', '该编号菜品信息不在当前展示列表, 请重新输入.');
+				foodAlias.focus(foodAlias, 100);
+				foodAlias.selectText();
+			}
+		},
+		listeners : {
+			render : function(thiz){
+				thiz.getEl().setWidth(100, true);
+			}
+		}
+	});
+	var btnCloseForQAWin = new Ext.Button({
+		text : '关闭(ESC)',
+		handler : function(){
+			quickActionWin.hide();
+		},
+		listeners : {
+			render : function(thiz){
+				thiz.getEl().setWidth(100, true);
+			}
+		}
+	});
+	
+	var quickActionWin = new Ext.Window({
+		title : '&nbsp;',
+		modal : true,
+		closable : false,
+		resizeble : false,
+		width : 600,
+		keys : [{
+			key : 27,
+			scope : this,
+			fn : function(){
+				btnCloseForQAWin.handler(btnCloseForQAWin);
+			}
+		}, {
+			key : 107,
+			scope : this,
+			fn : function(){
+				btnSaveForQAWin.handler(btnSaveForQAWin);
+			}
+		}, {
+			key : 111,
+			scope : this,
+			fn : function(){
+				foodAlias.focus(foodAlias, 100);
+				foodAlias.selectText();
+			}
+		}, {
+			key : 106,
+			scope : this,
+			fn : function(){
+				foodCount.focus(foodCount, 100);
+				foodCount.selectText();
+			}
+		}],
+		listeners : {
+			show : function(){
+				foodAlias.setValue();
+				foodCount.setValue();
+				foodAlias.clearInvalid();
+				foodCount.clearInvalid();
+				
+				foodAlias.focus(foodAlias, 100);
+			}
+		},
+		items : [{
+			layout : 'column',
+			height : 180,
+			frame : true,
+			items : [{
+				columnWidth : .5,
+				html : '菜品编号(/)',
+				height : 30,
+				style : 'font-size: 26px;'
+			}, {
+				columnWidth : .5,
+				html : '数量(*)',
+				height : 30,
+				style : 'font-size: 26px;'
+			}, foodAlias, {
+				columnWidth : .01,
+				html : '&nbsp;'
+			}, foodCount, {
+				columnWidth : 1,
+				buttonAlign : 'center',
+				buttons : [btnSaveForQAWin, btnCloseForQAWin],
+			}]
+		}]
+	});
+	
+	new Ext.KeyMap(document.body, [{
+		key : 107,
+		scope : this,
+		fn : function(){
+			quickActionWin.show();
+		}
+	}]);
+}
+
+
 var dishesOrderNorthPanel = new Ext.Panel({
 	id : 'dishesOrderNorthPanel',
 	region : 'north',
@@ -731,8 +891,7 @@ var dishesOrderNorthPanel = new Ext.Panel({
 	frame : true
 });
 
-var dishesOrderEastPanel;
-var centerPanel;
+var dishesOrderEastPanel, centerPanel;
 Ext.onReady(function() {
 	var menuTabPanel = new Ext.TabPanel({
 		id : 'menuTabPanel',
@@ -766,7 +925,7 @@ Ext.onReady(function() {
 		width : 450,
 		id : 'dishesOrderEastPanel',
 		frame : true,
-		title : ' 菜单 ',
+		title : ' 菜单 &nbsp;<font style="color:red;">编号点菜快捷键(+)</font>',
 		layout : 'fit',
 //		margins : '0 0 0 5',
 		items : [menuTabPanel]
@@ -788,4 +947,6 @@ Ext.onReady(function() {
 
 	initMainView(null, centerPanel, null);
 	getOperatorName("../../");
+	
+	initKeyBoardEvent();
 });
