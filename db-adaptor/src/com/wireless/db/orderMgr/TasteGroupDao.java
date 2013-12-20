@@ -92,7 +92,7 @@ public class TasteGroupDao {
 			Taste normal = null;
 			int normalTasteGroupId = dbCon.rs.getInt("normal_taste_group_id");
 			if(normalTasteGroupId != TasteGroup.EMPTY_NORMAL_TASTE_GROUP_ID){
-				normal = new Taste();
+				normal = new Taste(0);
 				normal.setPreference(dbCon.rs.getString("normal_taste_pref"));
 				normal.setPrice(dbCon.rs.getFloat("normal_taste_price"));
 			}
@@ -100,7 +100,7 @@ public class TasteGroupDao {
 			//Get the temporary taste in case of exist.
 			Taste tmp = null;
 			if(dbCon.rs.getBoolean("has_tmp_taste")){
-				tmp = new Taste();
+				tmp = new Taste(0);
 				tmp.setTasteId(dbCon.rs.getInt("tmp_taste_id"));
 				tmp.setPreference(dbCon.rs.getString("tmp_taste_pref"));
 				tmp.setPrice(dbCon.rs.getFloat("tmp_taste_price"));
@@ -149,7 +149,7 @@ public class TasteGroupDao {
 			Taste normal = null;
 			normalTasteGroupId = dbCon.rs.getInt("normal_taste_group_id");
 			if(normalTasteGroupId != TasteGroup.EMPTY_NORMAL_TASTE_GROUP_ID){
-				normal = new Taste();
+				normal = new Taste(0);
 				normal.setPreference(dbCon.rs.getString("normal_taste_pref"));
 				normal.setPrice(dbCon.rs.getFloat("normal_taste_price"));
 			}
@@ -157,7 +157,7 @@ public class TasteGroupDao {
 			//Get the temporary taste in case of exist.
 			Taste tmp = null;
 			if(dbCon.rs.getBoolean("has_tmp_taste")){
-				tmp = new Taste();
+				tmp = new Taste(0);
 				tmp.setTasteId(dbCon.rs.getInt("tmp_taste_id"));
 				tmp.setPreference(dbCon.rs.getString("tmp_taste_pref"));
 				tmp.setPrice(dbCon.rs.getFloat("tmp_taste_price"));

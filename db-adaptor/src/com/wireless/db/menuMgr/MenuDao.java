@@ -240,8 +240,7 @@ public class MenuDao {
 							+ (orderBy != null && orderBy.trim().length() > 0 ? " " + orderBy : "");
 			dbCon.rs = dbCon.stmt.executeQuery(querySQL);
 			while(dbCon.rs != null && dbCon.rs.next()){
-				taste = new Taste();
-				taste.setTasteId(dbCon.rs.getInt("taste_id"));
+				taste = new Taste(dbCon.rs.getInt("taste_id"));
 				taste.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
 				taste.setPreference(dbCon.rs.getString("preference"));
 				taste.setPrice(dbCon.rs.getFloat("price"));

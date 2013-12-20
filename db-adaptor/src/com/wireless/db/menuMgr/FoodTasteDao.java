@@ -39,8 +39,7 @@ public class FoodTasteDao {
 					
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		while(dbCon.rs.next()){
-			taste = new Taste();
-			taste.setTasteId(dbCon.rs.getInt("taste_id"));
+			taste = new Taste(dbCon.rs.getInt("taste_id"));
 			taste.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
 			taste.setPreference(dbCon.rs.getString("taste_name"));
 			taste.setPrice(dbCon.rs.getFloat("price"));
