@@ -37,7 +37,7 @@ public class FoodDetailContent extends ConcreteContent {
 		}
 		
 		String taste = null;
-		if(_food.hasTaste()){
+		if(_food.hasTasteGroup()){
 			taste = "-" + _food.getTasteGroup().getPreference();
 		}
 		_format = _format.replace(PVar.FOOD_TASTE, taste == null ? "" : taste);				
