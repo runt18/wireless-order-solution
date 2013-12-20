@@ -17,7 +17,7 @@ public class FoodTaste implements Jsonable{
 		this.food = food;
 	}
 	public FoodTaste(){
-		init(new Taste(), new Food());
+		init(new Taste(0), new Food());
 	}
 	public FoodTaste(Taste taste){
 		init(taste, new Food());

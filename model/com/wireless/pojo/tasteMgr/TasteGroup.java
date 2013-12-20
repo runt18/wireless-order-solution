@@ -15,10 +15,29 @@ import com.wireless.pojo.util.SortedList;
 
 public class TasteGroup implements Parcelable, Jsonable{
 	
+	public static final TasteGroup EMPTY = new TasteGroup(){
+		@Override
+		public void setGroupId(int groupId){
+			throw new UnsupportedOperationException("Empty taste group does NOT support this operation.");
+		}
+		@Override
+		public void setTmpTaste(Taste tmpTaste){
+			throw new UnsupportedOperationException("Empty taste group does NOT support this operation.");
+		}
+		@Override
+		public void setAttachedFood(OrderFood attachedFood){
+			throw new UnsupportedOperationException("Empty taste group does NOT support this operation.");
+		}
+		@Override
+		public boolean addTaste(Taste tasteToAdd){
+			throw new UnsupportedOperationException("Empty taste group does NOT support this operation.");
+		}
+	};
+	
 	public final static byte TG_PARCELABLE_COMPLEX = 0;
 	public final static byte TG_PARCELABLE_SIMPLE = 1;
 	
-	public final static String NO_TASTE_PREF = "无口味";
+	private final static String NO_TASTE_PREF = "无口味";
 	
 	public final static int NEW_TASTE_GROUP_ID = 0;
 	public final static int EMPTY_TASTE_GROUP_ID = 1;
@@ -44,16 +63,6 @@ public class TasteGroup implements Parcelable, Jsonable{
 		this.mGroupId = groupId;
 		this.mNormalTaste = normalTaste;
 		this.mTmpTaste = tmpTaste; 
-	}
-	
-	public TasteGroup(OrderFood attachedOrderFood, Taste[] normalTastes, Taste tmpTaste){
-		this.mAttachedOrderFood = attachedOrderFood;
-		if(normalTastes != null){
-			for(Taste t : normalTastes){
-				addTaste(t);
-			}
-		}
-		this.mTmpTaste = tmpTaste;
 	}
 	
 	public TasteGroup(OrderFood attachedOrderFood, List<Taste> normalTastes, Taste tmpTaste){
@@ -225,7 +234,7 @@ public class TasteGroup implements Parcelable, Jsonable{
 	 */
 	public String getNormalTastePref(){
 		
-		if(hasTaste() || hasTmpTaste()){
+		if(hasTaste() || hasSpec()){
 			StringBuilder tastePref = new StringBuilder();
 			
 			for(Taste taste : mTastes){
