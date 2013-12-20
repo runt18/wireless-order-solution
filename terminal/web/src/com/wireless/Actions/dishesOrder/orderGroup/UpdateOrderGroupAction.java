@@ -158,16 +158,14 @@ public class UpdateOrderGroupAction extends DispatchAction{
 					if(tgContent != null && tgContent.size() > 0){
 						of.makeTasteGroup();
 						for(int ti = 0; ti < tgContent.size(); ti++){
-							tasteToAdd = new Taste();
-							tasteToAdd.setTasteId(tgContent.getJSONObject(ti).getInt("tasteID"));
+							tasteToAdd = new Taste(tgContent.getJSONObject(ti).getInt("tasteID"));
 							tasteToAdd.setTasteId(tgContent.getJSONObject(ti).getInt("tasteAliasID"));
 							tasteToAdd.setCategory(new TasteCategory(tgContent.getJSONObject(ti).getInt("tasteCategory")));
 							of.addTaste(tasteToAdd);							
 						}
 					}
 					if(ttObj != null && !ttObj.toString().equals("null")){
-						tmpTaste = new Taste();
-						tmpTaste.setTasteId(ttObj.getInt("tasteID"));
+						tmpTaste = new Taste(ttObj.getInt("tasteID"));
 						tmpTaste.setTasteId(ttObj.getInt("tasteAliasID"));
 						tmpTaste.setPreference(ttObj.getString("tasteName"));
 						tmpTaste.setPrice(Float.valueOf(ttObj.getString("tastePrice")));

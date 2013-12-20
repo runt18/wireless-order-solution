@@ -131,7 +131,7 @@ public class Util {
 						for(int j = 0; j < nTaste.length; j++){
 							String[] taste = nTaste[j].split("<<stb>>");
 							if(taste.length == 3){
-								Taste it = new Taste();
+								Taste it = new Taste(0);
 								it.setTasteId(Integer.valueOf(taste[0]));
 								it.setTasteId(Integer.valueOf(taste[1]));
 								it.setCategory(new TasteCategory(Short.valueOf(taste[2])));
@@ -143,7 +143,7 @@ public class Util {
 					if(tasteGroup[1] != null && !tasteGroup[1].trim().isEmpty()){
 						String[] tTaste = tasteGroup[1].trim().split("<<sttt>>");
 						if(tTaste.length >= 4){
-							Taste tmpTaste = new Taste();
+							Taste tmpTaste = new Taste(0);
 							tmpTaste.setPrice(Float.valueOf(tTaste[0]));
 							tmpTaste.setPreference(tTaste[1]);
 							tmpTaste.setTasteId(Integer.valueOf(tTaste[2]));
