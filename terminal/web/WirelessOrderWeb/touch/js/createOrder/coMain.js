@@ -37,9 +37,9 @@ co.show = function(c){
 	}));
 };
 /**
- * 菜品操作返回
+ * 清理内存
  */
-co.back = function(c){
+co.clear = function(){
 	Util.toggleContentDisplay({
 		type:'hide', 
 		renderTo:'divCreateOrder'
@@ -49,6 +49,24 @@ co.back = function(c){
 	co.newFood = [];
 	co.callback = null;
 	co.initNewFoodContent();
+};
+/**
+ * 菜品操作返回
+ */
+co.back = function(c){
+	if(co.newFood.length > 0){
+		Util.msg.alert({
+			msg : '还有新点菜未处理, 是否继续退出?',
+			buttons : 'YESBACK',
+			fn : function(btn){
+				if(btn == 'yes'){
+					co.clear();
+				}
+			}
+		});
+	}else{
+		co.clear();
+	}
 };
 
 /**
@@ -438,11 +456,12 @@ co.ot.save = function(c){
 		if(temp.cateValue == 0){
 			tasteGroup.normalTaste.price += temp.price;
 		}else if(temp.cateValue == 2){
-			tasteGroup.normalTaste.price += co.ot.foodData.unitPrice * (1 + temp.rate);
+			tasteGroup.normalTaste.price += co.ot.foodData.unitPrice * temp.rate;
 		}
 	}
 	tasteGroup.tastePref = tasteGroup.normalTaste.name;
 	tasteGroup.price = tasteGroup.normalTaste.price;
+	
 	for(var i = 0; i < co.newFood.length; i++){
 		if(co.newFood[i].id == co.ot.foodData.id){
 			co.newFood[i].tasteGroup = tasteGroup;
