@@ -21,7 +21,7 @@ public class TasteCategory implements Parcelable{
 	public static class SwapDisplayBuilder{
 		private final int idA;
 		private final int idB;
-		SwapDisplayBuilder(int idA, int idB){
+		public SwapDisplayBuilder(int idA, int idB){
 			this.idA = idA;
 			this.idB = idB;
 		}
@@ -155,6 +155,11 @@ public class TasteCategory implements Parcelable{
 	private Type type;
 	private Status status;
 	
+	public TasteCategory(int id, String name){
+		setId(id);
+		setName(name);
+	}
+	
 	private TasteCategory(UpdateBuilder builder){
 		setId(builder.id);
 		setName(builder.name);
@@ -167,7 +172,7 @@ public class TasteCategory implements Parcelable{
 		setStatus(builder.status);
 	}
 	
-	private TasteCategory(){
+	TasteCategory(){
 		
 	}
 	

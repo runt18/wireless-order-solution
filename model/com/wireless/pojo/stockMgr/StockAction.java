@@ -789,12 +789,13 @@ public class StockAction implements Jsonable{
 	
 	public float getTotalPrice(){
 		float sum = 0;
-		for (StockActionDetail sDetail : this.stockDetails) {
-			sum += sDetail.getAmount() * sDetail.getPrice();
+		if(this.subType == SubType.STOCK_IN || this.subType == SubType.STOCK_OUT || this.subType == SubType.USE_UP){
+			for (StockActionDetail sDetail : this.stockDetails) {
+				sum += sDetail.getAmount() * sDetail.getPrice();
+			}
 		}
 		return sum;
 	}
-	
 	
 	@Override
 	public String toString() {

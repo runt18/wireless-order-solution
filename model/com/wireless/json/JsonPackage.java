@@ -95,7 +95,7 @@ public final class JsonPackage {
 					List<Map<String, Object>> lm = new ArrayList<Map<String, Object>>();
 					for(Object temp : list){
 						if(temp instanceof Jsonable){
-							item = new LinkedHashMap<String, Object>(((Jsonable)temp).toJsonMap(0));
+							item = new LinkedHashMap<String, Object>(((Jsonable)temp).toJsonMap(mFlag));
 							changeToMap(item);
 							lm.add(item);
 						}

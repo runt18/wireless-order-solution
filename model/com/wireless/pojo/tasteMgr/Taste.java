@@ -219,6 +219,7 @@ public class Taste implements Parcelable, Comparable<Taste>, Jsonable{
 		}
 		
 		public UpdateBuilder setCategory(TasteCategory category){
+			this.category = category;
 			if(this.category.isTaste()){
 				this.calc = Calc.BY_PRICE;
 			}else if(this.category.isSpec()){
@@ -247,7 +248,7 @@ public class Taste implements Parcelable, Comparable<Taste>, Jsonable{
 	private float price;							// 口味价格
 	private float rate;								// 口味比例
 	private int rank;								// 排行	
-	private TasteCategory category;					// 口味类型    
+	private TasteCategory category = new TasteCategory();					// 口味类型    
 	private Calc calc = Calc.BY_PRICE;				// 口味计算方式          0:按价格     1:按比例
 	private Type type = Type.NORMAL;				// 操作类型	0:默认    1:系统保留(不可删除)
 	
@@ -350,6 +351,10 @@ public class Taste implements Parcelable, Comparable<Taste>, Jsonable{
 		this.category = category;
 	}
 	
+	public void setCategoryIdAndName(int id, String name){
+		this.category.setId(id);
+		this.category.setName(name);
+	}
 	public int getRank() {
 		return rank;
 	}
@@ -510,8 +515,8 @@ public class Taste implements Parcelable, Comparable<Taste>, Jsonable{
 		jm.put("price", this.getPrice());
 		jm.put("rate", this.rate);
 		jm.put("rank", this.rank);
-		//jm.put("cateValue", this.category.getVal());
-		//jm.put("cateText", this.category.getDesc());
+		jm.put("cateValue", this.category.getId());
+		jm.put("cateText", this.category.getName());
 		jm.put("calcValue", this.calc.getVal());
 		jm.put("calcText", this.calc.getDesc());
 		jm.put("typeValue", this.type.getVal());
