@@ -504,6 +504,12 @@
 		<action path="/FinanceWeixin" type="com.wireless.Actions.weixin.FinanceWeixinAction"
 			scope="request">
 		</action>
+		<action path="/QueryTasteCate" type="com.wireless.Actions.menuMgr.taste.QueryFoodTasteCategoryAction"
+			scope="request" parameter="dataSource">
+		</action>
+		<action path="/OperateTasteCate" type="com.wireless.Actions.menuMgr.taste.OperateFoodTasteCategoryAction"
+			scope="request" parameter="dataSource">
+		</action>
 	</action-mappings>
 
 	<message-resources parameter="com.yourcompany.struts.ApplicationResources" />
