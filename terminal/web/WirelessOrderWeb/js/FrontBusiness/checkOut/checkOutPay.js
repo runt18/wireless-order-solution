@@ -83,7 +83,7 @@ var paySubmit = function(submitType) {
 					'customNum' : Ext.getCmp('numCustomNum').getValue()
 				},
 				success : function(response, options) {
-					//isPaying = false;
+					isPaying = false;
 					var resultJSON = Ext.decode(response.responseText);
 					var dataInfo = resultJSON.data;
 					
