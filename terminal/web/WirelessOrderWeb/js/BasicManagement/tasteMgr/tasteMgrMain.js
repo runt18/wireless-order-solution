@@ -655,6 +655,7 @@ function tasteCateOperateHandler(c){
 		cateName.clearInvalid();
 	}else if(c.otype == 'update'){
 		var tn = tmm_tasteTree.getNodeById(nodeId);
+		cateName.setDisabled(false);
 		if(!tn){
 			Ext.example.msg('提示', '操作失败, 请选中一条数据再进行操作.');
 			return;
@@ -677,6 +678,7 @@ function tasteCateOperateHandler(c){
 			return;
 		}else{
 			if(tn.attributes.status == 1){
+				Ext.example.msg('提示', '系统保留,不能删除.');
 				return;
 			}
 			Ext.Msg.confirm(
