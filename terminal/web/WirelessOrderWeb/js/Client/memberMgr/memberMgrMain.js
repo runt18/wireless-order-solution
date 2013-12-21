@@ -822,7 +822,7 @@ function gridInit(){
 				gs.baseParams['consumptionAmount'] = searchType == 6 ? searchValue : '';
 				gs.baseParams['point'] = searchType == 7 ? searchValue : '';
 				gs.baseParams['usedPoint'] = searchType == 8 ? searchValue : '';
-				
+
 				gs.baseParams['so'] = Ext.getCmp('comboSearchValueByOperation').getValue();
 				gs.load({
 					params : {
@@ -879,6 +879,54 @@ function gridInit(){
 			iconCls : 'icon_tb_setting',
 			handler : function(e){
 				adjustPoint();
+			}
+		}, '-', {
+			text : '导出',
+			iconCls : 'icon_tb_setting',
+			handler : function(){
+				var memberTypeNode = memberTypeTree.getSelectionModel().getSelectedNode();
+				var searchType = Ext.getCmp('mr_comboMemberSearchType').getValue();
+				var searchValue = Ext.getCmp(mObj.searchValue) ? Ext.getCmp(mObj.searchValue).getValue() : '';
+				
+				var memberType, memberTypeAttr;
+				
+				if(memberTypeNode){
+					if(memberTypeNode.childNodes.length > 0 && memberTypeNode.attributes.memberTypeId != -1){
+						memberType = '';
+						memberTypeAttr = memberTypeNode.attributes.attr;
+					}else{
+						if(memberTypeNode.attributes.attr >= 0){
+							memberType = '';
+							memberTypeAttr = memberTypeNode.attributes.attr;
+						}else{
+							memberType = memberTypeNode.attributes.memberTypeId;
+							memberTypeAttr = '';
+						}
+					}
+				}else{
+					memberType = '';
+					memberTypeAttr = '';
+				}
+				var url = '../../{0}?memberType={1}&memberTypeAttr={2}&name={3}&memberCard={4}&mobile={5}&totalBalance={6}' +
+						'&usedBalance={7}&consumptionAmount={8}&point={9}&usedPoint={10}&so={11}&dataSource={12}';
+				url = String.format(
+					url, 
+					'ExportHistoryStatisticsToExecl.do', 
+					memberType,
+					memberTypeAttr,
+					searchType == 1 ? searchValue : '',
+					searchType == 2 ? searchValue : '',
+					searchType == 3 ? searchValue : '',
+					searchType == 4 ? searchValue : '',
+					searchType == 5 ? searchValue : '',
+					searchType == 6 ? searchValue : '',
+					searchType == 7 ? searchValue : '',
+					searchType == 8 ? searchValue : '',
+					Ext.getCmp('comboSearchValueByOperation').getValue(),
+					'memberList'
+				);
+				
+				window.location = url;
 			}
 		}]
 	});

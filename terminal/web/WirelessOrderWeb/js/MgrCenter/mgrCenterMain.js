@@ -43,7 +43,8 @@ Ext.onReady(function(){
 		items : [{
 			region : "north",
 			bodyStyle : "background-color:#DFE8F6;",
-			html : "<h4 style='padding:10px;font-size:150%;float:left;'>Digi-e管理中心</h4><div id='optName' class='optName'></div>",
+			html : "<h4 style='padding:10px;font-size:150%;float:left;'>Digi-e管理中心</h4><div id='optName' class='optName'></div>" +
+			       "<div id='divLoginOut' class='loginOut' style='width: 40px;height: 41px;'><img id='btnLoginOut' src='../images/ResLogout.png' width='40' height='40' /> </div>",
 			height : 50,
 			border : false,
 			margins : '0 0 0 0'
@@ -58,5 +59,17 @@ Ext.onReady(function(){
 			html : '<div style="font-size:11pt; text-align:center;"><b>版权所有(c) 2011 智易科技</b></div>'
 		}]
 	 });
+	 
+	 Ext.get('btnLoginOut').on('click', function(){
+		Ext.Ajax.request({
+			url : '../../LoginOut.do',
+			success : function(){
+				location.href = '../LoginAdmin.html';
+			},
+			failure : function(){
+				
+			}
+		});
+    });
 	
 });

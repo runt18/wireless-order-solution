@@ -9,6 +9,9 @@ Ext.onReady(function(){
 		contetntDiv.innerHTML = '操作失败, 获取账单信息失败, 请联系客服人员.';
 		return false;
 	}
+	
+	loadSystemSetting();
+	
 	var pe = contetntDiv.parentElement;
 	var mw = parseInt(pe.style.width);
 	var mh = parseInt(pe.style.height);
@@ -77,7 +80,9 @@ Ext.onReady(function(){
 		border : false,
 		height : 32,
 		bodyStyle : 'font-size:26px;text-align:left;',
-		html : '收款 : <input id="mpo_txtPayMoneyForPayOrder" type="text" disabled="disabled" value="0.00" style="color:red;height: 27px;width:120px;font-size :26px;font-weight: bolder;" />'
+		html : '收款 : <input id="mpo_txtPayMoneyForPayOrder" type="text" disabled="disabled" value="0.00" style="color:red;height: 27px;width:120px;font-size :26px;font-weight: bolder;" />'+
+				'<div id="div_memberShowEraseQuota" style="display: none;float:right">抹数金额：￥<input id="txtMemberEraseQuota" type="text" value="0" style="width: 50px;height: 27px;font-size :26px;" />' +
+				'上限:￥<font id="font_showMemberEraseQuota" style="color:red;"></font></div>'
 	};
 	new Ext.Panel({
 		renderTo : 'divMemberPayOrderContent',
@@ -270,6 +275,36 @@ Ext.onReady(function(){
 		mpo_orderFoodGrid, secondStepPanelSouth]
 	});
 });
+
+function loadSystemSetting(_c){
+	if(_c == null || typeof _c == 'undefined'){
+		_c = {};
+	}
+	Ext.Ajax.request({
+		url : '../../QuerySystemSetting.do',
+		success : function(response, options) {
+			var jr = Ext.decode(response.responseText);
+			if (jr.success == true) {
+				restaurantData = jr.other.systemSetting;
+				if(restaurantData.setting.eraseQuota > 0){
+					Ext.getDom('div_memberShowEraseQuota').style.display = 'block';
+					Ext.getDom('font_showMemberEraseQuota').innerHTML = parseFloat(restaurantData.setting.eraseQuota).toFixed(2);
+				}else{
+					Ext.getDom('div_memberShowEraseQuota').style.display = 'none';
+					Ext.getDom('font_showMemberEraseQuota').innerHTML = '';
+				}
+			} else {
+				jr.success = true;
+				Ext.ux.showMsg(jr);
+			}
+		},
+		failure : function(response,options) {
+			Ext.ux.showMsg(Ext.decode(jr));
+		},
+		callback : _c.callback
+	});
+}
+
 
 /**
  * 
@@ -592,11 +627,15 @@ function memberPayOrderHandler(_c){
 	var payManner = Ext.getCmp('mpo_comPayMannerForPayOrder');
 	var customNum = Ext.getCmp('mpo_numCustomNumberForPayOrder');
 	var chooseDiscount = Ext.getCmp('mpo_txtDiscountForPayOrder');
+	var eraseQuota = document.getElementById("txtMemberEraseQuota").value;
 	
 	if(!payManner.isValid() || !customNum.isValid()){
 		return;
 	}
-	
+				// 抹数金额
+	if(!isNaN(eraseQuota) && eraseQuota >=0 && eraseQuota > restaurantData.setting.eraseQuota){
+		Ext.Msg.alert("提示", "<b>抹数金额大于设置上限，不能结帐！</b>");
+	}
 	if(eval(memberType.attributeValue == 0) && eval(client.clientTypeID != 0)){
 		if(eval(member.totalBalance < order.acturalPrice)){
 			Ext.example.msg('提示', '操作失败, 会员卡余额不足, 请先充值.');
@@ -619,7 +658,7 @@ function memberPayOrderHandler(_c){
 			memberID : member['id'],
 			comment : '',
 			serviceRate : order['serviceRate'],
-			eraseQuota : 0,
+			eraseQuota : eraseQuota,
 			pricePlanID : order['pricePlan']['id'],
 			customNum : customNum.getValue()
 		},

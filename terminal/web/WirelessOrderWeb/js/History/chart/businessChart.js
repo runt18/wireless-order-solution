@@ -77,9 +77,9 @@ function each(x){
 
 function showChart(time){
 	$("#loading").show();
-	$.post('../../BusinessReceiptsStatistics.do', {dataSource : 'chart', time : time==null?7:time}, function(data){
+	$.post('../../BusinessReceiptsStatistics.do', {dataSource : 'chart', time : time==null?7:time}, function(jdata){
 		$("#loading").hide();
-		var jdata = $.parseJSON(data);
+//		var jdata = $.parseJSON(data);
 		details = jdata.root;
 		//console.debug(jdata.other.chart)
 		var chartData = eval('(' + jdata.other.chart + ')');
@@ -138,8 +138,8 @@ function showChart(time){
                 }
 	        },
 //	        series : [{  
-//	            name: chartData.ser.name,  
-//	            data: chartData.ser.data
+//	            name: 'aaaaaa',  
+//	            data: [6, 9, 2, 7, 13, 21, 10]
 //	        }],
 	        series : chartData.ser,
 	        exporting : {

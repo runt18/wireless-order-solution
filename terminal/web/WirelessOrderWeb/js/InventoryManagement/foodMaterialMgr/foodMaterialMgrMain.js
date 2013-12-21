@@ -128,7 +128,7 @@ function initControl(){
 		title : '分厨',
 		region : 'west',
 		frame : true,
-		width : 200,
+		width : 180,
 		border : true,
 		rootVisible : true,
 		autoScroll : true,
@@ -374,13 +374,13 @@ function initControl(){
 		'materialBasicGrid',
 		'原料信息',
 		'',
-		350,
+		280,
 		'../../QueryMaterial.do',
 		[
 			[true, false, false, false], 
-			['原料名称', 'name', 60],
-			['单位成本', 'price', 60],
-			['操作', 'operate', , 'center', 'materialBasicGridRenderer']
+			['原料名称', 'name', 100],
+			['单位成本', 'price', 100],
+			['操作', 'operate', 80 , 'center', 'materialBasicGridRenderer']
 		],
 		MaterialRecord.getKeys(),
 		[['isPaging', true],  ['restaurantID', restaurantID], ['dataSource', 'normal'], ['cateType', 2]],

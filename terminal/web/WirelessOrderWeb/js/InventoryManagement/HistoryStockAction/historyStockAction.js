@@ -274,7 +274,13 @@ Ext.onReady(function(){
 		}
 		return display;
 	}
-	
+	function displayPrice(v){
+		if(v == 0){
+			return "----";
+		}else{
+			return Ext.ux.txtFormat.gridDou(v);
+		}
+	}
 	function stockOutRenderer(v, m, r, ri, ci, s){
 		var display = '', t = r.get('typeValue'), st = r.get('subTypeValue');
 		if(t == 1){
@@ -299,8 +305,8 @@ Ext.onReady(function(){
 	    {header: '出货仓/供应商', renderer: stockOutRenderer, width:100},
 	    {header: '收货仓/供应商', dataIndex: 'stockInRenderer', renderer: stockInRenderer, width:100},
 	    {header: '数量', dataIndex: 'amount', align: 'right', width:80, renderer: Ext.ux.txtFormat.gridDou},
-	    {header: '应收金额', dataIndex: 'price', align: 'right', width:80, renderer: Ext.ux.txtFormat.gridDou},
-	    {header: '实际金额', dataIndex: 'actualPrice', width:100, align: 'right', renderer: Ext.ux.txtFormat.gridDou},
+	    {header: '应收金额', dataIndex: 'price', align: 'right', width:80, renderer: displayPrice},
+	    {header: '实际金额', dataIndex: 'actualPrice', width:100, align: 'right', renderer: displayPrice},
 	    {header: '审核人', dataIndex: 'approverName', width:80, align: 'center'},
 	    {header: '审核状态', dataIndex: 'statusText', align: 'center', width:70},
 	    {header: '制单人', dataIndex: 'operatorName', width:80, align: 'center'},

@@ -272,7 +272,40 @@ Ext.onReady(function(){
 					}
 				});
 			}
-		},{xtype : 'tbtext', text : '&nbsp;&nbsp;'}
+		}, '-', {
+				text : '导出',
+				iconCls : 'btn_search',
+				handler : function(){
+					var cateType = '', cateId = '', materialId = '';
+					var rn = stockReportTree.getSelectionModel().getSelectedNode();
+					if(!rn){
+						cateType = '';
+					}else{
+						if(rn.attributes.typeId){
+							cateType = rn.attributes.typeId;
+						}else{
+							cateId = rn.attributes.cateId;
+						}
+					}
+					if(materialComb.getValue() != ''){
+						materialId = materialComb.getValue();
+					}
+					
+					var url = "../../{0}?beginDate={1}&endDate={2}&cateId={3}&materialId={4}&cateType={5}&deptId={6}&dataSource={7}";
+					url = String.format(
+						url,
+						'ExportHistoryStatisticsToExecl.do',
+						Ext.getCmp('sr_beginDate').getValue().format('Y-m-d'),
+						Ext.getCmp('sr_endDate').getValue().format('Y-m-d'),
+						cateId,
+						materialId,
+						cateType,
+						deptComb.getValue(),
+						'stockCollect'
+					);
+					window.location = url;
+				}
+			},{xtype : 'tbtext', text : '&nbsp;&nbsp;'}
 		]
 	});
 	

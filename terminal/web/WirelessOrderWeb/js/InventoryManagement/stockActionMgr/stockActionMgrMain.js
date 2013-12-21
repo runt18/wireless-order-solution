@@ -830,6 +830,14 @@ function stockOutRenderer(v, m, r, ri, ci, s){
 	}
 	return display;
 }
+
+function displayPrice(v){
+	if(v == 0){
+		return "----";
+	}else{
+		return Ext.ux.txtFormat.gridDou(v);
+	}
+}
 function IsNum(e) {
 	    var k = window.event ? e.keyCode : e.which;
 	    if (((k >= 48) && (k <= 57)) || k == 8 || k == 0) {
@@ -1119,8 +1127,8 @@ function initControl(){
 			['出库仓/供应商', 'center', 65,,'stockOutRenderer'],
 			['收货仓/供应商', 'center', 65,,'stockInRenderer'],
 			['数量', 'amount',60,'right','Ext.ux.txtFormat.gridDou'],
-			['应收金额', 'price',80,'right','Ext.ux.txtFormat.gridDou'],
-			['实际金额', 'actualPrice', 80, 'right', 'Ext.ux.txtFormat.gridDou'],
+			['应收金额', 'price',80,'right', displayPrice],
+			['实际金额', 'actualPrice', 80, 'right', displayPrice],
 			['审核人', 'approverName', 60],
 			['审核状态', 'statusText', 60, 'center'],
 			['制单人', 'operatorName', 60],
@@ -1825,7 +1833,7 @@ function initControl(){
 	    		change : 1,
 	    		handler : function(e){
 	    			stockTaskNavHandler(e);
-	    			Ext.getCmp('sam_secondStepPanelWest').setWidth(220);
+	    			Ext.getCmp('sam_secondStepPanelWest').setWidth(230);
 	    			Ext.getCmp('stock_secondStepPanel').doLayout();
 	    			
 		    	}

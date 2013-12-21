@@ -116,7 +116,7 @@ function loadOrderBasicMsg(){
 	for(var i = 0; i < checkOutData.root.length; i++){
 		sumFoodCount += checkOutData.root[i].count;
 	}
-	document.getElementById("spanSumFoodCount").innerHTML = sumFoodCount.toFixed(2);;
+//	document.getElementById("spanSumFoodCount").innerHTML = sumFoodCount.toFixed(2);;
 	
 	checkOutMainPanel.setTitle('结账 -- 账单号:<font color="red">' + orderMsg.id + '</font>');
 	if(orderMsg.category != 4){
@@ -413,16 +413,16 @@ function createCancelFoodDetail(_data){
 	}
 	cancelFoodPrice = cancelFoodPrice.toFixed(2);
 	sumAmount = sumAmount.toFixed(2);
-	cancelFoodDetailData.root.push({
+/*	cancelFoodDetailData.root.push({
 		orderDateFormat : '汇总',		
 		count : sumAmount,
 		totalPrice : cancelFoodPrice,
 		'kitchen' : {},
 		'tasteGroup' : {}
-	});
+	});*/
 	cancelFoodDetailData.totalProperty = cancelFoodDetailData.root.length;
 	
-	Ext.getDom('spanCancelFoodAmount').innerHTML = cancelFoodPrice;
+//	Ext.getDom('spanCancelFoodAmount').innerHTML = cancelFoodPrice;
 };
 
 var showCancelFoodDetailWin = null;
@@ -480,7 +480,6 @@ showCancelFoodDetail = function(){
 							time : new Date(),
 							limit : 200,
 							start : 0,
-							
 							queryType : 'TodayByTbl',
 							tableAlias : tableID,
 							restaurantID : restaurantID

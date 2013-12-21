@@ -7,7 +7,7 @@ var taste_filterTypeComb = new Ext.form.ComboBox({
 	id : 'tasteFilter',
 	store : new Ext.data.SimpleStore({
 		fields : [ 'value', 'text' ],
-		data : [[0, '全部'],[2, '价格'],[3, '名称'], [4, '类型']]
+		data : [[0, '全部'],[2, '价格'],[3, '名称']]
 	}),
 	valueField : 'value',
 	displayField : 'text',
@@ -50,7 +50,7 @@ var taste_filterTypeComb = new Ext.form.ComboBox({
 				ct.setVisible(false);
 				cn.setVisible(false);
 				tasteTypeComb.setVisible(true);
-				tasteTypeComb.store.loadData(tasteTypeData);
+				
 				tasteTypeComb.setValue(tasteTypeData[0][0]);
 				conditionType = tasteTypeComb.getId();
 			}
@@ -115,7 +115,7 @@ function initTasteGrid(){
 			hidden : true,
 			forceSelection : true,
 			width : 120,
-			value : tasteTypeData[0][0],
+			value : "规格",
 			store : new Ext.data.SimpleStore({
 				fields : [ 'value', 'text' ],
 				data : tasteTypeData
@@ -127,22 +127,28 @@ function initTasteGrid(){
 			triggerAction : 'all',
 			selectOnFocus : true,
 			allowBlank : false
-		},'->', {
+		},'->',{
+			text : '添加',
+			iconCls : 'btn_add',
+			handler : function(){
+				tasteInsertHandler();
+			}
+		}, {
 			text : '搜索',				
 			id : 'btnSerachForTasteBasic',
 			iconCls : 'btn_search',
-			handler : function(){
+			handler : function(nodeId){
 				var oCombo = Ext.getCmp('operator');
 				var st = Ext.getCmp('txtSearchForTextField');
 				var sn = Ext.getCmp('txtSearchForNumberField');
-				var cate = Ext.getCmp('comboSearchForTasteType');
+//				var cate = Ext.getCmp('comboSearchForTasteType');
 				var gs = tasteGrid.getStore();
 				gs.baseParams['ope'] = oCombo.getValue();
 				
 				gs.baseParams['alias'] = taste_filterTypeComb.getValue() == 1 ? sn.getValue() : '';
 				gs.baseParams['price'] = taste_filterTypeComb.getValue() == 2 ? sn.getValue() : '';
 				gs.baseParams['name'] = taste_filterTypeComb.getValue() == 3 ? st.getValue() : '';
-				gs.baseParams['cate'] = taste_filterTypeComb.getValue() == 4 ? cate.getValue() : '';					
+				gs.baseParams['cate'] = nodeId?nodeId : '';					
 				
 				gs.load({
 					params : {
@@ -174,6 +180,7 @@ function initTasteGrid(){
 		'',
 		tasteGridTbar
 	);	
+	tasteGrid.region = 'center';
 	tasteGrid.on('render', function(thiz){
 		Ext.getCmp('btnSerachForTasteBasic').handler();
 	});
@@ -181,6 +188,160 @@ function initTasteGrid(){
 		tasteUpdateHandler();
 	});
 	
+	tmm_tasteTree = new Ext.tree.TreePanel({
+		title : '口味分组',
+		id : 'tmm_tasteTree',
+		region : 'west',
+		width : 200,
+		rootVisible : true,
+		border : true,
+		autoScroll : true,
+		frame : true,
+		enableDD : true,
+		bodyStyle : 'backgroundColor:#FFFFFF; border:1px solid #99BBE8;',
+		root : new Ext.tree.AsyncTreeNode({
+			expanded : true,
+			text : '全部',
+			id : -1,
+			loader : new Ext.tree.TreeLoader({
+				dataUrl : '../../QueryTasteCate.do',
+				baseParams : {
+					dataSource : 'tree'
+				}
+			})
+		}),
+		tbar : [ '->', {
+			text : '添加',
+			iconCls : 'btn_add',
+			handler : function(e) {
+				tasteCateOperateHandler({otype : 'insert'});
+			}
+		}],
+		listeners : {
+			load : function(){
+				var nodes = tmm_tasteTree.getRootNode().childNodes;
+				tasteTypeData = [];
+				for (var i = 0; i < nodes.length; i++) {
+					tasteTypeData.push([nodes[i].id, nodes[i].attributes.tasteCateName]);
+					if(nodes[i].attributes.status == 1){
+						nodes[i].setText('<font color=\"#808080\">' + nodes[i].attributes.tasteCateName + '&nbsp;(系统保留)</font>');
+					}	
+				}
+				Ext.getCmp('comboTasteCate').store.loadData(tasteTypeData);
+			},
+			click : function(e){
+				Ext.getCmp('btnSerachForTasteBasic').handler(e.id);
+			},
+			enddrag : function(t,n,e){
+				var cateB;
+				if(n.nextSibling != null){
+					cateB = n.nextSibling.id;
+				}else{
+					cateB = n.previousSibling.id;
+				}
+				Ext.Ajax.request({
+					url : '../../OperateTasteCate.do',
+					params : {
+						cateA : n.id,
+						cateB : cateB,
+						dataSource : 'swap'
+					},
+					success : function(res, opt){
+						tmm_tasteTree.getRootNode().reload();
+					},
+					failure : function(res, opt){
+						Ext.ux.show(Ext.decode(res.responseText));
+					}
+				});
+				
+			}
+		}
+	});
+	
+}
+
+function initTasteCateOperatorWin(){
+	tasteCateOperatorWin = Ext.getCmp('taste_tasteCateOperatorWin');
+	if(!tasteCateOperatorWin){
+		tasteCateOperatorWin = new Ext.Window({
+			id : 'taste_tasteCateOperatorWin',
+			title : '添加',
+			width : 280,
+			closable : false,
+			resizable : false,
+			modal : true,
+			items : [{
+				layout : 'form',
+				labelWidth : 60,
+				width : 280,
+				border : false,
+				frame : true,
+				items : [{
+					xtype : 'textfield',
+					fieldLabel : '名称',
+					id : 'txtTasteCateName',
+					allowBlank : false,
+					width : 160
+				},{
+					xtype:'hidden',
+					id:'hideTasteCateId'
+				}]
+			}],
+			keys : [{
+				key : Ext.EventObject.ESC,
+				scope : this,
+				fn : function(){
+					tasteCateOperatorWin.hide();
+				}
+			}, {
+				key : Ext.EventObject.ENTER,
+				scope : this,
+				fn : function(){
+					Ext.getCmp().handler();
+				}
+			
+			}],
+			bbar : ['->', {
+				text : '保存',
+				iconCls : 'btn_save',
+				handler : function(){
+					var tasteCateName = Ext.getCmp('txtTasteCateName');
+					if(!tasteCateName.isValid()){
+						return;
+					}
+					Ext.Ajax.request({
+						url : '../../OperateTasteCate.do',
+						params : {
+							dataSource : tasteCateOperatorWin.otype,
+							tasteCateName : tasteCateName.getValue(),
+							categoryId : Ext.getCmp('hideTasteCateId').getValue()
+						},
+						success : function(res, opt){
+							var jr = Ext.decode(res.responseText);
+							if(jr.success){
+								Ext.ux.showMsg(jr);
+								tmm_tasteTree.getRootNode().reload();
+								tasteCateOperatorWin.hide();
+							}else{
+								Ext.ux.showMsg(jr);
+							}
+						},
+						failure : function(res, opt){
+							Ext.ux.showMsg(Ext.decode(res.responseText));
+						}
+					});
+				}
+			}, {
+				text : '取消',
+				id : 'btnCancelTasteCateWin',
+				iconCls : 'btn_cancel',
+				handler : function(){
+					tasteCateOperatorWin.hide();
+				}
+			}]
+			
+		});
+	}
 }
 
 function initTasteOperatorWin(){
@@ -201,15 +362,57 @@ function initTasteOperatorWin(){
 				border : false,
 				frame : true,
 				items : [{
-					xtype:'hidden',
-					id:'hideTasteId'
-				}, 
-				{
 					xtype : 'textfield',
 					fieldLabel : '名称',
 					id : 'txtTasteName',
 					allowBlank : false,
-					width : 160
+					width : 160,
+					listeners : {
+						focus : function(e){
+							e.focus(true, 100);
+						}
+					}
+				}, {
+					xtype : 'combo',
+					fieldLabel : '类型',
+					forceSelection : true,
+					width : 160,
+//					value : '规格',
+					id : 'comboTasteCate',
+					store : new Ext.data.SimpleStore({
+						fields : [ 'value', 'text' ],
+						data : tasteTypeData
+					}),
+					valueField : 'value',
+					displayField : 'text',
+					typeAhead : true,
+					mode : 'local',
+					triggerAction : 'all',
+					selectOnFocus : true,
+					allowBlank : false,
+					readOnly : true,
+					listeners : {
+						select : function(e){
+							var tastePrice = Ext.getCmp('numTastePrice');
+							var tasteRate = Ext.getCmp('numTasteRate');
+							var displayCalc = Ext.getCmp('txtDisplayCalc');
+							if(e.getEl().dom.value == '规格'){
+								tastePrice.setDisabled(true);
+								tasteRate.setDisabled(false);
+								tastePrice.setValue(0);
+								displayCalc.setValue('按比例');
+								
+							}else{
+								tastePrice.setDisabled(false);
+								tasteRate.setDisabled(true);
+								tasteRate.setValue(0);
+								displayCalc.setValue('按价格');
+							}
+						},
+						render : function(e){
+							e.store.loadData(tasteTypeData);
+						}
+					}
 				}, {
 					xtype : 'numberfield',
 					fieldLabel : '价格',
@@ -240,42 +443,8 @@ function initTasteOperatorWin(){
 					width : 160,
 					value : '按价格'
 				}, {
-					xtype : 'combo',
-					fieldLabel : '类型',
-					forceSelection : true,
-					width : 160,
-					value : tasteTypeData[0][0],
-					id : 'comboTasteCate',
-					store : new Ext.data.SimpleStore({
-						fields : [ 'value', 'text' ],
-						data : tasteTypeData
-					}),
-					valueField : 'value',
-					displayField : 'text',
-					typeAhead : true,
-					mode : 'local',
-					triggerAction : 'all',
-					selectOnFocus : true,
-					allowBlank : false,
-					readOnly : true,
-					listeners : {
-						select : function(e){
-							var tastePrice = Ext.getCmp('numTastePrice');
-							var tasteRate = Ext.getCmp('numTasteRate');
-							var displayCalc = Ext.getCmp('txtDisplayCalc');
-							tastePrice.setValue(0);
-							tasteRate.setValue(0);
-							if(e.getValue() == 0){
-								tastePrice.setDisabled(false);
-								tasteRate.setDisabled(true);
-								displayCalc.setValue('按价格');
-							}else if(e.getValue() == 2){
-								tastePrice.setDisabled(true);
-								tasteRate.setDisabled(false);
-								displayCalc.setValue('按比例');
-							}
-						}
-					}
+					xtype:'hidden',
+					id:'hideTasteId'
 				}]
 			}],
 			keys : [{
@@ -302,6 +471,9 @@ function initTasteOperatorWin(){
 					var tasteRate = Ext.getCmp('numTasteRate');
 					var tasteCate = Ext.getCmp('comboTasteCate');
 					
+					if(!tasteCate.isValid()){
+						return;
+					}
 					if(tasteCate.getValue() == 0){
 						if(!tastePrice.isValid()){
 							return;
@@ -311,6 +483,7 @@ function initTasteOperatorWin(){
 							return;
 						}
 					}
+
 					
 					var btnSave = Ext.getCmp('btnSaveTaste');
 					var btnCancel = Ext.getCmp('btnCancelTasteWin');
@@ -373,21 +546,16 @@ var tasteAddBut = new Ext.ux.ImageButton({
 Ext.onReady(function() {
 	initTasteGrid();
 	initTasteOperatorWin();
+	initTasteCateOperatorWin();
 	
 	new Ext.Panel({
-		title : '口味管理',
+//		title : '口味管理',
 		renderTo : 'divTaste',
 		width : parseInt(Ext.getDom('divTaste').parentElement.style.width.replace(/px/g,'')),
 		height : parseInt(Ext.getDom('divTaste').parentElement.style.height.replace(/px/g,'')),
-		layout : 'fit',
+		layout : 'border',
 		frame : true,
-		items : [tasteGrid],
-		tbar : new Ext.Toolbar({
-			height : 55,
-			items : [
-			    tasteAddBut
-			]
-		}),
+		items : [tmm_tasteTree, tasteGrid],
 		keys : [{
 			key : Ext.EventObject.ENTER,
 			scope : this,
@@ -398,6 +566,36 @@ Ext.onReady(function() {
 	});
 });
 
+function ko(e){
+	alert(e);
+//	alert('ko'+e.name);
+}
+$(function(){
+	
+//	var c = {name : '修改2', fn : "tasteCateOperateHandler({otype : 'update'})"};
+	var c = {name : '修改2', fn : "ko('name')"};
+	$("#over").append('<a href="javascript:void(0)" onclick='+ c.fn + '>'+ c.name +'</a>');
+	
+	
+	var nodex=0,x=0;
+	$("#tmm_tasteTree").mouseover(function(){
+		$("#tmm_tasteTree").find("li").find("li").mouseover(function(){
+			nodeId = $(this).find("div").attr("ext:tree-node-id");
+			var offset = $(this).find("a").offset();
+			nodex = offset.left-18;
+			x = (offset.left+$(this).find("a").width()+100);
+			$('#over').css({left :offset.left+$(this).find("a").width(), top : (offset.top-2)});
+			$('#over').show();
+		});
+		
+		$(document).mousemove(function(event){
+			if(event.clientX > x || event.clientX < nodex){
+				$('#over').hide();
+			}
+		});
+
+	});
+});
 
 /**
  * 
@@ -439,6 +637,80 @@ function tasteDeleteHandler() {
 	});
 };
 
+
+function tasteCateOperateHandler(c){
+	if(c == null || typeof c == 'undefined' || typeof c.otype == 'undefined'){
+		return;
+	}
+	var cateId = Ext.getCmp('hideTasteCateId');
+	var cateName = Ext.getCmp('txtTasteCateName');
+	if(c.otype == 'insert'){
+		tasteCateOperatorWin.otype = 'insert';
+		tasteCateOperatorWin.show();
+		tasteCateOperatorWin.center();
+		cateName.setDisabled(false);
+		tasteCateOperatorWin.setTitle("添加新口味类型");
+		cateId.setValue();
+		cateName.setValue();
+		cateName.clearInvalid();
+	}else if(c.otype == 'update'){
+		var tn = tmm_tasteTree.getNodeById(nodeId);
+		if(!tn){
+			Ext.example.msg('提示', '操作失败, 请选中一条数据再进行操作.');
+			return;
+		}else{
+			if(tn.attributes.status == 1){
+				Ext.getCmp('txtTasteCateName').setDisabled(true);
+			}
+		}
+		
+		tasteCateOperatorWin.otype = 'update';
+		tasteCateOperatorWin.show();
+		tasteCateOperatorWin.center();
+		tasteCateOperatorWin.setTitle("修改口味类型");
+		cateId.setValue(tn.id);
+		cateName.setValue(tn.attributes.tasteCateName);
+	}else if(c.otype == 'delete'){
+		var tn = tmm_tasteTree.getNodeById(nodeId);
+		if(!tn){
+			Ext.example.msg('提示', '操作失败, 请选中一条数据再进行操作.');
+			return;
+		}else{
+			if(tn.attributes.status == 1){
+				return;
+			}
+			Ext.Msg.confirm(
+				'提示',
+				'是否删除口味类型',
+				function(e){
+					if(e == 'yes'){
+						Ext.Ajax.request({
+							url : '../../OperateTasteCate.do',
+							params : {
+								dataSource : 'delete',
+								categoryId : tn.id
+							},
+							success : function(res, opt){
+								var jr = Ext.util.JSON.decode(res.responseText);
+								if(jr.success){
+									Ext.example.msg(jr.title, jr.msg);
+									tmm_tasteTree.getRootNode().reload();
+								}else{
+									Ext.ux.showMsg(jr);
+								}
+							},
+							failure : function(res, opt){
+								Ext.ux.showMsg(Ext.util.JSON.decode(res.responseText));
+							}
+						});
+					}
+				},
+				this
+			);
+		}
+	}
+}
+
 function tasteInsertHandler(){
 	tasteOperatorWin.otype = Ext.ux.otype['insert'];
 	tasteOperatorWin.show();
@@ -478,7 +750,7 @@ function operatorWinData(c){
 	if(c.otype == Ext.ux.otype['set']){
 		tasteId.setValue(c.data['id']);
 		tasteName.setValue(c.data['name']);
-		tasteCate.setValue(typeof c.data['cateValue'] == 'undefined' ? 0 : c.data['cateValue']);
+		tasteCate.setValue(typeof c.data['cateValue'] == 'undefined' ? '' : c.data['cateValue']);
 		tasteCate.fireEvent('select', tasteCate);
 		if(c.data['typeValue'] == 1){
 			tasteCate.setDisabled(true);
@@ -491,6 +763,8 @@ function operatorWinData(c){
 		tasteName.clearInvalid();
 		tastePrice.clearInvalid();
 		tasteRate.clearInvalid();
+		tasteCate.clearInvalid();
+		tasteName.focus();
 	}else if(c.otype == Ext.ux.otype['get']){
 		c.data = {
 			id : tasteId.getValue(),
