@@ -31,7 +31,7 @@
             android:paddingLeft="15dp"
             android:paddingRight="15dp"
             android:paddingTop="10dp"
-            android:src="@drawable/search_selector" />
+            android:src="@drawable/erase_selector" />
     </RelativeLayout>
 
     <GridView

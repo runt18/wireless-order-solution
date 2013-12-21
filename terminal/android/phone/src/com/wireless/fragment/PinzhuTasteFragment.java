@@ -9,11 +9,13 @@ import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
+import android.view.View.OnClickListener;
 import android.view.View.OnFocusChangeListener;
 import android.view.View.OnTouchListener;
+import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.wireless.parcel.OrderFoodParcel;
@@ -137,6 +139,14 @@ public class PinzhuTasteFragment extends Fragment{
 			
 		});
 		
+		//品注的删除Button处理函数
+		((ImageButton)view.findViewById(R.id.imgButton_deletePinZhu_pickPinzhuFgm)).setOnClickListener(new OnClickListener(){
+			@Override
+			public void onClick(View v) {
+				pinZhuEdtTxt.setText("");
+			}
+		});
+		
         //点击价钱EditText后全选内容并弹出软键盘
 		priceEdtTxt.setOnTouchListener(new OnTouchListener(){
 			@Override
@@ -192,6 +202,14 @@ public class PinzhuTasteFragment extends Fragment{
 				
 			}
 			
+		});
+		
+		//品注的删除Button处理函数
+		((ImageButton)view.findViewById(R.id.imgButton_deletePrice_pickPinzhuFgm)).setOnClickListener(new OnClickListener(){
+			@Override
+			public void onClick(View v) {
+				priceEdtTxt.setText("");
+			}
 		});
 		
 		return view;
