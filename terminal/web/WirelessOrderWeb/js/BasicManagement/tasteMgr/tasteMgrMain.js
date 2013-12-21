@@ -222,6 +222,18 @@ function initTasteGrid(){
 			handler : function(e) {
 				tasteCateOperateHandler({otype : 'insert'});
 			}
+		},{
+			text : '修改',
+			iconCls : 'btn_edit',
+			handler : function(e) {
+				tasteCateOperateHandler({otype : 'update'});
+			}
+		},{
+			text : '删除',
+			iconCls : 'btn_delete',
+			handler : function(e) {
+				tasteCateOperateHandler({otype : 'delete'});
+			}
 		}],
 		listeners : {
 			load : function(){
