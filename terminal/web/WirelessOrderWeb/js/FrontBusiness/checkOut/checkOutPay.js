@@ -289,7 +289,7 @@ function memberPay(){
 											style : 'vertical-align:middle; line-height:36px; padding-left:20px; font-size:15px; font-weight: bold;'
 										},
 										items : [{
-											html : '会员名称：￥<font color="red">' + member.name + '</font>'
+											html : '会员名称：<font color="red">' + member.name + '</font>'
 										}, {
 											html : '本次消费：￥<font color="red">' + newOrder.actualPrice.toFixed(2) + '</font>'
 										}, {

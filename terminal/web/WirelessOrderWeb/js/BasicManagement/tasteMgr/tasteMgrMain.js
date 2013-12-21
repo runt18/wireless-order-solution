@@ -71,7 +71,13 @@ function tasteGridRenderer(value, cellmeta, record, rowIndex, columnIndex, store
 function initTasteGrid(){
 	var tasteGridTbar = new Ext.Toolbar({
 		height : 26,
-		items : [ { 
+		items : [ {
+			xtype : 'tbtext',
+			text : String.format(
+				Ext.ux.txtFormat.typeName,
+				'类型','lblTasteCateName','全部'
+			)
+		},{ 
 			xtype:'tbtext',
 			text:'过滤:'
 		}, taste_filterTypeComb, { 
@@ -222,15 +228,23 @@ function initTasteGrid(){
 				var nodes = tmm_tasteTree.getRootNode().childNodes;
 				tasteTypeData = [];
 				for (var i = 0; i < nodes.length; i++) {
-					tasteTypeData.push([nodes[i].id, nodes[i].attributes.tasteCateName]);
 					if(nodes[i].attributes.status == 1){
 						nodes[i].setText('<font color=\"#808080\">' + nodes[i].attributes.tasteCateName + '&nbsp;(系统保留)</font>');
+					}else{
+						tasteTypeData.push([nodes[i].id, nodes[i].attributes.tasteCateName]);
 					}	
 				}
 				Ext.getCmp('comboTasteCate').store.loadData(tasteTypeData);
 			},
 			click : function(e){
+				tastem_selectedId = e.id;
 				Ext.getCmp('btnSerachForTasteBasic').handler(e.id);
+				Ext.getDom('lblTasteCateName').innerHTML = e.attributes.tasteCateName;
+				if(e.attributes.status == 1){
+					tastem_add = false;
+				}else{
+					tastem_add = true;
+				}
 			},
 			enddrag : function(t,n,e){
 				var cateB;
@@ -281,7 +295,12 @@ function initTasteCateOperatorWin(){
 					fieldLabel : '名称',
 					id : 'txtTasteCateName',
 					allowBlank : false,
-					width : 160
+					width : 160,
+					listeners : {
+						focus : function(e){
+							e.focus(true, 100);
+						}
+					}
 				},{
 					xtype:'hidden',
 					id:'hideTasteCateId'
@@ -297,12 +316,13 @@ function initTasteCateOperatorWin(){
 				key : Ext.EventObject.ENTER,
 				scope : this,
 				fn : function(){
-					Ext.getCmp().handler();
+					Ext.getCmp('taste_btnSave').handler();
 				}
 			
 			}],
 			bbar : ['->', {
 				text : '保存',
+				id : 'taste_btnSave',
 				iconCls : 'btn_save',
 				handler : function(){
 					var tasteCateName = Ext.getCmp('txtTasteCateName');
@@ -507,7 +527,7 @@ function initTasteOperatorWin(){
 							if(jr.success){
 								tasteOperatorWin.hide();
 								Ext.example.msg(jr.title, jr.msg);
-								Ext.getCmp('btnSerachForTasteBasic').handler();
+								Ext.getCmp('btnSerachForTasteBasic').handler(tastem_selectedId);
 							}else{
 								Ext.ux.showMsg(jr);
 							}
@@ -566,21 +586,21 @@ Ext.onReady(function() {
 	});
 });
 
-function ko(e){
-	alert(e);
-//	alert('ko'+e.name);
+function createFloatBar(e){
+	showFloatOption(e.treeId);
+	for (var i = 0; i < e.option.length; i++) {
+		if(i > 0){
+			$("#over").append('|&nbsp;');
+		}
+		$("#over").append('<a href="javascript:void(0)" onclick='+e.option[i].fn+'>'+ e.option[i].name +'</a>&nbsp;');
+	}
 }
-$(function(){
-	
-//	var c = {name : '修改2', fn : "tasteCateOperateHandler({otype : 'update'})"};
-/*	var c = {name : '修改2', fn : "ko('name')"};
-	$("#over").append('<a href="javascript:void(0)" onclick='+ c.fn + '>'+ c.name +'</a>');*/
-	
-	
+
+function showFloatOption(treeId){
 	var nodex=0,x=0;
-	$("#tmm_tasteTree").mouseover(function(){
-		$("#tmm_tasteTree").find("li").find("li").mouseover(function(){
-			nodeId = $(this).find("div").attr("ext:tree-node-id");
+	$("#"+treeId).mouseover(function(){
+		$("#"+treeId).find("li").find("li").mouseover(function(){
+			tastem_nodeId = $(this).find("div").attr("ext:tree-node-id");
 			var offset = $(this).find("a").offset();
 			nodex = offset.left-18;
 			x = (offset.left+$(this).find("a").width()+100);
@@ -595,6 +615,10 @@ $(function(){
 		});
 
 	});
+}
+$(function(){
+	var bar = {treeId : 'tmm_tasteTree', option :[{name : '修改', fn : "tasteCateOperateHandler({otype:'update'})"}, {name : '删除', fn : "tasteCateOperateHandler({otype:'delete'})"}]};
+	createFloatBar(bar);
 });
 
 /**
@@ -644,24 +668,25 @@ function tasteCateOperateHandler(c){
 	}
 	var cateId = Ext.getCmp('hideTasteCateId');
 	var cateName = Ext.getCmp('txtTasteCateName');
+	
 	if(c.otype == 'insert'){
 		tasteCateOperatorWin.otype = 'insert';
 		tasteCateOperatorWin.show();
 		tasteCateOperatorWin.center();
-		cateName.setDisabled(false);
 		tasteCateOperatorWin.setTitle("添加新口味类型");
 		cateId.setValue();
 		cateName.setValue();
 		cateName.clearInvalid();
+		cateName.focus();
 	}else if(c.otype == 'update'){
-		var tn = tmm_tasteTree.getNodeById(nodeId);
-		cateName.setDisabled(false);
+		var tn = tmm_tasteTree.getNodeById(tastem_nodeId);
 		if(!tn){
 			Ext.example.msg('提示', '操作失败, 请选中一条数据再进行操作.');
 			return;
 		}else{
 			if(tn.attributes.status == 1){
-				Ext.getCmp('txtTasteCateName').setDisabled(true);
+				Ext.example.msg('提示', '系统保留,不能修改.');
+				return;
 			}
 		}
 		
@@ -671,8 +696,9 @@ function tasteCateOperateHandler(c){
 		tasteCateOperatorWin.setTitle("修改口味类型");
 		cateId.setValue(tn.id);
 		cateName.setValue(tn.attributes.tasteCateName);
+		cateName.focus();
 	}else if(c.otype == 'delete'){
-		var tn = tmm_tasteTree.getNodeById(nodeId);
+		var tn = tmm_tasteTree.getNodeById(tastem_nodeId);
 		if(!tn){
 			Ext.example.msg('提示', '操作失败, 请选中一条数据再进行操作.');
 			return;
@@ -683,7 +709,7 @@ function tasteCateOperateHandler(c){
 			}
 			Ext.Msg.confirm(
 				'提示',
-				'是否删除口味类型',
+				'是否删除: ' + tn.text,
 				function(e){
 					if(e == 'yes'){
 						Ext.Ajax.request({
@@ -695,7 +721,7 @@ function tasteCateOperateHandler(c){
 							success : function(res, opt){
 								var jr = Ext.util.JSON.decode(res.responseText);
 								if(jr.success){
-									Ext.example.msg(jr.title, jr.msg);
+									Ext.example.msg(jr.title, '<font style="color:red">'+tn.text+'</font>&nbsp;删除成功');
 									tmm_tasteTree.getRootNode().reload();
 								}else{
 									Ext.ux.showMsg(jr);
@@ -714,6 +740,10 @@ function tasteCateOperateHandler(c){
 }
 
 function tasteInsertHandler(){
+	if(!tastem_add){
+		Ext.example.msg('提示', '操作失败, 规格不能添加.');
+		return;
+	}
 	tasteOperatorWin.otype = Ext.ux.otype['insert'];
 	tasteOperatorWin.show();
 	tasteOperatorWin.center();
@@ -752,10 +782,11 @@ function operatorWinData(c){
 	if(c.otype == Ext.ux.otype['set']){
 		tasteId.setValue(c.data['id']);
 		tasteName.setValue(c.data['name']);
-		tasteCate.setValue(typeof c.data['cateValue'] == 'undefined' ? '' : c.data['cateValue']);
+		tasteCate.setValue(typeof c.data['cateValue'] == 'undefined' ? tastem_selectedId : c.data['cateValue']);
 		tasteCate.fireEvent('select', tasteCate);
 		if(c.data['typeValue'] == 1){
 			tasteCate.setDisabled(true);
+			tasteCate.setValue('规格');
 		}else{
 			tasteCate.setDisabled(false);
 		}
