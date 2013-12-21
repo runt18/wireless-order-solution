@@ -573,8 +573,8 @@ function ko(e){
 $(function(){
 	
 //	var c = {name : '修改2', fn : "tasteCateOperateHandler({otype : 'update'})"};
-	var c = {name : '修改2', fn : "ko('name')"};
-	$("#over").append('<a href="javascript:void(0)" onclick='+ c.fn + '>'+ c.name +'</a>');
+/*	var c = {name : '修改2', fn : "ko('name')"};
+	$("#over").append('<a href="javascript:void(0)" onclick='+ c.fn + '>'+ c.name +'</a>');*/
 	
 	
 	var nodex=0,x=0;
