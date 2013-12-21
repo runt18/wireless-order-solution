@@ -1,4 +1,7 @@
-﻿//-----------------load
+﻿String.prototype.trim=function() {  
+    return this.replace(/(^\s*)|(\s*$)/g,'');  
+};  
+//-----------------load
 var taste_filterTypeComb = new Ext.form.ComboBox({
 	fieldLabel : '过滤',
 	forceSelection : true,
@@ -340,7 +343,7 @@ function initTasteCateOperatorWin(){
 				iconCls : 'btn_save',
 				handler : function(){
 					var tasteCateName = Ext.getCmp('txtTasteCateName');
-					if(!tasteCateName.isValid()){
+					if(!tasteCateName.isValid() || !tasteCateName.getValue().trim()){
 						return;
 					}
 					Ext.Ajax.request({
@@ -505,7 +508,7 @@ function initTasteOperatorWin(){
 					var tasteRate = Ext.getCmp('numTasteRate');
 					var tasteCate = Ext.getCmp('comboTasteCate');
 					
-					if(!tasteCate.isValid() || !tasteName.isValid()){
+					if(!tasteCate.isValid() || !tasteName.isValid() || !tasteName.getValue().trim()){
 						return;
 					}
 					if(tasteCate.getValue() == 0){
@@ -625,6 +628,7 @@ function showFloatOption(obj_b){
 		$(document).mousemove(function(event){
 			if(event.clientX > x || event.clientX < nodex){
 				$('#div_floatBar').hide();
+				tastem_nodeId ="";
 			}
 		});
 
@@ -693,7 +697,7 @@ function tasteCateOperateHandler(c){
 		cateName.clearInvalid();
 		cateName.focus();
 	}else if(c.otype == 'update'){
-		var tn = tmm_tasteTree.getNodeById(tastem_nodeId);
+		var tn = tmm_tasteTree.getNodeById(tastem_nodeId==""?tastem_selectedId:tastem_nodeId);
 		if(!tn){
 			Ext.example.msg('提示', '操作失败, 请选中一条数据再进行操作.');
 			return;
@@ -712,7 +716,7 @@ function tasteCateOperateHandler(c){
 		cateName.setValue(tn.attributes.tasteCateName);
 		cateName.focus();
 	}else if(c.otype == 'delete'){
-		var tn = tmm_tasteTree.getNodeById(tastem_nodeId);
+		var tn = tmm_tasteTree.getNodeById(tastem_nodeId==""?tastem_selectedId:tastem_nodeId);
 		if(!tn){
 			Ext.example.msg('提示', '操作失败, 请选中一条数据再进行操作.');
 			return;
