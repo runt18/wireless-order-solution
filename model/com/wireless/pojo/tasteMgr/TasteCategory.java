@@ -43,7 +43,11 @@ public class TasteCategory implements Parcelable{
 		
 		public InsertBuilder(int restaurantId, String name){
 			this.restaurantId = restaurantId;
-			this.name = name;
+			if(name.trim().length() != 0){
+				this.name = name;
+			}else{
+				throw new IllegalArgumentException("类型名称不能为空");
+			}
 		}
 		
 		InsertBuilder setType(Type type){
@@ -67,7 +71,11 @@ public class TasteCategory implements Parcelable{
 		
 		public UpdateBuilder(int id, String name){
 			this.id = id;
-			this.name = name;
+			if(name.trim().length() != 0){
+				this.name = name;
+			}else{
+				throw new IllegalArgumentException("类型名称不能为空");
+			}
 		}
 		
 		public TasteCategory build(){
