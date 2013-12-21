@@ -188,7 +188,7 @@ public class QueryPrivilegeAction extends DispatchAction{
 				if(privilege.getCode() == Code.INVENTORY){
 					tree.append("{");
 					tree.append("leaf:false");
-					tree.append(",expanded:true");
+//					tree.append(",expanded:true");
 					tree.append(",id:'stockMgr'");
 					tree.append(",text:'库存'");
 					tree.append(",cls:'tFont'");
