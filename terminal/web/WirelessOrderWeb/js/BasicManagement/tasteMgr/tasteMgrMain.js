@@ -239,11 +239,13 @@ function initTasteGrid(){
 			click : function(e){
 				tastem_selectedId = e.id;
 				Ext.getCmp('btnSerachForTasteBasic').handler(e.id);
-				Ext.getDom('lblTasteCateName').innerHTML = e.attributes.tasteCateName;
+				
 				if(e.attributes.status == 1){
 					tastem_add = false;
+					Ext.getDom('lblTasteCateName').innerHTML = e.attributes.tasteCateName;
 				}else{
 					tastem_add = true;
+					Ext.getDom('lblTasteCateName').innerHTML = e.text;
 				}
 			},
 			enddrag : function(t,n,e){
@@ -491,7 +493,7 @@ function initTasteOperatorWin(){
 					var tasteRate = Ext.getCmp('numTasteRate');
 					var tasteCate = Ext.getCmp('comboTasteCate');
 					
-					if(!tasteCate.isValid()){
+					if(!tasteCate.isValid() || !tasteName.isValid()){
 						return;
 					}
 					if(tasteCate.getValue() == 0){
@@ -586,31 +588,31 @@ Ext.onReady(function() {
 	});
 });
 
-function createFloatBar(e){
-	showFloatOption(e.treeId);
-	for (var i = 0; i < e.option.length; i++) {
-		if(i > 0){
-			$("#over").append('|&nbsp;');
-		}
-		$("#over").append('<a href="javascript:void(0)" onclick='+e.option[i].fn+'>'+ e.option[i].name +'</a>&nbsp;');
-	}
-}
-
-function showFloatOption(treeId){
+function showFloatOption(obj_b){
+	//记录节点的位置和鼠标位置
 	var nodex=0,x=0;
-	$("#"+treeId).mouseover(function(){
-		$("#"+treeId).find("li").find("li").mouseover(function(){
+	var offset;
+	//生成浮动bar
+	for (var i = 0; i < obj_b.option.length; i++) {
+		if(i > 0){
+			$("#div_floatBar").append('|&nbsp;');
+		}
+		$("#div_floatBar").append('<a href="javascript:void(0)" onclick='+obj_b.option[i].fn+'>'+ obj_b.option[i].name +'</a>&nbsp;');
+	}
+	//把bar加到tree上
+	$("#"+obj_b.treeId).mouseover(function(){
+		$("#"+obj_b.treeId).find("li").find("li").mouseover(function(){
 			tastem_nodeId = $(this).find("div").attr("ext:tree-node-id");
-			var offset = $(this).find("a").offset();
+			offset = $(this).find("a").offset();
 			nodex = offset.left-18;
 			x = (offset.left+$(this).find("a").width()+100);
-			$('#over').css({left :offset.left+$(this).find("a").width(), top : (offset.top-2)});
-			$('#over').show();
+			$('#div_floatBar').css({left :offset.left+$(this).find("a").width(), top : (offset.top-2)});
+			$('#div_floatBar').show();
 		});
 		
 		$(document).mousemove(function(event){
 			if(event.clientX > x || event.clientX < nodex){
-				$('#over').hide();
+				$('#div_floatBar').hide();
 			}
 		});
 
@@ -618,7 +620,7 @@ function showFloatOption(treeId){
 }
 $(function(){
 	var bar = {treeId : 'tmm_tasteTree', option :[{name : '修改', fn : "tasteCateOperateHandler({otype:'update'})"}, {name : '删除', fn : "tasteCateOperateHandler({otype:'delete'})"}]};
-	createFloatBar(bar);
+	showFloatOption(bar);
 });
 
 /**
@@ -647,7 +649,7 @@ function tasteDeleteHandler() {
 						var jr = Ext.decode(response.responseText);
 						if (jr.success == true) {							
 							Ext.example.msg('提示', jr.msg);
-							Ext.getCmp('btnSerachForTasteBasic').handler();
+							Ext.getCmp('btnSerachForTasteBasic').handler(tastem_selectedId);
 						} else {
 							Ext.ux.showMsg(jr);
 						}
