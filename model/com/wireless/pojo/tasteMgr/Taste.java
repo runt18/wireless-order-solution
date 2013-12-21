@@ -138,7 +138,11 @@ public class Taste implements Parcelable, Comparable<Taste>, Jsonable{
 		
 		public InsertBuilder(int restaurantId, String pref, TasteCategory category){
 			this.restaurantId = restaurantId;
-			this.preference = pref;
+			if(pref.trim().length() != 0){
+				this.preference = pref;
+			}else{
+				throw new IllegalArgumentException("输入的口味名称不能为空");
+			}
 			this.category = category;
 		}
 		
@@ -210,7 +214,11 @@ public class Taste implements Parcelable, Comparable<Taste>, Jsonable{
 		}
 		
 		public UpdateBuilder setPrefence(String pref){
-			this.preference = pref;
+			if(pref.trim().length() != 0){
+				this.preference = pref;
+			}else{
+				throw new IllegalArgumentException("输入的口味名称不能为空");
+			}
 			return this;
 		}
 		
