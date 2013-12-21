@@ -12,8 +12,9 @@
 	var pageRecordCount = 30;
 	
 	var tasteData = [];
-	var tasteGrid, tasteOperatorWin;
-	var tasteTypeData = [[0, '口味'], [2, '规格']];
+	var tasteGrid, tasteOperatorWin, tmm_tasteTree;
+	var tasteTypeData = [];
+	var nodeId;
 </script>
 
 <script type="text/javascript" src="../../js/BasicManagement/tasteMgr/tasteMgrMain.js"></script>
@@ -28,6 +29,19 @@
 	}
 	.x-toolbar table{
 		vertical-align : middle;
+	}
+ 	.test{
+		background-color: red;
+	} 
+	.loginBtn {
+		background-image: -webkit-linear-gradient(to top, #000000, #000000);
+		/* background-image: -moz-linear-gradient(to bottom, #B5DEF2, #85CFEE); */
+		border: 1px solid #fff;
+		/* border-radius: 10px; */
+		box-shadow:inset rgba(255,255,255,0.6) 0 1px 1px, rgba(0,0,0,0.1) 0 1px 1px;
+		color: black;
+		font: bold 12px Arial;
+		padding: 1px 14px;
 	}
 </style> 
 

@@ -317,8 +317,7 @@ function setCookie(cookiename, cookievalue, days) {
   					data : {
   						account : $('#name').val()
   					},
-  					success : function(data, status, xhr){
-  						var jr = jQuery.parseJSON(data);
+  					success : function(jr, status, xhr){
   						if(jr.success){
   							if(jr.root == ''){
   								alert('账号输入错误');
