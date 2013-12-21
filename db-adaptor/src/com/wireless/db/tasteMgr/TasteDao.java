@@ -11,7 +11,6 @@ import com.wireless.exception.BusinessException;
 import com.wireless.exception.TasteError;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.tasteMgr.Taste;
-import com.wireless.pojo.tasteMgr.TasteCategory;
 
 public class TasteDao {
 
@@ -182,10 +181,11 @@ public class TasteDao {
 	 */
 	public static List<Taste> getTastes(DBCon dbCon, Staff staff, String extraCond, String orderClause) throws SQLException, BusinessException{
 		String sql = " SELECT " +
-				 	 " taste_id, restaurant_id, preference, " +
-				 	 " category_id, calc, rate, price, type " +
+				 	 " TASTE.taste_id, TASTE.restaurant_id, TASTE.preference, " +
+				 	 " TASTE.category_id, TASTE.calc, TASTE.rate, TASTE.price, TASTE.type, TCATE.name " +
 				 	 " FROM " + 
 				 	 Params.dbName + ".taste TASTE " +
+				 	 " JOIN " + Params.dbName + ".taste_category TCATE ON TCATE.category_id = TASTE.category_id " +
 				 	 " WHERE 1=1 " +
 				 	 " AND TASTE.restaurant_id = " + staff.getRestaurantId() + " " +
 				 	 (extraCond == null ? "" : extraCond) + " " +
@@ -197,7 +197,7 @@ public class TasteDao {
 			Taste taste = new Taste(dbCon.rs.getInt("taste_id"));
 			taste.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
 			taste.setPreference(dbCon.rs.getString("preference"));
-			taste.setCategory(new TasteCategory(dbCon.rs.getInt("category_id")));
+			taste.setCategoryIdAndName(dbCon.rs.getInt("category_id"), dbCon.rs.getString("name"));
 			taste.setCalc(dbCon.rs.getShort("calc"));
 			taste.setRate(dbCon.rs.getFloat("rate"));
 			taste.setPrice(dbCon.rs.getFloat("price"));
@@ -318,7 +318,7 @@ public class TasteDao {
 			  (builder.isPrefChanged() ? " ,preference = '" + tasteToUpdate.getPreference() + "'" : "") +
 			  (builder.isRateChanged() ? " ,rate = " + tasteToUpdate.getRate() : "") +
 			  (builder.isPriceChanged() ?" ,price = " + tasteToUpdate.getPrice() : "") +
-			  (builder.isCategoryChanged() ? " ,category = " + tasteToUpdate.getCategory().getId() : "") +
+			  (builder.isCategoryChanged() ? " ,category_id = " + tasteToUpdate.getCategory().getId() : "") +
 			  (builder.isCategoryChanged() ? " ,calc = " + tasteToUpdate.getCalc().getVal() : "") +
 			  " WHERE restaurant_id = " + staff.getRestaurantId() +
 			  " AND taste_id = " + tasteToUpdate.getTasteId();
