@@ -249,13 +249,15 @@ public class AskTableDialog extends DialogFragment {
 	    tblNumEditTxt.setOnFocusChangeListener(new OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
-            	tblNumEditTxt.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-                        imm.showSoftInput(tblNumEditTxt, InputMethodManager.SHOW_IMPLICIT);
-                    }
-                });
+            	if(hasFocus){
+	            	tblNumEditTxt.post(new Runnable() {
+	                    @Override
+	                    public void run() {
+	                        InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+	                        imm.showSoftInput(tblNumEditTxt, InputMethodManager.SHOW_IMPLICIT);
+	                    }
+	                });
+            	}
             }
         });
 	    tblNumEditTxt.requestFocus();

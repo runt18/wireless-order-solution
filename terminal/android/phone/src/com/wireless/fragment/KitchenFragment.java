@@ -20,7 +20,6 @@ import android.widget.ExpandableListView.OnGroupExpandListener;
 import android.widget.GridView;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -64,21 +63,21 @@ public class KitchenFragment extends Fragment {
 			int i = 0;
 			for(Department dept : WirelessOrder.foodMenu.depts){
 				//解析跟图层
-				RelativeLayout view = (RelativeLayout) LayoutInflater.from(fragment.getActivity()).inflate(R.layout.pick_food_by_kitchen_fgm_dept_item, null);
+				View view = LayoutInflater.from(fragment.getActivity()).inflate(R.layout.pick_food_by_kitchen_fgm_dept_item, null);
 				
 				//解析子图层并设置颜色
-				final RelativeLayout childView = (RelativeLayout) view.findViewById(R.id.relativeLayout_child_kcFgm);
-				childView.setBackgroundResource(R.color.orange);
+				final View bgView = view.findViewById(R.id.txtView_bg_kitchenFgm_dept_item);
+				bgView.setBackgroundResource(R.color.orange);
 
 				//设置第一项为选中状态
 				if(i == 0){
-					mDeptLayout.setTag(childView);
-					childView.setBackgroundResource(R.color.gold);
+					mDeptLayout.setTag(bgView);
+					bgView.setBackgroundResource(R.color.gold);
 				}
 				i++;
 				
 				//设置该项名称
-				((TextView)view.findViewById(R.id.textView_kitchenFragment_dept_item)).setText(dept.getName());
+				((TextView)view.findViewById(R.id.txtView_name_kitchenFgm_dept_item)).setText(dept.getName());
 				
 				view.setTag(dept);
 				
@@ -94,9 +93,9 @@ public class KitchenFragment extends Fragment {
 						if(mDeptLayout.getTag() != null){
 							((View)(mDeptLayout.getTag())).setBackgroundResource(R.color.orange);
 						}
-						mDeptLayout.setTag(childView);
+						mDeptLayout.setTag(bgView);
 						//设置该项的点击状态
-						childView.setBackgroundResource(R.color.gold);
+						bgView.setBackgroundResource(R.color.gold);
 						
 						//若关闭按钮显示，则取消显示
 						ImageButton collapseBtn = (ImageButton) fragment.getView().findViewById(R.id.imageButton_collaps_kitchenFgm);

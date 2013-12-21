@@ -40,7 +40,6 @@ import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.tasteMgr.Taste;
-import com.wireless.pojo.tasteMgr.TasteGroup;
 import com.wireless.pojo.util.NumericUtil;
 import com.wireless.ui.PickFoodActivity;
 import com.wireless.ui.PickTasteActivity;
@@ -146,7 +145,7 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 					map.put(ITEM_FOOD_NAME, f.getName());
 					map.put(ITEM_FOOD_AMOUNT, String.valueOf(f.getCount()));
 					map.put(ITEM_FOOD_PRICE, NumericUtil.CURRENCY_SIGN + NumericUtil.float2String2(f.calcPriceBeforeDiscount()));
-					map.put(ITEM_FOOD_TASTE, f.hasTaste() ? f.getTasteGroup().getTastePref() : TasteGroup.NO_TASTE_PREF);
+					map.put(ITEM_FOOD_TASTE, f.getTasteGroup().getPreference());
 					map.put(ITEM_THE_FOOD, f);
 					newFoodDatas.add(map);
 				}
@@ -181,7 +180,7 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 						map.put(ITEM_FOOD_NAME, f.getName());
 						map.put(ITEM_FOOD_AMOUNT, String.valueOf(f.getCount()));
 						map.put(ITEM_FOOD_PRICE, NumericUtil.CURRENCY_SIGN + NumericUtil.float2String2(f.calcPriceBeforeDiscount()));
-						map.put(ITEM_FOOD_TASTE, f.hasTaste() ? f.getTasteGroup().getTastePref() : TasteGroup.NO_TASTE_PREF);
+						map.put(ITEM_FOOD_TASTE, f.getTasteGroup().getPreference());
 						map.put(ITEM_THE_FOOD, f);
 						pickedFoodDatas.add(map);
 					}
@@ -552,7 +551,7 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 								dummyFood.asFood().setName("全单备注");
 								dummyFood.makeTasteGroup(mAllFoodTastes, null);
 								bundle.putParcelable(OrderFoodParcel.KEY_VALUE, new OrderFoodParcel(dummyFood));
-								bundle.putString(PickTasteActivity.INIT_TAG, PickTasteActivity.TAG_TASTE);
+								bundle.putInt(PickTasteActivity.PICK_TASTE_INIT_FGM, PickTasteActivity.POP_TASTE_FRAGMENT);
 								bundle.putBoolean(PickTasteActivity.PICK_ALL_ORDER_TASTE, true);
 								intent.putExtras(bundle);
 								startActivityForResult(intent, PICK_ALL_FOOD_TASTE);
@@ -663,8 +662,8 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 				//全单备注改变时更新所有新点菜的口味
 				for(Taste t : mAllFoodTastes){
 					for(OrderFood of : mNewFoodList){
-						if(of.hasTaste() && !of.isTemp()){
-							of.getTasteGroup().removeTaste(t);
+						if(!of.isTemp()){
+							of.removeTaste(t);
 						}
 					}
 				}
@@ -672,17 +671,13 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 				mAllFoodTastes.clear();
 				
 				OrderFoodParcel foodParcel = data.getParcelableExtra(OrderFoodParcel.KEY_VALUE);
-				if(foodParcel.asOrderFood().hasTaste()){
+				if(foodParcel.asOrderFood().hasTasteGroup()){
 					mAllFoodTastes.addAll(foodParcel.asOrderFood().getTasteGroup().getNormalTastes());
 					//为所有新点菜添加口味,临时菜除外
 					for(OrderFood food : mNewFoodList){
 						if(!food.isTemp()){
-							if(food.hasTaste()){
-								for(Taste taste : mAllFoodTastes){
-									food.getTasteGroup().addTaste(taste);
-								}
-							}else{
-								food.makeTasteGroup(mAllFoodTastes, null);
+							for(Taste taste : mAllFoodTastes){
+								food.addTaste(taste);
 							}
 						}
 					}

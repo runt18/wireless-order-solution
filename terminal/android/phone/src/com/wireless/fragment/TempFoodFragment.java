@@ -155,28 +155,23 @@ public class TempFoodFragment extends Fragment {
 	@Override
 	public void onStop() {
 		if(!isSent){
-			ArrayList<OrderFood> mValidFoods = getValidTempFood();
 			if(mFoodPickedListener != null)
-				for(OrderFood f: mValidFoods)
-				{
-					mFoodPickedListener.onFoodPicked(f);
+				for(OrderFood of: getValidTempFood()){
+					mFoodPickedListener.onFoodPicked(of);
 				}
 		}
 		super.onStop();
 	}
 
-	public ArrayList<OrderFood> getValidTempFood(){
-		ArrayList<OrderFood> mValidFoods = new ArrayList<OrderFood>();
-		ArrayList<OrderFood> mTempFoods = mTempFoodAdapter.getFoods();
-		for(OrderFood f:mTempFoods)
-		{
-			if(f.getName() != null && !f.getName().equals("") && f.getKitchen() != null)
-			{
-				mValidFoods.add(f);
+	public List<OrderFood> getValidTempFood(){
+		List<OrderFood> validFoods = new ArrayList<OrderFood>();
+		for(OrderFood f : mTempFoodAdapter.getFoods()){
+			if(f.getName() != null && !f.getName().equals("") && f.getKitchen() != null){
+				validFoods.add(f);
 			}
 		}
 		isSent = true;
-		return mValidFoods;
+		return validFoods;
 	}
 	
 	private class TempFoodAdapter extends BaseAdapter{
@@ -204,6 +199,7 @@ public class TempFoodFragment extends Fragment {
 		ArrayList<OrderFood> getFoods(){
 			return mTempFoods;
 		}
+		
 		@Override
 		public int getCount() {
 			return mTempFoods.size();

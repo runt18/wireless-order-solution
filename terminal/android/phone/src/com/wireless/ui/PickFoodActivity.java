@@ -1,7 +1,6 @@
 package com.wireless.ui;
 
 import java.lang.ref.WeakReference;
-import java.util.ArrayList;
 
 import android.content.Context;
 import android.content.Intent;
@@ -242,9 +241,7 @@ public class PickFoodActivity extends FragmentActivity
 		
 		TempFoodFragment fgm = (TempFoodFragment) getSupportFragmentManager().findFragmentByTag(TEMP_FOOD_FRAGMENT_TAG);
 		if(fgm != null){
-			ArrayList<OrderFood> tempFoods = fgm.getValidTempFood();
-			for(OrderFood f:tempFoods)
-			{
+			for(OrderFood f : fgm.getValidTempFood()){
 				try {
 					mTmpOrder.addFood(f, WirelessOrder.loginStaff);
 				} catch (BusinessException e) {

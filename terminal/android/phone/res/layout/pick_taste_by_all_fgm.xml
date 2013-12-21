@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <ImageView
+        android:id="@+id/imgView_line_top_allTasteFgm"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:background="@drawable/line" />
+
+    <HorizontalScrollView
+        android:id="@+id/hsv_category_allTasteFgm"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="2dp"
+        android:layout_below="@+id/imgView_line_top_allTasteFgm" >
+
+        <LinearLayout
+            android:id="@+id/linearLayout_category_allTasteFgm"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="horizontal" >
+        </LinearLayout>
+    </HorizontalScrollView>
+
+    <GridView
+        android:id="@+id/gridView_taste_allTasteFgm"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/hsv_category_allTasteFgm"
+        android:numColumns="3"
+        android:verticalSpacing="5dp" >
+    </GridView>
+
+</RelativeLayout>

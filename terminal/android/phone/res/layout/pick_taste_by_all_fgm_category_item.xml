@@ -4,21 +4,22 @@
     android:layout_height="wrap_content"
     android:paddingLeft="1dp" >
 
+
     <TextView
-        android:id="@+id/txtView_bg_kitchenFgm_dept_item"
+        android:id="@+id/txtView_bg_allTaste_category_item"
         android:layout_width="70dp"
         android:layout_height="60dp"
         android:background="@color/gold" />
 
     <TextView
-        android:id="@+id/txtView_name_kitchenFgm_dept_item"
+        android:id="@+id/txtView_name_allTaste_category_item"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="false"
         android:layout_centerInParent="true"
         android:layout_centerVertical="false"
         android:gravity="center"
-        android:text="部门"
+        android:text="规格"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:textColor="@color/white"
         android:textSize="16sp" />

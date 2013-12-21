@@ -157,7 +157,7 @@ public class AskOrderAmountDialog extends DialogFragment{
 				Intent intent = new Intent(getActivity(), PickTasteActivity.class);
 				Bundle bundle = new Bundle();
 				bundle.putParcelable(OrderFoodParcel.KEY_VALUE, new OrderFoodParcel(mSelectedFood));
-				bundle.putString(PickTasteActivity.INIT_TAG, PickTasteActivity.TAG_TASTE);
+				bundle.putInt(PickTasteActivity.PICK_TASTE_INIT_FGM, PickTasteActivity.ALL_TASTE_FRAGMENT);
 				intent.putExtras(bundle);
 				AskOrderAmountDialog.this.startActivityForResult(intent, PICK_WITH_TASTE);
 			}
@@ -229,7 +229,7 @@ public class AskOrderAmountDialog extends DialogFragment{
 							if(isChecked){
 								buttonView.setBackgroundColor(buttonView.getResources().getColor(R.color.orange));
 								
-								if(!mSelectedFood.hasTaste()){
+								if(!mSelectedFood.hasTasteGroup()){
 									mSelectedFood.makeTasteGroup();
 								} 
 								mSelectedFood.getTasteGroup().addTaste(thisTaste);
