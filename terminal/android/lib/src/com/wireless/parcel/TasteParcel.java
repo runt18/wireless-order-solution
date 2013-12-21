@@ -22,10 +22,9 @@ public class TasteParcel implements Parcelable{
 	
 	private TasteParcel(Parcel in){
 		if(in.readInt() != 1){
-			mSrcTaste = new Taste();
-			mSrcTaste.setTasteId(in.readInt());
+			mSrcTaste = new Taste(in.readInt());
 			mSrcTaste.setPreference(in.readString());
-			mSrcTaste.setCategory(in.readInt());
+			mSrcTaste.setCategory(TasteCategoryParcel.CREATOR.createFromParcel(in).asCategory());
 			mSrcTaste.setCalc(in.readInt());
 			mSrcTaste.setRate(NumericUtil.int2Float(in.readInt()));
 			mSrcTaste.setPrice(NumericUtil.int2Float(in.readInt()));
@@ -58,7 +57,7 @@ public class TasteParcel implements Parcelable{
 			parcel.writeInt(0);
 			parcel.writeInt(mSrcTaste.getTasteId());
 			parcel.writeString(mSrcTaste.getPreference());
-			parcel.writeInt(mSrcTaste.getCategory().getVal());
+			new TasteCategoryParcel(mSrcTaste.getCategory()).writeToParcel(parcel, flags);
 			parcel.writeInt(mSrcTaste.getCalc().getVal());
 			parcel.writeInt(NumericUtil.float2Int(mSrcTaste.getRate()));
 			parcel.writeInt(NumericUtil.float2Int(mSrcTaste.getPrice()));			

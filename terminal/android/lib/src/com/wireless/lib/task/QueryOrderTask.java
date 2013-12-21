@@ -51,8 +51,6 @@ public class QueryOrderTask extends AsyncTask<Void, Void, Order>{
 						//Get the normal taste detail to each order food
 						for(Taste eachNormalTaste : eachOrderFood.getTasteGroup().getNormalTastes()){
 							eachNormalTaste.copyFrom(mFoodMenu.tastes.get(mFoodMenu.tastes.indexOf(eachNormalTaste)));
-							eachNormalTaste.copyFrom(mFoodMenu.styles.get(mFoodMenu.styles.indexOf(eachNormalTaste)));
-							eachNormalTaste.copyFrom(mFoodMenu.specs.get(mFoodMenu.specs.indexOf(eachNormalTaste)));
 						}
 					}
 				}
