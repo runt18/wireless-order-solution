@@ -14,7 +14,7 @@ import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.tasteMgr.Taste;
-import com.wireless.pojo.tasteMgr.Taste.Category;
+import com.wireless.pojo.tasteMgr.TasteCategory;
 import com.wireless.util.WebParams;
 
 public class OperateTasteAction extends DispatchAction{
@@ -22,8 +22,8 @@ public class OperateTasteAction extends DispatchAction{
 	public ActionForward insert(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		request.setCharacterEncoding("UTF-8");
-		response.setCharacterEncoding("UTF-8");
+		
+		
 		
 		JObject jobject = new JObject();
 		try{
@@ -35,10 +35,10 @@ public class OperateTasteAction extends DispatchAction{
 			
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
-			Taste.InsertBuilder builder = new Taste.InsertBuilder(staff.getRestaurantId(), name)
+			TasteCategory category = new TasteCategory(Integer.parseInt(cate));
+			Taste.InsertBuilder builder = new Taste.InsertBuilder(staff.getRestaurantId(), name, category)
 												   .setPrice(Float.valueOf(price))
-												   .setRate(Float.valueOf(rate))
-												   .setCategory(Category.valueOf(Integer.valueOf(cate)));
+												   .setRate(Float.valueOf(rate));
 			
 			TasteDao.insert(staff, builder);
 			jobject.initTip(true, "操作成功, 已添加新口味信息.");
@@ -58,8 +58,8 @@ public class OperateTasteAction extends DispatchAction{
 	public ActionForward update(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		request.setCharacterEncoding("UTF-8");
-		response.setCharacterEncoding("UTF-8");
+		
+		
 		
 		JObject jobject = new JObject();
 		try{
@@ -69,13 +69,15 @@ public class OperateTasteAction extends DispatchAction{
 			String price = request.getParameter("price");
 			String rate = request.getParameter("rate");
 			String cate = request.getParameter("cate");
+			TasteCategory category = new TasteCategory(Integer.parseInt(cate));
 			
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
-			Taste.UpdateBuilder builder = new Taste.UpdateBuilder(Integer.valueOf(id), name)
+			Taste.UpdateBuilder builder = new Taste.UpdateBuilder(Integer.valueOf(id))
 												   .setPrice(Float.valueOf(price))
 												   .setRate(Float.valueOf(rate))
-												   .setCategory(Category.valueOf(Integer.valueOf(cate)));
+												   .setPrefence(name)
+												   .setCategory(category);
 			
 			TasteDao.update(staff, builder);
 			
@@ -95,8 +97,8 @@ public class OperateTasteAction extends DispatchAction{
 	public ActionForward delete(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		request.setCharacterEncoding("UTF-8");
-		response.setCharacterEncoding("UTF-8");
+		
+		
 		
 		JObject jobject = new JObject();
 		try{

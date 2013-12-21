@@ -29,7 +29,7 @@ import com.wireless.util.WebParams;
 public class OperateRestaurantAction extends DispatchAction {
 	public ActionForward insert(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response) throws Exception{
-		response.setCharacterEncoding("utf-8");
+		
 		JObject jobject = new JObject();
 		String account = request.getParameter("account");
 		String name = request.getParameter("name");
@@ -64,7 +64,7 @@ public class OperateRestaurantAction extends DispatchAction {
 	public ActionForward update(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception{
-		response.setContentType("text/json; charset=utf-8");
+		
 		String id = request.getParameter("id");
 		String account = request.getParameter("account");
 		String name = request.getParameter("name");
@@ -110,7 +110,7 @@ public class OperateRestaurantAction extends DispatchAction {
 			throws Exception {
 		DBCon dbCon = new DBCon();
 		
-		response.setContentType("text/json; charset=utf-8");
+		
 		
 		PrintWriter out = response.getWriter();
 		

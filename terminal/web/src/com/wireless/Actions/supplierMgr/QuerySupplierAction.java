@@ -21,8 +21,8 @@ import com.wireless.util.WebParams;
 public class QuerySupplierAction extends Action {
 
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception{
-		response.setCharacterEncoding("UTF-8");
-		request.setCharacterEncoding("UTF-8");
+		
+		
 		JObject jobject = new JObject();
 		try{
 			//String pin = (String)request.getAttribute("pin");

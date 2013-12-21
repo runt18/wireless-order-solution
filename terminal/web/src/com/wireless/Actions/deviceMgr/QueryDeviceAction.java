@@ -19,7 +19,7 @@ public class QueryDeviceAction extends Action{
 
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response) throws SQLException, Exception{
-		response.setCharacterEncoding("utf-8");
+		
 		JObject jobject = new JObject();
 		List<Device> devices ;
 		String rId = request.getParameter("rId");

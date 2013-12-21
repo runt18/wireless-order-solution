@@ -22,7 +22,7 @@ public class UpdateFoodCombinationAction extends Action{
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		response.setContentType("text/json; charset=utf-8");
+		
 		
 		FoodCombo fc = new FoodCombo();
 		JObject jobject = new JObject();

@@ -18,8 +18,8 @@ public class QueryBillboardAction extends DispatchAction{
 	public ActionForward normal(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		request.setCharacterEncoding("UTF-8");
-		response.setCharacterEncoding("UTF-8");
+		
+		
 		JObject jobject = new JObject();
 		String isPaging = request.getParameter("isPaging");
 		String start = request.getParameter("start");
@@ -55,8 +55,8 @@ public class QueryBillboardAction extends DispatchAction{
 	public ActionForward loginInfo(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		request.setCharacterEncoding("UTF-8");
-		response.setCharacterEncoding("UTF-8");
+		
+		
 		JObject jobject = new JObject();
 		try{
 			String extra = " AND BB.expired >= NOW() AND BB.type = " + BillBoard.Type.SYSTEM.getVal() + " ORDER BY created DESC ";
@@ -82,8 +82,8 @@ public class QueryBillboardAction extends DispatchAction{
 	public ActionForward persionLoginInfo(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		request.setCharacterEncoding("UTF-8");
-		response.setCharacterEncoding("UTF-8");
+		
+		
 		JObject jobject = new JObject();
 		try{
 			String extra = " AND BB.expired >= NOW() AND BB.restaurant_id = " + request.getParameter("rid") + " ORDER BY created DESC ";

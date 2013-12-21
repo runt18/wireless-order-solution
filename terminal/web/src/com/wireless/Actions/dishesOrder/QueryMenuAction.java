@@ -28,7 +28,7 @@ public class QueryMenuAction extends DispatchAction {
 	 */
 	public ActionForward foods(ActionMapping mapping, ActionForm form,
 			 HttpServletRequest request, HttpServletResponse response) throws Exception {
-		response.setContentType("text/json; charset=utf-8");
+		response.setContentType("text/json;charset=utf-8");
 		JObject jobject = new JObject();
 		List<? extends Jsonable> root = null;
 		String isPaging = request.getParameter("isPaging");
@@ -90,13 +90,13 @@ public class QueryMenuAction extends DispatchAction {
 	 */
 	public ActionForward tastes(ActionMapping mapping, ActionForm form,
 			 HttpServletRequest request, HttpServletResponse response) throws Exception {
-		response.setContentType("text/json; charset=utf-8");
+		
 		JObject jobject = new JObject();
 		List<? extends Jsonable> root = null;
 		String isPaging = request.getParameter("isPaging");
 		String start = request.getParameter("start");
 		String limit = request.getParameter("limit");
-		
+		response.setContentType("text/json;charset=utf-8");
 		try{
 			String restaurantID = (String)request.getAttribute("restaurantID");
 			try{
@@ -130,7 +130,7 @@ public class QueryMenuAction extends DispatchAction {
 	 */
 	public ActionForward kitchens(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
-		response.setContentType("text/json; charset=utf-8");
+		response.setContentType("text/json;charset=utf-8");
 		JObject jobject = new JObject();
 		List<? extends Jsonable> root = null;
 		String isPaging = request.getParameter("isPaging");
@@ -177,7 +177,7 @@ public class QueryMenuAction extends DispatchAction {
 	 */
 	public ActionForward depts(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response) throws Exception {
-		response.setContentType("text/json; charset=utf-8");
+		response.setContentType("text/json;charset=utf-8");
 		JObject jobject = new JObject();
 		List<? extends Jsonable> root = null;
 		String isPaging = request.getParameter("isPaging");

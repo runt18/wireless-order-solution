@@ -39,8 +39,8 @@ public class OperateMemberAction extends DispatchAction{
 	public ActionForward insert(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		request.setCharacterEncoding("UTF-8");
-		response.setCharacterEncoding("UTF-8");
+		
+		
 		JObject jobject = new JObject();
 		try{
 			String pin = (String)request.getAttribute("pin");
@@ -95,8 +95,8 @@ public class OperateMemberAction extends DispatchAction{
 	public ActionForward update(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		request.setCharacterEncoding("UTF-8");
-		response.setCharacterEncoding("UTF-8");
+		
+		
 		JObject jobject = new JObject();
 		try{
 			String pin = (String)request.getAttribute("pin");
@@ -157,8 +157,8 @@ public class OperateMemberAction extends DispatchAction{
 	public ActionForward delete(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		request.setCharacterEncoding("UTF-8");
-		response.setCharacterEncoding("UTF-8");
+		
+		
 		JObject jobject = new JObject();
 		try{
 			String pin = (String)request.getAttribute("pin");
@@ -190,8 +190,8 @@ public class OperateMemberAction extends DispatchAction{
 	public ActionForward charge(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		request.setCharacterEncoding("UTF-8");
-		response.setCharacterEncoding("UTF-8");
+		
+		
 		JObject jobject = new JObject();
 		try{
 			String pin = (String)request.getAttribute("pin");
@@ -250,8 +250,8 @@ public class OperateMemberAction extends DispatchAction{
 	 * @throws Exception
 	 */
 	public ActionForward takeMoney(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception{
-		request.setCharacterEncoding("UTF-8");
-		response.setCharacterEncoding("UTF-8");
+		
+		
 		
 		JObject jobject = new JObject();
 		
@@ -314,8 +314,8 @@ public class OperateMemberAction extends DispatchAction{
 	public ActionForward adjustPoint(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		request.setCharacterEncoding("UTF-8");
-		response.setCharacterEncoding("UTF-8");
+		
+		
 		JObject jobject = new JObject();
 		try{
 			String pin = (String)request.getAttribute("pin");
@@ -350,8 +350,8 @@ public class OperateMemberAction extends DispatchAction{
 	public ActionForward consumePoint(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		request.setCharacterEncoding("UTF-8");
-		response.setCharacterEncoding("UTF-8");
+		
+		
 		JObject jobject = new JObject();
 		try{
 			String pin = (String)request.getAttribute("pin");
@@ -375,8 +375,8 @@ public class OperateMemberAction extends DispatchAction{
 	
 	
 	public ActionForward interestedMember(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception{
-		request.setCharacterEncoding("UTF-8");
-		response.setCharacterEncoding("UTF-8");
+		
+		
 		JObject jobject = new JObject();
 		try{
 			String pin = (String)request.getAttribute("pin");

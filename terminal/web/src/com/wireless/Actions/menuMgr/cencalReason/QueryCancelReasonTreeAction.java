@@ -24,8 +24,8 @@ public class QueryCancelReasonTreeAction extends Action{
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		request.setCharacterEncoding("UTF-8");
-		response.setCharacterEncoding("UTF-8");
+		
+		
 		List<CancelReason> list = new ArrayList<CancelReason>();
 		CancelReason item = null;
 		StringBuffer jsb = new StringBuffer();

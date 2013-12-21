@@ -25,8 +25,8 @@ public class QueryMaterialDeptAction extends Action{
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		request.setCharacterEncoding("UTF-8");
-		response.setCharacterEncoding("UTF-8");
+		
+		
 		String start = request.getParameter("start");
 		String limit = request.getParameter("limit");
 		JObject jobject = new JObject();

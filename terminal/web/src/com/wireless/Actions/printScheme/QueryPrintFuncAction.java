@@ -21,8 +21,8 @@ import com.wireless.util.WebParams;
 public class QueryPrintFuncAction extends Action{
 
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception{
-		response.setCharacterEncoding("UTF-8");
-		request.setCharacterEncoding("UTF-8");
+		
+		
 		JObject jobject = new JObject();
 		List<PrintFunc> root = new ArrayList<PrintFunc>();
 		try{

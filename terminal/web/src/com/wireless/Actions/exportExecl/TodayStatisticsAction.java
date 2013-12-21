@@ -79,8 +79,8 @@ public class TodayStatisticsAction extends DispatchAction{
 	public ActionForward salesFoodDetail(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		request.setCharacterEncoding("UTF-8");
-		response.setCharacterEncoding("UTF-8");
+		
+		
 		response.setContentType("application/vnd.ms-excel;");
 		response.addHeader("Content-Disposition","attachment;filename=" + new String(("菜品销售明细(" + DateType.TODAY.getDesc() + ").xls").getBytes("GBK"), "ISO8859_1"));
 		
@@ -239,8 +239,8 @@ public class TodayStatisticsAction extends DispatchAction{
 	public ActionForward salesByKitchen(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		request.setCharacterEncoding("UTF-8");
-		response.setCharacterEncoding("UTF-8");
+		
+		
 		response.setContentType("application/vnd.ms-excel;");
 		response.addHeader("Content-Disposition","attachment;filename=" + new String(("分厨銷售统计(" + DateType.TODAY.getDesc() + ").xls").getBytes("GBK"), "ISO8859_1"));
 		
@@ -372,8 +372,8 @@ public class TodayStatisticsAction extends DispatchAction{
 	public ActionForward salesByDept(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		request.setCharacterEncoding("UTF-8");
-		response.setCharacterEncoding("UTF-8");
+		
+		
 		response.setContentType("application/vnd.ms-excel;");
 		response.addHeader("Content-Disposition","attachment;filename=" + new String(("部门销售统计(" + DateType.TODAY.getDesc() + ").xls").getBytes("GBK"), "ISO8859_1"));
 		

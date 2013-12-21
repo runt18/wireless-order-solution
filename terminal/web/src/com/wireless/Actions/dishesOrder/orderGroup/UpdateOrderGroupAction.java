@@ -45,8 +45,8 @@ public class UpdateOrderGroupAction extends DispatchAction{
 	public ActionForward updateTable(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		request.setCharacterEncoding("UTF-8");
-		response.setCharacterEncoding("UTF-8");
+		
+		
 		JObject jobject = new JObject();
 		try{
 			String restaurantID = (String)request.getAttribute("restaurantID");
@@ -108,8 +108,8 @@ public class UpdateOrderGroupAction extends DispatchAction{
 	public ActionForward updateOrder(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		request.setCharacterEncoding("UTF-8");
-		response.setCharacterEncoding("UTF-8");
+		
+		
 		JObject jobject = new JObject();
 		try{
 			String pin = (String)request.getAttribute("pin");

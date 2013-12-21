@@ -18,8 +18,8 @@ import com.wireless.pojo.staffMgr.Staff;
 public class QueryPrinterTreeAction extends Action{
 	@Override
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception{
-		request.setCharacterEncoding("UTF-8");
-		response.setCharacterEncoding("UTF-8");
+		
+		
 		
 		StringBuilder jsonSB = new StringBuilder();
 		String pin = (String)request.getAttribute("pin");

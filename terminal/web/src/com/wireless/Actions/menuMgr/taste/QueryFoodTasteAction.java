@@ -32,7 +32,7 @@ public class QueryFoodTasteAction extends Action{
 			String pin = (String)request.getAttribute("pin");
 			StaffDao.verify(Integer.parseInt(pin));
 			
-			response.setContentType("text/json; charset=utf-8");
+			
 			if(foodID == null){
 				jobject.initTip(false, WebParams.TIP_TITLE_ERROE, "操作失败,没有指定查询口味的菜品!");
 			}

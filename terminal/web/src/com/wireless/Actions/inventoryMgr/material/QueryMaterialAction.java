@@ -32,8 +32,8 @@ public class QueryMaterialAction extends DispatchAction{
 	public ActionForward normal(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		request.setCharacterEncoding("UTF-8");
-		response.setCharacterEncoding("UTF-8");
+		
+		
 		JObject jobject = new JObject();
 		List<Material> root = null;
 		String isPaging = request.getParameter("isPaging");
@@ -98,8 +98,8 @@ public class QueryMaterialAction extends DispatchAction{
 	public ActionForward monthSettleMaterial(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		request.setCharacterEncoding("UTF-8");
-		response.setCharacterEncoding("UTF-8");
+		
+		
 		JObject jobject = new JObject();
 		String mType = request.getParameter("mType");
 		String type = request.getParameter("type");
@@ -164,8 +164,8 @@ public class QueryMaterialAction extends DispatchAction{
 	public ActionForward stockTakeDetail(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		request.setCharacterEncoding("UTF-8");
-		response.setCharacterEncoding("UTF-8");
+		
+		
 		JObject jobject = new JObject();
 		List<StockTakeDetail> root = new ArrayList<StockTakeDetail>();
 		try{

@@ -28,8 +28,8 @@ import com.wireless.util.WebParams;
 public class OperatePrintFuncAction extends DispatchAction{
 
 	public ActionForward delete(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception{
-		request.setCharacterEncoding("UTF-8");
-		response.setCharacterEncoding("UTF-8");
+		
+		
 		JObject jobject = new JObject();
 		
 		try{
@@ -54,8 +54,8 @@ public class OperatePrintFuncAction extends DispatchAction{
 	
 	//FIXME
 	public ActionForward port(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception{
-		request.setCharacterEncoding("UTF-8");
-		response.setCharacterEncoding("UTF-8");
+		
+		
 		DBCon dbCon = new DBCon();
 		
 		int pType = PType.PRINT_UNKNOWN.getVal();
@@ -210,8 +210,8 @@ public class OperatePrintFuncAction extends DispatchAction{
 	}
 	
 	public ActionForward insert(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception{
-		request.setCharacterEncoding("UTF-8");
-		response.setCharacterEncoding("UTF-8");
+		
+		
 		JObject jobject = new JObject();
 		DBCon dbCon = new DBCon();
 		try{
@@ -348,8 +348,8 @@ public class OperatePrintFuncAction extends DispatchAction{
 	}
 	
 	public ActionForward update(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception{
-		request.setCharacterEncoding("UTF-8");
-		response.setCharacterEncoding("UTF-8");
+		
+		
 		JObject jobject = new JObject();
 		DBCon dbCon = new DBCon();
 		try{

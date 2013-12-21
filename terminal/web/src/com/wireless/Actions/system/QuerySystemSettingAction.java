@@ -19,7 +19,7 @@ public class QuerySystemSettingAction extends Action{
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		response.setContentType("text/json; charset=utf-8");
+		
 		JObject jobject = new JObject();
 		SystemSetting set = null;
 		try{

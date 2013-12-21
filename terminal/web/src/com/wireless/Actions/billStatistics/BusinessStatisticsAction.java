@@ -36,8 +36,8 @@ public class BusinessStatisticsAction extends DispatchAction {
 	public ActionForward history(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		request.setCharacterEncoding("UTF-8");
-		response.setCharacterEncoding("UTF-8");
+		
+		
 		
 		JObject jobject = new JObject();
 		try{
@@ -90,8 +90,8 @@ public class BusinessStatisticsAction extends DispatchAction {
 	public ActionForward today(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		request.setCharacterEncoding("UTF-8");
-		response.setCharacterEncoding("UTF-8");
+		
+		
 		
 		JObject jobject = new JObject();
 		try{

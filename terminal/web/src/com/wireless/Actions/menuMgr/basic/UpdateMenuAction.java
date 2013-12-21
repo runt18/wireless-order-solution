@@ -20,7 +20,7 @@ public class UpdateMenuAction extends Action {
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		response.setContentType("text/json; charset=utf-8");
+		
 		Food fb = new Food();
 		JObject jobject = new JObject();
 		try {

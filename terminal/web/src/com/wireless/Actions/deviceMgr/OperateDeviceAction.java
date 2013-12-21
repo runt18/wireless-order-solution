@@ -25,7 +25,7 @@ public class OperateDeviceAction extends DispatchAction{
 
 	public ActionForward insert(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response) throws BusinessException, Exception{
-		response.setCharacterEncoding("utf-8");
+		
 		JObject jobject = new JObject();
 		String deviceId = request.getParameter("deviceId");
 		String rId = request.getParameter("rId");
@@ -44,10 +44,10 @@ public class OperateDeviceAction extends DispatchAction{
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getCode(), e.getMessage());
 		}catch(SQLException e){
 			e.printStackTrace();
-			jobject.initTip(false, "数据库请求发生错误，请确认网络是否连接正常");
+			jobject.initTip(e);
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
+			jobject.initTip(e);
 		}finally{
 			response.getWriter().print(jobject.toString());
 		}
@@ -57,7 +57,7 @@ public class OperateDeviceAction extends DispatchAction{
 	
 	public ActionForward update(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response) throws SQLException, BusinessException, Exception{
-		response.setCharacterEncoding("UTF-8");
+		
 		JObject jobject = new JObject();
 		String id = request.getParameter("id");
 		String deviceId = request.getParameter("deviceId");
@@ -74,13 +74,13 @@ public class OperateDeviceAction extends DispatchAction{
 			
 		}catch(BusinessException e){
 			e.printStackTrace();
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getCode(), e.getMessage());
+			jobject.initTip(e);
 		}catch(SQLException e){
 			e.printStackTrace();
-			jobject.initTip(false, "数据库请求发生错误，请确认网络是否连接正常");
+			jobject.initTip(e);
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
+			jobject.initTip(e);
 		}finally{
 			response.getWriter().print(jobject.toString());
 		}
@@ -92,7 +92,7 @@ public class OperateDeviceAction extends DispatchAction{
 	public ActionForward delete(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response) throws IOException{
 		
-		response.setCharacterEncoding("UTF-8");
+		
 		JObject jobject = new JObject();
 		
 		String id = request.getParameter("id");
@@ -103,10 +103,10 @@ public class OperateDeviceAction extends DispatchAction{
 			
 		}catch(SQLException e){
 			e.printStackTrace();
-			jobject.initTip(false, "数据库请求发生错误，请确认网络是否连接正常");
+			jobject.initTip(e);
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
+			jobject.initTip(e);
 		}finally{
 			response.getWriter().print(jobject.toString());
 		}

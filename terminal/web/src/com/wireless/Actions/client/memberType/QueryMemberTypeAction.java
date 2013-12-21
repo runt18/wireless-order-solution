@@ -33,8 +33,8 @@ public class QueryMemberTypeAction extends DispatchAction {
 	public ActionForward normal(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		request.setCharacterEncoding("UTF-8");
-		response.setCharacterEncoding("UTF-8");
+		
+		
 		JObject jobject = new JObject();
 		List<MemberType> list = new ArrayList<MemberType>();
 		
@@ -85,8 +85,8 @@ public class QueryMemberTypeAction extends DispatchAction {
 	public ActionForward tree(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		request.setCharacterEncoding("UTF-8");
-		response.setCharacterEncoding("UTF-8");
+		
+		
 		StringBuilder tsb = new StringBuilder();
 		try{
 			String pin = (String)request.getAttribute("pin");

@@ -30,7 +30,7 @@ public class OperateStaffAction extends Action{
 		String comeFrom = request.getParameter("comeFrom");
 		JObject jobject = new JObject();
 		try{
-			response.setContentType("text/json; charset=utf-8");
+			
 			Staff staff = null;
 			if(pin != null){
 				staff = StaffDao.verify(Integer.parseInt(pin));

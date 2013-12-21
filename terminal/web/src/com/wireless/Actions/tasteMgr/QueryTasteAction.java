@@ -24,8 +24,8 @@ public class QueryTasteAction extends Action {
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		request.setCharacterEncoding("UTF-8");
-		response.setCharacterEncoding("UTF-8");
+		
+		
 		
 		List<Taste> root = null;
 		JObject jobject = new JObject();
@@ -68,8 +68,8 @@ public class QueryTasteAction extends Action {
 			if(name != null && !name.trim().isEmpty() && !name.equals("")){
 				extraCond += (" AND TASTE.preference like '%" + name + "%' ");
 			}
-			if(cate != null && !cate.trim().isEmpty() && !cate.equals("")){
-				extraCond += (" AND TASTE.category = " + cate);
+			if(cate != null && !cate.trim().isEmpty() && !cate.equals("-1")){
+				extraCond += (" AND TASTE.category_id = " + cate);
 			}
 			
 			root = TasteDao.getTastes(staff, extraCond, " ORDER BY TASTE.taste_id ");

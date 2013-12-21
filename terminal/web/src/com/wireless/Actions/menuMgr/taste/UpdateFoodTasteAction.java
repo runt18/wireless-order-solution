@@ -23,7 +23,7 @@ public class UpdateFoodTasteAction extends Action {
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
 		
-		response.setContentType("text/json; charset=utf-8");
+		
 		JObject jobject = new JObject();
 		
 		try{

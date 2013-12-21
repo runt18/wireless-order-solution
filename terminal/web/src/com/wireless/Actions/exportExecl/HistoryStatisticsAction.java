@@ -4,7 +4,9 @@ import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -34,19 +36,23 @@ import com.wireless.db.client.member.MemberOperationDao;
 import com.wireless.db.shift.QueryShiftDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.stockMgr.StockActionDao;
+import com.wireless.db.stockMgr.StockReportDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.billStatistics.IncomeByDept;
 import com.wireless.pojo.billStatistics.IncomeByEachDay;
 import com.wireless.pojo.billStatistics.SalesDetail;
 import com.wireless.pojo.billStatistics.ShiftDetail;
+import com.wireless.pojo.client.Member;
 import com.wireless.pojo.client.MemberOperation;
 import com.wireless.pojo.client.MemberOperation.OperationType;
+import com.wireless.pojo.client.MemberType.Attribute;
 import com.wireless.pojo.dishesOrder.CancelledFood;
 import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.stockMgr.StockAction;
+import com.wireless.pojo.stockMgr.StockReport;
 import com.wireless.pojo.stockMgr.StockAction.Status;
 import com.wireless.pojo.stockMgr.StockAction.SubType;
 import com.wireless.pojo.stockMgr.StockActionDetail;
@@ -57,7 +63,7 @@ import com.wireless.util.SQLUtil;
 @SuppressWarnings("deprecation")
 public class HistoryStatisticsAction extends DispatchAction{
 	
-	private HSSFCellStyle headerStyle = null, titleStyle = null, strStyle = null, numStyle = null;
+	private HSSFCellStyle headerStyle = null, titleStyle = null, strStyle = null, numStyle = null, normalNumStyle = null;
 	private HSSFFont headerFont = null, titleFont = null;
 	private HSSFDataFormat doubleForamt = null;
 	
@@ -91,6 +97,11 @@ public class HistoryStatisticsAction extends DispatchAction{
 		numStyle.setAlignment(HSSFCellStyle.ALIGN_RIGHT);
 		numStyle.setVerticalAlignment(HSSFCellStyle.VERTICAL_CENTER);
 		numStyle.setDataFormat(doubleForamt.getFormat("0.00"));
+		
+		normalNumStyle = wb.createCellStyle();
+		normalNumStyle.setAlignment(HSSFCellStyle.ALIGN_RIGHT);
+		normalNumStyle.setVerticalAlignment(HSSFCellStyle.VERTICAL_CENTER);
+		
 	}
 	
 	/**
@@ -105,8 +116,8 @@ public class HistoryStatisticsAction extends DispatchAction{
 	public ActionForward salesFoodDetail(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		request.setCharacterEncoding("UTF-8");
-		response.setCharacterEncoding("UTF-8");
+		
+		
 		response.setContentType("application/vnd.ms-excel;");
 		response.addHeader("Content-Disposition","attachment;filename=" + new String("菜品销售统计(历史).xls".getBytes("GBK"), "ISO8859_1"));
 		
@@ -318,8 +329,8 @@ public class HistoryStatisticsAction extends DispatchAction{
 	public ActionForward salesByKitchen(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		request.setCharacterEncoding("UTF-8");
-		response.setCharacterEncoding("UTF-8");
+		
+		
 		response.setContentType("application/vnd.ms-excel;");
 		response.addHeader("Content-Disposition","attachment;filename=" + new String(("分厨銷售统计(" + DateType.HISTORY.getDesc() + ").xls").getBytes("GBK"), "ISO8859_1"));
 		
@@ -487,8 +498,8 @@ public class HistoryStatisticsAction extends DispatchAction{
 	public ActionForward salesByDept(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		request.setCharacterEncoding("UTF-8");
-		response.setCharacterEncoding("UTF-8");
+		
+		
 		response.setContentType("application/vnd.ms-excel;");
 		response.addHeader("Content-Disposition","attachment;filename=" + new String("部门销售统计(历史).xls".getBytes("GBK"), "ISO8859_1"));
 		
@@ -653,8 +664,8 @@ public class HistoryStatisticsAction extends DispatchAction{
 	public ActionForward businessReceips(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		request.setCharacterEncoding("UTF-8");
-		response.setCharacterEncoding("UTF-8");
+		
+		
 		response.setContentType("application/vnd.ms-excel;");
 		response.addHeader("Content-Disposition","attachment;filename=" + new String("收款明细(历史).xls".getBytes("GBK"), "ISO8859_1"));
 		
@@ -903,8 +914,8 @@ public class HistoryStatisticsAction extends DispatchAction{
 	public ActionForward business(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		request.setCharacterEncoding("UTF-8");
-		response.setCharacterEncoding("UTF-8");
+		
+		
 		response.setContentType("application/vnd.ms-excel;");
 		
 		String pin = (String)request.getAttribute("pin");
@@ -1289,8 +1300,8 @@ public class HistoryStatisticsAction extends DispatchAction{
 	 * @throws Exception
 	 */
 	public ActionForward stockAction(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception{
-		request.setCharacterEncoding("UTF-8");
-		response.setCharacterEncoding("UTF-8");
+		
+		
 		response.setContentType("application/vnd.ms-excel;");
 		
 		String pin = (String)request.getAttribute("pin");
@@ -1450,8 +1461,8 @@ public class HistoryStatisticsAction extends DispatchAction{
 	 * @throws BusinessException
 	 */
 	public ActionForward rechargeDetail(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws UnsupportedEncodingException, Exception, SQLException, BusinessException{
-		request.setCharacterEncoding("UTF-8");
-		response.setCharacterEncoding("UTF-8");
+		
+		
 		response.setContentType("application/vnd.ms-excel;");
 		
 		String pin = (String)request.getAttribute("pin");
@@ -1704,8 +1715,8 @@ public class HistoryStatisticsAction extends DispatchAction{
 	 * @throws BusinessException
 	 */
 	public ActionForward consumeDetail(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws UnsupportedEncodingException, Exception, SQLException, BusinessException{
-		request.setCharacterEncoding("UTF-8");
-		response.setCharacterEncoding("UTF-8");
+		
+		
 		response.setContentType("application/vnd.ms-excel;");
 		
 		String pin = (String)request.getAttribute("pin");
@@ -1943,8 +1954,8 @@ public class HistoryStatisticsAction extends DispatchAction{
 	
 	
 	public ActionForward cancelledFood(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws UnsupportedEncodingException, Exception, SQLException, BusinessException{
-		request.setCharacterEncoding("UTF-8");
-		response.setCharacterEncoding("UTF-8");
+		
+		
 		response.setContentType("application/vnd.ms-excel;");
 		List<CancelledFood> list = new ArrayList<CancelledFood>();
 		//Object sum = null;
@@ -1988,9 +1999,6 @@ public class HistoryStatisticsAction extends DispatchAction{
 				tempSum.setCount(tempSum.getCount() + tempItem.getCount());
 				tempSum.setTotalPrice(tempSum.getTotalPrice() + tempItem.getTotalPrice());
 			}
-			
-			//list = DataPaging.getPagingData(list, isPaging, start, limit);
-			//list.add(tempSum);
 		}
 		
 		String title = "退菜明细表";
@@ -2016,7 +2024,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 		//冻结行
 		sheet.createFreezePane(0, 4, 0, 4);
 		
-		//报表头
+//------------------报表头
 		row = sheet.createRow(0);
 		row.setHeight((short) 550);
 		
@@ -2026,7 +2034,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 		
 		//合并单元格
 		sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, 8));
-		
+//---------------摘要------------------		
 		row = sheet.createRow(sheet.getLastRowNum() + 1);
 		row.setHeight((short) 350);
 		
@@ -2036,12 +2044,13 @@ public class HistoryStatisticsAction extends DispatchAction{
 		cell.setCellStyle(strStyle);
 		
 		sheet.addMergedRegion(new CellRangeAddress(sheet.getLastRowNum(), sheet.getLastRowNum(), 0, 8));
-		
-		//空白
+//----------------		
+//----------------空白
 		row = sheet.createRow(sheet.getLastRowNum() + 1);
 		row.setHeight((short) 350);
 		sheet.addMergedRegion(new CellRangeAddress(sheet.getLastRowNum(), sheet.getLastRowNum(), 0, 8));
-		
+
+//------------------
 		row = sheet.createRow(sheet.getLastRowNum() + 1);
 		row.setHeight((short) 350);
 		
@@ -2128,6 +2137,495 @@ public class HistoryStatisticsAction extends DispatchAction{
 		os.flush();
 		os.close();
 		
+		return null;
+	}
+	
+	public ActionForward memberList(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws UnsupportedEncodingException, Exception, SQLException, BusinessException{
+		
+		
+		response.setContentType("application/vnd.ms-excel;");
+		
+		String pin = (String)request.getAttribute("pin");
+		Staff staff = StaffDao.verify(Integer.parseInt(pin));
+		
+		String extraCond = " ", orderClause = " ";
+		String id = request.getParameter("id");
+		String restaurantID = (String)request.getAttribute("restaurantID");
+		String memberType = request.getParameter("memberType");
+		String memberTypeAttr = request.getParameter("memberTypeAttr");
+		String name = request.getParameter("name");
+		String memberCard = request.getParameter("memberCard");
+		String mobile = request.getParameter("mobile");
+		String totalBalance = request.getParameter("totalBalance");
+		String usedBalance = request.getParameter("usedBalance");
+		String consumptionAmount = request.getParameter("consumptionAmount");
+		String point = request.getParameter("point");
+		String usedPoint = request.getParameter("usedPoint");
+		String so = request.getParameter("so");
+		
+		if(id != null && !id.trim().isEmpty() && Integer.valueOf(id.trim()) > 0){
+			extraCond += (" AND M.member_id = " + id);
+		}else{
+			if(so != null){
+				so = so.trim();
+				if(so.equals("0")){
+					so = "=";
+				}else if(so.equals("1")){
+					so = ">=";
+				}else if(so.equals("2")){
+					so = "<=";
+				}else{
+					so = "=";
+				}
+			}else{
+				so = "=";
+			}
+			
+			if(restaurantID != null && !restaurantID.trim().isEmpty())
+				extraCond += (" AND M.restaurant_id = " + restaurantID);
+			if(memberType != null && !memberType.trim().isEmpty())
+				extraCond += (" AND MT.member_type_id = " + memberType);
+			
+			if(memberTypeAttr != null && !memberTypeAttr.trim().isEmpty())
+				if(Attribute.valueOf(Integer.parseInt(memberTypeAttr)) == Attribute.INTERESTED){
+					extraCond += (" AND IM.staff_id = " + pin);
+				}else{
+					extraCond += (" AND MT.attribute = " + memberTypeAttr);
+				}
+			if(name != null && !name.trim().isEmpty())
+				extraCond += (" AND M.name like '%" + name.trim() + "%'");
+			
+			if(memberCard != null && !memberCard.trim().isEmpty())
+				extraCond += (" AND M.member_card like '%" + memberCard.trim() + "%'");
+			
+			if(mobile != null && !mobile.trim().isEmpty())
+				extraCond += (" AND M.mobile like '%" + mobile.trim() + "%'");
+				
+			if(totalBalance != null && !totalBalance.trim().isEmpty())
+				extraCond += (" AND (M.base_balance + M.extra_balance) " + so + totalBalance);
+			
+			if(usedBalance != null && !usedBalance.trim().isEmpty())
+				extraCond += (" AND M.used_balance " + so + usedBalance);
+			
+			if(consumptionAmount != null && !consumptionAmount.trim().isEmpty())
+				extraCond += (" AND M.consumption_amount " + so + consumptionAmount);
+			
+			if(usedPoint != null && !usedPoint.trim().isEmpty())
+				extraCond += (" AND M.used_point " + so + usedPoint);
+			
+			if(point != null && !point.trim().isEmpty())
+				extraCond += (" AND M.point " + so + point);
+		}
+		
+		orderClause = " ORDER BY M.member_id ";
+		
+		Map<Object, Object> paramsSet = new HashMap<Object, Object>();
+		paramsSet.put(SQLUtil.SQL_PARAMS_EXTRA, extraCond);
+		paramsSet.put(SQLUtil.SQL_PARAMS_ORDERBY, orderClause);
+		
+		List<Member> list = MemberDao.getMember(staff, extraCond, orderClause);
+		
+		String title = "会员列表";
+		
+		//标题
+		response.addHeader("Content-Disposition", "attachment;filename=" + new String( ("会员列表.xls").getBytes("GBK"),  "ISO8859_1"));
+		HSSFWorkbook wb = new HSSFWorkbook();
+		HSSFSheet sheet = wb.createSheet(title);
+		HSSFRow row = null;
+		HSSFCell cell = null;
+		initParams(wb);
+		
+		sheet.setColumnWidth(0, 3000);
+		sheet.setColumnWidth(1, 3300);
+		sheet.setColumnWidth(2, 3000);
+		sheet.setColumnWidth(3, 3500);
+		sheet.setColumnWidth(4, 3500);
+		sheet.setColumnWidth(5, 3000);
+		sheet.setColumnWidth(6, 3000);
+		sheet.setColumnWidth(7, 3200);
+		sheet.setColumnWidth(8, 4000);
+		sheet.setColumnWidth(9, 4000);
+		
+		
+		//冻结行
+		sheet.createFreezePane(0, 4, 0, 4);
+		
+//------------------报表头
+		row = sheet.createRow(0);
+		row.setHeight((short) 550);
+		
+		cell = row.createCell(0);
+		cell.setCellValue(title);
+		cell.setCellStyle(titleStyle);
+		
+		//合并单元格
+		sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, 9));
+//---------------摘要------------------		
+		row = sheet.createRow(sheet.getLastRowNum() + 1);
+		row.setHeight((short) 350);
+		
+		cell = row.createCell(0);
+		
+		cell.setCellValue("会员数量: " + list.size());
+		cell.setCellStyle(strStyle);
+		
+		sheet.addMergedRegion(new CellRangeAddress(sheet.getLastRowNum(), sheet.getLastRowNum(), 0, 9));
+//----------------		
+//----------------空白
+		row = sheet.createRow(sheet.getLastRowNum() + 1);
+		row.setHeight((short) 350);
+		sheet.addMergedRegion(new CellRangeAddress(sheet.getLastRowNum(), sheet.getLastRowNum(), 0, 9));
+		
+		row = sheet.createRow(sheet.getLastRowNum() + 1);
+		row.setHeight((short) 350);
+		
+		cell = row.createCell(0);
+		cell.setCellValue("名称");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell(row.getLastCellNum());
+		cell.setCellValue("类型");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell(row.getLastCellNum());
+		cell.setCellValue("消费次数");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell(row.getLastCellNum());
+		cell.setCellValue("消费总额");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell(row.getLastCellNum());
+		cell.setCellValue("累计积分");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell(row.getLastCellNum());
+		cell.setCellValue("当前积分");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell(row.getLastCellNum());
+		cell.setCellValue("总充值额");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell(row.getLastCellNum());
+		cell.setCellValue("账户余额");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell(row.getLastCellNum());
+		cell.setCellValue("手机号码");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell(row.getLastCellNum());
+		cell.setCellValue("会员卡号");
+		cell.setCellStyle(headerStyle);
+		
+		for (Member member : list) {
+			row = sheet.createRow(sheet.getLastRowNum() + 1);
+			row.setHeight((short) 350);
+			
+			cell = row.createCell(0);
+			cell.setCellValue(member.getName());
+			cell.setCellStyle(strStyle);
+			
+			cell = row.createCell(row.getLastCellNum());
+			cell.setCellValue(member.getMemberType().getName());
+			cell.setCellStyle(strStyle);
+			
+			cell = row.createCell(row.getLastCellNum());
+			cell.setCellValue(member.getConsumptionAmount());
+			cell.setCellStyle(normalNumStyle);
+			
+			cell = row.createCell(row.getLastCellNum());
+			cell.setCellValue(member.getTotalConsumption());
+			cell.setCellStyle(numStyle);
+			
+			cell = row.createCell(row.getLastCellNum());
+			cell.setCellValue(member.getTotalPoint());
+			cell.setCellStyle(normalNumStyle);
+			
+			cell = row.createCell(row.getLastCellNum());
+			cell.setCellValue(member.getPoint());
+			cell.setCellStyle(normalNumStyle);
+			
+			cell = row.createCell(row.getLastCellNum());
+			cell.setCellValue(member.getBaseBalance());
+			cell.setCellStyle(numStyle);
+			
+			cell = row.createCell(row.getLastCellNum());
+			cell.setCellValue(member.getTotalBalance());
+			cell.setCellStyle(numStyle);
+			
+			cell = row.createCell(row.getLastCellNum());
+			cell.setCellValue(member.getMobile());
+			cell.setCellStyle(strStyle);
+			
+			cell = row.createCell(row.getLastCellNum());
+			cell.setCellValue(member.getMemberCard());
+			cell.setCellStyle(strStyle);
+		}
+		
+		OutputStream os = response.getOutputStream();
+		wb.write(os);
+		os.flush();
+		os.close();
+		
+		return null;
+	}
+	
+	public ActionForward stockCollect(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws UnsupportedEncodingException, Exception, SQLException, BusinessException{
+		
+		
+		response.setContentType("application/vnd.ms-excel;");
+		
+		String pin = (String)request.getAttribute("pin");
+		Staff staff = StaffDao.verify(Integer.parseInt(pin));
+		
+		String beginDate = request.getParameter("beginDate");
+		String endDate = request.getParameter("endDate");
+		String cateType = request.getParameter("cateType");
+		String cateId = request.getParameter("cateId");
+		String materialId = request.getParameter("materialId");
+		String deptId = request.getParameter("deptId");
+		
+		List<StockReport> stockReports = null ;
+		String extra = "";
+		extra += " AND S.status = " + Status.AUDIT.getVal();
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+		if(beginDate == null || cateType == null){
+				
+			Calendar c = Calendar.getInstance();
+			c.setTime(new Date());
+			c.add(Calendar.MONTH, -1);
+			beginDate = sdf.format(c.getTime());
+			endDate = sdf.format(new Date());
+			stockReports = StockReportDao.getStockCollectByTime(staff, beginDate, endDate, extra, null);
+			
+		}else{
+			if(!materialId.equals("-1") && !materialId.trim().isEmpty()){
+				extra += " AND M.material_id = " + materialId;
+			}
+			if(cateType.trim().isEmpty() && cateId.trim().isEmpty()){
+				
+			}else if(!cateType.trim().isEmpty() && cateId.trim().isEmpty()){
+				extra += " AND S.cate_type = " + cateType;
+			}else{
+				extra += " AND M.cate_id = " + cateId; 
+			}
+			
+			if(deptId != null && !deptId.isEmpty() && !deptId.equals("-1")){
+				extra += " AND (S.dept_in = " + deptId +" OR S.dept_out = " + deptId + ")";
+				stockReports = StockReportDao.getStockCollectByDept(staff, beginDate, endDate, extra, null, Integer.parseInt(deptId));
+			}else{
+				stockReports = StockReportDao.getStockCollectByTypes(staff, beginDate, endDate, extra, null);
+			}
+		}
+
+		
+		String title = "进销存汇总";
+		
+		//标题
+		response.addHeader("Content-Disposition", "attachment;filename=" + new String( ("进销存汇总.xls").getBytes("GBK"),  "ISO8859_1"));
+		HSSFWorkbook wb = new HSSFWorkbook();
+		HSSFSheet sheet = wb.createSheet(title);
+		HSSFRow row = null;
+		HSSFCell cell = null;
+		initParams(wb);
+		
+		sheet.setColumnWidth(0, 3000);
+		sheet.setColumnWidth(1, 3500);
+		sheet.setColumnWidth(2, 3000);
+		sheet.setColumnWidth(3, 3000);
+		sheet.setColumnWidth(4, 3000);
+		sheet.setColumnWidth(5, 3000);
+		sheet.setColumnWidth(6, 3000);
+		sheet.setColumnWidth(7, 3000);
+		sheet.setColumnWidth(8, 3000);
+		sheet.setColumnWidth(9, 3000);
+		sheet.setColumnWidth(10, 3000);
+		sheet.setColumnWidth(11, 3000);
+		sheet.setColumnWidth(12, 3000);
+		sheet.setColumnWidth(13, 3000);
+		sheet.setColumnWidth(14, 3000);
+		sheet.setColumnWidth(15, 3000);
+		sheet.setColumnWidth(16, 3000);
+		
+		
+		//冻结行
+		sheet.createFreezePane(0, 4, 0, 4);
+		
+//------------------报表头
+		row = sheet.createRow(0);
+		row.setHeight((short) 550);
+		
+		cell = row.createCell(0);
+		cell.setCellValue(title);
+		cell.setCellStyle(titleStyle);
+		
+		//合并单元格
+		sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, 16));
+//---------------摘要------------------		
+		row = sheet.createRow(sheet.getLastRowNum() + 1);
+		row.setHeight((short) 350);
+		
+		cell = row.createCell(0);
+		
+		cell.setCellValue("日期: " + beginDate + "  至  " + endDate +  "         物料个数: " + stockReports.size());
+		cell.setCellStyle(strStyle);
+		
+		sheet.addMergedRegion(new CellRangeAddress(sheet.getLastRowNum(), sheet.getLastRowNum(), 0, 16));
+//----------------		
+//----------------空白
+		row = sheet.createRow(sheet.getLastRowNum() + 1);
+		row.setHeight((short) 350);
+		sheet.addMergedRegion(new CellRangeAddress(sheet.getLastRowNum(), sheet.getLastRowNum(), 0, 16));
+//------------------		
+		row = sheet.createRow(sheet.getLastRowNum() + 1);
+		row.setHeight((short) 350);
+		
+		cell = row.createCell(0);
+		cell.setCellValue("物料编号");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell(row.getLastCellNum());
+		cell.setCellValue("物料名称");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell(row.getLastCellNum());
+		cell.setCellValue("期初数量");
+		cell.setCellStyle(headerStyle);
+		
+/*		cell = row.createCell(row.getLastCellNum());
+		cell.setCellValue("");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell(row.getLastCellNum());
+		cell.setCellValue("");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell(row.getLastCellNum());
+		cell.setCellValue("");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell(row.getLastCellNum());
+		cell.setCellValue("");
+		cell.setCellStyle(headerStyle);*/
+		
+		cell = row.createCell(row.getLastCellNum());
+		cell.setCellValue("入库小计");
+		cell.setCellStyle(headerStyle);
+		
+/*		cell = row.createCell(row.getLastCellNum());
+		cell.setCellValue("");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell(row.getLastCellNum());
+		cell.setCellValue("");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell(row.getLastCellNum());
+		cell.setCellValue("");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell(row.getLastCellNum());
+		cell.setCellValue("");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell(row.getLastCellNum());
+		cell.setCellValue("");
+		cell.setCellStyle(headerStyle);*/
+		
+		cell = row.createCell(row.getLastCellNum());
+		cell.setCellValue("出库小计");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell(row.getLastCellNum());
+		cell.setCellValue("期末数量");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell(row.getLastCellNum());
+		cell.setCellValue("期末单价");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell(row.getLastCellNum());
+		cell.setCellValue("期末金额");
+		cell.setCellStyle(headerStyle);
+		
+		for (StockReport s : stockReports) {
+			row = sheet.createRow(sheet.getLastRowNum() + 1);
+			row.setHeight((short) 350);
+			
+			cell = row.createCell(0);
+			cell.setCellValue(s.getMaterial().getId());
+			cell.setCellStyle(strStyle);
+			
+			cell = row.createCell(row.getLastCellNum());
+			cell.setCellValue(s.getMaterial().getName());
+			cell.setCellStyle(strStyle);
+			
+			cell = row.createCell(row.getLastCellNum());
+			cell.setCellValue(s.getPrimeAmount());
+			cell.setCellStyle(numStyle);
+			
+/*			cell = row.createCell(row.getLastCellNum());
+			cell.setCellValue(s.getStockIn());
+			cell.setCellStyle(numStyle);
+			
+			cell = row.createCell(row.getLastCellNum());
+			cell.setCellValue(s.getStockInTransfer());
+			cell.setCellStyle(numStyle);
+			
+			cell = row.createCell(row.getLastCellNum());
+			cell.setCellValue(s.getStockSpill());
+			cell.setCellStyle(numStyle);
+			
+			cell = row.createCell(row.getLastCellNum());
+			cell.setCellValue(s.getStockTakeMore());
+			cell.setCellStyle(numStyle);*/
+			
+			cell = row.createCell(row.getLastCellNum());
+			cell.setCellValue(s.getStockInAmount());
+			cell.setCellStyle(numStyle);
+			
+/*			cell = row.createCell(row.getLastCellNum());
+			cell.setCellValue(s.getStockOut());
+			cell.setCellStyle(numStyle);
+			
+			cell = row.createCell(row.getLastCellNum());
+			cell.setCellValue(s.getStockOutTransfer());
+			cell.setCellStyle(numStyle);
+			
+			cell = row.createCell(row.getLastCellNum());
+			cell.setCellValue(s.getStockDamage());
+			cell.setCellStyle(numStyle);
+			
+			cell = row.createCell(row.getLastCellNum());
+			cell.setCellValue(s.getStockTakeLess());
+			cell.setCellStyle(numStyle);
+			
+			cell = row.createCell(row.getLastCellNum());
+			cell.setCellValue(s.getUseUp());
+			cell.setCellStyle(numStyle);*/
+			
+			cell = row.createCell(row.getLastCellNum());
+			cell.setCellValue(s.getStockOutAmount());
+			cell.setCellStyle(numStyle);
+			
+			cell = row.createCell(row.getLastCellNum());
+			cell.setCellValue(s.getFinalAmount());
+			cell.setCellStyle(numStyle);
+			
+			cell = row.createCell(row.getLastCellNum());
+			cell.setCellValue(s.getFinalPrice());
+			cell.setCellStyle(numStyle);
+			
+			cell = row.createCell(row.getLastCellNum());
+			cell.setCellValue(s.getFinalMoney());
+			cell.setCellStyle(numStyle);
+		}
+		OutputStream os = response.getOutputStream();
+		wb.write(os);
+		os.flush();
+		os.close();
 		return null;
 	}
 	

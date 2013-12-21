@@ -42,10 +42,11 @@ public class RequestFilter implements Filter{
 
 	@Override
 	public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain chain) throws IOException, ServletException {
-		
 		HttpServletRequest request = (HttpServletRequest)servletRequest;
 		HttpServletResponse response = (HttpServletResponse)servletResponse;
 		
+		request.setCharacterEncoding("UTF-8");
+		response.setContentType("text/json;charset=utf-8");
 		String requestPath = request.getRequestURI();
 		if(check(requestPath)){
 			String pin =  (String) request.getSession().getAttribute("pin");
@@ -57,6 +58,7 @@ public class RequestFilter implements Filter{
 				request.setAttribute("restaurantID", restaurantID);
 			}
 			chain.doFilter(request, response);
+			
 		}else{
 			//FIXME
 			//The code below just for print scheme port, should be removed in future
@@ -111,7 +113,7 @@ public class RequestFilter implements Filter{
 			}
 				
 		}
-		
+		response.setContentType("text/json;charset=utf-8");
 	}
 
 	@Override

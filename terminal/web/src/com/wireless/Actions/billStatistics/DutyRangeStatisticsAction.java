@@ -32,8 +32,8 @@ public class DutyRangeStatisticsAction extends DispatchAction {
 	public ActionForward today(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		request.setCharacterEncoding("UTF-8");
-		response.setCharacterEncoding("UTF-8");
+		
+		
 		JObject jobject = new JObject();
 		List<ShiftGeneral> list = null;
 		try{
@@ -61,8 +61,8 @@ public class DutyRangeStatisticsAction extends DispatchAction {
 	public ActionForward history(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		request.setCharacterEncoding("UTF-8");
-		response.setCharacterEncoding("UTF-8");
+		
+		
 		JObject jobject = new JObject();
 		List<ShiftGeneral> list = null;
 		String isPaging = request.getParameter("isPaging");
@@ -115,7 +115,7 @@ public class DutyRangeStatisticsAction extends DispatchAction {
 		boolean isError = false;
 		try {
 			// 解决后台中文传到前台乱码
-			response.setContentType("text/json; charset=utf-8");
+			
 			out = response.getWriter();
 
 			*//**

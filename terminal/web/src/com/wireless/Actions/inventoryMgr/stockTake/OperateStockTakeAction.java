@@ -35,8 +35,8 @@ public class OperateStockTakeAction extends DispatchAction{
 	public ActionForward insert(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		request.setCharacterEncoding("UTF-8");
-		response.setCharacterEncoding("UTF-8");
+		
+		
 		JObject jobject = new JObject();
 		try{
 			String pin = (String)request.getAttribute("pin");
@@ -89,8 +89,8 @@ public class OperateStockTakeAction extends DispatchAction{
 	public ActionForward update(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		request.setCharacterEncoding("UTF-8");
-		response.setCharacterEncoding("UTF-8");
+		
+		
 		JObject jobject = new JObject();
 		try{
 			String pin = (String)request.getAttribute("pin");
@@ -144,8 +144,8 @@ public class OperateStockTakeAction extends DispatchAction{
 	public ActionForward cancel(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		request.setCharacterEncoding("UTF-8");
-		response.setCharacterEncoding("UTF-8");
+		
+		
 		JObject jobject = new JObject();
 		try{
 			String pin = (String)request.getAttribute("pin");
@@ -179,8 +179,8 @@ public class OperateStockTakeAction extends DispatchAction{
 	public ActionForward audit(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		request.setCharacterEncoding("UTF-8");
-		response.setCharacterEncoding("UTF-8");
+		
+		
 		JObject jobject = new JObject();
 		try{
 			String pin = (String)request.getAttribute("pin");
@@ -216,8 +216,8 @@ public class OperateStockTakeAction extends DispatchAction{
 	public ActionForward miss(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		request.setCharacterEncoding("UTF-8");
-		response.setCharacterEncoding("UTF-8");
+		
+		
 		JObject jobject = new JObject();
 		try{
 			String pin = (String)request.getAttribute("pin");
@@ -255,8 +255,8 @@ public class OperateStockTakeAction extends DispatchAction{
 	public ActionForward checkCurrentMonth(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		request.setCharacterEncoding("UTF-8");
-		response.setCharacterEncoding("UTF-8");
+		
+		
 		JObject jobject = new JObject();
 		try{
 			String pin = (String)request.getAttribute("pin");
@@ -290,8 +290,8 @@ public class OperateStockTakeAction extends DispatchAction{
 	public ActionForward checkStockAction(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		request.setCharacterEncoding("UTF-8");
-		response.setCharacterEncoding("UTF-8");
+		
+		
 		JObject jobject = new JObject();
 		try{
 			String pin = (String)request.getAttribute("pin");

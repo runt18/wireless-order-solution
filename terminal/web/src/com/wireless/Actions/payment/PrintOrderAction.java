@@ -33,7 +33,7 @@ import com.wireless.util.WebParams;
 public class PrintOrderAction extends Action{
 
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
-		response.setContentType("text/json; charset=utf-8");
+		
 		JObject jobject = new JObject();
 		int tableID = 0;
 		DBCon dbCon = new DBCon();

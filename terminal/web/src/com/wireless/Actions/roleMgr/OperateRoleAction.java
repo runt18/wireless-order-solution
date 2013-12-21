@@ -29,7 +29,7 @@ import com.wireless.util.WebParams;
 
 public class OperateRoleAction extends DispatchAction{
 	public ActionForward insert(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception, BusinessException{
-		response.setCharacterEncoding("UTF-8");
+		
 		String pin = (String) request.getAttribute("pin");
 		String roleName = request.getParameter("roleName");
 		String modelId = request.getParameter("modelId");
@@ -65,7 +65,7 @@ public class OperateRoleAction extends DispatchAction{
 	}
 	
 	public ActionForward update(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception, BusinessException{
-		response.setCharacterEncoding("UTF-8");
+		
 		String pin = (String) request.getAttribute("pin");
 		String roleName = request.getParameter("roleName");
 		String roleId = request.getParameter("roleId");
@@ -94,7 +94,7 @@ public class OperateRoleAction extends DispatchAction{
 	}
 	
 	public ActionForward updatePrivilege(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception, BusinessException{
-		response.setCharacterEncoding("UTF-8");
+		
 		String pin = (String) request.getAttribute("pin");
 		String roleId = request.getParameter("roleId");
 		String privileges = request.getParameter("privileges");
@@ -178,7 +178,7 @@ public class OperateRoleAction extends DispatchAction{
 	}
 	
 	public ActionForward delete(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception{
-		response.setCharacterEncoding("UTF-8");
+		
 		String roleId = request.getParameter("roleId");
 		String pin = (String) request.getAttribute("pin");
 		JObject jobject = new JObject();

@@ -29,8 +29,8 @@ public class QueryFoodPricePlanAction extends Action {
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
 
-		request.setCharacterEncoding("UTF-8");
-		response.setCharacterEncoding("UTF-8");
+		
+		
 		String isPaging = request.getParameter("isPaging");
 		String start = request.getParameter("start");
 		String limit = request.getParameter("limit");

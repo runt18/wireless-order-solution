@@ -26,8 +26,8 @@ public class QueryStockTakeAction extends Action{
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		request.setCharacterEncoding("UTF-8");
-		response.setCharacterEncoding("UTF-8");
+		
+		
 		JObject jobject = new JObject();
 		List<StockTake> root = null;
 		String isPaging = request.getParameter("isPaging");

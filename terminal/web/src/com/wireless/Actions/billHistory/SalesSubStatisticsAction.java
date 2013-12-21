@@ -27,7 +27,7 @@ public class SalesSubStatisticsAction extends Action {
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		response.setContentType("text/json; charset=utf-8");
+		
 		
 		SalesDetail[] saleDetails = {};
 		List<SalesDetail> itemsList = new ArrayList<SalesDetail>();

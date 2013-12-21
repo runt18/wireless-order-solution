@@ -19,7 +19,7 @@ import com.wireless.pojo.staffMgr.Staff;
 public class VerifyLoginAction extends Action {
 
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception{
-		response.setContentType("text/json; charset=utf-8");
+		
 		JObject jobject = new JObject();
 		Map<Object, Object> other = new HashMap<Object, Object>();
 		try{        

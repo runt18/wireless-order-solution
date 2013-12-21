@@ -27,7 +27,7 @@ import com.wireless.pojo.staffMgr.Staff;
 public class QueryPrivilegeAction extends DispatchAction{
 
 	public ActionForward normal(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception{
-		response.setCharacterEncoding("UTF-8");
+		
 		JObject jobject = new JObject();
 		String pin = (String) request.getAttribute("pin");
 		String roleId = request.getParameter("roleId");
@@ -59,7 +59,7 @@ public class QueryPrivilegeAction extends DispatchAction{
 	}
 	
 	public ActionForward tree(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception{
-		response.setCharacterEncoding("UTF-8");
+		
 		String pin = (String) request.getAttribute("pin");
 		StringBuilder tree = new StringBuilder();
 		List<Privilege> root = null;
@@ -115,7 +115,7 @@ public class QueryPrivilegeAction extends DispatchAction{
 	
 	
 	public ActionForward pageTree(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception, SQLException, BusinessException{
-		response.setCharacterEncoding("UTF-8");
+		
 		String pin = (String) request.getAttribute("pin");
 		StringBuilder tree = new StringBuilder();
 		List<Privilege> rolePrivilege = new ArrayList<Privilege>();
@@ -188,7 +188,7 @@ public class QueryPrivilegeAction extends DispatchAction{
 				if(privilege.getCode() == Code.INVENTORY){
 					tree.append("{");
 					tree.append("leaf:false");
-//					tree.append(",expanded:true");
+					tree.append(",expanded:true");
 					tree.append(",id:'stockMgr'");
 					tree.append(",text:'库存'");
 					tree.append(",cls:'tFont'");
@@ -233,7 +233,7 @@ public class QueryPrivilegeAction extends DispatchAction{
 	}
 	
 	public ActionForward roleTree(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception{
-		response.setCharacterEncoding("UTF-8");
+		
 		String pin = (String) request.getAttribute("pin");
 		String roleId = request.getParameter("roleId");
 		StringBuilder tree = new StringBuilder();

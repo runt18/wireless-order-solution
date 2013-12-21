@@ -27,8 +27,8 @@ public class QueryReportAction extends Action {
 
 	@Override
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception{
-		response.setCharacterEncoding("UTF-8");
-		request.setCharacterEncoding("UTF-8");
+		
+		
 		JObject jobject = new JObject();
 		try{
 			String pin = (String)request.getAttribute("pin");
@@ -42,7 +42,6 @@ public class QueryReportAction extends Action {
 			String deptId = request.getParameter("deptId");
 			
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
-			//String orderClause = " LIMIT " + Integer.parseInt(start) + ", " + Integer.parseInt(limit);
 			List<StockReport> stockReports = null ;
 			List<StockReport> stockReportPage = new ArrayList<StockReport>() ;
 			int roots = 0;
@@ -51,30 +50,12 @@ public class QueryReportAction extends Action {
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 			if(beginDate == null || cateType == null){
 					
-/*				long current = MonthlyBalanceDao.getCurrentMonthTimeByRestaurant(staff.getRestaurantId());*/
 				Calendar c = Calendar.getInstance();
 				c.setTime(new Date());
 				c.add(Calendar.MONTH, -1);
 				stockReports = StockReportDao.getStockCollectByTime(staff, sdf.format(c.getTime()), sdf.format(new Date()), extra, null);
 				
 			}else{
-/*				if(deptId != null && !deptId.isEmpty()){
-					extra += " AND (S.dept_in = " + deptId +" OR S.dept_out = " + deptId + ")";
-				}
-				if(!materialId.equals("-1") && !materialId.trim().isEmpty()){
-					extra += " AND M.material_id = " + materialId;
-					stockReports = StockReportDao.getStockCollectByTypes(staff, beginDate, endDate, extra, null);
-				}else{
-					if(cateType.trim().isEmpty() && cateId.trim().isEmpty()){
-						stockReports = StockReportDao.getStockCollectByTime(staff, beginDate, endDate, extra, null);
-					}else if(!cateType.trim().isEmpty() && cateId.trim().isEmpty()){
-						extra += " AND S.cate_type = " + cateType;
-						stockReports = StockReportDao.getStockCollectByTypes(staff, beginDate, endDate, extra, null);
-					}else{
-						extra += " AND M.cate_id = " + cateId; 
-						stockReports = StockReportDao.getStockCollectByTypes(staff, beginDate, endDate, extra, null);
-					}
-				}*/
 				if(!materialId.equals("-1") && !materialId.trim().isEmpty()){
 					extra += " AND M.material_id = " + materialId;
 				}

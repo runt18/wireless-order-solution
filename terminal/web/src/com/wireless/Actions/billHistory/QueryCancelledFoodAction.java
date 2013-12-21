@@ -37,8 +37,8 @@ public class QueryCancelledFoodAction extends Action {
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
 		
-		request.setCharacterEncoding("UTF-8");
-		response.setContentType("text/json; charset=utf-8");
+		
+		
 		JObject jobject = new JObject();
 		@SuppressWarnings("rawtypes")
 		List list = new ArrayList();

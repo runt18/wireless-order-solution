@@ -25,7 +25,7 @@ public class InsertStaffAction extends Action {
 		JObject jobject = new JObject();
 		try {
 			// 解决后台中文传到前台乱码
-			response.setContentType("text/json; charset=utf-8");
+			
 
 			String pin = (String)request.getAttribute("pin");
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));

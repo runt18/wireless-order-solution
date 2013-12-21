@@ -23,8 +23,8 @@ public class DailySettleStatisticsAction extends Action {
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		request.setCharacterEncoding("UTF-8");
-		response.setCharacterEncoding("UTF-8");
+		
+		
 		
 		JObject jobject = new JObject();
 		String isPaging = request.getParameter("isPaging");
@@ -83,7 +83,7 @@ public class DailySettleStatisticsAction extends Action {
 		boolean isError = false;
 		try {
 			// 解决后台中文传到前台乱码
-			response.setContentType("text/json; charset=utf-8");
+			
 			out = response.getWriter();
 
 			*//**

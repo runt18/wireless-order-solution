@@ -22,8 +22,8 @@ public class UpdateFoodPricePlanAction extends Action {
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		request.setCharacterEncoding("UTF-8");
-		response.setCharacterEncoding("UTF-8");
+		
+		
 		JSONObject content = null;
 		JObject jobject = new JObject();
 		try{

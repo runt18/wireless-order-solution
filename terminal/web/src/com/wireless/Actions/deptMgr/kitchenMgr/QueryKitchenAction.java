@@ -32,8 +32,8 @@ public class QueryKitchenAction extends DispatchAction {
 	public ActionForward tree(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		request.setCharacterEncoding("UTF-8");
-		response.setCharacterEncoding("UTF-8");
+		
+		
 		
 		StringBuffer jsb = new StringBuffer();
 		try{
@@ -75,8 +75,8 @@ public class QueryKitchenAction extends DispatchAction {
 	public ActionForward normal(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		request.setCharacterEncoding("UTF-8");
-		response.setCharacterEncoding("UTF-8");
+		
+		
 		JObject jobject = new JObject();
 		List<Kitchen> root = null;
 		

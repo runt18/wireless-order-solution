@@ -20,8 +20,8 @@ public class QueryMemberTypeTreeAction extends Action {
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
 		
-		request.setCharacterEncoding("UTF-8");
-		response.setCharacterEncoding("UTF-8");
+		
+		
 		StringBuilder tsb = new StringBuilder();
 		try{
 			String pin = (String)request.getAttribute("pin");

@@ -28,7 +28,7 @@ public class QueryStaffAction extends Action {
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-
+//		response.setContentType("text/json;charset=utf-8");
 		PrintWriter out = null;
 		String pin = (String) request.getAttribute("pin");
 		String start = request.getParameter("start");
@@ -56,7 +56,7 @@ public class QueryStaffAction extends Action {
 		
 		try {
 			// 解决后台中文传到前台乱码
-			response.setContentType("text/json; charset=utf-8");
+			
 			
 			out = response.getWriter();
 			String restaurantID ;

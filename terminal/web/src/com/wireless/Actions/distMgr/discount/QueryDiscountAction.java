@@ -33,8 +33,8 @@ public class QueryDiscountAction extends DispatchAction{
 	public ActionForward role(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		response.setCharacterEncoding("UTF-8");
-		request.setCharacterEncoding("UTF-8");
+		
+		
 		JObject jobject = new JObject();
 		try{
 			Staff staff = StaffDao.verify(Integer.parseInt((String) request.getAttribute("pin")));
@@ -62,8 +62,8 @@ public class QueryDiscountAction extends DispatchAction{
 	public ActionForward normal(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		response.setCharacterEncoding("UTF-8");
-		request.setCharacterEncoding("UTF-8");
+		
+		
 		
 		try{
 			
@@ -87,8 +87,8 @@ public class QueryDiscountAction extends DispatchAction{
 	public ActionForward tree(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		response.setCharacterEncoding("UTF-8");
-		request.setCharacterEncoding("UTF-8");
+		
+		
 		
 		DBCon dbCon = new DBCon();
 		StringBuffer tsb = new StringBuffer();

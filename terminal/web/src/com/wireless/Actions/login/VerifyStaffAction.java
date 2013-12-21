@@ -18,7 +18,7 @@ public class VerifyStaffAction extends Action{
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception{
 		
 
-		response.setContentType("text/json; charset=utf-8");
+		
 		String pin = (String) request.getAttribute("pin");
 		String code = request.getParameter("code");
 		JObject jobject = new JObject();

@@ -31,7 +31,7 @@ public class QueryOTAction extends Action {
 		try {
 
 			// 解决后台中文传到前台乱码
-			response.setContentType("text/json; charset=utf-8");
+			
 			out = response.getWriter();			
 			result = "$(result)</br>$(value)";
 

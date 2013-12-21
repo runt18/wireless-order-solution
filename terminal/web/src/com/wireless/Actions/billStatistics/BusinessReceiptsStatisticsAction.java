@@ -34,8 +34,8 @@ public class BusinessReceiptsStatisticsAction extends DispatchAction {
 //			HttpServletRequest request, HttpServletResponse response)
 //			throws Exception {
 //		
-//		request.setCharacterEncoding("UTF-8");
-//		response.setCharacterEncoding("UTF-8");
+//		
+//		
 //		String isPaging = request.getParameter("isPaging");
 //		String start = request.getParameter("start");
 //		String limit = request.getParameter("limit");
@@ -100,8 +100,8 @@ public class BusinessReceiptsStatisticsAction extends DispatchAction {
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
 		
-		request.setCharacterEncoding("UTF-8");
-		response.setCharacterEncoding("UTF-8");
+		
+		
 		
 		String isPaging = request.getParameter("isPaging");
 		String start = request.getParameter("start");
@@ -170,8 +170,8 @@ public class BusinessReceiptsStatisticsAction extends DispatchAction {
 	public ActionForward chart(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		request.setCharacterEncoding("UTF-8");
-		response.setCharacterEncoding("UTF-8");
+		
+		
 		String time = request.getParameter("time");
 		JObject jobject = new JObject();
 		Calendar c = Calendar.getInstance();

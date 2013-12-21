@@ -39,8 +39,8 @@ public class QueryMaterialCateAction extends DispatchAction{
 	public ActionForward normal(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		request.setCharacterEncoding("UTF-8");
-		response.setCharacterEncoding("UTF-8");
+		
+		
 		JObject jobject = new JObject();
 		List<MaterialCate> root = null;
 		String isPaging = request.getParameter("isPaging");
@@ -89,8 +89,8 @@ public class QueryMaterialCateAction extends DispatchAction{
 	public ActionForward tree(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		request.setCharacterEncoding("UTF-8");
-		response.setCharacterEncoding("UTF-8");
+		
+		
 		JObject jobject = new JObject();
 		List<MaterialCate> list = null;
 		MaterialCate item = null;
@@ -143,8 +143,8 @@ public class QueryMaterialCateAction extends DispatchAction{
 	public ActionForward monthSettleTree(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		request.setCharacterEncoding("UTF-8");
-		response.setCharacterEncoding("UTF-8");
+		
+		
 		JObject jobject = new JObject();
 		List<MaterialCate> list = null;
 		MaterialCate item = null;

@@ -23,8 +23,8 @@ public class DeletePricePlanAction extends Action {
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
 
-		request.setCharacterEncoding("UTF-8");
-		response.setCharacterEncoding("UTF-8");
+		
+		
 		JSONObject content = null;
 		JObject jobject = new JObject();
 		try{

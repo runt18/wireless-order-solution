@@ -21,7 +21,7 @@ public class QueryRestaurantAction extends Action {
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		response.setContentType("text/json; charset=utf-8");
+		
 		DBCon dbCon = new DBCon();
 		String jsonResp = "{success:$(result), data:'$(value)'}";
 		try {

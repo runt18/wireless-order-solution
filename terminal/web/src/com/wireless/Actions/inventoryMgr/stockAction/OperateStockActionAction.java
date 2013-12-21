@@ -36,8 +36,8 @@ public class OperateStockActionAction extends DispatchAction{
 	public ActionForward insert(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		request.setCharacterEncoding("UTF-8");
-		response.setCharacterEncoding("UTF-8");
+		
+		
 		JObject jobject = new JObject();
 		try{
 			String pin = (String)request.getAttribute("pin");
@@ -159,8 +159,8 @@ public class OperateStockActionAction extends DispatchAction{
 	public ActionForward update(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		request.setCharacterEncoding("UTF-8");
-		response.setCharacterEncoding("UTF-8");
+		
+		
 		JObject jobject = new JObject();
 		try{
 			String pin = (String)request.getAttribute("pin");
@@ -278,8 +278,8 @@ public class OperateStockActionAction extends DispatchAction{
 	public ActionForward delete(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		request.setCharacterEncoding("UTF-8");
-		response.setCharacterEncoding("UTF-8");
+		
+		
 		JObject jobject = new JObject();
 		try{
 			String pin = (String)request.getAttribute("pin");
@@ -312,8 +312,8 @@ public class OperateStockActionAction extends DispatchAction{
 	public ActionForward audit(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		request.setCharacterEncoding("UTF-8");
-		response.setCharacterEncoding("UTF-8");
+		
+		
 		JObject jobject = new JObject();
 		try{
 			String pin = (String)request.getAttribute("pin");
@@ -347,8 +347,8 @@ public class OperateStockActionAction extends DispatchAction{
 	public ActionForward checkStockTake(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		request.setCharacterEncoding("UTF-8");
-		response.setCharacterEncoding("UTF-8");
+		
+		
 		JObject jobject = new JObject();
 		try{
 			String pin = (String)request.getAttribute("pin");

@@ -26,15 +26,14 @@ public class QueryDetailAction extends Action {
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		request.setCharacterEncoding("UTF-8");
-		response.setCharacterEncoding("UTF-8");
+		
+		
 		
 		JObject jobject = new JObject();
 		List<OrderFood> list = null;
 		String isPaging = request.getParameter("isPaging");
 		String start = request.getParameter("start");
 		String limit = request.getParameter("limit");
-		
 		try{
 			
 			String pin = (String)request.getAttribute("pin");
@@ -44,6 +43,7 @@ public class QueryDetailAction extends Action {
 			String restaurantID = (String)request.getAttribute("restaurantID");
 			String talias = request.getParameter("tableAlias");
 			String queryType = request.getParameter("queryType");
+			
 			
 			if (queryType.equals("Today")) {
 				list = OrderFoodDao.getSingleDetailToday(staff, " AND OF.order_id=" + orderID, " ORDER BY OF.order_date ");
@@ -72,7 +72,7 @@ public class QueryDetailAction extends Action {
 				list = DataPaging.getPagingData(list, isPaging, start, limit);
 				jobject.setRoot(list);
 			}
-			response.getWriter().print(jobject.toString());
+			response.getWriter().print(jobject.toString(2));
 		}
 		return null;
 	}

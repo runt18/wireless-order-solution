@@ -26,8 +26,8 @@ public class QueryDailySettleByNowAction extends Action{
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
 		
-		request.setCharacterEncoding("UTF-8");
-		response.setCharacterEncoding("UTF-8");
+		
+		
 		HashMap resultMap = new HashMap();
 		ShiftDetail res = null;
 		try{

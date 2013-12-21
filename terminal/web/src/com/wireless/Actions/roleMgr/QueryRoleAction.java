@@ -20,7 +20,7 @@ import com.wireless.util.WebParams;
 public class QueryRoleAction extends Action{
 
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception{
-		response.setCharacterEncoding("UTF-8");
+		
 		String pin = (String) request.getAttribute("pin");
 		
 		List<Role> root = null;

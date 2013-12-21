@@ -24,8 +24,8 @@ public class InsertDiscountAction extends Action{
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
 		
-		response.setCharacterEncoding("UTF-8");
-		request.setCharacterEncoding("UTF-8");
+		
+		
 		JObject jobject = new JObject();
 		
 		try{

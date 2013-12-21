@@ -20,7 +20,7 @@ public class QueryRestaurantAction extends Action{
 
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response) throws Exception{
-		response.setCharacterEncoding("UTF-8");
+		
 		String start = request.getParameter("start");
 		String limit = request.getParameter("limit");
 		String isPaging = request.getParameter("isPaging");
