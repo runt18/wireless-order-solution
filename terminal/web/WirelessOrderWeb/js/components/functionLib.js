@@ -275,3 +275,45 @@ function bindActiveEvent(id, sbg, bg, href){
 	}
 	return active;
 }
+
+function showFloatOption(obj_b){
+	//记录节点的位置和鼠标位置
+	var nodex=0;
+	var offset, liOffset;
+	//把bar加到tree上
+	$("#"+obj_b.treeId).mouseover(function(){
+		//生成浮动bar
+		if($("#div_floatBar").find("a").length == 0){
+			for (var i = 0; i < obj_b.option.length; i++) {
+				if(i > 0){
+					$("#div_floatBar").append('|&nbsp;');
+				}
+				$("#div_floatBar").append('<a href="javascript:void(0)" onclick='+obj_b.option[i].fn+'>'+ obj_b.option[i].name +'</a>&nbsp;');
+			}
+		}
+
+		liOffset = $("#"+obj_b.treeId).find("ul").offset();
+		nodey = liOffset.top;
+		
+		barY = ($("#"+obj_b.treeId).find("li").height() + nodey);
+		$("#"+obj_b.treeId).find("li").find("li").mouseover(function(){
+			tastem_nodeId = $(this).find("div").attr("ext:tree-node-id");
+			offset = $(this).find("a").offset();
+			nodex = offset.left-18;
+			barX = (offset.left+$(this).find("a").width()+100);
+			$('#div_floatBar').css({left :offset.left+$(this).find("a").width(), top : (offset.top-2)});
+			$('#div_floatBar').show();
+		});
+		
+		$(document).mousemove(function(event){
+			
+			if(event.clientX > barX || event.clientX < nodex || event.clientY <=nodey || event.clientY >barY){
+				
+				$('#div_floatBar').hide();
+				$('#div_floatBar').html("");
+				tastem_nodeId ="";
+			}
+		});
+
+	});
+}

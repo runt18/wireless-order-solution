@@ -197,98 +197,6 @@ function initTasteGrid(){
 		tasteUpdateHandler();
 	});
 	
-	tmm_tasteTree = new Ext.tree.TreePanel({
-		title : '口味分组',
-		id : 'tmm_tasteTree',
-		region : 'west',
-		width : 200,
-		rootVisible : true,
-		border : true,
-		autoScroll : true,
-		frame : true,
-		enableDD : true,
-		bodyStyle : 'backgroundColor:#FFFFFF; border:1px solid #99BBE8;',
-		root : new Ext.tree.AsyncTreeNode({
-			expanded : true,
-			text : '全部',
-			id : -1,
-			loader : new Ext.tree.TreeLoader({
-				dataUrl : '../../QueryTasteCate.do',
-				baseParams : {
-					dataSource : 'tree'
-				}
-			})
-		}),
-		tbar : [ '->', {
-			text : '添加',
-			iconCls : 'btn_add',
-			handler : function(e) {
-				tasteCateOperateHandler({otype : 'insert'});
-			}
-		},{
-			text : '修改',
-			iconCls : 'btn_edit',
-			handler : function(e) {
-				tasteCateOperateHandler({otype : 'update'});
-			}
-		},{
-			text : '删除',
-			iconCls : 'btn_delete',
-			handler : function(e) {
-				tasteCateOperateHandler({otype : 'delete'});
-			}
-		}],
-		listeners : {
-			load : function(){
-				var nodes = tmm_tasteTree.getRootNode().childNodes;
-				tasteTypeData = [];
-				for (var i = 0; i < nodes.length; i++) {
-					if(nodes[i].attributes.status == 1){
-						nodes[i].setText('<font color=\"#808080\">' + nodes[i].attributes.tasteCateName + '&nbsp;(系统保留)</font>');
-					}else{
-						tasteTypeData.push([nodes[i].id, nodes[i].attributes.tasteCateName]);
-					}	
-				}
-				Ext.getCmp('comboTasteCate').store.loadData(tasteTypeData);
-			},
-			click : function(e){
-				tastem_selectedId = e.id;
-				Ext.getCmp('btnSerachForTasteBasic').handler(e.id);
-				
-				if(e.attributes.status == 1){
-					tastem_add = false;
-					Ext.getDom('lblTasteCateName').innerHTML = e.attributes.tasteCateName;
-				}else{
-					tastem_add = true;
-					Ext.getDom('lblTasteCateName').innerHTML = e.text;
-				}
-			},
-			enddrag : function(t,n,e){
-				var cateB;
-				if(n.nextSibling != null){
-					cateB = n.nextSibling.id;
-				}else{
-					cateB = n.previousSibling.id;
-				}
-				Ext.Ajax.request({
-					url : '../../OperateTasteCate.do',
-					params : {
-						cateA : n.id,
-						cateB : cateB,
-						dataSource : 'swap'
-					},
-					success : function(res, opt){
-						tmm_tasteTree.getRootNode().reload();
-					},
-					failure : function(res, opt){
-						Ext.ux.show(Ext.decode(res.responseText));
-					}
-				});
-				
-			}
-		}
-	});
-	
 }
 
 function initTasteCateOperatorWin(){
@@ -584,6 +492,98 @@ Ext.onReady(function() {
 	initTasteGrid();
 	initTasteOperatorWin();
 	initTasteCateOperatorWin();
+	tmm_tasteTree = new Ext.tree.TreePanel({
+		title : '口味分组',
+		id : 'tmm_tasteTree',
+		region : 'west',
+		width : 200,
+		rootVisible : true,
+		border : true,
+//		autoScroll : true,
+		frame : true,
+		enableDD : true,
+		bodyStyle : 'backgroundColor:#FFFFFF; border:1px solid #99BBE8;',
+		loader : new Ext.tree.TreeLoader({
+			dataUrl : '../../QueryTasteCate.do',
+			baseParams : {
+				dataSource : 'tree'
+			}
+		}),
+		root : new Ext.tree.AsyncTreeNode({
+			expanded : true,
+			text : '全部',
+			leaf : false,
+			id : -1
+		}),
+		tbar : [ '->', {
+			text : '添加',
+			iconCls : 'btn_add',
+			handler : function(e) {
+				tasteCateOperateHandler({otype : 'insert'});
+			}
+		},{
+			text : '修改',
+			iconCls : 'btn_edit',
+			handler : function(e) {
+				tasteCateOperateHandler({otype : 'update'});
+			}
+		},{
+			text : '删除',
+			iconCls : 'btn_delete',
+			handler : function(e) {
+				tasteCateOperateHandler({otype : 'delete'});
+			}
+		}],
+		listeners : {
+			load : function(){
+				var nodes = tmm_tasteTree.getRootNode().childNodes;
+				tasteTypeData = [];
+				for (var i = 0; i < nodes.length; i++) {
+					if(nodes[i].attributes.status == 1){
+						nodes[i].setText('<font color=\"#808080\">' + nodes[i].attributes.tasteCateName + '&nbsp;(系统保留)</font>');
+					}else{
+						tasteTypeData.push([nodes[i].id, nodes[i].attributes.tasteCateName]);
+					}	
+				}
+				Ext.getCmp('comboTasteCate').store.loadData(tasteTypeData);
+			},
+			click : function(e){
+				tastem_selectedId = e.id;
+				Ext.getCmp('btnSerachForTasteBasic').handler(e.id);
+				
+				if(e.attributes.status == 1){
+					tastem_add = false;
+					Ext.getDom('lblTasteCateName').innerHTML = e.attributes.tasteCateName;
+				}else{
+					tastem_add = true;
+					Ext.getDom('lblTasteCateName').innerHTML = e.text;
+				}
+			},
+			enddrag : function(t,n,e){
+				var cateB;
+				if(n.nextSibling != null){
+					cateB = n.nextSibling.id;
+				}else{
+					cateB = n.previousSibling.id;
+				}
+				Ext.Ajax.request({
+					url : '../../OperateTasteCate.do',
+					params : {
+						cateA : n.id,
+						cateB : cateB,
+						dataSource : 'swap'
+					},
+					success : function(res, opt){
+						tmm_tasteTree.getRootNode().reload();
+					},
+					failure : function(res, opt){
+						Ext.ux.show(Ext.decode(res.responseText));
+					}
+				});
+				
+			}
+		}
+	});
 	
 	new Ext.Panel({
 //		title : '口味管理',
@@ -603,41 +603,8 @@ Ext.onReady(function() {
 	});
 });
 
-function showFloatOption(obj_b){
-	//记录节点的位置和鼠标位置
-	var nodex=0,x=0;
-	var offset;
-	//生成浮动bar
-	for (var i = 0; i < obj_b.option.length; i++) {
-		if(i > 0){
-			$("#div_floatBar").append('|&nbsp;');
-		}
-		$("#div_floatBar").append('<a href="javascript:void(0)" onclick='+obj_b.option[i].fn+'>'+ obj_b.option[i].name +'</a>&nbsp;');
-	}
-	//把bar加到tree上
-	$("#"+obj_b.treeId).mouseover(function(){
-		$("#"+obj_b.treeId).find("li").find("li").mouseover(function(){
-			tastem_nodeId = $(this).find("div").attr("ext:tree-node-id");
-			offset = $(this).find("a").offset();
-			nodex = offset.left-18;
-			x = (offset.left+$(this).find("a").width()+100);
-			$('#div_floatBar').css({left :offset.left+$(this).find("a").width(), top : (offset.top-2)});
-			$('#div_floatBar').show();
-		});
-		
-		$(document).mousemove(function(event){
-			if(event.clientX > x || event.clientX < nodex){
-				$('#div_floatBar').hide();
-				tastem_nodeId ="";
-			}
-		});
-
-	});
-}
-$(function(){
 	var bar = {treeId : 'tmm_tasteTree', option :[{name : '修改', fn : "tasteCateOperateHandler({otype:'update'})"}, {name : '删除', fn : "tasteCateOperateHandler({otype:'delete'})"}]};
 	showFloatOption(bar);
-});
 
 /**
  * 
@@ -649,7 +616,7 @@ function tasteDeleteHandler() {
 		return;
 	}
 	Ext.MessageBox.show({
-		msg : '确定删除?',
+		msg : '是否删除: ' + data['name'],
 		buttons : Ext.MessageBox.YESNO,
 		icon: Ext.MessageBox.QUESTION,
 		fn : function(btn) {
@@ -664,7 +631,7 @@ function tasteDeleteHandler() {
 					success : function(response, options) {
 						var jr = Ext.decode(response.responseText);
 						if (jr.success == true) {							
-							Ext.example.msg('提示', jr.msg);
+							Ext.example.msg('提示', '<font style="color:red">'+data['name']+'</font>&nbsp;删除成功');
 							Ext.getCmp('btnSerachForTasteBasic').handler(tastem_selectedId);
 						} else {
 							Ext.ux.showMsg(jr);
