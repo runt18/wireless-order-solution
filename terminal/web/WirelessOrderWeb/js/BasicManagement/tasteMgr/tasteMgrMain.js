@@ -169,7 +169,7 @@ function initTasteGrid(){
 	    }]
 	});
 	tasteGrid = createGridPanel(
-		'',
+		'taste_grid',
 		'',
 		'',
 		'',
@@ -454,6 +454,7 @@ function initTasteOperatorWin(){
 								tasteOperatorWin.hide();
 								Ext.example.msg(jr.title, jr.msg);
 								Ext.getCmp('btnSerachForTasteBasic').handler(tastem_selectedId);
+								Ext.getCmp('taste_grid').getBottomToolbar().onClick("last");
 							}else{
 								Ext.ux.showMsg(jr);
 							}
@@ -626,7 +627,6 @@ function tasteDeleteHandler() {
 					url : '../../OperateTaste.do',
 					params : {
 						'dataSource' : 'delete',
-						
 						id : data['id']
 					},
 					success : function(response, options) {
