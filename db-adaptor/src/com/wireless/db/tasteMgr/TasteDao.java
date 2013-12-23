@@ -11,6 +11,7 @@ import com.wireless.exception.BusinessException;
 import com.wireless.exception.TasteError;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.tasteMgr.Taste;
+import com.wireless.pojo.tasteMgr.TasteCategory;
 
 public class TasteDao {
 
@@ -193,12 +194,12 @@ public class TasteDao {
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		ArrayList<Taste> tastes = new ArrayList<Taste>();
 		while(dbCon.rs.next()){
-			
 			Taste taste = new Taste(dbCon.rs.getInt("taste_id"));
+			TasteCategory tCate = new TasteCategory(dbCon.rs.getInt("category_id"));
+			tCate.setName(dbCon.rs.getString("name"));
+			taste.setCategory(tCate);
 			taste.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
 			taste.setPreference(dbCon.rs.getString("preference"));
-			taste.getCategory().setId(dbCon.rs.getInt("category_id"));
-			taste.getCategory().setName(dbCon.rs.getString("name"));
 			taste.setCalc(dbCon.rs.getShort("calc"));
 			taste.setRate(dbCon.rs.getFloat("rate"));
 			taste.setPrice(dbCon.rs.getFloat("price"));
