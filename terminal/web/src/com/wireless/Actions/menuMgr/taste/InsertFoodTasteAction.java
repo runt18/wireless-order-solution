@@ -54,6 +54,8 @@ public class InsertFoodTasteAction extends Action{
 			e.printStackTrace();
 			jobject.initTip(true, WebParams.TIP_TITLE_EXCEPTION, e.getCode(), e.getDesc());
 			
+		}catch(IllegalArgumentException e){
+			jobject.initTip(false, e.getMessage());
 		} catch(Exception e) {
 			e.printStackTrace();
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);

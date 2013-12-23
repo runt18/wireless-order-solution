@@ -32,6 +32,8 @@ public class OperateFoodTasteCategoryAction extends DispatchAction{
 			TasteCategory.InsertBuilder builder = new TasteCategory.InsertBuilder(staff.getRestaurantId(), name);
 			TasteCategoryDao.insert(staff, builder);
 			jobject.initTip(true, "添加成功");
+		}catch(IllegalArgumentException e){
+			jobject.initTip(e);
 		}catch(SQLException e){
 			jobject.initTip(e);
 		}catch(Exception e){
@@ -56,6 +58,8 @@ public class OperateFoodTasteCategoryAction extends DispatchAction{
 			TasteCategoryDao.update(staff, updateBuilder);
 			jobject.initTip(true, "修改成功");
 		}catch(BusinessException e){
+			jobject.initTip(e);
+		}catch(IllegalArgumentException e){
 			jobject.initTip(e);
 		}catch(SQLException e){
 			jobject.initTip(e);

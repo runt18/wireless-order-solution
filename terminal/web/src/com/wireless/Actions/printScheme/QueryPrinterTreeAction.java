@@ -33,6 +33,7 @@ public class QueryPrinterTreeAction extends Action{
 					jsonSB.append(index > 0 ? "," : "");
 					jsonSB.append("{");
 					jsonSB.append("printerId : '" + printer.getId() + "'");
+					jsonSB.append(", id : '" + printer.getId() + "'");
 					jsonSB.append(", restaurantId : '" + printer.getRestaurantId() + "'");
 					jsonSB.append(", name :'" + printer.getName() + "'");
 					jsonSB.append(", alias : '" + printer.getAlias() + "'");
