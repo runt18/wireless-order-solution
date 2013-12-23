@@ -15,6 +15,9 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.wireless.exception.BusinessException;
+import com.wireless.exception.SystemError;
+import com.wireless.json.JObject;
 import com.wireless.util.Encrypt;
 
 public class RequestFilter implements Filter{
@@ -94,7 +97,9 @@ public class RequestFilter implements Filter{
 			String pin = null;
 			pin = (String) request.getSession().getAttribute("pin");
 			if(pin == null){
-				servletResponse.getWriter().print("Did not pass the whitelist");
+				JObject jObject = new JObject();
+				jObject.initTip(new BusinessException(SystemError.NOT_PASS_WHITELIST));
+				servletResponse.getWriter().print(jObject.toString());
 				if (request.getHeader("x-requested-with") != null && request.getHeader("x-requested-with").equalsIgnoreCase("XMLHttpRequest")) {  
                     response.setHeader("session_status", "timeout");
                     response.addHeader("root_path",	request.getContextPath());
