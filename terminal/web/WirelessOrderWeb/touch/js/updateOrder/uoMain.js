@@ -65,16 +65,18 @@ function showKeyboardNumForUO(foodName, dishes){
 	$("#divTopForKeyboardNumForUO").html("<div style = 'font-size: 20px; " +
 			"font-weight: bold; color : white;" +
 			"text-align : center; line-height : 40px;'>" + title + "</div>");
-	//初始化退菜原因信息
-	var htmlReason = '';
-	for(x in cancelReasonData){
-		htmlReason += "<div class = 'button-base reason' onclick = 'setReason(this)'" +
-				"id = 'btnReason" + cancelReasonData[x].id + "' " +
-				"style = 'margin: 0 0 5px 8px; height: 66px; width: 165px;'>" +
-				 cancelReasonData[x].reason + "</div>";
-	}
-	$("#divReasonForKeyboardNumForUO").html(htmlReason);
+	
 	if(cancelReasonData.length > 0){
+		//初始化退菜原因信息
+		var htmlReason = '';
+		for(var i = 0; i < cancelReasonData.length; i++){
+			htmlReason += "<div class = 'button-base reason' onclick = 'setReason(this)'" +
+			"id = 'btnReason" + cancelReasonData[i].id + "' " +
+			"style = 'margin: 0 0 5px 8px; height: 66px; width: 165px;'>" +
+			cancelReasonData[i].reason + "</div>";
+		}
+		$("#divReasonForKeyboardNumForUO").html(htmlReason);
+		
 		//默认选中第一个退菜原因
 		selectingReasonId = "btnReason" + cancelReasonData[0].id;
 		selectingCancelReason = cancelReasonData[0];

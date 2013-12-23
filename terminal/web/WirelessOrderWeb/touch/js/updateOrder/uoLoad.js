@@ -86,11 +86,7 @@ function initCancelReason(){
 			restaurantID : restaurantID,
 		},
 		success : function(data, status, xhr){
-			cancelReasonData = [];
-//			data = JSON.parse(data);
-			for(x in data.root){
-				cancelReasonData.push(data.root[x]);
-			}
+			cancelReasonData = JSON.parse(data).root;
 		},
 		error : function(request, status, err){
 			Util.msg.alert({
