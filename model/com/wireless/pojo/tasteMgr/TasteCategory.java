@@ -122,6 +122,7 @@ public class TasteCategory implements Parcelable{
 	}
 	
 	public static enum Status{
+		UNKNOWN(0, "未知"),
 		SPEC(1, "规格"),
 		TASTE(2, "口味");
 		
@@ -156,12 +157,39 @@ public class TasteCategory implements Parcelable{
 		}
 	}
 	
+	public final static TasteCategory EMPTY = new TasteCategory(){
+		@Override
+		public void setId(int id){
+			throw new UnsupportedOperationException("Empty taste category does NOT support this operation.");
+		}
+		@Override 
+		public void setDisplayId(int displayId){
+			throw new UnsupportedOperationException("Empty taste group does NOT support this operation.");
+		}
+		@Override
+		public void setRestaurantId(int restaurantId){
+			throw new UnsupportedOperationException("Empty taste group does NOT support this operation.");
+		}
+		@Override
+		public void setName(String name){
+			throw new UnsupportedOperationException("Empty taste group does NOT support this operation.");
+		}
+		@Override 
+		public void setType(Type type){
+			throw new UnsupportedOperationException("Empty taste group does NOT support this operation.");
+		}
+		@Override
+		public void setStatus(Status status){
+			throw new UnsupportedOperationException("Empty taste group does NOT support this operation.");
+		}
+	};
+	
 	private int id;
 	private int restaurantId;
 	private int displayId;
 	private String name;
-	private Type type;
-	private Status status;
+	private Type type = Type.NORMAL;
+	private Status status = Status.UNKNOWN;
 	
 	public TasteCategory(int id, String name){
 		setId(id);
@@ -224,6 +252,9 @@ public class TasteCategory implements Parcelable{
 	}
 
 	public Type getType() {
+		if(type == null){
+			return Type.NORMAL;
+		}
 		return type;
 	}
 
@@ -232,6 +263,9 @@ public class TasteCategory implements Parcelable{
 	}
 	
 	public Status getStatus(){
+		if(status == null){
+			return Status.UNKNOWN;
+		}
 		return this.status;
 	}
 	
@@ -254,6 +288,7 @@ public class TasteCategory implements Parcelable{
 			setRestaurantId(src.getRestaurantId());
 			setStatus(src.getStatus());
 			setType(src.getType());
+			setDisplayId(src.getDisplayId());
 		}
 	}
 	

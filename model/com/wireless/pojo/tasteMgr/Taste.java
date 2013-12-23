@@ -256,7 +256,7 @@ public class Taste implements Parcelable, Comparable<Taste>, Jsonable{
 	private float price;							// 口味价格
 	private float rate;								// 口味比例
 	private int rank;								// 排行	
-	private TasteCategory category = new TasteCategory();					// 口味类型    
+	private TasteCategory category;					// 口味类型    
 	private Calc calc = Calc.BY_PRICE;				// 口味计算方式          0:按价格     1:按比例
 	private Type type = Type.NORMAL;				// 操作类型	0:默认    1:系统保留(不可删除)
 	
@@ -286,10 +286,11 @@ public class Taste implements Parcelable, Comparable<Taste>, Jsonable{
 	 * @return the instance to temporary taste 
 	 */
 	public static Taste newTmpTaste(String pref, float price){
-		Taste tmpTaste = new Taste();
+		Taste tmpTaste = new Taste(0, TasteCategory.Status.TASTE);
 		tmpTaste.setTasteId((int)(System.currentTimeMillis() % 65535));
 		tmpTaste.setPreference(pref);
 		tmpTaste.setPrice(price);
+		tmpTaste.setType(Type.NORMAL);
 		return tmpTaste;
 	}
 	
@@ -352,6 +353,9 @@ public class Taste implements Parcelable, Comparable<Taste>, Jsonable{
 	}
 	
 	public TasteCategory getCategory() {
+		if(category == null){
+			return TasteCategory.EMPTY;
+		}
 		return category;
 	}
 	
