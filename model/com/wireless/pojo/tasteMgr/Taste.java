@@ -359,10 +359,6 @@ public class Taste implements Parcelable, Comparable<Taste>, Jsonable{
 		this.category = category;
 	}
 	
-	public void setCategoryIdAndName(int id, String name){
-		this.category.setId(id);
-		this.category.setName(name);
-	}
 	public int getRank() {
 		return rank;
 	}
