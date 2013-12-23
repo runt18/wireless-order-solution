@@ -197,7 +197,8 @@ public class TasteDao {
 			Taste taste = new Taste(dbCon.rs.getInt("taste_id"));
 			taste.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
 			taste.setPreference(dbCon.rs.getString("preference"));
-			taste.setCategoryIdAndName(dbCon.rs.getInt("category_id"), dbCon.rs.getString("name"));
+			taste.getCategory().setId(dbCon.rs.getInt("category_id"));
+			taste.getCategory().setName(dbCon.rs.getString("name"));
 			taste.setCalc(dbCon.rs.getShort("calc"));
 			taste.setRate(dbCon.rs.getFloat("rate"));
 			taste.setPrice(dbCon.rs.getFloat("price"));
