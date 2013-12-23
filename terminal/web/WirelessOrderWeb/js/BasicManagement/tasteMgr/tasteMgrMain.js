@@ -665,7 +665,7 @@ function tasteCateOperateHandler(c){
 		cateName.focus();
 	}else if(c.otype == 'update'){
 		var tn = tmm_tasteTree.getNodeById(tastem_nodeId==""?tastem_selectedId:tastem_nodeId);
-		if(!tn){
+		if(!tn || tn.id==-1){
 			Ext.example.msg('提示', '操作失败, 请选中一条数据再进行操作.');
 			return;
 		}else{
