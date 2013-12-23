@@ -29,6 +29,8 @@
 
 
 <script type="text/javascript">
+var tastem_nodeId, tastem_selectedId;
+var nodey=0,barX=500, barY=800;
 var restaurantID;
 var tabIndex = 0;
 //收款统计
@@ -114,6 +116,11 @@ var tabs = new Ext.TabPanel({
         icon: '../../images/home.png',
         iconCls : 'tab_home'
     }],
+    listeners : {
+    	tabchange : function(){
+    		nodey = 0;
+    	}
+    },
     plugins: new Ext.ux.TabCloseMenu()
     
 });
@@ -309,6 +316,6 @@ Ext.onReady(function(){
   <div id="west"></div>
   <div id="center" >
   <img alt="" src="../../images/home_page.jpg" style="width:100%;height: 100%"></div>
-  <div class="loginBtn" id="div_floatBar" style="height: 15px;background-color: #DFE8F6;position: absolute;display: none"></div>
+  <div class="floatBar" id="div_floatBar" style="height: 15px;background-color: #DFE8F6;position: absolute;display: none"></div>
 </body>
 </html>
