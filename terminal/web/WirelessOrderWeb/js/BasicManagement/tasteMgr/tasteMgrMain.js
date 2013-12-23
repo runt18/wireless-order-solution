@@ -683,7 +683,6 @@ function tasteCateOperateHandler(c){
 		cateId.setValue(tn.id);
 		cateName.setValue(tn.attributes.tasteCateName);
 		cateName.focus();
-		Ext.getCmp('comboTasteCate').fireEvent(select, Ext.getCmp('comboTasteCate'));
 	}else if(c.otype == 'delete'){
 		var tn = tmm_tasteTree.getNodeById(tastem_nodeId==""?tastem_selectedId:tastem_nodeId);
 		if(!tn){
