@@ -53,6 +53,7 @@ public class TestMemberLevelDao {
 		
 		int memberLevelId = 0;
 		try{
+			//添加
 			MemberLevel.InsertBuilder insertBuilder = new InsertBuilder(1000, memberType.getTypeId());
 			insertBuilder.setRestaurantId(mStaff.getRestaurantId());
 			
@@ -66,6 +67,7 @@ public class TestMemberLevelDao {
 			expected.setLevelId(actual.getLevelId());
 			compare(expected, actual);
 			
+			//修改
 			MemberLevel.UpdateBuilder updateBuilder = new UpdateBuilder(memberLevelId);
 			updateBuilder.setPointThreshold(1500);
 			updateBuilder.setMemberTypeId(list.get(1).getTypeId());

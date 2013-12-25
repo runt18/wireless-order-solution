@@ -48,13 +48,14 @@ public class MemberLevelDao {
 	public static int insert(DBCon dbCon, InsertBuilder builder, int restaurantId) throws SQLException, BusinessException{
 		MemberLevel memberLevel = builder.build();
 		String sql;
+		//判断是否会员类型已有所属
 		sql = "SELECT * FROM " + Params.dbName + ".member_level WHERE restaurant_id = " + restaurantId + " AND member_type_id = " + memberLevel.getMemberTypeId();
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		if(dbCon.rs.next()){
 			throw new BusinessException(MemberError.MEMBER_TYPE_BELONG);
 		}
 		dbCon.rs.close();
-		
+		//获取等级id
 		sql = " SELECT IFNULL(MAX(level_id), 0) + 1 FROM " + Params.dbName + ".member_level WHERE restaurant_id = " + restaurantId;
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		int levelId = 0;
@@ -62,7 +63,7 @@ public class MemberLevelDao {
 			levelId = dbCon.rs.getInt(1);
 		}
 		dbCon.rs.close();
-		
+		//判断积分是否大于低等级
 		sql = "SELECT IF(" + memberLevel.getPointThreshold() + " > (SELECT IFNULL(MAX(point_threshold), -1) FROM " + Params.dbName + ".member_level WHERE restaurant_id = " + restaurantId + " AND level_id < "+ levelId +" LIMIT 0, 1), " + memberLevel.getPointThreshold() + ", -1)" +
 				" FROM " + Params.dbName + ".member_level WHERE restaurant_id = " + restaurantId ;
 		
@@ -119,12 +120,14 @@ public class MemberLevelDao {
 		MemberLevel memberLevel = builder.build();
 		String sql;
 		int levelId = 0;
+		//判断会员类型是否有所属
 		sql = "SELECT * FROM " + Params.dbName + ".member_level WHERE restaurant_id = " + restaurantId + " AND member_type_id = " + memberLevel.getMemberTypeId();
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		if(dbCon.rs.next()){
 			throw new BusinessException(MemberError.MEMBER_TYPE_BELONG);
 		}
 		dbCon.rs.close();
+		//获取等级id
 		sql = "SELECT level_id FROM " + Params.dbName + ".member_level WHERE id = " + memberLevel.getId();
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		if(dbCon.rs.next()){
@@ -133,7 +136,7 @@ public class MemberLevelDao {
 			throw new BusinessException(MemberError.MEMBER_LEVEL_NOT_EXIST);
 		}
 		dbCon.rs.close();
-		
+		//获取低一级积分
 		int minPoint = -1, maxPoint = 2147483640;
 		sql = "SELECT IFNULL(MAX(point_threshold), -1) FROM " + Params.dbName + ".member_level WHERE restaurant_id = " + restaurantId + " AND level_id < "+ levelId +" LIMIT 0, 1";
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
@@ -141,14 +144,14 @@ public class MemberLevelDao {
 			minPoint = dbCon.rs.getInt(1);
 		}
 		dbCon.rs.close();
-		
+		//获取高一级积分
 		sql = "SELECT IFNULL(MAX(point_threshold), 2147483640) FROM " + Params.dbName + ".member_level WHERE restaurant_id = " + restaurantId + " AND level_id > "+ levelId +" LIMIT 0, 1";
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		if(dbCon.rs.next()){
 			maxPoint = dbCon.rs.getInt(1);
 		}
 		dbCon.rs.close();
-		
+		//判断修改积分是否符合条件
 		if(minPoint > memberLevel.getPointThreshold()){
 			throw new BusinessException(MemberError.MEMBER_LEVEL_LESS_POINT);
 		}else if(maxPoint < memberLevel.getPointThreshold()){
