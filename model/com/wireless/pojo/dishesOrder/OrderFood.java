@@ -409,12 +409,8 @@ public class OrderFood implements Parcelable, Comparable<OrderFood>, Jsonable {
 		return NumericUtil.roundFloat(mDiscount);
 	}
 	
-	public long getFoodId(){
+	public int getFoodId(){
 		return mFood.getFoodId();
-	}
-	
-	public Food getFood(){
-		return this.mFood;
 	}
 	
 	/**

@@ -5,7 +5,7 @@ import com.wireless.pojo.util.DateUtil;
 public class CancelledFood {
 	private long orderID;           // 账单号
 	private long orderDate;			// 账单时间
-	private long foodID;			// 食品编号
+	private int foodId;			// 食品编号
 	private String foodName;		// 食品名称
 	private int deptID;				// 部门编号
 	private String deptName;		// 部门名称
@@ -19,7 +19,7 @@ public class CancelledFood {
 	public CancelledFood(OrderFood of){
 		this.orderID = of.getOrderId();
 		this.orderDate = of.getOrderDate();
-		this.foodID = of.getFoodId();
+		this.foodId = of.getFoodId();
 		this.foodName = of.getName();
 		this.deptID = of.getKitchen().getDept().getId();
 		this.deptName = of.getKitchen().getDept().getName();
@@ -46,11 +46,11 @@ public class CancelledFood {
 	public void setOrderDate(long orderDate) {
 		this.orderDate = orderDate;
 	}
-	public long getFoodID() {
-		return foodID;
+	public long getFoodId() {
+		return foodId;
 	}
-	public void setFoodID(long foodID) {
-		this.foodID = foodID;
+	public void setFoodId(int foodId) {
+		this.foodId = foodId;
 	}
 	public String getFoodName() {
 		return foodName;
