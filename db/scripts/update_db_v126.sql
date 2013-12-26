@@ -53,4 +53,43 @@ UPDATE wireless_order_db.taste T
 JOIN wireless_order_db.taste_category TC ON T.restaurant_id = TC.restaurant_id AND T.category_id = 2 AND TC.status = 1
 SET T.category_id = TC.category_id;
 
+-- -----------------------------------------------------
+-- Table `wireless_order_db`.`member_level`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `wireless_order_db`.`member_level` ;
+
+CREATE TABLE IF NOT EXISTS `wireless_order_db`.`member_level` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `restaurant_id` INT NOT NULL,
+  `level_id` INT NOT NULL,
+  `point_threshold` INT NOT NULL,
+  `member_type_id` INT NOT NULL,
+  PRIMARY KEY (`id`),
+  INDEX `ix_restaurant_id` (`restaurant_id` ASC),
+  INDEX `ix_member_type_id` (`member_type_id` ASC))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
+-- -----------------------------------------------------
+-- Table `wireless_order_db`.`weixin_image`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `wireless_order_db`.`weixin_image` ;
+
+CREATE TABLE IF NOT EXISTS `wireless_order_db`.`weixin_image` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `restaurant_id` INT NOT NULL,
+  `image` VARCHAR(45) NOT NULL,
+  `last_modified` DATETIME NOT NULL,
+  PRIMARY KEY (`id`),
+  INDEX `ix_restaurant_id` (`restaurant_id` ASC))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
+-- -----------------------------------------------------
+-- Add the field 'weixin_token' & 'weixin_info' to table `wireless_order_db`.`restaurant`
+-- -----------------------------------------------------
+ALTER TABLE `wireless_order_db`.`restaurant` 
+ADD COLUMN `weixin_token` VARCHAR(45) NULL DEFAULT NULL AFTER `liveness`,
+ADD COLUMN `weixin_info` VARCHAR(500) NULL DEFAULT NULL AFTER `weixin_token`;
+
 SET SQL_SAFE_UPDATES = @OLD_SAFE_UPDATES;
