@@ -152,9 +152,9 @@ public class MemberLevelDao {
 		}
 		dbCon.rs.close();
 		//判断修改积分是否符合条件
-		if(minPoint > memberLevel.getPointThreshold()){
+		if(minPoint >= memberLevel.getPointThreshold()){
 			throw new BusinessException(MemberError.MEMBER_LEVEL_LESS_POINT);
-		}else if(maxPoint < memberLevel.getPointThreshold()){
+		}else if(maxPoint <= memberLevel.getPointThreshold()){
 			throw new BusinessException(MemberError.MEMBER_LEVEL_MORE_POINT);
 		}
 		sql = "UPDATE " + Params.dbName + ".member_level SET " +
