@@ -10,36 +10,49 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
+import com.wireless.Actions.menuMgr.basic.ImageFileUploadAction;
+import com.wireless.db.DBCon;
 import com.wireless.db.menuMgr.FoodDao;
+import com.wireless.db.weixin.restaurant.WeixinRestaurantDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.menuMgr.Food;
 import com.wireless.util.DataPaging;
+import com.wireless.util.OSSParams;
+import com.wireless.util.OSSUtil;
 
 public class QueryFoodAction extends DispatchAction{
 	
-	public ActionForward normal(ActionMapping mapping, ActionForm form,
+	/**
+	 * 明星菜(推荐属性菜品)
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward isRecommend(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
 		
 		
 		JObject jobject = new JObject();
-		
 		String imageBrowseDefaultFile = this.getServlet().getInitParameter("imageBrowseDefaultFile");
-		String imageBrowsePath = this.getServlet().getInitParameter("imageBrowsePath");
-		
 		try{
-			String rid = request.getParameter("rid");
+			String fid = request.getParameter("fid");
+			int rid = WeixinRestaurantDao.getRestaurantIdByWeixin(fid);
 			
 			String extraCond = " AND FOOD.restaurant_id = " + rid, orderClause = " ORDER BY FOOD.food_alias";
-			extraCond += (" AND FOOD.status & " + Food.RECOMMEND + " <> 0");
+			extraCond += " AND (FOOD.status & " + Food.SELL_OUT + ") = 0";
+			extraCond += " AND (FOOD.status & " + Food.RECOMMEND + ") <> 0";
 			List<Food> list = FoodDao.getPureFoods(extraCond, orderClause);
 			if(list != null){
 				jobject.setTotalProperty(list.size());
 				list = DataPaging.getPagingData(list, true, 0, 20);
 				for(Food temp : list){
 					if(temp.hasImage()){
-						temp.setImage((imageBrowsePath + "/" + temp.getRestaurantId() + "/" + temp.getImage()));
+						temp.setImage(("http://" + OSSUtil.BUCKET_IMAGE + "." + OSSParams.instance().OSS_OUTER_POINT + "/" + temp.getRestaurantId() + "/" + ImageFileUploadAction.CI_PRIEX + temp.getImage()));
 					}else{
 						temp.setImage(imageBrowseDefaultFile);
 					}
@@ -53,6 +66,69 @@ public class QueryFoodAction extends DispatchAction{
 			e.printStackTrace();
 			jobject.initTip(e);
 		}finally{
+			response.getWriter().print(jobject.toString());
+		}
+		return null;
+	}
+	
+	/**
+	 * 普通查询
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward normal(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		request.setCharacterEncoding("UTF-8");
+		response.setCharacterEncoding("UTF-8");
+		JObject jobject = new JObject();
+		List<Food> root = null;
+		
+		String isPaging = request.getParameter("isPaging");
+		String start = request.getParameter("start");
+		String limit = request.getParameter("limit");
+		
+		String imageBrowseDefaultFile = this.getServlet().getInitParameter("imageBrowseDefaultFile");
+		DBCon dbCon = null;
+		try{
+			dbCon = new DBCon();
+			dbCon.connect();
+			
+			String fid = request.getParameter("fid");
+			String kitchenId = request.getParameter("kitchenId");
+			int rid = WeixinRestaurantDao.getRestaurantIdByWeixin(dbCon, fid);
+			
+			String extraCond = " AND FOOD.restaurant_id = " + rid, orderClause = " ORDER BY FOOD.food_alias";
+			extraCond += " AND (FOOD.status & " + Food.SELL_OUT + ") = 0";
+			if(kitchenId != null && !kitchenId.trim().isEmpty() && !kitchenId.trim().equals("-1")){
+				extraCond += (" AND KITCHEN.kitchen_id = " + kitchenId);
+			}
+			root = FoodDao.getPureFoods(dbCon, extraCond, orderClause);
+			
+		}catch(BusinessException e){
+			e.printStackTrace();
+			jobject.initTip(e);
+		}catch(Exception e){
+			e.printStackTrace();
+			jobject.initTip(e);
+		}finally{
+			if(dbCon != null) dbCon.disconnect();
+			if(root != null && !root.isEmpty()){
+				jobject.setTotalProperty(root.size());
+				root = DataPaging.getPagingData(root, isPaging, start, limit);
+				for(Food temp : root){
+					if(temp.hasImage()){
+						temp.setImage(("http://" + OSSUtil.BUCKET_IMAGE + "." + OSSParams.instance().OSS_OUTER_POINT + "/" + temp.getRestaurantId() + "/" + ImageFileUploadAction.CI_PRIEX + temp.getImage()));
+					}else{
+						temp.setImage(imageBrowseDefaultFile);
+					}
+				}
+				jobject.setRoot(root);
+			}
 			response.getWriter().print(jobject.toString());
 		}
 		

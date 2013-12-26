@@ -28,10 +28,13 @@ import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.menuMgr.Food;
+import com.wireless.util.CompressImage;
 import com.wireless.util.OSSUtil;
 import com.wireless.util.WebParams;
 
 public class ImageFileUploadAction extends Action{
+	
+	public static final String CI_PRIEX = "small_";
 	
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
@@ -79,7 +82,10 @@ public class ImageFileUploadAction extends Action{
 				root.add(fb);
             	
             	FoodDao.updateFoodImageName(Integer.parseInt(restaurantID), Integer.parseInt(foodID), null);
+            	// 删除原始图片
             	OSSUtil.deleteImage(restaurantID + "/" + oldName);
+            	// 删除原始缩略图
+            	OSSUtil.deleteImage(restaurantID + "/" + CI_PRIEX + oldName);
             	
 			}else if(Integer.parseInt(otype) == 0){
 				File tempFile = new File(Thread.currentThread().getContextClassLoader().getResource("").getPath());
@@ -161,7 +167,12 @@ public class ImageFileUploadAction extends Action{
 		                		filePart.writeTo(tempStream);
 		                		uploadStream = new ByteArrayInputStream(tempStream.toByteArray());
 		                		jobject.initTip(true, "操作成功, 读取上传图片信息成功!");
+		                		// 原始图片
 		                		OSSUtil.uploadImage(uploadStream, restaurantID + "/" + newFileName);
+		                		// 缩略图
+		                		CompressImage ci = new CompressImage();
+		                		uploadStream = ci.imageZoomOut(new ByteArrayInputStream(tempStream.toByteArray()), 500, 400);
+		                		OSSUtil.uploadImage(uploadStream, restaurantID + "/" + CI_PRIEX + newFileName);
 		                	}catch(Exception e){
 		                		jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9993, "操作失败, 读取上传图片信息失败, 请联系客服人员!");
 		                		deleteImage(op);
@@ -180,6 +191,7 @@ public class ImageFileUploadAction extends Action{
 			                    tempFile.delete();
 		                    	// 删除原图片
 			        			OSSUtil.deleteImage(restaurantID + "/" + oldName);
+			        			OSSUtil.deleteImage(restaurantID + "/" + CI_PRIEX + oldName);
 		                    }catch(Exception e){
 		                    	jobject.initTip(false, WebParams.TIP_TITLE_ERROE, 9991, "操作失败, 更新编号为 " + foodID + " 的菜品图片信息失败!");
 		                    	deleteImage(op);
@@ -200,6 +212,7 @@ public class ImageFileUploadAction extends Action{
 		                	
 		                	FoodDao.updateFoodImageName(Integer.parseInt(restaurantID), Integer.parseInt(foodID), null);
 		                	OSSUtil.deleteImage(restaurantID + "/" + oldName);
+		                	OSSUtil.deleteImage(restaurantID + "/" + CI_PRIEX + oldName);
 		                }
 		            }
 		        }
