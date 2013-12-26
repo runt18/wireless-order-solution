@@ -13,8 +13,7 @@ public class MemberLevel implements Jsonable{
 	private int restaurantId;
 	private int levelId;
 	private int pointThreshold;
-	private int memberTypeId = -1;
-	private String memberTypeName;
+	private MemberType memberType;
 	
 	
 	public int getId() {
@@ -41,19 +40,25 @@ public class MemberLevel implements Jsonable{
 	public void setPointThreshold(int pointThreshold) {
 		this.pointThreshold = pointThreshold;
 	}
-	public int getMemberTypeId() {
-		return memberTypeId;
+	public MemberType getMemberType() {
+		if(memberType == null){
+			memberType = new MemberType(-1);
+		}
+		return memberType;
 	}
-	public void setMemberTypeId(int memberTypeId) {
-		this.memberTypeId = memberTypeId;
-	}
-	public String getMemberTypeName() {
-		return memberTypeName;
-	}
-	public void setMemberTypeName(String memberTypeName) {
-		this.memberTypeName = memberTypeName;
+	public void setMemberType(MemberType memberType) {
+		this.memberType = memberType;
 	}
 	
+	public void setMemberTypeId(int typeId){
+		this.memberType.setTypeId(typeId);
+	}
+	
+	public void setMemberTypeName(String name){
+		this.memberType.setName(name);
+	}
+
+
 	public static class Builder{
 		protected MemberLevel data;
 		public Builder(){
@@ -69,7 +74,7 @@ public class MemberLevel implements Jsonable{
 	public static class InsertBuilder extends Builder{
 		public InsertBuilder(int pointThreshold, int memberTypeId){
 			data.setPointThreshold(pointThreshold);
-			data.setMemberTypeId(memberTypeId);	
+			data.getMemberType().setTypeId(memberTypeId);	
 		}
 		public InsertBuilder setRestaurantId(int restaurantId){
 			data.setRestaurantId(restaurantId);
@@ -88,12 +93,12 @@ public class MemberLevel implements Jsonable{
 		}
 		
 		public UpdateBuilder setMemberTypeId(int memberTypeId){
-			data.setMemberTypeId(memberTypeId);
+			data.getMemberType().setTypeId(memberTypeId);	
 			return this;
 		}
 		
 		public boolean isMemberTypeIdChange(){
-			return data.memberTypeId > 0;
+			return data.memberType != null;
 		}
 		
 		public boolean isPointThresholdChange(){
@@ -124,8 +129,8 @@ public class MemberLevel implements Jsonable{
 		jm.put("restaurantId", this.restaurantId);
 		jm.put("levelId", this.levelId);
 		jm.put("pointThreshold", this.pointThreshold);
-		jm.put("memberTypeId", this.memberTypeId);
-		jm.put("memberTypeName", this.memberTypeName);
+		jm.put("memberTypeId", this.memberType.getTypeId());
+		jm.put("memberTypeName", this.memberType.getName());
 		return Collections.unmodifiableMap(jm);
 	}
 	@Override
