@@ -109,8 +109,8 @@ public class PrinterLoginHandler implements Runnable{
 					//check to see whether the password is matched or not
 					//if(pwd.equals(dbCon.rs.getString("pwd"))){
 						
-						Staff term = new Staff();
-						term.setRestaurantId(restaurant.getId());
+						Staff staff = new Staff();
+						staff.setRestaurantId(restaurant.getId());
 						
 						//respond with the related kitchen information
 						new RespPrintLogin(loginReq.header, 
@@ -126,7 +126,7 @@ public class PrinterLoginHandler implements Runnable{
 						List<Content> printLosses = PrinterLosses.instance().get(restaurant);
 						if(!printLosses.isEmpty()){
 							PrinterLosses.instance().remove(restaurant);
-							new PrintHandler(term, printLosses).fireAsync();
+							new PrintHandler(staff, printLosses).fireAsync();
 						}
 						
 					//}else{
