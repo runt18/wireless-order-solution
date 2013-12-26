@@ -98,6 +98,10 @@ public final class JsonPackage {
 							item = new LinkedHashMap<String, Object>(((Jsonable)temp).toJsonMap(mFlag));
 							changeToMap(item);
 							lm.add(item);
+						}else if(temp instanceof Map){
+							Map<String, Object> tempMap = (Map<String, Object>) temp;
+							changeToMap(tempMap);
+							lm.add(tempMap);
 						}
 					}
 					entry.setValue(lm);
