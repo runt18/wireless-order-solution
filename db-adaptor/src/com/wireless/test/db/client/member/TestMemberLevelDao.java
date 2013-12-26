@@ -38,7 +38,7 @@ public class TestMemberLevelDao {
 		assertEquals("id", expected.getId(), actual.getId());
 		assertEquals("levelId", expected.getLevelId(), actual.getLevelId());
 		assertEquals("pointThreshold", expected.getPointThreshold(), actual.getPointThreshold());
-		assertEquals("memberTypeId", expected.getMemberTypeId(), actual.getMemberTypeId());
+		assertEquals("memberTypeId", expected.getMemberType().getTypeId(), actual.getMemberType().getTypeId());
 	}
 	
 	@Test
@@ -57,11 +57,11 @@ public class TestMemberLevelDao {
 			MemberLevel.InsertBuilder insertBuilder = new InsertBuilder(1000, memberType.getTypeId());
 			insertBuilder.setRestaurantId(mStaff.getRestaurantId());
 			
-			memberLevelId = MemberLevelDao.insert(insertBuilder, mStaff.getRestaurantId());
+			memberLevelId = MemberLevelDao.insert(mStaff, insertBuilder);
 			
 			MemberLevel expected = insertBuilder.build();
 			
-			MemberLevel actual = MemberLevelDao.getMemberLevelById(memberLevelId, mStaff.getRestaurantId());
+			MemberLevel actual = MemberLevelDao.getMemberLevelById(mStaff, memberLevelId);
 			
 			expected.setId(memberLevelId);
 			expected.setLevelId(actual.getLevelId());
@@ -72,10 +72,10 @@ public class TestMemberLevelDao {
 			updateBuilder.setPointThreshold(1500);
 			updateBuilder.setMemberTypeId(list.get(1).getTypeId());
 			
-			MemberLevelDao.update(updateBuilder, mStaff.getRestaurantId());
+			MemberLevelDao.update(mStaff, updateBuilder);
 			
 			expected = updateBuilder.build();
-			actual = MemberLevelDao.getMemberLevelById(memberLevelId, mStaff.getRestaurantId());
+			actual = MemberLevelDao.getMemberLevelById(mStaff, memberLevelId);
 			
 			expected.setLevelId(actual.getLevelId());
 			
@@ -84,7 +84,7 @@ public class TestMemberLevelDao {
 		}finally{
 			MemberLevelDao.delete(memberLevelId);
 			try{
-				MemberLevelDao.getMemberLevelById(memberLevelId, mStaff.getRestaurantId());
+				MemberLevelDao.getMemberLevelById(mStaff, memberLevelId);
 				assertEquals("failed to delete memberLevel", false);
 			}catch(Exception e){}
 		}
