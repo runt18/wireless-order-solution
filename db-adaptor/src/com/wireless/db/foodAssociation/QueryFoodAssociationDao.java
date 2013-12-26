@@ -17,8 +17,8 @@ public class QueryFoodAssociationDao {
 	 * Calculate the rank to each associated food according to a specific food.
 	 * @param dbCon
 	 * 			the database connection
-	 * @param term
-	 * 			the associated terminal
+	 * @param staff
+	 * 			the staff to perform this action
 	 * @param foodToAssociated
 	 * 			the food to be associated
 	 * @return the associated foods
@@ -27,11 +27,11 @@ public class QueryFoodAssociationDao {
 	 * @throws BusinessException
 	 * 			throws if the food to be associated NOT exist
 	 */
-	public static Food[] exec(Staff term, Food foodToAssociated) throws SQLException, BusinessException{ 
+	public static List<Food> exec(Staff staff, Food foodToAssociated) throws SQLException, BusinessException{ 
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return exec(dbCon, term, foodToAssociated);
+			return exec(dbCon, staff, foodToAssociated);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -41,8 +41,8 @@ public class QueryFoodAssociationDao {
 	 * Calculate the rank to each associated food according to a specific food.
 	 * @param dbCon
 	 * 			the database connection
-	 * @param term
-	 * 			the associated terminal
+	 * @param staff
+	 * 			the staff to perform this action
 	 * @param foodToAssociated
 	 * 			the food to be associated
 	 * @return the associated foods
@@ -51,9 +51,9 @@ public class QueryFoodAssociationDao {
 	 * @throws BusinessException
 	 * 			throws if the food to be associated NOT exist
 	 */
-	public static Food[] exec(DBCon dbCon, Staff term, Food foodToAssociated) throws SQLException, BusinessException{
+	public static List<Food> exec(DBCon dbCon, Staff staff, Food foodToAssociated) throws SQLException, BusinessException{
 		//Get the detail to food to associated.
-		foodToAssociated = FoodDao.getPureFoodByAlias(dbCon, term, foodToAssociated.getAliasId());
+		foodToAssociated = FoodDao.getPureFoodById(dbCon, staff, foodToAssociated.getFoodId());
 		
 		/**
 		 * Calculate point to each associated food, and sort it in descending order.
@@ -84,10 +84,10 @@ public class QueryFoodAssociationDao {
 		//Get the details to each associated food.
 		List<Food> result = new ArrayList<Food>(associatedFoods.size());
 		for(Food food : associatedFoods){
-			result.add(FoodDao.getPureFoodById(dbCon, term, food.getFoodId()));
+			result.add(FoodDao.getPureFoodById(dbCon, staff, food.getFoodId()));
 		}
 		
-		return result.toArray(new Food[result.size()]);
+		return result;
 		
 	}
 	

@@ -829,7 +829,7 @@ public class CalcBillStatisticsDao {
 			kitchen.setDept(dept);
 
 			Food food = new Food();
-			food.setFoodId(dbCon.rs.getLong("food_id"));
+			food.setFoodId(dbCon.rs.getInt("food_id"));
 			food.setAliasId(dbCon.rs.getInt("food_alias"));
 			food.setName(dbCon.rs.getString("food_name"));
 			food.setRestaurantId(dbCon.rs.getInt("restaurant_id"));

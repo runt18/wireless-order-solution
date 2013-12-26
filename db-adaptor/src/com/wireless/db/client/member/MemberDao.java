@@ -185,7 +185,7 @@ public class MemberDao {
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
 			while(dbCon.rs.next()){
 				Food favorFood = new Food();
-				favorFood.setFoodId(dbCon.rs.getLong("food_id"));
+				favorFood.setFoodId(dbCon.rs.getInt("food_id"));
 				favorFood.setAliasId(dbCon.rs.getInt("food_alias"));
 				favorFood.setName(dbCon.rs.getString("name"));
 				favorFood.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
@@ -203,7 +203,7 @@ public class MemberDao {
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
 			while(dbCon.rs.next()){
 				Food recommendFood = new Food();
-				recommendFood.setFoodId(dbCon.rs.getLong("food_id"));
+				recommendFood.setFoodId(dbCon.rs.getInt("food_id"));
 				recommendFood.setAliasId(dbCon.rs.getInt("food_alias"));
 				recommendFood.setName(dbCon.rs.getString("name"));
 				recommendFood.setRestaurantId(dbCon.rs.getInt("restaurant_id"));

@@ -103,7 +103,7 @@ public class OrderFoodDao {
 		while (dbCon.rs.next()) {
 			OrderFood food = new OrderFood();
 			food.setOrderId(dbCon.rs.getInt("order_id"));
-			food.asFood().setFoodId(dbCon.rs.getLong("food_id"));
+			food.asFood().setFoodId(dbCon.rs.getInt("food_id"));
 			food.asFood().setName(dbCon.rs.getString("name"));
 			food.asFood().setAliasId(dbCon.rs.getInt("food_alias"));
 			food.asFood().setRestaurantId(dbCon.rs.getInt("restaurant_id"));
@@ -217,7 +217,7 @@ public class OrderFoodDao {
 		while (dbCon.rs.next()) {
 			OrderFood food = new OrderFood();
 			food.setOrderId(dbCon.rs.getInt("order_id"));
-			food.asFood().setFoodId(dbCon.rs.getLong("food_id"));
+			food.asFood().setFoodId(dbCon.rs.getInt("food_id"));
 			food.asFood().setName(dbCon.rs.getString("name"));
 			food.asFood().setAliasId(dbCon.rs.getInt("food_alias"));
 			food.asFood().setRestaurantId(dbCon.rs.getInt("restaurant_id"));
@@ -338,7 +338,7 @@ public class OrderFoodDao {
 		ArrayList<OrderFood> orderFoods = new ArrayList<OrderFood>();
 		while (dbCon.rs.next()) {
 			OrderFood food = new OrderFood();
-			food.asFood().setFoodId(dbCon.rs.getLong("food_id"));
+			food.asFood().setFoodId(dbCon.rs.getInt("food_id"));
 			food.asFood().setName(dbCon.rs.getString("name"));
 			food.asFood().setAliasId(dbCon.rs.getInt("food_alias"));
 			food.asFood().setRestaurantId(dbCon.rs.getInt("restaurant_id"));
@@ -443,7 +443,7 @@ public class OrderFoodDao {
 		ArrayList<OrderFood> orderFoods = new ArrayList<OrderFood>();
 		while (dbCon.rs.next()) {
 			OrderFood food = new OrderFood();
-			food.asFood().setFoodId(dbCon.rs.getLong("food_id"));
+			food.asFood().setFoodId(dbCon.rs.getInt("food_id"));
 			food.asFood().setName(dbCon.rs.getString("name"));
 			food.asFood().setAliasId(dbCon.rs.getInt("food_alias"));
 			food.asFood().setRestaurantId(dbCon.rs.getInt("restaurant_id"));

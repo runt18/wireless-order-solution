@@ -572,7 +572,7 @@ public class FoodDao {
 				
 			while(dbCon.rs.next()){
 					
-				long foodID = dbCon.rs.getLong("food_id");
+				int foodID = dbCon.rs.getInt("food_id");
 				int restaurantID = dbCon.rs.getInt("restaurant_id");
 					
 				Food childFood = new Food(restaurantID,
@@ -666,7 +666,7 @@ public class FoodDao {
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		while(dbCon.rs.next()){
 	
-			long foodId = dbCon.rs.getLong("food_id");
+			int foodId = dbCon.rs.getInt("food_id");
 			int restaurantId = dbCon.rs.getInt("restaurant_id");
 			
 			foods.add(new Food(restaurantId,
@@ -871,7 +871,7 @@ public class FoodDao {
 	public static List<Food> getFoods(DBCon dbCon, Staff term, String extraCondition, String orderClause) throws SQLException{
 
 		//Using link hash map to keep original order after retrieving the foods by order clause defined in SQL statement.
-		Map<Long, Food> foods = new LinkedHashMap<Long, Food>();
+		Map<Integer, Food> foods = new LinkedHashMap<Integer, Food>();
 		
 		if(orderClause == null){
 			orderClause = " ORDER BY FOOD.food_alias ";
@@ -919,7 +919,7 @@ public class FoodDao {
 		dbCon.rs.close();
 		
 		//Get the combo detail to each food if belongs to combo. 
-		for(Entry<Long, Food> entry : foods.entrySet()){
+		for(Entry<Integer, Food> entry : foods.entrySet()){
 			if(entry.getValue().isCombo()){
 				entry.getValue().setChildFoods(queryComboByParent(dbCon, entry.getValue()));
 			}
