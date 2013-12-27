@@ -89,7 +89,7 @@ public class TablePanelFragment extends Fragment implements OnGestureListener {
 		mOnTableChangedListener = l;
 	}
 	
-	public interface OnTableChangedListener{
+	public static interface OnTableChangedListener{
 		void onTableChanged(Table table);
 	}
 	

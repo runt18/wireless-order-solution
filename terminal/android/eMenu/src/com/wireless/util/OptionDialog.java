@@ -62,10 +62,6 @@ public class OptionDialog extends Dialog implements OnTableChangedListener, OnSt
 	
 	private OnStaffChangedListener mOnStaffChangedListener;
 	
-	public static interface OnStaffChangedListener{
-		void onStaffChanged(Staff staff, String id, String pwd);
-	}
-	
 	public void setOnStaffChangeListener(OnStaffChangedListener l){
 		mOnStaffChangedListener = l;
 	}

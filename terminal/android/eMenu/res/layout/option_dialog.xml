@@ -64,14 +64,13 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
     </RelativeLayout>
-
+
     <RelativeLayout
         android:id="@+id/relativeLayout2"
         android:layout_width="wrap_content"
         android:layout_height="@dimen/dialog_option_bottom_height"
         android:layout_alignParentBottom="true"
         android:background="@drawable/optionbar_bg" >
-
     </RelativeLayout>
 
 </RelativeLayout>

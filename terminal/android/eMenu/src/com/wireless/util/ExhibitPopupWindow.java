@@ -1,5 +1,7 @@
 package com.wireless.util;
 
+import java.util.List;
+
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.Gravity;
@@ -86,8 +88,8 @@ public class ExhibitPopupWindow extends PopupWindow {
 			 * finally, the {@link PopupWindow} will show base on the anchor view 
 			 */
 			@Override
-			protected void onPostExecute(Food[] associatedFoods) {
-				if(associatedFoods.length == 0){
+			protected void onPostExecute(List<Food> associatedFoods) {
+				if(associatedFoods.isEmpty()){
 					Toast.makeText(getContentView().getContext(), "此菜无关联菜", Toast.LENGTH_SHORT).show();
 					
 				} else {

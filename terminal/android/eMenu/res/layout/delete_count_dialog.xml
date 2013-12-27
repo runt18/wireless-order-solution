@@ -4,86 +4,35 @@
     android:layout_height="match_parent"
     android:padding="10dp" >
 
-    <TextView
-        android:id="@+id/textView_orderName_deleteCount"
+    <EditText
+        android:id="@+id/editText_count_deleteCount_dialog"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
+        android:ems="10"
+        android:inputType="number|numberDecimal"
+        android:layout_toRightOf="@+id/imageButton_minus_deleteCount_dialog" >
+    </EditText>
 
-    <RelativeLayout
-        android:id="@+id/relativeLayout1"
-        android:layout_width="match_parent"
+    <ImageButton
+        android:id="@+id/imageButton_plus_deleteCount_dialog"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_below="@+id/textView_orderName_deleteCount"
-        android:layout_marginBottom="10dp" >
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_toRightOf="@+id/editText_count_deleteCount_dialog"
+        android:background="@null"
+        android:src="@drawable/plus_btn_selector" />
 
-        <TextView
-            android:id="@+id/textView_combo_name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentTop="false"
-            android:layout_centerVertical="true"
-            android:text="数量："
-            android:textAppearance="?android:attr/textAppearanceLarge" />
-
-        <EditText
-            android:id="@+id/editText_count_deleteCount"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_toRightOf="@+id/textView_combo_name"
-            android:ems="10"
-            android:inputType="number|numberDecimal" >
-        </EditText>
-
-        <ImageButton
-            android:id="@+id/imageButton_plus_deleteCount_dialog"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
-            android:layout_toRightOf="@+id/editText_count_deleteCount"
-            android:background="@null"
-            android:src="@drawable/plus_btn_selector" />
-
-        <ImageButton
-            android:id="@+id/imageButton_minus_deleteCount_dialog"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
-            android:layout_toRightOf="@+id/imageButton_plus_deleteCount_dialog"
-            android:background="@null"
-            android:src="@drawable/minus_btn_selector" />
-    </RelativeLayout>
-
-    <RelativeLayout
-        android:layout_width="match_parent"
+    <ImageButton
+        android:id="@+id/imageButton_minus_deleteCount_dialog"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/relativeLayout1"
-        android:layout_below="@+id/relativeLayout1" >
-
-        <Button
-            android:id="@+id/button_confirm_deleteCount"
-            android:layout_width="120dp"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentTop="true"
-            android:text="确定" />
-
-        <Button
-            android:id="@+id/button_cancel_deleteCount"
-            android:layout_width="120dp"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_toLeftOf="@+id/button_confirm_deleteCount"
-            android:text="取消" />
-    </RelativeLayout>
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:background="@null"
+        android:src="@drawable/minus_btn_selector" />
 
 </RelativeLayout>

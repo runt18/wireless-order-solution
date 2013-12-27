@@ -1,6 +1,7 @@
 package com.wireless.common;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import com.wireless.exception.BusinessException;
@@ -164,6 +165,27 @@ public final class ShoppingCart {
 	}
 	
 	/**
+	 * Remove the specific order food from new order list without privilege check.
+	 * @param foodToDel 
+	 * 			the food to remove
+	 * @param staff
+	 * 			the staff to remove food
+	 * @return true if the food to be removed exist before, otherwise return false
+	 */
+	public boolean delete(OrderFood foodToDel){
+		if(mNewOrder != null){
+			if(mNewOrder.delete(foodToDel)){
+				notifyFoodsChanged();
+				return true;
+			}else{
+				return false;
+			}
+		}else{
+			return false;
+		}
+	}
+	
+	/**
 	 * 把多个新点菜添加到购物篮中。 遍历查找已点的新菜品中是否相同的菜品， 如果有就将他们的点菜数量相加， 否则就直接添加到新菜品List中。
 	 * 
 	 * @param extraFoods
@@ -194,10 +216,6 @@ public final class ShoppingCart {
 			mNewOrder = new Order();
 		}
 		
-		if(!foodToAdd.hasTaste()){
-			foodToAdd.makeTasteGroup();
-		}
-		
 		mNewOrder.addFood(new OrderFood(foodToAdd), WirelessOrder.loginStaff);
 		notifyFoodsChanged();
 	}
@@ -211,6 +229,33 @@ public final class ShoppingCart {
 		boolean result = mNewOrder.replace(foodToReplace);
 		notifyFoodsChanged();
 		return result;
+	}
+	
+	/**
+	 * Remove specific amount from original food list. 
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param foodToDel
+	 * 			the food to remove
+	 * @param removeAmount
+	 * 			the amount to remove
+	 * @return true if the food to remove exist, otherwise false
+	 * @throws BusinessException
+	 * 			throws if the staff has no privilege to remove food
+	 */
+	public boolean removeCount(Staff staff, OrderFood foodToDel, float removeAmount) throws BusinessException{
+		if(mOriOrder != null){
+			for(OrderFood of : mOriOrder.getOrderFoods()){
+				if(of.equals(foodToDel)){
+					of.removeCount(removeAmount, staff);
+					notifyFoodsChanged();
+					return true;
+				}
+			}
+			return false;
+		}else{
+			return false;
+		}
 	}
 	
 	/**
@@ -262,9 +307,9 @@ public final class ShoppingCart {
 	 */
 	public List<OrderFood> getOriFoods(){
 		if(mOriOrder != null){
-			return mOriOrder.getOrderFoods();
+			return Collections.unmodifiableList(mOriOrder.getOrderFoods());
 		}else{
-			return new ArrayList<OrderFood>(0);
+			return Collections.emptyList();
 		}		
 	}
 	
@@ -286,9 +331,9 @@ public final class ShoppingCart {
 	 */
 	public List<OrderFood> getNewFoods(){
 		if(mNewOrder != null){
-			return mNewOrder.getOrderFoods();
+			return Collections.unmodifiableList(mNewOrder.getOrderFoods());
 		}else{
-			return new ArrayList<OrderFood>(0);
+			return Collections.emptyList();
 		}
 	}
 	
@@ -309,7 +354,7 @@ public final class ShoppingCart {
 	 * @return all foods to shopping cart
 	 */
 	public List<OrderFood> getAllFoods(){
-		return new ArrayList<OrderFood>(mFoodsInCart);
+		return Collections.unmodifiableList((mFoodsInCart));
 	}
 
 	/**
@@ -354,14 +399,10 @@ public final class ShoppingCart {
 		
 		mFoodsInCart.clear();
 		if(mNewOrder != null){
-			for(OrderFood of : mNewOrder.getOrderFoods()){
-				mFoodsInCart.add(of);
-			}
+			mFoodsInCart.addAll(mNewOrder.getOrderFoods());
 		}
 		if(mOriOrder != null){
-			for(OrderFood of : mOriOrder.getOrderFoods()){
-				mFoodsInCart.add(of);
-			}
+			mFoodsInCart.addAll(mOriOrder.getOrderFoods());
 		}
 		
 		if(mOnFoodsChangedListener != null){

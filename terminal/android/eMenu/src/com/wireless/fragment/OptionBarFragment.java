@@ -23,6 +23,7 @@ import android.widget.Toast;
 import com.wireless.common.ShoppingCart;
 import com.wireless.common.ShoppingCart.OnFoodsChangedListener;
 import com.wireless.common.WirelessOrder;
+import com.wireless.fragment.StaffPanelFragment.OnStaffChangedListener;
 import com.wireless.ordermenu.R;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.OrderFood;
@@ -31,7 +32,6 @@ import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.ui.MainActivity;
 import com.wireless.ui.SelectedFoodActivity;
 import com.wireless.util.OptionDialog;
-import com.wireless.util.OptionDialog.OnStaffChangedListener;
 import com.wireless.util.OptionDialog.OnTableChangedListener;
 
 /**
@@ -166,9 +166,10 @@ public class OptionBarFragment extends Fragment
 	public void onStart(){
 		super.onStart();		
 		mBBarRefleshHandler = new BBarHandler(this);
-		ShoppingCart.instance().setOnFoodsChangeListener(this);
 		mBBarRefleshHandler.sendEmptyMessage(0);
 		
+		ShoppingCart.instance().setOnFoodsChangeListener(this);
+
 		//decide whether need to fix staff/table or not
 		if(!STAFF_FIXED){
 			mStaffBtn.setClickable(true);
@@ -219,7 +220,7 @@ public class OptionBarFragment extends Fragment
 		mDialog.setOwnerActivity(getActivity());
 		mDialog.setOnStaffChangeListener(this);
 		mDialog.setOnTableChangedListener(this);
-		
+
 		//服务员
 		mStaffBtn.setOnClickListener(new View.OnClickListener() {			
 			@Override
@@ -412,21 +413,26 @@ public class OptionBarFragment extends Fragment
 		public void onOrderChanged(Order order);
 	}
 	
-	public void setOnOrderChangeListener(OnOrderChangeListener l)
-	{
+	public void setOnOrderChangeListener(OnOrderChangeListener l){
 		mOnOrderChangeListener = l;
 	}
 
 	public void setTable(int tableId) {
-		for(Table t :WirelessOrder.tables)
-			if(t.getAliasId() == tableId)
+		for(Table t : WirelessOrder.tables){
+			if(t.getAliasId() == tableId){
 				onTableChanged(t);
+				break;
+			}
+		}
 	}
 
 	public void setStaff(int staffPin) {
-		for(Staff s : WirelessOrder.staffs)
-			if(s.getId() == staffPin)
+		for(Staff s : WirelessOrder.staffs){
+			if(s.getId() == staffPin){
 				ShoppingCart.instance().setStaff(s);
+				break;
+			}
+		}
 	}
 	
 }

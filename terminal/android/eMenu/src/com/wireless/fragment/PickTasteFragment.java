@@ -59,8 +59,8 @@ public class PickTasteFragment extends DialogFragment  implements OnGestureListe
 	
 	public static final String FOCUS_TASTE = "focus_taste";
 	
-	private static final int TASTE_FOOD = 243459;
-	private static final int TASTE_ALL = 89457;
+	private static final int POP_TASTE = 243459;
+	private static final int ALL_TASTE = 89457;
 	private static final int TASTE_SELECTED = 34874;
 	private static final int TASTE_REMOVED = 33486;
 
@@ -86,23 +86,20 @@ public class PickTasteFragment extends DialogFragment  implements OnGestureListe
 	 *
 	 */
 	private static class TasteRefreshHandler extends Handler{
-		private int mCurTasteGroup = TASTE_FOOD;
+		private int mCurTasteGroup = POP_TASTE;
 		private List<Taste> mFilterTaste = new ArrayList<Taste>();
 		private WeakReference<PickTasteFragment> mFragment;
 		private TextView mSelectedFoodPriceTextView ;
-		private LinearLayout mPickedTasteLinear;
 		
 		TasteRefreshHandler(PickTasteFragment fragment){
 			mFragment = new WeakReference<PickTasteFragment>(fragment);
 		}
 		
 		@Override
-		public void handleMessage(Message msg)
-		{
+		public void handleMessage(Message msg){
+			
 			final PickTasteFragment fragment = mFragment.get();
 			//初始化
-			if(mPickedTasteLinear == null)
-				mPickedTasteLinear = (LinearLayout) fragment.getView().findViewById(R.id.pickedTaste_linearLayout);
 			if(mSelectedFoodPriceTextView == null)
 				mSelectedFoodPriceTextView = (TextView) fragment.getView().findViewById(R.id.textView_selected_tastePrice);
 			
@@ -111,8 +108,8 @@ public class PickTasteFragment extends DialogFragment  implements OnGestureListe
 			 */
 			switch(msg.what)
 			{
-			case TASTE_FOOD :
-				mCurTasteGroup = TASTE_FOOD;
+			case POP_TASTE :
+				mCurTasteGroup = POP_TASTE;
 				if(fragment.mOrderFood.asFood().hasPopTastes()){
 					fragment.mTastes = new ArrayList<Taste>(fragment.mOrderFood.asFood().getPopTastes());
 				}else{
@@ -121,8 +118,8 @@ public class PickTasteFragment extends DialogFragment  implements OnGestureListe
 				refreshTasteDisplay();
 				break;
 				
-			case TASTE_ALL :
-				mCurTasteGroup = TASTE_ALL;
+			case ALL_TASTE :
+				mCurTasteGroup = ALL_TASTE;
 				fragment.mTastes = new ArrayList<Taste>(WirelessOrder.foodMenu.tastes);
 				refreshTasteDisplay();
 				break;
@@ -162,38 +159,29 @@ public class PickTasteFragment extends DialogFragment  implements OnGestureListe
 		 */
 		private void refreshPickedTaste(){
 			final PickTasteFragment fragment = mFragment.get();
-			mPickedTasteLinear.removeAllViews();
+			
+			final LinearLayout pickedTasteLayout = (LinearLayout) fragment.getView().findViewById(R.id.linearLayout_pickedTaste_pickTaste_dialog);
+			
+			pickedTasteLayout.removeAllViews();
+			
 			if(fragment.mOrderFood.hasNormalTaste()){
 				//如果不是规格，则显示该口味
 				for(Taste normalTaste : fragment.mOrderFood.getTasteGroup().getNormalTastes()){
-					boolean isSpec = false;
-					for(Taste spec:WirelessOrder.foodMenu.specs)
-					{
-						if(normalTaste.equals(spec)){
-							isSpec = true;
-							break;
-						}
-					}
-					//不是规格，则显示该口味的button
-					if(!isSpec)
-					{
-						Button btn = new Button(fragment.getActivity());
-						btn.setText(normalTaste.getPreference());
-						btn.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.search, 0);
-						btn.setTag(normalTaste);
-						mPickedTasteLinear.addView(btn);
-					
-						btn.setOnClickListener(new OnClickListener(){
-							@Override
-							public void onClick(View v) {
-								Taste t = (Taste) v.getTag();
-								if(fragment.mOrderFood.hasTaste())
-									fragment.mOrderFood.getTasteGroup().removeTaste(t);
+					Button btn = new Button(fragment.getActivity());
+					btn.setText(normalTaste.getPreference());
+					btn.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.search, 0);
+					btn.setTag(normalTaste);
+					pickedTasteLayout.addView(btn);
+				
+					btn.setOnClickListener(new OnClickListener(){
+						@Override
+						public void onClick(View v) {
+							if(fragment.mOrderFood.removeTaste((Taste)v.getTag())){
 								TasteRefreshHandler.this.sendEmptyMessage(TASTE_REMOVED);
 							}
-						});
-					}
-				}				
+						}
+					});
+				}
 			}
 			mSelectedFoodPriceTextView.setText("" + fragment.mOrderFood.getUnitPriceWithTaste());
 		}
@@ -207,8 +195,8 @@ public class PickTasteFragment extends DialogFragment  implements OnGestureListe
 	 * initial {@link GestureDetector} and some {@link Handler}
 	 */
 	@Override 
-	public void onCreate(Bundle savedInstanceState)
-	{
+	public void onCreate(Bundle savedInstanceState){
+		
 		super.onCreate(savedInstanceState);
 		setStyle(PickTasteFragment.STYLE_NO_TITLE, android.R.style.Theme_Holo_Light_Dialog);
 		
@@ -218,7 +206,7 @@ public class PickTasteFragment extends DialogFragment  implements OnGestureListe
 		mOrderFood = foodParcel.asOrderFood();
 		mTasteHandler = new TasteRefreshHandler(this);
 		
-		mTasteHandler.sendEmptyMessage(TASTE_FOOD);
+		mTasteHandler.sendEmptyMessage(POP_TASTE);
 		mTasteHandler.sendEmptyMessage(TASTE_SELECTED);
 		
 	}
@@ -235,11 +223,11 @@ public class PickTasteFragment extends DialogFragment  implements OnGestureListe
 			public void onCheckedChanged(RadioGroup group,int checkedId) {
 				switch(checkedId)
 				{
-				case R.id.radio0_pickTaste :
-					mTasteHandler.sendEmptyMessage(TASTE_FOOD);
+				case R.id.radioButton_popTaste_pickTaste_dialog :
+					mTasteHandler.sendEmptyMessage(POP_TASTE);
 					break;
-				case R.id.radio1_pickTaste :
-					mTasteHandler.sendEmptyMessage(TASTE_ALL);
+				case R.id.radioButton_allTaste_pickTaste_dialog :
+					mTasteHandler.sendEmptyMessage(ALL_TASTE);
 					break;
 				}
 			}
@@ -264,9 +252,6 @@ public class PickTasteFragment extends DialogFragment  implements OnGestureListe
 			
 			@Override
 			public void onClick(View v) {
-				if(!mOrderFood.hasTaste()){
-					mOrderFood.makeTasteGroup();
-				}
 				if(mOnTasteChangeListener != null){
 					mOnTasteChangeListener.onTasteChanged(mOrderFood);
 				}
@@ -318,20 +303,16 @@ public class PickTasteFragment extends DialogFragment  implements OnGestureListe
 					final RelativeLayout background = (RelativeLayout)view.findViewById(R.id.realativeLayout_pickTaste_item);
 					//when clicked , highlight the box and refresh selected taste
 					if(selectChkBox.isChecked()){
-						if(mOrderFood.hasNormalTaste()){
-							mOrderFood.getTasteGroup().removeTaste(mTastes.get(position));
+						if(mOrderFood.removeTaste(mTastes.get(position))){
 							background.setBackgroundResource(R.color.blue);
 							selectChkBox.setChecked(false);
 						}
 					}else{
-						if(!mOrderFood.hasNormalTaste()){
-							mOrderFood.makeTasteGroup();
+						if(mOrderFood.addTaste(mTastes.get(position))){
+							selectChkBox.setChecked(true);
+							background.setBackgroundResource(R.color.green);
+							Toast.makeText(PickTasteFragment.this.getActivity(), "添加" + mTastes.get(position).getPreference(), Toast.LENGTH_SHORT).show();
 						}
-						mOrderFood.getTasteGroup().addTaste(mTastes.get(position));
-						selectChkBox.setChecked(true);
-						background.setBackgroundResource(R.color.green);
-						Toast.makeText(PickTasteFragment.this.getActivity(), "添加" + mTastes.get(position).getPreference(), Toast.LENGTH_SHORT).show();
-	
 					}
 					mTasteHandler.sendEmptyMessage(TASTE_SELECTED);
 				}
