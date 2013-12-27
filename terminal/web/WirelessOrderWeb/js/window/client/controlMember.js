@@ -363,8 +363,8 @@ function operateMemberHandler(c){
 	var birthday = Ext.getCmp('cm_dateMemberBirthday');
 	
 	if(cm_obj.otype.toLowerCase() == Ext.ux.otype['update'].toLowerCase()){
-		// 验证旧类型为充值属性
-		if(c.data['memberType']['attributeValue'] == 0){
+		// 验证旧类型为充值属性(后台验证)
+/*		if(c.data['memberType']['attributeValue'] == 0){
 			for(var i = 0; i < membetType.store.getCount(); i++){
 				if(membetType.store.getAt(i).get('id') == membetType.getValue()){
 					if(membetType.store.getAt(i).get('attributeValue') != c.data['memberType']['attributeValue']){
@@ -376,7 +376,7 @@ function operateMemberHandler(c){
 					break;
 				}
 			}
-		}
+		}*/
 	}
 	
 	if(!memberName.isValid() || !memberMobile.isValid() 
