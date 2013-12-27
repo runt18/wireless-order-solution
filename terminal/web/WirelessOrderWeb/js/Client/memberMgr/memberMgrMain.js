@@ -1049,6 +1049,7 @@ function winInit(){
 								memberBasicWin.hide();
 								Ext.example.msg(res.title, res.msg);
 								Ext.getCmp('btnSearchMember').handler();
+								memberTypeTree.getRootNode().reload();
 							}else{
 								Ext.ux.showMsg(res);
 							}
