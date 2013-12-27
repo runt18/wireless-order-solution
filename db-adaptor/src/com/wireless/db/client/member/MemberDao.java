@@ -530,14 +530,16 @@ public class MemberDao {
 	 */
 	public static void update(DBCon dbCon, Staff staff, Member.UpdateBuilder builder) throws SQLException, BusinessException{
 		Member member = builder.build();
+		MemberType mType = MemberTypeDao.getMemberTypeById(staff, member.getMemberType().getTypeId());
 		// 旧会员类型是充值属性, 修改为优惠属性时, 检查是否还有余额, 有则不允许修改
 		Member old = MemberDao.getMemberById(staff, member.getId());
-		if(member.getMemberType().getAttribute() != old.getMemberType().getAttribute() 
+		if(mType.getAttribute() != old.getMemberType().getAttribute() 
 				&& old.getMemberType().getAttribute() == MemberType.Attribute.CHARGE){
 			if(old.getTotalBalance() > 0){
 				throw new BusinessException(MemberError.UPDATE_FAIL_HAS_BALANCE);
 			}
 		}
+
 		checkValid(dbCon, member);
 		
 		String updateSQL = " UPDATE " + Params.dbName + ".member SET " 
