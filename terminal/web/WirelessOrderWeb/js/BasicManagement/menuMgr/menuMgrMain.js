@@ -1441,12 +1441,13 @@ function uploadFoodImage(c){
 	}
 	foodImageUpdateLoaddingMask.show();		
 	
-	Ext.getCmp('imgFileUploadForm').getForm().submit({
-		url : '../../ImageFileUpload.do?restaurantID=' + restaurantID + '&foodID=' + c.id + '&otype=' + otype + '&time=' + new Date(), 
-		success : function(thiz, result){
+	Ext.Ajax.request({
+		url : '../../ImageFileUpload.do?restaurantID=' + restaurantID + '&foodID=' + c.id + '&otype=' + otype + '&time=' + new Date(),
+		isUpload : true,
+		form : Ext.getCmp('imgFileUploadForm').getForm().getEl(),
+		success : function(response, options){
 			foodImageUpdateLoaddingMask.hide();
-			
-			var jr = Ext.decode(result.response.responseText);
+			var jr = Ext.decode(response.responseText.replace(/<\/?[^>]*>/g,''));
 			if(eval(jr.success)){
 				Ext.example.msg(jr.title, jr.msg);
 				Ext.getCmp('menuMgrGrid').getStore().each(function(record){
@@ -1467,14 +1468,14 @@ function uploadFoodImage(c){
 			btnDeleteFoodImage.setDisabled(false);
 			setButtonStateOne(false);
 		},
-		failure : function(thiz, result){
+		failure : function(response, options){
 			foodImageUpdateLoaddingMask.hide();
 			btnUploadFoodImage.setDisabled(false);
 			btnDeleteFoodImage.setDisabled(false);
 			setButtonStateOne(false);
-			Ext.ux.showMsg(Ext.decode(result.response.responseText));
-		}
-	});
+			Ext.ux.showMsg(Ext.decode(response.responseText.replace(/<\/?[^>]*>/g,'')));
+	   	}
+     });
 };
 
 /**
