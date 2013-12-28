@@ -49,7 +49,8 @@ public class RequestFilter implements Filter{
 		HttpServletResponse response = (HttpServletResponse)servletResponse;
 		
 		request.setCharacterEncoding("UTF-8");
-		response.setContentType("text/html;charset=utf-8");
+		response.setCharacterEncoding("UTF-8");
+		
 		String requestPath = request.getRequestURI();
 		if(check(requestPath)){
 			String pin =  (String) request.getSession().getAttribute("pin");
@@ -118,9 +119,16 @@ public class RequestFilter implements Filter{
 			}
 				
 		}
-		if(!requestPath.contains("/ImageFileUpload.do")){
-			response.setContentType("text/json;charset=utf-8");
+//		if(!requestPath.contains("/ImageFileUpload.do")){
+//			response.setContentType("text/json;charset=utf-8");
+//		}
+		String ct = request.getContentType();
+		if(ct != null && ct.split(";")[0].equalsIgnoreCase("multipart/form-data")){
+			response.setContentType("text/plain; charset=utf-8");
+		}else{
+			response.setContentType("text/json; charset=utf-8");
 		}
+		
 	}
 
 	@Override
