@@ -49,7 +49,7 @@ public class RequestFilter implements Filter{
 		HttpServletResponse response = (HttpServletResponse)servletResponse;
 		
 		request.setCharacterEncoding("UTF-8");
-		response.setContentType("text/json;charset=utf-8");
+		response.setContentType("text/html;charset=utf-8");
 		String requestPath = request.getRequestURI();
 		if(check(requestPath)){
 			String pin =  (String) request.getSession().getAttribute("pin");
@@ -118,7 +118,9 @@ public class RequestFilter implements Filter{
 			}
 				
 		}
-		response.setContentType("text/json;charset=utf-8");
+		if(!requestPath.contains("/ImageFileUpload.do")){
+			response.setContentType("text/json;charset=utf-8");
+		}
 	}
 
 	@Override
