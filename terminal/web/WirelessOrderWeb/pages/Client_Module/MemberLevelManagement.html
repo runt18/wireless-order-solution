@@ -1,0 +1,26 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Insert title here</title>
+<script type="text/javascript" src="../../jquery/highcharts.js"></script>
+<script type="text/javascript">
+	var memberLevelAddWin;
+	//会员类型
+	var combo_memberTypeData = [];
+	var colors = ['red', 'yellow', 'blue', 'balck'];
+	//chart数据
+	var chartDatas;
+	//所有memberLevel
+	var memberLevels;
+	//单条memberLevel
+	var memberLevelDetail;
+</script>
+<script type="text/javascript" src="../../js/Client/memberLevel/memberLevelMgrMain.js"></script>
+</head>
+<body>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="javascript:void(0)" onclick="operateMemberLevel({otype:'insert'})">添加等级</a>
+<div id="div_memberLevelChart" style="min-width: 310px; height: 450px; margin: 0 auto;"></div>
+</body>
+</html>
