@@ -1,5 +1,6 @@
 package com.wireless.Actions.client.memberType;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,10 +12,12 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
+import com.wireless.db.client.member.MemberLevelDao;
 import com.wireless.db.client.member.MemberTypeDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
+import com.wireless.pojo.client.MemberLevel;
 import com.wireless.pojo.client.MemberType;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.util.WebParams;
@@ -90,14 +93,20 @@ public class QueryMemberTypeAction extends DispatchAction {
 		StringBuilder tsb = new StringBuilder();
 		try{
 			String pin = (String)request.getAttribute("pin");
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			List<MemberType> list = MemberTypeDao.getMemberType(StaffDao.verify(Integer.parseInt(pin)), null, " ORDER BY MT.member_type_id ");
+			List<MemberLevel> levelList = MemberLevelDao.getMemberLevels(staff);
 			MemberType item = null;
-			
+			StringBuilder typeNode = new StringBuilder(), levelNode = new StringBuilder();
+			typeNode.append("{")
+					.append("text:'会员类型'")
+					.append(", MemberTypeId : -1")
+					.append(",expanded:true")
+					.append(",children:[");
 			StringBuilder change = new StringBuilder(), point = new StringBuilder(), interested = new StringBuilder();
 			change.append("{")
 				  .append("text:'充值属性'")
 				  .append(",attr:"+MemberType.Attribute.CHARGE.getVal())
-				  .append(",expanded:true")
 				  .append(",children:[");
 			point.append("{")
 				 .append("text:'积分属性'")
@@ -125,7 +134,31 @@ public class QueryMemberTypeAction extends DispatchAction {
 					 .append(",leaf:true")
 					 .append("}");
 			
-			tsb.append("[").append(change).append(",").append(point).append(",").append(interested).append("]");
+			typeNode.append(change).append(",").append(point).append(",").append(interested).append("]");
+			typeNode.append("}");
+			
+			if(!levelList.isEmpty()){
+				levelNode.append("{")
+				 .append("text:'会员级别'")
+				 .append(",children:[");
+				for (int i = 0; i < levelList.size(); i++) {
+					if(i > 0){
+						levelNode.append(",");
+					}
+					levelNode.append("{")
+							.append("text:'" + levelList.get(i).getMemberType().getName() + "  (LV"+ (i+1) +") "+ levelList.get(i).getPointThreshold() +"'")
+							.append(",leaf:true")
+							.append(",memberTypeId:" + levelList.get(i).getMemberType().getTypeId())
+							.append(",memberTypeName:'" + levelList.get(i).getMemberType().getName() + "'")
+							.append("}");
+				}
+				levelNode.append("]}");
+				tsb.append("[").append(typeNode).append(",").append(levelNode).append("]");
+			}else{
+				tsb.append("[").append(typeNode).append("]");
+			}
+
+			
 		}catch(Exception e){
 			e.printStackTrace();
 		}finally{
@@ -144,4 +177,28 @@ public class QueryMemberTypeAction extends DispatchAction {
 		return sb;
 	}
 	
+	public ActionForward notBelongType(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		String pin = (String) request.getAttribute("pin");
+		JObject jobject = new JObject();
+		try{
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			List<MemberType> list = MemberTypeDao.getNotBelongMemberType(staff);
+			jobject.setRoot(list);
+			jobject.setTotalProperty(list.size());
+		}catch(BusinessException e){
+			e.printStackTrace();
+			jobject.initTip(e);
+		}catch(SQLException e){
+			e.printStackTrace();
+			jobject.initTip(e);
+		}catch(Exception e){
+			e.printStackTrace();
+			jobject.initTip(e);
+		}finally{
+			response.getWriter().print(jobject.toString());
+		}
+		return null;
+	}
 }

@@ -1,9 +1,7 @@
 package com.wireless.filters;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.servlet.Filter;
@@ -18,26 +16,20 @@ import javax.servlet.http.HttpServletResponse;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.SystemError;
 import com.wireless.json.JObject;
-import com.wireless.util.Encrypt;
 
 public class RequestFilter implements Filter{
 
 	private static final String SKIPVERIFY = "skipVerify";
-	private List<String> skipVerifyList = new ArrayList<String>();
-	//private static final String DEFREDIRECT = "/pages/PersonLoginTimeout.html";
-	private static final String KEYS = "mi";
-	
-	
+	private Map<String, String> skipVerifyList = new HashMap<String, String>();
 	
 	private boolean check(String path){
-		for (String skip : skipVerifyList) {
+		for (String skip : skipVerifyList.values()) {
 			if(path.indexOf(skip) > -1){
 				return true;
 			}
 		}
 		return false;
 	}
-	
 	@Override
 	public void destroy() {
 		
@@ -64,37 +56,6 @@ public class RequestFilter implements Filter{
 			chain.doFilter(request, response);
 			
 		}else{
-			//FIXME
-			//The code below just for print scheme port, should be removed in future
-			String url = requestPath + "?" + request.getQueryString();
-			if(url.contains("/OperatePrinter.do?skipVerify&dataSource=port") ||
-			   url.contains("/OperatePrintFunc.do?skipVerify&dataSource=port")){
-				chain.doFilter(request, response);
-				return;
-			}
-			//-----------------------------------------------------------------------
-			
-			//String isCookie = null;
-			Map<String, String> params = new HashMap<String, String>();
-			
-			if(request.getQueryString() != null && (requestPath.indexOf(".do") < 0) && (requestPath.indexOf(".jsp") < 0)){
-				//获取url带的参数
-				String query = request.getQueryString();
-				String des = Encrypt.strDecode(query, KEYS, null, null);
-				
-				String[] urlParam = des.split("&");
-				//分解参数
-				for (int i = 0; i < urlParam.length; i++) {
-					int num = urlParam[i].indexOf("=");
-					if (num > 0) {
-						String name = urlParam[i].substring(0, num);
-						String value = urlParam[i].substring(num + 1);
-						params.put(name, value);
-					}
-				}
-				
-			}
-			
 			String pin = null;
 			pin = (String) request.getSession().getAttribute("pin");
 			if(pin == null){
@@ -137,10 +98,10 @@ public class RequestFilter implements Filter{
 		if(!skipVerifys.trim().isEmpty()){
 			if(skipVerifys.indexOf(",") != -1){
 				for (String path : skipVerifys.split(",")) {
-					skipVerifyList.add(path.trim());
+					skipVerifyList.put(path.trim(), path.trim());
 				}
 			}else{
-				skipVerifyList.add(skipVerifys);
+				skipVerifyList.put(skipVerifys, skipVerifys);
 			}
 		}
 	}
