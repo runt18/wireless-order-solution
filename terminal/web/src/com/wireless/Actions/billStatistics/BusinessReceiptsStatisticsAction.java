@@ -99,10 +99,6 @@ public class BusinessReceiptsStatisticsAction extends DispatchAction {
 	public ActionForward normal(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		
-		
-		
-		
 		String isPaging = request.getParameter("isPaging");
 		String start = request.getParameter("start");
 		String limit = request.getParameter("limit");
@@ -170,8 +166,6 @@ public class BusinessReceiptsStatisticsAction extends DispatchAction {
 	public ActionForward chart(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		
-		
 		String time = request.getParameter("time");
 		JObject jobject = new JObject();
 		Calendar c = Calendar.getInstance();

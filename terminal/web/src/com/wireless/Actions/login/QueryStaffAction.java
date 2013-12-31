@@ -75,6 +75,9 @@ public class QueryStaffAction extends Action {
 				}else if(cate != null && !cate.trim().isEmpty()){
 					staffList = StaffDao.getStaffsByRoleId(staff, Integer.parseInt(cate));
 				}else{
+					if(restaurantID == null){
+						restaurantID = (String) request.getSession().getAttribute("restaurantID");
+					}
 					staffList = StaffDao.getStaffs(Integer.parseInt(restaurantID));
 				}
 				Restaurant restaurant = RestaurantDao.getById(Integer.parseInt(restaurantID));
