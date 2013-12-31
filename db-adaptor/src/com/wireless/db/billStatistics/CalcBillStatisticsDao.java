@@ -28,6 +28,7 @@ import com.wireless.pojo.client.MemberOperation.ChargeType;
 import com.wireless.pojo.client.MemberOperation.OperationType;
 import com.wireless.pojo.crMgr.CancelReason;
 import com.wireless.pojo.dishesOrder.Order;
+import com.wireless.pojo.dishesOrder.RepaidStatistics;
 import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.menuMgr.Kitchen;
@@ -1095,5 +1096,59 @@ public class CalcBillStatisticsDao {
 		 return incomeByCharge;
 		 
 	 }
+	 
+	private static List<RepaidStatistics> getRepaidStatistics(DBCon dbCon, Staff staff, DutyRange range, String extraCond, DateType queryType) throws SQLException{
+		String orderTbl = null;
+		if(queryType.isHistory()){
+			orderTbl = TBL_ORDER_HISTORY;
+			
+		}else if(queryType.isToday()){
+			orderTbl = TBL_ORDER_TODAY;
+			
+		}else{
+			throw new IllegalArgumentException("The query type is invalid.");
+		}
+		String sql = "SELECT order_date, staff_id, waiter, id,  repaid_price, total_price, actual_price, pay_type FROM " + Params.dbName + "." + orderTbl +
+					" WHERE status = " + Order.Status.REPAID.getVal() + 
+					" AND order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +
+					(extraCond != null ? extraCond : "");
+		dbCon.rs = dbCon.stmt.executeQuery(sql);
+		List<RepaidStatistics> list = new ArrayList<RepaidStatistics>();
+		while(dbCon.rs.next()){
+			RepaidStatistics order = new RepaidStatistics();
+			Staff oStaff = new Staff();
+			order.setmId(dbCon.rs.getInt("id"));
+			order.setmOrderDate(dbCon.rs.getTimestamp("order_date").getTime());
+			order.setmActualPrice(dbCon.rs.getFloat("actual_price"));
+			order.setmTotalPrice(dbCon.rs.getFloat("total_price"));
+			order.setmRepaidPrice(dbCon.rs.getFloat("repaid_price"));
+			order.setPaymentType(dbCon.rs.getInt("pay_type"));
+			oStaff.setId(dbCon.rs.getInt("staff_id"));
+			oStaff.setName(dbCon.rs.getString("waiter"));
+			order.setStaff(oStaff);
+			list.add(order);
+		}
+		return list;
+	}
+	
+	public static List<RepaidStatistics> getRepaidStatisticsByStaffId(Staff staff, DutyRange range, int staffId, DateType queryType) throws SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return getRepaidStatistics(dbCon, staff, range, " AND staff_id = " + staffId , queryType);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	public static List<RepaidStatistics> getRepaidStatistics(Staff staff, DutyRange range, DateType queryType) throws SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return getRepaidStatistics(dbCon, staff, range, null , queryType);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
 	 
 }
