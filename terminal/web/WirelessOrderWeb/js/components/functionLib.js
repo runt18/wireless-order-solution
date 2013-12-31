@@ -294,10 +294,10 @@ function showFloatOption(obj_b){
 
 		liOffset = $("#"+obj_b.treeId).find("ul").offset();
 		nodey = liOffset.top;
+		barY = ($("#"+obj_b.treeId).find("ul").height() + nodey);
 		
-		barY = ($("#"+obj_b.treeId).find("li").height() + nodey);
 		$("#"+obj_b.treeId).find("li").find("li").mouseover(function(){
-			tastem_nodeId = $(this).find("div").attr("ext:tree-node-id");
+			floatBarNodeId = $(this).find("div").attr("ext:tree-node-id");
 			offset = $(this).find("a").offset();
 			nodex = offset.left-18;
 			barX = (offset.left+$(this).find("a").width()+100);
@@ -306,12 +306,10 @@ function showFloatOption(obj_b){
 		});
 		
 		$(document).mousemove(function(event){
-			
 			if(event.clientX > barX || event.clientX < nodex || event.clientY <=nodey || event.clientY >barY){
-				
 				$('#div_floatBar').hide();
 				$('#div_floatBar').html("");
-				tastem_nodeId ="";
+				floatBarNodeId ="";
 			}
 		});
 

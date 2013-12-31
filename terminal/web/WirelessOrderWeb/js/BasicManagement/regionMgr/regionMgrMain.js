@@ -306,6 +306,12 @@ function initGrid(){
 			id : 'txtSearchForTableName',
 			width : 100
 		}, '->', {
+				text : '添加',
+				iconCls : 'btn_add',
+				handler : function(){
+					insertTableBasicHandler();
+				}
+			},{
 			text : '搜索',
 			id : 'btnSearchForTable',
 			iconCls : 'btn_search',
@@ -522,15 +528,7 @@ function initWin(){
 }
 
 //----------
-var btnAddTable = new Ext.ux.ImageButton({
-	imgPath : '../../images/btnAddForBigBar.png',
-	imgWidth : 50,
-	imgHeight : 50,
-	tooltip : '添加新餐台',
-	handler : function(btn){
-		insertTableBasicHandler();
-	}
-});
+
 
 Ext.onReady(function(){
 	//
@@ -548,11 +546,7 @@ Ext.onReady(function(){
 		layout : 'border',
 		width : parseInt(Ext.getDom('divRegion').parentElement.style.width.replace(/px/g,'')),
 		height : parseInt(Ext.getDom('divRegion').parentElement.style.height.replace(/px/g,'')),
-		items : [regionTree, tableBasicGrid],
-		tbar : new Ext.Toolbar({
-			height : 55,
-			items : [btnAddTable]
-		})
+		items : [regionTree, tableBasicGrid]
 	});
 	
 });

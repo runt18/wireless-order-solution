@@ -652,11 +652,13 @@ function treeInit(){
 	});
 	
 	memberTypeTree = new Ext.tree.TreePanel({
+		id : 'tree_memberMgr',
 		title : '会员类型',
 		region : 'west',
-		width : 180,
+		width : 200,
 		border : true,
-		rootVisible : true,
+		rootVisible : false,
+		singleExpand : true,
 		autoScroll : true,
 		frame : true,
 		bodyStyle : 'backgroundColor:#FFFFFF; border:1px solid #99BBE8;',
@@ -701,7 +703,7 @@ function gridInit(){
 	var memberBasicGridTbar = new Ext.Toolbar({
 		items : [{
 			xtype : 'tbtext',
-			text : String.format(Ext.ux.txtFormat.typeName, '会员类型', 'memberTypeShowType', '----')
+			text : String.format(Ext.ux.txtFormat.longerTypeName, '会员类型', 'memberTypeShowType', '----')
 		}, {
 			xtype : 'tbtext',
 			text : '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
@@ -1145,6 +1147,7 @@ var btnRechargeDetail = new Ext.ux.ImageButton({
 });
 
 /**********************************************************************/
+var member_obj = {treeId : 'tree_memberMgr', option : [{name : '修改', fn : 'queryMemberOperationSummaryHandler()'}]};
 Ext.onReady(function(){
 	treeInit();
 	gridInit();
@@ -1180,5 +1183,6 @@ Ext.onReady(function(){
 	 
 	winInit();
 	memberBasicWin.render(document.body);
+//	showFloatOption(member_obj);
 });
 

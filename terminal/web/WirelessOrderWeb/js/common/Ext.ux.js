@@ -15,11 +15,13 @@ Ext.ux.txtFormat = {
 	barMsg : '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{0}:&nbsp;<span id="{1}" style="color:green; font-size:15px; font-weight:bold;">{2}</span>',
 	barTitle : '<span style="font-weight:bold; font-size:13px;">{0}</span>',
 	typeName : '<div style="float:left; width:100px; font-size:12px;">&nbsp;{0}:&nbsp;<span id="{1}" style="color:green; font-weight:bold; font-size:13px;">{2}</span></div>',
+	longerTypeName : '<div style="float:left; width:150px; font-size:12px;">&nbsp;{0}:&nbsp;<span id="{1}" style="color:green; font-weight:bold; font-size:13px;">{2}</span></div>',
 	attrName : '<div style="float:left; width:300px; font-size:12px;">&nbsp;{0}:&nbsp;<span id="{1}" style="color:green; font-weight:bold; font-size:13px;">{2}</span></div>',
 	tbarName : '<div style="float:left; width:60px; font-size:12px;"><span id="{0}" style="color:red; font-weight:bold; font-size:16px;">{1}</span><span id="{2}" style="color:green; font-weight:bold; font-size:13px;">{3}</span></div>',
 	linkClassOne : '<a id="{0}" href="{1}" onClick="{2}" style="color:green; font-size:15px; font-weight:bold;">{3}</a>',
 	renderer : '<a href="javascript:{0}({1})" {2}>{3}</a>',
 	xh : '<font color="red">＊</font>',
+	deleteSuccess : '<font color="red">{0}</font>&nbsp;删除成功',
 	gridDou : function(_v){
 		return _v == '' ? '0.00&nbsp;&nbsp;' : (parseFloat(_v).toFixed(2) + '&nbsp;&nbsp;');
 	},

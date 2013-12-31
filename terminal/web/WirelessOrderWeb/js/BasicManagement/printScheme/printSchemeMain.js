@@ -1,5 +1,5 @@
 
-var addPrinter = new Ext.ux.ImageButton({
+/*var addPrinter = new Ext.ux.ImageButton({
 	imgPath : '../../images/btnAddprinter.png',
 	imgWidth : 50,
 	imgHeight : 50,
@@ -17,7 +17,7 @@ var addPrintScheme = new Ext.ux.ImageButton({
 	handler : function(btn){
 		printFuncOperactionHandler({type : 'insert'});
 	} 
-});
+});*/
  
 //var json = {items : [{xtype : "checkbox", name : 'pType',boxLabel : '下单详细',hideLabel : true,inputValue : 2}]};
 
@@ -786,7 +786,14 @@ if(!printerWin){
 				id : 'txtPrinterName',
 				fieldLabel : '打印机',
 				width : 130,
-				allowBlank : false
+				allowBlank : false,
+				validator : function(v){
+					if(Ext.util.Format.trim(v).length > 0){
+						return true;
+					}else{
+						return '名称不能为空.';
+					}
+				}
 			},{
 				id : 'txtPrinterAlias',
 				fieldLabel : '别名',
@@ -1028,11 +1035,12 @@ function operatePrinterHandler(c){
 	if(c == null || typeof c == 'undefined' || typeof c.otype == 'undefined'){
 		return;
 	}
+	var printerName = Ext.getCmp('txtPrinterName');
 	if(c.otype == 'insert'){
 		printerWin.setTitle('添加打印机');
 		
-		Ext.getCmp('txtPrinterName').setValue();
-		Ext.getCmp('txtPrinterName').clearInvalid();
+		printerName.setValue();
+		printerName.clearInvalid();
 		Ext.getCmp('txtPrinterAlias').setValue();
 		Ext.getCmp('txtPrinterAlias').clearInvalid();
 
@@ -1040,8 +1048,9 @@ function operatePrinterHandler(c){
 		printerWin.show();
 		document.getElementById('enabled').checked = true;
 		document.getElementById('rdo80mm').checked = true;
+		printerName.focus(true, 100);
 	}else if(c.otype == 'update'){
-		var sn = printerTree.getSelectionModel().getSelectedNode();
+		var sn = Ext.ux.getSelNode(printerTree);
 		if(!sn){
 			Ext.example.msg('提示', '请选中一个打印机再进行操作.');
 			return;
@@ -1049,7 +1058,7 @@ function operatePrinterHandler(c){
 		printerWin.operationType = c.otype;
 		printerWin.show();
 		printerWin.setTitle('修改打印机');
-		Ext.getCmp('txtPrinterName').setValue(sn.attributes.name);
+		printerName.setValue(sn.attributes.name);
 		Ext.getCmp('txtPrinterAlias').setValue(sn.attributes.alias);
 		var styles = document.getElementsByName('pStyle');
 	
@@ -1063,10 +1072,10 @@ function operatePrinterHandler(c){
 		}else{
 			document.getElementById('unEnabled').checked = true;
 		}
-		
+		printerName.focus(true, 100);
 		
 	}else if(c.otype == 'delete'){
-		var sn = printerTree.getSelectionModel().getSelectedNode();
+		var sn = Ext.ux.getSelNode(printerTree);
 		if(!sn){
 			Ext.example.msg('提示', '请选中一个打印机再进行操作.');
 			return;
@@ -1074,7 +1083,7 @@ function operatePrinterHandler(c){
 		
 		Ext.Msg.show({
 			title : '重要',
-			msg : '是否删除打印机?',
+			msg : '是否删除打印机: '+sn.attributes.name,
 			icon: Ext.MessageBox.QUESTION,
 			buttons : Ext.Msg.YESNO,
 			fn : function(e){
@@ -1089,7 +1098,7 @@ function operatePrinterHandler(c){
 							var jr = Ext.decode(res.responseText);
 							if(jr.success){
 								printerTree.getRootNode().reload();
-								Ext.example.msg(jr.title, jr.msg);
+								Ext.example.msg(jr.title, String.format(Ext.ux.txtFormat.deleteSuccess, sn.attributes.name));
 								printerWin.hide();
 							}else{
 								Ext.ux.showMsg(jr);
@@ -1106,9 +1115,9 @@ function operatePrinterHandler(c){
 	
 }
 
-
-
 var printerTree;
+var obj = {treeId : 'printerTree', option :[{name : '修改', fn : "operatePrinterHandler({otype:'update'})"}, {name : '删除', fn : "operatePrinterHandler({otype:'delete'})"}]};
+
 Ext.onReady(function(){
 	init();
 	
@@ -1127,20 +1136,19 @@ Ext.onReady(function(){
 		region : 'west',
 		width : 250,
 		border : true,
-		rootVisible : false,
+		rootVisible : true,
 		frame : true,
 		cls : 'font',
 		bodyStyle : 'backgroundColor:#FFFFFF; border:1px solid #99BBE8;',
 		tbar : new Ext.Toolbar({
 			height : 26,
-			items : [{
+			items : ['->',{
 				text : '添加',
-				hidden : true,
 				iconCls : 'btn_add',
 				handler : function(){
 					operatePrinterHandler({otype:'insert'});
 				}
-			}, '->',{
+			}, {
 				text : '修改',
 				iconCls : 'btn_edit',
 				handler : function(){
@@ -1186,9 +1194,8 @@ Ext.onReady(function(){
 			}
 		}),
 		listeners : {
-			dblclick : function(e){
+			click : function(e){
 				Ext.getDom('tbPrinterName').innerHTML = e.attributes.name + " " + e.attributes.alias;
-				//var rn = printerTree.getSelectionModel().getSelectedNode();
 				ds.load({
 					params : {
 						'printerId' : e.attributes.printerId
@@ -1269,6 +1276,14 @@ Ext.onReady(function(){
 		 				Ext.ux.txtFormat.attrName,
 		 				'打印机','tbPrinterName','----'
 		 			)
+		 		},'->',{
+		 			text : '添加',
+		 			iconCls : 'btn_add',
+		 			handler : function(){
+		 				printFuncOperactionHandler({type : 'insert'});
+		 			}
+		 		},{
+		 			text : '&nbsp;&nbsp;'
 		 		}
 			 ]
 		}),
@@ -1280,23 +1295,15 @@ Ext.onReady(function(){
 	});
 	
 	new Ext.Panel({
-		title : '打印配置',
 		id : 'printPanel',
 		renderTo : 'divPrint',
 		width : parseInt(Ext.getDom('divPrint').parentElement.style.width.replace(/px/g,'')),
 		height : parseInt(Ext.getDom('divPrint').parentElement.style.height.replace(/px/g,'')),
 		layout : 'border',
 		frame : true,
-		items : [printerTree, printFuncGrid],
-		tbar : new Ext.Toolbar({
-			height : 55,
-			items : [
-				addPrinter,
-			    {xtype:'tbtext',text:'&nbsp;&nbsp;'},
-			    addPrintScheme
-			]
-		})
+		items : [printerTree, printFuncGrid]
 		
 	});
+	showFloatOption(obj);
 	
 });

@@ -1,7 +1,4 @@
-﻿String.prototype.trim=function() {  
-    return this.replace(/(^\s*)|(\s*$)/g,'');  
-};  
-//-----------------load
+﻿//-----------------load
 var taste_filterTypeComb = new Ext.form.ComboBox({
 	fieldLabel : '过滤',
 	forceSelection : true,
@@ -221,6 +218,13 @@ function initTasteCateOperatorWin(){
 					id : 'txtTasteCateName',
 					allowBlank : false,
 					width : 160,
+					validator : function(v){
+						if(Ext.util.Format.trim(v).length > 0){
+							return true;
+						}else{
+							return '名称不能为空.';
+						}
+					},
 					listeners : {
 						focus : function(e){
 							e.focus(true, 100);
@@ -251,7 +255,7 @@ function initTasteCateOperatorWin(){
 				iconCls : 'btn_save',
 				handler : function(){
 					var tasteCateName = Ext.getCmp('txtTasteCateName');
-					if(!tasteCateName.isValid() || !tasteCateName.getValue().trim()){
+					if(!tasteCateName.isValid()){
 						return;
 					}
 					Ext.Ajax.request({
@@ -315,6 +319,13 @@ function initTasteOperatorWin(){
 					listeners : {
 						focus : function(e){
 							e.focus(true, 100);
+						}
+					},
+					validator : function(v){
+						if(Ext.util.Format.trim(v).length > 0){
+							return true;
+						}else{
+							return '名称不能为空.';
 						}
 					}
 				}, {
@@ -417,7 +428,7 @@ function initTasteOperatorWin(){
 					var tasteRate = Ext.getCmp('numTasteRate');
 					var tasteCate = Ext.getCmp('comboTasteCate');
 					
-					if(!tasteCate.isValid() || !tasteName.isValid() || !tasteName.getValue().trim()){
+					if(!tasteCate.isValid() || !tasteName.isValid()){
 						return;
 					}
 					if(tasteCate.getValue() == 0){
@@ -632,7 +643,7 @@ function tasteDeleteHandler() {
 					success : function(response, options) {
 						var jr = Ext.decode(response.responseText);
 						if (jr.success == true) {							
-							Ext.example.msg('提示', '<font style="color:red">'+data['name']+'</font>&nbsp;删除成功');
+							Ext.example.msg('提示', String.format(Ext.ux.txtFormat.deleteSuccess, data['name']));
 							Ext.getCmp('btnSerachForTasteBasic').handler(tastem_selectedId);
 						} else {
 							Ext.ux.showMsg(jr);
@@ -665,7 +676,7 @@ function tasteCateOperateHandler(c){
 		cateName.clearInvalid();
 		cateName.focus();
 	}else if(c.otype == 'update'){
-		var tn = tmm_tasteTree.getNodeById(tastem_nodeId==""?tastem_selectedId:tastem_nodeId);
+		var tn = tmm_tasteTree.getNodeById(floatBarNodeId==""?tastem_selectedId:floatBarNodeId);
 		if(!tn || tn.id==-1){
 			Ext.example.msg('提示', '操作失败, 请选中一条数据再进行操作.');
 			return;
@@ -684,7 +695,7 @@ function tasteCateOperateHandler(c){
 		cateName.setValue(tn.attributes.tasteCateName);
 		cateName.focus();
 	}else if(c.otype == 'delete'){
-		var tn = tmm_tasteTree.getNodeById(tastem_nodeId==""?tastem_selectedId:tastem_nodeId);
+		var tn = tmm_tasteTree.getNodeById(floatBarNodeId==""?tastem_selectedId:floatBarNodeId);
 		if(!tn){
 			Ext.example.msg('提示', '操作失败, 请选中一条数据再进行操作.');
 			return;
@@ -707,7 +718,7 @@ function tasteCateOperateHandler(c){
 							success : function(res, opt){
 								var jr = Ext.util.JSON.decode(res.responseText);
 								if(jr.success){
-									Ext.example.msg(jr.title, '<font style="color:red">'+tn.text+'</font>&nbsp;删除成功');
+									Ext.example.msg(jr.title, String.format(Ext.ux.txtFormat.deleteSuccess, tn.text));
 									tmm_tasteTree.getRootNode().reload();
 								}else{
 									Ext.ux.showMsg(jr);

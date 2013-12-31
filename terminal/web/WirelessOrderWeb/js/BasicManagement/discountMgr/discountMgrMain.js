@@ -1,26 +1,39 @@
-﻿var btnAddProgram = new Ext.ux.ImageButton({
-	imgPath : '../../images/btnAddProgram.png',
-	imgWidth : 50,
-	imgHeight : 50,
-	tooltip : '添加方案',
-	handler : function(e){
-		programOperationHandler({
-			type : dmObj.operation.insert
-		});
+﻿
+function deleteDiscountPlanHandler(){
+	var sn = Ext.ux.getSelNode(programTree);
+	if(!sn || sn.attributes.discountID == -1){
+		Ext.example.msg('提示', '请选中一个方案再进行操作.');
+		return;
 	}
-});
-
-var btnAddDiscount = new Ext.ux.ImageButton({
-	imgPath : '../../images/btnAddDiscount.png',
-	imgWidth : 50,
-	imgHeight : 50,
-	tooltip : '添加分厨折扣',
-	handler : function(e){
-		disocuntOperationHandler({
-			type : dmObj.operation.insert
-		});
-	}
-});
+	Ext.Msg.confirm(
+		'提示',
+		'是否删除方案:&nbsp;<font color="red">' + sn.text + '</font>',
+		function(e){
+			if(e == 'yes'){
+				Ext.Ajax.request({
+					url : '../../DeleteDiscount.do',
+					params : {
+						restaurantID : restaurantID,
+						discountID : sn.attributes.discountID
+					},
+					success : function(res, opt){
+						var jr = Ext.util.JSON.decode(res.responseText);
+						if(jr.success){
+							Ext.example.msg(jr.title, jr.msg);
+							Ext.getCmp('btnRefreshProgramTree').handler();
+						}else{
+							Ext.ux.showMsg(jr);
+						}
+					},
+					failure : function(res, opt){
+						Ext.ux.showMsg(Ext.util.JSON.decode(res.responseText));
+					}
+				});
+			}
+		},
+		this
+	);
+}
 
 function programOperationHandler(c){
 	if(c == null || typeof(c) == 'undefined' || typeof(c.type) == 'undefined'){
@@ -51,7 +64,7 @@ function programOperationHandler(c){
 		Ext.getDom('numDiscountRate').parentElement.parentElement.style.display = 'none';
 		Ext.getDom('chbIsAuto').parentElement.parentElement.parentElement.style.display = 'none';
 		
-		var sn = programTree.getSelectionModel().getSelectedNode();
+		var sn = Ext.ux.getSelNode(programTree);
 		if(!sn || sn.attributes.discountID == -1){
 			Ext.example.msg('提示', '请选中一个方案再进行操作.');
 			return;
@@ -186,6 +199,7 @@ var discountGrid;
 var addProgramWin;
 var addDiscountWin;
 var updateDiscountRateWin;
+var discount_obj = {treeId : 'discount_tree', option : [{name:'修改', fn:"programOperationHandler({type:dmObj.operation.update})"},{name:'删除', fn:"deleteDiscountPlanHandler()"}]};
 Ext.onReady(function(){
 	Ext.Ajax.request({
 		url : '../../QueryKitchen.do',
@@ -201,9 +215,14 @@ Ext.onReady(function(){
 	
 	var programTreeTbar = new Ext.Toolbar({
 		items : [{
-			xtype : 'tbtext',
-			text : ' '
-		}, '->', {
+			text : '添加',
+			iconCls : 'btn_add',
+			handler : function(){
+				programOperationHandler({
+					type : dmObj.operation.insert
+				});
+			}
+		}, {
 			text : '修改',
 			iconCls : 'btn_edit',
 			handler : function(){
@@ -215,39 +234,7 @@ Ext.onReady(function(){
 			text : '删除',
 			iconCls : 'btn_delete',
 			handler : function(){
-				var sn = programTree.getSelectionModel().getSelectedNode();
-				if(!sn || sn.attributes.discountID == -1){
-					Ext.example.msg('提示', '请选中一个方案再进行操作.');
-					return;
-				}
-				Ext.Msg.confirm(
-					'提示',
-					'是否删除方案:&nbsp;<font color="red">' + sn.text + '</font>',
-					function(e){
-						if(e == 'yes'){
-							Ext.Ajax.request({
-								url : '../../DeleteDiscount.do',
-								params : {
-									restaurantID : restaurantID,
-									discountID : sn.attributes.discountID
-								},
-								success : function(res, opt){
-									var jr = Ext.util.JSON.decode(res.responseText);
-									if(jr.success){
-										Ext.example.msg(jr.title, jr.msg);
-										Ext.getCmp('btnRefreshProgramTree').handler();
-									}else{
-										Ext.ux.showMsg(jr);
-									}
-								},
-								failure : function(res, opt){
-									Ext.ux.showMsg(Ext.util.JSON.decode(res.responseText));
-								}
-							});
-						}
-					},
-					this
-				);
+				deleteDiscountPlanHandler();
 			}
 		}, {
 			text : '刷新',
@@ -262,6 +249,7 @@ Ext.onReady(function(){
 	});
 	
 	programTree = new Ext.tree.TreePanel({
+		id : 'discount_tree',
 		title : '方案',
 		region : 'west',
 		width : 200,
@@ -442,22 +430,12 @@ Ext.onReady(function(){
 	});
 	
 	new Ext.Panel({
-		title : '折扣方案管理',
 		renderTo : 'divDiscount',
 		width : parseInt(Ext.getDom('divDiscount').parentElement.style.width.replace(/px/g,'')),
 		height : parseInt(Ext.getDom('divDiscount').parentElement.style.height.replace(/px/g,'')),
 		layout : 'border',
 		frame : true,
-		items : [programTree, discountGrid],
-		tbar : new Ext.Toolbar({
-			height : 55,
-			items : [
-			    {xtype:'tbtext',text:'&nbsp;&nbsp;'},
-			    btnAddProgram,
-			    {xtype:'tbtext',text:'&nbsp;&nbsp;'},
-			    btnAddDiscount
-			]
-		})
+		items : [programTree, discountGrid]
 	});
 	
 	addProgramWin = Ext.getCmp('dm_addProgramWin');
@@ -957,5 +935,5 @@ Ext.onReady(function(){
 			 scope : this 
 		 }]
 	});
-	
+	showFloatOption(discount_obj);	
 });

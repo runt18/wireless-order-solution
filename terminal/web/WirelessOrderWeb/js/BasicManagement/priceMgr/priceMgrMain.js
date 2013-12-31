@@ -35,7 +35,6 @@ function initTree(){
 		height : 26,
 		items : ['->', {
 			text : '添加',
-			hidden : true,
 			iconCls : 'btn_add',
 			handler : function(){
 				insertPricePlanWinHandler();
@@ -64,6 +63,7 @@ function initTree(){
 	});
 	
 	pricePlanTree = new Ext.tree.TreePanel({
+		id : 'prp_pricePlanTree',
 		title : '方案',
 		region : 'west',
 		width : 200,
@@ -110,8 +110,6 @@ function initTree(){
 		listeners : {
 			click : function(e){
 				Ext.getDom('pricePlanShowName').innerHTML = e.attributes['pricePlanName'];
-			},
-			dblclick : function(){
 				Ext.getCmp('btnSearchFoodPricePlan').handler();
 			}
 		}
@@ -589,15 +587,6 @@ function initWin(){
 };
 //-----------------
 
-var btnInsertPricePlan = new Ext.ux.ImageButton({
-	imgPath : '../../images/btnAddForBigBar.png',
-	imgWidth : 50,
-	imgHeight : 50,
-	tooltip : '添加方案',
-	handler : function(btn){
-		insertPricePlanWinHandler();
-	}
-});
 
 /**********************************************************************/
 insertPricePlanWinHandler = function(){
@@ -636,7 +625,7 @@ function pricePlanOperationHandler(c){
 		oPricePlanWin.show();
 		oPricePlanWin.center();
 	}else if(c.type == pmObj.operation['update']){
-		var sn = pricePlanTree.getSelectionModel().getSelectedNode();
+		var sn = Ext.ux.getSelNode(pricePlanTree);
 		if(!sn || sn.attributes.pricePlanID == -1){
 			Ext.example.msg('提示', '请选中一个方案再进行操作.');
 			return;
@@ -656,7 +645,7 @@ function pricePlanOperationHandler(c){
 		oPricePlanWin.show();
 		oPricePlanWin.center();
 	}else if(c.type == pmObj.operation['delete']){
-		var sn = pricePlanTree.getSelectionModel().getSelectedNode();
+		var sn = Ext.ux.getSelNode(pricePlanTree);
 		if(!sn || sn.attributes['pricePlanID'] == -1){
 			Ext.example.msg('提示', '请选中一个方案再进行操作.');
 			return;
@@ -681,7 +670,7 @@ function pricePlanOperationHandler(c){
 						success : function(res, opt){
 							var jr = Ext.util.JSON.decode(res.responseText);
 							if(jr.success){
-								Ext.example.msg(jr.title, jr.msg);
+								Ext.example.msg(jr.title, String.format(Ext.ux.txtFormat.deleteSuccess, sn.text));
 								Ext.getCmp('btnRefreshPricePlanTree').handler();
 							}else{
 								Ext.ux.showMsg(jr);
@@ -795,24 +784,19 @@ Ext.onReady(function(){
 	initGrid();
 	
 	new Ext.Panel({
-		title : '菜品价格方案管理',
 		renderTo : 'divPrice',
 		width : parseInt(Ext.getDom('divPrice').parentElement.style.width.replace(/px/g,'')),
 		height : parseInt(Ext.getDom('divPrice').parentElement.style.height.replace(/px/g,'')),
 		layout : 'border',
 		frame : true,
-		items : [pricePlanTree, priceBaiscGrid],
-		tbar : new Ext.Toolbar({
-			height : 55,
-			items : [
-			    {xtype:'tbtext',text:'&nbsp;&nbsp;'},
-//			    btnAddProgram,
-//			    {xtype:'tbtext',text:'&nbsp;&nbsp;'},
-			    btnInsertPricePlan
-			]
-		})
+		items : [pricePlanTree, priceBaiscGrid]
 	});
 	
 	initWin();
 	
+});
+
+$(function(){
+	var obj = {treeId : 'prp_pricePlanTree', option : [{name : '修改', fn : "updatePricePlanWinHandler()"}, {name : '删除', fn : "deletePricePlanWinHandler()"}]};
+	showFloatOption(obj);
 });

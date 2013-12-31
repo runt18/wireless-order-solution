@@ -51,6 +51,24 @@ Ext.ux.getSelData = function(_component){
 	}
 };
 
+Ext.ux.getSelNode = function(_component){
+	if(typeof _component == 'string'){
+		var treePanelNodes = Ext.getCmp(_component);
+		if(!treePanelNodes){
+			return false;
+		}else{
+			var node = floatBarNodeId==""?treePanelNodes.getSelectionModel().getSelectedNode():treePanelNodes.getNodeById(floatBarNodeId);
+
+			return node;
+		}
+	}else if(typeof _component == 'object'){
+		var node = floatBarNodeId==""?_component.getSelectionModel().getSelectedNode():_component.getNodeById(floatBarNodeId);
+		return node;
+	}else{
+		return false;
+	}
+};
+
 /**
  * 
  */
