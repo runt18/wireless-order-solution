@@ -92,7 +92,7 @@ public class Page{
 		BUSINESS_RECEIPS("businessReceiptsStatistics", "收款统计", "", "../../images/businessReceips.png"),
 		SALES_SUB("salesSubStatistics", "销售统计", "", "../../images/salesStat.png"),
 		CANCELLED_FOOD("cancelledFood", "退菜统计", "", "../../images/cancelledFoodStatis.png"),
-		REPAID_STATISTICS("repaid_statistics", "反结账统计", "History_Module/RepaidStatistics.html", "../../images/cancelledFoodStatis.png"),
+		REPAID_STATISTICS("repaid_statistics", "反结账统计", "History_Module/RepaidStatistics.html", "../../images/repaidStatistics.png"),
 		BUSINESS_CHART("businessChart", "营业走势图", "History_Module/BusinessChart.html", "../../images/businessChart.png");
 		
 		private String mgrId;
