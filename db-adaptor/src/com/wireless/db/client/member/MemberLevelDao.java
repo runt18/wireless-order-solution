@@ -68,8 +68,8 @@ public class MemberLevelDao {
 	 * @throws SQLException
 	 * @throws BusinessException
 	 */
-	private static void isMemberTypeBelong(DBCon dbCon, Staff staff, int typeId) throws SQLException, BusinessException{
-		String sql = "SELECT COUNT(*) FROM " + Params.dbName + ".member_level WHERE restaurant_id = " + staff.getRestaurantId() + " AND member_type_id = " + typeId;
+	private static void isMemberTypeBelong(DBCon dbCon, Staff staff, int id, int typeId) throws SQLException, BusinessException{
+		String sql = "SELECT COUNT(*) FROM " + Params.dbName + ".member_level WHERE restaurant_id = " + staff.getRestaurantId() + " AND member_type_id = " + typeId + " AND id <> " + id;
 		try{
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
 			if(dbCon.rs.next()){
@@ -116,7 +116,7 @@ public class MemberLevelDao {
 		MemberLevel memberLevel = builder.build();
 		String sql;
 		//判断是否会员类型已有所属
-		isMemberTypeBelong(dbCon, staff, memberLevel.getMemberType().getTypeId());
+//		isMemberTypeBelong(dbCon, staff, memberLevel.getMemberType().getTypeId());
 		//获取等级id
 		sql = " SELECT IFNULL(MAX(level_id), 0) + 1 FROM " + Params.dbName + ".member_level WHERE restaurant_id = " + staff.getRestaurantId();
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
@@ -128,7 +128,7 @@ public class MemberLevelDao {
 		int minPoint = getLowerPointThreshold(dbCon, staff, levelId);
 		//判断积分是否大于低等级
 		if(memberLevel.getPointThreshold() <= minPoint){
-			throw new BusinessException(MemberError.MEMBER_LEVEL_LESS_POINT);
+			throw new BusinessException(MemberError.MEMBER_LEVEL_HIGHEST);
 		}
 		
 		sql = "INSERT INTO " + Params.dbName + ".member_level(restaurant_id, level_id, point_threshold, member_type_id) VALUES( " +
@@ -183,7 +183,7 @@ public class MemberLevelDao {
 		String sql;
 		int levelId = 0;
 		//判断会员类型是否有所属
-		isMemberTypeBelong(dbCon, staff, memberLevel.getMemberType().getTypeId());
+		isMemberTypeBelong(dbCon, staff, memberLevel.getId(), memberLevel.getMemberType().getTypeId());
 		//获取自身等级id
 		sql = "SELECT level_id FROM " + Params.dbName + ".member_level WHERE id = " + memberLevel.getId();
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
@@ -272,7 +272,7 @@ public class MemberLevelDao {
 		String sql = "SELECT ML.* FROM " + Params.dbName + ".member_level ML" +
 					" WHERE ML.restaurant_id = " + staff.getRestaurantId() +
 					(extraCond != null ? extraCond : "")+
-					(otherClause != null ? otherClause : "");
+					(otherClause != null ? otherClause : " ORDER BY level_id");
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		while(dbCon.rs.next()){
 			MemberLevel mLevel = new MemberLevel();

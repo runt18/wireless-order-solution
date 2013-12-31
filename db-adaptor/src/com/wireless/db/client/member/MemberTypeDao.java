@@ -404,4 +404,29 @@ public class MemberTypeDao {
 			return list.get(0);
 		}
 	}
+	
+	public static List<MemberType> getNotBelongMemberType(Staff staff) throws SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return getNotBelongMemberType(dbCon, staff);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	public static List<MemberType> getNotBelongMemberType(DBCon dbCon, Staff staff) throws SQLException{
+		List<MemberType> list = new ArrayList<MemberType>();
+		String sql = "SELECT member_type_id, name, attribute FROM " + Params.dbName + ".member_type WHERE restaurant_id = "+staff.getRestaurantId() +
+					" AND member_type_id NOT IN (SELECT member_type_id FROM " + Params.dbName + ".member_level WHERE restaurant_id = " + staff.getRestaurantId() + ")";
+		dbCon.rs = dbCon.stmt.executeQuery(sql);
+		while(dbCon.rs.next()){
+			MemberType mType = new MemberType(-1);
+			mType.setTypeId(dbCon.rs.getInt("member_type_id"));
+			mType.setName(dbCon.rs.getString("name"));
+			mType.setAttribute(dbCon.rs.getInt("attribute"));
+			list.add(mType);
+		}
+		return list;
+	}
 }
