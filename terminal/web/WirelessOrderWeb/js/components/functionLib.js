@@ -296,7 +296,7 @@ function showFloatOption(obj_b){
 		nodey = liOffset.top;
 		barY = ($("#"+obj_b.treeId).find("ul").height() + nodey);
 		
-		$("#"+obj_b.treeId).find("li").find("li").mouseover(function(){
+		$("#"+obj_b.treeId).find(".x-tree-node-leaf").mouseover(function(){
 			floatBarNodeId = $(this).find("div").attr("ext:tree-node-id");
 			offset = $(this).find("a").offset();
 			nodex = offset.left-18;

@@ -172,10 +172,109 @@ kitchenOperationRenderer = function(){
 	return '<a href="javascript:updateKitchen()">修改</a>';
 };
 
+function updateDeptHandler(){
+	var node = Ext.ux.getSelNode(deptTree);
+	
+	if(!node || node.attributes.deptID == -1){
+		Ext.example.msg('提示', '请选中一个部门再进行操作.');
+		return;
+	}
+	
+	if(node.attributes.type == 1){
+		Ext.example.msg('提示', '<<font color="red">' + node.text + '</font>>为系统保留部门,不允许修改.');
+		return;
+	}
+	
+	if(!updateDeptWin){
+		updateDeptWin = new Ext.Window({
+			title : '修改部门信息',
+			closable : false,
+			resizable : false,
+			modal : true,
+			width : 230,
+			items : [{
+				xtype : 'form',
+				layout : 'form',
+				frame : true,
+				labelWidth : 65,
+				items : [{
+					xtype : 'textfield',
+					id : 'txtDeptID',
+					fieldLabel : '部门编号',
+					readOnly : true,
+					disabled : true,
+					width : 130
+				}, {
+					xtype : 'textfield',
+					id : 'txtDeptName',
+					fieldLabel : '部门名称',
+					width : 130
+				}]
+			}],
+			bbar : [
+			'->',
+			{
+				text : '保存',
+				id : 'btnSaveUpdateDept',
+				iconCls : 'btn_save',
+				handler : function(){
+					var deptID = Ext.getCmp('txtDeptID');
+					var deptName = Ext.getCmp('txtDeptName');
+					
+					Ext.Ajax.request({
+						url : '../../UpdateDepartment.do',
+						params : {
+							restaurantID : restaurantID,
+							deptID : deptID.getValue(),
+							deptName : deptName.getValue()
+						},
+						success : function(res, opt){
+							var jr = Ext.util.JSON.decode(res.responseText);
+							Ext.example.msg(jr.title, jr.msg);
+							updateDeptWin.hide();
+							deptTree.getRootNode().reload();
+						},
+						failure : function(res, opt) {
+							Ext.ux.showMsg(Ext.util.JSON.decode(res.responseText));
+						}
+					});
+				}
+			}, {
+				text : '关闭',
+				iconCls : 'btn_close',
+				handler : function(){
+					updateDeptWin.hide();
+				}
+			}],
+			listeners : {
+				show : function(){
+					var node = Ext.ux.getSelNode(deptTree);
+					Ext.getCmp('txtDeptID').setValue(node.attributes.deptID);
+					Ext.getCmp('txtDeptName').setValue(node.text);
+					
+					var deptName = Ext.get("txtDeptName");
+					deptName.focus.defer(100, deptName);
+				}
+			},
+			keys : [{
+				 key : Ext.EventObject.ENTER,
+				 fn : function(){ 
+					 Ext.getCmp('btnSaveUpdateDept').handler();
+				 },
+				 scope : this 
+			 }]
+		});
+	}
+	
+	updateDeptWin.show();
+	updateDeptWin.center();
+}
+
 var deptTree;
 var updateDeptWin;
 var kitchenGrid;
 var updateKitchenWin;
+var deptTreeFloat_obj = {treeId : 'cancelledFoodDeptTree', option : [{name : '修改', fn : 'updateDeptHandler()'}]};
 Ext.onReady(function() {
 	deptTree = new Ext.tree.TreePanel({
 		title : '部门信息',
@@ -233,103 +332,7 @@ Ext.onReady(function() {
 				text : '修改',
 				iconCls : 'btn_edit',
 				handler : function(e){
-					
-					var node = deptTree.getSelectionModel().getSelectedNode();
-					
-					if(!node || node.attributes.deptID == -1){
-						Ext.example.msg('提示', '请选中一个部门再进行操作.');
-						return;
-					}
-					
-					if(node.attributes.type == 1){
-						Ext.example.msg('提示', '<<font color="red">' + node.text + '</font>>为系统保留部门,不允许修改.');
-						return;
-					}
-					
-					if(!updateDeptWin){
-						updateDeptWin = new Ext.Window({
-							title : '修改部门信息',
-							closable : false,
-							resizable : false,
-							modal : true,
-							width : 230,
-							items : [{
-								xtype : 'form',
-								layout : 'form',
-								frame : true,
-								labelWidth : 65,
-								items : [{
-									xtype : 'textfield',
-									id : 'txtDeptID',
-									fieldLabel : '部门编号',
-									readOnly : true,
-									disabled : true,
-									width : 130
-								}, {
-									xtype : 'textfield',
-									id : 'txtDeptName',
-									fieldLabel : '部门名称',
-									width : 130
-								}]
-							}],
-							bbar : [
-							'->',
-							{
-								text : '保存',
-								id : 'btnSaveUpdateDept',
-								iconCls : 'btn_save',
-								handler : function(){
-									var deptID = Ext.getCmp('txtDeptID');
-									var deptName = Ext.getCmp('txtDeptName');
-									
-									Ext.Ajax.request({
-										url : '../../UpdateDepartment.do',
-										params : {
-											restaurantID : restaurantID,
-											deptID : deptID.getValue(),
-											deptName : deptName.getValue()
-										},
-										success : function(res, opt){
-											var jr = Ext.util.JSON.decode(res.responseText);
-											Ext.example.msg(jr.title, jr.msg);
-											updateDeptWin.hide();
-											deptTree.getRootNode().reload();
-										},
-										failure : function(res, opt) {
-											Ext.ux.showMsg(Ext.util.JSON.decode(res.responseText));
-										}
-									});
-								}
-							}, {
-								text : '关闭',
-								iconCls : 'btn_close',
-								handler : function(){
-									updateDeptWin.hide();
-								}
-							}],
-							listeners : {
-								show : function(){
-									var node = deptTree.getSelectionModel().getSelectedNode();
-									Ext.getCmp('txtDeptID').setValue(node.attributes.deptID);
-									Ext.getCmp('txtDeptName').setValue(node.text);
-									
-									var deptName = Ext.get("txtDeptName");
-									deptName.focus.defer(100, deptName);
-								}
-							},
-							keys : [{
-								 key : Ext.EventObject.ENTER,
-								 fn : function(){ 
-									 Ext.getCmp('btnSaveUpdateDept').handler();
-								 },
-								 scope : this 
-							 }]
-						});
-					}
-					
-					updateDeptWin.show();
-					updateDeptWin.center();
-					
+					updateDeptHandler();					
 				}
 			}, {
 				text : '刷新',
@@ -434,5 +437,5 @@ Ext.onReady(function() {
 		height : parseInt(Ext.getDom('divDept').parentElement.style.height.replace(/px/g,'')),
 		items : [deptTree, kitchenGrid]
 	});
-	
+	showFloatOption(deptTreeFloat_obj);
 });
