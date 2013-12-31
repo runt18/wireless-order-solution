@@ -510,6 +510,15 @@
 		<action path="/OperateTasteCate" type="com.wireless.Actions.menuMgr.taste.OperateFoodTasteCategoryAction"
 			scope="request" parameter="dataSource">
 		</action>
+		<action path="/OperateMemberLevel" type="com.wireless.Actions.client.memberLevel.OperateMemberLevelAction"
+			scope="request" parameter="dataSource">
+		</action>
+		<action path="/QueryMemberLevel" type="com.wireless.Actions.client.memberLevel.QueryMemberLevelAction"
+			scope="request" parameter="dataSource">
+		</action>
+		<action path="/QueryRepaidStatistics" type="com.wireless.Actions.dishesOrder.QueryRepaidReportAction"
+			scope="request">
+		</action>
 	</action-mappings>
 
 	<message-resources parameter="com.yourcompany.struts.ApplicationResources" />
