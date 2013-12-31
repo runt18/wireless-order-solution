@@ -54,6 +54,7 @@ public class MemberError extends ErrorEnum{
 	public static final ErrorCode MEMBER_TYPE_BELONG = build(9618, "操作失败, 此会员类型已属于别的等级,不能选择");
 	public static final ErrorCode MEMBER_LEVEL_LESS_POINT = build(9617, "操作失败, 积分必须大于低等级的");
 	public static final ErrorCode MEMBER_LEVEL_MORE_POINT = build(9616, "操作失败, 积分必须小于高等级的");
+	public static final ErrorCode MEMBER_LEVEL_HIGHEST = build(9617, "操作失败, 积分必须最高等级的");
 	
 	private MemberError(){
 		
