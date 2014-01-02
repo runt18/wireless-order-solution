@@ -92,4 +92,16 @@ ALTER TABLE `wireless_order_db`.`restaurant`
 ADD COLUMN `weixin_token` VARCHAR(45) NULL DEFAULT NULL AFTER `liveness`,
 ADD COLUMN `weixin_info` VARCHAR(500) NULL DEFAULT NULL AFTER `weixin_token`;
 
+-- -----------------------------------------------------
+-- Add the field 'commission' to table `wireless_order_db`.`order_food`
+-- -----------------------------------------------------
+ALTER TABLE `wireless_order_db`.`order_food` 
+ADD COLUMN `commission` FLOAT NOT NULL DEFAULT 0 COMMENT 'commission to the food' AFTER `order_count`;
+
+-- -----------------------------------------------------
+-- Add the field 'commission' to table `wireless_order_db`.`order_food`
+-- -----------------------------------------------------
+ALTER TABLE `wireless_order_db`.`order_food_history` 
+ADD COLUMN `commission` FLOAT NOT NULL DEFAULT 0 COMMENT 'commission to the food' AFTER `order_count`;
+
 SET SQL_SAFE_UPDATES = @OLD_SAFE_UPDATES;
