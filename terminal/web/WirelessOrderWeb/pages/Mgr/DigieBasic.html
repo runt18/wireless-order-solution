@@ -23,11 +23,16 @@
 
 <script type="text/javascript" src="../../js/basicMgrMain.js"></script>
 
+<script type="text/javascript" src="../../extjs/ext-plugins-define.js"></script>
 
 <link rel="stylesheet" type="text/css" href="../../css/header.css" />
 <link rel="stylesheet" type="text/css" href="../../css/systemSetting.css" />
 
-
+<style type="text/css">
+.x-window, .x-panel-ghost, .ext-el-mask, .ext-el-mask-msg, .x-mask-loading{
+	z-index: 99999 !important;
+}
+</style>
 <script type="text/javascript">
 var floatBarNodeId;
 var nodey=0,barX=500, barY=800;
@@ -124,7 +129,13 @@ var tabs = new Ext.TabPanel({
     plugins: new Ext.ux.TabCloseMenu()
     
 });
+
+var wx = {info:{},sales:{}};
 Ext.onReady(function(){
+	wx.lm = new Ext.LoadMask(document.body, {
+		title : ''
+	});
+	
 	Ext.BLANK_IMAGE_URL = '../../extjs/resources/images/default/s.gif';
     //Ext.state.Manager.setProvider(new Ext.state.CookieProvider());
     getOperatorName('../../', function(staff){
@@ -242,6 +253,8 @@ Ext.onReady(function(){
 							salesSubWinTabPanel.setActiveTab(orderFoodStatPanel);
 						}else if(e.attributes.mId == "cancelledFood"){
 							cancelledFood();
+						}else if(e.attributes.mId == "WXInfo"){
+							operateWXInfo();
 						}
 						
 					}
