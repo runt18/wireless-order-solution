@@ -1,0 +1,23 @@
+.box-s-f-b{
+	margin: 10px auto 0 auto;
+	width: 90%;
+	background: #FFF;
+	//-webkit-border-radius: 10px;
+	border: 1px solid #ccc;
+	font-size: 12px;
+}
+.box-s-f-b > div{
+	width: calc(100% - 20px); 
+	min-height: 16px; 
+	padding: 5px 10px 5px 10px;
+	border-bottom: 1px solid #ccc;
+}
+
+.box-s-f-b > div:first-child{
+	height: 150px; 
+	padding-top: 10px; 
+	padding-bottom: 10px;
+}
+.box-s-f-b > div:last-child{
+	border-bottom: 0;
+}
