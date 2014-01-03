@@ -13,7 +13,8 @@ public class BillBoard implements Jsonable {
 	
 	public enum Type{
 		SYSTEM(1, "系统公告"),
-		RESTAURANT(2, "餐厅通知");
+		RESTAURANT(2, "餐厅通知"),
+		WX_INFO(3, "温馨促销信息");
 		
 		Type(int val, String desc){
 			this.val = val;
