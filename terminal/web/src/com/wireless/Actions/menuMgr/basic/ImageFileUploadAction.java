@@ -33,6 +33,8 @@ import com.wireless.util.WebParams;
 
 public class ImageFileUploadAction extends Action{
 	
+	public static final String CI_PRIEX = "small_";
+	
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {	

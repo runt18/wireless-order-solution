@@ -16,6 +16,7 @@ import org.apache.struts.actions.DispatchAction;
 import com.wireless.db.DBCon;
 import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.db.staffMgr.StaffDao;
+import com.wireless.db.weixin.restaurant.WeixinRestaurantDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.restaurantMgr.Restaurant;
@@ -104,92 +105,102 @@ public class OperateRestaurantAction extends DispatchAction {
 		
 	}
 	
-	
 	public ActionForward systemUpdate(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
 		DBCon dbCon = new DBCon();
-		
-		
-		
 		PrintWriter out = response.getWriter();
-		
 		JSONObject all = new JSONObject();
-		
 		JSONObject msg = new JSONObject();
-		
 		boolean success = false;
 		
 		try{
-		
 			String restaurant_name = request.getParameter("restaurant_name");
-			
 			String restaurant_info = request.getParameter("restaurant_info");
-			
 			String address = request.getParameter("address");
-			
 			String tele1 = request.getParameter("tel1");
-			
 			String tele2 = request.getParameter("tel2");
-			
 			String pin = (String)request.getAttribute("pin");
-			
 			String id = request.getParameter("restaurantID"); 
-			
 			dbCon.connect();
-
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
-			
 			id = staff.getRestaurantId()+"";
-			
 			Restaurant restaurant = new Restaurant();
-			
 			restaurant.setId(Integer.parseInt(id));
-			
 			restaurant.setName(restaurant_name);
-			
 			restaurant.setInfo(restaurant_info);
-			
 			restaurant.setAddress(address);
-			
 			restaurant.setTele1(tele1);
-			
 			restaurant.setTele2(tele2);
-			
 			RestaurantDao.update(staff, restaurant);
-			
 			success = true;
-			
 			msg.put("success", success);
-			
 			msg.put("message", "操作成功!");
-			
-		}
-		catch(BusinessException e){
-			
+		} catch(BusinessException e) {
 			e.printStackTrace();
-			
 			success = false;
-			
 			msg.put("success", success);
-			
 			msg.put("message", e.getDesc());
-			
-		}
-		finally{
-			
+		} finally {
 			dbCon.disconnect();
-			
 			all.put("all", msg);
-			
 			out.write(all.toString());
-			
 			out.flush();
-			
 			out.close();
-			
 		}
 		
+		return null;
+	}
+	
+	/**
+	 * 
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward updateInfo(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		JObject jobject = new JObject();
+		try{
+			String info = request.getParameter("info");
+			String rid = request.getAttribute("restaurantID").toString();
+			
+			WeixinRestaurantDao.updateInfo(Integer.valueOf(rid), info);
+			jobject.initTip(true, "操作成功, 已修改微信餐厅简介信息.");
+		}catch(Exception e){
+			e.printStackTrace();
+			jobject.initTip(e);
+		}finally{
+			response.getWriter().print(jobject.toString());
+		}
+		return null;
+	}
+	
+	/**
+	 * 
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward getInfo(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		JObject jobject = new JObject();
+		try{
+			jobject.getOther().put("info", WeixinRestaurantDao.getInfo(Integer.valueOf(request.getAttribute("restaurantID").toString())));
+		}catch(Exception e){
+			e.printStackTrace();
+			jobject.initTip(e);
+		}finally{
+			response.getWriter().print(jobject.toString());
+		}
 		return null;
 	}
 }

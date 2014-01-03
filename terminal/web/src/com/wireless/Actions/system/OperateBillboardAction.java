@@ -15,12 +15,18 @@ import com.wireless.pojo.system.BillBoard;
 
 public class OperateBillboardAction extends DispatchAction{
 	
+	/**
+	 * 
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
 	public ActionForward insert(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		
-		
-		
 		JObject jobject = new JObject();
 		try{
 			String type = request.getParameter("type");
@@ -34,7 +40,7 @@ public class OperateBillboardAction extends DispatchAction{
 				  .setDesc(desc.trim())
 				  .setExpired(Long.valueOf(expired))
 				  .setType(Integer.valueOf(type))
-				  .setRestaurantId(Integer.valueOf(type) == 2 ? Integer.valueOf(rid) : 0);
+				  .setRestaurantId(Integer.valueOf(type) == 1 ? 0 : Integer.valueOf(rid));
 			BillBoardDao.insert(insert);
 			jobject.initTip(true, "操作成功, 已添加新公告信息.");
 		}catch(Exception e){
@@ -46,11 +52,18 @@ public class OperateBillboardAction extends DispatchAction{
 		return null;
 	}
 	
+	/**
+	 * 
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
 	public ActionForward update(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		
-		
 		JObject jobject = new JObject();
 		try{
 			String id = request.getParameter("id");
@@ -65,7 +78,7 @@ public class OperateBillboardAction extends DispatchAction{
 				  .setDesc(desc.trim())
 				  .setExpired(Long.valueOf(expired))
 				  .setType(Integer.valueOf(type))
-				  .setRestaurantId(Integer.valueOf(type) == 2 ? Integer.valueOf(rid) : 0);
+				  .setRestaurantId(Integer.valueOf(type) == 1 ? 0 : Integer.valueOf(rid));
 			BillBoardDao.update(update);
 			jobject.initTip(true, "操作成功, 已修改公告信息.");
 		}catch(Exception e){
@@ -77,11 +90,18 @@ public class OperateBillboardAction extends DispatchAction{
 		return null;
 	}
 	
+	/**
+	 * 
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
 	public ActionForward delete(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		
-		
 		JObject jobject = new JObject();
 		try{
 			String id = request.getParameter("id");
