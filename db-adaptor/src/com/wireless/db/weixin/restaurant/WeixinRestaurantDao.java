@@ -282,4 +282,134 @@ public class WeixinRestaurantDao {
 		}
 		return restaurantId;
 	}
+	
+	/**
+	 * 
+	 * @param dbCon
+	 * @param rid
+	 * @return
+	 * @throws SQLException
+	 * @throws BusinessException
+	 */
+	public static String getInfo(DBCon dbCon, int rid) throws SQLException, BusinessException{
+		String info = "";
+		String querySQL = "SELECT weixin_info FROM restaurant WHERE id = " + rid;
+		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
+		if(dbCon.rs != null && dbCon.rs.next()){
+			info = dbCon.rs.getString(1);
+		}
+		info = info.replaceAll("&amp;", "&")
+			.replaceAll("&lt;", "<").replaceAll("&gt;", ">").replaceAll("&quot;", "\"")
+			.replaceAll("\r&#10;", "　\n").replaceAll("&#10;", "　\n").replaceAll("&#032;", " ")
+			.replaceAll("&#039;", "'").replaceAll("&#033;", "!");
+		return info;
+	}
+	public static String getInfo(int rid) throws SQLException, BusinessException{
+		DBCon dbCon = null;
+		try{
+			dbCon = new DBCon();
+			dbCon.connect();
+			return getInfo(dbCon, rid);
+		}finally{
+			if(dbCon != null) dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * 
+	 * @param dbCon
+	 * @param serial
+	 * @return
+	 * @throws SQLException
+	 * @throws BusinessException
+	 */
+	public static String getInfoByRestaurantSerial(DBCon dbCon, String serial) throws SQLException, BusinessException{
+		int rid = getRestaurantIdByWeixin(dbCon, serial);
+		return getInfo(dbCon, rid);
+	}
+	public static String getInfoByRestaurantSerial(String serial) throws SQLException, BusinessException{
+		DBCon dbCon = null;
+		try{
+			dbCon = new DBCon();
+			dbCon.connect();
+			return getInfoByRestaurantSerial(dbCon, serial);
+		}finally{
+			if(dbCon != null) dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * 
+	 * @param dbCon
+	 * @param rid
+	 * @param info
+	 * @throws SQLException
+	 * @throws BusinessException
+	 */
+	public static void updateInfo(DBCon dbCon, int rid, String info) throws SQLException, BusinessException{
+		info = info.replaceAll("&", "&amp;")
+			.replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll("\"", "&quot;")
+			.replaceAll("\n\r", "&#10;").replaceAll("\r\n", "&#10;").replaceAll("\n", "&#10;")
+			.replaceAll(" ", "&#032;").replaceAll("'", "&#039;").replaceAll("!", "&#033;");
+		String updateSQL = "UPDATE restaurant SET weixin_info = '" + info + "' WHERE id = " + rid;
+		if(dbCon.stmt.executeUpdate(updateSQL) == 0){
+			throw new BusinessException(WeixinRestaurantError.WEIXIN_UPDATE_INFO_FAIL);
+		}
+	}
+	public static void updateInfo(int rid, String info) throws SQLException, BusinessException{
+		DBCon dbCon = null;
+		try{
+			dbCon = new DBCon();
+			dbCon.connect();
+			updateInfo(dbCon, rid, info);
+		}finally{
+			if(dbCon != null) dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * 
+	 * @param dbCon
+	 * @param serial
+	 * @param info
+	 * @throws SQLException
+	 * @throws BusinessException
+	 */
+	public static void updateInfoByRestaurantSerial(DBCon dbCon, String serial, String info) throws SQLException, BusinessException{
+		int rid = getRestaurantIdByWeixin(dbCon, serial);
+		updateInfo(dbCon, rid, info);
+	}
+	public static void updateInfoByRestaurantSerial(String serial, String info) throws SQLException, BusinessException{
+		DBCon dbCon = null;
+		try{
+			dbCon = new DBCon();
+			dbCon.connect();
+			updateInfoByRestaurantSerial(dbCon, serial, info);
+		}finally{
+			if(dbCon != null) dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * 
+	 * @param dbCon
+	 * @param rid
+	 * @param imgKey
+	 * @throws SQLException
+	 */
+	public static void addImageMateril(DBCon dbCon, int rid, String imgKey) throws SQLException{
+		String insertSQL = "INSERT INTO weixin_image (restaurant_id,image,last_modified)"
+				+ " VALUES(" + rid + ",'" + imgKey + "', NOW())";
+		dbCon.stmt.executeUpdate(insertSQL);
+	}
+	public static void addImageMateril(int rid, String imgKey) throws SQLException{
+		DBCon dbCon = null;
+		try{
+			dbCon = new DBCon();
+			dbCon.connect();
+			addImageMateril(dbCon, rid, imgKey);
+		}finally{
+			if(dbCon != null) dbCon.disconnect();
+		}
+	}
 }
