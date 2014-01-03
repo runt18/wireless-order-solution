@@ -149,11 +149,33 @@ Ext.ux.plugins.HEInsertImage = function(config){
 	 	        	}
 	 	        },
 	 	        handler : function(e){
+	 	        	var check = true, img = '';
+ 	        		if(Ext.isIE){
+ 	        			Ext.getDom(imgFile.getId()).select();
+ 	        			img = document.selection.createRange().text;
+ 	        		}else{
+		 	        	img = Ext.getDom(imgFile.getId()).value;
+ 	        		}
+ 	        		if(typeof(img) != 'undefined' && img.length > 0){
+		 	        	var type = img.substring(img.lastIndexOf('.') + 1, img.length);
+		 	        	check = false;
+		 	        	for(var i = 0; i < Ext.ux.plugins.imgTypes.length; i++){
+		 	        		if(type.toLowerCase() == Ext.ux.plugins.imgTypes[i].toLowerCase()){
+		 	        			check = true;
+			 	        	   	break;
+			 	        	}
+		 	        	}
+		 	        	if(!check){
+			 	        	Ext.example.msg('提示', '图片类型不正确.');
+			 	        	return;
+	 	        		}
+ 	        		}else{
+ 	        			Ext.example.msg('提示', '未选择图片.');
+		 	        	return;
+ 	        		}
 	 	        	uploadMask.show();
-	 	        	
 	 	        	Ext.Ajax.request({
 		 	   			url : config.url,
-		 	   			params : config.params,
 		 	   			isUpload : true,
 		 	   			form : form.getForm().getEl(),
 		 	   			success : function(response, options){
@@ -205,7 +227,7 @@ Ext.ux.plugins.HEInsertImage = function(config){
 	 	    	buttons : [btnUpload, btnClose]
     		});
     		
-    		this.win = new Ext.Window({
+    		this.win = new top.Ext.Window({
     			title : '插入图片',
     			modal : true,
     			resizable : false,
