@@ -788,3 +788,155 @@ var resturantMgr = new Ext.Window({
 		}
 	]
 });
+
+function operateWXInfo(){
+	if(!wx.info.win){
+		var edit = new Ext.form.HtmlEditor({
+			fieldLabel : '公告内容',
+			hideLabel : true,
+			width : 500,
+			height : 440,
+			enableAlignments: false,
+	        enableColors: false,
+	        enableFont: false,
+	        enableFontSize: true,
+	        enableFormat: true,
+	        enableLinks: false,
+	        enableLists: true,
+	        enableSourceEdit: true,
+//	        fontFamilies: ["宋体", "隶书", "黑体"],
+	        plugins : [new Ext.ux.plugins.HEInsertImage({
+	        	url : '../../WXOperateMaterial.do?dataSource=upload&time=' + new Date().getTime()
+	        })]
+		});
+		var btnPreview = new Ext.Button({
+			text : '预览',
+			listeners : {
+				render : function(thiz){
+					thiz.getEl().setWidth(100, true);
+				}
+			},
+			handler : function(){
+				center.body.update(edit.getValue());
+			}
+		});
+		var btnClear = new Ext.Button({
+			text : '清空',
+			listeners : {
+				render : function(thiz){
+					thiz.getEl().setWidth(100, true);
+				}
+			},
+			handler : function(){
+				edit.setValue();
+				center.body.update(edit.getValue());
+			}
+		});
+		var btnSave = new Ext.Button({
+			text : '保存',
+			listeners : {
+				render : function(thiz){
+					thiz.getEl().setWidth(100, true);
+				}
+			},
+			handler : function(){
+				wx.lm.show();
+				Ext.Ajax.request({
+					url : '../../OperateRestaurant.do',
+					params : {
+						dataSource : 'updateInfo',
+						info : edit.getValue()
+					},
+					success : function(res, opt){
+						wx.lm.hide();
+						var jr = Ext.decode(res.responseText);
+						Ext.ux.showMsg(jr);
+						if(jr.success){
+							wx.info.win.hide();
+						}
+					},
+					fialure : function(res, opt){
+						wx.lm.hide();
+						Ext.ux.showMsg(res.responseText);
+					}
+				});
+			}
+		});
+		var btnClose = new Ext.Button({
+			text : '关闭',
+			listeners : {
+				render : function(thiz){
+					thiz.getEl().setWidth(100, true);
+				}
+			},
+			handler : function(){
+				wx.info.win.hide();
+			}
+		});
+		var west = new Ext.form.FormPanel({
+			region : 'west',
+			width : 510,
+			items : [edit],
+			buttonAlign : 'center',
+			buttons : [btnPreview, btnClear, btnSave, btnClose]
+		});
+		var center = new Ext.Panel({
+			region : 'center',
+			style : 'background-color: #fff; border: 1px solid #ccc; padding: 5px 5px 5px 5px;',
+			bodyStyle : 'overflow-y: auto; word-wrap:break-word;',
+			html : '&nbsp;'
+		});
+		
+		wx.info.win = new Ext.Window({
+			title : '&nbsp;',
+			closable : false,
+			resizeble : false,
+			modal : true,
+			width : 850,
+			items : [{
+				layout : 'border',
+				frame : true,
+				border : false,
+				height : 500,
+				items : [west, center]
+			}],
+			listeners : {
+				show : function(){
+					wx.lm.show();
+					Ext.Ajax.request({
+						url : '../../OperateRestaurant.do',
+						params : {
+							dataSource : 'getInfo'
+						},
+						success : function(res, opt){
+							wx.lm.hide();
+							var jr = Ext.decode(res.responseText);
+							if(jr.success){
+								wx.info.setValue(jr.other.info);
+							}else{
+								wx.info.setValue('');
+								Ext.ux.showMsg(jr);
+							}
+						},
+						fialure : function(res, opt){
+							wx.lm.hide();
+							Ext.ux.showMsg(res.responseText);
+						}
+					});
+				}
+			}
+		});
+		
+		wx.info.setValue = function(v){
+			edit.setValue(v);
+			btnPreview.handler();
+			edit.focus();
+		};
+		wx.info.clearValue = function(){
+			btnClear.handler();
+		};
+	}
+	
+	wx.info.win.show();
+}
+
