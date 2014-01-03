@@ -8,8 +8,15 @@
 		<init-param>
 			<param-name>skipVerify</param-name>
 			<param-value>
+				/WXQueryInfo.do,
+				/WXOperateInfo.do,
+				/WXOperateMaterial.do,
+				
 				/WXEntry.do,
-				/QueryFood_q.do,
+				/WXQueryFood.do,
+				/WXQueryDept.do,
+				/WXOperateMember.do,
+				
 				/FinanceWeixin.do,
 
 				/QueryRestaurants.do,
