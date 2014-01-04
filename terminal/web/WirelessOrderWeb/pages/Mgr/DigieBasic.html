@@ -41,6 +41,9 @@ var tabIndex = 0;
 //收款统计
 var receivablesStaticRecordCount = 10;
 
+//月结等待
+var monthlySet = true;
+
 //销售统计
 	// kitchen
 	var kitchenStaticBeginDate;
@@ -168,6 +171,11 @@ Ext.onReady(function(){
 						addTab(id, title, url);
 					}else{
 						if(e.attributes.mId == "monthSettle"){
+							if(!monthlySet){
+								Ext.example.msg('提示', '月结中,请稍后');
+								return;
+							}
+							
 							var date = new Date();
 							var presentMonth = date.getMonth() + 1;
 							Ext.Ajax.request({
