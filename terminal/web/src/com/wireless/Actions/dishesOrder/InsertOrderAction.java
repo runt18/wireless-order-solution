@@ -140,12 +140,14 @@ public class InsertOrderAction extends Action{
 		}catch(BusinessException e){
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getCode(), e.getDesc());
 			e.printStackTrace();
-			
 		}catch(IOException e){
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9997, "服务器请求不成功，请重新检查网络是否连通.");
 			e.printStackTrace();
 		}catch(NumberFormatException e){
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9998, "菜品提交的数量不正确，请检查后重新提交.");
+			e.printStackTrace();
+		}catch(Exception e){
+			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, "操作失败, 数据库操作错误.");
 			e.printStackTrace();
 		}finally{
 			JSONObject json = JSONObject.fromObject(jobject);
