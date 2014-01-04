@@ -750,38 +750,4 @@ public class OrderDao {
 			dbCon.disconnect();
 		}
 	}
-	
-	private static List<Order> getOrderRepaidReport(DBCon dbCon, Staff staff, String extraCond, String orderClause) throws SQLException{
-		String sql = "SELECT order_date, staff_id, waiter, id,  repaid_price, total_price, actual_price, pay_type FROM " + Params.dbName + ".order_history " +
-					" WHERE status = " + Order.Status.REPAID.getVal() + 
-					(extraCond != null ? extraCond : "") +
-					(orderClause != null ? orderClause : "");
-		dbCon.rs = dbCon.stmt.executeQuery(sql);
-		List<Order> list = new ArrayList<Order>();
-		while(dbCon.rs.next()){
-			Order order = new Order();
-			Staff oStaff = new Staff();
-			order.setId(dbCon.rs.getInt("id"));
-			order.setOrderDate(dbCon.rs.getTimestamp("order_date").getTime());
-			order.setActualPrice(dbCon.rs.getFloat("actual_price"));
-			order.setTotalPrice(dbCon.rs.getFloat("total_price"));
-			order.setRepaidPrice(dbCon.rs.getFloat("repaid_price"));
-			order.setPaymentType(dbCon.rs.getInt("pay_type"));
-			oStaff.setId(dbCon.rs.getInt("staff_id"));
-			oStaff.setName(dbCon.rs.getString("waiter"));
-			order.setStaff(oStaff);
-			list.add(order);
-		}
-		return list;
-	}
-	
-	public static List<Order> getOrderRepaidReport(Staff staff, String extraCond, String orderClause) throws SQLException{
-		DBCon dbCon = new DBCon();
-		try{
-			dbCon.connect();
-			return getOrderRepaidReport(dbCon, staff, extraCond, orderClause);
-		}finally{
-			dbCon.disconnect();
-		}
-	}
 }

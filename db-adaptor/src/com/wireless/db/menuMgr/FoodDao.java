@@ -75,8 +75,8 @@ public class FoodDao {
 		}
 		
 		// 新增菜谱价格方案信息
-		insertSQL = "INSERT INTO food_price_plan (restaurant_id, food_id, price_plan_id, unit_price)"
-				  + " SELECT " + fb.getRestaurantId() + "," + fb.getFoodId() + ",price_plan_id," + fb.getPrice() + " FROM price_plan WHERE restaurant_id = " + fb.getRestaurantId();
+		insertSQL = "INSERT INTO food_price_plan (restaurant_id, food_id, price_plan_id, unit_price, commission)"
+				  + " SELECT " + fb.getRestaurantId() + "," + fb.getFoodId() + ",price_plan_id," + fb.getPrice() + ", " + fb.getCommission() + " FROM price_plan WHERE restaurant_id = " + fb.getRestaurantId();
 		count = dbCon.stmt.executeUpdate(insertSQL);
 		if(count == 0){
 			throw new BusinessException(PlanError.PRICE_FOOD_INSERT);
