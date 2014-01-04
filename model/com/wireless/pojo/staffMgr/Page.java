@@ -87,12 +87,13 @@ public class Page{
 	}
 	
 	public static enum History{
-		HISTORY("history", "历史", "History_Module/HistoryStatistics.html", "../../images/history.png"),
+		HISTORY("history", "历史账单", "History_Module/HistoryStatistics.html", "../../images/history.png"),
 		BIlls("businessStat", "营业统计", "", "../../images/businessStatis.png"),
 		BUSINESS_RECEIPS("businessReceiptsStatistics", "收款统计", "", "../../images/businessReceips.png"),
 		SALES_SUB("salesSubStatistics", "销售统计", "", "../../images/salesStat.png"),
 		CANCELLED_FOOD("cancelledFood", "退菜统计", "", "../../images/cancelledFoodStatis.png"),
 		REPAID_STATISTICS("repaid_statistics", "反结账统计", "History_Module/RepaidStatistics.html", "../../images/repaidStatistics.png"),
+		COMMISSION_STATISTICS("commission_statistics", "提成统计", "History_Module/CommissionStatistics.html", "../../images/repaidStatistics.png"),
 		BUSINESS_CHART("businessChart", "营业走势图", "History_Module/BusinessChart.html", "../../images/businessChart.png");
 		
 		private String mgrId;
