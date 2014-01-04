@@ -20,6 +20,7 @@ import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.pojo.ppMgr.PricePlan;
 import com.wireless.pojo.tasteMgr.Taste;
 import com.wireless.pojo.tasteMgr.TasteCategory;
+import com.wireless.pojo.tasteMgr.TasteCategory.Status;
 import com.wireless.util.SQLUtil;
 
 public class MenuDao {
@@ -233,8 +234,9 @@ public class MenuDao {
 		try{
 			dbCon.connect();
 			String querySQL = "SELECT "
-							+ " A.taste_id, A.restaurant_id, A.preference, A.price, A.category_id, A.rate, A.calc, A.type "
-							+ " FROM " + Params.dbName + ".taste A "
+							+ " A.taste_id, A.restaurant_id, A.preference, A.price, A.category_id, A.rate, A.calc, A.type, "
+							+ " B.name category_name, B.type category_type"
+							+ " FROM " + Params.dbName + ".taste A LEFT JOIN " + Params.dbName + ".taste_category B ON A.category_id = B.category_id "
 							+ " WHERE 1=1 "
 							+ (cond != null && cond.trim().length() > 0 ? " " + cond : "")
 							+ (orderBy != null && orderBy.trim().length() > 0 ? " " + orderBy : "");
@@ -244,7 +246,8 @@ public class MenuDao {
 				taste.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
 				taste.setPreference(dbCon.rs.getString("preference"));
 				taste.setPrice(dbCon.rs.getFloat("price"));
-				taste.setCategory(new TasteCategory(dbCon.rs.getInt("category_id")));
+				taste.setCategory(new TasteCategory(dbCon.rs.getInt("category_id"), dbCon.rs.getString("category_name")));
+				taste.getCategory().setStatus(Status.valueOf(dbCon.rs.getInt("category_type")));
 				taste.setRate(dbCon.rs.getFloat("rate"));
 				taste.setCalc(dbCon.rs.getInt("calc"));
 				taste.setType(dbCon.rs.getInt("type"));

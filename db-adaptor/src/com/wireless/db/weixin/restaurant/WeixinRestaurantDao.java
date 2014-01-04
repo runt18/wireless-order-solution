@@ -297,11 +297,12 @@ public class WeixinRestaurantDao {
 		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
 		if(dbCon.rs != null && dbCon.rs.next()){
 			info = dbCon.rs.getString(1);
+			info = info == null ? "" : info;
+			info = info.replaceAll("&amp;", "&")
+					.replaceAll("&lt;", "<").replaceAll("&gt;", ">").replaceAll("&quot;", "\"")
+					.replaceAll("\r&#10;", "　\n").replaceAll("&#10;", "　\n").replaceAll("&#032;", " ")
+					.replaceAll("&#039;", "'").replaceAll("&#033;", "!");
 		}
-		info = info.replaceAll("&amp;", "&")
-			.replaceAll("&lt;", "<").replaceAll("&gt;", ">").replaceAll("&quot;", "\"")
-			.replaceAll("\r&#10;", "　\n").replaceAll("&#10;", "　\n").replaceAll("&#032;", " ")
-			.replaceAll("&#039;", "'").replaceAll("&#033;", "!");
 		return info;
 	}
 	public static String getInfo(int rid) throws SQLException, BusinessException{
