@@ -525,6 +525,8 @@ public class Taste implements Parcelable, Comparable<Taste>, Jsonable{
 		jm.put("rank", this.rank);
 		jm.put("cateValue", this.category.getId());
 		jm.put("cateText", this.category.getName());
+		jm.put("cateStatusValue", this.category.getStatus().getVal());
+		jm.put("cateStatusText", this.category.getStatus().getDesc());
 		jm.put("calcValue", this.calc.getVal());
 		jm.put("calcText", this.calc.getDesc());
 		jm.put("typeValue", this.type.getVal());
