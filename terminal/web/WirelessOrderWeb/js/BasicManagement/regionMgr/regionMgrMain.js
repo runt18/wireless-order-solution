@@ -123,6 +123,96 @@ function deleteTableBasicHandler(){
 	});
 }
 
+function updateRegionHandler(){
+	var node = Ext.ux.getSelNode(regionTree);
+	if (!node || node.attributes.regionId == -1) {
+		Ext.example.msg('提示', '操作失败, 请选择一个区域再进行修改.');
+		return;
+	}
+	var operateRegionWin = Ext.getCmp('operateRegionWin');
+	if(!operateRegionWin){
+		operateRegionWin = new Ext.Window({
+			id : 'operateRegionWin',
+			title : '修改区域信息',
+			modal : true,
+			closable : false,
+			resizeble : false,
+			width : 250,
+			items : [{
+				layout : 'form',
+				labelWidth : 60,
+				frame : true,
+				items : [{
+					xtype : 'hidden',
+					id : 'hideRegionId'
+				}, {
+					xtype : 'textfield',
+					id : 'txtRegionName',
+					fieldLabel : '区域名称',
+					allowBlank : false
+				}]
+			}],
+			keys : [{
+				key : Ext.EventObject.ENTER,
+				scope : this,
+				fn : function(){
+					Ext.getCmp('btnSaveOperateRegoin').handler();
+				}
+			}, {
+				key : Ext.EventObject.ESC,
+				scope : this,
+				fn : function(){
+					operateRegionWin.hide();
+				}
+			}],
+			bbar : ['->', {
+				text : '保存',
+				id : 'btnSaveOperateRegoin',
+				iconCls : 'btn_save',
+				handler : function(){
+					var id = Ext.getCmp('hideRegionId');
+					var name = Ext.getCmp('txtRegionName');
+					if(!name.isValid()){
+						return;
+					}
+					Ext.Ajax.request({
+						url : '../../OperateRegion.do',
+						params : {
+							dataSource : 'update',
+							
+							id : id.getValue(),
+							name : name.getValue()
+						},
+						success : function(res, opt){
+							var jr = Ext.decode(res.responseText);
+							if(jr.success){
+								Ext.example.msg(jr.title, jr.msg);
+								operateRegionWin.hide();
+								regionTree.getRootNode().reload();
+								Ext.getCmp('btnSearchForTable').handler();
+							}else{
+								Ext.ux.showMsg(jr);
+							}
+						},
+						failure : function(res, opt){
+							Ext.ux.showMsg(Ext.decode(res.responseText));
+						}
+					});
+				}
+			}, {
+				text : '取消',
+				iconCls : 'btn_cancel',
+				handler : function(){
+					operateRegionWin.hide();
+				}
+			}]
+		});
+	}
+	operateRegionWin.show();
+	operateRegionWin.center();
+	Ext.getCmp('hideRegionId').setValue(node.attributes.regionId);
+	Ext.getCmp('txtRegionName').setValue(node.attributes.regionName);
+}
 
 //---------------
 //-------------load
@@ -140,6 +230,7 @@ function tableBasicGridOperateRenderer(v, m, r, ri, ci, s){
  */
 function initTree(){
 	regionTree = new Ext.tree.TreePanel({
+		id : "regionTree",
 		title : '区域',
 		region : 'west',
 		width : 200,
@@ -171,94 +262,7 @@ function initTree(){
 			text : '修改',
 			iconCls : 'btn_edit',
 			handler : function(e) {
-				var node = regionTree.getSelectionModel().getSelectedNode();
-				if (!node || node.attributes.regionId == -1) {
-					Ext.example.msg('提示', '操作失败, 请选择一个区域再进行修改.');
-					return;
-				}
-				var operateRegionWin = Ext.getCmp('operateRegionWin');
-				if(!operateRegionWin){
-					operateRegionWin = new Ext.Window({
-						id : 'operateRegionWin',
-						title : '修改区域信息',
-						modal : true,
-						closable : false,
-						resizeble : false,
-						width : 250,
-						items : [{
-							layout : 'form',
-							labelWidth : 60,
-							frame : true,
-							items : [{
-								xtype : 'hidden',
-								id : 'hideRegionId'
-							}, {
-								xtype : 'textfield',
-								id : 'txtRegionName',
-								fieldLabel : '区域名称',
-								allowBlank : false
-							}]
-						}],
-						keys : [{
-							key : Ext.EventObject.ENTER,
-							scope : this,
-							fn : function(){
-								Ext.getCmp('btnSaveOperateRegoin').handler();
-							}
-						}, {
-							key : Ext.EventObject.ESC,
-							scope : this,
-							fn : function(){
-								operateRegionWin.hide();
-							}
-						}],
-						bbar : ['->', {
-							text : '保存',
-							id : 'btnSaveOperateRegoin',
-							iconCls : 'btn_save',
-							handler : function(){
-								var id = Ext.getCmp('hideRegionId');
-								var name = Ext.getCmp('txtRegionName');
-								if(!name.isValid()){
-									return;
-								}
-								Ext.Ajax.request({
-									url : '../../OperateRegion.do',
-									params : {
-										dataSource : 'update',
-										
-										id : id.getValue(),
-										name : name.getValue()
-									},
-									success : function(res, opt){
-										var jr = Ext.decode(res.responseText);
-										if(jr.success){
-											Ext.example.msg(jr.title, jr.msg);
-											operateRegionWin.hide();
-											regionTree.getRootNode().reload();
-											Ext.getCmp('btnSearchForTable').handler();
-										}else{
-											Ext.ux.showMsg(jr);
-										}
-									},
-									failure : function(res, opt){
-										Ext.ux.showMsg(Ext.decode(res.responseText));
-									}
-								});
-							}
-						}, {
-							text : '取消',
-							iconCls : 'btn_cancel',
-							handler : function(){
-								operateRegionWin.hide();
-							}
-						}]
-					});
-				}
-				operateRegionWin.show();
-				operateRegionWin.center();
-				Ext.getCmp('hideRegionId').setValue(node.attributes.regionId);
-				Ext.getCmp('txtRegionName').setValue(node.attributes.regionName);
+				updateRegionHandler();
 			}
 		}, {
 			text : '刷新',
@@ -275,8 +279,6 @@ function initTree(){
 			},
 			click : function(node){
 				Ext.getDom('displaySearchRegion').innerHTML = node.text ;
-			},
-			dblclick : function(){
 				Ext.getCmp('btnSearchForTable').handler();
 			}
 		}
@@ -529,7 +531,7 @@ function initWin(){
 
 //----------
 
-
+var region_obj = {treeId : 'regionTree', option : [{name : '修改', fn : 'updateRegionHandler()'}]};
 Ext.onReady(function(){
 	//
 	initTree();
@@ -540,13 +542,12 @@ Ext.onReady(function(){
 	initWin();
 	
 	new Ext.Panel({
-		title : '区域管理',
 		renderTo : 'divRegion',
-		frame : true,
+		frame : false,
 		layout : 'border',
 		width : parseInt(Ext.getDom('divRegion').parentElement.style.width.replace(/px/g,'')),
 		height : parseInt(Ext.getDom('divRegion').parentElement.style.height.replace(/px/g,'')),
 		items : [regionTree, tableBasicGrid]
 	});
-	
+	showFloatOption(region_obj);
 });

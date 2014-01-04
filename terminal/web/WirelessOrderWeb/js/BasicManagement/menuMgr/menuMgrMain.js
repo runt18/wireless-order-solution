@@ -881,17 +881,8 @@ var basicOperationPanel = new Ext.Panel({
 		 	}, {
 		 		columnWidth : .5,
 		 		items : [{
-		 			xtype : 'textfield',
-		 			id : 'txtBasicForPinyin',
-		 			fieldLabel : '拼音',
-		 			width : 100,
-		 			validator : function(v){
-		 				if(/^[a-zA-Z]+$/.test(v)){
-		 					return true;
-		 	    	    }else{
-		 	    	    	return '只能输入拼音,不区分大小写!';
-		 	    	    }
-		 	    	}
+		 			xtype : 'hidden',
+		 			id : 'txtBasicForPinyin'
 		 		}]
 		 	}, {
 		 		columnWidth : .5,
@@ -1011,9 +1002,28 @@ var basicOperationPanel = new Ext.Panel({
 		 	    	xtype : 'checkbox',
 		 	    	id : 'chbForBasicWeight',
 		 	    	hideLabel : true,
-		 	    	boxLabel : '<img title="热销" src="../../images/weight.png"></img>'
+		 	    	boxLabel : '<img title="称重" src="../../images/weight.png"></img>'
 		 	    }]
 		 	}, {
+		 		columnWidth : .2,
+		 	    items : [{
+		 	    	xtype : 'checkbox',
+		 	    	id : 'chbForBasicCommission',
+		 	    	hideLabel : true,
+		 	    	boxLabel : '<img title="提成" src="../../images/weight.png"></img>',
+		 	    	listeners : {
+		 	    		check : function(checkbox, checked){
+							if(checked){
+								Ext.getCmp('numCommission').getEl().up('.x-form-item').setDisplayed(true);
+								Ext.getCmp('numCommission').focus(true, 100);
+							}else{
+								Ext.getCmp('numCommission').getEl().up('.x-form-item').setDisplayed(false);
+							}
+							
+						}
+		 	    	}
+		 	    }]
+		 	},{
 		 		columnWidth : .5,
 		 		labelWidth : 55,
 		 		items : [{
@@ -1035,6 +1045,27 @@ var basicOperationPanel = new Ext.Panel({
 					forceSelection : true,
 					allowBlank : false,
 					readOnly : true
+		 	    }]
+		 	},{
+		 		columnWidth : .5,
+		 		labelWidth : 35,
+		 		items : [{
+		 	    	xtype : 'numberfield',
+		 	    	id : 'numCommission',
+		 	    	style : 'text-align:right;',
+		 	    	fieldLabel : '提成',
+		 	    	decimalPrecision : 2,
+		 	    	allowBlank : false,
+		 	    	maxValue : 99999.99,
+		 	    	minValue : 0.00,
+		 	    	width : 60,
+		 	    	validator : function(v){
+		 	    		if(v >= 0.00 && v <= 99999.99){
+		 	    	    	return true;
+		 	    	    }else{
+		 	    	    	return '价格需在 0.00  至 99999.99 之间!';
+		 	    	    }
+		 	    	}
 		 	    }]
 		 	}]
 		}, {
@@ -1166,11 +1197,12 @@ function resetbBasicOperation(_d){
 	var isCurrPrice = Ext.getCmp('chbForBasicCurrPrice');
 	var isHot = Ext.getCmp('chbForBasicHot');
 	var isWeight = Ext.getCmp('chbForBasicWeight');
+	var isCommission = Ext.getCmp('chbForBasicCommission');
 	var img = Ext.getDom('foodBasicImg');
 	var btnUploadFoodImage = Ext.getCmp('btnUploadFoodImage');
 	var btnDeleteFoodImage = Ext.getCmp('btnDeleteFoodImage');
 	var stockStatus = Ext.getCmp('comboBasicForStockStatus');
-	
+	var commission = Ext.getCmp('numCommission');
 	var data = {};
 	
 	// 清空图片信息
@@ -1211,6 +1243,8 @@ function resetbBasicOperation(_d){
 	isCurrPrice.setValue(Ext.ux.cfs.isCurrPrice(status));
 	isHot.setValue(Ext.ux.cfs.isHot(status));
 	isWeight.setValue(Ext.ux.cfs.isWeigh(status));
+	isCommission.setValue(Ext.ux.cfs.isCommission(status));
+	commission.setValue(data.commission);
 	img.src = typeof(data.img) == 'undefined' || data.img == '' ? '../../images/nophoto.jpg' : data.img;
 	stockStatus.setValue(typeof(data.stockStatusValue) == 'undefined' ? 1 : data.stockStatusValue);
 	
@@ -1270,13 +1304,15 @@ function basicOperationBasicHandler(c){
 	var isCurrPrice = Ext.getCmp('chbForBasicCurrPrice');
 	var isHot = Ext.getCmp('chbForBasicHot');
 	var isWeight = Ext.getCmp('chbForBasicWeight');
+	var isCommission = Ext.getCmp('chbForBasicCommission');
+	var commission = Ext.getCmp('numCommission');
 	var isCombination = false;
 	var comboContent = '';
 	var kitchenID = '';
 	var cfg = Ext.getCmp('combinationFoodGrid');
 	var stockStatus = Ext.getCmp('comboBasicForStockStatus');
 		
-	if(!foodName.isValid() || !foodPinyin.isValid() || !foodAliasID.isValid() || !foodPrice.isValid() || !foodKitchenAlias.isValid()){
+	if(!foodName.isValid() || !foodAliasID.isValid() || !foodPrice.isValid() || !foodKitchenAlias.isValid()){
 		Ext.getCmp('foodOperationWinTab').setActiveTab('basicOperationTab');
 		return;
 	}
@@ -1311,7 +1347,6 @@ function basicOperationBasicHandler(c){
 	Ext.Ajax.request({
 		url : actionURL,
 		params : {
-			
 			restaurantID : restaurantID,
 			foodID : (typeof(c.data) != 'undefined' && typeof(c.data.id) != 'undefined' ? c.data.id : 0),
 			foodName : foodName.getValue().trim(),
@@ -1329,6 +1364,8 @@ function basicOperationBasicHandler(c){
 			isHot : isHot.getValue(),
 			isCombination : isCombination,
 			isWeight : isWeight.getValue(),
+			isCommission : isCommission.getValue(),
+			commission : commission.getValue(),
 			comboContent : comboContent,
 			stockStatus : stockStatus.getValue()
 		},
@@ -1376,6 +1413,7 @@ function basicOperationBasicHandler(c){
 							record.set('currPrice', isCurrPrice.getValue());
 							record.set('hot', isHot.getValue());
 							record.set('weight', isWeight.getValue());
+							record.set('commission', isCommission.getValue());
 							Ext.ux.formatFoodName(record, 'displayFoodName', 'name');
 							record.commit();
 							return;
@@ -1831,8 +1869,6 @@ function initKitchenTreeForSreach(){
 		listeners : {
 			click : function(e){
 				Ext.getDom('showTypeForSearchKitchen').innerHTML = e.text;
-			},
-			dblclick : function(node, e){
 				searchMenuHandler();
 				Ext.getCmp('menuMgrGrid').getSelectionModel().clearSelections();
 				Ext.getCmp('menuMgrGrid').fireEvent('rowclick');

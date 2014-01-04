@@ -691,8 +691,6 @@ function treeInit(){
 		listeners : {
 	    	click : function(e){
 	    		Ext.getDom('memberTypeShowType').innerHTML = e.text;
-	    	},
-	    	dblclick : function(e){
 	    		Ext.getCmp('btnSearchMember').handler();
 	    	}
 	    }
@@ -1147,7 +1145,7 @@ var btnRechargeDetail = new Ext.ux.ImageButton({
 });
 
 /**********************************************************************/
-var member_obj = {treeId : 'tree_memberMgr', option : [{name : '修改', fn : 'queryMemberOperationSummaryHandler()'}]};
+//var member_obj = {treeId : 'tree_memberMgr', option : [{name : '修改', fn : 'queryMemberOperationSummaryHandler()'}]};
 Ext.onReady(function(){
 	treeInit();
 	gridInit();

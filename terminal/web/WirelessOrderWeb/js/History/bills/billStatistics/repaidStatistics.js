@@ -1,5 +1,5 @@
 
-var beginDate = new Ext.form.DateField({
+var repaid_beginDate = new Ext.form.DateField({
 	xtype : 'datefield',		
 	format : 'Y-m-d',
 	width : 100,
@@ -7,7 +7,7 @@ var beginDate = new Ext.form.DateField({
 	readOnly : true,
 	allowBlank : false
 });
-var endDate = new Ext.form.DateField({
+var repaid_endDate = new Ext.form.DateField({
 	xtype : 'datefield',
 	format : 'Y-m-d',
 	width : 100,
@@ -16,8 +16,8 @@ var endDate = new Ext.form.DateField({
 	allowBlank : false
 });
 var repaid_dateCombo = Ext.ux.createDateCombo({
-	beginDate : beginDate,
-	endDate : endDate,
+	beginDate : repaid_beginDate,
+	endDate : repaid_endDate,
 	callback : function(){
 		Ext.getCmp('btnSearchForRepaidStatistics').handler();
 	}
@@ -68,11 +68,11 @@ function initGrid(){
 		{header : '反结账时间', dataIndex : 'orderDateFormat'},
 		{header : '人员', dataIndex : 'operateStaff'},
 		{header : '单据编号', dataIndex : 'orderId'},
-		{header : '原应收', dataIndex : 'oldTotalPrice'},
-		{header : '原实收', dataIndex : 'oldActualPrice'},
-		{header : '反结账金额', dataIndex : 'repaidPrice'},
-		{header : '现应收', dataIndex : 'totalPrice'},
-		{header : '现实收', dataIndex : 'actualPrice'},
+		{header : '原应收', dataIndex : 'oldTotalPrice', align : 'right', renderer : Ext.ux.txtFormat.gridDou},
+		{header : '原实收', dataIndex : 'oldActualPrice', align : 'right', renderer : Ext.ux.txtFormat.gridDou},
+		{header : '反结账金额', dataIndex : 'repaidPrice', align : 'right', renderer : Ext.ux.txtFormat.gridDou},
+		{header : '现应收', dataIndex : 'totalPrice', align : 'right', renderer : Ext.ux.txtFormat.gridDou},
+		{header : '现实收', dataIndex : 'actualPrice', align : 'right', renderer : Ext.ux.txtFormat.gridDou},
 		{header : '付款方式', dataIndex : 'payTypeText'}
 	]);
 	
@@ -102,10 +102,10 @@ function initGrid(){
 			}, repaid_dateCombo, {
 				xtype : 'tbtext',
 				text : '&nbsp;'
-			}, beginDate , {
+			}, repaid_beginDate , {
 				xtype : 'tbtext',
 				text : '&nbsp;至&nbsp;'
-			}, endDate, {
+			}, repaid_endDate, {
 				xtype : 'tbtext',
 				text : '&nbsp;&nbsp;'
 			},{
@@ -116,12 +116,12 @@ function initGrid(){
 				id : 'btnSearchForRepaidStatistics',
 				iconCls : 'btn_search',
 				handler : function(e){
-					if(!beginDate.isValid() || !endDate.isValid()){
+					if(!repaid_beginDate.isValid() || !repaid_endDate.isValid()){
 						return;
 					}
 					var store = repaidStatisticsGrid.getStore();
-					store.baseParams['beginDate'] = beginDate.getValue().format('Y-m-d 00:00:00');
-					store.baseParams['endDate'] = endDate.getValue().format('Y-m-d 23:59:59');
+					store.baseParams['beginDate'] = repaid_beginDate.getValue().format('Y-m-d 00:00:00');
+					store.baseParams['endDate'] = repaid_endDate.getValue().format('Y-m-d 23:59:59');
 					store.baseParams['staffId'] = repaid_combo_staffs.getValue();
 					store.load({
 						params : {
@@ -168,7 +168,7 @@ Ext.onReady(function(){
 		width : parseInt(Ext.getDom('divRepaidStatistics').parentElement.style.width.replace(/px/g,'')),
 		height : parseInt(Ext.getDom('divRepaidStatistics').parentElement.style.height.replace(/px/g,'')),
 		layout:'border',
-		frame : true, //边框
+		frame : false, //边框
 		//子集
 		items : [repaidStatisticsGrid]
 	});

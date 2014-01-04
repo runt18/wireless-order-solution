@@ -66,6 +66,7 @@ function priceChange(record){
 }
 
 function operateMaterialPrice(){
+	monthlySet = false;
 	Ext.Ajax.request({
 		url : '../../OperateMaterial.do',
 		params : {
@@ -79,7 +80,7 @@ function operateMaterialPrice(){
 					var jr = Ext.decode(res.responseText);
 					if(jr.success){
 						Ext.ux.showMsg(jr);
-						
+						monthlySet = true;
 					}else{
 						Ext.ux.showMsg(jr);
 					}

@@ -421,7 +421,8 @@ Ext.ux.checkFoodStatus = {
 	isCurrPrice : function(s){ return (s & 1 << 4) != 0; },
 	isCombo : function(s){ return (s & 1 << 5) != 0; },
 	isHot : function(s){ return (s & 1 << 6) != 0; },
-	isWeigh : function(s){ return (s & 1 << 7) != 0; }
+	isWeigh : function(s){ return (s & 1 << 7) != 0; },
+	isCommission : function(s){ return (s & 1 << 8) != 0; }
 };
 Ext.ux.cfs = Ext.ux.checkFoodStatus;
 
@@ -447,7 +448,8 @@ Ext.ux.formatFoodName = function(record, iname, name){
 		img += '&nbsp;<img src="../../images/hot.png"></img>';
 	if(Ext.ux.cfs.isWeigh(status))
 		img += '&nbsp;<img src="../../images/weight.png"></img>';
-	
+	if(Ext.ux.cfs.isCommission(status))
+		img += '&nbsp;<img src="../../images/weight.png"></img>';
 	if (record.get('temporary') || record.get('isTemporary'))
 		img += '&nbsp;<img src="../../images/tempDish.png"></img>';
 	
@@ -605,7 +607,7 @@ var TableRecord = Ext.ux.cr(['id', 'alias', 'rid', 'name', 'customNum', 'minimum
     'categoryText', 'statusValue', 'statusText', 'region']);
 var TasteRecord = Ext.ux.cr(['id','alias','name','price','rate', 'cateValue','cateText','calcText','typeValue', 'typeText']);
 var FoodBasicRecord = Ext.ux.cr(['id','alias','name','displayFoodName','pinyin','unitPrice','status','stockStatusValue',
-    'kitchen', 'kitchen.alias','kitchen.name','kitchen.id','operator','tasteRefType','desc','img', 'rid']);
+    'kitchen', 'kitchen.alias','kitchen.name','kitchen.id','operator','tasteRefType','desc','img', 'rid', 'commission']);
 var FoodTasteRecord = Ext.ux.cr(['taste', 'taste.id', 'taste.alias', 'taste.name', 'taste.rank', 'taste.price', 'taste.rate', 
     'taste.calcValue', 'taste.calcText', 'taste.cateValue', 'taste.cateText', 'food', 'food.id', 'food.name']);
 var ComboFoodRecord = Ext.ux.cr(['parentId', 'parentName', 'amount'], FoodBasicRecord);

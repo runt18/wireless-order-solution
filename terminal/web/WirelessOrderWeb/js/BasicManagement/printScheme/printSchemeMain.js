@@ -1127,9 +1127,6 @@ Ext.onReady(function(){
 		 + "<a href=\"javascript:deletePrintFuncOperationHandler()\">" + "<img src='../../images/del.png'/>删除</a>";
 	};
 	
-	
-	
-	
 	printerTree = new Ext.tree.TreePanel({
 		title : '打印机',
 		id : 'printerTree',

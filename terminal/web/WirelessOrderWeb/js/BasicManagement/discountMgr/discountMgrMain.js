@@ -324,12 +324,10 @@ Ext.onReady(function(){
 				}
 			},
 			click : function(e){
-				if(e.attributes.discountID != -1)
+				if(e.attributes.discountID != -1){
 					Ext.getDom('discountNameShowType').innerHTML = e.attributes.discountName;
-			},
-			dblclick : function(e){
-				if(e.attributes.discountID != -1)
 					Ext.getCmp('btnSearchDiscountPlan').handler();
+				}
 			}
 		}
 	});	

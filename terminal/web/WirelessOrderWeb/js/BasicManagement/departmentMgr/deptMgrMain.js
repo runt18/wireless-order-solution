@@ -345,8 +345,6 @@ Ext.onReady(function() {
 		listeners : {
 			click : function(e){
 				Ext.getDom('deptNameShowType').innerHTML = e.text;
-			},
-			dblclick : function(e){
 				Ext.getCmp('btnSearchKitchen').handler();
 			}
 		}
