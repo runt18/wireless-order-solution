@@ -7,7 +7,6 @@
 	<global-forwards />
 
 	<action-mappings>
-
 		<action path="/QueryOTA" type="com.wireless.Actions.ota.QueryOTAction"
 			scope="request">
 		</action>
