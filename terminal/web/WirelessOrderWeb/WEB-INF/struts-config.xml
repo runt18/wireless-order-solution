@@ -547,6 +547,12 @@
 			type="com.wireless.Actions.weixin.query.WXQueryInfoAction"
 			scope="request" parameter="dataSource">
 		</action>
+		<action path="/QueryCommissionStatistics" type="com.wireless.Actions.dishesOrder.QueryCommissionStatisticsAction"
+			scope="request">
+		</action>
+		<action path="/QueryCommissionTotal" type="com.wireless.Actions.dishesOrder.QueryCommissionTotalAction"
+			scope="request">
+		</action>
 	</action-mappings>
 
 	<message-resources parameter="com.yourcompany.struts.ApplicationResources" />
