@@ -89,8 +89,8 @@ DEFAULT CHARACTER SET = utf8;
 -- Add the field 'weixin_token' & 'weixin_info' to table `wireless_order_db`.`restaurant`
 -- -----------------------------------------------------
 ALTER TABLE `wireless_order_db`.`restaurant` 
-ADD COLUMN `weixin_token` VARCHAR(45) NULL DEFAULT NULL AFTER `liveness`,
-ADD COLUMN `weixin_info` VARCHAR(500) NULL DEFAULT NULL AFTER `weixin_token`;
+ADD COLUMN `weixin_token` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the weixin token to this restaurant' AFTER `liveness`,
+ADD COLUMN `weixin_info` TEXT NULL DEFAULT NULL COMMENT 'the weixin info to this restaurant' AFTER `weixin_token`;
 
 -- -----------------------------------------------------
 -- Add the field 'commission' to table `wireless_order_db`.`order_food`
@@ -103,5 +103,17 @@ ADD COLUMN `commission` FLOAT NOT NULL DEFAULT 0 COMMENT 'commission to the food
 -- -----------------------------------------------------
 ALTER TABLE `wireless_order_db`.`order_food_history` 
 ADD COLUMN `commission` FLOAT NOT NULL DEFAULT 0 COMMENT 'commission to the food' AFTER `order_count`;
+
+-- -----------------------------------------------------
+-- Change the field type of 'desc' to TEXT for table `wireless_order_db`.`order_food`
+-- -----------------------------------------------------
+ALTER TABLE `wireless_order_db`.`billboard` 
+CHANGE COLUMN `desc` `desc` TEXT NULL DEFAULT NULL ;
+
+-- -----------------------------------------------------
+-- Add the field 'commission' to table `wireless_order_db`.`food_price_plan`
+-- -----------------------------------------------------
+ALTER TABLE `wireless_order_db`.`food_price_plan` 
+ADD COLUMN `commission` FLOAT NOT NULL DEFAULT 0 AFTER `unit_price`;
 
 SET SQL_SAFE_UPDATES = @OLD_SAFE_UPDATES;
