@@ -523,14 +523,20 @@ public class Taste implements Parcelable, Comparable<Taste>, Jsonable{
 		jm.put("price", this.getPrice());
 		jm.put("rate", this.rate);
 		jm.put("rank", this.rank);
-		jm.put("cateValue", this.category.getId());
-		jm.put("cateText", this.category.getName());
-		jm.put("cateStatusValue", this.category.getStatus().getVal());
-		jm.put("cateStatusText", this.category.getStatus().getDesc());
-		jm.put("calcValue", this.calc.getVal());
-		jm.put("calcText", this.calc.getDesc());
-		jm.put("typeValue", this.type.getVal());
-		jm.put("typeText", this.type.getDesc());
+		if(this.category != null){
+			jm.put("cateValue", this.category.getId());
+			jm.put("cateText", this.category.getName());			
+			jm.put("cateStatusValue", this.category.getStatus().getVal());
+			jm.put("cateStatusText", this.category.getStatus().getDesc());
+		}
+		if(this.calc != null){
+			jm.put("calcValue", this.calc.getVal());
+			jm.put("calcText", this.calc.getDesc());			
+		}
+		if(this.type != null){
+			jm.put("typeValue", this.type.getVal());
+			jm.put("typeText", this.type.getDesc());			
+		}
 		
 		return Collections.unmodifiableMap(jm);
 	}
