@@ -141,7 +141,7 @@ public class OrderFoodDao {
 											   dbCon.rs.getInt("restaurant_id"));
 			food.setCancelReason(cr);
 			
-			food.asFood().setChildFoods(FoodDao.queryComboByParent(food.asFood()));
+			food.asFood().setChildFoods(FoodDao.getComboByParent(staff, food.asFood()));
 			orderFoods.add(food);
 		}
 		dbCon.rs.close();
@@ -254,7 +254,7 @@ public class OrderFoodDao {
 											   dbCon.rs.getInt("restaurant_id"));
 			food.setCancelReason(cr);
 			
-			food.asFood().setChildFoods(FoodDao.queryComboByParent(food.asFood()));
+			food.asFood().setChildFoods(FoodDao.getComboByParent(staff, food.asFood()));
 			orderFoods.add(food);
 		}
 		dbCon.rs.close();
@@ -358,7 +358,7 @@ public class OrderFoodDao {
 			food.getKitchen().getDept().setId(dbCon.rs.getShort("dept_id"));
 			food.setDiscount(dbCon.rs.getFloat("discount"));
 			food.setTemp(dbCon.rs.getBoolean("is_temporary"));
-			food.asFood().setChildFoods(FoodDao.queryComboByParent(food.asFood()));
+			food.asFood().setChildFoods(FoodDao.getComboByParent(staff, food.asFood()));
 			orderFoods.add(food);
 		}
 		dbCon.rs.close();
