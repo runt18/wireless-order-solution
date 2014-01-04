@@ -76,6 +76,8 @@ public class QueryRegionAction extends DispatchAction{
 					   .append("{")
 					   .append("leaf:" + true)
 					   .append(",")
+					   .append("id:" + temp.getRegionId())
+					   .append(",")
 					   .append("regionId:" + temp.getRegionId())
 					   .append(",")
 					   .append("regionName:'" + temp.getName() + "'")

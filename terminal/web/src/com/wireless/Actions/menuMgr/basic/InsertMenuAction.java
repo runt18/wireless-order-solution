@@ -41,7 +41,6 @@ public class InsertMenuAction extends Action {
 			
 			String foodAliasID = request.getParameter("foodAliasID");
 			String foodName = request.getParameter("foodName");
-			String foodPinyin = request.getParameter("foodPinyin");
 			String foodPrice = request.getParameter("foodPrice");
 			
 			String kitchenAliasID = request.getParameter("kitchenAliasID");
@@ -56,6 +55,8 @@ public class InsertMenuAction extends Action {
 			String comboContent = request.getParameter("comboContent");
 			String isHot = request.getParameter("isHot");
 			String isWeight = request.getParameter("isWeight");
+			String isCommission = request.getParameter("isCommission");
+			String commission = request.getParameter("commission");
 			String stockStatus = request.getParameter("stockStatus");
 			
 			if(pin == null || restaurantID == null || pin.trim().length() == 0 || restaurantID.trim().length() == 0){
@@ -76,7 +77,6 @@ public class InsertMenuAction extends Action {
 				fb.setRestaurantId(Integer.parseInt(restaurantID));
 				fb.setAliasId(Integer.parseInt(foodAliasID));
 				fb.setName(foodName);
-				fb.setPinyin(foodPinyin);
 				fb.setPrice(Float.parseFloat(foodPrice));
 				fb.getKitchen().setAliasId(Short.parseShort(kitchenAliasID));
 				fb.getKitchen().setId(Integer.parseInt(kitchenID));
@@ -92,6 +92,11 @@ public class InsertMenuAction extends Action {
 				fb.setCombo(Boolean.valueOf(isCombination));
 				fb.setHot(Boolean.valueOf(isHot));
 				fb.setWeigh(Boolean.valueOf(isWeight));
+				fb.setCommission(Boolean.valueOf(isCommission));
+				if(Boolean.valueOf(isCommission)){
+					fb.setCommission(Float.parseFloat(commission));
+				}
+				
 				
 				if (isCombination != null && isCombination.equals("true")) {
 					FoodDao.insertFoodBaisc(staff, fb, comboContent);

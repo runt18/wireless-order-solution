@@ -172,7 +172,7 @@ public class QueryPrivilegeAction extends DispatchAction{
 					tree.append("leaf:false");
 					tree.append(",expanded:true");
 					tree.append(",id:'historyMgr'");
-					tree.append(",text:'历史'");
+					tree.append(",text:'统计'");
 					tree.append(",cls:'tFont'");
 					StringBuilder children = new StringBuilder();
 					for (int i = 0; i < Page.History.values().length; i++) {

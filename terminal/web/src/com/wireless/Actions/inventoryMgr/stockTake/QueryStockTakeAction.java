@@ -44,7 +44,7 @@ public class QueryStockTakeAction extends Action{
 			}
 			// 只能查询当前会计月份数据
 			String curmonth = new SimpleDateFormat("yyyy-MM").format(MonthlyBalanceDao.getCurrentMonthTimeByRestaurant(staff.getRestaurantId()));
-			extraCond += (" AND ST.start_date BETWEEN '" + curmonth + "-01' AND '" + curmonth + "-31' ");
+			extraCond += (" AND ST.start_date BETWEEN '" + curmonth + "-01' AND '" + curmonth + "-31 23:59:59' ");
 			
 			orderClause += (" ORDER BY ST.status, ST.start_date ");
 			root = StockTakeDao.getStockTakesAndDetail(staff, extraCond, orderClause);
