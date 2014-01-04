@@ -82,11 +82,12 @@ function initCancelReason(){
 	$.ajax({
 		url : '../QueryCancelReason.do',
 		type : 'post',
+		dataType : 'json',
 		data : {
 			restaurantID : restaurantID,
 		},
 		success : function(data, status, xhr){
-			cancelReasonData = JSON.parse(data).root;
+			cancelReasonData = data.root;
 		},
 		error : function(request, status, err){
 			Util.msg.alert({

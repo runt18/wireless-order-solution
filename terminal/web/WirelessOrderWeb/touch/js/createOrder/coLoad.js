@@ -142,7 +142,7 @@ co.ot.initBarForCommomTaste = function(){
 co.ot.initBarForAllTaste = function(){
 	var data = [];
 	for(var i = 0; i < tasteData.root.length; i++){
-		if(tasteData.root[i].taste.cateValue == 0){
+		if(tasteData.root[i].taste.cateStatusValue == 1){
 			data.push(tasteData.root[i]);
 		}
 	}
@@ -168,7 +168,7 @@ co.ot.initBarForAllTaste = function(){
 co.ot.initBarForCate = function(){
 	var data = [];
 	for(var i = 0; i < tasteData.root.length; i++){
-		if(tasteData.root[i].taste.cateValue == 2){
+		if(tasteData.root[i].taste.cateStatusValue == 2){
 			data.push(tasteData.root[i]);
 		}
 	}
@@ -199,8 +199,8 @@ co.ot.initNewTasteContent = function(){
 		html += Templet.co.boxNewTaste.format({
 			id : temp.id,
 			name : temp.name,
-			mark : temp.cateValue == 0 ? '¥' : temp.cateValue == 2 ? '比例' : '',
-			markText : temp.cateValue == 0 ? temp.price : temp.cateValue == 2 ? temp.rate : '0.00'
+			mark : temp.cateStatusValue == 1 ? '¥' : temp.cateStatusValue == 2 ? '比例' : '',
+			markText : temp.cateStatusValue == 1 ? temp.price : temp.cateStatusValue == 2 ? temp.rate : '0.00'
 		});
 	}
 	temp = null;

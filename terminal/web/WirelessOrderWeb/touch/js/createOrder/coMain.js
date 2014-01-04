@@ -54,7 +54,7 @@ co.clear = function(){
  * 菜品操作返回
  */
 co.back = function(c){
-	if(co.newFood.length > 0){
+	if(c && co.newFood.length > 0){
 		Util.msg.alert({
 			msg : '还有新点菜未处理, 是否继续退出?',
 			buttons : 'YESBACK',
@@ -453,9 +453,9 @@ co.ot.save = function(c){
 		temp = co.ot.newTaste[i];
 		tasteGroup.normalTasteContent.push(temp);
 		tasteGroup.normalTaste.name += (i > 0 ? ',' + temp.name : temp.name);
-		if(temp.cateValue == 0){
+		if(temp.cateStatusValue == 1){
 			tasteGroup.normalTaste.price += temp.price;
-		}else if(temp.cateValue == 2){
+		}else if(temp.cateStatusValue == 2){
 			tasteGroup.normalTaste.price += co.ot.foodData.unitPrice * temp.rate;
 		}
 	}
@@ -525,7 +525,7 @@ co.submit = function(c){
 			var normalTaste = '', tmpTaste = '' , tasteGroup = item.tasteGroup;
 			for(var j = 0; j < tasteGroup.normalTasteContent.length; j++){
 				var t = tasteGroup.normalTasteContent[j];
-				normalTaste += ((j > 0 ? '<<stnt>>' : '') + (t.id + '<<stb>>' + t.alias + '<<stb>>' + t.cateValue));
+				normalTaste += ((j > 0 ? '<<stnt>>' : '') + (t.id + '<<stb>>' + t.alias + '<<stb>>' + t.cateValue + '<<stb>>' + t.cateStatusValue));
 			}
 			if(tasteGroup.tmpTaste != null && typeof tasteGroup.tmpTaste != 'undefined'){
 				if(eval(tasteGroup.tmpTaste.id >= 0))
