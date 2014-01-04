@@ -245,6 +245,9 @@ public class Table implements Parcelable, Comparable<Table>, Jsonable{
 	}
 	
 	public String getName() {
+		if(tableName == null){
+			return "";
+		}
 		return tableName;
 	}
 	
