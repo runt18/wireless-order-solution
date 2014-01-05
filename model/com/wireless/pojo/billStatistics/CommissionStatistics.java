@@ -1,4 +1,4 @@
-package com.wireless.pojo.dishesOrder;
+package com.wireless.pojo.billStatistics;
 
 import java.util.Collections;
 import java.util.HashMap;
