@@ -590,7 +590,6 @@ public class FoodDao {
 				
 				childFood.setPrice(dbCon.rs.getFloat("unit_price"));
 				childFood.setCommission(dbCon.rs.getFloat("commission"));
-				childFood.setStatistics(new FoodStatistics(dbCon.rs.getInt("order_amount")));
 				childFood.setStatus(dbCon.rs.getShort("status"));
 				childFood.setTasteRefType(dbCon.rs.getShort("taste_ref_type"));
 				childFood.setDesc(dbCon.rs.getString("desc"));
