@@ -102,7 +102,7 @@ function initAddLevelWin(){
 			border : false,
 			frame : true,
 			items : [{
-				xtype : 'textfield',
+				xtype : 'numberfield',
 				fieldLabel : '积分',
 				id : 'txtPointThreshold',
 				allowBlank : false,
