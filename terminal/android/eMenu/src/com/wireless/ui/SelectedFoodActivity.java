@@ -12,18 +12,17 @@ import android.app.Dialog;
 import android.app.DialogFragment;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
-import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
+import android.widget.BaseExpandableListAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ExpandableListView;
@@ -34,14 +33,13 @@ import android.widget.SimpleExpandableListAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.wireless.common.Params;
 import com.wireless.common.ShoppingCart;
+import com.wireless.common.ShoppingCart.OnCartChangedListener;
 import com.wireless.common.ShoppingCart.OnCommitListener;
+import com.wireless.common.ShoppingCart.OnPayListener;
 import com.wireless.common.WirelessOrder;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.ProtocolError;
-import com.wireless.fragment.OptionBarFragment;
-import com.wireless.fragment.OptionBarFragment.OnOrderChangeListener;
 import com.wireless.fragment.PickTasteFragment;
 import com.wireless.fragment.PickTasteFragment.OnTasteChangeListener;
 import com.wireless.ordermenu.R;
@@ -49,15 +47,14 @@ import com.wireless.parcel.OrderFoodParcel;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.menuMgr.Food;
-import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.util.NumericUtil;
 import com.wireless.util.SearchFoodHandler;
 import com.wireless.util.SearchFoodHandler.OnFoodAddListener;
 import com.wireless.util.imgFetcher.ImageFetcher;
 
-public class SelectedFoodActivity extends Activity implements
-		OnOrderChangeListener, OnTasteChangeListener, OnFoodAddListener {
+public class SelectedFoodActivity extends Activity 
+								  implements OnCartChangedListener, OnTasteChangeListener, OnFoodAddListener {
 	// 列表项的显示标签
 	private static final String ITEM_FOOD_NAME = "item_food_name";
 	private static final String ITEM_FOOD_ORI_PRICE = "item_ori_food_price";
@@ -72,6 +69,9 @@ public class SelectedFoodActivity extends Activity implements
 
 	private static final String ITEM_GROUP_NAME = "itemGroupName";
 
+	private final List<Map<String, ?>> groupData = new ArrayList<Map<String, ?>>();
+	private final List<List<Map<String, ?>>> childData =  new ArrayList<List<Map<String, ?>>>();
+	
 	/*
 	 * the tags use to build adapter
 	 */
@@ -120,16 +120,13 @@ public class SelectedFoodActivity extends Activity implements
 	 */
 	private static class TotalCountHandler extends Handler{
 		
-		private TextView mTotalCountTextView;
 		private TextView mTotalPriceTextView;
 		
 		public TotalCountHandler(SelectedFoodActivity activity) {
-			mTotalCountTextView = (TextView) activity.findViewById(R.id.textView_total_count_pickedFood);
 			mTotalPriceTextView = (TextView) activity.findViewById(R.id.textView_total_price_pickedFood);
 		}
 		@Override
 		public void handleMessage(Message msg) {
-			mTotalCountTextView.setText(NumericUtil.float2String2(ShoppingCart.instance().getTotalCount()));
 			mTotalPriceTextView.setText(NumericUtil.float2String2(ShoppingCart.instance().getTotalPrice()));
 		}
 		
@@ -139,6 +136,7 @@ public class SelectedFoodActivity extends Activity implements
 	 * 显示已点菜的列表的handler 负责更新已点菜的显示
 	 */
 	private static class FoodListHandler extends Handler {
+		
 		private WeakReference<SelectedFoodActivity> mActivity;
 
 		FoodListHandler(SelectedFoodActivity activity) {
@@ -154,11 +152,78 @@ public class SelectedFoodActivity extends Activity implements
 			
 			activity.mTotalCountHandler.sendEmptyMessage(0);
 			
+			prepareAdaptorData(activity);
+			
 			for(int i = 0; i < activity.mPickedFoodList.getExpandableListAdapter().getGroupCount(); i++){
-				if(activity.mPickedFoodList.collapseGroup(i)){
-					activity.mPickedFoodList.expandGroup(i);
+//				if(activity.mPickedFoodList.collapseGroup(i)){
+//					activity.mPickedFoodList.expandGroup(i);
+//				}
+				activity.mPickedFoodList.collapseGroup(i);
+				activity.mPickedFoodList.expandGroup(i);
+			}
+		}
+		
+		private void prepareAdaptorData(SelectedFoodActivity activity){
+			
+			activity.groupData.clear();
+			activity.childData.clear();
+			
+			HashMap<String, Object> map2 = new HashMap<String, Object>();
+			map2.put(ITEM_GROUP_NAME, "新点菜");
+			activity.groupData.add(map2);
+			
+			List<Map<String, ?>> newFoodDatas = new ArrayList<Map<String,?>>();
+			//若包含新点菜，则将新点菜添加进列表
+			if(ShoppingCart.instance().hasNewOrder()){
+				for(OrderFood f : ShoppingCart.instance().getNewFoods()){
+					Map<String, Object> map = new HashMap<String, Object>();
+					map.put(ITEM_FOOD_NAME, f.getName());
+					map.put(ITEM_FOOD_ORI_PRICE, String.valueOf(NumericUtil.float2String2(f.getUnitPriceWithTaste())));
+					map.put(ITEM_FOOD_COUNT, String.valueOf(f.getCount()));
+					map.put(ITEM_FOOD_SUM_PRICE, String.valueOf(NumericUtil.float2String2(f.calcPriceWithTaste())));
+					map.put(ITEM_THE_FOOD, f);
+					newFoodDatas.add(map);
 				}
 			}
+			activity.childData.add(newFoodDatas);
+
+
+			//若包含菜单，则将已点菜添加进列表
+			if(ShoppingCart.instance().hasOriOrder()){
+				Map<String, Object> map1 = new HashMap<String, Object>();
+				map1.put(ITEM_GROUP_NAME, "已点菜");
+				activity.groupData.add(map1);
+				List<Map<String, ?>> pickedFoodDatas = new ArrayList<Map<String,?>>();
+				for(OrderFood f : ShoppingCart.instance().getOriFoods()){
+					if(f.getCount() != 0f){
+						Map<String, Object> map = new HashMap<String, Object>();
+						map.put(ITEM_IS_ORI_FOOD, true);
+						map.put(ITEM_FOOD_NAME, f.getName());
+						map.put(ITEM_FOOD_ORI_PRICE, NumericUtil.float2String2(f.getUnitPriceWithTaste()));
+						map.put(ITEM_FOOD_COUNT, String.valueOf(f.getCount()));
+						map.put(ITEM_FOOD_SUM_PRICE, NumericUtil.float2String2(f.calcPriceWithTaste()));
+						map.put(ITEM_THE_FOOD, f);
+						pickedFoodDatas.add(map);
+					}
+					if(f.getDelta() > 0f){
+						Map<String, Object> map = new HashMap<String, Object>();
+						map.put(ITEM_IS_ORI_FOOD, true);
+						map.put(ITEM_FOOD_NAME, f.getName());
+						map.put(ITEM_FOOD_ORI_PRICE, NumericUtil.float2String2(f.getUnitPriceWithTaste()));
+						map.put(ITEM_FOOD_COUNT, String.valueOf(f.getCount()));
+						map.put(ITEM_FOOD_SUM_PRICE, NumericUtil.float2String2(f.calcPriceWithTaste()));
+						map.put(ITEM_THE_FOOD, f);
+						map.put(ITEM_IS_OFFSET, true);
+						map.put(ITEM_FOOD_OFFSET, NumericUtil.float2String2(f.getDelta()));
+						pickedFoodDatas.add(map);
+					}
+				}
+				activity.childData.add(pickedFoodDatas);
+			}
+			
+			//刷新Adapter显示
+			((BaseExpandableListAdapter)activity.mPickedFoodList.getExpandableListAdapter()).notifyDataSetChanged();
+
 		}
 	}
 
@@ -167,84 +232,35 @@ public class SelectedFoodActivity extends Activity implements
 	 */
 	private static class FoodDetailHandler extends Handler {
 		private WeakReference<SelectedFoodActivity> mActivity;
-		private ImageView mFoodImageView;
 
+		private Food mDisplayedFood;
+		
 		FoodDetailHandler(final SelectedFoodActivity activity) {
 			mActivity = new WeakReference<SelectedFoodActivity>(activity);
-			mFoodImageView = (ImageView)activity.findViewById(R.id.imageView_selected_food_pickedFood);
 		}
 
 		@Override
 		public void handleMessage(Message msg) {
 			final SelectedFoodActivity activity = mActivity.get();
 
-			//显示菜品图片
-			Food f = WirelessOrder.foods.find(activity.mCurrentFood.asFood());
-			if(f.hasImage()){
-				activity.mImageFetcher.loadImage(f.getImage(), mFoodImageView);
-			}else{
-				mFoodImageView.setImageResource(R.drawable.null_pic);
+			if(!activity.mCurrentFood.asFood().equals(mDisplayedFood)){
+				mDisplayedFood = activity.mCurrentFood.asFood();
+				//显示菜品图片
+				mDisplayedFood = WirelessOrder.foodMenu.foods.find(mDisplayedFood);
+				((TextView)activity.findViewById(R.id.txtView_selectedFoodName_pickedFood)).setText(mDisplayedFood.getName());
+				((TextView)activity.findViewById(R.id.txtView_selectedFoodPrice_pickedFood)).setText(NumericUtil.float2String2(mDisplayedFood.getPrice()) + "元");
+				ImageView foodImgView = (ImageView)activity.findViewById(R.id.imageView_selected_food_pickedFood);
+				if(mDisplayedFood.hasImage()){
+					activity.mImageFetcher.loadImage(mDisplayedFood.getImage(), foodImgView);
+				}else{
+					foodImgView.setImageResource(R.drawable.null_pic);
+				}
 			}
 		}
 	}
 
 	private void initPickedFoodList(){
-		final List<Map<String, ?>> groupData = new ArrayList<Map<String, ?>>();
-		final List<List<Map<String, ?>>> childData =  new ArrayList<List<Map<String, ?>>>();
-//
-		HashMap<String, Object> map2 = new HashMap<String, Object>();
-		map2.put(ITEM_GROUP_NAME, "新点菜");
-		groupData.add(map2);
-		
-		List<Map<String, ?>> newFoodDatas = new ArrayList<Map<String,?>>();
-		//若包含新点菜，则将新点菜添加进列表
-		if(ShoppingCart.instance().hasNewOrder()){
-			for(OrderFood f : ShoppingCart.instance().getNewFoods()){
-				HashMap<String, Object> map = new HashMap<String, Object>();
-				map.put(ITEM_FOOD_NAME, f.getName());
-				map.put(ITEM_FOOD_ORI_PRICE, String.valueOf(NumericUtil.float2String2(f.getUnitPriceWithTaste())));
-				map.put(ITEM_FOOD_COUNT, String.valueOf(f.getCount()));
-				map.put(ITEM_FOOD_SUM_PRICE, String.valueOf(NumericUtil.float2String2(f.calcPriceWithTaste())));
-				map.put(ITEM_THE_FOOD, f);
-				newFoodDatas.add(map);
-			}
-		}
-		childData.add(newFoodDatas);
 
-		//若包含菜单，则将已点菜添加进列表
-		if(ShoppingCart.instance().hasOriOrder()){
-			List<Map<String, ?>> pickedFoodDatas = new ArrayList<Map<String,?>>();
-			for(OrderFood f : ShoppingCart.instance().getOriFoods()){
-				if(f.getCount() != 0f){
-					Map<String, Object> map = new HashMap<String, Object>();
-					map.put(ITEM_IS_ORI_FOOD, true);
-					map.put(ITEM_FOOD_NAME, f.getName());
-					map.put(ITEM_FOOD_ORI_PRICE, NumericUtil.float2String2(f.getUnitPriceWithTaste()));
-					map.put(ITEM_FOOD_COUNT, String.valueOf(f.getCount()));
-					map.put(ITEM_FOOD_SUM_PRICE, NumericUtil.float2String2(f.calcPriceWithTaste()));
-					map.put(ITEM_THE_FOOD, f);
-					pickedFoodDatas.add(map);
-				}
-				if(f.getDelta() > 0f){
-					Map<String, Object> map = new HashMap<String, Object>();
-					map.put(ITEM_IS_ORI_FOOD, true);
-					map.put(ITEM_FOOD_NAME, f.getName());
-					map.put(ITEM_FOOD_ORI_PRICE, NumericUtil.float2String2(f.getUnitPriceWithTaste()));
-					map.put(ITEM_FOOD_COUNT, String.valueOf(f.getCount()));
-					map.put(ITEM_FOOD_SUM_PRICE, NumericUtil.float2String2(f.calcPriceWithTaste()));
-					map.put(ITEM_THE_FOOD, f);
-					map.put(ITEM_IS_OFFSET, true);
-					map.put(ITEM_FOOD_OFFSET, NumericUtil.float2String2(f.getDelta()));
-					pickedFoodDatas.add(map);
-				}
-			}
-			childData.add(pickedFoodDatas);
-			
-			HashMap<String, Object> map1 = new HashMap<String, Object>();
-			map1.put(ITEM_GROUP_NAME, "已点菜");
-			groupData.add(map1);
-		}
-		
 		//创建ListView的adapter
 		SimpleExpandableListAdapter adapter = new SimpleExpandableListAdapter(getApplicationContext(), 
 				groupData, R.layout.picked_food_list_group_item, GROUP_ITEM_TAGS, GROUP_ITEM_ID, 
@@ -252,7 +268,7 @@ public class SelectedFoodActivity extends Activity implements
 			
 			@Override
 			public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
-				View layout =  super.getGroupView(groupPosition, isExpanded, convertView, parent);
+				View layout = super.getGroupView(groupPosition, isExpanded, convertView, parent);
 				//initial groupView buttons
 				EditText searchEditText = (EditText) layout.findViewById(R.id.editText_SelectedFood_listGroup_item_search);
 				Button clearSearchBtn = (Button) layout.findViewById(R.id.button_selectedFoodListGroup_item_clear);
@@ -329,7 +345,7 @@ public class SelectedFoodActivity extends Activity implements
 						
 						//如果有退菜显示'取消退菜'
 						button1.setVisibility(View.INVISIBLE);
-						(layout.findViewById(R.id.view_pickedFood_cancel_line)).setVisibility(View.VISIBLE);
+						layout.findViewById(R.id.view_pickedFood_cancel_line).setVisibility(View.VISIBLE);
 						countEditText.setText(map.get(ITEM_FOOD_OFFSET).toString());
 						
 						button2.setText("取消退菜");
@@ -340,7 +356,7 @@ public class SelectedFoodActivity extends Activity implements
 									orderFood.addCount(orderFood.getDelta());
 									mFoodListHandler.sendEmptyMessage(0);
 								} catch (BusinessException e) {
-									e.printStackTrace();
+									Toast.makeText(SelectedFoodActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
 								}
 							}
 						});
@@ -356,7 +372,7 @@ public class SelectedFoodActivity extends Activity implements
 									if(ShoppingCart.instance().getStaff().getRole().hasPrivilege(Privilege.Code.CANCEL_FOOD)){
 										AskCancelAmountDialog.newInstance(orderFood).show(getFragmentManager(), AskCancelAmountDialog.TAG);
 									}else{
-										Toast.makeText(SelectedFoodActivity.this, "对不起,没有退菜权限", Toast.LENGTH_SHORT).show();
+										Toast.makeText(SelectedFoodActivity.this, "对不起, 您没有退菜权限哦", Toast.LENGTH_SHORT).show();
 									}
 								}else{
 									Toast.makeText(SelectedFoodActivity.this, "请先输入服务员账号再执行退菜操作", Toast.LENGTH_SHORT).show();
@@ -364,22 +380,8 @@ public class SelectedFoodActivity extends Activity implements
 							}
 						});
 						
-						//已点菜显示催菜按钮
-						button1.setVisibility(View.VISIBLE);
-						button1.setOnClickListener(new View.OnClickListener() {
-							@Override
-							public void onClick(View v) {
-								View stateHurrySignal = layout.findViewById(R.id.imgView_hurried_pickedFood_list_item);  	
-								if(orderFood.isHurried()){
-									orderFood.setHurried(false);
-									stateHurrySignal.setVisibility(View.INVISIBLE);
-								}else{
-									orderFood.setHurried(true);
-									Toast.makeText(SelectedFoodActivity.this, orderFood.getName() + "催菜成功", Toast.LENGTH_SHORT).show();
-									stateHurrySignal.setVisibility(View.VISIBLE);
-								}
-							}
-						});
+						//已点菜不显示显示催菜按钮
+						button1.setVisibility(View.INVISIBLE);
 					}
 					
 					//隐藏数量'+'和'='按钮
@@ -387,9 +389,19 @@ public class SelectedFoodActivity extends Activity implements
 					((ImageButton) layout.findViewById(R.id.imageButton_minus_pickedFood_item)).setVisibility(View.INVISIBLE);
 				
 				} else{
+					
+					//新点菜中显示估清菜品
+					if(orderFood.asFood().isSellOut()){
+						layout.findViewById(R.id.imgView_sellOut_pickedFood_list_item).setVisibility(View.VISIBLE);
+						layout.findViewById(R.id.view_pickedFood_cancel_line).setVisibility(View.VISIBLE);
+					}else{
+						layout.findViewById(R.id.imgView_sellOut_pickedFood_list_item).setVisibility(View.INVISIBLE);
+						layout.findViewById(R.id.view_pickedFood_cancel_line).setVisibility(View.INVISIBLE);
+					}
+					
 					//新点菜显示'口味'和'删除'
-					//'口味'Button
-					button1.setVisibility(View.VISIBLE);
+					//FIXME 暂时不显示'口味'Button
+					button1.setVisibility(View.INVISIBLE);
 					button1.setText("口味");
 					button1.setOnClickListener(new OnClickListener() {
 						@Override
@@ -412,7 +424,7 @@ public class SelectedFoodActivity extends Activity implements
 									@Override
 									public void onClick(DialogInterface dialog, int which) {
 										if(ShoppingCart.instance().delete(orderFood)){
-											initPickedFoodList();
+											mFoodListHandler.sendEmptyMessage(0);
 										}
 									}
 								})
@@ -483,10 +495,6 @@ public class SelectedFoodActivity extends Activity implements
 		};
 		
 		mPickedFoodList.setAdapter(adapter);
-		//展开所有列表
-		for(int i=0 ; i < groupData.size(); i++){
-			mPickedFoodList.expandGroup(i);
-		}
 	}
 	
 	@Override
@@ -500,12 +508,10 @@ public class SelectedFoodActivity extends Activity implements
 		getWindowManager().getDefaultDisplay().getMetrics(dm);
 		int width = 0;
 		int height = 0;
-		Log.i("SelectedFood", "density dpi : "+ dm.densityDpi);
 		switch(dm.densityDpi){
 		case DisplayMetrics.DENSITY_LOW:
 			break;
 		case DisplayMetrics.DENSITY_MEDIUM:
-	
 			break;
 		case DisplayMetrics.DENSITY_HIGH:
 			 width = 600;
@@ -522,18 +528,11 @@ public class SelectedFoodActivity extends Activity implements
 		mFoodDetailHandler = new FoodDetailHandler(this);
 		mTotalCountHandler = new TotalCountHandler(this);
 		
-		//initial OptionBar
-		OptionBarFragment optionbar = (OptionBarFragment) this.getFragmentManager().findFragmentById(R.id.bottombar_pickedFood);
-		optionbar.setOnOrderChangeListener(this);
-
 		mPickedFoodList = (ExpandableListView) findViewById(R.id.expandableListView_pickedFood);
 		initPickedFoodList();
 		
-		if (ShoppingCart.instance().hasTable()) {
-			new QueryOrderTask(ShoppingCart.instance().getDestTable().getAliasId()).execute();
-		} else {
-			mFoodListHandler.sendEmptyMessage(0);
-		}
+		//刷新购物车的显示
+		ShoppingCart.instance().refresh();
 
 		if(ShoppingCart.instance().hasNewOrder()){
 			mCurrentFood = ShoppingCart.instance().getNewFoods().get(0);
@@ -556,6 +555,53 @@ public class SelectedFoodActivity extends Activity implements
 			}
 		});
 		
+		//暂结按钮
+		((Button)findViewById(R.id.imageButton_temp_payOrder_pickedFood)).setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				try {
+					ShoppingCart.instance().pay(new OnPayListener(){
+						
+						private ProgressDialog mProgressDialog;
+
+						@Override
+						public void onPrePay(Order orderToPay) {
+							mProgressDialog = ProgressDialog.show(SelectedFoodActivity.this,"", "正在暂结" + orderToPay.getDestTbl().getAliasId() + "号账单信息...请稍候");
+						}
+						
+						@Override
+						public void onSuccess(Order orderToPay) {
+							mProgressDialog.dismiss();
+							new AlertDialog.Builder(SelectedFoodActivity.this)
+								.setTitle("提示")
+								.setMessage(orderToPay.getDestTbl().getAliasId() + "号餐台暂结成功，请等待服务员结账...")
+								.setNeutralButton("确定", new DialogInterface.OnClickListener() {
+									@Override
+									public void onClick(DialogInterface dialog,	int which){
+										onBackPressed();
+									}
+								})
+								.show();
+						}
+
+						@Override
+						public void onFail(BusinessException e) {
+							mProgressDialog.dismiss();
+							new AlertDialog.Builder(SelectedFoodActivity.this)
+								.setTitle("提示")
+								.setMessage(e.getMessage())
+								.setNeutralButton("确定", null)
+								.show();
+						}
+						
+					});
+				} catch (BusinessException e) {
+					Toast.makeText(SelectedFoodActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+				}
+			}
+		});
+		
 		//下单按钮 
 		((Button) findViewById(R.id.imageButton_submit_pickedFood)).setOnClickListener(new OnClickListener(){
 			@Override
@@ -565,105 +611,90 @@ public class SelectedFoodActivity extends Activity implements
 						
 						private ProgressDialog mProgressDialog;
 						@Override
-						public void OnPreCommit(Order reqOrder) {
+						public void onPreCommit(Order reqOrder) {
 							mProgressDialog = ProgressDialog.show(SelectedFoodActivity.this,"", "查询" + reqOrder.getDestTbl().getAliasId() + "号账单信息...请稍候");
 						}
 
 						@Override
-						public void onPostCommit(Order reqOrder, BusinessException e) {
-							mProgressDialog.cancel();
-							if(e == null){
-								//当读取到餐台锁定信息时,如果是锁定状态则不清除数据
-								SharedPreferences pref = getSharedPreferences(Params.TABLE_ID, MODE_PRIVATE);
-								if(!pref.contains(Params.TABLE_ID)){
-									ShoppingCart.instance().clearTable();
-								} else {
-									ShoppingCart.instance().setOriOrder(reqOrder);
+						public void onSuccess(Order reqOrder) {
+							mProgressDialog.dismiss();
+							
+							Toast.makeText(SelectedFoodActivity.this, reqOrder.getDestTbl().getAliasId() + "号餐台下单成功", Toast.LENGTH_SHORT).show();
+							
+							v.postDelayed(new Runnable(){
+
+								@Override
+								public void run() {
+									onBackPressed();
 								}
-								//读取服务员锁定信息
-								pref = getSharedPreferences(Params.PREFS_NAME, MODE_PRIVATE);
-								if(!pref.contains(Params.IS_FIX_STAFF)){
-									ShoppingCart.instance().clearStaff();
-								}
-								
-								Toast.makeText(SelectedFoodActivity.this, reqOrder.getDestTbl().getAliasId() + "号餐台下单成功", Toast.LENGTH_SHORT).show();
-								
-								v.postDelayed(new Runnable(){
+							}, 100);
+						}
+						
+						@Override
+						public void onFail(BusinessException e){
+							if(ShoppingCart.instance().hasOriOrder()){
 
-									@Override
-									public void run() {
-										onBackPressed();
-									}
-								}, 100);
-								
-							}else{
-								if(ShoppingCart.instance().hasOriOrder()){
+								if(e.getErrCode().equals(ProtocolError.TABLE_IDLE)){
+									//如果是改单，并且返回是餐台空闲的错误状态，
+									//则提示用户，并清空购物车中的原账单
+									new AlertDialog.Builder(SelectedFoodActivity.this)
+										.setTitle("提示")
+										.setMessage(ShoppingCart.instance().getDestTable().getAliasId() + "号餐台已经结帐，已点菜信息将刷新，新点菜信息将会保留")
+										.setNeutralButton("确定",
+											new DialogInterface.OnClickListener() {
+												@Override
+												public void onClick(DialogInterface dialog,	int which){
+													ShoppingCart.instance().refresh();
+												}
+											})
+										.show();
 
-									if(e.getErrCode().equals(ProtocolError.TABLE_IDLE)){
-										//如果是改单，并且返回是餐台空闲的错误状态，
-										//则提示用户，并清空购物车中的原账单
-										new AlertDialog.Builder(SelectedFoodActivity.this)
-											.setTitle("提示")
-											.setMessage(reqOrder.getDestTbl().getAliasId() + "号餐台已经结帐，已点菜信息将刷新，新点菜信息将会保留")
-											.setNeutralButton("确定",
-												new DialogInterface.OnClickListener() {
-													@Override
-													public void onClick(DialogInterface dialog,	int which){
-														ShoppingCart.instance().setOriOrder(null);
-														mFoodListHandler.sendEmptyMessage(0);
-													}
-												})
-											.show();
-
-										
-									}else if(e.getErrCode().equals(ProtocolError.ORDER_EXPIRED)){
-										//如果是改单，并且返回是账单过期的错误状态，
-										//则提示用户重新请求账单，再次确认提交
-										final Table destTbl = reqOrder.getDestTbl();
-										new AlertDialog.Builder(SelectedFoodActivity.this)
-											.setTitle("提示")
-											.setMessage(reqOrder.getDestTbl().getAliasId() + "号餐台的账单信息已经更新，已点菜信息将刷新，新点菜信息将会保留")
-											.setNeutralButton("确定",
-												new DialogInterface.OnClickListener() {
-													@Override
-													public void onClick(DialogInterface dialog,	int which){
-														new QueryOrderTask(destTbl.getAliasId()).execute();
-													}
-												})
-											.show();
-										
-									}else{
-										new AlertDialog.Builder(SelectedFoodActivity.this)
-											.setTitle("提示")
-											.setMessage(e.getMessage())
-											.setNeutralButton("确定", null)
-											.show();
-									}
+									
+								}else if(e.getErrCode().equals(ProtocolError.ORDER_EXPIRED)){
+									//如果是改单，并且返回是账单过期的错误状态，
+									//则提示用户重新请求账单，再次确认提交
+									new AlertDialog.Builder(SelectedFoodActivity.this)
+										.setTitle("提示")
+										.setMessage(ShoppingCart.instance().getDestTable().getAliasId() + "号餐台的账单信息已经更新，已点菜信息将刷新，新点菜信息将会保留")
+										.setNeutralButton("确定",
+											new DialogInterface.OnClickListener() {
+												@Override
+												public void onClick(DialogInterface dialog,	int which){
+													ShoppingCart.instance().refresh();
+												}
+											})
+										.show();
+									
 								}else{
-									if(e.getErrCode().equals(ProtocolError.TABLE_BUSY)){
-										//如果是新下单，并且返回是餐台就餐的错误状态，
-										//则提示用户重新请求账单，再次确认提交
-										final Table destTbl = reqOrder.getDestTbl();
-										new AlertDialog.Builder(SelectedFoodActivity.this)
-											.setTitle("提示")
-											.setMessage(reqOrder.getDestTbl().getAliasId() + "号餐台的账单信息已经更新，已点菜信息将刷新，新点菜信息将会保留")
-											.setNeutralButton("确定",
-												new DialogInterface.OnClickListener() {
-													@Override
-													public void onClick(DialogInterface dialog,	int which){
-														new QueryOrderTask(destTbl.getAliasId()).execute();
-													}
-												})
-											.show();
-									}else{
-										new AlertDialog.Builder(SelectedFoodActivity.this)
-											.setTitle("提示")
-											.setMessage(e.getMessage())
-											.setNeutralButton("确定", null)
-											.show();
-									}
+									new AlertDialog.Builder(SelectedFoodActivity.this)
+										.setTitle("提示")
+										.setMessage(e.getMessage())
+										.setNeutralButton("确定", null)
+										.show();
 								}
-							}								
+							}else{
+								if(e.getErrCode().equals(ProtocolError.TABLE_BUSY)){
+									//如果是新下单，并且返回是餐台就餐的错误状态，
+									//则提示用户重新请求账单，再次确认提交
+									new AlertDialog.Builder(SelectedFoodActivity.this)
+										.setTitle("提示")
+										.setMessage(ShoppingCart.instance().getDestTable().getAliasId() + "号餐台的账单信息已经更新，已点菜信息将刷新，新点菜信息将会保留")
+										.setNeutralButton("确定",
+											new DialogInterface.OnClickListener() {
+												@Override
+												public void onClick(DialogInterface dialog,	int which){
+													ShoppingCart.instance().refresh();
+												}
+											})
+										.show();
+								}else{
+									new AlertDialog.Builder(SelectedFoodActivity.this)
+										.setTitle("提示")
+										.setMessage(e.getMessage())
+										.setNeutralButton("确定", null)
+										.show();
+								}
+							}
 						}						
 					});
 					
@@ -685,9 +716,7 @@ public class SelectedFoodActivity extends Activity implements
 	@Override
 	public void onBackPressed() {
 		// Activity关闭后不再侦听购物车变化
-		ShoppingCart.instance().setOnTableChangeListener(null);
 		mPickedFoodList.setOnChildClickListener(null);
-		((OptionBarFragment) this.getFragmentManager().findFragmentById(R.id.bottombar_pickedFood)).setOnOrderChangeListener(null);
 		super.onBackPressed();
 	}
 
@@ -751,12 +780,12 @@ public class SelectedFoodActivity extends Activity implements
 			return 
 				new AlertDialog.Builder(getActivity()).setTitle("请输入退菜数量")
 				   .setView(view)
-				   .setNeutralButton("确定",new DialogInterface.OnClickListener() {
+				   .setNeutralButton("确定", new DialogInterface.OnClickListener() {
 					   @Override
 					   public void onClick(DialogInterface dialog, int whichButton) {
 							float foodAmount = selectedFood.getCount();
 							float cancelAmount = Float.parseFloat(countEdtTxt.getText().toString());
-							if (foodAmount <= cancelAmount) {
+							if (foodAmount >= cancelAmount) {
 								try {
 									ShoppingCart.instance().removeCount(WirelessOrder.loginStaff, selectedFood, cancelAmount);
 								} catch (BusinessException e) {
@@ -772,24 +801,6 @@ public class SelectedFoodActivity extends Activity implements
 							   
 		}
 		
-	}
-
-	private class QueryOrderTask extends com.wireless.lib.task.QueryOrderTask {
-
-		public QueryOrderTask(int tableAlias) {
-			super(WirelessOrder.loginStaff, tableAlias, WirelessOrder.foodMenu);
-		}
-
-		@Override
-		protected void onPreExecute() {
-		}
-
-		@Override
-		protected void onPostExecute(Order order) {
-			// 请求成功后设置购物车并更新
-			ShoppingCart.instance().setOriOrder(order);
-			mFoodListHandler.sendEmptyMessage(0);
-		}
 	}
 
 	/**
@@ -814,9 +825,8 @@ public class SelectedFoodActivity extends Activity implements
 	 * if the order changed ,refresh the food list
 	 */
 	@Override
-	public void onOrderChanged(Order order) {
-		ShoppingCart.instance().setOriOrder(order);
-		initPickedFoodList();
+	public void onCartChanged(List<OrderFood> foodsInCart) {
+		mFoodListHandler.sendEmptyMessage(0);
 	}
 	
 	/**
@@ -824,6 +834,6 @@ public class SelectedFoodActivity extends Activity implements
 	 */
 	@Override
 	public void onFoodAdd(Food food) {
-		initPickedFoodList();
+		mFoodListHandler.sendEmptyMessage(0);
 	}
 }

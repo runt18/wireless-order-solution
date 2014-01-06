@@ -48,7 +48,6 @@
         android:ems="10"
         android:focusable="false"
         android:gravity="top|center_horizontal"
-        android:inputType="numberDecimal"
         android:paddingTop="6dp"
         android:text="11"
         android:textColor="@color/black"
@@ -83,7 +82,7 @@
     <View
         android:id="@+id/view_pickedFood_cancel_line"
         android:layout_width="wrap_content"
-        android:layout_height="1px"
+        android:layout_height="3dp"
         android:layout_alignLeft="@+id/textView_picked_food_name_item"
         android:layout_alignRight="@+id/textView_picked_food_sum_price"
         android:layout_centerVertical="true"
@@ -104,11 +103,11 @@
         android:textSize="@dimen/text_size_m" />
 
     <ImageView
-        android:id="@+id/imgView_hurried_pickedFood_list_item"
+        android:id="@+id/imgView_sellOut_pickedFood_list_item"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignRight="@+id/textView_picked_food_price_item"
         android:src="@drawable/hurry_signal_small"
-        android:visibility="gone" />
+        android:visibility="invisible" />
 
 </RelativeLayout>

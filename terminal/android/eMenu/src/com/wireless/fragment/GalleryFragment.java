@@ -443,12 +443,12 @@ public class GalleryFragment extends Fragment implements OnSearchItemClickListen
     	
     	//Add the listener to retrieve the width and height of this fragment, then set them to image fetcher.
     	getView().getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-    	     @SuppressWarnings("deprecation")
+    		@SuppressWarnings("deprecation")
 			@Override
-   	          public void onGlobalLayout() {
-    	    	 mImgFetcher.setImageSize(getView().getWidth(), getView().getHeight());
-    	    	 getView().getViewTreeObserver().removeGlobalOnLayoutListener(this);
-   	          }
+   	        public void onGlobalLayout() {
+    			mImgFetcher.setImageSize(getView().getWidth(), getView().getHeight());
+    	    	getView().getViewTreeObserver().removeGlobalOnLayoutListener(this);
+   	        }
     	});
         
         final ScaleType scale = scaleType;

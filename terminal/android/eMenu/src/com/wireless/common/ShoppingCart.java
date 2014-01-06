@@ -4,23 +4,28 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+
 import com.wireless.exception.BusinessException;
 import com.wireless.pack.Type;
+import com.wireless.pack.req.PrintOption;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.OrderFood;
+import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.staffMgr.Staff;
 
 public final class ShoppingCart {
 	
-	public static interface OnFoodsChangedListener{
+	public static interface OnStaffChangedListener{
 		/**
-		 * Called when new foods are changed in shopping cart,
-		 * such as add {@link ShoppingCart#addFood(OrderFood)}, remove {@link ShoppingCart#remove(OrderFood)} 
-		 * would notify to invoke this call back if the listener is set.
-		 * @param newFoods the current new foods
+		 * Called when new staff is set.
+		 * @param staff
+		 * @param id
+		 * @param pwd
 		 */
-		public void onFoodsChanged(List<OrderFood> newFoods);
+		public void onStaffChanged(Staff staff);
 	}
 	
 	public static interface OnTableChangedListener{
@@ -31,11 +36,29 @@ public final class ShoppingCart {
 		public void onTableChanged(Table table);
 	}
 	
-	public static interface OnCommitListener{
-		public void OnPreCommit(Order reqOrder);
-		public void onPostCommit(Order reqOrder, BusinessException e);
+	public static interface OnCartChangedListener{
+		/**
+		 * Called when new foods are changed in shopping cart,
+		 * such as add {@link ShoppingCart#addFood(OrderFood)}, remove {@link ShoppingCart#remove(OrderFood)} 
+		 * would notify to invoke this call back if the listener is set.
+		 * @param foodsInCart the foods in shopping cart
+		 */
+		public void onCartChanged(List<OrderFood> foodsInCart);
 	}
 	
+	public static interface OnCommitListener{
+		public void onPreCommit(Order reqOrder);
+		public void onSuccess(Order reqOrder);
+		public void onFail(BusinessException e);
+	}
+	
+	public static interface OnPayListener{
+		public void onPrePay(Order orderToPay);
+		public void onSuccess(Order orderToPay);
+		public void onFail(BusinessException e);
+	}
+	
+	private Context mContext;
 	private Staff mStaff;
 	private Table mDestTable;
 	//private List<OrderFood> mExtraFoods = new LinkedList<OrderFood>();
@@ -44,9 +67,13 @@ public final class ShoppingCart {
 	
 	private Order mOriOrder;
 	
-	private List<OrderFood> mFoodsInCart = new ArrayList<OrderFood>();
-	
 	private final static ShoppingCart mInstance = new ShoppingCart();
+
+	private OnCartChangedListener mOnCartChangedListener;
+
+	private OnTableChangedListener mOnTableChangedListener;
+	
+	private OnStaffChangedListener mOnStaffChangedListener;
 	
 	private ShoppingCart(){
 		
@@ -56,16 +83,65 @@ public final class ShoppingCart {
 		return mInstance;
 	}
 
-	private OnFoodsChangedListener mOnFoodsChangedListener;
 
-	private OnTableChangedListener mOnTableChangeListener;
-	
-	public void setOnFoodsChangeListener(OnFoodsChangedListener l){
-		mOnFoodsChangedListener = l;
+	public void setOnCartChangeListener(OnCartChangedListener l){
+		mOnCartChangedListener = l;
 	}
 	
-	public void setOnTableChangeListener(OnTableChangedListener l){
-		mOnTableChangeListener = l;
+	public void setOnTableChangedListener(OnTableChangedListener l){
+		mOnTableChangedListener = l;
+	}
+	
+	public void setOnStaffChangedListener(OnStaffChangedListener l){
+		mOnStaffChangedListener = l;
+	}
+	
+	public void init(Context context){
+		this.mStaff = null;
+		this.mNewOrder = null;
+		this.mDestTable = null;
+		this.mOriOrder = null;
+		this.mContext = context;
+	}
+	
+	/**
+	 * 
+	 * @param payListener
+	 * @throws BusinessException
+	 */
+	public void pay(final OnPayListener payListener) throws BusinessException{
+		
+		commit(new OnCommitListener() {
+			@Override
+			public void onPreCommit(Order reqOrder) {
+				if(payListener != null){
+					payListener.onPrePay(reqOrder);
+				}
+			}
+			
+			@Override
+			public void onSuccess(Order reqOrder) {
+				new com.wireless.lib.task.QueryOrderTask(WirelessOrder.loginStaff, reqOrder.getDestTbl().getAliasId(), WirelessOrder.foodMenu){
+					@Override
+					public void onSuccess(Order order){
+						new PayOrderTask(order, payListener).execute();
+					}
+					@Override
+					public void onFail(BusinessException e){
+						if(payListener != null){
+							payListener.onFail(mBusinessException);
+						}
+					}
+				}.execute();
+			}
+
+			@Override
+			public void onFail(BusinessException e) {
+				if(payListener != null){
+					payListener.onFail(e);
+				}				
+			}
+		});
 	}
 	
 	/**
@@ -83,14 +159,23 @@ public final class ShoppingCart {
 			Order reqOrder = new Order(mOriOrder.getOrderFoods(), mDestTable.getAliasId(), mDestTable.getCustomNum());	
 			reqOrder.setId(mOriOrder.getId());
 			reqOrder.setOrderDate(mOriOrder.getOrderDate());
-			if(hasNewOrder()){
-				reqOrder.addFoods(mNewOrder.getOrderFoods(), WirelessOrder.loginStaff);
+			//Skip the new food in case of sell out.
+			for(OrderFood newFood : getNewFoods()){
+				if(!newFood.asFood().isSellOut()){
+					reqOrder.addFood(newFood, WirelessOrder.loginStaff);
+				}
 			}
 			new CommitOrderTask(reqOrder, Type.UPDATE_ORDER, commitListener).execute();
 			
 		}else{
 			checkCommitValid();
-			Order reqOrder = new Order(mNewOrder.getOrderFoods(), mDestTable.getAliasId(), mDestTable.getCustomNum());			
+			Order reqOrder = new Order(null, mDestTable.getAliasId(), mDestTable.getCustomNum());			
+			//Skip the new food in case of sell out.
+			for(OrderFood newFood : getNewFoods()){
+				if(!newFood.asFood().isSellOut()){
+					reqOrder.addFood(newFood, WirelessOrder.loginStaff);
+				}
+			}
 			new CommitOrderTask(reqOrder, Type.INSERT_ORDER, commitListener).execute();
 		}
 	}
@@ -277,10 +362,13 @@ public final class ShoppingCart {
 	/**
 	 * Set the staff.
 	 * @param mStaff
-	 *            the mStaff to set
+	 *            the staff to set
 	 */
 	public void setStaff(Staff staff) {
 		this.mStaff = staff;
+		if(mOnStaffChangedListener != null){
+			mOnStaffChangedListener.onStaffChanged(mStaff);
+		}
 	}
 
 	/**
@@ -291,13 +379,65 @@ public final class ShoppingCart {
 	}
 
 	/**
-	 * @param mDestTable
-	 *            the mTable to set
+	 * Refresh the shopping cart.
+	 * @see {@link #setDestTable(Table)}
+	 */
+	public void refresh(){
+		new com.wireless.lib.task.QuerySellOutTask(WirelessOrder.loginStaff, WirelessOrder.foodMenu.foods){
+			@Override
+			public void onSuccess(List<Food> sellOutFoods){
+				//Check to see whether any new food is sold out.
+				for(OrderFood newFood : getNewFoods()){
+					for(Food f : sellOutFoods){
+						if(f.equals(newFood.asFood())){
+							newFood.asFood().setSellOut(true);
+							break;
+						}
+					}
+				}
+				//Set the table to refresh the original order.
+				setDestTable(mDestTable);
+			}
+			@Override
+			public void onFail(BusinessException e){
+				
+			}
+		}.execute();
+		
+	}
+	
+	/**
+	 * Set the table. 
+	 * The call back {@link OnTableChangedListener} and {@link OnCartChangedListener} would be invoked to notify the change.
+	 * @param tabel
+	 *            the table to set
 	 */
 	public void setDestTable(Table table) {
-		this.mDestTable = table;
-		if(mOnTableChangeListener != null){
-			mOnTableChangeListener.onTableChanged(table);
+		mDestTable = table;
+		if(table != null){
+			new com.wireless.lib.task.QueryOrderTask(WirelessOrder.loginStaff, table.getAliasId(), WirelessOrder.foodMenu){
+				@Override
+				public void onSuccess(Order order){
+					setOriOrder(order);
+					if(mOnTableChangedListener != null){
+						mOnTableChangedListener.onTableChanged(mDestTable);
+					}
+				}
+				
+				@Override
+				public void onFail(BusinessException e){
+					setOriOrder(null);
+					if(mOnTableChangedListener != null){
+						mOnTableChangedListener.onTableChanged(mDestTable);
+					}
+				}
+				
+			}.execute();
+		}else{
+			setOriOrder(null);
+			if(mOnTableChangedListener != null){
+				mOnTableChangedListener.onTableChanged(mDestTable);
+			}
 		}
 	}
 
@@ -354,7 +494,14 @@ public final class ShoppingCart {
 	 * @return all foods to shopping cart
 	 */
 	public List<OrderFood> getAllFoods(){
-		return Collections.unmodifiableList((mFoodsInCart));
+		List<OrderFood> foodsInCart = new ArrayList<OrderFood>();
+		if(mNewOrder != null){
+			foodsInCart.addAll(mNewOrder.getOrderFoods());
+		}
+		if(mOriOrder != null){
+			foodsInCart.addAll(mOriOrder.getOrderFoods());
+		}
+		return Collections.unmodifiableList((foodsInCart));
 	}
 
 	/**
@@ -362,10 +509,10 @@ public final class ShoppingCart {
 	 * @return the amount to all foods
 	 */
 	public int getAllAmount(){
-		return mFoodsInCart.size();
+		return getAllFoods().size();
 	}
 	
-	public void setOriOrder(Order mOriOrder) {
+	private void setOriOrder(Order mOriOrder) {
 		this.mOriOrder = mOriOrder;
 		notifyFoodsChanged();
 	}
@@ -396,17 +543,8 @@ public final class ShoppingCart {
 
 
 	private void notifyFoodsChanged(){
-		
-		mFoodsInCart.clear();
-		if(mNewOrder != null){
-			mFoodsInCart.addAll(mNewOrder.getOrderFoods());
-		}
-		if(mOriOrder != null){
-			mFoodsInCart.addAll(mOriOrder.getOrderFoods());
-		}
-		
-		if(mOnFoodsChangedListener != null){
-			mOnFoodsChangedListener.onFoodsChanged(getAllFoods());
+		if(mOnCartChangedListener != null){
+			mOnCartChangedListener.onCartChanged(getAllFoods());
 		}
 	}
 	
@@ -448,7 +586,7 @@ public final class ShoppingCart {
 	 * @return the order food in shopping cart matched the food alias, return null if not found. 
 	 */
 	public OrderFood searchFoodByAlias(int aliasId){
-		for(OrderFood of : mFoodsInCart){
+		for(OrderFood of : getAllFoods()){
 			if(of.getAliasId() == aliasId){
 				return new OrderFood(of);
 			}
@@ -471,37 +609,66 @@ public final class ShoppingCart {
 		@Override
 		protected void onPreExecute(){
 			if(mCommitListener != null){
-				mCommitListener.OnPreCommit(mReqOrder);
+				mCommitListener.onPreCommit(mReqOrder);
 			}
 		}		
 		
 		@Override
 		protected void onPostExecute(Void arg){
+
 			if(mBusinessException == null){
-				mNewOrder = null;
-			}
-			if(mCommitListener != null){	
-				mCommitListener.onPostCommit(mReqOrder, mBusinessException);
+				//如果是锁定餐台状态则重新设置锁定的餐台，否则清除餐台数据
+				SharedPreferences pref = mContext.getSharedPreferences(Params.PREFS_NAME, Context.MODE_PRIVATE);
+				if(pref.getBoolean(Params.TABLE_FIXED, false)){
+					mNewOrder = null;
+					setDestTable(mDestTable);
+				}else{
+					initTable();
+				}
+				//如果不是锁定服务员状态则清除服务员数据
+				if(!pref.getBoolean(Params.STAFF_FIXED, false)){
+					setStaff(null);
+				}
+				if(mCommitListener != null){	
+					mCommitListener.onSuccess(mReqOrder);
+				}
+			}else{
+				if(mCommitListener != null){	
+					mCommitListener.onFail(mBusinessException);
+				}
 			}
 		}		
 
 	}
 	
-	public void clear(){
-		clearTable();
-		clearStaff();
-		this.mFoodsInCart.clear();
+	private class PayOrderTask extends com.wireless.lib.task.PayOrderTask{
+
+		private OnPayListener mPayListener;
+		
+		public PayOrderTask(Order orderToPay, OnPayListener payListener) {
+			super(WirelessOrder.loginStaff, orderToPay, Type.PAY_TEMP_ORDER, PrintOption.DO_PRINT);
+			mPayListener = payListener;
+		}
+		
+		@Override
+		protected void onPostExecute(Void arg){
+			if(mPayListener != null){
+				if(mBusinessException != null){
+					mPayListener.onFail(mBusinessException);
+				}else{
+					mPayListener.onSuccess(mOrderToPay);
+				}
+			}
+		}	
 	}
 	
-	public void clearTable(){
+	private void initTable(){
 		this.mNewOrder = null;
 		this.mDestTable = null;
 		this.mOriOrder = null;
-		mFoodsInCart.clear();
-	}
-	
-	public void clearStaff(){
-		this.mStaff = null;
+		if(mOnTableChangedListener != null){
+			mOnTableChangedListener.onTableChanged(null);
+		}
 	}
 	
 	/**

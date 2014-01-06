@@ -5,7 +5,6 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -21,8 +20,6 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.wireless.common.Params;
-import com.wireless.common.ShoppingCart;
-import com.wireless.common.ShoppingCart.OnTableChangedListener;
 import com.wireless.common.WirelessOrder;
 import com.wireless.ordermenu.R;
 import com.wireless.pojo.regionMgr.Table;
@@ -32,122 +29,90 @@ import com.wireless.pojo.staffMgr.Staff;
  * this fragment offers bind table and server function, the view is define by xml, <br/>
  * see {@link #addPreferencesFromResource(int)}. 
  * <br/>
- * it also contains a {@link OnTableChangedListener} to return the bound food
  * @author ggdsn1
  *
  */
 public class BindTableAndServerSettingFragment extends PreferenceFragment implements OnPreferenceChangeListener{
 
 	private static final CharSequence UNLOCK = "未绑定";
-	private Table mTable;
-	private OnTableChangedListener mOnTableChangeListener;
-	private Staff mStaff;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
 		addPreferencesFromResource(R.xml.bind_table_server_setting_pref);
 	}
-
-	
-	@Override
-	public void onAttach(Activity activity) {
-		super.onAttach(activity);
-		if(!(activity instanceof OnTableChangedListener)){
-			throw new ClassCastException("activity must implement the OnTableChangeListener");
-		} else {
-			mOnTableChangeListener = (OnTableChangedListener) activity;
-		}
-	}
-
 
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
-//////////////////////组织餐台数据//////////////////////////////////////
-		CharSequence[] tableEntries = new CharSequence[WirelessOrder.tables.length + 1];
-		CharSequence[] tableEntryValues = new CharSequence[WirelessOrder.tables.length + 1];
-		tableEntries[tableEntries.length - 1] = "不绑定";
-		tableEntryValues[tableEntryValues.length - 1] = UNLOCK;
+		//////////////////////组织餐台数据//////////////////////////////////////
+		List<CharSequence> tableEntries = new ArrayList<CharSequence>();
+		List<CharSequence> tableEntryValues = new ArrayList<CharSequence>();
 		
-		Table[] tables = WirelessOrder.tables;
-		for (int i = 0; i < tables.length; i++) {
-			Table t = tables[i];
-			tableEntries[i] = String.valueOf(t.getAliasId()) + "    " + t.getName();
-			tableEntryValues[i] = String.valueOf(t.getAliasId());
+		for (Table t : WirelessOrder.tables) {
+			if(t.getName().isEmpty()){
+				tableEntries.add("" + t.getAliasId());
+			}else{
+				tableEntries.add(t.getAliasId() + "(" + t.getName() + ")");
+			}
+			tableEntryValues.add(String.valueOf(t.getAliasId()));
 		}
+		tableEntries.add("不绑定");
+		tableEntryValues.add(UNLOCK);
+		
 		//设置ListPreference
 		ListPreference tablePref = (ListPreference) findPreference(getString(R.string.bind_table_pref_key));
 		tablePref.setTitle("选择要绑定的餐台");
 		tablePref.setOnPreferenceChangeListener(this);
-		tablePref.setEntries(tableEntries);
-		tablePref.setEntryValues(tableEntryValues);
-		//当读取到餐台锁定信息时,如果是锁定状态则还原数据
-		SharedPreferences ourPref = getActivity().getSharedPreferences(Params.TABLE_ID, Context.MODE_PRIVATE);
-		if(ourPref.contains(Params.TABLE_ID))
-		{
-			int tableId = ourPref.getInt(Params.TABLE_ID, Integer.MIN_VALUE);
-			tablePref.setSummary("已绑定：" + tableId);
-			
-			Table[] tables2 = WirelessOrder.tables;
-			for (int i = 0; i < tables2.length; i++) {
-				Table t = tables2[i];
-				if(t.getAliasId() == tableId){
-					mTable = t;
+		tablePref.setEntries(tableEntries.toArray(new CharSequence[tableEntries.size()]));
+		tablePref.setEntryValues(tableEntryValues.toArray(new CharSequence[tableEntryValues.size()]));
+		
+		//显示餐台绑定的信息
+		SharedPreferences pref = getActivity().getSharedPreferences(Params.PREFS_NAME, Context.MODE_PRIVATE);
+		if(pref.getBoolean(Params.TABLE_FIXED, false)){
+			int tableAlias = pref.getInt(Params.TABLE_ID, Integer.MIN_VALUE);
+			for(int i = 0; i < tablePref.getEntryValues().length; i++){
+				if(tableAlias == Integer.parseInt(tablePref.getEntryValues()[i].toString())){
+					tablePref.setSummary("已绑定：" + tablePref.getEntries()[i].toString());
 					tablePref.setValueIndex(i);
 					break;
 				}
 			}
 		} else {
 			tablePref.setSummary(UNLOCK);
-			tablePref.setValueIndex(tableEntries.length - 1);
-			mTable = null;
+			tablePref.setValueIndex(tablePref.getEntryValues().length - 1);
 		}
 		
-/////////////组织服务员数据///////////////////////////////////////////////////
-		List<Staff> staffs = new ArrayList<Staff>();
-		for(Staff s : WirelessOrder.staffs){
-			if(!s.getName().equals(""))
-				staffs.add(s);
-		}
+		/////////////组织服务员数据///////////////////////////////////////////////////
+		List<CharSequence> staffEntries = new ArrayList<CharSequence>();
+		List<CharSequence> staffEntryValues = new ArrayList<CharSequence>();
 		
-		CharSequence[] staffEntries = new CharSequence[staffs.size() + 1];
-		CharSequence[] staffEntryValues = new CharSequence[staffs.size() + 1];
-		staffEntries[staffEntries.length - 1] = "不绑定";
-		staffEntryValues[staffEntryValues.length - 1] = UNLOCK;
-		
-		for (int i = 0; i < staffs.size(); i++) {
-			Staff s = staffs.get(i);
-			staffEntries[i] = s.getName();
-			staffEntryValues[i] = s.getName();
+		for (Staff s : WirelessOrder.staffs) {
+			staffEntries.add(s.getName());
+			staffEntryValues.add(String.valueOf(s.getId()));
 		}
+		staffEntries.add("不绑定");
+		staffEntryValues.add(UNLOCK);
+		
 		//设置服务员的preference
 		ListPreference staffPref = (ListPreference) findPreference(getString(R.string.bind_server_pref_key));
 		staffPref.setOnPreferenceChangeListener(this);
-		staffPref.setEntries(staffEntries);
-		staffPref.setEntryValues(staffEntryValues);
+		staffPref.setEntries(staffEntries.toArray(new CharSequence[staffEntries.size()]));
+		staffPref.setEntryValues(staffEntryValues.toArray(new CharSequence[staffEntryValues.size()]));
 		
-		SharedPreferences oriStaffPref = getActivity().getSharedPreferences(Params.PREFS_NAME, Context.MODE_PRIVATE);
-		//如果已绑定，则显示
-		if(oriStaffPref != null && oriStaffPref.contains(Params.IS_FIX_STAFF))
-		{
-			mStaff = new Staff();
-			int staffPin = oriStaffPref.getInt(Params.STAFF_ID, -1);
-			mStaff.setId(staffPin);
-			
-			for (int i = 0; i < staffs.size(); i++) {
-				Staff s = staffs.get(i);
-				if(s.equals(mStaff)){
-					mStaff = s;
+		//显示服务员绑定的信息
+		if(pref.getBoolean(Params.STAFF_FIXED, false)){
+			int staffId = pref.getInt(Params.STAFF_ID, -1);
+			for (int i = 0; i < staffPref.getEntryValues().length; i++) {
+				if(Integer.parseInt(staffPref.getEntryValues()[i].toString()) == staffId){
 					staffPref.setValueIndex(i);
-					staffPref.setSummary("已绑定：" + mStaff.getName());
+					staffPref.setSummary("已绑定：" + staffPref.getEntries()[i]);
+					break;
 				}
 			}
 		} else{
-			mStaff = null;
 			staffPref.setSummary(UNLOCK);
-			staffPref.setValueIndex(staffEntries.length -1 );
+			staffPref.setValueIndex(staffPref.getEntries().length - 1);
 		}
 	}
 
@@ -160,11 +125,11 @@ public class BindTableAndServerSettingFragment extends PreferenceFragment implem
 	 */
 	@Override
 	public boolean onPreferenceChange(Preference preference, Object newValue) {
-///////////////////////////餐台改变///////////////////////////////////////
 		if(preference.getKey().equals(getString(R.string.bind_table_pref_key))){
+			///////////////////////////餐台改变///////////////////////////////////////
 			ListPreference tablePref = (ListPreference) findPreference(getString(R.string.bind_table_pref_key));
 			
-			SharedPreferences ourPref = getActivity().getSharedPreferences(Params.TABLE_ID, Context.MODE_PRIVATE);
+			SharedPreferences ourPref = getActivity().getSharedPreferences(Params.PREFS_NAME, Context.MODE_PRIVATE);
 			Editor editor = ourPref.edit();
 
 			String newValueString = newValue.toString();
@@ -172,45 +137,35 @@ public class BindTableAndServerSettingFragment extends PreferenceFragment implem
 			//如果是不绑定的项，则解绑
 			if(newValueString.equals(UNLOCK)){
 				tablePref.setSummary(newValueString);
-				
-				editor.clear();
+				editor.putBoolean(Params.TABLE_FIXED, false);
 				editor.commit();
-				mTable = null;
-				OptionBarFragment.setTableFixed(false);
 
-			}
-			//如果选定了餐台
-			else {
-				tablePref.setSummary("已绑定："+ newValueString);
-				editor.putInt(Params.TABLE_ID, Integer.parseInt(newValueString));
-				editor.commit();
+			}else {
+				//如果选定了餐台
 				for(Table t: WirelessOrder.tables){
 					if(t.getAliasId() == Integer.parseInt(newValueString)){
-						mTable = t;
-						OptionBarFragment.setTableFixed(true);
+						tablePref.setSummary("已绑定："+ t.getAliasId() + "  " + t.getName());
+						editor.putBoolean(Params.TABLE_FIXED, true);
+						editor.putInt(Params.TABLE_ID, t.getAliasId());
+						editor.commit();
 						break;
 					}
 				}
 			}
-			mOnTableChangeListener.onTableChanged(mTable);
-
-		} 
-///////////////////////////服务员变化///////////////////////////////////////////
-		if(preference.getKey().equals(getString(R.string.bind_server_pref_key))){
+			
+		}else if(preference.getKey().equals(getString(R.string.bind_server_pref_key))){
+			///////////////////////////服务员变化///////////////////////////////////////////
 			final ListPreference staffPref = (ListPreference) findPreference(getString(R.string.bind_server_pref_key));
 			Editor editor = getActivity().getSharedPreferences(Params.PREFS_NAME, Context.MODE_PRIVATE).edit();
 			
 			final String newValueString  = newValue.toString();
-			//如果是解绑，则清除数据
 			if(newValueString.equals(UNLOCK)){
+				//如果是解绑，则清除数据
 				staffPref.setSummary(UNLOCK);
-				editor.remove(Params.IS_FIX_STAFF);
+				editor.putBoolean(Params.STAFF_FIXED, false);
 				editor.commit();
-				OptionBarFragment.setStaffFixed(false);
-				ShoppingCart.instance().clearStaff();
-			}
-			//绑定时弹出密码输入框
-			else {
+			}else {
+				//绑定时弹出密码输入框
 				final EditText editLayout = new EditText(getActivity());
 				editLayout.setHint("请输入密码");
 				
@@ -228,7 +183,7 @@ public class BindTableAndServerSettingFragment extends PreferenceFragment implem
 							
 							Staff theStaff = null;
 							for(Staff s: WirelessOrder.staffs){
-								if(s.getName().equals(newValueString)){
+								if(s.getId() == Integer.parseInt(newValueString)){
 									theStaff = s;
 									break;
 								}
@@ -237,21 +192,16 @@ public class BindTableAndServerSettingFragment extends PreferenceFragment implem
 							if(pwd.equals("")){
 								Toast.makeText(getActivity(), "请输入密码", Toast.LENGTH_SHORT).show();
 							} else if(theStaff.getPwd().equals(toHexString(digester.digest()))){
-								//储存这个服务员
-								mStaff = theStaff;
-								ShoppingCart.instance().setStaff(mStaff);
 								//保存staff pin到文件里面
 								Editor editor = getActivity().getSharedPreferences(Params.PREFS_NAME, Context.MODE_PRIVATE).edit();//获取编辑器
 								
-								staffPref.setSummary("已绑定："+newValueString);
-								editor.putInt(Params.STAFF_ID, mStaff.getId());
-								//FIXME 去掉 下面这个值
-								editor.putBoolean(Params.IS_FIX_STAFF, true);
+								staffPref.setSummary("已绑定：" + theStaff.getName());
+								editor.putBoolean(Params.STAFF_FIXED, true);
+								editor.putInt(Params.STAFF_ID, theStaff.getId());
 								editor.commit();
-								OptionBarFragment.setStaffFixed(true);
 								
 								//set the pin generator according to the staff login
-								WirelessOrder.loginStaff = mStaff;
+								WirelessOrder.loginStaff = theStaff;
 
 							} else {
 								Toast.makeText(getActivity(), "密码错误,请重新输入",Toast.LENGTH_SHORT).show();
@@ -267,12 +217,12 @@ public class BindTableAndServerSettingFragment extends PreferenceFragment implem
 				
 			}
 		}
+		
+		((ListPreference)preference).setValue(newValue.toString());
+		
 		return false;
 	}
 
-	public void setOnTableChangeListener(OnTableChangedListener l){
-		mOnTableChangeListener = l;
-	}
 	/**
 	 * Convert the md5 byte to hex string.
 	 * @param md5Msg the md5 byte value

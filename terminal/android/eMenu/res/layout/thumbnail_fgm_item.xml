@@ -26,14 +26,14 @@
             android:layout_height="171dp"
             android:layout_alignParentLeft="true"
             android:layout_alignParentTop="true" />
-<RelativeLayout
+
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_alignParentTop="true"
             android:layout_alignRight="@+id/imageView_thumbnailFgm_item_foodImg1"
             android:background="@drawable/gray_bg" >
-
         </RelativeLayout>
 
         <TextView
@@ -116,7 +116,6 @@
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:textColor="@color/orange"
             android:textSize="40sp" />
-
     </RelativeLayout>
 
     <RelativeLayout
@@ -134,14 +133,14 @@
             android:layout_height="171dp"
             android:layout_alignParentLeft="true"
             android:layout_alignParentTop="true" />
-<RelativeLayout
+
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_alignParentTop="true"
             android:layout_alignRight="@+id/imageView_thumbnailFgm_item_foodImg2"
             android:background="@drawable/gray_bg" >
-
         </RelativeLayout>
 
         <TextView
@@ -224,7 +223,6 @@
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:textColor="@color/orange"
             android:textSize="40sp" />
-
     </RelativeLayout>
 
 </RelativeLayout>

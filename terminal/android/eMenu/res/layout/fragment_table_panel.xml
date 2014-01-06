@@ -97,7 +97,7 @@
             android:layout_toRightOf="@+id/textView_customNum"
             android:background="@null"
             android:src="@drawable/table_setting_minus_selector" />
-
+
         <AutoCompleteTextView
             android:id="@+id/editText_table_num"
             android:layout_width="wrap_content"

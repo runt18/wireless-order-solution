@@ -40,7 +40,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="false"
         android:layout_marginLeft="10dp"
-        android:layout_toLeftOf="@+id/textView2"
+        android:layout_toLeftOf="@+id/txtView_yuan_recommendFoodItem"
         android:shadowColor="@color/black"
         android:shadowDx="2"
         android:shadowDy="2"
@@ -51,7 +51,7 @@
         android:textSize="@dimen/text_size_m" />
 
     <TextView
-        android:id="@+id/textView2"
+        android:id="@+id/txtView_yuan_recommendFoodItem"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignRight="@+id/imgView_food_recommendFoodItem"

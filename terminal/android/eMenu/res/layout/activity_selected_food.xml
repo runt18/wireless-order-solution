@@ -28,11 +28,11 @@
             android:background="@drawable/picked_food_bottom" >
 
             <TextView
-                android:id="@+id/textView5"
+                android:id="@+id/txtView_totalPriceName_pickedFood"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
-                android:text="总计："
+                android:text="小计："
                 android:textAppearance="?android:attr/textAppearanceLarge"
                 android:textColor="@color/white"
                 android:textSize="@dimen/text_size_l" />
@@ -43,7 +43,7 @@
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
                 android:layout_marginRight="10dp"
-                android:layout_toLeftOf="@+id/textView6"
+                android:layout_toRightOf="@+id/txtView_totalPriceName_pickedFood"
                 android:gravity="center"
                 android:text="1"
                 android:textAppearance="?android:attr/textAppearanceLarge"
@@ -51,17 +51,24 @@
                 android:textSize="@dimen/text_size_l" />
 
             <TextView
-                android:id="@+id/textView_total_count_pickedFood"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
-                android:layout_marginLeft="25dp"
-                android:layout_marginRight="10dp"
-                android:layout_toLeftOf="@+id/textView8"
-                android:text="0"
+                android:layout_marginRight="25dp"
+                android:layout_toRightOf="@+id/textView_total_price_pickedFood"
+                android:text="元"
                 android:textAppearance="?android:attr/textAppearanceLarge"
                 android:textColor="@color/white"
                 android:textSize="@dimen/text_size_l" />
+
+            <Button
+                android:id="@+id/imageButton_temp_payOrder_pickedFood"
+                android:layout_width="120dp"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_toLeftOf="@+id/imageButton_submit_pickedFood"
+                android:background="@drawable/submit_selector"
+                android:textColor="@color/white" />
 
             <Button
                 android:id="@+id/imageButton_submit_pickedFood"
@@ -72,30 +79,6 @@
                 android:layout_centerVertical="true"
                 android:background="@drawable/submit_selector"
                 android:textColor="@color/white" />
-
-            <TextView
-                android:id="@+id/textView8"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_marginRight="80dp"
-                android:layout_toLeftOf="@+id/textView_total_price_pickedFood"
-                android:text="份"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:textColor="@color/white"
-                android:textSize="@dimen/text_size_l" />
-
-            <TextView
-                android:id="@+id/textView6"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_marginRight="25dp"
-                android:layout_toLeftOf="@+id/imageButton_submit_pickedFood"
-                android:text="元"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:textColor="@color/white"
-                android:textSize="@dimen/text_size_l" />
         </RelativeLayout>
 
         <ExpandableListView
@@ -106,7 +89,6 @@
             android:layout_alignLeft="@+id/relativeLayout1"
             android:layout_below="@+id/relativeLayout1" >
         </ExpandableListView>
-
     </RelativeLayout>
 
     <RelativeLayout
@@ -128,7 +110,45 @@
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_alignParentTop="true"
-            android:scaleType="centerInside" />
+            android:scaleType="centerCrop" />
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:background="@drawable/gray_bg" >
+        </RelativeLayout>
+
+        <TextView
+            android:id="@+id/txtView_selectedFoodName_pickedFood"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/imageView_selected_food_pickedFood"
+            android:layout_alignTop="@+id/imageView_selected_food_pickedFood"
+            android:layout_marginLeft="10dp"
+            android:shadowColor="@color/black"
+            android:shadowDx="2"
+            android:shadowDy="2"
+            android:shadowRadius="4"
+            android:text="菜名"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@color/white"
+            android:textSize="20sp" />
+
+        <TextView
+            android:id="@+id/txtView_selectedFoodPrice_pickedFood"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignRight="@+id/imageView_selected_food_pickedFood"
+            android:paddingRight="2dp"
+            android:shadowColor="@color/black"
+            android:shadowDx="2"
+            android:shadowDy="2"
+            android:shadowRadius="2"
+            android:text="元"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@color/white" />
     </RelativeLayout>
 
     <fragment

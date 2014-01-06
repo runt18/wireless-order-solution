@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/tab_dialog"
     android:layout_width="match_parent"
     android:layout_height="wrap_content" >
 
@@ -43,27 +42,15 @@
         </LinearLayout>
     </RelativeLayout>
 
-    <RelativeLayout
+    <FrameLayout
+        android:id="@+id/frameLayout_container_optionDialog"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@+id/relativeLayout2"
         android:layout_alignParentLeft="true"
         android:layout_below="@+id/relativeLayout1"
         android:background="@drawable/option_dialog_middle_bg" >
-
-        <fragment
-            android:id="@+id/staffPanelFgm_optionDialog"
-            android:name="com.wireless.fragment.StaffPanelFragment"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:visibility="invisible" />
-
-        <fragment
-            android:id="@+id/tablePanelFgm_optionDialog"
-            android:name="com.wireless.fragment.TablePanelFragment"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-    </RelativeLayout>
+    </FrameLayout>
 
     <RelativeLayout
         android:id="@+id/relativeLayout2"

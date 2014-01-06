@@ -2,21 +2,17 @@ package com.wireless.fragment;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
 import android.app.Fragment;
-import android.content.Context;
-import android.content.SharedPreferences.Editor;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.GestureDetector;
 import android.view.GestureDetector.OnGestureListener;
 import android.view.Gravity;
@@ -40,11 +36,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewFlipper;
 
-import com.wireless.common.Params;
+import com.wireless.common.ShoppingCart;
 import com.wireless.common.WirelessOrder;
 import com.wireless.ordermenu.R;
 import com.wireless.pojo.regionMgr.Region;
 import com.wireless.pojo.regionMgr.Table;
+import com.wireless.util.OptionDialogFragment;
 
 /**
  * this fragment will display all legal regions and tables<br/>
@@ -56,6 +53,7 @@ import com.wireless.pojo.regionMgr.Table;
  * @see TableRefreshHandler
  */
 public class TablePanelFragment extends Fragment implements OnGestureListener {
+	
 	// 每页要显示餐台数量
 	private static final int TABLE_AMOUNT_PER_PAGE = 18;
 	private List<Table> mTables = new ArrayList<Table>();
@@ -69,7 +67,7 @@ public class TablePanelFragment extends Fragment implements OnGestureListener {
 	private short mRegionCond = FILTER_REGION_ALL;		//the current region filter condition
 	private final static short FILTER_REGION_ALL = Short.MIN_VALUE;		//region filter condition to all
 	private static final String REGION_ALL_STR = "全部区域";
-	protected static final String TAG = "TablePanelFragment";
+	public static final String TAG = "TablePanelFragment";
 	
 	private String mFilterCond = "";					//the current filter string
 	
@@ -82,28 +80,23 @@ public class TablePanelFragment extends Fragment implements OnGestureListener {
 	private int CURRENT_VIEW_ID = 0;
 	private int mPageSize = 0;
 
-	private OnTableChangedListener mOnTableChangedListener;
-	private AsyncTask<Void, Void, Table[]> mQueryTableTask;
+	//private OnTableChangedListener mOnTableChangedListener;
+	private AsyncTask<Void, Void, List<Table>> mQueryTableTask;
 
-	public void setOnTableChangedListener(OnTableChangedListener l){
-		mOnTableChangedListener = l;
-	}
-	
-	public static interface OnTableChangedListener{
-		void onTableChanged(Table table);
+	public static TablePanelFragment newInstance(){
+		TablePanelFragment fgm = new TablePanelFragment();
+		return fgm;
 	}
 	
 	@Override
-	public void onCreate(Bundle savedInstanceState)
-	{
+	public void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
 		mTableRefreshHandler = new TableRefreshHandler(this);
 		mRegionRefreshHandler = new RegionRefreshHandler(this);
 	}
 	
 	@Override
-	public View onCreateView(LayoutInflater inflater , ViewGroup container, Bundle savedInstanceState)
-	{
+	public View onCreateView(LayoutInflater inflater , ViewGroup container, Bundle savedInstanceState){
 		final View view = inflater.inflate(R.layout.fragment_table_panel,container,false);
 		final AutoCompleteTextView tableNumEditText = (AutoCompleteTextView)view.findViewById(R.id.editText_table_num);
 		
@@ -166,14 +159,27 @@ public class TablePanelFragment extends Fragment implements OnGestureListener {
 		return view;
 	}
 
-	public void refreshTableState(){
+	@Override
+	public void onActivityCreated(Bundle savedInstanceState){
+		super.onActivityCreated(savedInstanceState);
+//		try{
+//			mOnTableChangedListener = (OnTableChangedListener)getParentFragment();
+//		}catch(ClassCastException e){
+//			throw new IllegalArgumentException("The fragment must implement the table change notify interface.");
+//		}
+		
 		mQueryTableTask = new QueryTableTask().execute();
+
 	}
 	
-	public void cancelTask(){
-		if(mQueryTableTask != null)
+	@Override
+	public void onDestroyView(){
+		super.onDestroyView();
+		if(mQueryTableTask != null){
 			mQueryTableTask.cancel(true);
+		}
 	}
+	
 	/**
 	 * select and refresh all legal regions
 	 */
@@ -248,12 +254,11 @@ public class TablePanelFragment extends Fragment implements OnGestureListener {
 		 * according to the condition, select tables and refresh display
 		 */
 		@Override
-		public void handleMessage(Message msg)
-		{
+		public void handleMessage(Message msg){
 			TablePanelFragment fragment = mFragment.get();
 			fragment.CURRENT_VIEW_ID = 0;
 			mFilterTable.clear();
-			mFilterTable.addAll(Arrays.asList(WirelessOrder.tables));
+			mFilterTable.addAll(WirelessOrder.tables);
 			Iterator<Table> iter = mFilterTable.iterator();
 
 			/**
@@ -362,23 +367,16 @@ public class TablePanelFragment extends Fragment implements OnGestureListener {
 
 				@Override
 				public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-					Table table = (Table) view.getTag();
+					final Table table = (Table) view.getTag();
 
-					Log.i(TAG, "customerNum: "+ table.getCustomNum());
 					if(table.getCustomNum() <= 1){
 						short customNum = Short.parseShort(((TextView)getView().findViewById(R.id.textView_customNum)).getText().toString());
 						table.setCustomNum(customNum);
 					}
 					
-					if(OptionBarFragment.isTableFixed())
-					{
-						Editor editor = getActivity().getSharedPreferences(Params.TABLE_ID, Context.MODE_PRIVATE).edit();
-						editor.putInt(Params.TABLE_ID, table.getAliasId());
-						editor.commit();
-					}
+					ShoppingCart.instance().setDestTable(table);
 					
-					if(mOnTableChangedListener != null)
-						mOnTableChangedListener.onTableChanged(table);
+					((OptionDialogFragment)getParentFragment()).dismiss();
 					
 				}
 			});
@@ -496,7 +494,7 @@ public class TablePanelFragment extends Fragment implements OnGestureListener {
 		 * 根据返回的error message判断，如果发错异常则提示用户， 如果成功，则执行请求餐厅的操作。
 		 */
 		@Override
-		protected void onPostExecute(Table[] tables) {
+		protected void onPostExecute(List<Table> tables) {
 			/**
 			 * Prompt user message if any error occurred.
 			 */
@@ -509,7 +507,7 @@ public class TablePanelFragment extends Fragment implements OnGestureListener {
 				mRegionRefreshHandler.sendEmptyMessage(0);
 				mTableRefreshHandler.sendEmptyMessage(0);
 				((AutoCompleteTextView) getView().findViewById(R.id.editText_table_num)).setText("");
-				Toast.makeText(TablePanelFragment.this.getActivity(), "餐台信息刷新成功",	Toast.LENGTH_SHORT).show();
+				Toast.makeText(TablePanelFragment.this.getActivity(), "餐台信息刷新成功", Toast.LENGTH_SHORT).show();
 			} 
 		}
 	}

@@ -40,12 +40,12 @@ import com.wireless.fragment.ThumbnailFragment.OnThumbnailChangedListener;
 import com.wireless.ordermenu.BuildConfig;
 import com.wireless.ordermenu.R;
 import com.wireless.parcel.FoodParcel;
-import com.wireless.parcel.TableParcel;
 import com.wireless.pojo.menuMgr.DepartmentTree;
 import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.menuMgr.FoodList;
 import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.pojo.regionMgr.Table;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.util.imgFetcher.ImageResizer;
 
 public class MainActivity extends Activity  
@@ -202,20 +202,27 @@ public class MainActivity extends Activity
 		OptionBarFragment bar = (OptionBarFragment)this.getFragmentManager().findFragmentById(R.id.bottombar);
 		bar.setBackButtonDisable();
 		
-		//当读取到餐台锁定信息时
-		SharedPreferences pref = this.getSharedPreferences(Params.TABLE_ID, MODE_PRIVATE);
-		if(pref.contains(Params.TABLE_ID)){
-			int tableId = pref.getInt(Params.TABLE_ID, 1);
-			bar.setTable(tableId);
-			OptionBarFragment.setTableFixed(true);
+		//餐台锁定时读取到锁定的餐台信息
+		SharedPreferences pref = getSharedPreferences(Params.PREFS_NAME, MODE_PRIVATE);
+		if(pref.getBoolean(Params.TABLE_FIXED, false)){
+			int tableId = pref.getInt(Params.TABLE_ID, -1);
+			for(Table t : WirelessOrder.tables){
+				if(t.getAliasId() == tableId){
+					ShoppingCart.instance().setDestTable(t);
+					break;
+				}
+			}
 		}
 		
-		//读取服务员锁定信息
-		pref = this.getSharedPreferences(Params.PREFS_NAME, MODE_PRIVATE);
-		if(pref.contains(Params.IS_FIX_STAFF)){
-			int staffPin = pref.getInt(Params.STAFF_ID, -1);
-			bar.setStaff(staffPin);
-			OptionBarFragment.setStaffFixed(true);
+		//服务员锁定时读取锁定的服务员信息
+		if(pref.getBoolean(Params.STAFF_FIXED, false)){
+			int staffId = pref.getInt(Params.STAFF_ID, -1);
+			for(Staff s : WirelessOrder.staffs){
+				if(s.getId() == staffId){
+					ShoppingCart.instance().setStaff(s);
+					break;
+				}
+			}
 		}
 	}
 
@@ -238,7 +245,6 @@ public class MainActivity extends Activity
 		.setPositiveButton("确定", new DialogInterface.OnClickListener(){
 			@Override 
 			public void onClick(DialogInterface dialog, int which) {
-				ShoppingCart.instance().clear();
 				MainActivity.super.onBackPressed();
 			}
 		})
@@ -247,7 +253,6 @@ public class MainActivity extends Activity
 
 	@Override
 	protected void onDestroy() {
-		//XXX 修复横竖屏切换死机的问题,OOM
 		mCurrentView = VIEW_NONE;
 		super.onDestroy();
 	}
@@ -321,15 +326,27 @@ public class MainActivity extends Activity
 	        	break;
 	        	
 	        case SettingsActivity.SETTING_RES_CODE:
-	        	Table table = data.getParcelableExtra(TableParcel.KEY_VALUE);
-	        	if(table != null)
-	        		((OptionBarFragment)this.getFragmentManager().findFragmentById(R.id.bottombar)).onTableChanged(table);
-	        	
-	        	if(data.getBooleanExtra(SettingsActivity.FOODS_REFRESHED, false))
-	        	{
-	        		//如果包含刷新项，则刷新全部数据
-	        		//TODO
-	        		//refreshDatas(mDataHolder);
+	        	//如果绑定餐台, 设置餐台并更新OptionBar
+	        	if(getSharedPreferences(Params.PREFS_NAME, MODE_PRIVATE).getBoolean(Params.TABLE_FIXED, false)){
+	        		int tableAlias = getSharedPreferences(Params.PREFS_NAME, MODE_PRIVATE).getInt(Params.TABLE_ID, -1);
+	        		for(Table t : WirelessOrder.tables){
+	        			if(t.getAliasId() == tableAlias){
+	        				ShoppingCart.instance().setDestTable(t);
+	        			}
+	        		}
+	        	}else{
+	        		ShoppingCart.instance().setDestTable(null);
+	        	}
+	        	//如果绑定服务员, 设置服务员并更新OptionBar
+	        	if(getSharedPreferences(Params.PREFS_NAME, MODE_PRIVATE).getBoolean(Params.STAFF_FIXED, false)){
+	        		int staffId = getSharedPreferences(Params.PREFS_NAME, MODE_PRIVATE).getInt(Params.STAFF_ID, -1);
+	        		for(Staff s : WirelessOrder.staffs){
+	        			if(s.getId() == staffId){
+	        				ShoppingCart.instance().setStaff(s);
+	        			}
+	        		}
+	        	}else{
+	        		ShoppingCart.instance().setStaff(null);
 	        	}
 	        	break;
 	        	

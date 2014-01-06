@@ -6,8 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.app.Fragment;
-import android.content.Context;
-import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -23,7 +21,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.wireless.common.Params;
 import com.wireless.common.ShoppingCart;
 import com.wireless.common.WirelessOrder;
 import com.wireless.ordermenu.R;
@@ -39,21 +36,20 @@ import com.wireless.pojo.staffMgr.Staff;
  *
  */
 public class StaffPanelFragment extends Fragment {
+	
+	public final static String TAG = "StaffPanelFragment";
+	
 	private Staff mStaff;
 	private TextView mServerIdTextView;
 	private EditText mServerPswdEditText;
 	private ImageView mCorrectIcon;
 
 
-	private OnStaffChangedListener mOnStaffChangedListener;
 	private PswdTextWatcher mPswdTextWatcher;
 	
-	public static interface OnStaffChangedListener{
-		void onStaffChanged(Staff staff, String id, String pwd);
-	}
-	
-	public void setOnStaffChangeListener(OnStaffChangedListener l){
-		mOnStaffChangedListener = l;
+	public static StaffPanelFragment newInstance(){
+		StaffPanelFragment fgm = new StaffPanelFragment();
+		return fgm;
 	}
 	
 	@Override
@@ -225,32 +221,17 @@ public class StaffPanelFragment extends Fragment {
 					//储存这个服务员
 					ShoppingCart.instance().setStaff(mStaff);
 					
-					//保存staff pin到文件里面
-					Editor editor = getActivity().getSharedPreferences(Params.PREFS_NAME, Context.MODE_PRIVATE).edit();//获取编辑器
-					editor.putInt(Params.STAFF_ID, mStaff.getId());
-					if(OptionBarFragment.isStaffFixed())
-					{
-						editor.putBoolean(Params.IS_FIX_STAFF, true);
-					}
-					//提交修改
-					editor.commit();	
 					//set the pin generator according to the staff login
 					WirelessOrder.loginStaff = mStaff;
 					
-					//通知观察者
-					if(mOnStaffChangedListener != null)
-						mOnStaffChangedListener.onStaffChanged(mStaff, null,null);
 				//密码错误
 				}else{		
 					mCorrectIcon.setBackgroundResource(R.drawable.staff_wrong);
 					Toast.makeText(getActivity(), "密码错误", Toast.LENGTH_SHORT).show();
 					mCorrectIcon.setVisibility(View.VISIBLE);
 					ShoppingCart.instance().setStaff(null);
-					//通知观察者
-					if(mOnStaffChangedListener != null)
-						mOnStaffChangedListener.onStaffChanged(mStaff, null,null);
-					}
-				
+					
+				}				
 			}catch(NoSuchAlgorithmException e) {
 				Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_SHORT).show();
 			}

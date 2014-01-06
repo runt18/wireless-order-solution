@@ -13,14 +13,11 @@ import android.preference.PreferenceActivity;
 import android.view.View;
 import android.widget.ListView;
 
-import com.wireless.common.ShoppingCart.OnTableChangedListener;
 import com.wireless.common.WirelessOrder;
 import com.wireless.ordermenu.R;
-import com.wireless.parcel.TableParcel;
 import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.menuMgr.FoodList;
 import com.wireless.pojo.menuMgr.FoodMenu;
-import com.wireless.pojo.regionMgr.Table;
 
 /**
  * This activity will display some setting headers, all header are define 
@@ -33,15 +30,13 @@ import com.wireless.pojo.regionMgr.Table;
  * @author ggdsn1
  *
  */
-public class SettingsActivity extends PreferenceActivity  implements OnTableChangedListener{
+public class SettingsActivity extends PreferenceActivity{
 
 	public static final String SETTINGS_IP = "settingIP";
 	public static final int SETTING_RES_CODE = 131;
 	public static final String FOODS_REFRESHED = "food_refreshed";
 	
 	private boolean isFoodChanged;
-
-	private Table mTable;
 
 	@Override
 	public void onBuildHeaders(List<Header> target) {
@@ -68,11 +63,6 @@ public class SettingsActivity extends PreferenceActivity  implements OnTableChan
 		Intent intent = new Intent();
 		Bundle bundle = new Bundle();
 
-		//如果绑定了餐台，则传回餐台
-		if(mTable != null){
-			bundle.putParcelable(TableParcel.KEY_VALUE, new TableParcel(mTable));
-		}
-
 		if(isFoodChanged){
 			bundle.putBoolean(FOODS_REFRESHED, true);
 		}
@@ -82,11 +72,6 @@ public class SettingsActivity extends PreferenceActivity  implements OnTableChan
 		super.onBackPressed();
 	}
 	
-	@Override
-	public void onTableChanged(Table table) {
-		mTable = table;
-	}
-
 	/**
 	 * the task to refresh the food menu, all new foods will be sort by it's id
 	 * @author ggdsn1

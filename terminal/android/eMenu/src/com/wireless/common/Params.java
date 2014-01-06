@@ -11,10 +11,11 @@ public final class Params {
 	public final static String IP_PORT = "IPPort";
 	//The pin to login staff
 	public final static String STAFF_ID = "StaffPin";
-	public final static String IS_FIX_STAFF = "IsFixStaff";
+	public final static String STAFF_FIXED = "isFixStaff";
 	//The last pick food category
 	public final static String LAST_PICK_CATE = "LastPickCate";
 	// the table id
+	public final static String TABLE_FIXED = "isTableFixed";
 	public final static String TABLE_ID = "TableId";
 	
 	/* The setting value to print setting */

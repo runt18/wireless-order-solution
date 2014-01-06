@@ -26,8 +26,8 @@ import android.util.Log;
 import android.widget.TextView;
 
 import com.wireless.common.Params;
+import com.wireless.common.ShoppingCart;
 import com.wireless.common.WirelessOrder;
-import com.wireless.lib.task.CheckVersionTask;
 import com.wireless.lib.task.PicDownloadTask;
 import com.wireless.ordermenu.R;
 import com.wireless.pojo.menuMgr.Food;
@@ -64,15 +64,16 @@ public class StartupActivity extends Activity {
 			ServerConnector.instance().setNetAddr(sharedPrefs.getString(Params.IP_ADDR,Params.DEF_IP_ADDR));
 			ServerConnector.instance().setNetPort(sharedPrefs.getInt(Params.IP_PORT, Params.DEF_IP_PORT));
 		}
-    		
+    	
+		//初始化购物车的数据
+		ShoppingCart.instance().init(getApplicationContext());
     }
     
     @Override
 	protected void onStart(){
 		super.onStart();
 		if(isNetworkAvail()){
-			//FIXME
-			new MatchPinTask().execute();
+			new QueryStaffTask().execute();
 		}else{
 			showNetSetting();
 		}		
@@ -126,58 +127,6 @@ public class StartupActivity extends Activity {
  		    })
 			.show();
 
-	}
-	
-	/**
-	 * 从SDCard中读取PIN的验证信息
-	 */
-	private class MatchPinTask extends com.wireless.lib.task.MatchPinTask{
-		
-		MatchPinTask(){
-			super(StartupActivity.this);
-		}
-		
-		/**
-		 * 在读取Pin信息前显示提示信息
-		 */
-		@Override
-		protected void onPreExecute(){			
-			mMsgTxtView.setText("正在读取验证PIN码...请稍候");
-		}		
-		
-		/**
-		 * 如果读取成功，执行QueryStaff的操作。
-		 * 否则提示用户错误信息。
-		 */
-		@Override
-		protected void onPostExecute(Void result){
-			if(mErrMsg != null){
-				new AlertDialog.Builder(StartupActivity.this)
-				.setTitle("提示")
-				.setMessage(mErrMsg)
-				.setPositiveButton("确定", new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int id) {
-						finish();
-					}
-				})
- 		    	.setNeutralButton("设置", new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						Intent intent = new Intent(StartupActivity.this, SettingsActivity.class);
-						intent.putExtra(SettingsActivity.SETTINGS_IP, true);
-						startActivity(intent);					
-					}
- 		    	}).show();				
-				
-			}else{
-				new com.wireless.lib.task.CheckVersionTask(StartupActivity.this, CheckVersionTask.E_MENU){
-					@Override
-					public void onCheckVersionPass() {
-						new QueryStaffTask().execute();
-					}					
-				}.execute();
-			}
-		}
 	}
 	
 	private class QueryStaffTask extends com.wireless.lib.task.QueryStaffTask{
@@ -498,7 +447,7 @@ public class StartupActivity extends Activity {
 		 * 如果成功，则执行请求餐厅的操作。
 		 */
 		@Override
-		protected void onPostExecute(Table[] tables){
+		protected void onPostExecute(List<Table> tables){
 			/**
 			 * Prompt user message if any error occurred.
 			 */		
