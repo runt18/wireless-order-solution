@@ -1218,8 +1218,6 @@ public class CalcBillStatisticsDao {
 			CommissionStatistics c = new CommissionStatistics();
 			c.setOrderId(dbCon.rs.getInt("order_id"));
 			c.setOrderDate(dbCon.rs.getTimestamp("order_date").getTime());
-			Food food = new Food();
-			food.setFoodId(dbCon.rs.getInt("food_id"));
 			c.setFoodName(dbCon.rs.getString("name"));
 			Department dept = DepartmentDao.getDepartmentById(staff, dbCon.rs.getInt("dept_id"));
 			c.setDept(dept);
