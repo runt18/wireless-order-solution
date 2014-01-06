@@ -2,6 +2,7 @@ package com.wireless.db.client.member;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import com.mysql.jdbc.Statement;
@@ -135,7 +136,7 @@ public class MemberLevelDao {
 				memberLevel.getRestaurantId() + "," +
 				levelId + ", " +
 				memberLevel.getPointThreshold() + "," +
-				memberLevel.getMemberType().getTypeId() + ")";
+				memberLevel.getMemberType().getId() + ")";
 		
 		dbCon.stmt.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
 		dbCon.rs = dbCon.stmt.getGeneratedKeys();
@@ -183,7 +184,7 @@ public class MemberLevelDao {
 		String sql;
 		int levelId = 0;
 		//判断会员类型是否有所属
-		isMemberTypeBelong(dbCon, staff, memberLevel.getId(), memberLevel.getMemberType().getTypeId());
+		isMemberTypeBelong(dbCon, staff, memberLevel.getId(), memberLevel.getMemberType().getId());
 		//获取自身等级id
 		sql = "SELECT level_id FROM " + Params.dbName + ".member_level WHERE id = " + memberLevel.getId();
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
@@ -209,7 +210,7 @@ public class MemberLevelDao {
 		sql = "UPDATE " + Params.dbName + ".member_level SET " +
 						" id = " + memberLevel.getId() +
 						(builder.isPointThresholdChange()?" ,point_threshold = " + memberLevel.getPointThreshold() : "")+
-						(builder.isMemberTypeIdChange()?" ,member_type_id = " + memberLevel.getMemberType().getTypeId() : "") +
+						(builder.isMemberTypeIdChange()?" ,member_type_id = " + memberLevel.getMemberType().getId() : "") +
 					  " WHERE id = " + memberLevel.getId();
 		dbCon.stmt.executeUpdate(sql);
 	}
@@ -242,49 +243,67 @@ public class MemberLevelDao {
 	
 	/**
 	 * Get the list of memberLevel.
-	 * @param restaurantId
-	 * @return
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @return the result of member level
 	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
 	 * @throws BusinessException 
+	 * 	 		throws if the any member type in levels does NOT exist
 	 */
 	public static List<MemberLevel> getMemberLevels(Staff staff) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return getMemberLevels(dbCon,staff,null, null);
+			return getMemberLevels(dbCon, staff);
 		}finally{
 			dbCon.disconnect();
 		}
 	}
+	
+	/**
+	 * Get the list of memberLevel.
+	 * @param dbCon
+	 * 			the database connection 
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @return the result of member level
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException 
+	 * 	 		throws if the any member type in levels does NOT exist
+	 */
+	public static List<MemberLevel> getMemberLevels(DBCon dbCon, Staff staff) throws SQLException, BusinessException{
+		return getMemberLevels(dbCon, staff, null, null);
+	}
+	
 	/**
 	 * Get the list of memberLevel by extra condition.
 	 * @param dbCon
 	 * @param restaurantId
 	 * @param extraCond
 	 * @param otherClause
-	 * @return
-	 * @throws SQLException
+	 * @return the result of member level
 	 * @throws BusinessException 
-	 * 			throw if 该会员类型不存在或已被删除
+	 * 	 		throws if the any member type in levels does NOT exist
 	 */
 	private static List<MemberLevel> getMemberLevels(DBCon dbCon, Staff staff, String extraCond, String otherClause) throws SQLException, BusinessException{
 		List<MemberLevel> list = new ArrayList<MemberLevel>();
 		String sql = "SELECT ML.* FROM " + Params.dbName + ".member_level ML" +
 					" WHERE ML.restaurant_id = " + staff.getRestaurantId() +
-					(extraCond != null ? extraCond : "")+
+					(extraCond != null ? extraCond : " ")+
 					(otherClause != null ? otherClause : " ORDER BY level_id");
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		while(dbCon.rs.next()){
-			MemberLevel mLevel = new MemberLevel();
+			MemberLevel mLevel = new MemberLevel(dbCon.rs.getInt("id"));
 			MemberType mType = MemberTypeDao.getMemberTypeById(staff, dbCon.rs.getInt("member_type_id"));
-			mLevel.setId(dbCon.rs.getInt("id"));
 			mLevel.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
 			mLevel.setLevelId(dbCon.rs.getInt("level_id"));
 			mLevel.setPointThreshold(dbCon.rs.getInt("point_threshold"));
 			mLevel.setMemberType(mType);
 			list.add(mLevel);
 		}
-		return list;
+		return Collections.unmodifiableList(list);
 	}
 	
 	/**

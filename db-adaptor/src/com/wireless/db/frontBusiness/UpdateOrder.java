@@ -21,7 +21,6 @@ import com.wireless.exception.StaffError;
 import com.wireless.pojo.crMgr.CancelReason;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.OrderFood;
-import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.staffMgr.Staff;
@@ -309,7 +308,7 @@ public class UpdateOrder {
 			
 			sql = " INSERT INTO " + Params.dbName + ".order_food " +
 				  " ( " + 
-				  " `restaurant_id`, `order_id`, `food_id`, `food_alias`, `order_count`, `unit_price`, `name`, `food_status`, " +
+				  " `restaurant_id`, `order_id`, `food_id`, `food_alias`, `order_count`, `unit_price`, `commission`, `name`, `food_status`, " +
 				  " `discount`, `taste_group_id`, " +
 				  " `dept_id`, `kitchen_id`, `kitchen_alias`, " +
 				  " `staff_id`, `waiter`, `order_date`, `is_temporary`, `is_paid` " +
@@ -321,8 +320,9 @@ public class UpdateOrder {
 				  (extraFood.getFoodId() == 0 ? "NULL" : extraFood.getFoodId()) + ", " +
 				  extraFood.getAliasId() + ", " + 
 				  extraFood.getCount() + ", " + 
-				  extraFood.getPrice() + ", '" + 
-				  extraFood.getName() + "', " + 
+				  extraFood.getPrice() + ", " + 
+				  extraFood.asFood().getCommission() + ", " +
+				  "'" + extraFood.getName() + "', " + 
 				  extraFood.asFood().getStatus() + ", " +
 				  extraFood.getDiscount() + ", " +
 				  (extraFood.hasTasteGroup() ? extraFood.getTasteGroup().getGroupId() : TasteGroup.EMPTY_TASTE_GROUP_ID) + ", " +
@@ -343,7 +343,7 @@ public class UpdateOrder {
 
 			sql = " INSERT INTO `" + Params.dbName + "`.`order_food` " +
 				  " ( " +
-				  " `restaurant_id`, `order_id`, `food_id`, `food_alias`, `order_count`, `unit_price`, `name`, `food_status`, " +
+				  " `restaurant_id`, `order_id`, `food_id`, `food_alias`, `order_count`, `unit_price`, `commission`, `name`, `food_status`, " +
 				  " `discount`, `taste_group_id`, `cancel_reason_id`, `cancel_reason`, " +
 				  " `dept_id`, `kitchen_id`, `kitchen_alias`, " +
 				  " `staff_id`, `waiter`, `order_date`, `is_temporary`, `is_paid`) VALUES (" +
@@ -353,6 +353,7 @@ public class UpdateOrder {
 				  cancelledFood.getAliasId() + ", " + 
 				  "-" + cancelledFood.getCount() + ", " + 
 				  cancelledFood.getPrice() + ", " + 
+				  cancelledFood.asFood().getCommission() + "," +
 				  "'" + cancelledFood.getName() + "', " + 
 				  cancelledFood.asFood().getStatus() + ", " +
 				  cancelledFood.getDiscount() + ", " +
@@ -457,16 +458,19 @@ public class UpdateOrder {
 			
 		}else{
 			//Get the details to each order food			
-			Food detailFood = FoodDao.getFoodByAlias(dbCon, staff, foodToFill.getAliasId());
+//			Food detailFood = FoodDao.getFoodByAlias(dbCon, staff, foodToFill.getAliasId());
+//			
+//			foodToFill.asFood().setFoodId(detailFood.getFoodId());
+//			foodToFill.asFood().setAliasId(detailFood.getAliasId());
+//			foodToFill.asFood().setRestaurantId(detailFood.getRestaurantId());
+//			foodToFill.asFood().setStatus(detailFood.getStatus());
+//			foodToFill.asFood().setName(detailFood.getName());
+//			foodToFill.asFood().setPrice(detailFood.getPrice());
+//			foodToFill.asFood().setCommission(detailFood.getCommission());
+//			foodToFill.asFood().setKitchen(detailFood.getKitchen());
+//			foodToFill.asFood().setChildFoods(detailFood.getChildFoods());
 			
-			foodToFill.asFood().setFoodId(detailFood.getFoodId());
-			foodToFill.asFood().setAliasId(detailFood.getAliasId());
-			foodToFill.asFood().setRestaurantId(detailFood.getRestaurantId());
-			foodToFill.asFood().setStatus(detailFood.getStatus());
-			foodToFill.asFood().setName(detailFood.getName());
-			foodToFill.asFood().setPrice(detailFood.getPrice());
-			foodToFill.asFood().setKitchen(detailFood.getKitchen());
-			foodToFill.asFood().setChildFoods(detailFood.getChildFoods());
+			foodToFill.asFood().copyFrom(FoodDao.getFoodByAlias(dbCon, staff, foodToFill.getAliasId()));
 			
 			//Get the details to each normal tastes.
 			if(foodToFill.hasNormalTaste()){

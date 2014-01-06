@@ -134,6 +134,49 @@ public class StaffDao {
 	}
 	
 	/**
+	 * Get the admin to specific restaurant
+	 * @param restaurantId
+	 * 			the restaurant id
+	 * @return the admin to this restaurant
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if the admin to this restaurant does NOT exist
+	 */
+	public static Staff getAdminByRestaurant(int restaurantId) throws SQLException, BusinessException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return getAdminByRestaurant(dbCon, restaurantId);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Get the admin to specific restaurant
+	 * @param dbCon
+	 * 			the database connection
+	 * @param restaurantId
+	 * 			the restaurant id
+	 * @return the admin to this restaurant
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if the admin to this restaurant does NOT exist
+	 */
+	public static Staff getAdminByRestaurant(DBCon dbCon, int restaurantId) throws SQLException, BusinessException{
+		String sql;
+		sql = " SELECT role_id FROM " + Params.dbName + ".role WHERE cate = " + Role.Category.ADMIN.getVal();
+		List<Staff> result = getStaffs(dbCon, " AND STAFF.restaurant_id = " + restaurantId + " AND STAFF.role_id IN ( " + sql + ")" , null);
+		if(result.isEmpty()){
+			throw new BusinessException(StaffError.STAFF_NOT_EXIST);
+		}else{
+			return result.get(0);
+		}
+	}
+	
+	/**
 	 * Get the staff by specific id.
 	 * @param staffId
 	 * 			the staff id 
@@ -210,6 +253,18 @@ public class StaffDao {
 		return getStaffs(dbCon, " AND STAFF.restaurant_id = " + restaurantId, null);
 	}
 	
+	/**
+	 * Get staff which is like specific name.
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param staffName
+	 * 			the staff name to get
+	 * @return the result to staff like the name
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if any role to the staff does NOT exist
+	 */
 	public static List<Staff> getStaffsByName(Staff staff, String staffName) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
@@ -220,10 +275,78 @@ public class StaffDao {
 		}
 	}
 	
+	/**
+	 * Get staff which is like specific name.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param staffName
+	 * 			the staff name to get
+	 * @return the result to staff like the name
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if any role to the staff does NOT exist
+	 */
 	public static List<Staff> getStaffsByName(DBCon dbCon, Staff staff, String staffName) throws SQLException, BusinessException{
 		return getStaffs(dbCon, " AND STAFF.restaurant_id = " + staff.getRestaurantId() + " AND STAFF.name like '%" + staffName + "%'", null);
 	}
 	
+	/**
+	 * Get the staffs by specific role category
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param cate
+	 * 			the role category
+	 * @return the staffs to this role category
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if any role to the staff does NOT exist
+	 */
+	public static List<Staff> getStaffsByRoleCate(Staff staff, Role.Category cate) throws SQLException, BusinessException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return getStaffsByRoleCate(dbCon, staff, cate);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Get the staffs by specific role category
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param cate
+	 * 			the role category
+	 * @return the staffs to this role category
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if any role to the staff does NOT exist
+	 */
+	public static List<Staff> getStaffsByRoleCate(DBCon dbCon, Staff staff, Role.Category cate) throws SQLException, BusinessException{
+		String sql;
+		sql = " SELECT role_id FROM " + Params.dbName + ".role WHERE cate = " + cate.getVal();
+		return Collections.unmodifiableList(getStaffs(dbCon, " AND STAFF.restaurant_id = " + staff.getRestaurantId() + " AND STAFF.role_id IN ( " + sql + ")" , null));
+	}
+	
+	/**
+	 * Get the staff to specific role
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param roleId
+	 * 			the id to the role
+	 * @return the staffs to specific role
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if any role to the staff does NOT exist
+	 */
 	public static List<Staff> getStaffsByRoleId(Staff staff, int roleId) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
@@ -234,6 +357,20 @@ public class StaffDao {
 		}
 	}
 	
+	/**
+	 * Get the staff to specific role
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param roleId
+	 * 			the id to the role
+	 * @return the staffs to specific role
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if any role to the staff does NOT exist
+	 */
 	public static List<Staff> getStaffsByRoleId(DBCon dbCon, Staff staff, int roleId) throws SQLException, BusinessException{
 		return getStaffs(dbCon, " AND STAFF.restaurant_id = " + staff.getRestaurantId() + " AND STAFF.role_id = " + roleId , null);
 	}

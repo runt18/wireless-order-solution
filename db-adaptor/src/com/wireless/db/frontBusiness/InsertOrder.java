@@ -17,7 +17,6 @@ import com.wireless.exception.ProtocolError;
 import com.wireless.exception.StaffError;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.OrderFood;
-import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.staffMgr.Staff;
@@ -191,15 +190,18 @@ public class InsertOrder {
 						
 					}else{		
 						//Get the details to each order food.
-						Food detailFood = FoodDao.getFoodByAlias(dbCon, staff, of.getAliasId());
-						of.asFood().setFoodId(detailFood.getFoodId());
-						of.asFood().setAliasId(detailFood.getAliasId());
-						of.asFood().setRestaurantId(detailFood.getRestaurantId());
-						of.asFood().setName(detailFood.getName());
-						of.asFood().setStatus(detailFood.getStatus());
-						of.asFood().setPrice(detailFood.getPrice());
-						of.asFood().setKitchen(detailFood.getKitchen());
-						of.asFood().setChildFoods(detailFood.getChildFoods());
+//						Food detailFood = FoodDao.getFoodByAlias(dbCon, staff, of.getAliasId());
+//						of.asFood().setFoodId(detailFood.getFoodId());
+//						of.asFood().setAliasId(detailFood.getAliasId());
+//						of.asFood().setRestaurantId(detailFood.getRestaurantId());
+//						of.asFood().setName(detailFood.getName());
+//						of.asFood().setStatus(detailFood.getStatus());
+//						of.asFood().setPrice(detailFood.getPrice());
+//						of.asFood().setCommission(detailFood.getCommission());
+//						of.asFood().setKitchen(detailFood.getKitchen());
+//						of.asFood().setChildFoods(detailFood.getChildFoods());
+						
+						of.asFood().copyFrom(FoodDao.getFoodByAlias(dbCon, staff, of.getAliasId()));
 						
 						//Check to see whether the staff has the privilege to present the food.
 						if(of.asFood().isGift() && !staff.getRole().hasPrivilege(Privilege.Code.GIFT)){
@@ -356,7 +358,7 @@ public class InsertOrder {
 			//insert the record to table "order_food"
 			sql = " INSERT INTO `" + Params.dbName + "`.`order_food` " +
 				  " ( " +
-				  " `restaurant_id`, `order_id`, `food_id`, `food_alias`, `order_count`, `unit_price`, `name`, " +
+				  " `restaurant_id`, `order_id`, `food_id`, `food_alias`, `order_count`, `unit_price`, `commission`, `name`, " +
 				  " `food_status`, `discount`, `taste_group_id`, " +
 				  " `dept_id`, `kitchen_id`, `kitchen_alias`, " +
 				  " `staff_id`, `waiter`, `order_date`, `is_temporary` " +
@@ -368,7 +370,8 @@ public class InsertOrder {
 				  (foodToInsert.getFoodId() == 0 ? "NULL" : foodToInsert.getFoodId()) + ", " +
 				  foodToInsert.getAliasId() + ", " + 
 				  foodToInsert.getCount() + ", " + 
-				  foodToInsert.getPrice() + ", '" + 
+				  foodToInsert.getPrice() + ", " + 
+				  foodToInsert.asFood().getCommission() + ",'" +
 				  foodToInsert.getName() + "', " +
 				  foodToInsert.asFood().getStatus() + ", " +
 				  foodToInsert.getDiscount() + ", " +

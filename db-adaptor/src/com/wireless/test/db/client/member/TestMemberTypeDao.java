@@ -35,7 +35,7 @@ public class TestMemberTypeDao {
 	}
 	
 	private void compare(MemberType expected, MemberType actual){
-		assertEquals("member type id", expected.getTypeId(), actual.getTypeId());
+		assertEquals("member type id", expected.getId(), actual.getId());
 		assertEquals("member type name", expected.getName(), actual.getName());
 		assertEquals("type to member type", expected.getType(), actual.getType());
 		assertEquals("member type attribute", expected.getAttribute().getVal(), actual.getAttribute().getVal());
@@ -61,7 +61,7 @@ public class TestMemberTypeDao {
 			
 			MemberType expected = builder.build();
 			memberTypeId = MemberTypeDao.insert(mStaff, builder);
-			expected.setTypeId(memberTypeId);
+			expected.setId(memberTypeId);
 			
 			MemberType actual = MemberTypeDao.getMemberTypeById(mStaff, memberTypeId);
 			compare(expected, actual);

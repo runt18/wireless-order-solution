@@ -64,7 +64,7 @@ public class TestWeixinMemberDao {
 			try{
 				//Test to bind a new member
 				Member.InsertBuilder builder = new Member.InsertBuilder(restaurant.getId(), "张菁洋", "18520590932", 
-																		MemberTypeDao.getWeixinMemberType(staff).getTypeId(), 
+																		MemberTypeDao.getWeixinMemberType(staff).getId(), 
 																		Member.Sex.FEMALE);
 				memberId = WeixinMemberDao.bindNewMember(builder, WEIXIN_MEMBER_SERIAL, WEIXIN_RESTAURANT_SERIAL);
 				

@@ -323,7 +323,7 @@ public class OrderFoodDao {
 		sql = "SELECT OF.order_id, OF.food_alias, OF.taste_group_id, OF.is_temporary, " +
 				" MAX(OF.restaurant_id) AS restaurant_id, MAX(OF.kitchen_alias) AS kitchen_alias, MAX(OF.kitchen_id) AS kitchen_id, " + 
 				" MAX(OF.food_id) AS food_id, MAX(OF.name) AS name, MAX(OF.food_status) AS food_status, " +
-				" MAX(OF.unit_price) AS unit_price, MAX(OF.waiter) AS waiter, MAX(OF.order_date) AS order_date, MAX(OF.discount) AS discount, " +
+				" MAX(OF.unit_price) AS unit_price, MAX(OF.commission) AS commission, MAX(OF.waiter) AS waiter, MAX(OF.order_date) AS order_date, MAX(OF.discount) AS discount, " +
 				" MAX(OF.dept_id) AS dept_id, MAX(OF.id) AS id, MAX(OF.order_date) AS pay_datetime, SUM(OF.order_count) AS order_sum " +
 				" FROM " +
 				Params.dbName +	".order_food OF " +
@@ -349,6 +349,7 @@ public class OrderFoodDao {
 			}
 			food.setCount(dbCon.rs.getFloat("order_sum"));
 			food.asFood().setPrice(dbCon.rs.getFloat("unit_price"));
+			food.asFood().setCommission(dbCon.rs.getFloat("commission"));
 			food.setOrderDate(dbCon.rs.getTimestamp("pay_datetime").getTime());
 			food.setWaiter(dbCon.rs.getString("waiter"));
 			food.getKitchen().setRestaurantId(dbCon.rs.getInt("restaurant_id"));
@@ -429,7 +430,7 @@ public class OrderFoodDao {
 		sql = "SELECT OFH.order_id, OFH.food_alias, OFH.taste_group_id, OFH.is_temporary, " +
 			  " MAX(OFH.restaurant_id) AS restaurant_id, MAX(OFH.kitchen_alias) AS kitchen_alias, MAX(OFH.kitchen_id) AS kitchen_id, " +
 			  " MAX(OFH.food_id) AS food_id, MAX(OFH.name) AS name, MAX(OFH.food_status) AS food_status, " +
-			  " MAX(OFH.unit_price) AS unit_price, MAX(OFH.waiter) AS waiter, MAX(OFH.order_date) AS order_date, MAX(OFH.discount) AS discount, " +
+			  " MAX(OFH.unit_price) AS unit_price, MAX(OFH.commission) AS commission, MAX(OFH.waiter) AS waiter, MAX(OFH.order_date) AS order_date, MAX(OFH.discount) AS discount, " +
 			  " MAX(OFH.dept_id) AS dept_id, MAX(OFH.id) AS id, MAX(OFH.order_date) AS pay_datetime, SUM(OFH.order_count) AS order_sum " +
 			  " FROM " +
 			  Params.dbName + ".order_food_history OFH " +
@@ -454,6 +455,7 @@ public class OrderFoodDao {
 			}
 			food.setCount(dbCon.rs.getFloat("order_sum"));
 			food.asFood().setPrice(dbCon.rs.getFloat("unit_price"));
+			food.asFood().setCommission(dbCon.rs.getFloat("commission"));
 			food.setWaiter(dbCon.rs.getString("waiter"));
 			food.setOrderDate(dbCon.rs.getTimestamp("pay_datetime").getTime());
 			food.getKitchen().setRestaurantId(dbCon.rs.getInt("restaurant_id"));

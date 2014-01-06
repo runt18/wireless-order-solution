@@ -153,7 +153,7 @@ public class DailySettleDao {
 		
 		String sql;
 		
-		List<Staff> terms = new ArrayList<Staff>();
+		List<Staff> staffs = new ArrayList<Staff>();
 		
 		//Filter the restaurant whose order record exceed 1 day.
 		sql = " SELECT restaurant_id " +
@@ -166,16 +166,16 @@ public class DailySettleDao {
 			  " HAVING TO_DAYS(NOW()) - TO_DAYS(MIN(order_date)) > 1 ";
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		while(dbCon.rs.next()){
-			Staff term = new Staff();
-			term.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
-			term.setName("system");
-			terms.add(term);
+			Staff s = new Staff();
+			s.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
+			s.setName("system");
+			staffs.add(s);
 		}
 		dbCon.rs.close();		
 		
 		Result result = new Result();
-		for(Staff term : terms){			
-			Result eachResult = exec(dbCon, term, SettleType.AUTO_MATION);
+		for(Staff staff : staffs){			
+			Result eachResult = exec(dbCon, staff, SettleType.AUTO_MATION);
 			
 			result.setTotalOrder(result.getTotalOrder() + eachResult.getTotalOrder());
 			result.setTotalOrderDetail(result.getTotalOrderDetail()	+ eachResult.getTotalOrderDetail());
@@ -683,7 +683,7 @@ public class DailySettleDao {
 	private static void moveOrderFood(DBCon dbCon, String orderIdCond) throws SQLException{
 		
 		final String orderFoodItem = "`id`,`restaurant_id`, `order_id`, `food_id`, `food_alias`, `order_date`, `order_count`," + 
-				"`unit_price`,`name`, `food_status`, `taste_group_id`, `cancel_reason_id`, `cancel_reason`," +
+				"`unit_price`, `commission`, `name`, `food_status`, `taste_group_id`, `cancel_reason_id`, `cancel_reason`," +
 				"`discount`, `dept_id`, `kitchen_id`, `kitchen_alias`," +
 				"`staff_id`, `waiter`, `is_temporary`, `is_paid`";
 

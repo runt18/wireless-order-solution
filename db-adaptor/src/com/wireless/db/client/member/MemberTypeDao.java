@@ -46,7 +46,7 @@ public class MemberTypeDao {
 		dbCon.stmt.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
 		dbCon.rs = dbCon.stmt.getGeneratedKeys();
 		if(dbCon.rs.next()){
-			mt.setTypeId(dbCon.rs.getInt(1));
+			mt.setId(dbCon.rs.getInt(1));
 		}else{
 			throw new SQLException("Failed to generated the discount id.");
 		}
@@ -56,7 +56,7 @@ public class MemberTypeDao {
 			sql = " INSERT INTO " + Params.dbName + ".member_type_discount" +
 				  " (`member_type_id`, `discount_id`, `type`) " +
 				  " VALUES (" +
-				  mt.getTypeId() + "," +
+				  mt.getId() + "," +
 				  discount.getId() + "," +
 				  MemberType.DiscountType.NORMAL.getVal() + 
 				  ")";
@@ -66,11 +66,11 @@ public class MemberTypeDao {
 		//Update the default discount.
 		sql = " UPDATE " + Params.dbName + ".member_type_discount" +
 			  " SET type = " + MemberType.DiscountType.DEFAULT.getVal() +
-			  " WHERE member_type_id = " + mt.getTypeId() +
+			  " WHERE member_type_id = " + mt.getId() +
 			  " AND discount_id = " + mt.getDefaultDiscount().getId();
 		dbCon.stmt.executeUpdate(sql);
 
-		return mt.getTypeId();
+		return mt.getId();
 	}
 	
 	/**
@@ -283,7 +283,7 @@ public class MemberTypeDao {
 		dbCon.rs.close();
 		
 		for(MemberType eachType : result){
-			sql = " SELECT discount_id, type FROM " + Params.dbName + ".member_type_discount WHERE member_type_id = " + eachType.getTypeId();
+			sql = " SELECT discount_id, type FROM " + Params.dbName + ".member_type_discount WHERE member_type_id = " + eachType.getId();
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
 			while(dbCon.rs.next()){
 				Discount distToMemberType = DiscountDao.getDiscountById(staff, dbCon.rs.getInt("discount_id"));
@@ -422,7 +422,7 @@ public class MemberTypeDao {
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		while(dbCon.rs.next()){
 			MemberType mType = new MemberType(-1);
-			mType.setTypeId(dbCon.rs.getInt("member_type_id"));
+			mType.setId(dbCon.rs.getInt("member_type_id"));
 			mType.setName(dbCon.rs.getString("name"));
 			mType.setAttribute(dbCon.rs.getInt("attribute"));
 			list.add(mType);

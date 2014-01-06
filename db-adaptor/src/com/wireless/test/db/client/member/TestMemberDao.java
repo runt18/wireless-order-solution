@@ -123,7 +123,7 @@ public class TestMemberDao {
 		try{
 			
 			//Insert a new member
-			Member.InsertBuilder builder = new Member.InsertBuilder(mStaff.getRestaurantId(), "张三", "13694260535", memberType.getTypeId(), Sex.FEMALE)
+			Member.InsertBuilder builder = new Member.InsertBuilder(mStaff.getRestaurantId(), "张三", "13694260535", memberType.getId(), Sex.FEMALE)
 													 .setBirthday(DateUtil.parseDate("1981-03-15"))
 													 .setCompany("Digie Co.,Ltd")
 													 .setContactAddr("广州市东圃镇晨晖商务大厦")
@@ -171,7 +171,7 @@ public class TestMemberDao {
 			Member.UpdateBuilder updateBuilder = new Member.UpdateBuilder(memberId, mStaff.getRestaurantId())
 														   .setName("李四")
 														   .setMobile("18520590931")
-														   .setMemberTypeId(memberType.getTypeId())
+														   .setMemberTypeId(memberType.getId())
 														   .setSex(Sex.MALE)
 														   .setBirthday(DateUtil.parseDate("1987-06-29"))
 														   .setCompany("DingDing Tech")

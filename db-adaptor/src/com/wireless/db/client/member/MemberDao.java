@@ -3,27 +3,59 @@ package com.wireless.db.client.member;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
 import com.mysql.jdbc.Statement;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
+import com.wireless.db.restaurantMgr.RestaurantDao;
+import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.MemberError;
 import com.wireless.pojo.client.Member;
 import com.wireless.pojo.client.MemberComment.CommitBuilder;
+import com.wireless.pojo.client.MemberLevel;
 import com.wireless.pojo.client.MemberOperation;
 import com.wireless.pojo.client.MemberOperation.ChargeType;
 import com.wireless.pojo.client.MemberType;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.distMgr.Discount;
 import com.wireless.pojo.menuMgr.Food;
+import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.DateUtil;
+import com.wireless.pojo.util.SortedList;
 import com.wireless.util.SQLUtil;
 
 public class MemberDao {
+	
+	public final static class UpgradeResult{
+		private final int elapsedTime;
+		private final int memberAmount;
+		private final int memberUpgradeAmount;
+		
+		public UpgradeResult(int elapsedTime, int memberAmount, int memberUpgradeAmount) {
+			this.elapsedTime = elapsedTime;
+			this.memberAmount = memberAmount;
+			this.memberUpgradeAmount = memberUpgradeAmount;
+		}
+		
+		public int getElapsedTime(){
+			return this.elapsedTime;
+		}
+		
+		public int getMemberAmount(){
+			return this.memberAmount;
+		}
+		
+		@Override
+		public String toString(){
+			return "The calculation to " + memberUpgradeAmount + "/" + memberAmount + " member(s) upgrade takes " + elapsedTime + " sec.";
+		}
+	}
 	
 	/**
 	 * 
@@ -66,6 +98,76 @@ public class MemberDao {
 		return count;
 	}
 	
+	/**
+	 * Get the pure member by extra condition
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param extraCond
+	 * 			the extra condition
+	 * @param orderClause
+	 * 			the order clause
+	 * @return the result to pure member
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	private static List<Member> getPureMember(DBCon dbCon, Staff staff, String extraCond, String orderClause) throws SQLException{
+		List<Member> result = new ArrayList<Member>();
+		String sql;
+		sql = " SELECT "	+
+			  " M.member_id, M.restaurant_id, M.point, M.used_point, " +
+			  " M.base_balance, M.extra_balance, M.consumption_amount, M.last_consumption, M.used_balance," +
+			  " M.total_consumption, M.total_point, M.total_charge, " +
+			  " M.member_card, M.name AS member_name, M.sex, M.create_date, " +
+			  " M.tele, M.mobile, M.birthday, M.id_card, M.company, M.contact_addr, M.comment, " +
+			  " M.member_type_id " +
+			  " FROM " + Params.dbName + ".member M " +
+			  " WHERE 1 = 1 "	+
+			  " AND M.restaurant_id = " + staff.getRestaurantId() +
+			  (extraCond != null ? extraCond : " ") +
+			  (orderClause != null ? orderClause : "");
+			
+		dbCon.rs = dbCon.stmt.executeQuery(sql);
+		while(dbCon.rs.next()){
+			Member member = new Member();
+			member.setId(dbCon.rs.getInt("member_id"));
+			member.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
+			member.setBaseBalance(dbCon.rs.getFloat("base_balance"));
+			member.setExtraBalance(dbCon.rs.getFloat("extra_balance"));
+			member.setUsedBalance(dbCon.rs.getFloat("used_balance"));
+			member.setConsumptionAmount(dbCon.rs.getInt("consumption_amount"));
+			Timestamp ts = dbCon.rs.getTimestamp("last_consumption");
+			if(ts != null){
+				member.setLastConsumption(ts.getTime());
+			}
+			member.setUsedPoint(dbCon.rs.getInt("used_point"));
+			member.setPoint(dbCon.rs.getInt("point"));
+			member.setTotalConsumption(dbCon.rs.getFloat("total_consumption"));
+			member.setTotalPoint(dbCon.rs.getInt("total_point"));
+			member.setTotalCharge(dbCon.rs.getFloat("total_charge"));
+			member.setMemberCard(dbCon.rs.getString("member_card"));
+			member.setName(dbCon.rs.getString("member_name"));
+			member.setSex(dbCon.rs.getInt("sex"));
+			member.setCreateDate(dbCon.rs.getTimestamp("create_date").getTime());
+			member.setTele(dbCon.rs.getString("tele"));
+			member.setMobile(dbCon.rs.getString("mobile"));
+			ts = dbCon.rs.getTimestamp("birthday");
+			if(ts != null){
+				member.setBirthday(ts.getTime());
+			}
+			member.setIdCard(dbCon.rs.getString("id_card"));
+			member.setCompany(dbCon.rs.getString("company"));
+			member.setContactAddress(dbCon.rs.getString("contact_addr"));
+			
+			member.setMemberType(new MemberType(dbCon.rs.getInt("member_type_id")));
+			
+			result.add(member);
+		}
+		dbCon.rs.close();
+		
+		return Collections.unmodifiableList(result);
+	}
 	
 	/**
 	 * Get member by extra condition.
@@ -82,6 +184,7 @@ public class MemberDao {
 	public static List<Member> getMember(DBCon dbCon, Staff staff, String extraCond, String orderClause) throws SQLException{
 		List<Member> result = new ArrayList<Member>();
 		String sql;
+		//FIXME
 		sql = " SELECT "	+
 			  " M.member_id, M.restaurant_id, M.point, M.used_point, " +
 			  " M.base_balance, M.extra_balance, M.consumption_amount, M.last_consumption, M.used_balance," +
@@ -157,7 +260,7 @@ public class MemberDao {
 			sql = " SELECT MD.discount_id, MD.type, D.name FROM " + Params.dbName + ".member_type_discount MD " +
 					" JOIN " + Params.dbName + ".discount D " +
 					" ON MD.discount_id = D.discount_id " +
-					" WHERE member_type_id = " + eachMember.getMemberType().getTypeId();
+					" WHERE member_type_id = " + eachMember.getMemberType().getId();
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
 			while(dbCon.rs.next()){
 				Discount discount = new Discount(dbCon.rs.getInt("MD.discount_id"));
@@ -441,7 +544,7 @@ public class MemberDao {
 			+ "(member_type_id, member_card, restaurant_id, name, sex, tele, mobile, birthday, " 
 			+ " id_card, company, contact_addr, create_date, point)" 
 			+ " VALUES( " 
-			+ member.getMemberType().getTypeId() 
+			+ member.getMemberType().getId() 
 			+ ",'" + member.getMemberCard() + "'"
 			+ "," + member.getRestaurantId() 
 			+ ",'" + member.getName() + "'" 
@@ -453,7 +556,7 @@ public class MemberDao {
 			+ ",'" + member.getCompany()+ "'"
 			+ ",'" + member.getContactAddress() + "'"
 			+ ",'" + DateUtil.format(member.getCreateDate()) + "'"
-			+ "," + "(SELECT initial_point FROM member_type WHERE member_type_id = " + member.getMemberType().getTypeId() + ")" + 
+			+ "," + "(SELECT initial_point FROM member_type WHERE member_type_id = " + member.getMemberType().getId() + ")" + 
 		")";
 		
 		dbCon.stmt.executeUpdate(insertSQL, Statement.RETURN_GENERATED_KEYS);
@@ -530,7 +633,7 @@ public class MemberDao {
 	 */
 	public static void update(DBCon dbCon, Staff staff, Member.UpdateBuilder builder) throws SQLException, BusinessException{
 		Member member = builder.build();
-		MemberType mType = MemberTypeDao.getMemberTypeById(staff, member.getMemberType().getTypeId());
+		MemberType mType = MemberTypeDao.getMemberTypeById(staff, member.getMemberType().getId());
 		// 旧会员类型是充值属性, 修改为优惠属性时, 检查是否还有余额, 有则不允许修改
 		Member old = MemberDao.getMemberById(staff, member.getId());
 		if(mType.getAttribute() != old.getMemberType().getAttribute() 
@@ -546,7 +649,7 @@ public class MemberDao {
 			+ " member_id = " + member.getId()  
 			+ (builder.isNameChanged() ? " ,name = '" + member.getName() + "'" : "")
 			+ (builder.isMobileChanged() ? " ,mobile = " + "'" + member.getMobile() + "'" : "") 
-			+ (builder.isMemberTypeChanged() ? " ,member_type_id = " + member.getMemberType().getTypeId() : "")
+			+ (builder.isMemberTypeChanged() ? " ,member_type_id = " + member.getMemberType().getId() : "")
 			+ (builder.isMemberCardChanged() ? " ,member_card = '" + member.getMemberCard() + "'" : "") 
 			+ (builder.isTeleChanged() ? " ,tele = '" + member.getTele() + "'" : "") 
 			+ (builder.isSexChanged() ? " ,sex = " + member.getSex().getVal() : "") 
@@ -1374,4 +1477,85 @@ public class MemberDao {
 			  " LIMIT 10 ";
 		dbCon.stmt.executeUpdate(sql);
 	} 
+	
+	/**
+	 * Update the level to all members
+	 * @return the upgrade result
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if exception occurred while perform upgrade
+	 */
+	public static UpgradeResult upgrade() throws SQLException, BusinessException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return upgrade(dbCon);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Update the level to all members
+	 * @param dbCon
+	 * 			the database connection
+	 * @return the upgrade result
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if exception occurred while perform upgrade
+	 */
+	public static UpgradeResult upgrade(DBCon dbCon) throws SQLException, BusinessException{
+		
+		long beginTime = System.currentTimeMillis();
+		int memberAmount = 0;
+		int memberUpgradAmount = 0;
+		
+		for(Restaurant restaurant : RestaurantDao.getByCond(null, null)){
+			Staff admin = StaffDao.getAdminByRestaurant(dbCon, restaurant.getId());
+			
+			//Check to see whether the member level to this restaurant exist.
+			List<MemberLevel> lvs = MemberLevelDao.getMemberLevels(dbCon, admin);
+			if(lvs.isEmpty()){
+				continue;
+			}
+			
+			//Sorted the level using threshold by descend 
+			List<MemberLevel> upLvs = SortedList.newInstance(lvs, new Comparator<MemberLevel>(){
+				@Override
+				public int compare(MemberLevel arg0, MemberLevel arg1) {
+					if(arg0.getPointThreshold() > arg1.getPointThreshold()){
+						return -1;
+					}else if(arg0.getPointThreshold() < arg1.getPointThreshold()){
+						return 1;
+					}else{
+						return 0;
+					}
+				}
+			});
+			
+			for(Member m : getPureMember(dbCon, admin, null, null)){
+				for(MemberLevel lv : lvs){
+					//If the member type belongs to level route and its total point is greater than the threshold, then perform member level upgrade.
+					if(m.getMemberType().equals(lv.getMemberType()) && m.getTotalPoint() > lv.getPointThreshold()){
+						for(MemberLevel lvToUpgrade : upLvs){
+							//upgrade the member to level whose threshold is nearest the member's
+							if(m.getTotalPoint() > lvToUpgrade.getPointThreshold()){
+								update(dbCon, admin, new Member.UpdateBuilder(m.getId(), m.getRestaurantId()).setMemberTypeId(lvToUpgrade.getMemberType().getId()));
+								memberUpgradAmount++;
+								break;
+							}
+						}
+						break;
+					}
+				}
+				memberAmount++;
+			}
+		}
+		
+		return new UpgradeResult((int)(System.currentTimeMillis() - beginTime) / 1000, 
+								 memberAmount, 
+								 memberUpgradAmount);
+	}
 }

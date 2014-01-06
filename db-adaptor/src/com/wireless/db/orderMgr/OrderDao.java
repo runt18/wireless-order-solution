@@ -188,8 +188,8 @@ public class OrderDao {
 	 * 
 	 * @param dbCon
 	 *            the database connection
-	 * @param term
-	 * 			  the terminal
+	 * @param staff
+	 * 			  the staff to perform this action
 	 * @param orderId
 	 *            the order id to query
 	 * @param dateType
@@ -200,7 +200,7 @@ public class OrderDao {
 	 * @throws SQLException
 	 *             throws if fail to execute any SQL statement
 	 */
-	public static Order getById(DBCon dbCon, Staff term, int orderId, DateType dateType) throws BusinessException, SQLException{
+	public static Order getById(DBCon dbCon, Staff staff, int orderId, DateType dateType) throws BusinessException, SQLException{
 		
 		String extraCond = null;
 		if(dateType == DateType.TODAY){
@@ -209,7 +209,7 @@ public class OrderDao {
 			extraCond = " AND OH.id = " + orderId;
 		}
 		
-		List<Order> results = getByCond(dbCon, term, extraCond, null, dateType);
+		List<Order> results = getByCond(dbCon, staff, extraCond, null, dateType);
 		if(results.isEmpty()){
 			throw new BusinessException("The order(id = " + orderId + ") does NOT exist.", ProtocolError.ORDER_NOT_EXIST);
 		}else{

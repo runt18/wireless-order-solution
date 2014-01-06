@@ -38,7 +38,7 @@ public class TestMemberLevelDao {
 		assertEquals("id", expected.getId(), actual.getId());
 		assertEquals("levelId", expected.getLevelId(), actual.getLevelId());
 		assertEquals("pointThreshold", expected.getPointThreshold(), actual.getPointThreshold());
-		assertEquals("memberTypeId", expected.getMemberType().getTypeId(), actual.getMemberType().getTypeId());
+		assertEquals("memberTypeId", expected.getMemberType().getId(), actual.getMemberType().getId());
 	}
 	
 	@Test
@@ -54,7 +54,7 @@ public class TestMemberLevelDao {
 		int memberLevelId = 0;
 		try{
 			//添加
-			MemberLevel.InsertBuilder insertBuilder = new InsertBuilder(1000, memberType.getTypeId());
+			MemberLevel.InsertBuilder insertBuilder = new InsertBuilder(1000, memberType.getId());
 			insertBuilder.setRestaurantId(mStaff.getRestaurantId());
 			
 			memberLevelId = MemberLevelDao.insert(mStaff, insertBuilder);
@@ -70,7 +70,7 @@ public class TestMemberLevelDao {
 			//修改
 			MemberLevel.UpdateBuilder updateBuilder = new UpdateBuilder(memberLevelId);
 			updateBuilder.setPointThreshold(1500);
-			updateBuilder.setMemberTypeId(list.get(1).getTypeId());
+			updateBuilder.setMemberTypeId(list.get(1).getId());
 			
 			MemberLevelDao.update(mStaff, updateBuilder);
 			

@@ -7,6 +7,6 @@ import com.wireless.db.DBCon;
 public final class TestInit {
 	
 	public static void init() throws PropertyVetoException{
-		DBCon.init("127.0.0.1", "3306", "wireless_order_db", "root", "q123123");
+		DBCon.init("192.168.110.100", "3306", "wireless_order_db", "root", "HelloZ315");
 	}
 }
