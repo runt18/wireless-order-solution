@@ -154,7 +154,7 @@ public class WXOperateMemberAction extends DispatchAction {
 							restaurantId,
 							request.getParameter("name"),
 							request.getParameter("mobile"),
-							MemberTypeDao.getWeixinMemberType(dbCon, StaffDao.getStaffs(dbCon, WeixinRestaurantDao.getRestaurantIdByWeixin(dbCon, formId)).get(0)).getTypeId(), 
+							MemberTypeDao.getWeixinMemberType(dbCon, StaffDao.getStaffs(dbCon, WeixinRestaurantDao.getRestaurantIdByWeixin(dbCon, formId)).get(0)).getId(), 
 							Member.Sex.valueOf(Integer.valueOf(request.getParameter("sex")))
 						), 
 						openId, 

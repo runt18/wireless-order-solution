@@ -15,7 +15,7 @@ import com.wireless.db.billStatistics.CalcBillStatisticsDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.json.JObject;
 import com.wireless.pojo.billStatistics.DutyRange;
-import com.wireless.pojo.dishesOrder.RepaidStatistics;
+import com.wireless.pojo.billStatistics.RepaidStatistics;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.util.DataPaging;
 import com.wireless.util.DateType;

@@ -37,7 +37,7 @@ public class QueryMemberTypeTreeAction extends Action {
 				tsb.append(",");
 				tsb.append("leaf:true");
 				tsb.append(",");
-				tsb.append("memberTypeID:" + item.getTypeId());
+				tsb.append("memberTypeID:" + item.getId());
 				tsb.append(",");
 				tsb.append("memberTypeName:'" + item.getName() + "'");
 				tsb.append("}");

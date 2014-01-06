@@ -148,7 +148,7 @@ public class QueryMemberTypeAction extends DispatchAction {
 					levelNode.append("{")
 							.append("text:'" + levelList.get(i).getMemberType().getName() + "  (LV"+ (i+1) +") "+ levelList.get(i).getPointThreshold() +"'")
 							.append(",leaf:true")
-							.append(",memberTypeId:" + levelList.get(i).getMemberType().getTypeId())
+							.append(",memberTypeId:" + levelList.get(i).getMemberType().getId())
 							.append(",memberTypeName:'" + levelList.get(i).getMemberType().getName() + "'")
 							.append("}");
 				}
@@ -171,7 +171,7 @@ public class QueryMemberTypeAction extends DispatchAction {
 		sb.append("{")
 			.append("text:'" + item.getName() + "'")
 			.append(",leaf:true")
-			.append(",memberTypeId:" + item.getTypeId())
+			.append(",memberTypeId:" + item.getId())
 			.append(",memberTypeName:'" + item.getName() + "'")
 			.append("}");
 		return sb;
