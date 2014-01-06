@@ -170,6 +170,49 @@ public class MemberDao {
 	}
 	
 	/**
+	 * Get the interested member according to extra condition.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @return the result to interested members
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException 
+	 * 			throws if any member type does NOT exist
+	 */
+	public static List<Member> getInterestedMember(Staff staff) throws SQLException, BusinessException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return getInterestedMember(dbCon, staff, null, null);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Get the interested member according to extra condition.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param extraCond
+	 * 			the extra condition
+	 * @param orderClause
+	 * 			the order clause
+	 * @return the result to interested members
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException 
+	 * 			throws if any member type does NOT exist
+	 */
+	private static List<Member> getInterestedMember(DBCon dbCon, Staff staff, String extraCond, String orderClause) throws SQLException, BusinessException{
+		extraCond = " AND M.member_id IN( SELECT member_id FROM interested_member WHERE staff_id = " + staff.getId() + ")" + (extraCond != null ? extraCond : "");
+		return getMember(dbCon, staff, extraCond, null);
+	}
+	
+	/**
 	 * Get member by extra condition.
 	 * @param dbCon
 	 * 			the database connection
@@ -180,82 +223,19 @@ public class MemberDao {
 	 * @return the list holding the result
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException 
+	 * 			throws if any member type does NOT exist
 	 */
-	public static List<Member> getMember(DBCon dbCon, Staff staff, String extraCond, String orderClause) throws SQLException{
-		List<Member> result = new ArrayList<Member>();
-		String sql;
-		//FIXME
-		sql = " SELECT "	+
-			  " M.member_id, M.restaurant_id, M.point, M.used_point, " +
-			  " M.base_balance, M.extra_balance, M.consumption_amount, M.last_consumption, M.used_balance," +
-			  " M.total_consumption, M.total_point, M.total_charge, " +
-			  " M.member_card, M.name AS member_name, M.sex, M.create_date, " +
-			  " M.tele, M.mobile, M.birthday, M.id_card, M.company, M.contact_addr, M.comment, "	+
-			  " MT.member_type_id, MT.charge_rate, MT.exchange_rate, " +
-			  " MT.name AS member_type_name, MT.type, MT.attribute, MT.initial_point " +
-			  " FROM (" + Params.dbName + ".member M " +
-			  " JOIN " + Params.dbName + ".member_type MT ON M.member_type_id = MT.member_type_id) "	+
-			  " LEFT JOIN " + Params.dbName + ".interested_member IM ON M.member_id = IM.member_id " +
-			  " WHERE 1=1 "	+
-			  " AND M.restaurant_id = " + staff.getRestaurantId() +
-			  (extraCond != null ? extraCond : " ") +
-			  (orderClause != null ? orderClause : "");
-			
-		dbCon.rs = dbCon.stmt.executeQuery(sql);
-		while(dbCon.rs.next()){
-			Member member = new Member();
-			member.setId(dbCon.rs.getInt("member_id"));
-			member.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
-			member.setBaseBalance(dbCon.rs.getFloat("base_balance"));
-			member.setExtraBalance(dbCon.rs.getFloat("extra_balance"));
-			member.setUsedBalance(dbCon.rs.getFloat("used_balance"));
-			member.setConsumptionAmount(dbCon.rs.getInt("consumption_amount"));
-			Timestamp ts = dbCon.rs.getTimestamp("last_consumption");
-			if(ts != null){
-				member.setLastConsumption(ts.getTime());
-			}
-			member.setUsedPoint(dbCon.rs.getInt("used_point"));
-			member.setPoint(dbCon.rs.getInt("point"));
-			member.setTotalConsumption(dbCon.rs.getFloat("total_consumption"));
-			member.setTotalPoint(dbCon.rs.getInt("total_point"));
-			member.setTotalCharge(dbCon.rs.getFloat("total_charge"));
-			member.setMemberCard(dbCon.rs.getString("member_card"));
-			member.setName(dbCon.rs.getString("member_name"));
-			member.setSex(dbCon.rs.getInt("sex"));
-			member.setCreateDate(dbCon.rs.getTimestamp("create_date").getTime());
-			member.setTele(dbCon.rs.getString("tele"));
-			member.setMobile(dbCon.rs.getString("mobile"));
-			ts = dbCon.rs.getTimestamp("birthday");
-			if(ts != null){
-				member.setBirthday(ts.getTime());
-			}
-			member.setIdCard(dbCon.rs.getString("id_card"));
-			member.setCompany(dbCon.rs.getString("company"));
-			member.setContactAddress(dbCon.rs.getString("contact_addr"));
-			
-			MemberType memberType = new MemberType(dbCon.rs.getInt("member_type_id"));
-			memberType.setExchangeRate(dbCon.rs.getFloat("exchange_rate"));
-			memberType.setChargeRate(dbCon.rs.getFloat("charge_rate"));
-			memberType.setName(dbCon.rs.getString("member_type_name"));
-			memberType.setType(MemberType.Type.valueOf(dbCon.rs.getInt("type")));
-			memberType.setAttribute(dbCon.rs.getInt("attribute"));
-			memberType.setInitialPoint(dbCon.rs.getInt("initial_point"));
-			member.setMemberType(memberType);
-			
-			result.add(member);
-		}
-		dbCon.rs.close();
+	public static List<Member> getMember(DBCon dbCon, Staff staff, String extraCond, String orderClause) throws SQLException, BusinessException{
+		List<Member> result = getPureMember(dbCon, staff, extraCond, orderClause);
 		
-		//获取关注的会员
-		List<Integer> mIds = new ArrayList<Integer>();
-		sql = "SELECT staff_id,member_id,start_date FROM " + Params.dbName + ".interested_member WHERE staff_id = " + staff.getId();
-		dbCon.rs = dbCon.stmt.executeQuery(sql);
-		while(dbCon.rs.next()){
-			mIds.add(dbCon.rs.getInt("member_id"));
-		}
-		
-		dbCon.rs.close();
 		for(Member eachMember : result){
+			
+			String sql;
+			
+			//Get the member type detail to each member.
+			eachMember.getMemberType().copyFrom(MemberTypeDao.getMemberTypeById(dbCon, staff, eachMember.getMemberType().getId()));
+			
 			//Get the discounts to each member
 			sql = " SELECT MD.discount_id, MD.type, D.name FROM " + Params.dbName + ".member_type_discount MD " +
 					" JOIN " + Params.dbName + ".discount D " +
@@ -314,17 +294,9 @@ public class MemberDao {
 			}
 			dbCon.rs.close();
 			
-			if(!mIds.isEmpty()){
-				for (Integer integer : mIds) {
-					if(eachMember.getId() == integer){
-						eachMember.setAttentioned(true);
-						break;
-					}
-				}
-			}
 		}
 		
-		return result;
+		return Collections.unmodifiableList(result);
 	}
 	
 	/**
