@@ -343,6 +343,21 @@ public class MemberType implements Jsonable, Parcelable{
 		setId(id);
 	}
 	
+	public void copyFrom(MemberType src){
+		if(src != null && src != this){
+			setId(src.getId());
+			setRestaurantId(src.getRestaurantId());
+			setName(src.getName());
+			setType(src.getType());
+			setDiscounts(src.getDiscounts());
+			setDefaultDiscount(src.getDefaultDiscount());
+			setExchangeRate(src.getExchangeRate());
+			setChargeRate(src.getChargeRate());
+			setAttribute(src.getAttribute());
+			setInitialPoint(src.getInitialPoint());
+		}
+	}
+	
 	public int getInitialPoint() {
 		return initialPoint;
 	}
@@ -368,6 +383,9 @@ public class MemberType implements Jsonable, Parcelable{
 	}
 	
 	public String getName() {
+		if(name == null){
+			return "";
+		}
 		return name;
 	}
 	
