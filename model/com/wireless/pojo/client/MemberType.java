@@ -315,7 +315,7 @@ public class MemberType implements Jsonable, Parcelable{
 		}
 	}
 	
-	private int typeId;
+	private int id;
 	private int restaurantId;
 	private String name;
 	private Type type = Type.NORMAL;
@@ -339,8 +339,8 @@ public class MemberType implements Jsonable, Parcelable{
 		setInitialPoint(builder.initialPoint);
 	}
 	
-	public MemberType(int memberTypeId){
-		setTypeId(memberTypeId);
+	public MemberType(int id){
+		setId(id);
 	}
 	
 	public int getInitialPoint() {
@@ -351,12 +351,12 @@ public class MemberType implements Jsonable, Parcelable{
 		this.initialPoint = initialPoint;
 	}
 	
-	public int getTypeId() {
-		return typeId;
+	public int getId() {
+		return id;
 	}
 	
-	public void setTypeId(int typeId) {
-		this.typeId = typeId;
+	public void setId(int typeId) {
+		this.id = typeId;
 	}
 	
 	public int getRestaurantId() {
@@ -439,13 +439,13 @@ public class MemberType implements Jsonable, Parcelable{
 	
 	@Override
 	public String toString(){
-		return "member type(id = " + getTypeId() + ", name = " + getName() + ")";
+		return "member type(id = " + getId() + ", name = " + getName() + ")";
 	}
 	
 	@Override
 	public int hashCode(){
 		int result = 17;
-		result = result * 31 + getTypeId();
+		result = result * 31 + getId();
 		return result;
 	}
 	
@@ -454,14 +454,14 @@ public class MemberType implements Jsonable, Parcelable{
 		if(obj == null || !(obj instanceof MemberType)){
 			return false;
 		}else{
-			return getTypeId() == ((MemberType)obj).getTypeId();
+			return getId() == ((MemberType)obj).getId();
 		}
 	}
 
 	@Override
 	public Map<String, Object> toJsonMap(int flag) {
 		Map<String, Object> jm = new LinkedHashMap<String, Object>();
-		jm.put("id", this.typeId);
+		jm.put("id", this.id);
 		jm.put("rid", this.restaurantId);
 		jm.put("name", this.name);
 		jm.put("type", this.type.getVal());
@@ -495,11 +495,11 @@ public class MemberType implements Jsonable, Parcelable{
 	public void writeToParcel(Parcel dest, int flag) {
 		dest.writeByte(flag);
 		if(flag == MEMBER_TYPE_PARCELABLE_SIMPLE){
-			dest.writeInt(this.getTypeId());
+			dest.writeInt(this.getId());
 			dest.writeString(this.getName());
 			
 		}else if(flag == MEMBER_TYPE_PARCELABLE_COMPLEX){
-			dest.writeInt(this.getTypeId());
+			dest.writeInt(this.getId());
 			dest.writeString(this.getName());
 		}		
 	}
@@ -508,11 +508,11 @@ public class MemberType implements Jsonable, Parcelable{
 	public void createFromParcel(Parcel source) {
 		int flag = source.readByte();
 		if(flag == MEMBER_TYPE_PARCELABLE_SIMPLE){
-			setTypeId(source.readInt());
+			setId(source.readInt());
 			setName(source.readString());
 			
 		}else if(flag == MEMBER_TYPE_PARCELABLE_COMPLEX){
-			setTypeId(source.readInt());
+			setId(source.readInt());
 			setName(source.readString());
 		}
 	}

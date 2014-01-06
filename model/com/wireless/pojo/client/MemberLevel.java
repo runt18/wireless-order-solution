@@ -15,6 +15,9 @@ public class MemberLevel implements Jsonable{
 	private int pointThreshold;
 	private MemberType memberType;
 	
+	public MemberLevel(int id){
+		this.id = id;
+	}
 	
 	public int getId() {
 		return id;
@@ -51,7 +54,7 @@ public class MemberLevel implements Jsonable{
 	}
 	
 	public void setMemberTypeId(int typeId){
-		this.memberType.setTypeId(typeId);
+		this.memberType.setId(typeId);
 	}
 	
 	public void setMemberTypeName(String name){
@@ -62,7 +65,7 @@ public class MemberLevel implements Jsonable{
 	public static class Builder{
 		protected MemberLevel data;
 		public Builder(){
-			data = new MemberLevel();
+			data = new MemberLevel(0);
 		}
 	
 		public MemberLevel build(){
@@ -74,7 +77,7 @@ public class MemberLevel implements Jsonable{
 	public static class InsertBuilder extends Builder{
 		public InsertBuilder(int pointThreshold, int memberTypeId){
 			data.setPointThreshold(pointThreshold);
-			data.getMemberType().setTypeId(memberTypeId);	
+			data.getMemberType().setId(memberTypeId);	
 		}
 		public InsertBuilder setRestaurantId(int restaurantId){
 			data.setRestaurantId(restaurantId);
@@ -93,7 +96,7 @@ public class MemberLevel implements Jsonable{
 		}
 		
 		public UpdateBuilder setMemberTypeId(int memberTypeId){
-			data.getMemberType().setTypeId(memberTypeId);	
+			data.getMemberType().setId(memberTypeId);	
 			return this;
 		}
 		
@@ -129,7 +132,7 @@ public class MemberLevel implements Jsonable{
 		jm.put("restaurantId", this.restaurantId);
 		jm.put("levelId", this.levelId);
 		jm.put("pointThreshold", this.pointThreshold);
-		jm.put("memberTypeId", this.memberType.getTypeId());
+		jm.put("memberTypeId", this.memberType.getId());
 		jm.put("memberTypeName", this.memberType.getName());
 		return Collections.unmodifiableMap(jm);
 	}
