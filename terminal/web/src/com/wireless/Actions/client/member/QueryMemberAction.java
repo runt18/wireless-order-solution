@@ -49,7 +49,6 @@ public class QueryMemberAction extends DispatchAction {
 			
 			String extraCond = " ", orderClause = " ";
 			String id = request.getParameter("id");
-			String restaurantID = (String)request.getAttribute("restaurantID");
 			String memberType = request.getParameter("memberType");
 			String memberTypeAttr = request.getParameter("memberTypeAttr");
 			String name = request.getParameter("name");
@@ -80,10 +79,8 @@ public class QueryMemberAction extends DispatchAction {
 					so = "=";
 				}
 				
-				if(restaurantID != null && !restaurantID.trim().isEmpty())
-					extraCond += (" AND M.restaurant_id = " + restaurantID);
 				if(memberType != null && !memberType.trim().isEmpty())
-					extraCond += (" AND MT.member_type_id = " + memberType);
+					extraCond += (" AND M.member_type_id = " + memberType);
 				
 				if(memberTypeAttr != null && !memberTypeAttr.trim().isEmpty())
 					if(Attribute.valueOf(Integer.parseInt(memberTypeAttr)) == Attribute.INTERESTED){
@@ -110,7 +107,7 @@ public class QueryMemberAction extends DispatchAction {
 					extraCond += (" AND M.consumption_amount " + so + consumptionAmount);
 				
 				if(usedPoint != null && !usedPoint.trim().isEmpty())
-					extraCond += (" AND M.used_point " + so + usedPoint);
+					extraCond += (" AND M.total_point " + so + usedPoint);
 				
 				if(point != null && !point.trim().isEmpty())
 					extraCond += (" AND M.point " + so + point);
