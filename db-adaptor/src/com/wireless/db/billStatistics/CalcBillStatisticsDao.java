@@ -1121,7 +1121,7 @@ public class CalcBillStatisticsDao {
 		}else{
 			throw new IllegalArgumentException("The query type is invalid.");
 		}
-		String sql = "SELECT order_date, waiter, id,  repaid_price, total_price, actual_price, pay_type FROM " + Params.dbName + "." + orderTbl +
+		String sql = "SELECT order_date, waiter, staff_id, id,  repaid_price, total_price, actual_price, pay_type FROM " + Params.dbName + "." + orderTbl +
 					" WHERE status = " + Order.Status.REPAID.getVal() + 
 					" AND order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +
 					(extraCond != null ? extraCond : "");
@@ -1377,7 +1377,7 @@ public class CalcBillStatisticsDao {
 		}else{
 			throw new IllegalArgumentException("The query type is invalid.");
 		}
-		String sql = "SELECT ROUND(SUM(unit_price * order_count), 2) totalPrice, ROUND(SUM(commission * order_count), 2) commission, waiter, staff_id FROM " + Params.dbName + "." + orderTbl + 
+		String sql = "SELECT ROUND(SUM(unit_price * order_count), 2) AS totalPrice, ROUND(SUM(commission * order_count), 2) AS commission, MAX(waiter) AS waiter, staff_id FROM " + Params.dbName + "." + orderTbl + 
 					" WHERE (food_status & " + Food.COMMISSION + ") <> 0 " +
 					" AND commission <> 0 " +
 					" AND order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +
