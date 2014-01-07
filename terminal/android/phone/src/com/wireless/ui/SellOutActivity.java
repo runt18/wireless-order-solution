@@ -28,6 +28,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.wireless.common.WirelessOrder;
+import com.wireless.exception.BusinessException;
 import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.menuMgr.FoodList;
 import com.wireless.ui.dialog.SelloutCommitDialog;
@@ -337,24 +338,26 @@ public class SellOutActivity extends FragmentActivity {
 		}
 		
 		@Override
-		protected void onPostExecute(Food[] sellOutFoods){
-			if(mProtocolException != null){
-				Toast.makeText(SellOutActivity.this, "沽清菜品更新失败", Toast.LENGTH_SHORT).show();				
-			}else{
-				Toast.makeText(SellOutActivity.this, "沽清菜品更新成功", Toast.LENGTH_SHORT).show();
-				List<Food> sellOut = new ArrayList<Food>();
-				List<Food> onSale = new ArrayList<Food>();
-				for(Food f : WirelessOrder.foodMenu.foods){
-					if(f.isSellOut()){
-						sellOut.add(f);
-					}else{
-						onSale.add(f);
-					}
+		public void onSuccess(List<Food> sellOutFoods){
+			Toast.makeText(SellOutActivity.this, "沽清菜品更新成功", Toast.LENGTH_SHORT).show();
+			List<Food> sellOut = new ArrayList<Food>();
+			List<Food> onSale = new ArrayList<Food>();
+			for(Food f : WirelessOrder.foodMenu.foods){
+				if(f.isSellOut()){
+					sellOut.add(f);
+				}else{
+					onSale.add(f);
 				}
-				mSellOutFoods = new FoodList(sellOut);
-				mOnSaleFoods = new FoodList(onSale);
-				mFoodListHandler.sendEmptyMessage(mCurrentPage);
 			}
+			mSellOutFoods = new FoodList(sellOut);
+			mOnSaleFoods = new FoodList(onSale);
+			mFoodListHandler.sendEmptyMessage(mCurrentPage);
 		}
+		
+		@Override
+		public void onFail(BusinessException e){
+			Toast.makeText(SellOutActivity.this, "沽清菜品更新失败", Toast.LENGTH_SHORT).show();		
+		}
+		
 	}
 }

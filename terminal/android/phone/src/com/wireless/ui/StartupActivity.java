@@ -17,7 +17,6 @@ import android.widget.TextView;
 
 import com.wireless.common.Params;
 import com.wireless.common.WirelessOrder;
-import com.wireless.lib.task.CheckVersionTask;
 import com.wireless.pojo.menuMgr.FoodMenu;
 import com.wireless.pojo.regionMgr.Region;
 import com.wireless.pojo.regionMgr.Table;
@@ -61,9 +60,7 @@ public class StartupActivity extends Activity {
 	protected void onStart() {
 		super.onStart();
 		if (isNetworkAvail()) {
-			//FIXME
-			new MatchPinTask().execute();
-			
+			new QueryStaffTask().execute();
 		} else {
 			showNetSetting();
 		}
@@ -303,7 +300,7 @@ public class StartupActivity extends Activity {
 		 * 如果成功，则执行请求餐厅的操作。
 		 */
 		@Override
-		protected void onPostExecute(Table[] tables){
+		protected void onPostExecute(List<Table> tables){
 			/**
 			 * Prompt user message if any error occurred.
 			 */		
@@ -375,49 +372,5 @@ public class StartupActivity extends Activity {
 			}
 		}
 	}
-
-	/**
-	 * 从SDCard中读取PIN的验证信息
-	 */
-	private class MatchPinTask extends com.wireless.lib.task.MatchPinTask {
-
-		MatchPinTask(){
-			super(StartupActivity.this);
-		}
-		
-		/**
-		 * 在读取Pin信息前显示提示信息
-		 */
-		@Override
-		protected void onPreExecute() {
-			_msgTxtView.setText("正在读取验证PIN码...请稍候");
-		}
-
-
-		@Override
-		protected void onPostExecute(Void result) {
-			if (mErrMsg != null) {
-				new AlertDialog.Builder(StartupActivity.this)
-					.setTitle("提示")
-					.setMessage(mErrMsg)
-					.setPositiveButton("确定", new DialogInterface.OnClickListener() {
-						@Override
-						public void onClick(DialogInterface dialog,	int id) {
-							finish();
-						}
-					}).show();
-
-			} else {
-				
-				new com.wireless.lib.task.CheckVersionTask(StartupActivity.this, CheckVersionTask.PHONE){
-					@Override
-					public void onCheckVersionPass() {
-						new QueryStaffTask().execute();
-					}					
-				}.execute();
-			}
-		}
-	}
-
 
 }

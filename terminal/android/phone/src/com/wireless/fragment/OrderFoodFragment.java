@@ -756,45 +756,48 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 
 		QueryOrderTask(int tableAlias){
 			super(WirelessOrder.loginStaff, tableAlias, WirelessOrder.foodMenu);
-			mProgressDialog = ProgressDialog.show(getActivity(), "", "正在读取账单，请稍后", true);
+			mProgressDialog = ProgressDialog.show(getActivity(), "", "正在读取账单...请稍后", true);
 		}
 		
 		@Override
-		protected void onPostExecute(Order order){
-			
+		public void onSuccess(Order order){
 			mProgressDialog.dismiss();
 			
-			if(mBusinessException != null){
-				if(mBusinessException.getErrCode().equals(ProtocolError.ORDER_NOT_EXIST)){
-					mOriOrder = null;
-					
-				}else{
-					new AlertDialog.Builder(getActivity()).setTitle("更新账单失败")
-						.setMessage(mBusinessException.getMessage())
-						.setPositiveButton("刷新", new DialogInterface.OnClickListener() {
-							@Override
-							public void onClick(DialogInterface dialog, int which) {
-								mQueryOrderTask = new QueryOrderTask(mTblAlias);
-								mQueryOrderTask.execute();
-							}
-						})
-						.setNegativeButton("退出", new DialogInterface.OnClickListener() {
-							@Override
-							public void onClick(DialogInterface dialog, int which) {
-								getActivity().finish();
-							}
-						}).show();
-				}
-			}else{
-				
-				mOriOrder = order;
-				
-				//更新沽清菜品
-				new QuerySellOutTask().execute();
-			}		
+			mOriOrder = order;
+			//更新沽清菜品
+			new QuerySellOutTask().execute();
 			
 			mFoodListHandler.sendEmptyMessage(0);
-		}		
+		}
+		
+		@Override
+		public void onFail(BusinessException e){
+			mProgressDialog.dismiss();
+			
+			if(mBusinessException.getErrCode().equals(ProtocolError.ORDER_NOT_EXIST)){
+				mOriOrder = null;
+				
+			}else{
+				new AlertDialog.Builder(getActivity()).setTitle("更新账单失败")
+					.setMessage(mBusinessException.getMessage())
+					.setPositiveButton("刷新", new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							mQueryOrderTask = new QueryOrderTask(mTblAlias);
+							mQueryOrderTask.execute();
+						}
+					})
+					.setNegativeButton("退出", new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							getActivity().finish();
+						}
+					}).show();
+			}
+			
+			mFoodListHandler.sendEmptyMessage(0);
+		}
+		
 	}
 	
 	/**
@@ -807,13 +810,15 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 		}
 		
 		@Override
-		protected void onPostExecute(Food[] sellOutFoods){
-			if(mProtocolException != null){
-				Toast.makeText(getActivity(), "沽清菜品更新失败", Toast.LENGTH_SHORT).show();				
-			}else{
-				Toast.makeText(getActivity(), "沽清菜品更新成功", Toast.LENGTH_SHORT).show();
-			}
+		public void onSuccess(List<Food> sellOutFoods){
+			Toast.makeText(getActivity(), "沽清菜品更新成功", Toast.LENGTH_SHORT).show();
 		}
+		
+		@Override
+		public void onFail(BusinessException e){
+			Toast.makeText(getActivity(), "沽清菜品更新失败", Toast.LENGTH_SHORT).show();				
+		}
+		
 	}
 
 	@Override

@@ -245,45 +245,42 @@ public class CommitDialog extends DialogFragment{
 			mProgDialog = ProgressDialog.show(getActivity(), "", "查询" + mTblAlias + "号餐台的信息...请稍候", true);
 		}
 		
-		/**
-		 * 根据返回的error message判断，如果发错异常则提示用户，
-		 * 如果成功，则迁移到改单页面
-		 */
 		@Override
-		protected void onPostExecute(Order order){
-			
+		public void onSuccess(Order order){
 			mProgDialog.dismiss();
-
-			if(mBusinessException != null){ 
-				if(mBusinessException.getErrCode().equals(ProtocolError.ORDER_NOT_EXIST)){				
-						
-					//Perform to insert a new order in case of the activity_table is IDLE.
-					mOrderToCommit = mReqOrder;
-					mOrderToCommit.setDestTbl(new Table(mTblAlias));
-					new InsertOrderTask(mOrderToCommit, Type.INSERT_ORDER, mPrintOption).execute();						
-					
-				}else{
-					new AlertDialog.Builder(getActivity())
-					.setTitle("提示")
-					.setMessage(mBusinessException.getMessage())
-					.setPositiveButton("确定", new DialogInterface.OnClickListener() {
-						public void onClick(DialogInterface dialog, int id) {
-							dialog.dismiss();
-						}
-					})
-					.show();
-				}
-			}else{
-				//Merge the original order and update if the activity_table is BUSY.
-				try{
-					order.addFoods(mReqOrder.getOrderFoods(), WirelessOrder.loginStaff);
-					mOrderToCommit = order;
-					new InsertOrderTask(mOrderToCommit, Type.UPDATE_ORDER, mPrintOption).execute();
-				}catch(BusinessException e){
-					Toast.makeText(CommitDialog.this.getActivity(), e.getMessage(), Toast.LENGTH_SHORT).show();
-				}
+			//Merge the original order and update if the activity_table is BUSY.
+			try{
+				order.addFoods(mReqOrder.getOrderFoods(), WirelessOrder.loginStaff);
+				mOrderToCommit = order;
+				new InsertOrderTask(mOrderToCommit, Type.UPDATE_ORDER, mPrintOption).execute();
+			}catch(BusinessException e){
+				Toast.makeText(CommitDialog.this.getActivity(), e.getMessage(), Toast.LENGTH_SHORT).show();
 			}
 		}
+		
+		@Override
+		public void onFail(BusinessException e){
+			mProgDialog.dismiss();
+			if(mBusinessException.getErrCode().equals(ProtocolError.ORDER_NOT_EXIST)){				
+				
+				//Perform to insert a new order in case of the activity_table is IDLE.
+				mOrderToCommit = mReqOrder;
+				mOrderToCommit.setDestTbl(new Table(mTblAlias));
+				new InsertOrderTask(mOrderToCommit, Type.INSERT_ORDER, mPrintOption).execute();						
+				
+			}else{
+				new AlertDialog.Builder(getActivity())
+				.setTitle("提示")
+				.setMessage(mBusinessException.getMessage())
+				.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+						dialog.dismiss();
+					}
+				})
+				.show();
+			}
+		}
+		
 	}
 	
 	/**
@@ -358,12 +355,15 @@ public class CommitDialog extends DialogFragment{
 		}
 		
 		@Override
-		protected void onPostExecute(Order result) {
-			super.onPostExecute(result);
+		public void onSuccess(Order order){
 			mProgressDialog.dismiss();
-			
-			if(mBusinessException != null){
-				new AlertDialog.Builder(getActivity())
+			new PayOrderTask(order, Type.PAY_ORDER).execute();
+		}
+		
+		@Override 
+		public void onFail(BusinessException e){
+			mProgressDialog.dismiss();
+			new AlertDialog.Builder(getActivity())
 				.setTitle(mBusinessException.getMessage())
 				.setMessage("菜品已添加，但结账请求失败，是否重试？")
 				.setPositiveButton("重试", new DialogInterface.OnClickListener() {
@@ -378,11 +378,8 @@ public class CommitDialog extends DialogFragment{
 						getActivity().finish();
 					}
 				}).show();
-			}
-			else {
-				new PayOrderTask(result, Type.PAY_ORDER).execute();
-			}
 		}
+		
 	}
 	/**
 	 * 执行结帐请求操作

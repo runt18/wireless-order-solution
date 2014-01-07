@@ -21,6 +21,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.wireless.common.WirelessOrder;
+import com.wireless.exception.BusinessException;
 import com.wireless.pack.Type;
 import com.wireless.pack.req.PrintOption;
 import com.wireless.pojo.dishesOrder.Order;
@@ -322,43 +323,33 @@ public class BillActivity extends Activity {
 			_progDialog = ProgressDialog.show(BillActivity.this, "", "查询" + mTblAlias + "号餐台的信息...请稍候", true);
 		}
 		
-		/**
-		 * 根据返回的error message判断，如果发错异常则提示用户，
-		 * 如果成功，则迁移到改单页面
-		 */
 		@Override
-		protected void onPostExecute(Order order){
-
+		public void onSuccess(Order order){
 			//make the progress dialog disappeared
 			_progDialog.dismiss();
 			
-			if(mBusinessException != null){
-				/**
-				 * 如果请求账单信息失败，则跳转会MainActivity
-				 */
-				new AlertDialog.Builder(BillActivity.this)
-					.setTitle("提示")
-					.setMessage(mBusinessException.getMessage())
-					.setPositiveButton("确定", new DialogInterface.OnClickListener() {
-						public void onClick(DialogInterface dialog, int id) {
-							dialog.dismiss();
-							finish();
-						}
-					})
-					.show();
-			}else{
-				
-				mOrderToPay = order;
-				
-				//Apply discount in case of default
-				//mOrderToPay.setDiscount(WirelessOrder.loginStaff.getRole().getDefaultDiscount());
-				/**
-				 * 请求账单成功则更新相关的控件
-				 */
-				mHandler.sendEmptyMessage(0);
-
-			}			
-		}		
+			mOrderToPay = order;
+			//请求账单成功则更新相关的控件
+			mHandler.sendEmptyMessage(0);
+		}
+		
+		@Override
+		public void onFail(BusinessException e){
+			//make the progress dialog disappeared
+			_progDialog.dismiss();
+			//如果请求账单信息失败，则跳转会MainActivity
+			new AlertDialog.Builder(BillActivity.this)
+				.setTitle("提示")
+				.setMessage(mBusinessException.getMessage())
+				.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+						dialog.dismiss();
+						finish();
+					}
+				})
+				.show();
+		}
+		
 	}
 
 }

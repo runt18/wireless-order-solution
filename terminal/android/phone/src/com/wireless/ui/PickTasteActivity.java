@@ -10,7 +10,6 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
 import android.view.View;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.wireless.fragment.PinzhuTasteFragment;
@@ -58,27 +57,27 @@ public class PickTasteActivity extends FragmentActivity
 			PickTasteActivity activity = mActivity.get();
 			FragmentTransaction fgTrans = activity.getSupportFragmentManager().beginTransaction();
 
-			((LinearLayout)activity.findViewById(R.id.linearLayout_pop_pickTaste)).setBackgroundResource(R.drawable.tab_bg_unselected);
-			((LinearLayout)activity.findViewById(R.id.linearLayout_taste_pickTaste)).setBackgroundResource(R.drawable.tab_bg_unselected);
-			((LinearLayout)activity.findViewById(R.id.linearLayout_pinzhu_pickTaste)).setBackgroundResource(R.drawable.tab_bg_unselected);
+			activity.findViewById(R.id.imgButton_pop_pickTaste).setPressed(false);
+			activity.findViewById(R.id.imgButton_all_pickTaste).setPressed(false);
+			activity.findViewById(R.id.imgButton_pinzhu_pickTaste).setPressed(false);
 			
 			if(msg.what == POP_TASTE_FRAGMENT && activity.mCurFg != POP_TASTE_FRAGMENT){
 				mTitleTextView.setText("常用口味");
-				((LinearLayout)activity.findViewById(R.id.linearLayout_pop_pickTaste)).setBackgroundResource(R.drawable.tab_bg_selected);
+				activity.findViewById(R.id.imgButton_pop_pickTaste).setPressed(true);
 				activity.mCurFg = POP_TASTE_FRAGMENT;
 				//jump to pop taste fragment
 				fgTrans.replace(R.id.frameLayout_container_pickTaste, PopTasteFragment.newInstance(activity.mSelectedFood)).commit();
 
 			}else if(msg.what == ALL_TASTE_FRAGMENT && activity.mCurFg != ALL_TASTE_FRAGMENT){
 				mTitleTextView.setText("全部口味");
-				((LinearLayout)activity.findViewById(R.id.linearLayout_taste_pickTaste)).setBackgroundResource(R.drawable.tab_bg_selected);
 				activity.mCurFg = ALL_TASTE_FRAGMENT;
+				activity.findViewById(R.id.imgButton_all_pickTaste).setPressed(true);
 				//jump to all taste fragment
 				fgTrans.replace(R.id.frameLayout_container_pickTaste, TasteFragment.newInstance(activity.mSelectedFood)).commit();
 				
 			}else if(msg.what == PINZHU_FRAGMENT && activity.mCurFg != PINZHU_FRAGMENT){
 				mTitleTextView.setText("品注");
-				((LinearLayout)activity.findViewById(R.id.linearLayout_pinzhu_pickTaste)).setBackgroundResource(R.drawable.tab_bg_selected);
+				activity.findViewById(R.id.imgButton_pinzhu_pickTaste).setPressed(true);
 				activity.mCurFg = PINZHU_FRAGMENT;
 				//jump to pinzhu fragment
 				fgTrans.replace(R.id.frameLayout_container_pickTaste, PinzhuTasteFragment.newInstance(activity.mSelectedFood)).commit();
@@ -137,7 +136,7 @@ public class PickTasteActivity extends FragmentActivity
 		mFgmHandler = new FgmHandler(this);
 		
 		//常用Button
-		((LinearLayout)findViewById(R.id.linearLayout_pop_pickTaste)).setOnClickListener(new View.OnClickListener() {			
+		((ImageButton)findViewById(R.id.imgButton_pop_pickTaste)).setOnClickListener(new View.OnClickListener() {			
 			@Override
 			public void onClick(View v) {
 				mFgmHandler.sendEmptyMessage(POP_TASTE_FRAGMENT);
@@ -145,7 +144,7 @@ public class PickTasteActivity extends FragmentActivity
 		});
 		
 		//口味Button
-		((LinearLayout)findViewById(R.id.linearLayout_taste_pickTaste)).setOnClickListener(new View.OnClickListener() {			
+		((ImageButton)findViewById(R.id.imgButton_all_pickTaste)).setOnClickListener(new View.OnClickListener() {			
 			@Override
 			public void onClick(View v) {
 				mFgmHandler.sendEmptyMessage(ALL_TASTE_FRAGMENT);
@@ -156,9 +155,9 @@ public class PickTasteActivity extends FragmentActivity
 		//品注Button
 		if(getIntent().getBooleanExtra(PICK_ALL_ORDER_TASTE, false)){
 			//全单备注下不显示品注
-			((LinearLayout)findViewById(R.id.linearLayout_pinzhu_pickTaste)).setVisibility(View.GONE);
+			((ImageButton)findViewById(R.id.imgButton_pinzhu_pickTaste)).setVisibility(View.GONE);
 		}else {
-			((LinearLayout)findViewById(R.id.linearLayout_pinzhu_pickTaste)).setOnClickListener(new View.OnClickListener() {			
+			((ImageButton)findViewById(R.id.imgButton_pinzhu_pickTaste)).setOnClickListener(new View.OnClickListener() {			
 				@Override
 				public void onClick(View v) {
 					mFgmHandler.sendEmptyMessage(PINZHU_FRAGMENT);

@@ -2,7 +2,6 @@ package com.wireless.ui;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -186,7 +185,7 @@ public class TableActivity extends FragmentActivity implements OnTableSelectedLi
 			final TableActivity theActivity = mActivity.get();
 			
 			mFilterTable.clear();
-			mFilterTable.addAll(Arrays.asList(WirelessOrder.tables));
+			mFilterTable.addAll(WirelessOrder.tables);
 			
 			Iterator<Table> iter = mFilterTable.iterator();
 			
@@ -821,7 +820,7 @@ public class TableActivity extends FragmentActivity implements OnTableSelectedLi
 		 * 根据返回的error message判断，如果发错异常则提示用户， 如果成功，则执行请求餐厅的操作。
 		 */
 		@Override
-		protected void onPostExecute(Table[] tables) {
+		protected void onPostExecute(List<Table> tables) {
 			
 			mProgDialog.dismiss();
 			

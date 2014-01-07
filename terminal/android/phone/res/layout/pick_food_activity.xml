@@ -16,7 +16,7 @@
         android:layout_below="@+id/top"
         android:background="@color/white" >
     </FrameLayout>
-
+
     <LinearLayout
         android:id="@+id/linearLayout_bottom_pickFood"
         android:layout_width="match_parent"
@@ -49,7 +49,7 @@
             android:background="@null"
             android:src="@drawable/spell_selector"
             android:visibility="visible" />
-
+
         <ImageButton
             android:id="@+id/imageButton_tempFood_pickFood"
             android:layout_width="wrap_content"
@@ -58,7 +58,6 @@
             android:background="@null"
             android:src="@drawable/linshicai_selector"
             android:visibility="visible" />
-
     </LinearLayout>
 
 </RelativeLayout>

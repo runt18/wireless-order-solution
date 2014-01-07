@@ -14,5 +14,5 @@ public final class WirelessOrder {
 	public static Restaurant restaurant;
 	public static List<Staff> staffs;
 	public static Region[] regions;
-	public static Table[] tables;
+	public static List<Table> tables;
 }
