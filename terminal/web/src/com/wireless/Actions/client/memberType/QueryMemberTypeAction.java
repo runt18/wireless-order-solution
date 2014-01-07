@@ -98,7 +98,7 @@ public class QueryMemberTypeAction extends DispatchAction {
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			List<MemberType> list = MemberTypeDao.getMemberType(StaffDao.verify(Integer.parseInt(pin)), null, " ORDER BY MT.member_type_id ");
 			List<MemberLevel> levelList = MemberLevelDao.getMemberLevels(staff);
-			List<Member> interestedMembers = MemberDao.getInterestedMember(staff);
+			List<Member> interestedMembers = MemberDao.getInterestedMember(staff, null);
 			MemberType item = null;
 			StringBuilder typeNode = new StringBuilder(), levelNode = new StringBuilder();
 			typeNode.append("{")

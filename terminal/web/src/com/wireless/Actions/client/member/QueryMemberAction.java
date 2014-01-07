@@ -125,7 +125,7 @@ public class QueryMemberAction extends DispatchAction {
 			if(memberTypeAttr != null && !memberTypeAttr.trim().isEmpty()){
 				newList.clear();
 				if(Integer.parseInt(memberTypeAttr) == MemberType.Attribute.INTERESTED.getVal()){
-					newList.addAll(MemberDao.getInterestedMember(staff));
+					newList.addAll(MemberDao.getInterestedMember(staff, extraCond));
 				}else{
 					List<Member> attrMember = new ArrayList<Member>();  
 					for (Member member : list) {
