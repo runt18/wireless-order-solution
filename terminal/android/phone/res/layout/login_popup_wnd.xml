@@ -4,13 +4,13 @@
     android:layout_height="match_parent"
     android:background="@drawable/pwd_selector"
     android:orientation="vertical" >
-    
-    <ListView 
+
+    <ListView
         android:id="@+id/loginpopuwindow"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:divider="@drawable/line"
         android:cacheColorHint="#00000000"
-        ></ListView>
+        android:divider="@drawable/line" >
+    </ListView>
 
 </LinearLayout>

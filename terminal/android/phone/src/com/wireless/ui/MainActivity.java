@@ -550,7 +550,7 @@ public class MainActivity extends FragmentActivity implements OnTableSelectedLis
 			});
 	        
 	        // 获取自定义布局文件的视图
-			View popupWndView = getLayoutInflater().inflate(R.layout.loginpopuwindow, null, false);
+			View popupWndView = getLayoutInflater().inflate(R.layout.login_popup_wnd, null, false);
 			// 创建PopupWindow实例
 			_popupWindow = new PopupWindow(popupWndView, 380, 200, true);
 			_popupWindow.setOutsideTouchable(true);
