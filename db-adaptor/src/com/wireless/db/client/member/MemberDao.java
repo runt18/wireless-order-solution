@@ -215,11 +215,11 @@ public class MemberDao {
 	 * @throws BusinessException 
 	 * 			throws if any member type does NOT exist
 	 */
-	public static List<Member> getInterestedMember(Staff staff) throws SQLException, BusinessException{
+	public static List<Member> getInterestedMember(Staff staff, String extraCond) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return getInterestedMember(dbCon, staff, null, null);
+			return getInterestedMember(dbCon, staff, extraCond, null);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -374,7 +374,6 @@ public class MemberDao {
 			dbCon.disconnect();
 		}
 	}
-	
 	/**
 	 * Get the member according to member id.
 	 * @param dbCon
