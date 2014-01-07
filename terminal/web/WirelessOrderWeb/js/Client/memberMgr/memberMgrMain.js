@@ -636,7 +636,7 @@ memberOperationRenderer = function(val, m, record){
 //		+ '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
 //		+ '<a href="javascript:adjustPoint()">积分调整</a>';
 };
-
+var selectedNode;
 /**************************************************/
 function treeInit(){
 	var memberTypeTreeTbar = new Ext.Toolbar({
@@ -690,9 +690,9 @@ function treeInit(){
 		tbar : memberTypeTreeTbar,
 		listeners : {
 	    	click : function(e){
-	    		Ext.getCmp('btnSearchMember').handler(e);
+	    		selectedNode = e;
+	    		Ext.getCmp('btnSearchMember').handler();
 	    		Ext.getDom('memberTypeShowType').innerHTML = e.text;
-	    		
 	    	}
 	    }
 	});
@@ -790,13 +790,9 @@ function gridInit(){
 			text : '搜索',
 			id : 'btnSearchMember',
 			iconCls : 'btn_search',
-			handler : function(e){
-				var memberTypeNode;
-				if(e){
-					memberTypeNode = e;
-				}else{
-					memberTypeNode = memberTypeTree.getSelectionModel().getSelectedNode();
-				}
+			handler : function(){
+//					memberTypeNode = memberTypeTree.getSelectionModel().getSelectedNode();
+				var memberTypeNode = selectedNode;
 				var searchType = Ext.getCmp('mr_comboMemberSearchType').getValue();
 				var searchValue = Ext.getCmp(mObj.searchValue) ? Ext.getCmp(mObj.searchValue).getValue() : '';
 				
@@ -836,16 +832,14 @@ function gridInit(){
 						limit : GRID_PADDING_LIMIT_20
 					}
 				});
-				//显示关注的会员
 				gs.on('load', function(store, records, options){
-					if(e){
-						if(typeof e.attributes.attr != 'undefined' && e.attributes.attr == 2){
+					if(selectedNode){
+						if(typeof selectedNode.attributes.attr != 'undefined' && selectedNode.attributes.attr == 2){
 							for (var i = 0; i < records.length; i++) {
 								records[i].set('acctendtioned', true);
 							}
 						}
 					}
-					e = "";
 				});
 			}
 		}, {
