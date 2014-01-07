@@ -7,13 +7,32 @@ import com.wireless.db.Params;
 
 public class CalcFoodStatisticsDao {
 	
+	public final static class Result{
+		private final int amount;
+		private final int elapsed;
+		Result(int amount, int elapsed){
+			this.amount = amount;
+			this.elapsed = elapsed;
+		}
+		public int getAmount(){
+			return this.amount;
+		}
+		public int getElapsed(){
+			return this.elapsed;
+		}
+		@Override
+		public String toString(){
+			return "The calculation to " + amount + " food's statistics takes " + elapsed + " sec.";
+		}
+	}
+	
 	/**
 	 * Calculate the food statistics.
-	 * @return The amount of statistics record would be written to database. 
+	 * @return the result to food statistics calculation
 	 * @throws SQLException
-	 * 			Throws if failed to execute the SQL statement.
+	 * 			throws if failed to execute the SQL statement
 	 */
-	public static int exec() throws SQLException{
+	public static Result exec() throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -27,17 +46,19 @@ public class CalcFoodStatisticsDao {
 	 * Calculate the food statistics.
 	 * Note that the database should be connected before invoking this method. 
 	 * @param dbCon
-	 * 			The database base connection
-	 * @return The amount of statistics record would be written to database. 
+	 * 			the database base connection
+	 * @return the result to food statistics calculation
 	 * @throws SQLException
-	 * 			Throws if failed to execute the SQL statement.
+	 * 			throws if failed to execute the SQL statement
 	 */
-	public static int exec(DBCon dbCon) throws SQLException{
+	public static Result exec(DBCon dbCon) throws SQLException{
 		
 		int nRows = 0;
 		
 		try{
 			//dbCon.conn.setAutoCommit(false);
+			
+			long beginTime = System.currentTimeMillis();
 			
 			String sql;
 			
@@ -56,7 +77,7 @@ public class CalcFoodStatisticsDao {
 			
 			//dbCon.conn.commit();
 			
-			return nRows;
+			return new Result(nRows, (int)(System.currentTimeMillis() - beginTime) / 1000);
 			
 		}catch(SQLException e){
 			//dbCon.conn.rollback();

@@ -37,7 +37,7 @@ public class MemberDao {
 		private final int memberAmount;
 		private final int memberUpgradeAmount;
 		
-		public UpgradeResult(int elapsedTime, int memberAmount, int memberUpgradeAmount) {
+		UpgradeResult(int elapsedTime, int memberAmount, int memberUpgradeAmount) {
 			this.elapsedTime = elapsedTime;
 			this.memberAmount = memberAmount;
 			this.memberUpgradeAmount = memberUpgradeAmount;
@@ -54,6 +54,40 @@ public class MemberDao {
 		@Override
 		public String toString(){
 			return "The calculation to " + memberUpgradeAmount + "/" + memberAmount + " member(s) upgrade takes " + elapsedTime + " sec.";
+		}
+	}
+	
+	public final static class CalcRecommendResult{
+		private final int elapsedTime;
+		
+		public CalcRecommendResult(int elapsedTime) {
+			this.elapsedTime = elapsedTime;
+		}
+		
+		public int getElapsedTime(){
+			return this.elapsedTime;
+		}
+		
+		@Override
+		public String toString(){
+			return "The calculation to member recommended foods takes " + elapsedTime + " sec.";
+		}
+	}
+	
+	public final static class CalcFavorResult{
+		private final int elapsedTime;
+		
+		public CalcFavorResult(int elapsedTime) {
+			this.elapsedTime = elapsedTime;
+		}
+		
+		public int getElapsedTime(){
+			return this.elapsedTime;
+		}
+		
+		@Override
+		public String toString(){
+			return "The calculation to member favor foods takes " + elapsedTime + " sec.";
 		}
 	}
 	
@@ -1302,14 +1336,15 @@ public class MemberDao {
 	
 	/**
 	 * Calculate most favor foods to each member.
+	 * @return the result to calculate favor foods
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static void calcFavorFoods() throws SQLException{
+	public static CalcFavorResult calcFavorFoods() throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			calcFavorFoods(dbCon);
+			return calcFavorFoods(dbCon);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -1319,10 +1354,14 @@ public class MemberDao {
 	 * Calculate most favor foods to each member.
 	 * @param dbCon
 	 * 			the database connection
+	 * @return the result to calculate favor foods
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static void calcFavorFoods(DBCon dbCon) throws SQLException{
+	public static CalcFavorResult calcFavorFoods(DBCon dbCon) throws SQLException{
+		
+		long beginTime = System.currentTimeMillis();
+		
 		String sql;
 		//Delete all the original member favor foods.
 		sql = " DELETE FROM " + Params.dbName + ".member_favor_food";
@@ -1342,6 +1381,9 @@ public class MemberDao {
 		for(Integer memberId : memberIds){
 			calcFavorFoods(dbCon, memberId);
 		}
+		
+		return new CalcFavorResult((int)(System.currentTimeMillis() - beginTime) / 1000);
+
 	}
 	
 	/**
@@ -1354,6 +1396,7 @@ public class MemberDao {
 	 * 			throws if failed to execute any SQL statement
 	 */
 	private static void calcFavorFoods(DBCon dbCon, int memberId) throws SQLException{
+		
 		String sql;
 		sql = " INSERT INTO " + Params.dbName + ".member_favor_food " +
 			  " (`member_id`, `food_id`, `point`) " +
@@ -1377,18 +1420,20 @@ public class MemberDao {
 			  " point = point / @max_favor_food_point " +
 			  " WHERE member_id = " + memberId;
 		dbCon.stmt.executeUpdate(sql);
+		
 	}
 
 	/**
 	 * Calculate the recommended foods to each member.
+	 * @return the result to calculate recommend foods
 	 * @throws SQLException	
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static void calcRecommendFoods() throws SQLException{
+	public static CalcRecommendResult calcRecommendFoods() throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			calcRecommendFoods(dbCon);
+			return calcRecommendFoods(dbCon);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -1398,10 +1443,14 @@ public class MemberDao {
 	 * Calculate the recommended foods to each member.
 	 * @param dbCon
 	 * 			the database connection 
+	 * @return the result to calculate recommend foods
 	 * @throws SQLException	
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static void calcRecommendFoods(DBCon dbCon) throws SQLException{
+	public static CalcRecommendResult calcRecommendFoods(DBCon dbCon) throws SQLException{
+		
+		long beginTime = System.currentTimeMillis();
+		
 		String sql;
 		//Delete all the original member recommended foods.
 		sql = " DELETE FROM " + Params.dbName + ".member_recommend_food";
@@ -1422,6 +1471,8 @@ public class MemberDao {
 		for(int memberId : memberIds){
 			calcRecommnedFoods(dbCon, memberId);
 		}
+		
+		return new CalcRecommendResult((int)(System.currentTimeMillis() - beginTime) / 1000);
 	}
 	
 	/**
@@ -1514,8 +1565,10 @@ public class MemberDao {
 						for(MemberLevel lvToUpgrade : upLvs){
 							//upgrade the member to level whose threshold is nearest the member's
 							if(m.getTotalPoint() > lvToUpgrade.getPointThreshold()){
-								update(dbCon, admin, new Member.UpdateBuilder(m.getId(), m.getRestaurantId()).setMemberTypeId(lvToUpgrade.getMemberType().getId()));
-								memberUpgradAmount++;
+								if(!m.getMemberType().equals(lvToUpgrade.getMemberType())){
+									update(dbCon, admin, new Member.UpdateBuilder(m.getId(), m.getRestaurantId()).setMemberTypeId(lvToUpgrade.getMemberType().getId()));
+									memberUpgradAmount++;
+								}
 								break;
 							}
 						}

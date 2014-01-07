@@ -30,6 +30,17 @@ public class TasteRefDao {
 	private final static String REF_COUNT = "$(ref_cnt)";
 	private final static String TASTE_RANK = "$(taste_rank)";
 	
+	public static final class Result{
+		private final int elapsed;
+		Result(int elapsed){
+			this.elapsed = elapsed;
+		}
+		@Override
+		public String toString(){
+			return "The calculation to smart taste reference takes " + elapsed + " sec.";
+		}
+	}
+	
 	private final static String QUERY_TASTE_SQL = 
 			" SELECT A.food_id, A.taste_id, COUNT(*) AS ref_cnt " +
 			" FROM " +
@@ -182,14 +193,15 @@ public class TasteRefDao {
 	
 	/**
 	 * Calculate the taste reference count to all the foods with smart taste reference.
+	 * @return the result to smart taste reference calculation
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */	
-	public static void exec() throws SQLException{
+	public static Result exec() throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			exec(dbCon);
+			return exec(dbCon);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -197,13 +209,16 @@ public class TasteRefDao {
 	
 	/**
 	 * Calculate the taste reference count to all the foods with smart taste reference.
-	 * Note that the database should be connected before invoking this method.
 	 * @param dbCon
 	 * 			the database connection
+	 * @return the result to smart taste reference calculation
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static void exec(DBCon dbCon) throws SQLException{
+	public static Result exec(DBCon dbCon) throws SQLException{
+		
+		long beginTime = System.currentTimeMillis();
+		
 		/**
 		 * Get all the foods whose taste reference type is smart
 		 */
@@ -229,7 +244,7 @@ public class TasteRefDao {
 			/**
 			 * The hash map to store the taste reference count to all the foods
 			 */
-			HashMap<Food, Set<TasteRefCnt>> foodTasteRef = new HashMap<Food, Set<TasteRefCnt>>();
+			Map<Food, Set<TasteRefCnt>> foodTasteRef = new HashMap<Food, Set<TasteRefCnt>>();
 
 			//Combine the food id to condition string.
 			StringBuilder foodIdCond = new StringBuilder();
@@ -265,6 +280,8 @@ public class TasteRefDao {
 			storeFoodTaste(dbCon, foodTasteRef);	
 
 		}	
+		
+		return new Result((int)(System.currentTimeMillis() - beginTime) / 1000);
 	}
 	
 	/**
@@ -299,7 +316,7 @@ public class TasteRefDao {
 	 * @param foodTasteRef
 	 * @throws SQLException
 	 */
-	private static void storeFoodTaste(DBCon dbCon, HashMap<Food, Set<TasteRefCnt>> foodTasteRef) throws SQLException{
+	private static void storeFoodTaste(DBCon dbCon, Map<Food, Set<TasteRefCnt>> foodTasteRef) throws SQLException{
 		
 		String sql;
 		
@@ -368,12 +385,12 @@ public class TasteRefDao {
 		/**
 		 * Get the taste reference count to each kitchens.
 		 */
-		HashMap<Kitchen, Set<TasteRefCnt>> kitchenTasteRef = getTasteRefByKitchen(dbCon, null, null);
+		Map<Kitchen, Set<TasteRefCnt>> kitchenTasteRef = getTasteRefByKitchen(dbCon, null, null);
 		
 		/**
 		 * Get the taste reference count to each departments.
 		 */
-		HashMap<Department, Set<TasteRefCnt>> deptTasteRef = getTasteRefByDept(dbCon, null, null);
+		Map<Department, Set<TasteRefCnt>> deptTasteRef = getTasteRefByDept(dbCon, null, null);
 		
 		for(Map.Entry<Food, Set<TasteRefCnt>> entry : foodTasteRef.entrySet()){
 			Set<TasteRefCnt> kitchenTaste = kitchenTasteRef.get(entry.getKey().getKitchen());
@@ -476,7 +493,7 @@ public class TasteRefDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	private static HashMap<Kitchen, Set<TasteRefCnt>> getTasteRefByKitchen(DBCon dbCon, String extraCond, String orderClause) throws SQLException{
+	private static Map<Kitchen, Set<TasteRefCnt>> getTasteRefByKitchen(DBCon dbCon, String extraCond, String orderClause) throws SQLException{
 		
 		String sql;
 		
@@ -538,7 +555,7 @@ public class TasteRefDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	private static HashMap<Department, Set<TasteRefCnt>> getTasteRefByDept(DBCon dbCon, String extraCond, String orderClause) throws SQLException{
+	private static Map<Department, Set<TasteRefCnt>> getTasteRefByDept(DBCon dbCon, String extraCond, String orderClause) throws SQLException{
 		
 		String sql;
 		

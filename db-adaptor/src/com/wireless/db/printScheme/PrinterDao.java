@@ -49,12 +49,13 @@ public class PrinterDao {
 		
 		//Insert a new printer
 		sql = " INSERT INTO " + Params.dbName + ".printer " +
-		      " (restaurant_id, name, alias, style ) " +
+		      " ( restaurant_id, name, alias, style, enabled ) " +
 			  " VALUES ( " +
 		      printerToAdd.getRestaurantId() + "," +
 			  "'" + printerToAdd.getName() + "'," +
 		      "'" + printerToAdd.getAlias() + "'," +
-			  printerToAdd.getStyle().getVal() +
+			  printerToAdd.getStyle().getVal() + "," +
+		      (printerToAdd.isEnabled() ? 1 : 0) +
 		      ")";
 		
 		dbCon.stmt.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
@@ -100,7 +101,7 @@ public class PrinterDao {
 			  " name = " + "'" + printerToUpdate.getName() + "'" + 
 			  " ,alias = " + "'" + printerToUpdate.getAlias() + "'" +
 			  " ,style = " + printerToUpdate.getStyle().getVal() + 
-			  " ,enabled = " + (printerToUpdate.isEnabled() == true ? 1 : 0) +
+			  " ,enabled = " + (printerToUpdate.isEnabled() ? 1 : 0) +
 			  " WHERE 1 = 1 " +
 			  " AND printer_id = " + printerToUpdate.getId();
 		

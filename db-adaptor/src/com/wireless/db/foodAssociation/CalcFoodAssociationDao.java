@@ -11,18 +11,34 @@ import com.wireless.pojo.menuMgr.Food;
 public class CalcFoodAssociationDao {
 	
 	//private static final int MAX_FOOD_AMOUNT_PER_CONNECTION = 3000;
+
+	public final static class Result{
+		private final int elapsed;
+		Result(int elapsed){
+			this.elapsed = elapsed;
+		}
+		public int getElapsed(){
+			return this.elapsed;
+		}
+		@Override
+		public String toString(){
+			return "The calculation to food association takes " + elapsed + " sec.";
+		}
+	}
 	
-	public static void exec() throws SQLException{
+	public static Result exec() throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			exec(dbCon);
+			return exec(dbCon);
 		}finally{
 			dbCon.disconnect();
 		}
 	}
 	
-	public static void exec(DBCon dbCon) throws SQLException{
+	public static Result exec(DBCon dbCon) throws SQLException{
+		
+		long beginTime = System.currentTimeMillis();
 		
 		String sql;
 		//Delete the original food association records.
@@ -34,19 +50,11 @@ public class CalcFoodAssociationDao {
 		for(Food f : foods){
 			exec(dbCon, f);
 		}
+		
+		return new Result((int)(System.currentTimeMillis() - beginTime) / 1000);
 	}
 	
-	public static void exec(Food food) throws SQLException{
-		DBCon dbCon = new DBCon();
-		try{
-			dbCon.connect();
-			exec(dbCon, food);
-		}finally{
-			dbCon.disconnect();
-		}
-	}
-	
-	public static void exec(DBCon dbCon, Food food) throws SQLException{
+	private static void exec(DBCon dbCon, Food food) throws SQLException{
 		
 		String sql;
 		

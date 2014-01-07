@@ -12,6 +12,7 @@ import com.wireless.db.crMgr.CancelReasonDao;
 import com.wireless.db.deptMgr.DepartmentDao;
 import com.wireless.db.deptMgr.KitchenDao;
 import com.wireless.db.distMgr.DiscountDao;
+import com.wireless.db.printScheme.PrinterDao;
 import com.wireless.db.regionMgr.RegionDao;
 import com.wireless.db.regionMgr.TableDao;
 import com.wireless.db.staffMgr.RoleDao;
@@ -27,6 +28,8 @@ import com.wireless.pojo.inventoryMgr.MaterialCate;
 import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.pojo.ppMgr.PricePlan;
+import com.wireless.pojo.printScheme.PStyle;
+import com.wireless.pojo.printScheme.Printer;
 import com.wireless.pojo.regionMgr.Region;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.restaurantMgr.Restaurant;
@@ -37,6 +40,25 @@ import com.wireless.pojo.tasteMgr.TasteCategory;
 import com.wireless.pojo.util.DateUtil;
 
 public class RestaurantDao {
+	
+	public static final class LivessnessResult{
+		private final int amount;
+		private final int elapsed;
+		public LivessnessResult(int amount, int elapsed) {
+			this.amount = amount;
+			this.elapsed = elapsed;
+		}
+		public int getAmount(){
+			return this.amount;
+		}
+		public int getElapsed(){
+			return this.elapsed;
+		}
+		@Override
+		public String toString(){
+			return "The calculation to " + amount + " restaurant(s) liveness takes " + elapsed + " sec.";
+		}
+	}
 	
 	/**
 	 * Query a restaurant according to specified id.
@@ -345,6 +367,9 @@ public class RestaurantDao {
 			//Insert a weixin member type
 			initMemberType(dbCon, staff);
 			
+			//Insert the printers
+			initPrinter(dbCon, staff);
+			
 			return restaurant.getId();
 			
 		}catch(Exception e){
@@ -354,6 +379,19 @@ public class RestaurantDao {
 			throw new SQLException(e);
 		}
 
+	}
+	
+	private static void initPrinter(DBCon dbCon, Staff staff) throws SQLException, BusinessException{
+		PrinterDao.insert(dbCon, staff, new Printer.InsertBuilder("GP-80250-201", PStyle.PRINT_STYLE_80MM, staff.getRestaurantId()));
+		PrinterDao.insert(dbCon, staff, new Printer.InsertBuilder("GP-80250-202", PStyle.PRINT_STYLE_80MM, staff.getRestaurantId()));
+		PrinterDao.insert(dbCon, staff, new Printer.InsertBuilder("GP-80250-203", PStyle.PRINT_STYLE_80MM, staff.getRestaurantId()));
+		PrinterDao.insert(dbCon, staff, new Printer.InsertBuilder("GP-80250-204", PStyle.PRINT_STYLE_80MM, staff.getRestaurantId()));
+		PrinterDao.insert(dbCon, staff, new Printer.InsertBuilder("GP-80250-205", PStyle.PRINT_STYLE_80MM, staff.getRestaurantId()));
+		PrinterDao.insert(dbCon, staff, new Printer.InsertBuilder("GP-80250-206", PStyle.PRINT_STYLE_80MM, staff.getRestaurantId()).setEnabled(false));
+		PrinterDao.insert(dbCon, staff, new Printer.InsertBuilder("GP-80250-207", PStyle.PRINT_STYLE_80MM, staff.getRestaurantId()).setEnabled(false));
+		PrinterDao.insert(dbCon, staff, new Printer.InsertBuilder("GP-80250-208", PStyle.PRINT_STYLE_80MM, staff.getRestaurantId()).setEnabled(false));
+		PrinterDao.insert(dbCon, staff, new Printer.InsertBuilder("GP-80250-209", PStyle.PRINT_STYLE_80MM, staff.getRestaurantId()).setEnabled(false));
+		PrinterDao.insert(dbCon, staff, new Printer.InsertBuilder("GP-80250-210", PStyle.PRINT_STYLE_80MM, staff.getRestaurantId()).setEnabled(false));
 	}
 	
 	private static void initMemberType(DBCon dbCon, Staff staff) throws SQLException{
@@ -482,9 +520,102 @@ public class RestaurantDao {
 	}
 	
 	private static void initTastes(DBCon dbCon, Staff staff) throws SQLException, BusinessException{
-		//Insert the '规格' category
-		int categoryId = TasteCategoryDao.insert(dbCon, staff, new TasteCategory.SpecInsertBuilder(staff.getRestaurantId()));
+		int categoryId; 
 		
+		//Insert the '通用' category
+		categoryId = TasteCategoryDao.insert(dbCon, staff, new TasteCategory.InsertBuilder(staff.getRestaurantId(), "通用"));
+		TasteCategory commonCategory = TasteCategoryDao.getById(dbCon, staff, categoryId);
+		TasteDao.insert(dbCon, staff, new Taste.InsertBuilder(staff.getRestaurantId(), "打包", commonCategory));
+		TasteDao.insert(dbCon, staff, new Taste.InsertBuilder(staff.getRestaurantId(), "加快", commonCategory));
+		TasteDao.insert(dbCon, staff, new Taste.InsertBuilder(staff.getRestaurantId(), "补单免做", commonCategory));
+		TasteDao.insert(dbCon, staff, new Taste.InsertBuilder(staff.getRestaurantId(), "分席上", commonCategory));
+		TasteDao.insert(dbCon, staff, new Taste.InsertBuilder(staff.getRestaurantId(), "清淡", commonCategory));
+		TasteDao.insert(dbCon, staff, new Taste.InsertBuilder(staff.getRestaurantId(), "少盐", commonCategory));
+		TasteDao.insert(dbCon, staff, new Taste.InsertBuilder(staff.getRestaurantId(), "少油", commonCategory));
+		TasteDao.insert(dbCon, staff, new Taste.InsertBuilder(staff.getRestaurantId(), "免辣", commonCategory));
+		TasteDao.insert(dbCon, staff, new Taste.InsertBuilder(staff.getRestaurantId(), "加辣", commonCategory));
+		TasteDao.insert(dbCon, staff, new Taste.InsertBuilder(staff.getRestaurantId(), "加姜", commonCategory));
+		TasteDao.insert(dbCon, staff, new Taste.InsertBuilder(staff.getRestaurantId(), "加葱", commonCategory));
+		TasteDao.insert(dbCon, staff, new Taste.InsertBuilder(staff.getRestaurantId(), "免姜", commonCategory));
+		TasteDao.insert(dbCon, staff, new Taste.InsertBuilder(staff.getRestaurantId(), "免葱", commonCategory));
+		TasteDao.insert(dbCon, staff, new Taste.InsertBuilder(staff.getRestaurantId(), "冻饮", commonCategory));
+		TasteDao.insert(dbCon, staff, new Taste.InsertBuilder(staff.getRestaurantId(), "热饮", commonCategory));
+		TasteDao.insert(dbCon, staff, new Taste.InsertBuilder(staff.getRestaurantId(), "VIP用", commonCategory));
+		TasteDao.insert(dbCon, staff, new Taste.InsertBuilder(staff.getRestaurantId(), "即起", commonCategory));
+		TasteDao.insert(dbCon, staff, new Taste.InsertBuilder(staff.getRestaurantId(), "生上", commonCategory));
+		TasteDao.insert(dbCon, staff, new Taste.InsertBuilder(staff.getRestaurantId(), "开锅", commonCategory));
+
+		//Insert the '海鲜' category
+		categoryId = TasteCategoryDao.insert(dbCon, staff, new TasteCategory.InsertBuilder(staff.getRestaurantId(), "海鲜"));
+		TasteCategory seefoodCategory = TasteCategoryDao.getById(dbCon, staff, categoryId);
+		TasteDao.insert(dbCon, staff, new Taste.InsertBuilder(staff.getRestaurantId(), "清蒸", seefoodCategory));
+		TasteDao.insert(dbCon, staff, new Taste.InsertBuilder(staff.getRestaurantId(), "豉汁蒸", seefoodCategory));
+		TasteDao.insert(dbCon, staff, new Taste.InsertBuilder(staff.getRestaurantId(), "酸菜", seefoodCategory));
+		TasteDao.insert(dbCon, staff, new Taste.InsertBuilder(staff.getRestaurantId(), "水煮", seefoodCategory));
+		TasteDao.insert(dbCon, staff, new Taste.InsertBuilder(staff.getRestaurantId(), "香煎", seefoodCategory));
+		TasteDao.insert(dbCon, staff, new Taste.InsertBuilder(staff.getRestaurantId(), "椒盐", seefoodCategory));
+		TasteDao.insert(dbCon, staff, new Taste.InsertBuilder(staff.getRestaurantId(), "白灼", seefoodCategory));
+		TasteDao.insert(dbCon, staff, new Taste.InsertBuilder(staff.getRestaurantId(), "刺身", seefoodCategory));
+		TasteDao.insert(dbCon, staff, new Taste.InsertBuilder(staff.getRestaurantId(), "铁板", seefoodCategory));
+		TasteDao.insert(dbCon, staff, new Taste.InsertBuilder(staff.getRestaurantId(), "美极", seefoodCategory));
+		TasteDao.insert(dbCon, staff, new Taste.InsertBuilder(staff.getRestaurantId(), "榄角蒸", seefoodCategory));
+		TasteDao.insert(dbCon, staff, new Taste.InsertBuilder(staff.getRestaurantId(), "荷叶蒸", seefoodCategory));
+		TasteDao.insert(dbCon, staff, new Taste.InsertBuilder(staff.getRestaurantId(), "红枣枸子蒸", seefoodCategory));
+		TasteDao.insert(dbCon, staff, new Taste.InsertBuilder(staff.getRestaurantId(), "豉汁金钱片", seefoodCategory));
+		TasteDao.insert(dbCon, staff, new Taste.InsertBuilder(staff.getRestaurantId(), "砂锅", seefoodCategory));
+		TasteDao.insert(dbCon, staff, new Taste.InsertBuilder(staff.getRestaurantId(), "锡纸", seefoodCategory));
+		TasteDao.insert(dbCon, staff, new Taste.InsertBuilder(staff.getRestaurantId(), "油浸", seefoodCategory));
+		TasteDao.insert(dbCon, staff, new Taste.InsertBuilder(staff.getRestaurantId(), "药材浸", seefoodCategory));
+		TasteDao.insert(dbCon, staff, new Taste.InsertBuilder(staff.getRestaurantId(), "蒜子焖", seefoodCategory));
+		TasteDao.insert(dbCon, staff, new Taste.InsertBuilder(staff.getRestaurantId(), "姜葱焖", seefoodCategory));
+		TasteDao.insert(dbCon, staff, new Taste.InsertBuilder(staff.getRestaurantId(), "红焖", seefoodCategory));
+		TasteDao.insert(dbCon, staff, new Taste.InsertBuilder(staff.getRestaurantId(), "开锅", seefoodCategory));
+		TasteDao.insert(dbCon, staff, new Taste.InsertBuilder(staff.getRestaurantId(), "起片", seefoodCategory));
+		TasteDao.insert(dbCon, staff, new Taste.InsertBuilder(staff.getRestaurantId(), "酱爆", seefoodCategory));
+
+		//Insert the '蔬菜' category
+		categoryId = TasteCategoryDao.insert(dbCon, staff, new TasteCategory.InsertBuilder(staff.getRestaurantId(), "蔬菜"));
+		TasteCategory vegatableCategory = TasteCategoryDao.getById(dbCon, staff, categoryId);
+		TasteDao.insert(dbCon, staff, new Taste.InsertBuilder(staff.getRestaurantId(), "盐水", vegatableCategory));
+		TasteDao.insert(dbCon, staff, new Taste.InsertBuilder(staff.getRestaurantId(), "上汤", vegatableCategory));
+		TasteDao.insert(dbCon, staff, new Taste.InsertBuilder(staff.getRestaurantId(), "生炒", vegatableCategory));
+		TasteDao.insert(dbCon, staff, new Taste.InsertBuilder(staff.getRestaurantId(), "蒜蓉炒", vegatableCategory));
+		TasteDao.insert(dbCon, staff, new Taste.InsertBuilder(staff.getRestaurantId(), "豉汁炒", vegatableCategory));
+		TasteDao.insert(dbCon, staff, new Taste.InsertBuilder(staff.getRestaurantId(), "姜汁炒", vegatableCategory));
+		TasteDao.insert(dbCon, staff, new Taste.InsertBuilder(staff.getRestaurantId(), "耗油", vegatableCategory));
+		TasteDao.insert(dbCon, staff, new Taste.InsertBuilder(staff.getRestaurantId(), "煲淋", vegatableCategory));
+		TasteDao.insert(dbCon, staff, new Taste.InsertBuilder(staff.getRestaurantId(), "咸猪骨煲", vegatableCategory));
+		TasteDao.insert(dbCon, staff, new Taste.InsertBuilder(staff.getRestaurantId(), "豆豉炒", vegatableCategory));
+		TasteDao.insert(dbCon, staff, new Taste.InsertBuilder(staff.getRestaurantId(), "豆豉鲮鱼炒", vegatableCategory));
+		TasteDao.insert(dbCon, staff, new Taste.InsertBuilder(staff.getRestaurantId(), "辣炒", vegatableCategory));
+		TasteDao.insert(dbCon, staff, new Taste.InsertBuilder(staff.getRestaurantId(), "凉拌", vegatableCategory));
+		TasteDao.insert(dbCon, staff, new Taste.InsertBuilder(staff.getRestaurantId(), "原味", vegatableCategory));
+		TasteDao.insert(dbCon, staff, new Taste.InsertBuilder(staff.getRestaurantId(), "肉片炒", vegatableCategory));
+		TasteDao.insert(dbCon, staff, new Taste.InsertBuilder(staff.getRestaurantId(), "牛肉炒", vegatableCategory));
+		TasteDao.insert(dbCon, staff, new Taste.InsertBuilder(staff.getRestaurantId(), "鲜尤炒", vegatableCategory));
+		
+		//Insert the '西餐' category
+		categoryId = TasteCategoryDao.insert(dbCon, staff, new TasteCategory.InsertBuilder(staff.getRestaurantId(), "西餐"));
+		TasteCategory westernCategory = TasteCategoryDao.getById(dbCon, staff, categoryId);
+		TasteDao.insert(dbCon, staff, new Taste.InsertBuilder(staff.getRestaurantId(), "黑椒汁", westernCategory));
+		TasteDao.insert(dbCon, staff, new Taste.InsertBuilder(staff.getRestaurantId(), "蒜蓉汁", westernCategory));
+		TasteDao.insert(dbCon, staff, new Taste.InsertBuilder(staff.getRestaurantId(), "红酒汁", westernCategory));
+		TasteDao.insert(dbCon, staff, new Taste.InsertBuilder(staff.getRestaurantId(), "洋葱汁", westernCategory));
+		TasteDao.insert(dbCon, staff, new Taste.InsertBuilder(staff.getRestaurantId(), "蘑菇汁", westernCategory));
+		TasteDao.insert(dbCon, staff, new Taste.InsertBuilder(staff.getRestaurantId(), "咖喱汁", westernCategory));
+		TasteDao.insert(dbCon, staff, new Taste.InsertBuilder(staff.getRestaurantId(), "香草汁", westernCategory));
+		TasteDao.insert(dbCon, staff, new Taste.InsertBuilder(staff.getRestaurantId(), "番茄汁", westernCategory));
+		TasteDao.insert(dbCon, staff, new Taste.InsertBuilder(staff.getRestaurantId(), "加铁板", westernCategory));
+		TasteDao.insert(dbCon, staff, new Taste.InsertBuilder(staff.getRestaurantId(), "加白饭", westernCategory));
+		TasteDao.insert(dbCon, staff, new Taste.InsertBuilder(staff.getRestaurantId(), "加意粉", westernCategory));
+		TasteDao.insert(dbCon, staff, new Taste.InsertBuilder(staff.getRestaurantId(), "全熟", westernCategory));
+		TasteDao.insert(dbCon, staff, new Taste.InsertBuilder(staff.getRestaurantId(), "九成熟", westernCategory));
+		TasteDao.insert(dbCon, staff, new Taste.InsertBuilder(staff.getRestaurantId(), "八成熟", westernCategory));
+		TasteDao.insert(dbCon, staff, new Taste.InsertBuilder(staff.getRestaurantId(), "七成熟", westernCategory));
+		TasteDao.insert(dbCon, staff, new Taste.InsertBuilder(staff.getRestaurantId(), "六成熟", westernCategory));
+		
+		//Insert the '规格' category
+		categoryId = TasteCategoryDao.insert(dbCon, staff, new TasteCategory.SpecInsertBuilder(staff.getRestaurantId()));
 		TasteCategory spec = TasteCategoryDao.getById(dbCon, staff, categoryId);
 		//Insert the '例牌'
 		TasteDao.insert(dbCon, staff, new Taste.RegularInsertBuilder(staff.getRestaurantId(), spec));
@@ -492,9 +623,6 @@ public class RestaurantDao {
 		TasteDao.insert(dbCon, staff, new Taste.MediumInsertBuilder(staff.getRestaurantId(), spec));
 		//Insert the '大牌'
 		TasteDao.insert(dbCon, staff, new Taste.LargeInsertBuilder(staff.getRestaurantId(), spec));
-		
-		//Insert the '口味' category
-		TasteCategoryDao.insert(dbCon, staff, new TasteCategory.InsertBuilder(staff.getRestaurantId(), "口味"));
 	}
 	
 	private static Staff initStaff(DBCon dbCon, int restaurantId, String pwd) throws SQLException, BusinessException{
@@ -576,6 +704,10 @@ public class RestaurantDao {
 		sql = " DELETE FROM " + Params.dbName + ".price_plan WHERE restaurant_id = " + restaurantId;
 		dbCon.stmt.executeUpdate(sql);
 		
+		//Delete the taste category
+		sql = " DELETE FROM " + Params.dbName + ".taste_category WHERE restaurant_id = " + restaurantId;
+		dbCon.stmt.executeUpdate(sql);
+		
 		//Delete the '大牌', '中牌', '例牌' and popular tastes
 		sql = " DELETE FROM " + Params.dbName + ".taste WHERE restaurant_id = " + restaurantId;
 		dbCon.stmt.executeUpdate(sql);
@@ -632,6 +764,10 @@ public class RestaurantDao {
 		
 		//Delete the member type
 		sql = " DELETE FROM " + Params.dbName + ".member_type WHERE restaurant_id = " + restaurantId;
+		dbCon.stmt.executeUpdate(sql);
+		
+		//Delete the printers
+		sql = " DELETE FROM " + Params.dbName + ".printer WHERE restaurant_id = " + restaurantId;
 		dbCon.stmt.executeUpdate(sql);
 	}
 	
@@ -690,9 +826,11 @@ public class RestaurantDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static void calcLiveness() throws SQLException{ 
+	public static LivessnessResult calcLiveness() throws SQLException{ 
 		DBCon dbCon = new DBCon();
 		try{
+			long beginTime = System.currentTimeMillis();
+			
 			dbCon.connect();
 			
 			String sql;
@@ -710,13 +848,17 @@ public class RestaurantDao {
 				restaurant.setLiveness(calcLiveness(dbCon, restaurant.getId()));
 			}
 			
+			int amount = 0;
 			//Update all liveness to each restaurant
 			for(Restaurant restaurant : restaurants){
 				sql = " UPDATE " + Params.dbName + ".restaurant SET " +
 					  " liveness = " + restaurant.getLiveness() +
 					  " WHERE id = " + restaurant.getId();
 				dbCon.stmt.executeUpdate(sql);
+				amount++;
 			}
+			
+			return new LivessnessResult(amount, (int)(System.currentTimeMillis() - beginTime) / 1000);
 			
 		}finally{
 			dbCon.disconnect();

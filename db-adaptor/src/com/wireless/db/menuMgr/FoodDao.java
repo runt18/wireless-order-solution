@@ -915,29 +915,31 @@ public class FoodDao {
 			f.setPinyinShortcut(PinyinUtil.cn2FirstSpell(f.getName()));
 		}
 		
-		//Get the associated popular tastes to each food.
-		String sql;
-		sql = " SELECT " +
-		      " FTR.food_id, " + 
-			  " TASTE.taste_id, TASTE.restaurant_id " +
-			  " FROM " + Params.dbName + ".food_taste_rank FTR " +
-			  " LEFT JOIN " + Params.dbName + ".taste TASTE " +
-			  " ON TASTE.taste_id = FTR.taste_id " + 
-			  " WHERE " + " FTR.food_id IN(" + foodCond + ")" +
-			  " ORDER BY FTR.rank ";
-		
-		dbCon.rs = dbCon.stmt.executeQuery(sql);
-		
-		while(dbCon.rs.next()){
-			Food f = foods.get(dbCon.rs.getLong("food_id"));
-			if(f != null){
-				Taste t = new Taste(dbCon.rs.getInt("taste_id"));
-				t.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
-				f.addPopTaste(t);
+		if(foodCond.length() > 0){
+			//Get the associated popular tastes to each food.
+			String sql;
+			sql = " SELECT " +
+			      " FTR.food_id, " + 
+				  " TASTE.taste_id, TASTE.restaurant_id " +
+				  " FROM " + Params.dbName + ".food_taste_rank FTR " +
+				  " LEFT JOIN " + Params.dbName + ".taste TASTE " +
+				  " ON TASTE.taste_id = FTR.taste_id " + 
+				  " WHERE " + " FTR.food_id IN(" + foodCond + ")" +
+				  " ORDER BY FTR.rank ";
+			
+			dbCon.rs = dbCon.stmt.executeQuery(sql);
+			
+			while(dbCon.rs.next()){
+				Food f = foods.get(dbCon.rs.getInt("food_id"));
+				if(f != null){
+					Taste t = new Taste(dbCon.rs.getInt("taste_id"));
+					t.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
+					f.addPopTaste(t);
+				}
 			}
+			
+			dbCon.rs.close();
 		}
-		
-		dbCon.rs.close();
 		
 		//Get the combo detail to each food if belongs to combo. 
 		for(Entry<Integer, Food> entry : foods.entrySet()){

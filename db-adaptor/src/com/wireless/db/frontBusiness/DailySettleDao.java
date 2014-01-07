@@ -36,6 +36,7 @@ public class DailySettleDao {
 	 */
 	public static final class Result{
 		
+		private int elapsedTime;			//日结消耗的时间
 		private int totalOrder;				//当日已结帐的账单数
 		private int totalOrderDetail;		//当日已结帐的账单明细数
 		private int totalShift;				//当日交班的记录数
@@ -48,6 +49,14 @@ public class DailySettleDao {
 		
 		Result(){
 			
+		}
+		
+		public int getElapsedTime(){
+			return this.elapsedTime;
+		}
+		
+		void setElapsedTime(int elapsedTime){
+			this.elapsedTime = elapsedTime;
 		}
 		
 		public int getTotalOrder() {
@@ -122,6 +131,24 @@ public class DailySettleDao {
 			this.maxMemberOperationId = maxMemberOperationId;
 		}
 		
+		@Override
+		public String toString(){
+			
+			final String sep = System.getProperty("line.separator");
+
+			StringBuilder resultInfo = new StringBuilder();
+			resultInfo.append("info : " + getTotalOrder() + " record(s) are moved from \"order\" to \"order_history\"").append(sep);
+			resultInfo.append("info : " + getTotalOrderDetail() + " record(s) are moved from \"order_food\" to \"order_food_history\"").append(sep);
+			resultInfo.append("info : " + getTotalShift() + " record(s) are moved from \"shift\" to \"shift_history\"").append(sep);
+			resultInfo.append("info : " + 
+							  "maxium order id : " + getMaxOrderId() + ", " +
+							  "maxium order food id : " + getMaxOrderFoodId() + ", " +
+							  "maxium shift id : " + getMaxShiftId()).append(sep);
+			resultInfo.append("info : The record movement takes " + getElapsedTime() + " sec.");
+			
+			return resultInfo.toString();
+		}
+		
 	}
 
 	/**
@@ -150,6 +177,8 @@ public class DailySettleDao {
 	 * @throws BusinessException
 	 */
 	public static Result exec(DBCon dbCon) throws SQLException, BusinessException{
+		
+		long beginTime = System.currentTimeMillis();
 		
 		String sql;
 		
@@ -184,6 +213,8 @@ public class DailySettleDao {
 			result.setMaxOrderId(eachResult.getMaxOrderId());
 			result.setMaxShiftId(eachResult.getMaxShiftId());
 		}
+		
+		result.setElapsedTime((int)(System.currentTimeMillis() - beginTime) / 1000);
 		
 		return result;
 	}
@@ -742,24 +773,24 @@ public class DailySettleDao {
 	 * Check to see whether the paid order is exist before daily settlement to a specific restaurant.
 	 * @param dbCon
 	 * 			the database connection
-	 * @param term
+	 * @param staff
 	 * 			the terminal attached with the restaurant id
 	 * @return
 	 * 			an integer array holding the paid order id, 
 	 * 			return int[0] if no paid order exist. 
 	 * @throws SQLException
 	 */
-	public static int[] check(DBCon dbCon, Staff term) throws SQLException{
+	public static int[] check(DBCon dbCon, Staff staff) throws SQLException{
 		String sql;
-		int[] restOrderID = new int[0];
+		int[] restOrderId = new int[0];
 		
 		/**
 		 * Get the last off duty date from both shift and shift_history,
 		 */
 		String lastOffDuty;
 		sql = "SELECT MAX(off_duty) FROM (" +
-		 	  "SELECT off_duty FROM " + Params.dbName + ".shift WHERE restaurant_id=" + term.getRestaurantId() + " UNION " +
-			  "SELECT off_duty FROM " + Params.dbName + ".shift_history WHERE restaurant_id=" + term.getRestaurantId() + ") AS all_off_duty";
+		 	  "SELECT off_duty FROM " + Params.dbName + ".shift WHERE restaurant_id=" + staff.getRestaurantId() + " UNION " +
+			  "SELECT off_duty FROM " + Params.dbName + ".shift_history WHERE restaurant_id=" + staff.getRestaurantId() + ") AS all_off_duty";
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		if(dbCon.rs.next()){
 			Timestamp offDuty = dbCon.rs.getTimestamp(1);
@@ -779,23 +810,23 @@ public class DailySettleDao {
 		 * get the paid orders which has NOT been shifted between the last off duty and now,
 		 */
 		sql = " SELECT id FROM " + Params.dbName + ".order WHERE " +
-			  " restaurant_id = " + term.getRestaurantId() + " AND " +
+			  " restaurant_id = " + staff.getRestaurantId() + " AND " +
 			  " (status = " + Order.Status.PAID.getVal() + " OR " + " status = " + Order.Status.REPAID.getVal() + ")" + " AND " +
 			  " order_date BETWEEN " +
 			  "'" + lastOffDuty + "'" + " AND " + "NOW()";
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
-		ArrayList<Integer> orderIDs = new ArrayList<Integer>();
+		List<Integer> orderIds = new ArrayList<Integer>();
 		while(dbCon.rs.next()){
-			orderIDs.add(dbCon.rs.getInt("id"));
+			orderIds.add(dbCon.rs.getInt("id"));
 		}
 		dbCon.rs.close();
 		
-		restOrderID = new int[orderIDs.size()];
-		for(int i = 0; i < restOrderID.length; i++){
-			restOrderID[i] = orderIDs.get(i).intValue();
+		restOrderId = new int[orderIds.size()];
+		for(int i = 0; i < restOrderId.length; i++){
+			restOrderId[i] = orderIds.get(i).intValue();
 		}
 		
-		return restOrderID;
+		return restOrderId;
 	}
 	
 }
