@@ -51,7 +51,14 @@ public class QueryCommissionStatisticsAction extends Action{
 			}
 			if(!list.isEmpty()){
 				jobject.setTotalProperty(list.size());
-				jobject.setRoot(DataPaging.getPagingData(list, true, start, limit));
+				CommissionStatistics total = new CommissionStatistics();
+				for (CommissionStatistics item : list) {
+					total.setTotalPrice(item.getTotalPrice() + total.getTotalPrice());
+					total.setCommission(item.getCommission() + total.getCommission());
+				}
+				list = DataPaging.getPagingData(list, true, start, limit);
+				list.add(total);
+				jobject.setRoot(list);
 			}
 		}catch (SQLException e) {
 			e.printStackTrace();

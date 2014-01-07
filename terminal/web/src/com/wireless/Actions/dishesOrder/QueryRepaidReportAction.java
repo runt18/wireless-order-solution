@@ -43,7 +43,13 @@ public class QueryRepaidReportAction extends Action{
 			}
 			if(!list.isEmpty()){
 				jobject.setTotalProperty(list.size());
-				jobject.setRoot(DataPaging.getPagingData(list, true, start, limit));
+				RepaidStatistics total = new RepaidStatistics();
+				for (RepaidStatistics item : list) {
+					total.setmRepaidPrice(total.getmRepaidPrice() + item.getmRepaidPrice());
+				}
+				list = DataPaging.getPagingData(list, true, start, limit);
+				list.add(total);
+				jobject.setRoot(list);
 			}
 		}catch (SQLException e) {
 			e.printStackTrace();

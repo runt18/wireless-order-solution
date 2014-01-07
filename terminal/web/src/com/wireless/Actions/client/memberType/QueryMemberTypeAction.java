@@ -12,11 +12,13 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
+import com.wireless.db.client.member.MemberDao;
 import com.wireless.db.client.member.MemberLevelDao;
 import com.wireless.db.client.member.MemberTypeDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
+import com.wireless.pojo.client.Member;
 import com.wireless.pojo.client.MemberLevel;
 import com.wireless.pojo.client.MemberType;
 import com.wireless.pojo.staffMgr.Staff;
@@ -96,6 +98,7 @@ public class QueryMemberTypeAction extends DispatchAction {
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			List<MemberType> list = MemberTypeDao.getMemberType(StaffDao.verify(Integer.parseInt(pin)), null, " ORDER BY MT.member_type_id ");
 			List<MemberLevel> levelList = MemberLevelDao.getMemberLevels(staff);
+			List<Member> interestedMembers = MemberDao.getInterestedMember(staff);
 			MemberType item = null;
 			StringBuilder typeNode = new StringBuilder(), levelNode = new StringBuilder();
 			typeNode.append("{")
@@ -128,15 +131,11 @@ public class QueryMemberTypeAction extends DispatchAction {
 			}
 			change.append("]}");
 			point.append("]}");
-			interested.append("{")
-					 .append("text:'关注的会员'")
-					 .append(",attr:"+MemberType.Attribute.INTERESTED.getVal())
-					 .append(",leaf:true")
-					 .append("}");
+
 			
-			typeNode.append(change).append(",").append(point).append(",").append(interested).append("]");
+			typeNode.append(change).append(",").append(point).append("]");
 			typeNode.append("}");
-			
+			tsb.append("[").append(typeNode);
 			if(!levelList.isEmpty()){
 				levelNode.append("{")
 				 .append("text:'会员级别'")
@@ -146,18 +145,24 @@ public class QueryMemberTypeAction extends DispatchAction {
 						levelNode.append(",");
 					}
 					levelNode.append("{")
-							.append("text:'" + levelList.get(i).getMemberType().getName() + "  (LV"+ (i+1) +") "+ levelList.get(i).getPointThreshold() +"'")
+							.append("text:'" + levelList.get(i).getMemberType().getName() + "  (Lv"+ (i+1) +", "+ levelList.get(i).getPointThreshold() +"分)'")
 							.append(",leaf:true")
 							.append(",memberTypeId:" + levelList.get(i).getMemberType().getId())
 							.append(",memberTypeName:'" + levelList.get(i).getMemberType().getName() + "'")
 							.append("}");
 				}
 				levelNode.append("]}");
-				tsb.append("[").append(typeNode).append(",").append(levelNode).append("]");
-			}else{
-				tsb.append("[").append(typeNode).append("]");
+				tsb.append(",").append(levelNode);
 			}
-
+			if(!interestedMembers.isEmpty()){
+				interested.append("{")
+				 .append("text:'关注的会员'")
+				 .append(",attr:"+MemberType.Attribute.INTERESTED.getVal())
+				 .append(",leaf:true")
+				 .append("}");
+				tsb.append(",").append(interested);
+			}
+			tsb.append("]");
 			
 		}catch(Exception e){
 			e.printStackTrace();

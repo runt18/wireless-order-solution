@@ -1,5 +1,6 @@
 package com.wireless.Actions.client.member;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,8 +18,9 @@ import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.client.Member;
-import com.wireless.pojo.client.MemberType.Attribute;
+import com.wireless.pojo.client.MemberType;
 import com.wireless.pojo.staffMgr.Staff;
+import com.wireless.util.DataPaging;
 import com.wireless.util.SQLUtil;
 import com.wireless.util.WebParams;
 
@@ -40,7 +42,7 @@ public class QueryMemberAction extends DispatchAction {
 		
 		JObject jobject = new JObject();
 		List<Member> list = null;
-		String isPaging = request.getParameter("isPaging");
+//		String isPaging = request.getParameter("isPaging");
 		String start = request.getParameter("start");
 		String limit = request.getParameter("limit");
 		try{
@@ -81,13 +83,6 @@ public class QueryMemberAction extends DispatchAction {
 				
 				if(memberType != null && !memberType.trim().isEmpty())
 					extraCond += (" AND M.member_type_id = " + memberType);
-				
-				if(memberTypeAttr != null && !memberTypeAttr.trim().isEmpty())
-					if(Attribute.valueOf(Integer.parseInt(memberTypeAttr)) == Attribute.INTERESTED){
-						extraCond += (" AND IM.staff_id = " + pin);
-					}else{
-						extraCond += (" AND MT.attribute = " + memberTypeAttr);
-					}
 				if(name != null && !name.trim().isEmpty())
 					extraCond += (" AND M.name like '%" + name.trim() + "%'");
 				
@@ -115,18 +110,36 @@ public class QueryMemberAction extends DispatchAction {
 			
 			orderClause = " ORDER BY M.member_id ";
 			
-			Map<Object, Object> paramsSet = new HashMap<Object, Object>(), countSet = null;
+			Map<Object, Object> paramsSet = new HashMap<Object, Object>();
 			paramsSet.put(SQLUtil.SQL_PARAMS_EXTRA, extraCond);
 			paramsSet.put(SQLUtil.SQL_PARAMS_ORDERBY, orderClause);
-			if(isPaging != null && isPaging.trim().equals("true")){
+/*			if(isPaging != null && isPaging.trim().equals("true")){
 				countSet = new HashMap<Object, Object>();
 				countSet.put(SQLUtil.SQL_PARAMS_EXTRA, extraCond);
 				jobject.setTotalProperty(MemberDao.getMemberCount(countSet));
 				// 分页
 				orderClause += " LIMIT " + start + "," + limit;
-			}
+			}*/
 			list = MemberDao.getMember(staff, extraCond, orderClause);
-			jobject.setRoot(list);
+			List<Member> newList = new ArrayList<Member>(list);  
+			if(memberTypeAttr != null && !memberTypeAttr.trim().isEmpty()){
+				newList.clear();
+				if(Integer.parseInt(memberTypeAttr) == MemberType.Attribute.INTERESTED.getVal()){
+					newList.addAll(MemberDao.getInterestedMember(staff));
+				}else{
+					List<Member> attrMember = new ArrayList<Member>();  
+					for (Member member : list) {
+						if(member.getMemberType().getAttribute().getVal() == Integer.parseInt(memberTypeAttr)){
+							attrMember.add(member);
+						};
+					}
+					newList.addAll(attrMember);
+				}
+			}
+			jobject.setTotalProperty(newList.size());
+			newList = DataPaging.getPagingData(newList, true, start, limit);
+			
+			jobject.setRoot(newList);
 			
 		}catch(BusinessException e){
 			e.printStackTrace();

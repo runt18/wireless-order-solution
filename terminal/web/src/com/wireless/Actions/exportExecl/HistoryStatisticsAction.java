@@ -46,7 +46,7 @@ import com.wireless.pojo.billStatistics.ShiftDetail;
 import com.wireless.pojo.client.Member;
 import com.wireless.pojo.client.MemberOperation;
 import com.wireless.pojo.client.MemberOperation.OperationType;
-import com.wireless.pojo.client.MemberType.Attribute;
+import com.wireless.pojo.client.MemberType;
 import com.wireless.pojo.dishesOrder.CancelledFood;
 import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.menuMgr.Kitchen;
@@ -2150,7 +2150,6 @@ public class HistoryStatisticsAction extends DispatchAction{
 		
 		String extraCond = " ", orderClause = " ";
 		String id = request.getParameter("id");
-		String restaurantID = (String)request.getAttribute("restaurantID");
 		String memberType = request.getParameter("memberType");
 		String memberTypeAttr = request.getParameter("memberTypeAttr");
 		String name = request.getParameter("name");
@@ -2181,17 +2180,8 @@ public class HistoryStatisticsAction extends DispatchAction{
 				so = "=";
 			}
 			
-			if(restaurantID != null && !restaurantID.trim().isEmpty())
-				extraCond += (" AND M.restaurant_id = " + restaurantID);
 			if(memberType != null && !memberType.trim().isEmpty())
-				extraCond += (" AND MT.member_type_id = " + memberType);
-			
-			if(memberTypeAttr != null && !memberTypeAttr.trim().isEmpty())
-				if(Attribute.valueOf(Integer.parseInt(memberTypeAttr)) == Attribute.INTERESTED){
-					extraCond += (" AND IM.staff_id = " + pin);
-				}else{
-					extraCond += (" AND MT.attribute = " + memberTypeAttr);
-				}
+				extraCond += (" AND M.member_type_id = " + memberType);
 			if(name != null && !name.trim().isEmpty())
 				extraCond += (" AND M.name like '%" + name.trim() + "%'");
 			
@@ -2211,7 +2201,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 				extraCond += (" AND M.consumption_amount " + so + consumptionAmount);
 			
 			if(usedPoint != null && !usedPoint.trim().isEmpty())
-				extraCond += (" AND M.used_point " + so + usedPoint);
+				extraCond += (" AND M.total_point " + so + usedPoint);
 			
 			if(point != null && !point.trim().isEmpty())
 				extraCond += (" AND M.point " + so + point);
@@ -2222,8 +2212,29 @@ public class HistoryStatisticsAction extends DispatchAction{
 		Map<Object, Object> paramsSet = new HashMap<Object, Object>();
 		paramsSet.put(SQLUtil.SQL_PARAMS_EXTRA, extraCond);
 		paramsSet.put(SQLUtil.SQL_PARAMS_ORDERBY, orderClause);
-		
+/*			if(isPaging != null && isPaging.trim().equals("true")){
+			countSet = new HashMap<Object, Object>();
+			countSet.put(SQLUtil.SQL_PARAMS_EXTRA, extraCond);
+			jobject.setTotalProperty(MemberDao.getMemberCount(countSet));
+			// 分页
+			orderClause += " LIMIT " + start + "," + limit;
+		}*/
 		List<Member> list = MemberDao.getMember(staff, extraCond, orderClause);
+		List<Member> newList = new ArrayList<Member>(list);  
+		if(memberTypeAttr != null && !memberTypeAttr.trim().isEmpty()){
+			newList.clear();
+			if(Integer.parseInt(memberTypeAttr) == MemberType.Attribute.INTERESTED.getVal()){
+				newList.addAll(MemberDao.getInterestedMember(staff));
+			}else{
+				List<Member> attrMember = new ArrayList<Member>();  
+				for (Member member : list) {
+					if(member.getMemberType().getAttribute().getVal() == Integer.parseInt(memberTypeAttr)){
+						attrMember.add(member);
+					};
+				}
+				newList.addAll(attrMember);
+			}
+		}
 		
 		String title = "会员列表";
 		
@@ -2266,7 +2277,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 		
 		cell = row.createCell(0);
 		
-		cell.setCellValue("会员数量: " + list.size());
+		cell.setCellValue("会员数量: " + newList.size());
 		cell.setCellStyle(strStyle);
 		
 		sheet.addMergedRegion(new CellRangeAddress(sheet.getLastRowNum(), sheet.getLastRowNum(), 0, 9));
@@ -2319,7 +2330,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 		cell.setCellValue("会员卡号");
 		cell.setCellStyle(headerStyle);
 		
-		for (Member member : list) {
+		for (Member member : newList) {
 			row = sheet.createRow(sheet.getLastRowNum() + 1);
 			row.setHeight((short) 350);
 			
