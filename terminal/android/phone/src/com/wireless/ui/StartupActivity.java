@@ -51,8 +51,8 @@ public class StartupActivity extends Activity {
 			ServerConnector.instance().setNetPort(sharedPrefs.getInt(Params.IP_PORT, Params.DEF_IP_PORT)); 
 		}
 
-		setContentView(R.layout.enter);
-		_msgTxtView = (TextView) findViewById(R.id.myTextView);
+		setContentView(R.layout.startup_activity);
+		_msgTxtView = (TextView) findViewById(R.id.txtView_info_startup);
 
 	}
 

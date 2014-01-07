@@ -6,6 +6,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -79,22 +80,22 @@ public class MainActivity extends FragmentActivity implements OnTableSelectedLis
 			if(message.what == REDRAW_FOOD_MENU){
 
 				if(WirelessOrder.foodMenu == null){
-					((TextView)mActivity.get().findViewById(R.id.username)).setText("");
-					((TextView)mActivity.get().findViewById(R.id.notice)).setText("");
+					((TextView)mActivity.get().findViewById(R.id.txtView_staffName_main)).setText("");
+					((TextView)mActivity.get().findViewById(R.id.marqueeTxt_billBoard_main)).setText("");
 				}
 				
 			}else if(message.what == REDRAW_STAFF_LOGIN){
 				if(WirelessOrder.staffs == null){
-					((TextView)mActivity.get().findViewById(R.id.username)).setText("");
-					((TextView)mActivity.get().findViewById(R.id.notice)).setText("");
+					((TextView)mActivity.get().findViewById(R.id.txtView_staffName_main)).setText("");
+					((TextView)mActivity.get().findViewById(R.id.marqueeTxt_billBoard_main)).setText("");
 				}
 				
 			}else if(message.what == REDRAW_RESTAURANT){
 				if(WirelessOrder.restaurant != null){
-					TextView billBoard = (TextView)mActivity.get().findViewById(R.id.notice);
+					TextView billBoard = (TextView)mActivity.get().findViewById(R.id.marqueeTxt_billBoard_main);
 					billBoard.setText(WirelessOrder.restaurant.getInfo().replaceAll("\n", ""));
 					
-					TextView userName = (TextView)mActivity.get().findViewById(R.id.username);
+					TextView userName = (TextView)mActivity.get().findViewById(R.id.txtView_staffName_main);
 					if(mActivity.get().mStaffLogin != null){
 						if(mActivity.get().mStaffLogin.getName().length() != 0){
 							userName.setText(WirelessOrder.restaurant.getName() + "(" + mActivity.get().mStaffLogin.getName() + ")");							
@@ -120,7 +121,7 @@ public class MainActivity extends FragmentActivity implements OnTableSelectedLis
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
-		setContentView(R.layout.main);
+		setContentView(R.layout.main_activity);
 		
 		int[] imageIcons = { 
 							 R.drawable.btnup01, R.drawable.btnup10, R.drawable.btnup02, 
@@ -135,23 +136,25 @@ public class MainActivity extends FragmentActivity implements OnTableSelectedLis
 							};
 
 		// 生成动态数组，并且转入数据
-		ArrayList<HashMap<String, Object>> imgItems = new ArrayList<HashMap<String, Object>>();
+		final String imgGridItem = "image_main_grid_view_item";
+		final String txtGridItem = "text_main_grid_view_item";;
+		List<Map<String, Object>> imgItems = new ArrayList<Map<String, Object>>();
 		for (int i = 0; i < imageIcons.length; i++) {
-			HashMap<String, Object> map = new HashMap<String, Object>();
-			map.put("ItemImage", imageIcons[i]);// 添加图像资源的ID
-			map.put("ItemText", iconDesc[i]);// 按序号做ItemText
+			Map<String, Object> map = new HashMap<String, Object>();
+			map.put(imgGridItem, imageIcons[i]);// 添加图像资源的ID
+			map.put(txtGridItem, iconDesc[i]);// 按序号做ItemText
 			imgItems.add(map);
 		}
 
-		GridView funGridView = (GridView)findViewById(R.id.gridview);
+		GridView funGridView = (GridView)findViewById(R.id.gridView_9_item_main);
 		/**
 		 * 生成适配器的ImageItem <====> 动态数组的元素，两者一一对应，添加并且显示九宫格。
 		 */
 		funGridView.setAdapter(new SimpleAdapter(MainActivity.this, 		// context
 												  imgItems, 			  	// 数据来源
-												  R.layout.grewview_item, 	// night_item的XML实现
-												  new String[] { "ItemImage", "ItemText" }, 	// 动态数组与ImageItem对应的子项
-												  new int[] { R.id.ItemImage, R.id.ItemText }));// ImageItem的XML文件里面的一个ImageView,一个TextView ID
+												  R.layout.main_grid_view_item, 				// night_item的XML实现
+												  new String[] { imgGridItem, txtGridItem }, 	// 动态数组与ImageItem对应的子项
+												  new int[] { R.id.imgView_main_gridView_item, R.id.txtView_main_gridView_item }));// ImageItem的XML文件里面的一个ImageView,一个TextView ID
 
 		funGridView.setOnItemClickListener(new OnItemClickListener() {
 			public void onItemClick(AdapterView<?> arg0,// The AdapterView where the click happened

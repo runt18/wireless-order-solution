@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
     android:background="@drawable/bgcolor" >
 
     <include
@@ -9,14 +9,14 @@
         layout="@layout/topbar" />
 
     <RelativeLayout
-        android:id="@+id/title"
-        android:layout_width="fill_parent"
+        android:id="@+id/relativeLayout_top_main"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/top"
         android:background="@drawable/bg02" >
 
         <TextView
-            android:id="@+id/username"
+            android:id="@+id/txtView_staffName_main"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
@@ -27,29 +27,27 @@
     </RelativeLayout>
 
     <GridView
-        android:id="@+id/gridview"
-        android:layout_width="fill_parent"
+        android:id="@+id/gridView_9_item_main"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_below="@id/relativeLayout_top_main"
         android:layout_marginTop="20dip"
         android:columnWidth="90dp"
         android:gravity="center"
         android:horizontalSpacing="10dp"
         android:numColumns="3"
-            android:layout_below="@id/title"
-        
         android:stretchMode="columnWidth"
         android:verticalSpacing="10dp" >
     </GridView>
 
     <RelativeLayout
-        android:id="@+id/buttom"
         android:layout_width="match_parent"
         android:layout_height="28dp"
         android:layout_alignParentBottom="true"
         android:background="@drawable/bg03" >
 
         <ImageView
-            android:id="@+id/voice"
+            android:id="@+id/imgView_billBoard_main"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
@@ -57,11 +55,11 @@
             android:src="@drawable/bulletin" />
 
         <com.wireless.ui.view.MarqueeText
-            android:id="@+id/notice"
+            android:id="@+id/marqueeTxt_billBoard_main"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:layout_toRightOf="@id/voice"
+            android:layout_toRightOf="@id/imgView_billBoard_main"
             android:ellipsize="marquee"
             android:focusable="true"
             android:focusableInTouchMode="true"
@@ -71,32 +69,5 @@
             android:textColor="#FFFFFF"
             android:textSize="15sp" />
     </RelativeLayout>
-
-    <!--
-<RelativeLayout 
-android:id="@+id/top"
-android:layout_width="fill_parent"
-android:layout_height="wrap_content"
-android:background="@drawable/bg01"
-android:layout_alignParentTop="true"
->
-
-<TextView 
-android:id="@+id/toptitle"
-android:layout_width="wrap_content"
-android:layout_height="wrap_content"
-android:textColor="#FFFFFF"
-android:textSize="22sp"
-android:textStyle="bold"
-android:typeface="monospace"
-android:shadowDx="1"
-android:shadowDy="1"
-android:shadowRadius="3.0"
-android:layout_centerVertical="true"
-android:layout_centerHorizontal="true"
->
-</TextView>
-</RelativeLayout>
-    -->
 
 </RelativeLayout>
