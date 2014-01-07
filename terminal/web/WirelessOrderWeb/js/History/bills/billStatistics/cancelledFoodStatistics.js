@@ -1,5 +1,7 @@
+var cfdsTree, cfbdsTree, cfbrsTree;
 function cancelFoodDetailsStatPanelInit(){
-	var cfdsTree = new Ext.tree.TreePanel({
+	
+	cfdsTree = new Ext.tree.TreePanel({
 		region : 'west',
 		frame : true,
 		rootVisible : true,
@@ -244,7 +246,7 @@ function cancelFoodDetailsStatPanelInit(){
 }
 
 function cancelFoodByDeptStatPanelInit(){
-	var cfbdsTree = new Ext.tree.TreePanel({
+	cfbdsTree = new Ext.tree.TreePanel({
 		region : 'west',
 		frame : true,
 		rootVisible : true,
@@ -392,7 +394,7 @@ function cancelFoodByDeptStatPanelInit(){
 }
 
 function cancelFoodByReasonStatPanelInit(){
-	var cfbrsTree = new Ext.tree.TreePanel({
+	cfbrsTree = new Ext.tree.TreePanel({
 		region : 'west',
 		frame : true,
 		rootVisible : true,
@@ -529,63 +531,33 @@ function cancelFoodByReasonStatPanelInit(){
 	});
 }
 
-function cancelledFood(){
-	cancelFoodStatWin = Ext.getCmp('cancelFoodStatWin');
-	if(!cancelFoodStatWin){
-		// 
-		cancelFoodDetailsStatPanelInit();
-		//
-		cancelFoodByDeptStatPanelInit();
-		// 
-		cancelFoodByReasonStatPanelInit();
-		//
-		cancelFoodStatWinTabPanel = new Ext.TabPanel({
-			border : false,
-			items : [cancelFoodDetailsStatPanel, cancelFoodByDeptStatPanel, cancelFoodByReasonStatPanel],
-			listeners : {
-				render : function(thiz){
-					thiz.setActiveTab(cancelFoodDetailsStatPanel);
-				},
-				tabchange : function(thiz, tab){
-					if(thiz.getActiveTab() == tab){
-						cancelFoodStatWin.setTitle(String.format('退菜汇总 -- <font color="green">{0}</font>', tab.title));
-					}
-				}
+Ext.onReady(function(){
+	cancelFoodDetailsStatPanelInit();
+	//
+	cancelFoodByDeptStatPanelInit();
+	// 
+	cancelFoodByReasonStatPanelInit();
+	//
+	cancelFoodStatWinTabPanel = new Ext.TabPanel({
+		region : 'center',
+		border : false,
+		items : [cancelFoodDetailsStatPanel, cancelFoodByDeptStatPanel, cancelFoodByReasonStatPanel],
+		listeners : {
+			render : function(thiz){
+				thiz.setActiveTab(cancelFoodDetailsStatPanel);
 			}
-		});
-		// 
-		cancelFoodStatWin = new Ext.Window({
-			title : '&nbsp;',
-			id : 'cancelFoodStatWin',
-			resizable : false,
-			modal : true,
-			closable : false,
-			width : 1200,
-			height : 500,
-			layout : 'fit',
-			items : [cancelFoodStatWinTabPanel],
-			bbar : ['->', {
-				text : '关闭',
-				iconCls : 'btn_close',
-				handler : function(){
-					cancelFoodStatWin.hide();
-				}
-			}],
-			keys : [{
-				key : Ext.EventObject.ESC,
-				scope : this,
-				fn : function(){
-					cancelFoodStatWin.hide();
-				}
-			}],
-			listeners : {
-				show : function(){
-					
-				}
-			}
-		});
-	}
+		}
+	});
+	new Ext.Panel({
+		renderTo : 'divCancelledFood',//渲染到
+		id : 'cancelledFoodPanel',
+		//solve不跟随窗口的变化而变化
+		width : parseInt(Ext.getDom('divCancelledFood').parentElement.style.width.replace(/px/g,'')),
+		height : parseInt(Ext.getDom('divCancelledFood').parentElement.style.height.replace(/px/g,'')),
+		layout:'border',
+		frame : true, //边框
+		//子集
+		items : [cancelFoodStatWinTabPanel]
+	});
 	
-	cancelFoodStatWin.show();
-	cancelFoodStatWin.center();
-};
+});

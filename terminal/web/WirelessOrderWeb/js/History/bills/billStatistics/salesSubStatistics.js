@@ -488,62 +488,34 @@ function salesSubWinTabPanelInit(){
 	
 	salesSubWinTabPanel = new Ext.TabPanel({
 		xtype : 'tabpanel',
+		region : 'center',
 		frame : true,
 		activeTab : 0,
 		border : false,
 		items : [orderFoodStatPanel, kitchenStatPanel, deptStatPanel],
 		listeners : {
 			tabchange : function(thiz, tab){
-				if(thiz.getActiveTab() == tab){
-					salesSubWin.setTitle(String.format('销售统计 -- <font color="green">{0}</font>', tab.title));
-				}
+			
 			}
 		}
 	});	
 }
 
-salesSubPanelnit = function(){
+Ext.onReady(function(){
 	if(!salesSubWinTabPanel){
 		salesSubWinTabPanelInit();
 	}
-	
-	salesSubWin = new Ext.Window({
-		title : '&nbsp;',
-		layout : 'fit',
-		resizable : false,
-		modal : true,
-		closable : false,
-		constrainHeader : true,
-		width : 1200,
-		height : 500,
-		items : [salesSubWinTabPanel],
-		bbar : ['->', {
-			text : '导出',
-			hidden : true,
-			handler : function(){
-				
-			}
-		}, {
-			text : '关闭',
-			iconCls : 'btn_close',
-			handler : function(){
-				salesSubWin.hide();
-			}
-		}],
-		keys : [{
-			key : Ext.EventObject.ESC,
-			scope : this,
-			fn : function(){
-				salesSubWin.hide();
-			}
-		}]
+	salesSubWinTabPanel.setActiveTab(orderFoodStatPanel);
+	new Ext.Panel({
+		renderTo : 'divSalesSubStatistics',//渲染到
+		id : 'salesSubStatisticsPanel',
+		//solve不跟随窗口的变化而变化
+		width : parseInt(Ext.getDom('divSalesSubStatistics').parentElement.style.width.replace(/px/g,'')),
+		height : parseInt(Ext.getDom('divSalesSubStatistics').parentElement.style.height.replace(/px/g,'')),
+		layout:'border',
+		frame : true, //边框
+		//子集
+		items : [salesSubWinTabPanel]
 	});
-};
-
-function salesSub(){
-	if(!salesSubWin){
-		salesSubPanelnit();
-	}
-	salesSubWin.show();
-	salesSubWin.center();
-}
+	
+});

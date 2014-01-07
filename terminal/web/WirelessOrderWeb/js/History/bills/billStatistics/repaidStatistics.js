@@ -157,6 +157,27 @@ function initGrid(){
 	    bbar : pagingBar
 	});
 	repaidStatisticsGrid.region = 'center';
+		repaidStatisticsGrid.getStore().on('load', function(store, records, options){
+		
+		if(store.getCount() > 0){
+			var sumRow = repaidStatisticsGrid.getView().getRow(store.getCount() - 1);	
+			sumRow.style.backgroundColor = '#EEEEEE';			
+			for(var i = 0; i < repaidStatisticsGrid.getColumnModel().getColumnCount(); i++){
+				var sumCell = repaidStatisticsGrid.getView().getCell(store.getCount() - 1, i);
+				sumCell.style.fontSize = '15px';
+				sumCell.style.fontWeight = 'bold';	
+				sumCell.style.color = 'green';
+			}
+			repaidStatisticsGrid.getView().getCell(store.getCount()-1, 1).innerHTML = '汇总';
+			repaidStatisticsGrid.getView().getCell(store.getCount()-1, 2).innerHTML = '--';
+			repaidStatisticsGrid.getView().getCell(store.getCount()-1, 3).innerHTML = '--';
+			repaidStatisticsGrid.getView().getCell(store.getCount()-1, 4).innerHTML = '--';
+			repaidStatisticsGrid.getView().getCell(store.getCount()-1, 5).innerHTML = '--';
+			repaidStatisticsGrid.getView().getCell(store.getCount()-1, 7).innerHTML = '--';
+			repaidStatisticsGrid.getView().getCell(store.getCount()-1, 8).innerHTML = '--';
+			repaidStatisticsGrid.getView().getCell(store.getCount()-1, 9).innerHTML = '--';
+		}
+	});
 }
 
 Ext.onReady(function(){

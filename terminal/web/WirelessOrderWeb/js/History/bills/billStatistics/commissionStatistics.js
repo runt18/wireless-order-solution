@@ -211,6 +211,27 @@ function commissionDetailInit(){
 	});
 	commissionStatisticsGrid.region = 'center';
 	
+	commissionStatisticsGrid.getStore().on('load', function(store, records, options){
+		
+		if(store.getCount() > 0){
+			var sumRow = commissionStatisticsGrid.getView().getRow(store.getCount() - 1);	
+			sumRow.style.backgroundColor = '#EEEEEE';			
+			for(var i = 0; i < commissionStatisticsGrid.getColumnModel().getColumnCount(); i++){
+				var sumCell = commissionStatisticsGrid.getView().getCell(store.getCount() - 1, i);
+				sumCell.style.fontSize = '15px';
+				sumCell.style.fontWeight = 'bold';	
+				sumCell.style.color = 'green';
+			}
+			commissionStatisticsGrid.getView().getCell(store.getCount()-1, 1).innerHTML = '汇总';
+			commissionStatisticsGrid.getView().getCell(store.getCount()-1, 2).innerHTML = '--';
+			commissionStatisticsGrid.getView().getCell(store.getCount()-1, 3).innerHTML = '--';
+			commissionStatisticsGrid.getView().getCell(store.getCount()-1, 4).innerHTML = '--';
+			commissionStatisticsGrid.getView().getCell(store.getCount()-1, 5).innerHTML = '--';
+			commissionStatisticsGrid.getView().getCell(store.getCount()-1, 6).innerHTML = '--';
+			commissionStatisticsGrid.getView().getCell(store.getCount()-1, 9).innerHTML = '--';
+		}
+	});
+	
 	commissionDetailPanel = new Ext.Panel({
 		title : '提成明细',
 		layout:'border',
@@ -377,6 +398,20 @@ function commissionTotalInit(){
 	    bbar : pagingBar
 	});
 	commissionTotalStatisticsGrid.region = 'center';
+	commissionTotalStatisticsGrid.getStore().on('load', function(store, records, options){
+		
+		if(store.getCount() > 0){
+			var sumRow = commissionTotalStatisticsGrid.getView().getRow(store.getCount() - 1);	
+			sumRow.style.backgroundColor = '#EEEEEE';			
+			for(var i = 0; i < commissionTotalStatisticsGrid.getColumnModel().getColumnCount(); i++){
+				var sumCell = commissionTotalStatisticsGrid.getView().getCell(store.getCount() - 1, i);
+				sumCell.style.fontSize = '15px';
+				sumCell.style.fontWeight = 'bold';	
+				sumCell.style.color = 'green';
+			}
+			commissionTotalStatisticsGrid.getView().getCell(store.getCount()-1, 3).innerHTML = '汇总';
+		}
+	});
 	
 	commissionTotalPanel = new Ext.Panel({
 		id : 'commissionTotalStatisticsPanel',
@@ -407,5 +442,5 @@ Ext.onReady(function(){
 			}
 		}
 	});
-//	repaidStatisticsGrid.getStore().load();
+//	commissionStatisticsGrid.getStore().load();
 });

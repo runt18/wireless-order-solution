@@ -60,7 +60,7 @@ function memberOperationHandler(c){
 			success : function(res, opt){
 				var jr = Ext.decode(res.responseText);
 				if(jr.success){
-					Ext.example.msg(jr.title, jr.msg);
+					Ext.example.msg(jr.title, String.format(Ext.ux.txtFormat.operateSuccess, data['name'], jr.msg));
 					memberBasicGrid.getStore().reload();
 				}else{
 					Ext.ux.showMsg(jr);
@@ -83,7 +83,7 @@ function memberOperationHandler(c){
 			success : function(res, opt){
 				var jr = Ext.decode(res.responseText);
 				if(jr.success){
-					Ext.example.msg(jr.title, jr.msg);
+					Ext.example.msg(jr.title, String.format(Ext.ux.txtFormat.operateSuccess, data['name'], jr.msg));
 					memberBasicGrid.getStore().reload();
 				}else{
 					Ext.ux.showMsg(jr);
@@ -690,8 +690,9 @@ function treeInit(){
 		tbar : memberTypeTreeTbar,
 		listeners : {
 	    	click : function(e){
+	    		Ext.getCmp('btnSearchMember').handler(e);
 	    		Ext.getDom('memberTypeShowType').innerHTML = e.text;
-	    		Ext.getCmp('btnSearchMember').handler();
+	    		
 	    	}
 	    }
 	});
@@ -789,8 +790,13 @@ function gridInit(){
 			text : '搜索',
 			id : 'btnSearchMember',
 			iconCls : 'btn_search',
-			handler : function(){
-				var memberTypeNode = memberTypeTree.getSelectionModel().getSelectedNode();
+			handler : function(e){
+				var memberTypeNode;
+				if(e){
+					memberTypeNode = e;
+				}else{
+					memberTypeNode = memberTypeTree.getSelectionModel().getSelectedNode();
+				}
 				var searchType = Ext.getCmp('mr_comboMemberSearchType').getValue();
 				var searchValue = Ext.getCmp(mObj.searchValue) ? Ext.getCmp(mObj.searchValue).getValue() : '';
 				
@@ -829,6 +835,17 @@ function gridInit(){
 						start : 0,
 						limit : GRID_PADDING_LIMIT_20
 					}
+				});
+				//显示关注的会员
+				gs.on('load', function(store, records, options){
+					if(e){
+						if(typeof e.attributes.attr != 'undefined' && e.attributes.attr == 2){
+							for (var i = 0; i < records.length; i++) {
+								records[i].set('acctendtioned', true);
+							}
+						}
+					}
+					e = "";
 				});
 			}
 		}, {
@@ -883,7 +900,8 @@ function gridInit(){
 		}, '-', {
 			text : '导出',
 			iconCls : 'icon_tb_setting',
-			handler : function(){
+			handler : function(e){
+
 				var memberTypeNode = memberTypeTree.getSelectionModel().getSelectedNode();
 				var searchType = Ext.getCmp('mr_comboMemberSearchType').getValue();
 				var searchValue = Ext.getCmp(mObj.searchValue) ? Ext.getCmp(mObj.searchValue).getValue() : '';
@@ -1145,7 +1163,6 @@ var btnRechargeDetail = new Ext.ux.ImageButton({
 });
 
 /**********************************************************************/
-//var member_obj = {treeId : 'tree_memberMgr', option : [{name : '修改', fn : 'queryMemberOperationSummaryHandler()'}]};
 Ext.onReady(function(){
 	treeInit();
 	gridInit();
@@ -1181,6 +1198,5 @@ Ext.onReady(function(){
 	 
 	winInit();
 	memberBasicWin.render(document.body);
-//	showFloatOption(member_obj);
 });
 

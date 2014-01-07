@@ -252,8 +252,8 @@ function updateDeptHandler(){
 					Ext.getCmp('txtDeptID').setValue(node.attributes.deptID);
 					Ext.getCmp('txtDeptName').setValue(node.text);
 					
-					var deptName = Ext.get("txtDeptName");
-					deptName.focus.defer(100, deptName);
+					var deptName = Ext.getCmp("txtDeptName");
+					deptName.focus(true, 100);
 				}
 			},
 			keys : [{

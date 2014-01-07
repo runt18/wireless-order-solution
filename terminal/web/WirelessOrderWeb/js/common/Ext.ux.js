@@ -22,6 +22,7 @@ Ext.ux.txtFormat = {
 	renderer : '<a href="javascript:{0}({1})" {2}>{3}</a>',
 	xh : '<font color="red">＊</font>',
 	deleteSuccess : '<font color="red">{0}</font>&nbsp;删除成功',
+	operateSuccess : '<font color="red">{0}</font>&nbsp;{1}',
 	gridDou : function(_v){
 		return _v == '' ? '0.00&nbsp;&nbsp;' : (parseFloat(_v).toFixed(2) + '&nbsp;&nbsp;');
 	},

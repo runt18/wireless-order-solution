@@ -317,14 +317,7 @@ var receivablesStatResultGrid = new Ext.grid.GridPanel({
 		displayInfo : true,
 		displayMsg : '显示第 {0} 条到 {1} 条记录，共 {2} 条',
 		emptyMsg : "没有记录"
-	}),
-	keys : [{
-		key : Ext.EventObject.ESC,
-		scope : this,
-		fn : function(){
-			receivablesStatResultWin.hide();
-		}
-	}]
+	})
 });
 
 var receivablesStatResultSummaryPanel = new Ext.Panel({
@@ -565,42 +558,20 @@ var receivablesStatResultSummaryPanel = new Ext.Panel({
 	})]
 });
 
-receivablesStatResultWin = new Ext.Window({
-	title : '收款统计',
-	width : 1200,
-	height : 510,
-	resizable : false,
-	modal : true,
-	closable : false,
-	layout : 'border',
-	items : [receivablesStatResultSummaryPanel, receivablesStatResultGrid],
-	bbar : ['->', {
-		text : '关闭',
-		iconCls : 'btn_close',
-		handler : function() {
-			receivablesStatResultWin.hide();
-		}
-	}],
-	keys : [{
-		key : Ext.EventObject.ESC,
-		scope : this,
-		fn : function(){
-			receivablesStatResultWin.hide();
-		}
-	}, {
-		key : Ext.EventObject.ENTER,
-		scope : this,
-		fn : function(){
-			Ext.getCmp('btnSearchReceivablesStat').handler();
-		}
-	}],
-	listeners : {
-		show : function(thiz) {
-			Ext.getCmp('comboBSSearchDate').setValue(1);
-			Ext.getCmp('comboBSSearchDate').fireEvent('select', null, null, 1);
-		},
-		hide : function(){
-			receivablesStatResultGrid.getStore().removeAll();
-		}
-	}
+Ext.onReady(function(){
+
+	new Ext.Panel({
+		renderTo : 'divBusinessReceiptStatistics',//渲染到
+		id : 'businessReceiptStatisticsPanel',
+		//solve不跟随窗口的变化而变化
+		width : parseInt(Ext.getDom('divBusinessReceiptStatistics').parentElement.style.width.replace(/px/g,'')),
+		height : parseInt(Ext.getDom('divBusinessReceiptStatistics').parentElement.style.height.replace(/px/g,'')),
+		layout:'border',
+		frame : true, //边框
+		//子集
+		items : [receivablesStatResultGrid, receivablesStatResultSummaryPanel]
+	});
+	Ext.getCmp('comboBSSearchDate').setValue(1);
+	Ext.getCmp('comboBSSearchDate').fireEvent('select', null, null, 1);
+//	repaidStatisticsGrid.getStore().load();
 });
