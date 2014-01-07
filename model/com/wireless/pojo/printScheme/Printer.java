@@ -30,6 +30,7 @@ public class Printer implements Jsonable{
 		private final PStyle mStyle;
 		private final int mRestaurantId;
 		private String mAlias;
+		private boolean isEnabled = true;
 		
 		public InsertBuilder(String name, PStyle style, int restaurantId){
 			mName = name;
@@ -42,6 +43,11 @@ public class Printer implements Jsonable{
 			return this;
 		}
 
+		public InsertBuilder setEnabled(boolean isEnabled){
+			this.isEnabled = isEnabled;
+			return this;
+		}
+		
 		public Printer build(){
 			return new Printer(this);
 		}
@@ -76,7 +82,7 @@ public class Printer implements Jsonable{
 	}
 	
 	private Printer(InsertBuilder builder){
-		this(builder.mName, builder.mStyle, builder.mRestaurantId, true);
+		this(builder.mName, builder.mStyle, builder.mRestaurantId, builder.isEnabled);
 		this.mAlias = builder.mAlias;
 	}
 	
@@ -99,7 +105,7 @@ public class Printer implements Jsonable{
 	
 	public String getAlias(){
 		if(mAlias == null){
-			mAlias = "";
+			return "";
 		}
 		return mAlias;
 	}
