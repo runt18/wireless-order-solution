@@ -8,22 +8,16 @@
         android:id="@+id/top"
         layout="@layout/topbar" />
 
-    <LinearLayout
-        android:layout_width="0px"
-        android:layout_height="0px"
-        android:focusable="true"
-        android:focusableInTouchMode="true" />
-
     <RelativeLayout
-        android:id="@+id/relativeLayout_search"
+        android:id="@+id/relativeLayout_search_table"
         android:layout_width="match_parent"
         android:layout_height="48dp"
         android:layout_alignParentLeft="true"
         android:layout_below="@+id/top" >
 
         <AutoCompleteTextView
-            android:id="@+id/search_view_table"
-            android:layout_width="fill_parent"
+            android:id="@+id/txtView_srch_table"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_alignParentTop="true"
@@ -35,7 +29,7 @@
             android:paddingTop="2dp" />
 
         <ImageButton
-            android:id="@+id/deleteBtn_table"
+            android:id="@+id/imgButton_clearSrch_table"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
@@ -61,19 +55,19 @@
         android:visibility="gone" />
 
     <com.wireless.ui.view.PullListView
-        android:id="@+id/listView_table"
+        android:id="@+id/pull_listView_table"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/arelativeLayout1"
+        android:layout_above="@+id/relativeLayout_bottom_table"
         android:layout_alignParentLeft="true"
-        android:layout_below="@+id/relativeLayout_search"
+        android:layout_below="@+id/relativeLayout_search_table"
         android:cacheColorHint="@color/dartgrey"
         android:fadingEdge="vertical"
         android:fadingEdgeLength="2dp" >
     </com.wireless.ui.view.PullListView>
 
     <RelativeLayout
-        android:id="@+id/arelativeLayout1"
+        android:id="@+id/relativeLayout_bottom_table"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
@@ -81,7 +75,7 @@
         android:background="@drawable/bottom_bg" >
 
         <ImageButton
-            android:id="@+id/left_btn_bottom"
+            android:id="@+id/imgButton_all_table"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
@@ -90,7 +84,7 @@
             android:src="@drawable/all_selector" />
 
         <ImageButton
-            android:id="@+id/right_btn_bottom"
+            android:id="@+id/imgButton_busy_table"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
@@ -99,7 +93,7 @@
             android:src="@drawable/eating_selector" />
 
         <ImageButton
-            android:id="@+id/middle_btn_bottom"
+            android:id="@+id/imgButton_idle_table"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
@@ -108,37 +102,35 @@
             android:src="@drawable/free_selector" />
 
         <TextView
-            android:id="@+id/left_txt_bottom"
+            android:id="@+id/txtView_allAmount_table"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="false"
             android:layout_alignParentRight="false"
             android:layout_alignParentTop="true"
-            android:layout_alignRight="@+id/left_btn_bottom"
+            android:layout_alignRight="@+id/imgButton_all_table"
             android:background="@drawable/hint"
             android:paddingLeft="8dp"
             android:paddingRight="8dp"
             android:paddingTop="3dp"
-            android:text="11"
             android:textColor="@color/white"
             android:visibility="gone" />
 
         <TextView
-            android:id="@+id/middle_txt_bottom"
+            android:id="@+id/txtView_busyAmount_table"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
-            android:layout_alignRight="@+id/middle_btn_bottom"
+            android:layout_alignRight="@+id/imgButton_idle_table"
             android:background="@drawable/hint"
             android:paddingLeft="8dp"
             android:paddingRight="8dp"
             android:paddingTop="4dp"
-            android:text="TextView"
             android:textColor="@color/white"
             android:visibility="gone" />
 
         <TextView
-            android:id="@+id/right_txt_bottom"
+            android:id="@+id/txtView_idleAmount_table"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
@@ -147,7 +139,6 @@
             android:paddingLeft="8dp"
             android:paddingRight="8dp"
             android:paddingTop="4dp"
-            android:text="TextView"
             android:textColor="@color/white"
             android:visibility="gone" />
     </RelativeLayout>

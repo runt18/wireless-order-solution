@@ -75,7 +75,7 @@ public class PullListView extends ListView{
 	private void init(Context context) {
 		inflater = LayoutInflater.from(context);
 
-		headView = (LinearLayout) inflater.inflate(R.layout.head, null);
+		headView = (LinearLayout) inflater.inflate(R.layout.table_activity_pull_header, null);
 
 		arrowImageView = (ImageView) headView
 				.findViewById(R.id.head_arrowImageView);

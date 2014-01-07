@@ -312,14 +312,14 @@ public class TableActivity extends FragmentActivity implements OnTableSelectedLi
 			/*
 			 * set the counts
 			 */
-			TextView allCountTextView = (TextView)theActivity.findViewById(R.id.left_txt_bottom);
+			TextView allCountTextView = (TextView)theActivity.findViewById(R.id.txtView_allAmount_table);
 			allCountTextView.setText(Integer.toString(allCnt));
 			allCountTextView.setVisibility(View.VISIBLE);
-			TextView idleCountTxtView = (TextView)theActivity.findViewById(R.id.middle_txt_bottom);
+			TextView idleCountTxtView = (TextView)theActivity.findViewById(R.id.txtView_busyAmount_table);
 			idleCountTxtView.setText(Integer.toString(idleCnt));
 			idleCountTxtView.setVisibility(View.VISIBLE);
 			
-			TextView busyCountTxtView = (TextView)theActivity.findViewById(R.id.right_txt_bottom);
+			TextView busyCountTxtView = (TextView)theActivity.findViewById(R.id.txtView_idleAmount_table);
 			busyCountTxtView.setText(Integer.toString(busyCnt));
 			busyCountTxtView.setVisibility(View.VISIBLE);
 			
@@ -409,11 +409,11 @@ public class TableActivity extends FragmentActivity implements OnTableSelectedLi
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_table);
+		setContentView(R.layout.table_activity);
 		
-		regionAllBtn = (ImageButton)findViewById(R.id.left_btn_bottom);
-		idleBtn = (ImageButton)findViewById(R.id.middle_btn_bottom);
-		busyBtn = (ImageButton)findViewById(R.id.right_btn_bottom);
+		regionAllBtn = (ImageButton)findViewById(R.id.imgButton_all_table);
+		idleBtn = (ImageButton)findViewById(R.id.imgButton_idle_table);
+		busyBtn = (ImageButton)findViewById(R.id.imgButton_busy_table);
 		mDataHandler = new RefreshHandler(this);
 		mRegionHandler = new RegionRefreshHandler(this);
 		prepareUI();		
@@ -525,7 +525,7 @@ public class TableActivity extends FragmentActivity implements OnTableSelectedLi
 		/**
 		 * 搜索框
 		 */
-		final AutoCompleteTextView searchTxtView = (AutoCompleteTextView)findViewById(R.id.search_view_table);
+		final AutoCompleteTextView searchTxtView = (AutoCompleteTextView)findViewById(R.id.txtView_srch_table);
 		searchTxtView.addTextChangedListener(new TextWatcher(){
 			@Override 
 			public void afterTextChanged(Editable s) {}
@@ -543,7 +543,7 @@ public class TableActivity extends FragmentActivity implements OnTableSelectedLi
 		/**
 		 * PullListView
 		 */
-		mListView = (PullListView) findViewById(R.id.listView_table);
+		mListView = (PullListView) findViewById(R.id.pull_listView_table);
 		mListView.setOnRefreshListener(new OnRefreshListener(){
 			@Override
 			public void onRefresh() {
@@ -618,7 +618,7 @@ public class TableActivity extends FragmentActivity implements OnTableSelectedLi
 		/**
 		 * “空闲”按钮
 		 */
-		idleBtn = (ImageButton)findViewById(R.id.middle_btn_bottom);
+		idleBtn = (ImageButton)findViewById(R.id.imgButton_idle_table);
 		idleBtn.setOnClickListener(new OnClickListener(){
 			public void onClick(View arg0) {
 				searchTxtView.setText("");
@@ -631,7 +631,7 @@ public class TableActivity extends FragmentActivity implements OnTableSelectedLi
 		/**
 		 * “就餐”按钮
 		 */
-		busyBtn = (ImageButton)findViewById(R.id.right_btn_bottom);
+		busyBtn = (ImageButton)findViewById(R.id.imgButton_busy_table);
 		busyBtn.setOnClickListener(new OnClickListener(){
 			public void onClick(View arg0) {
 				searchTxtView.setText("");
@@ -643,7 +643,7 @@ public class TableActivity extends FragmentActivity implements OnTableSelectedLi
 		/**
 		 * “清空”按钮
 		 */
-		ImageButton deleteBtn = (ImageButton)findViewById(R.id.deleteBtn_table);
+		ImageButton deleteBtn = (ImageButton)findViewById(R.id.imgButton_clearSrch_table);
 		deleteBtn.setOnClickListener(new OnClickListener(){
 			@Override
 			public void onClick(View v) {
@@ -654,7 +654,7 @@ public class TableActivity extends FragmentActivity implements OnTableSelectedLi
 		/**
 		 * region all button
 		 */
-		regionAllBtn = (ImageButton)findViewById(R.id.left_btn_bottom);
+		regionAllBtn = (ImageButton)findViewById(R.id.imgButton_all_table);
 		regionAllBtn.setImageResource(R.drawable.alldown);
 		regionAllBtn.setOnClickListener(new OnClickListener() {
 			
@@ -840,7 +840,7 @@ public class TableActivity extends FragmentActivity implements OnTableSelectedLi
 				mDataHandler.sendEmptyMessage(0);
 				mListView.setVisibility(View.VISIBLE);
 				((TextView)findViewById(R.id.hint_text_table)).setVisibility(View.INVISIBLE);
-				((AutoCompleteTextView)findViewById(R.id.search_view_table)).setText("");
+				((AutoCompleteTextView)findViewById(R.id.txtView_srch_table)).setText("");
 				Toast.makeText(getApplicationContext(), "餐台信息刷新成功",	Toast.LENGTH_SHORT).show();
 			} 
 		}
