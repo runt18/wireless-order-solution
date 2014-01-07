@@ -44,29 +44,6 @@ var receivablesStaticRecordCount = 10;
 //月结等待
 var monthlySet = true;
 
-//销售统计
-	// kitchen
-	var kitchenStaticBeginDate;
-	var kitchenStaticEndDate;
-	var kitchenStaticString = "";
-	var kitchenMultSelectData = [];
-	var kitchenStaticRecordCount = 10;
-	// dept
-	var deptStaticBeginDate;
-	var deptStaticEndDate;
-	var deptStaticString = "";
-	var deptMultSelectData = [];
-	var deptStaticRecordCount = 10;
-	// region
-	var businessStaticBeginDate;
-	var businessStaticEndDate;
-	var businessMultSelectData = [];
-	var businessStaticRecordCount = 10;
-	
-	var salesSubWin, salesSubWinTabPanel, orderFoodStatPanel, orderFoodStatPanelDeptTree, kitchenStatPanel, deptStatPanel;
-//退菜统计
-	var cancelFoodStatWin, cancelFoodStatWinTabPanel, cancelFoodDetailsStatPanel, cancelFoodByDeptStatPanel, cancelFoodByReasonStatPanel;
-	
 function addTab(id, title, url){
 	var tab = tabs.getComponent(id);
 	if(!tab){
@@ -253,14 +230,6 @@ Ext.onReady(function(){
 							}
 							businessStatWin.show();
 							businessStatWin.center();
-						}else if(e.attributes.mId == "businessReceiptsStatistics"){
-							receivablesStatResultWin.show();
-							receivablesStatResultWin.center();
-						}else if(e.attributes.mId == "salesSubStatistics"){
-							salesSub();
-							salesSubWinTabPanel.setActiveTab(orderFoodStatPanel);
-						}else if(e.attributes.mId == "cancelledFood"){
-							cancelledFood();
 						}else if(e.attributes.mId == "WXInfo"){
 							operateWXInfo();
 						}
@@ -328,9 +297,6 @@ Ext.onReady(function(){
      
 });	
 </script>
-<script type="text/javascript" src="../../js/History/bills/billStatistics/businessReceipsStatistics.js"></script>
-<script type="text/javascript" src="../../js/History/bills/billStatistics/salesSubStatistics.js"></script>
-<script type="text/javascript" src="../../js/History/bills/billStatistics/cancelledFoodStatistics.js"></script>	
 </head>
 <body >
 
