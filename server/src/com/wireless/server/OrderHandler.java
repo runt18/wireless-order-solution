@@ -401,7 +401,7 @@ class OrderHandler implements Runnable{
 					
 				}else if(request.header.mode == Mode.MEMBER && request.header.type == Type.QUERY_INTERESTED_MEMBER){
 					//handle the request to query interested member
-					response = new RespPackage(request.header, MemberDao.getInterestedMember(staff), Member.MEMBER_PARCELABLE_SIMPLE);
+					response = new RespPackage(request.header, MemberDao.getInterestedMember(staff, null), Member.MEMBER_PARCELABLE_SIMPLE);
 					
 				}else if(request.header.mode == Mode.MEMBER && request.header.type == Type.INTERESTED_IN_MEMBER){
 					//handle the request to be interested in specific member

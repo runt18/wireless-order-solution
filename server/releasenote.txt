@@ -1,8 +1,19 @@
 /******************** (C) COPYRIGHT Digi-e Co.,Ltd*****************************
 * Author                : Ying.Zhang
-* Create Date        : 28/10/2010
-* Description         : The release note of server socket for wireless order project
+* Create Date        	: 28/10/2010
+* Description         	: The release note of server socket for wireless order project
 *******************************************************************************/
+
+/******************************************************************************************************
+Release v1.1.6 <10/1/2014> 
+<General Info>
+1 - Release on 10/1/2014
+2 - Source code is tagged as 1.2.6" in Google Code's SVN
+3 - Build under Eclipse
+<Issues>
+1 - 增加口味分组的功能
+2 - 调整会员查询的请求
+******************************************************************************************************/
 
 /******************************************************************************************************
 Release v1.1.5 <25/11/2013> 
