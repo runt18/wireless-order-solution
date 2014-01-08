@@ -14,9 +14,9 @@ import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.sccon.ServerConnector;
 
-public class UpdateSelloutStatusTask extends AsyncTask<Void, Void, Void>{
+public abstract class UpdateSelloutStatusTask extends AsyncTask<Void, Void, Void>{
 
-	protected BusinessException mBusinessException;
+	private BusinessException mBusinessException;
 	
 	private final Staff mStaff;
 	
@@ -52,4 +52,17 @@ public class UpdateSelloutStatusTask extends AsyncTask<Void, Void, Void>{
 		
 		return null;
 	}
+	
+	@Override
+	protected final void onPostExecute(Void result){
+		if(mBusinessException != null){
+			onFail(mBusinessException);
+		}else{
+			onSuccess();
+		}
+	}
+	
+	public abstract void onSuccess();
+	
+	public abstract void onFail(BusinessException e);
 }

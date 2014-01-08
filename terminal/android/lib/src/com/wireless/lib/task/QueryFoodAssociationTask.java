@@ -1,7 +1,9 @@
 package com.wireless.lib.task;
 
 import java.io.IOException;
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import android.os.AsyncTask;
 
@@ -15,7 +17,7 @@ import com.wireless.pojo.menuMgr.FoodList;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.sccon.ServerConnector;
 
-public class QueryFoodAssociationTask extends AsyncTask<Void, Void, Food[]>{
+public class QueryFoodAssociationTask extends AsyncTask<Void, Void, List<Food>>{
 
 	protected BusinessException mBusinessException;
 	
@@ -41,20 +43,24 @@ public class QueryFoodAssociationTask extends AsyncTask<Void, Void, Food[]>{
 	}
 	
 	@Override
-	protected Food[] doInBackground(Void... args) {
+	protected List<Food> doInBackground(Void... args) {
 		
-		Food[] associatedFoods = null;
+		List<Food> result = new ArrayList<Food>();
 		
 		if(mIsForceToQuery || !mFoodToAssociate.hasAssociatedFoods()){
 			
 			try{
 				ProtocolPackage resp = ServerConnector.instance().ask(new ReqQueryFoodAssociation(mStaff, mFoodToAssociate));
 				if(resp.header.type == Type.ACK){
-					associatedFoods = new Parcel(resp.body).readParcelArray(Food.CREATOR);
-					for(int i = 0; i < associatedFoods.length; i++){
-						associatedFoods[i] = mFoodList.find(associatedFoods[i]);
+					List<Food> associated = new Parcel(resp.body).readParcelList(Food.CREATOR);
+					if(associated != null){
+						for(Food f : associated){
+							if(mFoodList.contains(f)){
+								result.add(mFoodList.find(f));
+							}
+						}
+						mFoodToAssociate.setAssocatedFoods(result);
 					}
-					mFoodToAssociate.setAssocatedFoods(Arrays.asList(associatedFoods));
 				}else{
 					throw new BusinessException("查找菜品关联数据不成功");
 				}
@@ -67,7 +73,7 @@ public class QueryFoodAssociationTask extends AsyncTask<Void, Void, Food[]>{
 			
 		}		
 		
-		return associatedFoods == null ? new Food[0] : associatedFoods;
+		return Collections.unmodifiableList(result);
 		
 	}
 

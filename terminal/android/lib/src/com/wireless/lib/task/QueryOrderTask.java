@@ -18,7 +18,7 @@ import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.tasteMgr.Taste;
 import com.wireless.sccon.ServerConnector;
 
-public class QueryOrderTask extends AsyncTask<Void, Void, Order>{
+public abstract class QueryOrderTask extends AsyncTask<Void, Void, Order>{
 
 	protected BusinessException mBusinessException;
 	
@@ -79,4 +79,16 @@ public class QueryOrderTask extends AsyncTask<Void, Void, Order>{
 		return order;
 	}
 
+	@Override
+	protected final void onPostExecute(Order order){
+		if(mBusinessException != null){
+			onFail(mBusinessException);
+		}else{
+			onSuccess(order);
+		}
+	}
+	
+	public abstract void onSuccess(Order order);
+	
+	public abstract void onFail(BusinessException e);
 }

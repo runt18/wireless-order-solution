@@ -16,7 +16,7 @@ import com.wireless.pojo.menuMgr.FoodList;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.sccon.ServerConnector;
 
-public class QueryMemberDetailTask extends AsyncTask<Void, Void, Member>{
+public abstract class QueryMemberDetailTask extends AsyncTask<Void, Void, Member>{
 
 	private final Staff mStaff;
 	
@@ -24,7 +24,7 @@ public class QueryMemberDetailTask extends AsyncTask<Void, Void, Member>{
 	
 	private final FoodList mSrcFoods;
 	
-	protected BusinessException mBusinessException;
+	private BusinessException mBusinessException;
 	
 	public QueryMemberDetailTask(Staff staff, Member member, FoodList srcFoods){
 		mStaff = staff;
@@ -63,5 +63,18 @@ public class QueryMemberDetailTask extends AsyncTask<Void, Void, Member>{
 		
 		return null;
 	}
+	
+	@Override
+	protected final void onPostExecute(Member member){
+		if(mBusinessException != null){
+			onFail(mBusinessException);
+		}else{
+			onSuccess(member);
+		}
+	}
+	
+	public abstract void onSuccess(Member member);
+	
+	public abstract void onFail(BusinessException e);
 }
 

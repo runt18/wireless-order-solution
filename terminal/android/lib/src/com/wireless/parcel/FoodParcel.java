@@ -22,7 +22,7 @@ public class FoodParcel implements Parcelable{
 	private FoodParcel(Parcel in){
 		if(in.readInt() != 1){
 			mSrcFood = new Food();
-			mSrcFood.setFoodId(in.readLong());
+			mSrcFood.setFoodId(in.readInt());
 			mSrcFood.setAliasId(in.readInt());
 			mSrcFood.setRestaurantId(in.readInt());
 			mSrcFood.setKitchen(KitchenParcel.CREATOR.createFromParcel(in).asKitchen());
@@ -82,7 +82,7 @@ public class FoodParcel implements Parcelable{
 		}else{
 			dest.writeInt(0);
 			
-			dest.writeLong(mSrcFood.getFoodId());
+			dest.writeInt(mSrcFood.getFoodId());
 			dest.writeInt(mSrcFood.getAliasId());
 			dest.writeInt(mSrcFood.getRestaurantId());
 			new KitchenParcel(mSrcFood.getKitchen()).writeToParcel(dest, flags);

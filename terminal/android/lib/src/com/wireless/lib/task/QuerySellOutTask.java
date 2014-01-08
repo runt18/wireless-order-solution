@@ -2,6 +2,7 @@ package com.wireless.lib.task;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import android.os.AsyncTask;
@@ -17,11 +18,9 @@ import com.wireless.pojo.menuMgr.FoodList;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.sccon.ServerConnector;
 
-public class QuerySellOutTask extends AsyncTask<Void, Void, Food[]>{
+public abstract class QuerySellOutTask extends AsyncTask<Void, Void, List<Food>>{
 
-	private final static Food[] EMPTY = new Food[0];
-	
-	protected BusinessException mProtocolException;
+	private BusinessException mBusinessException;
 	
 	private final FoodList mFoodList;
 	
@@ -33,7 +32,7 @@ public class QuerySellOutTask extends AsyncTask<Void, Void, Food[]>{
 	}
 	
 	@Override
-	protected Food[] doInBackground(Void... args) {
+	protected List<Food> doInBackground(Void... args) {
 		
 		List<Food> sellOutFoods = new ArrayList<Food>();
 		
@@ -55,13 +54,25 @@ public class QuerySellOutTask extends AsyncTask<Void, Void, Food[]>{
 				}
 				
 			}else{
-				mProtocolException = new BusinessException(new Parcel(resp.body).readParcel(ErrorCode.CREATOR));
+				mBusinessException = new BusinessException(new Parcel(resp.body).readParcel(ErrorCode.CREATOR));
 			}
 		}catch(IOException e){
-			mProtocolException = new BusinessException(e.getMessage());
+			mBusinessException = new BusinessException(e.getMessage());
 		}
 		
-		return sellOutFoods.toArray(EMPTY);
+		return Collections.unmodifiableList(sellOutFoods);
 	}
 
+	@Override
+	protected final void onPostExecute(List<Food> sellOutFoods){
+		if(mBusinessException != null){
+			onFail(mBusinessException);
+		}else{
+			onSuccess(sellOutFoods);
+		}
+	}
+	
+	public abstract void onSuccess(List<Food> sellOutFoods);
+	
+	public abstract void onFail(BusinessException e);
 }

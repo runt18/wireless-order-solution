@@ -10,13 +10,13 @@ import com.wireless.pojo.client.Member;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.sccon.ServerConnector;
 
-public class InterestedInMemberTask extends AsyncTask<Void, Void, Void>{
+public abstract class InterestedInMemberTask extends AsyncTask<Void, Void, Void>{
 
 	private final Staff mStaff;
 	
 	private final Member mMember;
 	
-	protected BusinessException mBusinessException;
+	private BusinessException mBusinessException;
 	
 	public InterestedInMemberTask(Staff staff, Member member){
 		mStaff = staff;
@@ -32,4 +32,17 @@ public class InterestedInMemberTask extends AsyncTask<Void, Void, Void>{
 		}
 		return null;
 	}
+	
+	@Override
+	protected final void onPostExecute(Void result){
+		if(mBusinessException != null){
+			onFail(mBusinessException);
+		}else{
+			onSuccess();
+		}
+	}
+	
+	public abstract void onSuccess();
+	
+	public abstract void onFail(BusinessException e);
 }

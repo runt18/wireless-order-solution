@@ -2,6 +2,7 @@ package com.wireless.lib.task;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import android.os.AsyncTask;
@@ -15,7 +16,7 @@ import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.sccon.ServerConnector;
 
-public class QueryTableTask extends AsyncTask<Void, Void, Table[]>{
+public class QueryTableTask extends AsyncTask<Void, Void, List<Table>>{
 
 	protected BusinessException mBusinessException;
 	
@@ -29,7 +30,7 @@ public class QueryTableTask extends AsyncTask<Void, Void, Table[]>{
 	 * 在新的线程中执行请求餐台信息的操作
 	 */
 	@Override
-	protected Table[] doInBackground(Void... args) {
+	protected List<Table> doInBackground(Void... args) {
 	
 		List<Table> tables = new ArrayList<Table>();
 		
@@ -43,7 +44,7 @@ public class QueryTableTask extends AsyncTask<Void, Void, Table[]>{
 			mBusinessException = new BusinessException(e.getMessage());
 		}
 		
-		return tables.toArray(new Table[tables.size()]);
+		return Collections.unmodifiableList(tables);
 	}
 
 }

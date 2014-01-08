@@ -17,11 +17,11 @@ import com.wireless.pojo.client.Member;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.sccon.ServerConnector;
 
-public class QueryMemberTask extends AsyncTask<Void, Void, List<Member>>{
+public abstract class QueryMemberTask extends AsyncTask<Void, Void, List<Member>>{
 
 	private final Staff mStaff;
 	
-	protected BusinessException mBusinessException;
+	private BusinessException mBusinessException;
 	
 	public QueryMemberTask(Staff staff){
 		mStaff = staff;
@@ -42,4 +42,17 @@ public class QueryMemberTask extends AsyncTask<Void, Void, List<Member>>{
 		}
 		return Collections.unmodifiableList(members);
 	}
+	
+	@Override
+	protected final void onPostExecute(List<Member> members){
+		if(mBusinessException != null){
+			onFail(mBusinessException);
+		}else{
+			onSuccess(members);
+		}
+	}
+	
+	public abstract void onSuccess(List<Member> members);
+	
+	public abstract void onFail(BusinessException e);
 }
