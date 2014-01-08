@@ -130,8 +130,8 @@ co.ot.initBarForCommomTaste = function(){
 				dataIndex : c.dataIndex,
 				id : c.data.taste.id,
 				name : c.data.taste.name,
-				mark : '¥',
-				markText : c.data.taste.price
+				mark : c.data.taste.cateStatusValue == 2 ? '¥' : c.data.taste.cateStatusValue == 1 ? '比例' : '',
+				markText : c.data.taste.cateStatusValue == 2 ? c.data.taste.price : c.data.taste.cateStatusValue == 1 ? c.data.taste.rate : '0.00'
 			});
 		}
 	});
@@ -155,8 +155,8 @@ co.ot.initBarForAllTaste = function(){
 				dataIndex : c.dataIndex,
 				id : c.data.taste.id,
 				name : c.data.taste.name,
-				mark : c.data.taste.cateStatusValue == 1 ? '¥' : c.data.taste.cateStatusValue == 2 ? '比例' : '',
-				markText : c.data.taste.cateStatusValue == 1 ? c.data.taste.price : c.data.taste.cateStatusValue == 2 ? c.data.taste.rate : '0.00'
+				mark : c.data.taste.cateStatusValue == 2 ? '¥' : c.data.taste.cateStatusValue == 1 ? '比例' : '',
+				markText : c.data.taste.cateStatusValue == 2 ? c.data.taste.price : c.data.taste.cateStatusValue == 1 ? c.data.taste.rate : '0.00'
 			});
 		}
 	});

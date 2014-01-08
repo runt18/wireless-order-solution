@@ -408,8 +408,8 @@ co.ot.changeTasteCategory = function(c){
 				dataIndex : c.dataIndex,
 				id : c.data.taste.id,
 				name : c.data.taste.name,
-				mark : c.data.taste.cateStatusValue == 1 ? '¥' : c.data.taste.cateStatusValue == 2 ? '比例' : '',
-				markText : c.data.taste.cateStatusValue == 1 ? c.data.taste.price : c.data.taste.cateStatusValue == 2 ? c.data.taste.rate : '0.00'
+				mark : c.data.taste.cateStatusValue == 2 ? '¥' : c.data.taste.cateStatusValue == 1 ? '比例' : '',
+				markText : c.data.taste.cateStatusValue == 2 ? c.data.taste.price : c.data.taste.cateStatusValue == 1 ? c.data.taste.rate : '0.00'
 			});
 		}
 	});
@@ -484,9 +484,9 @@ co.ot.save = function(c){
 		temp = co.ot.newTaste[i];
 		tasteGroup.normalTasteContent.push(temp);
 		tasteGroup.normalTaste.name += (i > 0 ? ',' + temp.name : temp.name);
-		if(temp.cateStatusValue == 1){
+		if(temp.cateStatusValue == 2){
 			tasteGroup.normalTaste.price += temp.price;
-		}else if(temp.cateStatusValue == 2){
+		}else if(temp.cateStatusValue == 1){
 			tasteGroup.normalTaste.price += co.ot.foodData.unitPrice * temp.rate;
 		}
 	}
@@ -556,7 +556,7 @@ co.submit = function(c){
 			var normalTaste = '', tmpTaste = '' , tasteGroup = item.tasteGroup;
 			for(var j = 0; j < tasteGroup.normalTasteContent.length; j++){
 				var t = tasteGroup.normalTasteContent[j];
-				normalTaste += ((j > 0 ? '<<stnt>>' : '') + (t.id + '<<stb>>' + t.alias + '<<stb>>' + t.cateValue + '<<stb>>' + t.cateStatusValue));
+				normalTaste += ((j > 0 ? '<<stnt>>' : '') + (t.id + '<<stb>>' + t.cateValue + '<<stb>>' + t.cateStatusValue));
 			}
 			if(tasteGroup.tmpTaste != null && typeof tasteGroup.tmpTaste != 'undefined'){
 				if(eval(tasteGroup.tmpTaste.id >= 0))
