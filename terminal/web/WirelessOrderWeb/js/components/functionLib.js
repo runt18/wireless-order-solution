@@ -38,6 +38,13 @@ function checkUserSessionStatus(conn,response,options){
 		});
     }     
 } 
+
+Ext.override(Ext.tree.TreeEventModel, {
+	onNodeClick : function(e, node) {
+		this.tree.getSelectionModel().select(node);
+		node.ui.onClick(e);
+	}
+});
 Ext.override(Ext.tree.TreeNodeUI, {
 	onDblClick : function(e){
 		e.preventDefault();
