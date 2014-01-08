@@ -24,14 +24,15 @@ import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.util.DateUtil;
 
 public class WeiXinRestaurantHandleMessageAdapter implements HandleMessageListener {
+	public static final String WEIXIN_INDEX = "http://42.121.54.177/web-term/weixin/order/index.html";
 	public static final String WEIXIN_FOOD = "http://42.121.54.177/web-term/weixin/order/food.html";
-	public static final String WEIXIN_ORDER = "http://42.121.54.177/web-term/weixin/order/order.html";
+	public static final String WEIXIN_RFOOD = "http://42.121.54.177/web-term/weixin/order/rfood.html";
 	public static final String WEIXIN_ABOUT = "http://42.121.54.177/web-term/weixin/order/about.html";
 	public static final String WEIXIN_SALES = "http://42.121.54.177/web-term/weixin/order/sales.html";
 	public static final String WEIXIN_MEMBER = "http://42.121.54.177/web-term/weixin/order/member.html";
 	
-	public static final String COMMAND_HELP = "h";
-	public static final String COMMAND_MENU = "m";
+	public static final String COMMAND_HELP = "H";
+	public static final String COMMAND_MENU = "M";
 	
 	private DBCon dbCon;
 	private Restaurant restaurant;
@@ -57,9 +58,9 @@ public class WeiXinRestaurantHandleMessageAdapter implements HandleMessageListen
 	private void init(Msg msg) throws SQLException, BusinessException{
 		if(msg == null) throw new NullPointerException("当前时间: " + DateUtil.format(new Date()) + "\n 错误: 接收公众平台回发信息失败.");
 		else this.msg = msg;
-		System.out.println("FromID: " + msg.getToUserName());
-		System.out.println("OpenID: " + msg.getFromUserName());
-		System.out.println("account: " + account);
+//		System.out.println("FromID: " + msg.getToUserName());
+//		System.out.println("OpenID: " + msg.getFromUserName());
+//		System.out.println("account: " + account);
 		if(dbCon == null){
 			dbCon = new DBCon();
 			dbCon.connect();
@@ -91,8 +92,7 @@ public class WeiXinRestaurantHandleMessageAdapter implements HandleMessageListen
 	}
 	private String createUrl(String url){
 		StringBuilder target = new StringBuilder();
-		target.append(url).append("?_d="+Math.random())
-			.append("&rid=").append(restaurant.getId())
+		target.append(url).append("?_d=" + (int)(Math.random() * 1000000))
 			.append("&m=").append(imageText.getToUserName())
 			.append("&r=").append(imageText.getFromUserName());
 		return target.toString();
@@ -105,24 +105,29 @@ public class WeiXinRestaurantHandleMessageAdapter implements HandleMessageListen
 	private void explainOrder(String order){
 		if(order == null) return;
 		else order = order.trim().toLowerCase();
-		if("1".equals(order) || COMMAND_MENU.equals(order)){
+		if("1".equals(order) || COMMAND_MENU.equals(order.toUpperCase())){
 			initImageText();
 			
-			dataItem = new Data4Item("logo", "最新促销信息", "http://42.121.54.177/web-term/weixin/title-image.jpg", WEIXIN_ORDER); 
+			dataItem = new Data4Item("logo", "最新优惠信息", "http://42.121.54.177/web-term/weixin/title-image.jpg", WEIXIN_SALES); 
 			imageText.addItem(dataItem);
 			
 			dataItem = new Data4Item();
-			dataItem.setTitle("点菜");
+			dataItem.setTitle("主页");
+			dataItem.setUrl(createUrl(WEIXIN_INDEX));
+			imageText.addItem(dataItem);
+			
+			dataItem = new Data4Item();
+			dataItem.setTitle("自助点餐");
 			dataItem.setUrl(createUrl(WEIXIN_FOOD));
 			imageText.addItem(dataItem);
 			
 			dataItem = new Data4Item();
-			dataItem.setTitle("订单");
-			dataItem.setUrl(createUrl(WEIXIN_ORDER));
+			dataItem.setTitle("特色菜品");
+			dataItem.setUrl(createUrl(WEIXIN_RFOOD));
 			imageText.addItem(dataItem);
 			
 			dataItem = new Data4Item();
-			dataItem.setTitle("促销信息");
+			dataItem.setTitle("优惠信息");
 			dataItem.setUrl(createUrl(WEIXIN_SALES));
 			imageText.addItem(dataItem);
 			
@@ -137,7 +142,7 @@ public class WeiXinRestaurantHandleMessageAdapter implements HandleMessageListen
 			imageText.addItem(dataItem);
 			
 			session.callback(imageText);
-		}else if(COMMAND_HELP.equals(order)){
+		}else if(COMMAND_HELP.equals(order.toUpperCase())){
 			initText();
 			text.setContent("餐厅编号:"+restaurant.getId()+"\nToUserName(openID):"+msg.getFromUserName()+"\nFromUserName(开发者微信号):"+msg.getToUserName());
 			session.callback(text);
