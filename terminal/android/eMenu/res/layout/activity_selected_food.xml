@@ -67,7 +67,7 @@
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
                 android:layout_toLeftOf="@+id/imageButton_submit_pickedFood"
-                android:background="@drawable/submit_selector"
+                android:background="@drawable/pay_temp_selector"
                 android:textColor="@color/white" />
 
             <Button
