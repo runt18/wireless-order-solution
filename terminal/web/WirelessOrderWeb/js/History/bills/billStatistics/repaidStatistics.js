@@ -157,7 +157,11 @@ function initGrid(){
 	    bbar : pagingBar
 	});
 	repaidStatisticsGrid.region = 'center';
-		repaidStatisticsGrid.getStore().on('load', function(store, records, options){
+	repaidStatisticsGrid.on('render', function(){
+		repaid_dateCombo.setValue(1);
+		repaid_dateCombo.fireEvent('select', repaid_dateCombo, null, 1);
+	});
+	repaidStatisticsGrid.getStore().on('load', function(store, records, options){
 		
 		if(store.getCount() > 0){
 			var sumRow = repaidStatisticsGrid.getView().getRow(store.getCount() - 1);	

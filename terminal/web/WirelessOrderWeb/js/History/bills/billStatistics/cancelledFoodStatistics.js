@@ -218,15 +218,20 @@ function cancelFoodDetailsStatPanelInit(){
 		cfdsGridTbar
 	);
 	cfdsGrid.region = 'center';
+	cfdsGrid.on('render', function(){
+		dateCombo.setValue(1);
+		dateCombo.fireEvent('select', dateCombo, null, 1);
+	});
 	cfdsGrid.getStore().on('load', function(store, records, options){
 		if(store.getCount() > 0){
 			var sumRow = cfdsGrid.getView().getRow(store.getCount()-1);	
 			sumRow.style.backgroundColor = '#EEEEEE';			
-			sumRow.style.color = 'green';
+			
 			for(var i = 0; i < cfdsGrid.getColumnModel().getColumnCount(); i++){
 				var sumRow = cfdsGrid.getView().getCell(store.getCount()-1, i);
 				sumRow.style.fontSize = '15px';
-				sumRow.style.fontWeight = 'bold';					
+				sumRow.style.fontWeight = 'bold';
+				sumRow.style.color = 'green';
 			}
 			cfdsGrid.getView().getCell(store.getCount()-1, 1).innerHTML = '汇总';
 			cfdsGrid.getView().getCell(store.getCount()-1, 2).innerHTML = '--';
@@ -373,15 +378,20 @@ function cancelFoodByDeptStatPanelInit(){
 		cfbdsGridTbar
 	);
 	cfbdsGrid.region = 'center';
+	cfbdsGrid.on('render', function(){
+		dateCombo.setValue(1);
+		dateCombo.fireEvent('select', dateCombo, null, 1);
+	});
 	cfbdsGrid.getStore().on('load', function(store, records, options){
 		if(store.getCount() > 0){
 			var sumRow = cfbdsGrid.getView().getRow(store.getCount()-1);	
 			sumRow.style.backgroundColor = '#EEEEEE';			
-			sumRow.style.color = 'green';
+			
 			for(var i = 0; i < cfbdsGrid.getColumnModel().getColumnCount(); i++){
 				var sumRow = cfbdsGrid.getView().getCell(store.getCount()-1, i);
 				sumRow.style.fontSize = '15px';
-				sumRow.style.fontWeight = 'bold';					
+				sumRow.style.fontWeight = 'bold';	
+				sumRow.style.color = 'green';
 			}
 		}
 	});
@@ -511,15 +521,19 @@ function cancelFoodByReasonStatPanelInit(){
 		cfbrsGridTbar
 	);
 	cfbrsGrid.region = 'center';
+	cfbrsGrid.on('render', function(){
+		dateCombo.setValue(1);
+		dateCombo.fireEvent('select', dateCombo, null, 1);
+	});
 	cfbrsGrid.getStore().on('load', function(store, records, options){
 		if(store.getCount() > 0){
 			var sumRow = cfbrsGrid.getView().getRow(store.getCount()-1);	
 			sumRow.style.backgroundColor = '#EEEEEE';			
-			sumRow.style.color = 'green';
 			for(var i = 0; i < cfbrsGrid.getColumnModel().getColumnCount(); i++){
 				var sumRow = cfbrsGrid.getView().getCell(store.getCount()-1, i);
 				sumRow.style.fontSize = '15px';
-				sumRow.style.fontWeight = 'bold';					
+				sumRow.style.fontWeight = 'bold';
+				sumRow.style.color = 'green';
 			}
 		}
 	});

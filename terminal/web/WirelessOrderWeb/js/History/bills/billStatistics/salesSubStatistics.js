@@ -186,6 +186,10 @@ function orderFoodStatPanelInit(){
 		}
 	}];
 	orderFoodStatPanelGrid.region = 'center';
+	orderFoodStatPanelGrid.on('render', function(){
+		dateCombo.setValue(1);
+		dateCombo.fireEvent('select', dateCombo, null, 1);
+	});
 	orderFoodStatPanelGrid.getStore().on('load', function(store, records, options){
 		if(store.getCount() > 0){
 			var sumRow = orderFoodStatPanelGrid.getView().getRow(store.getCount()-1);	
@@ -338,7 +342,10 @@ function kitchenStatPanelInit(){
         forceFit:true,   
         groupTextTpl : '{[kitchenGroupTextTpl(values.rs)]}'
     });
-	
+	kitchenStatPanelGrid.on('render', function(){
+		dateCombo.setValue(1);
+		dateCombo.fireEvent('select', dateCombo, null, 1);
+	});
 	kitchenStatPanel = new Ext.Panel({
 		title : '分厨统计',
 		layout : 'fit',
@@ -467,6 +474,10 @@ function deptStatPanelInit(){
 			deptStatPanelGrid.getView().getCell(store.getCount()-1, 6).innerHTML = '--';
 			deptStatPanelGrid.getView().getCell(store.getCount()-1, 8).innerHTML = '--';
 		}
+	});
+	deptStatPanelGrid.on('render', function(){
+		dateCombo.setValue(1);
+		dateCombo.fireEvent('select', dateCombo, null, 1);
 	});
 	deptStatPanel = new Ext.Panel({
 		title : '部门统计',

@@ -210,7 +210,10 @@ function commissionDetailInit(){
 	    bbar : pagingBar
 	});
 	commissionStatisticsGrid.region = 'center';
-	
+	commissionStatisticsGrid.on('render', function(){
+		commission_dateCombo.setValue(1);
+		commission_dateCombo.fireEvent('select', commission_dateCombo, null, 1);
+	});
 	commissionStatisticsGrid.getStore().on('load', function(store, records, options){
 		
 		if(store.getCount() > 0){
