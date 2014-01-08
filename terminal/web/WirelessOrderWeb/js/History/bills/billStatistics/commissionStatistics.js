@@ -401,6 +401,10 @@ function commissionTotalInit(){
 	    bbar : pagingBar
 	});
 	commissionTotalStatisticsGrid.region = 'center';
+	commissionTotalStatisticsGrid.on('render', function(){
+		commissionTotal_dateCombo.setValue(1);
+		commissionTotal_dateCombo.fireEvent('select', commissionTotal_dateCombo, null, 1);
+	});
 	commissionTotalStatisticsGrid.getStore().on('load', function(store, records, options){
 		
 		if(store.getCount() > 0){
