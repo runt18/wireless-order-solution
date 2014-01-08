@@ -295,16 +295,19 @@ co.ot.show = function(){
 		type : 'show',
 		renderTo : 'divOperateBoxForFoodTaste'
 	});
-	
+	// 常用口味
 	if(typeof co.ot.ctp == 'undefined'){
 		co.ot.initBarForCommomTaste();
 	}
+	// 所有口味
 	if(typeof co.ot.atp == 'undefined'){
 		co.ot.initBarForAllTaste();
 	}
-	if(typeof co.ot.ggp == 'undefined'){
-		co.ot.initBarForCate();
+	// 口味组
+	if(typeof co.ot.tctp == 'undefined'){
+		co.ot.initBarForTasteCategory();
 	}
+	
 	co.ot.changeTaste({
 		foodData : co.ot.foodData,
 		type : 1,
@@ -377,12 +380,41 @@ co.ot.changeTaste = function(c){
 		co.ot.tp = co.ot.atp;
 		co.ot.tp.getFirstPage();
 	}else if(c.type == 3){
-		// 规格
-		co.ot.tp = co.ot.catep;
+		// 口味组
+		co.ot.tp = co.ot.tctp;
 		co.ot.tp.getFirstPage();
 	}
 };
-
+/**
+ * 口味选择切换
+ */
+co.ot.changeTasteCategory = function(c){
+	if(c == null || typeof c.tasteId != 'number'){
+		return;
+	}
+	var data = [];
+	for(var i = 0; i < co.ot.tctp.data.length; i++){
+		if(co.ot.tctp.data[i].id == c.tasteId){
+			data = co.ot.tctp.data[i].items;
+			break;
+		}
+	}
+	co.ot.tp = new Util.padding({
+		data : data,
+		renderTo : 'divCFOTTasteSelectContent',
+		displayId : 'divDescForOperateTaste-padding-msg',
+		templet : function(c){
+			return Templet.co.boxSelectTaste.format({
+				dataIndex : c.dataIndex,
+				id : c.data.taste.id,
+				name : c.data.taste.name,
+				mark : c.data.taste.cateStatusValue == 1 ? '¥' : c.data.taste.cateStatusValue == 2 ? '比例' : '',
+				markText : c.data.taste.cateStatusValue == 1 ? c.data.taste.price : c.data.taste.cateStatusValue == 2 ? c.data.taste.rate : '0.00'
+			});
+		}
+	});
+	co.ot.tp.getFirstPage();
+};
 /**
  * 添加新口味
  */
@@ -428,7 +460,6 @@ co.ot.deleteTaste = function(c){
 	//
 	co.ot.initNewTasteContent();
 };
-
 /**
  * 保存口味
  */

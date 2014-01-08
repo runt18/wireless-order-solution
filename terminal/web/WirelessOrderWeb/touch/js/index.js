@@ -35,6 +35,9 @@ var Templet={
   	  		+ '{name}'
   	  		+ '<div>{mark}:{markText}</div>'
   	  		+ '</div>',
+  	  	boxTasteCategory : '<div data-index={dataIndex} data-value={id} class="main-box-base" onClick="co.ot.changeTasteCategory({event:this, tasteId:{id}})">'
+  	  		+ '{name}'
+  	  		+ '</div>',
   	  	boxNewTaste : '<div data-value={id} class="main-box-base" onClick="co.ot.deleteTaste({event:this, tasteId:{id}})">'
   	  		+ '{name}'
   	  		+ '<div>{mark}:{markText}</div>'

@@ -119,7 +119,7 @@ co.initKitchenContent = function(c){
 /*** -------------------------------------------------- ***/
 
 /**
- * 
+ * 初始化常用口味数据操作工具
  */
 co.ot.initBarForCommomTaste = function(){
 	co.ot.ctp = new Util.padding({
@@ -137,14 +137,14 @@ co.ot.initBarForCommomTaste = function(){
 	});
 };
 /**
- * 
+ * 初始化所有口味数据操作工具
  */
 co.ot.initBarForAllTaste = function(){
 	var data = [];
 	for(var i = 0; i < tasteData.root.length; i++){
-		if(tasteData.root[i].taste.cateStatusValue == 1){
+//		if(tasteData.root[i].taste.cateStatusValue == 1){
 			data.push(tasteData.root[i]);
-		}
+//		}
 	}
 	co.ot.atp = new Util.padding({
 		data : data,
@@ -155,40 +155,60 @@ co.ot.initBarForAllTaste = function(){
 				dataIndex : c.dataIndex,
 				id : c.data.taste.id,
 				name : c.data.taste.name,
-				mark : '¥',
-				markText : c.data.taste.price
+				mark : c.data.taste.cateStatusValue == 1 ? '¥' : c.data.taste.cateStatusValue == 2 ? '比例' : '',
+				markText : c.data.taste.cateStatusValue == 1 ? c.data.taste.price : c.data.taste.cateStatusValue == 2 ? c.data.taste.rate : '0.00'
 			});
 		}
 	});
 	data = null;
 };
 /**
- * 
+ * 初始化口味组数据操作工具
  */
-co.ot.initBarForCate = function(){
+co.ot.initBarForTasteCategory = function(){
 	var data = [];
+	if(tasteData.root.length > 0){
+		data.push({
+			id : tasteData.root[0].taste.cateValue,
+			name : tasteData.root[0].taste.cateText,
+			items : []
+		});
+	}
+	var has = true, temp = {};
 	for(var i = 0; i < tasteData.root.length; i++){
-		if(tasteData.root[i].taste.cateStatusValue == 2){
-			data.push(tasteData.root[i]);
+		has = false;
+		for(var k = 0; k < data.length; k++){
+			if(tasteData.root[i].taste.cateValue == data[k].id){
+				data[k].items.push(tasteData.root[i]);
+				has = true;
+				break;
+			}
+		}
+		if(!has){
+			temp = {
+				id : tasteData.root[i].taste.cateValue,
+				name : tasteData.root[i].taste.cateText,
+				items : []
+			};
+			temp.items.push(tasteData.root[i]);
+			data.push(temp);
 		}
 	}
-	co.ot.catep = new Util.padding({
+	co.ot.tctp = new Util.padding({
 		data : data,
 		renderTo : 'divCFOTTasteSelectContent',
 		displayId : 'divDescForOperateTaste-padding-msg',
 		templet : function(c){
-			return Templet.co.boxSelectTaste.format({
+			return Templet.co.boxTasteCategory.format({
 				dataIndex : c.dataIndex,
-				id : c.data.taste.id,
-				name : c.data.taste.name,
-				mark : '比例',
-				markText : c.data.taste.rate
+				id : c.data.id,
+				name : c.data.name
 			});
 		}
 	});
-	
 	data = null;
 };
+
 /**
  * 
  */
