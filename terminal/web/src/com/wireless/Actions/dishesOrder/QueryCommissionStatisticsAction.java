@@ -37,7 +37,7 @@ public class QueryCommissionStatisticsAction extends Action{
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			DutyRange range = new DutyRange(beginDate, endDate);
 			List<CommissionStatistics> list;
-			if(staffId != null && !staffId.equals("-1")){
+			if(staffId != null && !staffId.equals("-1") && !staffId.isEmpty()){
 				if(deptId != null && !deptId.equals("-1")){
 					list = CalcBillStatisticsDao.getCommissionStatisticsByStaffAndDeptId(staff, range, Integer.parseInt(staffId), Integer.parseInt(deptId), DateType.HISTORY);
 				}else{

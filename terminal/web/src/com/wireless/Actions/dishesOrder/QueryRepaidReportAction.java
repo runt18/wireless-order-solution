@@ -36,7 +36,7 @@ public class QueryRepaidReportAction extends Action{
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			DutyRange range = new DutyRange(beginDate, endDate);
 			List<RepaidStatistics> list;
-			if(staffId != null && !staffId.equals("-1")){
+			if(staffId != null && !staffId.equals("-1") && !staffId.isEmpty()){
 				list = CalcBillStatisticsDao.getRepaidStatisticsByStaffId(staff, range, Integer.parseInt(staffId), DateType.HISTORY);
 			}else{
 				list = CalcBillStatisticsDao.getRepaidStatistics(staff, range, DateType.HISTORY);
