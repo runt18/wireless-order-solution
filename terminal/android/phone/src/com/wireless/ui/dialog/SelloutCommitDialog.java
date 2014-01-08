@@ -19,6 +19,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.wireless.common.WirelessOrder;
+import com.wireless.exception.BusinessException;
 import com.wireless.lib.task.UpdateSelloutStatusTask;
 import com.wireless.parcel.FoodParcel;
 import com.wireless.pojo.menuMgr.Food;
@@ -142,20 +143,24 @@ public class SelloutCommitDialog extends DialogFragment {
 					}
 					
 					@Override
-					protected void onPostExecute(Void result){
+					public void onSuccess(){
 						mProgDialog.dismiss();
 						dismiss();
-						if(mBusinessException != null){
-							new AlertDialog.Builder(getActivity())
-											.setTitle("提示")
-											.setMessage(mBusinessException.getMessage())
-											.setPositiveButton("确定", null)
-											.show();							
-						}else{
-							Toast.makeText(getActivity(), "更新沽清菜品成功", Toast.LENGTH_SHORT).show();
-							getActivity().finish();
-						}
+						Toast.makeText(getActivity(), "更新沽清菜品成功", Toast.LENGTH_SHORT).show();
+						getActivity().finish();
 					}
+					
+					@Override
+					public void onFail(BusinessException e){
+						mProgDialog.dismiss();
+						dismiss();
+						new AlertDialog.Builder(getActivity())
+										.setTitle("提示")
+										.setMessage(e.getMessage())
+										.setPositiveButton("确定", null)
+										.show();
+					}
+					
 				}.execute();
 			}
 		});

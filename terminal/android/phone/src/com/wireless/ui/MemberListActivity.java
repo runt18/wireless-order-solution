@@ -32,6 +32,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.wireless.common.WirelessOrder;
+import com.wireless.exception.BusinessException;
 import com.wireless.parcel.MemberParcel;
 import com.wireless.pojo.client.Member;
 import com.wireless.pojo.util.SortedList;
@@ -353,7 +354,8 @@ public class MemberListActivity extends FragmentActivity {
 			
 			//设置姓名,会员类型,电话
 			((TextView)layout.findViewById(R.id.txtView_name_memberList_listItem)).setText(mMembers.get(position).getName());
-			((TextView)layout.findViewById(R.id.txtView_tele_memberList_listItem)).setText(mMembers.get(position).getMobile());
+			String mobile = mMembers.get(position).getMobile();
+			((TextView)layout.findViewById(R.id.txtView_tele_memberList_listItem)).setText(mobile.substring(0, 3) + "****" + mobile.substring(7));
 			((TextView)layout.findViewById(R.id.txtView_type_memberList_listItem)).setText(mMembers.get(position).getMemberType().getName());
 			((TextView)layout.findViewById(R.id.txtView_consumptionAmount_memberList_listItem)).setText(mMembers.get(position).getConsumptionAmount() + "次光顾");
 
@@ -377,19 +379,22 @@ public class MemberListActivity extends FragmentActivity {
 		}
 		
 		@Override
-		protected void onPostExecute(List<Member> members){
-			
+		public void onSuccess(List<Member> members){
 			findViewById(R.id.progressBar_allMember_memberList).setVisibility(View.GONE);
 			findViewById(R.id.txtView_allMemberAmount_memberList).setVisibility(View.VISIBLE);
 			
-			if(mBusinessException != null){
-				Toast.makeText(MemberListActivity.this, "会员列表更新失败", Toast.LENGTH_SHORT).show();				
-			}else{
-				Toast.makeText(MemberListActivity.this, "会员列表更新成功", Toast.LENGTH_SHORT).show();
-				mMembers = members;
-				mMemberListHandler.sendEmptyMessage(mCurrentPage);
-			}
+			Toast.makeText(MemberListActivity.this, "会员列表更新成功", Toast.LENGTH_SHORT).show();
+			mMembers = members;
+			mMemberListHandler.sendEmptyMessage(mCurrentPage);
 		}
+		
+		@Override
+		public void onFail(BusinessException e){
+			findViewById(R.id.progressBar_allMember_memberList).setVisibility(View.GONE);
+			findViewById(R.id.txtView_allMemberAmount_memberList).setVisibility(View.VISIBLE);
+			Toast.makeText(MemberListActivity.this, "会员列表更新失败", Toast.LENGTH_SHORT).show();				
+		}
+		
 	}
 	
 	/**
@@ -408,19 +413,23 @@ public class MemberListActivity extends FragmentActivity {
 		}
 		
 		@Override
-		protected void onPostExecute(List<Member> members){
-
+		public void onFail(BusinessException e){
 			findViewById(R.id.progressBar_interestedMember_memberList).setVisibility(View.GONE);
 			findViewById(R.id.txtView_interestedMemberAmount_memberList).setVisibility(View.VISIBLE);
-
-			if(mBusinessException != null){
-				Toast.makeText(MemberListActivity.this, "关注的会员列表更新失败", Toast.LENGTH_SHORT).show();				
-			}else{
-				Toast.makeText(MemberListActivity.this, "关注的会员列表更新成功", Toast.LENGTH_SHORT).show();
-				mInterestedMembers = SortedList.newInstance(members);
-				mMemberListHandler.sendEmptyMessage(mCurrentPage);
-			}
+			
+			Toast.makeText(MemberListActivity.this, "关注的会员列表更新失败", Toast.LENGTH_SHORT).show();				
 		}
+		
+		@Override
+		public void onSuccess(List<Member> members){
+			findViewById(R.id.progressBar_interestedMember_memberList).setVisibility(View.GONE);
+			findViewById(R.id.txtView_interestedMemberAmount_memberList).setVisibility(View.VISIBLE);
+			
+			Toast.makeText(MemberListActivity.this, "关注的会员列表更新成功", Toast.LENGTH_SHORT).show();
+			mInterestedMembers = SortedList.newInstance(members);
+			mMemberListHandler.sendEmptyMessage(mCurrentPage);
+		}
+		
 	}
 	
 	/**
@@ -436,9 +445,15 @@ public class MemberListActivity extends FragmentActivity {
 		}
 		
 		@Override
-		protected void onPostExecute(Void result){
+		public void onSuccess(){
 			Toast.makeText(MemberListActivity.this, "关注" + mMemberToInterested.getName() + "成功", Toast.LENGTH_SHORT).show();
 		}
+	
+		@Override
+		public void onFail(BusinessException e){
+			Toast.makeText(MemberListActivity.this, "关注" + mMemberToInterested.getName() + "失败", Toast.LENGTH_SHORT).show();
+		}
+		
 	}
 	
 	/**

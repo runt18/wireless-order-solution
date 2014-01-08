@@ -374,31 +374,36 @@ public class MemberDetailActivity extends FragmentActivity {
 		}
 		
 		@Override
-		protected void onPostExecute(Member result){
+		public void onSuccess(Member member){
 			//make the progress dialog disappeared
 			_progDialog.dismiss();
 			
-			mMember = result;
-			
-			if(mBusinessException != null){
-				new AlertDialog.Builder(MemberDetailActivity.this)
-							   .setTitle("提示")
-							   .setMessage(mBusinessException.getMessage())
-							   .setPositiveButton("确定", new DialogInterface.OnClickListener() {
-								   	public void onClick(DialogInterface dialog, int id) {
-								   		dialog.dismiss();
-								   	}
-							   }).show();
-				
-			}else{
-				//隐藏软键盘
-				EditText editTxtComment = (EditText)findViewById(R.id.editText_commitComment_memberDetail);
-				editTxtComment.setText("");
-				((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(editTxtComment.getWindowToken(), 0);
-				//重新请求更新页面
-				mRefreshMemberDetailHandler.sendEmptyMessage(mCurrentTab);
-			}
+			mMember = member;
+			//隐藏软键盘
+			EditText editTxtComment = (EditText)findViewById(R.id.editText_commitComment_memberDetail);
+			editTxtComment.setText("");
+			((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(editTxtComment.getWindowToken(), 0);
+			//重新请求更新页面
+			mRefreshMemberDetailHandler.sendEmptyMessage(mCurrentTab);
 		}
+
+		@Override 
+		public void onFail(BusinessException e){
+			//make the progress dialog disappeared
+			_progDialog.dismiss();
+			
+			mMember = null;
+			
+			new AlertDialog.Builder(MemberDetailActivity.this)
+			   .setTitle("提示")
+			   .setMessage(e.getMessage())
+			   .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+				   	public void onClick(DialogInterface dialog, int id) {
+				   		dialog.dismiss();
+				   	}
+			   }).show();
+		}
+		
 	}
 	
 	private class FoodAdaptor extends BaseAdapter{
