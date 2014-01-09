@@ -753,7 +753,6 @@ function initKeyBoardEvent(){
 	var btnSaveForQAWin = new Ext.Button({
 		text : '保存再录(+)',
 		handler : function(thiz){
-//			alert(thiz.text)
 			if(!foodAlias.isValid() || !foodCount.isValid()){
 				return;
 			}

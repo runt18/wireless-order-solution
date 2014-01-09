@@ -31,9 +31,9 @@ function tasteOnLoad() {
 				
 				for(var i = 0; i < rj.root.length; i++){
 					tasteMenuData.root.push(rj.root[i]);
-					if(rj.root[i].taste.cateValue == 0){
+					if(rj.root[i].taste.cateStatusValue == 2){
 						allTasteData.root.push(rj.root[i]);
-					}else if(rj.root[i].taste.cateValue == 2){
+					}else if(rj.root[i].taste.cateStatusValue == 1){
 						ggTasteData.root.push(rj.root[i]);
 					}
 				}
@@ -496,7 +496,7 @@ function initPasswordWin(){
 		winValidPassword = new Ext.Window({
 			id : 'winValidPassword',
 			renderTo : document.body,
-			title : '验证密码',
+			title : '&nbsp;',
 			modal : true,
 			resizable : false,
 			closable : false,
