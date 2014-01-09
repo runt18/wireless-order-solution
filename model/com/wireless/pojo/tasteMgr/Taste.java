@@ -97,6 +97,7 @@ public class Taste implements Parcelable, Comparable<Taste>, Jsonable{
 			}
 			setType(Type.RESERVED);
 			setCalc(Calc.BY_RATE);
+			setRate(1.0f);
 		}
 	}
 	
@@ -110,6 +111,7 @@ public class Taste implements Parcelable, Comparable<Taste>, Jsonable{
 			}
 			setType(Type.RESERVED);
 			setCalc(Calc.BY_RATE);
+			setRate(0.5f);
 		}
 	}
 	
