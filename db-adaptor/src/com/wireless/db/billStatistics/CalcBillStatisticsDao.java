@@ -883,7 +883,7 @@ public class CalcBillStatisticsDao {
 	 */
 	public static List<CancelIncomeByDept> calcCancelIncomeByDept(DBCon dbCon, Staff staff, DutyRange range, String extraCond, DateType queryType) throws SQLException{
 		HashMap<Department, CancelIncomeByDept> result = new HashMap<Department, CancelIncomeByDept>();
-		List<CancelIncomeByDeptAndReason> list = getCancelIncomeByDeptAndReason(dbCon, staff, range, extraCond, queryType);
+		List<CancelIncomeByDeptAndReason> list = calcCancelIncomeByDeptAndReason(dbCon, staff, range, extraCond, queryType);
 		for(CancelIncomeByDeptAndReason income : list){
 			CancelIncomeByDept incomeByDept = result.get(income.getDept());
 			if(incomeByDept != null){
@@ -933,7 +933,7 @@ public class CalcBillStatisticsDao {
 	 */
 	public static List<CancelIncomeByReason> calcCancelIncomeByReason(DBCon dbCon, Staff staff, DutyRange range, String extraCond, DateType queryType) throws SQLException{
 		HashMap<CancelReason, CancelIncomeByReason> result = new HashMap<CancelReason, CancelIncomeByReason>();
-		List<CancelIncomeByDeptAndReason> list = getCancelIncomeByDeptAndReason(dbCon, staff, range, extraCond, queryType);
+		List<CancelIncomeByDeptAndReason> list = calcCancelIncomeByDeptAndReason(dbCon, staff, range, extraCond, queryType);
 		for(CancelIncomeByDeptAndReason income : list){
 			CancelIncomeByReason incomeByReason = result.get(income.getReason());
 			if(incomeByReason != null){
@@ -961,7 +961,7 @@ public class CalcBillStatisticsDao {
 	 * @return
 	 * @throws SQLException
 	 */
-	 static List<CancelIncomeByDeptAndReason> getCancelIncomeByDeptAndReason(DBCon dbCon, Staff staff, DutyRange range, String extraCond, DateType queryType) throws SQLException{
+	 private static List<CancelIncomeByDeptAndReason> calcCancelIncomeByDeptAndReason(DBCon dbCon, Staff staff, DutyRange range, String extraCond, DateType queryType) throws SQLException{
 		String orderFoodTbl = null;
 		String tasteGrpTbl = null;
 		if(queryType.isHistory()){
@@ -1110,7 +1110,7 @@ public class CalcBillStatisticsDao {
 	 * @throws SQLException
 	 * 			if failed to execute any SQL statement
 	 */
-	private static List<RepaidStatistics> getRepaidStatistics(DBCon dbCon, Staff staff, DutyRange range, String extraCond, DateType queryType) throws SQLException{
+	private static List<RepaidStatistics> calcRepaidStatistics(DBCon dbCon, Staff staff, DutyRange range, String extraCond, DateType queryType) throws SQLException{
 		String orderTbl = null;
 		if(queryType.isHistory()){
 			orderTbl = TBL_ORDER_HISTORY;
@@ -1121,25 +1121,26 @@ public class CalcBillStatisticsDao {
 		}else{
 			throw new IllegalArgumentException("The query type is invalid.");
 		}
-		String sql = "SELECT order_date, waiter, staff_id, id,  repaid_price, total_price, actual_price, pay_type FROM " + Params.dbName + "." + orderTbl +
+		String sql = " SELECT order_date, waiter, staff_id, id,  repaid_price, total_price, actual_price, pay_type FROM " + Params.dbName + "." + orderTbl +
 					" WHERE status = " + Order.Status.REPAID.getVal() + 
+					" AND restaurant_id = " + staff.getRestaurantId() + 
 					" AND order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +
 					(extraCond != null ? extraCond : "");
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		List<RepaidStatistics> list = new ArrayList<RepaidStatistics>();
 		while(dbCon.rs.next()){
-			RepaidStatistics order = new RepaidStatistics();
+			RepaidStatistics each = new RepaidStatistics();
 			Staff oStaff = new Staff();
-			order.setmId(dbCon.rs.getInt("id"));
-			order.setmOrderDate(dbCon.rs.getTimestamp("order_date").getTime());
-			order.setmActualPrice(dbCon.rs.getFloat("actual_price"));
-			order.setmTotalPrice(dbCon.rs.getFloat("total_price"));
-			order.setmRepaidPrice(dbCon.rs.getFloat("repaid_price"));
-			order.setPaymentType(dbCon.rs.getInt("pay_type"));
+			each.setId(dbCon.rs.getInt("id"));
+			each.setOrderDate(dbCon.rs.getTimestamp("order_date").getTime());
+			each.setActualPrice(dbCon.rs.getFloat("actual_price"));
+			each.setTotalPrice(dbCon.rs.getFloat("total_price"));
+			each.setRepaidPrice(dbCon.rs.getFloat("repaid_price"));
+			each.setPaymentType(dbCon.rs.getInt("pay_type"));
 			oStaff.setId(dbCon.rs.getInt("staff_id"));
 			oStaff.setName(dbCon.rs.getString("waiter"));
-			order.setStaff(oStaff);
-			list.add(order);
+			each.setStaff(oStaff);
+			list.add(each);
 		}
 		return list;
 	}
@@ -1153,11 +1154,11 @@ public class CalcBillStatisticsDao {
 	 * @throws SQLException
 	 * 			if failed to execute any SQL statement
 	 */
-	public static List<RepaidStatistics> getRepaidStatisticsByStaffId(Staff staff, DutyRange range, int staffId, DateType queryType) throws SQLException{
+	public static List<RepaidStatistics> calcRepaidStatisticsByStaffId(Staff staff, DutyRange range, int staffId, DateType queryType) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return getRepaidStatistics(dbCon, staff, range, " AND staff_id = " + staffId , queryType);
+			return calcRepaidStatistics(dbCon, staff, range, " AND staff_id = " + staffId , queryType);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -1171,11 +1172,11 @@ public class CalcBillStatisticsDao {
 	 * @throws SQLException
 	 * 			if failed to execute any SQL statement
 	 */
-	public static List<RepaidStatistics> getRepaidStatistics(Staff staff, DutyRange range, DateType queryType) throws SQLException{
+	public static List<RepaidStatistics> calcRepaidStatistics(Staff staff, DutyRange range, DateType queryType) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return getRepaidStatistics(dbCon, staff, range, null , queryType);
+			return calcRepaidStatistics(dbCon, staff, range, null , queryType);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -1194,7 +1195,7 @@ public class CalcBillStatisticsDao {
 	 * @throws BusinessException
 	 * 			throw if the query type is invalid
 	 */
-	private static List<CommissionStatistics> getCommissionStatistics(DBCon dbCon, Staff staff, DutyRange range, String extraCond, DateType queryType) throws SQLException, BusinessException{
+	private static List<CommissionStatistics> calcCommissionStatistics(DBCon dbCon, Staff staff, DutyRange range, String extraCond, DateType queryType) throws SQLException, BusinessException{
 		String orderTbl = null;
 		if(queryType.isHistory()){
 			orderTbl = TBL_ORDER_FOOD_HISTORY;
@@ -1243,11 +1244,11 @@ public class CalcBillStatisticsDao {
 	 * @throws BusinessException
 	 * 			throw if the query type is invalid
 	 */
-	public static List<CommissionStatistics> getCommissionStatisticsByStaffId(Staff staff, DutyRange range, int staffId, DateType queryType) throws SQLException, BusinessException{
+	public static List<CommissionStatistics> calcCommissionStatByStaff(Staff staff, DutyRange range, int staffId, DateType queryType) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return getCommissionStatistics(dbCon, staff, range, " AND staff_id = " + staffId , queryType);
+			return calcCommissionStatistics(dbCon, staff, range, " AND staff_id = " + staffId , queryType);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -1265,11 +1266,11 @@ public class CalcBillStatisticsDao {
 	 * @throws BusinessException
 	 * 			throw if the query type is invalid
 	 */
-	public static List<CommissionStatistics> getCommissionStatisticsByDeptId(Staff staff, DutyRange range, int deptId, DateType queryType) throws SQLException, BusinessException{
+	public static List<CommissionStatistics> calcCommissionStatByDeptId(Staff staff, DutyRange range, int deptId, DateType queryType) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return getCommissionStatistics(dbCon, staff, range, " AND dept_id = " + deptId , queryType);
+			return calcCommissionStatistics(dbCon, staff, range, " AND dept_id = " + deptId , queryType);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -1290,11 +1291,11 @@ public class CalcBillStatisticsDao {
 	 * @throws BusinessException
 	 * 			throw if the query type is invalid
 	 */
-	public static List<CommissionStatistics> getCommissionStatisticsByStaffAndDeptId(Staff staff, DutyRange range,int staffId, int deptId, DateType queryType) throws SQLException, BusinessException{
+	public static List<CommissionStatistics> calcCommissionStatByDeptAndStaff(Staff staff, DutyRange range,int staffId, int deptId, DateType queryType) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return getCommissionStatistics(dbCon, staff, range, " AND staff_id = " + staffId + " AND dept_id = " + deptId , queryType);
+			return calcCommissionStatistics(dbCon, staff, range, " AND staff_id = " + staffId + " AND dept_id = " + deptId , queryType);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -1310,21 +1311,21 @@ public class CalcBillStatisticsDao {
 	 * @throws BusinessException
 	 * 			throw if the query type is invalid
 	 */
-	public static List<CommissionStatistics> getCommissionStatistics(Staff staff, DutyRange range, DateType queryType) throws SQLException, BusinessException{
+	public static List<CommissionStatistics> calcCommissionStatistics(Staff staff, DutyRange range, DateType queryType) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return getCommissionStatistics(dbCon, staff, range, null , queryType);
+			return calcCommissionStatistics(dbCon, staff, range, null , queryType);
 		}finally{
 			dbCon.disconnect();
 		}
 	}
 	
-	public static List<CommissionStatistics> getCommissionTotal(Staff staff, DutyRange range, DateType queryType) throws SQLException, BusinessException{
+	public static List<CommissionStatistics> calcCommissionTotal(Staff staff, DutyRange range, DateType queryType) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return getCommissionTotal(dbCon, staff, range, null, queryType);
+			return calcCommissionTotal(dbCon, staff, range, null, queryType);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -1342,11 +1343,11 @@ public class CalcBillStatisticsDao {
 	 * @throws BusinessException
 	 * 			
 	 */
-	public static List<CommissionStatistics> getCommissionTotalByDept(Staff staff, DutyRange range, int deptId, DateType queryType) throws SQLException, BusinessException{
+	public static List<CommissionStatistics> calcCommissionTotalByDept(Staff staff, DutyRange range, int deptId, DateType queryType) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return getCommissionTotal(dbCon, staff, range, " AND dept_id = " + deptId, queryType);
+			return calcCommissionTotal(dbCon, staff, range, " AND dept_id = " + deptId, queryType);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -1366,7 +1367,7 @@ public class CalcBillStatisticsDao {
 	 * @throws BusinessException
 	 * 			throw if the query type is invalid
 	 */
-	private static List<CommissionStatistics> getCommissionTotal(DBCon dbCon, Staff staff, DutyRange range, String extraCond, DateType queryType) throws SQLException, BusinessException{
+	private static List<CommissionStatistics> calcCommissionTotal(DBCon dbCon, Staff staff, DutyRange range, String extraCond, DateType queryType) throws SQLException, BusinessException{
 		String orderTbl = null;
 		if(queryType.isHistory()){
 			orderTbl = TBL_ORDER_FOOD_HISTORY;
