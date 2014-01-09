@@ -3,9 +3,8 @@ package com.wireless.fragment;
 import java.util.ArrayList;
 import java.util.List;
 
-import android.annotation.TargetApi;
 import android.app.Fragment;
-import android.os.Build;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -78,16 +77,14 @@ public class DepartmentTreeFragment extends Fragment{
 		
 		boolean isFound = false;
 		int groupPos = 0;
-		int childPos = 0;
 		for(DeptNode deptNode : mDeptNodes){
-			childPos = 0;
+			//childPos = 0;
 			for(KitchenNode kitchenNode : deptNode.getValue()){
 				if(kitchenNode.getKey().equals(clickedKitchen)){
 					mCurrentKitchen = kitchenNode.getKey();
 					isFound = true;
 					break;
 				}
-				childPos++;
 			}
 			
 			if(isFound){
@@ -98,6 +95,7 @@ public class DepartmentTreeFragment extends Fragment{
 		}
 
 		if(isFound){
+			
 			int groupCount = mListView.getExpandableListAdapter().getGroupCount();
 			//收起所有部门
 			for(int i = 0; i < groupCount; i++){
@@ -107,21 +105,6 @@ public class DepartmentTreeFragment extends Fragment{
 			}
 			//展开厨房所在的部门
 			mListView.expandGroup(groupPos);
-			
-			//计算出回调的位置，更改样式和当前厨房
-			final int childViewIndex = groupPos + childPos + 1;
-			
-			mListView.post(new Runnable(){
-				@Override
-				public void run() {
-					View curView = mListView.getChildAt(childViewIndex);
-					if(curView != null){
-//						mListView.setChildIndicator(getResources().getDrawable(R.drawable.blue_patch));
-//						mListView.setSelectedChild(1, 2, true);
-						curView.setBackgroundColor(getResources().getColor(R.color.blue));
-					}
-				}
-			});
 			
 			return true;
 			
@@ -158,7 +141,7 @@ public class DepartmentTreeFragment extends Fragment{
     public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {  
 	   View fragmentView = inflater.inflate(R.layout.fragment_department_tree, container, false);
 	   //Setup kitchen list view and it's adapter.
-	   mListView = (ExpandableListView) fragmentView.findViewById(R.id.expandableListView1);
+	   mListView = (ExpandableListView) fragmentView.findViewById(R.id.eplv_deptTree_fgm);
 	   mAdapter = new KitchenExpandableAdapter();
 	   mListView.setAdapter(mAdapter);
 	   
@@ -273,26 +256,24 @@ public class DepartmentTreeFragment extends Fragment{
 		/**
 		 * setup kitchen view
 		 */
-		@SuppressWarnings("deprecation")
-		@TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
 		@Override
 		public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
 			View view;
 			if (convertView != null) {
 				view = convertView;
 			} else {
-				view = View.inflate(DepartmentTreeFragment.this.getActivity(), R.layout.listview_child_department_tree_fragment, null);
+				view = View.inflate(getActivity(), R.layout.listview_child_department_tree_fragment, null);
 			}
 			
 			//Kitchen kitchen = mChildren.get(groupPosition).get(childPosition);
 			Kitchen kitchen = mDeptNodes.get(groupPosition).getValue().get(childPosition).getKey();
-			((TextView) view.findViewById(R.id.mychild)).setText(kitchen.getName());
+			((TextView) view.findViewById(R.id.txtView_kitchenName_deptTree_fgm)).setText(kitchen.getName());
 			
 			//更改点击显示样式
 			if(mCurrentKitchen.equals(kitchen)){
 				view.setBackgroundColor(view.getResources().getColor(R.color.blue));
 			}else{
-				view.setBackgroundDrawable(null);
+				view.setBackgroundColor(Color.WHITE);
 			}
 			return view;
 		}

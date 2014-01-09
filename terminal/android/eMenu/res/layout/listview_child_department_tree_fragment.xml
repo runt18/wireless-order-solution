@@ -1,21 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-  xmlns:android="http://schemas.android.com/apk/res/android"
-  android:orientation="vertical"
-  android:layout_width="fill_parent"
-  android:layout_height="fill_parent"
-  android:minHeight="40dip"
-  >
-       
-  <TextView
-      android:id="@+id/mychild"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:layout_centerVertical="true"
-      android:layout_marginLeft="80dp"
-      android:text="厨房"
-      android:textColor="@color/brown_wood"
-      android:textSize="@dimen/text_size_l"
-      android:typeface="normal" />
-   
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:minHeight="40dip"
+    android:orientation="vertical" >
+
+    <TextView
+        android:id="@+id/txtView_kitchenName_deptTree_fgm"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="80dp"
+        android:text="厨房"
+        android:textColor="@color/brown_wood"
+        android:textSize="@dimen/text_size_l"
+        android:typeface="normal" />
+
 </RelativeLayout>
