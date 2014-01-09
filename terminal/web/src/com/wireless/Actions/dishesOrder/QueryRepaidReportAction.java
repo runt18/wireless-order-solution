@@ -37,15 +37,15 @@ public class QueryRepaidReportAction extends Action{
 			DutyRange range = new DutyRange(beginDate, endDate);
 			List<RepaidStatistics> list;
 			if(staffId != null && !staffId.equals("-1") && !staffId.isEmpty()){
-				list = CalcBillStatisticsDao.getRepaidStatisticsByStaffId(staff, range, Integer.parseInt(staffId), DateType.HISTORY);
+				list = CalcBillStatisticsDao.calcRepaidStatisticsByStaffId(staff, range, Integer.parseInt(staffId), DateType.HISTORY);
 			}else{
-				list = CalcBillStatisticsDao.getRepaidStatistics(staff, range, DateType.HISTORY);
+				list = CalcBillStatisticsDao.calcRepaidStatistics(staff, range, DateType.HISTORY);
 			}
 			if(!list.isEmpty()){
 				jobject.setTotalProperty(list.size());
 				RepaidStatistics total = new RepaidStatistics();
 				for (RepaidStatistics item : list) {
-					total.setmRepaidPrice(total.getmRepaidPrice() + item.getmRepaidPrice());
+					total.setRepaidPrice(total.getRepaidPrice() + item.getRepaidPrice());
 				}
 				list = DataPaging.getPagingData(list, true, start, limit);
 				list.add(total);

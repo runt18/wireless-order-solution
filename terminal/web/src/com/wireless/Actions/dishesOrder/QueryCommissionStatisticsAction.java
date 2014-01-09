@@ -39,15 +39,15 @@ public class QueryCommissionStatisticsAction extends Action{
 			List<CommissionStatistics> list;
 			if(staffId != null && !staffId.equals("-1") && !staffId.isEmpty()){
 				if(deptId != null && !deptId.equals("-1")){
-					list = CalcBillStatisticsDao.getCommissionStatisticsByStaffAndDeptId(staff, range, Integer.parseInt(staffId), Integer.parseInt(deptId), DateType.HISTORY);
+					list = CalcBillStatisticsDao.calcCommissionStatByDeptAndStaff(staff, range, Integer.parseInt(staffId), Integer.parseInt(deptId), DateType.HISTORY);
 				}else{
-					list = CalcBillStatisticsDao.getCommissionStatisticsByStaffId(staff, range, Integer.parseInt(staffId), DateType.HISTORY);
+					list = CalcBillStatisticsDao.calcCommissionStatByStaff(staff, range, Integer.parseInt(staffId), DateType.HISTORY);
 				}
 				
 			}else if(deptId != null && !deptId.equals("-1")){
-				list = CalcBillStatisticsDao.getCommissionStatisticsByDeptId(staff, range, Integer.parseInt(deptId), DateType.HISTORY);
+				list = CalcBillStatisticsDao.calcCommissionStatByDeptId(staff, range, Integer.parseInt(deptId), DateType.HISTORY);
 			}else{
-				list = CalcBillStatisticsDao.getCommissionStatistics(staff, range, DateType.HISTORY);
+				list = CalcBillStatisticsDao.calcCommissionStatistics(staff, range, DateType.HISTORY);
 			}
 			if(!list.isEmpty()){
 				jobject.setTotalProperty(list.size());

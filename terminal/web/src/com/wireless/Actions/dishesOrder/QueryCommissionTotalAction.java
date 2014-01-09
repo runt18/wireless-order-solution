@@ -38,9 +38,9 @@ public class QueryCommissionTotalAction extends Action{
 			DutyRange range = new DutyRange(beginDate, endDate);
 			List<CommissionStatistics> list;
 			if(deptId != null && !deptId.equals("-1")){
-				list = CalcBillStatisticsDao.getCommissionTotalByDept(staff, range, Integer.parseInt(deptId), DateType.HISTORY);
+				list = CalcBillStatisticsDao.calcCommissionTotalByDept(staff, range, Integer.parseInt(deptId), DateType.HISTORY);
 			}else{
-				list = CalcBillStatisticsDao.getCommissionTotal(staff, range, DateType.HISTORY);
+				list = CalcBillStatisticsDao.calcCommissionTotal(staff, range, DateType.HISTORY);
 			}
 			if(!list.isEmpty()){
 				jobject.setTotalProperty(list.size());
