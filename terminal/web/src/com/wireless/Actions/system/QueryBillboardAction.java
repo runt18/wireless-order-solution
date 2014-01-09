@@ -26,7 +26,7 @@ public class QueryBillboardAction extends DispatchAction{
 		try{
 			dbCon = new DBCon();
 			dbCon.connect();
-			String extra = "";
+			String extra = " AND BB.type <> " + BillBoard.Type.WX_INFO.getVal() + " ORDER BY created DESC ";
 			if(isPaging != null && isPaging.trim().equals("true")){
 				jobject.setTotalProperty(BillBoardDao.getCount(dbCon, extra));
 			}
@@ -55,7 +55,7 @@ public class QueryBillboardAction extends DispatchAction{
 			throws Exception {
 		JObject jobject = new JObject();
 		try{
-			String extra = " AND BB.expired >= NOW() AND BB.type = " + BillBoard.Type.SYSTEM.getVal() + " ORDER BY created DESC ";
+			String extra = " AND BB.expired <= NOW() AND BB.type = " + BillBoard.Type.SYSTEM.getVal() + " ORDER BY created DESC ";
 			jobject.setRoot(BillBoardDao.get(extra));
 		}catch(Exception e){
 			e.printStackTrace();
