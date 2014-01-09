@@ -53,11 +53,12 @@ function programOperationHandler(c){
 		Ext.getDom('numDiscountRate').parentElement.parentElement.style.display = 'block';
 		Ext.getDom('chbIsAuto').parentElement.parentElement.parentElement.style.display = 'block';
 		
-		name.setValue();
 		level.setValue(0);
 		rate.setValue(1.00);
 		isAuto.setValue(true);
 		isDefault.setValue(false);
+		name.setValue();
+		name.focus(true, 100);
 		addProgramWin.setTitle('添加方案');
 	}else if(c.type == dmObj.operation.update){
 		Ext.getDom('numDiscountID').parentElement.parentElement.style.display = 'block';
@@ -70,12 +71,12 @@ function programOperationHandler(c){
 			return;
 		}
 		id.setValue(sn.attributes.discountID); 
-		name.setValue(sn.attributes.discountName); 
 		level.setValue(sn.attributes.level); 
 		isAuto.setValue(true);
 		isDefault.setValue(eval(sn.attributes.isDefault));
 		status.setValue(sn.attributes.status);
-		
+		name.setValue(sn.attributes.discountName); 
+		name.focus(null, 100);
 		if(sn.attributes.status == 2 || sn.attributes.status == 3){
 			name.setDisabled(true);
 			level.setDisabled(true);

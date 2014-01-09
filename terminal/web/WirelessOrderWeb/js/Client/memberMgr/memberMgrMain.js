@@ -636,7 +636,6 @@ memberOperationRenderer = function(val, m, record){
 //		+ '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
 //		+ '<a href="javascript:adjustPoint()">积分调整</a>';
 };
-var selectedNode;
 /**************************************************/
 function treeInit(){
 	var memberTypeTreeTbar = new Ext.Toolbar({
@@ -690,7 +689,6 @@ function treeInit(){
 		tbar : memberTypeTreeTbar,
 		listeners : {
 	    	click : function(e){
-	    		selectedNode = e;
 	    		Ext.getCmp('btnSearchMember').handler();
 	    		Ext.getDom('memberTypeShowType').innerHTML = e.text;
 	    	}
@@ -791,8 +789,7 @@ function gridInit(){
 			id : 'btnSearchMember',
 			iconCls : 'btn_search',
 			handler : function(){
-//					memberTypeNode = memberTypeTree.getSelectionModel().getSelectedNode();
-				var memberTypeNode = selectedNode;
+				var memberTypeNode = memberTypeTree.getSelectionModel().getSelectedNode();
 				var searchType = Ext.getCmp('mr_comboMemberSearchType').getValue();
 				var searchValue = Ext.getCmp(mObj.searchValue) ? Ext.getCmp(mObj.searchValue).getValue() : '';
 				
@@ -833,8 +830,8 @@ function gridInit(){
 					}
 				});
 				gs.on('load', function(store, records, options){
-					if(selectedNode){
-						if(typeof selectedNode.attributes.attr != 'undefined' && selectedNode.attributes.attr == 2){
+					if(memberTypeNode){
+						if(typeof memberTypeNode.attributes.attr != 'undefined' && memberTypeNode.attributes.attr == 2){
 							for (var i = 0; i < records.length; i++) {
 								records[i].set('acctendtioned', true);
 							}

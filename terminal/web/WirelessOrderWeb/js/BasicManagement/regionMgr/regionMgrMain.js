@@ -212,6 +212,7 @@ function updateRegionHandler(){
 	operateRegionWin.center();
 	Ext.getCmp('hideRegionId').setValue(node.attributes.regionId);
 	Ext.getCmp('txtRegionName').setValue(node.attributes.regionName);
+	Ext.getCmp('txtRegionName').focus(true, 100);
 }
 
 //---------------

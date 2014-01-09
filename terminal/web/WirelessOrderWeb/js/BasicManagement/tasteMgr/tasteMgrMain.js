@@ -143,7 +143,8 @@ function initTasteGrid(){
 			text : '搜索',				
 			id : 'btnSerachForTasteBasic',
 			iconCls : 'btn_search',
-			handler : function(nodeId){
+			handler : function(e){
+				var node = tmm_tasteTree.getSelectionModel().getSelectedNode();
 				var oCombo = Ext.getCmp('operator');
 				var st = Ext.getCmp('txtSearchForTextField');
 				var sn = Ext.getCmp('txtSearchForNumberField');
@@ -154,7 +155,7 @@ function initTasteGrid(){
 				gs.baseParams['alias'] = taste_filterTypeComb.getValue() == 1 ? sn.getValue() : '';
 				gs.baseParams['price'] = taste_filterTypeComb.getValue() == 2 ? sn.getValue() : '';
 				gs.baseParams['name'] = taste_filterTypeComb.getValue() == 3 ? st.getValue() : '';
-				gs.baseParams['cate'] = nodeId?nodeId : '';					
+				gs.baseParams['cate'] = node?node.id : '';					
 				
 				gs.load({
 					params : {
@@ -464,7 +465,7 @@ function initTasteOperatorWin(){
 							if(jr.success){
 								tasteOperatorWin.hide();
 								Ext.example.msg(jr.title, jr.msg);
-								Ext.getCmp('btnSerachForTasteBasic').handler(tastem_selectedId);
+								Ext.getCmp('btnSerachForTasteBasic').handler();
 								Ext.getCmp('taste_grid').getBottomToolbar().onClick("last");
 							}else{
 								Ext.ux.showMsg(jr);
@@ -561,8 +562,7 @@ Ext.onReady(function() {
 				Ext.getCmp('comboTasteCate').store.loadData(tasteTypeData);
 			},
 			click : function(e){
-				tastem_selectedId = e.id;
-				Ext.getCmp('btnSerachForTasteBasic').handler(e.id);
+				Ext.getCmp('btnSerachForTasteBasic').handler();
 				
 				if(e.attributes.status == 1){
 					tastem_add = false;
@@ -644,7 +644,7 @@ function tasteDeleteHandler() {
 						var jr = Ext.decode(response.responseText);
 						if (jr.success == true) {							
 							Ext.example.msg('提示', String.format(Ext.ux.txtFormat.deleteSuccess, data['name']));
-							Ext.getCmp('btnSerachForTasteBasic').handler(tastem_selectedId);
+							Ext.getCmp('btnSerachForTasteBasic').handler();
 						} else {
 							Ext.ux.showMsg(jr);
 						}
@@ -676,8 +676,8 @@ function tasteCateOperateHandler(c){
 		cateName.clearInvalid();
 		cateName.focus();
 	}else if(c.otype == 'update'){
-		var tn = tmm_tasteTree.getNodeById(floatBarNodeId==""?tastem_selectedId:floatBarNodeId);
-		if(!tn || tn.id==-1){
+		var tn = Ext.ux.getSelNode(tmm_tasteTree);
+		if(!tn || tn.id == -1){
 			Ext.example.msg('提示', '操作失败, 请选中一条数据再进行操作.');
 			return;
 		}else{
@@ -695,7 +695,7 @@ function tasteCateOperateHandler(c){
 		cateName.setValue(tn.attributes.tasteCateName);
 		cateName.focus();
 	}else if(c.otype == 'delete'){
-		var tn = tmm_tasteTree.getNodeById(floatBarNodeId==""?tastem_selectedId:floatBarNodeId);
+		var tn = Ext.ux.getSelNode(tmm_tasteTree);
 		if(!tn){
 			Ext.example.msg('提示', '操作失败, 请选中一条数据再进行操作.');
 			return;
@@ -758,12 +758,13 @@ function tasteUpdateHandler(){
 	}
 	tasteOperatorWin.otype = Ext.ux.otype['update'];
 	tasteOperatorWin.show();
-	tasteOperatorWin.center();
+	
 	tasteOperatorWin.setTitle("修改口味信息 -- " + data['name']);
 	operatorWinData({
 		otype : Ext.ux.otype['set'],
 		data : data
 	});
+	tasteOperatorWin.center();
 }
 
 function operatorWinData(c){
@@ -779,13 +780,12 @@ function operatorWinData(c){
 	if(c.otype == Ext.ux.otype['set']){
 		tasteId.setValue(c.data['id']);
 		tasteName.setValue(c.data['name']);
-		tasteCate.setValue(typeof c.data['cateValue'] == 'undefined' ? tastem_selectedId : c.data['cateValue']);
+		tasteCate.setValue(typeof c.data['cateValue'] == 'undefined' ? Ext.ux.getSelNode(tmm_tasteTree).id : c.data['cateValue']);
 		tasteCate.fireEvent('select', tasteCate);
 		if(c.data['typeValue'] == 1){
-			tasteCate.setDisabled(true);
-			tasteCate.setValue('规格');
+			tasteCate.getEl().up('.x-form-item').setDisplayed(false);
 		}else{
-			tasteCate.setDisabled(false);
+			tasteCate.getEl().up('.x-form-item').setDisplayed(true);
 		}
 		tastePrice.setValue(typeof c.data['price'] == 'undefined' ? 0 : c.data['price']);
 		tasteRate.setValue(typeof c.data['rate'] == 'undefined' ? 0 : c.data['rate']);

@@ -151,7 +151,7 @@ function updateKitchen(){
 					kitchenName.setValue(sd.name);
 					kitchenDept.setValue(sd.dept.id);
 					isAllowTemp.setValue(sd.isAllowTmp);
-					
+					kitchenName.focus(true, 100);
 				}
 			},
 			keys : [{
