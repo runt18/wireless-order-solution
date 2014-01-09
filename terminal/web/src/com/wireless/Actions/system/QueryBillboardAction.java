@@ -1,5 +1,7 @@
 package com.wireless.Actions.system;
 
+import java.util.Date;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -12,6 +14,7 @@ import com.wireless.db.DBCon;
 import com.wireless.db.system.BillBoardDao;
 import com.wireless.json.JObject;
 import com.wireless.pojo.system.BillBoard;
+import com.wireless.pojo.util.DateUtil;
 
 public class QueryBillboardAction extends DispatchAction{
 
@@ -55,7 +58,7 @@ public class QueryBillboardAction extends DispatchAction{
 			throws Exception {
 		JObject jobject = new JObject();
 		try{
-			String extra = " AND BB.expired <= NOW() AND BB.type = " + BillBoard.Type.SYSTEM.getVal() + " ORDER BY created DESC ";
+			String extra = " AND BB.expired >= NOW() AND BB.type = " + BillBoard.Type.SYSTEM.getVal() + " ORDER BY created DESC ";
 			jobject.setRoot(BillBoardDao.get(extra));
 		}catch(Exception e){
 			e.printStackTrace();
