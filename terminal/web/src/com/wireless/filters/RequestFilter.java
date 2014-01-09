@@ -19,17 +19,9 @@ import com.wireless.json.JObject;
 
 public class RequestFilter implements Filter{
 
-	private static final String SKIPVERIFY = "skipVerify";
-	private Map<String, String> skipVerifyList = new HashMap<String, String>();
+	private static final String SKIP_VERIFY_LIST = "skipVerify";
+	private final Map<String, String> skipVerifyList = new HashMap<String, String>();
 	
-	private boolean check(String path){
-		for (String skip : skipVerifyList.values()) {
-			if(path.indexOf(skip) > -1){
-				return true;
-			}
-		}
-		return false;
-	}
 	@Override
 	public void destroy() {
 		
@@ -44,23 +36,26 @@ public class RequestFilter implements Filter{
 		response.setCharacterEncoding("UTF-8");
 		
 		String requestPath = request.getRequestURI();
-		if(check(requestPath)){
+		//Check to see whether the request is contained in while list.
+		if(skipVerifyList.get(requestPath.substring(requestPath.lastIndexOf("/"))) != null){
+			//If the request is contained in white list, do chain directly.
 			String pin =  (String) request.getSession().getAttribute("pin");
-			String restaurantID =  (String) request.getSession().getAttribute("restaurantID");
+			String restaurantId = (String) request.getSession().getAttribute("restaurantID");
 			if(pin != null){
 				request.setAttribute("pin", pin);
 			}
-			if(restaurantID != null){
-				request.setAttribute("restaurantID", restaurantID);
+			if(restaurantId != null){
+				request.setAttribute("restaurantID", restaurantId);
 			}
 			chain.doFilter(request, response);
 			
 		}else{
-			String pin = null;
-			pin = (String) request.getSession().getAttribute("pin");
+			//If the request is NOT contained in white list, check to see whether the session is expired.
+			String pin = (String) request.getSession().getAttribute("pin");
 			if(pin == null){
+				//If the session is expired, tell the request caller about this.
 				JObject jObject = new JObject();
-				jObject.initTip(new BusinessException(SystemError.NOT_PASS_WHITELIST));
+				jObject.initTip(new BusinessException(SystemError.REQUEST_EXPIRED_OR_NOT_IN_WHITE_LIST));
 				servletResponse.getWriter().print(jObject.toString());
 				if (request.getHeader("x-requested-with") != null && request.getHeader("x-requested-with").equalsIgnoreCase("XMLHttpRequest")) {  
                     response.setHeader("session_status", "timeout");
@@ -74,15 +69,13 @@ public class RequestFilter implements Filter{
 //                }
 
 			}else{
+				//if the session is OK, just do chain...go!!!
 				request.setAttribute("pin", pin);
 				request.setAttribute("restaurantID", (String) request.getSession().getAttribute("restaurantID"));
 				chain.doFilter(request, response);
 			}
 				
 		}
-//		if(!requestPath.contains("/ImageFileUpload.do")){
-//			response.setContentType("text/json;charset=utf-8");
-//		}
 		String ct = request.getContentType();
 		if(ct != null && ct.split(";")[0].equalsIgnoreCase("multipart/form-data")){
 			response.setContentType("text/plain; charset=utf-8");
@@ -94,7 +87,8 @@ public class RequestFilter implements Filter{
 
 	@Override
 	public void init(FilterConfig init) throws ServletException {
-		String skipVerifys = init.getInitParameter(SKIPVERIFY);
+		//Read the skip verify list and put them to hash map.
+		String skipVerifys = init.getInitParameter(SKIP_VERIFY_LIST);
 		if(!skipVerifys.trim().isEmpty()){
 			if(skipVerifys.indexOf(",") != -1){
 				for (String path : skipVerifys.split(",")) {
@@ -106,6 +100,4 @@ public class RequestFilter implements Filter{
 		}
 	}
 	
-
-
 }
