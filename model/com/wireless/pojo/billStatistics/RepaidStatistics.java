@@ -38,7 +38,7 @@ public class RepaidStatistics implements Jsonable{
 		return mId;
 	}
 
-	public void setmId(int mId) {
+	public void setId(int mId) {
 		this.mId = mId;
 	}
 
@@ -46,31 +46,31 @@ public class RepaidStatistics implements Jsonable{
 		return mOrderDate;
 	}
 
-	public void setmOrderDate(long mOrderDate) {
+	public void setOrderDate(long mOrderDate) {
 		this.mOrderDate = mOrderDate;
 	}
 
-	public float getmTotalPrice() {
+	public float getTotalPrice() {
 		return NumericUtil.roundFloat(mTotalPrice);
 	}
 
-	public void setmTotalPrice(float mTotalPrice) {
+	public void setTotalPrice(float mTotalPrice) {
 		this.mTotalPrice = mTotalPrice;
 	}
 
-	public float getmActualPrice() {
+	public float getActualPrice() {
 		return NumericUtil.roundFloat(mActualPrice);
 	}
 
-	public void setmActualPrice(float mActualPrice) {
+	public void setActualPrice(float mActualPrice) {
 		this.mActualPrice = mActualPrice;
 	}
 
-	public float getmRepaidPrice() {
+	public float getRepaidPrice() {
 		return NumericUtil.roundFloat(mRepaidPrice);
 	}
 
-	public void setmRepaidPrice(float mRepaidPrice) {
+	public void setRepaidPrice(float mRepaidPrice) {
 		this.mRepaidPrice = mRepaidPrice;
 	}
 	
