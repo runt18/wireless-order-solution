@@ -1,7 +1,5 @@
 package com.wireless.Actions.system;
 
-import java.util.Date;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -14,7 +12,6 @@ import com.wireless.db.DBCon;
 import com.wireless.db.system.BillBoardDao;
 import com.wireless.json.JObject;
 import com.wireless.pojo.system.BillBoard;
-import com.wireless.pojo.util.DateUtil;
 
 public class QueryBillboardAction extends DispatchAction{
 
