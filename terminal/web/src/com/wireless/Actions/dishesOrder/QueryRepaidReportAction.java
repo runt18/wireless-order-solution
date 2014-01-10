@@ -37,9 +37,9 @@ public class QueryRepaidReportAction extends Action{
 			DutyRange range = new DutyRange(beginDate, endDate);
 			List<RepaidStatistics> list;
 			if(staffId != null && !staffId.equals("-1") && !staffId.isEmpty()){
-				list = CalcBillStatisticsDao.calcRepaidStatisticsByStaffId(staff, range, Integer.parseInt(staffId), DateType.HISTORY);
+				list = CalcBillStatisticsDao.calcRepaidStatByStaff(staff, range, Integer.parseInt(staffId), DateType.HISTORY);
 			}else{
-				list = CalcBillStatisticsDao.calcRepaidStatistics(staff, range, DateType.HISTORY);
+				list = CalcBillStatisticsDao.calcRepaidStat(staff, range, DateType.HISTORY);
 			}
 			if(!list.isEmpty()){
 				jobject.setTotalProperty(list.size());
