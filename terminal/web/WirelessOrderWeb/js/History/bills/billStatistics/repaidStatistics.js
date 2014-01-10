@@ -62,12 +62,24 @@ var repaid_combo_staffs = new Ext.form.ComboBox({
 		}
 	}
 });
+
+function res_billDetailHandler(orderID) {
+	res_showBillDetailWin();
+	repaidOrderDetailWin.show();
+	repaidOrderDetailWin.setTitle('账单号: ' + orderID);
+	repaidOrderDetailWin.center();
+};
+
+function linkOrderId(v){
+	return '<a href=\"javascript:res_billDetailHandler('+ v +')\">'+ v +'</a>';
+}
+
 function initGrid(){
 	var cm = new Ext.grid.ColumnModel([
 		new Ext.grid.RowNumberer(),
 		{header : '反结账时间', dataIndex : 'orderDateFormat'},
 		{header : '人员', dataIndex : 'operateStaff'},
-		{header : '单据编号', dataIndex : 'orderId'},
+		{header : '账单号', dataIndex : 'orderId', renderer : linkOrderId},
 		{header : '原应收', dataIndex : 'oldTotalPrice', align : 'right', renderer : Ext.ux.txtFormat.gridDou},
 		{header : '原实收', dataIndex : 'oldActualPrice', align : 'right', renderer : Ext.ux.txtFormat.gridDou},
 		{header : '反结账金额', dataIndex : 'repaidPrice', align : 'right', renderer : Ext.ux.txtFormat.gridDou},
@@ -183,8 +195,48 @@ function initGrid(){
 		}
 	});
 }
+function res_showBillDetailWin(){
+	repaidOrderDetailWin = new Ext.Window({
+		layout : 'fit',
+		width : 1100,
+		height : 440,
+		closable : false,
+		resizable : false,
+		modal : true,
+		bbar : ['->', {
+			text : '关闭',
+			iconCls : 'btn_close',
+			handler : function() {
+				repaidOrderDetailWin.destroy();
+			}
+		} ],
+		keys : [{
+			key : Ext.EventObject.ESC,
+			scope : this,
+			fn : function(){
+				repaidOrderDetailWin.destroy();
+			}
+		}],
+		listeners : {
+			show : function(thiz) {
+				var sd = Ext.ux.getSelData(repaidStatisticsGrid);
+				thiz.load({
+					url : '../window/history/orderDetail.jsp', 
+					scripts : true,
+					params : {
+						orderId : sd.orderId,
+						foodStatus : 'isRepaid'
+					},
+					method : 'post'
+				});
+				thiz.center();	
+			}
+		}
+	});
+}
 
 Ext.onReady(function(){
+
 	initGrid();
 	new Ext.Panel({
 		renderTo : 'divRepaidStatistics',//渲染到

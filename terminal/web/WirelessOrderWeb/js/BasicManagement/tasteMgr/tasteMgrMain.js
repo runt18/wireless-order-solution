@@ -465,7 +465,6 @@ function initTasteOperatorWin(){
 							if(jr.success){
 								tasteOperatorWin.hide();
 								Ext.example.msg(jr.title, jr.msg);
-								Ext.getCmp('btnSerachForTasteBasic').handler();
 								Ext.getCmp('taste_grid').getBottomToolbar().onClick("last");
 							}else{
 								Ext.ux.showMsg(jr);
@@ -513,9 +512,8 @@ Ext.onReady(function() {
 		width : 200,
 		rootVisible : true,
 		border : true,
-//		autoScroll : true,
 		frame : true,
-		enableDD : true,
+//		enableDD : true,
 		bodyStyle : 'backgroundColor:#FFFFFF; border:1px solid #99BBE8;',
 		loader : new Ext.tree.TreeLoader({
 			dataUrl : '../../QueryTasteCate.do',
@@ -563,15 +561,10 @@ Ext.onReady(function() {
 			},
 			click : function(e){
 				Ext.getCmp('btnSerachForTasteBasic').handler();
-				
-				if(e.attributes.status == 1){
-					tastem_add = false;
-					Ext.getDom('lblTasteCateName').innerHTML = e.attributes.tasteCateName;
-				}else{
-					tastem_add = true;
-					Ext.getDom('lblTasteCateName').innerHTML = e.text;
-				}
-			},
+				Ext.getDom('lblTasteCateName').innerHTML = e.attributes.tasteCateName;
+
+			}
+/*			,
 			enddrag : function(t,n,e){
 				var cateB;
 				if(n.nextSibling != null){
@@ -594,7 +587,7 @@ Ext.onReady(function() {
 					}
 				});
 				
-			}
+			}*/
 		}
 	});
 	
@@ -616,8 +609,8 @@ Ext.onReady(function() {
 	});
 });
 
-	var bar = {treeId : 'tmm_tasteTree', option :[{name : '修改', fn : "tasteCateOperateHandler({otype:'update'})"}, {name : '删除', fn : "tasteCateOperateHandler({otype:'delete'})"}]};
-	showFloatOption(bar);
+var bar = {treeId : 'tmm_tasteTree', option :[{name : '修改', fn : "tasteCateOperateHandler({otype:'update'})"}, {name : '删除', fn : "tasteCateOperateHandler({otype:'delete'})"}]};
+showFloatOption(bar);
 
 /**
  * 

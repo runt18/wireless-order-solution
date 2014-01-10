@@ -1,7 +1,7 @@
 var salesSubQueryType = 0;
 var salesSubOrderType = 0;
 var salesSubDeptId = -1;
-
+var SALESSUB_PAGE_LIMIT = 22;
 function orderFoodStatPanelInit(){
 	orderFoodStatPanelDeptTree = new Ext.tree.TreePanel({
 		id : 'orderFoodStatPanelDeptTree',
@@ -37,6 +37,7 @@ function orderFoodStatPanelInit(){
 				}
         	},
         	click : function(e){
+        		Ext.getDom('lab_salesSubDept_food').innerHTML = e.text;
         		if(e.attributes.deptID == '' || e.attributes.deptID == '-1'){
         			salesSubDeptId = '';
         			if(e.hasChildNodes()){
@@ -90,7 +91,10 @@ function orderFoodStatPanelInit(){
 	});
 	var orderFoodStatPanelGridTbar = new Ext.Toolbar({
 		height : 26,
-		items : [ {xtype:'tbtext',text:'日期:'}, dateCombo, 
+		items : [ {
+				xtype : 'tbtext',
+				text : String.format(Ext.ux.txtFormat.typeName, '部门', 'lab_salesSubDept_food', '----')
+			},{xtype:'tbtext',text:'日期:'}, dateCombo, 
 		    {xtype:'tbtext',text:'&nbsp;'},  beginDate,
 		    {xtype:'tbtext',text:'&nbsp;至&nbsp;'}, endDate, 
 		    {xtype:'tbtext',text:'&nbsp;&nbsp;菜品:'}, foodName,
@@ -118,7 +122,7 @@ function orderFoodStatPanelInit(){
 				gs.load({
 					params : {
 						start : 0,
-						limit : 15
+						limit : SALESSUB_PAGE_LIMIT
 					}
 				});
 			}
@@ -174,7 +178,7 @@ function orderFoodStatPanelInit(){
 		],
 		SalesSubStatRecord.getKeys().concat(['food', 'food.name']),
 		[ ['isPaging', true], ['restaurantID', restaurantID], ['dataType', 1], ['queryType', 1]],
-		15,
+		SALESSUB_PAGE_LIMIT,
 		'',
 		orderFoodStatPanelGridTbar
 	);
@@ -194,11 +198,11 @@ function orderFoodStatPanelInit(){
 		if(store.getCount() > 0){
 			var sumRow = orderFoodStatPanelGrid.getView().getRow(store.getCount()-1);	
 			sumRow.style.backgroundColor = '#EEEEEE';			
-			sumRow.style.color = 'green';
 			for(var i = 0; i < orderFoodStatPanelGrid.getColumnModel().getColumnCount(); i++){
 				var sumRow = orderFoodStatPanelGrid.getView().getCell(store.getCount()-1, i);
 				sumRow.style.fontSize = '15px';
-				sumRow.style.fontWeight = 'bold';					
+				sumRow.style.fontWeight = 'bold';
+				sumRow.style.color = 'green';
 			}
 			orderFoodStatPanelGrid.getView().getCell(store.getCount()-1, 6).innerHTML = '--';
 			orderFoodStatPanelGrid.getView().getCell(store.getCount()-1, 7).innerHTML = '--';
@@ -330,7 +334,7 @@ function kitchenStatPanelInit(){
 		],
 		SalesSubStatRecord.getKeys().concat(['dept', 'dept.id', 'dept.name', 'kitchen', 'kitchen.name']),
 		[ ['restaurantID', restaurantID], ['dataType', 1], ['queryType', 2]],
-		15,
+		SALESSUB_PAGE_LIMIT,
 		{
 			name : 'dept.id',
 			hide : true,
@@ -457,7 +461,7 @@ function deptStatPanelInit(){
 		],
 		SalesSubStatRecord.getKeys().concat(['dept', 'dept.name']),
 		[ ['restaurantID', restaurantID], ['dataType', 1], ['queryType', 0]],
-		30,
+		SALESSUB_PAGE_LIMIT,
 		null,
 		deptStatPanelGridTbar
 	);
@@ -465,11 +469,11 @@ function deptStatPanelInit(){
 		if(store.getCount() > 0){
 			var sumRow = deptStatPanelGrid.getView().getRow(store.getCount()-1);	
 			sumRow.style.backgroundColor = '#EEEEEE';			
-			sumRow.style.color = 'green';
 			for(var i = 0; i < deptStatPanelGrid.getColumnModel().getColumnCount(); i++){
 				var sumRow = deptStatPanelGrid.getView().getCell(store.getCount()-1, i);
 				sumRow.style.fontSize = '15px';
-				sumRow.style.fontWeight = 'bold';					
+				sumRow.style.fontWeight = 'bold';		
+				sumRow.style.color = 'green';
 			}
 			deptStatPanelGrid.getView().getCell(store.getCount()-1, 6).innerHTML = '--';
 			deptStatPanelGrid.getView().getCell(store.getCount()-1, 8).innerHTML = '--';

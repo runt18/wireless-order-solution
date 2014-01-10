@@ -274,7 +274,7 @@ var deptTree;
 var updateDeptWin;
 var kitchenGrid;
 var updateKitchenWin;
-//var deptTreeFloat_obj = {treeId : 'cancelledFoodDeptTree', option : [{name : '修改', fn : 'updateDeptHandler()'}]};
+var deptTreeFloat_obj = {treeId : 'cancelledFoodDeptTree', option : [{name : '修改', fn : 'updateDeptHandler()'}]};
 Ext.onReady(function() {
 	deptTree = new Ext.tree.TreePanel({
 		title : '部门信息',
@@ -435,5 +435,5 @@ Ext.onReady(function() {
 		height : parseInt(Ext.getDom('divDept').parentElement.style.height.replace(/px/g,'')),
 		items : [deptTree, kitchenGrid]
 	});
-//	showFloatOption(deptTreeFloat_obj);
+	showFloatOption(deptTreeFloat_obj);
 });

@@ -455,7 +455,7 @@ function detailIsPaidRenderer(v){
 	return eval(v) ? '是' : '否';
 }
 
-var billDetailGrid = createGridPanel(
+/*var billDetailGrid = createGridPanel(
 	'',
 	'',
 	'',
@@ -483,7 +483,7 @@ billDetailGrid.frame = false;
 billDetailGrid.border = false;
 billDetailGrid.getStore().on('beforeload', function(thiz){
 	thiz.baseParams['orderID'] = Ext.ux.getSelData(billsGrid)['id'];
-});
+});*/
 
 var billgodtpStatus = false;
 var billGroupOrderDetailTabPanel = new Ext.TabPanel({
@@ -503,96 +503,51 @@ var billGroupOrderDetailTabPanel = new Ext.TabPanel({
 	}
 });
 
-billDetailWin = new Ext.Window({
-	layout : 'fit',
-	width : 1100,
-	height : 370,
-	closable : false,
-	resizable : false,
-	modal : true,
-	items : [billDetailGrid, billGroupOrderDetailTabPanel],
-	bbar : ['->', {
-		text : '关闭',
-		iconCls : 'btn_close',
-		handler : function() {
-			billDetailWin.hide();
-		}
-	} ],
-	keys : [{
-		key : Ext.EventObject.ESC,
-		scope : this,
-		fn : function(){
-			billDetailWin.hide();
-		}
-	}],
-	listeners : {
-		show : function(thiz) {
-			var sd = Ext.ux.getSelData(billsGrid);
-			billgodtpStatus = false;
-			if(sd.category == 4){
-				billDetailGrid.hide();
-				billGroupOrderDetailTabPanel.show();
-				for(var i = billGroupOrderDetailTabPanel.items.length - 1; i >= 0 ; i--){
-					billGroupOrderDetailTabPanel.items.get(i).destroy();
-					billGroupOrderDetailTabPanel.remove(billGroupOrderDetailTabPanel.items.get(i));
-				}
-				var active = null;
-				for(var i = 0; i < sd.childOrder.length; i++){
-					var tempDetailGridID = 'detailGridForTabPanel' + sd.childOrder[i].id;
-					var gp = createGridPanel(
-						tempDetailGridID,
-						('子账单编号:' + sd.childOrder[i].id),
-						'',
-					    '',
-					    '../../QueryDetail.do',
-					    [
-						    [true, false, false, true], 
-						    ['日期', 'order_date', 110] , 
-						    ['名称', 'food_name', 130] , 
-						    ['单价', 'unit_price', 60, 'right', 'Ext.ux.txtFormat.gridDou'],
-						    ['数量', 'amount', 60, 'right', 'Ext.ux.txtFormat.gridDou'],
-						    ['折扣', 'discount', 60, 'right', 'Ext.ux.txtFormat.gridDou'],
-						    ['口味', 'taste_pref'],
-						    ['口味价钱', 'taste_price', 60, 'right', 'Ext.ux.txtFormat.gridDou'],
-						    ['厨房', 'kitchen', 60],
-						    ['反结账', 'aaa', 60, 'center', 'detailIsPaidRenderer'],
-						    ['服务员', 'waiter', 60],
-						    ['退菜原因', 'cancelReason']
-						],
-						['order_date', 'food_name', 'unit_price', 'amount', 'discount',
-						 'taste_pref', 'taste_price', 'kitchen', 'waiter', 'cancelReason'],
-					    [ ['orderID', sd.childOrder[i].id], ['queryType', 'History']],
-					    billDetailpageRecordCount,
-					    ''
-					);
-					gp.border = false;
-					gp.frame = false;
-					gp.on('load', function(thiz, rs, opt){
-						detailGridLoadListeners(gp);
-					});
-					billGroupOrderDetailTabPanel.add(gp);
-					if(i == 0)
-						active = gp;
-				}
-				billgodtpStatus = true;
-				billGroupOrderDetailTabPanel.setActiveTab(active);
-				billGroupOrderDetailTabPanel.setHeight(thiz.getInnerHeight());
-			}else{
-				billGroupOrderDetailTabPanel.hide();
-				billDetailGrid.show();
-				billDetailGrid.getStore().reload({
+function showBillDetailWin(){
+	billDetailWin = new Ext.Window({
+		layout : 'fit',
+		width : 1100,
+		height : 440,
+		closable : false,
+		resizable : false,
+		modal : true,
+	//	items : [billDetailGrid, billGroupOrderDetailTabPanel],
+		bbar : ['->', {
+			text : '关闭',
+			iconCls : 'btn_close',
+			handler : function() {
+				billDetailWin.destroy();
+			}
+		} ],
+		keys : [{
+			key : Ext.EventObject.ESC,
+			scope : this,
+			fn : function(){
+				billDetailWin.destroy();
+			}
+		}],
+		listeners : {
+			show : function(thiz) {
+				var sd = Ext.ux.getSelData(billsGrid);
+				thiz.load({
+					url : '../window/history/orderDetail.jsp', 
+					scripts : true,
 					params : {
-						start : 0,
-						limit : billDetailpageRecordCount
-					}
+						orderId : sd.id,
+						foodStatus : foodStatus
+					},
+					method : 'post'
 				});
-				billDetailGrid.setHeight(thiz.getInnerHeight());
+				thiz.center();	
 			}
 		}
-	}
-});
+	});
+}
+
+
 
 function billDetailHandler(orderID) {
+	showBillDetailWin();
 	billDetailWin.show();
 	billDetailWin.setTitle('账单号: ' + orderID);
 	billDetailWin.center();
@@ -734,6 +689,7 @@ function billOpt(value, cellmeta, record, rowIndex, columnIndex, store) {
 };
 
 var billsGrid;
+var foodStatus;
 Ext.onReady(function() {
 	var billsGridTbar = new Ext.Toolbar({
 		height : 26,
@@ -855,8 +811,11 @@ Ext.onReady(function() {
 			inputValue : 1,
 			listeners : {
 				check : function(e){
-					if(e.getValue())
+					if(e.getValue()){
+						foodStatus = 'isRepaid';
 						searchAdditionFilter = e.getId();
+					}
+						
 				}
 			}
 		}, { xtype:'tbtext', text:'&nbsp;&nbsp;'}, {
@@ -877,8 +836,10 @@ Ext.onReady(function() {
 			inputValue : 3,
 			listeners : {
 				check : function(e){
-					if(e.getValue())
+					if(e.getValue()){
+						foodStatus = 'isGift';
 						searchAdditionFilter = e.getId();
+					}
 				}
 			}
 		}, { xtype:'tbtext', text:'&nbsp;&nbsp;'}, {
@@ -888,8 +849,10 @@ Ext.onReady(function() {
 			inputValue : 4,
 			listeners : {
 				check : function(e){
-					if(e.getValue())
+					if(e.getValue()){
+						foodStatus = 'isReturn';
 						searchAdditionFilter = e.getId();
+					}
 				}
 			}
 		}, { xtype:'tbtext', text:'&nbsp;&nbsp;'}, {

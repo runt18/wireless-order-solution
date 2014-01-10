@@ -1,4 +1,54 @@
-var cfdsTree, cfbdsTree, cfbrsTree;
+var cfdsTree, cfbdsTree, cfbrsTree, cfdsGrid;
+var CANCELL_FOOD_PAGE_LIMIT = 22;
+function cancellFood_showBillDetailWin(){
+	cancellFoodOrderDetailWin = new Ext.Window({
+		layout : 'fit',
+		width : 1100,
+		height : 440,
+		closable : false,
+		resizable : false,
+		modal : true,
+		bbar : ['->', {
+			text : '关闭',
+			iconCls : 'btn_close',
+			handler : function() {
+				cancellFoodOrderDetailWin.destroy();
+			}
+		} ],
+		keys : [{
+			key : Ext.EventObject.ESC,
+			scope : this,
+			fn : function(){
+				cancellFoodOrderDetailWin.destroy();
+			}
+		}],
+		listeners : {
+			show : function(thiz) {
+				var sd = Ext.ux.getSelData(cfdsGrid);
+				thiz.load({
+					url : '../window/history/orderDetail.jsp', 
+					scripts : true,
+					params : {
+						orderId : sd.orderID,
+						foodStatus : 'isReturn'
+					},
+					method : 'post'
+				});
+				thiz.center();	
+			}
+		}
+	});
+}
+function cancellFood_billDetailHandler(orderID) {
+	cancellFood_showBillDetailWin();
+	cancellFoodOrderDetailWin.show();
+	cancellFoodOrderDetailWin.setTitle('账单号: ' + orderID);
+	cancellFoodOrderDetailWin.center();
+};
+
+function linkOrderId(v){
+	return '<a href=\"javascript:cancellFood_billDetailHandler('+ v +')\">'+ v +'</a>';
+}
 function cancelFoodDetailsStatPanelInit(){
 	
 	cfdsTree = new Ext.tree.TreePanel({
@@ -40,6 +90,9 @@ function cancelFoodDetailsStatPanelInit(){
 			}]
 		}),
 		listeners : {
+			click : function(e){
+				Ext.getDom('labCancellFoodDept').innerHTML = e.text; 
+			},
 			dblclick : function(e){
 				Ext.getCmp('btnSearchForCancelFoodDetailsStat').handler();
 			}
@@ -115,6 +168,9 @@ function cancelFoodDetailsStatPanelInit(){
 	var cfdsGridTbar = new Ext.Toolbar({
 		height : 26,
 		items : [{
+			xtype : 'tbtext',
+			text : String.format(Ext.ux.txtFormat.typeName, '部门', 'labCancellFoodDept', '----')
+		},{
 			xtype:'tbtext',
 			text:'日期:'
 		}, dateCombo, {
@@ -157,7 +213,7 @@ function cancelFoodDetailsStatPanelInit(){
 				gs.load({
 					params : {
 						start : 0,
-						limit : 15
+						limit : CANCELL_FOOD_PAGE_LIMIT
 					}
 				});
 			}
@@ -194,7 +250,7 @@ function cancelFoodDetailsStatPanelInit(){
 			}
 		}]
 	});
-	var cfdsGrid = createGridPanel(
+	cfdsGrid = createGridPanel(
 		'',
 		'',
 		'',
@@ -204,7 +260,7 @@ function cancelFoodDetailsStatPanelInit(){
 		 ['日期','orderDateFormat',150], 
 		 ['菜名','foodName',180],
          ['部门','deptName'], 
-         ['账单号', 'orderID'],
+         ['账单号', 'orderID',,,'linkOrderId'],
          ['单价','unitPrice',,'right','Ext.ux.txtFormat.gridDou'],
          ['退菜数量','count',,'right','Ext.ux.txtFormat.gridDou'], 
          ['退菜金额','totalPrice',,'right','Ext.ux.txtFormat.gridDou'],		              
@@ -213,7 +269,7 @@ function cancelFoodDetailsStatPanelInit(){
 		],
 		['orderDateFormat', 'foodName', 'deptName', 'orderID', 'unitPrice', 'count', 'totalPrice', 'waiter', 'reason'],
 		[ ['isPaging', true], ['qtype', 2], ['otype', 0], ['dtype', 1]],
-		15,
+		CANCELL_FOOD_PAGE_LIMIT,
 		null,
 		cfdsGridTbar
 	);
@@ -290,6 +346,9 @@ function cancelFoodByDeptStatPanelInit(){
 			}]
 		}),
 		listeners : {
+			click : function(e){
+				Ext.getDom('labCancellFoodDept_total').innerHTML = e.text; 
+			},
 			dblclick : function(e){
 				Ext.getCmp('btnSearchForCancelFoodByDeptStat').handler();
 			}
@@ -330,6 +389,9 @@ function cancelFoodByDeptStatPanelInit(){
 	var cfbdsGridTbar = new Ext.Toolbar({
 		height : 26,
 		items : [{
+			xtype : 'tbtext',
+			text : String.format(Ext.ux.txtFormat.typeName, '部门', 'labCancellFoodDept_total', '----')
+		},{
 			xtype:'tbtext',
 			text:'日期:'
 		}, dateCombo, {
@@ -433,6 +495,9 @@ function cancelFoodByReasonStatPanelInit(){
 			}]
 		}),
 		listeners : {
+			click : function(e){
+				Ext.getDom('labCancellFoodDept_reason').innerHTML = e.text; 
+			},
 			dblclick : function(e){
 				Ext.getCmp('btnSearchForCancelFoodByReasonStat').handler();
 			}
@@ -473,6 +538,9 @@ function cancelFoodByReasonStatPanelInit(){
 	var cfbrsGridTbar = new Ext.Toolbar({
 		height : 26,
 		items : [{
+			xtype : 'tbtext',
+			text : String.format(Ext.ux.txtFormat.typeName, '部门', 'labCancellFoodDept_reason', '----')
+		},{
 			xtype:'tbtext',
 			text:'日期:'
 		}, dateCombo, {
@@ -516,7 +584,7 @@ function cancelFoodByReasonStatPanelInit(){
 		],
 		['dept.name','amount','price'],
 		[ ['qtype', 1], ['otype', 0], ['dtype', 1]],
-		15,
+		CANCELL_FOOD_PAGE_LIMIT,
 		null,
 		cfbrsGridTbar
 	);

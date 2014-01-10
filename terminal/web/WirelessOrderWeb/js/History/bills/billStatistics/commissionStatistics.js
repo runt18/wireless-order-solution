@@ -1,4 +1,53 @@
+function comi_billDetailHandler(orderID) {
+	comi_showBillDetailWin();
+	commissionOrderDetailWin.show();
+	commissionOrderDetailWin.setTitle('账单号: ' + orderID);
+	commissionOrderDetailWin.center();
+};
 
+function linkOrderId(v){
+	return '<a href=\"javascript:comi_billDetailHandler('+ v +')\">'+ v +'</a>';
+}
+
+function comi_showBillDetailWin(){
+	commissionOrderDetailWin = new Ext.Window({
+		layout : 'fit',
+		width : 1100,
+		height : 440,
+		closable : false,
+		resizable : false,
+		modal : true,
+		bbar : ['->', {
+			text : '关闭',
+			iconCls : 'btn_close',
+			handler : function() {
+				commissionOrderDetailWin.destroy();
+			}
+		} ],
+		keys : [{
+			key : Ext.EventObject.ESC,
+			scope : this,
+			fn : function(){
+				commissionOrderDetailWin.destroy();
+			}
+		}],
+		listeners : {
+			show : function(thiz) {
+				var sd = Ext.ux.getSelData(commissionStatisticsGrid);
+				thiz.load({
+					url : '../window/history/orderDetail.jsp', 
+					scripts : true,
+					params : {
+						orderId : sd.orderId,
+						foodStatus : 'isCommission'
+					},
+					method : 'post'
+				});
+				thiz.center();	
+			}
+		}
+	});
+}
 function commissionDetailInit(){
 	var commission_beginDate = new Ext.form.DateField({
 		xtype : 'datefield',		
@@ -115,7 +164,7 @@ function commissionDetailInit(){
 		{header : '日期', dataIndex : 'orderDateFormat'},
 		{header : '菜名', dataIndex : 'foodName'},
 		{header : '部门', dataIndex : 'dept'},
-		{header : '账单号', dataIndex : 'orderId'},
+		{header : '账单号', dataIndex : 'orderId', renderer : linkOrderId},
 		{header : '单价', dataIndex : 'unitPrice', align : 'right', renderer : Ext.ux.txtFormat.gridDou},
 		{header : '数量', dataIndex : 'amount', align : 'right', renderer : Ext.ux.txtFormat.gridDou},
 		{header : '总额', dataIndex : 'totalPrice', align : 'right', renderer : Ext.ux.txtFormat.gridDou},

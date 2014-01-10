@@ -207,149 +207,50 @@ function detailGridLoadListeners(_g){
 	}	
 }
 
-var billDetailGrid = createGridPanel(
-	'',
-	'',
-	'',
-	'',
-	'../../QueryDetail.do',
-	[
-	    [true,false,false,false],
-	    ['日期','orderDateFormat',100],
-	    ['名称','name',130],
-	    ['单价','unitPrice',60, 'right', 'Ext.ux.txtFormat.gridDou'],
-	    ['数量','count', 60, 'right', 'Ext.ux.txtFormat.gridDou'], 
-	    ['口味','tasteGroup.tastePref'],
-	    ['口味价钱','tasteGroup.tastePrice', 60, 'right', 'Ext.ux.txtFormat.gridDou'],
-	    ['厨房','kitchen.name', 60],
-	    ['反结账','isPaid', 60, 'center', 'detailIsPaidRenderer'],
-	    ['服务员','waiter', 60],
-	    ['退菜原因', 'cancelReason.reason']
-	],
-	OrderFoodRecord.getKeys(),
-	[ ['queryType', 'Today'], ['isCookie', true]],
-	'',
-	''
-);
-billDetailGrid.frame = false;
-billDetailGrid.border = false;
-billDetailGrid.getStore().on('beforeload', function(thiz){
-	thiz.baseParams['orderID'] = Ext.ux.getSelData(billsGrid)['id'];
-});
-billDetailGrid.getStore().on('load', function(){
-	detailGridLoadListeners(billDetailGrid);	
-});
-
-var billgodtpStatus = false;
-var billGroupOrderDetailTabPanel = new Ext.TabPanel({
-	activeTab : 0,
-	border : false,
-	enableTabScroll : true,
-	listeners : {
-		tabchange : function(thiz, stab){
-			if(billgodtpStatus && thiz.getActiveTab().getId() == stab.getId()){
-				stab.getStore().load({
-					params : {
-						start : 0,
-						limit : billDetailpageRecordCount
-					}
-				});				
+function showBillDetailWin(){
+	billDetailWin = new Ext.Window({
+		layout : 'fit',
+		width : 1100,
+		height : 440,
+		closable : false,
+		resizable : false,
+		modal : true,
+	//	items : [billDetailGrid, billGroupOrderDetailTabPanel],
+		bbar : ['->', {
+			text : '关闭',
+			iconCls : 'btn_close',
+			handler : function() {
+				billDetailWin.destroy();
 			}
-		}
-	}
-});
-
-var billDetailWin = new Ext.Window({
-	layout : 'fit',
-	width : 1100,
-	height : 370,
-	closeAction : 'hide',
-	closable : false,
-	resizable : true,
-	modal : true,
-	items : [billDetailGrid, billGroupOrderDetailTabPanel],
-	bbar : ['->', {
-		text : '关闭',
-		iconCls : 'btn_close',
-		handler : function(){
-			billDetailWin.hide();
-		}
-	}],
-	keys : [{
-		key : Ext.EventObject.ESC,
-		scope : this,
-		fn : function(){
-			billDetailWin.hide();
-		}
-	}],
-	listeners : {
-		beforeshow : function(thiz){
-			var sd = Ext.ux.getSelData(billsGrid);
-			billgodtpStatus = false;
-			if(sd.category == 4){
-				billDetailGrid.hide();
-				billGroupOrderDetailTabPanel.show();
-				for(var i = billGroupOrderDetailTabPanel.items.length - 1; i >= 0 ; i--){
-					billGroupOrderDetailTabPanel.items.get(i).destroy();
-					billGroupOrderDetailTabPanel.remove(billGroupOrderDetailTabPanel.items.get(i));
-				}
-				var active = null;
-				for(var i = 0; i < sd.childOrder.length; i++){
-					var tempDetailGridID = 'detailGridForTabPanel' + sd.childOrder[i].id;
-					var gp = createGridPanel(
-						tempDetailGridID,
-						('子账单编号:' + sd.childOrder[i].id),
-						'',
-					    '',
-					    '../../QueryDetail.do',
-					    [
-						    [true, false, false, true], 
-						    ['日期', 'order_date', 110] , 
-						    ['名称', 'food_name', 130] , 
-						    ['单价', 'unit_price', 60, 'right', 'Ext.ux.txtFormat.gridDou'],
-						    ['数量', 'amount', 60, 'right', 'Ext.ux.txtFormat.gridDou'],
-						    ['折扣', 'discount', 60, 'right', 'Ext.ux.txtFormat.gridDou'],
-						    ['口味', 'taste_pref'],
-						    ['口味价钱', 'taste_price', 60, 'right', 'Ext.ux.txtFormat.gridDou'],
-						    ['厨房', 'kitchen', 60],
-						    ['反结账', '', 60, 'center', 'detailIsPaidRenderer'],
-						    ['服务员', 'waiter', 60],
-						    ['退菜原因', 'cancelReason']
-						],
-						OrderFoodRecord.getKeys(),
-					    [ ['orderID', sd.childOrder[i].id], ['queryType', 'Today'], ['isCookie', true]],
-					    billDetailpageRecordCount,
-					    ''
-					);
-					gp.border = false;
-					gp.frame = false;
-					gp.on('load', function(thiz, rs, opt){
-						detailGridLoadListeners(gp);
-					});
-					billGroupOrderDetailTabPanel.add(gp);
-					if(i == 0)
-						active = gp;
-				}
-				billgodtpStatus = true;
-				billGroupOrderDetailTabPanel.setActiveTab(active);
-				billGroupOrderDetailTabPanel.setHeight(thiz.getInnerHeight());
-			}else{
-				billGroupOrderDetailTabPanel.hide();
-				billDetailGrid.show();
-				billDetailGrid.getStore().reload({
+		} ],
+		keys : [{
+			key : Ext.EventObject.ESC,
+			scope : this,
+			fn : function(){
+				billDetailWin.destroy();
+			}
+		}],
+		listeners : {
+			show : function(thiz) {
+				var sd = Ext.ux.getSelData(billsGrid);
+				thiz.load({
+					url : '../window/history/orderDetail.jsp', 
+					scripts : true,
 					params : {
-						start : 0,
-						limit : billDetailpageRecordCount
-					}
+						orderId : sd.id,
+						queryType : 'Today',
+						foodStatus : foodStatus
+					},
+					method : 'post'
 				});
-				billDetailGrid.setHeight(thiz.getInnerHeight());
+				thiz.center();	
 			}
 		}
-	}
-});
-
+	});
+}
 // 查看明细
 function billDetailHandler(orderID) {
+	showBillDetailWin();
 	billDetailWin.show();
 	billDetailWin.setTitle('账单号: ' + orderID);
 	billDetailWin.center();
@@ -503,6 +404,7 @@ function billOpt(value, cellmeta, record, rowIndex, columnIndex, store) {
 }
 
 var billsGrid;
+var foodStatus;
 Ext.onReady(function(){
 	var billsGridTbar = new Ext.Toolbar({
 		height : 26,
@@ -609,8 +511,10 @@ Ext.onReady(function(){
 			inputValue : 1,
 			listeners : {
 				check : function(e){
-					if(e.getValue())
+					if(e.getValue()){
+						foodStatus = 'isRepaid';
 						searchAdditionFilter = e.getId();
+					}
 				}
 			}
 		}, { xtype:'tbtext', text:'&nbsp;&nbsp;'}, {
@@ -631,8 +535,11 @@ Ext.onReady(function(){
 			inputValue : 3,
 			listeners : {
 				check : function(e){
-					if(e.getValue())
+					if(e.getValue()){
+						foodStatus = 'isGift';
 						searchAdditionFilter = e.getId();
+					}
+
 				}
 			}
 		}, { xtype:'tbtext', text:'&nbsp;&nbsp;'}, {
@@ -642,8 +549,10 @@ Ext.onReady(function(){
 			inputValue : 4,
 			listeners : {
 				check : function(e){
-					if(e.getValue())
+					if(e.getValue()){
+						foodStatus = 'isReturn';
 						searchAdditionFilter = e.getId();
+					}
 				}
 			}
 		}, { xtype:'tbtext', text:'&nbsp;&nbsp;'}, {
