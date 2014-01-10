@@ -401,6 +401,10 @@ public class MemberType implements Jsonable, Parcelable{
 		this.type = type;
 	}
 	
+	public void setType(int type){
+		this.type = Type.valueOf(type);
+	}
+	
 	public List<Discount> getDiscounts(){
 		return Collections.unmodifiableList(this.discounts);
 	}
