@@ -302,7 +302,7 @@ public class MemberDao {
 			  " M.total_consumption, M.total_point, M.total_charge, " +
 			  " M.member_card, M.name AS member_name, M.sex, M.create_date, " +
 			  " M.tele, M.mobile, M.birthday, M.id_card, M.company, M.contact_addr, M.comment, " +
-			  " MT.member_type_id, MT.name AS member_type_name " +
+			  " MT.member_type_id, MT.name AS member_type_name, MT.attribute " +
 			  " FROM " + Params.dbName + ".member M " +
 			  " JOIN " + Params.dbName + ".member_type MT ON M.member_type_id = MT.member_type_id " +
 			  " WHERE 1 = 1 "	+
@@ -344,6 +344,7 @@ public class MemberDao {
 			
 			MemberType memberType = new MemberType(dbCon.rs.getInt("member_type_id"));
 			memberType.setName(dbCon.rs.getString("member_type_name"));
+			memberType.setAttribute(dbCon.rs.getInt("attribute"));
 			member.setMemberType(memberType);
 			
 			result.add(member);
