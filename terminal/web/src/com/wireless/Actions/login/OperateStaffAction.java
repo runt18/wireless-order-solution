@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -53,8 +52,6 @@ public class OperateStaffAction extends Action{
 				session.setAttribute("pin", pin);
 				session.setAttribute("restaurantID", staff.getRestaurantId()+"");
 				
-				Cookie cPin = new Cookie("pin", pin);
-				response.addCookie(cPin);
 				Map<Object, Object> other = new HashMap<Object, Object>();
 				other.put("staff", staff);
 				jobject.setOther(other);
