@@ -1062,10 +1062,10 @@ public class CalcBillStatisticsDao {
 		 	   " SUM(IF(charge_type = " + ChargeType.CASH.getValue() + ", charge_money, 0)) AS total_actual_charge_by_cash, " +
 		 	   " SUM(IF(charge_type = " + ChargeType.CREDIT_CARD.getValue() + ", charge_money, 0)) AS total_actual_charge_by_card " +
 			   " FROM " + Params.dbName + "." + moTbl +
-			   " WHERE " +
-			   " operate_type = " + OperationType.CHARGE.getValue() +
-			   " AND " +
-			   " operate_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'";
+			   " WHERE 1 = 1 " +
+			   " AND restaurant_id = " + staff.getRestaurantId() +
+			   " AND operate_type = " + OperationType.CHARGE.getValue() +
+			   " AND operate_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'";
 		 
 		 dbCon.rs = dbCon.stmt.executeQuery(sql);
 		 
@@ -1086,10 +1086,10 @@ public class CalcBillStatisticsDao {
 			   " SUM(delta_base_money + delta_extra_money) AS total_account_refund, " +
 		 	   " SUM(charge_money) AS total_actual_refund " +
 			   " FROM " + Params.dbName + "." + moTbl +
-			   " WHERE " +
-			   " operate_type = " + OperationType.REFUND.getValue() +
-			   " AND " +
-			   " operate_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'";
+			   " WHERE 1 = 1 " +
+			   " AND restaurant_id = " + staff.getRestaurantId() +
+			   " AND operate_type = " + OperationType.REFUND.getValue() +
+			   " AND operate_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'";
 		 
 		 dbCon.rs = dbCon.stmt.executeQuery(sql);
 		 

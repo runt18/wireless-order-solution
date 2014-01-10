@@ -221,18 +221,18 @@ public class DailySettleDao {
 	
 	/**
 	 * Perform to daily settle according to a terminal.
-	 * @param term
+	 * @param staff
 	 * 			  the terminal with both user name and restaurant id
 	 * @return the result to daily settle
 	 * @throws SQLException
 	 *             throws if fail to execute any SQL statement
 	 * @throws BusinessException
 	 */
-	public static Result exec(Staff term) throws SQLException, BusinessException{
+	public static Result exec(Staff staff) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return exec(dbCon, term, SettleType.MANUAL);
+			return exec(dbCon, staff, SettleType.MANUAL);
 			
 		}finally{
 			dbCon.disconnect();
@@ -543,19 +543,19 @@ public class DailySettleDao {
 //				  " SELECT " + memberOperationItem + " FROM " + Params.dbName + ".member_operation";
 			sql = " INSERT INTO " + Params.dbName + ".member_operation_history" +
 				  " SELECT * FROM " + Params.dbName + ".member_operation" + 
-				  " WHERE restaurant_id <> " + Restaurant.ADMIN;
+				  " WHERE restaurant_id = " + staff.getRestaurantId();
 			dbCon.stmt.executeUpdate(sql);
 			
 			//Move the shift record from 'shift' to 'shift_history'.
 			sql = " INSERT INTO " + Params.dbName + ".shift_history (" + shiftItem + ") " +
 				  " SELECT " + shiftItem + " FROM " + Params.dbName + ".shift " +
-				  " WHERE " + (staff.getRestaurantId() < 0 ? "" : "restaurant_id=" + staff.getRestaurantId());
+				  " WHERE " + (staff.getRestaurantId() < 0 ? "" : "restaurant_id = " + staff.getRestaurantId());
 			dbCon.stmt.executeUpdate(sql);
 			
 			//Create the daily settle record
 			sql = " INSERT INTO " + Params.dbName + ".daily_settle_history (`restaurant_id`, `name`, `on_duty`, `off_duty`) VALUES (" +
 				  staff.getRestaurantId() + ", " +
-				  "'" + (staff.getName() == null ? "" : staff.getName()) + "', " +
+				  "'" + staff.getName() + "', " +
 				  onDuty + ", " +
 				  " NOW() " +
 				  " ) ";
@@ -625,19 +625,45 @@ public class DailySettleDao {
 			
 			}
 			
-			//Delete the shift record from "shift".
+			//Delete the shift records belong to this restaurant.
 			sql = " DELETE FROM " + Params.dbName + ".shift WHERE " + (staff.getRestaurantId() < 0 ? "" : "restaurant_id=" + staff.getRestaurantId());
 			dbCon.stmt.executeUpdate(sql);
 			
-			//Delete the member operation 
-			sql = " DELETE FROM " + Params.dbName + ".member_operation";
+			//Delete the shift record belongs to admin.
+			sql = " DELETE FROM " + Params.dbName + ".shift WHERE restaurant_id = " + Restaurant.ADMIN;
 			dbCon.stmt.executeUpdate(sql);
 			
-			//Delete the taste group record attached to admin.
+			//Insert a shift record with the max shift id belongs to admin.
+			sql = "INSERT INTO " + Params.dbName + ".shift (`id`, `restaurant_id`) VALUES (" +
+				  result.getMaxShiftId() + ", " +
+				  Restaurant.ADMIN +
+				  ")";
+			dbCon.stmt.executeUpdate(sql);
+			
+			//Delete the member operation to this restaurant
+			sql = " DELETE FROM " + Params.dbName + ".member_operation WHERE restaurant_id = " + staff.getRestaurantId();
+			dbCon.stmt.executeUpdate(sql);
+			
+			//Delete the member operation belongs to admin.
+			sql = " DELETE FROM " + Params.dbName + ".member_operation WHERE restaurant_id = " + Restaurant.ADMIN;
+			dbCon.stmt.executeUpdate(sql);
+			
+			//Insert a record with max member operation id 
+			sql = " INSERT INTO " + Params.dbName + ".member_operation" +
+				  " (`id`, `restaurant_id`, `staff_id`, `member_id`, `member_name`, `member_mobile`, `operate_seq`, `operate_date`, `operate_type`) " +
+				  " VALUES " +
+				  " ( " +
+				  result.getMaxMemberOperationId() + "," +
+				  Restaurant.ADMIN + "," +
+				  " 0, 0, '', '', '', 0, 0 " +
+				  " ) ";
+			dbCon.stmt.executeUpdate(sql);
+			
+			//Delete the taste group record belongs to admin.
 			sql = " DELETE FROM " + Params.dbName + ".taste_group WHERE taste_group_id = " + tgIdToAdmin;
 			dbCon.stmt.executeUpdate(sql);
 			
-			//Delete the order_food record attached to admin.
+			//Delete the order_food record belongs to admin.
 			sql = " DELETE FROM " + Params.dbName + ".order_food WHERE id = " + ofIdToAdmin;
 			dbCon.stmt.executeUpdate(sql);
 			
@@ -645,11 +671,7 @@ public class DailySettleDao {
 			sql = " DELETE FROM " + Params.dbName + ".order WHERE restaurant_id=" + Restaurant.ADMIN;
 			dbCon.stmt.executeUpdate(sql);
 			
-			//delete the shift record to root
-			sql = " DELETE FROM " + Params.dbName + ".shift WHERE restaurant_id=" + Restaurant.ADMIN;
-			dbCon.stmt.executeUpdate(sql);
-			
-			//Insert a order record with the max order id to root.
+			//Insert a order record with the max order id belongs to admin.
 			sql = "INSERT INTO " + Params.dbName + ".order (`id`, `restaurant_id`, `order_date`) VALUES (" + 
 				  result.getMaxOrderId() + ", " +
 				  Restaurant.ADMIN + ", " +
@@ -657,7 +679,7 @@ public class DailySettleDao {
 				  ")";
 			dbCon.stmt.executeUpdate(sql);
 			
-			//Insert a order_food record with the max order food id, max taste group id to root.
+			//Insert a order_food record with the max order food id, max taste group id belongs to admin.
 			sql = "INSERT INTO " + Params.dbName + ".order_food (`id`, `order_id`, `taste_group_id`, `order_date`) VALUES (" +
 				  result.getMaxOrderFoodId() + ", " +
 				  result.getMaxOrderId() + ", " +
@@ -674,24 +696,6 @@ public class DailySettleDao {
 				  result.getMaxTasteGroupId() + ", " +
 				  result.getMaxNormalTasteGroupId() +
 				  " ) ";
-			dbCon.stmt.executeUpdate(sql);
-			
-			//Insert a record with max member operation id 
-			sql = " INSERT INTO " + Params.dbName + ".member_operation" +
-				  " (`id`, `restaurant_id`, `staff_id`, `member_id`, `member_name`, `member_mobile`, `operate_seq`, `operate_date`, `operate_type`) " +
-				  " VALUES " +
-				  " ( " +
-				  result.getMaxMemberOperationId() + "," +
-				  Restaurant.ADMIN + "," +
-				  " 0, 0, '', '', '', 0, 0 " +
-				  " ) ";
-			dbCon.stmt.executeUpdate(sql);
-			
-			//Insert a shift record with the max shift id to root.
-			sql = "INSERT INTO " + Params.dbName + ".shift (`id`, `restaurant_id`) VALUES (" +
-				  result.getMaxShiftId() + ", " +
-				  Restaurant.ADMIN +
-				  ")";
 			dbCon.stmt.executeUpdate(sql);
 			
 			dbCon.conn.commit();
