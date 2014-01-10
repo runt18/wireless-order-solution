@@ -59,7 +59,7 @@ public class WirelessSocketServer {
     static int blockQueueSize = 200;
 	
     //the hash map holding the information is as below
-    public static final HashMap<PType, Map<PStyle, String>> printTemplates = new HashMap<PType, Map<PStyle, String>>();    
+    public static final Map<PType, Map<PStyle, String>> printTemplates = new HashMap<PType, Map<PStyle, String>>();    
     
     //the thread pool
     static ThreadPoolExecutor threadPool = null;
@@ -71,7 +71,7 @@ public class WirelessSocketServer {
     //printer login handler
     static PrinterLoginHandler printerLoginHandler = null;
     //the sweep db scheduler task
-    static Scheduler scheDBTask = null;
+    static Scheduler scheDbTask = null;
     //the daily settlement task
     static Scheduler scheDailySettlement = null;
     
@@ -193,7 +193,7 @@ public class WirelessSocketServer {
 				new Thread(printerLoginHandler, "Printer Login").start();
 				
 				//start to schedule the sweep db task
-				scheDBTask = new Scheduler();
+				scheDbTask = new Scheduler();
 				//parse the time to run sweep db task from configuration file
 				nl = doc.getElementsByTagName("sweep_db");
 				if(nl.item(0) != null){
@@ -213,12 +213,11 @@ public class WirelessSocketServer {
 					pos1 = pos2 + 1;
 					int second = Integer.parseInt(time.substring(pos1));
 					//schedule the sweep db task
-					scheDBTask.schedule(new SweepDBTask(), 
+					scheDbTask.schedule(new SweepDBTask(), 
 										new MonthlyIterator(dayOfMonth, hourOfDay, minute, second));
 				}else{
 					//schedule the sweeper task on 15th 2:00am every month if not specified in conf.xml 
-					scheDBTask.schedule(new SweepDBTask(), 
-										new MonthlyIterator(15, 2, 0, 0));
+					//scheDbTask.schedule(new SweepDBTask(), new MonthlyIterator(15, 2, 0, 0));
 				}
 				
 				
@@ -243,8 +242,7 @@ public class WirelessSocketServer {
 												 new DailyIterator(hourOfDay, minute, second));
 				}else{
 					//schedule the daily settlement task on 01:23:37 if not specified in conf.xml 
-					scheDailySettlement.schedule(new DailySettlementTask(), 
-										new DailyIterator(1, 23, 37));
+					//scheDailySettlement.schedule(new DailySettlementTask(), new DailyIterator(1, 23, 37));
 				}
 				
 			}catch(ParserConfigurationException e){
