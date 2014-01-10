@@ -85,13 +85,14 @@ public class OrderFoodDao {
 	public static List<OrderFood> getSingleDetailToday(DBCon dbCon, Staff staff, String extraCond, String orderClause) throws SQLException, BusinessException {
 		String sql;
 
-		sql = "SELECT OF.order_id, OF.food_alias, OF.taste_group_id, OF.is_temporary, " +
+		sql = " SELECT OF.order_id, OF.food_alias, OF.taste_group_id, OF.is_temporary, " +
 				" OF.restaurant_id, OF.food_id, OF.name, OF.food_status, OF.is_paid, " +
 				" OF.unit_price, OF.order_count, OF.waiter, OF.order_date, OF.discount, OF.order_date, " +
 				" OF.cancel_reason_id, OF.cancel_reason, " +
 				" OF.kitchen_alias, OF.kitchen_id, (CASE WHEN K.kitchen_id IS NULL THEN '已删除厨房' ELSE K.name END) AS kitchen_name, " +
 				" OF.dept_id, (CASE WHEN D.dept_id IS NULL THEN '已删除部门' ELSE D.name END) as dept_name " +
 				" FROM " + Params.dbName + ".order_food OF " +
+				" JOIN " + Params.dbName + ".order O ON OF.order_id = O.id " +
 				" LEFT JOIN " + Params.dbName + ".kitchen K " + " ON OF.kitchen_id = K.kitchen_id " +
 				" LEFT JOIN " + Params.dbName + ".department D " + " ON D.dept_id = K.dept_id AND D.restaurant_id = K.restaurant_id " +
 				" WHERE 1 = 1 " +
@@ -206,14 +207,15 @@ public class OrderFoodDao {
 				" OFH.kitchen_alias, OFH.kitchen_id, (CASE WHEN K.kitchen_id IS NULL THEN '已删除厨房' ELSE K.name END) AS kitchen_name, " +
 				" OFH.dept_id, (CASE WHEN D.dept_id IS NULL THEN '已删除部门' ELSE D.name END) as dept_name " +
 				" FROM " + Params.dbName + ".order_food_history OFH " +
-				" LEFT JOIN " + Params.dbName + ".kitchen K " + " ON OFH.kitchen_id = K.kitchen_id " +
-				" LEFT JOIN " + Params.dbName + ".department D " + " ON D.dept_id = K.dept_id AND D.restaurant_id = K.restaurant_id " +
+				" JOIN " + Params.dbName + ".order_history OH ON OH.id = OFH.order_id " +
+				" LEFT JOIN " + Params.dbName + ".kitchen K ON OFH.kitchen_id = K.kitchen_id " +
+				" LEFT JOIN " + Params.dbName + ".department D ON D.dept_id = K.dept_id AND D.restaurant_id = K.restaurant_id " +
 				" WHERE 1 = 1 " +
 				(extraCond == null ? "" : extraCond) +
 				(orderClause == null ? "" : " " + orderClause);
 		
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
-		ArrayList<OrderFood> orderFoods = new ArrayList<OrderFood>();
+		List<OrderFood> orderFoods = new ArrayList<OrderFood>();
 		while (dbCon.rs.next()) {
 			OrderFood food = new OrderFood();
 			food.setOrderId(dbCon.rs.getInt("order_id"));

@@ -985,13 +985,16 @@ public class CalcBillStatisticsDao {
 			  " ABS(SUM(OF.order_count)) AS cancel_amount, " +
 			  " ABS(ROUND(SUM((OF.unit_price + IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * OF.order_count * OF.discount), 2)) AS cancel_price " +
 			  " FROM " + Params.dbName + "." + orderFoodTbl + " OF " +
+			  " JOIN " + Params.dbName + ".order_history O ON 1 = 1" +
+			  " AND OF.order_id = O.id " +
+			  " AND O.restaurant_id = " + staff.getRestaurantId() +
+			  " AND O.order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +
+			  " AND O.cancel_price <> 0 " +
 			  " JOIN " + Params.dbName + "." + tasteGrpTbl + " TG " + " ON OF.taste_group_id = TG.taste_group_id " +
 			  " JOIN " + Params.dbName + ".department DEPT " + " ON OF.dept_id = DEPT.dept_id AND OF.restaurant_id = DEPT.restaurant_id " +
 			  " WHERE 1 = 1 " +
 			  (extraCond == null ? "" : extraCond) +
-			  " AND OF.restaurant_id = " + staff.getRestaurantId() +
 			  " AND OF.order_count < 0 " +
-			  " AND OF.order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" + 
 			  " GROUP BY OF.dept_id, OF.cancel_reason_id " +
 			  " ORDER BY dept_id ";
 		
