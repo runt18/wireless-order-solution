@@ -641,7 +641,7 @@ public class OrderFood implements Parcelable, Comparable<OrderFood>, Jsonable {
 	public Map<String, Object> toJsonMap(int flag) {
 		Map<String, Object> jm = new LinkedHashMap<String, Object>();
 		// extends food
-		jm.putAll(new LinkedHashMap<String, Object>(this.mFood.toJsonMap(0)));
+		jm.putAll(this.mFood.toJsonMap(0));
 		jm.put("orderId", this.mOrderId);
 		jm.put("orderDateFormat", DateUtil.format(this.mOrderDate));
 		jm.put("waiter", this.mWaiter);
@@ -650,6 +650,9 @@ public class OrderFood implements Parcelable, Comparable<OrderFood>, Jsonable {
 		jm.put("isRepaid", this.isRepaid);
 		jm.put("isHurried", this.isHurried);
 		jm.put("isHangup", this.isHangup);
+		jm.put("isGift", this.mFood.isGift());
+		jm.put("isCommission", this.mFood.isCommission());
+		jm.put("isReturn", this.getCount() < 0 ? true : false);
 		jm.put("discount", this.mDiscount);
 		jm.put("count", this.getCount());
 		jm.put("unitPrice", this.getPrice());
