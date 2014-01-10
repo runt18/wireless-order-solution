@@ -118,7 +118,7 @@ public class QueryCancelledFoodAction extends Action {
 					}
 				}
 			}else if(qt == QueryCancelledFood.QUERY_BY_FOOD){
-				list = QueryCancelledFood.getCancelledFoodDetail(staff, queryDate, dt, ot, did, rid);
+				list = QueryCancelledFood.getCancelledFoodDetail(staff, queryDate, dt, did, rid);
 				if(list != null && list.size() > 0){
 					CancelledFood tempSum = new CancelledFood(), tempItem = null;
 					for(int i = 0; i < list.size(); i++){

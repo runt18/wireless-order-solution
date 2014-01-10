@@ -1982,7 +1982,6 @@ public class HistoryStatisticsAction extends DispatchAction{
 		if(reasonID == null || reasonID.trim().isEmpty()){
 			reasonID = "-1";
 		}
-		Integer ot = Integer.valueOf(otype);
 		DateType dt = DateType.valueOf(Integer.valueOf(dtype));
 		Integer did = Integer.valueOf(deptID), rid = Integer.valueOf(reasonID);
 		
@@ -1990,7 +1989,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 		Staff staff = StaffDao.verify(Integer.parseInt(pin));
 		
 		
-		list = QueryCancelledFood.getCancelledFoodDetail(staff, queryDate, dt, ot, did, rid);
+		list = QueryCancelledFood.getCancelledFoodDetail(staff, queryDate, dt, did, rid);
 		CancelledFood tempSum = new CancelledFood();
 		if(list != null && list.size() > 0){
 			CancelledFood tempItem = null;
