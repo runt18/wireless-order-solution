@@ -2,12 +2,12 @@ package com.wireless.db.billStatistics;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
-import com.wireless.db.deptMgr.DepartmentDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.billStatistics.CancelIncomeByDept;
 import com.wireless.pojo.billStatistics.CancelIncomeByDept.IncomeByEachReason;
@@ -1113,7 +1113,7 @@ public class CalcBillStatisticsDao {
 	 * @throws SQLException
 	 * 			if failed to execute any SQL statement
 	 */
-	private static List<RepaidStatistics> calcRepaidStatistics(DBCon dbCon, Staff staff, DutyRange range, String extraCond, DateType queryType) throws SQLException{
+	private static List<RepaidStatistics> calcRepaidStat(DBCon dbCon, Staff staff, DutyRange range, String extraCond, DateType queryType) throws SQLException{
 		String orderTbl = null;
 		if(queryType.isHistory()){
 			orderTbl = TBL_ORDER_HISTORY;
@@ -1124,13 +1124,18 @@ public class CalcBillStatisticsDao {
 		}else{
 			throw new IllegalArgumentException("The query type is invalid.");
 		}
-		String sql = " SELECT order_date, waiter, staff_id, id,  repaid_price, total_price, actual_price, pay_type FROM " + Params.dbName + "." + orderTbl +
-					" WHERE status = " + Order.Status.REPAID.getVal() + 
-					" AND restaurant_id = " + staff.getRestaurantId() + 
-					" AND order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +
-					(extraCond != null ? extraCond : "");
+		String sql;
+		sql = " SELECT " +
+			  " order_date, waiter, staff_id, id,  repaid_price, total_price, actual_price, pay_type "  +
+			  " FROM " + Params.dbName + "." + orderTbl +
+			  " WHERE 1 = 1 " +
+			  " AND status = " + Order.Status.REPAID.getVal() + 
+			  " AND restaurant_id = " + staff.getRestaurantId() + 
+			  " AND order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +
+			  (extraCond != null ? extraCond : "") +
+			  " ORDER BY order_date ";
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
-		List<RepaidStatistics> list = new ArrayList<RepaidStatistics>();
+		List<RepaidStatistics> result = new ArrayList<RepaidStatistics>();
 		while(dbCon.rs.next()){
 			RepaidStatistics each = new RepaidStatistics();
 			Staff oStaff = new Staff();
@@ -1143,9 +1148,10 @@ public class CalcBillStatisticsDao {
 			oStaff.setId(dbCon.rs.getInt("staff_id"));
 			oStaff.setName(dbCon.rs.getString("waiter"));
 			each.setStaff(oStaff);
-			list.add(each);
+			result.add(each);
 		}
-		return list;
+		dbCon.rs.close();
+		return Collections.unmodifiableList(result);
 	}
 	/**
 	 * Get repaid detail by staff_id.
@@ -1157,11 +1163,11 @@ public class CalcBillStatisticsDao {
 	 * @throws SQLException
 	 * 			if failed to execute any SQL statement
 	 */
-	public static List<RepaidStatistics> calcRepaidStatisticsByStaffId(Staff staff, DutyRange range, int staffId, DateType queryType) throws SQLException{
+	public static List<RepaidStatistics> calcRepaidStatByStaff(Staff staff, DutyRange range, int staffId, DateType queryType) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return calcRepaidStatistics(dbCon, staff, range, " AND staff_id = " + staffId , queryType);
+			return calcRepaidStat(dbCon, staff, range, " AND staff_id = " + staffId , queryType);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -1175,11 +1181,11 @@ public class CalcBillStatisticsDao {
 	 * @throws SQLException
 	 * 			if failed to execute any SQL statement
 	 */
-	public static List<RepaidStatistics> calcRepaidStatistics(Staff staff, DutyRange range, DateType queryType) throws SQLException{
+	public static List<RepaidStatistics> calcRepaidStat(Staff staff, DutyRange range, DateType queryType) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return calcRepaidStatistics(dbCon, staff, range, null , queryType);
+			return calcRepaidStat(dbCon, staff, range, null , queryType);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -1198,41 +1204,54 @@ public class CalcBillStatisticsDao {
 	 * @throws BusinessException
 	 * 			throw if the query type is invalid
 	 */
-	private static List<CommissionStatistics> calcCommissionStatistics(DBCon dbCon, Staff staff, DutyRange range, String extraCond, DateType queryType) throws SQLException, BusinessException{
+	private static List<CommissionStatistics> calcCommissionStat(DBCon dbCon, Staff staff, DutyRange range, String extraCond, DateType queryType) throws SQLException, BusinessException{
+		String orderFoodTbl = null;
 		String orderTbl = null;
 		if(queryType.isHistory()){
-			orderTbl = TBL_ORDER_FOOD_HISTORY;
+			orderFoodTbl = TBL_ORDER_FOOD_HISTORY;
+			orderTbl = TBL_ORDER_HISTORY;
 			
 		}else if(queryType.isToday()){
-			orderTbl = TBL_ORDER_FOOD_TODAY;
+			orderFoodTbl = TBL_ORDER_FOOD_TODAY;
+			orderTbl = TBL_ORDER_TODAY;
 			
 		}else{
 			throw new IllegalArgumentException("The query type is invalid.");
 		}
 		
-		String sql = "SELECT id, order_id, order_date, name, dept_id, unit_price, order_count, ROUND((unit_price * order_count), 2) total_price, ROUND((commission * order_count), 2) commission, waiter  FROM " + Params.dbName + "." + orderTbl + 
-					" WHERE 1=1 AND (food_status & " + Food.COMMISSION + ") <> 0 " +
-					" AND commission <> 0 " +
-					" AND order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +
-					" AND restaurant_id = " + staff.getRestaurantId() + " " +
-					(extraCond != null ? extraCond : "");
+		String sql;
+		sql = " SELECT OFH.order_id, OFH.order_date, OFH.name, OFH.unit_price, OFH.order_count, OFH.waiter, " +
+			  " ROUND((OFH.unit_price * OFH.order_count), 2) AS total_price, " + 
+			  " ROUND((OFH.commission * OFH.order_count), 2) AS commission, "  +
+			  " D.dept_id, D.restaurant_id, D.name AS dept_name " +
+			  " FROM " + Params.dbName + "." + orderFoodTbl + " OFH " +
+			  " JOIN " + Params.dbName + "." + orderTbl + " OH ON 1 = 1 " + 
+			  " AND OFH.order_id = OH.id " +
+			  " AND OH.restaurant_id = " + staff.getRestaurantId() +
+		 	  " AND OH.order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +
+			  " JOIN " + Params.dbName + ".department D ON D.dept_id = OFH.dept_id AND D.restaurant_id = OFH.restaurant_id " +
+		 	  " WHERE 1 = 1 " +
+			  " AND (OFH.food_status & " + Food.COMMISSION + ") <> 0 " +
+		 	  " AND OFH.commission <> 0 " +
+		 	  (extraCond != null ? extraCond : "");
+		
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
-		List<CommissionStatistics> list = new ArrayList<CommissionStatistics>();
+		List<CommissionStatistics> result = new ArrayList<CommissionStatistics>();
 		while(dbCon.rs.next()){
 			CommissionStatistics c = new CommissionStatistics();
 			c.setOrderId(dbCon.rs.getInt("order_id"));
 			c.setOrderDate(dbCon.rs.getTimestamp("order_date").getTime());
 			c.setFoodName(dbCon.rs.getString("name"));
-			Department dept = DepartmentDao.getDepartmentById(staff, dbCon.rs.getInt("dept_id"));
-			c.setDept(dept);
+			c.setDept( new Department(dbCon.rs.getInt("restaurant_id"), dbCon.rs.getShort("dept_id"), dbCon.rs.getString("dept_name")));
 			c.setUnitPrice(dbCon.rs.getFloat("unit_price"));
 			c.setAmount(dbCon.rs.getFloat("order_count"));
 			c.setTotalPrice(dbCon.rs.getFloat("total_price"));
 			c.setCommission(dbCon.rs.getFloat("commission"));
 			c.setWaiter(dbCon.rs.getString("waiter"));
-			list.add(c);
+			result.add(c);
 		}
-		return list;
+		dbCon.rs.close();
+		return Collections.unmodifiableList(result);
 	}
 	
 	/**
@@ -1251,7 +1270,7 @@ public class CalcBillStatisticsDao {
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return calcCommissionStatistics(dbCon, staff, range, " AND staff_id = " + staffId , queryType);
+			return calcCommissionStat(dbCon, staff, range, " AND OFH.staff_id = " + staffId , queryType);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -1273,7 +1292,7 @@ public class CalcBillStatisticsDao {
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return calcCommissionStatistics(dbCon, staff, range, " AND dept_id = " + deptId , queryType);
+			return calcCommissionStat(dbCon, staff, range, " AND OFH.dept_id = " + deptId , queryType);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -1298,7 +1317,7 @@ public class CalcBillStatisticsDao {
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return calcCommissionStatistics(dbCon, staff, range, " AND staff_id = " + staffId + " AND dept_id = " + deptId , queryType);
+			return calcCommissionStat(dbCon, staff, range, " AND OFH.staff_id = " + staffId + " AND OFH.dept_id = " + deptId , queryType);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -1318,7 +1337,7 @@ public class CalcBillStatisticsDao {
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return calcCommissionStatistics(dbCon, staff, range, null , queryType);
+			return calcCommissionStat(dbCon, staff, range, null , queryType);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -1350,7 +1369,7 @@ public class CalcBillStatisticsDao {
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return calcCommissionTotal(dbCon, staff, range, " AND dept_id = " + deptId, queryType);
+			return calcCommissionTotal(dbCon, staff, range, " AND OFH.dept_id = " + deptId, queryType);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -1371,33 +1390,45 @@ public class CalcBillStatisticsDao {
 	 * 			throw if the query type is invalid
 	 */
 	private static List<CommissionStatistics> calcCommissionTotal(DBCon dbCon, Staff staff, DutyRange range, String extraCond, DateType queryType) throws SQLException, BusinessException{
+		String orderFoodTbl = null;
 		String orderTbl = null;
 		if(queryType.isHistory()){
-			orderTbl = TBL_ORDER_FOOD_HISTORY;
+			orderFoodTbl = TBL_ORDER_FOOD_HISTORY;
+			orderTbl = TBL_ORDER_HISTORY;
 			
 		}else if(queryType.isToday()){
-			orderTbl = TBL_ORDER_FOOD_TODAY;
+			orderFoodTbl = TBL_ORDER_FOOD_TODAY;
+			orderTbl = TBL_ORDER_TODAY;
 			
 		}else{
 			throw new IllegalArgumentException("The query type is invalid.");
 		}
-		String sql = "SELECT ROUND(SUM(unit_price * order_count), 2) AS totalPrice, ROUND(SUM(commission * order_count), 2) AS commission, MAX(waiter) AS waiter, staff_id FROM " + Params.dbName + "." + orderTbl + 
-					" WHERE (food_status & " + Food.COMMISSION + ") <> 0 " +
-					" AND commission <> 0 " +
-					" AND order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +
-					" AND restaurant_id = " + staff.getRestaurantId() + " " +
-					(extraCond != null ? extraCond : "") +
-					" GROUP BY staff_id ";
+		String sql;
+		sql = " SELECT " +
+			  " ROUND(SUM(OFH.unit_price * OFH.order_count), 2) AS totalPrice, " +
+			  " ROUND(SUM(OFH.commission * OFH.order_count), 2) AS commission, MAX(OFH.waiter) AS waiter, " +
+			  " OFH.staff_id " +
+			  " FROM " + Params.dbName + "." + orderFoodTbl + " OFH " +
+			  " JOIN " + Params.dbName + "." + orderTbl + " OH ON 1 = 1 " +
+			  " AND OH.id = OFH.order_id " +
+			  " AND OH.restaurant_id = " + staff.getRestaurantId() + 
+			  " AND OH.order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +
+			  " WHERE (OFH.food_status & " + Food.COMMISSION + ") <> 0 " +
+			  " AND OFH.commission <> 0 " +
+			  (extraCond != null ? extraCond : "") +
+			  " GROUP BY OFH.staff_id ";
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
-		List<CommissionStatistics> list = new ArrayList<CommissionStatistics>();
+		List<CommissionStatistics> result = new ArrayList<CommissionStatistics>();
 		while(dbCon.rs.next()){
 			CommissionStatistics c = new CommissionStatistics();
 			c.setWaiter(dbCon.rs.getString("waiter"));
 			c.setTotalPrice(dbCon.rs.getFloat("totalPrice"));
 			c.setCommission(dbCon.rs.getFloat("commission"));
-			list.add(c);
+			result.add(c);
 		}
-		return list;
+		dbCon.rs.close();
+		
+		return Collections.unmodifiableList(result);
 	}
 	 
 }
