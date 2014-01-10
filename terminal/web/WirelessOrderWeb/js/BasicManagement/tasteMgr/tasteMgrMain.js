@@ -300,7 +300,7 @@ function initTasteOperatorWin(){
 		tasteOperatorWin = new Ext.Window({
 			id : 'taste_tasteOperatorWin',
 			title : '添加',
-			width : 280,
+			width : 310,
 			closeAction : 'hide',
 			closable : false,
 			resizable : false,
@@ -308,7 +308,7 @@ function initTasteOperatorWin(){
 			items : [{
 				layout : 'form',
 				labelWidth : 60,
-				width : 280,
+				width : 310,
 				border : false,
 				frame : true,
 				items : [{
@@ -316,7 +316,7 @@ function initTasteOperatorWin(){
 					fieldLabel : '名称',
 					id : 'txtTasteName',
 					allowBlank : false,
-					width : 160,
+					width : 210,
 					listeners : {
 						focus : function(e){
 							e.focus(true, 100);
@@ -333,7 +333,7 @@ function initTasteOperatorWin(){
 					xtype : 'combo',
 					fieldLabel : '类型',
 					forceSelection : true,
-					width : 160,
+					width : 210,
 //					value : '规格',
 					id : 'comboTasteCate',
 					store : new Ext.data.SimpleStore({
@@ -352,19 +352,18 @@ function initTasteOperatorWin(){
 						select : function(e){
 							var data = Ext.ux.getSelData(tasteGrid);
 							var tastePrice = Ext.getCmp('numTastePrice');
-							var tasteRate = Ext.getCmp('numTasteRate');
-							var displayCalc = Ext.getCmp('txtDisplayCalc');
+							var tasteRate = Ext.getCmp('panelTasteRate');
+//							var displayCalc = Ext.getCmp('txtDisplayCalc');
 							if(data['typeValue'] == 1){
 								tastePrice.setDisabled(true);
-								tasteRate.setDisabled(false);
+								tasteRate.show();
 								tastePrice.setValue(0);
-								displayCalc.setValue('按比例');
+//								displayCalc.setValue('按比例');
 								
 							}else{
 								tastePrice.setDisabled(false);
-								tasteRate.setDisabled(true);
-								tasteRate.setValue(0);
-								displayCalc.setValue('按价格');
+								tasteRate.hide();
+//								displayCalc.setValue('按价格');
 							}
 						},
 						render : function(e){
@@ -373,18 +372,19 @@ function initTasteOperatorWin(){
 					}
 				}, {
 					xtype : 'numberfield',
-					fieldLabel : '价格',
+					fieldLabel : '加收价钱',
 					id : 'numTastePrice',
 					value : 0.00,
 					allowBlank : false,
-					width : 160
-				}, {
+					width : 210
+				}, 
+/*					{
 					xtype : 'numberfield',
 					fieldLabel : '比例',
 					id : 'numTasteRate',
 					value : 0.00,
 					allowBlank : false,
-					width : 160,
+					width : 170,
 					validator : function(v) {
 						if (v < 0.00 || v > 9.99) {
 							return '比例范围是 0.00 至 9.99';
@@ -392,17 +392,97 @@ function initTasteOperatorWin(){
 							return true;
 						}
 					}
-				}, {
+				}, */
+/*				{
 					xtype : 'textfield',
 					id : 'txtDisplayCalc',
 					fieldLabel : '计算方式',
 					readOnly : true,
 					disabled : true,
-					width : 160,
+					width : 170,
 					value : '按价格'
-				}, {
+				}, */
+				{
 					xtype:'hidden',
 					id:'hideTasteId'
+				},{
+					layout : 'column',
+					id : 'panelTasteRate',
+					frame : true,
+					border : false,
+					frame : false,
+					defaults : {
+						columnWidth : .20,
+						labelWidth : 40
+					},
+					items : [{
+						columnWidth : .25,
+						xtype : 'label',
+						labelWidth : 60,
+						html : '加收比率:&nbsp; '
+					},{
+						columnWidth : .18,
+						items : [{
+							xtype : 'radio',
+							name : 'tasteRate',
+							id : 'rdoFifty',
+							inputValue : 1,
+							hideLabel : true,
+//							checked : true,
+							boxLabel : '50%'
+						}]
+					}, {
+						
+						items : [{
+							xtype : 'radio',
+							name : 'tasteRate',
+							inputValue : 2,
+							hideLabel : true,
+							boxLabel : '100%'
+						}]
+					},{
+						columnWidth : .15,
+						items : [{
+							xtype : 'radio',
+							id : 'radioTasteRate',
+							name : 'tasteRate',
+							inputValue : 3,
+							hideLabel : true,
+							boxLabel : '其他',
+							listeners : {
+								check  : function(thiz, checked){
+									var tasteRate = Ext.getCmp('numTasteRateOther');
+									if(checked){
+										tasteRate.enable();
+										tasteRate.focus();
+									}else{
+										tasteRate.disable();
+										tasteRate.setValue();
+										tasteRate.clearInvalid();
+									}
+								}
+							}
+						}]
+					},{
+						items : [{
+							xtype : 'numberfield',
+							id : 'numTasteRateOther',
+							allowBlank : false,
+							disabled : true,
+							width : 30,
+							validator : function(v) {
+								if (v < 0.00 || v > 100) {
+									return '比例范围是 0.00 至 100';
+								} else {
+									return true;
+								}
+							}
+						},{
+							xtype : 'tbtext',
+							text : '%'
+						}]
+					}]
+						
 				}]
 			}],
 			keys : [{
@@ -423,11 +503,13 @@ function initTasteOperatorWin(){
 		    	id : 'btnSaveTaste',
 		    	iconCls : 'btn_save',
 				handler : function() {
+					var otherTasteRate = 0;
 					var tasteId = Ext.getCmp('hideTasteId');
 					var tasteName = Ext.getCmp('txtTasteName');
 					var tastePrice = Ext.getCmp('numTastePrice');
-					var tasteRate = Ext.getCmp('numTasteRate');
+					var numTasteRate = Ext.getCmp('numTasteRateOther');
 					var tasteCate = Ext.getCmp('comboTasteCate');
+					var tasteRate = document.getElementsByName('tasteRate');
 					
 					if(!tasteCate.isValid() || !tasteName.isValid()){
 						return;
@@ -436,12 +518,25 @@ function initTasteOperatorWin(){
 						if(!tastePrice.isValid()){
 							return;
 						}
-					}else if(tasteCate.getValue() == 2){
-						if(!tasteRate.isValid()){
-							return;
-						}
 					}
-
+					if(!numTasteRate.isValid()){
+						return;
+					}
+					
+					if(Ext.getCmp('panelTasteRate').isVisible()){
+						for ( var i = 0; i < tasteRate.length; i++) {
+							if(tasteRate[i].checked){
+								if(tasteRate[i].value == 1){
+									otherTasteRate = 0.5;
+								}else if(tasteRate[i].value == 2){
+									otherTasteRate = 1;
+								}else{
+									otherTasteRate = eval(numTasteRate.getValue() / 100);
+								};
+							}
+						}
+						
+					}
 					
 					var btnSave = Ext.getCmp('btnSaveTaste');
 					var btnCancel = Ext.getCmp('btnCancelTasteWin');
@@ -455,7 +550,7 @@ function initTasteOperatorWin(){
 							id : tasteId.getValue(),
 							name : tasteName.getValue(),
 							price : tastePrice.getValue(),
-							rate : tasteRate.getValue(),
+							rate : otherTasteRate,
 							cate : tasteCate.getValue()
 						},
 						success : function(res, opt) {
@@ -524,6 +619,7 @@ Ext.onReady(function() {
 		root : new Ext.tree.AsyncTreeNode({
 			expanded : true,
 			text : '全部',
+			tasteCateName : '全部',
 			leaf : false,
 			id : -1
 		}),
@@ -562,7 +658,11 @@ Ext.onReady(function() {
 			click : function(e){
 				Ext.getCmp('btnSerachForTasteBasic').handler();
 				Ext.getDom('lblTasteCateName').innerHTML = e.attributes.tasteCateName;
-
+				if(e.attributes.tasteCateName == '规格'){
+					tastem_add = false;
+				}else{
+					tastem_add = true;
+				}
 			}
 /*			,
 			enddrag : function(t,n,e){
@@ -736,12 +836,13 @@ function tasteInsertHandler(){
 	}
 	tasteOperatorWin.otype = Ext.ux.otype['insert'];
 	tasteOperatorWin.show();
-	tasteOperatorWin.center();
+	
 	tasteOperatorWin.setTitle("添加新口味信息");
 	operatorWinData({
 		otype : Ext.ux.otype['set'],
 		data : {}
 	});
+	tasteOperatorWin.center();
 }
 function tasteUpdateHandler(){
 	var data = Ext.ux.getSelData(tasteGrid);
@@ -767,13 +868,13 @@ function operatorWinData(c){
 	var tasteId = Ext.getCmp('hideTasteId');
 	var tasteName = Ext.getCmp('txtTasteName');
 	var tastePrice = Ext.getCmp('numTastePrice');
-	var tasteRate = Ext.getCmp('numTasteRate');
 	var tasteCate = Ext.getCmp('comboTasteCate');
+	var tasteRate = document.getElementsByName('tasteRate');
 	
 	if(c.otype == Ext.ux.otype['set']){
 		tasteId.setValue(c.data['id']);
 		tasteName.setValue(c.data['name']);
-		tasteCate.setValue(typeof c.data['cateValue'] == 'undefined' ? Ext.ux.getSelNode(tmm_tasteTree).id : c.data['cateValue']);
+		tasteCate.setValue(typeof c.data['cateValue'] == 'undefined' ? Ext.ux.getSelNode(tmm_tasteTree)?Ext.ux.getSelNode(tmm_tasteTree).id : '' : c.data['cateValue']);
 		tasteCate.fireEvent('select', tasteCate);
 		if(c.data['typeValue'] == 1){
 			tasteCate.getEl().up('.x-form-item').setDisplayed(false);
@@ -781,11 +882,17 @@ function operatorWinData(c){
 			tasteCate.getEl().up('.x-form-item').setDisplayed(true);
 		}
 		tastePrice.setValue(typeof c.data['price'] == 'undefined' ? 0 : c.data['price']);
-		tasteRate.setValue(typeof c.data['rate'] == 'undefined' ? 0 : c.data['rate']);
+		
+		if(typeof c.data['rate'] == 'undefined'){
+			document.getElementById('rdoFifty').checked = true;
+		}else{
+			document.getElementById('radioTasteRate').checked = true;
+			Ext.getCmp('radioTasteRate').fireEvent('check', Ext.getCmp('radioTasteRate'), true);
+			Ext.getCmp('numTasteRateOther').setValue(c.data['rate'] * 100);
+		}
 		
 		tasteName.clearInvalid();
 		tastePrice.clearInvalid();
-		tasteRate.clearInvalid();
 		tasteCate.clearInvalid();
 		tasteName.focus();
 	}else if(c.otype == Ext.ux.otype['get']){

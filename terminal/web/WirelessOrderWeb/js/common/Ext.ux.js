@@ -450,7 +450,7 @@ Ext.ux.formatFoodName = function(record, iname, name){
 	if(Ext.ux.cfs.isWeigh(status))
 		img += '&nbsp;<img src="../../images/weight.png"></img>';
 	if(Ext.ux.cfs.isCommission(status))
-		img += '&nbsp;<img src="../../images/weight.png"></img>';
+		img += '&nbsp;<img src="../../images/commission.png"></img>';
 	if (record.get('temporary') || record.get('isTemporary'))
 		img += '&nbsp;<img src="../../images/tempDish.png"></img>';
 	

@@ -1010,7 +1010,7 @@ var basicOperationPanel = new Ext.Panel({
 		 	    	xtype : 'checkbox',
 		 	    	id : 'chbForBasicCommission',
 		 	    	hideLabel : true,
-		 	    	boxLabel : '<img title="提成" src="../../images/weight.png"></img>',
+		 	    	boxLabel : '<img title="提成" src="../../images/commission.png"></img>',
 		 	    	listeners : {
 		 	    		check : function(checkbox, checked){
 							if(checked){
