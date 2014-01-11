@@ -58,13 +58,20 @@ public class MemberReceiptContent extends ConcreteContent {
 		
 		if(mMo.getOperationType() == OperationType.CONSUME){
 			
-			s.append(new Grid2ItemsContent("本次消费：" + NumericUtil.float2String(mMo.getPayMoney()),
-										   "本次积分：" + mMo.getDeltaPoint(),
-										   getStyle())).append(SEP);
+			if(mMo.getDeltaPoint() > 0){
 			
-			s.append(new Grid2ItemsContent("可用余额：" + (mMo.getRemainingBaseMoney() + mMo.getRemainingExtraMoney()),
-										   "可用积分：" + mMo.getRemainingPoint(),
-										   getStyle())).append(SEP);
+				s.append(new Grid2ItemsContent("本次消费：" + NumericUtil.float2String(mMo.getPayMoney()),
+											   "本次积分：" + mMo.getDeltaPoint(),
+											   getStyle())).append(SEP);
+				
+				s.append(new Grid2ItemsContent("可用余额：" + (mMo.getRemainingBaseMoney() + mMo.getRemainingExtraMoney()),
+											   "可用积分：" + mMo.getRemainingPoint(),
+											   getStyle())).append(SEP);
+			}else{
+				s.append(new Grid2ItemsContent("本次消费：" + NumericUtil.float2String(mMo.getPayMoney()),
+						   					   "可用余额：" + (mMo.getRemainingBaseMoney() + mMo.getRemainingExtraMoney()),
+						   					   getStyle())).append(SEP);
+			}
 			
 		}else if(mMo.getOperationType() == OperationType.CHARGE){
 			
