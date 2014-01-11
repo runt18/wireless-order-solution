@@ -20,7 +20,6 @@
 		}
 	}
 });
-
 var btnLogOut = new Ext.ux.ImageButton({
 	imgPath : "../../images/ResLogout.png",
 	imgWidth : 50,

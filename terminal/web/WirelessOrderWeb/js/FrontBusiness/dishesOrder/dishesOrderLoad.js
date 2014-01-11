@@ -11,7 +11,6 @@
 		orderPanel.setTitle(orderPanel.title + String.format(' -- 餐台号: <font color="red">{0}</font>', tableAliasID));
 	}
 };
-
 // loading taste 
 function tasteOnLoad() {
 	Ext.Ajax.request({
