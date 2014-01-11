@@ -273,7 +273,7 @@ public class AskOrderAmountDialog extends DialogFragment{
 			public void afterTextChanged(Editable s) {
 				mPinZhu = s.toString().trim();
    				if(mPinZhu != null || mPriceToPinZhu != 0){
-   					mSelectedFood.getTasteGroup().setTmpTaste(Taste.newTmpTaste(mPinZhu, mPriceToPinZhu));
+   					mSelectedFood.setTmpTaste(Taste.newTmpTaste(mPinZhu, mPriceToPinZhu));
    				}
 				getDialog().setTitle(mSelectedFood.toString());
 			}
