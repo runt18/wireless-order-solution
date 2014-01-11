@@ -68,6 +68,10 @@ function tasteGridRenderer(value, cellmeta, record, rowIndex, columnIndex, store
 	return operate;
 };
 
+function tasteRateFormat(v){
+	return (v * 100) + '%';
+}
+
 function initTasteGrid(){
 	var tasteGridTbar = new Ext.Toolbar({
 		height : 26,
@@ -176,7 +180,7 @@ function initTasteGrid(){
 			[true, false, false, true], 
 			['名称', 'name'],
 			['价格', 'price',,'right','Ext.ux.txtFormat.gridDou'],
-			['比例', 'rate',,'right','Ext.ux.txtFormat.gridDou'],
+			['比例', 'rate',,'right','tasteRateFormat'],
 			['计算方式', 'calcText',,'center'],
 			['类型', 'cateText',,'center'],
 			['操作', '',,'center','tasteGridRenderer']
@@ -608,7 +612,7 @@ Ext.onReady(function() {
 		rootVisible : true,
 		border : true,
 		frame : true,
-//		enableDD : true,
+		enableDD : true,
 		bodyStyle : 'backgroundColor:#FFFFFF; border:1px solid #99BBE8;',
 		loader : new Ext.tree.TreeLoader({
 			dataUrl : '../../QueryTasteCate.do',
@@ -664,7 +668,7 @@ Ext.onReady(function() {
 					tastem_add = true;
 				}
 			}
-/*			,
+			,
 			enddrag : function(t,n,e){
 				var cateB;
 				if(n.nextSibling != null){
@@ -687,7 +691,7 @@ Ext.onReady(function() {
 					}
 				});
 				
-			}*/
+			}
 		}
 	});
 	

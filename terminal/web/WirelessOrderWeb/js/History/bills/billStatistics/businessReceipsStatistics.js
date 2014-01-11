@@ -1,4 +1,6 @@
-﻿var receivablesStatResultStore = new Ext.data.Store({
+﻿receivablesStaticRecordCount = 22;
+
+var receivablesStatResultStore = new Ext.data.Store({
 	proxy : new Ext.data.HttpProxy({
 		url : "../../BusinessReceiptsStatistics.do"
 	}),

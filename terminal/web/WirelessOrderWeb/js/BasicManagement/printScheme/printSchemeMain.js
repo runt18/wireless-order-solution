@@ -718,9 +718,10 @@ if(!printerWin){
 				var printerAlias = Ext.getCmp('txtPrinterAlias');
 				var isEnabled = Ext.getCmp('enabled');
 				var styles = document.getElementsByName('pStyle');
+				var printerId = Ext.getCmp('printerId');
 				
 				var dataSource = '';
-				var printerId = '';
+				
 				var style = '';
 				
 				for ( var i = 0; i < styles.length; i++) {
@@ -739,8 +740,6 @@ if(!printerWin){
 				if(printerWin.operationType == 'insert'){
 					dataSource = 'insert';
 				}else if(printerWin.operationType == 'update'){
-					var sn = Ext.getCmp('printerTree').getSelectionModel().getSelectedNode();
-					printerId = sn.attributes.printerId;
 					dataSource = 'update';
 				}
 				else return;
@@ -750,7 +749,7 @@ if(!printerWin){
 						printerName : printerName.getValue(),
 						printerAlias : printerAlias.getValue(),
 						style : style,
-						printerId : printerId,
+						printerId : printerId.getValue(),
 						isEnabled : isEnabled,
 						dataSource : dataSource
 					},
@@ -840,6 +839,9 @@ if(!printerWin){
 					hideLabel : true,
 					boxLabel : '停用'
 				}]
+			},{
+				xtype : 'hidden',
+				id : 'printerId'
 			}]
 		}]
 		
@@ -1060,6 +1062,7 @@ function operatePrinterHandler(c){
 		printerWin.setTitle('修改打印机');
 		printerName.setValue(sn.attributes.name);
 		Ext.getCmp('txtPrinterAlias').setValue(sn.attributes.alias);
+		Ext.getCmp('printerId').setValue(sn.id);
 		var styles = document.getElementsByName('pStyle');
 	
 		if(styles[0].value == sn.attributes.styleValue){
