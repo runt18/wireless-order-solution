@@ -229,13 +229,10 @@ public class AskOrderAmountDialog extends DialogFragment{
 							if(isChecked){
 								buttonView.setBackgroundColor(buttonView.getResources().getColor(R.color.orange));
 								
-								if(!mSelectedFood.hasTasteGroup()){
-									mSelectedFood.makeTasteGroup();
-								} 
-								mSelectedFood.getTasteGroup().addTaste(thisTaste);
+								mSelectedFood.addTaste(thisTaste);
 							} else {
 								buttonView.setBackgroundColor(buttonView.getResources().getColor(R.color.green));
-								mSelectedFood.getTasteGroup().removeTaste(thisTaste);
+								mSelectedFood.removeTaste(thisTaste);
 							}
 							getDialog().setTitle(mSelectedFood.toString());
 						}
@@ -301,7 +298,7 @@ public class AskOrderAmountDialog extends DialogFragment{
 					}
 					
 	   				if(mPinZhu != null || mPriceToPinZhu != 0){
-	   					mSelectedFood.getTasteGroup().setTmpTaste(Taste.newTmpTaste(mPinZhu, mPriceToPinZhu));
+	   					mSelectedFood.setTmpTaste(Taste.newTmpTaste(mPinZhu, mPriceToPinZhu));
 	   				}
 	   				
 					getDialog().setTitle(mSelectedFood.toString());
