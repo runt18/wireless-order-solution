@@ -430,6 +430,7 @@ public class OrderDao {
 			sql = " SELECT " +
 				  " O.id, O.order_date, O.seq_id, O.custom_num, O.table_id, O.table_alias, O.table_name, " +
 				  " T.minimum_cost, T.service_rate AS tbl_service_rate, T.status AS table_status, " +
+				  " O.waiter, " +
 				  " O.region_id, O.region_name, O.restaurant_id, " +
 				  " O.member_id, O.member_operation_id, " +
 				  " O.settle_type, O.pay_type, O.category, O.status, O.service_rate, O.comment, " +
@@ -452,6 +453,7 @@ public class OrderDao {
 		}else if(dateType == DateType.HISTORY){
 			sql = " SELECT " +
 				  " OH.id, OH.order_date, OH.seq_id, OH.custom_num, OH.table_id, OH.table_alias, OH.table_name, " +
+				  " OH.waiter, " +
 				  " OH.region_id, OH.region_name, OH.restaurant_id, " +
 				  " OH.member_id, OH.member_operation_id, " +
 				  " OH.settle_type, OH.pay_type, OH.category, OH.status, 0 AS discount_id, OH.service_rate, OH.comment, " +
@@ -475,6 +477,7 @@ public class OrderDao {
 			orderInfo.setId(dbCon.rs.getInt("id"));
 			orderInfo.setSeqId(dbCon.rs.getInt("seq_id"));
 			orderInfo.setOrderDate(dbCon.rs.getTimestamp("order_date").getTime());
+			
 			orderInfo.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
 			orderInfo.setStatus(dbCon.rs.getInt("status"));
 			Table table = new Table();
