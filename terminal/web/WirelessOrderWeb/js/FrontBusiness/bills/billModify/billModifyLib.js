@@ -227,7 +227,7 @@ function submitOrderHandler(_c){
 				var normalTaste = '', tmpTaste = '' , tasteGroup = orderFoods[i].tasteGroup;
 				for(var j = 0; j < tasteGroup.normalTasteContent.length; j++){
 					var t = tasteGroup.normalTasteContent[j];
-					normalTaste += ((j > 0 ? '<<stnt>>' : '') + (t.id + '<<stb>>' + t.alias + '<<stb>>' + t.cateValue));
+					normalTaste += ((j > 0 ? '<<stnt>>' : '') + (t.id + '<<stb>>' + t.cateValue + '<<stb>>' + t.cateStatusValue));
 				}
 				if(tasteGroup.tmpTaste != null && typeof tasteGroup.tmpTaste != 'undefined'){
 					if(eval(tasteGroup.tmpTaste.id >= 0))
