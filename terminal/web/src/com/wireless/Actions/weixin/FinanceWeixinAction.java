@@ -350,11 +350,15 @@ public class FinanceWeixinAction extends Action {
 			int restaurantId = WeixinFinanceDao.getRestaurantIdByWeixin(dbCon, msg.getFromUserName());
 			Calendar c = Calendar.getInstance();
 			c.setTimeInMillis(System.currentTimeMillis());
+			c.add(Calendar.DAY_OF_MONTH, -1);
+			long endDate = c.getTimeInMillis();
+			
 			c.add(Calendar.DAY_OF_MONTH, -4);
+			long beginDate = c.getTimeInMillis();
 			
 			List<IncomeByEachDay> incomes = QueryIncomeStatisticsDao.getIncomeByEachDay(StaffDao.getStaffs(dbCon, restaurantId).get(0), 
-														DateUtil.format(c.getTimeInMillis(), DateUtil.Pattern.DATE),
-														DateUtil.format(System.currentTimeMillis(), DateUtil.Pattern.DATE)
+														DateUtil.format(beginDate, DateUtil.Pattern.DATE),
+														DateUtil.format(endDate, DateUtil.Pattern.DATE)
 														//"2013-08-1",
 														//"2013-08-5"
 														);
