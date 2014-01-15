@@ -5,27 +5,28 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no,maximum-scale=1">
 <title>促销信息</title>
 <link rel="stylesheet" href="./css/base.css">
+<link type="text/css" rel="stylesheet" href="./css/mbar.css">
+<link type="text/css" rel="stylesheet" href="./css/general_foundicons.css">
 <script type="text/javascript" src="../../jquery/jquery-1.8.2.min.js"></script>
 <script type="text/javascript" src="./js/Util.js"></script>
 <script type="text/javascript">
-var oid = Util.getParam('m');
-var fid = Util.getParam('r');
 $(function(){
+	Util.html('', function(html){ $(document.body).append(html);  });
 	$.ajax({
 		url : '../../WXQueryInfo.do',
 		dataType : 'json',
 		type : 'post',
 		data : {
 			dataSource : 'normal',
-			fid : fid
+			fid : Util.mp.fid
 		},
 		success : function(data, statuc, xhr){
 			if(data.success && data.root.length > 0){
-				document.body.innerHTML =  '<div style="margin: 10px 10px 10px 10px; text-align:center; font-size: 26px; font-weight: bold; word-wrap:break-word; color: #D2691E;">' + data.root[0].title + '</div>'
+				Util.getDom('divInfoContent').innerHTML =  '<div style="margin: 10px 10px 10px 10px; text-align:center; font-size: 26px; font-weight: bold; word-wrap:break-word; color: #D2691E;">' + data.root[0].title + '</div>'
 					+ '<div style="margin: 10px 10px 10px 10px; color:#aaa; font-szie:12px;">' + data.root[0].expiredFormat + '</div>'
 					+ '<div style="margin: 10px 10px 10px 10px; word-wrap:break-word;">' + data.root[0].desc + '</div>';
 			}else{
-				document.body.innerHTML = '';
+				Util.getDom('divInfoContent').innerHTML = '暂无促销信息';
 			}
 		},
 		error : function(xhr, errorType, error){
@@ -36,6 +37,8 @@ $(function(){
 </script>
 </head>
 <body>
-
+<div id="divInfoContent"></div>
+<div class="footer">&copy; 2014 技术支持：智易科技</div>
+<div style="height: 45px;">&nbsp;</div>
 </body>
 </html>

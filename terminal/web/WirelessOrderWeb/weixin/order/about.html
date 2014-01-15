@@ -5,37 +5,40 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no,maximum-scale=1">
 <title>餐厅简介</title>
 <link rel="stylesheet" href="./css/base.css">
+<link type="text/css" rel="stylesheet" href="./css/mbar.css">
+<link type="text/css" rel="stylesheet" href="./css/general_foundicons.css">
 <script type="text/javascript" src="../../jquery/jquery-1.8.2.min.js"></script>
 <script type="text/javascript" src="../../jquery/jquery.client.js"></script>
 <script type="text/javascript" src="./js/Util.js"></script>
 <script type="text/javascript">
-var params = {
-	fid : Util.getParam('r')
-};
 $.dom = function(id){ return document.getElementById(id); };
 $(function(){
+	Util.html('', function(html){ $(document.body).append(html);  });
 	$.ajax({
 		url : '../../WXOperateInfo.do',
 		dataType : 'json',
 		data : {
 			dataSource : 'getInfo',
-			fid : params.fid
+			fid : Util.mp.fid
 		},
 		success : function(data, status, xhr){
 			if(data.success){
-				document.body.innerHTML = data.other.info;
+				Util.getDom('divInfoContent').innerHTML = data.other.info;
 			}else{
 				alert(data.msg)
+				Util.getDom('divInfoContent').innerHTML = '暂无简介信息';
 			}
 		},
 		error : function(xhr, errorType, error){
-			alert('加载菜品信息失败.');
+			alert('加载简介信息失败.');
 		}
 	});
 });
 </script>
 </head>
 <body>
-
+<div id="divInfoContent"></div>
+<div class="footer">&copy; 2014 技术支持：智易科技</div>
+<div style="height: 45px;">&nbsp;</div>
 </body>
 </html>
