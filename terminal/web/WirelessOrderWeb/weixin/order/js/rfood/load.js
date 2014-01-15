@@ -8,13 +8,14 @@ var Templet = {
 			+ '<div style="width: 50px; text-align: right; color: #0000FF;">¥:{unitPrice}</div>'
 		+ '</div>'
 		+ '<div>{desc}</div>'
-		+ '<div class="box-horizontal">'
-			+ '<div style="-webkit-box-flex: 1; text-align: center; border-right: 1px solid #ddd; ">分享&nbsp;8888</div>'
-			+ '<div style="-webkit-box-flex: 1; text-align: center; ">赞&nbsp;8888</div>'
-		+ '</div>'
+//		+ '<div class="box-horizontal">'
+//			+ '<div style="-webkit-box-flex: 1; text-align: center; border-right: 1px solid #ddd; ">分享&nbsp;8888</div>'
+//			+ '<div style="-webkit-box-flex: 1; text-align: center; ">赞&nbsp;8888</div>'
+//		+ '</div>'
 		+ '</div>'
 };
 $(function(){
+	Util.html('', function(html){ $(document.body).append(html);  });
 	$.ajax({
 		url : '../../WXQueryFood.do',
 		dataType : 'json',

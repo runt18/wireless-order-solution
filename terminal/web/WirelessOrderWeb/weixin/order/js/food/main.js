@@ -207,8 +207,38 @@ function operateShoppingCart(c){
 		scBox.addClass('left-nav-hide');
 		scMainView.html(html.join(''));
 	}else if(c.otype == 'confirm'){
+		if(params.orderData.length == 0){
+			alert("您的购物车没有菜品, 请先选菜.");
+			return;
+		}
 		if(confirm('是否确定下单?')){
-			alert('后台对接....................')
+			var foods = "";
+			for(var i = 0; i < params.orderData.length; i++){
+				temp = params.orderData[i];
+				if(i > 0) foods += '<<si>>';
+				foods += (temp.id + '<<sa>>' + temp.count);
+			}
+			$.ajax({
+				url : '../../WXOperateOrder.do',
+				dataType : 'json',
+				type : 'post',
+				data : {
+					dataSource : 'insertOrder',
+					oid : Util.mp.oid,
+					fid : Util.mp.fid,
+					foods : foods
+				},
+				success : function(data, status, xhr){
+					if(data.success){
+						alert(data.msg + '\n菜单标识码是: ' + data.other.order.code + '');
+					}else{
+						alert(data.msg);			
+					}
+				},
+				error : function(xhr, errorType, error){
+					alert('下单失败.');
+				}
+			});
 		}
 	}
 }
