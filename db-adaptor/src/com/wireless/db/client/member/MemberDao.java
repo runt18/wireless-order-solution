@@ -520,7 +520,7 @@ public class MemberDao {
 	 * 			throws if the card to new member has been exist before
 	 * 			throws if the member type does NOT exist
 	 */
-	private static void checkValid(DBCon dbCon, Member memberToCheck) throws SQLException, BusinessException{
+	public static void checkValid(DBCon dbCon, Member memberToCheck) throws SQLException, BusinessException{
 		String querySQL;
 		// 检查手机号码
 		querySQL = "SELECT member_id FROM " + Params.dbName + ".member "

@@ -10,6 +10,7 @@ import com.wireless.db.weixin.restaurant.WeixinRestaurantDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.WeixinMemberError;
 import com.wireless.pojo.client.Member;
+import com.wireless.pojo.staffMgr.Staff;
 
 public class WeixinMemberDao {
 	
@@ -273,13 +274,15 @@ public class WeixinMemberDao {
 	 * 			throws if the mobile to update has been exist before
 	 */
 	public static void updateMobile(DBCon dbCon, String mobile, String weixinMemberSerial, String weixinRestaurantSerial) throws SQLException, BusinessException{
-		
 		int memberId = getBoundMemberIdByWeixin(dbCon, weixinMemberSerial, weixinRestaurantSerial);
 		int restaurantId = WeixinRestaurantDao.getRestaurantIdByWeixin(dbCon, weixinRestaurantSerial);
-		
-		MemberDao.update(dbCon, 
-						 StaffDao.getStaffs(dbCon, restaurantId).get(0),
-						 new Member.UpdateBuilder(memberId, restaurantId).setMobile(mobile));
+		Staff staff = StaffDao.getStaffs(dbCon, restaurantId).get(0);
+		Member member = MemberDao.getMemberById(dbCon, staff, memberId);
+		member.setMobile(mobile);
+		MemberDao.checkValid(dbCon, member);
+		String updateSQL = " UPDATE " + Params.dbName + ".member SET mobile = " + "'" + member.getMobile() + "' WHERE member_id = " + member.getId(); 
+		dbCon.stmt.executeUpdate(updateSQL);
+//		MemberDao.update(dbCon, staff, new Member.UpdateBuilder(memberId, restaurantId).setMobile(mobile));
 	}
 	
 	/**
