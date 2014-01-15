@@ -122,6 +122,15 @@ public class WXOperateMemberAction extends DispatchAction {
 		return null;
 	}
 	
+	/**
+	 * 
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
 	public ActionForward bind(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
@@ -180,5 +189,50 @@ public class WXOperateMemberAction extends DispatchAction {
 		}
 		return null;
 	}
-
+	
+	/**
+	 * 重新绑定手机号码
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward rebind(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		request.setCharacterEncoding("UTF-8");
+		response.setCharacterEncoding("UTF-8");
+		JObject jobject = new JObject();
+		DBCon dbCon = null;
+		try{
+			String openId = request.getParameter("oid");
+			String formId = request.getParameter("fid");
+			String codeId = request.getParameter("codeId");
+			String code = request.getParameter("code");
+			
+			dbCon = new DBCon();
+			dbCon.connect();
+			dbCon.conn.setAutoCommit(false);
+			
+			// 验证验证码
+			VerifySMSDao.verify(dbCon, new VerifyBuilder(Integer.valueOf(codeId), Integer.valueOf(code)));
+			// 修改手机号码
+			WeixinMemberDao.updateMobile(dbCon, request.getParameter("mobile"), openId, formId);
+			
+			dbCon.conn.commit();
+			jobject.initTip(true, "操作成功, 已重新绑定手机号码.");
+		}catch(BusinessException e){
+			e.printStackTrace();
+			jobject.initTip(e);
+		}catch(Exception e){
+			e.printStackTrace();
+			jobject.initTip(e);
+		}finally{
+			if(dbCon != null) dbCon.disconnect();
+			response.getWriter().print(jobject.toString());
+		}
+		return null;
+	}
 }

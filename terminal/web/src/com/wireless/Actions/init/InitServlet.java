@@ -32,16 +32,13 @@ public class InitServlet extends ActionServlet {
 			throw new ServletException(e);
 		}
 		
-		
 		try {
-			
 			OSSParams.init(getServletConfig().getInitParameter("oss_access_id"),
 					   	   getServletConfig().getInitParameter("oss_access_key"), 
 					   	   getServletConfig().getInitParameter("oss_inner_point"), 
 					   	   getServletConfig().getInitParameter("oss_outer_point"));
-			
-			OSSUtil.init(OSSParams.instance(), 
-						 getServletConfig().getInitParameter("oss_bucket_image"));
+			/**/
+			OSSUtil.init(OSSParams.instance(), getServletConfig().getInitParameter("oss_bucket_image"));
 			
 		} catch (Exception e) {
 			throw new ServletException(e);
