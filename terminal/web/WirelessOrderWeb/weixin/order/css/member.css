@@ -1,13 +1,13 @@
 body{
-	background-color: #f7f7f7;
+	background-color: #f5f5f5;
 }
-#divMemberCard, #divMemberContent, #divVerifyAndBind{
+#divMemberCard, #divMemberContent, #divVerifyAndBind, #divResetMobile{
 	display: none;
 }
 
 #divMemberCard {
 	height: 192px;
-	background-image: url(../../member_card.jpg);
+	background-image: url(../member_card.jpg);
 	background-size: 100% 100%; 
 	text-align: right;
 }
@@ -49,3 +49,9 @@ input[type=text], input[type=number]{
 		
 }
 
+#divResetMobile > div > div[class*=button]{
+	z-index: 10;
+	text-align: center;
+	font-weight: bold;
+	font-size: 14px;
+}
