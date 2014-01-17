@@ -35,8 +35,8 @@ Ext.ux.plugins.createImageFile = function(config){
  	        	    				img.src = Ext.BLANK_IMAGE_URL;
  	        	    				if(img.filters.length == 0){
  	        	    					img.style.filter = 'progid:DXImageTransform.Microsoft.AlphaImageLoader(sizingMethod=scale)';
- 	        	    					img.style.width = '400px';
- 	        	    					img.style.height = '300px';
+ 	        	    					img.style.width = typeof config.width == 'number' ? config.width+'px' : '400px';
+ 	        	    					img.style.height = typeof config.height == 'number' ? config.height+'px' : '300px';
  	        	    				}
  	        	    				img.filters.item("DXImageTransform.Microsoft.AlphaImageLoader").src = imgURL; 	        	    					
  	        	    			}else{
@@ -88,6 +88,20 @@ Ext.ux.plugins.createImageFile = function(config){
 			}
 			img.removeAttribute('src');
 			file.value = '';
+		}
+	};
+	img.setImg = function(iurl){
+		var img = Ext.getDom(config.img.getId());
+		if(Ext.isIE){
+			img.src = Ext.BLANK_IMAGE_URL;
+			if(img.filters.length == 0){
+				img.style.filter = 'progid:DXImageTransform.Microsoft.AlphaImageLoader(sizingMethod=scale)';
+				img.style.width = typeof config.width == 'number' ? config.width+'px' : '400px';
+				img.style.height = typeof config.height == 'number' ? config.height+'px' : '300px';
+			}
+			img.filters.item("DXImageTransform.Microsoft.AlphaImageLoader").src = iurl;
+		}else{
+			img.src = iurl;
 		}
 	};
 	return img;
