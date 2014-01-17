@@ -110,7 +110,7 @@ var tabs = new Ext.TabPanel({
     
 });
 
-var wx = {info:{},sales:{}};
+var wx = {info:{},sales:{}, logo:{}};
 Ext.onReady(function(){
 	wx.lm = new Ext.LoadMask(document.body, {
 		title : ''
@@ -232,12 +232,11 @@ Ext.onReady(function(){
 							businessStatWin.center();
 						}else if(e.attributes.mId == "WXInfo"){
 							operateWXInfo();
+						}else if(e.attributes.mId == "WXLogo"){
+							operateWXLogo();
 						}
-						
 					}
-					
 				}
-
 			}
 		}
 	});
