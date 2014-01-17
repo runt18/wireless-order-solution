@@ -25,12 +25,12 @@ wx.sales.operateSalseData = function(c){
 			height : 420,
 			allowBlank : false,
 			enableAlignments: false,
-	        enableColors: false,
+	        enableColors: true,
 	        enableFont: false,
 	        enableFontSize: true,
 	        enableFormat: true,
 	        enableLinks: false,
-	        enableLists: true,
+	        enableLists: false,
 	        enableSourceEdit: true,
 	        plugins : [new Ext.ux.plugins.HEInsertImage({
 	        	url : '../../WXOperateMaterial.do?dataSource=upload&time=' + new Date().getTime()
