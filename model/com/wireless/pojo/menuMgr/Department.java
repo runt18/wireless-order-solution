@@ -15,6 +15,38 @@ public class Department implements Parcelable, Comparable<Department>, Jsonable{
 	public final static byte DEPT_PARCELABLE_COMPLEX = 0;
 	public final static byte DEPT_PARCELABLE_SIMPLE = 1;
 	
+	public static class SwapDisplayBuilder{
+		private final int idA;
+		private final int idB;
+		public SwapDisplayBuilder(int idA, int idB){
+			this.idA = idA;
+			this.idB = idB;
+		}
+		
+		public int getIdA(){
+			return this.idA;
+		}
+		
+		public int getIdB(){
+			return this.idB;
+		}
+	}
+	
+	public static class AddBuilder{
+		private final String name;
+		public AddBuilder(String name){
+			if(name.length() == 0){
+				throw new IllegalArgumentException("The department name should NOT be empty.");
+			}else{
+				this.name = name;
+			}
+		}
+		
+		public Department build(){
+			return new Department(this);
+		}
+	}
+	
 	//The helper class to build a new department
 	public static class InsertBuilder{
 		private final int restaurantId;
@@ -45,6 +77,27 @@ public class Department implements Parcelable, Comparable<Department>, Jsonable{
 		}
 	}
 	
+	public static class UpdateBuilder{
+		private final DeptId deptId;
+		private final String name;
+		public UpdateBuilder(DeptId deptId, String name){
+			if(name.length() == 0){
+				throw new IllegalArgumentException("The department name should NOT be empty.");
+			}else{
+				this.name = name;
+			}
+			if(deptId.getType() != Type.NORMAL){
+				throw new IllegalArgumentException("The type to dept id should belong to normal.");
+			}else{
+				this.deptId = deptId;
+			}
+		}
+		
+		public Department build(){
+			return new Department(this);
+		}
+	}
+	
 	public static enum DeptId{
 		DEPT_1(0, "部门1", Type.NORMAL),
 		DEPT_2(1, "部门2", Type.NORMAL),
@@ -56,10 +109,10 @@ public class Department implements Parcelable, Comparable<Department>, Jsonable{
 		DEPT_8(7, "部门8", Type.NORMAL),
 		DEPT_9(8, "部门9", Type.NORMAL),
 		DEPT_10(9, "部门10", Type.NORMAL),
-		DEPT_WAREHOUSE(252, "总仓", Type.RESERVED),
-		DEPT_TMP(253, "临时部门", Type.RESERVED),
-		DEPT_ALL(254, "全部部门", Type.RESERVED),
-		DEPT_NULL(255, "空部门", Type.RESERVED);
+		DEPT_WAREHOUSE(252, "总仓", Type.WARE_HOUSE),
+		DEPT_TMP(253, "临时部门", Type.TEMP),
+		//DEPT_ALL(254, "全部部门", Type.RESERVED),
+		DEPT_NULL(255, "空部门", Type.NULL);
 
 
 		private final int val;
@@ -101,7 +154,10 @@ public class Department implements Parcelable, Comparable<Department>, Jsonable{
 	
 	public static enum Type{
 		NORMAL(0, "普通"),
-		RESERVED(1, "保留");
+		IDLE(1, "保留"),
+		WARE_HOUSE(2, "总仓"),
+		TEMP(3, "临时"),
+		NULL(4, "空");
 		
 		private final int val;
 		private final String desc;
@@ -138,12 +194,23 @@ public class Department implements Parcelable, Comparable<Department>, Jsonable{
 	private short deptId;
 	private String deptName;
 	private Type deptType = Type.NORMAL;
+	private int displayId;
 
 	private Department(InsertBuilder builder){
 		this.restaurantId = builder.restaurantId;
 		this.deptId = builder.deptId;
 		this.deptName = builder.deptName;
 		this.deptType = builder.deptType;
+	}
+	
+	private Department(UpdateBuilder builder){
+		this.deptId = builder.deptId.getVal();
+		this.deptName = builder.name;
+	}
+	
+	private Department(AddBuilder builder){
+		this.deptName = builder.name;
+		this.deptType = Type.NORMAL;
 	}
 	
 	public Department(){
@@ -156,11 +223,12 @@ public class Department implements Parcelable, Comparable<Department>, Jsonable{
 		this.deptName = deptName;
 	}
 	
-	public Department(String deptName, short deptId, int restaurantId, Type type){
+	public Department(String deptName, short deptId, int restaurantId, Type type, int displayId){
 		this.restaurantId = restaurantId;
 		this.deptId = deptId;
 		this.deptName = deptName;
 		this.deptType = type;
+		this.displayId = displayId;
 	}
 	
 	public int getRestaurantId() {
@@ -179,9 +247,17 @@ public class Department implements Parcelable, Comparable<Department>, Jsonable{
 		this.deptId = deptId;
 	}
 	
+	public void setDisplayId(int displayId){
+		this.displayId = displayId;
+	}
+	
+	public int getDisplayId(){
+		return this.displayId;
+	}
+	
 	public String getName() {
 		if(deptName == null){
-			deptName = "";
+			return "";
 		}
 		return this.deptName;
 	}
@@ -206,8 +282,20 @@ public class Department implements Parcelable, Comparable<Department>, Jsonable{
 		return this.deptType == Type.NORMAL;
 	}
 	
-	public boolean isReserved(){
-		return this.deptType == Type.RESERVED;
+	public boolean isIdle(){
+		return this.deptType == Type.IDLE;
+	}
+	
+	public boolean isTemp(){
+		return this.deptType == Type.TEMP;
+	}
+	
+	public boolean isNull(){
+		return this.deptType == Type.NULL;
+	}
+	
+	public boolean isWare(){
+		return this.deptType == Type.WARE_HOUSE;
 	}
 	
 	@Override
@@ -242,6 +330,7 @@ public class Department implements Parcelable, Comparable<Department>, Jsonable{
 			dest.writeByte(this.deptId);
 			dest.writeByte(this.deptType.getVal());
 			dest.writeString(this.deptName);
+			dest.writeInt(this.displayId);
 		}
 	}
 
@@ -254,6 +343,7 @@ public class Department implements Parcelable, Comparable<Department>, Jsonable{
 			this.deptId = source.readByte();
 			this.deptType = Type.valueOf(source.readByte());
 			this.deptName = source.readString();
+			this.displayId = source.readInt();
 		}
 	}
 

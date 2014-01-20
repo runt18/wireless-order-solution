@@ -42,9 +42,7 @@ public class FoodList extends AbstractList<Food>{
     	Map<Kitchen, List<Food>> foodsByKitchen = new HashMap<Kitchen, List<Food>>();
     	
 		//Group the foods by kitchen and put it to a map.
-    	Iterator<Food> iter = mFoods.iterator();
-    	while(iter.hasNext()){
-    		Food f = iter.next();
+    	for(Food f : mFoods){
 			List<Food> foodsToEachKitchen = foodsByKitchen.get(f.getKitchen());
 			if(foodsToEachKitchen != null){
 				foodsToEachKitchen.add(f);
@@ -83,9 +81,7 @@ public class FoodList extends AbstractList<Food>{
     	Map<Department, List<Food>> foodsByDept = new LinkedHashMap<Department, List<Food>>();
     	
     	//Group the foods by department and put it to a map.
-    	Iterator<Food> iter = mFoods.iterator();
-    	while(iter.hasNext()){
-    		Food f = iter.next();
+    	for(Food f : mFoods){
     		List<Food> foodsToEachDept = foodsByDept.get(f.getKitchen().getDept());
     		if(foodsToEachDept != null){
     			foodsToEachDept.add(f);

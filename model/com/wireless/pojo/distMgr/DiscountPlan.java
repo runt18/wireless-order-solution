@@ -92,7 +92,7 @@ public class DiscountPlan implements Parcelable, Jsonable{
 	
 	@Override
 	public String toString(){
-		return "discount plan(kitchen_alias = " + kitchen.getAliasId() + ", restaurant_id = " + kitchen.getRestaurantId() + ", rate = " + getRate() + ")";
+		return "discount plan(kitchen_name = " + kitchen.getName() + ", restaurant_id = " + kitchen.getRestaurantId() + ", rate = " + getRate() + ")";
 	}
 	
 	@Override

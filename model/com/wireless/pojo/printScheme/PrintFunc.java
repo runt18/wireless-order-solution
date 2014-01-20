@@ -248,7 +248,7 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 	}
 	
 	public boolean isDeptAll(){
-		return mDept.size() == 0;
+		return mDept.isEmpty();
 	}
 	
 	public List<Region> getRegions(){
@@ -274,7 +274,7 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 	}
 	
 	public boolean isKitchenAll(){
-		return mKitchens.size() == 0;
+		return mKitchens.isEmpty();
 	}
 	
 	public void addRegion(Region regionToAdd){
@@ -292,7 +292,7 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 	}
 	
 	public boolean isRegionAll(){
-		return mRegions.size() == 0;
+		return mRegions.isEmpty();
 	}
 	
 	@Override
@@ -409,10 +409,10 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 			
 			for (Kitchen kitchen : this.mKitchens) {
 				if(kitchens == ""){
-					kitchenValues += kitchen.getAliasId();
+					kitchenValues += kitchen.getDisplayId();
 					kitchens += kitchen.getName();
 				}else{
-					kitchenValues += ("," + kitchen.getAliasId());
+					kitchenValues += ("," + kitchen.getDisplayId());
 					kitchens += ("," + kitchen.getName());
 				}
 			}

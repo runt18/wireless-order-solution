@@ -101,14 +101,14 @@ public class DepartmentTree{
 				kitchenNodes.add(new KitchenNode(entry.getKey(), sorted));
 			}
 			
-			//厨房按编号排序
+			//厨房按displayId排序
 			Collections.sort(kitchenNodes, new Comparator<KitchenNode>(){
 
 				@Override
 				public int compare(KitchenNode lhs, KitchenNode rhs) {
-					if(lhs.getKey().getAliasId() > rhs.getKey().getAliasId()){
+					if(lhs.getKey().getDisplayId() > rhs.getKey().getDisplayId()){
 						return 1;
-					}else if(lhs.getKey().getAliasId() < rhs.getKey().getAliasId()){
+					}else if(lhs.getKey().getDisplayId() < rhs.getKey().getDisplayId()){
 						return -1;
 					}else{
 						return 0;
@@ -122,14 +122,14 @@ public class DepartmentTree{
 		}
 		
 		public DepartmentTree build(){
-			//部门按编号排序
+			//部门按displayId排序
 			Collections.sort(mNodesToBuild, new Comparator<DeptNode>(){
 
 				@Override
 				public int compare(DeptNode lhs, DeptNode rhs) {
-					if(lhs.getKey().getId() > rhs.getKey().getId()){
+					if(lhs.getKey().getDisplayId() > rhs.getKey().getDisplayId()){
 						return 1;
-					}else if(lhs.getKey().getId() < rhs.getKey().getId()){
+					}else if(lhs.getKey().getDisplayId() < rhs.getKey().getDisplayId()){
 						return -1;
 					}else{
 						return 0;

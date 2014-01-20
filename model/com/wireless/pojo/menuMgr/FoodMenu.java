@@ -1,8 +1,6 @@
 package com.wireless.pojo.menuMgr;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
 import com.wireless.parcel.Parcel;
@@ -59,31 +57,33 @@ public class FoodMenu implements Parcelable{
 
 	private void deal(){
 		
-		//Sort the foods by kitchen.
-		SortedList<Food> foodsByKitchen = SortedList.newInstance(foods, Food.BY_KITCHEN);
-		//Remove the kitchen which does NOT contain any foods using binary search.
-		List<Kitchen> tmpKitchen = new ArrayList<Kitchen>(kitchens);
-		Iterator<Kitchen> iterKitchen = tmpKitchen.iterator();
-		while(iterKitchen.hasNext()){
-			Food key = new Food();
-			key.setKitchen(iterKitchen.next());
-			if(!foodsByKitchen.containsElement(key)){
-				iterKitchen.remove();
-			}
-		}
-		this.kitchens = Collections.unmodifiableList(SortedList.newInstance(tmpKitchen));
+//		//Sort the foods by kitchen.
+//		SortedList<Food> foodsByKitchen = SortedList.newInstance(foods, Food.BY_KITCHEN);
+//		//Remove the kitchen which does NOT contain any foods using binary search.
+//		List<Kitchen> tmpKitchen = new ArrayList<Kitchen>(kitchens);
+//		Iterator<Kitchen> iterKitchen = tmpKitchen.iterator();
+//		while(iterKitchen.hasNext()){
+//			Food key = new Food();
+//			key.setKitchen(iterKitchen.next());
+//			if(!foodsByKitchen.containsElement(key)){
+//				iterKitchen.remove();
+//			}
+//		}
+//		this.kitchens = Collections.unmodifiableList(SortedList.newInstance(tmpKitchen));
+		
+		this.kitchens = Collections.unmodifiableList(SortedList.newInstance(kitchens));
 		
 		//Remove the department which does NOT contain any foods.
-		List<Department> tmpDept = new ArrayList<Department>();
-		for(Department d : depts){
-			for(Kitchen k : kitchens){
-				if(k.getDept().equals(d)){
-					tmpDept.add(d);
-					break;
-				}
-			}
-		}
-		this.depts = Collections.unmodifiableList(SortedList.newInstance(tmpDept));
+//		List<Department> tmpDept = new ArrayList<Department>();
+//		for(Department d : depts){
+//			for(Kitchen k : kitchens){
+//				if(k.getDept().equals(d)){
+//					tmpDept.add(d);
+//					break;
+//				}
+//			}
+//		}
+		this.depts = Collections.unmodifiableList(SortedList.newInstance(depts));
 		
 		//Set the department detail to associated kitchen.
 		for(Kitchen eachKitchen : kitchens){
@@ -91,12 +91,12 @@ public class FoodMenu implements Parcelable{
 		}
 		
 		this.categorys = Collections.unmodifiableList(categorys);
-		this.tastes = Collections.unmodifiableList(SortedList.newInstance(tastes));
 		
 		//Set the category to each taste.
 		for(Taste t : tastes){
 			t.setCategory(categorys.get(categorys.indexOf(t.getCategory())));
 		}
+		this.tastes = Collections.unmodifiableList(SortedList.newInstance(tastes));
 		
 		for(Food eachFood : foods){
 			

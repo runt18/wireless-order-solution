@@ -50,7 +50,7 @@ public class TestParcel {
 		
 		foodToParcel.setAliasId(1);
 		foodToParcel.setPrice(2.45f);
-		foodToParcel.getKitchen().setAliasId((short)1);
+		foodToParcel.getKitchen().setDisplayId(1);
 		foodToParcel.setHot(true);
 		foodToParcel.setSpecial(true);
 		foodToParcel.setName("测试菜品");
@@ -173,8 +173,8 @@ public class TestParcel {
 	public void testComplexKitchenParcel(){
 		Kitchen kitchenToParcel = new Kitchen();
 		
-		kitchenToParcel.setAliasId(Kitchen.KitchenAlias.KITCHEN_NULL.getAliasId());
-		kitchenToParcel.getDept().setId(Department.DeptId.DEPT_ALL.getVal());
+		kitchenToParcel.setDisplayId(1);
+		kitchenToParcel.getDept().setId(Department.DeptId.DEPT_1.getVal());
 		kitchenToParcel.setAllowTemp(true);
 		kitchenToParcel.setType(Kitchen.Type.NORMAL);
 		kitchenToParcel.setName("测试厨房");
@@ -189,7 +189,7 @@ public class TestParcel {
 		parcelableKitchen.createFromParcel(p2);
 		
 		// Check the kitchen alias id
-		assertEquals("kitchen alias id", kitchenToParcel.getAliasId(), parcelableKitchen.getAliasId());
+		assertEquals("kitchen display id", kitchenToParcel.getDisplayId(), parcelableKitchen.getDisplayId());
 		
 		// Check the associated department
 		assertEquals("associated department", kitchenToParcel.getDept(), parcelableKitchen.getDept());
@@ -208,8 +208,8 @@ public class TestParcel {
 	public void testComplexDeptParcel(){
 		Department deptToParcel = new Department();
 		
-		deptToParcel.setId(Department.DeptId.DEPT_ALL.getVal());
-		deptToParcel.setType(Department.Type.RESERVED);
+		deptToParcel.setId(Department.DeptId.DEPT_1.getVal());
+		deptToParcel.setType(Department.DeptId.DEPT_1.getType());
 		deptToParcel.setName("测试部门");
 		
 		Parcel p = new Parcel();
@@ -468,7 +468,7 @@ public class TestParcel {
 			assertEquals("price to temporary food", of1.getPrice(), of2.getPrice(), 0.01);
 			
 			// Check the kitchen alias to temporary food
-			assertEquals("kitchen alias to temporary food", of1.getKitchen().getAliasId(), of2.getKitchen().getAliasId());
+			assertEquals("kitchen display id to temporary food", of1.getKitchen().getDisplayId(), of2.getKitchen().getDisplayId());
 			
 		}else{
 
@@ -642,7 +642,7 @@ public class TestParcel {
 			assertEquals("price to temporary food", of1.getPrice(), of2.getPrice(), 0.01);
 			
 			// Check the kitchen alias to temporary food
-			assertEquals("kitchen alias to temporary food", of1.getKitchen().getAliasId(), of2.getKitchen().getAliasId());
+			assertEquals("kitchen display id to temporary food", of1.getKitchen().getDisplayId(), of2.getKitchen().getDisplayId());
 			
 		}else{
 

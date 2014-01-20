@@ -451,8 +451,7 @@ public final class Parcel {
      * too much space in unused excess capacity.
      */
     private static int newCapacity(int currentCapacity) {
-        int increment = (currentCapacity < (MIN_CAPACITY_INCREMENT / 2) ?
-                MIN_CAPACITY_INCREMENT : currentCapacity >> 1);
+        int increment = (currentCapacity < (MIN_CAPACITY_INCREMENT / 2) ? MIN_CAPACITY_INCREMENT : currentCapacity >> 1);
         return currentCapacity + increment;
     }
 	

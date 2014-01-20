@@ -8,144 +8,171 @@ import java.util.Map;
 import com.wireless.json.Jsonable;
 import com.wireless.parcel.Parcel;
 import com.wireless.parcel.Parcelable;
+import com.wireless.pojo.menuMgr.Department.DeptId;
 
 
 public class Kitchen implements Parcelable, Comparable<Kitchen>, Jsonable{
 	
-	public static class InsertBuilder{
-		private final short kitchenAlias;
-		private final String kitchenName;
-		private final int restaurantId;
-		private Type type = Type.NORMAL;
-		private Department.DeptId deptId = Department.DeptId.DEPT_1;
-		
-		public InsertBuilder(int restaurantId, String kitchenName, short kitchenAlias){
-			this.restaurantId = restaurantId;
-			this.kitchenName = kitchenName;
-			this.kitchenAlias = kitchenAlias;
+	public static class SwapDisplayBuilder{
+		private final int idA;
+		private final int idB;
+		public SwapDisplayBuilder(int idA, int idB){
+			this.idA = idA;
+			this.idB = idB;
 		}
 		
-		public InsertBuilder(int restaurantId, KitchenAlias alias){
-			this(restaurantId, alias.getDesc(), alias.getAliasId());
-			this.type = alias.getType();
+		public int getIdA(){
+			return this.idA;
 		}
 		
-		public short getKitchenAlias(){
-			return kitchenAlias;
-		}
-		
-		public String getKitchenName(){
-			if(kitchenName == null){
-				return "";
-			}else{
-				return kitchenName;
-			}
-		}
-		
-		public int getRestaurantId(){
-			return this.restaurantId;
-		}
-		
-		public InsertBuilder setType(Type type){
-			this.type = type;
-			return this;
-		}
-		
-		public Type getType(){
-			return type;
-		}
-		
-		public InsertBuilder setDeptId(Department.DeptId deptId){
-			this.deptId = deptId;
-			return this;
-		}
-		
-		public Department.DeptId getDeptId(){
-			return this.deptId;
+		public int getIdB(){
+			return this.idB;
 		}
 	}
 	
-	public static class Builder{
+	public static class AddBuilder{
 		private final String kitchenName;
-		private final short aliasId;
-		private final int restaurantId;
-
-		private long kitchenId;
+		private final Department.DeptId deptId;
+		private boolean isAllowTemp = false;
+		
+		public AddBuilder(String kitchenName, Department.DeptId deptId){
+			this.kitchenName = kitchenName;
+			if(deptId.getType() == Department.Type.NORMAL){
+				this.deptId = deptId;
+			}else{
+				throw new IllegalArgumentException("The dept id should belong to normal.");
+			}
+		}
+		
+		public AddBuilder setAllowTmp(boolean onOff){
+			this.isAllowTemp = onOff;
+			return this;
+		}
+		
+		public Kitchen build(){
+			return new Kitchen(this); 
+		}
+	}
+	
+	public static class UpdateBuilder{
+		private final int id;
+		private String kitchenName;
+		private Department.DeptId deptId;
+		private boolean isAllowTemp = false;
+		
+		public UpdateBuilder(int id){
+			this.id = id;
+		}
+		
+		public UpdateBuilder setName(String name){
+			this.kitchenName = name;
+			return this;
+		}
+		
+		public boolean isNameChanged(){
+			return this.kitchenName != null;
+		}
+		
+		public UpdateBuilder setDeptId(Department.DeptId deptId){
+			if(deptId.getType() == Department.Type.NORMAL){
+				this.deptId = deptId;
+			}else{
+				throw new IllegalArgumentException("The dept id should belong to normal.");
+			}
+			return this;
+		}
+		
+		public boolean isDeptChanged(){
+			return this.deptId != null;
+		}
+		
+		public UpdateBuilder setAllowTmp(boolean onOff){
+			this.isAllowTemp = onOff;
+			return this;
+		}
+		
+		public boolean isAllowTmpChanged(){
+			return this.isAllowTemp != false;
+		}
+		
+		public Kitchen build(){
+			return new Kitchen(this); 
+		}
+	}
+	
+	public static class InsertBuilder{
+		private final String kitchenName;
+		private final DeptId deptId;
+		private final Type type;
+		
+		public InsertBuilder(String name, DeptId deptId, Type type){
+			this.kitchenName = name;
+			this.deptId = deptId;
+			this.type = type;
+		}
+		
+		public Kitchen build(){
+			return new Kitchen(this);
+		}
+	}
+	
+	public static class QueryBuilder{
+		private final String kitchenName;
+		private final int kitchenId;
+		
+		private int restaurantId;
 		private boolean isAllowTemp;
 		private Type type = Type.NORMAL;
 		private Department dept;
+		private int displayId;
 		
 		public Kitchen build(){
 			return new Kitchen(this);
 		}
 		
-		public Builder(short aliasId, String kitchenName, int restaurantId){
+		public QueryBuilder(int id, String kitchenName){
 			this.kitchenName = kitchenName;
-			this.aliasId = aliasId;
+			this.kitchenId = id;
+		}
+
+		public QueryBuilder setDisplayId(int displayId){
+			this.displayId = displayId;
+			return this;
+		}
+		
+		public QueryBuilder setRestaurantId(int restaurantId) {
 			this.restaurantId = restaurantId;
-		}
-
-		public long getKitchenId() {
-			return kitchenId;
-		}
-
-		public Builder setKitchenId(long kitchenId) {
-			this.kitchenId = kitchenId;
 			return this;
 		}
 
-		public boolean isAllowTemp() {
-			return isAllowTemp;
-		}
-
-		public Builder setAllowTemp(boolean isAllowTemp) {
+		public QueryBuilder setAllowTemp(boolean isAllowTemp) {
 			this.isAllowTemp = isAllowTemp;
 			return this;
 		}
 
-		public Type getType() {
-			return type;
-		}
-
-		public Builder setType(Type type) {
+		public QueryBuilder setType(Type type) {
 			this.type = type;
 			return this;
 		}
 
-		public Builder setType(int typeVal){
+		public QueryBuilder setType(int typeVal){
 			this.type = Type.valueOf(typeVal);
 			return this;
 		}
 		
-		public Department getDept() {
-			return dept;
-		}
-
-		public Builder setDept(Department dept) {
+		public QueryBuilder setDept(Department dept) {
 			this.dept = dept;
 			return this;
 		}
 
-		public String getKitchenName() {
-			return kitchenName;
-		}
-
-		public short getAliasId() {
-			return aliasId;
-		}
-
-		public int getRestaurantId() {
-			return restaurantId;
-		}
 	}
 	
 	public final static byte KITCHEN_PARCELABLE_COMPLEX = 0;
 	public final static byte KITCHEN_PARCELABLE_SIMPLE = 1;
 	
-//	public final static short KITCHEN_NULL = 255;
-//	public final static short KITCHEN_FULL = 254;
-//	public final static short KITCHEN_TEMP = 253;
-	
+	/**
+	 * @deprecated
+	 */
 	public static enum KitchenAlias{
 		KITCHEN_1(0, "厨房1", Type.NORMAL), KITCHEN_2(1, "厨房2", Type.NORMAL), KITCHEN_3(2, "厨房3", Type.NORMAL), KITCHEN_4(3, "厨房4", Type.NORMAL), KITCHEN_5(4, "厨房5", Type.NORMAL),
 		KITCHEN_6(5, "厨房6", Type.NORMAL), KITCHEN_7(6, "厨房7", Type.NORMAL), KITCHEN_8(7, "厨房8", Type.NORMAL), KITCHEN_9(8, "厨房9", Type.NORMAL), KITCHEN_10(9, "厨房10", Type.NORMAL),
@@ -157,9 +184,9 @@ public class Kitchen implements Parcelable, Comparable<Kitchen>, Jsonable{
 		KITCHEN_36(35, "厨房36", Type.NORMAL), KITCHEN_37(36, "厨房37", Type.NORMAL), KITCHEN_38(37, "厨房38", Type.NORMAL), KITCHEN_39(38, "厨房39", Type.NORMAL), KITCHEN_40(39, "厨房40", Type.NORMAL),
 		KITCHEN_41(40, "厨房41", Type.NORMAL), KITCHEN_42(41, "厨房42", Type.NORMAL), KITCHEN_43(42, "厨房43", Type.NORMAL), KITCHEN_44(43, "厨房44", Type.NORMAL), KITCHEN_45(44, "厨房45", Type.NORMAL),
 		KITCHEN_46(45, "厨房46", Type.NORMAL), KITCHEN_47(46, "厨房47", Type.NORMAL), KITCHEN_48(47, "厨房48", Type.NORMAL), KITCHEN_49(48, "厨房49", Type.NORMAL), KITCHEN_50(49, "厨房50", Type.NORMAL),
-		KITCHEN_TEMP(253, "临时厨房", Type.RESERVED),
-		KITCHEN_FULL(254, "全部厨房", Type.RESERVED),
-		KITCHEN_NULL(255, "空厨房", Type.RESERVED);
+		KITCHEN_TEMP(253, "临时厨房", Type.TEMP),
+		//KITCHEN_FULL(254, "全部厨房", Type.RESERVED),
+		KITCHEN_NULL(255, "空厨房", Type.NULL);
 		
 		private final int aliasId;
 		private final String desc;
@@ -199,8 +226,10 @@ public class Kitchen implements Parcelable, Comparable<Kitchen>, Jsonable{
 	}
 	
 	public static enum Type{
-		NORMAL(0, "普通"),
-		RESERVED(1, "系统保留");
+		NORMAL(0, "普通厨房"),
+		IDLE(1, "空闲厨房"),
+		TEMP(2, "临时厨房"),
+		NULL(3, "空厨房");
 		
 		private final int val;
 		private final String desc;
@@ -232,10 +261,10 @@ public class Kitchen implements Parcelable, Comparable<Kitchen>, Jsonable{
 		}
 	}
 	
-	private long kitchenId;
-	private short aliasId;
+	private int kitchenId;
 	private int restaurantId;
 	private String name;
+	private int displayId;
 	private boolean isAllowTmp;
 	private Type type = Type.NORMAL;
 	private Department dept;
@@ -244,35 +273,50 @@ public class Kitchen implements Parcelable, Comparable<Kitchen>, Jsonable{
 		this.dept = new Department();
 	}
 	
-	private Kitchen(Builder builder){
-		setId(builder.getKitchenId());
-		setAliasId(builder.getAliasId());
-		setName(builder.getKitchenName());
-		setRestaurantId(builder.getRestaurantId());
-		setAllowTemp(builder.isAllowTemp);
-		setType(builder.getType());
-		setDept(builder.getDept());
+	public Kitchen(int id){
+		setId(id);
 	}
 	
-	public long getId() {
+	private Kitchen(QueryBuilder builder){
+		setId(builder.kitchenId);
+		setName(builder.kitchenName);
+		setRestaurantId(builder.restaurantId);
+		setAllowTemp(builder.isAllowTemp);
+		setType(builder.type);
+		setDept(builder.dept);
+		setDisplayId(builder.displayId);
+	}
+	
+	private Kitchen(InsertBuilder builder){
+		setName(builder.kitchenName);
+		setType(builder.type);
+		setDept(builder.deptId.getVal(), builder.deptId.getDesc());
+	}
+	
+	private Kitchen(AddBuilder builder){
+		setName(builder.kitchenName);
+		setAllowTemp(builder.isAllowTemp);
+		setDept(builder.deptId.getVal(), builder.deptId.getDesc());
+	}
+	
+	private Kitchen(UpdateBuilder builder){
+		setId(builder.id);
+		setName(builder.kitchenName);
+		setAllowTemp(builder.isAllowTemp);
+		setDept(builder.deptId.getVal(), builder.deptId.getDesc());
+	}
+	
+	public int getId() {
 		return this.kitchenId;
 	}
 	
-	public void setId(long kitchenId) {
+	public void setId(int kitchenId) {
 		this.kitchenId = kitchenId;
-	}
-	
-	public short getAliasId() {
-		return this.aliasId;
-	}
-	
-	public void setAliasId(short aliasId) {
-		this.aliasId = aliasId;
 	}
 	
 	public String getName() {
 		if(name == null){
-			name = "";
+			return "";
 		}
 		return this.name;
 	}
@@ -287,6 +331,14 @@ public class Kitchen implements Parcelable, Comparable<Kitchen>, Jsonable{
 	
 	public void setRestaurantId(int restaurantId) {
 		this.restaurantId = restaurantId;
+	}
+	
+	public void setDisplayId(int displayId){
+		this.displayId = displayId;
+	}
+	
+	public int getDisplayId(){
+		return this.displayId;
 	}
 	
 	public boolean isAllowTemp() {
@@ -329,8 +381,16 @@ public class Kitchen implements Parcelable, Comparable<Kitchen>, Jsonable{
 		return this.type == Type.NORMAL;
 	}
 	
-	public boolean isReserved(){
-		return this.type == Type.RESERVED;
+	public boolean idIdle(){
+		return this.type == Type.IDLE;
+	}
+	
+	public boolean isTemp(){
+		return this.type == Type.TEMP;
+	}
+	
+	public boolean isNull(){
+		return this.type == Type.NULL;
 	}
 	
 	@Override
@@ -338,36 +398,33 @@ public class Kitchen implements Parcelable, Comparable<Kitchen>, Jsonable{
 		if(obj == null || !(obj instanceof Kitchen)){
 			return false;
 		}else{
-			Kitchen kitchen = (Kitchen)obj;
-			return this.restaurantId == kitchen.restaurantId && this.aliasId == kitchen.aliasId;
+			return this.kitchenId == ((Kitchen)obj).kitchenId;
 		}
 	}
 	
 	@Override
 	public int hashCode(){
-		int result = 17;
-		result = result * 31 + restaurantId;
-		result = result * 31 + aliasId;
-		return result;
+		return 17 * 31 + kitchenId;
 	}
 	
 	@Override
 	public String toString(){
-		return "kitchen(alias_id = " + getAliasId() + ",restaurant_id = " + getRestaurantId() + ")";
+		return "kitchen(id = " + getId() + ",name = " + getName() + ")";
 	}
 
 	@Override
 	public void writeToParcel(Parcel dest, int flag) {
 		dest.writeByte(flag);
 		if(flag == KITCHEN_PARCELABLE_SIMPLE){
-			dest.writeByte(this.aliasId);
+			dest.writeInt(this.getId());
 			
 		}else if(flag == KITCHEN_PARCELABLE_COMPLEX){
-			dest.writeByte(this.aliasId);
+			dest.writeInt(this.getId());
+			dest.writeInt(this.getDisplayId());
 			dest.writeParcel(this.dept, Department.DEPT_PARCELABLE_SIMPLE);
 			dest.writeByte(this.isAllowTmp ? 1 : 0);
-			dest.writeByte(this.type.getVal());
-			dest.writeString(this.name);
+			dest.writeByte(this.getType().getVal());
+			dest.writeString(this.getName());
 		}
 	}
 	
@@ -375,14 +432,15 @@ public class Kitchen implements Parcelable, Comparable<Kitchen>, Jsonable{
 	public void createFromParcel(Parcel source) {
 		short flag = source.readByte();
 		if(flag == KITCHEN_PARCELABLE_SIMPLE){
-			this.aliasId = source.readByte();
+			setId(source.readInt());
 			
 		}else if(flag == KITCHEN_PARCELABLE_COMPLEX){
-			this.aliasId = source.readByte();
-			this.dept = source.readParcel(Department.DEPT_CREATOR);
-			this.isAllowTmp = source.readByte() == 1 ? true : false;
-			this.type = Type.valueOf(source.readByte());
-			this.name = source.readString();
+			setId(source.readInt());
+			setDisplayId(source.readInt());
+			setDept(source.readParcel(Department.DEPT_CREATOR));
+			setAllowTemp(source.readByte() == 1 ? true : false);
+			setType(Type.valueOf(source.readByte()));
+			setName(source.readString());
 		}
 	}
 
@@ -399,9 +457,9 @@ public class Kitchen implements Parcelable, Comparable<Kitchen>, Jsonable{
 
 	@Override
 	public int compareTo(Kitchen kitchen) {
-		if(getAliasId() > kitchen.getAliasId()){
+		if(getId() > kitchen.getId()){
 			return 1;
-		}else if(getAliasId() < kitchen.getAliasId()){
+		}else if(getId() < kitchen.getId()){
 			return -1;
 		}else{
 			return 0;
@@ -412,13 +470,14 @@ public class Kitchen implements Parcelable, Comparable<Kitchen>, Jsonable{
 	public Map<String, Object> toJsonMap(int flag) {
 		Map<String, Object> jm = new LinkedHashMap<String, Object>();
 		jm.put("id", this.kitchenId);
-		jm.put("alias", this.aliasId);
+		jm.put("alias", this.displayId);
 		jm.put("rid", this.restaurantId);
 		jm.put("name", this.name);
 		jm.put("isAllowTmp", this.isAllowTmp);
 		jm.put("typeValue", this.type.getVal());
-		if(this.dept != null)
+		if(this.dept != null){
 			jm.put("dept", this.dept.toJsonMap(0));
+		}
 		
 		return Collections.unmodifiableMap(jm);
 	}
