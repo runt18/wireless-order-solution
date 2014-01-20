@@ -27,7 +27,7 @@ public class FoodCombinationDao {
 		try{
 			dbCon.connect();
 			String sql = "SELECT A.restaurant_id, A.food_id, A.food_alias, A.name, "
-						 + " A.kitchen_alias, A.kitchen_id, A.status, A.pinyin, A.taste_ref_type, A.desc, A.img," 
+						 + " A.kitchen_id, A.status, A.pinyin, A.taste_ref_type, A.desc, A.img," 
 						 + " B.sub_food_id, B.amount, " 
 						 + " C.dept_id, C.name AS kitchen_name,"
 						 + " FPP.unit_price "
@@ -48,7 +48,6 @@ public class FoodCombinationDao {
 				tempItem.setAliasId(dbCon.rs.getInt("food_alias"));
 				tempItem.setName(dbCon.rs.getString("name"));
 				tempItem.getKitchen().setId(dbCon.rs.getInt("kitchen_id"));
-				tempItem.getKitchen().setAliasId(dbCon.rs.getShort("kitchen_alias"));
 				tempItem.setStatus(dbCon.rs.getByte("status"));
 				tempItem.setPinyin(dbCon.rs.getString("pinyin"));
 				tempItem.setTasteRefType(dbCon.rs.getShort("taste_ref_type"));

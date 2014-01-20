@@ -11,7 +11,9 @@ import com.wireless.db.menuMgr.FoodDao;
 import com.wireless.db.tasteMgr.TasteCategoryDao;
 import com.wireless.db.tasteMgr.TasteDao;
 import com.wireless.exception.BusinessException;
+import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.menuMgr.FoodMenu;
+import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.pojo.staffMgr.Staff;
 
 public class QueryMenu {
@@ -50,8 +52,8 @@ public class QueryMenu {
 		return new FoodMenu(FoodDao.getFoods(dbCon, staff, null, null),
 						    TasteCategoryDao.get(dbCon, staff),
 							TasteDao.getTastes(dbCon, staff, null, null),
-							KitchenDao.getNormalKitchens(dbCon, staff),
-			    			DepartmentDao.getNormalDepartments(dbCon, staff),
+							KitchenDao.getByType(dbCon, staff, Kitchen.Type.NORMAL),
+			    			DepartmentDao.getByType(dbCon, staff, Department.Type.NORMAL),
 			    			DiscountDao.getDiscount(dbCon, staff, null, null),
 			    			CancelReasonDao.getReasons(dbCon, staff, null, null));
 	}

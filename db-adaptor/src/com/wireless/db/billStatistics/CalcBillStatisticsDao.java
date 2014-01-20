@@ -562,14 +562,14 @@ public class CalcBillStatisticsDao {
 		
 		//Get the gift, discount & total to each department during this period.
 		sql = " SELECT " +
-			  " dept_id, restaurant_id, dept_type, dept_name, " +
+			  " dept_id, restaurant_id, dept_type, dept_name, dept_display_id, " +
 			  " ROUND(SUM(dept_gift), 2) AS dept_gift, " +
 			  " ROUND(SUM(dept_discount), 2) AS dept_discount, " +
 			  " ROUND(SUM(dept_income), 2) AS dept_income " +
 			  " FROM (" +
 				  " SELECT " +
-				  " MAX(DEPT.dept_id) AS dept_id, MAX(DEPT.restaurant_id) AS restaurant_id, MAX(DEPT.type) AS dept_type, " +
-				  " MAX(DEPT.name) AS dept_name, " +
+				  " MAX(D.dept_id) AS dept_id, MAX(D.restaurant_id) AS restaurant_id, MAX(D.type) AS dept_type, " +
+				  " MAX(D.name) AS dept_name, MAX(D.display_id) AS dept_display_id, " +
 				  " CASE WHEN ((OF.food_status & " + Food.GIFT + ") <> 0) THEN (OF.unit_price + IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * discount * SUM(OF.order_count) ELSE 0 END AS dept_gift," +
 				  " (OF.unit_price + IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * (1 - discount) * SUM(OF.order_count) AS dept_discount, " +
 				  " CASE WHEN ((OF.food_status & " + Food.GIFT + ") = 0 AND (OF.food_status & " + Food.WEIGHT + ") = 0) THEN (OF.unit_price + IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * discount * SUM(OF.order_count) " +
@@ -593,7 +593,7 @@ public class CalcBillStatisticsDao {
 				  			 	   " AND " + " O.category = " + Order.Category.MERGER_TBL.getVal() +
 				  			 ") AS O " + " ON OF.order_id = O.id " +
 				  " JOIN " + Params.dbName + "." + tasteGrpTbl + " TG " + " ON OF.taste_group_id = TG.taste_group_id " +
-				  " JOIN " + Params.dbName + ".department DEPT " + " ON OF.dept_id = DEPT.dept_id AND OF.restaurant_id = DEPT.restaurant_id " +
+				  " JOIN " + Params.dbName + ".department D " + " ON OF.dept_id = D.dept_id AND OF.restaurant_id = D.restaurant_id AND D.type = " + Department.Type.NORMAL.getVal() +
 				  " WHERE 1 = 1 " +
 				  (extraCond == null ? "" : extraCond) +
 				  " AND O.order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +
@@ -601,7 +601,7 @@ public class CalcBillStatisticsDao {
 				  " HAVING SUM(order_count) > 0 " +
 				  " ) AS TMP " +
 			  " GROUP BY dept_id " +
-			  " ORDER BY dept_id ASC ";
+			  " ORDER BY dept_display_id ASC ";
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		
 		List<IncomeByDept> deptIncomes = new ArrayList<IncomeByDept>();
@@ -609,7 +609,8 @@ public class CalcBillStatisticsDao {
 			deptIncomes.add(new IncomeByDept(new Department(dbCon.rs.getString("dept_name"),
 														    dbCon.rs.getShort("dept_id"),
 														    dbCon.rs.getInt("restaurant_id"),
-														    Department.Type.valueOf(dbCon.rs.getShort("dept_type"))),
+														    Department.Type.valueOf(dbCon.rs.getShort("dept_type")),
+														    dbCon.rs.getInt("dept_display_id")),
 										     dbCon.rs.getFloat("dept_gift"),
 										     dbCon.rs.getFloat("dept_discount"),
 										     dbCon.rs.getFloat("dept_income")));
@@ -674,14 +675,14 @@ public class CalcBillStatisticsDao {
 		
 		//Get the gift, discount & total to each kitchen during this period.
 		sql = " SELECT " +
-			  " kitchen_id, kitchen_alias, kitchen_name, kitchen_type, " +
-			  " dept_id, dept_type, dept_name, restaurant_id, " +
+			  " kitchen_id, kitchen_display_id, kitchen_name, kitchen_type, " +
+			  " dept_id, dept_type, dept_name, dept_display_id, restaurant_id, " +
 			  " ROUND(SUM(kitchen_gift), 2) AS kitchen_gift, ROUND(SUM(kitchen_discount), 2) AS kitchen_discount, ROUND(SUM(kitchen_income), 2) AS kitchen_income " +
 			  " FROM ( " + 
 				  " SELECT " +
-				  " MAX(KITCHEN.kitchen_id) AS kitchen_id, MAX(KITCHEN.kitchen_alias) AS kitchen_alias, " +
-				  " MAX(KITCHEN.name) AS kitchen_name, MAX(KITCHEN.type) AS kitchen_type, " +
-				  " MAX(DEPT.dept_id) AS dept_id, MAX(DEPT.type) AS dept_type, MAX(DEPT.name) AS dept_name, " +
+				  " MAX(K.kitchen_id) AS kitchen_id, MAX(K.display_id) AS kitchen_display_id, " +
+				  " MAX(K.name) AS kitchen_name, MAX(K.type) AS kitchen_type, " +
+				  " MAX(D.dept_id) AS dept_id, MAX(D.type) AS dept_type, MAX(D.name) AS dept_name, MAX(D.display_id) AS dept_display_id, " +
 				  " MAX(OF.restaurant_id) AS restaurant_id, " +
 				  " CASE WHEN ((OF.food_status & " + Food.GIFT + ") <> 0) THEN (OF.unit_price + IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * discount * SUM(OF.order_count) ELSE 0 END AS kitchen_gift," +
 				  " (OF.unit_price + IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * (1 - discount) * SUM(OF.order_count) AS kitchen_discount, " +
@@ -706,27 +707,29 @@ public class CalcBillStatisticsDao {
 				  			 	   " AND " + " O.category = " + Order.Category.MERGER_TBL.getVal() +
 				  			 ") AS O " + " ON OF.order_id = O.id " +
 				  " JOIN " + Params.dbName + "." + tasteGrpTbl + " TG " + " ON OF.taste_group_id = TG.taste_group_id " +
-				  " JOIN " + Params.dbName + ".kitchen KITCHEN " + " ON OF.kitchen_id = KITCHEN.kitchen_id " + 
-				  " JOIN " + Params.dbName + ".department DEPT " + " ON KITCHEN.dept_id = DEPT.dept_id AND KITCHEN.restaurant_id = DEPT.restaurant_id " +
+				  " JOIN " + Params.dbName + ".kitchen K " + " ON OF.kitchen_id = K.kitchen_id AND K.type = " + Kitchen.Type.NORMAL.getVal() + 
+				  " JOIN " + Params.dbName + ".department D " + " ON K.dept_id = D.dept_id AND K.restaurant_id = D.restaurant_id " +
 				  " WHERE 1 = 1 " +
 				  (extraCond == null ? "" : extraCond) +
 				  " AND O.order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +
 				  " GROUP BY OF.order_id, OF.food_alias, OF.taste_group_id ) AS TMP " +
 			  " GROUP BY kitchen_id " +
-			  " ORDER BY kitchen_id ASC ";
+			  " ORDER BY kitchen_display_id ASC ";
 		
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		
 		List<IncomeByKitchen> kitchenIncomes = new ArrayList<IncomeByKitchen>();
 		while(dbCon.rs.next()){
-			Kitchen k = new Kitchen.Builder(dbCon.rs.getShort("kitchen_alias"), dbCon.rs.getString("kitchen_name"), dbCon.rs.getInt("restaurant_id"))
-							.setKitchenId(dbCon.rs.getLong("kitchen_id"))
-							.setAllowTemp(false)
-							.setType(dbCon.rs.getShort("kitchen_type"))
-							.setDept(new Department(dbCon.rs.getString("dept_name"),
-											  	   dbCon.rs.getShort("dept_id"),
-											  	   dbCon.rs.getInt("restaurant_id"),
-											  	   Department.Type.valueOf(dbCon.rs.getShort("dept_type")))).build();
+			Kitchen k = new Kitchen(dbCon.rs.getInt("kitchen_id"));
+			k.setName(dbCon.rs.getString("kitchen_name"));
+			k.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
+			k.setAllowTemp(false);
+			k.setType(dbCon.rs.getShort("kitchen_type"));
+			k.setDept(new Department(dbCon.rs.getString("dept_name"),
+									 dbCon.rs.getShort("dept_id"),
+									 dbCon.rs.getInt("restaurant_id"),
+									 Department.Type.valueOf(dbCon.rs.getShort("dept_type")),
+									 dbCon.rs.getInt("dept_display_id")));
 			
 			kitchenIncomes.add(new IncomeByKitchen(k, 
 												   dbCon.rs.getFloat("kitchen_gift"),
@@ -786,7 +789,7 @@ public class CalcBillStatisticsDao {
 		sql = " SELECT " +
 			  " OF.food_id, MAX(OF.food_alias) AS food_alias, MAX(OF.name) AS food_name, " +
 			  " MAX(OF.food_status) AS food_status, MAX(OF.restaurant_id) AS restaurant_id, " +
-			  " MAX(OF.kitchen_id) AS kitchen_id, MAX(OF.kitchen_alias) AS kitchen_alias, " +
+			  " MAX(OF.kitchen_id) AS kitchen_id, " +
 			  " MAX(OF.dept_id) AS dept_id, " +
 			  " SUM(OF.order_count) AS sale_amount, " +
 			  " ROUND(SUM(CASE WHEN ((OF.food_status & " + Food.GIFT + ") <> 0) THEN ((OF.unit_price + IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * discount * OF.order_count) ELSE 0 END), 2) AS food_gift," +
@@ -828,7 +831,6 @@ public class CalcBillStatisticsDao {
 			
 			Kitchen kitchen = new Kitchen();
 			kitchen.setId(dbCon.rs.getInt("kitchen_id"));
-			kitchen.setAliasId(dbCon.rs.getShort("kitchen_alias"));
 			kitchen.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
 			kitchen.setDept(dept);
 
@@ -979,7 +981,8 @@ public class CalcBillStatisticsDao {
 		String sql;
 		
 		sql = " SELECT " +
-			  " MAX(DEPT.dept_id) AS dept_id, MAX(DEPT.name) AS dept_name, MAX(DEPT.restaurant_id) AS restaurant_id, " +
+			  " MAX(D.dept_id) AS dept_id, MAX(D.display_id) AS dept_display_id, MAX(D.name) AS dept_name, " +
+			  " MAX(D.restaurant_id) AS restaurant_id, MAX(D.type) AS dept_type, " +
 			  " OF.cancel_reason_id, " +
 			  " CASE WHEN OF.cancel_reason_id = 1 THEN '无原因' ELSE MAX(OF.cancel_reason) END AS cancel_reason, " +
 			  " ABS(SUM(OF.order_count)) AS cancel_amount, " +
@@ -991,12 +994,12 @@ public class CalcBillStatisticsDao {
 			  " AND O.order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +
 			  " AND O.cancel_price <> 0 " +
 			  " JOIN " + Params.dbName + "." + tasteGrpTbl + " TG " + " ON OF.taste_group_id = TG.taste_group_id " +
-			  " JOIN " + Params.dbName + ".department DEPT " + " ON OF.dept_id = DEPT.dept_id AND OF.restaurant_id = DEPT.restaurant_id " +
+			  " JOIN " + Params.dbName + ".department D " + " ON OF.dept_id = D.dept_id AND OF.restaurant_id = D.restaurant_id AND D.type = " + Department.Type.NORMAL.getVal() +
 			  " WHERE 1 = 1 " +
 			  (extraCond == null ? "" : extraCond) +
 			  " AND OF.order_count < 0 " +
 			  " GROUP BY OF.dept_id, OF.cancel_reason_id " +
-			  " ORDER BY dept_id ";
+			  " ORDER BY dept_display_id ";
 		
 		List<CancelIncomeByDeptAndReason> cancelByDept = new ArrayList<CancelIncomeByDeptAndReason>();
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
@@ -1004,7 +1007,8 @@ public class CalcBillStatisticsDao {
 			cancelByDept.add(new CancelIncomeByDeptAndReason(new Department(dbCon.rs.getString("dept_name"), 
 					 											   		    dbCon.rs.getShort("dept_id"),
 					 											   		    dbCon.rs.getInt("restaurant_id"),
-					 											   		    Department.Type.NORMAL),
+					 											   		    Department.Type.valueOf(dbCon.rs.getInt("dept_type")),
+					 											   		    dbCon.rs.getInt("dept_display_id")),
 					 										 new CancelReason(dbCon.rs.getInt("cancel_reason_id"),
 					 												 		  dbCon.rs.getString("cancel_reason"),
 					 												 		  dbCon.rs.getInt("restaurant_id")),

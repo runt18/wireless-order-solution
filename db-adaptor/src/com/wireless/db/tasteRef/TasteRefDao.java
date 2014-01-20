@@ -138,7 +138,7 @@ public class TasteRefDao {
 		dbCon.stmt.clearBatch();
 		for(TasteRefCnt t : tasteRefByFood){
 			sql = INSERT_FOOD_TASTE_SQL.replace(FOOD_ID, Long.toString(food.getFoodId()))
-			 						   .replace(TASTE_ID, Integer.toString(t.tasteID))
+			 						   .replace(TASTE_ID, Integer.toString(t.tasteId))
 									   .replace(RESTAURANT_ID, Integer.toString(food.getRestaurantId()))
 									   .replace(REF_COUNT, Integer.toString(t.refCnt));
 			dbCon.stmt.addBatch(sql);
@@ -180,7 +180,7 @@ public class TasteRefDao {
 		for(TasteRefCnt t : sortedTasteRef){
 			if(tasteRank <= TASTE_REF_NUM){
 				sql = INSERT_FOOD_TASTE_RANK_SQL.replace(FOOD_ID, Long.toString(food.getFoodId()))
-											    .replace(TASTE_ID, Integer.toString(t.tasteID))
+											    .replace(TASTE_ID, Integer.toString(t.tasteId))
 			 						   			.replace(RESTAURANT_ID, Integer.toString(food.getRestaurantId()))
 			 						   			.replace(TASTE_RANK, Integer.toString(tasteRank++));
 				dbCon.stmt.addBatch(sql);
@@ -331,7 +331,7 @@ public class TasteRefDao {
 		for(Map.Entry<Food, Set<TasteRefCnt>> entry : foodTasteRef.entrySet()){
 			for(TasteRefCnt t : entry.getValue()){
 				sql = INSERT_FOOD_TASTE_SQL.replace(FOOD_ID, Long.toString(entry.getKey().getFoodId()))
-				 						   .replace(TASTE_ID, Integer.toString(t.tasteID))
+				 						   .replace(TASTE_ID, Integer.toString(t.tasteId))
 										   .replace(RESTAURANT_ID, Integer.toString(entry.getKey().getRestaurantId()))
 										   .replace(REF_COUNT, Integer.toString(t.refCnt));
 				dbCon.stmt.addBatch(sql);
@@ -356,8 +356,6 @@ public class TasteRefDao {
 			  Params.dbName + ".food FOOD " +
 			  " WHERE " +
 			  " FOOD_TASTE.food_id = FOOD.food_id " +
-			  " AND " +
-			  " FOOD.kitchen_alias <> " + Kitchen.KitchenAlias.KITCHEN_NULL.getAliasId() +
 			  " GROUP BY FOOD.kitchen_id, FOOD_TASTE.taste_id ";
 		dbCon.stmt.executeUpdate(sql);
 		
@@ -439,7 +437,7 @@ public class TasteRefDao {
 			for(TasteRefCnt t : entry.getValue()){				
 				if(tasteRank <= TASTE_REF_NUM){
 					sql = INSERT_FOOD_TASTE_RANK_SQL.replace(FOOD_ID, Long.toString(entry.getKey().getFoodId()))
-												    .replace(TASTE_ID, Integer.toString(t.tasteID))
+												    .replace(TASTE_ID, Integer.toString(t.tasteId))
 				 						   			.replace(RESTAURANT_ID, Integer.toString(entry.getKey().getRestaurantId()))
 				 						   			.replace(TASTE_RANK, Integer.toString(tasteRank++));
 					dbCon.stmt.addBatch(sql);
@@ -501,8 +499,7 @@ public class TasteRefDao {
 		 * Get the taste reference count to one or more kitchens.
 		 */
 		sql = " SELECT " +
-			  " KITCHEN_TASTE.kitchen_id, KITCHEN_TASTE.taste_id, KITCHEN_TASTE.restaurant_id, KITCHEN_TASTE.ref_cnt, " +
-			  " KITCHEN.kitchen_alias " +
+			  " KITCHEN_TASTE.kitchen_id, KITCHEN_TASTE.taste_id, KITCHEN_TASTE.restaurant_id, KITCHEN_TASTE.ref_cnt " +
 			  " FROM " + 
 			  Params.dbName + ".kitchen_taste KITCHEN_TASTE, " +
 			  Params.dbName + ".kitchen KITCHEN " +
@@ -511,18 +508,10 @@ public class TasteRefDao {
 			  (orderClause != null ? orderClause : "");
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		
-		HashMap<Kitchen, Set<TasteRefCnt>> result = new HashMap<Kitchen, Set<TasteRefCnt>>();
+		Map<Kitchen, Set<TasteRefCnt>> result = new HashMap<Kitchen, Set<TasteRefCnt>>();
 		while(dbCon.rs.next()){
-			Kitchen kitchen = new Kitchen.Builder(dbCon.rs.getShort("kitchen_alias"), null, dbCon.rs.getInt("restaurant_id"))
-								.setKitchenId(dbCon.rs.getLong("kitchen_id"))
-								.build();
-//			Kitchen kitchen = new Kitchen(dbCon.rs.getInt("restaurant_id"),
-//										  "",
-//										  dbCon.rs.getLong("kitchen_id"),
-//										  dbCon.rs.getShort("kitchen_alias"),
-//										  false,
-//										  Kitchen.TYPE_NORMAL,
-//										  null);
+			Kitchen kitchen = new Kitchen(dbCon.rs.getInt("kitchen_id"));
+			kitchen.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
 			
 			TasteRefCnt tasteRef = new TasteRefCnt(dbCon.rs.getInt("taste_id"),
 				    							   TasteRefCnt.TASTE_BY_KITCHEN,
@@ -573,7 +562,9 @@ public class TasteRefDao {
 		
 		HashMap<Department, Set<TasteRefCnt>> result = new HashMap<Department, Set<TasteRefCnt>>();
 		while(dbCon.rs.next()){
-			Department dept = new Department("", dbCon.rs.getShort("dept_id"), dbCon.rs.getInt("restaurant_id"), Department.Type.NORMAL);
+			Department dept = new Department(dbCon.rs.getInt("restaurant_id"), 
+											 dbCon.rs.getShort("dept_id"), 
+											 null);
 			
 			TasteRefCnt tasteRef = new TasteRefCnt(dbCon.rs.getInt("taste_id"),
 				    							   TasteRefCnt.TASTE_BY_DEPT,
@@ -602,12 +593,12 @@ class TasteRefCnt implements Comparable<TasteRefCnt>{
 	final static int TASTE_BY_KITCHEN = 1;
 	final static int TASTE_BY_DEPT = 0;
 	
-	int tasteID;
+	int tasteId;
 	int cate = TASTE_BY_FOOD;
 	int refCnt;
 	
 	public TasteRefCnt(int tasteID, int cate, int refCnt){
-		this.tasteID = tasteID;
+		this.tasteId = tasteID;
 		this.cate = cate;
 		this.refCnt = refCnt;
 	}
@@ -617,13 +608,13 @@ class TasteRefCnt implements Comparable<TasteRefCnt>{
 		if(obj == null || !(obj instanceof TasteRefCnt)){
 			return false;
 		}else{
-			return tasteID == ((TasteRefCnt)obj).tasteID;
+			return tasteId == ((TasteRefCnt)obj).tasteId;
 		}
 	}
 	
 	@Override
 	public int hashCode(){
-		return tasteID * 31 + 17;
+		return tasteId * 31 + 17;
 	}
 
 	/**
@@ -640,7 +631,7 @@ class TasteRefCnt implements Comparable<TasteRefCnt>{
 			}else if(refCnt < o.refCnt){
 				return 1;
 			}else{
-				return tasteID == o.tasteID ? 0 : (tasteID > o.tasteID ? -1 : 1);
+				return tasteId == o.tasteId ? 0 : (tasteId > o.tasteId ? -1 : 1);
 			}
 		}else{
 			if(cate > o.cate){
@@ -648,7 +639,7 @@ class TasteRefCnt implements Comparable<TasteRefCnt>{
 			}else if(cate < o.cate){
 				return 1;
 			}else{
-				return tasteID == o.tasteID ? 0 : (tasteID > o.tasteID ? -1 : 1);
+				return tasteId == o.tasteId ? 0 : (tasteId > o.tasteId ? -1 : 1);
 			}
 		}
 	}

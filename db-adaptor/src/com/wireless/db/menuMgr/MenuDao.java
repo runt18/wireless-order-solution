@@ -33,7 +33,7 @@ public class MenuDao {
 	 * @throws Exception
 	 */
 	public static List<Kitchen> getKitchen(int restaurantID) throws Exception{
-		return MenuDao.getKitchen(" and A.restaurant_id = " + restaurantID, " order by A.kitchen_alias");
+		return MenuDao.getKitchen(" and A.restaurant_id = " + restaurantID, " order by A.display_id");
 	}
 	
 	/**
@@ -152,8 +152,8 @@ public class MenuDao {
 			
 		String selectSQL = "SELECT" 
 				+ " A.food_id, A.food_alias, A.restaurant_id, A.name food_name, A.pinyin, A.status, A.taste_ref_type, "
-				+ " A.desc, A.img, A.kitchen_id, A.kitchen_alias, A.stock_status,  "
-				+ " B.name kitchen_name, B.dept_id, C.unit_price "
+				+ " A.desc, A.img, A.kitchen_id, A.stock_status,  "
+				+ " B.name kitchen_name, B.display_id AS kitchen_display_id, B.dept_id, C.unit_price "
 				+ " FROM " + Params.dbName + ".food A" 
 				+ " LEFT JOIN "
 				+ Params.dbName + ".kitchen B ON A.kitchen_id = B.kitchen_id "
@@ -181,7 +181,7 @@ public class MenuDao {
 			item.setStockStatus(dbCon.rs.getInt("stock_status"));
 			
 			kitchen.setId(dbCon.rs.getInt("kitchen_id"));
-			kitchen.setAliasId(dbCon.rs.getShort("kitchen_alias"));
+			kitchen.setDisplayId(dbCon.rs.getInt("kitchen_display_id"));
 			kitchen.setName(dbCon.rs.getString("kitchen_name"));
 			kitchen.getDept().setId(dbCon.rs.getShort("dept_id"));
 			
@@ -284,7 +284,7 @@ public class MenuDao {
 			dbCon.connect();
 			
 			String selectSQL = "select"
-							+ " A.kitchen_id, A.kitchen_alias, A.restaurant_id, A.name kitchen_name, A.is_allow_temp, "
+							+ " A.kitchen_id, A.display_id, A.restaurant_id, A.name kitchen_name, A.is_allow_temp, "
 							+ " B.dept_id, B.name dept_name"
 							+ " from " + Params.dbName + ".kitchen A left join " + Params.dbName + ".department B on A.dept_id = B.dept_id and A.restaurant_id = B.restaurant_id "
 							+ " where 1=1 "
@@ -297,7 +297,7 @@ public class MenuDao {
 				item = new Kitchen();
 				item.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
 				item.setId(dbCon.rs.getInt("kitchen_id"));
-				item.setAliasId(dbCon.rs.getShort("kitchen_alias"));
+				item.setDisplayId(dbCon.rs.getInt("display_id"));
 				item.setName(dbCon.rs.getString("kitchen_name"));
 				item.setAllowTemp(dbCon.rs.getBoolean("is_allow_temp"));
 				item.setDept(dbCon.rs.getShort("dept_id"), dbCon.rs.getString("dept_name"));
@@ -709,7 +709,7 @@ public class MenuDao {
 		FoodPricePlan item = null;
 		String querySQL = "SELECT A.price_plan_id, A.restaurant_id, A.unit_price,  "
 						+ " B.food_id, B.food_alias, B.name food_name, "
-						+ " C.kitchen_id, C.kitchen_alias, C.name kitchen_name, "
+						+ " C.kitchen_id, C.display_id AS kitchen_display_id, C.name kitchen_name, "
 						+ " D.name price_plan_name, D.status price_plan_status"
 						+ " FROM " + Params.dbName + ".food_price_plan A, " + Params.dbName + ".food B, " + Params.dbName + ".kitchen C, " + Params.dbName + ".price_plan D "
 						+ " WHERE A.restaurant_id = B.restaurant_id AND A.food_id = B.food_id "
@@ -726,7 +726,7 @@ public class MenuDao {
 			item.setFoodAlias(dbCon.rs.getInt("food_alias"));
 			item.setFoodName(dbCon.rs.getString("food_name"));
 			item.setKitchenId(dbCon.rs.getInt("kitchen_id"));
-			item.setKitchenAlias(dbCon.rs.getInt("kitchen_alias"));
+			item.setKitchenAlias(dbCon.rs.getInt("kitchen_display_id"));
 			item.setKitchenName(dbCon.rs.getString("kitchen_name"));
 			item.getPricePlan().setRestaurantId(dbCon.rs.getInt("restaurant_id"));
 			item.getPricePlan().setId(dbCon.rs.getInt("price_plan_id"));

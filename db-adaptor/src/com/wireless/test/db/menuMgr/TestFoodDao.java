@@ -43,7 +43,7 @@ public class TestFoodDao {
 			fb.setName("44");
 			fb.setPinyin("44");
 			fb.setPrice(0.00f);
-			fb.getKitchen().setAliasId((short) 0);
+			fb.getKitchen().setId(0);
 			fb.getKitchen().setId(160);
 			fb.setStockStatus(Food.StockStatus.GOOD);
 			

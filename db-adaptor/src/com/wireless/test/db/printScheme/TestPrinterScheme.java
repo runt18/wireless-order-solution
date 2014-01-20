@@ -82,8 +82,8 @@ public class TestPrinterScheme {
 		try{
 			dbCon.connect();
 			
-			List<Department> depts = DepartmentDao.getNormalDepartments(dbCon, mStaff);
-			List<Kitchen> kitchens = KitchenDao.getKitchens(dbCon, mStaff, null, null);
+			List<Department> depts = DepartmentDao.getByType(dbCon, mStaff, Department.Type.NORMAL);
+			List<Kitchen> kitchens = KitchenDao.getByType(dbCon, mStaff, Kitchen.Type.NORMAL);
 			List<Region> regions = RegionDao.getRegions(dbCon, mStaff, null, null);
 			
 			Printer.InsertBuilder builder = new Printer.InsertBuilder("GP-80250-200", PStyle.PRINT_STYLE_58MM, mStaff.getRestaurantId())

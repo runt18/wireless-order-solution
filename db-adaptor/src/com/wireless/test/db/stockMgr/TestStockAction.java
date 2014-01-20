@@ -113,22 +113,22 @@ public class TestStockAction {
 		StockAction expected = builder.build();
 		//根据不同类型获取供应商或部门
 		if(builder.getSubType() == SubType.STOCK_IN ){
-			Department deptIn = DepartmentDao.getDepartmentById(mStaff, builder.getDeptIn().getId());
+			Department deptIn = DepartmentDao.getById(mStaff, builder.getDeptIn().getId());
 			Supplier supplier = SupplierDao.getSupplierById(mStaff, builder.getSupplier().getSupplierId());
 			expected.setDeptIn(deptIn);
 			expected.setSupplier(supplier);
 		}else if(builder.getSubType() == SubType.STOCK_OUT){
-			Department deptOut = DepartmentDao.getDepartmentById(mStaff, builder.getDeptOut().getId());
+			Department deptOut = DepartmentDao.getById(mStaff, builder.getDeptOut().getId());
 			Supplier supplier = SupplierDao.getSupplierById(mStaff, builder.getSupplier().getSupplierId());
 			expected.setDeptOut(deptOut);
 			expected.setSupplier(supplier);
 		}else if(builder.getSubType() == SubType.STOCK_IN_TRANSFER || builder.getSubType() == SubType.STOCK_OUT_TRANSFER){
-			Department deptIn = DepartmentDao.getDepartmentById(mStaff, builder.getDeptIn().getId());
-			Department deptOut = DepartmentDao.getDepartmentById(mStaff, builder.getDeptOut().getId());
+			Department deptIn = DepartmentDao.getById(mStaff, builder.getDeptIn().getId());
+			Department deptOut = DepartmentDao.getById(mStaff, builder.getDeptOut().getId());
 			expected.setDeptIn(deptIn);
 			expected.setDeptOut(deptOut);
 		}else{
-			Department deptIn = DepartmentDao.getDepartmentById(mStaff, builder.getDeptIn().getId());
+			Department deptIn = DepartmentDao.getById(mStaff, builder.getDeptIn().getId());
 			expected.setDeptIn(deptIn);
 		}
 		expected.setId(stockActionId);

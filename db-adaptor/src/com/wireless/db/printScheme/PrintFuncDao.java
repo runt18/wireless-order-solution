@@ -23,8 +23,8 @@ public class PrintFuncDao {
 	 * Add a new print function to specific printer
 	 * @param dbCon
 	 * 			the database connection
-	 * @param term
-	 * 			the terminal
+	 * @param staff
+	 * 			the staff to perform this action
 	 * @param printerId
 	 * 			the printer to add function
 	 * @param func
@@ -36,7 +36,7 @@ public class PrintFuncDao {
 	 * 			throws if the printer does NOT exist
 	 * 			throws if the function type has exist before
 	 */
-	private static int addFunc(DBCon dbCon, Staff term, int printerId, PrintFunc func) throws SQLException, BusinessException{
+	private static int addFunc(DBCon dbCon, Staff staff, int printerId, PrintFunc func) throws SQLException, BusinessException{
 		
 		String sql;
 		
@@ -81,7 +81,7 @@ public class PrintFuncDao {
 				  " VALUES(" +
 				  funcId + "," +
 				  dept.getId() + "," +
-				  term.getRestaurantId() + 
+				  staff.getRestaurantId() + 
 				  ")";
 			dbCon.stmt.executeUpdate(sql);
 		}
@@ -89,11 +89,11 @@ public class PrintFuncDao {
 		//Insert the kitchens to this print function
 		for(Kitchen kitchen : func.getKitchens()){
 			sql = " INSERT INTO " + Params.dbName + ".func_kitchen" +
-				  "( func_id, kitchen_alias, restaurant_id )" +
+				  "( func_id, kitchen_id, restaurant_id )" +
 				  " VALUES( " +
 				  funcId + "," +
-				  kitchen.getAliasId() + "," +
-				  term.getRestaurantId() + 
+				  kitchen.getId() + "," +
+				  staff.getRestaurantId() + 
 				  ")";
 			dbCon.stmt.executeUpdate(sql);
 		}
@@ -105,7 +105,7 @@ public class PrintFuncDao {
 				  " VALUES( " +
 				  funcId + "," +
 				  region.getRegionId() + "," +
-				  term.getRestaurantId() +
+				  staff.getRestaurantId() +
 				  ")";
 			dbCon.stmt.executeUpdate(sql);
 		}
@@ -232,7 +232,7 @@ public class PrintFuncDao {
 		}
 	}
 	
-	public static void updateFunc(DBCon dbCon, Staff term, int printerId, PrintFunc func, int funcId) throws SQLException, BusinessException{
+	public static void updateFunc(DBCon dbCon, Staff staff, int printerId, PrintFunc func, int funcId) throws SQLException, BusinessException{
 		String sql;
 		
 		//Check to see whether the printer is exist
@@ -243,12 +243,12 @@ public class PrintFuncDao {
 		}
 		dbCon.rs.close();
 		
-		sql = "UPDATE " + Params.dbName + ".print_func SET " +
-				" `repeat` = " + func.getRepeat() +
-				" ,type = " + func.getType().getVal() +
-				" WHERE func_id = " +  funcId;
+		sql = " UPDATE " + Params.dbName + ".print_func SET " +
+			  " `repeat` = " + func.getRepeat() +
+			  " ,type = " + func.getType().getVal() +
+			  " WHERE func_id = " +  funcId;
 		
-		dbCon.stmt.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
+		dbCon.stmt.executeUpdate(sql);
 		
 		sql = " DELETE FROM " + Params.dbName + ".func_dept WHERE func_id = " + funcId;
 		dbCon.stmt.executeUpdate(sql);
@@ -266,7 +266,7 @@ public class PrintFuncDao {
 				  " VALUES(" +
 				  funcId + "," +
 				  dept.getId() + "," +
-				  term.getRestaurantId() + 
+				  staff.getRestaurantId() + 
 				  ")";
 			dbCon.stmt.executeUpdate(sql);
 		}
@@ -274,11 +274,11 @@ public class PrintFuncDao {
 		//Insert the kitchens to this print function
 		for(Kitchen kitchen : func.getKitchens()){
 			sql = " INSERT INTO " + Params.dbName + ".func_kitchen" +
-				  "( func_id, kitchen_alias, restaurant_id )" +
+				  "( func_id, kitchen_id, restaurant_id )" +
 				  " VALUES( " +
 				  funcId + "," +
-				  kitchen.getAliasId() + "," +
-				  term.getRestaurantId() + 
+				  kitchen.getId() + "," +
+				  staff.getRestaurantId() + 
 				  ")";
 			dbCon.stmt.executeUpdate(sql);
 		}
@@ -290,7 +290,7 @@ public class PrintFuncDao {
 				  " VALUES( " +
 				  funcId + "," +
 				  region.getRegionId() + "," +
-				  term.getRestaurantId() +
+				  staff.getRestaurantId() +
 				  ")";
 			dbCon.stmt.executeUpdate(sql);
 		}
@@ -343,10 +343,9 @@ public class PrintFuncDao {
 		
 		for(PrintFunc func : result){
 			//Get the department to this function
-			sql = " SELECT DEPT.name, DEPT.dept_id, DEPT.restaurant_id FROM " +
-				  Params.dbName + ".func_dept FD" + " JOIN " +
-				  Params.dbName + ".department DEPT" + " ON " + 
-				  " FD.dept_id = DEPT.dept_id AND FD.restaurant_id = DEPT.restaurant_id " +
+			sql = " SELECT DEPT.name, DEPT.dept_id, DEPT.restaurant_id " +
+				  " FROM " + Params.dbName + ".func_dept FD" + 
+				  " JOIN " + Params.dbName + ".department DEPT ON FD.dept_id = DEPT.dept_id AND FD.restaurant_id = DEPT.restaurant_id " +
 				  " WHERE FD.func_id = " + func.getId();
 			
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
@@ -358,27 +357,25 @@ public class PrintFuncDao {
 			dbCon.rs.close();
 			
 			//Get the kitchens to this function
-			sql = " SELECT KITCHEN.kitchen_id, KITCHEN.kitchen_alias, KITCHEN.name, KITCHEN.restaurant_id FROM " +
-				  Params.dbName + ".func_kitchen FK " + " JOIN " +
-				  Params.dbName + ".kitchen KITCHEN " + " ON " +
-				  " FK.kitchen_alias = KITCHEN.kitchen_alias AND FK.restaurant_id = KITCHEN.restaurant_id " +
+			sql = " SELECT K.kitchen_id, K.display_id, K.name, K.restaurant_id "	+
+				  " FROM " + Params.dbName + ".func_kitchen FK " + 
+				  " JOIN " + Params.dbName + ".kitchen K ON FK.kitchen_id = K.kitchen_id " +
 				  " WHERE FK.func_id = " + func.getId();
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
 			while(dbCon.rs.next()){
 				Kitchen kitchenToAdd = new Kitchen();
-				kitchenToAdd.setId(dbCon.rs.getLong("kitchen_id"));
+				kitchenToAdd.setId(dbCon.rs.getInt("kitchen_id"));
 				kitchenToAdd.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
-				kitchenToAdd.setAliasId(dbCon.rs.getShort("kitchen_alias"));
+				kitchenToAdd.setDisplayId(dbCon.rs.getInt("display_id"));
 				kitchenToAdd.setName(dbCon.rs.getString("name"));
 				func.addKitchen(kitchenToAdd);
 			}
 			dbCon.rs.close();
 			
 			//Get the regions to this function
-			sql = " SELECT REGION.region_id, REGION.name, REGION.restaurant_id FROM " +
-				  Params.dbName + ".func_region FR " + " JOIN " +
-			      Params.dbName + ".region REGION " + " ON " +
-				  " FR.region_id = REGION.region_id AND FR.restaurant_id = REGION.restaurant_id " +
+			sql = " SELECT R.region_id, R.name, R.restaurant_id " +
+				  " FROM " + Params.dbName + ".func_region FR " + 
+				  " JOIN " + Params.dbName + ".region R ON FR.region_id = R.region_id AND FR.restaurant_id = R.restaurant_id " +
 			      " WHERE FR.func_id = " + func.getId();
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
 			while(dbCon.rs.next()){

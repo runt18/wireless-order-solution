@@ -53,14 +53,13 @@ public class FoodDao {
 		}
 		// 新增菜品信息
 		insertSQL = "INSERT INTO " + Params.dbName + ".food" 
-				+ " ( food_alias, name, pinyin, restaurant_id, kitchen_id, kitchen_alias, status, taste_ref_type, food.desc, food.stock_status ) "
+				+ " ( food_alias, name, pinyin, restaurant_id, kitchen_id, status, taste_ref_type, food.desc, food.stock_status ) "
 				+ "values("
 				+ fb.getAliasId() + ", " 
 				+ "'" + fb.getName() + "', " 
 				+ "'" + fb.getPinyin() + "', " 
 				+ fb.getRestaurantId() + ", " 
 				+ fb.getKitchen().getId() + ", " 
-				+ fb.getKitchen().getAliasId() + ", " 
 				+ fb.getStatus() + ", " 
 				+ Food.TasteRef.SMART.getVal() + ", "
 				+ "'" + fb.getDesc() + "', "
@@ -166,7 +165,6 @@ public class FoodDao {
 				  + " SET name = '" + fb.getName() + "', "
 				  + " pinyin = '"+ fb.getPinyin() + "', "
 				  + " kitchen_id =  " + (fb.getKitchen().getId() < 0 ? null : fb.getKitchen().getId()) + ", " 
-				  + " kitchen_alias = " + fb.getKitchen().getAliasId() + ", "
 				  + " status =  " + fb.getStatus() + ", "
 				  + " food.desc = " + (fb.getDesc() == null || fb.getDesc().trim().length() == 0 ? null : "'" + fb.getDesc() + "'") + ", "
 				  + " food.stock_status = " + fb.getStockStatus().getVal()
@@ -551,9 +549,9 @@ public class FoodDao {
 				  " FOOD.restaurant_id, FOOD.food_id, FOOD.food_alias, FOOD.stock_status, " +
 				  " FOOD.name, FPP.unit_price, FPP.commission, FOOD.status, FOOD.pinyin, FOOD.taste_ref_type, " +
 				  " FOOD.desc, FOOD.img, " +
-				  " KITCHEN.kitchen_id, KITCHEN.kitchen_alias, KITCHEN.name AS kitchen_name, " +
+				  " KITCHEN.kitchen_id, KITCHEN.name AS kitchen_name, KITCHEN.display_id AS kitchen_display_id, " +
 				  " KITCHEN.type AS kitchen_type, KITCHEN.is_allow_temp AS is_allow_temp, " +
-				  " DEPT.dept_id, DEPT.name AS dept_name, DEPT.type AS dept_type, " +
+				  " DEPT.dept_id, DEPT.name AS dept_name, DEPT.type AS dept_type, DEPT.display_id AS dept_display_id, " +
 				  " COMBO.amount " +
 				  " FROM " +
 				  Params.dbName + ".food FOOD " + 
@@ -594,16 +592,16 @@ public class FoodDao {
 				childFood.setTasteRefType(dbCon.rs.getShort("taste_ref_type"));
 				childFood.setDesc(dbCon.rs.getString("desc"));
 				childFood.setImage(dbCon.rs.getString("img"));
-				childFood.setKitchen( new Kitchen.Builder(dbCon.rs.getShort("kitchen_alias"), 
-		 				   				   		  dbCon.rs.getString("kitchen_name"), 
-		 				   				   		  restaurantId)
-											.setAllowTemp(dbCon.rs.getBoolean("is_allow_temp"))
-											.setKitchenId(dbCon.rs.getLong("kitchen_id"))
-											.setType(dbCon.rs.getShort("kitchen_type"))
-											.setDept(new Department(dbCon.rs.getString("dept_name"), 
+				childFood.setKitchen(new Kitchen.QueryBuilder(dbCon.rs.getInt("kitchen_id"), dbCon.rs.getString("kitchen_name")) 
+		 				   				   		.setRestaurantId(restaurantId)
+		 				   				   		.setDisplayId(dbCon.rs.getInt("kitchen_display_id"))
+		 				   				   		.setAllowTemp(dbCon.rs.getBoolean("is_allow_temp"))
+		 				   				   		.setType(dbCon.rs.getShort("kitchen_type"))
+		 				   				   		.setDept(new Department(dbCon.rs.getString("dept_name"), 
 		 				   				    		   		  	    dbCon.rs.getShort("dept_id"), 
 		 				   				    		   		  	    restaurantId,
-		 				   				    		   		  	    Department.Type.valueOf(dbCon.rs.getShort("dept_type"))))
+		 				   				    		   		  	    Department.Type.valueOf(dbCon.rs.getShort("dept_type")),
+		 				   				    		   		  	    dbCon.rs.getInt("dept_display_id")))
 		 				   				     .build());
 				childFood.setStockStatus(dbCon.rs.getInt("stock_status"));
 				
@@ -656,12 +654,12 @@ public class FoodDao {
 	    //get all the food information to this restaurant
 		String sql = " SELECT " +
 					 " FOOD.restaurant_id, FOOD.food_id, FOOD.food_alias, FOOD.stock_status, " +
-					 " FOOD.name, FPP.unit_price, FPP.commission, FOOD.kitchen_alias, FOOD.status, FOOD.taste_ref_type, " +
+					 " FOOD.name, FPP.unit_price, FPP.commission, FOOD.status, FOOD.taste_ref_type, " +
 					 " FOOD.desc, FOOD.img, " +
 					 " FOOD.order_amount, " +
-					 " KITCHEN.kitchen_id, KITCHEN.kitchen_alias, KITCHEN.name AS kitchen_name, " +
+					 " KITCHEN.kitchen_id, KITCHEN.display_id AS kitchen_display_id, KITCHEN.name AS kitchen_name, " +
 					 " KITCHEN.type AS kitchen_type , KITCHEN.is_allow_temp AS is_allow_temp, " +
-					 " DEPT.dept_id, DEPT.name AS dept_name, DEPT.type AS dept_type " +
+					 " DEPT.dept_id, DEPT.name AS dept_name, DEPT.type AS dept_type, DEPT.display_id AS dept_display_id " +
 					 " FROM " + 
 					 Params.dbName + ".food FOOD " +
 					 " INNER JOIN " + Params.dbName + ".price_plan PP " +
@@ -699,17 +697,17 @@ public class FoodDao {
 			f.setTasteRefType(dbCon.rs.getShort("taste_ref_type"));
 			f.setDesc(dbCon.rs.getString("desc"));
 			f.setImage(dbCon.rs.getString("img"));
-			f.setKitchen( new Kitchen.Builder(dbCon.rs.getShort("kitchen_alias"), 
-	 				   				   		  dbCon.rs.getString("kitchen_name"), 
-	 				   				   		  restaurantId)
-										.setAllowTemp(dbCon.rs.getBoolean("is_allow_temp"))
-										.setKitchenId(dbCon.rs.getLong("kitchen_id"))
-										.setType(dbCon.rs.getShort("kitchen_type"))
-										.setDept(new Department(dbCon.rs.getString("dept_name"), 
-	 				   				    		   		  	    dbCon.rs.getShort("dept_id"), 
-	 				   				    		   		  	    restaurantId,
-	 				   				    		   		  	    Department.Type.valueOf(dbCon.rs.getShort("dept_type"))))
-	 				   				     .build());
+			f.setKitchen(new Kitchen.QueryBuilder(dbCon.rs.getInt("kitchen_id"), dbCon.rs.getString("kitchen_name")) 
+									.setDisplayId(dbCon.rs.getInt("kitchen_display_id"))
+	 				   				.setRestaurantId(restaurantId)
+									.setAllowTemp(dbCon.rs.getBoolean("is_allow_temp"))
+									.setType(dbCon.rs.getShort("kitchen_type"))
+									.setDept(new Department(dbCon.rs.getString("dept_name"), 
+ 				   				    		   		  	    dbCon.rs.getShort("dept_id"), 
+ 				   				    		   		  	    restaurantId,
+ 				   				    		   		  	    Department.Type.valueOf(dbCon.rs.getShort("dept_type")),
+ 				   				    		   		  	    dbCon.rs.getInt("dept_display_id")))
+ 			   				        .build());
 			f.setStockStatus(dbCon.rs.getInt("stock_status"));
 			
 			foods.add(f);

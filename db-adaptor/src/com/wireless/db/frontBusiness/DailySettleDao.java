@@ -260,7 +260,7 @@ public class DailySettleDao {
 		List<StockAction.AuditBuilder> auditBuilders = new ArrayList<StockAction.AuditBuilder>();
 		
 		//生成每个部门的商品和原料出库消耗单
-		for(Department dept : DepartmentDao.getNormalDepartments(staff)){
+		for(Department dept : DepartmentDao.getByType(dbCon, staff, Department.Type.NORMAL)){
 			
 			for(MaterialCate.Type cateType : MaterialCate.Type.values()){
 				
@@ -298,7 +298,7 @@ public class DailySettleDao {
 				
 				//如果存在出库消耗单则插入
 				if(!builder.getStockActionDetails().isEmpty()){
-					auditBuilders.add(StockAction.AuditBuilder.newStockActionAudit(StockActionDao.insertStockAction(staff, builder)));
+					auditBuilders.add(StockAction.AuditBuilder.newStockActionAudit(StockActionDao.insertStockAction(dbCon, staff, builder)));
 				}
 			}
 			
@@ -307,7 +307,7 @@ public class DailySettleDao {
 		//如果有盘点任务正在进行，则不审核出入库消耗单
 		if(!StockActionDao.isStockTakeChecking(dbCon, staff)){
 			for(AuditBuilder auditBuilder : auditBuilders){
-				StockActionDao.auditStockAction(staff, auditBuilder);
+				StockActionDao.auditStockAction(dbCon, staff, auditBuilder);
 			}
 		}
 		

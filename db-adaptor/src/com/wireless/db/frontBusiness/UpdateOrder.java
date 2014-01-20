@@ -310,7 +310,7 @@ public class UpdateOrder {
 				  " ( " + 
 				  " `restaurant_id`, `order_id`, `food_id`, `food_alias`, `order_count`, `unit_price`, `commission`, `name`, `food_status`, " +
 				  " `discount`, `taste_group_id`, " +
-				  " `dept_id`, `kitchen_id`, `kitchen_alias`, " +
+				  " `dept_id`, `kitchen_id`, " +
 				  " `staff_id`, `waiter`, `order_date`, `is_temporary`, `is_paid` " +
 				  " ) " +
 				  " VALUES " +
@@ -328,7 +328,6 @@ public class UpdateOrder {
 				  (extraFood.hasTasteGroup() ? extraFood.getTasteGroup().getGroupId() : TasteGroup.EMPTY_TASTE_GROUP_ID) + ", " +
 				  extraFood.getKitchen().getDept().getId() + ", " +
 				  extraFood.getKitchen().getId() + ", " +
-				  extraFood.getKitchen().getAliasId() + ", " + 
 				  staff.getId() + ", " +
 				  "'" + staff.getName() + "', " +
 				  "NOW(), " + 
@@ -345,7 +344,7 @@ public class UpdateOrder {
 				  " ( " +
 				  " `restaurant_id`, `order_id`, `food_id`, `food_alias`, `order_count`, `unit_price`, `commission`, `name`, `food_status`, " +
 				  " `discount`, `taste_group_id`, `cancel_reason_id`, `cancel_reason`, " +
-				  " `dept_id`, `kitchen_id`, `kitchen_alias`, " +
+				  " `dept_id`, `kitchen_id`, " +
 				  " `staff_id`, `waiter`, `order_date`, `is_temporary`, `is_paid`) VALUES (" +
 				  staff.getRestaurantId() + ", " +
 				  diffResult.newOrder.getId() + ", " +
@@ -362,7 +361,6 @@ public class UpdateOrder {
 				  (cancelledFood.hasCancelReason() ? "'" + cancelledFood.getCancelReason().getReason() + "'" : "NULL") + ", " +
 				  cancelledFood.getKitchen().getDept().getId() + ", " +
 				  cancelledFood.getKitchen().getId() + ", " +
-				  cancelledFood.getKitchen().getAliasId() + ", " + 
 				  staff.getId() + ", " +
 				  "'" + staff.getName() + "', " +
 				  "NOW(), " + 
@@ -454,22 +452,10 @@ public class UpdateOrder {
 		
 		if(foodToFill.isTemp()){
 			// Get the associated kitchen detail in case of temporary.
-			foodToFill.asFood().setKitchen(KitchenDao.getKitchenByAlias(dbCon, staff, foodToFill.getKitchen().getAliasId()));
+			foodToFill.asFood().setKitchen(KitchenDao.getById(dbCon, staff, foodToFill.getKitchen().getId()));
 			
 		}else{
 			//Get the details to each order food			
-//			Food detailFood = FoodDao.getFoodByAlias(dbCon, staff, foodToFill.getAliasId());
-//			
-//			foodToFill.asFood().setFoodId(detailFood.getFoodId());
-//			foodToFill.asFood().setAliasId(detailFood.getAliasId());
-//			foodToFill.asFood().setRestaurantId(detailFood.getRestaurantId());
-//			foodToFill.asFood().setStatus(detailFood.getStatus());
-//			foodToFill.asFood().setName(detailFood.getName());
-//			foodToFill.asFood().setPrice(detailFood.getPrice());
-//			foodToFill.asFood().setCommission(detailFood.getCommission());
-//			foodToFill.asFood().setKitchen(detailFood.getKitchen());
-//			foodToFill.asFood().setChildFoods(detailFood.getChildFoods());
-			
 			foodToFill.asFood().copyFrom(FoodDao.getFoodByAlias(dbCon, staff, foodToFill.getAliasId()));
 			
 			//Get the details to each normal tastes.

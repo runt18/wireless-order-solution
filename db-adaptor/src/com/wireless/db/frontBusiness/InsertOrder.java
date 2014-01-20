@@ -186,21 +186,10 @@ public class InsertOrder {
 					 * If the food does NOT exist, tell the terminal that the food menu has been expired.
 					 */
 					if(of.isTemp()){
-						of.asFood().setKitchen(KitchenDao.getKitchenByAlias(dbCon, staff, of.getKitchen().getAliasId()));
+						of.asFood().setKitchen(KitchenDao.getById(dbCon, staff, of.getKitchen().getId()));
 						
 					}else{		
 						//Get the details to each order food.
-//						Food detailFood = FoodDao.getFoodByAlias(dbCon, staff, of.getAliasId());
-//						of.asFood().setFoodId(detailFood.getFoodId());
-//						of.asFood().setAliasId(detailFood.getAliasId());
-//						of.asFood().setRestaurantId(detailFood.getRestaurantId());
-//						of.asFood().setName(detailFood.getName());
-//						of.asFood().setStatus(detailFood.getStatus());
-//						of.asFood().setPrice(detailFood.getPrice());
-//						of.asFood().setCommission(detailFood.getCommission());
-//						of.asFood().setKitchen(detailFood.getKitchen());
-//						of.asFood().setChildFoods(detailFood.getChildFoods());
-						
 						of.asFood().copyFrom(FoodDao.getFoodByAlias(dbCon, staff, of.getAliasId()));
 						
 						//Check to see whether the staff has the privilege to present the food.
@@ -360,7 +349,7 @@ public class InsertOrder {
 				  " ( " +
 				  " `restaurant_id`, `order_id`, `food_id`, `food_alias`, `order_count`, `unit_price`, `commission`, `name`, " +
 				  " `food_status`, `discount`, `taste_group_id`, " +
-				  " `dept_id`, `kitchen_id`, `kitchen_alias`, " +
+				  " `dept_id`, `kitchen_id`, " +
 				  " `staff_id`, `waiter`, `order_date`, `is_temporary` " +
 				  " ) " +
 				  " VALUES " +
@@ -378,7 +367,6 @@ public class InsertOrder {
 				  (foodToInsert.hasTasteGroup() ? foodToInsert.getTasteGroup().getGroupId() : TasteGroup.EMPTY_TASTE_GROUP_ID) + ", " +
 				  foodToInsert.getKitchen().getDept().getId() + ", " +
 				  foodToInsert.getKitchen().getId() + ", " +
-				  foodToInsert.getKitchen().getAliasId() + ", " + 
 				  staff.getId() + "," +
 				  "'" + staff.getName() + "', NOW(), " + 
 				  (foodToInsert.isTemp() ? "1" : "0") + 

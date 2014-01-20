@@ -239,7 +239,7 @@ public class DiscountDao {
 		sql = " SELECT " +
 			  " DIST.discount_id, DIST.restaurant_id, DIST.name AS dist_name, DIST.level, DIST.status AS dist_status, " +
 			  " DIST_PLAN.dist_plan_id, DIST_PLAN.kitchen_id, DIST_PLAN.rate, " +
-			  " KITCHEN.name AS kitchen_name, KITCHEN.kitchen_alias, " +
+			  " KITCHEN.name AS kitchen_name, KITCHEN.display_id, " +
 			  " CASE WHEN DIST_PLAN.discount_id IS NULL THEN '0' ELSE '1' END AS has_plan " +
 			  " FROM " + 
 			  Params.dbName + ".discount DIST " +
@@ -268,7 +268,7 @@ public class DiscountDao {
 			Kitchen kitchen = new Kitchen();
 			kitchen.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
 			kitchen.setId(dbCon.rs.getInt("kitchen_id"));
-			kitchen.setAliasId(dbCon.rs.getShort("kitchen_alias"));
+			kitchen.setDisplayId(dbCon.rs.getShort("display_id"));
 			kitchen.setName(dbCon.rs.getString("kitchen_name"));
 			
 			float rate = dbCon.rs.getFloat("rate");
@@ -468,7 +468,7 @@ public class DiscountDao {
 		if(discountID != null && plan != null){
 			 Staff term = new Staff();
 			 term.setRestaurantId(pojo.getRestaurantId());
-			 List<Kitchen> kl = KitchenDao.getKitchens(dbCon, term, " AND KITCHEN.type = " + Kitchen.Type.NORMAL.getVal(), null);
+			 List<Kitchen> kl = KitchenDao.getByType(dbCon, term, Kitchen.Type.NORMAL);
 			 insertSQL = "INSERT INTO " +  Params.dbName + ".discount_plan " 
 						+ " (discount_id, kitchen_id, rate)";
 			 insertSQL += " values";
@@ -836,7 +836,7 @@ public class DiscountDao {
 			  " (discount_id, kitchen_id, rate) ";
 		sql += " values";
 		int i = 0;
-		for(Kitchen k : KitchenDao.getKitchens(dbCon, staff, " AND KITCHEN.type = " + Kitchen.Type.NORMAL.getVal(), null)){
+		for(Kitchen k : KitchenDao.getByType(dbCon, staff, Kitchen.Type.NORMAL)){
 			sql += ( i > 0 ? "," : "");
 			sql += ("(" + discountId + "," + k.getId() + "," + builder.getInitRate() + ")");
 			i++;

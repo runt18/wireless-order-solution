@@ -21,7 +21,7 @@ public class CostAnalyzeReportDao {
 	/**
 	 * 
 	 * @param dbCon
-	 * @param term
+	 * @param staff
 	 * @param begin
 	 * @param end 
 	 * 				already format 23:59:59
@@ -30,10 +30,10 @@ public class CostAnalyzeReportDao {
 	 * @throws SQLException
 	 * @throws BusinessException 
 	 */
-	public static List<CostAnalyze> getCostAnalyzes(DBCon dbCon, Staff term, String begin, String end, String orderClause) throws SQLException, BusinessException{
+	public static List<CostAnalyze> getCostAnalyzes(DBCon dbCon, Staff staff, String begin, String end, String orderClause) throws SQLException, BusinessException{
 		List<CostAnalyze> costAnalyzes = new ArrayList<CostAnalyze>();
 		List<MaterialDept> materialDepts;
-		List<Department> departments = DepartmentDao.getNormalDepartments(dbCon, term);
+		List<Department> departments = DepartmentDao.getByType(dbCon, staff, Department.Type.NORMAL);
 		String extra;
 		String extraCond = " AND S.ori_stock_date >= '" + begin + "' AND S.ori_stock_date <= '" + end + "'";
 		
@@ -42,7 +42,7 @@ public class CostAnalyzeReportDao {
 			costAnalyze.setDeptId(dept.getId());
 			costAnalyze.setDeptName(dept.getName());
 			
-			materialDepts = MaterialDeptDao.getMaterialDepts(dbCon, term, " AND MD.dept_id = " + dept.getId(), null);
+			materialDepts = MaterialDeptDao.getMaterialDepts(dbCon, staff, " AND MD.dept_id = " + dept.getId(), null);
 			if(materialDepts.isEmpty()){
 				costAnalyze.setPrimeMoney(0);
 				costAnalyze.setEndMoney(0);
@@ -50,7 +50,7 @@ public class CostAnalyzeReportDao {
 				float primeMoney = 0, endMoney = 0;
 				String primeAmount = "SELECT MBD.opening_balance FROM " + Params.dbName + ".monthly_balance MB" +
 										" JOIN " + Params.dbName + ".monthly_balance_detail MBD ON MB.id = MBD.monthly_balance_id " +
-										" WHERE MB.restaurant_id = " + term.getRestaurantId() + 
+										" WHERE MB.restaurant_id = " + staff.getRestaurantId() + 
 										" AND MB.month <= '" + begin + "'" +
 										" AND MBD.dept_id = " + dept.getId() + 
 										" ORDER BY MB.id DESC LIMIT 0,1";
@@ -63,7 +63,7 @@ public class CostAnalyzeReportDao {
 				
 				String endAmount = "SELECT MBD.ending_balance FROM " + Params.dbName + ".monthly_balance MB" +
 						" JOIN " + Params.dbName + ".monthly_balance_detail MBD ON MB.id = MBD.monthly_balance_id " +
-						" WHERE MB.restaurant_id = " + term.getRestaurantId() + 
+						" WHERE MB.restaurant_id = " + staff.getRestaurantId() + 
 						" AND MB.month <= '" + end + "'" +
 						" AND MBD.dept_id = " + dept.getId() + 
 						" ORDER BY MB.id DESC LIMIT 0,1";
@@ -79,13 +79,13 @@ public class CostAnalyzeReportDao {
 			
 			//获取领料金额
 			extra = " AND S.dept_in = " + dept.getId() + " AND (S.sub_type = " + SubType.STOCK_IN.getVal() + " OR S.sub_type = " + SubType.STOCK_OUT_TRANSFER.getVal() + " OR S.sub_type = " + SubType.STOCK_IN_TRANSFER.getVal() + ")";
-			costAnalyze.setPickMaterialMoney(getMoney(dbCon, term, extraCond + extra, orderClause));
+			costAnalyze.setPickMaterialMoney(getMoney(dbCon, staff, extraCond + extra, orderClause));
 			//退料金额
 			extra = " AND S.dept_out = " + dept.getId() + " AND S.sub_type = " + SubType.STOCK_OUT.getVal();
-			costAnalyze.setStockOutMoney(getMoney(dbCon, term, extraCond + extra, orderClause));
+			costAnalyze.setStockOutMoney(getMoney(dbCon, staff, extraCond + extra, orderClause));
 			//拨出金额
 			extra = " AND S.dept_out = " + dept.getId() + " AND (S.sub_type = " + SubType.STOCK_OUT_TRANSFER.getVal() + " OR S.sub_type = " + SubType.STOCK_IN_TRANSFER.getVal() + ") ";
-			costAnalyze.setStockOutTransferMoney(getMoney(dbCon, term, extraCond + extra, orderClause));
+			costAnalyze.setStockOutTransferMoney(getMoney(dbCon, staff, extraCond + extra, orderClause));
 			//成本金额
 			costAnalyze.setCostMoney(costAnalyze.getPrimeMoney() + costAnalyze.getPickMaterialMoney() - costAnalyze.getStockOutMoney() - costAnalyze.getStockOutTransferMoney() - costAnalyze.getEndMoney());
 			
@@ -93,7 +93,7 @@ public class CostAnalyzeReportDao {
 		}
 		//获取销售额
 		String sql = "SELECT dept_id, SUM(unit_price * order_count) as money FROM " + Params.dbName + ".order_food_history " +
-				 	" WHERE restaurant_id = " + term.getRestaurantId() + 
+				 	" WHERE restaurant_id = " + staff.getRestaurantId() + 
 				 	" AND order_date >= '" + begin + "' AND  order_date <= '" + end + "'" +
 				 	" GROUP BY dept_id";
 		DBCon cost = new DBCon();

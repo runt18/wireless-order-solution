@@ -89,7 +89,7 @@ public class OrderFoodDao {
 				" OF.restaurant_id, OF.food_id, OF.name, OF.food_status, OF.is_paid, " +
 				" OF.unit_price, OF.order_count, OF.waiter, OF.order_date, OF.discount, OF.order_date, " +
 				" OF.cancel_reason_id, OF.cancel_reason, " +
-				" OF.kitchen_alias, OF.kitchen_id, (CASE WHEN K.kitchen_id IS NULL THEN '已删除厨房' ELSE K.name END) AS kitchen_name, " +
+				" OF.kitchen_id, (CASE WHEN K.kitchen_id IS NULL THEN '已删除厨房' ELSE K.name END) AS kitchen_name, " +
 				" OF.dept_id, (CASE WHEN D.dept_id IS NULL THEN '已删除部门' ELSE D.name END) as dept_name " +
 				" FROM " + Params.dbName + ".order_food OF " +
 				" JOIN " + Params.dbName + ".order O ON OF.order_id = O.id " +
@@ -121,8 +121,7 @@ public class OrderFoodDao {
 			
 			Kitchen kitchen = new Kitchen();
 			kitchen.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
-			kitchen.setId(dbCon.rs.getLong("kitchen_id"));
-			kitchen.setAliasId(dbCon.rs.getShort("kitchen_alias"));
+			kitchen.setId(dbCon.rs.getInt("kitchen_id"));
 			kitchen.setName(dbCon.rs.getString("kitchen_name"));
 			
 			Department dept = new Department();
@@ -204,7 +203,7 @@ public class OrderFoodDao {
 				" OFH.restaurant_id, OFH.food_id, OFH.name, OFH.food_status, OFH.is_paid, " +
 				" OFH.unit_price, OFH.order_count, OFH.waiter, OFH.order_date, OFH.discount, OFH.order_date, " +
 				" OFH.cancel_reason_id, IF(OFH.cancel_reason_id = 1, '无原因', OFH.cancel_reason) cancel_reason, " +
-				" OFH.kitchen_alias, OFH.kitchen_id, (CASE WHEN K.kitchen_id IS NULL THEN '已删除厨房' ELSE K.name END) AS kitchen_name, " +
+				" OFH.kitchen_id, (CASE WHEN K.kitchen_id IS NULL THEN '已删除厨房' ELSE K.name END) AS kitchen_name, " +
 				" OFH.dept_id, (CASE WHEN D.dept_id IS NULL THEN '已删除部门' ELSE D.name END) as dept_name " +
 				" FROM " + Params.dbName + ".order_food_history OFH " +
 				" JOIN " + Params.dbName + ".order_history OH ON OH.id = OFH.order_id " +
@@ -236,8 +235,7 @@ public class OrderFoodDao {
 			
 			Kitchen kitchen = new Kitchen();
 			kitchen.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
-			kitchen.setId(dbCon.rs.getLong("kitchen_id"));
-			kitchen.setAliasId(dbCon.rs.getShort("kitchen_alias"));
+			kitchen.setId(dbCon.rs.getInt("kitchen_id"));
 			kitchen.setName(dbCon.rs.getString("kitchen_name"));
 			
 			Department dept = new Department();
@@ -323,7 +321,7 @@ public class OrderFoodDao {
 		String sql;
 
 		sql = "SELECT OF.order_id, OF.food_alias, OF.taste_group_id, OF.is_temporary, " +
-				" MAX(OF.restaurant_id) AS restaurant_id, MAX(OF.kitchen_alias) AS kitchen_alias, MAX(OF.kitchen_id) AS kitchen_id, " + 
+				" MAX(OF.restaurant_id) AS restaurant_id, MAX(OF.kitchen_id) AS kitchen_id, " + 
 				" MAX(OF.food_id) AS food_id, MAX(OF.name) AS name, MAX(OF.food_status) AS food_status, " +
 				" MAX(OF.unit_price) AS unit_price, MAX(OF.commission) AS commission, MAX(OF.waiter) AS waiter, MAX(OF.order_date) AS order_date, MAX(OF.discount) AS discount, " +
 				" MAX(OF.dept_id) AS dept_id, MAX(OF.id) AS id, MAX(OF.order_date) AS pay_datetime, SUM(OF.order_count) AS order_sum " +
@@ -355,8 +353,7 @@ public class OrderFoodDao {
 			food.setOrderDate(dbCon.rs.getTimestamp("pay_datetime").getTime());
 			food.setWaiter(dbCon.rs.getString("waiter"));
 			food.getKitchen().setRestaurantId(dbCon.rs.getInt("restaurant_id"));
-			food.getKitchen().setId(dbCon.rs.getLong("kitchen_id"));
-			food.getKitchen().setAliasId(dbCon.rs.getShort("kitchen_alias"));
+			food.getKitchen().setId(dbCon.rs.getInt("kitchen_id"));
 			food.getKitchen().getDept().setRestaurantId(dbCon.rs.getInt("restaurant_id"));
 			food.getKitchen().getDept().setId(dbCon.rs.getShort("dept_id"));
 			food.setDiscount(dbCon.rs.getFloat("discount"));
@@ -430,7 +427,7 @@ public class OrderFoodDao {
 		String sql;
 
 		sql = "SELECT OFH.order_id, OFH.food_alias, OFH.taste_group_id, OFH.is_temporary, " +
-			  " MAX(OFH.restaurant_id) AS restaurant_id, MAX(OFH.kitchen_alias) AS kitchen_alias, MAX(OFH.kitchen_id) AS kitchen_id, " +
+			  " MAX(OFH.restaurant_id) AS restaurant_id, MAX(OFH.kitchen_id) AS kitchen_id, " +
 			  " MAX(OFH.food_id) AS food_id, MAX(OFH.name) AS name, MAX(OFH.food_status) AS food_status, " +
 			  " MAX(OFH.unit_price) AS unit_price, MAX(OFH.commission) AS commission, MAX(OFH.waiter) AS waiter, MAX(OFH.order_date) AS order_date, MAX(OFH.discount) AS discount, " +
 			  " MAX(OFH.dept_id) AS dept_id, MAX(OFH.id) AS id, MAX(OFH.order_date) AS pay_datetime, SUM(OFH.order_count) AS order_sum " +
@@ -461,8 +458,7 @@ public class OrderFoodDao {
 			food.setWaiter(dbCon.rs.getString("waiter"));
 			food.setOrderDate(dbCon.rs.getTimestamp("pay_datetime").getTime());
 			food.getKitchen().setRestaurantId(dbCon.rs.getInt("restaurant_id"));
-			food.getKitchen().setId(dbCon.rs.getLong("kitchen_id"));
-			food.getKitchen().setAliasId(dbCon.rs.getShort("kitchen_alias"));
+			food.getKitchen().setId(dbCon.rs.getInt("kitchen_id"));
 			food.getKitchen().getDept().setRestaurantId(dbCon.rs.getInt("restaurant_id"));
 			food.getKitchen().getDept().setId(dbCon.rs.getShort("dept_id"));
 			food.setDiscount(dbCon.rs.getFloat("discount"));

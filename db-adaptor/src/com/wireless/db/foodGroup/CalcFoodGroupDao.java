@@ -52,7 +52,7 @@ public class CalcFoodGroupDao {
 	 */
 	public static List<Pager> calc(DBCon dbCon, Staff term) throws SQLException{
 		
-		List<Department> depts = DepartmentDao.getNormalDepartments(dbCon, term);
+		List<Department> depts = DepartmentDao.getByType(dbCon, term, Department.Type.NORMAL);
 		
 		List<Pager> pagers = new ArrayList<Pager>();
 		for(Department dept : depts){
@@ -145,9 +145,9 @@ public class CalcFoodGroupDao {
 
 				@Override
 				public int compare(Food f1, Food f2) {
-					if(f1.getKitchen().getAliasId() > f2.getKitchen().getAliasId()){
+					if(f1.getKitchen().getDisplayId() > f2.getKitchen().getDisplayId()){
 						return 1;
-					}else if(f1.getKitchen().getAliasId() < f2.getKitchen().getAliasId()){
+					}else if(f1.getKitchen().getDisplayId() < f2.getKitchen().getDisplayId()){
 						return -1;
 					}else{
 						if(f1.isHot()){

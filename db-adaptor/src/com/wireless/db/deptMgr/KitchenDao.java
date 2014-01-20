@@ -2,6 +2,7 @@ package com.wireless.db.deptMgr;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import com.mysql.jdbc.Statement;
@@ -12,154 +13,403 @@ import com.wireless.exception.DeptError;
 import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.menuMgr.Kitchen;
+import com.wireless.pojo.menuMgr.Kitchen.Type;
 import com.wireless.pojo.staffMgr.Staff;
 
 public class KitchenDao {
 	
 	/**
-	 * Get the kitchens to a specified restaurant defined in {@link Staff} and other extra condition.
+	 * Swap the display id between two kitchens.
 	 * @param staff
 	 * 			the staff to perform this action
-	 * @param extraCond
-	 * 			the extra condition
-	 * @param orderClause
-	 * 			the order clause
-	 * @return the list holding the kitchen result
+	 * @param builder
+	 * 			the swap display builder
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if the kitchen to swap does NOT exist
 	 */
-	public static List<Kitchen> getKitchens(Staff staff, String extraCond, String orderClause) throws SQLException{
+	public static void swap(Staff staff, Kitchen.SwapDisplayBuilder builder) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return getKitchens(dbCon, staff, extraCond, orderClause);
+			dbCon.conn.setAutoCommit(false);
+			swap(dbCon, staff, builder);
+			dbCon.conn.commit();
+		}catch(Exception e){
+			dbCon.conn.rollback();
+			throw e;
 		}finally{
 			dbCon.disconnect();
 		}
 	}
 	
 	/**
-	 * Get the kitchens to a specified restaurant defined in {@link Staff} and other extra condition.
+	 * Swap the display id between two kitchens.
 	 * @param dbCon
 	 * 			the database connection
 	 * @param staff
 	 * 			the staff to perform this action
-	 * @param extraCond
-	 * 			the extra condition
-	 * @param orderClause
-	 * 			the order clause
-	 * @return the list holding the kitchen result
+	 * @param builder
+	 * 			the swap display builder
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if the kitchen to swap does NOT exist
 	 */
-	public static List<Kitchen> getKitchens(DBCon dbCon, Staff staff, String extraCond, String orderClause) throws SQLException{
-		List<Kitchen> kitchens = new ArrayList<Kitchen>();
-		String sql = " SELECT " +
-					 " KITCHEN.restaurant_id, KITCHEN.kitchen_id, KITCHEN.kitchen_alias, " +
-					 " KITCHEN.name AS kitchen_name, KITCHEN.type AS kitchen_type, KITCHEN.is_allow_temp AS is_allow_temp, " +
-					 " DEPT.dept_id, DEPT.name AS dept_name, DEPT.type AS dept_type FROM " + 
-			  		 Params.dbName + ".kitchen KITCHEN " +
-					 " JOIN " +
-					 Params.dbName + ".department DEPT " +
-					 " ON KITCHEN.dept_id = DEPT.dept_id AND KITCHEN.restaurant_id = DEPT.restaurant_id " +
-			  		 " WHERE 1=1 " +
-					 " AND KITCHEN.restaurant_id = " + staff.getRestaurantId() +
-			  		 (extraCond == null ? "" : extraCond) + " " +
-			  		 (orderClause == null ? "" : orderClause);
+	public static void swap(DBCon dbCon, Staff staff, Kitchen.SwapDisplayBuilder builder) throws SQLException, BusinessException{
+		Kitchen kA = getById(dbCon, staff, builder.getIdA());
+		Kitchen kB = getById(dbCon, staff, builder.getIdB());
+		
+		String sql;
+		sql = " UPDATE " + Params.dbName + ".kitchen SET " +
+			  " display_id = " + kA.getDisplayId() +
+			  " WHERE kitchen_id = " + kB.getId();
+		dbCon.stmt.executeUpdate(sql);
+		
+		sql = " UPDATE " + Params.dbName + ".kitchen SET " +
+			  " display_id = " + kB.getDisplayId() +
+			  " WHERE kitchen_id = " + kA.getId();
+		dbCon.stmt.executeUpdate(sql);
+	}
+	
+	/**
+	 * Update a kitchen according to update builder
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param builder
+	 * 			the update builder
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if the kitchen to update does NOT exist
+	 */
+	public static void update(Staff staff, Kitchen.UpdateBuilder builder) throws SQLException, BusinessException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			update(dbCon, staff, builder);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Update a kitchen according to update builder
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param builder
+	 * 			the update builder
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if the kitchen to update does NOT exist
+	 */
+	public static void update(DBCon dbCon, Staff staff, Kitchen.UpdateBuilder builder) throws SQLException, BusinessException{
+		Kitchen k = builder.build();
+		String sql;
+		sql = " UPDATE " + Params.dbName + ".kitchen SET " +
+			  " kitchen_id = " + k.getId() +
+			  (builder.isNameChanged() ? ",name = '" + k.getName() + "'": "") +
+			  (builder.isDeptChanged() ? ",dept_id = " + k.getDept().getId() : "") +
+			  (builder.isAllowTmpChanged() ? ",is_allow_temp = " + (k.isAllowTemp() ? 1 : 0) : "") +
+			  " WHERE kitchen_id = " + k.getId();
+		if(dbCon.stmt.executeUpdate(sql) == 0){
+			throw new BusinessException(DeptError.KITCHEN_NOT_EXIST);
+		}
+	}
+	
+	/**
+	 * Remove a kitchen and put it back to the pool containing unused kitchens.
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param kitchenId
+	 * 			the kitchen id to remove
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if the kitchen to delete does NOT exist.
+	 */
+	public static void remove(Staff staff, int kitchenId) throws SQLException, BusinessException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			remove(dbCon, staff, kitchenId);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Remove a kitchen and put it back to the pool containing unused kitchens.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param kitchenId
+	 * 			the kitchen id to remove
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if the kitchen to delete is NOT empty
+	 * 			throws if the kitchen to delete does NOT exist
+	 */
+	public static void remove(DBCon dbCon, Staff staff, int kitchenId) throws SQLException, BusinessException{
+		String sql;
+		//Check to see whether any food is associated with the kitchen to remove
+		sql = " SELECT food_id FROM " + Params.dbName + ".food WHERE kitchen_id = " + kitchenId + " LIMIT 1 ";
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
-		while(dbCon.rs.next()){
-			kitchens.add(new Kitchen.Builder(dbCon.rs.getShort("kitchen_alias"), dbCon.rs.getString("kitchen_name"), dbCon.rs.getInt("restaurant_id"))
-								.setAllowTemp(dbCon.rs.getBoolean("is_allow_temp"))
-								.setKitchenId(dbCon.rs.getLong("kitchen_id"))
-								.setType(dbCon.rs.getShort("kitchen_type"))
-								.setDept(new Department(dbCon.rs.getString("dept_name"), 
-											 		dbCon.rs.getShort("dept_id"), 
-											 		dbCon.rs.getInt("restaurant_id"),
-											 		Department.Type.valueOf(dbCon.rs.getShort("dept_type")))).build());
+		if(dbCon.rs.next()){
+			throw new BusinessException(DeptError.KITCHEN_NOT_EMPTY);
 		}
 		dbCon.rs.close();
 		
-		return kitchens;
+		sql = " UPDATE " + Params.dbName + ".kitchen SET " +
+			  " kitchen_id = " + kitchenId + 
+			  " ,type = " + Kitchen.Type.IDLE.getVal() + 
+			  " ,dept_id = " + Department.DeptId.DEPT_NULL.getVal() + 
+			  " ,is_allow_temp = 0 " +
+			  " WHERE kitchen_id = " + kitchenId;
+		if(dbCon.stmt.executeUpdate(sql) == 0){
+			throw new BusinessException(DeptError.KITCHEN_NOT_EXIST);
+		}
+	}
+	
+	/**
+	 * Add a kitchen from the pool containing unused kitchens.
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param builder
+	 * 			the builder to add kitchen
+	 * @return the id to kitchen just added
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if the unused kitchen has been run out of
+	 * 			throws if the kitchen to update does NOT exist
+	 */
+	public static int add(Staff staff, Kitchen.AddBuilder builder) throws SQLException, BusinessException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return add(dbCon, staff, builder);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Add a kitchen from the pool containing unused kitchens.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param builder
+	 * 			the builder to add kitchen
+	 * @return the id to kitchen just added
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if the unused kitchen has been run out of
+	 * 			throws if the kitchen to update does NOT exist
+	 */
+	public static int add(DBCon dbCon, Staff staff, Kitchen.AddBuilder builder) throws SQLException, BusinessException{
+		String sql;
+		//Check to see whether any unused kitchens exist.
+		sql = " SELECT kitchen_id FROM " + Params.dbName + ".kitchen " +
+			  " WHERE 1 = 1 " +
+			  " AND type = " + Type.IDLE.getVal() + 
+			  " AND restaurant_id = " + staff.getRestaurantId() +
+			  " ORDER BY kitchen_id LIMIT 1 ";
+		dbCon.rs = dbCon.stmt.executeQuery(sql);
+		int kitchenId = 0;
+		if(dbCon.rs.next()){
+			kitchenId = dbCon.rs.getInt(1);
+		}else{
+			throw new BusinessException(DeptError.INSUFFICIENT_IDLE_KITCHEN);
+		}
+		dbCon.rs.close();
+		
+		Kitchen k = builder.build();
+		//Update the kitchen type to normal so as to be ready for user.
+		sql = " UPDATE " + Params.dbName + ".kitchen SET " +
+			  " kitchen_id = " + kitchenId + 
+			  " ,type = " + Kitchen.Type.NORMAL.getVal() +
+			  " ,dept_id = " + k.getDept().getId() + 
+			  " ,name = '" + k.getName() + "'" +
+			  " ,is_allow_temp = " + (k.isAllowTemp() ? 1 : 0) +
+			  " WHERE kitchen_id = " + kitchenId;
+		if(dbCon.stmt.executeUpdate(sql) == 0){
+			throw new BusinessException(DeptError.KITCHEN_NOT_EXIST);
+		}
+		
+		return kitchenId;
+	}
+	
+	/**
+	 * Get the kitchens to a specific type.
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param type
+	 * 			the kitchen type
+	 * @return the kitchens to this specific type
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static List<Kitchen> getByType(Staff staff, Kitchen.Type type) throws SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return getByType(dbCon, staff, type);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Get the kitchens to a specific type.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param type
+	 * 			the kitchen type
+	 * @return the kitchens to this specific type
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static List<Kitchen> getByType(DBCon dbCon, Staff staff, Kitchen.Type type) throws SQLException{
+		return getByCond(dbCon, staff, " AND K.type = " + type.getVal(), null);
+	}
+	
+	/**
+	 * Get the kitchen according to specific id.
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param kitchenId
+	 * 			the kitchen id to get
+	 * @return the kitchen to this specific id
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if the kitchen to this id does NOT exist
+	 */
+	public static Kitchen getById(Staff staff, int kitchenId) throws SQLException, BusinessException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return getById(dbCon, staff, kitchenId);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Get the kitchen according to specific id.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param kitchenId
+	 * 			the kitchen id to get
+	 * @return the kitchen to this specific id
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if the kitchen to this id does NOT exist
+	 */
+	public static Kitchen getById(DBCon dbCon, Staff staff, int kitchenId) throws SQLException, BusinessException{
+		List<Kitchen> result = getByCond(dbCon, staff, " AND K.kitchen_id = " + kitchenId, null);
+		if(result.isEmpty()){
+			throw new BusinessException(DeptError.KITCHEN_NOT_EXIST);
+		}else{
+			return result.get(0);
+		}
+	}
+	
+	/**
+	 * Get the kitchens to a specified restaurant defined in {@link Staff} and other extra condition.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param extraCond
+	 * 			the extra condition
+	 * @param orderClause
+	 * 			the order clause
+	 * @return the list holding the kitchen result
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	private static List<Kitchen> getByCond(DBCon dbCon, Staff staff, String extraCond, String orderClause) throws SQLException{
+		List<Kitchen> result = new ArrayList<Kitchen>();
+		String sql;
+		sql = " SELECT " +
+			  " K.restaurant_id, K.kitchen_id, K.display_id AS kitchen_dispay_id, " +
+			  " K.name AS kitchen_name, K.type AS kitchen_type, K.is_allow_temp AS is_allow_temp, " +
+			  " D.dept_id, D.name AS dept_name, D.type AS dept_type, D.display_id AS dept_display_id " +
+			  " FROM " + Params.dbName + ".kitchen K " +
+			  " JOIN " + Params.dbName + ".department D ON K.dept_id = D.dept_id AND K.restaurant_id = D.restaurant_id " +
+		  	  " WHERE 1=1 " +
+			  " AND K.restaurant_id = " + staff.getRestaurantId() +
+		  	  (extraCond == null ? "" : extraCond) + " " +
+		  	  (orderClause == null ? " ORDER BY K.display_id " : orderClause);
+		dbCon.rs = dbCon.stmt.executeQuery(sql);
+		while(dbCon.rs.next()){
+			Kitchen k = new Kitchen(dbCon.rs.getInt("kitchen_id"));
+			k.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
+			k.setDisplayId(dbCon.rs.getShort("kitchen_dispay_id"));
+			k.setName(dbCon.rs.getString("kitchen_name"));
+			k.setAllowTemp(dbCon.rs.getBoolean("is_allow_temp"));
+			k.setType(dbCon.rs.getShort("kitchen_type"));
+			k.setDept(new Department(dbCon.rs.getString("dept_name"), 
+			 						 dbCon.rs.getShort("dept_id"), 
+			 						 dbCon.rs.getInt("restaurant_id"),
+			 						 Department.Type.valueOf(dbCon.rs.getShort("dept_type")),
+			 						 dbCon.rs.getInt("dept_display_id")));
+			result.add(k);
+		}
+		dbCon.rs.close();
+		return Collections.unmodifiableList(result);
 		
 	}
 	
 	/**
-	 * Get the normal kitchens to a specific restaurant.
+	 * Get the kitchens to a specific department.
 	 * @param staff
 	 * 			the staff to perform this action
-	 * @return the normal kitchens to specific restaurant
+	 * @param deptId
+	 * 			the id to department
+	 * @return the kitchens to specific department
 	 * @throws SQLException
-	 * 			throws if failed to execute any SQL statment
+	 * 			throws if failed to execute any SQL statement
 	 */
-	public static List<Kitchen> getNormalKitchens(Staff staff) throws SQLException{
+	public static List<Kitchen> getByDept(Staff staff, Department.DeptId deptId) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return getNormalKitchens(dbCon, staff);
+			return getByDept(dbCon, staff, deptId);
 		}finally{
 			dbCon.disconnect();
 		}
 	}
 	
 	/**
-	 * Get the normal kitchens to a specific restaurant.
+	 * Get the kitchens to a specific department.
 	 * @param dbCon
 	 * 			the database connection
 	 * @param staff
 	 * 			the staff to perform this action
-	 * @return the normal kitchens to specific restaurant
-	 * @throws SQLException
-	 * 			throws if failed to execute any SQL statment
-	 */
-	public static List<Kitchen> getNormalKitchens(DBCon dbCon, Staff staff) throws SQLException{
-		return getKitchens(dbCon, staff, " AND KITCHEN.type = " + Kitchen.Type.NORMAL.getVal(), null);
-	}
-	
-	/**
-	 * Get the kitchen to a specified restaurant defined in {@link Staff} and kitchen alias
-	 * @param term
-	 * 			the terminal
-	 * @param kitchenAlias
-	 * 			the kitchen alas
-	 * @return the kitchen to a specified restaurant and kitchen alias
+	 * @param deptId
+	 * 			the id to department
+	 * @return the kitchens to specific department
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
-	 * @throws BusinessException
-	 * 			throws if the kitchen does NOT exist
 	 */
-	public static Kitchen getKitchenByAlias(Staff term, int kitchenAlias) throws SQLException, BusinessException{
-		DBCon dbCon = new DBCon();
-		try{
-			dbCon.connect();
-			return getKitchenByAlias(dbCon, term, kitchenAlias);
-		}finally{
-			dbCon.disconnect();
-		}
-	}
-	
-	/**
-	 * Get the kitchen to a specified restaurant defined in {@link Staff} and kitchen alias
-	 * @param dbCon
-	 * 			the database connection
-	 * @param term
-	 * 			the terminal
-	 * @param kitchenAlias
-	 * 			the kitchen alas
-	 * @return the kitchen to a specified restaurant and kitchen alias
-	 * @throws SQLException
-	 * 			throws if failed to execute any SQL statement
-	 * @throws BusinessException
-	 * 			throws if the kitchen does NOT exist
-	 */
-	public static Kitchen getKitchenByAlias(DBCon dbCon, Staff term, int kitchenAlias) throws SQLException, BusinessException{
-		List<Kitchen> result = getKitchens(dbCon, term,
-										   " AND KITCHEN.kitchen_alias = " + kitchenAlias,
-										   null);
-		if(result.isEmpty()){
-			throw new BusinessException("The kitchen(alias_id = " + kitchenAlias + ", restaurant_id = " + term.getRestaurantId() + ") does NOT exist.", DeptError.KITCHEN_NOT_EXIST);
-		}else{
-			return result.get(0);
-		}
+	public static List<Kitchen> getByDept(DBCon dbCon, Staff staff, Department.DeptId deptId) throws SQLException{
+		return getByCond(dbCon, staff, " AND K.dept_id = " + deptId.getVal(), null);
 	}
 	
 	/**
@@ -175,15 +425,32 @@ public class KitchenDao {
 	 * 			throws if failed to execute any SQL statement
 	 */
 	public static int insert(DBCon dbCon, Staff staff, Kitchen.InsertBuilder builder) throws SQLException{
+		Kitchen kitchenToAdd = builder.build();
+		
 		String sql;
+
+		int displayId = 0;
+
+		if(kitchenToAdd.isNull() || kitchenToAdd.isTemp()){
+			displayId = 0;
+		}else{
+			//Calculate the display id if case of normal kitchen.
+			sql = " SELECT IFNULL(MAX(display_id), 0) + 1 FROM " + Params.dbName + ".kitchen WHERE restaurant_id = " + staff.getRestaurantId();
+			dbCon.rs = dbCon.stmt.executeQuery(sql);
+			if(dbCon.rs.next()){
+				displayId = dbCon.rs.getInt(1);
+			}
+			dbCon.rs.close();
+		}
+		
 		sql = " INSERT INTO " + Params.dbName + ".kitchen" +
-		      " (restaurant_id, kitchen_alias, name, type, dept_id) " +
+		      " (restaurant_id, name, type, dept_id, display_id) " +
 			  " VALUES ( " +
-		      builder.getRestaurantId() + "," +
-			  builder.getKitchenAlias() + "," +
-		      "'" + builder.getKitchenName() + "'," +
-			  builder.getType().getVal() + "," +
-			  builder.getDeptId().getVal() +
+		      staff.getRestaurantId() + "," +
+		      "'" + kitchenToAdd.getName() + "'," +
+		      kitchenToAdd.getType().getVal() + "," +
+		      kitchenToAdd.getDept().getId() + "," +
+		      displayId +
 		      " ) ";
 		
 		dbCon.stmt.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);

@@ -343,12 +343,9 @@ public class RestaurantDao {
 			//Insert the '大牌', '中牌', '例牌' and popular tastes
 			initTastes(dbCon, staff);
 
-			//Insert the departments ranged from 1 to 10
-			initDepartment(dbCon, staff);
+			//Insert the departments and kitchens 
+			initDepartmentAndKitchen(dbCon, staff);
 
-			//Insert the kitchens ranged from 1 to 50
-			initKitchen(dbCon, staff);
-			
 			//Insert the regions ranged from 1 - 10
 			initRegion(dbCon, staff);
 			
@@ -444,76 +441,92 @@ public class RestaurantDao {
 		RegionDao.insert(dbCon, staff, new Region.InsertBuilder(staff.getRestaurantId(), Region.RegionId.REGION_10));
 	}
 	
-	private static void initDepartment(DBCon dbCon, Staff staff) throws SQLException{
-		DepartmentDao.insert(dbCon, new Department.InsertBuilder(staff.getRestaurantId(), Department.DeptId.DEPT_1));
-		DepartmentDao.insert(dbCon, new Department.InsertBuilder(staff.getRestaurantId(), Department.DeptId.DEPT_2));
-		DepartmentDao.insert(dbCon, new Department.InsertBuilder(staff.getRestaurantId(), Department.DeptId.DEPT_3));
-		DepartmentDao.insert(dbCon, new Department.InsertBuilder(staff.getRestaurantId(), Department.DeptId.DEPT_4));
-		DepartmentDao.insert(dbCon, new Department.InsertBuilder(staff.getRestaurantId(), Department.DeptId.DEPT_5));
-		DepartmentDao.insert(dbCon, new Department.InsertBuilder(staff.getRestaurantId(), Department.DeptId.DEPT_6));
-		DepartmentDao.insert(dbCon, new Department.InsertBuilder(staff.getRestaurantId(), Department.DeptId.DEPT_7));
-		DepartmentDao.insert(dbCon, new Department.InsertBuilder(staff.getRestaurantId(), Department.DeptId.DEPT_8));
-		DepartmentDao.insert(dbCon, new Department.InsertBuilder(staff.getRestaurantId(), Department.DeptId.DEPT_9));
-		DepartmentDao.insert(dbCon, new Department.InsertBuilder(staff.getRestaurantId(), Department.DeptId.DEPT_10));
-		DepartmentDao.insert(dbCon, new Department.InsertBuilder(staff.getRestaurantId(), Department.DeptId.DEPT_TMP));
-		DepartmentDao.insert(dbCon, new Department.InsertBuilder(staff.getRestaurantId(), Department.DeptId.DEPT_NULL));
-		DepartmentDao.insert(dbCon, new Department.InsertBuilder(staff.getRestaurantId(), Department.DeptId.DEPT_WAREHOUSE));
+	private static void initDepartmentAndKitchen(DBCon dbCon, Staff staff) throws SQLException, BusinessException{
+		DepartmentDao.insert(dbCon, staff, new Department.InsertBuilder(staff.getRestaurantId(), Department.DeptId.DEPT_1).setType(Department.Type.IDLE));
+		DepartmentDao.insert(dbCon, staff, new Department.InsertBuilder(staff.getRestaurantId(), Department.DeptId.DEPT_2).setType(Department.Type.IDLE));
+		DepartmentDao.insert(dbCon, staff, new Department.InsertBuilder(staff.getRestaurantId(), Department.DeptId.DEPT_3).setType(Department.Type.IDLE));
+		DepartmentDao.insert(dbCon, staff, new Department.InsertBuilder(staff.getRestaurantId(), Department.DeptId.DEPT_4).setType(Department.Type.IDLE));
+		DepartmentDao.insert(dbCon, staff, new Department.InsertBuilder(staff.getRestaurantId(), Department.DeptId.DEPT_5).setType(Department.Type.IDLE));
+		DepartmentDao.insert(dbCon, staff, new Department.InsertBuilder(staff.getRestaurantId(), Department.DeptId.DEPT_6).setType(Department.Type.IDLE));
+		DepartmentDao.insert(dbCon, staff, new Department.InsertBuilder(staff.getRestaurantId(), Department.DeptId.DEPT_7).setType(Department.Type.IDLE));
+		DepartmentDao.insert(dbCon, staff, new Department.InsertBuilder(staff.getRestaurantId(), Department.DeptId.DEPT_8).setType(Department.Type.IDLE));
+		DepartmentDao.insert(dbCon, staff, new Department.InsertBuilder(staff.getRestaurantId(), Department.DeptId.DEPT_9).setType(Department.Type.IDLE));
+		DepartmentDao.insert(dbCon, staff, new Department.InsertBuilder(staff.getRestaurantId(), Department.DeptId.DEPT_10).setType(Department.Type.IDLE));
+		DepartmentDao.insert(dbCon, staff, new Department.InsertBuilder(staff.getRestaurantId(), Department.DeptId.DEPT_TMP));
+		DepartmentDao.insert(dbCon, staff, new Department.InsertBuilder(staff.getRestaurantId(), Department.DeptId.DEPT_NULL));
+		DepartmentDao.insert(dbCon, staff, new Department.InsertBuilder(staff.getRestaurantId(), Department.DeptId.DEPT_WAREHOUSE));
+
+		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder("分厨1", Department.DeptId.DEPT_NULL, Kitchen.Type.IDLE));
+		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder("分厨2", Department.DeptId.DEPT_NULL, Kitchen.Type.IDLE));
+		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder("分厨3", Department.DeptId.DEPT_NULL, Kitchen.Type.IDLE));
+		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder("分厨4", Department.DeptId.DEPT_NULL, Kitchen.Type.IDLE));
+		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder("分厨5", Department.DeptId.DEPT_NULL, Kitchen.Type.IDLE));
+		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder("分厨6", Department.DeptId.DEPT_NULL, Kitchen.Type.IDLE));
+		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder("分厨7", Department.DeptId.DEPT_NULL, Kitchen.Type.IDLE));
+		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder("分厨8", Department.DeptId.DEPT_NULL, Kitchen.Type.IDLE));
+		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder("分厨9", Department.DeptId.DEPT_NULL, Kitchen.Type.IDLE));
+		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder("分厨10", Department.DeptId.DEPT_NULL, Kitchen.Type.IDLE));
+		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder("分厨11", Department.DeptId.DEPT_NULL, Kitchen.Type.IDLE));
+		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder("分厨12", Department.DeptId.DEPT_NULL, Kitchen.Type.IDLE));
+		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder("分厨13", Department.DeptId.DEPT_NULL, Kitchen.Type.IDLE));
+		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder("分厨14", Department.DeptId.DEPT_NULL, Kitchen.Type.IDLE));
+		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder("分厨15", Department.DeptId.DEPT_NULL, Kitchen.Type.IDLE));
+		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder("分厨16", Department.DeptId.DEPT_NULL, Kitchen.Type.IDLE));
+		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder("分厨17", Department.DeptId.DEPT_NULL, Kitchen.Type.IDLE));
+		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder("分厨18", Department.DeptId.DEPT_NULL, Kitchen.Type.IDLE));
+		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder("分厨19", Department.DeptId.DEPT_NULL, Kitchen.Type.IDLE));
+		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder("分厨20", Department.DeptId.DEPT_NULL, Kitchen.Type.IDLE));
+		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder("分厨21", Department.DeptId.DEPT_NULL, Kitchen.Type.IDLE));
+		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder("分厨22", Department.DeptId.DEPT_NULL, Kitchen.Type.IDLE));
+		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder("分厨23", Department.DeptId.DEPT_NULL, Kitchen.Type.IDLE));
+		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder("分厨24", Department.DeptId.DEPT_NULL, Kitchen.Type.IDLE));
+		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder("分厨25", Department.DeptId.DEPT_NULL, Kitchen.Type.IDLE));
+		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder("分厨26", Department.DeptId.DEPT_NULL, Kitchen.Type.IDLE));
+		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder("分厨27", Department.DeptId.DEPT_NULL, Kitchen.Type.IDLE));
+		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder("分厨28", Department.DeptId.DEPT_NULL, Kitchen.Type.IDLE));
+		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder("分厨29", Department.DeptId.DEPT_NULL, Kitchen.Type.IDLE));
+		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder("分厨30", Department.DeptId.DEPT_NULL, Kitchen.Type.IDLE));
+		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder("分厨31", Department.DeptId.DEPT_NULL, Kitchen.Type.IDLE));
+		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder("分厨32", Department.DeptId.DEPT_NULL, Kitchen.Type.IDLE));
+		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder("分厨33", Department.DeptId.DEPT_NULL, Kitchen.Type.IDLE));
+		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder("分厨34", Department.DeptId.DEPT_NULL, Kitchen.Type.IDLE));
+		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder("分厨35", Department.DeptId.DEPT_NULL, Kitchen.Type.IDLE));
+		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder("分厨36", Department.DeptId.DEPT_NULL, Kitchen.Type.IDLE));
+		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder("分厨37", Department.DeptId.DEPT_NULL, Kitchen.Type.IDLE));
+		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder("分厨38", Department.DeptId.DEPT_NULL, Kitchen.Type.IDLE));
+		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder("分厨39", Department.DeptId.DEPT_NULL, Kitchen.Type.IDLE));
+		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder("分厨40", Department.DeptId.DEPT_NULL, Kitchen.Type.IDLE));
+		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder("分厨41", Department.DeptId.DEPT_NULL, Kitchen.Type.IDLE));
+		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder("分厨42", Department.DeptId.DEPT_NULL, Kitchen.Type.IDLE));
+		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder("分厨43", Department.DeptId.DEPT_NULL, Kitchen.Type.IDLE));
+		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder("分厨44", Department.DeptId.DEPT_NULL, Kitchen.Type.IDLE));
+		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder("分厨45", Department.DeptId.DEPT_NULL, Kitchen.Type.IDLE));
+		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder("分厨46", Department.DeptId.DEPT_NULL, Kitchen.Type.IDLE));
+		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder("分厨47", Department.DeptId.DEPT_NULL, Kitchen.Type.IDLE));
+		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder("分厨48", Department.DeptId.DEPT_NULL, Kitchen.Type.IDLE));
+		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder("分厨49", Department.DeptId.DEPT_NULL, Kitchen.Type.IDLE));
+		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder("分厨50", Department.DeptId.DEPT_NULL, Kitchen.Type.IDLE));
+		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder("空厨房", Department.DeptId.DEPT_NULL, Kitchen.Type.NULL));
+		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder("临时厨房", Department.DeptId.DEPT_NULL, Kitchen.Type.TEMP));
+		
+		short deptId = DepartmentDao.add(dbCon, staff, new Department.AddBuilder("中厨"));
+		KitchenDao.add(dbCon, staff, new Kitchen.AddBuilder("中厨分厨1", Department.DeptId.valueOf(deptId)));
+		KitchenDao.add(dbCon, staff, new Kitchen.AddBuilder("中厨分厨2", Department.DeptId.valueOf(deptId)));
+		KitchenDao.add(dbCon, staff, new Kitchen.AddBuilder("中厨分厨3", Department.DeptId.valueOf(deptId)));
+		KitchenDao.add(dbCon, staff, new Kitchen.AddBuilder("中厨分厨4", Department.DeptId.valueOf(deptId)));
+		KitchenDao.add(dbCon, staff, new Kitchen.AddBuilder("中厨分厨5", Department.DeptId.valueOf(deptId)));
+		
+		deptId = DepartmentDao.add(dbCon, staff, new Department.AddBuilder("酒水"));
+		KitchenDao.add(dbCon, staff, new Kitchen.AddBuilder("酒水分厨1", Department.DeptId.valueOf(deptId)));
+		KitchenDao.add(dbCon, staff, new Kitchen.AddBuilder("酒水分厨2", Department.DeptId.valueOf(deptId)));
+		KitchenDao.add(dbCon, staff, new Kitchen.AddBuilder("酒水分厨3", Department.DeptId.valueOf(deptId)));
+
+		deptId = DepartmentDao.add(dbCon, staff, new Department.AddBuilder("杂项"));
+		KitchenDao.add(dbCon, staff, new Kitchen.AddBuilder("杂项分厨1", Department.DeptId.valueOf(deptId)));
+		KitchenDao.add(dbCon, staff, new Kitchen.AddBuilder("杂项分厨2", Department.DeptId.valueOf(deptId)));
+		
 	}
 	
-	private static void initKitchen(DBCon dbCon, Staff staff) throws SQLException{
-		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder(staff.getRestaurantId(), Kitchen.KitchenAlias.KITCHEN_1));
-		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder(staff.getRestaurantId(), Kitchen.KitchenAlias.KITCHEN_2));
-		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder(staff.getRestaurantId(), Kitchen.KitchenAlias.KITCHEN_3));
-		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder(staff.getRestaurantId(), Kitchen.KitchenAlias.KITCHEN_4));
-		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder(staff.getRestaurantId(), Kitchen.KitchenAlias.KITCHEN_5));
-		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder(staff.getRestaurantId(), Kitchen.KitchenAlias.KITCHEN_6));
-		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder(staff.getRestaurantId(), Kitchen.KitchenAlias.KITCHEN_7));
-		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder(staff.getRestaurantId(), Kitchen.KitchenAlias.KITCHEN_8));
-		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder(staff.getRestaurantId(), Kitchen.KitchenAlias.KITCHEN_9));
-		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder(staff.getRestaurantId(), Kitchen.KitchenAlias.KITCHEN_10));
-		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder(staff.getRestaurantId(), Kitchen.KitchenAlias.KITCHEN_11));
-		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder(staff.getRestaurantId(), Kitchen.KitchenAlias.KITCHEN_12));
-		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder(staff.getRestaurantId(), Kitchen.KitchenAlias.KITCHEN_13));
-		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder(staff.getRestaurantId(), Kitchen.KitchenAlias.KITCHEN_14));
-		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder(staff.getRestaurantId(), Kitchen.KitchenAlias.KITCHEN_15));
-		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder(staff.getRestaurantId(), Kitchen.KitchenAlias.KITCHEN_16));
-		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder(staff.getRestaurantId(), Kitchen.KitchenAlias.KITCHEN_17));
-		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder(staff.getRestaurantId(), Kitchen.KitchenAlias.KITCHEN_18));
-		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder(staff.getRestaurantId(), Kitchen.KitchenAlias.KITCHEN_19));
-		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder(staff.getRestaurantId(), Kitchen.KitchenAlias.KITCHEN_20));
-		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder(staff.getRestaurantId(), Kitchen.KitchenAlias.KITCHEN_21));
-		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder(staff.getRestaurantId(), Kitchen.KitchenAlias.KITCHEN_22));
-		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder(staff.getRestaurantId(), Kitchen.KitchenAlias.KITCHEN_23));
-		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder(staff.getRestaurantId(), Kitchen.KitchenAlias.KITCHEN_24));
-		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder(staff.getRestaurantId(), Kitchen.KitchenAlias.KITCHEN_25));
-		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder(staff.getRestaurantId(), Kitchen.KitchenAlias.KITCHEN_26));
-		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder(staff.getRestaurantId(), Kitchen.KitchenAlias.KITCHEN_27));
-		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder(staff.getRestaurantId(), Kitchen.KitchenAlias.KITCHEN_28));
-		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder(staff.getRestaurantId(), Kitchen.KitchenAlias.KITCHEN_29));
-		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder(staff.getRestaurantId(), Kitchen.KitchenAlias.KITCHEN_30));
-		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder(staff.getRestaurantId(), Kitchen.KitchenAlias.KITCHEN_31));
-		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder(staff.getRestaurantId(), Kitchen.KitchenAlias.KITCHEN_32));
-		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder(staff.getRestaurantId(), Kitchen.KitchenAlias.KITCHEN_33));
-		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder(staff.getRestaurantId(), Kitchen.KitchenAlias.KITCHEN_34));
-		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder(staff.getRestaurantId(), Kitchen.KitchenAlias.KITCHEN_35));
-		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder(staff.getRestaurantId(), Kitchen.KitchenAlias.KITCHEN_36));
-		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder(staff.getRestaurantId(), Kitchen.KitchenAlias.KITCHEN_37));
-		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder(staff.getRestaurantId(), Kitchen.KitchenAlias.KITCHEN_38));
-		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder(staff.getRestaurantId(), Kitchen.KitchenAlias.KITCHEN_39));
-		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder(staff.getRestaurantId(), Kitchen.KitchenAlias.KITCHEN_40));
-		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder(staff.getRestaurantId(), Kitchen.KitchenAlias.KITCHEN_41));
-		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder(staff.getRestaurantId(), Kitchen.KitchenAlias.KITCHEN_42));
-		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder(staff.getRestaurantId(), Kitchen.KitchenAlias.KITCHEN_43));
-		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder(staff.getRestaurantId(), Kitchen.KitchenAlias.KITCHEN_44));
-		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder(staff.getRestaurantId(), Kitchen.KitchenAlias.KITCHEN_45));
-		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder(staff.getRestaurantId(), Kitchen.KitchenAlias.KITCHEN_46));
-		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder(staff.getRestaurantId(), Kitchen.KitchenAlias.KITCHEN_47));
-		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder(staff.getRestaurantId(), Kitchen.KitchenAlias.KITCHEN_48));
-		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder(staff.getRestaurantId(), Kitchen.KitchenAlias.KITCHEN_49));
-		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder(staff.getRestaurantId(), Kitchen.KitchenAlias.KITCHEN_50));
-		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder(staff.getRestaurantId(), Kitchen.KitchenAlias.KITCHEN_TEMP));
-		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder(staff.getRestaurantId(), Kitchen.KitchenAlias.KITCHEN_NULL));
-	}
 	
 	private static void initDiscount(DBCon dbCon, Staff staff) throws SQLException{
 		DiscountDao.insert(dbCon, staff, new Discount.NotDiscountBuilder(staff.getRestaurantId()));
