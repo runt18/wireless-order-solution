@@ -41,8 +41,8 @@ public class WXQueryDeptAction extends DispatchAction{
 			int rid = WeixinRestaurantDao.getRestaurantIdByWeixin(dbCon, fid);
 			
 			Staff staff = StaffDao.getStaffs(dbCon, rid).get(0);
-			List<Department> depts = DepartmentDao.getNormalDepartments(dbCon, staff);
-			List<Kitchen> kitchens = KitchenDao.getKitchens(dbCon, staff, null, null);
+			List<Department> depts = DepartmentDao.getByType(dbCon, staff, Department.Type.NORMAL);
+			List<Kitchen> kitchens = KitchenDao.getByType(dbCon, staff, Kitchen.Type.NORMAL);
 //			List<Food> tempFoods = null;
 //			for(int i = kitchens.size() - 1; i >= 0; i--){
 //				tempFoods = FoodDao.getPureFoods(dbCon, staff, " AND FOOD.kitchen_alias = " + kitchens.get(i).getAliasId(), null);
@@ -100,7 +100,7 @@ public class WXQueryDeptAction extends DispatchAction{
 			int rid = WeixinRestaurantDao.getRestaurantIdByWeixin(dbCon, fid);
 			
 			Staff staff = StaffDao.getStaffs(dbCon, rid).get(0);
-			List<Kitchen> kitchens = KitchenDao.getKitchens(dbCon, staff, null, null);
+			List<Kitchen> kitchens = KitchenDao.getByType(dbCon, staff, Kitchen.Type.NORMAL);
 			jobject.setRoot(kitchens);
 			
 		}catch(BusinessException e){
