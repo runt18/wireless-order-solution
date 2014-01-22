@@ -17,9 +17,8 @@ public class KitchenParcel implements Parcelable{
 	
 	public KitchenParcel(Parcel in){
 		if(in.readInt() != 1){
-			mSrcKitchen = new Kitchen();
-			mSrcKitchen.setId(in.readLong());
-			mSrcKitchen.setAliasId((short)in.readInt());
+			mSrcKitchen = new Kitchen(in.readInt());
+			mSrcKitchen.setDisplayId(in.readInt());
 			mSrcKitchen.setRestaurantId(in.readInt());
 			mSrcKitchen.setName(in.readString());
 			mSrcKitchen.setType(in.readInt());
@@ -55,8 +54,8 @@ public class KitchenParcel implements Parcelable{
 			dest.writeInt(1);
 		}else{
 			dest.writeInt(0);
-			dest.writeLong(mSrcKitchen.getId());
-			dest.writeInt(mSrcKitchen.getAliasId());
+			dest.writeInt(mSrcKitchen.getId());
+			dest.writeInt(mSrcKitchen.getDisplayId());
 			dest.writeInt(mSrcKitchen.getRestaurantId());
 			dest.writeString(mSrcKitchen.getName());
 			dest.writeInt(mSrcKitchen.getType().getVal());

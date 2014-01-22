@@ -21,8 +21,7 @@ public class FoodParcel implements Parcelable{
 	
 	private FoodParcel(Parcel in){
 		if(in.readInt() != 1){
-			mSrcFood = new Food();
-			mSrcFood.setFoodId(in.readInt());
+			mSrcFood = new Food(in.readInt());
 			mSrcFood.setAliasId(in.readInt());
 			mSrcFood.setRestaurantId(in.readInt());
 			mSrcFood.setKitchen(KitchenParcel.CREATOR.createFromParcel(in).asKitchen());
