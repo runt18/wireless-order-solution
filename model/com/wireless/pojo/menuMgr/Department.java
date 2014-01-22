@@ -231,6 +231,16 @@ public class Department implements Parcelable, Comparable<Department>, Jsonable{
 		this.displayId = displayId;
 	}
 	
+	public void copyFrom(Department src){
+		if(src != null && src != this){
+			setId(src.getId());
+			setRestaurantId(src.getRestaurantId());
+			setName(src.getName());
+			setType(src.getType());
+			setDisplayId(src.getDisplayId());
+		}
+	}
+	
 	public int getRestaurantId() {
 		return this.restaurantId;
 	}

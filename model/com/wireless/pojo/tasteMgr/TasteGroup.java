@@ -400,9 +400,9 @@ public class TasteGroup implements Parcelable, Jsonable{
 			
 		}else if(flag == TG_PARCELABLE_COMPLEX){
 			this.mGroupId = source.readInt();
-			this.mTastes = SortedList.newInstance((source.readParcelList(Taste.TASTE_CREATOR)));
-			this.mSpec = source.readParcel(Taste.TASTE_CREATOR);
-			this.mTmpTaste = (Taste)source.readParcel(Taste.TASTE_CREATOR);
+			this.mTastes = SortedList.newInstance((source.readParcelList(Taste.CREATOR)));
+			this.mSpec = source.readParcel(Taste.CREATOR);
+			this.mTmpTaste = (Taste)source.readParcel(Taste.CREATOR);
 		}
 	}
 	

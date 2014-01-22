@@ -493,7 +493,7 @@ public class Taste implements Parcelable, Comparable<Taste>, Jsonable{
 		}
 	}
 
-	public final static Parcelable.Creator<Taste> TASTE_CREATOR = new Parcelable.Creator<Taste>() {
+	public final static Parcelable.Creator<Taste> CREATOR = new Parcelable.Creator<Taste>() {
 		
 		public Taste[] newInstance(int size) {
 			return new Taste[size];

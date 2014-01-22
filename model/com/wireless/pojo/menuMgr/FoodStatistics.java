@@ -38,7 +38,7 @@ public class FoodStatistics implements Parcelable{
 		this.setOrderCnt(source.readInt());
 	}
 
-	public final static Parcelable.Creator<FoodStatistics> FS_CREATOR = new Parcelable.Creator<FoodStatistics>() {
+	public final static Parcelable.Creator<FoodStatistics> CREATOR = new Parcelable.Creator<FoodStatistics>() {
 		
 		public FoodStatistics[] newInstance(int size) {
 			return new FoodStatistics[size];

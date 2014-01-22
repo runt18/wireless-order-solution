@@ -63,7 +63,7 @@ public class OrderFood implements Parcelable, Comparable<OrderFood>, Jsonable {
 	//the last order amount to this order food
 	private float mLastCnt;	
 
-	private final Food mFood = new Food();
+	private final Food mFood = new Food(0);
 	
 	public Food asFood(){
 		return mFood;
@@ -541,6 +541,7 @@ public class OrderFood implements Parcelable, Comparable<OrderFood>, Jsonable {
 			dest.writeString(mFood.getName());
 			dest.writeFloat(mFood.getPrice());
 			dest.writeParcel(mFood.getKitchen(), Kitchen.KITCHEN_PARCELABLE_SIMPLE);
+			dest.writeInt(this.getFoodId());
 			dest.writeShort(this.getAliasId());
 			dest.writeFloat(this.getDiscount());
 			dest.writeFloat(this.mCurCnt);
@@ -558,6 +559,7 @@ public class OrderFood implements Parcelable, Comparable<OrderFood>, Jsonable {
 				dest.writeParcel(this.mTasteGroup, TasteGroup.TG_PARCELABLE_COMPLEX);
 			}
 			
+			dest.writeInt(this.getFoodId());
 			dest.writeShort(this.getAliasId());
 			dest.writeFloat(this.mCurCnt);
 			dest.writeBoolean(this.isHangup);
@@ -582,7 +584,8 @@ public class OrderFood implements Parcelable, Comparable<OrderFood>, Jsonable {
 
 			mFood.setName(source.readString());
 			mFood.setPrice(source.readFloat());
-			mFood.setKitchen(source.readParcel(Kitchen.KITCHEN_CREATOR));
+			mFood.setKitchen(source.readParcel(Kitchen.CREATOR));
+			mFood.setFoodId(source.readInt());
 			mFood.setAliasId(source.readShort());
 			this.setDiscount(source.readFloat());
 			this.mCurCnt = source.readFloat();
@@ -594,12 +597,13 @@ public class OrderFood implements Parcelable, Comparable<OrderFood>, Jsonable {
 			if(isTemporary){
 				mFood.setName(source.readString());
 				mFood.setPrice(source.readFloat());
-				mFood.setKitchen(source.readParcel(Kitchen.KITCHEN_CREATOR));
+				mFood.setKitchen(source.readParcel(Kitchen.CREATOR));
 			}else{
 				mFood.setStatus(source.readShort());
 				this.mTasteGroup = source.readParcel(TasteGroup.TG_CREATOR);
 			}
 			
+			mFood.setFoodId(source.readInt());
 			mFood.setAliasId(source.readShort());
 			this.mCurCnt = source.readFloat();
 			this.isHangup = source.readBoolean();

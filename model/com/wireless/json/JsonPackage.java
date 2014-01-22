@@ -2,6 +2,7 @@ package com.wireless.json;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -49,23 +50,27 @@ public final class JsonPackage {
 		mJsonables.addAll(Arrays.asList(jsonables));
 	}
 	
-	public List<Map<String, Object>> toJsonMap(){
+	private Map<String, Object> toJsonMap(){
 		if(mType == Jsonable.Type.PAIR){
-			List<Map<String, Object>> maps = new ArrayList<Map<String, Object>>();
-			if(mJsonables.size() == 1){
-				maps.add(mJsonables.get(0).toJsonMap(mFlag));
-			}else{
-				for(Jsonable jsonable : mJsonables){
-					maps.add(jsonable.toJsonMap(mFlag));
+			Map<String, Object> map = new HashMap<String, Object>();
+			for(Jsonable jsonable : mJsonables){
+				for(Entry<String, Object> entry : jsonable.toJsonMap(mFlag).entrySet()){
+					if(entry.getValue() instanceof Jsonable){
+						map.put(entry.getKey(), new JsonPackage((Jsonable)entry.getValue(), mFlag, Jsonable.Type.PAIR).toJsonMap());
+						
+						
+					}else if(entry.getValue() instanceof Map){
+						map.put(entry.getKey(), entry.getValue());
+					}
 				}
 			}
-			return maps;
+			return map;
 		}else{
 			throw new UnsupportedOperationException("The json type is NOT map.");
 		}
 	}
 	
-	public List<List<Object>> toJsonList(){
+	private List<List<Object>> toJsonList(){
 		if(mType == Jsonable.Type.LIST){
 			List<List<Object>> list = new ArrayList<List<Object>>();
 			if(mJsonables.size() == 1){
@@ -85,10 +90,10 @@ public final class JsonPackage {
 	private void changeToMap(Map<String, Object> mobj){
 		if(mobj == null)
 			return;
-		Iterator<Entry<String, Object>> ite = mobj.entrySet().iterator();
+		Iterator<Entry<String, Object>> it = mobj.entrySet().iterator();
 		Map<String, Object> item = null;
-		while(ite.hasNext()){	
-			Entry<String, Object> entry = ite.next();
+		while(it.hasNext()){	
+			Entry<String, Object> entry = it.next();
 			if(entry != null){
 				if(entry.getValue() instanceof List){
 					List<?> list = (List<?>)entry.getValue();

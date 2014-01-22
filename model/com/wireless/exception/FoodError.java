@@ -10,11 +10,13 @@ public class FoodError extends ErrorEnum{
 	public static final ErrorCode UPDATE_FAIL = build(9897, "操作失败, 修改菜品信息失败, 请检查数据内容是否正确.");
 	public static final ErrorCode INSERT_FAIL_NOT_FIND_GOODS_TYPE = build(9896, "操作失败, 生成商品库存信息失败, 找不到商品类型库存信息, 请联系客服人员.");
 	public static final ErrorCode INSERT_FAIL_BIND_MATERIAL_FAIL = build(9895, "操作失败, 菜谱绑定库存资料失败, 请联系客服人员.");
-	public static final ErrorCode NOT_FIND = build(9893, "操作失败, 该菜品不存在或已删除.");
+	public static final ErrorCode FOOD_NOT_EXIST = build(9893, "操作失败, 该菜品不存在.");
 	
 	public static final ErrorCode UPDATE_PRICE_FAIL = build(9886, "操作失败, 修改菜品价格信息失败.");
 	
-	public static final ErrorCode DELETE_FAIL_IS_USED = build(9883, "操作失败, 删除菜品信息失败, 该菜品正在使用.");
+	public static final ErrorCode FOOD_IN_USED = build(9883, "操作失败, 该菜品正在使用.");
+	public static final ErrorCode DELETE_FAIL_SINCE_COMBO_SUB_FOOD = build(9884, "删除操作失败, 该菜品包含套菜信息.");
+	public static final ErrorCode DELETE_FAIL_SINCE_STILL_STOCK = build(9885, "删除操作失败, 该菜品包含库存信息.");
 	
 	public static final ErrorCode COMBO_INSERT_FAIL = build(9879, "操作失败, 添加菜品套餐信息失败, 请检查数据内容是否正确.");
 	public static final ErrorCode COMBO_DELETE_FAIL = build(9879, "操作失败, 删除菜品套餐信息失败, 请检查数据内容是否正确.");

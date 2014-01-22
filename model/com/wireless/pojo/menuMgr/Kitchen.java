@@ -170,61 +170,6 @@ public class Kitchen implements Parcelable, Comparable<Kitchen>, Jsonable{
 	public final static byte KITCHEN_PARCELABLE_COMPLEX = 0;
 	public final static byte KITCHEN_PARCELABLE_SIMPLE = 1;
 	
-	/**
-	 * @deprecated
-	 */
-	public static enum KitchenAlias{
-		KITCHEN_1(0, "厨房1", Type.NORMAL), KITCHEN_2(1, "厨房2", Type.NORMAL), KITCHEN_3(2, "厨房3", Type.NORMAL), KITCHEN_4(3, "厨房4", Type.NORMAL), KITCHEN_5(4, "厨房5", Type.NORMAL),
-		KITCHEN_6(5, "厨房6", Type.NORMAL), KITCHEN_7(6, "厨房7", Type.NORMAL), KITCHEN_8(7, "厨房8", Type.NORMAL), KITCHEN_9(8, "厨房9", Type.NORMAL), KITCHEN_10(9, "厨房10", Type.NORMAL),
-		KITCHEN_11(10, "厨房11", Type.NORMAL), KITCHEN_12(11, "厨房12", Type.NORMAL), KITCHEN_13(12, "厨房13", Type.NORMAL), KITCHEN_14(13, "厨房14", Type.NORMAL), KITCHEN_15(14, "厨房15", Type.NORMAL),
-		KITCHEN_16(15, "厨房16", Type.NORMAL), KITCHEN_17(16, "厨房17", Type.NORMAL), KITCHEN_18(17, "厨房18", Type.NORMAL), KITCHEN_19(18, "厨房19", Type.NORMAL), KITCHEN_20(19, "厨房20", Type.NORMAL),
-		KITCHEN_21(20, "厨房21", Type.NORMAL), KITCHEN_22(21, "厨房22", Type.NORMAL), KITCHEN_23(22, "厨房23", Type.NORMAL), KITCHEN_24(23, "厨房24", Type.NORMAL), KITCHEN_25(24, "厨房25", Type.NORMAL),
-		KITCHEN_26(25, "厨房26", Type.NORMAL), KITCHEN_27(26, "厨房27", Type.NORMAL), KITCHEN_28(27, "厨房28", Type.NORMAL), KITCHEN_29(28, "厨房29", Type.NORMAL), KITCHEN_30(29, "厨房30", Type.NORMAL),
-		KITCHEN_31(30, "厨房31", Type.NORMAL), KITCHEN_32(31, "厨房32", Type.NORMAL), KITCHEN_33(32, "厨房33", Type.NORMAL), KITCHEN_34(33, "厨房34", Type.NORMAL), KITCHEN_35(34, "厨房35", Type.NORMAL),
-		KITCHEN_36(35, "厨房36", Type.NORMAL), KITCHEN_37(36, "厨房37", Type.NORMAL), KITCHEN_38(37, "厨房38", Type.NORMAL), KITCHEN_39(38, "厨房39", Type.NORMAL), KITCHEN_40(39, "厨房40", Type.NORMAL),
-		KITCHEN_41(40, "厨房41", Type.NORMAL), KITCHEN_42(41, "厨房42", Type.NORMAL), KITCHEN_43(42, "厨房43", Type.NORMAL), KITCHEN_44(43, "厨房44", Type.NORMAL), KITCHEN_45(44, "厨房45", Type.NORMAL),
-		KITCHEN_46(45, "厨房46", Type.NORMAL), KITCHEN_47(46, "厨房47", Type.NORMAL), KITCHEN_48(47, "厨房48", Type.NORMAL), KITCHEN_49(48, "厨房49", Type.NORMAL), KITCHEN_50(49, "厨房50", Type.NORMAL),
-		KITCHEN_TEMP(253, "临时厨房", Type.TEMP),
-		//KITCHEN_FULL(254, "全部厨房", Type.RESERVED),
-		KITCHEN_NULL(255, "空厨房", Type.NULL);
-		
-		private final int aliasId;
-		private final String desc;
-		private final Type type;
-		
-		KitchenAlias(int aliasId, String desc, Type type){
-			this.aliasId = aliasId;
-			this.desc = desc;
-			this.type = type;
-		}
-		
-		public short getAliasId(){
-			return (short)aliasId;
-		}
-		
-		public String getDesc(){
-			return desc;
-		}
-		
-		public Type getType(){
-			return type;
-		}
-		
-		public static KitchenAlias valueOf(int aliasId){
-			for(KitchenAlias alias : values()){
-				if(alias.aliasId == aliasId){
-					return alias;
-				}
-			}
-			throw new IllegalArgumentException("The alias id(" + aliasId + ") is invalid.");
-		}
-		
-		@Override
-		public String toString(){
-			return "(alias_id = " + aliasId + ", desc = " + desc + ", type = " + type.getDesc() + ")";
-		}
-	}
-	
 	public static enum Type{
 		NORMAL(0, "普通厨房"),
 		IDLE(1, "空闲厨房"),
@@ -267,11 +212,7 @@ public class Kitchen implements Parcelable, Comparable<Kitchen>, Jsonable{
 	private int displayId;
 	private boolean isAllowTmp;
 	private Type type = Type.NORMAL;
-	private Department dept;
-	
-	public Kitchen(){
-		this.dept = new Department();
-	}
+	private final Department dept = new Department();
 	
 	public Kitchen(int id){
 		setId(id);
@@ -304,6 +245,18 @@ public class Kitchen implements Parcelable, Comparable<Kitchen>, Jsonable{
 		setName(builder.kitchenName);
 		setAllowTemp(builder.isAllowTemp);
 		setDept(builder.deptId.getVal(), builder.deptId.getDesc());
+	}
+	
+	public void copyFrom(Kitchen src){
+		if(src != null && src != this){
+			setId(src.getId());
+			setRestaurantId(src.getRestaurantId());
+			setName(src.getName());
+			setDisplayId(src.getDisplayId());
+			setAllowTemp(src.isAllowTemp());
+			setType(src.getType());
+			setDept(src.dept);
+		}
 	}
 	
 	public int getId() {
@@ -349,20 +302,20 @@ public class Kitchen implements Parcelable, Comparable<Kitchen>, Jsonable{
 		this.isAllowTmp = isAllowTmp;
 	}
 	
-	public void setAllowTemp(String isAllowTemp) {
-		this.isAllowTmp = (isAllowTemp != null && isAllowTemp.equals("1")) ? true : false;
-	}
-	
 	public Department getDept() {
 		return this.dept;
 	}
 	
 	public void setDept(Department dept) {
-		this.dept = dept;
+		if(dept != null){
+			this.dept.copyFrom(dept);
+		}
 	}
 	
 	public void setDept(short deptId, String deptName) {
-		this.dept = new Department(restaurantId, deptId, deptName);
+		this.dept.setRestaurantId(restaurantId);
+		this.dept.setId(deptId);
+		this.dept.setName(deptName);
 	}	
 	
 	public void setType(Type type){
@@ -444,14 +397,14 @@ public class Kitchen implements Parcelable, Comparable<Kitchen>, Jsonable{
 		}
 	}
 
-	public final static Parcelable.Creator<Kitchen> KITCHEN_CREATOR = new Parcelable.Creator<Kitchen>() {
+	public final static Parcelable.Creator<Kitchen> CREATOR = new Parcelable.Creator<Kitchen>() {
 		
 		public Kitchen[] newInstance(int size) {
 			return new Kitchen[size];
 		}
 		
 		public Kitchen newInstance() {
-			return new Kitchen();
+			return new Kitchen(0);
 		}
 	};
 

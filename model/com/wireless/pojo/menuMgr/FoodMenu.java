@@ -47,8 +47,8 @@ public class FoodMenu implements Parcelable{
 	public void createFromParcel(Parcel source) {
 		foods = new FoodList(source.readParcelList(Food.CREATOR));
 		categorys = source.readParcelList(TasteCategory.CREATOR);
-		tastes = source.readParcelList(Taste.TASTE_CREATOR);
-		kitchens = source.readParcelList(Kitchen.KITCHEN_CREATOR);
+		tastes = source.readParcelList(Taste.CREATOR);
+		kitchens = source.readParcelList(Kitchen.CREATOR);
 		depts = source.readParcelList(Department.DEPT_CREATOR);
 		discounts = source.readParcelList(Discount.CREATOR);
 		reasons = source.readParcelList(CancelReason.CR_CREATOR);
@@ -57,32 +57,8 @@ public class FoodMenu implements Parcelable{
 
 	private void deal(){
 		
-//		//Sort the foods by kitchen.
-//		SortedList<Food> foodsByKitchen = SortedList.newInstance(foods, Food.BY_KITCHEN);
-//		//Remove the kitchen which does NOT contain any foods using binary search.
-//		List<Kitchen> tmpKitchen = new ArrayList<Kitchen>(kitchens);
-//		Iterator<Kitchen> iterKitchen = tmpKitchen.iterator();
-//		while(iterKitchen.hasNext()){
-//			Food key = new Food();
-//			key.setKitchen(iterKitchen.next());
-//			if(!foodsByKitchen.containsElement(key)){
-//				iterKitchen.remove();
-//			}
-//		}
-//		this.kitchens = Collections.unmodifiableList(SortedList.newInstance(tmpKitchen));
-		
 		this.kitchens = Collections.unmodifiableList(SortedList.newInstance(kitchens));
 		
-		//Remove the department which does NOT contain any foods.
-//		List<Department> tmpDept = new ArrayList<Department>();
-//		for(Department d : depts){
-//			for(Kitchen k : kitchens){
-//				if(k.getDept().equals(d)){
-//					tmpDept.add(d);
-//					break;
-//				}
-//			}
-//		}
 		this.depts = Collections.unmodifiableList(SortedList.newInstance(depts));
 		
 		//Set the department detail to associated kitchen.

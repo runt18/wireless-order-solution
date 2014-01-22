@@ -21,7 +21,7 @@ public class Pager implements Parcelable{
 		this.mMediumFoods = new Food[0];
 		this.mSmallFoods = new Food[0];
 		this.mTextFoods = new Food[0];
-		this.mCaptainFood = new Food();
+		this.mCaptainFood = new Food(0);
 	}
 	
 	public Pager(Food[] largeFoods, Food[] mediumFoods, Food[] smallFoods, Food[] textFoods, Food captainFood){
@@ -126,7 +126,7 @@ public class Pager implements Parcelable{
 		if(captainFood != null){
 			this.mCaptainFood = captainFood;
 		}else{
-			this.mCaptainFood = new Food();
+			this.mCaptainFood = new Food(0);
 		}
 	}
 	

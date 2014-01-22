@@ -46,7 +46,7 @@ public class TestParcel {
 	
 	@Test
 	public void testComplexFoodParcel(){
-		Food foodToParcel = new Food();
+		Food foodToParcel = new Food(0);
 		
 		foodToParcel.setAliasId(1);
 		foodToParcel.setPrice(2.45f);
@@ -88,7 +88,7 @@ public class TestParcel {
 		
 		Parcel p2 = new Parcel();
 		p2.unmarshall(p.marshall());
-		Food parcelableFood = new Food();
+		Food parcelableFood = new Food(0);
 		parcelableFood.createFromParcel(p2);
 		
 		// Check the food alias id 
@@ -171,7 +171,7 @@ public class TestParcel {
 	
 	@Test
 	public void testComplexKitchenParcel(){
-		Kitchen kitchenToParcel = new Kitchen();
+		Kitchen kitchenToParcel = new Kitchen(0);
 		
 		kitchenToParcel.setDisplayId(1);
 		kitchenToParcel.getDept().setId(Department.DeptId.DEPT_1.getVal());
@@ -185,7 +185,7 @@ public class TestParcel {
 		Parcel p2 = new Parcel();
 		p2.unmarshall(p.marshall());
 
-		Kitchen parcelableKitchen = new Kitchen();
+		Kitchen parcelableKitchen = new Kitchen(0);
 		parcelableKitchen.createFromParcel(p2);
 		
 		// Check the kitchen alias id
@@ -263,11 +263,11 @@ public class TestParcel {
 		discountToParcel.setStatus(Math.round((float)Math.random()));
 		discountToParcel.setName("测试折扣方案");
 		List<DiscountPlan> plans = new ArrayList<DiscountPlan>();
-		plans.add(new DiscountPlan(1, new Kitchen(), 0.1f));
-		plans.add(new DiscountPlan(2, new Kitchen(), 0.2f));
-		plans.add(new DiscountPlan(3, new Kitchen(), 0.2f));
-		plans.add(new DiscountPlan(4, new Kitchen(), 0.2f));
-		plans.add(new DiscountPlan(5, new Kitchen(), 0.2f));
+		plans.add(new DiscountPlan(1, new Kitchen(0), 0.1f));
+		plans.add(new DiscountPlan(2, new Kitchen(0), 0.2f));
+		plans.add(new DiscountPlan(3, new Kitchen(0), 0.2f));
+		plans.add(new DiscountPlan(4, new Kitchen(0), 0.2f));
+		plans.add(new DiscountPlan(5, new Kitchen(0), 0.2f));
 		discountToParcel.addPlans(plans);
 		
 		Parcel p = new Parcel();

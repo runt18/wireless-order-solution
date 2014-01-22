@@ -17,10 +17,10 @@ public class FoodTaste implements Jsonable{
 		this.food = food;
 	}
 	public FoodTaste(){
-		init(new Taste(0), new Food());
+		init(new Taste(0), new Food(0));
 	}
 	public FoodTaste(Taste taste){
-		init(taste, new Food());
+		init(taste, new Food(0));
 	}
 	public FoodTaste(Taste taste, Food food){
 		init(taste, food);

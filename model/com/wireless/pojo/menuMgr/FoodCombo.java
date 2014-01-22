@@ -7,9 +7,14 @@ import java.util.Map;
 import com.wireless.json.Jsonable;
 
 public class FoodCombo extends Food implements Jsonable{
+	
 	private long parentId;			// 套菜所属菜品编号
 	private String parentName;		// 套菜所属菜品名称
 	private int amount;				// 菜品份数
+	
+	public FoodCombo() {
+		super(0);
+	}
 	
 	public long getParentId() {
 		return parentId;
