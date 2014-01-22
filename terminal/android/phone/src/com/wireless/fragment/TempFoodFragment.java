@@ -184,7 +184,7 @@ public class TempFoodFragment extends Fragment {
 		void add(){
 			OrderFood tmpFood = new OrderFood();
 			tmpFood.setTemp(true);
-			tmpFood.asFood().setKitchen(new Kitchen());
+			tmpFood.asFood().setKitchen(new Kitchen(0));
 			tmpFood.setCount(1f);
 			mTempFoods.add(tmpFood);
 			notifyDataSetChanged();
