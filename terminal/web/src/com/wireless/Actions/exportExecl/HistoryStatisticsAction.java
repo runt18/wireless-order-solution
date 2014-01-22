@@ -425,8 +425,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 		
 		if(list != null && list.length > 0){
 			SalesDetail temp = null, sum = new SalesDetail();
-			Kitchen kitchen = new Kitchen();
-			kitchen.setId(-1);
+			Kitchen kitchen = new Kitchen(-1);
 			kitchen.setName("汇总");
 			sum.setKitchen(kitchen);
 			for(int i = 0; i <= list.length; i++){

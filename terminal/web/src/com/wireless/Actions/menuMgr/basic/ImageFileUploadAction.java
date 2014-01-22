@@ -67,9 +67,8 @@ public class ImageFileUploadAction extends Action{
 			}
 			List<Food> root = new ArrayList<Food>();
 			
-			Food fb = new Food();
+			Food fb = new Food(Integer.parseInt(foodID));
 			fb.setRestaurantId(Integer.parseInt(restaurantID));
-			fb.setFoodId(Integer.parseInt(foodID));
 			
 			// 获取菜品原图信息,用于更新图片成功之后删除原文件,否则保留原文件
 			fb = FoodDao.getFoodBasicImage(fb);

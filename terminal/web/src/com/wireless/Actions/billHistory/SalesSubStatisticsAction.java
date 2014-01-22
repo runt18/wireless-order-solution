@@ -17,6 +17,7 @@ import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.billStatistics.SalesDetail;
+import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.menuMgr.Food;
 import com.wireless.util.DataPaging;
 import com.wireless.util.DateType;
@@ -130,10 +131,10 @@ public class SalesSubStatisticsAction extends Action {
 			
 			if(queryType != null && !queryType.equals("2") && saleDetails.length > 0){
 				SalesDetail sum = new SalesDetail();
-				Food fb = new Food();
+				Food fb = new Food(0);
 				fb.setName("汇总");
 				sum.setFood(fb);
-				com.wireless.pojo.menuMgr.Department dept = new com.wireless.pojo.menuMgr.Department();
+				Department dept = new Department();
 				dept.setName("汇总");
 				sum.setDept(dept);
 				for(SalesDetail tp : saleDetails){

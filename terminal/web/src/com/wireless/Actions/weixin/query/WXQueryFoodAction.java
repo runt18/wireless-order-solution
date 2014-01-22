@@ -46,7 +46,7 @@ public class WXQueryFoodAction extends DispatchAction{
 			String extraCond = " AND FOOD.restaurant_id = " + rid, orderClause = " ORDER BY FOOD.food_alias";
 			extraCond += " AND (FOOD.status & " + Food.SELL_OUT + ") = 0";
 			extraCond += " AND (FOOD.status & " + Food.RECOMMEND + ") <> 0";
-			List<Food> list = FoodDao.getPureFoods(extraCond, orderClause);
+			List<Food> list = FoodDao.getPureByCond(extraCond, orderClause);
 			if(list != null){
 				jobject.setTotalProperty(list.size());
 				list = DataPaging.getPagingData(list, true, 0, 20);
@@ -107,7 +107,7 @@ public class WXQueryFoodAction extends DispatchAction{
 			if(kitchenId != null && !kitchenId.trim().isEmpty() && !kitchenId.trim().equals("-1")){
 				extraCond += (" AND KITCHEN.kitchen_id = " + kitchenId);
 			}
-			root = FoodDao.getPureFoods(dbCon, extraCond, orderClause);
+			root = FoodDao.getPureByCond(dbCon, extraCond, orderClause);
 			
 		}catch(BusinessException e){
 			e.printStackTrace();

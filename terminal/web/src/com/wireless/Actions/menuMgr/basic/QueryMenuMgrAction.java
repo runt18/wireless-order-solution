@@ -17,6 +17,7 @@ import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.menuMgr.Food;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.util.DataPaging;
 
 public class QueryMenuMgrAction extends Action {
@@ -41,9 +42,8 @@ public class QueryMenuMgrAction extends Action {
 		try{
 			
 			String pin = (String)request.getAttribute("pin");
-			StaffDao.verify(Integer.parseInt(pin));
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
-			String restaurantId = request.getParameter("restaurantId");
 			String kitchen = request.getParameter("kitchen");
 			String alias = request.getParameter("alias");
 			String operqtor = request.getParameter("operator");
@@ -62,8 +62,7 @@ public class QueryMenuMgrAction extends Action {
 			String isWeight = request.getParameter("isWeight");
 			List<String> statusList = new ArrayList<String>();
 			
-			String extraCond = "", orderClause = " ORDER BY FOOD.food_alias";
-			extraCond += (" AND FOOD.restaurant_id = " + restaurantId);
+			String extraCond = "";
 			//****************  基本条件处理
 			if(operqtor != null && !operqtor.trim().isEmpty() && !operqtor.equals("")){
 				try{
@@ -138,7 +137,7 @@ public class QueryMenuMgrAction extends Action {
 				extraCond += strStatus;
 			}
 			
-			root = FoodDao.getPureFoods(extraCond, orderClause);
+			root = FoodDao.getPureByCond(staff, extraCond, null);
 			
 		}catch(BusinessException e){
 			e.printStackTrace();

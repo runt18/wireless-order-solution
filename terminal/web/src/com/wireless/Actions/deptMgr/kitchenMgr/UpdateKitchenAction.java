@@ -31,9 +31,8 @@ public class UpdateKitchenAction extends Action {
 			String deptID = request.getParameter("deptID");
 			String isAllowTemp = request.getParameter("isAllowTemp");
 			
-			Kitchen kitchen = new Kitchen();
+			Kitchen kitchen = new Kitchen(Integer.valueOf(kitchenID));
 			kitchen.setRestaurantId(Integer.valueOf(restaurantID));
-			kitchen.setId(Integer.valueOf(kitchenID));
 			kitchen.setName(kitchenName.trim());
 			kitchen.getDept().setId(Short.valueOf(deptID));
 			kitchen.setAllowTemp(isAllowTemp);
