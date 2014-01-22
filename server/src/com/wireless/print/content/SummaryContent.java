@@ -25,7 +25,7 @@ public class SummaryContent extends ConcreteContent {
 
 	@Override
 	public String toString(){
-		String deptName = _dept.getName().length() == 0 ? "" : ("-" + _dept.getName());
+		String deptName = _dept.getName().isEmpty() ? "" : ("-" + _dept.getName());
 		
 		//generate the title and replace the "$(title)" with it
 		if(mPrintType == PType.PRINT_ORDER){

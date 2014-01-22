@@ -137,14 +137,14 @@ class OrderHandler implements Runnable{
 				}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_SELL_OUT){
 					//handle query sell out foods request
 					response = new RespPackage(request.header, 
-											   FoodDao.getPureFoods(staff, " AND FOOD.status & " + Food.SELL_OUT + " <> 0 ", null), 
+											   FoodDao.getPureByCond(staff, " AND FOOD.status & " + Food.SELL_OUT + " <> 0 ", null), 
 											   Food.FOOD_PARCELABLE_SIMPLE);
 					
 				}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.MAKE_FOOD_SELL_OUT){
 					//handle update the food to be sell out
 					List<Food> toSellOut = new Parcel(request.body).readParcelList(Food.CREATOR);
 					for(Food f : toSellOut){
-						FoodDao.makeSellOutByAlias(staff, f.getAliasId());
+						FoodDao.update(staff, new Food.UpdateBuilder(f.getFoodId()).setSellOut(true));
 					}
 					response = new RespACK(request.header);
 					
@@ -152,7 +152,7 @@ class OrderHandler implements Runnable{
 					//handle update the food to be on sale 
 					List<Food> toOnSale = new Parcel(request.body).readParcelList(Food.CREATOR);
 					for(Food f : toOnSale){
-						FoodDao.makeOnSaleByAlias(staff, f.getAliasId());
+						FoodDao.update(staff, new Food.UpdateBuilder(f.getFoodId()).setSellOut(false));
 					}
 					response = new RespACK(request.header);
 					

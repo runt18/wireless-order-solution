@@ -98,11 +98,11 @@ public class JobContentFactory {
 		return mInstance;
 	}
 	
-	public Content createSummaryContent(PType printType, Staff term, List<Printer> printers, int orderId) throws SQLException, BusinessException{
-		return createSummaryContent(printType, term, printers, OrderDao.getById(term, orderId, DateType.TODAY));
+	public Content createSummaryContent(PType printType, Staff staff, List<Printer> printers, int orderId) throws SQLException, BusinessException{
+		return createSummaryContent(printType, staff, printers, OrderDao.getById(staff, orderId, DateType.TODAY));
 	}
 	
-	public Content createSummaryContent(PType printType, Staff term, List<Printer> printers, Order order) throws SQLException{
+	public Content createSummaryContent(PType printType, Staff staff, List<Printer> printers, Order order) throws SQLException{
 		if(order.hasOrderFood() && !printers.isEmpty()){
 			
 			final List<JobContent> jobContents = new ArrayList<JobContent>();
@@ -113,10 +113,10 @@ public class JobContentFactory {
 						if(func.isDeptAll()){
 							//Generate the the summary to all departments.
 							jobContents.add(new JobContent(printer, func.getRepeat(), printType, 
-										   				   new SummaryContent(new Department(null, Department.DeptId.DEPT_ALL.getVal(), term.getRestaurantId(), Department.Type.RESERVED), 
+										   				   new SummaryContent(new Department(staff.getRestaurantId(), Department.DeptId.DEPT_NULL.getVal(), null), 
 										   						   			  PFormat.FROMAT_NO_DISCOUNT, 
 										   						   			  order,
-										   						   			  term.getName(),
+										   						   			  staff.getName(),
 										   						   			  printType, 
 										   						   			  printer.getStyle())));
 						}else{
@@ -138,7 +138,7 @@ public class JobContentFactory {
 								   				   new SummaryContent(dept, 
 								   						   			  PFormat.FROMAT_NO_DISCOUNT, 
 								   						   			  orderToDept,
-								   						   			  term.getName(),
+								   						   			  staff.getName(),
 								   						   			  printType, 
 								   						   			  printer.getStyle())));
 									
