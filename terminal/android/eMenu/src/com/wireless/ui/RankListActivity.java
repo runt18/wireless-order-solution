@@ -247,7 +247,7 @@ public class RankListActivity extends Activity {
 				for(Food f:activity.mOriFoods)
 				{
 					for(Kitchen k:kitchens)
-						if(f.getKitchen().getAliasId() == k.getAliasId() && f.hasImage())
+						if(f.getKitchen().equals(k) && f.hasImage())
 						{
 							allFoods.add(f);
 						}

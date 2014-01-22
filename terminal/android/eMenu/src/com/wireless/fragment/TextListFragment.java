@@ -326,17 +326,11 @@ public class TextListFragment extends Fragment implements OnSearchItemClickListe
 	private void refreshDisplay(int position){
 		TextFoodPager holder = mTextFoodPagers.get(position);
 		
-		Kitchen kitchen = null;
 		for(Kitchen k: WirelessOrder.foodMenu.kitchens){
-			if(holder.getFoods().get(0).getKitchen().getAliasId() == k.getAliasId())
-				kitchen = k;
+			if(holder.getFoods().get(0).getKitchen().equals(k))
+				mKitchenText.setText(k.getName());
+				break;
 		}
-		if(kitchen != null){
-			mKitchenText.setText(kitchen.getName());
-		}else{
-			mKitchenText.setText(Integer.toString(holder.getFoods().get(0).getKitchen().getAliasId()));
-		}
-//		
 		mCurrentPageText.setText("第" + (position + 1) + "页");
 	}
 	
