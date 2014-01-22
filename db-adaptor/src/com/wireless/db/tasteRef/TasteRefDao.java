@@ -222,7 +222,7 @@ public class TasteRefDao {
 		/**
 		 * Get all the foods whose taste reference type is smart
 		 */
-		List<Food> foods = FoodDao.getPureFoods("AND FOOD.taste_ref_type=" + Food.TasteRef.SMART.getVal(), null);
+		List<Food> foods = FoodDao.getPureByCond("AND FOOD.taste_ref_type=" + Food.TasteRef.SMART.getVal(), null);
 		
 		if(!foods.isEmpty()){
 			

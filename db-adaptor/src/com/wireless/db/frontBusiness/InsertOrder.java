@@ -190,7 +190,7 @@ public class InsertOrder {
 						
 					}else{		
 						//Get the details to each order food.
-						of.asFood().copyFrom(FoodDao.getFoodByAlias(dbCon, staff, of.getAliasId()));
+						of.asFood().copyFrom(FoodDao.getById(dbCon, staff, of.getFoodId()));
 						
 						//Check to see whether the staff has the privilege to present the food.
 						if(of.asFood().isGift() && !staff.getRole().hasPrivilege(Privilege.Code.GIFT)){

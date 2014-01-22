@@ -165,10 +165,9 @@ public class MenuDao {
 
 		dbCon.rs = dbCon.stmt.executeQuery(selectSQL);
 		while(dbCon.rs != null && dbCon.rs.next()){
-			item = new Food();
+			item = new Food(dbCon.rs.getInt("food_id"));
 			kitchen = item.getKitchen();
 			
-			item.setFoodId(dbCon.rs.getInt("food_id"));
 			item.setAliasId(dbCon.rs.getInt("food_alias"));
 			item.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
 			item.setName(dbCon.rs.getString("food_name"));
@@ -294,9 +293,8 @@ public class MenuDao {
 			dbCon.rs = dbCon.stmt.executeQuery(selectSQL);
 			
 			while(dbCon.rs != null && dbCon.rs.next()){
-				item = new Kitchen();
+				item = new Kitchen(dbCon.rs.getInt("kitchen_id"));
 				item.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
-				item.setId(dbCon.rs.getInt("kitchen_id"));
 				item.setDisplayId(dbCon.rs.getInt("display_id"));
 				item.setName(dbCon.rs.getString("kitchen_name"));
 				item.setAllowTemp(dbCon.rs.getBoolean("is_allow_temp"));

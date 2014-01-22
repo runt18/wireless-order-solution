@@ -16,6 +16,8 @@ import org.junit.Test;
 
 import com.wireless.db.client.member.MemberTypeDao;
 import com.wireless.db.crMgr.CancelReasonDao;
+import com.wireless.db.deptMgr.DepartmentDao;
+import com.wireless.db.deptMgr.KitchenDao;
 import com.wireless.db.distMgr.DiscountDao;
 import com.wireless.db.inventoryMgr.MaterialCateDao;
 import com.wireless.db.menuMgr.PricePlanDao;
@@ -31,6 +33,8 @@ import com.wireless.pojo.crMgr.CancelReason;
 import com.wireless.pojo.distMgr.Discount;
 import com.wireless.pojo.distMgr.DiscountPlan;
 import com.wireless.pojo.inventoryMgr.MaterialCate;
+import com.wireless.pojo.menuMgr.Department;
+import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.pojo.ppMgr.PricePlan;
 import com.wireless.pojo.regionMgr.Region;
 import com.wireless.pojo.regionMgr.Table;
@@ -194,27 +198,43 @@ public class TestRestaurantDao {
 	}
 	
 	private void compareDept(Staff staff, int restaurantId) throws SQLException, BusinessException{
-//		List<Department> depts = DepartmentDao.getDepartments4Inventory(staff);
-//		for(Department d : depts){
-//			Department.DeptId deptId = Department.DeptId.valueOf(d.getId());
-//			assertEquals("department id", d.getId(), deptId.getVal());
-//			assertEquals("department name", d.getName(), deptId.getDesc());
-//			assertEquals("department associated restaurant id", d.getRestaurantId(), restaurantId);
-//			assertEquals("department type", d.getType().getVal(), deptId.getType().getVal());
-//		}
+		Department deptToTemp = DepartmentDao.getByType(staff, Department.Type.TEMP).get(0);
+		assertEquals("department id", deptToTemp.getId(), Department.DeptId.DEPT_TMP.getVal());
+		assertEquals("department name", deptToTemp.getName(), Department.DeptId.DEPT_TMP.getDesc());
+		assertEquals("department associated restaurant id", deptToTemp.getRestaurantId(), restaurantId);
+		assertEquals("department type", deptToTemp.getType(), Department.Type.TEMP);
+		assertEquals("display id", deptToTemp.getDisplayId(), 0);
+
+		Department deptToNull = DepartmentDao.getByType(staff, Department.Type.NULL).get(0);
+		assertEquals("department id", deptToNull.getId(), Department.DeptId.DEPT_NULL.getVal());
+		assertEquals("department name", deptToNull.getName(), Department.DeptId.DEPT_NULL.getDesc());
+		assertEquals("department associated restaurant id", deptToNull.getRestaurantId(), restaurantId);
+		assertEquals("department type", deptToNull.getType(), Department.Type.NULL);
+		assertEquals("display id", deptToNull.getDisplayId(), 0);
+
+		Department deptToWare = DepartmentDao.getByType(staff, Department.Type.WARE_HOUSE).get(0);
+		assertEquals("department id", deptToWare.getId(), Department.DeptId.DEPT_WAREHOUSE.getVal());
+		assertEquals("department name", deptToWare.getName(), Department.DeptId.DEPT_WAREHOUSE.getDesc());
+		assertEquals("department associated restaurant id", deptToNull.getRestaurantId(), restaurantId);
+		assertEquals("department type", deptToWare.getType(), Department.Type.WARE_HOUSE);
+		assertEquals("display id", deptToWare.getDisplayId(), 0);
+		
 	}
 	
 	private void compareKitchens(Staff staff, int restaurantId) throws SQLException{
-		//FIXME
-//		List<Kitchen> kitchens = KitchenDao.getNormalKitchens(staff);
-//		for(Kitchen k : kitchens){
-//			Kitchen.KitchenAlias kitchenAlias = Kitchen.KitchenAlias.valueOf(k.getAliasId());
-//			assertEquals("deptId to kitchen", k.getDept().getId(), Department.DeptId.DEPT_1.getVal());
-//			assertEquals("kitchen alias", k.getAliasId(), kitchenAlias.getAliasId());
-//			assertEquals("kitchen name", k.getName(), kitchenAlias.getDesc());
-//			assertEquals("kitchen type", k.getType().getVal(), kitchenAlias.getType().getVal());
-//			assertEquals("kitchen associated restaurant", k.getRestaurantId(), restaurantId);
-//		}
+		Kitchen kitchenToNull = KitchenDao.getByType(staff, Kitchen.Type.NULL).get(0);
+		assertEquals("deptId to kitchen", kitchenToNull.getDept().getId(), Department.DeptId.DEPT_NULL.getVal());
+		assertEquals("kitchen name", kitchenToNull.getName(), "空厨房");
+		assertEquals("kitchen type", kitchenToNull.getType(), Kitchen.Type.NULL);
+		assertEquals("kitchen associated restaurant", kitchenToNull.getRestaurantId(), restaurantId);
+		assertEquals("display id", kitchenToNull.getDisplayId(), 0);
+		
+		Kitchen kitchenToTemp = KitchenDao.getByType(staff, Kitchen.Type.TEMP).get(0);
+		assertEquals("deptId to kitchen", kitchenToTemp.getDept().getId(), Department.DeptId.DEPT_TMP.getVal());
+		assertEquals("kitchen name", kitchenToTemp.getName(), "临时厨房");
+		assertEquals("kitchen type", kitchenToTemp.getType(), Kitchen.Type.TEMP);
+		assertEquals("kitchen associated restaurant", kitchenToTemp.getRestaurantId(), restaurantId);
+		assertEquals("display id", kitchenToTemp.getDisplayId(), 0);
 	}
 	
 	private void compareDiscount(Staff staff, int restaurantId) throws SQLException{

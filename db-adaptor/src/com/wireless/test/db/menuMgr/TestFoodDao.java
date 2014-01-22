@@ -1,108 +1,128 @@
 package com.wireless.test.db.menuMgr;
 
-import static org.junit.Assert.fail;
-
 import java.beans.PropertyVetoException;
 import java.sql.SQLException;
+import java.util.List;
 
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.wireless.db.DBCon;
+import com.wireless.db.deptMgr.KitchenDao;
 import com.wireless.db.menuMgr.FoodDao;
-import com.wireless.db.menuMgr.MenuDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
+import com.wireless.exception.FoodError;
 import com.wireless.pojo.menuMgr.Food;
+import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.test.db.TestInit;
 
 public class TestFoodDao {
-	private static Staff term;
+	private static Staff mStaff;
 	
 	@BeforeClass
 	public static void beforeClass() throws PropertyVetoException, BusinessException{
 		TestInit.init();
 		try {
-			term = StaffDao.getStaffs(26).get(0);
+			mStaff = StaffDao.getStaffs(26).get(0);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 	}
 	
 	@Test
-	public void insert() throws SQLException{
-		DBCon dbCon = new DBCon();
+	public void testCombo() throws SQLException, BusinessException{
+		int foodId = 0;
 		try {
-			dbCon.connect();
-			dbCon.conn.setAutoCommit(false);
+			Food.InsertBuilder insertBuilder = new Food.InsertBuilder("测试套菜", 15.4f, KitchenDao.getByType(mStaff, Kitchen.Type.NORMAL).get(0))
+													   .setAliasId(100).setDesc("测试描述").setHot(true).setCommission(2.0f).setGift(true).setWeigh(false);
+			foodId = FoodDao.insert(mStaff, insertBuilder); 
 			
-			Food fb = new Food();
-			fb.setRestaurantId(26);
-			fb.setAliasId(44);
-			fb.setName("44");
-			fb.setPinyin("44");
-			fb.setPrice(0.00f);
-			fb.getKitchen().setId(0);
-			fb.getKitchen().setId(160);
-			fb.setStockStatus(Food.StockStatus.GOOD);
+			List<Food> foods = FoodDao.getPureFoods(mStaff);
+			Food childFood1 = foods.get(0);
+			Food childFood2 = foods.get(2);
 			
-			FoodDao.insertFoodBaisc(dbCon, term, fb);
-			System.out.println("菜品资料添加成功.");
+			Food.ComboBuilder comboBuilder = new Food.ComboBuilder(foodId)
+													 .addChild(childFood1.getFoodId(), 1)
+													 .addChild(childFood2.getFoodId(), 2);
+			FoodDao.buildCombo(mStaff, comboBuilder);
 			
-			dbCon.conn.commit();
-		} catch (Exception e) {
-			e.printStackTrace();
-			try {
-				dbCon.conn.rollback();
-			} catch (SQLException e1) {
-				e1.printStackTrace();
+			Food expected = comboBuilder.build();
+			Food actual = FoodDao.getById(mStaff, foodId);
+			
+			Assert.assertEquals("parent id : insert combo", expected.getFoodId(), actual.getFoodId());
+			Assert.assertEquals("children : insert combo", expected.getChildFoods(), actual.getChildFoods());
+			
+		}finally{
+			if(foodId != 0){
+				FoodDao.delete(mStaff, foodId);
+				try{
+					FoodDao.getById(mStaff, foodId);
+					Assert.assertTrue("failed to delete the food", false);
+				}catch(BusinessException e){
+					Assert.assertEquals("failed to delete the food", FoodError.FOOD_NOT_EXIST, e.getErrCode());
+				}
+				
+				Assert.assertEquals("failed to delete the child foods", 0, FoodDao.getChildrenByParent(mStaff, foodId).size());
 			}
-			fail();
-		} finally{
-			dbCon.disconnect();
 		}
 	}
 	
 	@Test
-	public void delete() throws SQLException{
-		DBCon dbCon = new DBCon();
+	public void testFoodDao() throws SQLException, BusinessException{
+		int foodId = 0;
 		try {
-			dbCon.connect();
-			dbCon.conn.setAutoCommit(false);
+			Food.InsertBuilder insertBuilder = new Food.InsertBuilder("测试菜品", 15.4f, KitchenDao.getByType(mStaff, Kitchen.Type.NORMAL).get(0))
+													   .setAliasId(100).setDesc("测试描述").setHot(true).setCommission(2.0f).setGift(true).setWeigh(false);
+			foodId = FoodDao.insert(mStaff, insertBuilder); 
 			
-			Food fb = new Food();
-			fb.setFoodId(27942);
-			fb.setRestaurantId(26);
+			Food expected = insertBuilder.build();
+			Food actual = FoodDao.getById(mStaff, foodId);
 			
-			FoodDao.deleteFood(fb);
-			System.out.println("菜品资料删除成功.");
+			compare(foodId, expected, actual, "insert food");
+
+			Food.UpdateBuilder updateBuilder = new Food.UpdateBuilder(foodId).setAliasId(101).setName("测试修改菜品")
+													   .setKitchen(KitchenDao.getByType(mStaff, Kitchen.Type.NORMAL).get(1))
+													   .setPrice(34.2f).setDesc("测试修改描述")
+													   .setHot(false).setCommission(3).setSellOut(true).setRecommend(true)
+													   .setGift(false).setWeigh(true);
+			FoodDao.update(mStaff, updateBuilder);
 			
-			dbCon.conn.commit();
-		} catch (Exception e) {
-			e.printStackTrace();
-			try {
-				dbCon.conn.rollback();
-			} catch (SQLException e1) {
-				e1.printStackTrace();
-			}
-			fail();
+			expected = updateBuilder.build();
+			actual = FoodDao.getById(mStaff, foodId);
+
+			compare(foodId, expected, actual, "update food");
+			
 		} finally{
-			dbCon.disconnect();
+			if(foodId != 0){
+				FoodDao.delete(mStaff, foodId);
+				try{
+					FoodDao.getById(mStaff, foodId);
+					Assert.assertTrue("failed to delete the food", false);
+				}catch(BusinessException e){
+					Assert.assertEquals("failed to delete the food", FoodError.FOOD_NOT_EXIST, e.getErrCode());
+				}
+			}
 		}
 	}
 	
-	@Test
-	public void update(){
-		try {
-			Food fb = MenuDao.getFoodById(27937);
-			fb.setStockStatus(Food.StockStatus.MATERIAL);
-			FoodDao.updateFoodBaisc(term, fb);
-			System.out.println("菜品资料修改成功.");
-		} catch (Exception e) {
-			e.printStackTrace();
-			fail();
-		} 
+	private void compare(int foodId, Food expected, Food actual, final String tag){
+		Assert.assertEquals("id : " + tag, foodId, actual.getFoodId());
+		Assert.assertEquals("restaurant : " + tag, mStaff.getRestaurantId(), actual.getRestaurantId());
+		Assert.assertEquals("name : " + tag, expected.getName(), actual.getName());
+		Assert.assertEquals("price : " + tag, expected.getPrice(), actual.getPrice(), 0.01);
+		Assert.assertEquals("kitchen : " + tag, expected.getKitchen(), actual.getKitchen());
+		Assert.assertEquals("alias : " + tag, expected.getAliasId(), actual.getAliasId());
+		Assert.assertEquals("desc : " + tag, expected.getDesc(), actual.getDesc());
+		Assert.assertEquals("current price : " + tag, expected.isCurPrice(), actual.isCurPrice());
+		Assert.assertEquals("recommend : " + tag, expected.isRecommend(), actual.isRecommend());
+		Assert.assertEquals("sell out : " + tag, expected.isSellOut(), actual.isSellOut());
+		Assert.assertEquals("special : " + tag, expected.isSpecial(), actual.isSpecial());
+		Assert.assertEquals("weight : " + tag, expected.isWeigh(), actual.isWeigh());
+		Assert.assertEquals("hot : " + tag, expected.isHot(), actual.isHot());
+		Assert.assertEquals("gift : " + tag, expected.isGift(), actual.isGift());
+		Assert.assertEquals("commission : " + tag, expected.isCommission(), actual.isCommission());
+		Assert.assertEquals("commission : " + tag, expected.getCommission(), actual.getCommission(), 0.01);
 	}
-	
 }

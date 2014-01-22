@@ -31,7 +31,7 @@ public class FoodMaterialDao {
 		querySQL = "SELECT COUNT(*) FROM food WHERE food_id = " + item.getFoodId();
 		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
 		if(dbCon.rs != null && dbCon.rs.next() && dbCon.rs.getInt(1) == 0){
-			throw new BusinessException(FoodError.NOT_FIND);
+			throw new BusinessException(FoodError.FOOD_NOT_EXIST);
 		}
 		insertSQL = "INSERT INTO food_material (food_id, material_id, restaurant_id, consumption)"
 						 + " VALUES(" + item.getFoodId() + ", " 

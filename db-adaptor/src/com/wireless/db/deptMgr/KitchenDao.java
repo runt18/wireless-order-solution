@@ -153,8 +153,8 @@ public class KitchenDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 * @throws BusinessException
-	 * 			throws if the kitchen to delete is NOT empty
-	 * 			throws if the kitchen to delete does NOT exist
+	 * 			<li>throws if the kitchen to delete is NOT empty<br>
+	 * 			<li>throws if the kitchen to delete does NOT exist
 	 */
 	public static void remove(DBCon dbCon, Staff staff, int kitchenId) throws SQLException, BusinessException{
 		String sql;
@@ -178,7 +178,7 @@ public class KitchenDao {
 	}
 	
 	/**
-	 * Add a kitchen from the pool containing unused kitchens.
+	 * Add a kitchen from the pool containing idle kitchens.
 	 * @param staff
 	 * 			the staff to perform this action
 	 * @param builder
@@ -187,8 +187,8 @@ public class KitchenDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 * @throws BusinessException
-	 * 			throws if the unused kitchen has been run out of
-	 * 			throws if the kitchen to update does NOT exist
+	 * 			<li>throws if the unused kitchen has been run out of<br>
+	 * 			<li>throws if the kitchen to update does NOT exist
 	 */
 	public static int add(Staff staff, Kitchen.AddBuilder builder) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
@@ -212,8 +212,8 @@ public class KitchenDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 * @throws BusinessException
-	 * 			throws if the unused kitchen has been run out of
-	 * 			throws if the kitchen to update does NOT exist
+	 * 			<li>throws if the unused kitchen has been run out of<br>
+	 * 			<li>throws if the kitchen to update does NOT exist
 	 */
 	public static int add(DBCon dbCon, Staff staff, Kitchen.AddBuilder builder) throws SQLException, BusinessException{
 		String sql;
@@ -486,8 +486,7 @@ public class KitchenDao {
 		
 		List<Kitchen> kitchens = new ArrayList<Kitchen>();
 		while(dbCon.rs.next()){
-			Kitchen k = new Kitchen();
-			k.setId(dbCon.rs.getInt("kitchen_id"));
+			Kitchen k = new Kitchen(dbCon.rs.getInt("kitchen_id"));
 			k.setName(dbCon.rs.getString("name"));
 			kitchens.add(k);
 		}

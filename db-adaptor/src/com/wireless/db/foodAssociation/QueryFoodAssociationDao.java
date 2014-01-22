@@ -53,7 +53,7 @@ public class QueryFoodAssociationDao {
 	 */
 	public static List<Food> exec(DBCon dbCon, Staff staff, Food foodToAssociated) throws SQLException, BusinessException{
 		//Get the detail to food to associated.
-		foodToAssociated = FoodDao.getPureFoodById(dbCon, staff, foodToAssociated.getFoodId());
+		foodToAssociated = FoodDao.getPureById(dbCon, staff, foodToAssociated.getFoodId());
 		
 		/**
 		 * Calculate point to each associated food, and sort it in descending order.
@@ -84,7 +84,7 @@ public class QueryFoodAssociationDao {
 		//Get the details to each associated food.
 		List<Food> result = new ArrayList<Food>(associatedFoods.size());
 		for(Food food : associatedFoods){
-			result.add(FoodDao.getPureFoodById(dbCon, staff, food.getFoodId()));
+			result.add(FoodDao.getPureById(dbCon, staff, food.getFoodId()));
 		}
 		
 		return result;

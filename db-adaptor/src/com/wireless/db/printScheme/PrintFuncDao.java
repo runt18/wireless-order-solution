@@ -363,8 +363,7 @@ public class PrintFuncDao {
 				  " WHERE FK.func_id = " + func.getId();
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
 			while(dbCon.rs.next()){
-				Kitchen kitchenToAdd = new Kitchen();
-				kitchenToAdd.setId(dbCon.rs.getInt("kitchen_id"));
+				Kitchen kitchenToAdd = new Kitchen(dbCon.rs.getInt("kitchen_id"));
 				kitchenToAdd.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
 				kitchenToAdd.setDisplayId(dbCon.rs.getInt("display_id"));
 				kitchenToAdd.setName(dbCon.rs.getString("name"));

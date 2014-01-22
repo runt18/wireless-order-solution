@@ -507,7 +507,7 @@ public class RestaurantDao {
 		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder("分厨49", Department.DeptId.DEPT_NULL, Kitchen.Type.IDLE));
 		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder("分厨50", Department.DeptId.DEPT_NULL, Kitchen.Type.IDLE));
 		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder("空厨房", Department.DeptId.DEPT_NULL, Kitchen.Type.NULL));
-		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder("临时厨房", Department.DeptId.DEPT_NULL, Kitchen.Type.TEMP));
+		KitchenDao.insert(dbCon, staff, new Kitchen.InsertBuilder("临时厨房", Department.DeptId.DEPT_TMP, Kitchen.Type.TEMP));
 		
 		short deptId = DepartmentDao.add(dbCon, staff, new Department.AddBuilder("中厨"));
 		KitchenDao.add(dbCon, staff, new Kitchen.AddBuilder("中厨分厨1", Department.DeptId.valueOf(deptId)));

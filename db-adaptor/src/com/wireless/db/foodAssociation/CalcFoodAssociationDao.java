@@ -45,7 +45,7 @@ public class CalcFoodAssociationDao {
 		sql = " DELETE FROM " + Params.dbName + ".food_association";
 		dbCon.stmt.executeUpdate(sql);
 		
-		List<Food> foods = FoodDao.getPureFoods(dbCon, null, null);		
+		List<Food> foods = FoodDao.getPureByCond(dbCon, null, null);		
 		
 		for(Food f : foods){
 			exec(dbCon, f);

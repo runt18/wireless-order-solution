@@ -180,7 +180,7 @@ public class TestOrderGroupDao {
 		
 		List<Table> tbls = TableDao.getTables(staff, null, null);
 
-		List<Food> foods = FoodDao.getPureFoods(staff, null, null);
+		List<Food> foods = FoodDao.getPureByCond(staff, null, null);
 
 		Params4Order[] params = new Params4Order[]{
 			new Params4Order(tbls.get(0), 

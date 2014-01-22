@@ -45,7 +45,7 @@ public class TestCommitOrderDao {
 	public void testUpdateOrder() throws BusinessException, BusinessException, SQLException{
 		
 		Table tblToInsert = TableDao.getTables(mStaff, null, null).get(0);
-		List<Food> foods = FoodDao.getPureFoods(mStaff, null, null);
+		List<Food> foods = FoodDao.getPureByCond(mStaff, null, null);
 		
 		//Cancel the order associated with table inserted if it exist before.
 		try{

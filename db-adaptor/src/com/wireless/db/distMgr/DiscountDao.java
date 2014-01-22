@@ -265,9 +265,8 @@ public class DiscountDao {
 			key.setLevel(dbCon.rs.getShort("level"));
 			key.setStatus(dbCon.rs.getInt("dist_status"));
 
-			Kitchen kitchen = new Kitchen();
+			Kitchen kitchen = new Kitchen(dbCon.rs.getInt("kitchen_id"));
 			kitchen.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
-			kitchen.setId(dbCon.rs.getInt("kitchen_id"));
 			kitchen.setDisplayId(dbCon.rs.getShort("display_id"));
 			kitchen.setName(dbCon.rs.getString("kitchen_name"));
 			

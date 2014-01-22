@@ -222,7 +222,7 @@ public class FoodTasteDao {
 	 */
 	public static void updataBySmart(long foodID, int restaurantID) throws Exception{
 		FoodTasteDao.updateFoodTasteRefType(foodID, restaurantID, Food.TasteRef.SMART);
-		List<Food> updateFood = FoodDao.getPureFoods(" AND FOOD.food_id = " + foodID, null);
+		List<Food> updateFood = FoodDao.getPureByCond(" AND FOOD.food_id = " + foodID, null);
 		if(updateFood.isEmpty()){
 			throw new Exception();
 		}else{
@@ -282,7 +282,7 @@ public class FoodTasteDao {
 			FoodTasteDao.updateFoodTasteRefType(parent.getFood().getFoodId(), parent.getFood().getRestaurantId(), parent.getFood().getTasteRefType());
 			
 			if(parent.getFood().getTasteRefType() == Food.TasteRef.SMART){
-				List<Food> updateFood = FoodDao.getPureFoods(" AND FOOD.food_id = " + parent.getFood().getFoodId(), null);
+				List<Food> updateFood = FoodDao.getPureByCond(" AND FOOD.food_id = " + parent.getFood().getFoodId(), null);
 				if(updateFood.isEmpty()){
 					throw new BusinessException("操作失败,修改菜品口味关联方式为智能关联时发生异常!", ErrorLevel.ERROR);
 				}else{

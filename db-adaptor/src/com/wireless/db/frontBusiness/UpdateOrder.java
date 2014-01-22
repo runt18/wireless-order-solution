@@ -456,7 +456,7 @@ public class UpdateOrder {
 			
 		}else{
 			//Get the details to each order food			
-			foodToFill.asFood().copyFrom(FoodDao.getFoodByAlias(dbCon, staff, foodToFill.getAliasId()));
+			foodToFill.asFood().copyFrom(FoodDao.getById(dbCon, staff, foodToFill.getFoodId()));
 			
 			//Get the details to each normal tastes.
 			if(foodToFill.hasNormalTaste()){
