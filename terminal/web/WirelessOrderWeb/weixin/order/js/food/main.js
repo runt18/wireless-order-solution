@@ -9,13 +9,15 @@ function filtersFood(e){
 	for(var i = 0; i < kitchenBodyList.length; i++){
 		$(kitchenBodyList[i]).removeClass(params.DNSC);
 	}
-	$(e).addClass(params.DNSC);
-	params.kitchenId = e.getAttribute('data-value');
+	var kitchenId = parseInt(e.getAttribute('data-value'));
+	if(kitchenId > 0){ $(e).addClass(params.DNSC); }
+	
+	params.kitchenId = kitchenId;
 	params.start = 0;
 	params.limit = 10;
-	var clone = $.dom('divOperateFoodPaging').cloneNode();
-	$.dom('divFoodList').innerHTML = '';
-	$.dom('divFoodList').appendChild(clone);
+	var clone = Util.getDom('divOperateFoodPaging').cloneNode();
+	Util.getDom('divFoodList').innerHTML = '';
+	Util.getDom('divFoodList').appendChild(clone);
 	initFoodData({
 		callback : function(){
 			operateKitchenSearch({otype:'hide'});
@@ -131,7 +133,7 @@ function operateFood(c){
 	}else if(c.otype == 'claer'){
 		if(confirm('是否清空已选菜品?')){
 			params.orderData = [];
-			$.dom('divFoodListForSC').innerHTML = '';
+			Util.getDom('divFoodListForSC').innerHTML = '';
 			operateShoppingCart({otype:'hide'});
 		}
 	}
@@ -142,10 +144,10 @@ function displayOrderFoodMsg(c){
 		sumCount += params.orderData[i].count;
 		sumPrice += params.orderData[i].unitPrice * params.orderData[i].count;
 	}
-	$.dom('spanSumCountForSC').innerHTML = parseInt(sumCount);
-	$.dom('spanSumPriceForSC').innerHTML = sumPrice.toFixed(2);
+	Util.getDom('spanSumCountForSC').innerHTML = parseInt(sumCount);
+	Util.getDom('spanSumPriceForSC').innerHTML = sumPrice.toFixed(2);
 	
-	var display = $.dom('spanDisplayFoodCount');
+	var display = Util.getDom('spanDisplayFoodCount');
 	if(params.orderData.length > 0){
 		display.innerHTML = params.orderData.length;
 		display.style.visibility = 'visible';
@@ -207,6 +209,8 @@ function operateShoppingCart(c){
 		scBox.addClass('left-nav-hide');
 		scMainView.html(html.join(''));
 	}else if(c.otype == 'confirm'){
+		alert('暂不支持下单功能.');return;
+		
 		if(params.orderData.length == 0){
 			alert("您的购物车没有菜品, 请先选菜.");
 			return;
@@ -240,26 +244,6 @@ function operateShoppingCart(c){
 				}
 			});
 		}
-	}
-}
-
-function changeMoveMenu(c){
-	var menu = $('#divMoveMenu'), event = $(c.event);
-	
-	if(event.attr('isShow') == "false"){
-		menu.css({
-			display : 'none',
-			top : document.documentElement.clientHeight,
-			left : document.documentElement.clientWidth - menu.width() - 2
-		});	
-		event.attr('isShow', true);
-	}else{
-		menu.css({
-			display : 'block',
-			top : document.documentElement.clientHeight - event.height() - menu.height() - 2 * 2,
-			left : document.documentElement.clientWidth - menu.width() - 2
-		});		
-		event.attr('isShow', false);
 	}
 }
 

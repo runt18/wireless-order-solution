@@ -38,8 +38,8 @@ body{
 }
 
 #spanDisplayFoodCount{
-	background: #fdc800; 
-	color: #fff; 
+	color: #16a9d0;
+	display: inline;
 	font-weight: bold;
 	visibility: hidden;
 }
@@ -268,7 +268,7 @@ color:#ff6600;
 	-webkit-transform: translateX(-100%);
 }
 .d-fsa-img > div{
-	height: 200px;
+	height: 230px;
 	background: url(../../title-image.jpg);
 	background-size: 100% 100%;
 }

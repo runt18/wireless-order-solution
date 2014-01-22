@@ -1,17 +1,17 @@
 String.prototype.format = function(args){
     var result = this;
     if (arguments.length > 0){    
-        if (arguments.length == 1 && typeof args == "object"){
+        if (arguments.length == 1 && typeof args == 'object'){
             for(var key in args) {
                 if(args[key] != undefined){
-                    var reg = new RegExp("({" + key + "})", "g");
+                    var reg = new RegExp('({' + key + '})', 'g');
                     result = result.replace(reg, args[key]);
                 }
             }
         }else{
         	for(var i = 0; i < arguments.length; i++){
         		if (arguments[i] != undefined) {
-        			var reg= new RegExp("({)" + i + "(})", "g");
+        			var reg= new RegExp('({)' + i + '(})', 'g');
         			result = result.replace(reg, arguments[i]);
                 }
             }
@@ -20,10 +20,23 @@ String.prototype.format = function(args){
     return result;
 };
 String.prototype.trim = function(){
-	return this.replace(/(^\s*)|(\s*$)/g, ""); 
+	return this.replace(/(^\s*)|(\s*$)/g, ''); 
 };
 String.prototype.isEmpty = function(){
 	return this.trim().isEmpty();
+};
+Object.clone = function(obj){
+	if(typeof obj !== 'object'){
+		return obj;   
+	}
+	 var clone = {}; 
+	 if(obj.constructor == Array){   
+		 clone = [];
+	 }
+	 for(var i in obj){  
+		 clone[i] = Object.clone(obj[i]);
+	 }
+	 return clone;
 };
 var Util = {
 	mp : { oid : 0, fid : 0 },
@@ -74,6 +87,27 @@ var Util = {
 	}
 };
 Util.initParams();
+Util.lm = {
+	box : '',
+	img : './loading.gif',
+	id : './images/div-loadmask-m',
+	templet : '<div id={id} class="loadingbox"><div class="img"><img src="{img}" border="0"></div></div>',
+	init : function(){
+		this.box = Util.getDom(this.id);
+		if(!this.box){
+			document.body.insertAdjacentHTML('afterBegin', this.templet.format({id:Util.lm.id ,img:Util.lm.img}));
+			this.box = Util.getDom(this.id);
+		}
+	},
+	show : function(){
+		this.init();
+		this.box.style.display = 'block';
+	},
+	hide : function(){
+		this.init();
+		this.box.style.display = 'none';
+	}
+};
 document.addEventListener('WeixinJSBridgeReady', function onBridgeReady() {
 	//WeixinJSBridge.call('hideToolbar');
 });

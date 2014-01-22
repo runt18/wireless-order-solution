@@ -34,15 +34,12 @@ function initView(){
 }
 
 function initEvent(){
-	if(params.isLinux === true){
-		$.dom('divNavKitchen-mask').ontouchstart = function(){operateKitchenSearch({event:this, otype:'hide'}); };
-		$('#divBottomNav-top > div[data-region=left]')[0].ontouchstart = function(){operateKitchenSearch({event:this, otype:'show'}); };
-		$('#divBottomNav-top > div[data-region=center]')[0].ontouchstart = function(){operateShoppingCart({event:this, otype:'show'}); };
-	}else if(params.isWindow === true){
-		$.dom('divNavKitchen-mask').onclick = function(){ operateKitchenSearch({event:this, otype:'hide'}); };
-		$('#divBottomNav-top > div[data-region=left]')[0].onclick = function(){ operateKitchenSearch({event:this, otype:'show'}); };
-		$('#divBottomNav-top > div[data-region=center]')[0].onclick = function(){operateShoppingCart({event:this, otype:'show'}); };
-	}
+	Util.getDom('divNavKitchen-mask').onclick = function(){operateKitchenSearch({event:this, otype:'hide'}); };
+//	if(params.isLinux === true){
+//		$.dom('divNavKitchen-mask').ontouchstart = function(){operateKitchenSearch({event:this, otype:'hide'}); };
+//	}else if(params.isWindow === true){
+//		$.dom('divNavKitchen-mask').onclick = function(){ operateKitchenSearch({event:this, otype:'hide'}); };
+//	}
 }
 /**
  * 
@@ -64,18 +61,20 @@ function initFoodData(c){
 	c = c == null ? {} : c;
 	var requestParams = {
 		dataSource : params.dataSource,
-		fid : params.fid,
+		fid : Util.mp.fid,
 		kitchenId : typeof c.kitchenAlias != 'undefined' ? c.kitchenId : params.kitchenId,
 		isPaging : params.isPaging,
 		start : typeof c.start != 'undefined' ? c.start : params.start,
 		limit : typeof c.limit != 'undefined' ? c.limit : params.limit
 	};
+	Util.lm.show();
 	$.ajax({
 		url : '../../WXQueryFood.do',
 		dataType : 'json',
 		type : 'post',
 		data : requestParams,
 		success : function(data, status, xhr){
+			Util.lm.hide();
 			if(requestParams.start == 0 && requestParams.limit == 10){
 				params.foodData = data.root;
 			}else{
@@ -97,16 +96,17 @@ function initFoodData(c){
 					}));
 				}
 				count = null;
-				$.dom('divOperateFoodPaging').insertAdjacentHTML('beforeBegin', html.join(''));
-				$.dom('divOperateFoodPaging').innerHTML = '点击加载更多.';
+				Util.getDom('divOperateFoodPaging').insertAdjacentHTML('beforeBegin', html.join(''));
+				Util.getDom('divOperateFoodPaging').innerHTML = '点击加载更多.';
 			}else{
-				$.dom('divOperateFoodPaging').innerHTML = '没有记录.';
+				Util.getDom('divOperateFoodPaging').innerHTML = '没有记录.';
 			}
 			if(typeof c.callback == 'function'){
 				c.callback(data);
 			}
 		},
 		error : function(xhr, errorType, error){
+			Util.lm.hide();
 			alert('加载菜品信息失败.');
 		}
 	});

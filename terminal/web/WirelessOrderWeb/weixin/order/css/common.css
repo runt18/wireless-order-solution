@@ -198,12 +198,14 @@ button,input,select,textarea {
 	color: #fff;
 	padding: 10px;
 	position: relative;
+	
 }
 
 .indexsub .subtype em {
 	font-weight: bold;
 	display: block;
 	font-size: 30px;
+	line-height: 1.6;
 }
 
 .indexsub .subtype span {

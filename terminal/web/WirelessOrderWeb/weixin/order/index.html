@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>食尚微餐厅</title>
+	<!-- <title>食尚微餐厅</title> -->
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport">
 	<link type="text/css" rel="stylesheet" href="./css/common.css">
@@ -12,6 +12,21 @@
 	<script type="text/javascript">
 	$(function(){
 		Util.html('', function(html){ $(document.body).append(html);  });
+		$.ajax({
+			url : '../../WXQueryInfo.do',
+			dataType : 'json',
+			type : 'post',
+			data : {
+				dataSource : 'initData',
+				fid : Util.mp.fid
+			},
+			success : function(data, statuc, xhr){
+				Util.getDom('imgRestaurantHeader').src = data.other.logo;
+			},
+			error : function(xhr, errorType, error){
+				alert('加载店铺形象失败.');
+			}
+		});
 	});
 	</script>
 </head>
@@ -24,7 +39,7 @@
 	<!-- banner -->
 	<div class="bgstyle banner">
 		<div> 
-			<img src="./header.jpg" />
+			<img id="imgRestaurantHeader" src="" />
 		</div>
 	</div>
 	<!-- banner END -->

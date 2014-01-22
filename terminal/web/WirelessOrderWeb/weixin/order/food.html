@@ -6,9 +6,12 @@
 <title>菜品列表</title>
 <link rel="stylesheet" href="./css/base.css">
 <link rel="stylesheet" href="./css/food.css">
+<link type="text/css" rel="stylesheet" href="./css/mbar.css">
+<link type="text/css" rel="stylesheet" href="./css/general_foundicons.css">
 <script type="text/javascript" src="../../jquery/jquery-1.8.2.min.js"></script>
 <script type="text/javascript" src="../../jquery/jquery.client.js"></script>
 <script type="text/javascript" src="./js/Util.js"></script>
+<script type="text/javascript" src="./js/idangerous.swiper-2.1.min.js"></script>
 <script type="text/javascript">
 document.addEventListener('WeixinJSBridgeReady', function onBridgeReady() {
 //	WeixinJSBridge.call('hideToolbar');
@@ -24,13 +27,13 @@ var params = {
 	limit : 10,
 	kitchenData : {},
 	kitchenId : -1,
-	fid : Util.getParam('r'),
 	DNSC : 'divNavKitchen-item-select'
 };
-$.dom = function(id){ return document.getElementById(id); };
+
 </script>
 <script type="text/javascript" src="./js/food/load.js"></script>
 <script type="text/javascript" src="./js/food/main.js"></script>
+
 </head>
 <body>
 
@@ -40,7 +43,7 @@ $.dom = function(id){ return document.getElementById(id); };
 		<div data-r="body"></div>
 	</div> -->
 	<div id="divNavKitchen-kitchen">
-		<div data-r="title" class="div-l-n-title">全部</div>
+		<div data-r="title" class="div-l-n-title" data-value="-1" onclick="filtersFood(this)">全部</div>
 		<div data-r="body"></div>
 	</div>
 	<div id="divNavKitchen-mask" class="div-full"> </div>
@@ -64,12 +67,25 @@ $.dom = function(id){ return document.getElementById(id); };
 		总数量:&nbsp;<span id="spanSumCountForSC">--.--</span>
 		&nbsp;&nbsp;
 		合计:&nbsp;<span id="spanSumPriceForSC">--.--</span>
-		&nbsp;&nbsp;
-		<span onclick="operateFood({otype:'claer'})">清空</span>
 	</div>
-	<div id="divButtonForSC" class="box-horizontal">
-		<div onclick="operateShoppingCart({event:this, otype:'confirm'})">下单 </div>
-		<div onclick="operateShoppingCart({event:this, otype:'hide'})">返回 </div>
+	<div id="divButtonForSC" class="hewarp">
+		<ul>
+			<li style="width:33.33%">
+				<a href="javascript:operateFood({otype:'claer'});" title="会员中心"> 
+				<i class="foundicon-remove fcolor1"></i>清&nbsp;空
+				</a>
+			</li>
+			<li style="width:33.33%">
+				<a href="javascript:operateShoppingCart({event:this, otype:'confirm'});" title="店铺首页">
+				<i class="foundicon-checkmark fcolor2"></i>下&nbsp;单
+				</a>
+			</li>
+			<li style="width:33.33%">
+				<a href="javascript:operateShoppingCart({event:this, otype:'hide'});" title="会员中心"> 
+				<i class="foundicon-left-arrow fcolor3"></i>返&nbsp;回
+				</a>
+			</li>
+		</ul>
 	</div>
 </div>
 
@@ -92,24 +108,71 @@ $.dom = function(id){ return document.getElementById(id); };
 			</div>
 		 -->
 		<div id="divOperateFoodPaging" onclick="loadFoodPaging()">&nbsp;</div>
+		<!-- <div class="footer">&copy; 2014 技术支持：智易科技</div> -->
 	</div>
+	<!-- 
 	<div id="divBottomNav">
 	<div id="divBottomNav-top" class="box-horizontal">
 		<div data-region="left">分厨</div>
 		<div data-region="center" class="div-full">购物车&nbsp;<span id="spanDisplayFoodCount">0</span></div>
 		<div data-region="right" onclick="changeMoveMenu({event:this});">更多</div>
+	<div>
 	</div>
-	<!-- 
-	<div id="divBottomNav-middle" class="box-horizontal"></div>
 	 -->
+	<div id="divBottomNav" class="hewarp">
+		<ul class="swiper-wrapper">
+			<li class="index swiper-slide">
+				<a href="javascript:Util.skip('index.html');" title="店铺首页">
+				<i class="foundicon-home fcolor6"></i>首&nbsp;页
+				</a>
+			</li>
+			<li class="order swiper-slide">
+				<a href="javascript:operateKitchenSearch({event:this, otype:'show'});" title="分厨">
+				<i class="foundicon-search fcolor5"></i>分&nbsp;厨
+				</a>
+			</li>
+			<li class="special swiper-slide">
+				<a href="javascript:operateShoppingCart({event:this, otype:'show'});" title="购物车">
+				<i class="foundicon-cart fcolor2"></i>购物车<div id="spanDisplayFoodCount">0</div>
+				</a>
+			</li>
+			<li class="user swiper-slide">
+				<a href="javascript:window.location.reload();" title="刷新"> 
+				<i class="foundicon-refresh fcolor3"></i>刷新
+				</a>
+			</li>
+			<li class="special swiper-slide">
+				<a href="javascript:Util.skip('rfood.html');" title="特色菜品">
+				<i class="foundicon-heart fcolor2"></i>特色菜品
+				</a>
+			</li>
+			<li class="user swiper-slide">
+				<a href="javascript:Util.skip('member.html');" title="会员中心"> 
+				<i class="foundicon-user fcolor3"></i>会员中心
+				</a>
+			</li>
+			<li class="user swiper-slide">
+				<a href="javascript:Util.skip('sales.html');" title="会员中心"> 
+				<i class="foundicon-offsale fcolor1"></i>优惠信息
+				</a>
+			</li>
+		</ul>
 	</div>
 </div>
 
-<div id="divMoveMenu">
-	<div onclick="window.location.href='./index.html'">主页</div>
-	<div onclick="window.location.reload()">刷新</div>
-	<div>会员中心</div>
-</div>
+<script>
+var mySwiper = new Swiper('#divBottomNav',{
+	paginationClickable: true,
+    slidesPerView: 'auto',
+    disableAutoResize : true
+});
+var li = $('#divBottomNav li');
+var tw = $('#divBottomNav').width();
+tw = li.length > 5 ? parseInt(tw / 5) : parseInt(tw / li.length);
+for(var i = 0;i < li.length; i++){
+	li[i].style.width = tw + 'px';
+}
+</script>
 
 <div id="divFoodShowAbout">
 	<div data-region="img" class="d-fsa-img"><div></div></div>
@@ -118,6 +181,35 @@ $.dom = function(id){ return document.getElementById(id); };
 	<div data-region="mask" class="d-fsa-mask div-full" onclick="foodShowAbout({event:this, otype:'hide'})"></div>
 </div>
 
-
+<!-- <div id="signup" style="display:none;">
+    <div class="backdrop"></div>
+    <div class="signup-dialog clearfix">
+    	<div class="signup-form">
+    		<h2 class="no-wait">列表信息读取失败</h2>
+            <p class="no-wait">提示信息</p>
+            <p class="no-signup">
+            	<form id="request-trial-form" method="post">
+	                <div class="clearfix">
+	                    <span class="tos">
+						<button tabindex="5" type="submit" class="flat-button flat-blue right">
+	                        <span class="icon-edit-ok"></span>
+	                        <span class="button-text">确定</span>
+	                        <span class="button-loading"></span>
+	                    </button>
+	                    </span>
+	                    <span>
+						<button tabindex="5" type="submit" class="flat-button flat-gray right">
+	                        <span class="icon-edit-ok"></span>
+	                        <span class="button-text">取消</span>
+	                        <span class="button-loading"></span>
+	                    </button>
+						</span>
+	                </div>
+	        	</form>
+            </p>
+        </div>
+    </div>
+</div>
+ -->
 </body>
 </html>
