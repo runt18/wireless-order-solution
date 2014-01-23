@@ -37,5 +37,4 @@ public class WXOperateInfoAction extends DispatchAction {
 		}
 		return null;
 	}
-	
 }

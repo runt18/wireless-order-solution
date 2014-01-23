@@ -16,20 +16,30 @@ import org.marker.weixin.msg.Msg4Text;
 import org.marker.weixin.msg.Msg4Video;
 import org.marker.weixin.msg.Msg4Voice;
 
+import com.wireless.Actions.init.InitServlet;
 import com.wireless.db.DBCon;
 import com.wireless.db.restaurantMgr.RestaurantDao;
+import com.wireless.db.weixin.member.WeixinMemberDao;
 import com.wireless.db.weixin.restaurant.WeixinRestaurantDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.util.DateUtil;
 
 public class WeiXinRestaurantHandleMessageAdapter implements HandleMessageListener {
-	public static final String WEIXIN_INDEX = "http://42.121.54.177/web-term/weixin/order/index.html";
-	public static final String WEIXIN_FOOD = "http://42.121.54.177/web-term/weixin/order/food.html";
-	public static final String WEIXIN_RFOOD = "http://42.121.54.177/web-term/weixin/order/rfood.html";
-	public static final String WEIXIN_ABOUT = "http://42.121.54.177/web-term/weixin/order/about.html";
-	public static final String WEIXIN_SALES = "http://42.121.54.177/web-term/weixin/order/sales.html";
-	public static final String WEIXIN_MEMBER = "http://42.121.54.177/web-term/weixin/order/member.html";
+	public static final String WEIXIN_BASE_SERVER = InitServlet.getConfig().getInitParameter("weixin_callback_address");
+	
+	public static final String WEIXIN_INDEX = WEIXIN_BASE_SERVER + "/weixin/order/index.html";
+	public static final String WEIXIN_FOOD = WEIXIN_BASE_SERVER + "/weixin/order/food.html";
+	public static final String WEIXIN_RFOOD = WEIXIN_BASE_SERVER + "/weixin/order/rfood.html";
+	public static final String WEIXIN_ABOUT = WEIXIN_BASE_SERVER + "/weixin/order/about.html";
+	public static final String WEIXIN_SALES = WEIXIN_BASE_SERVER + "/weixin/order/sales.html";
+	public static final String WEIXIN_MEMBER = WEIXIN_BASE_SERVER + "/weixin/order/member.html";
+	
+	public static final String WEIXIN_FOOD_ICON = WEIXIN_BASE_SERVER + "/weixin/order/images/icon_food.png";
+	public static final String WEIXIN_RFOOD_ICON = WEIXIN_BASE_SERVER + "/weixin/order/images/icon_rfood.png";
+	public static final String WEIXIN_ABOUT_ICON = WEIXIN_BASE_SERVER + "/weixin/order/images/icon_about.png";
+	public static final String WEIXIN_SALES_ICON = WEIXIN_BASE_SERVER + "/weixin/order/images/icon_sales.png";
+	public static final String WEIXIN_MEMBER_ICON = WEIXIN_BASE_SERVER + "/weixin/order/images/icon_member.png";
 	
 	public static final String COMMAND_HELP = "H";
 	public static final String COMMAND_MENU = "M";
@@ -58,9 +68,6 @@ public class WeiXinRestaurantHandleMessageAdapter implements HandleMessageListen
 	private void init(Msg msg) throws SQLException, BusinessException{
 		if(msg == null) throw new NullPointerException("当前时间: " + DateUtil.format(new Date()) + "\n 错误: 接收公众平台回发信息失败.");
 		else this.msg = msg;
-//		System.out.println("FromID: " + msg.getToUserName());
-//		System.out.println("OpenID: " + msg.getFromUserName());
-//		System.out.println("account: " + account);
 		if(dbCon == null){
 			dbCon = new DBCon();
 			dbCon.connect();
@@ -72,6 +79,7 @@ public class WeiXinRestaurantHandleMessageAdapter implements HandleMessageListen
 			rid = WeixinRestaurantDao.getRestaurantIdByWeixin(dbCon, msg.getToUserName());
 			restaurant = RestaurantDao.getById(dbCon, rid);
 		}
+		
 	}
 	/**
 	 * 初始化文本回复信息对象
@@ -108,38 +116,59 @@ public class WeiXinRestaurantHandleMessageAdapter implements HandleMessageListen
 		if("1".equals(order) || COMMAND_MENU.equals(order.toUpperCase())){
 			initImageText();
 			
-			dataItem = new Data4Item("logo", "最新优惠信息", "http://42.121.54.177/web-term/weixin/title-image.jpg", WEIXIN_SALES); 
+			String logo;
+			try {
+				logo = WeixinRestaurantDao.getLogo(rid);
+				if(logo == null || logo.trim().isEmpty()){
+					logo = InitServlet.getConfig().getInitParameter("imageBrowseDefaultFile");
+				}else{
+					logo = "http://" + InitServlet.getConfig().getInitParameter("oss_bucket_image")
+							+ "." + InitServlet.getConfig().getInitParameter("oss_outer_point") 
+							+ "/" + logo;
+				}
+			} catch (SQLException e) {
+				System.out.println("获取餐厅LOGO信息失败.");
+				logo = InitServlet.getConfig().getInitParameter("imageBrowseDefaultFile");
+			}
+			
+			dataItem = new Data4Item(" ", " ", logo, createUrl(WEIXIN_INDEX)); 
 			imageText.addItem(dataItem);
 			
-			dataItem = new Data4Item();
-			dataItem.setTitle("主页");
-			dataItem.setUrl(createUrl(WEIXIN_INDEX));
-			imageText.addItem(dataItem);
+//			dataItem = new Data4Item();
+//			dataItem.setTitle("主页");
+//			dataItem.setUrl(createUrl(WEIXIN_INDEX));
+//			imageText.addItem(dataItem);
 			
 			dataItem = new Data4Item();
 			dataItem.setTitle("自助点餐");
 			dataItem.setUrl(createUrl(WEIXIN_FOOD));
+			dataItem.setPicUrl(WEIXIN_FOOD_ICON);
 			imageText.addItem(dataItem);
 			
 			dataItem = new Data4Item();
 			dataItem.setTitle("特色菜品");
 			dataItem.setUrl(createUrl(WEIXIN_RFOOD));
-			imageText.addItem(dataItem);
-			
-			dataItem = new Data4Item();
-			dataItem.setTitle("优惠信息");
-			dataItem.setUrl(createUrl(WEIXIN_SALES));
-			imageText.addItem(dataItem);
-			
-			dataItem = new Data4Item();
-			dataItem.setTitle("餐厅简介");
-			dataItem.setUrl(createUrl(WEIXIN_ABOUT));
+			dataItem.setPicUrl(WEIXIN_RFOOD_ICON);
 			imageText.addItem(dataItem);
 			
 			dataItem = new Data4Item();
 			dataItem.setTitle("会员资料");
 			dataItem.setUrl(createUrl(WEIXIN_MEMBER));
+			dataItem.setPicUrl(WEIXIN_MEMBER_ICON);
 			imageText.addItem(dataItem);
+			
+			dataItem = new Data4Item();
+			dataItem.setTitle("优惠信息");
+			dataItem.setUrl(createUrl(WEIXIN_SALES));
+			dataItem.setPicUrl(WEIXIN_SALES_ICON);
+			imageText.addItem(dataItem);
+			
+			dataItem = new Data4Item();
+			dataItem.setTitle("餐厅简介");
+			dataItem.setUrl(createUrl(WEIXIN_ABOUT));
+			dataItem.setPicUrl(WEIXIN_ABOUT_ICON);
+			imageText.addItem(dataItem);
+			
 			
 			session.callback(imageText);
 		}else if(COMMAND_HELP.equals(order.toUpperCase())){
@@ -160,7 +189,7 @@ public class WeiXinRestaurantHandleMessageAdapter implements HandleMessageListen
 	 * 文本信息, 操作请求指令集
 	 */
 	public void onTextMsg(Msg4Text msg) {
-		System.out.println("微信餐厅收到消息：" + msg.getContent());
+//		System.out.println("微信餐厅收到消息：" + msg.getContent());
 		try{
 			init(msg);
 			explainOrder(msg.getContent());
@@ -179,16 +208,19 @@ public class WeiXinRestaurantHandleMessageAdapter implements HandleMessageListen
 			init(msg);
 			if(msg.getEvent().equals(Msg4Event.SUBSCRIBE)){
 				System.out.println("微信餐厅->添加关注: " + msg.getToUserName());
-				initText();
-				text.setContent(new StringBuilder().append("谢谢您的支持.\n")
-						.append("回复【h】获取帮助信息\n")
-						.append("回复【m】获得主菜单")
-						.toString());
-				session.callback(text);
+				WeixinMemberDao.interest(msg.getToUserName(), msg.getFromUserName());
+				explainOrder(COMMAND_MENU);
+//				initText();
+//				text.setContent(new StringBuilder().append("谢谢您的支持.\n")
+//						.append("回复【h】获取帮助信息\n")
+//						.append("回复【m】获得主菜单")
+//						.toString());
+//				session.callback(text);
 			}else if(msg.getEvent().equals(Msg4Event.UNSUBSCRIBE)){
-				System.out.println("微信餐厅->取消关注: " + msg.getToUserName());
+//				System.out.println("微信餐厅->取消关注: " + msg.getToUserName());
+				WeixinMemberDao.interest(msg.getToUserName(), msg.getFromUserName());
 			}else{
-				System.out.println("微信餐厅->菜单回调事件, 推送指令: " + msg.getEventKey());
+//				System.out.println("微信餐厅->菜单回调事件, 推送指令: " + msg.getEventKey());
 				explainOrder(msg.getEventKey());
 			}
 			

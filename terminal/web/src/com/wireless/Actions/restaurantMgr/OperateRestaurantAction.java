@@ -203,4 +203,37 @@ public class OperateRestaurantAction extends DispatchAction {
 		}
 		return null;
 	}
+	
+	/**
+	 * 
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward getLogo(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		JObject jobject = new JObject();
+		try{
+			String logo = WeixinRestaurantDao.getLogo(Integer.valueOf(request.getAttribute("restaurantID").toString()));
+			if(logo == null || logo.trim().isEmpty()){
+				logo = getServlet().getInitParameter("imageBrowseDefaultFile");
+			}else{
+				logo = "http://" + getServlet().getInitParameter("oss_bucket_image")
+	    	    		+ "." + getServlet().getInitParameter("oss_outer_point") 
+	    	    		+ "/" + logo;
+			}
+			jobject.getOther().put("logo", logo);
+			jobject.setSuccess(true);
+		}catch(Exception e){
+			e.printStackTrace();
+			jobject.initTip(e);
+		}finally{
+			response.getWriter().print(jobject.toString());
+		}
+		return null;
+	}
 }
