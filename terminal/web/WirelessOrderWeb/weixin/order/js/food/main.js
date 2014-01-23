@@ -152,6 +152,7 @@ function displayOrderFoodMsg(c){
 		display.innerHTML = params.orderData.length;
 		display.style.visibility = 'visible';
 	}else{
+		display.innerHTML = '';
 		display.style.visibility = 'hidden';
 	}
 	

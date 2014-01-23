@@ -2,7 +2,7 @@ body{
 	overflow: hidden;
 }
 .left-nav-show{
-	//-webkit-animation: left-nav-show .5s .01s ease both;
+	-webkit-animation: left-nav-show .5s .01s ease both;
 }
 @-webkit-keyframes left-nav-show{
 	/* 0%{-webkit-transform:translateX(-100%);} 
@@ -275,7 +275,6 @@ color:#ff6600;
 }
 .d-fsa-img > div{
 	height: 230px;
-	background: url(../../title-image.jpg);
 	background-size: 100% 100%;
 }
 .d-fsa-msg{
