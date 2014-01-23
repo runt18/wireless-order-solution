@@ -2,18 +2,22 @@ body{
 	overflow: hidden;
 }
 .left-nav-show{
-	-webkit-animation: left-nav-show .5s .01s ease both;
+	//-webkit-animation: left-nav-show .5s .01s ease both;
 }
 @-webkit-keyframes left-nav-show{
-	0%{-webkit-transform:translateX(-100%);} 
-	100%{-webkit-transform:translateX(0);}
+	/* 0%{-webkit-transform:translateX(-100%);} 
+	100%{-webkit-transform:translateX(0);} */
+	0%{left: -100%;} 
+	100%{left: 0;}
 }
 .left-nav-hide{
 	-webkit-animation: left-nav-hide .5s .01s ease both;
 }
 @-webkit-keyframes left-nav-hide{
-	0%{-webkit-transform:translateX(0);} 
-	100%{-webkit-transform:translateX(-100%);}
+	/* 0%{-webkit-transform:translateX(0);} 
+	100%{-webkit-transform:translateX(-100%);} */
+	0%{left: 0;}
+	100%{left: -100%;} 
 }
 
 /* divBottomNav--------------------------------------------- */
@@ -54,7 +58,8 @@ body{
 	width: 100%;
 	height: 100%;
 	font-size: 13px;
-	-webkit-transform: translateX(-100%);
+	/* -webkit-transform: translateX(-100%); */
+	left: -100%;
 	z-index: 999 !important;
 }
 
@@ -170,7 +175,8 @@ color:#a7cb19;
 	font-size: 13px;
 	top: 0;
 	left: 0;
-	-webkit-transform: translateX(-100%);
+	//-webkit-transform: translateX(-100%);
+	left: -100%;
 	z-index: 999 !important;
 	background-color: #eee;
 }
@@ -262,10 +268,10 @@ color:#ff6600;
 	z-index: 99999;
 	position: absolute;
 	top: 0;
-	left: 0;
+	left: -100%;
 	width: 100%;
 	height: 100%;
-	-webkit-transform: translateX(-100%);
+	//-webkit-transform: translateX(-100%);
 }
 .d-fsa-img > div{
 	height: 230px;

@@ -87,15 +87,18 @@ var Util = {
 	}
 };
 Util.initParams();
+/**
+ * Enpty:
+ * Util.lm.show();
+ */
 Util.lm = {
 	box : '',
-	img : './loading.gif',
-	id : './images/div-loadmask-m',
-	templet : '<div id={id} class="loadingbox"><div class="img"><img src="{img}" border="0"></div></div>',
+	img : 'images/loading.gif',
+	id : 'div-loadmask-m-ld',
+	templet : '<div id={id} class="div-mask div-mask-ld"><div class="img"><img src="{img}" border="0"></div></div>',
 	init : function(){
-		this.box = Util.getDom(this.id);
 		if(!this.box){
-			document.body.insertAdjacentHTML('afterBegin', this.templet.format({id:Util.lm.id ,img:Util.lm.img}));
+			document.body.insertAdjacentHTML('afterBegin', this.templet.format({id:Util.lm.id, img:Util.lm.img}));
 			this.box = Util.getDom(this.id);
 		}
 	},
@@ -106,6 +109,51 @@ Util.lm = {
 	hide : function(){
 		this.init();
 		this.box.style.display = 'none';
+	}
+};
+/**
+ * Enpty:
+ * Util.dialog.show({
+ * 	title:title, msg:msg, [callback:callback]
+ * });
+ */
+Util.dialog = {
+	box : '',
+	id : 'div-loadmask-m-dialog',
+	templet : '<div id="{id}" class="div-mask div-mask-dialog"><div class="dialog">'
+		+ '<div class="dialog-title">{title}</div>'
+		+ '<div class="dialog-msg">{msg}</div>'
+		+ '<div class="dialog-button">'
+			+ '<button onclick="Util.dialog.event(\'yes\');">确定</button>&nbsp;&nbsp;<button onclick="Util.dialog.event(\'cancel\');">取消</button>'
+		+ '</div>'
+		+ '</div>'
+		+ '</div>',
+	init : function(c){
+		if(!this.box){
+			document.body.insertAdjacentHTML('afterBegin', this.templet.format({
+				id:Util.dialog.id,
+				title : typeof c.title == 'string' ? c.title : '温馨提示',
+				msg : c.msg
+			}));
+			this.box = Util.getDom(this.id);
+		}
+	},
+	event : function(btn){
+		this.hide();
+		if(typeof this.defineConfig.callback == 'function'){
+			this.defineConfig.callback(btn, this.defineConfig);
+		}
+	},
+	show : function(c){
+		this.defineConfig = null;
+		this.defineConfig = c ? c : {};
+		this.init(this.defineConfig);
+		this.box.style.display = 'block';
+		var view = this.box.firstChild;
+		view.style.marginTop = parseInt(view.offsetHeight / 2 * -1) + 'px';
+	},
+	hide : function(){
+		if(this.box){ this.box.style.display = 'none'; }
 	}
 };
 document.addEventListener('WeixinJSBridgeReady', function onBridgeReady() {

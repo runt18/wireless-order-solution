@@ -107,7 +107,7 @@ function initFoodData(c){
 		},
 		error : function(xhr, errorType, error){
 			Util.lm.hide();
-			alert('加载菜品信息失败.');
+			Util.dialog.show({ msg : '加载菜品信息失败.' });
 		}
 	});
 }
@@ -125,7 +125,7 @@ function initDeptData(){
 			params.kitchenData = data.root;
 		},
 		error : function(xhr, errorType, error){
-			alert('加载分厨信息失败.');
+			Util.dialog.show({ msg : '加载分厨信息失败.' });
 		}
 	});
 }

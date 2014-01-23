@@ -18,7 +18,6 @@
 .main-box{
 	margin: 15px auto 15px auto;
 	width: 96%;
-	//border-radius: 5px;
 	background-color: #fff;
     border: 1px solid #ccc;
 	box-shadow: 5px 5px 5px 0px lightgray;
@@ -55,93 +54,12 @@
 	0%{opacity:1;} 100%{opacity:0;}
 }
 
-#signup .backdrop{
-	background: rgba(0,0,0,.5);
-	position:absolute;
-	top:0;
-	right:0;
-	bottom:0;
-	left:0
-}
-.signup-dialog{
-	background:#FFF;
-	position: absolute;
-	padding:40px 30px 30px 30px;
-	margin:auto;
-	width: 70%;
-	margin-top:150px;
-	z-index: 1000;
-	top: 0px;
-	left: 0px;
-}
-.signup-dialog h2{
-	font-size:23px;
-	color:#3BB9BB;
-	text-shadow:1px 1px 1px #fff;
-	line-height:1;
-	margin-bottom:10px;
-	margin-top:-10px;
-	text-align:left;
-}
-.signup-dialog .no-signup{display:none}
-.signup-dialog p{
-	display:block;
-	color:#738488;
-	margin-bottom:20px;
-	display:block
-}
-.signup-dialog.wait{width:380px}
-.signup-dialog.wait 
-.no-wait{display:none}
-.signup-dialog.wait .no-signup{display:block}
-.signup-dialog ul{margin:0;padding:0;list-style:none}
-.signup-dialog-footer{border-top:1px solid #DDD;background:#ecf0f1;padding:17px 20px 18px 20px;margin:15px -30px -30px -30px}
-.signup-dialog-footer .tos{color:#738488;float:left;width:180px;line-height:18px;font-size:13px;margin-top:-2px;margin-bottom:-2px}
-.signup-dialog-footer .tos a{color:#3bb9bb}
-.signup-dialog-footer button{float:right;font-size:16px}
-.signup-dialog label{width:25%;float:left;text-align:right;line-height:32px}
-.signup-dialog input{border:1px solid #CCC;-webkit-border-radius:3px;-moz-border-radius:3px;-ms-border-radius:3px;-o-border-radius:3px;border-radius:3px;background:#FFF;width:65%;margin:0;padding:4px 8px;float:right;font-size:14px}
-.signup-dialog .signup-success{display:none}
-.button-loading{display:none}
-#signup-form-errors{display:none}
-.signup-dialog li{margin-bottom:15px}
-.signup-dialog li .input-error{display:none;font-size:12px}
-.signup-dialog li.error input{border-color:#D06142}
-.signup-dialog li.error .input-error{display:block;color:#D06142;margin-left:25%;padding-left:15px}
-#page{position:relative}
-.flat-button{
-	border:0;
-	background:#4aaaa5;
-	border-bottom:3px solid #249698;
-	font-family:proxima-nova-n3, proxima-nova-n4, proxima-nova, 'Helvetica Neue', Helvetica, Arial, sans-serif;
-	display:-moz-inline-stack;
-	display:inline-block;
-	vertical-align:middle;
-	*vertical-align:auto;zoom:1;
-	*display:inline;
-	vertical-align:baseline;
-	color:#FFF;
-	letter-spacing:1px;
-	text-align:center;
-	-webkit-border-radius:2px;
-	-moz-border-radius:2px;
-	-ms-border-radius:2px;
-	-o-border-radius:2px;
-	border-radius:2px;
-	margin:auto;
-	padding:6px 14px;
-	font-size:18px;
-	margin-left:0
-}
-.flat-button.flat-yellow{background:#d06142;border-color:#bd573b;-webkit-transition:all 0.3s ease;-moz-transition:all 0.3s ease;-o-transition:all 0.3s ease;transition:all 0.3s ease}
-.flat-button.flat-yellow:hover{background:#3bb9bb;border-color:#31a8aa}
-.flat-button.flat-gray{background:#CCCCCC;border-color:#BBBBBB;-webkit-transition:all 0.3s ease;-moz-transition:all 0.3s ease;-o-transition:all 0.3s ease;transition:all 0.3s ease}
-.flat-button.flat-gray:hover{background:#EEEEEE;border-color:#DDDDDD}
-.flat-button.flat-red{background:#FF0000;border-color:#980000;-webkit-transition:all 0.3s ease;-moz-transition:all 0.3s ease;-o-transition:all 0.3s ease;transition:all 0.3s ease}
-.flat-button.flat-red:hover{background:#3bb9bb;border-color:#31a8aa}
-.flat-button.flat-blue{background:#3bb9bb;border-color:#31a8aa;-webkit-transition:all 0.3s ease;-moz-transition:all 0.3s ease;-o-transition:all 0.3s ease;transition:all 0.3s ease}
-.flat-button.flat-blue:hover{background:#d06142;border-color:#bd573b}
-.flat-button:hover{background:#b7ca33;border-color:#a4b52e;text-decoration:none !important}
-
-#div-loadmask-m{display: none; z-index:1000; position: absolute; height: 100%; width: 100%; left:0; top:0; background: rgba(0,0,0,.5);}
-#div-loadmask-m > div[class=img]{position: absolute; height:40px; width:40px; left:50%; top:50%; margin: -20px; /* background: #fff;border-radius:5px; */}
+.div-mask{display: none; z-index:1000; position: absolute; height: 100%; width: 100%; left:0; top:0;}
+.div-mask-dialog{background: rgba(0,0,0, .5);}
+.dialog{ position: absolute; min-height: 100px; width: 260px; left:50%; top:50%; margin: 0px 0 0 -130px; background: #fff; }
+.dialog-title{ text-align: center; font-size: 23px; color: #4aaaa5; font-weight: bold; line-height: 45px; padding: 0 0 0 10px; }
+.dialog-msg{ font-size: 18px; line-height: 23px; padding: 0 0 0 10px;  }
+.dialog-button{ line-height: 45px; padding: 0 0 0 10px; text-align: center;}
+.dialog-button > button{ border:0; background:#4aaaa5; color: #FFF; text-align: center; font-size: 18px; width: 100px; height: 30px; margin: 10px 0 0 0;}
+.div-mask-ld{background: rgba(0,0,0, 0);}
+.div-mask-ld > div[class=img]{position: absolute; height:40px; width:40px; left:50%; top:50%; margin: -20px; /* background: #fff;border-radius:5px; */}

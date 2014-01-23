@@ -180,7 +180,7 @@ function operateShoppingCart(c){
 	
 	if(c.otype == 'show'){
 		if(params.orderData.length == 0){
-			alert("您的购物车没有菜品, 请先选菜.");
+			Util.dialog.show({ msg : '您的购物车没有菜品, 请先选菜.' });
 			return;
 		}
 		if(scBox.hasClass('left-nav-hide')){
@@ -209,10 +209,10 @@ function operateShoppingCart(c){
 		scBox.addClass('left-nav-hide');
 		scMainView.html(html.join(''));
 	}else if(c.otype == 'confirm'){
-		alert('暂不支持下单功能.');return;
+		Util.dialog.show({ msg : '暂不支持下单功能.' });return;
 		
 		if(params.orderData.length == 0){
-			alert("您的购物车没有菜品, 请先选菜.");
+			Util.dialog.show({ msg : '您的购物车没有菜品, 请先选菜.' });
 			return;
 		}
 		if(confirm('是否确定下单?')){
@@ -234,13 +234,13 @@ function operateShoppingCart(c){
 				},
 				success : function(data, status, xhr){
 					if(data.success){
-						alert(data.msg + '\n菜单标识码是: ' + data.other.order.code + '');
+						Util.dialog.show({ msg : data.msg + '\n菜单标识码是: ' + data.other.order.code + '' });
 					}else{
-						alert(data.msg);			
+						Util.dialog.show({ msg : data.msg });
 					}
 				},
 				error : function(xhr, errorType, error){
-					alert('下单失败.');
+					Util.dialog.show({ msg : '操作失败, 数据请求发生错误.' });
 				}
 			});
 		}
@@ -248,7 +248,6 @@ function operateShoppingCart(c){
 }
 
 function foodShowAbout(c){
-//	alert(c.event)
 	var box = $('#divFoodShowAbout');
 	if(c.otype == 'show'){
 		box.removeClass('left-nav-hide').addClass('left-nav-show');

@@ -8,6 +8,7 @@
 	<link type="text/css" rel="stylesheet" href="./css/mbar.css">
 	<link type="text/css" rel="stylesheet" href="css/general_foundicons.css">
 	<script type="text/javascript" src="../../jquery/jquery-1.8.2.min.js"></script>
+	
 	<script type="text/javascript" src="./js/Util.js"></script>
 	<script type="text/javascript">
 	$(function(){
@@ -51,47 +52,35 @@
 	<!-- 栏目 -->
 	<div class="bgstyle indexsub">
 		<ul>
-			<li class="s1 bg1">
-				<a href="javascript:Util.skip('food.html');">
-					<div class="subtype">
-						<em class="foundicon-website fontsize1"></em> <span></span> <del>自助点餐</del>
-					</div>
-				</a>
+			<li class="s1 bg5">
+				<div class="subtype" onclick="Util.skip('food.html')">
+					<em class="foundicon-website fontsize1"></em> <span></span> <del>自助点餐</del>
+				</div>
 			</li>
 			<li class="s2 bg2">
-				<a href="javascript:Util.skip('sales.html');">
-					<div class="subtype">
-						<em class="foundicon-offsale fontsize1"> </em> <del>优惠信息</del>
-					</div>	
-				</a>
+				<div class="subtype" onclick="Util.skip('sales.html')">
+					<em class="foundicon-offsale fontsize1"> </em> <del>优惠信息</del>
+				</div>	
 			</li>
 			<li class="s3 bg3">
-				<a href="javascript:Util.skip('member.html');">
-					<div class="subtype">
-						<em class="foundicon-user fontsize1"></em> <span></span> <del>会员中心</del>
-					</div>
-				</a>
-			</li>
-			<li class="s4 bg4">
-				<a href="javascript:Util.skip('rfood.html');">
-					<div class="subtype">
-						<em class="foundicon-heart fontsize1"></em> <span></span> <del>特色菜品</del>
-					</div>
-				</a>
+				<div class="subtype" onclick="Util.skip('member.html')">
+					<em class="foundicon-user fontsize1"></em> <span></span> <del>会员中心</del>
+				</div>
 			</li>
 			<li class="s5 bg5">
-				<a href="javascript:Util.skip('about.html');">
-					<div class="subtype">
-						<em class="foundicon-quote fontsize1"></em> <span></span> <del>店铺简介</del>
-					</div>
-				</a>
+				<div class="subtype" onclick="Util.skip('about.html')">
+					<em class="foundicon-quote fontsize1"></em> <span></span> <del>店铺简介</del>
+				</div>
+			</li>
+			<li class="s4 bg4">
+				<div class="subtype" onclick="Util.skip('rfood.html')">
+					<em class="foundicon-heart fontsize1"></em> <span></span> <del>特色菜品</del>
+				</div>
 			</li>
 			<li class="s6 bg6">
-				<a href="javascript:">
-					<div class="subtype">
-						<em class="foundicon-page fontsize1"></em> <span></span> <del>查看更多</del>
-					</div>
-				</a>
+				<div class="subtype" onclick="navBottomSwiper.swipeNext()">
+					<em class="foundicon-page fontsize1"></em> <span></span> <del>查看更多</del>
+				</div>
 			</li>
 		</ul>
 	</div>
@@ -122,25 +111,6 @@
 		</div>
 	</div>
 </div>
-
-<!-- 右边隐藏的内容 -->
-<div class="moveright">
-	<div class="mrwarp">
-		<div class="">
-			<strong>更多菜单</strong>
-		</div>
-		<div class="mrtype">
-			<ul>
-				<li><a href="#"> 菜单一 </a></li>
-				<li><a href="#"> 菜单二 </a></li>
-				<li><a href="#"> 菜单三 </a></li>
-				<li><a href="#"> 菜单四 </a></li>
-				<li><a href="#"> 菜单五 </a></li>
-				<li><a href="#"> 菜单六</a></li>
-			</ul>
-		</div>
-	</div>
-</div>	
 
 </body>
 </html>

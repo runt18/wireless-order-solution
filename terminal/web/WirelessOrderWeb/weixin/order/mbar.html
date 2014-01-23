@@ -1,6 +1,7 @@
-<div id="header">
+<script type="text/javascript" src="./js/idangerous.swiper-2.4.2.min.js"></script>
+<div id="bottomToolbar">
 	<div class="hewarp">
-		<ul>
+		<ul class="swiper-wrapper">
 			<li class="index swiper-slide">
 				<a href="javascript:Util.skip('index.html');" title="店铺首页">
 				<i class="foundicon-home fcolor6"></i>首 页
@@ -11,25 +12,44 @@
 				<i class="foundicon-website fcolor5"></i>自助点餐
 				</a>
 			</li>
+			<li class="user swiper-slide">
+				<a href="javascript:Util.skip('member.html');" title="会员中心"> 
+				<i class="foundicon-user fcolor3"></i>会员中心
+				</a>
+			</li>
 			<li class="special swiper-slide">
 				<a href="javascript:Util.skip('rfood.html');" title="特色菜品">
 				<i class="foundicon-heart fcolor2"></i>特色菜品
 				</a>
 			</li>
 			<li class="user swiper-slide">
-				<a href="javascript:Util.skip('member.html');" title="会员中心"> 
-				<i class="foundicon-user fcolor3"></i>会员中心
+				<a href="javascript:window.location.reload();" title="刷新">
+				<i class="foundicon-refresh fcolor3"></i>刷新
 				</a>
 			</li>
-			<li class="rimore swiper-slide">
-				<span> <i class="foundicon-page fcolor1"></i> 更多分类 </span>
+			<li class="offsale swiper-slide">
+				<a href="javascript:Util.skip('sales.html');" title="会员中心"> 
+				<i class="foundicon-offsale fcolor1"></i>优惠信息
+				</a>
+			</li>
+			<li class="quote swiper-slide">
+				<a href="javascript:Util.skip('about.html');" title="特色菜品">
+				<i class="foundicon-quote fcolor1"></i>店铺简介
+				</a>
 			</li>
 		</ul>
 	</div>
 </div>
 <script>
-var mySwiper = new Swiper('.hewarp',{
+var navBottomSwiper = new Swiper('#bottomToolbar > div[class=hewarp]', {
 	paginationClickable: true,
-    slidesPerView: 'auto'
+    slidesPerView: 'auto',
+    disableAutoResize : true
 });
+var li = $('#bottomToolbar li');
+var tw = $('#bottomToolbar').width();
+tw = li.length > 5 ? parseInt(tw / 5) : parseInt(tw / li.length);
+for(var i = 0;i < li.length; i++){
+	li[i].style.width = tw + 'px';
+}
 </script>

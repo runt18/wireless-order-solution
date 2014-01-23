@@ -7,7 +7,7 @@ body {
 ol,ul,li {
 	list-style: none;
 }
-#header {
+#bottomToolbar {
 	position: fixed;
 	width: 100%;
 	left: 0;
@@ -19,18 +19,9 @@ ol,ul,li {
 	line-height: 1.4;
 	height: 45px;
 	border-bottom: 1px solid #ccc;
-	background-image: -webkit-gradient(linear, left top, left bottom, from(#FFFFFF), to(#EAEAEA) ); 
-	/* Saf4+, Chrome */
-	background-image: -webkit-linear-gradient(top, #FFFFFF, #EAEAEA);
-	/* Chrome 10+, Saf5.1+, iOS 5+ */
-	background-image: -moz-linear-gradient(top, #FFFFFF, #EAEAEA);
-	/* FF3.6 */
-	background-image: -ms-linear-gradient(top, #FFFFFF, #EAEAEA);
-	/* IE10 */
-	background-image: -o-linear-gradient(top, #FFFFFF, #EAEAEA);
-	/* Opera 11.10+ */
-	background: linear-gradient(to bottom, #FFFFFF, #EAEAEA);
 	box-shadow: -1px -1px 3px #ccc;
+	background-image: -webkit-gradient(linear, left top, left bottom, from(#FFFFFF), to(#EAEAEA) ); 
+	//background-image: -webkit-linear-gradient(top, #FFFFFF, #EAEAEA);
 }
 .hewarp li {
 	float: left;
