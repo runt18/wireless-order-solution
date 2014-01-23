@@ -334,7 +334,7 @@ function init(){
 					success : function(res, opt){
 						var jr = Ext.decode(res.responseText);
 						if(jr.success){
-							sn.fireEvent('dblclick', sn);
+							sn.fireEvent('click', sn);
 							Ext.example.msg(jr.title, jr.msg);
 						}else{
 							Ext.ux.showMsg(jr);
