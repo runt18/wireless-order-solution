@@ -95,7 +95,7 @@ public class PayOrder {
 						  " discount = " + food.getDiscount() + ", " +
 						  " unit_price = " + food.getPrice() +
 						  " WHERE order_id = " + orderCalculated.getId() + 
-						  " AND food_alias = " + food.getAliasId();
+						  " AND food_id = " + food.getFoodId();
 					dbCon.stmt.executeUpdate(sql);				
 				}	
 			}
@@ -254,71 +254,6 @@ public class PayOrder {
 			
 			dbCon.conn.setAutoCommit(false);	
 			
-			if(orderCalculated.isMerged() && orderCalculated.hasChildOrder()){
-				for(Order childOrder : orderCalculated.getChildOrder()){
-					//Delete each child order from table 'order'
-					sql = " DELETE FROM " + Params.dbName + ".order WHERE id = " + childOrder.getId();
-					dbCon.stmt.executeUpdate(sql);
-					
-					//Update the status to the table associated with each child order.
-					sql = " UPDATE " + Params.dbName + ".table SET " +
-						  " status = " + Table.Status.IDLE.getVal() + ", " +
-						  " custom_num = NULL, " +
-						  " category = NULL " +
-						  " WHERE " +
-		  			  	  " table_id = " + childOrder.getDestTbl().getTableId();
-					dbCon.stmt.executeUpdate(sql);	
-					
-					//Update the status to each child order
-					sql = " UPDATE " + Params.dbName + ".sub_order SET " +
-					      " cancel_price = " + childOrder.getCancelPrice() + ", " +
-						  " gift_price = " + childOrder.getGiftPrice() + ", " +
-					      " discount_price = " + childOrder.getDiscountPrice() + ", " +
-						  " erase_price = " + childOrder.getErasePrice() + ", " +
-					      " total_price = " + childOrder.getTotalPrice() + ", " +
-						  " actual_price = " + childOrder.getActualPrice() +
-						  " WHERE order_id = " + childOrder.getId();
-					dbCon.stmt.executeUpdate(sql);
-					
-					//Update the unit price and discount to every food of each child order.
-					for(OrderFood food : childOrder.getOrderFoods()){
-						sql = " UPDATE " + Params.dbName + ".order_food " +
-							  " SET " +
-							  " discount = " + food.getDiscount() + ", " +
-							  " unit_price = " + food.getPrice() +
-							  " WHERE order_id = " + childOrder.getId() + 
-							  " AND food_alias = " + food.getAliasId();
-						dbCon.stmt.executeUpdate(sql);
-					}
-				}
-				
-			}else if(orderCalculated.isMergedChild()){
-				//Delete the child order from 'sub_order'
-				sql = " DELETE FROM " + Params.dbName + ".sub_order WHERE order_id = " + orderCalculated.getId();
-				dbCon.stmt.executeUpdate(sql);
-				
-				//Get its parent order id
-				sql = " SELECT order_id FROM " + Params.dbName + ".order_group WHERE sub_order_id = " + orderCalculated.getId();
-				int parentOrderId = 0;
-				dbCon.rs = dbCon.stmt.executeQuery(sql);
-				if(dbCon.rs.next()){
-					parentOrderId = dbCon.rs.getInt("order_id");
-				}
-				
-				//Delete the relationship from 'order_group'
-				sql = " DELETE FROM " + Params.dbName + ".order_group WHERE sub_order_id = " + orderCalculated.getId();
-				dbCon.stmt.executeUpdate(sql);
-				
-				//Delete its parent in case of empty.
-				sql = " DELETE FROM " + Params.dbName + ".order " +
-					  " WHERE id = " + parentOrderId + 
-					  " AND NOT EXISTS (" + " SELECT * FROM " + Params.dbName + ".order_group WHERE order_id = " + parentOrderId + ")";
-				dbCon.stmt.executeUpdate(sql);
-				
-				//Set the status to normal.
-				orderCalculated.setCategory(Order.Category.NORMAL);
-			}
-			
 			//Update the order.
 			sql = " UPDATE " + Params.dbName + ".order SET " +
 				  " staff_id = " + staff.getId() + ", " +
@@ -455,7 +390,7 @@ public class PayOrder {
 	 */
 	public static Order calcByTable(DBCon dbCon, Staff staff, Order orderToPay) throws BusinessException, SQLException{
 		
-		orderToPay.setId(OrderDao.getOrderIdByUnPaidTable(dbCon, TableDao.getTableByAlias(dbCon, staff, orderToPay.getDestTbl().getAliasId()))[0]);			
+		orderToPay.setId(OrderDao.getOrderIdByUnPaidTable(dbCon, staff, TableDao.getTableByAlias(dbCon, staff, orderToPay.getDestTbl().getAliasId())));			
 		
 		return calcById(dbCon, staff, orderToPay);		
 
@@ -511,17 +446,7 @@ public class PayOrder {
 	 */
 	public static Order calcByTableDync(DBCon dbCon, Staff staff, Order orderToPay) throws BusinessException, SQLException{
 		
-		//Get the details of table to be calculated.
-		Table tblToCalc = TableDao.getTableByAlias(dbCon, staff, orderToPay.getDestTbl().getAliasId());
-		
-		//If the table is merged, get its parent order.
-		//Otherwise get the order of its own.
-		int[] unpaidId = OrderDao.getOrderIdByUnPaidTable(dbCon, tblToCalc);
-		if(unpaidId.length > 1){
-			orderToPay.setId(unpaidId[1]);			
-		}else{
-			orderToPay.setId(unpaidId[0]);			
-		}
+		orderToPay.setId(OrderDao.getOrderIdByUnPaidTable(dbCon, staff, TableDao.getTableByAlias(dbCon, staff, orderToPay.getDestTbl().getAliasId())));			
 		
 		return calcById(dbCon, staff, orderToPay);		
 
@@ -598,125 +523,90 @@ public class PayOrder {
 			}
 		}
 
-		if(orderToCalc.isMerged() && orderToCalc.hasChildOrder()){
-			//Add up the custom number to each child order
-			orderToCalc.setCustomNum(0);
-			
-			for(Order childOrder : orderToCalc.getChildOrder()){
-				//Set the calculate parameters to each child order.
-				setOrderCalcParams(childOrder, orderToPay);
-				//Calculate each child order.
-				childOrder.copyFrom(calcById(dbCon, staff, childOrder));
-				//Accumulate the custom number.
-				orderToCalc.setCustomNum(orderToCalc.getCustomNum() + childOrder.getCustomNum());
-				//Accumulate the discount price.
-				orderToCalc.setDiscountPrice(orderToCalc.getDiscountPrice() + childOrder.getDiscountPrice());
-				//Accumulate the gift price.
-				orderToCalc.setGiftPrice(orderToCalc.getGiftPrice() + childOrder.getGiftPrice());
-				//Accumulate the cancel price.
-				orderToCalc.setCancelPrice(orderToCalc.getCancelPrice() + childOrder.getCancelPrice());
-				//Accumulate the repaid price.
-				orderToCalc.setRepaidPrice(orderToCalc.getRepaidPrice() + childOrder.getRepaidPrice());
-				//Accumulate the total price.
-				orderToCalc.setTotalPrice(orderToCalc.getTotalPrice() + childOrder.getTotalPrice());
-				//Accumulate the actual price.
-				orderToCalc.setActualPrice(orderToCalc.getActualPrice() + childOrder.getActualPrice());
-			}
-			
-			//Minus the erase price.
-			orderToCalc.setActualPrice(orderToCalc.getActualPrice() - orderToCalc.getErasePrice());
-			
-		}else{
-			
-			float cancelPrice = 0;
-			//Calculate the cancel price to this order.
-			sql = " SELECT " + 
-				  " ABS(ROUND(SUM((unit_price + IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * order_count * OF.discount), 2)) AS cancel_price " +
-				  " FROM " +
-				  Params.dbName + ".order_food OF" + 
-				  " JOIN " + 
-				  Params.dbName + ".taste_group TG" +
-				  " ON " + " OF.taste_group_id = TG.taste_group_id " +
-				  " WHERE " +
-				  " OF.order_count < 0 " + " AND " + " OF.order_id = " + orderToCalc.getId();
-			
-			dbCon.rs = dbCon.stmt.executeQuery(sql);
-			if(dbCon.rs.next()){
-				cancelPrice = dbCon.rs.getFloat("cancel_price");
-			}
-			
-			float repaidPrice = 0;
-			//Calculate the repaid price to this order.
-			sql = " SELECT " + 
-				  " ROUND(SUM((unit_price + IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * order_count * OF.discount), 2) AS repaid_price " +
-				  " FROM " +
-				  Params.dbName + ".order_food OF" + 
-				  " JOIN " + 
-				  Params.dbName + ".taste_group TG" +
-				  " ON " + " OF.taste_group_id = TG.taste_group_id " +
-				  " WHERE " +
-				  " OF.is_paid = 1 " + " AND " + " OF.order_id = " + orderToCalc.getId();
-				
-			dbCon.rs = dbCon.stmt.executeQuery(sql);
-			if(dbCon.rs.next()){
-				repaidPrice = dbCon.rs.getFloat("repaid_price");
-			}
-			
-			//Get the total price .
-			float totalPrice = orderToCalc.calcTotalPrice();			
-			
-			//Calculate the actual price.
-			float actualPrice;
-			
-			//Comparing the minimum cost against total price.
-			//Set the actual price to minimum cost if total price does NOT reach minimum cost.
-			float miniCost = orderToCalc.getDestTbl().getMinimumCost();
-			if(totalPrice < miniCost){
-				actualPrice = miniCost;			
-			}else{
-				//Deal with the decimal according to setting.
-				if(setting.getPriceTail().isDecimalCut()){
-					//小数抹零
-					actualPrice = Float.valueOf(totalPrice).intValue();
-				}else if(setting.getPriceTail().isDecimalRound()){
-					//四舍五入
-					actualPrice = Math.round(totalPrice);
-				}else{
-					//不处理
-					actualPrice = totalPrice;
-				}
-			}
-			
-			//Minus the erase price.
-			actualPrice = actualPrice - orderToCalc.getErasePrice();
-			actualPrice = actualPrice > 0 ? actualPrice : 0;
-			
-			//Set the cancel price.
-			orderToCalc.setCancelPrice(cancelPrice);
-			//Set the repaid price.
-			orderToCalc.setRepaidPrice(repaidPrice);
-			//Set the gift price.
-			orderToCalc.setGiftPrice(orderToCalc.calcGiftPrice());			
-			//Set the discount price.
-			orderToCalc.setDiscountPrice(orderToCalc.calcDiscountPrice());
-			//Set the total price.
-			orderToCalc.setTotalPrice(totalPrice);
-			//Set the actual price
-			orderToCalc.setActualPrice(actualPrice);
-			
+		float cancelPrice = 0;
+		//Calculate the cancel price to this order.
+		sql = " SELECT " + 
+			  " ABS(ROUND(SUM((unit_price + IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * order_count * OF.discount), 2)) AS cancel_price " +
+			  " FROM " +
+			  Params.dbName + ".order_food OF" + 
+			  " JOIN " + 
+			  Params.dbName + ".taste_group TG" +
+			  " ON " + " OF.taste_group_id = TG.taste_group_id " +
+			  " WHERE " +
+			  " OF.order_count < 0 " + " AND " + " OF.order_id = " + orderToCalc.getId();
+		
+		dbCon.rs = dbCon.stmt.executeQuery(sql);
+		if(dbCon.rs.next()){
+			cancelPrice = dbCon.rs.getFloat("cancel_price");
 		}
+		
+		float repaidPrice = 0;
+		//Calculate the repaid price to this order.
+		sql = " SELECT " + 
+			  " ROUND(SUM((unit_price + IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * order_count * OF.discount), 2) AS repaid_price " +
+			  " FROM " +
+			  Params.dbName + ".order_food OF" + 
+			  " JOIN " + 
+			  Params.dbName + ".taste_group TG" +
+			  " ON " + " OF.taste_group_id = TG.taste_group_id " +
+			  " WHERE " +
+			  " OF.is_paid = 1 " + " AND " + " OF.order_id = " + orderToCalc.getId();
+			
+		dbCon.rs = dbCon.stmt.executeQuery(sql);
+		if(dbCon.rs.next()){
+			repaidPrice = dbCon.rs.getFloat("repaid_price");
+		}
+		
+		//Get the total price .
+		float totalPrice = orderToCalc.calcTotalPrice();			
+		
+		//Calculate the actual price.
+		float actualPrice;
+		
+		//Comparing the minimum cost against total price.
+		//Set the actual price to minimum cost if total price does NOT reach minimum cost.
+		float miniCost = orderToCalc.getDestTbl().getMinimumCost();
+		if(totalPrice < miniCost){
+			actualPrice = miniCost;			
+		}else{
+			//Deal with the decimal according to setting.
+			if(setting.getPriceTail().isDecimalCut()){
+				//小数抹零
+				actualPrice = Float.valueOf(totalPrice).intValue();
+			}else if(setting.getPriceTail().isDecimalRound()){
+				//四舍五入
+				actualPrice = Math.round(totalPrice);
+			}else{
+				//不处理
+				actualPrice = totalPrice;
+			}
+		}
+		
+		//Minus the erase price.
+		actualPrice = actualPrice - orderToCalc.getErasePrice();
+		actualPrice = actualPrice > 0 ? actualPrice : 0;
+		
+		//Set the cancel price.
+		orderToCalc.setCancelPrice(cancelPrice);
+		//Set the repaid price.
+		orderToCalc.setRepaidPrice(repaidPrice);
+		//Set the gift price.
+		orderToCalc.setGiftPrice(orderToCalc.calcGiftPrice());			
+		//Set the discount price.
+		orderToCalc.setDiscountPrice(orderToCalc.calcDiscountPrice());
+		//Set the total price.
+		orderToCalc.setTotalPrice(totalPrice);
+		//Set the actual price
+		orderToCalc.setActualPrice(actualPrice);
+			
 		
 		return orderToCalc;
 	}
 	
 	private static void setOrderCalcParams(Order orderToCalc, Order calcParams){
-		if(!orderToCalc.isMergedChild()){
-			orderToCalc.setErasePrice(calcParams.getErasePrice());
-		}
-		if(!(orderToCalc.isMerged() || orderToCalc.isMergedChild())){
-			if(calcParams.getCustomNum() >= 0){
-				orderToCalc.setCustomNum(calcParams.getCustomNum());
-			}
+		orderToCalc.setErasePrice(calcParams.getErasePrice());
+		if(calcParams.getCustomNum() >= 0){
+			orderToCalc.setCustomNum(calcParams.getCustomNum());
 		}
 		orderToCalc.setDiscount(calcParams.getDiscount());
 		orderToCalc.setSettleType(calcParams.getSettleType());

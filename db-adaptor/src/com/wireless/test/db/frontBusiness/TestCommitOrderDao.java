@@ -1,13 +1,10 @@
 package com.wireless.test.db.frontBusiness;
 
-import static org.junit.Assert.assertEquals;
-
 import java.beans.PropertyVetoException;
 import java.sql.SQLException;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -24,6 +21,7 @@ import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.staffMgr.Staff;
+import com.wireless.pojo.util.SortedList;
 import com.wireless.test.db.TestInit;
 import com.wireless.util.DateType;
 
@@ -42,14 +40,14 @@ public class TestCommitOrderDao {
 	}
 	
 	@Test
-	public void testUpdateOrder() throws BusinessException, BusinessException, SQLException{
+	public void testCommitOrder() throws BusinessException, BusinessException, SQLException{
 		
 		Table tblToInsert = TableDao.getTables(mStaff, null, null).get(0);
 		List<Food> foods = FoodDao.getPureByCond(mStaff, null, null);
 		
 		//Cancel the order associated with table inserted if it exist before.
 		try{
-			CancelOrder.exec(mStaff, tblToInsert.getAliasId());
+			CancelOrder.execByTable(mStaff, tblToInsert.getAliasId());
 		}catch(BusinessException e){
 			
 		}
@@ -114,8 +112,10 @@ public class TestCommitOrderDao {
 		
 		//------------------------------------------------------------------
 		//Cancel the order associated with table inserted after test.
+		CancelOrder.execByTable(mStaff, actualOrder.getDestTbl().getAliasId());
 		try{
-			CancelOrder.exec(mStaff, actualOrder.getDestTbl().getAliasId());
+			OrderDao.getById(mStaff, actualOrder.getId(), DateType.TODAY);
+			Assert.assertTrue("failed to cancel order", false);
 		}catch(BusinessException e){
 			
 		}
@@ -123,45 +123,29 @@ public class TestCommitOrderDao {
 	
 	private void compareOrder(Order expected, Order actual) throws BusinessException, SQLException{
 		
-		Comparator<OrderFood> foodComp = new Comparator<OrderFood>(){
-
-			@Override
-			public int compare(OrderFood o1, OrderFood o2) {
-				if(o1.getAliasId() > o2.getAliasId()){
-					return 1;
-				}else if(o1.getAliasId() < o2.getAliasId()){
-					return -1;
-				}else{
-					return 0;
-				}
-			}
-		};
-		
 		//Check the associated table
-		assertEquals("the table to order", expected.getDestTbl(), actual.getDestTbl());
+		Assert.assertEquals("the table to order", expected.getDestTbl(), actual.getDestTbl());
 		//Check the custom number
-		assertEquals("the custom number to order", expected.getCustomNum(), actual.getCustomNum());
+		Assert.assertEquals("the custom number to order", expected.getCustomNum(), actual.getCustomNum());
 		//Check the category
-		assertEquals("the category to order", expected.getCategory(), actual.getCategory());
+		Assert.assertEquals("the category to order", expected.getCategory(), actual.getCategory());
 		//Check the order foods
-		List<OrderFood> expectedFoods = expected.getOrderFoods();
-		List<OrderFood> actualFoods = actual.getOrderFoods();
-		Collections.sort(expectedFoods, foodComp);
-		Collections.sort(actualFoods, foodComp);
+		List<OrderFood> expectedFoods = SortedList.newInstance(expected.getOrderFoods());
+		List<OrderFood> actualFoods = SortedList.newInstance(actual.getOrderFoods());
 		
-		assertEquals(expectedFoods.size(), actualFoods.size());
+		Assert.assertEquals(expectedFoods.size(), actualFoods.size());
 		for(int i = 0; i < expectedFoods.size(); i++){
-			assertEquals("basic info to food[" + i + "]", expectedFoods.get(i), actualFoods.get(i));
-			assertEquals("order count to food[" + i + "]", expectedFoods.get(i).getCount(), actualFoods.get(i).getCount(), 0.01);
+			Assert.assertEquals("basic info to food[" + i + "]", expectedFoods.get(i), actualFoods.get(i));
+			Assert.assertEquals("order count to food[" + i + "]", expectedFoods.get(i).getCount(), actualFoods.get(i).getCount(), 0.01);
 		}
 		
 		//Check the associated table detail
 		Table tbl = TableDao.getTableByAlias(mStaff, actual.getDestTbl().getAliasId());
 		//Check the status to associated table
-		assertEquals("the status to associated table", tbl.getStatus().getVal(), Table.Status.BUSY.getVal());
+		Assert.assertEquals("the status to associated table", tbl.getStatus().getVal(), Table.Status.BUSY.getVal());
 		//Check the custom number to associated table
-		assertEquals("the custom number to associated table", tbl.getCustomNum(), actual.getCustomNum());
+		Assert.assertEquals("the custom number to associated table", tbl.getCustomNum(), actual.getCustomNum());
 		//Check the category to associated table
-		assertEquals("the category to associated table", tbl.getCategory().getVal(), actual.getCategory().getVal());
+		Assert.assertEquals("the category to associated table", tbl.getCategory().getVal(), actual.getCategory().getVal());
 	}
 }

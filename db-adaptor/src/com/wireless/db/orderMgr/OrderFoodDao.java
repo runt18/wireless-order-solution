@@ -62,7 +62,7 @@ public class OrderFoodDao {
 	 *             throws if fail to execute the SQL statement
 	 */
 	public static List<OrderFood> getSingleDetailTodayByTable(DBCon dbCon, Staff staff, String extraCond, String orderClause, Table tbl) throws BusinessException, SQLException {
-		int orderId = OrderDao.getOrderIdByUnPaidTable(dbCon, tbl)[0];
+		int orderId = OrderDao.getOrderIdByUnPaidTable(dbCon, staff, tbl);
 		return getSingleDetailToday(dbCon, staff, " AND OF.order_id = " + orderId + (extraCond != null ? extraCond : " "), orderClause);
 	}
 	

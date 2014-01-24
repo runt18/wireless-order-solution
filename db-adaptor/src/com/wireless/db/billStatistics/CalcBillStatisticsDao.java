@@ -42,12 +42,10 @@ public class CalcBillStatisticsDao {
 
 	private final static String TBL_ORDER_TODAY = "order";
 	private final static String TBL_ORDER_FOOD_TODAY = "order_food";
-	private final static String TBL_ORDER_GROUP_TODAY = "order_group";
 	private final static String TBL_TASTE_GROUP_TODAY = "taste_group";
 	private final static String TBL_MEMBER_OPERATION = "member_operation";
 	private final static String TBL_ORDER_HISTORY = "order_history";
 	private final static String TBL_ORDER_FOOD_HISTORY = "order_food_history";
-	private final static String TBL_ORDER_GROUP_HISTORY = "order_group_history";
 	private final static String TBL_TASTE_GROUP_HISTORY = "taste_group_history";
 	private final static String TBL_MEMBER_OPERATION_HISTORY = "member_operation_history";
 	
@@ -540,18 +538,15 @@ public class CalcBillStatisticsDao {
 	public static List<IncomeByDept> calcIncomeByDept(DBCon dbCon, Staff staff, DutyRange range, String extraCond, DateType queryType) throws SQLException{
 		String orderTbl = null;
 		String orderFoodTbl = null;
-		String orderGrpTbl = null;
 		String tasteGrpTbl = null;
 		if(queryType.isHistory()){
 			orderTbl = TBL_ORDER_HISTORY;
 			orderFoodTbl = TBL_ORDER_FOOD_HISTORY;
-			orderGrpTbl = TBL_ORDER_GROUP_HISTORY;
 			tasteGrpTbl = TBL_TASTE_GROUP_HISTORY;
 			
 		}else if(queryType.isToday()){
 			orderTbl = TBL_ORDER_TODAY;
 			orderFoodTbl = TBL_ORDER_FOOD_TODAY;
-			orderGrpTbl = TBL_ORDER_GROUP_TODAY;
 			tasteGrpTbl = TBL_TASTE_GROUP_TODAY;
 			
 		}else{
@@ -576,22 +571,11 @@ public class CalcBillStatisticsDao {
 				  	   " WHEN ((OF.food_status & " + Food.GIFT + ") = 0 AND (OF.food_status & " + Food.WEIGHT + ") <> 0) THEN (OF.unit_price * SUM(OF.order_count) + (IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0))) * discount " +
 				  	   " ELSE 0 " +
 				  	   " END AS dept_income " +
-				  " FROM " +
-				  Params.dbName + "." + orderFoodTbl + " OF " + 
-				  " JOIN " + "(" + " SELECT id, order_date FROM " + Params.dbName + "." + orderTbl + 
-				  			 	   " WHERE 1 = 1 " +
-				  			 	   " AND " + " restaurant_id = " + staff.getRestaurantId() + 
-				  			 	   " AND " + " status <> " + Order.Status.UNPAID.getVal() +
-				  			 	   " AND " + " category <> " + Order.Category.MERGER_TBL.getVal() +
-				  			 	   " UNION " +
-				  			 	   " SELECT OG.sub_order_id AS id, O.order_date " +
-				  			 	   " FROM " + Params.dbName + "." + orderGrpTbl + " OG " +
-				  			 	   " JOIN " + Params.dbName + "." + orderTbl + " O " + " ON OG.order_id = O.id " +
-				  			 	   " WHERE 1 = 1 " +
-				  			 	   " AND " + " O.restaurant_id = " + staff.getRestaurantId() +
-				  			 	   " AND " + " O.status <> " + Order.Status.UNPAID.getVal() + 
-				  			 	   " AND " + " O.category = " + Order.Category.MERGER_TBL.getVal() +
-				  			 ") AS O " + " ON OF.order_id = O.id " +
+				  " FROM " + Params.dbName + "." + orderFoodTbl + " OF " + 
+				  " JOIN " + Params.dbName + "." + orderTbl + " O ON 1 = 1 " + 
+				  " AND OF.order_id = O.id " + 
+				  " AND O.restaurant_id = " + staff.getRestaurantId() + 
+				  " AND O.status <> " + Order.Status.UNPAID.getVal() +
 				  " JOIN " + Params.dbName + "." + tasteGrpTbl + " TG " + " ON OF.taste_group_id = TG.taste_group_id " +
 				  " JOIN " + Params.dbName + ".department D " + " ON OF.dept_id = D.dept_id AND OF.restaurant_id = D.restaurant_id AND D.type = " + Department.Type.NORMAL.getVal() +
 				  " WHERE 1 = 1 " +
@@ -653,18 +637,15 @@ public class CalcBillStatisticsDao {
 	public static List<IncomeByKitchen> calcIncomeByKitchen(DBCon dbCon, Staff staff, DutyRange range, String extraCond, DateType queryType) throws SQLException{
 		String orderTbl = null;
 		String orderFoodTbl = null;
-		String orderGrpTbl = null;
 		String tasteGrpTbl = null;
 		if(queryType.isHistory()){
 			orderTbl = TBL_ORDER_HISTORY;
 			orderFoodTbl = TBL_ORDER_FOOD_HISTORY;
-			orderGrpTbl = TBL_ORDER_GROUP_HISTORY;
 			tasteGrpTbl = TBL_TASTE_GROUP_HISTORY;
 			
 		}else if(queryType.isToday()){
 			orderTbl = TBL_ORDER_TODAY;
 			orderFoodTbl = TBL_ORDER_FOOD_TODAY;
-			orderGrpTbl = TBL_ORDER_GROUP_TODAY;
 			tasteGrpTbl = TBL_TASTE_GROUP_TODAY;
 			
 		}else{
@@ -692,20 +673,10 @@ public class CalcBillStatisticsDao {
 			  	   	   " END AS kitchen_income " +
 			  	  " FROM " +
 				  Params.dbName + "." + orderFoodTbl + " OF " + 
-				  " JOIN " + "(" + " SELECT id, order_date FROM " + Params.dbName + "." + orderTbl + 
-				  			 	   " WHERE 1 = 1 " +
-				  			 	   " AND " + " restaurant_id = " + staff.getRestaurantId() + 
-				  			 	   " AND " + " status <> " + Order.Status.UNPAID.getVal() +
-				  			 	   " AND " + " category <> " + Order.Category.MERGER_TBL.getVal() +
-				  			 	   " UNION " +
-				  			 	   " SELECT OG.sub_order_id AS id, O.order_date " +
-				  			 	   " FROM " + Params.dbName + "." + orderGrpTbl + " OG " +
-				  			 	   " JOIN " + Params.dbName + "." + orderTbl + " O " + " ON OG.order_id = O.id " +
-				  			 	   " WHERE 1 = 1 " +
-				  			 	   " AND " + " O.restaurant_id = " + staff.getRestaurantId() +
-				  			 	   " AND " + " O.status <> " + Order.Status.UNPAID.getVal() + 
-				  			 	   " AND " + " O.category = " + Order.Category.MERGER_TBL.getVal() +
-				  			 ") AS O " + " ON OF.order_id = O.id " +
+				  " JOIN " + Params.dbName + "." + orderTbl + " O ON 1 = 1 " + 
+				  " AND OF.order_id = O.id " + 
+				  " AND O.restaurant_id = " + staff.getRestaurantId() + 
+				  " AND O.status <> " + Order.Status.UNPAID.getVal() +
 				  " JOIN " + Params.dbName + "." + tasteGrpTbl + " TG " + " ON OF.taste_group_id = TG.taste_group_id " +
 				  " JOIN " + Params.dbName + ".kitchen K " + " ON OF.kitchen_id = K.kitchen_id AND K.type = " + Kitchen.Type.NORMAL.getVal() + 
 				  " JOIN " + Params.dbName + ".department D " + " ON K.dept_id = D.dept_id AND K.restaurant_id = D.restaurant_id " +
@@ -765,18 +736,15 @@ public class CalcBillStatisticsDao {
 	public static List<IncomeByFood> calcIncomeByFood(DBCon dbCon, Staff staff, DutyRange range, String extraCond, DateType queryType) throws SQLException{
 		String orderTbl = null;
 		String orderFoodTbl = null;
-		String orderGrpTbl = null;
 		String tasteGrpTbl = null;
 		if(queryType.isHistory()){
 			orderTbl = TBL_ORDER_HISTORY;
 			orderFoodTbl = TBL_ORDER_FOOD_HISTORY;
-			orderGrpTbl = TBL_ORDER_GROUP_HISTORY;
 			tasteGrpTbl = TBL_TASTE_GROUP_HISTORY;
 			
 		}else if(queryType.isToday()){
 			orderTbl = TBL_ORDER_TODAY;
 			orderFoodTbl = TBL_ORDER_FOOD_TODAY;
-			orderGrpTbl = TBL_ORDER_GROUP_TODAY;
 			tasteGrpTbl = TBL_TASTE_GROUP_TODAY;
 			
 		}else{
@@ -797,20 +765,10 @@ public class CalcBillStatisticsDao {
 			  " ROUND(SUM(CASE WHEN ((OF.food_status & " + Food.GIFT + ") = 0) THEN ((OF.unit_price + IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * discount * OF.order_count) ELSE 0 END), 2) AS food_income " +
 			  " FROM " +
 			  Params.dbName + "." + orderFoodTbl + " OF " + 
-			  " JOIN " + "(" + " SELECT id, order_date FROM " + Params.dbName + "." + orderTbl + 
-			  			 	   " WHERE 1 = 1 " +
-			  			 	   " AND " + " restaurant_id = " + staff.getRestaurantId() + 
-			  			 	   " AND " + " status <> " + Order.Status.UNPAID.getVal() +
-			  			 	   " AND " + " category <> " + Order.Category.MERGER_TBL.getVal() +
-			  			 	   " UNION " +
-			  			 	   " SELECT OG.sub_order_id AS id, O.order_date " +
-			  			 	   " FROM " + Params.dbName + "." + orderGrpTbl + " OG " +
-			  			 	   " JOIN " + Params.dbName + "." + orderTbl + " O " + " ON OG.order_id = O.id " +
-			  			 	   " WHERE 1 = 1 " +
-			  			 	   " AND " + " O.restaurant_id = " + staff.getRestaurantId() +
-			  			 	   " AND " + " O.status <> " + Order.Status.UNPAID.getVal() + 
-			  			 	   " AND " + " O.category = " + Order.Category.MERGER_TBL.getVal() +
-			  			 ") AS O " + " ON OF.order_id = O.id " +
+			  " JOIN " + Params.dbName + "." + orderTbl + " O ON 1 = 1 " + 
+			  " AND OF.order_id = O.id " + 
+			  " AND O.restaurant_id = " + staff.getRestaurantId() + 
+			  " AND O.status <> " + Order.Status.UNPAID.getVal() +
 			  " JOIN " + Params.dbName + "." + tasteGrpTbl + " TG " + " ON OF.taste_group_id = TG.taste_group_id " +
 			  " WHERE 1 = 1 " +
 			  (extraCond == null ? "" : extraCond) +

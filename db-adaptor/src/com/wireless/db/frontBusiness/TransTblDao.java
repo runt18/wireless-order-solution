@@ -4,6 +4,7 @@ import java.sql.SQLException;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
+import com.wireless.db.orderMgr.OrderDao;
 import com.wireless.db.regionMgr.TableDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.ProtocolError;
@@ -43,8 +44,8 @@ public class TransTblDao {
 	 * Note that database should be connected before invoking this method
 	 * @param dbCon
 	 * 			the database connection
-	 * @param term
-	 * 			the terminal information
+	 * @param staff
+	 * 			the staff to perform this action
 	 * @param srcTbl
 	 * 			the source table wants to transfer
 	 * @param destTbl
@@ -57,11 +58,11 @@ public class TransTblDao {
 	 * 			1 - the source table is IDLE or merged<br>
 	 * 			2 - the destination table is BUSY or merged<br>
 	 */
-	public static int exec(DBCon dbCon, Staff term, Table srcTbl, Table destTbl) throws SQLException, BusinessException{		
+	public static int exec(DBCon dbCon, Staff staff, Table srcTbl, Table destTbl) throws SQLException, BusinessException{		
 		
-		srcTbl = TableDao.getTableByAlias(dbCon, term, srcTbl.getAliasId());
+		srcTbl = TableDao.getTableByAlias(dbCon, staff, srcTbl.getAliasId());
 
-		destTbl = TableDao.getTableByAlias(dbCon, term, destTbl.getAliasId());
+		destTbl = TableDao.getTableByAlias(dbCon, staff, destTbl.getAliasId());
 
 		/**
 		 * Need to assure two conditions before table transfer 
@@ -94,7 +95,7 @@ public class TransTblDao {
 
 		}else {
 
-			int orderID = com.wireless.db.orderMgr.OrderDao.getOrderIdByUnPaidTable(dbCon, srcTbl)[0];
+			int orderID = OrderDao.getOrderIdByUnPaidTable(dbCon, staff, srcTbl);
 
 			try{
 				

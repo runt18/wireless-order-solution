@@ -334,10 +334,9 @@ public class DailySettleDao {
 		}
 		
 		StringBuilder paidOrderCond = new StringBuilder();
-		StringBuilder paidMergedOrderCond = new StringBuilder();
 		
 		//Get the amount and id to paid orders
-		sql = " SELECT id, category FROM " + Params.dbName + ".order " +
+		sql = " SELECT id FROM " + Params.dbName + ".order " +
 			  " WHERE " +
 			  " (status = " + Order.Status.PAID.getVal() + " OR " + " status = " + Order.Status.REPAID.getVal() + ")" +
 			 (staff.getRestaurantId() < 0 ? "" : "AND restaurant_id=" + staff.getRestaurantId());
@@ -349,16 +348,8 @@ public class DailySettleDao {
 			paidOrderCond.append(orderId).append(",");
 			result.setTotalOrder(result.getTotalOrder() + 1);
 			
-			if(dbCon.rs.getInt("category") == Order.Category.MERGER_TBL.getVal()){
-				paidMergedOrderCond.append(orderId).append(",");
-			}
-			
 		}
 		dbCon.rs.close();		
-		
-		if(paidMergedOrderCond.length() > 0){
-			paidMergedOrderCond.deleteCharAt(paidMergedOrderCond.length() - 1);
-		}
 		
 		if(paidOrderCond.length() > 0){
 			paidOrderCond.deleteCharAt(paidOrderCond.length() - 1);
@@ -474,11 +465,6 @@ public class DailySettleDao {
 		}
 		dbCon.rs.close();
 		
-		final String subOrderItem = "`order_id`, `table_id`, `table_name`, `cancel_price`, " +
-									"`gift_price`, `discount_price`, `erase_price`, `total_price`, `actual_price`";
-		
-		final String orderGroupItem = "`order_id`, `sub_order_id`, `restaurant_id`";
-		
 		final String orderItem = "`id`, `seq_id`, `restaurant_id`, `birth_date`, `order_date`, `status`, " +
 				"`cancel_price`, `discount_price`, `gift_price`, `repaid_price`, `erase_price`, `total_price`, `actual_price`, `custom_num`," + 
 				"`waiter`, `settle_type`, `pay_type`, `category`, `member_id`, `member_operation_id`, `staff_id`, " +
@@ -498,31 +484,6 @@ public class DailySettleDao {
 			
 			if(result.getTotalOrder() > 0){
 			
-				if(paidMergedOrderCond.length() > 0){
-					
-					String querySubId = " SELECT " + " sub_order_id " + " FROM " + Params.dbName + ".order_group WHERE order_id IN (" + paidMergedOrderCond + ")";
-					
-					//Move the paid child order details from "order_food" to "order_food_history"
-					moveOrderFood(dbCon, querySubId);
-
-					//Move the paid child order taste group from 'taste_group' to 'taste_group_history' except the empty taste group.
-					moveTasteGroup(dbCon, querySubId);
-					
-					//Move the paid child order normal taste group from 'normal_taste_group' to 'normal_taste_group_history' except the empty normal taste group.
-					moveNormalTasteGroup(dbCon, querySubId);
-					
-					//Move the paid child orders from "sub_order" to "sub_order_history"
-					sql = " INSERT INTO " + Params.dbName + ".sub_order_history (" + subOrderItem + " ) " +
-						  " SELECT " + subOrderItem + " FROM " + Params.dbName + ".sub_order WHERE order_id IN (" +
-						  " SELECT " + " sub_order_id " + " FROM " + Params.dbName + ".order_group WHERE order_id IN (" + paidMergedOrderCond + ")" + ")";
-					dbCon.stmt.executeUpdate(sql);
-					
-					//Move the paid order group from "order_group" to "order_group_history"
-					sql = " INSERT INTO " + Params.dbName + ".order_group_history (" + orderGroupItem + ")" +
-						  " SELECT " + orderGroupItem + " FROM " + Params.dbName + ".order_group WHERE order_id IN (" + paidMergedOrderCond + ")";
-					dbCon.stmt.executeUpdate(sql);					
-					
-				}				
 				//Move the paid order from "order" to "order_history".
 				sql = " INSERT INTO " + Params.dbName + ".order_history (" + orderItem + ") " + 
 					  " SELECT " + orderItem + " FROM " + Params.dbName + ".order WHERE id IN " + "(" + paidOrderCond + ")";
@@ -568,22 +529,6 @@ public class DailySettleDao {
 				if(result.getTotalOrder() > 0){
 					dbCon.stmt.executeUpdate(sql);
 				}
-			}
-			
-			if(paidMergedOrderCond.length() > 0){
-				//Delete the paid child order details from "order_food" table
-				sql = " DELETE FROM " + Params.dbName + ".order_food WHERE order_id IN(" +
-					  " SELECT " + " sub_order_id " + " FROM " + Params.dbName + ".order_group WHERE order_id IN (" + paidMergedOrderCond + ")" + ")";
-				dbCon.stmt.executeUpdate(sql);
-				
-				//Delete the paid child order from "sub_order" table.
-				sql = " DELETE FROM " + Params.dbName + ".sub_order WHERE order_id IN(" +
-					  " SELECT " + " sub_order_id " + " FROM " + Params.dbName + ".order_group WHERE order_id IN (" + paidMergedOrderCond + ")" + ")";
-				dbCon.stmt.executeUpdate(sql);
-				
-				//Delete the paid order group from "order_group" table.
-				sql = " DELETE FROM " + Params.dbName + ".order_group WHERE order_id IN (" + paidMergedOrderCond + ")" ;
-				dbCon.stmt.executeUpdate(sql);			
 			}
 			
 			if(paidOrderCond.length() > 0){

@@ -66,7 +66,7 @@ public class OrderDao {
 	 *             Throws if fail to execute any SQL statement.
 	 */
 	public static Order getByTableAlias(DBCon dbCon, Staff staff, int tableAlias) throws BusinessException, SQLException {		
-		return getById(dbCon, staff, OrderDao.getOrderIdByUnPaidTable(dbCon, TableDao.getTableByAlias(dbCon, staff, tableAlias))[0], DateType.TODAY);
+		return getById(dbCon, staff, OrderDao.getOrderIdByUnPaidTable(dbCon, staff, TableDao.getTableByAlias(dbCon, staff, tableAlias)), DateType.TODAY);
 	}
 	
 	/**
@@ -117,15 +117,7 @@ public class OrderDao {
 	 *             Throws if fail to execute any SQL statement.
 	 */
 	public static Order getByTableAliasDync(DBCon dbCon, Staff staff, int tableAlias) throws BusinessException, SQLException {
-		
-		//If the table is merged, get its parent order.
-		//Otherwise get the order of its own.
-		int[] unpaidId = OrderDao.getOrderIdByUnPaidTable(dbCon, TableDao.getTableByAlias(dbCon, staff, tableAlias));
-		if(unpaidId.length > 1){
-			return getById(dbCon, staff, unpaidId[1], DateType.TODAY);
-		}else{
-			return getById(dbCon, staff, unpaidId[0], DateType.TODAY);
-		}
+		return getById(dbCon, staff, OrderDao.getOrderIdByUnPaidTable(dbCon, staff, TableDao.getTableByAlias(dbCon, staff, tableAlias)), DateType.TODAY);
 	}
 	
 	/**
@@ -219,6 +211,7 @@ public class OrderDao {
 	}
 	
 	/**
+	 * @deprecated
 	 * Get the details to both order and its children according to the specific order id. 
 	 * @param term
 	 * 			  the terminal
@@ -232,7 +225,7 @@ public class OrderDao {
 	 * @throws SQLException
 	 *             Throws if fail to execute any SQL statement
 	 */
-	public static Order execWithChildDetailByID(Staff term, int orderId, DateType queryType) throws BusinessException, SQLException{
+	private static Order execWithChildDetailByID(Staff term, int orderId, DateType queryType) throws BusinessException, SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -243,6 +236,7 @@ public class OrderDao {
 	}
 	
 	/**
+	 * @deprecated
 	 * Get the details to both order and its children according to the specific order id. 
 	 * 
 	 * @param dbCon
@@ -259,18 +253,18 @@ public class OrderDao {
 	 * @throws SQLException
 	 *             Throws if fail to execute any SQL statement
 	 */
-	public static Order getWithChildDetailById(DBCon dbCon, Staff staff, int orderId, DateType dateType) throws BusinessException, SQLException{
+	private static Order getWithChildDetailById(DBCon dbCon, Staff staff, int orderId, DateType dateType) throws BusinessException, SQLException{
 		Order result = getById(dbCon, staff, orderId, dateType);
-		if(result.isMerged() && result.hasChildOrder()){
-			for(Order childOrder : result.getChildOrder()){
-				if(dateType == DateType.TODAY){
-					childOrder.setOrderFoods(OrderFoodDao.getDetailToday(dbCon, staff, "AND O.id = " + childOrder.getId(), null));
-				}else if(dateType == DateType.HISTORY){
-					childOrder.setOrderFoods(OrderFoodDao.getDetailHistory(dbCon, staff, "AND OH.id = " + childOrder.getId(), null));
-				}
-
-			}
-		}
+//		if(result.isMerged() && result.hasChildOrder()){
+//			for(Order childOrder : result.getChildOrder()){
+//				if(dateType == DateType.TODAY){
+//					childOrder.setOrderFoods(OrderFoodDao.getDetailToday(dbCon, staff, "AND O.id = " + childOrder.getId(), null));
+//				}else if(dateType == DateType.HISTORY){
+//					childOrder.setOrderFoods(OrderFoodDao.getDetailHistory(dbCon, staff, "AND OH.id = " + childOrder.getId(), null));
+//				}
+//
+//			}
+//		}
 		return result;
 	}
 	
@@ -324,86 +318,12 @@ public class OrderDao {
 		List<Order> result = getPureOrder(dbCon, staff, extraCond, orderClause, dateType);
 		
 		for(Order eachOrder : result){
-			
-			String sql;
-			
-			StringBuilder childOrderIds = new StringBuilder();		
-			/*
-			 * If the order status is merged (means containing any child order), 
-			 * then get the basic detail (such as child order id) to each child order. 
-			 */
-			if(eachOrder.isMerged()){
-				if(dateType == DateType.TODAY){
-					sql = " SELECT " + 
-						  " OG.sub_order_id, SO.table_id, SO.table_name," +
-						  " SO.cancel_price, SO.gift_price, SO.discount_price, SO.erase_price, SO.total_price, SO.actual_price, " +
-						  " T.table_alias, T.restaurant_id " +
-						  " FROM " + 
-						  Params.dbName + ".order_group OG " +
-						  " JOIN " + Params.dbName + ".sub_order SO " +
-						  " ON " + " OG.sub_order_id = SO.order_id " +
-						  " LEFT JOIN " + Params.dbName + ".table T " + 
-						  " ON " + " SO.table_id = T.table_id " +
-						  " WHERE " + " OG.order_id = " + eachOrder.getId();
-					
-				}else if(dateType == DateType.HISTORY){
-					sql = " SELECT " + 
-						  " OGH.sub_order_id, SOH.table_id, SOH.table_name," +
-						  " SOH.cancel_price, SOH.gift_price, SOH.discount_price, SOH.erase_price, SOH.total_price, SOH.actual_price, " +
-						  " T.table_alias, T.restaurant_id " +
-						  " FROM " + 
-						  Params.dbName + ".order_group_history OGH " +
-						  " JOIN " + Params.dbName + ".sub_order_history SOH " +
-						  " ON " + " OGH.sub_order_id = SOH.order_id " +
-						  " LEFT JOIN " + Params.dbName + ".table T " + 
-						  " ON " + " SOH.table_id = T.table_id " +
-						  " WHERE " + " OGH.order_id = " + eachOrder.getId();
-				}else{
-					throw new IllegalArgumentException("The query type passed to query order is NOT valid.");
-				}
-				
-				dbCon.rs = dbCon.stmt.executeQuery(sql);
-				List<Order> childOrders = new ArrayList<Order>();
-				while(dbCon.rs.next()){
-					Order subOrder = new Order();
-					subOrder.setId(dbCon.rs.getInt("sub_order_id"));
-					subOrder.setCancelPrice(dbCon.rs.getFloat("cancel_price"));
-					subOrder.setGiftPrice(dbCon.rs.getFloat("gift_price"));
-					subOrder.setDiscountPrice(dbCon.rs.getFloat("discount_price"));
-					subOrder.setErasePrice(dbCon.rs.getInt("erase_price"));
-					subOrder.setTotalPrice(dbCon.rs.getFloat("total_price"));
-					subOrder.setActualPrice(dbCon.rs.getFloat("actual_price"));
-					
-					subOrder.getDestTbl().setTableId(dbCon.rs.getInt("table_id"));
-					subOrder.getDestTbl().setTableAlias(dbCon.rs.getInt("table_alias"));
-					subOrder.getDestTbl().setRestaurantId(dbCon.rs.getInt("restaurant_id"));
-					subOrder.getDestTbl().setTableName(dbCon.rs.getString("table_name"));
-					
-					childOrders.add(subOrder);
-					//Combine each child order
-					childOrderIds.append(dbCon.rs.getInt("sub_order_id") + ",");
-				}
-				if(childOrderIds.length() != 0){
-					childOrderIds.deleteCharAt(childOrderIds.length() - 1);
-				}
-				eachOrder.setChildOrder(childOrders);
-				dbCon.rs.close();
-				
-			}else{
-				//Just assign the parent order id.
-				childOrderIds.append(eachOrder.getId());
-			}
-			
-			/*
-			 * Note that get the order foods of all its child order to parent order in case of merged.
-			 */
-			if(childOrderIds.length() != 0){
-				if(dateType == DateType.TODAY){
-					eachOrder.setOrderFoods(OrderFoodDao.getDetailToday(dbCon, staff, " AND OF.order_id IN(" + childOrderIds + ")", "ORDER BY pay_datetime"));					
-				}else if(dateType == DateType.HISTORY){
-					eachOrder.setOrderFoods(OrderFoodDao.getDetailHistory(dbCon, staff, " AND OFH.order_id IN(" + childOrderIds + ")", "ORDER BY pay_datetime"));
-				} 
-			}
+			//Get the order foods to each order.
+			if(dateType == DateType.TODAY){
+				eachOrder.setOrderFoods(OrderFoodDao.getDetailToday(dbCon, staff, " AND OF.order_id = " + eachOrder.getId(), "ORDER BY pay_datetime"));					
+			}else if(dateType == DateType.HISTORY){
+				eachOrder.setOrderFoods(OrderFoodDao.getDetailHistory(dbCon, staff, " AND OFH.order_id = " + eachOrder.getId(), "ORDER BY pay_datetime"));
+			} 
 		}
 		
 		return result;
@@ -643,106 +563,41 @@ public class OrderDao {
 	 * Get the order id according to the specific unpaid table.
 	 * @param dbCon 
 	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
 	 * @param table 
 	 * 			the table information containing the alias id and associated restaurant id
-	 * @return An array holding the unpaid child and parent order id to this table.
-	 * 		   If the table is merged, the array contains two elements,
-	 * 		   the 1st element is the order id of its own, the 2nd is the order id of its parent.
-	 * 		   Otherwise, the array only has one element which is the order id of its own. <br>
-	 * 		   As a result, we can make use of the length of array to check if the table to query is merged or not, looks like below.<br>
-	 * 		   <p>
-	 * 		   if(QueryOrderDao.getOrderIdByUnPaidTable(dbCon, tbl).length > 1){<br>
-	 * 				//means the table with an unpaid merged order<br>
-	 *				//to do something ... <br>
-	 * 		   }<br>
-	 * 		   </p>
+	 * @return the unpaid order id to this table if exist
 	 * @throws BusinessException 
-	 * 			Throws if either of cases below.<br>
-	 * 			1 - The table to query is IDLE.<br>
-	 * 			2 - The unpaid order to this table does NOT exist.<br>
-	 * @throws SQLException throws if fail to execute any SQL statement
+	 * 			throws if either of cases below<br>
+	 * 			<li>the table to query is IDLE<br>
+	 * 			<li>the unpaid order to this table does NOT exist<br>
+	 * @throws SQLException 
+	 * 			throws if fail to execute any SQL statement
 	 */
-	public static int[] getOrderIdByUnPaidTable(DBCon dbCon, Table table) throws BusinessException, SQLException{
+	public static int getOrderIdByUnPaidTable(DBCon dbCon, Staff staff, Table table) throws BusinessException, SQLException{
 		
 		String sql;
 		
-		int[] result;		
+		//Get the order id associated with this table.
+		int orderId;
 		
-		//Get the order id & category associated with this table.
-		int childOrderId;
-		int category = 0;
-
 		sql = " SELECT " +
-			  " id, category " +
+			  " id " +
 			  " FROM " + Params.dbName + ".order " +
 			  " WHERE " +
 			  " table_alias = " + table.getAliasId() +
-			  " AND restaurant_id = " + table.getRestaurantId() +
+			  " AND restaurant_id = " + staff.getRestaurantId() +
 			  " AND status = " + Order.Status.UNPAID.getVal();
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		if(dbCon.rs.next()){
-			childOrderId = dbCon.rs.getInt("id");
-			category = dbCon.rs.getShort("category");
-			result = new int[1];
-			result[0] = childOrderId;
+			orderId = dbCon.rs.getInt("id");
 		}else{
 			throw new BusinessException("The un-paid order id to table(alias_id = " + table.getAliasId() + ", restaurant_id = " + table.getRestaurantId() + ") does NOT exist.", ProtocolError.ORDER_NOT_EXIST);
 		}
 		dbCon.rs.close();
 		
-		//If the table is child merged, get the id to its parent order.
-		if(category == Order.Category.MERGER_CHILD.getVal()){
-			sql = " SELECT " +
-				  " O.id " +
-				  " FROM " +
-				  Params.dbName + ".order O " +
-				  " JOIN " + Params.dbName + ".order_group OG " + " ON " + " O.id = OG.order_id " +
-				  " WHERE 1 = 1" +
-				  " AND O.status = " + Order.Status.UNPAID.getVal() +
-				  " AND " + " OG.sub_order_id = " + childOrderId;
-			dbCon.rs = dbCon.stmt.executeQuery(sql);
-			if(dbCon.rs.next()){
-				result = new int[2];
-				result[0] = childOrderId;
-				result[1] = dbCon.rs.getInt("id");
-			}else{
-				throw new BusinessException("The un-paid merged order (sub order id = " + childOrderId + ") does NOT exist.", ProtocolError.ORDER_NOT_EXIST);
-			}
-			dbCon.rs.close();
-		}
-		
-		return result;
-		
+		return orderId;
 	}
 	
-	/**
-	 * 
-	 * @param child
-	 * @param queryType
-	 * @return
-	 * @throws Exception
-	 */
-	public static List<Order> getOrderByChild(Staff staff, String extraCond, String orderClause, DateType dateType, Table childTable) throws Exception{
-		DBCon dbCon = new DBCon();
-		List<Order> order = null;
-		try{
-			if(childTable != null){
-				dbCon.connect();
-				int[] oid =  getOrderIdByUnPaidTable(dbCon, childTable);
-				if(dateType == DateType.HISTORY){
-					extraCond += (" AND OH.id = " + oid[1]);
-				}else{
-					extraCond += (" AND O.id = " + oid[1]);
-				}
-				if(oid.length == 2){
-					order = OrderDao.getByCond(dbCon, staff, extraCond, orderClause, dateType);
-				}
-			}
-			return order;
-		}catch(Exception e){
-			throw e;
-		}finally{
-			dbCon.disconnect();
-		}
-	}
 }

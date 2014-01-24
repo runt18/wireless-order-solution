@@ -19,10 +19,9 @@ import com.wireless.pojo.restaurantMgr.Restaurant;
 public class SweepDB {
 	
 	public static class Result{
+		private int elapsedTime;					//the elapsed time to sweep db
 		private int totalExpiredOrder;				//the expired amount of order
-		private int totalExpiredOrderDetail;			//the expired amount of order food
-		private int totalExpiredOrderGroup;			//the expired amount of order group
-		private int totalExpiredSubOrder;			//the expired amount of sub order
+		private int totalExpiredOrderDetail;		//the expired amount of order food
 		private int totalExpiredTG;					//the expired amount of taste group records 
 		private int totalExpiredNormalTG;			//the expired amount of normal taste group records
 		private int totalExpiredShift;				//the expired amount of shift
@@ -32,8 +31,6 @@ public class SweepDB {
 		public String toString(){
 			return "expired order: " + getTotalExpiredOrder() +
 				   ", expired order detail: " + getTotalExpiredOrderDetail() +
-				   ", expired order group : " + getTotalExpiredOrderGroup() +
-				   ", expired sub order: " + getTotalExpiredSubOrder() +
 				   ", expired taste group: " + getTotalExpiredTG() +
 				   ", expired normal taste group: " + getTotalExpiredNormalTG() +
 				   ", expired shift: " + getTotalExpiredShift() +
@@ -46,14 +43,6 @@ public class SweepDB {
 
 		public int getTotalExpiredOrderDetail() {
 			return totalExpiredOrderDetail;
-		}
-
-		public int getTotalExpiredOrderGroup() {
-			return totalExpiredOrderGroup;
-		}
-
-		public int getTotalExpiredSubOrder() {
-			return totalExpiredSubOrder;
 		}
 
 		public int getTotalExpiredTG() {
@@ -71,6 +60,10 @@ public class SweepDB {
 		public int getTotalExpiredDailySettle() {
 			return totalExpiredDailySettle;
 		}
+		
+		public int getElapsed(){
+			return this.elapsedTime;
+		}
 
 	}
 	
@@ -80,6 +73,9 @@ public class SweepDB {
 		
 		DBCon dbCon = new DBCon();
 		try{
+			
+			long beginTime = System.currentTimeMillis();
+			
 			dbCon.connect();
 			
 			dbCon.conn.setAutoCommit(false);
@@ -126,24 +122,6 @@ public class SweepDB {
 				  " WHERE TGH.normal_taste_group_id IS NULL ";
 			result.totalExpiredNormalTG = dbCon.stmt.executeUpdate(sql);
 			
-			// Delete the history order group which has been expired.
-			sql = " DELETE OGH FROM " + 
-				  Params.dbName + ".order_group_history AS OGH " +
-				  " LEFT JOIN " +
-				  Params.dbName + ".order_history AS OH " +
-				  " ON OGH.order_id = OH.id " +
-				  " WHERE OH.id IS NULL ";
-			result.totalExpiredOrderGroup = dbCon.stmt.executeUpdate(sql);
-
-			// Delete the history sub order which has been expired.
-			sql = " DELETE SOH FROM " + 
-				  Params.dbName + ".sub_order_history AS SOH " +
-				  " LEFT JOIN " +
-				  Params.dbName + ".order_group_history AS OGH " +
-				  " ON SOH.order_id = OGH.sub_order_id " +
-				  " WHERE OGH.sub_order_id IS NULL ";
-			result.totalExpiredSubOrder = dbCon.stmt.executeUpdate(sql);
-			
 			// Delete the history shift which has been expired.
 			sql = " DELETE SH FROM " + 
 				  Params.dbName + ".shift_history AS SH, " +
@@ -163,6 +141,8 @@ public class SweepDB {
 				  " AND DSH.restaurant_id = REST.id " +
 				  " AND UNIX_TIMESTAMP(NOW()) - UNIX_TIMESTAMP(DSH.off_duty) > REST.record_alive ";
 			result.totalExpiredDailySettle = dbCon.stmt.executeUpdate(sql);
+			
+			result.elapsedTime = ((int)(System.currentTimeMillis() - beginTime) / 1000);
 			
 			dbCon.conn.commit();
 			
