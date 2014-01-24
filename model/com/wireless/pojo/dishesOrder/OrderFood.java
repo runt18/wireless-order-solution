@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.zip.CRC32;
 
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.StaffError;
@@ -410,7 +411,13 @@ public class OrderFood implements Parcelable, Comparable<OrderFood>, Jsonable {
 	}
 	
 	public int getFoodId(){
-		return mFood.getFoodId();
+		if(isTemporary){
+			CRC32 crc = new CRC32();
+			crc.update((mFood.getName() + mFood.getPrice() + mFood.getKitchen().getId()).getBytes());
+			return Math.abs((int)crc.getValue() % Integer.MAX_VALUE);
+		}else{
+			return mFood.getFoodId();
+		}
 	}
 	
 	/**
@@ -420,11 +427,7 @@ public class OrderFood implements Parcelable, Comparable<OrderFood>, Jsonable {
 	 * @return the alias id to this order food
 	 */
 	public int getAliasId(){
-		if(isTemporary){
-			return Math.abs((mFood.getName().hashCode() + Math.round(mFood.getPrice())) % 65535);
-		}else{
-			return mFood.getAliasId();
-		}
+		return mFood.getAliasId();
 	}
 	
 	public int getRestaurantId(){
@@ -445,29 +448,29 @@ public class OrderFood implements Parcelable, Comparable<OrderFood>, Jsonable {
 	
 	/**
 	 * Comparing two foods without the tastes
-	 * @param food
-	 * @return
+	 * @param of the order food to compare
+	 * @return true if the order food is the same ignoring taste, otherwise false
 	 */
-	public boolean equalsIgnoreTaste(OrderFood food){
-		if(isTemporary != food.isTemporary){
+	public boolean equalsIgnoreTaste(OrderFood of){
+		if(isTemporary != of.isTemporary){
 			return false;
-		}else if(isTemporary && food.isTemporary){
-			return mFood.getName().equals(food.asFood().getName()) && (mFood.getPrice() == food.asFood().getPrice());
+		}else if(isTemporary && of.isTemporary){
+			return mFood.getName().equals(of.asFood().getName()) && (mFood.getPrice() == of.asFood().getPrice());
 		}else{
-			return this.getAliasId() == food.getAliasId();
+			return mFood.equals(of.asFood());
 		}
 	}
 	
 	/**
 	 * Check to see whether the taste group to two foods is the same.
-	 * @param food the food to compared
+	 * @param of the order food to compared
 	 * @return true if the taste group is the same, otherwise false
 	 */
-	boolean equalsByTasteGroup(OrderFood food){
-		if(hasTasteGroup() && food.hasTasteGroup()){
-			return mTasteGroup.equals(food.mTasteGroup);
+	boolean equalsByTasteGroup(OrderFood of){
+		if(hasTasteGroup() && of.hasTasteGroup()){
+			return mTasteGroup.equals(of.mTasteGroup);
 			
-		}else if(!hasTasteGroup() && !food.hasTasteGroup()){
+		}else if(!hasTasteGroup() && !of.hasTasteGroup()){
 			return true;
 			
 		}else{
@@ -487,17 +490,15 @@ public class OrderFood implements Parcelable, Comparable<OrderFood>, Jsonable {
 			return false;
 			
 		}else{
-			OrderFood food = (OrderFood)obj;
-			if(isTemporary != food.isTemporary){
+			OrderFood of = (OrderFood)obj;
+			if(isTemporary != of.isTemporary){
 				return false;
 				
-			}else if(isTemporary && food.isTemporary){
-				return mFood.getName().equals(food.asFood().getName()) && (mFood.getPrice() == food.asFood().getPrice());
+			}else if(isTemporary && of.isTemporary){
+				return mFood.getName().equals(of.asFood().getName()) && (mFood.getPrice() == of.asFood().getPrice());
 				
 			}else{
-				return mFood.getRestaurantId() == food.asFood().getRestaurantId() && 
-						mFood.getAliasId() == food.asFood().getAliasId() && 
-					   equalsByTasteGroup(food);
+				return mFood.equals(of.asFood()) && equalsByTasteGroup(of);
 			}
 		}
 	}
@@ -632,9 +633,9 @@ public class OrderFood implements Parcelable, Comparable<OrderFood>, Jsonable {
 
 	@Override
 	public int compareTo(OrderFood o) {
-		if(getAliasId() > o.getAliasId()){
+		if(getFoodId() > o.getFoodId()){
 			return 1;
-		}else if(getAliasId() < o.getAliasId()){
+		}else if(getFoodId() < o.getFoodId()){
 			return -1;
 		}else{
 			return 0;

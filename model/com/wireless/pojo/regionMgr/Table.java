@@ -291,7 +291,7 @@ public class Table implements Parcelable, Comparable<Table>, Jsonable{
 	}
 	
 	public boolean isMerged(){
-		return category == Category.MERGER_TBL || category == Category.MERGER_CHILD;
+		return category == Category.MERGER_TBL;
 	}
 	
 	public Status getStatus() {

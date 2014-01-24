@@ -350,7 +350,7 @@ public class TestParcel {
 		expected.setServiceRate(0.2f);
 		expected.setMinimumCost(23.4f);
 		expected.setStatus(Table.Status.IDLE);
-		expected.setCategory(Order.Category.MERGER_CHILD);
+		expected.setCategory(Order.Category.NORMAL);
 		expected.setCustomNum(13);
 		
 		Parcel p = new Parcel();
@@ -517,7 +517,7 @@ public class TestParcel {
 		orderToParcel.getDestTbl().setTableAlias(100);
 		orderToParcel.setBirthDate(new Date().getTime());
 		orderToParcel.setOrderDate(new Date().getTime());
-		orderToParcel.setCategory(Order.Category.MERGER_CHILD);
+		orderToParcel.setCategory(Order.Category.NORMAL);
 		orderToParcel.setCustomNum(4);
 		
 		OrderFood[] foods = new OrderFood[]{
