@@ -20,7 +20,6 @@ import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.menuMgr.FoodStatistics;
 import com.wireless.pojo.menuMgr.Kitchen;
-import com.wireless.pojo.ppMgr.PricePlan;
 import com.wireless.pojo.regionMgr.Region;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.restaurantMgr.Restaurant;
@@ -699,7 +698,6 @@ public class TestParcel {
 		orderToParcel.setReceivedCash(453.23f);
 		orderToParcel.setSettleType(Order.SettleType.MEMBER);
 		orderToParcel.setDiscount(new Discount(3));
-		orderToParcel.setPricePlan(new PricePlan(2));
 		orderToParcel.setErasePrice(20);
 		orderToParcel.setPaymentType(PayType.CREDIT_CARD);
 		orderToParcel.setServiceRate(0.1f);
@@ -728,9 +726,6 @@ public class TestParcel {
 		
 		// Check the discount id
 		assertEquals("discount id to order", orderToParcel.getDiscount().getId(), orderAfterParcelled.getDiscount().getId());
-		
-		// Check the price plan id
-		assertEquals("price plan id to order", orderToParcel.getPricePlan().getId(), orderAfterParcelled.getPricePlan().getId());
 		
 		// Check the erase price
 		assertEquals("erase price to order", orderToParcel.getErasePrice(), orderAfterParcelled.getErasePrice());
