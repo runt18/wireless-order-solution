@@ -61,24 +61,11 @@ public class SummaryContent extends ConcreteContent {
 			_template = _template.replace(PVar.WAITER_NAME, _waiter);			
 		}
 		
-		if(mOrder.hasChildOrder()){
-			StringBuilder tblInfo = new StringBuilder();
-			for(Order childOrder : mOrder.getChildOrder()){
-				tblInfo.append(childOrder.getDestTbl().getAliasId() + (childOrder.getDestTbl().getName().trim().length() == 0 ? "" : ("(" + mOrder.getDestTbl().getName() + ")"))).append(",");
-			}
-			if(tblInfo.length() > 0){
-				tblInfo.deleteCharAt(tblInfo.length() - 1);
-			}
-			//replace the "$(var_5)"
-			_template = _template.replace(PVar.VAR_2, "餐台：" + tblInfo + "(共" + mOrder.getCustomNum() + "人)");
-			
-		}else{
+		_template = _template.replace(PVar.VAR_2, 
+						new Grid2ItemsContent("餐台：" + mOrder.getDestTbl().getAliasId() + (mOrder.getDestTbl().getName().length() == 0 ? "" : ("(" + mOrder.getDestTbl().getName() + ")")), 
+											  "人数：" + mOrder.getCustomNum(), 
+											  getStyle()).toString());
 		
-			_template = _template.replace(PVar.VAR_2, 
-							new Grid2ItemsContent("餐台：" + mOrder.getDestTbl().getAliasId() + (mOrder.getDestTbl().getName().length() == 0 ? "" : ("(" + mOrder.getDestTbl().getName() + ")")), 
-												  "人数：" + mOrder.getCustomNum(), 
-												  getStyle()).toString());
-		}		
 		//generate the order food list and replace the $(var_1) with the ordered foods
 		_template = _template.replace(PVar.VAR_1, 
 									  new FoodListWithSepContent(_format, mPrintType, mOrder.getOrderFoods(), mStyle).toString());

@@ -294,7 +294,7 @@ class OrderHandler implements Runnable{
 				}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.CANCEL_ORDER){
 					//handle the cancel order request
 					Table tblToCancel = new Parcel(request.body).readParcel(Table.CREATOR);
-					CancelOrder.exec(staff, tblToCancel.getAliasId());
+					CancelOrder.execByTable(staff, tblToCancel.getAliasId());
 					response = new RespACK(request.header);
 
 				}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.PAY_ORDER || request.header.type == Type.PAY_TEMP_ORDER){

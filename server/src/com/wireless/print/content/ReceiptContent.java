@@ -71,13 +71,7 @@ public class ReceiptContent extends ConcreteContent {
 		_template = _template.replace(PVar.PAY_MANNER, payManner);
 		
 		//replace the "$(order_cate)"
-		String orderCate;
-		if(mOrder.isMerged()){
-			orderCate = "(并台)";
-		}else{
-			orderCate = "";
-		}
-		_template = _template.replace(PVar.ORDER_CATE, orderCate);
+		_template = _template.replace(PVar.ORDER_CATE, "");
 		
 		//replace the "$(seq_id)"
 		_template = _template.replace(PVar.SEQ_ID, Integer.toString(mOrder.getSeqId()));
@@ -90,25 +84,13 @@ public class ReceiptContent extends ConcreteContent {
 		_template = _template.replace(PVar.WAITER_NAME, _waiter);
 		
 		StringBuilder tblInfo = new StringBuilder();
-		if(mOrder.hasChildOrder()){
-			for(Order childOrder : mOrder.getChildOrder()){
-				tblInfo.append(childOrder.getDestTbl().getAliasId() + (childOrder.getDestTbl().getName().trim().length() == 0 ? "" : ("(" + mOrder.getDestTbl().getName() + ")"))).append(",");
-			}
-			if(tblInfo.length() > 0){
-				tblInfo.deleteCharAt(tblInfo.length() - 1);
-			}
-			//replace the "$(var_5)"
-			_template = _template.replace(PVar.VAR_5, "餐台：" + tblInfo + "(共" + mOrder.getCustomNum() + "人)");
-			
-		}else{
-			tblInfo.append(mOrder.getDestTbl().getAliasId() + (mOrder.getDestTbl().getName().trim().length() == 0 ? "" : ("(" + mOrder.getDestTbl().getName() + ")")));
-			//replace the "$(var_5)"
-			_template = _template.replace(PVar.VAR_5, 
-								new Grid2ItemsContent("餐台：" + tblInfo, 
-													  "人数：" + mOrder.getCustomNum(), 
-													  getStyle()).toString());
-
-		}
+		
+		tblInfo.append(mOrder.getDestTbl().getAliasId() + (mOrder.getDestTbl().getName().trim().length() == 0 ? "" : ("(" + mOrder.getDestTbl().getName() + ")")));
+		//replace the "$(var_5)"
+		_template = _template.replace(PVar.VAR_5, 
+							new Grid2ItemsContent("餐台：" + tblInfo, 
+												  "人数：" + mOrder.getCustomNum(), 
+												  getStyle()).toString());
 		
 		
 		//generate the order food list and replace the $(var_1) with the ordered foods

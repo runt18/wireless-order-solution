@@ -37,11 +37,7 @@ public class OrderDetailContent extends ConcreteContent {
 	public String toString(){
 		
 		String tblName;
-		if(mOrder.hasChildOrder()){
-			tblName = "团体";
-		}else{
-			tblName = Integer.toString(mOrder.getDestTbl().getAliasId()) + ((mOrder.getDestTbl().getName().trim().length() == 0) ? "" : "(" + mOrder.getDestTbl().getName() + ")");
-		}
+		tblName = Integer.toString(mOrder.getDestTbl().getAliasId()) + ((mOrder.getDestTbl().getName().trim().length() == 0) ? "" : "(" + mOrder.getDestTbl().getName() + ")");
 		
 		//generate the title and replace the "$(title)" with it
 		if(mPrintType == PType.PRINT_ORDER_DETAIL){
@@ -82,27 +78,14 @@ public class OrderDetailContent extends ConcreteContent {
 													  "时间：" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()), 
 													  getStyle()).toString());
 		}
-		
-		if(mOrder.hasChildOrder()){
-			StringBuilder tblInfo = new StringBuilder();
-			for(Order childOrder : mOrder.getChildOrder()){
-				tblInfo.append(childOrder.getDestTbl().getAliasId() + (childOrder.getDestTbl().getName().trim().length() == 0 ? "" : ("(" + mOrder.getDestTbl().getName() + ")"))).append(",");
-			}
-			if(tblInfo.length() > 0){
-				tblInfo.deleteCharAt(tblInfo.length() - 1);
-			}
-			//replace the "$(var_5)"
-			_printTemplate = _printTemplate.replace(PVar.VAR_2, "餐台：" + tblInfo + "(共" + mOrder.getCustomNum() + "人)");
+
+		_printTemplate = _printTemplate.replace(PVar.VAR_2, 
+				new ExtraFormatDecorator(
+					new Grid2ItemsContent("餐台：" + tblName, 
+										  "服务员：" + _waiter, 
+									      getStyle()),
+					ExtraFormatDecorator.LARGE_FONT_1X).toString());
 			
-		}else{
-			_printTemplate = _printTemplate.replace(PVar.VAR_2, 
-					new ExtraFormatDecorator(
-						new Grid2ItemsContent("餐台：" + tblName, 
-											  "服务员：" + _waiter, 
-										      getStyle()),
-						ExtraFormatDecorator.LARGE_FONT_1X).toString());
-			
-		}
 		
 		
 		StringBuilder cancelReason = new StringBuilder();
