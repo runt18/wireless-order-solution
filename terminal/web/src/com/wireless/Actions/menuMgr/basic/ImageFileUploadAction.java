@@ -78,7 +78,7 @@ public class ImageFileUploadAction extends Action{
 				root.clear();
 				root.add(fb);
             	
-            	FoodDao.updateFoodImageName(Integer.parseInt(restaurantID), Integer.parseInt(foodID), null);
+				FoodDao.update(staff, new Food.UpdateBuilder(Integer.parseInt(foodID)).setImage(null));
             	// 删除原始图片
             	OSSUtil.deleteImage(restaurantID + "/" + oldName);
             	// 删除原始缩略图
@@ -171,7 +171,7 @@ public class ImageFileUploadAction extends Action{
 		                	
 		                    // 更新菜品数据库信息 
 		                    try{
-		                    	FoodDao.updateFoodImageName(Integer.parseInt(restaurantID), Integer.parseInt(foodID), newFileName);
+		                    	FoodDao.update(staff, new Food.UpdateBuilder(Integer.parseInt(foodID)).setImage(newFileName));
 		                    	// 删除原图片
 			        			OSSUtil.deleteImage(restaurantID + "/" + oldName);
 			        			OSSUtil.deleteImage(restaurantID + "/" + CI_PRIEX + oldName);
@@ -192,7 +192,7 @@ public class ImageFileUploadAction extends Action{
 		                	root.clear();
 		    				root.add(fb);
 		                	
-		                	FoodDao.updateFoodImageName(Integer.parseInt(restaurantID), Integer.parseInt(foodID), null);
+		    				FoodDao.update(staff, new Food.UpdateBuilder(Integer.parseInt(foodID)).setImage(null));
 		                	OSSUtil.deleteImage(restaurantID + "/" + oldName);
 		                	OSSUtil.deleteImage(restaurantID + "/" + CI_PRIEX + oldName);
 		                }

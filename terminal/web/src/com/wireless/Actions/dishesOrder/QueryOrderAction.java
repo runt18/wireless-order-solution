@@ -21,7 +21,6 @@ import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.distMgr.Discount;
 import com.wireless.pojo.menuMgr.Kitchen;
-import com.wireless.pojo.ppMgr.PricePlan;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.util.DateType;
 import com.wireless.util.WebParams;
@@ -50,7 +49,6 @@ public class QueryOrderAction extends Action {
 			String oid = request.getParameter("orderID");
 			String calc = request.getParameter("calc");
 			String discountID = request.getParameter("discountID");
-			String pricePlanID = request.getParameter("pricePlanID");
 			String eraseQuota = request.getParameter("eraseQuota");
 			String serviceRate = request.getParameter("serviceRate");
 			String customNum = request.getParameter("customNum");
@@ -73,9 +71,6 @@ public class QueryOrderAction extends Action {
 				if(calc != null && Boolean.valueOf(calc)){
 					if(discountID != null && !discountID.trim().isEmpty()){
 						order.setDiscount(new Discount(Integer.valueOf(discountID)));
-					}
-					if(pricePlanID != null && !pricePlanID.trim().isEmpty()){
-						order.setPricePlan(new PricePlan(Integer.valueOf(pricePlanID)));
 					}
 					if(eraseQuota != null && !eraseQuota.trim().isEmpty()){
 						order.setErasePrice(Integer.valueOf(eraseQuota));

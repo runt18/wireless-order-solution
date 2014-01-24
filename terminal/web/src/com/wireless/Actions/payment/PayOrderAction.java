@@ -23,7 +23,6 @@ import com.wireless.parcel.Parcel;
 import com.wireless.pojo.client.Member;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.distMgr.Discount;
-import com.wireless.pojo.ppMgr.PricePlan;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.NumericUtil;
 import com.wireless.sccon.ServerConnector;
@@ -136,12 +135,6 @@ public class PayOrderAction extends Action{
 			if(comment != null){
 				orderToPay.setComment(comment.substring(0, comment.length() < 20 ? comment.length() : 20));
 			}			
-			/**
-			 * 
-			 */
-			if(request.getParameter("pricePlanID") != null){
-				orderToPay.setPricePlan(new PricePlan(Integer.valueOf(request.getParameter("pricePlanID"))));
-			}
 			/**
 			 * 
 			 */

@@ -20,7 +20,6 @@ import com.wireless.exception.BusinessException;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.distMgr.Discount;
-import com.wireless.pojo.ppMgr.PricePlan;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.util.DateType;
@@ -45,7 +44,6 @@ public class QueryOrderGroupAction extends Action{
 			String childTableAliasID = request.getParameter("childTableAliasID");
 			String calc = request.getParameter("calc");
 			String discountID = request.getParameter("discountID");
-			String pricePlanID = request.getParameter("pricePlanID");
 			String status = request.getParameter("status");
 			String category = request.getParameter("category");
 			String eraseQuota = request.getParameter("eraseQuota");
@@ -72,9 +70,6 @@ public class QueryOrderGroupAction extends Action{
 				}
 				if(discountID != null && !discountID.trim().isEmpty()){
 					calcOrder.setDiscount(new Discount(Integer.valueOf(discountID)));
-				}
-				if(pricePlanID != null && !pricePlanID.trim().isEmpty()){
-					calcOrder.setPricePlan(new PricePlan(Integer.valueOf(pricePlanID)));
 				}
 				if(eraseQuota != null && !eraseQuota.trim().isEmpty()){
 					calcOrder.setErasePrice(Integer.valueOf(eraseQuota));
