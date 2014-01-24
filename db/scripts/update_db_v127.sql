@@ -196,6 +196,14 @@ DROP COLUMN `price_plan_id`;
 -- -----------------------------------------------------
 -- Drop the field 'kitchen_alias' & 'food_alias' to table 'order_food' and 'order_food_history'
 -- -----------------------------------------------------
+UPDATE wireless_order_db.order_food
+SET food_id = CRC32(name) % 1000000000
+WHERE is_temporary = 1;
+
+UPDATE wireless_order_db.order_food_history
+SET food_id = CRC32(name) % 1000000000
+WHERE is_temporary = 1;
+
 ALTER TABLE `wireless_order_db`.`order_food` 
 DROP COLUMN `kitchen_alias`,
 DROP COLUMN `food_alias`;
