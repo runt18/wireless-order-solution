@@ -187,4 +187,39 @@ DROP COLUMN `kitchen_alias`,
 CHANGE COLUMN `kitchen_id` `kitchen_id` INT(11) NOT NULL COMMENT 'the kitchen id the food belong to' ,
 ADD INDEX `ix_kitchen_id` (`kitchen_id` ASC);
 
+-- -----------------------------------------------------
+-- Drop the field 'price_plan_id' to table 'order' 
+-- -----------------------------------------------------
+ALTER TABLE `wireless_order_db`.`order` 
+DROP COLUMN `price_plan_id`;
+
+-- -----------------------------------------------------
+-- Drop the field 'kitchen_alias' & 'food_alias' to table 'order_food' and 'order_food_history'
+-- -----------------------------------------------------
+ALTER TABLE `wireless_order_db`.`order_food` 
+DROP COLUMN `kitchen_alias`,
+DROP COLUMN `food_alias`;
+ALTER TABLE `wireless_order_db`.`order_food_history` 
+DROP COLUMN `kitchen_alias`,
+DROP COLUMN `food_alias`;
+
+-- -----------------------------------------------------
+-- Add the field 'price' & 'commission' to table 'food'
+-- Drop the field 'pinyin' to table 'food'
+-- -----------------------------------------------------
+ALTER TABLE `wireless_order_db`.`food` 
+DROP COLUMN `pinyin`,
+ADD COLUMN `price` FLOAT NOT NULL DEFAULT 0 AFTER `name`,
+ADD COLUMN `commission` FLOAT NULL DEFAULT NULL AFTER `price`,
+DROP INDEX `ix_food_alias_id` ,
+ADD INDEX `ix_restaurant_id` (`restaurant_id` ASC);
+
+-- -----------------------------------------------------
+-- Update the price and commission to each food
+-- -----------------------------------------------------
+UPDATE wireless_order_db.food F
+JOIN wireless_order_db.food_price_plan FPP ON F.food_id = FPP.food_id
+JOIN wireless_order_db.price_plan PP ON FPP.price_plan_id = PP.price_plan_id AND PP.status = 1
+SET F.price = FPP.unit_price, F.commission = FPP.commission;
+
 SET SQL_SAFE_UPDATES = @OLD_SAFE_UPDATES;
