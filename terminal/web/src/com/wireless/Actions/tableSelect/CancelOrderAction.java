@@ -33,7 +33,7 @@ public class CancelOrderAction extends Action {
 			
 			tableAlias = Integer.parseInt(request.getParameter("tableAlias"));
 			
-			CancelOrder.exec(StaffDao.verify(Integer.parseInt(pin)), tableAlias);
+			CancelOrder.execByTable(StaffDao.verify(Integer.parseInt(pin)), tableAlias);
 			jsonResp = jsonResp.replace("$(result)", "true");
 			jsonResp = jsonResp.replace("$(value)", tableAlias + "号餐台删单成功");
 			
