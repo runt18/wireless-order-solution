@@ -597,7 +597,7 @@ public class CalcBillStatisticsDao {
 				  " WHERE 1 = 1 " +
 				  (extraCond == null ? "" : extraCond) +
 				  " AND O.order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +
-				  " GROUP BY " + " OF.order_id, OF.food_alias, OF.taste_group_id " +
+				  " GROUP BY " + " OF.order_id, OF.food_id, OF.taste_group_id " +
 				  " HAVING SUM(order_count) > 0 " +
 				  " ) AS TMP " +
 			  " GROUP BY dept_id " +
@@ -712,7 +712,7 @@ public class CalcBillStatisticsDao {
 				  " WHERE 1 = 1 " +
 				  (extraCond == null ? "" : extraCond) +
 				  " AND O.order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +
-				  " GROUP BY OF.order_id, OF.food_alias, OF.taste_group_id ) AS TMP " +
+				  " GROUP BY OF.order_id, OF.food_id, OF.taste_group_id ) AS TMP " +
 			  " GROUP BY kitchen_id " +
 			  " ORDER BY kitchen_display_id ASC ";
 		
@@ -787,7 +787,7 @@ public class CalcBillStatisticsDao {
 		
 		//Get the gift, discount & total to each food during this period.
 		sql = " SELECT " +
-			  " OF.food_id, MAX(OF.food_alias) AS food_alias, MAX(OF.name) AS food_name, " +
+			  " OF.food_id, MAX(OF.name) AS food_name, " +
 			  " MAX(OF.food_status) AS food_status, MAX(OF.restaurant_id) AS restaurant_id, " +
 			  " MAX(OF.kitchen_id) AS kitchen_id, " +
 			  " MAX(OF.dept_id) AS dept_id, " +
@@ -834,7 +834,6 @@ public class CalcBillStatisticsDao {
 			kitchen.setDept(dept);
 
 			Food food = new Food(dbCon.rs.getInt("food_id"));
-			food.setAliasId(dbCon.rs.getInt("food_alias"));
 			food.setName(dbCon.rs.getString("food_name"));
 			food.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
 			food.setStatus(dbCon.rs.getShort("food_status"));

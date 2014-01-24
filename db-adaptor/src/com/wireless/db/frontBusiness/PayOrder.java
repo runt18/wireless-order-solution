@@ -7,7 +7,6 @@ import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.client.member.MemberDao;
 import com.wireless.db.distMgr.DiscountDao;
-import com.wireless.db.menuMgr.PricePlanDao;
 import com.wireless.db.orderMgr.OrderDao;
 import com.wireless.db.regionMgr.TableDao;
 import com.wireless.db.system.SystemDao;
@@ -19,7 +18,6 @@ import com.wireless.pojo.client.MemberOperation;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.distMgr.Discount;
-import com.wireless.pojo.ppMgr.PricePlan;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.staffMgr.Staff;
@@ -337,7 +335,6 @@ public class PayOrder {
 				  " pay_type = " + orderCalculated.getPaymentType().getVal() + ", " + 
 				  " settle_type = " + orderCalculated.getSettleType().getVal() + ", " +
 				  " discount_id = " + orderCalculated.getDiscount().getId() + ", " +
-				  " price_plan_id = " + (orderCalculated.hasPricePlan() ? orderCalculated.getPricePlan().getId() : "price_plan_id") + ", " +
 				  " service_rate = " + orderCalculated.getServiceRate() + ", " +
 				  " status = " + (orderCalculated.isUnpaid() ? Order.Status.PAID.getVal() : Order.Status.REPAID.getVal()) + ", " + 
 				  (orderCalculated.isUnpaid() ? (" seq_id = " + orderCalculated.getSeqId() + ", ") : "") +
@@ -355,7 +352,7 @@ public class PayOrder {
 					  " discount = " + food.getDiscount() + ", " +
 					  " unit_price = " + food.getPrice() +
 					  " WHERE order_id = " + orderCalculated.getId() + 
-					  " AND food_alias = " + food.getAliasId();
+					  " AND food_id = " + food.getFoodId();
 				dbCon.stmt.executeUpdate(sql);				
 			}	
 
@@ -584,8 +581,6 @@ public class PayOrder {
 		//Get all the details of order to be calculated.
 		Order orderToCalc = OrderDao.getById(staff, orderToPay.getId(), DateType.TODAY);
 		
-		PricePlan oriPricePlan = orderToCalc.getPricePlan();
-		
 		//Set the order calculate parameters.
 		setOrderCalcParams(orderToCalc, orderToPay);
 
@@ -603,36 +598,6 @@ public class PayOrder {
 			}
 		}
 
-		//Get the details if the requested plan is set.
-		//Otherwise use the price plan which is active instead.
-		if(orderToCalc.hasPricePlan()){
-			orderToCalc.setPricePlan(PricePlanDao.getPricePlanById(dbCon, staff,  orderToCalc.getPricePlan().getId()));
-		}else{
-			orderToCalc.setPricePlan(PricePlanDao.getActivePricePlan(dbCon, staff));
-		}
-		
-		//Check to see whether the requested price plan is same as before.
-		if(!orderToCalc.getPricePlan().equals(oriPricePlan)){
-			
-			//Get the price belongs to requested plan to each order food(except the temporary food) if different from before.
-			List<OrderFood> foodsToCalc = orderToCalc.getOrderFoods();
-			for(OrderFood of : foodsToCalc){
-				if(!of.isTemp()){
-					sql = " SELECT " +
-						  " unit_price " + " FROM " + Params.dbName + ".food_price_plan" +
-						  " WHERE " + 
-						  " price_plan_id = " + orderToCalc.getPricePlan().getId() +
-						  " AND " +
-						  " food_id = " + of.getFoodId();
-					dbCon.rs = dbCon.stmt.executeQuery(sql);
-					if(dbCon.rs.next()){
-						of.asFood().setPrice(dbCon.rs.getFloat("unit_price"));
-					}
-					dbCon.rs.close();
-				}
-			}
-		}
-		
 		if(orderToCalc.isMerged() && orderToCalc.hasChildOrder()){
 			//Add up the custom number to each child order
 			orderToCalc.setCustomNum(0);
@@ -754,7 +719,6 @@ public class PayOrder {
 			}
 		}
 		orderToCalc.setDiscount(calcParams.getDiscount());
-		orderToCalc.setPricePlan(calcParams.getPricePlan());
 		orderToCalc.setSettleType(calcParams.getSettleType());
 		orderToCalc.setMember(calcParams.getMember()); 
 		orderToCalc.setReceivedCash(calcParams.getReceivedCash());

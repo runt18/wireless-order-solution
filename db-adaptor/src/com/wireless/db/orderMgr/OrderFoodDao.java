@@ -85,7 +85,7 @@ public class OrderFoodDao {
 	public static List<OrderFood> getSingleDetailToday(DBCon dbCon, Staff staff, String extraCond, String orderClause) throws SQLException, BusinessException {
 		String sql;
 
-		sql = " SELECT OF.order_id, OF.food_alias, OF.taste_group_id, OF.is_temporary, " +
+		sql = " SELECT OF.order_id, OF.taste_group_id, OF.is_temporary, " +
 				" OF.restaurant_id, OF.food_id, OF.name, OF.food_status, OF.is_paid, " +
 				" OF.unit_price, OF.order_count, OF.waiter, OF.order_date, OF.discount, OF.order_date, " +
 				" OF.cancel_reason_id, OF.cancel_reason, " +
@@ -106,7 +106,6 @@ public class OrderFoodDao {
 			food.setOrderId(dbCon.rs.getInt("order_id"));
 			food.asFood().setFoodId(dbCon.rs.getInt("food_id"));
 			food.asFood().setName(dbCon.rs.getString("name"));
-			food.asFood().setAliasId(dbCon.rs.getInt("food_alias"));
 			food.asFood().setRestaurantId(dbCon.rs.getInt("restaurant_id"));
 			food.setRepaid(dbCon.rs.getBoolean("is_paid"));
 			food.asFood().setStatus(dbCon.rs.getShort("food_status"));
@@ -198,7 +197,7 @@ public class OrderFoodDao {
 	public static List<OrderFood> getSingleDetailHistory(DBCon dbCon, Staff staff, String extraCond, String orderClause) throws SQLException, BusinessException {
 		String sql;
 
-		sql = "SELECT OFH.order_id, OFH.food_alias, OFH.taste_group_id, OFH.is_temporary, " +
+		sql = "SELECT OFH.order_id, OFH.taste_group_id, OFH.is_temporary, " +
 				" OFH.restaurant_id, OFH.food_id, OFH.name, OFH.food_status, OFH.is_paid, " +
 				" OFH.unit_price, OFH.order_count, OFH.waiter, OFH.order_date, OFH.discount, OFH.order_date, " +
 				" OFH.cancel_reason_id, IF(OFH.cancel_reason_id = 1, '无原因', OFH.cancel_reason) cancel_reason, " +
@@ -219,7 +218,6 @@ public class OrderFoodDao {
 			food.setOrderId(dbCon.rs.getInt("order_id"));
 			food.asFood().setFoodId(dbCon.rs.getInt("food_id"));
 			food.asFood().setName(dbCon.rs.getString("name"));
-			food.asFood().setAliasId(dbCon.rs.getInt("food_alias"));
 			food.asFood().setRestaurantId(dbCon.rs.getInt("restaurant_id"));
 			food.asFood().setStatus(dbCon.rs.getShort("food_status"));
 			food.setRepaid(dbCon.rs.getBoolean("is_paid"));
@@ -318,16 +316,16 @@ public class OrderFoodDao {
 	public static List<OrderFood> getDetailToday(DBCon dbCon, Staff staff, String extraCond, String orderClause) throws SQLException, BusinessException {
 		String sql;
 
-		sql = "SELECT OF.order_id, OF.food_alias, OF.taste_group_id, OF.is_temporary, " +
+		sql = "SELECT OF.order_id, OF.food_id, OF.taste_group_id, OF.is_temporary, " +
 				" MAX(OF.restaurant_id) AS restaurant_id, MAX(OF.kitchen_id) AS kitchen_id, " + 
-				" MAX(OF.food_id) AS food_id, MAX(OF.name) AS name, MAX(OF.food_status) AS food_status, " +
+				" MAX(OF.name) AS name, MAX(OF.food_status) AS food_status, " +
 				" MAX(OF.unit_price) AS unit_price, MAX(OF.commission) AS commission, MAX(OF.waiter) AS waiter, MAX(OF.order_date) AS order_date, MAX(OF.discount) AS discount, " +
 				" MAX(OF.dept_id) AS dept_id, MAX(OF.id) AS id, MAX(OF.order_date) AS pay_datetime, SUM(OF.order_count) AS order_sum " +
 				" FROM " +
 				Params.dbName +	".order_food OF " +
 				" WHERE 1 = 1 " +
 				(extraCond == null ? "" : extraCond) +
-				" GROUP BY OF.food_alias, OF.taste_group_id, OF.hang_status, OF.is_temporary " + 
+				" GROUP BY OF.food_id, OF.taste_group_id, OF.hang_status, OF.is_temporary " + 
 				" HAVING " +
 				" order_sum > 0 " +
 				(orderClause == null ? "" : " " + orderClause);
@@ -338,7 +336,6 @@ public class OrderFoodDao {
 			OrderFood food = new OrderFood();
 			food.asFood().setFoodId(dbCon.rs.getInt("food_id"));
 			food.asFood().setName(dbCon.rs.getString("name"));
-			food.asFood().setAliasId(dbCon.rs.getInt("food_alias"));
 			food.asFood().setRestaurantId(dbCon.rs.getInt("restaurant_id"));
 			food.asFood().setStatus(dbCon.rs.getShort("food_status"));
 			int tasteGroupId = dbCon.rs.getInt("taste_group_id");
@@ -424,16 +421,16 @@ public class OrderFoodDao {
 	public static List<OrderFood> getDetailHistory(DBCon dbCon, Staff staff, String extraCond, String orderClause) throws SQLException, BusinessException {
 		String sql;
 
-		sql = "SELECT OFH.order_id, OFH.food_alias, OFH.taste_group_id, OFH.is_temporary, " +
+		sql = "SELECT OFH.order_id, OFH.food_id, OFH.taste_group_id, OFH.is_temporary, " +
 			  " MAX(OFH.restaurant_id) AS restaurant_id, MAX(OFH.kitchen_id) AS kitchen_id, " +
-			  " MAX(OFH.food_id) AS food_id, MAX(OFH.name) AS name, MAX(OFH.food_status) AS food_status, " +
+			  " MAX(OFH.name) AS name, MAX(OFH.food_status) AS food_status, " +
 			  " MAX(OFH.unit_price) AS unit_price, MAX(OFH.commission) AS commission, MAX(OFH.waiter) AS waiter, MAX(OFH.order_date) AS order_date, MAX(OFH.discount) AS discount, " +
 			  " MAX(OFH.dept_id) AS dept_id, MAX(OFH.id) AS id, MAX(OFH.order_date) AS pay_datetime, SUM(OFH.order_count) AS order_sum " +
 			  " FROM " +
 			  Params.dbName + ".order_food_history OFH " +
 			  " WHERE 1 = 1 " +
 			  (extraCond == null ? "" : extraCond) +
-			  " GROUP BY OFH.food_alias, OFH.taste_group_id, OFH.is_temporary " +
+			  " GROUP BY OFH.food_id, OFH.taste_group_id, OFH.is_temporary " +
 			  " HAVING order_sum > 0 " +
 			  (orderClause == null ? "" : " " + orderClause);
 		
@@ -443,7 +440,6 @@ public class OrderFoodDao {
 			OrderFood food = new OrderFood();
 			food.asFood().setFoodId(dbCon.rs.getInt("food_id"));
 			food.asFood().setName(dbCon.rs.getString("name"));
-			food.asFood().setAliasId(dbCon.rs.getInt("food_alias"));
 			food.asFood().setRestaurantId(dbCon.rs.getInt("restaurant_id"));
 			food.asFood().setStatus(dbCon.rs.getShort("food_status"));
 			int tasteGroupId = dbCon.rs.getInt("taste_group_id");

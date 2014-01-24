@@ -308,7 +308,7 @@ public class UpdateOrder {
 			
 			sql = " INSERT INTO " + Params.dbName + ".order_food " +
 				  " ( " + 
-				  " `restaurant_id`, `order_id`, `food_id`, `food_alias`, `order_count`, `unit_price`, `commission`, `name`, `food_status`, " +
+				  " `restaurant_id`, `order_id`, `food_id`, `order_count`, `unit_price`, `commission`, `name`, `food_status`, " +
 				  " `discount`, `taste_group_id`, " +
 				  " `dept_id`, `kitchen_id`, " +
 				  " `staff_id`, `waiter`, `order_date`, `is_temporary`, `is_paid` " +
@@ -317,8 +317,7 @@ public class UpdateOrder {
 				  "(" +
 				  staff.getRestaurantId() + ", " +
 				  diffResult.newOrder.getId() + ", " +
-				  (extraFood.getFoodId() == 0 ? "NULL" : extraFood.getFoodId()) + ", " +
-				  extraFood.getAliasId() + ", " + 
+				  extraFood.getFoodId() + ", " +
 				  extraFood.getCount() + ", " + 
 				  extraFood.getPrice() + ", " + 
 				  extraFood.asFood().getCommission() + ", " +
@@ -342,14 +341,13 @@ public class UpdateOrder {
 
 			sql = " INSERT INTO `" + Params.dbName + "`.`order_food` " +
 				  " ( " +
-				  " `restaurant_id`, `order_id`, `food_id`, `food_alias`, `order_count`, `unit_price`, `commission`, `name`, `food_status`, " +
+				  " `restaurant_id`, `order_id`, `food_id`, `order_count`, `unit_price`, `commission`, `name`, `food_status`, " +
 				  " `discount`, `taste_group_id`, `cancel_reason_id`, `cancel_reason`, " +
 				  " `dept_id`, `kitchen_id`, " +
 				  " `staff_id`, `waiter`, `order_date`, `is_temporary`, `is_paid`) VALUES (" +
 				  staff.getRestaurantId() + ", " +
 				  diffResult.newOrder.getId() + ", " +
-				  (cancelledFood.getFoodId() == 0 ? "NULL" : cancelledFood.getFoodId()) + ", " +
-				  cancelledFood.getAliasId() + ", " + 
+				  cancelledFood.getFoodId() + ", " +
 				  "-" + cancelledFood.getCount() + ", " + 
 				  cancelledFood.getPrice() + ", " + 
 				  cancelledFood.asFood().getCommission() + "," +

@@ -20,7 +20,6 @@ import com.wireless.db.deptMgr.DepartmentDao;
 import com.wireless.db.deptMgr.KitchenDao;
 import com.wireless.db.distMgr.DiscountDao;
 import com.wireless.db.inventoryMgr.MaterialCateDao;
-import com.wireless.db.menuMgr.PricePlanDao;
 import com.wireless.db.printScheme.PrinterDao;
 import com.wireless.db.regionMgr.RegionDao;
 import com.wireless.db.regionMgr.TableDao;
@@ -35,7 +34,6 @@ import com.wireless.pojo.distMgr.DiscountPlan;
 import com.wireless.pojo.inventoryMgr.MaterialCate;
 import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.menuMgr.Kitchen;
-import com.wireless.pojo.ppMgr.PricePlan;
 import com.wireless.pojo.regionMgr.Region;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.restaurantMgr.Restaurant;
@@ -75,9 +73,6 @@ public class TestRestaurantDao {
 			
 			//Compare the '商品' material category
 			compareMaterialCate(restaurantId);
-			
-			//Compare the 默认的活动价格方案
-			comparePricePlan(restaurantId);
 			
 			//Compare the '大牌', '中牌', '例牌' and popular tastes
 			compareTastes(staff, restaurantId);
@@ -309,17 +304,6 @@ public class TestRestaurantDao {
 		assertEquals("role category", expectedRole.getCategory().getVal(), cate.getVal());
 		assertEquals("role restaurant id", expectedRole.getRestaurantId(), restaurantId);
 		assertEquals("role category", expectedRole.getType().getVal(), type.getVal());
-	}
-	
-	private void comparePricePlan(int restaurantId) throws SQLException, BusinessException{
-		PricePlan expectedPricePlan = new PricePlan();
-		expectedPricePlan.setRestaurantId(restaurantId);
-		expectedPricePlan.setStatus(PricePlan.Status.ACTIVITY);
-		
-		PricePlan actualPricePlan = PricePlanDao.getPricePlans(StaffDao.getStaffs(restaurantId).get(0), null, null).get(0);
-		
-		assertEquals("price plan restaurant id", expectedPricePlan.getRestaurantId(), actualPricePlan.getRestaurantId());
-		assertEquals("price plan status", expectedPricePlan.getStatus().getVal(), actualPricePlan.getStatus().getVal());
 	}
 	
 	private void compareMaterialCate(int restaurantId) throws SQLException{

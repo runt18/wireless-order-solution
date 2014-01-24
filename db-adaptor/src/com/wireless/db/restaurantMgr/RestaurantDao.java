@@ -27,7 +27,6 @@ import com.wireless.pojo.distMgr.Discount;
 import com.wireless.pojo.inventoryMgr.MaterialCate;
 import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.menuMgr.Kitchen;
-import com.wireless.pojo.ppMgr.PricePlan;
 import com.wireless.pojo.printScheme.PStyle;
 import com.wireless.pojo.printScheme.Printer;
 import com.wireless.pojo.regionMgr.Region;
@@ -336,9 +335,6 @@ public class RestaurantDao {
 			
 			//Insert '商品' material category
 			initMaterialCate(dbCon, restaurant.getId());
-			
-			//Insert默认的活动价格方案
-			initPricePlan(dbCon, restaurant.getId());
 			
 			//Insert the '大牌', '中牌', '例牌' and popular tastes
 			initTastes(dbCon, staff);
@@ -672,18 +668,6 @@ public class RestaurantDao {
 			  "'" + MaterialCate.Type.GOOD.getText() + "'," +
 			  MaterialCate.Type.GOOD.getValue() +
 			  " ) ";
-		dbCon.stmt.executeUpdate(sql);
-	}
-	
-	private static void initPricePlan(DBCon dbCon, int restaurantId) throws SQLException{
-		String sql;
-		sql = " INSERT INTO " + Params.dbName + ".price_plan " +
-			  "(`restaurant_id`, `name`, `status`)" +
-			  " VALUES(" +
-			  restaurantId + "," +
-			  "'默认方案'" + "," +
-			  PricePlan.Status.ACTIVITY.getVal() + 
-			  ")";
 		dbCon.stmt.executeUpdate(sql);
 	}
 	

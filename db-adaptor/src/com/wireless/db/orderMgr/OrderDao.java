@@ -13,7 +13,6 @@ import com.wireless.pojo.client.Member;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.OrderSummary;
 import com.wireless.pojo.distMgr.Discount;
-import com.wireless.pojo.ppMgr.PricePlan;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.util.DateType;
@@ -53,8 +52,8 @@ public class OrderDao {
 	 * 
 	 * @param dbCon
 	 *            the database connection
-	 * @param term
-	 *            the terminal
+	 * @param staff
+	 *            the staff to perform this action
 	 * @param tableAlias
 	 *            the table alias id to query
 	 * @return Order the order detail information
@@ -66,30 +65,32 @@ public class OrderDao {
 	 * @throws SQLException
 	 *             Throws if fail to execute any SQL statement.
 	 */
-	public static Order getByTableAlias(DBCon dbCon, Staff term, int tableAlias) throws BusinessException, SQLException {		
-		return getById(dbCon, term, OrderDao.getOrderIdByUnPaidTable(dbCon, TableDao.getTableByAlias(dbCon, term, tableAlias))[0], DateType.TODAY);
+	public static Order getByTableAlias(DBCon dbCon, Staff staff, int tableAlias) throws BusinessException, SQLException {		
+		return getById(dbCon, staff, OrderDao.getOrderIdByUnPaidTable(dbCon, TableDao.getTableByAlias(dbCon, staff, tableAlias))[0], DateType.TODAY);
 	}
 	
 	/**
 	 * Get the unpaid order detail information to the specific restaurant and
 	 * table. If the table is merged, get its parent order, otherwise get the
 	 * order of its own.
+	 * @param staff
+	 * 			the staff to perform this action
 	 * @param tableAlias
 	 *            the table alias id to query
 	 * @return Order the order detail information
 	 * @throws BusinessException
-	 *             Throws if one of cases below.<br>
+	 *             throws if one of cases below.<br>
 	 *             - The terminal is NOT attached to any restaurant.<br>
 	 *             - The table to query does NOT exist.<br>
 	 *             - The unpaid order to this table does NOT exist.
 	 * @throws SQLException
-	 *             Throws if fail to execute any SQL statement.
+	 *             throws if fail to execute any SQL statement
 	 */
-	public static Order getByTableAliasDync(Staff term, int tableAlias) throws BusinessException, SQLException {		
+	public static Order getByTableAliasDync(Staff staff, int tableAlias) throws BusinessException, SQLException {		
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return getByTableAliasDync(dbCon, term, tableAlias);
+			return getByTableAliasDync(dbCon, staff, tableAlias);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -102,8 +103,8 @@ public class OrderDao {
 	 * 
 	 * @param dbCon
 	 *            the database connection
-	 * @param term
-	 *            the terminal
+	 * @param staff
+	 *            the staff to perform this action
 	 * @param tableAlias
 	 *            the table alias id to query
 	 * @return Order the order detail information
@@ -115,22 +116,22 @@ public class OrderDao {
 	 * @throws SQLException
 	 *             Throws if fail to execute any SQL statement.
 	 */
-	public static Order getByTableAliasDync(DBCon dbCon, Staff term, int tableAlias) throws BusinessException, SQLException {
+	public static Order getByTableAliasDync(DBCon dbCon, Staff staff, int tableAlias) throws BusinessException, SQLException {
 		
 		//If the table is merged, get its parent order.
 		//Otherwise get the order of its own.
-		int[] unpaidId = OrderDao.getOrderIdByUnPaidTable(dbCon, TableDao.getTableByAlias(dbCon, term, tableAlias));
+		int[] unpaidId = OrderDao.getOrderIdByUnPaidTable(dbCon, TableDao.getTableByAlias(dbCon, staff, tableAlias));
 		if(unpaidId.length > 1){
-			return getById(dbCon, term, unpaidId[1], DateType.TODAY);
+			return getById(dbCon, staff, unpaidId[1], DateType.TODAY);
 		}else{
-			return getById(dbCon, term, unpaidId[0], DateType.TODAY);
+			return getById(dbCon, staff, unpaidId[0], DateType.TODAY);
 		}
 	}
 	
 	/**
 	 * Get the unpaid order detail information to the specific restaurant and table regardless of the merged status.
-	 * @param terminal
-	 *            the terminal to query
+	 * @param staff
+	 *            the staff to perform this action
 	 * @param tableAlias
 	 *            the table alias id to query
 	 * @return Order the order detail information
@@ -142,13 +143,13 @@ public class OrderDao {
 	 * @throws SQLException
 	 *             throws if fail to execute any SQL statement.
 	 */
-	public static Order getByTableAlias(Staff term, int tableAlias) throws BusinessException, SQLException {		
+	public static Order getByTableAlias(Staff staff, int tableAlias) throws BusinessException, SQLException {		
 
 		DBCon dbCon = new DBCon();
 		try{
 			
 			dbCon.connect();			
-			return getByTableAlias(dbCon, term, tableAlias);
+			return getByTableAlias(dbCon, staff, tableAlias);
 			
 		}finally{
 			dbCon.disconnect();
@@ -158,8 +159,8 @@ public class OrderDao {
 	
 	/**
 	 * Get the order detail information according to the specific order id. Note
-	 * @param term
-	 * 			  the terminal
+	 * @param staff
+	 * 			  the staff to perform this action
 	 * @param orderId
 	 *            the order id to query
 	 * @param dateType
@@ -170,13 +171,13 @@ public class OrderDao {
 	 * @throws SQLException
 	 *             throws if fail to execute any SQL statement
 	 */
-	public static Order getById(Staff term, int orderId, DateType dateType) throws BusinessException, SQLException {
+	public static Order getById(Staff staff, int orderId, DateType dateType) throws BusinessException, SQLException {
 		DBCon dbCon = new DBCon();
 		
 		try {
 			dbCon.connect();
 
-			return getById(dbCon, term, orderId, dateType);
+			return getById(dbCon, staff, orderId, dateType);
 
 		} finally {
 			dbCon.disconnect();
@@ -435,16 +436,13 @@ public class OrderDao {
 				  " O.member_id, O.member_operation_id, " +
 				  " O.settle_type, O.pay_type, O.category, O.status, O.service_rate, O.comment, " +
 				  " O.discount_id, DIST.name AS discount_name, " +
-				  " O.gift_price, O.cancel_price, O.discount_price, O.repaid_price, O.erase_price, O.total_price, O.actual_price, " +
-				  " PP.price_plan_id, PP.name AS price_plan_name, PP.status AS price_plan_status " +
+				  " O.gift_price, O.cancel_price, O.discount_price, O.repaid_price, O.erase_price, O.total_price, O.actual_price " +
 				  " FROM " + 
 				  Params.dbName + ".order O " +
 				  " LEFT JOIN " + Params.dbName + ".table T " +
 				  " ON O.table_id = T.table_id " +
 				  " LEFT JOIN " + Params.dbName + ".discount DIST " +
 				  " ON O.discount_id = DIST.discount_id " +
-				  " LEFT JOIN " + Params.dbName + ".price_plan PP " +
-				  " ON O.price_plan_id = PP.price_plan_id " +
 				  " WHERE 1 = 1 " + 
 				  " AND O.restaurant_id = " + staff.getRestaurantId() + " " +
 				  (extraCond != null ? extraCond : "") + " " +
@@ -525,12 +523,6 @@ public class OrderDao {
 			orderInfo.setErasePrice(dbCon.rs.getInt("erase_price"));
 			orderInfo.setTotalPrice(dbCon.rs.getFloat("total_price"));
 			orderInfo.setActualPrice(dbCon.rs.getFloat("actual_price"));
-			if(dateType == DateType.TODAY){
-				orderInfo.setPricePlan(new PricePlan(dbCon.rs.getInt("price_plan_id"),
-													 dbCon.rs.getString("price_plan_name"),
-													 PricePlan.Status.valueOf(dbCon.rs.getInt("price_plan_status")),
-													 dbCon.rs.getInt("restaurant_id")));
-			}
 			
 			result.add(orderInfo);
 		}
@@ -542,8 +534,8 @@ public class OrderDao {
 
 	/**
 	 * Get the pure order according to extra condition and order clause.
-	 * @param term
-	 * 			the terminal
+	 * @param staff
+	 * 			the staff to perform this action
 	 * @param extraCond
 	 * 			the extra condition
 	 * @param orderClause
@@ -554,11 +546,11 @@ public class OrderDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static List<Order> getPureOrder(Staff term, String extraCond, String orderClause, DateType dateType) throws SQLException{
+	public static List<Order> getPureOrder(Staff staff, String extraCond, String orderClause, DateType dateType) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return getPureOrder(dbCon, term, extraCond, orderClause, dateType);
+			return getPureOrder(dbCon, staff, extraCond, orderClause, dateType);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -568,8 +560,8 @@ public class OrderDao {
 	 * Get the summary to orders to specified restaurant defined in {@link terminal} and other condition.
 	 * @param dbCon
 	 * 			the database connection
-	 * @param term
-	 * 			the terminal
+	 * @param staff
+	 * 			the staff to perform this action
 	 * @param extraCond
 	 * 			the extra condition
 	 * @param dateType
@@ -578,11 +570,11 @@ public class OrderDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static OrderSummary getOrderSummary(Staff term, String extraCond, DateType dateType) throws SQLException{
+	public static OrderSummary getOrderSummary(Staff staff, String extraCond, DateType dateType) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return getOrderSummary(dbCon, term, extraCond, dateType);
+			return getOrderSummary(dbCon, staff, extraCond, dateType);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -592,8 +584,8 @@ public class OrderDao {
 	 * Get the summary to orders to specified restaurant defined in {@link terminal} and other condition.
 	 * @param dbCon
 	 * 			the database connection
-	 * @param term
-	 * 			the terminal
+	 * @param staff
+	 * 			the staff to perform this action
 	 * @param extraCond
 	 * 			the extra condition
 	 * @param dateType
@@ -602,7 +594,7 @@ public class OrderDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static OrderSummary getOrderSummary(DBCon dbCon, Staff term, String extraCond, DateType dateType) throws SQLException{
+	public static OrderSummary getOrderSummary(DBCon dbCon, Staff staff, String extraCond, DateType dateType) throws SQLException{
 		
 		String sql;
 		
@@ -613,7 +605,7 @@ public class OrderDao {
 				  " SUM(repaid_price) AS total_repaid_price " +
 				  " FROM " + Params.dbName + ".order O " +
 				  " WHERE 1 = 1 " +
-				  " AND O.restaurant_id = " + term.getRestaurantId() + " " +
+				  " AND O.restaurant_id = " + staff.getRestaurantId() + " " +
 				  (extraCond != null ? extraCond : "");
 			
 		}else if(dateType == DateType.HISTORY){
@@ -624,7 +616,7 @@ public class OrderDao {
 				  " SUM(total_price) AS price " +
 				  " FROM " + Params.dbName + ".order_history OH " +
 				  " WHERE 1 = 1 " +
-				  " AND OH.restaurant_id = " + term.getRestaurantId() + " " +
+				  " AND OH.restaurant_id = " + staff.getRestaurantId() + " " +
 				  (extraCond != null ? extraCond : "");
 			
 		}else{
@@ -730,7 +722,7 @@ public class OrderDao {
 	 * @return
 	 * @throws Exception
 	 */
-	public static List<Order> getOrderByChild(Staff term, String extraCond, String orderClause, DateType dateType, Table childTable) throws Exception{
+	public static List<Order> getOrderByChild(Staff staff, String extraCond, String orderClause, DateType dateType, Table childTable) throws Exception{
 		DBCon dbCon = new DBCon();
 		List<Order> order = null;
 		try{
@@ -743,7 +735,7 @@ public class OrderDao {
 					extraCond += (" AND O.id = " + oid[1]);
 				}
 				if(oid.length == 2){
-					order = OrderDao.getByCond(dbCon, term, extraCond, orderClause, dateType);
+					order = OrderDao.getByCond(dbCon, staff, extraCond, orderClause, dateType);
 				}
 			}
 			return order;

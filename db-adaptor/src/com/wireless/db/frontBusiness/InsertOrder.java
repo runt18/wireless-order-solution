@@ -9,7 +9,6 @@ import com.wireless.db.Params;
 import com.wireless.db.deptMgr.KitchenDao;
 import com.wireless.db.distMgr.DiscountDao;
 import com.wireless.db.menuMgr.FoodDao;
-import com.wireless.db.menuMgr.PricePlanDao;
 import com.wireless.db.regionMgr.TableDao;
 import com.wireless.db.tasteMgr.TasteDao;
 import com.wireless.exception.BusinessException;
@@ -29,7 +28,7 @@ public class InsertOrder {
 	 * Insert a new order according to the specific order detail information.
 	 * 
 	 * @param staff
-	 *            the terminal to query
+	 *            the staff to perform this action
 	 * @param orderToInsert
 	 *            the order information submitted by terminal, refer to class
 	 *            "ReqInsertOrder" for more detail about what information the
@@ -67,7 +66,7 @@ public class InsertOrder {
 	 * @param dbCon
 	 * 			  the database connection
 	 * @param staff
-	 *            the terminal to query
+	 *            the staff to perform this action
 	 * @param orderToInsert
 	 *            the order information submitted by terminal, refer to class
 	 *            "ReqInsertOrder" for more detail about what information the
@@ -122,7 +121,7 @@ public class InsertOrder {
 	 * @param dbCon
 	 * 			the database connection
 	 * @param staff
-	 * 			the terminal
+	 * 			the staff to perform this action
 	 * @param orderToInsert
 	 * 			the order along with basic insert parameters
 	 * @return the completed order details to insert
@@ -149,7 +148,7 @@ public class InsertOrder {
 	 * @param dbCon
 	 * 			the database connection
 	 * @param staff
-	 * 			the terminal
+	 * 			the staff to perform this action
 	 * @param orderToInsert
 	 * 			the order along with basic insert parameters
 	 * @return the completed order details to insert
@@ -212,9 +211,6 @@ public class InsertOrder {
 				}
 			}
 
-			//Set the active price plan.
-			orderToInsert.setPricePlan(PricePlanDao.getActivePricePlan(dbCon, staff));
-			
 			//Set the default discount.
 			orderToInsert.setDiscount(DiscountDao.getDefaultDiscount(dbCon, staff));
 			
@@ -234,7 +230,7 @@ public class InsertOrder {
 	 * @param dbCon
 	 * 			the database connection
 	 * @param staff
-	 * 			the terminal
+	 * 			the staff to perform this action
 	 * @param orderToInsert
 	 * 			the order along with basic insert parameters
 	 * @throws SQLException
@@ -250,7 +246,7 @@ public class InsertOrder {
 		sql = " INSERT INTO `" + Params.dbName + "`.`order` (" +
 			  " `restaurant_id`, `category`, `region_id`, `region_name`, " +
 			  " `table_id`, `table_alias`, `table_name`, " +
-			  " `birth_date`, `order_date`, `custom_num`, `staff_id`, `waiter`, `discount_id`, `price_plan_id`) VALUES (" +
+			  " `birth_date`, `order_date`, `custom_num`, `staff_id`, `waiter`, `discount_id`) VALUES (" +
 			  orderToInsert.getDestTbl().getRestaurantId() + ", " + 
 			  orderToInsert.getCategory().getVal() + ", " +
 			  orderToInsert.getRegion().getRegionId() + ", '" +
@@ -263,8 +259,8 @@ public class InsertOrder {
 			  orderToInsert.getCustomNum() + ", " +
 			  staff.getId() + ", " +
 			  "'" + staff.getName() + "'" + ", " +
-			  orderToInsert.getDiscount().getId() + "," +
-			  orderToInsert.getPricePlan().getId() + ")";
+			  orderToInsert.getDiscount().getId() + 
+			  ")";
 		dbCon.stmt.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
 		//get the generated id to order 
 		dbCon.rs = dbCon.stmt.getGeneratedKeys();
@@ -347,7 +343,7 @@ public class InsertOrder {
 			//insert the record to table "order_food"
 			sql = " INSERT INTO `" + Params.dbName + "`.`order_food` " +
 				  " ( " +
-				  " `restaurant_id`, `order_id`, `food_id`, `food_alias`, `order_count`, `unit_price`, `commission`, `name`, " +
+				  " `restaurant_id`, `order_id`, `food_id`, `order_count`, `unit_price`, `commission`, `name`, " +
 				  " `food_status`, `discount`, `taste_group_id`, " +
 				  " `dept_id`, `kitchen_id`, " +
 				  " `staff_id`, `waiter`, `order_date`, `is_temporary` " +
@@ -356,8 +352,7 @@ public class InsertOrder {
 				  " ( " +	
 				  staff.getRestaurantId() + ", " +
 				  orderToInsert.getId() + ", " +
-				  (foodToInsert.getFoodId() == 0 ? "NULL" : foodToInsert.getFoodId()) + ", " +
-				  foodToInsert.getAliasId() + ", " + 
+				  foodToInsert.getFoodId() + ", " +
 				  foodToInsert.getCount() + ", " + 
 				  foodToInsert.getPrice() + ", " + 
 				  foodToInsert.asFood().getCommission() + ",'" +

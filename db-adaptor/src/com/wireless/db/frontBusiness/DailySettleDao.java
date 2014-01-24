@@ -717,9 +717,9 @@ public class DailySettleDao {
 	
 	private static void moveOrderFood(DBCon dbCon, String orderIdCond) throws SQLException{
 		
-		final String orderFoodItem = "`id`,`restaurant_id`, `order_id`, `food_id`, `food_alias`, `order_date`, `order_count`," + 
+		final String orderFoodItem = "`id`,`restaurant_id`, `order_id`, `food_id`, `order_date`, `order_count`," + 
 				"`unit_price`, `commission`, `name`, `food_status`, `taste_group_id`, `cancel_reason_id`, `cancel_reason`," +
-				"`discount`, `dept_id`, `kitchen_id`, `kitchen_alias`," +
+				"`discount`, `dept_id`, `kitchen_id`, " +
 				"`staff_id`, `waiter`, `is_temporary`, `is_paid`";
 
 		

@@ -11,23 +11,17 @@ import com.mysql.jdbc.Statement;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.inventoryMgr.MaterialDao;
-import com.wireless.db.tasteRef.TasteRefDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.FoodError;
-import com.wireless.exception.MaterialError;
-import com.wireless.exception.PlanError;
 import com.wireless.pojo.dishesOrder.Order;
-import com.wireless.pojo.inventoryMgr.MaterialCate;
 import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.menuMgr.Department.DeptId;
 import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.menuMgr.FoodStatistics;
 import com.wireless.pojo.menuMgr.Kitchen;
-import com.wireless.pojo.ppMgr.PricePlan;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.tasteMgr.Taste;
 import com.wireless.util.PinyinUtil;
-import com.wireless.util.SQLUtil;
 
 public class FoodDao {
 	
@@ -76,9 +70,11 @@ public class FoodDao {
 		String sql;
 		Food f = builder.build();
 		sql = " INSERT INTO " + Params.dbName + ".food" +
-			  " (`name`, `food_alias`, `restaurant_id`, `kitchen_id`, `status`, `desc`, `stock_status`) VALUES ( " +
+			  " (`name`, `food_alias`, `price`, `commission`, `restaurant_id`, `kitchen_id`, `status`, `desc`, `stock_status`) VALUES ( " +
 			  "'" + f.getName() + "'," +
 			  f.getAliasId() + "," +
+			  f.getPrice() + "," +
+			  f.getCommission() + "," +
 			  staff.getRestaurantId() + "," +
 			  f.getKitchen().getId() + "," +
 			  f.getStatus() + "," +
@@ -95,13 +91,6 @@ public class FoodDao {
 			throw new SQLException("The food id is NOT generated successfully.");
 		}
 		dbCon.rs.close();
-		
-		//FIXME 新增菜谱价格方案信息
-		sql = " INSERT INTO " + Params.dbName + ".food_price_plan " + 
-			  " (`restaurant_id`, `food_id`, `price_plan_id`, `unit_price`, `commission`) " +
-			  " SELECT " + staff.getRestaurantId() + "," + foodId + ",price_plan_id," + f.getPrice() + ", " + f.getCommission() + 
-			  " FROM " + Params.dbName + ".price_plan WHERE restaurant_id = " + staff.getRestaurantId();
-		dbCon.stmt.executeUpdate(sql);
 		
 		//设为商品出库时，在库存中增加这条菜品的商品记录
 		if(f.getStockStatus() == Food.StockStatus.GOOD){
@@ -196,10 +185,6 @@ public class FoodDao {
 		sql = " DELETE FROM " + Params.dbName + ".combo WHERE food_id = " + foodId;
 		dbCon.stmt.executeUpdate(sql);
 
-		//FIXME Delete the associated food price plan
-		sql = " DELETE FROM " + Params.dbName + ".food_price_plan WHERE food_id = " + foodId;
-		dbCon.stmt.executeUpdate(sql);
-		
 		//Delete the food info
 		sql = " DELETE FROM " + Params.dbName + ".food WHERE food_id = " + foodId;
 		if(dbCon.stmt.executeUpdate(sql) == 0){
@@ -294,23 +279,17 @@ public class FoodDao {
 			dbCon.stmt.executeUpdate(sql);
 		}
 
-		//FIXME 修改当前活动价格方案信息 
-		sql = " UPDATE " + Params.dbName + ".food_price_plan SET " +
-			  " unit_price = " + f.getPrice()  + 
-			  " ,commission = " + (f.isCommission() ? f.getCommission() : 0) +
-			  " WHERE food_id = " + f.getFoodId() +
-			  " AND price_plan_id = (SELECT price_plan_id FROM " + Params.dbName + ".price_plan WHERE restaurant_id = " + staff.getRestaurantId() + " AND status = " + PricePlan.Status.ACTIVITY.getVal() + ")";
-		dbCon.stmt.executeUpdate(sql);
-		
 		sql = " UPDATE " + Params.dbName + ".food SET " +
 			  " food_id = " + f.getFoodId() +
 			  " ,status = " + f.getStatus() +
 			  (builder.isAliasChanged() ? ",food_alias = " + f.getAliasId() : "") +
 			  (builder.isNameChanged() ? ",name = '" + f.getName() + "'" : "") +
 			  (builder.isKitchenChanged() ? ",kitchen_id = " + f.getKitchen().getId() : "") +
-			  //(builder.isPriceChanged() ? ",price = " + f.getPrice() : "") +
+			  (builder.isPriceChanged() ? ",price = " + f.getPrice() : "") +
+			  (builder.isCommissionChanged() ? ",commission = " + f.getCommission() : "") +
 			  (builder.isStockChanged() ? ",stock_status = " + f.getStockStatus().getVal() : "") +
 			  (builder.isDescChanged() ? ",`desc` = '" + f.getDesc() + "'" : "") +
+			  (builder.isImageChanged() ? ",img = '" + f.getImage() + "'" : "") +
 			  " WHERE food_id = " + f.getFoodId();
 		
 		if(dbCon.stmt.executeUpdate(sql) == 0){
@@ -390,404 +369,6 @@ public class FoodDao {
 	}
 	
 	/**
-	 * @deprecated
-	 * @param dbCon
-	 * @param term
-	 * @param fb
-	 * @return
-	 * @throws BusinessException
-	 * @throws SQLException
-	 */
-	private static int insertFoodBaisc(DBCon dbCon, Staff term, Food fb) throws BusinessException, SQLException{
-		int count = 0;
-		String insertSQL = "", querySQL = "";
-		// 检查菜品是否存在
-		querySQL = "SELECT count(food_alias) count FROM " + Params.dbName + ".food WHERE restaurant_id = " + fb.getRestaurantId() + " AND food_alias = " + fb.getAliasId();
-		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
-		while(dbCon.rs != null && dbCon.rs.next()){
-			count = dbCon.rs.getInt("count");
-			break;
-		}
-		if(count > 0){
-			throw new BusinessException("操作失败,该编号菜品已经存在!");
-		}
-		// 新增菜品信息
-		insertSQL = "INSERT INTO " + Params.dbName + ".food" 
-				+ " ( food_alias, name, pinyin, restaurant_id, kitchen_id, status, taste_ref_type, food.desc, food.stock_status ) "
-				+ "values("
-				+ fb.getAliasId() + ", " 
-				+ "'" + fb.getName() + "', " 
-				+ "'" + fb.getPinyin() + "', " 
-				+ fb.getRestaurantId() + ", " 
-				+ fb.getKitchen().getId() + ", " 
-				+ fb.getStatus() + ", " 
-				+ Food.TasteRef.SMART.getVal() + ", "
-				+ "'" + fb.getDesc() + "', "
-				+ fb.getStockStatus().getVal()
-				+ ")";
-		count = dbCon.stmt.executeUpdate(insertSQL);
-		// 获取新增菜品数据编号
-		dbCon.rs = dbCon.stmt.executeQuery(SQLUtil.SQL_QUERY_LAST_INSERT_ID);
-		if(dbCon.rs != null && dbCon.rs.next()){
-			fb.setFoodId(dbCon.rs.getInt(1));
-			dbCon.rs = null;
-		}
-		
-		// 新增菜谱价格方案信息
-		insertSQL = "INSERT INTO food_price_plan (restaurant_id, food_id, price_plan_id, unit_price, commission)"
-				  + " SELECT " + fb.getRestaurantId() + "," + fb.getFoodId() + ",price_plan_id," + fb.getPrice() + ", " + fb.getCommission() + " FROM price_plan WHERE restaurant_id = " + fb.getRestaurantId();
-		count = dbCon.stmt.executeUpdate(insertSQL);
-		if(count == 0){
-			throw new BusinessException(PlanError.PRICE_FOOD_INSERT);
-		}
-		
-		// 处理库存
-		if(fb.getStockStatus() == Food.StockStatus.NONE){
-			// 无需处理
-		}else if(fb.getStockStatus() == Food.StockStatus.GOOD){
-			MaterialDao.insertGood(dbCon, term, fb.getFoodId(), fb.getName());
-		}else if(fb.getStockStatus() == Food.StockStatus.MATERIAL){
-			// 无需处理
-		}
-		return count;
-	}
-	
-	/**
-	 * @deprecated
-	 * @param term
-	 * @param fb
-	 * @throws BusinessException
-	 * @throws SQLException
-	 */
-	private static void insertFoodBaisc(Staff term, Food fb) throws BusinessException, SQLException{		
-		DBCon dbCon = new DBCon();
-		try{
-			dbCon.connect();
-			dbCon.conn.setAutoCommit(false);
-			int count = insertFoodBaisc(dbCon, term, fb);
-			dbCon.conn.commit();
-			if(count == 0){
-				throw new BusinessException(FoodError.INSERT_FAIL);
-			}
-		} catch(BusinessException e){
-			dbCon.conn.rollback();
-			throw e;
-		} catch(SQLException e){
-			dbCon.conn.rollback();
-			throw e;
-		} finally {
-			dbCon.disconnect();
-		}
-	}
-	
-	/**
-	 * @deprecated
-	 * @param term
-	 * @param fb
-	 * @param content
-	 * @throws BusinessException
-	 * @throws SQLException
-	 */
-	private static void insertFoodBaisc(Staff term, Food fb, String content) throws BusinessException, SQLException{
-		FoodDao.insertFoodBaisc(term, fb);
-		try{
-			TasteRefDao.execByFood(FoodDao.getById(term, fb.getFoodId()));
-			FoodCombinationDao.updateFoodCombination(fb.getFoodId(), fb.getRestaurantId(), fb.getStatus(), content);
-		} catch(Exception e){
-			throw new BusinessException(FoodError.COMBO_UPDATE_FAIL);
-		}
-	}
-	
-	/**
-	 * @deprecated
-	 * @param dbCon
-	 * @param fb
-	 * @return
-	 * @throws BusinessException
-	 * @throws SQLException
-	 */
-	private static int updateFoodBaisc(DBCon dbCon, Staff term, Food fb) throws BusinessException, SQLException{
-		Food old = MenuDao.getFoodById(dbCon, fb.getFoodId());
-		int count = 0;
-		String updateSQL = "", deleteSQL = "";
-		// 修改当前活动价格方案信息 
-		updateSQL = " UPDATE " + Params.dbName + ".food_price_plan SET " +
-					" unit_price = " + fb.getPrice()  + 
-					" ,commission = " + fb.getCommission() +
-					" WHERE food_id = " + fb.getFoodId() +
-					" AND price_plan_id = (SELECT price_plan_id FROM " + Params.dbName + ".price_plan WHERE restaurant_id = " + fb.getRestaurantId() + " AND status = " + PricePlan.Status.ACTIVITY.getVal() + ")";
-		count = dbCon.stmt.executeUpdate(updateSQL);
-		if(count == 0){
-			throw new BusinessException(FoodError.UPDATE_PRICE_FAIL);
-		}
-		// 修改菜品基础信息
-		updateSQL = "UPDATE " + Params.dbName + ".food "
-				  + " SET name = '" + fb.getName() + "', "
-				  + " pinyin = '"+ fb.getPinyin() + "', "
-				  + " kitchen_id =  " + (fb.getKitchen().getId() < 0 ? null : fb.getKitchen().getId()) + ", " 
-				  + " status =  " + fb.getStatus() + ", "
-				  + " food.desc = " + (fb.getDesc() == null || fb.getDesc().trim().length() == 0 ? null : "'" + fb.getDesc() + "'") + ", "
-				  + " food.stock_status = " + fb.getStockStatus().getVal()
-				  +" WHERE restaurant_id=" + fb.getRestaurantId() + " and food_id = " + fb.getFoodId();
-		
-		count = dbCon.stmt.executeUpdate(updateSQL);
-		if(count == 0){
-			throw new BusinessException(FoodError.UPDATE_FAIL);
-		}
-		
-		// 处理库存资料
-		if(fb.getStockStatus() == Food.StockStatus.NONE){
-			if(old.getStockStatus() == Food.StockStatus.NONE){
-				// 无需处理
-			}else if(old.getStockStatus() == Food.StockStatus.GOOD){
-				// 删除商品出库关系
-				String sql = "SELECT material_id FROM food_material WHERE food_id = " + fb.getFoodId();
-				dbCon.rs = dbCon.stmt.executeQuery(sql);
-				if(dbCon.rs.next()){
-					int materialId = dbCon.rs.getInt("material_id");
-					dbCon.rs.close();
-					MaterialDao.delete(dbCon, materialId);
-				}
-				
-				deleteSQL = "DELETE FROM food_material"
-						  + " WHERE food_id = " + fb.getFoodId()
-						  + " AND material_id NOT IN (SELECT material_id FROM material T1, material_cate T2 WHERE T1.cate_id = T2.cate_id AND T2.type = " + MaterialCate.Type.MATERIAL.getValue() + ")";
-				dbCon.stmt.executeUpdate(deleteSQL);
-				
-				
-
-			}else if(old.getStockStatus() == Food.StockStatus.MATERIAL){
-				// 删除原料出库关系
-				deleteSQL = "DELETE FROM food_material"
-						  + " WHERE food_id = " + fb.getFoodId()
-						  + " AND material_id NOT IN (SELECT material_id FROM material T1, material_cate T2 WHERE T1.cate_id = T2.cate_id AND T2.type = " + MaterialCate.Type.GOOD.getValue() + ")";
-				dbCon.stmt.executeUpdate(deleteSQL);
-			}
-		}else if(fb.getStockStatus() == Food.StockStatus.GOOD){
-			if(old.getStockStatus() == Food.StockStatus.NONE){
-				// 添加新商品库存资料
-				try{
-					MaterialDao.insertGood(dbCon, term, (int)fb.getFoodId(), fb.getName());					
-				}catch(BusinessException e){
-					if(e.getErrCode() != MaterialError.GOOD_INSERT_FAIL){
-						throw e;
-					}
-				}
-			}else if(old.getStockStatus() == Food.StockStatus.GOOD){
-				// 无需处理
-			}else if(old.getStockStatus() == Food.StockStatus.MATERIAL){
-				// 删除原料出库关系
-				deleteSQL = "DELETE FROM food_material"
-						  + " WHERE food_id = " + fb.getFoodId()
-						  + " AND material_id NOT IN (SELECT material_id FROM material T1, material_cate T2 WHERE T1.cate_id = T2.cate_id AND T2.type = " + MaterialCate.Type.GOOD.getValue() + ")";
-				dbCon.stmt.executeUpdate(deleteSQL);
-				// 添加新商品库存资料
-				try{
-					MaterialDao.insertGood(dbCon, term, (int)fb.getFoodId(), fb.getName());					
-				}catch(BusinessException e){
-					if(e.getErrCode() != MaterialError.GOOD_INSERT_FAIL){
-						throw e;
-					}
-				}
-			}
-		}else if(fb.getStockStatus() == Food.StockStatus.MATERIAL){
-			if(old.getStockStatus() == Food.StockStatus.NONE){
-				// 无需处理
-			}else if(old.getStockStatus() == Food.StockStatus.GOOD){
-				// 无需处理
-			}else if(old.getStockStatus() == Food.StockStatus.MATERIAL){
-				// 无需处理
-			}
-		}
-		
-		return count;
-	}
-	
-	/**
-	 * @deprecated
-	 * @param term
-	 * @param fb
-	 * @throws BusinessException
-	 * @throws SQLException
-	 */
-	private static void updateFoodBaisc(Staff term, Food fb) throws BusinessException, SQLException{
-		DBCon dbCon = new DBCon();
-		try{
-			dbCon.connect();
-			dbCon.conn.setAutoCommit(false);
-			int count = FoodDao.updateFoodBaisc(dbCon, term, fb);
-			dbCon.conn.commit();
-			if(count == 0){
-				throw new BusinessException(FoodError.UPDATE_FAIL);
-			}
-		} catch(BusinessException e){
-			dbCon.conn.rollback();
-			throw e;
-		} catch(SQLException e){
-			dbCon.conn.rollback();
-			throw e;
-		} finally {
-			dbCon.disconnect();
-		}
-	}
-	
-	/**
-	 * @deprecated
-	 * @param dbCon
-	 * @param fb
-	 * @return
-	 * @throws BusinessException
-	 * @throws SQLException
-	 */
-	private static int deleteFood(DBCon dbCon, Food fb) throws BusinessException, SQLException{
-		int count = 0;
-		String querySQL = "", deleteSQL = "", tableIDList = "";
-		
-		// 验证删除菜品是否正在营业使用过程中
-		querySQL = "SELECT A.id, A.table_id, A.table_alias, A.table_name, B.food_id, SUM(B.order_count) order_count "
-				 + " FROM " + Params.dbName + ".order A, " + Params.dbName + ".order_food B"
-				 + " WHERE A.id = B.order_id AND A.status = " + Order.Status.UNPAID.getVal() + " AND A.restaurant_id = " + fb.getRestaurantId()
-				 + " GROUP BY B.order_id, B.food_id "
-				 + " HAVING B.food_id = " + fb.getFoodId()
-				 + " ORDER BY A.table_alias ";
-		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
-		int index = 0;
-		while(dbCon.rs != null && dbCon.rs.next()){
-			if(index >= 0 && index < 5){
-				tableIDList += ((index > 0 ? "," : "") + dbCon.rs.getInt("table_alias"));
-			}else{
-				tableIDList += ".";
-			}
-			index++;
-		}
-		if(!tableIDList.trim().isEmpty()){
-			throw new BusinessException(FoodError.FOOD_IN_USED);
-		}
-		
-		// delete food
-		deleteSQL = "DELETE FROM " + Params.dbName + ".food WHERE food_id = " + fb.getFoodId() + " and restaurant_id = " + fb.getRestaurantId();
-		count = dbCon.stmt.executeUpdate(deleteSQL);
-		if(count == 0)
-			throw new BusinessException(FoodError.DELETE_FAIL);
-		
-		// delete foodTaste
-		deleteSQL = "DELETE FROM " + Params.dbName + ".food_taste_rank WHERE food_id = " + fb.getFoodId() + " and restaurant_id = " + fb.getRestaurantId();
-		dbCon.stmt.executeUpdate(deleteSQL);
-		deleteSQL = "DELETE FROM " + Params.dbName + ".food_taste WHERE food_id = " + fb.getFoodId() + " and restaurant_id = " + fb.getRestaurantId();
-		dbCon.stmt.executeUpdate(deleteSQL);
-		
-		// delete foodCombination
-		deleteSQL = "DELETE FROM " + Params.dbName + ".combo WHERE food_id = " + fb.getFoodId() + " and restaurant_id = " + fb.getRestaurantId();
-		dbCon.stmt.executeUpdate(deleteSQL);
-		
-		// delete foodPricePlan
-		deleteSQL = "DELETE FROM " + Params.dbName + ".food_price_plan WHERE food_id = " + fb.getFoodId() + " and restaurant_id = " + fb.getRestaurantId();
-		count = dbCon.stmt.executeUpdate(deleteSQL);
-		if(count == 0)
-			throw new BusinessException(PlanError.PRICE_FOOD_DELETE);
-		
-		//delete material
-		deleteSQL = "DELETE FROM material WHERE "
-				  + " material_id IN (SELECT material_id FROM " + Params.dbName + ".food_material WHERE food_id = " + fb.getFoodId() + " AND restaurant_id = " + fb.getRestaurantId() + ") "
-				  + " AND cate_id = (SELECT cate_id FROM " + Params.dbName + ".material_cate WHERE restaurant_id = " + fb.getRestaurantId() + " AND type = " + MaterialCate.Type.GOOD.getValue() + ") ";
-		dbCon.stmt.executeUpdate(deleteSQL);
-		
-		//delete foodMaterial
-		deleteSQL = "DELETE FROM " + Params.dbName + ".food_material WHERE food_id = " + fb.getFoodId() + " AND restaurant_id = " + fb.getRestaurantId();
-		dbCon.stmt.executeUpdate(deleteSQL);
-		
-		return count;
-	}
-	
-	/**
-	 * @deprecated
-	 * @param fb
-	 * @throws BusinessException
-	 * @throws SQLException
-	 */
-	private static void deleteFood(Food fb) throws BusinessException, SQLException{
-		DBCon dbCon = new DBCon();
-		try{
-			dbCon.connect();
-			dbCon.conn.setAutoCommit(false);
-			int count = FoodDao.deleteFood(dbCon, fb);
-			dbCon.conn.commit();
-			if(count == 0){
-				throw new BusinessException(FoodError.DELETE_FAIL);
-			}
-		} catch(BusinessException e){
-			dbCon.conn.rollback();
-			throw e;
-		}catch(SQLException e){
-			dbCon.conn.rollback();
-			throw e;
-		} finally{
-			dbCon.disconnect();
-		}
-	}
-	
-	/**
-	 * 
-	 * @param restaurantId
-	 * @param foodId
-	 * @param imgName
-	 * @throws BusinessException
-	 * @throws SQLException
-	 */
-	public static void updateFoodImageName(int restaurantId, int foodId, String imgName) throws BusinessException, SQLException{
-		Food fb = new Food(foodId);
-		fb.setRestaurantId(restaurantId);
-		fb.setImage(imgName);
-		updateFoodImageName(fb);
-	}
-	
-	/**
-	 * 
-	 * @param fb
-	 * @throws BusinessException
-	 * @throws SQLException
-	 */
-	public static void updateFoodImageName(Food fb) throws BusinessException, SQLException{
-		DBCon dbCon = new DBCon();
-		try{
-			dbCon.connect();
-			String updateSQL = "update " + Params.dbName + ".food set "
-						       + " img = " + (fb.getImage() == null || fb.getImage().trim().length() == 0 ? null : "'" + fb.getImage() + "'") 
-						       + " where food_id = " + fb.getFoodId() + " and restaurant_id = " + fb.getRestaurantId();
-			
-			int count = dbCon.stmt.executeUpdate(updateSQL);
-			if(count <= 0){
-				throw new BusinessException("操作失败,未更新编号为" + fb.getFoodId() + "的菜品图片信息!");
-			}
-		}finally{
-			dbCon.disconnect();
-		}
-	}
-	
-	/**
-	 * @deprecated
-	 * @param fb
-	 * @return
-	 * @throws SQLException
-	 */
-	private static Food getFoodBasicImage(Food fb) throws SQLException{
-		DBCon dbCon = new DBCon();
-		try{
-			dbCon.connect();
-			String selectSQL = "select A.img" 
-						       + " from " + Params.dbName + ".food A"
-						       + " where A.food_id = " + fb.getFoodId() + " and A.restaurant_id = " + fb.getRestaurantId();
-			dbCon.rs = dbCon.stmt.executeQuery(selectSQL);
-			if(dbCon.rs != null && dbCon.rs.next()){
-				fb.setImage(dbCon.rs.getString("img"));
-			}
-		}finally{
-			dbCon.disconnect();
-		}
-		return fb;
-	}
-
-	/**
 	 * Get the food and its related information to the specified restaurant and id as below.
 	 * 1 - Popular taste to each food
 	 * 2 - Child food details to the food in case of combo
@@ -856,7 +437,7 @@ public class FoodDao {
 		String sql;
 		sql = " SELECT " +
 			  " FOOD.restaurant_id, FOOD.food_id, FOOD.food_alias, FOOD.stock_status, " +
-			  " FOOD.name, FPP.unit_price, FPP.commission, FOOD.status, FOOD.pinyin, FOOD.taste_ref_type, " +
+			  " FOOD.name, FOOD.price, FOOD.commission, FOOD.status, FOOD.taste_ref_type, " +
 			  " FOOD.desc, FOOD.img, " +
 			  " KITCHEN.kitchen_id, KITCHEN.name AS kitchen_name, KITCHEN.display_id AS kitchen_display_id, " +
 			  " KITCHEN.type AS kitchen_type, KITCHEN.is_allow_temp AS is_allow_temp, " +
@@ -864,11 +445,7 @@ public class FoodDao {
 			  " COMBO.amount " +
 			  " FROM " +
 			  Params.dbName + ".food FOOD " + 
-		 	  " INNER JOIN " + Params.dbName + ".price_plan PP " +
-		 	  " ON FOOD.restaurant_id = PP.restaurant_id AND PP.status = " + PricePlan.Status.ACTIVITY.getVal() +
-		 	  " INNER JOIN " + Params.dbName + ".food_price_plan FPP " +
-		 	  " ON PP.price_plan_id = FPP.price_plan_id AND FOOD.food_id = FPP.food_id " +
-			  " INNER JOIN " +
+			  " JOIN " +
 			  Params.dbName + ".combo COMBO " +
 			  " ON FOOD.food_id = COMBO.sub_food_id " + 
 			  " LEFT OUTER JOIN " +
@@ -895,7 +472,7 @@ public class FoodDao {
 			childFood.setPinyin(PinyinUtil.cn2Spell(childFood.getName()));
 			childFood.setPinyinShortcut(PinyinUtil.cn2FirstSpell(childFood.getName()));
 			
-			childFood.setPrice(dbCon.rs.getFloat("unit_price"));
+			childFood.setPrice(dbCon.rs.getFloat("price"));
 			childFood.setCommission(dbCon.rs.getFloat("commission"));
 			childFood.setStatus(dbCon.rs.getShort("status"));
 			childFood.setTasteRefType(dbCon.rs.getShort("taste_ref_type"));
@@ -960,7 +537,7 @@ public class FoodDao {
 	    //get all the food information to this restaurant
 		String sql = " SELECT " +
 					 " FOOD.restaurant_id, FOOD.food_id, FOOD.food_alias, FOOD.stock_status, " +
-					 " FOOD.name, FPP.unit_price, FPP.commission, FOOD.status, FOOD.taste_ref_type, " +
+					 " FOOD.name, FOOD.price, FOOD.commission, FOOD.status, FOOD.taste_ref_type, " +
 					 " FOOD.desc, FOOD.img, " +
 					 " FOOD.order_amount, " +
 					 " KITCHEN.kitchen_id, KITCHEN.display_id AS kitchen_display_id, KITCHEN.name AS kitchen_name, " +
@@ -968,14 +545,10 @@ public class FoodDao {
 					 " DEPT.dept_id, DEPT.name AS dept_name, DEPT.type AS dept_type, DEPT.display_id AS dept_display_id " +
 					 " FROM " + 
 					 Params.dbName + ".food FOOD " +
-					 " INNER JOIN " + Params.dbName + ".price_plan PP " +
-					 " ON FOOD.restaurant_id = PP.restaurant_id AND PP.status = " + PricePlan.Status.ACTIVITY.getVal() +
-					 " INNER JOIN " + Params.dbName + ".food_price_plan FPP " +
-					 " ON PP.price_plan_id = FPP.price_plan_id AND FOOD.food_id = FPP.food_id " +
-					 " LEFT OUTER JOIN " +
+					 " JOIN " +
 					 Params.dbName + ".kitchen KITCHEN " +
 					 " ON FOOD.kitchen_id = KITCHEN.kitchen_id " +
-					 " LEFT OUTER JOIN " +
+					 " JOIN " +
 					 Params.dbName + ".department DEPT " +
 					 " ON KITCHEN.dept_id = DEPT.dept_id AND KITCHEN.restaurant_id = DEPT.restaurant_id " +
 					 " WHERE 1=1 " +
@@ -996,7 +569,7 @@ public class FoodDao {
 			f.setPinyin(PinyinUtil.cn2Spell(f.getName()));
 			f.setPinyinShortcut(PinyinUtil.cn2FirstSpell(f.getName()));
 			
-			f.setPrice(dbCon.rs.getFloat("unit_price"));
+			f.setPrice(dbCon.rs.getFloat("price"));
 			f.setCommission(dbCon.rs.getFloat("commission"));
 			f.setStatistics(new FoodStatistics(dbCon.rs.getInt("order_amount")));
 			f.setStatus(dbCon.rs.getShort("status"));

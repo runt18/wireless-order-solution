@@ -10,7 +10,6 @@ import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.frontBusiness.InsertOrder;
 import com.wireless.db.frontBusiness.UpdateOrder;
-import com.wireless.db.menuMgr.PricePlanDao;
 import com.wireless.db.regionMgr.TableDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.dishesOrder.Order;
@@ -115,9 +114,6 @@ public class OrderGroupDao {
 			try{
 				dbCon.conn.setAutoCommit(false);
 				
-				//Get the price plan which is in use to this restaurant.
-				parentOrder.setPricePlan(PricePlanDao.getActivePricePlan(dbCon, staff));
-	
 				//Set the new group's category to merged.
 				parentOrder.setCategory(Order.Category.MERGER_TBL);
 				
@@ -126,7 +122,7 @@ public class OrderGroupDao {
 				//Insert the parent order.
 				sql = " INSERT INTO " + Params.dbName + ".order " +
 					  "(`id`, `restaurant_id`, `category`, " +
-					  " `birth_date`, `order_date`, `custom_num`, `staff_id`, `waiter`, `price_plan_id`)" +
+					  " `birth_date`, `order_date`, `custom_num`, `staff_id`, `waiter`)" +
 					  " VALUES (" +
 					  "	NULL, " + 
 					  staff.getRestaurantId() + ", " + 
@@ -135,8 +131,8 @@ public class OrderGroupDao {
 					  " NOW() " + ", " +
 					  parentOrder.getCustomNum() + ", " +
 					  staff.getId() + ", " +
-					  "'" + staff.getName() + "'" + ", " +
-					  parentOrder.getPricePlan().getId() + ")";
+					  "'" + staff.getName() + "'" +
+					  ")";
 				
 				dbCon.stmt.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
 				

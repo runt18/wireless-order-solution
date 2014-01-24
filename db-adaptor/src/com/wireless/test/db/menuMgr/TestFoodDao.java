@@ -84,6 +84,7 @@ public class TestFoodDao {
 
 			Food.UpdateBuilder updateBuilder = new Food.UpdateBuilder(foodId).setAliasId(101).setName("测试修改菜品")
 													   .setKitchen(KitchenDao.getByType(mStaff, Kitchen.Type.NORMAL).get(1))
+													   .setImage("hello")
 													   .setPrice(34.2f).setDesc("测试修改描述")
 													   .setHot(false).setCommission(3).setSellOut(true).setRecommend(true)
 													   .setGift(false).setWeigh(true);
@@ -115,6 +116,7 @@ public class TestFoodDao {
 		Assert.assertEquals("kitchen : " + tag, expected.getKitchen(), actual.getKitchen());
 		Assert.assertEquals("alias : " + tag, expected.getAliasId(), actual.getAliasId());
 		Assert.assertEquals("desc : " + tag, expected.getDesc(), actual.getDesc());
+		Assert.assertEquals("image : " + tag, expected.getImage(), actual.getImage());
 		Assert.assertEquals("current price : " + tag, expected.isCurPrice(), actual.isCurPrice());
 		Assert.assertEquals("recommend : " + tag, expected.isRecommend(), actual.isRecommend());
 		Assert.assertEquals("sell out : " + tag, expected.isSellOut(), actual.isSellOut());
