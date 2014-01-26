@@ -451,4 +451,39 @@ public class DepartmentDao {
 		
 		return deptToInsert.getId();
 	}
+	
+	public static List<Department> getDeptByNomal(Staff staff, String extraCond, String otherClause) throws SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return getDeptByNomal(dbCon, staff, extraCond, otherClause);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	public static List<Department> getDeptByNomal(DBCon dbCon, Staff staff, String extraCond, String otherClause) throws SQLException{
+		String sql = " SELECT dept_id, name, type, restaurant_id " 
+				+ " FROM " 
+				+ Params.dbName + ".department " 
+				+ " WHERE restaurant_id = " + staff.getRestaurantId() 
+				+ " AND dept_id <> " + Department.DeptId.DEPT_TMP.getVal() + " AND dept_id <> " + Department.DeptId.DEPT_NULL.getVal() 
+				+ (extraCond == null ? "" : extraCond) 
+				+ " ORDER BY dept_id ";
+		
+		dbCon.rs = dbCon.stmt.executeQuery(sql);
+		List<Department> list = new ArrayList<Department>();
+		
+		while(dbCon.rs.next()){
+			Department dept = new Department();
+			dept.setId((short) dbCon.rs.getInt("dept_id"));
+			dept.setName(dbCon.rs.getString("name"));
+			dept.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
+			dept.setType(dbCon.rs.getInt("type"));
+			
+			list.add(dept);
+		}
+		
+		return list;
+	}
 }

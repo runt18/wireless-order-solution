@@ -342,7 +342,7 @@ public class FoodDao {
 		
 		Food parent = getPureById(dbCon, staff, f.getFoodId());
 		for(Food child : f.getChildFoods()){
-			parent.addChildFood(getPureById(dbCon, staff, child.getFoodId()));
+			parent.addChildFood(child);
 		}
 		
 		String sql;

@@ -337,6 +337,7 @@ public class OrderDao {
 			orderInfo.setId(dbCon.rs.getInt("id"));
 			orderInfo.setSeqId(dbCon.rs.getInt("seq_id"));
 			orderInfo.setOrderDate(dbCon.rs.getTimestamp("order_date").getTime());
+			orderInfo.setWaiter(dbCon.rs.getString("waiter"));
 			
 			orderInfo.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
 			orderInfo.setStatus(dbCon.rs.getInt("status"));
