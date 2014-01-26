@@ -239,6 +239,7 @@ public class PickFoodActivity extends FragmentActivity
 		Intent intent = new Intent();
 		Bundle bundle = new Bundle();
 		
+		//FIXME
 		TempFoodFragment fgm = (TempFoodFragment) getSupportFragmentManager().findFragmentByTag(TEMP_FOOD_FRAGMENT_TAG);
 		if(fgm != null){
 			for(OrderFood f : fgm.getValidTempFood()){

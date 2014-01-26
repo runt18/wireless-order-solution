@@ -154,6 +154,7 @@ public class TempFoodFragment extends Fragment {
 
 	@Override
 	public void onStop() {
+		//FIXME
 		if(!isSent){
 			if(mFoodPickedListener != null)
 				for(OrderFood of: getValidTempFood()){
@@ -163,10 +164,11 @@ public class TempFoodFragment extends Fragment {
 		super.onStop();
 	}
 
+	//FIXME
 	public List<OrderFood> getValidTempFood(){
 		List<OrderFood> validFoods = new ArrayList<OrderFood>();
 		for(OrderFood f : mTempFoodAdapter.getFoods()){
-			if(f.getName() != null && !f.getName().equals("") && f.getKitchen() != null){
+			if(f.getName().trim().length() != 0 && f.getKitchen().getId() != 0){
 				validFoods.add(f);
 			}
 		}
@@ -196,7 +198,7 @@ public class TempFoodFragment extends Fragment {
 			notifyDataSetChanged();
 		}
 		
-		ArrayList<OrderFood> getFoods(){
+		List<OrderFood> getFoods(){
 			return mTempFoods;
 		}
 		
@@ -239,8 +241,9 @@ public class TempFoodFragment extends Fragment {
 			}
 			
 //			默认初始化为第一个部门
-			if(food.getKitchen().getName() == null)
+			if(food.getKitchen().getId() == 0){
 				food.asFood().setKitchen(mKitchens.get(0));
+			}
 			/**
 			 * 菜名赋值
 			 */
@@ -256,8 +259,9 @@ public class TempFoodFragment extends Fragment {
 			holder.foodNameEditText.setTag(nameWatcher);
 			holder.foodNameEditText.addTextChangedListener(nameWatcher);	
 			//数量赋值
-			if(holder.amountEditText.getTag() != null)
+			if(holder.amountEditText.getTag() != null){
 				holder.amountEditText.removeTextChangedListener((TextWatcher)holder.amountEditText.getTag());
+			}
 			holder.amountEditText.setText(NumericUtil.float2String2(food.getCount()));
 			
 			FoodAmountWatcher amountWatcher = new FoodAmountWatcher();
@@ -283,22 +287,7 @@ public class TempFoodFragment extends Fragment {
 				public void onClick(View kitchenTextView) {
 					if(mKitchens.size() > 1){
 						//设置弹出框
-						final PopupWindow popWnd = new PopupWindow(
-								inflater.inflate(R.layout.pick_food_by_temp_fgm_popup_wnd, null),
-								180, LayoutParams.WRAP_CONTENT, true){
-	
-							@Override
-							public void dismiss() {
-								if(food.getKitchen() != null && !mKitchens.isEmpty())
-									if(food.getKitchen().getName() == null)
-									{
-										food.asFood().setKitchen(mKitchens.get(0));
-										mTempFoods.set(position, food);
-										holder.refresh(food);
-									}
-								super.dismiss();
-							}
-						};
+						final PopupWindow popWnd = new PopupWindow(inflater.inflate(R.layout.pick_food_by_temp_fgm_popup_wnd, null), 180, LayoutParams.WRAP_CONTENT, true);
 						popWnd.setOutsideTouchable(true);
 						popWnd.setBackgroundDrawable(getResources().getDrawable(R.drawable.popup_small));
 						popWnd.update();
@@ -361,8 +350,8 @@ public class TempFoodFragment extends Fragment {
 //				return mFood;
 //			}
 
-			public void setFood(OrderFood mFood, int position) {
-				this.mFood = mFood;
+			public void setFood(OrderFood of, int position) {
+				this.mFood = of;
 				mPosition = position;
 			}
 
@@ -387,8 +376,8 @@ public class TempFoodFragment extends Fragment {
 			private OrderFood mFood;
 			private int mPosition;
 			
-			public void setFood(OrderFood mFood, int position) {
-				this.mFood = mFood;
+			public void setFood(OrderFood of, int position) {
+				this.mFood = of;
 				mPosition = position;
 			}
 			
@@ -397,15 +386,12 @@ public class TempFoodFragment extends Fragment {
 			}
 
 			@Override
-			public void beforeTextChanged(CharSequence s, int start, int count,
-					int after) {
+			public void beforeTextChanged(CharSequence s, int start, int count,	int after) {
 			}
 
 			@Override
-			public void onTextChanged(CharSequence s, int start, int before,
-					int count) {
-				if(!s.toString().equals(""))
-				{
+			public void onTextChanged(CharSequence s, int start, int before, int count) {
+				if(!s.toString().equals("")){
 					mFood.setCount(Float.valueOf(s.toString().replace(",", ";").replace("，", "；").trim()));
 					mTempFoods.set(mPosition, mFood);
 				}
@@ -416,8 +402,8 @@ public class TempFoodFragment extends Fragment {
 			private OrderFood mFood;
 			private int mPosition;
 			
-			public void setFood(OrderFood mFood, int position) {
-				this.mFood = mFood;
+			public void setFood(OrderFood of, int position) {
+				this.mFood = of;
 				mPosition = position;
 			}
 			@Override
@@ -430,8 +416,7 @@ public class TempFoodFragment extends Fragment {
 
 			@Override
 			public void afterTextChanged(Editable s) {
-				if(!s.toString().equals(""))
-				{
+				if(!s.toString().equals("")){
 					mFood.asFood().setPrice(Float.valueOf(s.toString()));
 					mTempFoods.set(mPosition, mFood);
 				}
