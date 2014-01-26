@@ -6,7 +6,9 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
+import com.alibaba.fastjson.JSON;
 import com.wireless.exception.BusinessException;
 import com.wireless.util.WebParams;
 
@@ -104,24 +106,44 @@ public class JObject implements Jsonable {
 
 	@Override
 	public List<Object> toJsonList(int flag) {
-		
 		return null;
+	}
+	
+	@SuppressWarnings("unchecked")
+	private Map<String, Object> toJsonMap(Map<String, Object> src){
+		Map<String, Object> map = new LinkedHashMap<String, Object>();
+		for(Entry<String, Object> entry : src.entrySet()){
+			if(entry.getValue() instanceof Jsonable){
+				map.put(entry.getKey(), toJsonMap(((Jsonable)entry.getValue()).toJsonMap(0)));
+				
+			}else if(entry.getValue() instanceof Map){
+				map.put(entry.getKey(), toJsonMap((Map<String, Object>)entry.getValue()));
+				
+			}else if(entry.getValue() instanceof List){
+				List<Map<String, Object>> lm = new ArrayList<Map<String, Object>>();
+				for(Object item : (List<?>)entry.getValue()){
+					if(item instanceof Jsonable){
+						lm.add(toJsonMap(((Jsonable)item).toJsonMap(0)));
+						
+					}else if(item instanceof Map){
+						lm.add(toJsonMap((Map<String, Object>)item));
+						
+					}else{
+						throw new IllegalArgumentException("The item put to json map can ONLY be map or jsonable.");
+					}
+				}
+				map.put(entry.getKey(), lm);	
+				
+			}else{
+				map.put(entry.getKey(), entry.getValue());
+			}
+		}
+		return map;
 	}
 	
 	@Override
 	public String toString() {
-		JsonPackage jp = new JsonPackage(this, 0, Jsonable.Type.PAIR);
-		return jp.toString();
-	}
-	
-	public String toString(int flag) {
-		JsonPackage jp = new JsonPackage(this, flag, Jsonable.Type.PAIR);
-		return jp.toString();
-	}
-	
-	public String toString(Jsonable.Type type) {
-		JsonPackage jp = new JsonPackage(this, 0, type);
-		return jp.toString();
+		return JSON.toJSONString(toJsonMap(toJsonMap(0)));
 	}
 	
 	public boolean isSuccess() {
