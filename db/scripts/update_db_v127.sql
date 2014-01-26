@@ -230,4 +230,46 @@ JOIN wireless_order_db.food_price_plan FPP ON F.food_id = FPP.food_id
 JOIN wireless_order_db.price_plan PP ON FPP.price_plan_id = PP.price_plan_id AND PP.status = 1
 SET F.price = FPP.unit_price, F.commission = FPP.commission;
 
+-- -----------------------------------------------------
+-- Drop the table 'sub_order', 'sub_order_history', 'order_group', 'order_group_history', 'terminal'
+-- -----------------------------------------------------
+DROP TABLE 
+`wireless_order_db`.`sub_order`, 
+`wireless_order_db`.`sub_order_history`,
+`wireless_order_db`.`order_group`, 
+`wireless_order_db`.`order_group_history`,
+`wireless_order_db`.`terminal`;
+
+-- -----------------------------------------------------
+-- Table `wireless_order_db`.`coupon_type`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `wireless_order_db`.`coupon_type` ;
+
+CREATE TABLE IF NOT EXISTS `wireless_order_db`.`coupon_type` (
+  `coupon_type_id` INT NOT NULL AUTO_INCREMENT,
+  `name` VARCHAR(45) NOT NULL,
+  `price` FLOAT NOT NULL,
+  `expired` DATETIME NULL DEFAULT NULL,
+  PRIMARY KEY (`coupon_type_id`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
+-- -----------------------------------------------------
+-- Table `wireless_order_db`.`coupon_state`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `wireless_order_db`.`coupon_state` ;
+
+CREATE TABLE IF NOT EXISTS `wireless_order_db`.`coupon_state` (
+  `coupon_id` INT NOT NULL AUTO_INCREMENT,
+  `coupon_type_id` INT NOT NULL,
+  `birth_date` DATETIME NOT NULL,
+  `member_id` INT NOT NULL,
+  `order_id` INT NULL DEFAULT NULL,
+  `order_date` DATETIME NULL DEFAULT NULL,
+  `status` TINYINT NOT NULL DEFAULT 1 COMMENT 'the status as below.\n1 - 已发放\n2 - 已使用\n3 - 已过期',
+  PRIMARY KEY (`coupon_id`),
+  INDEX `ix_coupon_type_id` (`coupon_type_id` ASC))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
 SET SQL_SAFE_UPDATES = @OLD_SAFE_UPDATES;
