@@ -9,7 +9,32 @@
 * return the encrypted string
 */
 //密钥
-KEYS = "mi";
+function setDynamicKey(href, params){
+	Ext.Ajax.request({
+		url : '../../QueryDynamicKey.do',
+		success : function(res, ope){
+			var jr = Ext.decode(res.responseText);
+			location.href = href +"?"+ strEncode(params, jr);
+		},
+		failure : function(){
+			Ext.ux.show();
+		}
+	});
+}
+
+function getDynamicKey(params){
+	$.ajax({
+        cache: false,
+        async: false,   
+        dataType: 'json', 
+        type: 'post',
+        url: '../../QueryDynamicKey.do',
+        success: function (jr){ 
+			return strEncode(params, jr);
+        }
+    });
+    
+}
 
 //加密方法
 function strEncode(data,firstKey,secondKey,thirdKey){
@@ -176,6 +201,7 @@ function strEncode(data,firstKey,secondKey,thirdKey){
 */
 //解密方法
 function strDecode(data,firstKey,secondKey,thirdKey){
+
  var leng = data.length;
  var decStr = "";
  var firstKeyBt,secondKeyBt,thirdKeyBt,firstLength,secondLength,thirdLength;

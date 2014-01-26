@@ -434,20 +434,19 @@ function oOrderGroup(_c){
 						success : function(res, opt){
 							btnSave.setDisabled(false);
 							btnCancel.setDisabled(false);
+
 							var jr = Ext.decode(res.responseText);
 							if(jr.success){
 								if(orderGroupWin.otype == 1){
-									location.href = "OrderMain.html?"+ 
-										strEncode('restaurantID=' + restaurantID
+									setDynamicKey("OrderMain.html", 'restaurantID=' + restaurantID
 										+ "&category=" + 4
 										+ "&tableAliasID=" + tables[0].alias
 										+ "&orderID=" + jr.other.orderID
-										+ "&ts=" + 1, 'mi');  // 团体操作暂定为都是改单操作
+										+ "&ts=" + 1);  // 团体操作暂定为都是改单操作
 								}else if(orderGroupWin.otype == 2){
-									location.href = "CheckOut.html?" +
-										 		strEncode('restaurantID=' + restaurantID
+									setDynamicKey("CheckOut.html", 'restaurantID=' + restaurantID
 												 + "&category=" + 4
-												 + "&orderID=" + (otype == 1 ? parentID : jr.other.orderID), 'mi');
+												 + "&orderID=" + (otype == 1 ? parentID : jr.other.orderID));
 								}
 							}else{
 								Ext.ux.showMsg(jr);

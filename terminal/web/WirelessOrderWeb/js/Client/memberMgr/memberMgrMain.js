@@ -303,7 +303,7 @@ function queryMemberOperationHandler(title, url, params){
 			modal : true,
 			closable : false,
 			resizable : false,
-			width : 1200,
+			width : 1320,
 			height : 500,
 			keys : [{
 				key : Ext.EventObject.ESC,

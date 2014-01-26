@@ -232,7 +232,27 @@ function commissionDetailInit(){
 						}
 					});
 				}
-			}]
+			},'-', {
+			text : '导出',
+			iconCls : 'icon_tb_exoprt_excel',
+			handler : function(){
+				if(!commission_beginDate.isValid() || !commission_endDate.isValid()){
+					return;
+				}
+				var sn = commissionDeptTree.getSelectionModel().getSelectedNode();
+				var url = '../../{0}?beginDate={1}&endDate={2}&staffId={3}&deptId={4}&dataSource={5}';
+				url = String.format(
+						url, 
+						'ExportHistoryStatisticsToExecl.do', 
+						commission_beginDate.getValue().format('Y-m-d 00:00:00'), 
+						commission_endDate.getValue().format('Y-m-d 23:59:59'),
+						commission_combo_staffs.getValue(),
+						sn ? sn.id : "-1",
+						'commissionStatisticsList'
+				);
+				window.location = url;
+			}
+		}]
 	});
 	var pagingBar = new Ext.PagingToolbar({
 	   pageSize : limitCount,	//显示记录条数
@@ -423,7 +443,26 @@ function commissionTotalInit(){
 						}
 					});
 				}
-			}]
+			},'-', {
+			text : '导出',
+			iconCls : 'icon_tb_exoprt_excel',
+			handler : function(){
+				if(!commissionTotal_beginDate.isValid() || !commissionTotal_endDate.isValid()){
+					return;
+				}
+				var sn = commissionTotalDeptTree.getSelectionModel().getSelectedNode();
+				var url = '../../{0}?beginDate={1}&endDate={2}&deptId={3}&dataSource={4}';
+				url = String.format(
+						url, 
+						'ExportHistoryStatisticsToExecl.do', 
+						commissionTotal_beginDate.getValue().format('Y-m-d 00:00:00'), 
+						commissionTotal_endDate.getValue().format('Y-m-d 23:59:59'),
+						sn ? sn.id : "-1",
+						'commissionTotalList'
+				);
+				window.location = url;
+			}
+		}]
 	});
 	var pagingBar = new Ext.PagingToolbar({
 	   pageSize : limitCount,	//显示记录条数

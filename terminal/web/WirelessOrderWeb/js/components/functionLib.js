@@ -40,11 +40,30 @@ function checkUserSessionStatus(conn,response,options){
 } 
 
 Ext.override(Ext.tree.TreeEventModel, {
+	delegateClick : function(e, t){
+        if(!this.beforeEvent(e)){
+            return;
+        }
+
+        if(e.getTarget('input[type=checkbox]', 1)){
+            this.onCheckboxClick(e, this.getNode(e));
+        }
+        else if(e.getTarget('.x-tree-ec-icon', 1)){
+            this.onIconClick(e, this.getNode(e));
+        }
+        else if(this.getNodeTarget(e)){
+			this.tree.getSelectionModel().selNode = this.getNode(e);
+			
+            this.onNodeClick(e, this.getNode(e));
+        }
+    }
+});
+/*Ext.override(Ext.tree.TreeEventModel, {
 	onNodeClick : function(e, node) {
 		this.tree.getSelectionModel().select(node);
 		node.ui.onClick(e);
 	}
-});
+});*/
 Ext.override(Ext.tree.TreeNodeUI, {
 	onDblClick : function(e){
 		e.preventDefault();
@@ -81,21 +100,33 @@ Ext.ux.otype = {
 
 //从url获取当前桌信息
 function URLParaQuery() {
-	var name, value, i;
+	var name, value, i, key = 0;
 	var str = location.href;
 	var num = str.indexOf("?");
-	str = str.substr(num + 1);
-	//"mi" is the key
-	str = strDecode(str, KEYS);
-	var arrtmp = str.split("&");
-	for (i = 0; i < arrtmp.length; i++) {
-		num = arrtmp[i].indexOf("=");
-		if (num > 0) {
-			name = arrtmp[i].substring(0, num);
-			value = arrtmp[i].substr(num + 1);
-			this[name] = value;
+	if(num > 0){
+		str = str.substr(num + 1);
+		$.ajax({
+            cache: false,
+            async: false,   
+            dataType: 'json', 
+            type: 'post',
+            url: '../../QueryDynamicKey.do',
+            success: function (jr){ 
+				key = jr;
+            }
+        });
+        str = strDecode(str, key);
+		var arrtmp = str.split("&");
+		for (i = 0; i < arrtmp.length; i++) {
+			num = arrtmp[i].indexOf("=");
+			if (num > 0) {
+				name = arrtmp[i].substring(0, num);
+				value = arrtmp[i].substr(num + 1);
+				this[name] = value;
+			}
 		}
 	}
+
 }
 
 
@@ -303,11 +334,11 @@ function showFloatOption(obj_b){
 		nodey = liOffset.top;
 		barY = ($("#"+obj_b.treeId).find("ul").height() + nodey);
 		
-		$("#"+obj_b.treeId).find(".x-tree-node-leaf").mouseover(function(){
+		$("#"+obj_b.treeId).find(".x-tree-node-leaf, .floatBarStyle").mouseover(function(){
 			floatBarNodeId = $(this).attr("ext:tree-node-id");
 			offset = $(this).find("a").offset();
-			nodex = offset.left-18;
-			barX = (offset.left+$(this).find("a").width()+100);
+			nodex = offset.left - 18;
+			barX = (offset.left + $(this).find("a").width() + 100);
 			$('#div_floatBar').css({left :offset.left+$(this).find("a").width(), top : (offset.top-2)});
 			$('#div_floatBar').show();
 		});

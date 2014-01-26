@@ -1,4 +1,4 @@
-﻿
+
 
 /**
  * 修改部门信息
@@ -276,6 +276,7 @@ var kitchenGrid;
 var updateKitchenWin;
 var deptTreeFloat_obj = {treeId : 'cancelledFoodDeptTree', option : [{name : '修改', fn : 'updateDeptHandler()'}]};
 Ext.onReady(function() {
+	
 	deptTree = new Ext.tree.TreePanel({
 		title : '部门信息',
 		id : 'cancelledFoodDeptTree',
@@ -284,11 +285,13 @@ Ext.onReady(function() {
 		border : true,
 		rootVisible : true,
 		frame : true,
+		autoScroll:true,
+		enableDD : true,
 		bodyStyle : 'backgroundColor:#FFFFFF; border:1px solid #99BBE8;',
 		loader : new Ext.tree.TreeLoader({
-			dataUrl : '../../QueryDeptTree.do?time='+new Date(),
+			dataUrl : '../../QueryKitchen.do',
 			baseParams : {
-				'restaurantID' : restaurantID
+				dataSource : 'deptKitchenTree'
 			}
 		}),
 		root : new Ext.tree.AsyncTreeNode({
@@ -376,8 +379,8 @@ Ext.onReady(function() {
 					
 					kitchenGrid.getStore().load({
 						params : {
-							start : 0,
 							limit : 50,
+							start : '0',
 							deptID : deptID,
 							kitchenName : kitchenName
 						}
@@ -436,5 +439,7 @@ Ext.onReady(function() {
 		height : parseInt(Ext.getDom('divDept').parentElement.style.height.replace(/px/g,'')),
 		items : [deptTree, kitchenGrid]
 	});
-	showFloatOption(deptTreeFloat_obj);
+	
+	
+//	showFloatOption(deptTreeFloat_obj);
 });

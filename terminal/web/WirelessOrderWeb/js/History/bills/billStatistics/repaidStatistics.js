@@ -142,7 +142,25 @@ function initGrid(){
 						}
 					});
 				}
-			}]
+			},'-', {
+			text : '导出',
+			iconCls : 'icon_tb_exoprt_excel',
+			handler : function(){
+				if(!repaid_beginDate.isValid() || !repaid_endDate.isValid()){
+					return;
+				}
+				var url = '../../{0}?beginDate={1}&endDate={2}&staffId={3}&dataSource={4}';
+				url = String.format(
+						url, 
+						'ExportHistoryStatisticsToExecl.do', 
+						repaid_beginDate.getValue().format('Y-m-d 00:00:00'), 
+						repaid_endDate.getValue().format('Y-m-d 23:59:59'),
+						repaid_combo_staffs.getValue(),
+						'repaidStatisticsList'
+					);
+				window.location = url;
+			}
+		}]
 	});
 	var pagingBar = new Ext.PagingToolbar({
 	   pageSize : limitCount,	//显示记录条数

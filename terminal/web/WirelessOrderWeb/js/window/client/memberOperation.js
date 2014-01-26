@@ -177,6 +177,14 @@ Ext.onReady(function(){
 		readOnly : true,
 		allowBlank : false
 	});
+	
+	var cdd_search_dateCombo = Ext.ux.createDateCombo({
+		beginDate : cdd_search_onDuty,
+		endDate : cdd_search_offDuty,
+		callback : function(){
+			cdd_searchMemberOperation();
+		}
+	});
 	var cdd_mo_tbar = new Ext.Toolbar({
 		height : 26,
 		items : [{
@@ -185,7 +193,6 @@ Ext.onReady(function(){
 		}, {
 			xtype : 'radio',
 			name : 'cdd_search_radioDataSource',
-			checked : true,
 			inputValue : 'today',
 			boxLabel : '当日&nbsp;',
 			listeners : {
@@ -193,6 +200,7 @@ Ext.onReady(function(){
 					if(e.getValue()){
 						cdd_search_onDuty.setDisabled(true);
 						cdd_search_offDuty.setDisabled(true);
+						cdd_search_dateCombo.setDisabled(true);
 					}
 				}
 			}
@@ -201,6 +209,7 @@ Ext.onReady(function(){
 			name : 'cdd_search_radioDataSource',
 			inputValue : 'history',
 			boxLabel : '历史',
+			checked : true,
 			hideParent : true,
 			hidden : cdd_modal ? false : true,
 			listeners : {
@@ -208,13 +217,17 @@ Ext.onReady(function(){
 					if(e.getValue()){
 						cdd_search_onDuty.setDisabled(false);
 						cdd_search_offDuty.setDisabled(false);
+						cdd_search_dateCombo.setDisabled(false);
 					}
 				}
 			}
 		}, { 
 			xtype : 'tbtext', 
 			text : (cdd_modal ? '&nbsp;&nbsp;日期:&nbsp;' : ' ')
-		}, cdd_search_onDuty, { 
+		}, cdd_search_dateCombo, {
+			xtype : 'tbtext',
+			text : '&nbsp;&nbsp;'
+		},cdd_search_onDuty, { 
 			xtype : 'tbtext',
 			text : (cdd_modal ? '&nbsp;至&nbsp;' : ' ')
 		}, cdd_search_offDuty, {
@@ -273,7 +286,8 @@ Ext.onReady(function(){
 	cdd_mo_grid.frame = false;
 	cdd_mo_grid.border = false;
 	cdd_mo_grid.on('render', function(thiz){
-		cdd_searchMemberOperation();
+		cdd_search_dateCombo.setValue(1);
+		cdd_search_dateCombo.fireEvent('select', cdd_search_dateCombo, null, 1);
 	});
 	cdd_mo_grid.getStore().on('beforeload', function(){
 		if(cdd_search_comboOperateType.getValue() == 1){

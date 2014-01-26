@@ -2,6 +2,58 @@ var mcd_mo_grid, mcd_panelMemberOperationContent;
 var mcd_search_comboOperateType, mcd_search_memberType, mcd_search_memerbMobile, mcd_search_memerbCard
 	,mcd_search_onDuty, mcd_search_offDuty, mcd_search_memberName;
 var mcd_modal = true;
+
+function member_showViewBillWin(){
+	member_viewBillWin = new Ext.Window({
+		layout : 'fit',
+		title : '查看账单',
+		width : 510,
+		height : 550,
+		resizable : false,
+		closable : false,
+		modal : true,
+		bbar : ['->', {
+			text : '关闭',
+			iconCls : 'btn_close',
+			handler : function() {
+				member_viewBillWin.destroy();
+			}
+		}],
+		keys : [{
+			key : Ext.EventObject.ESC,
+			scope : this,
+			fn : function(){
+				member_viewBillWin.destroy();
+			}
+		}],
+		listeners : {
+			show : function(thiz) {
+				var sd = Ext.ux.getSelData(mcd_mo_grid);
+				thiz.load({
+					url : '../window/history/viewBillDetail.jsp', 
+					scripts : true,
+					params : {
+						orderId : sd.orderId,
+						queryType : 'History'
+					},
+					method : 'post'
+				});
+				thiz.center();	
+			}
+		}
+	});
+}
+
+function member_billViewHandler() {
+	member_showViewBillWin();
+	member_viewBillWin.show();
+	member_viewBillWin.center();
+};
+
+function linkOrderId(v){
+	return '<a href=\"javascript:member_billViewHandler()\">'+ v +'</a>';
+}
+
 Ext.onReady(function(){
 	var pe = Ext.query('#divMemberConsumeDetails')[0].parentElement;
 	var mw = parseInt(pe.style.width);
@@ -108,6 +160,15 @@ Ext.onReady(function(){
 		readOnly : true,
 		allowBlank : false
 	});
+	var mcd_search_dateCombo = Ext.ux.createDateCombo({
+		beginDate : mcd_search_onDuty,
+		endDate : mcd_search_offDuty,
+		callback : function(){
+			mcd_searchMemberOperation();
+		}
+	});
+	
+	
 	
 	mcd_search_memberName = new Ext.form.TextField({
 		xtype : 'textfield',
@@ -122,7 +183,7 @@ Ext.onReady(function(){
 		}, {
 			xtype : 'radio',
 			name : 'mcd_search_radioDataSource',
-			checked : true,
+			
 			inputValue : 'today',
 			boxLabel : '当日&nbsp;',
 			listeners : {
@@ -130,6 +191,7 @@ Ext.onReady(function(){
 					if(e.getValue()){
 						mcd_search_onDuty.setDisabled(true);
 						mcd_search_offDuty.setDisabled(true);
+						mcd_search_dateCombo.setDisabled(true);
 					}
 				}
 			}
@@ -139,18 +201,23 @@ Ext.onReady(function(){
 			inputValue : 'history',
 			boxLabel : '历史',
 			hideParent : true,
+			checked : true,
 			hidden : mcd_modal ? false : true,
 			listeners : {
 				check : function(e){
 					if(e.getValue()){
 						mcd_search_onDuty.setDisabled(false);
 						mcd_search_offDuty.setDisabled(false);
+						mcd_search_dateCombo.setDisabled(false);
 					}
 				}
 			}
 		}, { 
 			xtype : 'tbtext', 
 			text : (mcd_modal ? '&nbsp;&nbsp;日期:&nbsp;' : ' ')
+		}, mcd_search_dateCombo, {
+			xtype : 'tbtext',
+			text : '&nbsp;&nbsp;'
 		}, mcd_search_onDuty, { 
 			xtype : 'tbtext',
 			text : (mcd_modal ? '&nbsp;至&nbsp;' : ' ')
@@ -232,7 +299,7 @@ Ext.onReady(function(){
 		'../../QueryMemberOperation.do',
 		[
 			[true, false, false, true], 
-			['单据号', 'orderId', 110],
+			['账单号', 'orderId', 110, 'center', 'linkOrderId'],
 			['消费时间', 'operateDateFormat'],
 			['会员名称', 'member.name', 60],
 			['会员类型', 'member.memberType.name'],
@@ -242,7 +309,7 @@ Ext.onReady(function(){
 			['备注', 'comment', 200, 'center']
 		],
 		MemberOperationRecord.getKeys(),
-		[ ['isPaging', true], ['restaurantID', restaurantID], ['isCookie', true]],
+		[ ['isPaging', true], ['restaurantID', restaurantID]],
 		GRID_PADDING_LIMIT_20,
 		'',
 		mcd_mo_tbar
@@ -250,7 +317,8 @@ Ext.onReady(function(){
 	mcd_mo_grid.frame = false;
 	mcd_mo_grid.border = false;
 	mcd_mo_grid.on('render', function(thiz){
-		mcd_searchMemberOperation();
+		mcd_search_dateCombo.setValue(1);
+		mcd_search_dateCombo.fireEvent('select', mcd_search_dateCombo, null, 1);
 	});
 	mcd_mo_grid.getStore().on('load', function(){
 //		mcd_search_memerbCard.setValue();

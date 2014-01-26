@@ -275,11 +275,10 @@ function tableListReflash(node) {
 //							success : function(res, opt){
 //								var jr = Ext.decode(res.responseText);
 //								if(jr.success){
-									location.href = "OrderMain.html?"+ strEncode('restaurantID=' + restaurantID
+									setDynamicKey("OrderMain.html", 'restaurantID=' + restaurantID
 											+ "&ts=0"
 											+ "&tableAliasID=" + selectedTable
-											+ "&category=" + CATE_NORMAL
-											, 'mi');
+											+ "&category=" + CATE_NORMAL);
 //								}else{
 //									lm.hide();
 //									jr['icon'] = Ext.MessageBox.WARNING;
@@ -292,7 +291,7 @@ function tableListReflash(node) {
 //						});
 
 					} else {
-						location.href = "CheckOut.html?"+ strEncode('restaurantID=' + restaurantID+ "&tableID=" + selectedTable, 'mi');
+						setDynamicKey("CheckOut.html", 'restaurantID=' + restaurantID+ "&tableID=" + selectedTable);
 					}
 					break;
 				}

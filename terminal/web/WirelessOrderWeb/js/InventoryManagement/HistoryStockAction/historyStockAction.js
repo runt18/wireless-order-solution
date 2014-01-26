@@ -246,9 +246,6 @@ var hideTopTBar;
 //var date , maxDate;
 
 Ext.onReady(function(){
-	
-	Ext.BLANK_IMAGE_URL = '../../extjs/resources/images/default/s.gif';
-	Ext.QuickTips.init();
 	Ext.form.Field.prototype.msgTarget = 'side';
 	
 	function stockOperateRenderer(){

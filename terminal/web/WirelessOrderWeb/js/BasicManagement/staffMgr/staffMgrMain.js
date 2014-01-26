@@ -196,12 +196,12 @@ var pushBackBut = new Ext.ux.ImageButton({
 				buttons : Ext.MessageBox.YESNO,
 				fn : function(btn) {
 					if (btn == 'yes') {
-						location.href = 'SystemProtal.html?'+ strEncode('restaurantID=' + restaurantID, 'mi');
+						location.href = 'SystemProtal.html?'+ strEncode('restaurantID=' + restaurantID, KEYS);
 					}
 				}
 			});
 		} else {
-			location.href = 'SystemProtal.html?'+ strEncode('restaurantID=' + restaurantID, 'mi');
+			location.href = 'SystemProtal.html?'+ strEncode('restaurantID=' + restaurantID, KEYS);
 		}
 	}
 });

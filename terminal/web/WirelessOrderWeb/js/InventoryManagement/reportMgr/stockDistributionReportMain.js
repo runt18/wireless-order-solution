@@ -138,8 +138,6 @@ var materialComb = new Ext.form.ComboBox({
 var deptTree;
 var stockDistributionGrid;
 Ext.onReady(function(){
-	Ext.BLANK_IMAGE_URL = '../../extjs/resources/images/default/s.gif';
-	Ext.QuickTips.init();
 	Ext.form.Field.prototype.msgTarget = 'side';
 	
 	deptTree = new Ext.tree.TreePanel({

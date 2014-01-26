@@ -1,5 +1,430 @@
 ﻿
 //-------------lib.js---------
+
+function floatBarDeleteHandler(){
+	var tn = Ext.ux.getSelNode(kitchenTreeForSreach);
+	if(!tn){
+		Ext.example.msg('提示', '操作失败, 请选中一条数据再进行操作.');
+		return;
+	}
+	if(typeof tn.attributes.kid != 'undefined'){
+		deleteKitchenHandler(tn);
+	}else{
+		deleteDeptHandler(tn);
+	}
+}
+
+function floatBarUpdateHandler(){
+	var tn = Ext.ux.getSelNode(kitchenTreeForSreach);
+	if(!tn){
+		Ext.example.msg('提示', '操作失败, 请选中一条数据再进行操作.');
+		return;
+	}
+	if(typeof tn.attributes.kid != 'undefined'){
+		updateKitchenWin.otype = 'update';
+		operateKitchenHandler(tn);
+	}else{
+		updateDeptWin.otype = 'update';
+		operateDeptHandler(tn);
+	}
+}
+
+
+function foodRelationWinShow(){
+	
+	foodRelationOperationWin.show();
+	foodRelationOperationWin.center();
+	foodRelationOperationWin.setTitle(Ext.ux.getSelData(menuGrid)['name']);
+	foodOperationHandler({
+		win : 'relation',
+		type : mmObj.operation.select
+	});
+}
+
+
+function operateKitchenHandler(node){
+	var kitchenID = Ext.getCmp('txtKitchenID');
+	var kitchenName = Ext.getCmp('txtKitchenName');
+	var kitchenDept = Ext.getCmp('comboKitchenDept');
+	var isAllowTemp = Ext.getCmp('comboIsAllowTemp');
+	
+	if(updateKitchenWin.otype == 'insert'){
+		kitchenID.setValue();
+		kitchenName.setValue();
+		kitchenName.clearInvalid();
+		node = kitchenTreeForSreach.getSelectionModel().getSelectedNode();
+		if(node){
+			kitchenDept.setValue(node.attributes.deptID);
+		}
+		kitchenDept.clearInvalid();
+		
+	}else if(updateKitchenWin.otype == 'update'){
+		
+		kitchenID.setValue(node.attributes.kid);
+		kitchenName.setValue(node.text);
+		kitchenDept.setValue(node.attributes.belongDept);
+		isAllowTemp.setValue(node.attributes.isAllowTemp);
+		
+	}
+	kitchenName.focus(true, 100);	
+	updateKitchenWin.show();
+	updateKitchenWin.center();
+	
+}
+
+function deleteKitchenHandler(node){
+	Ext.Msg.confirm(
+		'提示',
+		'是否删除: ' + node.text,
+		function(e){
+			if(e == 'yes'){
+				Ext.Ajax.request({
+					url : '../../OperateKitchen.do',
+					params : {
+						kitchenID : node.attributes.kid,
+						dataSource : 'removeKitchen'
+					},
+					success : function(res, opt){
+						var jr = Ext.util.JSON.decode(res.responseText);
+						if(jr.success){
+							Ext.example.msg(jr.title, String.format(Ext.ux.txtFormat.deleteSuccess, node.text));
+							kitchenTreeForSreach.getRootNode().reload();
+						}else{
+							Ext.ux.showMsg(jr);
+						}
+					},
+					failure : function(res, opt){
+						Ext.ux.showMsg(Ext.util.JSON.decode(res.responseText));
+					}
+				});
+			}
+		}
+	);
+}
+
+function updateKitchenHandler(){
+	updateKitchenWin.otype = 'update';
+	operateKitchenHandler();
+}
+
+function initDeptData(){
+	var combo_deptData = [];
+	var thiz = Ext.getCmp('comboKitchenDept');
+	Ext.Ajax.request({
+		url : '../../QueryDept.do',
+		params : {
+			dataSource : 'normal',
+			isDept : true
+		},
+		success : function(res, opt){
+			var jr = Ext.decode(res.responseText);
+			for(var i = 0; i < jr.root.length; i++){
+				combo_deptData.push([jr.root[i]['id'], jr.root[i]['name']]);
+			}
+			thiz.store.loadData(combo_deptData);
+		},
+		fialure : function(res, opt){
+			thiz.store.loadData(combo_deptData);
+		}
+	});
+	
+	var combo_kitchenData = [];
+	var combo_kitchen = Ext.getCmp('cmbBasicForKitchenAlias');
+	Ext.Ajax.request({
+		url : '../../QueryKitchen.do',
+		params : {
+			dataSource : 'normal'
+		},
+		success : function(res, opt){
+			var jr = Ext.decode(res.responseText);
+			for(var i = 0; i < jr.root.length; i++){
+				combo_kitchenData.push([jr.root[i]['id'], jr.root[i]['name']]);
+			}
+			combo_kitchen.store.loadData(combo_kitchenData);
+		},
+		fialure : function(res, opt){
+			combo_kitchen.store.loadData(combo_kitchenData);
+		}
+	});
+	
+}
+function kitchenWinShow(){
+
+	updateKitchenWin = Ext.getCmp('dept_updateKitchenWin');
+	if(!updateKitchenWin){
+		updateKitchenWin = new Ext.Window({
+			id : 'dept_updateKitchenWin',
+			title : '添加分厨信息',
+			closable : false,
+			resizable : false,
+			modal : true,
+			width : 245,			
+			items : [{
+				xtype : 'form',
+				layout : 'form',
+				width : 245,
+				labelWidth : 65,
+				frame : true,
+				items : [{
+					xtype : 'hidden',
+					id : 'txtKitchenID',
+					fieldLabel : '厨房编号'
+				}, {
+					xtype : 'textfield',
+					id : 'txtKitchenName',
+					width : 130,
+					fieldLabel : '厨房名称',
+					allowBlank : false
+				}, {
+ 	    	    	xtype : 'combo',
+ 	    	    	id : 'comboKitchenDept',
+ 	    	    	fieldLabel : '所属部门',
+ 	    	    	width : 130,
+ 	    	    	store : new Ext.data.SimpleStore({
+						fields : [ 'deptID', 'deptName']
+					}),
+					valueField : 'deptID',
+					displayField : 'deptName',
+					mode : 'local',
+					triggerAction : 'all',
+					typeAhead : true,
+					selectOnFocus : true,
+					forceSelection : true,
+					allowBlank : false,
+					blankText : '该项部门不能为空.'
+ 	    	    }, {
+ 	    	    	xtype : 'combo',
+ 	    	    	id : 'comboIsAllowTemp',
+ 	    	    	fieldLabel : '允许临时菜',
+ 	    	    	width : 130,
+ 	    	    	value : 0,
+ 	    	    	store : new Ext.data.SimpleStore({
+						fields : [ 'value', 'text'],
+						data : [[false,'否'], [true, '是']]
+					}),
+					valueField : 'value',
+					displayField : 'text',
+					mode : 'local',
+					triggerAction : 'all',
+					typeAhead : true,
+					selectOnFocus : true,
+					forceSelection : true,
+					allowBlank : false,
+					blankText : '该项不能为空.'
+ 	    	    }]
+			}],
+			bbar : [
+				'->',
+				{
+					text : '保存',
+					id : 'btnSaveUpdateKitchen',
+					iconCls : 'btn_save',
+					handler : function(){
+						
+						var kitchenID = Ext.getCmp('txtKitchenID');
+						var kitchenName = Ext.getCmp('txtKitchenName');
+						var kitchenDept = Ext.getCmp('comboKitchenDept');
+						var isAllowTemp = Ext.getCmp('comboIsAllowTemp');
+						var dataSource = '';
+						
+						if(!kitchenName.isValid() || !kitchenDept.isValid() || !isAllowTemp.isValid()){
+							return;
+						}
+						
+						if(updateKitchenWin.otype == 'insert'){
+							dataSource = 'addKitchen';
+							
+						}else if(updateKitchenWin.otype == 'update'){
+							dataSource = 'updateKitchen';
+						}
+						
+						var save = Ext.getCmp('btnSaveUpdateKitchen');
+						var cancel = Ext.getCmp('btnCancelUpdateKitchen');
+						
+						save.setDisabled(true);
+						cancel.setDisabled(true);
+						Ext.Ajax.request({
+							url : '../../OperateKitchen.do',
+							params : {
+								dataSource : dataSource,
+								kitchenID : kitchenID.getValue(),
+								kitchenName : kitchenName.getValue(),
+								deptID : kitchenDept.getValue(),
+								isAllowTemp : isAllowTemp.getValue()
+							},
+							success : function(res, opt){
+								var jr = Ext.util.JSON.decode(res.responseText);
+								if(jr.success){
+									Ext.example.msg(jr.title, jr.msg);
+									updateKitchenWin.hide();
+									kitchenTreeForSreach.getRootNode().reload();
+								}else{
+									Ext.ux.showMsg(jr);
+								}
+								save.setDisabled(false);
+								cancel.setDisabled(false);
+							},
+							failure : function(res, opt) {
+								Ext.ux.showMsg(Ext.util.JSON.decode(res.responseText));
+								save.setDisabled(false);
+								cancel.setDisabled(false);
+							}
+						});
+						
+					}
+				}, {
+					text : '关闭',
+					id : 'btnCancelUpdateKitchen',
+					iconCls : 'btn_close',
+					handler : function(){
+						updateKitchenWin.hide();
+					}
+				}
+			],
+			keys : [{
+				 key : Ext.EventObject.ENTER,
+				 fn : function(){ 
+					 Ext.getCmp('btnSaveUpdateKitchen').handler();
+				 },
+				 scope : this 
+			 }]
+		});
+	}
+};
+
+function operateDeptHandler(node){
+	var deptId = Ext.getCmp('txtDeptID');
+	var deptName = Ext.getCmp("txtDeptName");
+	deptName.focus(true, 100);				
+	if(updateDeptWin.otype == 'update'){
+		if(node.attributes.type == 1){
+			Ext.example.msg('提示', '<<font color="red">' + node.text + '</font>>为系统保留部门,不允许修改.');
+			return;
+		}
+		updateDeptWin.setTitle("修改部门信息");
+		deptId.setValue(node.attributes.deptID);
+		deptName.setValue(node.text);
+	}else if(updateDeptWin.otype == 'insert'){
+		updateDeptWin.setTitle("添加部门");
+		deptId.setValue();
+		deptName.setValue();
+		deptName.clearInvalid();
+	}
+	updateDeptWin.show();
+	updateDeptWin.center();
+}
+
+function updateDeptHandler(){
+	updateDeptWin.otype = 'update';
+	operateDeptHandler();
+}
+
+function deleteDeptHandler(node){
+	Ext.Msg.confirm(
+		'提示',
+		'是否删除: ' + node.text,
+		function(e){
+			if(e == 'yes'){
+				Ext.Ajax.request({
+					url : '../../OperateDept.do',
+					params : {
+						deptID : node.attributes.deptID,
+						dataSource : 'removeDept'
+					},
+					success : function(res, opt){
+						var jr = Ext.util.JSON.decode(res.responseText);
+						if(jr.success){
+							Ext.example.msg(jr.title, String.format(Ext.ux.txtFormat.deleteSuccess, node.text));
+							kitchenTreeForSreach.getRootNode().reload();
+						}else{
+							Ext.ux.showMsg(jr);
+						}
+					},
+					failure : function(res, opt){
+						Ext.ux.showMsg(Ext.util.JSON.decode(res.responseText));
+					}
+				});
+			}
+		}
+	);
+}
+
+function deptWinShow(){
+	if(!updateDeptWin){
+		updateDeptWin = new Ext.Window({
+			title : '添加部门',
+			closable : false,
+			resizable : false,
+			modal : true,
+			width : 230,
+			items : [{
+				xtype : 'form',
+				layout : 'form',
+				frame : true,
+				labelWidth : 65,
+				items : [{
+					xtype : 'hidden',
+					id : 'txtDeptID'
+				}, {
+					xtype : 'textfield',
+					id : 'txtDeptName',
+					fieldLabel : '部门名称',
+					width : 130
+				}]
+			}],
+			bbar : [
+			'->',
+			{
+				text : '保存',
+				id : 'btnSaveUpdateDept',
+				iconCls : 'btn_save',
+				handler : function(){
+					var deptID = Ext.getCmp('txtDeptID');
+					var deptName = Ext.getCmp('txtDeptName');
+					var dataSource = '';
+					if(updateDeptWin.otype == 'insert'){
+						dataSource = 'addDept';
+					}else if(updateDeptWin.otype == 'update'){
+						dataSource = 'updateDept';
+					}
+					
+					Ext.Ajax.request({
+						url : '../../OperateDept.do',
+						params : {
+							dataSource : dataSource,
+							deptID : deptID.getValue(),
+							deptName : deptName.getValue()
+						},
+						success : function(res, opt){
+							var jr = Ext.util.JSON.decode(res.responseText);
+							Ext.example.msg(jr.title, jr.msg);
+							updateDeptWin.hide();
+							kitchenTreeForSreach.getRootNode().reload();
+						},
+						failure : function(res, opt) {
+							Ext.ux.showMsg(Ext.util.JSON.decode(res.responseText));
+						}
+					});
+				}
+			}, {
+				text : '关闭',
+				iconCls : 'btn_close',
+				handler : function(){
+					updateDeptWin.hide();
+				}
+			}],
+			keys : [{
+				 key : Ext.EventObject.ENTER,
+				 fn : function(){ 
+					 Ext.getCmp('btnSaveUpdateDept').handler();
+				 },
+				 scope : this 
+			 }]
+		});
+	}
+
+}
+
 /**
  * 菜品搜索
  */
@@ -11,9 +436,13 @@ function searchMenuHandler(){
 	};
 	// 分厨
 	var sn = kitchenTreeForSreach.getSelectionModel().getSelectedNode();
-	if(sn && sn.attributes.alias >= 0)
-		baseParams['kitchen'] = sn.attributes.alias;
+	if(sn){
+		baseParams['kitchen'] = sn.attributes.kid;
+		baseParams['deptId'] = sn.attributes.deptID;
+	}
+		
 	// 编号, 名称, 拼音, 价钱, 库存管理
+		
 	var queryType = Ext.getCmp('menu_filter').getValue();
 	if(queryType != '全部' && queryType != 0){	
 		if(queryType == 1){
@@ -40,6 +469,7 @@ function searchMenuHandler(){
 	var isCombination = Ext.getCmp('combinationCheckbox').getValue();
 	var isHot = Ext.getCmp('hotCheckbox').getValue();
 	var isWeight = Ext.getCmp('weightCheckbox').getValue();
+	var isCommission = Ext.getCmp('commissionCheckbox').getValue();
 	if(isSpecial)
 		baseParams['isSpecial'] = true;
 	if(isRecommend)
@@ -56,6 +486,8 @@ function searchMenuHandler(){
 		baseParams['isHot'] = true;
 	if(isWeight)
 		baseParams['isWeight'] = true;
+	if(isCommission)
+		baseParams['isCommission'] = true;
 	
 	var gs = menuGrid.getStore();
 	gs.baseParams = baseParams;
@@ -75,16 +507,10 @@ function searchMenuHandler(){
 foodOperationHandler = function(c){
 	c = c == null || typeof(c) == 'undefined' ? {type:''} : c;
 	
-	var foWinTab = Ext.getCmp('foodOperationWinTab');
-	var activeTab = foWinTab.getActiveTab();
 	var selData = Ext.ux.getSelData('menuMgrGrid');
 	c.data = selData;
 	
-	if(typeof(activeTab) == 'undefined'){
-		return;
-	}
-	
-	if(activeTab.getId() == 'basicOperationTab'){
+	if(c.win == 'foodDetail'){
 		if(c.type == mmObj.operation.insert){
 //			resetbBasicOperation();
 		}else if(c.type == mmObj.operation.update){
@@ -93,38 +519,9 @@ foodOperationHandler = function(c){
 			if(!selData){
 				return;
 			}
-			resetbBasicOperation(selData);
+			(selData);
 		}
-	}else if(activeTab.getId() == 'tasteOperationTab'){
-		if(c.type == mmObj.operation.update){
-			updateTasteHandler(c);
-		}else if(c.type == mmObj.operation.select){
-			if(!selData){
-				return;
-			}
-			if(parseInt(selData.tasteRefType) == 1){
-				Ext.getCmp('rdoTasteTypeSmart').setValue(true);
-				Ext.getDom('rdoTasteTypeSmart').onclick();
-			}else if(parseInt(selData.tasteRefType) == 2){
-				Ext.getCmp('rdoTasteTypeManual').setValue(true);
-				Ext.getDom('rdoTasteTypeManual').onclick();
-			}
-			var ctgd = Ext.getCmp('commonTasteGrid').getStore();
-			ctgd.load();
-		}
-	}else if(activeTab.getId() == 'materialOperationTab'){
-		if(c.type == mmObj.operation.update){
-			updateMaterialHandler(c);
-		}else if(c.type == mmObj.operation.select){
-			if(!selData){
-				return;
-			}
-			Ext.getCmp('txtMaterialNameSearch').setValue('');
-			Ext.getCmp('btnSearchForAllMaterialGridTbar').handler();
-			var hmgd = Ext.getCmp('haveMaterialGrid').getStore();
-			hmgd.load();
-		}
-	}else if(activeTab.getId() == 'combinationOperationTab'){
+	}else if(c.win == 'relation'){
 		var cfgd = Ext.getCmp('combinationFoodGrid').getStore();
 		if(c.type == mmObj.operation.insert){
 			
@@ -189,12 +586,8 @@ function foodOperation(active, type){
 		btnSaveForOW.setDisabled(true);
 		
 		resetbBasicOperation();
-		Ext.getCmp('combinationFoodGrid').getStore().removeAll();
-		Ext.getDom('txtDisplayCombinationFoodPrice').innerHTML = '0.00';
-		Ext.getDom('txtDisplayCombinationFoodPriceAmount').innerHTML = '0.00';
-		Ext.getCmp('txtMiniAllFoodNameSearch').setValue('');
-		Ext.getCmp('btnSearchForAllFoodMiniGridTbar').handler();
 	}else if(typeof(type) == 'string' && type == mmObj.operation.update){
+		resetbBasicOperation(selRowData);
 		foWin.setTitle(selRowData.name);
 		btnAddForOW.setVisible(false);
 		btnAppForOW.setVisible(true);
@@ -223,17 +616,6 @@ function foodOperation(active, type){
 	
 	btnRefreshForOW.setVisible(true);
 	btnRefreshForOW.setDisabled(false);
-	
-	if(typeof active == 'string'){
-		if(Ext.getCmp(active)){
-			var foWinTab = Ext.getCmp('foodOperationWinTab');
-			if(!foWinTab.getActiveTab() || foWinTab.getActiveTab().getId() == active){
-				foWinTab.fireEvent('tabchange');
-			}else{
-				foWinTab.setActiveTab(active);
-			}
-		}
-	}
 	
 };
 /**
@@ -292,7 +674,7 @@ var combinationFoodGrid = new Ext.grid.EditorGridPanel({
 	title : '<center>已关联菜品<font color="red">(关联菜品即可设为套菜,否则留空)</font></center>',
 	id : 'combinationFoodGrid',
 	columnWidth : .55,
-	height : (Ext.isIE ? 425 : 410),
+	height : tabItemsHeight,
 	loadMask : { msg: '数据请求中，请稍后...' },
 	frame : true,
 	trackMouseOver : true,
@@ -343,7 +725,7 @@ var combinationFoodGrid = new Ext.grid.EditorGridPanel({
 				combinationDisplaySumHandler();
 			},
 			add : function(){
-				combinationDisplaySumHandler();
+				//combinationDisplaySumHandler();
 			},
 			remove : function(){
 				combinationDisplaySumHandler();
@@ -365,12 +747,7 @@ var combinationFoodGrid = new Ext.grid.EditorGridPanel({
 			xtype:'tbtext', 
 			text:String.format(Ext.ux.txtFormat.barMsg, '总份数', 'txtDisplayCombinationFoodPriceAmount', '0.00')
 		}]
-	}),
-	listeners : {
-		resize : function(thiz, adjWidth, adjHeight, rawWidth, rawHeight){
-			thiz.setHeight(tabItemsHeight);
-		}
-	}
+	})
 });
 
 var allFoodMiniGridTbar = new Ext.Toolbar({
@@ -400,7 +777,7 @@ var allFoodMiniGridTbar = new Ext.Toolbar({
 var allFoodMiniGrid = createGridPanel(
     'allFoodMiniGrid',
     '<center>所有菜品</center>',
-    tabItemsHeight,
+    415,
     '',
     '../../QueryMenuMgr.do',
     [
@@ -417,12 +794,12 @@ var allFoodMiniGrid = createGridPanel(
 );
 allFoodMiniGrid.columnWidth = .44;
 allFoodMiniGrid.getBottomToolbar().displayMsg = '共&nbsp;{2}&nbsp;条记录';
-allFoodMiniGrid.on('resize', function(thiz){
+/*allFoodMiniGrid.on('resize', function(thiz){
 	thiz.setHeight(tabItemsHeight);
-});
+});*/
 allFoodMiniGrid.on('rowdblclick', function(thiz){
 	var cfd = Ext.getCmp('combinationFoodGrid');
-	var sr = thiz.getSelectionModel().getSelections()[0];
+	var sr = thiz.getSelectionModel().getSelected();
 	var selData = Ext.ux.getSelData(menuGrid);
 	var cv = true;
 	if(sr.get('id') == selData.id){
@@ -441,8 +818,9 @@ allFoodMiniGrid.on('rowdblclick', function(thiz){
 		}
 	});
 	if(cv){
-		sr.set('amount', 1);
-		cfd.getStore().insert(0, sr);
+		sr.set('amount', 0);
+		cfd.getStore().add(sr);
+		sr.set('amount', parseFloat(sr.get('amount') + 1));
 		cfd.getView().refresh();
 	}
 });
@@ -489,22 +867,11 @@ updateCombinationHandler = function(c){
 			if(eval(jr.success)){
 				Ext.example.msg(jr.title, jr.msg);
 				if(c.hide == true){
-					Ext.getCmp('foodOperationWin').hide();
+					Ext.getCmp('foodRelationOperationWin').hide();
 				}else{
 					cfg.load();					
 				}
-				Ext.getCmp('menuMgrGrid').getStore().each(function(record){
-					if(record.get('foodID') == c.data.foodID){
-						if(cfg.getCount() > 0){
-							record.set('combination', true);
-						}else{
-							record.set('combination', false);
-						}
-						Ext.ux.formatFoodName(record, 'displayFoodName', 'foodName');
-						record.commit();
-						return;
-					}
-				});
+				Ext.getCmp('menuMgrGrid').getStore().reload();
 			}else{
 				Ext.ux.showMsg(jr);
 			}
@@ -590,60 +957,7 @@ var commonTasteGridTbar = new Ext.Toolbar({
     }]
 });
 
-var commonTasteGrid = new Ext.grid.EditorGridPanel({
-	title : '<center>已关联口味</center>',
-	id : 'commonTasteGrid',
-	columnWidth : .55,
-	height : (Ext.isIE ? 405 : 400),
-	loadMask : { msg: '数据请求中，请稍后...' },
-	frame : true,
-	trackMouseOver : true,
-	viewConfig : {
-		forceFit : true
-	},
-	sm : new Ext.grid.RowSelectionModel({singleSelect:true}),
-	cm : new Ext.grid.ColumnModel([
-	    new Ext.grid.RowNumberer(),
-	    {header:'口味名', dataIndex:'taste.name', width:100},
-		{
-	    	header : '等级', 
-			dataIndex : 'taste.rank', 
-			width : 60, 
-			align : 'center', 
-			editor : new Ext.form.NumberField({
-				maxLength : 8,
-	    		maxLengthText : '长度不能超过8位',
-	    		minValue : 0.01,
-	    		maxValue : 65535,
-	    		allowBlank : false,
-	    		style : 'color:green; font-weight:bold;'
-			})
-		},
-		{header:'价钱', dataIndex:'taste.price', width:60, renderer:Ext.ux.txtFormat.gridDou},
-		{header:'比例', dataIndex:'taste.rate', width:60, renderer:Ext.ux.txtFormat.gridDou},
-		{header:'计算方式', dataIndex:'taste.calcValue', renderer:tasteCalcRenderer},
-		{header:'操作', align:'center', renderer:tasteOperationRenderer}
-		]
-	),
-	ds : new Ext.data.JsonStore({
-		url : '../../QueryFoodTaste.do',
-		root : 'root',		
-		fields : FoodTasteRecord.getKeys(),
-		listeners : {
-			beforeload : function(){
-				var selData = Ext.ux.getSelData('menuMgrGrid');
-				this.baseParams['foodID'] = selData.id;
-				this.baseParams['restaurantID'] = restaurantID;
-			}
-		}
-	}),
-	tbar : commonTasteGridTbar,
-	listeners : {
-		resize : function(thiz, adjWidth, adjHeight, rawWidth, rawHeight){
-			thiz.setHeight(tabItemsHeight);
-		}
-	}
-});
+
 
 var allTasteGridTbar = new Ext.Toolbar({
 	height : 26,
@@ -699,142 +1013,6 @@ var allTasteGridTbar = new Ext.Toolbar({
 	}]
 });
 
-var allTasteGrid = createGridPanel(
-	'allTasteGrid',
-	'<center>所有口味</center>',
-	'',
-	'',
-	'../../QueryTaste.do',
-	[
-	    [true, false, false, false], 
-	    ['口味名', 'name', 100] , 
-	    ['价钱', 'price', 60, 'right', 'Ext.ux.txtFormat.gridDou'], 
-	    ['比例', 'rate', 60, 'right', 'Ext.ux.txtFormat.gridDou'], 
-	    ['计算方式', 'calcValue', '', '', 'tasteCalcRenderer']
-	],
-	TasteRecord.getKeys(),
-	[ ['type',0], ['isCombo',false], ['isPaging',false]],
-	0,
-	'',
-	allTasteGridTbar
-);
-allTasteGrid.columnWidth = .44;
-allTasteGrid.on('render', function(thiz){
-	thiz.getStore().load({
-		params : {
-			limit : 30,
-			start : 0
-		}
-	});
-});
-allTasteGrid.on('resize', function(thiz, adjWidth, adjHeight, rawWidth, rawHeight){
-	thiz.setHeight(tabItemsHeight);
-});
-
-allTasteGrid.on('rowdblclick', function(thiz, ri, e){
-	var ctg = commonTasteGrid;
-	var sr = thiz.getSelectionModel().getSelections()[0];
-	var cv = true;
-	ctg.getStore().each(function(r){
-		if(r.get('taste')['id'] == sr.get('id')){
-			cv = false;
-		}
-	});
-	if(cv){
-		ctg.getStore().insert(0, new FoodTasteRecord({
-			'taste.id' : sr.get('id'),
-			'taste.name' : sr.get('name'),
-			'taste.rank' : 0,
-			'taste.price' : sr.get('price'),
-			'taste.rate' : sr.get('rate'),
-			'taste.calcValue' : sr.get('calcValue'),
-			taste : {
-				id : sr.get('id'),
-				name : sr.get('name'),
-				rank : 0,
-				price : sr.get('price'),
-				rate : sr.get('rate'),
-				calcValue : sr.get('calcValue')
-			}
-		}));
-		ctg.getView().refresh();
-		ctg.getSelectionModel().selectFirstRow();
-	}else{
-		Ext.example.msg('提示', '该菜品已关联口味<'+sr.get('name')+'>');
-	}
-});
-allTasteGrid.getStore().on('load', function(e){	
-	mmObj.allTasteGridData = e.data;
-});
-
-var tasteOperationPanel = new Ext.Panel({
-	id : 'tasteOperationPanel',
-	frame : true,
-	border : false,
-	layout : 'column',
-	items : [
-	    commonTasteGrid,
-	    { xtype:'panel', columnWidth:.01, html:'&nbsp;'},
-	    allTasteGrid
-	],
-	listeners : {
-		render : function(e){
-			
-		}
-	}
-});
-
-/**
- * 修改菜品关联口味
- */
-updateTasteHandler = function(c){
-	var foodID = c.data.id;
-	var tasteContent = '';
-	var ctg = commonTasteGrid.getStore();
-	
-	if(mmObj.rdoTasteType == c.data.tasteRefType && mmObj.rdoTasteType == 1){
-		Ext.example.msg('提示', '智能关联方式无需修改!');
-		ctg.load();
-		return;
-	}
-	
-	for(var i = 0; i < ctg.getCount(); i++){
-		tasteContent += (i > 0 ? '<split>' : '');
-		tasteContent += (ctg.getAt(i).get('taste')['id'] + ',' + ctg.getAt(i).get('taste')['rank']);
-	}
-	
-	setButtonStateOne(true);
-	Ext.Ajax.request({
-		url : '../../UpdateFoodTaste.do',
-		params : {
-			foodID : foodID,
-			restaurantID : restaurantID,
-			nValue : mmObj.rdoTasteType,
-			oValue : c.data.tasteRefType,
-			tasteContent : tasteContent
-		},
-		success : function(response, options){
-			var jr = Ext.util.JSON.decode(response.responseText);
-			if(eval(jr.success)){
-				Ext.example.msg(jr.title, jr.msg);
-				if(c.hide == true){
-					Ext.getCmp('foodOperationWin').hide();
-				}
-				ctg.load();
-				Ext.getCmp('menuMgrGrid').getSelectionModel().getSelections()[0].set('tasteRefType', mmObj.rdoTasteType);
-			}else{
-				Ext.ux.showMsg(jr);
-			}
-			setButtonStateOne(false);
-		},
-		failure : function(response, options) {
-			var jr = Ext.util.JSON.decode(response.responseText);
-			Ext.ux.showMsg(jr);
-			setButtonStateOne(false);
-		}
-	});
-};
-
 //----------------basic
 var basicOperationPanel = new Ext.Panel({
 	id : 'basicOperationPanel',
@@ -861,29 +1039,7 @@ var basicOperationPanel = new Ext.Panel({
 		 			width : 260
 		 		}]
 		 	}, {
-		 		columnWidth : .5,
-		 		items : [{
-		 			xtype : 'numberfield',
-		 	    	id : 'numBasicForFoodAliasID',
-		 	    	fieldLabel : '编号',
-		 	    	maxValue : 65535,
-		 	    	minValue : 1,
-		 	    	allowBlank : false,
-		 	    	width : 100,
-		 	    	validator : function(v){
-		 	    		if(v > 0 && v <= 65535 && v.indexOf('.') == -1){
-		 	    	    	return true;
-		 	    	    }else{
-		 	    	    	return '编号需在 1  至 65535 之间,且为整数!';
-		 	    	    }
-		 	    	}
-		 		}]
-		 	}, {
-		 		columnWidth : .5,
-		 		items : [{
-		 			xtype : 'hidden',
-		 			id : 'txtBasicForPinyin'
-		 		}]
+		 		columnWidth : 1
 		 	}, {
 		 		columnWidth : .5,
 		 	    items : [{
@@ -904,6 +1060,50 @@ var basicOperationPanel = new Ext.Panel({
 		 	    	    }
 		 	    	}
 		 	    }]
+		 	},{
+		 	    items : [{
+		 	    	xtype : 'checkbox',
+		 	    	id : 'chbForFoodAlias',
+		 	    	hideLabel : true,
+		 	    	width : 16,
+		 	    	listeners : {
+		 	    		check : function(checkbox, checked){
+		 	    			var numForAlias = Ext.getCmp('numBasicForFoodAliasID');
+							if(checked){
+								numForAlias.enable();
+								numForAlias.focus(true, 100);
+							}else{
+								numForAlias.disable();
+								numForAlias.setValue();
+								numForAlias.clearInvalid();
+							}
+						}
+		 	    	}
+		 	    }]
+		 	},{
+		 		columnWidth : .5,
+		 		items : [{
+		 			xtype : 'numberfield',
+		 	    	id : 'numBasicForFoodAliasID',
+		 	    	fieldLabel : '编号',
+		 	    	maxValue : 65535,
+		 	    	minValue : 1,
+		 	    	width : 90,
+		 	    	disabled : true,
+		 	    	validator : function(v){
+		 	    		if(v > 0 && v <= 65535 && v.indexOf('.') == -1){
+		 	    	    	return true;
+		 	    	    }else{
+		 	    	    	return '编号需在 1  至 65535 之间,且为整数!';
+		 	    	    }
+		 	    	}
+		 		}]
+		 	}, {
+		 		columnWidth : .5,
+		 		items : [{
+		 			xtype : 'hidden',
+		 			id : 'txtBasicForPinyin'
+		 		}]
 		 	}, {
 		 		columnWidth : .5,
 		 	    items : [{
@@ -912,10 +1112,10 @@ var basicOperationPanel = new Ext.Panel({
 		 	    	fieldLabel : '厨房',
 		 	    	width : 86,
 		 	    	listWidth : 99,
-		 	    	store : new Ext.data.JsonStore({
-						fields : [ 'alias', 'name' ]
+		 	    	store : new Ext.data.SimpleStore({
+						fields : ['id', 'name']
 					}),
-					valueField : 'alias',
+					valueField : 'id',
 					displayField : 'name',
 					mode : 'local',
 					triggerAction : 'all',
@@ -977,6 +1177,8 @@ var basicOperationPanel = new Ext.Panel({
 		 	    	hideLabel : true,
 		 	    	boxLabel : '<img title="停售" src="../../images/icon_tip_ting.png"></img>'
 		 	   	}]
+		 	}, {
+		 		columnWidth : 1
 		 	}, {
 		 		columnWidth : .13,
 		 	    items : [{html:'&nbsp;&nbsp;&nbsp;&nbsp;'}]
@@ -1203,6 +1405,7 @@ function resetbBasicOperation(_d){
 	var btnDeleteFoodImage = Ext.getCmp('btnDeleteFoodImage');
 	var stockStatus = Ext.getCmp('comboBasicForStockStatus');
 	var commission = Ext.getCmp('numCommission');
+	var chkAlias = Ext.getCmp('chbForFoodAlias');
 	var data = {};
 	
 	// 清空图片信息
@@ -1212,20 +1415,21 @@ function resetbBasicOperation(_d){
 	
 	if(_d != null && typeof(_d) != 'undefined'){
 		data = _d;
-		foodAliasID.setDisabled(true);
 		btnUploadFoodImage.setDisabled(false);
 		btnDeleteFoodImage.setDisabled(false);
 		imgFile.setDisabled(false);
+		document.getElementById('chbForFoodAlias').checked = true;
+		chkAlias.fireEvent('check', chkAlias, true);
+		foodKitchenAlias.setValue(data['kitchen.id']);
 	}else{
 		data = {};
-		foodAliasID.setDisabled(false);
 		btnUploadFoodImage.setDisabled(true);
 		btnDeleteFoodImage.setDisabled(true);
 		imgFile.setDisabled(true);
-	}
-	
-	if(foodKitchenAlias.store.getCount() == 0){
-		foodKitchenAlias.store.loadData(kitchenData);
+		var node = kitchenTreeForSreach.getSelectionModel().getSelectedNode();
+		if(node && typeof node.attributes.kid != 'undefined') {
+			foodKitchenAlias.setValue(node.attributes.kid);
+		}
 	}
 	
 	var status = typeof(data.status) == 'undefined' ? 0 : parseInt(data.status);
@@ -1234,7 +1438,7 @@ function resetbBasicOperation(_d){
 	foodAliasID.setValue(data.alias);
 	foodPinyin.setValue(data.pinyin);
 	foodPrice.setValue(data.unitPrice);
-	foodKitchenAlias.setValue(data['kitchen.alias']);
+	
 	foodDesc.setValue(data.desc);
 	isSpecial.setValue(Ext.ux.cfs.isSpecial(status));
 	isRecommend.setValue(Ext.ux.cfs.isRecommend(status));
@@ -1248,8 +1452,8 @@ function resetbBasicOperation(_d){
 	img.src = typeof(data.img) == 'undefined' || data.img == '' ? '../../images/nophoto.jpg' : data.img;
 	stockStatus.setValue(typeof(data.stockStatusValue) == 'undefined' ? 1 : data.stockStatusValue);
 	
+	foodName.focus(true, 100);
 	foodName.clearInvalid();
-	foodAliasID.clearInvalid();
 	foodPinyin.clearInvalid();
 	foodPrice.clearInvalid();
 	stockStatus.clearInvalid();
@@ -1329,12 +1533,12 @@ function basicOperationBasicHandler(c){
 		isCombination = (typeof(c.data) != 'undefined' && typeof(c.data.combination) != 'undefined' ? c.data.combination : false);
 	}
 	
-	for(var i = 0; i < kitchenData.length; i++){
+/*	for(var i = 0; i < kitchenData.length; i++){
 		if(kitchenData[i].alias == foodKitchenAlias.getValue()){
 			kitchenID = kitchenData[i].id;
 			break;
 		}
-	}
+	}*/
 	
 	if(c.type == mmObj.operation.insert){
 		Ext.getCmp('btnAddForOW').setDisabled(true);
@@ -1353,8 +1557,7 @@ function basicOperationBasicHandler(c){
 			foodAliasID : foodAliasID.getValue(),
 			foodPinyin : foodPinyin.getValue(),
 			foodPrice : foodPrice.getValue(),
-			kitchenAliasID : foodKitchenAlias.getValue(),
-			kitchenID : kitchenID,
+			kitchenID : foodKitchenAlias.getValue(),
 			foodDesc : foodDesc.getValue().trim(),
 			isSpecial : isSpecial.getValue(),
 			isRecommend : isRecommend.getValue(),
@@ -1379,13 +1582,33 @@ function basicOperationBasicHandler(c){
 							var faid = foodAliasID.getValue();
 							var kaid = foodKitchenAlias.getValue();	
 							
+							var	isSpecialValue = isSpecial.getValue();
+							var isRecommendValue = isRecommend.getValue();
+							var isFreeValue = isFree.getValue();
+							var isStopValue = isStop.getValue();
+							var isCurrPriceValue = isCurrPrice.getValue();
+							var isHotValue = isHot.getValue();
+							var isWeightValue = isWeight.getValue();
+							var isCommissionValue = isCommission.getValue();
+							//重置信息
 							resetbBasicOperation();
-							Ext.getCmp('combinationFoodGrid').getStore().removeAll();
-							Ext.getCmp('txtMiniAllFoodNameSearch').setValue('');
-							Ext.getCmp('btnSearchForAllFoodMiniGridTbar').handler();
 							
-							foodAliasID.setValue(parseInt(faid+1));
+							isSpecial.setValue(isSpecialValue);
+							isRecommend.setValue(isRecommendValue);
+							isFree.setValue(isFreeValue);
+							isStop.setValue(isStopValue);
+							isCurrPrice.setValue(isCurrPriceValue);
+							isHot.setValue(isHotValue);
+							isWeight.setValue(isWeightValue);
+							isCommission.setValue(isCommissionValue);
+							
+							if(document.getElementById('chbForFoodAlias').checked){
+								foodAliasID.setValue(parseInt(faid+1));
+							}
 							foodKitchenAlias.setValue(kaid);
+							
+							foodName.focus(true, 100);
+
 						}else{
 							Ext.getCmp('foodOperationWin').hide();
 						}
@@ -1833,8 +2056,11 @@ function fppOperation(){
 };
 //------------------
 //-----------load----------------
+var startDeptNode;
 function initKitchenTreeForSreach(){
+	
 	kitchenTreeForSreach = new Ext.tree.TreePanel({
+		id : 'kitchenTreeForSreach',
 		region : 'west',
 		frame : true,
 		width : 200,
@@ -1843,9 +2069,15 @@ function initKitchenTreeForSreach(){
 		autoScroll : true,
 		frame : true,
 		bodyStyle : 'backgroundColor:#FFFFFF; border:1px solid #99BBE8;',
-		root : new Ext.tree.TreeNode({
+		enableDD : true,
+		loader : new Ext.tree.TreeLoader({
+			dataUrl : '../../QueryKitchen.do',
+			baseParams : {
+				dataSource : 'deptKitchenTree'
+			}
+		}),
+		root : new Ext.tree.AsyncTreeNode({
 			text : '全部',
-			alias : -1,
 			expanded : true
 		}),
 		tbar : ['->', {
@@ -1853,17 +2085,7 @@ function initKitchenTreeForSreach(){
 			iconCls : 'btn_refresh',
 			handler : function(){
 				Ext.getDom('showTypeForSearchKitchen').innerHTML = '----';
-				var root = kitchenTreeForSreach.getRootNode();
-				for(var i = root.childNodes.length - 1; i >= 0 ; i--){
-					root.childNodes[i].remove();
-				}
-				for(var i = 0; i < kitchenData.length; i++){
-					root.appendChild(new Ext.tree.TreeNode({
-						text : kitchenData[i].name,
-						alias : kitchenData[i].alias
-					}));
-				}
-				root.expand();
+				kitchenTreeForSreach.getRootNode().reload();
 			}
 		}],
 		listeners : {
@@ -1872,9 +2094,71 @@ function initKitchenTreeForSreach(){
 				searchMenuHandler();
 				Ext.getCmp('menuMgrGrid').getSelectionModel().clearSelections();
 				Ext.getCmp('menuMgrGrid').fireEvent('rowclick');
+			},
+			startdrag : function(t, n, e){
+				if(!n.hasChildNodes()){
+					startDeptNode = n.parentNode;
+				}
+			}
+			,
+			nodedrop : function(e){
+				var url = '', params = {};
+				//部门之间拖动
+				if(typeof e.dropNode.attributes.deptID != 'undefined'){
+					if(typeof e.target.attributes.deptID != 'undefined'){
+						url = '../../OperateDept.do';
+						params = {
+							dataSource : 'swap',
+							deptA : e.dropNode.attributes.deptID,
+							deptB : e.target.attributes.deptID
+						};
+					}else{
+						kitchenTreeForSreach.getRootNode().reload();
+						return;
+					}
+				//节点之间
+				}else{
+					if(typeof e.target.attributes.deptID != 'undefined'){
+						url = '../../UpdateKitchen.do';
+						params = {
+							kitchenID : e.dropNode.attributes.kid,
+							deptID : e.target.attributes.deptID
+						};
+					}else{
+						//不同部门
+						if(e.target.parentNode != startDeptNode){
+							url = '../../UpdateKitchen.do';
+							params = {
+								kitchenID : e.dropNode.attributes.kid,
+								deptID : e.target.parentNode.attributes.deptID
+							};
+						}else{
+							url = '../../OperateKitchen.do',
+							params = {
+								dataSource : 'swap',
+								kitchenA : e.target.attributes.kid,
+								kitchenB : e.dropNode.attributes.kid
+							};
+						}
+
+					}
+				}
+				
+				Ext.Ajax.request({
+					url : url,
+					params : params,
+					success : function(res, opt){
+						kitchenTreeForSreach.getRootNode().reload();
+					},
+					failure : function(res, opt){
+						Ext.ux.show(Ext.decode(res.responseText));
+					}
+				});
 			}
 		}
 	});
+
+	
 }
 function menuIsHaveImage(value, cellmeta, record, rowIndex, columnIndex, store){
 	var style = '', content = '';
@@ -1889,7 +2173,7 @@ function menuIsHaveImage(value, cellmeta, record, rowIndex, columnIndex, store){
 
 function menuDishOpt(value, cellmeta, record, rowIndex, columnIndex, store) {
 	return '' 
-		 + '<a href=\"javascript:btnTaste.handler()">口味</a>'
+		 + '<a href=\"javascript:foodRelationWinShow()">套菜关联</a>'
 		 + '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
 		 + '<a href=\"javascript:btnFood.handler()">修改</a>'
 		 + '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
@@ -2087,6 +2371,12 @@ function initMenuGrid(){
 			}, {
 				xtype : 'checkbox',
 				id : 'weightCheckbox'
+			}, { 
+				xtype:'tbtext',
+				text:'&nbsp;&nbsp;&nbsp;&nbsp; 提成:'
+			}, {
+				xtype : 'checkbox',
+				id : 'commissionCheckbox'
 			}, '->', {
 				xtype : 'button',
 				hideLabel : true,
@@ -2145,6 +2435,12 @@ function initFoodOperationWin(){
 				fn : function(){
 					foodOperationWin.hide();
 				}
+			},{
+				key : Ext.EventObject.ENTER,
+				scope : this,
+				fn : function(){
+					addBasicHandler();
+				}
 			}],
 			bbar : [ {
 				text : '上一道菜品',
@@ -2188,6 +2484,7 @@ function initFoodOperationWin(){
 		    	tooltip : '保存修改',
 		    	handler : function(){
 		    		foodOperationHandler({
+		    			win : 'foodDetail',
 	    				type : mmObj.operation.update,
 	    				hide : false
 	    			});
@@ -2207,6 +2504,7 @@ function initFoodOperationWin(){
 		    	tooltip : '保存修改并关闭窗体',
 		    	handler : function(){
 		    		foodOperationHandler({
+		    			win : 'foodDetail',
 	    				type : mmObj.operation.update,
 	    				hide : true
 	    			});
@@ -2233,116 +2531,88 @@ function initFoodOperationWin(){
 		    }],
 			listeners : {
 				hide : function(){
-	    			var tabID = Ext.getCmp('foodOperationWinTab').getActiveTab().getId();
-	    			if(tabID == 'basicOperationTab' || tabID == 'combinationOperationTab'){
-	    				Ext.getCmp('menuMgrGrid').getSelectionModel().clearSelections();
-	    				Ext.getCmp('menuMgrGrid').getStore().reload();
+	    			Ext.getCmp('menuMgrGrid').getStore().reload();
+//	    			Ext.getCmp('menuMgrGrid').fireEvent('rowclick');
+	    			if(document.getElementById('chbForFoodAlias').checked){
+	    				Ext.getCmp('chbForFoodAlias').fireEvent('check', Ext.getCmp('chbForFoodAlias'), false);
 	    			}
-	    			Ext.getCmp('menuMgrGrid').fireEvent('rowclick');
+	    			
 	    		}
 			},
 			items : [{
-				xtype : 'tabpanel',
-		    	id : 'foodOperationWinTab',
-		    	width : 930,
-		    	height : Ext.isIE ? 500 : null,
-		    	border : false,
-		    	activeTab : 0,
-		    	defaults : {
 		    		xtype : 'panel',
-		    		layout : 'fit'
-		    	},
-		    	items : [{
+		    		layout : 'fit',
+		    		width : 930,
+			    	height : Ext.isIE ? 500 : 500,
+			    	border : false,
 		    		id : 'basicOperationTab',
-	    	    	title : '菜品信息',
 	    	    	items : [basicOperationPanel]
-		    	}, {
-		    		id : 'tasteOperationTab',
-	    	    	title : '口味关联',
-	    	    	items : [tasteOperationPanel]
-	    	    }, 
-	    	    /*{
-	    	    	id : 'materialOperationTab',
-	    	    	title : '食材关联',
-	    	    	items : [materialOperationPanel]
-	    	    },*/ 
-	    	    {
-	    	    	id : 'combinationOperationTab',
-	    	    	title : '套菜关联',
-	    	    	items : [combinationOperationPanel]
-	    	    }],
-	    	    listeners : {
-		    		beforetabchange : function(thiz, newTab, currentTab ){
-		    			foodOperationWin.newTab = !newTab ? '' : newTab.getId();
-		    			foodOperationWin.currentTab = !currentTab ? '' : currentTab.getId();
-		    		},
-		    		tabchange : function(e, p){
-		    			var foWinTab = Ext.getCmp('foodOperationWinTab');
-		    			if(typeof(foWinTab.getActiveTab()) == 'undefined'){
-		    				return;
-		    			}
-		    			if(foodOperationWin.operation == mmObj.operation.insert){
-		    				if(foWinTab.getActiveTab().getId() == 'basicOperationTab' || foWinTab.getActiveTab().getId() == 'combinationOperationTab'){
-		    					foodOperationHandler({
-				    				type : mmObj.operation.insert
-				    			});
-		    				}else{
-		    					foWinTab.setActiveTab(foodOperationWin.currentTab);
-		    				}
-		    			}else{
-		    				foodOperationHandler({
-			    				type : mmObj.operation.select
-			    			});
-		    			}
-		    		}
-		    	}
-			}]
+		    	}]
 		});
 	}
 }
 
-// on page load function
-function menuMgrOnLoad() {
 
-	Ext.Ajax.request({
-		url : "../../QueryMenu.do",
-		params : {
-			dataSource : 'kitchens',
-			restaurantID : restaurantID,
-			type : 3
-		},
-		success : function(response, options) {
-			var resultJSON = Ext.decode(response.responseText);
-			if (resultJSON.success == true) {
-				kitchenData = resultJSON.root;
-				for(var i = 0; i < kitchenData.length; i++){
-					kitchenTreeForSreach.getRootNode().appendChild(new Ext.tree.TreeNode({
-						text : kitchenData[i].name,
-						alias : kitchenData[i].alias,
-						leaf : true
-					}));
+function initFoodRelationOperationWin(){
+	foodRelationOperationWin = Ext.getCmp('foodRelationOperationWin');
+	if(!foodRelationOperationWin){
+		foodRelationOperationWin = new Ext.Window({
+			id : 'foodRelationOperationWin',
+			closeAction : 'hide',
+			closable : false,
+			collapsed : true,
+			modal : true,
+			resizable : false,
+			width : 940,
+			height : Ext.isIE ? null : 551,
+			layout : 'fit',
+			keys : [{
+				key : Ext.EventObject.ESC,
+				scope : this,
+				fn : function(){
+					foodRelationOperationWin.hide();
 				}
-			} else {
-				Ext.MessageBox.show({
-					msg : resultJSON.msg,
-					width : 300,
-					buttons : Ext.MessageBox.OK
-				});
-			}
-		},
-		failure : function(response, options) {
-			
-		}
-	});
-};
-
-
-
-
-
-
-
-
+			}],
+			bbar : ['->', {
+		    	text : '保存',
+		    	id : 'btnSaveForOW',
+		    	iconCls : 'btn_save',
+		    	tooltip : '保存修改并关闭窗体',
+		    	handler : function(){
+		    		foodOperationHandler({
+		    			win : 'relation',
+	    				type : mmObj.operation.update,
+	    				hide : true
+	    			});
+		    	}
+		    },{
+		    	text : '关闭',
+		    	id : 'btnCloseForOW',
+		    	iconCls : 'btn_close',
+		    	tooltip : '关闭窗体',
+		    	handler : function(){
+		    		foodRelationOperationWin.hide();
+		    	}
+		    }],
+			listeners : {
+				hide : function(){
+	    			Ext.getCmp('combinationFoodGrid').getStore().removeAll();
+	    			Ext.getDom('txtDisplayCombinationFoodPrice').innerHTML = 0.00;
+	    			Ext.getDom('txtDisplayCombinationFoodPriceAmount').innerHTML = 0.00;
+	    		}
+			},
+			items : [{
+		    		xtype : 'panel',
+		    		layout : 'fit',
+		    		width : 930,
+			    	height : Ext.isIE ? 500 : null,
+			    	border : false,
+		    		id : 'combinationOperationTab',
+	    	    	items : [combinationOperationPanel]
+		    	}]
+		});
+	}
+}
 
 
 var btnAddFood = new Ext.ux.ImageButton({
@@ -2350,8 +2620,30 @@ var btnAddFood = new Ext.ux.ImageButton({
 	imgWidth : 50,
 	imgHeight : 50,
 	tooltip : '添加新菜',
-	handler : function(btn) {
+	handler : function(btn) {                                                                     
 		foodOperation('basicOperationTab', mmObj.operation.insert);
+	}
+});
+
+var btnAddKitchen = new Ext.ux.ImageButton({
+	imgPath : '',
+	imgWidth : 50,
+	imgHeight : 50,
+	tooltip : '添加厨房',
+	handler : function(btn) {
+		updateKitchenWin.otype = 'insert';
+		operateKitchenHandler();
+	}
+});
+
+var btnAddDept = new Ext.ux.ImageButton({
+	imgPath : '',
+	imgWidth : 50,
+	imgHeight : 50,
+	tooltip : '添加部门',
+	handler : function(btn) {
+		updateDeptWin.otype = 'insert';
+		operateDeptHandler();
 	}
 });
 
@@ -2405,7 +2697,7 @@ var btnCombination = new Ext.ux.ImageButton({
 	}
 });
 
-var pushBackBut = new Ext.ux.ImageButton({
+/*var pushBackBut = new Ext.ux.ImageButton({
 	imgPath : '../../images/UserLogout.png',
 	imgWidth : 50,
 	imgHeight : 50,
@@ -2413,7 +2705,7 @@ var pushBackBut = new Ext.ux.ImageButton({
 	handler : function(btn) {
 		location.href = "BasicMgrProtal.html?"+ strEncode('restaurantID=' + restaurantID, 'mi');
 	}
-});
+});*/
 
 var logOutBut = new Ext.ux.ImageButton({
 	imgPath : '../../images/ResLogout.png',
@@ -2547,11 +2839,15 @@ function setButtonStateOne(s){
 	Ext.getCmp('btnRefreshForOW').setDisabled(s);
 };
 
+var bar = {treeId : 'kitchenTreeForSreach', option :[{name : '修改', fn : "floatBarUpdateHandler()"}, {name : '删除', fn : "floatBarDeleteHandler()"}]};
+
+
 Ext.onReady(function() {
 
 	initKitchenTreeForSreach();
+	
 	//menuMgrOnLoad();
-	Ext.Ajax.request({
+/*	Ext.Ajax.request({
 		url : "../../QueryMenu.do",
 		params : {
 			dataSource : 'kitchens',
@@ -2580,7 +2876,7 @@ Ext.onReady(function() {
 		failure : function(response, options) {
 			
 		}
-	});
+	});*/
 	initMenuGrid();
 	
 	new Ext.Panel({
@@ -2598,10 +2894,10 @@ Ext.onReady(function() {
 			items : [btnAddFood, { 
 				xtype:'tbtext', 
 				text : '&nbsp;&nbsp;&nbsp;&nbsp;' 
-			}, btnTaste, { 
-				xtype:'tbtext',
-				text : '&nbsp;&nbsp;&nbsp;&nbsp;'
-			}, btnCombination]
+			}, btnAddKitchen, { 
+				xtype:'tbtext', 
+				text : '&nbsp;&nbsp;&nbsp;&nbsp;' 
+			},btnAddDept]
 		}),
 		keys : [{
 			key : Ext.EventObject.ENTER,
@@ -2614,11 +2910,19 @@ Ext.onReady(function() {
 	
 	initFoodOperationWin();
 	
+	initFoodRelationOperationWin();
+	
 	foodOperationWin.operation == mmObj.operation.select;
 	foodOperationWin.render(document.body);
-	var foWinTab = Ext.getCmp('foodOperationWinTab');
-	foWinTab.setActiveTab('tasteOperationTab');
-	foWinTab.setActiveTab('materialOperationTab');
-	foWinTab.setActiveTab('combinationOperationTab');
+//	var foWinTab = Ext.getCmp('foodOperationWinTab');
+//	foWinTab.setActiveTab('tasteOperationTab');
+//	foWinTab.setActiveTab('materialOperationTab');
+//	foWinTab.setActiveTab('combinationOperationTab');
+	
+	deptWinShow();
+	
+	kitchenWinShow();
+	initDeptData();
 	
 });
+showFloatOption(bar);

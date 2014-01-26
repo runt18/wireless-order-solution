@@ -304,9 +304,7 @@ deleteSupplierOperationHandler = function(){
 };
 
 Ext.onReady(function(){
-	Ext.BLANK_IMAGE_URL = '../../extjs/resources/images/default/s.gif';
-	Ext.QuickTips.init();
-	Ext.form.Field.prototype.msgTarget = 'side';
+
 	//设置列默认值
 	supplierOpt = function(){
 		return "<a href = \"javascript:supplierOperactionHandler({type:'update'})\">" + "<img src='../../images/Modify.png'/>修改</a>"

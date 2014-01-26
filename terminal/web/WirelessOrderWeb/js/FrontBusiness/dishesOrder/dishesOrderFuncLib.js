@@ -927,7 +927,13 @@ function skip(_c){
 		new Ext.util.TaskRunner().start({
 			run: function(){
 				if(interval < 1){
-					location.href = _c.href;								
+					var num = _c.href.indexOf('?');
+					if(num <= 0){
+						location.href = _c.href;	
+					}else{
+						setDynamicKey(_c.href.substring(0, num), _c.href.substr(num + 1));
+					}
+												
 				}
 				Ext.getDom('returnInterval').innerHTML = interval;
 				interval--;
@@ -941,7 +947,12 @@ function skip(_c){
 		buttons : Ext.MessageBox.OK,
 		fn : function() {
 			if(typeof(_c.href) != 'undefined'){
-				location.href = _c.href;								
+				var num = _c.href.indexOf('?');
+				if(num <= 0){
+					location.href = _c.href;	
+				}else{
+					setDynamicKey(_c.href.substring(0, num), _c.href.substr(num + 1));
+				}						
 			}
 		}
 	});

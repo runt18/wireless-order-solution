@@ -127,7 +127,7 @@ var dailySettleStatBut = new Ext.ux.ImageButton({
 });
 
 // --
-var pushBackBut = new Ext.ux.ImageButton({
+/*var pushBackBut = new Ext.ux.ImageButton({
 	imgPath : "../../images/UserLogout.png",
 	imgWidth : 50,
 	imgHeight : 50,
@@ -135,7 +135,7 @@ var pushBackBut = new Ext.ux.ImageButton({
 	handler : function(btn) {
 		location.href = '../PersonLogin.html?'+ strEncode('restaurantID=' + restaurantID, 'mi');
 	}
-});
+});*/
 
 var logOutBut = new Ext.ux.ImageButton({
 	imgPath : "../../images/ResLogout.png",
@@ -147,306 +147,50 @@ var logOutBut = new Ext.ux.ImageButton({
 	}
 });
 
-var history_viewBillGrid;
-	if(!history_viewBillGrid){
-		history_viewBillGrid = createGridPanel(
-			'',
-			'已点菜',
-			'',
-		    '',
-		    '',
-		    [
-			    [true, false, false, false], 
-			    ['菜名', 'name', 130] , 
-			    ['口味', 'tasteGroup.tastePref', 100],
-			    ['数量', 'count', 50, 'right', 'Ext.ux.txtFormat.gridDou'],
-			    ['折扣', 'discount', 50, 'right', 'Ext.ux.txtFormat.gridDou'],
-			    ['金额', 'totalPrice', 100, 'right', 'Ext.ux.txtFormat.gridDou']
-			],
-			OrderFoodRecord.getKeys(),
-		    [],
-		    0
-		);
-	}
-
-
-history_viewBillGrid.region = 'center';
-
-var viewBillGenPanel = new Ext.Panel({
-	region : 'north',
-	height : 120,
-	frame : true,
-	border : false,
-	items : [new Ext.Panel({
-		xtype : 'panel',
-		layout : 'column',
-		//height : Ext.isIE ? 90 : 110 ,
-		height : 110,
-		defaults : {
-			columnWidth : .23,
-			defaults : {
-				xtype : 'panel',
-				html : '----'
-			}
-		},
-		items : [{
-			items : [{
-				cls : 'cLeft',
-				html : '账单号:'
-			}]
-		}, {
-			items : [{
-				cls : 'left',
-				id : 'billIDBV'
-			}]
-		},{
-			items : [{
-				cls : 'cLeft',
-				html : '类型:'
-			}]
-		}, {
-			items : [{
-				cls : 'left',
-				id : 'billTypeBV'
-			}]
-		}, {
-			columnWidth : 1
-		}, {
-			items : [{
-				cls : 'cLeft',
-				html : '台号:'
-			}]
-		}, {
-			items : [{
-				cls : 'left',
-				id : 'tableNbrBV'
-			}]
-		},{
-			items : [{
-				cls : 'cLeft',
-				html : '人数:'
-			}]
-		}, {
-			items : [{
-				cls : 'left',
-				id : 'personNbrBV'
-			}]
-		}, {
-			columnWidth : 1
-		}, {
-			items : [{
-				cls : 'cLeft',
-				html : '日期:'
-			}]
-		}, {
-			columnWidth : .7,
-			items : [{
-				cls : 'left',
-				id : 'billDateBV'
-			}]
-		}, {
-			columnWidth : 1
-		},{
-			items : [{
-				cls : 'cLeft',
-				html : '结账方式:'
-			}]
-		}, {
-			items : [{
-				cls : 'left',
-				id : 'payTypeBV'
-			}]
-		},{
-			items : [{
-				cls : 'cLeft',
-				html : '付款方式:'
-			}]
-		}, {
-			items : [{
-				cls : 'left',
-				id : 'payMannerBV'
-			}]
-		}, {
-			columnWidth : 1
-		},{
-			items : [{
-				cls : 'cLeft',
-				html : '服务费:'
-			}]
-		}, {
-			items : [{
-				cls : 'left',
-				id : 'serviceRateBV'
-			}]
-		}]
-	})]
-});
-
-var viewBillAddPanel = new Ext.Panel({
-	region : 'south',
-	height : 60,
-	frame : true,
-	border : false,
-	items : [new Ext.Panel({
-		xtype : 'panel',
-		layout : 'column',
-		//height : Ext.isIE ? 90 : 110 ,
-		height : 70,
-		defaults : {
-			columnWidth : .16,
-			defaults : {
-				xtype : 'panel',
-				html : '----'
-			}
-		},
-		items : [{
-			items : [{
-				cls : 'cLeft',
-				html : '抹数:'
-			}]
-		}, {
-			items : [{
-				cls : 'left',
-				id : 'erasePuotaPriceBV'
-			}]
-		},{
-			items : [{
-				cls : 'cLeft',
-				html : '赠送:'
-			}]
-		}, {
-			items : [{
-				cls : 'left',
-				id : 'forFreeBV'
-			}]
-		}, {
-			items : [{
-				cls : 'cLeft',
-				html : '应收:'
-			}]
-		}, {
-			items : [{
-				cls : 'left',
-				id : 'shouldPayBV'
-			}]
-		},{
-			columnWidth : 1
-		},{
-			items : [{
-				cls : 'cLeft',
-				html : '退菜:'
-			}]
-		}, {
-			items : [{
-				cls : 'left',
-				id : 'cancelPriceBV'
-			}]
-		},  {
-			items : [{
-				cls : 'cLeft',
-				html : '折扣:'
-			}]
-		}, {
-			items : [{
-				cls : 'left',
-				id : 'discountBV'
-			}]
-		}, {
-			items : [{
-				cls : 'cLeft',
-				html : '应收:'
-			}]
-		}, {
-			items : [{
-				cls : 'left',
-				id : 'actrualPayBV'
-			}]
-		}]
-	})]
-});
-
-var viewBillWin = Ext.getCmp('history_viewBillWin');
-if(!viewBillWin){
+function showViewBillWin(){
 	viewBillWin = new Ext.Window({
 		id : 'history_viewBillWin',
 		layout : 'fit',
 		title : '查看账单',
-		width : 500,
-		height : 500,
+		width : 510,
+		height : 550,
 		resizable : false,
 		closable : false,
 		modal : true,
-		items : [ {
-			layout : 'border',
-			border : false,
-			items : [ viewBillGenPanel, history_viewBillGrid, viewBillAddPanel ]
-			//items : [viewBillGrid]
-		} ],
 		bbar : ['->', {
 			text : '关闭',
 			iconCls : 'btn_close',
 			handler : function() {
-				viewBillWin.hide();
+				viewBillWin.destroy();
 			}
 		}],
 		keys : [{
 			key : Ext.EventObject.ESC,
 			scope : this,
 			fn : function(){
-				viewBillWin.hide();
+				viewBillWin.destroy();
 			}
 		}],
 		listeners : {
-			hide : function(thiz) {
-				viewBillData = null;
-				history_viewBillGrid.getStore().removeAll();
-			},
 			show : function(thiz) {
-				var data = Ext.ux.getSelData(billsGrid);
-				var orderID = data['id'];
-				
-				Ext.getDom('billIDBV').innerHTML = orderID;
-				Ext.getDom('billTypeBV').innerHTML = data['categoryText'];
-				Ext.getDom('tableNbrBV').innerHTML = data['table.alias'];
-				Ext.getDom('personNbrBV').innerHTML = data['customNum'];
-				Ext.getDom('billDateBV').innerHTML = data['orderDateFormat'];
-				Ext.getDom('payTypeBV').innerHTML = data['settleTypeText'];
-				Ext.getDom('payMannerBV').innerHTML = data['payTypeText'];
-				Ext.getDom('serviceRateBV').innerHTML = data['serviceRate'] + '％';
-				Ext.getDom('forFreeBV').innerHTML = '￥' + data['giftPrice'].toFixed(2);
-				Ext.getDom('shouldPayBV').innerHTML = '￥' + data['totalPrice'].toFixed(2);
-				Ext.getDom('actrualPayBV').innerHTML = '￥' + data['actualPrice'].toFixed(2);
-				Ext.getDom('discountBV').innerHTML = '￥' + data['discountPrice'].toFixed(2);
-				Ext.getDom('erasePuotaPriceBV').innerHTML = '￥' + data['erasePrice'].toFixed(2);
-				Ext.getDom('cancelPriceBV').innerHTML = '￥' + data['cancelPrice'].toFixed(2);
-	
-				Ext.Ajax.request({
-					url : '../../QueryOrder.do',
+				var sd = Ext.ux.getSelData(billsGrid);
+				thiz.load({
+					url : '../window/history/viewBillDetail.jsp', 
+					scripts : true,
 					params : {
-						
-						'orderID' : orderID,
-						'queryType' : 'History'
+						orderId : sd.id,
+						queryType : 'History'
 					},
-					success : function(response, options) {
-						var jr = Ext.decode(response.responseText);
-						if (jr.success == true) {
-							viewBillData = jr;
-							history_viewBillGrid.getStore().loadData(viewBillData);
-						} else {
-							Ext.ux.showMsg(jr);
-						}
-					},
-					failure : function(response, options) {
-						var jr = Ext.decode(response.responseText);
-						Ext.ux.showMsg(jr);	
-					}
+					method : 'post'
 				});
+				thiz.center();	
 			}
 		}
 	});
 }
 
 function billViewHandler() {
+	showViewBillWin();
 	viewBillWin.show();
 	viewBillWin.center();
 };

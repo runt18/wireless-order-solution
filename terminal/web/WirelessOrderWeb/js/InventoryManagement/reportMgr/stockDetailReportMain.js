@@ -264,8 +264,6 @@ var stockInDate = [[1, '采购'], [2, '入库调拨'], [3, '报溢'], [7, '盘�
 var stockOutDate = [[4, '退货'], [5, '出库调拨'], [6, '报损'], [8, '盘亏'], [9, '消耗']];
 var stock = [[-1, '全部'], [1, '入库'], [2, '出库']];
 Ext.onReady(function(){
-	Ext.BLANK_IMAGE_URL = '../../extjs/resources/images/default/s.gif';
-	Ext.QuickTips.init();
 	Ext.form.Field.prototype.msgTarget = 'side';
 	
 	//定义列模型
@@ -539,7 +537,7 @@ Ext.onReady(function(){
 			         	id = rec.get('id');
 			    });   
 				stockForm.form.load({
-					url:'../../QueryStockAction.do?'+ strEncode('restaurantID=' + restaurantID + '&id'+ id, 'mi')
+					url:'../../QueryStockAction.do?'+ strEncode('restaurantID=' + restaurantID + '&id'+ id, KEYS)
 				});
 				var detailds = stockDetailGrid.getStore();
 				detailds.load({

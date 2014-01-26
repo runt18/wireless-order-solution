@@ -1,7 +1,7 @@
 
 
 
-var pushBackBut = new Ext.ux.ImageButton({
+/*var pushBackBut = new Ext.ux.ImageButton({
 	imgPath : '../../images/UserLogout.png',
 	imgWidth : 50,
 	imgHeight : 50,
@@ -9,7 +9,7 @@ var pushBackBut = new Ext.ux.ImageButton({
 	handler : function(btn){
 		location.href = 'InventoryProtal.html?'+ strEncode('restaurantID=' + restaurantID, 'mi');
 	}
-});
+});*/
 
 var logOutBut = new Ext.ux.ImageButton({
 	imgPath : '../../images/ResLogout.png',
@@ -137,8 +137,6 @@ var materialComb = new Ext.form.ComboBox({
 
 var stockReportTree;
 Ext.onReady(function(){
-	Ext.BLANK_IMAGE_URL = '../../extjs/resources/images/default/s.gif';
-	Ext.QuickTips.init();
 	Ext.form.Field.prototype.msgTarget = 'side';
 	
 
@@ -274,7 +272,7 @@ Ext.onReady(function(){
 			}
 		}, '-', {
 				text : '导出',
-				iconCls : 'btn_search',
+				iconCls : 'icon_tb_exoprt_excel',
 				handler : function(){
 					var cateType = '', cateId = '', materialId = '';
 					var rn = stockReportTree.getSelectionModel().getSelectedNode();

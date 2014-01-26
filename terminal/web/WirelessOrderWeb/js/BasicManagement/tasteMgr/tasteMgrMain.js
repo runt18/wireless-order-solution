@@ -163,7 +163,7 @@ function initTasteGrid(){
 				
 				gs.load({
 					params : {
-						start : 0,
+						start : '0',
 						limit : GRID_PADDING_LIMIT_20
 					}
 				});
@@ -304,7 +304,7 @@ function initTasteOperatorWin(){
 		tasteOperatorWin = new Ext.Window({
 			id : 'taste_tasteOperatorWin',
 			title : '添加',
-			width : 310,
+			width : 320,
 			closeAction : 'hide',
 			closable : false,
 			resizable : false,
@@ -312,7 +312,7 @@ function initTasteOperatorWin(){
 			items : [{
 				layout : 'form',
 				labelWidth : 60,
-				width : 310,
+				width : 320,
 				border : false,
 				frame : true,
 				items : [{
@@ -612,7 +612,7 @@ Ext.onReady(function() {
 		rootVisible : true,
 		border : true,
 		frame : true,
-		enableDD : true,
+//		enableDD : true,
 		bodyStyle : 'backgroundColor:#FFFFFF; border:1px solid #99BBE8;',
 		loader : new Ext.tree.TreeLoader({
 			dataUrl : '../../QueryTasteCate.do',
@@ -668,7 +668,7 @@ Ext.onReady(function() {
 					tastem_add = true;
 				}
 			}
-			,
+/*			,
 			enddrag : function(t,n,e){
 				var cateB;
 				if(n.nextSibling != null){
@@ -691,7 +691,7 @@ Ext.onReady(function() {
 					}
 				});
 				
-			}
+			}*/
 		}
 	});
 	

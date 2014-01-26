@@ -673,9 +673,9 @@ var orderPanel = new Ext.Panel({
 		handler : function() {
 			var href = '';
 			if(isGroup){
-				href = 'CheckOut.html?'+ strEncode('restaurantID=' + restaurantID + '&orderID=' + orderID + '&category=' + tableCategory, 'mi');
+				href = 'CheckOut.html?'+ 'restaurantID=' + restaurantID + '&orderID=' + orderID + '&category=' + tableCategory;
 			}else{
-				href = 'CheckOut.html?'+ strEncode('restaurantID=' + restaurantID + '&tableID=' + tableAliasID+ '&personCount=1', 'mi');
+				href = 'CheckOut.html?'+ 'restaurantID=' + restaurantID + '&tableID=' + tableAliasID+ '&personCount=1';
 			}
 			submitOrderHandler({
 				notPrint : true,
@@ -687,9 +687,9 @@ var orderPanel = new Ext.Panel({
 		handler : function() {
 			var href = '';
 			if(isGroup){
-				href = 'CheckOut.html?'+ strEncode('restaurantID=' + restaurantID + '&orderID=' + orderID + '&category=' + tableCategory, 'mi');
+				href = 'CheckOut.html?'+ 'restaurantID=' + restaurantID + '&orderID=' + orderID + '&category=' + tableCategory;
 			}else{
-				href = 'CheckOut.html?'+ strEncode('restaurantID=' + restaurantID + '&tableID=' + tableAliasID+ '&personCount=1', 'mi');
+				href = 'CheckOut.html?'+ 'restaurantID=' + restaurantID + '&tableID=' + tableAliasID+ '&personCount=1';
 			}
 			submitOrderHandler({
 				href : href			
@@ -866,7 +866,7 @@ function initKeyBoardEvent(){
 			}, foodCount, {
 				columnWidth : 1,
 				buttonAlign : 'center',
-				buttons : [btnSaveForQAWin, btnCloseForQAWin],
+				buttons : [btnSaveForQAWin, btnCloseForQAWin]
 			}]
 		}]
 	});

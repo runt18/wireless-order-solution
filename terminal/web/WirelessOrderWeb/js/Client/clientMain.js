@@ -11,7 +11,7 @@
 				imgHeight : 50,
 				tooltip : '返回',
 				handler : function(e){
-					location.href = '../PersonLogin.html?'+ strEncode('restaurantID=' + restaurantID, 'mi');
+					location.href = '../PersonLogin.html?'+ strEncode('restaurantID=' + restaurantID, KEYS);
 				}
 			}), {
 				xtype : 'tbtext',
@@ -45,19 +45,19 @@ function bingActiveEvent(){
 //	bindActiveEvent('clientMgr', 
 //			'url(../../images/clientMgr_select.png) no-repeat 50%',
 //			'url(../../images/clientMgr.png) no-repeat 50%',
-//			"SupplierManagement.html"+ strEncode('restaurantID=' + restaurantID, 'mi')
+//			"SupplierManagement.html"+ strEncode('restaurantID=' + restaurantID, KEYS)
 //	);
 	// ---------------------------------
 	bindActiveEvent('memberTypeMgr', 
 			'url(../../images/memberTypeMgr_select.png) no-repeat 50%',
 			'url(../../images/memberTypeMgr.png) no-repeat 50%',
-			"MemberTypeManagement.html?"+ strEncode('restaurantID=' + restaurantID, 'mi')
+			"MemberTypeManagement.html?"+ strEncode('restaurantID=' + restaurantID, KEYS)
 	);
 	// ---------------------------------
 	bindActiveEvent('memberMgr', 
 			'url(../../images/memberMgr_select.png) no-repeat 50%',
 			'url(../../images/memberMgr.png) no-repeat 50%',
-			"MemberManagement.html?"+ strEncode('restaurantID=' + restaurantID, 'mi')
+			"MemberManagement.html?"+ strEncode('restaurantID=' + restaurantID, KEYS)
 	);
 };
 

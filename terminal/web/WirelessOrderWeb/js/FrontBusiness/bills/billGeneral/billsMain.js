@@ -47,121 +47,52 @@ function billOptModifyHandler(rowindex) {
 		Ext.example.msg('提示', '会员结账单暂不允许反结账.');
 		return;
 	}
-	location.href = 'BillModify.html?' + strEncode('restaurantID=' + restaurantID + '&orderID=' + data['id'], "mi");
+	setDynamicKey('BillModify.html', 'restaurantID=' + restaurantID + '&orderID=' + data['id']);
 };
 
-var viewBillGenPanel = new Ext.Panel({
-	region : 'north',
-	height : 125,
-	frame : true,
-	items : [ {
-		border : false,
-		contentEl : 'billView'
-	} ]
-});
-
-var viewBillGrid = createGridPanel(
-	'',
-	'已点菜',
-	'',
-    '',
-    '',
-    [
-	    [true, false, false, false], 
-	    ['菜名', 'name', 130] , 
-	    ['口味', 'tasteGroup.tastePref', 100],
-	    ['数量', 'count', 50, 'right', 'Ext.ux.txtFormat.gridDou'],
-	    ['折扣', 'discount', 50, 'right', 'Ext.ux.txtFormat.gridDou'],
-	    ['金额', 'totalPrice', 100, 'right', 'Ext.ux.txtFormat.gridDou']
-	],
-	OrderFoodRecord.getKeys(),
-    [],
-    0
-);
-viewBillGrid.region = 'center';
-
-var viewBillAddPanel = new Ext.Panel({
-	region : 'south',
-	height : 60,
-	frame : true,
-	items : [ {
-		border : false,
-		contentEl : 'billViewAddInfo'
-	} ]
-});
-
-var viewBillWin = new Ext.Window({
-	layout : 'border',
-	title : '查看账单',
-	width : 500,
-	height : 500,
-	closeAction : 'hide',
-	resizable : false,
-	closable : false,
-	modal : true,
-	items : [viewBillGenPanel, viewBillGrid, viewBillAddPanel],
-	bbar : ['->', {
-		text : '关闭',
-		iconCls : 'btn_close',
-		handler : function(){
-			viewBillWin.hide();
+function showViewBillWin(){
+	viewBillWin = new Ext.Window({
+		layout : 'fit',
+		title : '查看账单',
+		width : 510,
+		height : 550,
+		resizable : false,
+		closable : false,
+		modal : true,
+		bbar : ['->', {
+			text : '关闭',
+			iconCls : 'btn_close',
+			handler : function() {
+				viewBillWin.destroy();
+			}
+		}],
+		keys : [{
+			key : Ext.EventObject.ESC,
+			scope : this,
+			fn : function(){
+				viewBillWin.destroy();
+			}
+		}],
+		listeners : {
+			show : function(thiz) {
+				var sd = Ext.ux.getSelData(billsGrid);
+				thiz.load({
+					url : '../window/history/viewBillDetail.jsp', 
+					scripts : true,
+					params : {
+						orderId : sd.id,
+						queryType : 'Today'
+					},
+					method : 'post'
+				});
+				thiz.center();	
+			}
 		}
-	} ],
-	keys : [{
-		key : Ext.EventObject.ESC,
-		scope : this,
-		fn : function(){
-			viewBillWin.hide();
-		}
-	}],
-	listeners : {
-		show : function(thiz) {
-			var data = Ext.ux.getSelData(billsGrid);
-			var billID = data['id'];
-			
-			document.getElementById('billIDBV').innerHTML = billID;
-			document.getElementById('billTypeBV').innerHTML = data['categoryText'];
-			document.getElementById('tableNbrBV').innerHTML = data['table']['alias'];
-			document.getElementById('personNbrBV').innerHTML = data['customNum'];
-			document.getElementById('billDateBV').innerHTML = data['orderDateFormat'];
-			document.getElementById('payTypeBV').innerHTML = data['settleTypeText'];
-			document.getElementById('payMannerBV').innerHTML = data['payTypeText'];
-			document.getElementById('serviceRateBV').innerHTML = parseInt(data['serviceRate'] * 100) + ' ％';
-			document.getElementById('forFreeBV').innerHTML = '￥' + data['giftPrice'].toFixed(2);
-			document.getElementById('shouldPayBV').innerHTML = '￥' + data['totalPrice'].toFixed(2);
-			document.getElementById('actrualPayBV').innerHTML = '￥' + data['actualPrice'].toFixed(2);
-			document.getElementById('discountBV').innerHTML = '￥' + data['discountPrice'].toFixed(2);
-			document.getElementById('erasePuotaPriceBV').innerHTML = '￥' + data['erasePrice'].toFixed(2);
-			document.getElementById('cancelPriceBV').innerHTML = '￥' + data['cancelPrice'].toFixed(2);
-			
-			Ext.Ajax.request({
-				url : '../../QueryOrder.do',
-				params : {
-					isCookie : true,
-					'orderID' : billID,
-					'queryType' : 'Today'
-				},
-				success : function(response, options) {
-					var resultJSON = Ext.decode(response.responseText);
-					if (resultJSON.success == true) {
-						viewBillGrid.getStore().loadData(resultJSON);
-					} else {
-						Ext.ux.showMsg(resultJSON);
-					}
-				},
-				failure : function(response, options) {
-					Ext.ux.showMsg(Ext.decode(response.responseText));
-				}
-			});
-		},
-		hide : function(thiz) {
-			viewBillData = null;
-			viewBillGrid.getStore().removeAll();
-		}
-	}
-});
+	});
+}
 
 function billViewHandler() {
+	showViewBillWin();
 	viewBillWin.show();
 	viewBillWin.center();
 };
@@ -266,7 +197,6 @@ function printBillFunc(orderID) {
 	Ext.Ajax.request({
 		url : '../../PrintOrder.do',
 		params : {
-			isCookie : true,
 			'orderID' : orderID,
 			'printType' : 3
 		},

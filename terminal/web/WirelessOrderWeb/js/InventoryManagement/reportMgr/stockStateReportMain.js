@@ -1,4 +1,4 @@
-var pushBackBut = new Ext.ux.ImageButton({
+/*var pushBackBut = new Ext.ux.ImageButton({
 	imgPath : "../../images/UserLogout.png",
 	imgWidth : 50,
 	imgHeight : 50,
@@ -6,7 +6,7 @@ var pushBackBut = new Ext.ux.ImageButton({
 	handler : function(btn){
 		location.href = "InventoryProtal.html?"+ strEncode('restaurantID=' + restaurantID, 'mi');
 	}
-});
+});*/
 
 var logOutBut = new Ext.ux.ImageButton({
 	imgPath : "../../images/ResLogout.png",
@@ -152,8 +152,6 @@ var materialComb = new Ext.form.ComboBox({
 var deptTree;
 var stockStateGrid;
 Ext.onReady(function(){
-	Ext.BLANK_IMAGE_URL = '../../extjs/resources/images/default/s.gif';
-	Ext.QuickTips.init();
 	Ext.form.Field.prototype.msgTarget = 'side';
 	
 	deptTree = new Ext.tree.TreePanel({
