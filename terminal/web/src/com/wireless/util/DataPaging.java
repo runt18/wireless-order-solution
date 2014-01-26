@@ -55,9 +55,15 @@ public class DataPaging {
 	 * @throws Exception
 	 */
 	public static <T> List<T> getPagingData(List<T> list, String isPaging, String start, String limit) throws Exception{
-		if(isPaging != null && start != null && limit != null)
+		if(isPaging != null && start != null && limit != null){
+			if(isPaging.isEmpty()){
+				isPaging = "false";
+			}
+			if(start.isEmpty()){
+				start = "0";
+			}
 			return DataPaging.getPagingData(list, Boolean.valueOf(isPaging), Integer.valueOf(start), Integer.valueOf(limit));
-		else
+		}else
 			return list;
 	}
 	

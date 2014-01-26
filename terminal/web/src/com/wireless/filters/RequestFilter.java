@@ -61,12 +61,6 @@ public class RequestFilter implements Filter{
                     response.setHeader("session_status", "timeout");
                     response.addHeader("root_path",	request.getContextPath());
                 }
-//				else{
-//                	if(comeFrom != null){
-//                		response.sendRedirect(request.getContextPath() + Staff.RequestSource.valueOf(Integer.parseInt(comeFrom.getValue())).getRedirect()
-//                							  + "?" + Encrypt.strEncode("restaurantID="+params.get("restaurantID"), KEYS, null, null));
-//                	}
-//                }
 
 			}else{
 				//if the session is OK, just do chain...go!!!

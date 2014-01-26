@@ -15,7 +15,6 @@ import com.wireless.json.JObject;
 import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.pojo.staffMgr.Staff;
-import com.wireless.util.WebParams;
 
 public class InsertMenuAction extends Action {
 	
@@ -56,7 +55,6 @@ public class InsertMenuAction extends Action {
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
 			Food.InsertBuilder builder = new Food.InsertBuilder(foodName, Float.parseFloat(foodPrice), new Kitchen(Integer.parseInt(kitchenId)))
-												 .setAliasId(Integer.parseInt(foodAliasId))
 												 .setDesc(foodDesc)
 												 .setStockStatus(Food.StockStatus.valueOf(Integer.valueOf(stockStatus)))
 												 .setSpecial(Boolean.valueOf(isSpecial))
@@ -66,6 +64,11 @@ public class InsertMenuAction extends Action {
 												 .setCurPrice(Boolean.valueOf(isCurrPrice))
 												 .setHot(Boolean.valueOf(isHot))
 												 .setWeigh(Boolean.valueOf(isWeight));
+			
+			if(foodAliasId != null && !foodAliasId.isEmpty()){
+				builder.setAliasId(Integer.parseInt(foodAliasId));
+			}
+			
 			if(Boolean.valueOf(isCommission)){
 				builder.setCommission(Float.parseFloat(commission));
 			}
@@ -76,10 +79,10 @@ public class InsertMenuAction extends Action {
 			
 		} catch (BusinessException e) {
 			e.printStackTrace();
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getCode(), e.getDesc());
+			jobject.initTip(e);
 		} catch (Exception e) {
 			e.printStackTrace();
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
+			jobject.initTip(e);
 		} finally {
 			response.getWriter().write(jobject.toString());
 		}

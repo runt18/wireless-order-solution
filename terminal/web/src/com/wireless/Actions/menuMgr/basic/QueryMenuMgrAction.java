@@ -45,7 +45,7 @@ public class QueryMenuMgrAction extends Action {
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
 			String kitchen = request.getParameter("kitchen");
-			String alias = request.getParameter("alias");
+			String deptId = request.getParameter("deptId");
 			String operqtor = request.getParameter("operator");
 			String name = request.getParameter("name");
 			String pinyin = request.getParameter("pinyin");
@@ -60,6 +60,7 @@ public class QueryMenuMgrAction extends Action {
 			String isCombination = request.getParameter("isCombination");
 			String isHot = request.getParameter("isHot");
 			String isWeight = request.getParameter("isWeight");
+			String isCommission = request.getParameter("isCommission");
 			List<String> statusList = new ArrayList<String>();
 			
 			String extraCond = "";
@@ -83,11 +84,11 @@ public class QueryMenuMgrAction extends Action {
 					operqtor = "=";
 				}
 			}
-			if(kitchen != null && !kitchen.trim().isEmpty() && !kitchen.equals("")){
-				extraCond += (" AND FOOD.kitchen_alias = " + kitchen);
+			if(kitchen != null && !kitchen.trim().isEmpty()){
+				extraCond += (" AND FOOD.kitchen_id = " + kitchen);
 			}
-			if(alias != null && !alias.trim().isEmpty() && !alias.equals("")){
-				extraCond += (" AND FOOD.food_alias " + operqtor + alias);
+			if(deptId != null && !deptId.trim().isEmpty()){
+				extraCond += (" AND DEPT.dept_id = " + deptId);
 			}
 			if(name != null && !name.trim().isEmpty() && !name.equals("")){
 				extraCond += (" AND FOOD.name like '%" + name.trim() + "%'");
@@ -125,6 +126,9 @@ public class QueryMenuMgrAction extends Action {
 			}
 			if(isWeight != null && isWeight.trim().equals("true")){
 				statusList.add("(FOOD.status & " + Food.WEIGHT + ") <> 0");
+			}
+			if(isCommission != null && isCommission.trim().equals("true")){
+				statusList.add("(FOOD.status & " + Food.COMMISSION + ") <> 0");
 			}
 			if(!statusList.isEmpty()){
 				String strStatus = "";

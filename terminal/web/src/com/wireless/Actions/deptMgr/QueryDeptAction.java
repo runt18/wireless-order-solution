@@ -17,7 +17,6 @@ import com.wireless.json.JObject;
 import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.util.DataPaging;
-import com.wireless.util.WebParams;
 
 public class QueryDeptAction extends DispatchAction{
 
@@ -51,11 +50,11 @@ public class QueryDeptAction extends DispatchAction{
 			}
 		}catch(BusinessException e){
 			e.printStackTrace();
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getCode(), e.getDesc());
+			jobject.initTip(e);
 			
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
+			jobject.initTip(e);
 		}finally{
 			if(root != null){
 				jobject.setTotalProperty(root.size());

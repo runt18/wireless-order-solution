@@ -44,6 +44,7 @@ public class VerifyLoginAction extends Action {
 				Staff staff = StaffDao.verify(Integer.parseInt(pin));
 				
 				other.put("staff", staff);
+				other.put("sessionId", request.getSession().getId());
 				jobject.setOther(other);
 				jobject.initTip(true, "true");
 			}

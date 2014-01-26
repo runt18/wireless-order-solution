@@ -1,5 +1,6 @@
 package com.wireless.Actions.deptMgr.kitchenMgr;
 
+import java.sql.SQLException;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -10,10 +11,14 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
+import com.wireless.db.deptMgr.DepartmentDao;
 import com.wireless.db.deptMgr.KitchenDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.json.JObject;
+import com.wireless.pojo.menuMgr.Department;
+import com.wireless.pojo.menuMgr.Department.DeptId;
 import com.wireless.pojo.menuMgr.Kitchen;
+import com.wireless.pojo.menuMgr.Kitchen.Type;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.util.DataPaging;
 import com.wireless.util.WebParams;
@@ -63,6 +68,64 @@ public class QueryKitchenAction extends DispatchAction {
 		return null;
 	}
 	
+	public ActionForward deptKitchenTree(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		StringBuilder jsonSB = new StringBuilder();
+		try{
+			String pin = (String)request.getAttribute("pin");
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			
+			List<Department> depts = DepartmentDao.getByType(staff, Department.Type.NORMAL);
+			
+			for (int i = 0; i < depts.size(); i++) {
+				jsonSB.append(i > 0 ? "," : "");
+				jsonSB.append("{");
+				jsonSB.append("id:'dept_id_" + depts.get(i).getId() + "'");
+				jsonSB.append(",text:'" + depts.get(i).getName() + "'");
+				jsonSB.append(",deptID:'" + depts.get(i).getId() + "'");
+				jsonSB.append(",type:'" + depts.get(i).getType().getVal() + "'");
+				jsonSB.append(",cls:'floatBarStyle'");
+				jsonSB.append(",restaurantID:'" + depts.get(i).getRestaurantId() + "'");
+				jsonSB.append(",expanded : true");
+				jsonSB.append(",expandable : true");
+				jsonSB.append(",children:[");
+				jsonSB.append(getChildren(staff, depts.get(i).getId()));
+				jsonSB.append("]}");
+			}
+	
+		}catch(SQLException e){
+			e.printStackTrace();
+		}catch(Exception e){
+			e.printStackTrace();
+		}finally{
+			response.getWriter().print("[" + jsonSB.toString() + "]");
+		}
+		return null;
+	}
+	
+	private StringBuilder getChildren(Staff staff, int deptId) throws SQLException{
+		StringBuilder jsb = new StringBuilder();
+		
+		List<Kitchen> list = KitchenDao.getByDept(staff, Department.DeptId.valueOf(deptId));
+		
+		for(int i = 0; i < list.size(); i++){
+			if(i > 0){
+				jsb.append(",");
+			}
+			jsb.append("{");
+			jsb.append("leaf:true");
+			jsb.append(",text:'" + list.get(i).getName() + "'");
+			jsb.append(",isAllowTemp:" + list.get(i).isAllowTemp());
+			jsb.append(",name:'" + list.get(i).getName() + "'");
+			jsb.append(",kid:" + list.get(i).getId());
+			jsb.append(",belongDept:" + list.get(i).getDept().getId());
+			jsb.append("}");
+		}
+		
+		return jsb;
+	}
+	
 	/**
 	 * 普通数据格式
 	 * @param mapping
@@ -86,23 +149,15 @@ public class QueryKitchenAction extends DispatchAction {
 		
 		try{
 			String pin = (String)request.getAttribute("pin");
-			String deptID = request.getParameter("deptID");
+//			String deptID = request.getParameter("deptID");
+			
 			
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
-			String extraCond = "", orderClause = "";
 			
-			extraCond += (" AND KITCHEN.restaurant_id = " + staff.getRestaurantId());
-			extraCond += (" AND KITCHEN.kitchen_alias <> 253 AND KITCHEN.kitchen_alias <> 255 ");
-			if(deptID != null && !deptID.trim().isEmpty() && !deptID.equals("-1")){
-				extraCond += (" AND DEPT.dept_id = " + deptID);
-			}
-			
-			orderClause = " ORDER BY KITCHEN.kitchen_alias ";
-			
-			root = KitchenDao.getKitchens(staff, extraCond, orderClause);
+			root = KitchenDao.getByType(staff, Type.NORMAL);
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
+			jobject.initTip(e);
 		}finally{
 			if(root != null){
 				jobject.setTotalProperty(root.size());

@@ -51,7 +51,7 @@ public class OperateStaffAction extends Action{
 				HttpSession session = request.getSession();
 				session.setAttribute("pin", pin);
 				session.setAttribute("restaurantID", staff.getRestaurantId()+"");
-				
+				session.setAttribute("dynamicKey", System.currentTimeMillis() % 100000);
 				Map<Object, Object> other = new HashMap<Object, Object>();
 				other.put("staff", staff);
 				jobject.setOther(other);

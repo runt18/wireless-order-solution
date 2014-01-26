@@ -3,49 +3,42 @@ package com.wireless.Actions.deptMgr.kitchenMgr;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import net.sf.json.JSONObject;
-
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import com.wireless.db.menuMgr.MenuDao;
-import com.wireless.pojo.menuMgr.Kitchen;
-import com.wireless.util.JObject;
-import com.wireless.util.WebParams;
+import com.wireless.db.deptMgr.KitchenDao;
+import com.wireless.db.staffMgr.StaffDao;
+import com.wireless.json.JObject;
+import com.wireless.pojo.menuMgr.Department;
+import com.wireless.pojo.menuMgr.Kitchen.UpdateBuilder;
 
 public class UpdateKitchenAction extends Action {
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		
-		
-		
 		JObject jobject = new JObject();
 		
 		try{
-			String restaurantID = request.getParameter("restaurantID");
 			String kitchenID = request.getParameter("kitchenID");
 			String kitchenName = request.getParameter("kitchenName");
 			String deptID = request.getParameter("deptID");
 			String isAllowTemp = request.getParameter("isAllowTemp");
+			String pin = (String) request.getAttribute("pin");
 			
-			Kitchen kitchen = new Kitchen(Integer.valueOf(kitchenID));
-			kitchen.setRestaurantId(Integer.valueOf(restaurantID));
-			kitchen.setName(kitchenName.trim());
-			kitchen.getDept().setId(Short.valueOf(deptID));
-			kitchen.setAllowTemp(isAllowTemp);
-			
-			MenuDao.updateKitchen(kitchen);
+			KitchenDao.update(StaffDao.verify(Integer.parseInt(pin)), 
+							 new UpdateBuilder(Integer.valueOf(kitchenID))
+									.setName(kitchenName)
+									.setDeptId(Department.DeptId.valueOf(Integer.parseInt(deptID)))
+									.setAllowTmp(Boolean.parseBoolean(isAllowTemp)));
 			
 			jobject.initTip(true, "操作成功,已修改厨房信息.");
 		} catch (Exception e) {
 			e.printStackTrace();
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
+			jobject.initTip(e);
 		} finally {
-			JSONObject json = JSONObject.fromObject(jobject);
-			response.getWriter().print(json.toString());
+			response.getWriter().print(jobject.toString());
 		}
 
 		return null;
