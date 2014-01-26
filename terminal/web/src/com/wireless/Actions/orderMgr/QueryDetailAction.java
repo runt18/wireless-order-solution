@@ -72,7 +72,7 @@ public class QueryDetailAction extends Action {
 				list = DataPaging.getPagingData(list, isPaging, start, limit);
 				jobject.setRoot(list);
 			}
-			response.getWriter().print(jobject.toString(2));
+			response.getWriter().print(jobject.toString());
 		}
 		return null;
 	}

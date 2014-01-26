@@ -12,7 +12,7 @@ import com.wireless.db.menuMgr.MenuDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
-import com.wireless.pojo.ppMgr.PricePlan;
+import com.wireless.pojo.menuMgr.PricePlan;
 import com.wireless.util.WebParams;
 
 public class UpdatePricePlanAction extends Action {
