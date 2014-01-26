@@ -211,64 +211,6 @@ public class OrderDao {
 	}
 	
 	/**
-	 * @deprecated
-	 * Get the details to both order and its children according to the specific order id. 
-	 * @param term
-	 * 			  the terminal
-	 * @param orderId
-	 *            the order id to query
-	 * @param dateType
-	 * 			  indicates which date type {@link DateType} should use
-	 * @return the order detail information
-	 * @throws BusinessException
-	 * 			   Throws if the order to this id does NOT exist.
-	 * @throws SQLException
-	 *             Throws if fail to execute any SQL statement
-	 */
-	private static Order execWithChildDetailByID(Staff term, int orderId, DateType queryType) throws BusinessException, SQLException{
-		DBCon dbCon = new DBCon();
-		try{
-			dbCon.connect();
-			return getWithChildDetailById(dbCon, term, orderId, queryType);
-		}finally{
-			dbCon.disconnect();
-		}
-	}
-	
-	/**
-	 * @deprecated
-	 * Get the details to both order and its children according to the specific order id. 
-	 * 
-	 * @param dbCon
-	 *            the database connection
-	 * @param staff
-	 * 			  the staff to perform this action
-	 * @param orderId
-	 *            the order id to query
-	 * @param dateType
-	 * 			  indicates which date type {@link DateType} should use
-	 * @return the order detail information
-	 * @throws BusinessException
-	 * 			   Throws if the order to this id does NOT exist.
-	 * @throws SQLException
-	 *             Throws if fail to execute any SQL statement
-	 */
-	private static Order getWithChildDetailById(DBCon dbCon, Staff staff, int orderId, DateType dateType) throws BusinessException, SQLException{
-		Order result = getById(dbCon, staff, orderId, dateType);
-//		if(result.isMerged() && result.hasChildOrder()){
-//			for(Order childOrder : result.getChildOrder()){
-//				if(dateType == DateType.TODAY){
-//					childOrder.setOrderFoods(OrderFoodDao.getDetailToday(dbCon, staff, "AND O.id = " + childOrder.getId(), null));
-//				}else if(dateType == DateType.HISTORY){
-//					childOrder.setOrderFoods(OrderFoodDao.getDetailHistory(dbCon, staff, "AND OH.id = " + childOrder.getId(), null));
-//				}
-//
-//			}
-//		}
-		return result;
-	}
-	
-	/**
 	 * Get the order detail information according to the specific extra condition and order clause. 
 	 * @param term
 	 * 			  the terminal
