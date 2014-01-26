@@ -6,7 +6,6 @@
  * http://extjs.com/license
  */
 
-Ext.BLANK_IMAGE_URL = '../extjs/resources/images/default/s.gif';
 
 Ext.example = function(){
     var msgCt;
