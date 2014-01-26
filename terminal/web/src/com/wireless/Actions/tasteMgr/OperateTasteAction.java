@@ -9,6 +9,7 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
 import com.wireless.db.staffMgr.StaffDao;
+import com.wireless.db.tasteMgr.TasteCategoryDao;
 import com.wireless.db.tasteMgr.TasteDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
@@ -36,10 +37,15 @@ public class OperateTasteAction extends DispatchAction{
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
 			TasteCategory category = new TasteCategory(Integer.parseInt(cate));
-			Taste.InsertBuilder builder = new Taste.InsertBuilder(staff.getRestaurantId(), name, category)
-												   .setPrice(Float.valueOf(price))
-												   .setRate(Float.valueOf(rate));
+			Taste.InsertBuilder builder = new Taste.InsertBuilder(staff.getRestaurantId(), name, category);
 			
+			if(price != null && !price.isEmpty()){
+				builder.setPrice(Float.valueOf(price));
+			}
+			if(rate != null && !rate.isEmpty()){
+				builder.setRate(Float.valueOf(rate));
+				
+			}
 			TasteDao.insert(staff, builder);
 			jobject.initTip(true, "操作成功, 已添加新口味信息.");
 			
@@ -71,15 +77,19 @@ public class OperateTasteAction extends DispatchAction{
 			String price = request.getParameter("price");
 			String rate = request.getParameter("rate");
 			String cate = request.getParameter("cate");
-			TasteCategory category = new TasteCategory(Integer.parseInt(cate));
-			
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			TasteCategory category = TasteCategoryDao.getById(staff, Integer.parseInt(cate));
+			
 			
 			Taste.UpdateBuilder builder = new Taste.UpdateBuilder(Integer.valueOf(id))
-												   .setPrice(Float.valueOf(price))
-												   .setRate(Float.valueOf(rate))
 												   .setPrefence(name)
 												   .setCategory(category);
+			if(price != null && !price.isEmpty()){
+				builder.setPrice(Float.valueOf(price));
+			}
+			if(rate != null && !rate.isEmpty()){
+				builder.setRate(Float.valueOf(rate));
+			}
 			
 			TasteDao.update(staff, builder);
 			
