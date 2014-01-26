@@ -33,7 +33,7 @@ var restaurantID = Request["restaurantID"];
 		new Ext.util.TaskRunner().start({
 			run: function(){
 				if(interval < 1){
-					location.href = '/WirelessOrderWeb/pages/PersonLogin.html?'+strEncode('restaurantID='+restaurantID, 'mi');								
+					location.href = '/WirelessOrderWeb/pages/PersonLogin.html?'+strEncode('restaurantID='+restaurantID, KEYS);								
 				}
 				Ext.getDom('returnInterval').innerHTML = interval;
 				interval--;
@@ -48,7 +48,7 @@ var restaurantID = Request["restaurantID"];
 			closable : false,
 			fn : function(btn){
 				if(btn == 'ok'){
-					location.href = '/WirelessOrderWeb/pages/PersonLogin.html?'+strEncode('restaurantID='+restaurantID, 'mi');
+					location.href = '/WirelessOrderWeb/pages/PersonLogin.html?'+strEncode('restaurantID='+restaurantID, KESY);
 				}
 			}
 		});
