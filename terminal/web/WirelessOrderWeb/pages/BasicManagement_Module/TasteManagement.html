@@ -3,27 +3,13 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>无线点餐网页终端</title>
-<style type="text/css"> 
-	.x-grid3-row td, .x-grid3-summary-row td{
-		line-height : 20px;
-		vertical-align : middle;
-	}
-	.x-grid3-row img, .x-grid3-summary-row img{ 
-		vertical-align : middle;
-	}
-	.x-toolbar table{
-		vertical-align : middle;
-	}
- 	.test{
-		background-color: red;
-	} 
-</style> 
+
 
 <script type="text/javascript">
 	var conditionType = '';
 	var currPageIndex = 0;
 	var currRowIndex = -1;
-	var pageRecordCount = 30;
+	var GRID_PADDING_LIMIT_20 = 23;
 	
 	var tasteData = [];
 	var tasteGrid, tasteOperatorWin, tmm_tasteTree;
