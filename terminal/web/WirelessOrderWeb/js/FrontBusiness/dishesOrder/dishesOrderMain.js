@@ -297,9 +297,6 @@ var allFoodTabPanelGridTbar = new Ext.Toolbar({
 				type : 1,
 				name : '菜名'
 			}, {
-				type : 2,
-				name : '拼音'
-			}, {
 				type : 3,
 				name : '编号'
 			}]
@@ -384,7 +381,6 @@ var allFoodTabPanelGridTbar = new Ext.Toolbar({
 				Ext.Ajax.request({
 					url : '../../QueryMenu.do',
 					params : {
-						isCookie : true,
 						dataSource : 'kitchens',
 						restaurantID : restaurantID
 					},
@@ -430,11 +426,13 @@ var allFoodTabPanelGridTbar = new Ext.Toolbar({
 		iconCls : 'btn_search',
 		handler : function(){
 			var searchType = Ext.getCmp('comSearchType').getValue();
-			var searchValue = Ext.getCmp(orderMainObject.searchField).getValue();
+			var searchValue = '';
+			if(orderMainObject.searchField != ''){
+				searchValue = Ext.getCmp(orderMainObject.searchField).getValue();
+			}
 			var gs = allFoodTabPanelGrid.getStore();
 			gs.baseParams['kitchenAlias'] = searchType == 0 ? searchValue : '';
 			gs.baseParams['foodName'] = searchType == 1 ? searchValue : '';
-			gs.baseParams['pinyin'] = searchType == 2 ? searchValue : '';
 			gs.baseParams['foodAlias'] = searchType == 3 ? searchValue : '';
 			
 			gs.load({
@@ -559,11 +557,11 @@ var tempFoodTabPanel = new Ext.Panel({
 				xtype : 'combo',
 				id : 'comboTempFoodKitchen',
 				fieldLabel : '分厨',
-			    width : 144,
+			    width : 130,
 			    store : new Ext.data.JsonStore({
 					fields : KitchenRecord.getKeys()
 				}),
-				valueField : 'alias',
+				valueField : 'id',
 				displayField : 'name',
 				mode : 'local',
 				triggerAction : 'all',
@@ -618,7 +616,7 @@ var tempFoodTabPanel = new Ext.Panel({
     			unitPrice : price.getValue(),
     			acturalPrice : price.getValue(),
     			kitchen : {
-    				alias : kitchen.getValue()
+    				id : kitchen.getValue()
     			},
     			status : 0,
     			count : count.getValue(),

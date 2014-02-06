@@ -2232,7 +2232,6 @@ function initMenuGrid(){
 			}
 		}
 	});
-	
 	menuGrid = new Ext.grid.GridPanel({
 		id : 'menuMgrGrid',
 		region : 'center',
@@ -2250,146 +2249,146 @@ function initMenuGrid(){
 		autoScroll : true,
 		loadMask : { msg : '数据加载中，请稍等...' },
 		tbar : new Ext.Toolbar({
-			height : 26,
-			items : [{
-				xtype : 'tbtext',
-				text : String.format(Ext.ux.txtFormat.typeName, '分厨', 'showTypeForSearchKitchen', '----')
-			}, { 
-				xtype:'tbtext', 
-				text:'过滤:'
-			}, menu_filterTypeComb, { 
-				xtype:'tbtext', 
-				text:'&nbsp;&nbsp;'
-			}, {
-				xtype : 'combo',
-				hidden : true,
-				hideLabel : true,
-				forceSelection : true,
-				width : 100,
-				id : 'comboOperatorForGridSearch',
-				value : '等于',
-				rawValue : 1,
-				store : new Ext.data.SimpleStore({
-					fields : [ 'value', 'text' ],
-					data : [[1, '等于'], [2, '大于等于'], [3, '小于等于']]
-				}),
-				valueField : 'value',
-				displayField : 'text',
-				typeAhead : true,
-				mode : 'local',
-				triggerAction : 'all',
-				selectOnFocus : true,
-				readOnly : true,
-				allowBlank : false
-			}, {
-				xtype : 'textfield',
-				id : 'textfieldForGridSearch',
-				hidden : true,
-				width : 120
-			}, {
-				xtype: 'numberfield',
-				id : 'numfieldForGridSearch',
-				style: 'text-align: left;',
-				hidden : true,
-				width : 120
-			}, {
-				xtype : 'combo',
-				forceSelection : true,
-				hidden : true,
-				width : 120,
-				id : 'kitchenTypeComb',
-				store : new Ext.data.JsonStore({
-					fields : [ 'alias', 'name' ]
-				}),
-				valueField : 'alias',
-				displayField : 'name',
-				typeAhead : true,
-				mode : 'local',
-				triggerAction : 'all',
-				selectOnFocus : true
-			}, {
-				xtype : 'combo',
-				forceSelection : true,
-				hidden : true,
-				width : 120,
-				id : 'comboStockStatusForSearch',
-				store : new Ext.data.SimpleStore({
-					fields : ['value', 'text'],
-					data : stockStatusData
-				}),
-				valueField : 'value',
-				displayField : 'text',
-				typeAhead : true,
-				mode : 'local',
-				triggerAction : 'all',
-				selectOnFocus : true
-			}, { 
-				xtype:'tbtext', 
-				text:'&nbsp;&nbsp;&nbsp;&nbsp;特价:'
-			}, {
-				xtype : 'checkbox',
-				id : 'specialCheckbox'
-			}, { 
-				xtype:'tbtext', 
-				text:'&nbsp;&nbsp;&nbsp;&nbsp;推荐:'
-			}, {
-				xtype : 'checkbox',
-				id : 'recommendCheckbox'
-			}, { 
-				xtype:'tbtext', 
-				text:'&nbsp;&nbsp;&nbsp;&nbsp;赠送:'
-			}, {
-				xtype : 'checkbox',
-				id : 'freeCheckbox'
-			}, { 
-				xtype:'tbtext', 
-				text:'&nbsp;&nbsp;&nbsp;&nbsp;停售:'
-			}, {
-				xtype : 'checkbox',
-				id : 'stopCheckbox'
-			}, { 
-				xtype:'tbtext',
-				text:'&nbsp;&nbsp;&nbsp;&nbsp;时价:'
-			}, {
-				xtype : 'checkbox',
-				id : 'currPriceCheckbox'
-			}, { 
-				xtype:'tbtext', 
-				text:'&nbsp;&nbsp;&nbsp;&nbsp; 套菜:'
-			}, {
-				xtype : 'checkbox',
-				id : 'combinationCheckbox'
-			}, { 
-				xtype:'tbtext', 
-				text:'&nbsp;&nbsp;&nbsp;&nbsp; 热销:'
-			}, {
-				xtype : 'checkbox',
-				id : 'hotCheckbox'
-			}, { 
-				xtype:'tbtext',
-				text:'&nbsp;&nbsp;&nbsp;&nbsp; 称重:'
-			}, {
-				xtype : 'checkbox',
-				id : 'weightCheckbox'
-			}, { 
-				xtype:'tbtext',
-				text:'&nbsp;&nbsp;&nbsp;&nbsp; 提成:'
-			}, {
-				xtype : 'checkbox',
-				id : 'commissionCheckbox'
-			}, '->', {
-				xtype : 'button',
-				hideLabel : true,
-				iconCls : 'btn_search',
-				id : 'srchBtn',
-				text : '搜索',
-				width : 100,
-				handler : function(thiz, e) {
-					searchMenuHandler();
-					Ext.getCmp('menuMgrGrid').getSelectionModel().clearSelections();
-					Ext.getCmp('menuMgrGrid').fireEvent('rowclick');
-				}
-			}]
+				height : 26,
+				items : [{
+					xtype : 'tbtext',
+					text : String.format(Ext.ux.txtFormat.typeName, '分厨', 'showTypeForSearchKitchen', '----')
+				}, { 
+					xtype:'tbtext', 
+					text:'过滤:'
+				}, menu_filterTypeComb, { 
+					xtype:'tbtext', 
+					text:'&nbsp;&nbsp;'
+				}, {
+					xtype : 'combo',
+					hidden : true,
+					hideLabel : true,
+					forceSelection : true,
+					width : 100,
+					id : 'comboOperatorForGridSearch',
+					value : '等于',
+					rawValue : 1,
+					store : new Ext.data.SimpleStore({
+						fields : [ 'value', 'text' ],
+						data : [[1, '等于'], [2, '大于等于'], [3, '小于等于']]
+					}),
+					valueField : 'value',
+					displayField : 'text',
+					typeAhead : true,
+					mode : 'local',
+					triggerAction : 'all',
+					selectOnFocus : true,
+					readOnly : true,
+					allowBlank : false
+				}, {
+					xtype : 'textfield',
+					id : 'textfieldForGridSearch',
+					hidden : true,
+					width : 120
+				}, {
+					xtype: 'numberfield',
+					id : 'numfieldForGridSearch',
+//					style: 'text-align: left;',
+					hidden : true,
+					width : 120
+				}, {
+					xtype : 'combo',
+					forceSelection : true,
+					hidden : true,
+					width : 120,
+					id : 'kitchenTypeComb',
+					store : new Ext.data.JsonStore({
+						fields : [ 'alias', 'name' ]
+					}),
+					valueField : 'alias',
+					displayField : 'name',
+					typeAhead : true,
+					mode : 'local',
+					triggerAction : 'all',
+					selectOnFocus : true
+				}, {
+					xtype : 'combo',
+					forceSelection : true,
+					hidden : true,
+					width : 120,
+					id : 'comboStockStatusForSearch',
+					store : new Ext.data.SimpleStore({
+						fields : ['value', 'text'],
+						data : stockStatusData
+					}),
+					valueField : 'value',
+					displayField : 'text',
+					typeAhead : true,
+					mode : 'local',
+					triggerAction : 'all',
+					selectOnFocus : true
+				}, { 
+					xtype:'tbtext', 
+					text:'&nbsp;&nbsp;&nbsp;&nbsp;特价:'
+				}, {
+					xtype : 'checkbox',
+					id : 'specialCheckbox'
+				}, { 
+					xtype:'tbtext', 
+					text:'&nbsp;&nbsp;&nbsp;&nbsp;推荐:'
+				}, {
+					xtype : 'checkbox',
+					id : 'recommendCheckbox'
+				}, { 
+					xtype:'tbtext', 
+					text:'&nbsp;&nbsp;&nbsp;&nbsp;赠送:'
+				}, {
+					xtype : 'checkbox',
+					id : 'freeCheckbox'
+				}, { 
+					xtype:'tbtext', 
+					text:'&nbsp;&nbsp;&nbsp;&nbsp;停售:'
+				}, {
+					xtype : 'checkbox',
+					id : 'stopCheckbox'
+				}, { 
+					xtype:'tbtext',
+					text:'&nbsp;&nbsp;&nbsp;&nbsp;时价:'
+				}, {
+					xtype : 'checkbox',
+					id : 'currPriceCheckbox'
+				}, { 
+					xtype:'tbtext', 
+					text:'&nbsp;&nbsp;&nbsp;&nbsp; 套菜:'
+				}, {
+					xtype : 'checkbox',
+					id : 'combinationCheckbox'
+				}, { 
+					xtype:'tbtext', 
+					text:'&nbsp;&nbsp;&nbsp;&nbsp; 热销:'
+				}, {
+					xtype : 'checkbox',
+					id : 'hotCheckbox'
+				}, { 
+					xtype:'tbtext',
+					text:'&nbsp;&nbsp;&nbsp;&nbsp; 称重:'
+				}, {
+					xtype : 'checkbox',
+					id : 'weightCheckbox'
+				}, { 
+					xtype:'tbtext',
+					text:'&nbsp;&nbsp;&nbsp;&nbsp; 提成:'
+				}, {
+					xtype : 'checkbox',
+					id : 'commissionCheckbox'
+				}, '->', {
+					xtype : 'button',
+					hideLabel : true,
+					iconCls : 'btn_search',
+					id : 'srchBtn',
+					text : '搜索',
+					width : 100,
+					handler : function(thiz, e) {
+						searchMenuHandler();
+						Ext.getCmp('menuMgrGrid').getSelectionModel().clearSelections();
+						Ext.getCmp('menuMgrGrid').fireEvent('rowclick');
+					}
+				}]
 		}),
 		listeners : {
 			render : function(thiz) {

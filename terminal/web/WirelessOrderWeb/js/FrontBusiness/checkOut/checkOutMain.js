@@ -40,31 +40,6 @@ var checkOutMainPanelTbar = new Ext.Toolbar({
 	}, {
 		xtype : 'tbtext',
 		text : '&nbsp;&nbsp;当前折扣方案:&nbsp;<span id="spanDisplayCurrentDiscount" style="color:rgb(21, 66, 139); font-weight:bold;">&nbsp;&nbsp;</span>'
-	}, {
-		xtype : 'tbtext',
-		text : '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;价格方案:&nbsp;&nbsp;'
-	}, {
-		xtype : 'combo',
-		id : 'comboPricePlan',
-		labelStyle : 'font-size:14px;font-weight:bold;',
-		readOnly : true,
-		forceSelection : true,
-		store : new Ext.data.JsonStore({
-			root : 'root',
-			fields : ['id', 'name', 'statusValue', 'foodPricePlan']
-		}),
-		valueField : 'id',
-		displayField : 'name',
-		typeAhead : true,
-		mode : 'local',
-		triggerAction : 'all',
-		selectOnFocus : true,
-		listeners : {
-			select : function(thiz, record, index) {
-				calcPricePlanID = thiz.getValue();
-				refreshCheckOutData();
-			}
-		}
 	}]
 });
 

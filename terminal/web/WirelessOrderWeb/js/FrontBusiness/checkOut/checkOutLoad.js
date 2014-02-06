@@ -65,7 +65,7 @@ function loadPricePlanData(_c){
 					if(pricePlanData.root[i]['statusValue'] == 1){
 						var pp = Ext.getCmp('comboPricePlan');
 						pp.setValue(pricePlanData.root[i]['id']);
-						calcPricePlanID = pricePlanData.root[i]['id'];
+//						calcPricePlanID = pricePlanData.root[i]['id'];
 						break;
 					}
 				}
@@ -85,7 +85,7 @@ function loadPricePlanData(_c){
  */
 function loadOrderBasicMsg(){
 	calcDiscountID = orderMsg.discount.id; // i
-	calcPricePlanID = orderMsg.pricePlan.id; // i
+//	calcPricePlanID = orderMsg.pricePlan.id; // i
 	document.getElementById('spanDisplayCurrentDiscount').innerHTML = orderMsg.discount.name;
 	
 	document.getElementById("serviceCharge").value = orderMsg.serviceRate * 100;
@@ -186,7 +186,7 @@ function loadTableData(_c){
 			orderID : orderID,
 			calc : typeof _c.calc == 'boolean' ? _c.calc : true,
 			discountID : calcDiscountID,
-			pricePlanID : calcPricePlanID,
+//			pricePlanID : calcPricePlanID,
 			eraseQuota : eraseQuota,
 			serviceRate : serviceRate,
 			customNum : customNum
@@ -244,7 +244,7 @@ function loadTableGroupData(_c){
 			orderID : orderID,
 			calc : true,
 			discountID : calcDiscountID,
-			pricePlanID : calcPricePlanID,
+//			pricePlanID : calcPricePlanID,
 			eraseQuota : eraseQuota,
 			serviceRate : serviceRate,
 			customNum : customNum
@@ -342,7 +342,7 @@ var timerCheckCount = 0;
 function refreshCheckOutData(_c){
 	if(timerCheckCount < 10*10){
 		// 加载参数检查定时器
-		if(typeof calcDiscountID == 'undefined' || typeof calcPricePlanID == 'undefined'){
+		if(typeof calcDiscountID == 'undefined'){
 			if(timerCheckParams == null || typeof timerCheckParams == 'undefined'){
 				timerCheckParams = setInterval(function(){
 					refreshCheckOutData();
@@ -382,7 +382,7 @@ function checkOutOnLoad() {
 	// 加载系统设置
 	loadSystemSetting();
 	// 加载价格方案
-	loadPricePlanData();
+//	loadPricePlanData();
 	//
 	loadTableData({
 		calc : false

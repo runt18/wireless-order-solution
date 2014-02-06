@@ -185,7 +185,7 @@ function initMenuForOperationFoodCount(){
 	var menuOperationFoodCount = new Ext.menu.Menu({
 		id : 'menuOperationFoodCount',
 		hideOnClick : false,
-		items : [new Ext.menu.Adapter(new Ext.Panel({
+		items : [new Ext.Panel({
 			frame : true,
 			width : 150,
 			items : [{
@@ -230,7 +230,7 @@ function initMenuForOperationFoodCount(){
 					Ext.menu.MenuMgr.get('menuOperationFoodCount').hide();
 				}
 			}]
-		}), {hideOnClick : false})],
+		}), {hideOnClick : false}],
 		listeners : {
 			show : function(){
 				var count = Ext.getCmp('numOperationFoodCount');

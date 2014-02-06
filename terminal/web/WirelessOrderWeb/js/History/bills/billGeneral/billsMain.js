@@ -533,7 +533,6 @@ Ext.onReady(function() {
 			xtype : 'numberfield',
 			id : 'numberSearchValue',
 			hidden : true,
-			style : 'text-align: left;',
 			width : 130
 		}, 
 		{ xtype:'tbtext', text:'&nbsp;&nbsp;'}, {

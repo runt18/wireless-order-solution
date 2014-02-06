@@ -79,7 +79,7 @@ var paySubmit = function(submitType) {
 					"comment" : Ext.getCmp("remark").getValue(),
 					"serviceRate" : serviceRate,
 					'eraseQuota' : eraseQuota,
-					'pricePlanID' : calcPricePlanID,
+//					'pricePlanID' : calcPricePlanID,
 					'customNum' : Ext.getCmp('numCustomNum').getValue()
 				},
 				success : function(response, options) {

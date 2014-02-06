@@ -782,7 +782,6 @@ function gridInit(){
 		}, {
 			xtype : 'numberfield',
 			id : 'numberSearchValueByNumber',
-			style : 'text-align: left;',
 			hidden : true
 		}, '->', {
 			text : '搜索',
