@@ -1,6 +1,7 @@
 package com.wireless.db.weixin.restaurant;
 
 import java.security.NoSuchAlgorithmException;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import com.wireless.db.DBCon;
@@ -413,4 +414,68 @@ public class WeixinRestaurantDao {
 			if(dbCon != null) dbCon.disconnect();
 		}
 	}
+	
+	/**
+	 * 
+	 * @param dbCon
+	 * @param rid
+	 * @return
+	 * @throws SQLException
+	 */
+	public static String getLogo(DBCon dbCon, int rid) throws SQLException{
+		String querySQL = "SELECT weixin_logo FROM restaurant WHERE id = " + rid;
+		String logo = null;
+		ResultSet res = dbCon.stmt.executeQuery(querySQL);
+		if(res != null && res.next()){
+			logo = res.getString(1);
+		}
+		return logo;
+	}
+	public static String getLogo(int rid) throws SQLException{
+		DBCon dbCon = null;
+		try{
+			dbCon = new DBCon();
+			dbCon.connect();
+			return getLogo(dbCon, rid);
+		}finally{
+			if(dbCon != null) dbCon.disconnect();
+		}
+	}
+	public static String getLogoByRestaurantSerial(DBCon dbCon, String serial) throws SQLException, BusinessException{
+		return getLogo(dbCon, getRestaurantIdByWeixin(dbCon, serial));
+	}
+	public static String getLogoByRestaurantSerial(String serial) throws SQLException, BusinessException{
+		DBCon dbCon = null;
+		try{
+			dbCon = new DBCon();
+			dbCon.connect();
+			return getLogoByRestaurantSerial(dbCon, serial);
+		}finally{
+			if(dbCon != null) dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * 
+	 * @param dbCon
+	 * @param rid
+	 * @param imgKey
+	 * @throws SQLException
+	 */
+	public static void updateLogo(DBCon dbCon, int rid, String imgKey) throws SQLException{
+		String updateSQL = "UPDATE restaurant SET weixin_logo = '" + imgKey + "' WHERE id = " + rid;
+		dbCon.stmt.executeUpdate(updateSQL);
+	}
+	public static void updateLogo(int rid, String imgKey) throws SQLException{
+		DBCon dbCon = null;
+		try{
+			dbCon = new DBCon();
+			dbCon.connect();
+			updateLogo(dbCon, rid, imgKey);
+		}finally{
+			if(dbCon != null) dbCon.disconnect();
+		}
+	}
+	
+	
 }
