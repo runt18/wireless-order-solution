@@ -10,7 +10,6 @@ import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.OrderFood;
-import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.pojo.tasteMgr.Taste;
 import com.wireless.pojo.tasteMgr.TasteCategory;
 import com.wireless.pojo.tasteMgr.TasteCategory.Status;
@@ -80,7 +79,7 @@ public class Util {
 				// set the temporary flag
 				foods[i].setTemp(true);
 				// extract the alias id to this temporary food
-				int aliasID = Integer.parseInt(values[1]);
+				int foodID = Integer.parseInt(values[1]);
 				// extract the name to this temporary food
 				foods[i].asFood().setName(values[2]);
 				// extract the amount to this temporary food
@@ -90,36 +89,21 @@ public class Util {
 				// extract the hang status to this temporary food
 				foods[i].setHangup(Boolean.parseBoolean(values[5]));
 				
-				foods[i].getKitchen().setAliasId(Kitchen.KitchenAlias.KITCHEN_TEMP.getAliasId());
+//				foods[i].getKitchen().setAliasId(Kitchen.KitchenAlias.KITCHEN_TEMP.getAliasId());
 				// extract the flag to indicates whether the food is original or extra
 				if (Short.parseShort(values[6]) == EXTRA_ORDER_FOOD) {
 					//Generate an unique food id to temporary food if it is extra.
 					//Otherwise just assign the alias id.
-					int tmpFoodID;
-					boolean isUnique;
-					do{
-						tmpFoodID = (int)(System.currentTimeMillis() % 65535);
-						isUnique = true;
-						for(int j = 0; j < i; j++){
-							if(foods[j].isTemp()){
-								if(tmpFoodID == foods[j].getAliasId()){
-									isUnique = false;
-									break;
-								}
-							}
-						}						
-					}while(!isUnique);					
-					foods[i].asFood().setAliasId(tmpFoodID);
 				}else if(Short.parseShort(values[6]) == ORIGINAL_ORDER_FOOD){
-					foods[i].asFood().setAliasId(aliasID);
+					foods[i].asFood().setFoodId(foodID);
 				}else if(Short.parseShort(values[6]) == PAY_AGAIN_ORDER_FOOD){
 					
 				}
 				// 
-				foods[i].getKitchen().setAliasId(Short.valueOf(values[7]));
+				foods[i].getKitchen().setId(Integer.parseInt(values[7]));
 			} else {
 				// extract the food alias id
-				foods[i].asFood().setAliasId(Integer.parseInt(values[1]));
+				foods[i].asFood().setFoodId(Integer.parseInt(values[1]));
 				// extract the amount to order food
 				foods[i].setCount(Float.parseFloat(values[2]));
 				// extract the tasteGroup
@@ -154,7 +138,7 @@ public class Util {
 					}
 				}
 				// extract the kitchen number
-				foods[i].getKitchen().setAliasId(Short.parseShort(values[4]));
+//				foods[i].getKitchen().setAliasId(Short.parseShort(values[4]));
 				// extract the discount
 				foods[i].setDiscount(Float.parseFloat(values[5]));
 				// extract the hang status 
