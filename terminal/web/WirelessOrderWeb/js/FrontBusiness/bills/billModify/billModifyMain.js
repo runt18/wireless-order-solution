@@ -91,7 +91,7 @@
 	}, {
 		defaults : {
 			labelWidth : 1,
-			labelSeparator : ' ',
+			labelSeparator : ' '
 		},
 		items : [{
 			xtype : 'label',

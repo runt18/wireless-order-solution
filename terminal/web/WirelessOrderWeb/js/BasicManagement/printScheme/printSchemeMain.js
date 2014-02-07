@@ -45,7 +45,7 @@ function loadInformation(){
 				for ( var i = 0; i < jr.root.length; i++) {
 					
 					var k = jr.root[i];
-					var c = {items : [{xtype : "checkbox", name : "kitchen",boxLabel : formatName(k.name) , hideLabel : true, inputValue : k.alias }]};
+					var c = {items : [{xtype : "checkbox", name : "kitchen",boxLabel : formatName(k.name) , hideLabel : true, inputValue : k.id }]};
 					
 					Ext.getCmp('allKitchen').add(c);
 					//solveIE自动换行时格式错乱

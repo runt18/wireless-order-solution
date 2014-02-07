@@ -214,13 +214,13 @@ function submitOrderHandler(_c){
 				foodPara = foodPara 
 						+ '[' 
 						+ 'true' + '<<sb>>'// 是否临时菜(true)
-						+ orderFoods[i].alias + '<<sb>>' // 临时菜1编号
+						+ orderFoods[i].id + '<<sb>>' // 临时菜1编号
 						+ foodname + '<<sb>>' // 临时菜1名称
 						+ orderFoods[i].count + '<<sb>>' // 临时菜1数量
 						+ orderFoods[i].unitPrice + '<<sb>>' // 临时菜1单价(原料單價)
 						+ '<<sb>>' // 菜品状态,暂时没用
 						+ 3 + '<<sb>>' // 菜品操作状态 1:已点菜 2:新点菜 3:反结账
-						+ orderFoods[i].kitchen.alias	// 临时菜出单厨房
+						+ orderFoods[i].kitchen.id	// 临时菜出单厨房
 						+ ']';
 			}else{
 				// 普通菜
@@ -236,10 +236,10 @@ function submitOrderHandler(_c){
 				foodPara = foodPara 
 						+ '['
 						+ 'false' + '<<sb>>' // 是否临时菜(false)
-						+ orderFoods[i].alias + '<<sb>>' // 菜品1编号
+						+ orderFoods[i].id + '<<sb>>' // 菜品1编号
 						+ orderFoods[i].count + '<<sb>>' // 菜品1数量
 						+ (normalTaste + ' <<st>> ' + tmpTaste) + '<<sb>>'
-						+ orderFoods[i].kitchen.alias + '<<sb>>'// 厨房1编号
+						+ orderFoods[i].kitchen.id + '<<sb>>'// 厨房1编号
 						+ '1' + '<<sb>>' // 菜品1折扣
 						+ 3  // 菜品操作状态 1:已点菜 2:新点菜 3:反结账
 						+ ']';

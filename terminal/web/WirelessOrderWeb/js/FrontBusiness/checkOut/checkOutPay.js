@@ -106,7 +106,7 @@ var paySubmit = function(submitType) {
 								defaults : {
 									xtype : 'label',
 									columnWidth : .25,
-									style : 'vertical-align:middle; line-height:36px; padding-left:20px; font-size:15px; font-weight: bold;'
+									style : 'font-size:15px;font-weight: bold;line-height:36px;padding-left:20px;  '
 								},
 								items : [{
 									html : '应收：￥<font color="red">'+countPrice+'</font>'
@@ -126,7 +126,7 @@ var paySubmit = function(submitType) {
 									html : '服务费：￥<font color="red">'+serviceRate+'</font>'
 								}, {
 									columnWidth : 1,
-									style : 'font-size:22px; line-height:40px; text-align:center;',
+									style : 'font-size:22px;line-height:40px;text-align:center;',
 									html : (dataInfo + '.' + action)
 								}],
 								buttonAlign : 'center',
