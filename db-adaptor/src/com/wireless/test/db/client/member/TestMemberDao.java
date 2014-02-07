@@ -14,6 +14,7 @@ import com.wireless.db.client.member.MemberCommentDao;
 import com.wireless.db.client.member.MemberDao;
 import com.wireless.db.client.member.MemberOperationDao;
 import com.wireless.db.client.member.MemberTypeDao;
+import com.wireless.db.coupon.CouponDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.client.Member;
@@ -249,6 +250,9 @@ public class TestMemberDao {
 				//Check to see whether the associated member operations are deleted
 				assertTrue("failed to delete today member operation", MemberOperationDao.getTodayByMemberId(memberId).isEmpty());
 				assertTrue("failed to delete history member operation", MemberOperationDao.getHistoryByMemberId(memberId).isEmpty());
+				
+				//Check to see whether the coupon associated with this member are deleted
+				assertTrue("failed to delete the coupons associated with this member", CouponDao.getByMember(mStaff, memberId).isEmpty());
 			}
 		}
 

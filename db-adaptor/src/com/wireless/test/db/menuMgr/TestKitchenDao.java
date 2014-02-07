@@ -34,7 +34,7 @@ public class TestKitchenDao {
 		int kitchenId = 0;
 		try{
 			//Add a kitchen.
-			Kitchen.AddBuilder addBuilder = new Kitchen.AddBuilder("测试厨房", Department.DeptId.DEPT_1).setAllowTmp(false);
+			Kitchen.AddBuilder addBuilder = new Kitchen.AddBuilder("测试厨房", Department.DeptId.DEPT_1).setAllowTmp(true);
 			kitchenId = KitchenDao.add(mStaff, addBuilder);
 			
 			Kitchen expected = addBuilder.build();
@@ -48,7 +48,7 @@ public class TestKitchenDao {
 			Assert.assertEquals("is allow tmp : add kitchen", expected.isAllowTemp(), actual.isAllowTemp());
 			
 			//Update a kitchen.
-			Kitchen.UpdateBuilder updateBuilder = new Kitchen.UpdateBuilder(kitchenId).setName("测试厨房2").setDeptId(Department.DeptId.DEPT_2).setAllowTmp(true);
+			Kitchen.UpdateBuilder updateBuilder = new Kitchen.UpdateBuilder(kitchenId).setName("测试厨房2").setDeptId(Department.DeptId.DEPT_2).setAllowTmp(false);
 			KitchenDao.update(mStaff, updateBuilder);
 			expected = updateBuilder.build();
 			actual = KitchenDao.getById(mStaff, kitchenId);

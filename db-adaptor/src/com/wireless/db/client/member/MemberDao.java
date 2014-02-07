@@ -11,6 +11,7 @@ import java.util.Map;
 import com.mysql.jdbc.Statement;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
+import com.wireless.db.coupon.CouponDao;
 import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
@@ -767,15 +768,18 @@ public class MemberDao {
 	 * Delete the member and associated member operation (today & history) according to id
 	 * @param dbCon
 	 * 			the database connection
-	 * @param term
-	 * 			the terminal
+	 * @param staff
+	 * 			the staff to perform this action
 	 * @param memberId
 	 * 			the member id to delete
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static void deleteById(DBCon dbCon, Staff term, int memberId) throws SQLException{
+	public static void deleteById(DBCon dbCon, Staff staff, int memberId) throws SQLException{
 		String sql;
+		//Delete the coupon associated with this member
+		CouponDao.deleteByMember(dbCon, staff, memberId);
+		
 		//Delete the interested member.
 		sql = " DELETE FROM " + Params.dbName + ".interested_member WHERE member_id = " + memberId;
 		dbCon.stmt.executeUpdate(sql);

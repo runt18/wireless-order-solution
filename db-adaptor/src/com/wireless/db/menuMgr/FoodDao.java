@@ -374,8 +374,8 @@ public class FoodDao {
 	 * 2 - Child food details to the food in case of combo
 	 * @param dbCon
 	 * 			the database connection
-	 * @param terminal
-	 * 			the terminal
+	 * @param staff
+	 * 			the staff to perform this action
 	 * @param foodId
 	 * 			the food id to query
 	 * @return	the food to the specified restaurant and id
@@ -384,8 +384,8 @@ public class FoodDao {
 	 * @throws BusinessException
 	 * 			throws if the food to specified restaurant and id is NOT found
 	 */	
-	public static Food getById(DBCon dbCon, Staff term, int foodId) throws SQLException, BusinessException{
-		List<Food> result = FoodDao.getByCond(dbCon, term, " AND FOOD.food_id = " + foodId, null);
+	public static Food getById(DBCon dbCon, Staff staff, int foodId) throws SQLException, BusinessException{
+		List<Food> result = FoodDao.getByCond(dbCon, staff, " AND FOOD.food_id = " + foodId, null);
 		if(result.isEmpty()){
 			throw new BusinessException(FoodError.FOOD_NOT_EXIST);
 		}else{
@@ -636,7 +636,7 @@ public class FoodDao {
 	}
 
 	/**
-	 * Query the foods to the specified restaurant defined in terminal {@link Staff} according to extra condition.
+	 * Query the foods to the specified restaurant defined in staff {@link Staff} according to extra condition.
 	 * @param staff
 	 * 			the staff to perform this action 
 	 * @param extraCondition
@@ -845,7 +845,7 @@ public class FoodDao {
 	}
 	
 	/**
-	 * Get the food and its related information to the specified restaurant defined in terminal {@link Staff} as below.
+	 * Get the food and its related information to the specified restaurant defined in staff {@link Staff} as below.
 	 * 1 - Popular taste to each food
 	 * 2 - Child food details to the food in case of combo
 	 * @param dbCon
@@ -927,7 +927,7 @@ public class FoodDao {
 	 * Get the food and its related information to the specified restaurant defined in staff {@link Staff} as below.
 	 * 1 - Popular taste to each food
 	 * 2 - Child food details to the food in case of combo
-	 * @param terminal
+	 * @param staff
 	 * 			the staff to perform this action
 	 * @param extraCondition
 	 * 			the extra condition to SQL statement
