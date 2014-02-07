@@ -97,7 +97,7 @@ public class QueryMenuMgrAction extends Action {
 				extraCond += (" AND FOOD.pinyin like '" + pinyin.trim() + "%'");
 			}
 			if(price != null && !price.trim().isEmpty() && !price.equals("")){
-				extraCond += (" AND FPP.unit_price " + operqtor + price);
+				extraCond += (" AND FOOD.price " + operqtor + price);
 			}
 			if(stockStatus != null && !stockStatus.trim().isEmpty() && !stockStatus.equals("")){
 				extraCond += (" AND FOOD.stock_status = " + stockStatus);

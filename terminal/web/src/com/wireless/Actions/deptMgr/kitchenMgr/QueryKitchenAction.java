@@ -111,6 +111,9 @@ public class QueryKitchenAction extends DispatchAction {
 			jsb.append(",name:'" + list.get(i).getName() + "'");
 			jsb.append(",kid:" + list.get(i).getId());
 			jsb.append(",belongDept:" + list.get(i).getDept().getId());
+			if(list.get(i).isAllowTemp()){
+				jsb.append(",icon:'../../images/linshicai.png'");
+			}
 			jsb.append("}");
 		}
 		

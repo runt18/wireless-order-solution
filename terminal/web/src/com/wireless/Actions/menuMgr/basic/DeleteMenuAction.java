@@ -12,7 +12,7 @@ import com.wireless.db.menuMgr.FoodDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.staffMgr.Staff;
-import com.wireless.util.JObject;
+import com.wireless.json.JObject;
 import com.wireless.util.WebParams;
 
 public class DeleteMenuAction extends Action {

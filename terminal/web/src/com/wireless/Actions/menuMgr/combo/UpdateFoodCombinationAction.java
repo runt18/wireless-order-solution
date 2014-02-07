@@ -35,14 +35,15 @@ public class UpdateFoodCombinationAction extends Action{
 			}
 			
 			Food.ComboBuilder comboBuilder = new Food.ComboBuilder(Integer.parseInt(foodID));
-			String[] sl = comboContent.split("<split>");
-			if(sl != null && sl.length != 0){
-				for(int i = 0; i < sl.length; i++){
-					String[] temp = sl[i].split(",");
-					comboBuilder.addChild(Integer.parseInt(temp[0]), Integer.parseInt(temp[1]));
+			if(!comboContent.isEmpty()){
+				String[] sl = comboContent.split("<split>");
+				if(sl != null && sl.length != 0){
+					for(int i = 0; i < sl.length; i++){
+						String[] temp = sl[i].split(",");
+						comboBuilder.addChild(Integer.parseInt(temp[0]), Integer.parseInt(temp[1]));
+					}
 				}
 			}
-			
 			FoodDao.buildCombo(StaffDao.verify(Integer.parseInt(pin)), comboBuilder);
 			jobject.initTip(true, "操作成功,已修改套菜关联信息.");
 		}catch(BusinessException e){
