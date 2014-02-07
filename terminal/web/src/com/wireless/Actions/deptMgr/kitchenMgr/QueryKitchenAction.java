@@ -16,12 +16,10 @@ import com.wireless.db.deptMgr.KitchenDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.json.JObject;
 import com.wireless.pojo.menuMgr.Department;
-import com.wireless.pojo.menuMgr.Department.DeptId;
 import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.pojo.menuMgr.Kitchen.Type;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.util.DataPaging;
-import com.wireless.util.WebParams;
 
 public class QueryKitchenAction extends DispatchAction {
 	
@@ -37,17 +35,10 @@ public class QueryKitchenAction extends DispatchAction {
 	public ActionForward tree(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		
-		
-		
-		StringBuffer jsb = new StringBuffer();
+		StringBuilder jsb = new StringBuilder();
 		try{
 			String pin = (String)request.getAttribute("pin");
-			Staff staff = StaffDao.verify(Integer.parseInt(pin));
-			String extraCond = "", orderClause = "";
-			extraCond += (" AND KITCHEN.restaurant_id = " + staff.getRestaurantId());
-			extraCond += (" AND KITCHEN.kitchen_alias <> 253 AND KITCHEN.kitchen_alias <> 255 ");
-			List<Kitchen> list = KitchenDao.getKitchens(staff, extraCond, orderClause);
+			List<Kitchen> list = KitchenDao.getByType(StaffDao.verify(Integer.parseInt(pin)), Type.NORMAL);
 			for(int i = 0; i < list.size(); i++){
 				if(i > 0){
 					jsb.append(",");
@@ -55,7 +46,7 @@ public class QueryKitchenAction extends DispatchAction {
 				jsb.append("{");
 				jsb.append("leaf:true");
 				jsb.append(",text:'" + list.get(i).getName() + "'");
-				jsb.append(",alias:" + list.get(i).getAliasId());
+				jsb.append(",alias:" + list.get(i).getDisplayId());
 				jsb.append(",name:'" + list.get(i).getName() + "'");
 				jsb.append(",kid:" + list.get(i).getId());
 				jsb.append("}");
