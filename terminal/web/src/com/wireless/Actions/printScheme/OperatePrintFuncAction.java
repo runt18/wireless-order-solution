@@ -144,9 +144,8 @@ public class OperatePrintFuncAction extends DispatchAction{
 			}else if(PType.valueOf(pType) == PType.PRINT_ORDER_DETAIL){
 				PrintFunc.DetailBuilder detailBuilder = DetailBuilder.newPrintFoodDetail();
 				for (String kitchenAlias : kitchens) {
-					Kitchen k = new Kitchen();
-					k.setAliasId(Short.parseShort(kitchenAlias));
-					detailBuilder.addKitchen(k);
+					Kitchen ki = new Kitchen(Integer.parseInt(kitchenAlias));
+					detailBuilder.addKitchen(ki);
 				}
 				detailBuilder.setRepeat(Integer.parseInt(repeat));
 				PrintFuncDao.addFunc(dbCon, staff, printerId, detailBuilder);
@@ -154,9 +153,8 @@ public class OperatePrintFuncAction extends DispatchAction{
 			}else if(PType.valueOf(pType) == PType.PRINT_CANCELLED_FOOD){
 				PrintFunc.DetailBuilder detailBuilder = DetailBuilder.newCancelledFood();
 				for (String kitchenAlias : kitchens) {
-					Kitchen k = new Kitchen();
-					k.setAliasId(Short.parseShort(kitchenAlias));
-					detailBuilder.addKitchen(k);
+					Kitchen ki = new Kitchen(Integer.parseInt(kitchenAlias));
+					detailBuilder.addKitchen(ki);
 				}
 				detailBuilder.setRepeat(Integer.parseInt(repeat));
 				PrintFuncDao.addFunc(dbCon, staff, printerId, detailBuilder);
@@ -282,9 +280,8 @@ public class OperatePrintFuncAction extends DispatchAction{
 			}else if(PType.valueOf(pType) == PType.PRINT_ORDER_DETAIL){
 				PrintFunc.DetailBuilder detailBuilder = DetailBuilder.newPrintFoodDetail();
 				for (String kitchenAlias : kitchens) {
-					Kitchen k = new Kitchen();
-					k.setAliasId(Short.parseShort(kitchenAlias));
-					detailBuilder.addKitchen(k);
+					Kitchen ki = new Kitchen(Integer.parseInt(kitchenAlias));
+					detailBuilder.addKitchen(ki);
 				}
 				detailBuilder.setRepeat(Integer.parseInt(repeat));
 				PrintFuncDao.addFunc(dbCon, staff, printerId, detailBuilder);
@@ -292,9 +289,8 @@ public class OperatePrintFuncAction extends DispatchAction{
 			}else if(PType.valueOf(pType) == PType.PRINT_CANCELLED_FOOD){
 				PrintFunc.DetailBuilder detailBuilder = DetailBuilder.newCancelledFood();
 				for (String kitchenAlias : kitchens) {
-					Kitchen k = new Kitchen();
-					k.setAliasId(Short.parseShort(kitchenAlias));
-					detailBuilder.addKitchen(k);
+					Kitchen ki = new Kitchen(Integer.parseInt(kitchenAlias));
+					detailBuilder.addKitchen(ki);
 				}
 				detailBuilder.setRepeat(Integer.parseInt(repeat));
 				PrintFuncDao.addFunc(dbCon, staff, printerId, detailBuilder);
@@ -410,8 +406,7 @@ public class OperatePrintFuncAction extends DispatchAction{
 			}else if(PType.valueOf(pType) == PType.PRINT_ORDER_DETAIL){
 				PrintFunc.DetailBuilder detailBuilder = DetailBuilder.newPrintFoodDetail();
 				for (String k : kitchen) {
-					Kitchen ki = new Kitchen();
-					ki.setAliasId(Short.parseShort(k));
+					Kitchen ki = new Kitchen(Integer.parseInt(k));
 					detailBuilder.addKitchen(ki);
 				}
 				detailBuilder.setRepeat(Integer.parseInt(repeat));
@@ -419,8 +414,7 @@ public class OperatePrintFuncAction extends DispatchAction{
 			}else if(PType.valueOf(pType) == PType.PRINT_CANCELLED_FOOD){
 				PrintFunc.DetailBuilder detailBuilder = DetailBuilder.newCancelledFood();
 				for (String k : kitchen) {
-					Kitchen ki = new Kitchen();
-					ki.setAliasId(Short.parseShort(k));
+					Kitchen ki = new Kitchen(Integer.parseInt(k));
 					detailBuilder.addKitchen(ki);
 				}
 				detailBuilder.setRepeat(Integer.parseInt(repeat));

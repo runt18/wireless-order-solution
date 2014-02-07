@@ -25,9 +25,6 @@ public class QueryMenuMgrAction extends Action {
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		
-		
-		
 		String isPaging = request.getParameter("isPaging");
 		String start = request.getParameter("start");
 		String limit = request.getParameter("limit");
@@ -99,7 +96,7 @@ public class QueryMenuMgrAction extends Action {
 			if(price != null && !price.trim().isEmpty() && !price.equals("")){
 				extraCond += (" AND FOOD.price " + operqtor + price);
 			}
-			if(stockStatus != null && !stockStatus.trim().isEmpty() && !stockStatus.equals("")){
+			if(stockStatus != null && !stockStatus.trim().isEmpty()){
 				extraCond += (" AND FOOD.stock_status = " + stockStatus);
 			}
 			//****************  菜品状态处理
