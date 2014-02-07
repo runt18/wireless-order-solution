@@ -1900,7 +1900,7 @@ function initControl(){
 	menuStockDetailPrice = new Ext.menu.Menu({
 		id : 'menuStockDetailPrice',
 		hideOnClick : false,
-		items : [new Ext.menu.Adapter(new Ext.Panel({
+		items : [new Ext.Panel({
 			frame : true,
 			width : 150,
 			items : [{
@@ -1947,7 +1947,7 @@ function initControl(){
 					Ext.getCmp('btnSaveStockDetailPrice').handler();
 				}
 			}]
-		}), {hideOnClick : false})],
+		}), {hideOnClick : false}],
 		listeners : {
 			show : function(){
 				var data = Ext.ux.getSelData(secondStepPanelCenter);
@@ -1963,7 +1963,7 @@ function initControl(){
 	menuStockDetailAmount = new Ext.menu.Menu({
 		id : 'menuStockDetailPrice',
 		hideOnClick : false,
-		items : [new Ext.menu.Adapter(new Ext.Panel({
+		items : [new Ext.Panel({
 			frame : true,
 			width : 150,
 			items : [{
@@ -2010,7 +2010,7 @@ function initControl(){
 					Ext.getCmp('btnSaveStockDetailAmount').handler();
 				}
 			}]
-		}), {hideOnClick : false})],
+		}), {hideOnClick : false}],
 		listeners : {
 			show : function(){
 				var data = Ext.ux.getSelData(secondStepPanelCenter);

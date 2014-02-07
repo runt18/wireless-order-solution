@@ -909,7 +909,7 @@ function initDetailActualAmountMenu(){
 	menuOperateActualAmount = new Ext.menu.Menu({
 		id : 'menuOperateActualAmount',
 		hideOnClick : false,
-		items : [new Ext.menu.Adapter(new Ext.Panel({
+		items : [new Ext.Panel({
 			frame : true,
 			width : 150,
 			items : [{
@@ -950,7 +950,7 @@ function initDetailActualAmountMenu(){
 					menuOperateActualAmount.hide();
 				}
 			}]
-		}), {hideOnClick : false})],
+		}), {hideOnClick : false}],
 		listeners : {
 			show : function(){
 				var amount = Ext.getCmp('numOperateActualAmount');

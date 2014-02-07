@@ -399,7 +399,7 @@ function initControl(){
 	menuFoodMaterialCount = new Ext.menu.Menu({
 		id : 'menuFoodMaterialCount',
 		hideOnClick : false,
-		items : [new Ext.menu.Adapter(new Ext.Panel({
+		items : [new Ext.Panel({
 			frame : true,
 			width : 150,
 			items : [{
@@ -451,7 +451,7 @@ function initControl(){
 					Ext.getCmp('btnSaveFoodMaterialCount').handler();
 				}
 			}]
-		}), {hideOnClick : false})],
+		}), {hideOnClick : false}],
 		listeners : {
 			show : function(){
 				var data = Ext.ux.getSelData(foodMaterialGrid);

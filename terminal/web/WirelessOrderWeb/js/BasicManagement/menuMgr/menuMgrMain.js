@@ -107,7 +107,7 @@ function updateKitchenHandler(){
 	operateKitchenHandler();
 }
 
-function initDeptData(){
+function initDeptComboData(){
 	var combo_deptData = [];
 	var thiz = Ext.getCmp('comboKitchenDept');
 	Ext.Ajax.request({
@@ -127,7 +127,9 @@ function initDeptData(){
 			thiz.store.loadData(combo_deptData);
 		}
 	});
-	
+}
+
+function initKitchenComboData(){
 	var combo_kitchenData = [];
 	var combo_kitchen = Ext.getCmp('cmbBasicForKitchenAlias');
 	Ext.Ajax.request({
@@ -146,8 +148,8 @@ function initDeptData(){
 			combo_kitchen.store.loadData(combo_kitchenData);
 		}
 	});
-	
 }
+
 function kitchenWinShow(){
 
 	updateKitchenWin = Ext.getCmp('dept_updateKitchenWin');
@@ -258,6 +260,7 @@ function kitchenWinShow(){
 									Ext.example.msg(jr.title, jr.msg);
 									updateKitchenWin.hide();
 									kitchenTreeForSreach.getRootNode().reload();
+									initKitchenComboData();
 								}else{
 									Ext.ux.showMsg(jr);
 								}
@@ -400,6 +403,7 @@ function deptWinShow(){
 							Ext.example.msg(jr.title, jr.msg);
 							updateDeptWin.hide();
 							kitchenTreeForSreach.getRootNode().reload();
+							initDeptComboData();
 						},
 						failure : function(res, opt) {
 							Ext.ux.showMsg(Ext.util.JSON.decode(res.responseText));
@@ -2921,7 +2925,8 @@ Ext.onReady(function() {
 	deptWinShow();
 	
 	kitchenWinShow();
-	initDeptData();
 	
+	initDeptComboData();
+	initKitchenComboData();
 });
 showFloatOption(bar);

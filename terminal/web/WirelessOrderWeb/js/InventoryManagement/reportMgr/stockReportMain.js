@@ -1,16 +1,4 @@
 
-
-
-/*var pushBackBut = new Ext.ux.ImageButton({
-	imgPath : '../../images/UserLogout.png',
-	imgWidth : 50,
-	imgHeight : 50,
-	tooltip : '返回',
-	handler : function(btn){
-		location.href = 'InventoryProtal.html?'+ strEncode('restaurantID=' + restaurantID, 'mi');
-	}
-});*/
-
 var logOutBut = new Ext.ux.ImageButton({
 	imgPath : '../../images/ResLogout.png',
 	imgWidth : 50,
@@ -20,21 +8,6 @@ var logOutBut = new Ext.ux.ImageButton({
 		
 	}
 });
-
-/*var deptStore = new Ext.data.Store({
-	//proxy : new Ext.data.MemoryProxy(data),
-	proxy : new Ext.data.HttpProxy({url:'../../QueryDept.do'}),
-	reader : new Ext.data.JsonReader({totalProperty:'totalProperty', root : 'root'}, [
-	         {name : 'id'},
-	         {name : 'name'}
-	])
-});
-
-deptStore.load({  
-    params: { 
-    	dataSource : 'normal'
-    }  
-});*/
 
 var deptComb = new Ext.form.ComboBox({
 	forceSelection : true,
@@ -164,7 +137,7 @@ Ext.onReady(function(){
          {header:'出库消耗', dataIndex:'useUp', align:'right'},
          {header:'出库小计', dataIndex:'stockOutAmount', align:'right', renderer:amountStyle},
          {header:'期末数量', dataIndex:'finalAmount', align:'right', renderer:totalStyle},
-         {header:'期末单价', dataIndex:'finalPrice', align:'right', renderer:''},
+         {header:'期末单价', dataIndex:'finalPrice', align:'right', renderer:Ext.ux.txtFormat.gridDou},
          {header:'期末金额', dataIndex:'finalMoney', align:'right', renderer:totalStyle}]);
 	 cm.defaultSortable = true;
 			
