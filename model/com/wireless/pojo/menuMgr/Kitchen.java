@@ -59,6 +59,7 @@ public class Kitchen implements Parcelable, Comparable<Kitchen>, Jsonable{
 		private String kitchenName;
 		private Department.DeptId deptId;
 		private boolean isAllowTemp = false;
+		private boolean isAllowTempChanged = false;
 		
 		public UpdateBuilder(int id){
 			this.id = id;
@@ -88,11 +89,12 @@ public class Kitchen implements Parcelable, Comparable<Kitchen>, Jsonable{
 		
 		public UpdateBuilder setAllowTmp(boolean onOff){
 			this.isAllowTemp = onOff;
+			isAllowTempChanged = true;
 			return this;
 		}
 		
 		public boolean isAllowTmpChanged(){
-			return this.isAllowTemp != false;
+			return this.isAllowTempChanged;
 		}
 		
 		public Kitchen build(){
