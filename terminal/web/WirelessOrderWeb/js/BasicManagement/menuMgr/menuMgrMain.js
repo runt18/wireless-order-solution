@@ -441,8 +441,8 @@ function searchMenuHandler(){
 	// 分厨
 	var sn = kitchenTreeForSreach.getSelectionModel().getSelectedNode();
 	if(sn){
-		baseParams['kitchen'] = sn.attributes.kid;
-		baseParams['deptId'] = sn.attributes.deptID;
+		baseParams['kitchen'] = typeof sn.attributes.kid != 'undefined' ? sn.attributes.kid : '';
+		baseParams['deptId'] = typeof sn.attributes.deptID != 'undefined' ? sn.attributes.deptID : "";
 	}
 		
 	// 编号, 名称, 拼音, 价钱, 库存管理
@@ -1040,7 +1040,7 @@ var basicOperationPanel = new Ext.Panel({
 		 			id : 'txtBasicForFoodName',
 		 			fieldLabel : '菜名',
 		 			allowBlank : false,
-		 			width : 260
+		 			width : 250
 		 		}]
 		 	}, {
 		 		columnWidth : 1
@@ -1055,7 +1055,7 @@ var basicOperationPanel = new Ext.Panel({
 		 	    	allowBlank : false,
 		 	    	maxValue : 99999.99,
 		 	    	minValue : 0.00,
-		 	    	width : 100,
+		 	    	width : 80,
 		 	    	validator : function(v){
 		 	    		if(v >= 0.00 && v <= 99999.99){
 		 	    	    	return true;
@@ -1422,8 +1422,7 @@ function resetbBasicOperation(_d){
 		btnUploadFoodImage.setDisabled(false);
 		btnDeleteFoodImage.setDisabled(false);
 		imgFile.setDisabled(false);
-		document.getElementById('chbForFoodAlias').checked = true;
-		chkAlias.fireEvent('check', chkAlias, true);
+
 		foodKitchenAlias.setValue(data['kitchen.id']);
 	}else{
 		data = {};
@@ -1439,7 +1438,11 @@ function resetbBasicOperation(_d){
 	var status = typeof(data.status) == 'undefined' ? 0 : parseInt(data.status);
 	
 	foodName.setValue(data.name);
-	foodAliasID.setValue(data.alias);
+	if(data.alias > 0){
+		document.getElementById('chbForFoodAlias').checked = true;
+		chkAlias.fireEvent('check', chkAlias, true);
+		foodAliasID.setValue(data.alias);
+	}
 	foodPinyin.setValue(data.pinyin);
 	foodPrice.setValue(data.unitPrice);
 	
@@ -2535,8 +2538,8 @@ function initFoodOperationWin(){
 			listeners : {
 				hide : function(){
 	    			Ext.getCmp('menuMgrGrid').getStore().reload();
-//	    			Ext.getCmp('menuMgrGrid').fireEvent('rowclick');
 	    			if(document.getElementById('chbForFoodAlias').checked){
+	    				document.getElementById('chbForFoodAlias').checked = false;
 	    				Ext.getCmp('chbForFoodAlias').fireEvent('check', Ext.getCmp('chbForFoodAlias'), false);
 	    			}
 	    			
