@@ -2,12 +2,13 @@ package com.wireless.exception;
 
 public class MemberError extends ErrorEnum{
 	/** 
-	 * codeRange : 9600 - 9799
+	 *  codeRange : 9600 - 9799
 	 * 	member : 			9750 - 9799
 	 * 	memberCard :		9700 - 9749
 	 * 	memberOperation :	9650 - 9699
 	 * 	memberType   :		9620 - 9649
 	 *  memberLevel  :      9600 - 9619
+	 *  coupon :			
 	 */
 	/* member 9750 - 9799 */
 	public static final ErrorCode UNKNOWN = build(ErrorEnum.UNKNOWN_CODE, "操作失败, 未知错误.");
@@ -49,12 +50,16 @@ public class MemberError extends ErrorEnum{
 	public static final ErrorCode TYPE_UPDATE = build(9647, "操作失败, 修改充值操作日志失败, 请检查数据内容是否正确.");
 	public static final ErrorCode TYPE_SET_ORDER_DISCOUNT = build(9647, "操作失败, 设置会员类型全单折扣信息失败, 未知错误.");
 	public static final ErrorCode TYPE_DELETE_ISNOT_EMPTY = build(9646, "操作失败, 该类型下已有会员, 不允许删除.");
+	
 	/* memberType 9600 - 9619 */
 	public static final ErrorCode MEMBER_LEVEL_NOT_EXIST = build(9619, "操作失败, 该会员等级不存在或已被删除");
 	public static final ErrorCode MEMBER_TYPE_BELONG = build(9618, "操作失败, 此会员类型已属于别的等级,不能选择");
 	public static final ErrorCode MEMBER_LEVEL_LESS_POINT = build(9617, "操作失败, 积分必须大于低等级的");
 	public static final ErrorCode MEMBER_LEVEL_MORE_POINT = build(9616, "操作失败, 积分必须小于高等级的");
 	public static final ErrorCode MEMBER_LEVEL_HIGHEST = build(9617, "操作失败, 积分必须最高等级的");
+	
+	public static final ErrorCode COUPON_TYPE_NOT_EXIST = build(9600, "操作失败, 该优惠券类型不存在");
+	public static final ErrorCode COUPON_NOT_EXIST = build(9601, "操作失败, 该优惠券不存在");
 	
 	private MemberError(){
 		
