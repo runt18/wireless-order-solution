@@ -409,10 +409,10 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 			
 			for (Kitchen kitchen : this.mKitchens) {
 				if(kitchens == ""){
-					kitchenValues += kitchen.getDisplayId();
+					kitchenValues += kitchen.getId();
 					kitchens += kitchen.getName();
 				}else{
-					kitchenValues += ("," + kitchen.getDisplayId());
+					kitchenValues += ("," + kitchen.getId());
 					kitchens += ("," + kitchen.getName());
 				}
 			}
