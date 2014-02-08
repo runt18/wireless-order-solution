@@ -2120,8 +2120,12 @@ function initKitchenTreeForSreach(){
 							deptB : e.target.attributes.deptID
 						};
 					}else{
-						kitchenTreeForSreach.getRootNode().reload();
-						return;
+						url = '../../OperateDept.do';
+						params = {
+							dataSource : 'swap',
+							deptA : e.dropNode.attributes.deptID,
+							deptB : e.target.parentNode.attributes.deptID
+						};
 					}
 				//节点之间
 				}else{
@@ -2137,14 +2141,16 @@ function initKitchenTreeForSreach(){
 							url = '../../UpdateKitchen.do';
 							params = {
 								kitchenID : e.dropNode.attributes.kid,
-								deptID : e.target.parentNode.attributes.deptID
+								deptID : e.target.parentNode.attributes.deptID,
+								kitchenB : e.target.attributes.kid,
+								move : true
 							};
 						}else{
 							url = '../../OperateKitchen.do',
 							params = {
 								dataSource : 'swap',
-								kitchenA : e.target.attributes.kid,
-								kitchenB : e.dropNode.attributes.kid
+								kitchenA : e.dropNode.attributes.kid,
+								kitchenB : e.target.attributes.kid
 							};
 						}
 

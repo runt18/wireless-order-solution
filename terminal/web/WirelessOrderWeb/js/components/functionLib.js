@@ -339,7 +339,7 @@ function showFloatOption(obj_b){
 			offset = $(this).find("a").offset();
 			nodex = offset.left - 18;
 			barX = (offset.left + $(this).find("a").width() + 100);
-			$('#div_floatBar').css({left :offset.left+$(this).find("a").width(), top : (offset.top-2)});
+			$('#div_floatBar').css({left:offset.left+$(this).find("a").width(), top:(Ext.isIE?(offset.top-12):(offset.top-2))});
 			$('#div_floatBar').show();
 		});
 		
