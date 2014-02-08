@@ -394,39 +394,6 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 		}
 	}
 	
-//	/**
-//	 * 
-//	 * @param id
-//	 * @param baseBalance
-//	 * @param extraBalance
-//	 * @param comment
-//	 * @return
-//	 */
-//	public static Member buildToBalance(int id, float baseBalance, float extraBalance, String comment){
-//		Member updateBalance = new Member();
-//		updateBalance.setId(id);
-//		updateBalance.setBaseBalance(baseBalance);
-//		updateBalance.setExtraBalance(extraBalance);
-//		updateBalance.setComment(comment);
-//		return updateBalance;
-//	}
-//	
-//	/**
-//	 * 
-//	 * @param id
-//	 * @param point
-//	 * @param staffID
-//	 * @param comment
-//	 * @return
-//	 */
-//	public static Member buildToPoint(int id, int point, String comment){
-//		Member updateBalance = new Member();
-//		updateBalance.setId(id);
-//		updateBalance.setPoint(point);
-//		updateBalance.setComment(comment);
-//		return updateBalance;
-//	}
-	
 	/**
 	 * Check to see whether the balance of member account is enough for consumption in case of paid by member.
 	 * @param consumePrice
@@ -855,15 +822,15 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 	}
 	
 	public MemberType getMemberType() {
-		if(memberType == null){
-			memberType = new MemberType(0);
-		}
 		return memberType;
 	}
 	
 	public void setMemberType(MemberType memberType) {
 		if(memberType != null){
-			this.memberType = memberType;
+			if(this.memberType == null){
+				this.memberType = new MemberType(0);
+			}
+			this.memberType.copyFrom(memberType);
 		}
 	}
 	

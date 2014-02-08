@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import com.wireless.pojo.client.Member;
 import com.wireless.pojo.util.SortedList;
 
 
@@ -86,16 +87,16 @@ public class Coupon {
 	
 	private int id;
 	private int restaurantId;
-	private CouponType couponType = new CouponType(0);
+	private CouponType couponType;
 	private long birthDate;
-	private int memberId;
+	private Member member;
 	private int orderId;
 	private long orderDate;
 	private Status status = Status.UNKNOWN;
 	
 	private Coupon(InsertBuilder builder){
 		setCouponType(new CouponType(builder.couponTypeId));
-		setMemberId(builder.memberId);
+		setMember(new Member(builder.memberId));
 		setStatus(Status.CREATED);
 		setBirthDate(System.currentTimeMillis());
 	}
@@ -125,7 +126,12 @@ public class Coupon {
 	}
 
 	public void setCouponType(CouponType couponType) {
-		this.couponType.copyFrom(couponType);
+		if(couponType != null){
+			if(this.couponType == null){
+				this.couponType = new CouponType(0);
+			}
+			this.couponType.copyFrom(couponType);
+		}
 	}
 
 	public long getBirthDate() {
@@ -136,12 +142,12 @@ public class Coupon {
 		this.birthDate = birthDate;
 	}
 
-	public int getMemberId() {
-		return memberId;
+	public Member getMember() {
+		return member;
 	}
 
-	public void setMemberId(int memberId) {
-		this.memberId = memberId;
+	public void setMember(Member member) {
+		this.member = member;
 	}
 
 	public int getOrderId() {
@@ -181,15 +187,27 @@ public class Coupon {
 	}
 	
 	public float getPrice(){
-		return this.couponType.getPrice();
+		if(this.couponType != null){
+			return this.couponType.getPrice();
+		}else{
+			return 0;
+		}
 	}
 	
 	public String getName(){
-		return this.couponType.getName();
+		if(this.couponType != null){
+			return this.couponType.getName();
+		}else{
+			return "";
+		}
 	}
 	
 	public long getExpired(){
-		return this.couponType.getExpired();
+		if(this.couponType != null){
+			return this.couponType.getExpired();
+		}else{
+			return 0;
+		}
 	}
 	
 	@Override
