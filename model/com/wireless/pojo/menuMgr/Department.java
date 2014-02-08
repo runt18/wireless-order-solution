@@ -15,20 +15,21 @@ public class Department implements Parcelable, Comparable<Department>, Jsonable{
 	public final static byte DEPT_PARCELABLE_COMPLEX = 0;
 	public final static byte DEPT_PARCELABLE_SIMPLE = 1;
 	
-	public static class SwapDisplayBuilder{
-		private final int idA;
-		private final int idB;
-		public SwapDisplayBuilder(int idA, int idB){
-			this.idA = idA;
-			this.idB = idB;
+	public static class MoveBuilder{
+		private final int from;
+		private final int to;
+		
+		public MoveBuilder(int from, int to){
+			this.from = from;
+			this.to = to;
 		}
 		
-		public int getIdA(){
-			return this.idA;
+		public int from(){
+			return this.from;
 		}
 		
-		public int getIdB(){
-			return this.idB;
+		public int to(){
+			return this.to;
 		}
 	}
 	
