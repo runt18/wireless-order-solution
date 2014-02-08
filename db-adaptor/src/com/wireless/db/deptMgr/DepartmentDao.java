@@ -10,65 +10,87 @@ import com.wireless.db.Params;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.DeptError;
 import com.wireless.pojo.menuMgr.Department;
-import com.wireless.pojo.menuMgr.Kitchen.Type;
 import com.wireless.pojo.staffMgr.Staff;
 
 public class DepartmentDao {
 
 	/**
-	 * Swap the display id between two department.
+	 * Move the department up to another.  
 	 * @param staff
 	 * 			the staff to perform this action
 	 * @param builder
-	 * 			the swap display builder
+	 * 			the move builder
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 * @throws BusinessException
-	 * 			throws if the department to swap does NOT exist
+	 * 			throws if the department to move does NOT exist
 	 */
-	public static void swap(Staff staff, Department.SwapDisplayBuilder builder) throws SQLException, BusinessException{
+	public static void move(Staff staff, Department.MoveBuilder builder) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
 			dbCon.conn.setAutoCommit(false);
-			swap(dbCon, staff, builder);
+			move(dbCon, staff, builder);
 			dbCon.conn.commit();
 		}catch(Exception e){
 			dbCon.conn.rollback();
+			throw e;
 		}finally{
 			dbCon.disconnect();
 		}
 	}
 	
 	/**
-	 * Swap the display id between two department.
+	 * Move the department up to another.  
 	 * @param dbCon
 	 * 			the database connection
 	 * @param staff
 	 * 			the staff to perform this action
 	 * @param builder
-	 * 			the swap display builder
+	 * 			the move builder
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 * @throws BusinessException
-	 * 			throws if the department to swap does NOT exist
+	 * 			throws if the department to move does NOT exist
 	 */
-	public static void swap(DBCon dbCon, Staff staff, Department.SwapDisplayBuilder builder) throws SQLException, BusinessException{
-		Department deptA = getById(dbCon, staff, builder.getIdA());
-		Department deptB = getById(dbCon, staff, builder.getIdB());
+	public static void move(DBCon dbCon, Staff staff, Department.MoveBuilder builder) throws SQLException, BusinessException{
+		Department from = getById(dbCon, staff, builder.from());
+		Department to = getById(dbCon, staff, builder.to());
 		
 		String sql;
-		sql = " UPDATE " + Params.dbName + ".department SET " +
-			  " display_id = " + deptA.getDisplayId() +
-			  " WHERE dept_id = " + deptB.getId() +
-			  " AND restaurant_id = " + staff.getRestaurantId();
-		dbCon.stmt.executeUpdate(sql);
+		if(from.getDisplayId() < to.getDisplayId()){
+			sql = " UPDATE " + Params.dbName + ".department SET " +
+				  " display_id = display_id - 1 " +
+				  " WHERE 1 = 1 " +
+				  " AND display_id > " + from.getDisplayId() +
+				  " AND display_id < " + to.getDisplayId() + 
+				  " AND type = " + Department.Type.NORMAL.getVal() +
+				  " AND restaurant_id = " + staff.getRestaurantId();
+			dbCon.stmt.executeUpdate(sql);
+			
+			sql = " UPDATE " + Params.dbName + ".department SET " +
+				  " display_id = " + (to.getDisplayId() - 1) +
+				  " WHERE dept_id = " + from.getId() + 
+				  " AND restaurant_id = " + staff.getRestaurantId();
+			dbCon.stmt.executeUpdate(sql);
+			
+		}else if(from.getDisplayId() > to.getDisplayId()){
+			sql = " UPDATE " + Params.dbName + ".department SET " +
+				  " display_id = display_id + 1 " +
+				  " WHERE 1 = 1 " +
+				  " AND display_id >= " + to.getDisplayId() +
+				  " AND display_id < " + from.getDisplayId() +
+				  " AND type = " + Department.Type.NORMAL.getVal() +
+				  " AND restaurant_id = " + staff.getRestaurantId();
+			dbCon.stmt.executeUpdate(sql);
+			
+			sql = " UPDATE " + Params.dbName + ".department SET " +
+				  " display_id = " + to.getDisplayId() +
+				  " WHERE dept_id = " + from.getId() +
+				  " AND restaurant_id = " + staff.getRestaurantId();
+			dbCon.stmt.executeUpdate(sql);
+		}
 		
-		sql = " UPDATE " + Params.dbName + ".department SET " +
-			  " display_id = " + deptB.getDisplayId() +
-			  " WHERE dept_id = " + deptA.getId() +
-			  " AND restaurant_id = " + staff.getRestaurantId();
-		dbCon.stmt.executeUpdate(sql);
 	}
 	
 	/**
@@ -332,7 +354,7 @@ public class DepartmentDao {
 		//Check to see whether any unused kitchens exist.
 		sql = " SELECT dept_id FROM " + Params.dbName + ".department " +
 			  " WHERE 1 = 1 " +
-			  " AND type = " + Type.IDLE.getVal() + 
+			  " AND type = " + Department.Type.IDLE.getVal() + 
 			  " AND restaurant_id = " + staff.getRestaurantId() +
 			  " ORDER BY dept_id LIMIT 1 ";
 		dbCon.rs = dbCon.stmt.executeQuery(sql);

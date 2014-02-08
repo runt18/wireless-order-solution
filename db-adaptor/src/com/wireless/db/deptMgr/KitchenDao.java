@@ -19,22 +19,22 @@ import com.wireless.pojo.staffMgr.Staff;
 public class KitchenDao {
 	
 	/**
-	 * Swap the display id between two kitchens.
+	 * Move the kitchen up to another.  
 	 * @param staff
 	 * 			the staff to perform this action
 	 * @param builder
-	 * 			the swap display builder
+	 * 			the move builder
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 * @throws BusinessException
-	 * 			throws if the kitchen to swap does NOT exist
+	 * 			throws if the kitchen to move does NOT exist
 	 */
-	public static void swap(Staff staff, Kitchen.SwapDisplayBuilder builder) throws SQLException, BusinessException{
+	public static void move(Staff staff, Kitchen.MoveBuilder builder) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
 			dbCon.conn.setAutoCommit(false);
-			swap(dbCon, staff, builder);
+			move(dbCon, staff, builder);
 			dbCon.conn.commit();
 		}catch(Exception e){
 			dbCon.conn.rollback();
@@ -45,32 +45,54 @@ public class KitchenDao {
 	}
 	
 	/**
-	 * Swap the display id between two kitchens.
+	 * Move the kitchen up to another.  
 	 * @param dbCon
 	 * 			the database connection
 	 * @param staff
 	 * 			the staff to perform this action
 	 * @param builder
-	 * 			the swap display builder
+	 * 			the move builder
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 * @throws BusinessException
-	 * 			throws if the kitchen to swap does NOT exist
+	 * 			throws if the kitchen to move does NOT exist
 	 */
-	public static void swap(DBCon dbCon, Staff staff, Kitchen.SwapDisplayBuilder builder) throws SQLException, BusinessException{
-		Kitchen kA = getById(dbCon, staff, builder.getIdA());
-		Kitchen kB = getById(dbCon, staff, builder.getIdB());
+	public static void move(DBCon dbCon, Staff staff, Kitchen.MoveBuilder builder) throws SQLException, BusinessException{
+		Kitchen from = getById(dbCon, staff, builder.from());
+		Kitchen to = getById(dbCon, staff, builder.to());
 		
 		String sql;
-		sql = " UPDATE " + Params.dbName + ".kitchen SET " +
-			  " display_id = " + kA.getDisplayId() +
-			  " WHERE kitchen_id = " + kB.getId();
-		dbCon.stmt.executeUpdate(sql);
+		if(from.getDisplayId() < to.getDisplayId()){
+			sql = " UPDATE " + Params.dbName + ".kitchen SET " +
+				  " display_id = display_id - 1 " +
+				  " WHERE 1 = 1 " +
+				  " AND display_id > " + from.getDisplayId() +
+				  " AND display_id < " + to.getDisplayId() + 
+				  " AND type = " + Kitchen.Type.NORMAL.getVal() +
+				  " AND restaurant_id = " + staff.getRestaurantId();
+			dbCon.stmt.executeUpdate(sql);
+			
+			sql = " UPDATE " + Params.dbName + ".kitchen SET " +
+				  " display_id = " + (to.getDisplayId() - 1) +
+				  " WHERE kitchen_id = " + from.getId();
+			dbCon.stmt.executeUpdate(sql);
+			
+		}else if(from.getDisplayId() > to.getDisplayId()){
+			sql = " UPDATE " + Params.dbName + ".kitchen SET " +
+				  " display_id = display_id + 1 " +
+				  " WHERE 1 = 1 " +
+				  " AND display_id >= " + to.getDisplayId() +
+				  " AND display_id < " + from.getDisplayId() +
+				  " AND type = " + Kitchen.Type.NORMAL.getVal() +
+				  " AND restaurant_id = " + staff.getRestaurantId();
+			dbCon.stmt.executeUpdate(sql);
+			
+			sql = " UPDATE " + Params.dbName + ".kitchen SET " +
+				  " display_id = " + to.getDisplayId() +
+				  " WHERE kitchen_id = " + from.getId();
+			dbCon.stmt.executeUpdate(sql);
+		}
 		
-		sql = " UPDATE " + Params.dbName + ".kitchen SET " +
-			  " display_id = " + kB.getDisplayId() +
-			  " WHERE kitchen_id = " + kA.getId();
-		dbCon.stmt.executeUpdate(sql);
 	}
 	
 	/**
@@ -166,6 +188,13 @@ public class KitchenDao {
 		}
 		dbCon.rs.close();
 		
+		//Delete the print scheme related to this kitchen.
+		sql = " DELETE FROM " + Params.dbName + ".func_kitchen WHERE 1 = 1 " +
+			  " AND kitchen_id = " + kitchenId +
+			  " AND restaurant_id = " + staff.getRestaurantId();
+		dbCon.stmt.executeUpdate(sql);
+		
+		//Update the kitchen status to idle.
 		sql = " UPDATE " + Params.dbName + ".kitchen SET " +
 			  " kitchen_id = " + kitchenId + 
 			  " ,type = " + Kitchen.Type.IDLE.getVal() + 
