@@ -65,7 +65,10 @@ public class TestCouponDao {
 			Assert.assertEquals("coupon price : insert a coupon to member 1", actualCouponType.getPrice(), actualCoupon1.getPrice(), 0.01);
 			Assert.assertEquals("coupon name : insert a coupon to member 1", actualCouponType.getName(), actualCoupon1.getName());
 			Assert.assertEquals("restaurant : insert a coupon to member 1", mStaff.getRestaurantId(), actualCoupon1.getRestaurantId());
-			Assert.assertEquals("member id : insert a coupon to member 1", members.get(0).getId(), actualCoupon1.getMemberId());
+			Assert.assertEquals("member id : insert a coupon to member 1", members.get(0).getId(), actualCoupon1.getMember().getId());
+			Assert.assertEquals("member name : insert a coupon to member 1", members.get(0).getName(), actualCoupon1.getMember().getName());
+			Assert.assertEquals("member mobile : insert a coupon to member 1", members.get(0).getMobile(), actualCoupon1.getMember().getMobile());
+			Assert.assertEquals("member card : insert a coupon to member 1", members.get(0).getMemberCard(), actualCoupon1.getMember().getMemberCard());
 			Assert.assertEquals("status : insert a coupon to member 1", Coupon.Status.CREATED, actualCoupon1.getStatus());
 			Assert.assertTrue("birth date : insert a coupon to member 1", System.currentTimeMillis() - actualCoupon1.getBirthDate() < 5000);
 
@@ -75,7 +78,10 @@ public class TestCouponDao {
 			Assert.assertEquals("coupon price : insert a coupon to member 2", actualCouponType.getPrice(), actualCoupon2.getPrice(), 0.01);
 			Assert.assertEquals("coupon name : insert a coupon to member 2", actualCouponType.getName(), actualCoupon2.getName());
 			Assert.assertEquals("restaurant : insert a coupon to member 2", mStaff.getRestaurantId(), actualCoupon2.getRestaurantId());
-			Assert.assertEquals("member id : insert a coupon to member 2", members.get(1).getId(), actualCoupon2.getMemberId());
+			Assert.assertEquals("member id : insert a coupon to member 2", members.get(1).getId(), actualCoupon2.getMember().getId());
+			Assert.assertEquals("member name : insert a coupon to member 2", members.get(1).getName(), actualCoupon2.getMember().getName());
+			Assert.assertEquals("member mobile : insert a coupon to member 2", members.get(1).getMobile(), actualCoupon2.getMember().getMobile());
+			Assert.assertEquals("member card : insert a coupon to member 2", members.get(1).getMemberCard(), actualCoupon2.getMember().getMemberCard());
 			Assert.assertEquals("status : insert a coupon to member 2", Coupon.Status.CREATED, actualCoupon2.getStatus());
 			Assert.assertTrue("birth date : insert a coupon to member 2", System.currentTimeMillis() - actualCoupon2.getBirthDate() < 5000);
 
@@ -91,7 +97,10 @@ public class TestCouponDao {
 			Assert.assertEquals("coupon price : insert another coupon to member 1", actualCouponType.getPrice(), actualCoupon1.getPrice(), 0.01);
 			Assert.assertEquals("coupon name : insert another coupon to member 1", actualCouponType.getName(), actualCoupon1.getName());
 			Assert.assertEquals("restaurant : insert another coupon to member 1", mStaff.getRestaurantId(), actualCoupon1.getRestaurantId());
-			Assert.assertEquals("member id : insert another coupon to member 1", members.get(0).getId(), actualCoupon1.getMemberId());
+			Assert.assertEquals("member id : insert another coupon to member 1", members.get(0).getId(), actualCoupon1.getMember().getId());
+			Assert.assertEquals("member name : insert another coupon to member 1", members.get(0).getName(), actualCoupon1.getMember().getName());
+			Assert.assertEquals("member mobile : insert another coupon to member 1", members.get(0).getMobile(), actualCoupon1.getMember().getMobile());
+			Assert.assertEquals("member card : insert another coupon to member 1", members.get(0).getMemberCard(), actualCoupon1.getMember().getMemberCard());
 			Assert.assertEquals("status : insert another coupon to member 1", Coupon.Status.CREATED, actualCoupon1.getStatus());
 			Assert.assertTrue("birth date : insert another coupon to member 1", System.currentTimeMillis() - actualCoupon1.getBirthDate() < 5000);
 			

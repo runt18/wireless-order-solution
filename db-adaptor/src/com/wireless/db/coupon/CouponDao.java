@@ -9,8 +9,10 @@ import java.util.List;
 import com.mysql.jdbc.Statement;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
+import com.wireless.db.client.member.MemberDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.MemberError;
+import com.wireless.pojo.client.Member;
 import com.wireless.pojo.coupon.Coupon;
 import com.wireless.pojo.coupon.CouponType;
 import com.wireless.pojo.staffMgr.Staff;
@@ -71,7 +73,7 @@ public class CouponDao {
 		dbCon.rs.close();
 		
 		//Check to see whether the member exist.
-		sql = " SELECT COUNT(*) FROM " + Params.dbName + ".member WHERE member_id = " + coupon.getMemberId();
+		sql = " SELECT COUNT(*) FROM " + Params.dbName + ".member WHERE member_id = " + coupon.getMember().getId();
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		if(dbCon.rs.next()){
 			if(dbCon.rs.getInt(1) == 0){
@@ -86,7 +88,7 @@ public class CouponDao {
 			  staff.getRestaurantId() + "," +
 			  coupon.getCouponType().getId() + "," +
 			  " NOW(), " +
-			  coupon.getMemberId() +
+			  coupon.getMember().getId() +
 			  ")";
 		dbCon.stmt.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
 		dbCon.rs = dbCon.stmt.getGeneratedKeys();
@@ -361,6 +363,7 @@ public class CouponDao {
 		}else{
 			Coupon coupon = result.get(0);
 			coupon.setCouponType(CouponTypeDao.getById(dbCon, staff, coupon.getCouponType().getId()));
+			coupon.setMember(MemberDao.getMemberById(dbCon, staff, coupon.getMember().getId()));
 			return coupon;
 		}
 	}
@@ -370,9 +373,11 @@ public class CouponDao {
 		String sql;
 		sql = " SELECT " +
 			  " C.coupon_id, C.restaurant_id, C.coupon_type_id, C.birth_date, C.member_id, C.order_id, C.order_date, C.status, " +
-			  " CT.name, CT.price, CT.expired " +
+			  " CT.name, CT.price, CT.expired, " +
+			  " M.name AS member_name, M.mobile, M.member_card " +
 			  " FROM " + Params.dbName + ".coupon C " +
 			  " JOIN " + Params.dbName + ".coupon_type CT ON C.coupon_type_id = CT.coupon_type_id " +
+			  " JOIN " + Params.dbName + ".member M ON C.member_id = M.member_id " +
 			  " WHERE 1 = 1 " +
 			  " AND C.restaurant_id = " + staff.getRestaurantId() +
 			  (extraCond != null ? extraCond : " ") +
@@ -388,7 +393,11 @@ public class CouponDao {
 			ct.setExpired(dbCon.rs.getTimestamp("expired").getTime());
 			coupon.setCouponType(ct);
 			coupon.setBirthDate(dbCon.rs.getTimestamp("birth_date").getTime());
-			coupon.setMemberId(dbCon.rs.getInt("member_id"));
+			Member m = new Member(dbCon.rs.getInt("member_id"));
+			m.setName(dbCon.rs.getString("member_name"));
+			m.setMobile(dbCon.rs.getString("mobile"));
+			m.setMemberCard(dbCon.rs.getString("member_card"));
+			coupon.setMember(m);
 			coupon.setOrderId(dbCon.rs.getInt("order_id"));
 			Timestamp ts = dbCon.rs.getTimestamp("order_date");
 			if(ts != null){

@@ -289,6 +289,8 @@ public class DepartmentDao {
 	 */
 	public static void remove(DBCon dbCon, Staff staff, int deptId) throws SQLException, BusinessException{
 		String sql;
+		
+		//Check to see whether the department contains any kitchen.
 		sql = " SELECT kitchen_id FROM " + Params.dbName + ".kitchen WHERE " +
 			  " restaurant_id = " + staff.getRestaurantId() + 
 			  " AND dept_id = " + deptId +
@@ -299,6 +301,13 @@ public class DepartmentDao {
 		}
 		dbCon.rs.close();
 		
+		//Delete the print scheme associated with this department.
+		sql = " DELETE FROM " + Params.dbName + ".func_dept WHERE 1 = 1 " +
+			  " AND dept_id = " + deptId +
+			  " AND restaurant_id = " + staff.getRestaurantId();
+		dbCon.stmt.executeUpdate(sql);
+		
+		//Update the department status to idle.
 		sql = " UPDATE " + Params.dbName + ".department SET " +
 			  " dept_id = " + deptId +
 			  " ,type = " + Department.Type.IDLE.getVal() +
