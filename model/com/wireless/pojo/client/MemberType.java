@@ -90,7 +90,6 @@ public class MemberType implements Jsonable, Parcelable{
 		CHARGE(0, "充值"),		//充值
 		POINT(1, "积分"),		//积分
 		INTERESTED(2, "关注");
-		//COUPON(2);			//优惠
 		
 		private final int val;
 		
@@ -457,6 +456,14 @@ public class MemberType implements Jsonable, Parcelable{
 	
 	public void setAttribute(int attributeVal) {
 		this.attribute = Attribute.valueOf(attributeVal);
+	}
+	
+	public boolean isPoint(){
+		return this.attribute == Attribute.POINT;
+	}
+	
+	public boolean isCharge(){
+		return this.attribute == Attribute.CHARGE;
 	}
 	
 	@Override

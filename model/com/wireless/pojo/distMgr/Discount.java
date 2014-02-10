@@ -99,7 +99,7 @@ public class Discount implements Jsonable, Parcelable, Comparable<Discount>{
 	
 	private String name;
 	private int id;
-	private int restaurantID;
+	private int restaurantId;
 	private int level;
 	private Status status = Status.NORMAL;
 	private List<DiscountPlan> plans = new ArrayList<DiscountPlan>();
@@ -138,11 +138,11 @@ public class Discount implements Jsonable, Parcelable, Comparable<Discount>{
 	}
 	
 	public int getRestaurantId(){
-		return restaurantID;
+		return restaurantId;
 	}
 	
 	public void setRestaurantId(int restId){
-		this.restaurantID = restId;
+		this.restaurantId = restId;
 	}
 	
 	public int getLevel(){
@@ -221,7 +221,7 @@ public class Discount implements Jsonable, Parcelable, Comparable<Discount>{
 	
 	@Override
 	public String toString(){
-		return "discount(id = " + id + ", restaurant_id = " + restaurantID + ", name = " + getName() + ")";
+		return "discount(id = " + id + ", restaurant_id = " + restaurantId + ", name = " + getName() + ")";
 	}
 	
 	public void writeToParcel(Parcel dest, int flag) {
@@ -268,7 +268,7 @@ public class Discount implements Jsonable, Parcelable, Comparable<Discount>{
 		LinkedHashMap<String, Object> jm = new LinkedHashMap<String, Object>();
 		jm.put("id", this.id);
 		jm.put("name", this.name);
-		jm.put("rid", this.restaurantID);
+		jm.put("rid", this.restaurantId);
 		jm.put("level", this.level);
 		jm.put("status", this.status.getVal());
 		jm.put("isDefault", this.isDefault() || this.isDefaultReserved());

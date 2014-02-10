@@ -12,7 +12,6 @@ import org.junit.Test;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.crMgr.CancelReason;
 import com.wireless.pojo.dishesOrder.Order;
-import com.wireless.pojo.dishesOrder.Order.PayType;
 import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.distMgr.Discount;
 import com.wireless.pojo.distMgr.DiscountPlan;
@@ -688,56 +687,4 @@ public class TestParcel {
 		assertEquals("cancel reason id to order food", of1.getCancelReason().getId(), of2.getCancelReason().getId());
 	}
 	
-	@Test
-	public void testComplexOrder4Pay(){
-		Order orderToParcel = new Order();
-
-		orderToParcel.setId(19231);
-		orderToParcel.setDestTbl(new Table(100));
-		orderToParcel.setCustomNum(3);
-		orderToParcel.setReceivedCash(453.23f);
-		orderToParcel.setSettleType(Order.SettleType.MEMBER);
-		orderToParcel.setDiscount(new Discount(3));
-		orderToParcel.setErasePrice(20);
-		orderToParcel.setPaymentType(PayType.CREDIT_CARD);
-		orderToParcel.setServiceRate(0.1f);
-		orderToParcel.setComment("测试备注");
-		
-		Parcel p = new Parcel();
-		orderToParcel.writeToParcel(p, Order.ORDER_PARCELABLE_4_PAY);
-		
-		Order orderAfterParcelled = new Order();
-		orderAfterParcelled.createFromParcel(new Parcel(p.marshall()));
-		
-		// Check the order id
-		assertEquals("order id", orderToParcel.getId(), orderAfterParcelled.getId());
-		
-		// Check the destination table to order
-		assertEquals("destination table to order", orderToParcel.getDestTbl().getAliasId(), orderAfterParcelled.getDestTbl().getAliasId());
-		
-		// Check the custom number
-		assertEquals("custom number to order", orderToParcel.getCustomNum(), orderAfterParcelled.getCustomNum());
-		
-		// Check the received cash
-		assertEquals("received cash to order", orderToParcel.getReceivedCash(), orderAfterParcelled.getReceivedCash(), 0.01);
-		
-		// Check the pay type
-		assertEquals("pay type to order", orderToParcel.getSettleType(), orderAfterParcelled.getSettleType());
-		
-		// Check the discount id
-		assertEquals("discount id to order", orderToParcel.getDiscount().getId(), orderAfterParcelled.getDiscount().getId());
-		
-		// Check the erase price
-		assertEquals("erase price to order", orderToParcel.getErasePrice(), orderAfterParcelled.getErasePrice());
-		
-		// Check the pay manner
-		assertEquals("pay manner to order", orderToParcel.getPaymentType(), orderAfterParcelled.getPaymentType());
-		
-		// Check the service rate
-		assertEquals("service rate to order", orderToParcel.getServiceRate(), orderAfterParcelled.getServiceRate(), 0.01);
-		
-		// Check the comment
-		assertEquals("comment to order", orderToParcel.getComment(), orderAfterParcelled.getComment());
-
-	}
 }
