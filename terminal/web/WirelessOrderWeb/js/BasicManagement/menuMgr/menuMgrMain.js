@@ -29,6 +29,16 @@ function floatBarUpdateHandler(){
 	}
 }
 
+function floatBarSetTopHandler(){
+	var tn = Ext.ux.getSelNode(kitchenTreeForSreach);
+	if(!tn){
+		Ext.example.msg('提示', '操作失败, 请选中一条数据再进行操作.');
+		return;
+	}
+	kitchenTreeForSreach.fireEvent('nodedrop', 
+		{tree : kitchenTreeForSreach, target : tn.parentNode.firstChild, dropNode : tn });
+}
+
 
 function foodRelationWinShow(){
 	
@@ -47,11 +57,13 @@ function operateKitchenHandler(node){
 	var kitchenName = Ext.getCmp('txtKitchenName');
 	var kitchenDept = Ext.getCmp('comboKitchenDept');
 	var isAllowTemp = Ext.getCmp('comboIsAllowTemp');
+	initDeptComboData();
 	
 	if(updateKitchenWin.otype == 'insert'){
 		kitchenID.setValue();
 		kitchenName.setValue();
 		kitchenName.clearInvalid();
+		isAllowTemp.setValue(false);
 		node = kitchenTreeForSreach.getSelectionModel().getSelectedNode();
 		if(node){
 			kitchenDept.setValue(node.attributes.deptID);
@@ -260,7 +272,6 @@ function kitchenWinShow(){
 									Ext.example.msg(jr.title, jr.msg);
 									updateKitchenWin.hide();
 									kitchenTreeForSreach.getRootNode().reload();
-									initKitchenComboData();
 								}else{
 									Ext.ux.showMsg(jr);
 								}
@@ -403,7 +414,6 @@ function deptWinShow(){
 							Ext.example.msg(jr.title, jr.msg);
 							updateDeptWin.hide();
 							kitchenTreeForSreach.getRootNode().reload();
-							initDeptComboData();
 						},
 						failure : function(res, opt) {
 							Ext.ux.showMsg(Ext.util.JSON.decode(res.responseText));
@@ -435,7 +445,6 @@ function deptWinShow(){
 function searchMenuHandler(){
 	var baseParams = {
 		'isPaging' : true,
-		
 		'restaurantId' : restaurantID
 	};
 	// 分厨
@@ -564,6 +573,7 @@ function foodOperation(active, type){
 	
 	// 标志是否新添加菜品
 	foWin.operation = type;
+	initKitchenComboData();
 	foWin.show();
 	foWin.center();
 	
@@ -1524,7 +1534,7 @@ function basicOperationBasicHandler(c){
 	var stockStatus = Ext.getCmp('comboBasicForStockStatus');
 		
 	if(!foodName.isValid() || !foodAliasID.isValid() || !foodPrice.isValid() || !foodKitchenAlias.isValid()){
-		Ext.getCmp('foodOperationWinTab').setActiveTab('basicOperationTab');
+//		Ext.getCmp('foodOperationWinTab').setActiveTab('basicOperationTab');
 		return;
 	}
 	
@@ -1620,6 +1630,8 @@ function basicOperationBasicHandler(c){
 							Ext.getCmp('foodOperationWin').hide();
 						}
 					}, this);
+					var bToolBar = Ext.getCmp('menuMgrGrid').getBottomToolbar();
+					bToolBar.onClick(bToolBar.last);
 				}else if(c.type == mmObj.operation.update){
 					if(c.hide == true){
 						Ext.getCmp('foodOperationWin').hide();
@@ -2133,6 +2145,7 @@ function initKitchenTreeForSreach(){
 						url = '../../UpdateKitchen.do';
 						params = {
 							kitchenID : e.dropNode.attributes.kid,
+							isAllowTemp : e.dropNode.attributes.isAllowTemp,
 							deptID : e.target.attributes.deptID
 						};
 					}else{
@@ -2141,6 +2154,7 @@ function initKitchenTreeForSreach(){
 							url = '../../UpdateKitchen.do';
 							params = {
 								kitchenID : e.dropNode.attributes.kid,
+								isAllowTemp : e.dropNode.attributes.isAllowTemp,
 								deptID : e.target.parentNode.attributes.deptID,
 								kitchenB : e.target.attributes.kid,
 								move : true
@@ -2451,7 +2465,16 @@ function initFoodOperationWin(){
 				key : Ext.EventObject.ENTER,
 				scope : this,
 				fn : function(){
-					addBasicHandler();
+					if(foodOperationWin.operation == mmObj.operation.insert){
+						addBasicHandler();
+					}else if(foodOperationWin.operation == mmObj.operation.update){
+						foodOperationHandler({
+			    			win : 'foodDetail',
+		    				type : mmObj.operation.update,
+		    				hide : true
+		    			});
+					}
+					
 				}
 			}],
 			bbar : [ {
@@ -2804,13 +2827,14 @@ var menu_filterTypeComb = new Ext.form.ComboBox({
 });
 
 function deleteFoodHandler() {
+	var selData = Ext.ux.getSelData('menuMgrGrid');
 	Ext.MessageBox.show({
-		msg : '<center>是否确定删除？</center>',
+		msg : '<center>是否确定删除: '+ selData.name +' ？</center>',
 		width : 200,
 		buttons : Ext.MessageBox.YESNO,
 		fn : function(btn) {
 			if (btn == 'yes') {
-				var selData = Ext.ux.getSelData('menuMgrGrid');
+				
 				Ext.Ajax.request({
 					url : '../../DeleteMenu.do',
 					params : {
@@ -2851,7 +2875,7 @@ function setButtonStateOne(s){
 	Ext.getCmp('btnRefreshForOW').setDisabled(s);
 };
 
-var bar = {treeId : 'kitchenTreeForSreach', option :[{name : '修改', fn : "floatBarUpdateHandler()"}, {name : '删除', fn : "floatBarDeleteHandler()"}]};
+var bar = {treeId : 'kitchenTreeForSreach', option :[{name : '修改', fn : "floatBarUpdateHandler()"}, {name : '删除', fn : "floatBarDeleteHandler()"}, {name : '置顶', fn : "floatBarSetTopHandler()"}]};
 
 
 Ext.onReady(function() {

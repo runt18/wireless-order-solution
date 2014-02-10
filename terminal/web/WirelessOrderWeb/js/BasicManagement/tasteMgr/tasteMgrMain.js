@@ -416,7 +416,10 @@ function initTasteOperatorWin(){
 							if(jr.success){
 								tasteOperatorWin.hide();
 								Ext.example.msg(jr.title, jr.msg);
-								Ext.getCmp('taste_grid').getBottomToolbar().onClick("last");
+								if(tasteOperatorWin.otype.toLowerCase() == 'insert'){
+									var bToolBar = Ext.getCmp('taste_grid').getBottomToolbar();
+									bToolBar.onClick(bToolBar.last);
+								}
 							}else{
 								Ext.ux.showMsg(jr);
 							}
@@ -920,7 +923,7 @@ function operatorWinData(c){
 	if(c.otype == Ext.ux.otype['set']){
 		tasteId.setValue(c.data['id']);
 		tasteName.setValue(c.data['name']);
-		tasteCate.setValue(typeof c.data['cateValue'] == 'undefined' ? Ext.ux.getSelNode(tmm_tasteTree)?Ext.ux.getSelNode(tmm_tasteTree).id : '' : c.data['cateValue']);
+		tasteCate.setValue(typeof c.data['cateValue'] == 'undefined' ? (Ext.ux.getSelNode(tmm_tasteTree)?(Ext.ux.getSelNode(tmm_tasteTree).id != '-1'?Ext.ux.getSelNode(tmm_tasteTree).id:'') : '') : c.data['cateValue']);
 		tasteCate.fireEvent('select', tasteCate);
 		if(c.data['typeValue'] == 1){
 			tasteCate.getEl().up('.x-form-item').setDisplayed(false);
