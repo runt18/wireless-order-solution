@@ -3,6 +3,7 @@ package com.wireless.pack.req;
 import com.wireless.pack.Mode;
 import com.wireless.pack.Type;
 import com.wireless.pojo.dishesOrder.Order;
+import com.wireless.pojo.dishesOrder.PrintOption;
 import com.wireless.pojo.staffMgr.Staff;
 
 public class ReqInsertOrder extends RequestPackage {

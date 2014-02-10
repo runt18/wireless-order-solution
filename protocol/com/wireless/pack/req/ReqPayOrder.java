@@ -7,24 +7,18 @@ import com.wireless.pojo.staffMgr.Staff;
 
 public class ReqPayOrder extends RequestPackage{
 	
-	public ReqPayOrder(Staff staff, Order order, byte payType){
-		this(staff, order, payType, PrintOption.DO_PRINT);
-	}
-	
-	public ReqPayOrder(Staff staff, Order order, byte payType, PrintOption printOption){
+	public ReqPayOrder(Staff staff, Order.PayBuilder payParam){
 		
 		super(staff);
-		
-		if(payType == Type.PAY_ORDER || payType == Type.PAY_TEMP_ORDER){
-		
-			header.mode = Mode.ORDER_BUSSINESS;
-			header.type = payType;
-			header.reserved = printOption.getVal();
-			
-			fillBody(order, Order.ORDER_PARCELABLE_4_PAY);
-			
+	
+		header.mode = Mode.ORDER_BUSSINESS;
+		if(payParam.isTemp()){
+			header.type = Type.PAY_TEMP_ORDER;
 		}else{
-			throw new IllegalArgumentException("The pay type is incorrect.");
+			header.type = Type.PAY_ORDER;
 		}
+		
+		fillBody(payParam, 0);
+			
 	}
 }
