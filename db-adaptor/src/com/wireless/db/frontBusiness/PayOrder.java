@@ -8,7 +8,6 @@ import com.wireless.db.Params;
 import com.wireless.db.client.member.MemberDao;
 import com.wireless.db.distMgr.DiscountDao;
 import com.wireless.db.orderMgr.OrderDao;
-import com.wireless.db.regionMgr.TableDao;
 import com.wireless.db.system.SystemDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.FrontBusinessError;
@@ -16,6 +15,7 @@ import com.wireless.exception.StaffError;
 import com.wireless.pojo.client.Member;
 import com.wireless.pojo.client.MemberOperation;
 import com.wireless.pojo.dishesOrder.Order;
+import com.wireless.pojo.dishesOrder.Order.PayBuilder;
 import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.distMgr.Discount;
 import com.wireless.pojo.regionMgr.Table;
@@ -27,45 +27,43 @@ import com.wireless.util.DateType;
 public class PayOrder {
 	
 	/**
-	 * Perform to pay a temporary order.
-	 * @param dbCon
-	 * 			the database connection
+	 * Perform to pay a temporary order according to {@link Order.PayBuilder}.
 	 * @param staff
 	 * 			the staff to perform this action
-	 * @param orderToPay
-	 * 			the order to pay temporary
+	 * @param payBuilder
+	 * 			the parameters to pay order
 	 * @return the order calculated
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 * @throws BusinessException 
-	 * 			throws if the order to this id does NOT exist
+	 * 			throws if failed to execute {@link#calcById}
 	 */
-	public static Order execTmpById(Staff staff, Order orderToPay) throws SQLException, BusinessException{
+	public static Order payTemp(Staff staff, PayBuilder payBuilder) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return execTmpById(dbCon, staff, orderToPay);
+			return payTemp(dbCon, staff, payBuilder);
 		}finally{
 			dbCon.disconnect();
 		}
 	}
 	
 	/**
-	 * Perform to pay a temporary order.
+	 * Perform to pay a temporary order according to {@link Order.PayBuilder}.
 	 * @param dbCon
 	 * 			the database connection
 	 * @param staff
 	 * 			the staff to perform this action
-	 * @param orderToPay
-	 * 			the order to pay temporary
+	 * @param payBuilder
+	 * 			the parameters to pay order
 	 * @return the order calculated
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 * @throws BusinessException 
-	 * 			throws if the order to this id does NOT exist
+	 * 			throws if failed to execute {@link#calcById}
 	 */
-	public static Order execTmpById(DBCon dbCon, Staff staff, Order orderToPay) throws SQLException, BusinessException{
-		return doTmpPayment(dbCon, staff, calcById(dbCon, staff, orderToPay));
+	public static Order payTemp(DBCon dbCon, Staff staff, PayBuilder payBuilder) throws SQLException, BusinessException{
+		return doTmpPayment(dbCon, staff, calc(dbCon, staff, payBuilder));
 	}
 	
 	private static Order doTmpPayment(DBCon dbCon, Staff staff, Order orderCalculated) throws SQLException{
@@ -115,26 +113,28 @@ public class PayOrder {
 	
 	
 	/**
-	 * Perform to pay an order along with the id and other pay condition.
-	 * 
+	 * Perform to pay an order according to {@link Order.PayBuilder}.
+	 * @param dbCon
+	 * 			the database connection
 	 * @param staff
 	 * 			the staff to perform this action
-	 * @param orderToPay
-	 * 			the order to pay along with id and other pay condition
+	 * @param payBuilder
+	 * 			the parameters to pay order
 	 * @return Order completed pay order information to paid order
 	 * @throws BusinessException
-	 *             throws if one of the cases below.<br>
-	 *             - The terminal is NOT attached to any restaurant.<br>
-	 *             - The terminal is expired.<br>
-	 *             - The order to query does NOT exist.
+	 *             throws if one of the cases below
+	 *             <li>failed to perform prepare and payment referred to {@link#doPayment} and {@link#doPrepare}
+	 *             <li>the order to pay does NOT exist
+	 *             <li>the staff has no privilege for payment in case of order unpaid
+	 *             <li>the staff has no privilege for re-payment in case of order paid
 	 * @throws SQLException
 	 *             throws if fail to execute any SQL statement
 	 */
-	public static Order execById(Staff staff, Order orderToPay) throws BusinessException, SQLException{
+	public static Order pay(Staff staff, PayBuilder payBuilder) throws BusinessException, SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return execById(dbCon, staff, orderToPay);
+			return pay(dbCon, staff, payBuilder);
 			
 		}finally{
 			dbCon.disconnect();
@@ -142,28 +142,25 @@ public class PayOrder {
 	}
 	
 	/**
-	 * Perform to pay an order along with the id and other pay condition.
-	 * 
+	 * Perform to pay an order according to {@link Order.PayBuilder}.
 	 * @param dbCon
 	 * 			the database connection
 	 * @param staff
 	 * 			the staff to perform this action
-	 * @param orderToPay
-	 * 			the order to pay along with id and other pay condition
+	 * @param payBuilder
+	 * 			the parameters to pay order
 	 * @return Order completed pay order information to paid order
 	 * @throws BusinessException
-	 *             throws if one of the cases below<br>
-	 *             - the terminal is NOT attached to any restaurant<br>
-	 *             - the terminal is expired<br>
-	 *             - the order to be paid repeat<br>
-	 *             - the order to query does NOT exist<br>
-	 *             - the staff has no privilege for payment in case of order unpaid<br>
-	 *             - the staff has no privilege for re-payment in case of order paid
+	 *             throws if one of the cases below
+	 *             <li>failed to perform prepare and payment referred to {@link#doPayment} and {@link#doPrepare}
+	 *             <li>the order to pay does NOT exist
+	 *             <li>the staff has no privilege for payment in case of order unpaid
+	 *             <li>the staff has no privilege for re-payment in case of order paid
 	 * @throws SQLException
 	 *             throws if fail to execute any SQL statement
 	 */
-	public static Order execById(DBCon dbCon, Staff staff, Order orderToPay) throws BusinessException, SQLException{
-		Order.Status status = OrderDao.getStatusById(dbCon, staff, orderToPay.getId());
+	public static Order pay(DBCon dbCon, Staff staff, PayBuilder payBuilder) throws BusinessException, SQLException{
+		Order.Status status = OrderDao.getStatusById(dbCon, staff, payBuilder.getOrderId());
 		if(status == Order.Status.UNPAID && !staff.getRole().hasPrivilege(Privilege.Code.PAYMENT)){
 			throw new BusinessException(StaffError.PAYMENT_NOT_ALLOW);
 			
@@ -171,7 +168,7 @@ public class PayOrder {
 			throw new BusinessException(StaffError.RE_PAYMENT_NOT_ALLOW);
 			
 		}else{
-			return doPayment(dbCon, staff, doPrepare(dbCon, staff, orderToPay));
+			return doPayment(dbCon, staff, doPrepare(dbCon, staff, payBuilder));
 		}
 		
 	}
@@ -179,8 +176,11 @@ public class PayOrder {
 	/**
 	 * 
 	 * @param dbCon
+	 * 			the database connection
 	 * @param staff
-	 * @param orderToPay
+	 * 			the staff to perform this action
+	 * @param payBuilder
+	 * 			the parameters to pay order
 	 * @return
 	 * @throws BusinessException
 	 * 			throws if one of cases below
@@ -190,13 +190,13 @@ public class PayOrder {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statements
 	 */
-	private static Order doPrepare(DBCon dbCon, Staff staff, Order orderToPay) throws BusinessException, SQLException{
-		int customNum = orderToPay.getCustomNum();
-		Order orderCalculated = calcById(dbCon, staff, orderToPay);
+	private static Order doPrepare(DBCon dbCon, Staff staff, PayBuilder payBuilder) throws BusinessException, SQLException{
+		int customNum = payBuilder.getCustomNum();
+		Order orderCalculated = calc(dbCon, staff, payBuilder);
 		orderCalculated.setCustomNum(customNum);
 		
 		//Set the received cash if less than actual price.
-		if(orderCalculated.isPayByCash() && orderCalculated.getReceivedCash() < orderCalculated.getActualPrice()){
+		if(orderCalculated.isPayByCash() && payBuilder.getReceivedCash() < orderCalculated.getActualPrice()){
 			orderCalculated.setReceivedCash(orderCalculated.getActualPrice());
 		}
 		
@@ -361,16 +361,16 @@ public class PayOrder {
 	 * @throws SQLException
 	 * 			Throws if failed to execute any SQL statement.
 	 */
-	public static Order calcByTable(Staff staff, Order orderToPay) throws BusinessException, SQLException{
-		DBCon dbCon = new DBCon();
-		try{
-			dbCon.connect();
-			return calcByTable(dbCon, staff, orderToPay);
-			
-		}finally{
-			dbCon.disconnect();
-		}
-	}
+//	public static Order calcByTable(Staff staff, Order orderToPay) throws BusinessException, SQLException{
+//		DBCon dbCon = new DBCon();
+//		try{
+//			dbCon.connect();
+//			return calcByTable(dbCon, staff, orderToPay);
+//			
+//		}finally{
+//			dbCon.disconnect();
+//		}
+//	}
 	
 	/**
 	 * Calculate the order details according to the specific table defined in order regardless of merged status. 
@@ -388,110 +388,54 @@ public class PayOrder {
 	 * @throws SQLException
 	 * 			Throws if failed to execute any SQL statement.
 	 */
-	public static Order calcByTable(DBCon dbCon, Staff staff, Order orderToPay) throws BusinessException, SQLException{
-		
-		orderToPay.setId(OrderDao.getOrderIdByUnPaidTable(dbCon, staff, TableDao.getTableByAlias(dbCon, staff, orderToPay.getDestTbl().getAliasId())));			
-		
-		return calcById(dbCon, staff, orderToPay);		
-
-	}
+//	public static Order calcByTable(DBCon dbCon, Staff staff, Order orderToPay) throws BusinessException, SQLException{
+//		
+//		orderToPay.setId(OrderDao.getOrderIdByUnPaidTable(dbCon, staff, TableDao.getTableByAlias(dbCon, staff, orderToPay.getDestTbl().getAliasId())));			
+//		
+//		return calc(dbCon, staff, orderToPay);		
+//
+//	}
 	
 	/**
-	 * Calculate the details to order according to the specific table
-	 * and other condition referring to {@link ReqPayOrderParser}.
-	 * If the table is merged, perform to get its parent order,
-	 * otherwise get the order of its own.
-	 * @param staff
-	 * 			the staff to perform this action 
-	 * @param orderToPay
-	 * 			the order along with table and other condition referring to {@link ReqPayOrderParser}
-	 * @return the order result after calculated
-	 * @throws BusinessException
-	 * 			Throws if one of cases below.<br>
-	 * 			1 - The order associated with table to be paid does NOT exist.<br>
-	 * 			2 - The erase price exceeds the quota.
-	 * @throws SQLException
-	 * 			Throws if failed to execute any SQL statement.
-	 */
-	public static Order calcByTableDync(Staff staff, Order orderToPay) throws BusinessException, SQLException{
-		
-		DBCon dbCon = new DBCon();
-		try{
-			dbCon.connect();
-			return calcByTableDync(dbCon, staff, orderToPay);
-		}finally{
-			dbCon.disconnect();
-		}
-
-	}
-	
-	/**
-	 * Calculate the details to order according to the specific table
-	 * and other condition referring to {@link ReqPayOrderParser}.
-	 * If the table is merged, perform to get its parent order,
-	 * otherwise get the order of its own.
-	 * @param dbCon
-	 * 			the database connection
-	 * @param staff
-	 * 			the staff to perform this action 
-	 * @param orderToPay
-	 * 			the order along with table and other condition referring to {@link ReqPayOrderParser}
-	 * @return the order result after calculated
-	 * @throws BusinessException
-	 * 			Throws if one of cases below.<br>
-	 * 			1 - The order associated with table to be paid does NOT exist.<br>
-	 * 			2 - The erase price exceeds the quota.
-	 * @throws SQLException
-	 * 			Throws if failed to execute any SQL statement.
-	 */
-	public static Order calcByTableDync(DBCon dbCon, Staff staff, Order orderToPay) throws BusinessException, SQLException{
-		
-		orderToPay.setId(OrderDao.getOrderIdByUnPaidTable(dbCon, staff, TableDao.getTableByAlias(dbCon, staff, orderToPay.getDestTbl().getAliasId())));			
-		
-		return calcById(dbCon, staff, orderToPay);		
-
-	}
-	
-	/**
-	 * Calculate the details to the order according to id and
-	 * other condition.
+	 * Calculate the details to the order according to {@link Order.PayBuilder}.
 	 * @param staff
 	 * 			the staff to perform this action
-	 * @param orderToPay
-	 * 			the order along with id and other condition
-	 * @return the order result after calculated
-	 * @throws BusinessException
-	 * 			Throws if the order to this id does NOT exist.
-	 * @throws SQLException
-	 * 			Throws if failed to execute any SQL statement.
-	 */
-	public static Order calcById(Staff staff, Order orderToPay) throws BusinessException, SQLException{
-		DBCon dbCon = new DBCon();
-		try{
-			dbCon.connect();
-			return calcById(dbCon, staff, orderToPay);
-		}finally{
-			dbCon.disconnect();
-		}
-	}
-	
-	/**
-	 * Calculate the details to the order according to id and
-	 * other condition.
-	 * @param dbCon
-	 * 			the database connection
-	 * @param staff
-	 * 			the staff to perform this action
-	 * @param orderToPay
-	 * 			the order along with id and other condition
+	 * @param payBuilder
+	 * 			the parameters to pay order
 	 * @return the order result after calculated
 	 * @throws BusinessException
 	 * 			throws if the order to this id does NOT exist
-	 * 			throws if the staff has no privilege to make use of the requested discount
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static Order calcById(DBCon dbCon, Staff staff, Order orderToPay) throws BusinessException, SQLException{
+	public static Order calc(Staff staff, PayBuilder payBuilder) throws BusinessException, SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return calc(dbCon, staff, payBuilder);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Calculate the details to the order according according to {@link Order.PayBuilder}.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param payBuilder
+	 * 			the parameters to pay order
+	 * @return the order result after calculated
+	 * @throws BusinessException
+	 * 			throws if any cases below
+	 * 			<li>the erase price exceeds the quota 
+	 * 			<li>the order to this id does NOT exist
+	 * 			<li>the staff has no privilege to use the requested discount
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static Order calc(DBCon dbCon, Staff staff, PayBuilder payBuilder) throws BusinessException, SQLException{
 		
 		String sql;
 		
@@ -499,29 +443,43 @@ public class PayOrder {
 		Setting setting = SystemDao.getSetting(dbCon, staff.getRestaurantId());
 		
 		//Check to see whether has erase quota and the order exceed the erase quota.
-		if(setting.hasEraseQuota() && orderToPay.getErasePrice() > setting.getEraseQuota()){
+		if(setting.hasEraseQuota() && payBuilder.getErasePrice() > setting.getEraseQuota()){
 			throw new BusinessException(FrontBusinessError.EXCEED_ERASE_QUOTA);
 		}
 		
 		//Get all the details of order to be calculated.
-		Order orderToCalc = OrderDao.getById(staff, orderToPay.getId(), DateType.TODAY);
+		Order orderToCalc = OrderDao.getById(staff, payBuilder.getOrderId(), DateType.TODAY);
 		
 		//Set the order calculate parameters.
-		setOrderCalcParams(orderToCalc, orderToPay);
+		setOrderCalcParams(orderToCalc, payBuilder);
 
-		if(orderToCalc.getDiscount().equals(orderToPay.getDiscount())){
-			orderToCalc.setDiscount(DiscountDao.getDiscountById(dbCon, staff, orderToPay.getDiscount().getId()));
+		//If the service rate is set, just use it, otherwise use the one associated with the table belongs to this order.
+		if(payBuilder.hasServiceRate()){
+			orderToCalc.setServiceRate(payBuilder.getServiceRate());
 		}else{
-			//Get the discounts to role owned by staff
-			//and check to see whether the staff is permitted to make use of the discount.
-			List<Discount> discounts = DiscountDao.getDiscountByRole(dbCon, staff, staff.getRole());
-			int index = discounts.indexOf(orderToCalc.getDiscount());
-			if(index < 0){
-				throw new BusinessException(StaffError.DISCOUNT_NOT_ALLOW);
-			}else{
-				orderToCalc.setDiscount(discounts.get(index));
-			}
+			orderToCalc.setServiceRate(orderToCalc.getDestTbl().getServiceRate());
 		}
+		
+		//If the discount is set, check to see whether it is the same as before.
+		if(payBuilder.hasDiscount()){
+			//If the discount to set is the same as before, just use original.
+			if(orderToCalc.getDiscount().getId() == payBuilder.getDiscountId()){
+				orderToCalc.setDiscount(DiscountDao.getDiscountById(dbCon, staff, orderToCalc.getDiscount().getId()));
+			}else{
+				//If the discount to set is NOT the same as before, check to see whether the staff is permitted to use the discount.
+				List<Discount> discounts = DiscountDao.getDiscountByRole(dbCon, staff, staff.getRole());
+				int index = discounts.indexOf(new Discount(payBuilder.getDiscountId()));
+				if(index < 0){
+					throw new BusinessException(StaffError.DISCOUNT_NOT_ALLOW);
+				}else{
+					orderToCalc.setDiscount(discounts.get(index));
+				}
+			}
+		}else{
+			//If the discount NOT set, just use the original.
+			orderToCalc.setDiscount(DiscountDao.getDiscountById(dbCon, staff, orderToCalc.getDiscount().getId()));
+		}
+		
 
 		float cancelPrice = 0;
 		//Calculate the cancel price to this order.
@@ -599,18 +557,14 @@ public class PayOrder {
 		return orderToCalc;
 	}
 	
-	private static void setOrderCalcParams(Order orderToCalc, Order calcParams){
-		orderToCalc.setErasePrice(calcParams.getErasePrice());
-		if(calcParams.getCustomNum() >= 0){
-			orderToCalc.setCustomNum(calcParams.getCustomNum());
-		}
-		orderToCalc.setDiscount(calcParams.getDiscount());
-		orderToCalc.setSettleType(calcParams.getSettleType());
-		orderToCalc.setMember(calcParams.getMember()); 
-		orderToCalc.setReceivedCash(calcParams.getReceivedCash());
-		orderToCalc.setPaymentType(calcParams.getPaymentType());
-		orderToCalc.setComment(calcParams.getComment());
-		orderToCalc.setServiceRate(calcParams.getServiceRate());
+	private static void setOrderCalcParams(Order orderToCalc, PayBuilder payBuilder){
+		orderToCalc.setErasePrice(payBuilder.getErasePrice());
+		orderToCalc.setCustomNum(payBuilder.getCustomNum());
+		orderToCalc.setSettleType(payBuilder.getSettleType());
+		orderToCalc.setMember(payBuilder.getMember()); 
+		orderToCalc.setReceivedCash(payBuilder.getReceivedCash());
+		orderToCalc.setPaymentType(payBuilder.getPaymentType());
+		orderToCalc.setComment(payBuilder.getComment());
 	}
 	
 }
