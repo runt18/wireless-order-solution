@@ -16,7 +16,7 @@ import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.menuMgr.Department.AddBuilder;
-import com.wireless.pojo.menuMgr.Department.SwapDisplayBuilder;
+import com.wireless.pojo.menuMgr.Department.MoveBuilder;
 import com.wireless.pojo.staffMgr.Staff;
 
 public class OperateDeptAction extends DispatchAction{
@@ -31,11 +31,11 @@ public class OperateDeptAction extends DispatchAction{
 		String pin = (String) request.getAttribute("pin");
 		Staff staff = StaffDao.verify(Integer.parseInt(pin));
 		
-		Department.SwapDisplayBuilder builder = new SwapDisplayBuilder(Integer.parseInt(deptA), Integer.parseInt(deptB));
+		Department.MoveBuilder builder = new MoveBuilder(Integer.parseInt(deptA), Integer.parseInt(deptB));
 		
 		JObject jobject = new JObject();
 		try{
-			DepartmentDao.swap(staff, builder);
+			DepartmentDao.move(staff, builder);
 		}catch(BusinessException e){
 			e.printStackTrace();
 			jobject.initTip(e);

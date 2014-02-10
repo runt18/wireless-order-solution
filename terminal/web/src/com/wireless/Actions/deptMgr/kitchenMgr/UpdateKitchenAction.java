@@ -12,6 +12,8 @@ import com.wireless.db.deptMgr.KitchenDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.json.JObject;
 import com.wireless.pojo.menuMgr.Department;
+import com.wireless.pojo.menuMgr.Kitchen;
+import com.wireless.pojo.menuMgr.Kitchen.MoveBuilder;
 import com.wireless.pojo.menuMgr.Kitchen.UpdateBuilder;
 
 public class UpdateKitchenAction extends Action {
@@ -26,12 +28,19 @@ public class UpdateKitchenAction extends Action {
 			String deptID = request.getParameter("deptID");
 			String isAllowTemp = request.getParameter("isAllowTemp");
 			String pin = (String) request.getAttribute("pin");
+			String move = request.getParameter("move");
+			String kitchenB = request.getParameter("kitchenB");
 			
 			KitchenDao.update(StaffDao.verify(Integer.parseInt(pin)), 
 							 new UpdateBuilder(Integer.valueOf(kitchenID))
 									.setName(kitchenName)
 									.setDeptId(Department.DeptId.valueOf(Integer.parseInt(deptID)))
 									.setAllowTmp(Boolean.parseBoolean(isAllowTemp)));
+			
+			if(move != null && !move.isEmpty()){
+				Kitchen.MoveBuilder builder = new MoveBuilder(Integer.parseInt(kitchenID), Integer.parseInt(kitchenB));
+				KitchenDao.move(StaffDao.verify(Integer.parseInt(pin)), builder);
+			}
 			
 			jobject.initTip(true, "操作成功,已修改厨房信息.");
 		} catch (Exception e) {
