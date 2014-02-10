@@ -29,10 +29,11 @@ import com.wireless.common.WirelessOrder;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.ProtocolError;
 import com.wireless.pack.Type;
-import com.wireless.pack.req.PrintOption;
 import com.wireless.parcel.OrderParcel;
 import com.wireless.pojo.dishesOrder.Order;
+import com.wireless.pojo.dishesOrder.Order.PayBuilder;
 import com.wireless.pojo.dishesOrder.OrderFood;
+import com.wireless.pojo.dishesOrder.PrintOption;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.util.NumericUtil;
 import com.wireless.ui.MainActivity;
@@ -357,7 +358,7 @@ public class CommitDialog extends DialogFragment{
 		@Override
 		public void onSuccess(Order order){
 			mProgressDialog.dismiss();
-			new PayOrderTask(order, Type.PAY_ORDER).execute();
+			new PayOrderTask(Order.PayBuilder.build(order.getId())).execute();
 		}
 		
 		@Override 
@@ -388,8 +389,8 @@ public class CommitDialog extends DialogFragment{
 
 		private ProgressDialog mProgDialog;
 
-		PayOrderTask(Order order, byte payCate) {
-			super(WirelessOrder.loginStaff, order, payCate, PrintOption.DO_PRINT);
+		PayOrderTask(Order.PayBuilder payBuilder) {
+			super(WirelessOrder.loginStaff, payBuilder);
 		}
 
 		/**
@@ -397,49 +398,38 @@ public class CommitDialog extends DialogFragment{
 		 */
 		@Override
 		protected void onPreExecute() {
-			mProgDialog = ProgressDialog.show(getActivity(), 
-											  "", 
-											  "提交"	+ mOrderToPay.getDestTbl().getAliasId() + "号台" + 
-											 (mPayCate == Type.PAY_ORDER ? "结帐"	: "暂结") + "信息...请稍候",
-											 true);
+			mProgDialog = ProgressDialog.show(getActivity(), "", "提交" + getPromptInfo() + "信息...请稍候", true);
 		}
 
-
-		/**
-		 * 根据返回的error message判断，如果发错异常则提示用户， 如果成功，则返回到主界面，并提示用户结帐成功
-		 */
 		@Override
-		protected void onPostExecute(Void arg) {
-			mProgDialog.dismiss();
+		protected void onSuccess(PayBuilder payBuilder) {
+			mProgDialog.dismiss();	
+			Toast.makeText(getActivity(),"账单提交并" + (payBuilder.isTemp() ? "暂结" : "结账") + "成功", Toast.LENGTH_SHORT).show();
+			dismiss();
+			//直接返回到MainActivity
+			Intent intent = new Intent(getActivity(), MainActivity.class);
+			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			getActivity().startActivity(intent);
+		}
 
-			if (mBusinessException != null) {
-				new AlertDialog.Builder(getActivity())
-				.setTitle(mBusinessException.getMessage())
-				.setMessage("菜品已添加，但结账请求失败，是否重试？")
-				.setPositiveButton("重试", new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int id) {
-						new PayOrderTask(mOrderToPay, mPayCate).execute();
-					}
-				})
-				.setNegativeButton("退出", new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						dismiss();
-						getActivity().finish();
-					}
-				}).show();
-
-			} else {
-
-				Toast.makeText(getActivity(), 
-							  mOrderToPay.getDestTbl().getAliasId()	+ "号台提交并" + (mPayCate == Type.PAY_ORDER ? "结帐" : "暂结") + "成功", 
-							  Toast.LENGTH_SHORT).show();
-				dismiss();
-				//直接返回到MainActivity
-				Intent intent = new Intent(getActivity(), MainActivity.class);
-				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-				getActivity().startActivity(intent);
-			}
+		@Override
+		protected void onFail(final PayBuilder payBuilder, BusinessException e) {
+			mProgDialog.dismiss();		
+			new AlertDialog.Builder(getActivity())
+						.setTitle(e.getMessage())
+						.setMessage("菜品已添加，但结账请求失败，是否重试？")
+						.setPositiveButton("重试", new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog, int id) {
+								new PayOrderTask(payBuilder).execute();
+							}
+						})
+						.setNegativeButton("退出", new DialogInterface.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog, int which) {
+								dismiss();
+								getActivity().finish();
+							}
+						}).show();
 		}
 	}
 }

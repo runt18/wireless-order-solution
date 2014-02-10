@@ -23,9 +23,9 @@ import android.widget.Toast;
 import com.wireless.common.WirelessOrder;
 import com.wireless.exception.BusinessException;
 import com.wireless.pack.Type;
-import com.wireless.pack.req.PrintOption;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.OrderFood;
+import com.wireless.pojo.dishesOrder.PrintOption;
 import com.wireless.pojo.distMgr.Discount;
 import com.wireless.pojo.util.NumericUtil;
 import com.wireless.ui.view.BillFoodListView;
@@ -134,24 +134,8 @@ public class BillActivity extends Activity {
 
 		private ProgressDialog mProgDialog;
 
-		PayOrderTask(Order order, byte payCate, PrintOption printOption){
-			super(WirelessOrder.loginStaff, order, payCate, printOption);
-		}
-		
-		PayOrderTask(Order order, byte payCate) {
-			super(WirelessOrder.loginStaff, order, payCate, PrintOption.DO_PRINT);
-		}
-
-		private String getPromptInfo(){
-			if(mPayCate == Type.PAY_ORDER){
-				return "结帐";
-			}else if(mPayCate == Type.PAY_TEMP_ORDER && mPrintOption == PrintOption.DO_PRINT){
-				return "暂结";
-			}else if(mPayCate == Type.PAY_TEMP_ORDER && mPrintOption == PrintOption.DO_NOT_PRINT){
-				return "打折";
-			}else{
-				return "";
-			}
+		PayOrderTask(Order.PayBuilder payBuilder){
+			super(WirelessOrder.loginStaff, payBuilder);
 		}
 		
 		/**
@@ -159,42 +143,30 @@ public class BillActivity extends Activity {
 		 */
 		@Override
 		protected void onPreExecute() {
-			mProgDialog = ProgressDialog.show(BillActivity.this, "", 
-											  "提交"	+ mOrderToPay.getDestTbl().getAliasId() + "号台" + getPromptInfo() + "信息...请稍候",
-											 true);
+			mProgDialog = ProgressDialog.show(BillActivity.this, "", "提交账单" + getPromptInfo() + "信息...请稍候", true);
 		}
 
-
-		/**
-		 * 根据返回的error message判断，如果发错异常则提示用户， 如果成功，则返回到主界面，并提示用户结帐成功
-		 */
 		@Override
-		protected void onPostExecute(Void arg) {
+		protected void onSuccess(Order.PayBuilder payBuilder){
 			mProgDialog.dismiss();
-
-			if (mBusinessException != null) {
-				new AlertDialog.Builder(BillActivity.this)
-					.setTitle("提示")
-					.setMessage(mBusinessException.getMessage())
-					.setPositiveButton("确定", null)
-					.show();
-
-			} else {
-				/**
-				 * Back to main activity if perform to pay order. Refresh the
-				 * bill list if perform to pay temporary order.
-				 */
-				if (mPayCate == Type.PAY_ORDER) {
-					BillActivity.this.finish();
-				} else {
-					mHandler.sendEmptyMessage(0);
-				}
-
-				Toast.makeText(BillActivity.this, 
-							  mOrderToPay.getDestTbl().getAliasId()	+ "号台" + getPromptInfo() + "成功", 
-							  Toast.LENGTH_SHORT).show();
-
+			//Back to main activity if perform to pay order. Refresh the bill list if perform to pay temporary order.
+			if(payBuilder.isTemp()) {
+				mHandler.sendEmptyMessage(0);
+			}else{
+				BillActivity.this.finish();
 			}
+
+			Toast.makeText(BillActivity.this, "账单" + getPromptInfo() + "成功", Toast.LENGTH_SHORT).show();
+		}
+		
+		@Override
+		protected void onFail(Order.PayBuilder payBuilder, BusinessException e){
+			mProgDialog.dismiss();
+			new AlertDialog.Builder(BillActivity.this)
+							.setTitle("提示")
+							.setMessage(e.getMessage())
+							.setPositiveButton("确定", null)
+							.show();
 		}
 	}
 
@@ -228,7 +200,11 @@ public class BillActivity extends Activity {
 				.setPositiveButton("打折", new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(DialogInterface dialog,	int which) {
-						new PayOrderTask(mOrderToPay, Type.PAY_TEMP_ORDER, PrintOption.DO_NOT_PRINT).execute();
+						Order.PayBuilder payBuilder = Order.PayBuilder.build(mOrderToPay.getId(), mOrderToPay.getPaymentType())
+															    .setTemp(true)
+															    .setDiscountId(mOrderToPay.getDiscount().getId())
+																.setPrintOption(PrintOption.DO_NOT_PRINT);
+						new PayOrderTask(payBuilder).execute();
 					}
 				})
 				.setNegativeButton("取消", null)
@@ -296,7 +272,10 @@ public class BillActivity extends Activity {
 				@Override
 				public void onClick(DialogInterface dialog,	int which) {
 					// 执行结账异步线程
-					new PayOrderTask(mOrderToPay, payCate).execute();
+					Order.PayBuilder payBuilder = Order.PayBuilder.build(mOrderToPay.getId(), mOrderToPay.getPaymentType())
+														    .setTemp(payCate == Type.PAY_TEMP_ORDER)
+														    .setDiscountId(mOrderToPay.getDiscount().getId());
+					new PayOrderTask(payBuilder).execute();
 				}
 			})
 			.setNegativeButton("取消", null)

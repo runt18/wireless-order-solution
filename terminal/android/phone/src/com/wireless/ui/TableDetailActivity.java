@@ -24,8 +24,8 @@ import android.widget.Toast;
 import com.wireless.common.WirelessOrder;
 import com.wireless.exception.BusinessException;
 import com.wireless.pack.Type;
-import com.wireless.pack.req.PrintOption;
 import com.wireless.pojo.dishesOrder.Order;
+import com.wireless.pojo.dishesOrder.Order.PayBuilder;
 import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.distMgr.Discount;
 import com.wireless.pojo.util.NumericUtil;
@@ -129,7 +129,7 @@ public class TableDetailActivity extends Activity {
 
 			theActivity.mBillFoodListView.notifyDataChanged(new ArrayList<OrderFood>(theActivity.mOrderToPay.getOrderFoods()));
 			//set the discount price
-			((TextView) theActivity.findViewById(R.id.txtView_discountValue_bill)).setText(NumericUtil.CURRENCY_SIGN	+ Float.toString(theActivity.mOrderToPay.calcDiscountPrice()));
+			((TextView) theActivity.findViewById(R.id.txtView_discountValue_bill)).setText(NumericUtil.CURRENCY_SIGN + Float.toString(theActivity.mOrderToPay.calcDiscountPrice()));
 			//set the actual price
 			((TextView) theActivity.findViewById(R.id.txtView_actualValue_bill)).setText(NumericUtil.CURRENCY_SIGN + Float.toString(Math.round(theActivity.mOrderToPay.calcTotalPrice())));
 			//set the activity_table ID
@@ -146,8 +146,8 @@ public class TableDetailActivity extends Activity {
 
 		private ProgressDialog _progDialog;
 
-		public PayOrderTask(Order orderToPay, byte payCate, PrintOption printOption) {
-			super(WirelessOrder.loginStaff, orderToPay, payCate, printOption);
+		public PayOrderTask(Order.PayBuilder payBuilder) {
+			super(WirelessOrder.loginStaff, payBuilder);
 		}
 		
 		/**
@@ -155,44 +155,30 @@ public class TableDetailActivity extends Activity {
 		 */
 		@Override
 		protected void onPreExecute() {
-			_progDialog = ProgressDialog.show(TableDetailActivity.this, 
-											  "", 
-											  "提交"	+ mOrderToPay.getDestTbl().getAliasId() + "号台" + 
-											 (mPayCate == Type.PAY_ORDER ? "结帐" : "暂结") + "信息...请稍候",
-											 true);
+			_progDialog = ProgressDialog.show(TableDetailActivity.this, "", "提交账单信息...请稍候", true);
 		}
 
-
-		/**
-		 * 根据返回的error message判断，如果发错异常则提示用户， 如果成功，则返回到主界面，并提示用户结帐成功
-		 */
 		@Override
-		protected void onPostExecute(Void arg) {
-			_progDialog.dismiss();
-
-			if (mBusinessException != null) {
-				new AlertDialog.Builder(TableDetailActivity.this)
-					.setTitle("提示")
-					.setMessage(mBusinessException.getMessage())
-					.setPositiveButton("确定", null)
-					.show();
-
-			} else {
-				/**
-				 * Back to main activity if perform to pay order. Refresh the
-				 * bill list if perform to pay temporary order.
-				 */
-				if (mPayCate == Type.PAY_ORDER) {
-					TableDetailActivity.this.finish();
-				} else {
-					mHandler.sendEmptyMessage(0);
-				}
-
-				Toast.makeText(TableDetailActivity.this, 
-							   mOrderToPay.getDestTbl().getAliasId()	+ "号台" + (mPayCate == Type.PAY_ORDER ? "结帐" : "暂结") + "成功", 
-							   Toast.LENGTH_SHORT).show();
-
+		protected void onSuccess(PayBuilder payBuilder) {
+			_progDialog.dismiss();	
+			//Back to main activity if perform to pay order. Refresh the bill list if perform to pay temporary order.
+			if(payBuilder.isTemp()) {
+				mHandler.sendEmptyMessage(0);
+			}else{
+				TableDetailActivity.this.finish();
 			}
+
+			Toast.makeText(TableDetailActivity.this, "账单" + getPromptInfo() + "成功", Toast.LENGTH_SHORT).show();
+		}
+
+		@Override
+		protected void onFail(PayBuilder payBuilder, BusinessException e) {
+			_progDialog.dismiss();			
+			new AlertDialog.Builder(TableDetailActivity.this)
+							.setTitle("提示")
+							.setMessage(e.getMessage())
+							.setPositiveButton("确定", null)
+							.show();
 		}
 	}
 	/**
@@ -258,7 +244,10 @@ public class TableDetailActivity extends Activity {
 				@Override
 				public void onClick(DialogInterface dialog,	int which) {
 					// 执行结账异步线程
-					new PayOrderTask(mOrderToPay, payCate, PrintOption.DO_PRINT).execute();
+					Order.PayBuilder payBuilder = Order.PayBuilder.build(mOrderToPay.getId(), mOrderToPay.getPaymentType())
+												   .setDiscountId(mOrderToPay.getDiscount().getId())
+												   .setTemp(payCate == Type.PAY_TEMP_ORDER);
+					new PayOrderTask(payBuilder).execute();
 				}
 			})
 			.setNegativeButton("取消", null)
