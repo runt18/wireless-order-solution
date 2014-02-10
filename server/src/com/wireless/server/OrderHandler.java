@@ -35,7 +35,6 @@ import com.wireless.exception.ProtocolError;
 import com.wireless.pack.Mode;
 import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
-import com.wireless.pack.req.PrintOption;
 import com.wireless.pack.resp.RespACK;
 import com.wireless.pack.resp.RespNAK;
 import com.wireless.pack.resp.RespOTAUpdate;
@@ -45,6 +44,7 @@ import com.wireless.pojo.client.Member;
 import com.wireless.pojo.client.MemberComment;
 import com.wireless.pojo.client.MemberComment.CommitBuilder;
 import com.wireless.pojo.dishesOrder.Order;
+import com.wireless.pojo.dishesOrder.PrintOption;
 import com.wireless.pojo.foodGroup.Pager;
 import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.printScheme.PType;
@@ -299,7 +299,7 @@ class OrderHandler implements Runnable{
 
 				}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.PAY_ORDER || request.header.type == Type.PAY_TEMP_ORDER){
 					//handle the pay order request
-					Order orderToPay = new Parcel(request.body).readParcel(Order.CREATOR);
+					Order.PayBuilder payParam = new Parcel(request.body).readParcel(Order.PayBuilder.CREATOR);
 					
 					List<Printer> printers = PrinterDao.getPrinters(staff);
 					
@@ -308,20 +308,20 @@ class OrderHandler implements Runnable{
 					 * Otherwise perform the pay action and print receipt 
 					 */
 					if(request.header.type == Type.PAY_TEMP_ORDER){
-						if(request.header.reserved == PrintOption.DO_PRINT.getVal()){
+						if(payParam.getPrintOption() == PrintOption.DO_PRINT){
 							new PrintHandler(staff)
 								.addContent(JobContentFactory.instance().createReceiptContent(PType.PRINT_TEMP_RECEIPT, 
 																							  staff,
 																							  printers,
-																							  PayOrder.execTmpById(staff, orderToPay)))
+																							  PayOrder.payTemp(staff, payParam)))
 								.fireAsync();
 						}else{
-							PayOrder.execTmpById(staff, orderToPay);
+							PayOrder.payTemp(staff, payParam);
 						}
 						
 					}else{
 						
-						final Order order = PayOrder.execById(staff, orderToPay);
+						final Order order = PayOrder.pay(staff, payParam);
 						
 						PrintHandler printHandler = new PrintHandler(staff);
 						
