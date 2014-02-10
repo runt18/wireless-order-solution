@@ -11,13 +11,15 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
+import com.wireless.db.client.member.MemberDao;
 import com.wireless.db.frontBusiness.PayOrder;
 import com.wireless.db.frontBusiness.UpdateOrder;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.client.Member;
 import com.wireless.pojo.dishesOrder.Order;
-import com.wireless.pojo.distMgr.Discount;
+import com.wireless.pojo.dishesOrder.Order.PayType;
+import com.wireless.pojo.dishesOrder.Order.SettleType;
 import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.NumericUtil;
@@ -30,7 +32,7 @@ public class UpdateOrderAction2 extends Action{
 		
 		String jsonResp = "{success:$(result), data:'$(value)'}";
 		PrintWriter out = null;
-		int orderID = 0;
+		int orderId = 0;
 		
 		try {
 			// 解决后台中文传到前台乱码
@@ -85,50 +87,61 @@ public class UpdateOrderAction2 extends Action{
 			 **/
 			String pin = (String)request.getAttribute("pin");
 			
-			Order orderToUpdate = new Order();
+			Staff staff = StaffDao.verify(Integer.parseInt(pin), Privilege.Code.RE_PAYMENT);
+			
 			//get the id to this order
-			orderID = Integer.parseInt(request.getParameter("orderID"));
-			orderToUpdate.setId(orderID);
-			//get the category to this order
-			orderToUpdate.setCategory(Short.parseShort(request.getParameter("category")));
-			//get the custom number to this order
-			orderToUpdate.setCustomNum(Integer.parseInt(request.getParameter("customNum")));
+			orderId = Integer.parseInt(request.getParameter("orderID"));
+			Order orderToUpdate = new Order(orderId);
+			
 			//get the pay type to this order
-			orderToUpdate.setSettleType(Integer.parseInt(request.getParameter("payType")));	
-			//get the discount type to this order
-			orderToUpdate.setDiscount(new Discount(Integer.parseInt(request.getParameter("discountID"))));
+			SettleType settleType = SettleType.valueOf(Integer.parseInt(request.getParameter("payType")));
+			orderToUpdate.setSettleType(settleType);	
 			//get the pay manner to this order
-			orderToUpdate.setPaymentType(Integer.parseInt(request.getParameter("payManner")));
-			//get the service rate to this order
-			orderToUpdate.setServiceRate(NumericUtil.int2Float(Integer.parseInt(request.getParameter("serviceRate"))));
-			//get the erasePrice rate to this order
-			orderToUpdate.setErasePrice(Integer.valueOf(request.getParameter("erasePrice")));
-			
-			orderToUpdate.getDestTbl().setTableAlias(Integer.valueOf(request.getParameter("tableAlias")));
-			
-			/**
-			 * Get the member id if the pay type is "会员"
-			 */
-			if(orderToUpdate.getSettleType() == Order.SettleType.MEMBER){
-				orderToUpdate.setMember(new Member(Integer.valueOf(request.getParameter("memberID").trim())));
+			PayType payType = PayType.valueOf(Integer.parseInt(request.getParameter("payManner")));
+			orderToUpdate.setPaymentType(payType);
+
+			Order.PayBuilder payBuilder;
+			//Get the member id if the pay type is "会员"
+			if(settleType == Order.SettleType.MEMBER){
+				Member member = MemberDao.getMemberById(staff, Integer.valueOf(request.getParameter("memberID")));
+				payBuilder = Order.PayBuilder.build4Member(orderId, member, payType);
+			}else{
+				payBuilder = Order.PayBuilder.build(orderId, payType);
 			}
-			/**
-			 * Get the first 20 characters of the comment
-			 */
-			String comment = request.getParameter("comment");
-			if(comment != null){
-				orderToUpdate.setComment(comment.substring(0, comment.length() < 20 ? comment.length() : 20));
-			}
+			
 			//get the food string to this order
 			orderToUpdate.setOrderFoods(Util.toFoodArray(request.getParameter("foods")));
 			
-			Staff staff = StaffDao.verify(Integer.parseInt(pin), Privilege.Code.RE_PAYMENT);
+			//get the category to this order
+			orderToUpdate.setCategory(Short.parseShort(request.getParameter("category")));
+			
+			//get the custom number to this order
+			orderToUpdate.setCustomNum(Integer.parseInt(request.getParameter("customNum")));
+			payBuilder.setCustomNum(Integer.parseInt(request.getParameter("customNum")));
+			
+			//get the discount type to this order
+			payBuilder.setDiscountId(Integer.parseInt(request.getParameter("discountID")));
+			
+			//get the service rate to this order
+			payBuilder.setServiceRate(NumericUtil.int2Float(Integer.parseInt(request.getParameter("serviceRate"))));
+
+			//get the erasePrice rate to this order
+			payBuilder.setErasePrice(Integer.valueOf(request.getParameter("erasePrice")));
+			
+			//get the table alias to this order
+			orderToUpdate.getDestTbl().setTableAlias(Integer.valueOf(request.getParameter("tableAlias")));
+
+			//Get the first 20 characters of the comment
+			String comment = request.getParameter("comment");
+			if(comment != null){
+				payBuilder.setComment(comment.substring(0, comment.length() < 20 ? comment.length() : 20));
+			}
 			
 			UpdateOrder.execById(staff, orderToUpdate);
-			PayOrder.execById(staff, orderToUpdate);
+			PayOrder.pay(staff, payBuilder);
 			
 			jsonResp = jsonResp.replace("$(result)", "true");	
-			jsonResp = jsonResp.replace("$(value)", orderID + "号账单修改成功");
+			jsonResp = jsonResp.replace("$(value)", orderId + "号账单修改成功");
 			
 		}catch(BusinessException e){
 			e.printStackTrace();

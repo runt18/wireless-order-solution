@@ -17,12 +17,11 @@ import com.wireless.exception.ErrorCode;
 import com.wireless.exception.ProtocolError;
 import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
-import com.wireless.pack.req.PrintOption;
 import com.wireless.pack.req.ReqPayOrder;
 import com.wireless.parcel.Parcel;
 import com.wireless.pojo.client.Member;
 import com.wireless.pojo.dishesOrder.Order;
-import com.wireless.pojo.distMgr.Discount;
+import com.wireless.pojo.dishesOrder.PrintOption;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.NumericUtil;
 import com.wireless.sccon.ServerConnector;
@@ -35,7 +34,6 @@ public class PayOrderAction extends Action{
 		
 		String jsonResp = "{success:$(result), data:'$(value)'}";
 		PrintWriter out = null;
-		String tempPay;
 		try {
 			// 解决后台中文传到前台乱码
 			
@@ -82,64 +80,56 @@ public class PayOrderAction extends Action{
 			
 			final Staff staff = StaffDao.verify(Integer.parseInt((String)request.getAttribute("pin")));
 			
-			Order orderToPay = new Order();
+			Order.PayBuilder payBuilder;
 			
-			if(request.getParameter("eraseQuota") != null)
-				orderToPay.setErasePrice(Integer.parseInt(request.getParameter("eraseQuota")));
+			int orderId = Integer.parseInt(request.getParameter("orderID"));
 			
-//			orderToPay.destTbl.aliasID = Integer.parseInt(request.getParameter("tableID"));
-			orderToPay.setId(Integer.parseInt(request.getParameter("orderID")));
-			
+			Order.SettleType settleType;
 			if(request.getParameter("payType") != null){
-				orderToPay.setSettleType(Integer.parseInt(request.getParameter("payType")));				
+				settleType = Order.SettleType.valueOf(Integer.parseInt(request.getParameter("payType")));
 			}else{
-				orderToPay.setSettleType(Order.SettleType.NORMAL);
+				settleType = Order.SettleType.NORMAL;
 			}
 			
-			/**
-			 * Get the member id if the pay type is "会员"
-			 */
-			if(orderToPay.getSettleType() == Order.SettleType.MEMBER){
-				orderToPay.setMember(new Member(Integer.valueOf(request.getParameter("memberID"))));
+			Order.PayType payType;
+			if(request.getParameter("payManner") != null){
+				payType = Order.PayType.valueOf(Integer.parseInt(request.getParameter("payManner")));
+			}else{
+				payType = Order.PayType.CASH;
+			}
+			
+			if(settleType == Order.SettleType.MEMBER){
+				payBuilder = Order.PayBuilder.build4Member(orderId, new Member(Integer.valueOf(request.getParameter("memberID"))), payType);
+			}else{
+				payBuilder = Order.PayBuilder.build(orderId, payType);
+			}
+			
+			//Get the cash income if the pay manner is "现金"
+			if(payType == Order.PayType.CASH){
+				payBuilder.setReceivedCash(Float.parseFloat(request.getParameter("cashIncome")));
 			}
 			
 			if(request.getParameter("discountID") != null && !request.getParameter("discountID").equals("-1")){
-				orderToPay.setDiscount(new Discount(Integer.parseInt(request.getParameter("discountID"))));				
-			}else{
-				orderToPay.setDiscount(new Discount());
-			}
-			
-			if(request.getParameter("payManner") != null){
-				orderToPay.setPaymentType(Integer.parseInt(request.getParameter("payManner")));
-			}else{
-				orderToPay.setPaymentType(Order.PayType.CASH);
+				payBuilder.setDiscountId(Integer.parseInt(request.getParameter("discountID")));
 			}
 			
 			if(request.getParameter("serviceRate") != null){
-				orderToPay.setServiceRate(NumericUtil.int2Float(Integer.parseInt(request.getParameter("serviceRate"))));
-			}else{
-				orderToPay.setServiceRate(new Float(0));
+				payBuilder.setServiceRate(NumericUtil.int2Float(Integer.parseInt(request.getParameter("serviceRate"))));
 			}
 			
-			/**
-			 * Get the cash income if the pay manner is "现金"
-			 */
-			if(orderToPay.isPayByCash()){
-				orderToPay.setReceivedCash(Float.parseFloat(request.getParameter("cashIncome")));
+			if(request.getParameter("eraseQuota") != null){
+				payBuilder.setErasePrice(Integer.parseInt(request.getParameter("eraseQuota")));
 			}
 			
+			//Get the first 20 characters of the comment
 			String comment = request.getParameter("comment");
-			/**
-			 * Get the first 20 characters of the comment
-			 */
 			if(comment != null){
-				orderToPay.setComment(comment.substring(0, comment.length() < 20 ? comment.length() : 20));
-			}			
-			/**
-			 * 
-			 */
+				payBuilder.setComment(comment.substring(0, comment.length() < 20 ? comment.length() : 20));
+			}	
+
+			//Get the custom number.
 			if(request.getParameter("customNum") != null){
-				orderToPay.setCustomNum(Integer.valueOf(request.getParameter("customNum")));
+				payBuilder.setCustomNum(Integer.valueOf(request.getParameter("customNum")));
 			}
 			
 			/**
@@ -147,46 +137,37 @@ public class PayOrderAction extends Action{
 			 * If pay order temporary, just print the receipt.
 			 * Otherwise perform to pay order and print the receipt.
 			 */
-			byte payCate = Type.PAY_ORDER;
-			tempPay = request.getParameter("tempPay");
+			String tempPay = request.getParameter("tempPay");
 			if(tempPay != null){
-				if(Boolean.parseBoolean(tempPay)){
-					payCate = Type.PAY_TEMP_ORDER;
-				}else{
-					payCate = Type.PAY_ORDER;
-				}				
+				payBuilder.setTemp(Boolean.parseBoolean(tempPay));
 			}
 			
 			/**
 			 * 
 			 */
-			PrintOption po = PrintOption.DO_PRINT;
 			String isPrint = request.getParameter("isPrint");
-			if(isPrint != null && !isPrint.trim().isEmpty() && !Boolean.valueOf(isPrint.trim()))
-				po = PrintOption.DO_NOT_PRINT;
+			if(isPrint != null && !isPrint.trim().isEmpty() && !Boolean.valueOf(isPrint.trim())){
+				payBuilder.setPrintOption(PrintOption.DO_NOT_PRINT);
+			}
 				
-			ProtocolPackage resp = ServerConnector.instance().ask(new ReqPayOrder(staff, orderToPay, payCate, po));
+			ProtocolPackage resp = ServerConnector.instance().ask(new ReqPayOrder(staff, payBuilder));
 			
 			if(resp.header.type == Type.ACK){
 				jsonResp = jsonResp.replace("$(result)", "true");
-				if(tempPay != null){
-					if(Boolean.parseBoolean(tempPay)){
-						jsonResp = jsonResp.replace("$(value)", orderToPay.getId() + "号账单暂结成功");
-					}else{
-						jsonResp = jsonResp.replace("$(value)", orderToPay.getId() + "号账单结帐成功");
-					}
+				if(payBuilder.isTemp()){
+					jsonResp = jsonResp.replace("$(value)", payBuilder.getOrderId() + "号账单暂结成功");
 				}else{
-					jsonResp = jsonResp.replace("$(value)", orderToPay.getId() + "号账单结帐成功");
+					jsonResp = jsonResp.replace("$(value)", payBuilder.getOrderId() + "号账单结帐成功");
 				}
 				
 			}else if(resp.header.type == Type.NAK){
 				jsonResp = jsonResp.replace("$(result)", "false");
 				ErrorCode errCode = new Parcel(resp.body).readParcel(ErrorCode.CREATOR);
 				if(errCode.equals(ProtocolError.ORDER_NOT_EXIST)){					
-					jsonResp = jsonResp.replace("$(value)", orderToPay.getId() + "号账单信息不存在，请重新确认");
+					jsonResp = jsonResp.replace("$(value)", payBuilder.getOrderId() + "号账单信息不存在，请重新确认");
 					
 				}else if(errCode.equals(ProtocolError.ORDER_BE_REPEAT_PAID)){
-					jsonResp = jsonResp.replace("$(value)", orderToPay.getId() + "号账单已结帐，请重新确认");
+					jsonResp = jsonResp.replace("$(value)", payBuilder.getOrderId() + "号账单已结帐，请重新确认");
 					
 				}else{
 					jsonResp = jsonResp.replace("$(value)", errCode.getDesc());
@@ -194,7 +175,7 @@ public class PayOrderAction extends Action{
 				
 			}else{
 				jsonResp = jsonResp.replace("$(result)", "false");
-				jsonResp = jsonResp.replace("$(value)", orderToPay.getId() + "号账单结帐不成功，请重新确认");
+				jsonResp = jsonResp.replace("$(value)", payBuilder.getOrderId() + "号账单结帐不成功，请重新确认");
 			}
 			
 		}catch(BusinessException e){

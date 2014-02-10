@@ -12,9 +12,10 @@ import com.wireless.db.client.member.MemberDao;
 import com.wireless.db.frontBusiness.PayOrder;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
+import com.wireless.exception.MemberError;
 import com.wireless.json.JObject;
 import com.wireless.pojo.client.Member;
-import com.wireless.pojo.distMgr.Discount;
+import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.util.WebParams;
 
@@ -35,29 +36,25 @@ public class QueryOrderFromMemberPayAction extends Action{
 			String sv = request.getParameter("sv");
 			
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
-			Member m = new Member();
+			Member m;
 			if(st != null && st.trim().equals("mobile")){
 				m = MemberDao.getMemberByMobile(staff, sv);
 			}else if(st != null && st.trim().equals("card")){
 				m = MemberDao.getMemberByCard(staff, sv);				
-			}
-			
-			com.wireless.pojo.dishesOrder.Order no = new com.wireless.pojo.dishesOrder.Order();
-			no.setId(Integer.valueOf(orderID));
-			if(discountId != null && !discountId.trim().isEmpty()){
-				no.setDiscount(new Discount(Integer.valueOf(discountId)));
 			}else{
-				no.setDiscount(new Discount(Integer.valueOf(m.getMemberType().getDefaultDiscount().getId())));
+				throw new BusinessException(MemberError.MEMBER_NOT_EXIST);
 			}
-			no = PayOrder.calcById(staff, no);
 			
-			m.getMemberType().setDefaultDiscount(no.getDiscount());
-/*			if(m.getMemberType().getDiscountType() == MemberType.DiscountType.DISCOUNT_ENTIRE){
-				m.getMemberType().setDiscountRate(no.getDiscount().getPlans().get(0).getRate());
-			}*/
-			m.getMemberType().getDefaultDiscount().setPlans(null);
+			Order.PayBuilder payBuilder = Order.PayBuilder.build4Member(Integer.valueOf(orderID), m, Order.PayType.CASH);
+			if(discountId != null && !discountId.trim().isEmpty()){
+				payBuilder.setDiscountId(Integer.valueOf(discountId));
+			}else{
+				payBuilder.setDiscountId(m.getMemberType().getDefaultDiscount().getId());
+			}
+			Order order = PayOrder.calc(staff, payBuilder);
+			
 			jobject.getOther().put("member", m);
-			jobject.getOther().put("newOrder", no);
+			jobject.getOther().put("newOrder", order);
 		}catch(BusinessException e){
 			e.printStackTrace();
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getCode(), e.getDesc());

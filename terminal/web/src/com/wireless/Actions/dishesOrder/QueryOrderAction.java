@@ -19,7 +19,6 @@ import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.OrderFood;
-import com.wireless.pojo.distMgr.Discount;
 import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.util.DateType;
@@ -48,7 +47,7 @@ public class QueryOrderAction extends Action {
 			String tid = request.getParameter("tableID");
 			String oid = request.getParameter("orderID");
 			String calc = request.getParameter("calc");
-			String discountID = request.getParameter("discountID");
+			String discountId = request.getParameter("discountID");
 			String eraseQuota = request.getParameter("eraseQuota");
 			String serviceRate = request.getParameter("serviceRate");
 			String customNum = request.getParameter("customNum");
@@ -69,37 +68,35 @@ public class QueryOrderAction extends Action {
 					order = OrderDao.getById(staff, Integer.valueOf(oid), DateType.TODAY);
 				}
 				if(calc != null && Boolean.valueOf(calc)){
-					if(discountID != null && !discountID.trim().isEmpty()){
-						order.setDiscount(new Discount(Integer.valueOf(discountID)));
+					Order.PayBuilder payParam = Order.PayBuilder.build(order.getId());
+					if(discountId != null && !discountId.trim().isEmpty()){
+						payParam.setDiscountId(Integer.valueOf(discountId));
 					}
 					if(eraseQuota != null && !eraseQuota.trim().isEmpty()){
-						order.setErasePrice(Integer.valueOf(eraseQuota));
+						payParam.setErasePrice(Integer.valueOf(eraseQuota));
 					}
 					if(customNum != null && !customNum.trim().isEmpty() && Integer.valueOf(customNum.trim()) > 0){
-						order.setCustomNum(Short.valueOf(customNum));
+						payParam.setCustomNum(Short.valueOf(customNum));
 					}
 					if(serviceRate != null && !serviceRate.trim().isEmpty()){
 						if(Float.valueOf(serviceRate.trim()) > 0){
-							order.setServiceRate(Float.valueOf(serviceRate) / 100);						
-						}else{
-							order.setServiceRate(0);						
+							payParam.setServiceRate(Float.valueOf(serviceRate) / 100);						
 						}
 					}
+					
+					order = PayOrder.calc(staff, payParam);
+					
 				}else{
-					order.setServiceRate(order.getDestTbl().getServiceRate());
+					order = PayOrder.calc(staff, Order.PayBuilder.build(order.getId()));
 				}
-				if(tid != null && !tid.trim().isEmpty()){
-					order = PayOrder.calcByTable(staff, order);
-				} else if (oid != null && !oid.trim().isEmpty()){
-					order = PayOrder.calcById(staff, order);
-				}
+
 			}
 			
 			List<OrderFood> root = new ArrayList<OrderFood>();
 			if(order != null && order.hasOrderFood()){
 				OrderFood item = null;
 				int i = 0;
-				for(com.wireless.pojo.dishesOrder.OrderFood of : order.getOrderFoods()){
+				for(OrderFood of : order.getOrderFoods()){
 					idList += (i > 0 ? "," : "");
 					idList += of.getFoodId();
 					item = new OrderFood(of);

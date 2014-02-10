@@ -47,7 +47,7 @@ public class QueryDiscountPlanAction extends Action{
 			if(kitchenName != null && !kitchenName.trim().equals(""))
 				extraCond += " AND K.name like '%" + kitchenName.trim() + "%'";
 			
-			list = DiscountDao.getDiscountPlan(extraCond, " ORDER BY A.dist_plan_id,K.kitchen_alias");
+			list = DiscountDao.getDiscountPlan(extraCond, " ORDER BY A.dist_plan_id, K.display_id ");
 			
 		}catch(BusinessException e){
 			e.printStackTrace();
