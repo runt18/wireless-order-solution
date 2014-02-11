@@ -19,7 +19,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
-import com.wireless.db.billStatistics.QuerySaleDetails;
+import com.wireless.db.billStatistics.SaleDetailsDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.pojo.billStatistics.SalesDetail;
 import com.wireless.pojo.menuMgr.Department;
@@ -102,12 +102,12 @@ public class TodayStatisticsAction extends DispatchAction{
 			}
 		}
 		Staff staff = StaffDao.verify(Integer.parseInt(pin));
-		SalesDetail[] saleDetails = QuerySaleDetails.execByFood(
+		SalesDetail[] saleDetails = SaleDetailsDao.execByFood(
 				staff, 
 				onDuty, 
 				offDuty,
 				did,
-				QuerySaleDetails.ORDER_BY_SALES,
+				SaleDetailsDao.ORDER_BY_SALES,
 				DateType.TODAY,
 				foodName
 		);
@@ -249,7 +249,7 @@ public class TodayStatisticsAction extends DispatchAction{
 		String offDuty = request.getParameter("offDuty");
 		
 		Staff staff = StaffDao.verify(Integer.parseInt(pin));
-		SalesDetail[] list = QuerySaleDetails.execByKitchen(staff, onDuty, offDuty, DateType.TODAY);
+		SalesDetail[] list = SaleDetailsDao.execByKitchen(staff, onDuty, offDuty, DateType.TODAY);
 		
 		HSSFWorkbook wb = new HSSFWorkbook();
 		HSSFSheet sheet = wb.createSheet("分厨销售统计(" + DateType.HISTORY.getDesc() + ")");
@@ -381,7 +381,7 @@ public class TodayStatisticsAction extends DispatchAction{
 		String offDuty = request.getParameter("offDuty");
 		
 		Staff staff = StaffDao.verify(Integer.parseInt(pin));
-		SalesDetail[] list = QuerySaleDetails.execByDept(staff, onDuty, offDuty, DateType.TODAY);
+		SalesDetail[] list = SaleDetailsDao.execByDept(staff, onDuty, offDuty, DateType.TODAY);
 		
 		HSSFWorkbook wb = new HSSFWorkbook();
 		HSSFSheet sheet = wb.createSheet("部门销售统计(" + DateType.HISTORY.getDesc() + ")");

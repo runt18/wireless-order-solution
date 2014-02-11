@@ -15,7 +15,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
-import com.wireless.db.billStatistics.QueryIncomeStatisticsDao;
+import com.wireless.db.billStatistics.CalcBillStatisticsDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.json.JObject;
 import com.wireless.pojo.billStatistics.IncomeByCancel;
@@ -109,7 +109,7 @@ public class BusinessReceiptsStatisticsAction extends DispatchAction {
 			String onDuty = request.getParameter("dateBegin");
 			String offDuty = request.getParameter("dateEnd");
 			
-			incomesByEachDay.addAll(QueryIncomeStatisticsDao.getIncomeByEachDay(StaffDao.verify(Integer.parseInt(pin)), onDuty, offDuty));
+			incomesByEachDay.addAll(CalcBillStatisticsDao.calcIncomeByEachDay(StaffDao.verify(Integer.parseInt(pin)), onDuty, offDuty));
 			
 		}catch(Exception e){
 			e.printStackTrace();
@@ -182,7 +182,7 @@ public class BusinessReceiptsStatisticsAction extends DispatchAction {
 		List<IncomeByEachDay> incomesByEachDay = new ArrayList<IncomeByEachDay>();
 		try{
 			String pin = (String)request.getAttribute("pin");
-			incomesByEachDay.addAll(QueryIncomeStatisticsDao.getIncomeByEachDay(StaffDao.verify(Integer.parseInt(pin)), DateUtil.format(c.getTime()), DateUtil.format(endDate)));
+			incomesByEachDay.addAll(CalcBillStatisticsDao.calcIncomeByEachDay(StaffDao.verify(Integer.parseInt(pin)), DateUtil.format(c.getTime()), DateUtil.format(endDate)));
 			
 			jobject.setRoot(incomesByEachDay);
 			

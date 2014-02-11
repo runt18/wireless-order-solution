@@ -10,7 +10,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
-import com.wireless.db.billStatistics.QueryShiftGeneralDao;
+import com.wireless.db.billStatistics.ShiftGeneralDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
@@ -38,7 +38,7 @@ public class DutyRangeStatisticsAction extends DispatchAction {
 		List<ShiftGeneral> list = null;
 		try{
 			String pin = (String)request.getAttribute("pin");
-			list = QueryShiftGeneralDao.getToday(StaffDao.verify(Integer.parseInt(pin)));
+			list = ShiftGeneralDao.getToday(StaffDao.verify(Integer.parseInt(pin)));
 		}catch(Exception e){
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, "操作失败, 数据库操作请求发生错误!");
 			e.printStackTrace();
@@ -72,7 +72,7 @@ public class DutyRangeStatisticsAction extends DispatchAction {
 			String pin = (String)request.getAttribute("pin");
 			String onDuty = request.getParameter("onDuty");
 			String offDuty = request.getParameter("offDuty");
-			list = QueryShiftGeneralDao.getByRange(StaffDao.verify(Integer.parseInt(pin)), onDuty, offDuty);
+			list = ShiftGeneralDao.getByRange(StaffDao.verify(Integer.parseInt(pin)), onDuty, offDuty);
 			
 		}catch(BusinessException e){	
 			e.printStackTrace();

@@ -11,7 +11,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
-import com.wireless.db.billStatistics.QueryDutyRange;
+import com.wireless.db.billStatistics.DutyRangeDao;
 import com.wireless.db.shift.QueryShiftDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
@@ -51,7 +51,7 @@ public class BusinessStatisticsAction extends DispatchAction {
 			String dutyRange = request.getParameter("dutyRange");
 			ShiftDetail sdetail = new ShiftDetail();
 			if(!dutyRange.equals("null") && !dutyRange.trim().isEmpty()){
-				DutyRange range = QueryDutyRange.exec(staff, onDuty, offDuty);
+				DutyRange range = DutyRangeDao.exec(staff, onDuty, offDuty);
 				
 				if(range != null){
 					sdetail = QueryShiftDao.exec(staff, range.getOnDutyFormat(), range.getOffDutyFormat(), DateType.HISTORY);

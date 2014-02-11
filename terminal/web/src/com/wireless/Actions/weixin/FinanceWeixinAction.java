@@ -52,7 +52,7 @@ import org.marker.weixin.msg.Msg4Text;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
-import com.wireless.db.billStatistics.QueryIncomeStatisticsDao;
+import com.wireless.db.billStatistics.CalcBillStatisticsDao;
 import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.db.shift.QueryShiftDao;
 import com.wireless.db.staffMgr.StaffDao;
@@ -356,7 +356,7 @@ public class FinanceWeixinAction extends Action {
 			c.add(Calendar.DAY_OF_MONTH, -4);
 			long beginDate = c.getTimeInMillis();
 			
-			List<IncomeByEachDay> incomes = QueryIncomeStatisticsDao.getIncomeByEachDay(StaffDao.getStaffs(dbCon, restaurantId).get(0), 
+			List<IncomeByEachDay> incomes = CalcBillStatisticsDao.calcIncomeByEachDay(StaffDao.getStaffs(dbCon, restaurantId).get(0), 
 														DateUtil.format(beginDate, DateUtil.Pattern.DATE),
 														DateUtil.format(endDate, DateUtil.Pattern.DATE)
 														//"2013-08-1",

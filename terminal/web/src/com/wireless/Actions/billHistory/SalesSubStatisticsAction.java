@@ -12,7 +12,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import com.wireless.db.billStatistics.QuerySaleDetails;
+import com.wireless.db.billStatistics.SaleDetailsDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
@@ -87,14 +87,14 @@ public class SalesSubStatisticsAction extends Action {
 				dateEnd = dateEnd != null && dateEnd.length() > 0 ? dateEnd.trim() + " 23:59:59" : "";
 			}
 			
-			if(qt == QuerySaleDetails.QUERY_BY_DEPT){
-				saleDetails = QuerySaleDetails.execByDept(
+			if(qt == SaleDetailsDao.QUERY_BY_DEPT){
+				saleDetails = SaleDetailsDao.execByDept(
 						StaffDao.verify(Integer.parseInt(pin)), 
 	  					dateBeg, 
 	  					dateEnd,
 	  					dt);
 				
-			}else if(qt == QuerySaleDetails.QUERY_BY_FOOD){
+			}else if(qt == SaleDetailsDao.QUERY_BY_FOOD){
 				String[] splitDeptID = deptID.split(",");
 				int[] did = new int[splitDeptID.length];
 				for(int i = 0; i < splitDeptID.length; i++){
@@ -103,7 +103,7 @@ public class SalesSubStatisticsAction extends Action {
 				if(did.length == 1 && did[0] == -1){
 					did = new int[0];
 				}
-				saleDetails = QuerySaleDetails.execByFood(
+				saleDetails = SaleDetailsDao.execByFood(
 						StaffDao.verify(Integer.parseInt(pin)), 
 	  					dateBeg, 
 	  					dateEnd,
@@ -111,8 +111,8 @@ public class SalesSubStatisticsAction extends Action {
 	  					ot,
 	  					dt,
 	  					foodName);
-			}else if(qt == QuerySaleDetails.QUERY_BY_KITCHEN){
-				saleDetails = QuerySaleDetails.execByKitchen(
+			}else if(qt == SaleDetailsDao.QUERY_BY_KITCHEN){
+				saleDetails = SaleDetailsDao.execByKitchen(
 						StaffDao.verify(Integer.parseInt(pin)), 
 						dateBeg, 
 						dateEnd, 

@@ -29,9 +29,8 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
 import com.wireless.db.billStatistics.CalcBillStatisticsDao;
-import com.wireless.db.billStatistics.QueryCancelledFood;
-import com.wireless.db.billStatistics.QueryIncomeStatisticsDao;
-import com.wireless.db.billStatistics.QuerySaleDetails;
+import com.wireless.db.billStatistics.CancelledFoodDao;
+import com.wireless.db.billStatistics.SaleDetailsDao;
 import com.wireless.db.client.member.MemberDao;
 import com.wireless.db.client.member.MemberOperationDao;
 import com.wireless.db.shift.QueryShiftDao;
@@ -143,12 +142,12 @@ public class HistoryStatisticsAction extends DispatchAction{
 			}
 		}
 		Staff staff = StaffDao.verify(Integer.parseInt(pin));
-		SalesDetail[] saleDetails = QuerySaleDetails.execByFood(
+		SalesDetail[] saleDetails = SaleDetailsDao.execByFood(
 				staff, 
 				onDuty, 
 				offDuty,
 				did,
-				QuerySaleDetails.ORDER_BY_SALES,
+				SaleDetailsDao.ORDER_BY_SALES,
 				DateType.HISTORY,
 				foodName);
 		
@@ -343,7 +342,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 		String offDuty = request.getParameter("offDuty");
 		
 		Staff staff = StaffDao.verify(Integer.parseInt(pin));
-		SalesDetail[] list = QuerySaleDetails.execByKitchen(staff, onDuty, offDuty, DateType.HISTORY);
+		SalesDetail[] list = SaleDetailsDao.execByKitchen(staff, onDuty, offDuty, DateType.HISTORY);
 		
 		HSSFWorkbook wb = new HSSFWorkbook();
 		HSSFSheet sheet = wb.createSheet("分厨销售统计(" + DateType.HISTORY.getDesc() + ")");
@@ -511,7 +510,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 		String offDuty = request.getParameter("offDuty");
 		
 		Staff staff = StaffDao.verify(Integer.parseInt(pin));
-		SalesDetail[] list = QuerySaleDetails.execByDept(staff, onDuty, offDuty, DateType.HISTORY);
+		SalesDetail[] list = SaleDetailsDao.execByDept(staff, onDuty, offDuty, DateType.HISTORY);
 		
 		HSSFWorkbook wb = new HSSFWorkbook();
 		HSSFSheet sheet = wb.createSheet("部门销售统计(历史)");
@@ -686,7 +685,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 		Staff staff = StaffDao.verify(Integer.parseInt(pin));
 		
 		List<IncomeByEachDay> incomesByEachDay = new ArrayList<IncomeByEachDay>();
-		incomesByEachDay.addAll(QueryIncomeStatisticsDao.getIncomeByEachDay(StaffDao.verify(Integer.parseInt(pin)), onDuty, offDuty));
+		incomesByEachDay.addAll(CalcBillStatisticsDao.calcIncomeByEachDay(StaffDao.verify(Integer.parseInt(pin)), onDuty, offDuty));
 		
 		
 //		BusinessStatistics sum = new BusinessStatistics();
@@ -1689,11 +1688,11 @@ public class HistoryStatisticsAction extends DispatchAction{
 			cell.setCellStyle(strStyle);
 			
 			cell = row.createCell(row.getLastCellNum());
-			cell.setCellValue(mo.getOperateDateFormat());
+			cell.setCellValue(DateUtil.format(mo.getOperateDate()));
 			cell.setCellStyle(strStyle);
 			
 			cell = row.createCell(row.getLastCellNum());
-			cell.setCellValue(mo.getOperationTypeText());
+			cell.setCellValue(mo.getOperationType().getName());
 			cell.setCellStyle(strStyle);
 		}
 		
@@ -1919,7 +1918,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 			cell.setCellStyle(strStyle);
 			
 			cell = row.createCell(row.getLastCellNum());
-			cell.setCellValue(mo.getOperateDateFormat());
+			cell.setCellValue(DateUtil.format(mo.getOperateDate()));
 			cell.setCellStyle(strStyle);
 			
 			cell = row.createCell(row.getLastCellNum());
@@ -1977,7 +1976,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 		String reasonID = request.getParameter("reasonID");
 		
 		if(otype == null || otype.trim().isEmpty()){
-			otype = QueryCancelledFood.ORDER_BY_COUNT + "";
+			otype = CancelledFoodDao.ORDER_BY_COUNT + "";
 		}
 		if(deptID == null || deptID.trim().isEmpty()){
 			deptID = "-1";
@@ -1992,7 +1991,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 		Staff staff = StaffDao.verify(Integer.parseInt(pin));
 		
 		
-		list = QueryCancelledFood.getCancelledFoodDetail(staff, queryDate, dt, did, rid);
+		list = CancelledFoodDao.getCancelledFoodDetail(staff, queryDate, dt, did, rid);
 		CancelledFood tempSum = new CancelledFood();
 		if(list != null && list.size() > 0){
 			CancelledFood tempItem = null;
