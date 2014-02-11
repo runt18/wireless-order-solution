@@ -17,6 +17,7 @@ public class IncomeByEachDay implements Jsonable{
 	private IncomeByDiscount incomeByDiscount;
 	private IncomeByGift incomeByGift;
 	private IncomeByCancel incomeByCancel;
+	private IncomeByCoupon incomeByCoupon;
 	private IncomeByRepaid incomeByRepaid;
 	private IncomeByService incomeByService;
 	private IncomeByCharge incomeByCharge;
@@ -98,6 +99,17 @@ public class IncomeByEachDay implements Jsonable{
 	
 	public void setIncomeByCancel(IncomeByCancel incomeByCancel) {
 		this.incomeByCancel = incomeByCancel;
+	}
+	
+	public IncomeByCoupon getIncomeByCoupon(){
+		if(incomeByCoupon == null){
+			return IncomeByCoupon.DUMMY;
+		}
+		return incomeByCoupon;
+	}
+	
+	public void setIncomeByCoupon(IncomeByCoupon incomeByCoupon){
+		this.incomeByCoupon = incomeByCoupon;
 	}
 	
 	public IncomeByRepaid getIncomeByRepaid() {

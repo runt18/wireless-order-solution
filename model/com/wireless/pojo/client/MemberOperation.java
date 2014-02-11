@@ -130,7 +130,7 @@ public class MemberOperation implements Jsonable {
 	
 	private int id;
 	private int restaurantId;
-	private long staffId;
+	private int staffId;
 	private String staffName;
 	private Member member;
 	private String seq;
@@ -139,6 +139,9 @@ public class MemberOperation implements Jsonable {
 	private float payMoney;
 	private Order.PayType payType;
 	private int orderId;
+	private int couponId;
+	private float couponMoney;
+	private String couponName;
 	private ChargeType chargeType;
 	private float chargeMoney;
 	private float takeMoney;
@@ -232,15 +235,21 @@ public class MemberOperation implements Jsonable {
 	public void setRestaurantId(int restaurantId) {
 		this.restaurantId = restaurantId;
 	}
-	public long getStaffID() {
+	public int getStaffId() {
 		return staffId;
 	}
-	public void setStaffID(long staffId) {
+	
+	public void setStaffId(int staffId) {
 		this.staffId = staffId;
 	}
+	
 	public String getStaffName() {
+		if(staffName == null){
+			return "";
+		}
 		return staffName;
 	}
+	
 	public void setStaffName(String staffName) {
 		this.staffName = staffName;
 	}
@@ -256,15 +265,23 @@ public class MemberOperation implements Jsonable {
 	}
 	
 	public int getMemberId() {
-		return this.member.getId();
+		if(member != null){
+			return this.member.getId();
+		}else{
+			return 0;
+		}
 	}
 	
-	public void setMemberId(int memberID) {
-		this.member.setId(memberID);
+	public void setMemberId(int memberId) {
+		this.member.setId(memberId);
 	}
 	
 	public String getMemberCard(){
-		return getMember().getMemberCard();
+		if(member != null){
+			return member.getMemberCard();
+		}else{
+			return "";
+		}
 	}
 	
 	public void setMemberCard(String memberCard){
@@ -272,7 +289,11 @@ public class MemberOperation implements Jsonable {
 	}
 	
 	public String getMemberName(){
-		return member.getName();
+		if(member != null){
+			return member.getName();
+		}else{
+			return "";
+		}
 	}
 	
 	public void setMemberName(String name){
@@ -280,7 +301,11 @@ public class MemberOperation implements Jsonable {
 	}
 	
 	public String getMemberMobile(){
-		return member.getMobile();
+		if(member != null){
+			return member.getMobile();
+		}else{
+			return "";
+		}
 	}
 	
 	public void setMemberMobile(String mobile){
@@ -295,9 +320,6 @@ public class MemberOperation implements Jsonable {
 		this.seq = seq;
 	}
 	
-	public String getOperateDateFormat() {
-		return this.operateDate > 0 ? DateUtil.format(this.operateDate) : null;
-	}
 	public long getOperateDate() {
 		return operateDate;
 	}
@@ -305,12 +327,7 @@ public class MemberOperation implements Jsonable {
 	public void setOperateDate(long date) {
 		this.operateDate = date;
 	}
-	public Integer getOperationTypeValue() {
-		return this.operateType != null ? this.operateType.getValue() : null;
-	}
-	public String getOperationTypeText() {
-		return this.operateType != null ? this.operateType.getName() : null;
-	}
+	
 	public OperationType getOperationType() {
 		return operateType;
 	}
@@ -321,14 +338,6 @@ public class MemberOperation implements Jsonable {
 	
 	public void setOperationType(OperationType ot){
 		this.operateType = ot;
-	}
-	
-	public Integer getPayTypeValue(){
-		return this.payType != null ? this.payType.getVal() : null;
-	}
-	
-	public String getPayTypeText(){
-		return this.payType != null ? this.payType.getDesc() : null;
 	}
 	
 	public void setOrderId(int orderId){
@@ -355,6 +364,34 @@ public class MemberOperation implements Jsonable {
 		this.payMoney = payMoney;
 	}
 	
+	public void setCouponId(int couponId){
+		this.couponId = couponId;
+	}
+	
+	public int getCouponId(){
+		return this.couponId;
+	}
+	
+	public String getCouponName(){
+		if(couponName != null){
+			return this.couponName;
+		}else{
+			return "";
+		}
+	}
+	
+	public void setCoupnName(String name){
+		this.couponName = name;
+	}
+	
+	public float getCouponMoney(){
+		return this.couponMoney;
+	}
+	
+	public void setCouponMoney(float couponMoney){
+		this.couponMoney = couponMoney;
+	}
+	
 	public ChargeType getChargeType() {
 		return chargeType;
 	}
@@ -370,12 +407,15 @@ public class MemberOperation implements Jsonable {
 	public float getChargeMoney() {
 		return chargeMoney;
 	}
+	
 	public void setChargeMoney(float chargeMoney) {
 		this.chargeMoney = chargeMoney;
 	}
+	
 	public float getDeltaBaseMoney() {
 		return deltaBaseMoney;
 	}
+	
 	public void setDeltaBaseMoney(float deltaBaseMoney) {
 		this.deltaBaseMoney = deltaBaseMoney;
 	}
@@ -383,30 +423,35 @@ public class MemberOperation implements Jsonable {
 	public float getDeltaExtraMoney() {
 		return deltaExtraMoney;
 	}
+	
 	public void setDeltaExtraMoney(float deltaExtraMoney) {
 		this.deltaExtraMoney = deltaExtraMoney;
 	}
+	
 	public float getRemainingBaseMoney() {
 		return remainingBaseMoney;
 	}
+	
 	public void setRemainingBaseMoney(float remainingBaseMoney) {
 		this.remainingBaseMoney = remainingBaseMoney;
 	}
+	
 	public float getRemainingExtraMoney() {
 		return remainingExtraMoney;
 	}
+	
 	public void setRemainingExtraMoney(float remainingExtraMoney) {
 		this.remainingExtraMoney = remainingExtraMoney;
 	}
+	
 	public int getDeltaPoint() {
 		return deltaPoint;
 	}
+	
 	public void setDeltaPoint(int deltaPoint) {
 		this.deltaPoint = deltaPoint;
 	}
 	
-/*	public void setDeltaTotalMoney(float deltaTotalMoney){
-	}*/
 	public int getRemainingPoint() {
 		return remainingPoint;
 	}
@@ -422,12 +467,14 @@ public class MemberOperation implements Jsonable {
 	public void setRemainingPoint(int remainingPoint) {
 		this.remainingPoint = remainingPoint;
 	}
+	
 	public String getComment() {
 		if(comment == null){
-			comment = "";
+			return "";
 		}
 		return comment;
 	}
+	
 	public void setComment(String comment) {
 		this.comment = comment;
 	}

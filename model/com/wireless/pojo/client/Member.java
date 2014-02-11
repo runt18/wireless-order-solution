@@ -14,6 +14,7 @@ import com.wireless.parcel.Parcel;
 import com.wireless.parcel.Parcelable;
 import com.wireless.pojo.client.MemberOperation.ChargeType;
 import com.wireless.pojo.client.MemberOperation.OperationType;
+import com.wireless.pojo.coupon.Coupon;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.util.DateUtil;
@@ -398,18 +399,20 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 	 * Check to see whether the balance of member account is enough for consumption in case of paid by member.
 	 * @param consumePrice
 	 * 			the amount to consume price
+	 * @param coupon
+	 * 			the coupon to use, null means NOT use coupon
 	 * @param payType
 	 * 			the payment type referred to {@link Order.PayType}
 	 * @throws BusinessException
 	 *             throws if the consume price exceeds total balance to this member account
 	 */
-	public void checkConsume(float consumePrice, Order.PayType payType) throws BusinessException{
+	public void checkConsume(float consumePrice, Coupon coupon, Order.PayType payType) throws BusinessException{
 		
 		if(payType != Order.PayType.MEMBER){
 			return;
 		}
-		
-		if(getTotalBalance() < consumePrice){
+		float couponPrice = coupon != null ? coupon.getPrice() : 0; 
+		if(getTotalBalance() < consumePrice - couponPrice){
 			//Check to see whether the balance of member account is enough or NOT in case of unpaid.
 			throw new BusinessException(MemberError.EXCEED_BALANCE);
 		}
@@ -420,13 +423,15 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 	 * 
 	 * @param consumePrice
 	 *            the amount to consume price
+	 * @param coupon
+	 * 			the coupon to use, null means not use coupon
 	 * @param payType
 	 * 			  	the pay type referred to {@link Order.PayType}
 	 * @return the member operation to this consumption
 	 * @throws BusinessException
 	 *             throws if the consume price exceeds total balance to this member account
 	 */
-	public MemberOperation consume(float consumePrice, Order.PayType payType) throws BusinessException{
+	public MemberOperation consume(float consumePrice, Coupon coupon, Order.PayType payType) throws BusinessException{
 
 		MemberOperation mo = MemberOperation.newMO(getId(), getName(), getMobile(), getMemberCard());
 		
@@ -436,11 +441,20 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 		
 		if(payType == Order.PayType.MEMBER){
 			//使用会员付款时扣除账户余额
-			checkConsume(consumePrice, payType);
+			checkConsume(consumePrice, coupon, payType);
 
 			mo.setPayMoney(consumePrice);
 			
 			float deltaBase, deltaExtra;
+			
+			//先扣除优惠券的面额
+			if(coupon != null){
+				consumePrice = consumePrice - coupon.getPrice();
+				consumePrice = consumePrice > 0 ? consumePrice : 0;
+				mo.setCouponId(coupon.getId());
+				mo.setCouponMoney(coupon.getPrice());
+				mo.setCoupnName(coupon.getName());
+			}
 			
 			/*
 			 * 计算账户余额。

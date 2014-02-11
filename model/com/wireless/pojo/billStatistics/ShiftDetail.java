@@ -12,48 +12,21 @@ public class ShiftDetail implements Jsonable{
 	private String onDuty;				//开始时间
 	private String offDuty;				//结束时间
 	
-	private int orderAmount;			//总账单数
+	private IncomeByPay incomeByPay;	//各种收款方式数据
 	
-	private int cashAmount;				//现金账单数
-	private float cashTotalIncome;		//现金金额
-	private float cashActualIncome;		//现金实收
+	private IncomeByDiscount incomeByDiscount;	//折扣数据
 	
-	private int creditCardAmount;		//刷卡账单数
-	private float creditTotalIncome;	//刷卡金额
-	private float creditActualIncome;	//刷卡实收
+	private IncomeByGift incomeByGift;			//赠送数据
 	
-	private int memberCardAmount;		//会员卡账单数
-	private float memberTotalIncome;	//会员卡金额
-	private float memberActualIncome;	//会员卡实收
+	private IncomeByCancel incomeByCancel;		//退菜数据
 	
-	private int signAmount;				//签单账单数
-	private float signTotalIncome;		//签单金额
-	private float signActualIncome;		//签单实收
+	private IncomeByCoupon incomeByCoupon;		//优惠券数据
 	
-	private int hangAmount;				//挂账账单数
-	private float hangTotalIncome;		//挂账金额
-	private float hangActualIncome;		//挂账实收
+	private IncomeByService incomeByService;	//服务费数据
 	
-	private float totalActual;			//合计实收金额
-	private float totalIncome;			//合计实收金额
+	private IncomeByRepaid incomeByRepaid;		//反结账数据
 	
-	private int discountAmount;			//折扣账单数
-	private float discountIncome;		//合计折扣金额
-	
-	private int giftAmount;				//赠送账单数
-	private float giftIncome;			//合计赠送金额
-	
-	private int cancelAmount;			//退菜账单数
-	private float cancelIncome;			//合计退菜金额
-	
-	private int serviceAmount;			//服务费账单数
-	private float serviceIncome;		//服务费金额
-	
-	private int paidAmount;				//反结帐账单数
-	private float paidIncome;			//反结帐金额
-	
-	private int eraseAmount;			//抹数账单数
-	private float eraseIncome;			//抹数金额
+	private IncomeByErase incomeByErase;		//抹数数据
 	
 	private IncomeByCharge incomeByCharge; 	//会员充值信息
 	
@@ -76,234 +49,283 @@ public class ShiftDetail implements Jsonable{
 	}
 	
 	public int getOrderAmount() {
-		return orderAmount;
+		if(incomeByPay != null){
+			return incomeByPay.getOrderAmount();
+		}else{
+			return 0;
+		}
 	}
 	
-	public void setOrderAmount(int orderAmount) {
-		this.orderAmount = orderAmount;
+	public void setIncomeByPay(IncomeByPay incomeByPay){
+		this.incomeByPay = incomeByPay;
 	}
 	
 	public int getCashAmount() {
-		return cashAmount;
-	}
-	
-	public void setCashAmount(int cashAmount) {
-		this.cashAmount = cashAmount;
+		if(incomeByPay != null){
+			return incomeByPay.getCashAmount();
+		}else{
+			return 0;
+		}
 	}
 	
 	public float getCashTotalIncome() {
-		return cashTotalIncome;
-	}
-	
-	public void setCashTotalIncome(float cashTotalIncome) {
-		this.cashTotalIncome = cashTotalIncome;
+		if(incomeByPay != null){
+			return incomeByPay.getTotalIncome();
+		}else{
+			return 0;
+		}
 	}
 	
 	public float getCashActualIncome() {
-		return cashActualIncome;
-	}
-	
-	public void setCashActualIncome(float cashActualIncome) {
-		this.cashActualIncome = cashActualIncome;
+		if(incomeByPay != null){
+			return incomeByPay.getTotalActual();
+		}else{
+			return 0;
+		}
 	}
 	
 	public int getCreditCardAmount() {
-		return creditCardAmount;
-	}
-	
-	public void setCreditCardAmount(int creditCardAmount) {
-		this.creditCardAmount = creditCardAmount;
+		if(incomeByPay != null){
+			return incomeByPay.getCreditCardAmount();
+		}else{
+			return 0;
+		}
 	}
 	
 	public float getCreditTotalIncome() {
-		return creditTotalIncome;
-	}
-	
-	public void setCreditTotalIncome(float creditTotalIncome) {
-		this.creditTotalIncome = creditTotalIncome;
+		if(incomeByPay != null){
+			return incomeByPay.getCreditCardIncome();
+		}else{
+			return 0;
+		}
 	}
 	
 	public float getCreditActualIncome() {
-		return creditActualIncome;
-	}
-	
-	public void setCreditActualIncome(float creditActualIncome) {
-		this.creditActualIncome = creditActualIncome;
+		if(incomeByPay != null){
+			return incomeByPay.getCreditCardActual();
+		}else{
+			return 0;
+		}
 	}
 	
 	public int getMemberCardAmount() {
-		return memberCardAmount;
-	}
-	
-	public void setMemberCardAmount(int memberCardAmount) {
-		this.memberCardAmount = memberCardAmount;
+		if(incomeByPay != null){
+			return incomeByPay.getMemberCardAmount();
+		}else{
+			return 0;
+		}
 	}
 	
 	public float getMemberTotalIncome() {
-		return memberTotalIncome;
-	}
-	
-	public void setMemberTotalIncome(float memberTotalIncome) {
-		this.memberTotalIncome = memberTotalIncome;
+		if(incomeByPay != null){
+			return incomeByPay.getMemberCardIncome();
+		}else{
+			return 0;
+		}
 	}
 	
 	public float getMemberActualIncome() {
-		return memberActualIncome;
-	}
-	
-	public void setMemberActualIncome(float memberActualIncome) {
-		this.memberActualIncome = memberActualIncome;
+		if(incomeByPay != null){
+			return incomeByPay.getMemberCardActual();
+		}else{
+			return 0;
+		}
 	}
 	
 	public int getSignAmount() {
-		return signAmount;
-	}
-	
-	public void setSignAmount(int signAmount) {
-		this.signAmount = signAmount;
+		if(incomeByPay != null){
+			return incomeByPay.getSignAmount();
+		}else{
+			return 0;
+		}
 	}
 	
 	public float getSignTotalIncome() {
-		return signTotalIncome;
-	}
-	
-	public void setSignTotalIncome(float signTotalIncome) {
-		this.signTotalIncome = signTotalIncome;
+		if(incomeByPay != null){
+			return incomeByPay.getSignIncome();
+		}else{
+			return 0;
+		}
 	}
 	
 	public float getSignActualIncome() {
-		return signActualIncome;
-	}
-	
-	public void setSignActualIncome(float signActualIncome) {
-		this.signActualIncome = signActualIncome;
+		if(incomeByPay != null){
+			return incomeByPay.getSignActual();
+		}else{
+			return 0;
+		}
 	}
 	
 	public int getHangAmount() {
-		return hangAmount;
-	}
-	
-	public void setHangAmount(int hangAmount) {
-		this.hangAmount = hangAmount;
+		if(incomeByPay != null){
+			return incomeByPay.getHangAmount();
+		}else{
+			return 0;
+		}
 	}
 	
 	public float getHangTotalIncome() {
-		return hangTotalIncome;
-	}
-	
-	public void setHangTotalIncome(float hangTotalIncome) {
-		this.hangTotalIncome = hangTotalIncome;
+		if(incomeByPay != null){
+			return incomeByPay.getHangIncome();
+		}else{
+			return 0;
+		}
 	}
 	
 	public float getHangActualIncome() {
-		return hangActualIncome;
-	}
-	
-	public void setHangActualIncome(float hangActualIncome) {
-		this.hangActualIncome = hangActualIncome;
+		if(incomeByPay != null){
+			return incomeByPay.getHangActual();
+		}else{
+			return 0;
+		}
 	}
 	
 	public float getTotalActual() {
-		return totalActual;
+		if(incomeByPay != null){
+			return incomeByPay.getTotalActual();
+		}else{
+			return 0;
+		}
 	}
 	
-	public void setTotalActual(float totalActual) {
-		this.totalActual = totalActual;
+	public void setDiscountIncome(IncomeByDiscount discountIncome){
+		this.incomeByDiscount = discountIncome;
 	}
 	
 	public int getDiscountAmount() {
-		return discountAmount;
-	}
-	
-	public void setDiscountAmount(int discountAmount) {
-		this.discountAmount = discountAmount;
+		if(incomeByDiscount != null){
+			return incomeByDiscount.getDiscountAmount();
+		}else{
+			return 0;
+		}
 	}
 	
 	public float getDiscountIncome() {
-		return discountIncome;
+		if(incomeByDiscount != null){
+			return incomeByDiscount.getTotalDiscount();
+		}else{
+			return 0;
+		}
 	}
 	
-	public void setDiscountIncome(float discountIncome) {
-		this.discountIncome = discountIncome;
+	public void setGiftIncome(IncomeByGift giftIncome){
+		this.incomeByGift = giftIncome;
 	}
 	
 	public int getGiftAmount() {
-		return giftAmount;
-	}
-	
-	public void setGiftAmount(int giftAmount) {
-		this.giftAmount = giftAmount;
+		if(incomeByGift != null){
+			return incomeByGift.getGiftAmount();
+		}else{
+			return 0;
+		}
 	}
 	
 	public float getGiftIncome() {
-		return giftIncome;
+		if(incomeByGift != null){
+			return incomeByGift.getTotalGift();
+		}else{
+			return 0;
+		}
 	}
 	
-	public void setGiftIncome(float giftIncome) {
-		this.giftIncome = giftIncome;
+	public void setCancelIncome(IncomeByCancel cancelIncome){
+		this.incomeByCancel = cancelIncome;
 	}
 	
 	public int getCancelAmount() {
-		return cancelAmount;
+		if(incomeByCancel != null){
+			return incomeByCancel.getCancelAmount();
+		}else{
+			return 0;
+		}
 	}
 	
-	public void setCancelAmount(int cancelAmount) {
-		this.cancelAmount = cancelAmount;
-	}
 	public float getCancelIncome() {
-		return cancelIncome;
+		if(incomeByCancel != null){
+			return incomeByCancel.getTotalCancel();
+		}else{
+			return 0;
+		}
 	}
 	
-	public void setCancelIncome(float cancelIncome) {
-		this.cancelIncome = cancelIncome;
+	public void setCouponIncome(IncomeByCoupon couponIncome){
+		this.incomeByCoupon = couponIncome;
+	}
+	
+	public int getCouponAmount(){
+		if(incomeByCoupon != null){
+			return this.incomeByCoupon.getCouponAmount();
+		}else{
+			return 0;
+		}
+	}
+	
+	public float getCouponIncome(){
+		if(incomeByCoupon != null){
+			return this.incomeByCoupon.getTotalCoupon();
+		}else{
+			return 0;
+		}
+	}
+	
+	public void setServiceIncome(IncomeByService serviceIncome){
+		this.incomeByService = serviceIncome;
 	}
 	
 	public int getServiceAmount() {
-		return serviceAmount;
-	}
-	
-	public void setServiceAmount(int serviceAmount) {
-		this.serviceAmount = serviceAmount;
+		if(incomeByService != null){
+			return incomeByService.getServiceAmount();
+		}else{
+			return 0;
+		}
 	}
 	
 	public float getServiceIncome() {
-		return serviceIncome;
+		if(incomeByService != null){
+			return incomeByService.getTotalService();
+		}else{
+			return 0;
+		}
 	}
 	
-	public void setServiceIncome(float serviceIncome) {
-		this.serviceIncome = serviceIncome;
+	public void setRepaidIncome(IncomeByRepaid repaidIncome){
+		this.incomeByRepaid = repaidIncome;
 	}
 	
 	public int getPaidAmount() {
-		return paidAmount;
-	}
-	
-	public void setPaidAmount(int paidAmount) {
-		this.paidAmount = paidAmount;
+		if(incomeByRepaid != null){
+			return incomeByRepaid.getRepaidAmount();
+		}else{
+			return 0;
+		}
 	}
 	
 	public float getPaidIncome() {
-		return paidIncome;
+		if(incomeByRepaid != null){
+			return incomeByRepaid.getTotalRepaid();
+		}else{
+			return 0;
+		}
 	}
 	
-	public void setPaidIncome(float paidIncome) {
-		this.paidIncome = paidIncome;
+	public void setEraseIncome(IncomeByErase eraseIncome){
+		this.incomeByErase = eraseIncome;
 	}
 	
 	public int getEraseAmount() {
-		return eraseAmount;
-	}
-	
-	public void setEraseAmount(int eraseAmount) {
-		this.eraseAmount = eraseAmount;
+		if(incomeByErase != null){
+			return incomeByErase.getEraseAmount();
+		}else{
+			return 0;
+		}
 	}
 	
 	public float getEraseIncome() {
-		return eraseIncome;
-	}
-	
-	public void setEraseIncome(float eraseIncome) {
-		this.eraseIncome = eraseIncome;
+		if(incomeByErase != null){
+			return incomeByErase.getTotalErase();
+		}else{
+			return 0;
+		}
 	}
 	
 	public List<IncomeByDept> getDeptIncome() {
@@ -323,19 +345,19 @@ public class ShiftDetail implements Jsonable{
 	}
 	
 	public float getTotalIncome() {
-		return totalIncome;
-	}
-
-	public void setTotalIncome(float totalIncome) {
-		this.totalIncome = totalIncome;
+		if(incomeByPay != null){
+			return incomeByPay.getTotalIncome();
+		}else{
+			return 0;
+		}
 	}
 
 	@Override 
 	public String toString(){
 		return "ShiftDetail : " +
-				"orderAmount " + this.orderAmount +
-				"onDuty" + this.onDuty +
-				"offDuty" + this.offDuty;
+			   "orderAmount " + this.getOrderAmount() +
+			   ",onDuty" + this.onDuty +
+			   ",offDuty" + this.offDuty;
 	}
 	
 	@Override
@@ -361,7 +383,7 @@ public class ShiftDetail implements Jsonable{
 		jm.put("paramsOffDuty", this.offDuty);
 		jm.put("totalActual", this.getTotalActual());
 		jm.put("totalIncome", this.getTotalIncome());
-		jm.put("orderAmount", this.orderAmount);
+		jm.put("orderAmount", this.getOrderAmount());
 		
 		jm.put("cashIncome2", this.getCashActualIncome());
 		jm.put("cashAmount", this.getCashAmount());
