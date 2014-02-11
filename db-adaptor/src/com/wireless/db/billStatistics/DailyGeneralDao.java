@@ -9,7 +9,7 @@ import com.wireless.db.DBCon;
 import com.wireless.pojo.billStatistics.ShiftGeneral;
 import com.wireless.pojo.staffMgr.Staff;
 
-public class QueryDailyGeneralDao {
+public class DailyGeneralDao {
 	
 	/**
 	 * Get the history daily general according to date range. 

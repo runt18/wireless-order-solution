@@ -21,7 +21,7 @@ import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.util.DateType;
 
-public class QuerySaleDetails {
+public class SaleDetailsDao {
 	
 	public final static int QUERY_BY_DEPT = 0;		//按部门显示
 	public final static int QUERY_BY_FOOD = 1;		//按菜品显示
@@ -74,7 +74,7 @@ public class QuerySaleDetails {
 			/**
 			 * Get the duty range between on and off duty date
 			 */
-			DutyRange dutyRange = QueryDutyRange.exec(dbCon, staff, onDuty, offDuty);
+			DutyRange dutyRange = DutyRangeDao.exec(dbCon, staff, onDuty, offDuty);
 			
 			if(dutyRange == null){
 				return new SalesDetail[0];
@@ -198,7 +198,7 @@ public class QuerySaleDetails {
 			/**
 			 * Get the duty range between on and off duty date
 			 */
-			DutyRange dutyRange = QueryDutyRange.exec(dbCon, term, onDuty, offDuty);
+			DutyRange dutyRange = DutyRangeDao.exec(dbCon, term, onDuty, offDuty);
 			
 			if(dutyRange == null){
 				return new SalesDetail[0];
@@ -337,7 +337,7 @@ public class QuerySaleDetails {
 			/**
 			 * Get the duty range between on and off duty date
 			 */
-			DutyRange dutyRange = QueryDutyRange.exec(dbCon, term, onDuty, offDuty);
+			DutyRange dutyRange = DutyRangeDao.exec(dbCon, term, onDuty, offDuty);
 			
 			if(dutyRange == null){
 				return new SalesDetail[0];
@@ -399,7 +399,7 @@ public class QuerySaleDetails {
 		
 		SalesDetail[] result = foodSalesDetail.values().toArray(new SalesDetail[foodSalesDetail.values().size()]);
 		
-		if(orderType == QuerySaleDetails.ORDER_BY_PROFIT){
+		if(orderType == SaleDetailsDao.ORDER_BY_PROFIT){
 			Arrays.sort(result, new Comparator<SalesDetail>(){
 				@Override
 				public int compare(SalesDetail o1, SalesDetail o2) {
@@ -412,7 +412,7 @@ public class QuerySaleDetails {
 					}
 				}				
 			});
-		}else if(orderType == QuerySaleDetails.ORDER_BY_SALES){
+		}else if(orderType == SaleDetailsDao.ORDER_BY_SALES){
 			Arrays.sort(result, new Comparator<SalesDetail>(){
 				@Override
 				public int compare(SalesDetail o1, SalesDetail o2) {

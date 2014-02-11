@@ -19,7 +19,7 @@ import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.util.DateType;
 
-public class QueryCancelledFood {
+public class CancelledFoodDao {
 	
 	public final static int QUERY_BY_DEPT = 0;		//按部门显示
 	public final static int QUERY_BY_REASON = 1;	//按原因显示
@@ -111,7 +111,7 @@ public class QueryCancelledFood {
 	public static List<CancelIncomeByDept> getCancelledFoodByDept(DBCon dbCon, Staff staff, DutyRange range, String extraCond, DateType queryType, int orderBy) throws SQLException{
 		List<CancelIncomeByDept> result = CalcBillStatisticsDao.calcCancelIncomeByDept(dbCon, staff, range, extraCond, queryType);		
 		if(result != null && result.size() > 0){
-			if(orderBy == QueryCancelledFood.ORDER_BY_COUNT){
+			if(orderBy == CancelledFoodDao.ORDER_BY_COUNT){
 				Collections.sort(result, new Comparator<CancelIncomeByDept>(){
 					@Override
 					public int compare(CancelIncomeByDept r1, CancelIncomeByDept r2) {
@@ -124,7 +124,7 @@ public class QueryCancelledFood {
 						}
 					}					
 				});
-			}else if(orderBy == QueryCancelledFood.ORDER_BY_PRICE){
+			}else if(orderBy == CancelledFoodDao.ORDER_BY_PRICE){
 				Collections.sort(result, new Comparator<CancelIncomeByDept>(){
 					@Override
 					public int compare(CancelIncomeByDept r1, CancelIncomeByDept r2) {
@@ -263,7 +263,7 @@ public class QueryCancelledFood {
 	public static List<CancelIncomeByReason> getCancelledFoodByReason(DBCon dbCon, Staff staff, DutyRange range, String extraCond, DateType queryType, int orderBy) throws SQLException{
 		List<CancelIncomeByReason> result = CalcBillStatisticsDao.calcCancelIncomeByReason(dbCon, staff, range, extraCond, queryType);		
 		if(result != null && result.size() > 0){
-			if(orderBy == QueryCancelledFood.ORDER_BY_COUNT){
+			if(orderBy == CancelledFoodDao.ORDER_BY_COUNT){
 				Collections.sort(result, new Comparator<CancelIncomeByReason>(){
 					@Override
 					public int compare(CancelIncomeByReason r1, CancelIncomeByReason r2) {
@@ -276,7 +276,7 @@ public class QueryCancelledFood {
 						}
 					}					
 				});
-			}else if(orderBy == QueryCancelledFood.ORDER_BY_PRICE){
+			}else if(orderBy == CancelledFoodDao.ORDER_BY_PRICE){
 				Collections.sort(result, new Comparator<CancelIncomeByReason>(){
 					@Override
 					public int compare(CancelIncomeByReason r1, CancelIncomeByReason r2) {

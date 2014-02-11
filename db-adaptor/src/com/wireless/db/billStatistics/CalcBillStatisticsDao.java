@@ -1,8 +1,12 @@
 package com.wireless.db.billStatistics;
 
 import java.sql.SQLException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -18,8 +22,10 @@ import com.wireless.pojo.billStatistics.CommissionStatistics;
 import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.billStatistics.IncomeByCancel;
 import com.wireless.pojo.billStatistics.IncomeByCharge;
+import com.wireless.pojo.billStatistics.IncomeByCoupon;
 import com.wireless.pojo.billStatistics.IncomeByDept;
 import com.wireless.pojo.billStatistics.IncomeByDiscount;
+import com.wireless.pojo.billStatistics.IncomeByEachDay;
 import com.wireless.pojo.billStatistics.IncomeByErase;
 import com.wireless.pojo.billStatistics.IncomeByFood;
 import com.wireless.pojo.billStatistics.IncomeByGift;
@@ -36,6 +42,7 @@ import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.pojo.staffMgr.Staff;
+import com.wireless.pojo.util.DateUtil;
 import com.wireless.util.DateType;
 
 public class CalcBillStatisticsDao {
@@ -326,12 +333,16 @@ public class CalcBillStatisticsDao {
 	}
 	
 	/**
-	 * 
+	 * Calculate the cancel price to specific duty range.
 	 * @param staff
+	 * 			the staff to perform this action
 	 * @param range
+	 * 			the duty range 
 	 * @param queryType
-	 * @return
+	 * 			the query type
+	 * @return the income by cancel pricee
 	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
 	 */
 	public static IncomeByCancel calcCancelPrice(Staff staff, DutyRange range, DateType queryType) throws SQLException{
 		DBCon dbCon = new DBCon();
@@ -344,13 +355,18 @@ public class CalcBillStatisticsDao {
 	}	
 	
 	/**
-	 * 
+	 * Calculate the cancel price to specific duty range.
 	 * @param dbCon
+	 * 			the database connection
 	 * @param staff
+	 * 			the staff to perform this action
 	 * @param range
+	 * 			the duty range 
 	 * @param queryType
-	 * @return
+	 * 			the query type
+	 * @return the income by cancel price
 	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
 	 */
 	public static IncomeByCancel calcCancelPrice(DBCon dbCon, Staff staff, DutyRange range, DateType queryType) throws SQLException{
 		
@@ -387,6 +403,76 @@ public class CalcBillStatisticsDao {
 		return cancelIncome;
 	}
 
+	/**
+	 * Calculate the coupon price to specific duty range.
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param range
+	 * 			the duty range
+	 * @param queryType 
+	 * 			the query type
+	 * @return the income by coupon price
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static IncomeByCoupon calcCouponPrice(Staff staff, DutyRange range, DateType queryType) throws SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return calcCouponPrice(dbCon, staff, range, queryType);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Calculate the coupon price to specific duty range.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param range
+	 * 			the duty range
+	 * @param queryType 
+	 * 			the query type
+	 * @return the income by coupon price
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static IncomeByCoupon calcCouponPrice(DBCon dbCon, Staff staff, DutyRange range, DateType queryType) throws SQLException{
+		String orderTbl = null;
+		if(queryType.isHistory()){
+			orderTbl = TBL_ORDER_HISTORY;
+			
+		}else if(queryType.isToday()){
+			orderTbl = TBL_ORDER_TODAY;
+			
+		}else{
+			throw new IllegalArgumentException("The query type is invalid.");
+		}
+		
+		String sql;
+		
+		sql = " SELECT " +
+		      " COUNT(*) AS amount, ROUND(SUM(coupon_price), 2) AS total_coupon " +
+		      " FROM " +
+		      Params.dbName + "." + orderTbl +
+		      " WHERE 1 = 1 " +
+		      " AND restaurant_id = " + staff.getRestaurantId() +
+		      " AND order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +
+			  " AND coupon_price > 0 ";
+			
+		dbCon.rs = dbCon.stmt.executeQuery(sql);
+		IncomeByCoupon couponIncome = new IncomeByCoupon();
+		if(dbCon.rs.next()){
+			couponIncome.setCouponAmount(dbCon.rs.getInt("amount"));
+			couponIncome.setTotalCoupon(dbCon.rs.getFloat("total_coupon"));
+		}
+		dbCon.rs.close();
+		
+		return couponIncome;
+	}
+	
 	/**
 	 * 
 	 * @param staff
@@ -1061,6 +1147,7 @@ public class CalcBillStatisticsDao {
 		 return incomeByCharge;
 		 
 	 }
+	 
 	/**
 	 * Get repaid list of order. 
 	 * @param dbCon
@@ -1388,6 +1475,100 @@ public class CalcBillStatisticsDao {
 		dbCon.rs.close();
 		
 		return Collections.unmodifiableList(result);
+	}
+
+	/**
+	 * Get income to each day during on & off duty.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param onDuty
+	 * 			the on duty
+	 * @param offDuty
+	 * 			the off duty
+	 * @return the income by each during on & off duty
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws ParseException
+	 * 			throws if failed to parse the on or off duty string
+	 */
+	public static List<IncomeByEachDay> calcIncomeByEachDay(DBCon dbCon, Staff staff, String onDuty, String offDuty) throws SQLException, ParseException{
+		
+		List<IncomeByEachDay> result = new ArrayList<IncomeByEachDay>();
+		
+		Calendar c = Calendar.getInstance();
+		Date dateBegin = new SimpleDateFormat("yyyy-MM-dd").parse(onDuty);
+		Date dateEnd = new SimpleDateFormat("yyyy-MM-dd").parse(offDuty);
+		c.setTime(dateBegin);
+		while (dateBegin.compareTo(dateEnd) <= 0) {
+			c.add(Calendar.DATE, 1);
+			
+			DutyRange range = DutyRangeDao.exec(dbCon, staff, 
+												DateUtil.format(dateBegin, DateUtil.Pattern.DATE_TIME), 
+												DateUtil.format(c.getTime(), DateUtil.Pattern.DATE_TIME));
+			
+			IncomeByEachDay income = new IncomeByEachDay(DateUtil.format(dateBegin, DateUtil.Pattern.DATE));
+			if(range != null){
+				
+				//Calculate the general income
+				income.setIncomeByPay(calcIncomeByPayType(dbCon, staff, range, DateType.HISTORY));
+				
+				//Calculate the total & amount to erase price
+				income.setIncomeByErase(calcErasePrice(dbCon, staff, range, DateType.HISTORY));
+				
+				//Get the total & amount to discount price
+				income.setIncomeByDiscount(calcDiscountPrice(dbCon, staff, range, DateType.HISTORY));
+	
+				//Get the total & amount to gift price
+				income.setIncomeByGift(calcGiftPrice(dbCon, staff, range, DateType.HISTORY));
+				
+				//Get the total & amount to cancel price
+				income.setIncomeByCancel(calcCancelPrice(dbCon, staff, range, DateType.HISTORY));
+				
+				//Get the total & amount to coupon price
+				income.setIncomeByCoupon(calcCouponPrice(dbCon, staff, range, DateType.HISTORY));
+				
+				//Get the total & amount to repaid order
+				income.setIncomeByRepaid(calcRepaidPrice(dbCon, staff, range, DateType.HISTORY));
+				
+				//Get the total & amount to order with service
+				income.setIncomeByService(calcServicePrice(dbCon, staff, range, DateType.HISTORY));
+				
+				//Get the charge income by both cash and credit card
+				income.setIncomeByCharge(calcIncomeByCharge(dbCon, staff, range, DateType.HISTORY));
+				
+			}
+			result.add(income);
+			
+			dateBegin = c.getTime();
+		}
+		
+		return Collections.unmodifiableList(result);
+	}
+
+	/**
+	 * Get income to each day during on & off duty.
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param onDuty
+	 * 			the on duty
+	 * @param offDuty
+	 * 			the off duty
+	 * @return the income by each during on & off duty
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws ParseException
+	 * 			throws if failed to parse the on or off duty string
+	 */
+	public static List<IncomeByEachDay> calcIncomeByEachDay(Staff staff, String onDuty, String offDuty) throws SQLException, ParseException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return calcIncomeByEachDay(dbCon, staff, onDuty, offDuty);
+		}finally{
+			dbCon.disconnect();
+		}
 	}
 	 
 }

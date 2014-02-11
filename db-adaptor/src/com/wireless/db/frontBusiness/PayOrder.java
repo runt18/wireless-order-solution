@@ -6,6 +6,7 @@ import java.util.List;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.client.member.MemberDao;
+import com.wireless.db.coupon.CouponDao;
 import com.wireless.db.distMgr.DiscountDao;
 import com.wireless.db.orderMgr.OrderDao;
 import com.wireless.db.system.SystemDao;
@@ -168,7 +169,7 @@ public class PayOrder {
 			throw new BusinessException(StaffError.RE_PAYMENT_NOT_ALLOW);
 			
 		}else{
-			return doPayment(dbCon, staff, doPrepare(dbCon, staff, payBuilder));
+			return doPayment(dbCon, staff, doPrepare(dbCon, staff, payBuilder), payBuilder);
 		}
 		
 	}
@@ -191,9 +192,7 @@ public class PayOrder {
 	 * 			throws if failed to execute any SQL statements
 	 */
 	private static Order doPrepare(DBCon dbCon, Staff staff, PayBuilder payBuilder) throws BusinessException, SQLException{
-		int customNum = payBuilder.getCustomNum();
 		Order orderCalculated = calc(dbCon, staff, payBuilder);
-		orderCalculated.setCustomNum(customNum);
 		
 		//Set the received cash if less than actual price.
 		if(orderCalculated.isPayByCash() && payBuilder.getReceivedCash() < orderCalculated.getActualPrice()){
@@ -202,17 +201,18 @@ public class PayOrder {
 		
 		if(orderCalculated.isSettledByMember()){
 			
-			Member member = MemberDao.getMemberById(staff, orderCalculated.getMember().getId());
+			Member member = MemberDao.getMemberById(staff, payBuilder.getMemberId());
 			
 			if(orderCalculated.isUnpaid()){
 				//Check to see whether be able to perform consumption.
-				member.checkConsume(orderCalculated.getActualPrice(), orderCalculated.getPaymentType());
+				member.checkConsume(orderCalculated.getActualPrice(), 
+									payBuilder.hasCoupon() ? CouponDao.getById(dbCon, staff, payBuilder.getCouponId()) : null, 
+									orderCalculated.getPaymentType());
 			}else{
 				//Check to see whether be able to perform repaid consumption.
 				throw new BusinessException("Repaid to member consumption is NOT supported.");
 			}
 			
-			orderCalculated.setMember(member);
 		}
 		
 		//Calculate the sequence id to this order in case of unpaid.
@@ -235,12 +235,11 @@ public class PayOrder {
 	 * @param dbCon
 	 * @param staff
 	 * @param orderCalculated
-	 * @param isPaidAgain
+	 * @param payBuilder
 	 * @return
 	 * @throws SQLException
-	 * 			Throws if failed to execute any SQL statement.
 	 */
-	private static Order doPayment(DBCon dbCon, Staff staff, Order orderCalculated) throws SQLException{
+	private static Order doPayment(DBCon dbCon, Staff staff, Order orderCalculated, PayBuilder payBuilder) throws SQLException{
 		
 		String sql;
 		
@@ -256,25 +255,27 @@ public class PayOrder {
 			
 			//Update the order.
 			sql = " UPDATE " + Params.dbName + ".order SET " +
-				  " staff_id = " + staff.getId() + ", " +
-				  " waiter = '" + staff.getName() + "', " +
-				  " category = " + orderCalculated.getCategory().getVal() + ", " +
-				  " gift_price = " + orderCalculated.getGiftPrice() + ", " +
-				  " discount_price = " + orderCalculated.getDiscountPrice() + ", " +
-				  " cancel_price = " + orderCalculated.getCancelPrice() + ", " +
-				  " repaid_price =  " + orderCalculated.getRepaidPrice() + ", " +
-				  " erase_price = " + orderCalculated.getErasePrice() + ", " +
-				  " total_price = " + orderCalculated.getTotalPrice() + ", " + 
-				  " actual_price = " + orderCalculated.getActualPrice() + ", " +
-				  " custom_num = " + orderCalculated.getCustomNum() + ", " +
-				  " pay_type = " + orderCalculated.getPaymentType().getVal() + ", " + 
-				  " settle_type = " + orderCalculated.getSettleType().getVal() + ", " +
-				  " discount_id = " + orderCalculated.getDiscount().getId() + ", " +
-				  " service_rate = " + orderCalculated.getServiceRate() + ", " +
-				  " status = " + (orderCalculated.isUnpaid() ? Order.Status.PAID.getVal() : Order.Status.REPAID.getVal()) + ", " + 
-				  (orderCalculated.isUnpaid() ? (" seq_id = " + orderCalculated.getSeqId() + ", ") : "") +
-			   	  " order_date = NOW(), " + 
-				  " comment = " + "'" + orderCalculated.getComment() + "'" + 
+				  " id = " + orderCalculated.getId() +
+				  " ,staff_id = " + staff.getId() + 
+				  " ,waiter = '" + staff.getName() + "'" +
+				  " ,category = " + orderCalculated.getCategory().getVal() + 
+				  " ,gift_price = " + orderCalculated.getGiftPrice() + 
+				  " ,discount_price = " + orderCalculated.getDiscountPrice() + 
+				  " ,cancel_price = " + orderCalculated.getCancelPrice() + 
+				  " ,repaid_price =  " + orderCalculated.getRepaidPrice() + 
+				  " ,erase_price = " + orderCalculated.getErasePrice() + 
+				  " ,coupon_price = " + orderCalculated.getCouponPrice() + 
+				  " ,total_price = " + orderCalculated.getTotalPrice() +  
+				  " ,actual_price = " + orderCalculated.getActualPrice() + 
+				  " ,custom_num = " + orderCalculated.getCustomNum() + 
+				  " ,pay_type = " + orderCalculated.getPaymentType().getVal() +  
+				  " ,settle_type = " + orderCalculated.getSettleType().getVal() + 
+				  " ,discount_id = " + orderCalculated.getDiscount().getId() + 
+				  " ,service_rate = " + orderCalculated.getServiceRate() + 
+				  " ,status = " + (orderCalculated.isUnpaid() ? Order.Status.PAID.getVal() : Order.Status.REPAID.getVal()) +  
+				  (orderCalculated.isUnpaid() ? (" ,seq_id = " + orderCalculated.getSeqId()) : "") +
+			   	  " ,order_date = NOW() " + 
+				  " ,comment = '" + orderCalculated.getComment() + "'" + 
 				  " WHERE " +
 				  " id = " + orderCalculated.getId();
 				
@@ -284,8 +285,9 @@ public class PayOrder {
 			for(OrderFood food : orderCalculated.getOrderFoods()){
 				sql = " UPDATE " + Params.dbName + ".order_food " +
 					  " SET " +
-					  " discount = " + food.getDiscount() + ", " +
-					  " unit_price = " + food.getPrice() +
+					  " food_id = " + food.getFoodId() +
+					  " ,discount = " + food.getDiscount() + 
+					  " ,unit_price = " + food.getPrice() +
 					  " WHERE order_id = " + orderCalculated.getId() + 
 					  " AND food_id = " + food.getFoodId();
 				dbCon.stmt.executeUpdate(sql);				
@@ -295,9 +297,9 @@ public class PayOrder {
 			if(orderCalculated.isUnpaid()){
 				
 				sql = " UPDATE " + Params.dbName + ".table SET " +
-					  " status = " + Table.Status.IDLE.getVal() + ", " +
-					  " custom_num = NULL, " +
-					  " category = NULL " +
+					  " status = " + Table.Status.IDLE.getVal() + 
+					  " ,custom_num = NULL " +
+					  " ,category = NULL " +
 					  " WHERE " +
   			  		  " restaurant_id = " + orderCalculated.getRestaurantId() + " AND " +
 					  " table_alias = " + orderCalculated.getDestTbl().getAliasId();
@@ -313,8 +315,9 @@ public class PayOrder {
 				if(orderCalculated.isUnpaid()){
 					//Perform the consumption.
 					mo = MemberDao.consume(dbCon, staff, 
-										   orderCalculated.getMember().getId(), 
+										   payBuilder.getMemberId(), 
 										   orderCalculated.getActualPrice(), 
+										   payBuilder.hasCoupon() ? CouponDao.getById(dbCon, staff, payBuilder.getCouponId()) : null,
 										   orderCalculated.getPaymentType(),
 										   orderCalculated.getId());
 					orderCalculated.setMemberOperationId(mo.getId());
@@ -324,7 +327,6 @@ public class PayOrder {
 				}
 				
 				sql = " UPDATE " + Params.dbName + ".order SET " +
-					  " member_id = " + mo.getMemberId() + "," +
 					  " member_operation_id = " + mo.getId() +
 					  " WHERE id = " + orderCalculated.getId();
 				dbCon.stmt.executeUpdate(sql);
@@ -453,6 +455,11 @@ public class PayOrder {
 		//Set the order calculate parameters.
 		setOrderCalcParams(orderToCalc, payBuilder);
 
+		//If the coupon is set, get the coupon price to this order.
+		if(payBuilder.hasCoupon()){
+			orderToCalc.setCouponPrice(CouponDao.getById(dbCon, staff, payBuilder.getCouponId()).getPrice());
+		}
+		
 		//If the service rate is set, just use it, otherwise use the one associated with the table belongs to this order.
 		if(payBuilder.hasServiceRate()){
 			orderToCalc.setServiceRate(payBuilder.getServiceRate());
@@ -536,8 +543,8 @@ public class PayOrder {
 			}
 		}
 		
-		//Minus the erase price.
-		actualPrice = actualPrice - orderToCalc.getErasePrice();
+		//Minus the erase & coupon price.
+		actualPrice = actualPrice - orderToCalc.getErasePrice() - orderToCalc.getCouponPrice();
 		actualPrice = actualPrice > 0 ? actualPrice : 0;
 		
 		//Set the cancel price.
@@ -561,7 +568,6 @@ public class PayOrder {
 		orderToCalc.setErasePrice(payBuilder.getErasePrice());
 		orderToCalc.setCustomNum(payBuilder.getCustomNum());
 		orderToCalc.setSettleType(payBuilder.getSettleType());
-		orderToCalc.setMember(payBuilder.getMember()); 
 		orderToCalc.setReceivedCash(payBuilder.getReceivedCash());
 		orderToCalc.setPaymentType(payBuilder.getPaymentType());
 		orderToCalc.setComment(payBuilder.getComment());

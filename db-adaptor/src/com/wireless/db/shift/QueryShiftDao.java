@@ -3,7 +3,6 @@ package com.wireless.db.shift;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
-import java.util.List;
 import java.util.TimeZone;
 
 import com.wireless.db.DBCon;
@@ -11,14 +10,6 @@ import com.wireless.db.Params;
 import com.wireless.db.billStatistics.CalcBillStatisticsDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.billStatistics.DutyRange;
-import com.wireless.pojo.billStatistics.IncomeByCancel;
-import com.wireless.pojo.billStatistics.IncomeByDept;
-import com.wireless.pojo.billStatistics.IncomeByDiscount;
-import com.wireless.pojo.billStatistics.IncomeByErase;
-import com.wireless.pojo.billStatistics.IncomeByGift;
-import com.wireless.pojo.billStatistics.IncomeByPay;
-import com.wireless.pojo.billStatistics.IncomeByRepaid;
-import com.wireless.pojo.billStatistics.IncomeByService;
 import com.wireless.pojo.billStatistics.ShiftDetail;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.util.DateType;
@@ -262,70 +253,35 @@ public class QueryShiftDao {
 		result.setOffDuty(offDuty);
 		
 		//Calculate the general income
-		IncomeByPay incomeByPay = CalcBillStatisticsDao.calcIncomeByPayType(dbCon, staff, new DutyRange(onDuty, offDuty), queryType);
-		
-		result.setCashAmount(incomeByPay.getCashAmount());
-		result.setCashTotalIncome(incomeByPay.getCashIncome());
-		result.setCashActualIncome(incomeByPay.getCashActual());
-				
-		result.setCreditCardAmount(incomeByPay.getCreditCardAmount());
-		result.setCreditTotalIncome(incomeByPay.getCreditCardIncome());
-		result.setCreditActualIncome(incomeByPay.getCreditCardActual());
-				
-		result.setMemberCardAmount(incomeByPay.getMemberCardAmount());
-		result.setMemberTotalIncome(incomeByPay.getMemberCardIncome());
-		result.setMemberActualIncome(incomeByPay.getMemberCardActual());
-				
-		result.setHangAmount(incomeByPay.getHangAmount());
-		result.setHangTotalIncome(incomeByPay.getHangIncome());
-		result.setHangActualIncome(incomeByPay.getHangActual());
-				
-		result.setSignAmount(incomeByPay.getSignAmount());
-		result.setSignTotalIncome(incomeByPay.getSignIncome());
-		result.setSignActualIncome(incomeByPay.getSignActual());
-		
-		result.setOrderAmount(incomeByPay.getOrderAmount());
-		result.setTotalActual(incomeByPay.getTotalActual());
-		result.setTotalIncome(incomeByPay.getTotalIncome());
+		result.setIncomeByPay(CalcBillStatisticsDao.calcIncomeByPayType(dbCon, staff, new DutyRange(onDuty, offDuty), queryType));
 		
 		//Calculate the total & amount to erase price
-		IncomeByErase incomeByErase = CalcBillStatisticsDao.calcErasePrice(dbCon, staff, new DutyRange(onDuty, offDuty), queryType);
-		result.setEraseAmount(incomeByErase.getEraseAmount());
-		result.setEraseIncome(incomeByErase.getTotalErase());
+		result.setEraseIncome(CalcBillStatisticsDao.calcErasePrice(dbCon, staff, new DutyRange(onDuty, offDuty), queryType));
 		//-----------------------------
 		
 		//Get the total & amount to discount price
-		IncomeByDiscount incomeByDiscount = CalcBillStatisticsDao.calcDiscountPrice(dbCon, staff, new DutyRange(onDuty, offDuty), queryType);
-		result.setDiscountAmount(incomeByDiscount.getDiscountAmount());
-		result.setDiscountIncome(incomeByDiscount.getTotalDiscount());	
-
+		result.setDiscountIncome(CalcBillStatisticsDao.calcDiscountPrice(dbCon, staff, new DutyRange(onDuty, offDuty), queryType));
 		
 		//Get the total & amount to gift price
-		IncomeByGift incomeByGift = CalcBillStatisticsDao.calcGiftPrice(dbCon, staff, new DutyRange(onDuty, offDuty),  queryType);
-		result.setGiftAmount(incomeByGift.getGiftAmount());
-		result.setGiftIncome(incomeByGift.getTotalGift());
+		result.setGiftIncome(CalcBillStatisticsDao.calcGiftPrice(dbCon, staff, new DutyRange(onDuty, offDuty), queryType));
 		
 		//Get the total & amount to cancel price
-		IncomeByCancel incomeByCancel = CalcBillStatisticsDao.calcCancelPrice(dbCon, staff, new DutyRange(onDuty, offDuty), queryType);
-		result.setCancelAmount(incomeByCancel.getCancelAmount());
-		result.setCancelIncome(incomeByCancel.getTotalCancel());
+		result.setCancelIncome(CalcBillStatisticsDao.calcCancelPrice(dbCon, staff, new DutyRange(onDuty, offDuty), queryType));
+		
+		//Get the total & amount to coupon price
+		result.setCouponIncome(CalcBillStatisticsDao.calcCouponPrice(dbCon, staff, new DutyRange(onDuty, offDuty), queryType));
 		
 		//Get the total & amount to repaid order
-		IncomeByRepaid incomeByRepaid = CalcBillStatisticsDao.calcRepaidPrice(dbCon, staff, new DutyRange(onDuty, offDuty), queryType);
-		result.setPaidAmount(incomeByRepaid.getRepaidAmount());
-		result.setPaidIncome(incomeByRepaid.getTotalRepaid());
+		result.setRepaidIncome(CalcBillStatisticsDao.calcRepaidPrice(dbCon, staff, new DutyRange(onDuty, offDuty), queryType));
 		
 		//Get the total & amount to order with service
-		IncomeByService incomeByService = CalcBillStatisticsDao.calcServicePrice(dbCon, staff, new DutyRange(onDuty, offDuty), queryType);
-		result.setServiceAmount(incomeByService.getServiceAmount());
-		result.setServiceIncome(incomeByService.getTotalService());
+		result.setServiceIncome(CalcBillStatisticsDao.calcServicePrice(dbCon, staff, new DutyRange(onDuty, offDuty), queryType));
 		
 		//Get the income by charge
 		result.setIncomeByCharge(CalcBillStatisticsDao.calcIncomeByCharge(dbCon, staff, new DutyRange(onDuty, offDuty), queryType));
 		
 		//Get the gift, discount & total to each department during this period.
-		List<IncomeByDept> incomeByDept = CalcBillStatisticsDao.calcIncomeByDept(dbCon, staff, new DutyRange(onDuty, offDuty), null, queryType);
-		result.setDeptIncome(incomeByDept);
+		result.setDeptIncome(CalcBillStatisticsDao.calcIncomeByDept(dbCon, staff, new DutyRange(onDuty, offDuty), null, queryType));
 		
 		return result;
 	}

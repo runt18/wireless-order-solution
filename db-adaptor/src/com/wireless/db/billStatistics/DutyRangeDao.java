@@ -8,7 +8,7 @@ import com.wireless.db.Params;
 import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.staffMgr.Staff;
 
-public class QueryDutyRange {
+public class DutyRangeDao {
 	
 	/**
 	 * Get the records to daily settle history whose off duty is between on and off duty(two input parameters),
@@ -83,7 +83,7 @@ public class QueryDutyRange {
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return QueryDutyRange.exec(dbCon, staff, onDuty, offDuty);
+			return DutyRangeDao.exec(dbCon, staff, onDuty, offDuty);
 		}catch(Exception e){
 			throw e;
 		}finally{

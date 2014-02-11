@@ -30,59 +30,64 @@ public class MemberOperationDao {
 	 * 
 	 * @param dbCon
 	 *            the database connection
-	 * @param term
-	 * 			  the terminal
+	 * @param staff
+	 * 			  the staff to perform this action 
 	 * @param mo
 	 *            the member operation to insert
 	 * @return the row count for the SQL statements 
 	 * @throws SQLException
 	 *             throws if failed to execute any SQL statements
 	 */
-	public static int insert(DBCon dbCon, Staff term, MemberOperation mo) throws SQLException {
+	public static int insert(DBCon dbCon, Staff staff, MemberOperation mo) throws SQLException {
 		
 		//Build the operate date and sequence.
 		Date now = new Date();
 		mo.setOperateDate(now.getTime());
 		mo.setOperateSeq(mo.getOperationType().getPrefix().concat(DateUtil.format(now, Pattern.MO_SEQ)));
 		
-		mo.setRestaurantId(term.getRestaurantId());
-		mo.setStaffID(term.getId());
-		mo.setStaffName(term.getName());
+		mo.setRestaurantId(staff.getRestaurantId());
+		mo.setStaffId(staff.getId());
+		mo.setStaffName(staff.getName());
 		
-		String insertSQL = " INSERT INTO " +
-						   Params.dbName + ".member_operation " +
-						   "(" +
-						   " restaurant_id, staff_id, staff_name, member_id, member_card, member_name, member_mobile," +
-						   " operate_seq, operate_date, operate_type, pay_type, pay_money, order_id, charge_type, charge_money, " +
-						   " delta_base_money, delta_extra_money, delta_point, "	+
-						   " remaining_base_money, remaining_extra_money, remaining_point, comment "	+
-						   ")" +
-						   " VALUES( " +
-						   mo.getRestaurantId() + "," + 
-						   mo.getStaffID() + "," +
-						   "'" + mo.getStaffName() + "'," + 
-						   mo.getMemberId() + "," +
-						   "'" + mo.getMemberCard() + "'," + 
-						   "'" + mo.getMemberName() + "'," +
-						   "'" + mo.getMemberMobile() + "'," +
-						   "'" + mo.getOperateSeq() + "'," +
-						   "'" + DateUtil.format(mo.getOperateDate()) + "'," + 
-						   mo.getOperationType().getValue() + "," + 
-						   (mo.getOperationType() == OperationType.CONSUME ? mo.getPayType().getVal() : "NULL") + "," +
-						   (mo.getOperationType() == OperationType.CONSUME ? mo.getPayMoney() : "NULL") + "," + 
-						   (mo.getOperationType() == OperationType.CONSUME ? mo.getOrderId() : "NULL") + "," +
-						   (mo.getOperationType() == OperationType.CHARGE ? mo.getChargeType().getValue() : (mo.getOperationType() == OperationType.REFUND ? mo.getChargeType().getValue() : "NULL")) + "," + 
-						   (mo.getOperationType() == OperationType.CHARGE ? mo.getChargeMoney() : (mo.getOperationType() == OperationType.REFUND ? mo.getChargeMoney() : "NULL")) + "," +
-						   mo.getDeltaBaseMoney() + "," + 
-						   mo.getDeltaExtraMoney() + "," + 
-						   mo.getDeltaPoint() + ","	+ 
-						   mo.getRemainingBaseMoney() + "," + 
-						   mo.getRemainingExtraMoney() + "," + 
-						   mo.getRemainingPoint() + "," +
-						   "'" + mo.getComment() + "'" + 
-						   ") ";
+		String sql;
+		sql = " INSERT INTO " +
+			  Params.dbName + ".member_operation " +
+			  "(" +
+			  " restaurant_id, staff_id, staff_name, member_id, member_card, member_name, member_mobile," +
+			  " operate_seq, operate_date, operate_type, pay_type, pay_money, order_id, charge_type, charge_money, " +
+			  " coupon_id, coupon_money, coupon_name, " +
+			  " delta_base_money, delta_extra_money, delta_point, "	+
+			  " remaining_base_money, remaining_extra_money, remaining_point, comment "	+
+			  ")" +
+			  " VALUES( " +
+		      mo.getRestaurantId() + "," + 
+		      mo.getStaffId() + "," +
+		      "'" + mo.getStaffName() + "'," + 
+		      mo.getMemberId() + "," +
+		      "'" + mo.getMemberCard() + "'," + 
+		      "'" + mo.getMemberName() + "'," +
+		      "'" + mo.getMemberMobile() + "'," +
+		      "'" + mo.getOperateSeq() + "'," +
+		      "'" + DateUtil.format(mo.getOperateDate()) + "'," + 
+		      mo.getOperationType().getValue() + "," + 
+		      (mo.getOperationType() == OperationType.CONSUME ? mo.getPayType().getVal() : "NULL") + "," +
+		      (mo.getOperationType() == OperationType.CONSUME ? mo.getPayMoney() : "NULL") + "," + 
+		      (mo.getOperationType() == OperationType.CONSUME ? mo.getOrderId() : "NULL") + "," +
+		      (mo.getOperationType() == OperationType.CHARGE ? mo.getChargeType().getValue() : (mo.getOperationType() == OperationType.REFUND ? mo.getChargeType().getValue() : "NULL")) + "," + 
+		      (mo.getOperationType() == OperationType.CHARGE ? mo.getChargeMoney() : (mo.getOperationType() == OperationType.REFUND ? mo.getChargeMoney() : "NULL")) + "," +
+		      mo.getCouponId() + "," +
+		      mo.getCouponMoney() + "," +
+		      "'" + mo.getCouponName() + "'," +
+		      mo.getDeltaBaseMoney() + "," + 
+		      mo.getDeltaExtraMoney() + "," + 
+		      mo.getDeltaPoint() + ","	+ 
+		      mo.getRemainingBaseMoney() + "," + 
+		      mo.getRemainingExtraMoney() + "," + 
+		      mo.getRemainingPoint() + "," +
+		      "'" + mo.getComment() + "'" + 
+		      ") ";
 		
-		int count = dbCon.stmt.executeUpdate(insertSQL, Statement.RETURN_GENERATED_KEYS);
+		int count = dbCon.stmt.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
 		//Get the generated id to this member operation. 
 		dbCon.rs = dbCon.stmt.getGeneratedKeys();
 		if(dbCon.rs.next()){
@@ -97,52 +102,20 @@ public class MemberOperationDao {
 	 * Insert a new member operation.
 	 * 
 	 * @param dbCon
-	 *            the database connection
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
 	 * @param mo
-	 *            the member operation to insert
+	 *          the member operation to insert
 	 * @return the row count for the SQL statements 
 	 * @throws SQLException
 	 *             Throws if failed to execute any SQL statements.
 	 */
-	public static int insert(Staff term, MemberOperation mo) throws SQLException {
+	public static int insert(Staff staff, MemberOperation mo) throws SQLException {
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return MemberOperationDao.insert(dbCon, term, mo);
-		}finally{
-			dbCon.disconnect();
-		}
-	}
-	
-	/**
-	 * 
-	 * @param dbCon
-	 * @param id
-	 * @param restaurantID
-	 * @return
-	 * @throws SQLException
-	 */
-	public static int deleteById(DBCon dbCon, int id) throws SQLException {
-		int count = 0;
-		String deleteSQL = " DELETE FROM " +
-					       Params.dbName + ".member_operation " + 
-					       " WHERE id = " + id; 
-		count = dbCon.stmt.executeUpdate(deleteSQL);
-		return count;
-	}
-	
-	/**
-	 * 
-	 * @param id
-	 * @param restaurantID
-	 * @return
-	 * @throws SQLException
-	 */
-	public static int deleteById(int id) throws SQLException {
-		DBCon dbCon = new DBCon();
-		try{
-			dbCon.connect();
-			return deleteById(dbCon, id);
+			return MemberOperationDao.insert(dbCon, staff, mo);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -188,28 +161,29 @@ public class MemberOperationDao {
 	 * @return
 	 * @throws SQLException
 	 */
-	public static List<MemberOperation> getToday(DBCon dbCon, Map<Object, Object> params) throws SQLException{
+	private static List<MemberOperation> getToday(DBCon dbCon, Map<Object, Object> params) throws SQLException{
 		List<MemberOperation> list = new ArrayList<MemberOperation>();
-		String querySQL = "SELECT"
-						+ " MO.id, MO.restaurant_id, MO.staff_id, MO.staff_name, " 
-						+ " MO.member_id, MO.member_card, MO.member_name, MO.member_mobile, "
-						+ " MO.operate_seq, MO.operate_date, MO.operate_type, MO.pay_type, MO.pay_money, MO.order_id, MO.charge_type, MO.charge_money,"
-						+ " MO.delta_base_money, MO.delta_extra_money, MO.delta_point, "
-						+ " MO.remaining_base_money, MO.remaining_extra_money, MO.remaining_point, MO.comment, "
-						+ " M.member_type_id "
-						+ " FROM member_operation MO LEFT JOIN member M ON MO.member_id = M.member_id "
-						+ " WHERE 1=1 ";
-		querySQL = SQLUtil.bindSQLParams(querySQL, params);
-		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
-		MemberOperation mo = null;
+		String sql;
+		sql = " SELECT " +
+			  " MO.id, MO.restaurant_id, MO.staff_id, MO.staff_name, " +
+			  " MO.member_id, MO.member_card, MO.member_name, MO.member_mobile, " +
+			  " MO.operate_seq, MO.operate_date, MO.operate_type, MO.pay_type, MO.pay_money, MO.order_id, MO.charge_type, MO.charge_money,"	+
+			  " MO.delta_base_money, MO.delta_extra_money, MO.delta_point, " +
+			  " MO.remaining_base_money, MO.remaining_extra_money, MO.remaining_point, MO.comment, " +
+			  " MO.coupon_id, MO.coupon_money, MO.coupon_name, " +
+			  " M.member_type_id " +
+			  " FROM member_operation MO LEFT JOIN member M ON MO.member_id = M.member_id "	+
+			  " WHERE 1=1 ";
+		sql = SQLUtil.bindSQLParams(sql, params);
+		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		while(dbCon.rs.next()){
-			mo = MemberOperation.newMO(dbCon.rs.getInt("member_id"), 
+			MemberOperation mo = MemberOperation.newMO(dbCon.rs.getInt("member_id"), 
 													   dbCon.rs.getString("member_name"), 
 													   dbCon.rs.getString("member_mobile"), 
 													   dbCon.rs.getString("member_card"));
 			mo.setId(dbCon.rs.getInt("id"));
 			mo.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
-			mo.setStaffID(dbCon.rs.getInt("staff_id"));
+			mo.setStaffId(dbCon.rs.getInt("staff_id"));
 			mo.setStaffName(dbCon.rs.getString("staff_name"));
 			mo.setOperateSeq(dbCon.rs.getString("operate_seq"));
 			mo.setOperateDate(dbCon.rs.getTimestamp("operate_date").getTime());
@@ -232,9 +206,12 @@ public class MemberOperationDao {
 			mo.setRemainingPoint(dbCon.rs.getInt("remaining_point"));
 			mo.setComment(dbCon.rs.getString("comment"));
 			
+			mo.setCouponId(dbCon.rs.getInt("coupon_id"));
+			mo.setCouponMoney(dbCon.rs.getFloat("coupon_money"));
+			mo.setCoupnName(dbCon.rs.getString("coupon_name"));
+			
 			list.add(mo);
 		}
-		mo = null;
 		return list;
 	}
 	
@@ -409,26 +386,27 @@ public class MemberOperationDao {
 	 */
 	public static List<MemberOperation> getHistory(DBCon dbCon, Map<Object, Object> params) throws SQLException{
 		List<MemberOperation> list = new ArrayList<MemberOperation>();
-		String querySQL = "SELECT"
-						+ " MO.id, MO.restaurant_id, MO.staff_id, MO.staff_name, " 
-						+ " MO.member_id, MO.member_card, MO.member_name, MO.member_mobile, "
-						+ " MO.operate_seq, MO.operate_date, MO.operate_type, MO.pay_type, MO.pay_money, MO.order_id, MO.charge_type, MO.charge_money,"
-						+ " MO.delta_base_money, MO.delta_extra_money, MO.delta_point, "
-						+ " MO.remaining_base_money, MO.remaining_extra_money, MO.remaining_point, MO.comment, "
-						+ " M.member_type_id "
-						+ " FROM member_operation_history MO LEFT JOIN member M ON MO.member_id = M.member_id "
-						+ " WHERE 1=1 ";
-		querySQL = SQLUtil.bindSQLParams(querySQL, params);
-		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
-		MemberOperation mo = null;
+		String sql;
+		sql = " SELECT " +
+			  " MO.id, MO.restaurant_id, MO.staff_id, MO.staff_name, " +
+			  " MO.member_id, MO.member_card, MO.member_name, MO.member_mobile, " +
+			  " MO.operate_seq, MO.operate_date, MO.operate_type, MO.pay_type, MO.pay_money, MO.order_id, MO.charge_type, MO.charge_money," +
+			  " MO.delta_base_money, MO.delta_extra_money, MO.delta_point, " +
+			  " MO.remaining_base_money, MO.remaining_extra_money, MO.remaining_point, MO.comment, " +
+			  " MO.coupon_id, MO.coupon_money, MO.coupon_name, " +
+			  " M.member_type_id " +
+			  " FROM member_operation_history MO LEFT JOIN member M ON MO.member_id = M.member_id " +
+			  " WHERE 1=1 ";
+		sql = SQLUtil.bindSQLParams(sql, params);
+		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		while(dbCon.rs.next()){
-			mo = MemberOperation.newMO(dbCon.rs.getInt("member_id"), 
+			MemberOperation mo = MemberOperation.newMO(dbCon.rs.getInt("member_id"), 
 													   dbCon.rs.getString("member_name"), 
 													   dbCon.rs.getString("member_mobile"), 
 													   dbCon.rs.getString("member_card"));
 			mo.setId(dbCon.rs.getInt("id"));
 			mo.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
-			mo.setStaffID(dbCon.rs.getInt("staff_id"));
+			mo.setStaffId(dbCon.rs.getInt("staff_id"));
 			mo.setStaffName(dbCon.rs.getString("staff_name"));
 			mo.setOperateSeq(dbCon.rs.getString("operate_seq"));
 			mo.setOperateDate(dbCon.rs.getTimestamp("operate_date").getTime());
@@ -450,9 +428,12 @@ public class MemberOperationDao {
 			mo.setRemainingPoint(dbCon.rs.getInt("remaining_point"));
 			mo.setComment(dbCon.rs.getString("comment"));
 			
+			mo.setCouponId(dbCon.rs.getInt("coupon_id"));
+			mo.setCouponMoney(dbCon.rs.getFloat("coupon_money"));
+			mo.setCoupnName(dbCon.rs.getString("coupon_name"));
+			
 			list.add(mo);
 		}
-		mo = null;
 		return list;
 	}
 	

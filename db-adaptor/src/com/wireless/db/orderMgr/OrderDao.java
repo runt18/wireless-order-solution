@@ -9,7 +9,6 @@ import com.wireless.db.Params;
 import com.wireless.db.regionMgr.TableDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.ProtocolError;
-import com.wireless.pojo.client.Member;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.OrderSummary;
 import com.wireless.pojo.distMgr.Discount;
@@ -295,10 +294,10 @@ public class OrderDao {
 				  " T.minimum_cost, T.service_rate AS tbl_service_rate, T.status AS table_status, " +
 				  " O.waiter, " +
 				  " O.region_id, O.region_name, O.restaurant_id, " +
-				  " O.member_id, O.member_operation_id, " +
+				  " O.member_operation_id, " +
 				  " O.settle_type, O.pay_type, O.category, O.status, O.service_rate, O.comment, " +
 				  " O.discount_id, DIST.name AS discount_name, " +
-				  " O.gift_price, O.cancel_price, O.discount_price, O.repaid_price, O.erase_price, O.total_price, O.actual_price " +
+				  " O.gift_price, O.cancel_price, O.discount_price, O.repaid_price, O.erase_price, O.coupon_price, O.total_price, O.actual_price " +
 				  " FROM " + 
 				  Params.dbName + ".order O " +
 				  " LEFT JOIN " + Params.dbName + ".table T " +
@@ -315,7 +314,7 @@ public class OrderDao {
 				  " OH.id, OH.order_date, OH.seq_id, OH.custom_num, OH.table_id, OH.table_alias, OH.table_name, " +
 				  " OH.waiter, " +
 				  " OH.region_id, OH.region_name, OH.restaurant_id, " +
-				  " OH.member_id, OH.member_operation_id, " +
+				  " OH.member_operation_id, " +
 				  " OH.settle_type, OH.pay_type, OH.category, OH.status, 0 AS discount_id, OH.service_rate, OH.comment, " +
 				  " OH.gift_price, OH.cancel_price, OH.discount_price, OH.repaid_price, OH.erase_price, OH.total_price, OH.actual_price " +
 				  " FROM " + Params.dbName + ".order_history OH " + 
@@ -373,7 +372,6 @@ public class OrderDao {
 			orderInfo.setPaymentType(dbCon.rs.getShort("pay_type"));
 			orderInfo.setSettleType(dbCon.rs.getShort("settle_type"));
 			if(orderInfo.isSettledByMember()){
-				orderInfo.setMember(new Member(dbCon.rs.getInt("member_id")));
 				orderInfo.setMemberOperationId(dbCon.rs.getInt("member_operation_id"));
 			}
 			orderInfo.setStatus(dbCon.rs.getInt("status"));
@@ -384,6 +382,7 @@ public class OrderDao {
 			orderInfo.setRepaidPrice(dbCon.rs.getFloat("repaid_price"));
 			orderInfo.setDiscountPrice(dbCon.rs.getFloat("discount_price"));
 			orderInfo.setErasePrice(dbCon.rs.getInt("erase_price"));
+			orderInfo.setCouponPrice(dbCon.rs.getFloat("coupon_price"));
 			orderInfo.setTotalPrice(dbCon.rs.getFloat("total_price"));
 			orderInfo.setActualPrice(dbCon.rs.getFloat("actual_price"));
 			

@@ -10,7 +10,7 @@ import com.wireless.db.Params;
 import com.wireless.pojo.billStatistics.ShiftGeneral;
 import com.wireless.pojo.staffMgr.Staff;
 
-public class QueryShiftGeneralDao {
+public class ShiftGeneralDao {
 
 	/**
 	 * Get the today shift general.

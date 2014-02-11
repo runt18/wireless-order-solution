@@ -89,7 +89,7 @@ public class TestMemberDao {
 	private void compareMemberOperation(MemberOperation expected, MemberOperation actual){
 		assertEquals("mo - id", expected.getId(), actual.getId());
 		assertEquals("mo - associated restaurant id", expected.getRestaurantId(), actual.getRestaurantId());
-		assertEquals("mo - staff id", expected.getStaffID(), actual.getStaffID());
+		assertEquals("mo - staff id", expected.getStaffId(), actual.getStaffId());
 		assertEquals("mo - member name", expected.getMemberName(), actual.getMemberName());
 		assertEquals("mo - member mobile", expected.getMemberMobile(), actual.getMemberMobile());
 		assertEquals("mo - member id", expected.getMemberId(), actual.getMemberId());
@@ -106,6 +106,9 @@ public class TestMemberDao {
 		assertEquals("mo - remaining base balance", expected.getRemainingBaseMoney(), actual.getRemainingBaseMoney(), 0.01);
 		assertEquals("mo - remaining extra balance", expected.getRemainingExtraMoney(), actual.getRemainingExtraMoney(), 0.01);
 		assertEquals("mo - remaining point", expected.getRemainingPoint(), actual.getRemainingPoint());
+		assertEquals("mo - coupon id", expected.getCouponId(), actual.getCouponId());
+		assertEquals("mo - coupon money", expected.getCouponMoney(), actual.getCouponMoney(), 0.01);
+		assertEquals("mo - coupon name", expected.getCouponName(), actual.getCouponName());
 	}
 	
 	@Test
@@ -273,15 +276,15 @@ public class TestMemberDao {
 		expect.charge(100, 120, ChargeType.CASH);
 		
 		//使用会员卡余额消费
-		MemberOperation mo = MemberDao.consume(mStaff, expect.getId(), 50, Order.PayType.MEMBER, 10);
-		expect.consume(50, Order.PayType.MEMBER);
+		MemberOperation mo = MemberDao.consume(mStaff, expect.getId(), 50, null,Order.PayType.MEMBER, 10);
+		expect.consume(50, null, Order.PayType.MEMBER);
 		
 		compareMember(expect, MemberDao.getMemberById(mStaff, expect.getId()));
 		compareMemberOperation(mo, MemberOperationDao.getTodayById(mo.getId()));
 		
 		//使用现金消费
-		mo = MemberDao.consume(mStaff, expect.getId(), 50, Order.PayType.CASH, 10);
-		expect.consume(50, Order.PayType.CASH);
+		mo = MemberDao.consume(mStaff, expect.getId(), 50, null, Order.PayType.CASH, 10);
+		expect.consume(50, null, Order.PayType.CASH);
 		
 		compareMember(expect, MemberDao.getMemberById(mStaff, expect.getId()));
 		compareMemberOperation(mo, MemberOperationDao.getTodayById(mo.getId()));

@@ -22,6 +22,7 @@ import com.wireless.pojo.client.MemberLevel;
 import com.wireless.pojo.client.MemberOperation;
 import com.wireless.pojo.client.MemberOperation.ChargeType;
 import com.wireless.pojo.client.MemberType;
+import com.wireless.pojo.coupon.Coupon;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.distMgr.Discount;
 import com.wireless.pojo.menuMgr.Food;
@@ -896,6 +897,8 @@ public class MemberDao {
 	 * 			the id to member account
 	 * @param consumePrice	
 	 * 			the price to consume
+	 * @param coupon
+	 * 			the coupon to use, null means no coupon
 	 * @param payType
 	 * 			the payment type referred to {@link Order.PayType}
 	 * @param orderId
@@ -908,12 +911,12 @@ public class MemberDao {
 	 *			1 - the consume price exceeds total balance to this member account<br>
 	 *			2 - the member account to consume is NOT found.
 	 */
-	public static MemberOperation consume(DBCon dbCon, Staff staff, int memberId, float consumePrice, Order.PayType payType, int orderId) throws SQLException, BusinessException{
+	public static MemberOperation consume(DBCon dbCon, Staff staff, int memberId, float consumePrice, Coupon coupon, Order.PayType payType, int orderId) throws SQLException, BusinessException{
 		
 		Member member = getMemberById(dbCon, staff, memberId);
 		
 		//Perform the consume operation and get the related member operation.
-		MemberOperation mo = member.consume(consumePrice, payType);
+		MemberOperation mo = member.consume(consumePrice, coupon, payType);
 		
 		//Set the associate order id
 		mo.setOrderId(orderId);
@@ -939,11 +942,14 @@ public class MemberDao {
 	
 	/**
 	 * Perform the consume operation to a member.
-	 * @param term	
+	 * @param staff	
+	 * 			the staff to perform this action
 	 * @param memberId 
 	 * 			the id to member account
 	 * @param consumePrice	
 	 * 			the price to consume
+	 * @param coupon
+	 * 			the coupon to use, null means no coupon 
 	 * @param payType
 	 * 			the payment type referred to {@link Order.PayType}
 	 * @param orderId
@@ -953,16 +959,16 @@ public class MemberDao {
 	 * 			throws if failed to execute any SQL statements.
 	 * @throws BusinessException
 	 *	 		throws if one of cases below occurred<br>
-	 *			1 - the consume price exceeds total balance to this member account<br>
-	 *			2 - the member account to consume is NOT found.
+	 *			<li>the consume price exceeds total balance to this member account<br>
+	 *			<li>the member account to consume is NOT found.
 	 */
-	public static MemberOperation consume(Staff term, int memberId, float consumePrice, Order.PayType payType, int orderId) throws SQLException, BusinessException{
+	public static MemberOperation consume(Staff staff, int memberId, float consumePrice, Coupon coupon, Order.PayType payType, int orderId) throws SQLException, BusinessException{
 		
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
 			dbCon.conn.setAutoCommit(false);
-			MemberOperation mo = MemberDao.consume(dbCon, term, memberId, consumePrice, payType, orderId);
+			MemberOperation mo = MemberDao.consume(dbCon, staff, memberId, consumePrice, coupon, payType, orderId);
 			dbCon.conn.commit();
 			return mo;
 			
