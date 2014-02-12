@@ -2,13 +2,17 @@ package com.wireless.pojo.coupon;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import com.wireless.json.Jsonable;
 import com.wireless.pojo.client.Member;
+import com.wireless.pojo.util.DateUtil;
 import com.wireless.pojo.util.SortedList;
 
 
-public class Coupon {
+public class Coupon implements Jsonable{
 
 	public static class InsertAllBuilder{
 		private final int couponTypeId;
@@ -137,7 +141,7 @@ public class Coupon {
 	public long getBirthDate() {
 		return birthDate;
 	}
-
+	
 	public void setBirthDate(long birthDate) {
 		this.birthDate = birthDate;
 	}
@@ -229,5 +233,25 @@ public class Coupon {
 		return "coupon(id = " + getId() +
 				",status = " + getStatus().getDesc() + 
 				(couponType != null ? ",type = " + couponType + "" : "") + ")";
+	}
+
+	@Override
+	public Map<String, Object> toJsonMap(int flag) {
+		Map<String, Object> jm = new HashMap<String, Object>();
+		jm.put("member", this.member);
+		jm.put("couponId", this.id);
+		jm.put("restaurantId", this.restaurantId);
+		jm.put("couponType", this.couponType);
+		jm.put("orderId", this.orderId);
+		jm.put("orderDate", DateUtil.formatToDate(this.getBirthDate()));
+		jm.put("statusText", this.status.desc);
+		jm.put("statusValue", this.status.val);
+		
+		return Collections.unmodifiableMap(jm);
+	}
+
+	@Override
+	public List<Object> toJsonList(int flag) {
+		return null;
 	}
 }
