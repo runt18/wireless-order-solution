@@ -567,6 +567,23 @@
 		<action path="/QueryCommissionTotal" type="com.wireless.Actions.dishesOrder.QueryCommissionTotalAction"
 			scope="request">
 		</action>
+		
+		<action path="/QueryCouponType"
+			type="com.wireless.Actions.couponMgr.QueryCouponTypeAction"
+			scope="request" parameter="dataSource">
+		</action>
+		<action path="/OperateCouponType"
+			type="com.wireless.Actions.couponMgr.OperateCouponTypeAction"
+			scope="request" parameter="dataSource">
+		</action>
+		<action path="/QueryCoupon"
+			type="com.wireless.Actions.couponMgr.QueryCouponAction"
+			scope="request" >
+		</action>
+		<action path="/OperateCoupon"
+			type="com.wireless.Actions.couponMgr.OperateCouponAction"
+			scope="request" parameter="dataSource">
+		</action>
 	</action-mappings>
 
 	<message-resources parameter="com.yourcompany.struts.ApplicationResources" />
