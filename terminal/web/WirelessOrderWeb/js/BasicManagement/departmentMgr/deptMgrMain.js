@@ -3,16 +3,13 @@
 /**
  * 修改部门信息
  */
-function updateKitchen(){
-	if(!Ext.ux.getSelData(kitchenGrid)){
-		Ext.example.msg('提示', '请选中一个分厨再进行操作.');
-		return;
-	}
-	updateKitchenWin = Ext.getCmp('dept_updateKitchenWin');
-	if(!updateKitchenWin){
-		updateKitchenWin = new Ext.Window({
-			id : 'dept_updateKitchenWin',
-			title : '修改分厨信息',
+function initCouponTypeWin(){
+
+	operateCouponTypeWin = Ext.getCmp('operateCouponTypeWin');
+	if(!operateCouponTypeWin){
+		operateCouponTypeWin = new Ext.Window({
+			id : 'operateCouponTypeWin',
+			title : '添加优惠劵类型',
 			closable : false,
 			resizable : false,
 			modal : true,
@@ -24,101 +21,80 @@ function updateKitchen(){
 				labelWidth : 65,
 				frame : true,
 				items : [{
-					xtype : 'hidden',
-					id : 'txtKitchenID',
-					fieldLabel : '厨房编号'
-				}, {
 					xtype : 'textfield',
-					id : 'txtKitchenName',
+					id : 'txtCouponTypeName',
 					width : 130,
-					fieldLabel : '厨房名称',
+					fieldLabel : '名称',
 					allowBlank : false
 				}, {
- 	    	    	xtype : 'combo',
- 	    	    	id : 'comboKitchenDept',
- 	    	    	fieldLabel : '所属部门',
- 	    	    	width : 130,
- 	    	    	store : new Ext.data.JsonStore({
-						fields : [ 'deptID', 'deptName', 'type'],
-						root : 'root'
-					}),
-					valueField : 'deptID',
-					displayField : 'deptName',
-					mode : 'local',
-					triggerAction : 'all',
-					typeAhead : true,
-					selectOnFocus : true,
-					forceSelection : true,
+					xtype : 'numberfield',
+					id : 'numCouponPrice',
+					width : 130,
+					fieldLabel : '代金额',
+					allowBlank : false
+				},{
+					id : 'dateForExpired',
+					xtype : 'datefield',
+					width : 130,
+					fieldLabel : '日期',
+					format : 'Y-m-d',
+					readOnly : true,
 					allowBlank : false,
-					blankText : '该项部门不能为空.'
- 	    	    }, {
- 	    	    	xtype : 'combo',
- 	    	    	id : 'comboIsAllowTemp',
- 	    	    	fieldLabel : '允许临时菜',
- 	    	    	width : 130,
- 	    	    	value : 0,
- 	    	    	store : new Ext.data.SimpleStore({
-						fields : [ 'value', 'text'],
-						data : [[0,'否'], [1, '是']]
-					}),
-					valueField : 'value',
-					displayField : 'text',
-					mode : 'local',
-					triggerAction : 'all',
-					typeAhead : true,
-					selectOnFocus : true,
-					forceSelection : true,
-					allowBlank : false,
-					blankText : '该项不能为空.'
- 	    	    }]
+					blankText : '日期不能为空.'
+				},{
+					xtype : 'textarea',
+					id : 'txtDirectionsForCouponType',
+					fieldLabel : '备注',
+					width : 130
+				},{
+					xtype : 'hidden',
+					id : 'txtCouponTypeId'
+				}]
 			}],
 			bbar : [
 				'->',
 				{
 					text : '保存',
-					id : 'btnSaveUpdateKitchen',
+					id : 'btnSaveCoupon',
 					iconCls : 'btn_save',
 					handler : function(){
 						
-						var kitchenID = Ext.getCmp('txtKitchenID');
-						var kitchenName = Ext.getCmp('txtKitchenName');
-						var kitchenDept = Ext.getCmp('comboKitchenDept');
-						var isAllowTemp = Ext.getCmp('comboIsAllowTemp');
+						var id = Ext.getCmp('txtCouponTypeId');
+						var name = Ext.getCmp('txtCouponTypeName');
+						var price = Ext.getCmp('numCouponPrice');
+						var date = Ext.getCmp('dateForExpired');
+						var dataSource = 'insert';
 						
-						if(!kitchenName.isValid() || !kitchenDept.isValid() || !isAllowTemp.isValid()){
-							return;
+						if(operateCouponTypeWin.otype == 'insert') {
+							dataSource = 'insert';
+						}else if(operateCouponTypeWin.otype == 'update'){
+							dataSource = 'update';
 						}
 						
-						var save = Ext.getCmp('btnSaveUpdateKitchen');
-						var cancel = Ext.getCmp('btnCancelUpdateKitchen');
-						
-						save.setDisabled(true);
-						cancel.setDisabled(true);
+						if(!name.isValid() || !price.isValid() || !date.isValid()){
+							return;
+						}
 						Ext.Ajax.request({
-							url : '../../UpdateKitchen.do',
+							url : '../../OperateCouponType.do',
 							params : {
-								restaurantID : restaurantID,
-								kitchenID : kitchenID.getValue(),
-								kitchenName : kitchenName.getValue(),
-								deptID : kitchenDept.getValue(),
-								isAllowTemp : isAllowTemp.getValue()
+								dataSource : dataSource,
+								typeId : id.getValue(),
+								typeName : name.getValue(),
+								price : price.getValue(),
+								date : date.getValue().getTime()
 							},
 							success : function(res, opt){
 								var jr = Ext.util.JSON.decode(res.responseText);
 								if(jr.success){
 									Ext.example.msg(jr.title, jr.msg);
-									updateKitchenWin.hide();
-									Ext.getCmp('btnSearchKitchen').handler();
+									operateCouponTypeWin.hide();
+									couponTree.getRootNode().reload();
 								}else{
 									Ext.ux.showMsg(jr);
 								}
-								save.setDisabled(false);
-								cancel.setDisabled(false);
 							},
 							failure : function(res, opt) {
 								Ext.ux.showMsg(Ext.util.JSON.decode(res.responseText));
-								save.setDisabled(false);
-								cancel.setDisabled(false);
 							}
 						});
 						
@@ -128,157 +104,312 @@ function updateKitchen(){
 					id : 'btnCancelUpdateKitchen',
 					iconCls : 'btn_close',
 					handler : function(){
-						updateKitchenWin.hide();
+						operateCouponTypeWin.hide();
 					}
 				}
 			],
-			listeners : {
-				show : function(){
-					var sd = Ext.ux.getSelData(kitchenGrid);
-					var kitchenID = Ext.getCmp('txtKitchenID');
-					var kitchenName = Ext.getCmp('txtKitchenName');
-					var kitchenDept = Ext.getCmp('comboKitchenDept');
-					var isAllowTemp = Ext.getCmp('comboIsAllowTemp');
-					
-					var root = {root:[]};
-					for(var i = 0; i < deptData.length; i++){
-						if(deptData[i].type == 0)
-							root.root.push(deptData[i]);
-					}
-					kitchenDept.store.loadData(root);
-					
-					kitchenID.setValue(sd.id);
-					kitchenName.setValue(sd.name);
-					kitchenDept.setValue(sd.dept.id);
-					isAllowTemp.setValue(sd.isAllowTmp);
-					kitchenName.focus(true, 100);
-				}
-			},
 			keys : [{
 				 key : Ext.EventObject.ENTER,
 				 fn : function(){ 
-					 Ext.getCmp('btnSaveUpdateKitchen').handler();
+					 Ext.getCmp('btnSaveCoupon').handler();
 				 },
 				 scope : this 
 			 }]
 		});
 	}
-	
-	updateKitchenWin.show();
-	updateKitchenWin.center();
 };
 
-kitchenOperationRenderer = function(){
-	return '<a href="javascript:updateKitchen()">修改</a>';
-};
 
-function updateDeptHandler(){
-	var node = Ext.ux.getSelNode(deptTree);
-	
-	if(!node || node.attributes.deptID == -1){
-		Ext.example.msg('提示', '请选中一个部门再进行操作.');
-		return;
+function getMemberCounts(){
+	var memberTypes = '';
+	var checkMemberTypes = document.getElementsByName('memberType');
+	for (var i = 0; i < checkMemberTypes.length; i++) {
+		if(checkMemberTypes[i].checked && memberTypes == ''){
+			memberTypes += checkMemberTypes[i].value;
+		}else if(checkMemberTypes[i].checked && memberTypes != ''){
+			memberTypes += (',' + checkMemberTypes[i].value);
+		}
 	}
+	var gs = memberCountGrid.getStore();
+	gs.load({params : {
+		memberTypes : memberTypes
+	}});
+}
+
+function initSendCouponWin(floatBarNodeId){
+	memberCountGrid = createGridPanel(
+		'memberCount',
+		'',
+		'300',
+		'',
+		'../../QueryMember.do',
+		[
+		    [true, false, false, false], 
+			['会员类型', 'name',,'center'] , 
+			['数量', 'memberCount',,'right']
+		],
+		['name','memberCount'],
+		[ ['isPaging', false], ['dataSource', 'count']],
+		0,
+		'',
+		''
+	);
+	memberCountGrid.region = 'center';
+	memberCountGrid.getStore().on('load', function(store, records, options){
+		
+		if(store.getCount() > 0){
+			var sumRow = memberCountGrid.getView().getRow(store.getCount() - 1);	
+			sumRow.style.backgroundColor = '#EEEEEE';			
+			for(var i = 0; i < memberCountGrid.getColumnModel().getColumnCount(); i++){
+				var sumCell = memberCountGrid.getView().getCell(store.getCount() - 1, i);
+				sumCell.style.fontSize = '15px';
+				sumCell.style.fontWeight = 'bold';	
+				sumCell.style.color = 'green';
+			}
+			memberCountGrid.getView().getCell(store.getCount()-1, 1).innerHTML = '发放总数';
+		}
+	});
 	
-	if(node.attributes.type == 1){
-		Ext.example.msg('提示', '<<font color="red">' + node.text + '</font>>为系统保留部门,不允许修改.');
-		return;
-	}
-	
-	if(!updateDeptWin){
-		updateDeptWin = new Ext.Window({
-			title : '修改部门信息',
-			closable : false,
-			resizable : false,
-			modal : true,
-			width : 230,
+	sendCouponWin = new Ext.Window({
+		id : 'sendCouponWin',
+		title : '发放优惠劵',
+		closable : false,
+		resizable : false,
+		modal : true,
+		width : 600,			
+		items : [{
+			xtype : 'form',
+			layout : 'form',
+			width : 590,
+			frame : true,
 			items : [{
-				xtype : 'form',
-				layout : 'form',
-				frame : true,
-				labelWidth : 65,
-				items : [{
-					xtype : 'textfield',
-					id : 'txtDeptID',
-					fieldLabel : '部门编号',
-					readOnly : true,
-					disabled : true,
-					width : 130
-				}, {
-					xtype : 'textfield',
-					id : 'txtDeptName',
-					fieldLabel : '部门名称',
-					width : 130
-				}]
-			}],
-			bbar : [
-			'->',
-			{
-				text : '保存',
-				id : 'btnSaveUpdateDept',
+				xtype : 'label',
+				width : 130,
+				fieldLabel : '会员类型'
+			},{
+				//所有厨房
+				columnWidth : 1,
+				layout : 'column',
+				id : 'allMemberType',
+				defaults : {
+					columnWidth : .2,
+					layout : 'form',
+					labelWidth : 70
+				}
+			}, 	new Ext.Panel({
+				layout : 'border',
+				height : 300,
+				border : false,
+				frame : false,
+				items : [memberCountGrid]
+			})]
+		}],
+		listeners : {
+			show : function(){
+				Ext.Ajax.request({
+					url : '../../QueryMemberType.do',
+					params : {
+						dataSource : 'normal'
+					},
+					success : function(res, opt){
+						var jr = Ext.decode(res.responseText);
+						
+						if(jr.success){
+							for ( var i = 0; i < jr.root.length; i++) {
+								
+								var m = jr.root[i];
+								var c = {items : [{
+									xtype : "checkbox", 
+									name : "memberType",
+									boxLabel : m.name , 
+									hideLabel : true, 
+									inputValue : m.id ,
+									listeners : {
+										check : function(){
+											getMemberCounts();
+										}
+									}
+								}]};
+								Ext.getCmp('allMemberType').add(c);
+								if((i+1)%5 == 0){
+									Ext.getCmp('allMemberType').add({columnWidth : 1});
+								}
+								Ext.getCmp('allMemberType').doLayout();
+							
+							}
+							
+						}else{
+							Ext.ux.showMsg(jr);
+						}
+				
+					},
+					failure : function(res, opt){
+						Ext.ux.showMsg(Ext.decode(res.responseText));
+					}
+				
+					
+				});
+				
+			}
+		},
+		bbar : ['->',{
+				text : '发放',
+				id : 'btnSaveFunc',
 				iconCls : 'btn_save',
-				handler : function(){
-					var deptID = Ext.getCmp('txtDeptID');
-					var deptName = Ext.getCmp('txtDeptName');
+				handler : function(e){
+					var memberTypes = '';
+					var checkMemberTypes = document.getElementsByName('memberType');
+					for (var i = 0; i < checkMemberTypes.length; i++) {
+						if(checkMemberTypes[i].checked && memberTypes == ''){
+							memberTypes += checkMemberTypes[i].value;
+						}else if(checkMemberTypes[i].checked && memberTypes != ''){
+							memberTypes += (',' + checkMemberTypes[i].value);
+						}
+					}
+					var node = couponTree.getNodeById(floatBarNodeId);
+					if(!node){
+						Ext.ux.showMsg({title : '提示', msg : '请选中一个优惠劵',success : true});
+						return;
+					}
+					
+					if(memberTypes == ''){
+						Ext.ux.showMsg({title : '提示', msg : '请选中一个会员类型', success : true});
+						return;
+					}
 					
 					Ext.Ajax.request({
-						url : '../../UpdateDepartment.do',
+						url : '../../OperateCoupon.do',
 						params : {
-							restaurantID : restaurantID,
-							deptID : deptID.getValue(),
-							deptName : deptName.getValue()
+							memberTypes : memberTypes,
+							typeId : node.attributes.couponTypeId,
+							dataSource : 'insert'
 						},
 						success : function(res, opt){
-							var jr = Ext.util.JSON.decode(res.responseText);
-							Ext.example.msg(jr.title, jr.msg);
-							updateDeptWin.hide();
-							deptTree.getRootNode().reload();
+							var jr = Ext.decode(res.responseText);
+							if(jr.success){
+								Ext.getCmp('couponGrid').store.reload();
+								Ext.example.msg(jr.title, jr.msg);
+								Ext.getCmp('btnCancelSendCoupon').handler();
+							}else{
+								Ext.ux.showMsg(jr);
+							}
 						},
-						failure : function(res, opt) {
-							Ext.ux.showMsg(Ext.util.JSON.decode(res.responseText));
+						failure : function(res, opt){
+							Ext.ux.showMsg(Ext.decode(res.responseText));
 						}
 					});
 				}
 			}, {
-				text : '关闭',
+				text : '取消',
+				id : 'btnCancelSendCoupon',
 				iconCls : 'btn_close',
 				handler : function(){
-					updateDeptWin.hide();
+/*					sendCouponWin.hide();
+					var checkMemberTypes = document.getElementsByName('memberType');
+					for (var i = 0; i < checkMemberTypes.length; i++) {
+						if(checkMemberTypes[i].checked){
+							checkMemberTypes[i].checked = false;
+						}
+					}
+					memberCountGrid.getStore().removeAll();*/
+					sendCouponWin.destroy();
 				}
-			}],
-			listeners : {
-				show : function(){
-					var node = Ext.ux.getSelNode(deptTree);
-					Ext.getCmp('txtDeptID').setValue(node.attributes.deptID);
-					Ext.getCmp('txtDeptName').setValue(node.text);
-					
-					var deptName = Ext.getCmp("txtDeptName");
-					deptName.focus(true, 100);
-				}
-			},
-			keys : [{
-				 key : Ext.EventObject.ENTER,
-				 fn : function(){ 
-					 Ext.getCmp('btnSaveUpdateDept').handler();
-				 },
-				 scope : this 
-			 }]
+			}]
 		});
 	}
 	
-	updateDeptWin.show();
-	updateDeptWin.center();
+function couponTypeOperation(c){
+	if(c == null || typeof c == 'undefined'){
+		return;
+	}
+	var id = Ext.getCmp('txtCouponTypeId');
+	var name = Ext.getCmp('txtCouponTypeName');
+	var price = Ext.getCmp('numCouponPrice');
+	var date = Ext.getCmp('dateForExpired');
+	
+	var data = c.data == null || typeof c.data == 'undefined' ? {attributes : {}} : c.data;
+	
+	if(c.otype == 'insert'){
+		operateCouponTypeWin.otype = 'insert';
+		price.enable();
+	}else if(c.otype == 'update'){
+		if(!data){
+			Ext.example.msg('提示', '请选中一个数据再进行操作.');
+			return;
+		}
+		operateCouponTypeWin.otype = 'update';
+		price.disable();
+	}
+	
+	operateCouponTypeWin.show();
+	operateCouponTypeWin.center();
+	
+	id.setValue(data.attributes.couponTypeId);
+	name.setValue(data.text);
+	price.setValue(data.attributes.price);
+	date.setValue(data.attributes.date);
+	name.focus(true, 100);
+	
+	name.clearInvalid();
+	price.clearInvalid();
+	date.clearInvalid();
 }
 
-var deptTree;
+function floatBarUpdateHandler(){
+	couponTypeOperation({otype : 'update', data : Ext.ux.getSelNode(couponTree)});	
+}
+
+function floatBarSendCouponHandler(){
+	initSendCouponWin(floatBarNodeId);
+	sendCouponWin.show();
+}
+
+function floatBarDeleteHandler(){
+	var node = Ext.ux.getSelNode(couponTree);
+	if(!node){
+		Ext.example.msg('提示', '操作失败, 请选中一条数据再进行操作.');
+		return;
+	}
+	Ext.Msg.confirm(
+		'提示',
+		'是否删除: ' + node.text,
+		function(e){
+			if(e == 'yes'){
+				Ext.Ajax.request({
+					url : '../../OperateCouponType.do',
+					params : {
+						typeId : node.attributes.couponTypeId,
+						dataSource : 'delete'
+					},
+					success : function(res, opt){
+						var jr = Ext.util.JSON.decode(res.responseText);
+						if(jr.success){
+							Ext.example.msg(jr.title, String.format(Ext.ux.txtFormat.deleteSuccess, node.text));
+							couponTree.getRootNode().reload();
+						}else{
+							Ext.ux.showMsg(jr);
+						}
+					},
+					failure : function(res, opt){
+						Ext.ux.showMsg(Ext.util.JSON.decode(res.responseText));
+					}
+				});
+			}
+		}
+	);
+}
+
+
+var couponTree;
 var updateDeptWin;
-var kitchenGrid;
-var updateKitchenWin;
-var deptTreeFloat_obj = {treeId : 'cancelledFoodDeptTree', option : [{name : '修改', fn : 'updateDeptHandler()'}]};
+var couponGrid, memberCountGrid;
+var operateCouponTypeWin, sendCouponWin;
+var bar = {treeId : 'couponTypeTree', option :[{name : '发放', fn : "floatBarSendCouponHandler()"}, {name : '修改', fn : "floatBarUpdateHandler()"}, {name : '删除', fn : "floatBarDeleteHandler()"}]};
 Ext.onReady(function() {
-	deptTree = new Ext.tree.TreePanel({
-		title : '部门信息',
-		id : 'cancelledFoodDeptTree',
+	initCouponTypeWin();
+	couponTree = new Ext.tree.TreePanel({
+		title : '优惠劵信息',
+		id : 'couponTypeTree',
 		region : 'west',
 		width : 200,
 		border : true,
@@ -286,146 +417,139 @@ Ext.onReady(function() {
 		frame : true,
 		bodyStyle : 'backgroundColor:#FFFFFF; border:1px solid #99BBE8;',
 		loader : new Ext.tree.TreeLoader({
-			dataUrl : '../../QueryDeptTree.do?time='+new Date(),
+			dataUrl : '../../QueryCouponType.do',
 			baseParams : {
-				'restaurantID' : restaurantID
+				dataSource : 'tree'
 			}
 		}),
 		root : new Ext.tree.AsyncTreeNode({
 			expanded : true,
-			text : '全部部门',
+			text : '全部类型',
 	        leaf : false,
 	        border : true,
-	        deptID : -1,
-	        cls : 'floatBarStyle',
+	        couponTypeId : -1,
 	        listeners : {
 	        	load : function(){
-	        		var treeRoot = deptTree.getRootNode().childNodes;
-	        		if(treeRoot.length > 0){
-	        			deptData = [];
-	        			for(var i = (treeRoot.length - 1); i >= 0; i--){
-	    					if(treeRoot[i].attributes.deptID == 255 || treeRoot[i].attributes.deptID == 253){
-	    						deptTree.getRootNode().removeChild(treeRoot[i]);
-	    					}
-	    				}
-	        			for(var i = 0; i < treeRoot.length; i++){
-	        				var tp = {};
-	        				tp.type = treeRoot[i].attributes.type;
-	        				tp.deptID = treeRoot[i].attributes.deptID;
-	        				tp.deptName = treeRoot[i].text;
-	        				deptData.push(tp);
-	        			}
-	        			Ext.getCmp('btnRefreshSearchKitchen').handler();
-	        		}else{
-	        			deptTree.getRootNode().getUI().hide();
-	        			Ext.Msg.show({
-	        				title : '提示',
-	        				msg : '加载部门信息失败.',
-	        				buttons : Ext.MessageBox.OK
-	        			});
-	        		}
+//	        		var treeRoot = couponTree.getRootNode().childNodes;
+	        		
 	        	}
 	        }
 		}),
 		tbar : [
-		    '->',
+		    '->', 
 		    {
-				text : '修改',
-				iconCls : 'btn_edit',
+				text : '添加',
+				iconCls : 'btn_add',
 				handler : function(e){
-					updateDeptHandler();					
+					couponTypeOperation({otype : 'insert', data : null});				
 				}
-			}, {
+			},{
 				text : '刷新',
 				iconCls : 'btn_refresh',
 				handler : function(){
-					deptTree.getRootNode().reload();
+					couponTree.getRootNode().reload();
 				}
 			}
 		],
 		listeners : {
 			click : function(e){
-				Ext.getCmp('btnSearchKitchen').handler();
-				Ext.getDom('deptNameShowType').innerHTML = e.text;
+				Ext.getCmp('btnSearchCoupon').handler();
+				Ext.getDom('couponTypeNameShowType').innerHTML = e.text;
 			}
 		}
 	});
 	
-	var kitchenGridTbar = new Ext.Toolbar({
+	var coupon_dateCombo = new Ext.form.ComboBox({
+		xtype : 'combo',
+		id : 'coupon_statusCombo',
+		forceSelection : true,
+		width : 100,
+		store : new Ext.data.SimpleStore({
+			fields : ['value', 'text']
+		}),
+		valueField : 'value',
+		displayField : 'text',
+		typeAhead : true,
+		mode : 'local',
+		triggerAction : 'all',
+		selectOnFocus : true,
+		listeners : {
+			render : function(thiz){
+				thiz.store.loadData([[1,'已发放'], [2,'已使用'], [3,'已过期']]);					
+			},
+			select : function(thiz, record, index){
+				Ext.getCmp('btnSearchCoupon').handler();
+			}
+		}
+	});
+	
+	var couponGridTbar = new Ext.Toolbar({
 		height : 26,
 		items : [
-		    {xtype:'tbtext', text:String.format(Ext.ux.txtFormat.typeName, '部门', 'deptNameShowType', '----')},
+		    {xtype:'tbtext', text:String.format(Ext.ux.txtFormat.typeName, '类型', 'couponTypeNameShowType', '----')},
 		    {xtype:'tbtext', text:'&nbsp;&nbsp;'},
-//		    {xtype:'tbtext', text:'分厨名称:'},
-		    {
-		    	xtype : 'hidden',
-		    	id : 'txtSearchKitchenName'
-		    },
+			{
+				xtype : 'tbtext',
+				text : '状态:'
+			}, coupon_dateCombo,{
+				xtype : 'tbtext',
+				text : '&nbsp;&nbsp;'
+			},{
+				xtype : 'tbtext',
+				text : '会员信息:'
+			},{
+		    	xtype : 'textfield',
+		    	id : 'txtSearchMemberDetail'
+	    	},
 			'->',
 			{
 				text : '搜索',
-				id : 'btnSearchKitchen',
+				id : 'btnSearchCoupon',
 				iconCls : 'btn_search',
 				handler : function(){
-					var deptID = '';
-					var kitchenName = Ext.getCmp('txtSearchKitchenName').getValue();
+					var couponTypeId = '';
 					
-					var sn = deptTree.getSelectionModel().getSelectedNode();
-					deptID = !sn ? deptID : sn.attributes.deptID;
-					kitchenName = kitchenName.replace(/(^\s*)|(\s*$)/g, '');
+					var sn = couponTree.getSelectionModel().getSelectedNode();
+					couponTypeId = !sn ? couponTypeId : sn.attributes.couponTypeId;
+					var memberDetail = Ext.getCmp('txtSearchMemberDetail').getValue();
+					var gs = couponGrid.getStore();
+					gs.baseParams['couponTypeId'] = couponTypeId;
+					gs.baseParams['memberName'] = isNaN(memberDetail)?memberDetail : '';
+					gs.baseParams['memberMobile'] = !isNaN(memberDetail)?memberDetail : '';
+					gs.baseParams['status'] = coupon_dateCombo.getValue();
 					
-					kitchenGrid.getStore().load({
+					gs.load({
 						params : {
 							start : 0,
-							limit : 50,
-							deptID : deptID,
-							kitchenName : kitchenName
+							limit : couponPageRecordCount
 						}
 					});
-				}
-			}, {
-				text : '修改',
-				iconCls : 'btn_edit',
-				handler : function(){
-					updateKitchen();
-				}
-			}, {
-				text : '重置',
-				id : 'btnRefreshSearchKitchen',
-				iconCls : 'btn_refresh',
-				handler : function(){
-					deptTree.getSelectionModel().clearSelections();
-					Ext.getDom('deptNameShowType').innerHTML = '----';
-					Ext.getCmp('txtSearchKitchenName').setValue();
-					Ext.getCmp('btnSearchKitchen').handler();
 				}
 			}
 		]
 	});
 	
-	kitchenGrid = createGridPanel(
-		'kitchenGrid',
-		'分厨信息',
+	couponGrid = createGridPanel(
+		'couponGrid',
+		'持有信息',
 		'',
 		'',
-		'../../QueryKitchen.do',
+		'../../QueryCoupon.do',
 		[
-		    [true, false, false, false], 
-			['厨房编号', 'alias', '50'] , 
-			['厨房名称', 'name'] , 
-			['所属部门', 'dept.name', '', , 'function(v){if(v.length==0){ v = \"--\"; } return v;}'],
-			['是否允许临时菜', 'isAllowTmp', ,'center', 'function(val){return eval(val == 1) ? "是" : "否";}'],
-			['操作', 'operation', , 'center', 'kitchenOperationRenderer']
+		    [true, false, false, true], 
+			['会员姓名', 'member.name'] , 
+			['会员号码', 'member.mobile'] , 
+			['到期时间', 'couponType.expiredFormat'],
+			['状态', 'statusText']
 		],
-		KitchenRecord.getKeys(),
-		//['kitchenID', 'kitchenName', 'department', 'deptName', 'kitchenAlias', 'isAllowTemp'],
-		[ ['isPaging', false], ['dataSource', 'normal']],
-		0,
+		CouponRecord.getKeys(),
+		[ ['isPaging', true]],
+		couponPageRecordCount,
 		'',
-		kitchenGridTbar
+		couponGridTbar
 	);
-	kitchenGrid.region = 'center';
-	kitchenGrid.on('rowdblclick', function(){
+	couponGrid.region = 'center';
+	couponGrid.on('rowdblclick', function(){
 		updateKitchen();
 	});
 	
@@ -434,7 +558,7 @@ Ext.onReady(function() {
 		layout : 'border',
 		width : parseInt(Ext.getDom('divDept').parentElement.style.width.replace(/px/g,'')),
 		height : parseInt(Ext.getDom('divDept').parentElement.style.height.replace(/px/g,'')),
-		items : [deptTree, kitchenGrid]
+		items : [couponTree, couponGrid]
 	});
-	showFloatOption(deptTreeFloat_obj);
+	showFloatOption(bar);
 });

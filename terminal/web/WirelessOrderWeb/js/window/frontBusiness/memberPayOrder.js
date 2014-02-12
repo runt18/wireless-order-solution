@@ -171,12 +171,6 @@ Ext.onReady(function(){
 					fieldLabel : '剩余积分'
 				}]
 			}, 
-/*			{
-				items : [{
-					id : 'mpo_txtDiscountForPayOrder',
-					fieldLabel : '折扣方案'
-				}]
-			}, */
 			{
 				items : [{
 					xtype : 'combo',
@@ -199,8 +193,10 @@ Ext.onReady(function(){
 							Ext.Ajax.request({
 								url : '../../QueryOrderFromMemberPay.do',
 								params : {
-									
+									st : 'mobile',
+									sv :  Ext.getCmp('mpo_numMemberMobileForPayOrder').getValue(),
 									discountId : thiz.getValue(),
+									couponId : Ext.getCmp('mpo_couponForPayOrder').getValue(),
 									orderID : orderID
 								},
 								success : function(res, opt){
@@ -244,6 +240,17 @@ Ext.onReady(function(){
 				}]
 			}, {
 				items : [{
+					xtype : 'numberfield',
+					id : 'mpo_numCustomNumberForPayOrder',
+					fieldLabel : '就餐人数',
+					value : 1,
+					allowBlank : false,
+					maxValue : 65535,
+					minValue : 1,
+					disabled : false
+				}]
+			}, {
+				items : [{
 					xtype : 'combo',
 					id : 'mpo_comPayMannerForPayOrder',
 					readOnly : true,
@@ -261,19 +268,60 @@ Ext.onReady(function(){
 				}]
 			}, {
 				items : [{
-					xtype : 'numberfield',
-					id : 'mpo_numCustomNumberForPayOrder',
-					fieldLabel : '就餐人数',
-					value : 1,
-					allowBlank : false,
-					maxValue : 65535,
-					minValue : 1,
-					disabled : false
+					xtype : 'combo',
+					id : 'mpo_couponForPayOrder',
+					readOnly : true,
+					forceSelection : true,
+					disabled : false,
+					fieldLabel : '优惠劵',
+					store : new Ext.data.SimpleStore({
+						fields : [ 'value', 'text' ]
+					}),
+					valueField : 'value',
+					displayField : 'text',
+					typeAhead : true,
+					mode : 'local',
+					triggerAction : 'all',
+					selectOnFocus : true,
+					listeners : {
+						select : function(thiz){
+							Ext.Ajax.request({
+								url : '../../QueryOrderFromMemberPay.do',
+								params : {
+									st : 'mobile',
+									sv :  Ext.getCmp('mpo_numMemberMobileForPayOrder').getValue(),
+									discountId : Ext.getCmp('mpo_txtDiscountForPayOrder').getValue(),
+									couponId : thiz.getValue(),
+									orderID : orderID
+								},
+								success : function(res, opt){
+									var jr = Ext.decode(res.responseText);
+									if(jr.success){
+										var no = jr.other.newOrder;
+										jr.other.member = mpo_memberDetailData.member; 
+										memberPayOrderToBindData({
+											data : jr
+										});	
+										mpo_memberDetailData.newOrder = no;
+										Ext.getCmp('mpo_txtMemberPriceForPayOrder').setValue(no['actualPrice'].toFixed(2));
+										Ext.getDom('mpo_txtPayMoneyForPayOrder').value = no['actualPrice'].toFixed(2);
+									}else{
+										Ext.example.msg(jr.title, jr.msg);
+									}
+								},
+								failure : function(res, opt){
+									Ext.ux.showMsg(Ext.decode(res.responseText));
+								}
+							});
+						}
+					}
 				}]
 			}]
 		}, 
 		mpo_orderFoodGrid, secondStepPanelSouth]
 	});
+	
+	Ext.getCmp('mpo_couponForPayOrder').getEl().up('.x-form-item').setDisplayed(false);
 });
 
 function loadSystemSetting(_c){
@@ -329,6 +377,7 @@ function memberPayOrderToBindData(_c){
 	var payManner = Ext.getCmp('mpo_comPayMannerForPayOrder');
 	var payMoney = Ext.getDom('mpo_txtPayMoneyForPayOrder');
 	var customNum = Ext.getCmp('mpo_numCustomNumberForPayOrder');
+	var coupon = Ext.getCmp('mpo_couponForPayOrder');
 	
 	var data = typeof _c.data == 'undefined' || typeof _c.data.other == 'undefined' ? {} : _c.data.other;
 	
@@ -337,6 +386,21 @@ function memberPayOrderToBindData(_c){
 	var discountMsg = typeof memberType.discount == 'undefined' ? {} : memberType.discount;
 	var discountMsgs = typeof memberType.discounts == 'undefined' ? {discounts:[{id:-1, name:'全部'}]} : memberType.discounts;
 	var newOrder = typeof data.newOrder == 'undefined' ? {} : data.newOrder;
+	
+	var coupons = typeof data.coupons == 'undefined' ? null : data.coupons;
+	
+	coupon.getEl().up('.x-form-item').setDisplayed(false);
+	if(coupons){
+		coupon.getEl().up('.x-form-item').setDisplayed(true);
+		var list = [];
+		for (var i = 0; i < coupons.length; i++) {
+			list.push([coupons[i].couponId, coupons[i].couponType.name]);
+		}
+		if(coupon.store.getCount() == 0){
+			coupon.store.loadData(list);
+		}
+	}
+	
 	
 	mobile.setValue(member['mobile']);
 	memberCard.setValue(member['memberCard']);

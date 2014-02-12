@@ -361,13 +361,13 @@ var allFoodTabPanelGridTbar = new Ext.Toolbar({
 	    listWidth : 100,
 	    value : -1,
 	    store : new Ext.data.JsonStore({
-			fields : [ 'alias', 'name' ],
+			fields : [ 'id', 'name' ],
 			data : [{
-				alias : -1,
+				id : -1,
 				name : '全部'
 			}]
 		}),
-		valueField : 'alias',
+		valueField : 'id',
 		displayField : 'name',
 		mode : 'local',
 		triggerAction : 'all',
@@ -427,9 +427,11 @@ var allFoodTabPanelGridTbar = new Ext.Toolbar({
 		handler : function(){
 			var searchType = Ext.getCmp('comSearchType').getValue();
 			var searchValue = '';
+			
 			if(orderMainObject.searchField != ''){
 				searchValue = Ext.getCmp(orderMainObject.searchField).getValue();
 			}
+			
 			var gs = allFoodTabPanelGrid.getStore();
 			gs.baseParams['kitchenAlias'] = searchType == 0 ? searchValue : '';
 			gs.baseParams['foodName'] = searchType == 1 ? searchValue : '';
