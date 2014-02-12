@@ -141,6 +141,38 @@ public class CouponDao {
 	}
 	
 	/**
+	 * Get the coupons to specific restaurant associated with the staff
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @return the coupons to specific restaurant 
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static List<Coupon> getAll(Staff staff) throws SQLException{ 
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return getAll(dbCon, staff);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Get the coupons to specific restaurant associated with the staff
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @return the coupons to specific restaurant 
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static List<Coupon> getAll(DBCon dbCon, Staff staff) throws SQLException{ 
+		return getByCond(dbCon, staff, null, null);
+	}
+	
+	/**
 	 * Get coupons to specific member.
 	 * @param staff
 	 * 			the staff to perform this action
