@@ -401,6 +401,28 @@ public class CouponDao {
 	
 	/**
 	 * Get the coupon to specific extra condition. 
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param extraCond
+	 * 			the extra condition
+	 * @param orderClause
+	 * 			the order clause
+	 * @return the coupons to specific extra condition
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static List<Coupon> getByCond(Staff staff, String extraCond, String orderClause) throws SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return getByCond(dbCon, staff, extraCond, orderClause);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Get the coupon to specific extra condition. 
 	 * @param dbCon
 	 * 			the database connection
 	 * @param staff
