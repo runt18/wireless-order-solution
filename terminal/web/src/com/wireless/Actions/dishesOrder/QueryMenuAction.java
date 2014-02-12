@@ -40,7 +40,7 @@ public class QueryMenuAction extends DispatchAction {
 		String limit = request.getParameter("limit");
 		try {
 			String pin = (String)request.getAttribute("pin");
-			String cond = null;
+			String cond = "";
 			String orderBy = null;
 			
 			
@@ -49,7 +49,7 @@ public class QueryMenuAction extends DispatchAction {
 			String foodName = request.getParameter("foodName");
 			String foodAlias = request.getParameter("foodAlias");
 			if(kitchenAlias != null && !kitchenAlias.trim().isEmpty() && !kitchenAlias.equals("-1")){
-				cond += (" AND FOOD.kitchen_alias = " + kitchenAlias);
+				cond += (" AND FOOD.kitchen_id = " + kitchenAlias);
 			}
 			if(foodName != null && !foodName.trim().isEmpty()){
 				cond += (" AND FOOD.name like '%" + foodName.trim() + "%'");

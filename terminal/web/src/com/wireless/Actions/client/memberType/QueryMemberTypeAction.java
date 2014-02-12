@@ -22,7 +22,6 @@ import com.wireless.pojo.client.Member;
 import com.wireless.pojo.client.MemberLevel;
 import com.wireless.pojo.client.MemberType;
 import com.wireless.pojo.staffMgr.Staff;
-import com.wireless.util.WebParams;
 
 public class QueryMemberTypeAction extends DispatchAction {
 	
@@ -46,7 +45,6 @@ public class QueryMemberTypeAction extends DispatchAction {
 		try{
 			
 			String pin = (String)request.getAttribute("pin");
-			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
 			String name = request.getParameter("name");
 			String attr = request.getParameter("attr");
@@ -60,15 +58,15 @@ public class QueryMemberTypeAction extends DispatchAction {
 				extraCond += (" AND MT.attribute = " + attr);
 			}
 			
-			list = MemberTypeDao.getMemberType(staff, extraCond, " ORDER BY MT.member_type_id ");
+			list = MemberTypeDao.getMemberType(StaffDao.verify(Integer.parseInt(pin)), extraCond, " ORDER BY MT.member_type_id ");
 			
 		}catch(BusinessException e){
 			e.printStackTrace();
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getCode(), e.getDesc());
+			jobject.initTip(e);
 			
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, WebParams.TIP_CODE_EXCEPTION, WebParams.TIP_CONTENT_SQLEXCEPTION);
+			jobject.initTip(e);
 		}finally{
 			jobject.setTotalProperty(list.size());
 			jobject.setRoot(list);

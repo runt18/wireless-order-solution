@@ -1,7 +1,10 @@
 package com.wireless.Actions.client.member;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -14,17 +17,84 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
 import com.wireless.db.client.member.MemberDao;
+import com.wireless.db.client.member.MemberTypeDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
+import com.wireless.json.Jsonable;
 import com.wireless.pojo.client.Member;
 import com.wireless.pojo.client.MemberType;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.util.DataPaging;
 import com.wireless.util.SQLUtil;
-import com.wireless.util.WebParams;
 
 public class QueryMemberAction extends DispatchAction {
+	
+	public ActionForward count(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		String memberType = request.getParameter("memberTypes");
+		String[] memberTypes = memberType.split(",");
+		String pin = (String) request.getAttribute("pin");
+		Staff staff = StaffDao.verify(Integer.parseInt(pin));
+		List<Jsonable> mts = new ArrayList<Jsonable>();
+		String extra = "";
+		JObject jobject = new JObject();
+		int sum = 0;
+		try{
+			for (int i = 0; i < memberTypes.length; i++) {
+				extra += " AND M.restaurant_id = " + staff.getRestaurantId();
+				extra += " AND M.member_type_id = " + memberTypes[i];
+				Map<Object, Object> paramsSet = new HashMap<Object, Object>();
+				paramsSet.put(SQLUtil.SQL_PARAMS_EXTRA, extra);
+				final MemberType mt = MemberTypeDao.getMemberTypeById(staff, Integer.parseInt(memberTypes[i]));
+				final int mc = MemberDao.getMemberCount(paramsSet);
+				mts.add(new Jsonable() {
+					
+					@Override
+					public Map<String, Object> toJsonMap(int flag) {
+						Map<String, Object> jm = new LinkedHashMap<String, Object>();
+						jm.put("name", mt.getName());
+						jm.put("memberCount", mc);
+						return Collections.unmodifiableMap(jm);
+					}
+					
+					@Override
+					public List<Object> toJsonList(int flag) {
+						return null;
+					}
+				});
+				sum += mc;
+				extra = "";
+			}
+			final int mTotal = sum;
+			mts.add(new Jsonable() {
+				@Override
+				public Map<String, Object> toJsonMap(int flag) {
+					Map<String, Object> jm = new LinkedHashMap<String, Object>();
+					jm.put("name", "总数");
+					jm.put("memberCount", mTotal);
+					return Collections.unmodifiableMap(jm);
+				}
+				
+				@Override
+				public List<Object> toJsonList(int flag) {
+					return null;
+				}
+			});
+			
+			jobject.setRoot(mts);
+		}catch(BusinessException e){
+			e.printStackTrace();
+		}catch(SQLException e){
+			e.printStackTrace();
+		}catch(Exception e){
+			e.printStackTrace();
+		}finally{
+			response.getWriter().print(jobject.toString());
+		}
+		return null;
+	}
 	
 	/**
 	 * 搜索
@@ -143,11 +213,11 @@ public class QueryMemberAction extends DispatchAction {
 			
 		}catch(BusinessException e){
 			e.printStackTrace();
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getCode(), e.getDesc());
+			jobject.initTip(e);
 			
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
+			jobject.initTip(e);
 			
 		}finally{
 			response.getWriter().print(jobject.toString());

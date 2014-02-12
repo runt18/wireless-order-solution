@@ -1,5 +1,7 @@
 package com.wireless.Actions.dishesOrder.singleOrder;
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -9,15 +11,16 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.client.member.MemberDao;
+import com.wireless.db.coupon.CouponDao;
 import com.wireless.db.frontBusiness.PayOrder;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.MemberError;
 import com.wireless.json.JObject;
 import com.wireless.pojo.client.Member;
+import com.wireless.pojo.coupon.Coupon;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.staffMgr.Staff;
-import com.wireless.util.WebParams;
 
 public class QueryOrderFromMemberPayAction extends Action{
 	
@@ -32,6 +35,7 @@ public class QueryOrderFromMemberPayAction extends Action{
 			String pin = (String)request.getAttribute("pin");
 			String orderID = request.getParameter("orderID");
 			String discountId = request.getParameter("discountId");
+			String couponId = request.getParameter("couponId");
 			String st = request.getParameter("st");
 			String sv = request.getParameter("sv");
 			
@@ -51,16 +55,26 @@ public class QueryOrderFromMemberPayAction extends Action{
 			}else{
 				payBuilder.setDiscountId(m.getMemberType().getDefaultDiscount().getId());
 			}
+			
+			if(couponId != null && !couponId.trim().isEmpty()){
+				payBuilder.setCouponId(Integer.parseInt(couponId));
+			}
 			Order order = PayOrder.calc(staff, payBuilder);
+			
+			List<Coupon> coupons = CouponDao.getByMember(staff, m.getId());
 			
 			jobject.getOther().put("member", m);
 			jobject.getOther().put("newOrder", order);
+			if(!coupons.isEmpty()){
+				jobject.getOther().put("coupons", coupons);
+			}
+			
 		}catch(BusinessException e){
 			e.printStackTrace();
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getCode(), e.getDesc());
+			jobject.initTip(e);
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, WebParams.TIP_CODE_EXCEPTION, WebParams.TIP_CONTENT_SQLEXCEPTION);
+			jobject.initTip(e);
 		}finally{
 			response.getWriter().print(jobject.toString());
 		}
