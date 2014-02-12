@@ -2,7 +2,6 @@ package com.wireless.db.deptMgr;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import com.mysql.jdbc.Statement;
@@ -359,6 +358,38 @@ public class KitchenDao {
 	}
 	
 	/**
+	 * Get the kitchens allow temporary food.
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @return the kitchens allow temporary food
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static List<Kitchen> getByAllowTemp(Staff staff) throws SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return getByAllowTemp(dbCon, staff);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Get the kitchens allow temporary food.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @return the kitchens allow temporary food
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static List<Kitchen> getByAllowTemp(DBCon dbCon, Staff staff) throws SQLException{
+		return getByCond(dbCon, staff, " AND K.is_allow_temp = 1 ", null);
+	}
+	
+	/**
 	 * Get the kitchens to a specified restaurant defined in {@link Staff} and other extra condition.
 	 * @param dbCon
 	 * 			the database connection
@@ -401,7 +432,7 @@ public class KitchenDao {
 			result.add(k);
 		}
 		dbCon.rs.close();
-		return Collections.unmodifiableList(result);
+		return result;
 		
 	}
 	

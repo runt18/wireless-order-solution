@@ -2,7 +2,6 @@ package com.wireless.db.deptMgr;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import com.wireless.db.DBCon;
@@ -127,7 +126,7 @@ public class DepartmentDao {
 		}
 		dbCon.rs.close();
 		
-		return Collections.unmodifiableList(result);
+		return result;
 	}
 	
 	/**
