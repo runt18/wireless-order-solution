@@ -13,7 +13,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.DBCon;
-import com.wireless.db.shift.QueryShiftDao;
+import com.wireless.db.shift.ShiftDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.billStatistics.ShiftDetail;
@@ -37,7 +37,7 @@ public class QueryShiftAction extends Action {
 			 */
 			String pin = (String)request.getAttribute("pin");
 					
-			ShiftDetail result = QueryShiftDao.execByNow(StaffDao.verify(dbCon, Integer.parseInt(pin)));
+			ShiftDetail result = ShiftDao.getCurrentShift(StaffDao.verify(dbCon, Integer.parseInt(pin)));
 			
 			/**
 			 * The json to shift record like below

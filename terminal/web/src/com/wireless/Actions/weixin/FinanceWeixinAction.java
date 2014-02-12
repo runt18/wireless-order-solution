@@ -54,10 +54,11 @@ import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.billStatistics.CalcBillStatisticsDao;
 import com.wireless.db.restaurantMgr.RestaurantDao;
-import com.wireless.db.shift.QueryShiftDao;
+import com.wireless.db.shift.ShiftDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.weixin.finance.WeixinFinanceDao;
 import com.wireless.exception.BusinessException;
+import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.billStatistics.IncomeByDept;
 import com.wireless.pojo.billStatistics.IncomeByEachDay;
 import com.wireless.pojo.billStatistics.ShiftDetail;
@@ -246,9 +247,8 @@ public class FinanceWeixinAction extends Action {
 				
 				dbCon.rs.close();
 				
-				ShiftDetail detail = QueryShiftDao.exec(dbCon, StaffDao.getStaffs(dbCon, restaurantId).get(0), 
-													    new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(onDuty), 
-													    new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(offDuty), 
+				ShiftDetail detail = ShiftDao.getByRange(dbCon, StaffDao.getStaffs(dbCon, restaurantId).get(0), 
+													    new DutyRange(onDuty, offDuty), 
 														DateType.HISTORY);
 				StringBuilder content = new StringBuilder();
 				content.append(centerAligned("最近日结") + "\n");

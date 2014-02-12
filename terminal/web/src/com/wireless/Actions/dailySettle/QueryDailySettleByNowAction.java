@@ -14,7 +14,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import com.wireless.db.shift.QueryShiftDao;
+import com.wireless.db.shift.ShiftDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.pojo.billStatistics.IncomeByDept;
 import com.wireless.pojo.billStatistics.ShiftDetail;
@@ -38,9 +38,9 @@ public class QueryDailySettleByNowAction extends Action{
 				return null;
 			
 			if(Integer.valueOf(queryType) == 0){
-				res = QueryShiftDao.execByNow(StaffDao.verify(Integer.parseInt(pin)));
+				res = ShiftDao.getCurrentShift(StaffDao.verify(Integer.parseInt(pin)));
 			}else if(Integer.valueOf(queryType) == 1){
-				res = QueryShiftDao.execDailySettleByNow(StaffDao.verify(Integer.parseInt(pin)));
+				res = ShiftDao.getTodayDaily(StaffDao.verify(Integer.parseInt(pin)));
 			}
 			
 			if(res == null)

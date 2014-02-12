@@ -12,7 +12,7 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
 import com.wireless.db.billStatistics.DutyRangeDao;
-import com.wireless.db.shift.QueryShiftDao;
+import com.wireless.db.shift.ShiftDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
@@ -54,13 +54,12 @@ public class BusinessStatisticsAction extends DispatchAction {
 				DutyRange range = DutyRangeDao.exec(staff, onDuty, offDuty);
 				
 				if(range != null){
-					sdetail = QueryShiftDao.exec(staff, range.getOnDutyFormat(), range.getOffDutyFormat(), DateType.HISTORY);
-					
+					sdetail = ShiftDao.getByRange(staff, range, DateType.HISTORY);
 				}else{
 					jobject.initTip(false, WebParams.TIP_TITLE_DEFAULT, 1111, "操作成功, 该时间段没有记录, 请重新查询.");
 				}
 			}else{
-				sdetail = QueryShiftDao.exec(staff, onDuty, offDuty, DateType.HISTORY);
+				sdetail = ShiftDao.getByRange(staff, new DutyRange(onDuty, offDuty), DateType.HISTORY);
 			}
 			jobject.getOther().put("business", sdetail);
 		}catch(BusinessException e){
@@ -109,7 +108,7 @@ public class BusinessStatisticsAction extends DispatchAction {
 			params.put("offDuty", offDuty);
 			params.put("queryPattern", queryPattern);
 			
-			ShiftDetail sdetail = QueryShiftDao.exec(StaffDao.verify(Integer.parseInt(pin)), onDuty, offDuty, DateType.TODAY);
+			ShiftDetail sdetail = ShiftDao.getByRange(StaffDao.verify(Integer.parseInt(pin)), new DutyRange(onDuty, offDuty), DateType.TODAY);
 			
 			if(sdetail != null){
 				jobject.getOther().put("business", sdetail);

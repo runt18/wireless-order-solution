@@ -19,9 +19,10 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.DBCon;
-import com.wireless.db.shift.QueryShiftDao;
+import com.wireless.db.shift.ShiftDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
+import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.billStatistics.IncomeByDept;
 import com.wireless.pojo.billStatistics.ShiftDetail;
 import com.wireless.util.DateType;
@@ -61,9 +62,9 @@ public class DailySettleStatDetailAction extends Action {
 			String offDuty = request.getParameter("offDuty");
 
 			ShiftDetail result = null;
-			result = QueryShiftDao.exec(dbCon, 
+			result = ShiftDao.getByRange(dbCon, 
 										StaffDao.verify(dbCon, Integer.parseInt(pin)), 
-										onDuty, offDuty,
+										new DutyRange(onDuty, offDuty),
 										DateType.HISTORY);
 
 			/**

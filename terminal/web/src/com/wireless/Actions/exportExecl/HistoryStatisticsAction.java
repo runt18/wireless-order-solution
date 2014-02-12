@@ -33,7 +33,7 @@ import com.wireless.db.billStatistics.CancelledFoodDao;
 import com.wireless.db.billStatistics.SaleDetailsDao;
 import com.wireless.db.client.member.MemberDao;
 import com.wireless.db.client.member.MemberOperationDao;
-import com.wireless.db.shift.QueryShiftDao;
+import com.wireless.db.shift.ShiftDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.stockMgr.StockActionDao;
 import com.wireless.db.stockMgr.StockReportDao;
@@ -943,9 +943,9 @@ public class HistoryStatisticsAction extends DispatchAction{
 		params.put("queryPattern", queryPattern);*/
 		
 		Staff staff = StaffDao.verify(Integer.parseInt(pin));
-		ShiftDetail business = QueryShiftDao.exec(staff, onDuty, offDuty, DateType.HISTORY);
+		ShiftDetail business = ShiftDao.getByRange(staff, new DutyRange(onDuty, offDuty), DateType.HISTORY);
 		
-		// 创建execl主页
+		// 创建excel主页
 		HSSFWorkbook wb = new HSSFWorkbook();
 		HSSFSheet sheet = wb.createSheet("营业汇总(" + dt.getDesc() + ")");
 		HSSFRow row = null;
