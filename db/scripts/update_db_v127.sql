@@ -247,20 +247,24 @@ DROP TABLE IF EXISTS `wireless_order_db`.`coupon_type` ;
 
 CREATE TABLE IF NOT EXISTS `wireless_order_db`.`coupon_type` (
   `coupon_type_id` INT NOT NULL AUTO_INCREMENT,
+  `restaurant_id` INT NOT NULL,
   `name` VARCHAR(45) NOT NULL,
   `price` FLOAT NOT NULL,
   `expired` DATETIME NULL DEFAULT NULL,
-  PRIMARY KEY (`coupon_type_id`))
+  PRIMARY KEY (`coupon_type_id`),
+  INDEX `ix_restaurant_id` (`restaurant_id` ASC))
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8;
 
--- -----------------------------------------------------
--- Table `wireless_order_db`.`coupon_state`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `wireless_order_db`.`coupon_state` ;
 
-CREATE TABLE IF NOT EXISTS `wireless_order_db`.`coupon_state` (
+-- -----------------------------------------------------
+-- Table `wireless_order_db`.`coupon`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `wireless_order_db`.`coupon` ;
+
+CREATE TABLE IF NOT EXISTS `wireless_order_db`.`coupon` (
   `coupon_id` INT NOT NULL AUTO_INCREMENT,
+  `restaurant_id` INT NOT NULL,
   `coupon_type_id` INT NOT NULL,
   `birth_date` DATETIME NOT NULL,
   `member_id` INT NOT NULL,
@@ -268,8 +272,50 @@ CREATE TABLE IF NOT EXISTS `wireless_order_db`.`coupon_state` (
   `order_date` DATETIME NULL DEFAULT NULL,
   `status` TINYINT NOT NULL DEFAULT 1 COMMENT 'the status as below.\n1 - 已发放\n2 - 已使用\n3 - 已过期',
   PRIMARY KEY (`coupon_id`),
-  INDEX `ix_coupon_type_id` (`coupon_type_id` ASC))
+  INDEX `ix_coupon_type_id` (`coupon_type_id` ASC),
+  INDEX `ix_restaurant_id` (`restaurant_id` ASC),
+  INDEX `ix_member_id` (`member_id` ASC))
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8;
+
+-- -----------------------------------------------------
+-- Add the field 'coupon_price' to table 'order'
+-- -----------------------------------------------------
+ALTER TABLE `wireless_order_db`.`order` 
+ADD COLUMN `coupon_price` FLOAT NOT NULL DEFAULT 0 AFTER `gift_price`;
+
+-- -----------------------------------------------------
+-- Add the field 'coupon_price' to table 'order_history'
+-- -----------------------------------------------------
+ALTER TABLE `wireless_order_db`.`order_history` 
+ADD COLUMN `coupon_price` FLOAT NOT NULL DEFAULT 0 AFTER `gift_price`;
+
+-- -----------------------------------------------------
+-- Add the field 'coupon_id', 'coupon_money', 'coupon_name' to table 'member_operation'
+-- -----------------------------------------------------
+ALTER TABLE `wireless_order_db`.`member_operation` 
+ADD COLUMN `coupon_id` INT NULL DEFAULT NULL AFTER `pay_money`,
+ADD COLUMN `coupon_money` FLOAT NULL DEFAULT NULL AFTER `coupon_id`,
+ADD COLUMN `coupon_name` VARCHAR(45) NULL DEFAULT NULL AFTER `coupon_money`;
+
+-- -----------------------------------------------------
+-- Add the field 'coupon_id', 'coupon_money', 'coupon_name' to table 'member_operation_history'
+-- -----------------------------------------------------
+ALTER TABLE `wireless_order_db`.`member_operation_history` 
+ADD COLUMN `coupon_id` INT NULL DEFAULT NULL AFTER `pay_money`,
+ADD COLUMN `coupon_money` FLOAT NULL DEFAULT NULL AFTER `coupon_id`,
+ADD COLUMN `coupon_name` VARCHAR(45) NULL DEFAULT NULL AFTER `coupon_money`;
+
+-- -----------------------------------------------------
+-- Drop the field 'member_id' to table 'order'
+-- -----------------------------------------------------
+ALTER TABLE `wireless_order_db`.`order` 
+DROP COLUMN `member_id`;
+
+-- -----------------------------------------------------
+-- Drop the field 'member_id' to table 'order_history'
+-- -----------------------------------------------------
+ALTER TABLE `wireless_order_db`.`order_history` 
+DROP COLUMN `member_id`;
 
 SET SQL_SAFE_UPDATES = @OLD_SAFE_UPDATES;
