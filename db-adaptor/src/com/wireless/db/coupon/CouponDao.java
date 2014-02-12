@@ -4,7 +4,6 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Pattern;
 
 import com.mysql.jdbc.Statement;
 import com.wireless.db.DBCon;
@@ -401,51 +400,6 @@ public class CouponDao {
 	}
 	
 	/**
-	 * Get the coupons to specific coupon type and owner.
-	 * @param staff
-	 * 			the staff to perform this action
-	 * @param couponTypeId
-	 * 			the coupon type id
-	 * @param owner
-	 * 			the owner might be name or mobile
-	 * @return the coupons to this type and owner
-	 * @throws SQLException
-	 * 			throws if failed to execute any SQL statement
-	 */
-	public static List<Coupon> getByTypeAndOwner(Staff staff, int couponTypeId, String owner) throws SQLException{
-		DBCon dbCon = new DBCon();
-		try{
-			dbCon.connect();
-			return getByTypeAndOwner(dbCon, staff, couponTypeId, owner);
-		}finally{
-			dbCon.disconnect();
-		}
-	}
-	
-	/**
-	 * Get the coupons to specific coupon type and owner.
-	 * @param dbCon
-	 * 			the database connection
-	 * @param staff
-	 * 			the staff to perform this action
-	 * @param couponTypeId
-	 * 			the coupon type id
-	 * @param owner
-	 * 			the owner might be name or mobile
-	 * @return the coupons to this type and owner
-	 * @throws SQLException
-	 * 			throws if failed to execute any SQL statement
-	 */
-	public static List<Coupon> getByTypeAndOwner(DBCon dbCon, Staff staff, int couponTypeId, String owner) throws SQLException{
-		 Pattern pattern = Pattern.compile("[0-9]*"); 
-		 if(pattern.matcher(owner).matches()){
-			 return getByCond(dbCon, staff, " AND M.mobile LIKE " + owner + "%", null);
-		 }else{
-			 return getByCond(dbCon, staff, " AND M.name LIKE %" + owner + "%", null);
-		 }
-	}
-	
-	/**
 	 * Get the coupon to specific extra condition. 
 	 * @param dbCon
 	 * 			the database connection
@@ -459,7 +413,7 @@ public class CouponDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	private static List<Coupon> getByCond(DBCon dbCon, Staff staff, String extraCond, String orderClause) throws SQLException{
+	public static List<Coupon> getByCond(DBCon dbCon, Staff staff, String extraCond, String orderClause) throws SQLException{
 		List<Coupon> result = new ArrayList<Coupon>();
 		String sql;
 		sql = " SELECT " +
