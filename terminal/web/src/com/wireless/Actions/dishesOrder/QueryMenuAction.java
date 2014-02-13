@@ -1,5 +1,6 @@
 package com.wireless.Actions.dishesOrder;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -132,7 +133,6 @@ public class QueryMenuAction extends DispatchAction {
 		
 		try{
 			String pin = (String)request.getAttribute("pin");
-			
 			root = KitchenDao.getByType(StaffDao.verify(Integer.parseInt(pin)), Type.NORMAL);
 		}catch(Exception e){
 			e.printStackTrace();
@@ -182,6 +182,34 @@ public class QueryMenuAction extends DispatchAction {
 				jobject.setTotalProperty(root.size());
 				jobject.setRoot(DataPaging.getPagingData(root, isPaging, start, limit));
 			}
+			response.getWriter().print(jobject.toString());
+		}
+		return null;
+	}
+	
+	/**
+	 * 
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward isAllowTempKitchen(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response) throws Exception {
+		response.setContentType("text/json;charset=utf-8");
+		JObject jobject = new JObject();
+		List<? extends Jsonable> root = new ArrayList<Jsonable>();
+		try{
+			String pin = (String)request.getAttribute("pin");
+			root = KitchenDao.getByAllowTemp(StaffDao.verify(Integer.parseInt(pin)));
+		}catch(Exception e){
+			e.printStackTrace();
+			jobject.initTip(e);
+		}finally{
+			jobject.setTotalProperty(root.size());
+			jobject.setRoot(root);
 			response.getWriter().print(jobject.toString());
 		}
 		return null;

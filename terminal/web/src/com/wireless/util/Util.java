@@ -8,6 +8,7 @@ import java.util.List;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
+import com.wireless.pojo.crMgr.CancelReason;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.tasteMgr.Taste;
@@ -101,6 +102,9 @@ public class Util {
 				}
 				// 
 				foods[i].getKitchen().setId(Integer.parseInt(values[7]));
+				if(values.length > 8 && Integer.valueOf(values[8]) > 0){
+					foods[i].setCancelReason(new CancelReason(Integer.valueOf(values[8])));
+				}
 			} else {
 				// extract the food alias id
 				foods[i].asFood().setFoodId(Integer.parseInt(values[1]));
@@ -143,6 +147,9 @@ public class Util {
 				foods[i].setDiscount(Float.parseFloat(values[5]));
 				// extract the hang status 
 				foods[i].setHangup(Boolean.parseBoolean(values[6]));
+				if(values.length > 7 && Integer.valueOf(values[7]) > 0){
+					foods[i].setCancelReason(new CancelReason(Integer.valueOf(values[7])));
+				}
 			}
 		}
 
