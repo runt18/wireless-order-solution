@@ -543,13 +543,13 @@ co.submit = function(c){
 			foods = foods 
 					+ '['
 					+ 'true' + '<<sb>>'
-					+ item.alias + '<<sb>>'
+					+ item.id + '<<sb>>'
 					+ item.name + '<<sb>>'
 					+ item.count + '<<sb>>'
 					+ item.unitPrice + '<<sb>>'
 					+ (typeof item.isHangup != 'boolean' ? false : item.isHangup) + '<<sb>>'
 					+ '1<<sb>>'
-					+ item.kitchen.alias
+					+ item.kitchen.id
 					+ ']';
 		}else{
 			// 普通菜
@@ -565,10 +565,10 @@ co.submit = function(c){
 			foods = foods 
 					+ '['
 					+ 'false' + '<<sb>>'
-					+ item.alias + '<<sb>>'
+					+ item.id + '<<sb>>'
 					+ item.count + '<<sb>>'
 					+ (normalTaste + ' <<st>> ' + tmpTaste) + '<<sb>>'
-					+ item.kitchen.alias + '<<sb>>'
+					+ item.kitchen.id + '<<sb>>'
 					+ '1' + '<<sb>>'
 					+ (typeof item.isHangup != 'boolean' ? false : item.isHangup)
 					+ ']';

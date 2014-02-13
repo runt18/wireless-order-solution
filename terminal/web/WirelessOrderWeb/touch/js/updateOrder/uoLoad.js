@@ -138,7 +138,7 @@ function showOrder(){
 	for(var i = 0; i < uoFood.length; i++){
 		html += Templet.uo.orderFood.format({
 			dataIndex : i + 1,
-			alias : uoFood[i].alias,
+			id : uoFood[i].id,
 			name : uoFood[i].name,
 			count : uoFood[i].count.toFixed(2),
 			tastePref : uoFood[i].tasteGroup.tastePref,

@@ -172,7 +172,7 @@ uo.cf.save = function(){
 		
 		$("#" + rowId).after(htmlcancel);
 		//把相关数据加到退菜信息对象
-		uoCancelFood.alias = document.getElementById(rowId).getAttribute("data-value");
+		uoCancelFood.id = document.getElementById(rowId).getAttribute("data-value");
 		uoCancelFood.foodName = foodName;
 		uoCancelFood.dishes = $("#" + rowId).find("td").eq(3).text();
 		uoCancelFood.count = -num;
@@ -224,14 +224,14 @@ uo.cf.save = function(){
  */
 function cancelForCancelFood(rowId){
 	var cancelIndex, dishes;
-	var foodAlias = document.getElementById(rowId).getAttribute("data-value");
+	var foodId = document.getElementById(rowId).getAttribute("data-value");
 	dishes = $("#" + rowId).find("td").eq(3).text();
 	//退菜行号，移除表格的退菜行
 	cancelIndex = $("#" + rowId).prevAll().length + 1;
 	$("#tabForUpdateOrder").find("tr").eq(cancelIndex).remove();
 	//从退菜数组中删掉被取消的退菜对象
 	for(x in uoCancelFoods){
-		if(uoCancelFoods[x].alias == foodAlias && uoCancelFoods[x].dishes == dishes){
+		if(uoCancelFoods[x].id == foodId && uoCancelFoods[x].dishes == dishes){
 			uoCancelFoods.splice(x, 1);
 			break;
 		}
@@ -341,10 +341,11 @@ uo.saveForUO = function(){
 			time : 3,
 		});
 	}else{
-		for(x in uoFood){
-			for(y in uoCancelFoods){
-				if(uoFood[x].alias == uoCancelFoods[y].alias && uoFood[x].tasteGroup.tastePref == uoCancelFoods[y].dishes){
-					uoFood[x].count = (uoFood[x].count + uoCancelFoods[y].count).toFixed(2);
+		for(var x = 0; x < uoFood.length; x++){
+			for(var y = 0; y < uoCancelFoods.length; y++){
+				//alert(JSON.stringify(uoCancelFoods[y]));//return;
+				if(uoFood[x].id == uoCancelFoods[y].id && uoFood[x].tasteGroup.tastePref == uoCancelFoods[y].dishes){
+					uoFood[x].count = parseFloat(uoFood[x].count + uoCancelFoods[y].count).toFixed(2);
 					uoFood[x].cancelReason = uoCancelFoods[y].reason.id;
 				}
 			}
@@ -531,14 +532,14 @@ uo.submitUpdateOrderHandler = function(c){
 				foodPara = foodPara 
 						+ '[' 
 						+ 'true' + '<<sb>>'// 是否临时菜(true)
-						+ orderFoods[i].alias + '<<sb>>' // 临时菜1编号
+						+ orderFoods[i].id + '<<sb>>' // 临时菜1编号
 						+ foodname + '<<sb>>' // 临时菜1名称
 						+ orderFoods[i].count + '<<sb>>' // 临时菜1数量
 						+ orderFoods[i].unitPrice + '<<sb>>' // 临时菜1单价(原料單價)
 						+ orderFoods[i].isHangup +'<<sb>>' // 菜品状态
 						+ '1' + '<<sb>>' // 菜品操作状态 1:已点菜 2:新点菜 3:反结账
-						+ orderFoods[i].kitchen.alias + '<<sb>>'	// 临时菜出单厨房
-						+ orderFoods[i].cancelReason //退菜原因
+						+ orderFoods[i].kitchen.id + '<<sb>>'	// 临时菜出单厨房
+						+ (typeof orderFoods[i].cancelReason != 'undefined' ?  orderFoods[i].cancelReason : 0)//退菜原因
 						+ ']';
 			}else{
 				// 普通菜
@@ -554,13 +555,13 @@ uo.submitUpdateOrderHandler = function(c){
 				foodPara = foodPara 
 						+ '['
 						+ 'false' + '<<sb>>' // 是否临时菜(false)
-						+ orderFoods[i].alias + '<<sb>>' // 菜品1编号
+						+ orderFoods[i].id + '<<sb>>' // 菜品1编号
 						+ orderFoods[i].count + '<<sb>>' // 菜品1数量
 						+ (normalTaste + ' <<st>> ' + tmpTaste) + '<<sb>>'
-						+ orderFoods[i].kitchen.alias + '<<sb>>'// 厨房1编号
+						+ orderFoods[i].kitchen.id + '<<sb>>'// 厨房1编号
 						+ orderFoods[i].discount + '<<sb>>' // 菜品1折扣
 						+ orderFoods[i].isHangup + '<<sb>>'//是否叫起
-						+ orderFoods[i].cancelReason //退菜原因
+						+ (typeof orderFoods[i].cancelReason != 'undefined' ?  orderFoods[i].cancelReason : 0) //退菜原因
 						+ ']';
 			}
 		}	
@@ -632,7 +633,6 @@ uo.tempPayForUO = function(c){
 				serviceRate : uo.order.serviceRate,
 				cashIncome : '-1',
 				comment : uo.order.comment,
-				pricePlanID : uo.order.pricePlan.id,
 				customNum : uo.order.customNum,
 				discountID : typeof c.discountId != 'undefined' ? c.discountId : uo.order.discount.id,
 				tempPay : true,

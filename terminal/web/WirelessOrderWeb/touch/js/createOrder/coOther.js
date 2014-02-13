@@ -133,7 +133,7 @@ co.tf = {
 		this.priceDom = null;
 		this.countDom = null;
 		
-		var sl = $('#divKitchenSelectForCOTF > div[class="main-box-base"]');
+		var sl = $('#divKitchenSelectForCOTF > div[class*=div-tempFood-select]');
 		for(var i = 0; i < sl.length; i++){
 			$(sl.length[i]).removeClass('div-tempFood-select');
 		}
@@ -147,7 +147,7 @@ co.tf = {
 		}
 		var html = [];
 		for(var i = 0; i < this.kd.length; i++){
-			html.push('<div data-value="'+this.kd[i].alias+'" class="main-box-base" onClick="co.tf.selectKitchen({event:this, kitchenAlias:'+this.kd[i].alias+'})">'+this.kd[i].name+'</div>');
+			html.push('<div data-value="'+this.kd[i].id+'" class="main-box-base" onClick="co.tf.selectKitchen({event:this, kitchenId:'+this.kd[i].id+'})">'+this.kd[i].name+'</div>');
 		}
 		this.kc.innerHTML = html.join('');
 	},
@@ -185,9 +185,9 @@ co.tf.keyBoy = function(c){
  * 
  */
 co.tf.selectKitchen = function(c){
-	var sl = $('#divKitchenSelectForCOTF > div[class="main-box-base"]');
+	var sl = $('#divKitchenSelectForCOTF > div[class*=div-tempFood-select]');
 	for(var i = 0; i < sl.length; i++){
-		$(sl.length[i]).removeClass('div-tempFood-select');
+		$(sl[i]).removeClass('div-tempFood-select');
 	}
 	$(c.event).addClass('div-tempFood-select');
 	this.kitchenDom = c.event;
@@ -233,7 +233,7 @@ co.tf.save = function(){
 				unitPrice : parseFloat(this.priceDom.value.trim()),
 				isHangup : false,
 				kitchen : {
-					alias : this.kitchenDom.getAttribute('data-value')
+					id : this.kitchenDom.getAttribute('data-value')
 				},
 				tasteGroup : {
 					tastePref : '无口味',
