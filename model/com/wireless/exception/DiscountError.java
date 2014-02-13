@@ -1,9 +1,13 @@
 package com.wireless.exception;
 
-public class PlanError extends ErrorEnum{
+public class DiscountError extends ErrorEnum{
 	/**
 	 *  code range : 9300 - 9499 
 	 */
+	public static final ErrorCode DISCOUNT_NOT_EXIST = build(9499, "操作失败, 操作的折扣方案不存在");
+	public static final ErrorCode RESERVED_NOT_ALLOW_DELETE = build(9498, "操作失败, 保留的折扣方案不能删除");
+	//public static final ErrorCode PLAN_UPDATE_FAIL_SINCE_KITCHEN_NOT_EXIST = build(9497, "操作失败, 折扣修改的相应厨房不存在");
+
 	public static final ErrorCode DISCOUNT_INSERT_FAIL = build(9499, "操作失败, 添加折扣方案基础信息失败, 请检查数据内容是否正确.");
 	public static final ErrorCode DISCOUNT_DELETE_FAIL = build(9498, "操作失败, 删除折扣方案基础信息失败, 该方案不存在或已被删除.");
 	public static final ErrorCode DISCOUNT_UPDATE_FAIL = build(9497, "操作失败, 更新折扣方案基础信息失败, 请检查数据内容是否正确.");
@@ -30,7 +34,7 @@ public class PlanError extends ErrorEnum{
 	public static final ErrorCode PRICE_FOOD_STATUS_IS_ACTIVE = build(9413, "操作失败, 该价格方案为活动状态, 正在使用中的不允许删除.");
 	public static final ErrorCode PRICE_FOOD_DELETE_FOOD = build(9412, "操作失败, 删除该方案下所有菜品价格信息失败, 未知错误.");
 	
-	private PlanError(){
+	private DiscountError(){
 		
 	}
 	private static ErrorCode build(int code, String desc){

@@ -257,15 +257,15 @@ public class TestParcel {
 		Discount discountToParcel = new Discount();
 		
 		discountToParcel.setId(Math.round((float)Math.random()));
-		discountToParcel.setLevel(Math.round((float)Math.random()));
-		discountToParcel.setStatus(Math.round((float)Math.random()));
+		discountToParcel.setType(Discount.Type.NORMAL);
+		discountToParcel.setStatus(Discount.Status.DEFAULT);
 		discountToParcel.setName("测试折扣方案");
 		List<DiscountPlan> plans = new ArrayList<DiscountPlan>();
-		plans.add(new DiscountPlan(1, new Kitchen(0), 0.1f));
-		plans.add(new DiscountPlan(2, new Kitchen(0), 0.2f));
-		plans.add(new DiscountPlan(3, new Kitchen(0), 0.2f));
-		plans.add(new DiscountPlan(4, new Kitchen(0), 0.2f));
-		plans.add(new DiscountPlan(5, new Kitchen(0), 0.2f));
+		plans.add(new DiscountPlan(new Kitchen(0), 0.1f));
+		plans.add(new DiscountPlan(new Kitchen(0), 0.2f));
+		plans.add(new DiscountPlan(new Kitchen(0), 0.2f));
+		plans.add(new DiscountPlan(new Kitchen(0), 0.2f));
+		plans.add(new DiscountPlan(new Kitchen(0), 0.2f));
 		discountToParcel.addPlans(plans);
 		
 		Parcel p = new Parcel();
@@ -281,7 +281,7 @@ public class TestParcel {
 		assertEquals("discount id", discountToParcel.getId(), parcelableDiscount.getId());
 		
 		// Check the discount level
-		assertEquals("discount level", discountToParcel.getLevel(), parcelableDiscount.getLevel());
+		assertEquals("discount level", discountToParcel.getType(), parcelableDiscount.getType());
 		
 		// Check the discount status
 		assertEquals("discount status", discountToParcel.getStatus(), parcelableDiscount.getStatus());

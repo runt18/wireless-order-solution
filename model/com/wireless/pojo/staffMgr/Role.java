@@ -371,7 +371,7 @@ public class Role implements Jsonable, Parcelable{
 	
 	public Discount getDefaultDiscount(){
 		for(Discount discount : getDiscounts()){
-			if(discount.isDefault() || discount.isDefaultReserved()){
+			if(discount.isDefault()){
 				return discount;
 			}
 		}

@@ -9,34 +9,40 @@ import java.util.Map;
 import com.wireless.json.Jsonable;
 import com.wireless.parcel.Parcel;
 import com.wireless.parcel.Parcelable;
+import com.wireless.pojo.menuMgr.Kitchen;
 
 public class Discount implements Jsonable, Parcelable, Comparable<Discount>{
 	
-	public final static List<Discount> EMPTY_LIST = new ArrayList<Discount>(0);
+	public final static List<Discount> EMPTY_LIST = Collections.emptyList();
 	
 	public final static byte DISCOUNT_PARCELABLE_COMPLEX = 0;
 	public final static byte DISCOUNT_PARCELABLE_SIMPLE = 1;
 	
 	//The helper class insert a '无折扣'
-	public static class NotDiscountBuilder extends InsertBuilder{
+	public static class NoDiscountBuilder extends InsertBuilder{
 		public final static String TAG = "无折扣";
-		public NotDiscountBuilder(int restaurantId){
-			super(TAG, restaurantId);
-			setStatus(Status.DEFAULT_RESERVED);
-			setInitRage(1);
+		public NoDiscountBuilder(){
+			super(TAG, Status.DEFAULT, Type.RESERVED);
+			setRate(1);
 		}
 	}
 	
 	//The helper class to insert a new discount
 	public static class InsertBuilder{
 		private final String name;
-		private final int restaurantId;
 		private Status status = Status.NORMAL;
-		private float initRate = 1;
+		private final Type type;
+		private float rate = 1;
 		
-		public InsertBuilder(String name, int restaurantId){
+		InsertBuilder(String name, Status status, Type type){
 			this.name = name;
-			this.restaurantId = restaurantId;
+			this.status = status;
+			this.type = type;
+		}
+		
+		public InsertBuilder(String name){
+			this.name = name;
+			this.type = Type.NORMAL;
 		}
 		
 		public InsertBuilder setStatus(Status status){
@@ -44,16 +50,16 @@ public class Discount implements Jsonable, Parcelable, Comparable<Discount>{
 			return this;
 		}
 		
-		public InsertBuilder setInitRage(float rate){
+		public InsertBuilder setRate(float rate){
 			if(rate < 0 || rate > 1){
 				throw new IllegalArgumentException("The initial rate must be ranged from 0 to 1.");
 			}
-			this.initRate = rate;
+			this.rate = rate;
 			return this;
 		}
 		
-		public float getInitRate(){
-			return this.initRate;
+		public float getRate(){
+			return this.rate;
 		}
 		
 		public Discount build(){
@@ -61,13 +67,60 @@ public class Discount implements Jsonable, Parcelable, Comparable<Discount>{
 		}
 	}
 	
+	public static class UpdateBuilder{
+		private final int id;
+		private String name;
+		private Status status;
+		
+		public UpdateBuilder(int id){
+			this.id = id;
+		}
+		
+		public UpdateBuilder setName(String name){
+			this.name = name;
+			return this;
+		}
+		
+		public boolean isNameChanged(){
+			return this.name != null;
+		}
+		
+		public UpdateBuilder setStatus(Status status){
+			this.status = status;
+			return this;
+		}
+		
+		public boolean isStatusChanged(){
+			return status != null;
+		}
+		
+		public Discount build(){
+			return new Discount(this);
+		}
+	}
+	
+	public static class UpdatePlanBuilder{
+		private final int id;
+		private final List<DiscountPlan> dps = new ArrayList<DiscountPlan>(); 
+		
+		public UpdatePlanBuilder(int id){
+			this.id = id;
+		}
+		
+		public UpdatePlanBuilder add(Kitchen kitchen, float rate){
+			dps.add(new DiscountPlan(kitchen, rate));
+			return this;
+		}
+
+		public Discount build(){
+			return new Discount(this);
+		}
+	}
+	
 	public static enum Status{
 		
-		NORMAL(0, "normal"),							// 一般类型
-		DEFAULT(1, "default"),							// 一般类型
-		RESERVED(2, "reserved"),						// 系统保留
-		DEFAULT_RESERVED(3, "default & reserved"),		// 既是默认类型, 也是系统保留(默认类型属于用户自定义操作,等级高于系统保留)
-		MEMBER_TYPE(4, "member");						// 会员类型全单使用的
+		NORMAL(1, "normal"),							// 普通
+		DEFAULT(2, "default");							// 默认
 		
 		private final int val;
 		private final String desc;
@@ -97,17 +150,61 @@ public class Discount implements Jsonable, Parcelable, Comparable<Discount>{
 		
 	}
 	
+	public static enum Type{
+		
+		NORMAL(1, "normal"),	// 普通
+		RESERVED(2, "reserved");// 保留
+		
+		private final int val;
+		private final String desc;
+		
+		private Type(int val, String desc){
+			this.val = val;
+			this.desc = desc;
+		}
+		
+		@Override
+		public String toString(){
+			return "status(val = " + val + ", desc = " + desc + ")";
+		}
+		
+		public static Type valueOf(int val){
+			for(Type type : values()){
+				if(type.getVal() == val){
+					return type;
+				}
+			}
+			throw new IllegalArgumentException("The discount type(val = " + val + ") passed is invalid.");
+		}
+		
+		public int getVal(){
+			return this.val;
+		}
+		
+	}
+	
 	private String name;
 	private int id;
 	private int restaurantId;
-	private int level;
 	private Status status = Status.NORMAL;
+	private Type type = Type.NORMAL;
 	private List<DiscountPlan> plans = new ArrayList<DiscountPlan>();
+	
+	private Discount(UpdatePlanBuilder builder){
+		setId(builder.id);
+		setPlans(builder.dps);
+	}
+	
+	private Discount(UpdateBuilder builder){
+		setId(builder.id);
+		setName(builder.name);
+		setStatus(builder.status);
+	}
 	
 	private Discount(InsertBuilder builder){
 		setName(builder.name);
-		setRestaurantId(builder.restaurantId);
 		setStatus(builder.status);
+		setType(builder.type);
 	}
 	
 	public Discount(){
@@ -120,7 +217,7 @@ public class Discount implements Jsonable, Parcelable, Comparable<Discount>{
 	
 	public String getName(){
 		if(name == null){
-			name = "";
+			return "";
 		}
 		return name;
 	}
@@ -145,14 +242,6 @@ public class Discount implements Jsonable, Parcelable, Comparable<Discount>{
 		this.restaurantId = restId;
 	}
 	
-	public int getLevel(){
-		return level;
-	}
-	
-	public void setLevel(int level){
-		this.level = level;
-	}
-	
 	public Status getStatus() {
 		return status;
 	}
@@ -161,15 +250,26 @@ public class Discount implements Jsonable, Parcelable, Comparable<Discount>{
 		this.status = Status.valueOf(statusVal);
 	}
 	
+	public void setType(Type type){
+		this.type = type;
+	}
+	
+	public Type getType(){
+		return this.type;
+	}
+	
 	public void setStatus(Status status){
 		this.status = status;
 	}
 	
 	public void setPlans(List<DiscountPlan> plans) {
-		this.plans = plans;
+		if(plans != null){
+			this.plans.clear();
+			addPlans(plans);
+		}
 	}
 	public List<DiscountPlan> getPlans(){
-		return plans;
+		return Collections.unmodifiableList(plans);
 	}
 	
 	public void addPlans(List<DiscountPlan> plans){
@@ -185,24 +285,12 @@ public class Discount implements Jsonable, Parcelable, Comparable<Discount>{
 		}
 	}
 	
-	public boolean isNormal(){
-		return this.status == Status.NORMAL;
-	}
-	
 	public boolean isDefault(){
 		return this.status == Status.DEFAULT;
 	}
 	
 	public boolean isReserved(){
-		return this.status == Status.RESERVED;
-	}
-	
-	public boolean isDefaultReserved(){
-		return this.status == Status.DEFAULT_RESERVED;
-	}
-	
-	public boolean isMemberType(){
-		return this.status == Status.MEMBER_TYPE;
+		return this.type == Type.RESERVED;
 	}
 	
 	@Override
@@ -231,8 +319,8 @@ public class Discount implements Jsonable, Parcelable, Comparable<Discount>{
 			
 		}else if(flag == DISCOUNT_PARCELABLE_COMPLEX){
 			dest.writeInt(this.id);
-			dest.writeShort(this.level);
 			dest.writeByte(this.status.getVal());
+			dest.writeByte(this.type.getVal());
 			dest.writeString(this.name);
 			dest.writeParcelList(this.plans, 0);
 		}
@@ -245,8 +333,8 @@ public class Discount implements Jsonable, Parcelable, Comparable<Discount>{
 			
 		}else if(flag == DISCOUNT_PARCELABLE_COMPLEX){
 			this.id = source.readInt();
-			this.level = source.readShort();
 			this.status = Status.valueOf(source.readByte());
+			this.type = Type.valueOf(source.readByte());
 			this.name = source.readString();
 			this.plans = source.readParcelList(DiscountPlan.DP_CREATOR);
 		}
@@ -269,9 +357,10 @@ public class Discount implements Jsonable, Parcelable, Comparable<Discount>{
 		jm.put("id", this.id);
 		jm.put("name", this.name);
 		jm.put("rid", this.restaurantId);
-		jm.put("level", this.level);
+		//FIXME level not exist
+		jm.put("level", 0);
 		jm.put("status", this.status.getVal());
-		jm.put("isDefault", this.isDefault() || this.isDefaultReserved());
+		jm.put("isDefault", this.isDefault());
 		
 		return Collections.unmodifiableMap(jm);
 	}

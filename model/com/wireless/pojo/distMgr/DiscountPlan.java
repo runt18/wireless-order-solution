@@ -16,40 +16,36 @@ public class DiscountPlan implements Parcelable, Jsonable{
 	public final static byte DP_PARCELABLE_COMPLEX = 0;
 	public final static byte DP_PARCELABLE_SIMPLE = 1;
 	
-	private int planId;
+	private int id;
 	private Discount discount;
 	private Kitchen kitchen = new Kitchen(0);
 	private float rate;
 	
-	public DiscountPlan(){
-		
+	public DiscountPlan(int id){
+		this.id = id;
 	}
 	
-	public DiscountPlan(int planId, int discountId, int kitchenId, float rate){
-		this.planId = planId;
-		this.getDiscount().setId(discountId);
-		this.getKitchen().setId(kitchenId);
+	public DiscountPlan(int id, int discountId, int kitchenId, float rate){
+		this.id = id;
+		setDiscount(new Discount(discountId));
+		this.kitchen.setId(kitchenId);
 		this.rate = rate;
 	}
 	
-	public DiscountPlan(int planId, Kitchen kitchen, float rate){
-		this.planId = planId;
-		this.kitchen = kitchen;
+	public DiscountPlan(Kitchen kitchen, float rate){
+		this.setKitchen(kitchen);
 		this.rate = rate;
 	}
 	
-	public int getPlanID() {
-		return planId;
+	public int getId() {
+		return id;
 	}
 	
-	public void setPlanID(int planID) {
-		this.planId = planID;
+	public void setId(int id) {
+		this.id = id;
 	}
 	
 	public Discount getDiscount() {
-		if(discount == null){
-			discount = new Discount();
-		}
 		return discount;
 	}
 	
@@ -80,13 +76,13 @@ public class DiscountPlan implements Parcelable, Jsonable{
 		if(obj == null || !(obj instanceof DiscountPlan)){
 			return false;
 		}else{
-			return this.planId == ((DiscountPlan)obj).planId;
+			return this.id == ((DiscountPlan)obj).id;
 		}
 	}
 	
 	@Override
 	public int hashCode(){
-		return this.planId * 31 + 17;
+		return this.id * 31 + 17;
 	}
 	
 	@Override
@@ -113,14 +109,14 @@ public class DiscountPlan implements Parcelable, Jsonable{
 		}
 		
 		public DiscountPlan newInstance() {
-			return new DiscountPlan();
+			return new DiscountPlan(0);
 		}
 	};
 
 	@Override
 	public Map<String, Object> toJsonMap(int flag) {
 		HashMap<String, Object> jm = new LinkedHashMap<String, Object>();
-		jm.put("id", this.planId);
+		jm.put("id", this.id);
 		jm.put("discount", this.discount);
 		jm.put("rate", this.rate);
 		if(this.kitchen != null){
