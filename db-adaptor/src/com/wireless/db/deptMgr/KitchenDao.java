@@ -187,6 +187,11 @@ public class KitchenDao {
 		}
 		dbCon.rs.close();
 		
+		//Delete the discount plan related to this kitchen
+		sql = " DELETE FROM " + Params.dbName + ".discount_plan WHERE 1 = 1 " +
+			  " AND kitchen_id = " + kitchenId;
+		dbCon.stmt.executeUpdate(sql);
+		
 		//Delete the print scheme related to this kitchen.
 		sql = " DELETE FROM " + Params.dbName + ".func_kitchen WHERE 1 = 1 " +
 			  " AND kitchen_id = " + kitchenId +

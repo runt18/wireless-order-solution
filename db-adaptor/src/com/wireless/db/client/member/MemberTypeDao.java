@@ -286,7 +286,7 @@ public class MemberTypeDao {
 			sql = " SELECT discount_id, type FROM " + Params.dbName + ".member_type_discount WHERE member_type_id = " + eachType.getId();
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
 			while(dbCon.rs.next()){
-				Discount distToMemberType = DiscountDao.getDiscountById(staff, dbCon.rs.getInt("discount_id"));
+				Discount distToMemberType = DiscountDao.getById(staff, dbCon.rs.getInt("discount_id"));
 				eachType.addDiscount(distToMemberType);
 				if(MemberType.DiscountType.valueOf(dbCon.rs.getInt("type")) == MemberType.DiscountType.DEFAULT){
 					eachType.setDefaultDiscount(distToMemberType);

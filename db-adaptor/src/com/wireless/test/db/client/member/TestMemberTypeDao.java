@@ -50,7 +50,7 @@ public class TestMemberTypeDao {
 	public void testMemberType() throws SQLException, BusinessException{
 		int memberTypeId = 0;
 		try{
-			List<Discount> discounts = DiscountDao.getDiscount(mStaff, null, null);
+			List<Discount> discounts = DiscountDao.getAll(mStaff);
 			
 			//Test to insert a new member type
 			MemberType.InsertBuilder builder = new MemberType.InsertBuilder(mStaff.getRestaurantId(), "测试会员类型", discounts.get(0))
@@ -109,7 +109,7 @@ public class TestMemberTypeDao {
 					assertTrue("fail to delete member type", false);
 				}catch(BusinessException ingored){}
 				
-				assertTrue("fail to delete discounts associated with this member type", DiscountDao.getDiscountByMemberType(mStaff, memberTypeId).isEmpty());
+				assertTrue("fail to delete discounts associated with this member type", DiscountDao.getByMemberType(mStaff, memberTypeId).isEmpty());
 			}
 		}
 	}

@@ -205,7 +205,7 @@ public class UpdateOrder {
 		
 		//Set the default discount to new order if original order is unpaid
 		if(oriOrder.isUnpaid()){
-			newOrder.setDiscount(DiscountDao.getDefaultDiscount(dbCon, staff));
+			newOrder.setDiscount(DiscountDao.getDefault(dbCon, staff));
 		}
 		
 		//Calculate the difference between the original and new order.

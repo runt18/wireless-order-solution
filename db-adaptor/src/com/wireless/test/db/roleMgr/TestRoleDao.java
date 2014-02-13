@@ -76,7 +76,7 @@ public class TestRoleDao {
 		//get all privilege
 		List<Privilege> privileges = PrivilegeDao.getPrivileges(mStaff, null, null);
 		//get all discount
-		List<Discount> discounts = DiscountDao.getDiscount(mStaff, null, null);
+		List<Discount> discounts = DiscountDao.getAll(mStaff);
 		int roleId = 0, newRoleId = 0;
 		
 		try{

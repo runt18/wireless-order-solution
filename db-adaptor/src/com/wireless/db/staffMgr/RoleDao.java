@@ -108,7 +108,7 @@ public class RoleDao {
 			//Get the allowed discounts in case of the discount privilege
 			for(Privilege privilege : role.getPrivileges()){
 				if(privilege.getCode() == Code.DISCOUNT){
-					for(Discount discount : DiscountDao.getDiscountByRole(dbCon, staff, role)){
+					for(Discount discount : DiscountDao.getByRole(dbCon, staff, role)){
 						privilege.addDiscount(discount);
 					}
 				}

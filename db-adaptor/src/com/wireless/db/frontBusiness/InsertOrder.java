@@ -212,7 +212,7 @@ public class InsertOrder {
 			}
 
 			//Set the default discount.
-			orderToInsert.setDiscount(DiscountDao.getDefaultDiscount(dbCon, staff));
+			orderToInsert.setDiscount(DiscountDao.getDefault(dbCon, staff));
 			
 		}else if(orderToInsert.getDestTbl().isBusy()){
 			throw new BusinessException("The " + orderToInsert.getDestTbl() + " to insert order is BUSY.", ProtocolError.TABLE_BUSY);

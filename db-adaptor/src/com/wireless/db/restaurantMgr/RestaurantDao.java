@@ -390,7 +390,7 @@ public class RestaurantDao {
 	private static void initMemberType(DBCon dbCon, Staff staff) throws SQLException{
 		MemberType.InsertBuilder builder = new MemberType.InsertBuilder(staff.getRestaurantId(), 
 																		"微信会员", 
-																		DiscountDao.getDefaultDiscount(dbCon, staff))
+																		DiscountDao.getDefault(dbCon, staff))
 														 .setType(MemberType.Type.WEIXIN);
 		MemberTypeDao.insert(dbCon, staff, builder);
 	}
@@ -525,7 +525,7 @@ public class RestaurantDao {
 	
 	
 	private static void initDiscount(DBCon dbCon, Staff staff) throws SQLException{
-		DiscountDao.insert(dbCon, staff, new Discount.NotDiscountBuilder(staff.getRestaurantId()));
+		DiscountDao.insert(dbCon, staff, new Discount.NoDiscountBuilder());
 	}
 	
 	private static void initTastes(DBCon dbCon, Staff staff) throws SQLException, BusinessException{

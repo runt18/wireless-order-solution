@@ -54,7 +54,7 @@ public class QueryMenu {
 							TasteDao.getTastes(dbCon, staff, null, null),
 							KitchenDao.getByType(dbCon, staff, Kitchen.Type.NORMAL),
 			    			DepartmentDao.getByType(dbCon, staff, Department.Type.NORMAL),
-			    			DiscountDao.getDiscount(dbCon, staff, null, null),
+			    			DiscountDao.getAll(dbCon, staff),
 			    			CancelReasonDao.getReasons(dbCon, staff, null, null));
 	}
 	

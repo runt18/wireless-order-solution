@@ -471,10 +471,17 @@ public class PayOrder {
 		if(payBuilder.hasDiscount()){
 			//If the discount to set is the same as before, just use original.
 			if(orderToCalc.getDiscount().getId() == payBuilder.getDiscountId()){
-				orderToCalc.setDiscount(DiscountDao.getDiscountById(dbCon, staff, orderToCalc.getDiscount().getId()));
+				orderToCalc.setDiscount(DiscountDao.getById(dbCon, staff, orderToCalc.getDiscount().getId()));
 			}else{
-				//If the discount to set is NOT the same as before, check to see whether the staff is permitted to use the discount.
-				List<Discount> discounts = DiscountDao.getDiscountByRole(dbCon, staff, staff.getRole());
+				List<Discount> discounts;
+				//If the discount to set is NOT the same as before, check to see whether the discount is permitted to use.
+				if(payBuilder.getSettleType() == Order.SettleType.MEMBER){
+					discounts = DiscountDao.getByMemberType(dbCon, staff, 
+															MemberDao.getMemberById(dbCon, staff, payBuilder.getMemberId()).getMemberType().getId());
+				}else{
+					discounts = DiscountDao.getByRole(dbCon, staff, staff.getRole());
+				}
+				
 				int index = discounts.indexOf(new Discount(payBuilder.getDiscountId()));
 				if(index < 0){
 					throw new BusinessException(StaffError.DISCOUNT_NOT_ALLOW);
@@ -484,7 +491,7 @@ public class PayOrder {
 			}
 		}else{
 			//If the discount NOT set, just use the original.
-			orderToCalc.setDiscount(DiscountDao.getDiscountById(dbCon, staff, orderToCalc.getDiscount().getId()));
+			orderToCalc.setDiscount(DiscountDao.getById(dbCon, staff, orderToCalc.getDiscount().getId()));
 		}
 		
 
