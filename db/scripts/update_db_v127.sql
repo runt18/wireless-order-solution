@@ -318,4 +318,37 @@ DROP COLUMN `member_id`;
 ALTER TABLE `wireless_order_db`.`order_history` 
 DROP COLUMN `member_id`;
 
+-- -----------------------------------------------------
+-- Change the filed 'status' & 'type' to table 'discount' 
+-- -----------------------------------------------------
+ALTER TABLE `wireless_order_db`.`discount` 
+DROP COLUMN `level`,
+CHANGE COLUMN `restaurant_id` `restaurant_id` INT(10) UNSIGNED NOT NULL COMMENT 'the restaurant id this discount belongs to' ,
+CHANGE COLUMN `name` `name` VARCHAR(45) NOT NULL COMMENT 'the name to this discount' ,
+CHANGE COLUMN `status` `status` TINYINT(4) NOT NULL DEFAULT 1 COMMENT 'the status is as below\n1 - normal\n2 - default' ,
+ADD COLUMN `status_tmp` TINYINT NOT NULL DEFAULT 1 COMMENT 'the status is as below\n1 - normal\n2 - default' AFTER `status`,
+ADD COLUMN `type` TINYINT NOT NULL DEFAULT 1 COMMENT 'the type as below\n1 - normal\n2 - reserved' AFTER `status_tmp`;
+
+UPDATE wireless_order_db.discount
+SET type = 2
+WHERE status = 2 OR status = 3;
+
+UPDATE wireless_order_db.discount
+SET status_tmp = 2
+WHERE status = 1 OR status = 3;
+
+ALTER TABLE `wireless_order_db`.`discount` 
+DROP COLUMN `status`;
+ALTER TABLE `wireless_order_db`.`discount` 
+CHANGE COLUMN `status_tmp` `status` TINYINT(4) NULL DEFAULT '1' COMMENT 'the status is as below\n1 - normal\n2 - default' ;
+
+-- -----------------------------------------------------
+-- Delete the idle kitchen to discount plan
+-- -----------------------------------------------------
+DELETE DP
+FROM
+wireless_order_db.discount_plan DP,
+wireless_order_db.kitchen K
+WHERE DP.kitchen_id = K.kitchen_id AND K.type = 1;
+
 SET SQL_SAFE_UPDATES = @OLD_SAFE_UPDATES;
