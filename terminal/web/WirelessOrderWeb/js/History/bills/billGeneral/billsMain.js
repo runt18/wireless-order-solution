@@ -38,6 +38,42 @@ function billQueryHandler() {
 	});
 };
 
+function billQueryExportHandler() {
+	var sType = searchType, sValue = '', sOperator = '', sAdditionFilter = 0;
+	var onDuty = '', offDuty = '';
+	if(sType == 0){
+		sValue = '';
+		searchOperator = '';
+	}else if(sType == 4){
+		var temp = searchValue.split(searchSubSplitSymbol);
+		onDuty = Ext.getCmp(temp[0]).getValue().format('Y-m-d 00:00:00');
+		offDuty = Ext.getCmp(temp[1]).getValue().format('Y-m-d 23:59:59');
+		sValue = onDuty + '<split>' + offDuty;
+	}else if(searchType == 9){
+		sValue = '';
+	}else{
+		sValue = searchValue != '' ? Ext.getCmp(searchValue).getValue() : '';
+		sOperator = searchOperator != '' ? Ext.getCmp(searchOperator).getValue() : '';
+		if(typeof sValue == 'string' && sValue == ''){
+			sType = 0;
+			sValue = '';
+		}
+	}
+	sAdditionFilter = Ext.getCmp(searchAdditionFilter).inputValue;	
+	
+	var url = '../../{0}?type={1}&ope={2}&value={3}&havingCond={4}&dataSource={5}';
+	url = String.format(
+			url, 
+			'ExportHistoryStatisticsToExecl.do', 
+			sType, 
+			sOperator,
+			sValue,
+			sAdditionFilter,
+			'historyOrder'
+	);
+	window.location = url;
+};
+
 //----------------------load
 function loadAddKitchens() {
 	kitchenMultSelectData = [];
@@ -617,6 +653,12 @@ Ext.onReady(function() {
 			iconCls : 'btn_search',
 			handler : function(e){
 				billQueryHandler();
+			}
+		},{
+			text : '导出',
+			iconCls : 'icon_tb_exoprt_excel',
+			handler : function(){
+				billQueryExportHandler();
 			}
 		}, {
 			text : '高级搜索',

@@ -728,7 +728,7 @@ function initKeyBoardEvent(){
 		xtype : 'numberfield',
 		columnWidth : .49,
 		height : 110,
-		style : 'line-height: 100px; font-size: 100px; font-weight: bold; text-align: left; color: red;',
+		style : 'line-height: 100px;font-size: 100px;font-weight: bold;text-align: left;color: red;',
 		allowBlank : false,
 		listeners : {
 			render : function(thiz){
@@ -740,7 +740,7 @@ function initKeyBoardEvent(){
 		xtype : 'numberfield',
 		columnWidth : .49,
 		height : 110,
-		style : 'line-height: 100px; font-size: 100px; font-weight: bold; text-align: left; color: red;',
+		style : 'line-height: 100px;font-size: 100px;font-weight: bold;text-align: left;color: red;',
 		allowBlank : false,
 		listeners : {
 			render : function(thiz){
@@ -848,18 +848,18 @@ function initKeyBoardEvent(){
 		},
 		items : [{
 			layout : 'column',
-			height : 180,
+			height : 183,
 			frame : true,
 			items : [{
 				columnWidth : .5,
 				html : '菜品编号(/)',
 				height : 30,
-				style : 'font-size: 26px;'
+				style : 'font-size:26px;'
 			}, {
 				columnWidth : .5,
 				html : '数量(*)',
 				height : 30,
-				style : 'font-size: 26px;'
+				style : 'font-size:26px;'
 			}, foodAlias, {
 				columnWidth : .01,
 				html : '&nbsp;'

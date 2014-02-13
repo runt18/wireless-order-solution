@@ -1542,7 +1542,7 @@ Ext.onReady(function() {
 			var alias = new Ext.form.NumberField({
 				xtype : 'numberfield',
 				hideLabel : true,
-				style : 'line-height: 100px; font-size: 100px; font-weight: bold; text-align: center; color: red;',
+				style : 'line-height:100px;font-size:100px;font-weight:bold;text-align:center;color:red;',
 				width : 350,
 				height : 110,
 				maxValue : 65535,
