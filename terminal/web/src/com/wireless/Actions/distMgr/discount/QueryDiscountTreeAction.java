@@ -1,7 +1,5 @@
 package com.wireless.Actions.distMgr.discount;
 
-import java.util.List;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -30,13 +28,8 @@ public class QueryDiscountTreeAction extends Action{
 			dbCon.connect();
 			String pin = (String)request.getAttribute("pin");
 			
-			List<Discount> discounts = DiscountDao.getPureDiscount(dbCon, 
-					StaffDao.getStaffById(Integer.parseInt(pin)), 
-					" AND DIST.status <> " + Discount.Status.MEMBER_TYPE.getVal(), 
-					" ORDER BY DIST.level DESC");
-			
 			int i = 0;
-			for(Discount discount : discounts){
+			for(Discount discount : DiscountDao.getPureAll(dbCon, StaffDao.getStaffById(Integer.parseInt(pin)))){
 				tsb.append(i > 0 ? "," : "");
 				tsb.append("{");
 				tsb.append("leaf:true");

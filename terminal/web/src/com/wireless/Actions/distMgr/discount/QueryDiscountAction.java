@@ -39,7 +39,7 @@ public class QueryDiscountAction extends DispatchAction{
 		try{
 			Staff staff = StaffDao.verify(Integer.parseInt((String) request.getAttribute("pin")));
 			Role role = new Role(Integer.valueOf(request.getParameter("roleId")));
-			List<Discount> root = DiscountDao.getDiscountByRole(staff, role);
+			List<Discount> root = DiscountDao.getByRole(staff, role);
 			jobject.setRoot(root);
 			jobject.setTotalProperty(root.size());
 		}catch(Exception e){
@@ -96,13 +96,8 @@ public class QueryDiscountAction extends DispatchAction{
 			dbCon.connect();
 			String pin = (String)request.getAttribute("pin");
 			
-			List<Discount> discounts = DiscountDao.getPureDiscount(dbCon, 
-					StaffDao.getStaffById(Integer.parseInt(pin)), 
-					" AND DIST.status <> " + Discount.Status.MEMBER_TYPE.getVal(), 
-					" ORDER BY DIST.level DESC");
-			
 			int i = 0;
-			for(Discount discount : discounts){
+			for(Discount discount : DiscountDao.getPureAll(dbCon, StaffDao.getStaffById(Integer.parseInt(pin)))){
 				tsb.append(i > 0 ? "," : "");
 				tsb.append("{");
 				tsb.append("leaf:true");

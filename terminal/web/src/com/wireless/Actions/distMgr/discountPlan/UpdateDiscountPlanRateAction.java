@@ -36,7 +36,7 @@ public class UpdateDiscountPlanRateAction extends Action{
 			String discountID = request.getParameter("discountID");
 			String rate = request.getParameter("rate");
 			
-			DiscountPlan pojo = new DiscountPlan();
+			DiscountPlan pojo = new DiscountPlan(0);
 			pojo.setRate(Float.valueOf(rate));
 			pojo.getDiscount().setId(Integer.valueOf(discountID));
 			pojo.getDiscount().setRestaurantId(Integer.valueOf(restaurantID));

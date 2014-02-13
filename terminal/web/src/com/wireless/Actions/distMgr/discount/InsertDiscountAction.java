@@ -51,7 +51,7 @@ public class InsertDiscountAction extends Action{
 			DiscountPlan plan = null;
 			
 			if(isAuto != null && isAuto.trim().equals("true")){
-				plan = new DiscountPlan();
+				plan = new DiscountPlan(0);
 				plan.setRate(Float.valueOf(rate));
 			}
 			

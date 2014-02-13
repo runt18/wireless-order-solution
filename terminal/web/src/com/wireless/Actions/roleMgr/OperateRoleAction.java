@@ -18,7 +18,6 @@ import com.wireless.db.staffMgr.RoleDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
-import com.wireless.pojo.distMgr.Discount;
 import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.staffMgr.Privilege.Code;
 import com.wireless.pojo.staffMgr.Role;
@@ -107,11 +106,11 @@ public class OperateRoleAction extends DispatchAction{
 			
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 		
-			List<Privilege> privilegeList = PrivilegeDao.getPrivileges(staff, null, " AND status != " + Discount.Status.MEMBER_TYPE.getVal());
+			List<Privilege> privilegeList = PrivilegeDao.getPrivileges(staff, null, null);
 
 			
 			
-			List<String> newPId = new ArrayList<String>(); ;
+			List<String> newPriId = new ArrayList<String>(); ;
 			
 			Role role = RoleDao.getRoleById(staff, Integer.parseInt(roleId));
 			role.clearPrivilege();
@@ -119,7 +118,7 @@ public class OperateRoleAction extends DispatchAction{
 				String[] privilegeArray = privileges.split(",");
 				for (String string : privilegeArray) {
 					if(!string.isEmpty()){
-						newPId.add(string);
+						newPriId.add(string);
 					}
 				}
 				if(discounts != null && !discounts.trim().isEmpty()){
@@ -131,8 +130,8 @@ public class OperateRoleAction extends DispatchAction{
 								isAllCount = "true";
 							}
 							//选了部分折扣的情况
-							if( newPId.indexOf(privilege.getId()+"") < 0 && isAllCount.trim().isEmpty()){
-								newPId.add(privilege.getId()+"");
+							if( newPriId.indexOf(privilege.getId()+"") < 0 && isAllCount.trim().isEmpty()){
+								newPriId.add(privilege.getId() + "");
 							}
 /*							else if(newPId.indexOf(privilege.getId()+"") > 0 && !isAllCount.trim().isEmpty()){
 								newPId.remove(privilege.getId()+"");
@@ -140,17 +139,16 @@ public class OperateRoleAction extends DispatchAction{
 						}
 					}
 				}
-				for (String pID : newPId) {
+				for (String priId : newPriId) {
 					
-					int index = privilegeList.indexOf(new Privilege(Integer.parseInt(pID)));
+					int index = privilegeList.indexOf(new Privilege(Integer.parseInt(priId)));
 					if(index >= 0){
 						if(isAllCount.trim().isEmpty()){
 							if(privilegeList.get(index).getCode() == Code.DISCOUNT){
 								privilegeList.get(index).setAllDiscount();
 								String[] discountArray = discounts.split(",");
-								for (String dID : discountArray) {
-									Discount disc = DiscountDao.getPureDiscount(staff, " AND DIST.discount_id = " + dID, null).get(0);
-									privilegeList.get(index).addDiscount(disc);
+								for (String distId : discountArray) {
+									privilegeList.get(index).addDiscount(DiscountDao.getById(staff, Integer.parseInt(distId)));
 								}
 							}
 						}
