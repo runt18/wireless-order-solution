@@ -149,7 +149,7 @@ public class CancelReasonDao {
 		String sql;
 		CancelReason crToUpdate = builder.build();
 		sql = " UPDATE " + Params.dbName + ".cancel_reason SET " +
-			  " reason = " + crToUpdate.getReason() +
+			  " reason = '" + crToUpdate.getReason() + "' " +
 			  " WHERE cancel_reason_id = " + crToUpdate.getId();
 		if(dbCon.stmt.executeUpdate(sql) == 0){
 			throw new BusinessException("The cancel reason(id = " + crToUpdate.getId() + ") is NOT found.");

@@ -67,7 +67,7 @@ public class DiscountDao {
 	 * 			throws if failed to execute any SQL statement
 	 */
 	public static Discount getDefault(DBCon dbCon, Staff staff) throws SQLException{
-		List<Discount> result = getByCond(dbCon, staff, " AND DIST.status = " + Discount.Status.DEFAULT.getVal() + ")", null, ShowType.BY_PLAN);
+		List<Discount> result = getByCond(dbCon, staff, " AND DIST.status = " + Discount.Status.DEFAULT.getVal(), null, ShowType.BY_PLAN);
 		if(result.isEmpty()){
 			return getByCond(dbCon, staff, " AND DIST.status = " + Discount.Type.RESERVED.getVal(), null, ShowType.BY_PLAN).get(0);
 		}else{
