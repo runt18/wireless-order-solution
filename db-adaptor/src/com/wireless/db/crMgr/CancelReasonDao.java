@@ -208,4 +208,46 @@ public class CancelReasonDao {
 		}
 		return cancelReasonId;
 	}
+	
+	/**
+	 * Delete the cancel reason to specific id.
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param id
+	 * 			the reason id to delete
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if the reason to delete does NOT exist
+	 */
+	public static void delete(Staff staff, int id) throws SQLException, BusinessException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			delete(dbCon, staff, id);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Delete the cancel reason to specific id.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param id
+	 * 			the reason id to delete
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if the reason to delete does NOT exist
+	 */
+	public static void delete(DBCon dbCon, Staff staff, int id) throws SQLException, BusinessException{
+		String sql;
+		sql = " DELETE FROM " + Params.dbName + ".cancel_reason WHERE cancel_reason_id = " + id;
+		if(dbCon.stmt.executeUpdate(sql) == 0){
+			throw new BusinessException("The cancel reason(id = " + id + ") is NOT found.");
+		}
+	}
 }
