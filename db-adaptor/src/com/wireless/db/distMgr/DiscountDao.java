@@ -339,7 +339,7 @@ public class DiscountDao {
 				sql = " SELECT " +
 					  " KITCHEN.name AS kitchen_name, KITCHEN.display_id, " +
 					  " DEPT.dept_id, DEPT.name AS dept_name, DEPT.display_id AS dept_display_id, " +
-					  " DIST_PLAN.dist_plan_id, DIST_PLAN.kitchen_id, DIST_PLAN.rate " +
+					  " DIST_PLAN.dist_plan_id, DIST_PLAN.kitchen_id, DIST_PLAN.rate, IF(DIST_PLAN.rate IS NULL, 0, 1) AS has_plan " +
 					  " FROM " + Params.dbName + ".kitchen KITCHEN " +
 					  " JOIN " + Params.dbName + ".department DEPT ON KITCHEN.dept_id = DEPT.dept_id AND KITCHEN.restaurant_id = DEPT.restaurant_id " + 
 					  " LEFT JOIN " + Params.dbName + ".discount_plan DIST_PLAN ON DIST_PLAN.kitchen_id = KITCHEN.kitchen_id AND DIST_PLAN.discount_id = " + each.getId() +
@@ -349,26 +349,29 @@ public class DiscountDao {
 					  " ORDER BY DEPT.display_id, KITCHEN.display_id ";
 				dbCon.rs = dbCon.stmt.executeQuery(sql);
 				while(dbCon.rs.next()){
-					float rate = dbCon.rs.getFloat("rate");
-					if(rate != 0){
-						DiscountPlan dp = new DiscountPlan(dbCon.rs.getInt("dist_plan_id"));
-						
-						dp.setRate(rate);
-						
-						Kitchen k = new Kitchen(dbCon.rs.getInt("kitchen_id"));
-						k.setRestaurantId(staff.getRestaurantId());
-						k.setDisplayId(dbCon.rs.getShort("display_id"));
-						k.setName(dbCon.rs.getString("kitchen_name"));
-						
-						Department d = new Department(dbCon.rs.getInt("dept_id"));
-						d.setName(dbCon.rs.getString("dept_name"));
-						d.setDisplayId(dbCon.rs.getInt("dept_display_id"));
-						k.setDept(d);
-						
-						dp.setKitchen(k);
-						
-						each.addPlan(dp);
+					float rate;
+					if(dbCon.rs.getBoolean("has_plan")){
+						rate = dbCon.rs.getFloat("rate");
+					}else{
+						rate = 1;
 					}
+					DiscountPlan dp = new DiscountPlan(dbCon.rs.getInt("dist_plan_id"));
+					
+					dp.setRate(rate);
+					
+					Kitchen k = new Kitchen(dbCon.rs.getInt("kitchen_id"));
+					k.setRestaurantId(staff.getRestaurantId());
+					k.setDisplayId(dbCon.rs.getShort("display_id"));
+					k.setName(dbCon.rs.getString("kitchen_name"));
+					
+					Department d = new Department(dbCon.rs.getInt("dept_id"));
+					d.setName(dbCon.rs.getString("dept_name"));
+					d.setDisplayId(dbCon.rs.getInt("dept_display_id"));
+					k.setDept(d);
+					
+					dp.setKitchen(k);
+					
+					each.addPlan(dp);
 				}
 				dbCon.rs.close();	  
 			}
