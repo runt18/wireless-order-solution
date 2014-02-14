@@ -691,6 +691,7 @@ function memberPayOrderHandler(_c){
 	var payManner = Ext.getCmp('mpo_comPayMannerForPayOrder');
 	var customNum = Ext.getCmp('mpo_numCustomNumberForPayOrder');
 	var chooseDiscount = Ext.getCmp('mpo_txtDiscountForPayOrder');
+	var chooseCoupon = Ext.getCmp('mpo_couponForPayOrder');
 	var eraseQuota = document.getElementById("txtMemberEraseQuota").value;
 	
 	if(!payManner.isValid() || !customNum.isValid()){
@@ -717,6 +718,7 @@ function memberPayOrderHandler(_c){
 			cashIncome : order['actualPrice'],
 			payType : 2,
 			discountID : chooseDiscount.getValue(),
+			couponID : chooseCoupon.getValue(),
 			payManner : payManner.getValue(),
 			tempPay : _c.tempPay,
 			memberID : member['id'],
