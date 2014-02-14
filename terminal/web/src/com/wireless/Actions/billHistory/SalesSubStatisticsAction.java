@@ -134,7 +134,7 @@ public class SalesSubStatisticsAction extends Action {
 				Food fb = new Food(0);
 				fb.setName("汇总");
 				sum.setFood(fb);
-				Department dept = new Department();
+				Department dept = new Department(0);
 				dept.setName("汇总");
 				sum.setDept(dept);
 				for(SalesDetail tp : saleDetails){
