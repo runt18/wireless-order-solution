@@ -293,7 +293,6 @@ function createGridPanel(id, title, height, width, url, cmData, readerData,
 			},
 			groupField : group.name
 		});		
-		console.log(group.sort);
 	} else {
 		/** 普通数据源 **/
 		g_store = new Ext.data.Store({

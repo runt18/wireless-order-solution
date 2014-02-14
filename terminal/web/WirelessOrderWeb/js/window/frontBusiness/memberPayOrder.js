@@ -723,7 +723,7 @@ function memberPayOrderHandler(_c){
 			tempPay : _c.tempPay,
 			memberID : member['id'],
 			comment : '',
-			serviceRate : order['serviceRate'],
+			serviceRate : (order['serviceRate'] * 100),
 			eraseQuota : eraseQuota,
 //			pricePlanID : order['pricePlan']['id'],
 			customNum : customNum.getValue()
