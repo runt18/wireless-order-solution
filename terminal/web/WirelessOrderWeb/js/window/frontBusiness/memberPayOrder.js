@@ -723,7 +723,7 @@ function memberPayOrderHandler(_c){
 			comment : '',
 			serviceRate : order['serviceRate'],
 			eraseQuota : eraseQuota,
-			pricePlanID : order['pricePlan']['id'],
+//			pricePlanID : order['pricePlan']['id'],
 			customNum : customNum.getValue()
 		},
 		success : function(res, opt){

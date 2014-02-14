@@ -285,12 +285,15 @@ function createGridPanel(id, title, height, width, url, cmData, readerData,
 			autoLoad : false,
 			proxy : g_proxy,
 			reader : g_reader,
+			remoteSort : typeof group.sort != 'undefined' ? null : true,
+			groupOnSort : typeof group.sort != 'undefined' ? null : false,
 			sortInfo : {
 				field : typeof group.sort != 'undefined' ? group.sort : group.name,
 				direction : "ASC"
 			},
 			groupField : group.name
 		});		
+		console.log(group.sort);
 	} else {
 		/** 普通数据源 **/
 		g_store = new Ext.data.Store({

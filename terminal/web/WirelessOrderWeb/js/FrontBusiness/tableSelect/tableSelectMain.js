@@ -194,7 +194,7 @@ var shiftBut = new Ext.ux.ImageButton({
 			success : function(res, opt){
 				var jr = Ext.util.JSON.decode(res.responseText);
 				if(jr.success){
-					shiftCheckDate = jr;
+					shiftCheckDate = jr.root[0];
 					shiftCheckDate.otype = 0;
 					dailySettleCheckTableWin.show();
 					dailySettleCheckTableWin.center();
@@ -230,7 +230,7 @@ var dailySettleBut = new Ext.ux.ImageButton({
 				success : function(res, opt){
 					var jr = Ext.util.JSON.decode(res.responseText);
 					if(jr.success){
-						shiftCheckDate = jr;
+						shiftCheckDate = jr.root[0];
 						shiftCheckDate.otype = 1;
 						dailySettleCheckTableWin.show();
 						dailySettleCheckTableWin.center();

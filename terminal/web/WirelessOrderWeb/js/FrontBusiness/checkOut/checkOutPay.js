@@ -286,7 +286,7 @@ function memberPay(){
 										defaults : {
 											xtype : 'label',
 											columnWidth : .33,
-											style : 'vertical-align:middle; line-height:36px; padding-left:20px; font-size:15px; font-weight: bold;'
+											style : 'vertical-align:middle;line-height:36px;padding-left:20px;font-size:15px;font-weight: bold;'
 										},
 										items : [{
 											html : '会员名称：<font color="red">' + member.name + '</font>'
