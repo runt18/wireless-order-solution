@@ -204,9 +204,8 @@ public class TestParcel {
 	
 	@Test
 	public void testComplexDeptParcel(){
-		Department deptToParcel = new Department();
+		Department deptToParcel = new Department(Department.DeptId.DEPT_1.getVal());
 		
-		deptToParcel.setId(Department.DeptId.DEPT_1.getVal());
 		deptToParcel.setType(Department.DeptId.DEPT_1.getType());
 		deptToParcel.setName("测试部门");
 		
@@ -215,7 +214,7 @@ public class TestParcel {
 		
 		Parcel p2 = new Parcel();
 		p2.unmarshall(p.marshall());
-		Department parcelableDept = new Department();
+		Department parcelableDept = new Department(0);
 		parcelableDept.createFromParcel(p2);
 		
 		// Check the department id

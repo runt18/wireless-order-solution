@@ -24,8 +24,8 @@ public class StockAction implements Jsonable{
 		private String oriStockId;
 		private long oriStockIdDate;
 		private Supplier supplier = new Supplier();
-		private Department deptIn = new Department();
-		private Department deptOut = new Department();
+		private Department deptIn = new Department(0);
+		private Department deptOut = new Department(0);
 		private int operatorId;
 		private String operator;
 		private List<StockActionDetail> stockActionDetails = new ArrayList<StockActionDetail>(); 
@@ -508,8 +508,8 @@ public class StockAction implements Jsonable{
 	private int approverId;
 	private String approver;
 	private long approverDate;
-	private Department deptIn = new Department();
-	private Department deptOut = new Department();
+	private Department deptIn = new Department(0);
+	private Department deptOut = new Department(0);
 	private Supplier supplier = new Supplier();
 	private int operatorId;
 	private String operator;

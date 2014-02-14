@@ -36,9 +36,6 @@ public class CommissionStatistics implements Jsonable{
 	}
 
 	public Department getDept() {
-		if(dept == null){
-			dept = new Department();
-		}
 		return dept;
 	}
 	public void setDept(Department dept) {

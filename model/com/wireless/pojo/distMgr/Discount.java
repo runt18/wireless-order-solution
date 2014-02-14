@@ -45,8 +45,8 @@ public class Discount implements Jsonable, Parcelable, Comparable<Discount>{
 			this.type = Type.NORMAL;
 		}
 		
-		public InsertBuilder setStatus(Status status){
-			this.status = status;
+		public InsertBuilder setDefault(){
+			this.status = Status.DEFAULT;
 			return this;
 		}
 		
@@ -85,8 +85,8 @@ public class Discount implements Jsonable, Parcelable, Comparable<Discount>{
 			return this.name != null;
 		}
 		
-		public UpdateBuilder setStatus(Status status){
-			this.status = status;
+		public UpdateBuilder setDefault(){
+			this.status = Status.DEFAULT;
 			return this;
 		}
 		

@@ -18,7 +18,7 @@ public class DiscountPlan implements Parcelable, Jsonable{
 	
 	private int id;
 	private Discount discount;
-	private Kitchen kitchen = new Kitchen(0);
+	private final Kitchen kitchen = new Kitchen(0);
 	private float rate;
 	
 	public DiscountPlan(int id){
@@ -99,7 +99,7 @@ public class DiscountPlan implements Parcelable, Jsonable{
 	@Override
 	public void createFromParcel(Parcel source) {
 		this.rate = source.readFloat();
-		this.kitchen = source.readParcel(Kitchen.CREATOR);
+		this.kitchen.copyFrom(source.readParcel(Kitchen.CREATOR));
 	}
 	
 	public final static Parcelable.Creator<DiscountPlan> DP_CREATOR = new Parcelable.Creator<DiscountPlan>() {

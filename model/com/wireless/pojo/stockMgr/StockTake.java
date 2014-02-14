@@ -19,7 +19,7 @@ public class StockTake implements Jsonable {
 	public static class InsertStockTakeBuilder{
 		private final int restaurantId ;
 		private CateType cateType ;	
-		private Department dept = new Department();
+		private Department dept = new Department(0);
 		private Status status = Status.CHECKING;
 		private int cateId;
 		private int operatorId;
@@ -294,7 +294,7 @@ public class StockTake implements Jsonable {
 	
 	private int id;
 	private int restaurantId;
-	private Department dept = new Department();
+	private Department dept = new Department(0);
 	private CateType cateType ;
 	private Status status = Status.CHECKING;
 	private MaterialCate materialCate = new MaterialCate();

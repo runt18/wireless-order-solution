@@ -15,7 +15,7 @@ public class MaterialDept implements Jsonable{
 	private float stock;
 	
 	private Material material = new Material();
-	private Department dept = new Department();
+	private Department dept = new Department(0);
 	private float cost;
 	
 	

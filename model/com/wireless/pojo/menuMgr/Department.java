@@ -214,8 +214,8 @@ public class Department implements Parcelable, Comparable<Department>, Jsonable{
 		this.deptType = Type.NORMAL;
 	}
 	
-	public Department(){
-		
+	public Department(int id){
+		this.deptId = (short)id;
 	}
 	
 	public Department(int restaurantId, short deptId, String deptName){
@@ -361,7 +361,7 @@ public class Department implements Parcelable, Comparable<Department>, Jsonable{
 	public final static Parcelable.Creator<Department> DEPT_CREATOR = new Parcelable.Creator<Department>(){
 
 		public Department newInstance() {
-			return new Department();
+			return new Department(0);
 		}
 
 		public Department[] newInstance(int size) {
