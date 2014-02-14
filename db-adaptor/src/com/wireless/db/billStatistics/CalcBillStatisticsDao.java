@@ -868,8 +868,7 @@ public class CalcBillStatisticsDao {
 		List<IncomeByFood> foodIncomes = new ArrayList<IncomeByFood>();
 		while(dbCon.rs.next()){
 
-			Department dept = new Department();
-			dept.setId(dbCon.rs.getShort("dept_id"));
+			Department dept = new Department(dbCon.rs.getShort("dept_id"));
 			dept.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
 
 			

@@ -122,9 +122,8 @@ public class OrderFoodDao {
 			kitchen.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
 			kitchen.setName(dbCon.rs.getString("kitchen_name"));
 			
-			Department dept = new Department();
+			Department dept = new Department(dbCon.rs.getShort("dept_id"));
 			dept.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
-			dept.setId(dbCon.rs.getShort("dept_id"));
 			dept.setName(dbCon.rs.getString("dept_name"));
 			
 			kitchen.setDept(dept);
@@ -234,9 +233,8 @@ public class OrderFoodDao {
 			kitchen.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
 			kitchen.setName(dbCon.rs.getString("kitchen_name"));
 			
-			Department dept = new Department();
+			Department dept = new Department(dbCon.rs.getShort("dept_id"));
 			dept.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
-			dept.setId(dbCon.rs.getShort("dept_id"));
 			dept.setName(dbCon.rs.getString("dept_name"));
 			
 			kitchen.setDept(dept);

@@ -332,10 +332,9 @@ public class MenuDao {
 			dbCon.rs = dbCon.stmt.executeQuery(selectSQL);
 			
 			while(dbCon.rs != null && dbCon.rs.next()){
-				item = new Department();
+				item = new Department(dbCon.rs.getShort("dept_id"));
 				
 				item.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
-				item.setId(dbCon.rs.getShort("dept_id"));
 				item.setName(dbCon.rs.getString("name"));
 				
 				list.add(item);

@@ -505,8 +505,7 @@ public class DepartmentDao {
 		List<Department> list = new ArrayList<Department>();
 		
 		while(dbCon.rs.next()){
-			Department dept = new Department();
-			dept.setId((short) dbCon.rs.getInt("dept_id"));
+			Department dept = new Department(dbCon.rs.getInt("dept_id"));
 			dept.setName(dbCon.rs.getString("name"));
 			dept.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
 			dept.setType(dbCon.rs.getInt("type"));

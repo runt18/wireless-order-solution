@@ -15,11 +15,28 @@ import com.wireless.pojo.distMgr.Discount;
 import com.wireless.pojo.distMgr.Discount.Status;
 import com.wireless.pojo.distMgr.Discount.Type;
 import com.wireless.pojo.distMgr.DiscountPlan;
+import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.pojo.staffMgr.Role;
 import com.wireless.pojo.staffMgr.Staff;
 
 public class DiscountDao {
+	
+	public static enum ShowType{
+		BY_PLAN("按方案显示"),
+		BY_KITCHEN("按厨房显示");
+		
+		private final String desc;
+		
+		ShowType(String desc){
+			this.desc = desc;
+		}
+		
+		@Override
+		public String toString(){
+			return desc;
+		}
+	}
 	
 	/**
 	 * Get the default the discount to a specific restaurant.
@@ -50,9 +67,9 @@ public class DiscountDao {
 	 * 			throws if failed to execute any SQL statement
 	 */
 	public static Discount getDefault(DBCon dbCon, Staff staff) throws SQLException{
-		List<Discount> result = getByCond(dbCon, staff, " AND DIST.status = " + Discount.Status.DEFAULT.getVal() + ")", null);
+		List<Discount> result = getByCond(dbCon, staff, " AND DIST.status = " + Discount.Status.DEFAULT.getVal() + ")", null, ShowType.BY_PLAN);
 		if(result.isEmpty()){
-			return getByCond(dbCon, staff, " AND DIST.status = " + Discount.Type.RESERVED.getVal(), null).get(0);
+			return getByCond(dbCon, staff, " AND DIST.status = " + Discount.Type.RESERVED.getVal(), null, ShowType.BY_PLAN).get(0);
 		}else{
 			return result.get(0);
 		}
@@ -78,7 +95,7 @@ public class DiscountDao {
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		if(dbCon.rs.next()){
 			dbCon.rs.close();
-			return getByCond(dbCon, staff, " AND DIST.discount_id IN (" + sql + ")", null);
+			return getByCond(dbCon, staff, " AND DIST.discount_id IN (" + sql + ")", null, ShowType.BY_PLAN);
 		}else{
 			return Collections.emptyList();
 		}
@@ -144,10 +161,10 @@ public class DiscountDao {
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		if(dbCon.rs.next()){
 			dbCon.rs.close();
-			return getByCond(dbCon, staff, " AND DIST.discount_id IN (" + sql + ")", null);
+			return getByCond(dbCon, staff, " AND DIST.discount_id IN (" + sql + ")", null, ShowType.BY_PLAN);
 		}else{
 			dbCon.rs.close();
-			return getByCond(dbCon, staff, null, null);
+			return getByCond(dbCon, staff, null, null, ShowType.BY_PLAN);
 		}
 	}
 	
@@ -188,7 +205,51 @@ public class DiscountDao {
 	 * 			throws if the discount to this id does NOT exist
 	 */
 	public static Discount getById(DBCon dbCon, Staff staff, int discountId) throws SQLException, BusinessException{
-		List<Discount> result = getByCond(dbCon, staff, " AND DIST.discount_id = " + discountId, null);
+		return getById(dbCon, staff, discountId, ShowType.BY_PLAN);
+	}
+	
+	/**
+	 * Get the discount according to a specific id.
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param discountId
+	 * 			the discount id
+	 * @param showType
+	 * 			the show type {@link ShowType}
+	 * @return the discount to this id
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if the discount to this id does NOT exist
+	 */
+	public static Discount getById(Staff staff, int discountId, ShowType showType) throws SQLException, BusinessException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return getById(dbCon, staff, discountId, showType);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Get the discount according to a specific id.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param discountId
+	 * 			the discount id
+	 * @param showType
+	 * 			the show type {@link ShowType}
+	 * @return the discount to this id
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if the discount to this id does NOT exist
+	 */
+	public static Discount getById(DBCon dbCon, Staff staff, int discountId, ShowType showType) throws SQLException, BusinessException{
+		List<Discount> result = getByCond(dbCon, staff, " AND DIST.discount_id = " + discountId, null, showType);
 		if(result.isEmpty()){
 			throw new BusinessException(DiscountError.DISCOUNT_NOT_EXIST);
 		}else{
@@ -225,7 +286,7 @@ public class DiscountDao {
 	 * 			throws if failed to execute any SQL statement
 	 */
 	public static List<Discount> getAll(DBCon dbCon, Staff staff) throws SQLException{
-		return getByCond(dbCon, staff, null, null);
+		return getByCond(dbCon, staff, null, null, ShowType.BY_PLAN);
 	}
 	
 	/**
@@ -242,37 +303,75 @@ public class DiscountDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	private static List<Discount> getByCond(DBCon dbCon, Staff staff, String extraCond, String orderClause) throws SQLException{
+	private static List<Discount> getByCond(DBCon dbCon, Staff staff, String extraCond, String orderClause, ShowType showType) throws SQLException{
 		
 		List<Discount> result = getPureByCond(dbCon, staff, extraCond, orderClause);
 		for(Discount each : result){
 			String sql;
-			sql = " SELECT " +
-				  " DIST_PLAN.dist_plan_id, DIST_PLAN.kitchen_id, DIST_PLAN.rate, " +
-				  " KITCHEN.name AS kitchen_name, KITCHEN.display_id " +
-				  " FROM " + Params.dbName + ".discount_plan DIST_PLAN " +
-				  " JOIN " + Params.dbName + ".kitchen KITCHEN ON DIST_PLAN.kitchen_id = KITCHEN.kitchen_id " +
-				  " WHERE 1 = 1 " +
-				  " AND DIST_PLAN.discount_id = " + each.getId();
-			
-			dbCon.rs = dbCon.stmt.executeQuery(sql);
-			while(dbCon.rs.next()){
-				DiscountPlan dp = new DiscountPlan(dbCon.rs.getInt("dist_plan_id"));
+			if(showType == ShowType.BY_PLAN){
+				sql = " SELECT " +
+					  " DIST_PLAN.dist_plan_id, DIST_PLAN.kitchen_id, DIST_PLAN.rate, " +
+					  " KITCHEN.name AS kitchen_name, KITCHEN.display_id " +
+					  " FROM " + Params.dbName + ".discount_plan DIST_PLAN " +
+					  " JOIN " + Params.dbName + ".kitchen KITCHEN ON DIST_PLAN.kitchen_id = KITCHEN.kitchen_id " +
+					  " WHERE 1 = 1 " +
+					  " AND DIST_PLAN.discount_id = " + each.getId();
 				
-				float rate = dbCon.rs.getFloat("rate");
-				if(rate != 1){
-					dp.setRate(rate);
+				dbCon.rs = dbCon.stmt.executeQuery(sql);
+				while(dbCon.rs.next()){
+					if(dbCon.rs.getFloat("rate") != 1){
+						DiscountPlan dp = new DiscountPlan(dbCon.rs.getInt("dist_plan_id"));
+						
+						dp.setRate(dbCon.rs.getFloat("rate"));
+						
+						Kitchen k = new Kitchen(dbCon.rs.getInt("kitchen_id"));
+						k.setRestaurantId(staff.getRestaurantId());
+						k.setDisplayId(dbCon.rs.getShort("display_id"));
+						k.setName(dbCon.rs.getString("kitchen_name"));
+						dp.setKitchen(k);
+						
+						each.addPlan(dp);
+					}
 				}
+				dbCon.rs.close();
 				
-				Kitchen k = new Kitchen(dbCon.rs.getInt("kitchen_id"));
-				k.setRestaurantId(staff.getRestaurantId());
-				k.setDisplayId(dbCon.rs.getShort("display_id"));
-				k.setName(dbCon.rs.getString("kitchen_name"));
-				dp.setKitchen(k);
-				
-				each.addPlan(dp);
+			}else if(showType == ShowType.BY_KITCHEN){
+				sql = " SELECT " +
+					  " KITCHEN.name AS kitchen_name, KITCHEN.display_id, " +
+					  " DEPT.dept_id, DEPT.name AS dept_name, DEPT.display_id AS dept_display_id, " +
+					  " DIST_PLAN.dist_plan_id, DIST_PLAN.kitchen_id, DIST_PLAN.rate " +
+					  " FROM " + Params.dbName + ".kitchen KITCHEN " +
+					  " JOIN " + Params.dbName + ".department DEPT ON KITCHEN.dept_id = DEPT.dept_id AND KITCHEN.restaurant_id = DEPT.restaurant_id " + 
+					  " LEFT JOIN " + Params.dbName + ".discount_plan DIST_PLAN ON DIST_PLAN.kitchen_id = KITCHEN.kitchen_id " +
+					  " WHERE 1 = 1 " +
+					  " AND KITCHEN.type = " + Kitchen.Type.NORMAL.getVal() +
+					  " AND DIST_PLAN.discount_id = " + each.getId() +
+					  " ORDER BY DEPT.display_id, KITCHEN.display_id ";
+				dbCon.rs = dbCon.stmt.executeQuery(sql);
+				while(dbCon.rs.next()){
+					float rate = dbCon.rs.getFloat("rate");
+					if(rate != 0){
+						DiscountPlan dp = new DiscountPlan(dbCon.rs.getInt("dist_plan_id"));
+						
+						dp.setRate(rate);
+						
+						Kitchen k = new Kitchen(dbCon.rs.getInt("kitchen_id"));
+						k.setRestaurantId(staff.getRestaurantId());
+						k.setDisplayId(dbCon.rs.getShort("display_id"));
+						k.setName(dbCon.rs.getString("kitchen_name"));
+						
+						Department d = new Department(dbCon.rs.getInt("dept_id"));
+						d.setName(dbCon.rs.getString("dept_name"));
+						d.setDisplayId(dbCon.rs.getInt("dept_display_id"));
+						k.setDept(d);
+						
+						dp.setKitchen(k);
+						
+						each.addPlan(dp);
+					}
+				}
+				dbCon.rs.close();	  
 			}
-			dbCon.rs.close();
 		}
 		
 		return result;
@@ -1046,6 +1145,7 @@ public class DiscountDao {
 	 * @throws BusinessException
 	 * 			throws if cases below
 	 * 			<li>the discount to delete belongs to reserved
+	 * 			<li>the discount is used by member type
 	 * 			<li>the discount to delete does NOT exist
 	 */
 	public static void delete(DBCon dbCon, Staff staff, int id) throws SQLException, BusinessException{
@@ -1060,6 +1160,16 @@ public class DiscountDao {
 			}
 		}else{
 			throw new BusinessException(DiscountError.DISCOUNT_NOT_EXIST);
+		}
+		dbCon.rs.close();
+		
+		//Check to see whether the discount to delete is used by member type.
+		sql = " SELECT COUNT(*) FROM " +  Params.dbName + ".member_type_discount WHERE discount_id = " + id;
+		dbCon.rs = dbCon.stmt.executeQuery(sql);
+		if(dbCon.rs.next()){
+			if(dbCon.rs.getInt(1) > 0){
+				throw new BusinessException(DiscountError.DISCOUNT_USED_BY_MEMBER_TYPE);
+			}
 		}
 		dbCon.rs.close();
 		
