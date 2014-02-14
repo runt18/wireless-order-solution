@@ -6,8 +6,6 @@ import java.sql.SQLException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import net.sf.json.JSONObject;
-
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
@@ -25,7 +23,6 @@ import com.wireless.pojo.restaurantMgr.Restaurant.RecordAlive;
 import com.wireless.pojo.restaurantMgr.Restaurant.UpdateBuilder;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.DateUtil;
-import com.wireless.util.WebParams;
 
 public class OperateRestaurantAction extends DispatchAction {
 	public ActionForward insert(ActionMapping mapping, ActionForm form,
@@ -54,7 +51,7 @@ public class OperateRestaurantAction extends DispatchAction {
 			jobject.initTip(true, "添加成功");
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
+			jobject.initTip(e);
 		}finally{
 			response.getWriter().print(jobject.toString());
 		}
@@ -110,10 +107,7 @@ public class OperateRestaurantAction extends DispatchAction {
 			throws Exception {
 		DBCon dbCon = new DBCon();
 		PrintWriter out = response.getWriter();
-		JSONObject all = new JSONObject();
-		JSONObject msg = new JSONObject();
-		boolean success = false;
-		
+		JObject jobject = new JObject();
 		try{
 			String restaurant_name = request.getParameter("restaurant_name");
 			String restaurant_info = request.getParameter("restaurant_info");
@@ -133,22 +127,15 @@ public class OperateRestaurantAction extends DispatchAction {
 			restaurant.setTele1(tele1);
 			restaurant.setTele2(tele2);
 			RestaurantDao.update(staff, restaurant);
-			success = true;
-			msg.put("success", success);
-			msg.put("message", "操作成功!");
+			
+			jobject.initTip(true, "操作成功!");
 		} catch(BusinessException e) {
 			e.printStackTrace();
-			success = false;
-			msg.put("success", success);
-			msg.put("message", e.getDesc());
+			jobject.initTip(e);
 		} finally {
 			dbCon.disconnect();
-			all.put("all", msg);
-			out.write(all.toString());
-			out.flush();
-			out.close();
+			out.print(jobject.toString());
 		}
-		
 		return null;
 	}
 	

@@ -3,8 +3,6 @@ package com.wireless.Actions.menuMgr.taste;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import net.sf.json.JSONObject;
-
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -13,8 +11,8 @@ import org.apache.struts.action.ActionMapping;
 import com.wireless.db.menuMgr.FoodTasteDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
+import com.wireless.json.JObject;
 import com.wireless.pojo.menuMgr.Food;
-import com.wireless.util.JObject;
 import com.wireless.util.WebParams;
 
 public class UpdateFoodTasteAction extends Action {
@@ -22,10 +20,7 @@ public class UpdateFoodTasteAction extends Action {
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		
-		
 		JObject jobject = new JObject();
-		
 		try{
 			String pin = (String)request.getAttribute("pin");
 			StaffDao.verify(Integer.parseInt(pin));
@@ -69,10 +64,9 @@ public class UpdateFoodTasteAction extends Action {
 			
 		} catch(Exception e) {
 			e.printStackTrace();
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
+			jobject.initTip(e);
 		} finally {
-			JSONObject json = JSONObject.fromObject(jobject);
-			response.getWriter().print(json.toString());
+			response.getWriter().print(jobject.toString());
 		}
 		
 		return null;

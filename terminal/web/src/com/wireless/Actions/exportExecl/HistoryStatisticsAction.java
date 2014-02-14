@@ -33,10 +33,12 @@ import com.wireless.db.billStatistics.CancelledFoodDao;
 import com.wireless.db.billStatistics.SaleDetailsDao;
 import com.wireless.db.client.member.MemberDao;
 import com.wireless.db.client.member.MemberOperationDao;
+import com.wireless.db.orderMgr.OrderDao;
 import com.wireless.db.shift.ShiftDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.stockMgr.StockActionDao;
 import com.wireless.db.stockMgr.StockReportDao;
+import com.wireless.db.system.SystemDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.billStatistics.CommissionStatistics;
 import com.wireless.pojo.billStatistics.DutyRange;
@@ -50,6 +52,7 @@ import com.wireless.pojo.client.MemberOperation;
 import com.wireless.pojo.client.MemberOperation.OperationType;
 import com.wireless.pojo.client.MemberType;
 import com.wireless.pojo.dishesOrder.CancelledFood;
+import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.pojo.staffMgr.Staff;
@@ -58,6 +61,7 @@ import com.wireless.pojo.stockMgr.StockAction.Status;
 import com.wireless.pojo.stockMgr.StockAction.SubType;
 import com.wireless.pojo.stockMgr.StockActionDetail;
 import com.wireless.pojo.stockMgr.StockReport;
+import com.wireless.pojo.system.DailySettle;
 import com.wireless.pojo.util.DateUtil;
 import com.wireless.pojo.util.NumericUtil;
 import com.wireless.util.DateType;
@@ -2817,6 +2821,232 @@ public class HistoryStatisticsAction extends DispatchAction{
 		os.flush();
 		os.close();
 		
+		return null;
+	}
+	
+	public ActionForward historyOrder(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws UnsupportedEncodingException, Exception, SQLException, BusinessException{
+		
+		response.setContentType("application/vnd.ms-excel;");
+		String restaurantId = (String) request.getAttribute("restaurantID");
+		String pin = (String)request.getAttribute("pin");
+		String value = request.getParameter("value");
+		
+		String ope = request.getParameter("ope");
+		if(ope != null && !ope.trim().isEmpty()){
+			int opeType = Integer.parseInt(ope);
+			
+			if(opeType == 1){
+				ope = "=";
+			}else if(opeType == 2){
+				ope = ">=";
+			}else if(opeType == 3){
+				ope = "<=";
+			}else{
+				ope = "=";
+			}
+		}else{
+			ope = "=";
+		}
+		
+		String comboCond;
+		String comboType = request.getParameter("havingCond");
+		if(comboType != null && !comboType.trim().isEmpty()){
+			int comboVal = Integer.valueOf(comboType);
+			if(comboVal == 1){
+				//是否有反结帐
+				comboCond = " AND OH.status = " + Order.Status.REPAID.getVal();
+			}else if(comboVal == 2){
+				//是否有折扣
+				comboCond = " AND OH.discount_price > 0 ";
+			}else if(comboVal == 3){
+				//是否有赠送
+				comboCond = " AND OH.gift_price > 0 ";
+			}else if(comboVal == 4){
+				//是否有退菜
+				comboCond = " AND OH.cancel_price > 0 ";
+			}else if(comboVal == 5){
+				//是否有抹数
+				comboCond = " AND OH.erase_price > 0 ";				
+			}else{
+				comboCond = "";
+			}
+		}else{
+			comboCond = "";
+		}
+		
+		String filterCond;
+		String type = request.getParameter("type");
+		if(type.equals("1")){
+			//按账单号
+			filterCond = " AND OH.id" + ope + value;
+		}else if(type.equals("2")){
+			//按流水号
+			filterCond = " AND OH.seq_id " + ope + value;
+		}else if(type.equals("3")){
+			//按台号
+			filterCond = " AND OH.table_alias != '' " + " AND OH.table_alias" + ope + value;
+		}else if(type.equals("4")){
+			//按日期
+			String[] dutyParams = request.getParameter("value").split("<split>");
+			filterCond = " AND OH.order_date BETWEEN '" + dutyParams[0] + "' AND '" + dutyParams[1] + "'";
+		}else if(type.equals("5")){
+			//按类型
+			filterCond = " AND OH.category " + ope + value;
+		}else if(type.equals("6")){
+			//按结帐方式
+			filterCond = " AND OH.pay_type " + ope + value;
+		}else if(type.equals("7")){
+			//按金额
+			filterCond = " AND OH.total_price " + ope + value;
+		}else if(type.equals("8")){
+			//按实收
+			filterCond = " AND OH.actual_price " + ope + value;
+		}else if(type.equals("9")){
+			DailySettle ds = SystemDao.getDailySettle(Integer.valueOf(restaurantId), SystemDao.MAX_DAILY_SETTLE);
+//			System.out.println("ds: "+ds.getOnDutyFormat()+"  -  "+ds.getOffDutyFormat());
+			filterCond = " AND OH.order_date BETWEEN '" + ds.getOnDutyFormat() + "' AND '" + ds.getOffDutyFormat() + "'";
+		}else{
+			filterCond = "";
+		}
+		
+		Staff staff = StaffDao.verify(Integer.parseInt(pin));
+		
+		List<Order> list = OrderDao.getPureOrder(staff, comboCond + filterCond, null, DateType.HISTORY);
+		
+		String title = "历史账单";
+		
+		//标题
+		response.addHeader("Content-Disposition", "attachment;filename=" + new String( ("历史账单.xls").getBytes("GBK"),  "ISO8859_1"));
+		HSSFWorkbook wb = new HSSFWorkbook();
+		HSSFSheet sheet = wb.createSheet(title);
+		HSSFRow row = null;
+		HSSFCell cell = null;
+		initParams(wb);
+		
+		sheet.setColumnWidth(0, 3000);
+		sheet.setColumnWidth(1, 3000);
+		sheet.setColumnWidth(2, 6000);
+		sheet.setColumnWidth(3, 3000);
+		sheet.setColumnWidth(4, 3000);
+		sheet.setColumnWidth(5, 3000);
+		sheet.setColumnWidth(6, 3000);
+		sheet.setColumnWidth(7, 3000);
+		sheet.setColumnWidth(8, 3000);
+		
+		//冻结行
+		sheet.createFreezePane(0, 4, 0, 4);
+		
+//------------------报表头
+		row = sheet.createRow(0);
+		row.setHeight((short) 550);
+		
+		cell = row.createCell(0);
+		cell.setCellValue(title);
+		cell.setCellStyle(titleStyle);
+		
+		//合并单元格
+		sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, 7));
+//---------------摘要------------------		
+		row = sheet.createRow(sheet.getLastRowNum() + 1);
+		row.setHeight((short) 350);
+		
+		cell = row.createCell(0);
+		
+		cell.setCellValue("账单数量: " + list.size());
+		cell.setCellStyle(strStyle);
+		
+		sheet.addMergedRegion(new CellRangeAddress(sheet.getLastRowNum(), sheet.getLastRowNum(), 0, 8));
+//----------------		
+//----------------空白
+		row = sheet.createRow(sheet.getLastRowNum() + 1);
+		row.setHeight((short) 350);
+		sheet.addMergedRegion(new CellRangeAddress(sheet.getLastRowNum(), sheet.getLastRowNum(), 0, 8));
+		
+//----	
+		
+		row = sheet.createRow(sheet.getLastRowNum() + 1);
+		row.setHeight((short) 350);
+		
+		cell = row.createCell(0);
+		cell.setCellValue("账单号");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell(row.getLastCellNum());
+		cell.setCellValue("台号");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell(row.getLastCellNum());
+		cell.setCellValue("日期");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell(row.getLastCellNum());
+		cell.setCellValue("账单类型");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell(row.getLastCellNum());
+		cell.setCellValue("结账方式");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell(row.getLastCellNum());
+		cell.setCellValue("收款方式");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell(row.getLastCellNum());
+		cell.setCellValue("应收");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell(row.getLastCellNum());
+		cell.setCellValue("实收");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell(row.getLastCellNum());
+		cell.setCellValue("状态");
+		cell.setCellStyle(headerStyle);
+		
+		for (Order o : list) {
+			row = sheet.createRow(sheet.getLastRowNum() + 1);
+			row.setHeight((short) 350);
+			
+			cell = row.createCell(0);
+			cell.setCellValue(o.getId());
+			cell.setCellStyle(strStyle);
+			
+			cell = row.createCell(row.getLastCellNum());
+			cell.setCellValue(o.getDestTbl().getAliasId());
+			cell.setCellStyle(strStyle);
+			
+			cell = row.createCell(row.getLastCellNum());
+			cell.setCellValue(DateUtil.format(o.getOrderDate()));
+			cell.setCellStyle(strStyle);
+			
+			cell = row.createCell(row.getLastCellNum());
+			cell.setCellValue(o.getCategory().getDesc());
+			cell.setCellStyle(strStyle);
+			
+			cell = row.createCell(row.getLastCellNum());
+			cell.setCellValue(o.getSettleType().getDesc());
+			cell.setCellStyle(strStyle);
+			
+			cell = row.createCell(row.getLastCellNum());
+			cell.setCellValue(o.getPaymentType().getDesc());
+			cell.setCellStyle(strStyle);
+			
+			cell = row.createCell(row.getLastCellNum());
+			cell.setCellValue(o.getTotalPrice());
+			cell.setCellStyle(numStyle);
+			
+			cell = row.createCell(row.getLastCellNum());
+			cell.setCellValue(o.getActualPrice());
+			cell.setCellStyle(numStyle);
+			
+			cell = row.createCell(row.getLastCellNum());
+			cell.setCellValue(o.getStatus().getDesc());
+			cell.setCellStyle(strStyle);
+		}
+		OutputStream os = response.getOutputStream();
+		wb.write(os);
+		os.flush();
+		os.close();
 		return null;
 	}
 	

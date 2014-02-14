@@ -7,8 +7,6 @@ import java.sql.SQLException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import net.sf.json.JSONObject;
-
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -17,8 +15,8 @@ import org.apache.struts.action.ActionMapping;
 import com.wireless.db.frontBusiness.DailySettleDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
+import com.wireless.json.JObject;
 import com.wireless.pojo.staffMgr.Staff;
-import com.wireless.util.JObject;
 
 public class DailySettleExecAction extends Action {
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
@@ -54,10 +52,7 @@ public class DailySettleExecAction extends Action {
 			jObj.initTip(false, "数据库请求发生错误，请确认网络是否连接正常");
 
 		} finally {
-
-			JSONObject obj = JSONObject.fromObject(jObj);
-			
-			out.write(obj.toString());
+			out.write(jObj.toString());
 		}
 
 		return null;

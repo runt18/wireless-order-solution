@@ -2,7 +2,6 @@ package com.wireless.Actions.billStatistics;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -169,12 +168,13 @@ public class BusinessReceiptsStatisticsAction extends DispatchAction {
 		String time = request.getParameter("time");
 		JObject jobject = new JObject();
 		Calendar c = Calendar.getInstance();
-		Date endDate = new Date();
+		Calendar endDate = Calendar.getInstance();
+		endDate.add(Calendar.DATE, -1);
 		
 		if(Integer.parseInt(time) == 7){
-			c.add(Calendar.DATE, -6);
+			c.add(Calendar.DATE, -7);
 		}else if(Integer.parseInt(time) == 14){
-			c.add(Calendar.DATE, -13);
+			c.add(Calendar.DATE, -14);
 		}else if(Integer.parseInt(time) == 30){
 			c.add(Calendar.MONTH, -1);
 		}
@@ -182,7 +182,7 @@ public class BusinessReceiptsStatisticsAction extends DispatchAction {
 		List<IncomeByEachDay> incomesByEachDay = new ArrayList<IncomeByEachDay>();
 		try{
 			String pin = (String)request.getAttribute("pin");
-			incomesByEachDay.addAll(CalcBillStatisticsDao.calcIncomeByEachDay(StaffDao.verify(Integer.parseInt(pin)), DateUtil.format(c.getTime()), DateUtil.format(endDate)));
+			incomesByEachDay.addAll(CalcBillStatisticsDao.calcIncomeByEachDay(StaffDao.verify(Integer.parseInt(pin)), DateUtil.format(c.getTime()), DateUtil.format(endDate.getTime())));
 			
 			jobject.setRoot(incomesByEachDay);
 			

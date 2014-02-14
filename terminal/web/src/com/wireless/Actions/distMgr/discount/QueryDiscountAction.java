@@ -108,13 +108,10 @@ public class QueryDiscountAction extends DispatchAction{
 				tsb.append(",");
 				tsb.append("discountName:'" + discount.getName() + "'");
 				tsb.append(",");
-				tsb.append("level:" + discount.getLevel());
-				tsb.append(",");
 				tsb.append("restaurantID:" + discount.getRestaurantId());
 				tsb.append(",");
-				tsb.append("isDefault:" + (discount.isDefault() || discount.isDefaultReserved()));
-				tsb.append(",");
 				tsb.append("status:" + discount.getStatus().getVal());
+				tsb.append(",type:" + discount.getType().getVal());
 				tsb.append("}");
 				i++;
 			}

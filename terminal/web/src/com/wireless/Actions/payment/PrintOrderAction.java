@@ -5,8 +5,6 @@ import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import net.sf.json.JSONObject;
-
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -18,6 +16,7 @@ import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.ErrorCode;
 import com.wireless.exception.ProtocolError;
+import com.wireless.json.JObject;
 import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Reserved;
 import com.wireless.pack.Type;
@@ -27,7 +26,6 @@ import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.DateUtil;
 import com.wireless.sccon.ServerConnector;
-import com.wireless.util.JObject;
 import com.wireless.util.WebParams;
 
 public class PrintOrderAction extends Action{
@@ -201,7 +199,7 @@ public class PrintOrderAction extends Action{
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, "操作失败, 未知错误, 请联系客服人员.");
 		}finally{
 			dbCon.disconnect();
-			response.getWriter().print(JSONObject.fromObject(jobject).toString());
+			response.getWriter().print(jobject.toString());
 		}
 		return null;
 	}

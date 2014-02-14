@@ -20,21 +20,16 @@ import com.wireless.pojo.dishesOrder.OrderSummary;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.system.DailySettle;
 import com.wireless.util.DateType;
-import com.wireless.util.WebParams;
 
 public class QueryHistoryAction extends Action {
 	
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 			HttpServletResponse response) throws Exception {
-		
-		
-		
-		
 		JObject jobject = new JObject();
 		String start = request.getParameter("start");
 		String limit = request.getParameter("limit");
 		try{
-			String restaurantId = request.getParameter("restaurantID");
+			String restaurantId = (String) request.getAttribute("restaurantID");
 			String pin = (String)request.getAttribute("pin");
 			String value = request.getParameter("value");
 			
@@ -129,11 +124,11 @@ public class QueryHistoryAction extends Action {
 			
 		}catch(BusinessException e){
 			e.printStackTrace();
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getCode(), e.getDesc());
+			jobject.initTip(e);
 			
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
+			jobject.initTip(e);
 			
 		}finally{
 			response.getWriter().print(jobject.toString());

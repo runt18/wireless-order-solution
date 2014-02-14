@@ -3,8 +3,6 @@ package com.wireless.Actions.menuMgr.taste;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import net.sf.json.JSONObject;
-
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -13,8 +11,8 @@ import org.apache.struts.action.ActionMapping;
 import com.wireless.db.menuMgr.FoodTasteDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
+import com.wireless.json.JObject;
 import com.wireless.pojo.menuMgr.FoodTaste;
-import com.wireless.util.JObject;
 import com.wireless.util.WebParams;
 
 public class DeleteFoodTasteAction extends Action{
@@ -58,8 +56,7 @@ public class DeleteFoodTasteAction extends Action{
 			e.printStackTrace();
 			jobject.initTip(true, WebParams.TIP_TITLE_EXCEPTION, 9999, "操作失败,删除关联口味时发生异常!");
 		} finally {
-			JSONObject json = JSONObject.fromObject(jobject);
-			response.getWriter().print(json.toString());
+			response.getWriter().print(jobject.toString());
 		}
 		
 		return null;
