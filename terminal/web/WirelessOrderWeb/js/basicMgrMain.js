@@ -202,10 +202,7 @@ cancelReasonOperationHandler = function(c){
 					Ext.Ajax.request({
 						url : '../../DeleteCancelReason.do',
 						params : {
-							cancelReason : Ext.encode({
-								id : sd['id'],
-								restaurantID : restaurantID
-							})
+							id : sd['id']
 						},
 						success : function(res, opt){
 							var jr = Ext.util.JSON.decode(res.responseText);
@@ -377,7 +374,8 @@ function initCancelReasonWin(){
 				Ext.Ajax.request({
 					url : action,
 					params : {
-						cancelReason : Ext.encode(cancelReason)
+						id : cancelReason['id'],
+						reason : cancelReason['reason']
 					},
 					success : function(res, opt){
 						var jr = Ext.util.JSON.decode(res.responseText);

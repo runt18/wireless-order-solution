@@ -156,7 +156,7 @@ function initTasteOperatorWin(){
 		tasteOperatorWin = new Ext.Window({
 			id : 'taste_tasteOperatorWin',
 			title : '添加',
-			width : 320,
+			width : 310,
 			closeAction : 'hide',
 			closable : false,
 			resizable : false,
@@ -164,7 +164,7 @@ function initTasteOperatorWin(){
 			items : [{
 				layout : 'form',
 				labelWidth : 60,
-				width : 320,
+				width : 310,
 				border : false,
 				frame : true,
 				items : [{
@@ -320,12 +320,13 @@ function initTasteOperatorWin(){
 							}
 						}]
 					},{
+						columnWidth : .12,
 						items : [{
 							xtype : 'numberfield',
 							id : 'numTasteRateOther',
 							allowBlank : false,
 							disabled : true,
-							width : 30,
+							width : 35,
 							validator : function(v) {
 								if (v < 0.00 || v > 100) {
 									return '比例范围是 0.00 至 100';
@@ -333,8 +334,12 @@ function initTasteOperatorWin(){
 									return true;
 								}
 							}
-						},{
+						}]
+					},{
+						columnWidth : .1,
+						items : [{
 							xtype : 'tbtext',
+							style : 'padding: 4px 0px 2px 2px;',
 							text : '%'
 						}]
 					}]
