@@ -28,18 +28,7 @@
 		<action path="/QueryOrder"
 			type="com.wireless.Actions.dishesOrder.QueryOrderAction" scope="request">
 		</action>
-		<action path="/QueryOrderGroup"
-			type="com.wireless.Actions.dishesOrder.orderGroup.QueryOrderGroupAction"
-			scope="request">
-		</action>
-		<action path="/UpdateOrderGroup"
-			type="com.wireless.Actions.dishesOrder.orderGroup.UpdateOrderGroupAction"
-			scope="request" parameter="dataSource">
-		</action>
-		<action path="/CancelOrderGroup"
-			type="com.wireless.Actions.dishesOrder.orderGroup.CancelOrderGroupAction"
-			scope="request">
-		</action>
+
 		<action path="/QueryMenu" type="com.wireless.Actions.dishesOrder.QueryMenuAction"
 			scope="request" parameter="dataSource">
 		</action>
@@ -282,34 +271,6 @@
 		<action path="/OperateMember"
 			type="com.wireless.Actions.client.member.OperateMemberAction" scope="request"
 			parameter="dataSource">
-		</action>
-		<action path="/QueryPricePlanTree"
-			type="com.wireless.Actions.menuMgr.pricePlan.QueryPricePlanTreeAction"
-			scope="request">
-		</action>
-		<action path="/InsertPricePlan"
-			type="com.wireless.Actions.menuMgr.pricePlan.InsertPricePlanAction"
-			scope="request">
-		</action>
-		<action path="/UpdatePricePlan"
-			type="com.wireless.Actions.menuMgr.pricePlan.UpdatePricePlanAction"
-			scope="request">
-		</action>
-		<action path="/DeletePricePlan"
-			type="com.wireless.Actions.menuMgr.pricePlan.DeletePricePlanAction"
-			scope="request">
-		</action>
-		<action path="/QueryFoodPricePlan"
-			type="com.wireless.Actions.menuMgr.pricePlan.QueryFoodPricePlanAction"
-			scope="request">
-		</action>
-		<action path="/QueryFoodPricePlanByOrder"
-			type="com.wireless.Actions.menuMgr.pricePlan.QueryFoodPricePlanByOrderAction"
-			scope="request">
-		</action>
-		<action path="/UpdateFoodPricePlan"
-			type="com.wireless.Actions.menuMgr.pricePlan.UpdateFoodPricePlanAction"
-			scope="request">
 		</action>
 		<action path="/QueryCancelReason"
 			type="com.wireless.Actions.menuMgr.cencalReason.QueryCancelReasonAction"
