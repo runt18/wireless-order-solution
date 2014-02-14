@@ -30,9 +30,8 @@ public class UpdateDepartmentAction extends Action {
 			String deptID = request.getParameter("deptID");
 			String deptName = request.getParameter("deptName");
 			
-			Department dept = new Department();
+			Department dept = new Department(Short.valueOf(deptID));
 			dept.setRestaurantId(Integer.valueOf(restaurantID));
-			dept.setId(Short.valueOf(deptID));
 			dept.setName(deptName);
 			
 			MenuDao.updateDepartment(dept);

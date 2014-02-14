@@ -256,9 +256,7 @@ public class OperatePrintFuncAction extends DispatchAction{
 					summaryBuilder.addRegion(new Region(Short.parseShort(region)));
 				}
 				for (String department : depts) {
-					Department d = new Department();
-					d.setId(Short.parseShort(department));
-					summaryBuilder.addDepartment(d);
+					summaryBuilder.addDepartment(new Department(Short.parseShort(department)));
 				}
 				summaryBuilder.setRepeat(Integer.parseInt(repeat));
 				
@@ -270,9 +268,7 @@ public class OperatePrintFuncAction extends DispatchAction{
 					summaryBuilder.addRegion(new Region(Short.parseShort(region)));
 				}
 				for (String department : depts) {
-					Department d = new Department();
-					d.setId(Short.parseShort(department));
-					summaryBuilder.addDepartment(d);
+					summaryBuilder.addDepartment(new Department(Short.parseShort(department)));
 				}
 				summaryBuilder.setRepeat(Integer.parseInt(repeat));
 				PrintFuncDao.addFunc(dbCon, staff, printerId, summaryBuilder);
@@ -385,9 +381,7 @@ public class OperatePrintFuncAction extends DispatchAction{
 					summaryBuilder.addRegion(new Region(Short.parseShort(r)));
 				}
 				for (String department : dept) {
-					Department d = new Department();
-					d.setId(Short.parseShort(department));
-					summaryBuilder.addDepartment(d);
+					summaryBuilder.addDepartment(new Department(Short.parseShort(department)));
 				}
 				summaryBuilder.setRepeat(Integer.parseInt(repeat));
 				PrintFuncDao.updateFunc(dbCon, staff, printerId, summaryBuilder.build(), funcId);
@@ -397,9 +391,7 @@ public class OperatePrintFuncAction extends DispatchAction{
 					summaryBuilder.addRegion(new Region(Short.parseShort(r)));
 				}
 				for (String department : dept) {
-					Department d = new Department();
-					d.setId(Short.parseShort(department));
-					summaryBuilder.addDepartment(d);
+					summaryBuilder.addDepartment(new Department(Short.parseShort(department)));
 				}
 				summaryBuilder.setRepeat(Integer.parseInt(repeat));
 				PrintFuncDao.updateFunc(dbCon, staff, printerId, summaryBuilder.build(), funcId);
