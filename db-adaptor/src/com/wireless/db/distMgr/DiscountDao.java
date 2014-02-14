@@ -342,10 +342,10 @@ public class DiscountDao {
 					  " DIST_PLAN.dist_plan_id, DIST_PLAN.kitchen_id, DIST_PLAN.rate " +
 					  " FROM " + Params.dbName + ".kitchen KITCHEN " +
 					  " JOIN " + Params.dbName + ".department DEPT ON KITCHEN.dept_id = DEPT.dept_id AND KITCHEN.restaurant_id = DEPT.restaurant_id " + 
-					  " LEFT JOIN " + Params.dbName + ".discount_plan DIST_PLAN ON DIST_PLAN.kitchen_id = KITCHEN.kitchen_id " +
+					  " LEFT JOIN " + Params.dbName + ".discount_plan DIST_PLAN ON DIST_PLAN.kitchen_id = KITCHEN.kitchen_id AND DIST_PLAN.discount_id = " + each.getId() +
 					  " WHERE 1 = 1 " +
 					  " AND KITCHEN.type = " + Kitchen.Type.NORMAL.getVal() +
-					  " AND DIST_PLAN.discount_id = " + each.getId() +
+					  " AND KITCHEN.restaurant_id = " + staff.getRestaurantId() +
 					  " ORDER BY DEPT.display_id, KITCHEN.display_id ";
 				dbCon.rs = dbCon.stmt.executeQuery(sql);
 				while(dbCon.rs.next()){
