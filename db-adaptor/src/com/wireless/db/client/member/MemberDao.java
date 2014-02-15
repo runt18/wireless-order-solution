@@ -918,6 +918,9 @@ public class MemberDao {
 		//Perform the consume operation and get the related member operation.
 		MemberOperation mo = member.consume(consumePrice, coupon, payType);
 		
+		//Perform to use coupon.
+		CouponDao.use(dbCon, staff, coupon.getId(), orderId);
+		
 		//Set the associate order id
 		mo.setOrderId(orderId);
 		

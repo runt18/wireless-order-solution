@@ -140,6 +140,35 @@ public class CouponDao {
 	}
 	
 	/**
+	 * Use the coupon.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param couponId
+	 * 			the coupon id to use
+	 * @param orderId
+	 * 			the order id used in coupon
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if the coupon to use does NOT exist
+	 */
+	public static void use(DBCon dbCon, Staff staff, int couponId, int orderId) throws SQLException, BusinessException{
+		String sql;
+		sql = " UPDATE " + Params.dbName + ".coupon SET " +
+			  " coupon_id = " + couponId +
+			  " ,order_id = " + orderId +
+			  " ,order_date = NOW() " +
+			  " ,status = " + Coupon.Status.USED.getVal() +
+			  " WHERE coupon_id = " + couponId +
+			  " AND restaurant_id = " + staff.getRestaurantId();
+		if(dbCon.stmt.executeUpdate(sql) == 0){
+			throw new BusinessException(MemberError.COUPON_NOT_EXIST);
+		}
+	}
+	
+	/**
 	 * Get the coupons to specific restaurant associated with the staff
 	 * @param staff
 	 * 			the staff to perform this action
