@@ -1033,6 +1033,7 @@ Ext.onReady(function() {
 					child.fireEvent('checkchange', child, checked); 
 				}); 
 				setParentNodeCheckState(node);
+				//取消所有折扣, 默认选中无折扣
 				if(node.attributes.text == '折扣'){
 					if(!node.firstChild.attributes.checked){
 						node.firstChild.getUI().checkbox.checked = true;
@@ -1115,7 +1116,6 @@ Ext.onReady(function() {
 	privilegeTree.loader = new Ext.tree.TreeLoader({
 		dataUrl : '../../QueryPrivilege.do',
 		baseParams : {
-			isCookie : true,
 			restaurantID : restaurantID,
 			dataSource : 'tree'
 		},
@@ -1123,16 +1123,15 @@ Ext.onReady(function() {
 			load : function(thiz, node, res){
 				node.eachChild(function(child) { 
 					
-					var checked = child.attributes.checked;
+/*					var checked = child.attributes.checked;
 					child.ui.toggleCheck(checked);  
-					child.attributes.checked = checked;
-					//alert("chii"+child.childNodes.length);
+					child.attributes.checked = checked;*/
 					if(child.hasChildNodes()){
 						child.expand();
 						child.eachChild(function(childSon) { 
-							checked = childSon.attributes.checked;
+/*							checked = childSon.attributes.checked;
 							childSon.ui.toggleCheck(checked);  
-							childSon.attributes.checked = checked;
+							childSon.attributes.checked = checked;*/
 							setParentNodeCheckState(childSon);
 						});
 					}

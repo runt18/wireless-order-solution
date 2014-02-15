@@ -88,10 +88,9 @@ function disocuntOperationHandler(c){
 		return;
 	}
 	
-	var program = Ext.getCmp('comboProgram');
-	var kitchen = Ext.getCmp('comboKitchen');
 	var rate = Ext.getCmp('numKitchenRate');
-	var planID = Ext.getCmp('hideDiscountPlanID');
+	var discountId = Ext.getCmp('hideDiscountID');
+	var kitchenId = Ext.getCmp('hideKitchenID');
 	
 	var tempRoot = {root:[]};
 	for(var i = 0; i < programData.root.length; i++){
@@ -99,34 +98,22 @@ function disocuntOperationHandler(c){
 			tempRoot.root.push(programData.root[i]);
 		}
 	}
-	program.store.loadData(tempRoot);
-	
-	kitchen.store.loadData(discountData);
 	
 	if(c.type == dmObj.operation.insert){
-		program.setValue();
-		kitchen.setValue();
 		rate.setValue(1.00);
-		program.setDisabled(false);
-		kitchen.setDisabled(false);
 		addDiscountWin.setTitle('添加分厨折扣');
 	}else if(c.type == dmObj.operation.update){
-		var sd = Ext.ux.getSelData(discountGrid.getId());
+		var sd = Ext.ux.getSelData(discountGrid);
 		if(!sd){
 			Ext.example.msg('提示', '请选中一个分厨折扣再进行操作.');
 			return;
 		}
-		program.setValue(sd['discount.id']);
-		kitchen.setValue(sd['kitchen.id']);
 		rate.setValue(sd['rate']);
-		planID.setValue(sd['id']);
-		program.setDisabled(true);
-		kitchen.setDisabled(true);
-		addDiscountWin.setTitle('修改分厨折扣');
+		discountId.setValue(sd['discount']['id']);
+		kitchenId.setValue(sd['kitchen']['id']);
+		addDiscountWin.setTitle('修改分厨折扣 --- ' + sd['kitchen']['name']);
 	}
 	
-	program.clearInvalid();
-	kitchen.clearInvalid();
 	rate.clearInvalid();
 	
 	addDiscountWin.operationType = c.type;
@@ -140,49 +127,13 @@ function updateDisocuntOperationHandler(){
 	});
 };
 
-function deleteDisocuntOperationHandler(){
-	var sd = Ext.ux.getSelData(discountGrid.getId());
-	if(!sd){
-		Ext.example.msg('提示', '请选中一个分厨折扣再进行操作.');
-		return;
-	}
-	Ext.Msg.confirm(
-		'提示',
-		'是否删除分厨折扣',
-		function(e){
-			if(e == 'yes'){
-				Ext.Ajax.request({
-					url : '../../DeleteDiscountPlan.do',
-					params : {
-						planID : sd['id']
-					},
-					success : function(res, opt){
-						var jr = Ext.util.JSON.decode(res.responseText);
-						if(jr.success){
-							Ext.example.msg(jr.title, jr.msg);
-							Ext.getCmp('btnSearchDiscountPlan').handler();
-						}else{
-							Ext.ux.showMsg(jr);
-						}
-					},
-					failure : function(res, opt){
-						Ext.ux.showMsg(Ext.util.JSON.decode(res.responseText));
-					}
-				});
-			}
-		},
-		this
-	);
-};
 
 function discountIsDefaultRenderer(val, md, record){
 	return eval(record.get('discount.status') == 1) ? '是' : '否';
 };
 
 function discountOperationRenderer(){
-	return '<a href="javascript:updateDisocuntOperationHandler()">修改</a>'
-		   + '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
-		   + '<a href="javascript:deleteDisocuntOperationHandler()">删除</a>';
+	return '<a href="javascript:updateDisocuntOperationHandler()">修改</a>';
 };
 
 function discountGroupTextTpl(rs){
@@ -209,7 +160,7 @@ Ext.onReady(function(){
 	});
 	
 	var programTreeTbar = new Ext.Toolbar({
-		items : [{
+		items : ['->',{
 			text : '添加',
 			iconCls : 'btn_add',
 			handler : function(){
@@ -217,21 +168,7 @@ Ext.onReady(function(){
 					type : dmObj.operation.insert
 				});
 			}
-		}, {
-			text : '修改',
-			iconCls : 'btn_edit',
-			handler : function(){
-				programOperationHandler({
-					type : dmObj.operation.update
-				});		
-			}
-		}, {
-			text : '删除',
-			iconCls : 'btn_delete',
-			handler : function(){
-				deleteDiscountPlanHandler();
-			}
-		}, {
+		},{
 			text : '刷新',
 			id : 'btnRefreshProgramTree',
 			iconCls : 'btn_refresh',
@@ -351,17 +288,20 @@ Ext.onReady(function(){
 					}
 				});
 			}
-		},{
+		}
+/*		,{
 			text : '展开/收缩',
 			iconCls : 'icon_tb_toggleAllGroups',
 			handler : function(){
 				discountGrid.getView().toggleAllGroups();
 			}
-		},{
+		}*/
+		,{
 			text : '一键修改折扣率',
 			iconCls : 'btn_edit_all',
 			handler : function(){
 				updateDiscountRateWin.show();
+				Ext.getCmp('numUpdateAllRateByDiscountPlan').focus(true, 100);
 			}
 		}]
 	});
@@ -374,8 +314,6 @@ Ext.onReady(function(){
 		'../../QueryDiscountPlan.do',
 		[
 			[true, false, false, true], 
-			['方案编号', 'discount.id'] , 
-			['方案名称', 'discount.name'],
 			['分厨名称', 'kitchen.name'], 
 			['折扣率', 'rate', 50, 'right' , 'Ext.ux.txtFormat.gridDou'],
 			['操作', 'operation', '', 'center', 'discountOperationRenderer'],
@@ -579,44 +517,7 @@ Ext.onReady(function(){
 				defaults : {
 					width : 130
 				},
-				items : [{
-					xtype : 'hidden',
-					id : 'hideDiscountPlanID'
-				}, {
- 	    	    	xtype : 'combo',
- 	    	    	id : 'comboProgram',
- 	    	    	fieldLabel : '方案名称',
- 	    	    	store : new Ext.data.JsonStore({
- 	    	    		root : 'root',
-						fields : [ 'discountID', 'discountName' ]
-					}),
-					valueField : 'discountID',
-					displayField : 'discountName',
-					mode : 'local',
-					triggerAction : 'all',
-					typeAhead : true,
-					selectOnFocus : true,
-					forceSelection : true,
-					allowBlank : false,
-					readOnly : true
- 	    	    }, {
- 	    	    	xtype : 'combo',
- 	    	    	id : 'comboKitchen',
- 	    	    	fieldLabel : '分厨名称',
- 	    	    	store : new Ext.data.JsonStore({
- 	    	    		root : 'root',
-						fields : [ 'id', 'name' ]
-					}),
-					valueField : 'id',
-					displayField : 'name',
-					mode : 'local',
-					triggerAction : 'all',
-					typeAhead : true,
-					selectOnFocus : true,
-					forceSelection : true,
-					allowBlank : false,
-					readOnly : true
- 	    	    }, {
+				items : [ {
  	    	    	xtype : 'numberfield',
  	    	    	id : 'numKitchenRate',
  	    	    	fieldLabel : '折扣率',
@@ -630,7 +531,13 @@ Ext.onReady(function(){
 							return '折扣率在 0.00 至 1.00 之间,如 8.8 折输入 0.88 ';
 						}
 					}
- 	    	    }]
+ 	    	    },{
+					xtype : 'hidden',
+					id : 'hideDiscountID'
+				}, {
+					xtype : 'hidden',
+					id : 'hideKitchenID'
+				}]
 			}],
 			bbar : [{
 				xtype : 'tbtext',
@@ -640,14 +547,13 @@ Ext.onReady(function(){
 				id : 'btnSaveDiscount',
 				iconCls : 'btn_save',
 				handler : function(e){					
-					var discountID = Ext.getCmp('comboProgram');
-					var kitchenID = Ext.getCmp('comboKitchen');
 					var rate = Ext.getCmp('numKitchenRate');
-					var planID = Ext.getCmp('hideDiscountPlanID');
+					var discountId = Ext.getCmp('hideDiscountID');
+					var kitchenId = Ext.getCmp('hideKitchenID');
 					
 					var actionURL = '';
 					
-					if(!discountID.isValid() || !kitchenID.isValid() || !rate.isValid()){
+					if(!rate.isValid()){
 						return;
 					}
 					
@@ -668,9 +574,8 @@ Ext.onReady(function(){
 					Ext.Ajax.request({
 						url : actionURL,
 						params : {
-							planID : planID.getValue(), 
-							discountID : discountID.getValue(),
-							kitchenID : kitchenID.getValue(),
+							discountId : discountId.getValue(), 
+							kitchenId : kitchenId.getValue(),
 							rate : rate.getValue()
 						},
 						success : function(res, opt){
@@ -678,14 +583,6 @@ Ext.onReady(function(){
 							if(jr.success){
 								addDiscountWin.hide();
 								Ext.example.msg(jr.title, jr.msg);
-								var treeRoot = programTree.getRootNode().childNodes;
-								for(var i = 0; i < treeRoot.length; i++){
-									if(treeRoot[i].attributes.discountID == discountID.getValue()){
-										treeRoot[i].select();
-										treeRoot[i].fireEvent('click', treeRoot[i]);
-										break;
-									}
-								}
 								Ext.getCmp('btnSearchDiscountPlan').handler();
 							}else{
 								Ext.ux.showMsg(jr);
@@ -797,7 +694,6 @@ Ext.onReady(function(){
 							Ext.Ajax.request({
 								url : '../../UpdateDiscountPlanRate.do',
 								params : {
-									restaurantID : restaurantID, 
 									discountID : discount.getValue(),
 									rate : rate.getValue()
 								},
@@ -843,15 +739,19 @@ Ext.onReady(function(){
 			show : function(){
 				var discount = Ext.getCmp('comboUpdateAllRateByDiscount');
 				var rate = Ext.getCmp('numUpdateAllRateByDiscountPlan');
+				rate.setValue(1.00);
 				var tempRoot = {root:[]};
 				for(var i = 0; i < programData.root.length; i++){
-					if(eval(programData.root[i].status != 2)){
-						tempRoot.root.push(programData.root[i]);
-					}
+					tempRoot.root.push(programData.root[i]);
 				}
 				discount.store.loadData(tempRoot);
-				discount.setValue();
-				rate.setValue(1.00);
+				
+				var node = Ext.ux.getSelNode(programTree);
+				if(node){
+					discount.setValue(node.attributes.discountID);
+				}else{
+					discount.setValue();
+				}
 				discount.clearInvalid();
 			}
 		},
