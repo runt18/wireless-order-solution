@@ -1540,9 +1540,9 @@ public class HistoryStatisticsAction extends DispatchAction{
 		paramsSet.put(SQLUtil.SQL_PARAMS_ORDERBY, orderClause);
 		
 		if(dataSource.equalsIgnoreCase("today")){
-			list = MemberOperationDao.getToday(paramsSet);
+			list = MemberOperationDao.getToday(staff, paramsSet);
 		}else if(dataSource.equalsIgnoreCase("history")){
-			list = MemberOperationDao.getHistory(paramsSet);
+			list = MemberOperationDao.getHistory(staff, paramsSet);
 		}
 		MemberOperation sum = MemberOperation.newMO(-10, "", "", "");
 		if(list != null && !list.isEmpty()){
@@ -1790,9 +1790,9 @@ public class HistoryStatisticsAction extends DispatchAction{
 		paramsSet.put(SQLUtil.SQL_PARAMS_ORDERBY, orderClause);
 		
 		if(dataSource.equalsIgnoreCase("today")){
-			list = MemberOperationDao.getToday(paramsSet);
+			list = MemberOperationDao.getToday(staff, paramsSet);
 		}else if(dataSource.equalsIgnoreCase("history")){
-			list = MemberOperationDao.getHistory(paramsSet);
+			list = MemberOperationDao.getHistory(staff, paramsSet);
 		}
 		MemberOperation sum = MemberOperation.newMO(-10, "", "", "");
 		if(list != null && !list.isEmpty()){

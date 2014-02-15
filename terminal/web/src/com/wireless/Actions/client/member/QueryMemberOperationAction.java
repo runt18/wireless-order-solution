@@ -113,9 +113,9 @@ public class QueryMemberOperationAction extends Action{
 			paramsSet.put(SQLUtil.SQL_PARAMS_ORDERBY, orderClause);
 			
 			if(dataSource.equalsIgnoreCase("today")){
-				list = MemberOperationDao.getToday(paramsSet);
+				list = MemberOperationDao.getToday(staff, paramsSet);
 			}else if(dataSource.equalsIgnoreCase("history")){
-				list = MemberOperationDao.getHistory(paramsSet);
+				list = MemberOperationDao.getHistory(staff, paramsSet);
 			}
 			
 			if(list != null && !list.isEmpty()){
