@@ -251,8 +251,8 @@ public class TestMemberDao {
 				assertTrue("failed to delete member public comments", MemberCommentDao.getPublicCommentByMember(mStaff, new Member(memberId)).isEmpty());
 				
 				//Check to see whether the associated member operations are deleted
-				assertTrue("failed to delete today member operation", MemberOperationDao.getTodayByMemberId(memberId).isEmpty());
-				assertTrue("failed to delete history member operation", MemberOperationDao.getHistoryByMemberId(memberId).isEmpty());
+				assertTrue("failed to delete today member operation", MemberOperationDao.getTodayByMemberId(mStaff, memberId).isEmpty());
+				assertTrue("failed to delete history member operation", MemberOperationDao.getHistoryByMemberId(mStaff, memberId).isEmpty());
 				
 				//Check to see whether the coupon associated with this member are deleted
 				assertTrue("failed to delete the coupons associated with this member", CouponDao.getByMember(mStaff, memberId).isEmpty());
@@ -268,7 +268,7 @@ public class TestMemberDao {
 		//CalcBillStatisticsDao.calcIncomeByCharge(mStaff, range, DateType.TODAY);
 		
 		compareMember(expect, MemberDao.getMemberById(mStaff, expect.getId()));
-		compareMemberOperation(mo, MemberOperationDao.getTodayById(mo.getId()));
+		compareMemberOperation(mo, MemberOperationDao.getTodayById(mStaff, mo.getId()));
 	}
 	
 	private void testConsume(Member expect) throws BusinessException, SQLException{
@@ -280,14 +280,14 @@ public class TestMemberDao {
 		expect.consume(50, null, Order.PayType.MEMBER);
 		
 		compareMember(expect, MemberDao.getMemberById(mStaff, expect.getId()));
-		compareMemberOperation(mo, MemberOperationDao.getTodayById(mo.getId()));
+		compareMemberOperation(mo, MemberOperationDao.getTodayById(mStaff, mo.getId()));
 		
 		//使用现金消费
 		mo = MemberDao.consume(mStaff, expect.getId(), 50, null, Order.PayType.CASH, 10);
 		expect.consume(50, null, Order.PayType.CASH);
 		
 		compareMember(expect, MemberDao.getMemberById(mStaff, expect.getId()));
-		compareMemberOperation(mo, MemberOperationDao.getTodayById(mo.getId()));
+		compareMemberOperation(mo, MemberOperationDao.getTodayById(mStaff, mo.getId()));
 			
 	}
 	
@@ -296,7 +296,7 @@ public class TestMemberDao {
 		expect.pointConsume(20);
 		
 		compareMember(expect, MemberDao.getMemberById(mStaff, expect.getId()));
-		compareMemberOperation(mo, MemberOperationDao.getTodayById(mo.getId()));
+		compareMemberOperation(mo, MemberOperationDao.getTodayById(mStaff, mo.getId()));
 	}
 	
 	private void testAdjustPoint(Member expect) throws SQLException, BusinessException{
@@ -304,7 +304,7 @@ public class TestMemberDao {
 		expect.adjustPoint(10, AdjustType.INCREASE);
 		
 		compareMember(expect, MemberDao.getMemberById(mStaff, expect.getId()));
-		compareMemberOperation(mo, MemberOperationDao.getTodayById(mo.getId()));
+		compareMemberOperation(mo, MemberOperationDao.getTodayById(mStaff, mo.getId()));
 	}
 	
 	private void testAdjustBalance(Member expect) throws SQLException, BusinessException{
@@ -312,7 +312,7 @@ public class TestMemberDao {
 		expect.adjustBalance(10);
 		
 		compareMember(expect, MemberDao.getMemberById(mStaff, expect.getId()));
-		compareMemberOperation(mo, MemberOperationDao.getTodayById(mo.getId()));
+		compareMemberOperation(mo, MemberOperationDao.getTodayById(mStaff, mo.getId()));
 	}
 	
 	@Test

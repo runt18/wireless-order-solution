@@ -161,7 +161,7 @@ public class MemberOperationDao {
 	 * @return
 	 * @throws SQLException
 	 */
-	private static List<MemberOperation> getToday(DBCon dbCon, Map<Object, Object> params) throws SQLException{
+	private static List<MemberOperation> getToday(DBCon dbCon, Staff staff, Map<Object, Object> params) throws SQLException{
 		List<MemberOperation> list = new ArrayList<MemberOperation>();
 		String sql;
 		sql = " SELECT " +
@@ -173,7 +173,8 @@ public class MemberOperationDao {
 			  " MO.coupon_id, MO.coupon_money, MO.coupon_name, " +
 			  " M.member_type_id " +
 			  " FROM member_operation MO LEFT JOIN member M ON MO.member_id = M.member_id "	+
-			  " WHERE 1=1 ";
+			  " WHERE 1=1 " +
+			  " AND MO.restaurant_id = " + staff.getRestaurantId();
 		sql = SQLUtil.bindSQLParams(sql, params);
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		while(dbCon.rs.next()){
@@ -221,11 +222,11 @@ public class MemberOperationDao {
 	 * @return
 	 * @throws SQLException
 	 */
-	public static List<MemberOperation> getToday(Map<Object, Object> params) throws SQLException{
+	public static List<MemberOperation> getToday(Staff staff, Map<Object, Object> params) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return MemberOperationDao.getToday(dbCon, params);
+			return MemberOperationDao.getToday(dbCon, staff, params);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -241,10 +242,10 @@ public class MemberOperationDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static List<MemberOperation> getTodayByMemberId(DBCon dbCon, int memberId) throws SQLException{
+	public static List<MemberOperation> getTodayByMemberId(DBCon dbCon, Staff staff, int memberId) throws SQLException{
 		Map<Object, Object> params = new HashMap<Object, Object>();
 		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND MO.member_id = " + memberId);
-		return MemberOperationDao.getToday(dbCon, params);
+		return MemberOperationDao.getToday(dbCon, staff, params);
 	}
 	
 	/**
@@ -255,11 +256,11 @@ public class MemberOperationDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static List<MemberOperation> getTodayByMemberId(int memberId) throws SQLException{
+	public static List<MemberOperation> getTodayByMemberId(Staff staff, int memberId) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return getTodayByMemberId(dbCon, memberId);
+			return getTodayByMemberId(dbCon, staff, memberId);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -277,10 +278,10 @@ public class MemberOperationDao {
 	 * @throws BusinessException
 	 * 			throws if the member operation to this id does NOT exist
 	 */
-	public static MemberOperation getTodayById(DBCon dbCon, int memberOperationId) throws SQLException, BusinessException{
+	public static MemberOperation getTodayById(DBCon dbCon, Staff staff, int memberOperationId) throws SQLException, BusinessException{
 		Map<Object, Object> params = new HashMap<Object, Object>();
 		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND MO.id = " + memberOperationId);
-		List<MemberOperation> list = MemberOperationDao.getToday(dbCon, params);
+		List<MemberOperation> list = MemberOperationDao.getToday(dbCon, staff, params);
 		if(list.isEmpty()){
 			throw new BusinessException("The member operation(id = " + memberOperationId + ") is NOT found.");
 		}else{
@@ -298,11 +299,11 @@ public class MemberOperationDao {
 	 * @throws BusinessException
 	 * 			throws if the member operation to this id does NOT exist
 	 */
-	public static MemberOperation getTodayById(int memberOperationID) throws SQLException, BusinessException{
+	public static MemberOperation getTodayById(Staff staff, int moId) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return MemberOperationDao.getTodayById(dbCon, memberOperationID);
+			return MemberOperationDao.getTodayById(dbCon, staff, moId);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -320,7 +321,7 @@ public class MemberOperationDao {
 	 * @throws BusinessException
 	 * 			throws if the order does NOT exist or the member operation is NOT found.
 	 */
-	public static MemberOperation getTodayByOrderId(DBCon dbCon, int orderId) throws SQLException, BusinessException{
+	public static MemberOperation getTodayByOrderId(DBCon dbCon, Staff staff, int orderId) throws SQLException, BusinessException{
 		String sql;
 		sql = " SELECT member_operation_id, CASE WHEN (member_operation_id IS NULL) THEN 0 ELSE 1 END AS has_mo FROM " + Params.dbName + ".order WHERE id = " + orderId;
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
@@ -337,7 +338,7 @@ public class MemberOperationDao {
 				throw new BusinessException(ProtocolError.ORDER_NOT_EXIST);
 			}
 			
-			return getTodayById(memberOperationId);
+			return getTodayById(staff, memberOperationId);
 			
 		}finally{
 			dbCon.rs.close();
@@ -384,7 +385,7 @@ public class MemberOperationDao {
 	 * @return
 	 * @throws SQLException
 	 */
-	public static List<MemberOperation> getHistory(DBCon dbCon, Map<Object, Object> params) throws SQLException{
+	public static List<MemberOperation> getHistory(DBCon dbCon, Staff staff, Map<Object, Object> params) throws SQLException{
 		List<MemberOperation> list = new ArrayList<MemberOperation>();
 		String sql;
 		sql = " SELECT " +
@@ -394,9 +395,9 @@ public class MemberOperationDao {
 			  " MO.delta_base_money, MO.delta_extra_money, MO.delta_point, " +
 			  " MO.remaining_base_money, MO.remaining_extra_money, MO.remaining_point, MO.comment, " +
 			  " MO.coupon_id, MO.coupon_money, MO.coupon_name, " +
-			  " M.member_type_id " +
-			  " FROM member_operation_history MO LEFT JOIN member M ON MO.member_id = M.member_id " +
-			  " WHERE 1=1 ";
+			  " FROM member_operation_history MO " +
+			  " WHERE 1=1 " +
+			  " AND MO.restaurant_id = " + staff.getRestaurantId();
 		sql = SQLUtil.bindSQLParams(sql, params);
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		while(dbCon.rs.next()){
@@ -443,11 +444,11 @@ public class MemberOperationDao {
 	 * @return
 	 * @throws SQLException
 	 */
-	public static List<MemberOperation> getHistory(Map<Object, Object> params) throws SQLException{
+	public static List<MemberOperation> getHistory(Staff staff, Map<Object, Object> params) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return MemberOperationDao.getHistory(dbCon, params);
+			return MemberOperationDao.getHistory(dbCon, staff, params);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -463,10 +464,10 @@ public class MemberOperationDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static List<MemberOperation> getHistoryByMemberId(DBCon dbCon, int memberId) throws SQLException{
+	public static List<MemberOperation> getHistoryByMemberId(DBCon dbCon, Staff staff, int memberId) throws SQLException{
 		Map<Object, Object> params = new HashMap<Object, Object>();
 		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND MO.member_id = " + memberId);
-		return MemberOperationDao.getHistory(dbCon, params);
+		return MemberOperationDao.getHistory(dbCon, staff, params);
 	}
 	
 	/**
@@ -477,11 +478,11 @@ public class MemberOperationDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static List<MemberOperation> getHistoryByMemberId(int memberId) throws SQLException{
+	public static List<MemberOperation> getHistoryByMemberId(Staff staff, int memberId) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return getHistoryByMemberId(dbCon, memberId);
+			return getHistoryByMemberId(dbCon, staff, memberId);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -494,10 +495,10 @@ public class MemberOperationDao {
 	 * @return
 	 * @throws SQLException
 	 */
-	public static MemberOperation getHistoryById(DBCon dbCon, int memberOperationID) throws SQLException{
+	public static MemberOperation getHistoryById(DBCon dbCon, Staff staff, int memberOperationID) throws SQLException{
 		Map<Object, Object> params = new HashMap<Object, Object>();
 		params.put(SQLUtil.SQL_PARAMS_EXTRA, " AND MO.id = " + memberOperationID);
-		List<MemberOperation> list = MemberOperationDao.getHistory(dbCon, params);
+		List<MemberOperation> list = MemberOperationDao.getHistory(dbCon, staff, params);
 		if(list.isEmpty()){
 			return null;
 		}else{
@@ -511,11 +512,11 @@ public class MemberOperationDao {
 	 * @return
 	 * @throws SQLException
 	 */
-	public static MemberOperation getHistoryById(int memberOperationID) throws SQLException{
+	public static MemberOperation getHistoryById(Staff staff, int memberOperationID) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return MemberOperationDao.getHistoryById(dbCon, memberOperationID);
+			return MemberOperationDao.getHistoryById(dbCon, staff, memberOperationID);
 		}finally{
 			dbCon.disconnect();
 		}
