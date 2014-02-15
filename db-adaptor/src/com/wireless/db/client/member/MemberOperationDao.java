@@ -172,8 +172,9 @@ public class MemberOperationDao {
 			  " MO.remaining_base_money, MO.remaining_extra_money, MO.remaining_point, MO.comment, " +
 			  " MO.coupon_id, MO.coupon_money, MO.coupon_name, " +
 			  " M.member_type_id " +
-			  " FROM member_operation MO LEFT JOIN member M ON MO.member_id = M.member_id "	+
-			  " WHERE 1=1 " +
+			  " FROM " + Params.dbName + ".member_operation MO " +
+			  " JOIN " + Params.dbName + ".member M ON MO.member_id = M.member_id "	+
+			  " WHERE 1 = 1 " +
 			  " AND MO.restaurant_id = " + staff.getRestaurantId();
 		sql = SQLUtil.bindSQLParams(sql, params);
 		dbCon.rs = dbCon.stmt.executeQuery(sql);

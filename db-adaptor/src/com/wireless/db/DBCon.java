@@ -13,10 +13,6 @@ public class DBCon {
 	public Statement stmt;
 	
 	public ResultSet rs;
-	public ResultSet rs2;
-	public ResultSet rs3;
-	public ResultSet rs4;
-	public ResultSet rs5;
 	
 //	private static final ComboPooledDataSource DB_POOL = new ComboPooledDataSource();
 	
@@ -63,22 +59,6 @@ public class DBCon {
 			if(rs != null){
 				rs.close();
 				rs = null;
-			}
-			if(rs2 != null){
-				rs2.close();
-				rs2 = null;
-			}
-			if(rs3 != null){
-				rs3.close();
-				rs3 = null;
-			}
-			if(rs4 != null){
-				rs4.close();
-				rs4 = null;
-			}
-			if(rs5 != null){
-				rs5.close();
-				rs5 = null;
 			}
 			if(stmt != null){
 				stmt.close();
