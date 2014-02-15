@@ -402,6 +402,11 @@ Ext.onReady(function(){
 						}
 					}
 				},{
+					xtype : 'label',
+					width : 200,
+					style : 'color:green;font-szie:14px;',
+					text : '说明: 如果是八折, 直接输入0.8即可'
+				},{
 					xtype : 'checkbox',
 					id : 'chbIsDefault',
 					hideLabel : true,
@@ -532,6 +537,11 @@ Ext.onReady(function(){
 						}
 					}
  	    	    },{
+					xtype : 'label',
+					width : 200,
+					style : 'color:green;font-szie:14px;',
+					text : '说明: 如果是八折, 直接输入0.8即可'
+				},{
 					xtype : 'hidden',
 					id : 'hideDiscountID'
 				}, {
@@ -666,7 +676,12 @@ Ext.onReady(function(){
 						return '折扣率在 0.00 至 1.00 之间,如 8.8 折输入 0.88 ';
 					}
 				}
-	    	}]
+	    	},{
+				xtype : 'label',
+				width : 200,
+				style : 'color:green;font-szie:14px;',
+				text : '说明: 如果是八折, 直接输入0.8即可'
+			}]
 		}],
 		bbar : [ '->', {
 			text : '保存',
