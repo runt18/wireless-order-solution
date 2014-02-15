@@ -465,7 +465,7 @@ public class DiscountDao {
 	 * @return
 	 * @throws SQLException
 	 */
-	public static List<DiscountPlan> getDiscountPlan(DBCon dbCon, String extraCond, String orderClause) throws SQLException{
+	private static List<DiscountPlan> getDiscountPlan(DBCon dbCon, String extraCond, String orderClause) throws SQLException{
 		List<DiscountPlan> list = new ArrayList<DiscountPlan>();
 		DiscountPlan item = null;
 		String selectSQL = "SELECT A.dist_plan_id, A.rate, B.discount_id, B.name as discount_name, B.type, B.restaurant_id, B.status, K.kitchen_id, K.name as kitchen_name "
@@ -504,7 +504,7 @@ public class DiscountDao {
 	 * @return
 	 * @throws SQLException
 	 */
-	public static List<DiscountPlan> getDiscountPlan(String extraCond, String orderClause) throws SQLException{
+	private static List<DiscountPlan> getDiscountPlan(String extraCond, String orderClause) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -552,7 +552,7 @@ public class DiscountDao {
 	 * @return
 	 * @throws Exception
 	 */
-	public static int insertDiscountBody(DBCon dbCon, Discount pojo, DiscountPlan plan) throws SQLException{
+	private static int insertDiscountBody(DBCon dbCon, Discount pojo, DiscountPlan plan) throws SQLException{
 		int count = 0;
 		// 处理原默认方案信息
 		DiscountDao.checkUpdateOrInsertDiscount(dbCon, pojo);
@@ -595,7 +595,7 @@ public class DiscountDao {
 	 * @param plan
 	 * @throws Exception
 	 */
-	public static int insertDiscount(DBCon dbCon, Discount pojo, DiscountPlan plan) throws Exception{
+	private static int insertDiscount(DBCon dbCon, Discount pojo, DiscountPlan plan) throws Exception{
 		int count = 0;
 		try{
 			dbCon.connect();
@@ -619,7 +619,7 @@ public class DiscountDao {
 	 * @param plan
 	 * @throws Exception
 	 */
-	public static int insertDiscount(Discount pojo, DiscountPlan plan) throws Exception{
+	private static int insertDiscount(Discount pojo, DiscountPlan plan) throws Exception{
 		return DiscountDao.insertDiscount(new DBCon(), pojo, plan);
 	}
 	
@@ -628,7 +628,7 @@ public class DiscountDao {
 	 * @param pojo
 	 * @throws Exception
 	 */
-	public static int updateDiscount(DBCon dbCon, Discount pojo) throws Exception{
+	private static int updateDiscount(DBCon dbCon, Discount pojo) throws Exception{
 		int count = 0;
 		try{
 			dbCon.connect();
@@ -663,7 +663,7 @@ public class DiscountDao {
 	 * @return 
 	 * @throws Exception
 	 */
-	public static int updateDiscount(Discount pojo) throws Exception{
+	private static int updateDiscount(Discount pojo) throws Exception{
 		return DiscountDao.updateDiscount(new DBCon(), pojo);
 	}
 	
@@ -675,7 +675,7 @@ public class DiscountDao {
 	 * @throws BusinessException
 	 * @throws SQLException
 	 */
-	public static int deleteDiscount(DBCon dbCon, Discount pojo) throws BusinessException, SQLException{
+	private static int deleteDiscount(DBCon dbCon, Discount pojo) throws BusinessException, SQLException{
 		int count = 0;
 		String selectSQL = "SELECT count(discount_id) count FROM " +  Params.dbName + ".member_type_discount WHERE discount_id = " + pojo.getId();
 		dbCon.rs = dbCon.stmt.executeQuery(selectSQL);
@@ -694,7 +694,7 @@ public class DiscountDao {
 	 * @throws BusinessException
 	 * @throws SQLException
 	 */
-	public static int deleteDiscount(Discount pojo) throws BusinessException, SQLException{
+	private static int deleteDiscount(Discount pojo) throws BusinessException, SQLException{
 		DBCon dbCon = new DBCon();
 		int count = 0;
 		try{
@@ -717,7 +717,7 @@ public class DiscountDao {
 	 * @throws BusinessException
 	 * @throws SQLException
 	 */
-	public static int insertDiscountPlan(DBCon dbCon, DiscountPlan pojo) throws BusinessException, SQLException{
+	private static int insertDiscountPlan(DBCon dbCon, DiscountPlan pojo) throws BusinessException, SQLException{
 		int count = 0;
 		String selectSQL = "SELECT count(discount_id) count FROM " +  Params.dbName + ".discount_plan WHERE discount_id = " + pojo.getDiscount().getId() + " AND kitchen_id = " + pojo.getKitchen().getId();
 		dbCon.rs = dbCon.stmt.executeQuery(selectSQL);
@@ -738,7 +738,7 @@ public class DiscountDao {
 	 * @throws BusinessException
 	 * @throws SQLException
 	 */
-	public static int insertDiscountPlan(DiscountPlan pojo) throws BusinessException, SQLException{
+	private static int insertDiscountPlan(DiscountPlan pojo) throws BusinessException, SQLException{
 		DBCon dbCon = new DBCon();
 		int count = 0;
 		try{
@@ -760,7 +760,7 @@ public class DiscountDao {
 	 * @return
 	 * @throws SQLException
 	 */
-	public static int updateDiscountPlan(DBCon dbCon, DiscountPlan pojo) throws SQLException{
+	private static int updateDiscountPlan(DBCon dbCon, DiscountPlan pojo) throws SQLException{
 		int count = 0;
 		String updateSQL = "UPDATE " +  Params.dbName + ".discount_plan SET rate = " + pojo.getRate() + " WHERE dist_plan_id = " + pojo.getId();
 		count = dbCon.stmt.executeUpdate(updateSQL);
@@ -774,7 +774,7 @@ public class DiscountDao {
 	 * @throws BusinessException
 	 * @throws SQLException
 	 */
-	public static int updateDiscountPlan(DiscountPlan pojo) throws BusinessException, SQLException{
+	private static int updateDiscountPlan(DiscountPlan pojo) throws BusinessException, SQLException{
 		DBCon dbCon = new DBCon();
 		int count = 0;
 		try{
@@ -796,7 +796,7 @@ public class DiscountDao {
 	 * @return
 	 * @throws SQLException
 	 */
-	public static int deleteDiscountPlan(DBCon dbCon, DiscountPlan pojo) throws SQLException{
+	private static int deleteDiscountPlan(DBCon dbCon, DiscountPlan pojo) throws SQLException{
 		int count = 0;
 		String deleteSQL = "DELETE FROM " +  Params.dbName + ".discount_plan WHERE dist_plan_id = " + pojo.getId();
 		count = dbCon.stmt.executeUpdate(deleteSQL);
@@ -809,7 +809,7 @@ public class DiscountDao {
 	 * @return
 	 * @throws Exception
 	 */
-	public static int deleteDiscountPlan(DiscountPlan pojo) throws Exception{
+	private static int deleteDiscountPlan(DiscountPlan pojo) throws Exception{
 		DBCon dbCon = new DBCon();
 		int count = 0;
 		try{
@@ -832,7 +832,7 @@ public class DiscountDao {
 	 * @throws BusinessException
 	 * @throws SQLException
 	 */
-	public static int updateDiscountPlanRate(DBCon dbCon, DiscountPlan pojo) throws BusinessException, SQLException{
+	private static int updateDiscountPlanRate(DBCon dbCon, DiscountPlan pojo) throws BusinessException, SQLException{
 		int count = 0;
 		String querySQL = "SELECT count(discount_id) count FROM discount_plan WHERE discount_id = " + pojo.getDiscount().getId();
 		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
@@ -853,7 +853,7 @@ public class DiscountDao {
 	 * @return
 	 * @throws Exception
 	 */
-	public static int updateDiscountPlanRate(DiscountPlan pojo) throws Exception{
+	private static int updateDiscountPlanRate(DiscountPlan pojo) throws Exception{
 		DBCon dbCon = new DBCon();
 		int count = 0;
 		try{
