@@ -17,7 +17,6 @@ import com.wireless.db.staffMgr.RoleDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
-import com.wireless.pojo.distMgr.Discount;
 import com.wireless.pojo.staffMgr.Page;
 import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.staffMgr.Privilege.Code;
@@ -83,8 +82,8 @@ public class QueryPrivilegeAction extends DispatchAction{
 								children.append(",");
 							}
 							children.append("{");
-							children.append("leaf:true");
-							children.append(",checked:false");
+							children.append("checked:false");
+							children.append(",leaf:true");
 							children.append(",text:'" + root.get(i).getDiscounts().get(j).getName() + "'");
 							children.append(",discountId:'" + root.get(i).getDiscounts().get(j).getId() + "'");
 							children.append(",isDiscount:true");
@@ -273,14 +272,14 @@ public class QueryPrivilegeAction extends DispatchAction{
 								children.append(",text:'" + root.get(i).getDiscounts().get(j).getName() + "'");
 								//转折
 								if(rolePrivilege.get(index).getDiscounts().isEmpty()){
-									if(root.get(i).getDiscounts().get(j).getStatus() == Discount.Status.RESERVED || root.get(i).getDiscounts().get(j).getStatus() == Discount.Status.DEFAULT_RESERVED){
+									if(root.get(i).getDiscounts().get(j).isReserved()){
 										children.append(",disabled:true");
 									}
 									children.append(",checked:true");
 								}else{
 									int disIndex = rolePrivilege.get(index).getDiscounts().indexOf(root.get(i).getDiscounts().get(j));
 									if(disIndex >= 0){
-										if(root.get(i).getDiscounts().get(j).getStatus() == Discount.Status.RESERVED || root.get(i).getDiscounts().get(j).getStatus() == Discount.Status.DEFAULT_RESERVED){
+										if(root.get(i).getDiscounts().get(j).isReserved()){
 											children.append(",disabled:true");
 										}
 										children.append(",checked:true");
@@ -311,7 +310,7 @@ public class QueryPrivilegeAction extends DispatchAction{
 								children.append("{");
 								children.append("leaf:true");
 								children.append(",text:'" + root.get(i).getDiscounts().get(j).getName() + "'");
-								if(root.get(i).getDiscounts().get(j).getStatus() == Discount.Status.RESERVED || root.get(i).getDiscounts().get(j).getStatus() == Discount.Status.DEFAULT_RESERVED){
+								if(root.get(i).getDiscounts().get(j).isReserved()){
 									children.append(",checked:true");
 									children.append(",disabled:true");
 								}else{

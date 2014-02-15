@@ -8,11 +8,14 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
+import com.wireless.db.deptMgr.KitchenDao;
 import com.wireless.db.distMgr.DiscountDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
-import com.wireless.pojo.distMgr.DiscountPlan;
+import com.wireless.pojo.distMgr.Discount;
+import com.wireless.pojo.menuMgr.Kitchen;
+import com.wireless.pojo.staffMgr.Staff;
 
 public class UpdateDiscountPlanRateAction extends Action{
 
@@ -24,18 +27,19 @@ public class UpdateDiscountPlanRateAction extends Action{
 		try{
 			
 			String pin = (String)request.getAttribute("pin");
-			StaffDao.verify(Integer.parseInt(pin));
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
-			String restaurantID = request.getParameter("restaurantID");
 			String discountID = request.getParameter("discountID");
 			String rate = request.getParameter("rate");
 			
-			DiscountPlan pojo = new DiscountPlan(0);
-			pojo.setRate(Float.valueOf(rate));
-			pojo.getDiscount().setId(Integer.valueOf(discountID));
-			pojo.getDiscount().setRestaurantId(Integer.valueOf(restaurantID));
 			
-			DiscountDao.updateDiscountPlanRate(pojo);
+			Discount.UpdatePlanBuilder builder = new Discount.UpdatePlanBuilder(Integer.parseInt(discountID));
+			
+			for (Kitchen k : KitchenDao.getByType(staff, Kitchen.Type.NORMAL)) {
+				builder.add(k, Float.parseFloat(rate));
+			}
+			
+			DiscountDao.updatePlan(staff, builder);
 			
 			jobject.initTip(true, "操作成功, 已修改该方案下所有分厨折扣信息.");
 		

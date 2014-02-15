@@ -20,7 +20,7 @@ public class DeleteDiscountAction extends Action{
 			throws Exception {
 		JObject jobject = new JObject();
 		try{
-			String pin = request.getParameter("pin");
+			String pin = (String) request.getAttribute("pin");
 			String discountID = request.getParameter("discountID");
 			
 			DiscountDao.delete(StaffDao.verify(Integer.parseInt(pin)), Integer.valueOf(discountID));
