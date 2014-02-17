@@ -726,8 +726,11 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 	 * Refresh the original order.
 	 */
 	public void refresh(){
-		mQueryOrderTask = new QueryOrderTask(mOriOrder.getDestTbl().getAliasId());
-		mQueryOrderTask.execute();
+		int tableAlias = getArguments().getInt(TBL_ALIAS_KEY);
+		if(tableAlias >= 0){
+			mQueryOrderTask = new QueryOrderTask(tableAlias);
+			mQueryOrderTask.execute();
+		}
 	}
 	
 	/**

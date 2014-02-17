@@ -17,7 +17,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.wireless.common.WirelessOrder;
-import com.wireless.exception.ProtocolError;
+import com.wireless.exception.BusinessException;
 import com.wireless.fragment.OrderFoodFragment;
 import com.wireless.fragment.OrderFoodFragment.OnOrderChangedListener;
 import com.wireless.pack.Type;
@@ -156,67 +156,35 @@ public class OrderActivity extends FragmentActivity implements OnOrderChangedLis
 		@Override
 		protected void onPreExecute() {
 			super.onPreExecute();
-			mProgressDialog = ProgressDialog.show(OrderActivity.this, "", "查询" + mReqOrder.getDestTbl().getAliasId() + "号账单信息...请稍候");
+			mProgressDialog = ProgressDialog.show(OrderActivity.this, "", "正在提交账单信息...请稍候");
 		}
 
 		@Override
-		protected void onPostExecute(Void result) {
-			super.onPostExecute(result);
-			mProgressDialog.cancel();
-			
-			if(mBusinessException == null){
-				Toast.makeText(OrderActivity.this, mReqOrder.getDestTbl().getAliasId() + "号餐台下单成功", Toast.LENGTH_SHORT).show();
-				finish();
-			}else{
-				if(mReqOrder.getId() != 0){
-
-					if(mBusinessException.getErrCode().equals(ProtocolError.ORDER_EXPIRED)){
-						//如果是改单，并且返回是账单过期的错误状态，表示账单已有更新
-						//则提示用户重新请求账单，再次确认提交
-						new AlertDialog.Builder(OrderActivity.this)
-							.setTitle("提示")
-							.setMessage(mReqOrder.getDestTbl().getAliasId() + "号餐台的账单信息已经更新，已点菜信息将刷新，新点菜信息将会保留")
-							.setNeutralButton("确定",
-								new DialogInterface.OnClickListener() {
-									@Override
-									public void onClick(DialogInterface dialog,	int which){
-										((OrderFoodFragment)getSupportFragmentManager().findFragmentByTag(OrderFoodFragment.TAG)).refresh();
-									}
-								})
-							.show();
-						
-					}else{
-						new AlertDialog.Builder(OrderActivity.this)
-							.setTitle("提示")
-							.setMessage(mBusinessException.getMessage())
-							.setNeutralButton("确定", null)
-							.show();
-					}
-				}else{
-					if(mBusinessException.getErrCode().equals(ProtocolError.TABLE_BUSY)){
-						//如果是新下单，并且返回是餐台就餐的错误状态，表示账单已更新
-						//则提示用户重新请求账单，再次确认提交
-						new AlertDialog.Builder(OrderActivity.this)
-							.setTitle("提示")
-							.setMessage(mReqOrder.getDestTbl().getAliasId() + "号餐台的账单信息已经更新，已点菜信息将刷新，新点菜信息将会保留")
-							.setNeutralButton("确定",
-								new DialogInterface.OnClickListener() {
-									@Override
-									public void onClick(DialogInterface dialog,	int which){
-										((OrderFoodFragment)getSupportFragmentManager().findFragmentByTag(OrderFoodFragment.TAG)).refresh();
-									}
-								})
-							.show();
-					}else{
-						new AlertDialog.Builder(OrderActivity.this)
-							.setTitle("提示")
-							.setMessage(mBusinessException.getMessage())
-							.setNeutralButton("确定", null)
-							.show();
-					}
-				}
-			}	
+		protected void onSuccess(Order reqOrder){
+			mProgressDialog.dismiss();			
+			Toast.makeText(OrderActivity.this, reqOrder.getDestTbl().getAliasId() + "号餐台下单成功", Toast.LENGTH_SHORT).show();
+			finish();
 		}
+		
+		@Override
+		protected void onFail(BusinessException e, Order reqOrder){
+			mProgressDialog.dismiss();	
+			
+			//如果返回是账单过期的错误状态，表示账单已有更新
+			//则提示用户重新请求账单，再次确认提交
+			new AlertDialog.Builder(OrderActivity.this)
+				.setTitle("提示")
+				.setMessage(reqOrder.getDestTbl().getAliasId() + "号餐台的账单信息已经更新，已点菜信息将刷新，新点菜信息将会保留")
+				.setNeutralButton("确定",
+					new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog,	int which){
+							((OrderFoodFragment)getSupportFragmentManager().findFragmentByTag(OrderFoodFragment.TAG)).refresh();
+						}
+					})
+				.show();
+		}
+		
 	}
 
 	@Override

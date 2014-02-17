@@ -300,47 +300,41 @@ public class CommitDialog extends DialogFragment{
 		 */
 		@Override
 		protected void onPreExecute(){
-			mProgDialog = ProgressDialog.show(getActivity(), "", "提交" + mReqOrder.getDestTbl().getAliasId() + "号餐台的下单信息...请稍候", true);
+			mProgDialog = ProgressDialog.show(getActivity(), "", "正在提交账单下单信息...请稍候", true);
 		}			
 		
-		/**
-		 * 根据返回的error message判断，如果发错异常则提示用户，
-		 * 如果成功，则返回到主界面，并提示用户下单成功
-		 */
 		@Override
-		protected void onPostExecute(Void arg){
-			//make the progress dialog disappeared
+		protected void onSuccess(Order reqOrder){
 			mProgDialog.dismiss();
-			/**
-			 * Prompt user message if any error occurred.
-			 */
-			if(mBusinessException != null){
-				new AlertDialog.Builder(getActivity())
+			//Perform to pay order in case the flag is true,
+			//otherwise back to the main activity and show the message
+			if(mIsPayOrder){
+				new QueryOrderTask2(mOrderToCommit.getDestTbl().getAliasId()).execute();
+				
+			}else{
+				dismiss();
+				//直接返回到MainActivity
+				Intent intent = new Intent(getActivity(), MainActivity.class);
+				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+				getActivity().startActivity(intent);
+				Toast.makeText(getActivity(), reqOrder.getDestTbl().getAliasId() + "号台下单成功。", Toast.LENGTH_SHORT).show();
+			}
+		}
+		
+		@Override
+		protected void onFail(BusinessException e, Order reqOrder){
+			mProgDialog.dismiss();
+			//Prompt user message if any error occurred.
+			new AlertDialog.Builder(getActivity())
 				.setTitle("提示")
-				.setMessage(mBusinessException.getMessage())
+				.setMessage(e.getMessage())
 				.setPositiveButton("确定", new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int id) {
 						dialog.dismiss();
 					}
 				}).show();
-			}else{
-				//Perform to pay order in case the flag is true,
-				//otherwise back to the main activity and show the message
-				if(mIsPayOrder){
-					//Set the default discount to committed order.
-					mOrderToCommit.setDiscount(WirelessOrder.loginStaff.getRole().getDefaultDiscount());
-					new QueryOrderTask2(mOrderToCommit.getDestTbl().getAliasId()).execute();
-					
-				}else{
-					dismiss();
-					//直接返回到MainActivity
-					Intent intent = new Intent(getActivity(), MainActivity.class);
-					intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-					getActivity().startActivity(intent);
-					Toast.makeText(getActivity(), mReqOrder.getDestTbl().getAliasId() + "号台下单成功。", Toast.LENGTH_SHORT).show();
-				}
-			}
 		}
+		
 	}	
 	
 	private class QueryOrderTask2 extends com.wireless.lib.task.QueryOrderTask{

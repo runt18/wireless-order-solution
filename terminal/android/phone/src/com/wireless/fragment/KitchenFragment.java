@@ -39,6 +39,8 @@ public class KitchenFragment extends Fragment {
 	private DepartmentRefreshHandler mDepartmentRefreshHandler;
 	private KitchenRefreshHandler mKitchenRefreshHandler;
 	
+	private DepartmentTree mDeptTree;
+
 	private ExpandableListView mXpListView;
 	
 	private static class BuildDepartmentHandler extends Handler{
@@ -57,7 +59,7 @@ public class KitchenFragment extends Fragment {
 			
 			//添加所有部门
 			deptLayout.removeAllViews();
-			for(final Department dept : WirelessOrder.foodMenu.depts){
+			for(final Department dept : fragment.mDeptTree.asDeptList()){
 				//解析跟图层
 				View view = LayoutInflater.from(fragment.getActivity()).inflate(R.layout.pick_food_by_kitchen_fgm_dept_item, null);
 				
@@ -123,8 +125,6 @@ public class KitchenFragment extends Fragment {
 	private static class KitchenRefreshHandler extends Handler{
 		private WeakReference<KitchenFragment> mFragment;
 
-		private DepartmentTree mDeptTree = WirelessOrder.foodMenu.foods.asDeptTree();
-		
 		KitchenRefreshHandler(KitchenFragment fragment) {
 			this.mFragment = new WeakReference<KitchenFragment>(fragment);
 		}
@@ -136,7 +136,7 @@ public class KitchenFragment extends Fragment {
 			int deptIdToFilter = msg.what;
 			
 			//根据条件筛选出要显示的厨房, 并菜品按销量排序
-			for(DeptNode deptNode : mDeptTree.asDeptNodes()){
+			for(DeptNode deptNode : fragment.mDeptTree.asDeptNodes()){
 				if(deptNode.getKey().getId() == deptIdToFilter){
 					fragment.mXpListView.setAdapter(fragment.new KitchenExpandableListAdapter(deptNode.getValue()));
 					break;
@@ -207,7 +207,8 @@ public class KitchenFragment extends Fragment {
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState){
 		super.onActivityCreated(savedInstanceState);
-		new BuildDepartmentHandler(this).sendEmptyMessage(WirelessOrder.foodMenu.depts.get(0).getId());
+		mDeptTree = WirelessOrder.foodMenu.foods.asDeptTree();
+		new BuildDepartmentHandler(this).sendEmptyMessage(mDeptTree.asDeptList().get(0).getId());
 	}
 	
 	private class KitchenExpandableListAdapter extends BaseExpandableListAdapter{
@@ -292,11 +293,9 @@ public class KitchenFragment extends Fragment {
 			view.setBackgroundResource(R.drawable.kitchen_fgm_group_selector);
 			
 			//设置厨房名
-			((TextView) view.findViewById(R.id.textView_name_kitchenFragment_xp_group_item))
-				.setText(mKitchenNodes.get(groupPosition).getKey().getName());
+			((TextView) view.findViewById(R.id.textView_name_kitchenFragment_xp_group_item)).setText(mKitchenNodes.get(groupPosition).getKey().getName());
 			//设置厨房持有菜品数量
-			((TextView) view.findViewById(R.id.textView_count_kitchenFragment_xp_group_item))
-				.setText(Integer.toString(mKitchenNodes.get(groupPosition).getValue().size()));
+			((TextView) view.findViewById(R.id.textView_count_kitchenFragment_xp_group_item)).setText(Integer.toString(mKitchenNodes.get(groupPosition).getValue().size()));
 			
 			return view;
 		}
