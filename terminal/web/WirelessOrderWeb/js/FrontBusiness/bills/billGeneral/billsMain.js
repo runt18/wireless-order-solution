@@ -333,6 +333,14 @@ function billOpt(value, cellmeta, record, rowIndex, columnIndex, store) {
 			+ '<a href=\'javascript:printBillFunc(' + record.get('id') + ')\'>补打</a>';
 }
 
+function couponPriceHandler(v){
+	if(!isNaN(v)){
+		return Ext.ux.txtFormat.gridDou(v);
+	}else{
+		return v; 
+	}
+}
+
 var billsGrid;
 var foodStatus;
 Ext.onReady(function(){
@@ -495,6 +503,17 @@ Ext.onReady(function(){
 						searchAdditionFilter = e.getId();
 				}
 			}
+		}, { xtype:'tbtext', text:'&nbsp;&nbsp;'}, {
+			xtype : 'radio',
+			name : 'conditionRadio',
+			boxLabel : '优惠劵',
+			inputValue : 6,
+			listeners : {
+				check : function(e){
+					if(e.getValue())
+						searchAdditionFilter = e.getId();
+				}
+			}
 		},
 		'->',
 		{
@@ -528,13 +547,14 @@ Ext.onReady(function(){
 			['账单类型', 'categoryText',,'center'],
 			['结账方式', 'settleTypeText',,'center'],
 			['收款方式', 'payTypeText',,'center'],
+			['优惠劵金额', 'couponPrice',,'right','couponPriceHandler'],
 			['应收', 'totalPrice',,'right', 'Ext.ux.txtFormat.gridDou'],
 			['实收', 'actualPrice',,'right', 'Ext.ux.txtFormat.gridDou'],
 			['状态', 'statusText',,'center', 'function(v,m,r){if(r.get("statusValue")==2){return \'<font color=\"#FF0000\">反结账</font>\';}else{return v;}}'],
 			['操作', 'operator', 270, 'center', 'billOpt']
 		],
 		OrderRecord.getKeys(),
-		[['isPaging', true], ['restaurantID', restaurantID], ['isCookie', true]],
+		[['isPaging', true], ['restaurantID', restaurantID]],
 		GRID_PADDING_LIMIT_20,
 		'',
 		billsGridTbar

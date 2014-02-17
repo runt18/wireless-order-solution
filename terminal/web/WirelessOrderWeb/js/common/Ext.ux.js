@@ -629,7 +629,7 @@ var KitchenRecord = Ext.ux.cr(['id', 'alias', 'rid', 'name', 'isAllowTmp', 'type
 var OrderRecord = Ext.ux.cr(['id', 'seqId', 'rid', 'birthDateFormat', 'orderDate', 'orderDateFormat', 'categoryValue', 'categoryText', 'waiter',
     'statusValue', 'statusText', 'settleTypeValue', 'settleTypeText', 'payTypeValue', 'payTypeText', 'discount', 'pricePlan', 
     'table', 'table.alias', 'member', 'customNum', 'comment', 'repaidPrice', 'receivedCash', 'serviceRate', 'discountPrice', 
-    'cancelPrice', 'giftPrice', 'totalPrice', 'erasePrice', 'actualPrice', 'orderFoods', 'childOrders', 'actualPriceBeforeDiscount']);
+    'cancelPrice', 'giftPrice', 'totalPrice', 'erasePrice', 'couponPrice', 'actualPrice', 'orderFoods', 'childOrders', 'actualPriceBeforeDiscount']);
 var OrderFoodRecord = Ext.ux.cr(['dataType', 'orderId', 'orderDateFormat', 'count', 'discount', 'isTemporary', 'totalPrice', 'totalPriceBeforeDiscount',
     'tasteGroup', 'tasteGroup.tastePref', 'tasteGroup.tastePrice', 'waiter', 'actualPrice'], FoodBasicRecord);
 var FoodPricePlanRecord = Ext.ux.cr(['planId', 'foodId', 'rid', 'unitPrice', 'foodAlias', 'foodName', 

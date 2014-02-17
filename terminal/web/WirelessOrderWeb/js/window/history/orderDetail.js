@@ -43,6 +43,7 @@ Ext.onReady(function(){
 		var sumRow;
 		for(var i = 0; i < records.length; i++){
 			if(records[i].get(foodStatus)){
+				
 				sumRow = billDetailGrid.getView().getRow(i);
 				sumRow.style.backgroundColor = 'salmon';
 			}

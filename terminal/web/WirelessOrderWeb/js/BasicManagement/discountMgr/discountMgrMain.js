@@ -47,17 +47,18 @@ function programOperationHandler(c){
 	var status = Ext.getCmp('hideDiscountStatus');
 	
 	if(c.type == dmObj.operation.insert){
-		Ext.getDom('numDiscountID').parentElement.parentElement.style.display = 'none';
-		Ext.getDom('numDiscountRate').parentElement.parentElement.style.display = 'block';
-		
+		Ext.getCmp('numDiscountRate').getEl().up('.x-form-item').setDisplayed(true);
+		Ext.getCmp('labTips').show();
 		rate.setValue(1.00);
 		isDefault.setValue(false);
 		name.setValue();
 		name.focus(true, 100);
 		addProgramWin.setTitle('添加方案');
 	}else if(c.type == dmObj.operation.update){
-		Ext.getDom('numDiscountID').parentElement.parentElement.style.display = 'block';
-		Ext.getDom('numDiscountRate').parentElement.parentElement.style.display = 'none';
+		Ext.getCmp('numDiscountRate').getEl().up('.x-form-item').setDisplayed(false);
+		Ext.getCmp('labTips').hide();
+//		Ext.getDom('numDiscountRate').parentElement.parentElement.style.display = 'none';
+//		Ext.getDom('labTips').parentElement.parentElement.style.display = 'none';
 		
 		var sn = Ext.ux.getSelNode(programTree);
 		if(!sn || sn.attributes.discountID == -1){
@@ -69,7 +70,7 @@ function programOperationHandler(c){
 		status.setValue(sn.attributes.status);
 		name.setValue(sn.attributes.discountName); 
 		name.focus(null, 100);
-		if(sn.attributes.status == 2 || sn.attributes.status == 3){
+		if(sn.attributes.type == 2){
 			name.setDisabled(true);
 		}else{
 			name.setDisabled(false);
@@ -365,13 +366,8 @@ Ext.onReady(function(){
 					xtype : 'hidden',
 					id : 'hideDiscountStatus'
 				}, {
-					xtype : 'numberfield',
-					id : 'numDiscountID',
-					width : 130,
-					fieldLabel : '方案编号',
-					allowBlank : false,
-					disabled : true,
-					emptyText : '不允许操作方案编号.'
+					xtype : 'hidden',
+					id : 'numDiscountID'
 				}, {
 					xtype : 'textfield',
 					id : 'txtDiscountName',
@@ -403,6 +399,7 @@ Ext.onReady(function(){
 					}
 				},{
 					xtype : 'label',
+					id : 'labTips',
 					width : 200,
 					style : 'color:green;font-szie:14px;',
 					text : '说明: 如果是八折, 直接输入0.8即可'

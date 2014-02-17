@@ -224,7 +224,6 @@ var dailySettleBut = new Ext.ux.ImageButton({
 			Ext.Ajax.request({
 				url : '../../QueryDailySettleByNow.do',
 				params : {
-					isCookie : true,
 					queryType : 1
 				},
 				success : function(res, opt){
@@ -891,7 +890,7 @@ var dailySettleCheckDetpPanel = new Ext.Panel({
 var dailySettleCheckTablePanel = new Ext.Panel({
 	frame : true,
 	region : "north",
-	height : 440,
+	height : 459,
 	items : [ {
 		border : false,
 		contentEl : "shiftCheckTableDiv"
@@ -902,7 +901,7 @@ var dailySettleCheckTablePanel = new Ext.Panel({
 var dailySettleCheckTableWin = new Ext.Window({
 	layout : "border",
 	width : 450,
-	height : 600,
+	height : 625,
 	closeAction : "hide",
 	resizable : false,
 	closable : false,
@@ -1137,6 +1136,9 @@ var dailySettleCheckTableWin = new Ext.Window({
 			
 			Ext.getDom('repayAmountCheck').innerHTML = shiftCheckDate.repayAmount.toFixed(2);
 			Ext.getDom('repayBillCountCheck').innerHTML = shiftCheckDate.repayBillCount;
+			
+			Ext.getDom('couponAmountCheck').innerHTML = shiftCheckDate.couponAmount.toFixed(2);
+			Ext.getDom('couponBillCountCheck').innerHTML = shiftCheckDate.couponBillCount;
 			
 			Ext.getDom('serviceAmountCheck').innerHTML = shiftCheckDate.serviceAmount.toFixed(2);
 			

@@ -4,7 +4,8 @@
  * 修改部门信息
  */
 function initCouponTypeWin(){
-
+	var minDate = new Date();
+	minDate.getDate() - 1;
 	operateCouponTypeWin = Ext.getCmp('operateCouponTypeWin');
 	if(!operateCouponTypeWin){
 		operateCouponTypeWin = new Ext.Window({
@@ -30,13 +31,14 @@ function initCouponTypeWin(){
 					xtype : 'numberfield',
 					id : 'numCouponPrice',
 					width : 130,
-					fieldLabel : '代金额',
+					fieldLabel : '面额',
 					allowBlank : false
 				},{
 					id : 'dateForExpired',
 					xtype : 'datefield',
+					minValue : minDate,
 					width : 130,
-					fieldLabel : '日期',
+					fieldLabel : '有效期至',
 					format : 'Y-m-d',
 					readOnly : true,
 					allowBlank : false,
@@ -372,7 +374,7 @@ function floatBarDeleteHandler(){
 	}
 	Ext.Msg.confirm(
 		'提示',
-		'是否删除: ' + node.text,
+		'是否删除: ' + node.text + ' ?</br><font style="color:red;font-weight:bold">Tips : 删除后该类型下所有优惠劵会同时清除</font> ',
 		function(e){
 			if(e == 'yes'){
 				Ext.Ajax.request({
@@ -398,7 +400,55 @@ function floatBarDeleteHandler(){
 		}
 	);
 }
+function linkOrderId(v){
+	if(!isNaN(v)){
+		return '<a href=\"javascript:comi_showBillDetailWin('+ v +')\">'+ v +'</a>';
+	}else{
+		return v;
+	}
+}
 
+function comi_showBillDetailWin(orderID){
+	couponOrderDetailWin = new Ext.Window({
+		layout : 'fit',
+		width : 1100,
+		height : 440,
+		closable : false,
+		resizable : false,
+		modal : true,
+		bbar : ['->', {
+			text : '关闭',
+			iconCls : 'btn_close',
+			handler : function() {
+				couponOrderDetailWin.destroy();
+			}
+		} ],
+		keys : [{
+			key : Ext.EventObject.ESC,
+			scope : this,
+			fn : function(){
+				couponOrderDetailWin.destroy();
+			}
+		}],
+		listeners : {
+			show : function(thiz) {
+				var sd = Ext.ux.getSelData(couponGrid);
+				thiz.load({
+					url : '../window/history/orderDetail.jsp', 
+					scripts : true,
+					params : {
+						orderId : sd.orderId
+					},
+					method : 'post'
+				});
+				thiz.center();	
+			}
+		}
+	});
+	couponOrderDetailWin.show();
+	couponOrderDetailWin.setTitle('账单号: ' + orderID);
+	couponOrderDetailWin.center();
+}
 
 var couponTree;
 var updateDeptWin;
@@ -536,11 +586,12 @@ Ext.onReady(function() {
 		'',
 		'../../QueryCoupon.do',
 		[
-		    [true, false, false, true], 
+		    [true, false, true, true], 
 			['会员姓名', 'member.name'] , 
 			['会员号码', 'member.mobile'] , 
 			['到期时间', 'couponType.expiredFormat'],
-			['状态', 'statusText']
+			['状态', 'statusText'],
+			['账单号', 'orderId',,'center', 'linkOrderId']
 		],
 		CouponRecord.getKeys(),
 		[ ['isPaging', true]],

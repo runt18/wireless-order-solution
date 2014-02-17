@@ -392,7 +392,7 @@ function memberPayOrderToBindData(_c){
 	coupon.getEl().up('.x-form-item').setDisplayed(false);
 	if(coupons){
 		coupon.getEl().up('.x-form-item').setDisplayed(true);
-		var list = [];
+		var list = [[-1,'不使用']];
 		for (var i = 0; i < coupons.length; i++) {
 			list.push([coupons[i].couponId, coupons[i].couponType.name]);
 		}
