@@ -133,6 +133,12 @@
 			<td class="text_right" id="bssiServiceIncome">---</td>
 			<td>&nbsp;</td>
 		</tr>
+		<tr>
+			<th>优惠劵</th>
+			<td class="text_right" id="bssiCouponAmount">---</td>
+			<td class="text_right" id="bssiCouponIncome">---</td>
+			<td>&nbsp;</td>
+		</tr>
 	</table>
 	
 	<!-- 
