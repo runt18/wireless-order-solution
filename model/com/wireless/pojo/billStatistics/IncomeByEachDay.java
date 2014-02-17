@@ -200,11 +200,14 @@ public class IncomeByEachDay implements Jsonable{
 		
 		jm.put("eraseIncome", this.getIncomeByErase().getTotalErase());
 		
+		jm.put("couponIncome", this.getIncomeByCoupon().getTotalCoupon());
+		
 		jm.put("paidIncome", this.getIncomeByRepaid().getTotalRepaid());
 		
-		if(flag > 0){
+//		if(flag > 0){
 			jm.put("paidAmount", this.getIncomeByRepaid().getRepaidAmount());
 			jm.put("eraseAmount", this.getIncomeByErase().getEraseAmount());
+			jm.put("couponAmount", this.getIncomeByCoupon().getCouponAmount());
 			jm.put("cancelAmount", this.getIncomeByCancel().getCancelAmount());
 			jm.put("giftAmount", this.getIncomeByGift().getGiftAmount());
 			jm.put("discountAmount", this.getIncomeByDiscount().getDiscountAmount());
@@ -213,7 +216,7 @@ public class IncomeByEachDay implements Jsonable{
 			jm.put("creditCardIncome", this.incomeByPay == null ? 0 : this.incomeByPay.getCreditCardIncome());
 			jm.put("cashIncome", this.incomeByPay == null ? 0 : this.incomeByPay.getCashIncome());
 			jm.put("memberIncome", this.incomeByPay == null ? 0 : this.incomeByPay.getMemberCardIncome());
-		}
+//		}
 		return Collections.unmodifiableMap(jm);
 	}
 

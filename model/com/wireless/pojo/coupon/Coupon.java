@@ -242,7 +242,7 @@ public class Coupon implements Jsonable{
 		jm.put("couponId", this.id);
 		jm.put("restaurantId", this.restaurantId);
 		jm.put("couponType", this.couponType);
-		jm.put("orderId", this.orderId);
+		jm.put("orderId", this.orderId == 0 ? "----" : this.orderId);
 		jm.put("orderDate", DateUtil.formatToDate(this.getBirthDate()));
 		jm.put("statusText", this.status.desc);
 		jm.put("statusValue", this.status.val);

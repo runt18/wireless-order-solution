@@ -404,6 +404,8 @@ public class ShiftDetail implements Jsonable{
 		
 		jm.put("giftIncome", this.getGiftIncome());
 		
+		jm.put("couponIncome", this.getCouponIncome());
+		
 		jm.put("cancelIncome", this.getCancelIncome());
 		
 		jm.put("eraseIncome", this.getEraseIncome());
@@ -415,6 +417,7 @@ public class ShiftDetail implements Jsonable{
 		jm.put("deptStat", this.getDeptIncome());
 		jm.put("paidAmount", this.getPaidAmount());
 		jm.put("eraseAmount", this.getEraseAmount());
+		jm.put("couponAmount", this.getCouponAmount());
 		jm.put("cancelAmount", this.getCancelAmount());
 		jm.put("giftAmount", this.getGiftAmount());
 		jm.put("discountAmount", this.getDiscountAmount());

@@ -129,6 +129,7 @@ public class SalesDetail implements Jsonable{
 		jm.put("income", this.income);
 		jm.put("discount", this.discount);
 		jm.put("gifted", this.gifted);
+		jm.put("couponed", this.gifted);
 		jm.put("cost", this.cost);
 		jm.put("costRate", this.costRate);
 		jm.put("profit", this.profit);
