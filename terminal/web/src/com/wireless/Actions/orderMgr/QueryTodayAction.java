@@ -20,7 +20,6 @@ import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.util.DateUtil;
 import com.wireless.util.DataPaging;
 import com.wireless.util.DateType;
-import com.wireless.util.WebParams;
 
 public class QueryTodayAction extends Action {
 	
@@ -75,6 +74,9 @@ public class QueryTodayAction extends Action {
 				}else if(comboVal == 5){
 					//是否有抹数
 					comboCond = " AND O.erase_price > 0 ";				
+				}else if(comboVal == 6){
+					//是否有优惠劵
+					comboCond = " AND O.coupon_price > 0 ";				
 				}else{
 					comboCond = "";
 				}
@@ -123,11 +125,11 @@ public class QueryTodayAction extends Action {
 			
 		}catch(BusinessException e){
 			e.printStackTrace();
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getCode(), e.getDesc());
+			jobject.initTip(e);
 			
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
+			jobject.initTip(e);
 		}finally{
 			if(list != null){
 				Order sum = new Order();

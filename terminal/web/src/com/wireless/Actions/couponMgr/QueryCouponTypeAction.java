@@ -36,6 +36,10 @@ public class QueryCouponTypeAction extends DispatchAction{
 				tree.append(",couponTypeId:" + list.get(i).getId());
 				tree.append(",price:" + list.get(i).getPrice());
 				tree.append(",date:'" + list.get(i).getExpiredFormat()+ "'");
+				if(list.get(i).isExpired()){
+					tree.append(",iconCls : 'btn_error'");
+				}
+				
 				tree.append("}");
 			}
 			tree.append("]");

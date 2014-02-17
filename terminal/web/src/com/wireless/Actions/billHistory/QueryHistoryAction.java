@@ -69,6 +69,9 @@ public class QueryHistoryAction extends Action {
 				}else if(comboVal == 5){
 					//是否有抹数
 					comboCond = " AND OH.erase_price > 0 ";				
+				}else if(comboVal == 6){
+					//是否有抹数
+					comboCond = " AND OH.coupon_price > 0 ";				
 				}else{
 					comboCond = "";
 				}

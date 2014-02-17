@@ -21,15 +21,12 @@ import com.wireless.pojo.client.MemberOperation;
 import com.wireless.pojo.client.MemberOperation.OperationType;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.util.SQLUtil;
-import com.wireless.util.WebParams;
 
 public class QueryMemberOperationAction extends Action{
 
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		
-		
 		JObject jobject = new JObject();
 		String start = request.getParameter("start");
 		String limit = request.getParameter("limit");
@@ -140,18 +137,16 @@ public class QueryMemberOperationAction extends Action{
 					sum.setMember(list.get(0).getMember());
 					list.add(sum);
 				}
-				
-	
 			}
 			jobject.setRoot(list);
 			
 		}catch(BusinessException e){
 			e.printStackTrace();
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getCode(), e.getDesc());
+			jobject.initTip(e);
 				
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
+			jobject.initTip(e);
 		}finally{
 			response.getWriter().print(jobject.toString());
 		}

@@ -33,8 +33,6 @@ public class QueryDiscountAction extends DispatchAction{
 	public ActionForward role(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		
-		
 		JObject jobject = new JObject();
 		try{
 			Staff staff = StaffDao.verify(Integer.parseInt((String) request.getAttribute("pin")));

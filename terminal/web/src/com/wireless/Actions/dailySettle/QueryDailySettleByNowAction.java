@@ -94,6 +94,9 @@ public class QueryDailySettleByNowAction extends Action{
 					
 					resultMap.put("eraseAmount", res.getEraseIncome());
 					resultMap.put("eraseBillCount", res.getEraseAmount());
+					
+					resultMap.put("couponAmount", res.getCouponAmount());
+					resultMap.put("couponBillCount", res.getCouponIncome());
 
 					List<Map<String, Object>> deptList = new ArrayList<Map<String, Object>>();
 					for (IncomeByDept deptIncome : res.getDeptIncome()) {

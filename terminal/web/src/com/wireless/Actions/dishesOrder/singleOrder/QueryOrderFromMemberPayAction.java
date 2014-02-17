@@ -56,7 +56,7 @@ public class QueryOrderFromMemberPayAction extends Action{
 				payBuilder.setDiscountId(m.getMemberType().getDefaultDiscount().getId());
 			}
 			
-			if(couponId != null && !couponId.trim().isEmpty()){
+			if(couponId != null && !couponId.trim().isEmpty() && !couponId.equals("-1")){
 				payBuilder.setCouponId(Integer.parseInt(couponId));
 			}
 			Order order = PayOrder.calc(staff, payBuilder);
