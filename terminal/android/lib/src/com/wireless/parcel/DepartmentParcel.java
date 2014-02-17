@@ -17,8 +17,7 @@ public class DepartmentParcel implements Parcelable{
 	
 	public DepartmentParcel(Parcel in){
 		if(in.readInt() != 1){
-			mSrcDept = new Department();
-			mSrcDept.setId((short)in.readInt());
+			mSrcDept = new Department(in.readInt());
 			mSrcDept.setRestaurantId(in.readInt());
 			mSrcDept.setType(in.readInt());
 			mSrcDept.setName(in.readString());

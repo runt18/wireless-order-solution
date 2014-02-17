@@ -23,8 +23,8 @@ public abstract class PayOrderTask extends AsyncTask<Void, Void, Void>{
 	
 	private final Staff mStaff;
 	
-	public PayOrderTask(Staff staff, Order.PayBuilder orderToPay){
-		mPayBuilder = orderToPay;
+	public PayOrderTask(Staff staff, Order.PayBuilder payBuilder){
+		mPayBuilder = payBuilder;
 		mStaff = staff;
 	}
 	

@@ -16,11 +16,11 @@ import com.wireless.pojo.dishesOrder.PrintOption;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.sccon.ServerConnector;
 
-public class CommitOrderTask extends AsyncTask<Void, Void, Void>{
+public abstract class CommitOrderTask extends AsyncTask<Void, Void, Void>{
 	
-	protected BusinessException mBusinessException;
+	private BusinessException mBusinessException;
 	
-	protected final Order mReqOrder;
+	private final Order mReqOrder;
 	
 	private final byte mType;
 	private final Staff mStaff;
@@ -79,4 +79,16 @@ public class CommitOrderTask extends AsyncTask<Void, Void, Void>{
 		return null;
 	}
 	
+	@Override
+	protected final void onPostExecute(Void result) {
+		if(mBusinessException == null){
+			onSuccess(mReqOrder);
+		}else{
+			onFail(mBusinessException, mReqOrder);
+		}
+	}
+	
+	protected abstract void onSuccess(Order reqOrder);
+	
+	protected abstract void onFail(BusinessException e, Order reqOrder);
 }
