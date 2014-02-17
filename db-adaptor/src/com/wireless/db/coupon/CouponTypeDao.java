@@ -196,7 +196,7 @@ public class CouponTypeDao {
 	 * 			throws if failed to execute any SQL statement
 	 */
 	public static List<CouponType> get(DBCon dbCon, Staff staff) throws SQLException{
-		return getByCond(dbCon, staff, null, null);
+		return getByCond(dbCon, staff, null, " ORDER BY expired DESC");
 	}
 	
 	/**
