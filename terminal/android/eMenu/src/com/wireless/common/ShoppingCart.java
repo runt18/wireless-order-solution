@@ -9,7 +9,6 @@ import android.content.SharedPreferences;
 
 import com.wireless.exception.BusinessException;
 import com.wireless.pack.Type;
-import com.wireless.pack.req.PrintOption;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.menuMgr.Food;
@@ -601,9 +600,12 @@ public final class ShoppingCart {
 		
 		private OnCommitListener mCommitListener;
 		
+		private final Order mReqOrder;
+		
 		CommitOrderTask(Order reqOrder, byte type, OnCommitListener commitListener){
 			super(WirelessOrder.loginStaff, reqOrder, type);
 			mCommitListener = commitListener;
+			mReqOrder = reqOrder;
 		}
 		
 		@Override
@@ -614,52 +616,58 @@ public final class ShoppingCart {
 		}		
 		
 		@Override
-		protected void onPostExecute(Void arg){
-
-			if(mBusinessException == null){
-				//如果是锁定餐台状态则重新设置锁定的餐台，否则清除餐台数据
-				SharedPreferences pref = mContext.getSharedPreferences(Params.PREFS_NAME, Context.MODE_PRIVATE);
-				if(pref.getBoolean(Params.TABLE_FIXED, false)){
-					mNewOrder = null;
-					setDestTable(mDestTable);
-				}else{
-					initTable();
-				}
-				//如果不是锁定服务员状态则清除服务员数据
-				if(!pref.getBoolean(Params.STAFF_FIXED, false)){
-					setStaff(null);
-				}
-				if(mCommitListener != null){	
-					mCommitListener.onSuccess(mReqOrder);
-				}
+		protected void onSuccess(Order reqOrder){
+			//如果是锁定餐台状态则重新设置锁定的餐台，否则清除餐台数据
+			SharedPreferences pref = mContext.getSharedPreferences(Params.PREFS_NAME, Context.MODE_PRIVATE);
+			if(pref.getBoolean(Params.TABLE_FIXED, false)){
+				mNewOrder = null;
+				setDestTable(mDestTable);
 			}else{
-				if(mCommitListener != null){	
-					mCommitListener.onFail(mBusinessException);
-				}
+				initTable();
 			}
-		}		
+			//如果不是锁定服务员状态则清除服务员数据
+			if(!pref.getBoolean(Params.STAFF_FIXED, false)){
+				setStaff(null);
+			}
+			if(mCommitListener != null){	
+				mCommitListener.onSuccess(reqOrder);
+			}
+		}
+		
+		@Override
+		protected void onFail(BusinessException e, Order reqOrder){
+			if(mCommitListener != null){	
+				mCommitListener.onFail(e);
+			}
+		}
 
 	}
 	
 	private class PayOrderTask extends com.wireless.lib.task.PayOrderTask{
 
-		private OnPayListener mPayListener;
+		private final OnPayListener mPayListener;
 		
-		public PayOrderTask(Order orderToPay, OnPayListener payListener) {
-			super(WirelessOrder.loginStaff, orderToPay, Type.PAY_TEMP_ORDER, PrintOption.DO_PRINT);
+		private final Order mOrderToPay;
+		
+		PayOrderTask(Order orderToPay, OnPayListener payListener) {
+			super(WirelessOrder.loginStaff, Order.PayBuilder.build(orderToPay.getId()));
 			mPayListener = payListener;
+			mOrderToPay = orderToPay;
 		}
 		
 		@Override
-		protected void onPostExecute(Void arg){
+		protected void onSuccess(Order.PayBuilder payBuilder){
 			if(mPayListener != null){
-				if(mBusinessException != null){
-					mPayListener.onFail(mBusinessException);
-				}else{
-					mPayListener.onSuccess(mOrderToPay);
-				}
+				mPayListener.onSuccess(mOrderToPay);
 			}
-		}	
+		}
+		
+		@Override
+		protected void onFail(Order.PayBuilder payBuilder, BusinessException e){
+			if(mPayListener != null){
+				mPayListener.onFail(e);
+			}
+		}
 	}
 	
 	private void initTable(){
