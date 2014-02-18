@@ -351,4 +351,10 @@ wireless_order_db.discount_plan DP,
 wireless_order_db.kitchen K
 WHERE DP.kitchen_id = K.kitchen_id AND K.type = 1;
 
+-- -----------------------------------------------------
+-- Change the type to field 'material_cate_id' to INT
+-- -----------------------------------------------------
+ALTER TABLE `wireless_order_db`.`stock_take` 
+CHANGE COLUMN `material_cate_id` `material_cate_id` INT NULL DEFAULT NULL ;
+
 SET SQL_SAFE_UPDATES = @OLD_SAFE_UPDATES;
