@@ -66,9 +66,9 @@ public class StockActionDao {
 			if(dbCon.rs.getTimestamp("date") != null){
 				maxDate = dbCon.rs.getTimestamp("date").getTime();
 			}else{
-				maxDate = MonthlyBalanceDao.getCurrentMonthTimeByRestaurant(term.getRestaurantId());
+				Calendar max = Calendar.getInstance();
+				maxDate = DateUtil.parseDate(max.get(Calendar.YEAR) + "-" + (max.get(Calendar.MONTH)+1) + "-01");
 			}
-			
 		}
 		dbCon.rs.close();
 		
@@ -82,8 +82,8 @@ public class StockActionDao {
 				throw new BusinessException(StockError.STOCKACTION_TIME_EARLIER);
 			}
 		}
-		//判断除了消耗单外, 是否正在盘点中
-		if(builder.getSubType() != SubType.USE_UP){
+		//判断除了消耗,盘盈,盘亏单外, 是否正在盘点中
+		if(builder.getSubType() != SubType.USE_UP && builder.getSubType() != SubType.LESS && builder.getSubType() != SubType.MORE){
 			checkStockTake(dbCon, term);
 		}		
 
@@ -324,7 +324,12 @@ public class StockActionDao {
 		long maxDate = 0;
 		dbCon.rs = dbCon.stmt.executeQuery(selectMaxDate);
 		if(dbCon.rs.next()){
-			maxDate = dbCon.rs.getTimestamp("date").getTime();
+			if(dbCon.rs.getTimestamp("date") != null){
+				maxDate = dbCon.rs.getTimestamp("date").getTime();
+			}else{
+				Calendar max = Calendar.getInstance();
+				maxDate = DateUtil.parseDate(max.get(Calendar.YEAR) + "-" + (max.get(Calendar.MONTH)+1) + "-01");
+			}
 		}
 		dbCon.rs.close();
 		
