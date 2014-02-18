@@ -74,7 +74,7 @@ var restaurantAddWin = new Ext.Window({
 						id : rId,
 						account : account.getValue(),
 						name : name.getValue(),
-						pwd : pwd.getValue(),
+						pwd : pwd.getValue() == encrypt ? '' : pwd.getValue(),
 						info : info,
 						tele1 : tele1,
 						tele2 : tele2,

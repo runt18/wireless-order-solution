@@ -18,6 +18,7 @@ function setOrderDetail(orderDetail){
 	Ext.getDom('discountBV').innerHTML = '￥' + orderDetail['discountPrice'].toFixed(2);
 	Ext.getDom('erasePuotaPriceBV').innerHTML = '￥' + orderDetail['erasePrice'].toFixed(2);
 	Ext.getDom('cancelPriceBV').innerHTML = '￥' + orderDetail['cancelPrice'].toFixed(2);
+	Ext.getDom('couponBV').innerHTML = '￥' + orderDetail['couponPrice'].toFixed(2);
 }
 
 function load(){
@@ -189,14 +190,14 @@ Ext.onReady(function(){
 	});
 	var viewBillAddPanel = new Ext.Panel({
 		region : 'south',
-		height : 60,
+		height : 90,
 		frame : true,
 		border : false,
 		items : [new Ext.Panel({
 			xtype : 'panel',
 			layout : 'column',
 			//height : Ext.isIE ? 90 : 110 ,
-			height : 70,
+			height : 90,
 			defaults : {
 				columnWidth : .16,
 				defaults : {
@@ -227,12 +228,12 @@ Ext.onReady(function(){
 			}, {
 				items : [{
 					cls : 'cLeft',
-					html : '应收:'
+					html : '优惠劵:'
 				}]
 			}, {
 				items : [{
 					cls : 'left',
-					id : 'shouldPayBV'
+					id : 'couponBV'
 				}]
 			},{
 				columnWidth : 1
@@ -264,6 +265,18 @@ Ext.onReady(function(){
 			}, {
 				items : [{
 					cls : 'left',
+					id : 'shouldPayBV'
+				}]
+			}, {
+				columnWidth : 1
+			},{
+				items : [{
+					style : 'color:#15428B;text-align:left;font-size: 25px;margin-bottom: 3px;',
+					html : '实收:'
+				}]
+			}, {
+				items : [{
+					style : 'text-align:left;font-size: 25px;margin-bottom: 3px;',
 					id : 'actrualPayBV'
 				}]
 			}]

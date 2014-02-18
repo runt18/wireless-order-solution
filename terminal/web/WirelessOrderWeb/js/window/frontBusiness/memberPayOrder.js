@@ -273,7 +273,7 @@ Ext.onReady(function(){
 					readOnly : true,
 					forceSelection : true,
 					disabled : false,
-					fieldLabel : '优惠劵',
+					fieldLabel : '<font style="color:red;font-weight: bolder">＊</font>优惠劵',
 					store : new Ext.data.SimpleStore({
 						fields : [ 'value', 'text' ]
 					}),
@@ -498,6 +498,8 @@ function memberPayOrderToLoadData(c){
 			if(jr.success){
 //				if(jr.other.member.statusValue == 0){
 					mpo_memberDetailData = jr.other;
+					Ext.getCmp('mpo_couponForPayOrder').setValue();
+					Ext.getCmp('mpo_txtDiscountForPayOrder').setValue();
 					memberPayOrderToBindData({
 						data : jr
 					});					

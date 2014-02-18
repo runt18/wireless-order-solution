@@ -409,35 +409,37 @@ function linkOrderId(v){
 }
 
 function comi_showBillDetailWin(orderID){
-	couponOrderDetailWin = new Ext.Window({
+	couponViewBillWin = new Ext.Window({
 		layout : 'fit',
-		width : 1100,
-		height : 440,
-		closable : false,
+		title : '查看账单',
+		width : 510,
+		height : 550,
 		resizable : false,
+		closable : false,
 		modal : true,
 		bbar : ['->', {
 			text : '关闭',
 			iconCls : 'btn_close',
 			handler : function() {
-				couponOrderDetailWin.destroy();
+				couponViewBillWin.destroy();
 			}
-		} ],
+		}],
 		keys : [{
 			key : Ext.EventObject.ESC,
 			scope : this,
 			fn : function(){
-				couponOrderDetailWin.destroy();
+				couponViewBillWin.destroy();
 			}
 		}],
 		listeners : {
 			show : function(thiz) {
 				var sd = Ext.ux.getSelData(couponGrid);
 				thiz.load({
-					url : '../window/history/orderDetail.jsp', 
+					url : '../window/history/viewBillDetail.jsp', 
 					scripts : true,
 					params : {
-						orderId : sd.orderId
+						orderId : sd.orderId,
+						queryType : 'History'
 					},
 					method : 'post'
 				});
@@ -445,15 +447,13 @@ function comi_showBillDetailWin(orderID){
 			}
 		}
 	});
-	couponOrderDetailWin.show();
-	couponOrderDetailWin.setTitle('账单号: ' + orderID);
-	couponOrderDetailWin.center();
+	couponViewBillWin.show();
+	couponViewBillWin.center();
 }
 
 var couponTree;
-var updateDeptWin;
 var couponGrid, memberCountGrid;
-var operateCouponTypeWin, sendCouponWin;
+var operateCouponTypeWin, sendCouponWin, couponViewBillWin;
 var bar = {treeId : 'couponTypeTree', option :[{name : '发放', fn : "floatBarSendCouponHandler()"}, {name : '修改', fn : "floatBarUpdateHandler()"}, {name : '删除', fn : "floatBarDeleteHandler()"}]};
 Ext.onReady(function() {
 	initCouponTypeWin();
@@ -502,6 +502,19 @@ Ext.onReady(function() {
 			}
 		],
 		listeners : {
+			load : function(thiz){
+				var rn = couponTree.getRootNode().childNodes;
+				if(rn.length == 0){
+					couponTree.getRootNode().getUI().hide();
+				}else{
+					for(var i = (rn.length - 1); i >= 0; i--){
+						if(typeof rn[i].attributes.expired != 'undefined'){
+							rn[i].setText('<font color=\"#808080\">' + rn[i].text + '&nbsp;(已过期)</font>');
+						}
+					}
+					couponTree.getRootNode().getUI().show();
+				}
+			},
 			click : function(e){
 				Ext.getCmp('btnSearchCoupon').handler();
 				Ext.getDom('couponTypeNameShowType').innerHTML = e.text;
@@ -600,9 +613,6 @@ Ext.onReady(function() {
 		couponGridTbar
 	);
 	couponGrid.region = 'center';
-	couponGrid.on('rowdblclick', function(){
-		updateKitchen();
-	});
 	
 	new Ext.Panel({
 		renderTo : 'divCoupon',
