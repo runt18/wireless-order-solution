@@ -61,7 +61,7 @@ public class QueryOrderFromMemberPayAction extends Action{
 			}
 			Order order = PayOrder.calc(staff, payBuilder);
 			
-			List<Coupon> coupons = CouponDao.getByMember(staff, m.getId());
+			List<Coupon> coupons = CouponDao.getAvailByMember(staff, m.getId());
 			
 			jobject.getOther().put("member", m);
 			jobject.getOther().put("newOrder", order);

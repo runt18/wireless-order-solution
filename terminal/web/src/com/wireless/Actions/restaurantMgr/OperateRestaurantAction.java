@@ -78,13 +78,16 @@ public class OperateRestaurantAction extends DispatchAction {
 		try{
 			Restaurant.UpdateBuilder builder = new UpdateBuilder(Integer.parseInt(id), account);
 			builder.setRestaurantName(name)
-					.setPwd(pwd)
 					.setTele1(tele1)
 					.setTele2(tele2)
 					.setAddress(address)
 					.setRecordAlive(RecordAlive.valueOf(Integer.parseInt(recordAlive)))
 					.setExpireDate(DateUtil.parseDate(expireDate))
 					.setRestaurantInfo(info);
+			
+			if(pwd != null && !pwd.isEmpty()){
+				builder.setPwd(pwd);
+			}
 			
 			RestaurantDao.update(builder);
 			

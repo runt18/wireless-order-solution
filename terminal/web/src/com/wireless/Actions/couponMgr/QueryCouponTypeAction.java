@@ -38,6 +38,7 @@ public class QueryCouponTypeAction extends DispatchAction{
 				tree.append(",date:'" + list.get(i).getExpiredFormat()+ "'");
 				if(list.get(i).isExpired()){
 					tree.append(",iconCls : 'btn_error'");
+					tree.append(",expired : true");
 				}
 				
 				tree.append("}");

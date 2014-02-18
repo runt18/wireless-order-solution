@@ -45,10 +45,10 @@ public class QueryCouponAction extends Action{
 				extra += " AND C.status = " + status;
 			}
 			if(memberMobile != null && !memberMobile.isEmpty()){
-				extra += " AND M.mobile like %" + memberMobile + "% ";
+				extra += " AND M.mobile like '%" + memberMobile + "%' ";
 			}
 			if(memberName != null && !memberName.isEmpty()){
-				extra += " AND M.name like %" + memberName + "% ";
+				extra += " AND M.name like '%" + memberName + "%' ";
 			}
 			
 			list = CouponDao.getByCond(staff, extra, null);
