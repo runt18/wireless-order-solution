@@ -32,6 +32,7 @@ public class QueryCouponTypeAction extends DispatchAction{
 				tree.append(i > 0 ? "," : "");
 				tree.append("{");
 				tree.append("text:'" + list.get(i).getName() + "'");
+				tree.append(",typeName:'" + list.get(i).getName() + "'");
 				tree.append(",leaf:true");
 				tree.append(",couponTypeId:" + list.get(i).getId());
 				tree.append(",price:" + list.get(i).getPrice());
