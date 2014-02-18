@@ -347,7 +347,7 @@ function couponTypeOperation(c){
 	operateCouponTypeWin.center();
 	
 	id.setValue(data.attributes.couponTypeId);
-	name.setValue(data.text);
+	name.setValue(data.attributes.typeName);
 	price.setValue(data.attributes.price);
 	date.setValue(data.attributes.date);
 	name.focus(true, 100);
@@ -374,7 +374,7 @@ function floatBarDeleteHandler(){
 	}
 	Ext.Msg.confirm(
 		'提示',
-		'是否删除: ' + node.text + ' ?</br><font style="color:red;font-weight:bold">Tips : 删除后该类型下所有优惠劵会同时清除</font> ',
+		'是否删除: ' + node.attributes.typeName + ' ?</br><font style="color:red;font-weight:bold">Tips : 删除后该类型下所有优惠劵会同时清除</font> ',
 		function(e){
 			if(e == 'yes'){
 				Ext.Ajax.request({
@@ -386,7 +386,7 @@ function floatBarDeleteHandler(){
 					success : function(res, opt){
 						var jr = Ext.util.JSON.decode(res.responseText);
 						if(jr.success){
-							Ext.example.msg(jr.title, String.format(Ext.ux.txtFormat.deleteSuccess, node.text));
+							Ext.example.msg(jr.title, String.format(Ext.ux.txtFormat.deleteSuccess, node.attributes.typeName));
 							couponTree.getRootNode().reload();
 						}else{
 							Ext.ux.showMsg(jr);
@@ -509,7 +509,7 @@ Ext.onReady(function() {
 				}else{
 					for(var i = (rn.length - 1); i >= 0; i--){
 						if(typeof rn[i].attributes.expired != 'undefined'){
-							rn[i].setText('<font color=\"#808080\">' + rn[i].text + '&nbsp;(已过期)</font>');
+							rn[i].setText('<font style="color:#808080">' + rn[i].text + '&nbsp;(已过期)</font>');
 						}
 					}
 					couponTree.getRootNode().getUI().show();

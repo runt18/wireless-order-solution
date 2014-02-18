@@ -18,7 +18,8 @@ function setOrderDetail(orderDetail){
 	Ext.getDom('discountBV').innerHTML = '￥' + orderDetail['discountPrice'].toFixed(2);
 	Ext.getDom('erasePuotaPriceBV').innerHTML = '￥' + orderDetail['erasePrice'].toFixed(2);
 	Ext.getDom('cancelPriceBV').innerHTML = '￥' + orderDetail['cancelPrice'].toFixed(2);
-	Ext.getDom('couponBV').innerHTML = '￥' + orderDetail['couponPrice'].toFixed(2);
+	var couponPrice = isNaN(orderDetail['couponPrice'])?0:orderDetail['couponPrice'];
+	Ext.getDom('couponBV').innerHTML = '￥' + couponPrice.toFixed(2);
 }
 
 function load(){
@@ -275,6 +276,7 @@ Ext.onReady(function(){
 					html : '实收:'
 				}]
 			}, {
+				columnWidth : 0.5,
 				items : [{
 					style : 'text-align:left;font-size: 25px;margin-bottom: 3px;',
 					id : 'actrualPayBV'
