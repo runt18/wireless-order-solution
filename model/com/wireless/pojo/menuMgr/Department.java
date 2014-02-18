@@ -329,7 +329,9 @@ public class Department implements Parcelable, Comparable<Department>, Jsonable{
 	
 	@Override
 	public String toString(){
-		return "department(dept_id = " + getId() + ",restaurant_id = " + getRestaurantId() + ")";
+		return "department(dept_id = " + getId() +
+						   ",name = " + getName() +
+						   ",restaurant_id = " + getRestaurantId() + ")";
 	}
 
 	public void writeToParcel(Parcel dest, int flag) {
