@@ -14,9 +14,9 @@ import com.wireless.pojo.menuMgr.FoodMenu;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.sccon.ServerConnector;
 
-public class QueryMenuTask extends AsyncTask<Void, Void, FoodMenu>{
+public abstract class QueryMenuTask extends AsyncTask<Void, Void, FoodMenu>{
 
-	protected BusinessException mProtocolException;
+	protected BusinessException mBusinessException;
 	
 	private final Staff mStaff;
 	
@@ -38,13 +38,25 @@ public class QueryMenuTask extends AsyncTask<Void, Void, FoodMenu>{
 			if(resp.header.type == Type.ACK){
 				foodMenu = new Parcel(resp.body).readParcel(FoodMenu.CREATOR);
 			}else{
-				mProtocolException = new BusinessException(new Parcel(resp.body).readParcel(ErrorCode.CREATOR));
+				mBusinessException = new BusinessException(new Parcel(resp.body).readParcel(ErrorCode.CREATOR));
 			}
 		}catch(IOException e){
-			mProtocolException = new BusinessException(e.getMessage());
+			mBusinessException = new BusinessException(e.getMessage());
 		}
 		
 		return foodMenu;
 	}
 
+	@Override
+	protected final void onPostExecute(FoodMenu foodMenu){
+		if(mBusinessException != null){
+			onFail(mBusinessException);
+		}else{
+			onSuccess(foodMenu);
+		}
+	}
+	
+	protected abstract void onSuccess(FoodMenu foodMenu);
+	
+	protected abstract void onFail(BusinessException e);
 }
