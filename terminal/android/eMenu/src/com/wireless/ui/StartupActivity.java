@@ -28,6 +28,7 @@ import android.widget.TextView;
 import com.wireless.common.Params;
 import com.wireless.common.ShoppingCart;
 import com.wireless.common.WirelessOrder;
+import com.wireless.exception.BusinessException;
 import com.wireless.lib.task.PicDownloadTask;
 import com.wireless.ordermenu.R;
 import com.wireless.pojo.menuMgr.Food;
@@ -211,13 +212,7 @@ public class StartupActivity extends Activity {
 			mMsgTxtView.setText("正在下载菜谱...请稍候");
 		}
 		
-		/**
-		 * 根据返回的error message判断，如果发错异常则提示用户，
-		 * 如果菜谱请求成功，则继续进行请求餐厅信息的操作。
-		 */
-		@Override
-		protected void onPostExecute(FoodMenu foodMenu){
-
+		private void prepare(FoodMenu foodMenu){
 			WirelessOrder.foodMenu = foodMenu;
 			
 			//Filter the food without image and sort the food by alias id.
@@ -230,145 +225,146 @@ public class StartupActivity extends Activity {
 				}
 			}
 			WirelessOrder.foods = new FoodList(foods);
+		}
+		
+		@Override
+		protected void onSuccess(FoodMenu foodMenu){
+			prepare(foodMenu);
+			
+			List<Food> downloadQueue = new ArrayList<Food>();
+			Map<String, ?> foodImg = mSharedPrefs.getAll();
+			for(Food food : WirelessOrder.foods){
+				if(food.hasImage()){
+					/**
+					 * Push the food to download queue in the three cases below.
+					 * 1 - the food is NOT contained in original list
+					 * 2 - the food's image is NOT the same as the original
+					 * 3 - the food's image file is NOT exist in the current file system
+					 */
+					Object image = foodImg.get(Integer.toString(food.getFoodId()));
+					if(image == null){
+						downloadQueue.add(food);
+						
+					}else if(!image.equals(food.getImage())){
+						downloadQueue.add(food);
+						
+					}else if(!new File(android.os.Environment.getExternalStorageDirectory().getPath() + Params.IMG_STORE_PATH + food.getImage()).exists()){
+						downloadQueue.add(food);										
+					}										
+				}
+			}								
 			
 			/**
-			 * Prompt user message if any error occurred,
-			 * otherwise continue to query restaurant info.
+			 * Enumerate the food image to check if each item is contained in the food menu.
+			 * If NOT contained, means the food associated with this image is no longer exist.
+			 * Just delete the image and remove it from preference in this case.
 			 */
-			if(mProtocolException != null){
-				new AlertDialog.Builder(StartupActivity.this)
-				.setTitle("提示")
-				.setMessage(mProtocolException.getMessage())
-				.setPositiveButton("确定", new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int id) {
-						finish();
-					}
-				})
-				.setNeutralButton("设置", new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						Intent intent = new Intent(StartupActivity.this, SettingsActivity.class);
-						intent.putExtra(SettingsActivity.SETTINGS_IP, true);
-						startActivity(intent);	
-					}
-				})
-				.show();
-				
-			}else{
-				
-				List<Food> downloadQueue = new ArrayList<Food>();
-				Map<String, ?> foodImg = mSharedPrefs.getAll();
-				for(Food food : WirelessOrder.foods){
-					if(food.hasImage()){
-						/**
-						 * Push the food to download queue in the three cases below.
-						 * 1 - the food is NOT contained in original list
-						 * 2 - the food's image is NOT the same as the original
-						 * 3 - the food's image file is NOT exist in the current file system
-						 */
-						Object image = foodImg.get(Integer.toString(food.getAliasId()));
-						if(image == null){
-							downloadQueue.add(food);
-							
-						}else if(!image.equals(food.getImage())){
-							downloadQueue.add(food);
-							
-						}else if(!new File(android.os.Environment.getExternalStorageDirectory().getPath() + Params.IMG_STORE_PATH + food.getImage()).exists()){
-							downloadQueue.add(food);										
-						}										
-					}
-				}								
-				
-				/**
-				 * Enumerate the food image to check if each item is contained in the food menu.
-				 * If NOT contained, means the food associated with this image is no longer exist.
-				 * Just delete the image and remove it from preference in this case.
-				 */
-				Editor edit = mSharedPrefs.edit();								
-				for(Map.Entry<String, ?> entry : foodImg.entrySet()){
+			Editor edit = mSharedPrefs.edit();								
+			for(Map.Entry<String, ?> entry : foodImg.entrySet()){
 
-					//Check to see whether the specified food image record of shared preference is contained in the download ones.
-					//If not, remove the image of this record from local disk memory. 
-					if(!WirelessOrder.foods.contains(new Food(0, Integer.parseInt(entry.getKey()), 0))){
-						File file = new File(android.os.Environment.getExternalStorageDirectory().getPath() + 
-							 			 	 Params.IMG_STORE_PATH + 
-							 			 	 entry.getValue());
-						/**
-						 * Remove the food key and delete the image file if it exist.
-						 * Otherwise just remove the food key.
-						 */
-						if(file.exists() && file.delete()){
-							edit.remove(entry.getKey());
-						}else{
-							edit.remove(entry.getKey());
-						}
+				//Check to see whether the specified food image record of shared preference is contained in the download ones.
+				//If not, remove the image of this record from local disk memory. 
+				if(!WirelessOrder.foods.contains(new Food(Integer.parseInt(entry.getKey())))){
+					File file = new File(android.os.Environment.getExternalStorageDirectory().getPath() + 
+						 			 	 Params.IMG_STORE_PATH + 
+						 			 	 entry.getValue());
+					/**
+					 * Remove the food key and delete the image file if it exist.
+					 * Otherwise just remove the food key.
+					 */
+					if(file.exists() && file.delete()){
+						edit.remove(entry.getKey());
+					}else{
+						edit.remove(entry.getKey());
 					}
 				}
-				edit.commit();
-				
-				new PicDownloadTask(WirelessOrder.loginStaff, downloadQueue){
-					
-					Editor edit = mSharedPrefs.edit();
-
-					@Override 
-					protected void onPreExecute(){			
-						File folder = new File(android.os.Environment.getExternalStorageDirectory().getPath() + Params.IMG_STORE_PATH);
-						if(!folder.exists()){
-							folder.mkdirs();
-						}
-					}
-					
-					@Override
-					protected void onProgressFinish(Food food, ByteArrayOutputStream picOutputStream) {
-						try{
-							picOutputStream.writeTo(new BufferedOutputStream(
-														new FileOutputStream(new File(android.os.Environment.getExternalStorageDirectory().getPath() + 
-																			 		  Params.IMG_STORE_PATH + 
-																			 		  food.getImage()))));
-							
-							edit.putString(Integer.toString(food.getAliasId()), food.getImage());			
-							
-						}catch(IOException e){
-							Log.e("", e.getMessage());
-						}
-					}
-					
-					@Override
-				    protected void onProgressUpdate(Progress... progress) {
-						if(progress[0].status == Progress.IN_QUEUE){
-							mMsgTxtView.setText("正在下载" + progress[0].food.getName() + "的图片..." + "准备下载");
-							
-						}else if(progress[0].status == Progress.IN_PROGRESS){
-							mMsgTxtView.setText("正在下载" + progress[0].food.getName() + "的图片..." + progress[0].progress + "%");
-
-						}else if(progress[0].status == Progress.DOWNLOAD_SUCCESS){
-							mMsgTxtView.setText("正在下载" + progress[0].food.getName() + "的图片..." + "完成");											
-							
-						}else if(progress[0].status == Progress.DOWNLOAD_FAIL){
-							mMsgTxtView.setText("正在下载" + progress[0].food.getName() + "的图片..." + "失败");											
-						}
-				    }
-					
-					@Override
-					protected void onPostExecute(Progress[] result){
-
-						edit.commit();
-						
-						new QueryRegionTask().execute();
-					}
-					
-				}.execute();				
-				
-				/////////////////queryFoodGroupTask////////////////////
-//				new QueryFoodGroupTask(){
-//
-//					@Override
-//					protected void onPostExecute(Pager[] result) {
-//						super.onPostExecute(result);
-//						FoodGroupProvider.getInstance().setGroups(result); 
-//					}
-//				}.execute(foodMenu);
 			}
+			edit.commit();
+			
+			new PicDownloadTask(WirelessOrder.loginStaff, downloadQueue){
+				
+				Editor edit = mSharedPrefs.edit();
+
+				@Override 
+				protected void onPreExecute(){			
+					File folder = new File(android.os.Environment.getExternalStorageDirectory().getPath() + Params.IMG_STORE_PATH);
+					if(!folder.exists()){
+						folder.mkdirs();
+					}
+				}
+				
+				@Override
+				protected void onProgressFinish(Food food, ByteArrayOutputStream picOutputStream) {
+					try{
+						picOutputStream.writeTo(new BufferedOutputStream(
+													new FileOutputStream(new File(android.os.Environment.getExternalStorageDirectory().getPath() + 
+																		 		  Params.IMG_STORE_PATH + 
+																		 		  food.getImage()))));
+						
+						edit.putString(Integer.toString(food.getFoodId()), food.getImage());			
+						
+					}catch(IOException e){
+						Log.e("", e.getMessage());
+					}
+				}
+				
+				@Override
+			    protected void onProgressUpdate(Progress... progress) {
+					if(progress[0].status == Progress.IN_QUEUE){
+						mMsgTxtView.setText("正在下载" + progress[0].food.getName() + "的图片..." + "准备下载");
+						
+					}else if(progress[0].status == Progress.IN_PROGRESS){
+						mMsgTxtView.setText("正在下载" + progress[0].food.getName() + "的图片..." + progress[0].progress + "%");
+
+					}else if(progress[0].status == Progress.DOWNLOAD_SUCCESS){
+						mMsgTxtView.setText("正在下载" + progress[0].food.getName() + "的图片..." + "完成");											
+						
+					}else if(progress[0].status == Progress.DOWNLOAD_FAIL){
+						mMsgTxtView.setText("正在下载" + progress[0].food.getName() + "的图片..." + "失败");											
+					}
+			    }
+				
+				@Override
+				protected void onPostExecute(Progress[] result){
+
+					edit.commit();
+					
+					new QueryRegionTask().execute();
+				}
+				
+			}.execute();				
+			
+			/////////////////queryFoodGroupTask////////////////////
+//			new QueryFoodGroupTask(){
+//
+//				@Override
+//				protected void onPostExecute(Pager[] result) {
+//					super.onPostExecute(result);
+//					FoodGroupProvider.getInstance().setGroups(result); 
+//				}
+//			}.execute(foodMenu);
+		
+		}
+		
+		@Override
+		protected void onFail(BusinessException e){
+			new AlertDialog.Builder(StartupActivity.this)
+					.setTitle("提示")
+					.setMessage(e.getMessage())
+					.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int id) {
+							finish();
+						}
+					})
+					.setNeutralButton("设置", new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							Intent intent = new Intent(StartupActivity.this, SettingsActivity.class);
+							intent.putExtra(SettingsActivity.SETTINGS_IP, true);
+							startActivity(intent);	
+						}
+					})
+					.show();
 		}
 	}
 	
@@ -389,39 +385,33 @@ public class StartupActivity extends Activity {
 			mMsgTxtView.setText("更新区域信息...请稍候");
 		}
 		
-		/**
-		 * 根据返回的error message判断，如果发错异常则提示用户，
-		 * 如果成功，则执行请求餐台的操作。
-		 */
 		@Override
-		protected void onPostExecute(Region[] regions){
-			/**
-			 * Prompt user message if any error occurred.
-			 */		
-			if(mErrMsg != null){
-				new AlertDialog.Builder(StartupActivity.this)
-					.setTitle("提示")
-					.setMessage(mErrMsg)
-					.setPositiveButton("确定", new DialogInterface.OnClickListener() {
-						public void onClick(DialogInterface dialog, int id) {
-							finish();
-						}
-					})
-					.setNeutralButton("设置", new DialogInterface.OnClickListener() {
-						@Override
-						public void onClick(DialogInterface dialog, int which) {
-							Intent intent = new Intent(StartupActivity.this, SettingsActivity.class);
-							intent.putExtra(SettingsActivity.SETTINGS_IP, true);
-							startActivity(intent);	
-						}
-					})
-					.show();
-				
-			}else{		
-				WirelessOrder.regions = regions;
-				new QueryTableTask().execute();
-			}
+		protected void onSuccess(List<Region> regions){
+			WirelessOrder.regions = regions;
+			new QueryTableTask().execute();
 		}
+		
+		@Override
+		protected void onFail(BusinessException e){
+			new AlertDialog.Builder(StartupActivity.this)
+			.setTitle("提示")
+			.setMessage(e.getMessage())
+			.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int id) {
+					finish();
+				}
+			})
+			.setNeutralButton("设置", new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					Intent intent = new Intent(StartupActivity.this, SettingsActivity.class);
+					intent.putExtra(SettingsActivity.SETTINGS_IP, true);
+					startActivity(intent);	
+				}
+			})
+			.show();
+		}
+		
 	};
 	
 	/**

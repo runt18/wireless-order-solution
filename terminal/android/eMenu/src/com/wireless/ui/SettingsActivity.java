@@ -14,6 +14,7 @@ import android.view.View;
 import android.widget.ListView;
 
 import com.wireless.common.WirelessOrder;
+import com.wireless.exception.BusinessException;
 import com.wireless.ordermenu.R;
 import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.menuMgr.FoodList;
@@ -92,13 +93,9 @@ public class SettingsActivity extends PreferenceActivity{
 			mToast = ProgressDialog.show(SettingsActivity.this, "","正在下载菜谱...请稍候");
 		}
 		
-		/**
-		 * 根据返回的error message判断，如果发错异常则提示用户，
-		 * 如果菜谱请求成功，则继续进行请求餐厅信息的操作。
-		 */
 		@Override
-		protected void onPostExecute(FoodMenu foodMenu){
-			mToast.cancel();
+		protected void onSuccess(FoodMenu foodMenu){
+			mToast.dismiss();
 			WirelessOrder.foodMenu = foodMenu;
 			
 			//Filter the food without image and sort the food by alias id.
@@ -113,20 +110,21 @@ public class SettingsActivity extends PreferenceActivity{
 			WirelessOrder.foods = new FoodList(foods);
 			
 			isFoodChanged  = true;
-			/**
-			 * Prompt user message if any error occurred,
-			 * otherwise continue to query restaurant info.
-			 */
-			if(mProtocolException != null){
-				new AlertDialog.Builder(SettingsActivity.this)
-				.setTitle("提示")
-				.setMessage(mProtocolException.getMessage())
-				.setPositiveButton("确定", new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int id) {
-						finish();
-					}
-				}).show();
-			}
 		}
+		
+		@Override
+		protected void onFail(BusinessException e){
+			mToast.dismiss();
+			
+			new AlertDialog.Builder(SettingsActivity.this)
+					.setTitle("提示")
+					.setMessage(e.getMessage())
+					.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int id) {
+							finish();
+						}
+					}).show();
+		}
+		
 	}
 }
