@@ -361,6 +361,7 @@ function getStaff(restaurantID){
  			}, function(result){
  				if(result.success){
  					location.href = 'Mgr/DigieBasic.html';
+ 					$('#pwd').val("");
  				}else{
  					alert(result.msg);
  				}
@@ -384,7 +385,10 @@ function getStaff(restaurantID){
  		
   		$('#validCode').keydown(function(e){
  			if(e.keyCode == 13){
- 				$('#login').click();
+ 				alert(!$('#staffForm').is(":visible"));
+ 				if(!$('#staffForm').is(":visible")){
+ 					$('#login').click();
+ 				}
  			}
  		}); 
 	});
