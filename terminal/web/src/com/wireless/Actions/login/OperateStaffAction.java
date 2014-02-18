@@ -30,7 +30,7 @@ public class OperateStaffAction extends Action{
 		try{
 			
 			Staff staff = null;
-			if(pin != null){
+			if(pin != null && !pin.trim().isEmpty()){
 				staff = StaffDao.verify(Integer.parseInt(pin));
 			}else{
 				List<Staff> list = StaffDao.getStaffs(Restaurant.ADMIN);
