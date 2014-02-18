@@ -385,10 +385,7 @@ function getStaff(restaurantID){
  		
   		$('#validCode').keydown(function(e){
  			if(e.keyCode == 13){
- 				alert(!$('#staffForm').is(":visible"));
- 				if(!$('#staffForm').is(":visible")){
- 					$('#login').click();
- 				}
+ 				$('#login').click();
  			}
  		}); 
 	});
