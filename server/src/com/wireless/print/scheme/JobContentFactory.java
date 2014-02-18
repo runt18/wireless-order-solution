@@ -314,7 +314,7 @@ public class JobContentFactory {
 		return jobContents.isEmpty() ? null : new JobCombinationContent(jobContents);
 	}
 	
-	public Content createMemberReceiptContent(PType printType, Staff staff, List<Printer> printers, int memberOperationId) throws BusinessException, SQLException{
+	public Content createMemberReceiptContent(PType printType, Staff staff, List<Printer> printers, int moId) throws BusinessException, SQLException{
 		
 		List<JobContent> jobContents = new ArrayList<JobContent>();
 		
@@ -324,7 +324,7 @@ public class JobContentFactory {
 			for(PrintFunc func : printer.getPrintFuncs()){
 				if(func.isTypeMatched(printType) && func.isRegionMatched(regionToCompare)){
 					
-					MemberOperation mo = MemberOperationDao.getTodayById(memberOperationId);
+					MemberOperation mo = MemberOperationDao.getTodayById(staff, moId);
 					
 					if(mo != null){
 						Member member = MemberDao.getMemberById(staff, mo.getMemberId());
