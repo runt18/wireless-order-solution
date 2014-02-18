@@ -26,6 +26,35 @@ import com.wireless.util.PinyinUtil;
 public class FoodDao {
 	
 	/**
+	 * Check to see whether the food alias is duplicated.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param f
+	 * 			the food to check			
+	 * @return true if the food alias is duplicated, otherwise false
+	 * @param foodAlias
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	private static boolean isAliasDuplicated(DBCon dbCon, Staff staff, Food f) throws SQLException, BusinessException{
+		String sql;
+		sql = " SELECT COUNT(*) FROM " + Params.dbName + ".food WHERE 1 = 1 " + 
+			  " AND restaurant_id = " + staff.getRestaurantId() + 
+			  " AND food_alias = " + f.getAliasId() +
+			  " AND food_id <> " + f.getFoodId();
+		dbCon.rs = dbCon.stmt.executeQuery(sql);
+		boolean isDuplicated = false;
+		if(dbCon.rs.next()){
+			isDuplicated = (dbCon.rs.getInt(1) != 0);
+		}
+		dbCon.rs.close();
+		
+		return isDuplicated;
+	}
+	
+	/**
 	 * Insert a new food according to specific builder.
 	 * @param staff
 	 * 			the staff to perform this action
@@ -65,10 +94,19 @@ public class FoodDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 * @throws BusinessException 
+	 * 			throws if the food alias is duplicated
 	 */
 	public static int insert(DBCon dbCon, Staff staff, Food.InsertBuilder builder) throws SQLException, BusinessException{
 		String sql;
 		Food f = builder.build();
+
+		//Check to see whether the alias is duplicated.
+		if(builder.isAliasChanged()){
+			if(isAliasDuplicated(dbCon, staff, f)){
+				throw new BusinessException(FoodError.DUPLICATED_FOOD_ALIAS);
+			}
+		}
+		
 		sql = " INSERT INTO " + Params.dbName + ".food" +
 			  " (`name`, `food_alias`, `price`, `commission`, `restaurant_id`, `kitchen_id`, `status`, `desc`, `stock_status`) VALUES ( " +
 			  "'" + f.getName() + "'," +
@@ -153,7 +191,8 @@ public class FoodDao {
 			  " AND OF.order_id = O.id " +
 			  " AND O.restaurant_id = " + staff.getRestaurantId() +
 			  " AND O.status = " + Order.Status.UNPAID.getVal() +
-			  " WHERE OF.food_id = " + foodId;
+			  " WHERE OF.food_id = " + foodId +
+			  " LIMIT 1 ";
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		if(dbCon.rs.next()){
 			throw new BusinessException(FoodError.FOOD_IN_USED);
@@ -229,11 +268,20 @@ public class FoodDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 * @throws BusinessException
-	 * 			throws if the food to update does NOT exist
+	 * 			throws if cases below 
+	 * 			<li>the food to update does NOT exist
+	 * 			<li>the food alias is duplicated
 	 */
 	public static void update(DBCon dbCon, Staff staff, Food.UpdateBuilder builder) throws SQLException, BusinessException{
 		String sql;
 		Food f = builder.build();
+		
+		//Check to see whether the alias is duplicated.
+		if(builder.isAliasChanged()){
+			if(isAliasDuplicated(dbCon, staff, f)){
+				throw new BusinessException(FoodError.DUPLICATED_FOOD_ALIAS);
+			}
+		}
 		
 		//Compare the original status against the new and set the status bit if changed.
 		sql = " SELECT status FROM " + Params.dbName + ".food WHERE food_id = " + f.getFoodId();
@@ -272,6 +320,7 @@ public class FoodDao {
 		if(builder.isComboChanged()){
 			f.setCombo(builder.isCombo());
 		}
+		f.setTemp(false);
 		
 		//Delete the food material relationship if cancel the stock status
 		if(builder.isStockChanged() && f.getStockStatus() == Food.StockStatus.NONE){

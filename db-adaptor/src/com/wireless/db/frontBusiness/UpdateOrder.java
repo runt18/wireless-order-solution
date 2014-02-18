@@ -21,6 +21,7 @@ import com.wireless.exception.StaffError;
 import com.wireless.pojo.crMgr.CancelReason;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.OrderFood;
+import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.staffMgr.Staff;
@@ -128,7 +129,6 @@ public class UpdateOrder {
 	
 	/**
 	 * Update an order according to a specific order id.
-	 * Note that the method does NOT run in db transition.
 	 * @param dbCon
 	 * 			the database connection
 	 * @param staff
@@ -137,10 +137,10 @@ public class UpdateOrder {
 	 * 			The order to update, at least along with order id & table.
 	 * @return the difference between original order and the new
  	 * @throws BusinessException 
- 	 * 			Throws if one of the cases below.<br>
- 	 * 			- The order to this id does NOT exist.<br>
-	 * 	        - The order to this id is expired.<br>
-	 * 			- The table of new order to update is BUSY.<br>
+ 	 * 			throws if one of the cases below
+ 	 * 			<li>the order to this id does NOT exist
+	 * 	        <li>the order to this id is expired
+	 * 			<li>the table of new order to update is BUSY
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 * 
@@ -159,13 +159,13 @@ public class UpdateOrder {
 	 * @param newOrder
 	 * @return the difference between original order and the new
  	 * @throws BusinessException 
- 	 * 			throws if one of the cases below<br>
- 	 * 			- the order to this id does NOT exist<br>
-	 * 	        - the order to this id is expired<br>
-	 * 			- the table of new order to update is BUSY<br>
-	 * 			- the staff has no privilege to add the food<br>
-	 * 			- the staff has no privilege to cancel the food<br>
-	 * 			- the staff has no privilege to present the food
+ 	 * 			throws if one of the cases below
+ 	 * 			<li>the order to this id does NOT exist
+	 * 	        <li>the order to this id is expired
+	 * 			<li>the table of new order to update is BUSY
+	 * 			<li>the staff has no privilege to add the food
+	 * 			<li>the staff has no privilege to cancel the food
+	 * 			<li>the staff has no privilege to present the food
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 * 
@@ -236,12 +236,12 @@ public class UpdateOrder {
 	 * @param newOrder
 	 * @return the difference between original order and the new
  	 * @throws BusinessException 
- 	 * 			Throws if one of the cases below.<br>
- 	 * 			- The order to this id does NOT exist.<br>
-	 * 	        - The order to this id is expired.<br>
-	 * 			- The table of new order to update is BUSY.<br>
+ 	 * 			throws if one of the cases below
+ 	 * 			<li>the order to this id does NOT exist
+	 * 	        <li>the order to this id is expired
+	 * 			<li>the table of new order to update is BUSY
 	 * @throws SQLException
-	 * 			Throws if failed to execute any SQL statement.
+	 * 			throws if failed to execute any SQL statement
 	 * 
 	 * @see DiffResult
 	 */
@@ -333,7 +333,14 @@ public class UpdateOrder {
 				  (extraFood.isTemp() ? 1 : 0) + ", " +
 				  (diffResult.oriOrder.isUnpaid() ? 0 : 1) +
 				  " ) ";
-			dbCon.stmt.executeUpdate(sql);			
+			dbCon.stmt.executeUpdate(sql);		
+			
+			//Insert the temporary food to menu.
+			if(extraFood.isTemp()){
+				try{
+					FoodDao.insert(dbCon, staff, new Food.InsertBuilder(extraFood.getName(), extraFood.getPrice(), extraFood.getKitchen()).setTemp(true));
+				}catch(BusinessException ingored){}
+			}
 		}
 		
 		//insert the canceled order food records 
@@ -437,9 +444,13 @@ public class UpdateOrder {
 	 * @return 
 	 * 			The food instance with the detail information
 	 * @throws BusinessException
-	 * 			Throws with "MENU_EXPIRED" if the food can NOT be found in db
+	 * 			throws if cases below
+	 * 			<li>the associated cancel reason does NOT exist
+	 * 			<li>the associated kitchen does NOT exist
+	 * 			<li>the associated food does NOT exist
+	 * 			<li>the associated taste does NOT exist
 	 * @throws SQLException
-	 * 			Throws if fail to execute any SQL statement
+	 * 			throws if fail to execute any SQL statement
 	 */
 	private static void fillFoodDetail(DBCon dbCon, Staff staff, OrderFood foodToFill) throws BusinessException, SQLException{
 		

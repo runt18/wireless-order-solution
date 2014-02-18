@@ -16,6 +16,7 @@ import com.wireless.exception.ProtocolError;
 import com.wireless.exception.StaffError;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.OrderFood;
+import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.staffMgr.Staff;
@@ -34,13 +35,11 @@ public class InsertOrder {
 	 *            "ReqInsertOrder" for more detail about what information the
 	 *            order contains
 	 * @throws BusinessException
-	 *             throws if one of cases below.<br>
-	 *             - The terminal is NOT attached to any restaurant.<br>
-	 *             - The terminal is expired.<br>
-	 *             - The table associated with this order does NOT exist.<br>
-	 *             - The table associated with this order is BUSY.<br>
-	 *             - Any food query to insert does NOT exist.<br>
-	 *             - Any food to this order does NOT exist.<br>
+	 *             throws if one of cases below
+	 *             <li>the table associated with this order does NOT exist
+	 *             <li>the table associated with this order is BUSY
+	 *             <li>any food query to insert does NOT exist
+	 *             <li>any food to this order does NOT exist
 	 * @throws SQLException
 	 *             throws if fail to execute any SQL statement
 	 * @return Order completed information to inserted order
@@ -61,7 +60,6 @@ public class InsertOrder {
 	
 	/**
 	 * Insert a new order according to the specific order detail information.
-	 * Note that the database should be connected before invoking this method
 	 * 
 	 * @param dbCon
 	 * 			  the database connection
@@ -72,13 +70,11 @@ public class InsertOrder {
 	 *            "ReqInsertOrder" for more detail about what information the
 	 *            order contains
 	 * @throws BusinessException
-	 *             throws if one of cases below.<br>
-	 *             - The terminal is NOT attached to any restaurant.<br>
-	 *             - The terminal is expired.<br>
-	 *             - The table associated with this order does NOT exist.<br>
-	 *             - The table associated with this order is BUSY.<br>
-	 *             - Any food query to insert does NOT exist.<br>
-	 *             - Any food to this order does NOT exist.<br>
+	 *             throws if one of cases below
+	 *             <li>the table associated with this order does NOT exist
+	 *             <li>the table associated with this order is BUSY
+	 *             <li>any food query to insert does NOT exist
+	 *             <li>any food to this order does NOT exist
 	 * @throws SQLException
 	 *             throws if fail to execute any SQL statement
 	 * @return Order completed information to inserted order
@@ -126,15 +122,13 @@ public class InsertOrder {
 	 * 			the order along with basic insert parameters
 	 * @return the completed order details to insert
 	 * @throws BusinessException
-	 *          Throws if one of cases below.<br>
-	 *          - The terminal is NOT attached to any restaurant.<br>
-	 *          - The terminal is expired.<br>
-	 *          - The table associated with this order does NOT exist.<br>
-	 *          - The table associated with this order is BUSY.<br>
-	 *          - Any food query to insert does NOT exist.<br>
-	 *          - Any food to this order does NOT exist.<br>
+	 *          throws if one of cases below
+	 *          <li>the table associated with this order does NOT exist
+	 *          <li>the table associated with this order is BUSY
+	 *          <li>any food query to insert does NOT exist
+	 *          <li>any food to this order does NOT exist>
 	 * @throws SQLException
-	 * 			Throws if failed to execute any SQL statements.
+	 * 			throws if failed to execute any SQL statements
 	 */
 	public static Order execAsync(DBCon dbCon, Staff staff, Order orderToInsert) throws BusinessException, SQLException{
 		doPrepare(dbCon, staff, orderToInsert);
@@ -153,17 +147,15 @@ public class InsertOrder {
 	 * 			the order along with basic insert parameters
 	 * @return the completed order details to insert
 	 * @throws BusinessException
-	 *          throws if one of cases below<br>
-	 *          - the terminal is NOT attached to any restaurant<br>
-	 *          - the terminal is expired<br>
-	 *          - the table associated with this order does NOT exist<br>
-	 *          - the table associated with this order is NOT idle<br>
-	 *          - any food query to insert does NOT exist<br>
-	 *          - any food to this order does NOT exist<br>
-	 *          - the staff has no privilege to add the food<br>
-	 *          - the staff has no privilege to present the food
+	 *          throws if one of cases below
+	 *          <li>the table associated with this order does NOT exist<br>
+	 *          <li>the table associated with this order is NOT idle<br>
+	 *          <li>any food query to insert does NOT exist<br>
+	 *          <li>any food to this order does NOT exist<br>
+	 *          <li>the staff has no privilege to add the food<br>
+	 *          <li>the staff has no privilege to present the food
 	 * @throws SQLException
-	 * 			Throws if failed to execute any SQL statements.
+	 * 			throws if failed to execute any SQL statements.
 	 */
 	private static void doPrepare(DBCon dbCon, Staff staff, Order orderToInsert) throws BusinessException, SQLException{
 		
@@ -234,7 +226,7 @@ public class InsertOrder {
 	 * @param orderToInsert
 	 * 			the order along with basic insert parameters
 	 * @throws SQLException
-	 * 			Throws if failed to execute any SQL statements.
+	 * 			throws if failed to execute any SQL statements
 	 */
 	private static void doInsert(DBCon dbCon, Staff staff, Order orderToInsert) throws SQLException{
 
@@ -368,6 +360,13 @@ public class InsertOrder {
 				  " ) ";
 				
 			dbCon.stmt.executeUpdate(sql);
+
+			//Insert the temporary food to menu.
+			if(foodToInsert.isTemp()){
+				try{
+					FoodDao.insert(dbCon, staff, new Food.InsertBuilder(foodToInsert.getName(), foodToInsert.getPrice(), foodToInsert.getKitchen()).setTemp(true));
+				}catch(BusinessException ingored){}
+			}
 		}
 	}
 }

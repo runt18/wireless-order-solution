@@ -82,7 +82,7 @@ public class TestFoodDao {
 			
 			compare(foodId, expected, actual, "insert food");
 
-			Food.UpdateBuilder updateBuilder = new Food.UpdateBuilder(foodId).setAliasId(101).setName("测试修改菜品")
+			Food.UpdateBuilder updateBuilder = new Food.UpdateBuilder(foodId).setAliasId(100).setName("测试修改菜品")
 													   .setKitchen(KitchenDao.getByType(mStaff, Kitchen.Type.NORMAL).get(1))
 													   .setImage("hello")
 													   .setPrice(34.2f).setDesc("测试修改描述")
