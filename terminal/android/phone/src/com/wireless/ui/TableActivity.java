@@ -45,6 +45,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.wireless.common.WirelessOrder;
+import com.wireless.exception.BusinessException;
 import com.wireless.pojo.regionMgr.Region;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.ui.dialog.AskTableDialog;
@@ -265,34 +266,34 @@ public class TableActivity extends FragmentActivity implements OnTableSelectedLi
 				((TextView)theActivity.findViewById(R.id.toptitle)).setText(REGION_ALL_STR);
 				
 			}else if(theActivity.mRegionCond == Region.RegionId.REGION_1.getId()){
-				((TextView)theActivity.findViewById(R.id.toptitle)).setText(WirelessOrder.regions[0].getName());
+				((TextView)theActivity.findViewById(R.id.toptitle)).setText(WirelessOrder.regions.get(0).getName());
 				
 			}else if(theActivity.mRegionCond == Region.RegionId.REGION_2.getId()){
-				((TextView)theActivity.findViewById(R.id.toptitle)).setText(WirelessOrder.regions[1].getName());
+				((TextView)theActivity.findViewById(R.id.toptitle)).setText(WirelessOrder.regions.get(1).getName());
 				
 			}else if(theActivity.mRegionCond == Region.RegionId.REGION_3.getId()){
-				((TextView)theActivity.findViewById(R.id.toptitle)).setText(WirelessOrder.regions[2].getName());
+				((TextView)theActivity.findViewById(R.id.toptitle)).setText(WirelessOrder.regions.get(2).getName());
 				
 			}else if(theActivity.mRegionCond == Region.RegionId.REGION_4.getId()){
-				((TextView)theActivity.findViewById(R.id.toptitle)).setText(WirelessOrder.regions[3].getName());
+				((TextView)theActivity.findViewById(R.id.toptitle)).setText(WirelessOrder.regions.get(3).getName());
 				
 			}else if(theActivity.mRegionCond == Region.RegionId.REGION_5.getId()){
-				((TextView)theActivity.findViewById(R.id.toptitle)).setText(WirelessOrder.regions[4].getName());
+				((TextView)theActivity.findViewById(R.id.toptitle)).setText(WirelessOrder.regions.get(4).getName());
 				
 			}else if(theActivity.mRegionCond == Region.RegionId.REGION_6.getId()){
-				((TextView)theActivity.findViewById(R.id.toptitle)).setText(WirelessOrder.regions[5].getName());
+				((TextView)theActivity.findViewById(R.id.toptitle)).setText(WirelessOrder.regions.get(5).getName());
 				
 			}else if(theActivity.mRegionCond == Region.RegionId.REGION_7.getId()){
-				((TextView)theActivity.findViewById(R.id.toptitle)).setText(WirelessOrder.regions[6].getName());
+				((TextView)theActivity.findViewById(R.id.toptitle)).setText(WirelessOrder.regions.get(6).getName());
 				
 			}else if(theActivity.mRegionCond == Region.RegionId.REGION_8.getId()){
-				((TextView)theActivity.findViewById(R.id.toptitle)).setText(WirelessOrder.regions[7].getName());
+				((TextView)theActivity.findViewById(R.id.toptitle)).setText(WirelessOrder.regions.get(7).getName());
 				
 			}else if(theActivity.mRegionCond == Region.RegionId.REGION_9.getId()){
-				((TextView)theActivity.findViewById(R.id.toptitle)).setText(WirelessOrder.regions[8].getName());
+				((TextView)theActivity.findViewById(R.id.toptitle)).setText(WirelessOrder.regions.get(8).getName());
 				
 			}else if(theActivity.mRegionCond == Region.RegionId.REGION_10.getId()){
-				((TextView)theActivity.findViewById(R.id.toptitle)).setText(WirelessOrder.regions[9].getName());
+				((TextView)theActivity.findViewById(R.id.toptitle)).setText(WirelessOrder.regions.get(9).getName());
 				
 			}
 			
@@ -769,31 +770,19 @@ public class TableActivity extends FragmentActivity implements OnTableSelectedLi
 			super(WirelessOrder.loginStaff);
 		}
 		
-		/**
-		 * 根据返回的error message判断，如果发错异常则提示用户，
-		 * 如果成功，则执行请求餐台的操作。
-		 */
 		@Override
-		protected void onPostExecute(Region[] regions){
-			
+		protected void onSuccess(List<Region> regions){
 			mProgDialog.dismiss();
+			WirelessOrder.regions = regions;
 			
-			/**
-			 * Prompt user message if any error occurred.
-			 */		
-			if(mErrMsg != null){
-				mListView.onRefreshComplete();
-				Toast.makeText(getApplicationContext(), "刷新区域数据失败,请检查网络", Toast.LENGTH_SHORT).show();
-				//mListView.setVisibility(View.GONE);
-				//mRegionHandler.sendEmptyMessage(0);
-				//WirelessOrder.tables = new Table[0];
-				//mDataHandler.sendEmptyMessage(0);
-			}else{			
-				
-				WirelessOrder.regions = regions;
-				
-				new QueryTableTask().execute();
-			}
+			new QueryTableTask().execute();
+		}
+		
+		@Override
+		protected void onFail(BusinessException e){
+			mProgDialog.dismiss();
+			mListView.onRefreshComplete();
+			Toast.makeText(getApplicationContext(), "刷新区域数据失败,请检查网络", Toast.LENGTH_SHORT).show();
 		}
 	}
 	/**

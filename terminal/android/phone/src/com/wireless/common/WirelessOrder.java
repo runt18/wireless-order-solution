@@ -13,6 +13,6 @@ public final class WirelessOrder {
 	public static FoodMenu foodMenu;
 	public static Restaurant restaurant;
 	public static List<Staff> staffs;
-	public static Region[] regions;
+	public static List<Region> regions;
 	public static List<Table> tables;
 }

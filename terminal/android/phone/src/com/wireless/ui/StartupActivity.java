@@ -17,6 +17,7 @@ import android.widget.TextView;
 
 import com.wireless.common.Params;
 import com.wireless.common.WirelessOrder;
+import com.wireless.exception.BusinessException;
 import com.wireless.pojo.menuMgr.FoodMenu;
 import com.wireless.pojo.regionMgr.Region;
 import com.wireless.pojo.regionMgr.Table;
@@ -199,38 +200,30 @@ public class StartupActivity extends Activity {
 			super(WirelessOrder.loginStaff);
 		}
 
-		/**
-		 * 根据返回的error message判断，如果发错异常则提示用户， 如果菜谱请求成功，则继续进行请求餐厅信息的操作。
-		 */
 		@Override
-		protected void onPostExecute(FoodMenu foodMenu) {
-
-			/**
-			 * Prompt user message if any error occurred, otherwise continue to
-			 * query restaurant info.
-			 */
-			if (mProtocolException != null) {
-				new AlertDialog.Builder(
-						StartupActivity.this)
-						.setTitle("提示")
-						.setMessage(mProtocolException.getMessage())
-						.setPositiveButton(
-								"确定",
-								new DialogInterface.OnClickListener() {
-									public void onClick(DialogInterface dialog,	int id) {
-										Intent intent = new Intent(StartupActivity.this, MainActivity.class);
-										startActivity(intent);
-										finish();
-									}
-								}).show();
-
-			} else {
-				
-				WirelessOrder.foodMenu = foodMenu;
-				
-				new QueryRegionTask().execute();
-			}
+		protected void onSuccess(FoodMenu foodMenu){
+			WirelessOrder.foodMenu = foodMenu;
+			new QueryRegionTask().execute();
 		}
+		
+		@Override
+		protected void onFail(BusinessException e){
+			new AlertDialog.Builder(
+					StartupActivity.this)
+					.setTitle("提示")
+					.setMessage(e.getMessage())
+					.setPositiveButton(
+							"确定",
+							new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog,	int id) {
+									Intent intent = new Intent(StartupActivity.this, MainActivity.class);
+									startActivity(intent);
+									finish();
+								}
+							})
+					.show();
+		}
+		
 	}
 	
 	/**
@@ -249,19 +242,18 @@ public class StartupActivity extends Activity {
 			super(WirelessOrder.loginStaff);
 		}
 	
-		/**
-		 * 根据返回的error message判断，如果发错异常则提示用户，
-		 * 如果成功，则执行请求餐台的操作。
-		 */
 		@Override
-		protected void onPostExecute(Region[] regions){
-			/**
-			 * Prompt user message if any error occurred.
-			 */		
-			if(mErrMsg != null){
-				new AlertDialog.Builder(StartupActivity.this)
+		protected void onSuccess(List<Region> regions){
+			WirelessOrder.regions = regions;
+			
+			new QueryTableTask().execute();
+		}
+		
+		@Override
+		protected void onFail(BusinessException e){
+			new AlertDialog.Builder(StartupActivity.this)
 				.setTitle("提示")
-				.setMessage(mErrMsg)
+				.setMessage(e.getMessage())
 				.setPositiveButton("确定", new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int id) {
 						Intent intent = new Intent(StartupActivity.this, MainActivity.class);
@@ -269,14 +261,8 @@ public class StartupActivity extends Activity {
 						finish();
 					}
 				}).show();
-				
-			}else{		
-				
-				WirelessOrder.regions = regions;
-				
-				new QueryTableTask().execute();
-			}
 		}
+		
 	};
 	
 	/**

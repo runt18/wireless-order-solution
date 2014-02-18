@@ -42,6 +42,7 @@ import android.widget.Toast;
 
 import com.wireless.common.Params;
 import com.wireless.common.WirelessOrder;
+import com.wireless.exception.BusinessException;
 import com.wireless.pojo.menuMgr.FoodMenu;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.restaurantMgr.Restaurant;
@@ -357,36 +358,34 @@ public class MainActivity extends FragmentActivity implements OnTableSelectedLis
 			_progDialog = ProgressDialog.show(MainActivity.this, "", "正在更新菜谱信息...请稍候", true);
 		}
 		
-		/**
-		 * 根据返回的error message判断，如果发错异常则提示用户，
-		 * 如果菜谱请求成功，则继续进行请求餐厅信息的操作。
-		 */
 		@Override
-		protected void onPostExecute(FoodMenu foodMenu){
+		protected void onSuccess(FoodMenu foodMenu){
 			//make the progress dialog disappeared
 			_progDialog.dismiss();					
 			//notify the main activity to redraw the food menu
 			_handler.sendEmptyMessage(REDRAW_FOOD_MENU);
-			/**
-			 * Prompt user message if any error occurred,
-			 * otherwise continue to query restaurant info.
-			 */
-			if(mProtocolException != null){
-				new AlertDialog.Builder(MainActivity.this)
-				.setTitle("提示")
-				.setMessage(mProtocolException.getMessage())
-				.setPositiveButton("确定", new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int id) {
-						dialog.dismiss();
-					}
-				}).show();
-				
-			}else{
-				
-				WirelessOrder.foodMenu = foodMenu;
-				new QueryRestaurantTask().execute();
-			}
-		}		
+			
+			WirelessOrder.foodMenu = foodMenu;
+			new QueryRestaurantTask().execute();
+		}
+		
+		@Override 
+		protected void onFail(BusinessException e){
+			//make the progress dialog disappeared
+			_progDialog.dismiss();					
+			//notify the main activity to redraw the food menu
+			_handler.sendEmptyMessage(REDRAW_FOOD_MENU);
+			
+			new AlertDialog.Builder(MainActivity.this)
+					.setTitle("提示")
+					.setMessage(e.getMessage())
+					.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int id) {
+							dialog.dismiss();
+						}
+					}).show();
+		}
+		
 	}
 	
 	/**
