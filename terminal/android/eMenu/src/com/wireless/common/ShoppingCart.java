@@ -547,31 +547,46 @@ public final class ShoppingCart {
 		}
 	}
 	
-	/**
-	 * Search the original order food in shopping cart according to food alias id.
-	 * @param aliasId the food alias to search
-	 * @return the original order food in shopping cart matched the food alias, return null if not found. 
-	 */
-	public OrderFood searchOriFoodByAlias(int aliasId){
+	public boolean contains(Food f){
+		for(OrderFood of : getAllFoods()){
+			if(of.getFoodId() == f.getFoodId()){
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public boolean containsInOriginal(Food f){
 		if(mOriOrder != null){
 			for(OrderFood of : mOriOrder.getOrderFoods()){
-				if(of.getAliasId() == aliasId){
-					return new OrderFood(of);
+				if(of.getFoodId() == f.getFoodId()){
+					return true;
 				}
 			}
 		}
-		return null;
+		return false;
 	}
 	
-	/**
-	 * Search the new order food in shopping cart according to food alias id.
-	 * @param aliasId the food alias to search
-	 * @return the new order food in shopping cart matched the food alias, return null if not found. 
-	 */
-	public OrderFood searchNewFoodByAlias(int aliasId){
+	public boolean containsInNew(Food f){
 		if(mNewOrder != null){
 			for(OrderFood of : mNewOrder.getOrderFoods()){
-				if(of.getAliasId() == aliasId){
+				if(of.getFoodId() == f.getFoodId()){
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	
+	/**
+	 * Search the original order food in shopping cart according to food {@link Food}.
+	 * @param f the food to search
+	 * @return the original order food in shopping cart matched the food alias, return null if not found. 
+	 */
+	public OrderFood searchInOriFood(Food f){
+		if(mOriOrder != null){
+			for(OrderFood of : mOriOrder.getOrderFoods()){
+				if(of.getFoodId() == f.getFoodId()){
 					return new OrderFood(of);
 				}
 			}
@@ -580,13 +595,29 @@ public final class ShoppingCart {
 	}
 	
 	/**
-	 * Search the order food in shopping cart according to food alias id.
-	 * @param aliasId the food alias to search
+	 * Search the new order food in shopping cart according to food {@link Food}.
+	 * @param f the food to search
+	 * @return the new order food in shopping cart matched the food alias, return null if not found. 
+	 */
+	public OrderFood searchInNew(Food f){
+		if(mNewOrder != null){
+			for(OrderFood of : mNewOrder.getOrderFoods()){
+				if(of.getFoodId() == f.getFoodId()){
+					return new OrderFood(of);
+				}
+			}
+		}
+		return null;
+	}
+	
+	/**
+	 * Search the order food in shopping cart according to {@link Food}
+	 * @param f the food to search
 	 * @return the order food in shopping cart matched the food alias, return null if not found. 
 	 */
-	public OrderFood searchFoodByAlias(int aliasId){
+	public OrderFood searchFood(Food f){
 		for(OrderFood of : getAllFoods()){
-			if(of.getAliasId() == aliasId){
+			if(of.getFoodId() == f.getFoodId()){
 				return new OrderFood(of);
 			}
 		}

@@ -286,7 +286,7 @@ public class ThumbnailItemFragment extends ListFragment {
 		
 		//Check to whether the order is ordered before.
 		//If yes, update the order amount.
-		OrderFood foodHasOrdered = ShoppingCart.instance().searchNewFoodByAlias(foodToDisplay.getAliasId());
+		OrderFood foodHasOrdered = ShoppingCart.instance().searchInNew(foodToDisplay);
 		float orderAmount;
 		if(foodHasOrdered != null){
 			orderAmount = foodHasOrdered.getCount();
@@ -298,11 +298,9 @@ public class ThumbnailItemFragment extends ListFragment {
 
 			// 点菜数量
 			if (orderAmount != 0f) {
-				((TextView) layout.findViewById(R.id.textView_thumbnailFgm_item_pickedCount1))
-						.setText(NumericUtil.float2String2(orderAmount));
+				((TextView) layout.findViewById(R.id.textView_thumbnailFgm_item_pickedCount1)).setText(NumericUtil.float2String2(orderAmount));
 			} else {
-				((TextView) layout.findViewById(R.id.textView_thumbnailFgm_item_pickedCount1))
-						.setText("");
+				((TextView) layout.findViewById(R.id.textView_thumbnailFgm_item_pickedCount1)).setText("");
 			}
 
 			// 菜品价钱
@@ -310,26 +308,22 @@ public class ThumbnailItemFragment extends ListFragment {
 							.setText(NumericUtil.float2String2(foodToDisplay.getPrice()));
 
 			// 菜品名称
-			((TextView) layout.findViewById(R.id.textView_thumbnailFgm_item_foodName1))
-					.setText(foodToDisplay.getName());
+			((TextView) layout.findViewById(R.id.textView_thumbnailFgm_item_foodName1)).setText(foodToDisplay.getName());
 
 		} else {
 			
 			// 点菜数量
 			if(orderAmount != 0f) {
-				((TextView) layout.findViewById(R.id.textView_thumbnailFgm_item_pickedCount2))
-						.setText(NumericUtil.float2String2(orderAmount));
+				((TextView) layout.findViewById(R.id.textView_thumbnailFgm_item_pickedCount2)).setText(NumericUtil.float2String2(orderAmount));
 			} else {
 				((TextView) layout.findViewById(R.id.textView_thumbnailFgm_item_pickedCount2)).setText("");
 			}
 			
 			// 菜品价钱
-			((TextView) layout.findViewById(R.id.textView_thumbnailFgm_item_price2))
-					.setText(NumericUtil.float2String2(foodToDisplay.getPrice()));
+			((TextView) layout.findViewById(R.id.textView_thumbnailFgm_item_price2)).setText(NumericUtil.float2String2(foodToDisplay.getPrice()));
 
 			// 菜品名称
-			((TextView) layout.findViewById(R.id.textView_thumbnailFgm_item_foodName2))
-					.setText(foodToDisplay.getName());
+			((TextView) layout.findViewById(R.id.textView_thumbnailFgm_item_foodName2)).setText(foodToDisplay.getName());
 		}
 	}
 
