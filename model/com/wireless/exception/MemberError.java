@@ -60,6 +60,7 @@ public class MemberError extends ErrorEnum{
 	
 	public static final ErrorCode COUPON_TYPE_NOT_EXIST = build(9600, "操作失败, 该优惠券类型不存在");
 	public static final ErrorCode COUPON_NOT_EXIST = build(9601, "操作失败, 该优惠券不存在");
+	public static final ErrorCode COUPON_EXPIRED = build(9602, "操作失败, 该优惠券已过期");
 	
 	private MemberError(){
 		

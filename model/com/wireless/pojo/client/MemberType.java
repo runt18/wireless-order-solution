@@ -135,6 +135,7 @@ public class MemberType implements Jsonable, Parcelable{
 		private float chargeRate = 1;
 		private Attribute attribute = Attribute.POINT;
 		private int initialPoint = 0;
+		private String desc;
 
 		public InsertBuilder(int restaurantId, String name, Discount defaultDiscount){
 			this.restaurantId = restaurantId;
@@ -183,6 +184,11 @@ public class MemberType implements Jsonable, Parcelable{
 			return this;
 		}
 		
+		public InsertBuilder setDesc(String desc){
+			this.desc = desc;
+			return this;
+		}
+		
 		public MemberType build(){
 			return new MemberType(this);
 		}
@@ -198,22 +204,15 @@ public class MemberType implements Jsonable, Parcelable{
 		private float chargeRate = -1;
 		private Attribute attribute;
 		private int initialPoint = -1;
+		private String desc;
 		
 		public UpdateBuilder(int id){
 			this.id = id;
 		}
 		
-		public int getId(){
-			return this.id;
-		}
-		
 		public UpdateBuilder setName(String name){
 			this.name = name;
 			return this;
-		}
-		
-		public String getName(){
-			return this.name;
 		}
 		
 		public boolean isNameChanged(){
@@ -226,19 +225,11 @@ public class MemberType implements Jsonable, Parcelable{
 			return this;
 		}
 		
-		public Discount getDefaultDiscount(){
-			return this.defaultDiscount;
-		}
-		
 		public UpdateBuilder addDiscount(Discount discount){
 			if(!discounts.contains(discount)){
 				discounts.add(discount);
 			}
 			return this;
-		}
-		
-		public List<Discount> getDiscounts(){
-			return this.discounts;
 		}
 		
 		public boolean isDiscountChanged(){
@@ -258,10 +249,6 @@ public class MemberType implements Jsonable, Parcelable{
 			return this;
 		}
 		
-		public float getExchangeRate(){
-			return exchangeRate;
-		}
-		
 		public boolean isExchangRateChanged(){
 			return exchangeRate >= 0;
 		}
@@ -275,10 +262,6 @@ public class MemberType implements Jsonable, Parcelable{
 			return this;
 		}
 		
-		public float getChargeRate(){
-			return chargeRate;
-		}
-		
 		public boolean isChargeRateChanged(){
 			return chargeRate >= 0;
 		}
@@ -286,10 +269,6 @@ public class MemberType implements Jsonable, Parcelable{
 		public UpdateBuilder setAttribute(Attribute attribute){
 			this.attribute = attribute;
 			return this;
-		}
-		
-		public Attribute getAttribute(){
-			return this.attribute;
 		}
 		
 		public boolean isAttributeChanged(){
@@ -305,12 +284,21 @@ public class MemberType implements Jsonable, Parcelable{
 			return this;
 		}
 		
-		public int getInitialPoint(){
-			return this.initialPoint;
-		}
-		
 		public boolean isInitialPointChanged(){
 			return initialPoint >= 0;
+		}
+		
+		public boolean isDescChanged(){
+			return this.desc != null;
+		}
+		
+		public UpdateBuilder setDesc(String desc){
+			this.desc = desc;
+			return this;
+		}
+		
+		public MemberType build(){
+			return new MemberType(this);
 		}
 	}
 	
@@ -324,7 +312,7 @@ public class MemberType implements Jsonable, Parcelable{
 	private float chargeRate;
 	private Attribute attribute;
 	private int initialPoint;
-	
+	private String desc;
 	
 	private MemberType(InsertBuilder builder){
 		setRestaurantId(builder.restaurantId);
@@ -336,6 +324,19 @@ public class MemberType implements Jsonable, Parcelable{
 		setChargeRate(builder.chargeRate);
 		setAttribute(builder.attribute);
 		setInitialPoint(builder.initialPoint);
+		setDesc(builder.desc);
+	}
+	
+	private MemberType(UpdateBuilder builder){
+		setId(builder.id);
+		setName(builder.name);
+		setDiscounts(builder.discounts);
+		setDefaultDiscount(builder.defaultDiscount);
+		setExchangeRate(builder.exchangeRate);
+		setChargeRate(builder.chargeRate);
+		setAttribute(builder.attribute);
+		setInitialPoint(builder.initialPoint);
+		setDesc(builder.desc);
 	}
 	
 	public MemberType(int id){
@@ -354,6 +355,7 @@ public class MemberType implements Jsonable, Parcelable{
 			setChargeRate(src.getChargeRate());
 			setAttribute(src.getAttribute());
 			setInitialPoint(src.getInitialPoint());
+			setDesc(src.getDesc());
 		}
 	}
 	
@@ -464,6 +466,17 @@ public class MemberType implements Jsonable, Parcelable{
 	
 	public boolean isCharge(){
 		return this.attribute == Attribute.CHARGE;
+	}
+	
+	public void setDesc(String desc){
+		this.desc = desc;
+	}
+	
+	public String getDesc(){
+		if(desc == null){
+			return "";
+		}
+		return desc;
 	}
 	
 	@Override

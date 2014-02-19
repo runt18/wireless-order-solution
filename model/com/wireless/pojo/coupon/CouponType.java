@@ -14,6 +14,7 @@ public class CouponType implements Jsonable{
 		private final String name;
 		private final float price;
 		private long expired;
+		private String comment;
 		
 		public InsertBuilder(String name, float price){
 			this.name = name;
@@ -32,6 +33,11 @@ public class CouponType implements Jsonable{
 			return this;
 		}
 		
+		public InsertBuilder setComment(String comment){
+			this.comment = comment;
+			return this;
+		}
+		
 		public CouponType build(){
 			return new CouponType(this);
 		}
@@ -41,6 +47,7 @@ public class CouponType implements Jsonable{
 		private final int id;
 		private final String name;
 		private long expired = Integer.MIN_VALUE;
+		private String comment;
 		
 		public UpdateBuilder(int id, String name){
 			this.id = id;
@@ -67,6 +74,15 @@ public class CouponType implements Jsonable{
 			return this.expired >= 0;
 		}
 		
+		public boolean isCommentChanged(){
+			return this.comment != null;
+		}
+		
+		public UpdateBuilder setComment(String comment){
+			this.comment = comment;
+			return this;
+		}
+		
 		public CouponType build(){
 			return new CouponType(this);
 		}
@@ -77,17 +93,20 @@ public class CouponType implements Jsonable{
 	private String name;
 	private float price;
 	private long expired;
+	private String comment;
 	
 	private CouponType(UpdateBuilder builder){
 		setId(builder.id);
 		setName(builder.name);
 		setExpired(builder.expired);
+		setComment(builder.comment);
 	}
 	
 	private CouponType(InsertBuilder builder){
 		setName(builder.name);
 		setPrice(builder.price);
 		setExpired(builder.expired);
+		setComment(builder.comment);
 	}
 	
 	public CouponType(int id){
@@ -101,6 +120,7 @@ public class CouponType implements Jsonable{
 			setName(src.getName());
 			setPrice(src.getPrice());
 			setExpired(src.getExpired());
+			setComment(src.getComment());
 		}
 	}
 	
@@ -159,6 +179,17 @@ public class CouponType implements Jsonable{
 		}else{
 			return System.currentTimeMillis() > expired;
 		}
+	}
+	
+	public void setComment(String comment){
+		this.comment = comment;
+	}
+	
+	public String getComment(){
+		if(this.comment == null){
+			return "";
+		}
+		return this.comment;
 	}
 	
 	@Override
