@@ -342,39 +342,24 @@ var btnOrderDetail = new Ext.ux.ImageButton({
 				);
 				selTabContentGrid.frame = false;
 				selTabContentGrid.border = false;
-				selTabContentGrid.getStore().on('load', function(store, records, options, res){
-					var sumRow;
-					for(var i = 0; i < records.length; i++){
-						if(eval(records[i].get('count') < 0)){
-							sumRow = selTabContentGrid.getView().getRow(i);
-							sumRow.style.backgroundColor = '#FF0000';
+				selTabContentGrid.getStore().on('load', function(store, records, options){
+					
+					if(store.getCount() > 0){
+						var sumRow = selTabContentGrid.getView().getRow(store.getCount() - 1);	
+						sumRow.style.backgroundColor = '#EEEEEE';			
+						for(var i = 0; i < selTabContentGrid.getColumnModel().getColumnCount(); i++){
+							var sumCell = selTabContentGrid.getView().getCell(store.getCount() - 1, i);
+							sumCell.style.fontSize = '15px';
+							sumCell.style.fontWeight = 'bold';	
+							sumCell.style.color = 'green';
 						}
+						selTabContentGrid.getView().getCell(store.getCount()-1, 1).innerHTML = '汇总';
+						selTabContentGrid.getView().getCell(store.getCount()-1, 2).innerHTML = '--';
+						selTabContentGrid.getView().getCell(store.getCount()-1, 5).innerHTML = '--';
+						selTabContentGrid.getView().getCell(store.getCount()-1, 6).innerHTML = '--';
+						selTabContentGrid.getView().getCell(store.getCount()-1, 7).innerHTML = '--';
+						selTabContentGrid.getView().getCell(store.getCount()-1, 8).innerHTML = '--';
 					}
-					sumRow = null;
-					// 汇总
-					var jr = Ext.decode(res.responseText);
-					if(jr.root.length > 0){
-						store.add(new OrderFoodRecord({
-							orderDateFormat : '汇总',
-							unitPrice : jr.other.sum.totalPrice,
-							count : jr.other.sum.totalCount
-						}));
-					}
-					var gv = selTabContentGrid.getView();
-					var sumRow = gv.getRow(store.getCount()-1);
-					sumRow.style.backgroundColor = '#DDD';			
-					sumRow.style.color = 'green';
-					gv.getCell(store.getCount()-1, 1).style.fontSize = '15px';
-					gv.getCell(store.getCount()-1, 1).style.fontWeight = 'bold';
-					gv.getCell(store.getCount()-1, 3).style.fontSize = '15px';
-					gv.getCell(store.getCount()-1, 3).style.fontWeight = 'bold';
-					gv.getCell(store.getCount()-1, 4).style.fontSize = '15px';
-					gv.getCell(store.getCount()-1, 4).style.fontWeight = 'bold';
-					gv.getCell(store.getCount()-1, 2).innerHTML = '';
-					gv.getCell(store.getCount()-1, 5).innerHTML = '';
-					gv.getCell(store.getCount()-1, 6).innerHTML = '';
-					gv.getCell(store.getCount()-1, 7).innerHTML = '';
-					gv.getCell(store.getCount()-1, 8).innerHTML = '';
 				});
 			}
 			

@@ -101,7 +101,7 @@ function memberTypeWinInit(){
 				labelWidth : 70,
 				labelAlign : 'right',
 				defaults : {
-					width : 130
+					width : 160
 				},
 				items : [{
 					xtype : 'hidden',
@@ -200,10 +200,13 @@ function memberTypeWinInit(){
 					xtype : 'label',
 					autoWidth : true,
 					style : 'color:green;font-szie:12px;',
-					text : '说明:  如充值实收  100.00元  可当  150.00元  (基本金额100.00,赠送金额50.00),则充值比率为  1:1.5,充值比率输入  1.5, 默认 1 '
+					text : '说明:充100.00元送50.00元, 充值比率输入  1.5, 默认 1 '
 				}, {
-					
-				}, {
+					xtype : 'textarea',
+					height : 40,
+					id : 'txtCommentForMemberType',
+					fieldLabel : '特权说明'
+				},{
 					xtype : 'panel',
 					layout : 'column',
 					id : 'formMemberDiscount',
@@ -267,6 +270,7 @@ function memberTypeWinInit(){
 					var initialPoint = Ext.getCmp('numInitialPoint');
 					var discount = Ext.getCmp('comboDiscount');
 					var attribute = Ext.getCmp('comboAttribute');
+					var desc = Ext.getCmp('txtCommentForMemberType');
 					
 					if(!typeName.isValid() || !chargeRate.isValid() || !exchangeRate.isValid() 
 							|| !initialPoint.isValid() || !attribute.isValid() || !discount.isValid()){
@@ -291,6 +295,7 @@ function memberTypeWinInit(){
 							initialPoint : initialPoint.getValue(),
 							chargeRate : chargeRate.getValue(),
 							attr : attribute.getValue(),
+							desc : desc.getValue(),
 							memberDiscountCheckeds : getChecked(memberDiscountCheckeds, document.getElementsByName('memberDiscount'))
 						},
 						success : function(res, opt){
@@ -538,7 +543,7 @@ function initMemberTypeGrid(){
 			['操作', 'operation', 200, 'center', 'memberTypeRenderer']
 		],
 		['id','name','chargeRate','exchangeRate','discountTypeValue', 'discountTypeText','type','attributeValue',
-		 'discount', 'discount.id', 'discount.name', 'discount.status', 'initialPoint', 'discounts'],
+		 'desc', 'discount', 'discount.id', 'discount.name', 'discount.status', 'initialPoint', 'discounts'],
 		[ ['isPaging', true], ['restaurantID', restaurantID], ['dataSource', 'normal']],
 		30,
 		'',
@@ -676,6 +681,7 @@ function bindMemberTypeData(d){
 	var initialPoint = Ext.getCmp('numInitialPoint');
 	var discount = Ext.getCmp('comboDiscount');
 	var attribute = Ext.getCmp('comboAttribute');
+	var desc = Ext.getCmp('txtCommentForMemberType');
 	
 	typeID.setValue(d['id']);
 	typeName.setValue(d['name']);
@@ -694,7 +700,7 @@ function bindMemberTypeData(d){
 	attribute.fireEvent('select', attribute);
 	chargeRate.setValue(d['chargeRate']);
 	discount.setValue(d['discount.id']);
-	
+	desc.setValue(d['desc']);
 	
 	typeID.clearInvalid();
 	typeName.clearInvalid();
