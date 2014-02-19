@@ -25,12 +25,14 @@ public class OperateCouponTypeAction extends DispatchAction{
 		String typeName = request.getParameter("typeName");
 		String price = request.getParameter("price");
 		String date = request.getParameter("date");
+		String desc = request.getParameter("desc");
 		
 		String pin = (String) request.getAttribute("pin");
 		JObject jobject = new JObject();
 		try{
 			CouponTypeDao.insert(StaffDao.verify(Integer.parseInt(pin)), new InsertBuilder(typeName, Float.parseFloat(price))
-																			.setExpired(Long.parseLong(date)));
+																			.setExpired(Long.parseLong(date))
+																			.setComment(desc));
 			jobject.initTip(true, "添加成功");
 		}catch(BusinessException e){
 			e.printStackTrace();
@@ -54,12 +56,14 @@ public class OperateCouponTypeAction extends DispatchAction{
 		String typeId = request.getParameter("typeId");
 		String typeName = request.getParameter("typeName");
 		String date = request.getParameter("date");
+		String desc = request.getParameter("desc");
 		
 		String pin = (String) request.getAttribute("pin");
 		JObject jobject = new JObject();
 		try{
 			CouponTypeDao.update(StaffDao.verify(Integer.parseInt(pin)), new CouponType.UpdateBuilder(Integer.parseInt(typeId), typeName)
-																			.setExpired(Long.parseLong(date)));
+																			.setExpired(Long.parseLong(date))
+																			.setComment(desc));
 			jobject.initTip(true, "修改成功");
 		}catch(BusinessException e){
 			e.printStackTrace();
