@@ -82,7 +82,7 @@ public class OrderDetailContent extends ConcreteContent {
 		_printTemplate = _printTemplate.replace(PVar.VAR_2, 
 				new ExtraFormatDecorator(
 					new Grid2ItemsContent("餐台：" + tblName, 
-										  "服务员：" + _waiter, 
+										  "服务员：" + mWaiter, 
 									      getStyle()),
 					ExtraFormatDecorator.LARGE_FONT_1X).toString());
 			

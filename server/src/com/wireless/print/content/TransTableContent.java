@@ -36,7 +36,7 @@ public class TransTableContent extends ConcreteContent {
 		_template = _template.replace(PVar.PRINT_DATE, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
 		
 		//replace the "$(waiter)"
-		_template = _template.replace(PVar.WAITER_NAME, _waiter);
+		_template = _template.replace(PVar.WAITER_NAME, mWaiter);
 
 		//replace the $(var_1) with the table transfer message
 		String msg = _srcTbl.getAliasId() + "号餐台转至" + _destTbl.getAliasId() + "号餐台";

@@ -37,7 +37,7 @@ public class ShiftContent extends ConcreteContent {
 		//replace $(order_amount) 
 		mTemplate = mTemplate.replace("$(order_amount)", Integer.toString(mShiftDetail.getOrderAmount()));
 		//replace $(waiter)
-		mTemplate = mTemplate.replace(PVar.WAITER_NAME, _waiter);
+		mTemplate = mTemplate.replace(PVar.WAITER_NAME, mWaiter);
 		//replace $(on_duty)
 		mTemplate = mTemplate.replace("$(on_duty)", mShiftDetail.getOnDuty());
 		//replace $(off_duty)

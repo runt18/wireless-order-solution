@@ -50,7 +50,7 @@ public class SummaryContent extends ConcreteContent {
 		
 		if(mStyle == PStyle.PRINT_STYLE_58MM){
 			_template = _template.replace(PVar.ORDER_ID, Integer.toString(mOrder.getId()));
-			_template = _template.replace(PVar.WAITER_NAME, _waiter);
+			_template = _template.replace(PVar.WAITER_NAME, mWaiter);
 			_template = _template.replace(PVar.PRINT_DATE, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
 			
 		}else if(mStyle == PStyle.PRINT_STYLE_80MM){
@@ -58,7 +58,7 @@ public class SummaryContent extends ConcreteContent {
 						new Grid2ItemsContent("’Àµ•∫≈£∫" + mOrder.getId(), 
 											  " ±º‰£∫" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()), 
 											  getStyle()).toString());
-			_template = _template.replace(PVar.WAITER_NAME, _waiter);			
+			_template = _template.replace(PVar.WAITER_NAME, mWaiter);			
 		}
 		
 		_template = _template.replace(PVar.VAR_2, 

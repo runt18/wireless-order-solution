@@ -24,7 +24,7 @@ public abstract class ConcreteContent implements Content {
 	final PType mPrintType;
 	
 	final Order mOrder;
-	final String _waiter;
+	final String mWaiter;
 
 	protected ConcreteContent(PStyle style){
 		mStyle = style;
@@ -40,7 +40,7 @@ public abstract class ConcreteContent implements Content {
 		}
 		
 		mPrintType = PType.PRINT_UNKNOWN;
-		_waiter = null;
+		mWaiter = null;
 		mOrder = null;
 	}
 	
@@ -59,7 +59,7 @@ public abstract class ConcreteContent implements Content {
 		}
 		
 		mPrintType = printType;
-		_waiter = null;
+		mWaiter = null;
 		mOrder = null;
 	}
 	
@@ -79,7 +79,7 @@ public abstract class ConcreteContent implements Content {
 		
 		mOrder = new Order();
 		mOrder.copyFrom(order);
-		_waiter = waiter;
+		mWaiter = waiter;
 		mPrintType = printType;
 	}
 	
