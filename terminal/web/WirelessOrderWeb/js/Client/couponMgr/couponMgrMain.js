@@ -65,6 +65,8 @@ function initCouponTypeWin(){
 						var name = Ext.getCmp('txtCouponTypeName');
 						var price = Ext.getCmp('numCouponPrice');
 						var date = Ext.getCmp('dateForExpired');
+						var desc = Ext.getCmp('txtDirectionsForCouponType');
+						
 						var dataSource = 'insert';
 						
 						if(operateCouponTypeWin.otype == 'insert') {
@@ -83,7 +85,8 @@ function initCouponTypeWin(){
 								typeId : id.getValue(),
 								typeName : name.getValue(),
 								price : price.getValue(),
-								date : date.getValue().getTime()
+								date : date.getValue().getTime(),
+								desc : desc.getValue()
 							},
 							success : function(res, opt){
 								var jr = Ext.util.JSON.decode(res.responseText);
@@ -328,6 +331,7 @@ function couponTypeOperation(c){
 	var name = Ext.getCmp('txtCouponTypeName');
 	var price = Ext.getCmp('numCouponPrice');
 	var date = Ext.getCmp('dateForExpired');
+	var desc = Ext.getCmp('txtDirectionsForCouponType');
 	
 	var data = c.data == null || typeof c.data == 'undefined' ? {attributes : {}} : c.data;
 	
@@ -350,6 +354,8 @@ function couponTypeOperation(c){
 	name.setValue(data.attributes.typeName);
 	price.setValue(data.attributes.price);
 	date.setValue(data.attributes.date);
+	desc.setValue(data.attributes.desc);
+	
 	name.focus(true, 100);
 	
 	name.clearInvalid();
@@ -362,6 +368,11 @@ function floatBarUpdateHandler(){
 }
 
 function floatBarSendCouponHandler(){
+	var node = Ext.ux.getSelNode(couponTree);
+	if(typeof node.attributes.expired != 'undefined'){
+		Ext.ux.showMsg({title : '提示', msg : '过期优惠劵不能发送', success : true});
+		return;
+	}
 	initSendCouponWin(floatBarNodeId);
 	sendCouponWin.show();
 }
