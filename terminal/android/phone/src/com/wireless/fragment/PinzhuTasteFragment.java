@@ -7,11 +7,9 @@ import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnFocusChangeListener;
-import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
@@ -95,20 +93,20 @@ public class PinzhuTasteFragment extends Fragment{
 		pinZhuEdtTxt.requestFocus();
 		
         //点击品注EditText后全选内容并弹出软键盘
-		pinZhuEdtTxt.setOnTouchListener(new OnTouchListener(){
-			@Override
-			public boolean onTouch(final View v, MotionEvent event) {
-				v.postDelayed(new Runnable(){
-					@Override
-					public void run() {
-						pinZhuEdtTxt.selectAll();
-					}
-					
-				}, 100);
-				return false;
-			}
-        	
-        });
+//		pinZhuEdtTxt.setOnTouchListener(new OnTouchListener(){
+//			@Override
+//			public boolean onTouch(final View v, MotionEvent event) {
+//				v.postDelayed(new Runnable(){
+//					@Override
+//					public void run() {
+//						pinZhuEdtTxt.selectAll();
+//					}
+//					
+//				}, 100);
+//				return false;
+//			}
+//        	
+//        });
 		
 		//品注的EditText的处理函数
 		pinZhuEdtTxt.addTextChangedListener(new TextWatcher(){
@@ -148,20 +146,20 @@ public class PinzhuTasteFragment extends Fragment{
 		});
 		
         //点击价钱EditText后全选内容并弹出软键盘
-		priceEdtTxt.setOnTouchListener(new OnTouchListener(){
-			@Override
-			public boolean onTouch(View v, MotionEvent event) {
-				v.postDelayed(new Runnable(){
-					@Override
-					public void run() {
-						priceEdtTxt.selectAll();
-					}
-					
-				}, 100);
-				return false;
-			}
-        	
-        });
+//		priceEdtTxt.setOnTouchListener(new OnTouchListener(){
+//			@Override
+//			public boolean onTouch(View v, MotionEvent event) {
+//				v.postDelayed(new Runnable(){
+//					@Override
+//					public void run() {
+//						priceEdtTxt.selectAll();
+//					}
+//					
+//				}, 100);
+//				return false;
+//			}
+//        	
+//        });
 		
 		//价格EditText的处理函数
 		priceEdtTxt.addTextChangedListener(new TextWatcher(){
