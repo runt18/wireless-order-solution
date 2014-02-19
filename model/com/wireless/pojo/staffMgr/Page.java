@@ -6,7 +6,6 @@ public class Page{
 		DISCOUNT("discountMgr", "折扣管理", "BasicManagement_Module/DiscountManagement.html", "../../images/cancelReasonMgr1.png"),
 		MENU("menuMgr", "菜谱管理", "BasicManagement_Module/MenuManagement.html", "../../images/discountMgr.png"),
 		TASTE("tasteMgr", "口味管理", "BasicManagement_Module/TasteManagement.html", "../../images/menuMgr.png"),
-		PRICE("priceMgr", "价格方案", "BasicManagement_Module/PriceManagement.html", "../../images/foodPricePlanMrg.png"),
 		PRINT("printMgr", "打印方案", "BasicManagement_Module/PrintScheme.html", "../../images/printerMgr.png"),
 		CANCELREASON("cancelReason", "退菜原因", "", "../../images/cancelFoodReason.png"),
 		REGION("regionMgr", "区域管理", "BasicManagement_Module/RegionManagement.html", "../../images/regionMgr.png");
