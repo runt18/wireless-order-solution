@@ -58,6 +58,7 @@ public class QueryMenuMgrAction extends Action {
 			String isHot = request.getParameter("isHot");
 			String isWeight = request.getParameter("isWeight");
 			String isCommission = request.getParameter("isCommission");
+			String isTempFood = request.getParameter("isTempFood");
 			List<String> statusList = new ArrayList<String>();
 			
 			String extraCond = "";
@@ -127,6 +128,10 @@ public class QueryMenuMgrAction extends Action {
 			if(isCommission != null && isCommission.trim().equals("true")){
 				statusList.add("(FOOD.status & " + Food.COMMISSION + ") <> 0");
 			}
+			if(isTempFood != null && isTempFood.trim().equals("true")){
+				statusList.add("(FOOD.status & " + Food.TEMP + ") <> 0");
+			}
+			
 			if(!statusList.isEmpty()){
 				String strStatus = "";
 				for(int i = 0; i < statusList.size(); i++){
