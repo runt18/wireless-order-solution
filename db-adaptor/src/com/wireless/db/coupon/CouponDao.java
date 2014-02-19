@@ -65,7 +65,7 @@ public class CouponDao {
 
 		//Check to see whether the coupon type exist or expired.
 		coupon.getCouponType().copyFrom(CouponTypeDao.getById(dbCon, staff, coupon.getCouponType().getId()));
-		if(coupon.isExpired()){
+		if(coupon.getCouponType().isExpired()){
 			throw new BusinessException(MemberError.COUPON_EXPIRED);
 		}
 		
