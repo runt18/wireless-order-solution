@@ -190,7 +190,7 @@ Ext.onReady(function(){
 								Ext.getDom('bssiGiftIncome').innerHTML = business.giftIncome.toFixed(2);
 								
 								Ext.getDom('bssiCouponAmount').innerHTML = business.couponAmount;
-								Ext.getDom('bssiCouponAmount').innerHTML = business.couponIncome.toFixed(2);
+								Ext.getDom('bssiCouponIncome').innerHTML = business.couponIncome.toFixed(2);
 								
 								Ext.getDom('bssiCancelAmount').innerHTML = business.cancelAmount;
 								Ext.getDom('bssiCancelIncome').innerHTML = business.cancelIncome.toFixed(2);

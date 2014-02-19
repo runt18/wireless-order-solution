@@ -270,15 +270,20 @@ Ext.onReady(function(){
 				}]
 			}, {
 				columnWidth : 1
+			}, {
+				columnWidth : .6,
+				items : [{
+					html : '&nbsp;'
+				}]
 			},{
 				items : [{
 					style : 'color:#15428B;text-align:left;font-size: 25px;margin-bottom: 3px;',
 					html : '实收:'
 				}]
 			}, {
-				columnWidth : 0.5,
+				columnWidth : 0.24,
 				items : [{
-					style : 'text-align:left;font-size: 25px;margin-bottom: 3px;',
+					style : 'text-align:left;font-size: 25px;margin-bottom: 3px;color:green',
 					id : 'actrualPayBV'
 				}]
 			}]

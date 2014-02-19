@@ -429,7 +429,7 @@ var receivablesStatResultSummaryPanel = new Ext.Panel({
 		{
 			items : [{
 				style : 'color:#15428B;margin-left:7px;',
-				html : '优惠劵单额:'
+				html : '优惠劵总额:'
 			}]
 		}, {
 			items : [{

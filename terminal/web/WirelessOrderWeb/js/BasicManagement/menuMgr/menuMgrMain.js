@@ -483,6 +483,7 @@ function searchMenuHandler(){
 	var isHot = Ext.getCmp('hotCheckbox').getValue();
 	var isWeight = Ext.getCmp('weightCheckbox').getValue();
 	var isCommission = Ext.getCmp('commissionCheckbox').getValue();
+	var isTempFood = Ext.getCmp('tempFoodCheckbox').getValue();
 	if(isSpecial)
 		baseParams['isSpecial'] = true;
 	if(isRecommend)
@@ -501,6 +502,9 @@ function searchMenuHandler(){
 		baseParams['isWeight'] = true;
 	if(isCommission)
 		baseParams['isCommission'] = true;
+	if(isTempFood){
+		baseParams['isTempFood'] = true;
+	}
 	
 	var gs = menuGrid.getStore();
 	gs.baseParams = baseParams;
@@ -2403,6 +2407,12 @@ function initMenuGrid(){
 				}, {
 					xtype : 'checkbox',
 					id : 'commissionCheckbox'
+				}, { 
+					xtype:'tbtext',
+					text:'&nbsp;&nbsp;&nbsp;&nbsp; 临时菜:'
+				}, {
+					xtype : 'checkbox',
+					id : 'tempFoodCheckbox'
 				}, '->', {
 					xtype : 'button',
 					hideLabel : true,
@@ -2661,7 +2671,7 @@ var btnAddFood = new Ext.ux.ImageButton({
 });
 
 var btnAddKitchen = new Ext.ux.ImageButton({
-	imgPath : '',
+	imgPath : '../../images/btnAddKitchen.png',
 	imgWidth : 50,
 	imgHeight : 50,
 	tooltip : '添加厨房',
@@ -2672,7 +2682,7 @@ var btnAddKitchen = new Ext.ux.ImageButton({
 });
 
 var btnAddDept = new Ext.ux.ImageButton({
-	imgPath : '',
+	imgPath : '../../images/btnAddDept.png',
 	imgWidth : 50,
 	imgHeight : 50,
 	tooltip : '添加部门',
@@ -2709,45 +2719,6 @@ var btnTaste = new Ext.ux.ImageButton({
 	tooltip : '口味关联',
 	handler : function(btn) {
 		foodOperation('tasteOperationTab', mmObj.operation.update);
-	}
-});
-
-var btnMaterial = new Ext.ux.ImageButton({
-	imgPath : '../../images/material_add.png',
-	imgWidth : 50,
-	imgHeight : 50,
-	tooltip : '食材关联',
-	handler : function(btn) {
-		foodOperation('materialOperationTab', mmObj.operation.update);
-	}
-});
-
-var btnCombination = new Ext.ux.ImageButton({
-	imgPath : '../../images/combination_add.png',
-	imgWidth : 50,
-	imgHeight : 50,
-	tooltip : '关联套菜',
-	handler : function(btn) {
-		foodOperation('combinationOperationTab', mmObj.operation.update);
-	}
-});
-
-/*var pushBackBut = new Ext.ux.ImageButton({
-	imgPath : '../../images/UserLogout.png',
-	imgWidth : 50,
-	imgHeight : 50,
-	tooltip : '返回',
-	handler : function(btn) {
-		location.href = "BasicMgrProtal.html?"+ strEncode('restaurantID=' + restaurantID, 'mi');
-	}
-});*/
-
-var logOutBut = new Ext.ux.ImageButton({
-	imgPath : '../../images/ResLogout.png',
-	imgWidth : 48,
-	imgHeight : 48,
-	tooltip : '登出',
-	handler : function(btn) {
 	}
 });
 
