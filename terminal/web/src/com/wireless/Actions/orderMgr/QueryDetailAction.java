@@ -19,7 +19,6 @@ import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.util.DataPaging;
-import com.wireless.util.WebParams;
 
 public class QueryDetailAction extends Action {
 	
@@ -57,19 +56,23 @@ public class QueryDetailAction extends Action {
 			}
 		}catch(BusinessException e){
 			e.printStackTrace();
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getCode(), e.getDesc());
+			jobject.initTip(e);
 			
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
+			jobject.initTip(e);
 		}finally{
 			if(list != null){
 				LinkedHashMap<String, Object> sum = new LinkedHashMap<String, Object>();
+				OrderFood total = new OrderFood();
+				total.asFood().setPrice(OrderFood.calcTotalPrice(list));
+				total.setCount(OrderFood.calcTotalCount(list));
 				sum.put("title", "汇总");
 				sum.put("totalPrice", OrderFood.calcTotalPrice(list));
 				sum.put("totalCount", OrderFood.calcTotalCount(list));
 				jobject.getOther().put("sum", sum);
 				list = DataPaging.getPagingData(list, isPaging, start, limit);
+				list.add(total);
 				jobject.setRoot(list);
 			}
 			response.getWriter().print(jobject.toString());
