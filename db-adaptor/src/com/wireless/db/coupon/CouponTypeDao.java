@@ -52,11 +52,12 @@ public class CouponTypeDao {
 		CouponType type = builder.build();
 		String sql;
 		sql = " INSERT INTO " + Params.dbName + ".coupon_type " +
-			  " (`restaurant_id`, `name`, `price`, `expired`) VALUES(" +
+			  " (`restaurant_id`, `name`, `price`, `expired`, `comment`) VALUES(" +
 			  staff.getRestaurantId() + "," +
 			  "'" + type.getName() + "'," +
 			  type.getPrice() + "," +
-			  "'" + DateUtil.format(type.getExpired(), DateUtil.Pattern.DATE_TIME) + "'" +
+			  "'" + DateUtil.format(type.getExpired(), DateUtil.Pattern.DATE_TIME) + "'," +
+			  "'" + type.getComment() + "'" +
 			  ")";
 		dbCon.stmt.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
 		dbCon.rs = dbCon.stmt.getGeneratedKeys();
@@ -108,6 +109,7 @@ public class CouponTypeDao {
 			  " coupon_type_id = " + type.getId() +
 			  (builder.isNameChanged() ? " ,name = '" + type.getName() + "'" : "") +
 			  (builder.isExpiredChanged() ? " ,expired = '" + DateUtil.format(type.getExpired()) + "'" : "") +
+			  (builder.isCommentChanged() ? " ,comment = '" + type.getComment() + "'" : "") +
 			  " WHERE coupon_type_id = " + type.getId();
 		if(dbCon.stmt.executeUpdate(sql) == 0){
 			throw new BusinessException(MemberError.COUPON_TYPE_NOT_EXIST);
@@ -247,7 +249,7 @@ public class CouponTypeDao {
 	private static List<CouponType> getByCond(DBCon dbCon, Staff staff, String extraCond, String orderClause) throws SQLException{
 		String sql;
 		sql = " SELECT " +
-			  " coupon_type_id, restaurant_id, name, price, expired " +
+			  " coupon_type_id, restaurant_id, name, price, expired, comment " +
 			  " FROM " + Params.dbName + ".coupon_type " +
 			  " WHERE restaurant_id = " + staff.getRestaurantId() +
 			  (extraCond != null ? extraCond : " ") +
@@ -261,6 +263,7 @@ public class CouponTypeDao {
 			type.setName(dbCon.rs.getString("name"));
 			type.setPrice(dbCon.rs.getFloat("price"));
 			type.setExpired(dbCon.rs.getTimestamp("expired").getTime());
+			type.setComment(dbCon.rs.getString("comment"));
 			result.add(type);
 		}
 		dbCon.rs.close();

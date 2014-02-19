@@ -32,7 +32,7 @@ public class MemberTypeDao {
 		MemberType mt = builder.build();
 		// 插入新数据
 		String sql = " INSERT INTO " + Params.dbName + ".member_type " 
-				   + " ( restaurant_id, name, type, exchange_rate, charge_rate, attribute, initial_point )"
+				   + " ( `restaurant_id`, `name`, `type`, `exchange_rate`, `charge_rate`, `attribute`, `initial_point`, `desc` )"
 				   + " VALUES("
 				   + mt.getRestaurantId() + ","	
 				   + "'" + mt.getName() + "',"
@@ -40,8 +40,9 @@ public class MemberTypeDao {
 				   + mt.getExchangeRate() + ","	
 				   + mt.getChargeRate() + "," 
 				   + mt.getAttribute().getVal() + "," 
-				   + mt.getInitialPoint()
-				   + ")";
+				   + mt.getInitialPoint() + "," +
+				   "'" + mt.getDesc() + "'" +
+				   ")";
 		
 		dbCon.stmt.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
 		dbCon.rs = dbCon.stmt.getGeneratedKeys();
@@ -175,29 +176,32 @@ public class MemberTypeDao {
 	 */
 	public static void update(DBCon dbCon, Staff staff, MemberType.UpdateBuilder builder) throws SQLException, BusinessException{
 		String sql;
+		MemberType mt = builder.build();
 		// 更新数据
 		sql = " UPDATE " + Params.dbName + ".member_type SET " +
-			  (builder.isNameChanged() ? " name = '" + builder.getName() + "', " : "") +
-			  (builder.isExchangRateChanged() ? " exchange_rate = " + builder.getExchangeRate() + ", " : "") +
-			  (builder.isChargeRateChanged() ? " charge_rate = " + builder.getChargeRate() + ", " : "") + 
-			  (builder.isAttributeChanged() ? " attribute = " + builder.getAttribute().getVal() + "," : "") + 
-			  (builder.isInitialPointChanged() ? " initial_point = " + builder.getInitialPoint() : "") +
+			  " member_type_id = " + mt.getId() +
+			  (builder.isNameChanged() ? " ,name = '" + mt.getName() + "'" : "") +
+			  (builder.isExchangRateChanged() ? " ,exchange_rate = " + mt.getExchangeRate() : "") +
+			  (builder.isChargeRateChanged() ? " ,charge_rate = " + mt.getChargeRate() : "") + 
+			  (builder.isAttributeChanged() ? " ,attribute = " + mt.getAttribute().getVal() : "") + 
+			  (builder.isInitialPointChanged() ? " ,initial_point = " + mt.getInitialPoint() : "") +
+			  (builder.isDescChanged() ? ",`desc` = '" + mt.getDesc() + "'" : "") +
 			  " WHERE restaurant_id = " + staff.getRestaurantId() +
-			  " AND member_type_id = " + builder.getId();
+			  " AND member_type_id = " + mt.getId();
 		if(dbCon.stmt.executeUpdate(sql) == 0){
 			throw new BusinessException(MemberError.MEMBER_TYPE_NOT_EXIST);
 		}
 		
 		if(builder.isDiscountChanged() || builder.isDefaultDiscountChanged()){
-			sql = " DELETE FROM " + Params.dbName + ".member_type_discount WHERE member_type_id = " + builder.getId();
+			sql = " DELETE FROM " + Params.dbName + ".member_type_discount WHERE member_type_id = " + mt.getId();
 			dbCon.stmt.executeUpdate(sql); 
 			
 			//Insert the discounts associated with this member type.
-			for(Discount discount : builder.getDiscounts()){
+			for(Discount discount : mt.getDiscounts()){
 				sql = " INSERT INTO " + Params.dbName + ".member_type_discount" +
 					  " (`member_type_id`, `discount_id`, `type`) " +
 					  " VALUES (" +
-					  builder.getId() + "," +
+					  mt.getId() + "," +
 					  discount.getId() + "," +
 					  MemberType.DiscountType.NORMAL.getVal() +
 					  ")";
@@ -207,8 +211,8 @@ public class MemberTypeDao {
 			//Update the default discount.
 			sql = " UPDATE " + Params.dbName + ".member_type_discount" +
 				  " SET type = " + MemberType.DiscountType.DEFAULT.getVal() +
-				  " WHERE member_type_id = " + builder.getId() +
-				  " AND discount_id = " + builder.getDefaultDiscount().getId();
+				  " WHERE member_type_id = " + mt.getId() +
+				  " AND discount_id = " + mt.getDefaultDiscount().getId();
 			dbCon.stmt.executeUpdate(sql);
 		}
 	}
@@ -260,7 +264,7 @@ public class MemberTypeDao {
 		List<MemberType> result = new ArrayList<MemberType>();
 		String sql;
 		sql = " SELECT " +
-			  " member_type_id, restaurant_id, exchange_rate, charge_rate, name, attribute, initial_point, type " +
+			  " member_type_id, restaurant_id, exchange_rate, charge_rate, name, attribute, initial_point, type, `desc` " +
 			  " FROM " + Params.dbName + ".member_type MT " +
 			  " WHERE 1 = 1 " +
 			  " AND MT.restaurant_id = " + staff.getRestaurantId() +
@@ -277,7 +281,7 @@ public class MemberTypeDao {
 			mt.setExchangeRate(dbCon.rs.getFloat("exchange_rate"));
 			mt.setAttribute(dbCon.rs.getInt("attribute"));
 			mt.setInitialPoint(dbCon.rs.getInt("initial_point"));
-			
+			mt.setDesc(dbCon.rs.getString("desc"));
 			result.add(mt);
 		}
 		dbCon.rs.close();

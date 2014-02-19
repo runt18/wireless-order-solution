@@ -42,6 +42,7 @@ public class TestMemberTypeDao {
 		assertEquals("member type charge rate", expected.getChargeRate(), actual.getChargeRate(), 0.01);
 		assertEquals("member type exchange rate", expected.getExchangeRate(), actual.getExchangeRate(), 0.01);
 		assertEquals("member type initial point", expected.getInitialPoint(), actual.getInitialPoint());
+		assertEquals("member type desc", expected.getDesc(), actual.getDesc());
 		assertEquals("member type default discount", expected.getDefaultDiscount(), actual.getDefaultDiscount());
 		assertEquals("member type associated discounts", SortedList.newInstance(expected.getDiscounts()), SortedList.newInstance(actual.getDiscounts()));
 	}
@@ -57,6 +58,7 @@ public class TestMemberTypeDao {
 															 .setAttribute(Attribute.POINT)
 															 .setInitialPoint(100)
 															 .setExchangeRate(1.1f)
+															 .setDesc("测试描述")
 															 .addDiscount(discounts.get(1));
 			
 			MemberType expected = builder.build();
@@ -73,31 +75,12 @@ public class TestMemberTypeDao {
 																   .setChargeRate(1.2f)
 																   .setInitialPoint(101)
 																   .setExchangeRate(0.4f)
+																   .setDesc("修改描述")
 																   .setDefaultDiscount(discounts.get(1))
 																   .addDiscount(discounts.get(0));
-			if(updateBuilder.isNameChanged()){
-				expected.setName(updateBuilder.getName());
-			}
-			if(updateBuilder.isAttributeChanged()){
-				expected.setAttribute(updateBuilder.getAttribute());
-			}
-			if(updateBuilder.isChargeRateChanged()){
-				expected.setChargeRate(updateBuilder.getChargeRate());
-			}
-			if(updateBuilder.isInitialPointChanged()){
-				expected.setInitialPoint(updateBuilder.getInitialPoint());
-			}
-			if(updateBuilder.isExchangRateChanged()){
-				expected.setExchangeRate(updateBuilder.getExchangeRate());
-			}
-			if(updateBuilder.isDiscountChanged()){
-				expected.setDiscounts(updateBuilder.getDiscounts());
-			}
-			if(updateBuilder.isDefaultDiscountChanged()){
-				expected.setDefaultDiscount(updateBuilder.getDefaultDiscount());
-			}
 			MemberTypeDao.update(mStaff, updateBuilder);
 			
+			expected = updateBuilder.build();
 			actual = MemberTypeDao.getMemberTypeById(mStaff, memberTypeId);
 			compare(expected, actual);
 						

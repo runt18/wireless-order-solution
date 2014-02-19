@@ -27,9 +27,10 @@ public class CouponDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 * @throws BusinessException 
-	 * 			throws if either case below<br>
-	 * 			<li>the coupon type does NOT exist<br>
-	 * 			<li>the member does NOT exist<br>
+	 * 			throws if any cases below
+	 * 			<li>the coupon type does NOT exist
+	 * 			<li>the coupon type has expired
+	 * 			<li>the member does NOT exist
 	 */
 	public static int insert(Staff staff, Coupon.InsertBuilder builder) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
@@ -52,24 +53,21 @@ public class CouponDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 * @throws BusinessException 
-	 * 			throws if either case below<br>
-	 * 			<li>the coupon type does NOT exist<br>
-	 * 			<li>the member does NOT exist<br>
+	 * 			throws if any cases below
+	 * 			<li>the coupon type does NOT exist
+	 * 			<li>the coupon type has expired
+	 * 			<li>the member does NOT exist
 	 */
 	public static int insert(DBCon dbCon, Staff staff, Coupon.InsertBuilder builder) throws SQLException, BusinessException{
 		String sql;
 
 		Coupon coupon = builder.build();
 
-		//Check to see whether the coupon type exist.
-		sql = " SELECT COUNT(*) FROM " + Params.dbName + ".coupon_type WHERE coupon_type_id = " + coupon.getCouponType().getId();
-		dbCon.rs = dbCon.stmt.executeQuery(sql);
-		if(dbCon.rs.next()){
-			if(dbCon.rs.getInt(1) == 0){
-				throw new BusinessException(MemberError.COUPON_TYPE_NOT_EXIST);
-			}
+		//Check to see whether the coupon type exist or expired.
+		coupon.getCouponType().copyFrom(CouponTypeDao.getById(dbCon, staff, coupon.getCouponType().getId()));
+		if(coupon.isExpired()){
+			throw new BusinessException(MemberError.COUPON_EXPIRED);
 		}
-		dbCon.rs.close();
 		
 		//Check to see whether the member exist.
 		sql = " SELECT COUNT(*) FROM " + Params.dbName + ".member WHERE member_id = " + coupon.getMember().getId();
