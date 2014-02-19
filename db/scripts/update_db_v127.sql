@@ -357,4 +357,17 @@ WHERE DP.kitchen_id = K.kitchen_id AND K.type = 1;
 ALTER TABLE `wireless_order_db`.`stock_take` 
 CHANGE COLUMN `material_cate_id` `material_cate_id` INT NULL DEFAULT NULL ;
 
+-- -----------------------------------------------------
+-- Add the field 'desc' to table 'member_type'
+-- -----------------------------------------------------
+ALTER TABLE `wireless_order_db`.`member_type` 
+ADD COLUMN `desc` VARCHAR(300) NULL DEFAULT NULL AFTER `type`;
+
+-- -----------------------------------------------------
+-- Add the field 'comment' to table 'coupon_type'
+-- -----------------------------------------------------
+ALTER TABLE `wireless_order_db`.`coupon_type` 
+ADD COLUMN `comment` VARCHAR(100) NULL DEFAULT NULL AFTER `expired`;
+
+
 SET SQL_SAFE_UPDATES = @OLD_SAFE_UPDATES;
