@@ -341,6 +341,9 @@ public class ShiftDetail implements Jsonable{
 	}
 
 	public IncomeByCharge getIncomeByCharge(){
+		if(this.incomeByCharge == null){
+			return IncomeByCharge.DUMMY;
+		}
 		return this.incomeByCharge;
 	}
 	
@@ -426,6 +429,8 @@ public class ShiftDetail implements Jsonable{
 		jm.put("creditCardIncome", this.getCreditTotalIncome());
 		jm.put("cashIncome", this.getCashTotalIncome());
 		jm.put("memberIncome", this.getMemberTotalIncome());
+		jm.put("totalMemberCharge", this.getIncomeByCharge().getTotalActualCharge());
+		jm.put("totalMemberRefund", this.getIncomeByCharge().getTotalActualRefund());
 		return Collections.unmodifiableMap(jm);
 	}
 
