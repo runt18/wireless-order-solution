@@ -216,6 +216,8 @@ public class IncomeByEachDay implements Jsonable{
 			jm.put("creditCardIncome", this.incomeByPay == null ? 0 : this.incomeByPay.getCreditCardIncome());
 			jm.put("cashIncome", this.incomeByPay == null ? 0 : this.incomeByPay.getCashIncome());
 			jm.put("memberIncome", this.incomeByPay == null ? 0 : this.incomeByPay.getMemberCardIncome());
+			jm.put("totalActualCharge", this.getIncomeByCharge().getTotalActualCharge());
+			jm.put("totalActualRefund", this.getIncomeByCharge().getTotalActualRefund());
 //		}
 		return Collections.unmodifiableMap(jm);
 	}
