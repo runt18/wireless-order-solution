@@ -255,10 +255,11 @@ public class Coupon implements Jsonable{
 		jm.put("restaurantId", this.restaurantId);
 		jm.put("couponType", this.couponType);
 		jm.put("orderId", this.orderId == 0 ? "----" : this.orderId);
-		jm.put("orderDate", DateUtil.formatToDate(this.getBirthDate()));
+		jm.put("orderDate", DateUtil.formatToDate(this.getOrderDate()));
 		jm.put("statusText", this.status.desc);
 		jm.put("statusValue", this.status.val);
-		
+		jm.put("createStaff", this.getCreateStaff());
+		jm.put("birthDate", DateUtil.formatToDate(this.getBirthDate()));
 		return Collections.unmodifiableMap(jm);
 	}
 

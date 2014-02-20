@@ -429,8 +429,11 @@ public class ShiftDetail implements Jsonable{
 		jm.put("creditCardIncome", this.getCreditTotalIncome());
 		jm.put("cashIncome", this.getCashTotalIncome());
 		jm.put("memberIncome", this.getMemberTotalIncome());
-		jm.put("totalMemberCharge", this.getIncomeByCharge().getTotalActualCharge());
-		jm.put("totalMemberRefund", this.getIncomeByCharge().getTotalActualRefund());
+		jm.put("memberChargeByCash", this.getIncomeByCharge().getActualCashCharge());
+		jm.put("memberChargeByCard", this.getIncomeByCharge().getActualCreditCardCharge());
+		jm.put("memberAccountCharge", this.getIncomeByCharge().getTotalAccountCharge());
+		jm.put("memberRefund", this.getIncomeByCharge().getTotalActualRefund());
+		jm.put("memberAccountRefund", this.getIncomeByCharge().getTotalAccountRefund());
 		return Collections.unmodifiableMap(jm);
 	}
 
