@@ -522,6 +522,11 @@
 			type="com.wireless.Actions.weixin.operate.WXOperateOrderAction"
 			scope="request" parameter="dataSource">
 		</action>
+		<action path="/WXQueryMemberOperation"
+			type="com.wireless.Actions.weixin.query.WXQueryMemberOperationAction"
+			scope="request" parameter="dataSource">
+		</action>
+		
 		<action path="/QueryCommissionStatistics" type="com.wireless.Actions.dishesOrder.QueryCommissionStatisticsAction"
 			scope="request">
 		</action>
