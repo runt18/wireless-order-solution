@@ -93,6 +93,7 @@ public class Coupon implements Jsonable{
 	private int restaurantId;
 	private CouponType couponType;
 	private long birthDate;
+	private String createStaff;
 	private Member member;
 	private int orderId;
 	private long orderDate;
@@ -170,6 +171,17 @@ public class Coupon implements Jsonable{
 		this.orderDate = orderDate;
 	}
 
+	public String getCreateStaff(){
+		if(this.createStaff == null){
+			return "";
+		}
+		return this.createStaff;
+	}
+	
+	public void setCreateStaff(String createStaff){
+		this.createStaff = createStaff;
+	}
+	
 	public Status getStatus() {
 		return status;
 	}
