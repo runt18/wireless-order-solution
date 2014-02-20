@@ -59,6 +59,10 @@ var receivablesStatResultStore = new Ext.data.Store({
 		name : "totalIncome"
 	}, {
 		name : "totalActual"
+	}, {
+		name : "totalActualCharge"
+	}, {
+		name : "totalActualRefund"
 	}]),
 	listeners : {
 		load : function(thiz, rs, options){
@@ -194,6 +198,18 @@ var receivablesStatResultColumnModel = new Ext.grid.ColumnModel([
 		renderer : Ext.ux.txtFormat.gridDou,
 		align : 'right',
 		width : 70
+	}, {
+		header : '会员充值',
+		dataIndex : 'totalActualCharge',
+		renderer : Ext.ux.txtFormat.gridDou,
+		align : 'right',
+		width : 90
+	}, {
+		header : '会员退款',
+		dataIndex : 'totalActualRefund',
+		renderer : Ext.ux.txtFormat.gridDou,
+		align : 'right',
+		width : 90
 	}
 ]);
 
@@ -211,9 +227,9 @@ var receivablesStatResultGrid = new Ext.grid.GridPanel({
 	sm : new Ext.grid.RowSelectionModel({
 		singleSelect : true
 	}),
-	viewConfig : {
+/*	viewConfig : {
 		forceFit : true
-	},
+	},*/
 	tbar : [{
 		xtype : 'tbtext',
 		text : '日期:&nbsp;'
@@ -342,13 +358,14 @@ var receivablesStatResultSummaryPanel = new Ext.Panel({
 		layout : 'column',
 		height : Ext.isIE ? 70 : 80 ,
 		defaults : {
-			columnWidth : .061,
+			columnWidth : .085,
 			defaults : {
 				xtype : 'panel',
 				html : '----'
 			}
 		},
 		items : [{
+			columnWidth : .061,
 			items : [{
 				style : 'color:#15428B;margin-left:7px;',
 				html : '开始时间:'
@@ -365,6 +382,7 @@ var receivablesStatResultSummaryPanel = new Ext.Panel({
 				html : '实收总额:'
 			}]
 		}, {
+			columnWidth : .035,
 			items : [{
 				style : 'text-align:right;',
 				id : 'panelOfReceivablesStatSumTotalPrice',
@@ -376,6 +394,7 @@ var receivablesStatResultSummaryPanel = new Ext.Panel({
 				html : '现金单总额:'
 			}]
 		}, {
+			columnWidth : .035,
 			items : [{
 				style : 'text-align:right;',
 				id : 'panelOfReceivablesStatSumCashIncome',
@@ -387,6 +406,7 @@ var receivablesStatResultSummaryPanel = new Ext.Panel({
 				html : '刷卡单总额:'
 			}]
 		}, {
+			columnWidth : .035,
 			items : [{
 				style : 'text-align:right;',
 				id : 'panelOfReceivablesStatSumCreditCardIncome',
@@ -398,6 +418,7 @@ var receivablesStatResultSummaryPanel = new Ext.Panel({
 				html : '会员单总额:'
 			}]
 		}, {
+			columnWidth : .035,
 			items : [{
 				style : 'text-align:right;',
 				id : 'panelOfReceivablesStatSumMemberActual',
@@ -409,6 +430,7 @@ var receivablesStatResultSummaryPanel = new Ext.Panel({
 				html : '挂账单总额:'
 			}]
 		}, {
+			columnWidth : .035,
 			items : [{
 				style : 'text-align:right;',
 				id : 'panelOfReceivablesStatSumHangIncome',
@@ -420,6 +442,7 @@ var receivablesStatResultSummaryPanel = new Ext.Panel({
 				html : '签单单总额:'
 			}]
 		}, {
+			columnWidth : .035,
 			items : [{
 				style : 'text-align:right;',
 				id : 'panelOfReceivablesStatSumSignIncome',
@@ -432,6 +455,7 @@ var receivablesStatResultSummaryPanel = new Ext.Panel({
 				html : '优惠劵总额:'
 			}]
 		}, {
+			columnWidth : .035,
 			items : [{
 				style : 'text-align:right;',
 				id : 'panelOfReceivablesStatSumCouponIncome',
@@ -445,6 +469,7 @@ var receivablesStatResultSummaryPanel = new Ext.Panel({
 		}, 
 		//***********
 		{
+			columnWidth : .061,
 			items : [{
 				style : 'color:#15428B;margin-left:7px;',
 				html : '结束时间:'
@@ -461,6 +486,7 @@ var receivablesStatResultSummaryPanel = new Ext.Panel({
 				html : '账单总数:'
 			}]
 		}, {
+			columnWidth : .035,
 			items : [{
 				id : 'panelOfReceivablesStatSumOrderAmount',
 				style : 'text-align:right;',
@@ -472,6 +498,7 @@ var receivablesStatResultSummaryPanel = new Ext.Panel({
 				html : '现金单总数:'
 			}]
 		}, {
+			columnWidth : .035,
 			items : [{
 				style : 'text-align:right;',
 				id : 'panelOfReceivablesStatSumCashAmount',
@@ -483,6 +510,7 @@ var receivablesStatResultSummaryPanel = new Ext.Panel({
 				html : '刷卡单总数:'
 			}]
 		}, {
+			columnWidth : .035,
 			items : [{
 				style : 'text-align:right;',
 				id : 'panelOfReceivablesStatSumCreditCardAmount',
@@ -494,6 +522,7 @@ var receivablesStatResultSummaryPanel = new Ext.Panel({
 				html : '会员单总数:'
 			}]
 		}, {
+			columnWidth : .035,
 			items : [{
 				style : 'text-align:right;',
 				id : 'panelOfReceivablesStatSumMemberAmount',
@@ -505,6 +534,7 @@ var receivablesStatResultSummaryPanel = new Ext.Panel({
 				html : '挂账单总数:'
 			}]
 		}, {
+			columnWidth : .035,
 			items : [{
 				style : 'text-align:right;',
 				id : 'panelOfReceivablesStatSumHangAmount',
@@ -516,6 +546,7 @@ var receivablesStatResultSummaryPanel = new Ext.Panel({
 				html : '签单单总数:'
 			}]
 		}, {
+			columnWidth : .035,
 			items : [{
 				style : 'text-align:right;',
 				id : 'panelOfReceivablesStatSumSignAmount',
@@ -527,6 +558,7 @@ var receivablesStatResultSummaryPanel = new Ext.Panel({
 				html : '优惠劵单数:'
 			}]
 		}, {
+			columnWidth : .035,
 			items : [{
 				style : 'text-align:right;',
 				id : 'panelOfReceivablesStatSumCouponAmount',

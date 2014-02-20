@@ -1,4 +1,18 @@
 Ext.onReady(function(){
+	var memberTitle = '<tr>' 
+					+ '<th class="table_title text_center">会员操作</th>'
+			 		+ '<th class="table_title text_center">金额</th>'
+			 		+ '<th></th>'
+			 		+ '<th></th>'
+			 		+ '</tr>';
+	var memberTrModel = '<tr>'
+					+ '<th>会员充值</th>'
+					+ '<td class="text_right">{0}</td>'
+					+ '</tr>'
+					+ '<tr>'
+					+ '<th>会员退款</th>'
+					+ '<td class="text_right">{1}</td>'
+					+ '</tr>';
 	var title = '<tr>'
 			  + '<th class="table_title text_center">部门汇总</th>'
 			  + '<th class="table_title text_center">折扣总额</th>'
@@ -74,8 +88,10 @@ Ext.onReady(function(){
 			id : 'businessStatisticsSummaryInformationCenterPanel',
 			listeners : {
 				render : function(thiz){
+					var memberTrEmpty = String.format(memberTrModel, '----', '----');
 					var empty = String.format(trModel, '---', '---', '---', '---');
-					var table = String.format('<table border="1" class="tb_base">{0}{1}</table>', title, empty);
+					var table = String.format('<table border="1" class="tb_base">{0}{1}</table><br><table border="1" class="tb_base">{2}{3}</table>', 
+												memberTitle, memberTrEmpty, title, empty);
 					thiz.body.update(table);
 				}
 			}
@@ -143,7 +159,10 @@ Ext.onReady(function(){
 										)
 									);
 								}
-								var table = String.format('<table border="1" class="tb_base">{0}{1}</table>', title, trContent);
+								
+								var memberTrDate = String.format(memberTrModel, business.totalMemberCharge.toFixed(2), business.totalMemberRefund.toFixed(2));
+								var table = String.format('<table border="1" class="tb_base">{0}{1}</table><br><table border="1" class="tb_base">{2}{3}</table>', 
+														memberTitle, memberTrDate, title, trContent);
 								Ext.getCmp('businessStatisticsSummaryInformationCenterPanel').body.update(table);
 								
 								if(dutyRange == "range"){

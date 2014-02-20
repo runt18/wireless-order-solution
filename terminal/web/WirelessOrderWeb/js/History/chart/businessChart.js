@@ -30,7 +30,7 @@ function each(x){
 		title : '营业统计 -- <font style="color:green;">历史</font>',
 		id : 'businessDetailWin',
 		width : 885,
-		height : 555,
+		height : 580,
 		closable : false,
 		modal : true,
 		resizable : false,	
