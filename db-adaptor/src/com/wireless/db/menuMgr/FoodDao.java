@@ -277,7 +277,7 @@ public class FoodDao {
 		Food f = builder.build();
 		
 		//Check to see whether the alias is duplicated.
-		if(builder.isAliasChanged()){
+		if(builder.isAliasChanged() && f.getAliasId() != 0){
 			if(isAliasDuplicated(dbCon, staff, f)){
 				throw new BusinessException(FoodError.DUPLICATED_FOOD_ALIAS);
 			}
