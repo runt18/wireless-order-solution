@@ -40,6 +40,7 @@ public class UpdateMenuAction extends Action {
 			String isCommission = request.getParameter("isCommission");
 			String commission = request.getParameter("commission");
 			String stockStatus = request.getParameter("stockStatus");
+			String foodAliasId = request.getParameter("foodAliasID");
 			
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
@@ -56,6 +57,13 @@ public class UpdateMenuAction extends Action {
 												 .setCurPrice(Boolean.parseBoolean(isCurrPrice))
 												 .setHot(Boolean.parseBoolean(isHot))
 												 .setWeigh(Boolean.parseBoolean(isWeight));
+			
+			if(!foodAliasId.isEmpty()){
+				builder.setAliasId(Integer.parseInt(foodAliasId));
+			}else{
+				builder.setAliasId(0);
+			}
+			
 			if(Boolean.parseBoolean(isCommission)){
 				builder.setCommission(Float.parseFloat(commission));
 			}
