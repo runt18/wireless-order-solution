@@ -717,9 +717,11 @@ public class HistoryStatisticsAction extends DispatchAction{
 		sheet.setColumnWidth(11, 3000);
 		sheet.setColumnWidth(12, 3000);
 		sheet.setColumnWidth(13, 3000);
+		sheet.setColumnWidth(14, 3000);
+		sheet.setColumnWidth(15, 3000);
 		
 		// 报表头
-		sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, 12));
+		sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, 16));
 		// 冻结行
 		sheet.createFreezePane(0, 5, 0, 5);
 		
@@ -734,18 +736,18 @@ public class HistoryStatisticsAction extends DispatchAction{
 		row.setHeight((short) 350);
 		cell = row.createCell(0);
 		cell.setCellValue("统计时间: " + onDuty + " 至 " + offDuty);
-		sheet.addMergedRegion(new CellRangeAddress(sheet.getLastRowNum(), sheet.getLastRowNum(), 0, 12));
+		sheet.addMergedRegion(new CellRangeAddress(sheet.getLastRowNum(), sheet.getLastRowNum(), 0, 16));
 		
 		// 导出操作相关信息
 		row = sheet.createRow(sheet.getLastRowNum() + 1);
 		row.setHeight((short) 350);
 		cell = row.createCell(0);
 		cell.setCellValue("导出时间: " + DateUtil.format(new Date()) + "     操作人:  " +staff.getName());
-		sheet.addMergedRegion(new CellRangeAddress(sheet.getLastRowNum(), sheet.getLastRowNum(), 0, 12));
+		sheet.addMergedRegion(new CellRangeAddress(sheet.getLastRowNum(), sheet.getLastRowNum(), 0, 16));
 		
 		row = sheet.createRow(sheet.getLastRowNum() + 1);
 		row.setHeight((short) 350);
-		sheet.addMergedRegion(new CellRangeAddress(sheet.getLastRowNum(), sheet.getLastRowNum(), 0, 12));
+		sheet.addMergedRegion(new CellRangeAddress(sheet.getLastRowNum(), sheet.getLastRowNum(), 0, 16));
 		
 		// 列表头
 		row = sheet.createRow(sheet.getLastRowNum() + 1);
@@ -804,6 +806,18 @@ public class HistoryStatisticsAction extends DispatchAction{
 		
 		cell = row.createCell(row.getLastCellNum());
 		cell.setCellValue("反结账");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell(row.getLastCellNum());
+		cell.setCellValue("优惠劵");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell(row.getLastCellNum());
+		cell.setCellValue("会员充值");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell(row.getLastCellNum());
+		cell.setCellValue("会员退款");
 		cell.setCellStyle(headerStyle);
 		
 		if(incomesByEachDay != null && incomesByEachDay.size() > 0){
@@ -872,6 +886,18 @@ public class HistoryStatisticsAction extends DispatchAction{
 				
 				cell = row.createCell(row.getLastCellNum());
 				cell.setCellValue(item.getIncomeByRepaid().getTotalRepaid());
+				cell.setCellStyle(numStyle);
+				
+				cell = row.createCell(row.getLastCellNum());
+				cell.setCellValue(item.getIncomeByCoupon().getTotalCoupon());
+				cell.setCellStyle(numStyle);
+				
+				cell = row.createCell(row.getLastCellNum());
+				cell.setCellValue(item.getIncomeByCharge().getTotalActualCharge());
+				cell.setCellStyle(numStyle);
+				
+				cell = row.createCell(row.getLastCellNum());
+				cell.setCellValue(item.getIncomeByCharge().getTotalActualRefund());
 				cell.setCellStyle(numStyle);
 				
 //				sum.setCashAmount(sum.getCashAmount() + item.getCashAmount());
@@ -1227,6 +1253,21 @@ public class HistoryStatisticsAction extends DispatchAction{
 		cell.setCellValue(business.getPaidIncome());
 		cell.setCellStyle(numStyle);
 		
+		// 优惠劵
+		row = sheet.createRow(sheet.getLastRowNum() + 1);
+		row.setHeight((short) 350);
+		
+		cell = row.createCell(0);
+		cell.setCellValue("优惠劵");
+		cell.setCellStyle(strStyle);
+		
+		cell = row.createCell(row.getLastCellNum());
+		cell.setCellValue(business.getCouponAmount());
+		
+		cell = row.createCell(row.getLastCellNum());
+		cell.setCellValue(business.getCouponIncome());
+		cell.setCellStyle(numStyle);
+		
 		// 服务费收入
 		row = sheet.createRow(sheet.getLastRowNum() + 1);
 		row.setHeight((short) 350);
@@ -1240,6 +1281,47 @@ public class HistoryStatisticsAction extends DispatchAction{
 		
 		cell = row.createCell(row.getLastCellNum());
 		cell.setCellValue(business.getServiceIncome());
+		cell.setCellStyle(numStyle);
+		
+		row = sheet.createRow(sheet.getLastRowNum() + 1);
+		row.setHeight((short) 350);
+		sheet.addMergedRegion(new CellRangeAddress(sheet.getLastRowNum(), sheet.getLastRowNum(), 0, 3));
+		
+		// ***** 会员充值退款
+		row = sheet.createRow(sheet.getLastRowNum() + 1);
+		row.setHeight((short) 350);
+		
+		cell = row.createCell(0);
+		cell.setCellValue("会员操作");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell(row.getLastCellNum());
+		cell.setCellValue("金额");
+		cell.setCellStyle(headerStyle);
+		
+		
+		// 会员充值
+		row = sheet.createRow(sheet.getLastRowNum() + 1);
+		row.setHeight((short) 350);
+		
+		cell = row.createCell(0);
+		cell.setCellValue("会员充值");
+		cell.setCellStyle(strStyle);
+		
+		cell = row.createCell(row.getLastCellNum());
+		cell.setCellValue(business.getIncomeByCharge().getTotalActualCharge());
+		cell.setCellStyle(numStyle);
+		
+		// 会员退款
+		row = sheet.createRow(sheet.getLastRowNum() + 1);
+		row.setHeight((short) 350);
+		
+		cell = row.createCell(0);
+		cell.setCellValue("会员退款");
+		cell.setCellStyle(strStyle);
+		
+		cell = row.createCell(row.getLastCellNum());
+		cell.setCellValue(business.getIncomeByCharge().getTotalActualRefund());
 		cell.setCellStyle(numStyle);
 		
 		// *****
