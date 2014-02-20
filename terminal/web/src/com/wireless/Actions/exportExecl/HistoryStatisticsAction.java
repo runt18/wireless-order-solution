@@ -987,7 +987,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 		sheet.setColumnWidth(0, 3000);
 		sheet.setColumnWidth(1, 3500);
 		sheet.setColumnWidth(2, 3500);
-		sheet.setColumnWidth(3, 3500);
+		sheet.setColumnWidth(3, 4000);
 		sheet.setColumnWidth(4, 1000);
 		sheet.setColumnWidth(5, 3500);
 		sheet.setColumnWidth(6, 3500);
@@ -1296,7 +1296,15 @@ public class HistoryStatisticsAction extends DispatchAction{
 		cell.setCellStyle(headerStyle);
 		
 		cell = row.createCell(row.getLastCellNum());
-		cell.setCellValue("金额");
+		cell.setCellValue("现金");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell(row.getLastCellNum());
+		cell.setCellValue("刷卡");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell(row.getLastCellNum());
+		cell.setCellValue("账户实充/扣额");
 		cell.setCellStyle(headerStyle);
 		
 		
@@ -1309,7 +1317,15 @@ public class HistoryStatisticsAction extends DispatchAction{
 		cell.setCellStyle(strStyle);
 		
 		cell = row.createCell(row.getLastCellNum());
-		cell.setCellValue(business.getIncomeByCharge().getTotalActualCharge());
+		cell.setCellValue(business.getIncomeByCharge().getActualCashCharge());
+		cell.setCellStyle(numStyle);
+		
+		cell = row.createCell(row.getLastCellNum());
+		cell.setCellValue(business.getIncomeByCharge().getActualCreditCardCharge());
+		cell.setCellStyle(numStyle);
+		
+		cell = row.createCell(row.getLastCellNum());
+		cell.setCellValue(business.getIncomeByCharge().getTotalAccountCharge());
 		cell.setCellStyle(numStyle);
 		
 		// 会员退款
@@ -1322,6 +1338,14 @@ public class HistoryStatisticsAction extends DispatchAction{
 		
 		cell = row.createCell(row.getLastCellNum());
 		cell.setCellValue(business.getIncomeByCharge().getTotalActualRefund());
+		cell.setCellStyle(numStyle);
+		
+		cell = row.createCell(row.getLastCellNum());
+		cell.setCellValue(0.00);
+		cell.setCellStyle(numStyle);
+		
+		cell = row.createCell(row.getLastCellNum());
+		cell.setCellValue(business.getIncomeByCharge().getTotalAccountRefund());
 		cell.setCellStyle(numStyle);
 		
 		// *****
