@@ -369,5 +369,10 @@ ADD COLUMN `desc` VARCHAR(300) NULL DEFAULT NULL AFTER `type`;
 ALTER TABLE `wireless_order_db`.`coupon_type` 
 ADD COLUMN `comment` VARCHAR(100) NULL DEFAULT NULL AFTER `expired`;
 
+-- -----------------------------------------------------
+-- Add the field 'create_staff' to table 'coupon'
+-- -----------------------------------------------------
+ALTER TABLE `wireless_order_db`.`coupon` 
+ADD COLUMN `create_staff` VARCHAR(45) NULL AFTER `coupon_type_id`;
 
 SET SQL_SAFE_UPDATES = @OLD_SAFE_UPDATES;
