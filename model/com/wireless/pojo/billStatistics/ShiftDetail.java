@@ -70,7 +70,7 @@ public class ShiftDetail implements Jsonable{
 	
 	public float getCashTotalIncome() {
 		if(incomeByPay != null){
-			return incomeByPay.getTotalIncome();
+			return incomeByPay.getCashIncome();
 		}else{
 			return 0;
 		}
@@ -78,7 +78,7 @@ public class ShiftDetail implements Jsonable{
 	
 	public float getCashActualIncome() {
 		if(incomeByPay != null){
-			return incomeByPay.getTotalActual();
+			return incomeByPay.getCashActual();
 		}else{
 			return 0;
 		}
