@@ -10,6 +10,7 @@ import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.MemberError;
+import com.wireless.pojo.coupon.Coupon;
 import com.wireless.pojo.coupon.CouponType;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.DateUtil;
@@ -83,7 +84,12 @@ public class CouponTypeDao {
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
+			dbCon.conn.setAutoCommit(false);
 			update(dbCon, staff, builder);
+			dbCon.conn.commit();
+		}catch(Exception e){
+			dbCon.conn.rollback();
+			throw e;
 		}finally{
 			dbCon.disconnect();
 		}
@@ -105,6 +111,27 @@ public class CouponTypeDao {
 	public static void update(DBCon dbCon, Staff staff, CouponType.UpdateBuilder builder) throws BusinessException, SQLException{
 		CouponType type = builder.build();
 		String sql;
+		
+		if(builder.isExpiredChanged()){
+			if(type.isExpired()){
+				//Update the associated coupon from 'CREATED' to 'EXPIRED' 
+				sql = " UPDATE " + Params.dbName + ".coupon SET " +
+					  " status = " + Coupon.Status.EXPIRED.getVal() +
+					  " WHERE 1 = 1 " + 
+					  " AND coupon_type_id = " + type.getId() +
+					  " AND status = " + Coupon.Status.CREATED.getVal();
+				dbCon.stmt.executeUpdate(sql);
+			}else{
+				//Update the associated coupon from 'EXPIRED' to 'CREATED' 
+				sql = " UPDATE " + Params.dbName + ".coupon SET " +
+					  " status = " + Coupon.Status.CREATED.getVal() +
+					  " WHERE 1 = 1 " + 
+					  " AND coupon_type_id = " + type.getId() +
+					  " AND status = " + Coupon.Status.EXPIRED.getVal();
+				dbCon.stmt.executeUpdate(sql);
+			}
+		}
+		
 		sql = " UPDATE " + Params.dbName + ".coupon_type SET " +
 			  " coupon_type_id = " + type.getId() +
 			  (builder.isNameChanged() ? " ,name = '" + type.getName() + "'" : "") +

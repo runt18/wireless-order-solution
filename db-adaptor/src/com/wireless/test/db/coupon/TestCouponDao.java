@@ -54,8 +54,8 @@ public class TestCouponDao {
 			
 			//Insert a new coupon and assign to member1 & member2.
 			List<Member> members = MemberDao.getMember(mStaff, null, null);
-			Member m1 = members.get(3);
-			Member m2 = members.get(4);
+			Member m1 = members.get(0);
+			Member m2 = members.get(1);
 			CouponDao.insertAll(mStaff, new Coupon.InsertAllBuilder(couponTypeId)
 			  									  .addMemberId(m1.getId())
 			  									  .addMemberId(m2.getId()));
@@ -74,7 +74,8 @@ public class TestCouponDao {
 			Assert.assertEquals("member card : insert a coupon to member 1", m1.getMemberCard(), actualCoupon1.getMember().getMemberCard());
 			Assert.assertEquals("status : insert a coupon to member 1", Coupon.Status.CREATED, actualCoupon1.getStatus());
 			Assert.assertTrue("birth date : insert a coupon to member 1", System.currentTimeMillis() - actualCoupon1.getBirthDate() < 5000);
-
+			Assert.assertEquals("create staff : insert a coupon to member 1", mStaff.getName(), actualCoupon1.getCreateStaff());
+			
 			Assert.assertEquals("coupon amount by member after inserting one to member 2", 1, CouponDao.getByMember(mStaff, m2.getId()).size());
 			Coupon actualCoupon2 = CouponDao.getByMember(mStaff, m2.getId()).get(0);
 			Assert.assertEquals("coupon type : insert a coupon to member 2", couponTypeId, actualCoupon2.getCouponType().getId());
@@ -87,6 +88,7 @@ public class TestCouponDao {
 			Assert.assertEquals("member card : insert a coupon to member 2", m2.getMemberCard(), actualCoupon2.getMember().getMemberCard());
 			Assert.assertEquals("status : insert a coupon to member 2", Coupon.Status.CREATED, actualCoupon2.getStatus());
 			Assert.assertTrue("birth date : insert a coupon to member 2", System.currentTimeMillis() - actualCoupon2.getBirthDate() < 5000);
+			Assert.assertEquals("create staff : insert a coupon to member 2", mStaff.getName(), actualCoupon2.getCreateStaff());
 
 			//Insert another coupon to member 1.
 			CouponDao.insertAll(mStaff, new Coupon.InsertAllBuilder(couponTypeId)
@@ -106,7 +108,8 @@ public class TestCouponDao {
 			Assert.assertEquals("member card : insert another coupon to member 1", m1.getMemberCard(), actualCoupon1.getMember().getMemberCard());
 			Assert.assertEquals("status : insert another coupon to member 1", Coupon.Status.CREATED, actualCoupon1.getStatus());
 			Assert.assertTrue("birth date : insert another coupon to member 1", System.currentTimeMillis() - actualCoupon1.getBirthDate() < 5000);
-			
+			Assert.assertEquals("create staff : insert another coupon to member 1", mStaff.getName(), actualCoupon1.getCreateStaff());
+
 			//Update the coupon type.
 			CouponType.UpdateBuilder updateBuilder = new CouponType.UpdateBuilder(couponTypeId, "修改优惠券类型").setExpired(System.currentTimeMillis() / 1000 * 1000)
 																   .setComment("修改备注");

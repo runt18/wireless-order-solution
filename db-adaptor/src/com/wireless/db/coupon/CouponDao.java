@@ -81,10 +81,11 @@ public class CouponDao {
 		
 		//Insert a new coupon.
 		sql = " INSERT INTO " + Params.dbName + ".coupon " +
-			  "(`restaurant_id`, `coupon_type_id`, `birth_date`, `member_id`) VALUES(" +
+			  "(`restaurant_id`, `coupon_type_id`, `birth_date`, `create_staff`, `member_id`) VALUES(" +
 			  staff.getRestaurantId() + "," +
 			  coupon.getCouponType().getId() + "," +
 			  " NOW(), " +
+			  "'" + staff.getName() + "'," +
 			  coupon.getMember().getId() +
 			  ")";
 		dbCon.stmt.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
@@ -466,7 +467,7 @@ public class CouponDao {
 		List<Coupon> result = new ArrayList<Coupon>();
 		String sql;
 		sql = " SELECT " +
-			  " C.coupon_id, C.restaurant_id, C.coupon_type_id, C.birth_date, C.member_id, C.order_id, C.order_date, C.status, " +
+			  " C.coupon_id, C.restaurant_id, C.coupon_type_id, C.birth_date, C.create_staff, C.member_id, C.order_id, C.order_date, C.status, " +
 			  " CT.name, CT.price, CT.expired, " +
 			  " M.name AS member_name, M.mobile, M.member_card " +
 			  " FROM " + Params.dbName + ".coupon C " +
@@ -487,6 +488,7 @@ public class CouponDao {
 			ct.setExpired(dbCon.rs.getTimestamp("expired").getTime());
 			coupon.setCouponType(ct);
 			coupon.setBirthDate(dbCon.rs.getTimestamp("birth_date").getTime());
+			coupon.setCreateStaff(dbCon.rs.getString("create_staff"));
 			Member m = new Member(dbCon.rs.getInt("member_id"));
 			m.setName(dbCon.rs.getString("member_name"));
 			m.setMobile(dbCon.rs.getString("mobile"));
