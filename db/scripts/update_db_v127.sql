@@ -375,4 +375,11 @@ ADD COLUMN `comment` VARCHAR(100) NULL DEFAULT NULL AFTER `expired`;
 ALTER TABLE `wireless_order_db`.`coupon` 
 ADD COLUMN `create_staff` VARCHAR(45) NULL AFTER `coupon_type_id`;
 
+-- -----------------------------------------------------
+-- Add the field 'weixin_logo' to table 'restaurant'
+-- -----------------------------------------------------
+ALTER TABLE `wireless_order_db`.`restaurant` 
+ADD COLUMN `weixin_logo` TEXT NULL DEFAULT NULL AFTER `weixin_info`;
+
+
 SET SQL_SAFE_UPDATES = @OLD_SAFE_UPDATES;
