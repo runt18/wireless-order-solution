@@ -510,6 +510,7 @@ public class MemberType implements Jsonable, Parcelable{
 		jm.put("exchangeRate", this.exchangeRate);
 		jm.put("chargeRate", this.chargeRate);
 		jm.put("initialPoint", this.initialPoint);
+		jm.put("desc", this.desc);
 //		if(this.discountType != null){
 //			jm.put("discountTypeText", this.discountType.getDesc());			
 //			jm.put("discountTypeValue", this.discountType.getVal());
