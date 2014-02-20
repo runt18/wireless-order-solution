@@ -613,6 +613,8 @@ Ext.onReady(function() {
 		    [true, false, true, true], 
 			['会员姓名', 'member.name'] , 
 			['会员号码', 'member.mobile'] , 
+			['发放人', 'createStaff'],
+			['发放时间', 'birthDate'],
 			['到期时间', 'couponType.expiredFormat'],
 			['状态', 'statusText'],
 			['账单号', 'orderId',,'center', 'linkOrderId']

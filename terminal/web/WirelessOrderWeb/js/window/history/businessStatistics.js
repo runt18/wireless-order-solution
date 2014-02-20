@@ -1,17 +1,21 @@
 Ext.onReady(function(){
 	var memberTitle = '<tr>' 
 					+ '<th class="table_title text_center">会员操作</th>'
-			 		+ '<th class="table_title text_center">金额</th>'
-			 		+ '<th></th>'
-			 		+ '<th></th>'
+			 		+ '<th class="table_title text_center">现金</th>'
+			 		+ '<th class="table_title text_center">刷卡</th>'
+			 		+ '<th class="table_title text_center">账户实充/扣额</th>'
 			 		+ '</tr>';
 	var memberTrModel = '<tr>'
 					+ '<th>会员充值</th>'
 					+ '<td class="text_right">{0}</td>'
+					+ '<td class="text_right">{1}</td>'
+					+ '<td class="text_right">{2}</td>'
 					+ '</tr>'
 					+ '<tr>'
 					+ '<th>会员退款</th>'
-					+ '<td class="text_right">{1}</td>'
+					+ '<td class="text_right">{3}</td>'
+					+ '<td class="text_right">{4}</td>'
+					+ '<td class="text_right">{5}</td>'
 					+ '</tr>';
 	var title = '<tr>'
 			  + '<th class="table_title text_center">部门汇总</th>'
@@ -88,7 +92,7 @@ Ext.onReady(function(){
 			id : 'businessStatisticsSummaryInformationCenterPanel',
 			listeners : {
 				render : function(thiz){
-					var memberTrEmpty = String.format(memberTrModel, '----', '----');
+					var memberTrEmpty = String.format(memberTrModel, '----', '----', '----', '----', '----', '----');
 					var empty = String.format(trModel, '---', '---', '---', '---');
 					var table = String.format('<table border="1" class="tb_base">{0}{1}</table><br><table border="1" class="tb_base">{2}{3}</table>', 
 												memberTitle, memberTrEmpty, title, empty);
@@ -160,7 +164,8 @@ Ext.onReady(function(){
 									);
 								}
 								
-								var memberTrDate = String.format(memberTrModel, business.totalMemberCharge.toFixed(2), business.totalMemberRefund.toFixed(2));
+								var memberTrDate = String.format(memberTrModel, business.memberChargeByCash.toFixed(2), business.memberChargeByCard.toFixed(2), business.memberAccountCharge.toFixed(2),
+																business.memberRefund.toFixed(2), 0.00, business.memberAccountRefund.toFixed(2));
 								var table = String.format('<table border="1" class="tb_base">{0}{1}</table><br><table border="1" class="tb_base">{2}{3}</table>', 
 														memberTitle, memberTrDate, title, trContent);
 								Ext.getCmp('businessStatisticsSummaryInformationCenterPanel').body.update(table);
