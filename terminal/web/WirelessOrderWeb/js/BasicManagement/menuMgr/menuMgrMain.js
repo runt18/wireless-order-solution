@@ -1097,11 +1097,15 @@ var basicOperationPanel = new Ext.Panel({
 							}
 						},
 						focus : function(){
+							var numForAlias = Ext.getCmp('numBasicForFoodAliasID');
 							if(document.getElementById('chbForFoodAlias').checked){
-								var numForAlias = Ext.getCmp('numBasicForFoodAliasID');
+								
 								numForAlias.disable();
 								numForAlias.setValue();
 								numForAlias.clearInvalid();
+							}else{
+								numForAlias.enable();
+								numForAlias.focus(true, 100);
 							}
 						}
 		 	    	}
