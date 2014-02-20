@@ -424,6 +424,8 @@ function initTasteOperatorWin(){
 								if(tasteOperatorWin.otype.toLowerCase() == 'insert'){
 									var bToolBar = Ext.getCmp('taste_grid').getBottomToolbar();
 									bToolBar.onClick(bToolBar.last);
+								}else{
+									tasteGrid.getStore().reload();
 								}
 							}else{
 								Ext.ux.showMsg(jr);

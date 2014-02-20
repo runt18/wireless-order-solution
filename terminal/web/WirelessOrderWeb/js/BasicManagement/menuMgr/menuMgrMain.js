@@ -1045,7 +1045,7 @@ var basicOperationPanel = new Ext.Panel({
 		 	defaults : {
 		 		xtype : 'panel',
 		 		layout : 'form',
-		 		labelWidth : 35
+		 		labelWidth : 40
 		 	},
 		 	items : [{
 		 		columnWidth : 1,
@@ -1095,6 +1095,14 @@ var basicOperationPanel = new Ext.Panel({
 								numForAlias.setValue();
 								numForAlias.clearInvalid();
 							}
+						},
+						focus : function(){
+							if(document.getElementById('chbForFoodAlias').checked){
+								var numForAlias = Ext.getCmp('numBasicForFoodAliasID');
+								numForAlias.disable();
+								numForAlias.setValue();
+								numForAlias.clearInvalid();
+							}
 						}
 		 	    	}
 		 	    }]
@@ -1103,7 +1111,7 @@ var basicOperationPanel = new Ext.Panel({
 		 		items : [{
 		 			xtype : 'numberfield',
 		 	    	id : 'numBasicForFoodAliasID',
-		 	    	fieldLabel : '编号',
+		 	    	fieldLabel : '座记码',
 		 	    	maxValue : 65535,
 		 	    	minValue : 1,
 		 	    	width : 90,
@@ -2218,7 +2226,7 @@ function initMenuGrid(){
 	var menuColumnModel = new Ext.grid.ColumnModel([ 
 	    new Ext.grid.RowNumberer(), 
 	    {
-    		header : '编号',
+    		header : '座记码',
     		dataIndex : 'alias',
     		width : 65
     	}, {

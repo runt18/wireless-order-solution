@@ -222,9 +222,9 @@ Ext.onReady(function() {
 		    '',
 		    [
 			    [true, false, false, false], 
-			    ['菜名', 'displayFoodName', 230] , 
+			    ['菜名', 'displayFoodName', 220] , 
 			    ['口味', 'tasteGroup.tastePref', 130] , 
-			    ['口味价钱', 'tasteGroup.tastePrice', 70, 'right', 'Ext.ux.txtFormat.gridDou'],
+			    ['口味价钱', 'tasteGroup.tastePrice', 80, 'right', 'Ext.ux.txtFormat.gridDou'],
 			    ['数量', 'count', 70, 'right', 'Ext.ux.txtFormat.gridDou'],
 			    ['单价', 'unitPrice', 70, 'right', 'Ext.ux.txtFormat.gridDou'],
 			    ['折扣率', 'discount', 70, 'right', 'Ext.ux.txtFormat.gridDou'],
