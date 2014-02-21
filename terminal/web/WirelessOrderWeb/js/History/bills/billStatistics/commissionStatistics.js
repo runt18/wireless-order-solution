@@ -224,7 +224,7 @@ function commissionDetailInit(){
 					store.baseParams['beginDate'] = commission_beginDate.getValue().format('Y-m-d 00:00:00');
 					store.baseParams['endDate'] = commission_endDate.getValue().format('Y-m-d 23:59:59');
 					store.baseParams['staffId'] = commission_combo_staffs.getValue();
-					store.baseParams['deptId'] = e?e : "-1";
+					store.baseParams['deptId'] = !isNaN(e)?e : "-1";
 					store.load({
 						params : {
 							start : 0,
@@ -432,10 +432,11 @@ function commissionTotalInit(){
 					if(!commissionTotal_beginDate.isValid() || !commissionTotal_endDate.isValid()){
 						return;
 					}
+
 					var store = commissionTotalStatisticsGrid.getStore();
 					store.baseParams['beginDate'] = commissionTotal_beginDate.getValue().format('Y-m-d 00:00:00');
 					store.baseParams['endDate'] = commissionTotal_endDate.getValue().format('Y-m-d 23:59:59');
-					store.baseParams['deptId'] = e?e : "-1";
+					store.baseParams['deptId'] = !isNaN(e)?e : "-1";
 					store.load({
 						params : {
 							start : 0,
