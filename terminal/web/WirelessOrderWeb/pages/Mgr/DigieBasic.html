@@ -54,12 +54,13 @@ function addTab(id, title, url){
 	    	id : id,
 	        title: title,
 	        iconCls: 'tab_icon',
- 	        autoLoad : {
+/*  	        autoLoad : {
 	        	url : '../'+url,
 	        	scripts : true,
-	        	text: "Loading..."
+	        	//nocache: true,
+	        	scope: this
 
-	        }, 
+	        },  */
 	       // html: '<iframe scrolling="auto" frameborder="0" width="100%" height="100%" src="../' + url + '?'+ getDynamicKey("restaurantID=" + restaurantID) + '"></iframe>',
 	        closable:true,
 	        listeners : {
@@ -79,12 +80,21 @@ function addTab(id, title, url){
 	        		} 
  	        		tabIndex ++; 
 	        	}
+	        	//
+/* 	        	,activate:function(){
+	        	      this.getUpdater().refresh();
+	            } */
 	        }
 	    }); 
-	    tabs.add(tab);
-	    tabs.doLayout();
+	    tabs.add(tab).doLayout();
 	}
 	tabs.setActiveTab(tab);
+	tab.load({
+    	url : '../'+url,
+    	scripts : true,
+    	//nocache: true,
+    	scope: this
+	});
  	if(tabs.items.length > 9){
 		tabs.remove(tabs.getComponent(1));
 	} 
