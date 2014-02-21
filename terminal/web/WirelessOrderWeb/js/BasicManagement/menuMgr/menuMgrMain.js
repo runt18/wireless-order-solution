@@ -1115,7 +1115,7 @@ var basicOperationPanel = new Ext.Panel({
 		 		items : [{
 		 			xtype : 'numberfield',
 		 	    	id : 'numBasicForFoodAliasID',
-		 	    	fieldLabel : '座记码',
+		 	    	fieldLabel : '助记码',
 		 	    	maxValue : 65535,
 		 	    	minValue : 1,
 		 	    	width : 90,
@@ -2230,7 +2230,7 @@ function initMenuGrid(){
 	var menuColumnModel = new Ext.grid.ColumnModel([ 
 	    new Ext.grid.RowNumberer(), 
 	    {
-    		header : '座记码',
+    		header : '助记码',
     		dataIndex : 'alias',
     		width : 65
     	}, {
