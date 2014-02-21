@@ -17,6 +17,7 @@ import com.wireless.db.menuMgr.MenuDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.json.JObject;
 import com.wireless.json.Jsonable;
+import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.menuMgr.Kitchen.Type;
 import com.wireless.util.DataPaging;
 import com.wireless.util.WebParams;
@@ -35,10 +36,11 @@ public class QueryMenuAction extends DispatchAction {
 			 HttpServletRequest request, HttpServletResponse response) throws Exception {
 		response.setContentType("text/json;charset=utf-8");
 		JObject jobject = new JObject();
-		List<? extends Jsonable> root = null;
+		List<Food> root = null;
 		String isPaging = request.getParameter("isPaging");
 		String start = request.getParameter("start");
 		String limit = request.getParameter("limit");
+		String pinyin = request.getParameter("pinyin");
 		try {
 			String pin = (String)request.getAttribute("pin");
 			String cond = "";
@@ -49,6 +51,8 @@ public class QueryMenuAction extends DispatchAction {
 			String kitchenAlias = request.getParameter("kitchenAlias");
 			String foodName = request.getParameter("foodName");
 			String foodAlias = request.getParameter("foodAlias");
+			
+			
 			if(kitchenAlias != null && !kitchenAlias.trim().isEmpty() && !kitchenAlias.equals("-1")){
 				cond += (" AND FOOD.kitchen_id = " + kitchenAlias);
 			}
@@ -59,12 +63,22 @@ public class QueryMenuAction extends DispatchAction {
 				cond += (" AND FOOD.food_alias like '" + foodAlias.trim() + "%'");
 			}
 			root = FoodDao.getByCond(StaffDao.verify(Integer.parseInt(pin)), cond, orderBy);
-			
+
 		}catch(Exception e){
 			e.printStackTrace();
 			jobject.initTip(e);
 		}finally{
 			if(root != null){
+				List<Food> result = new ArrayList<Food>();
+				if(pinyin != null && !pinyin.trim().isEmpty()){
+					for (Food f : root) {
+						if(f.getPinyinShortcut().contains(pinyin)){
+							result.add(f);
+						}
+					}
+					root.clear();
+					root.addAll(result);
+				}
 				jobject.setTotalProperty(root.size());
 				jobject.setRoot(DataPaging.getPagingData(root, isPaging, start, limit));
 			}
