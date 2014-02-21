@@ -297,6 +297,9 @@ var allFoodTabPanelGridTbar = new Ext.Toolbar({
 				type : 1,
 				name : '菜名'
 			}, {
+				type : 2,
+				name : '拼音'
+			}, {
 				type : 3,
 				name : '编号'
 			}]
@@ -435,6 +438,7 @@ var allFoodTabPanelGridTbar = new Ext.Toolbar({
 			var gs = allFoodTabPanelGrid.getStore();
 			gs.baseParams['kitchenAlias'] = searchType == 0 ? searchValue : '';
 			gs.baseParams['foodName'] = searchType == 1 ? searchValue : '';
+			gs.baseParams['pinyin'] = searchType == 2 ? searchValue : '';
 			gs.baseParams['foodAlias'] = searchType == 3 ? searchValue : '';
 			
 			gs.load({
