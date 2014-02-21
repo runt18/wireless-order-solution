@@ -16,6 +16,7 @@ import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.json.JObject;
 import com.wireless.pojo.billStatistics.CommissionStatistics;
 import com.wireless.pojo.billStatistics.DutyRange;
+import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.util.DataPaging;
 import com.wireless.util.DateType;
@@ -52,6 +53,7 @@ public class QueryCommissionStatisticsAction extends Action{
 			if(!list.isEmpty()){
 				jobject.setTotalProperty(list.size());
 				CommissionStatistics total = new CommissionStatistics();
+				total.setDept(new Department(-1));
 				for (CommissionStatistics item : list) {
 					total.setTotalPrice(item.getTotalPrice() + total.getTotalPrice());
 					total.setCommission(item.getCommission() + total.getCommission());
