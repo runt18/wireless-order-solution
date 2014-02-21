@@ -18,6 +18,7 @@ import android.widget.TextView;
 import com.wireless.common.Params;
 import com.wireless.common.WirelessOrder;
 import com.wireless.exception.BusinessException;
+import com.wireless.lib.task.CheckVersionTask;
 import com.wireless.pojo.menuMgr.FoodMenu;
 import com.wireless.pojo.regionMgr.Region;
 import com.wireless.pojo.regionMgr.Table;
@@ -61,7 +62,17 @@ public class StartupActivity extends Activity {
 	protected void onStart() {
 		super.onStart();
 		if (isNetworkAvail()) {
-			new QueryStaffTask().execute();
+			new com.wireless.lib.task.CheckVersionTask(StartupActivity.this, CheckVersionTask.PHONE){
+				@Override
+				protected void onPreExecute() {
+					_msgTxtView.setText("ÕýÔÚ¼ì²â°æ±¾...ÇëÉÔºò");
+				}
+				
+				@Override
+				public void onCheckVersionPass() {
+					new QueryStaffTask().execute();
+				}					
+			}.execute();
 		} else {
 			showNetSetting();
 		}
