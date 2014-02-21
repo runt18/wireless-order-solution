@@ -116,15 +116,19 @@ function orderSingleDeleteFoodOperationHandler(_c){
 					var temp =  _c.grid.order.orderFoods[i];
 					if(compareDataType(temp, data)){
 						if(compareTasteGroup(data.tasteGroup, temp.tasteGroup)){
-							if(typeof _c.count == 'number'){
-								temp.count += _c.count;								
-								if(temp.count <= 0){
+							if(data.id == temp.id){
+								if(typeof _c.count == 'number'){
+									temp.count += _c.count;								
+									if(temp.count <= 0){
+										_c.grid.order.orderFoods.splice(i, 1);
+									}
+								}else{
 									_c.grid.order.orderFoods.splice(i, 1);
 								}
-							}else{
-								_c.grid.order.orderFoods.splice(i, 1);
+								break;
+							
 							}
-							break;
+
 						}
 					}
 				}						
@@ -158,15 +162,18 @@ function orderOrderDeleteFoodOperationHandler(_c){
 							var temp =  itemTab.order.orderFoods[i];
 							if(compareDataType(temp, data) == true){
 								if(compareTasteGroup(data.tasteGroup, temp.tasteGroup)){
-									var tempCount = typeof _c.count == 'number' ? _c.count : temp.count * -1;
-									var newCount = eval(temp.count + tempCount);
-									if(newCount == 0){
-										itemTab.order.orderFoods.splice(i, 1);
-										Ext.example.msg('提示', String.format('账单: {0}, 已删除菜品: {1}, 数量: {2}', itemTab.order.id, temp.foodName, tempCount), 2);
-									}else{
-										temp.count = newCount;
-									}
-									break;
+//									if(data.id == temp.id){
+										var tempCount = typeof _c.count == 'number' ? _c.count : temp.count * -1;
+										var newCount = eval(temp.count + tempCount);
+										if(newCount == 0){
+											itemTab.order.orderFoods.splice(i, 1);
+											Ext.example.msg('提示', String.format('账单: {0}, 已删除菜品: {1}, 数量: {2}', itemTab.order.id, temp.foodName, tempCount), 2);
+										}else{
+											temp.count = newCount;
+										}
+										break;
+//									}
+
 								}
 							}
 						}						

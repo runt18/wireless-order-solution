@@ -528,59 +528,6 @@ function initPasswordWin(){
 						});
 					}
 					winValidPassword.hide();
-//					var pwdTrans;
-//					if(txtPassword.getRawValue() == ''){
-//						pwdTrans = '';
-//					}else{
-//						pwdTrans = MD5(txtPassword.getValue());
-//					}
-//					var mask = new Ext.LoadMask(document.body, {
-//					    msg  : '正在验证密码, 请稍等......',
-//					    disabled : false,
-//					    removeMask : true
-//					});
-//					
-//					mask.show();
-//					Ext.Ajax.request({
-//						url : '../../VerifyPwd.do',
-//						params : {
-//							isCookie : true,
-//							'type' : 5,
-//							'pwd' : pwdTrans
-//						},
-//						success : function(response, options) {
-//							var jr = Ext.decode(response.responseText);
-//							if(jr.success){
-//								winValidPassword.hide();
-//								if (isGroup) {
-//									orderOrderDeleteFoodOperationHandler({
-//										count : (numCount.getValue() * -1)
-//									});
-//								}else{
-//									orderSingleDeleteFoodOperationHandler({
-//										grid : orderSingleGridPanel,
-//										count : (numCount.getValue() * -1)
-//									});
-//								}
-//							}else{
-//								Ext.MessageBox.show({
-//									msg : jr.data,
-//									width : 300,
-//									buttons : Ext.MessageBox.OK
-//								});
-//							}
-//							mask.hide();
-//						},
-//						failure : function(response, options) {
-//							var jr = Ext.decode(response.responseText);
-//							mask.hide();
-//							Ext.MessageBox.show({
-//								msg : jr.data,
-//								width : 300,
-//								buttons : Ext.MessageBox.OK
-//							});
-//						}
-//					});
 				}
 			}, {
 				text : '关闭',
