@@ -395,7 +395,7 @@ public class MemberOperationDao {
 			  " MO.operate_seq, MO.operate_date, MO.operate_type, MO.pay_type, MO.pay_money, MO.order_id, MO.charge_type, MO.charge_money," +
 			  " MO.delta_base_money, MO.delta_extra_money, MO.delta_point, " +
 			  " MO.remaining_base_money, MO.remaining_extra_money, MO.remaining_point, MO.comment, " +
-			  " MO.coupon_id, MO.coupon_money, MO.coupon_name, " +
+			  " MO.coupon_id, MO.coupon_money, MO.coupon_name " +
 			  " FROM member_operation_history MO " +
 			  " WHERE 1=1 " +
 			  " AND MO.restaurant_id = " + staff.getRestaurantId();
