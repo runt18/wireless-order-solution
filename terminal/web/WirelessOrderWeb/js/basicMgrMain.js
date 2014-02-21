@@ -753,14 +753,14 @@ var resturantMgr = new Ext.Window({
 					   url: '../../OperateRestaurant.do',
 					   success: function(response,options){
 						   var resultJSON = Ext.util.JSON.decode(response.responseText);
-						   if(resultJSON.all.success){
+						   if(resultJSON.success){
 							   resturantMgr.hide();
 							   Ext.getCmp('restaurant_info').setValue("");
 							   Ext.getCmp('address').setValue("");
 							   Ext.getCmp('tel1').setValue("");
 							   Ext.getCmp('tel2').setValue("");
 						   }
-						   Ext.example.msg('提示', resultJSON.all.message);
+						   Ext.example.msg('提示', resultJSON.msg);
 					   },
 					   failure: function(response,options){
 						   

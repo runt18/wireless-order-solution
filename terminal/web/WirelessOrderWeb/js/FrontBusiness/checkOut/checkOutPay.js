@@ -95,6 +95,7 @@ var paySubmit = function(submitType) {
 							Ext.example.msg('提示', dataInfo);
 							setFormButtonStatus(false);
 						}else{
+							console.log('showwin');
 							action = '&nbsp;<span id="returnInterval" style="color:red;"></span>&nbsp; 秒之后自动跳转.';
 							new Ext.Window({
 								title : '<center>结账信息</center>',
@@ -106,7 +107,7 @@ var paySubmit = function(submitType) {
 								defaults : {
 									xtype : 'label',
 									columnWidth : .25,
-									style : 'font-size:15px;font-weight: bold;line-height:36px;padding-left:20px;  '
+									style : 'font-size:15px;font-weight:bold;line-height:36px;padding-left:20px;'
 								},
 								items : [{
 									html : '应收：￥<font color="red">'+countPrice+'</font>'
@@ -286,7 +287,7 @@ function memberPay(){
 										defaults : {
 											xtype : 'label',
 											columnWidth : .33,
-											style : 'vertical-align:middle;line-height:36px;padding-left:20px;font-size:15px;font-weight: bold;'
+											style : 'vertical-align:middle;line-height:36px;padding-left:20px;font-size:15px;font-weight:bold;'
 										},
 										items : [{
 											html : '会员名称：<font color="red">' + member.name + '</font>'
@@ -302,7 +303,7 @@ function memberPay(){
 											html : '收款方式：<font color="red">' + newOrder.payMannerDisplay + '</font>'
 										}, {
 											columnWidth : 1,
-											style : 'font-size:22px; line-height:40px; text-align:center;',
+											style : 'font-size:22px;line-height:40px;text-align:center;',
 											html : (res.data + '.' + action)
 										}],
 										buttonAlign : 'center',

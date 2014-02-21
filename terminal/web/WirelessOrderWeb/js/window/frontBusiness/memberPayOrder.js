@@ -51,7 +51,7 @@ Ext.onReady(function(){
 			id : 'mpo_numMemberCardAliasForPayOrder',
 //			inputType : 'password',
 			fieldLabel : '会员卡',
-			style : 'font-weight: bold; color: #FF0000;',
+			style : 'font-weight:bold;color:#FF0000;',
 			width : 100,
 //			maxLength : 10,
 //			maxLengthText : '请输入10位会员卡号',
@@ -80,8 +80,8 @@ Ext.onReady(function(){
 		border : false,
 		height : 32,
 		bodyStyle : 'font-size:26px;text-align:left;',
-		html : '收款 : <input id="mpo_txtPayMoneyForPayOrder" type="text" disabled="disabled" value="0.00" style="color:red;height: 27px;width:120px;font-size :26px;font-weight: bolder;" />'+
-				'<div id="div_memberShowEraseQuota" style="display: none;float:right">抹数金额：￥<input id="txtMemberEraseQuota" type="text" value="0" style="width: 50px;height: 27px;font-size :26px;" />' +
+		html : '收款 : <input id="mpo_txtPayMoneyForPayOrder" type="text" disabled="disabled" value="0.00" style="color:red;height:27px;width:120px;font-size:26px;font-weight:bolder;" />'+
+				'<div id="div_memberShowEraseQuota" style="display:none;float:right">抹数金额：￥<input id="txtMemberEraseQuota" type="text" value="0" style="width:50px;height:27px;font-size:26px;" />' +
 				'上限:￥<font id="font_showMemberEraseQuota" style="color:red;"></font></div>'
 	};
 	new Ext.Panel({
@@ -273,7 +273,7 @@ Ext.onReady(function(){
 					readOnly : true,
 					forceSelection : true,
 					disabled : false,
-					fieldLabel : '<font style="color:red;font-weight: bolder">＊</font>优惠劵',
+					fieldLabel : '<font style="color:red;font-weight:bold">＊</font>优惠劵',
 					store : new Ext.data.SimpleStore({
 						fields : [ 'value', 'text' ]
 					}),
