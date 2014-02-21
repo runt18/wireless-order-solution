@@ -1,6 +1,5 @@
 package com.wireless.Actions.orderMgr;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -25,9 +24,6 @@ public class QueryDetailAction extends Action {
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		
-		
-		
 		JObject jobject = new JObject();
 		List<OrderFood> list = null;
 		String isPaging = request.getParameter("isPaging");
@@ -63,16 +59,7 @@ public class QueryDetailAction extends Action {
 			jobject.initTip(e);
 		}finally{
 			if(list != null){
-				LinkedHashMap<String, Object> sum = new LinkedHashMap<String, Object>();
-				OrderFood total = new OrderFood();
-				total.asFood().setPrice(OrderFood.calcTotalPrice(list));
-				total.setCount(OrderFood.calcTotalCount(list));
-				sum.put("title", "汇总");
-				sum.put("totalPrice", OrderFood.calcTotalPrice(list));
-				sum.put("totalCount", OrderFood.calcTotalCount(list));
-				jobject.getOther().put("sum", sum);
 				list = DataPaging.getPagingData(list, isPaging, start, limit);
-				list.add(total);
 				jobject.setRoot(list);
 			}
 			response.getWriter().print(jobject.toString());
