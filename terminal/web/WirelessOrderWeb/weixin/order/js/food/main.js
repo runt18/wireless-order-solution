@@ -107,17 +107,22 @@ function operateFood(c){
 			temp = params.orderData[i];
 			if(temp.id == c.id){
 				if(temp.count - 1 == 0){
-					if(confirm('是否删除该菜品')){
-						var tl = $('#divFoodListForSC > div');
-						for(var j = 0; j < tl.length; j++){
-							if(parseInt(tl[j].getAttribute('data-value')) == temp.id){
-								$(tl[j]).remove();
-								break;
+					Util.dialog.show({
+						msg : '是否删除该菜品?',
+						callback : function(btn){
+							if(btn == 'yes'){
+								var tl = $('#divFoodListForSC > div');
+								for(var j = 0; j < tl.length; j++){
+									if(parseInt(tl[j].getAttribute('data-value')) == temp.id){
+										$(tl[j]).remove();
+										break;
+									}
+								}
+								params.orderData.splice(i, 1);
+								displayOrderFoodMsg();
 							}
 						}
-						params.orderData.splice(i, 1);
-						displayOrderFoodMsg();
-					}
+					});
 				}else{
 					params.orderData[i].count--;					
 					if(displayCount){
@@ -131,11 +136,16 @@ function operateFood(c){
 		}
 		
 	}else if(c.otype == 'claer'){
-		if(confirm('是否清空已选菜品?')){
-			params.orderData = [];
-			Util.getDom('divFoodListForSC').innerHTML = '';
-			operateShoppingCart({otype:'hide'});
-		}
+		Util.dialog.show({
+			msg : '是否清空已选菜品?',
+			callback : function(btn){
+				if(btn == 'yes'){
+					params.orderData = [];
+					operateShoppingCart({otype:'hide'});
+					Util.getDom('divFoodListForSC').innerHTML = '';
+				}
+			}
+		});
 	}
 }
 function displayOrderFoodMsg(c){

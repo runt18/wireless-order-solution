@@ -1,7 +1,10 @@
 body{
 	background-color: #f5f5f5;
 }
-#divMemberCard, #divMemberContent, #divVerifyAndBind, #divResetMobile{
+
+/**************************************************/
+#divMemberCard, #divMemberContent, #divVerifyAndBind, #divResetMobile, #divMemberTypeContent,
+#divMemberPointContent, #divMemberBalanceContent, #divMemberCouponContent{
 	display: none;
 }
 
@@ -24,34 +27,58 @@ body{
 #divMemberCard > div[data-type=r] > div{
 	line-height: 25px; 
 }
-
 input[type=text]:FOCUS, input[type=number]:FOCUS{
 	background-color: #f9f9a0;
 }
 input[type=text], input[type=number]{
-	max-width: 90px;
 	border: 1px solid #ddd;
 }
 
-#divVerifyAndBind > div > div[class*=button]{
-	z-index: 10;
-	text-align: center;
-	font-weight: bold;
-	font-size: 14px;
-}
-#divVerifyAndBind > div[data-type=detail]{
-	display: none;
-}
-#divVerifyAndBind > div[data-type=detail] > div[class*=box-horizontal] > div{
-	width: 50%;
-}
-#divVerifyAndBind > div[data-type=button]{
-		
+
+/**************************************************/
+#txtVerifyMobile, #txtVerifyCode, #txtVerifyName, #txtVerifyMobileByReset, #txtVerifyCodeByReset
+{
+	font-size: 25px;
+	padding: 3px 5px 3px 5px;
+	width: 180px;
+	//color: #26a9d0;
+	//border: 0;
+	//border-bottom: 1px solid #ddd;
 }
 
-#divResetMobile > div > div[class*=button]{
-	z-index: 10;
-	text-align: center;
-	font-weight: bold;
-	font-size: 14px;
+#btnVerifyCode, #btnVerifyCodeByReset{
+	display: inline;
+	font-size: 16px;
+	padding: 0 10px 0 10px;
+	color: #000;
+	border: 0;
+	background: #fff;
 }
+#btnBindMember, #btnBindMemberByReset{
+	width: 200px;
+	letter-spacing: 10px;
+	padding: 3px 5px 3px 5px;
+	font-size: 18px;
+	border: 1px solid #aaa;
+	margin-bottom: 10px;
+}
+
+.d-list{
+	width:100%; 
+	
+}
+.d-list-title td{
+	border-top: 1px solid #ddd; 
+	border-bottom: 1px solid #f1f1f1; 
+	color: #595959;
+	text-align: center;
+}
+.d-list-item td{
+	color: #898989;
+	border-bottom: 1px dashed #f1f1f1; 
+}
+.d-list-item > td:nth-child(2), .d-list-item > td:nth-child(3){
+	text-align: right;
+	color: #26a9d0;
+}
+

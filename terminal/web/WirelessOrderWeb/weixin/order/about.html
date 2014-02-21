@@ -13,7 +13,7 @@
 <script type="text/javascript">
 $.dom = function(id){ return document.getElementById(id); };
 $(function(){
-	Util.html('', function(html){ $(document.body).append(html);  });
+	Util.lbar('', function(html){ $(document.body).append(html);  });
 	$.ajax({
 		url : '../../WXOperateInfo.do',
 		dataType : 'json',

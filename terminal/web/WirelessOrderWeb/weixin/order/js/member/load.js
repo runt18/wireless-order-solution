@@ -1,5 +1,6 @@
 $(function(){
-	Util.html('', function(html){ $(document.body).append(html);  });
+	Util.lbar('', function(html){ $(document.body).append(html);  });
+	Util.lm.show();
 	$.ajax({
 		url : '../../WXOperateMember.do',
 		type : 'post',
@@ -10,23 +11,28 @@ $(function(){
 		},
 		dataType : 'json',
 		success : function(data, status, xhr){
+			Util.lm.hide();
 			if(data.success){
 				$('#divMemberCard').css('display', 'block');
 				$('#divMemberContent').css('display', 'block');
+				$('#divMemberTypeContent').css('display', 'block');
+				$('#divMemberPointContent').css('display', 'block');
+				$('#divMemberBalanceContent').css('display', 'block');
+				$('#divMemberCouponContent').css('display', 'block');
 				member = data.other.member;
-//				alert(JSON.stringify(member))
 				member.restaurant = data.other.restaurant;
 				initMemberMsg({data:member});
 			}else{
 				if(data.code == 7400){
 					$('#divVerifyAndBind').css('display', 'block');
 				}else{
-					alert(data.msg);
+					Util.dialog.show({msg: data.msg});
 				}
 			}
 		},
 		error : function(data, errotType, eeor){
-			alert('服务器请求失败, 请稍候再试.');
+			Util.lm.hide();
+			Util.dialog.show({title:'错误', msg: '服务器请求失败, 请稍候再试.'});
 		}
 	});
 	

@@ -18,8 +18,8 @@ var params = {
 		text : '请输入 11 位纯数字的有效手机号码.'
 	},
 	UserNameCode : {
-		code : /^[^x00-xff]{2,16}$/,
-		text : '请输入至少两个中文字的用户名.'
+		code : /^([^x00-xff]{2,16})|([a-zA-z][a-zA-z0-9]{3,17})$/,
+		text : '请输入至少两个中文字或<br>字母开头4至18位的会员名称.'
 	},
 	VerifyCode : {
 		code : /^[0-9]{4}$/,
@@ -40,68 +40,171 @@ var params = {
 </div>
 
 <div id="divMemberContent" class="main-box">
-<div class="line">
-	<div>会员名: <span id="spanMemberName">--</span></div>
-</div>
-<div class="line box-horizontal">
-	<div>手机号: <span id="spanMemberMobile">--</span></div>
-	<div style="text-align: right; color: #0000CD;"><b onclick="resetMobile()">重新绑定</b></div>
-</div>
-<div class="line box-horizontal">
-	<div >积&nbsp;&nbsp;分: <span  id="spanMemberPoint" style="color:#FF4500;">--.--</span> 分</div>
-	<!-- 
-	<div style="border-left: 1px solid #ddd; padding-left: 10px;">折&nbsp;&nbsp;扣: <span>8.8折</span></div>
-	 -->
-</div>
-<!-- <div class="line">积分规则详情</div> -->
-<div class="line box-horizontal">
-	<div>余&nbsp;&nbsp;额: <span id="spanMemberTotalBalance" style="color:#FF4500;">--.--</span> 元</div>
-	<div style="text-align: right; color: #0000CD;">&nbsp;</div>
-</div>
-<!-- <div class="line">更多......</div> -->
+<ul class="m-b-list">
+	<li class="box-horizontal" onclick="Util.skip('member_data_dateil.html')">
+		<div>会员名: <span id="spanMemberName">--</span></div>
+		<div class="event">完善资料&nbsp;&gt;</div>
+	</li>
+	<li class="box-horizontal">
+		<div>手机号: <span id="spanMemberMobile">--</span></div>
+		<!-- <div class="event"><a onclick="resetMobile()">重新绑定</a>&nbsp;&gt;</div> -->
+	</li>
+</ul>
 </div>
 
+<div id="divMemberTypeContent" class="main-box">
+<ul class="m-b-list">
+	<li class="box-horizontal none-line" onclick="$('#divMemberTypeDesc').fadeToggle()">
+		<div >类&nbsp;&nbsp;型: <span id="spanMemberTypeName" >--.--</span></div>
+		<div class="event">特权详细&nbsp;&gt;</div>
+	</li>
+	<li><div id="divMemberTypeDesc" style="display:none;">&nbsp;</div></li>
+</ul>
+</div>
+
+<div id="divMemberPointContent" class="main-box">
+<ul class="m-b-list">
+	<li class="box-horizontal none-line" onclick="toggleConsumeDetails()">
+		<div >积&nbsp;&nbsp;分: <span id="spanMemberPoint" style="color:#FF4500;">--.--</span>&nbsp;分</div>
+		<div class="event">消费记录&nbsp;&gt;</div>
+	</li>
+	<li>
+		<div id="divConsumeDetails" style="display:none; width:100%; ">
+		<table class="d-list" style="">
+			<thead>
+			<tr class="d-list-title">
+				<td style="width:50%;">消费时间</td>
+				<td style="width:25%;">消费金额</td>
+				<td style="width:25%;">消费积分</td>
+			</tr>
+			</thead>
+			<tbody>
+			</tbody>
+		</table>
+		<div style="color:#595959;" onclick="toggleConsumeDetails.load()">提示:显示近5条消费记录.<span style="color:#898989;">点击刷新</span></div>
+		</div>
+	</li>
+</ul>
+</div>
+
+<div id="divMemberBalanceContent" class="main-box">
+<ul class="m-b-list">
+	<li class="box-horizontal none-line" onclick="toggleRechargeDetails()">
+		<div>余&nbsp;&nbsp;额: <span id="spanMemberTotalBalance" style="color:#26a9d0;">--.--</span>&nbsp;元</div>
+		<div class="event">充值记录&nbsp;&gt;</div>
+	</li>
+	<li>
+		<div id="divRechargeDetails" style="display:none; width:100%; ">
+		<table class="d-list">
+			<thead>
+			<tr class="d-list-title">
+				<td style="width:50%;">充值时间</td>
+				<td style="width:25%;">充值实收</td>
+				<td style="width:25%;">充值金额</td>
+			</tr>
+			</thead>
+			<tbody>
+			</tbody>
+		</table>
+		<div style="color:#595959;" onclick="toggleRechargeDetails.load()">提示:显示近5条充值记录.<span style="color:#898989;">点击刷新</span></div>
+		</div>
+	</li>
+</ul>
+</div>
+
+<div id="divMemberCouponContent" class="main-box">
+<ul class="m-b-list">
+	<li class="box-horizontal none-line" onclick="toggleCouponContent()">
+		<div>优惠券获取明细</div>
+		<div class="event">&nbsp;&gt;</div>
+	</li>
+	<li>
+		<div id="divMemberCouponContentView" style="display:none; width:100%; ">
+		<table class="d-list">
+			<thead>
+			<tr class="d-list-title">
+				<td style="width:50%;">券名</td>
+				<td style="width:25%;">面额</td>
+				<td style="width:25%;">数量</td>
+			</tr>
+			</thead>
+			<tbody>
+			</tbody>
+		</table>
+		<div style="color:#595959;" onclick="toggleCouponContent.load()">提示:显示现有优惠券.<span style="color:#898989;">点击刷新</span></div>
+		</div>
+	</li>
+</ul>
+</div>
+
+<div id="divMemberCouponConsume" class="main-box">
+<ul class="m-b-list">
+	<li class="box-horizontal none-line" onclick="toggleCouponConsumeDetails()">
+		<div>优惠券使用明细</div>
+		<div class="event">&nbsp;&gt;</div>
+	</li>
+	<li>
+		<div id="divMemberCouponConsumeDetails" style="display:none; width:100%; ">
+		<table class="d-list">
+			<thead>
+			<tr class="d-list-title">
+				<td style="width:50%;">日期</td>
+				<td style="width:25%;">消费金额</td>
+				<td style="width:25%;">优惠金额</td>
+			</tr>
+			</thead>
+			<tbody>
+			</tbody>
+		</table>
+		<div style="color:#595959;" onclick="toggleCouponConsumeDetails.load()">提示:显示近5条优惠券使用记录.<span style="color:#898989;">点击刷新</span></div>
+		</div>
+	</li>
+</ul>
+</div>
 
 <div id="divVerifyAndBind" class="main-box">
-<div class="line" style="text-align:center; font-size: 16px;  background-color: #f1f1f1;">
-	请绑定会员
-</div>
-<div class="line box-horizontal">
-	<div>手机号: <input id="txtVerifyMobile" type="text" maxlength="11"/></div>
-	<div>验证码: <input id="txtVerifyCode" type="number" maxlength="4" /></div>
-</div>
-<div data-type="detail" class="line">
-<div class="box-horizontal">
-	<div>会员名: <input id="txtVerifyName" type="text"/></div>
-	<div style="z-index:-1;">性&nbsp;&nbsp;别: 
-		<input type="radio" value="0" name="radioVerifySex" checked/>男&nbsp;&nbsp;
-		<input type="radio" value="1" name="radioVerifySex"/>女
-	</div>
-</div>
-</div>
-<div data-type="button" class="line box-horizontal">
-	<div class="button"><input id="btnVerifyCode" type="button" value="获取验证码" onClick="getVerifyCode({event:this})"></div>
-	<div class="button"><input id="btnBindMember" type="button" value="确认绑定" disabled onClick="bindMember({event:this})"></div>
-</div>
+<ul class="m-b-list">
+	<li class="none-line title" >请绑定会员</li>
+	<li class="none-line" style="line-height: 50px;">
+		手机号: <input id="txtVerifyMobile" type="text" maxlength="11"/>
+	</li>
+	<li class="none-line" style="line-height: 50px;">
+		验证码: <input id="txtVerifyCode" type="number" maxlength="4" style="width:80px;"/>
+		<div id="btnVerifyCode" onClick="getVerifyCode({event:this})">点击获取验证码</div>
+	</li>
+	<li class="none-line">
+		会员名: <input id="txtVerifyName" type="text"/>
+	</li>
+	<li class="none-line" style="line-height:50px;">
+		性&nbsp;&nbsp;别: 
+		<span onclick="this.childNodes[0].checked=true;"><input type="radio" value="0" name="radioVerifySex" checked/>&nbsp;男</span>&nbsp;&nbsp;
+		<span onclick="this.childNodes[0].checked=true;"><input type="radio" value="1" name="radioVerifySex"/>&nbsp;女</span>
+	</li>
+	<li style="text-align: center;">
+		<input id="btnBindMember" type="button" value="确认绑定" disabled onClick="bindMember({event:this})">
+	</li>
+</ul>
 </div>
 
 <div id="divResetMobile" class="main-box">
-<div class="line" style="text-align:center; font-size: 16px;  background-color: #f1f1f1;">
-	重新绑定手机号码
-</div>
-<div class="line box-horizontal">
-	<div>新号码: <input id="txtVerifyMobileByReset" type="text" maxlength="11"/></div>
-	<div>验证码: <input id="txtVerifyCodeByReset" type="number" maxlength="4" /></div>
-</div>
-<div data-type="button" class="line box-horizontal">
-	<div class="button"><input id="btnVerifyCodeByReset" type="button" value="获取验证码" onClick="getVerifyCodeByReset({event:this})"></div>
-	<div class="button"><input id="btnBindMemberByReset" type="button" value="确认绑定" disabled onClick="bindMemberByReset({event:this})"></div>
-</div>
+<ul class="m-b-list">
+	<li class="none-line title">重新绑定手机号码</li>
+	<li class="none-line" style="line-height: 50px;">
+		新号码: <input id="txtVerifyMobileByReset" type="text" maxlength="11"/>
+	</li>
+	<li class="none-line" style="line-height: 50px;">
+		验证码: <input id="txtVerifyCodeByReset" type="number" maxlength="4" style="width:80px;"/>
+		<button id="btnVerifyCodeByReset" onClick="getVerifyCodeByReset({event:this})">点击获取验证码</button>
+	</li>
+	<li style="text-align: center;">
+		<input id="btnBindMemberByReset" type="button" value="确认绑定" disabled onClick="bindMemberByReset({event:this})">
+	</li>
+</ul>
 </div>
 
 <div id="divInsertBefore"></div>
 <div class="footer">&copy; 2014 技术支持：智易科技</div>
 <div style="height: 45px;">&nbsp;</div>
-
+ 
 </body>
 </html>

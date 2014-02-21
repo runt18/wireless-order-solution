@@ -42,10 +42,12 @@ body{
 }
 
 #spanDisplayFoodCount{
-	color: #16a9d0;
+	color: red;
 	display: inline;
 	font-weight: bold;
 	visibility: hidden;
+	vertical-align: top;
+	font-size: 18px;
 }
 /* divNavKitchen--------------------------------------------- */
 .divNavKitchen-item-select{
@@ -57,30 +59,30 @@ body{
 	position: absolute;
 	width: 100%;
 	height: 100%;
-	font-size: 13px;
+	font-size: 15px;
 	/* -webkit-transform: translateX(-100%); */
 	left: -100%;
 	z-index: 999 !important;
 }
 
 .div-l-n-title{
-	line-height: 35px;
+	line-height: 40px;
 	border-bottom: 2px solid #fb7251 !important;
 	text-align: center;
-	font-size: 15px;
+	font-size: 18px;
 	font-weight: bold;
 	background-color: #fff;
 }
 #divNavKitchen-kitchen{
 	overflow-y: auto;
-	width: 120px;
+	width: 130px;
 	height: 100%;
 	background-color: #eee;
 }
 #divNavKitchen-kitchen > div[data-r=body]{ overflow-y: auto;}
 #divNavKitchen-kitchen > div[data-r=body] > div{
 	width: 90%;
-	line-height: 35px;
+	line-height: 40px;
 	border-bottom: 1px solid #f1f1f1;
 	padding: 0 5% 0 5%;
 	background-color: #fff;
@@ -128,15 +130,9 @@ body{
 	margin: 9px 0 0 5px;
 	color: #696969;
 }
-.box-food-list-c b {
-color:#000000;
-}
-.box-food-list-c span {
-color:#ff6600;
-}
-.box-food-list-c font {
-color:#a7cb19;
-}
+.box-food-list-c b { color:#000000; }
+.box-food-list-c span { color:#ff6600; }
+.box-food-list-c font { color:#a7cb19; }
 .box-food-list-c > div[data-r=t]{
 	line-height: 24px;
 }

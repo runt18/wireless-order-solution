@@ -18,9 +18,8 @@ ol,ul,li {
 	border-top: 1px solid #eee;
 	line-height: 1.4;
 	height: 45px;
-	border-bottom: 1px solid #ccc;
-	box-shadow: -1px -1px 3px #ccc;
-	background-image: -webkit-gradient(linear, left top, left bottom, from(#FFFFFF), to(#EAEAEA) ); 
+	background: #fff;
+	//background-image: -webkit-gradient(linear, left top, left bottom, from(#FFFFFF), to(#EAEAEA) ); 
 	//background-image: -webkit-linear-gradient(top, #FFFFFF, #EAEAEA);
 }
 .hewarp li {
@@ -34,6 +33,7 @@ ol,ul,li {
 	font-size: 11px;
 	height: 45px;
 	width: 100%;
+	color: #333;
 }
 .hewarp li img {
 	width: 25px;
@@ -113,8 +113,8 @@ i.alltype {
 a {
 	font-size: 100%;
 	border: none;
-	color: #333;
 	text-decoration: none;
+	color: #666;
 }
 .footer {
 	text-align: center;

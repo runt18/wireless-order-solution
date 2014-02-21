@@ -23,7 +23,22 @@ String.prototype.trim = function(){
 	return this.replace(/(^\s*)|(\s*$)/g, ''); 
 };
 String.prototype.isEmpty = function(){
-	return this.trim().isEmpty();
+	return this.trim().length == 0;
+};
+Date.prototype.format = function(fmt) {
+	var o = {
+		'M+': this.getMonth() + 1,
+		'd+': this.getDate(),
+		'h+': this.getHours(),
+		'm+': this.getMinutes(),
+		's+': this.getSeconds(),
+		'q+': Math.floor((this.getMonth() + 3) / 3),
+		'S': this.getMilliseconds()
+	};
+    if (/(y+)/.test(fmt)) fmt = fmt.replace(RegExp.$1, (this.getFullYear() + '').substr(4 - RegExp.$1.length));
+    for (var k in o)
+    if (new RegExp('(' + k + ')').test(fmt)) fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (('00' + o[k]).substr(('' + o[k]).length)));
+    return fmt;
 };
 Object.clone = function(obj){
 	if(typeof obj !== 'object'){
@@ -44,23 +59,23 @@ var Util = {
 	hparam : [],
 	initParams : function(){
 		var str = location.href;
-		var temp = str.indexOf("?");
+		var temp = str.indexOf('?');
 		str = str.substr(temp + 1);
-		this.hparam = str.split("&");
+		this.hparam = str.split('&');
 		this.mp.oid = Util.getParam('m');
 		this.mp.fid = Util.getParam('r');
 	},
 	getParam : function(key){
 		var temp;
 		for (var i = 0; i < this.hparam.length; i++) {
-			temp = this.hparam[i].split("=");
+			temp = this.hparam[i].split('=');
 			if (temp.length > 0 && temp[0].trim() == key) {
 				return temp[1].trim();
 			}
 		}
 	},
 	lineTD : function(line, t){
-		var sc='m-b-line-show', hc="m-b-line-hide";
+		var sc='m-b-line-show', hc='m-b-line-hide';
 		if(t=='hide'){
 			if(line.hasClass(sc)) line.removeClass(sc);
 			line.addClass(hc);
@@ -77,7 +92,7 @@ var Util = {
 	skip : function(page){
 		window.location.href = this.defineURL(page);
 	},
-	html : function(addr, cb){
+	lbar : function(addr, cb){
 		$.ajax({
 			url : addr + 'mbar.html',
 			success : function(html){
@@ -95,7 +110,7 @@ Util.lm = {
 	box : '',
 	img : 'images/loading.gif',
 	id : 'div-loadmask-m-ld',
-	templet : '<div id={id} class="div-mask div-mask-ld"><div class="img"><img src="{img}" border="0"></div></div>',
+	templet : '<div id={id} class="div-mask div-mask-ld"><div class="img"><img src="{img}" style="border:0;margin:5px 0 0 6px;"></div></div>',
 	init : function(){
 		if(!this.box){
 			document.body.insertAdjacentHTML('afterBegin', this.templet.format({id:Util.lm.id, img:Util.lm.img}));
@@ -120,9 +135,11 @@ Util.lm = {
 Util.dialog = {
 	box : '',
 	id : 'div-loadmask-m-dialog',
+	tid : 'div-loadmask-m-dialog-t',
+	mid : 'div-loadmask-m-dialog-m',
 	templet : '<div id="{id}" class="div-mask div-mask-dialog"><div class="dialog">'
-		+ '<div class="dialog-title">{title}</div>'
-		+ '<div class="dialog-msg">{msg}</div>'
+		+ '<div id={tid} class="dialog-title">{title}</div>'
+		+ '<div id={mid} class="dialog-msg">{msg}</div>'
 		+ '<div class="dialog-button">'
 			+ '<button onclick="Util.dialog.event(\'yes\');">确定</button>&nbsp;&nbsp;<button onclick="Util.dialog.event(\'cancel\');">取消</button>'
 		+ '</div>'
@@ -131,12 +148,14 @@ Util.dialog = {
 	init : function(c){
 		if(!this.box){
 			document.body.insertAdjacentHTML('afterBegin', this.templet.format({
-				id:Util.dialog.id,
-				title : typeof c.title == 'string' ? c.title : '温馨提示',
-				msg : c.msg
+				id: Util.dialog.id,
+				tid: Util.dialog.tid,
+				mid: Util.dialog.mid
 			}));
 			this.box = Util.getDom(this.id);
 		}
+		Util.getDom(Util.dialog.tid).innerHTML = typeof c.title == 'string' ? c.title : '温馨提示';
+		Util.getDom(Util.dialog.mid).innerHTML = typeof c.msg == 'string' ? c.msg : '';
 	},
 	event : function(btn){
 		this.hide();
@@ -157,5 +176,5 @@ Util.dialog = {
 	}
 };
 document.addEventListener('WeixinJSBridgeReady', function onBridgeReady() {
-	//WeixinJSBridge.call('hideToolbar');
+//	WeixinJSBridge.call('hideToolbar');
 });

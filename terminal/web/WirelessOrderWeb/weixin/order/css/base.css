@@ -15,35 +15,6 @@
 	box-orient: horizontal;
 	-webkit-box-orient: horizontal;
 }
-.main-box{
-	margin: 15px auto 15px auto;
-	width: 96%;
-	background-color: #fff;
-    border: 1px solid #ccc;
-	box-shadow: 5px 5px 5px 0px lightgray;
-	font-size: 13px;
-}
-.main-box > div[class*=line]{
-	line-height: 30px;
-	border-bottom: 1px solid #ddd;
-	padding: 0 10px 0 10px;
-	text-align: left;
-	color: #696969;
-}
-.main-box > div[class*=line]:last-child{
-	border-bottom: 0;
-}
-.main-box > div[class*=box-horizontal] > div{
-	width: 50%;
-}
-.main-box > div[class*=line] > div > span{
-	color: #000;
-	font-weight: bold;
-}
-.m-b-line-show{
-	display: block !important;
-	-webkit-animation: line-show-inDownBig .3s ease both;
-}
 @-webkit-keyframes line-show-inDownBig{
 	0%{opacity:0;} 100%{opacity:1;}
 }
@@ -53,13 +24,57 @@
 @-webkit-keyframes line-hide-inDownBig{
 	0%{opacity:1;} 100%{opacity:0;}
 }
-
+/******************************/
 .div-mask{display: none; z-index:1000; position: absolute; height: 100%; width: 100%; left:0; top:0;}
 .div-mask-dialog{background: rgba(0,0,0, .5);}
-.dialog{ position: absolute; min-height: 100px; width: 260px; left:50%; top:50%; margin: 0px 0 0 -130px; background: #fff; }
+.dialog{ position: fixed; min-height: 100px; width: 260px; left:50%; top:50%; margin: 0px 0 0 -130px; background: #fff; }
 .dialog-title{ text-align: center; font-size: 23px; color: #4aaaa5; font-weight: bold; line-height: 45px; padding: 0 0 0 10px; }
 .dialog-msg{ font-size: 18px; line-height: 23px; padding: 0 0 0 10px;  }
 .dialog-button{ line-height: 45px; padding: 0 0 0 10px; text-align: center;}
 .dialog-button > button{ border:0; background:#4aaaa5; color: #FFF; text-align: center; font-size: 18px; width: 100px; height: 30px; margin: 10px 0 0 0;}
 .div-mask-ld{background: rgba(0,0,0, 0);}
-.div-mask-ld > div[class=img]{position: absolute; height:40px; width:40px; left:50%; top:50%; margin: -20px; /* background: #fff;border-radius:5px; */}
+.div-mask-ld > div[class=img]{position: fixed; height:50px; width:50px; left:50%; top:50%; margin: -25px; background: rgba(255,255,255,1); border: 1px solid #eee; border-radius: 2px;}
+/******************************/
+.main-box{
+	margin: 5px auto 5px auto;
+	width: 96%;
+	background-color: #fff;
+    border: 1px solid #eee;
+	//box-shadow: 2px 2px 2px lightgray;
+	font-size: 15px;
+}
+
+.m-b-line-show{
+	display: block !important;
+	-webkit-animation: line-show-inDownBig .3s ease both;
+}
+
+.m-b-list{
+	padding: 0 10px 0 10px;
+	color: #999999;
+}
+.m-b-list > li{
+	line-height: 30px;
+	border-bottom: 1px solid #eee;
+}
+.m-b-list > li[class*=title]{
+	text-align:center; font-size:16px; color: #000; font-weight: bold;
+}
+.m-b-list > li[class*=none-line]{
+	border-bottom: 0;
+}
+.m-b-list > li:last-child{
+	border-bottom: 0;
+}
+.m-b-list > li > div[class*=event]{
+	width: 30%;
+	text-align: right;
+	color: #595959;
+}
+.m-b-list > li > div:first-child{
+	width: 70%;
+}
+.m-b-list > li span{
+	color: #000;
+	font-weight: bold;
+}
