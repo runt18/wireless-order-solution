@@ -104,7 +104,7 @@
 	.info-box{
 		z-index: 9999;
 		position: absolute;
-		height: 150px; 
+		height: 190px; 
 		width: 370px; 
 		border: 1px solid #ddd;
 		top: 185px;
@@ -302,7 +302,8 @@ function getStaff(restaurantID){
 					}
 					
 					infoBox.css('display', 'block');
-					infoList.html(html);
+					//infoList.html('<marquee direction="up" onmouseover="this.stop()" onmouseout="this.start()" scrollamount="3">' + html.join('') + '</marquee>');
+					infoList.html(html.join(''));
 					
 				}
 			},

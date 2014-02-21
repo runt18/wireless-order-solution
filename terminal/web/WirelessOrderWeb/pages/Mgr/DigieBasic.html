@@ -79,6 +79,7 @@ function addTab(id, title, url){
 	        }
 	    });
 	    tabs.add(tab);
+	    tabs.doLayout();
 	}
 	tabs.setActiveTab(tab);
  	if(tabs.items.length > 9){
