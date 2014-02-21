@@ -32,14 +32,15 @@ Ext.onReady(function(){
 		    ['退菜原因', 'cancelReason.reason']
 		],
 		['orderDateFormat', 'name', 'unitPrice', 'count', 'discount',
-		 'tasteGroup.tastePref', 'tasteGroup.tastePrice', 'kitchen.name', 'waiter', 'cancelReason.reason', 'isGift', 'isReturn', 'isRepaid', 'isCommission'],
+		 'tasteGroup.tastePref', 'tasteGroup.tastePrice', 'kitchen.name', 'waiter', 'cancelReason.reason', 
+		 'isGift', 'isReturn', 'isRepaid', 'isCommission'],
 	    [ ['orderID', orderId], ['queryType', queryType != 'null'? queryType : 'History']],
 	    billDetailpageRecordCount,
 	    ''
 	);
 	billDetailGrid.frame = false;
 	billDetailGrid.border = false;
-	billDetailGrid.getStore().on('load', function(store, records, options, res){
+	billDetailGrid.getStore().on('load', function(store, records, options){
 		var sumRow;
 		for(var i = 0; i < records.length; i++){
 			if(records[i].get(foodStatus)){
@@ -49,33 +50,6 @@ Ext.onReady(function(){
 			}
 		}
 	});
-/*		sumRow = null;
-		// 汇总
-		var jr = Ext.decode(res.responseText);
-		if(jr.root.length > 0){
-			store.add(new OrderFoodRecord({
-				orderDateFormat : '汇总',
-				unitPrice : jr.other.sum.totalPrice,
-				count : jr.other.sum.totalCount
-			}));
-		}
-		var gv = billDetailGrid.getView();
-		var sumRow = gv.getRow(store.getCount()-1);
-		sumRow.style.backgroundColor = '#DDD';			
-		sumRow.style.fontWeight = 'bold';
-		gv.getCell(store.getCount()-1, 1).style.fontSize = '15px';
-		gv.getCell(store.getCount()-1, 1).style.color = 'green';
-		gv.getCell(store.getCount()-1, 1).style.fontWeight = 'bold';
-		gv.getCell(store.getCount()-1, 3).style.fontSize = '15px';
-		gv.getCell(store.getCount()-1, 3).style.color = 'green';
-		gv.getCell(store.getCount()-1, 4).style.fontSize = '15px';
-		gv.getCell(store.getCount()-1, 4).style.color = 'green';
-		gv.getCell(store.getCount()-1, 2).innerHTML = '';
-		gv.getCell(store.getCount()-1, 5).innerHTML = '';
-		gv.getCell(store.getCount()-1, 6).innerHTML = '';
-		gv.getCell(store.getCount()-1, 7).innerHTML = '';
-		gv.getCell(store.getCount()-1, 8).innerHTML = '';
-	});*/
 	new Ext.Panel({
 		renderTo : 'divOrderDetail',
 		frame : false,

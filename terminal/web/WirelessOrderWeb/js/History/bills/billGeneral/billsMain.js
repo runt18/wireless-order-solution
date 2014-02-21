@@ -235,36 +235,6 @@ function detailIsPaidRenderer(v){
 	return eval(v) ? '是' : '否';
 }
 
-/*var billDetailGrid = createGridPanel(
-	'',
-	'',
-	'',
-	'',
-	'../../QueryDetail.do',
-	[
-	    [true,false,false,false],
-	    ['日期','orderDateFormat',100],
-	    ['名称','name',130],
-	    ['单价','unitPrice',60, 'right', 'Ext.ux.txtFormat.gridDou'],
-	    ['数量','count', 60, 'right', 'Ext.ux.txtFormat.gridDou'], 
-	    ['口味','tasteGroup.tastePref'],
-	    ['口味价钱','tasteGroup.tastePrice', 60, 'right', 'Ext.ux.txtFormat.gridDou'],
-	    ['厨房','kitchen.name', 60],
-	    ['反结账','isPaid', 60, 'center', 'detailIsPaidRenderer'],
-	    ['服务员','waiter', 60],
-	    ['退菜原因', 'cancelReason.reason']
-	],
-	OrderFoodRecord.getKeys(),
-	[ ['queryType', 'History']],
-	'',
-	''
-);
-billDetailGrid.frame = false;
-billDetailGrid.border = false;
-billDetailGrid.getStore().on('beforeload', function(thiz){
-	thiz.baseParams['orderID'] = Ext.ux.getSelData(billsGrid)['id'];
-});*/
-
 var billgodtpStatus = false;
 var billGroupOrderDetailTabPanel = new Ext.TabPanel({
 	border : false,

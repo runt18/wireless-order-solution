@@ -342,25 +342,6 @@ var btnOrderDetail = new Ext.ux.ImageButton({
 				);
 				selTabContentGrid.frame = false;
 				selTabContentGrid.border = false;
-				selTabContentGrid.getStore().on('load', function(store, records, options){
-					
-					if(store.getCount() > 0){
-						var sumRow = selTabContentGrid.getView().getRow(store.getCount() - 1);	
-						sumRow.style.backgroundColor = '#EEEEEE';			
-						for(var i = 0; i < selTabContentGrid.getColumnModel().getColumnCount(); i++){
-							var sumCell = selTabContentGrid.getView().getCell(store.getCount() - 1, i);
-							sumCell.style.fontSize = '15px';
-							sumCell.style.fontWeight = 'bold';	
-							sumCell.style.color = 'green';
-						}
-						selTabContentGrid.getView().getCell(store.getCount()-1, 1).innerHTML = '汇总';
-						selTabContentGrid.getView().getCell(store.getCount()-1, 2).innerHTML = '--';
-						selTabContentGrid.getView().getCell(store.getCount()-1, 5).innerHTML = '--';
-						selTabContentGrid.getView().getCell(store.getCount()-1, 6).innerHTML = '--';
-						selTabContentGrid.getView().getCell(store.getCount()-1, 7).innerHTML = '--';
-						selTabContentGrid.getView().getCell(store.getCount()-1, 8).innerHTML = '--';
-					}
-				});
 			}
 			
 			if(!selTabContentWin){
