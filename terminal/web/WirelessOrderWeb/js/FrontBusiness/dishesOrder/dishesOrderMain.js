@@ -301,7 +301,7 @@ var allFoodTabPanelGridTbar = new Ext.Toolbar({
 				name : '拼音'
 			}, {
 				type : 3,
-				name : '编号'
+				name : '助记码'
 			}]
 		}),
 		valueField : 'type',
@@ -460,7 +460,7 @@ var allFoodTabPanelGrid = createGridPanel(
 	[
 	    [true, false, false, true], 
 	    ['菜名', 'displayFoodName', 200], 
-	    ['编号', 'alias', 70] , 
+	    ['助记码', 'alias', 70] , 
 		['拼音', 'pinyin', 70], 
 		['价格', 'unitPrice', 70, 'right', 'Ext.ux.txtFormat.gridDou']
 	],

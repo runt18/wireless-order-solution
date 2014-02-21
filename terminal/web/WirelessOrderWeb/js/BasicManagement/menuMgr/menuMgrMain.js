@@ -1092,8 +1092,6 @@ var basicOperationPanel = new Ext.Panel({
 								numForAlias.focus(true, 100);
 							}else{
 								numForAlias.disable();
-								numForAlias.setValue();
-								numForAlias.clearInvalid();
 							}
 						},
 						focus : function(){
@@ -1101,8 +1099,6 @@ var basicOperationPanel = new Ext.Panel({
 							if(document.getElementById('chbForFoodAlias').checked){
 								
 								numForAlias.disable();
-								numForAlias.setValue();
-								numForAlias.clearInvalid();
 							}else{
 								numForAlias.enable();
 								numForAlias.focus(true, 100);
@@ -1468,6 +1464,8 @@ function resetbBasicOperation(_d){
 		document.getElementById('chbForFoodAlias').checked = true;
 		chkAlias.fireEvent('check', chkAlias, true);
 		foodAliasID.setValue(data.alias);
+	}else{
+		foodAliasID.setValue();
 	}
 	foodPinyin.setValue(data.pinyin);
 	foodPrice.setValue(data.unitPrice);
@@ -1587,7 +1585,7 @@ function basicOperationBasicHandler(c){
 			restaurantID : restaurantID,
 			foodID : (typeof(c.data) != 'undefined' && typeof(c.data.id) != 'undefined' ? c.data.id : 0),
 			foodName : foodName.getValue().trim(),
-			foodAliasID : foodAliasID.getValue(),
+			foodAliasID : document.getElementById('chbForFoodAlias').checked?foodAliasID.getValue():'',
 			foodPinyin : foodPinyin.getValue(),
 			foodPrice : foodPrice.getValue(),
 			kitchenID : foodKitchenAlias.getValue(),
