@@ -185,7 +185,10 @@ public class MemberOperation implements Jsonable {
 		jm.put("rid", this.restaurantId);
 		jm.put("staffId", this.staffId);
 		jm.put("staffName", this.staffName);
-		jm.put("orderId", orderId);
+		jm.put("orderId", this.orderId);
+		jm.put("couponId", this.couponId);
+		jm.put("couponMoney", this.couponMoney);
+		jm.put("couponName", this.couponName);
 		jm.put("deltaBaseMoney", this.deltaBaseMoney);
 		jm.put("deltaExtraMoney", this.deltaExtraMoney);
 		jm.put("deltaPoint", deltaPoint);
