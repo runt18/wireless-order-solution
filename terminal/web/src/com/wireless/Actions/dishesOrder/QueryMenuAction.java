@@ -72,7 +72,7 @@ public class QueryMenuAction extends DispatchAction {
 				List<Food> result = new ArrayList<Food>();
 				if(pinyin != null && !pinyin.trim().isEmpty()){
 					for (Food f : root) {
-						if(f.getPinyinShortcut().contains(pinyin)){
+						if(f.getPinyinShortcut().contains(pinyin.toLowerCase())){
 							result.add(f);
 						}
 					}

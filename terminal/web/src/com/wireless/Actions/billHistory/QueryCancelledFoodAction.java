@@ -15,6 +15,7 @@ import com.wireless.db.billStatistics.CancelledFoodDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
+import com.wireless.json.Jsonable;
 import com.wireless.pojo.billStatistics.CancelIncomeByDept;
 import com.wireless.pojo.billStatistics.CancelIncomeByDept.IncomeByEachReason;
 import com.wireless.pojo.billStatistics.CancelIncomeByReason;
@@ -40,7 +41,7 @@ public class QueryCancelledFoodAction extends Action {
 		JObject jobject = new JObject();
 		@SuppressWarnings("rawtypes")
 		List list = new ArrayList();
-		Object sum = null;
+		Jsonable sum = null;
 		String isPaging = request.getParameter("isPaging");
 		String limit = request.getParameter("limit");
 		String start = request.getParameter("start");
