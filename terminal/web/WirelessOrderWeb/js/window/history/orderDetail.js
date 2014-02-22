@@ -46,7 +46,7 @@ Ext.onReady(function(){
 			if(records[i].get(foodStatus)){
 				
 				sumRow = billDetailGrid.getView().getRow(i);
-				sumRow.style.backgroundColor = 'salmon';
+				sumRow?sumRow.style.backgroundColor = 'salmon' : '';
 			}
 		}
 	});
