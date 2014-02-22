@@ -14,7 +14,7 @@ var materialTypeComb = new Ext.form.ComboBox({
 	mode : 'local',
 	triggerAction : 'all',
 	selectOnFocus : true,
-	readOnly : true	,
+	readOnly : false	,
 	listeners : {
         select : function(combo, record, index){ 
         	
@@ -66,7 +66,7 @@ var drm_materialCateComb = new Ext.form.ComboBox({
 	triggerAction : 'all',
 	selectOnFocus : true,
 	//blankText: '不能为空', 
-	readOnly : true,
+	readOnly : false,
 	listeners : {
         select : function(combo, record, index){ 
         	materialComb.allowBlank = true;

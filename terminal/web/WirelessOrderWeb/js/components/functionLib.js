@@ -1,5 +1,6 @@
 Ext.onReady(function() {
 	Ext.BLANK_IMAGE_URL = "../../extjs/resources/images/default/s.gif";
+	Ext.form.Field.prototype.msgTarget = 'side';  
 	Ext.QuickTips.init();
 	Ext.lib.Ajax.defaultPostHeader += '; charset=utf-8';
 });
@@ -10,14 +11,13 @@ Ext.onReady(function() {
 Ext.Ajax.on('requestcomplete',checkUserSessionStatus, this);     
 function checkUserSessionStatus(conn,response,options){     
    //Ext重新封装了response对象
-
-    if(response.getResponseHeader && response.getResponseHeader.session_status){ 
+    if(response.getResponseHeader && response.getResponseHeader("session_status")){ 
   		var interval = 3;
 		var action = '<br>&nbsp;&nbsp;&nbsp;<span id="returnInterval" style="color:red;"></span>&nbsp;之后自动跳转';
 		new Ext.util.TaskRunner().start({
 			run: function(){
 				if(interval < 1){
-					location.href = response.getResponseHeader.root_path + '/pages/Login.html';								
+					location.href = response.getResponseHeader("root_path") + '/pages/Login.html';								
 				}
 				Ext.getDom('returnInterval').innerHTML = interval;
 				interval--;
@@ -32,14 +32,14 @@ function checkUserSessionStatus(conn,response,options){
 			closable : false,
 			fn : function(btn){
 				if(btn == 'ok'){
-					location.href = response.getResponseHeader.root_path + '/pages/Login.html';
+					location.href = response.getResponseHeader("root_path") + '/pages/Login.html';
 				}
 			}
 		});
     }     
 } 
 
-Ext.override(Ext.tree.TreeEventModel, {
+/*Ext.override(Ext.tree.TreeEventModel, {
 	delegateClick : function(e, t){
         if(!this.beforeEvent(e)){
             return;
@@ -53,17 +53,17 @@ Ext.override(Ext.tree.TreeEventModel, {
         }
         else if(this.getNodeTarget(e)){
 			this.tree.getSelectionModel().selNode = this.getNode(e);
-			
             this.onNodeClick(e, this.getNode(e));
+            
         }
     }
-});
-/*Ext.override(Ext.tree.TreeEventModel, {
+});*/
+Ext.override(Ext.tree.TreeEventModel, {
 	onNodeClick : function(e, node) {
 		this.tree.getSelectionModel().select(node);
 		node.ui.onClick(e);
 	}
-});*/
+});
 Ext.override(Ext.tree.TreeNodeUI, {
 	onDblClick : function(e){
 		e.preventDefault();

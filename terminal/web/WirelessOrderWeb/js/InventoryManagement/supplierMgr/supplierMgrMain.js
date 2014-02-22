@@ -195,7 +195,7 @@ var filterComb = new Ext.form.ComboBox({
 	triggerAction : 'all',
 	selectOnFocus : true,
 	allowBlank : false,
-	readOnly : true,
+	readOnly : false,
 	listeners : {
 		select : function(combo, record, index){
 			var fn = Ext.getCmp('findName');

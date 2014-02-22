@@ -59,7 +59,7 @@ function orderFoodStatPanelInit(){
 		xtype : 'datefield',		
 		format : 'Y-m-d',
 		width : 100,
-		readOnly : true,
+		readOnly : false,
 		maxValue : new Date(),
 		listeners : {
 			blur : function(thiz){									
@@ -72,7 +72,7 @@ function orderFoodStatPanelInit(){
 		format : 'Y-m-d',
 		width : 100,
 		maxValue : new Date(),
-		readOnly : true,
+		readOnly : false,
 		listeners : {
 			blur : function(thiz){									
 				Ext.ux.checkDuft(false, beginDate.getId(), thiz.getId());
@@ -229,7 +229,7 @@ function kitchenStatPanelInit(){
 		format : 'Y-m-d',
 		width : 100,
 		maxValue : new Date(),
-		readOnly : true,
+		readOnly : false,
 		listeners : {
 			blur : function(thiz){									
 				Ext.ux.checkDuft(true, thiz.getId(), endDate.getId());
@@ -241,7 +241,7 @@ function kitchenStatPanelInit(){
 		format : 'Y-m-d',
 		width : 100,
 		maxValue : new Date(),
-		readOnly : true,
+		readOnly : false,
 		listeners : {
 			blur : function(thiz){									
 				Ext.ux.checkDuft(false, beginDate.getId(), thiz.getId());
@@ -363,7 +363,7 @@ function deptStatPanelInit(){
 		format : 'Y-m-d',
 		width : 100,
 		maxValue : new Date(),
-		readOnly : true,
+		readOnly : false,
 		listeners : {
 			blur : function(thiz){									
 				Ext.ux.checkDuft(true, thiz.getId(), endDate.getId());
@@ -375,7 +375,7 @@ function deptStatPanelInit(){
 		format : 'Y-m-d',
 		width : 100,
 		maxValue : new Date(),
-		readOnly : true,
+		readOnly : false,
 		listeners : {
 			blur : function(thiz){									
 				Ext.ux.checkDuft(false, beginDate.getId(), thiz.getId());

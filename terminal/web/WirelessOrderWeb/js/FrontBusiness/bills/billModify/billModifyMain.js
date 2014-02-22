@@ -31,7 +31,7 @@
 				xtype : 'combo',
 				id : 'comboDiscount',
 				fieldLabel : '折扣方案',
-				readOnly : true,
+				readOnly : false,
 				forceSelection : true,
 				store : new Ext.data.JsonStore({
 					root : 'root',

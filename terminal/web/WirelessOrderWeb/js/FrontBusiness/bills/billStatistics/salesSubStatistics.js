@@ -23,7 +23,7 @@ function createStatGridTabDutyFn(_c){
 		selectOnFocus : true,
 		forceSelection : true,
 		allowBlank : false,
-		readOnly : true,
+		readOnly : false,
 		selectOnFocus : true,
 		listeners : typeof _c.listeners != 'undefined' ? _c.listeners : null
 	}); 

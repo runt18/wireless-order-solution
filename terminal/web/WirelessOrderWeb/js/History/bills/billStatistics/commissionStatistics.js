@@ -54,7 +54,7 @@ function commissionDetailInit(){
 		format : 'Y-m-d',
 		width : 100,
 		maxValue : new Date(),
-		readOnly : true,
+		readOnly : false,
 		allowBlank : false
 	});
 	var commission_endDate = new Ext.form.DateField({
@@ -62,7 +62,7 @@ function commissionDetailInit(){
 		format : 'Y-m-d',
 		width : 100,
 		maxValue : new Date(),
-		readOnly : true,
+		readOnly : false,
 		allowBlank : false
 	});
 	var commission_dateCombo = Ext.ux.createDateCombo({
@@ -75,7 +75,7 @@ function commissionDetailInit(){
 	
 	var commission_combo_staffs = new Ext.form.ComboBox({
 		id : 'commission_combo_staffs',
-		readOnly : true,
+		readOnly : false,
 		forceSelection : true,
 		width : 103,
 		listWidth : 120,
@@ -321,7 +321,7 @@ function commissionTotalInit(){
 		format : 'Y-m-d',
 		width : 100,
 		maxValue : new Date(),
-		readOnly : true,
+		readOnly : false,
 		allowBlank : false
 	});
 	var commissionTotal_endDate = new Ext.form.DateField({
@@ -329,7 +329,7 @@ function commissionTotalInit(){
 		format : 'Y-m-d',
 		width : 100,
 		maxValue : new Date(),
-		readOnly : true,
+		readOnly : false,
 		allowBlank : false
 	});
 	var commissionTotal_dateCombo = Ext.ux.createDateCombo({

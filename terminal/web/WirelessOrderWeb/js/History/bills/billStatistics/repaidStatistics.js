@@ -4,7 +4,7 @@ var repaid_beginDate = new Ext.form.DateField({
 	format : 'Y-m-d',
 	width : 100,
 	maxValue : new Date(),
-	readOnly : true,
+	readOnly : false,
 	allowBlank : false
 });
 var repaid_endDate = new Ext.form.DateField({
@@ -12,7 +12,7 @@ var repaid_endDate = new Ext.form.DateField({
 	format : 'Y-m-d',
 	width : 100,
 	maxValue : new Date(),
-	readOnly : true,
+	readOnly : false,
 	allowBlank : false
 });
 var repaid_dateCombo = Ext.ux.createDateCombo({
@@ -25,7 +25,7 @@ var repaid_dateCombo = Ext.ux.createDateCombo({
 
 var repaid_combo_staffs = new Ext.form.ComboBox({
 	id : 'repaid_combo_staffs',
-	readOnly : true,
+	readOnly : false,
 	forceSelection : true,
 	width : 103,
 	listWidth : 120,

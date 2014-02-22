@@ -429,7 +429,7 @@ Ext.onReady(function(){
 			}, {
 				xtype : 'combo',
 				id : 'hsa_comboSearchForStockType',
-				readOnly : true,
+				readOnly : false,
 				forceSelection : true,
 				width : 100,
 				value : -1,
@@ -466,7 +466,7 @@ Ext.onReady(function(){
 			}, {
 				xtype : 'combo',
 				id : 'comboSearchForSubType',
-				readOnly : true,
+				readOnly : false,
 				forceSelection : true,
 				width : 100,
 				store : new Ext.data.SimpleStore({
@@ -490,7 +490,7 @@ Ext.onReady(function(){
 			}, {
 				xtype : 'combo',
 				id : 'comboSearchForCateType',
-				readOnly : true,
+				readOnly : false,
 				forceSelection : true,
 				width : 100,
 				value : -1,
@@ -518,7 +518,7 @@ Ext.onReady(function(){
 				id : 'comboSearchForDept',
 				fieldLabel : '仓库',
 				width : 100,
-				readOnly : true,
+				readOnly : false,
 				forceSelection : true,
 				store : new Ext.data.SimpleStore({
 					fields : ['value', 'text']
@@ -562,7 +562,7 @@ Ext.onReady(function(){
 			}, {
 				xtype : 'combo',
 				id : 'comboSearchForStockStatus',
-				readOnly : true,
+				readOnly : false,
 				forceSelection : true,
 				width : 100,
 				value : -1,
@@ -588,7 +588,7 @@ Ext.onReady(function(){
 			}, {
 				xtype : 'combo',
 				id : 'comboSearchForSupplier',
-				readOnly : true,
+				readOnly : false,
 				forceSelection : true,
 				width : 103,
 				listWidth : 120,

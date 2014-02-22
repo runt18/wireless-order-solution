@@ -33,7 +33,7 @@ var materialTypeComb = new Ext.form.ComboBox({
 	mode : 'local',
 	triggerAction : 'all',
 	selectOnFocus : true,
-	readOnly : true	,
+	readOnly : false	,
 	allowBlank : false,
 	blankText: '不能为空',
 	listeners : {
@@ -82,7 +82,7 @@ var materialCateComb = new Ext.form.ComboBox({
 	triggerAction : 'all',
 	selectOnFocus : true,
 	//blankText: '不能为空', 
-	readOnly : true,
+	readOnly : false,
 	listeners : {
         select : function(combo, record, index){ 
         	materialComb.reset();

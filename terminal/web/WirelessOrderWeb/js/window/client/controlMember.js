@@ -60,7 +60,7 @@ Ext.onReady(function(){
 				xtype : 'combo',
 				id : 'cm_comboMemberType',
 				fieldLabel : '会员类型' + Ext.ux.txtFormat.xh,
-				readOnly : true,
+				readOnly : false,
 				forceSelection : true,
 				store : new Ext.data.JsonStore({
 					url: '../../QueryMemberType.do?dataSource=normal&isCookie=true&restaurantID=' + restaurantID,
@@ -86,7 +86,7 @@ Ext.onReady(function(){
 				xtype : 'combo',
 				id : 'cm_comboMemberSex',
 				fieldLabel : '性别' + Ext.ux.txtFormat.xh,
-				readOnly : true,
+				readOnly : false,
 				forceSelection : true,
 				value : 0,
 				store : new Ext.data.SimpleStore({

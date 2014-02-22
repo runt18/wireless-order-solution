@@ -152,7 +152,7 @@ Ext.onReady(function(){
 					xtype : 'combo',
 					id : 'rd_comboRechargeType',
 					fieldLabel : '收款方式' + Ext.ux.txtFormat.xh,
-					readOnly : true,
+					readOnly : false,
 					forceSelection : true,
 					value : 1,
 					store : new Ext.data.SimpleStore({

@@ -3,7 +3,7 @@ getClientTypeTrigger = function(c){
 		editable : false,
 	    fieldLabel : c.fieldLabel,
 	    id : c.id,
-	    readOnly : true,
+	    readOnly : false,
 	    allowBlank : typeof c.allowBlank == 'boolean' ? c.allowBlank : false,
 	    width : c.width == null || typeof c.width == 'undefined' ? '' : c.width,
 	    blankText : '该项不能为空.',

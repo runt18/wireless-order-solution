@@ -62,7 +62,7 @@ Ext.onReady(function(){
 /*	mcd_search_comboOperateType = new Ext.form.ComboBox({
 		xtype : 'combo',
 		id : 'mcd_search_comboOperateType',
-		readOnly : true,
+		readOnly : false,
 		forceSelection : true,
 		width : 80,
 		value : -1,
@@ -87,7 +87,7 @@ Ext.onReady(function(){
 		id : 'mcd_search_memberType',
 		width : 90,
 		forceSelection : true,
-		readOnly : true,
+		readOnly : false,
 		store : new Ext.data.JsonStore({
 			root : 'root',
 			fields : ['id', 'name']
@@ -147,7 +147,7 @@ Ext.onReady(function(){
 		maxValue : new Date(),
 		hideParent : true,
 		hidden : mcd_modal ? false : true,
-		readOnly : true,
+		readOnly : false,
 		allowBlank : false
 	});
 	mcd_search_offDuty = new Ext.form.DateField({
@@ -157,7 +157,7 @@ Ext.onReady(function(){
 		maxValue : new Date(),
 		hideParent : true,
 		hidden : mcd_modal ? false : true,
-		readOnly : true,
+		readOnly : false,
 		allowBlank : false
 	});
 	var mcd_search_dateCombo = Ext.ux.createDateCombo({

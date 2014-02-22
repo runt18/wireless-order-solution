@@ -118,7 +118,7 @@ function initAddLevelWin(){
 				xtype : 'combo',
 				id : 'combo_memberLevel_mType',
 				fieldLabel : '会员类型',
-				readOnly : true,
+				readOnly : false,
 				forceSelection : true,
 				width : 130,
 				listWidth : 120,

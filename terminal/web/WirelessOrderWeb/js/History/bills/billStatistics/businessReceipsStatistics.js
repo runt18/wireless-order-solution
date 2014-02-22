@@ -283,7 +283,7 @@ var receivablesStatResultGrid = new Ext.grid.GridPanel({
 		width : 100,
 		maxValue : new Date(),
 		allowBlank : false,
-		readOnly : true
+		readOnly : false
 	}, {
 		xtype : 'tbtext',
 		text : '&nbsp;至&nbsp;'
@@ -294,7 +294,7 @@ var receivablesStatResultGrid = new Ext.grid.GridPanel({
 		width : 100,
 		maxValue : new Date(),
 		allowBlank : false,
-		readOnly : true
+		readOnly : false
 	}, '->', {
 		text : '搜索',
 		id : 'btnSearchReceivablesStat',

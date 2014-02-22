@@ -16,7 +16,7 @@ Ext.onReady(function(){
 	mcsc_search_comboOperateType = new Ext.form.ComboBox({
 		xtype : 'combo',
 		id : 'mcsc_search_comboOperateType',
-		readOnly : true,
+		readOnly : false,
 		forceSelection : true,
 		width : 80,
 		value : -1,
@@ -42,7 +42,7 @@ Ext.onReady(function(){
 		format : 'Y-m-d',
 //		maxValue : new Date(new Date().getTime() - 24 * 3600 * 1000),
 		maxValue : new Date(),
-		readOnly : true,
+		readOnly : false,
 		allowBlank : false
 	});
 	mcsc_search_offDuty = new Ext.form.DateField({
@@ -51,14 +51,14 @@ Ext.onReady(function(){
 		format : 'Y-m-d',
 		maxValue : new Date(new Date().getTime() - 24 * 3600 * 1000),
 		maxValue : new Date(),
-		readOnly : true,
+		readOnly : false,
 		allowBlank : false
 	});
 	mcsc_search_memberType = new Ext.form.ComboBox({
 		id : 'mcsc_search_memberType',
 		width : 90,
 		forceSelection : true,
-		readOnly : true,
+		readOnly : false,
 		store : new Ext.data.JsonStore({
 			root : 'root',
 			fields : ['id', 'name']

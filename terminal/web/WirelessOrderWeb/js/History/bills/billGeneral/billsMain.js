@@ -345,7 +345,7 @@ var h_bills_filterTypeComb = new Ext.form.ComboBox({
 	mode : 'local',
 	triggerAction : 'all',
 	selectOnFocus : true,
-	readOnly : true,
+	readOnly : false,
 	allowBlank : false,
 	listeners : {
 		select : function(combo, record, index) {
@@ -476,7 +476,7 @@ Ext.onReady(function() {
 			triggerAction : 'all',
 			selectOnFocus : true,
 			allowBlank : false,
-			readOnly : true,
+			readOnly : false,
 			listeners : {
 				select : function(combo, record, index){
 					searchOperator = combo.getId();
@@ -500,7 +500,7 @@ Ext.onReady(function() {
 			triggerAction : 'all',
 			selectOnFocus : true,
 			allowBlank : false,
-			readOnly : true
+			readOnly : false
 		}, {
 			xtype : 'combo',
 			forceSelection : true,
@@ -519,7 +519,7 @@ Ext.onReady(function() {
 			triggerAction : 'all',
 			selectOnFocus : true,
 			allowBlank : false,
-			readOnly : true
+			readOnly : false
 		}, {
 			xtype : 'datefield',
 			id : 'dateSearchDateBegin',

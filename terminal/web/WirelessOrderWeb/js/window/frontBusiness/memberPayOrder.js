@@ -175,7 +175,7 @@ Ext.onReady(function(){
 				items : [{
 					xtype : 'combo',
 					id : 'mpo_txtDiscountForPayOrder',
-					readOnly : true,
+					readOnly : false,
 					forceSelection : true,
 					disabled : false,
 					fieldLabel : '折扣方案',
@@ -253,7 +253,7 @@ Ext.onReady(function(){
 				items : [{
 					xtype : 'combo',
 					id : 'mpo_comPayMannerForPayOrder',
-					readOnly : true,
+					readOnly : false,
 					forceSelection : true,
 					fieldLabel : '收款方式',
 					store : new Ext.data.SimpleStore({
@@ -270,7 +270,7 @@ Ext.onReady(function(){
 				items : [{
 					xtype : 'combo',
 					id : 'mpo_couponForPayOrder',
-					readOnly : true,
+					readOnly : false,
 					forceSelection : true,
 					disabled : false,
 					fieldLabel : '<font style="color:red;font-weight:bold">＊</font>优惠劵',

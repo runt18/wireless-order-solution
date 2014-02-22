@@ -131,7 +131,7 @@ var materialTypeComb = new Ext.form.ComboBox({
 	mode : 'local',
 	triggerAction : 'all',
 	selectOnFocus : true,
-	readOnly : true	,
+	readOnly : false	,
 	listeners : {
         select : function(combo, record, index){  
         	materialCateComb.reset();
@@ -179,7 +179,7 @@ var materialCateComb = new Ext.form.ComboBox({
 	triggerAction : 'all',
 	selectOnFocus : true,
 	//blankText: '不能为空', 
-	readOnly : true,
+	readOnly : false,
 	listeners : {
         select : function(combo, record, index){ 
         	materialComb.allowBlank = true;
@@ -348,7 +348,7 @@ Ext.onReady(function(){
 		}, {
 			xtype : 'combo',
 			id : 'sdr_comboSearchForStockType',
-			readOnly : true,
+			readOnly : false,
 			forceSelection : true,
 			width : 100,
 			value : -1,
@@ -385,7 +385,7 @@ Ext.onReady(function(){
 		}, {
 			xtype : 'combo',
 			id : 'sdr_comboSearchForSubType',
-			readOnly : true,
+			readOnly : false,
 			forceSelection : true,
 			width : 100,
 			store : new Ext.data.SimpleStore({

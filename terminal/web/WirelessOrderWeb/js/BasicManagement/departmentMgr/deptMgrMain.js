@@ -38,7 +38,7 @@ function initCouponTypeWin(){
 					width : 130,
 					fieldLabel : '日期',
 					format : 'Y-m-d',
-					readOnly : true,
+					readOnly : false,
 					allowBlank : false,
 					blankText : '日期不能为空.'
 				},{

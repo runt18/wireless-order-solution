@@ -312,7 +312,7 @@ var allFoodTabPanelGridTbar = new Ext.Toolbar({
 		typeAhead : true,
 		selectOnFocus : true,
 		forceSelection : true,
-		readOnly : true,
+		readOnly : false,
 		listeners : {
 			render : function(thiz){
 				Ext.getCmp('comSearchType').fireEvent('select', thiz, null, 0);
@@ -377,7 +377,7 @@ var allFoodTabPanelGridTbar = new Ext.Toolbar({
 		typeAhead : true,
 		selectOnFocus : true,
 		forceSelection : true,
-		readOnly : true,
+		readOnly : false,
 		hidden : true,
 		listeners : {
 			render : function(thiz){
@@ -574,7 +574,7 @@ var tempFoodTabPanel = new Ext.Panel({
 				typeAhead : true,
 				selectOnFocus : true,
 				forceSelection : true,
-				readOnly : true,
+				readOnly : false,
 				allowBlank : false,
 				listeners : {
 					render : function(thiz){

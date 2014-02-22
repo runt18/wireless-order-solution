@@ -387,7 +387,7 @@ var chooseRoleComb = new Ext.form.ComboBox({
 	triggerAction : 'all',
 	selectOnFocus : true,
 	allowBlank : false,
-	readOnly : true,
+	readOnly : false,
 	listeners : {
 		render : function(thiz){
 			roleStore.remove(roleStore.getAt(0));
@@ -407,7 +407,7 @@ var referRoleComb = new Ext.form.ComboBox({
 	mode : 'local',
 	triggerAction : 'all',
 	selectOnFocus : true,
-	readOnly : true,
+	readOnly : false,
 		listeners : {
 		render : function(thiz){
 			roleStore.reload();
@@ -426,7 +426,7 @@ var searchRoleComb = new Ext.form.ComboBox({
 	mode : 'local',
 	triggerAction : 'all',
 	selectOnFocus : true,
-	readOnly : true,
+	readOnly : false,
 	hidden : true,
 	listeners : {
 		select : function(){
@@ -846,7 +846,7 @@ var spm_filterComb = new Ext.form.ComboBox({
 	triggerAction : 'all',
 	selectOnFocus : true,
 	allowBlank : false,
-	readOnly : true,
+	readOnly : false,
 	listeners : {
 		select : function(combo, record, index){
 			var name = Ext.getCmp('txtSearchName');

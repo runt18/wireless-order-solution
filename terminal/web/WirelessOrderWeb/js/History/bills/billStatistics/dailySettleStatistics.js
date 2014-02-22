@@ -97,7 +97,7 @@ function dailySettleStatGridInit(){
 		format : 'Y-m-d',
 		width : 100,
 		maxValue : new Date(),
-		readOnly : true,
+		readOnly : false,
 		allowBlank : false,
 		listeners : {
 			blur : function(thiz){									
@@ -110,7 +110,7 @@ function dailySettleStatGridInit(){
 		format : 'Y-m-d',
 		width : 100,
 		maxValue : new Date(),
-		readOnly : true,
+		readOnly : false,
 		allowBlank : false,
 		listeners : {
 			blur : function(thiz){									

@@ -862,7 +862,7 @@ function initControl(){
 		}, {
 			xtype : 'combo',
 			id : 'comboSearchForStockType',
-			readOnly : true,
+			readOnly : false,
 			forceSelection : true,
 			width : 100,
 			value : 1,
@@ -896,7 +896,7 @@ function initControl(){
 		}, {
 			xtype : 'combo',
 			id : 'sam_comboSearchForSubType',
-			readOnly : true,
+			readOnly : false,
 			forceSelection : true,
 			width : 100,
 			value : -1,
@@ -921,7 +921,7 @@ function initControl(){
 		}, {
 			xtype : 'combo',
 			id : 'sam_comboSearchForCateType',
-			readOnly : true,
+			readOnly : false,
 			forceSelection : true,
 			width : 100,
 			value : 1,
@@ -949,7 +949,7 @@ function initControl(){
 			id : 'sam_comboSearchForDept',
 			fieldLabel : '仓库',
 			width : 100,
-			readOnly : true,
+			readOnly : false,
 			forceSelection : true,
 			store : new Ext.data.SimpleStore({
 				fields : ['value', 'text']
@@ -995,7 +995,7 @@ function initControl(){
 		}, {
 			xtype : 'combo',
 			id : 'sam_comboSearchForStockStatus',
-			readOnly : true,
+			readOnly : false,
 			forceSelection : true,
 			width : 100,
 			value : -1,
@@ -1021,7 +1021,7 @@ function initControl(){
 		}, {
 			xtype : 'combo',
 			id : 'sam_comboSearchForSupplier',
-			readOnly : true,
+			readOnly : false,
 			forceSelection : true,
 			width : 103,
 			listWidth : 120,
@@ -1398,7 +1398,7 @@ function initControl(){
 	    				id : 'comboDeptInForStockActionBasic',
 	    				xtype : 'combo',
 	    				fieldLabel : '收货仓',
-	    				readOnly : true,
+	    				readOnly : false,
 	    				forceSelection : true,
 	    				width : 103,
 	    				listWidth : 120,
@@ -1431,7 +1431,7 @@ function initControl(){
 	    				id : 'comboSupplierForStockActionBasic',
 	    				xtype : 'combo',
 	    				fieldLabel : '供应商',
-	    				readOnly : true,
+	    				readOnly : false,
 	    				forceSelection : true,
 	    				width : 103,
 	    				listWidth : 120,
@@ -1460,7 +1460,7 @@ function initControl(){
 	    				id : 'comboDeptOutForStockActionBasic',
 	    				xtype : 'combo',
 	    				fieldLabel : '出货仓',
-	    				readOnly : true,
+	    				readOnly : false,
 	    				forceSelection : true,
 	    				width : 103,
 	    				listWidth : 120,
@@ -1500,7 +1500,7 @@ function initControl(){
 					width : 103,
 					fieldLabel : '日期',
 					format : 'Y-m-d',
-					readOnly : true,
+					readOnly : false,
 					allowBlank : false,
 					blankText : '日期不能为空, 且小于当前会计月月底并大于该月最后一次盘点时间.'
 				}]

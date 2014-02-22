@@ -131,7 +131,7 @@ function initGrid(){
 		}, {
 			xtype : 'combo',
 			id : 'comboSearchType',
-			readOnly : true,
+			readOnly : false,
 			forceSelection : true,
 			width : 100,
 			value : 0,
@@ -218,7 +218,7 @@ function initGrid(){
 			mode : 'local',
 			triggerAction : 'all',
 			selectOnFocus : true,
-			readOnly : true
+			readOnly : false
 		}, {
 			xtype : 'numberfield',
 			id : 'txtSearchNumberValue',
@@ -230,7 +230,7 @@ function initGrid(){
 			id : 'comboSearchKitchen',
 			hidden : true,
 			forceSelection : true,
-			readOnly : true,
+			readOnly : false,
 			width : 100,
 			store : new Ext.data.JsonStore({
 				root : 'root',
@@ -384,7 +384,7 @@ function initWin(){
 					mode : 'local',
 					triggerAction : 'all',
 					selectOnFocus : true,
-					readOnly : true
+					readOnly : false
 				}, {
 					xtype : 'label',
 					style : 'color:green;font-szie:12px;',

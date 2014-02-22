@@ -203,7 +203,7 @@ function initTasteOperatorWin(){
 					triggerAction : 'all',
 					selectOnFocus : true,
 					allowBlank : false,
-					readOnly : true,
+					readOnly : false,
 					listeners : {
 						select : function(e){
 							var data = Ext.ux.getSelData(tasteGrid);
@@ -253,7 +253,7 @@ function initTasteOperatorWin(){
 					xtype : 'textfield',
 					id : 'txtDisplayCalc',
 					fieldLabel : '计算方式',
-					readOnly : true,
+					readOnly : false,
 					disabled : true,
 					width : 170,
 					value : '按价格'
@@ -506,7 +506,7 @@ function initTasteGrid(){
 			mode : 'local',
 			triggerAction : 'all',
 			selectOnFocus : true,
-			readOnly : true
+			readOnly : false
 	    }, { 
 	    	xtype:'tbtext', 
 	    	text:'&nbsp;&nbsp;'

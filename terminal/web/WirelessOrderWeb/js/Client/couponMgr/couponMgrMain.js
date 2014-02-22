@@ -40,7 +40,7 @@ function initCouponTypeWin(){
 					width : 130,
 					fieldLabel : '有效期至',
 					format : 'Y-m-d',
-					readOnly : true,
+					readOnly : false,
 					allowBlank : false,
 					blankText : '日期不能为空.'
 				},{

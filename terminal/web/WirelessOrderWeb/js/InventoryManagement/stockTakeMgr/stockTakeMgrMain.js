@@ -525,7 +525,7 @@ function initWin(){
     				xtype : 'combo',
     				id : 'comboStockTakeDept',
     				fieldLabel : '部门',
-    				readOnly : true,
+    				readOnly : false,
     				forceSelection : true,
     				store : new Ext.data.JsonStore({
     					url: '../../QueryDept.do?',
@@ -558,7 +558,7 @@ function initWin(){
     				xtype : 'combo',
     				id : 'comboMaterialCate',
     				fieldLabel : '货品类型',
-    				readOnly : true,
+    				readOnly : false,
     				forceSelection : true,
     				store : new Ext.data.SimpleStore({
     					data : winParams.cate,

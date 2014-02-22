@@ -48,6 +48,7 @@ function orderSingleTasteOperationHandler(_c){
 	}
 	// 修改原数据
 	for(var i = 0; i < _c.grid.order.orderFoods.length; i++){
+		
 		if(compareDataType(_c.grid.order.orderFoods[i], or)){
 			if(compareTasteGroup(_c.grid.order.orderFoods[i].tasteGroup, or['tasteGroup'])){
 				tasteGroup.tastePref = tasteGroup.normalTaste.name.length > 0 ? tasteGroup.normalTaste.name : '无口味';
@@ -59,12 +60,16 @@ function orderSingleTasteOperationHandler(_c){
 	// 合并重复数据
 	var tempData = {root:[]};
 	for(var i = 0; i < _c.grid.order.orderFoods.length; i++){
+		
 		var cs = true;
 		for(var j = 0; j < tempData.root.length; j++){
 			if(compareDataType(tempData.root[j], _c.grid.order.orderFoods[i])){
 				if(compareTasteGroup(tempData.root[j].tasteGroup,  _c.grid.order.orderFoods[i].tasteGroup)){
-					cs = false;
-					tempData.root[j].count += _c.grid.order.orderFoods[i].count;
+					if(tempData.root[j].id == _c.grid.order.orderFoods[i].id){
+						cs = false;
+						tempData.root[j].count += _c.grid.order.orderFoods[i].count;
+					}
+
 				}
 			}
 		}

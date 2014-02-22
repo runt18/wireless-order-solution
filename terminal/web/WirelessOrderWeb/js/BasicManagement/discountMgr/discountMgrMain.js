@@ -657,7 +657,7 @@ Ext.onReady(function(){
 				selectOnFocus : true,
 				forceSelection : true,
 				allowBlank : false,
-				readOnly : true
+				readOnly : false
 	    	}, {
 	    		xtype : 'numberfield',
 	    		id : 'numUpdateAllRateByDiscountPlan',

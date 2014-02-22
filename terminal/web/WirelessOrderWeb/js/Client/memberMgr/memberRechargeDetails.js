@@ -10,7 +10,7 @@ Ext.onReady(function(){
 	mrd_search_comboOperateType = new Ext.form.ComboBox({
 		xtype : 'combo',
 		id : 'mrd_search_comboOperateType',
-		readOnly : true,
+		readOnly : false,
 		forceSelection : true,
 		width : 80,
 		value : -1,
@@ -35,7 +35,7 @@ Ext.onReady(function(){
 		id : 'mrd_search_memberType',
 		width : 90,
 		forceSelection : true,
-		readOnly : true,
+		readOnly : false,
 		store : new Ext.data.JsonStore({
 			root : 'root',
 			fields : ['id', 'name']
@@ -95,7 +95,7 @@ Ext.onReady(function(){
 		maxValue : new Date(),
 		hideParent : true,
 		hidden : mrd_modal ? false : true,
-		readOnly : true,
+		readOnly : false,
 		allowBlank : false
 	});
 	mrd_search_offDuty = new Ext.form.DateField({
@@ -105,7 +105,7 @@ Ext.onReady(function(){
 		maxValue : new Date(),
 		hideParent : true,
 		hidden : mrd_modal ? false : true,
-		readOnly : true,
+		readOnly : false,
 		allowBlank : false
 	});
 	var mrd_search_dateCombo = Ext.ux.createDateCombo({

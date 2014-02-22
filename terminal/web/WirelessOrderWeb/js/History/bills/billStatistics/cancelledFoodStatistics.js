@@ -104,7 +104,7 @@ function cancelFoodDetailsStatPanelInit(){
 		format : 'Y-m-d',
 		width : 100,
 		maxValue : new Date(),
-		readOnly : true,
+		readOnly : false,
 		listeners : {
 			blur : function(thiz){									
 				Ext.ux.checkDuft(true, thiz.getId(), endDate.getId());
@@ -116,7 +116,7 @@ function cancelFoodDetailsStatPanelInit(){
 		format : 'Y-m-d',
 		width : 100,
 		maxValue : new Date(),
-		readOnly : true,
+		readOnly : false,
 		listeners : {
 			blur : function(thiz){									
 				Ext.ux.checkDuft(false, beginDate.getId(), thiz.getId());
@@ -160,7 +160,7 @@ function cancelFoodDetailsStatPanelInit(){
 		displayField : 'reason',
 		typeAhead : true,
 //		mode : 'remote',
-		readOnly : true,
+		readOnly : false,
 		triggerAction : 'all',
 		selectOnFocus : true
 	});
@@ -360,7 +360,7 @@ function cancelFoodByDeptStatPanelInit(){
 		format : 'Y-m-d',
 		width : 100,
 		maxValue : new Date(),
-		readOnly : true,
+		readOnly : false,
 		listeners : {
 			blur : function(thiz){									
 				Ext.ux.checkDuft(true, thiz.getId(), endDate.getId());
@@ -372,7 +372,7 @@ function cancelFoodByDeptStatPanelInit(){
 		format : 'Y-m-d',
 		width : 100,
 		maxValue : new Date(),
-		readOnly : true,
+		readOnly : false,
 		listeners : {
 			blur : function(thiz){									
 				Ext.ux.checkDuft(false, beginDate.getId(), thiz.getId());
@@ -509,7 +509,7 @@ function cancelFoodByReasonStatPanelInit(){
 		format : 'Y-m-d',
 		width : 100,
 		maxValue : new Date(),
-		readOnly : true,
+		readOnly : false,
 		listeners : {
 			blur : function(thiz){									
 				Ext.ux.checkDuft(true, thiz.getId(), endDate.getId());
@@ -521,7 +521,7 @@ function cancelFoodByReasonStatPanelInit(){
 		format : 'Y-m-d',
 		width : 100,
 		maxValue : new Date(),
-		readOnly : true,
+		readOnly : false,
 		listeners : {
 			blur : function(thiz){									
 				Ext.ux.checkDuft(false, beginDate.getId(), thiz.getId());

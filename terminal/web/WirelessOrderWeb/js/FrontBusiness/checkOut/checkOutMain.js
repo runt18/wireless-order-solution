@@ -1,7 +1,7 @@
 ﻿var co_memberCard = new Ext.form.NumberField({
 	width : 100,
 	inputType : 'password',
-	style : 'text-align:left; font-weight: bold; color: #FF0000;',
+	style : 'text-align:left;font-weight: bold;color: #FF0000;',
 	maxLength : 10,
 	maxLengthText : '请输入10位会员卡号',
 	minLength : 10,
@@ -19,7 +19,7 @@ var checkOutMainPanelTbar = new Ext.Toolbar({
 		xtype : 'combo',
 		id : 'comboDiscount',
 		labelStyle : 'font-size:14px;font-weight:bold;',
-		readOnly : true,
+		readOnly : false,
 		forceSelection : true,
 		store : new Ext.data.JsonStore({
 			root : 'root',
@@ -107,6 +107,7 @@ var checkOutForm = new Ext.form.FormPanel({
 			} ]
 		} ]
 	} ],
+	buttonAlign : 'center',
 	buttons : [ {
 		text : '会员结账',
 		disabled : true,
@@ -237,7 +238,7 @@ Ext.onReady(function() {
 		    30,
 		    ''
 		);
-		checkOutGrid.style = 'backgroundColor:#FFFFFF; border:1px solid #99BBE8;';
+		checkOutGrid.style = 'backgroundColor:#FFFFFF;border:1px solid #99BBE8;';
 		checkOutGrid.getStore().on('load', function(thiz, records){
 			if(checkOutGrid.isVisible()){
 				for(var i = 0; i < records.length; i++){

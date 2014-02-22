@@ -237,7 +237,7 @@ function initOperateMaterialWin(){
 			typeAhead : true,
 			selectOnFocus : true,
 			forceSelection : true,
-			readOnly : true,
+			readOnly : false,
 			allowBlank : false
 		});
 		operateMaterialWin = new Ext.Window({

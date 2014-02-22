@@ -201,7 +201,7 @@ function updateDeptHandler(){
 					xtype : 'textfield',
 					id : 'txtDeptID',
 					fieldLabel : '部门编号',
-					readOnly : true,
+					readOnly : false,
 					disabled : true,
 					width : 130
 				}, {

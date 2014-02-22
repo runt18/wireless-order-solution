@@ -43,7 +43,7 @@ function initWinBillboard(){
 		});
 		var type = new Ext.form.ComboBox({
 			fieldLabel : '类型',
-			readOnly : true,
+			readOnly : false,
 			forceSelection : true,
 			width : 200,
 			value : 0,
@@ -71,7 +71,7 @@ function initWinBillboard(){
 		var restaurant = new Ext.form.ComboBox({
 			disabled : true,
 			fieldLabel : '类型',
-			readOnly : true,
+			readOnly : false,
 			forceSelection : true,
 			width : 200,
 			store : new Ext.data.JsonStore({
@@ -89,7 +89,7 @@ function initWinBillboard(){
 		var expired = new Ext.form.DateField({
 			fieldLabel : '过期时间',
 			width : 200,
-			readOnly : true,
+			readOnly : false,
 			allowBlank : false,
 			minValue : new Date(),
 			format : 'Y-m-d'

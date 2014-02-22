@@ -39,7 +39,6 @@ Ext.onReady(function(){
 		format : 'Y-m-d',
 		width : 100,
 		maxValue : new Date(),
-		readOnly : true,
 		allowBlank : false,
 		listeners : {
 			blur : function(thiz){									
@@ -52,7 +51,6 @@ Ext.onReady(function(){
 		format : 'Y-m-d',
 		width : 100,
 		maxValue : new Date(),
-		readOnly : true,
 		allowBlank : false,
 		listeners : {
 			blur : function(thiz){									

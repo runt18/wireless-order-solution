@@ -1054,7 +1054,7 @@ var basicOperationPanel = new Ext.Panel({
 		 			id : 'txtBasicForFoodName',
 		 			fieldLabel : '菜名',
 		 			allowBlank : false,
-		 			width : 250
+		 			width : 240
 		 		}]
 		 	}, {
 		 		columnWidth : 1
@@ -1114,7 +1114,7 @@ var basicOperationPanel = new Ext.Panel({
 		 	    	fieldLabel : '助记码',
 		 	    	maxValue : 65535,
 		 	    	minValue : 1,
-		 	    	width : 90,
+		 	    	width : 80,
 		 	    	disabled : true,
 		 	    	validator : function(v){
 		 	    		if(v > 0 && v <= 65535 && v.indexOf('.') == -1){
@@ -1149,7 +1149,7 @@ var basicOperationPanel = new Ext.Panel({
 					selectOnFocus : true,
 					forceSelection : true,
 					allowBlank : false,
-					readOnly : true
+					readOnly : false
 		 	    }]
 		 	}, {
 		 		columnWidth : 1,
@@ -1259,7 +1259,7 @@ var basicOperationPanel = new Ext.Panel({
 		 	    	id : 'comboBasicForStockStatus',
 		 	    	fieldLabel : '库存管理',
 		 	    	width : 66,
-		 	    	listWidth : Ext.isIE ? 79 : 83,
+//		 	    	listWidth : Ext.isIE ? 79 : 83,
 		 	    	store : new Ext.data.SimpleStore({
 						fields : ['value', 'text'],
 						data : stockStatusData
@@ -1272,7 +1272,7 @@ var basicOperationPanel = new Ext.Panel({
 					selectOnFocus : true,
 					forceSelection : true,
 					allowBlank : false,
-					readOnly : true
+					readOnly : false
 		 	    }]
 		 	},{
 		 		columnWidth : .5,
@@ -1433,7 +1433,7 @@ function resetbBasicOperation(_d){
 	var commission = Ext.getCmp('numCommission');
 	var chkAlias = Ext.getCmp('chbForFoodAlias');
 	var data = {};
-	
+	commission.getEl().up('.x-form-item').setDisplayed(false);
 	// 清空图片信息
 	refreshFoodImageMsg();
 	
@@ -2319,7 +2319,7 @@ function initMenuGrid(){
 					mode : 'local',
 					triggerAction : 'all',
 					selectOnFocus : true,
-					readOnly : true,
+					readOnly : false,
 					allowBlank : false
 				}, {
 					xtype : 'textfield',
@@ -2734,7 +2734,7 @@ var btnTaste = new Ext.ux.ImageButton({
 
 var menu_filterTypeComb = new Ext.form.ComboBox({
 	forceSelection : true,
-	readOnly : true,
+	readOnly : false,
 	width : 100,
 	value : '全部',
 	id : 'menu_filter',

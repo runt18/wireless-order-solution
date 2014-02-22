@@ -12,7 +12,7 @@ Ext.onReady(function(){
 		}, {
 			xtype : 'combo',
 			id : 'sc_comboClientSearchType',
-			readOnly : true,
+			readOnly : false,
 			forceSelection : true,
 			width : 90,
 			value : 0,
@@ -76,7 +76,7 @@ Ext.onReady(function(){
 			xtype : 'combo',
 			id : 'sc_comboSearchClientSex',
 			hidden : true,
-			readOnly : true,
+			readOnly : false,
 			forceSelection : true,
 			width : 90,
 			value : 0,

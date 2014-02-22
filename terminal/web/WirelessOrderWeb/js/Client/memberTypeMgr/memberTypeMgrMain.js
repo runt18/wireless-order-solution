@@ -146,7 +146,6 @@ function memberTypeWinInit(){
 					xtype : 'combo',
 					id : 'comboAttribute',
 					fieldLabel : '会员属性' + Ext.ux.txtFormat.xh,
-					readOnly : true,
 					forceSelection : true,
 					width : 130,
 					value : 0,
@@ -230,7 +229,6 @@ function memberTypeWinInit(){
 					xtype : 'combo',
 					id : 'comboDiscount',
 					fieldLabel : '默认方案' + Ext.ux.txtFormat.xh,
-					readOnly : true,
 					forceSelection : true,
 					allowBlank : false,
 					blankText : '折扣方案不能为空.',
@@ -393,7 +391,7 @@ function initMemberTypeGrid(){
 		}, {
 			xtype : 'combo',
 			id : 'mtm_comboSearchType',
-			readOnly : true,
+			readOnly : false,
 			forceSelection : true,
 			width : 80,
 			value : 0,
@@ -453,7 +451,7 @@ function initMemberTypeGrid(){
 			id : 'comboSearchDiscountType',
 			width : 150,
 			hidden : true,
-			readOnly : true,
+			readOnly : false,
 			forceSelection : true,
 			value : 0,
 			store : new Ext.data.SimpleStore({
@@ -471,7 +469,7 @@ function initMemberTypeGrid(){
 			id : 'comboSearchMemberAttribute',
 			width : 150,
 			hidden : true,
-			readOnly : true,
+			readOnly : false,
 			forceSelection : true,
 			value : 0,
 			store : new Ext.data.SimpleStore({
