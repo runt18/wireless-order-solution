@@ -1,8 +1,14 @@
 package com.wireless.pojo.dishesOrder;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import com.wireless.json.Jsonable;
 import com.wireless.pojo.util.DateUtil;
 
-public class CancelledFood {
+public class CancelledFood implements Jsonable{
 	private long orderID;           // 账单号
 	private long orderDate;			// 账单时间
 	private int foodId;			// 食品编号
@@ -102,6 +108,23 @@ public class CancelledFood {
 	}
 	public void setReason(String reason) {
 		this.reason = reason;
+	}
+	@Override
+	public Map<String, Object> toJsonMap(int flag) {
+		Map<String, Object> jm = new HashMap<String, Object>();
+		jm.put("orderDateFormat", DateUtil.formatToDate(this.orderDate));
+		jm.put("foodName", this.foodName);
+		jm.put("orderID", this.getOrderID());
+		jm.put("unitPrice", this.getUnitPrice());
+		jm.put("count", this.getCount());
+		jm.put("totalPrice", this.getTotalPrice());
+		jm.put("waiter", this.getWaiter());
+		jm.put("reason", this.getReason());
+		return Collections.unmodifiableMap(jm);
+	}
+	@Override
+	public List<Object> toJsonList(int flag) {
+		return null;
 	}
 	
 }

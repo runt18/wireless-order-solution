@@ -1,14 +1,18 @@
 package com.wireless.pojo.billStatistics;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import com.wireless.json.Jsonable;
 import com.wireless.pojo.crMgr.CancelReason;
 import com.wireless.pojo.menuMgr.Department;
 
 public class CancelIncomeByReason {
 	
-	public static class IncomeByEachDept{
+	public static class IncomeByEachDept implements Jsonable{
 		
 		Department mDept;		//部门信息
 		float mCancelAmount;	//退菜数量
@@ -46,6 +50,20 @@ public class CancelIncomeByReason {
 		
 		public float getPrice(){
 			return this.mCancelPrice;
+		}
+
+		@Override
+		public Map<String, Object> toJsonMap(int flag) {
+			Map<String, Object> jm = new HashMap<String, Object>();
+			jm.put("dept", this.getDept());
+			jm.put("amount", this.getAmount());
+			jm.put("price", this.getPrice());
+			return Collections.unmodifiableMap(jm);
+		}
+
+		@Override
+		public List<Object> toJsonList(int flag) {
+			return null;
 		}
 	}
 	
