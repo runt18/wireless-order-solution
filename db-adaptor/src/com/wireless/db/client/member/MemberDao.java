@@ -919,7 +919,9 @@ public class MemberDao {
 		MemberOperation mo = member.consume(consumePrice, coupon, payType);
 		
 		//Perform to use coupon.
-		CouponDao.use(dbCon, staff, coupon.getId(), orderId);
+		if(coupon != null){
+			CouponDao.use(dbCon, staff, coupon.getId(), orderId);
+		}
 		
 		//Set the associate order id
 		mo.setOrderId(orderId);

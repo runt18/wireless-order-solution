@@ -915,7 +915,7 @@ public class FoodDao {
 		Map<Integer, Food> foods = new LinkedHashMap<Integer, Food>();
 		
 		if(orderClause == null){
-			orderClause = " ORDER BY FOOD.food_id ";
+			orderClause = " ORDER BY FOOD.food_alias, food_id ";
 		}
 		//Get the basic detail to each food.
 		List<Food> pureFoods = getPureByCond(dbCon, staff, extraCondition, orderClause);
