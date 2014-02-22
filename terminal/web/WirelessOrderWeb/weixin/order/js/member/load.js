@@ -19,6 +19,7 @@ $(function(){
 				$('#divMemberPointContent').css('display', 'block');
 				$('#divMemberBalanceContent').css('display', 'block');
 				$('#divMemberCouponContent').css('display', 'block');
+				$('#divMemberCouponConsume').css('display', 'block');
 				member = data.other.member;
 				member.restaurant = data.other.restaurant;
 				initMemberMsg({data:member});

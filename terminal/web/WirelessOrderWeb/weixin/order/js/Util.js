@@ -86,7 +86,7 @@ var Util = {
 	},
 	URLTemplet : './{0}?m={1}&r={2}&time={3}',
 	defineURL : function(page){
-		this.mp.oid = 'o_da4uFcIRO1-WkbnEfebmstqFQw'; this.mp.fid = 'gh_cbad03f831ab';
+		//this.mp.oid = 'o_da4uFcIRO1-WkbnEfebmstqFQw'; this.mp.fid = 'gh_cbad03f831ab';
 		return this.URLTemplet.format(page, this.mp.oid, this.mp.fid, new Date().getTime());
 	},
 	skip : function(page){
