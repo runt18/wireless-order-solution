@@ -67,7 +67,12 @@ public class QueryStaffAction extends Action {
 			}
 			if(isName != null){
 				other.put("staff", staff);
-				Restaurant restaurant = RestaurantDao.getById(Integer.parseInt((String) request.getSession().getAttribute("restaurantID")));
+				Restaurant restaurant;
+				if(request.getSession().getAttribute("restaurantID") == null){
+					restaurant = new Restaurant();
+				}else{
+					restaurant = RestaurantDao.getById(Integer.parseInt((String) request.getSession().getAttribute("restaurantID")));
+				}
 				other.put("restaurant", restaurant);
 			}else {
 				if(name != null && !name.trim().isEmpty()){
