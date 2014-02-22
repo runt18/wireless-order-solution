@@ -29,6 +29,7 @@ import com.wireless.common.Params;
 import com.wireless.common.ShoppingCart;
 import com.wireless.common.WirelessOrder;
 import com.wireless.exception.BusinessException;
+import com.wireless.lib.task.CheckVersionTask;
 import com.wireless.lib.task.PicDownloadTask;
 import com.wireless.ordermenu.R;
 import com.wireless.pojo.menuMgr.Food;
@@ -74,7 +75,17 @@ public class StartupActivity extends Activity {
 	protected void onStart(){
 		super.onStart();
 		if(isNetworkAvail()){
-			new QueryStaffTask().execute();
+			new com.wireless.lib.task.CheckVersionTask(StartupActivity.this, CheckVersionTask.E_MENU){
+				@Override
+				protected void onPreExecute() {
+					mMsgTxtView.setText("正在检测版本...请稍候");
+				}
+				
+				@Override
+				public void onCheckVersionPass() {
+					new QueryStaffTask().execute();
+				}					
+			}.execute();
 		}else{
 			showNetSetting();
 		}		
