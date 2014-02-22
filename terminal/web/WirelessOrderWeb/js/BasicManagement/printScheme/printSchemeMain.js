@@ -1171,7 +1171,8 @@ Ext.onReady(function(){
 			text : '全部',
 			leaf : false,
 			printerId : -1,
-			border : true,
+			border : true
+/*			,
 			listeners : {
 				load : function(){
 					var treeRoot = printerTree.getRootNode().childNodes;
@@ -1182,16 +1183,16 @@ Ext.onReady(function(){
 							}
 						});
 					}else{
-						/*printerTree.getRootNode().getUI().hide();
+						printerTree.getRootNode().getUI().hide();
 						Ext.Msg.show({
 							title : '提示',
 							msg : '加载打印机失败',
 							buttons : Ext.MessageBox.OK
-						});*/
+						});
 					}
 					
 				}
-			}
+			}*/
 		}),
 		listeners : {
 			click : function(e){
@@ -1201,7 +1202,8 @@ Ext.onReady(function(){
 						'printerId' : e.attributes.printerId
 					}
 				});
-			},
+			}
+/*			,
 			load : function(node, records){
 				
 				if(node.firstChild != null){
@@ -1210,7 +1212,7 @@ Ext.onReady(function(){
 					Ext.getDom('tbPrinterName').innerHTML = node.firstChild.attributes.name + " " + node.firstChild.attributes.alias;
 				}
 				
-			}
+			}*/
 		}
 		
 		

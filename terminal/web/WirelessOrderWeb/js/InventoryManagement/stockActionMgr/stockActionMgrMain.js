@@ -6,6 +6,18 @@ function NewDate(str) {
 	date.setUTCHours(0, 0, 0, 0); 
 	return date; 
 } 
+
+	var secondStepPanelSouth = Ext.getCmp('secondStepPanelSouth');
+	if(!secondStepPanelSouth){
+		secondStepPanelSouth = new Ext.Panel({
+			id : 'secondStepPanelSouth',
+			region : 'south',
+			frame : true,
+			height : 35,
+			bodyStyle : 'font-size:18px;text-align:center;',
+			contentEl : 'test2'
+		});
+	}
 /**
  * 处理导航
  * @param e
@@ -64,7 +76,7 @@ function stockTaskNavHandler(e){
 		if(index == 1){
 			/***** 第二步, 根据用户选择入库单类型设置相关信息 *****/
 			// stockTypeList -> [[0]出入库类型, [1]货品类型, [2]货单类型]
-			var titleDom = Ext.getCmp('displayPanelForStockActionTitle');
+			var titleDom = Ext.getDom('displayPanelForStockActionTitle');
 			var deptInDom = Ext.getCmp('displayPanelForDeptIn');
 			var supplierDom = Ext.getCmp('displayPanelForSupplier');
 			var deptOutDom = Ext.getCmp('displayPanelForDeptOut');
@@ -226,10 +238,11 @@ function stockTaskNavHandler(e){
 			}
 			if(stockTaskNavWin.otype != Ext.ux.otype['insert']){
 				var sn = Ext.getCmp('stockBasicGrid').getSelectionModel().getSelected();
-				
-				titleDom.body.update(diaplayTitle + '<label style="margin-left:50px">库单编号: ' + sn.data.id + '</label>');
+				document.getElementById('test1').innerHTML = diaplayTitle + '<label style="margin-left:50px">库单编号: ' + sn.data.id + '</label>';
+//				titleDom.setText(diaplayTitle + '库单编号: ' + sn.data.id);
 			}else{
-				titleDom.body.update(diaplayTitle);
+//				titleDom.body.update(diaplayTitle);
+				document.getElementById('test1').innerHTML = diaplayTitle;
 			}
 			
 		}
@@ -1365,20 +1378,21 @@ function initControl(){
 	        }]
 	    });
 	}
-	var secondStepPanelNorth = Ext.getCmp('sam_secondStepPanelNorth');
+	var secondStepPanelNorth = null;
 	if(!secondStepPanelNorth){
 		secondStepPanelNorth = new Ext.Panel({
 			title : '货单基础信息',
 			id : 'sam_secondStepPanelNorth',
 	    	region : 'north',
-	    	height : 120,
+	    	height : 143,
 	    	frame : true,
 	    	items : [{
 	    		id : 'displayPanelForStockActionTitle',
 	    		height : 30,
 	    		bodyStyle : 'font-size:18px;text-align:center;',
-	    		html : '-----'
-		    	}, {
+	    		contentEl : 'test1'
+		    	}
+		    	, {
 					xtype : 'hidden',
 					id : 'hideStockActionId'
 		    	},{
@@ -1614,7 +1628,6 @@ function initControl(){
 				id : 'comboSelectMaterialForStockAction',
 				fieldLabel : '货品',
 				forceSelection : true,
-				width : 103,
 				listWidth : 250,
 				height : 200,
 				maxHeight : 300,
@@ -1777,19 +1790,7 @@ function initControl(){
 	    });
 	}
 
-	var secondStepPanelSouth = Ext.getCmp('secondStepPanelSouth');
-	if(!secondStepPanelSouth){
-		secondStepPanelSouth = new Ext.Panel({
-			id : 'secondStepPanelSouth',
-			region : 'south',
-			frame : true,
-			height : 30,
-			bodyStyle : 'font-size:18px;text-align:center;',
-			html : '总数量小计:<input id="txtTotalAmount" type="text" disabled="disabled" style="height: 20px;width:90px;font-size :18px;font-weight: bolder;" />' +
-				'&nbsp;&nbsp;&nbsp; 总金额:<input id="txtTotalPrice" type="text" disabled="disabled" style="height: 20px;width:90px;font-size :18px;font-weight: bolder;" />' +
-				'&nbsp;&nbsp;&nbsp;<label id="labActualPrice" >实际金额:</label><input id="txtActualPrice" disabled="disabled" type="text" style=" height: 20px;width:90px;font-size :18px;font-weight: bolder; color:red"/>'
-		});
-	}
+
 
 	
 	var secondStepPanel = Ext.getCmp('stock_secondStepPanel');

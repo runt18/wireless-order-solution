@@ -172,11 +172,12 @@ function kitchenWinShow(){
 			closable : false,
 			resizable : false,
 			modal : true,
-			width : 245,			
+			width : 245,
 			items : [{
 				xtype : 'form',
 				layout : 'form',
 				width : 245,
+				
 				labelWidth : 65,
 				frame : true,
 				items : [{
@@ -1258,7 +1259,7 @@ var basicOperationPanel = new Ext.Panel({
 		 	    	xtype : 'combo',
 		 	    	id : 'comboBasicForStockStatus',
 		 	    	fieldLabel : '库存管理',
-		 	    	width : 66,
+		 	    	width : 86,
 //		 	    	listWidth : Ext.isIE ? 79 : 83,
 		 	    	store : new Ext.data.SimpleStore({
 						fields : ['value', 'text'],
@@ -1312,7 +1313,7 @@ var basicOperationPanel = new Ext.Panel({
 		 	    }
 			}), {
 				tag : 'div',
-		 	    height : Ext.isIE ? null : 10
+		 	    height : Ext.isIE ? 5 : 10
 		 	}, {
 		 		xtype : 'panel',
 		 	    layout : 'column',
@@ -2473,7 +2474,7 @@ function initFoodOperationWin(){
 			modal : true,
 			resizable : false,
 			width : 940,
-			height : Ext.isIE ? null : 551,
+			height : 510,
 			layout : 'fit',
 			keys : [{
 				key : Ext.EventObject.ESC,
@@ -2619,7 +2620,7 @@ function initFoodRelationOperationWin(){
 			modal : true,
 			resizable : false,
 			width : 940,
-			height : Ext.isIE ? null : 551,
+			height : 550,
 			layout : 'fit',
 			keys : [{
 				key : Ext.EventObject.ESC,
@@ -2660,7 +2661,7 @@ function initFoodRelationOperationWin(){
 		    		xtype : 'panel',
 		    		layout : 'fit',
 		    		width : 930,
-			    	height : Ext.isIE ? 500 : null,
+			    	height : 500,
 			    	border : false,
 		    		id : 'combinationOperationTab',
 	    	    	items : [combinationOperationPanel]
