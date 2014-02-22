@@ -1,11 +1,9 @@
-/*
- * Ext JS Library 3.0 RC1
- * Copyright(c) 2006-2009, Ext JS, LLC.
+/*!
+ * Ext JS Library 3.1.0
+ * Copyright(c) 2006-2009 Ext JS, LLC
  * licensing@extjs.com
- * 
- * http://extjs.com/license
+ * http://www.extjs.com/license
  */
-
 .x-window {
     zoom:1;
 }
@@ -189,6 +187,12 @@
 	top:0;
 	left:0;
 }
+
+.ext-webkit .x-dlg-focus{
+    width: 1px;
+    height: 1px;
+}
+
 .x-dlg-mask{
     z-index:10000;
     display:none;

@@ -1,11 +1,9 @@
-/*
- * Ext JS Library 3.0 RC1
- * Copyright(c) 2006-2009, Ext JS, LLC.
+/*!
+ * Ext JS Library 3.1.0
+ * Copyright(c) 2006-2009 Ext JS, LLC
  * licensing@extjs.com
- * 
- * http://extjs.com/license
+ * http://www.extjs.com/license
  */
-
 /* Shared styles */
 .x-slider {
     zoom:1;
@@ -29,8 +27,9 @@
     font-size:1px;
     -moz-outline:0 none;
     outline:0 none;
-    -moz-user-select: text;
-    -khtml-user-select: text;
+    -moz-user-select: none;
+    -khtml-user-select:none;
+    -webkit-user-select:ignore;
 	display:block;
 	overflow:hidden;  
 }

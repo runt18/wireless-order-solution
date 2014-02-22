@@ -1,11 +1,9 @@
-/*
- * Ext JS Library 3.0 RC1
- * Copyright(c) 2006-2009, Ext JS, LLC.
+/*!
+ * Ext JS Library 3.1.0
+ * Copyright(c) 2006-2009 Ext JS, LLC
  * licensing@extjs.com
- * 
- * http://extjs.com/license
+ * http://www.extjs.com/license
  */
-
 .ext-strict .ext-ie .x-tree .x-panel-bwrap{
     position:relative;
     overflow:hidden;
@@ -33,31 +31,46 @@
 }
 
 .ext-ie .x-tree-node-indent img, .ext-ie .x-tree-node-icon, .ext-ie .x-tree-ec-icon {
-    vertical-align:middle !important;
+    vertical-align: middle !important;
+}
+
+.ext-strict .ext-ie8 .x-tree-node-indent img, .ext-strict .ext-ie8 .x-tree-node-icon, .ext-strict .ext-ie8 .x-tree-ec-icon {
+    vertical-align: top !important;
 }
 
 /* checkboxes */
-.ext-ie input.x-tree-node-cb {
-    width:15px;
-    height:15px;
-}
 
 input.x-tree-node-cb {
     margin-left:1px;
+    height: 19px;
+	vertical-align: bottom;
 }
 
 .ext-ie input.x-tree-node-cb {
     margin-left:0;
+    margin-top: 1px;
+    width: 16px;
+    height: 16px;
+    vertical-align: middle;
+}
+
+.ext-strict .ext-ie8 input.x-tree-node-cb{
+    margin: 1px 1px;
+    height: 14px;
+    vertical-align: bottom;
+}
+
+.ext-strict .ext-ie8 input.x-tree-node-cb + a{
+    vertical-align: bottom;
+}
+
+.ext-opera input.x-tree-node-cb {
+    height: 14px;
+    vertical-align: middle;
 }
 
 .x-tree-noicon .x-tree-node-icon{
 	width:0; height:0;
-}
-
-/* loading icon */
-.ext-ie .x-tree-node-el input {
-    width:15px;
-    height:15px;
 }
 
 /* No line styles */
@@ -141,6 +154,7 @@ input.x-tree-node-cb {
 	text-decoration:none;
 	-khtml-user-select:none;
 	-moz-user-select:none;
+    -webkit-user-select:ignore;
     -kthml-user-focus:normal;
     -moz-user-focus:normal;
     -moz-outline: 0 none;

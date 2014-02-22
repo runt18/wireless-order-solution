@@ -1,11 +1,9 @@
-/*
- * Ext JS Library 3.0 RC1
- * Copyright(c) 2006-2009, Ext JS, LLC.
+/*!
+ * Ext JS Library 3.1.0
+ * Copyright(c) 2006-2009 Ext JS, LLC
  * licensing@extjs.com
- * 
- * http://extjs.com/license
+ * http://www.extjs.com/license
  */
-
 .x-progress-wrap {
     border:1px solid;
     overflow:hidden;
@@ -41,4 +39,8 @@
 
 .ext-ie .x-progress-text-back {
     line-height:15px;
+}
+
+.ext-strict .ext-ie7 .x-progress-text-back{
+    width: 100%;
 }

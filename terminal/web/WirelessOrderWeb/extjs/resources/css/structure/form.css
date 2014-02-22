@@ -1,14 +1,16 @@
-/*
- * Ext JS Library 3.0 RC1
- * Copyright(c) 2006-2009, Ext JS, LLC.
+/*!
+ * Ext JS Library 3.1.0
+ * Copyright(c) 2006-2009 Ext JS, LLC
  * licensing@extjs.com
- * 
- * http://extjs.com/license
+ * http://www.extjs.com/license
  */
-
 /* all fields */
 .x-form-field{
     margin: 0 0 0 0;
+}
+
+.ext-webkit *:focus{
+    outline: none !important;
 }
 
 /* ---- text fields ---- */
@@ -46,7 +48,11 @@ textarea.x-form-field {
     margin-bottom:-2px; /* another bogus margin bug, safari/mac only */
 }
 
-.ext-gecko .x-form-text {
+.ext-strict .ext-ie8 .x-form-text, .ext-strict .ext-ie8 textarea.x-form-field {
+	margin-bottom: 1px;
+}
+
+.ext-gecko .x-form-text , .ext-ie8 .x-form-text {
     padding-top:2px; /* FF won't center the text vertically */
     padding-bottom:0;
 }
@@ -70,11 +76,16 @@ textarea {
 /* 2.0.2 style */
 .x-form-check-wrap {
     line-height:18px;
+    height: 22px;
 }
 
 .ext-ie .x-form-check-wrap input {
     width:15px;
     height:15px;
+}
+
+.x-form-check-wrap input{
+    vertical-align: bottom;
 }
 
 .x-editor .x-form-check-wrap {
@@ -104,15 +115,11 @@ textarea {
     top:0;
 }
 
-.ext-safari .x-form-field-wrap .x-form-trigger{
-    height:21px; /* safari doesn't allow height adjustments to the fields, so adjust trigger */
-}
-
 .x-form-field-wrap .x-form-date-trigger, .x-form-field-wrap .x-form-clear-trigger, .x-form-field-wrap .x-form-search-trigger{
     cursor:pointer;
 }
 
-.ext-safari .x-form-field-wrap .x-form-trigger,.ext-gecko .x-form-field-wrap .x-form-trigger{
+.ext-webkit .x-form-field-wrap .x-form-trigger{
     right:0;
 }
 
@@ -178,7 +185,7 @@ textarea {
 	border: 1px solid;
 }
 
-.ext-safari .x-form-invalid{
+.ext-webkit .x-form-invalid{
 	border: 1px solid;
 }
 
@@ -191,23 +198,6 @@ textarea {
     visibility:hidden;
     padding:0;
     margin:0;
-}
-.x-form-check-wrap {
-    height: 22px;
-    line-height:18px;
-}
-
-.ext-ie .x-form-check-wrap input {
-    width:15px;
-    height:15px;
-}
-
-.x-editor .x-form-check-wrap {
-    padding:3px;
-}
-
-.x-editor .x-form-checkbox {
-    height:13px;
 }
 
 .x-form-grow-sizer {
@@ -238,7 +228,7 @@ textarea {
     zoom:1;
 }
 
-.x-form-item label {
+.x-form-item label.x-form-item-label {
     display:block;
     float:left;
     width:100px;
@@ -262,15 +252,15 @@ textarea {
     width:200px;
 }
 
-.x-form-label-left label {
+.x-form-label-left label.x-form-item-label {
    text-align:left;
 }
 
-.x-form-label-right label {
+.x-form-label-right label.x-form-item-label {
    text-align:right;
 }
 
-.x-form-label-top .x-form-item label {
+.x-form-label-top .x-form-item label.x-form-item-label {
     width:auto;
     float:none;
     clear:none;
@@ -329,6 +319,8 @@ textarea {
     height:19px;
 }
 
+.ext-webkit .x-small-editor .x-form-text{padding-top:3px;font-size:100%;}
+
 .x-form-clear {
     clear:both;
     height:0;
@@ -344,12 +336,38 @@ textarea {
     font-size:0;
 }
 
+.ext-ie6 .x-form-check-wrap input, .ext-border-box .x-form-check-wrap input{
+   margin-top: 3px; 
+}
+
 .x-form-cb-label {
-    width:auto !important;
-    float:none !important;
-    clear:none !important;
-    display:inline !important;
+    position: relative;
     margin-left:4px;
+    top: 2px;
+}
+
+.ext-ie .x-form-cb-label{
+    top: 1px;
+}
+
+.ext-ie6 .x-form-cb-label, .ext-border-box .x-form-cb-label{
+    top: 3px;
+}
+
+.x-form-display-field{
+    padding-top: 2px;
+}
+
+.ext-gecko .x-form-display-field, .ext-strict .ext-ie7 .x-form-display-field{
+    padding-top: 1px;
+}
+
+.ext-ie .x-form-display-field{
+    padding-top: 3px;
+}
+
+.ext-strict .ext-ie8 .x-form-display-field{
+    padding-top: 0;
 }
 
 .x-form-column {
@@ -489,11 +507,6 @@ fieldset.x-panel-collapsed .x-fieldset-bwrap {
     zoom:1;
 }
 
-.ext-ie .x-toolbar .x-form-text {
-    position:relative;
-    top:-1px;
-}
-
 .x-fieldset-noborder {
     border:0px none transparent;
 }
@@ -527,6 +540,10 @@ fieldset.x-panel-collapsed .x-fieldset-bwrap {
 
 .x-hide-label .x-form-element {
      padding-left: 0 !important;
+}
+
+.x-form-label-top .x-hide-label label.x-form-item-label{
+    display: none;
 }
 
 .x-fieldset {
