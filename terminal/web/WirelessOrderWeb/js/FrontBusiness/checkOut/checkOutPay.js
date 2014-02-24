@@ -95,7 +95,7 @@ var paySubmit = function(submitType) {
 							Ext.example.msg('提示', dataInfo);
 							setFormButtonStatus(false);
 						}else{
-							console.log('showwin');
+//							console.log('showwin');
 							action = '&nbsp;<span id="returnInterval" style="color:red;"></span>&nbsp; 秒之后自动跳转.';
 							new Ext.Window({
 								title : '<center>结账信息</center>',
