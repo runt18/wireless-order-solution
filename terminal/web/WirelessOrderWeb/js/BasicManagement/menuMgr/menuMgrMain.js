@@ -1480,6 +1480,9 @@ function resetbBasicOperation(_d){
 	isHot.setValue(Ext.ux.cfs.isHot(status));
 	isWeight.setValue(Ext.ux.cfs.isWeigh(status));
 	isCommission.setValue(Ext.ux.cfs.isCommission(status));
+	if(Ext.ux.cfs.isCommission(status)){
+		isCommission.fireEvent('check', isCommission, true);
+	}
 	commission.setValue(data.commission);
 	img.src = typeof(data.img) == 'undefined' || data.img == '' ? '../../images/nophoto.jpg' : data.img;
 	stockStatus.setValue(typeof(data.stockStatusValue) == 'undefined' ? 1 : data.stockStatusValue);
