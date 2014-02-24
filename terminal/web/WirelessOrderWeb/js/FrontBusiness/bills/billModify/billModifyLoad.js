@@ -67,6 +67,39 @@ var orderedGrid = createGridPanel(
 	'',
 	orderedGridTbar
 );
+orderedGrid.buttonAlign = 'center';
+orderedGrid.addButton({text : '提交', listeners : {
+		render : function(thiz){
+			thiz.getEl().setWidth(80, true);
+		}
+	}}, function() {
+		submitOrderHandler({grid:orderedGrid});
+	}, this);
+	
+orderedGrid.addButton({
+	text : "返回",
+	listeners : {
+		render : function(thiz){
+			thiz.getEl().setWidth(80, true);
+		}
+	}}, function() {
+		if (orderIsChanged == false) {
+			location.href = "Bills.html";
+		} else {
+			Ext.MessageBox.show({
+				msg : "账单修改还未提交，是否确认返回？",
+				width : 300,
+				buttons : Ext.MessageBox.YESNO,
+				fn : function(btn) {
+					if (btn == "yes") {
+						location.href = "Bills.html";
+					}
+				}
+			});
+		}
+	}, this);
+	
+	
 orderedGrid.region = 'center';
 orderedGrid.buttonAlign = 'center';
 orderedGrid.buttons = [new Ext.Button({
