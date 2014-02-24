@@ -215,5 +215,4 @@ public class WXQueryMemberOperationAction extends DispatchAction{
 		return null;
 	}
 	
-	
 }
