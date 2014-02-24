@@ -717,16 +717,7 @@ Ext.onReady(function() {
 			{xtype:'tbtext',text:'&nbsp;'},
 			shiftStatBut, 
 			{xtype:'tbtext',text:'&nbsp;&nbsp;&nbsp;'},
-			dailySettleStatBut,
-			new Ext.ux.ImageButton({
-				imgPath : "../../images/dailySettleStatis.png",
-				imgWidth : 50,
-				imgHeight : 50,
-				tooltip : "日结记录",
-				handler : function(btn) {
-					window.print();
-				}
-			})
+			dailySettleStatBut
 			]
 		})
 	});
