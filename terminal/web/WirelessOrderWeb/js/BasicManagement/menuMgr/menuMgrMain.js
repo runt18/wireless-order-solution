@@ -1548,7 +1548,7 @@ function basicOperationBasicHandler(c){
 	var cfg = Ext.getCmp('combinationFoodGrid');
 	var stockStatus = Ext.getCmp('comboBasicForStockStatus');
 		
-	if(!foodName.isValid() || !foodAliasID.isValid() || !foodPrice.isValid() || !foodKitchenAlias.isValid()){
+	if(!foodName.isValid() || !foodPrice.isValid() || !foodKitchenAlias.isValid()){
 //		Ext.getCmp('foodOperationWinTab').setActiveTab('basicOperationTab');
 		return;
 	}
@@ -1646,7 +1646,7 @@ function basicOperationBasicHandler(c){
 						}
 					}, this);
 					var bToolBar = Ext.getCmp('menuMgrGrid').getBottomToolbar();
-					bToolBar.onClick(bToolBar.last);
+//					bToolBar.onClick(bToolBar.last);
 				}else if(c.type == mmObj.operation.update){
 					if(c.hide == true){
 						Ext.getCmp('foodOperationWin').hide();

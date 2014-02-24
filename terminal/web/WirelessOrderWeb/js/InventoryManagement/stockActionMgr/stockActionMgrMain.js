@@ -15,7 +15,7 @@ function NewDate(str) {
 			frame : true,
 			height : 35,
 			bodyStyle : 'font-size:18px;text-align:center;',
-			contentEl : 'test2'
+			contentEl : 'stockActionTotalPrice'
 		});
 	}
 /**
@@ -238,11 +238,11 @@ function stockTaskNavHandler(e){
 			}
 			if(stockTaskNavWin.otype != Ext.ux.otype['insert']){
 				var sn = Ext.getCmp('stockBasicGrid').getSelectionModel().getSelected();
-				document.getElementById('test1').innerHTML = diaplayTitle + '<label style="margin-left:50px">库单编号: ' + sn.data.id + '</label>';
+				document.getElementById('stockActionTitle').innerHTML = diaplayTitle + '<label style="margin-left:50px">库单编号: ' + sn.data.id + '</label>';
 //				titleDom.setText(diaplayTitle + '库单编号: ' + sn.data.id);
 			}else{
 //				titleDom.body.update(diaplayTitle);
-				document.getElementById('test1').innerHTML = diaplayTitle;
+				document.getElementById('stockActionTitle').innerHTML = diaplayTitle;
 			}
 			
 		}
@@ -1390,7 +1390,7 @@ function initControl(){
 	    		id : 'displayPanelForStockActionTitle',
 	    		height : 30,
 	    		bodyStyle : 'font-size:18px;text-align:center;',
-	    		contentEl : 'test1'
+	    		contentEl : 'stockActionTitle'
 		    	}
 		    	, {
 					xtype : 'hidden',
