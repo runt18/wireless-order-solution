@@ -161,7 +161,7 @@ public class MemberOperationDao {
 	 * @return
 	 * @throws SQLException
 	 */
-	private static List<MemberOperation> getToday(DBCon dbCon, Staff staff, Map<Object, Object> params) throws SQLException{
+	public static List<MemberOperation> getToday(DBCon dbCon, Staff staff, Map<Object, Object> params) throws SQLException{
 		List<MemberOperation> list = new ArrayList<MemberOperation>();
 		String sql;
 		sql = " SELECT " +
