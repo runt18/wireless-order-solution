@@ -54,13 +54,11 @@ function addTab(id, title, url){
 	    	id : id,
 	        title: title,
 	        iconCls: 'tab_icon',
-/*  	        autoLoad : {
+ 	        autoLoad : {
 	        	url : '../'+url,
 	        	scripts : true,
-	        	//nocache: true,
 	        	scope: this
-
-	        },  */
+	        }, 
 	       // html: '<iframe scrolling="auto" frameborder="0" width="100%" height="100%" src="../' + url + '?'+ getDynamicKey("restaurantID=" + restaurantID) + '"></iframe>',
 	        closable:true,
 	        listeners : {
@@ -70,14 +68,16 @@ function addTab(id, title, url){
 	        	resize : function(e,w,h){
 	        		//改变之前未加载, 不能获取
 	        		//alert(e.getEl().first().first().dom.firstChild);
-	        		//A计划
+	        		//PlanA
   	        		if(tabIndex != 0){
  	        			var p = e.getEl().first('div').first('div').first('div').first('div');
+ 	        			//document.getElementById(p.id).style.width = '1400px';
  	        			if(p != null && Ext.getCmp(p.id)){
  		        			Ext.getCmp(p.id).setWidth(w);
  		        			Ext.getCmp(p.id).setHeight(h);
  	        			}
 	        		} 
+	        		e.doLayout();
  	        		tabIndex ++; 
 	        	}
 	        	//
@@ -89,12 +89,6 @@ function addTab(id, title, url){
 	    tabs.add(tab).doLayout();
 	}
 	tabs.setActiveTab(tab);
-	tab.load({
-    	url : '../'+url,
-    	scripts : true,
-    	//nocache: true,
-    	scope: this
-	});
  	if(tabs.items.length > 9){
 		tabs.remove(tabs.getComponent(1));
 	} 
@@ -131,7 +125,6 @@ Ext.onReady(function(){
 	wx.lm = new Ext.LoadMask(document.body, {
 		title : ''
 	});
-	
 	Ext.BLANK_IMAGE_URL = '../../extjs/resources/images/default/s.gif';
     //Ext.state.Manager.setProvider(new Ext.state.CookieProvider());
     getOperatorName('../../', function(staff){

@@ -3,7 +3,12 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>无线点餐网页终端</title>
-
+<style type="text/css">
+	.test12{
+		font-size:18px;
+		text-align:center;
+	}
+</style>
 <script type="text/javascript">
 	var stockBasicGrid, stockDetailGrid;
 	var stockTaskNavWin, firstStepPanel, secondStepPanelCenter, dateTimePanel;
@@ -21,5 +26,11 @@
 <body>
 
 	<div id='divStockAction'></div>
+	<div id="stockActionTitle">-----</div>
+	<div id="stockActionTotalPrice">
+		总数量小计:<input id="txtTotalAmount" type="text" disabled="disabled" style="height:20px;width:90px;font-size:18px;font-weight:bolder;" />
+				 &nbsp;&nbsp;&nbsp; 总金额:<input id="txtTotalPrice" type="text" disabled="disabled" style="height:20px;width:90px;font-size:18px;font-weight:bolder;" />
+				 &nbsp;&nbsp;&nbsp;<label id="labActualPrice" >实际金额:</label><input id="txtActualPrice" disabled="disabled" type="text" style="height:20px;width:90px;font-size:18px;font-weight:bolder;color:red"/>
+	</div>
 </body>
 </html>
