@@ -101,8 +101,9 @@ orderedGrid.addButton({
 	
 	
 orderedGrid.region = 'center';
-orderedGrid.buttonAlign = 'center';
-orderedGrid.buttons = [new Ext.Button({
+
+
+/*orderedGrid.buttons = [new Ext.Button({
 	text : '提交',
 	listeners : {
 		render : function(thiz){
@@ -135,7 +136,7 @@ orderedGrid.buttons = [new Ext.Button({
 			});
 		}
 	}
-})];
+})];*/
 orderedGrid.getStore().on('load', function(thiz, rs){
 	for(var i = 0; i < rs.length; i++){
 		Ext.ux.formatFoodName(rs[i], 'displayFoodName', 'name');				

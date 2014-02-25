@@ -440,7 +440,8 @@ var allFoodTabPanelGridTbar = new Ext.Toolbar({
 			gs.baseParams['foodName'] = searchType == 1 ? searchValue : '';
 			gs.baseParams['pinyin'] = searchType == 2 ? searchValue : '';
 			gs.baseParams['foodAlias'] = searchType == 3 ? searchValue : '';
-			
+			//FIXME
+			gs.baseParams['showIndex'] = searchValue == ''?true:'';
 			gs.load({
 				params : {
 					start : 0,
@@ -450,7 +451,6 @@ var allFoodTabPanelGridTbar = new Ext.Toolbar({
 		}
 	}]
 });
-
 var allFoodTabPanelGrid = createGridPanel(
 	'allFoodTabPanelGrid',
 	'',
@@ -465,7 +465,7 @@ var allFoodTabPanelGrid = createGridPanel(
 		['价格', 'unitPrice', 70, 'right', 'Ext.ux.txtFormat.gridDou']
 	],
 	FoodBasicRecord.getKeys(),
-	[ ['dataSource', 'foods'], ['restaurantID', restaurantID], ['isPaging', true], ['isCookie', true]],
+	[ ['dataSource', 'foods'], ['isPaging', true]],
 	GRID_PADDING_LIMIT_30,
 	'',
 	allFoodTabPanelGridTbar
