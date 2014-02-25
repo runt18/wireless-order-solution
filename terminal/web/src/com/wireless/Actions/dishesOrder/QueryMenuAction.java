@@ -19,6 +19,7 @@ import com.wireless.json.JObject;
 import com.wireless.json.Jsonable;
 import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.menuMgr.Kitchen.Type;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.util.DataPaging;
 import com.wireless.util.WebParams;
 
@@ -41,6 +42,8 @@ public class QueryMenuAction extends DispatchAction {
 		String start = request.getParameter("start");
 		String limit = request.getParameter("limit");
 		String pinyin = request.getParameter("pinyin");
+		//FIXME
+		String showIndex = request.getParameter("showIndex");
 		try {
 			String pin = (String)request.getAttribute("pin");
 			String cond = "";
@@ -61,6 +64,9 @@ public class QueryMenuAction extends DispatchAction {
 			}
 			if(foodAlias != null && !foodAlias.trim().isEmpty()){
 				cond += (" AND FOOD.food_alias like '" + foodAlias.trim() + "%'");
+			}
+			if(showIndex != null && !showIndex.trim().isEmpty()){
+				cond += (" AND FOOD.food_alias <> 0");
 			}
 			root = FoodDao.getByCond(StaffDao.verify(Integer.parseInt(pin)), cond, orderBy);
 
@@ -228,4 +234,38 @@ public class QueryMenuAction extends DispatchAction {
 		}
 		return null;
 	}
+	
+	/**
+	 * 
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward stop(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response) throws Exception {
+		response.setContentType("text/json;charset=utf-8");
+		JObject jobject = new JObject();
+		List<? extends Jsonable> root = new ArrayList<Jsonable>();
+		try{
+			String pin = (String)request.getAttribute("pin");
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			
+			String extraCond = " AND (FOOD.status & " + Food.SELL_OUT + ") <> 0";
+			root = FoodDao.getPureByCond(staff, extraCond, null);
+			
+		}catch(Exception e){
+			e.printStackTrace();
+			jobject.initTip(e);
+		}finally{
+			jobject.setTotalProperty(root.size());
+			jobject.setRoot(root);
+			response.getWriter().print(jobject.toString());
+		}
+		return null;
+	}
+	
+	
 }
