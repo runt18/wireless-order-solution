@@ -411,6 +411,13 @@ function stockTakeGridOperateRenderer(v, m, r, ri, ci, s){
 	}
 }
 
+function actualStockTakeCount(event){
+	if(!menuOperateActualAmount){
+		initDetailActualAmountMenu();
+	}
+	menuOperateActualAmount.showAt([event.clientX, event.clientY]);
+}
+
 function actualAmountRenderer(v, m, r, ri, ci, s){
 	if(stockTakeWin.otype == Ext.ux.otype['select']){
 		return Ext.ux.txtFormat.gridDou(r.get('actualAmount'));
@@ -418,7 +425,7 @@ function actualAmountRenderer(v, m, r, ri, ci, s){
 		return Ext.ux.txtFormat.gridDou(r.get('actualAmount'))
 		+ '<a href="javascript:setAmountForStockTakeDetail({amount:1});"><img src="../../images/btnAdd.gif" title="数量+1"/></a>&nbsp;'
 		+ '<a href="javascript:setAmountForStockTakeDetail({amount:-1});"><img src="../../images/btnDelete.png" title="数量-1"/></a>&nbsp;'
-		+ '<a href="javascript:" onClick="menuOperateActualAmount.showAt([event.clientX, event.clientY])"><img src="../../images/icon_tb_setting.png" title="设置实际盘点数量"/></a>&nbsp;';		
+		+ '<a href="javascript:" onClick="actualStockTakeCount(event)"><img src="../../images/icon_tb_setting.png" title="设置实际盘点数量"/></a>&nbsp;';		
 	}
 }
 function shortageAmountRenderer(v, m, r, ri, ci, s){
@@ -907,72 +914,72 @@ function initWin(){
  */
 function initDetailActualAmountMenu(){
 	menuOperateActualAmount = new Ext.menu.Menu({
-		id : 'menuOperateActualAmount',
-		hideOnClick : false,
-		items : [new Ext.Panel({
-			frame : true,
-			width : 150,
-			items : [{
-				xtype : 'form',
-				layout : 'form',
-				frame : true,
-				labelWidth : 30,
+			id : 'menuOperateActualAmount',
+			hideOnClick : false,
+			items : [new Ext.Panel({
+				frame : false,
+				width : 150,
 				items : [{
-					xtype : 'numberfield',
-					id : 'numOperateActualAmount',
-					fieldLabel : '数量',
-					width : 80,
-					validator : function(v){
-						if(v >= 1 && v <= 65535){
-							return true;
-						}else{
-							return '菜品数量在 1 ~ 65535 之间.';
+					xtype : 'form',
+					layout : 'form',
+					frame : true,
+					labelWidth : 30,
+					items : [{
+						xtype : 'numberfield',
+						id : 'numOperateActualAmount',
+						fieldLabel : '数量',
+						width : 80,
+						validator : function(v){
+							if(v >= 1 && v <= 65535){
+								return true;
+							}else{
+								return '菜品数量在 1 ~ 65535 之间.';
+							}
+						} 
+					}]
+				}],
+				bbar : ['->', {
+					text : '确定',
+					id : 'btnSaveOperateActualAmount',
+					iconCls : 'btn_save',
+					handler : function(e){
+						var amount = Ext.getCmp('numOperateActualAmount');
+						if(!amount.isValid()){
+							return;
 						}
-					} 
-				}]
-			}],
-			bbar : ['->', {
-				text : '确定',
-				id : 'btnSaveOperateActualAmount',
-				iconCls : 'btn_save',
-				handler : function(e){
-					var amount = Ext.getCmp('numOperateActualAmount');
-					if(!amount.isValid()){
-						return;
+						Ext.getCmp('stockTakeWinCenter').getSelectionModel().getSelected().set('actualAmount', amount.getValue());
+						menuOperateActualAmount.hide();
 					}
-					Ext.getCmp('stockTakeWinCenter').getSelectionModel().getSelected().set('actualAmount', amount.getValue());
-					menuOperateActualAmount.hide();
+				}, {
+					text : '关闭',
+					iconCls : 'btn_close',
+					handler : function(e){
+						menuOperateActualAmount.hide();
+					}
+				}]
+			})],
+			listeners : {
+				show : function(){
+					var amount = Ext.getCmp('numOperateActualAmount');
+					amount.setValue(Ext.getCmp('stockTakeWinCenter').getSelectionModel().getSelected().get('actualAmount'));
+					amount.clearInvalid();
+					amount.focus.defer(100, amount);
+				}
+			},
+			keys : [{
+				key : Ext.EventObject.ENTER,
+				scope : this,
+				fn : function(){
+					Ext.getCmp('btnSaveOperateActualAmount').handler();
 				}
 			}, {
-				text : '关闭',
-				iconCls : 'btn_close',
-				handler : function(e){
+				key : Ext.EventObject.ENTER,
+				scope : this,
+				fn : function(){
 					menuOperateActualAmount.hide();
 				}
 			}]
-		}), {hideOnClick : false}],
-		listeners : {
-			show : function(){
-				var amount = Ext.getCmp('numOperateActualAmount');
-				amount.setValue(Ext.getCmp('stockTakeWinCenter').getSelectionModel().getSelected().get('actualAmount'));
-				amount.clearInvalid();
-				amount.focus.defer(100, amount);
-			}
-		},
-		keys : [{
-			key : Ext.EventObject.ENTER,
-			scope : this,
-			fn : function(){
-				Ext.getCmp('btnSaveOperateActualAmount').handler();
-			}
-		}, {
-			key : Ext.EventObject.ENTER,
-			scope : this,
-			fn : function(){
-				menuOperateActualAmount.hide();
-			}
-		}]
-	});
+		});
 	menuOperateActualAmount.render(document.body);
 }
 /**
@@ -1144,5 +1151,5 @@ Ext.onReady(function(){
 	Ext.getCmp('comboStockTakeDept').store.load();
 	Ext.getCmp('comboMaterialCateId').store.load();
 	//
-	initDetailActualAmountMenu();
+//	initDetailActualAmountMenu();
 });
