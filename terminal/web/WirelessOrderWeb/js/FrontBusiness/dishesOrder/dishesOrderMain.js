@@ -270,7 +270,12 @@ var choosenTasteWin = new Ext.Window({
 	listeners : {
 		show : function(thiz){
 			thiz.center();
-			commonTasteGridForTabPanel.getStore().load();
+			var data = Ext.ux.getSelData(orderSingleGridPanel);
+			commonTasteGridForTabPanel.getStore().load({
+				params : {
+					foodID : data?data.id:''
+				}
+			});
 			refreshHaveTasteHandler();
 			if(ggForTabPanel.getStore().getCount() == 0){
 				tasteOnLoad();				
@@ -581,20 +586,11 @@ var tempFoodTabPanel = new Ext.Panel({
 						Ext.Ajax.request({
 							url : '../../QueryMenu.do',
 							params : {
-								isCookie : true,
-								dataSource : 'kitchens',
-								restaurantID : restaurantID,
-								isAllowTemp : true
+								dataSource : 'isAllowTempKitchen'
 							},
 							success : function(response, options){
 								var jr = Ext.util.JSON.decode(response.responseText);
-								var root = jr.root;
-								for(var i = root.length - 1; i >= 0; i--){
-									if(root[i].aliasId == 253 || root[i].aliasId == 255){
-										root.splice(i,1);
-									}
-								}
-								thiz.store.loadData(root);
+								thiz.store.loadData(jr.root);
 							}
 						});
 					}
@@ -648,7 +644,7 @@ var tempFoodTabPanel = new Ext.Panel({
     		name.setValue();
     		count.setValue(1);
     		price.setValue(0);
-    		kitchen.setValue(0);
+    		kitchen.setValue();
     		
     		name.clearInvalid();
     		count.clearInvalid();

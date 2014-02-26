@@ -185,7 +185,7 @@ function createPagingBar(pageSize, store){
  * @return {}
  */
 function createGridPanel(id, title, height, width, url, cmData, readerData,
-		baseParams, pageSize, group, tbar, bbar) {
+		baseParams, pageSize, group, tbar, bbar, rid) {
 
 	var g_ckbox = new Ext.grid.CheckboxSelectionModel({
 				handleMouseDown : Ext.emptyFn	//只能通过点击复选框才能选中复选框
@@ -274,7 +274,8 @@ function createGridPanel(id, title, height, width, url, cmData, readerData,
 	/** 读取返回数据 * */
 	var g_reader = new Ext.data.JsonReader({
 				totalProperty : 'totalProperty',
-				root : 'root'
+				root : 'root',
+				idProperty : typeof rid == 'string' ? rid : ''
 			}, g_readerData);
 
 //	var b_groupBtn = null;

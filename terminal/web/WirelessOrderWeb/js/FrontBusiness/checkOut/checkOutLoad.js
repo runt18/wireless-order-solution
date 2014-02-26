@@ -180,7 +180,6 @@ function loadTableData(_c){
 	Ext.Ajax.request({
 		url : "../../QueryOrder.do",
 		params : {
-			isCookie : true,
 			restaurantID : restaurantID,
 			tableID : tableID,
 			orderID : orderID,
