@@ -145,7 +145,7 @@ public abstract class CheckVersionTask extends AsyncTask<Void, Void, Boolean>{
 	 * 如果发现新版本，则下载并安装新版本程序，否则执行相应的回调函数
 	 */
 	@Override
-	protected void onPostExecute(Boolean isUpdateAvail) {
+	protected final void onPostExecute(Boolean isUpdateAvail) {
 		if(isUpdateAvail){
 			new AlertDialog.Builder(mContext)
 				.setTitle("提示")
