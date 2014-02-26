@@ -135,7 +135,7 @@ public class CodeSMS{
 	 * 
 	 * @return
 	 */
-	public static int createCode(){
+	private static int createCode(){
 		int code = 0;
 		boolean s = true;
 		while(s){
@@ -152,7 +152,7 @@ public class CodeSMS{
 		operate(2);
 	}
 	
-	public static void operate(int type){
+	private static void operate(int type){
 		if(type == 1){
 			System.out.println("当前时间: " + new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(new Date()));
 		}else if(type == 2){
