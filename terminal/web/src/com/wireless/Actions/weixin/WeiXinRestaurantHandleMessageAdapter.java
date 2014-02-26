@@ -26,7 +26,7 @@ import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.util.DateUtil;
 
 public class WeiXinRestaurantHandleMessageAdapter implements HandleMessageListener {
-	public static final String WEIXIN_BASE_SERVER = InitServlet.getConfig().getInitParameter("weixin_callback_address");
+	private static final String WEIXIN_BASE_SERVER = InitServlet.getConfig().getInitParameter("weixin_callback_address");
 	
 	public static final String WEIXIN_INDEX = WEIXIN_BASE_SERVER + "/weixin/order/index.html";
 	public static final String WEIXIN_FOOD = WEIXIN_BASE_SERVER + "/weixin/order/food.html";
