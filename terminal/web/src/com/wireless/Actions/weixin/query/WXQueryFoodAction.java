@@ -104,6 +104,7 @@ public class WXQueryFoodAction extends DispatchAction{
 			
 			String extraCond = " AND FOOD.restaurant_id = " + rid, orderClause = " ORDER BY FOOD.food_alias";
 			extraCond += " AND (FOOD.status & " + Food.SELL_OUT + ") = 0";
+			extraCond += " AND (FOOD.img <> '') ";
 			if(kitchenId != null && !kitchenId.trim().isEmpty() && !kitchenId.trim().equals("-1")){
 				extraCond += (" AND KITCHEN.kitchen_id = " + kitchenId);
 			}
