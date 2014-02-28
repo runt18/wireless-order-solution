@@ -11,22 +11,24 @@
 				/WXQueryInfo.do,
 				/WXOperateInfo.do,
 				/WXOperateMaterial.do,
+				/WXOperateOrder.do,
 				
 				/WXEntry.do,
 				/WXQueryFood.do,
 				/WXQueryDept.do,
 				/WXOperateMember.do,
-				
+				/WXQueryMemberOperation.do,
+				/QueryFood_q.do,
 				/FinanceWeixin.do,
 
 				/QueryRestaurants.do,
 				/VerifyLogin.do,
 				/LoginOut.do,
-				/QueryBillboard.do,
+
 				/OperateStaff.do,
 				/QueryStaff.do,
 				/QueryOTA.do,
-								
+
 				/Login.html,
 				/LoginAdmin.html,
 				/PersonLoginTimeout.html,
@@ -42,7 +44,6 @@
 				/MemberConsumeDetails.html,
 				/MemberRechargeDetails.html,
 				/DigieBasic.html
-
 			</param-value>
 		</init-param>
 
@@ -79,7 +80,7 @@
 		</init-param>
 		<init-param>
 			<param-name>db_host</param-name>
-			<param-value>192.168.110.100</param-value>
+			<param-value>127.0.0.1</param-value>
 		</init-param>
 		<init-param>
 			<param-name>db_port</param-name>
@@ -91,7 +92,7 @@
 		</init-param>
 		<init-param>
 			<param-name>db_pwd</param-name>
-			<param-value>HelloZ315</param-value>
+			<param-value>root</param-value>
 		</init-param>
 		<!-- Below is the configuration parameters to socket -->
 		<init-param>
