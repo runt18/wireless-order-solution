@@ -220,7 +220,7 @@ function operateShoppingCart(c){
 		scBox.addClass('left-nav-hide');
 		scMainView.html(html.join(''));
 	}else if(c.otype == 'confirm'){
-		Util.dialog.show({ msg : '暂不支持下单功能.' });return;
+		Util.dialog.show({ msg : '请叫服务员照单下单.' });return;
 		
 		if(params.orderData.length == 0){
 			Util.dialog.show({ msg : '您的购物车没有菜品, 请先选菜.' });
