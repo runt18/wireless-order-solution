@@ -28,6 +28,9 @@
 		<action path="/QueryOrder"
 			type="com.wireless.Actions.dishesOrder.QueryOrderAction" scope="request">
 		</action>
+		<action path="/QueryOrderByCalc"
+			type="com.wireless.Actions.dishesOrder.QueryOrderByCalcAction" scope="request">
+		</action>
 
 		<action path="/QueryMenu" type="com.wireless.Actions.dishesOrder.QueryMenuAction"
 			scope="request" parameter="dataSource">
@@ -236,20 +239,12 @@
 			type="com.wireless.Actions.distMgr.discountPlan.QueryDiscountPlanAction"
 			scope="request">
 		</action>
-		<action path="/InsertDiscountPlan"
-			type="com.wireless.Actions.distMgr.discountPlan.InsertDiscountPlanAction"
-			scope="request">
-		</action>
 		<action path="/UpdateDiscountPlan"
 			type="com.wireless.Actions.distMgr.discountPlan.UpdateDiscountPlanAction"
 			scope="request">
 		</action>
 		<action path="/UpdateDiscountPlanRate"
 			type="com.wireless.Actions.distMgr.discountPlan.UpdateDiscountPlanRateAction"
-			scope="request">
-		</action>
-		<action path="/DeleteDiscountPlan"
-			type="com.wireless.Actions.distMgr.discountPlan.DeleteDiscountPlanAction"
 			scope="request">
 		</action>
 		<action path="/QueryDailySettleByNow"
@@ -548,6 +543,10 @@
 		</action>
 		<action path="/OperateCoupon"
 			type="com.wireless.Actions.couponMgr.OperateCouponAction"
+			scope="request" parameter="dataSource">
+		</action>
+		<action path="/OperateSellOutFood"
+			type="com.wireless.Actions.menuMgr.basic.OperateSellOutFoodAction"
 			scope="request" parameter="dataSource">
 		</action>
 	</action-mappings>
