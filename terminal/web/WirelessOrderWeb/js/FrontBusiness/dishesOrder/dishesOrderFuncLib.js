@@ -670,7 +670,6 @@ function refreshOrderHandler(){
 	Ext.Ajax.request({
 		url : '../../QueryOrder.do',
 		params : {
-			isCookie : true,
 			'tableID' : tableAliasID
 		},
 		success : function(response, options) {

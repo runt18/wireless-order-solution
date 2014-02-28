@@ -55,7 +55,6 @@ function loadSingleOrderData(){
 		Ext.Ajax.request({
 			url : '../../QueryOrder.do',
 			params : {
-				
 				'tableID' : tableAliasID
 			},
 			success : function(response, options) {

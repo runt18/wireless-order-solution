@@ -342,6 +342,35 @@ var btnOrderDetail = new Ext.ux.ImageButton({
 				);
 				selTabContentGrid.frame = false;
 				selTabContentGrid.border = false;
+				
+				selTabContentGrid.getStore().on('load', function(store, records, options){
+					store.add(new Ext.data.Record({'orderDateFormat':'haodongxi', 'name':'aaaaaa', 'unitPrice':0, 'count':0, 'tasteGroup.tastePref':'', 'tasteGroup.tastePrice':'', 'kitchen.name':'', 'waiter': '', 'cancelReason.reason':''}));
+					var sumRow;
+					var totalCount = 0;
+					
+					if(store.getCount() > 0){
+						for (var i = 0; i < store.getCount(); i++) {
+							totalCount += (store.getAt(i).get('unitPrice') * store.getAt(i).get('count'));
+						}
+						sumRow = selTabContentGrid.getView().getRow(store.getCount() - 1);	
+						sumRow.style.backgroundColor = '#EEEEEE';			
+						for(var i = 0; i < selTabContentGrid.getColumnModel().getColumnCount(); i++){
+							var sumCell = selTabContentGrid.getView().getCell(store.getCount() - 1, i);
+							sumCell.style.fontSize = '15px';
+							sumCell.style.fontWeight = 'bold';
+							sumCell.style.color = 'green';
+						}
+						selTabContentGrid.getView().getCell(store.getCount()-1, 1).innerHTML = '总金额';
+						selTabContentGrid.getView().getCell(store.getCount()-1, 2).innerHTML = totalCount.toFixed(2);
+						selTabContentGrid.getView().getCell(store.getCount()-1, 3).innerHTML = '--';
+						selTabContentGrid.getView().getCell(store.getCount()-1, 4).innerHTML = '--';
+						selTabContentGrid.getView().getCell(store.getCount()-1, 5).innerHTML = '--';
+						selTabContentGrid.getView().getCell(store.getCount()-1, 6).innerHTML = '--';
+						selTabContentGrid.getView().getCell(store.getCount()-1, 7).innerHTML = '--';
+						selTabContentGrid.getView().getCell(store.getCount()-1, 8).innerHTML = '--';
+						selTabContentGrid.getView().getCell(store.getCount()-1, 9).innerHTML = '--';
+					}
+				});
 			}
 			
 			if(!selTabContentWin){

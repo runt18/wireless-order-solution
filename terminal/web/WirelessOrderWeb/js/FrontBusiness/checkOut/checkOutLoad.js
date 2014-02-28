@@ -178,7 +178,7 @@ function loadTableData(_c){
 		document.getElementById("serviceCharge").value = 100;
 	}
 	Ext.Ajax.request({
-		url : "../../QueryOrder.do",
+		url : "../../QueryOrderByCalc.do",
 		params : {
 			restaurantID : restaurantID,
 			tableID : tableID,
