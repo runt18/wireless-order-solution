@@ -11,6 +11,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
+import com.wireless.db.frontBusiness.PayOrder;
 import com.wireless.db.menuMgr.MenuDao;
 import com.wireless.db.orderMgr.OrderDao;
 import com.wireless.db.staffMgr.StaffDao;
@@ -22,8 +23,7 @@ import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.util.DateType;
 
-public class QueryOrderAction extends Action {
-	
+public class QueryOrderByCalcAction extends Action{
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
@@ -40,27 +40,47 @@ public class QueryOrderAction extends Action {
 			 * : the order with this table ID to query
 			 */
 			String pin = (String)request.getAttribute("pin");
-			String queryType = request.getParameter("queryType");
-			String tid = request.getParameter("tableID");
+//			String queryType = request.getParameter("queryType");
 			String restaurantID = (String)request.getAttribute("restaurantID");
+			String tid = request.getParameter("tableID");
 			String oid = request.getParameter("orderID");
+			String calc = request.getParameter("calc");
+			String discountId = request.getParameter("discountID");
+			String eraseQuota = request.getParameter("eraseQuota");
+			String serviceRate = request.getParameter("serviceRate");
+			String customNum = request.getParameter("customNum");
 			
 			Order order = new Order();
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
-			if(queryType != null && queryType.trim().equals("History")){
-				if (oid != null && !oid.trim().isEmpty()){
-					order = OrderDao.getById(staff, Integer.valueOf(oid), DateType.HISTORY);
-				}else{
-					order = null;
+			if(tid != null && !tid.trim().isEmpty()){
+				order = OrderDao.getByTableAlias(staff, Integer.parseInt(tid));
+			} else if (oid != null && !oid.trim().isEmpty()){
+				order = OrderDao.getById(staff, Integer.valueOf(oid), DateType.TODAY);
+			}
+			if(calc != null && Boolean.valueOf(calc)){
+				Order.PayBuilder payParam = Order.PayBuilder.build(order.getId());
+				if(discountId != null && !discountId.trim().isEmpty()){
+					payParam.setDiscountId(Integer.valueOf(discountId));
 				}
+				if(eraseQuota != null && !eraseQuota.trim().isEmpty()){
+					payParam.setErasePrice(Integer.valueOf(eraseQuota));
+				}
+				if(customNum != null && !customNum.trim().isEmpty() && Integer.valueOf(customNum.trim()) > 0){
+					payParam.setCustomNum(Short.valueOf(customNum));
+				}
+				if(serviceRate != null && !serviceRate.trim().isEmpty()){
+					if(Float.valueOf(serviceRate.trim()) > 0){
+						payParam.setServiceRate(Float.valueOf(serviceRate) / 100);						
+					}
+				}
+				
+				order = PayOrder.calc(staff, payParam);
+				
 			}else{
-				if(tid != null && !tid.trim().isEmpty()){
-					order = OrderDao.getByTableAlias(staff, Integer.parseInt(tid));
-				} else if (oid != null && !oid.trim().isEmpty()){
-					order = OrderDao.getById(staff, Integer.valueOf(oid), DateType.TODAY);
-				}
-			}			
+				order = PayOrder.calc(staff, Order.PayBuilder.build(order.getId()));
+			}
+			
 			List<OrderFood> root = new ArrayList<OrderFood>();
 			if(order != null && order.hasOrderFood()){
 				OrderFood item = null;
@@ -95,6 +115,7 @@ public class QueryOrderAction extends Action {
 			
 			if(order != null){
 				order.setOrderFoods(null);
+//				order.setDiscount(null);
 				jobject.getOther().put("order", order);
 				jobject.getOther().put("idList", idList);
 			}
