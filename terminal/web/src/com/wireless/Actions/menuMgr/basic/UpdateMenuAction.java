@@ -66,7 +66,10 @@ public class UpdateMenuAction extends Action {
 			
 			if(Boolean.parseBoolean(isCommission)){
 				builder.setCommission(Float.parseFloat(commission));
+			}else{
+				builder.setCommission(false);
 			}
+			
 			FoodDao.update(staff, builder);
 			
 			jobject.initTip(true, "操作成功, 已修改菜品'" + foodName + "'信息.");
