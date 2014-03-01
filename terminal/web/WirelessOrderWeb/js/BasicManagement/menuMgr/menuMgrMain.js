@@ -527,10 +527,9 @@ foodOperationHandler = function(c){
 	
 	var selData = Ext.ux.getSelData('menuMgrGrid');
 	c.data = selData;
-	
 	if(c.win == 'foodDetail'){
 		if(c.type == mmObj.operation.insert){
-//			resetbBasicOperation();
+			resetbBasicOperation();
 		}else if(c.type == mmObj.operation.update){
 			updateBasicHandler(c);
 		}else if(c.type == mmObj.operation.select){
@@ -589,16 +588,15 @@ function foodOperation(active, type){
 	var btnRefreshForOW = Ext.getCmp('btnRefreshForOW');
 	var btnPreviousFood = Ext.getCmp('btnPreviousFood');
 	var btnNextFood = Ext.getCmp('btnNextFood');
-	var txtFoodPriceExplain = Ext.getCmp('txtFoodPriceExplain');
 	
 	if(typeof(type) == 'string' && type == mmObj.operation.insert){
 		foWin.setTitle('添加菜品');
+		foodOperationWin.otype = mmObj.operation.insert;
 		btnAddForOW.setVisible(true);
 		btnAppForOW.setVisible(false);
 		btnSaveForOW.setVisible(false);
 		btnPreviousFood.setVisible(false);
 		btnNextFood.setVisible(false);		
-		txtFoodPriceExplain.setVisible(false);
 		
 		btnAddForOW.setDisabled(false);
 		btnAppForOW.setDisabled(true);
@@ -608,12 +606,12 @@ function foodOperation(active, type){
 	}else if(typeof(type) == 'string' && type == mmObj.operation.update){
 		resetbBasicOperation(selRowData);
 		foWin.setTitle(selRowData.name);
+		foodOperationWin.otype = mmObj.operation.update;
 		btnAddForOW.setVisible(false);
 		btnAppForOW.setVisible(true);
 		btnSaveForOW.setVisible(true);
 		btnPreviousFood.setVisible(true);
 		btnNextFood.setVisible(true);
-		txtFoodPriceExplain.setVisible(true);
 		
 		btnAddForOW.setDisabled(true);
 		btnAppForOW.setDisabled(false);
@@ -1152,13 +1150,7 @@ var basicOperationPanel = new Ext.Panel({
 					allowBlank : false,
 					readOnly : false
 		 	    }]
-		 	}, {
-		 		columnWidth : 1,
-		 		xtype : 'panel',
-		 		id : 'txtFoodPriceExplain',
-		 		height : 20,
-		 		html : '<a href="javascript:fppOperation()">说明:此价格对应当前活动的价格方案,点击查看其他方案</a>'
-		 	}, {
+		 	},{
 		 		columnWidth : 1,
 		 	    items : [{
 		 	    	xtype : 'textarea',
@@ -1612,44 +1604,49 @@ function basicOperationBasicHandler(c){
 			
 			if(jr.success == true){
 				if(c.type == mmObj.operation.insert){
-					Ext.Msg.confirm(jr.titile, jr.msg + '\n是否继续添加?', function(e){
-						if(e == 'yes'){
-							var faid = foodAliasID.getValue();
-							var kaid = foodKitchenAlias.getValue();	
-							
-							var	isSpecialValue = isSpecial.getValue();
-							var isRecommendValue = isRecommend.getValue();
-							var isFreeValue = isFree.getValue();
-							var isStopValue = isStop.getValue();
-							var isCurrPriceValue = isCurrPrice.getValue();
-							var isHotValue = isHot.getValue();
-							var isWeightValue = isWeight.getValue();
-							var isCommissionValue = isCommission.getValue();
-							//重置信息
-							resetbBasicOperation();
-							
-							isSpecial.setValue(isSpecialValue);
-							isRecommend.setValue(isRecommendValue);
-							isFree.setValue(isFreeValue);
-							isStop.setValue(isStopValue);
-							isCurrPrice.setValue(isCurrPriceValue);
-							isHot.setValue(isHotValue);
-							isWeight.setValue(isWeightValue);
-							isCommission.setValue(isCommissionValue);
-							
-							if(document.getElementById('chbForFoodAlias').checked){
-								foodAliasID.setValue(parseInt(faid+1));
+					if(c.close == true){
+						Ext.getCmp('foodOperationWin').hide();
+					}else{
+						Ext.Msg.confirm(jr.titile, jr.msg + '\n是否继续添加?', function(e){
+							if(e == 'yes'){
+								var faid = foodAliasID.getValue();
+								var kaid = foodKitchenAlias.getValue();	
+								
+								var	isSpecialValue = isSpecial.getValue();
+								var isRecommendValue = isRecommend.getValue();
+								var isFreeValue = isFree.getValue();
+								var isStopValue = isStop.getValue();
+								var isCurrPriceValue = isCurrPrice.getValue();
+								var isHotValue = isHot.getValue();
+								var isWeightValue = isWeight.getValue();
+								var isCommissionValue = isCommission.getValue();
+								//重置信息
+								resetbBasicOperation();
+								
+								isSpecial.setValue(isSpecialValue);
+								isRecommend.setValue(isRecommendValue);
+								isFree.setValue(isFreeValue);
+								isStop.setValue(isStopValue);
+								isCurrPrice.setValue(isCurrPriceValue);
+								isHot.setValue(isHotValue);
+								isWeight.setValue(isWeightValue);
+								isCommission.setValue(isCommissionValue);
+								
+								if(document.getElementById('chbForFoodAlias').checked){
+									foodAliasID.setValue(parseInt(faid+1));
+								}
+								foodKitchenAlias.setValue(kaid);
+								
+								foodName.focus(true, 100);
+	
+							}else{
+								Ext.getCmp('foodOperationWin').hide();
 							}
-							foodKitchenAlias.setValue(kaid);
-							
-							foodName.focus(true, 100);
-
-						}else{
-							Ext.getCmp('foodOperationWin').hide();
-						}
-					}, this);
-					var bToolBar = Ext.getCmp('menuMgrGrid').getBottomToolbar();
-//					bToolBar.onClick(bToolBar.last);
+						}, this);
+						//FIXME 手动获取grid的最后一页
+						var bToolBar = Ext.getCmp('menuMgrGrid').getBottomToolbar();
+	//					bToolBar.onClick(bToolBar.last);
+					}
 				}else if(c.type == mmObj.operation.update){
 					if(c.hide == true){
 						Ext.getCmp('foodOperationWin').hide();
@@ -2467,7 +2464,6 @@ function initMenuGrid(){
 }
 
 function initFoodOperationWin(){
-	foodOperationWin = Ext.getCmp('foodOperationWin');
 	if(!foodOperationWin){
 		foodOperationWin = new Ext.Window({
 			id : 'foodOperationWin',
@@ -2544,7 +2540,7 @@ function initFoodOperationWin(){
 		    	handler : function(){
 		    		foodOperationHandler({
 		    			win : 'foodDetail',
-	    				type : mmObj.operation.update,
+	    				type : foodOperationWin.otype,
 	    				hide : false
 	    			});
 		    	}
@@ -2562,11 +2558,19 @@ function initFoodOperationWin(){
 		    	iconCls : 'btn_save',
 		    	tooltip : '保存修改并关闭窗体',
 		    	handler : function(){
-		    		foodOperationHandler({
-		    			win : 'foodDetail',
-	    				type : mmObj.operation.update,
-	    				hide : true
-	    			});
+		    		if(foodOperationWin.otype == mmObj.operation.update){
+		    			foodOperationHandler({
+			    			win : 'foodDetail',
+		    				type : mmObj.operation.update,
+		    				hide : true
+		    			});
+		    		}else{
+			    		basicOperationBasicHandler({
+		    				type : mmObj.operation.insert,
+		    				close : true
+		    			});
+		    		}
+
 		    	}
 		    }, {
 		    	text : '重置',
