@@ -70,16 +70,15 @@ function addTab(id, title, url){
 	        	render : function(){
 	        		tabIndex = 0;
 	        	},
-	        	resize : function(e,w,h){
+	        	bodyresize : function(e, w, h){
 	        		//改变之前未加载, 不能获取
 	        		//alert(e.getEl().first().first().dom.firstChild);
 	        		//PlanA
   	        		if(tabIndex != 0){
  	        			var p = e.getEl().first('div').first('div').first('div').first('div');
- 	        			//document.getElementById(p.id).style.width = '1400px';
  	        			if(p != null && Ext.getCmp(p.id)){
- 		        			Ext.getCmp(p.id).setWidth(w);
- 		        			Ext.getCmp(p.id).setHeight(h);
+  		        			Ext.getCmp(p.id).setWidth(w);
+ 		        			Ext.getCmp(p.id).setHeight(h); 
  	        			}
 	        		} 
 	        		e.doLayout();
@@ -307,7 +306,6 @@ Ext.onReady(function(){
 			}
 		});
     }); 
-     
 });	
 </script>
 </head>
