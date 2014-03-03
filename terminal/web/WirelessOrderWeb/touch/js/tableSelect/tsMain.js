@@ -154,7 +154,7 @@ function handleTableForTS(c){
 					renderTo:'divShowMessageForTableSelect'
 				});
 				inputNumVal = "";
-				$("#txtPeopleNumForSM").val("");
+				$("#txtPeopleNumForSM").val("1");
 			});
 			$("#txtTableNumForSM").val(table.alias);
 			$("#txtPeopleNumForSM").select();
@@ -209,7 +209,7 @@ function renderToCreateOrder(tableNo, peopleNo){
 			type:'hide', 
 			renderTo:'divShowMessageForTableSelect'
 		});
-		inputNumVal = "";
+		inputNumVal = "1";
 		$("#txtTableNumForTS").val(inputNumVal);
 		$("#txtPeopleNumForSM").val(inputNumVal);
 		if(getTableByAlias(tableNo).statusValue == 1){
