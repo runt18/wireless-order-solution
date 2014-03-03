@@ -8,6 +8,7 @@
 <link rel="stylesheet" href="./css/tableSelect.css">
 <link rel="stylesheet" href="./css/updateOrder.css">
 <link rel="stylesheet" href="./css/createOrder.css">
+<link rel="stylesheet" href="./css/stopSet.css">
 <script type="text/javascript" src="../jquery/jquery-1.8.2.min.js"></script>
 <script type="text/javascript" src="../js/components/Encrypt.js"></script>
 <script type="text/javascript" src="../js/components/md5.js"></script>
@@ -17,7 +18,7 @@
 var pin=0,  restaurantID=0;
 var staffData={staffID:0, staffName:''};
 var tableData={}, regionData={};
-var foodData={}, kitchenFoodData={}, kitchenData={}, deptData={root:[]}, tasteData={}, allowTempKitchen={};
+var foodDataBase={}; foodData={}, kitchenFoodData={}, kitchenData={},allKitchenFoodData={}, deptData={root:[]}, tasteData={}, allowTempKitchen={};
 function getDom(id){
 	return document.getElementById(id);
 }
@@ -46,6 +47,14 @@ var uo={
 	updateOrder : [],
 	cf : {}
 }
+
+//估清
+var ss = {
+	newFood : [],
+	cancelSellOutFood : [],
+	allStopFood : []
+};
+
 </script>
 <script type="text/javascript" src="./js/tableSelect/tsLoad.js"></script>
 <script type="text/javascript" src="./js/tableSelect/tsMain.js"></script>
@@ -54,6 +63,8 @@ var uo={
 <script type="text/javascript" src="./js/createOrder/coLoad.js"></script>
 <script type="text/javascript" src="./js/createOrder/coMain.js"></script>
 <script type="text/javascript" src="./js/createOrder/coOther.js"></script>
+<script type="text/javascript" src="./js/stopSet/ssLoad.js"></script>
+<script type="text/javascript" src="./js/stopSet/ssMain.js"></script>
 <script type="text/javascript" src="./js/index.js"></script>
 </head>
 <body>
@@ -132,6 +143,7 @@ var uo={
 	    <div class="button-base" style="margin-left: 2px; width: 120px;" onClick="createOrderForTS()">点菜</div>
 	    <div class="button-base" style="margin-left: 2px;" onClick="reFreshForTS()">刷新</div>
   		<div class="button-base" style="margin-left: 2px;" onClick="transTableForTS()">转台</div>
+  		<div class="button-base" style="margin-left: 2px;" onClick="ss.entry()">沽清</div>
 	    <!-- <div class="button-base" style="margin-left: 2px;" onClick="ts.tp.getFirstPage()">首页</div> -->
 		<div class="button-base" style="margin-left: 2px;" onClick="ts.tp.getPreviousPage()">上一页</div>
 		<div class="button-base" style="margin-left: 2px;" onClick="ts.tp.getNextPage()">下一页</div>
@@ -212,11 +224,47 @@ var uo={
   		<div class="button-base" style="margin-left: 2px; width: 120px;" onClick="co.submit({notPrint : false})">下单</div>
   		<div class="button-base" style="margin-left: 2px; width: 120px;" onClick="co.submit({notPrint : true})">下单不打印</div>
   		<div class="button-base" style="margin-left: 2px;" onClick="co.s.entry()">搜索</div>
+  		<div class="button-base" style="margin-left: 2px;" onClick="co.s.foodAlias()">助记码</div>
   		<div class="button-base" style="margin-left: 2px;" onClick="co.tf.entry()">临时菜</div>
   		<!-- <div class="button-base" style="margin-left: 2px;" onClick="co.fp.getFirstPage()">首页</div> -->
   		<div class="button-base" style="margin-left: 2px;" onClick="co.fp.getPreviousPage()">上一页</div>
   		<div class="button-base" style="margin-left: 2px;" onClick="co.fp.getNextPage()">下一页</div>
   		<!-- <div class="button-base" style="margin-left: 2px;" onClick="co.fp.getLastPage()">尾页</div> -->
+  	</div>
+</div>
+
+<div id="divStopSet" class="box-vertical content">
+	<div id="divNorthForStopSet" class="box-horizontal" style="margin-right: 2px; border-bottom: 2px solid #fff;">
+    	<div data-type="stop" style="width: 218px; margin-right: 2px;">
+    		<div class="button-base" data-type="sellOut" data-status="false" style="line-height: 60px;"  onclick="ss.searchData({event:this, isStop:false})">
+    			未沽清
+    		</div>
+    		<div class="button-base" data-type="sellOut" data-status="true" style="line-height: 60px; margin-top: 1px;" onclick="ss.searchData({event:this,isStop:true})">
+    			已沽清
+    		</div>
+		</div>
+		<div class="div-full">
+			<div id="divSelectDeptForStopSet" class="box-horizontal" > </div>
+			<div id="divSelectKitchenForStopSet" class="box-horizontal"> </div>
+		</div>
+  	</div>
+  	<div id="divCenterForStopSet" class="box-horizontal div-full">
+  		<div id="divNewFoodForStopSet" style=""> 11</div>
+    	<div id="divAllFoodForStopSet" class="div-full" style="overflow-y: auto;"></div>
+  	</div>
+  	<div id="divDescForStopSet" class="box-horizontal">
+  		<div style="width: 300px;">&nbsp;</div>
+  		<div id="divDescForStopSet-padding-msg" class="div-full"></div>
+  	</div>
+  	<div id="divSouthForStopSet" class="box-horizontal" style="">
+  		<div class="button-base" style="margin-right: 2px; width: 120px;" onClick="ss.back()">返回</div>
+  		<div class="button-base" style="margin-right: 2px;" onClick="Util.scroll({otype:'up', content:'divNewFoodForStopSet', size:80})">上翻</div>
+  		<div class="button-base" style="margin-right: 2px;" onClick="Util.scroll({otype:'down', content:'divNewFoodForStopSet', size:80})">下翻</div>
+  		<div class="div-full">&nbsp;</div>
+  		<div class="button-base" style="margin-left: 2px; width: 120px;" onClick="ss.soldOut({type : true})">沽清</div>
+  		<div class="button-base" style="margin-left: 2px; width: 120px;" onClick="ss.soldOut({type : false})">反沽清</div>
+  		<div class="button-base" style="margin-left: 2px;" onClick="ss.tp.getPreviousPage()">上一页</div>
+  		<div class="button-base" style="margin-left: 2px;" onClick="ss.tp.getNextPage()">下一页</div>
   	</div>
 </div>
 
@@ -338,7 +386,7 @@ var uo={
 			<span style="font-size: 20px; font-weight: bold;">桌号：</span>
 			<input type="text" id="txtTableNumForSM" class="desk-number" onClick='ts.selectInput({renderTo: this.id})'/>
 			<span style="font-size: 20px; font-weight: bold;">人数：</span>
-			<input type="text" id="txtPeopleNumForSM" class="desk-number" onClick='ts.selectInput({renderTo: this.id})'/>
+			<input type="text" id="txtPeopleNumForSM" class="desk-number" value="1" onClick='ts.selectInput({renderTo: this.id})'/>
 		</div>
 		<div id="divRightForShowMessageTS">
 			<div class="button-base" onClick="ts.selectingTxt({renderTo : 'txtTableNumForSM'})">选中</div>
@@ -446,6 +494,32 @@ var uo={
 			<div class="button-base" onClick="inputNumUO(this)" style="height: 130px; line-height: 130px;">0</div>
 		</div>
 	</div>
+</div>
+
+
+<div id="divFoodAlias" class="content-box-base" style="background: #4682B4; border: 1px solid #FFF;">
+		<div style="color: #FFF; font-weight: bold; font-size: 28px; line-height : 60px;height : 60px">
+			助记码:<input id="txtFoodAlias" type="text" style="width: 150px; height: 50px; background: yellow; font-weight: bold; font-size: 28px">
+		</div>
+		<div id="divNumForFoodAlias">
+			<div class="button-base" onClick="co.setValueToFoodAlias({value:7})">7</div>
+			<div class="button-base" onClick="co.setValueToFoodAlias({value:8})">8</div>
+			<div class="button-base" onClick="co.setValueToFoodAlias({value:9})">9</div>
+			<div class="button-base" onClick="co.setValueToFoodAlias({value:4})">4</div>
+			<div class="button-base" onClick="co.setValueToFoodAlias({value:5})">5</div>
+			<div class="button-base" onClick="co.setValueToFoodAlias({value:6})">6</div>
+			<div class="button-base" onClick="co.setValueToFoodAlias({value:1})">1</div>
+			<div class="button-base" onClick="co.setValueToFoodAlias({value:2})">2</div>
+			<div class="button-base" onClick="co.setValueToFoodAlias({value:3})">3</div>
+			<div class="button-base" onClick="co.setValueToFoodAlias({value:0})">0</div>
+			<div class="button-base" onClick="co.setValueToFoodAlias({type:1})">&laquo;</div>
+			<div class="button-base" onClick="co.setValueToFoodAlias({type:2})">&laquo;&laquo;</div>
+		</div>
+		<div class="box-horizontal" style="line-height:60px; width: 100%;">
+			<div class="button-base" style="line-height: 60px; width: 49%;" onClick="co.s.findByAlias({renderTo : 'divFoodAlias'})">确定</div>
+			<div class="button-base" style="line-height: 60px; width: 49%; margin-left: 2%;" onClick="co.fa.back()">返回</div>
+		</div>
+
 </div>
 
 </body>
