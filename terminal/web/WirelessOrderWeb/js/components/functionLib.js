@@ -39,7 +39,7 @@ function checkUserSessionStatus(conn,response,options){
     }     
 } 
 
-/*Ext.override(Ext.tree.TreeEventModel, {
+Ext.override(Ext.tree.TreeEventModel, {
 	delegateClick : function(e, t){
         if(!this.beforeEvent(e)){
             return;
@@ -52,18 +52,21 @@ function checkUserSessionStatus(conn,response,options){
             this.onIconClick(e, this.getNode(e));
         }
         else if(this.getNodeTarget(e)){
+        	if(this.tree.getSelectionModel().selNode){
+        		this.tree.getSelectionModel().selNode.ui.onSelectedChange(false);
+        	}
 			this.tree.getSelectionModel().selNode = this.getNode(e);
             this.onNodeClick(e, this.getNode(e));
             
         }
     }
-});*/
-Ext.override(Ext.tree.TreeEventModel, {
+});
+/*Ext.override(Ext.tree.TreeEventModel, {
 	onNodeClick : function(e, node) {
 		this.tree.getSelectionModel().select(node);
 		node.ui.onClick(e);
 	}
-});
+});*/
 Ext.override(Ext.tree.TreeNodeUI, {
 	onDblClick : function(e){
 		e.preventDefault();

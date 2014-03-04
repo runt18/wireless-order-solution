@@ -1606,6 +1606,9 @@ function basicOperationBasicHandler(c){
 				if(c.type == mmObj.operation.insert){
 					if(c.close == true){
 						Ext.getCmp('foodOperationWin').hide();
+						//FIXME 手动获取grid的最后一页
+						var bToolBar = Ext.getCmp('menuMgrGrid').getBottomToolbar();
+						bToolBar.moveLast();
 					}else{
 						Ext.Msg.confirm(jr.titile, jr.msg + '\n是否继续添加?', function(e){
 							if(e == 'yes'){
@@ -1643,9 +1646,6 @@ function basicOperationBasicHandler(c){
 								Ext.getCmp('foodOperationWin').hide();
 							}
 						}, this);
-						//FIXME 手动获取grid的最后一页
-						var bToolBar = Ext.getCmp('menuMgrGrid').getBottomToolbar();
-	//					bToolBar.onClick(bToolBar.last);
 					}
 				}else if(c.type == mmObj.operation.update){
 					if(c.hide == true){

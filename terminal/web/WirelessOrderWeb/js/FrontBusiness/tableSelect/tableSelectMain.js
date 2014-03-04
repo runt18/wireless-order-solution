@@ -325,7 +325,7 @@ var btnOrderDetail = new Ext.ux.ImageButton({
 					[
 					    [true,false,false,false],
 					    ['日期','orderDateFormat',100],
-					    ['名称','name',130],
+					    ['名称','displayFoodName',130],
 					    ['单价','unitPrice',60, 'right', 'Ext.ux.txtFormat.gridDou'],
 					    ['数量','count', 60, 'right', 'Ext.ux.txtFormat.gridDou'], 
 //					    ['折扣','discount',60, 'right', 'Ext.ux.txtFormat.gridDou'],
@@ -350,6 +350,7 @@ var btnOrderDetail = new Ext.ux.ImageButton({
 					
 					if(store.getCount() > 0){
 						for (var i = 0; i < store.getCount(); i++) {
+							Ext.ux.formatFoodName(store.getAt(i), 'displayFoodName', 'name');
 							totalCount += (store.getAt(i).get('unitPrice') * store.getAt(i).get('count'));
 						}
 						sumRow = selTabContentGrid.getView().getRow(store.getCount() - 1);	
