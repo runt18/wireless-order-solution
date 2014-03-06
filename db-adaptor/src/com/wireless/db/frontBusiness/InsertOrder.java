@@ -16,7 +16,6 @@ import com.wireless.exception.ProtocolError;
 import com.wireless.exception.StaffError;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.OrderFood;
-import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.staffMgr.Staff;
@@ -361,12 +360,12 @@ public class InsertOrder {
 				
 			dbCon.stmt.executeUpdate(sql);
 
-			//Insert the temporary food to menu.
-			if(foodToInsert.isTemp()){
-				try{
-					FoodDao.insert(dbCon, staff, new Food.InsertBuilder(foodToInsert.getName(), foodToInsert.getPrice(), foodToInsert.getKitchen()).setTemp(true));
-				}catch(BusinessException ingored){}
-			}
+			//FIXME Insert the temporary food to menu.
+//			if(foodToInsert.isTemp()){
+//				try{
+//					FoodDao.insert(dbCon, staff, new Food.InsertBuilder(foodToInsert.getName(), foodToInsert.getPrice(), foodToInsert.getKitchen()).setTemp(true));
+//				}catch(BusinessException ingored){}
+//			}
 		}
 	}
 }

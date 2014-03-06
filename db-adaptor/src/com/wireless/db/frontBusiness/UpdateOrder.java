@@ -21,7 +21,6 @@ import com.wireless.exception.StaffError;
 import com.wireless.pojo.crMgr.CancelReason;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.OrderFood;
-import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.staffMgr.Staff;
@@ -335,12 +334,12 @@ public class UpdateOrder {
 				  " ) ";
 			dbCon.stmt.executeUpdate(sql);		
 			
-			//Insert the temporary food to menu.
-			if(extraFood.isTemp()){
-				try{
-					FoodDao.insert(dbCon, staff, new Food.InsertBuilder(extraFood.getName(), extraFood.getPrice(), extraFood.getKitchen()).setTemp(true));
-				}catch(BusinessException ingored){}
-			}
+			//FIXME Insert the temporary food to menu.
+//			if(extraFood.isTemp()){
+//				try{
+//					FoodDao.insert(dbCon, staff, new Food.InsertBuilder(extraFood.getName(), extraFood.getPrice(), extraFood.getKitchen()).setTemp(true));
+//				}catch(BusinessException ingored){}
+//			}
 		}
 		
 		//insert the canceled order food records 
