@@ -1,4 +1,5 @@
 Ext.onReady(function(){
+	
 	var memberTitle = '<tr>' 
 					+ '<th class="table_title text_center">会员操作</th>'
 			 		+ '<th class="table_title text_center">现金</th>'
@@ -114,40 +115,47 @@ Ext.onReady(function(){
 				id : 'btnSearchForBusinessStatisticsSummaryInformation',
 				iconCls : 'btn_search',
 				handler : function(e){
-					var paramsOnDuty = '', paramsOffDuty;
-					
+					var paramsOnDuty = '', paramsOffDuty = '';
+					var requestUrl = '../../BusinessStatistics.do';
+					var params = {
+							dataSource : dataSource,
+							queryPattern : queryPattern,
+							restaurantID : restaurantID,
+							onDuty : paramsOnDuty,
+							offDuty : paramsOffDuty,
+							dutyRange : dutyRange
+					};
 					if(queryPattern == 1){
 						if(!beginDate.isValid() || !endDate.isValid()){
 							return;
 						}
-						paramsOnDuty = beginDate.getValue().format('Y-m-d 00:00:00');
-						paramsOffDuty = endDate.getValue().format('Y-m-d 23:59:59');
+						params.onDuty = beginDate.getValue().format('Y-m-d 00:00:00');
+						params.offDuty = endDate.getValue().format('Y-m-d 23:59:59');
 					}else if(queryPattern == 2){
 						paramsOnDuty = onDuty.format('Y-m-d H:i:s');
 						paramsOffDuty = offDuty.format('Y-m-d H:i:s');
 					}else if(queryPattern == 3){
-						paramsOnDuty = onDuty.format('Y-m-d 00:00:00');
-						paramsOffDuty = offDuty.format('Y-m-d 23:59:59');
+						params.onDuty  = onDuty.format('Y-m-d 00:00:00');
+						params.offDuty = offDuty.format('Y-m-d 23:59:59');
+					}else if(queryPattern == 4){
+						beginDate.clearInvalid();
+						endDate.clearInvalid();
+						requestUrl = '../../QueryDailySettleByNow.do';
+						params = {queryType : queryType};
+						Ext.getCmp('total_exoprt_excel').hide();
+						Ext.getCmp('btnSearchForBusinessStatisticsSummaryInformation').hide();
 					}else{
 						return;
 					}
 					
 					bssifLoadMarsk.show();
 					Ext.Ajax.request({
-						url : "../../BusinessStatistics.do",
-						params : {
-							dataSource : dataSource,
-							queryPattern : queryPattern,
-							isCookie : true,
-							restaurantID : restaurantID,
-							onDuty : paramsOnDuty,
-							offDuty : paramsOffDuty,
-							dutyRange : dutyRange
-						},
+						url : requestUrl,
+						params : params,
 						success : function(response, options) {
 							var jr = Ext.decode(response.responseText);
 							if(jr.success){
-								var business = jr.other.business;
+								business = jr.other.business;
 								var deptStat = business.deptStat;
 								
 								var trContent = '';
@@ -236,6 +244,7 @@ Ext.onReady(function(){
 				}
 			}, '-', {
 				text : '导出',
+				id : 'total_exoprt_excel',
 //				hidden : true,
 				iconCls : 'icon_tb_exoprt_excel',
 				handler : function(){
@@ -274,7 +283,7 @@ Ext.onReady(function(){
 					dateCombo.setDisabled(false);
 					beginDate.setDisabled(false);
 					endDate.setDisabled(false);
-				}else if(queryPattern == 2 || queryPattern == 3){
+				}else if(queryPattern == 2 || queryPattern == 3 || queryPattern == 4){
 					beginDate.setValue(onDuty);
 					endDate.setValue(offDuty);
 					Ext.getCmp('btnSearchForBusinessStatisticsSummaryInformation').handler();
@@ -288,3 +297,10 @@ Ext.onReady(function(){
 	});
 
 });
+
+function getDutyRange(){
+	var dutyRangeForPrinter = {};
+	dutyRangeForPrinter.onDutyFormat = business.paramsOnDuty;
+	dutyRangeForPrinter.offDutyFormat = business.paramsOffDuty;
+	return dutyRangeForPrinter;
+}
