@@ -11,6 +11,7 @@
 		
 		dataSource = dataSource != 'null' && (dataSource == 'today' || dataSource == 'history') ? dataSource : 'today';
 		var dutyRange = '<%=request.getParameter("dutyRange") %>';
+		var queryType = '<%=request.getParameter("queryType") %>';
 		queryPattern = queryPattern == null ? 1 : parseInt(queryPattern);
 		if(queryPattern == 2 || queryPattern == 3){
 			var onDuty = '<%=request.getParameter("onDuty") %>';
@@ -23,6 +24,7 @@
 				ofDuty = null;
 			}
 		}
+		var business;
 	</script>
 	<script type="text/javascript" src="../../js/window/history/businessStatistics.js"></script>
 	
