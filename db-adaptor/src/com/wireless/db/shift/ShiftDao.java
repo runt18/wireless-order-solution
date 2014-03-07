@@ -16,6 +16,53 @@ import com.wireless.util.DateType;
 public class ShiftDao {
 	
 	/**
+	 * Do shift by now.
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @return
+	 * 			the duty range to this shift
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static DutyRange doShift(Staff staff) throws SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return doShift(dbCon, staff);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Do shift by now.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @return
+	 * 			the duty range to this shift
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static DutyRange doShift(DBCon dbCon, Staff staff) throws SQLException{
+		
+		DutyRange range = getCurrentShiftRange(dbCon, staff);
+		
+		String sql;
+		sql = " INSERT INTO " + Params.dbName + ".shift (restaurant_id, name, on_duty, off_duty) VALUES(" +
+			  staff.getRestaurantId() + "," +
+			  "'" + staff.getName() + "'," +
+			  " DATE_FORMAT('" + range.getOnDutyFormat() + "', '%Y%m%d%H%i%s')" + "," +
+			  " DATE_FORMAT('" + range.getOffDutyFormat() + "', '%Y%m%d%H%i%s')" + 
+			  " ) ";
+	
+		dbCon.stmt.execute(sql);
+		
+		return range;
+	}
+	
+	/**
 	 * Get current daily shift detail to today.
 	 * @param dbCon
 	 * 			The database connection
@@ -104,7 +151,20 @@ public class ShiftDao {
 	 *             throws if fail to execute any SQL statement
 	 */
 	private static ShiftDetail getCurrentShift(DBCon dbCon, Staff staff) throws SQLException{
-		
+		return getByRange(dbCon, staff, getCurrentShiftRange(dbCon, staff), DateType.TODAY);
+	}
+	
+	/**
+	 * Get the range to current shift.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @return the duty range to current shift
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	private static DutyRange getCurrentShiftRange(DBCon dbCon, Staff staff) throws SQLException{
 		/**
 		 * Get the latest off duty date from below.
 		 * 1 - shift 
@@ -138,8 +198,7 @@ public class ShiftDao {
 		sdf.setTimeZone(TimeZone.getTimeZone("GMT+8"));
 		String offDuty = sdf.format(System.currentTimeMillis());
 		
-		return getByRange(dbCon, staff, new DutyRange(onDuty, offDuty), DateType.TODAY);
-
+		return new DutyRange(onDuty, offDuty);
 	}
 	
 	/**
