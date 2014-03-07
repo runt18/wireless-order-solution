@@ -550,6 +550,8 @@ foodOperationHandler = function(c){
 			}
 			Ext.getCmp('txtMiniAllFoodNameSearch').setValue('');
 			Ext.getCmp('btnSearchForAllFoodMiniGridTbar').handler();
+			cfgd.baseParams['foodID'] = selData.id;
+			cfgd.baseParams['restaurantID'] = restaurantID;
 			cfgd.load();
 		}
 	}	
@@ -734,9 +736,9 @@ var combinationFoodGrid = new Ext.grid.EditorGridPanel({
 		fields : ComboFoodRecord.getKeys(),
 		listeners : {
 			beforeload : function(){
-				var selData = Ext.ux.getSelData('menuMgrGrid');
+/*				var selData = Ext.ux.getSelData('menuMgrGrid');
 				this.baseParams['foodID'] = selData.id;
-				this.baseParams['restaurantID'] = restaurantID;
+				this.baseParams['restaurantID'] = restaurantID;*/
 			},
 			load : function(){
 				combinationDisplaySumHandler();
@@ -841,7 +843,13 @@ allFoodMiniGrid.on('rowdblclick', function(thiz){
 		cfd.getView().refresh();
 	}
 });
-
+allFoodMiniGrid.keys = [{
+			key : Ext.EventObject.ENTER,
+			scope : this,
+			fn : function(){
+				Ext.getCmp('btnSearchForAllFoodMiniGridTbar').handler();
+			}
+		}];
 var combinationOperationPanel = new Ext.Panel({
 	id : 'combinationOperationPanel',
 	frame : true,
@@ -2617,7 +2625,6 @@ function initFoodOperationWin(){
 
 
 function initFoodRelationOperationWin(){
-	foodRelationOperationWin = Ext.getCmp('foodRelationOperationWin');
 	if(!foodRelationOperationWin){
 		foodRelationOperationWin = new Ext.Window({
 			id : 'foodRelationOperationWin',
@@ -2638,7 +2645,7 @@ function initFoodRelationOperationWin(){
 			}],
 			bbar : ['->', {
 		    	text : '保存',
-		    	id : 'btnSaveForOW',
+		    	id : 'btnSaveForRelation',
 		    	iconCls : 'btn_save',
 		    	tooltip : '保存修改并关闭窗体',
 		    	handler : function(){
@@ -2650,7 +2657,7 @@ function initFoodRelationOperationWin(){
 		    	}
 		    },{
 		    	text : '关闭',
-		    	id : 'btnCloseForOW',
+		    	id : 'btnCloseForRelation',
 		    	iconCls : 'btn_close',
 		    	tooltip : '关闭窗体',
 		    	handler : function(){

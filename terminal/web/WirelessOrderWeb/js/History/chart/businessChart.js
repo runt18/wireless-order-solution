@@ -1,4 +1,4 @@
-var details;
+//var details;
 var series;
 var businessStatWin;
 function print(obj){
@@ -80,7 +80,7 @@ function showChart(time){
 	$.post('../../BusinessReceiptsStatistics.do', {dataSource : 'chart', time : time==null?7:time}, function(jdata){
 		$("#loading").hide();
 //		var jdata = $.parseJSON(data);
-		details = jdata.root;
+//		details = jdata.root;
 		//console.debug(jdata.other.chart)
 		var chartData = eval('(' + jdata.other.chart + ')');
 		new Highcharts.Chart({
