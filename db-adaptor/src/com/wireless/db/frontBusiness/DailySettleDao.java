@@ -9,8 +9,10 @@ import java.util.List;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.deptMgr.DepartmentDao;
+import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.db.stockMgr.StockActionDao;
 import com.wireless.exception.BusinessException;
+import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.inventoryMgr.MaterialCate;
 import com.wireless.pojo.menuMgr.Department;
@@ -312,7 +314,8 @@ public class DailySettleDao {
 		}
 		
 		String sql;
-		String onDuty = null;
+		DutyRange range = new DutyRange();
+		//String onDuty = null;
 		
 		/**
 		 * Get the date to last daily settlement.
@@ -325,13 +328,14 @@ public class DailySettleDao {
 		if(dbCon.rs.next()){
 			Timestamp offDuty = dbCon.rs.getTimestamp(1);
 			if(offDuty != null){
-				onDuty = "'" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(offDuty) + "'";
+				range.setOnDuty(offDuty.getTime());
 			}else{
-				onDuty = "date_format(NOW(), '%Y-%m-%d')";
+				range.setOnDuty(RestaurantDao.getById(dbCon, staff.getRestaurantId()).getBirthDate());
 			}
 		}else{
-			onDuty = "date_format(NOW(), '%Y-%m-%d')";
+			range.setOnDuty(RestaurantDao.getById(dbCon, staff.getRestaurantId()).getBirthDate());
 		}
+		range.setOffDuty(System.currentTimeMillis());
 		
 		StringBuilder paidOrderCond = new StringBuilder();
 		
@@ -517,8 +521,8 @@ public class DailySettleDao {
 			sql = " INSERT INTO " + Params.dbName + ".daily_settle_history (`restaurant_id`, `name`, `on_duty`, `off_duty`) VALUES (" +
 				  staff.getRestaurantId() + ", " +
 				  "'" + staff.getName() + "', " +
-				  onDuty + ", " +
-				  " NOW() " +
+				  " DATE_FORMAT('" + range.getOnDutyFormat() + "', '%Y%m%d%H%i%s')" + "," +
+				  " DATE_FORMAT('" + range.getOffDutyFormat() + "', '%Y%m%d%H%i%s')" + 
 				  " ) ";
 
 			//Insert the daily settle record in case of manual.

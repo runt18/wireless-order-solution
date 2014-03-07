@@ -2,12 +2,12 @@ package com.wireless.db.shift;
 
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
-import java.util.TimeZone;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.billStatistics.CalcBillStatisticsDao;
+import com.wireless.db.restaurantMgr.RestaurantDao;
+import com.wireless.exception.BusinessException;
 import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.billStatistics.ShiftDetail;
 import com.wireless.pojo.staffMgr.Staff;
@@ -22,9 +22,11 @@ public class ShiftDao {
 	 * @return
 	 * 			the duty range to this shift
 	 * @throws SQLException
-	 * 			throws if failed to execute any SQL statement
+	 * 				throws if failed to execute any SQL statement
+	 * @throws BusinessException 
+	 * 	 			throws if the restaurant does NOT exist 
 	 */
-	public static DutyRange doShift(Staff staff) throws SQLException{
+	public static DutyRange doShift(Staff staff) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -44,8 +46,10 @@ public class ShiftDao {
 	 * 			the duty range to this shift
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException 
+	 * 	 			throws if the restaurant does NOT exist 
 	 */
-	public static DutyRange doShift(DBCon dbCon, Staff staff) throws SQLException{
+	public static DutyRange doShift(DBCon dbCon, Staff staff) throws SQLException, BusinessException{
 		
 		DutyRange range = getCurrentShiftRange(dbCon, staff);
 		
@@ -71,8 +75,10 @@ public class ShiftDao {
 	 * @return the shift detail to today
 	 * @throws SQLException
 	 *             throws if fail to execute any SQL statement
+	 * @throws BusinessException 
+	 * 				throws if the restaurant does NOT exist
 	 */
-	public static ShiftDetail getTodayDaily(Staff staff) throws SQLException{
+	public static ShiftDetail getTodayDaily(Staff staff) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -91,8 +97,10 @@ public class ShiftDao {
 	 * @return the shift detail to today
 	 * @throws SQLException
 	 *             throws if fail to execute any SQL statement
+	 * @throws BusinessException 
+	 * 				throws if the restaurant does NOT exist
 	 */
-	public static ShiftDetail getTodayDaily(DBCon dbCon, Staff staff) throws SQLException{
+	public static ShiftDetail getTodayDaily(DBCon dbCon, Staff staff) throws SQLException, BusinessException{
 		
 		//Get the latest off duty date from daily settle history, and make it as the on duty date to this daily shift
 		String sql = " SELECT MAX(off_duty) FROM " +
@@ -100,25 +108,20 @@ public class ShiftDao {
 					 " WHERE " +
 					 " restaurant_id = " + staff.getRestaurantId();
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
-		String onDuty;
+		long onDuty;
 		if(dbCon.rs.next()){
 			Timestamp offDuty = dbCon.rs.getTimestamp(1);
 			if(offDuty == null){
-				onDuty = "2011-07-30 00:00:00";
+				onDuty = RestaurantDao.getById(dbCon, staff.getRestaurantId()).getBirthDate();
 			}else{
-				onDuty = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(offDuty);
+				onDuty = offDuty.getTime();
 			}
 		}else{
-			onDuty = "2011-07-30 00:00:00";
+			onDuty = RestaurantDao.getById(dbCon, staff.getRestaurantId()).getBirthDate();
 		}
 		dbCon.rs.close();
 		
-		//Make the current date as the off duty date.
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		sdf.setTimeZone(TimeZone.getTimeZone("GMT+8"));
-		String offDuty = sdf.format(System.currentTimeMillis());
-		
-		return getByRange(dbCon, staff, new DutyRange(onDuty, offDuty), DateType.TODAY);
+		return getByRange(dbCon, staff, new DutyRange(onDuty, System.currentTimeMillis()), DateType.TODAY);
 	}
 	
 	/**
@@ -128,8 +131,10 @@ public class ShiftDao {
 	 * @return the current shift detail 
 	 * @throws SQLException
 	 *             throws if fail to execute any SQL statement
+	 * @throws BusinessException 
+	 * 	 			throws if the restaurant does NOT exist 
 	 */
-	public static ShiftDetail getCurrentShift(Staff staff) throws SQLException{
+	public static ShiftDetail getCurrentShift(Staff staff) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -149,8 +154,10 @@ public class ShiftDao {
 	 * @return the current shift detail 
 	 * @throws SQLException
 	 *             throws if fail to execute any SQL statement
+	 * @throws BusinessException
+	 * 	 			throws if the restaurant does NOT exist 
 	 */
-	private static ShiftDetail getCurrentShift(DBCon dbCon, Staff staff) throws SQLException{
+	private static ShiftDetail getCurrentShift(DBCon dbCon, Staff staff) throws SQLException, BusinessException{
 		return getByRange(dbCon, staff, getCurrentShiftRange(dbCon, staff), DateType.TODAY);
 	}
 	
@@ -163,16 +170,19 @@ public class ShiftDao {
 	 * @return the duty range to current shift
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException 
+	 * 			throws if the restaurant does NOT exist
 	 */
-	private static DutyRange getCurrentShiftRange(DBCon dbCon, Staff staff) throws SQLException{
+	private static DutyRange getCurrentShiftRange(DBCon dbCon, Staff staff) throws SQLException, BusinessException{
 		/**
-		 * Get the latest off duty date from below.
+		 * Get the latest off duty date from tables below.
 		 * 1 - shift 
 		 * 2 - shift_history
 		 * 3 - daily_settle_history
-		 * and make it as the on duty date to this duty shift
+		 * And make it as the on duty date to this duty shift.
+		 * Use the birth date to restaurant if no latest off duty exist.
 		 */
-		String onDuty;
+		long onDuty;
 		String sql = "SELECT MAX(off_duty) FROM (" +
 					 "SELECT off_duty FROM " + Params.dbName + ".shift WHERE restaurant_id=" + staff.getRestaurantId() + " UNION " +
 					 "SELECT off_duty FROM " + Params.dbName + ".shift_history WHERE restaurant_id=" + staff.getRestaurantId() + " UNION " +
@@ -182,23 +192,16 @@ public class ShiftDao {
 		if(dbCon.rs.next()){
 			Timestamp offDuty = dbCon.rs.getTimestamp(1);
 			if(offDuty == null){
-				onDuty = "2011-07-30 00:00:00";
+				onDuty = RestaurantDao.getById(dbCon, staff.getRestaurantId()).getBirthDate();
 			}else{
-				onDuty = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(offDuty);
+				onDuty = offDuty.getTime();
 			}
 		}else{
-			onDuty = "2011-07-30 00:00:00";
+			onDuty = RestaurantDao.getById(dbCon, staff.getRestaurantId()).getBirthDate();
 		}
 		dbCon.rs.close();
 		
-		/**
-		 * Make the current date as the off duty date
-		 */
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		sdf.setTimeZone(TimeZone.getTimeZone("GMT+8"));
-		String offDuty = sdf.format(System.currentTimeMillis());
-		
-		return new DutyRange(onDuty, offDuty);
+		return new DutyRange(onDuty, System.currentTimeMillis());
 	}
 	
 	/**
