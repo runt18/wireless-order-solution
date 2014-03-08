@@ -113,7 +113,7 @@ public class PayOrderAction extends Action{
 				payBuilder.setDiscountId(Integer.parseInt(request.getParameter("discountID")));
 			}
 			
-			if(request.getParameter("couponID") != null  && !request.getParameter("couponID").equals("-1")){
+			if(request.getParameter("couponID") != null && !request.getParameter("couponID").isEmpty() && !request.getParameter("couponID").equals("-1")){
 				payBuilder.setCouponId(Integer.parseInt(request.getParameter("couponID")));
 			}
 			
