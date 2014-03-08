@@ -48,6 +48,7 @@ public class DailySettleDao {
 		private int maxTasteGroupId;		//taste_group和taste_group_history表的最大id
 		private int maxNormalTasteGroupId;	//normal_taste_group和normal_taste_group_history表的最大id
 		private int maxMemberOperationId;	//member_operation和member_operation_history表的最大id
+		private DutyRange range;
 		
 		Result(){
 			
@@ -131,6 +132,14 @@ public class DailySettleDao {
 		
 		void setMaxMemberOperationId(int maxMemberOperationId) {
 			this.maxMemberOperationId = maxMemberOperationId;
+		}
+		
+		void setRange(DutyRange range){
+			this.range = range;
+		}
+		
+		public DutyRange getRange(){
+			return this.range;
 		}
 		
 		@Override
@@ -336,6 +345,7 @@ public class DailySettleDao {
 			range.setOnDuty(RestaurantDao.getById(dbCon, staff.getRestaurantId()).getBirthDate());
 		}
 		range.setOffDuty(System.currentTimeMillis());
+		result.setRange(range);
 		
 		StringBuilder paidOrderCond = new StringBuilder();
 		
