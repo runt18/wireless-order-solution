@@ -3,6 +3,8 @@ package com.wireless.Actions.dailySettle;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -16,6 +18,7 @@ import com.wireless.db.frontBusiness.DailySettleDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
+import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.staffMgr.Staff;
 
 public class DailySettleExecAction extends Action {
@@ -25,6 +28,8 @@ public class DailySettleExecAction extends Action {
 		PrintWriter out = null;
 
 		JObject jObj = new JObject();		
+		
+		DutyRange dutyRange = null;
 
 		try {
 			// 解决后台中文传到前台乱码
@@ -35,7 +40,7 @@ public class DailySettleExecAction extends Action {
 
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 
-			DailySettleDao.exec(staff);
+			dutyRange = DailySettleDao.exec(staff).getRange();
 
 			jObj.initTip(true, staff.getName() + "日结成功");
 
@@ -52,6 +57,10 @@ public class DailySettleExecAction extends Action {
 			jObj.initTip(false, "数据库请求发生错误，请确认网络是否连接正常");
 
 		} finally {
+			Map<Object, Object> map = new HashMap<Object, Object>();
+			map.put("dutyRange", dutyRange);
+			
+			jObj.setOther(map);
 			out.write(jObj.toString());
 		}
 

@@ -122,7 +122,7 @@ public class BusinessReceiptsStatisticsAction extends DispatchAction {
 			String pin = (String)request.getAttribute("pin");
 			incomesByEachDay.addAll(CalcBillStatisticsDao.calcIncomeByEachDay(StaffDao.verify(Integer.parseInt(pin)), DateUtil.format(c.getTime()), DateUtil.format(endDate.getTime())));
 			
-			jobject.setRoot(incomesByEachDay);
+//			jobject.setRoot(incomesByEachDay);
 			
 			List<String> xAxis = new ArrayList<String>();
 			List<Float> data = new ArrayList<Float>();

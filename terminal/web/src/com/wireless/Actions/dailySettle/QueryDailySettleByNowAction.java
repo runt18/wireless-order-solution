@@ -1,11 +1,5 @@
 package com.wireless.Actions.dailySettle;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -17,8 +11,6 @@ import org.apache.struts.action.ActionMapping;
 import com.wireless.db.shift.ShiftDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.json.JObject;
-import com.wireless.json.Jsonable;
-import com.wireless.pojo.billStatistics.IncomeByDept;
 import com.wireless.pojo.billStatistics.ShiftDetail;
 
 public class QueryDailySettleByNowAction extends Action{
@@ -27,7 +19,7 @@ public class QueryDailySettleByNowAction extends Action{
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
 		JObject jobject = new JObject();
-		List<Jsonable> list = new ArrayList<Jsonable>(); 
+//		List<Jsonable> list = new ArrayList<Jsonable>(); 
 		ShiftDetail resd = null;
 		try{
 			String pin = (String)request.getAttribute("pin");
@@ -42,12 +34,13 @@ public class QueryDailySettleByNowAction extends Action{
 				resd = ShiftDao.getTodayDaily(StaffDao.verify(Integer.parseInt(pin)));
 			}
 			
+/*	
 			if(resd == null)
 				return null;
 
 			final ShiftDetail res = resd;
 			
-			Jsonable j = new Jsonable() {
+     		Jsonable j = new Jsonable() {
 				
 				@Override
 				public Map<String, Object> toJsonMap(int flag) {
@@ -116,14 +109,16 @@ public class QueryDailySettleByNowAction extends Action{
 					return null;
 				}
 			}; 
-			
 			list.add(j);
+ */
 			
+			
+			jobject.getOther().put("business", resd);
 		}catch(Exception e){
 			jobject.initTip(e);
 			e.printStackTrace();
 		}finally{
-			jobject.setRoot(list);
+//			jobject.setRoot(list);
 			response.getWriter().print(jobject.toString());
 		}
 		
