@@ -132,8 +132,8 @@ Ext.onReady(function(){
 						params.onDuty = beginDate.getValue().format('Y-m-d 00:00:00');
 						params.offDuty = endDate.getValue().format('Y-m-d 23:59:59');
 					}else if(queryPattern == 2){
-						paramsOnDuty = onDuty.format('Y-m-d H:i:s');
-						paramsOffDuty = offDuty.format('Y-m-d H:i:s');
+						params.onDuty = onDuty.format('Y-m-d H:i:s');
+						params.offDuty = offDuty.format('Y-m-d H:i:s');
 					}else if(queryPattern == 3){
 						params.onDuty  = onDuty.format('Y-m-d 00:00:00');
 						params.offDuty = offDuty.format('Y-m-d 23:59:59');
