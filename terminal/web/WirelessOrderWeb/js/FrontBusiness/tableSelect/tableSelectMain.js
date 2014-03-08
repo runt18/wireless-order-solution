@@ -953,6 +953,7 @@ doDailySettle = function() {
 			var resultJSON = Ext.util.JSON.decode(response.responseText);
 			if (eval(resultJSON.success == true)) {
 				omsg = resultJSON.msg;
+				dutyRange = resultJSON.other.dutyRange;
 				riJieDaYin(null);
 			} else {
 				Ext.ux.showMsg(resultJSON);
@@ -1183,7 +1184,6 @@ Ext.onReady(function() {
 							Ext.Ajax.request({
 								url : "../../CancelOrder.do",
 								params : {
-									isCookie : true,
 									"tableAlias" : selectedTable
 								},
 								success : function(response, options) {
@@ -1306,8 +1306,7 @@ Ext.onReady(function() {
 			loader : new Ext.tree.TreeLoader({
 				url : "../../QueryRegion.do",
 				baseParams : {
-					dataSource : 'tree',
-					isCookie : true
+					dataSource : 'tree'
 				},
 				listeners : {
 					load : function(){
