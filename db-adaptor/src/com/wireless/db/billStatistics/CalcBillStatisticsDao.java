@@ -594,6 +594,47 @@ public class CalcBillStatisticsDao {
 		return serviceIncome;
 	}
 	
+	private static String makeSql4CalcFood(Staff staff, DutyRange range, String extraCond, DateType queryType){
+		String orderTbl = null;
+		String orderFoodTbl = null;
+		String tasteGrpTbl = null;
+		if(queryType.isHistory()){
+			orderTbl = TBL_ORDER_HISTORY;
+			orderFoodTbl = TBL_ORDER_FOOD_HISTORY;
+			tasteGrpTbl = TBL_TASTE_GROUP_HISTORY;
+			
+		}else if(queryType.isToday()){
+			orderTbl = TBL_ORDER_TODAY;
+			orderFoodTbl = TBL_ORDER_FOOD_TODAY;
+			tasteGrpTbl = TBL_TASTE_GROUP_TODAY;
+			
+		}else{
+			throw new IllegalArgumentException("The query type is invalid.");
+		}
+		
+		return " SELECT " +
+			   " OF.order_id, OF.food_id, " +
+ 			   " MAX(OF.food_status) AS food_status, MAX(OF.name) AS food_name,	MAX(OF.dept_id) AS dept_id, MAX(OF.kitchen_id) AS kitchen_id, " +
+			   " SUM(order_count) AS food_amount, " +
+			   " CASE WHEN ((OF.food_status & " + Food.GIFT + ") <> 0) THEN (OF.unit_price + IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * discount * SUM(OF.order_count) ELSE 0 END AS food_gift," +
+			   " (OF.unit_price + IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * (1 - discount) * SUM(OF.order_count) AS food_discount, " +
+			   " CASE WHEN ((OF.food_status & " + Food.GIFT + ") = 0 AND (OF.food_status & " + Food.WEIGHT + ") = 0) THEN (OF.unit_price + IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * discount * SUM(OF.order_count) " +
+					" WHEN ((OF.food_status & " + Food.GIFT + ") = 0 AND (OF.food_status & " + Food.WEIGHT + ") <> 0) THEN (OF.unit_price * SUM(OF.order_count) + (IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0))) * discount " +
+				  	" ELSE 0 " +
+				  	" END AS food_income " +
+			   " FROM " + Params.dbName + "." + orderFoodTbl + " OF " + 
+			   " JOIN " + Params.dbName + "." + orderTbl + " O ON 1 = 1 " + 
+			   " AND OF.order_id = O.id " + 
+			   " AND O.restaurant_id = " + staff.getRestaurantId() + 
+			   " AND O.status <> " + Order.Status.UNPAID.getVal() +
+			   " JOIN " + Params.dbName + "." + tasteGrpTbl + " TG " + " ON OF.taste_group_id = TG.taste_group_id " +
+			   " WHERE 1 = 1 " +
+			   (extraCond == null ? "" : extraCond) +
+			   " AND O.order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +
+			   " GROUP BY " + " OF.order_id, OF.food_id, OF.taste_group_id " +
+			   " HAVING food_amount > 0 ";
+	}
+	
 	/**
 	 * 
 	 * @param staff
@@ -622,56 +663,21 @@ public class CalcBillStatisticsDao {
 	 * @throws SQLException
 	 */
 	public static List<IncomeByDept> calcIncomeByDept(DBCon dbCon, Staff staff, DutyRange range, String extraCond, DateType queryType) throws SQLException{
-		String orderTbl = null;
-		String orderFoodTbl = null;
-		String tasteGrpTbl = null;
-		if(queryType.isHistory()){
-			orderTbl = TBL_ORDER_HISTORY;
-			orderFoodTbl = TBL_ORDER_FOOD_HISTORY;
-			tasteGrpTbl = TBL_TASTE_GROUP_HISTORY;
-			
-		}else if(queryType.isToday()){
-			orderTbl = TBL_ORDER_TODAY;
-			orderFoodTbl = TBL_ORDER_FOOD_TODAY;
-			tasteGrpTbl = TBL_TASTE_GROUP_TODAY;
-			
-		}else{
-			throw new IllegalArgumentException("The query type is invalid.");
-		}
 		
 		String sql;
 		
 		//Get the gift, discount & total to each department during this period.
 		sql = " SELECT " +
-			  " dept_id, restaurant_id, dept_type, dept_name, dept_display_id, " +
-			  " ROUND(SUM(dept_gift), 2) AS dept_gift, " +
-			  " ROUND(SUM(dept_discount), 2) AS dept_discount, " +
-			  " ROUND(SUM(dept_income), 2) AS dept_income " +
-			  " FROM (" +
-				  " SELECT " +
-				  " MAX(D.dept_id) AS dept_id, MAX(D.restaurant_id) AS restaurant_id, MAX(D.type) AS dept_type, " +
-				  " MAX(D.name) AS dept_name, MAX(D.display_id) AS dept_display_id, " +
-				  " CASE WHEN ((OF.food_status & " + Food.GIFT + ") <> 0) THEN (OF.unit_price + IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * discount * SUM(OF.order_count) ELSE 0 END AS dept_gift," +
-				  " (OF.unit_price + IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * (1 - discount) * SUM(OF.order_count) AS dept_discount, " +
-				  " CASE WHEN ((OF.food_status & " + Food.GIFT + ") = 0 AND (OF.food_status & " + Food.WEIGHT + ") = 0) THEN (OF.unit_price + IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * discount * SUM(OF.order_count) " +
-				  	   " WHEN ((OF.food_status & " + Food.GIFT + ") = 0 AND (OF.food_status & " + Food.WEIGHT + ") <> 0) THEN (OF.unit_price * SUM(OF.order_count) + (IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0))) * discount " +
-				  	   " ELSE 0 " +
-				  	   " END AS dept_income " +
-				  " FROM " + Params.dbName + "." + orderFoodTbl + " OF " + 
-				  " JOIN " + Params.dbName + "." + orderTbl + " O ON 1 = 1 " + 
-				  " AND OF.order_id = O.id " + 
-				  " AND O.restaurant_id = " + staff.getRestaurantId() + 
-				  " AND O.status <> " + Order.Status.UNPAID.getVal() +
-				  " JOIN " + Params.dbName + "." + tasteGrpTbl + " TG " + " ON OF.taste_group_id = TG.taste_group_id " +
-				  " JOIN " + Params.dbName + ".department D " + " ON OF.dept_id = D.dept_id AND OF.restaurant_id = D.restaurant_id AND D.type = " + Department.Type.NORMAL.getVal() +
-				  " WHERE 1 = 1 " +
-				  (extraCond == null ? "" : extraCond) +
-				  " AND O.order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +
-				  " GROUP BY " + " OF.order_id, OF.food_id, OF.taste_group_id " +
-				  " HAVING SUM(order_count) > 0 " +
-				  " ) AS TMP " +
-			  " GROUP BY dept_id " +
-			  " ORDER BY dept_display_id ASC ";
+			  " D.dept_id, D.restaurant_id, D.type, D.name AS dept_name, D.display_id, " +
+			  " ROUND(SUM(food_gift), 2) AS dept_gift, " +
+			  " ROUND(SUM(food_discount), 2) AS dept_discount, " +
+			  " ROUND(SUM(food_income), 2) AS dept_income " +
+			  " FROM (" + 
+			  	makeSql4CalcFood(staff, range, extraCond, queryType) +
+			  " ) AS TMP " +
+		      " JOIN " + Params.dbName + ".department D " + " ON TMP.dept_id = D.dept_id " + " AND D.restaurant_id = " + staff.getRestaurantId() + " AND D.type = " + Department.Type.NORMAL.getVal() +
+			  " GROUP BY TMP.dept_id " +
+			  " ORDER BY D.display_id ASC ";
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		
 		List<IncomeByDept> deptIncomes = new ArrayList<IncomeByDept>();
@@ -679,8 +685,8 @@ public class CalcBillStatisticsDao {
 			deptIncomes.add(new IncomeByDept(new Department(dbCon.rs.getString("dept_name"),
 														    dbCon.rs.getShort("dept_id"),
 														    dbCon.rs.getInt("restaurant_id"),
-														    Department.Type.valueOf(dbCon.rs.getShort("dept_type")),
-														    dbCon.rs.getInt("dept_display_id")),
+														    Department.Type.valueOf(dbCon.rs.getShort("type")),
+														    dbCon.rs.getInt("display_id")),
 										     dbCon.rs.getFloat("dept_gift"),
 										     dbCon.rs.getFloat("dept_discount"),
 										     dbCon.rs.getFloat("dept_income")));
@@ -721,57 +727,54 @@ public class CalcBillStatisticsDao {
 	 * @throws SQLException
 	 */
 	public static List<IncomeByKitchen> calcIncomeByKitchen(DBCon dbCon, Staff staff, DutyRange range, String extraCond, DateType queryType) throws SQLException{
-		String orderTbl = null;
-		String orderFoodTbl = null;
-		String tasteGrpTbl = null;
-		if(queryType.isHistory()){
-			orderTbl = TBL_ORDER_HISTORY;
-			orderFoodTbl = TBL_ORDER_FOOD_HISTORY;
-			tasteGrpTbl = TBL_TASTE_GROUP_HISTORY;
-			
-		}else if(queryType.isToday()){
-			orderTbl = TBL_ORDER_TODAY;
-			orderFoodTbl = TBL_ORDER_FOOD_TODAY;
-			tasteGrpTbl = TBL_TASTE_GROUP_TODAY;
-			
-		}else{
-			throw new IllegalArgumentException("The query type is invalid.");
-		}
 		
 		String sql;
 		
-		//Get the gift, discount & total to each kitchen during this period.
 		sql = " SELECT " +
-			  " kitchen_id, kitchen_display_id, kitchen_name, kitchen_type, " +
-			  " dept_id, dept_type, dept_name, dept_display_id, restaurant_id, " +
-			  " ROUND(SUM(kitchen_gift), 2) AS kitchen_gift, ROUND(SUM(kitchen_discount), 2) AS kitchen_discount, ROUND(SUM(kitchen_income), 2) AS kitchen_income " +
-			  " FROM ( " + 
-				  " SELECT " +
-				  " MAX(K.kitchen_id) AS kitchen_id, MAX(K.display_id) AS kitchen_display_id, " +
-				  " MAX(K.name) AS kitchen_name, MAX(K.type) AS kitchen_type, " +
-				  " MAX(D.dept_id) AS dept_id, MAX(D.type) AS dept_type, MAX(D.name) AS dept_name, MAX(D.display_id) AS dept_display_id, " +
-				  " MAX(OF.restaurant_id) AS restaurant_id, " +
-				  " CASE WHEN ((OF.food_status & " + Food.GIFT + ") <> 0) THEN (OF.unit_price + IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * discount * SUM(OF.order_count) ELSE 0 END AS kitchen_gift," +
-				  " (OF.unit_price + IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * (1 - discount) * SUM(OF.order_count) AS kitchen_discount, " +
-				  " CASE WHEN ((OF.food_status & " + Food.GIFT + ") = 0 AND (OF.food_status & " + Food.WEIGHT + ") = 0) THEN (OF.unit_price + IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * discount * SUM(OF.order_count) " +
-			  	   	   " WHEN ((OF.food_status & " + Food.GIFT + ") = 0 AND (OF.food_status & " + Food.WEIGHT + ") <> 0) THEN (OF.unit_price * SUM(OF.order_count) + (IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0))) * discount " +
-			  	   	   " ELSE 0 " +
-			  	   	   " END AS kitchen_income " +
-			  	  " FROM " +
-				  Params.dbName + "." + orderFoodTbl + " OF " + 
-				  " JOIN " + Params.dbName + "." + orderTbl + " O ON 1 = 1 " + 
-				  " AND OF.order_id = O.id " + 
-				  " AND O.restaurant_id = " + staff.getRestaurantId() + 
-				  " AND O.status <> " + Order.Status.UNPAID.getVal() +
-				  " JOIN " + Params.dbName + "." + tasteGrpTbl + " TG " + " ON OF.taste_group_id = TG.taste_group_id " +
-				  " JOIN " + Params.dbName + ".kitchen K " + " ON OF.kitchen_id = K.kitchen_id AND K.type = " + Kitchen.Type.NORMAL.getVal() + 
-				  " JOIN " + Params.dbName + ".department D " + " ON K.dept_id = D.dept_id AND K.restaurant_id = D.restaurant_id " +
-				  " WHERE 1 = 1 " +
-				  (extraCond == null ? "" : extraCond) +
-				  " AND O.order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +
-				  " GROUP BY OF.order_id, OF.food_id, OF.taste_group_id ) AS TMP " +
+			  " K.kitchen_id, K.display_id AS kitchen_display_id, K.name AS kitchen_name, K.type AS kitchen_type, " +
+			  " D.dept_id, D.type AS dept_type, D.name AS dept_name, D.display_id AS dept_display_id, " +
+			  " ROUND(SUM(food_gift), 2) AS kitchen_gift, ROUND(SUM(food_discount), 2) AS kitchen_discount, ROUND(SUM(food_income), 2) AS kitchen_income " +
+			  " FROM ( " +
+			  makeSql4CalcFood(staff, range, extraCond, queryType) +
+			  " ) AS TMP " +
+			  " JOIN " + Params.dbName + ".kitchen K " + " ON TMP.kitchen_id = K.kitchen_id AND K.type = " + Kitchen.Type.NORMAL.getVal() + 
+			  " JOIN " + Params.dbName + ".department D " + " ON TMP.dept_id = D.dept_id AND D.restaurant_id = " + staff.getRestaurantId() +
 			  " GROUP BY kitchen_id " +
-			  " ORDER BY kitchen_display_id ASC ";
+			  " ORDER BY kitchen_display_id ";
+
+		
+		//Get the gift, discount & total to each kitchen during this period.
+//		sql = " SELECT " +
+//			  " kitchen_id, kitchen_display_id, kitchen_name, kitchen_type, " +
+//			  " dept_id, dept_type, dept_name, dept_display_id, restaurant_id, " +
+//			  " ROUND(SUM(kitchen_gift), 2) AS kitchen_gift, ROUND(SUM(kitchen_discount), 2) AS kitchen_discount, ROUND(SUM(kitchen_income), 2) AS kitchen_income " +
+//			  " FROM ( " + 
+//				  " SELECT " +
+//				  " MAX(K.kitchen_id) AS kitchen_id, MAX(K.display_id) AS kitchen_display_id, " +
+//				  " MAX(K.name) AS kitchen_name, MAX(K.type) AS kitchen_type, " +
+//				  " MAX(D.dept_id) AS dept_id, MAX(D.type) AS dept_type, MAX(D.name) AS dept_name, MAX(D.display_id) AS dept_display_id, " +
+//				  " MAX(OF.restaurant_id) AS restaurant_id, " +
+//				  " CASE WHEN ((OF.food_status & " + Food.GIFT + ") <> 0) THEN (OF.unit_price + IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * discount * SUM(OF.order_count) ELSE 0 END AS kitchen_gift," +
+//				  " (OF.unit_price + IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * (1 - discount) * SUM(OF.order_count) AS kitchen_discount, " +
+//				  " CASE WHEN ((OF.food_status & " + Food.GIFT + ") = 0 AND (OF.food_status & " + Food.WEIGHT + ") = 0) THEN (OF.unit_price + IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * discount * SUM(OF.order_count) " +
+//			  	   	   " WHEN ((OF.food_status & " + Food.GIFT + ") = 0 AND (OF.food_status & " + Food.WEIGHT + ") <> 0) THEN (OF.unit_price * SUM(OF.order_count) + (IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0))) * discount " +
+//			  	   	   " ELSE 0 " +
+//			  	   	   " END AS kitchen_income " +
+//			  	  " FROM " +
+//				  Params.dbName + "." + orderFoodTbl + " OF " + 
+//				  " JOIN " + Params.dbName + "." + orderTbl + " O ON 1 = 1 " + 
+//				  " AND OF.order_id = O.id " + 
+//				  " AND O.restaurant_id = " + staff.getRestaurantId() + 
+//				  " AND O.status <> " + Order.Status.UNPAID.getVal() +
+//				  " JOIN " + Params.dbName + "." + tasteGrpTbl + " TG " + " ON OF.taste_group_id = TG.taste_group_id " +
+//				  " JOIN " + Params.dbName + ".kitchen K " + " ON OF.kitchen_id = K.kitchen_id AND K.type = " + Kitchen.Type.NORMAL.getVal() + 
+//				  " JOIN " + Params.dbName + ".department D " + " ON K.dept_id = D.dept_id AND K.restaurant_id = D.restaurant_id " +
+//				  " WHERE 1 = 1 " +
+//				  (extraCond == null ? "" : extraCond) +
+//				  " AND O.order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +
+//				  " GROUP BY OF.order_id, OF.food_id, OF.taste_group_id ) AS TMP " +
+//			  " GROUP BY kitchen_id " +
+//			  " ORDER BY kitchen_display_id ASC ";
 		
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		
@@ -779,12 +782,12 @@ public class CalcBillStatisticsDao {
 		while(dbCon.rs.next()){
 			Kitchen k = new Kitchen(dbCon.rs.getInt("kitchen_id"));
 			k.setName(dbCon.rs.getString("kitchen_name"));
-			k.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
+			k.setRestaurantId(staff.getRestaurantId());
 			k.setAllowTemp(false);
 			k.setType(dbCon.rs.getShort("kitchen_type"));
 			k.setDept(new Department(dbCon.rs.getString("dept_name"),
 									 dbCon.rs.getShort("dept_id"),
-									 dbCon.rs.getInt("restaurant_id"),
+									 staff.getRestaurantId(),
 									 Department.Type.valueOf(dbCon.rs.getShort("dept_type")),
 									 dbCon.rs.getInt("dept_display_id")));
 			
@@ -820,52 +823,23 @@ public class CalcBillStatisticsDao {
 	 * @throws SQLException
 	 */
 	public static List<IncomeByFood> calcIncomeByFood(DBCon dbCon, Staff staff, DutyRange range, String extraCond, DateType queryType) throws SQLException{
-		String orderTbl = null;
-		String orderFoodTbl = null;
-		String tasteGrpTbl = null;
-		if(queryType.isHistory()){
-			orderTbl = TBL_ORDER_HISTORY;
-			orderFoodTbl = TBL_ORDER_FOOD_HISTORY;
-			tasteGrpTbl = TBL_TASTE_GROUP_HISTORY;
-			
-		}else if(queryType.isToday()){
-			orderTbl = TBL_ORDER_TODAY;
-			orderFoodTbl = TBL_ORDER_FOOD_TODAY;
-			tasteGrpTbl = TBL_TASTE_GROUP_TODAY;
-			
-		}else{
-			throw new IllegalArgumentException("The query type is invalid.");
-		}
 		
 		String sql;
 		
 		//Get the gift, discount & total to each food during this period.
 		sql = " SELECT " +
-			  " OF.food_id, MAX(OF.name) AS food_name, " +
-			  " MAX(OF.food_status) AS food_status, MAX(OF.restaurant_id) AS restaurant_id, " +
-			  " MAX(OF.kitchen_id) AS kitchen_id, " +
-			  " MAX(OF.dept_id) AS dept_id, " +
-			  " SUM(OF.order_count) AS sale_amount, " +
-			  " ROUND(SUM(CASE WHEN ((OF.food_status & " + Food.GIFT + ") <> 0) THEN ((OF.unit_price + IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * discount * OF.order_count) ELSE 0 END), 2) AS food_gift," +
-			  " ROUND(SUM((OF.unit_price + IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * (1 - discount) * OF.order_count), 2) AS food_discount, " +
-//			  " ROUND(SUM(CASE WHEN ((OF.food_status & " + Food.GIFT + ") = 0) THEN ((OF.unit_price + IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * discount * OF.order_count) ELSE 0 END), 2) AS food_income " +
-			  " ROUND(CASE WHEN ((OF.food_status & " + Food.GIFT + ") = 0 AND (OF.food_status & " + Food.WEIGHT + ") = 0) THEN (OF.unit_price + IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * discount * SUM(OF.order_count) " +
-	  	   	  " WHEN ((OF.food_status & " + Food.GIFT + ") = 0 AND (OF.food_status & " + Food.WEIGHT + ") <> 0) THEN (OF.unit_price * SUM(OF.order_count) + (IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0))) * discount " +
-	  	   	  " ELSE 0 " +
-	  	   	  " END, 2) AS food_income " +
-			  " FROM " +
-			  Params.dbName + "." + orderFoodTbl + " OF " + 
-			  " JOIN " + Params.dbName + "." + orderTbl + " O ON 1 = 1 " + 
-			  " AND OF.order_id = O.id " + 
-			  " AND O.restaurant_id = " + staff.getRestaurantId() + 
-			  " AND O.status <> " + Order.Status.UNPAID.getVal() +
-			  " JOIN " + Params.dbName + "." + tasteGrpTbl + " TG " + " ON OF.taste_group_id = TG.taste_group_id " +
-			  " WHERE 1 = 1 " +
-			  (extraCond == null ? "" : extraCond) +
-			  " AND O.order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +
-			  " GROUP BY " + " OF.food_id " +
-			  " HAVING sale_amount > 0 " +
-			  " ORDER BY " + " OF.food_id ASC ";
+			  " TMP.food_id, " + 
+			  " MAX(TMP.food_name) AS food_name, MAX(TMP.food_status) AS food_status, " + 
+			  " MAX(TMP.dept_id) AS dept_id, MAX(TMP.kitchen_id) AS kitchen_id, " +
+			  " SUM(TMP.food_amount) AS food_amount, " +
+			  " ROUND(SUM(TMP.food_gift), 2) AS food_gift, " +
+			  " ROUND(SUM(TMP.food_discount), 2) AS food_discount, " +
+			  " ROUND(SUM(TMP.food_income), 2) AS food_income " +
+			  " FROM (" +
+			  makeSql4CalcFood(staff, range, extraCond, queryType) +
+			  " ) AS TMP " +
+			  " GROUP BY food_id " +
+			  " ORDER BY food_id ";
 		
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		
@@ -873,16 +847,16 @@ public class CalcBillStatisticsDao {
 		while(dbCon.rs.next()){
 
 			Department dept = new Department(dbCon.rs.getShort("dept_id"));
-			dept.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
+			dept.setRestaurantId(staff.getRestaurantId());
 
 			
 			Kitchen kitchen = new Kitchen(dbCon.rs.getInt("kitchen_id"));
-			kitchen.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
+			kitchen.setRestaurantId(staff.getRestaurantId());
 			kitchen.setDept(dept);
 
 			Food food = new Food(dbCon.rs.getInt("food_id"));
 			food.setName(dbCon.rs.getString("food_name"));
-			food.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
+			food.setRestaurantId(staff.getRestaurantId());
 			food.setStatus(dbCon.rs.getShort("food_status"));
 			food.setKitchen(kitchen);
 			
@@ -890,7 +864,7 @@ public class CalcBillStatisticsDao {
 											 dbCon.rs.getFloat("food_gift"),
 											 dbCon.rs.getFloat("food_discount"),
 											 dbCon.rs.getFloat("food_income"),
-											 dbCon.rs.getFloat("sale_amount")));
+											 dbCon.rs.getFloat("food_amount")));
 		}
 		
 		dbCon.rs.close();
