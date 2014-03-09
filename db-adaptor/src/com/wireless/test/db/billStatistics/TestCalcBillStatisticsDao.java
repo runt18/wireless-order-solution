@@ -137,7 +137,7 @@ public class TestCalcBillStatisticsDao {
 			totalCancel += cancelByEachReason.getTotalCancelPrice();
 		}
 		
-		Assert.assertTrue("", Float.valueOf(cancelIncome.getTotalCancel()).intValue() == Float.valueOf(totalCancel).intValue());
+		Assert.assertEquals("", Float.valueOf(cancelIncome.getTotalCancel()).intValue(), Float.valueOf(totalCancel).intValue());
 	}
 	
 	@Test
@@ -155,6 +155,6 @@ public class TestCalcBillStatisticsDao {
 			totalCancel += cancelByEachDept.getTotalCancelPrice();
 		}
 		
-		Assert.assertTrue("", Float.valueOf(cancelIncome.getTotalCancel()).intValue() == Float.valueOf(totalCancel).intValue());
+		Assert.assertEquals(Float.valueOf(cancelIncome.getTotalCancel()).intValue(), Float.valueOf(totalCancel).intValue());
 	}
 }
