@@ -742,40 +742,6 @@ public class CalcBillStatisticsDao {
 			  " GROUP BY kitchen_id " +
 			  " ORDER BY kitchen_display_id ";
 
-		
-		//Get the gift, discount & total to each kitchen during this period.
-//		sql = " SELECT " +
-//			  " kitchen_id, kitchen_display_id, kitchen_name, kitchen_type, " +
-//			  " dept_id, dept_type, dept_name, dept_display_id, restaurant_id, " +
-//			  " ROUND(SUM(kitchen_gift), 2) AS kitchen_gift, ROUND(SUM(kitchen_discount), 2) AS kitchen_discount, ROUND(SUM(kitchen_income), 2) AS kitchen_income " +
-//			  " FROM ( " + 
-//				  " SELECT " +
-//				  " MAX(K.kitchen_id) AS kitchen_id, MAX(K.display_id) AS kitchen_display_id, " +
-//				  " MAX(K.name) AS kitchen_name, MAX(K.type) AS kitchen_type, " +
-//				  " MAX(D.dept_id) AS dept_id, MAX(D.type) AS dept_type, MAX(D.name) AS dept_name, MAX(D.display_id) AS dept_display_id, " +
-//				  " MAX(OF.restaurant_id) AS restaurant_id, " +
-//				  " CASE WHEN ((OF.food_status & " + Food.GIFT + ") <> 0) THEN (OF.unit_price + IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * discount * SUM(OF.order_count) ELSE 0 END AS kitchen_gift," +
-//				  " (OF.unit_price + IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * (1 - discount) * SUM(OF.order_count) AS kitchen_discount, " +
-//				  " CASE WHEN ((OF.food_status & " + Food.GIFT + ") = 0 AND (OF.food_status & " + Food.WEIGHT + ") = 0) THEN (OF.unit_price + IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * discount * SUM(OF.order_count) " +
-//			  	   	   " WHEN ((OF.food_status & " + Food.GIFT + ") = 0 AND (OF.food_status & " + Food.WEIGHT + ") <> 0) THEN (OF.unit_price * SUM(OF.order_count) + (IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0))) * discount " +
-//			  	   	   " ELSE 0 " +
-//			  	   	   " END AS kitchen_income " +
-//			  	  " FROM " +
-//				  Params.dbName + "." + orderFoodTbl + " OF " + 
-//				  " JOIN " + Params.dbName + "." + orderTbl + " O ON 1 = 1 " + 
-//				  " AND OF.order_id = O.id " + 
-//				  " AND O.restaurant_id = " + staff.getRestaurantId() + 
-//				  " AND O.status <> " + Order.Status.UNPAID.getVal() +
-//				  " JOIN " + Params.dbName + "." + tasteGrpTbl + " TG " + " ON OF.taste_group_id = TG.taste_group_id " +
-//				  " JOIN " + Params.dbName + ".kitchen K " + " ON OF.kitchen_id = K.kitchen_id AND K.type = " + Kitchen.Type.NORMAL.getVal() + 
-//				  " JOIN " + Params.dbName + ".department D " + " ON K.dept_id = D.dept_id AND K.restaurant_id = D.restaurant_id " +
-//				  " WHERE 1 = 1 " +
-//				  (extraCond == null ? "" : extraCond) +
-//				  " AND O.order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +
-//				  " GROUP BY OF.order_id, OF.food_id, OF.taste_group_id ) AS TMP " +
-//			  " GROUP BY kitchen_id " +
-//			  " ORDER BY kitchen_display_id ASC ";
-		
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		
 		List<IncomeByKitchen> kitchenIncomes = new ArrayList<IncomeByKitchen>();
