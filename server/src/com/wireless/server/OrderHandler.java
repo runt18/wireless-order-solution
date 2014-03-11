@@ -382,9 +382,9 @@ class OrderHandler implements Runnable{
 							.fireAsync();
 						
 					}else if(printType.isMember()){
-						int memberOperationId = new Parcel(request.body).readInt();
+						int moId = new Parcel(request.body).readInt();
 						new PrintHandler(staff)
-							.addContent(JobContentFactory.instance().createMemberReceiptContent(printType, staff, printers, memberOperationId))
+							.addContent(JobContentFactory.instance().createMemberReceiptContent(printType, staff, printers, moId))
 							.fireAsync();
 					}
 					

@@ -54,7 +54,7 @@ public class OrderDetailContent extends ConcreteContent {
 			
 		}else if(mPrintType == PType.PRINT_CANCELLED_FOOD){
 			_printTemplate = _printTemplate.replace(PVar.TITLE,
-													new ExtraFormatDecorator(new CenterAlignedDecorator("ÍË²Ëµ¥(ÏêÏ¸)!!!-" + tblName, mStyle), 
+													new ExtraFormatDecorator(new CenterAlignedDecorator("!!!ÍË²Ëµ¥(ÏêÏ¸)!!!-" + tblName, mStyle), 
 																			 ExtraFormatDecorator.LARGE_FONT_3X).toString());
 			
 		}else if(mPrintType == PType.PRINT_HURRIED_FOOD){

@@ -4,6 +4,7 @@ import java.text.SimpleDateFormat;
 
 import com.wireless.pojo.client.MemberOperation;
 import com.wireless.pojo.client.MemberOperation.OperationType;
+import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.printScheme.PStyle;
 import com.wireless.pojo.printScheme.PType;
 import com.wireless.pojo.restaurantMgr.Restaurant;
@@ -14,12 +15,14 @@ public class MemberReceiptContent extends ConcreteContent {
 	private final Restaurant mRestaurant;
 	private final String mWaiter;
 	private final MemberOperation mMo;
+	private final Order mOrder;
 	
-	public MemberReceiptContent(Restaurant restaurant, String waiter, MemberOperation mo, PType printType, PStyle style) {
+	public MemberReceiptContent(Restaurant restaurant, String waiter, MemberOperation mo, Order order, PType printType, PStyle style) {
 		super(printType, style);
 		mRestaurant = restaurant;
 		mWaiter = waiter;
 		mMo = mo;
+		mOrder = order;
 	}
 	
 	@Override
@@ -41,7 +44,10 @@ public class MemberReceiptContent extends ConcreteContent {
 									   getStyle())).append(SEP);
 		
 		if(mMo.getOperationType() == OperationType.CONSUME){
-			s.append("消费账单号：" + mMo.getOrderId()).append(SEP);
+			s.append("消费账单号：" + mOrder.getId()).append(SEP); 
+			if(mOrder != null){
+				s.append("餐台：" + mOrder.getDestTbl().getAliasId() + (mOrder.getDestTbl().getName().isEmpty() ? "" : ("(" + mOrder.getDestTbl().getName() + ")"))).append(SEP);
+			}
 			
 		}else if(mMo.getOperationType() == OperationType.CHARGE){
 			s.append("充值方式：" + mMo.getChargeType().getName()).append(SEP);

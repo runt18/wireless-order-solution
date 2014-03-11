@@ -21,7 +21,6 @@ import com.wireless.pojo.client.MemberOperation;
 import com.wireless.pojo.client.MemberType.Attribute;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.OrderFood;
-import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.pojo.printScheme.PType;
@@ -114,36 +113,31 @@ public class JobContentFactory {
 						if(func.isDeptAll()){
 							//Generate the the summary to all departments.
 							jobContents.add(new JobContent(printer, func.getRepeat(), printType, 
-										   				   new SummaryContent(new Department(staff.getRestaurantId(), Department.DeptId.DEPT_NULL.getVal(), null), 
-										   						   			  PFormat.FROMAT_NO_DISCOUNT, 
+										   				   new SummaryContent(PFormat.FROMAT_NO_DISCOUNT, 
 										   						   			  order,
 										   						   			  staff.getName(),
 										   						   			  printType, 
 										   						   			  printer.getStyle())));
 						}else{
-							//Generate the summary to specific department.
-							for(Department dept : func.getDepartment()){
-								
-								List<OrderFood> orderFoods = new ArrayList<OrderFood>();
-								for(OrderFood of : order.getOrderFoods()){
-									if(of.asFood().getKitchen().getDept().equals(dept)){
-										orderFoods.add(of);
-									}
+							//Generate the summary to specific departments.
+							List<OrderFood> orderFoods = new ArrayList<OrderFood>();
+							for(OrderFood of : order.getOrderFoods()){
+								if(func.getDepartment().contains(of.asFood().getKitchen().getDept())){
+									orderFoods.add(of);
 								}
-								
-								if(!orderFoods.isEmpty()){
-									Order orderToDept = new Order();
-									orderToDept.copyFrom(order);
-									orderToDept.setOrderFoods(orderFoods);
-									jobContents.add(new JobContent(printer, func.getRepeat(), printType,
-								   				   new SummaryContent(dept, 
-								   						   			  PFormat.FROMAT_NO_DISCOUNT, 
-								   						   			  orderToDept,
-								   						   			  staff.getName(),
-								   						   			  printType, 
-								   						   			  printer.getStyle())));
-									
-								}
+							}
+							
+							if(!orderFoods.isEmpty()){
+								Order orderToDept = new Order(0);
+								orderToDept.copyFrom(order);
+								orderToDept.setOrderFoods(orderFoods);
+								jobContents.add(new JobContent(printer, func.getRepeat(), printType,
+							   				   new SummaryContent(func.getDepartment(), 
+							   						   			  PFormat.FROMAT_NO_DISCOUNT, 
+							   						   			  orderToDept,
+							   						   			  staff.getName(),
+							   						   			  printType, 
+							   						   			  printer.getStyle())));
 							}
 						}
 						
@@ -326,17 +320,17 @@ public class JobContentFactory {
 					
 					MemberOperation mo = MemberOperationDao.getTodayById(staff, moId);
 					
-					if(mo != null){
-						Member member = MemberDao.getMemberById(staff, mo.getMemberId());
-						//Print the member receipt only if member type belongs to charge.
-						if(member.getMemberType().getAttribute() == Attribute.CHARGE){
-							
-							mo.setMember(MemberDao.getMemberById(staff, mo.getMemberId()));
-							Restaurant restaurant = RestaurantDao.getById(staff.getRestaurantId());
-							jobContents.add(new JobContent(printer, func.getRepeat(), printType,
-														   new MemberReceiptContent(restaurant, staff.getName(), mo, printType, printer.getStyle())));
+					Member member = MemberDao.getMemberById(staff, mo.getMemberId());
+					//Print the member receipt only if member type belongs to charge.
+					if(member.getMemberType().getAttribute() == Attribute.CHARGE){
+						
+						mo.setMember(MemberDao.getMemberById(staff, mo.getMemberId()));
+						Restaurant restaurant = RestaurantDao.getById(staff.getRestaurantId());
+						jobContents.add(new JobContent(printer, func.getRepeat(), printType,
+													   new MemberReceiptContent(restaurant, staff.getName(), mo, 
+															   					mo.getOrderId() != 0 ? OrderDao.getById(staff, mo.getOrderId(), DateType.TODAY) : null, 
+															   					printType, printer.getStyle())));
 
-						}
 					}					
 				}
 			}
@@ -345,10 +339,10 @@ public class JobContentFactory {
 		return jobContents.isEmpty() ? null : new JobCombinationContent(jobContents);
 	}
 	
-	public Content createTransContent(PType printType, Staff term, List<Printer> printers, int orderId, Table srcTbl, Table destTbl){
+	public Content createTransContent(PType printType, Staff staff, List<Printer> printers, int orderId, Table srcTbl, Table destTbl){
 		List<JobContent> jobContents = new ArrayList<JobContent>();
 		
-		Region regionToCompare = new Region(Region.RegionId.REGION_1.getId(), "", term.getRestaurantId());
+		Region regionToCompare = new Region(Region.RegionId.REGION_1.getId(), "", staff.getRestaurantId());
 		
 		for(Printer printer : printers){
 			for(PrintFunc func : printer.getPrintFuncs()){
@@ -358,7 +352,7 @@ public class JobContentFactory {
 														new TransTableContent(orderId,
 																   srcTbl,
 																   destTbl,
-																   term.getName(),
+																   staff.getName(),
 																   printType,
 																   printer.getStyle())));
 					}
