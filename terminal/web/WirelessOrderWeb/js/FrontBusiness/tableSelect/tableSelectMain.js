@@ -528,14 +528,14 @@ var btnOrderDetail = new Ext.ux.ImageButton({
 									sumCell.style.fontWeight = 'bold';
 									sumCell.style.color = 'green';
 								}
-								selTabContentGrid.getView().getCell(store.getCount()-1, 1).innerHTML = '总金额';
-								selTabContentGrid.getView().getCell(store.getCount()-1, 2).innerHTML = '--';
-								selTabContentGrid.getView().getCell(store.getCount()-1, 3).innerHTML = '--';
-								selTabContentGrid.getView().getCell(store.getCount()-1, 4).innerHTML = '--';
-								selTabContentGrid.getView().getCell(store.getCount()-1, 5).innerHTML = '--';
-								selTabContentGrid.getView().getCell(store.getCount()-1, 6).innerHTML = '--';
-								selTabContentGrid.getView().getCell(store.getCount()-1, 7).innerHTML = '--';
-								selTabContentGrid.getView().getCell(store.getCount()-1, 8).innerHTML = '--';
+								selTabContentGrid.getView().getCell(store.getCount()-1, 1).innerHTML = '';
+								selTabContentGrid.getView().getCell(store.getCount()-1, 2).innerHTML = '';
+								selTabContentGrid.getView().getCell(store.getCount()-1, 3).innerHTML = '';
+								selTabContentGrid.getView().getCell(store.getCount()-1, 4).innerHTML = '';
+								selTabContentGrid.getView().getCell(store.getCount()-1, 5).innerHTML = '';
+								selTabContentGrid.getView().getCell(store.getCount()-1, 6).innerHTML = '';
+								selTabContentGrid.getView().getCell(store.getCount()-1, 7).innerHTML = '';
+								selTabContentGrid.getView().getCell(store.getCount()-1, 8).innerHTML = '总金额 :';
 								selTabContentGrid.getView().getCell(store.getCount()-1, 9).innerHTML = jr.other.order.actualPrice.toFixed(2);
 							},
 							failure : function(){
