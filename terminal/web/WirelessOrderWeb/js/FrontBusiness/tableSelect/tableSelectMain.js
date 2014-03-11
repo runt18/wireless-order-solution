@@ -508,8 +508,11 @@ var btnOrderDetail = new Ext.ux.ImageButton({
 				selTabContentGrid.border = false;
 				
 				selTabContentGrid.getStore().on('load', function(store, records, options){
-					store.add(new Ext.data.Record({'orderDateFormat':'haodongxi', 'name':'aaaaaa', 'unitPrice':0, 'count':0, 'tasteGroup.tastePref':'', 'tasteGroup.tastePrice':'', 'kitchen.name':'', 'waiter': '', 'cancelReason.reason':''}));
+					store.add(new Ext.data.Record({'orderDateFormat':'汇总', 'name':'-----', 'unitPrice':0, 'count':0, 'tasteGroup.tastePref':'', 'tasteGroup.tastePrice':'', 'kitchen.name':'', 'waiter': '', 'cancelReason.reason':''}));
 					var sumRow;
+					for (var i = 0; i < store.getCount(); i++) {
+						Ext.ux.formatFoodName(store.getAt(i), 'displayFoodName', 'name');
+					}
 					if(store.getCount() > 0){
 						Ext.Ajax.request({
 							url : '../../QueryOrderByCalc.do',
@@ -526,14 +529,14 @@ var btnOrderDetail = new Ext.ux.ImageButton({
 									sumCell.style.color = 'green';
 								}
 								selTabContentGrid.getView().getCell(store.getCount()-1, 1).innerHTML = '总金额';
-								selTabContentGrid.getView().getCell(store.getCount()-1, 2).innerHTML = jr.other.order.actualPrice.toFixed(2);
+								selTabContentGrid.getView().getCell(store.getCount()-1, 2).innerHTML = '--';
 								selTabContentGrid.getView().getCell(store.getCount()-1, 3).innerHTML = '--';
 								selTabContentGrid.getView().getCell(store.getCount()-1, 4).innerHTML = '--';
 								selTabContentGrid.getView().getCell(store.getCount()-1, 5).innerHTML = '--';
 								selTabContentGrid.getView().getCell(store.getCount()-1, 6).innerHTML = '--';
 								selTabContentGrid.getView().getCell(store.getCount()-1, 7).innerHTML = '--';
 								selTabContentGrid.getView().getCell(store.getCount()-1, 8).innerHTML = '--';
-								selTabContentGrid.getView().getCell(store.getCount()-1, 9).innerHTML = '--';
+								selTabContentGrid.getView().getCell(store.getCount()-1, 9).innerHTML = jr.other.order.actualPrice.toFixed(2);
 							},
 							failure : function(){
 							
