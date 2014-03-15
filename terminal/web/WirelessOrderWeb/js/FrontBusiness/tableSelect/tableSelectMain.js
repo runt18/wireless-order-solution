@@ -259,7 +259,7 @@ function shiftButHandler(){
 				});
 			}
 		}, {
-			text : '打印',
+			text : '预打',
 			id : 'btnJiaoBanDaYin',
 			icon: '../../images/printShift.png',
 			handler : function(e){
@@ -381,7 +381,7 @@ function dailySettleButHandler(){
 				});
 			}
 		}, {
-			text : '打印',
+			text : '预打',
 			id : 'btnRiJieDaYin',
 			icon: '../../images/printShift.png',
 			handler : function(e){
