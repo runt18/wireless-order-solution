@@ -146,8 +146,9 @@ public class WeixinMemberDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 * @throws BusinessException
-	 * 			throws if the member to be bound does NOT exist<br>
-	 * 			throws if the weixin member has NOT been interested in restaurant
+	 * 			throws if either cases below<br>
+	 * 			<li>throws if the member to be bound does NOT exist
+	 * 			<li>throws if the weixin member has NOT been interested in restaurant
 	 */
 	public static void bindExistMember(DBCon dbCon, int memberId, String weixinMemberSerial, String weixinRestaurantSerial) throws SQLException, BusinessException{
 		

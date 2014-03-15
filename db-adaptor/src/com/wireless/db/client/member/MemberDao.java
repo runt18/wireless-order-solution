@@ -14,6 +14,7 @@ import com.wireless.db.Params;
 import com.wireless.db.coupon.CouponDao;
 import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.db.staffMgr.StaffDao;
+import com.wireless.db.weixin.member.WeixinMemberDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.MemberError;
 import com.wireless.pojo.client.Member;
@@ -790,11 +791,17 @@ public class MemberDao {
 		dbCon.stmt.executeUpdate(sql);
 		
 		//Delete the member operation.
-		sql = " DELETE FROM " + Params.dbName + ".member_operation WHERE member_id = " + memberId;
-		dbCon.stmt.executeUpdate(sql);
+		//sql = " DELETE FROM " + Params.dbName + ".member_operation WHERE member_id = " + memberId;
+		//dbCon.stmt.executeUpdate(sql);
 		
 		//Delete the member operation history.
-		sql = " DELETE FROM " + Params.dbName + ".member_operation_history WHERE member_id = " + memberId;
+		//sql = " DELETE FROM " + Params.dbName + ".member_operation_history WHERE member_id = " + memberId;
+		//dbCon.stmt.executeUpdate(sql);
+		
+		//Change the weixin status to be interested if exist
+		sql = " UPDATE " + Params.dbName + ".weixin_member SET " +
+			  " status = " + WeixinMemberDao.Status.INTERESTED.getVal() +
+			  " WHERE member_id = " + memberId;
 		dbCon.stmt.executeUpdate(sql);
 		
 		//Delete the member
