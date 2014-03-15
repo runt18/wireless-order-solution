@@ -25,6 +25,7 @@ import com.wireless.pojo.sms.VerifySMS;
 import com.wireless.pojo.sms.VerifySMS.ExpiredPeriod;
 import com.wireless.pojo.sms.VerifySMS.InsertBuilder;
 import com.wireless.pojo.sms.VerifySMS.VerifyBuilder;
+import com.wireless.util.sms.SMS;
 
 public class WXOperateMemberAction extends DispatchAction {
 	
@@ -78,26 +79,21 @@ public class WXOperateMemberAction extends DispatchAction {
 	 * @return
 	 * @throws Exception
 	 */
-	public ActionForward getVerifyCode(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
+	public ActionForward getVerifyCode(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		request.setCharacterEncoding("UTF-8");
 		response.setCharacterEncoding("UTF-8");
 		JObject jobject = new JObject();
-		DBCon dbCon = null;
+		DBCon dbCon = new DBCon();
 		try{
-			String mobile = request.getParameter("mobile");
-			dbCon = new DBCon();
 			dbCon.connect();
 			dbCon.conn.setAutoCommit(false);
-			InsertBuilder builder = new InsertBuilder(ExpiredPeriod.MINUTE_10);
-			int lastId = VerifySMSDao.insert(dbCon, builder);
-			VerifySMS sms = VerifySMSDao.getById(dbCon, lastId);
-			//
-			String formId = request.getParameter("fid");
-			Restaurant restaurant = RestaurantDao.getById(WeixinRestaurantDao.getRestaurantIdByWeixin(dbCon, formId));
-			com.wireless.util.sms.CodeSMS.Status ss = com.wireless.util.sms.CodeSMS.send(mobile, sms.getCode(), restaurant.getName());
-//			com.wireless.util.sms.TextSMS.Status ss = com.wireless.util.sms.TextSMS.sendCodeSMS(mobile, sms.getCode(), restaurant.getName());
+			
+			String mobile = request.getParameter("mobile");
+			String fromId = request.getParameter("fid");
+
+			VerifySMS sms = VerifySMSDao.getById(dbCon, VerifySMSDao.insert(dbCon, new InsertBuilder(ExpiredPeriod.MINUTE_10)));
+			SMS.Status ss = SMS.send(mobile, new SMS.Msg("您本次操作的验证码是" + sms.getCode(), 
+														 RestaurantDao.getById(WeixinRestaurantDao.getRestaurantIdByWeixin(dbCon, fromId))));
 			if(ss.isSuccess()){
 				dbCon.conn.commit();
 				jobject.initTip(true, "操作成功, 已发送短信验证码, 请注意查看.");
@@ -116,7 +112,9 @@ public class WXOperateMemberAction extends DispatchAction {
 			e.printStackTrace();
 			jobject.initTip(e);
 		}finally{
-			if(dbCon != null) dbCon.disconnect();
+			if(dbCon != null){
+				dbCon.disconnect();
+			}
 			response.getWriter().print(jobject.toString());
 		}
 		return null;
