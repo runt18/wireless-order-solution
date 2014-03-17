@@ -219,7 +219,7 @@ public class CouponType implements Jsonable{
 		jm.put("name", this.name);
 		jm.put("price", this.price);
 		jm.put("expired", this.expired);
-		jm.put("expiredFormat", DateUtil.format(this.expired));
+		jm.put("expiredFormat", DateUtil.formatToDate(this.expired));
 		return Collections.unmodifiableMap(jm);
 	}
 
