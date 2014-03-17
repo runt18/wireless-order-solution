@@ -82,3 +82,101 @@ input[type=text], input[type=number]{
 	color: #26a9d0;
 }
 
+
+/*
+会员等级列表
+*/
+	#divMemberTypeDesc{
+	border:1px solid #e7e7e7;
+	padding:10px;
+	background-color:#f8f8f8;
+	}
+	.graph{
+	position:relative;
+	background-color:white;
+	border:1px solid #cccccc;
+	padding:2px;
+	font-size:13px;
+	font-weight:700;
+	
+	  -webkit-transform: translateZ(0); /* webkit flicker fix */
+	  text-align: center;
+	  line-height: 25px;
+	}
+	.graph span{
+	position:relative;
+	text-align:left;
+	
+	height:18px;
+	line-height:18px;
+	font-family:Arial;
+	display:block;
+	}
+	.graph .orange{background-color:#ff6600;}
+	.graph .green{background-color:#66CC33;}
+	
+	.memberLevelList{
+		height: 35px;background-color: silver;border-radius: 10px; line-height: 35px;margin-bottom: 5px;
+	}
+	.memberLevelHead{
+		width : 20%;height: 35px;background-color: dimgray;float: left;border-radius: 10px 0px 0px 10px;text-align: center;
+	}
+	.memberLevelHeadFont{
+		font-weight: bolder;color : white;font-size: 8px;
+	}
+	.memberLevelDiscount{
+		font-weight: bolder;color : whitesomke;font-size: 6px;
+	}
+	.memberLevelBody{
+		float: left;width: 70%;padding-top: 5px; margin-left: 5%;
+	}
+	
+/*
+会员等级列表分数提示
+*/
+
+
+.graph .tooltip {
+	background: dimgray;
+	bottom: 100%;
+	color: #fff;
+	display: block;
+	width :26%;
+	margin-bottom: 10px;
+	opacity: 0.8;
+	pointer-events: none;
+	position: absolute;
+	border-radius: 5px;
+	-webkit-box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.28);
+	   -moz-box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.28);
+	    -ms-box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.28);
+	     -o-box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.28);
+	        box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.28);
+	        
+	/* left: -22%; */
+}
+
+/* This bridges the gap so you can mouse into the tooltip without it disappearing */
+.graph .tooltip:before {
+  bottom: -20px;
+  content: " ";
+  display: block;
+  height: 20px;
+  left: 0;
+  position: absolute;
+  width: 100%;
+}  
+
+/* CSS Triangles - see Trevor's post */
+.graph .tooltip:after {
+  border-left: solid transparent 10px;
+  border-right: solid transparent 10px;
+  border-top: solid dimgray 10px;
+  bottom: -10px;
+  content: " ";
+  height: 0;
+  left: 50%;
+  margin-left: -10px;
+  position: absolute;
+ /*  width: 0; */
+}
