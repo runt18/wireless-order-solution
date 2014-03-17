@@ -2,7 +2,10 @@ package com.wireless.Actions.client.memberType;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -16,8 +19,11 @@ import com.wireless.db.client.member.MemberDao;
 import com.wireless.db.client.member.MemberLevelDao;
 import com.wireless.db.client.member.MemberTypeDao;
 import com.wireless.db.staffMgr.StaffDao;
+import com.wireless.db.weixin.member.WeixinMemberDao;
+import com.wireless.db.weixin.restaurant.WeixinRestaurantDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
+import com.wireless.json.Jsonable;
 import com.wireless.pojo.client.Member;
 import com.wireless.pojo.client.MemberLevel;
 import com.wireless.pojo.client.MemberType;
@@ -190,6 +196,62 @@ public class QueryMemberTypeAction extends DispatchAction {
 			List<MemberType> list = MemberTypeDao.getNotBelongMemberType(staff);
 			jobject.setRoot(list);
 			jobject.setTotalProperty(list.size());
+		}catch(BusinessException e){
+			e.printStackTrace();
+			jobject.initTip(e);
+		}catch(SQLException e){
+			e.printStackTrace();
+			jobject.initTip(e);
+		}catch(Exception e){
+			e.printStackTrace();
+			jobject.initTip(e);
+		}finally{
+			response.getWriter().print(jobject.toString());
+		}
+		return null;
+	}
+	
+	public ActionForward getMemberLevel(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		JObject jobject = new JObject();
+		try{
+
+			List<Jsonable> result = new ArrayList<Jsonable>();
+			Map<Object, Object> other = new HashMap<Object, Object>();
+			String openId = request.getParameter("oid");
+			String formId = request.getParameter("fid");
+			int rid = WeixinRestaurantDao.getRestaurantIdByWeixin(formId);
+			int mid = WeixinMemberDao.getBoundMemberIdByWeixin(openId, formId);
+			Staff staff = StaffDao.getStaffs(rid).get(0);
+			List<MemberLevel> list = MemberLevelDao.getMemberLevels(staff);
+			
+			for (final MemberLevel ml : list) {
+				final List<Member> mlists = MemberDao.getMember(staff, " AND MT.member_type_id = " + ml.getMemberType().getId() + " AND M.member_id = " + mid, null);
+				if(mlists.size() > 0){
+					other.put("member", mlists.get(0));
+				}
+				Jsonable j = new Jsonable() {
+					@Override
+					public Map<String, Object> toJsonMap(int flag) {
+						Map<String, Object> jm = new HashMap<String, Object>();
+						jm.put("pointThreshold", ml.getPointThreshold());
+						jm.put("memberTypeName", ml.getMemberType().getName());
+						jm.put("inLevel", mlists.size() != 0 ? true : "");
+						return Collections.unmodifiableMap(jm);
+					}
+					
+					@Override
+					public List<Object> toJsonList(int flag) {
+						return null;
+					}
+				};
+				result.add(j);
+			}
+			
+			jobject.setRoot(result);
+			jobject.setTotalProperty(result.size());
+			jobject.setOther(other);
 		}catch(BusinessException e){
 			e.printStackTrace();
 			jobject.initTip(e);

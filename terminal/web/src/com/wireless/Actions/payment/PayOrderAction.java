@@ -190,6 +190,7 @@ public class PayOrderAction extends Action{
 		}catch(IOException e){
 			e.printStackTrace();
 			jsonResp = jsonResp.replace("$(result)", "false");
+			
 			jsonResp = jsonResp.replace("$(value)", "服务器请求不成功，请重新检查网络是否连通");
 			
 		}catch(NumberFormatException e){

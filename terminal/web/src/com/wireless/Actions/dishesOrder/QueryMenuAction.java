@@ -268,4 +268,36 @@ public class QueryMenuAction extends DispatchAction {
 	}
 	
 	
+	/**
+	 * 
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward unStop(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response) throws Exception {
+		response.setContentType("text/json;charset=utf-8");
+		JObject jobject = new JObject();
+		List<? extends Jsonable> root = new ArrayList<Jsonable>();
+		try{
+			String pin = (String)request.getAttribute("pin");
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			
+			String extraCond = " AND (FOOD.status & " + Food.SELL_OUT + ") = 0";
+			root = FoodDao.getPureByCond(staff, extraCond, null);
+			
+		}catch(Exception e){
+			e.printStackTrace();
+			jobject.initTip(e);
+		}finally{
+			jobject.setTotalProperty(root.size());
+			jobject.setRoot(root);
+			response.getWriter().print(jobject.toString());
+		}
+		return null;
+	}
+	
 }

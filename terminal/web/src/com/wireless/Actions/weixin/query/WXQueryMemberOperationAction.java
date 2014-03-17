@@ -16,7 +16,6 @@ import org.apache.struts.actions.DispatchAction;
 import com.wireless.db.DBCon;
 import com.wireless.db.client.member.MemberOperationDao;
 import com.wireless.db.coupon.CouponDao;
-import com.wireless.db.coupon.CouponTypeDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.weixin.member.WeixinMemberDao;
 import com.wireless.db.weixin.restaurant.WeixinRestaurantDao;
@@ -24,7 +23,6 @@ import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.client.MemberOperation;
 import com.wireless.pojo.coupon.Coupon;
-import com.wireless.pojo.coupon.CouponType;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.util.SQLUtil;
 
@@ -183,10 +181,11 @@ public class WXQueryMemberOperationAction extends DispatchAction{
 			//
 			Staff staff = StaffDao.getStaffs(dbCon, rid).get(0);
 			
-			List<CouponType> couponTypeList = CouponTypeDao.get(dbCon, staff);
-			List<Coupon> couponList = CouponDao.getByCond(staff, " AND C.member_id = " + mid, null);
+//			List<CouponType> couponTypeList = CouponTypeDao.get(dbCon, staff);
+			List<Coupon> couponList = CouponDao.getAvailByMember(staff, mid);
 			
-			List<Map<String, Object>> root = new ArrayList<Map<String, Object>>(), asItems;
+			//获取所有优惠券
+/*			List<Map<String, Object>> root = new ArrayList<Map<String, Object>>(), asItems;
 			Map<String, Object> item = null;
 			for(CouponType listTemp : couponTypeList){
 				item = new HashMap<String, Object>(listTemp.toJsonMap(0));
@@ -200,7 +199,8 @@ public class WXQueryMemberOperationAction extends DispatchAction{
 				root.add(item);
 			}
 			
-			jobject.getOther().put("root", root);
+			jobject.getOther().put("root", root);*/
+			jobject.setRoot(couponList);
 		}catch(BusinessException e){	
 			e.printStackTrace();
 			jobject.initTip(e);
