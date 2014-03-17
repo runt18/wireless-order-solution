@@ -3,8 +3,8 @@
 	<div class="hewarp">
 		<ul class="swiper-wrapper">
 			<li class="index swiper-slide">
-				<a href="javascript:Util.skip('index.html');" title="店铺首页">
-				<i class="foundicon-home fcolor6"></i>首&nbsp;页
+				<a href="javascript:Util.skip('index.html');" title="首页">
+				<i class="foundicon-home fcolor6"></i>首页
 				</a>
 			</li>
 			<li class="order swiper-slide">
@@ -13,8 +13,8 @@
 				</a>
 			</li>
 			<li class="user swiper-slide">
-				<a href="javascript:Util.skip('member.html');" title="会员中心"> 
-				<i class="foundicon-user fcolor3"></i>会员中心
+				<a id="mbarMemberCenter" href="javascript:Util.skip('member.html');" title="会员中心"> 
+					<i class="foundicon-user fcolor3"></i>会员中心
 				</a>
 			</li>
 			<li class="special swiper-slide">
@@ -24,16 +24,16 @@
 			</li>
 			<li class="user swiper-slide">
 				<a href="javascript:window.location.reload();" title="刷新">
-				<i class="foundicon-refresh fcolor3"></i>刷&nbsp;新
+				<i class="foundicon-refresh fcolor3"></i>刷新
 				</a>
 			</li>
 			<li class="offsale swiper-slide">
-				<a href="javascript:Util.skip('sales.html');" title="会员中心"> 
+				<a href="javascript:Util.skip('sales.html');" title="优惠信息"> 
 				<i class="foundicon-offsale fcolor1"></i>优惠信息
 				</a>
 			</li>
 			<li class="quote swiper-slide">
-				<a href="javascript:Util.skip('about.html');" title="特色菜品">
+				<a href="javascript:Util.skip('about.html');" title="店铺简介">
 				<i class="foundicon-quote fcolor1"></i>店铺简介
 				</a>
 			</li>
@@ -52,4 +52,26 @@ tw = li.length > 5 ? parseInt(tw / 5) : parseInt(tw / li.length);
 for(var i = 0;i < li.length; i++){
 	li[i].style.width = tw + 'px';
 }
+
+$.ajax({
+	url : '../../WXQueryMemberOperation.do',
+	type : 'post',
+	data : {
+		dataSource : 'hasCouponDetails',
+		oid : Util.mp.oid,
+		fid : Util.mp.fid
+	},
+	dataType : 'json',
+	success : function(data, status, xhr){
+		if(data.root.length > 0){
+			$('#mbarMemberCenter').prepend('<img id="imgNewCouponTip" src="../../images/WXnew.gif" style="float : right;"></img>');
+		}else{
+			$('#mbarMemberCenter img').html('');
+		}
+	},
+	error : function(data, errotType, eeor){
+		Util.dialog.show({msg: '服务器请求失败, 请稍候再试.'});
+	}
+});
+
 </script>
