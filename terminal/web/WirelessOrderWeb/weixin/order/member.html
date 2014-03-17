@@ -26,6 +26,9 @@ var params = {
 		text : '请输入 4 位纯数字验证码.'
 	}
 };
+var colors = ['orange', 'red', 'green'];
+
+var totalMath = 0;
 </script>
 <script type="text/javascript" src="./js/member/load.js"></script>
 <script type="text/javascript" src="./js/member/main.js"></script>
@@ -41,31 +44,40 @@ var params = {
 
 <div id="divMemberContent" class="main-box">
 <ul class="m-b-list">
-	<li class="box-horizontal" onclick="Util.skip('member_data_dateil.html')">
+	<!-- <li class="box-horizontal" onclick="Util.skip('member_data_dateil.html')"> -->
+	<li class="box-horizontal">
 		<div>会员名: <span id="spanMemberName">--</span></div>
-		<div class="event">完善资料&nbsp;&gt;</div>
+		<!-- <div class="event">完善资料&nbsp;&gt;</div> -->
 	</li>
 	<li class="box-horizontal">
 		<div>手机号: <span id="spanMemberMobile">--</span></div>
-		<!-- <div class="event"><a onclick="resetMobile()">重新绑定</a>&nbsp;&gt;</div> -->
+		<div class="event"><a onclick="Util.dialog.show({ msg : '重新绑定手机号需要到前台办理.' })">重新绑定</a>&nbsp;&gt;</div>
 	</li>
 </ul>
 </div>
 
 <div id="divMemberTypeContent" class="main-box">
 <ul class="m-b-list">
-	<li class="box-horizontal none-line" onclick="$('#divMemberTypeDesc').fadeToggle()">
-		<div >类&nbsp;&nbsp;型: <span id="spanMemberTypeName" >--.--</span></div>
-		<div class="event">特权详细&nbsp;&gt;</div>
+	<li class="box-horizontal">
+		<div >等&nbsp;&nbsp;级: <span id="spanMemberTypeName" >--.--</span>&nbsp;<font id="fontMemberDiscount" style="color : red;font-size: 13px;font-weight: bold;">8.8</font></div>
+		<!-- <div class="event">完善资料&nbsp;&gt;</div> -->
+		
 	</li>
-	<li><div id="divMemberTypeDesc" style="display:none;">&nbsp;</div></li>
+	<li class="box-horizontal none-line" onclick="toggleMemberLevel()">
+		<div style="font-size: 13px;font-weight: bold;">累计积分:<font id="fontMemberPoint" style="color : red;">0</font>分,打败了<font id="fontDefeatMemberCount" style="color : red;">0%</font>的会员</div>
+		<div class="event">更多等级&nbsp;&gt;</div>
+	</li>
+	<li><div></div>
+		<div id="divMemberTypeDesc" style="display:none;">
+		</div>
+	</li>
 </ul>
 </div>
 
 <div id="divMemberPointContent" class="main-box">
 <ul class="m-b-list">
 	<li class="box-horizontal none-line" onclick="toggleConsumeDetails()">
-		<div >积&nbsp;&nbsp;分: <span id="spanMemberPoint" style="color:#FF4500;">--.--</span>&nbsp;分</div>
+		<div >当前积分: <span id="spanMemberPoint" style="color:#FF4500;">--.--</span>&nbsp;分</div>
 		<div class="event">消费记录&nbsp;&gt;</div>
 	</li>
 	<li>
@@ -115,17 +127,17 @@ var params = {
 <div id="divMemberCouponContent" class="main-box">
 <ul class="m-b-list">
 	<li class="box-horizontal none-line" onclick="toggleCouponContent()">
-		<div>优惠券获取明细</div>
-		<div class="event">&nbsp;&gt;</div>
+		<div>我的优惠券</div>
+		<div id="divMyCoupon" class="event">&nbsp;&gt;</div>
 	</li>
 	<li>
 		<div id="divMemberCouponContentView" style="display:none; width:100%; ">
 		<table class="d-list">
 			<thead>
 			<tr class="d-list-title">
-				<td style="width:50%;">券名</td>
+				<td style="width:40%;">券名</td>
 				<td style="width:25%;">面额</td>
-				<td style="width:25%;">数量</td>
+				<td style="width:35%;">到期时间</td>
 			</tr>
 			</thead>
 			<tbody>
@@ -140,7 +152,7 @@ var params = {
 <div id="divMemberCouponConsume" class="main-box">
 <ul class="m-b-list">
 	<li class="box-horizontal none-line" onclick="toggleCouponConsumeDetails()">
-		<div>优惠券使用明细</div>
+		<div>优惠券消费记录</div>
 		<div class="event">&nbsp;&gt;</div>
 	</li>
 	<li>
