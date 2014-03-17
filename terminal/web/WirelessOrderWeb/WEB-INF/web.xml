@@ -18,6 +18,7 @@
 				/WXQueryDept.do,
 				/WXOperateMember.do,
 				/WXQueryMemberOperation.do,
+				/QueryMemberType.do,
 				/QueryFood_q.do,
 				/FinanceWeixin.do,
 
