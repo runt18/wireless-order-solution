@@ -11,7 +11,8 @@ function initMemberMsg(c){
 	var point = $('#spanMemberPoint');
 	var totalBalance = $('#spanMemberTotalBalance');
 	var typeName = $('#spanMemberTypeName');
-	var typeDesc = $('#divMemberTypeDesc');
+	var defaultMemberDiscount = $('#fontMemberDiscount');
+//	var typeDesc = $('#divMemberTypeDesc');
 	
 	restaurantName.html(typeof data.restaurant == 'undefined' ? '--' : data.restaurant.name);
 	name.html(typeof data.name == 'undefined' ? '--' : data.name);
@@ -19,7 +20,8 @@ function initMemberMsg(c){
 	point.html(typeof data.point == 'undefined' ? '--' : data.point.toFixed(2));
 	totalBalance.html(typeof data.totalBalance == 'undefined' ? '--' : data.totalBalance.toFixed(2));
 	typeName.html(typeof data.memberType.name == 'undefined' ? '--' : data.memberType.name);
-	typeDesc.html(typeof data.memberType.desc == 'undefined' ? '&nbsp;' : data.memberType.desc);
+	defaultMemberDiscount.html(typeof data.memberType.discount == 'undefined' ? '' : data.memberType.discount.name);
+//	typeDesc.html(typeof data.memberType.desc == 'undefined' ? '&nbsp;' : data.memberType.desc);
 	
 }
 
@@ -376,7 +378,7 @@ function toggleCouponContent(){
 	var templet = '<tr class="d-list-item">'
 		+ '<td>{name}</td>'
 		+ '<td>{price}</td>'
-		+ '<td>{count}</td>'
+		+ '<td>{expiredTime}</td>'
 		+ '</tr>';
 	mainView.fadeToggle(function(){
 		if(mainView.css('display') == 'block'){
@@ -397,12 +399,12 @@ function toggleCouponContent(){
 							Util.lm.hide();
 							if(data.success){
 								var html = [], temp = null;
-								for(var i = 0; i < data.other.root.length; i++){
-									temp = data.other.root[i];
+								for(var i = 0; i < data.root.length; i++){
+									temp = data.root[i];
 									html.push(templet.format({
-										name : temp.name,
-										price : temp.price.toFixed(2),
-										count : temp.items.length
+										name : temp.couponType.name,
+										price : temp.couponType.price.toFixed(2),
+										expiredTime : temp.couponType.expiredFormat
 									}));
 								}
 								tbody.html(html.length == 0 ? '暂无优惠券' : html.join(''));
@@ -430,7 +432,7 @@ function toggleCouponConsumeDetails(){
 	var mainView = $('#divMemberCouponConsumeDetails');
 	var tbody = mainView.find('table > tbody');
 	var templet = '<tr class="d-list-item">'
-		+ '<td>{name}</td>'
+		+ '<td>{time}</td>'
 		+ '<td>{payMoney}</td>'
 		+ '<td>{couponMoney}</td>'
 		+ '</tr>';
@@ -456,7 +458,7 @@ function toggleCouponConsumeDetails(){
 								for(var i = 0; i < data.root.length; i++){
 									temp = data.root[i];
 									html.push(templet.format({
-										name : temp.name,
+										time : temp.operateDateFormat,
 										payMoney : temp.payMoney.toFixed(2),
 										couponMoney : temp.couponMoney.toFixed(2)
 									}));
@@ -476,6 +478,48 @@ function toggleCouponConsumeDetails(){
 			toggleCouponConsumeDetails.load();
 		}else{
 			tbody.html('');
+		}
+	});
+}
+
+function toggleMemberLevel(){
+	var mainView = $('#divMemberTypeDesc');
+	mainView.fadeToggle(function(){
+		if(mainView.css('display') == 'block'){
+			if(!toggleMemberLevel.load){
+				toggleMemberLevel.load = function(){
+					Util.lm.show();
+					$.post('../../QueryMemberType.do', {dataSource : 'getMemberLevel', fid : Util.mp.fid, oid : Util.mp.oid}, function(result){
+						if(result.success){
+							totalMath = result.root[result.root.length - 1].pointThreshold;
+							member.totalPoint = member.totalPoint >= totalMath ? totalMath : member.totalPoint; 
+							mainView.append('<h3>会员等级列表</h3>');
+							for(var i in result.root){
+								var levelWidth = result.root[i].pointThreshold / totalMath * 100;
+								var memberLevelWidth = member.totalPoint / totalMath * 100;
+								var tipHtml = result.root[i].inLevel == true ? '<div id="positionTip" class="tooltip" style="left : -13%">'+ member.totalPoint +'分</div>' : '';
+								var spanHtml = result.root[i].inLevel == true ? '<span style="width:'+ memberLevelWidth +'%;background-color:'+ colors[1] +';word-break:keep-all;white-space:nowrap;">'+ result.root[i].pointThreshold +'分&nbsp;('+ member.memberType.discount.name +')</span>'
+																				: '<span style="width:'+ levelWidth +'%;background-color:'+ colors[2] +';word-break:keep-all;white-space:nowrap;">'+ result.root[i].pointThreshold +'分&nbsp;('+ member.memberType.discount.name +')</span>';
+								
+								mainView.append('<div class="memberLevelList"><div class="memberLevelHead"><p class="memberLevelHeadFont">'+ result.root[i].memberTypeName+'</div>'
+										+ '<div class="memberLevelBody">'
+										+ '<div class="graph">' + spanHtml 
+										+ tipHtml
+										+ '</div></div></div>');
+							}
+							var width = ((member.totalPoint/totalMath) - .13) * 100 + '%';
+							$('#positionTip').css({left : width});
+							
+						}else{
+							$('#divMemberTypeDesc').append('<div>会员等级建立中...</div>');
+						}
+						Util.lm.hide();
+					});
+				};
+			}
+			toggleMemberLevel.load();
+		}else{
+			mainView.html('');
 		}
 	});
 }
