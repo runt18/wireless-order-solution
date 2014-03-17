@@ -16,7 +16,7 @@ wx.sales.operateSalseData = function(c){
 		});
 		var title = new Ext.form.TextField({
 			fieldLabel : '标题',
-			width : 430,
+			width : 425,
 			allowBlank : false
 		});
 		var edit = new Ext.form.HtmlEditor({
