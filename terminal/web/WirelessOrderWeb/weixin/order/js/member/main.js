@@ -12,6 +12,7 @@ function initMemberMsg(c){
 	var totalBalance = $('#spanMemberTotalBalance');
 	var typeName = $('#spanMemberTypeName');
 	var defaultMemberDiscount = $('#fontMemberDiscount');
+	var memberTotalPoint = $('#fontMemberPoint');
 //	var typeDesc = $('#divMemberTypeDesc');
 	
 	restaurantName.html(typeof data.restaurant == 'undefined' ? '--' : data.restaurant.name);
@@ -21,6 +22,7 @@ function initMemberMsg(c){
 	totalBalance.html(typeof data.totalBalance == 'undefined' ? '--' : data.totalBalance.toFixed(2));
 	typeName.html(typeof data.memberType.name == 'undefined' ? '--' : data.memberType.name);
 	defaultMemberDiscount.html(typeof data.memberType.discount == 'undefined' ? '' : data.memberType.discount.name);
+	memberTotalPoint.html(typeof data.totalPoint == 'undefined' ? '--' : data.totalPoint);
 //	typeDesc.html(typeof data.memberType.desc == 'undefined' ? '&nbsp;' : data.memberType.desc);
 	
 }
