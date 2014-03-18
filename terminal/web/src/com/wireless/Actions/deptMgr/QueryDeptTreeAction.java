@@ -35,7 +35,7 @@ public class QueryDeptTreeAction extends Action{
 					+ " FROM " 
 					+ Params.dbName + ".department " 
 					+ " WHERE restaurant_id = " + restaurantID 
-					+ " AND dept_id <> " + Department.DeptId.DEPT_TMP.getVal() + " AND dept_id <> " + Department.DeptId.DEPT_NULL.getVal() 
+					+ " AND type = " + Department.Type.NORMAL.getVal() 
 					+ extra
 					+ " ORDER BY dept_id ";
 			

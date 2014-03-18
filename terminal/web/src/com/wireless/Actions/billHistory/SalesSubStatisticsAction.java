@@ -21,7 +21,6 @@ import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.menuMgr.Food;
 import com.wireless.util.DataPaging;
 import com.wireless.util.DateType;
-import com.wireless.util.WebParams;
 
 public class SalesSubStatisticsAction extends Action {
 	
@@ -121,11 +120,11 @@ public class SalesSubStatisticsAction extends Action {
 				
 		} catch(BusinessException e){
 			e.printStackTrace();
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getCode(), e.getDesc());
+			jobject.initTip(e);
 			
 		} catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
+			jobject.initTip(e);
 		} finally{
 			itemsList = DataPaging.getPagingData(new ArrayList<SalesDetail>(Arrays.asList(saleDetails)), isPaging, start, limit);
 			
