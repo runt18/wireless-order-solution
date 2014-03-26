@@ -46,6 +46,7 @@ public class WXQueryFoodAction extends DispatchAction{
 			String extraCond = " AND FOOD.restaurant_id = " + rid, orderClause = " ORDER BY FOOD.food_alias";
 			extraCond += " AND (FOOD.status & " + Food.SELL_OUT + ") = 0";
 			extraCond += " AND (FOOD.status & " + Food.RECOMMEND + ") <> 0";
+			extraCond += " AND (FOOD.img <> '') ";
 			List<Food> list = FoodDao.getPureByCond(extraCond, orderClause);
 			if(list != null){
 				jobject.setTotalProperty(list.size());

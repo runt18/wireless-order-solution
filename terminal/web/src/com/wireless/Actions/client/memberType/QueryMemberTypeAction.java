@@ -237,6 +237,7 @@ public class QueryMemberTypeAction extends DispatchAction {
 						Map<String, Object> jm = new HashMap<String, Object>();
 						jm.put("pointThreshold", ml.getPointThreshold());
 						jm.put("memberTypeName", ml.getMemberType().getName());
+						jm.put("memberType", ml.getMemberType());
 						jm.put("inLevel", mlists.size() != 0 ? true : "");
 						return Collections.unmodifiableMap(jm);
 					}
