@@ -11,6 +11,7 @@ function initMemberMsg(c){
 	var point = $('#spanMemberPoint');
 	var totalBalance = $('#spanMemberTotalBalance');
 	var typeName = $('#spanMemberTypeName');
+	var typeNameInCard = $('#divMemberTypeName');
 	var defaultMemberDiscount = $('#fontMemberDiscount');
 	var memberTotalPoint = $('#fontMemberPoint');
 //	var typeDesc = $('#divMemberTypeDesc');
@@ -21,6 +22,7 @@ function initMemberMsg(c){
 	point.html(typeof data.point == 'undefined' ? '--' : data.point.toFixed(2));
 	totalBalance.html(typeof data.totalBalance == 'undefined' ? '--' : data.totalBalance.toFixed(2));
 	typeName.html(typeof data.memberType.name == 'undefined' ? '--' : data.memberType.name);
+	typeNameInCard.html(typeof data.memberType.name == 'undefined' ? '' : data.memberType.name);
 	defaultMemberDiscount.html(typeof data.memberType.discount == 'undefined' ? '' : data.memberType.discount.name);
 	memberTotalPoint.html(typeof data.totalPoint == 'undefined' ? '--' : data.totalPoint);
 //	typeDesc.html(typeof data.memberType.desc == 'undefined' ? '&nbsp;' : data.memberType.desc);
@@ -500,8 +502,8 @@ function toggleMemberLevel(){
 								var levelWidth = result.root[i].pointThreshold / totalMath * 100;
 								var memberLevelWidth = member.totalPoint / totalMath * 100;
 								var tipHtml = result.root[i].inLevel == true ? '<div id="positionTip" class="tooltip" style="left : -13%">'+ member.totalPoint +'分</div>' : '';
-								var spanHtml = result.root[i].inLevel == true ? '<span style="width:'+ memberLevelWidth +'%;background-color:'+ colors[1] +';word-break:keep-all;white-space:nowrap;">'+ result.root[i].pointThreshold +'分&nbsp;('+ member.memberType.discount.name +')</span>'
-																				: '<span style="width:'+ levelWidth +'%;background-color:'+ colors[2] +';word-break:keep-all;white-space:nowrap;">'+ result.root[i].pointThreshold +'分&nbsp;('+ member.memberType.discount.name +')</span>';
+								var spanHtml = result.root[i].inLevel == true ? '<span style="width:'+ memberLevelWidth +'%;background-color:'+ colors[1] +';word-break:keep-all;white-space:nowrap;">'+ result.root[i].pointThreshold +'分&nbsp;('+ result.root[i].memberType.discount.name +')</span>'
+																				: '<span style="width:'+ levelWidth +'%;background-color:'+ colors[2] +';word-break:keep-all;white-space:nowrap;">'+ result.root[i].pointThreshold +'分&nbsp;('+ result.root[i].memberType.discount.name +')</span>';
 								
 								mainView.append('<div class="memberLevelList"><div class="memberLevelHead"><p class="memberLevelHeadFont">'+ result.root[i].memberTypeName+'</div>'
 										+ '<div class="memberLevelBody">'
