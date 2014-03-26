@@ -551,6 +551,7 @@ Ext.onReady(function() {
 		}, 
 		{ xtype:'tbtext', text:'&nbsp;&nbsp;'}, {
 			xtype : 'radio',
+			id : 'searchAdditionFilterAll',
 			checked : true,
 			boxLabel : '全部',
 			name : 'conditionRadio',
