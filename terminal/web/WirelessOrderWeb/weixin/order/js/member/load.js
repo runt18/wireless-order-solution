@@ -23,6 +23,26 @@ $(function(){
 				member = data.other.member;
 				member.restaurant = data.other.restaurant;
 				initMemberMsg({data:member});
+				$.ajax({
+					url : '../../WXQueryMemberOperation.do',
+					type : 'post',
+					data : {
+						dataSource : 'hasCouponDetails',
+						oid : Util.mp.oid,
+						fid : Util.mp.fid
+					},
+					dataType : 'json',
+					success : function(data, status, xhr){
+						if(data.root.length > 0){
+							$('#divMyCoupon').prepend('<img src="../../images/WXnew.png" style="margin-top: 10px;"></img>');
+						}else{
+							$('#divMyCoupon img').html('');
+						}
+					},
+					error : function(data, errotType, eeor){
+						Util.dialog.show({msg: '服务器请求失败, 请稍候再试.'});
+					}
+				});
 			}else{
 				if(data.code == 7400){
 					$('#divVerifyAndBind').css('display', 'block');
@@ -38,25 +58,6 @@ $(function(){
 	});
 	
 
-	$.ajax({
-		url : '../../WXQueryMemberOperation.do',
-		type : 'post',
-		data : {
-			dataSource : 'hasCouponDetails',
-			oid : Util.mp.oid,
-			fid : Util.mp.fid
-		},
-		dataType : 'json',
-		success : function(data, status, xhr){
-			if(data.root.length > 0){
-				$('#divMyCoupon').prepend('<img src="../../images/WXnew.png" style="margin-top: 10px;"></img>');
-			}else{
-				$('#divMyCoupon img').html('');
-			}
-		},
-		error : function(data, errotType, eeor){
-			Util.dialog.show({msg: '服务器请求失败, 请稍候再试.'});
-		}
-	});
+
 	
 });
