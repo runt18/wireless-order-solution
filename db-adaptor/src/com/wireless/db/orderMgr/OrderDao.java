@@ -261,9 +261,9 @@ public class OrderDao {
 		for(Order eachOrder : result){
 			//Get the order foods to each order.
 			if(dateType == DateType.TODAY){
-				eachOrder.setOrderFoods(OrderFoodDao.getDetailToday(dbCon, staff, " AND OF.order_id = " + eachOrder.getId(), "ORDER BY pay_datetime"));					
+				eachOrder.setOrderFoods(OrderFoodDao.getDetailToday(dbCon, staff, " AND OF.order_id = " + eachOrder.getId(), null));					
 			}else if(dateType == DateType.HISTORY){
-				eachOrder.setOrderFoods(OrderFoodDao.getDetailHistory(dbCon, staff, " AND OFH.order_id = " + eachOrder.getId(), "ORDER BY pay_datetime"));
+				eachOrder.setOrderFoods(OrderFoodDao.getDetailHistory(dbCon, staff, " AND OFH.order_id = " + eachOrder.getId(), null));
 			} 
 		}
 		

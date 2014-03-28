@@ -314,19 +314,19 @@ public class OrderFoodDao {
 	public static List<OrderFood> getDetailToday(DBCon dbCon, Staff staff, String extraCond, String orderClause) throws SQLException, BusinessException {
 		String sql;
 
-		sql = "SELECT OF.order_id, OF.food_id, OF.taste_group_id, OF.is_temporary, " +
-				" MAX(OF.restaurant_id) AS restaurant_id, MAX(OF.kitchen_id) AS kitchen_id, " + 
-				" MAX(OF.name) AS name, MAX(OF.food_status) AS food_status, " +
-				" MAX(OF.unit_price) AS unit_price, MAX(OF.commission) AS commission, MAX(OF.waiter) AS waiter, MAX(OF.order_date) AS order_date, MAX(OF.discount) AS discount, " +
-				" MAX(OF.dept_id) AS dept_id, MAX(OF.id) AS id, MAX(OF.order_date) AS pay_datetime, SUM(OF.order_count) AS order_sum " +
-				" FROM " +
-				Params.dbName +	".order_food OF " +
-				" WHERE 1 = 1 " +
-				(extraCond == null ? "" : extraCond) +
-				" GROUP BY OF.food_id, OF.taste_group_id, OF.hang_status, OF.is_temporary " + 
-				" HAVING " +
-				" order_sum > 0 " +
-				(orderClause == null ? "" : " " + orderClause);
+		sql = " SELECT OF.order_id, OF.food_id, OF.taste_group_id, OF.is_temporary, " +
+			  " MIN(OF.id) AS id, MAX(OF.restaurant_id) AS restaurant_id, MAX(OF.kitchen_id) AS kitchen_id, " + 
+		      " MAX(OF.name) AS name, MAX(OF.food_status) AS food_status, " +
+		      " MAX(OF.unit_price) AS unit_price, MAX(OF.commission) AS commission, MAX(OF.waiter) AS waiter, MAX(OF.order_date) AS order_date, MAX(OF.discount) AS discount, " +
+			  " MAX(OF.dept_id) AS dept_id, MAX(OF.id) AS id, MAX(OF.order_date) AS pay_datetime, SUM(OF.order_count) AS order_sum " +
+			  " FROM " +
+			  Params.dbName +	".order_food OF " +
+			  " WHERE 1 = 1 " +
+			  (extraCond == null ? "" : extraCond) +
+			  " GROUP BY OF.food_id, OF.taste_group_id, OF.hang_status, OF.is_temporary " + 
+			  " HAVING " +
+			  " order_sum > 0 " +
+			  (orderClause == null ? " ORDER BY id ASC " : " " + orderClause);
 		
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		ArrayList<OrderFood> orderFoods = new ArrayList<OrderFood>();
@@ -419,8 +419,8 @@ public class OrderFoodDao {
 	public static List<OrderFood> getDetailHistory(DBCon dbCon, Staff staff, String extraCond, String orderClause) throws SQLException, BusinessException {
 		String sql;
 
-		sql = "SELECT OFH.order_id, OFH.food_id, OFH.taste_group_id, OFH.is_temporary, " +
-			  " MAX(OFH.restaurant_id) AS restaurant_id, MAX(OFH.kitchen_id) AS kitchen_id, " +
+		sql = " SELECT OFH.order_id, OFH.food_id, OFH.taste_group_id, OFH.is_temporary, " +
+			  " MIN(OFH.id) AS id, MAX(OFH.restaurant_id) AS restaurant_id, MAX(OFH.kitchen_id) AS kitchen_id, " +
 			  " MAX(OFH.name) AS name, MAX(OFH.food_status) AS food_status, " +
 			  " MAX(OFH.unit_price) AS unit_price, MAX(OFH.commission) AS commission, MAX(OFH.waiter) AS waiter, MAX(OFH.order_date) AS order_date, MAX(OFH.discount) AS discount, " +
 			  " MAX(OFH.dept_id) AS dept_id, MAX(OFH.id) AS id, MAX(OFH.order_date) AS pay_datetime, SUM(OFH.order_count) AS order_sum " +
@@ -430,7 +430,7 @@ public class OrderFoodDao {
 			  (extraCond == null ? "" : extraCond) +
 			  " GROUP BY OFH.food_id, OFH.taste_group_id, OFH.is_temporary " +
 			  " HAVING order_sum > 0 " +
-			  (orderClause == null ? "" : " " + orderClause);
+			  (orderClause == null ? " ORDER BY id ASC " : " " + orderClause);
 		
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		ArrayList<OrderFood> orderFoods = new ArrayList<OrderFood>();
