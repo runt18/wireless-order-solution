@@ -2,6 +2,7 @@ package com.wireless.Actions.weixin;
 
 import java.sql.SQLException;
 import java.util.Date;
+import java.util.List;
 
 import org.marker.weixin.DefaultSession;
 import org.marker.weixin.HandleMessageListener;
@@ -18,11 +19,15 @@ import org.marker.weixin.msg.Msg4Voice;
 
 import com.wireless.Actions.init.InitServlet;
 import com.wireless.db.DBCon;
+import com.wireless.db.coupon.CouponDao;
 import com.wireless.db.restaurantMgr.RestaurantDao;
+import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.weixin.member.WeixinMemberDao;
 import com.wireless.db.weixin.restaurant.WeixinRestaurantDao;
 import com.wireless.exception.BusinessException;
+import com.wireless.pojo.coupon.Coupon;
 import com.wireless.pojo.restaurantMgr.Restaurant;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.DateUtil;
 
 public class WeiXinRestaurantHandleMessageAdapter implements HandleMessageListener {
@@ -109,8 +114,10 @@ public class WeiXinRestaurantHandleMessageAdapter implements HandleMessageListen
 	/**
 	 * 解释用户对话操作指令
 	 * @param order
+	 * @throws BusinessException 
+	 * @throws SQLException 
 	 */
-	private void explainOrder(String order){
+	private void explainOrder(String order) throws SQLException, BusinessException{
 		if(order == null) return;
 		else order = order.trim().toLowerCase();
 		if("1".equals(order) || COMMAND_MENU.equals(order.toUpperCase())){
@@ -152,7 +159,19 @@ public class WeiXinRestaurantHandleMessageAdapter implements HandleMessageListen
 			imageText.addItem(dataItem);
 			
 			dataItem = new Data4Item();
-			dataItem.setTitle("会员资料");
+			try{
+				int memberId = WeixinMemberDao.getBoundMemberIdByWeixin(msg.getFromUserName(), msg.getToUserName());
+				Staff staff = StaffDao.getStaffs(dbCon, rid).get(0);
+				List<Coupon> couponList = CouponDao.getAvailByMember(staff, memberId);
+				if(couponList.size() > 0){
+					dataItem.setTitle("会员资料 | 您有新优惠劵!");
+				}else{
+					dataItem.setTitle("会员资料");
+				}
+			}catch(BusinessException e){
+				dataItem.setTitle("会员资料 | 请绑定会员");
+			}
+			
 			dataItem.setUrl(createUrl(WEIXIN_MEMBER));
 			dataItem.setPicUrl(WEIXIN_MEMBER_ICON);
 			imageText.addItem(dataItem);
@@ -173,7 +192,7 @@ public class WeiXinRestaurantHandleMessageAdapter implements HandleMessageListen
 			session.callback(imageText);
 		}else if(COMMAND_HELP.equals(order.toUpperCase())){
 			initText();
-			text.setContent("餐厅编号:"+restaurant.getId()+"\nToUserName(openID):"+msg.getFromUserName()+"\nFromUserName(开发者微信号):"+msg.getToUserName());
+			text.setContent("餐厅编号:"+restaurant.getId()+"\nToUserName(openID:公众号):"+msg.getToUserName()+"\nFromUserName(开发者微信号:手机微信号):"+msg.getFromUserName());
 			session.callback(text);
 		}else{
 			initText();
