@@ -294,7 +294,7 @@ public class WeixinRestaurantDao {
 	 */
 	public static String getInfo(DBCon dbCon, int rid) throws SQLException, BusinessException{
 		String info = "";
-		String querySQL = "SELECT weixin_info FROM restaurant WHERE id = " + rid;
+		String querySQL = "SELECT weixin_info FROM weixin_misc WHERE restaurant_id = " + rid;
 		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
 		if(dbCon.rs != null && dbCon.rs.next()){
 			info = dbCon.rs.getString(1);
@@ -353,7 +353,7 @@ public class WeixinRestaurantDao {
 			.replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll("\"", "&quot;")
 			.replaceAll("\n\r", "&#10;").replaceAll("\r\n", "&#10;").replaceAll("\n", "&#10;")
 			.replaceAll(" ", "&#032;").replaceAll("'", "&#039;").replaceAll("!", "&#033;");
-		String updateSQL = "UPDATE restaurant SET weixin_info = '" + info + "' WHERE id = " + rid;
+		String updateSQL = "UPDATE weixin_misc SET weixin_info = '" + info + "' WHERE restaurant_id = " + rid;
 		if(dbCon.stmt.executeUpdate(updateSQL) == 0){
 			throw new BusinessException(WeixinRestaurantError.WEIXIN_UPDATE_INFO_FAIL);
 		}
@@ -423,7 +423,7 @@ public class WeixinRestaurantDao {
 	 * @throws SQLException
 	 */
 	public static String getLogo(DBCon dbCon, int rid) throws SQLException{
-		String querySQL = "SELECT weixin_logo FROM restaurant WHERE id = " + rid;
+		String querySQL = "SELECT weixin_logo FROM weixin_misc WHERE restaurant_id = " + rid;
 		String logo = null;
 		ResultSet res = dbCon.stmt.executeQuery(querySQL);
 		if(res != null && res.next()){
@@ -463,7 +463,7 @@ public class WeixinRestaurantDao {
 	 * @throws SQLException
 	 */
 	public static void updateLogo(DBCon dbCon, int rid, String imgKey) throws SQLException{
-		String updateSQL = "UPDATE restaurant SET weixin_logo = '" + imgKey + "' WHERE id = " + rid;
+		String updateSQL = "UPDATE weixin_misc SET weixin_logo = '" + imgKey + "' WHERE restaurant_id = " + rid;
 		dbCon.stmt.executeUpdate(updateSQL);
 	}
 	public static void updateLogo(int rid, String imgKey) throws SQLException{
