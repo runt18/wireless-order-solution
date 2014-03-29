@@ -18,7 +18,6 @@ import org.marker.weixin.msg.Msg4Video;
 import org.marker.weixin.msg.Msg4Voice;
 
 import com.wireless.Actions.init.InitServlet;
-import com.wireless.db.DBCon;
 import com.wireless.db.coupon.CouponDao;
 import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.db.staffMgr.StaffDao;
@@ -49,7 +48,6 @@ public class WeiXinRestaurantHandleMessageAdapter implements HandleMessageListen
 	public static final String COMMAND_HELP = "H";
 	public static final String COMMAND_MENU = "M";
 	
-	private DBCon dbCon;
 	private Restaurant restaurant;
 	private Msg4Text text;
 	private Msg4ImageText imageText;
@@ -71,18 +69,17 @@ public class WeiXinRestaurantHandleMessageAdapter implements HandleMessageListen
 	 * @throws BusinessException
 	 */
 	private void init(Msg msg) throws SQLException, BusinessException{
-		if(msg == null) throw new NullPointerException("当前时间: " + DateUtil.format(new Date()) + "\n 错误: 接收公众平台回发信息失败.");
-		else this.msg = msg;
-		if(dbCon == null){
-			dbCon = new DBCon();
-			dbCon.connect();
+		if(msg == null){
+			throw new NullPointerException("当前时间: " + DateUtil.format(new Date()) + "\n 错误: 接收公众平台回发信息失败.");
+		}else{
+			this.msg = msg;
 		}
 		// 绑定餐厅和公众平台信息
-		WeixinRestaurantDao.bind(dbCon, msg.getToUserName(), account);
+		WeixinRestaurantDao.bind(msg.getToUserName(), account);
 		// 获取公众平台对应餐厅信息
 		if(restaurant == null){
-			rid = WeixinRestaurantDao.getRestaurantIdByWeixin(dbCon, msg.getToUserName());
-			restaurant = RestaurantDao.getById(dbCon, rid);
+			rid = WeixinRestaurantDao.getRestaurantIdByWeixin(msg.getToUserName());
+			restaurant = RestaurantDao.getById(rid);
 		}
 		
 	}
@@ -118,8 +115,11 @@ public class WeiXinRestaurantHandleMessageAdapter implements HandleMessageListen
 	 * @throws SQLException 
 	 */
 	private void explainOrder(String order) throws SQLException, BusinessException{
-		if(order == null) return;
-		else order = order.trim().toLowerCase();
+		if(order == null){
+			return;
+		}else{
+			order = order.trim().toLowerCase();
+		}
 		if("1".equals(order) || COMMAND_MENU.equals(order.toUpperCase())){
 			initImageText();
 			
@@ -161,7 +161,7 @@ public class WeiXinRestaurantHandleMessageAdapter implements HandleMessageListen
 			dataItem = new Data4Item();
 			try{
 				int memberId = WeixinMemberDao.getBoundMemberIdByWeixin(msg.getFromUserName(), msg.getToUserName());
-				Staff staff = StaffDao.getStaffs(dbCon, rid).get(0);
+				Staff staff = StaffDao.getStaffs(rid).get(0);
 				List<Coupon> couponList = CouponDao.getAvailByMember(staff, memberId);
 				if(couponList.size() > 0){
 					dataItem.setTitle("会员资料 | 您有新优惠劵!");
@@ -214,8 +214,6 @@ public class WeiXinRestaurantHandleMessageAdapter implements HandleMessageListen
 			explainOrder(msg.getContent());
 		}catch(Exception e){
 			e.printStackTrace();
-		}finally{
-			safeClose();
 		}
 	}
 	
@@ -226,18 +224,12 @@ public class WeiXinRestaurantHandleMessageAdapter implements HandleMessageListen
 		try{
 			init(msg);
 			if(msg.getEvent().equals(Msg4Event.SUBSCRIBE)){
-				System.out.println("微信餐厅->添加关注: " + msg.getToUserName());
+				//System.out.println("微信餐厅->添加关注: " + msg.getToUserName());
 				WeixinMemberDao.interest(msg.getToUserName(), msg.getFromUserName());
 				explainOrder(COMMAND_MENU);
-//				initText();
-//				text.setContent(new StringBuilder().append("谢谢您的支持.\n")
-//						.append("回复【h】获取帮助信息\n")
-//						.append("回复【m】获得主菜单")
-//						.toString());
-//				session.callback(text);
 			}else if(msg.getEvent().equals(Msg4Event.UNSUBSCRIBE)){
 //				System.out.println("微信餐厅->取消关注: " + msg.getToUserName());
-				WeixinMemberDao.interest(msg.getToUserName(), msg.getFromUserName());
+				WeixinMemberDao.cancel(msg.getFromUserName(), msg.getToUserName());
 			}else{
 //				System.out.println("微信餐厅->菜单回调事件, 推送指令: " + msg.getEventKey());
 				explainOrder(msg.getEventKey());
@@ -245,15 +237,9 @@ public class WeiXinRestaurantHandleMessageAdapter implements HandleMessageListen
 			
 		}catch(Exception e){
 			e.printStackTrace();
-		}finally{
-			safeClose();
 		}
 	}
 	
-	private void safeClose(){
-		if(dbCon != null) dbCon.disconnect();
-	}
-
 	@Override
 	public void onImageMsg(Msg4Image msg4image) { }
 

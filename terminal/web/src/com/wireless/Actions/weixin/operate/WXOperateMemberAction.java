@@ -1,5 +1,7 @@
 package com.wireless.Actions.weixin.operate;
 
+import java.sql.SQLException;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -17,7 +19,7 @@ import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.weixin.member.WeixinMemberDao;
 import com.wireless.db.weixin.restaurant.WeixinRestaurantDao;
 import com.wireless.exception.BusinessException;
-import com.wireless.exception.WeixinMemberError;
+import com.wireless.exception.MemberError;
 import com.wireless.json.JObject;
 import com.wireless.pojo.client.Member;
 import com.wireless.pojo.restaurantMgr.Restaurant;
@@ -25,6 +27,7 @@ import com.wireless.pojo.sms.VerifySMS;
 import com.wireless.pojo.sms.VerifySMS.ExpiredPeriod;
 import com.wireless.pojo.sms.VerifySMS.InsertBuilder;
 import com.wireless.pojo.sms.VerifySMS.VerifyBuilder;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.util.sms.SMS;
 
 public class WXOperateMemberAction extends DispatchAction {
@@ -38,33 +41,30 @@ public class WXOperateMemberAction extends DispatchAction {
 	 * @return
 	 * @throws Exception
 	 */
-	public ActionForward getInfo(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
+	public ActionForward getInfo(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		request.setCharacterEncoding("UTF-8");
 		response.setCharacterEncoding("UTF-8");
 		JObject jobject = new JObject();
-		DBCon dbCon = null;
+		DBCon dbCon = new DBCon();
 		try{
 			String openId = request.getParameter("oid");
 			String formId = request.getParameter("fid");
-			dbCon = new DBCon();
 			dbCon.connect();
 			int mid = WeixinMemberDao.getBoundMemberIdByWeixin(dbCon, openId, formId);
 			int rid = WeixinRestaurantDao.getRestaurantIdByWeixin(dbCon, formId);
 			Restaurant restaurant = RestaurantDao.getById(dbCon, rid);
+			
 			Member member = MemberDao.getMemberById(dbCon, StaffDao.getStaffs(dbCon, rid).get(0), mid);
 			jobject.initTip(true, "操作成功, 已获取微信会员信息.");
 			jobject.getOther().put("member", member);
 			jobject.getOther().put("restaurant", restaurant);
-		}catch(BusinessException e){
+			
+		}catch(BusinessException | SQLException e){
 			e.printStackTrace();
 			jobject.initTip(e);
-		}catch(Exception e){
-			e.printStackTrace();
-			jobject.initTip(e);
+			
 		}finally{
-			if(dbCon != null) dbCon.disconnect();
+			dbCon.disconnect();
 			response.getWriter().print(jobject.toString());
 		}
 		return null;
@@ -99,22 +99,14 @@ public class WXOperateMemberAction extends DispatchAction {
 				jobject.initTip(true, "操作成功, 已发送短信验证码, 请注意查看.");
 				jobject.getOther().put("code", sms);
 			}else{
-				dbCon.conn.rollback();
-				System.out.println(ss.getMsg());
-				jobject.initTip(false, "操作失败, 未知错误, 请稍候再试.");
+				throw new BusinessException(ss.toString());
 			}
-		}catch(BusinessException e){
-			dbCon.conn.rollback();
-			e.printStackTrace();
-			jobject.initTip(e);
-		}catch(Exception e){
+		}catch(BusinessException | SQLException e){
 			dbCon.conn.rollback();
 			e.printStackTrace();
 			jobject.initTip(e);
 		}finally{
-			if(dbCon != null){
-				dbCon.disconnect();
-			}
+			dbCon.disconnect();
 			response.getWriter().print(jobject.toString());
 		}
 		return null;
@@ -129,60 +121,56 @@ public class WXOperateMemberAction extends DispatchAction {
 	 * @return
 	 * @throws Exception
 	 */
-	public ActionForward bind(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
+	public ActionForward bind(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)	throws Exception {
 		request.setCharacterEncoding("UTF-8");
 		response.setCharacterEncoding("UTF-8");
 		JObject jobject = new JObject();
-		DBCon dbCon = null;
+		DBCon dbCon = new DBCon();
 		try{
 			String openId = request.getParameter("oid");
 			String formId = request.getParameter("fid");
 			String codeId = request.getParameter("codeId");
 			String code = request.getParameter("code");
 			
-			dbCon = new DBCon();
 			dbCon.connect();
 			dbCon.conn.setAutoCommit(false);
 			
+			int restaurantId = WeixinRestaurantDao.getRestaurantIdByWeixin(dbCon, formId);
+			
 			// 验证验证码
 			VerifySMSDao.verify(dbCon, new VerifyBuilder(Integer.valueOf(codeId), Integer.valueOf(code)));
+			Staff staff = StaffDao.getStaffs(dbCon, restaurantId).get(0);
 			
 			// 绑定会员信息
 			int mid = 0;
 			try{
-				mid = WeixinMemberDao.getBoundMemberIdByWeixin(dbCon, openId, formId);
+				mid = MemberDao.getMemberByMobile(dbCon, staff, request.getParameter("mobile")).getId();
+				WeixinMemberDao.bindExistMember(dbCon, mid, openId, formId);
 			}catch(BusinessException e){
-				if(e.getCode() == WeixinMemberError.WEIXIN_MEMBER_NOT_BOUND.getCode()){
-					int restaurantId = WeixinRestaurantDao.getRestaurantIdByWeixin(dbCon, formId);
+				if(e.getErrCode() == MemberError.MEMBER_NOT_EXIST){
 					WeixinMemberDao.bindNewMember(dbCon, 
 						new Member.InsertBuilder(
 							restaurantId,
 							request.getParameter("name"),
 							request.getParameter("mobile"),
-							MemberTypeDao.getWeixinMemberType(dbCon, StaffDao.getStaffs(dbCon, WeixinRestaurantDao.getRestaurantIdByWeixin(dbCon, formId)).get(0)).getId(), 
+							MemberTypeDao.getWeixinMemberType(dbCon, staff).getId(), 
 							Member.Sex.valueOf(Integer.valueOf(request.getParameter("sex")))
 						), 
 						openId, 
 						formId
 					);
 				}else{
-					WeixinMemberDao.bindExistMember(dbCon, mid, openId, formId);
+					throw e;
 				}
-			}catch(Exception e){
-				throw e;
 			}
 			dbCon.conn.commit();
 			jobject.initTip(true, "操作成功, 已绑定会员信息.");
-		}catch(BusinessException e){
+		}catch(BusinessException | SQLException e){
 			e.printStackTrace();
 			jobject.initTip(e);
-		}catch(Exception e){
-			e.printStackTrace();
-			jobject.initTip(e);
+			
 		}finally{
-			if(dbCon != null) dbCon.disconnect();
+			dbCon.disconnect();
 			response.getWriter().print(jobject.toString());
 		}
 		return null;
@@ -197,20 +185,17 @@ public class WXOperateMemberAction extends DispatchAction {
 	 * @return
 	 * @throws Exception
 	 */
-	public ActionForward rebind(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
+	public ActionForward rebind(ActionMapping mapping, ActionForm form,	HttpServletRequest request, HttpServletResponse response) throws Exception {
 		request.setCharacterEncoding("UTF-8");
 		response.setCharacterEncoding("UTF-8");
 		JObject jobject = new JObject();
-		DBCon dbCon = null;
+		DBCon dbCon = new DBCon();
 		try{
 			String openId = request.getParameter("oid");
 			String formId = request.getParameter("fid");
 			String codeId = request.getParameter("codeId");
 			String code = request.getParameter("code");
 			
-			dbCon = new DBCon();
 			dbCon.connect();
 			dbCon.conn.setAutoCommit(false);
 			
@@ -221,14 +206,12 @@ public class WXOperateMemberAction extends DispatchAction {
 			
 			dbCon.conn.commit();
 			jobject.initTip(true, "操作成功, 已重新绑定手机号码.");
-		}catch(BusinessException e){
-			e.printStackTrace();
-			jobject.initTip(e);
-		}catch(Exception e){
+			
+		}catch(BusinessException | SQLException e){
 			e.printStackTrace();
 			jobject.initTip(e);
 		}finally{
-			if(dbCon != null) dbCon.disconnect();
+			dbCon.disconnect();
 			response.getWriter().print(jobject.toString());
 		}
 		return null;
