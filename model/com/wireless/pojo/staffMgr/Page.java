@@ -126,7 +126,39 @@ public class Page{
 	public static enum System{
 		FORMATPRICE("formatPrice", "收款设置", "", "../../images/formatPrice.png"),
 		RESTAURANT("resturantMgr", "餐厅管理", "", "../../images/resturantMgr.png"),
-		STAFF("staffMgr", "员工管理", "System_Module/StaffManagement.html", "../../images/staffMgr.png"),
+		STAFF("staffMgr", "员工管理", "System_Module/StaffManagement.html", "../../images/staffMgr.png");
+		
+		private String mgrId;
+		private String desc;
+		private String url;
+		private String image;
+		
+		System(String mgrId, String desc, String url, String image){
+			this.mgrId = mgrId;
+			this.image = image;
+			this.url = url;
+			this.desc = desc;
+		}
+
+		public String getMgrId() {
+			return mgrId;
+		}
+
+		public String getDesc() {
+			return desc;
+		}
+
+		public String getUrl() {
+			return url;
+		}
+
+		public String getImage() {
+			return image;
+		}
+		
+	}
+	
+	public static enum Weixin{
 		WX_LOGO("WXLogo", "微信餐厅形象", "", "../../images/resturantMgr.png"),
 		WX_INFO("WXInfo", "微信餐厅简介", "", "../../images/resturantMgr.png"),
 		WX_SALES("WXSales", "微信促销信息", "System_Module/WXSalesManagement.html", "../../images/staffMgr.png");
@@ -136,7 +168,7 @@ public class Page{
 		private String url;
 		private String image;
 		
-		System(String mgrId, String desc, String url, String image){
+		Weixin(String mgrId, String desc, String url, String image){
 			this.mgrId = mgrId;
 			this.image = image;
 			this.url = url;
