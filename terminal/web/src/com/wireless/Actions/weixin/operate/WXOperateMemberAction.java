@@ -59,10 +59,16 @@ public class WXOperateMemberAction extends DispatchAction {
 			jobject.getOther().put("member", member);
 			jobject.getOther().put("restaurant", restaurant);
 			
-		}catch(BusinessException | SQLException e){
+		}catch(BusinessException e){
 			e.printStackTrace();
 			jobject.initTip(e);
 			
+		}catch(SQLException e){
+			e.printStackTrace();
+			jobject.initTip(e);
+		}catch(Exception e){
+			e.printStackTrace();
+			jobject.initTip(e);
 		}finally{
 			dbCon.disconnect();
 			response.getWriter().print(jobject.toString());
@@ -101,7 +107,11 @@ public class WXOperateMemberAction extends DispatchAction {
 			}else{
 				throw new BusinessException(ss.toString());
 			}
-		}catch(BusinessException | SQLException e){
+		}catch(BusinessException e ){
+			dbCon.conn.rollback();
+			e.printStackTrace();
+			jobject.initTip(e);
+		}catch(SQLException e){
 			dbCon.conn.rollback();
 			e.printStackTrace();
 			jobject.initTip(e);
@@ -165,10 +175,13 @@ public class WXOperateMemberAction extends DispatchAction {
 			}
 			dbCon.conn.commit();
 			jobject.initTip(true, "操作成功, 已绑定会员信息.");
-		}catch(BusinessException | SQLException e){
+		}catch(BusinessException e){
 			e.printStackTrace();
 			jobject.initTip(e);
 			
+		}catch(SQLException e){
+			e.printStackTrace();
+			jobject.initTip(e);
 		}finally{
 			dbCon.disconnect();
 			response.getWriter().print(jobject.toString());
@@ -207,7 +220,10 @@ public class WXOperateMemberAction extends DispatchAction {
 			dbCon.conn.commit();
 			jobject.initTip(true, "操作成功, 已重新绑定手机号码.");
 			
-		}catch(BusinessException | SQLException e){
+		}catch(BusinessException e){
+			e.printStackTrace();
+			jobject.initTip(e);
+		}catch(SQLException e){
 			e.printStackTrace();
 			jobject.initTip(e);
 		}finally{
