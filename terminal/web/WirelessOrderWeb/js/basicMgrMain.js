@@ -790,7 +790,7 @@ var resturantMgr = new Ext.Window({
 function operateWXInfo(){
 	if(!wx.info.win){
 		var edit = new Ext.form.HtmlEditor({
-			fieldLabel : '公告内容',
+			fieldLabel : '餐厅简介',
 			hideLabel : true,
 			width : 500,
 			height : 440,

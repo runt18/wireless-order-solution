@@ -1503,6 +1503,7 @@ Ext.onReady(function() {
 				modal : true,
 				resiza : false,
 				closable : false,
+				width : 400,
 				items : [{
 					layout : 'form',
 					frame : true,
