@@ -187,7 +187,7 @@ public class QueryPrivilegeAction extends DispatchAction{
 				if(privilege.getCode() == Code.INVENTORY){
 					tree.append("{");
 					tree.append("leaf:false");
-//					tree.append(",expanded:true");
+					tree.append(",expanded:false");
 					tree.append(",id:'stockMgr'");
 					tree.append(",text:'库存'");
 					tree.append(",cls:'tFont'");
@@ -199,6 +199,23 @@ public class QueryPrivilegeAction extends DispatchAction{
 						children.append("{leaf:true," + (Page.Stock.values()[i].getUrl().isEmpty()?"id:'" +Page.Stock.values()[i].getMgrId() + "'," : "") + " text:'" + Page.Stock.values()[i].getDesc() + "'," + "icon:'" + Page.Stock.values()[i].getImage() +"'" + ", mId:'" +Page.Stock.values()[i].getMgrId() + "', cls:'font', url:'" + Page.Stock.values()[i].getUrl() + "'}");
 					}
 
+					tree.append(",children : [" + children.toString() + "]");
+					tree.append("},");
+				}
+				if(privilege.getCode() == Code.WEIXIN){
+					tree.append("{");
+					tree.append("leaf:false");
+					tree.append(",expanded:true");
+					tree.append(",id:'weixinMgr'");
+					tree.append(",text:'微信'");
+					tree.append(",cls:'tFont'");
+					StringBuilder children = new StringBuilder();
+					for (int i = 0; i < Page.Weixin.values().length; i++) {
+						if(i > 0){
+							children.append(",");
+						}
+						children.append("{leaf:true," + "icon:'" + Page.Weixin.values()[i].getImage() +"'" + ", text:'" + Page.Weixin.values()[i].getDesc() + "', mId:'" +Page.Weixin.values()[i].getMgrId() + "', cls:'font', url:'" + Page.Weixin.values()[i].getUrl() + "'}");
+					}
 					tree.append(",children : [" + children.toString() + "]");
 					tree.append("},");
 				}
