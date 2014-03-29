@@ -18,8 +18,11 @@ import com.aliyun.common.utils.IOUtils;
 import com.oreilly.servlet.multipart.FilePart;
 import com.oreilly.servlet.multipart.MultipartParser;
 import com.oreilly.servlet.multipart.Part;
+import com.wireless.db.weixin.WeixinInfoDao;
 import com.wireless.db.weixin.restaurant.WeixinRestaurantDao;
 import com.wireless.json.JObject;
+import com.wireless.pojo.weixin.weixinInfo.WeixinInfo;
+import com.wireless.pojo.weixin.weixinInfo.WeixinInfo.UpdateBuilder;
 import com.wireless.util.OSSUtil;
 import com.wireless.util.WebParams;
 
@@ -144,9 +147,14 @@ public class WXOperateMaterialAction extends DispatchAction {
 	                		filePart.writeTo(tempStream);
 	                		uploadStream = new ByteArrayInputStream(tempStream.toByteArray());
 	                		jobject.initTip(true, "操作成功, 读取上传图片信息成功!");
+
 	                		
 	                		// 记录图片素材信息
-	                		WeixinRestaurantDao.updateLogo(Integer.valueOf(rid), key);
+//	                		WeixinRestaurantDao.updateLogo(Integer.valueOf(rid), key);
+	                		
+	                		WeixinInfo.UpdateBuilder builder = new UpdateBuilder(Integer.valueOf(rid));
+	                		builder.setWeixinLogo(key);
+	                		WeixinInfoDao.update(builder);
 	                		
 	                		// 原始图片
 	                		OSSUtil.uploadImage(uploadStream, key);

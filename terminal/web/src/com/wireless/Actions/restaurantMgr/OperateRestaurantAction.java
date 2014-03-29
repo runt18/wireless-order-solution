@@ -14,6 +14,7 @@ import org.apache.struts.actions.DispatchAction;
 import com.wireless.db.DBCon;
 import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.db.staffMgr.StaffDao;
+import com.wireless.db.weixin.WeixinInfoDao;
 import com.wireless.db.weixin.restaurant.WeixinRestaurantDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
@@ -23,6 +24,7 @@ import com.wireless.pojo.restaurantMgr.Restaurant.RecordAlive;
 import com.wireless.pojo.restaurantMgr.Restaurant.UpdateBuilder;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.DateUtil;
+import com.wireless.pojo.weixin.weixinInfo.WeixinInfo;
 
 public class OperateRestaurantAction extends DispatchAction {
 	public ActionForward insert(ActionMapping mapping, ActionForm form,
@@ -159,7 +161,21 @@ public class OperateRestaurantAction extends DispatchAction {
 			String info = request.getParameter("info");
 			String rid = request.getAttribute("restaurantID").toString();
 			
-			WeixinRestaurantDao.updateInfo(Integer.valueOf(rid), info);
+			if(!info.isEmpty()){
+				info = info.replaceAll("&", "&amp;")
+						.replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll("\"", "&quot;")
+						.replaceAll("\n\r", "&#10;").replaceAll("\r\n", "&#10;").replaceAll("\n", "&#10;")
+						.replaceAll(" ", "&#032;").replaceAll("'", "&#039;").replaceAll("!", "&#033;");
+	    		WeixinInfo.UpdateBuilder builder = new WeixinInfo.UpdateBuilder(Integer.parseInt(rid));
+	    		
+	    		builder.setWeixinInfo(info);
+	    		
+	    		WeixinInfoDao.update(builder);
+			}
+
+    		
+    		
+//			WeixinRestaurantDao.updateInfo(Integer.valueOf(rid), info);
 			jobject.initTip(true, "操作成功, 已修改微信餐厅简介信息.");
 		}catch(Exception e){
 			e.printStackTrace();
