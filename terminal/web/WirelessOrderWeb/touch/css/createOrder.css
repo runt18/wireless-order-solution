@@ -144,3 +144,20 @@
 	line-height: 70px;
 	text-align: center;
 }
+
+
+#divNumForFoodAlias{
+	width: 280px;
+	height: 300px;
+	margin: 10px 0 0 30px;
+}
+
+#divNumForFoodAlias > div[class*=button-base]{
+	width: 80px;
+	line-height: 60px;
+	float: left;
+	margin-top: 5px;
+	margin-right: 5px;
+	font-weight: bold;
+	font-size: 28px;
+}
