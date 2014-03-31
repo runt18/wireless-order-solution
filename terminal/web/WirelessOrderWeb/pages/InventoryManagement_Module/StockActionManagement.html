@@ -19,6 +19,7 @@
 		cate : [[1, '商品'], [2, '原料']],
 		sst : [[1, '采购'], [2, '入库调拨'], [3, '报溢'], [4, '退货'], [5, '出库调拨'], [6, '报损'], [7, '盘盈'], [8, '盘亏'], [9, '消耗']]
 	};
+	var currRecordMaterialId;
 </script>
 
 <script type="text/javascript" src="../../js/InventoryManagement/stockActionMgr/stockActionMgrMain.js"></script>
@@ -27,7 +28,7 @@
 
 	<div id='divStockAction'></div>
 	<div id="stockActionTitle" style="display: none">-----</div>
-	<div id="stockActionTotalPrice" style="">
+	<div id="stockActionTotalPrice" style="display: none">
 		总数量小计:<input id="txtTotalAmount" type="text" disabled="disabled" style="height:20px;width:90px;font-size:18px;font-weight:bolder;" />
 				 &nbsp;&nbsp;&nbsp; 总金额:<input id="txtTotalPrice" type="text" disabled="disabled" style="height:20px;width:90px;font-size:18px;font-weight:bolder;" />
 				 &nbsp;&nbsp;&nbsp;<label id="labActualPrice" >实际金额:</label><input id="txtActualPrice" disabled="disabled" type="text" style="height:20px;width:90px;font-size:18px;font-weight:bolder;color:red"/>
