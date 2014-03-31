@@ -86,6 +86,7 @@ co.insertFood = function(c){
 //	}
 	for(var i = 0; i < foodData.root.length; i++){
 		if(foodData.root[i].id == c.foodId){
+			//返回连接空数组的副本
 			data = (foodData.root.concat()[i]);
 			break;
 		}
@@ -160,7 +161,7 @@ co.cutFood = function(){
  */
 co.setFood = function(){
 	co.operateFoodCount({
-		otype : 'set',
+		otype : 'set'
 	});
 };
 co.saveForSetFood = function(c){
@@ -624,5 +625,20 @@ co.submit = function(c){
 			});
 		}
 	});
+};
+/**
+ * 
+ * @param {} c
+ */
+co.setValueToFoodAlias = function (c){
+	var alias=getDom('txtFoodAlias');
+	if(c.type === 1){
+		alias.value=alias.value.substring(0, alias.value.length - 1);
+	}else if(c.type === 2){
+		alias.value='';
+	}else{
+		alias.value=alias.value + '' + c.value;
+	}
+	alias.focus();
 };
 

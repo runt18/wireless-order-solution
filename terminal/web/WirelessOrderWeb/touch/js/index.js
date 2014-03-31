@@ -12,7 +12,7 @@ var Templet={
 			+ '<div style="color: #462B77; font-size: 10px;">{alias}</div>'
 			+ '</div>',
 		region : '<div class="button-base" data-value={value} data-type="region-select" '
-			+ 'onClick="ts.findTableByRegion({event:this, regionId:{value}})">{text}</div>',
+			+ 'onClick="ts.findTableByRegion({event:this, regionId:{value}})">{text}</div>'
 	},
 	co : {
 		dept : '<div class="button-base" data-value={value} data-type="dept-select" '
@@ -57,8 +57,94 @@ var Templet={
 			+ '<td>{waiter}</td>'
 			+ '</tr>',
 		changeDiscount : '<div data-value={id} class="main-box-base" onClick="uo.cd.select({id:{id}})">{name}</div>'
+	},
+	ss : {
+		dept : '<div class="button-base" data-value={value} data-type="dept-select" '
+			+ 'onClick="ss.initKitchenContent({event:this, deptId:{value}})">{text}</div>',
+		kitchen : '<div class="button-base" data-value={value} data-type="kitchen-select" '
+			+ 'onClick="ss.findFoodByKitchen({event:this, kitchenId:{value}})">{text}</div>',
+		boxFood : '<div data-index={dataIndex} data-value={id} class="main-box-base" onClick="{click}">'
+			+ '{name}<br>' 
+			+ '¥{unitPrice}'
+			+ '</div>',
+		newFood : '<div data-index={dataIndex} data-value={id} data-type="newFood-select" onClick="ss.selectNewFood({event:this, foodId:{id}})">'
+			+ '<div style="line-height: 40px; ">{name}</div>'
+  			+ '<div style="text-align: right;padding-right: 5px;">'
+  				+ '<div>¥:{unitPrice}</div>'
+  			+'</div>'
+  			+ '</div>',
+  		newFoodType : 'sellOut'
 	}
 };
+
+/**
+ * 沽清之后更新数据
+ */
+function updateFoodData(){
+	$.ajax({
+		url : '../QueryMenu.do',
+		type : 'post',
+		data : {
+			dataSource : 'foods',
+			restaurantID : restaurantID
+		},
+		success : function(data, status, xhr){
+			if(data.success){
+				foodDataBase = data;
+				
+				foodData = {root:[]};
+				for(var i = 0; i < data.root.length; i++){
+					if((data.root[i].status & 1 << 2) == 0)
+						foodData.root.push(data.root[i]);
+				}
+				foodData.totalProperty = foodData.root.length;
+				
+				var tempFoodData = foodData.root.slice(0);
+				
+				for(var j=0; j < kitchenFoodData.root.length; j++){
+					var temp=kitchenFoodData.root[j];
+					temp.foods=[];
+					for(var i=0; i < tempFoodData.length; i++){
+						if(tempFoodData[i].kitchen.id == temp.id){
+							temp.foods.push(tempFoodData[i]);
+						}else if(temp.id == -1){
+							temp.foods = foodData.root.slice(0);
+						}
+					}
+				}
+				
+				tempFoodData = foodDataBase.root.slice(0);
+				for(var j=0; j < kitchenAllFoodData.root.length; j++){
+					var temp=kitchenAllFoodData.root[j];
+					temp.foods=[];
+					for(var i=0; i < tempFoodData.length; i++){
+						if(tempFoodData[i].kitchen.id == temp.id){
+							temp.foods.push(tempFoodData[i]);
+						}else if(temp.id == -1){
+							temp.foods = foodDataBase.root.slice(0);
+						}
+					}
+				}
+				// 清理多余数据
+				for(var i = kitchenFoodData.root.length - 1; i >= 0; i--){
+					if(kitchenFoodData.root[i].foods.length <= 0){
+						for(var k=kitchenData.root.length - 1; k >= 0; k--){
+							if(kitchenData.root[k].id == kitchenFoodData.root[i].id){
+								if(kitchenData.root[k].id == -1){
+									kitchenData.root[k].foods = foodData.root.slice(0);
+								}
+								kitchenFoodData.root.splice(i, 1);
+								kitchenData.root.splice(k, 1);
+								break;
+							}
+						}
+					}
+				}
+			}
+		}
+	});
+}
+
 
 /**
  * 初始化菜品数据
@@ -75,6 +161,7 @@ function initFoodData(){
 		},
 		success : function(data, status, xhr){
 			if(data.success){
+				foodDataBase = data;
 				// 加载口味信息
 				$.ajax({
 					url : '../QueryMenu.do',
@@ -109,6 +196,7 @@ function initFoodData(){
 				}
 				tmpKitchen = null;
 //				localStorage.setItem('foods', JSON.stringify(data));
+				
 				foodData = {root:[]};
 				for(var i = 0; i < data.root.length; i++){
 					if((data.root[i].status & 1 << 2) == 0)
@@ -130,6 +218,7 @@ function initFoodData(){
 							deptData = {root:[]};
 							kitchenData = {totalProperty:data.root.length, root:data.root.slice(0)};
 							kitchenFoodData = {totalProperty:data.root.length, root:data.root.slice(0)};
+							kitchenAllFoodData = {totalProperty:data.root.length, root:data.root.slice(0)};
 							var tempFoodData = foodData.root.slice(0);
 							deptData.root.push(kitchenData.root[0].dept);
 							for(var j=0; j < kitchenFoodData.root.length; j++){
@@ -150,6 +239,7 @@ function initFoodData(){
 									deptData.root.push(temp.dept);
 								}
 							}
+							
 							deptData.totalProperty = deptData.root.length;
 							deptData.root.unshift({
 								id : -1,
@@ -170,6 +260,27 @@ function initFoodData(){
 									id : -1
 								},
 								foods : foodData.root.slice(0)
+							});
+							
+							
+							tempFoodData = foodDataBase.root.slice(0);
+							for(var j=0; j < kitchenAllFoodData.root.length; j++){
+								var temp=kitchenAllFoodData.root[j];
+								temp.foods=[];
+								for(var i=0; i < tempFoodData.length; i++){
+									if(tempFoodData[i].kitchen.id == temp.id){
+										temp.foods.push(tempFoodData[i]);
+									}
+								}
+							}
+							//设置一个包含所有food的厨房s
+							kitchenAllFoodData.root.unshift({
+								id : -1,
+								name : '全部分厨',
+								dept : {
+									id : -1
+								},
+								foods : foodDataBase.root.slice(0)
 							});
 							// 清理多余数据
 							for(var i = kitchenFoodData.root.length - 1; i >= 0; i--){
@@ -387,7 +498,7 @@ function restaurantLoginHandler(){
 	$.ajax({
 		url : '../QueryRestaurants.do',
 		data : {
-			account : account.value,
+			account : account.value
 		},
 		dataType : 'json',
 		success : function(data, status, xhr){
@@ -397,7 +508,7 @@ function restaurantLoginHandler(){
 					setcookie("restaurant", JSON.stringify(data.root[0]));
 					Util.dialongDisplay({
 						renderTo : 'divRestaurantLogin',
-						type : 'hide',
+						type : 'hide'
 					});
 					ln.restaurant=data.root[0];
 					restaurantID=ln.restaurant.id;

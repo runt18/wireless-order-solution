@@ -192,6 +192,8 @@ co.tf.selectKitchen = function(c){
 	$(c.event).addClass('div-tempFood-select');
 	this.kitchenDom = c.event;
 };
+
+
 /**
  * 
  */
@@ -261,3 +263,46 @@ co.tf.back = function(){
 	});
 	this.clearDom();
 };
+
+
+/**
+ * 
+ */
+co.s.foodAlias = function(){
+	Util.dialongDisplay({
+		renderTo : 'divFoodAlias',
+		type : 'show'
+	});
+	$("#txtFoodAlias").focus();
+};
+co.s.findByAlias = function(c){
+	var alias = getDom('txtFoodAlias');
+	var data = null, temp = null;
+	temp = foodData.root.slice(0);
+	for(var i = 0; i < temp.length; i++){
+		if(eval(temp[i].alias == alias.value)){
+			data = temp[i];
+		}
+	}
+	if(data == null){
+		Util.msg.alert({
+			title : '提示',
+			msg : '此编码无对应菜品'
+		});
+		
+	}else{
+		co.insertFood({foodId : data.id});
+	}
+	alias.value = "";
+	data = null;
+	temp = null;
+	
+};
+co.fa = {};
+co.fa.back = function(){
+	Util.dialongDisplay({
+		renderTo : 'divFoodAlias',
+		type : 'hide'
+	});
+};
+

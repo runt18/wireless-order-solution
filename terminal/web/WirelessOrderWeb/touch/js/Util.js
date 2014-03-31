@@ -400,7 +400,7 @@ Util.toggleContentDisplay = function(c){
 	Util.toggleDisplay({
 		showCls : 'content-show',
 		hideCls : 'content-hide',
-		el : c.renderTo,
+		el : c.renderTo || c.el,
 		type : c.type
 	});
 };

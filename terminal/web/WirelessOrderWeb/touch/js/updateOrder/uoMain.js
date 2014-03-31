@@ -338,7 +338,7 @@ uo.saveForUO = function(){
 		Util.msg.alert({
 			title : '温馨提示',
 			msg : '账单没有修改，不能提交', 
-			time : 3,
+			time : 3
 		});
 	}else{
 		for(var x = 0; x < uoFood.length; x++){
