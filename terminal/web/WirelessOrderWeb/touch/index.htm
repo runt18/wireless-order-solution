@@ -18,7 +18,7 @@
 var pin=0,  restaurantID=0;
 var staffData={staffID:0, staffName:''};
 var tableData={}, regionData={};
-var foodDataBase={}; foodData={}, kitchenFoodData={}, kitchenData={},allKitchenFoodData={}, deptData={root:[]}, tasteData={}, allowTempKitchen={};
+var foodDataBase={}; foodData={}, kitchenFoodData={}, kitchenData={},kitchenAllFoodData={}, deptData={root:[]}, tasteData={}, allowTempKitchen={};
 function getDom(id){
 	return document.getElementById(id);
 }
@@ -249,7 +249,7 @@ var ss = {
 		</div>
   	</div>
   	<div id="divCenterForStopSet" class="box-horizontal div-full">
-  		<div id="divNewFoodForStopSet" style=""> 11</div>
+  		<div id="divNewFoodForStopSet" style=""></div>
     	<div id="divAllFoodForStopSet" class="div-full" style="overflow-y: auto;"></div>
   	</div>
   	<div id="divDescForStopSet" class="box-horizontal">
@@ -517,7 +517,7 @@ var ss = {
 		</div>
 		<div class="box-horizontal" style="line-height:60px; width: 100%;">
 			<div class="button-base" style="line-height: 60px; width: 49%;" onClick="co.s.findByAlias({renderTo : 'divFoodAlias'})">确定</div>
-			<div class="button-base" style="line-height: 60px; width: 49%; margin-left: 2%;" onClick="co.fa.back()">返回</div>
+			<div class="button-base" style="line-height: 60px; width: 49%; margin-left: 2%;" onClick="co.fa.back()">关闭</div>
 		</div>
 
 </div>
