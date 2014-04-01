@@ -202,23 +202,7 @@ public class QueryPrivilegeAction extends DispatchAction{
 					tree.append(",children : [" + children.toString() + "]");
 					tree.append("},");
 				}
-				if(privilege.getCode() == Code.WEIXIN){
-					tree.append("{");
-					tree.append("leaf:false");
-					tree.append(",expanded:true");
-					tree.append(",id:'weixinMgr'");
-					tree.append(",text:'微信'");
-					tree.append(",cls:'tFont'");
-					StringBuilder children = new StringBuilder();
-					for (int i = 0; i < Page.Weixin.values().length; i++) {
-						if(i > 0){
-							children.append(",");
-						}
-						children.append("{leaf:true," + "icon:'" + Page.Weixin.values()[i].getImage() +"'" + ", text:'" + Page.Weixin.values()[i].getDesc() + "', mId:'" +Page.Weixin.values()[i].getMgrId() + "', cls:'font', url:'" + Page.Weixin.values()[i].getUrl() + "'}");
-					}
-					tree.append(",children : [" + children.toString() + "]");
-					tree.append("},");
-				}
+
 				if(privilege.getCode() == Code.SYSTEM){
 					tree.append("{");
 					tree.append("leaf:false");
@@ -236,6 +220,24 @@ public class QueryPrivilegeAction extends DispatchAction{
 					tree.append(",children : [" + children.toString() + "]");
 					tree.append("},");
 				}
+			}
+			//FIXME 加权限控制
+			if(true){
+				tree.append("{");
+				tree.append("leaf:false");
+				tree.append(",expanded:true");
+				tree.append(",id:'weixinMgr'");
+				tree.append(",text:'微信'");
+				tree.append(",cls:'tFont'");
+				StringBuilder children = new StringBuilder();
+				for (int i = 0; i < Page.Weixin.values().length; i++) {
+					if(i > 0){
+						children.append(",");
+					}
+					children.append("{leaf:true," + "icon:'" + Page.Weixin.values()[i].getImage() +"'" + ", text:'" + Page.Weixin.values()[i].getDesc() + "', mId:'" +Page.Weixin.values()[i].getMgrId() + "', cls:'font', url:'" + Page.Weixin.values()[i].getUrl() + "'}");
+				}
+				tree.append(",children : [" + children.toString() + "]");
+				tree.append("},");
 			}
 			tree.append("]");
 			
