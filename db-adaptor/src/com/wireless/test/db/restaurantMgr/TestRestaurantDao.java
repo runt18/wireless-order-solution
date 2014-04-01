@@ -27,6 +27,7 @@ import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.db.staffMgr.RoleDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.system.SystemDao;
+import com.wireless.db.weixin.WeixinInfoDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.crMgr.CancelReason;
 import com.wireless.pojo.distMgr.Discount;
@@ -40,6 +41,7 @@ import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.restaurantMgr.Restaurant.RecordAlive;
 import com.wireless.pojo.staffMgr.Role;
 import com.wireless.pojo.staffMgr.Staff;
+import com.wireless.pojo.weixin.weixinInfo.WeixinInfo;
 import com.wireless.test.db.TestInit;
 import com.wireless.util.SQLUtil;
 
@@ -104,6 +106,9 @@ public class TestRestaurantDao {
 			//Compare the printer
 			comparePrinters(staff);
 			
+			//Compare the weixin misc
+			compareWeixinMisc(staff);
+			
 			//Update a restaurant
 			Restaurant.UpdateBuilder updateBuilder = new Restaurant.UpdateBuilder(restaurantId, "test2")
 														 		   .setPwd("test2@123")
@@ -131,6 +136,15 @@ public class TestRestaurantDao {
 		}finally{
 			RestaurantDao.deleteById(restaurantId);
 		}
+	}
+	
+	private void compareWeixinMisc(Staff staff) throws SQLException, BusinessException{
+		WeixinInfo actual = WeixinInfoDao.getByRestaurant(staff.getRestaurantId());
+		assertEquals("weixin misc : restaurant id", actual.getRestaurantId(), staff.getRestaurantId());
+		assertEquals("weixin misc : bound coupon type ", actual.getBoundCouponType(), 0);
+		assertEquals("weixin misc : info", actual.getWeixinInfo(), "");
+		assertEquals("weixin misc : logo", actual.getWeixinLogo(), "");
+		assertEquals("weixin misc : promote", actual.getWeixinPromote(), "");
 	}
 	
 	private void comparePrinters(Staff staff) throws SQLException{
@@ -238,7 +252,7 @@ public class TestRestaurantDao {
 		Discount actual = DiscountDao.getAll(staff).get(0);
 
 		assertEquals("discount name", actual.getName(), expected.getName());
-		assertEquals("discount restaurant id", actual.getRestaurantId(), expected.getRestaurantId());
+		assertEquals("discount restaurant id", actual.getRestaurantId(), staff.getRestaurantId());
 		assertEquals("discount status", actual.getStatus().getVal(), expected.getStatus().getVal());
 		
 		for(DiscountPlan dp : actual.getPlans()){

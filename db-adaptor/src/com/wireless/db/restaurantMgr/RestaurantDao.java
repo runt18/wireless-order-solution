@@ -19,6 +19,7 @@ import com.wireless.db.staffMgr.RoleDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.tasteMgr.TasteCategoryDao;
 import com.wireless.db.tasteMgr.TasteDao;
+import com.wireless.db.weixin.WeixinInfoDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.RestaurantError;
 import com.wireless.pojo.client.MemberType;
@@ -37,6 +38,7 @@ import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.tasteMgr.Taste;
 import com.wireless.pojo.tasteMgr.TasteCategory;
 import com.wireless.pojo.util.DateUtil;
+import com.wireless.pojo.weixin.weixinInfo.WeixinInfo;
 
 public class RestaurantDao {
 	
@@ -363,6 +365,9 @@ public class RestaurantDao {
 			//Insert the printers
 			initPrinter(dbCon, staff);
 			
+			//Insert the weixin_misc
+			initWeixinMisc(dbCon, staff);
+			
 			return restaurant.getId();
 			
 		}catch(Exception e){
@@ -372,6 +377,10 @@ public class RestaurantDao {
 			throw new SQLException(e);
 		}
 
+	}
+	
+	private static void initWeixinMisc(DBCon dbCon, Staff staff) throws SQLException{
+		WeixinInfoDao.insert(dbCon, staff, new WeixinInfo.InsertBuilder(staff.getRestaurantId()));
 	}
 	
 	private static void initPrinter(DBCon dbCon, Staff staff) throws SQLException, BusinessException{
@@ -765,6 +774,10 @@ public class RestaurantDao {
 		
 		//Delete the printers
 		sql = " DELETE FROM " + Params.dbName + ".printer WHERE restaurant_id = " + restaurantId;
+		dbCon.stmt.executeUpdate(sql);
+		
+		//Delete the weixin misc
+		sql = " DELETE FROM " + Params.dbName + ".weixin_misc WHERE restaurant_id = " + restaurantId;
 		dbCon.stmt.executeUpdate(sql);
 	}
 	

@@ -1,12 +1,16 @@
 package com.wireless.db.weixin;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.mysql.jdbc.Statement;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
+import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
-import com.wireless.exception.DeviceError;
+import com.wireless.exception.WeixinMemberError;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.weixin.weixinInfo.WeixinInfo;
 
 public class WeixinInfoDao {
@@ -16,15 +20,16 @@ public class WeixinInfoDao {
 	 * @return
 	 * @throws SQLException
 	 */
-	public static int insert(WeixinInfo.InsertBuilder builder) throws SQLException{
+	public static void insert(Staff staff, WeixinInfo.InsertBuilder builder) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return insert(dbCon, builder);
+			insert(dbCon, staff, builder);
 		}finally{
 			dbCon.disconnect();
 		}
 	}
+	
 	/**
 	 * 
 	 * @param dbCon
@@ -32,23 +37,16 @@ public class WeixinInfoDao {
 	 * @return
 	 * @throws SQLException
 	 */
-	public static int insert(DBCon dbCon, WeixinInfo.InsertBuilder builder) throws SQLException{
+	public static void insert(DBCon dbCon, Staff staff, WeixinInfo.InsertBuilder builder) throws SQLException{
 		WeixinInfo wxInfo = builder.build();
-		String sql = " INSERT INTO " + Params.dbName + ".weixin_misc " +
-					"(restaurant_id, bound_coupon_type, weixin_logo, weixin_info, weixin_promote)" +
-					 " VALUES (" +
-					 wxInfo.getRestaurantId() + ", " +
-					 wxInfo.getBoundCouponType() + ", " +
-					 "'" + wxInfo.getWeixinLogo() + "', " +
-					 "'" + wxInfo.getWeixinInfo() + "', " +
-					 "'" + wxInfo.getWeixinPromote() + "') ";
+		String sql;
+		sql = " INSERT INTO " + Params.dbName + ".weixin_misc " +
+			  " (restaurant_id)" +
+			  " VALUES (" +
+			  wxInfo.getRestaurantId() + 
+			  " ) ";
 		dbCon.stmt.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
-		dbCon.rs = dbCon.stmt.getGeneratedKeys();
-		if(dbCon.rs.next()){
-			return dbCon.rs.getInt(1);
-		}else{
-			throw new SQLException("The id of device is not generated successfully.");
-		}
+
 	}
 	/**
 	 * 
@@ -57,18 +55,19 @@ public class WeixinInfoDao {
 	 * @throws SQLException
 	 * @throws BusinessException
 	 */
-	public static void update(DBCon dbCon, WeixinInfo.UpdateBuilder builder) throws SQLException, BusinessException{
+	public static void update(DBCon dbCon, Staff staff, WeixinInfo.UpdateBuilder builder) throws SQLException, BusinessException{
 		WeixinInfo wxInfo = builder.build();
 		
-		String sql = "UPDATE "+ Params.dbName + ".weixin_misc SET " +
-						" restaurant_id = " + wxInfo.getRestaurantId() +
-						(wxInfo.getBoundCouponType() != 0 ? " ,bound_coupon_type = " + wxInfo.getBoundCouponType() : "") +
-						(wxInfo.getWeixinLogo() != null ? " ,weixin_logo = '" + wxInfo.getWeixinLogo() + "'" : "") +
-						(wxInfo.getWeixinInfo() != null ? " ,weixin_info = '" + wxInfo.getWeixinInfo() + "'" : "") +
-						(wxInfo.getWeixinPromote() != null ? " ,weixin_promote = '" + wxInfo.getWeixinPromote() + "'" : "") +
-						" WHERE restaurant_id = " + wxInfo.getRestaurantId();
+		String sql;
+		sql = " UPDATE "+ Params.dbName + ".weixin_misc SET " +
+			  " restaurant_id = " + wxInfo.getRestaurantId() +
+			  (builder.isBoundCouponTypeChanged() ? " ,bound_coupon_type = " + wxInfo.getBoundCouponType() : "") +
+			  (builder.isWeixinLogoChanged() ? " ,weixin_logo = '" + wxInfo.getWeixinLogo() + "'" : "") +
+			  (builder.isWeixinInfoChanged() ? " ,weixin_info = '" + wxInfo.getWeixinInfo() + "'" : "") +
+			  (builder.isWeixinPromotChanged() ? " ,weixin_promote = '" + wxInfo.getWeixinPromote() + "'" : "") +
+			  " WHERE restaurant_id = " + wxInfo.getRestaurantId();
 		if(dbCon.stmt.executeUpdate(sql) == 0){
-			throw new BusinessException(DeviceError.DEVICE_NOT_EXIST);
+			throw new BusinessException(WeixinMemberError.WEIXIN_INFO_NOT_EXIST);
 		}
 		
 	}
@@ -79,13 +78,31 @@ public class WeixinInfoDao {
 	 * @throws SQLException
 	 * @throws BusinessException
 	 */
-	public static void update(WeixinInfo.UpdateBuilder builder) throws SQLException, BusinessException {
+	public static void update(Staff staff, WeixinInfo.UpdateBuilder builder) throws SQLException, BusinessException {
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			update(dbCon, builder);
+			update(dbCon, staff, builder);
 		}finally{
 			dbCon.disconnect();
+		}
+	}
+	
+	public static void delete(Staff staff) throws SQLException, BusinessException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			delete(dbCon, staff);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	public static void delete(DBCon dbCon, Staff staff) throws SQLException, BusinessException{
+		String sql;
+		sql = " DELETE FROM " + Params.dbName + ".weixin_misc WHERE restaurant_id = " + staff.getRestaurantId();
+		if(dbCon.stmt.executeUpdate(sql) == 0){
+			throw new BusinessException(WeixinMemberError.WEIXIN_INFO_NOT_EXIST);
 		}
 	}
 	
@@ -97,21 +114,27 @@ public class WeixinInfoDao {
 	 * @return
 	 * @throws SQLException
 	 */
-	private static WeixinInfo getWeixinInfo(DBCon dbCon, String extraCond, String orderClause) throws SQLException{
-		WeixinInfo wx = new WeixinInfo();
-		String sql = "SELECT restaurant_id, bound_coupon_type, weixin_logo, weixin_info, weixin_promote FROM " +
-					Params.dbName + ".weixin_misc WHERE 1 = 1" + 
-					(extraCond != null ? extraCond : " ");
+	private static List<WeixinInfo> getByCond(DBCon dbCon, Staff staff, String extraCond, String orderClause) throws SQLException{
+		
+		List<WeixinInfo> result = new ArrayList<WeixinInfo>();
+		
+		String sql;
+		sql = " SELECT restaurant_id, bound_coupon_type, weixin_logo, weixin_info, weixin_promote FROM " +
+			  Params.dbName + ".weixin_misc WHERE 1 = 1 " +
+			  " AND restaurant_id = " + staff.getRestaurantId() +
+			  (extraCond != null ? extraCond : " ") + 
+			  (orderClause != null ? orderClause : "");
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		while(dbCon.rs.next()){
+			WeixinInfo wx = new WeixinInfo(dbCon.rs.getInt("restaurant_id"));
 			wx.setBoundCouponType(dbCon.rs.getInt("bound_coupon_type"));
-			wx.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
 			wx.setWeixinInfo(dbCon.rs.getString("weixin_info"));
 			wx.setWeixinLogo(dbCon.rs.getString("weixin_logo"));
 			wx.setWeixinPromote(dbCon.rs.getString("weixin_promote"));
+			result.add(wx);
 		}
 		dbCon.rs.close();
-		return wx;
+		return result;
 	}
 	
 	/**
@@ -119,12 +142,18 @@ public class WeixinInfoDao {
 	 * @param restaurantId
 	 * @return
 	 * @throws SQLException
+	 * @throws BusinessException 
 	 */
-	public static WeixinInfo getWeixinInfo(int restaurantId) throws SQLException{
+	public static WeixinInfo getByRestaurant(int restaurantId) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return getWeixinInfo(dbCon, " AND restaurant_id = " + restaurantId, null);
+			List<WeixinInfo> result = getByCond(dbCon, StaffDao.getAdminByRestaurant(restaurantId), null, null);
+			if(result.isEmpty()){
+				throw new BusinessException(WeixinMemberError.WEIXIN_INFO_NOT_EXIST);
+			}else{
+				return result.get(0);
+			}
 		}finally{
 			dbCon.disconnect();
 		}
