@@ -108,7 +108,7 @@ public class CommissionStatistics implements Jsonable{
 		if(flag == 0){
 			jm.put("orderDateFormat", DateUtil.format(orderDate));
 			jm.put("foodName", this.foodName);
-			jm.put("dept", getDept().getName());
+			jm.put("dept", getDept() != null ? getDept().getName() : "");
 			jm.put("orderId", this.orderId);
 			jm.put("unitPrice", this.unitPrice);
 			jm.put("amount", this.amount);
