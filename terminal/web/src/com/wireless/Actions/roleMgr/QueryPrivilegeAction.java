@@ -117,17 +117,12 @@ public class QueryPrivilegeAction extends DispatchAction{
 		
 		String pin = (String) request.getAttribute("pin");
 		StringBuilder tree = new StringBuilder();
-		List<Privilege> rolePrivilege = new ArrayList<Privilege>();
 		try{
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
-
-			Role role = RoleDao.getRoleById(staff, staff.getRole().getId());
-			if(role != null){
-				rolePrivilege = role.getPrivileges();
-			}
+			
 			tree.append("[");
 			
-			for (Privilege privilege : rolePrivilege) {
+			for (Privilege privilege : RoleDao.getRoleById(staff, staff.getRole().getId()).getPrivileges()) {
 				if(privilege.getCode() == Code.BASIC){
 					tree.append("{");
 					tree.append("leaf:false");

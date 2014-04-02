@@ -166,11 +166,8 @@ public class OperateRestaurantAction extends DispatchAction {
 						.replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll("\"", "&quot;")
 						.replaceAll("\n\r", "&#10;").replaceAll("\r\n", "&#10;").replaceAll("\n", "&#10;")
 						.replaceAll(" ", "&#032;").replaceAll("'", "&#039;").replaceAll("!", "&#033;");
-	    		WeixinInfo.UpdateBuilder builder = new WeixinInfo.UpdateBuilder(Integer.parseInt(rid));
 	    		
-	    		builder.setWeixinInfo(info);
-	    		
-	    		WeixinInfoDao.update(builder);
+	    		WeixinInfoDao.update(StaffDao.getAdminByRestaurant(Integer.parseInt(rid)), new WeixinInfo.UpdateBuilder(Integer.parseInt(rid)).setWeixinInfo(info));
 			}
 
     		
