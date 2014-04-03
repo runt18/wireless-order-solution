@@ -255,7 +255,7 @@ Ext.onReady(function(){
 			['操作类型', 'operateTypeText', 90, 'center']
 		],
 		MemberOperationRecord.getKeys(),
-		[ ['isPaging', true], ['restaurantID', restaurantID], ['isCookie', true]],
+		[ ['isPaging', true], ['restaurantID', restaurantID]],
 		GRID_PADDING_LIMIT_20,
 		'',
 		mrd_mo_tbar

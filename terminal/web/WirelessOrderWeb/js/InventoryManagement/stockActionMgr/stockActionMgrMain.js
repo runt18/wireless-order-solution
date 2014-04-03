@@ -7,7 +7,7 @@ function NewDate(str) {
 	return date; 
 } 
 
-	var secondStepPanelSouth = Ext.getCmp('secondStepPanelSouth');
+	var secondStepPanelSouth;
 	if(!secondStepPanelSouth){
 		secondStepPanelSouth = new Ext.Panel({
 			id : 'secondStepPanelSouth',
@@ -122,7 +122,7 @@ function stockTaskNavHandler(e){
 					deptOutDom.show();
 					
 					moneyPanel.setDisabled(true);
-					priceDom.getEl().up('.x-form-item').setDisplayed(false);
+					priceDom.getEl()? priceDom.getEl().up('.x-form-item').setDisplayed(false) : '';
 					column.setHidden(3, true);
 					column.setHidden(4, true);
 				}else if(stockSubType == 3){
@@ -141,7 +141,7 @@ function stockTaskNavHandler(e){
 					supplierDom.hide();
 					deptOutDom.hide();
 					
-					priceDom.getEl().up('.x-form-item').setDisplayed(false);
+					priceDom.getEl()? priceDom.getEl().up('.x-form-item').setDisplayed(false) : '';
 					column.setRenderer(3,'');
 				}else if(stockSubType == 7){
 					if(stockCate == 1){
@@ -189,7 +189,7 @@ function stockTaskNavHandler(e){
 					deptOutDom.show();
 					
 					moneyPanel.setDisabled(true);
-					priceDom.getEl().up('.x-form-item').setDisplayed(false);
+					priceDom.getEl()? priceDom.getEl().up('.x-form-item').setDisplayed(false) : '';
 					column.setHidden(3, true);
 					column.setHidden(4, true);
 				}else if(stockSubType == 6){
@@ -206,7 +206,7 @@ function stockTaskNavHandler(e){
 					supplierDom.hide();
 					deptOutDom.show();
 					
-					priceDom.getEl().up('.x-form-item').setDisplayed(false);
+					priceDom.getEl()? priceDom.getEl().up('.x-form-item').setDisplayed(false) : '';
 					column.setRenderer(3, '');
 				}else if(stockSubType == 8){
 					// 报损
@@ -247,7 +247,7 @@ function stockTaskNavHandler(e){
 				document.getElementById('stockActionTitle').innerHTML = diaplayTitle;
 			}
 			document.getElementById('stockActionTitle').style.display = 'block';
-			
+			document.getElementById('stockActionTotalPrice').style.display = 'block';
 		}
 		
 		// 设置导航按钮信息
@@ -523,6 +523,8 @@ function insertStockActionHandler(){
 				stockTaskNavWin.show();
 				stockTaskNavWin.setTitle(stockTaskNavWin.getLayout().activeItem.mt);
 				Ext.getCmp('sam_secondStepPanelWest').setDisabled(false);
+				//货品添加可用
+				Ext.getCmp('comboSelectMaterialForStockAction').setDisabled(false);
 			}else{
 				Ext.ux.showMsg(jr);
 			}
@@ -552,6 +554,8 @@ function updateStockActionHandler(){
 			data : data
 		});
 		Ext.getCmp('btnPreviousForStockNav').setDisabled(true);
+		//货品添加可用
+		Ext.getCmp('comboSelectMaterialForStockAction').setDisabled(false);
 		if(data['subTypeValue'] == 1 || data['subTypeValue'] == 4){
 			Ext.getDom('txtActualPrice').disabled = false;
 		}
@@ -574,6 +578,8 @@ function updateStockActionHandler(){
 		Ext.getCmp('btnPreviousForStockNav').setDisabled(true);
 		Ext.getCmp('btnNextForStockNav').setDisabled(true);
 		Ext.getCmp('sam_secondStepPanelWest').setDisabled(true);
+		//货品添加禁用
+		Ext.getCmp('comboSelectMaterialForStockAction').setDisabled(true);
 		Ext.getDom('txtActualPrice').disabled = true;
 		Ext.getCmp('btnAuditStockAction').hide();
 		Ext.getCmp('datetOriStockDateForStockActionBasic').clearInvalid();
@@ -672,14 +678,13 @@ function auditStockActionHandler(){
  * @param c
  */
 function setAmountForStockActionDetail(c){
-	var data = Ext.ux.getSelData(secondStepPanelCenter);
-	if(!data){
+	if(!currRecordMaterialId){
 		Ext.example.msg('提示', '操作失败, 请选中一条记录后再操作.');
 	}
 	
 	for(var i = 0; i < secondStepPanelCenter.getStore().getCount(); i++){
 		var temp = secondStepPanelCenter.getStore().getAt(i);
-		if(temp.get('material.id') == data['material.id']){
+		if(temp.get('material.id') == currRecordMaterialId){
 			if(c.otype == Ext.ux.otype['delete']){
 				secondStepPanelCenter.getStore().remove(temp);
 			}else if(c.otype == Ext.ux.otype['set']){
@@ -695,6 +700,7 @@ function setAmountForStockActionDetail(c){
 			break;
 		}
 	}
+	currRecordMaterialId = null;
 }
 
 /**
@@ -812,6 +818,11 @@ function stockDetailTotalCountRenderer(v, m, r, ri, ci, s){
 }
 function stockDetailTotalPriceRenderer(v, m, r, ri, ci, s){
 	return Ext.ux.txtFormat.gridDou(r.get('amount') * r.get('price'));
+}
+
+
+function stockDetailOpertionRenderer(){
+	return "<a href=\"javascript:void(0);\" onclick=\"setAmountForStockActionDetail({otype:Ext.ux.otype[\'delete\']})\">" + "<img src='../../images/del.png'/>删除</a>";
 }
 
 
@@ -1578,10 +1589,183 @@ function initControl(){
 	    	}]
 	    });
 	}
-
+	var stockAddMarterialGridTbar = new Ext.Toolbar({
+			height : 26,
+			items : [{
+				xtype : 'tbtext',
+				text : '选择货品:&nbsp;&nbsp;'
+			},{
+				xtype : 'combo',
+				id : 'comboSelectMaterialForStockAction',
+				fieldLabel : '选择货品',
+				forceSelection : true,
+				listWidth : 250,
+				height : 200,
+				maxHeight : 300,
+				store : new Ext.data.JsonStore({
+					url : '../../QueryMaterial.do',
+					baseParams : {
+						dataSource : 'normal',
+						
+						restaurantID : restaurantID
+					},
+					root : 'root',
+					fields : MaterialRecord.getKeys()
+				}),
+				valueField : 'id',
+				displayField : 'name',
+				typeAhead : true,
+				mode : 'local',
+				triggerAction : 'all',
+				selectOnFocus : true,
+				allowBlank : false,
+				tpl:'<tpl for=".">' 
+					+ '<div class="x-combo-list-item" style="height:18px;">'
+					+ '{id} -- {name} -- {pinyin}'
+					+ '</div>'
+					+ '</tpl>',
+				listeners : {
+					beforequery : function(e){ 
+						var combo = e.combo; 
+						if(!e.forceAll){ 
+							var value = e.query; 
+							combo.store.filterBy(function(record,id){
+								return record.get('name').indexOf(value) != -1 
+										|| (record.get('id')+'').indexOf(value) != -1 
+										|| record.get('pinyin').indexOf(value.toUpperCase()) != -1;
+							}); 
+							combo.expand(); 
+							combo.select(0, true);
+							return false; 
+						}
+					},
+					select : function(thiz){
+						thiz.focus(true, 100);
+						var newRecord = null;
+		    			for(var i=0, temp=thiz.store, sv=thiz.getValue(); i<temp.getCount(); i++){
+		    				if(temp.getAt(i).get('id') == sv){
+		    					newRecord = temp.getAt(i);
+		    					break;
+		    				}
+		    			}
+						var detail = secondStepPanelCenter.getStore();
+		    			var has = false;
+		    			for(var i=0; i < detail.getCount(); i++){
+		    				if(detail.getAt(i).get('material.id') == newRecord.get('id')){
+		    					detail.getAt(i).set('amount', detail.getAt(i).get('amount') + 1);
+		    					has = true;
+		    					break;
+		    				}
+		    			}
+		    			if(!has){
+		    				detail.add(new StockDetailRecord({
+		    					material : newRecord.data,
+		    					id : newRecord.get('id'),
+		    					'material.id' : newRecord.get('id'),
+		    					'material.cateName' : newRecord.get('cateName'),
+		    					'material.name' : newRecord.get('name'),
+		    					amount : 1,
+		    					price : newRecord.get('price')
+		    				}));
+		    			}
+						
+						
+/*	添加数量
+ * 					var price = Ext.getCmp('numSelectPriceForStockAction');
+		    			var count = Ext.getCmp('numSelectCountForStockAction');
+						var stockTypeList = stockTaskNavWin.stockType.split(',');
+						var stockSubType = stockTypeList[2];
+						if(stockSubType == 3 || stockSubType == 6 || stockSubType == 2 || stockSubType == 5){
+							Ext.Ajax.request({
+								url : '../../QueryMaterial.do',
+								params : {
+									dataSource : 'normal',
+									
+									restaurantID : restaurantID,
+									materialId : thiz.getValue()
+								},
+								success : function(res, opt){
+								var jr = Ext.decode(res.responseText);
+									if(jr.success){
+										price.setValue(jr.root[0].price);
+										price.setDisabled(true);
+									}else{
+										Ext.ux.showMsg(jr);
+									}
+								},
+								failure : function(res, opt){
+									Ext.ux.showMsg(Ext.decode(res.responseText));
+								}
+							});
+						}else{
+							price.setValue(0);
+						}
+	
+		    			count.setValue(1);
+		    			count.focus(true, 100);*/
+					}
+				}
+			}]
+	});
     
 	if(!secondStepPanelCenter){
-		secondStepPanelCenter = createGridPanel(
+		
+		var cm = new Ext.grid.ColumnModel([
+	       new Ext.grid.RowNumberer(),
+		   {header:'货品名称',dataIndex:'material.name'},
+		   {header:'数量',dataIndex:'amount',align : 'right',
+				editor: new Ext.form.NumberField({
+						id : 'stockDetailCountEditor',
+				      allowNegative: false,
+				      selectOnFocus:true,
+				      enableKeyEvents: true
+				})},
+		   {header:'单价',dataIndex:'price',align : 'right',
+		   		editor: new Ext.form.NumberField({
+				      allowNegative: false,
+				      selectOnFocus:true,
+				      enableKeyEvents: true
+				})},
+		   {header:'总价',dataIndex:'totalPrice',align : 'right', renderer : stockDetailTotalPriceRenderer},
+		   {header:'操作',align : 'center', renderer : stockDetailOpertionRenderer}
+	       ]);
+	  	cm.defaultSortable = true;
+	  	
+		var bbds = new Ext.data.Store({
+			proxy : new Ext.data.MemoryProxy({}),
+			reader : new Ext.data.JsonReader({totalProperty:'totalProperty', root:'root'},[
+				{name : 'id'},
+		        {name : 'stockActionId'},
+		        {name : 'stock'},
+		        {name : 'price'},
+		        {name : 'amount'},
+		        {name : 'totalPrice'},
+		        {name : 'material.cateName'},
+		        {name : 'material.name'},
+		        {name : 'material'},
+		        {name : 'material.id'}
+			])
+		});
+		secondStepPanelCenter = new Ext.grid.EditorGridPanel({
+			title : '货品列表',
+			id : 'secondStepPanelCenter',
+		    //height : '500',
+		    border : false,
+		    frame : false,
+		    store : bbds,
+		    cm : cm,
+		    viewConfig : {
+		    	forceFit : true
+		    },
+		    tbar : stockAddMarterialGridTbar,
+		    listeners : {
+		    	rowmousedown: function(g, index, e){  
+		            currRecordMaterialId = secondStepPanelCenter.getStore().getAt(index).get('material.id');
+		    	}
+		    }
+		});
+		
+/*		secondStepPanelCenter = createGridPanel(
 			'secondStepPanelCenter',
 			'货品列表',
 			'',
@@ -1591,14 +1775,15 @@ function initControl(){
 				[true, false, false, false], 
 				['品名', 'material.name', 130],
 				['数量', 'amount',130,'right', 'stockDetailTotalCountRenderer'],
-				['单价', 'price',80,'right', 'stockDetailPriceRenderer'],
+				['单价', 'price',80,'right'],
 				['总价', 'totalPrice',80,'right', 'stockDetailTotalPriceRenderer']
 			],
 			StockDetailRecord.getKeys(),
 			[['isPaging', true],  ['restaurantId', restaurantID], ['stockStatus', 3]],
 			GRID_PADDING_LIMIT_20,
-			''
-		);
+			'',
+			stockAddMarterialGridTbar
+		);*/
 	}
 
 	secondStepPanelCenter.region = 'center';
@@ -1629,13 +1814,15 @@ function initControl(){
 		secondStepPanelCenter.getStore().fireEvent('load', thiz, rs);
 	});
 	
+	Ext.getCmp('stockDetailCountEditor').hide();
+	
 	var secondStepPanelWest = Ext.getCmp('sam_secondStepPanelWest');
 	if(!secondStepPanelWest){
 		secondStepPanelWest = new Ext.Panel({
 	        title : '添加货品',
 	        id : 'sam_secondStepPanelWest',
 	        layout : 'form',
-	    	region : 'west',
+//	    	region : 'west',
 	    	frame : true,
 	    	width : 220,
 	    	labelWidth : 60,
@@ -1644,7 +1831,7 @@ function initControl(){
 	    	},
 	    	items : [{
 				xtype : 'combo',
-				id : 'comboSelectMaterialForStockAction',
+//				id : 'comboSelectMaterialForStockAction',
 				fieldLabel : '货品',
 				forceSelection : true,
 				listWidth : 250,
@@ -1654,7 +1841,6 @@ function initControl(){
 					url : '../../QueryMaterial.do',
 					baseParams : {
 						dataSource : 'normal',
-						
 						restaurantID : restaurantID
 					},
 					root : 'root',
@@ -1820,7 +2006,7 @@ function initControl(){
 	        index : 1,
 	        width : '100%',
 	        layout : 'border',
-	        items : [secondStepPanelNorth, secondStepPanelCenter, secondStepPanelWest, secondStepPanelSouth]
+	        items : [secondStepPanelNorth, secondStepPanelCenter, secondStepPanelSouth]
 	    });
 	}
 	if(!stockTaskNavWin){
@@ -1875,7 +2061,6 @@ function initControl(){
 					var column = Ext.getCmp('secondStepPanelCenter').getColumnModel();
 					column.setHidden(3, false);
 					column.setHidden(4, false);
-					column.setRenderer(3, stockDetailPriceRenderer);
 	    			stockTaskNavWin.hide();
 	    		}
 	    	}],

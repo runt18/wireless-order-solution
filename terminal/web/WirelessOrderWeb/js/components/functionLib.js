@@ -53,7 +53,9 @@ Ext.override(Ext.tree.TreeEventModel, {
         }
         else if(this.getNodeTarget(e)){
         	if(this.tree.getSelectionModel().selNode){
-        		this.tree.getSelectionModel().selNode.ui.onSelectedChange(false);
+        		if(this.tree.getSelectionModel().selNode.ui != "null"){
+        			this.tree.getSelectionModel().selNode.ui.onSelectedChange(false);
+        		}
         	}
 			this.tree.getSelectionModel().selNode = this.getNode(e);
             this.onNodeClick(e, this.getNode(e));
@@ -84,6 +86,55 @@ Ext.override(Ext.tree.TreeNodeUI, {
 		}
 		this.fireEvent("dblclick", this.node, e);
 	}    
+});
+
+Ext.override(Ext.grid.CellSelectionModel, {
+    onEditorKey : function(field, e) {
+        var smodel = this;
+        var k = e.getKey(), newCell=null, g = smodel.grid, ed = g.activeEditor;
+        switch(k){
+            case e.TAB:
+                 e.stopEvent();
+                 ed.completeEdit();
+                 if (e.shiftKey) {
+                     newCell = g.walkCells(ed.row, ed.col-1, -1, smodel.acceptsNav, smodel);
+                 } else {
+                     newCell = g.walkCells(ed.row, ed.col+1, 1, smodel.acceptsNav, smodel);
+                 }
+                 if (ed.col == 1) {
+                     if (e.shiftKey) {
+                         newCell = g.walkCells(ed.row, ed.col+1, -1, smodel.acceptsNav, smodel);
+                     } else {
+                         newCell = g.walkCells(ed.row, ed.col+1, 1, smodel.acceptsNav, smodel);
+                     }
+                 }
+                break;
+            case e.UP:
+                 e.stopEvent();
+                 ed.completeEdit();
+                 newCell = g.walkCells(ed.row-1, ed.col, -1, smodel.acceptsNav, smodel);
+                break;
+            case e.DOWN:
+                 e.stopEvent();
+                 ed.completeEdit();
+                 g.startEditing(ed.row+1, ed.col);
+                 e.stopEvent(); 
+                break;
+            case e.LEFT:
+                 e.stopEvent();
+                 ed.completeEdit();
+                 newCell = g.walkCells(ed.row, ed.col-1, -1, smodel.acceptsNav, smodel);
+                 break;
+             case e.RIGHT:
+                 e.stopEvent();
+                 ed.completeEdit();
+                 newCell = g.walkCells(ed.row, ed.col+1, 1, smodel.acceptsNav, smodel);
+                   break;
+        }
+       if (newCell) {
+            g.startEditing(newCell[0], newCell[1]);
+       }
+     }
 });
 // GridPanel默认分页条数
 var GRID_PADDING_LIMIT_10 = 10;
