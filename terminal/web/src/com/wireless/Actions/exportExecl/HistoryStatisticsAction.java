@@ -70,7 +70,7 @@ import com.wireless.util.SQLUtil;
 @SuppressWarnings("deprecation")
 public class HistoryStatisticsAction extends DispatchAction{
 	
-	private HSSFCellStyle headerStyle = null, titleStyle = null, strStyle = null, numStyle = null, normalNumStyle = null;
+	private HSSFCellStyle headerStyle = null, headerDetailStyle = null, titleStyle = null, strStyle = null, numStyle = null, normalNumStyle = null;
 	private HSSFFont headerFont = null, titleFont = null;
 	private HSSFDataFormat doubleForamt = null;
 	
@@ -87,27 +87,50 @@ public class HistoryStatisticsAction extends DispatchAction{
 		headerFont.setBoldweight(HSSFFont.BOLDWEIGHT_BOLD);
 		headerStyle.setFont(headerFont);
 		
+		headerStyle.setBorderTop((short)1);
+		headerStyle.setBorderBottom((short)1);
+		headerStyle.setBorderLeft((short)1);
+		headerStyle.setBorderRight((short)1);
+		
 		titleStyle = wb.createCellStyle();
 		titleStyle.setVerticalAlignment(HSSFCellStyle.VERTICAL_CENTER);
 		titleStyle.setAlignment(HSSFCellStyle.ALIGN_CENTER);
 		titleFont = wb.createFont();
-		titleFont.setFontHeight((short) 350);
+		titleFont.setFontHeight((short) 350);	
 		titleFont.setBoldweight(HSSFFont.BOLDWEIGHT_BOLD);
 		titleStyle.setFont(titleFont);
 		
 		strStyle = wb.createCellStyle();
 		strStyle.setVerticalAlignment(HSSFCellStyle.VERTICAL_CENTER);
 		strStyle.setAlignment(HSSFCellStyle.ALIGN_LEFT);
+		strStyle.setBorderTop((short)1);
+		strStyle.setBorderBottom((short)1);
+		strStyle.setBorderLeft((short)1);
+		strStyle.setBorderRight((short)1);
+		
+
+		headerDetailStyle = wb.createCellStyle();
+		headerDetailStyle.setVerticalAlignment(HSSFCellStyle.VERTICAL_CENTER);
+		headerDetailStyle.setAlignment(HSSFCellStyle.ALIGN_LEFT);
+
 		
 		doubleForamt = wb.createDataFormat();
 		numStyle = wb.createCellStyle();
 		numStyle.setAlignment(HSSFCellStyle.ALIGN_RIGHT);
 		numStyle.setVerticalAlignment(HSSFCellStyle.VERTICAL_CENTER);
 		numStyle.setDataFormat(doubleForamt.getFormat("0.00"));
+		numStyle.setBorderTop((short)1);
+		numStyle.setBorderBottom((short)1);
+		numStyle.setBorderLeft((short)1);
+		numStyle.setBorderRight((short)1);
 		
 		normalNumStyle = wb.createCellStyle();
 		normalNumStyle.setAlignment(HSSFCellStyle.ALIGN_RIGHT);
 		normalNumStyle.setVerticalAlignment(HSSFCellStyle.VERTICAL_CENTER);
+		normalNumStyle.setBorderTop((short)1);
+		normalNumStyle.setBorderBottom((short)1);
+		normalNumStyle.setBorderLeft((short)1);
+		normalNumStyle.setBorderRight((short)1);
 		
 	}
 	
@@ -1470,7 +1493,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 		cell.setCellValue(dept + "         原始单号: " + stockAction.getOriStockId() + "         货单日期: " + DateUtil.formatToDate(stockAction.getOriStockDate())
 				);
 
-		cell.setCellStyle(strStyle);
+		cell.setCellStyle(headerDetailStyle);
 		sheet.addMergedRegion(new CellRangeAddress(sheet.getLastRowNum(), sheet.getLastRowNum(), 0, 3));
 		
 		//审核人
@@ -1483,7 +1506,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 		}else{
 			cell.setCellValue("审核人: " + stockAction.getApprover() + "         审核时间: " + DateUtil.format(stockAction.getApproverDate()) + "         制单人: " + stockAction.getOperator() + "         制单时间: " + DateUtil.format(stockAction.getBirthDate()));
 		}
-		cell.setCellStyle(strStyle);
+		cell.setCellStyle(headerDetailStyle);
 		sheet.addMergedRegion(new CellRangeAddress(sheet.getLastRowNum(), sheet.getLastRowNum(), 0, 3));
 		
 		//数量, 金额
@@ -1492,7 +1515,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 		
 		cell = row.createCell(0);
 		cell.setCellValue("总数量: " + stockAction.getAmount() + "         总金额: " + stockAction.getTotalPrice() + "         实际金额: " + stockAction.getActualPrice());
-		cell.setCellStyle(strStyle);
+		cell.setCellStyle(headerDetailStyle);
 		sheet.addMergedRegion(new CellRangeAddress(sheet.getLastRowNum(), sheet.getLastRowNum(), 0, 3));
 		
 		//备注
@@ -1501,7 +1524,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 		
 		cell = row.createCell(0);
 		cell.setCellValue("备注: " + stockAction.getComment());
-		cell.setCellStyle(strStyle);
+		cell.setCellStyle(headerDetailStyle);
 		sheet.addMergedRegion(new CellRangeAddress(sheet.getLastRowNum(), sheet.getLastRowNum(), 0, 3));
 		
 		//空白

@@ -17,8 +17,10 @@ import com.wireless.db.client.member.MemberOperationDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
+import com.wireless.pojo.client.Member;
 import com.wireless.pojo.client.MemberOperation;
 import com.wireless.pojo.client.MemberOperation.OperationType;
+import com.wireless.pojo.client.MemberType;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.util.SQLUtil;
 
@@ -124,8 +126,15 @@ public class QueryMemberOperationAction extends Action{
 				sum.setOperateSeq(list.get(0).getOperateSeq());
 				sum.setStaffName(list.get(0).getStaffName());
 				for(MemberOperation temp : list){
-					temp.setMember(MemberDao.getMemberById(staff, temp.getMemberId()));
+					List<Member> members = MemberDao.getMember(staff, " AND M.member_id = " + temp.getMemberId(), null);
 					
+					if(members.isEmpty()){
+						MemberType delteMT = new MemberType(0);
+						delteMT.setName("已删除类型");
+						temp.getMember().setMemberType(delteMT);
+					}else{
+						temp.setMember(members.get(0));
+					}
 					sum.setDeltaBaseMoney(temp.getDeltaBaseMoney() + sum.getDeltaBaseMoney());
 					sum.setDeltaExtraMoney(temp.getDeltaExtraMoney() + sum.getDeltaExtraMoney());
 					sum.setChargeMoney(temp.getChargeMoney() + sum.getChargeMoney());

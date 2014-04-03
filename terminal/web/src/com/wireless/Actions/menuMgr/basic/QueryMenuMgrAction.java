@@ -44,6 +44,7 @@ public class QueryMenuMgrAction extends Action {
 			String kitchen = request.getParameter("kitchen");
 			String deptId = request.getParameter("deptId");
 			String operqtor = request.getParameter("operator");
+			String alias = request.getParameter("alias");
 			String name = request.getParameter("name");
 			String pinyin = request.getParameter("pinyin");
 			String price = request.getParameter("price");
@@ -99,6 +100,9 @@ public class QueryMenuMgrAction extends Action {
 			}
 			if(stockStatus != null && !stockStatus.trim().isEmpty()){
 				extraCond += (" AND FOOD.stock_status = " + stockStatus);
+			}
+			if(alias != null && !alias.trim().isEmpty() && !alias.equals("")){
+				extraCond += (" AND FOOD.food_alias " + operqtor + alias);
 			}
 			//****************  菜品状态处理
 			if(isSpecial != null && isSpecial.trim().equals("true")){
