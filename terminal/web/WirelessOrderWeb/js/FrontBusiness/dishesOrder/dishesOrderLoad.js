@@ -198,7 +198,7 @@ function initMenuForOperationFoodCount(){
 					fieldLabel : '数量',
 					width : 80,
 					validator : function(v){
-						if(v >= 1 && v <= 255){
+						if(v >= 0 && v <= 255){
 							return true;
 						}else{
 							return '菜品数量在 1 ~ 255 之间.';
@@ -229,7 +229,7 @@ function initMenuForOperationFoodCount(){
 					Ext.menu.MenuMgr.get('menuOperationFoodCount').hide();
 				}
 			}]
-		}), {hideOnClick : false}],
+		})],
 		listeners : {
 			show : function(){
 				var count = Ext.getCmp('numOperationFoodCount');
@@ -477,7 +477,7 @@ function initPasswordWin(){
 			width : 100,
 			fieldLabel : '数量',
 			validator : function(v){
-				if(v >= 1 && v <= 255){
+				if(v >= 0 && v <= 255){
 					return true;
 				}else{
 					return '菜品数量在 1 ~ 255 之间';
