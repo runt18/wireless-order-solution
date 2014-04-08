@@ -241,10 +241,12 @@ public class RestaurantDao {
 	 * 			throws if the restaurant to update does NOT exist
 	 */
 	public static void update(DBCon dbCon, Restaurant.UpdateBuilder builder) throws SQLException, BusinessException{
+
+		Restaurant restaurant = builder.build();
 		
 		String sql;
 		//Check to whether the duplicated account exist
-		sql = " SELECT * FROM " + Params.dbName + ".restaurant WHERE account = '" + builder.getAccount() + "'" + " AND " + " id <> " + builder.getId();
+		sql = " SELECT * FROM " + Params.dbName + ".restaurant WHERE account = '" + restaurant.getAccount() + "'" + " AND " + " id <> " + builder.getId();
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		if(dbCon.rs.next()){
 			throw new BusinessException(RestaurantError.DUPLICATED_RESTAURANT_ACCOUNT);
@@ -254,18 +256,27 @@ public class RestaurantDao {
 		//Update the basic.
 		sql = " UPDATE " + Params.dbName + ".restaurant SET " +
 			  " id = " + builder.getId() +
-			  (builder.isAccountChanged() ? " ,account = '" + builder.getAccount() + "'" : "") +
-			  (builder.isRestaurantNameChanged() ? " ,restaurant_name = '" + builder.getRestaurantName() + "'" : "") +
-			  (builder.isRestaurantInfoChanged() ? " ,restaurant_info = '" + builder.getRestaurantInfo() + "'" : "") +
-			  (builder.isTele1Changed() ? " ,tele1 = '" + builder.getTele1() + "'" : "") +
-			  (builder.isTele2Changed() ? " ,tele2 = '" + builder.getTele2() + "'" : "") +
-			  (builder.isAddressChanged() ? " ,address = '" + builder.getAddress() + "'" : "") +
-			  (builder.isRecordAliveChanged() ? " ,record_alive = " + builder.getRecordAlive().getSeconds() + "" : "") +
-			  (builder.isExpireDateChanged() ? " ,expire_date = '" + DateUtil.format(builder.getExpireDate()) + "'" : "") +
+			  (builder.isAccountChanged() ? " ,account = '" + restaurant.getAccount() + "'" : "") +
+			  (builder.isRestaurantNameChanged() ? " ,restaurant_name = '" + restaurant.getName() + "'" : "") +
+			  (builder.isRestaurantInfoChanged() ? " ,restaurant_info = '" + restaurant.getInfo() + "'" : "") +
+			  (builder.isTele1Changed() ? " ,tele1 = '" + restaurant.getTele1() + "'" : "") +
+			  (builder.isTele2Changed() ? " ,tele2 = '" + restaurant.getTele2() + "'" : "") +
+			  (builder.isAddressChanged() ? " ,address = '" + restaurant.getAddress() + "'" : "") +
+			  (builder.isRecordAliveChanged() ? " ,record_alive = " + restaurant.getRecordAlive() + "" : "") +
+			  (builder.isExpireDateChanged() ? " ,expire_date = '" + DateUtil.format(restaurant.getExpireDate()) + "'" : "") +
 			  " WHERE id = " + builder.getId();
 		
 		if(dbCon.stmt.executeUpdate(sql) == 0){
 			throw new BusinessException(RestaurantError.RESTAURANT_NOT_FOUND);
+		}
+		
+		//Update the module.
+		if(builder.isModuleChanged()){
+			sql = " DELETE FROM " + Params.dbName + ".restaurant_module WHERE restaurant_id = " + builder.getId();
+			dbCon.stmt.executeUpdate(sql);
+			for(Module module : restaurant.getModules()){
+				insertModule(dbCon, StaffDao.getAdminByRestaurant(builder.getId()), module);
+			}
 		}
 		
 		//Update the password to administrator of restaurant.
@@ -395,25 +406,28 @@ public class RestaurantDao {
 
 	}
 	
+	private static void insertModule(DBCon dbCon, Staff staff, Module module) throws SQLException, BusinessException{
+		int moduleId = 0;
+		String sql = " SELECT module_id FROM " + Params.dbName + ".module WHERE code = " + module.getCode().getVal();
+		dbCon.rs = dbCon.stmt.executeQuery(sql);
+		if(dbCon.rs.next()){
+			moduleId = dbCon.rs.getInt("module_id");
+		}else{
+			throw new BusinessException(RestaurantError.MODULE_NOT_EXIST);
+		}
+		dbCon.rs.close();
+		
+		sql = " INSERT INTO " + Params.dbName + ".restaurant_module " +
+			  " (restaurant_id, module_id) " +
+			  " VALUES(" +
+			  staff.getRestaurantId() + "," +
+			  moduleId + ")";
+		dbCon.stmt.executeUpdate(sql);
+	}
+	
 	private static void initModule(DBCon dbCon, Staff staff, Restaurant restaurant) throws SQLException, BusinessException{
 		for(Module module : restaurant.getModules()){
-			int moduleId = 0;
-			String sql = " SELECT module_id FROM " + Params.dbName + ".module WHERE code = " + module.getCode().getVal();
-			dbCon.rs = dbCon.stmt.executeQuery(sql);
-			if(dbCon.rs.next()){
-				moduleId = dbCon.rs.getInt("module_id");
-			}else{
-				throw new BusinessException(RestaurantError.MODULE_NOT_EXIST);
-			}
-			dbCon.rs.close();
-			
-			sql = " INSERT INTO " + Params.dbName + ".restaurant_module " +
-				  " (restaurant_id, module_id) " +
-				  " VALUES(" +
-				  staff.getRestaurantId() + "," +
-				  moduleId + ")";
-			dbCon.stmt.executeUpdate(sql);
-				  
+			insertModule(dbCon, staff, module);
 		}
 	}
 	
@@ -821,56 +835,6 @@ public class RestaurantDao {
 		//Delete the restaurant module
 		sql = " DELETE FROM " + Params.dbName + ".restaurant_module WHERE restaurant_id = " + restaurantId;
 		dbCon.stmt.executeUpdate(sql);
-	}
-	
-	/**
-	 * Update a specified restaurant. 
-	 * @param term
-	 * 			the terminal
-	 * @param restaurant
-	 * 			the restaurant to update
-	 * @return the count to modified restaurant record
-	 * @throws BusinessException
-	 * 			if the restaurant to update does NOT exist
-	 * @throws SQLException
-	 * 			if failed to execute any SQL statements
-	 */
-	public static void update(Staff term, Restaurant restaurant) throws SQLException, BusinessException {
-		DBCon dbCon = new DBCon();
-		try{
-			dbCon.connect();
-			update(dbCon, term, restaurant);
-		}finally{
-			dbCon.disconnect();
-		}
-	}
-	
-	/**
-	 * Update a specified restaurant. 
-	 * @param dbCon
-	 * 			The database connection
-	 * @param term
-	 * 			the terminal
-	 * @param restaurant
-	 * 			the restaurant to update
-	 * @return the count to modified restaurant record
-	 * @throws BusinessException
-	 * 			if the restaurant to update does NOT exist
-	 * @throws SQLException
-	 * 			if failed to execute any SQL statements
-	 */
-	private static void update(DBCon dbCon, Staff term, Restaurant restaurant) throws SQLException, BusinessException{
-		String sql = " UPDATE " + Params.dbName + ".restaurant SET " +
-					 " restaurant_info = '" + restaurant.getInfo() + "'," +
-					 " address = '" + restaurant.getAddress() + "'," +
-					 " restaurant.tele1 = '" + restaurant.getTele1() + "'," +
-					 " restaurant.tele2 = '" + restaurant.getTele2() + "' " +
-					 " WHERE " +
-					 " id = " + term.getRestaurantId();
-		
-		if(dbCon.stmt.executeUpdate(sql) != 1){
-			throw new BusinessException(RestaurantError.UPDATE_RESTAURANT_FAIL);
-		}
 	}
 	
 	/**

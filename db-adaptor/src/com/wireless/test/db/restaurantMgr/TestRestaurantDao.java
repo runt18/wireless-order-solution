@@ -118,20 +118,41 @@ public class TestRestaurantDao {
 														 		   .setTele1("测试号码2")
 														 		   .setTele2("测试号码2")
 														 		   .setRecordAlive(RecordAlive.ONE_YEAR)
-														 		   .setExpireDate(new SimpleDateFormat("yyyy-MM-dd").parse("2015-01-01").getTime());
+														 		   .setExpireDate(new SimpleDateFormat("yyyy-MM-dd").parse("2015-01-01").getTime())
+														 		   .addModule(Module.Code.INVENTORY)
+														 		   .addModule(Module.Code.MEMBER);
 			
 			RestaurantDao.update(updateBuilder);
 			
-			actual.setAccount(updateBuilder.getAccount());
-			actual.setName(updateBuilder.getRestaurantName());
-			actual.setInfo(updateBuilder.getRestaurantInfo());
-			actual.setRecordAlive(updateBuilder.getRecordAlive());
-			actual.setTele1(updateBuilder.getTele1());
-			actual.setTele2(updateBuilder.getTele2());
-			actual.setAddress(updateBuilder.getAddress());
-			actual.setExpireDate(updateBuilder.getExpireDate());
+			if(updateBuilder.isTele2Changed()){
+				expected.setTele2(updateBuilder.build().getTele2());
+			}
+			if(updateBuilder.isTele1Changed()){
+				expected.setTele1(updateBuilder.build().getTele1());
+			}
+			if(updateBuilder.isRestaurantNameChanged()){
+				expected.setName(updateBuilder.build().getName());
+			}
+			if(updateBuilder.isRestaurantInfoChanged()){
+				expected.setInfo(updateBuilder.build().getInfo());
+			}
+			if(updateBuilder.isRecordAliveChanged()){
+				expected.setRecordAlive(updateBuilder.build().getRecordAlive());
+			}
+			if(updateBuilder.isModuleChanged()){
+				expected.setModule(updateBuilder.build().getModules());
+			}
+			if(updateBuilder.isExpireDateChanged()){
+				expected.setExpireDate(updateBuilder.build().getExpireDate());
+			}
+			if(updateBuilder.isAddressChanged()){
+				expected.setAddress(updateBuilder.build().getAddress());
+			}
+			if(updateBuilder.isAccountChanged()){
+				expected.setAccount(updateBuilder.build().getAccount());
+			}
 			
-			expected = RestaurantDao.getById(restaurantId);
+			actual = RestaurantDao.getById(restaurantId);
 			compareRestaurant(expected, actual);
 			
 		}finally{
@@ -347,8 +368,6 @@ public class TestRestaurantDao {
 		assertEquals("restaurant birth date", expected.getBirthDate(), actual.getBirthDate());
 		assertEquals("restaurant expire date", expected.getExpireDate(), actual.getExpireDate());
 		assertEquals("restaurant record alive", expected.getRecordAlive(), actual.getRecordAlive());
-		List<Module> initModules = actual.getModules();
-		assertEquals("init modules", 1, initModules.size());
-		assertEquals("init modules", Module.Code.BASIC, initModules.get(0).getCode());
+		assertEquals("init modules", expected.getModules(), actual.getModules());
 	}
 }
