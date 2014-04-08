@@ -103,7 +103,7 @@ public class Staff implements Parcelable, Jsonable{
 	private Role role;
 	
 
-	public static class DefAdminBuilder extends StaffInsertBuilder{
+	public static class DefAdminBuilder extends InsertBuilder{
 		
 		public final static String ADMIN = "管理员";
 		
@@ -113,7 +113,7 @@ public class Staff implements Parcelable, Jsonable{
 		}
 	}
 	
-	public static class StaffInsertBuilder{
+	public static class InsertBuilder{
 		private final int restaurantId;
 		private final Role role;
 		private final String name;
@@ -121,7 +121,7 @@ public class Staff implements Parcelable, Jsonable{
 		private String mobile;
 		private Type type = Type.NORMAL;
 
-		public StaffInsertBuilder(String name, String pwd, int restaurantId, Role role){
+		public InsertBuilder(String name, String pwd, int restaurantId, Role role){
 			this.name = name;
 			this.restaurantId = restaurantId;
 			this.role = role;
@@ -163,14 +163,14 @@ public class Staff implements Parcelable, Jsonable{
 	}
 	
 	
-	public static class StaffUpdateBuilder{
+	public static class UpdateBuilder{
 		private final int staffId;
 		private String staffName;
 		private String staffPwd;
 		private String mobile;
 		private int roleId;
 
-		public StaffUpdateBuilder(int staffId){
+		public UpdateBuilder(int staffId){
 			this.staffId = staffId;
 		}
 		
@@ -181,7 +181,7 @@ public class Staff implements Parcelable, Jsonable{
 		public int getRoleId() {
 			return roleId;
 		}
-		public StaffUpdateBuilder setRoleId(int roleId) {
+		public UpdateBuilder setRoleId(int roleId) {
 			this.roleId = roleId;
 			return this;
 		}
@@ -190,7 +190,7 @@ public class Staff implements Parcelable, Jsonable{
 			return staffName;
 		}
 		
-		public StaffUpdateBuilder setStaffName(String staffName) {
+		public UpdateBuilder setStaffName(String staffName) {
 			this.staffName = staffName;
 			return this;
 		}
@@ -199,7 +199,7 @@ public class Staff implements Parcelable, Jsonable{
 			return staffPwd;
 		}
 		
-		public StaffUpdateBuilder setStaffPwd(String pwd) {
+		public UpdateBuilder setStaffPwd(String pwd) {
 			if(pwd != null){
 				if(pwd.trim().length() > 0){
 					this.staffPwd = pwd;
@@ -212,7 +212,7 @@ public class Staff implements Parcelable, Jsonable{
 			return mobile;
 		}
 		
-		public StaffUpdateBuilder setMobile(String mobile) {
+		public UpdateBuilder setMobile(String mobile) {
 			this.mobile = mobile;
 			return this;
 		}
@@ -237,7 +237,7 @@ public class Staff implements Parcelable, Jsonable{
 		setName(name);
 	}
 	
-	private Staff(StaffInsertBuilder builder){
+	private Staff(InsertBuilder builder){
 		setRestaurantId(builder.getRestaurantId());
 		setRole(builder.getRole());
 		setMobile(builder.getMobile());
@@ -246,7 +246,7 @@ public class Staff implements Parcelable, Jsonable{
 		setType(builder.getType());
 	}
 	
-	private Staff(StaffUpdateBuilder builder){
+	private Staff(UpdateBuilder builder){
 		setMobile(builder.getMobile());
 		setName(builder.getStaffName());
 		setPwd(builder.getStaffPwd());
@@ -272,7 +272,7 @@ public class Staff implements Parcelable, Jsonable{
 
 	public String getName() {
 		if(name == null){
-			name = "";
+			return "";
 		}
 		return name;
 	}
@@ -291,7 +291,7 @@ public class Staff implements Parcelable, Jsonable{
 	
 	public String getMobile() {
 		if(mobile == null){
-			mobile = "";
+			return "";
 		}
 		return mobile;
 	}
@@ -302,7 +302,7 @@ public class Staff implements Parcelable, Jsonable{
 
 	public String getPwd() {
 		if(pwd == null){
-			pwd = "";
+			return "";
 		}
 		return pwd;
 	}

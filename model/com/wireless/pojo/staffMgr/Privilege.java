@@ -14,20 +14,23 @@ import com.wireless.pojo.distMgr.Discount;
 public class Privilege implements Comparable<Privilege>, Parcelable, Jsonable{
 
 	public static enum Cate{
-		FRONT_BUSINESS(1, "前台"),
-		BASIC(2, "后台"),
-		INVENTORY(3, "库存"),
-		HISTORY(4, "历史"),
-		MEMBER(5, "会员"),
-		SYSTEM(6, "系统"),
-		WEIXIN(7, "微信");
+		UNKNOWN(0, "未知", 0),
+		FRONT_BUSINESS(1, "前台", 1),
+		BASIC(2, "后台", 2),
+		INVENTORY(3, "库存", 3),
+		HISTORY(4, "历史", 4),
+		MEMBER(5, "会员", 5),
+		SYSTEM(6, "系统", 7),
+		WEIXIN(7, "微信", 6);
 		
 		private final int val;
 		private final String desc;
+		private final int displayId;
 		
-		Cate(int val, String desc){
+		Cate(int val, String desc, int displayId){
 			this.val = val;
 			this.desc = desc;
+			this.displayId = displayId;
 		}
 		
 		public static Cate valueOf(int val){
@@ -36,7 +39,7 @@ public class Privilege implements Comparable<Privilege>, Parcelable, Jsonable{
 					return cate;
 				}
 			}
-			throw new IllegalArgumentException("The cate(val = " + val + ") is invalid.");
+			return UNKNOWN;
 		}
 		
 		@Override
@@ -51,9 +54,14 @@ public class Privilege implements Comparable<Privilege>, Parcelable, Jsonable{
 		public String getDesc(){
 			return desc;
 		}
+		
+		public int getDisplayId(){
+			return displayId;
+		}
 	}
 	
 	public static enum Code{
+		UNKNOWN(0, Cate.UNKNOWN, "未知"),
 		ADD_FOOD(1000, Cate.FRONT_BUSINESS, "点菜"),
 		CANCEL_FOOD(1001, Cate.FRONT_BUSINESS, "退菜"),
 		DISCOUNT(1002, Cate.FRONT_BUSINESS, "折扣"),
@@ -84,7 +92,7 @@ public class Privilege implements Comparable<Privilege>, Parcelable, Jsonable{
 					return code;
 				}
 			}
-			throw new IllegalArgumentException("The code(val = " + val + ") is invalid.");
+			return UNKNOWN;
 		}
 		
 		@Override

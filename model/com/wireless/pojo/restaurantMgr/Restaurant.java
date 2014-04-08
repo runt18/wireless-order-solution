@@ -2,6 +2,7 @@ package com.wireless.pojo.restaurantMgr;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -27,12 +28,14 @@ public class Restaurant implements Parcelable, Jsonable{
 		private String tele1;
 		private String tele2;
 		private String address;
+		private final List<Module> modules = new ArrayList<Module>();
 		
 		public InsertBuilder(String account, String restaurantName, long expireDate, String pwd){
 			this.account = account;
 			this.restaurantName = restaurantName;
 			this.expireDate = expireDate;
 			this.pwd = pwd;
+			modules.add(new Module(Module.Code.BASIC));
 		}
 		
 		public InsertBuilder setRestaurantInfo(String info){
@@ -64,6 +67,14 @@ public class Restaurant implements Parcelable, Jsonable{
 			return this.pwd;
 		}
 		
+		public InsertBuilder addModule(Module.Code code){
+			Module module = new Module(code);
+			if(!modules.contains(module)){
+				modules.add(module);
+			}
+			return this;
+		}
+		
 		public Restaurant build(){
 			return new Restaurant(this);
 		}
@@ -81,6 +92,7 @@ public class Restaurant implements Parcelable, Jsonable{
 		private String tele1;
 		private String tele2;
 		private String address;
+		private final List<Module> modules = new ArrayList<Module>(); 
 		
 		public UpdateBuilder(int id, String account){
 			this.id = id;
@@ -91,9 +103,17 @@ public class Restaurant implements Parcelable, Jsonable{
 			return this.account;
 		}
 		
+		public boolean isAccountChanged(){
+			return this.account != null;
+		}
+		
 		public UpdateBuilder setRestaurantName(String name){
 			this.restaurantName = name;
 			return this;
+		}
+		
+		public boolean isRestaurantNameChanged(){
+			return this.restaurantName != null;
 		}
 		
 		public String getRestaurantName(){
@@ -105,6 +125,10 @@ public class Restaurant implements Parcelable, Jsonable{
 			return this;
 		}
 		
+		public boolean isExpireDateChanged(){
+			return this.expireDate != 0;
+		}
+		
 		public long getExpireDate(){
 			return this.expireDate;
 		}
@@ -114,11 +138,19 @@ public class Restaurant implements Parcelable, Jsonable{
 			return this;
 		}
 		
+		public boolean isPwdChanged(){
+			return this.pwd != null;
+		}
+		
 		public UpdateBuilder setRestaurantInfo(String info){
 			this.restaurantInfo = info;
 			return this;
 		}
 
+		public boolean isRestaurantInfoChanged(){
+			return this.restaurantInfo != null;
+		}
+		
 		public String getRestaurantInfo(){
 			return this.restaurantInfo;
 		}
@@ -126,6 +158,10 @@ public class Restaurant implements Parcelable, Jsonable{
 		public UpdateBuilder setRecordAlive(RecordAlive recordAlive){
 			this.recordAlive = recordAlive;
 			return this;
+		}
+		
+		public boolean isRecordAliveChanged(){
+			return this.recordAlive != null;
 		}
 		
 		public RecordAlive getRecordAlive(){
@@ -137,6 +173,10 @@ public class Restaurant implements Parcelable, Jsonable{
 			return this;
 		}
 		
+		public boolean isTele1Changed(){
+			return this.tele1 != null;
+		}
+		
 		public String getTele1(){
 			return this.tele1;
 		}
@@ -146,6 +186,10 @@ public class Restaurant implements Parcelable, Jsonable{
 			return this;
 		}
 		
+		public boolean isTele2Changed(){
+			return this.tele2 != null;
+		}
+		
 		public String getTele2(){
 			return this.tele2;
 		}
@@ -153,6 +197,10 @@ public class Restaurant implements Parcelable, Jsonable{
 		public UpdateBuilder setAddress(String address){
 			this.address = address;
 			return this;
+		}
+		
+		public boolean isAddressChanged(){
+			return this.address != null;
 		}
 		
 		public String getAddress(){
@@ -165,6 +213,18 @@ public class Restaurant implements Parcelable, Jsonable{
 		
 		public int getId(){
 			return id;
+		}
+		
+		public UpdateBuilder addModule(Module.Code code){
+			Module module = new Module(code);
+			if(!this.modules.contains(module)){
+				modules.add(module);
+			}
+			return this;
+		}
+		
+		public boolean isModuleChanged(){
+			return !modules.isEmpty();
 		}
 		
 	}
@@ -247,6 +307,7 @@ public class Restaurant implements Parcelable, Jsonable{
 	private float liveness;
 	private long birthDate;
 	private long expireDate;
+	private final List<Module> modules = new ArrayList<Module>();
 	
 	public Restaurant(){
 		
@@ -269,6 +330,7 @@ public class Restaurant implements Parcelable, Jsonable{
 		try {
 			setBirthDate(new SimpleDateFormat(DateUtil.Pattern.DATE.getPattern(), Locale.getDefault()).parse(now).getTime());
 		} catch (ParseException ignored) {}
+		setModule(builder.modules);
 	}
 	
 	public int getId() {
@@ -397,6 +459,27 @@ public class Restaurant implements Parcelable, Jsonable{
 		}
 	}
 
+	public void addModule(Module module){
+		if(!modules.contains(module)){
+			modules.add(module);
+		}
+	}
+	
+	public void setModule(List<Module> modules){
+		this.modules.clear();
+		for(Module module : modules){
+			addModule(module);
+		}
+	}
+	
+	public List<Module> getModules(){
+		return Collections.unmodifiableList(modules);
+	}
+	
+	public boolean hasModule(Module.Code code){
+		return modules.contains(new Module(code));
+	}
+	
 	@Override
 	public int hashCode(){
 		return id * 31 + 17;
