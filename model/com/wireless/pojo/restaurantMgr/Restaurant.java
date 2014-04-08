@@ -14,6 +14,7 @@ import com.wireless.json.Jsonable;
 import com.wireless.parcel.Parcel;
 import com.wireless.parcel.Parcelable;
 import com.wireless.pojo.util.DateUtil;
+import com.wireless.pojo.util.SortedList;
 
 
 public class Restaurant implements Parcelable, Jsonable{
@@ -92,17 +93,13 @@ public class Restaurant implements Parcelable, Jsonable{
 		private String tele1;
 		private String tele2;
 		private String address;
-		private final List<Module> modules = new ArrayList<Module>(); 
+		private final List<Module> modules = SortedList.newInstance(); 
 		
 		public UpdateBuilder(int id, String account){
 			this.id = id;
 			this.account = account;
 		}
 
-		public String getAccount(){
-			return this.account;
-		}
-		
 		public boolean isAccountChanged(){
 			return this.account != null;
 		}
@@ -116,10 +113,6 @@ public class Restaurant implements Parcelable, Jsonable{
 			return this.restaurantName != null;
 		}
 		
-		public String getRestaurantName(){
-			return this.restaurantName;
-		}
-		
 		public UpdateBuilder setExpireDate(long expiredate){
 			this.expireDate = expiredate;
 			return this;
@@ -127,10 +120,6 @@ public class Restaurant implements Parcelable, Jsonable{
 		
 		public boolean isExpireDateChanged(){
 			return this.expireDate != 0;
-		}
-		
-		public long getExpireDate(){
-			return this.expireDate;
 		}
 		
 		public UpdateBuilder setPwd(String pwd){
@@ -151,10 +140,6 @@ public class Restaurant implements Parcelable, Jsonable{
 			return this.restaurantInfo != null;
 		}
 		
-		public String getRestaurantInfo(){
-			return this.restaurantInfo;
-		}
-		
 		public UpdateBuilder setRecordAlive(RecordAlive recordAlive){
 			this.recordAlive = recordAlive;
 			return this;
@@ -162,10 +147,6 @@ public class Restaurant implements Parcelable, Jsonable{
 		
 		public boolean isRecordAliveChanged(){
 			return this.recordAlive != null;
-		}
-		
-		public RecordAlive getRecordAlive(){
-			return this.recordAlive;
 		}
 		
 		public UpdateBuilder setTele1(String tele1){
@@ -177,10 +158,6 @@ public class Restaurant implements Parcelable, Jsonable{
 			return this.tele1 != null;
 		}
 		
-		public String getTele1(){
-			return this.tele1;
-		}
-		
 		public UpdateBuilder setTele2(String tele2){
 			this.tele2 = tele2;
 			return this;
@@ -190,10 +167,6 @@ public class Restaurant implements Parcelable, Jsonable{
 			return this.tele2 != null;
 		}
 		
-		public String getTele2(){
-			return this.tele2;
-		}
-		
 		public UpdateBuilder setAddress(String address){
 			this.address = address;
 			return this;
@@ -201,10 +174,6 @@ public class Restaurant implements Parcelable, Jsonable{
 		
 		public boolean isAddressChanged(){
 			return this.address != null;
-		}
-		
-		public String getAddress(){
-			return this.address;
 		}
 		
 		public String getPwd(){
@@ -227,6 +196,9 @@ public class Restaurant implements Parcelable, Jsonable{
 			return !modules.isEmpty();
 		}
 		
+		public Restaurant build(){
+			return new Restaurant(this);
+		}
 	}
 	
 	public final static byte RESTAURANT_PARCELABLE_COMPLEX = 0;
@@ -294,6 +266,7 @@ public class Restaurant implements Parcelable, Jsonable{
 		public String toString(){
 			return "RecordAlive(val = " + val + ",desc = " + desc + ")";
 		}
+		
 	}
 	
 	private int id;
@@ -318,6 +291,23 @@ public class Restaurant implements Parcelable, Jsonable{
 	}
 	
 	private Restaurant(InsertBuilder builder){
+		setAccount(builder.account);
+		setName(builder.restaurantName);
+		setInfo(builder.restaurantInfo);
+		setRecordAlive(builder.recordAlive.getSeconds());
+		setTele1(builder.tele1);
+		setTele2(builder.tele2);
+		setAddress(builder.address);
+		setExpireDate(builder.expireDate);
+		String now = new SimpleDateFormat(DateUtil.Pattern.DATE.getPattern(), Locale.getDefault()).format(new Date());
+		try {
+			setBirthDate(new SimpleDateFormat(DateUtil.Pattern.DATE.getPattern(), Locale.getDefault()).parse(now).getTime());
+		} catch (ParseException ignored) {}
+		setModule(builder.modules);
+	}
+	
+	private Restaurant(UpdateBuilder builder){
+		setId(builder.id);
 		setAccount(builder.account);
 		setName(builder.restaurantName);
 		setInfo(builder.restaurantInfo);

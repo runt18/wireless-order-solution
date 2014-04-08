@@ -1,6 +1,6 @@
 package com.wireless.pojo.restaurantMgr;
 
-public class Module {
+public class Module implements Comparable<Module>{
 
 	public static enum Cate{
 		UNKNOWN(0, "unknown"),
@@ -80,7 +80,7 @@ public class Module {
 		
 		@Override
 		public String toString(){
-			return this.cate.desc + "," + this.desc;
+			return desc;
 		}
 	}
 	
@@ -125,5 +125,16 @@ public class Module {
 	@Override
 	public String toString(){
 		return code.toString();
+	}
+
+	@Override
+	public int compareTo(Module module) {
+		if(code.val > module.code.val){
+			return 1;
+		}else if(code.val < module.code.val){
+			return -1;
+		}else{
+			return 0;
+		}
 	}
 }
