@@ -2,6 +2,8 @@ package com.wireless.Actions.roleMgr;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -122,7 +124,22 @@ public class QueryPrivilegeAction extends DispatchAction{
 			
 			tree.append("[");
 			
-			for (Privilege privilege : RoleDao.getRoleById(staff, staff.getRole().getId()).getPrivileges()) {
+			List<Privilege> privileges = new ArrayList<Privilege>(RoleDao.getRoleById(staff, staff.getRole().getId()).getPrivileges());
+			Collections.sort(privileges, new Comparator<Privilege>(){
+				@Override
+				public int compare(Privilege p0, Privilege p1) {
+					if(p0.getCate().getDisplayId() < p1.getCate().getDisplayId()){
+						return -1;
+					}else if(p0.getCate().getDisplayId() > p1.getCate().getDisplayId()){
+						return 1;
+					}else{
+						return 0;
+					}
+				}
+				
+			});
+			
+			for (Privilege privilege : privileges) {
 				if(privilege.getCode() == Code.BASIC){
 					tree.append("{");
 					tree.append("leaf:false");

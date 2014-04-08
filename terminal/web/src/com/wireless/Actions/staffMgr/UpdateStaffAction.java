@@ -15,7 +15,7 @@ import com.wireless.exception.BusinessException;
 import com.wireless.exception.StaffError;
 import com.wireless.json.JObject;
 import com.wireless.pojo.staffMgr.Staff;
-import com.wireless.pojo.staffMgr.Staff.StaffUpdateBuilder;
+import com.wireless.pojo.staffMgr.Staff.UpdateBuilder;
 
 public class UpdateStaffAction extends Action {
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
@@ -43,7 +43,7 @@ public class UpdateStaffAction extends Action {
 				}
 			}
 			
-			StaffUpdateBuilder builder = new StaffUpdateBuilder(Integer.parseInt(staffId))
+			UpdateBuilder builder = new UpdateBuilder(Integer.parseInt(staffId))
 			 .setStaffName(staffName)
 			 .setStaffPwd(staffPwd)
 			 .setMobile(tele)

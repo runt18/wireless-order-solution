@@ -14,7 +14,7 @@ import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.json.JObject;
 import com.wireless.pojo.staffMgr.Role;
 import com.wireless.pojo.staffMgr.Staff;
-import com.wireless.pojo.staffMgr.Staff.StaffInsertBuilder;
+import com.wireless.pojo.staffMgr.Staff.InsertBuilder;
 import com.wireless.util.WebParams;
 
 public class InsertStaffAction extends Action {
@@ -35,7 +35,7 @@ public class InsertStaffAction extends Action {
 			String roleId = request.getParameter("roleId");
 			String tele = request.getParameter("tele");
 			
-			StaffInsertBuilder builder = new StaffInsertBuilder(staffName, staffPwd, staff.getRestaurantId(), new Role(Integer.parseInt(roleId)));
+			InsertBuilder builder = new InsertBuilder(staffName, staffPwd, staff.getRestaurantId(), new Role(Integer.parseInt(roleId)));
 			builder.setMobile(tele);
 			
 			StaffDao.insertStaff(builder);
