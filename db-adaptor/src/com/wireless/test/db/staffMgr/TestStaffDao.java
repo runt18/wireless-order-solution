@@ -14,8 +14,8 @@ import com.wireless.exception.BusinessException;
 import com.wireless.pojo.staffMgr.Role;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.staffMgr.Staff.DefAdminBuilder;
-import com.wireless.pojo.staffMgr.Staff.StaffInsertBuilder;
-import com.wireless.pojo.staffMgr.Staff.StaffUpdateBuilder;
+import com.wireless.pojo.staffMgr.Staff.InsertBuilder;
+import com.wireless.pojo.staffMgr.Staff.UpdateBuilder;
 import com.wireless.test.db.TestInit;
 
 public class TestStaffDao {
@@ -75,7 +75,7 @@ public class TestStaffDao {
 				}
 			}
 			//添加新员工
-			StaffInsertBuilder builder = new StaffInsertBuilder("鸣人", "123", mStaff.getRestaurantId(), staffRole);
+			InsertBuilder builder = new InsertBuilder("鸣人", "123", mStaff.getRestaurantId(), staffRole);
 
 			builder.setMobile("13533464033");
 			
@@ -90,7 +90,7 @@ public class TestStaffDao {
 			compare(expected, actual);
 			
 			//修改信息
-			StaffUpdateBuilder updateBuilder = new StaffUpdateBuilder(staffId);
+			UpdateBuilder updateBuilder = new UpdateBuilder(staffId);
 			
 			updateBuilder.setStaffPwd("321");
 			updateBuilder.setStaffName("佐助");

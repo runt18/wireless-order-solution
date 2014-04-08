@@ -14,8 +14,8 @@ import com.wireless.exception.StaffError;
 import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.staffMgr.Role;
 import com.wireless.pojo.staffMgr.Staff;
-import com.wireless.pojo.staffMgr.Staff.StaffInsertBuilder;
-import com.wireless.pojo.staffMgr.Staff.StaffUpdateBuilder;
+import com.wireless.pojo.staffMgr.Staff.InsertBuilder;
+import com.wireless.pojo.staffMgr.Staff.UpdateBuilder;
 
 public class StaffDao {
 
@@ -437,7 +437,7 @@ public class StaffDao {
 	 * @return	the id of staff just create
 	 * @throws SQLException
 	 */
-	public static int insertStaff(StaffInsertBuilder builder) throws SQLException{
+	public static int insertStaff(InsertBuilder builder) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -453,7 +453,7 @@ public class StaffDao {
 	 * @return
 	 * @throws SQLException
 	 */
-	public static int insertStaff(DBCon dbCon, StaffInsertBuilder builder) throws SQLException{
+	public static int insertStaff(DBCon dbCon, InsertBuilder builder) throws SQLException{
 		String sql = "INSERT INTO " + Params.dbName + ".staff(restaurant_id, role_id, name, tele, pwd, type) VALUES(" +
 					builder.getRestaurantId() + ", " +
 					builder.getRole().getId() + ", " +
@@ -482,7 +482,7 @@ public class StaffDao {
 	 * @throws BusinessException 
 	 * 			throws if the staff to update does NOT exist
 	 */
-	public static void updateStaff(StaffUpdateBuilder builder) throws SQLException, BusinessException{
+	public static void updateStaff(UpdateBuilder builder) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -502,7 +502,7 @@ public class StaffDao {
 	 * @throws BusinessException 
 	 * 			throws if the staff to update does NOT exist
 	 */
-	public static void updateStaff(DBCon dbCon, StaffUpdateBuilder builder) throws SQLException, BusinessException{
+	public static void updateStaff(DBCon dbCon, UpdateBuilder builder) throws SQLException, BusinessException{
 		String sql;
 		sql = " UPDATE " + Params.dbName + ".staff SET " + 
 			  " staff_id = " + builder.getStaffId() +

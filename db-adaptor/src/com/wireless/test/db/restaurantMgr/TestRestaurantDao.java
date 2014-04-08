@@ -37,6 +37,7 @@ import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.pojo.regionMgr.Region;
 import com.wireless.pojo.regionMgr.Table;
+import com.wireless.pojo.restaurantMgr.Module;
 import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.restaurantMgr.Restaurant.RecordAlive;
 import com.wireless.pojo.staffMgr.Role;
@@ -63,10 +64,10 @@ public class TestRestaurantDao {
 															 .setTele2("020-85473215");
 			restaurantId = RestaurantDao.insert(builder);
 			
-			Restaurant actual = builder.build();
-			actual.setId(restaurantId);
+			Restaurant expected = builder.build();
+			expected.setId(restaurantId);
 			
-			Restaurant expected = RestaurantDao.getById(restaurantId);
+			Restaurant actual = RestaurantDao.getById(restaurantId);
 			//Compare the basic info
 			compareRestaurant(expected, actual);
 			
@@ -346,5 +347,8 @@ public class TestRestaurantDao {
 		assertEquals("restaurant birth date", expected.getBirthDate(), actual.getBirthDate());
 		assertEquals("restaurant expire date", expected.getExpireDate(), actual.getExpireDate());
 		assertEquals("restaurant record alive", expected.getRecordAlive(), actual.getRecordAlive());
+		List<Module> initModules = actual.getModules();
+		assertEquals("init modules", 1, initModules.size());
+		assertEquals("init modules", Module.Code.BASIC, initModules.get(0).getCode());
 	}
 }

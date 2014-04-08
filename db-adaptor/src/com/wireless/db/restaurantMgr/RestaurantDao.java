@@ -32,6 +32,7 @@ import com.wireless.pojo.printScheme.PStyle;
 import com.wireless.pojo.printScheme.Printer;
 import com.wireless.pojo.regionMgr.Region;
 import com.wireless.pojo.regionMgr.Table;
+import com.wireless.pojo.restaurantMgr.Module;
 import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.staffMgr.Role;
 import com.wireless.pojo.staffMgr.Staff;
@@ -172,9 +173,8 @@ public class RestaurantDao {
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		
 		while(dbCon.rs.next()){
-			Restaurant restaurant = new Restaurant();
+			Restaurant restaurant = new Restaurant(dbCon.rs.getInt("id"));
 			restaurant.setAccount(dbCon.rs.getString("account"));
-			restaurant.setId(dbCon.rs.getInt("id"));
 			restaurant.setRecordAlive(dbCon.rs.getInt("record_alive"));
 			restaurant.setInfo(dbCon.rs.getString("restaurant_info"));
 			restaurant.setName(dbCon.rs.getString("restaurant_name"));
@@ -193,6 +193,19 @@ public class RestaurantDao {
 			result.add(restaurant);
 		}
 		dbCon.rs.close();
+		
+		//Get the modules to each restaurant.
+		for(Restaurant eachRestaurant : result){
+			sql = " SELECT M.module_id, M.code FROM " + Params.dbName + ".restaurant_module RM "	+
+				  " JOIN " + Params.dbName + ".module M " + " ON RM.module_id = M.module_id " + 
+				  " WHERE RM.restaurant_id = " + eachRestaurant.getId();
+			dbCon.rs = dbCon.stmt.executeQuery(sql);
+			while(dbCon.rs.next()){
+				eachRestaurant.addModule(new Module(dbCon.rs.getInt("module_id"), 
+													Module.Code.valueOf(dbCon.rs.getInt("code"))));
+			}
+			dbCon.rs.close();
+		}
 		
 		return result;
 	}
@@ -238,16 +251,17 @@ public class RestaurantDao {
 		}
 		dbCon.rs.close();
 		
+		//Update the basic.
 		sql = " UPDATE " + Params.dbName + ".restaurant SET " +
 			  " id = " + builder.getId() +
-			  (builder.getAccount() != null ? " ,account = '" + builder.getAccount() + "'" : "") +
-			  (builder.getRestaurantName() != null ? " ,restaurant_name = '" + builder.getRestaurantName() + "'" : "") +
-			  (builder.getRestaurantInfo() != null ? " ,restaurant_info = '" + builder.getRestaurantInfo() + "'" : "") +
-			  (builder.getTele1() != null ? " ,tele1 = '" + builder.getTele1() + "'" : "") +
-			  (builder.getTele2() != null ? " ,tele2 = '" + builder.getTele2() + "'" : "") +
-			  (builder.getAddress() != null ? " ,address = '" + builder.getAddress() + "'" : "") +
-			  (builder.getRecordAlive() != null ? " ,record_alive = " + builder.getRecordAlive().getSeconds() + "" : "") +
-			  (builder.getExpireDate() != 0 ? " ,expire_date = '" + DateUtil.format(builder.getExpireDate()) + "'" : "") +
+			  (builder.isAccountChanged() ? " ,account = '" + builder.getAccount() + "'" : "") +
+			  (builder.isRestaurantNameChanged() ? " ,restaurant_name = '" + builder.getRestaurantName() + "'" : "") +
+			  (builder.isRestaurantInfoChanged() ? " ,restaurant_info = '" + builder.getRestaurantInfo() + "'" : "") +
+			  (builder.isTele1Changed() ? " ,tele1 = '" + builder.getTele1() + "'" : "") +
+			  (builder.isTele2Changed() ? " ,tele2 = '" + builder.getTele2() + "'" : "") +
+			  (builder.isAddressChanged() ? " ,address = '" + builder.getAddress() + "'" : "") +
+			  (builder.isRecordAliveChanged() ? " ,record_alive = " + builder.getRecordAlive().getSeconds() + "" : "") +
+			  (builder.isExpireDateChanged() ? " ,expire_date = '" + DateUtil.format(builder.getExpireDate()) + "'" : "") +
 			  " WHERE id = " + builder.getId();
 		
 		if(dbCon.stmt.executeUpdate(sql) == 0){
@@ -255,10 +269,9 @@ public class RestaurantDao {
 		}
 		
 		//Update the password to administrator of restaurant.
-		Staff admin = StaffDao.getStaffsByRoleCategory(dbCon, builder.getId(), Role.Category.ADMIN).get(0);
-		Staff.StaffUpdateBuilder staffBuilder = new Staff.StaffUpdateBuilder(admin.getId())
-														 .setStaffPwd(builder.getPwd());
-		StaffDao.updateStaff(dbCon, staffBuilder);
+		if(builder.isPwdChanged()){
+			StaffDao.updateStaff(dbCon, new Staff.UpdateBuilder(StaffDao.getAdminByRestaurant(dbCon, builder.getId()).getId()).setStaffPwd(builder.getPwd()));
+		}
 	}
 	
 	/**
@@ -368,6 +381,9 @@ public class RestaurantDao {
 			//Insert the weixin_misc
 			initWeixinMisc(dbCon, staff);
 			
+			//Insert the module
+			initModule(dbCon, staff, restaurant);
+			
 			return restaurant.getId();
 			
 		}catch(Exception e){
@@ -377,6 +393,28 @@ public class RestaurantDao {
 			throw new SQLException(e);
 		}
 
+	}
+	
+	private static void initModule(DBCon dbCon, Staff staff, Restaurant restaurant) throws SQLException, BusinessException{
+		for(Module module : restaurant.getModules()){
+			int moduleId = 0;
+			String sql = " SELECT module_id FROM " + Params.dbName + ".module WHERE code = " + module.getCode().getVal();
+			dbCon.rs = dbCon.stmt.executeQuery(sql);
+			if(dbCon.rs.next()){
+				moduleId = dbCon.rs.getInt("module_id");
+			}else{
+				throw new BusinessException(RestaurantError.MODULE_NOT_EXIST);
+			}
+			dbCon.rs.close();
+			
+			sql = " INSERT INTO " + Params.dbName + ".restaurant_module " +
+				  " (restaurant_id, module_id) " +
+				  " VALUES(" +
+				  staff.getRestaurantId() + "," +
+				  moduleId + ")";
+			dbCon.stmt.executeUpdate(sql);
+				  
+		}
 	}
 	
 	private static void initWeixinMisc(DBCon dbCon, Staff staff) throws SQLException{
@@ -778,6 +816,10 @@ public class RestaurantDao {
 		
 		//Delete the weixin misc
 		sql = " DELETE FROM " + Params.dbName + ".weixin_misc WHERE restaurant_id = " + restaurantId;
+		dbCon.stmt.executeUpdate(sql);
+		
+		//Delete the restaurant module
+		sql = " DELETE FROM " + Params.dbName + ".restaurant_module WHERE restaurant_id = " + restaurantId;
 		dbCon.stmt.executeUpdate(sql);
 	}
 	
