@@ -3,6 +3,7 @@ package com.wireless.ui.dialog;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
@@ -78,6 +79,25 @@ public class AskCancelAmountDialog extends DialogFragment {
 		}
 
 		final EditText amountEditTxt = (EditText)view.findViewById(R.id.editText_ask_cancel_amountDialog);
+		
+		//点击数量EditText后全选内容并弹出软键盘
+		amountEditTxt.setSelectAllOnFocus(true);
+		amountEditTxt.setOnTouchListener(new View.OnTouchListener() {
+			@Override
+			public boolean onTouch(View v, MotionEvent event) {
+				v.postDelayed(new Runnable(){
+					@Override
+					public void run() {
+						amountEditTxt.selectAll();
+					}
+				}, 100);
+				
+//				InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+//			    imm.showSoftInput(v, 0);
+				return false;
+			}
+		});
+		
 		amountEditTxt.setText(NumericUtil.float2String2(mTheFood.getCount()));
 		
 		//数量加
@@ -231,20 +251,13 @@ public class AskCancelAmountDialog extends DialogFragment {
 			}
 		});
 		
-		amountEditTxt.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				amountEditTxt.selectAll();
-			}
-		});
-		
 		return view;
 	}
 	
 	@Override 
 	public void onActivityCreated(Bundle savedInstanceState){
 		super.onActivityCreated(savedInstanceState);
-		((EditText)getView().findViewById(R.id.editText_ask_cancel_amountDialog)).selectAll();
+		//((EditText)getView().findViewById(R.id.editText_ask_cancel_amountDialog)).selectAll();
 	}
 	
 

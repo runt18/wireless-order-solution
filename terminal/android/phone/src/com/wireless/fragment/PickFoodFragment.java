@@ -124,8 +124,6 @@ public class PickFoodFragment extends Fragment{
 				}
 			}
         });
-
-
         
         searchTxtView.addTextChangedListener(new TextWatcher(){
         	
