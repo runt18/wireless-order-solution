@@ -758,10 +758,6 @@ public class RestaurantDao {
 		sql = " DELETE FROM " + Params.dbName + ".material_cate WHERE restaurant_id = " + restaurantId;
 		dbCon.stmt.executeUpdate(sql);
 		
-		//Delete 默认的活动价格方案
-		sql = " DELETE FROM " + Params.dbName + ".price_plan WHERE restaurant_id = " + restaurantId;
-		dbCon.stmt.executeUpdate(sql);
-		
 		//Delete the taste category
 		sql = " DELETE FROM " + Params.dbName + ".taste_category WHERE restaurant_id = " + restaurantId;
 		dbCon.stmt.executeUpdate(sql);
