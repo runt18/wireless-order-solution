@@ -159,7 +159,9 @@ public class FoodList extends AbstractList<Food>{
 			return tmpFoods;
 			
 		}else{
-			return new ArrayList<Food>(mFoods);
+			List<Food> tmp = new ArrayList<Food>(mFoods);
+			Collections.sort(tmp, Food.BY_ALIAS);
+			return tmp;
 		}
 		
     }
