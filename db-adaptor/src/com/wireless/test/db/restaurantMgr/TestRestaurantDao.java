@@ -11,6 +11,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -24,6 +25,7 @@ import com.wireless.db.printScheme.PrinterDao;
 import com.wireless.db.regionMgr.RegionDao;
 import com.wireless.db.regionMgr.TableDao;
 import com.wireless.db.restaurantMgr.RestaurantDao;
+import com.wireless.db.sms.SMStatDao;
 import com.wireless.db.staffMgr.RoleDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.system.SystemDao;
@@ -40,6 +42,7 @@ import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.restaurantMgr.Module;
 import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.restaurantMgr.Restaurant.RecordAlive;
+import com.wireless.pojo.sms.SMStat;
 import com.wireless.pojo.staffMgr.Role;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.weixin.weixinInfo.WeixinInfo;
@@ -110,6 +113,9 @@ public class TestRestaurantDao {
 			//Compare the weixin misc
 			compareWeixinMisc(staff);
 			
+			//Compare the SMS state
+			compareSMStat(staff);
+			
 			//Update a restaurant
 			Restaurant.UpdateBuilder updateBuilder = new Restaurant.UpdateBuilder(restaurantId, "test2")
 														 		   .setPwd("test2@123")
@@ -158,6 +164,16 @@ public class TestRestaurantDao {
 		}finally{
 			RestaurantDao.deleteById(restaurantId);
 		}
+	}
+	
+	private void compareSMStat(Staff staff) throws SQLException, BusinessException{
+		SMStat actual = SMStatDao.get(staff);
+		Assert.assertEquals("sms stat : restaurant", staff.getRestaurantId(), actual.getRestaurantId());
+		Assert.assertEquals("sms stat : charge used", 0, actual.getChargeUsed());
+		Assert.assertEquals("sms stat : consumption used", 0, actual.getConsumptionUsed());
+		Assert.assertEquals("sms stat : verification used", 0, actual.getVerificationUsed());
+		Assert.assertEquals("sms stat : total used", 0, actual.getTotalUsed());
+		Assert.assertEquals("sms stat : remaining", 0, actual.getRemaining());
 	}
 	
 	private void compareWeixinMisc(Staff staff) throws SQLException, BusinessException{

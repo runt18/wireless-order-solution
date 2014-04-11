@@ -15,6 +15,7 @@ import com.wireless.db.distMgr.DiscountDao;
 import com.wireless.db.printScheme.PrinterDao;
 import com.wireless.db.regionMgr.RegionDao;
 import com.wireless.db.regionMgr.TableDao;
+import com.wireless.db.sms.SMStatDao;
 import com.wireless.db.staffMgr.RoleDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.tasteMgr.TasteCategoryDao;
@@ -34,6 +35,7 @@ import com.wireless.pojo.regionMgr.Region;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.restaurantMgr.Module;
 import com.wireless.pojo.restaurantMgr.Restaurant;
+import com.wireless.pojo.sms.SMStat;
 import com.wireless.pojo.staffMgr.Role;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.tasteMgr.Taste;
@@ -395,6 +397,9 @@ public class RestaurantDao {
 			//Insert the module
 			initModule(dbCon, staff, restaurant);
 			
+			//Insert the SMS state
+			initSMStat(dbCon, staff);
+			
 			return restaurant.getId();
 			
 		}catch(Exception e){
@@ -404,6 +409,10 @@ public class RestaurantDao {
 			throw new SQLException(e);
 		}
 
+	}
+	
+	private static void initSMStat(DBCon dbCon, Staff staff) throws SQLException{
+		SMStatDao.insert(dbCon, staff, new SMStat.InsertBuilder(staff.getRestaurantId()));
 	}
 	
 	private static void insertModule(DBCon dbCon, Staff staff, Module module) throws SQLException, BusinessException{
