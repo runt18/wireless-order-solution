@@ -11,6 +11,7 @@ public class RestaurantError extends ErrorEnum{
 	public static final ErrorCode RESTAURANT_EXPIRED = build(9296, "餐厅已过期.");
 	public static final ErrorCode DUPLICATED_RESTAURANT_ACCOUNT = build(9295, "餐厅帐号已存在.");
 	public static final ErrorCode MODULE_NOT_EXIST = build(9294, "查找的模块不存在.");
+	public static final ErrorCode SMS_STAT_NOT_EXIST = build(9493, "没有相应的短信记录");
 	
 	private RestaurantError(){
 		
