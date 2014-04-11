@@ -18,11 +18,11 @@ import com.wireless.db.weixin.WeixinInfoDao;
 import com.wireless.db.weixin.restaurant.WeixinRestaurantDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
+import com.wireless.pojo.restaurantMgr.Module.Code;
 import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.restaurantMgr.Restaurant.InsertBuilder;
 import com.wireless.pojo.restaurantMgr.Restaurant.RecordAlive;
 import com.wireless.pojo.restaurantMgr.Restaurant.UpdateBuilder;
-import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.DateUtil;
 import com.wireless.pojo.weixin.weixinInfo.WeixinInfo;
 
@@ -40,6 +40,7 @@ public class OperateRestaurantAction extends DispatchAction {
 		String address = request.getParameter("address");
 		String recordAlive = request.getParameter("recordAlive");
 		String expireDate = request.getParameter("expireDate");
+		String moduleCheckeds = request.getParameter("moduleCheckeds");
 		//String activeness = request.getParameter("activeness");
 		try{
 			Restaurant.InsertBuilder builder = new InsertBuilder(account, name, DateUtil.parseDate(expireDate), pwd)
@@ -48,6 +49,12 @@ public class OperateRestaurantAction extends DispatchAction {
 												.setRestaurantInfo(info)
 												.setTele1(tele1)
 												.setTele2(tele2);
+			if(moduleCheckeds != null && !moduleCheckeds.isEmpty() ){
+				String[] modules = moduleCheckeds.split(",");
+				for (String module : modules) {
+					builder.addModule(Code.valueOf(Integer.parseInt(module)));
+				}
+			}
 			
 			RestaurantDao.insert(builder);
 			jobject.initTip(true, "添加成功");
@@ -75,6 +82,7 @@ public class OperateRestaurantAction extends DispatchAction {
 		String address = request.getParameter("address");
 		String recordAlive = request.getParameter("recordAlive");
 		String expireDate = request.getParameter("expireDate");
+		String moduleCheckeds = request.getParameter("moduleCheckeds");
 		
 		JObject jobject = new JObject();
 		try{
@@ -89,6 +97,12 @@ public class OperateRestaurantAction extends DispatchAction {
 			
 			if(pwd != null && !pwd.isEmpty()){
 				builder.setPwd(pwd);
+			}
+			if(moduleCheckeds != null && !moduleCheckeds.isEmpty() ){
+				String[] modules = moduleCheckeds.split(",");
+				for (String module : modules) {
+					builder.addModule(Code.valueOf(Integer.parseInt(module)));
+				}
 			}
 			
 			RestaurantDao.update(builder);
@@ -119,19 +133,18 @@ public class OperateRestaurantAction extends DispatchAction {
 			String address = request.getParameter("address");
 			String tele1 = request.getParameter("tel1");
 			String tele2 = request.getParameter("tel2");
-			String pin = (String)request.getAttribute("pin");
 			String id = request.getParameter("restaurantID"); 
-			dbCon.connect();
-			Staff staff = StaffDao.verify(Integer.parseInt(pin));
-			id = staff.getRestaurantId()+"";
-			Restaurant restaurant = new Restaurant();
-			restaurant.setId(Integer.parseInt(id));
-			restaurant.setName(restaurant_name);
-			restaurant.setInfo(restaurant_info);
-			restaurant.setAddress(address);
-			restaurant.setTele1(tele1);
-			restaurant.setTele2(tele2);
-			RestaurantDao.update(staff, restaurant);
+			
+			Restaurant restaurant = RestaurantDao.getById(Integer.parseInt(id));
+			
+			Restaurant.UpdateBuilder builder = new UpdateBuilder(Integer.parseInt(id), restaurant.getAccount());
+			builder.setRestaurantName(restaurant_name)
+					.setTele1(tele1)
+					.setTele2(tele2)
+					.setAddress(address)
+					.setRestaurantInfo(restaurant_info);
+			
+			RestaurantDao.update(builder);
 			
 			jobject.initTip(true, "操作成功!");
 		} catch(BusinessException e) {

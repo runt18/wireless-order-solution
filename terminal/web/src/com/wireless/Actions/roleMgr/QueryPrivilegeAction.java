@@ -14,11 +14,14 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
+import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.db.staffMgr.PrivilegeDao;
 import com.wireless.db.staffMgr.RoleDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
+import com.wireless.pojo.restaurantMgr.Module;
+import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.staffMgr.Page;
 import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.staffMgr.Privilege.Code;
@@ -119,6 +122,9 @@ public class QueryPrivilegeAction extends DispatchAction{
 		
 		String pin = (String) request.getAttribute("pin");
 		StringBuilder tree = new StringBuilder();
+		
+		Restaurant restaurant = RestaurantDao.getById(Integer.parseInt((String)request.getAttribute("restaurantID")));
+		List<Module> modules = restaurant.getModules();
 		try{
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
@@ -140,6 +146,7 @@ public class QueryPrivilegeAction extends DispatchAction{
 			});
 			
 			for (Privilege privilege : privileges) {
+				
 				if(privilege.getCode() == Code.BASIC){
 					tree.append("{");
 					tree.append("leaf:false");
@@ -160,14 +167,22 @@ public class QueryPrivilegeAction extends DispatchAction{
 
 					tree.append(",children : [" + children.toString() + "]");
 					tree.append("},");
-				}
-				if(privilege.getCode() == Code.MEMBER){
+				}else if(privilege.getCode() == Code.MEMBER){
 					tree.append("{");
 					tree.append("leaf:false");
-					tree.append(",expanded:true");
 					tree.append(",id:'memberMgr'");
-					tree.append(",text:'会员'");
-					tree.append(",cls:'tFont'");
+					Module mModule = new Module(Module.Code.MEMBER);
+					if(modules.indexOf(mModule) < 0){
+						tree.append(",expanded:false");
+						tree.append(",text:'会员(未开通)'");
+						tree.append(",cls:'unModuleFont'");
+						tree.append(",listeners : {beforeexpand : function(){warnModule('会员模块未开通, 只能录入50条信息');}}");
+					}else{
+						tree.append(",expanded:true");
+						tree.append(",text:'会员'");
+						tree.append(",cls:'tFont'");
+					}
+
 					StringBuilder children = new StringBuilder();
 					for (int i = 0; i < Page.Member.values().length; i++) {
 						if(i > 0){
@@ -177,8 +192,7 @@ public class QueryPrivilegeAction extends DispatchAction{
 					}
 					tree.append(",children : [" + children.toString() + "]");
 					tree.append("},");
-				}
-				if(privilege.getCode() == Code.HISTORY){
+				}else if(privilege.getCode() == Code.HISTORY){
 					tree.append("{");
 					tree.append("leaf:false");
 					tree.append(",expanded:true");
@@ -195,14 +209,20 @@ public class QueryPrivilegeAction extends DispatchAction{
 
 					tree.append(",children : [" + children.toString() + "]");
 					tree.append("},");
-				}
-				if(privilege.getCode() == Code.INVENTORY){
+				}else if(privilege.getCode() == Code.INVENTORY){
 					tree.append("{");
 					tree.append("leaf:false");
 					tree.append(",expanded:false");
 					tree.append(",id:'stockMgr'");
-					tree.append(",text:'库存'");
-					tree.append(",cls:'tFont'");
+					Module mModule = new Module(Module.Code.INVENTORY);
+					if(modules.indexOf(mModule) < 0){
+						tree.append(",text:'库存(未开通)'");
+						tree.append(",cls:'unModuleFont'");
+						tree.append(",listeners : {beforeexpand : function(){warnModule('库存模块未开通, 只能录入50条信息');}}");
+					}else{
+						tree.append(",text:'库存'");
+						tree.append(",cls:'tFont'");
+					}
 					StringBuilder children = new StringBuilder();
 					for (int i = 0; i < Page.Stock.values().length; i++) {
 						if(i > 0){
@@ -213,9 +233,7 @@ public class QueryPrivilegeAction extends DispatchAction{
 
 					tree.append(",children : [" + children.toString() + "]");
 					tree.append("},");
-				}
-
-				if(privilege.getCode() == Code.SYSTEM){
+				}else if(privilege.getCode() == Code.SYSTEM){
 					tree.append("{");
 					tree.append("leaf:false");
 					tree.append(",expanded:true");
@@ -231,25 +249,23 @@ public class QueryPrivilegeAction extends DispatchAction{
 					}
 					tree.append(",children : [" + children.toString() + "]");
 					tree.append("},");
-				}
-			}
-			//FIXME 加权限控制
-			if(true){
-				tree.append("{");
-				tree.append("leaf:false");
-				tree.append(",expanded:true");
-				tree.append(",id:'weixinMgr'");
-				tree.append(",text:'微信'");
-				tree.append(",cls:'tFont'");
-				StringBuilder children = new StringBuilder();
-				for (int i = 0; i < Page.Weixin.values().length; i++) {
-					if(i > 0){
-						children.append(",");
+				}else if(privilege.getCode() == Code.WEIXIN){
+					tree.append("{");
+					tree.append("leaf:false");
+					tree.append(",expanded:true");
+					tree.append(",id:'weixinMgr'");
+					tree.append(",text:'微信'");
+					tree.append(",cls:'tFont'");
+					StringBuilder children = new StringBuilder();
+					for (int i = 0; i < Page.Weixin.values().length; i++) {
+						if(i > 0){
+							children.append(",");
+						}
+						children.append("{leaf:true," + "icon:'" + Page.Weixin.values()[i].getImage() +"'" + ", text:'" + Page.Weixin.values()[i].getDesc() + "', mId:'" +Page.Weixin.values()[i].getMgrId() + "', cls:'font', url:'" + Page.Weixin.values()[i].getUrl() + "'}");
 					}
-					children.append("{leaf:true," + "icon:'" + Page.Weixin.values()[i].getImage() +"'" + ", text:'" + Page.Weixin.values()[i].getDesc() + "', mId:'" +Page.Weixin.values()[i].getMgrId() + "', cls:'font', url:'" + Page.Weixin.values()[i].getUrl() + "'}");
+					tree.append(",children : [" + children.toString() + "]");
+					tree.append("},");
 				}
-				tree.append(",children : [" + children.toString() + "]");
-				tree.append("},");
 			}
 			tree.append("]");
 			

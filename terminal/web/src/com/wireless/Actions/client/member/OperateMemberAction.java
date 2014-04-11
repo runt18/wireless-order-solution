@@ -73,10 +73,10 @@ public class OperateMemberAction extends DispatchAction{
 			jobject.initTip(true, "操作成功, 新会员资料已添加.");
 		}catch(BusinessException e){
 			e.printStackTrace();
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getCode(), e.getDesc());
+			jobject.initTip(e);
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, WebParams.TIP_CODE_EXCEPTION, WebParams.TIP_CONTENT_SQLEXCEPTION);
+			jobject.initTip(e);
 		}finally{
 			response.getWriter().print(jobject.toString());
 		}

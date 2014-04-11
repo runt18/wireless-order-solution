@@ -35,7 +35,7 @@ public class QueryRestaurantAction extends Action{
 		String extraCond = "", orderClause = "";
 		try{
 			if(name != null && !name.trim().isEmpty()){
-				extraCond += (" AND restaurant_name like '%" + name + "%' ");
+				extraCond += (" AND (restaurant_name like '%" + name + "%' OR account like '%" + name + "%') ");
 			}else if(account != null && !account.trim().isEmpty()){
 				extraCond = " AND account = '" + account + "' " ;
 			}else if(expireDate != null || alive != null){
