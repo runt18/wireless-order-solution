@@ -1,6 +1,13 @@
 package com.wireless.pojo.restaurantMgr;
 
-public class Module implements Comparable<Module>{
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import com.wireless.json.Jsonable;
+
+public class Module implements Comparable<Module>, Jsonable{
 
 	public static enum Cate{
 		UNKNOWN(0, "unknown"),
@@ -41,11 +48,11 @@ public class Module implements Comparable<Module>{
 	}
 	
 	public static enum Code{
-		UNKNOWN(0, Cate.UNKNOWN, "unknown"),
-		BASIC(1000, Cate.BASIC, "basic"),
-		MEMBER(2000, Cate.MEMBER, "member"),
-		INVENTORY(3000, Cate.INVENTORY, "inventory"),
-		SMS(4000, Cate.SMS, "sms");
+		UNKNOWN(0, Cate.UNKNOWN, "未知"),
+		BASIC(1000, Cate.BASIC, "基础"),
+		MEMBER(2000, Cate.MEMBER, "会员"),
+		INVENTORY(3000, Cate.INVENTORY, "库存"),
+		SMS(4000, Cate.SMS, "短信");
 		
 		private final int val;
 		private final Cate cate;
@@ -136,5 +143,18 @@ public class Module implements Comparable<Module>{
 		}else{
 			return 0;
 		}
+	}
+
+	@Override
+	public Map<String, Object> toJsonMap(int flag) {
+		Map<String, Object> jm = new HashMap<String, Object>();
+		jm.put("code", getCode().getVal());
+		jm.put("desc", getCode().getDesc());
+		return Collections.unmodifiableMap(jm);
+	}
+
+	@Override
+	public List<Object> toJsonList(int flag) {
+		return null;
 	}
 }
