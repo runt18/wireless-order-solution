@@ -1070,3 +1070,10 @@ function operateWXLogo(c){
 	
 	wx.logo.win.show();
 }
+
+
+function warnModule(msg){
+	var info = {success : false, code : 9986, title : '提示'};
+	info.msg = msg;
+	Ext.ux.showMsg(info);
+}

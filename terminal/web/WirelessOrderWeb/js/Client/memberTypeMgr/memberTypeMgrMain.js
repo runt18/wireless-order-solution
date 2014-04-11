@@ -325,7 +325,7 @@ function memberTypeWinInit(){
 				}
 			}],
 			listeners : {
-				show : function(e){
+				beforeshow : function(e){
 					if(document.getElementsByName('memberDiscount').length == 0){
 						for (var i = 0; i < discountData.length; i++) {
 							var c = {items : [{

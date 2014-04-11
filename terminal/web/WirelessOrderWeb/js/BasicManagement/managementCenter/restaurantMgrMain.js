@@ -28,6 +28,57 @@ var addRestaurant = new Ext.ux.ImageButton({
 	}
 });
 
+function getChecked(checkBoxs){
+	var checkeds = "";
+	for (var i = 0; i < checkBoxs.length; i++) {
+		if(checkBoxs[i].checked){
+			if(checkeds == ""){
+				checkeds += checkBoxs[i].value;
+			}else{
+				checkeds += "," + checkBoxs[i].value;
+			}
+		}
+	}
+	return checkeds;
+}
+function getRestaurantModules(){
+	if(document.getElementsByName('modules').length == 0){
+		for (var i = 0; i < moduleData.length; i++) {
+			var c = {items : [{
+				xtype : "checkbox", 
+				name : "modules",
+				boxLabel : moduleData[i].desc, 
+				hideLabel : true, 
+				//checked  : moduleData[i].code == 1000?true:false,
+				inputValue :  moduleData[i].code
+			}]};
+			Ext.getCmp('formRestaurantModule').add(c);
+			//solveIE自动换行时格式错乱
+			if((i+1)%4 == 0){
+				Ext.getCmp('formRestaurantModule').add({columnWidth : 1});
+			}
+			Ext.getCmp('formRestaurantModule').doLayout();
+		}
+	}
+}
+
+
+function initModulesData(){
+	Ext.Ajax.request({
+		url : '../../QueryModule.do',
+		success : function(res, opt){
+			var jr = Ext.decode(res.responseText);
+			if(jr.success){
+				moduleData = jr.root;
+			}
+		},
+		failure : function(res, opt){
+			Ext.ux.showMsg(Ext.decode(res.responseText));
+		}
+	
+	});
+}
+
 var restaurantAddWin = new Ext.Window({
 	title : '创建餐厅',
 	id : 'restaurantAddWin',
@@ -81,8 +132,8 @@ var restaurantAddWin = new Ext.Window({
 						address : address,
 						recordAlive : recordAlive,
 						expireDate : expireDate.getValue().format('Y-m-d'),
-						dataSource : dataSource,
-						isCookie : true
+						moduleCheckeds : getChecked(document.getElementsByName('modules')),
+						dataSource : dataSource
 					},
 					success : function(res, opt){
 						var jr = Ext.decode(res.responseText);
@@ -243,6 +294,24 @@ var restaurantAddWin = new Ext.Window({
 			fieldLabel : '餐厅信息',
 			width : 220,
 			id : 'txtInfo'
+		},{
+			xtype : 'panel',
+			layout : 'column',
+			id : 'formRestaurantModule',
+			frame : true,
+			width : 330,
+			defaults : {
+				columnWidth : .25,
+				layout : 'form',
+				labelWidth : 80
+			},
+			items : [{
+				columnWidth : 1,
+				xtype : 'label',
+				style : 'text-align:left;padding-bottom:3px;margin-left:20px;',
+				text : '授权模块:'
+			}]
+					
 		}]
 	}],
 	listeners : {
@@ -263,6 +332,17 @@ var restaurantAddWin = new Ext.Window({
 			Ext.getCmp('txtAddress').setValue('');
 			Ext.getCmp('txtInfo').setValue('');
 			Ext.getCmp('rdoRecordAlive').checked = true;
+		},
+		beforeshow : function(){
+			getRestaurantModules();
+		},
+		hide : function(){
+			var modules = document.getElementsByName('modules');
+			for (var i = 0; i < modules.length; i++) {
+				if(modules[i].checked){
+					modules[i].checked = false;
+				}
+			}
 		}
 	},
 	keys : [{
@@ -324,6 +404,15 @@ function optRestaurantHandler(c){
 				}
 			}
 			
+			var modules = document.getElementsByName('modules');
+			for (var i = 0; i < data.modules.length; i++) {
+				for (var j = 0; j < modules.length; j++) {
+					if(data.modules[i].code == modules[j].value){
+						modules[j].checked = true;
+					}
+				}
+			}
+			
 		}
 	}
 	
@@ -338,9 +427,6 @@ Ext.onReady(function(){
 		proxy : new Ext.data.HttpProxy({
 			url : '../../QueryRestaurants.do'
 		}),
-		baseParams : {
-			isCookie : true
-		},
 		reader : new Ext.data.JsonReader({
 			totalProperty : 'totalProperty',
 			root : 'root'
@@ -368,6 +454,8 @@ Ext.onReady(function(){
 			name : 'birthDate'
 		},{
 			name : 'expireDate'
+		},{
+			name : 'modules'
 		}])
 	});
 	
@@ -511,4 +599,6 @@ Ext.onReady(function(){
 			}
 		});
     });
+    
+    initModulesData();
 });
