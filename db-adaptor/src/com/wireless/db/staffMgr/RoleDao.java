@@ -183,44 +183,43 @@ public class RoleDao {
 		dbCon.rs = dbCon.stmt.getGeneratedKeys();
 		if(dbCon.rs.next()){
 			roleId = dbCon.rs.getInt(1);
-			//关联权限和折扣
-			for (Privilege privilege : builder.getPrivileges()) {
-				if(privilege.getId() == 0){
-					DBCon priCon = new DBCon();
-					try{
-						priCon.connect();
-						String selectPid = "SELECT pri_id FROM " + Params.dbName + ".privilege" + " WHERE pri_code = " + privilege.getCode().getVal();
-						priCon.rs = priCon.stmt.executeQuery(selectPid);
-						if(priCon.rs.next()){
-							privilege.setId(priCon.rs.getInt("pri_id"));
-						}else{
-							throw new BusinessException("无此权限");
-						}
-					}finally{
-						priCon.disconnect();
-					}
-
-					
-				}
-				String pSql = "INSERT INTO " + Params.dbName + ".role_privilege(role_id, pri_id, restaurant_id) " +
-								" VALUES(" +
-								roleId + ", " +
-								privilege.getId() + ", " +
-								staff.getRestaurantId() + ")";
-				dbCon.stmt.executeUpdate(pSql);
-				if(privilege.getCode() == Code.DISCOUNT){
-					for (Discount discount : privilege.getDiscounts()) {
-						String rdSql = "INSERT INTO " + Params.dbName + ".role_discount(role_id, discount_id) " +
-								" VALUES(" +
-								roleId + ", " +
-								discount.getId() + ")";
-						dbCon.stmt.executeUpdate(rdSql);
-						
-					}
-				}
-			}
 		}else{
 			throw new SQLException("The id is not generated successfully.");
+		}
+		dbCon.rs.close();
+		//关联权限和折扣
+		for (Privilege privilege : builder.getPrivileges()) {
+			if(privilege.getId() == 0){
+				try{
+					String selectPid = "SELECT pri_id FROM " + Params.dbName + ".privilege" + " WHERE pri_code = " + privilege.getCode().getVal();
+					dbCon.rs = dbCon.stmt.executeQuery(selectPid);
+					if(dbCon.rs.next()){
+						privilege.setId(dbCon.rs.getInt("pri_id"));
+					}else{
+						throw new BusinessException("无此权限");
+					}
+				}finally{
+					dbCon.rs.close();
+				}
+
+				
+			}
+			String pSql = "INSERT INTO " + Params.dbName + ".role_privilege(role_id, pri_id, restaurant_id) " +
+							" VALUES(" +
+							roleId + ", " +
+							privilege.getId() + ", " +
+							staff.getRestaurantId() + ")";
+			dbCon.stmt.executeUpdate(pSql);
+			if(privilege.getCode() == Code.DISCOUNT){
+				for (Discount discount : privilege.getDiscounts()) {
+					String rdSql = "INSERT INTO " + Params.dbName + ".role_discount(role_id, discount_id) " +
+							" VALUES(" +
+							roleId + ", " +
+							discount.getId() + ")";
+					dbCon.stmt.executeUpdate(rdSql);
+					
+				}
+			}
 		}
 		return roleId;
 	}

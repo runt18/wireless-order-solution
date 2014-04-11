@@ -17,6 +17,7 @@ import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.weixin.member.WeixinMemberDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.MemberError;
+import com.wireless.exception.ModuleError;
 import com.wireless.pojo.client.Member;
 import com.wireless.pojo.client.MemberComment.CommitBuilder;
 import com.wireless.pojo.client.MemberLevel;
@@ -27,6 +28,7 @@ import com.wireless.pojo.coupon.Coupon;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.distMgr.Discount;
 import com.wireless.pojo.menuMgr.Food;
+import com.wireless.pojo.restaurantMgr.Module;
 import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.DateUtil;
@@ -567,8 +569,25 @@ public class MemberDao {
 	 * 			throws if the member type does NOT exist
 	 */
 	public static int insert(DBCon dbCon, Staff staff, Member.InsertBuilder builder) throws SQLException, BusinessException{
+		Restaurant restaurant = RestaurantDao.getById(staff.getRestaurantId());
+		//判断是否有会员模块
+		if(!restaurant.hasModule(Module.Code.MEMBER)){
+			//限制添加条数
+			final int memberLimit = 50;
+			String sql = "SELECT COUNT(*) FROM " + Params.dbName + ".member ";
+			dbCon.rs = dbCon.stmt.executeQuery(sql);
+			int memberCount = 0;
+			if(dbCon.rs.next()){
+				memberCount = dbCon.rs.getInt(1);
+			}
+			if(memberCount > memberLimit){
+				throw new BusinessException(ModuleError.MEMBER_LIMIT);
+			}
+			dbCon.rs.close(); 
+		}
 		Member member = builder.build();
 
+		//检查是否信息有重复
 		checkValid(dbCon, member);
 		
 		String insertSQL = " INSERT INTO " + Params.dbName + ".member " 

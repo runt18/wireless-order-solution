@@ -12,9 +12,13 @@ import java.util.Map;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.inventoryMgr.MaterialDao;
+import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.exception.BusinessException;
+import com.wireless.exception.ModuleError;
 import com.wireless.exception.StockError;
 import com.wireless.pojo.inventoryMgr.Material;
+import com.wireless.pojo.restaurantMgr.Module;
+import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.stockMgr.MaterialDept;
 import com.wireless.pojo.stockMgr.StockAction;
@@ -42,6 +46,22 @@ public class StockActionDao {
 	 */
 	public static int insertStockAction(DBCon dbCon, Staff term, InsertBuilder builder) throws SQLException, BusinessException{
 		
+		Restaurant restaurant = RestaurantDao.getById(term.getRestaurantId());
+		//是否有库存模块授权
+		if(!restaurant.hasModule(Module.Code.INVENTORY)){
+			//限制添加的条数
+			final int stockActionCountLimit = 50;
+			String sql = "SELECT COUNT(*) FROM " + Params.dbName + ".stock_action WHERE sub_type <> 9";
+			dbCon.rs = dbCon.stmt.executeQuery(sql);
+			int stockActionCount = 0;
+			if(dbCon.rs.next()){
+				stockActionCount = dbCon.rs.getInt(1);
+			}
+			if(stockActionCount > stockActionCountLimit){
+				throw new BusinessException(ModuleError.INVENTORY_LIMIT);
+			}
+			dbCon.rs.close(); 
+		}
 		//判断是否同个部门下进行调拨
 		if((builder.getSubType() == SubType.STOCK_IN_TRANSFER || builder.getSubType() == SubType.STOCK_OUT_TRANSFER) && builder.getDeptIn().getId() == builder.getDeptOut().getId()){
 			throw new BusinessException(StockError.MATERIAL_DEPT_EXIST);
