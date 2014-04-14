@@ -12,7 +12,7 @@
         android:visibility="visible" />
 
     <RelativeLayout
-        android:id="@+id/relativeLayout1"
+        android:id="@+id/relativeLayout_commitDialog_top"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/line_commit_dialog"
@@ -32,22 +32,29 @@
         android:id="@+id/linearLayout_commitDialog"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/relativeLayout1"
-        android:weightSum="2" >
+        android:layout_below="@+id/relativeLayout_commitDialog_top"
+        android:weightSum="3" >
 
         <Button
-            android:id="@+id/button_confirm_commitDialog"
+            android:id="@+id/button_commitDialog_commit"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="确定" />
+            android:text="下单" />
 
         <Button
-            android:id="@+id/button_cancel_commitDialog"
+            android:id="@+id/button_commitDialog_payTempBill"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="取消" />
+            android:text="暂结" />
+
+        <Button
+            android:id="@+id/button_commitDialog_payBill"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="结账" />
     </LinearLayout>
 
     <View
@@ -61,32 +68,32 @@
     <ListView
         android:id="@+id/listView_commitDialog"
         android:layout_width="match_parent"
-        android:layout_height="150dp"
+        android:layout_height="wrap_content"
         android:layout_below="@+id/line2_commitDialog"
         android:paddingLeft="4dp"
         android:paddingRight="4dp" >
     </ListView>
 
     <LinearLayout
+        android:id="@+id/linearLayout_commitDialog_bottom"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
         android:layout_below="@+id/listView_commitDialog"
         android:weightSum="2" >
 
         <Button
-            android:id="@+id/button_changeOrder_commitDialog"
-            android:layout_width="wrap_content"
+            android:id="@+id/button_commitDialog_commit_not_print"
+            android:layout_width="0dip"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="提交不打印" />
 
         <Button
-            android:id="@+id/button_commitDialog_payBill"
-            android:layout_width="wrap_content"
+            android:id="@+id/button_commitDialog_cancel"
+            android:layout_width="0dip"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="提交结账" />
+            android:text="返回" />
     </LinearLayout>
 
 </RelativeLayout>

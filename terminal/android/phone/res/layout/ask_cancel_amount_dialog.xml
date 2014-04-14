@@ -52,7 +52,8 @@
         android:layout_alignParentTop="true"
         android:layout_toRightOf="@+id/button_ask_cancel_amountDialog_minus"
         android:ems="10"
-        android:inputType="number|numberDecimal" />
+        android:inputType="number|numberDecimal"
+        android:singleLine="true" />
 
     <Button
         android:id="@+id/button_ask_cancel_amountDialog_minus"
