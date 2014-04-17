@@ -135,7 +135,7 @@ public class KitchenFragment extends Fragment {
 
 			int deptIdToFilter = msg.what;
 			
-			//根据条件筛选出要显示的厨房, 并菜品按销量排序
+			//根据条件筛选出要显示的厨房, 菜品按编号排序
 			for(DeptNode deptNode : fragment.mDeptTree.asDeptNodes()){
 				if(deptNode.getKey().getId() == deptIdToFilter){
 					fragment.mXpListView.setAdapter(fragment.new KitchenExpandableListAdapter(deptNode.getValue()));

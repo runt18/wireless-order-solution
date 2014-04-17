@@ -13,6 +13,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -44,13 +45,16 @@ import com.wireless.pojo.util.NumericUtil;
 import com.wireless.ui.PickFoodActivity;
 import com.wireless.ui.PickTasteActivity;
 import com.wireless.ui.R;
+import com.wireless.ui.dialog.AddOrderAmountDialog;
+import com.wireless.ui.dialog.AddOrderAmountDialog.OnAmountAddedListener;
 import com.wireless.ui.dialog.AskCancelAmountDialog;
 import com.wireless.ui.dialog.AskCancelAmountDialog.OnCancelAmountChangedListener;
 import com.wireless.ui.dialog.SetOrderAmountDialog;
 import com.wireless.ui.dialog.SetOrderAmountDialog.OnAmountChangedListener;
 
 public class OrderFoodFragment extends Fragment implements OnCancelAmountChangedListener,
-														   OnAmountChangedListener{
+														   OnAmountChangedListener,
+														   OnAmountAddedListener{
 
 	public static interface OnButtonClickedListener{
 		public void onPickFoodClicked();
@@ -74,11 +78,11 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 	private static final String ITEM_FOOD_NAME = "item_food_name";
 	private static final String ITEM_FOOD_PRICE = "item_new_food_price";
 	private static final String ITEM_FOOD_AMOUNT = "item_food_count";
-	private static final String ITEM_FOOD_OFFSET = "item_food_offset";
+	private static final String ITEM_FOOD_DELTA = "item_food_delta";
 	private static final String ITEM_FOOD_TASTE = "item_food_taste";
 	private static final String ITEM_THE_FOOD = "item_the_food";
-	private static final String ITEM_IS_ORI_FOOD = "itemIsOriFood";
-	private static final String ITEM_IS_OFFSET = "item_is_offset";
+	private static final String ITEM_IS_ORI_FOOD = "item_is_original";
+	private static final String ITEM_IS_DELTA = "item_is_delta";
 	
 	private static final String ITEM_GROUP_NAME = "item_group_name";
 	
@@ -134,7 +138,7 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 			List<Map<String, ?>> groupData = new ArrayList<Map<String, ?>>();
 			List<List<Map<String, ?>>> childData =  new ArrayList<List<Map<String, ?>>>();
 			
-			HashMap<String, Object> groupMap = new HashMap<String, Object>();
+			Map<String, Object> groupMap = new HashMap<String, Object>();
 			groupMap.put(ITEM_GROUP_NAME, "新点菜");
 			groupData.add(groupMap);
 			
@@ -160,43 +164,67 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 				groupMap.put(ITEM_IS_ORI_FOOD, true);
 				groupData.add(groupMap);
 				
-				//有退菜的菜品显示在最上面
+				//有退菜和加菜的菜品显示在最上面
 				Comparator<OrderFood> comp = new Comparator<OrderFood>(){
 					@Override
 					public int compare(OrderFood lhs, OrderFood rhs) {
-						if(lhs.getDelta() > rhs.getDelta()){
+						if(lhs.getDelta() != 0 && rhs.getDelta() != 0){
+							if(lhs.getDelta() < rhs.getDelta()){
+								return -1;
+							}else if(lhs.getDelta() > rhs.getDelta()){
+								return 1;
+							}else{
+								return 0;
+							}
+						}else if(lhs.getDelta() != 0 && rhs.getDelta() == 0){
 							return -1;
+						}else if(lhs.getDelta() == 0 && rhs.getDelta() != 0){
+							return 1;
 						}else{
-							return 0;
+							return lhs.compareTo(rhs);
 						}
 					}
 				};
 				
 				List<Map<String, ?>> pickedFoodDatas = new ArrayList<Map<String, ?>>();
-				for(OrderFood f : ofFgm.mOriOrder.getOrderFoods(comp)){
-					if(f.getCount() != 0f){
-						HashMap<String, Object> map = new HashMap<String, Object>();
+				for(OrderFood of : ofFgm.mOriOrder.getOrderFoods(comp)){
+					if(of.getCount() != 0f){
+						Map<String, Object> map = new HashMap<String, Object>();
 						map.put(ITEM_IS_ORI_FOOD, true);
-						map.put(ITEM_FOOD_NAME, f.getName());
-						map.put(ITEM_FOOD_AMOUNT, String.valueOf(f.getCount()));
-						map.put(ITEM_FOOD_PRICE, NumericUtil.CURRENCY_SIGN + NumericUtil.float2String2(f.calcPriceBeforeDiscount()));
-						map.put(ITEM_FOOD_TASTE, f.getTasteGroup().getPreference());
-						map.put(ITEM_THE_FOOD, f);
+						map.put(ITEM_FOOD_NAME, of.getName());
+						map.put(ITEM_FOOD_AMOUNT, String.valueOf(of.getCount()));
+						map.put(ITEM_FOOD_PRICE, NumericUtil.CURRENCY_SIGN + NumericUtil.float2String2(of.calcPriceBeforeDiscount()));
+						map.put(ITEM_FOOD_TASTE, of.getTasteGroup().getPreference());
+						map.put(ITEM_THE_FOOD, of);
+						map.put(ITEM_FOOD_DELTA, Float.valueOf(of.getDelta()));
 						pickedFoodDatas.add(map);
 					}
 					
-					if(f.getDelta() > 0f){
-						HashMap<String, Object> map = new HashMap<String, Object>();
+					if(of.getDelta() > 0f){
+						Map<String, Object> map = new HashMap<String, Object>();
 						map.put(ITEM_IS_ORI_FOOD, true);
-						map.put(ITEM_FOOD_NAME, f.getName()); 
-						map.put(ITEM_FOOD_AMOUNT, String.valueOf(f.getCount()));
-						map.put(ITEM_FOOD_PRICE, NumericUtil.float2String2(f.calcPriceWithTaste()));
-						map.put(ITEM_FOOD_TASTE, f.hasCancelReason() ? f.getCancelReason().getReason() : "没有退菜原因");
-						map.put(ITEM_THE_FOOD, f);
-						map.put(ITEM_IS_OFFSET, true);
-						map.put(ITEM_FOOD_OFFSET, NumericUtil.float2String2(f.getDelta()));
+						map.put(ITEM_FOOD_NAME, of.getName()); 
+						map.put(ITEM_FOOD_AMOUNT, String.valueOf(of.getCount()));
+						map.put(ITEM_FOOD_PRICE, NumericUtil.float2String2(of.getUnitPriceWithTaste() * Math.abs(of.getDelta())));
+						map.put(ITEM_FOOD_TASTE, of.hasCancelReason() ? of.getCancelReason().getReason() : "无退菜原因");
+						map.put(ITEM_THE_FOOD, of);
+						map.put(ITEM_FOOD_DELTA, Float.valueOf(of.getDelta()));
+						map.put(ITEM_IS_DELTA, true);
+						pickedFoodDatas.add(map);
+						
+					}else if(of.getDelta() < 0f){
+						Map<String, Object> map = new HashMap<String, Object>();
+						map.put(ITEM_IS_ORI_FOOD, true);
+						map.put(ITEM_FOOD_NAME, of.getName()); 
+						map.put(ITEM_FOOD_AMOUNT, String.valueOf(of.getCount()));
+						map.put(ITEM_FOOD_PRICE, NumericUtil.float2String2(of.getUnitPriceWithTaste() * Math.abs(of.getDelta())));
+						map.put(ITEM_FOOD_TASTE, "加" + NumericUtil.float2String2(Math.abs(of.getDelta())) + "份");
+						map.put(ITEM_THE_FOOD, of);
+						map.put(ITEM_FOOD_DELTA, Float.valueOf(of.getDelta()));
+						map.put(ITEM_IS_DELTA, true);
 						pickedFoodDatas.add(map);
 					}
+					
 				}
 				childData.add(pickedFoodDatas);
 				
@@ -239,11 +267,13 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 		}
 	}
 	
-		private List<? extends Map<String, ?>> mGroupData;
-		private class FoodExpandableAdapter extends SimpleExpandableListAdapter{
-		private List<? extends List<? extends Map<String, ?>>> mChildData;
+	
+	private class FoodExpandableAdapter extends SimpleExpandableListAdapter{
+		
+		private final List<? extends Map<String, ?>> mGroupData;
+		private final List<? extends List<? extends Map<String, ?>>> mChildData;
 		private PopupWindow mPopup;
-
+	
 		public FoodExpandableAdapter(Context context,
 									 List<? extends Map<String, ?>> groupData, int groupLayout,	String[] groupFrom, int[] groupTo,
 									 List<? extends List<? extends Map<String, ?>>> childData, int childLayout, String[] childFrom, int[] childTo) {
@@ -258,22 +288,22 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 		public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
 			View layout = super.getChildView(groupPosition, childPosition, isLastChild,	convertView, parent);
 			Map<String, ?> map = mChildData.get(groupPosition).get(childPosition);
-			final OrderFood food = (OrderFood) map.get(ITEM_THE_FOOD);
+			final OrderFood of = (OrderFood) map.get(ITEM_THE_FOOD);
 			layout.setTag(map);
 			
 			//show the name to each food
 			String status = "";
-			if(food.asFood().isSpecial()){
+			if(of.asFood().isSpecial()){
 				status = "特";
 			}
-			if(food.asFood().isRecommend()){
+			if(of.asFood().isRecommend()){
 				if(status.length() == 0){
 					status = "荐";
 				}else{
 					status = status + ",荐";
 				}
 			}
-			if(food.asFood().isGift()){
+			if(of.asFood().isGift()){
 				if(status.length() == 0){
 					status = "赠";
 				}else{
@@ -285,14 +315,14 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 			}
 			
 			String tempStatus = null;
-			if(food.isTemp()){
+			if(of.isTemp()){
 				tempStatus = "(临)";
 			}else{
 				tempStatus = "";
 			}
 			
 			String hangStatus = null;
-			if(food.isHangup()){
+			if(of.isHangup()){
 				hangStatus = "叫";
 			}else{
 				hangStatus = "";
@@ -302,42 +332,42 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 			}
 			
 			String hurriedStatus = null;
-			if(food.isHurried()){
+			if(of.isHurried()){
 				hurriedStatus = "(催)";
 			}else{
 				hurriedStatus = "";
 			}
 			
 			String comboStatus = null;
-			if(food.asFood().isCombo()){
+			if(of.asFood().isCombo()){
 				comboStatus = "(套)";
 			}else{
 				comboStatus = "";
 			}
 			
-			((TextView) layout.findViewById(R.id.txtView_foodName_orderChildItem)).setText(comboStatus + tempStatus + hangStatus + hurriedStatus + food.getName() + status);
+			((TextView) layout.findViewById(R.id.txtView_foodName_orderChildItem)).setText(comboStatus + tempStatus + hangStatus + hurriedStatus + of.getName() + status);
 			
 			//如果是新点菜
 			if(!map.containsKey(ITEM_IS_ORI_FOOD)){
 				
 				layout.setOnClickListener(new OnClickListener(){
-
+	
 					@Override
 					public void onClick(View v) {
 						new AlertDialog.Builder(getActivity())
 						.setTitle("提示")
-						.setMessage("叫起" + food.getName() + "吗？")
+						.setMessage("叫起" + of.getName() + "吗？")
 						.setNeutralButton("是", new DialogInterface.OnClickListener() {
 								@Override
 								public void onClick(DialogInterface dialog,	int which){
-									food.setHangup(true);
+									of.setHangup(true);
 									mFoodListHandler.sendEmptyMessage(0);
 								}
 							})
 							.setNegativeButton("否", new DialogInterface.OnClickListener() {
 								@Override
 								public void onClick(DialogInterface dialog,	int which){
-									food.setHangup(false);
+									of.setHangup(false);
 									mFoodListHandler.sendEmptyMessage(0);
 								}
 							})
@@ -348,7 +378,7 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 				
 				//"口味"操作			 
 				ImageView delFoodImgView = (ImageView)layout.findViewById(R.id.imgView_left_orderFoodListView_childItem);
-				delFoodImgView.setTag(food);
+				delFoodImgView.setTag(of);
 				delFoodImgView.setBackgroundResource(R.drawable.taste_word_selector);
 				
 				OnClickListener listener = new OnClickListener() {
@@ -371,10 +401,10 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 				delFoodImgView.setOnClickListener(listener);
 	
 				//"数量"操作
-				ImageView addTasteImgView = (ImageView)layout.findViewById(R.id.imgView_right_orderFoodListView_childItem);
-				addTasteImgView.setBackgroundResource(R.drawable.amount_selector);
-				addTasteImgView.setTag(food);
-				addTasteImgView.setOnClickListener(new OnClickListener() {
+				ImageView amountImgView = (ImageView)layout.findViewById(R.id.imgView_right_orderFoodListView_childItem);
+				amountImgView.setBackgroundResource(R.drawable.amount_selector);
+				amountImgView.setTag(of);
+				amountImgView.setOnClickListener(new OnClickListener() {
 					@Override
 					public void onClick(View v) {
 						SetOrderAmountDialog.newInstance((OrderFood)v.getTag(), OrderFoodFragment.this.getId()).show(getFragmentManager(), SetOrderAmountDialog.TAG);
@@ -384,73 +414,129 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 			}else {//已点菜
 				
 				//"退菜"Button
-				ImageView cancelFoodImgView = (ImageView) layout.findViewById(R.id.imgView_left_orderFoodListView_childItem);
-				cancelFoodImgView.setBackgroundResource(R.drawable.tuicai_selector);
+				ImageView cancelImgView = (ImageView) layout.findViewById(R.id.imgView_left_orderFoodListView_childItem);
+				cancelImgView.setBackgroundResource(R.drawable.tuicai_selector);
 				
-				//"催菜"Button
-				ImageView hurriedImgView = (ImageView) layout.findViewById(R.id.imgView_right_orderFoodListView_childItem);
-				hurriedImgView.setBackgroundResource(R.drawable.cuicai_selector);
+				//"加菜"Button
+				ImageView addImgView = (ImageView) layout.findViewById(R.id.imgView_right_orderFoodListView_childItem);
+				addImgView.setBackgroundResource(R.drawable.amount_selector);
 				
-				//"取消退菜"Button
+				//"取消退菜"or"取消加菜"Button
 				Button restoreBtn = (Button) layout.findViewById(R.id.button_orderFoodListView_childItem_restore);
 				
-				//如果是退菜
-				if(map.containsKey(ITEM_IS_OFFSET)){
-					cancelFoodImgView.setVisibility(View.INVISIBLE);
-					hurriedImgView.setVisibility(View.INVISIBLE);
-					
-					((TextView) layout.findViewById(R.id.txtView_amountValue_orderChildItem)).setText(NumericUtil.float2String2(food.getDelta()));
-					layout.findViewById(R.id.view_OrderFoodListView_childItem).setVisibility(View.VISIBLE);
-					//取消退菜按钮
-					restoreBtn.setVisibility(View.VISIBLE); 
-					restoreBtn.setOnClickListener(new View.OnClickListener() {
-						@Override
-						public void onClick(View v) {
-							try {
-								food.addCount(food.getDelta());		
-								food.setCancelReason(null);
+				//Check if delta exist
+				if(map.containsKey(ITEM_IS_DELTA)){
+					//delta > 0 表示是退菜
+					if((Float)map.get(ITEM_FOOD_DELTA) > 0f){
+						cancelImgView.setVisibility(View.INVISIBLE);
+						addImgView.setVisibility(View.INVISIBLE);
+						
+						((TextView) layout.findViewById(R.id.txtView_amountValue_orderChildItem)).setText(NumericUtil.float2String2(of.getDelta()));
+						layout.findViewById(R.id.view_OrderFoodListView_childItem).setVisibility(View.VISIBLE);
+						//取消退菜按钮
+						restoreBtn.setText("取消退菜");
+						restoreBtn.setVisibility(View.VISIBLE); 
+						restoreBtn.setOnClickListener(new View.OnClickListener() {
+							@Override
+							public void onClick(View v) {
+								of.setCount(of.getCount() + of.getDelta());
+								of.setCancelReason(null);
 								mFoodListHandler.sendEmptyMessage(0);
-							} catch (BusinessException e) {
-								Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_SHORT).show();
 							}
-						}
-					});
-				//不是退菜
+						});
+						
+					}else if((Float)map.get(ITEM_FOOD_DELTA) < 0f){
+						//delta < 0 表示是加菜
+						cancelImgView.setVisibility(View.INVISIBLE);
+						addImgView.setVisibility(View.INVISIBLE);
+						
+						layout.setBackgroundColor(Color.LTGRAY);
+						((TextView)layout.findViewById(R.id.txtView_taste_orderChildItem)).setTextColor(getResources().getColor(R.color.green));
+						((TextView) layout.findViewById(R.id.txtView_amountValue_orderChildItem)).setText(NumericUtil.float2String2(Math.abs(of.getDelta())));
+						layout.findViewById(R.id.view_OrderFoodListView_childItem).setVisibility(View.INVISIBLE);
+						//取消加菜按钮
+						restoreBtn.setText("取消加菜");
+						restoreBtn.setVisibility(View.VISIBLE); 
+						restoreBtn.setOnClickListener(new View.OnClickListener() {
+							@Override
+							public void onClick(View v) {
+								of.setCount(of.getCount() - Math.abs(of.getDelta()));
+								mFoodListHandler.sendEmptyMessage(0);
+							}
+						});
+					}
+				
 				} else {
-					cancelFoodImgView.setVisibility(View.VISIBLE);
-					hurriedImgView.setVisibility(View.VISIBLE);
+					//Delta不存在表示菜品没有变化
+					
+					if((Float)map.get(ITEM_FOOD_DELTA) < 0f){
+						//delta < 0 表示是加菜, 只显示加菜Button
+						cancelImgView.setVisibility(View.INVISIBLE);
+						addImgView.setVisibility(View.VISIBLE);
+						
+					}else if((Float)map.get(ITEM_FOOD_DELTA) > 0f){
+						//delta > 0 表示是退菜, 只显示退菜Button
+						cancelImgView.setVisibility(View.VISIBLE);
+						addImgView.setVisibility(View.INVISIBLE);
+					}else{
+						//delta == 0表示普通状态, 显示加/退菜Button
+						cancelImgView.setVisibility(View.VISIBLE);
+						addImgView.setVisibility(View.VISIBLE);
+					}
 					
 					restoreBtn.setVisibility(View.INVISIBLE);
+					
 					//show the order amount to each food
-					((TextView) layout.findViewById(R.id.txtView_amountValue_orderChildItem)).setText(NumericUtil.float2String2(food.getCount()));
+					((TextView) layout.findViewById(R.id.txtView_amountValue_orderChildItem)).setText(NumericUtil.float2String2(of.getCount()));
 					layout.findViewById(R.id.view_OrderFoodListView_childItem).setVisibility(View.INVISIBLE);
 					//"退菜"操作
-					cancelFoodImgView.setOnClickListener(new View.OnClickListener() {				
+					cancelImgView.setOnClickListener(new View.OnClickListener() {				
 						@Override
 						public void onClick(View v) {
-							AskCancelAmountDialog.newInstance(food, getId()).show(getFragmentManager(), AskCancelAmountDialog.TAG);
+							AskCancelAmountDialog.newInstance(of, getId()).show(getFragmentManager(), AskCancelAmountDialog.TAG);
 						}
 					});
-					//"催菜"操作
-					hurriedImgView.setOnClickListener(new View.OnClickListener() {				
+					
+					//"加菜"操作
+					addImgView.setOnClickListener(new View.OnClickListener() {				
 						@Override
 						public void onClick(View v) {
-							if(food.isHurried()){
-								food.setHurried(false);
-								Toast.makeText(getActivity(), "取消催菜成功", Toast.LENGTH_SHORT).show();
-								mFoodListHandler.sendEmptyMessage(0);
-							}else{
-								food.setHurried(true);
-								Toast.makeText(getActivity(), "催菜成功", Toast.LENGTH_SHORT).show();	
-								mFoodListHandler.sendEmptyMessage(0);
-							}			
+							AddOrderAmountDialog.newInstance(of, getId()).show(getFragmentManager(), AddOrderAmountDialog.TAG);
 						}
-					}); 
+					});
+					
+					//"催菜"操作
+					layout.setOnClickListener(new OnClickListener(){
+						
+						@Override
+						public void onClick(View v) {
+							new AlertDialog.Builder(getActivity())
+							.setTitle("提示")
+							.setMessage("催" + of.getName() + "吗？")
+							.setNeutralButton("是", new DialogInterface.OnClickListener() {
+									@Override
+									public void onClick(DialogInterface dialog,	int which){
+										of.setHurried(true);
+										Toast.makeText(getActivity(), "催菜成功", Toast.LENGTH_SHORT).show();	
+										mFoodListHandler.sendEmptyMessage(0);
+									}
+								})
+								.setNegativeButton("否", new DialogInterface.OnClickListener() {
+									@Override
+									public void onClick(DialogInterface dialog,	int which){
+										of.setHurried(false);
+										mFoodListHandler.sendEmptyMessage(0);
+									}
+								})
+								.show();	
+						}
+						
+					});
 				}
 			}
 			return layout;
 		}
-
+	
 		@Override
 		public View getGroupView(int groupPosition, boolean isExpanded,	View convertView, ViewGroup parent) {
 			View layout = super.getGroupView(groupPosition, isExpanded, convertView, parent);
@@ -466,7 +552,7 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 				((ImageView) layout.findViewById(R.id.imgView_left_orderDropGroup)).setVisibility(View.INVISIBLE);
 				
 			}else{
-
+	
 				/**
 				 * 新点菜的Group显示"点菜"、"全单"Button
 				 */
@@ -571,11 +657,11 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 						mPopup.showAsDropDown(v);
 					}
 				});
-
+	
 			}
 			return layout;
 		}
-		
+	
 	}
 	
 	public static OrderFoodFragment newInstance(){
@@ -835,6 +921,11 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 		if(food.getCount() == 0){
 			mNewFoodList.remove(food);
 		}
+		mFoodListHandler.sendEmptyMessage(0);
+	}
+
+	@Override
+	public void onAmountAdded(OrderFood food) {
 		mFoodListHandler.sendEmptyMessage(0);
 	}
 }

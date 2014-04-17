@@ -13,47 +13,25 @@
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:textColor="@color/orange" />
 
-    <TextView
-        android:id="@+id/txtView_yuan_quickPick_commitDialog_item"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/textView_foodName_commit_dialog_item"
-        android:layout_alignBottom="@+id/textView_foodName_commit_dialog_item"
-        android:layout_alignParentRight="true"
-        android:text="元"
-        android:textColor="@color/orange"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
 
     <TextView
         android:id="@+id/textView_price_quickPick_commitDialog_item"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/txtView_yuan_quickPick_commitDialog_item"
-        android:layout_alignBottom="@+id/txtView_yuan_quickPick_commitDialog_item"
-        android:layout_toLeftOf="@+id/txtView_yuan_quickPick_commitDialog_item"
+        android:layout_alignBaseline="@+id/textView_foodName_commit_dialog_item"
+        android:layout_alignBottom="@+id/textView_foodName_commit_dialog_item"
+        android:layout_alignParentRight="true"
         android:text="10"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:textColor="@color/orange" />
 
     <TextView
-        android:id="@+id/txtView_fen_quickPick_commitDialog_item"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/textView_price_quickPick_commitDialog_item"
-        android:layout_alignBottom="@+id/textView_price_quickPick_commitDialog_item"
-        android:layout_marginRight="12dp"
-        android:layout_toLeftOf="@+id/textView_price_quickPick_commitDialog_item"
-        android:text="份"
-        android:textColor="@color/orange"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
-
-    <TextView
         android:id="@+id/textView_amount_quickPick_commitDialog_item"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/txtView_fen_quickPick_commitDialog_item"
-        android:layout_alignBottom="@+id/txtView_fen_quickPick_commitDialog_item"
-        android:layout_toLeftOf="@+id/txtView_fen_quickPick_commitDialog_item"
+        android:layout_alignBaseline="@+id/textView_foodName_commit_dialog_item"
+        android:layout_alignBottom="@+id/textView_foodName_commit_dialog_item"
+        android:layout_toRightOf="@+id/textView_foodName_commit_dialog_item"
         android:text="1"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:textColor="@color/orange" />

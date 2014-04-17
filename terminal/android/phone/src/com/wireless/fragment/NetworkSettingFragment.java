@@ -27,7 +27,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.wireless.common.Params;
+import com.wireless.common.WirelessOrder;
 import com.wireless.pack.req.ReqPing;
+import com.wireless.pojo.staffMgr.Role;
 import com.wireless.sccon.ServerConnector;
 import com.wireless.ui.R;
 import com.wireless.util.DeviceUtil;
@@ -58,6 +60,12 @@ public class NetworkSettingFragment extends Fragment {
 		_ipEdtTxt.setText(_address);
 		_portEdtTxt.setText(String.valueOf(_port));
 
+		//只有管理员才可以修改网络设定
+		if(WirelessOrder.loginStaff.getRole().getCategory() != Role.Category.ADMIN){
+			_ipEdtTxt.setEnabled(false);
+			_portEdtTxt.setEnabled(false);
+		}
+		
 		//监听服务器IP的变化
 		_ipEdtTxt.addTextChangedListener(new TextWatcher(){
 

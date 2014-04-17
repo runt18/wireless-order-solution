@@ -108,11 +108,7 @@ public class AskOrderAmountDialog extends DialogFragment{
 			public void onClick(View v) {
 				try{
 					float curNum = Float.parseFloat(countEditText.getText().toString());
-					if(++curNum <= 255){
-						countEditText.setText(NumericUtil.float2String2(curNum));
-					}else{
-						Toast.makeText(getActivity(), "点菜数量不能超过255", Toast.LENGTH_SHORT).show();
-					}
+					countEditText.setText(NumericUtil.float2String2(curNum));
 				}catch(NumberFormatException e){
 					
 				}
@@ -336,23 +332,19 @@ public class AskOrderAmountDialog extends DialogFragment{
 	private void onPick(){
 		try{
 			float orderAmount = Float.parseFloat(((EditText)getView().findViewById(R.id.editText_askOrderAmount_amount)).getText().toString());
-			
-   			if(orderAmount > 255){
-   				Toast.makeText(getActivity(), "对不起，\"" + mSelectedFood.toString() + "\"最多只能点255份", Toast.LENGTH_SHORT).show();
-   			}else{
-   				mSelectedFood.setCount(orderAmount);
-   				if(mFoodPickedListener != null){	
-   					mFoodPickedListener.onFoodPicked(mSelectedFood);
-   				}
-   				
-   				//Clear up the text to search box
-				View srchEditText = getFragmentManager().findFragmentById(mParentId).getView().findViewById(R.id.editText_search_pickFoodFragment);
-				if(srchEditText != null){
-					((EditText)srchEditText).setText("");
-				}
 
-				dismiss();
-   			}
+			mSelectedFood.setCount(orderAmount);
+			if(mFoodPickedListener != null){	
+				mFoodPickedListener.onFoodPicked(mSelectedFood);
+			}
+			
+			//Clear up the text to search box
+			View srchEditText = getFragmentManager().findFragmentById(mParentId).getView().findViewById(R.id.editText_search_pickFoodFragment);
+			if(srchEditText != null){
+				((EditText)srchEditText).setText("");
+			}
+
+			dismiss();
 			
 		}catch(NumberFormatException e){
 			Toast.makeText(getActivity(), "您输入的数量格式不正确，请重新输入", Toast.LENGTH_SHORT).show();

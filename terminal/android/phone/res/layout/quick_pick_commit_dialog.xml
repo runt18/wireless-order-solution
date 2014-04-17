@@ -18,14 +18,26 @@
         android:layout_below="@+id/line_commit_dialog"
         android:paddingLeft="3dp" >
 
-        <AutoCompleteTextView
+        <EditText
             android:id="@+id/autoCompleteTextView_commitDialog"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
             android:hint="请输入台号"
-            android:inputType="number" >
-        </AutoCompleteTextView>
+            android:inputType="number" />
+
+        <TextView
+            android:id="@+id/txtView_tableName_quickPick_commitDialog"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@+id/autoCompleteTextView_commitDialog"
+            android:layout_alignParentRight="true"
+            android:layout_alignRight="@+id/autoCompleteTextView_commitDialog"
+            android:paddingRight="8dp"
+            android:text="宏图厅"
+            android:textSize="20sp"
+            android:textColor="@color/green"
+            android:visibility="gone" />
     </RelativeLayout>
 
     <LinearLayout
@@ -58,7 +70,7 @@
     </LinearLayout>
 
     <View
-        android:id="@+id/line2_commitDialog"
+        android:id="@+id/line_commitDialog_middle"
         android:layout_width="wrap_content"
         android:layout_height="1dp"
         android:layout_below="@+id/linearLayout_commitDialog"
@@ -69,16 +81,36 @@
         android:id="@+id/listView_commitDialog"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/line2_commitDialog"
+        android:layout_below="@+id/line_commitDialog_middle"
         android:paddingLeft="4dp"
         android:paddingRight="4dp" >
     </ListView>
+
+    <TextView
+        android:id="@+id/txtView_totalPrice_quickPick_commitDialog"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/listView_commitDialog"
+        android:paddingRight="4dp"
+        android:text="小计：￥100"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textColor="@color/green" />
+
+    <View
+        android:id="@+id/line_commitDialog_bottom"
+        android:layout_width="wrap_content"
+        android:layout_height="1dp"
+        android:layout_below="@+id/txtView_totalPrice_quickPick_commitDialog"
+        android:background="@color/orange"
+        android:visibility="visible" />
 
     <LinearLayout
         android:id="@+id/linearLayout_commitDialog_bottom"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/listView_commitDialog"
+        android:layout_below="@+id/line_commitDialog_bottom"
+        android:layout_marginTop="1dp"
         android:weightSum="2" >
 
         <Button
@@ -86,7 +118,7 @@
             android:layout_width="0dip"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="提交不打印" />
+            android:text="下单不打印" />
 
         <Button
             android:id="@+id/button_commitDialog_cancel"
