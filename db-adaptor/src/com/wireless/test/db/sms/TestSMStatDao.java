@@ -10,7 +10,7 @@ import org.junit.Test;
 import com.wireless.db.sms.SMStatDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
-import com.wireless.exception.RestaurantError;
+import com.wireless.exception.SMSError;
 import com.wireless.pojo.sms.SMSDetail;
 import com.wireless.pojo.sms.SMStat;
 import com.wireless.pojo.staffMgr.Staff;
@@ -105,7 +105,7 @@ public class TestSMStatDao {
 				SMStatDao.get(mStaff);
 				Assert.assertTrue("failed to delete the sms stat", false);
 			}catch(BusinessException e){
-				Assert.assertEquals("failed to delete the sms stat", RestaurantError.SMS_STAT_NOT_EXIST, e.getErrCode());
+				Assert.assertEquals("failed to delete the sms stat", SMSError.SMS_STAT_NOT_EXIST, e.getErrCode());
 				Assert.assertTrue("failed to delete the sms details", SMStatDao.getDetails(mStaff, null, null).isEmpty());
 			}
 		}

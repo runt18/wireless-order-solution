@@ -22,6 +22,7 @@ import com.wireless.db.tasteMgr.TasteCategoryDao;
 import com.wireless.db.tasteMgr.TasteDao;
 import com.wireless.db.weixin.WeixinInfoDao;
 import com.wireless.exception.BusinessException;
+import com.wireless.exception.ModuleError;
 import com.wireless.exception.RestaurantError;
 import com.wireless.pojo.client.MemberType;
 import com.wireless.pojo.crMgr.CancelReason;
@@ -422,7 +423,7 @@ public class RestaurantDao {
 		if(dbCon.rs.next()){
 			moduleId = dbCon.rs.getInt("module_id");
 		}else{
-			throw new BusinessException(RestaurantError.MODULE_NOT_EXIST);
+			throw new BusinessException(ModuleError.MODULE_NOT_EXIST);
 		}
 		dbCon.rs.close();
 		

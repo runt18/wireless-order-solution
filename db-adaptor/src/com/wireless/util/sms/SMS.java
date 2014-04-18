@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.GZIPInputStream;
@@ -26,7 +27,17 @@ import org.apache.http.protocol.HttpContext;
 import sun.misc.BASE64Encoder;
 
 import com.alibaba.fastjson.JSON;
+import com.wireless.db.DBCon;
+import com.wireless.db.restaurantMgr.RestaurantDao;
+import com.wireless.db.sms.SMStatDao;
+import com.wireless.exception.BusinessException;
+import com.wireless.exception.ModuleError;
+import com.wireless.exception.SMSError;
+import com.wireless.pojo.restaurantMgr.Module;
 import com.wireless.pojo.restaurantMgr.Restaurant;
+import com.wireless.pojo.sms.SMSDetail;
+import com.wireless.pojo.sms.SMStat;
+import com.wireless.pojo.staffMgr.Staff;
 
 public final class SMS {
 	
@@ -34,13 +45,26 @@ public final class SMS {
 	
 	private SMS(){}
 	
-	public static class Msg{
-		private final Restaurant restaurant;
+	static class Msg{
+		private final String sign;
 		private final String content;
+		private final SMSDetail.Operation operation;
 		
-		public Msg(String content, Restaurant restaurant){
+		Msg(String content, String sign, SMSDetail.Operation operation){
 			this.content = content;
-			this.restaurant = restaurant;
+			this.sign = sign;
+			this.operation = operation;
+		}
+		
+		@Override
+		public String toString(){
+			return content + "【" + (sign.trim().isEmpty() ? "微信餐厅" : sign) + "】";
+		}
+	}
+	
+	public static class Msg4Verify extends Msg{
+		public Msg4Verify(int code){
+			super("您本次操作的验证码是" + code, null, SMSDetail.Operation.USE_VERIFY);
 		}
 	}
 	
@@ -89,7 +113,80 @@ public final class SMS {
 		}
 	}
 	
-	public static Status send(String mobile, Msg msg) throws ClientProtocolException, IOException{
+	/**
+	 * Send the SMS.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param mobile
+	 * 			the mobile to send SMS
+	 * @param msg
+	 * 			the content to send SMS
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if cases below.
+	 * 			<li>the restaurant does NOT has SMS module
+	 * 			<li>insufficient SMS to send
+	 * @throws ClientProtocolException
+	 * 			throws if failed to send SMS
+	 * @throws IOException
+	 * 			throws if failed to send SMS
+	 */
+	public static void send(Staff staff, String mobile, SMS.Msg msg) throws SQLException, BusinessException, ClientProtocolException, IOException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			send(dbCon, staff, mobile, msg);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Send the SMS.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param mobile
+	 * 			the mobile to send SMS
+	 * @param msg
+	 * 			the content to send SMS
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if cases below.
+	 * 			<li>the restaurant does NOT has SMS module
+	 * 			<li>insufficient SMS to send
+	 * @throws ClientProtocolException
+	 * 			throws if failed to send SMS
+	 * @throws IOException
+	 * 			throws if failed to send SMS
+	 */
+	public static void send(DBCon dbCon, Staff staff, String mobile, SMS.Msg msg) throws SQLException, BusinessException, ClientProtocolException, IOException{
+		//Check to see whether the restaurant has SMS module.
+		Restaurant restaurant = RestaurantDao.getById(dbCon, staff.getRestaurantId());
+		if(restaurant.hasModule(Module.Code.SMS)){
+			//Check to see whether has the remaining SMS to send.
+			if(SMStatDao.get(dbCon, staff).getRemaining() > 0){
+				Status status = send(mobile, new Msg(msg.content, restaurant.getName(), msg.operation));
+				if(status.isSuccess()){
+					//Log the SMS record if succeed to send.
+					SMStatDao.update(dbCon, staff, new SMStat.UpdateBuilder(staff.getRestaurantId(), msg.operation).setAmount(1));
+				}else{
+					throw new BusinessException(status.msg);
+				}
+			}else{
+				throw new BusinessException(SMSError.INSUFFICIENT_SMS_AMOUNT);
+			}
+		}else{
+			throw new BusinessException(ModuleError.SMS_LIMIT);
+		}
+	}
+	
+	private static Status send(String mobile, Msg msg) throws ClientProtocolException, IOException{
         DefaultHttpClient client = new DefaultHttpClient();
 
         client.addRequestInterceptor(new HttpRequestInterceptor() {
@@ -114,8 +211,7 @@ public final class SMS {
         try {
             List<NameValuePair> params = new ArrayList<NameValuePair>();
             params.add(new BasicNameValuePair("mobile", mobile));
-            String restaurant = msg.restaurant.getName();
-            params.add(new BasicNameValuePair("message", msg.content + "【" + (restaurant.trim().isEmpty() ? "微信餐厅" : restaurant) + "】"));
+            params.add(new BasicNameValuePair("message", msg.toString()));
             request.setEntity(new UrlEncodedFormEntity(params, "utf-8"));
 
 

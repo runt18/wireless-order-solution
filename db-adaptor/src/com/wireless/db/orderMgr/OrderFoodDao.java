@@ -85,7 +85,7 @@ public class OrderFoodDao {
 	public static List<OrderFood> getSingleDetailToday(DBCon dbCon, Staff staff, String extraCond, String orderClause) throws SQLException, BusinessException {
 		String sql;
 
-		sql = " SELECT OF.order_id, OF.taste_group_id, OF.is_temporary, " +
+		sql = " SELECT OF.id, OF.order_id, OF.taste_group_id, OF.is_temporary, " +
 				" OF.restaurant_id, OF.food_id, OF.name, OF.food_status, OF.is_paid, " +
 				" OF.unit_price, OF.order_count, OF.waiter, OF.order_date, OF.discount, OF.order_date, " +
 				" OF.cancel_reason_id, OF.cancel_reason, " +
@@ -102,7 +102,7 @@ public class OrderFoodDao {
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		ArrayList<OrderFood> orderFoods = new ArrayList<OrderFood>();
 		while (dbCon.rs.next()) {
-			OrderFood food = new OrderFood();
+			OrderFood food = new OrderFood(dbCon.rs.getLong("id"));
 			food.setOrderId(dbCon.rs.getInt("order_id"));
 			food.asFood().setFoodId(dbCon.rs.getInt("food_id"));
 			food.asFood().setName(dbCon.rs.getString("name"));
@@ -331,7 +331,7 @@ public class OrderFoodDao {
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		ArrayList<OrderFood> orderFoods = new ArrayList<OrderFood>();
 		while (dbCon.rs.next()) {
-			OrderFood food = new OrderFood();
+			OrderFood food = new OrderFood(dbCon.rs.getLong("id"));
 			food.asFood().setFoodId(dbCon.rs.getInt("food_id"));
 			food.asFood().setName(dbCon.rs.getString("name"));
 			food.asFood().setRestaurantId(dbCon.rs.getInt("restaurant_id"));

@@ -112,30 +112,6 @@ public class InsertOrder {
 	}
 	
 	/**
-	 * Insert a new order without database transaction.
-	 * @param dbCon
-	 * 			the database connection
-	 * @param staff
-	 * 			the staff to perform this action
-	 * @param orderToInsert
-	 * 			the order along with basic insert parameters
-	 * @return the completed order details to insert
-	 * @throws BusinessException
-	 *          throws if one of cases below
-	 *          <li>the table associated with this order does NOT exist
-	 *          <li>the table associated with this order is BUSY
-	 *          <li>any food query to insert does NOT exist
-	 *          <li>any food to this order does NOT exist>
-	 * @throws SQLException
-	 * 			throws if failed to execute any SQL statements
-	 */
-	public static Order execAsync(DBCon dbCon, Staff staff, Order orderToInsert) throws BusinessException, SQLException{
-		doPrepare(dbCon, staff, orderToInsert);
-		doInsert(dbCon, staff, orderToInsert);
-		return orderToInsert;
-	}
-	
-	/**
 	 * Prepare to fill the details to order inserted.
 	 * The SQL statements should only be the SELECT type. 
 	 * @param dbCon

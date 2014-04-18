@@ -7,7 +7,7 @@ import java.util.List;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.exception.BusinessException;
-import com.wireless.exception.RestaurantError;
+import com.wireless.exception.SMSError;
 import com.wireless.pojo.sms.SMSDetail;
 import com.wireless.pojo.sms.SMStat;
 import com.wireless.pojo.staffMgr.Staff;
@@ -105,7 +105,7 @@ public class SMStatDao {
 			stat.setTotalUsed(dbCon.rs.getInt("total_used"));
 			stat.setRemaining(dbCon.rs.getInt("remaining"));
 		}else{
-			throw new BusinessException(RestaurantError.SMS_STAT_NOT_EXIST);
+			throw new BusinessException(SMSError.SMS_STAT_NOT_EXIST);
 		}
 		dbCon.rs.close();
 		
@@ -247,7 +247,7 @@ public class SMStatDao {
 			  " ,remaining = " + state.getRemaining() +
 			  " WHERE restaurant_id = " + builder.getRestaurantId();
 		if(dbCon.stmt.executeUpdate(sql) == 0){
-			throw new BusinessException(RestaurantError.SMS_STAT_NOT_EXIST);
+			throw new BusinessException(SMSError.SMS_STAT_NOT_EXIST);
 		}
 
 		//Insert the sms detail.
