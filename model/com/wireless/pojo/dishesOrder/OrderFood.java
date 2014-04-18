@@ -26,6 +26,9 @@ public class OrderFood implements Parcelable, Comparable<OrderFood>, Jsonable {
 	public final static byte OF_PARCELABLE_4_COMMIT = 0;
 	public final static byte OF_PARCELABLE_4_QUERY = 1;
 	
+	//the id to this order food
+	private long id;
+	
 	//the order id associated with this order food
 	private int mOrderId;
 	
@@ -56,7 +59,7 @@ public class OrderFood implements Parcelable, Comparable<OrderFood>, Jsonable {
 	//the discount to this food represent as integer
 	private float mDiscount = 1;	 
 	
-	final static int MAX_ORDER_AMOUNT = 255;
+	final static int MAX_ORDER_AMOUNT = Short.MAX_VALUE;
 
 	//the current order amount to this order food
 	private float mCurCnt;		
@@ -116,10 +119,10 @@ public class OrderFood implements Parcelable, Comparable<OrderFood>, Jsonable {
 		if(countToAdd >= 0){
 			float amount = mCurCnt + countToAdd; 
 			if(amount <= MAX_ORDER_AMOUNT){
-				mLastCnt = mCurCnt;
+				//mLastCnt = mCurCnt;
 				mCurCnt = amount;
 			}else{
-				throw new BusinessException("对不起，\"" + mFood.getName() + "\"每次最多只能点" + MAX_ORDER_AMOUNT / 100 + "份");
+				throw new BusinessException("对不起，\"" + mFood.getName() + "\"每次最多只能点" + MAX_ORDER_AMOUNT + "份");
 			}
 			
 		}else{
@@ -141,7 +144,7 @@ public class OrderFood implements Parcelable, Comparable<OrderFood>, Jsonable {
 		if(staff.getRole().hasPrivilege(Privilege.Code.CANCEL_FOOD)){
 			if(countToRemove >= 0){
 				if(countToRemove <= getCount()){
-					mLastCnt = mCurCnt;
+					//mLastCnt = mCurCnt;
 					mCurCnt -= countToRemove;
 				}else{
 					throw new BusinessException("输入的删除数量大于已点数量, 请重新输入");
@@ -169,8 +172,12 @@ public class OrderFood implements Parcelable, Comparable<OrderFood>, Jsonable {
 	 * 			the order amount to set
 	 */
 	public void setCount(float count){
-		mLastCnt = mCurCnt;
-		mCurCnt = (count <= MAX_ORDER_AMOUNT ? count : MAX_ORDER_AMOUNT);		
+		//mLastCnt = mCurCnt;
+		if(count >= 0){
+			mLastCnt = mCurCnt = (count <= MAX_ORDER_AMOUNT ? count : MAX_ORDER_AMOUNT);
+		}else{
+			throw new IllegalArgumentException("菜品数量不能是负数");
+		}
 	}
 	
 	/**
@@ -179,14 +186,6 @@ public class OrderFood implements Parcelable, Comparable<OrderFood>, Jsonable {
 	 */
 	public float getCount(){
 		return NumericUtil.roundFloat(mCurCnt);
-	}
-	
-	/**
-	 * Get the original count to this order food.
-	 * @return the original count to this order food
-	 */
-	public Float getOriCount(){
-		return NumericUtil.roundFloat(mLastCnt);
 	}
 	
 	/**
@@ -266,6 +265,10 @@ public class OrderFood implements Parcelable, Comparable<OrderFood>, Jsonable {
 		
 	}
 
+	public OrderFood(long id){
+		this.id = id;
+	}
+	
 	public OrderFood(Food src){
 		mFood.copyFrom(src);
 	}
@@ -356,6 +359,14 @@ public class OrderFood implements Parcelable, Comparable<OrderFood>, Jsonable {
 	
 	public boolean hasCancelReason(){
 		return mCancelReason == null ? false : mCancelReason.hasReason();
+	}
+	
+	public long getId(){
+		return this.id;
+	}
+	
+	public void setId(long id){
+		this.id = id;
 	}
 	
 	public int getOrderId(){
@@ -539,16 +550,17 @@ public class OrderFood implements Parcelable, Comparable<OrderFood>, Jsonable {
 				dest.writeShort(mFood.getStatus());
 				dest.writeParcel(this.mTasteGroup, TasteGroup.TG_PARCELABLE_COMPLEX);
 			}
+			dest.writeLong(this.getId());
 			dest.writeString(mFood.getName());
 			dest.writeFloat(mFood.getPrice());
 			dest.writeParcel(mFood.getKitchen(), Kitchen.KITCHEN_PARCELABLE_SIMPLE);
 			dest.writeInt(this.getFoodId());
 			dest.writeShort(this.getAliasId());
 			dest.writeFloat(this.getDiscount());
-			dest.writeFloat(this.mCurCnt);
-			dest.writeBoolean(this.isHangup);
-			dest.writeLong(this.mOrderDate);
-			dest.writeString(this.mWaiter);
+			dest.writeFloat(this.getCount());
+			dest.writeBoolean(this.isHangup());
+			dest.writeLong(this.getOrderDate());
+			dest.writeString(this.getWaiter());
 
 		}else if(flag == OF_PARCELABLE_4_COMMIT){
 			if(this.isTemporary){
@@ -559,10 +571,10 @@ public class OrderFood implements Parcelable, Comparable<OrderFood>, Jsonable {
 				dest.writeShort(mFood.getStatus());
 				dest.writeParcel(this.mTasteGroup, TasteGroup.TG_PARCELABLE_COMPLEX);
 			}
-			
+			dest.writeLong(this.getId());
 			dest.writeInt(this.getFoodId());
 			dest.writeShort(this.getAliasId());
-			dest.writeFloat(this.mCurCnt);
+			dest.writeFloat(this.getCount());
 			dest.writeBoolean(this.isHangup);
 			dest.writeLong(this.mOrderDate);
 			dest.writeString(this.mWaiter);
@@ -582,17 +594,17 @@ public class OrderFood implements Parcelable, Comparable<OrderFood>, Jsonable {
 				mFood.setStatus(source.readShort());
 				this.mTasteGroup = source.readParcel(TasteGroup.TG_CREATOR);
 			}
-
+			this.setId(source.readLong());
 			mFood.setName(source.readString());
 			mFood.setPrice(source.readFloat());
 			mFood.setKitchen(source.readParcel(Kitchen.CREATOR));
 			mFood.setFoodId(source.readInt());
 			mFood.setAliasId(source.readShort());
 			this.setDiscount(source.readFloat());
-			this.mCurCnt = source.readFloat();
-			this.isHangup = source.readBoolean();
-			this.mOrderDate = source.readLong();
-			this.mWaiter = source.readString();
+			this.setCount(source.readFloat());
+			this.setHangup(source.readBoolean());
+			this.setOrderDate(source.readLong());
+			this.setWaiter(source.readString());
 			
 		}else if(flag == OF_PARCELABLE_4_COMMIT){
 			if(isTemporary){
@@ -603,10 +615,10 @@ public class OrderFood implements Parcelable, Comparable<OrderFood>, Jsonable {
 				mFood.setStatus(source.readShort());
 				this.mTasteGroup = source.readParcel(TasteGroup.TG_CREATOR);
 			}
-			
+			this.setId(source.readLong());
 			mFood.setFoodId(source.readInt());
 			mFood.setAliasId(source.readShort());
-			this.mCurCnt = source.readFloat();
+			this.setCount(source.readFloat());
 			this.isHangup = source.readBoolean();
 			this.mOrderDate = source.readLong();
 			this.mWaiter = source.readString();
@@ -633,9 +645,9 @@ public class OrderFood implements Parcelable, Comparable<OrderFood>, Jsonable {
 
 	@Override
 	public int compareTo(OrderFood o) {
-		if(getFoodId() > o.getFoodId()){
+		if(getId() > o.getId()){
 			return 1;
-		}else if(getFoodId() < o.getFoodId()){
+		}else if(getId() < o.getId()){
 			return -1;
 		}else{
 			return 0;

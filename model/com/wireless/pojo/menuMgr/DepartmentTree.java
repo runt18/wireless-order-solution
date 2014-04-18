@@ -80,19 +80,13 @@ public class DepartmentTree{
 				FoodList sorted = new FoodList(entry.getValue(), new Comparator<Food>(){
 
 					@Override
-					public int compare(Food lhs, Food rhs) {
-						if(lhs.isHot() && !rhs.isHot()){
+					public int compare(Food lf, Food rf) {
+						if(lf.isHot() && !rf.isHot()){
 							return -1;
-						}else if(!lhs.isHot() && rhs.isHot()){
+						}else if(!lf.isHot() && rf.isHot()){
 							return 1;
 						}else{
-							if(lhs.getAliasId() > rhs.getAliasId()){
-								return 1;
-							}else if(lhs.getAliasId() < rhs.getAliasId()){
-								return -1;
-							}else{
-								return 0;
-							}
+							return lf.compareTo(rf);
 						}
 					}
 					
