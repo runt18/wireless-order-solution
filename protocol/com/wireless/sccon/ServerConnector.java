@@ -20,7 +20,7 @@ public class ServerConnector{
 	
  	public ServerConnector(){
 		
-        new Thread(){
+        new Thread("Server Connector"){
         	public void run(){
         		
         		while(true){
