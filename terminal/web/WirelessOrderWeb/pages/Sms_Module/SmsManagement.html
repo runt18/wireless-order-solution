@@ -1,0 +1,189 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Insert title here</title>
+<style type="text/css">
+.shortcut-group {
+	margin: 0 auto;
+} 
+ul.a-btn-group, 
+ul.b-btn-group{
+    list-style: none;
+    text-align: center;
+    width : 850px;
+}
+.a-btn{
+    width:80px;
+    height:80px;
+    -webkit-border-radius:40px;
+    -moz-border-radius:50%;
+    -o-border-radius:50%;
+    -ms-border-radius:50%;
+    border-radius:50%;
+    display:inline;
+    margin:20px;
+    margin-right: 60px;
+    float:left;
+    position:relative;
+    -webkit-box-shadow:0px 0px 5px 0px rgba(238, 238, 238, 0.5) inset, 0px -1px 5px 4px rgba(221, 221, 221, 0.2) inset, 0px 0px 0px 7px #fafafa,  0px 0px 1px 8px rgba(204, 204, 204, 0.4), 0px 0px 0px 9px #dfdfdf;
+    -moz-box-shadow:0px 0px 5px 0px rgba(238, 238, 238, 0.5) inset, 0px -1px 5px 4px rgba(221, 221, 221, 0.2) inset, 0px 0px 0px 7px #fafafa,  0px 0px 1px 8px rgba(204, 204, 204, 0.4), 0px 0px 0px 9px #dfdfdf;
+    box-shadow:0px 0px 5px 0px rgba(238, 238, 238, 0.5) inset, 0px -1px 5px 4px rgba(221, 221, 221, 0.2) inset, 0px 0px 0px 7px #fafafa,  0px 0px 1px 8px rgba(204, 204, 204, 0.4), 0px 0px 0px 9px #dfdfdf;
+    -webkit-transition:all 0.3s linear;
+    -moz-transition:all 0.3s linear;
+    -o-transition:all 0.3s linear;
+    transition:all 0.3s linear;
+    line-height: 80px;
+    text-decoration: none;
+}
+.a-btn:HOVER{
+	text-decoration: none;
+}
+.grd-white{
+    background: #ffffff;
+    background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2ZmZmZmZiIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNmMWYxZjEiIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
+    background: -moz-linear-gradient(top,  #ffffff 0%, #f1f1f1 100%);
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ffffff), color-stop(100%,#f1f1f1));
+    background: -webkit-linear-gradient(top,  #ffffff 0%,#f1f1f1 100%);
+    background: -o-linear-gradient(top,  #ffffff 0%,#f1f1f1 100%);
+    background: -ms-linear-gradient(top,  #ffffff 0%,#f1f1f1 100%);
+    background: linear-gradient(to bottom,  #ffffff 0%,#f1f1f1 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#f1f1f1',GradientType=0 );
+    border: 1px solid #fafafa;
+
+}
+.color-silver-dark{
+    color : #777777;
+}
+.label,
+.badge {
+  display: inline-block;
+  padding: 2px 4px;
+  font-size: 11.844px;
+  font-weight: bold;
+  line-height: 14px;
+  color: #ffffff;
+  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+  white-space: nowrap;
+  vertical-align: baseline;
+  background-color: #999999;
+}
+.a-btn .badge, .a-btn .label{
+    position: absolute;
+    right: -10px; 
+    top: 0px;
+    font-size: 18px;
+    font-weight : bolder;
+ /*    padding: 1px 5px 1px 5px; */
+}
+.badge {
+  -webkit-border-radius: 20px;
+     -moz-border-radius: 20px;
+          border-radius: 20px;
+}
+.label-info,
+.badge-info {
+  background-color: #3a87ad;
+}
+.charge-info {
+  background-color: red;
+}
+.used-info {
+  background-color: #00CCFF;
+}
+.verify-info {
+  background-color: purple;
+}
+.remain-info {
+  background-color: green;
+}
+.a-btn font{
+	font-size: 30px;font-family: 'Microsoft Yahei',Helvetica,Arial,sans-serif;
+}
+.smsUseDesc{
+	line-height: 40px;
+	color: black !important;
+	font-size: 12px;
+}
+.smsUseDesc:HOVER{
+	color:black !important;
+	
+}
+</style> 
+<script type="text/javascript">
+var smsUsedDetailGrid;
+var smsDetailpageRecordCount = 18;
+var operationValue = 0;
+
+function querySmsDetail(c){
+	smsUsedDetailGrid.setTitle('短信明细 -- <font style="color:green;font-weight:bold">'+ c.title +'</font>');
+	var gs = smsUsedDetailGrid.getStore();
+	gs.baseParams['query'] = c.order;
+	gs.load({
+		params : {
+			start : 0,
+			limit : smsDetailpageRecordCount
+		}
+	});
+	
+}
+
+$.post('../../QuerySmsStat.do', function(data){
+	var smsStat = data.root[0];
+	$('#spanTotalUsed').text(smsStat.totalUsed);
+	$('#spanChargeUsed').text(smsStat.chargeUsed);
+	$('#spanConsumptionUsed').text(smsStat.consumptionUsed);
+	$('#spanVerifyUsed').text(smsStat.verifyUsed);
+	$('#spanRemianing').text(smsStat.remaining);
+});
+
+
+
+</script>
+<script type="text/javascript" src="../../js/Sms/smsMain.js"></script>
+
+</head>
+<body>
+<div id="smsGeneral" class="shortcut-group" align="center">
+	<ul class="a-btn-group">
+	    <li>
+	        <a href="javascript:querySmsDetail({order : 0, title : '总共使用'})" class="a-btn grd-white" title="总消耗">
+	            <font>总</font>
+	            <span id="spanTotalUsed" class="badge badge-info">0</span> <!--don't use span here!-->
+	            <br>
+	            <span class="smsUseDesc">总共使用</span>
+	       </a>
+	   	</li>
+	   	<li>
+	        <a href="javascript:querySmsDetail({order : 3, title : '充值使用'})" class="a-btn grd-white" title="充值消耗">
+	            <font>充</font>
+	            <span id="spanChargeUsed" class="badge charge-info">0</span> <!--don't use span here!-->
+	            <br><span class="smsUseDesc">充值使用</span>
+	       </a>
+	   	</li>
+	   	<li>
+	        <a href="javascript:querySmsDetail({order : 2, title : '消费使用'})" class="a-btn grd-white" title="消费消耗">
+	            <font>消</font>
+	            <span id="spanConsumptionUsed" class="badge used-info">0</span> <!--don't use span here!-->
+	            <br><span class="smsUseDesc">消费使用</span>
+	       </a>
+	   	</li>
+	   	<li>
+	        <a href="javascript:querySmsDetail({order : 1, title : '验证使用'})" class="a-btn grd-white" title="验证消耗">
+	            <font>验</font>
+	            <span id="spanVerifyUsed" class="badge verify-info">0</span> <!--don't use span here!-->
+	            <br><span class="smsUseDesc">验证使用</span>
+	       </a>
+	   	</li>
+	   	<li>
+	        <div  class="a-btn grd-white" title="剩余条数">
+	            <font>余</font>
+	            <span id="spanRemianing" class="badge remain-info">0</span> <!--don't use span here!-->
+	            <br><span class="smsUseDesc">剩余条数</span>
+	       </div>
+	   	</li>
+	 </ul>
+</div>
+	<div id="divSmsUseView"></div>
+</body>
+</html>
