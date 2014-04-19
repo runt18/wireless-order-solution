@@ -587,7 +587,7 @@ public class MemberOperationDao {
 		ResultSet rs = stmt.executeQuery(querySQL);
 		while(rs != null && rs.next()){
 			item = new MOSummary();
-			item.setMember(MemberDao.getMemberById(dbCon, staff, rs.getInt("member_id")));
+			item.setMember(MemberDao.getById(dbCon, staff, rs.getInt("member_id")));
 			item.setChargeMoney(rs.getFloat("charge_money"));
 			item.setConsumeAmount(rs.getInt("consume_amount"));
 			item.setPayMoney(rs.getFloat("pay_money"));
@@ -687,7 +687,7 @@ public class MemberOperationDao {
 		ResultSet rs = stmt.executeQuery(querySQL);
 		while(rs != null && rs.next()){
 			item = new MOSummary();
-			item.setMember(MemberDao.getMemberById(dbCon, staff, rs.getInt("member_id")));
+			item.setMember(MemberDao.getById(dbCon, staff, rs.getInt("member_id")));
 			item.setChargeMoney(rs.getFloat("charge_money"));
 			item.setConsumeAmount(rs.getInt("consume_amount"));
 			item.setPayMoney(rs.getFloat("pay_money"));

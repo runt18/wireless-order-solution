@@ -154,7 +154,7 @@ public class WeixinMemberDao {
 		
 		int restaurantId = WeixinRestaurantDao.getRestaurantIdByWeixin(dbCon, weixinRestaurantSerial);
 		
-		Member member = MemberDao.getMemberById(dbCon, StaffDao.getStaffs(restaurantId).get(0), memberId);
+		Member member = MemberDao.getById(dbCon, StaffDao.getStaffs(restaurantId).get(0), memberId);
 		
 		String sql;
 		sql = " UPDATE " + Params.dbName + ".weixin_member SET " +
@@ -278,7 +278,7 @@ public class WeixinMemberDao {
 		int memberId = getBoundMemberIdByWeixin(dbCon, weixinMemberSerial, weixinRestaurantSerial);
 		int restaurantId = WeixinRestaurantDao.getRestaurantIdByWeixin(dbCon, weixinRestaurantSerial);
 		Staff staff = StaffDao.getStaffs(dbCon, restaurantId).get(0);
-		Member member = MemberDao.getMemberById(dbCon, staff, memberId);
+		Member member = MemberDao.getById(dbCon, staff, memberId);
 		member.setMobile(mobile);
 		MemberDao.checkValid(dbCon, member);
 		String updateSQL = " UPDATE " + Params.dbName + ".member SET mobile = " + "'" + member.getMobile() + "' WHERE member_id = " + member.getId(); 

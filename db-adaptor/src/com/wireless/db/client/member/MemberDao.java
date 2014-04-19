@@ -96,6 +96,28 @@ public class MemberDao {
 		}
 	}
 	
+	public final static class MemberRank{
+		private final int total;
+		private final int rank;
+		MemberRank(int total, int rank){
+			this.total = total;
+			this.rank = rank;
+		}
+		
+		public int getTotal(){
+			return this.total;
+		}
+		
+		public int getRank(){
+			return this.rank;
+		}
+		
+		@Override
+		public String toString(){
+			return "member rank(total=" + total + ",rank=" + rank + ")";
+		}
+	}
+	
 	/**
 	 * 
 	 * @param dbCon
@@ -153,8 +175,8 @@ public class MemberDao {
 	 * @throws BusinessException
 	 * 			throws if any member type does NOT exist
 	 */
-	private static List<Member> getMemberDetail(DBCon dbCon, Staff staff, String extraCond, String orderClause) throws SQLException, BusinessException{
-		List<Member> result = getMember(dbCon, staff, extraCond, orderClause);
+	private static List<Member> getDetail(DBCon dbCon, Staff staff, String extraCond, String orderClause) throws SQLException, BusinessException{
+		List<Member> result = getByCond(dbCon, staff, extraCond, orderClause);
 		
 		for(Member eachMember : result){
 			
@@ -225,21 +247,6 @@ public class MemberDao {
 	}
 	
 	/**
-	 * Get the pure member by extra condition
-	 * @param dbCon
-	 * 			the database connection
-	 * @param staff
-	 * 			the staff to perform this action
-	 * @param extraCond
-	 * 			the extra condition
-	 * @param orderClause
-	 * 			the order clause
-	 * @return the result to pure member
-	 * @throws SQLException
-	 * 			throws if failed to execute any SQL statement
-	 */
-	
-	/**
 	 * Get the interested member according to extra condition.
 	 * @param dbCon
 	 * 			the database connection
@@ -279,7 +286,7 @@ public class MemberDao {
 	 */
 	private static List<Member> getInterestedMember(DBCon dbCon, Staff staff, String extraCond, String orderClause) throws SQLException, BusinessException{
 		extraCond = " AND M.member_id IN( SELECT member_id FROM interested_member WHERE staff_id = " + staff.getId() + ")" + (extraCond != null ? extraCond : "");
-		return getMember(dbCon, staff, extraCond, null);
+		return getByCond(dbCon, staff, extraCond, null);
 	}
 	
 	/**
@@ -296,7 +303,7 @@ public class MemberDao {
 	 * @throws BusinessException 
 	 * 			throws if any member type does NOT exist
 	 */
-	public static List<Member> getMember(DBCon dbCon, Staff staff, String extraCond, String orderClause) throws SQLException, BusinessException{
+	public static List<Member> getByCond(DBCon dbCon, Staff staff, String extraCond, String orderClause) throws SQLException, BusinessException{
 		List<Member> result = new ArrayList<Member>();
 		String sql;
 		sql = " SELECT "	+
@@ -371,11 +378,11 @@ public class MemberDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static List<Member> getMember(Staff staff, String extraCond, String orderClause) throws SQLException, BusinessException{
+	public static List<Member> getByCond(Staff staff, String extraCond, String orderClause) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return MemberDao.getMember(dbCon, staff, extraCond, orderClause);
+			return MemberDao.getByCond(dbCon, staff, extraCond, orderClause);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -393,11 +400,11 @@ public class MemberDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static Member getMemberById(Staff staff, int memberId) throws BusinessException, SQLException{
+	public static Member getById(Staff staff, int memberId) throws BusinessException, SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return MemberDao.getMemberById(dbCon, staff, memberId);
+			return MemberDao.getById(dbCon, staff, memberId);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -416,8 +423,8 @@ public class MemberDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static Member getMemberById(DBCon dbCon, Staff staff, int memberId) throws BusinessException, SQLException{
-		List<Member> ml = MemberDao.getMemberDetail(dbCon, staff, " AND M.member_id = " + memberId, null);
+	public static Member getById(DBCon dbCon, Staff staff, int memberId) throws BusinessException, SQLException{
+		List<Member> ml = MemberDao.getDetail(dbCon, staff, " AND M.member_id = " + memberId, null);
 		if(ml.isEmpty()){
 			throw new BusinessException(MemberError.MEMBER_NOT_EXIST);
 		}else{
@@ -436,8 +443,8 @@ public class MemberDao {
 	 * @throws BusinessException
 	 * 			throws the member to this card does NOT exist
 	 */
-	public static Member getMemberByCard(DBCon dbCon, Staff staff, String cardAlias) throws SQLException, BusinessException{
-		List<Member> ml = MemberDao.getMemberDetail(dbCon, staff, " AND M.member_card = '" + cardAlias + "'", null);
+	public static Member getByCard(DBCon dbCon, Staff staff, String cardAlias) throws SQLException, BusinessException{
+		List<Member> ml = MemberDao.getDetail(dbCon, staff, " AND M.member_card = '" + cardAlias + "'", null);
 		if(ml.isEmpty()){
 			throw new BusinessException(MemberError.MEMBER_NOT_EXIST);
 		}else{
@@ -455,11 +462,11 @@ public class MemberDao {
 	 * @throws BusinessException
 	 * 			throws the member to this card does NOT exist
 	 */
-	public static Member getMemberByCard(Staff staff, String cardAlias) throws SQLException, BusinessException{
+	public static Member getByCard(Staff staff, String cardAlias) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return getMemberByCard(dbCon, staff, cardAlias);
+			return getByCard(dbCon, staff, cardAlias);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -479,8 +486,8 @@ public class MemberDao {
 	 * @throws BusinessException
 	 * 			throws if the member to this mobile does NOT exist
 	 */
-	public static Member getMemberByMobile(DBCon dbCon, Staff staff, String mobile) throws SQLException, BusinessException{
-		List<Member> result = MemberDao.getMemberDetail(dbCon, staff, " AND M.mobile = '" + mobile + "'", null);
+	public static Member getByMobile(DBCon dbCon, Staff staff, String mobile) throws SQLException, BusinessException{
+		List<Member> result = MemberDao.getDetail(dbCon, staff, " AND M.mobile = '" + mobile + "'", null);
 		if(result.isEmpty()){
 			throw new BusinessException(MemberError.MEMBER_NOT_EXIST);
 		}else{
@@ -502,11 +509,11 @@ public class MemberDao {
 	 * @throws BusinessException
 	 * 			throws if the member to this mobile does NOT exist
 	 */
-	public static Member getMemberByMobile(Staff staff, String mobile) throws SQLException, BusinessException{
+	public static Member getByMobile(Staff staff, String mobile) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return getMemberByMobile(dbCon, staff, mobile);
+			return getByMobile(dbCon, staff, mobile);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -685,7 +692,7 @@ public class MemberDao {
 		Member member = builder.build();
 		MemberType mType = MemberTypeDao.getMemberTypeById(staff, member.getMemberType().getId());
 		// 旧会员类型是充值属性, 修改为优惠属性时, 检查是否还有余额, 有则不允许修改
-		Member old = MemberDao.getMemberById(staff, member.getId());
+		Member old = MemberDao.getById(staff, member.getId());
 		if(mType.getAttribute() != old.getMemberType().getAttribute() 
 				&& old.getMemberType().getAttribute() == MemberType.Attribute.CHARGE){
 			if(old.getTotalBalance() > 0){
@@ -939,7 +946,7 @@ public class MemberDao {
 	 */
 	public static MemberOperation consume(DBCon dbCon, Staff staff, int memberId, float consumePrice, Coupon coupon, Order.PayType payType, int orderId) throws SQLException, BusinessException{
 		
-		Member member = getMemberById(dbCon, staff, memberId);
+		Member member = getById(dbCon, staff, memberId);
 		
 		//Perform the consume operation and get the related member operation.
 		MemberOperation mo = member.consume(consumePrice, coupon, payType);
@@ -1040,7 +1047,7 @@ public class MemberDao {
 			throw new IllegalArgumentException("The amount of charge money(amount = " + chargeMoney + ") must be more than zero");
 		}
 		
-		Member member = getMemberById(dbCon, staff, memberId);
+		Member member = getById(dbCon, staff, memberId);
 		
 		//Perform the charge operation and get the related member operation.
 		MemberOperation mo = member.charge(chargeMoney, accountMoney, chargeType);
@@ -1119,7 +1126,7 @@ public class MemberDao {
 		if(refundMoney < 0){
 			throw new IllegalArgumentException("The amount of take money(amount = " + refundMoney + ") must be more than zero");
 		}
-		Member member = getMemberById(dbCon, staff, memberId);
+		Member member = getById(dbCon, staff, memberId);
 		
 		MemberOperation mo = member.refund(refundMoney, accountMoney);
 		
@@ -1199,7 +1206,7 @@ public class MemberDao {
 			throw new IllegalArgumentException("The amount of point to consume(amount = " + pointConsume + ") must be more than zero");
 		}
 		
-		Member member = getMemberById(dbCon, staff, memberId);
+		Member member = getById(dbCon, staff, memberId);
 		
 		//Perform the point consumption and get the related member operation.
 		MemberOperation mo = member.pointConsume(pointConsume);
@@ -1302,7 +1309,7 @@ public class MemberDao {
 	 */
 	public static MemberOperation adjustPoint(DBCon dbCon, Staff staff, int memberId, int deltaPoint, Member.AdjustType adjust) throws SQLException, BusinessException{
 		
-		Member member = getMemberById(dbCon, staff, memberId);
+		Member member = getById(dbCon, staff, memberId);
 		
 		if(adjust == Member.AdjustType.INCREASE){
 			deltaPoint = Math.abs(deltaPoint);
@@ -1378,7 +1385,7 @@ public class MemberDao {
 	 * 			throws if the member to this id is NOT found
 	 */
 	public static MemberOperation adjustBalance(DBCon dbCon, Staff staff, int memberId, float deltaBalance) throws SQLException, BusinessException{
-		Member member = getMemberById(dbCon, staff, memberId);
+		Member member = getById(dbCon, staff, memberId);
 		
 		//Perform the point adjust and get the related member operation.
 		MemberOperation mo = member.adjustBalance(deltaBalance);
@@ -1396,6 +1403,7 @@ public class MemberDao {
 		
 		return mo;
 	}
+	
 	
 	/**
 	 * Calculate most favor foods to each member.
@@ -1621,7 +1629,7 @@ public class MemberDao {
 				}
 			});
 			
-			for(Member m : getMember(dbCon, admin, null, null)){
+			for(Member m : getByCond(dbCon, admin, null, null)){
 				for(MemberLevel lv : lvs){
 					//If the member type belongs to level route and its total point is greater than the threshold, then perform member level upgrade.
 					if(m.getMemberType().equals(lv.getMemberType()) && m.getTotalPoint() > lv.getPointThreshold()){
@@ -1645,5 +1653,65 @@ public class MemberDao {
 		return new UpgradeResult((int)(System.currentTimeMillis() - beginTime) / 1000, 
 								 memberAmount, 
 								 memberUpgradAmount);
+	}
+	
+	/**
+	 * Calculate the member rank.
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param memberId
+	 * 			the member id to calculate rank
+	 * @return the rank {@link MemberRank}
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if the member to calculate rank does NOT exist
+	 */
+	public static MemberRank calcMemberRank(Staff staff, int memberId) throws SQLException, BusinessException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return calcMemberRank(dbCon, staff, memberId);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Calculate the member rank.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param memberId
+	 * 			the member id to calculate rank
+	 * @return the rank {@link MemberRank}
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if the member to calculate rank does NOT exist
+	 */
+	public static MemberRank calcMemberRank(DBCon dbCon, Staff staff, int memberId) throws SQLException, BusinessException{
+		
+		Member member = getById(dbCon, staff, memberId);
+		
+		String sql;
+		sql = " SELECT COUNT(*) FROM " + Params.dbName + ".member WHERE restaurant_id = " + staff.getRestaurantId();
+		dbCon.rs = dbCon.stmt.executeQuery(sql);
+		int total = 0;
+		if(dbCon.rs.next()){
+			total = dbCon.rs.getInt(1);
+		}
+		dbCon.rs.close();
+		
+		int rank = 0;
+		sql = " SELECT COUNT(*) FROM " + Params.dbName + ".member WHERE total_point >= " + member.getTotalPoint();
+		dbCon.rs = dbCon.stmt.executeQuery(sql);
+		if(dbCon.rs.next()){
+			rank = dbCon.rs.getInt(1);
+		}
+		dbCon.rs.close();
+		
+		return new MemberRank(total, rank);
 	}
 }

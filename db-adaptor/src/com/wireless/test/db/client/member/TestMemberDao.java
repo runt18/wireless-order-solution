@@ -166,7 +166,7 @@ public class TestMemberDao {
 			//Set the public member comment
 			expect.addPublicComment(publicCommentBuilder.build());
 			
-			Member actual = MemberDao.getMemberById(mStaff, memberId);
+			Member actual = MemberDao.getById(mStaff, memberId);
 			
 			//Compare the member just inserted
 			compareMember(expect, actual);
@@ -214,7 +214,7 @@ public class TestMemberDao {
 			//Set the public member comment
 			expect.addPublicComment(publicCommentBuilder.build());
 			
-			actual = MemberDao.getMemberById(mStaff, memberId);
+			actual = MemberDao.getById(mStaff, memberId);
 			
 			//Compare the member after update
 			compareMember(expect, actual);
@@ -240,7 +240,7 @@ public class TestMemberDao {
 				MemberDao.deleteById(mStaff, memberId);
 				//Check to see whether the member is deleted
 				try{
-					MemberDao.getMemberById(mStaff, memberId);
+					MemberDao.getById(mStaff, memberId);
 					assertTrue("failed to delete member", false);
 				}catch(BusinessException ignored){}
 				
@@ -267,7 +267,7 @@ public class TestMemberDao {
 		
 		//CalcBillStatisticsDao.calcIncomeByCharge(mStaff, range, DateType.TODAY);
 		
-		compareMember(expect, MemberDao.getMemberById(mStaff, expect.getId()));
+		compareMember(expect, MemberDao.getById(mStaff, expect.getId()));
 		compareMemberOperation(mo, MemberOperationDao.getTodayById(mStaff, mo.getId()));
 	}
 	
@@ -279,14 +279,14 @@ public class TestMemberDao {
 		MemberOperation mo = MemberDao.consume(mStaff, expect.getId(), 50, null,Order.PayType.MEMBER, 10);
 		expect.consume(50, null, Order.PayType.MEMBER);
 		
-		compareMember(expect, MemberDao.getMemberById(mStaff, expect.getId()));
+		compareMember(expect, MemberDao.getById(mStaff, expect.getId()));
 		compareMemberOperation(mo, MemberOperationDao.getTodayById(mStaff, mo.getId()));
 		
 		//使用现金消费
 		mo = MemberDao.consume(mStaff, expect.getId(), 50, null, Order.PayType.CASH, 10);
 		expect.consume(50, null, Order.PayType.CASH);
 		
-		compareMember(expect, MemberDao.getMemberById(mStaff, expect.getId()));
+		compareMember(expect, MemberDao.getById(mStaff, expect.getId()));
 		compareMemberOperation(mo, MemberOperationDao.getTodayById(mStaff, mo.getId()));
 			
 	}
@@ -295,7 +295,7 @@ public class TestMemberDao {
 		MemberOperation mo = MemberDao.pointConsume(mStaff, expect.getId(), 20);
 		expect.pointConsume(20);
 		
-		compareMember(expect, MemberDao.getMemberById(mStaff, expect.getId()));
+		compareMember(expect, MemberDao.getById(mStaff, expect.getId()));
 		compareMemberOperation(mo, MemberOperationDao.getTodayById(mStaff, mo.getId()));
 	}
 	
@@ -303,7 +303,7 @@ public class TestMemberDao {
 		MemberOperation mo = MemberDao.adjustPoint(mStaff, expect.getId(), 10, AdjustType.INCREASE);
 		expect.adjustPoint(10, AdjustType.INCREASE);
 		
-		compareMember(expect, MemberDao.getMemberById(mStaff, expect.getId()));
+		compareMember(expect, MemberDao.getById(mStaff, expect.getId()));
 		compareMemberOperation(mo, MemberOperationDao.getTodayById(mStaff, mo.getId()));
 	}
 	
@@ -311,7 +311,7 @@ public class TestMemberDao {
 		MemberOperation mo = MemberDao.adjustBalance(mStaff, expect.getId(), 10);
 		expect.adjustBalance(10);
 		
-		compareMember(expect, MemberDao.getMemberById(mStaff, expect.getId()));
+		compareMember(expect, MemberDao.getById(mStaff, expect.getId()));
 		compareMemberOperation(mo, MemberOperationDao.getTodayById(mStaff, mo.getId()));
 	}
 	

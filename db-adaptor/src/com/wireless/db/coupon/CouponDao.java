@@ -422,7 +422,7 @@ public class CouponDao {
 		}else{
 			Coupon coupon = result.get(0);
 			coupon.setCouponType(CouponTypeDao.getById(dbCon, staff, coupon.getCouponType().getId()));
-			coupon.setMember(MemberDao.getMemberById(dbCon, staff, coupon.getMember().getId()));
+			coupon.setMember(MemberDao.getById(dbCon, staff, coupon.getMember().getId()));
 			return coupon;
 		}
 	}

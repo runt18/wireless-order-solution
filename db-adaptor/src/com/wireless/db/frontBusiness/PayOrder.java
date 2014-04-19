@@ -201,7 +201,7 @@ public class PayOrder {
 		
 		if(orderCalculated.isSettledByMember()){
 			
-			Member member = MemberDao.getMemberById(staff, payBuilder.getMemberId());
+			Member member = MemberDao.getById(staff, payBuilder.getMemberId());
 			
 			if(orderCalculated.isUnpaid()){
 				//Check to see whether be able to perform consumption.
@@ -477,7 +477,7 @@ public class PayOrder {
 				//If the discount to set is NOT the same as before, check to see whether the discount is permitted to use.
 				if(payBuilder.getSettleType() == Order.SettleType.MEMBER){
 					discounts = DiscountDao.getByMemberType(dbCon, staff, 
-															MemberDao.getMemberById(dbCon, staff, payBuilder.getMemberId()).getMemberType().getId());
+															MemberDao.getById(dbCon, staff, payBuilder.getMemberId()).getMemberType().getId());
 				}else{
 					discounts = DiscountDao.getByRole(dbCon, staff, staff.getRole());
 				}

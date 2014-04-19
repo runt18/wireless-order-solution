@@ -53,7 +53,7 @@ public class TestCouponDao {
 			Assert.assertEquals("comment : insert coupon type", expectedCouponType.getComment(), actualCouponType.getComment());
 			
 			//Insert a new coupon and assign to member1 & member2.
-			List<Member> members = MemberDao.getMember(mStaff, null, null);
+			List<Member> members = MemberDao.getByCond(mStaff, null, null);
 			Member m1 = members.get(0);
 			Member m2 = members.get(1);
 			CouponDao.insertAll(mStaff, new Coupon.InsertAllBuilder(couponTypeId)
