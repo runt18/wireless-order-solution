@@ -320,11 +320,11 @@ public class JobContentFactory {
 					
 					MemberOperation mo = MemberOperationDao.getTodayById(staff, moId);
 					
-					Member member = MemberDao.getMemberById(staff, mo.getMemberId());
+					Member member = MemberDao.getById(staff, mo.getMemberId());
 					//Print the member receipt only if member type belongs to charge.
 					if(member.getMemberType().getAttribute() == Attribute.CHARGE){
 						
-						mo.setMember(MemberDao.getMemberById(staff, mo.getMemberId()));
+						mo.setMember(MemberDao.getById(staff, mo.getMemberId()));
 						Restaurant restaurant = RestaurantDao.getById(staff.getRestaurantId());
 						jobContents.add(new JobContent(printer, func.getRepeat(), printType,
 													   new MemberReceiptContent(restaurant, staff.getName(), mo, 

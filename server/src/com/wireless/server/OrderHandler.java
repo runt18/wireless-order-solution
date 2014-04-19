@@ -31,10 +31,11 @@ import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.db.staffMgr.DeviceDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
-import com.wireless.exception.ProtocolError;
+import com.wireless.exception.ErrorCode;
 import com.wireless.pack.Mode;
 import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
+import com.wireless.pack.req.ReqInsertOrder;
 import com.wireless.pack.resp.RespACK;
 import com.wireless.pack.resp.RespNAK;
 import com.wireless.pack.resp.RespOTAUpdate;
@@ -54,6 +55,7 @@ import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.staffMgr.Device;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.print.scheme.JobContentFactory;
+import com.wireless.sccon.ServerConnector;
 /**
  * @author yzhang
  *
@@ -163,133 +165,24 @@ class OrderHandler implements Runnable{
 				}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_ORDER_BY_TBL){
 					//handle query order request
 					Table tableToQuery = new Parcel(request.body).readParcel(Table.CREATOR);
-					try{
-						//response = new RespQueryOrder(request.header, QueryOrderDao.execByTableDync(_term, tableToQuery));
-						response = new RespPackage(request.header, OrderDao.getByTableAliasDync(staff, tableToQuery.getAliasId()), Order.ORDER_PARCELABLE_4_QUERY);
-					}catch(BusinessException e){
-						if(e.getErrCode() == ProtocolError.ORDER_NOT_EXIST || e.getErrCode() == ProtocolError.TABLE_IDLE || e.getErrCode() == ProtocolError.TABLE_NOT_EXIST){
-							response = new RespNAK(request.header, e.getErrCode());
-						}else{
-							throw e;
-						}
-					}
+					response = new RespPackage(request.header, OrderDao.getByTableAliasDync(staff, tableToQuery.getAliasId()), Order.ORDER_PARCELABLE_4_QUERY);
 
 				}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_TABLE_STATUS){
 					//handle query table status
-					try{
-						Table tblToQuery = new Parcel(request.body).readParcel(Table.CREATOR);
-						tblToQuery = TableDao.getTableByAlias(staff, tblToQuery.getAliasId());
-						response = new RespACK(request.header, (byte)tblToQuery.getStatus().getVal());
-							
-					}catch(BusinessException e){
-						response = new RespNAK(request.header, e.getErrCode());
-					}
+					Table tblToQuery = TableDao.getTableByAlias(staff, new Parcel(request.body).readParcel(Table.CREATOR).getAliasId());
+					response = new RespACK(request.header, (byte)tblToQuery.getStatus().getVal());
 					
 				}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.INSERT_ORDER){
 					//handle insert order request
-					List<Printer> printers = PrinterDao.getPrinters(staff);
-					Order insertedOrder = new Parcel(request.body).readParcel(Order.CREATOR);
-					
-					insertedOrder = InsertOrder.exec(staff, insertedOrder);
-					
-					if(request.header.reserved == PrintOption.DO_PRINT.getVal()){
-						new PrintHandler(staff)
-							.addContent(JobContentFactory.instance().createSummaryContent(PType.PRINT_ORDER, 
-							 																  staff, 
-							 																  printers,
-												 											  insertedOrder))
-							.addContent(JobContentFactory.instance().createDetailContent(PType.PRINT_ORDER_DETAIL, 
-																							 staff, 
-																							 printers,
-																							 insertedOrder))
-							.fireAsync();
-					}
-					
-					response = new RespACK(request.header);
+					response = doInsertOrder(staff, request);
 
 				}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.UPDATE_ORDER){
 					//handle update order request
-					Order orderToUpdate = new Parcel(request.body).readParcel(Order.CREATOR);
-					DiffResult diffResult = UpdateOrder.execById(staff, orderToUpdate);
-					List<Printer> printers = PrinterDao.getPrinters(staff);
-					
-					if(request.header.reserved == PrintOption.DO_PRINT.getVal()){
-						
-						PrintHandler printHandler = new PrintHandler(staff);
-						
-						if(!diffResult.hurriedFoods.isEmpty()){
-							diffResult.newOrder.setOrderFoods(diffResult.hurriedFoods);
-							//print the summary to hurried foods
-							printHandler.addContent(JobContentFactory.instance().createSummaryContent(PType.PRINT_ALL_HURRIED_FOOD, 
-																										  staff, 
-																										  printers,
-																										  diffResult.newOrder));
-							//print the detail to hurried foods
-							printHandler.addContent(JobContentFactory.instance().createDetailContent(PType.PRINT_HURRIED_FOOD, 
-																										 staff,
-																										 printers,
-																										 diffResult.newOrder));
-						}
-						
-						if(!diffResult.extraFoods.isEmpty()){
-							diffResult.newOrder.setOrderFoods(diffResult.extraFoods);
-							//print the summary to extra foods
-							printHandler.addContent(JobContentFactory.instance().createSummaryContent(PType.PRINT_ALL_EXTRA_FOOD, 
-																										  staff,
-																										  printers,
-																										  diffResult.newOrder));
-							//print the detail to extra foods
-							printHandler.addContent(JobContentFactory.instance().createDetailContent(PType.PRINT_EXTRA_FOOD, 
-																										 staff,
-																										 printers,
-																										 diffResult.newOrder));
-						}
-		
-						if(!diffResult.cancelledFoods.isEmpty()){
-							diffResult.newOrder.setOrderFoods(diffResult.cancelledFoods);
-							//print the summary to canceled foods
-							printHandler.addContent(JobContentFactory.instance().createSummaryContent(PType.PRINT_ALL_CANCELLED_FOOD,
-																										  staff,
-																										  printers,
-																										  diffResult.newOrder));
-							//print the detail to canceled foods
-							printHandler.addContent(JobContentFactory.instance().createDetailContent(PType.PRINT_CANCELLED_FOOD,
-																										 staff,
-																										 printers,
-																										 diffResult.newOrder));
-		
-						}
-		
-						//print the transfer
-						printHandler.addContent(JobContentFactory.instance().createTransContent(PType.PRINT_TRANSFER_TABLE, 
-																									 staff,
-																									 printers,
-																									 diffResult.newOrder.getId(), 
-																									 diffResult.oriOrder.getDestTbl(),
-																									 diffResult.newOrder.getDestTbl()));
-		
-						//Fire to execute print action.
-						printHandler.fireAsync();
-					}
-					response = new RespACK(request.header);
+					response = doUpdateOrder(staff, request);
 
 				}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.TRANS_TABLE){
 					//handle the table transfer request 
-					Table[] tables = new Parcel(request.body).readParcelArray(Table.CREATOR);
-					if(tables != null){
-						Table srcTbl = tables[0];
-						Table destTbl = tables[1];
-						
-						int orderId = TransTblDao.exec(staff, srcTbl, destTbl);
-						List<Printer> printers = PrinterDao.getPrinters(staff);
-						
-						response = new RespACK(request.header);
-						
-						new PrintHandler(staff)
-							.addContent(JobContentFactory.instance().createTransContent(PType.PRINT_TRANSFER_TABLE, staff, printers, orderId, srcTbl, destTbl))
-							.fireAsync();
-						
-					}
+					response = doTransTable(staff, request);
 					
 				}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.CANCEL_ORDER){
 					//handle the cancel order request
@@ -299,97 +192,12 @@ class OrderHandler implements Runnable{
 
 				}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.PAY_ORDER || request.header.type == Type.PAY_TEMP_ORDER){
 					//handle the pay order request
-					Order.PayBuilder payParam = new Parcel(request.body).readParcel(Order.PayBuilder.CREATOR);
+					response = doPayOrder(staff, request);
 					
-					List<Printer> printers = PrinterDao.getPrinters(staff);
-					
-					/**
-					 * If pay order temporary, just only print the temporary receipt.
-					 * Otherwise perform the pay action and print receipt 
-					 */
-					if(request.header.type == Type.PAY_TEMP_ORDER){
-						if(payParam.getPrintOption() == PrintOption.DO_PRINT){
-							new PrintHandler(staff)
-								.addContent(JobContentFactory.instance().createReceiptContent(PType.PRINT_TEMP_RECEIPT, 
-																							  staff,
-																							  printers,
-																							  PayOrder.payTemp(staff, payParam)))
-								.fireAsync();
-						}else{
-							PayOrder.payTemp(staff, payParam);
-						}
-						
-					}else{
-						
-						final Order order = PayOrder.pay(staff, payParam);
-						
-						PrintHandler printHandler = new PrintHandler(staff);
-						
-						printHandler.addContent(JobContentFactory.instance().createReceiptContent(PType.PRINT_RECEIPT, staff, printers, order));
-						
-						//Perform to print the member receipt if settled by member.
-						if(order.isSettledByMember()){
-							printHandler.addContent(JobContentFactory.instance().createMemberReceiptContent(PType.PRINT_MEMBER_RECEIPT, 
-																											staff, 
-																											printers,
-																											order.getMemberOperationId()));
-						}
-						
-						printHandler.fireAsync();
-						
-					}
-					
-					response = new RespACK(request.header);
-
 				}else if(request.header.mode == Mode.PRINT && request.header.type == Type.PRINT_CONTENT){
 					//handle the print request
-					PType printType = PType.valueOf(request.header.reserved);
-					List<Printer> printers = PrinterDao.getPrinters(staff);
+					response = doPrintContent(staff, request);
 					
-					if(printType.isSummary()){
-						int orderId = new Parcel(request.body).readInt();
-						new PrintHandler(staff)
-							.addContent(JobContentFactory.instance().createSummaryContent(printType, staff, printers, orderId))
-							.fireAsync();
-						
-					}else if(printType.isDetail()){
-						int orderId = new Parcel(request.body).readInt();
-						new PrintHandler(staff)
-							.addContent(JobContentFactory.instance().createDetailContent(printType, staff, printers, orderId))
-							.fireAsync();
-						
-					}else if(printType.isReceipt()){
-						int orderId = new Parcel(request.body).readInt();
-						new PrintHandler(staff)
-							.addContent(JobContentFactory.instance().createReceiptContent(printType, staff, printers, orderId))
-							.fireAsync();
-						
-					}else if(printType.isTransTbl()){
-						Parcel p = new Parcel(request.body);
-						int orderId = p.readInt();
-						Table srcTbl = p.readParcel(Table.CREATOR);
-						Table destTbl = p.readParcel(Table.CREATOR);
-						new PrintHandler(staff)
-							.addContent(JobContentFactory.instance().createTransContent(printType, staff, printers, orderId, srcTbl, destTbl))
-							.fireSync();
-						
-					}else if(printType.isShift()){
-						Parcel p = new Parcel(request.body);
-						long onDuty = p.readLong();
-						long offDuty = p.readLong();
-						new PrintHandler(staff)
-							.addContent(JobContentFactory.instance().createShiftContent(printType, staff, printers, onDuty, offDuty))
-							.fireAsync();
-						
-					}else if(printType.isMember()){
-						int moId = new Parcel(request.body).readInt();
-						new PrintHandler(staff)
-							.addContent(JobContentFactory.instance().createMemberReceiptContent(printType, staff, printers, moId))
-							.fireAsync();
-					}
-					
-					response = new RespACK(request.header);
-				
 				}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_FOOD_GROUP){
 					//handle the query food group
 					List<Pager> pagers = CalcFoodGroupDao.calc(staff);
@@ -397,7 +205,7 @@ class OrderHandler implements Runnable{
 					
 				}else if(request.header.mode == Mode.MEMBER && request.header.type == Type.QUERY_MEMBER){
 					//handle the request to query member
-					response = new RespPackage(request.header, MemberDao.getMember(staff, null, null), Member.MEMBER_PARCELABLE_SIMPLE);
+					response = new RespPackage(request.header, MemberDao.getByCond(staff, null, null), Member.MEMBER_PARCELABLE_SIMPLE);
 					
 				}else if(request.header.mode == Mode.MEMBER && request.header.type == Type.QUERY_INTERESTED_MEMBER){
 					//handle the request to query interested member
@@ -415,7 +223,7 @@ class OrderHandler implements Runnable{
 					
 				}else if(request.header.mode == Mode.MEMBER && request.header.type == Type.QUERY_MEMBER_DETAIL){
 					//handle the request to query member detail
-					response = new RespPackage(request.header, MemberDao.getMemberById(staff, new Parcel(request.body).readParcel(Member.CREATOR).getId()), Member.MEMBER_PARCELABLE_COMPLEX);
+					response = new RespPackage(request.header, MemberDao.getById(staff, new Parcel(request.body).readParcel(Member.CREATOR).getId()), Member.MEMBER_PARCELABLE_COMPLEX);
 					
 				}else if(request.header.mode == Mode.MEMBER && request.header.type == Type.COMMIT_MEMBER_COMMENT){
 					//handle the request to commit member comment
@@ -432,32 +240,24 @@ class OrderHandler implements Runnable{
 			//send the response to terminal
 			response.writeToStream(out);
 			
-			
 		}catch(BusinessException e){
 			try{
 				new RespNAK(request.header, e.getErrCode()).writeToStream(out);
-			}catch(IOException ex){}
+			}catch(IOException ignored){}
 			
 			e.printStackTrace();
 			
-		}catch(IOException e){
+		}catch(IOException | SQLException e){
 			try{
-				new RespNAK(request.header).writeToStream(out);
-			}catch(IOException ex){}
+				new RespNAK(request.header, new BusinessException(e.getMessage()).getErrCode()).writeToStream(out);
+			}catch(IOException ignored){}
 			
 			e.printStackTrace();
-			
-		}catch(SQLException e){
-			try{
-				new RespNAK(request.header).writeToStream(out);
-			}catch(IOException ex){}
-			
-			e.printStackTrace();			
 			
 		}catch(Exception e){
 			try{
-				new RespNAK(request.header).writeToStream(out);
-			}catch(IOException ex){}
+				new RespNAK(request.header, new BusinessException(e.getMessage()).getErrCode()).writeToStream(out);
+			}catch(IOException ignored){}
 			
 			e.printStackTrace();
 			
@@ -482,6 +282,223 @@ class OrderHandler implements Runnable{
 		}		
 	}
 	
+	private RespPackage doInsertOrder(Staff staff, ProtocolPackage request) throws SQLException, BusinessException, IOException{
+		//handle insert order request
+		List<Printer> printers = PrinterDao.getPrinters(staff);
+		Order orderToInsert = new Parcel(request.body).readParcel(Order.CREATOR);
+		
+		Table tblToOrder = TableDao.getTableByAlias(staff, orderToInsert.getDestTbl().getAliasId());
+		
+		if(tblToOrder.isIdle()){
+			orderToInsert = InsertOrder.exec(staff, orderToInsert);
+			
+			if(request.header.reserved == PrintOption.DO_PRINT.getVal()){
+				new PrintHandler(staff)
+					.addContent(JobContentFactory.instance().createSummaryContent(PType.PRINT_ORDER, 
+					 																  staff, 
+					 																  printers,
+										 											  orderToInsert))
+					.addContent(JobContentFactory.instance().createDetailContent(PType.PRINT_ORDER_DETAIL, 
+																					 staff, 
+																					 printers,
+																					 orderToInsert))
+					.fireAsync();
+			}
+			
+			return new RespACK(request.header);
+			
+		}else if(tblToOrder.isBusy()){
+			Order orderToUpdate = OrderDao.getByTableAlias(staff, tblToOrder.getAliasId());
+			orderToUpdate.addFoods(orderToInsert.getOrderFoods(), staff);
+			
+			ProtocolPackage resp = ServerConnector.instance().ask(new ReqInsertOrder(staff, orderToUpdate, Type.UPDATE_ORDER, PrintOption.valueOf(request.header.reserved)));
+			if(resp.header.type == Type.NAK){
+				throw new BusinessException(new Parcel(resp.body).readParcel(ErrorCode.CREATOR));
+			}else{
+				return new RespACK(request.header);
+			}
+			
+		}else{
+			throw new BusinessException("Unknown table status");
+		}
+	}
+	
+	private RespPackage doUpdateOrder(Staff staff, ProtocolPackage request) throws SQLException, BusinessException{
+		Order orderToUpdate = new Parcel(request.body).readParcel(Order.CREATOR);
+		DiffResult diffResult = UpdateOrder.execById(staff, orderToUpdate);
+		List<Printer> printers = PrinterDao.getPrinters(staff);
+		
+		if(request.header.reserved == PrintOption.DO_PRINT.getVal()){
+			
+			PrintHandler printHandler = new PrintHandler(staff);
+			
+			if(!diffResult.hurriedFoods.isEmpty()){
+				diffResult.newOrder.setOrderFoods(diffResult.hurriedFoods);
+				//print the summary to hurried foods
+				printHandler.addContent(JobContentFactory.instance().createSummaryContent(PType.PRINT_ALL_HURRIED_FOOD, 
+																							  staff, 
+																							  printers,
+																							  diffResult.newOrder));
+				//print the detail to hurried foods
+				printHandler.addContent(JobContentFactory.instance().createDetailContent(PType.PRINT_HURRIED_FOOD, 
+																							 staff,
+																							 printers,
+																							 diffResult.newOrder));
+			}
+			
+			if(!diffResult.extraFoods.isEmpty()){
+				diffResult.newOrder.setOrderFoods(diffResult.extraFoods);
+				//print the summary to extra foods
+				printHandler.addContent(JobContentFactory.instance().createSummaryContent(PType.PRINT_ALL_EXTRA_FOOD, 
+																							  staff,
+																							  printers,
+																							  diffResult.newOrder));
+				//print the detail to extra foods
+				printHandler.addContent(JobContentFactory.instance().createDetailContent(PType.PRINT_EXTRA_FOOD, 
+																							 staff,
+																							 printers,
+																							 diffResult.newOrder));
+			}
+
+			if(!diffResult.cancelledFoods.isEmpty()){
+				diffResult.newOrder.setOrderFoods(diffResult.cancelledFoods);
+				//print the summary to canceled foods
+				printHandler.addContent(JobContentFactory.instance().createSummaryContent(PType.PRINT_ALL_CANCELLED_FOOD,
+																							  staff,
+																							  printers,
+																							  diffResult.newOrder));
+				//print the detail to canceled foods
+				printHandler.addContent(JobContentFactory.instance().createDetailContent(PType.PRINT_CANCELLED_FOOD,
+																							 staff,
+																							 printers,
+																							 diffResult.newOrder));
+
+			}
+
+			//print the transfer
+			printHandler.addContent(JobContentFactory.instance().createTransContent(PType.PRINT_TRANSFER_TABLE, 
+																						 staff,
+																						 printers,
+																						 diffResult.newOrder.getId(), 
+																						 diffResult.oriOrder.getDestTbl(),
+																						 diffResult.newOrder.getDestTbl()));
+
+			//Fire to execute print action.
+			printHandler.fireAsync();
+		}
+		return new RespACK(request.header);
+	}
+	
+	private RespPackage doTransTable(Staff staff, ProtocolPackage request) throws SQLException, BusinessException{
+		Table[] tables = new Parcel(request.body).readParcelArray(Table.CREATOR);
+		if(tables != null){
+			Table srcTbl = tables[0];
+			Table destTbl = tables[1];
+			
+			int orderId = TransTblDao.exec(staff, srcTbl, destTbl);
+			List<Printer> printers = PrinterDao.getPrinters(staff);
+			
+			new PrintHandler(staff)
+				.addContent(JobContentFactory.instance().createTransContent(PType.PRINT_TRANSFER_TABLE, staff, printers, orderId, srcTbl, destTbl))
+				.fireAsync();
+			
+		}
+		
+		return new RespACK(request.header);
+	}
+	
+	private RespPackage doPayOrder(Staff staff, ProtocolPackage request)  throws SQLException, BusinessException{
+		Order.PayBuilder payParam = new Parcel(request.body).readParcel(Order.PayBuilder.CREATOR);
+		
+		List<Printer> printers = PrinterDao.getPrinters(staff);
+		
+		/**
+		 * If pay order temporary, just only print the temporary receipt.
+		 * Otherwise perform the pay action and print receipt 
+		 */
+		if(request.header.type == Type.PAY_TEMP_ORDER){
+			if(payParam.getPrintOption() == PrintOption.DO_PRINT){
+				new PrintHandler(staff)
+					.addContent(JobContentFactory.instance().createReceiptContent(PType.PRINT_TEMP_RECEIPT, 
+																				  staff,
+																				  printers,
+																				  PayOrder.payTemp(staff, payParam)))
+					.fireAsync();
+			}else{
+				PayOrder.payTemp(staff, payParam);
+			}
+			
+		}else{
+			
+			final Order order = PayOrder.pay(staff, payParam);
+			
+			PrintHandler printHandler = new PrintHandler(staff);
+			
+			printHandler.addContent(JobContentFactory.instance().createReceiptContent(PType.PRINT_RECEIPT, staff, printers, order));
+			
+			//Perform to print the member receipt if settled by member.
+			if(order.isSettledByMember()){
+				printHandler.addContent(JobContentFactory.instance().createMemberReceiptContent(PType.PRINT_MEMBER_RECEIPT, 
+																								staff, 
+																								printers,
+																								order.getMemberOperationId()));
+			}
+			
+			printHandler.fireAsync();
+			
+		}
+		
+		return new RespACK(request.header);
+	}
+	
+	private RespPackage doPrintContent(Staff staff, ProtocolPackage request) throws SQLException, BusinessException{
+		PType printType = PType.valueOf(request.header.reserved);
+		List<Printer> printers = PrinterDao.getPrinters(staff);
+		
+		if(printType.isSummary()){
+			int orderId = new Parcel(request.body).readInt();
+			new PrintHandler(staff)
+				.addContent(JobContentFactory.instance().createSummaryContent(printType, staff, printers, orderId))
+				.fireAsync();
+			
+		}else if(printType.isDetail()){
+			int orderId = new Parcel(request.body).readInt();
+			new PrintHandler(staff)
+				.addContent(JobContentFactory.instance().createDetailContent(printType, staff, printers, orderId))
+				.fireAsync();
+			
+		}else if(printType.isReceipt()){
+			int orderId = new Parcel(request.body).readInt();
+			new PrintHandler(staff)
+				.addContent(JobContentFactory.instance().createReceiptContent(printType, staff, printers, orderId))
+				.fireAsync();
+			
+		}else if(printType.isTransTbl()){
+			Parcel p = new Parcel(request.body);
+			int orderId = p.readInt();
+			Table srcTbl = p.readParcel(Table.CREATOR);
+			Table destTbl = p.readParcel(Table.CREATOR);
+			new PrintHandler(staff)
+				.addContent(JobContentFactory.instance().createTransContent(printType, staff, printers, orderId, srcTbl, destTbl))
+				.fireSync();
+			
+		}else if(printType.isShift()){
+			Parcel p = new Parcel(request.body);
+			long onDuty = p.readLong();
+			long offDuty = p.readLong();
+			new PrintHandler(staff)
+				.addContent(JobContentFactory.instance().createShiftContent(printType, staff, printers, onDuty, offDuty))
+				.fireAsync();
+			
+		}else if(printType.isMember()){
+			int moId = new Parcel(request.body).readInt();
+			new PrintHandler(staff)
+				.addContent(JobContentFactory.instance().createMemberReceiptContent(printType, staff, printers, moId))
+				.fireAsync();
+		}
+		
+		return new RespACK(request.header);
+	}
 }
 
 

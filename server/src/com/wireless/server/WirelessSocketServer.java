@@ -25,6 +25,7 @@ import org.xml.sax.SAXException;
 import com.wireless.db.DBCon;
 import com.wireless.pojo.printScheme.PStyle;
 import com.wireless.pojo.printScheme.PType;
+import com.wireless.sccon.ServerConnector;
 import com.wireless.task.DailySettlementTask;
 import com.wireless.task.SweepDBTask;
 
@@ -175,6 +176,9 @@ public class WirelessSocketServer {
 					OTA_Port = portTag.item(0) != null ? portTag.item(0).getFirstChild().getNodeValue() : "";
 				}
 				
+				ServerConnector.instance().setNetAddr("localhost");
+				ServerConnector.instance().setNetPort(WirelessSocketServer.listen);
+				
 				threadPool = new ThreadPoolExecutor(coolPoolSize,
 						  							maxPoolSize,
 						  							aliveTime, 
@@ -245,13 +249,7 @@ public class WirelessSocketServer {
 					//scheDailySettlement.schedule(new DailySettlementTask(), new DailyIterator(1, 23, 37));
 				}
 				
-			}catch(ParserConfigurationException e){
-				e.printStackTrace();
-				
-			}catch(IOException e){
-				e.printStackTrace();
-				
-			}catch(SAXException e){
+			}catch(ParserConfigurationException | IOException | SAXException e){
 				e.printStackTrace();
 			}
 		}else{
