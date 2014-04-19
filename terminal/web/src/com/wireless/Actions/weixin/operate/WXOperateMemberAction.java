@@ -1,5 +1,6 @@
 package com.wireless.Actions.weixin.operate;
 
+import java.io.IOException;
 import java.sql.SQLException;
 
 import javax.servlet.http.HttpServletRequest;
@@ -54,7 +55,7 @@ public class WXOperateMemberAction extends DispatchAction {
 			int rid = WeixinRestaurantDao.getRestaurantIdByWeixin(dbCon, formId);
 			Restaurant restaurant = RestaurantDao.getById(dbCon, rid);
 			
-			Member member = MemberDao.getMemberById(dbCon, StaffDao.getStaffs(dbCon, rid).get(0), mid);
+			Member member = MemberDao.getById(dbCon, StaffDao.getStaffs(dbCon, rid).get(0), mid);
 			jobject.initTip(true, "操作成功, 已获取微信会员信息.");
 			jobject.getOther().put("member", member);
 			jobject.getOther().put("restaurant", restaurant);
@@ -98,23 +99,33 @@ public class WXOperateMemberAction extends DispatchAction {
 			String fromId = request.getParameter("fid");
 
 			VerifySMS sms = VerifySMSDao.getById(dbCon, VerifySMSDao.insert(dbCon, new InsertBuilder(ExpiredPeriod.MINUTE_10)));
-			SMS.Status ss = SMS.send(mobile, new SMS.Msg("您本次操作的验证码是" + sms.getCode(), 
-														 RestaurantDao.getById(WeixinRestaurantDao.getRestaurantIdByWeixin(dbCon, fromId))));
-			if(ss.isSuccess()){
-				dbCon.conn.commit();
-				jobject.initTip(true, "操作成功, 已发送短信验证码, 请注意查看.");
-				jobject.getOther().put("code", sms);
-			}else{
-				throw new BusinessException(ss.toString());
-			}
+			int restaurantId = WeixinRestaurantDao.getRestaurantIdByWeixin(dbCon, fromId);
+			SMS.send(dbCon, StaffDao.getAdminByRestaurant(restaurantId), mobile, new SMS.Msg4Verify(sms.getCode()));
+			dbCon.conn.commit();
+			
+			jobject.initTip(true, "操作成功, 已发送短信验证码, 请注意查看.");
+			jobject.getOther().put("code", sms);
+			
 		}catch(BusinessException e ){
 			dbCon.conn.rollback();
 			e.printStackTrace();
 			jobject.initTip(e);
+			
 		}catch(SQLException e){
 			dbCon.conn.rollback();
 			e.printStackTrace();
 			jobject.initTip(e);
+			
+		}catch(IOException e){
+			dbCon.conn.rollback();
+			e.printStackTrace();
+			jobject.initTip(e);
+			
+		}catch(Exception e){
+			dbCon.conn.rollback();
+			e.printStackTrace();
+			jobject.initTip(e);
+			
 		}finally{
 			dbCon.disconnect();
 			response.getWriter().print(jobject.toString());
@@ -154,7 +165,7 @@ public class WXOperateMemberAction extends DispatchAction {
 			// 绑定会员信息
 			int mid = 0;
 			try{
-				mid = MemberDao.getMemberByMobile(dbCon, staff, request.getParameter("mobile")).getId();
+				mid = MemberDao.getByMobile(dbCon, staff, request.getParameter("mobile")).getId();
 				WeixinMemberDao.bindExistMember(dbCon, mid, openId, formId);
 			}catch(BusinessException e){
 				if(e.getErrCode() == MemberError.MEMBER_NOT_EXIST){

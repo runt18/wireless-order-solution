@@ -1682,7 +1682,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 			sum.setOperateSeq(list.get(0).getOperateSeq());
 			sum.setStaffName(list.get(0).getStaffName());
 			for(MemberOperation temp : list){
-				temp.setMember(MemberDao.getMemberById(staff, temp.getMemberId()));
+				temp.setMember(MemberDao.getById(staff, temp.getMemberId()));
 				
 				sum.setDeltaBaseMoney(temp.getDeltaBaseMoney() + sum.getDeltaBaseMoney());
 				sum.setDeltaExtraMoney(temp.getDeltaExtraMoney() + sum.getDeltaExtraMoney());
@@ -1932,7 +1932,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 			sum.setOperateSeq(list.get(0).getOperateSeq());
 			sum.setStaffName(list.get(0).getStaffName());
 			for(MemberOperation temp : list){
-				temp.setMember(MemberDao.getMemberById(staff, temp.getMemberId()));
+				temp.setMember(MemberDao.getById(staff, temp.getMemberId()));
 				
 				sum.setDeltaBaseMoney(temp.getDeltaBaseMoney() + sum.getDeltaBaseMoney());
 				sum.setDeltaExtraMoney(temp.getDeltaExtraMoney() + sum.getDeltaExtraMoney());
@@ -2353,7 +2353,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 			// 分页
 			orderClause += " LIMIT " + start + "," + limit;
 		}*/
-		List<Member> list = MemberDao.getMember(staff, extraCond, orderClause);
+		List<Member> list = MemberDao.getByCond(staff, extraCond, orderClause);
 		List<Member> newList = new ArrayList<Member>(list);  
 		if(memberTypeAttr != null && !memberTypeAttr.trim().isEmpty()){
 			newList.clear();

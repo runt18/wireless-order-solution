@@ -103,7 +103,7 @@ public class UpdateOrderAction2 extends Action{
 			Order.PayBuilder payBuilder;
 			//Get the member id if the pay type is "会员"
 			if(settleType == Order.SettleType.MEMBER){
-				Member member = MemberDao.getMemberById(staff, Integer.valueOf(request.getParameter("memberID")));
+				Member member = MemberDao.getById(staff, Integer.valueOf(request.getParameter("memberID")));
 				payBuilder = Order.PayBuilder.build4Member(orderId, member, payType);
 			}else{
 				payBuilder = Order.PayBuilder.build(orderId, payType);

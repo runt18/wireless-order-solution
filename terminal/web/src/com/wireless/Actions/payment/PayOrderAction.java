@@ -99,7 +99,7 @@ public class PayOrderAction extends Action{
 			}
 			
 			if(settleType == Order.SettleType.MEMBER){
-				payBuilder = Order.PayBuilder.build4Member(orderId, MemberDao.getMemberById(staff, Integer.valueOf(request.getParameter("memberID"))), payType);
+				payBuilder = Order.PayBuilder.build4Member(orderId, MemberDao.getById(staff, Integer.valueOf(request.getParameter("memberID"))), payType);
 			}else{
 				payBuilder = Order.PayBuilder.build(orderId, payType);
 			}

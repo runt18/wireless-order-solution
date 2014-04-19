@@ -126,7 +126,7 @@ public class QueryMemberOperationAction extends Action{
 				sum.setOperateSeq(list.get(0).getOperateSeq());
 				sum.setStaffName(list.get(0).getStaffName());
 				for(MemberOperation temp : list){
-					List<Member> members = MemberDao.getMember(staff, " AND M.member_id = " + temp.getMemberId(), null);
+					List<Member> members = MemberDao.getByCond(staff, " AND M.member_id = " + temp.getMemberId(), null);
 					
 					if(members.isEmpty()){
 						MemberType delteMT = new MemberType(0);

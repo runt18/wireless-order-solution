@@ -34,7 +34,7 @@ public class OperateCouponAction extends DispatchAction{
 			Coupon.InsertAllBuilder builder = new Coupon.InsertAllBuilder(Integer.parseInt(typeId));
 			memberType = memberTypes.split(",");
 			for (int i = 0; i < memberType.length; i++) {
-				List<Member> list = MemberDao.getMember(StaffDao.verify(Integer.parseInt(pin)), " AND M.member_type_id = " + memberType[i], null);
+				List<Member> list = MemberDao.getByCond(StaffDao.verify(Integer.parseInt(pin)), " AND M.member_type_id = " + memberType[i], null);
 				for (Member m : list) {
 					builder.addMemberId(m.getId());
 				}

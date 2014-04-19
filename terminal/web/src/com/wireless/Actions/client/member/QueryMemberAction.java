@@ -190,7 +190,7 @@ public class QueryMemberAction extends DispatchAction {
 				// 分页
 				orderClause += " LIMIT " + start + "," + limit;
 			}*/
-			list = MemberDao.getMember(staff, extraCond, orderClause);
+			list = MemberDao.getByCond(staff, extraCond, orderClause);
 			List<Member> newList = new ArrayList<Member>(list);  
 			if(memberTypeAttr != null && !memberTypeAttr.trim().isEmpty()){
 				newList.clear();

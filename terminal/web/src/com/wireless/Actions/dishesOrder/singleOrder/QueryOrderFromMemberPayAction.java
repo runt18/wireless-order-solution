@@ -42,9 +42,9 @@ public class QueryOrderFromMemberPayAction extends Action{
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			Member m;
 			if(st != null && st.trim().equals("mobile")){
-				m = MemberDao.getMemberByMobile(staff, sv);
+				m = MemberDao.getByMobile(staff, sv);
 			}else if(st != null && st.trim().equals("card")){
-				m = MemberDao.getMemberByCard(staff, sv);				
+				m = MemberDao.getByCard(staff, sv);				
 			}else{
 				throw new BusinessException(MemberError.MEMBER_NOT_EXIST);
 			}
