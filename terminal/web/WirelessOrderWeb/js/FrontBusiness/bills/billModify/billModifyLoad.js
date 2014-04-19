@@ -227,13 +227,13 @@ var allFoodTabPanelGridTbar = new Ext.Toolbar({
 	    listWidth : 100,
 	    value : -1,
 	    store : new Ext.data.JsonStore({
-			fields : [ 'alias', 'name' ],
+			fields : [ 'id', 'name' ],
 			data : [{
-				alias : -1,
+				id : -1,
 				name : '全部'
 			}]
 		}),
-		valueField : 'alias',
+		valueField : 'id',
 		displayField : 'name',
 		mode : 'local',
 		triggerAction : 'all',

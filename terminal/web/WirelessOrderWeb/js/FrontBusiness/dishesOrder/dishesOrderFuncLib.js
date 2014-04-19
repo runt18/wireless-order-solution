@@ -788,7 +788,8 @@ function submitSingleOrderHandler(_c){
 						+ (normalTaste + ' <<st>> ' + tmpTaste) + '<<sb>>'
 						+ orderFoods[i].kitchen.id + '<<sb>>'// 厨房1编号
 						+ '1' + '<<sb>>' // 菜品1折扣
-						+ orderFoods[i].dataType  // 菜品操作状态 1:已点菜 2:新点菜 3:反结账
+//						+ orderFoods[i].dataType  // 菜品操作状态 1:已点菜 2:新点菜 3:反结账
+						+ false
 						+ ']';
 			}
 		}	
