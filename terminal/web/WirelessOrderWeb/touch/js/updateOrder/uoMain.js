@@ -583,15 +583,21 @@ uo.submitUpdateOrderHandler = function(c){
 			},
 			success : function(data, status, xhr){
 				Util.LM.hide();
-				Util.msg.alert({
-					title : data.title,
-					msg : data.msg, 
-					time : 3,
-					fn : function(btn){
-						Util.toggleContentDisplay({type:'hide', renderTo:'divUpdateOrder'});
-						initTableData();
-					}
-				});
+				if(uo.printTemp == true){
+					uo.printTemp = false;
+					uo.tempPayForUO();
+				}else{
+					Util.msg.alert({
+						title : data.title,
+						msg : data.msg, 
+						time : 3,
+						fn : function(btn){
+							Util.toggleContentDisplay({type:'hide', renderTo:'divUpdateOrder'});
+							initTableData();
+						}
+					});
+				}
+
 			},
 			error : function(request, status, err){
 				Util.LM.hide();
@@ -667,11 +673,13 @@ uo.tempPayForUO = function(c){
 			}
 		});
 	}else{
-		Util.msg.alert({
+/*		Util.msg.alert({
 			title : '重要提示',
 			msg : '账单已经修改，请先做“确认修改”操作。',
 			time : 3
-		});
+		});*/
+		uo.printTemp = true;
+		uo.saveForUO();
 	}
 };
 
@@ -721,7 +729,7 @@ uo.cd = {
 					Util.msg.alert({
 						title : '提示',
 						msg : '没有折扣信息.',
-						time : 3,
+						time : 3
 					});
 				}
 			},
@@ -731,7 +739,7 @@ uo.cd = {
 				Util.msg.alert({
 					title : '错误',
 					msg : '加载折扣信息失败.',
-					time : 3,
+					time : 3
 				});
 			}
 		});
