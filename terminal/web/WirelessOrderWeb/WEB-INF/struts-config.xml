@@ -553,6 +553,19 @@
 			type="com.wireless.Actions.restaurantMgr.QueryModuleAction"
 			scope="request" parameter="dataSource">
 		</action>
+		<action path="/QuerySmsDetail"
+			type="com.wireless.Actions.smsMgr.QuerySmsDetailAction"
+			scope="request" >
+		</action>
+		<action path="/QuerySmsStat"
+			type="com.wireless.Actions.smsMgr.QuerySmsStatAction"
+			scope="request" >
+		</action>
+		<action path="/OperateSms"
+			type="com.wireless.Actions.smsMgr.OperateSmsAction"
+			scope="request" parameter="dataSource">
+		</action>
+
 	</action-mappings>
 
 	<message-resources parameter="com.yourcompany.struts.ApplicationResources" />
