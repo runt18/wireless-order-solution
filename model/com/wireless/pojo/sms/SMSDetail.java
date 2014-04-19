@@ -1,6 +1,14 @@
 package com.wireless.pojo.sms;
 
-public class SMSDetail {
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import com.wireless.json.Jsonable;
+import com.wireless.pojo.util.DateUtil;
+
+public class SMSDetail implements Jsonable{
 
 	public static enum Operation{
 		USE_VERIFY(1, "使用-验证"),
@@ -112,4 +120,23 @@ public class SMSDetail {
 	public void setStaff(String staff) {
 		this.staff = staff;
 	}
+
+	@Override
+	public Map<String, Object> toJsonMap(int flag) {
+		Map<String, Object> jm = new HashMap<String, Object>();
+		jm.put("id", this.id);
+		jm.put("modifiedFormad", DateUtil.format(this.modified));
+		jm.put("operationValue", this.operation.getVal());
+		jm.put("operationText", this.operation.getDesc());
+		jm.put("delta", this.delta);
+		jm.put("remaining", this.remaining);
+		jm.put("staffName", this.staff);
+		return Collections.unmodifiableMap(jm);
+	}
+
+	@Override
+	public List<Object> toJsonList(int flag) {
+		return null;
+	}
+	
 }

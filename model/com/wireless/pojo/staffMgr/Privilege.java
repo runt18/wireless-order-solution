@@ -20,8 +20,9 @@ public class Privilege implements Comparable<Privilege>, Parcelable, Jsonable{
 		INVENTORY(3, "库存", 3),
 		HISTORY(4, "历史", 4),
 		MEMBER(5, "会员", 5),
-		SYSTEM(6, "系统", 7),
-		WEIXIN(7, "微信", 6);
+		SYSTEM(6, "系统", 8),
+		WEIXIN(7, "微信", 6),
+		SMS(7, "微信", 7);
 		
 		private final int val;
 		private final String desc;
@@ -74,6 +75,7 @@ public class Privilege implements Comparable<Privilege>, Parcelable, Jsonable{
 		HISTORY(4000, Cate.HISTORY, "历史"),
 		MEMBER(3000, Cate.MEMBER, "会员"),
 		SYSTEM(6000, Cate.SYSTEM, "系统"),
+		SMS(8000, Cate.SMS, "短信"),
 		WEIXIN(7000, Cate.WEIXIN, "微信");
 		
 		private final int val;

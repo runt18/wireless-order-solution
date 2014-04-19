@@ -227,5 +227,37 @@ public class Page{
 			return image;
 		}
 	}
+	public static enum Sms{
+		SMS_USE("SmsUse", "短信使用记录", "Sms_Module/SmsManagement.html", "../../images/smsMgr.png");
+		
+		private String mgrId;
+		private String desc;
+		private String url;
+		private String image;
+		
+		Sms(String mgrId, String desc, String url, String image){
+			this.mgrId = mgrId;
+			this.image = image;
+			this.url = url;
+			this.desc = desc;
+		}
+
+		public String getMgrId() {
+			return mgrId;
+		}
+
+		public String getDesc() {
+			return desc;
+		}
+
+		public String getUrl() {
+			return url;
+		}
+
+		public String getImage() {
+			return image;
+		}
+		
+	}
 	
 }

@@ -1,8 +1,14 @@
 package com.wireless.pojo.sms;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import com.wireless.json.Jsonable;
 import com.wireless.pojo.sms.SMSDetail.Operation;
 
-public class SMStat {
+public class SMStat implements Jsonable{
 
 	public static class InsertBuilder{
 		private final int restaurantId;
@@ -194,5 +200,23 @@ public class SMStat {
 	@Override
 	public String toString(){
 		return "sms stat(" + restaurantId + ")";
+	}
+
+	@Override
+	public Map<String, Object> toJsonMap(int flag) {
+		Map<String, Object> jm = new HashMap<String, Object>();
+		jm.put("rid", this.restaurantId);
+		jm.put("totalUsed", this.totalUsed);
+		jm.put("verifyUsed", this.verificationUsed);
+		jm.put("consumptionUsed", this.consumptionUsed);
+		jm.put("chargeUsed", this.chargeUsed);
+		jm.put("remaining", this.remaining);
+		
+		return Collections.unmodifiableMap(jm);
+	}
+
+	@Override
+	public List<Object> toJsonList(int flag) {
+		return null;
 	}
 }

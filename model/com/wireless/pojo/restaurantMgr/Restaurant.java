@@ -526,6 +526,7 @@ public class Restaurant implements Parcelable, Jsonable{
 
 	@Override
 	public Map<String, Object> toJsonMap(int flag) {
+		String moduleDescs = "";
 		Map<String, Object> jm = new HashMap<String, Object>();
 		jm.put("id", this.id);
 		jm.put("account", this.account);
@@ -536,6 +537,17 @@ public class Restaurant implements Parcelable, Jsonable{
 		jm.put("address", this.address);
 		jm.put("liveness", this.liveness);
 		jm.put("modules", this.modules);
+		if(this.modules.size() > 0){
+			moduleDescs = "";
+			for (Module module : this.modules) {
+				if(moduleDescs == ""){
+					moduleDescs += module.getCode().getDesc();
+				}else{
+					moduleDescs += ("，" + module.getCode().getDesc());
+				}
+			}
+		}
+		jm.put("moduleDescs", moduleDescs);
 		jm.put("recordAliveValue", RecordAlive.valueOfSeconds(this.recordAlive).getVal());
 		jm.put("recordAliveText", RecordAlive.valueOfSeconds(this.recordAlive).getDesc());
 		jm.put("birthDate", DateUtil.formatToDate(this.birthDate));
