@@ -13,6 +13,8 @@ function billQueryHandler() {
 		sValue = onDuty + '<split>' + offDuty;
 	}else if(searchType == 9){
 		sValue = '';
+	}else if(searchType == 10){
+		sValue = searchValue != '' ? Ext.getCmp(searchValue).getValue() : '';
 	}else{
 		sValue = searchValue != '' ? Ext.getCmp(searchValue).getValue() : '';
 		sOperator = searchOperator != '' ? Ext.getCmp(searchOperator).getValue() : '';
@@ -337,7 +339,7 @@ var h_bills_filterTypeComb = new Ext.form.ComboBox({
 	store : new Ext.data.SimpleStore({
 		fields : [ 'value', 'text' ],
 		data :  [[0, '全部'], [1, '帐单号'], [2, '流水号'], [3, '台号'], [4, '日期'], [5, '类型'], 
-		         [6, '结帐方式'], [7, '金额'], [8, '实收'], [9, '最近日结']]
+		         [6, '结帐方式'], [7, '金额'], [8, '实收'], [9, '最近日结'],[10, '备注搜索']]
 	}),
 	valueField : 'value',
 	displayField : 'text',
@@ -359,6 +361,7 @@ var h_bills_filterTypeComb = new Ext.form.ComboBox({
 			var dateSearchDateEnd = Ext.getCmp('dateSearchDateEnd');
 			var numberSearchValue = Ext.getCmp('numberSearchValue');
 			var tbtextDisplanZ = Ext.getCmp('tbtextDisplanZ');
+			var textSearchValue= Ext.getCmp('textSearchValue');
 			//
 			comboOperator.setVisible(false);
 			comboTableType.setVisible(false);
@@ -367,6 +370,7 @@ var h_bills_filterTypeComb = new Ext.form.ComboBox({
 			dateSearchDateBegin.setVisible(false);
 			dateSearchDateEnd.setVisible(false);
 			tbtextDisplanZ.setVisible(false);
+			textSearchValue.setVisible(false);
 			
 			comboOperator.setVisible(true);
 			comboOperator.setValue(1);
@@ -424,6 +428,11 @@ var h_bills_filterTypeComb = new Ext.form.ComboBox({
 			} else if (index == 9) {
 				// 最近日结
 				comboOperator.setVisible(false);
+			}else if(index == 10){
+				//备注搜索
+				comboOperator.setVisible(false);
+				textSearchValue.setVisible(true);
+				searchValue = textSearchValue.getId();
 			}
 			
 		}
@@ -546,6 +555,11 @@ Ext.onReady(function() {
 		}, {
 			xtype : 'numberfield',
 			id : 'numberSearchValue',
+			hidden : true,
+			width : 130
+		}, {
+			xtype : 'textfield',
+			id : 'textSearchValue',
 			hidden : true,
 			width : 130
 		}, 

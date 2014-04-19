@@ -196,14 +196,7 @@ function initMenuForOperationFoodCount(){
 					xtype : 'numberfield',
 					id : 'numOperationFoodCount',
 					fieldLabel : '数量',
-					width : 80,
-					validator : function(v){
-						if(v >= 0 && v <= 255){
-							return true;
-						}else{
-							return '菜品数量在 1 ~ 255 之间.';
-						}
-					} 
+					width : 80
 				}]
 			}],
 			bbar : ['->', {

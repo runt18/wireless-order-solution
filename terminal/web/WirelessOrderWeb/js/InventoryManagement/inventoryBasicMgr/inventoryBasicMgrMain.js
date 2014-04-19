@@ -402,6 +402,11 @@ function operateMaterialHandler(c){
 		materialName.clearInvalid();
 		materialCate.clearInvalid();
 		materialCate.setDisabled(false);
+		
+		var node = materialCateTree.getSelectionModel().getSelectedNode();
+		if(node && typeof node.attributes.cateId != 'undefined' && node.attributes.cateId != -1) {
+			materialCate.setValue(node.attributes.cateId);
+		}
 	}else if(c.otype == Ext.ux.otype['update']){
 		var data = Ext.ux.getSelData(inventory_materialBasicGrid);
 		if(!data){

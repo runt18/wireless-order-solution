@@ -795,12 +795,6 @@ function submitSingleOrderHandler(_c){
 		
 		foodPara = '{' + foodPara + '}';
 		
-		var type = 0;
-		if(isFree){
-			type = 1;
-		}else{
-			type = 2;
-		}
 		setButtonDisabled(true);
 		
 		Ext.Ajax.request({
@@ -810,7 +804,7 @@ function submitSingleOrderHandler(_c){
 				tableID : tableAliasID,
 				orderID : _c.grid.order.id,
 				customNum : 1,
-				type : type,
+				type : isFree ? 1 : 2,
 				foods : foodPara,
 				category : tableCategory,
 				orderDate : (typeof _c.grid.order == 'undefined' ? '' : _c.grid.order.orderDate),

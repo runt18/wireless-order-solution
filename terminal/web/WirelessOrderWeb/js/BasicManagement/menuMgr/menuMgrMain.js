@@ -562,7 +562,7 @@ foodOperationHandler = function(c){
  * @param active
  * @param type
  */
-function foodOperation(active, type){
+function foodOperation(type){
 	var foWin = Ext.getCmp('foodOperationWin');
 	var selRowData = Ext.ux.getSelData('menuMgrGrid');
 	
@@ -2465,7 +2465,7 @@ function initMenuGrid(){
 				*/
 			},
 			rowdblclick : function(){
-				foodOperation('basicOperationTab', mmObj.operation.update);
+				foodOperation(mmObj.operation.update);
 			}
 		}
 	});
@@ -2513,8 +2513,7 @@ function initFoodOperationWin(){
 		    	handler : function(){
 		    		Ext.getCmp('menuMgrGrid').getSelectionModel().selectPrevious();
 		    		Ext.getCmp('foodOperationWin').setTitle(Ext.ux.getSelData('menuMgrGrid').name);
-		    		Ext.getCmp('foodOperationWinTab').fireEvent('tabchange');
-		    		
+		    		foodOperation(mmObj.operation.update);
 		    		Ext.getCmp('btnPreviousFood').setDisabled(!Ext.getCmp('menuMgrGrid').getSelectionModel().hasPrevious());
 		    		Ext.getCmp('btnNextFood').setDisabled(false);
 		    	}
@@ -2526,8 +2525,8 @@ function initFoodOperationWin(){
 		    	handler : function(){
 		    		Ext.getCmp('menuMgrGrid').getSelectionModel().selectNext();
 		    		Ext.getCmp('foodOperationWin').setTitle(Ext.ux.getSelData('menuMgrGrid').name);
-		    		Ext.getCmp('foodOperationWinTab').fireEvent('tabchange');
-		    		
+//		    		Ext.getCmp('foodOperationWinTab').fireEvent('tabchange');
+		    		foodOperation(mmObj.operation.update);
 		    		Ext.getCmp('btnPreviousFood').setDisabled(false);
 		    		Ext.getCmp('btnNextFood').setDisabled(!Ext.getCmp('menuMgrGrid').getSelectionModel().hasNext());
 		    	}
@@ -2691,7 +2690,7 @@ var btnAddFood = new Ext.ux.ImageButton({
 	imgHeight : 50,
 	tooltip : '添加新菜',
 	handler : function(btn) {                                                                     
-		foodOperation('basicOperationTab', mmObj.operation.insert);
+		foodOperation(mmObj.operation.insert);
 	}
 });
 
@@ -2733,7 +2732,7 @@ var btnFood = new Ext.ux.ImageButton({
 	imgHeight : 50,
 	tooltip : '修改菜品',
 	handler : function(btn) {
-		foodOperation('basicOperationTab', mmObj.operation.update);
+		foodOperation(mmObj.operation.update);
 	}
 });
 
@@ -2743,7 +2742,7 @@ var btnTaste = new Ext.ux.ImageButton({
 	imgHeight : 50,
 	tooltip : '口味关联',
 	handler : function(btn) {
-		foodOperation('tasteOperationTab', mmObj.operation.update);
+		foodOperation(mmObj.operation.update);
 	}
 });
 

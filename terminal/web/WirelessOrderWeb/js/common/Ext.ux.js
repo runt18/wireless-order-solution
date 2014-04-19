@@ -639,7 +639,7 @@ var DeptRecord = Ext.ux.cr(['id', 'name', 'rid', 'typeValue']);
 var DiscountPlanRecord = Ext.ux.cr(['id', 'rate', 'kitchen', 'kitchen.id', 'kitchen.name', 'discount', 'discount.id', 'discount.name']);
 var StockTakeDetailRecord = Ext.ux.cr(['id', 'material', 'material.name', 'actualAmount', 'expectAmount', 'deltaAmount']);
 var StockTakeRecord = Ext.ux.cr(['id', 'rid', 'dept', 'dept.name', 'cateTypeValue', 'cateTypeText', 'statusValue', 'statusText', 'detail',
-    'operator', 'operatorId', 'approver', 'approverId', 'startDateFormat', 'finishDateFormat', 'comment', 'materialCate']);
+    'operator', 'operatorId', 'approver', 'approverId', 'startDateFormat', 'finishDateFormat', 'comment', 'materialCate', 'materialCate.name']);
 var TableRecord = Ext.ux.cr(['id', 'alias', 'rid', 'name', 'customNum', 'minimumCost', 'serviceRate', 
     'categoryValue', 'categoryText', 'statusValue', 'statusText', 'region', 'region.name']);
 var SalesSubStatRecord = Ext.ux.cr(['salesAmount', 'income','discount','gifted', 'cost', 'costRate', 'profit','profitRate','avgPrice','avgCost']);

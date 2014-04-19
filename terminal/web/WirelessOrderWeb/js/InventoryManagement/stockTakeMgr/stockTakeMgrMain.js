@@ -4,6 +4,10 @@ function audit(){
 	data['statusValue'] = 3;
 	updateStockTakeHandler();
 }
+
+function setCateValue(materialCateId){
+	Ext.getCmp('comboMaterialCateId').setValue(materialCateId);
+}
 /**
  * 
  * @param c
@@ -16,7 +20,7 @@ function operateStockTakeDate(c){
 	var id = Ext.getCmp('hideStockTakeId');
 	var dept = Ext.getCmp('comboStockTakeDept');
 	var cate = Ext.getCmp('comboMaterialCate');
-	var cateId = Ext.getCmp('comboMaterialCateId');
+//	var cateId = Ext.getCmp('comboMaterialCateId');
 	var comment = Ext.getCmp('txtStockTakeComment');
 	var approver = Ext.getCmp('txtStockTakeApprover');
 	var approverDate = Ext.getCmp('txtStockTakeApproverDate');
@@ -27,10 +31,17 @@ function operateStockTakeDate(c){
 		var data = typeof c.data == 'undefined' ? {} : c.data;
 		var deptData = typeof data.dept == 'undefined' ? {} : data.dept;
 		var materialCate = typeof data['materialCate'] == 'undefined' ? {} : data['materialCate'];
+		if(typeof data['cateTypeValue'] == 'undefined'){
+			cate.setValue(1);
+		}else{
+			cate.setValue(data['cateTypeValue']);
+		}
+		//触发小类别变动
+		cate.fireEvent('select', cate);
+		
 		id.setValue(data['id']);
 		dept.setValue(deptData['id']);
 		
-		cateId.setValue(materialCate['id']);
 		comment.setValue(data['comment']);
 		if(data['statusValue'] == 2){
 			approver.setValue(data['approver']);
@@ -43,15 +54,10 @@ function operateStockTakeDate(c){
 		operator.setValue(data['operator']);
 		operatorDate.setValue(data['startDateFormat']);
 		
-		if(typeof data['cataTypeValue'] == 'undefined'){
-			cate.setValue(1);
-		}else{
-			cate.setValue(data['cataTypeValue']);
-		}
+
 		var gs = Ext.getCmp('stockTakeWinCenter').getStore();
 		gs.removeAll();
 		if(typeof data.detail != 'undefined' && data.detail.length > 0){
-//			alert(Ext.encode(data.detail[0]))
 			for(var i = 0; i < data.detail.length; i++){
 				var temp = data.detail[i];
 				gs.add(new StockTakeDetailRecord({
@@ -78,6 +84,9 @@ function operateStockTakeDate(c){
 				cateId : ''
 			};
 		}
+		//FIXME 小类别combo选中,异步来不及缓冲数据, 设置时间暂停
+		setTimeout("setCateValue("+materialCate["id"]+")", 600);
+		
 	}else if(c.otype == Ext.ux.otype['get']){
 		
 	}
@@ -468,7 +477,7 @@ function initGrid(){
 			[true, false, false, true],
 			['盘点日期', 'startDateFormat'],
 			['仓库', 'dept.name'],
-			['货品类型', 'cateTypeText'],
+			['货品类型', 'materialCate.name'],
 			['盘点状态', 'statusText'],
 			['审核人', 'approver'],
 			['审核时间', 'finishDateFormat',,,'function(v, m, r, ri, ci, s){if(r.get("statusValue")==2){return r.get("finishDateFormat")}else{return "";}}'],
@@ -476,7 +485,7 @@ function initGrid(){
 			['操作', 'operate', ,'center', 'stockTakeGridOperateRenderer']
 		],
 		StockTakeRecord.getKeys(),
-		[['isPaging', true],  ['restaurantId', restaurantID], ['dataSource', 'normal']],
+		[['restaurantId', restaurantID], ['dataSource', 'normal']],
 		GRID_PADDING_LIMIT_20,
 		'',
 		stockTakeGridTbar
@@ -579,10 +588,6 @@ function initWin(){
     				selectOnFocus : true,
     				allowBlank : false,
     				listeners : {
-    					render : function(thiz){
-    						thiz.setValue(1);
-    						thiz.fireEvent('select', thiz);
-    					},
     					select : function(thiz){
     						checkTakeContentChange('cateType', thiz);
     					}
@@ -1030,7 +1035,6 @@ function checkTakeContentChange(type, e){
 			cateId.setValue();
 			cateId.store.baseParams['type'] = e.getValue();
 			cateId.store.load();
-			
 		}else{
 			if(content.cateType != e.getValue()){
 				if(detailStore.getCount() > 0){

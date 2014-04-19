@@ -361,12 +361,198 @@ function optRestaurant(){
 	+ "<a href = \"javascript:optRestaurantHandler({otype:'update'})\">" + "<img src='../../images/Modify.png'/>修改</a>";
 }
 
+function optSms(v){
+	return ''
+	+ "<a href = \"javascript:optSmsHandler()\">" + "<img src='../../images/Modify.png'/>"+ v +"</a>";
+}
+
 function hideAddress(v){
 	if(v.length > 7){
 		return v.substring(0,7)+'...';
 	}else{
 		return v;
 	}
+}
+function changeAdjustSmsLabel(label){
+	Ext.query('label[for="numAdjustSms"]')[0].innerHTML = label+':';
+}
+
+function optSmsHandler(){
+	var data = Ext.ux.getSelData(restaurantPanel);
+	var numAdjustSms = new Ext.form.NumberField({
+			xtype : 'numberfield',
+			id : 'numAdjustSms',
+			fieldLabel : '',
+			style : 'color:red;',
+			width : 100,
+			allowBlank : false,
+			blankText : '不能为空, 0 则取消操作.',
+			validator : function(value){
+				var adjust = document.getElementsByName('radioAdjustSms');
+				for(var i=0; i< adjust.length; i++){
+					if(adjust[i].checked){
+						adjust = adjust[i].value;
+						break;
+					}
+				}
+				if(adjust == 2){
+					if(Math.abs(value) > data['smsRemain']){
+						Ext.getCmp('numAdjustSms').setValue(data['smsRemain']);
+					}
+					return true;
+				}else{
+					return true;
+				}
+			},
+			listeners : {
+				render : function(){
+					Ext.getCmp('radioAdjustSmsIncrease').setValue(true);
+				}
+			}
+		});
+	if(!adjustSmsWin){
+
+		adjustSmsWin = new Ext.Window({
+			title : '&nbsp;',
+			modal : true,
+			closable : false,
+			resizable : false,
+			width : 200,
+			height : 146,
+			layout : 'fit',
+			frame : true,
+			items : [{
+				layout : 'column',
+				frame : true,
+				defaults : {
+					columnWidth : .33,
+					layout : 'form',
+					labelWidth : 60
+				},
+				items : [{
+					items : [{
+						xtype : 'radio',
+						id : 'radioAdjustSmsIncrease',
+						name : 'radioAdjustSms',
+						inputValue : 1,
+						hideLabel : true,
+						boxLabel : '增加',
+						listeners : {
+							check : function(e){
+								if(e.getValue()){
+									changeAdjustSmsLabel('增加短信');
+								}
+							}
+						}
+					}]
+				}, {
+					items : [{
+						xtype : 'radio',
+						name : 'radioAdjustSms',
+						inputValue : 2,
+						hideLabel : true,
+						boxLabel : '减少',
+						listeners : {
+							check : function(e){
+								if(e.getValue()){
+									changeAdjustSmsLabel('减少短信');
+								}
+							}
+						}
+					}]
+				}, {
+					columnWidth : 1,
+					items : [{
+						xtype : 'textfield',
+						id : 'numMemberSmsForNow',
+						fieldLabel : '当前短信',
+						style : 'color:green;',
+						width : 100,
+						disabled : true
+					}]
+				}, {
+					columnWidth : 1,
+					items : [numAdjustSms]
+				},{
+					xtype : 'hidden',
+					id : 'smsRestaurantId'
+				}]
+			}],
+			bbar : ['->', {
+				text : '保存',
+				iconCls : 'btn_save',
+				handler : function(){
+					if(!numAdjustSms.isValid()){
+						return;
+					}
+					if(numAdjustSms.getValue() == 0){
+						adjustSmsWin.hide();
+						Ext.example.msg('提示', '你输入的短信为0, 无需调整');
+						return;
+					}
+					var adjust = document.getElementsByName('radioAdjustSms');
+					for(var i=0; i< adjust.length; i++){
+						if(adjust[i].checked){
+							adjust = adjust[i].value;
+							break;
+						}
+					}
+					var dataSource = "";
+					if(adjust == 1){
+						dataSource = "add";
+					}else{
+						dataSource = "reduce";
+					}
+					Ext.Ajax.request({
+						url : '../../OperateSms.do',
+						params : {
+							restaurantId : Ext.getCmp('smsRestaurantId').getValue(),
+							count : numAdjustSms.getValue(),
+							dataSource : dataSource
+						},
+						success : function(res, opt){
+							var jr = Ext.decode(res.responseText);
+							if(jr.success){
+								adjustSmsWin.hide();
+								Ext.example.msg(jr.title, jr.msg);
+								Ext.getCmp('btnSearch').handler();
+							}else{
+								Ext.ux.showMsg(jr);
+							}
+						},
+						failure : function(res, opt){
+							Ext.ux.showMsg(Ext.decode(res.responseText));
+						}
+					});
+				}
+			}, {
+				text : '关闭',
+				iconCls : 'btn_close',
+				handler : function(){
+					adjustSmsWin.hide();
+				}
+			}],
+			keys : [{
+				key : Ext.EventObject.ESC,
+				scope : this,
+				fn : function(){
+					adjustSmsWin.hide();
+				}
+			}],
+			listeners : {
+				hide : function(){
+					numAdjustSms.setValue();
+					Ext.getCmp('radioAdjustSmsIncrease').setValue(true);
+					numAdjustSms.clearInvalid();
+				}
+			}
+		});
+	}
+	adjustSmsWin.show();
+	adjustSmsWin.setTitle('短信调整');
+	Ext.getCmp('numMemberSmsForNow').setValue(data['smsRemain']);
+	Ext.getCmp('smsRestaurantId').setValue(data['id']);
+	numAdjustSms.focus(true, 100);
 }
 
 function optRestaurantHandler(c){
@@ -418,7 +604,7 @@ function optRestaurantHandler(c){
 	
 	
 }
-var restaurantPanel;
+
 Ext.onReady(function(){
 	Ext.BLANK_IMAGE_URL = '../../extjs/resources/images/default/s.gif';
 	Ext.QuickTips.init();
@@ -456,10 +642,12 @@ Ext.onReady(function(){
 			name : 'expireDate'
 		},{
 			name : 'modules'
+		},{
+			name : 'smsRemain'
+		},{
+			name : 'moduleDescs'
 		}])
 	});
-	
-	ds.load();
 	
 	var cm = new Ext.grid.ColumnModel([
 		new Ext.grid.RowNumberer(),
@@ -469,11 +657,9 @@ Ext.onReady(function(){
 		{header : '账号有效期', dataIndex : 'expireDate'},
 		{header : '餐厅名', dataIndex : 'name', width : 150},
 		{header : '活跃度', dataIndex : 'liveness'},
-		{header : '电话1', dataIndex : 'tele1'},
-		{header : '电话2', dataIndex : 'tele2'},
-		{header : '地址', dataIndex : 'address', renderer : hideAddress},
-		{header : '餐厅信息', dataIndex : 'info', renderer : hideAddress},
 		{header : '账单有效期', dataIndex : 'recordAliveText'},
+		{header : '授权模块', dataIndex : 'moduleDescs',width : 250},
+		{header : '短信', dataIndex : 'smsRemain', align : 'right', renderer : optSms},
 		{header : '操作', dataIndex : 'optRestaurant', id : 'optRestaurant', align : 'center', renderer : optRestaurant}
 		
 	]);
@@ -487,6 +673,7 @@ Ext.onReady(function(){
 		cm : cm,
 		store : ds,
 		autoExpandColumn : 'optRestaurant',
+		loadMask : {msg : '加载中.....'},
 		tbar : new Ext.Toolbar({
 			items : [{
 				xtype : 'tbtext',
@@ -601,4 +788,5 @@ Ext.onReady(function(){
     });
     
     initModulesData();
+    ds.load();
 });

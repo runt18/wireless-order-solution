@@ -30,7 +30,7 @@ var addDeviceWin = new Ext.Window({
 	width : 290,
 	bbar : [{
 		text : '应用',
-		id : 'btnAddDevice',
+		id : 'btnTempAddDevice',
 		iconCls : 'btn_app',
 		handler : function(){
 			var pin = Ext.getCmp('txtDeviceId');
@@ -77,8 +77,8 @@ var addDeviceWin = new Ext.Window({
 							Ext.example.msg(jr.title, jr.msg);
 							pin.setValue('');
 							pin.clearInvalid();
-							rId.setValue('');
-							rId.clearInvalid();
+/*							rId.setValue('');
+							rId.clearInvalid();*/
 							
 							Ext.getDom('rdoAndroid').checked = true;
 							Ext.getDom('rdoRecordAlive').checked = true;
