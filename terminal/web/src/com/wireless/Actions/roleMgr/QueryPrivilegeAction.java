@@ -265,6 +265,22 @@ public class QueryPrivilegeAction extends DispatchAction{
 					}
 					tree.append(",children : [" + children.toString() + "]");
 					tree.append("},");
+				}else if(privilege.getCode() == Code.SMS){
+					tree.append("{");
+					tree.append("leaf:false");
+					tree.append(",expanded:true");
+					tree.append(",id:'smsMgr'");
+					tree.append(",text:'短信'");
+					tree.append(",cls:'tFont'");
+					StringBuilder children = new StringBuilder();
+					for (int i = 0; i < Page.Sms.values().length; i++) {
+						if(i > 0){
+							children.append(",");
+						}
+						children.append("{leaf:true," + "icon:'" + Page.Sms.values()[i].getImage() +"'" + ", text:'" + Page.Sms.values()[i].getDesc() + "', mId:'" +Page.Sms.values()[i].getMgrId() + "', cls:'font', url:'" + Page.Sms.values()[i].getUrl() + "'}");
+					}
+					tree.append(",children : [" + children.toString() + "]");
+					tree.append("},");
 				}
 			}
 			tree.append("]");

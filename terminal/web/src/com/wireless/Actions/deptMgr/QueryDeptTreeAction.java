@@ -20,8 +20,10 @@ public class QueryDeptTreeAction extends Action{
 		
 		String warehouse = request.getParameter("warehouse");
 		String extra = "";
-		if(warehouse == null || warehouse.isEmpty()){
-			extra = " AND dept_id <> " + Department.DeptId.DEPT_WAREHOUSE.getVal();
+		if(warehouse != null && !warehouse.isEmpty()){
+			extra = " AND (type = " + Department.Type.NORMAL.getVal() + " OR type = " + Department.Type.WARE_HOUSE.getVal() + ")";
+		}else{
+			extra = " AND type = " + Department.Type.NORMAL.getVal();
 		}
 		DBCon dbCon = new DBCon();
 		
@@ -35,7 +37,6 @@ public class QueryDeptTreeAction extends Action{
 					+ " FROM " 
 					+ Params.dbName + ".department " 
 					+ " WHERE restaurant_id = " + restaurantID 
-					+ " AND type = " + Department.Type.NORMAL.getVal() 
 					+ extra
 					+ " ORDER BY dept_id ";
 			

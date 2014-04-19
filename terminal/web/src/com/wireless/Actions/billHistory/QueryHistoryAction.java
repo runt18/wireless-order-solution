@@ -110,6 +110,8 @@ public class QueryHistoryAction extends Action {
 				DailySettle ds = SystemDao.getDailySettle(Integer.valueOf(restaurantId), SystemDao.MAX_DAILY_SETTLE);
 //				System.out.println("ds: "+ds.getOnDutyFormat()+"  -  "+ds.getOffDutyFormat());
 				filterCond = " AND OH.order_date BETWEEN '" + ds.getOnDutyFormat() + "' AND '" + ds.getOffDutyFormat() + "'";
+			}else if(type.equals("10")){
+				filterCond = " AND OH.comment LIKE '%" + value + "%' ";
 			}else{
 				filterCond = "";
 			}
