@@ -46,7 +46,7 @@ public class ReqInsertOrder extends RequestPackage {
 	
 	private void check(Order reqOrder, byte type, PrintOption printOption){
 		
-		if(type == Type.INSERT_ORDER){
+		if(type == Type.INSERT_ORDER || type == Type.INSERT_ORDER_FORCE){
 			if(reqOrder.getDestTbl() == null){
 				throw new IllegalArgumentException("The table to insert order request can NOT be null.");
 			}
