@@ -8,7 +8,7 @@ import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.regionMgr.TableDao;
 import com.wireless.exception.BusinessException;
-import com.wireless.exception.ProtocolError;
+import com.wireless.exception.FrontBusinessError;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.OrderSummary;
 import com.wireless.pojo.distMgr.Discount;
@@ -41,7 +41,7 @@ public class OrderDao {
 			dbCon.rs.close();
 			return Order.Status.valueOf(status);
 		}else{
-			throw new BusinessException(ProtocolError.ORDER_NOT_EXIST);
+			throw new BusinessException(FrontBusinessError.ORDER_NOT_EXIST);
 		}
 	}
 	
@@ -203,7 +203,7 @@ public class OrderDao {
 		
 		List<Order> results = getByCond(dbCon, staff, extraCond, null, dateType);
 		if(results.isEmpty()){
-			throw new BusinessException("The order(id = " + orderId + ") does NOT exist.", ProtocolError.ORDER_NOT_EXIST);
+			throw new BusinessException("The order(id = " + orderId + ") does NOT exist.", FrontBusinessError.ORDER_NOT_EXIST);
 		}else{
 			return results.get(0);
 		}
@@ -535,7 +535,7 @@ public class OrderDao {
 		if(dbCon.rs.next()){
 			orderId = dbCon.rs.getInt("id");
 		}else{
-			throw new BusinessException("The un-paid order id to table(alias_id = " + table.getAliasId() + ", restaurant_id = " + table.getRestaurantId() + ") does NOT exist.", ProtocolError.ORDER_NOT_EXIST);
+			throw new BusinessException("The un-paid order id to table(alias_id = " + table.getAliasId() + ", restaurant_id = " + table.getRestaurantId() + ") does NOT exist.", FrontBusinessError.ORDER_NOT_EXIST);
 		}
 		dbCon.rs.close();
 		

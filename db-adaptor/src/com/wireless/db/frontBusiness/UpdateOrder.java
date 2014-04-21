@@ -13,9 +13,11 @@ import com.wireless.db.deptMgr.KitchenDao;
 import com.wireless.db.distMgr.DiscountDao;
 import com.wireless.db.menuMgr.FoodDao;
 import com.wireless.db.orderMgr.OrderDao;
+import com.wireless.db.orderMgr.OrderFoodDao;
 import com.wireless.db.regionMgr.TableDao;
 import com.wireless.db.tasteMgr.TasteDao;
 import com.wireless.exception.BusinessException;
+import com.wireless.exception.FrontBusinessError;
 import com.wireless.exception.ProtocolError;
 import com.wireless.exception.StaffError;
 import com.wireless.pojo.crMgr.CancelReason;
@@ -187,13 +189,15 @@ public class UpdateOrder {
 		 */
 		if(oriOrder.isUnpaid() && !oriOrder.getDestTbl().equals(newOrder.getDestTbl())){
 			if(!newOrder.getDestTbl().isIdle()){
-				throw new BusinessException("The new " + newOrder.getDestTbl() + " of order(id = " + newOrder.getId() + ") to update should be Idle.", ProtocolError.TABLE_BUSY);
+				throw new BusinessException(newOrder.getDestTbl().getAliasId() + "号台是就餐状态，不能转台", ProtocolError.TABLE_BUSY);
 			}
 		}
 		
 		//Check to see whether the new order is expired.
 		if(newOrder.getOrderDate() != 0 && newOrder.getOrderDate() < oriOrder.getOrderDate()){
-			throw new BusinessException("The order(order_id=" + newOrder.getId() + ",restaurant_id=" + staff.getRestaurantId() + ") has expired.", ProtocolError.ORDER_EXPIRED);
+			OrderFood of = OrderFoodDao.getSingleDetailToday(dbCon, staff, " AND OF.order_id = " + newOrder.getId(), " ORDER BY OF.id DESC LIMIT 1 ").get(0);
+			long deltaSeconds = (System.currentTimeMillis() - of.getOrderDate()) / 1000;
+			throw new BusinessException("\"" + of.getWaiter() + "\"" + (deltaSeconds >= 60 ? ((deltaSeconds / 60) + "分钟") : (deltaSeconds + "秒")) + "前修改了账单, 请重新确认", FrontBusinessError.ORDER_EXPIRED);
 		}
 		
 		//Fill the detail to each new order food

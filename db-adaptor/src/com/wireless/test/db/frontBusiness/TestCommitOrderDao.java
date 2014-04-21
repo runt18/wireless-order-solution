@@ -2,6 +2,7 @@ package com.wireless.test.db.frontBusiness;
 
 import java.beans.PropertyVetoException;
 import java.sql.SQLException;
+import java.util.Comparator;
 import java.util.List;
 
 import org.junit.Assert;
@@ -130,8 +131,20 @@ public class TestCommitOrderDao {
 		//Check the category
 		Assert.assertEquals("the category to order", expected.getCategory(), actual.getCategory());
 		//Check the order foods
-		List<OrderFood> expectedFoods = SortedList.newInstance(expected.getOrderFoods());
-		List<OrderFood> actualFoods = SortedList.newInstance(actual.getOrderFoods());
+		Comparator<OrderFood> comp = new Comparator<OrderFood>(){
+			@Override
+			public int compare(OrderFood arg0, OrderFood arg1) {
+				if(arg0.getId() < arg1.getId()){
+					return -1;
+				}else if(arg0.getId() > arg1.getId()){
+					return 1;
+				}else{
+					return 0;
+				}
+			}
+		};
+		List<OrderFood> expectedFoods = SortedList.newInstance(expected.getOrderFoods(), comp);
+		List<OrderFood> actualFoods = SortedList.newInstance(actual.getOrderFoods(), comp);
 		
 		Assert.assertEquals(expectedFoods.size(), actualFoods.size());
 		for(int i = 0; i < expectedFoods.size(); i++){

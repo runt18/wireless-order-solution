@@ -12,8 +12,8 @@ import java.util.Map;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.exception.BusinessException;
+import com.wireless.exception.FrontBusinessError;
 import com.wireless.exception.MemberError;
-import com.wireless.exception.ProtocolError;
 import com.wireless.pojo.client.MOSummary;
 import com.wireless.pojo.client.MemberOperation;
 import com.wireless.pojo.client.MemberOperation.OperationType;
@@ -336,7 +336,7 @@ public class MemberOperationDao {
 					throw new BusinessException(MemberError.OPERATION_SEARCH);
 				}
 			}else{
-				throw new BusinessException(ProtocolError.ORDER_NOT_EXIST);
+				throw new BusinessException(FrontBusinessError.ORDER_NOT_EXIST);
 			}
 			
 			return getTodayById(staff, memberOperationId);

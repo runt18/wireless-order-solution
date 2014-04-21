@@ -33,11 +33,14 @@ import com.wireless.db.sms.SMStatDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.ModuleError;
 import com.wireless.exception.SMSError;
+import com.wireless.pojo.client.MemberOperation;
+import com.wireless.pojo.client.MemberOperation.OperationType;
 import com.wireless.pojo.restaurantMgr.Module;
 import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.sms.SMSDetail;
 import com.wireless.pojo.sms.SMStat;
 import com.wireless.pojo.staffMgr.Staff;
+import com.wireless.pojo.util.NumericUtil;
 
 public final class SMS {
 	
@@ -65,6 +68,46 @@ public final class SMS {
 	public static class Msg4Verify extends Msg{
 		public Msg4Verify(int code){
 			super("您本次操作的验证码是" + code, null, SMSDetail.Operation.USE_VERIFY);
+		}
+	}
+	
+	public static class Msg4Consume extends Msg{
+		public Msg4Consume(MemberOperation mo){
+			super("尊敬的会员，您本次消费" + NumericUtil.float2String(mo.getPayMoney()) + "元" +
+				  (mo.getDeltaPoint() > 0 ? ("，积分" + mo.getDeltaPoint()) : "") +
+				  "，余额" + (mo.getRemainingBaseMoney() + mo.getRemainingExtraMoney()) + "元" +
+				  "，谢谢您的光临", 
+				  null, SMSDetail.Operation.USE_CONSUME);
+			
+			if(mo.getOperationType() != OperationType.CHARGE){
+				throw new IllegalArgumentException();
+			}
+		}
+	}
+	
+	public static class Msg4Charge extends Msg{
+		public Msg4Charge(MemberOperation mo){
+			super("尊敬的会员，您本次充值实收" + NumericUtil.float2String2(mo.getChargeMoney()) + "元" +
+				  "，充额" + NumericUtil.float2String2(mo.getDeltaBaseMoney() + mo.getDeltaExtraMoney()) + "元" +
+				  "，余额" + NumericUtil.float2String2(mo.getRemainingBaseMoney() + mo.getRemainingExtraMoney()) + "元", 
+				  null, SMSDetail.Operation.USE_CHARGE);
+			
+			if(mo.getOperationType() != OperationType.CHARGE){
+				throw new IllegalArgumentException();
+			}
+		}
+	}
+	
+	public static class Msg4Refund extends Msg{
+		public Msg4Refund(MemberOperation mo){
+			super("尊敬的会员，您本次退款实退" + NumericUtil.float2String2(Math.abs(mo.getChargeMoney())) + "元" +
+				  "，扣额" + NumericUtil.float2String2(Math.abs(mo.getDeltaBaseMoney() + mo.getDeltaExtraMoney())) + "元" +
+				  "，余额" + NumericUtil.float2String2(mo.getRemainingBaseMoney() + mo.getRemainingExtraMoney()) + "元", 
+				  null, SMSDetail.Operation.USE_CHARGE);
+			
+			if(mo.getOperationType() != OperationType.REFUND){
+				throw new IllegalArgumentException();
+			}
 		}
 	}
 	
