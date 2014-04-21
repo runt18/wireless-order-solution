@@ -75,7 +75,7 @@ public class JObject implements Jsonable {
 		this.msg = msg;
 	}
 	public void initTip(BusinessException e){
-		this.initTip(false, WebParams.TIP_TITLE_DEFAULT, e.getCode(), e.getMessage());
+		this.initTip(false, WebParams.TIP_TITLE_DEFAULT, e.getErrCode().getCode(), e.getMessage());
 	}
 	public void initTip(SQLException e){
 		this.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getErrorCode(), e.getMessage());

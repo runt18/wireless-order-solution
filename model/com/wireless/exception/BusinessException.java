@@ -41,6 +41,7 @@ public class BusinessException extends Exception{
 		super(errMsg);
 		if(errCode != null){
 			this.mErrCode = errCode;
+			this.mErrCode.setDesc(errMsg);
 		}else{
 			this.mErrCode = ErrorEnum.UNKNOWN;
 		}

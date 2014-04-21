@@ -59,7 +59,14 @@ public final class ErrorCode implements Parcelable{
 	}
 	
 	public String getDesc(){
+		if(desc == null){
+			return "";
+		}
 		return this.desc;
+	}
+	
+	void setDesc(String desc){
+		this.desc = desc;
 	}
 	
 	@Override

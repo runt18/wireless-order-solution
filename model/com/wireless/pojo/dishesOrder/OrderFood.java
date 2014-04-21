@@ -21,7 +21,7 @@ import com.wireless.pojo.tasteMgr.TasteGroup;
 import com.wireless.pojo.util.DateUtil;
 import com.wireless.pojo.util.NumericUtil;
 
-public class OrderFood implements Parcelable, Comparable<OrderFood>, Jsonable {
+public class OrderFood implements Parcelable, Jsonable {
 	
 	public final static byte OF_PARCELABLE_4_COMMIT = 0;
 	public final static byte OF_PARCELABLE_4_QUERY = 1;
@@ -173,11 +173,7 @@ public class OrderFood implements Parcelable, Comparable<OrderFood>, Jsonable {
 	 */
 	public void setCount(float count){
 		//mLastCnt = mCurCnt;
-		if(count >= 0){
-			mLastCnt = mCurCnt = (count <= MAX_ORDER_AMOUNT ? count : MAX_ORDER_AMOUNT);
-		}else{
-			throw new IllegalArgumentException("菜品数量不能是负数");
-		}
+		mLastCnt = mCurCnt = (count <= MAX_ORDER_AMOUNT ? count : MAX_ORDER_AMOUNT);
 	}
 	
 	/**
@@ -642,17 +638,6 @@ public class OrderFood implements Parcelable, Comparable<OrderFood>, Jsonable {
 			return new OrderFood();
 		}
 	};
-
-	@Override
-	public int compareTo(OrderFood o) {
-		if(getId() > o.getId()){
-			return 1;
-		}else if(getId() < o.getId()){
-			return -1;
-		}else{
-			return 0;
-		}
-	}
 
 	@Override
 	public Map<String, Object> toJsonMap(int flag) {
