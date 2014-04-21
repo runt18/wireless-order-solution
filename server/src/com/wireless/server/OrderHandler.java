@@ -176,6 +176,10 @@ class OrderHandler implements Runnable{
 					//handle insert order request
 					response = doInsertOrder(staff, request);
 
+				}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.INSERT_ORDER_FORCE){
+					//handle insert order request force
+					response = doInsertOrderForce(staff, request);
+					
 				}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.UPDATE_ORDER){
 					//handle update order request
 					response = doUpdateOrder(staff, request);
@@ -283,29 +287,36 @@ class OrderHandler implements Runnable{
 	}
 	
 	private RespPackage doInsertOrder(Staff staff, ProtocolPackage request) throws SQLException, BusinessException, IOException{
-		//handle insert order request
+		//handle insert order request 
 		List<Printer> printers = PrinterDao.getPrinters(staff);
+		Order orderToInsert = new Parcel(request.body).readParcel(Order.CREATOR);
+		
+		orderToInsert = InsertOrder.exec(staff, orderToInsert);
+		
+		if(request.header.reserved == PrintOption.DO_PRINT.getVal()){
+			new PrintHandler(staff)
+				.addContent(JobContentFactory.instance().createSummaryContent(PType.PRINT_ORDER, 
+				 															  staff, 
+				 															  printers,
+									 										  orderToInsert))
+				.addContent(JobContentFactory.instance().createDetailContent(PType.PRINT_ORDER_DETAIL, 
+																		     staff, 
+																		     printers,
+																		     orderToInsert))
+				.fireAsync();
+		}
+		
+		return new RespACK(request.header);
+	}
+	
+	private RespPackage doInsertOrderForce(Staff staff, ProtocolPackage request) throws SQLException, BusinessException, IOException{
+		//handle insert order request force
 		Order orderToInsert = new Parcel(request.body).readParcel(Order.CREATOR);
 		
 		Table tblToOrder = TableDao.getTableByAlias(staff, orderToInsert.getDestTbl().getAliasId());
 		
 		if(tblToOrder.isIdle()){
-			orderToInsert = InsertOrder.exec(staff, orderToInsert);
-			
-			if(request.header.reserved == PrintOption.DO_PRINT.getVal()){
-				new PrintHandler(staff)
-					.addContent(JobContentFactory.instance().createSummaryContent(PType.PRINT_ORDER, 
-					 																  staff, 
-					 																  printers,
-										 											  orderToInsert))
-					.addContent(JobContentFactory.instance().createDetailContent(PType.PRINT_ORDER_DETAIL, 
-																					 staff, 
-																					 printers,
-																					 orderToInsert))
-					.fireAsync();
-			}
-			
-			return new RespACK(request.header);
+			return doInsertOrder(staff, request);
 			
 		}else if(tblToOrder.isBusy()){
 			Order orderToUpdate = OrderDao.getByTableAlias(staff, tblToOrder.getAliasId());
@@ -324,6 +335,7 @@ class OrderHandler implements Runnable{
 	}
 	
 	private RespPackage doUpdateOrder(Staff staff, ProtocolPackage request) throws SQLException, BusinessException{
+		//handle update order request
 		Order orderToUpdate = new Parcel(request.body).readParcel(Order.CREATOR);
 		DiffResult diffResult = UpdateOrder.execById(staff, orderToUpdate);
 		List<Printer> printers = PrinterDao.getPrinters(staff);
