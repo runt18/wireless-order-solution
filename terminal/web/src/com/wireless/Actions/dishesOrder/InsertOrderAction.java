@@ -13,6 +13,7 @@ import org.apache.struts.action.ActionMapping;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.ErrorCode;
+import com.wireless.exception.FrontBusinessError;
 import com.wireless.exception.ProtocolError;
 import com.wireless.json.JObject;
 import com.wireless.pack.ProtocolPackage;
@@ -124,8 +125,8 @@ public class InsertOrderAction extends Action{
 					jobject.initTip(false, ProtocolError.TABLE_NOT_EXIST.getCode(), (orderToInsert.getDestTbl().getAliasId() + "号餐台信息不存在，请重新确认."));
 				}else if(errCode.equals(ProtocolError.TABLE_BUSY)){
 					jobject.initTip(false, ProtocolError.TABLE_BUSY.getCode(), (orderToInsert.getDestTbl().getAliasId() + "号餐台正在就餐，可能已下单，请重新确认."));
-				}else if(errCode.equals(ProtocolError.ORDER_EXPIRED)){
-					jobject.initTip(false, ProtocolError.ORDER_EXPIRED.getCode(), "账单信息已更新,请重新刷新或返回.");
+				}else if(errCode.equals(FrontBusinessError.ORDER_EXPIRED)){
+					jobject.initTip(false, FrontBusinessError.ORDER_EXPIRED.getCode(), "账单信息已更新,请重新刷新或返回.");
 				}else if(errCode.equals(ProtocolError.TABLE_IDLE)){
 					jobject.initTip(false, ProtocolError.TABLE_IDLE.getCode(), "该账单已结账或已删除.");
 				}else{

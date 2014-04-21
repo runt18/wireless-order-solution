@@ -12,19 +12,23 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.client.member.MemberDao;
+import com.wireless.db.client.member.MemberOperationDao;
+import com.wireless.db.orderMgr.OrderDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.ErrorCode;
-import com.wireless.exception.ProtocolError;
 import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
 import com.wireless.pack.req.ReqPayOrder;
 import com.wireless.parcel.Parcel;
+import com.wireless.pojo.client.MemberOperation;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.PrintOption;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.NumericUtil;
 import com.wireless.sccon.ServerConnector;
+import com.wireless.util.DateType;
+import com.wireless.util.sms.SMS;
 
 public class PayOrderAction extends Action{
 	
@@ -162,20 +166,17 @@ public class PayOrderAction extends Action{
 					jsonResp = jsonResp.replace("$(value)", payBuilder.getOrderId() + "号账单暂结成功");
 				}else{
 					jsonResp = jsonResp.replace("$(value)", payBuilder.getOrderId() + "号账单结帐成功");
+					
+					//FIXME
+					if(settleType == Order.SettleType.MEMBER){
+						MemberOperation mo = MemberOperationDao.getTodayById(staff, OrderDao.getById(staff, orderId, DateType.TODAY).getMemberOperationId());
+						SMS.send(staff, mo.getMemberMobile(), new SMS.Msg4Consume(mo));
+					}
 				}
 				
 			}else if(resp.header.type == Type.NAK){
 				jsonResp = jsonResp.replace("$(result)", "false");
-				ErrorCode errCode = new Parcel(resp.body).readParcel(ErrorCode.CREATOR);
-				if(errCode.equals(ProtocolError.ORDER_NOT_EXIST)){					
-					jsonResp = jsonResp.replace("$(value)", payBuilder.getOrderId() + "号账单信息不存在，请重新确认");
-					
-				}else if(errCode.equals(ProtocolError.ORDER_BE_REPEAT_PAID)){
-					jsonResp = jsonResp.replace("$(value)", payBuilder.getOrderId() + "号账单已结帐，请重新确认");
-					
-				}else{
-					jsonResp = jsonResp.replace("$(value)", errCode.getDesc());
-				}
+				jsonResp = jsonResp.replace("$(value)", new Parcel(resp.body).readParcel(ErrorCode.CREATOR).getDesc());
 				
 			}else{
 				jsonResp = jsonResp.replace("$(result)", "false");

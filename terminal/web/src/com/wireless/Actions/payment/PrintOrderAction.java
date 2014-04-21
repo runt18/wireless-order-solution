@@ -15,7 +15,7 @@ import com.wireless.db.regionMgr.TableDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.ErrorCode;
-import com.wireless.exception.ProtocolError;
+import com.wireless.exception.FrontBusinessError;
 import com.wireless.json.JObject;
 import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Reserved;
@@ -176,7 +176,7 @@ public class PrintOrderAction extends Action{
 					}
 				}else if(resp.header.type == Type.NAK){
 					ErrorCode errCode = new Parcel(resp.body).readParcel(ErrorCode.CREATOR);
-					if(errCode.equals(ProtocolError.ORDER_NOT_EXIST)){
+					if(errCode.equals(FrontBusinessError.ORDER_NOT_EXIST)){
 						jobject.initTip(false, WebParams.TIP_TITLE_ERROE, 9999, "操作失败, " + orderId + "账单不存在, 请重新确认.");
 					}else{
 						jobject.initTip(false, WebParams.TIP_TITLE_ERROE, 9999, "操作失败, " + orderId + "号账单打印不成功, 请重新检查网络是否连通.");
