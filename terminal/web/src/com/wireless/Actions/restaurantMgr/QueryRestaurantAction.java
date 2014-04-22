@@ -14,6 +14,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
+import com.wireless.db.DBCon;
 import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.db.sms.SMStatDao;
 import com.wireless.db.staffMgr.StaffDao;
@@ -41,6 +42,7 @@ public class QueryRestaurantAction extends Action{
 		JObject jobject = new JObject();
 		String extraCond = "", orderClause = " ORDER BY id";
 		List<Jsonable> resList = new ArrayList<Jsonable>();
+		DBCon dbCon = new DBCon();
 		try{
 			if(name != null && !name.trim().isEmpty()){
 				extraCond += (" AND (restaurant_name like '%" + name + "%' OR account like '%" + name + "%') ");
@@ -55,16 +57,16 @@ public class QueryRestaurantAction extends Action{
 					orderClause = (" ORDER BY expire_date, liveness" );
 				}
 			}
-			
+			dbCon.connect();
 			if(Boolean.parseBoolean(byId)){
-				restaurant = RestaurantDao.getById(Integer.parseInt((String) request.getAttribute("restaurantID")));
+				restaurant = RestaurantDao.getById(dbCon, Integer.parseInt((String) request.getAttribute("restaurantID")));
 				list.add(restaurant);
 			}else{
 				list = RestaurantDao.getByCond(extraCond, orderClause);
 				if(!list.isEmpty()){
 					for (final Restaurant smsr : list) {
 						//为restaurant加上短信条数
-						final SMStat sms = SMStatDao.get(StaffDao.getStaffs(smsr.getId()).get(0));
+						final SMStat sms = SMStatDao.get(dbCon, StaffDao.getAdminByRestaurant(dbCon, smsr.getId()));
 						Jsonable j = new Jsonable() {
 							
 							@Override
@@ -89,6 +91,7 @@ public class QueryRestaurantAction extends Action{
 			}
 			jobject.setRoot(resList);
 		}finally{
+			dbCon.disconnect();
 			response.getWriter().print(jobject.toString());
 		}
 		return null;
