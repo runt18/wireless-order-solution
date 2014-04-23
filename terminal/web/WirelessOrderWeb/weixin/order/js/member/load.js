@@ -23,6 +23,8 @@ $(function(){
 				member = data.other.member;
 				member.restaurant = data.other.restaurant;
 				initMemberMsg({data:member});
+				//设置会员排名
+				$('#fontDefeatMemberCount').text(member.rank);
 				$.ajax({
 					url : '../../WXQueryMemberOperation.do',
 					type : 'post',
