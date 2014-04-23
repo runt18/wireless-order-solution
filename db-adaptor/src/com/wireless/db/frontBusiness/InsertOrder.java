@@ -9,9 +9,12 @@ import com.wireless.db.Params;
 import com.wireless.db.deptMgr.KitchenDao;
 import com.wireless.db.distMgr.DiscountDao;
 import com.wireless.db.menuMgr.FoodDao;
+import com.wireless.db.orderMgr.OrderDao;
+import com.wireless.db.orderMgr.OrderFoodDao;
 import com.wireless.db.regionMgr.TableDao;
 import com.wireless.db.tasteMgr.TasteDao;
 import com.wireless.exception.BusinessException;
+import com.wireless.exception.FrontBusinessError;
 import com.wireless.exception.ProtocolError;
 import com.wireless.exception.StaffError;
 import com.wireless.pojo.dishesOrder.Order;
@@ -123,14 +126,14 @@ public class InsertOrder {
 	 * @return the completed order details to insert
 	 * @throws BusinessException
 	 *          throws if one of cases below
-	 *          <li>the table associated with this order does NOT exist<br>
-	 *          <li>the table associated with this order is NOT idle<br>
-	 *          <li>any food query to insert does NOT exist<br>
-	 *          <li>any food to this order does NOT exist<br>
-	 *          <li>the staff has no privilege to add the food<br>
+	 *          <li>the table associated with this order does NOT exist
+	 *          <li>the table associated with this order is NOT idle
+	 *          <li>any food query to insert does NOT exist
+	 *          <li>any food to this order does NOT exist
+	 *          <li>the staff has no privilege to add the food
 	 *          <li>the staff has no privilege to present the food
 	 * @throws SQLException
-	 * 			throws if failed to execute any SQL statements.
+	 * 			throws if failed to execute any SQL statements
 	 */
 	private static void doPrepare(DBCon dbCon, Staff staff, Order orderToInsert) throws BusinessException, SQLException{
 		
@@ -182,7 +185,10 @@ public class InsertOrder {
 			orderToInsert.setDiscount(DiscountDao.getDefault(dbCon, staff));
 			
 		}else if(orderToInsert.getDestTbl().isBusy()){
-			throw new BusinessException("The " + orderToInsert.getDestTbl() + " to insert order is BUSY.", ProtocolError.TABLE_BUSY);
+			int orderId = OrderDao.getOrderIdByUnPaidTable(dbCon, staff, orderToInsert.getDestTbl());
+			OrderFood of = OrderFoodDao.getSingleDetailToday(dbCon, staff, " AND OF.order_id = " + orderId, " ORDER BY OF.id DESC LIMIT 1 ").get(0);
+			long deltaSeconds = (System.currentTimeMillis() - of.getOrderDate()) / 1000;
+			throw new BusinessException("\"" + of.getWaiter() + "\"" + (deltaSeconds >= 60 ? ((deltaSeconds / 60) + "分钟") : (deltaSeconds + "秒")) + "前修改了账单, 请重新确认", FrontBusinessError.ORDER_EXPIRED);
 			
 		}else{
 			throw new BusinessException("Unknown error occourred while inserting order.", ProtocolError.UNKNOWN);

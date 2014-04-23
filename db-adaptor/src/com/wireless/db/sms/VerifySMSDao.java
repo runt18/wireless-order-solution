@@ -160,6 +160,35 @@ public class VerifySMSDao {
 	}
 	
 	/**
+	 * Delete all the verification SMS record.
+	 * @return the amount to verification SMS to delete
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static int deleteAll() throws SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return deleteAll(dbCon);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Delete all the verification SMS record.
+	 * @param dbCon
+	 * 			the database connection
+	 * @return the amount to verification SMS to delete
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static int deleteAll(DBCon dbCon) throws SQLException{
+		//Delete the verifications SMS records.
+		return dbCon.stmt.executeUpdate(" DELETE FROM " + Params.dbName + ".verify_sms");
+	}
+	
+	/**
 	 * Verify to see if the sms is valid or not. 
 	 * @param builder
 	 * 			the builder of sms to verify 

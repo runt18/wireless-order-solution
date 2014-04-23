@@ -18,25 +18,34 @@ import com.wireless.pojo.restaurantMgr.Restaurant;
  */
 public class SweepDB {
 	
-	public static class Result{
+	public static final class Result{
 		private int elapsedTime;					//the elapsed time to sweep db
 		private int totalExpiredOrder;				//the expired amount of order
 		private int totalExpiredOrderDetail;		//the expired amount of order food
 		private int totalExpiredTG;					//the expired amount of taste group records 
 		private int totalExpiredNormalTG;			//the expired amount of normal taste group records
 		private int totalExpiredShift;				//the expired amount of shift
-		private int totalExpiredDailySettle;			//the expired amount of daily settle
+		private int totalExpiredDailySettle;		//the expired amount of daily settle
+		private int totalExpiredMemberOperation;	//the expired amount of member operation
+		private int totalExpiredSMSDetail;			//the expired amount of sms detail
 		
 		@Override
 		public String toString(){
-			return "expired order: " + getTotalExpiredOrder() +
-				   ", expired order detail: " + getTotalExpiredOrderDetail() +
-				   ", expired taste group: " + getTotalExpiredTG() +
-				   ", expired normal taste group: " + getTotalExpiredNormalTG() +
-				   ", expired shift: " + getTotalExpiredShift() +
-				   ", expired daily shift: " + getTotalExpiredDailySettle();
+			final String sep = System.getProperty("line.separator");
+			return "expired order: " + getTotalExpiredOrder() + sep +
+				   "expired order detail: " + getTotalExpiredOrderDetail() + sep +
+				   "expired taste group: " + getTotalExpiredTG() + sep + 
+				   "expired normal taste group: " + getTotalExpiredNormalTG() + sep +
+				   "expired shift: " + getTotalExpiredShift() + sep +
+				   "expired daily shift: " + getTotalExpiredDailySettle() + sep +
+				   "expired member operation: " + getTotalExpiredMemberOperation() + sep +
+				   "expired SMS detail: " + getTotalExpiredSMSDetail();
 		}
 
+		public int getTotalExpiredSMSDetail(){
+			return this.totalExpiredSMSDetail;
+		}
+		
 		public int getTotalExpiredOrder() {
 			return totalExpiredOrder;
 		}
@@ -59,6 +68,10 @@ public class SweepDB {
 
 		public int getTotalExpiredDailySettle() {
 			return totalExpiredDailySettle;
+		}
+		
+		public int getTotalExpiredMemberOperation(){
+			return totalExpiredMemberOperation;
 		}
 		
 		public int getElapsed(){
@@ -141,6 +154,26 @@ public class SweepDB {
 				  " AND DSH.restaurant_id = REST.id " +
 				  " AND UNIX_TIMESTAMP(NOW()) - UNIX_TIMESTAMP(DSH.off_duty) > REST.record_alive ";
 			result.totalExpiredDailySettle = dbCon.stmt.executeUpdate(sql);
+			
+			// Delete the member operation history which has been expired.
+			sql = " DELETE MOH FROM " + 
+				  Params.dbName + ".member_operation_history AS MOH, " +
+				  Params.dbName + ".restaurant AS REST " +
+				  " WHERE 1 = 1 " +
+				  " AND REST.id > " + Restaurant.RESERVED_7 +
+				  " AND MOH.restaurant_id = REST.id " +
+				  " AND UNIX_TIMESTAMP(NOW()) - UNIX_TIMESTAMP(MOH.operate_date) > REST.record_alive ";
+			result.totalExpiredMemberOperation = dbCon.stmt.executeUpdate(sql);
+			
+			// Delete the SMS details which has been expired.
+			sql = " DELETE SMS_D FROM " + 
+				  Params.dbName + ".sms_detail SMS_D, " +
+				  Params.dbName + ".restaurant AS REST " +
+				  " WHERE 1 = 1 " +
+				  " AND REST.id > " + Restaurant.RESERVED_7 +
+				  " AND SMS_D.restaurant_id = REST.id " +
+				  " AND UNIX_TIMESTAMP(NOW()) - UNIX_TIMESTAMP(SMS_D.modified) > REST.record_alive ";
+			result.totalExpiredSMSDetail = dbCon.stmt.executeUpdate(sql);
 			
 			result.elapsedTime = ((int)(System.currentTimeMillis() - beginTime) / 1000);
 			

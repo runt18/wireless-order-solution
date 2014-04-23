@@ -324,7 +324,6 @@ public class DailySettleDao {
 		
 		String sql;
 		DutyRange range = new DutyRange();
-		//String onDuty = null;
 		
 		/**
 		 * Get the date to last daily settlement.
@@ -484,13 +483,6 @@ public class DailySettleDao {
 				"`waiter`, `settle_type`, `pay_type`, `category`, `member_operation_id`, `staff_id`, " +
 				"`region_id`, `region_name`, `table_alias`, `table_name`, `service_rate`, `comment`";
 
-//		final String memberOperationItem = "`id`, `restaurant_id`, `staff_id`, `staff_name`, " +
-//										   "`member_id`, `member_card_id`, `member_card_alias`," +
-//										   "`operate_seq`, `operate_date`, `operate_type`, " +
-//										   "`pay_type`, `pay_money`, `charge_type`, `charge_money`," +
-//										   "`delta_base_money`, `delta_extra_money`, `delta_point`," +
-//										   "`remaining_base_money`, `remaining_extra_money`, `remaining_point`";
-		
 		final String shiftItem = "`id`, `restaurant_id`, `name`, `on_duty`, `off_duty`";
 		
 		try{
@@ -514,8 +506,6 @@ public class DailySettleDao {
 			}
 			
 			//Move the member operation record from 'member_operation' to 'member_operation_history'
-//			sql = " INSERT INTO " + Params.dbName + ".member_operation_history (" + memberOperationItem + ")" +
-//				  " SELECT " + memberOperationItem + " FROM " + Params.dbName + ".member_operation";
 			sql = " INSERT INTO " + Params.dbName + ".member_operation_history" +
 				  " SELECT * FROM " + Params.dbName + ".member_operation" + 
 				  " WHERE restaurant_id = " + staff.getRestaurantId();
@@ -694,8 +684,7 @@ public class DailySettleDao {
 	
 	private static void moveTasteGroup(DBCon dbCon, String orderIdCond) throws SQLException{
 		
-		final String tasteGroupItem = "`taste_group_id`, " +
-				  "`normal_taste_group_id`, `normal_taste_pref`, `normal_taste_price`, " +
+		final String tasteGroupItem = "`taste_group_id`, `normal_taste_group_id`, `normal_taste_pref`, `normal_taste_price`, " +
 				  "`tmp_taste_id`, `tmp_taste_pref`, `tmp_taste_price`";
 		
 		String sql;
