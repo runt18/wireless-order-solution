@@ -967,7 +967,7 @@ function initControl(){
 			readOnly : false,
 			forceSelection : true,
 			width : 100,
-			value : 1,
+			value : -1,
 			store : new Ext.data.SimpleStore({
 				data : winParams.cate,
 				fields : ['value', 'text']

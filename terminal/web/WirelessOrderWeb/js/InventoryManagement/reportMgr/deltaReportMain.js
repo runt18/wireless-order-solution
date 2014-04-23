@@ -300,7 +300,7 @@ Ext.onReady(function(){
 		}),
 		listeners : {
 			click : function(e){
-				Ext.getCmp('btnSearch').handler();
+//				Ext.getCmp('btnSearch').handler();
 				Ext.getDom('dept').innerHTML = e.text;
 			},
 			dblclick : function(e){

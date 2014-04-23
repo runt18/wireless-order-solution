@@ -628,6 +628,13 @@ function initControl(){
 	inventory_materialBasicGrid.on('rowdblclick', function(){
 		operateMaterialHandler({otype:Ext.ux.otype['update']});		
 	});
+	inventory_materialBasicGrid.keys = [{
+		 key : Ext.EventObject.ENTER,
+		 fn : function(){ 
+			 Ext.getCmp('btnSearchMaterial').handler();
+		 },
+		 scope : this 
+	}];
 }
 	
 

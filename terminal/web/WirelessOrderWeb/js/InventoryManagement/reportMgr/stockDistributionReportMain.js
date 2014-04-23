@@ -131,6 +131,9 @@ var materialComb = new Ext.form.ComboBox({
 				combo.select(0, true);
 				return false; 
 			}
+		},
+		select : function(combo, record, index){
+			Ext.getCmp('btnStockDistributionSearch').handler();
 		}
 	}
 	
@@ -189,17 +192,17 @@ Ext.onReady(function(){
 				Ext.getDom('dept').innerHTML = e.text;
 			},
 			dblclick : function(e){
-				Ext.getCmp('btnSearch').handler();
+				Ext.getCmp('btnStockDistributionSearch').handler();
 			}
 		},
 		tbar :	[
 		     '->',
 		     {
-					text : '刷新',
-					iconCls : 'btn_refresh',
-					handler : function(){
-						deptTree.getRootNode().reload();
-					}
+				text : '刷新',
+				iconCls : 'btn_refresh',
+				handler : function(){
+					deptTree.getRootNode().reload();
+				}
 			}
 		 ]
 			
@@ -259,7 +262,7 @@ Ext.onReady(function(){
 				} 
 			}, {
 			text : '搜索',
-			id : 'btnSearch',
+			id : 'btnStockDistributionSearch',
 			iconCls : 'btn_search',
 			handler : function(){
 				var deptID = '';

@@ -180,7 +180,12 @@ function initControl(){
 		}, {
 			xtype : 'textfield',
 			id : 'txtFoodNameForSearch',
-			width : 100
+			width : 100,
+			listeners : {
+				focus : function(thiz){
+					thiz.focus(true, 100);
+				}
+			}
 		}, '->', {
 			text : '搜索',
 			id : 'btnSearchFood',
@@ -312,7 +317,7 @@ function initControl(){
 			['数量', 'consumption', ,'right', 'foodMaterialGridRenderer']
 		],
 		FoodMaterialRecord.getKeys(),
-		[['isPaging', true],  ['restaurantId', restaurantID]],
+		[['restaurantId', restaurantID]],
 		GRID_PADDING_LIMIT_20,
 		'',
 		foodMaterialGridTbar
@@ -344,7 +349,12 @@ function initControl(){
 			},{
 				xtype : 'textfield',
 				id : 'txtmaterialNameForSearch',
-				width : 100
+				width : 100,
+				listeners : {
+					focus : function(thiz){
+						thiz.focus(true, 100);
+					}
+				}
 			}, {
 				xtype : 'tbtext',
 				text : '&nbsp;&nbsp;'
@@ -360,7 +370,7 @@ function initControl(){
 				}
 			},{
 			text : '刷新',
-			id : 'btnSearchMaterial',
+			id : 'btnRefushMaterial',
 			iconCls : 'btn_refresh',
 			handler : function(){
 				Ext.getCmp('txtmaterialNameForSearch').setValue();
@@ -395,6 +405,13 @@ function initControl(){
 	materialBasicGrid.on('rowdblclick', function(thiz){
 		addNewFoodMaterial();
 	});
+	materialBasicGrid.keys = [{
+		key : Ext.EventObject.ENTER,
+		fn : function(){
+			Ext.getCmp('btnSearchMaterial').handler();
+		},
+		scope : this
+	}];
 	
 	menuFoodMaterialCount = new Ext.menu.Menu({
 		id : 'menuFoodMaterialCount',

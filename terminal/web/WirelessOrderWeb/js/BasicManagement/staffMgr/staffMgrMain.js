@@ -348,6 +348,7 @@ var staffColumnModel = new Ext.grid.ColumnModel([
 		renderer : staffOpt
 	} ]);
 
+var roleArray = []; 
 //角色列模型
 var roleModel = new Ext.grid.ColumnModel([
       {header : '角色名称', dataIndex : 'name', width : 90},
@@ -370,7 +371,18 @@ var roleStore = new Ext.data.Store({
 		{name : 'categoryText'},
 		{name : 'typeValue'},
 		{name : 'typeText'}
-	])
+	]),
+	listeners : {
+		load : function(s, r, o){
+			roleArray = [];
+			for (var i = 1; i < r.length; i++) {
+				roleArray.push([r[i].get('id'), r[i].get('name')]);
+			}
+			if(Ext.getCmp('combChooseRole')){
+				Ext.getCmp('combChooseRole').store.loadData(roleArray);
+			}
+		}
+	}
 });
 roleStore.load();
 
@@ -379,7 +391,9 @@ var chooseRoleComb = new Ext.form.ComboBox({
 	forceSelection : true,
 	width : 160,
 	id : 'combChooseRole',
-	store : roleStore,
+	store : new Ext.data.SimpleStore({
+		fields : [ 'id', 'name']
+	}),
 	valueField : 'id',
 	displayField : 'name',
 	typeAhead : true,
@@ -387,12 +401,7 @@ var chooseRoleComb = new Ext.form.ComboBox({
 	triggerAction : 'all',
 	selectOnFocus : true,
 	allowBlank : false,
-	readOnly : false,
-	listeners : {
-		render : function(thiz){
-			roleStore.remove(roleStore.getAt(0));
-		}	
-	}
+	readOnly : false
 });
 
 var referRoleComb = new Ext.form.ComboBox({
@@ -408,7 +417,7 @@ var referRoleComb = new Ext.form.ComboBox({
 	triggerAction : 'all',
 	selectOnFocus : true,
 	readOnly : false,
-		listeners : {
+	listeners : {
 		render : function(thiz){
 			roleStore.reload();
 		}	
@@ -652,7 +661,6 @@ if(!staffAddWin){
 						Ext.Ajax.request({
 							url : '../../' + url,
 							params : {
-								isCookie : true,
 								'staffName' : staffName,
 								'staffPwd' : staffAddPwd,
 								'roleId' : roleId,
@@ -776,7 +784,6 @@ if(!roleAddWin){
 					Ext.Ajax.request({
 						url : '../../OperateRole.do',
 						params : {
-							isCookie : true,
 							dataSource : dataSource,
 							roleName : roleName,
 							roleId : roleId, 
@@ -788,8 +795,12 @@ if(!roleAddWin){
 							if(jr.success){
 								roleAddWin.hide();
 								Ext.example.msg(jr.title, jr.msg);
-								Ext.getCmp('roleGrid').getSelectionModel().selectFirstRow();
-								//Ext.getCmp('roleGrid').getSelectionModel().selectLastRow();
+								if(dataSource == 'update'){
+									Ext.getCmp('staffGrid').store.reload();
+									Ext.getCmp('roleGrid').getSelectionModel().selectFirstRow();
+								}else{
+									Ext.getCmp('roleGrid').getSelectionModel().selectLastRow();
+								}
 							}else{
 								Ext.ux.showMsg(jr);
 							}
