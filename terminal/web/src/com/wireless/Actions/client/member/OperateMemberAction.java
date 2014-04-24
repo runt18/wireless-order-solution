@@ -24,6 +24,7 @@ import com.wireless.pojo.client.MemberOperation.ChargeType;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.sccon.ServerConnector;
 import com.wireless.util.WebParams;
+import com.wireless.util.sms.SMS;
 
 public class OperateMemberAction extends DispatchAction{
 	
@@ -187,10 +188,7 @@ public class OperateMemberAction extends DispatchAction{
 	 * @return
 	 * @throws Exception
 	 */
-	public ActionForward charge(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
-		
+	public ActionForward charge(ActionMapping mapping, ActionForm form,	HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
 		JObject jobject = new JObject();
 		try{
@@ -205,30 +203,32 @@ public class OperateMemberAction extends DispatchAction{
 			final Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
 			MemberOperation mo = MemberDao.charge(staff, Integer.valueOf(memberID), Float.valueOf(payMannerMoney), Float.valueOf(rechargeMoney), ChargeType.valueOf(Integer.valueOf(rechargeType)));
-			if(comment != null){
-				mo.setComment(comment);
-			}
-			if(mo == null || mo.getId() == 0){
-				jobject.initTip(false, WebParams.TIP_TITLE_ERROE, 9998, "操作失败, 会员充值未成功, 未知错误, 请联系客服人员.");
-			}else{
-				jobject.initTip(true, "操作成功, 会员充值成功.");
-				if(isPrint != null && Boolean.valueOf(isPrint)){
-					try{
-						ReqPrintContent reqPrintContent = ReqPrintContent.buildReqPrintMemberReceipt(staff, mo.getId());
-						if(reqPrintContent != null){
-							ProtocolPackage resp = ServerConnector.instance().ask(reqPrintContent);
-							if(resp.header.type == Type.ACK){
-								jobject.setMsg(jobject.getMsg() + "打印充值信息成功.");
-							}else{
-								jobject.setMsg(jobject.getMsg() + "打印充值信息失败.");
-							}
-						}
-					}catch(IOException e){
-						e.printStackTrace();
-						jobject.setMsg(jobject.getMsg() + " 打印操作请求失败, 请联系客服人员.");
+			mo.setComment(comment);
+			jobject.initTip(true, "操作成功, 会员充值成功.");
+			if(isPrint != null && Boolean.valueOf(isPrint)){
+				try{
+					ProtocolPackage resp = ServerConnector.instance().ask(ReqPrintContent.buildReqPrintMemberReceipt(staff, mo.getId()));
+					if(resp.header.type == Type.ACK){
+						jobject.setMsg(jobject.getMsg() + "打印充值信息成功.");
+					}else{
+						jobject.setMsg(jobject.getMsg() + "打印充值信息失败.");
 					}
+				}catch(IOException e){
+					e.printStackTrace();
+					jobject.setMsg(jobject.getMsg() + "打印操作请求失败.");
 				}
 			}
+			
+			//TODO
+			try{
+				//Send SMS.
+				SMS.send(staff, mo.getMemberMobile(), new SMS.Msg4Charge(mo));
+				jobject.setMsg(jobject.getMsg() + "充值短信发送成功.");
+			}catch(Exception e){
+				jobject.setMsg(jobject.getMsg() + "充值短信发送失败(" + e.getMessage() + ")");
+				e.printStackTrace();
+			}
+			
 		}catch(BusinessException e){	
 			e.printStackTrace();
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getCode(), e.getDesc());

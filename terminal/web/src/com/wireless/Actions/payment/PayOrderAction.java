@@ -21,6 +21,7 @@ import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
 import com.wireless.pack.req.ReqPayOrder;
 import com.wireless.parcel.Parcel;
+import com.wireless.pojo.client.Member;
 import com.wireless.pojo.client.MemberOperation;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.PrintOption;
@@ -32,14 +33,11 @@ import com.wireless.util.sms.SMS;
 
 public class PayOrderAction extends Action{
 	
-	public ActionForward execute(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
+	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
 		String jsonResp = "{success:$(result), data:'$(value)'}";
 		PrintWriter out = null;
 		try {
-			// 解决后台中文传到前台乱码
 			
 			out = response.getWriter();			
 
@@ -102,8 +100,10 @@ public class PayOrderAction extends Action{
 				payType = Order.PayType.CASH;
 			}
 			
+			Member member = null;
 			if(settleType == Order.SettleType.MEMBER){
-				payBuilder = Order.PayBuilder.build4Member(orderId, MemberDao.getById(staff, Integer.valueOf(request.getParameter("memberID"))), payType);
+				member = MemberDao.getById(staff, Integer.valueOf(request.getParameter("memberID")));
+				payBuilder = Order.PayBuilder.build4Member(orderId, member, payType);
 			}else{
 				payBuilder = Order.PayBuilder.build(orderId, payType);
 			}
@@ -165,13 +165,24 @@ public class PayOrderAction extends Action{
 				if(payBuilder.isTemp()){
 					jsonResp = jsonResp.replace("$(value)", payBuilder.getOrderId() + "号账单暂结成功");
 				}else{
-					jsonResp = jsonResp.replace("$(value)", payBuilder.getOrderId() + "号账单结帐成功");
 					
-					//FIXME
-					if(settleType == Order.SettleType.MEMBER){
-						MemberOperation mo = MemberOperationDao.getTodayById(staff, OrderDao.getById(staff, orderId, DateType.TODAY).getMemberOperationId());
-						SMS.send(staff, mo.getMemberMobile(), new SMS.Msg4Consume(mo));
-					}
+					//TODO
+					try{
+						if(settleType == Order.SettleType.MEMBER){
+							if(member.getMemberType().isCharge()){
+								//Send SMS if paid by charge member.
+								MemberOperation mo = MemberOperationDao.getTodayById(staff, OrderDao.getById(staff, orderId, DateType.TODAY).getMemberOperationId());
+								SMS.send(staff, mo.getMemberMobile(), new SMS.Msg4Consume(mo));
+							}
+							jsonResp = jsonResp.replace("$(value)", payBuilder.getOrderId() + "号账单结帐并发送短信成功");
+						}else{
+							jsonResp = jsonResp.replace("$(value)", payBuilder.getOrderId() + "号账单结帐成功");
+						}
+						
+					}catch(Exception e){
+						jsonResp = jsonResp.replace("$(value)", payBuilder.getOrderId() + "号账单结帐成功, 但短信发送失败(" + e.getMessage() + ")");
+						e.printStackTrace();
+					}						
 				}
 				
 			}else if(resp.header.type == Type.NAK){
@@ -186,12 +197,11 @@ public class PayOrderAction extends Action{
 		}catch(BusinessException e){
 			e.printStackTrace();
 			jsonResp = jsonResp.replace("$(result)", "false");
-			jsonResp = jsonResp.replace("$(value)", e.getDesc());
+			jsonResp = jsonResp.replace("$(value)", e.getMessage());
 			
 		}catch(IOException e){
 			e.printStackTrace();
 			jsonResp = jsonResp.replace("$(result)", "false");
-			
 			jsonResp = jsonResp.replace("$(value)", "服务器请求不成功，请重新检查网络是否连通");
 			
 		}catch(NumberFormatException e){
