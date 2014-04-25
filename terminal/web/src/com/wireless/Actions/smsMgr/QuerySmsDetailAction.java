@@ -24,7 +24,7 @@ public class QuerySmsDetailAction extends Action {
 			throws Exception {
 		String query = request.getParameter("query");
 		String pin = (String) request.getAttribute("pin");
-		String extra = "";
+		String extra = " AND operation <> " + SMSDetail.Operation.ADD.getVal() + " AND operation <> " + SMSDetail.Operation.DEDUCT.getVal();
 		JObject jobject = new JObject();
 		try{
 			if(query != null && Integer.parseInt(query) != 0){

@@ -394,6 +394,7 @@ public class QueryPrivilegeAction extends DispatchAction{
 					
 					tree.append(",text:'" + root.get(i).getCode().getDesc() + "'");
 					tree.append(",pId:'" + root.get(i).getId() + "'");
+					tree.append(",code:" + root.get(i).getCode().getVal());
 					tree.append("}");
 				}
 				tree.append("]");

@@ -25,7 +25,6 @@ import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.stockMgr.StockTakeDetail;
 import com.wireless.util.DataPaging;
 import com.wireless.util.SQLUtil;
-import com.wireless.util.WebParams;
 
 public class QueryMaterialAction extends DispatchAction{
 	
@@ -69,11 +68,11 @@ public class QueryMaterialAction extends DispatchAction{
 			
 			root = MaterialDao.getContent(params);
 		}catch(BusinessException e){
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getCode(), e.getDesc());
+			jobject.initTip(e);
 			e.printStackTrace();
 			
 		}catch(Exception e){
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
+			jobject.initTip(e);
 			e.printStackTrace();
 		}finally{
 			if(root != null){
@@ -177,11 +176,11 @@ public class QueryMaterialAction extends DispatchAction{
 				root = MaterialDeptDao.getStockTakeDetails(staff, Integer.parseInt(deptId), Integer.parseInt(cateId), " ORDER BY MD.stock DESC");
 			}
 		}catch(BusinessException e){
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getCode(), e.getDesc());
+			jobject.initTip(e);
 			e.printStackTrace();
 			
 		}catch(Exception e){
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
+			jobject.initTip(e);
 			e.printStackTrace();
 		}finally{
 			if(root != null){

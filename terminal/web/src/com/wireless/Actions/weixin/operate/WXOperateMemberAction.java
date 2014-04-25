@@ -2,6 +2,11 @@ package com.wireless.Actions.weixin.operate;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.text.DecimalFormat;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -13,6 +18,7 @@ import org.apache.struts.actions.DispatchAction;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.client.member.MemberDao;
+import com.wireless.db.client.member.MemberDao.MemberRank;
 import com.wireless.db.client.member.MemberTypeDao;
 import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.db.sms.VerifySMSDao;
@@ -22,6 +28,7 @@ import com.wireless.db.weixin.restaurant.WeixinRestaurantDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.MemberError;
 import com.wireless.json.JObject;
+import com.wireless.json.Jsonable;
 import com.wireless.pojo.client.Member;
 import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.sms.VerifySMS;
@@ -55,9 +62,28 @@ public class WXOperateMemberAction extends DispatchAction {
 			int rid = WeixinRestaurantDao.getRestaurantIdByWeixin(dbCon, formId);
 			Restaurant restaurant = RestaurantDao.getById(dbCon, rid);
 			
-			Member member = MemberDao.getById(dbCon, StaffDao.getStaffs(dbCon, rid).get(0), mid);
+			final Member member = MemberDao.getById(dbCon, StaffDao.getStaffs(dbCon, rid).get(0), mid);
+			MemberRank mr = MemberDao.calcMemberRank(StaffDao.getStaffs(dbCon, rid).get(0), mid);
+			DecimalFormat df = new DecimalFormat("#.00");
+			final String rank = df.format(mr.getRank()/mr.getTotal()) + "%";
+			Jsonable j = new Jsonable() {
+				
+				@Override
+				public Map<String, Object> toJsonMap(int flag) {
+					Map<String, Object> jm = new HashMap<String, Object>();
+					jm.putAll(member.toJsonMap(0));
+					jm.put("rank", rank);
+					return Collections.unmodifiableMap(jm);
+				}
+				
+				@Override
+				public List<Object> toJsonList(int flag) {
+					return null;
+				}
+			};
+			
 			jobject.initTip(true, "操作成功, 已获取微信会员信息.");
-			jobject.getOther().put("member", member);
+			jobject.getOther().put("member", j);
 			jobject.getOther().put("restaurant", restaurant);
 			
 		}catch(BusinessException e){

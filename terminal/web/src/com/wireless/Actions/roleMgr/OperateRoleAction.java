@@ -1,7 +1,6 @@
 package com.wireless.Actions.roleMgr;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -13,12 +12,10 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
 import com.wireless.db.distMgr.DiscountDao;
-import com.wireless.db.staffMgr.PrivilegeDao;
 import com.wireless.db.staffMgr.RoleDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
-import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.staffMgr.Privilege.Code;
 import com.wireless.pojo.staffMgr.Role;
 import com.wireless.pojo.staffMgr.Role.InsertBuilder;
@@ -97,75 +94,39 @@ public class OperateRoleAction extends DispatchAction{
 		String roleId = request.getParameter("roleId");
 		String privileges = request.getParameter("privileges");
 		String discounts = request.getParameter("discounts");
-		String isAllCount = "";
 		JObject jobject = new JObject();
-		
 		
 		try{
 			
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 		
-			List<Privilege> privilegeList = PrivilegeDao.getPrivileges(staff, null, null);
-
+			Role.UpdateBuilder updateBuilder = new Role.UpdateBuilder(Integer.parseInt(roleId));
 			
-			
-			List<String> newPriId = new ArrayList<String>(); ;
-			
-			Role role = RoleDao.getRoleById(staff, Integer.parseInt(roleId));
-			role.clearPrivilege();
 			if(privileges != null){
 				String[] privilegeArray = privileges.split(",");
 				for (String string : privilegeArray) {
 					if(!string.isEmpty()){
-						newPriId.add(string);
-					}
-				}
-				if(discounts != null && !discounts.trim().isEmpty()){
-					String[] discountArray = discounts.split(",");
-					for (Privilege privilege : privilegeList) {
-						if(privilege.getCode() == Code.DISCOUNT){
-							//判断是否全选了折扣
-							if(privilege.getDiscounts().size() == discountArray.length){
-								isAllCount = "true";
-							}
-							//选了部分折扣的情况
-							if( newPriId.indexOf(privilege.getId()+"") < 0 && isAllCount.trim().isEmpty()){
-								newPriId.add(privilege.getId() + "");
-							}
-/*							else if(newPId.indexOf(privilege.getId()+"") > 0 && !isAllCount.trim().isEmpty()){
-								newPId.remove(privilege.getId()+"");
-							}*/
-						}
-					}
-				}
-				for (String priId : newPriId) {
-					
-					int index = privilegeList.indexOf(new Privilege(Integer.parseInt(priId)));
-					if(index >= 0){
-						if(isAllCount.trim().isEmpty()){
-							if(privilegeList.get(index).getCode() == Code.DISCOUNT){
-								privilegeList.get(index).setAllDiscount();
-								String[] discountArray = discounts.split(",");
-								for (String distId : discountArray) {
-									privilegeList.get(index).addDiscount(DiscountDao.getById(staff, Integer.parseInt(distId)));
-								}
-							}
-						}
-						role.addPrivilege(privilegeList.get(index));
+						updateBuilder.addPrivilege(Code.valueOf(Integer.parseInt(string)));
 					}
 				}
 			}
-
 			
-			RoleDao.updateRole(staff, role);
+			if(discounts != null && !discounts.trim().isEmpty()){
+				String[] discountArray = discounts.split(",");
+				for (String distId : discountArray) {
+					updateBuilder.addDiscount(DiscountDao.getById(staff, Integer.parseInt(distId)));
+				}
+			}
+			
+			RoleDao.updateRole(staff, updateBuilder);
 			jobject.initTip(true, "修改成功");
 			
-		}catch(SQLException e){
-			e.printStackTrace();
-			jobject.initTip(false, e.getMessage(), 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
 		}catch(BusinessException e){
 			e.printStackTrace();
-			jobject.initTip(false, e.getMessage());
+			jobject.initTip(e);
+		}catch(SQLException e){
+			e.printStackTrace();
+			jobject.initTip(e);
 		}finally{
 			response.getWriter().print(jobject.toString());
 		}
