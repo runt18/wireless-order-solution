@@ -13,6 +13,7 @@ import com.wireless.db.foodAssociation.CalcFoodAssociationDao;
 import com.wireless.db.foodStatistics.CalcFoodStatisticsDao;
 import com.wireless.db.frontBusiness.DailySettleDao;
 import com.wireless.db.restaurantMgr.RestaurantDao;
+import com.wireless.db.sms.VerifySMSDao;
 import com.wireless.db.tasteRef.TasteRefDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.server.PrinterLosses;
@@ -34,6 +35,9 @@ public class DailySettlementTask extends SchedulerTask{
 			
 			//Clean up the unprinted records
 			PrinterLosses.instance().clear();
+
+			//Clean up all the verification SMS record
+			taskInfo.append("info : " + VerifySMSDao.deleteAll() + " verification SMS record(s) are removed.").append(sep);
 			
 			//Perform daily settlement.
 			taskInfo.append(DailySettleDao.exec()).append(sep);
