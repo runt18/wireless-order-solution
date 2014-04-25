@@ -672,7 +672,7 @@ public class OrderFood implements Parcelable, Jsonable {
 	}
 	
 	/**
-	 * 
+	 * @deprecated
 	 * @param list
 	 * @return
 	 */
@@ -687,11 +687,11 @@ public class OrderFood implements Parcelable, Jsonable {
 	}
 	
 	/**
-	 * 
+	 * @deprecated
 	 * @param list
 	 * @return
 	 */
-	public static float calcTotalPrice(List<OrderFood> list){
+	public static float calcTotalPrice(List<OrderFood> list){  
 		float price = 0;
 		if(list != null && !list.isEmpty()){
 			for(OrderFood temp : list){

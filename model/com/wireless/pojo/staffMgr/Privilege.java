@@ -2,6 +2,7 @@ package com.wireless.pojo.staffMgr;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -115,6 +116,19 @@ public class Privilege implements Comparable<Privilege>, Parcelable, Jsonable{
 			return desc;
 		}
 	}
+	
+	public final static Comparator<Privilege> BY_CATE = new Comparator<Privilege>(){
+		@Override
+		public int compare(Privilege p0, Privilege p1) {
+			if(p0.getCate().getDisplayId() < p1.getCate().getDisplayId()){
+				return -1;
+			}else if(p0.getCate().getDisplayId() > p1.getCate().getDisplayId()){
+				return 1;
+			}else{
+				return 0;
+			}
+		}
+	};
 	
 	private int id;
 	private Code code;
