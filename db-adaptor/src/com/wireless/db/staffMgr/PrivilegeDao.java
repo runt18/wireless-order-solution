@@ -2,6 +2,7 @@ package com.wireless.db.staffMgr;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import com.wireless.db.DBCon;
@@ -32,8 +33,8 @@ public class PrivilegeDao {
 		String sql;
 		sql = " SELECT pri_id, pri_code, cate FROM " + Params.dbName + ".privilege" +
 			  " WHERE 1 = 1 " +
-			  (extraCond != null ? extraCond : "") +
-			  (orderClause != null ? orderClause : " ORDER BY cate ");
+			  (extraCond != null ? extraCond : " ") +
+			  (orderClause != null ? orderClause : "");
 		
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		
@@ -52,6 +53,8 @@ public class PrivilegeDao {
 				break;
 			}
 		}
+		
+		Collections.sort(result, Privilege.BY_CATE);
 		
 		return result;
 	}
