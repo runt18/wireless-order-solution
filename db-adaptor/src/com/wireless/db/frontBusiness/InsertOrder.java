@@ -188,7 +188,7 @@ public class InsertOrder {
 			int orderId = OrderDao.getOrderIdByUnPaidTable(dbCon, staff, orderToInsert.getDestTbl());
 			OrderFood of = OrderFoodDao.getSingleDetailToday(dbCon, staff, " AND OF.order_id = " + orderId, " ORDER BY OF.id DESC LIMIT 1 ").get(0);
 			long deltaSeconds = (System.currentTimeMillis() - of.getOrderDate()) / 1000;
-			throw new BusinessException("\"" + of.getWaiter() + "\"" + (deltaSeconds >= 60 ? ((deltaSeconds / 60) + "分钟") : (deltaSeconds + "秒")) + "前修改了账单, 请重新确认", FrontBusinessError.ORDER_EXPIRED);
+			throw new BusinessException("\"" + of.getWaiter() + "\"" + (deltaSeconds >= 60 ? ((deltaSeconds / 60) + "分钟") : (deltaSeconds + "秒")) + "前修改了账单, 是否继续提交?", FrontBusinessError.ORDER_EXPIRED);
 			
 		}else{
 			throw new BusinessException("Unknown error occourred while inserting order.", ProtocolError.UNKNOWN);

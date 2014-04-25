@@ -323,9 +323,24 @@ public class FoodDao {
 		f.setTemp(false);
 		
 		//Delete the food material relationship if cancel the stock status
-		if(builder.isStockChanged() && f.getStockStatus() == Food.StockStatus.NONE){
+		if(f.getStockStatus() == Food.StockStatus.NONE){
+			int materialId = -1;
+			sql = "SELECT material_id FROM "+ Params.dbName + ".food_material WHERE food_id = " + f.getFoodId();
+			dbCon.rs = dbCon.stmt.executeQuery(sql);
+			if(dbCon.rs.next()){
+				materialId = dbCon.rs.getInt(1);
+			}
+			dbCon.rs.close();
+			if(materialId > -1){
+				MaterialDao.delete(materialId);
+			}
 			sql = " DELETE FROM " + Params.dbName + ".food_material WHERE food_id = " + f.getFoodId();
 			dbCon.stmt.executeUpdate(sql);
+
+		}else if(f.getStockStatus() == Food.StockStatus.GOOD){
+			if(!MaterialDao.checkMaterialFoodEx(dbCon, f.getFoodId())){
+				MaterialDao.insertGood(dbCon, staff, f.getFoodId(), f.getName());
+			}
 		}
 
 		sql = " UPDATE " + Params.dbName + ".food SET " +

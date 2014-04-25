@@ -322,6 +322,25 @@ public class MaterialDao {
 		}
 	}
 	
+	public static boolean checkMaterialFoodEx(DBCon dbCon, int foodId) throws SQLException{
+		boolean bool = false;
+		// 检查是否已存在商品库存资料
+		String querySQL = "SELECT COUNT(*) FROM food_material"
+				 + " WHERE food_id = " + foodId
+				 + " AND material_id IN (SELECT material_id FROM material T1, material_cate T2 WHERE T1.cate_id = T2.cate_id AND T2.type = 1)";
+		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
+		if(dbCon.rs != null && dbCon.rs.next()){
+			int rc = dbCon.rs.getInt(1);
+			if(rc > 0){
+				// 如果已存在则跳过继续操作
+				bool = true;
+			}
+		}
+		dbCon.rs.close();
+		return bool;
+		
+	}
+	
 	/**
 	 * 
 	 * @param dbCon
@@ -333,20 +352,9 @@ public class MaterialDao {
 	 * @throws SQLException
 	 */
 	public static Material insertGood(DBCon dbCon, Staff term, int foodId, String foodName) throws BusinessException, SQLException{
-		// 检查是否已存在商品库存资料
-		String querySQL = "SELECT COUNT(*) FROM food_material"
-				 + " WHERE food_id = " + foodId
-				 + " AND material_id IN (SELECT material_id FROM material T1, material_cate T2 WHERE T1.cate_id = T2.cate_id AND T2.type = 1)";
-		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
-		if(dbCon.rs != null && dbCon.rs.next()){
-			int rc = dbCon.rs.getInt(1);
-			if(rc > 0){
-				// 如果已存在则跳过继续操作
-				throw new BusinessException(MaterialError.GOOD_INSERT_FAIL);
-			}
-		}
+//		checkMaterialFoodEx(dbCon, foodId);
 		// 查找系统保留的商品类型
-		querySQL = "SELECT cate_id FROM material_cate " 
+		String querySQL = "SELECT cate_id FROM material_cate " 
 				 + " WHERE restaurant_id = " + term.getRestaurantId() + " AND type = " + MaterialCate.Type.GOOD.getValue();
 		int cateId = 0;
 		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
