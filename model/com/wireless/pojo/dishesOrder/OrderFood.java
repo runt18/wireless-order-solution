@@ -671,34 +671,4 @@ public class OrderFood implements Parcelable, Jsonable {
 		return null;
 	}
 	
-	/**
-	 * @deprecated
-	 * @param list
-	 * @return
-	 */
-	public static int calcTotalCount(List<OrderFood> list){
-		int total = 0;
-		if(list != null && !list.isEmpty()){
-			for(OrderFood temp : list){
-				total += temp.getCount();
-			}
-		}
-		return total;
-	}
-	
-	/**
-	 * @deprecated
-	 * @param list
-	 * @return
-	 */
-	public static float calcTotalPrice(List<OrderFood> list){  
-		float price = 0;
-		if(list != null && !list.isEmpty()){
-			for(OrderFood temp : list){
-				price += temp.calcPriceWithTaste();
-			}
-		}
-		return price;
-	}
-	
 }
