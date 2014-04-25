@@ -13,8 +13,6 @@ import org.apache.struts.action.ActionMapping;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.ErrorCode;
-import com.wireless.exception.FrontBusinessError;
-import com.wireless.exception.ProtocolError;
 import com.wireless.json.JObject;
 import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
@@ -104,7 +102,7 @@ public class InsertOrderAction extends Action{
 			ProtocolPackage resp = ServerConnector.instance().ask(
 										new ReqInsertOrder(staff,
 											orderToInsert,
-											(type == 1) ? Type.INSERT_ORDER : Type.UPDATE_ORDER,
+											(type == 1) ? Type.INSERT_ORDER : (type == 7) ? Type.UPDATE_ORDER : Type.INSERT_ORDER_FORCE,
 											notPrint != null && Boolean.valueOf(notPrint) ? PrintOption.DO_NOT_PRINT : PrintOption.DO_PRINT
 										));
 			
@@ -120,18 +118,7 @@ public class InsertOrderAction extends Action{
 				}
 				
 			}else if(resp.header.type == Type.NAK){
-				ErrorCode errCode = new Parcel(resp.body).readParcel(ErrorCode.CREATOR);
-				if(errCode.equals(ProtocolError.TABLE_NOT_EXIST)){					
-					jobject.initTip(false, ProtocolError.TABLE_NOT_EXIST.getCode(), (orderToInsert.getDestTbl().getAliasId() + "号餐台信息不存在，请重新确认."));
-				}else if(errCode.equals(ProtocolError.TABLE_BUSY)){
-					jobject.initTip(false, ProtocolError.TABLE_BUSY.getCode(), (orderToInsert.getDestTbl().getAliasId() + "号餐台正在就餐，可能已下单，请重新确认."));
-				}else if(errCode.equals(FrontBusinessError.ORDER_EXPIRED)){
-					jobject.initTip(false, FrontBusinessError.ORDER_EXPIRED.getCode(), "账单信息已更新,请重新刷新或返回.");
-				}else if(errCode.equals(ProtocolError.TABLE_IDLE)){
-					jobject.initTip(false, ProtocolError.TABLE_IDLE.getCode(), "该账单已结账或已删除.");
-				}else{
-					jobject.initTip(false, errCode.getDesc());
-				}
+				jobject.initTip(false, new Parcel(resp.body).readParcel(ErrorCode.CREATOR).getDesc());
 			}else{
 				jobject.initTip(false, (orderToInsert.getDestTbl().getAliasId() + "号餐台" + orderType + "不成功，请重新确认."));
 			}
