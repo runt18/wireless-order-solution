@@ -534,8 +534,7 @@ co.submit = function(c){
 		foodData = co.newFood.slice(0);
 	}
 	
-	var foods = '';
-	var item = null;
+/*	var item = null;
 	for ( var i = 0; i < foodData.length; i++) {
 		item = foodData[i];
 		foods += ( i > 0 ? '<<sh>>' : '');
@@ -575,18 +574,19 @@ co.submit = function(c){
 					+ ']';
 		}
 	}
-	item = null;
-	foods = '{' + foods + '}';
+	item = null;*/
+	
+	
+	var foods = Wireless.ux.createOrder({orderFoods: foodData, dataType : 1});
 	
 	Util.LM.show();
 	$.ajax({
 		url : '../InsertOrder.do',
 		type : 'post',
 		data : {
-			pin : pin,
 			tableID : co.table.alias,
 			customNum : co.table.customNum,
-			type : isFree ? 1 : 2,
+			type : (typeof c.commitType != 'undefined'? c.commitType : isFree ? 1 : 7),
 			foods : foods,
 			category :  co.table.categoryValue,
 			orderID : isFree ? '' : co.order.id,
@@ -611,10 +611,15 @@ co.submit = function(c){
 				Util.msg.alert({
 					title : data.title,
 					msg : data.msg, 
+					buttons : 'YESBACK',
 					fn : function(btn){
-						
+						if(btn == 'yes'){
+							c.commitType = 23;
+							co.submit(c);
+						}
 					}
 				});
+
 			}
 		},
 		error : function(request, status, err) {

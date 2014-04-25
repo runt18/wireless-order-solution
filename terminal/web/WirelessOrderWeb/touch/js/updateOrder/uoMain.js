@@ -523,8 +523,8 @@ uo.goToCreateOrder = function(){
 uo.submitUpdateOrderHandler = function(c){
 	var orderFoods = c;
 	if(orderFoods.length > 0){
-		var foodPara = '';
-		for ( var i = 0; i < orderFoods.length; i++) {
+		var foodPara = Wireless.ux.createOrder({orderFoods: orderFoods, dataType : 1});
+	/*	for ( var i = 0; i < orderFoods.length; i++) {
 			foodPara += ( i > 0 ? '<<sh>>' : '');
 			if (orderFoods[i].isTemporary) {
 				// 临时菜
@@ -565,8 +565,8 @@ uo.submitUpdateOrderHandler = function(c){
 						+ ']';
 			}
 		}	
-		foodPara = '{' + foodPara + '}';	
-		var type = 2;
+		foodPara = '{' + foodPara + '}';*/	
+		var type = 7;
 		Util.LM.show();
 		$.ajax({
 			url : '../InsertOrder.do',
