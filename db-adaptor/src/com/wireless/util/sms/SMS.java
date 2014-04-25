@@ -79,7 +79,7 @@ public final class SMS {
 				  "，谢谢您的光临", 
 				  null, SMSDetail.Operation.USE_CONSUME);
 			
-			if(mo.getOperationType() != OperationType.CHARGE){
+			if(mo.getOperationType() != OperationType.CONSUME){
 				throw new IllegalArgumentException();
 			}
 		}

@@ -788,6 +788,10 @@ public class DiscountDao {
 		}
 		dbCon.rs.close();
 		
+		//Delete the associated role discount.
+		sql = " DELETE FROM " + Params.dbName + ".role_discount WHERE discount_id = " + id;
+		dbCon.stmt.executeUpdate(sql);
+		
 		//Delete the discount plan associated with it.
 		sql = "DELETE FROM " + Params.dbName + ".discount_plan WHERE discount_id = " + id;
 		dbCon.stmt.executeUpdate(sql);

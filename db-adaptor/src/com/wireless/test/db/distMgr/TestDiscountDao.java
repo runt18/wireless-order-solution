@@ -97,6 +97,7 @@ public class TestDiscountDao {
 				DiscountDao.delete(mStaff, discountId);
 				try{
 					DiscountDao.getById(mStaff, discountId);
+					Assert.assertTrue("failed to delete discount", false);
 				}catch(BusinessException e){
 					Assert.assertEquals("failed to delete discount", DiscountError.DISCOUNT_NOT_EXIST, e.getErrCode());
 				}

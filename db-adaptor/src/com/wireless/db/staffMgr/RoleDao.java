@@ -140,36 +140,47 @@ public class RoleDao {
 			dbCon.disconnect();
 		}
 	}
+	
 	/**
-	 * Insert a Role.
+	 * Insert a new role according to builder{@link Role.InsertBuilder}
 	 * @param staff
-	 * 			the Staff
+	 * 			the staff to perform this action
 	 * @param builder
-	 * 			the detail of Role
-	 * @return	the id of Role just create
+	 * 			the builder to insert role
+	 * @return the id to role just inserted
 	 * @throws SQLException
-	 * @throws BusinessException 
+	 * 			throws if failed to execute any SQL statement
 	 */
-	public static int insertRole(Staff staff, InsertBuilder builder) throws SQLException, BusinessException{
+	public static int insertRole(Staff staff, InsertBuilder builder) throws SQLException{
 		DBCon dbCon = new DBCon();
 		
 		try{
 			dbCon.connect();
-			return insertRole(dbCon, staff, builder);
+			dbCon.conn.setAutoCommit(false);
+			int roleId = insertRole(dbCon, staff, builder);
+			dbCon.conn.commit();
+			return roleId;
+		}catch(SQLException e){
+			dbCon.conn.rollback();
+			throw e;
 		}finally{
 			dbCon.disconnect();
 		}
 	}
+
 	/**
-	 * Insert a Role.
+	 * Insert a new role according to builder{@link Role.InsertBuilder}
 	 * @param dbCon
+	 * 			the database connection
 	 * @param staff
+	 * 			the staff to perform this action
 	 * @param builder
-	 * @return
+	 * 			the builder to insert role
+	 * @return the id to role just inserted
 	 * @throws SQLException
-	 * @throws BusinessException 
+	 * 			throws if failed to execute any SQL statement
 	 */
-	public static int insertRole(DBCon dbCon, Staff staff, InsertBuilder builder) throws SQLException, BusinessException{
+	public static int insertRole(DBCon dbCon, Staff staff, InsertBuilder builder) throws SQLException{
 		String sql;
 		int roleId;
 		sql = "INSERT INTO " + Params.dbName + ".role(restaurant_id, name, type, cate) " +
@@ -188,102 +199,122 @@ public class RoleDao {
 		}
 		dbCon.rs.close();
 		//关联权限和折扣
-		for (Privilege privilege : builder.getPrivileges()) {
-			if(privilege.getId() == 0){
-				try{
-					String selectPid = "SELECT pri_id FROM " + Params.dbName + ".privilege" + " WHERE pri_code = " + privilege.getCode().getVal();
-					dbCon.rs = dbCon.stmt.executeQuery(selectPid);
-					if(dbCon.rs.next()){
-						privilege.setId(dbCon.rs.getInt("pri_id"));
-					}else{
-						throw new BusinessException("无此权限");
-					}
-				}finally{
-					dbCon.rs.close();
-				}
-
-				
+		insertPrivileges(dbCon, staff, roleId, builder.getPrivileges());
+		
+		return roleId;
+	}
+	
+	private static void insertPrivileges(DBCon dbCon, Staff staff, int roleId, List<Privilege> privileges) throws SQLException{
+		for (Privilege privilege : privileges) {
+			String sql = " SELECT pri_id FROM " + Params.dbName + ".privilege" + " WHERE pri_code = " + privilege.getCode().getVal();
+			dbCon.rs = dbCon.stmt.executeQuery(sql);
+			if(dbCon.rs.next()){
+				privilege.setId(dbCon.rs.getInt("pri_id"));
+			}else{
+				continue;
 			}
-			String pSql = "INSERT INTO " + Params.dbName + ".role_privilege(role_id, pri_id, restaurant_id) " +
-							" VALUES(" +
-							roleId + ", " +
-							privilege.getId() + ", " +
-							staff.getRestaurantId() + ")";
-			dbCon.stmt.executeUpdate(pSql);
+			dbCon.rs.close();
+				
+			sql = " INSERT INTO " + Params.dbName + ".role_privilege(role_id, pri_id, restaurant_id) " +
+				  " VALUES( " +
+				  roleId + ", " +
+				  privilege.getId() + ", " +
+				  staff.getRestaurantId() + ")";
+			dbCon.stmt.executeUpdate(sql);
+			
 			if(privilege.getCode() == Code.DISCOUNT){
 				for (Discount discount : privilege.getDiscounts()) {
-					String rdSql = "INSERT INTO " + Params.dbName + ".role_discount(role_id, discount_id) " +
-							" VALUES(" +
-							roleId + ", " +
-							discount.getId() + ")";
-					dbCon.stmt.executeUpdate(rdSql);
-					
+					//Check to see whether the discount exist
+					boolean isExist = false;
+					sql = " SELECT COUNT(*) FROM " + Params.dbName + ".discount WHERE discount_id = " + discount.getId();
+					dbCon.rs = dbCon.stmt.executeQuery(sql);
+					if(dbCon.rs.next()){
+						if(dbCon.rs.getInt(1) > 0){
+							isExist = true;
+						}
+					}
+					dbCon.rs.close();
+					if(isExist){
+						sql = " INSERT INTO " + Params.dbName + ".role_discount(role_id, discount_id) " +
+							  " VALUES(" +
+							  roleId + ", " +
+							  discount.getId() + ")";
+						dbCon.stmt.executeUpdate(sql);
+					}
 				}
 			}
 		}
-		return roleId;
 	}
+	
 	/**
 	 * Update the information of Role.
 	 * @param staff
-	 * 			the Staff
-	 * @param role
-	 * 			the role to update
+	 * 			the staff to perform this action
+	 * @param builder
+	 * 			the builder to update role
 	 * @throws SQLException
-	 * 			if failed to execute any SQL statement
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if the role to update does NOT exist
 	 */
-	public static void updateRole(Staff staff, Role role) throws SQLException{
+	public static void updateRole(Staff staff, Role.UpdateBuilder builder) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
+			dbCon.conn.setAutoCommit(false);
 			dbCon.connect();
-			updateRole(dbCon, staff, role);
+			updateRole(dbCon, staff, builder);
+			dbCon.conn.commit();
+		}catch(SQLException | BusinessException e){
+			dbCon.conn.rollback();
+			throw e;
 		}finally{
 			dbCon.disconnect();
 		}
 	}
+	
 	/**
 	 * Update the information of Role.
 	 * @param dbCon
+	 * 			the database connection
 	 * @param staff
-	 * @param role
+	 * 			the staff to perform this action
+	 * @param builder
+	 * 			the builder to update role
 	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if either cases below
+	 * 			<li>the role to update does NOT exist
+	 * 			<li>the role to update belongs to reserved
 	 */
-	public static void updateRole(DBCon dbCon, Staff staff, Role role) throws SQLException{
+	public static void updateRole(DBCon dbCon, Staff staff, Role.UpdateBuilder builder) throws SQLException, BusinessException{
+
+		Role role = builder.build();
+
+		if(getRoleById(dbCon, staff, role.getId()).getType() == Role.Type.RESERVED){
+			throw new BusinessException(StaffError.PRIVILEGE_NOT_MODIFY_BY_RESERVED_ROLE);
+		}
+		
 		String sql ;
-		sql = "UPDATE " + Params.dbName + ".role SET " +
-				" name = '" + role.getName() + "'" +
-				" WHERE role_id = " + role.getId();
-		dbCon.stmt.executeUpdate(sql);
-		if(!role.getPrivileges().isEmpty()){
+		sql = " UPDATE " + Params.dbName + ".role SET " +
+			  " role_id = " + role.getId() +
+			  (builder.isNameChanged() ? (" ,name = '" + role.getName() + "'") : "") +
+			  " WHERE role_id = " + role.getId();
+		if(dbCon.stmt.executeUpdate(sql) == 0){
+			throw new BusinessException(StaffError.ROLE_NOT_EXIST);
+		}
+		
+		if(builder.isPrivilegeChanged()){
 			
 			//删除权限关联
-			String delRPSql = "DELETE FROM " + Params.dbName + ".role_privilege" +
-								" WHERE role_id = " + role.getId();
-			dbCon.stmt.executeUpdate(delRPSql);
+			sql = " DELETE FROM " + Params.dbName + ".role_privilege WHERE role_id = " + role.getId();
+			dbCon.stmt.executeUpdate(sql);
 			//删除折扣关联
-			String delRDSql = "DELETE FROM " + Params.dbName + ".role_discount" + 
-								" WHERE role_id = " + role.getId();
-			dbCon.stmt.executeUpdate(delRDSql);
+			sql = " DELETE FROM " + Params.dbName + ".role_discount WHERE role_id = " + role.getId();
+			dbCon.stmt.executeUpdate(sql);
+			
 			//重新关联权限和折扣
-			for (Privilege privilege : role.getPrivileges()) {
-				String pSql = "INSERT INTO " + Params.dbName + ".role_privilege(role_id, pri_id, restaurant_id) " +
-						" VALUES(" +
-						role.getId() + ", " +
-						privilege.getId() + ", " +
-						staff.getRestaurantId() + ")";
-				dbCon.stmt.executeUpdate(pSql);
-				
-				if(privilege.getCode() == Code.DISCOUNT){
-					for (Discount discount : privilege.getDiscounts()) {
-						String rdSql = "INSERT INTO " + Params.dbName + ".role_discount(role_id, discount_id) " +
-								" VALUES(" +
-								role.getId() + ", " +
-								discount.getId() + ")";
-						dbCon.stmt.executeUpdate(rdSql);
-						
-					}
-				}
-			}
+			insertPrivileges(dbCon, staff, role.getId(), role.getPrivileges());
 		}
 	}
 	
