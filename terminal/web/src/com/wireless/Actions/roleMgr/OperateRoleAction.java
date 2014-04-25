@@ -22,7 +22,7 @@ import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.staffMgr.Privilege.Code;
 import com.wireless.pojo.staffMgr.Role;
 import com.wireless.pojo.staffMgr.Role.InsertBuilder;
-import com.wireless.pojo.staffMgr.Role.UpdateRoleBuilder;
+import com.wireless.pojo.staffMgr.Role.UpdateBuilder;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.util.WebParams;
 
@@ -74,11 +74,10 @@ public class OperateRoleAction extends DispatchAction{
 		try{
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
-			UpdateRoleBuilder builder = new UpdateRoleBuilder();
-			builder.setRoleId(Integer.parseInt(roleId));
-			builder.setName(roleName);
+			UpdateBuilder builder = new UpdateBuilder(Integer.parseInt(roleId))
+										.setName(roleName);
 		
-			RoleDao.updateRole(staff, builder.build());
+			RoleDao.updateRole(staff, builder);
 			jobject.initTip(true, "添加成功");
 			
 		}catch(SQLException e){
