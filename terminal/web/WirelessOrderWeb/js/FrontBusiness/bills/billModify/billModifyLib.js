@@ -198,14 +198,16 @@ function foodAmountSetHandler(_c){
 	count.focus.defer(100, count);
 	menuOperateFoodAmount.showAt([_c.x, _c.y]);
 }
+
+
 /**
  * 提交修改
  */
 function submitOrderHandler(_c){
 	var orderFoods = orderedGrid.order.orderFoods;
 	if(orderFoods.length > 0){
-		var foodPara = '';
-		for ( var i = 0; i < orderFoods.length; i++) {
+	var foodPara = Wireless.ux.createOrder({orderFoods: orderFoods, dataType : 3});
+/*		for ( var i = 0; i < orderFoods.length; i++) {
 			foodPara += ( i > 0 ? '<<sh>>' : '');
 			if (orderFoods[i].isTemporary) {
 				// 临时菜
@@ -245,7 +247,7 @@ function submitOrderHandler(_c){
 						+ ']';
 			}
 		}
-		foodPara = '{'+ foodPara + '}';
+		foodPara = '{'+ foodPara + '}';*/
 		
 		var payMannerOut = null;
 		var payManner = document.getElementsByName('radioPayType');
@@ -269,7 +271,7 @@ function submitOrderHandler(_c){
 			Ext.example.msg('提示', '抹数金额不能大于系统设置,请重新输入.');
 			return;
 		}
-		
+		//orderFoods = '{' + JSON.stringify(orderFoods) + '}';
 		orderedGrid.buttons[0].setDisabled(true);
 		orderedGrid.buttons[1].setDisabled(true);
 		Ext.Ajax.request({

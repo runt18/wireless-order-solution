@@ -741,7 +741,12 @@ function refreshOrder(res){
 			}
 		});
 	}else{
-		Ext.ux.showMsg(res);
+//		Ext.ux.showMsg(res);
+		Ext.MessageBox.confirm('提示', res.msg, function(btn){
+			if(btn == 'yes'){
+				submitSingleOrderHandler(res.reCommitData);
+			}
+		},this);
 	}
 };
 
@@ -751,61 +756,16 @@ function refreshOrder(res){
 function submitSingleOrderHandler(_c){
 	var orderFoods = _c.grid.order.orderFoods;
 	if(orderFoods.length > 0){
-		var foodPara = '';
-		for ( var i = 0; i < orderFoods.length; i++) {
-			foodPara += ( i > 0 ? '<<sh>>' : '');
-			if (orderFoods[i].isTemporary) {
-				// 临时菜
-				var foodname = orderFoods[i].name;
-				foodname = foodname.indexOf('<') > 0 ? foodname.substring(0,foodname.indexOf('<')) : foodname;
-				foodPara = foodPara 
-						+ '[' 
-						+ 'true' + '<<sb>>'// 是否临时菜(true)
-						+ orderFoods[i].id + '<<sb>>' // 临时菜1编号
-						+ foodname + '<<sb>>' // 临时菜1名称
-						+ orderFoods[i].count + '<<sb>>' // 临时菜1数量
-						+ orderFoods[i].unitPrice + '<<sb>>' // 临时菜1单价(原料單價)
-						+ '<<sb>>' // 菜品状态,暂时没用
-						+ orderFoods[i].dataType + '<<sb>>' // 菜品操作状态 1:已点菜 2:新点菜 3:反结账
-						+ orderFoods[i].kitchen.id	// 临时菜出单厨房
-						+ ']';
-			}else{
-				// 普通菜
-				var normalTaste = '', tmpTaste = '' , tasteGroup = orderFoods[i].tasteGroup;
-				for(var j = 0; j < tasteGroup.normalTasteContent.length; j++){
-					var t = tasteGroup.normalTasteContent[j];
-					normalTaste += ((j > 0 ? '<<stnt>>' : '') + (t.id + '<<stb>>' + t.cateValue + '<<stb>>' + t.cateStatusValue));
-				}
-				if(tasteGroup.tmpTaste != null && typeof tasteGroup.tmpTaste != 'undefined'){
-					if(eval(tasteGroup.tmpTaste.id >= 0))
-						tmpTaste = tasteGroup.tmpTaste.price + '<<sttt>>' + tasteGroup.tmpTaste.name  + '<<sttt>>' + tasteGroup.tmpTaste.id+ '<<sttt>>' + tasteGroup.tmpTaste.alias; 				
-				}
-				foodPara = foodPara 
-						+ '['
-						+ 'false' + '<<sb>>' // 是否临时菜(false)
-						+ orderFoods[i].id + '<<sb>>' // 菜品1编号
-						+ orderFoods[i].count + '<<sb>>' // 菜品1数量
-						+ (normalTaste + ' <<st>> ' + tmpTaste) + '<<sb>>'
-						+ orderFoods[i].kitchen.id + '<<sb>>'// 厨房1编号
-						+ '1' + '<<sb>>' // 菜品1折扣
-//						+ orderFoods[i].dataType  // 菜品操作状态 1:已点菜 2:新点菜 3:反结账
-						+ false
-						+ ']';
-			}
-		}	
-		
-		foodPara = '{' + foodPara + '}';
+		var foodPara = Wireless.ux.createOrder({orderFoods: orderFoods});
 		
 		setButtonDisabled(true);
-		
 		Ext.Ajax.request({
 			url : '../../InsertOrder.do',
 			params : {
-				isCookie : true,
 				tableID : tableAliasID,
 				orderID : _c.grid.order.id,
 				customNum : 1,
-				type : isFree ? 1 : 2,
+				type : (typeof _c.commitType != 'undefined'? _c.commitType : isFree ? 1 : 7),
 				foods : foodPara,
 				category : tableCategory,
 				orderDate : (typeof _c.grid.order == 'undefined' ? '' : _c.grid.order.orderDate),
@@ -818,6 +778,8 @@ function submitSingleOrderHandler(_c){
 				if (jr.success == true) {
 					skip(_c);
 				} else {
+					jr.reCommitData = _c;
+					jr.reCommitData.commitType = 23;
 					refreshOrder(jr);
 					setButtonDisabled(false);
 				}
@@ -869,7 +831,6 @@ function submitOrderGroupHandler(_c){
 	Ext.Ajax.request({
 		url : '../../UpdateOrderGroup.do',
 		params : {
-			isCookie : true,
 			'dataSource' : 'updateOrder',
 			'restaurantID' : restaurantID,
 			'parentOrderID' : orderGroupData.root[0].id,

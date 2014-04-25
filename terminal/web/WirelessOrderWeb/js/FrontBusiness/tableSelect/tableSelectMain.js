@@ -1336,6 +1336,9 @@ Ext.onReady(function() {
 				selectedStatus = null;
 				node.attributes.tableStatus = null;
 				tableListReflash(node);
+			},
+			collapsenode : function(node){
+				node.expand();
 			}
 		}
 	});			

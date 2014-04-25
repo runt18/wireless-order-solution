@@ -1028,7 +1028,7 @@ Ext.onReady(function() {
 		root : new Ext.tree.AsyncTreeNode({
             expanded: true,
             text : '权限列表',
-            pId : '-2',
+            code : '-2',
             leaf : false
            // checked : false,
 		}),
@@ -1088,7 +1088,7 @@ Ext.onReady(function() {
 							if(privilege != ''){
 								privilege += ',';
 							}
-							privilege += checkedNodes[i].attributes.pId;
+							privilege += checkedNodes[i].attributes.code;
 						}
 						
 					}

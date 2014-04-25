@@ -50,7 +50,6 @@ function tasteOnLoad() {
  * 加载单张账单信息
  */
 function loadSingleOrderData(){
-	if(tableStatus == 1){
 		// 加载普通账单信息
 		Ext.Ajax.request({
 			url : '../../QueryOrder.do',
@@ -75,20 +74,13 @@ function loadSingleOrderData(){
 						}
 					});
 				} else {
-					Ext.MessageBox.show({
-						msg : resultJSON.msg,
-						width : 300,
-						buttons : Ext.MessageBox.OK
-					});
+					initOrderSingleUI();
 				}
 			},
 			failure : function(response, options) {
-				
+				Ext.ux.showMsg(Ext.decode(response.responseText));
 			}
 		});
-	}else{
-		initOrderSingleUI();
-	}
 }
 
 /**
@@ -98,7 +90,6 @@ function loadOrderGroupData(){
 	Ext.Ajax.request({
 		url : '../../QueryOrderGroup.do',
 		params : {
-			isCookie : true,
 			'restaurantID' : restaurantID,
 			'queryType' : 0,
 			'childTableAliasID' : tableAliasID,
