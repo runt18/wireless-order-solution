@@ -134,9 +134,11 @@ public class Privilege implements Comparable<Privilege>, Parcelable, Jsonable{
 	public Privilege(Code code){
 		setCode(code);
 	}
-	public Privilege(int pId){
-		setId(pId);
+	
+	public Privilege(int id){
+		setId(id);
 	}
+	
 	public int getId() {
 		return id;
 	}
@@ -190,7 +192,7 @@ public class Privilege implements Comparable<Privilege>, Parcelable, Jsonable{
 		if(obj == null || !(obj instanceof Privilege)){
 			return false;
 		}else{
-			return getId() == ((Privilege)obj).getId();
+			return getCode().getVal() == ((Privilege)obj).getCode().getVal();
 		}
 	}
 	

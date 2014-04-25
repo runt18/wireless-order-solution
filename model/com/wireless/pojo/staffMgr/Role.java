@@ -102,18 +102,10 @@ public class Role implements Jsonable, Parcelable{
 			setType(Type.RESERVED);
 			setCategoty(Category.ADMIN);
 			
-			addPrivileges(new Privilege(Privilege.Code.ADD_FOOD));
-			addPrivileges(new Privilege(Privilege.Code.BASIC));
-			addPrivileges(new Privilege(Privilege.Code.CANCEL_FOOD));
-			addPrivileges(new Privilege(Privilege.Code.DISCOUNT));
-			addPrivileges(new Privilege(Privilege.Code.GIFT));
-			addPrivileges(new Privilege(Privilege.Code.HISTORY));
-			addPrivileges(new Privilege(Privilege.Code.INVENTORY));
-			addPrivileges(new Privilege(Privilege.Code.MEMBER));
-			addPrivileges(new Privilege(Privilege.Code.RE_PAYMENT));
-			addPrivileges(new Privilege(Privilege.Code.SYSTEM));
-			addPrivileges(new Privilege(Privilege.Code.PAYMENT));
-			addPrivileges(new Privilege(Privilege.Code.CHECK_ORDER));
+			for(Privilege.Code code : Privilege.Code.values()){
+				addPrivilege(code);
+			}
+			
 		}
 	}
 	
@@ -123,18 +115,10 @@ public class Role implements Jsonable, Parcelable{
 			super(restaurantId, Category.BOSS.getDesc());
 			setType(Type.RESERVED);
 			setCategoty(Category.BOSS);
-			addPrivileges(new Privilege(Privilege.Code.ADD_FOOD));
-			addPrivileges(new Privilege(Privilege.Code.BASIC));
-			addPrivileges(new Privilege(Privilege.Code.CANCEL_FOOD));
-			addPrivileges(new Privilege(Privilege.Code.DISCOUNT));
-			addPrivileges(new Privilege(Privilege.Code.GIFT));
-			addPrivileges(new Privilege(Privilege.Code.HISTORY));
-			addPrivileges(new Privilege(Privilege.Code.INVENTORY));
-			addPrivileges(new Privilege(Privilege.Code.MEMBER));
-			addPrivileges(new Privilege(Privilege.Code.RE_PAYMENT));
-			addPrivileges(new Privilege(Privilege.Code.SYSTEM));
-			addPrivileges(new Privilege(Privilege.Code.PAYMENT));
-			addPrivileges(new Privilege(Privilege.Code.CHECK_ORDER));
+			
+			for(Privilege.Code code : Privilege.Code.values()){
+				addPrivilege(code);
+			}
 		}
 	}
 	
@@ -144,17 +128,19 @@ public class Role implements Jsonable, Parcelable{
 			super(restaurantId, Category.FINANCE.getDesc());
 			setType(Type.NORMAL);
 			setCategoty(Category.FINANCE);
-			addPrivileges(new Privilege(Privilege.Code.ADD_FOOD));
-			addPrivileges(new Privilege(Privilege.Code.BASIC));
-			addPrivileges(new Privilege(Privilege.Code.CANCEL_FOOD));
-			addPrivileges(new Privilege(Privilege.Code.DISCOUNT));
-			addPrivileges(new Privilege(Privilege.Code.GIFT));
-			addPrivileges(new Privilege(Privilege.Code.HISTORY));
-			addPrivileges(new Privilege(Privilege.Code.INVENTORY));
-			addPrivileges(new Privilege(Privilege.Code.MEMBER));
-			addPrivileges(new Privilege(Privilege.Code.RE_PAYMENT));
-			addPrivileges(new Privilege(Privilege.Code.PAYMENT));
-			addPrivileges(new Privilege(Privilege.Code.CHECK_ORDER));
+			addPrivilege(Privilege.Code.ADD_FOOD);
+			addPrivilege(Privilege.Code.BASIC);
+			addPrivilege(Privilege.Code.CANCEL_FOOD);
+			addPrivilege(Privilege.Code.DISCOUNT);
+			addPrivilege(Privilege.Code.GIFT);
+			addPrivilege(Privilege.Code.HISTORY);
+			addPrivilege(Privilege.Code.INVENTORY);
+			addPrivilege(Privilege.Code.MEMBER);
+			addPrivilege(Privilege.Code.SMS);
+			addPrivilege(Privilege.Code.WEIXIN);
+			addPrivilege(Privilege.Code.RE_PAYMENT);
+			addPrivilege(Privilege.Code.PAYMENT);
+			addPrivilege(Privilege.Code.CHECK_ORDER);
 		}
 	}
 	
@@ -164,14 +150,14 @@ public class Role implements Jsonable, Parcelable{
 			super(restaurantId, Category.MANAGER.getDesc());
 			setType(Type.NORMAL);
 			setCategoty(Category.MANAGER);
-			addPrivileges(new Privilege(Privilege.Code.ADD_FOOD));
-			addPrivileges(new Privilege(Privilege.Code.CANCEL_FOOD));
-			addPrivileges(new Privilege(Privilege.Code.DISCOUNT));
-			addPrivileges(new Privilege(Privilege.Code.GIFT));
-			addPrivileges(new Privilege(Privilege.Code.RE_PAYMENT));
-			addPrivileges(new Privilege(Privilege.Code.PAYMENT));
-			addPrivileges(new Privilege(Privilege.Code.CHECK_ORDER));
-			addPrivileges(new Privilege(Privilege.Code.BASIC));
+			addPrivilege(Privilege.Code.ADD_FOOD);
+			addPrivilege(Privilege.Code.CANCEL_FOOD);
+			addPrivilege(Privilege.Code.DISCOUNT);
+			addPrivilege(Privilege.Code.GIFT);
+			addPrivilege(Privilege.Code.RE_PAYMENT);
+			addPrivilege(Privilege.Code.PAYMENT);
+			addPrivilege(Privilege.Code.CHECK_ORDER);
+			addPrivilege(Privilege.Code.BASIC);
 		}
 	}
 	
@@ -181,13 +167,13 @@ public class Role implements Jsonable, Parcelable{
 			super(restaurantId, Category.CASHIER.getDesc());
 			setType(Type.NORMAL);
 			setCategoty(Category.CASHIER);
-			addPrivileges(new Privilege(Privilege.Code.ADD_FOOD));
-			addPrivileges(new Privilege(Privilege.Code.CANCEL_FOOD));
-			addPrivileges(new Privilege(Privilege.Code.DISCOUNT));
-			addPrivileges(new Privilege(Privilege.Code.GIFT));
-			addPrivileges(new Privilege(Privilege.Code.RE_PAYMENT));
-			addPrivileges(new Privilege(Privilege.Code.PAYMENT));
-			addPrivileges(new Privilege(Privilege.Code.CHECK_ORDER));
+			addPrivilege(Privilege.Code.ADD_FOOD);
+			addPrivilege(Privilege.Code.CANCEL_FOOD);
+			addPrivilege(Privilege.Code.DISCOUNT);
+			addPrivilege(Privilege.Code.GIFT);
+			addPrivilege(Privilege.Code.RE_PAYMENT);
+			addPrivilege(Privilege.Code.PAYMENT);
+			addPrivilege(Privilege.Code.CHECK_ORDER);
 		}
 	}
 	
@@ -197,8 +183,8 @@ public class Role implements Jsonable, Parcelable{
 			super(restaurantId, Category.WAITER.getDesc());
 			setType(Type.NORMAL);
 			setCategoty(Category.WAITER);
-			addPrivileges(new Privilege(Privilege.Code.ADD_FOOD));
-			addPrivileges(new Privilege(Privilege.Code.CANCEL_FOOD));
+			addPrivilege(Privilege.Code.ADD_FOOD);
+			addPrivilege(Privilege.Code.CANCEL_FOOD);
 		}
 	}
 	
@@ -217,26 +203,51 @@ public class Role implements Jsonable, Parcelable{
 		public int getRestaurantId() {
 			return restaurantId;
 		}
+		
 		public String getName() {
 			return name;
 		}
+		
 		public Type getType() {
 			return type;
 		}
-		public void setType(Type type) {
+		
+		public InsertBuilder setType(Type type) {
 			this.type = type;
+			return this;
 		}
+		
 		public Category getCategoty() {
 			return categoty;
 		}
-		public void setCategoty(Category categoty) {
+		
+		public InsertBuilder setCategoty(Category categoty) {
 			this.categoty = categoty;
+			return this;
 		}
+		
 		public List<Privilege> getPrivileges() {
 			return privileges;
 		}
-		public void addPrivileges(Privilege privilege) {
-			this.privileges.add(privilege);
+		
+		public InsertBuilder addPrivilege(Privilege.Code code) {
+			Privilege privilege = new Privilege(code);
+			if(!this.privileges.contains(privilege)){
+				this.privileges.add(privilege);
+			}
+			return this;
+		}
+		
+		public InsertBuilder addDiscount(Discount discount){
+			int index = privileges.indexOf(new Privilege(Privilege.Code.DISCOUNT));
+			if(index < 0){
+				Privilege privilege = new Privilege(Privilege.Code.DISCOUNT);
+				privilege.addDiscount(discount);
+				privileges.add(privilege);
+			}else{
+				privileges.get(index).addDiscount(discount);
+			}
+			return this;
 		}
 		
 		public Role build(){
@@ -246,27 +257,50 @@ public class Role implements Jsonable, Parcelable{
 		
 	}
 	
-	public static class UpdateRoleBuilder{
-		private int roleId;
+	public static class UpdateBuilder{
+		private final int roleId;
 		private String name;
 		private List<Privilege> privileges = SortedList.newInstance();
+		
+		public UpdateBuilder(int id){
+			this.roleId = id;
+		}
+		
 		public int getRoleId() {
 			return roleId;
 		}
-		public void setRoleId(int roleId) {
-			this.roleId = roleId;
-		}
-		public String getName() {
-			return name;
-		}
-		public void setName(String name) {
+
+		public UpdateBuilder setName(String name) {
 			this.name = name;
+			return this;
 		}
-		public List<Privilege> getPrivileges() {
-			return privileges;
+		
+		public boolean isNameChanged(){
+			return this.name != null;
 		}
-		public void addPrivileges(Privilege privilege) {
-			this.privileges.add(privilege);
+		
+		public UpdateBuilder addPrivilege(Privilege.Code code) {
+			Privilege privilege = new Privilege(code);
+			if(!this.privileges.contains(privilege)){
+				this.privileges.add(privilege);
+			}
+			return this;
+		}
+		
+		public UpdateBuilder addDiscount(Discount discount){
+			int index = privileges.indexOf(new Privilege(Privilege.Code.DISCOUNT));
+			if(index < 0){
+				Privilege privilege = new Privilege(Privilege.Code.DISCOUNT);
+				privilege.addDiscount(discount);
+				privileges.add(privilege);
+			}else{
+				privileges.get(index).addDiscount(discount);
+			}
+			return this;
+		}
+		
+		public boolean isPrivilegeChanged(){
+			return !this.privileges.isEmpty();
 		}
 		
 		public Role build(){
@@ -282,17 +316,17 @@ public class Role implements Jsonable, Parcelable{
 	}
 	
 	private Role(InsertBuilder builder){
-		setCategory(builder.getCategoty());
-		setName(builder.getName());
-		setRestaurantId(builder.getRestaurantId());
-		setType(builder.getType());
-		this.privileges.addAll(builder.getPrivileges());
+		setCategory(builder.categoty);
+		setName(builder.name);
+		setRestaurantId(builder.restaurantId);
+		setType(builder.type);
+		this.privileges.addAll(builder.privileges);
 	}
 	
-	private Role(UpdateRoleBuilder updateBuilder){
-		setId(updateBuilder.getRoleId());
-		setName(updateBuilder.getName());
-		this.privileges.addAll(updateBuilder.getPrivileges());
+	private Role(UpdateBuilder updateBuilder){
+		setId(updateBuilder.roleId);
+		setName(updateBuilder.name);
+		this.privileges.addAll(updateBuilder.privileges);
 	}
 	
 	public int getId() {
@@ -313,7 +347,7 @@ public class Role implements Jsonable, Parcelable{
 	
 	public String getName() {
 		if(name == null){
-			name = "";
+			return "";
 		}
 		return name;
 	}
@@ -367,15 +401,6 @@ public class Role implements Jsonable, Parcelable{
 		}else{
 			return Discount.EMPTY_LIST;
 		}
-	}
-	
-	public Discount getDefaultDiscount(){
-		for(Discount discount : getDiscounts()){
-			if(discount.isDefault()){
-				return discount;
-			}
-		}
-		return getDiscounts().get(0);
 	}
 	
 	@Override 
