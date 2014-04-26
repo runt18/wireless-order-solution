@@ -1,6 +1,8 @@
 package com.wireless.Actions.moduleMgr;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -38,6 +40,23 @@ public class QueryModuleAction extends DispatchAction{
 			e.printStackTrace();
 			jobject.initTip(e);
 		}finally{
+			response.getWriter().print(jobject.toString());
+		}
+		return null;
+	}
+	
+	public ActionForward getModules(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		JObject jobject = new JObject();
+		List<Module> modulelist = new ArrayList<Module>();
+		try{
+			modulelist = ModuleDao.getAll();
+		}catch(Exception e){
+			e.printStackTrace();
+			jobject.initTip(e);
+		}finally{
+			jobject.setRoot(modulelist);
 			response.getWriter().print(jobject.toString());
 		}
 		return null;
