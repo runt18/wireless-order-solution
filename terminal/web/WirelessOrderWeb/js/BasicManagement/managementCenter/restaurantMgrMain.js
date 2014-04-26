@@ -65,7 +65,10 @@ function getRestaurantModules(){
 
 function initModulesData(){
 	Ext.Ajax.request({
-		url : '../../QueryModules.do',
+		url : '../../QueryModule.do',
+		params : {
+			dataSource : 'getModules'
+		},
 		success : function(res, opt){
 			var jr = Ext.decode(res.responseText);
 			if(jr.success){
