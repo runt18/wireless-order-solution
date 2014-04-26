@@ -3,6 +3,7 @@ package com.wireless.Actions.payment;
 import java.io.IOException;
 import java.io.PrintWriter;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -165,9 +166,18 @@ public class PayOrderAction extends Action{
 				if(payBuilder.isTemp()){
 					jsonResp = jsonResp.replace("$(value)", payBuilder.getOrderId() + "号账单暂结成功");
 				}else{
-					
-					//TODO
-					try{
+					Cookie[] cookies = request.getCookies();
+					for(Cookie cookie : cookies){
+						
+					    if(cookie.getName().equals((request.getServerName()+"_consumeSms"))){
+					    	if(cookie.getValue().equals("true")){
+					    		System.out.println("发送");
+					    	}else{
+					    		System.out.println("不发送");
+					    	}
+					    }
+					}
+/*					try{
 						if(settleType == Order.SettleType.MEMBER){
 							if(member.getMemberType().isCharge()){
 								//Send SMS if paid by charge member.
@@ -182,7 +192,7 @@ public class PayOrderAction extends Action{
 					}catch(Exception e){
 						jsonResp = jsonResp.replace("$(value)", payBuilder.getOrderId() + "号账单结帐成功, 但短信发送失败(" + e.getMessage() + ")");
 						e.printStackTrace();
-					}						
+					}*/						
 				}
 				
 			}else if(resp.header.type == Type.NAK){

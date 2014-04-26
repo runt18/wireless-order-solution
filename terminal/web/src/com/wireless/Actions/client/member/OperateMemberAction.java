@@ -3,6 +3,7 @@ package com.wireless.Actions.client.member;
 import java.io.IOException;
 import java.sql.SQLException;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -218,16 +219,26 @@ public class OperateMemberAction extends DispatchAction{
 					jobject.setMsg(jobject.getMsg() + "打印操作请求失败.");
 				}
 			}
-			
-			//TODO
-			try{
-				//Send SMS.
-				SMS.send(staff, mo.getMemberMobile(), new SMS.Msg4Charge(mo));
-				jobject.setMsg(jobject.getMsg() + "充值短信发送成功.");
-			}catch(Exception e){
-				jobject.setMsg(jobject.getMsg() + "充值短信发送失败(" + e.getMessage() + ")");
-				e.printStackTrace();
+			Cookie[] cookies = request.getCookies();
+			for(Cookie cookie : cookies){
+				
+			    if(cookie.getName().equals((request.getServerName()+"_chargeSms"))){
+			    	if(cookie.getValue().equals("true")){
+			    		System.out.println("发送");
+//						try{
+//							//Send SMS.
+//							SMS.send(staff, mo.getMemberMobile(), new SMS.Msg4Charge(mo));
+//							jobject.setMsg(jobject.getMsg() + "充值短信发送成功.");
+//						}catch(Exception e){
+//							jobject.setMsg(jobject.getMsg() + "充值短信发送失败(" + e.getMessage() + ")");
+//							e.printStackTrace();
+//						}
+			    	}else{
+			    		System.out.println("不发送");
+			    	}
+			    }
 			}
+
 			
 		}catch(BusinessException e){	
 			e.printStackTrace();
