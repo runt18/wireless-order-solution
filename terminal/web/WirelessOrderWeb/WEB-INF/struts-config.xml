@@ -565,6 +565,14 @@
 			type="com.wireless.Actions.smsMgr.OperateSmsAction"
 			scope="request" parameter="dataSource">
 		</action>
+		<action path="/QueryModule"
+			type="com.wireless.Actions.moduleMgr.QueryModuleAction"
+			scope="request" parameter="dataSource">
+		</action>
+		<action path="/AutoLogin"
+			type="com.wireless.Actions.login.AutoLoginAction"
+			scope="request" >
+		</action>
 
 	</action-mappings>
 
