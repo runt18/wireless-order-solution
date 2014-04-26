@@ -34,4 +34,28 @@ public class ModuleDao {
 		return result;
 	}
 	
+	public static boolean checkModule(DBCon dbCon, String extraCond) throws SQLException{
+		boolean hasModule = false;
+		String sql = "SELECT * FROM " + Params.dbName + ".restaurant_module RM " +
+					" JOIN " + Params.dbName + ".module M ON M.module_id = RM.module_id " +
+					" WHERE 1=1 " +
+					(extraCond != null ? extraCond : " ") ;
+		dbCon.rs = dbCon.stmt.executeQuery(sql);
+		if(dbCon.rs.next()){
+			hasModule = true;
+		}
+		return hasModule;
+					
+	}
+	
+	public static boolean checkModule(int restaurant, Module.Code code) throws SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return checkModule(dbCon, " AND RM.restaurant_id = " + restaurant + " AND M.code = " + code.getVal());
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
 }
