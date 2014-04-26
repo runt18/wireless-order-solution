@@ -641,10 +641,25 @@ var btnMemberRecharge = new Ext.ux.ImageButton({
 					id : 'ts_chbPrintRecharge',
 					checked : true,
 					boxLabel : '打印充值信息'
+				},{
+					xtype : 'tbtext',
+					text : '&nbsp;&nbsp;'
+				},{
+					xtype : 'checkbox',
+					id : 'chbFrontSendCharge',
+					checked : true,
+					boxLabel : '发送充值信息'+'(<font style="color:green;font-weight:bolder">剩余'+Ext.ux.smsCount+'条</font>)',
+					hidden : !Ext.ux.smsModule
 				}, '->', {
 					text : '充值',
 					iconCls : 'icon_tb_recharge',
 					handler : function(e){
+						var sendSms = Ext.getCmp('chbFrontSendCharge').getValue();
+						if(sendSms){
+							Ext.ux.setCookie(document.domain+'_chargeSms', true, 3650);
+						}else{
+							Ext.ux.setCookie(document.domain+'_chargeSms', false, 3650);
+						}
 						rechargeControlCenter({
 							reload : true,
 							isPrint : Ext.getCmp('ts_chbPrintRecharge').getValue(),
@@ -661,6 +676,11 @@ var btnMemberRecharge = new Ext.ux.ImageButton({
 					}
 				}]
 			});
+		}
+		if(Ext.ux.getCookie(document.domain+'_chargeSms') == 'true'){
+			Ext.getCmp('chbFrontSendCharge').setValue(true);
+		}else{
+			Ext.getCmp('chbFrontSendCharge').setValue(false);
 		}
 		table_memberRechargeWin.show();
 	}
@@ -1552,4 +1572,5 @@ Ext.onReady(function() {
 			keyboardFN();
 		}
 	}]);
+	Ext.ux.checkSmStat();
 });

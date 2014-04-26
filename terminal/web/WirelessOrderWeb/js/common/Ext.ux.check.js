@@ -152,3 +152,50 @@ Ext.ux.checkDuft = function(_s, _bid, _eid, _num){
 		}
 	}
 };
+
+Ext.ux.smsModule = false;
+Ext.ux.smsCount = 0;
+Ext.ux.checkSmStat = function(){
+	Ext.Ajax.request({
+		url : "../../QueryModule.do",
+		params : {
+			dataSource : 'checkModule',
+			code : 4000
+		},
+		success : function(res, opt){
+			var jr = Ext.decode(res.responseText);
+			if(jr.success){
+				Ext.ux.smsModule = true;
+				Ext.ux.smsCount = jr.code;
+			}else{
+				Ext.ux.smsModule = false;
+			}
+		},
+		failure : function(res, opt){
+		}
+	});
+}
+Ext.ux.getCookie = function(cookieName) {
+	var result = "";
+	var mycookie = document.cookie;
+	var start2 = mycookie.indexOf(cookieName + "=");
+	if (start2 > -1) {
+		start = mycookie.indexOf("=", start2) + 1;
+		var end = mycookie.indexOf(";", start);
+	
+		if (end == -1) {
+			end = mycookie.length;
+		}
+		//截取cookie
+		result = unescape(mycookie.substring(start, end));
+	}
+	return result;
+};
+
+Ext.ux.setCookie = function(cookieName, cookieValue, days) {
+	var date = new Date();
+	date.setTime(date.getTime() + Number(days) * 3600 * 1000 * 24);
+	
+	document.cookie = cookieName + "=" + cookieValue + ";domain=" + document.domain + ";path=/;expires = " + date.toGMTString();
+};
+

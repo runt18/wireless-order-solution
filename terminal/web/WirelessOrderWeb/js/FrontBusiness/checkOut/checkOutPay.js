@@ -223,6 +223,13 @@ function memberPay(){
 					bindMemberWin.hide();
 				}
 			}],
+			bbar : [{
+				xtype : 'checkbox',
+				id : 'chbFrontSendConsume',
+				checked : true,
+				boxLabel : '发送消费信息'+'(<font style="color:green;font-weight:bolder">剩余'+Ext.ux.smsCount+'条</font>)',
+				hidden : !Ext.ux.smsModule
+			}],
 			buttonAlign : 'center',
 			buttons : [{
 				text : '暂结',
@@ -255,6 +262,12 @@ function memberPay(){
 			}, {
 				text : '结账',
 				handler : function(e){
+					var sendSms = Ext.getCmp('chbFrontSendConsume').getValue();
+					if(sendSms){
+						Ext.ux.setCookie(document.domain+'_consumeSms', true, 3650);
+					}else{
+						Ext.ux.setCookie(document.domain+'_consumeSms', false, 3650);
+					}
 					if(memberPayOrderHandler){
 						Ext.getCmp('mpo_txtDiscountForPayOrder').fireEvent('select', Ext.getCmp('mpo_txtDiscountForPayOrder'));
 						memberPayOrderHandler({
@@ -364,6 +377,11 @@ function memberPay(){
 				}
 			}
 		});
+	}
+	if(Ext.ux.getCookie(document.domain+'_consumeSms') == 'true'){
+		Ext.getCmp('chbFrontSendConsume').setValue(true);
+	}else{
+		Ext.getCmp('chbFrontSendConsume').setValue(false);
 	}
 	bindMemberWin.show();
 }

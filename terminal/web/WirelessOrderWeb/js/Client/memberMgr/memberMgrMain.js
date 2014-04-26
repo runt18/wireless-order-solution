@@ -174,10 +174,25 @@ function initRechargeWin(){
 				id : 'chbPrintRecharge',
 				checked : true,
 				boxLabel : '打印充值信息'
+			},{
+				xtype : 'tbtext',
+				text : '&nbsp;&nbsp;'
+			},{
+				xtype : 'checkbox',
+				id : 'chbSendCharge',
+				checked : true,
+				boxLabel : '发送充值信息'+'(<font style="color:green;font-weight:bolder">剩余'+Ext.ux.smsCount+'条</font>)',
+				hidden : !Ext.ux.smsModule
 			}, '->', {
 				text : '充值',
 				iconCls : 'icon_tb_recharge',
 				handler : function(e){
+					var sendSms = Ext.getCmp('chbSendCharge').getValue();
+					if(sendSms){
+						Ext.ux.setCookie(document.domain+'_chargeSms', true, 3650);
+					}else{
+						Ext.ux.setCookie(document.domain+'_chargeSms', false, 3650);
+					}
 					// 跨域调用充值方法
 					rechargeControlCenter({
 						isPrint : Ext.getCmp('chbPrintRecharge').getValue(),
@@ -191,6 +206,9 @@ function initRechargeWin(){
 							Ext.getCmp('btnSearchMember').handler();
 						}
 					});
+					
+
+					
 				}
 			}, {
 				text : '关闭',
@@ -200,6 +218,11 @@ function initRechargeWin(){
 				}
 			}]
 		});
+	}
+	if(Ext.ux.getCookie(document.domain+'_chargeSms') == 'true'){
+		Ext.getCmp('chbSendCharge').setValue(true);
+	}else{
+		Ext.getCmp('chbSendCharge').setValue(false);
 	}
 }
 
@@ -1188,5 +1211,6 @@ Ext.onReady(function(){
 	 
 	winInit();
 	memberBasicWin.render(document.body);
+	Ext.ux.checkSmStat();
 });
 

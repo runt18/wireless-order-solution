@@ -6,7 +6,9 @@
  * 
  * 
  */
-
+Ext.ux.errorCode = {
+	ORDER_EXPIRED : 9195 //账单已过期
+};
 
 /*************************************
  * 部分通用显示格式
@@ -649,6 +651,7 @@ var MemberOperationRecord = Ext.ux.cr(['id', 'seq', 'rid', 'staffId', 'staffName
     'member', 'member.name', 'member.memberType.name', 'operateTypeText', 'operateTypeValue', 'payTypeText', 'payTypeValue', 'payMoney', 'chargeTypeText', 'chargeTypeValue', 'chargeMoney']);
 var MOSummaryRecord = Ext.ux.cr(['chargeMoney', 'consumeAmount', 'payMoney', 'consumePoint', 'pointConsume', 'pointAdjust', 'moneyAdjust', 'member', 'member.name', 'member.memberType.name']);
 var CouponRecord = Ext.ux.cr(['createStaff', 'birthDate', 'couponId', 'restaurantId', 'couponType','couponType.expiredFormat', 'orderId', 'orderDate', 'statusText', 'statusValue', 'member', 'member.name', 'member.mobile']);
+
 
 
 

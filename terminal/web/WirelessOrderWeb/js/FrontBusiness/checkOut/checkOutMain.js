@@ -269,7 +269,7 @@ Ext.onReady(function() {
 			paySubmit(6);
 		}
 	}]);
-	
+	Ext.ux.checkSmStat();
 });
 
 function setFormButtonStatus(_s){
