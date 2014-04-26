@@ -15,7 +15,7 @@ import com.wireless.db.restaurantMgr.ModuleDao;
 import com.wireless.json.JObject;
 import com.wireless.pojo.restaurantMgr.Module;
 
-public class QueryModuleAction extends Action{
+public class QueryModulesAction extends Action{
 
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
