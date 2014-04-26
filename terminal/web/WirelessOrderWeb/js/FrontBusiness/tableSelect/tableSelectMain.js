@@ -648,7 +648,7 @@ var btnMemberRecharge = new Ext.ux.ImageButton({
 					xtype : 'checkbox',
 					id : 'chbFrontSendCharge',
 					checked : true,
-					boxLabel : '发送充值信息'+'(<font style="color:green;font-weight:bolder">剩余'+Ext.ux.smsCount+'条</font>)',
+					boxLabel : '发送充值信息'+(Ext.ux.smsCount >= 20 ? '(<font style="color:green;font-weight:bolder">剩余'+Ext.ux.smsCount+'条</font>)' : '(<font style="color:red;font-weight:bolder">剩余'+Ext.ux.smsCount+'条, 请及时充值</font>)'),
 					hidden : !Ext.ux.smsModule
 				}, '->', {
 					text : '充值',
