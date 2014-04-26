@@ -549,8 +549,8 @@
 			type="com.wireless.Actions.menuMgr.basic.OperateSellOutFoodAction"
 			scope="request" parameter="dataSource">
 		</action>
-		<action path="/QueryModule"
-			type="com.wireless.Actions.restaurantMgr.QueryModuleAction"
+		<action path="/QueryModules"
+			type="com.wireless.Actions.restaurantMgr.QueryModulesAction"
 			scope="request" parameter="dataSource">
 		</action>
 		<action path="/QuerySmsDetail"
