@@ -166,34 +166,34 @@ public class PayOrderAction extends Action{
 				if(payBuilder.isTemp()){
 					jsonResp = jsonResp.replace("$(value)", payBuilder.getOrderId() + "号账单暂结成功");
 				}else{
-					Cookie[] cookies = request.getCookies();
-					for(Cookie cookie : cookies){
-						
-					    if(cookie.getName().equals((request.getServerName()+"_consumeSms"))){
-					    	if(cookie.getValue().equals("true")){
-					    		System.out.println("发送");
-					    	}else{
-					    		System.out.println("不发送");
-					    	}
-					    }
-					}
-/*					try{
-						if(settleType == Order.SettleType.MEMBER){
-							if(member.getMemberType().isCharge()){
-								//Send SMS if paid by charge member.
-								MemberOperation mo = MemberOperationDao.getTodayById(staff, OrderDao.getById(staff, orderId, DateType.TODAY).getMemberOperationId());
-								SMS.send(staff, mo.getMemberMobile(), new SMS.Msg4Consume(mo));
+					boolean sendSMS = false;
+					//Send SMS if paid by charge member.
+					if(settleType == Order.SettleType.MEMBER){
+						if(member.getMemberType().isCharge()){
+							for(Cookie cookie : request.getCookies()){
+							    if(cookie.getName().equals((request.getServerName() + "_consumeSms"))){
+							    	if(cookie.getValue().equals("true")){
+							    		sendSMS = true;
+							    		break;
+							    	}
+							    }
 							}
-							jsonResp = jsonResp.replace("$(value)", payBuilder.getOrderId() + "号账单结帐并发送短信成功");
-						}else{
-							jsonResp = jsonResp.replace("$(value)", payBuilder.getOrderId() + "号账单结帐成功");
 						}
-						
-					}catch(Exception e){
-						jsonResp = jsonResp.replace("$(value)", payBuilder.getOrderId() + "号账单结帐成功, 但短信发送失败(" + e.getMessage() + ")");
-						e.printStackTrace();
-					}*/						
-				}
+					}
+					
+					if(sendSMS){
+			    		try{
+							MemberOperation mo = MemberOperationDao.getTodayById(staff, OrderDao.getById(staff, orderId, DateType.TODAY).getMemberOperationId());
+							SMS.send(staff, mo.getMemberMobile(), new SMS.Msg4Consume(mo));
+							jsonResp = jsonResp.replace("$(value)", payBuilder.getOrderId() + "号账单结帐并发送短信成功");
+			    		}catch(Exception e){
+							jsonResp = jsonResp.replace("$(value)", payBuilder.getOrderId() + "号账单结帐成功, 但短信发送失败(" + e.getMessage() + ")");
+							e.printStackTrace();
+						}
+					}else{
+						jsonResp = jsonResp.replace("$(value)", payBuilder.getOrderId() + "号账单结帐成功");
+					}
+		    	}
 				
 			}else if(resp.header.type == Type.NAK){
 				jsonResp = jsonResp.replace("$(result)", "false");
