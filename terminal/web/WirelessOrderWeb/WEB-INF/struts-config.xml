@@ -551,7 +551,7 @@
 		</action>
 		<action path="/QueryModules"
 			type="com.wireless.Actions.restaurantMgr.QueryModulesAction"
-			scope="request" parameter="dataSource">
+			scope="request" >
 		</action>
 		<action path="/QuerySmsDetail"
 			type="com.wireless.Actions.smsMgr.QuerySmsDetailAction"
