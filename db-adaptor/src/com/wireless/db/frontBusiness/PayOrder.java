@@ -61,10 +61,14 @@ public class PayOrder {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 * @throws BusinessException 
-	 * 			throws if failed to execute {@link#calcById}
+	 * 			throws if failed to execute {@link#calcById} or has no privilege to do temporary payment
 	 */
 	public static Order payTemp(DBCon dbCon, Staff staff, PayBuilder payBuilder) throws SQLException, BusinessException{
-		return doTmpPayment(dbCon, staff, calc(dbCon, staff, payBuilder));
+		if(staff.getRole().hasPrivilege(Privilege.Code.TEMP_PAYMENT)){
+			return doTmpPayment(dbCon, staff, calc(dbCon, staff, payBuilder));
+		}else{
+			throw new BusinessException(StaffError.TEMP_PAYMENT_NOT_ALLOW);
+		}
 	}
 	
 	private static Order doTmpPayment(DBCon dbCon, Staff staff, Order orderCalculated) throws SQLException{
