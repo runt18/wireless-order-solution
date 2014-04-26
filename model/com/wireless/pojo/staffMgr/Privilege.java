@@ -63,30 +63,33 @@ public class Privilege implements Comparable<Privilege>, Parcelable, Jsonable{
 	}
 	
 	public static enum Code{
-		UNKNOWN(0, Cate.UNKNOWN, "未知"),
-		ADD_FOOD(1000, Cate.FRONT_BUSINESS, "点菜"),
-		CANCEL_FOOD(1001, Cate.FRONT_BUSINESS, "退菜"),
-		DISCOUNT(1002, Cate.FRONT_BUSINESS, "折扣"),
-		GIFT(1003, Cate.FRONT_BUSINESS, "赠送"),
-		RE_PAYMENT(1004, Cate.FRONT_BUSINESS, "反结帐"),
-		PAYMENT(1005, Cate.FRONT_BUSINESS, "结帐"),
-		CHECK_ORDER(1006, Cate.FRONT_BUSINESS, "查看账单"),
-		BASIC(2000, Cate.BASIC, "后台"),
-		INVENTORY(5000, Cate.INVENTORY, "库存"),
-		HISTORY(4000, Cate.HISTORY, "历史"),
-		MEMBER(3000, Cate.MEMBER, "会员"),
-		SYSTEM(6000, Cate.SYSTEM, "系统"),
-		WEIXIN(7000, Cate.WEIXIN, "微信"),
-		SMS(8000, Cate.SMS, "短信");
+		UNKNOWN(0, Cate.UNKNOWN, 1, "未知"),
+		ADD_FOOD(1000, Cate.FRONT_BUSINESS, 1, "点菜"),
+		CANCEL_FOOD(1001, Cate.FRONT_BUSINESS, 2, "退菜"),
+		DISCOUNT(1002, Cate.FRONT_BUSINESS, 3, "折扣"),
+		GIFT(1003, Cate.FRONT_BUSINESS, 4, "赠送"),
+		RE_PAYMENT(1004, Cate.FRONT_BUSINESS, 7, "反结帐"),
+		PAYMENT(1005, Cate.FRONT_BUSINESS, 6, "结帐"),
+		CHECK_ORDER(1006, Cate.FRONT_BUSINESS, 8, "查看账单"),
+		TEMP_PAYMENT(1007, Cate.FRONT_BUSINESS, 5, "暂结"),
+		BASIC(2000, Cate.BASIC, 1, "后台"),
+		INVENTORY(5000, Cate.INVENTORY, 1, "库存"),
+		HISTORY(4000, Cate.HISTORY, 1, "历史"),
+		MEMBER(3000, Cate.MEMBER, 1, "会员"),
+		SYSTEM(6000, Cate.SYSTEM, 1, "系统"),
+		WEIXIN(7000, Cate.WEIXIN, 1, "微信"),
+		SMS(8000, Cate.SMS, 1, "短信");
 
 		
 		private final int val;
 		private final Cate cate;
+		private final int displayId;
 		private final String desc;
 		
-		Code(int val, Cate cate, String desc){
+		Code(int val, Cate cate, int displayId, String desc){
 			this.val = val;
 			this.cate = cate;
+			this.displayId = displayId;
 			this.desc = desc;
 		}
 		
@@ -112,6 +115,10 @@ public class Privilege implements Comparable<Privilege>, Parcelable, Jsonable{
 			return val;
 		}
 		
+		public int getDisplayId(){
+			return this.displayId;
+		}
+		
 		public String getDesc(){
 			return desc;
 		}
@@ -125,7 +132,13 @@ public class Privilege implements Comparable<Privilege>, Parcelable, Jsonable{
 			}else if(p0.getCate().getDisplayId() > p1.getCate().getDisplayId()){
 				return 1;
 			}else{
-				return 0;
+				if(p0.getCode().getDisplayId() < p1.getCode().getDisplayId()){
+					return -1;
+				}else if(p0.getCode().getDisplayId() > p1.getCode().getDisplayId()){;
+					return 1;
+				}else{
+					return 0;
+				}
 			}
 		}
 	};
