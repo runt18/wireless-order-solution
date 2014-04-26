@@ -32,7 +32,7 @@ import com.wireless.task.SweepDBTask;
 public class WirelessSocketServer {
 
 	//the version of the wireless socket server
-	static final String VERSION = "1.1.7";
+	static final String VERSION = "1.1.8";
 	//the OTA server address
 	static String OTA_IP = ""; 
 	//the OTA server port
