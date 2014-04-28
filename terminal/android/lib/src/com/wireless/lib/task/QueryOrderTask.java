@@ -6,6 +6,7 @@ import android.os.AsyncTask;
 
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.ErrorCode;
+import com.wireless.exception.FrontBusinessError;
 import com.wireless.exception.ProtocolError;
 import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
@@ -59,7 +60,7 @@ public abstract class QueryOrderTask extends AsyncTask<Void, Void, Order>{
 				
 				ErrorCode errCode = new Parcel(resp.body).readParcel(ErrorCode.CREATOR);
 				
-				if(errCode.equals(ProtocolError.ORDER_NOT_EXIST)){
+				if(errCode.equals(FrontBusinessError.ORDER_NOT_EXIST)){
 					mBusinessException = new BusinessException(mTblAlias + "号台还未下单", errCode);
 					
 				}else if(errCode.equals(ProtocolError.TABLE_IDLE)) {

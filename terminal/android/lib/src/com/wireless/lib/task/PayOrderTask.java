@@ -6,7 +6,6 @@ import android.os.AsyncTask;
 
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.ErrorCode;
-import com.wireless.exception.ProtocolError;
 import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
 import com.wireless.pack.req.ReqPayOrder;
@@ -38,21 +37,7 @@ public abstract class PayOrderTask extends AsyncTask<Void, Void, Void>{
 		try {
 			resp = ServerConnector.instance().ask(new ReqPayOrder(mStaff, mPayBuilder));
 			if (resp.header.type == Type.NAK) {
-
-				ErrorCode errCode = new Parcel(resp.body).readParcel(ErrorCode.CREATOR);
-						
-				if (errCode.equals(ProtocolError.ORDER_NOT_EXIST)) {
-					mBusinessException = new BusinessException("账单不存在", errCode);
-					
-				}else if (errCode.equals(ProtocolError.TABLE_NOT_EXIST)) {
-					mBusinessException = new BusinessException("餐台已被删除", errCode);
-					
-				} else if (errCode.equals(ProtocolError.TABLE_IDLE)) {
-					mBusinessException = new BusinessException("账单已结帐或删除，请与餐厅负责人确认。", errCode);
-					
-				} else {
-					mBusinessException = new BusinessException(errCode);
-				}
+				mBusinessException = new BusinessException(new Parcel(resp.body).readParcel(ErrorCode.CREATOR));
 			}
 
 		} catch (IOException e) {

@@ -16,9 +16,9 @@ import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.sccon.ServerConnector;
 
-public class QueryTableTask extends AsyncTask<Void, Void, List<Table>>{
+public abstract class QueryTableTask extends AsyncTask<Void, Void, List<Table>>{
 
-	protected BusinessException mBusinessException;
+	private BusinessException mBusinessException;
 	
 	private final Staff mStaff;
 	
@@ -47,4 +47,16 @@ public class QueryTableTask extends AsyncTask<Void, Void, List<Table>>{
 		return Collections.unmodifiableList(tables);
 	}
 
+	@Override
+	protected final void onPostExecute(List<Table> tables){
+		if(mBusinessException != null){
+			onFail(mBusinessException);
+		}else{
+			onSuccess(tables);
+		}
+	}
+	
+	protected abstract void onSuccess(List<Table> tables);
+	
+	protected abstract void onFail(BusinessException e);
 }

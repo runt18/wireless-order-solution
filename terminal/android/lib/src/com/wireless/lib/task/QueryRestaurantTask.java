@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import android.os.AsyncTask;
 
+import com.wireless.exception.BusinessException;
 import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
 import com.wireless.pack.req.ReqQueryRestaurant;
@@ -12,9 +13,9 @@ import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.sccon.ServerConnector;
 
-public class QueryRestaurantTask extends AsyncTask<Void, Void, Restaurant>{
+public abstract class QueryRestaurantTask extends AsyncTask<Void, Void, Restaurant>{
 	
-	protected String mErrMsg;
+	private BusinessException mBusinessException;
 	
 	private final Staff mStaff;
 	
@@ -36,11 +37,22 @@ public class QueryRestaurantTask extends AsyncTask<Void, Void, Restaurant>{
 				restaurant = new Parcel(resp.body).readParcel(Restaurant.CREATOR);
 			}
 		}catch(IOException e){
-			mErrMsg = e.getMessage();
+			mBusinessException = new BusinessException(e.getMessage());
 		}
 		
 		return restaurant;
 	}
 
-
+	@Override
+	protected final void onPostExecute(Restaurant restuarant){
+		if(mBusinessException != null){
+			onFail(mBusinessException);
+		}else{
+			onSuccess(restuarant);
+		}
+	}
+	
+	protected abstract void onSuccess(Restaurant restaurant);
+	
+	protected abstract void onFail(BusinessException e);
 }

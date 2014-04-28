@@ -6,7 +6,6 @@ import android.os.AsyncTask;
 
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.ErrorCode;
-import com.wireless.exception.ProtocolError;
 import com.wireless.pack.ProtocolPackage;
 import com.wireless.pack.Type;
 import com.wireless.pack.req.ReqInsertOrder;
@@ -47,33 +46,13 @@ public abstract class CommitOrderTask extends AsyncTask<Void, Void, Void>{
 	@Override
 	protected Void doInBackground(Void... args) {
 		
-		String errMsg = null;
-		ErrorCode errCode = null;
 		try{
 			ProtocolPackage resp = ServerConnector.instance().ask(new ReqInsertOrder(mStaff, mReqOrder, mType, mPrintOption));
 			if(resp.header.type == Type.NAK){
-				
-				errCode = new Parcel(resp.body).readParcel(ErrorCode.CREATOR);
-				
-				if(errCode.equals(ProtocolError.ORDER_EXPIRED)){
-					errMsg = "账单已更新，请重新刷新数据或退出。";
-					
-				}else if(errCode.equals(ProtocolError.ORDER_NOT_EXIST)){			
-					errMsg = mReqOrder.getDestTbl().getAliasId() + "号台的账单信息不存在，请与餐厅负责人确认。";
-					
-				}else if(errCode.equals(ProtocolError.TABLE_BUSY)){
-					errMsg = mReqOrder.getDestTbl().getAliasId() + "号台是就餐状态，不能转台。";
-					
-				}else{
-					errMsg = errCode.getDesc();
-				}
+				mBusinessException = new BusinessException(new Parcel(resp.body).readParcel(ErrorCode.CREATOR));
 			}
 		}catch(IOException e){
-			errMsg = e.getMessage();
-		}
-		
-		if(errMsg != null){
-			mBusinessException = new BusinessException(errMsg, errCode);
+			mBusinessException = new BusinessException(e.getMessage());
 		}
 		
 		return null;

@@ -8,6 +8,7 @@ import java.util.List;
 import android.content.Context;
 import android.os.AsyncTask;
 
+import com.wireless.exception.BusinessException;
 import com.wireless.exception.DeviceError;
 import com.wireless.exception.ErrorCode;
 import com.wireless.exception.RestaurantError;
@@ -20,9 +21,9 @@ import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.sccon.ServerConnector;
 import com.wireless.util.DeviceUtil;
 
-public class QueryStaffTask extends AsyncTask<Void, Void, List<Staff>>{
+public abstract class QueryStaffTask extends AsyncTask<Void, Void, List<Staff>>{
 
-	protected String mErrMsg;
+	private BusinessException mBusinessException;
 	
 	private final Context mContext;
 	
@@ -50,27 +51,40 @@ public class QueryStaffTask extends AsyncTask<Void, Void, List<Staff>>{
 					ErrorCode errCode = new Parcel(resp.body).readParcel(ErrorCode.CREATOR);
 					
 					if(errCode.equals(DeviceError.DEVICE_NOT_EXIST)) {
-						mErrMsg = "终端没有登记到餐厅，请联系管理人员。";
+						mBusinessException = new BusinessException("终端没有登记到餐厅，请联系管理人员");
 						
 					}else if(errCode.equals(RestaurantError.RESTAURANT_EXPIRED)) {
-						mErrMsg = "终端已过期，请联系管理人员。";
+						mBusinessException = new BusinessException("终端已过期，请联系管理人员");
 						
 					}else{
-						mErrMsg = "更新员工信息失败，请检查网络信号或重新连接。";
+						mBusinessException = new BusinessException("更新员工信息失败，请检查网络信号或重新连接");
 					}
-					throw new IOException(mErrMsg);
 				}
 				
 			}else{
-				throw new IOException("无法获取设备ID");
+				mBusinessException = new BusinessException("无法获取设备ID");
 			}
+			
 		}catch(IOException e){
-			mErrMsg = e.getMessage();
+			mBusinessException = new BusinessException(e.getMessage());
 			
 		}catch(SecurityException e){
-			mErrMsg = e.getMessage();
+			mBusinessException = new BusinessException(e.getMessage());
 		}
 		
 		return Collections.unmodifiableList(staffs);
 	}
+	
+	@Override
+	protected final void onPostExecute(List<Staff> staffs){
+		if(mBusinessException != null){
+			onFail(mBusinessException);
+		}else{
+			onSuccess(staffs);
+		}
+	}
+	
+	protected abstract void onSuccess(List<Staff> staffs);
+	
+	protected abstract void onFail(BusinessException e);
 }
