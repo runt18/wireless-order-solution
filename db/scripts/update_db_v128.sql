@@ -38,6 +38,23 @@ WHERE R.cate IN (1, 2, 3)
 AND PRI.pri_code = 8000;
 
 -- -----------------------------------------------------
+-- Insert the '暂结' privilege whose code is 7000
+-- -----------------------------------------------------
+INSERT INTO wireless_order_db.privilege
+(pri_code, cate) VALUES (1007, 1);
+
+-- -----------------------------------------------------
+-- Assign the '暂结' privilege to role which has '结账' privilege before
+-- -----------------------------------------------------
+SELECT @payment_privilege_id := pri_id FROM wireless_order_db.privilege WHERE pri_code = 1007;
+
+INSERT INTO wireless_order_db.role_privilege
+(role_id, pri_id, restaurant_id)
+SELECT role_id, @payment_privilege_id, restaurant_id
+FROM wireless_order_db.role_privilege  
+WHERE pri_id = 6;
+
+-- -----------------------------------------------------
 -- Table `wireless_order_db`.`module`
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `wireless_order_db`.`module` ;
