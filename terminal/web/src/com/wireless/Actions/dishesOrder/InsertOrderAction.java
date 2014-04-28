@@ -118,7 +118,8 @@ public class InsertOrderAction extends Action{
 				}
 				
 			}else if(resp.header.type == Type.NAK){
-				jobject.initTip(false, new Parcel(resp.body).readParcel(ErrorCode.CREATOR).getDesc());
+				ErrorCode errCode = new Parcel(resp.body).readParcel(ErrorCode.CREATOR);
+				jobject.initTip(false, errCode.getCode(), errCode.getDesc());
 			}else{
 				jobject.initTip(false, (orderToInsert.getDestTbl().getAliasId() + "号餐台" + orderType + "不成功，请重新确认."));
 			}
