@@ -805,34 +805,31 @@ public class TableActivity extends FragmentActivity implements OnTableSelectedLi
 		}
 
 
-		/**
-		 * 根据返回的error message判断，如果发错异常则提示用户， 如果成功，则执行请求餐厅的操作。
-		 */
 		@Override
-		protected void onPostExecute(List<Table> tables) {
+		protected void onSuccess(List<Table> tables){
 			
 			mProgDialog.dismiss();
 			
-			/**
-			 * Prompt user message if any error occurred.
-			 */
-			if(mBusinessException != null) {
-				mListView.onRefreshComplete();
-				Toast.makeText(getApplicationContext(), "刷新餐台数据失败,请检查网络", Toast.LENGTH_SHORT).show();
-
-			} else {
-				
-				WirelessOrder.tables = tables;
-				
-				mListView.onRefreshComplete();				
-				mRegionHandler.sendEmptyMessage(0);
-				mDataHandler.sendEmptyMessage(0);
-				mListView.setVisibility(View.VISIBLE);
-				((TextView)findViewById(R.id.hint_text_table)).setVisibility(View.INVISIBLE);
-				((AutoCompleteTextView)findViewById(R.id.txtView_srch_table)).setText("");
-				Toast.makeText(getApplicationContext(), "餐台信息刷新成功",	Toast.LENGTH_SHORT).show();
-			} 
+			WirelessOrder.tables = tables;
+			
+			mListView.onRefreshComplete();				
+			mRegionHandler.sendEmptyMessage(0);
+			mDataHandler.sendEmptyMessage(0);
+			mListView.setVisibility(View.VISIBLE);
+			((TextView)findViewById(R.id.hint_text_table)).setVisibility(View.INVISIBLE);
+			((AutoCompleteTextView)findViewById(R.id.txtView_srch_table)).setText("");
+			Toast.makeText(getApplicationContext(), "餐台信息刷新成功",	Toast.LENGTH_SHORT).show();
 		}
+		
+		@Override
+		protected void onFail(BusinessException e){
+			mProgDialog.dismiss();
+
+			mListView.onRefreshComplete();
+			Toast.makeText(getApplicationContext(), "刷新餐台数据失败,请检查网络", Toast.LENGTH_SHORT).show();
+
+		}
+		
 	}
 	/**
 	 * 请求获得餐台的状态

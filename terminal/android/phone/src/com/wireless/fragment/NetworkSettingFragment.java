@@ -61,7 +61,7 @@ public class NetworkSettingFragment extends Fragment {
 		_portEdtTxt.setText(String.valueOf(_port));
 
 		//只有管理员才可以修改网络设定
-		if(WirelessOrder.loginStaff.getRole().getCategory() != Role.Category.ADMIN){
+		if(WirelessOrder.loginStaff == null || WirelessOrder.loginStaff.getRole().getCategory() != Role.Category.ADMIN){
 			_ipEdtTxt.setEnabled(false);
 			_portEdtTxt.setEnabled(false);
 		}

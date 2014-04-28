@@ -44,6 +44,7 @@ import com.wireless.common.Params;
 import com.wireless.common.WirelessOrder;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.menuMgr.FoodMenu;
+import com.wireless.pojo.regionMgr.Region;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.staffMgr.Staff;
@@ -405,36 +406,115 @@ public class MainActivity extends FragmentActivity implements OnTableSelectedLis
 		protected void onPreExecute(){
 			_progDialog = ProgressDialog.show(MainActivity.this, "", "更新餐厅信息...请稍候", true);
 		}
-		
 	
-		/**
-		 * 根据返回的error message判断，如果发错异常则提示用户，
-		 * 如果成功，则通知Handler更新界面的相关控件。
-		 */
 		@Override
-		protected void onPostExecute(Restaurant restaurant){
+		protected void onSuccess(Restaurant restaurant){
 			//make the progress dialog disappeared
 			_progDialog.dismiss();
+			
+			WirelessOrder.restaurant = restaurant;
 			//notify the main activity to update the food menu
 			_handler.sendEmptyMessage(REDRAW_RESTAURANT);
-			/**
-			 * Prompt user message if any error occurred.
-			 */
-			if(mErrMsg != null){
-				new AlertDialog.Builder(MainActivity.this)
-				.setTitle("提示")
-				.setMessage(mErrMsg)
-				.setPositiveButton("确定", new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int id) {
-						dialog.dismiss();
-					}
-				}).show();
-			}else{
-				
-				WirelessOrder.restaurant = restaurant;
-				Toast.makeText(MainActivity.this, "餐厅信息更新成功", Toast.LENGTH_SHORT).show();
-			}
-		}	
+
+			new QueryRegionTask().execute();
+		}
+		
+		@Override
+		protected void onFail(BusinessException e){
+			//make the progress dialog disappeared
+			_progDialog.dismiss();
+			
+			new AlertDialog.Builder(MainActivity.this)
+			.setTitle("提示")
+			.setMessage(e.getMessage())
+			.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int id) {
+					dialog.dismiss();
+				}
+			}).show();
+		}
+	
+	}
+	
+	/**
+	 * 请求查询区域信息
+	 */
+	private class QueryRegionTask extends com.wireless.lib.task.QueryRegionTask{
+		
+		private ProgressDialog _progDialog;
+		
+		QueryRegionTask(){
+			super(WirelessOrder.loginStaff);
+		}
+		/**
+		 * 在执行请求餐厅请求信息前显示提示信息
+		 */
+		@Override
+		protected void onPreExecute(){
+			_progDialog = ProgressDialog.show(MainActivity.this, "", "更新区域信息...请稍候", true);
+		}
+	
+		@Override
+		protected void onSuccess(List<Region> regions){
+			_progDialog.dismiss();
+			WirelessOrder.regions = regions;
+			
+			new QueryTableTask().execute();
+		}
+		
+		@Override
+		protected void onFail(BusinessException e){
+			_progDialog.dismiss();
+			
+			new AlertDialog.Builder(MainActivity.this)
+			.setTitle("提示")
+			.setMessage(e.getMessage())
+			.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int id) {
+					dialog.dismiss();
+				}
+			}).show();
+		}
+	}
+	
+	/**
+	 * 请求餐台信息
+	 */
+	private class QueryTableTask extends com.wireless.lib.task.QueryTableTask{
+		
+		private ProgressDialog _progDialog;
+		
+		/**
+		 * 在执行请求区域信息前显示提示信息
+		 */
+		@Override
+		protected void onPreExecute(){
+			_progDialog = ProgressDialog.show(MainActivity.this, "", "更新餐台信息...请稍候", true);
+		}
+		
+		QueryTableTask(){
+			super(WirelessOrder.loginStaff);
+		}
+		
+		@Override
+		protected void onSuccess(List<Table> tables){
+			_progDialog.dismiss();
+			WirelessOrder.tables = tables;
+			Toast.makeText(MainActivity.this, "菜谱信息更新成功", Toast.LENGTH_SHORT).show();
+		}
+		
+		@Override
+		protected void onFail(BusinessException e){
+			_progDialog.dismiss();
+			new AlertDialog.Builder(MainActivity.this)
+			.setTitle("提示")
+			.setMessage(e.getMessage())
+			.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int id) {
+					dialog.dismiss();
+				}
+			}).show();
+		}
 	}
 	
 	/**
@@ -459,49 +539,43 @@ public class MainActivity extends FragmentActivity implements OnTableSelectedLis
 			_progDialog = ProgressDialog.show(MainActivity.this, "", "正在更新员工信息...请稍后", true);
 		}
 		
-		/**
-		 * 根据返回的error message判断，如果发错异常则提示用户，
-		 * 如果员工信息请求成功，则显示登录Dialog。
-		 */
 		@Override
-		protected void onPostExecute(List<Staff> staffs){
-			//make the progress dialog disappeared
-			_progDialog.dismiss();		
-			_handler.sendEmptyMessage(REDRAW_STAFF_LOGIN);
+		protected void onSuccess(List<Staff> staffs){
+			_progDialog.dismiss();
 			
-			WirelessOrder.staffs = staffs;
-
-			/**
-			 * Prompt user message if any error occurred,
-			 * otherwise show the login dialog
-			 */
-			if(mErrMsg != null){
+			_handler.sendEmptyMessage(REDRAW_STAFF_LOGIN);
+			WirelessOrder.staffs.clear();
+			WirelessOrder.staffs.addAll(staffs);
+			
+			if(WirelessOrder.staffs.isEmpty()){
 				new AlertDialog.Builder(MainActivity.this)
-						.setTitle("提示")
-						.setMessage(mErrMsg)
-						.setPositiveButton("确定", null)
-						.show();
+							   .setTitle("提示")
+				               .setMessage("没有查询到任何的员工信息，请在管理后台先添加员工信息")
+				               .setPositiveButton("确定", null)
+				               .show();
 				
 			}else{
-				
-				if(WirelessOrder.staffs.isEmpty()){
-					new AlertDialog.Builder(MainActivity.this)
-								   .setTitle("提示")
-					               .setMessage("没有查询到任何的员工信息，请在管理后台先添加员工信息")
-					               .setPositiveButton("确定", null)
-					               .show();
-					
-				}else{
-					Editor editor = getSharedPreferences(Params.PREFS_NAME, Context.MODE_PRIVATE).edit();//获取编辑器
-					editor.putLong(Params.STAFF_LOGIN_ID, Params.DEF_STAFF_LOGIN_ID);
-					editor.commit();
-					showDialog(DIALOG_STAFF_LOGIN);
-					if(_isMenuUpdate){
-						new QueryMenuTask().execute();
-					}
+				Editor editor = getSharedPreferences(Params.PREFS_NAME, Context.MODE_PRIVATE).edit();//获取编辑器
+				editor.putLong(Params.STAFF_LOGIN_ID, Params.DEF_STAFF_LOGIN_ID);
+				editor.commit();
+				showDialog(DIALOG_STAFF_LOGIN);
+				if(_isMenuUpdate){
+					new QueryMenuTask().execute();
 				}
 			}
-		}	
+		}
+		
+		@Override
+		protected void onFail(BusinessException e){
+			_progDialog.dismiss();		
+
+			new AlertDialog.Builder(MainActivity.this)
+			.setTitle("提示")
+			.setMessage(e.getMessage())
+			.setPositiveButton("确定", null)
+			.show();
+		}
+		
 	}
 	
 	//登录框Dialog

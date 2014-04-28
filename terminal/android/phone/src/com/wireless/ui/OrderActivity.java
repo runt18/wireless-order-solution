@@ -18,6 +18,7 @@ import android.widget.Toast;
 
 import com.wireless.common.WirelessOrder;
 import com.wireless.exception.BusinessException;
+import com.wireless.exception.FrontBusinessError;
 import com.wireless.fragment.OrderFoodFragment;
 import com.wireless.fragment.OrderFoodFragment.OnOrderChangedListener;
 import com.wireless.pack.Type;
@@ -67,48 +68,7 @@ public class OrderActivity extends FragmentActivity implements OnOrderChangedLis
 		commitBtn.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				OrderFoodFragment ofFgm = (OrderFoodFragment)getSupportFragmentManager().findFragmentByTag(OrderFoodFragment.TAG);
-				//下单逻辑
-				String tableIdString = tblNoEditTxt.getText().toString();
-				
-				//如果餐台非空则继续，否则提示
-				if(tableIdString.trim().length() != 0){
-						
-					int tableAlias = Integer.parseInt(tableIdString);
-					
-					int customNum;
-					String custNumString = ((EditText)findViewById(R.id.editText_orderActivity_customerNum)).getText().toString();
-					//如果人数为空，则默认为1
-					if(custNumString.length() != 0){
-						customNum = Integer.parseInt(custNumString);
-					}else{
-						customNum = 1;
-					}
-					
-					Order reqOrder = ofFgm.buildRequestOrder(tableAlias, customNum);
-					
-					boolean hasOrderFood = false;
-					for(OrderFood of : reqOrder.getOrderFoods()){
-						if(of.getCount() > 0){
-							hasOrderFood = true;
-							break;
-						}
-					}
-					
-					if(hasOrderFood){
-						if(reqOrder.getId() != 0){
-							//改单
-							new CommitOrderTask(reqOrder, Type.UPDATE_ORDER).execute();
-						}else{
-							//下单
-							new CommitOrderTask(reqOrder, Type.INSERT_ORDER).execute();
-						}
-					}else{
-						Toast.makeText(OrderActivity.this, "您还未点菜，不能下单", Toast.LENGTH_SHORT).show();
-					}
-				} else {
-					Toast.makeText(OrderActivity.this, "请输入正确的餐台号", Toast.LENGTH_SHORT).show();
-				}
+				commit(false);
 			}
 		});
 		
@@ -120,6 +80,48 @@ public class OrderActivity extends FragmentActivity implements OnOrderChangedLis
 		
 	}
 
+	private void commit(boolean forceInsert){
+		OrderFoodFragment ofFgm = (OrderFoodFragment)getSupportFragmentManager().findFragmentByTag(OrderFoodFragment.TAG);
+		//下单逻辑
+		String tableIdString = ((EditText)findViewById(R.id.editText_orderActivity_tableNum)).getText().toString();
+		
+		//如果餐台非空则继续，否则提示
+		if(tableIdString.trim().length() != 0){
+				
+			int tableAlias = Integer.parseInt(tableIdString);
+			
+			int customNum;
+			String custNumString = ((EditText)findViewById(R.id.editText_orderActivity_customerNum)).getText().toString();
+			//如果人数为空，则默认为1
+			if(custNumString.length() != 0){
+				customNum = Integer.parseInt(custNumString);
+			}else{
+				customNum = 1;
+			}
+			
+			if(ofFgm.hasOrderFood()){
+				if(forceInsert){
+					//强制下单
+					new CommitOrderTask(ofFgm.buildNewOrder(tableAlias, customNum), Type.INSERT_ORDER_FORCE).execute();
+				}else{
+					Order reqOrder = ofFgm.buildRequestOrder(tableAlias, customNum);
+					if(reqOrder.getId() != 0){
+						//改单
+						new CommitOrderTask(reqOrder, Type.UPDATE_ORDER).execute();
+					}else{
+						//下单
+						new CommitOrderTask(reqOrder, Type.INSERT_ORDER).execute();
+					}
+				}
+			}else{
+				Toast.makeText(OrderActivity.this, "您还未点菜，不能下单", Toast.LENGTH_SHORT).show();
+			}
+			
+		} else {
+			Toast.makeText(OrderActivity.this, "请输入正确的餐台号", Toast.LENGTH_SHORT).show();
+		}
+	}
+	
 	@Override
 	public void onBackPressed() {
 		if(((OrderFoodFragment)getSupportFragmentManager().findFragmentByTag(OrderFoodFragment.TAG)).hasNewOrderFood()){			
@@ -170,12 +172,32 @@ public class OrderActivity extends FragmentActivity implements OnOrderChangedLis
 		protected void onFail(BusinessException e, Order reqOrder){
 			mProgressDialog.dismiss();	
 			
-			//如果返回是账单过期的错误状态，表示账单已有更新
-			//则提示用户重新请求账单，再次确认提交
-			new AlertDialog.Builder(OrderActivity.this)
+			if(e.getErrCode().equals(FrontBusinessError.ORDER_EXPIRED)){
+				//如果返回是账单过期的错误状态，表示账单已有更新
+				//则提示用户重新请求账单，再次确认提交
+				new AlertDialog.Builder(OrderActivity.this)
+					.setTitle("提示")
+					.setMessage(e.getMessage())
+					.setPositiveButton("继续提交", 
+						new DialogInterface.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog,	int which){
+								commit(true);
+							}
+						})
+					.setNeutralButton("刷新账单",
+						new DialogInterface.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog,	int which){
+								((OrderFoodFragment)getSupportFragmentManager().findFragmentByTag(OrderFoodFragment.TAG)).refresh();
+							}
+						})
+					.show();
+			}else{
+				new AlertDialog.Builder(OrderActivity.this)
 				.setTitle("提示")
-				.setMessage(reqOrder.getDestTbl().getAliasId() + "号餐台的账单信息已经更新，已点菜信息将刷新，新点菜信息将会保留")
-				.setNeutralButton("确定",
+				.setMessage(e.getMessage())
+				.setNeutralButton("刷新账单",
 					new DialogInterface.OnClickListener() {
 						@Override
 						public void onClick(DialogInterface dialog,	int which){
@@ -183,6 +205,7 @@ public class OrderActivity extends FragmentActivity implements OnOrderChangedLis
 						}
 					})
 				.show();
+			}
 		}
 		
 	}

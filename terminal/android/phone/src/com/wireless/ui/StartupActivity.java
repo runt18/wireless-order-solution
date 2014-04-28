@@ -143,55 +143,46 @@ public class StartupActivity extends Activity {
 			super(StartupActivity.this);
 		}
 		
-		/**
-		 * 根据返回的error message判断，如果发错异常则提示用户， 如果员工信息请求成功，则继续进行请求菜谱信息的操作。
-		 */
 		@Override
-		protected void onPostExecute(List<Staff> staffs) {
-			
-			WirelessOrder.staffs = staffs;
-			
-			/**
-			 * Prompt user message if any error occurred, otherwise continue to
-			 * query restaurant info.
-			 */
-			if (mErrMsg != null) {
-				new AlertDialog.Builder(
-						StartupActivity.this)
-						.setTitle("提示")
-						.setMessage(mErrMsg)
-						.setPositiveButton(
-								"确定",
-								new DialogInterface.OnClickListener() {
-									public void onClick(DialogInterface dialog,	int id) {
-										Intent intent = new Intent(StartupActivity.this, MainActivity.class);
-										startActivity(intent);
-										finish();
-									}
-								}).show();
-
+		protected void onSuccess(List<Staff> staffs){
+			WirelessOrder.staffs.clear();
+			WirelessOrder.staffs.addAll(staffs);
+			if (WirelessOrder.staffs.isEmpty()) {
+				new AlertDialog.Builder(StartupActivity.this)
+					.setTitle("提示")
+					.setMessage("没有查询到任何的员工信息，请先在管理后台添加员工信息")
+					.setPositiveButton("确定",
+						new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog,	int id) {
+								Intent intent = new Intent(StartupActivity.this, MainActivity.class);
+								startActivity(intent);
+								finish();
+							}})
+					.show();
 			} else {
 				
-				
-				if (WirelessOrder.staffs.isEmpty()) {
-					new AlertDialog.Builder(StartupActivity.this)
-						.setTitle("提示")
-						.setMessage("没有查询到任何的员工信息，请先在管理后台添加员工信息")
-						.setPositiveButton("确定",
+				WirelessOrder.loginStaff = staffs.get(0);
+				new QueryMenuTask().execute();
+			}
+		}
+		
+		@Override
+		protected void onFail(BusinessException e){
+			new AlertDialog.Builder(
+					StartupActivity.this)
+					.setTitle("提示")
+					.setMessage(e.getMessage())
+					.setPositiveButton("确定",
 							new DialogInterface.OnClickListener() {
 								public void onClick(DialogInterface dialog,	int id) {
 									Intent intent = new Intent(StartupActivity.this, MainActivity.class);
 									startActivity(intent);
 									finish();
-								}})
-						.show();
-				} else {
-					
-					WirelessOrder.loginStaff = staffs.get(0);
-					new QueryMenuTask().execute();
-				}
-			}
+								}
+							})
+					.show();
 		}
+		
 	}
 
 	/**
@@ -292,34 +283,27 @@ public class StartupActivity extends Activity {
 			super(WirelessOrder.loginStaff);
 		}
 		
-		/**
-		 * 根据返回的error message判断，如果发错异常则提示用户，
-		 * 如果成功，则执行请求餐厅的操作。
-		 */
 		@Override
-		protected void onPostExecute(List<Table> tables){
-			/**
-			 * Prompt user message if any error occurred.
-			 */		
-			if(mBusinessException != null){
-				new AlertDialog.Builder(StartupActivity.this)
-				.setTitle("提示")
-				.setMessage(mBusinessException.getMessage())
-				.setPositiveButton("确定", new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int id) {
-						Intent intent = new Intent(StartupActivity.this, MainActivity.class);
-						startActivity(intent);
-						finish();
-					}
-				}).show();
-				
-			}else{				
-				
-				WirelessOrder.tables = tables;
-				
-				new QueryRestaurantTask().execute();
-			}
+		protected void onSuccess(List<Table> tables){
+			WirelessOrder.tables = tables;
+			
+			new QueryRestaurantTask().execute();
 		}
+		
+		@Override
+		protected void onFail(BusinessException e){
+			new AlertDialog.Builder(StartupActivity.this)
+			.setTitle("提示")
+			.setMessage(e.getMessage())
+			.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int id) {
+					Intent intent = new Intent(StartupActivity.this, MainActivity.class);
+					startActivity(intent);
+					finish();
+				}
+			}).show();
+		}
+		
 	}
 
 	/**
@@ -339,34 +323,27 @@ public class StartupActivity extends Activity {
 			super(WirelessOrder.loginStaff);
 		}
 		
-		/**
-		 * 根据返回的error message判断，如果发错异常则提示用户， 如果成功，则跳转到主界面。
-		 */
 		@Override
-		protected void onPostExecute(Restaurant restaurant) {
-			/**
-			 * Prompt user message if any error occurred.
-			 */
-			if (mErrMsg != null) {
-				new AlertDialog.Builder(StartupActivity.this)
-					.setTitle("提示")
-					.setMessage(mErrMsg)
-					.setPositiveButton("确定", new DialogInterface.OnClickListener() {
-						public void onClick(DialogInterface dialog,	int id) {
-							finish();
-						}
-					})
-					.show();
-
-			} else {
-				
-				WirelessOrder.restaurant = restaurant;
-				
-				Intent intent = new Intent(StartupActivity.this, MainActivity.class);
-				startActivity(intent);
-				overridePendingTransition(R.anim.enter,	android.R.anim.fade_out);
-				finish();
-			}
+		protected void onSuccess(Restaurant restaurant){
+			WirelessOrder.restaurant = restaurant;
+			//Jump to main activity
+			Intent intent = new Intent(StartupActivity.this, MainActivity.class);
+			startActivity(intent);
+			overridePendingTransition(R.anim.enter,	android.R.anim.fade_out);
+			finish();
+		}
+		
+		@Override
+		protected void onFail(BusinessException e){
+			new AlertDialog.Builder(StartupActivity.this)
+			.setTitle("提示")
+			.setMessage(e.getMessage())
+			.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog,	int id) {
+					finish();
+				}
+			})
+			.show();
 		}
 	}
 

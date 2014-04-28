@@ -34,7 +34,6 @@ import android.widget.Toast;
 
 import com.wireless.common.WirelessOrder;
 import com.wireless.exception.BusinessException;
-import com.wireless.exception.ProtocolError;
 import com.wireless.pack.Type;
 import com.wireless.parcel.OrderParcel;
 import com.wireless.pojo.dishesOrder.Order;
@@ -59,8 +58,6 @@ public class QuickPickCommitDialog extends DialogFragment{
 	private boolean mIsPayOrder = false;
 	
 	private boolean mIsTempPay = false;
-	
-	private Order mOrderToCommit;
 	
 	private Order mReqOrder;
 	
@@ -183,23 +180,24 @@ public class QuickPickCommitDialog extends DialogFragment{
 			public void onClick(View v) {
 				mIsPayOrder = false;
 				try{
-					short tableAlias = Short.parseShort(tableText.getText().toString());
-					new QueryAndCommitOrderTask(tableAlias, PrintOption.DO_NOT_PRINT).execute();
+//					short tableAlias = Short.parseShort(tableText.getText().toString());
+//					new QueryAndCommitOrderTask(tableAlias, PrintOption.DO_NOT_PRINT).execute();
+					new InsertOrderForceTask(Short.parseShort(tableText.getText().toString()), PrintOption.DO_NOT_PRINT).execute();
+
 				}catch(NumberFormatException e){
 					Toast.makeText(getActivity(), "你输入的台号不正确，请重新输入", Toast.LENGTH_SHORT).show();
 				}
 			}
 		});
        	
-       	//暂账按钮  
+       	//暂结按钮  
        	((Button)view.findViewById(R.id.button_commitDialog_payTempBill)).setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				mIsPayOrder = true;
 				mIsTempPay = true;
 				try{
-					short tableAlias = Short.parseShort(tableText.getText().toString());
-					new QueryAndCommitOrderTask(tableAlias).execute();
+					new InsertOrderForceTask(Short.parseShort(tableText.getText().toString())).execute();
 				}catch(NumberFormatException e){
 					Toast.makeText(getActivity(), "你输入的台号不正确，请重新输入", Toast.LENGTH_SHORT).show();
 				}
@@ -213,8 +211,7 @@ public class QuickPickCommitDialog extends DialogFragment{
 				mIsPayOrder = true;
 				mIsTempPay = false;
 				try{
-					short tableAlias = Short.parseShort(tableText.getText().toString());
-					new QueryAndCommitOrderTask(tableAlias).execute();
+					new InsertOrderForceTask(Short.parseShort(tableText.getText().toString())).execute();
 				}catch(NumberFormatException e){
 					Toast.makeText(getActivity(), "你输入的台号不正确，请重新输入", Toast.LENGTH_SHORT).show();
 				}
@@ -238,7 +235,7 @@ public class QuickPickCommitDialog extends DialogFragment{
 					mIsTempPay = false;
 					try{
 						short tableAlias = Short.parseShort(tableText.getText().toString());
-						new QueryAndCommitOrderTask(tableAlias).execute();
+						new InsertOrderForceTask(tableAlias).execute();
 					}catch(NumberFormatException e){
 						Toast.makeText(getActivity(), "你输入的台号不正确，请重新输入", Toast.LENGTH_SHORT).show();
 					}
@@ -324,80 +321,19 @@ public class QuickPickCommitDialog extends DialogFragment{
 	}
 	
 	/**
-	 * 执行请求对应餐台的账单信息 
-	 */
-	private class QueryAndCommitOrderTask extends com.wireless.lib.task.QueryOrderTask{
-
-		private ProgressDialog mProgDialog;
-	
-		private final PrintOption mPrintOption;
-		
-		
-		QueryAndCommitOrderTask(int tableAlias){
-			super(WirelessOrder.loginStaff, tableAlias, WirelessOrder.foodMenu);
-			this.mPrintOption = PrintOption.DO_PRINT;
-		}
-		
-		QueryAndCommitOrderTask(int tableAlias, PrintOption printOption){
-			super(WirelessOrder.loginStaff, tableAlias, WirelessOrder.foodMenu);
-			this.mPrintOption = printOption;
-		}
-		
-		/**
-		 * 在执行请求删单操作前显示提示信息
-		 */
-		@Override
-		protected void onPreExecute(){
-			mProgDialog = ProgressDialog.show(getActivity(), "", "查询" + mTblAlias + "号餐台的信息...请稍候", true);
-		}
-		
-		@Override
-		public void onSuccess(Order order){
-			mProgDialog.dismiss();
-			//Merge the original order and update if the activity_table is BUSY.
-			try{
-				order.addFoods(mReqOrder.getOrderFoods(), WirelessOrder.loginStaff);
-				mOrderToCommit = order;
-				new InsertOrderTask(mOrderToCommit, Type.UPDATE_ORDER, mPrintOption).execute();
-			}catch(BusinessException e){
-				Toast.makeText(QuickPickCommitDialog.this.getActivity(), e.getMessage(), Toast.LENGTH_SHORT).show();
-			}
-		}
-		
-		@Override
-		public void onFail(BusinessException e){
-			mProgDialog.dismiss();
-			if(mBusinessException.getErrCode().equals(ProtocolError.ORDER_NOT_EXIST)){				
-				
-				//Perform to insert a new order in case of the activity_table is IDLE.
-				mOrderToCommit = mReqOrder;
-				mOrderToCommit.setDestTbl(new Table(mTblAlias));
-				new InsertOrderTask(mOrderToCommit, Type.INSERT_ORDER, mPrintOption).execute();						
-				
-			}else{
-				new AlertDialog.Builder(getActivity())
-				.setTitle("提示")
-				.setMessage(mBusinessException.getMessage())
-				.setPositiveButton("确定", new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int id) {
-						dialog.dismiss();
-					}
-				})
-				.show();
-			}
-		}
-		
-	}
-	
-	/**
 	 * 执行下单的请求操作
 	 */
-	private class InsertOrderTask extends com.wireless.lib.task.CommitOrderTask{
+	private class InsertOrderForceTask extends com.wireless.lib.task.CommitOrderTask{
 
 		private ProgressDialog mProgDialog;
 		
-		public InsertOrderTask(Order reqOrder, byte type, PrintOption printOption) {
-			super(WirelessOrder.loginStaff, reqOrder, type, printOption);
+		InsertOrderForceTask(int tableAlias, PrintOption printOption) {
+			super(WirelessOrder.loginStaff, mReqOrder, Type.INSERT_ORDER_FORCE, printOption);
+			mReqOrder.setDestTbl(new Table(tableAlias));
+		}
+		
+		InsertOrderForceTask(int tableAlias) {
+			this(tableAlias, PrintOption.DO_PRINT);
 		}
 		
 		/**
@@ -414,7 +350,7 @@ public class QuickPickCommitDialog extends DialogFragment{
 			//Perform to pay order in case the flag is true,
 			//otherwise back to the main activity and show the message
 			if(mIsPayOrder){
-				new QueryOrderTask2(mOrderToCommit.getDestTbl().getAliasId()).execute();
+				new QueryAndPayOrderTask(mReqOrder.getDestTbl().getAliasId()).execute();
 				
 			}else{
 				dismiss();
@@ -442,9 +378,9 @@ public class QuickPickCommitDialog extends DialogFragment{
 		
 	}	
 	
-	private class QueryOrderTask2 extends com.wireless.lib.task.QueryOrderTask{
+	private class QueryAndPayOrderTask extends com.wireless.lib.task.QueryOrderTask{
 		
-		public QueryOrderTask2(int tableAlias) {
+		public QueryAndPayOrderTask(int tableAlias) {
 			super(WirelessOrder.loginStaff, tableAlias, WirelessOrder.foodMenu);
 		}
 
@@ -468,7 +404,7 @@ public class QuickPickCommitDialog extends DialogFragment{
 				.setMessage("菜品已添加，但结账请求失败，是否重试？")
 				.setPositiveButton("重试", new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int id) {
-						new QueryOrderTask2(mTblAlias).execute();
+						new QueryAndPayOrderTask(mTblAlias).execute();
 					}
 				})
 				.setNegativeButton("退出", new DialogInterface.OnClickListener() {
@@ -515,8 +451,8 @@ public class QuickPickCommitDialog extends DialogFragment{
 		protected void onFail(final PayBuilder payBuilder, BusinessException e) {
 			mProgDialog.dismiss();		
 			new AlertDialog.Builder(getActivity())
-						.setTitle(e.getMessage())
-						.setMessage("菜品已添加，但结账请求失败，是否重试？")
+						.setTitle("提示")
+						.setMessage("菜品已添加，但" + (payBuilder.isTemp() ? "暂结" : "结账") + "请求失败(" + e.getMessage() + ")，是否重试？")
 						.setPositiveButton("重试", new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog, int id) {
 								new PayOrderTask(payBuilder).execute();

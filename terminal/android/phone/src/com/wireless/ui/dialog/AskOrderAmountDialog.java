@@ -224,7 +224,6 @@ public class AskOrderAmountDialog extends DialogFragment{
 							Taste thisTaste = (Taste) buttonView.getTag();
 							if(isChecked){
 								buttonView.setBackgroundColor(buttonView.getResources().getColor(R.color.orange));
-								
 								mSelectedFood.addTaste(thisTaste);
 							} else {
 								buttonView.setBackgroundColor(buttonView.getResources().getColor(R.color.green));

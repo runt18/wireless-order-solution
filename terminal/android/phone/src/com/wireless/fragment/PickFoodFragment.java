@@ -43,7 +43,6 @@ public class PickFoodFragment extends Fragment{
 	private static final int PICK_FOOD_FRAGMENT_NUMBER = 0;
 	private static final int PICK_FOOD_FRAGMENT_PINYIN = 1;
 
-	private FoodAdapter mAdapter;
 	private FoodHandler mHandler ;
 	private GridView mGridView;
 
@@ -60,8 +59,7 @@ public class PickFoodFragment extends Fragment{
 		public void handleMessage(Message msg){
 			PickFoodFragment fragment = mFragment.get();
 			//将所有菜品进行条件筛选后存入adapter
-			fragment.mAdapter = fragment.new FoodAdapter(WirelessOrder.foodMenu.foods.filter(fragment.mFilterCond));
-			fragment.mGridView.setAdapter(fragment.mAdapter);
+			fragment.mGridView.setAdapter(fragment.new FoodAdapter(WirelessOrder.foodMenu.foods.filter(fragment.mFilterCond)));
 		}
 	}
 	
@@ -207,16 +205,12 @@ public class PickFoodFragment extends Fragment{
 		
 		@Override
 		public int getCount() {
-			return mFoods.size();
+			return mFoods.size() >= 100 ? 100 : mFoods.size();
 		}
 
 		@Override
 		public Object getItem(int position) {
-			if(position < mFoods.size() && position >= 0){
-				return mFoods.get(position);
-			}else{
-				return null;
-			}
+			return mFoods.get(position);
 		}
 
 		@Override

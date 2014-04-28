@@ -33,7 +33,7 @@ import android.widget.Toast;
 
 import com.wireless.common.WirelessOrder;
 import com.wireless.exception.BusinessException;
-import com.wireless.exception.ProtocolError;
+import com.wireless.exception.FrontBusinessError;
 import com.wireless.parcel.OrderFoodParcel;
 import com.wireless.parcel.OrderParcel;
 import com.wireless.pojo.dishesOrder.Order;
@@ -181,7 +181,13 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 						}else if(lhs.getDelta() == 0 && rhs.getDelta() != 0){
 							return 1;
 						}else{
-							return lhs.compareTo(rhs);
+							if(lhs.getId() < rhs.getId()){
+								return -1;
+							}else if(lhs.getId() > rhs.getId()){
+								return 1;
+							}else{
+								return 0;
+							}
 						}
 					}
 				};
@@ -800,6 +806,26 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 		}
 	}
 	
+	public Order buildNewOrder(int tableAlias, int customNum){
+		return new Order(mNewFoodList, tableAlias, customNum);
+	}
+	
+	public boolean hasOrderFood(){
+		if(mOriOrder != null){
+			for(OrderFood of : mOriOrder.getOrderFoods()){
+				if(of.getCount() > 0){
+					return true;
+				}
+			}
+		}
+		for(OrderFood of : mNewFoodList){
+			if(of.getCount() > 0){
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	public boolean hasOriginalOrder(){
 		return mOriOrder != null;
 	}
@@ -863,7 +889,7 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 		public void onFail(BusinessException e){
 			mProgressDialog.dismiss();
 			
-			if(mBusinessException.getErrCode().equals(ProtocolError.ORDER_NOT_EXIST)){
+			if(mBusinessException.getErrCode().equals(FrontBusinessError.ORDER_NOT_EXIST)){
 				mOriOrder = null;
 				
 			}else{
