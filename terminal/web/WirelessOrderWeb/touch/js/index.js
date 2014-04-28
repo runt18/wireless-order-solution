@@ -418,8 +418,8 @@ function initStaffContent(c){
  * onload
  */
 $(function(){
-	if (getcookie("restaurant") != ""){
-		var restaurant = JSON.parse(getcookie("restaurant"));
+	if (getcookie("digie_restaurant") != ""){
+		var restaurant = JSON.parse(getcookie("digie_restaurant"));
 		ln.restaurant = restaurant;
 		restaurantID = restaurant.id;
 		$.ajax({
@@ -505,7 +505,7 @@ function restaurantLoginHandler(){
 			Util.LM.hide();
 			if(data.success){
 				if(data.root.length != 0){
-					setcookie("restaurant", JSON.stringify(data.root[0]));
+					setcookie("digie_restaurant", JSON.stringify(data.root[0]));
 					Util.dialongDisplay({
 						renderTo : 'divRestaurantLogin',
 						type : 'hide'

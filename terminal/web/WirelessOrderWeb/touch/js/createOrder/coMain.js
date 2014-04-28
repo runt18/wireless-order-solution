@@ -576,9 +576,7 @@ co.submit = function(c){
 	}
 	item = null;*/
 	
-	
-	var foods = Wireless.ux.createOrder({orderFoods: foodData, dataType : 1});
-	
+	var foods = Wireless.ux.createOrder({orderFoods: (typeof c.commitType != 'undefined'? co.newFood.slice(0) : foodData), dataType : 1});
 	Util.LM.show();
 	$.ajax({
 		url : '../InsertOrder.do',
@@ -595,6 +593,7 @@ co.submit = function(c){
 		},
 		success : function(data, status, xhr) {
 			Util.LM.hide();
+			//下单成功时才出现倒数, 否则提示是否强制提交
 			if (data.success == true) {
 				Util.msg.alert({
 					title : data.title,

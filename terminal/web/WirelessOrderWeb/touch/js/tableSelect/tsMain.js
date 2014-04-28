@@ -212,7 +212,10 @@ function renderToCreateOrder(tableNo, peopleNo){
 		inputNumVal = "1";
 		$("#txtTableNumForTS").val(inputNumVal);
 		$("#txtPeopleNumForSM").val(inputNumVal);
-		if(getTableByAlias(tableNo).statusValue == 1){
+		
+//FIXME		if(getTableByAlias(tableNo).statusValue == 1){
+//同时操作餐台时,选中状态没变化的餐桌处理
+		if(false){
 //			uo.show({
 //				table : getTableByAlias(tableNo),
 //				type : 'createOrder',

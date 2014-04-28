@@ -587,15 +587,28 @@ uo.submitUpdateOrderHandler = function(c){
 					uo.printTemp = false;
 					uo.tempPayForUO();
 				}else{
-					Util.msg.alert({
-						title : data.title,
-						msg : data.msg, 
-						time : 3,
-						fn : function(btn){
-							Util.toggleContentDisplay({type:'hide', renderTo:'divUpdateOrder'});
-							initTableData();
-						}
-					});
+					//下单成功时才出现倒数, 其他问题则等待确认
+					if(data.success){
+						Util.msg.alert({
+							title : data.title,
+							msg : data.msg, 
+							time : 3,
+							fn : function(btn){
+								Util.toggleContentDisplay({type:'hide', renderTo:'divUpdateOrder'});
+								initTableData();
+							}
+						});
+					}else{
+						Util.msg.alert({
+							title : data.title,
+							msg : data.msg, 
+							fn : function(btn){
+/*								Util.toggleContentDisplay({type:'hide', renderTo:'divUpdateOrder'});
+								initTableData();*/
+							}
+						});
+					}
+
 				}
 
 			},
