@@ -18,7 +18,7 @@ function orderGroupDisplayRefresh(_c){
 	if(gs != null){
 		for(var i = 0; i < gs.getCount(); i++){
 			if(gs.getAt(i).data.dataType == 2){
-				
+				frontNewOrderFood.push(gs.getAt(i).data);
 			}else{
 				grid.getView().getRow(i).style.backgroundColor = '#FFFF93';
 			}
@@ -740,13 +740,20 @@ function refreshOrder(res){
 				}
 			}
 		});
-	}else{
+	}else if(eval(res.code == Ext.ux.errorCode.ORDER_EXPIRED)){
 //		Ext.ux.showMsg(res);
 		Ext.MessageBox.confirm('提示', res.msg, function(btn){
 			if(btn == 'yes'){
 				submitSingleOrderHandler(res.reCommitData);
 			}
 		},this);
+	}else{
+		Ext.MessageBox.show({
+			title : res.title,
+			msg : res.msg,
+			width : 300,
+			buttons : Ext.MessageBox.OK
+		});
 	}
 };
 
@@ -756,7 +763,7 @@ function refreshOrder(res){
 function submitSingleOrderHandler(_c){
 	var orderFoods = _c.grid.order.orderFoods;
 	if(orderFoods.length > 0){
-		var foodPara = Wireless.ux.createOrder({orderFoods: orderFoods});
+		var foodPara = Wireless.ux.createOrder({orderFoods: (typeof _c.commitType != 'undefined'? frontNewOrderFood : orderFoods)});
 		
 		setButtonDisabled(true);
 		Ext.Ajax.request({
