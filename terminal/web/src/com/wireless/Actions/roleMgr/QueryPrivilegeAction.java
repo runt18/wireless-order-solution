@@ -69,7 +69,7 @@ public class QueryPrivilegeAction extends DispatchAction{
 		try{
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
-			root = PrivilegeDao.getPrivileges(staff, null, null);
+			root = PrivilegeDao.getByCond(staff, null, null);
 			if(root.size() > 0){
 				tree.append("[");
 				for (int i = 0; i < root.size(); i++) {
@@ -296,7 +296,7 @@ public class QueryPrivilegeAction extends DispatchAction{
 				rolePrivilege = role.getPrivileges();
 			}
 			//获取所有权限和不是会员类型的所有折扣
-			root = PrivilegeDao.getPrivileges(staff, null, null);
+			root = PrivilegeDao.getByCond(staff, null, null);
 			if(root.size() > 0){
 				tree.append("[");
 				for (int i = 0; i < root.size(); i++) {
