@@ -39,6 +39,7 @@ import com.wireless.common.ShoppingCart.OnCommitListener;
 import com.wireless.common.ShoppingCart.OnPayListener;
 import com.wireless.common.WirelessOrder;
 import com.wireless.exception.BusinessException;
+import com.wireless.exception.FrontBusinessError;
 import com.wireless.exception.ProtocolError;
 import com.wireless.fragment.PickTasteFragment;
 import com.wireless.fragment.PickTasteFragment.OnTasteChangeListener;
@@ -650,7 +651,7 @@ public class SelectedFoodActivity extends Activity
 										.show();
 
 									
-								}else if(e.getErrCode().equals(ProtocolError.ORDER_EXPIRED)){
+								}else if(e.getErrCode().equals(FrontBusinessError.ORDER_EXPIRED)){
 									//如果是改单，并且返回是账单过期的错误状态，
 									//则提示用户重新请求账单，再次确认提交
 									new AlertDialog.Builder(SelectedFoodActivity.this)

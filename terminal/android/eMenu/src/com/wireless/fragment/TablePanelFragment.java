@@ -38,6 +38,7 @@ import android.widget.ViewFlipper;
 
 import com.wireless.common.ShoppingCart;
 import com.wireless.common.WirelessOrder;
+import com.wireless.exception.BusinessException;
 import com.wireless.ordermenu.R;
 import com.wireless.pojo.regionMgr.Region;
 import com.wireless.pojo.regionMgr.Table;
@@ -490,25 +491,20 @@ public class TablePanelFragment extends Fragment implements OnGestureListener {
 			super(WirelessOrder.loginStaff);
 		}
 		
-		/*
-		 * 根据返回的error message判断，如果发错异常则提示用户， 如果成功，则执行请求餐厅的操作。
-		 */
 		@Override
-		protected void onPostExecute(List<Table> tables) {
-			/**
-			 * Prompt user message if any error occurred.
-			 */
-			if(mBusinessException != null) {
-				Toast.makeText(TablePanelFragment.this.getActivity(), "刷新餐台数据失败,请检查网络", Toast.LENGTH_SHORT).show();
-			} else {
-				
-				WirelessOrder.tables = tables;
-				
-				mRegionRefreshHandler.sendEmptyMessage(0);
-				mTableRefreshHandler.sendEmptyMessage(0);
-				((AutoCompleteTextView) getView().findViewById(R.id.editText_table_num)).setText("");
-				Toast.makeText(TablePanelFragment.this.getActivity(), "餐台信息刷新成功", Toast.LENGTH_SHORT).show();
-			} 
+		protected void onSuccess(List<Table> tables){
+			WirelessOrder.tables = tables;
+			
+			mRegionRefreshHandler.sendEmptyMessage(0);
+			mTableRefreshHandler.sendEmptyMessage(0);
+			((AutoCompleteTextView) getView().findViewById(R.id.editText_table_num)).setText("");
+			Toast.makeText(TablePanelFragment.this.getActivity(), "餐台信息刷新成功", Toast.LENGTH_SHORT).show();
+		}
+		
+		@Override
+		protected void onFail(BusinessException e){
+			Toast.makeText(TablePanelFragment.this.getActivity(), "刷新餐台数据失败,请检查网络", Toast.LENGTH_SHORT).show();
+
 		}
 	}
 	

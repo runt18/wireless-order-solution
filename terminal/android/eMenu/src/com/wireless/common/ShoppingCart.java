@@ -681,7 +681,7 @@ public final class ShoppingCart {
 		private final Order mOrderToPay;
 		
 		PayOrderTask(Order orderToPay, OnPayListener payListener) {
-			super(WirelessOrder.loginStaff, Order.PayBuilder.build(orderToPay.getId()));
+			super(WirelessOrder.loginStaff, Order.PayBuilder.build(orderToPay.getId()).setTemp(true));
 			mPayListener = payListener;
 			mOrderToPay = orderToPay;
 		}
