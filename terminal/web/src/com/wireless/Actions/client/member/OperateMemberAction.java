@@ -231,8 +231,8 @@ public class OperateMemberAction extends DispatchAction{
 							e.printStackTrace();
 						}
 			    	}
+				    break;
 			    }
-			    break;
 			}
 
 			
