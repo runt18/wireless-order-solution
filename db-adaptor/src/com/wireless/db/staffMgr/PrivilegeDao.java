@@ -29,7 +29,7 @@ public class PrivilegeDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static List<Privilege> getPrivileges(DBCon dbCon, Staff staff, String extraCond, String orderClause) throws SQLException{
+	public static List<Privilege> getByCond(DBCon dbCon, Staff staff, String extraCond, String orderClause) throws SQLException{
 		String sql;
 		sql = " SELECT pri_id, pri_code, cate FROM " + Params.dbName + ".privilege" +
 			  " WHERE 1 = 1 " +
@@ -71,11 +71,11 @@ public class PrivilegeDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static List<Privilege> getPrivileges(Staff staff, String extraCond, String orderClause) throws SQLException{
+	public static List<Privilege> getByCond(Staff staff, String extraCond, String orderClause) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return getPrivileges(dbCon, staff, extraCond, orderClause);
+			return getByCond(dbCon, staff, extraCond, orderClause);
 		}finally{
 			dbCon.disconnect();
 		}
