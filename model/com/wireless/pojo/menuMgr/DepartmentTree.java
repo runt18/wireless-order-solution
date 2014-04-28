@@ -7,9 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-
-
-
 public class DepartmentTree{
 
 	public static class KitchenNode implements Entry<Kitchen, FoodList>{
@@ -80,13 +77,13 @@ public class DepartmentTree{
 				FoodList sorted = new FoodList(entry.getValue(), new Comparator<Food>(){
 
 					@Override
-					public int compare(Food lf, Food rf) {
-						if(lf.isHot() && !rf.isHot()){
+					public int compare(Food f0, Food f1) {
+						if(f0.isHot() && !f1.isHot()){
 							return -1;
-						}else if(!lf.isHot() && rf.isHot()){
+						}else if(!f0.isHot() && f1.isHot()){
 							return 1;
 						}else{
-							return lf.compareTo(rf);
+							return Food.BY_ALIAS.compare(f0, f1);
 						}
 					}
 					
@@ -118,7 +115,6 @@ public class DepartmentTree{
 		public DepartmentTree build(){
 			//部门按displayId排序
 			Collections.sort(mNodesToBuild, new Comparator<DeptNode>(){
-
 				@Override
 				public int compare(DeptNode lhs, DeptNode rhs) {
 					if(lhs.getKey().getDisplayId() > rhs.getKey().getDisplayId()){
@@ -129,13 +125,12 @@ public class DepartmentTree{
 						return 0;
 					}
 				}
-				
 			});
 			return new DepartmentTree(mNodesToBuild);
 		}
 	}
 
-	private List<DeptNode> mDeptNodes;
+	private final List<DeptNode> mDeptNodes;
 
 	private DepartmentTree(List<DeptNode> deptNodes){
 		this.mDeptNodes = deptNodes;
@@ -189,7 +184,7 @@ public class DepartmentTree{
 	 * @param foodComp the food comparator of foods to each kitchen
 	 * @return the view represented as department nodes to the department tree
 	 */
-	public List<DeptNode> asDeptNodes(Comparator<Food> foodComp){
+	private List<DeptNode> asDeptNodes(Comparator<Food> foodComp){
 		if(foodComp != null){
 			List<DeptNode> deptNodes = new ArrayList<DeptNode>();
 			for(DeptNode deptNode : mDeptNodes){

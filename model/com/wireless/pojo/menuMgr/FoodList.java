@@ -67,7 +67,7 @@ public class FoodList extends AbstractList<Food>{
      * @return a map containing the foods to each kitchen
      */
     private Map<Kitchen, FoodList> groupByKitchen() {
-    	return groupByKitchen(null);
+    	return groupByKitchen(Food.BY_ALIAS);
     }
     
     /**
@@ -159,7 +159,7 @@ public class FoodList extends AbstractList<Food>{
 			return tmpFoods;
 			
 		}else{
-			return SortedList.newInstance(mFoods);
+			return SortedList.newInstance(mFoods, Food.BY_ALIAS);
 		}
 		
     }
