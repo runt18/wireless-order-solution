@@ -750,7 +750,8 @@ function refreshOrder(res){
 			   	if(btn == 'yes'){
 			   		submitSingleOrderHandler(res.reCommitData);
 			   	}else if(btn == 'no'){
-			   		location.reload();
+			   		isFree = false;
+			   		refreshOrderHandler();
 			   	}
 		   }
 		});
