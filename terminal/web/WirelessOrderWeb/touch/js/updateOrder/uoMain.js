@@ -16,7 +16,6 @@ uo.show = function(c){
 };
 
 uo.updateOrderHandler = function(){
-	console.log(uo.table);
 	initTableData();
 	uo.show({
 		table : uo.table
