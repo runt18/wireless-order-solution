@@ -12,6 +12,15 @@ uo.show = function(c){
 	}
 	initOrderData({table : c.table});
 	uo.table = c.table;
+//	uo.updateTable = c.table;
+};
+
+uo.updateOrderHandler = function(){
+	console.log(uo.table);
+	initTableData();
+	uo.show({
+		table : uo.table
+	});
 };
 
 /**
@@ -599,14 +608,30 @@ uo.submitUpdateOrderHandler = function(c){
 							}
 						});
 					}else{
-						Util.msg.alert({
-							title : data.title,
-							msg : data.msg, 
-							fn : function(btn){
-/*								Util.toggleContentDisplay({type:'hide', renderTo:'divUpdateOrder'});
-								initTableData();*/
-							}
-						});
+						//账单过期就刷新, 否则另外处理
+						if(data.code){
+							Util.msg.alert({
+								title : data.title,
+								msg : data.msg, 
+								buttons : 'YESBACK',
+								btnEnter : '刷新账单',
+								fn : function(btn){
+									if(btn == 'yes'){
+										uo.updateOrderHandler();
+									}
+								}
+							});
+						}else{
+							Util.msg.alert({
+								title : data.title,
+								msg : data.msg, 
+								fn : function(btn){
+	/*								Util.toggleContentDisplay({type:'hide', renderTo:'divUpdateOrder'});
+									initTableData();*/
+								}
+							});
+						}
+
 					}
 
 				}
