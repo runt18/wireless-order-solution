@@ -741,12 +741,19 @@ function refreshOrder(res){
 			}
 		});
 	}else if(eval(res.code == Ext.ux.errorCode.ORDER_EXPIRED)){
-//		Ext.ux.showMsg(res);
-		Ext.MessageBox.confirm('提示', res.msg, function(btn){
-			if(btn == 'yes'){
-				submitSingleOrderHandler(res.reCommitData);
-			}
-		},this);
+		Ext.MessageBox.INSERTUPDATE = {yes:"继续提交", no:"刷新账单"};
+		Ext.Msg.show({
+		   title:'提示',
+		   msg: res.msg,
+		   buttons: Ext.MessageBox.INSERTUPDATE,
+		   fn: function(btn){
+			   	if(btn == 'yes'){
+			   		submitSingleOrderHandler(res.reCommitData);
+			   	}else if(btn == 'no'){
+			   		location.reload();
+			   	}
+		   }
+		});
 	}else{
 		Ext.MessageBox.show({
 			title : res.title,
@@ -779,6 +786,7 @@ function submitSingleOrderHandler(_c){
 				notPrint : _c.notPrint === true ? true : false
 			},
 			success : function(response, options) {
+
 				var jr = Ext.util.JSON.decode(response.responseText);
 				_c.title = jr.title;
 				_c.msg = jr.msg;
