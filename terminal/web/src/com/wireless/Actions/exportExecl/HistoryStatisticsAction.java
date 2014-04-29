@@ -569,7 +569,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 		row.setHeight((short) 350);
 		cell = row.createCell(0);
 		cell.setCellValue("统计时间: " + onDuty + " 至 " + offDuty);
-		cell.setCellStyle(strStyle);
+//		cell.setCellStyle(strStyle);
 		sheet.addMergedRegion(new CellRangeAddress(sheet.getLastRowNum(), sheet.getLastRowNum(), 0, 7));
 				
 		// *****
@@ -578,7 +578,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 		row.setHeight((short) 350);
 		cell = row.createCell(0);
 		cell.setCellValue("导出时间: " + DateUtil.format(new Date()) + "     操作人:  " +staff.getName());
-		cell.setCellStyle(strStyle);
+//		cell.setCellStyle(strStyle);
 		sheet.addMergedRegion(new CellRangeAddress(sheet.getLastRowNum(), sheet.getLastRowNum(), 0, 7));
 		
 		row = sheet.createRow(sheet.getLastRowNum() + 1);
@@ -1031,16 +1031,16 @@ public class HistoryStatisticsAction extends DispatchAction{
 		row.setHeight((short) 350);
 		cell = row.createCell(0);
 		cell.setCellValue("统计时间: " + onDuty + " 至 " + offDuty + "     账单总数: " + business.getOrderAmount());
-		cell.setCellStyle(strStyle);
+//		cell.setCellStyle(headerStyle);
 		sheet.addMergedRegion(new CellRangeAddress(sheet.getLastRowNum(), sheet.getLastRowNum(), 0, 8));
 				
 		// *****
-		// 导出操作相关信息
+		// 导出操作相关信息 
 		row = sheet.createRow(sheet.getLastRowNum() + 1);
 		row.setHeight((short) 350);
 		cell = row.createCell(0);
 		cell.setCellValue("导出时间: " + DateUtil.format(new Date()) + "     操作人:  " +staff.getName());
-		cell.setCellStyle(strStyle);
+//		cell.setCellStyle(headerStyle);
 		sheet.addMergedRegion(new CellRangeAddress(sheet.getLastRowNum(), sheet.getLastRowNum(), 0, 8));
 		
 		row = sheet.createRow(sheet.getLastRowNum() + 1);
@@ -1077,6 +1077,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 		
 		cell = row.createCell(row.getLastCellNum());
 		cell.setCellValue(business.getCancelAmount());
+		cell.setCellStyle(normalNumStyle);
 		
 		cell = row.createCell(row.getLastCellNum());
 		cell.setCellValue(business.getCashTotalIncome());
@@ -1096,6 +1097,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 		
 		cell = row.createCell(row.getLastCellNum());
 		cell.setCellValue(business.getCreditCardAmount());
+		cell.setCellStyle(normalNumStyle);
 		
 		cell = row.createCell(row.getLastCellNum());
 		cell.setCellValue(business.getCreditTotalIncome());
@@ -1115,6 +1117,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 		
 		cell = row.createCell(row.getLastCellNum());
 		cell.setCellValue(business.getMemberCardAmount());
+		cell.setCellStyle(normalNumStyle);
 		
 		cell = row.createCell(row.getLastCellNum());
 		cell.setCellValue(business.getMemberTotalIncome());
@@ -1134,6 +1137,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 		
 		cell = row.createCell(row.getLastCellNum());
 		cell.setCellValue(business.getSignAmount());
+		cell.setCellStyle(normalNumStyle);
 		
 		cell = row.createCell(row.getLastCellNum());
 		cell.setCellValue(business.getSignTotalIncome());
@@ -1153,6 +1157,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 		
 		cell = row.createCell(row.getLastCellNum());
 		cell.setCellValue(business.getHangAmount());
+		cell.setCellStyle(normalNumStyle);
 		
 		cell = row.createCell(row.getLastCellNum());
 		cell.setCellValue(business.getHangTotalIncome());
@@ -1172,6 +1177,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 		
 		cell = row.createCell(row.getLastCellNum());
 		cell.setCellValue(business.getOrderAmount());
+		cell.setCellStyle(normalNumStyle);
 		
 		cell = row.createCell(row.getLastCellNum());
 		cell.setCellValue(business.getTotalIncome());
@@ -1211,6 +1217,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 		
 		cell = row.createCell(row.getLastCellNum());
 		cell.setCellValue(business.getEraseAmount());
+		cell.setCellStyle(normalNumStyle);
 		
 		cell = row.createCell(row.getLastCellNum());
 		cell.setCellValue(business.getEraseIncome());
@@ -1226,6 +1233,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 		
 		cell = row.createCell(row.getLastCellNum());
 		cell.setCellValue(business.getDiscountAmount());
+		cell.setCellStyle(normalNumStyle);
 		
 		cell = row.createCell(row.getLastCellNum());
 		cell.setCellValue(business.getDiscountIncome());
@@ -1241,6 +1249,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 		
 		cell = row.createCell(row.getLastCellNum());
 		cell.setCellValue(business.getGiftAmount());
+		cell.setCellStyle(normalNumStyle);
 		
 		cell = row.createCell(row.getLastCellNum());
 		cell.setCellValue(business.getGiftIncome());
@@ -1256,6 +1265,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 		
 		cell = row.createCell(row.getLastCellNum());
 		cell.setCellValue(business.getCancelAmount());
+		cell.setCellStyle(normalNumStyle);
 		
 		cell = row.createCell(row.getLastCellNum());
 		cell.setCellValue(business.getCancelIncome());
@@ -1271,6 +1281,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 		
 		cell = row.createCell(row.getLastCellNum());
 		cell.setCellValue(business.getPaidAmount());
+		cell.setCellStyle(normalNumStyle);
 		
 		cell = row.createCell(row.getLastCellNum());
 		cell.setCellValue(business.getPaidIncome());
@@ -1286,6 +1297,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 		
 		cell = row.createCell(row.getLastCellNum());
 		cell.setCellValue(business.getCouponAmount());
+		cell.setCellStyle(normalNumStyle);
 		
 		cell = row.createCell(row.getLastCellNum());
 		cell.setCellValue(business.getCouponIncome());
@@ -1301,6 +1313,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 		
 		cell = row.createCell(row.getLastCellNum());
 		cell.setCellValue("--");
+		cell.setCellStyle(strStyle);
 		
 		cell = row.createCell(row.getLastCellNum());
 		cell.setCellValue(business.getServiceIncome());
@@ -1737,7 +1750,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 			date = onDuty + "  至  " + offDuty;
 		}
 		cell.setCellValue("统计时间: " + date );
-		cell.setCellStyle(strStyle);
+//		cell.setCellStyle(strStyle);
 		
 		sheet.addMergedRegion(new CellRangeAddress(sheet.getLastRowNum(), sheet.getLastRowNum(), 0, 7));
 		
@@ -1747,7 +1760,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 		cell = row.createCell(0);
 		
 		cell.setCellValue("总收款金额: " + df.format(sum.getChargeMoney()) + "         总充值额 :" + df.format(sum.getDeltaTotalMoney()));
-		cell.setCellStyle(strStyle);
+//		cell.setCellStyle(strStyle);
 		
 		sheet.addMergedRegion(new CellRangeAddress(sheet.getLastRowNum(), sheet.getLastRowNum(), 0, 7));
 		
@@ -1987,7 +2000,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 			date = onDuty + "  至  " + offDuty;
 		}
 		cell.setCellValue("统计时间: " + date );
-		cell.setCellStyle(strStyle);
+//		cell.setCellStyle(strStyle);
 		
 		sheet.addMergedRegion(new CellRangeAddress(sheet.getLastRowNum(), sheet.getLastRowNum(), 0, 7));
 		
@@ -1997,7 +2010,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 		cell = row.createCell(0);
 		
 		cell.setCellValue("总金额: " + df.format(sum.getPayMoney()) + "         总积分 :" + sum.getDeltaPoint());
-		cell.setCellStyle(strStyle);
+//		cell.setCellStyle(strStyle);
 		
 		sheet.addMergedRegion(new CellRangeAddress(sheet.getLastRowNum(), sheet.getLastRowNum(), 0, 7));
 		
@@ -2175,7 +2188,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 		cell = row.createCell(0);
 		
 		cell.setCellValue("总数量: " + tempSum.getCount() + "         总金额 :" + tempSum.getTotalPrice());
-		cell.setCellStyle(strStyle);
+//		cell.setCellStyle(strStyle);
 		
 		sheet.addMergedRegion(new CellRangeAddress(sheet.getLastRowNum(), sheet.getLastRowNum(), 0, 8));
 //----------------		
@@ -2412,7 +2425,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 		cell = row.createCell(0);
 		
 		cell.setCellValue("会员数量: " + newList.size());
-		cell.setCellStyle(strStyle);
+//		cell.setCellStyle(strStyle);
 		
 		sheet.addMergedRegion(new CellRangeAddress(sheet.getLastRowNum(), sheet.getLastRowNum(), 0, 9));
 //----------------		
@@ -2517,6 +2530,18 @@ public class HistoryStatisticsAction extends DispatchAction{
 		return null;
 	}
 	
+	/**
+	 * 提成统计
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws UnsupportedEncodingException
+	 * @throws Exception
+	 * @throws SQLException
+	 * @throws BusinessException
+	 */
 	public ActionForward commissionStatisticsList(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws UnsupportedEncodingException, Exception, SQLException, BusinessException{
 		response.setContentType("application/vnd.ms-excel;");
 		
@@ -2542,9 +2567,9 @@ public class HistoryStatisticsAction extends DispatchAction{
 		}else{
 			list = CalcBillStatisticsDao.calcCommissionStatistics(staff, range, DateType.HISTORY);
 		}
-		CommissionStatistics total = null;
-		if(!list.isEmpty()){
-			total = new CommissionStatistics();
+		CommissionStatistics total = new CommissionStatistics();
+		total.setCommission(0);
+		if(!list.isEmpty() && list.size() != 0){
 			for (CommissionStatistics item : list) {
 //				total.setTotalPrice(item.getTotalPrice() + total.getTotalPrice());
 				total.setCommission(item.getCommission() + total.getCommission());
@@ -2590,7 +2615,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 		cell = row.createCell(0);
 		
 		cell.setCellValue("日期: " + beginDate + "  至  " + endDate +  "         提成总额: " + total.getCommission());
-		cell.setCellStyle(strStyle);
+//		cell.setCellStyle(strStyle);
 		
 		sheet.addMergedRegion(new CellRangeAddress(sheet.getLastRowNum(), sheet.getLastRowNum(), 0, 8));
 //----------------		
@@ -2747,7 +2772,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 		cell = row.createCell(0);
 		
 		cell.setCellValue("日期: " + beginDate + "  至  " + endDate +  "      提成总额: " + total.getCommission());
-		cell.setCellStyle(strStyle);
+//		cell.setCellStyle(strStyle);
 		
 		sheet.addMergedRegion(new CellRangeAddress(sheet.getLastRowNum(), sheet.getLastRowNum(), 0, 2));
 //----------------		
@@ -2855,7 +2880,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 		cell = row.createCell(0);
 		
 		cell.setCellValue("日期: " + beginDate + "  至  " + endDate +  "         账单数: " + list.size());
-		cell.setCellStyle(strStyle);
+//		cell.setCellStyle(strStyle);
 		
 		sheet.addMergedRegion(new CellRangeAddress(sheet.getLastRowNum(), sheet.getLastRowNum(), 0, 8));
 //----------------		
@@ -3082,7 +3107,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 		cell = row.createCell(0);
 		
 		cell.setCellValue("账单数量: " + list.size());
-		cell.setCellStyle(strStyle);
+//		cell.setCellStyle(strStyle);
 		
 		sheet.addMergedRegion(new CellRangeAddress(sheet.getLastRowNum(), sheet.getLastRowNum(), 0, 8));
 //----------------		
@@ -3277,7 +3302,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 		cell = row.createCell(0);
 		
 		cell.setCellValue("日期: " + beginDate + "  至  " + endDate +  "         物料个数: " + stockReports.size());
-		cell.setCellStyle(strStyle);
+//		cell.setCellStyle(strStyle);
 		
 		sheet.addMergedRegion(new CellRangeAddress(sheet.getLastRowNum(), sheet.getLastRowNum(), 0, 7));
 //----------------		
