@@ -13,7 +13,6 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -439,7 +438,7 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 						
 						((TextView) layout.findViewById(R.id.txtView_amountValue_orderChildItem)).setText(NumericUtil.float2String2(of.getDelta()));
 						layout.findViewById(R.id.view_OrderFoodListView_childItem).setVisibility(View.VISIBLE);
-						//取消退菜按钮
+						//'取消退菜'按钮
 						restoreBtn.setText("取消退菜");
 						restoreBtn.setVisibility(View.VISIBLE); 
 						restoreBtn.setOnClickListener(new View.OnClickListener() {
@@ -456,11 +455,11 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 						cancelImgView.setVisibility(View.INVISIBLE);
 						addImgView.setVisibility(View.INVISIBLE);
 						
-						layout.setBackgroundColor(Color.LTGRAY);
+						//layout.setBackgroundColor(Color.LTGRAY);
 						((TextView)layout.findViewById(R.id.txtView_taste_orderChildItem)).setTextColor(getResources().getColor(R.color.green));
 						((TextView) layout.findViewById(R.id.txtView_amountValue_orderChildItem)).setText(NumericUtil.float2String2(Math.abs(of.getDelta())));
 						layout.findViewById(R.id.view_OrderFoodListView_childItem).setVisibility(View.INVISIBLE);
-						//取消加菜按钮
+						//'取消加菜'按钮
 						restoreBtn.setText("取消加菜");
 						restoreBtn.setVisibility(View.VISIBLE); 
 						restoreBtn.setOnClickListener(new View.OnClickListener() {
