@@ -611,6 +611,7 @@ co.submit = function(c){
 					title : data.title,
 					msg : data.msg, 
 					buttons : 'YESBACK',
+					btnEnter : '继续提交',
 					fn : function(btn){
 						if(btn == 'yes'){
 							c.commitType = 23;

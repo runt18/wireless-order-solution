@@ -296,7 +296,7 @@ Util.msg = {
 			+ (typeof c.time == 'number' ? '<div data-type="time">&nbsp;</div>' : '')
 			+ '<div data-type="button" class="box-horizontal">'
 				+ '<div class="div-full"></div>'
-				+ '<div class="button-base" style="width:150px;" onClick="Util.msg.save({event:\'yes\', id:\''+id+'\'})">确定</div>'
+				+ '<div class="button-base" style="width:150px;" onClick="Util.msg.save({event:\'yes\', id:\''+id+'\'})">'+ (typeof c.btnEnter != 'undefined'? c.btnEnter : "确定") +'</div>'
 				+ (typeof c.buttons == 'string' && c.buttons.toUpperCase() == 'YESBACK' ? '<div class="button-base" style="width:150px; margin-left:20px;" onClick="Util.msg.hide({event:\'back\', id:\''+id+'\'})">返回</div>' : '')
 				+ '<div class="div-full"></div>'
 			+ '</div>'
@@ -340,6 +340,7 @@ Util.msg = {
 			msg : c.msg,
 			fn : c.fn,
 			buttons : c.buttons,
+			btnEnter : c.btnEnter,
 			time : c.time
 		});
 		document.body.insertAdjacentHTML('beforeEnd', content.content);
