@@ -100,6 +100,9 @@ ul.b-btn-group{
 .a-btn font{
 	font-size: 30px;font-family: 'Microsoft Yahei',Helvetica,Arial,sans-serif;
 }
+.smsTitleDesc{
+	margin-left: 4px;
+}
 .smsUseDesc{
 	line-height: 40px;
 	color: black !important;
@@ -148,7 +151,7 @@ $.post('../../QuerySmsStat.do', function(data){
 	<ul class="a-btn-group">
 	    <li>
 	        <a href="javascript:querySmsDetail({order : 0, title : '总共使用'})" class="a-btn grd-white" title="总消耗">
-	            <font>总</font>
+	            <font class="smsTitleDesc">总</font>
 	            <span id="spanTotalUsed" class="badge badge-info">0</span> <!--don't use span here!-->
 	            <br>
 	            <span class="smsUseDesc">总共使用</span>
@@ -156,28 +159,28 @@ $.post('../../QuerySmsStat.do', function(data){
 	   	</li>
 	   	<li>
 	        <a href="javascript:querySmsDetail({order : 3, title : '充值使用'})" class="a-btn grd-white" title="充值消耗">
-	            <font>充</font>
+	            <font class="smsTitleDesc">充</font>
 	            <span id="spanChargeUsed" class="badge charge-info">0</span> <!--don't use span here!-->
 	            <br><span class="smsUseDesc">充值使用</span>
 	       </a>
 	   	</li>
 	   	<li>
 	        <a href="javascript:querySmsDetail({order : 2, title : '消费使用'})" class="a-btn grd-white" title="消费消耗">
-	            <font>消</font>
+	            <font class="smsTitleDesc">消</font>
 	            <span id="spanConsumptionUsed" class="badge used-info">0</span> <!--don't use span here!-->
 	            <br><span class="smsUseDesc">消费使用</span>
 	       </a>
 	   	</li>
 	   	<li>
 	        <a href="javascript:querySmsDetail({order : 1, title : '验证使用'})" class="a-btn grd-white" title="验证消耗">
-	            <font>验</font>
+	            <font class="smsTitleDesc">验</font>
 	            <span id="spanVerifyUsed" class="badge verify-info">0</span> <!--don't use span here!-->
 	            <br><span class="smsUseDesc">验证使用</span>
 	       </a>
 	   	</li>
 	   	<li>
 	        <div  class="a-btn grd-white" title="剩余条数">
-	            <font>余</font>
+	            <font class="smsTitleDesc">余</font>
 	            <span id="spanRemianing" class="badge remain-info">0</span> <!--don't use span here!-->
 	            <br><span class="smsUseDesc">剩余条数</span>
 	       </div>
