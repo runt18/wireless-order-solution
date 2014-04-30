@@ -238,11 +238,11 @@ var ss = {
 <div id="divStopSet" class="box-vertical content">
 	<div id="divNorthForStopSet" class="box-horizontal" style="margin-right: 2px; border-bottom: 2px solid #fff;">
     	<div data-type="stop" style="width: 218px; margin-right: 2px;">
-    		<div class="button-base" data-type="sellOut" data-status="false" style="line-height: 60px;"  onclick="ss.searchData({event:this, isStop:false})">
-    			未沽清
+    		<div id="divBtnSellFood" class="button-base" data-type="sellOut" data-status="false" style="line-height: 60px;"  onclick="ss.searchData({event:this, isStop:false})">
+    			在售菜品
     		</div>
     		<div class="button-base" data-type="sellOut" data-status="true" style="line-height: 60px; margin-top: 1px;" onclick="ss.searchData({event:this,isStop:true})">
-    			已沽清
+    			沽清菜品
     		</div>
 		</div>
 		<div class="div-full">
@@ -264,7 +264,7 @@ var ss = {
   		<div class="button-base" style="margin-right: 2px;" onClick="Util.scroll({otype:'down', content:'divNewFoodForStopSet', size:80})">下翻</div>
   		<div class="div-full">&nbsp;</div>
   		<div class="button-base" style="margin-left: 2px; width: 120px;" onClick="ss.soldOut({type : true})">沽清</div>
-  		<div class="button-base" style="margin-left: 2px; width: 120px;" onClick="ss.soldOut({type : false})">反沽清</div>
+  		<div class="button-base" style="margin-left: 2px; width: 120px;" onClick="ss.soldOut({type : false})">开售</div>
   		<div class="button-base" style="margin-left: 2px;" onClick="ss.tp.getPreviousPage()">上一页</div>
   		<div class="button-base" style="margin-left: 2px;" onClick="ss.tp.getNextPage()">下一页</div>
   	</div>
