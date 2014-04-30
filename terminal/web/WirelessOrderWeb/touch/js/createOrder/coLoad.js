@@ -242,6 +242,7 @@ co.findFoodByKitchen = function(c){
 	var tempFoodData = [];
 	var temp = null;
 	if(c.kitchenId == -1){
+		
 		var dl = $('.div-deptOrKitchen-select[data-type=dept-select]');
 		if(dl.length == 0){
 			for(var i = 0; i < kitchenData.root.length; i++){

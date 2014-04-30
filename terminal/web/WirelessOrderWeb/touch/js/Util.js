@@ -44,6 +44,8 @@ String.prototype.trim = function(){
 
 //工具包
 var Util = {};
+//FIXME 临时加的判断是否沽清页面, 数据重构后删除
+Util.sellOutCond = false;
 /**
  * 分页工具
  * @param c
@@ -112,6 +114,7 @@ Util.padding = function(c){
 			var ch = this.dom.clientHeight, cw = this.dom.clientWidth;
 			this.limit = parseInt((ch / (70 + 5 + 3 * 2))) * parseInt((cw / (90 + 5 + 3 * 2)));
 			//
+			console.log(ic.data);
 			this.data = ic.data == null || typeof ic.data == 'undefined' ? [] : ic.data;
 			this.length = this.data.length;
 			if(typeof ic.callback == 'function'){
@@ -127,13 +130,29 @@ Util.padding = function(c){
 				var temp = null;
 				for(var i = 0; i < limit; i++){
 					temp = this.data[start+i];
-					this.pageData.push(temp);
-					if(temp != null){
-						html += this.templet({
-							dataIndex : i,
-							data : temp
-						});	
+					//FIXME 判断是否为沽清页面, 是就不用验证菜品状态
+					if(Util.sellOutCond){
+						this.pageData.push(temp);
+						if(temp != null){
+							html += this.templet({
+								dataIndex : i,
+								data : temp
+							});	
+						}
+					}else{
+						if((temp.status & 1 << 2) == 0){
+							this.pageData.push(temp);
+							if(temp != null){
+								html += this.templet({
+									dataIndex : i,
+									data : temp
+								});	
+							}
+	
+						}
 					}
+
+
 				}
 				temp = null;
 				this.dom.innerHTML = html;

@@ -232,6 +232,7 @@ ss.findFoodByKitchen = function(c){
 };
 
 ss.entry = function(){
+	Util.sellOutCond = true;
 	Util.toggleContentDisplay({
 		el : 'divStopSet',
 		type : 'show'
@@ -249,6 +250,7 @@ ss.entry = function(){
 	$('#divNorthForStopSet > div[data-type=stop]').first();
 };
 ss.back = function(){
+	Util.sellOutCond = false;
 	Util.toggleContentDisplay({
 		el : 'divStopSet',
 		type : 'hide'

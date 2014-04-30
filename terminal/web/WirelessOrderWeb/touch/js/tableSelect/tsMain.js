@@ -201,9 +201,12 @@ function inputNum(o){
 //进入点菜界面
 function renderToCreateOrder(tableNo, peopleNo){
 	if(hasTable(tables, tableNo)){
+		//FIXME 每点一次餐台都去更新菜品
+		initFoodData();
+		
 		Util.dialongDisplay({
-		type:'hide', 
-		renderTo:'divSelectTableNumForTs'
+			type:'hide', 
+			renderTo:'divSelectTableNumForTs'
 		});
 		Util.dialongDisplay({
 			type:'hide', 
@@ -213,8 +216,8 @@ function renderToCreateOrder(tableNo, peopleNo){
 		$("#txtTableNumForTS").val(inputNumVal);
 		$("#txtPeopleNumForSM").val(inputNumVal);
 		
-//FIXME		if(getTableByAlias(tableNo).statusValue == 1){
-//同时操作餐台时,选中状态没变化的餐桌处理
+		//FIXME		if(getTableByAlias(tableNo).statusValue == 1){
+		//同时操作餐台时,选中状态没变化的餐桌处理
 		if(false){
 //			uo.show({
 //				table : getTableByAlias(tableNo),

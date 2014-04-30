@@ -358,7 +358,7 @@ uo.saveForUO = function(){
 				}
 			}
 		}
-		uoCancelFoods = [];
+//		uoCancelFoods = [];
 		uo.updateOrder = uoFood;
 		//对更新的菜品和人数进行提交
 		uo.submitUpdateOrderHandler(uoFood);	
@@ -591,24 +591,28 @@ uo.submitUpdateOrderHandler = function(c){
 			},
 			success : function(data, status, xhr){
 				Util.LM.hide();
-				if(uo.printTemp == true){
-					uo.printTemp = false;
-					uo.tempPayForUO();
-				}else{
 					//下单成功时才出现倒数, 其他问题则等待确认
 					if(data.success){
-						Util.msg.alert({
-							title : data.title,
-							msg : data.msg, 
-							time : 3,
-							fn : function(btn){
-								Util.toggleContentDisplay({type:'hide', renderTo:'divUpdateOrder'});
-								initTableData();
-							}
-						});
+						//清空退菜列表
+						uoCancelFoods = [];
+						if(uo.printTemp == true){
+							uo.printTemp = false;
+							uo.tempPayForUO();
+						}else{
+							Util.msg.alert({
+								title : data.title,
+								msg : data.msg, 
+								time : 3,
+								fn : function(btn){
+									Util.toggleContentDisplay({type:'hide', renderTo:'divUpdateOrder'});
+									initTableData();
+								}
+							});
+						}
+
 					}else{
 						//账单过期就刷新, 否则另外处理
-						if(data.code){
+						if(data.code == '9195'){
 							Util.msg.alert({
 								title : data.title,
 								msg : data.msg, 
@@ -616,6 +620,7 @@ uo.submitUpdateOrderHandler = function(c){
 								btnEnter : '刷新账单',
 								fn : function(btn){
 									if(btn == 'yes'){
+										uoCancelFoods = [];
 										uo.updateOrderHandler();
 									}
 								}
@@ -627,14 +632,12 @@ uo.submitUpdateOrderHandler = function(c){
 								fn : function(btn){
 	/*								Util.toggleContentDisplay({type:'hide', renderTo:'divUpdateOrder'});
 									initTableData();*/
+									return;
 								}
 							});
 						}
 
 					}
-
-				}
-
 			},
 			error : function(request, status, err){
 				Util.LM.hide();
