@@ -310,7 +310,6 @@ public class DepartmentDao {
 		sql = " UPDATE " + Params.dbName + ".department SET " +
 			  " dept_id = " + deptId +
 			  " ,type = " + Department.Type.IDLE.getVal() +
-			  " ,name = '' " +
 			  " WHERE 1 = 1 " +
 			  " AND restaurant_id = " + staff.getRestaurantId() +
 			  " AND dept_id = " + deptId; 

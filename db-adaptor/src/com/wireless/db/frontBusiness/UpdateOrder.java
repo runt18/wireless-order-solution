@@ -90,20 +90,20 @@ public class UpdateOrder {
 	 * @param newOrder
 	 *            the order along with the order id and other detail information
 	 * 
-	 * @return The update result containing two orders below.<br>
-	 *         - The extra order.<br>
-	 *         - The canceled order.
+	 * @return the update result containing two orders below
+	 *         <li>the extra order
+	 *         <li>the canceled order
 	 * @throws BusinessException
-	 *             Throws if one of the cases below.<br>
-	 *             - The terminal is NOT attached to any restaurant.<br>
-	 *             - The terminal is expired.<br>
-	 *             - The order to this id does NOT exist.<br>
-	 *             - The order to this id is expired<br>.
-	 *             - Any food to this order does NOT exist.<br>
-	 *             - Any taste to this order does NOT exist.<br>
-	 *             - Exceed the gift quota.
+	 *             throws if one of the cases below<br>
+	 *             <li>the terminal is NOT attached to any restaurant
+	 *             <li>the terminal is expired
+	 *             <li>the order to this id does NOT exist
+	 *             <li>the order to this id is expired
+	 *             <li>any food to this order does NOT exist
+	 *             <li>any taste to this order does NOT exist
+	 *             <li>exceed the gift quota
 	 * @throws SQLException
-	 *             Throws if fail to execute any SQL statement.
+	 *             throws if fail to execute any SQL statement
 	 */
 	public static DiffResult execById(DBCon dbCon, Staff staff, Order newOrder) throws BusinessException, SQLException{
 		

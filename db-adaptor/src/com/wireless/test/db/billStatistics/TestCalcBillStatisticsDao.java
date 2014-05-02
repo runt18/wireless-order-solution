@@ -4,6 +4,7 @@ import java.beans.PropertyVetoException;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -25,21 +26,23 @@ import com.wireless.test.db.TestInit;
 import com.wireless.util.DateType;
 
 public class TestCalcBillStatisticsDao {
+	
+	private static Staff mStaff;
+	private static DutyRange mDutyRange;
+	
 	@BeforeClass
-	public static void initDbParam() throws PropertyVetoException{
+	public static void initDbParam() throws PropertyVetoException, SQLException, BusinessException{
 		TestInit.init();
+		 mStaff = StaffDao.getAdminByRestaurant(37);
+		 mDutyRange = new DutyRange("2014-1-10 23:40:04", "2014-1-26 23:49:36"); 
 	}
 	
 	@Test 
-	public void testCalcIncomeByKitchen() throws BusinessException, SQLException{
+	public void testCalcIncomeByKitchenAndDept() throws BusinessException, SQLException{
 		
-		Staff staff = StaffDao.getStaffs(37).get(0);
+		List<IncomeByKitchen> kitchenIncomes = CalcBillStatisticsDao.calcIncomeByKitchen(mStaff, mDutyRange, null, DateType.HISTORY);
 		
-		DutyRange range = new DutyRange("2013-12-10 23:40:04", "2013-12-26 23:49:36"); 
-		
-		List<IncomeByKitchen> kitchenIncomes = CalcBillStatisticsDao.calcIncomeByKitchen(staff, range, null, DateType.HISTORY);
-		
-		HashMap<Department, IncomeByDept> deptIncomeByKitchen = new HashMap<Department, IncomeByDept>();
+		Map<Department, IncomeByDept> deptIncomeByKitchen = new HashMap<Department, IncomeByDept>();
 		for(IncomeByKitchen kitchenIncome : kitchenIncomes){
 			IncomeByDept income = deptIncomeByKitchen.get(kitchenIncome.getKitchen().getDept());
 			if(income != null){
@@ -55,7 +58,7 @@ public class TestCalcBillStatisticsDao {
 			}
 		}
 		
-		List<IncomeByDept> deptIncomes = CalcBillStatisticsDao.calcIncomeByDept(staff, range, null, DateType.HISTORY);
+		List<IncomeByDept> deptIncomes = CalcBillStatisticsDao.calcIncomeByDept(mStaff, mDutyRange, null, DateType.HISTORY);
 		
 		if(deptIncomeByKitchen.size() != deptIncomes.size()){
 			//Check if the amount of department income is the same as before.
@@ -79,11 +82,8 @@ public class TestCalcBillStatisticsDao {
 	
 	@Test 
 	public void testCalcIncomeByFood() throws BusinessException, SQLException{
-		Staff staff = StaffDao.getStaffs(37).get(0);
 		
-		DutyRange range = new DutyRange("2013-12-25 23:40:04", "2013-12-26 23:49:36"); 
-		
-		List<IncomeByFood> foodIncomes = CalcBillStatisticsDao.calcIncomeByFood(staff, range, null, DateType.HISTORY);
+		List<IncomeByFood> foodIncomes = CalcBillStatisticsDao.calcIncomeByFood(mStaff, mDutyRange, null, DateType.HISTORY);
 		
 		HashMap<Department, IncomeByDept> deptIncomeByFood = new HashMap<Department, IncomeByDept>();
 		for(IncomeByFood foodIncome : foodIncomes){
@@ -101,7 +101,7 @@ public class TestCalcBillStatisticsDao {
 			}
 		}
 		
-		List<IncomeByDept> deptIncomes = CalcBillStatisticsDao.calcIncomeByDept(staff, range, null, DateType.HISTORY);
+		List<IncomeByDept> deptIncomes = CalcBillStatisticsDao.calcIncomeByDept(mStaff, mDutyRange, null, DateType.HISTORY);
 		
 		if(deptIncomeByFood.size() != deptIncomes.size()){
 			//Check if the amount of department income is the same as before.
@@ -124,13 +124,10 @@ public class TestCalcBillStatisticsDao {
 	
 	@Test
 	public void testCalcCancelIncomeByReason() throws SQLException, BusinessException{
-		Staff staff = StaffDao.getStaffs(37).get(0);
 		
-		DutyRange range = new DutyRange("2013-12-10 23:40:04", "2013-12-26 23:49:36"); 
+		List<CancelIncomeByReason> cancelByReason = CalcBillStatisticsDao.calcCancelIncomeByReason(mStaff, mDutyRange, null, DateType.HISTORY);
 		
-		List<CancelIncomeByReason> cancelByReason = CalcBillStatisticsDao.calcCancelIncomeByReason(staff, range, null, DateType.HISTORY);
-		
-		IncomeByCancel cancelIncome = CalcBillStatisticsDao.calcCancelPrice(staff, range, DateType.HISTORY);
+		IncomeByCancel cancelIncome = CalcBillStatisticsDao.calcCancelPrice(mStaff, mDutyRange, DateType.HISTORY);
 		
 		float totalCancel = 0;
 		for(CancelIncomeByReason cancelByEachReason : cancelByReason){

@@ -636,12 +636,18 @@ public class CalcBillStatisticsDao {
 	}
 	
 	/**
-	 * 
+	 * Calculate the income to each department according to extra condition.
+	 * @param dbCon	
+	 * 			the database connection
 	 * @param staff
+	 * 			the staff to perform this action
 	 * @param range
+	 * 			the duty range
 	 * @param queryType
-	 * @return
+	 * 			the query type {@link DateType}
+	 * @return the result {@link IncomeByDept} list
 	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
 	 */
 	public static List<IncomeByDept> calcIncomeByDept(Staff staff, DutyRange range, String extraCond, DateType queryType) throws SQLException{
 		DBCon dbCon = new DBCon();
@@ -654,13 +660,18 @@ public class CalcBillStatisticsDao {
 	}
 	
 	/**
-	 * 
-	 * @param dbCon
+	 * Calculate the income to each department according to extra condition.
+	 * @param dbCon	
+	 * 			the database connection
 	 * @param staff
+	 * 			the staff to perform this action
 	 * @param range
+	 * 			the duty range
 	 * @param queryType
-	 * @return
+	 * 			the query type {@link DateType}
+	 * @return the result {@link IncomeByDept} list
 	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
 	 */
 	public static List<IncomeByDept> calcIncomeByDept(DBCon dbCon, Staff staff, DutyRange range, String extraCond, DateType queryType) throws SQLException{
 		
@@ -675,18 +686,22 @@ public class CalcBillStatisticsDao {
 			  " FROM (" + 
 			  	makeSql4CalcFood(staff, range, extraCond, queryType) +
 			  " ) AS TMP " +
-		      " JOIN " + Params.dbName + ".department D " + " ON TMP.dept_id = D.dept_id " + " AND D.restaurant_id = " + staff.getRestaurantId() + " AND D.type = " + Department.Type.NORMAL.getVal() +
+		      " JOIN " + Params.dbName + ".department D " + " ON TMP.dept_id = D.dept_id " + " AND D.restaurant_id = " + staff.getRestaurantId() +
 			  " GROUP BY TMP.dept_id " +
 			  " ORDER BY D.display_id ASC ";
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		
 		List<IncomeByDept> deptIncomes = new ArrayList<IncomeByDept>();
 		while(dbCon.rs.next()){
-			deptIncomes.add(new IncomeByDept(new Department(dbCon.rs.getString("dept_name"),
-														    dbCon.rs.getShort("dept_id"),
-														    dbCon.rs.getInt("restaurant_id"),
-														    Department.Type.valueOf(dbCon.rs.getShort("type")),
-														    dbCon.rs.getInt("display_id")),
+			Department dept = new Department(dbCon.rs.getString("dept_name"),
+				    						 dbCon.rs.getShort("dept_id"),
+				    						 dbCon.rs.getInt("restaurant_id"),
+				    						 Department.Type.valueOf(dbCon.rs.getShort("type")),
+				    						 dbCon.rs.getInt("display_id"));
+			if(dept.isIdle()){
+				dept.setName(dept.getName().isEmpty() ? "已删除部门" : dept.getName() + "(已删除)");
+			}
+			deptIncomes.add(new IncomeByDept(dept,
 										     dbCon.rs.getFloat("dept_gift"),
 										     dbCon.rs.getFloat("dept_discount"),
 										     dbCon.rs.getFloat("dept_income")));
@@ -717,14 +732,20 @@ public class CalcBillStatisticsDao {
 
 	
 	/**
-	 * 
+	 * Calculate the income to each kitchen according to extra condition.
 	 * @param dbCon
+	 * 			the database connection
 	 * @param staff
+	 * 			the staff to perform this action
 	 * @param range
+	 * 			the duty range
 	 * @param extraCond
+	 * 			the extra condition
 	 * @param queryType
-	 * @return
+	 * 			the data type {@link DateType}
+	 * @return the result list {@link IncomeByKitchen}
 	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
 	 */
 	public static List<IncomeByKitchen> calcIncomeByKitchen(DBCon dbCon, Staff staff, DutyRange range, String extraCond, DateType queryType) throws SQLException{
 		
@@ -737,10 +758,10 @@ public class CalcBillStatisticsDao {
 			  " FROM ( " +
 			  makeSql4CalcFood(staff, range, extraCond, queryType) +
 			  " ) AS TMP " +
-			  " JOIN " + Params.dbName + ".kitchen K " + " ON TMP.kitchen_id = K.kitchen_id AND K.type = " + Kitchen.Type.NORMAL.getVal() + 
+			  " JOIN " + Params.dbName + ".kitchen K " + " ON TMP.kitchen_id = K.kitchen_id " + 
 			  " JOIN " + Params.dbName + ".department D " + " ON TMP.dept_id = D.dept_id AND D.restaurant_id = " + staff.getRestaurantId() +
-			  " GROUP BY kitchen_id " +
-			  " ORDER BY kitchen_display_id ";
+			  " GROUP BY TMP.kitchen_id " +
+			  " ORDER BY K.display_id ASC ";
 
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		
@@ -756,6 +777,10 @@ public class CalcBillStatisticsDao {
 									 staff.getRestaurantId(),
 									 Department.Type.valueOf(dbCon.rs.getShort("dept_type")),
 									 dbCon.rs.getInt("dept_display_id")));
+			
+			if(k.getType() == Kitchen.Type.IDLE){
+				k.setName(k.getName().isEmpty() ? "已删除厨房" : k.getName() + "(已删除)");
+			}
 			
 			kitchenIncomes.add(new IncomeByKitchen(k, 
 												   dbCon.rs.getFloat("kitchen_gift"),
