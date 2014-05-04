@@ -325,7 +325,7 @@ var allFoodTabPanelGrid = createGridPanel(
 		['价格', 'unitPrice', 70, 'right', 'Ext.ux.txtFormat.gridDou']
 	],
 	FoodBasicRecord.getKeys(),
-	[ ['dataSource', 'foods'], ['restaurantID', restaurantID], ['isPaging', true]],
+	[ ['dataSource', 'foods'], ['restaurantID', restaurantID]],
 	GRID_PADDING_LIMIT_30,
 	'',
 	allFoodTabPanelGridTbar
@@ -344,7 +344,7 @@ allFoodTabPanelGrid.getStore().on('load', function(thiz, records){
 		Ext.ux.formatFoodName(records[i], 'displayFoodName', 'name');
 	}
 });
-allFoodTabPanelGrid.on('rowdblclick', function(thiz, ri, e){
+allFoodTabPanelGrid.on('rowclick', function(thiz, ri, e){
 	bindGridData({
 		grid : orderedGrid,
 		record : thiz.getStore().getAt(ri)
