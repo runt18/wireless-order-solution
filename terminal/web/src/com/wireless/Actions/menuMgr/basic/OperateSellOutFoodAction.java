@@ -58,7 +58,7 @@ public class OperateSellOutFoodAction extends DispatchAction{
 				Food.UpdateBuilder builder = new Food.UpdateBuilder(Integer.parseInt(id)).setSellOut(false);
 				FoodDao.update(StaffDao.verify(Integer.parseInt(pin)), builder);
 			}
-			jobject.initTip(true, "取消沽清成功");
+			jobject.initTip(true, "开售成功");
 		}catch(BusinessException e){
 			jobject.initTip(e);
 			e.printStackTrace();
