@@ -1331,6 +1331,7 @@ Ext.onReady(function() {
 		autoScroll : true,
 		animate : true,
 		root : new Ext.tree.AsyncTreeNode({
+			expanded : true,
 			id : "regionTreeRoot",
 			text : "全部区域",
 			regionId : -1,

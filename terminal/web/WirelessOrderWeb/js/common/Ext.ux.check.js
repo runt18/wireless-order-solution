@@ -196,6 +196,6 @@ Ext.ux.setCookie = function(cookieName, cookieValue, days) {
 	var date = new Date();
 	date.setTime(date.getTime() + Number(days) * 3600 * 1000 * 24);
 	
-	document.cookie = cookieName + "=" + cookieValue + ";domain=" + document.domain + ";path=/;expires = " + date.toGMTString();
+	document.cookie = cookieName + "=" + cookieValue + ";path=/;expires = " + date.toGMTString();
 };
 

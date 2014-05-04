@@ -78,9 +78,9 @@ function operateKitchenHandler(node){
 		isAllowTemp.setValue(node.attributes.isAllowTemp);
 		
 	}
-	kitchenName.focus(true, 100);	
 	updateKitchenWin.show();
 	updateKitchenWin.center();
+	kitchenName.focus(true, 100);	
 	
 }
 
@@ -327,6 +327,7 @@ function operateDeptHandler(node){
 	}
 	updateDeptWin.show();
 	updateDeptWin.center();
+	deptName.focus(true, 100);
 }
 
 function updateDeptHandler(){
