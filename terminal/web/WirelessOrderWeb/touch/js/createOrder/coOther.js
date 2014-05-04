@@ -304,5 +304,6 @@ co.fa.back = function(){
 		renderTo : 'divFoodAlias',
 		type : 'hide'
 	});
+	getDom('txtFoodAlias').value = '';
 };
 

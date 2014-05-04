@@ -74,7 +74,6 @@ ss.updateData = function(c){
 			ss.normaltp.init({
 				data : data.root
 			});
-//			alert(data.root.length)
 		},
 		error : function(request, status, err) {
 			Util.LM.hide();
@@ -114,7 +113,6 @@ ss.showFoodByCond = function(c){
 			showFoodDatas.push(tempFoodData);
 		}
 	}
-	
 	ss.tp.init({
 		data : showFoodDatas
 	});
@@ -145,7 +143,6 @@ ss.initKitchenContent = function(c){
 				text : kitchenAllFoodData.root[i].name
 			}));
 			tempFoodData = tempFoodData.concat(temp.id != -1 ? temp.foods : []);
-//			tempFoodData = tempFoodData.concat(temp.foods);
 		}
 	}else{
 		html.push(Templet.ss.kitchen.format({
@@ -247,7 +244,8 @@ ss.entry = function(){
 	ss.initDeptContent();
 	
 	
-	$('#divNorthForStopSet > div[data-type=stop]').first();
+//	$('#divNorthForStopSet > div[data-type=stop]').first();
+	setTimeout("ss.searchData({event:$('#divBtnSellFood'), isStop:false})", 400);
 };
 ss.back = function(){
 	Util.sellOutCond = false;

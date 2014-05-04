@@ -114,7 +114,6 @@ Util.padding = function(c){
 			var ch = this.dom.clientHeight, cw = this.dom.clientWidth;
 			this.limit = parseInt((ch / (70 + 5 + 3 * 2))) * parseInt((cw / (90 + 5 + 3 * 2)));
 			//
-			console.log(ic.data);
 			this.data = ic.data == null || typeof ic.data == 'undefined' ? [] : ic.data;
 			this.length = this.data.length;
 			if(typeof ic.callback == 'function'){
