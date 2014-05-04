@@ -957,7 +957,7 @@ public class FoodDao {
 			      " FTR.food_id, " + 
 				  " TASTE.taste_id, TASTE.restaurant_id " +
 				  " FROM " + Params.dbName + ".food_taste_rank FTR " +
-				  " LEFT JOIN " + Params.dbName + ".taste TASTE " +
+				  " JOIN " + Params.dbName + ".taste TASTE " +
 				  " ON TASTE.taste_id = FTR.taste_id " + 
 				  " WHERE " + " FTR.food_id IN(" + foodCond + ")" +
 				  " ORDER BY FTR.rank ";
