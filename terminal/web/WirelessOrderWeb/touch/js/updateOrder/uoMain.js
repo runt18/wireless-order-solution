@@ -434,10 +434,10 @@ function inputNumUO(o){
 			inputNumValUO = "";
 			$("#" + inputNumIdUO).val(1);
 		}
-		if(parseFloat($("#" + inputNumIdUO).val()) == 0){
+		if(parseFloat($("#" + inputNumIdUO).val()) < 0){
 			Util.msg.alert({
 				title : '温馨提示',
-				msg : '人数值不能为0.', 
+				msg : '数量不能小于0.', 
 				time : 3
 			});
 			inputNumValUO = "";

@@ -592,20 +592,97 @@ co.submit = function(c){
 			notPrint : c.notPrint
 		},
 		success : function(data, status, xhr) {
-			Util.LM.hide();
+//			Util.LM.hide();
 			//下单成功时才出现倒数, 否则提示是否强制提交
 			if (data.success == true) {
-				Util.msg.alert({
-					title : data.title,
-					msg : data.msg,
-					time : 3,
-					fn : function(btn){
-						if(co.callback != null && typeof co.callback == 'function'){
-							co.callback();
-						}
-						co.back();
+					if(typeof c.tempPrint != 'undefined'){
+						$.ajax({
+							url : '../QueryOrderByCalc.do',
+							type : 'post',
+							data : {
+								calc:false,
+								serviceRate:0,
+								tableID:co.table.alias
+							},
+							dataType : 'text',
+							success : function(results, status, xhr){
+								Util.LM.hide();
+								results = eval("(" + results + ")");
+								if(results.success){
+									$.ajax({
+										url : '../PayOrder.do',
+										type : 'post',
+										data : {
+											orderID : results.other.order.id,
+											cashIncome : '-1',
+											tempPay : true,
+											isPrint : typeof c.isPrint == 'boolean' ? c.isPrint : true
+										},
+										dataType : 'text',
+										success : function(result, status, xhr){
+											Util.LM.hide();
+											result = eval("(" + result + ")");
+											if(result.success){
+												Util.msg.alert({
+													title : '提示',
+													msg : result.data,
+													time : 3,
+													fn : function(btn){
+														if(co.callback != null && typeof co.callback == 'function'){
+															co.callback();
+														}
+														co.back();
+													}
+												});
+				//								initOrderData({table : uo.table});
+											}else{
+												Util.msg.alert({
+													title : '错误',
+													msg : result.data,
+													time : 3
+												});
+											}
+										},
+										error : function(xhr, status, err){
+											Util.LM.hide();
+											Util.msg.alert({
+												title : '错误',
+												msg : err,
+												time : 3
+											});
+										}
+									});
+								}else{
+									Util.msg.alert({
+										title : '错误',
+										msg : results.data,
+										time : 3
+									});
+								}
+							},
+							error : function(xhr, status, err){
+								Util.LM.hide();
+								Util.msg.alert({
+									title : '错误',
+									msg : err,
+									time : 3
+								});
+							}
+						});
+
+					}else{
+						Util.msg.alert({
+							title : data.title,
+							msg : data.msg,
+							time : 3,
+							fn : function(btn){
+								if(co.callback != null && typeof co.callback == 'function'){
+									co.callback();
+								}
+								co.back();
+							}
+						});
 					}
-				});
 			} else {
 				Util.msg.alert({
 					title : data.title,

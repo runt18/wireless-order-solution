@@ -356,7 +356,6 @@ function initStaffContent(c){
 	$.ajax({
 		url : '../QueryStaff.do',
 		data : {
-			isCookie : true,
 			restaurantID : restaurantID
 		},
 		success : function(data, status, xhr){
