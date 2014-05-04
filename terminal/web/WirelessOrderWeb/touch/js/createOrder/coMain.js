@@ -671,6 +671,7 @@ co.submit = function(c){
 						});
 
 					}else{
+						Util.LM.hide();
 						Util.msg.alert({
 							title : data.title,
 							msg : data.msg,
