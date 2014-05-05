@@ -1,5 +1,6 @@
 package com.wireless.common;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.wireless.pojo.foodGroup.Pager;
@@ -15,7 +16,7 @@ public class WirelessOrder {
 	public static FoodMenu foodMenu;
 	public static FoodList foods;
 	public static Restaurant restaurant;
-	public static List<Staff> staffs;
+	public final static List<Staff> staffs = new ArrayList<Staff>();
 	public static List<Region> regions;
 	public static List<Table> tables;
 	public static List<Pager> pagers;

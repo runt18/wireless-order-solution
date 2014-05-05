@@ -157,7 +157,8 @@ public class StartupActivity extends Activity {
 		
 		protected void onSuccess(List<Staff> staffs){
 			
-			WirelessOrder.staffs = staffs;
+			WirelessOrder.staffs.clear();
+			WirelessOrder.staffs.addAll(staffs);
 			
 			if(staffs.isEmpty()){
 				new AlertDialog
