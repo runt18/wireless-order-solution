@@ -251,15 +251,11 @@ public class MainActivity extends FragmentActivity implements OnTableSelectedLis
 			SharedPreferences sharedPreferences = getSharedPreferences(Params.PREFS_NAME, Context.MODE_PRIVATE);
 			long loginStaffId = sharedPreferences.getLong(Params.STAFF_LOGIN_ID, Params.DEF_STAFF_LOGIN_ID);
 			if(loginStaffId == Params.DEF_STAFF_LOGIN_ID){
-				/**
-				 * Show the login dialog if logout before.  
-				 */
+				//Show the login dialog if logout before. 
 				showDialog(DIALOG_STAFF_LOGIN);
 			}else{
-				/**
-				 * Directly login with the previous staff account if user does NOT logout before.
-				 * Otherwise show the login dialog. 
-				 */
+				//Directly login with the previous staff account if user does NOT logout before.
+				//Otherwise show the login dialog. 
 				mStaffLogin = null;
 				for(Staff staff : WirelessOrder.staffs){
 					if(staff.getId() == loginStaffId){
@@ -457,7 +453,8 @@ public class MainActivity extends FragmentActivity implements OnTableSelectedLis
 		@Override
 		protected void onSuccess(List<Region> regions){
 			_progDialog.dismiss();
-			WirelessOrder.regions = regions;
+			WirelessOrder.regions.clear();
+			WirelessOrder.regions.addAll(regions);
 			
 			new QueryTableTask().execute();
 		}
@@ -499,7 +496,8 @@ public class MainActivity extends FragmentActivity implements OnTableSelectedLis
 		@Override
 		protected void onSuccess(List<Table> tables){
 			_progDialog.dismiss();
-			WirelessOrder.tables = tables;
+			WirelessOrder.tables.clear();
+			WirelessOrder.tables.addAll(tables);
 			Toast.makeText(MainActivity.this, "菜谱信息更新成功", Toast.LENGTH_SHORT).show();
 		}
 		

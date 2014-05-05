@@ -773,7 +773,8 @@ public class TableActivity extends FragmentActivity implements OnTableSelectedLi
 		@Override
 		protected void onSuccess(List<Region> regions){
 			mProgDialog.dismiss();
-			WirelessOrder.regions = regions;
+			WirelessOrder.regions.clear();
+			WirelessOrder.regions.addAll(regions);
 			
 			new QueryTableTask().execute();
 		}
@@ -809,8 +810,8 @@ public class TableActivity extends FragmentActivity implements OnTableSelectedLi
 		protected void onSuccess(List<Table> tables){
 			
 			mProgDialog.dismiss();
-			
-			WirelessOrder.tables = tables;
+			WirelessOrder.tables.clear();
+			WirelessOrder.tables.addAll(tables);
 			
 			mListView.onRefreshComplete();				
 			mRegionHandler.sendEmptyMessage(0);

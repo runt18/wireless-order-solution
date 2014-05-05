@@ -14,6 +14,6 @@ public final class WirelessOrder {
 	public static FoodMenu foodMenu;
 	public static Restaurant restaurant;
 	public final static List<Staff> staffs = new ArrayList<Staff>();
-	public static List<Region> regions;
-	public static List<Table> tables;
+	public final static List<Region> regions = new ArrayList<Region>();
+	public final static List<Table> tables = new ArrayList<Table>();
 }

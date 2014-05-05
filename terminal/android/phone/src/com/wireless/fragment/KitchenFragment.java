@@ -133,11 +133,9 @@ public class KitchenFragment extends Fragment {
 		public void handleMessage(Message msg) {
 			KitchenFragment fragment = mFragment.get();
 
-			int deptIdToFilter = msg.what;
-			
 			//根据条件筛选出要显示的厨房, 菜品按编号排序
 			for(DeptNode deptNode : fragment.mDeptTree.asDeptNodes()){
-				if(deptNode.getKey().getId() == deptIdToFilter){
+				if(deptNode.getKey().getId() == msg.what){
 					fragment.mXpListView.setAdapter(fragment.new KitchenExpandableListAdapter(deptNode.getValue()));
 					break;
 				}

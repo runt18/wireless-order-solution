@@ -8,7 +8,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
@@ -30,6 +30,8 @@ public class StartupActivity extends Activity {
 
 	private TextView _msgTxtView;
 
+	private final static boolean JUST_4_TEST = true;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -39,18 +41,19 @@ public class StartupActivity extends Activity {
 		 * getString()第二个参数为缺省值，如果preference中不存在该key，将返回缺省值，
 		 * 返回缺省值表示配置文件还未创建，需要初始化配置文件
 		 */
-		if (sharedPrefs.getString(Params.IP_ADDR, "").equals("")) {
-			Editor editor = sharedPrefs.edit();// 获取编辑器
-			editor.putString(Params.IP_ADDR, Params.DEF_IP_ADDR);
-			editor.putInt(Params.IP_PORT, Params.DEF_IP_PORT);
-			editor.putInt(Params.PRINT_SETTING,	Params.PRINT_ASYNC);
-			editor.putInt(Params.CONN_TIME_OUT, Params.TIME_OUT_10s);
-			editor.putInt(Params.LAST_PICK_CATE, Params.PICK_BY_KITCHEN);
-			editor.commit();// 提交修改
-
-		} else {
+		if(sharedPrefs.contains(Params.IP_ADDR)){
 			ServerConnector.instance().setNetAddr(sharedPrefs.getString(Params.IP_ADDR,	Params.DEF_IP_ADDR));
 			ServerConnector.instance().setNetPort(sharedPrefs.getInt(Params.IP_PORT, Params.DEF_IP_PORT)); 
+
+		} else {
+			sharedPrefs.edit()// 获取编辑器
+						.putString(Params.IP_ADDR, Params.DEF_IP_ADDR)
+						.putInt(Params.IP_PORT, Params.DEF_IP_PORT)
+						.putInt(Params.CONN_TIME_OUT, Params.TIME_OUT_10s)
+						.putInt(Params.LAST_PICK_CATE, Params.PICK_BY_KITCHEN)
+						.commit();// 提交修改
+			ServerConnector.instance().setNetAddr(Params.DEF_IP_ADDR);
+			ServerConnector.instance().setNetPort(Params.DEF_IP_PORT); 
 		}
 
 		setContentView(R.layout.startup_activity);
@@ -70,7 +73,15 @@ public class StartupActivity extends Activity {
 				
 				@Override
 				public void onCheckVersionPass() {
-					new QueryStaffTask().execute();
+					try {
+						if(getPackageManager().getPackageInfo(getPackageName(), 0).versionName.contains("test")){
+							new QueryStaffTask(JUST_4_TEST).execute();
+						}else{
+							new QueryStaffTask().execute();
+						}
+					} catch (NameNotFoundException e) {
+						new QueryStaffTask().execute();
+					}
 				}					
 			}.execute();
 		} else {
@@ -109,20 +120,15 @@ public class StartupActivity extends Activity {
 				.setPositiveButton(
 						"确定",
 						new DialogInterface.OnClickListener() {
-							public void onClick(
-									DialogInterface dialog,
-									int id) {
+							public void onClick(DialogInterface dialog,	int id) {
 								// 进入无线网络配置界面
-								startActivity(new Intent(
-										Settings.ACTION_WIRELESS_SETTINGS));
+								startActivity(new Intent(Settings.ACTION_WIRELESS_SETTINGS));
 							}
 						})
 				.setNegativeButton(
 						"取消",
 						new DialogInterface.OnClickListener() {
-							public void onClick(
-									DialogInterface dialog,
-									int id) {
+							public void onClick(DialogInterface dialog,	int id) {
 								finish();
 							}
 						}).show();
@@ -131,6 +137,8 @@ public class StartupActivity extends Activity {
 
 	private class QueryStaffTask extends com.wireless.lib.task.QueryStaffTask {
 
+		private final boolean mTestFlag;
+		
 		/**
 		 * 执行员工信息请求前显示提示信息
 		 */
@@ -141,6 +149,12 @@ public class StartupActivity extends Activity {
 
 		QueryStaffTask(){
 			super(StartupActivity.this);
+			mTestFlag = false;
+		}
+		
+		public QueryStaffTask(boolean testFlag){
+			super(StartupActivity.this, testFlag);
+			mTestFlag = testFlag;
 		}
 		
 		@Override
@@ -162,6 +176,12 @@ public class StartupActivity extends Activity {
 			} else {
 				
 				WirelessOrder.loginStaff = staffs.get(0);
+				if(mTestFlag){
+					//保存staff pin到文件里面
+					getSharedPreferences(Params.PREFS_NAME, Context.MODE_PRIVATE).edit()//获取编辑器
+						.putLong(Params.STAFF_LOGIN_ID, WirelessOrder.loginStaff.getId())
+						.commit();	//提交修改
+				}
 				new QueryMenuTask().execute();
 			}
 		}
@@ -246,7 +266,8 @@ public class StartupActivity extends Activity {
 	
 		@Override
 		protected void onSuccess(List<Region> regions){
-			WirelessOrder.regions = regions;
+			WirelessOrder.regions.clear();
+			WirelessOrder.regions.addAll(regions);
 			
 			new QueryTableTask().execute();
 		}
@@ -285,7 +306,8 @@ public class StartupActivity extends Activity {
 		
 		@Override
 		protected void onSuccess(List<Table> tables){
-			WirelessOrder.tables = tables;
+			WirelessOrder.tables.clear();
+			WirelessOrder.tables.addAll(tables);
 			
 			new QueryRestaurantTask().execute();
 		}

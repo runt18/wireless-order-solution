@@ -3,10 +3,6 @@ package com.wireless.common;
 public final class Params {
 	//The name to share preferences
 	public final static String PREFS_NAME = "TermPref";
-	//The name to Pin
-	public final static String PIN = "Pin";
-	//The name to "后厨打印"
-	public final static String PRINT_SETTING = "PrintSetting";
 	//The name to "连接超时"
 	public final static String CONN_TIME_OUT = "ConnTimeout";
 	//The name to IP address
@@ -17,10 +13,6 @@ public final class Params {
 	public final static String STAFF_LOGIN_ID = "StaffPin";
 	//The last pick food category
 	public final static String LAST_PICK_CATE = "LastPickCate";
-	
-	/* The setting value to print setting */
-	public final static int PRINT_SYNC = 0;			//同步
-	public final static int PRINT_ASYNC = 1;		//异步
 	
 	/* The time out value */
 	public final static int TIME_OUT_10s = 0;		//10s 
