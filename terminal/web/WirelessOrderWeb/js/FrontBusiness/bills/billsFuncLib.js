@@ -16,7 +16,6 @@
 		}
 	}
 	var gs = billsGrid.getStore();
-	gs.baseParams['isPaging'] = true;
 	gs.baseParams['restaurantID'] = restaurantID;
 	
 	gs.baseParams['type'] = sType;

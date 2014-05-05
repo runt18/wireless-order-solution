@@ -436,7 +436,6 @@ function billModifyOnLoad() {
 						Ext.Ajax.request({
 							url : '../../QueryDiscountPlan.do',
 							params : {
-								isCookie : true,
 								restaurantID : restaurantID
 							},
 							success : function(res, opt){
