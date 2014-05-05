@@ -315,7 +315,7 @@ public class MemberDao {
 			  " MT.member_type_id, MT.name AS member_type_name, MT.attribute, MT.exchange_rate, MT.charge_rate, MT.type, MT.initial_point " +
 			  " FROM " + Params.dbName + ".member M " +
 			  " JOIN " + Params.dbName + ".member_type MT ON M.member_type_id = MT.member_type_id " +
-			  " WHERE 1 = 1 "	+
+			  " WHERE 1 = 1 " +
 			  " AND M.restaurant_id = " + staff.getRestaurantId() +
 			  (extraCond != null ? extraCond : " ") +
 			  (orderClause != null ? orderClause : "");
