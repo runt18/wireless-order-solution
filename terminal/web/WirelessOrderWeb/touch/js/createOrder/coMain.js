@@ -694,6 +694,8 @@ co.submit = function(c){
 						if(btn == 'yes'){
 							c.commitType = 23;
 							co.submit(c);
+						}else{
+							Util.LM.hide();
 						}
 					}
 				});

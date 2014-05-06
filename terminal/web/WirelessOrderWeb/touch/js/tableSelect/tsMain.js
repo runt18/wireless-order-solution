@@ -216,9 +216,9 @@ function renderToCreateOrder(tableNo, peopleNo){
 		$("#txtTableNumForTS").val(inputNumVal);
 		$("#txtPeopleNumForSM").val(inputNumVal);
 		
-		//FIXME		if(getTableByAlias(tableNo).statusValue == 1){
 		//同时操作餐台时,选中状态没变化的餐桌处理
-		if(false){
+		//直接写台豪点菜时判断是否已点菜, 是则先给co.order.orderFoods赋值
+		if(getTableByAlias(tableNo).statusValue == 1){
 //			uo.show({
 //				table : getTableByAlias(tableNo),
 //				type : 'createOrder',
