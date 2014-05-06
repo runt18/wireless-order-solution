@@ -108,13 +108,10 @@ public class AskOrderAmountDialog extends DialogFragment{
 			public void onClick(View v) {
 				try{
 					float curNum = Float.parseFloat(countEditText.getText().toString());
+					curNum++;
 					countEditText.setText(NumericUtil.float2String2(curNum));
 				}catch(NumberFormatException e){
 					
-				}
-				if(!countEditText.getText().toString().equals("")){
-					float curNum = Float.parseFloat(countEditText.getText().toString());
-					countEditText.setText(NumericUtil.float2String2(curNum));
 				}
 			}
 		});
