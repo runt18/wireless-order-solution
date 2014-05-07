@@ -51,7 +51,7 @@ public class StockActionDao {
 		if(!restaurant.hasModule(Module.Code.INVENTORY)){
 			//限制添加的条数
 			final int stockActionCountLimit = 50;
-			String sql = "SELECT COUNT(*) FROM " + Params.dbName + ".stock_action WHERE sub_type <> 9";
+			String sql = "SELECT COUNT(*) FROM " + Params.dbName + ".stock_action WHERE restaurant_id = " + term.getRestaurantId() + " AND sub_type <> " + StockAction.SubType.USE_UP.getVal();
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
 			int stockActionCount = 0;
 			if(dbCon.rs.next()){
