@@ -47,8 +47,8 @@ public class StockActionDao {
 	public static int insertStockAction(DBCon dbCon, Staff term, InsertBuilder builder) throws SQLException, BusinessException{
 		
 		Restaurant restaurant = RestaurantDao.getById(term.getRestaurantId());
-		//是否有库存模块授权
-		if(!restaurant.hasModule(Module.Code.INVENTORY)){
+		//是否有库存模块授权&入库类型
+		if(!restaurant.hasModule(Module.Code.INVENTORY) && (builder.getSubType() != StockAction.SubType.USE_UP)){
 			//限制添加的条数
 			final int stockActionCountLimit = 50;
 			String sql = "SELECT COUNT(*) FROM " + Params.dbName + ".stock_action WHERE restaurant_id = " + term.getRestaurantId() + " AND sub_type <> " + StockAction.SubType.USE_UP.getVal();
