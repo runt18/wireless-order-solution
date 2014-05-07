@@ -38,6 +38,14 @@ import com.wireless.print.content.Content;
  *    get the version of this server socket
  */
 public class MonitorHandler implements Runnable{
+	
+	private static class Cmd{
+		private final static String SMonitor = "start_monitor";
+		private final static String KMonitor = "kill_monitor";
+		private final static String KSocket = "kill_socket";
+		private final static String CVersion = "check_version";
+	}
+	
 	private boolean _isRunning = false;
 	private ServerSocket _server = null;
 	
@@ -203,12 +211,6 @@ public class MonitorHandler implements Runnable{
 	}
 }
 
-class Cmd{
-	final static String SMonitor = "start_monitor";
-	final static String KMonitor = "kill_monitor";
-	final static String KSocket = "kill_socket";
-	final static String CVersion = "check_version";
-}
 
 /**
  * This class is to log the socket status (such as the thread pool status)
