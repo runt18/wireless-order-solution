@@ -110,6 +110,9 @@ public class QueryTodayAction extends Action {
 			}else if(type == 8){
 				//按结帐方式
 				filterCond = " AND O.pay_type " + ope + filterVal;
+			}else if(type == 9){
+				//按人员
+				filterCond = " AND O.waiter " + ope + "'" + filterVal + "'";
 			}else{
 				filterCond = "";
 			}
