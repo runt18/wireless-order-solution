@@ -16,6 +16,7 @@ import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.sms.SMSDetail;
+import com.wireless.util.DataPaging;
 
 public class QuerySmsDetailAction extends Action {
 	
@@ -24,13 +25,17 @@ public class QuerySmsDetailAction extends Action {
 			throws Exception {
 		String query = request.getParameter("query");
 		String pin = (String) request.getAttribute("pin");
+		String start = request.getParameter("start");
+		String limit = request.getParameter("limit");
 		String extra = " AND operation <> " + SMSDetail.Operation.ADD.getVal() + " AND operation <> " + SMSDetail.Operation.DEDUCT.getVal();
 		JObject jobject = new JObject();
 		try{
 			if(query != null && Integer.parseInt(query) != 0){
 				extra += " AND operation = " + query;
 			}
-			List<SMSDetail> list = SMStatDao.getDetails(StaffDao.verify(Integer.parseInt(pin)), extra, null);
+			List<SMSDetail> list = SMStatDao.getDetails(StaffDao.verify(Integer.parseInt(pin)), extra, " ORDER BY modified DESC");
+			jobject.setTotalProperty(list.size());
+			list = DataPaging.getPagingData(list, true, start, limit);
 			jobject.setRoot(list);
 		}catch(BusinessException e){
 			e.printStackTrace();
