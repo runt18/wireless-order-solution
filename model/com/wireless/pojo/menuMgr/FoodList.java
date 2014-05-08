@@ -12,9 +12,10 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import com.wireless.json.Jsonable;
 import com.wireless.pojo.util.SortedList;
 
-public class FoodList extends AbstractList<Food>{
+public class FoodList extends AbstractList<Food> implements Jsonable{
 	
 	private final SortedList<Food> mFoods;
 	
@@ -184,5 +185,17 @@ public class FoodList extends AbstractList<Food>{
 	@Override
 	public int size() {
 		return mFoods.size();
+	}
+
+	@Override
+	public Map<String, Object> toJsonMap(int flag) {
+		Map<String, Object> jm = new HashMap<String, Object>();
+		jm.put("foodList", this.mFoods);
+		return Collections.unmodifiableMap(jm);
+	}
+
+	@Override
+	public List<Object> toJsonList(int flag) {
+		return null;
 	}
 }

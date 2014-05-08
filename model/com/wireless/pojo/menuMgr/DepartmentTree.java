@@ -3,13 +3,17 @@ package com.wireless.pojo.menuMgr;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import com.wireless.json.Jsonable;
+
 public class DepartmentTree{
 
-	public static class KitchenNode implements Entry<Kitchen, FoodList>{
+	public static class KitchenNode implements Entry<Kitchen, FoodList>, Jsonable{
 
 		private final Kitchen key;
 		private final FoodList value;
@@ -33,10 +37,23 @@ public class DepartmentTree{
 		public FoodList setValue(FoodList value) {
 			throw new UnsupportedOperationException("The kitchen node is immutable");
 		}
+
+		@Override
+		public Map<String, Object> toJsonMap(int flag) {
+			Map<String, Object> jm = new HashMap<String, Object>();
+			jm.put("kitchenNodeKey", getKey());
+			jm.put("kitchenNodeValue", getValue());
+			return Collections.unmodifiableMap(jm);
+		}
+
+		@Override
+		public List<Object> toJsonList(int flag) {
+			return null;
+		}
 		
 	}
 	
-	public static class DeptNode implements Entry<Department, List<KitchenNode>>{
+	public static class DeptNode implements Entry<Department, List<KitchenNode>>, Jsonable{
 
 		private final Department key;
 		private final List<KitchenNode> value;
@@ -59,6 +76,19 @@ public class DepartmentTree{
 		@Override
 		public List<KitchenNode> setValue(List<KitchenNode> value) {
 			throw new UnsupportedOperationException("The dept node is immutable");
+		}
+
+		@Override
+		public Map<String, Object> toJsonMap(int flag) {
+			Map<String, Object> jm = new LinkedHashMap<String, Object>();
+			jm.put("deptNodeKey", getKey());
+			jm.put("deptNodeValue", getValue());
+			return Collections.unmodifiableMap(jm);
+		}
+
+		@Override
+		public List<Object> toJsonList(int flag) {
+			return null;
 		}
 		
 	}
