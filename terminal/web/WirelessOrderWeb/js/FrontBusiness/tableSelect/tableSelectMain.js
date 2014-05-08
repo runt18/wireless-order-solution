@@ -1539,7 +1539,7 @@ Ext.onReady(function() {
 					key : Ext.EventObject.ESC,
 					scope : this,
 					fn : function(){
-						inputAliasWin.hide();
+						inputAliasWin.destroy();
 					}
 				}, {
 					key : Ext.EventObject.ENTER,

@@ -870,7 +870,7 @@ function initKeyBoardEvent(){
 			}]
 		}]
 	});
-	
+	//FIXME 键盘按键事件
 	new Ext.KeyMap(document.body, [{
 		key : 107,
 		scope : this,

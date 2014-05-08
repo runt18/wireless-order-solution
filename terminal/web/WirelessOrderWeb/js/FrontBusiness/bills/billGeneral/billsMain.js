@@ -210,7 +210,46 @@ function printBillFunc(orderID) {
 		}
 	});
 };
-
+var frontBill_combo_staffs = new Ext.form.ComboBox({
+	id : 'frontBill_combo_staffs',
+	readOnly : false,
+	forceSelection : true,
+	width : 103,
+	listWidth : 120,
+	hidden : true,
+	store : new Ext.data.SimpleStore({
+		fields : ['staffID', 'staffName']
+	}),
+	valueField : 'staffName',
+	displayField : 'staffName',
+	typeAhead : true,
+	mode : 'local',
+	triggerAction : 'all',
+	selectOnFocus : true,
+	listeners : {
+		render : function(thiz){
+			var data = [['全部','全部']];
+			Ext.Ajax.request({
+				url : '../../QueryStaff.do',
+				success : function(res, opt){
+					var jr = Ext.decode(res.responseText);
+					for(var i = 0; i < jr.root.length; i++){
+						data.push([jr.root[i]['staffID'], jr.root[i]['staffName']]);
+					}
+					thiz.store.loadData(data);
+					thiz.setValue('全部');
+				},
+				fialure : function(res, opt){
+					thiz.store.loadData(data);
+					thiz.setValue('全部');
+				}
+			});
+		},
+		select : function(){
+			//Ext.getCmp('btnSearchForCommissionStatistics').handler();
+		}
+	}
+});
 
 // ------------------ north ------------------------
 var f_bills_filterTypeComb = new Ext.form.ComboBox({
@@ -221,7 +260,7 @@ var f_bills_filterTypeComb = new Ext.form.ComboBox({
 	id : 'front_bill_filter',
 	store : new Ext.data.SimpleStore({
 		fields : [ 'value', 'text' ],
-		data :  [[0, '全部'], [1, '帐单号'], [2, '流水号'], [3, '台号'], [4, '时间'], [5, '金额'], [6, '实收'], [7, '类型'], [8, '结帐方式']]
+		data :  [[0, '全部'], [1, '帐单号'], [2, '流水号'], [3, '台号'], [4, '时间'], [5, '金额'], [6, '实收'], [7, '类型'], [8, '结帐方式'], [9, '操作员工']]
 	}),
 	valueField : 'value',
 	displayField : 'text',
@@ -241,6 +280,7 @@ var f_bills_filterTypeComb = new Ext.form.ComboBox({
 			var comboPayType = Ext.getCmp('comboPayType');
 			var timeCondition = Ext.getCmp('timeCondition');
 			var numberSearchValue = Ext.getCmp('numberSearchValue');
+			var staffs = Ext.getCmp('frontBill_combo_staffs');
 			
 			//
 			comboOperator.setVisible(false);
@@ -248,6 +288,7 @@ var f_bills_filterTypeComb = new Ext.form.ComboBox({
 			comboPayType.setVisible(false);
 			timeCondition.setVisible(false);
 			numberSearchValue.setVisible(false);
+			staffs.setValue(false);
 			
 			comboOperator.setVisible(true);
 			comboOperator.setValue(1);
@@ -298,7 +339,13 @@ var f_bills_filterTypeComb = new Ext.form.ComboBox({
 				comboPayType.setVisible(true);
 				comboPayType.setValue(1);
 				searchValue = comboPayType.getId();
-			} 
+			}else if (index == 9) {
+				//操作人员
+				comboOperator.setVisible(false);
+				staffs.setVisible(true);
+				staffs.setValue('全部');
+				searchValue = staffs.getId();
+			}  
 			
 		}
 	}
@@ -429,6 +476,7 @@ Ext.onReady(function(){
 			hidden : true,
 			width : 130
 		}, 
+		frontBill_combo_staffs,
 		{ xtype:'tbtext', text:'&nbsp;&nbsp;'}, {
 			xtype : 'radio',
 			checked : true,
