@@ -107,7 +107,7 @@ public class SortedList<T> extends LinkedList<T> {
     @Override
     public boolean addAll(Collection<? extends T> paramCollection) {
         boolean result = false;
-        for (T paramT:paramCollection) {
+        for (T paramT : paramCollection) {
             result |= add(paramT);
         }
         return result;

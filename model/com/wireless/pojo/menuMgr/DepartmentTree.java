@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import com.wireless.json.Jsonable;
+import com.wireless.pojo.util.SortedList;
 
 public class DepartmentTree{
 
@@ -18,9 +19,26 @@ public class DepartmentTree{
 		private final Kitchen key;
 		private final FoodList value;
 		
-		private KitchenNode(Kitchen key, FoodList value){
+		private KitchenNode(Kitchen key, List<Food> value){
 			this.key = key;
-			this.value = value;
+			if(value != null){
+				this.value = new FoodList(value, new Comparator<Food>(){
+					//每个厨房的菜品重新排序，"热销"菜品排在最前，其他的按编号排序
+					@Override
+					public int compare(Food f0, Food f1) {
+						if(f0.isHot() && !f1.isHot()){
+							return -1;
+						}else if(!f0.isHot() && f1.isHot()){
+							return 1;
+						}else{
+							return Food.BY_ALIAS.compare(f0, f1);
+						}
+					}
+					
+				});
+			}else{
+				this.value = null;
+			}
 		}
 		
 		@Override
@@ -60,7 +78,24 @@ public class DepartmentTree{
 		
 		private DeptNode(Department key, List<KitchenNode> value){
 			this.key = key;
-			this.value = value;
+			if(value != null){
+				this.value =  SortedList.newInstance(value, new Comparator<KitchenNode>(){
+					//厨房按displayId排序
+					@Override
+					public int compare(KitchenNode lhs, KitchenNode rhs) {
+						if(lhs.getKey().getDisplayId() > rhs.getKey().getDisplayId()){
+							return 1;
+						}else if(lhs.getKey().getDisplayId() < rhs.getKey().getDisplayId()){
+							return -1;
+						}else{
+							return 0;
+						}
+					}
+					
+				});
+			}else{
+				this.value = null;
+			}
 		}
 		
 		@Override
@@ -97,73 +132,102 @@ public class DepartmentTree{
 		
 		private final List<DeptNode> mNodesToBuild = new ArrayList<DeptNode>();
 		
-		public Builder addNode(Department dept, Map<Kitchen, FoodList> foodsByKitchen){
-
-			final List<KitchenNode> kitchenNodes = new ArrayList<KitchenNode>();
-
-			for(Entry<Kitchen, FoodList> entry : foodsByKitchen.entrySet()){
-				
-				//每个厨房的菜品重新排序，"热销"菜品排在最前，其他的按编号排序
-				FoodList sorted = new FoodList(entry.getValue(), new Comparator<Food>(){
-
-					@Override
-					public int compare(Food f0, Food f1) {
-						if(f0.isHot() && !f1.isHot()){
-							return -1;
-						}else if(!f0.isHot() && f1.isHot()){
-							return 1;
-						}else{
-							return Food.BY_ALIAS.compare(f0, f1);
-						}
-					}
-					
-				});
-				
-				kitchenNodes.add(new KitchenNode(entry.getKey(), sorted));
-			}
-			
-			//厨房按displayId排序
-			Collections.sort(kitchenNodes, new Comparator<KitchenNode>(){
-
-				@Override
-				public int compare(KitchenNode lhs, KitchenNode rhs) {
-					if(lhs.getKey().getDisplayId() > rhs.getKey().getDisplayId()){
-						return 1;
-					}else if(lhs.getKey().getDisplayId() < rhs.getKey().getDisplayId()){
-						return -1;
-					}else{
-						return 0;
+		public Builder(List<Department> depts, List<Kitchen> kitchens){
+			for(Department d : depts){
+				List<KitchenNode> kitchenNodes = new ArrayList<KitchenNode>();
+				for(Kitchen k : kitchens){
+					if(k.getDept().equals(d)){
+						kitchenNodes.add(new KitchenNode(k, null));
 					}
 				}
-				
-			});
+				mNodesToBuild.add(new DeptNode(d, kitchenNodes));
+			}
+		}
+		
+		public Builder(List<Food> foodList){
+			for(Entry<Department, List<Food>> entry : groupByDept(foodList).entrySet()){
+				addNode(entry.getKey(), groupByKitchen(entry.getValue()));
+			}
+		}
+		
+	    /**
+	     * Return a map containing the foods to each department.
+	     * @return a map containing the foods to each department
+	     */
+	    private Map<Department, List<Food>> groupByDept(List<Food> foodList){
+	    	Map<Department, List<Food>> foodsByDept = new HashMap<Department, List<Food>>();
+	    	
+	    	//Group the foods by department and put it to a map.
+	    	for(Food f : foodList){
+	    		List<Food> foodsToEachDept = foodsByDept.get(f.getKitchen().getDept());
+	    		if(foodsToEachDept != null){
+	    			foodsToEachDept.add(f);
+	    		}else{
+	    			foodsToEachDept = new ArrayList<Food>();
+	    			foodsToEachDept.add(f);
+	    			foodsByDept.put(f.getKitchen().getDept(), foodsToEachDept);
+	    		}
+	    	}
+	    	
+	    	return foodsByDept;
+	    	
+	    }
+		
+	    /**
+	     * Return a map containing the foods to each kitchen.
+	     * @return a map containing the foods to each kitchen
+	     */
+	    private Map<Kitchen, List<Food>> groupByKitchen(List<Food> foodList) {
+	    	Map<Kitchen, List<Food>> foodsByKitchen = new HashMap<Kitchen, List<Food>>();
+	    	
+			//Group the foods by kitchen and put it to a map.
+	    	for(Food f : foodList){
+				List<Food> foodsToEachKitchen = foodsByKitchen.get(f.getKitchen());
+				if(foodsToEachKitchen != null){
+					foodsToEachKitchen.add(f);
+				}else{
+					foodsToEachKitchen = new ArrayList<Food>();
+					foodsToEachKitchen.add(f);
+					foodsByKitchen.put(f.getKitchen(), foodsToEachKitchen);
+				}
+			}
+	    	
+	    	return foodsByKitchen;
+	    }
+	    
+		private Builder addNode(Department dept, Map<Kitchen, List<Food>> foodsByKitchen){
+
+			List<KitchenNode> kitchenNodes = new ArrayList<KitchenNode>();
+
+			for(Entry<Kitchen, List<Food>> entry : foodsByKitchen.entrySet()){
+				kitchenNodes.add(new KitchenNode(entry.getKey(), entry.getValue()));
+			}
 			
 			mNodesToBuild.add(new DeptNode(dept, kitchenNodes));
 			return this;
 		}
 		
 		public DepartmentTree build(){
-			//部门按displayId排序
-			Collections.sort(mNodesToBuild, new Comparator<DeptNode>(){
-				@Override
-				public int compare(DeptNode lhs, DeptNode rhs) {
-					if(lhs.getKey().getDisplayId() > rhs.getKey().getDisplayId()){
-						return 1;
-					}else if(lhs.getKey().getDisplayId() < rhs.getKey().getDisplayId()){
-						return -1;
-					}else{
-						return 0;
-					}
-				}
-			});
 			return new DepartmentTree(mNodesToBuild);
 		}
 	}
 
-	private final List<DeptNode> mDeptNodes;
+	private final List<DeptNode> mDeptNodes = SortedList.newInstance(new Comparator<DeptNode>(){
+		//部门按displayId排序
+		@Override
+		public int compare(DeptNode lhs, DeptNode rhs) {
+			if(lhs.getKey().getDisplayId() > rhs.getKey().getDisplayId()){
+				return 1;
+			}else if(lhs.getKey().getDisplayId() < rhs.getKey().getDisplayId()){
+				return -1;
+			}else{
+				return 0;
+			}
+		}
+	});
 
 	private DepartmentTree(List<DeptNode> deptNodes){
-		this.mDeptNodes = deptNodes;
+		this.mDeptNodes.addAll(deptNodes);
 	}
 	
 	public List<Food> asFoodList(){
