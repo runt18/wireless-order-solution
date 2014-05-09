@@ -325,7 +325,7 @@ var allFoodTabPanelGrid = createGridPanel(
 		['价格', 'unitPrice', 70, 'right', 'Ext.ux.txtFormat.gridDou']
 	],
 	FoodBasicRecord.getKeys(),
-	[ ['dataSource', 'foods'], ['restaurantID', restaurantID]],
+	[['isPaging', true], ['dataSource', 'foods'], ['restaurantID', restaurantID]],
 	GRID_PADDING_LIMIT_30,
 	'',
 	allFoodTabPanelGridTbar
@@ -432,7 +432,10 @@ function billModifyOnLoad() {
 					},
 					success : function(res, opt) {
 						discountData = eval(res.responseText);
-						
+						var discount = Ext.getCmp('comboDiscount');
+						discount.store.loadData({root:discountData});
+						discount.setValue(orderedGrid.order.discount.id);
+/*						
 						Ext.Ajax.request({
 							url : '../../QueryDiscountPlan.do',
 							params : {
@@ -446,9 +449,6 @@ function billModifyOnLoad() {
 										discountPlanData.root.push(jr.root[i]);
 									}
 								}
-								var discount = Ext.getCmp('comboDiscount');
-								discount.store.loadData({root:discountData});
-								discount.setValue(orderedGrid.order.discount.id);
 							},
 							failure : function(res, opt) {
 								Ext.MessageBox.show({
@@ -458,6 +458,7 @@ function billModifyOnLoad() {
 								});
 							}
 						});
+						*/
 					},
 					failure : function(res, opt) {
 						Ext.MessageBox.show({
