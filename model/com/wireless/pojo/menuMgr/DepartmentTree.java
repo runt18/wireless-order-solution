@@ -134,13 +134,17 @@ public class DepartmentTree{
 		
 		public Builder(List<Department> depts, List<Kitchen> kitchens){
 			for(Department d : depts){
-				List<KitchenNode> kitchenNodes = new ArrayList<KitchenNode>();
-				for(Kitchen k : kitchens){
-					if(k.getDept().equals(d)){
-						kitchenNodes.add(new KitchenNode(k, null));
+				if(kitchens != null){
+					List<KitchenNode> kitchenNodes = new ArrayList<KitchenNode>();
+					for(Kitchen k : kitchens){
+						if(k.getDept().equals(d)){
+							kitchenNodes.add(new KitchenNode(k, null));
+						}
 					}
+					mNodesToBuild.add(new DeptNode(d, kitchenNodes));
+				}else{
+					mNodesToBuild.add(new DeptNode(d, null));
 				}
-				mNodesToBuild.add(new DeptNode(d, kitchenNodes));
 			}
 		}
 		
