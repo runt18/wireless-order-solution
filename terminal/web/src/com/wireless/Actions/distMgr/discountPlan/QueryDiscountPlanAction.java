@@ -19,6 +19,7 @@ import com.wireless.db.distMgr.DiscountDao.ShowType;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
+import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.pojo.distMgr.Discount;
 import com.wireless.pojo.distMgr.DiscountPlan;
@@ -59,8 +60,8 @@ public class QueryDiscountPlanAction extends Action{
 					}
 					
 					@Override
-					public List<Object> toJsonList(int flag) {
-						return null;
+					public void fromJsonMap(JsonMap jsonMap, int flag) {
+						
 					}
 				};
 				jList.add(j);

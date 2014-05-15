@@ -5,7 +5,6 @@ import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -28,6 +27,7 @@ import com.wireless.db.weixin.restaurant.WeixinRestaurantDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.MemberError;
 import com.wireless.json.JObject;
+import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.pojo.client.Member;
 import com.wireless.pojo.restaurantMgr.Restaurant;
@@ -77,8 +77,8 @@ public class WXOperateMemberAction extends DispatchAction {
 				}
 				
 				@Override
-				public List<Object> toJsonList(int flag) {
-					return null;
+				public void fromJsonMap(JsonMap jsonMap, int flag) {
+					
 				}
 			};
 			

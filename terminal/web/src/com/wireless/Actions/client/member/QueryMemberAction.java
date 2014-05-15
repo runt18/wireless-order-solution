@@ -21,6 +21,7 @@ import com.wireless.db.client.member.MemberTypeDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
+import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.pojo.client.Member;
 import com.wireless.pojo.client.MemberType;
@@ -58,10 +59,10 @@ public class QueryMemberAction extends DispatchAction {
 						jm.put("memberCount", mc);
 						return Collections.unmodifiableMap(jm);
 					}
-					
+
 					@Override
-					public List<Object> toJsonList(int flag) {
-						return null;
+					public void fromJsonMap(JsonMap jsonMap, int flag) {
+						
 					}
 				});
 				sum += mc;
@@ -78,8 +79,8 @@ public class QueryMemberAction extends DispatchAction {
 				}
 				
 				@Override
-				public List<Object> toJsonList(int flag) {
-					return null;
+				public void fromJsonMap(JsonMap jsonMap, int flag) {
+					
 				}
 			});
 			

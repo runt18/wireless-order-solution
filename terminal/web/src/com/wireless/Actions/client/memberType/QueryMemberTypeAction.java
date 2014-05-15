@@ -23,6 +23,7 @@ import com.wireless.db.weixin.member.WeixinMemberDao;
 import com.wireless.db.weixin.restaurant.WeixinRestaurantDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
+import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.pojo.client.Member;
 import com.wireless.pojo.client.MemberLevel;
@@ -243,8 +244,8 @@ public class QueryMemberTypeAction extends DispatchAction {
 					}
 					
 					@Override
-					public List<Object> toJsonList(int flag) {
-						return null;
+					public void fromJsonMap(JsonMap jsonMap, int flag) {
+						
 					}
 				};
 				result.add(j);

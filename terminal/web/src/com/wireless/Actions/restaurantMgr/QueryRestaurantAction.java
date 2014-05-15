@@ -19,6 +19,7 @@ import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.db.sms.SMStatDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.json.JObject;
+import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.sms.SMStat;
@@ -79,8 +80,8 @@ public class QueryRestaurantAction extends Action{
 							}
 							
 							@Override
-							public List<Object> toJsonList(int flag) {
-								return null;
+							public void fromJsonMap(JsonMap jsonMap, int flag) {
+								
 							}
 						};
 						resList.add(j);

@@ -20,6 +20,7 @@ import com.wireless.db.shift.ShiftDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
+import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.billStatistics.IncomeByDept;
@@ -135,8 +136,8 @@ public class DailySettleStatDetailAction extends Action {
 				}
 				
 				@Override
-				public List<Object> toJsonList(int flag) {
-					return null;
+				public void fromJsonMap(JsonMap jsonMap, int flag) {
+					
 				}
 			};
 			
