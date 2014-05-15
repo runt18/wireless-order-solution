@@ -57,7 +57,7 @@ public interface Parcelable {
      * Interface that must be implemented and provided as a public CREATOR
      * field that create a new instance of your Parcelable class.
      */
-    public interface Creator<T extends Parcelable>{
+    public static interface Creator<T extends Parcelable>{
 	    /**
 		 * Create a new instance of the Parcelable class.
 		 * 

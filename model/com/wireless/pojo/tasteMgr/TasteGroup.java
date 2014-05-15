@@ -1,11 +1,10 @@
 package com.wireless.pojo.tasteMgr;
 
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.parcel.Parcel;
 import com.wireless.parcel.Parcelable;
@@ -402,38 +401,79 @@ public class TasteGroup implements Parcelable, Jsonable{
 			this.mGroupId = source.readInt();
 			this.mTastes = SortedList.newInstance((source.readParcelList(Taste.CREATOR)));
 			this.mSpec = source.readParcel(Taste.CREATOR);
-			this.mTmpTaste = (Taste)source.readParcel(Taste.CREATOR);
+			this.mTmpTaste = source.readParcel(Taste.CREATOR);
 		}
 	}
 	
 	public final static Parcelable.Creator<TasteGroup> TG_CREATOR = new Parcelable.Creator<TasteGroup>() {
 		
+		@Override
 		public TasteGroup[] newInstance(int size) {
 			return new TasteGroup[size];
 		}
 		
+		@Override
 		public TasteGroup newInstance() {
 			return new TasteGroup();
 		}
 	};
 
+	public static enum Key4Json{
+		GROUP_ID("groupId", ""),
+		TASTE_PREF("tastePref", ""),
+		TASTE_PRICE("tastePrice", ""),
+		NORMAL_TASTE("normalTaste", ""),
+		NORMAL_TASTE_LIST("normalTasteContent", ""),
+		TMP_TASTE("tmpTaste", "");
+		
+		private final String key;
+		private final String desc;
+		
+		Key4Json(String key, String desc){
+			this.key = key;
+			this.desc = desc;
+		}
+		
+		@Override
+		public String toString(){
+			return "key = " + key + ",desc = " + desc;
+		}
+	}
+	
 	@Override
 	public Map<String, Object> toJsonMap(int flag) {
-		HashMap<String, Object> jm = new LinkedHashMap<String, Object>();
-		jm.put("groupId", this.mGroupId);
-		jm.put("tastePref", this.getPreference());
-		jm.put("tastePrice", this.getPrice());
-		jm.put("normalTaste", this.mNormalTaste);
-		jm.put("normalTasteContent", this.getNormalTastes());
-		jm.put("tmpTaste", this.mTmpTaste);
+		JsonMap jm = new JsonMap();
+		jm.putInt(Key4Json.GROUP_ID.key, this.mGroupId);
+		jm.putString(Key4Json.TASTE_PREF.key, this.getPreference());
+		jm.putFloat(Key4Json.TASTE_PRICE.key, this.getPrice());
+		jm.putJsonable(Key4Json.NORMAL_TASTE.key, this.mNormalTaste, 0);
+		jm.putJsonableList(Key4Json.NORMAL_TASTE_LIST.key, this.getNormalTastes(), 0);
+		jm.putJsonable(Key4Json.TMP_TASTE.key, this.mTmpTaste, 0);
 		
-		return Collections.unmodifiableMap(jm);
+		return jm;
 	}
 
+	public final static int TG_JSONABLE_4_COMMIT = 0;
+	
 	@Override
-	public List<Object> toJsonList(int flag) {
-		return null;
+	public void fromJsonMap(JsonMap jsonMap, int flag) {
+		if(flag == TG_JSONABLE_4_COMMIT){
+			if(jsonMap.containsKey(Key4Json.NORMAL_TASTE_LIST.key)){
+				for(Taste t : jsonMap.getJsonableList(Key4Json.NORMAL_TASTE_LIST.key, Taste.JSON_CREATOR, Taste.TASTE_JSONABLE_4_COMMIT)){
+					addTaste(t);
+				}
+			}
+			if(jsonMap.containsKey(Key4Json.TMP_TASTE.key)){
+				setTmpTaste(jsonMap.getJsonable(Key4Json.TMP_TASTE.key, Taste.JSON_CREATOR, Taste.TMP_TASTE_JSONABLE_4_COMMIT));
+			}
+		}
 	}
 
+	public static Jsonable.Creator<TasteGroup> JSON_CREATOR = new Jsonable.Creator<TasteGroup>() {
+		@Override
+		public TasteGroup newInstance() {
+			return new TasteGroup();
+		}
+	};
 	
 }	

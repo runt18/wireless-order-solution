@@ -1,6 +1,5 @@
 package com.wireless.json;
 
-import java.util.List;
 import java.util.Map;
 
 public interface Jsonable {
@@ -18,10 +17,23 @@ public interface Jsonable {
 	public Map<String, Object> toJsonMap(int flag);
 	
 	/**
-	 * Flatten the object to a list.
-	 * @param flag additional flags about how the object should be flatten
-	 * @return the list to the object
+	 * Create the object from key-value map.
+	 * @param jsonMap the key-value map to create object
+	 * @param flag additional flags about how the object should be created
 	 */
-	public List<Object> toJsonList(int flag);
+	public void fromJsonMap(JsonMap jsonMap, int flag);
+	
+    /**
+     * Interface that must be implemented and provided as a public CREATOR
+     * field that create a new instance of your Jsonable class.
+     */
+    public static interface Creator<T extends Jsonable>{
+		/**
+	     * Create the object.
+		 * @return  an instance of the Jsonable class, with every entry initialized to null.
+		 */
+		 public T newInstance();
+		 
+	 }
 	
 }

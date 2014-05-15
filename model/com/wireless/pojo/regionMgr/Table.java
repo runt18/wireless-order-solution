@@ -1,10 +1,8 @@
 package com.wireless.pojo.regionMgr;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
+import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.parcel.Parcel;
 import com.wireless.parcel.Parcelable;
@@ -400,10 +398,12 @@ public class Table implements Parcelable, Comparable<Table>, Jsonable{
 	
 	public final static Parcelable.Creator<Table> CREATOR = new Parcelable.Creator<Table>() {
 		
+		@Override
 		public Table[] newInstance(int size) {
 			return new Table[size];
 		}
 		
+		@Override
 		public Table newInstance() {
 			return new Table();
 		}
@@ -420,34 +420,28 @@ public class Table implements Parcelable, Comparable<Table>, Jsonable{
 		}
 	}
 
-	private Map<String, Object> toJsonMap() {
-		Map<String, Object> jm = new HashMap<String, Object>();
-		jm.put("id", this.tableId);
-		jm.put("alias", this.tableAlias);
-		jm.put("rid", this.restaurantId);
-		jm.put("name", this.tableName);
-		jm.put("customNum", this.customNum);
-		jm.put("minimumCost", this.minimumCost);
-		jm.put("serviceRate", this.serviceRate);
-		jm.put("categoryValue", this.category.getVal());
-		jm.put("categoryText", this.category.getDesc());
-		jm.put("statusValue", this.status.getVal());
-		jm.put("statusText", this.status.getDesc());
-		jm.put("region", this.region);
+	@Override
+	public Map<String, Object> toJsonMap(int flag) {
+		JsonMap jm = new JsonMap();
+		jm.putInt("id", this.tableId);
+		jm.putInt("alias", this.tableAlias);
+		jm.putInt("rid", this.restaurantId);
+		jm.putString("name", this.tableName);
+		jm.putInt("customNum", this.customNum);
+		jm.putFloat("minimumCost", this.minimumCost);
+		jm.putFloat("serviceRate", this.serviceRate);
+		jm.putInt("categoryValue", this.category.getVal());
+		jm.putString("categoryText", this.category.getDesc());
+		jm.putInt("statusValue", this.status.getVal());
+		jm.putString("statusText", this.status.getDesc());
+		jm.putJsonable("region", this.region, 0);
 		
 		return jm;
 	}
-	
-	@Override
-	public Map<String, Object> toJsonMap(int flag) {
-		Map<String, Object> jm = toJsonMap();
-		
-		return Collections.unmodifiableMap(jm);
-	}
 
 	@Override
-	public List<Object> toJsonList(int flag) {
-		return null;
+	public void fromJsonMap(JsonMap jsonMap, int flag) {
+		
 	}
 
 }

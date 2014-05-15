@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.pojo.util.SortedList;
 
@@ -65,8 +66,8 @@ public class DepartmentTree{
 		}
 
 		@Override
-		public List<Object> toJsonList(int flag) {
-			return null;
+		public void fromJsonMap(JsonMap jsonMap, int flag) {
+			
 		}
 		
 	}
@@ -122,8 +123,8 @@ public class DepartmentTree{
 		}
 
 		@Override
-		public List<Object> toJsonList(int flag) {
-			return null;
+		public void fromJsonMap(JsonMap jsonMap, int flag) {
+			
 		}
 		
 	}

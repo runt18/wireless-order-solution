@@ -2,9 +2,9 @@ package com.wireless.pojo.regionMgr;
 
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
+import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.parcel.Parcel;
 import com.wireless.parcel.Parcelable;
@@ -232,8 +232,8 @@ public class Region implements Parcelable, Jsonable, Comparable<Region>{
 	}
 
 	@Override
-	public List<Object> toJsonList(int flag) {
-		return null;
+	public void fromJsonMap(JsonMap jsonMap, int flag) {
+		
 	}
 
 	@Override

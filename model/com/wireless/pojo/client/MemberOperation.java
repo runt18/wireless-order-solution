@@ -6,6 +6,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.util.DateUtil;
@@ -222,8 +223,8 @@ public class MemberOperation implements Jsonable {
 	}
 
 	@Override
-	public List<Object> toJsonList(int flag) {
-		return null;
+	public void fromJsonMap(JsonMap jsonMap, int flag) {
+		
 	}
 	
 	public int getId() {

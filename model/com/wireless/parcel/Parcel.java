@@ -367,9 +367,9 @@ public final class Parcel {
     public <T extends Parcelable> List<T> readParcelList(Parcelable.Creator<T> creator){
 		if(readByte() != 0){
 			
-			List<T> destList = new ArrayList<T>();
-			
 	        int amount = readShort();
+			List<T> destList = new ArrayList<T>(amount);
+			
 	        for(int i = 0; i < amount; i++){
 	        	destList.add(readParcel(creator));
 	        }

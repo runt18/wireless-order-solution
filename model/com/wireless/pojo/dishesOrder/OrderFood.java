@@ -1,13 +1,12 @@
 package com.wireless.pojo.dishesOrder;
 
-import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.zip.CRC32;
 
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.StaffError;
+import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.parcel.Parcel;
 import com.wireless.parcel.Parcelable;
@@ -630,45 +629,133 @@ public class OrderFood implements Parcelable, Jsonable {
 	
 	public static Parcelable.Creator<OrderFood> CREATOR = new Parcelable.Creator<OrderFood>() {
 		
+		@Override
 		public OrderFood[] newInstance(int size) {
 			return new OrderFood[size];
 		}
 		
+		@Override
 		public OrderFood newInstance() {
 			return new OrderFood();
 		}
 	};
 
-	@Override
-	public Map<String, Object> toJsonMap(int flag) {
-		Map<String, Object> jm = new LinkedHashMap<String, Object>();
-		// extends food
-		jm.putAll(this.mFood.toJsonMap(0));
-		jm.put("orderId", this.mOrderId);
-		jm.put("orderDateFormat", DateUtil.format(this.mOrderDate));
-		jm.put("waiter", this.mWaiter);
-		jm.put("cancelReason", this.mCancelReason);
-		jm.put("isTemporary", this.isTemporary);
-		jm.put("isRepaid", this.isRepaid);
-		jm.put("isHurried", this.isHurried);
-		jm.put("isHangup", this.isHangup);
-		jm.put("isGift", this.mFood.isGift());
-		jm.put("isCommission", this.mFood.isCommission());
-		jm.put("isReturn", this.getCount() < 0 ? true : false);
-		jm.put("discount", this.mDiscount);
-		jm.put("count", this.getCount());
-		jm.put("unitPrice", this.getPrice());
-		jm.put("actualPrice", this.getPrice());
-		jm.put("totalPrice", this.calcPriceWithTaste());
-		jm.put("tasteGroup", this.getTasteGroup());
-		jm.put("totalPriceBeforeDiscount", this.calcPriceBeforeDiscount());
+	public static enum Key4Json{
+		ORDER_ID("orderId", "账单id"),
+		ORDER_DATE("orderDateFormat", "账单日期"),
+		WAITER("waiter", "服务员"),
+		CANCEL_REASON("cancelReason", "退菜原因"),
+		IS_TEMP("isTemporary", "是否临时菜"),
+		IS_REPAID("isRepaid", "是否反结账"),
+		IS_HURRIED("isHurried", "是否催菜"),
+		IS_GIFT("isGift", "是否赠送"),
+		IS_HANG("isHangup", "是否叫起"),
+		IS_COMMISSION("isCommission", "是否提成"),
+		IS_RETURN("isReturn", "是否退菜"),
+		DISCOUNT("discount", "折扣"),
+		COUNT("count", "数量"),
+		UNIT_PRICE("unitPrice", "单价"),
+		ACTUAL_PRICE("actualPrice", "实收"),
+		TOTAL_PRICE("totalPrice", "应收"),
+		TASTE_GROUP("tasteGroup", "口味"),
+		TOTAL_PRICE_BEFORE_DISCOUNT("totalPriceBeforeDiscount", "应收(折扣前)");
 		
-		return Collections.unmodifiableMap(jm);
-	}
-
-	@Override
-	public List<Object> toJsonList(int flag) {
-		return null;
+		Key4Json(String key, String desc){
+			this.key = key;
+			this.desc = desc;
+		}
+		
+		private final String key;
+		private final String desc;
+		
+		@Override
+		public String toString(){
+			return "key = " + key + ",desc = " + desc;
+		}
+		
 	}
 	
+	@Override
+	public Map<String, Object> toJsonMap(int flag) {
+		JsonMap jm = new JsonMap();
+		// extends food
+		jm.putJsonable(this.mFood, 0);
+		jm.putInt(Key4Json.ORDER_ID.key, this.mOrderId);
+		jm.putString(Key4Json.ORDER_DATE.key, DateUtil.format(this.mOrderDate));
+		jm.putString(Key4Json.WAITER.key, this.mWaiter);
+		jm.putJsonable(Key4Json.CANCEL_REASON.key, this.mCancelReason, 0);
+		jm.putBoolean(Key4Json.IS_TEMP.key, this.isTemporary);
+		jm.putBoolean(Key4Json.IS_REPAID.key, this.isRepaid);
+		jm.putBoolean(Key4Json.IS_HURRIED.key, this.isHurried);
+		jm.putBoolean(Key4Json.IS_HANG.key, this.isHangup);
+		jm.putBoolean(Key4Json.IS_GIFT.key, this.mFood.isGift());
+		jm.putBoolean(Key4Json.IS_COMMISSION.key, this.mFood.isCommission());
+		jm.putBoolean(Key4Json.IS_RETURN.key, this.getCount() < 0 ? true : false);
+		jm.putFloat(Key4Json.DISCOUNT.key, this.mDiscount);
+		jm.putFloat(Key4Json.COUNT.key, this.getCount());
+		jm.putFloat(Key4Json.UNIT_PRICE.key, this.getPrice());
+		jm.putFloat(Key4Json.ACTUAL_PRICE.key, this.getPrice());
+		jm.putFloat(Key4Json.TOTAL_PRICE.key, this.calcPriceWithTaste());
+		jm.putJsonable(Key4Json.TASTE_GROUP.key, this.getTasteGroup(), 0);
+		jm.putFloat(Key4Json.TOTAL_PRICE_BEFORE_DISCOUNT.key, this.calcPriceBeforeDiscount());
+		
+		return jm;
+	}
+
+	public final static int OF_JSONABLE_4_COMMIT = 0; 
+	
+	@Override
+	public void fromJsonMap(JsonMap jsonMap, int flag) {
+		if(flag == OF_JSONABLE_4_COMMIT){
+			if(jsonMap.getBoolean(Key4Json.IS_TEMP.key)){
+				setTemp(true);
+				//name to temporary...necessary
+				if(jsonMap.containsKey(Food.Key4Json.FOOD_NAME.key)){
+					mFood.setName(jsonMap.getString(Food.Key4Json.FOOD_NAME.key));
+				}else{
+					throw new IllegalStateException("提交的临时菜数据缺少(" + Food.Key4Json.FOOD_NAME.toString() + ")");
+				}
+				//price to temporary...necessary
+				if(jsonMap.containsKey(Food.Key4Json.FOOD_PRICE.key)){
+					mFood.setPrice(jsonMap.getFloat(Food.Key4Json.FOOD_PRICE.key));
+				}else{
+					throw new IllegalStateException("提交的临时菜数据缺少(" + Food.Key4Json.FOOD_PRICE.toString() + ")");
+				}
+			}else{
+				setTemp(false);
+				//food id...necessary
+				if(jsonMap.containsKey(Food.Key4Json.FOOD_ID.key)){
+					mFood.setFoodId(jsonMap.getInt(Food.Key4Json.FOOD_ID.key));
+				}else{
+					throw new IllegalStateException("提交的数据缺少(" + Food.Key4Json.FOOD_ID.toString() + ")");
+				}
+			}
+
+			if(jsonMap.containsKey(Key4Json.COUNT.key)){
+				setCount(jsonMap.getFloat(Key4Json.COUNT.key));
+			}else{
+				throw new IllegalStateException("提交的数据缺少(" + Key4Json.COUNT.toString() + ")");
+			}
+			
+			if(jsonMap.containsKey(Key4Json.IS_HANG.key)){
+				setHangup(jsonMap.getBoolean(Key4Json.IS_HANG.key));
+			}
+			
+			if(jsonMap.containsKey(Key4Json.TASTE_GROUP.key)){
+				setTasteGroup(jsonMap.getJsonable(Key4Json.TASTE_GROUP.key, TasteGroup.JSON_CREATOR, TasteGroup.TG_JSONABLE_4_COMMIT));
+			}
+			
+			if(jsonMap.containsKey(Key4Json.CANCEL_REASON.key)){
+				setCancelReason(jsonMap.getJsonable(Key4Json.CANCEL_REASON.key, CancelReason.JSON_CREATOR, CancelReason.CR_JSONABLE_4_COMMIT));
+			}
+		}
+	}
+	
+	public static Jsonable.Creator<OrderFood> JSON_CREATOR = new Jsonable.Creator<OrderFood>() {
+		
+		@Override
+		public OrderFood newInstance() {
+			return new OrderFood(0);
+		}
+	};
 }

@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.wireless.exception.BusinessException;
+import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 
 public class Printer implements Jsonable{
@@ -219,7 +220,7 @@ public class Printer implements Jsonable{
 	}
 
 	@Override
-	public List<Object> toJsonList(int flag) {
-		return null;
+	public void fromJsonMap(JsonMap jsonMap, int flag) {
+		
 	}
 }

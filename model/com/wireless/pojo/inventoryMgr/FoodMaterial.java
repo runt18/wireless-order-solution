@@ -2,9 +2,9 @@ package com.wireless.pojo.inventoryMgr;
 
 import java.util.Collections;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
+import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 
 public class FoodMaterial implements Jsonable{
@@ -139,8 +139,8 @@ public class FoodMaterial implements Jsonable{
 		return Collections.unmodifiableMap(jm);
 	}
 	@Override
-	public List<Object> toJsonList(int flag) {
-		return null;
+	public void fromJsonMap(JsonMap jsonMap, int flag) {
+		
 	}
 
 	

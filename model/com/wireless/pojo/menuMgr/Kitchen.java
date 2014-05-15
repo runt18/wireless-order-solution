@@ -1,10 +1,8 @@
 package com.wireless.pojo.menuMgr;
 
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
+import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.parcel.Parcel;
 import com.wireless.parcel.Parcelable;
@@ -402,10 +400,12 @@ public class Kitchen implements Parcelable, Comparable<Kitchen>, Jsonable{
 
 	public final static Parcelable.Creator<Kitchen> CREATOR = new Parcelable.Creator<Kitchen>() {
 		
+		@Override
 		public Kitchen[] newInstance(int size) {
 			return new Kitchen[size];
 		}
 		
+		@Override
 		public Kitchen newInstance() {
 			return new Kitchen(0);
 		}
@@ -424,23 +424,21 @@ public class Kitchen implements Parcelable, Comparable<Kitchen>, Jsonable{
 
 	@Override
 	public Map<String, Object> toJsonMap(int flag) {
-		Map<String, Object> jm = new LinkedHashMap<String, Object>();
-		jm.put("id", this.kitchenId);
-		jm.put("alias", this.displayId);
-		jm.put("rid", this.restaurantId);
-		jm.put("name", this.name);
-		jm.put("isAllowTmp", this.isAllowTmp);
-		jm.put("typeValue", this.type.getVal());
-		if(this.dept != null){
-			jm.put("dept", this.dept.toJsonMap(0));
-		}
+		JsonMap jm = new JsonMap();
+		jm.putInt("id", this.kitchenId);
+		jm.putInt("alias", this.displayId);
+		jm.putInt("rid", this.restaurantId);
+		jm.putString("name", this.name);
+		jm.putBoolean("isAllowTmp", this.isAllowTmp);
+		jm.putInt("typeValue", this.type.getVal());
+		jm.putJsonable("dept", this.dept, 0);
 		
-		return Collections.unmodifiableMap(jm);
+		return jm;
 	}
 
 	@Override
-	public List<Object> toJsonList(int flag) {
-		return null;
+	public void fromJsonMap(JsonMap jsonMap, int flag) {
+		
 	}
 
 	

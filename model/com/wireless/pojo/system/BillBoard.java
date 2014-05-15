@@ -2,9 +2,9 @@ package com.wireless.pojo.system;
 
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
+import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.util.DateUtil;
@@ -181,8 +181,8 @@ public class BillBoard implements Jsonable {
 		return Collections.unmodifiableMap(jm);
 	}
 	@Override
-	public List<Object> toJsonList(int flag) {
+	public void fromJsonMap(JsonMap jsonMap, int flag) {
 		// TODO Auto-generated method stub
-		return null;
+		
 	}
 }

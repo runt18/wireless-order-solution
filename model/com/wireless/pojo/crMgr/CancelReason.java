@@ -1,11 +1,8 @@
 package com.wireless.pojo.crMgr;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
+import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.parcel.Parcel;
 import com.wireless.parcel.Parcelable;
@@ -172,18 +169,52 @@ public class CancelReason implements Parcelable, Jsonable{
 		}
 	};
 
+	public static enum Key4Json{
+		CR_ID("id", "退菜原因id"),
+		REASON("reason", "退菜原因描述"),
+		RESTAURANT_ID("rid", "餐厅编号");
+		
+		private final String key;
+		private final String desc;
+		
+		Key4Json(String key, String desc){
+			this.key = key;
+			this.desc = desc;
+		}
+		
+		@Override
+		public String toString(){
+			return "key = " + key + ",desc = " + desc;
+		}
+	}
+	
 	@Override
 	public Map<String, Object> toJsonMap(int flag) {
-		HashMap<String, Object> jm = new LinkedHashMap<String, Object>();
-		jm.put("id", this.id);
-		jm.put("reason", this.reason);
-		jm.put("rid", this.restaurantId);
+		JsonMap jm = new JsonMap();
+		jm.putInt(Key4Json.CR_ID.key, this.id);
+		jm.putString(Key4Json.REASON.key, this.reason);
+		jm.putInt(Key4Json.RESTAURANT_ID.key, this.restaurantId);
 		
-		return Collections.unmodifiableMap(jm);
+		return jm;
 	}
 
+	public final static int CR_JSONABLE_4_COMMIT = 0; 
+	
 	@Override
-	public List<Object> toJsonList(int flag) {
-		return null;
+	public void fromJsonMap(JsonMap jsonMap, int flag) {
+		if(flag == CR_JSONABLE_4_COMMIT){
+			if(jsonMap.containsKey(Key4Json.CR_ID.key)){
+				setId(jsonMap.getInt(Key4Json.CR_ID.key));
+			}else{
+				throw new IllegalStateException("提交的退菜数据缺少字段(" + Key4Json.CR_ID + ")");
+			}
+		}
 	}
+
+	public static Jsonable.Creator<CancelReason> JSON_CREATOR = new Jsonable.Creator<CancelReason>() {
+		@Override
+		public CancelReason newInstance() {
+			return new CancelReason(0);
+		}
+	};
 }

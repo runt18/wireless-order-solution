@@ -1,10 +1,8 @@
 package com.wireless.pojo.tasteMgr;
 
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
+import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.parcel.Parcel;
 import com.wireless.parcel.Parcelable;
@@ -495,10 +493,12 @@ public class Taste implements Parcelable, Comparable<Taste>, Jsonable{
 
 	public final static Parcelable.Creator<Taste> CREATOR = new Parcelable.Creator<Taste>() {
 		
+		@Override
 		public Taste[] newInstance(int size) {
 			return new Taste[size];
 		}
 		
+		@Override
 		public Taste newInstance() {
 			return new Taste();
 		}
@@ -515,36 +515,102 @@ public class Taste implements Parcelable, Comparable<Taste>, Jsonable{
 		}
 	}
 	
-	@Override
-	public Map<String, Object> toJsonMap(int flag) {
-		Map<String, Object> jm = new LinkedHashMap<String, Object>();
-		jm.put("id", this.tasteId);
-		jm.put("alias", this.tasteId);
-		jm.put("rid", this.restaurantId);
-		jm.put("name", this.preference);
-		jm.put("price", this.getPrice());
-		jm.put("rate", this.rate);
-		jm.put("rank", this.rank);
-		if(this.category != null){
-			jm.put("cateValue", this.category.getId());
-			jm.put("cateText", this.category.getName());			
-			jm.put("cateStatusValue", this.category.getStatus().getVal());
-			jm.put("cateStatusText", this.category.getStatus().getDesc());
-		}
-		if(this.calc != null){
-			jm.put("calcValue", this.calc.getVal());
-			jm.put("calcText", this.calc.getDesc());			
-		}
-		if(this.type != null){
-			jm.put("typeValue", this.type.getVal());
-			jm.put("typeText", this.type.getDesc());			
+	public static enum Key4Json{
+		TASTE_ID("id", "口味编号"),
+		TASTE_ALIAS("alias", "口味编号"),
+		RESTAURANT_ID("rid", "餐厅编号"),
+		TASTE_NAME("name", "口味名称"),
+		TASTE_PRICE("price", "口味价钱"),
+		TASTE_RATE("rate", "口味比例"),
+		TASTE_RANK("rank", ""),
+		TASTE_CATE_ID("cateValue", "口味分类Id"),
+		TASTE_CATE_TEXT("cateText", "口味分类描述"),
+		TASTE_CATE_STATUS("cateStatusValue", "口味分类类型Id"),
+		TASTE_CATE_STATUS_TEXT("cateStatusText", "口味分类类型描述"),
+		TASTE_CALC_TYPE("calcValue", "计算方式Id"),
+		TASTE_CALC_TEXT("calcText", "计算方式描述"),
+		TASTE_TYPE("typeValue", "类型Id"),
+		TASTE_TYPE_TEXT("typeText", "类型描述");
+		
+		private final String key;
+		private final String desc;
+
+		Key4Json(String key, String desc){
+			this.key = key;
+			this.desc = desc;
 		}
 		
-		return Collections.unmodifiableMap(jm);
+		@Override
+		public String toString(){
+			return "key = " + key + ",desc = " + desc;
+		}
 	}
 	
 	@Override
-	public List<Object> toJsonList(int flag) {
-		return null;
+	public Map<String, Object> toJsonMap(int flag) {
+		JsonMap jm = new JsonMap();
+		jm.putInt(Key4Json.TASTE_ID.key, this.tasteId);
+		jm.putInt(Key4Json.TASTE_ALIAS.key, this.tasteId);
+		jm.putInt(Key4Json.RESTAURANT_ID.key, this.restaurantId);
+		jm.putString(Key4Json.TASTE_NAME.key, this.preference);
+		jm.putFloat(Key4Json.TASTE_PRICE.key, this.getPrice());
+		jm.putFloat(Key4Json.TASTE_RATE.key, this.rate);
+		jm.putInt(Key4Json.TASTE_RANK.key, this.rank);
+		if(this.category != null){
+			jm.putInt(Key4Json.TASTE_CATE_ID.key, this.category.getId());
+			jm.putString(Key4Json.TASTE_CATE_TEXT.key, this.category.getName());			
+			jm.putInt(Key4Json.TASTE_CATE_STATUS.key, this.category.getStatus().getVal());
+			jm.putString(Key4Json.TASTE_CATE_STATUS_TEXT.key, this.category.getStatus().getDesc());
+		}
+		if(this.calc != null){
+			jm.putInt(Key4Json.TASTE_CALC_TYPE.key, this.calc.getVal());
+			jm.putString(Key4Json.TASTE_CALC_TEXT.key, this.calc.getDesc());			
+		}
+		if(this.type != null){
+			jm.putInt(Key4Json.TASTE_TYPE.key, this.type.getVal());
+			jm.putString(Key4Json.TASTE_TYPE_TEXT.key, this.type.getDesc());			
+		}
+		
+		return jm;
 	}
+	
+	public final static int TASTE_JSONABLE_4_COMMIT = 0;
+	public final static int TMP_TASTE_JSONABLE_4_COMMIT = 1;
+	
+	@Override
+	public void fromJsonMap(JsonMap jsonMap, int flag) {
+		if(flag == TASTE_JSONABLE_4_COMMIT){
+			//taste id...must
+			if(jsonMap.containsKey(Key4Json.TASTE_ID.key)){
+				setTasteId(jsonMap.getInt(Key4Json.TASTE_ID.key));
+			}else{
+				throw new IllegalStateException("提交的口味数据缺少字段(" + Key4Json.TASTE_ID + ")");
+			}
+			TasteCategory tc = null;
+			//taste category id...must
+			if(jsonMap.containsKey(Key4Json.TASTE_CATE_ID.key)){
+				tc = new TasteCategory(jsonMap.getInt(Key4Json.TASTE_CATE_ID.key));
+			}else{
+				throw new IllegalStateException("提交的口味数据缺少字段(" + Key4Json.TASTE_CATE_ID + ")");
+			}
+			//taste category status...must
+			if(jsonMap.containsKey(Key4Json.TASTE_CATE_STATUS.key)){
+				tc.setStatus(TasteCategory.Status.valueOf(jsonMap.getInt(Key4Json.TASTE_CATE_STATUS.key)));
+			}else{
+				throw new IllegalStateException("提交的口味数据缺少字段(" + Key4Json.TASTE_CATE_STATUS + ")");
+			}
+			setCategory(tc);
+			
+		}else if(flag == TMP_TASTE_JSONABLE_4_COMMIT){
+			setPreference(jsonMap.getString(Key4Json.TASTE_NAME.key));
+			setPrice(jsonMap.getFloat(Key4Json.TASTE_PRICE.key));
+		}
+	}
+	
+	public static Jsonable.Creator<Taste> JSON_CREATOR = new Jsonable.Creator<Taste>() {
+		@Override
+		public Taste newInstance() {
+			return new Taste(0);
+		}
+	};
 }

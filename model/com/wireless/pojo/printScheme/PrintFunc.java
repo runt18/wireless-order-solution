@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.menuMgr.Kitchen;
@@ -474,8 +475,8 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 	}
 
 	@Override
-	public List<Object> toJsonList(int flag) {
+	public void fromJsonMap(JsonMap jsonMap, int flag) {
 		
-		return null;
+		
 	}
 }

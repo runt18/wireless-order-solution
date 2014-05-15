@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.util.DateUtil;
@@ -169,9 +170,8 @@ public class WXOrder implements Jsonable{
 		return jm;
 	}
 	@Override
-	public List<Object> toJsonList(int flag) {
-		// TODO Auto-generated method stub
-		return null;
+	public void fromJsonMap(JsonMap jsonMap, int flag) {
+		
 	}
 	
 	/**

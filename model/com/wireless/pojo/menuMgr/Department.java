@@ -1,10 +1,8 @@
 package com.wireless.pojo.menuMgr;
 
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
+import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.parcel.Parcel;
 import com.wireless.parcel.Parcelable;
@@ -362,10 +360,12 @@ public class Department implements Parcelable, Comparable<Department>, Jsonable{
 
 	public final static Parcelable.Creator<Department> DEPT_CREATOR = new Parcelable.Creator<Department>(){
 
+		@Override
 		public Department newInstance() {
 			return new Department(0);
 		}
 
+		@Override
 		public Department[] newInstance(int size) {
 			return new Department[size];
 		}
@@ -386,18 +386,18 @@ public class Department implements Parcelable, Comparable<Department>, Jsonable{
 
 	@Override
 	public Map<String, Object> toJsonMap(int flag) {
-		Map<String, Object> jm = new LinkedHashMap<String, Object>();
-		jm.put("rid", this.restaurantId);
-		jm.put("id", this.deptId);
-		jm.put("name", this.deptName);
-		jm.put("typeValue", this.deptType.getVal());
+		JsonMap jm = new JsonMap();
+		jm.putInt("rid", this.restaurantId);
+		jm.putShort("id", this.deptId);
+		jm.putString("name", this.deptName);
+		jm.putInt("typeValue", this.deptType.getVal());
 		
-		return Collections.unmodifiableMap(jm);
+		return jm;
 	}
 
 	@Override
-	public List<Object> toJsonList(int flag) {
-		return null;
+	public void fromJsonMap(JsonMap jsonMap, int flag) {
+		
 	}
 
 }

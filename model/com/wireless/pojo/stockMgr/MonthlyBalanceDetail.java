@@ -2,9 +2,9 @@ package com.wireless.pojo.stockMgr;
 
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
+import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 
 public class MonthlyBalanceDetail implements Jsonable{
@@ -124,8 +124,8 @@ public class MonthlyBalanceDetail implements Jsonable{
 		return Collections.unmodifiableMap(jm);
 	}
 	@Override
-	public List<Object> toJsonList(int flag) {
-		return null;
+	public void fromJsonMap(JsonMap jsonMap, int flag) {
+		
 	}
 	
 	

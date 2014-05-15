@@ -2,14 +2,13 @@ package com.wireless.pojo.stockMgr;
 
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
+import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 
 public class CostAnalyze implements Jsonable{
 
-	private static final List<Object> IllegalAccessException = null;
 	private int deptId;
 	private String deptName;
 	private float primeMoney;
@@ -166,9 +165,8 @@ public class CostAnalyze implements Jsonable{
 	}
 
 	@Override
-	public List<Object> toJsonList(int flag) {
+	public void fromJsonMap(JsonMap jsonMap, int flag) {
 		
-		return  IllegalAccessException;
 	}
 
 	

@@ -9,6 +9,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.wireless.exception.BusinessException;
 import com.wireless.util.WebParams;
 
@@ -105,8 +107,8 @@ public class JObject implements Jsonable {
 	}
 
 	@Override
-	public List<Object> toJsonList(int flag) {
-		return null;
+	public void fromJsonMap(JsonMap jsonMap, int flag) {
+		
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -195,4 +197,20 @@ public class JObject implements Jsonable {
 		this.other = other;
 	}
 	
+	public static <T extends Jsonable> T parse(Jsonable.Creator<T> creator, int flag, String jsonText){
+		T instance = creator.newInstance();
+		instance.fromJsonMap(new JsonMap(JSONObject.parseObject(jsonText)), flag);
+		return instance;
+	}
+	
+	public static <T extends Jsonable> List<T> parseList(Jsonable.Creator<T> creator, int flag, String jsonText){
+		JSONArray jsonArray = JSONObject.parseArray(jsonText);
+		List<T> result = new ArrayList<T>(jsonArray.size());
+		for(int i = 0; i < jsonArray.size(); i++){
+			T instance = creator.newInstance();
+			instance.fromJsonMap(new JsonMap(jsonArray.getJSONObject(i)), flag);
+			result.add(instance);
+		}
+		return result;
+	}
 }
