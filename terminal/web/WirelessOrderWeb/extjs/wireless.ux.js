@@ -1,6 +1,42 @@
 var Wireless = {
 	ux : {}
 };
+
+/*var TempFoodModel = {
+	isTemporary : 'isTemporary',
+	id : 'id',
+	foodName : 'foodName',
+	count : 'count',
+	unitPrice : 'unitPrice',
+	isHangup : 'isHangup',
+	dataType : 'dataType',
+	kitchen : 'kitchen',
+	cancelReason : 'cancelReason'
+};
+
+var NormalFoodModel = {
+	isTemporary : 'isTemporary',
+	id : 'id',
+	count : 'count',
+	tasteGroup : 'tasteGroup',
+	discount : 'discount',
+	kitchen : 'kitchen',
+	isHangup : 'isHangup',
+	cancelReason : 'cancelReason'
+};*/
+
+var FoodModel = {
+	isTemporary : 'isTemporary',
+	id : 'id',
+	foodName : 'foodName',
+	unitPrice : 'unitPrice',
+	count : 'count',
+	tasteGroup : 'tasteGroup',
+	kitchen : 'kitchen',
+	isHangup : 'isHangup',
+	cancelReason : 'cancelReason'
+};
+
 Wireless.ux.createOrder = function(c){
 	
 	var foodPara = '';
@@ -10,13 +46,13 @@ Wireless.ux.createOrder = function(c){
 		foodPara += ( i > 0 ? '<<sh>>' : '');
 		if (temp.isTemporary) {
 			// 临时菜
-			var foodname = temp.name;
-			foodname = foodname.indexOf('<') > 0 ? foodname.substring(0,foodname.indexOf('<')) : foodname;
+			var foodName = temp.name;
+			foodName = foodName.indexOf('<') > 0 ? foodName.substring(0,foodName.indexOf('<')) : foodName;
 			foodPara = foodPara 
 					+ '[' 
 					+ 'true' + '<<sb>>'// 是否临时菜(true)
 					+ temp.id + '<<sb>>' // 临时菜1编号
-					+ foodname + '<<sb>>' // 临时菜1名称
+					+ foodName + '<<sb>>' // 临时菜1名称
 					+ temp.count + '<<sb>>' // 临时菜1数量
 					+ temp.unitPrice + '<<sb>>' // 临时菜1单价(原料單價)
 					+ (typeof temp.isHangup != 'undefined' ?  temp.isHangup : false) +'<<sb>>' // 菜品状态,暂时没用
