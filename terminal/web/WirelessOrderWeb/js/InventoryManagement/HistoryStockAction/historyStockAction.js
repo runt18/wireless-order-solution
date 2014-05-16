@@ -590,8 +590,7 @@ Ext.onReady(function(){
 				id : 'comboSearchForSupplier',
 				readOnly : false,
 				forceSelection : true,
-				width : 103,
-				listWidth : 120,
+				width : 100,
 				store : new Ext.data.SimpleStore({
 					fields : ['supplierID', 'name']
 				}),
@@ -683,8 +682,8 @@ Ext.onReady(function(){
 								 gs.baseParams['status'] = status.getValue() != -1 ? status.getValue() : '';
 								 gs.baseParams['supplier'] = supplier.getValue();
 								 gs.baseParams['oriStockId'] = stockActionId.getValue();
-								 gs.baseParams['beginDate'] = beginDate.getValue().format('Y-m-d');
-								 gs.baseParams['endDate'] = endDate.getValue().format('Y-m-d');
+								 gs.baseParams['beginDate'] = beginDate.getValue() != ''? beginDate.getValue().format('Y-m-d 00:00:00') : '';
+								 gs.baseParams['endDate'] = endDate.getValue() != ''?endDate.getValue().format('Y-m-d 23:59:59') : '';
 				    		 }
 				    		 
 							 gs.load({
@@ -699,65 +698,30 @@ Ext.onReady(function(){
 				     },'-',
 				     {
 				    	 text : '高级条件↓',
-				    	 id : 'btnHeightSearch',
+				    	 id : 'btnStockHeightSearch',
 				    	 handler : function(){
 
-//				    		 Ext.Ajax.request({
-//				    				url : '../../QuerySystemSetting.do',
-//				    				params : {
-//				    					restaurantID : restaurantID
-//				    				},
-//				    				success : function(res, opt){
-//				    					var jr = Ext.decode(res.responseText);
-//				    					if(jr.success){
-//				    						var maxDate, date;
-//											var md = jr.other.systemSetting.setting.stringCurrentMonth;
-//											var d = jr.other.systemSetting.setting.stringCurrentMonth;
-//											if(navigator.userAgent.indexOf("Firefox")>0){ 
-//												maxDate = new Date(md);
-//												date = new Date(d);
-//											} else{
-//
-//												maxDate = new Date(md.replace(/-/,"/"));
-//												date = new Date(d.replace(/-/,"/"));
-//											}
-//				    						Ext.getCmp('endDate').setValue(maxDate);
-//				    						Ext.getCmp('endDate').maxValue = maxDate;
-//				    						Ext.getCmp('beginDate').maxValue = maxDate;
-//				    						date.setMonth(date.getMonth() - 1);
-//	
-//				    						Ext.getCmp('beginDate').setValue(date);
-//				    						
-//				    					}else{
-//				    						Ext.ux.showMsg(jr);
-//				    					}
-//	
-//				    				},
-//				    				failure : function(res, opt){
-//				    					Ext.ux.showMsg(Ext.decode(res.responseText));
-//				    				}
-//				    			});
-					    		Ext.getCmp('btnHeightSearch').hide();
-					    		Ext.getCmp('btnCommonSearch').show();
+					    		Ext.getCmp('btnStockHeightSearch').hide();
+					    		Ext.getCmp('btnStockCommonSearch').show();
 					    		
 					    		Ext.getCmp('oriStockId').setValue();
 					    		Ext.getCmp('oriStockId').disable();
 					    		Ext.getCmp('tbarSecond').show();
+
+					    		stockActionGrid.setHeight(stockActionGrid.getHeight()-28);
+					    		
 					    		stockActionGrid.syncSize();//重新计算高度
 					    		stockActionPanel.doLayout();//重新布局
 
 				    	 }
 				     },{
 				    	 text : '高级条件↑',
-				    	 id : 'btnCommonSearch',
+				    	 id : 'btnStockCommonSearch',
 				    	 hidden : true,
 				    	 handler : function(thiz){
 				    		Ext.getCmp('oriStockId').enable();
-				    		Ext.getCmp('btnHeightSearch').show();
-				    		Ext.getCmp('btnCommonSearch').hide();
-				    		Ext.getCmp('tbarSecond').hide();
-				    		stockActionGrid.syncSize();
-				    		stockActionPanel.doLayout();
+				    		Ext.getCmp('btnStockHeightSearch').show();
+				    		Ext.getCmp('btnStockCommonSearch').hide();
 				    		
 				    		Ext.getCmp('hsa_comboSearchForStockType').setValue(-1);
 				    		Ext.getCmp('comboSearchForSubType').store.loadData('');
@@ -767,10 +731,13 @@ Ext.onReady(function(){
 				    		Ext.getCmp('comboSearchForStockStatus').setValue(-1);
 				    		Ext.getCmp('comboSearchForSupplier').setValue(-1);
 				    		
-				    		Ext.getCmp('btnSearch').handler();
+				    		
 				    		Ext.getCmp('tbarSecond').hide();
+				    		Ext.getCmp('btnSearch').handler();
+				    		
+				    		stockActionGrid.setHeight(stockActionGrid.getHeight()+28);
 				    		stockActionGrid.syncSize();
-				    		stockActionPanel.doLayout();
+				    		stockActionGrid.doLayout();
 
 				    	 }
 				     }

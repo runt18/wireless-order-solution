@@ -246,8 +246,6 @@ function getOperatorName(actionPath, callback) {
 	Ext.Ajax.request({
 		url : actionPath + "QueryStaff.do",
 		params : {
-			isCookie : true,
-			"restaurantID" : restaurantID,
 			"type" : 0,
 			"isPaging" : false,
 			"isName" : true

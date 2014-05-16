@@ -5,7 +5,8 @@ var generalPanel = new Ext.Panel({
 	contentEl : 'smsGeneral',
 	region : 'north',
 	title : '总使用记录'
-});function initAdjustSmsWin(){
+});
+function initAdjustSmsWin(){
 	if(!adjustSmsWin){
 		var numAdjustSms = new Ext.form.NumberField({
 			xtype : 'numberfield',
