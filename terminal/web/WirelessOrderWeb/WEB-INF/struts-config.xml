@@ -569,6 +569,11 @@
 			type="com.wireless.Actions.login.AutoLoginAction"
 			scope="request" >
 		</action>
+		<!-- FIXME  -->
+		<action path="/TestAction"
+			type="com.wireless.Actions.menuMgr.basic.TestFoodList"
+			scope="request" >
+		</action>
 
 	</action-mappings>
 
