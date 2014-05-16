@@ -581,7 +581,7 @@ public class MemberDao {
 		if(!restaurant.hasModule(Module.Code.MEMBER)){
 			//限制添加条数
 			final int memberLimit = 50;
-			String sql = "SELECT COUNT(*) FROM " + Params.dbName + ".member ";
+			String sql = "SELECT COUNT(*) FROM " + Params.dbName + ".member WHERE restaurant_id = " + staff.getRestaurantId();
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
 			int memberCount = 0;
 			if(dbCon.rs.next()){
