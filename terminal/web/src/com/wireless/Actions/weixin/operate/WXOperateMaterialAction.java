@@ -151,8 +151,8 @@ public class WXOperateMaterialAction extends DispatchAction {
 	                		
 	                		// 记录图片素材信息
 //	                		WeixinRestaurantDao.updateLogo(Integer.valueOf(rid), key);
-	                		
-	                		WeixinInfoDao.update(StaffDao.getAdminByRestaurant(Integer.valueOf(rid)), new UpdateBuilder(Integer.valueOf(rid)).setWeixinInfo(key));
+	                		System.out.println(key);
+	                		WeixinInfoDao.update(StaffDao.getAdminByRestaurant(Integer.valueOf(rid)), new UpdateBuilder(Integer.valueOf(rid)).setWeixinLogo(key));
 	                		
 	                		// 原始图片
 	                		OSSUtil.uploadImage(uploadStream, key);
