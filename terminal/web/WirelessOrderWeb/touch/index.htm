@@ -19,7 +19,7 @@
 var pin=0,  restaurantID=0;
 var staffData={staffID:0, staffName:''};
 var tableData={}, regionData={};
-var foodDataBase={}; foodData={}, kitchenFoodData={}, kitchenData={},kitchenAllFoodData={}, deptData={root:[]}, tasteData={}, allowTempKitchen={};
+var /* foodDataBase={}; */ foodData={}, /* kitchenFoodData={}, */ kitchenData={},/* kitchenAllFoodData={},  */deptData={root:[]}, tasteData={}, allowTempKitchen={};
 function getDom(id){
 	return document.getElementById(id);
 }
@@ -207,7 +207,8 @@ var ss = {
 	      	<div class="button-base" onClick="co.cutFood()">数量-1</div>
 	      	<div class="button-base" onClick="co.setFood()">数量=</div>
 	      	<div class="button-base" onClick="co.deleteFood()">删除</div>
-	      	<div class="button-base" onClick="co.ot.show()">口味</div>
+	      	<div class="button-base" onClick="co.ot.show({type:2})">口味</div>
+	      	<div class="button-base" onClick="co.ot.show({type:1})">全单口味</div>
 	      	<!-- <div class="button-base" >催菜</div> -->
 	      	<div class="button-base" onClick="co.foodHangup({type:2})">叫起</div>
 	      	<div class="button-base" onClick="co.foodHangup({type:1})">全单叫起</div>

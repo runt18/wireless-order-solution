@@ -22,9 +22,10 @@ co.initNewFoodContent = function(c){
 			unitPrice : tempUnitPrice.toFixed(2),
 			totalPrice : tempUnitPrice.toFixed(2),
 			isHangup : typeof temp.isHangup == 'boolean' && temp.isHangup ? '叫起' : '',
+			isTemporary : typeof temp.isTemporary == 'boolean' && temp.isTemporary ? '临时菜' : '',
 			tasteDisplay : typeof temp.tasteGroup == 'undefined' 
 				|| typeof temp.tasteGroup.normalTasteContent == 'undefined' 
-					|| temp.tasteGroup.normalTasteContent.length <= 0 ? '' : temp.tasteGroup.tastePref
+					|| temp.tasteGroup.normalTasteContent.length <= 0 || temp.isTemporary == true ? '' : temp.tasteGroup.tastePref
 		}));
 	}
 	temp = null;
@@ -103,8 +104,8 @@ co.initKitchenContent = function(c){
 					value : temp.id,
 					text : temp.name
 				});
-				tempFoodData = tempFoodData.concat(temp.foods);
 			}
+			tempFoodData = foodData.root;
 		}
 	}
 	temp = null;

@@ -21,12 +21,14 @@ var Templet={
 			+ 'onClick="co.findFoodByKitchen({event:this, kitchenId:{value}})">{text}</div>',
 		boxFood : '<div data-index={dataIndex} data-value={id} class="main-box-base" onClick="{click}">'
 			+ '{name}'
-			+ '<div>¥:{unitPrice}</div>'
+			+ '<div style="width:55px;">¥:{unitPrice}</div>'
+			+ '<div style="width:25px;height : 25px;position:absolute;right:0;bottom:0;font-size:25px;color:white;">{foodState}</div>'
 			+ '</div>',
 		newFood : '<div data-index={dataIndex} data-value={id} data-type="newFood-select" onClick="co.selectNewFood({event:this, foodId:{id}})">'
 			+ '<div style="line-height: 40px; ">{name} x {count}</div>'
   			+ '<div>{tasteDisplay}</div>'
   			+ '<div class="box-horizontal" style="text-align: right; padding-right: 5px;">'
+  				+ '<div style="color: #FF0000;">{isTemporary}</div>'
   				+ '<div style="color: #FF0000; -webkit-box-flex: 1;">{isHangup}</div>'
   				+ '<div style="min-width: 100px;">¥:{totalPrice}</div>'
   			+'</div>'
@@ -90,56 +92,30 @@ function updateFoodData(){
 		},
 		success : function(data, status, xhr){
 			if(data.success){
-				foodDataBase = data;
+				//重新赋值
+				foodData = {root:data.root.foodList};
+				var tempFoodData = foodData.root.foodList.slice(0);
 				
-				foodData = {root:[]};
-				for(var i = 0; i < data.root.length; i++){
-					if((data.root[i].status & 1 << 2) == 0)
-						foodData.root.push(data.root[i]);
-				}
-				foodData.totalProperty = foodData.root.length;
-				
-				var tempFoodData = foodData.root.slice(0);
-				
-				for(var j=0; j < kitchenFoodData.root.length; j++){
-					var temp=kitchenFoodData.root[j];
+				for(var j=0; j < kitchenData.root.length; j++){
+					var temp=kitchenData.root[j];
 					temp.foods=[];
 					for(var i=0; i < tempFoodData.length; i++){
 						if(tempFoodData[i].kitchen.id == temp.id){
 							temp.foods.push(tempFoodData[i]);
 						}else if(temp.id == -1){
-							temp.foods = foodData.root.slice(0);
+							temp.foods = foodData.root.foodList.slice(0);
 						}
 					}
 				}
 				
-				tempFoodData = foodDataBase.root.slice(0);
-				for(var j=0; j < kitchenAllFoodData.root.length; j++){
-					var temp=kitchenAllFoodData.root[j];
-					temp.foods=[];
-					for(var i=0; i < tempFoodData.length; i++){
-						if(tempFoodData[i].kitchen.id == temp.id){
-							temp.foods.push(tempFoodData[i]);
-						}else if(temp.id == -1){
-							temp.foods = foodDataBase.root.slice(0);
-						}
+				//清除没有菜品的厨房
+				for(var i = kitchenData.root.length - 1; i >= 0; i--){
+					if(kitchenData.root[i].foods.length <= 0){
+						kitchenData.root.splice(i, 1);
 					}
 				}
-				// 清理多余数据
-				for(var i = kitchenFoodData.root.length - 1; i >= 0; i--){
-					if(kitchenFoodData.root[i].foods.length <= 0){
-						for(var k=kitchenData.root.length - 1; k >= 0; k--){
-							if(kitchenData.root[k].id == kitchenFoodData.root[i].id){
-								if(kitchenData.root[k].id == -1){
-									kitchenData.root[k].foods = foodData.root.slice(0);
-								}
-								kitchenFoodData.root.splice(i, 1);
-								kitchenData.root.splice(k, 1);
-								break;
-							}
-						}
-					}
-				}
+				
+				
 			}
 		}
 	});
@@ -153,6 +129,100 @@ function initFoodData(){
 	Util.LM.show();
 	// 加载菜品数据
 	$.ajax({
+		url : '../TestAction.do',
+		type : 'post',
+		success : function(data, status, xhr){
+			
+			Util.LM.hide();
+			if(data.success){
+				
+				var deptNodes = data.root;
+				deptData = {root:[]};
+				
+				foodData = {root:data.other.foodList.foodList};
+				
+				kitchenData = {totalProperty:0, root:[]};
+				
+				for (var i = 0; i < deptNodes.length; i++) {
+					deptData.root.push(deptNodes[i].deptNodeKey);
+					for (var j = 0; j < deptNodes[i].deptNodeValue.length; j++) {
+						var kitNode = deptNodes[i].deptNodeValue[j];
+						kitNode.kitchenNodeKey.foods = kitNode.kitchenNodeValue.foodList;
+						
+						kitchenData.root.push(kitNode.kitchenNodeKey);
+					}
+				}
+				
+				deptData.totalProperty = deptData.root.length;
+				
+				kitchenData.totalProperty = kitchenData.root.length;
+				
+				deptData.root.unshift({
+					id : -1,
+					name : '全部部门'
+				});				
+				kitchenData.root.unshift({
+					id : -1,
+					name : '全部分厨',
+					dept : {
+						id : -1
+					},
+					foods : foodData.root.slice(0)
+				});
+			}
+			
+			//清除没有菜品的厨房
+			for(var i = kitchenData.root.length - 1; i >= 0; i--){
+				if(kitchenData.root[i].foods.length <= 0){
+					kitchenData.root.splice(i, 1);
+				}
+			}
+			
+			// 加载临时菜打印分厨
+			$.ajax({
+				url : '../QueryMenu.do',
+				type : 'post',
+				data : {
+					dataSource : 'isAllowTempKitchen'
+				},
+				success : function(data, status, xhr){
+					if(data.success){
+						allowTempKitchen = data;
+					}else{
+						alert('初始化临时菜打印分厨数据失败.');
+					}
+				},
+				error : function(request, status, err){
+					alert('初始化临时菜打印分厨数据失败.');
+				}
+			});
+			
+			// 加载口味信息
+			$.ajax({
+				url : '../QueryMenu.do',
+				type : 'post',
+				data : {
+					dataSource : 'tastes',
+					restaurantID : restaurantID
+				},
+				success : function(data, status, xhr){
+					if(data.success){
+						tasteData = {};
+						tasteData = {totalProperty:data.root.length, root:data.root.slice(0)};
+					}else{
+						alert('初始化口味数据失败.');
+					}
+				},
+				error : function(request, status, err){
+					alert('初始化口味数据失败.');
+				}
+			});
+			
+		}
+	});
+	
+
+/*	$.ajax({
 		url : '../QueryMenu.do',
 		type : 'post',
 		data : {
@@ -215,7 +285,7 @@ function initFoodData(){
 					success : function(data, status, xhr){
 						Util.LM.hide();
 						if(data.success){
-							deptData = {root:[]};
+							
 							kitchenData = {totalProperty:data.root.length, root:data.root.slice(0)};
 							kitchenFoodData = {totalProperty:data.root.length, root:data.root.slice(0)};
 							kitchenAllFoodData = {totalProperty:data.root.length, root:data.root.slice(0)};
@@ -335,6 +405,8 @@ function initFoodData(){
 			alert('初始化菜品数据失败.');
 		}
 	});
+*/
+
 }
 
 /**
@@ -429,7 +501,6 @@ $(function(){
 					loginSuccessCallback();
 				}else{	
 					initStaffContent();
-//					window.clearInterval();
 				}
 			},
 			error : function(request, status, error){

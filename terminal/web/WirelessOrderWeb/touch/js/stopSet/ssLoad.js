@@ -135,26 +135,26 @@ ss.initKitchenContent = function(c){
 	var tempFoodData = []; // 菜品数据
 	var temp = null;
 	if(c.deptId == -1){
-		for(var i = 0; i < kitchenAllFoodData.root.length; i++){
-			temp = kitchenAllFoodData.root[i];
+		for(var i = 0; i < kitchenData.root.length; i++){
+			temp = kitchenData.root[i];
 			
 			html.push(Templet.ss.kitchen.format({
-				value : kitchenAllFoodData.root[i].id,
-				text : kitchenAllFoodData.root[i].name
+				value : kitchenData.root[i].id,
+				text : kitchenData.root[i].name
 			}));
 			tempFoodData = tempFoodData.concat(temp.id != -1 ? temp.foods : []);
 		}
 	}else{
 		html.push(Templet.ss.kitchen.format({
 			value : -1,
-			text : '全部'
+			text : '全部分厨'
 		}));
-		for(var i = 0; i < kitchenAllFoodData.root.length; i++){
-			if(kitchenAllFoodData.root[i].dept.id == c.deptId){
-				temp = kitchenAllFoodData.root[i];
+		for(var i = 0; i < kitchenData.root.length; i++){
+			if(kitchenData.root[i].dept.id == c.deptId){
+				temp = kitchenData.root[i];
 				html.push(Templet.ss.kitchen.format({
-					value : kitchenAllFoodData.root[i].id,
-					text : kitchenAllFoodData.root[i].name
+					value : kitchenData.root[i].id,
+					text : kitchenData.root[i].name
 				}));
 				tempFoodData = tempFoodData.concat(temp.foods);
 			}
@@ -163,14 +163,7 @@ ss.initKitchenContent = function(c){
 	kitchenView.html(html.join(''));
 	
 	temp = null;
-	
-	
-/*	
-	dExtra = '';
-	kExtra = '';
-	if(c.deptId != null && c.deptId != 'undefined' && c.deptId != -1){
-		dExtra += 'tempFoodData.kitchen.dept.id == ' + c.deptId;
-	}*/
+
 	ss.iteratorData = tempFoodData;
 	ss.showFoodByCond();
 	
@@ -194,20 +187,20 @@ ss.findFoodByKitchen = function(c){
 	if(c.kitchenId == -1){
 		var dl = $('.div-deptOrKitchen-select[data-type=dept-select]');
 		if(dl.length == 0){
-			for(var i = 0; i < kitchenAllFoodData.root.length; i++){
-				tempFoodData = tempFoodData.concat(kitchenAllFoodData.root[i].foods);
+			for(var i = 0; i < kitchenData.root.length; i++){
+				tempFoodData = tempFoodData.concat(kitchenData.root[i].foods);
 			}
 		}else{
-			for(var i = 0; i < kitchenAllFoodData.root.length; i++){
-				temp = kitchenAllFoodData.root[i];
+			for(var i = 0; i < kitchenData.root.length; i++){
+				temp = kitchenData.root[i];
 				if(temp.dept.id == parseInt(dl[0].getAttribute('data-value'))){
 					tempFoodData = tempFoodData.concat(temp.foods);		
 				}
 			}
 		}
 	}else{
-		for(var i = 0; i < kitchenAllFoodData.root.length; i++){
-			temp = kitchenAllFoodData.root[i];
+		for(var i = 0; i < kitchenData.root.length; i++){
+			temp = kitchenData.root[i];
 			if(typeof c.kitchenId == 'number' && c.kitchenId != -1){
 				if(temp.id == c.kitchenId){
 					tempFoodData = tempFoodData.concat(temp.foods);

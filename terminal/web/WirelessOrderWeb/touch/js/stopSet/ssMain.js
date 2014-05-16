@@ -7,10 +7,10 @@ ss.insertFood = function(c){
 	}
 	//
 	var data = null;
-	for(var i = 0; i < foodDataBase.root.length; i++){
-		if(foodDataBase.root[i].id == c.foodId){
+	for(var i = 0; i < foodData.root.length; i++){
+		if(foodData.root[i].id == c.foodId){
 			//返回连接空数组的副本
-			data = (foodDataBase.root.concat()[i]);
+			data = (foodData.root.concat()[i]);
 			break;
 		}
 	}

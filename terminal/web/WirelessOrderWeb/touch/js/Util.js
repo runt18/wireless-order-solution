@@ -127,10 +127,12 @@ Util.padding = function(c){
 				var html = '';
 				var start = this.start, limit = this.data.length >= this.start + this.limit ? this.limit : this.limit - (this.start + this.limit -this.data.length);
 				var temp = null;
+
 				for(var i = 0; i < limit; i++){
 					temp = this.data[start+i];
 					//FIXME 判断是否为沽清页面, 是就不用验证菜品状态
-					if(Util.sellOutCond){
+//					if(Util.sellOutCond){
+					if(true){
 						this.pageData.push(temp);
 						if(temp != null){
 							html += this.templet({

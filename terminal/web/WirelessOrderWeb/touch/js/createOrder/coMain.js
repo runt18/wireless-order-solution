@@ -13,7 +13,8 @@ co.show = function(c){
 					id : c.data.id,
 					name : c.data.name,
 					unitPrice : c.data.unitPrice,
-					click : 'co.insertFood({foodId:'+c.data.id+'})'
+					click : 'co.insertFood({foodId:'+c.data.id+'})',
+					foodState : (c.data.status & 1 << 3) != 0 ? '赠' : (c.data.status & 1 << 2) != 0 ? '停' : ''
 				});
 			}
 		});
@@ -94,6 +95,11 @@ co.insertFood = function(c){
 	if(data == null){
 		alert('添加菜品失败, 程序异常, 请刷新后重试或联系客服人员');
 		return;
+	}else{
+		if((data.status & 1 << 2) != 0){
+			alert('此菜品已停售!');
+			return;
+		}
 	}
 	//
 	var has = false;
@@ -275,16 +281,23 @@ co.foodHangup = function(c){
 /**
  * 口味操作
  */
-co.ot.show = function(){
+co.ot.show = function(c){
 	var sf = $('#divCFCONewFood > div[class*=div-newFood-select]');
-	if(sf.length != 1){
+	if(c.type == 2 && sf.length != 1){
 		Util.msg.alert({
 			msg : '请选中一道菜品.'
 		});
 		return;
+	}else if(c.type == 1 && co.newFood.length <= 0){
+		Util.msg.alert({
+			msg : '还未选择菜品.'
+		});
+		return;
 	}
-	var foodData = co.newFood[sf.attr('data-index')];
-	if(typeof foodData.isTemporary == 'boolean' && foodData.isTemporary){
+	
+	co.ot.allBill = c.type;
+	var foodData = typeof co.newFood[sf.attr('data-index')] != 'undefined' ? co.newFood[sf.attr('data-index')] : co.newFood[0];
+	if(c.type == 2 && typeof foodData.isTemporary == 'boolean' && foodData.isTemporary){
 		Util.msg.alert({
 			msg : '临时菜不能选择口味.'
 		});
@@ -461,6 +474,18 @@ co.ot.deleteTaste = function(c){
 	//
 	co.ot.initNewTasteContent();
 };
+
+function clone(myObj){
+  if(typeof(myObj) != 'object') return myObj;
+  if(myObj == null) return myObj;
+  
+  var myNewObj = new Object();
+  
+  for(var i in myObj)
+    myNewObj[i] = clone(myObj[i]);
+  
+  return myNewObj;
+}
 /**
  * 保存口味
  */
@@ -494,20 +519,30 @@ co.ot.save = function(c){
 	tasteGroup.tastePref = tasteGroup.normalTaste.name;
 	tasteGroup.price = tasteGroup.normalTaste.price;
 	
-	for(var i = 0; i < co.newFood.length; i++){
-		if(co.newFood[i].id == co.ot.foodData.id){
-			co.newFood[i].tasteGroup = tasteGroup;
-			break;
+	if(co.ot.allBill == 1){
+		for(var i = 0; i < co.newFood.length; i++){
+			if(typeof co.newFood[i].isTemporary == 'undefined'){
+				co.newFood[i].tasteGroup = clone(tasteGroup);
+			}
 		}
+		co.initNewFoodContent();
+		
+	}else if(co.ot.allBill == 2){
+		for(var i = 0; i < co.newFood.length; i++){
+			if(co.newFood[i].id == co.ot.foodData.id){
+				co.newFood[i].tasteGroup = tasteGroup;
+				break;
+			}
+		}
+		co.initNewFoodContent({
+			data : co.ot.foodData
+		});
 	}
-	co.initNewFoodContent({
-		data : co.ot.foodData
-	});
+
 	//
 	co.ot.back();
 	tasteGroup = null;
 };
-
 
 /*** -------------------------------------------------- ***/
 /**
@@ -575,8 +610,12 @@ co.submit = function(c){
 		}
 	}
 	item = null;*/
-	
+//	var testJson;
+	console.log(co.newFood);
+	console.log(JSON.stringify(co.newFood));
+//	alert(JSON.stringify(co.newFood));
 	var foods = Wireless.ux.createOrder({orderFoods: (typeof c.commitType != 'undefined'? co.newFood.slice(0) : foodData), dataType : 1});
+	
 	Util.LM.show();
 	$.ajax({
 		url : '../InsertOrder.do',
