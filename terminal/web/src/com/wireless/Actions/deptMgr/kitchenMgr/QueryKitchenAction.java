@@ -16,10 +16,12 @@ import com.wireless.db.deptMgr.KitchenDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.json.JObject;
 import com.wireless.pojo.menuMgr.Department;
+import com.wireless.pojo.menuMgr.DepartmentTree;
+import com.wireless.pojo.menuMgr.DepartmentTree.DeptNode;
+import com.wireless.pojo.menuMgr.DepartmentTree.KitchenNode;
 import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.pojo.menuMgr.Kitchen.Type;
 import com.wireless.pojo.staffMgr.Staff;
-import com.wireless.util.DataPaging;
 
 public class QueryKitchenAction extends DispatchAction {
 	
@@ -67,7 +69,7 @@ public class QueryKitchenAction extends DispatchAction {
 			String pin = (String)request.getAttribute("pin");
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
-			List<Department> depts = DepartmentDao.getByType(staff, Department.Type.NORMAL);
+/*			List<Department> depts = DepartmentDao.getByType(staff, Department.Type.NORMAL);
 			
 			for (int i = 0; i < depts.size(); i++) {
 				jsonSB.append(i > 0 ? "," : "");
@@ -84,7 +86,23 @@ public class QueryKitchenAction extends DispatchAction {
 				jsonSB.append(getChildren(staff, depts.get(i).getId()));
 				jsonSB.append("]}");
 			}
-	
+*/
+			List<DeptNode> depts = new DepartmentTree.Builder(DepartmentDao.getByType(staff, Department.Type.NORMAL), KitchenDao.getByType(staff, Kitchen.Type.NORMAL)).build().asDeptNodes();
+			for (int i = 0; i < depts.size(); i++) {
+				jsonSB.append(i > 0 ? "," : "");
+				jsonSB.append("{");
+				jsonSB.append("id:'dept_id_" + depts.get(i).getKey().getId() + "'");
+				jsonSB.append(",text:'" + depts.get(i).getKey().getName() + "'");
+				jsonSB.append(",deptID:'" + depts.get(i).getKey().getId() + "'");
+				jsonSB.append(",type:'" + depts.get(i).getKey().getType().getVal() + "'");
+				jsonSB.append(",cls:'floatBarStyle'");
+				jsonSB.append(",restaurantID:'" + depts.get(i).getKey().getRestaurantId() + "'");
+				jsonSB.append(",expanded : true");
+				jsonSB.append(",expandable : true");
+				jsonSB.append(",children:[");
+				jsonSB.append(getChildren(depts.get(i).getValue()));
+				jsonSB.append("]}");
+			}
 		}catch(SQLException e){
 			e.printStackTrace();
 		}catch(Exception e){
@@ -95,10 +113,10 @@ public class QueryKitchenAction extends DispatchAction {
 		return null;
 	}
 	
-	private StringBuilder getChildren(Staff staff, int deptId) throws SQLException{
+	private StringBuilder getChildren(List<KitchenNode> list) throws SQLException{
 		StringBuilder jsb = new StringBuilder();
 		
-		List<Kitchen> list = KitchenDao.getByDept(staff, Department.DeptId.valueOf(deptId));
+//		List<Kitchen> list = KitchenDao.getByDept(staff, Department.DeptId.valueOf(deptId));
 		
 		for(int i = 0; i < list.size(); i++){
 			if(i > 0){
@@ -106,12 +124,12 @@ public class QueryKitchenAction extends DispatchAction {
 			}
 			jsb.append("{");
 			jsb.append("leaf:true");
-			jsb.append(",text:'" + list.get(i).getName() + "'");
-			jsb.append(",isAllowTemp:" + list.get(i).isAllowTemp());
-			jsb.append(",name:'" + list.get(i).getName() + "'");
-			jsb.append(",kid:" + list.get(i).getId());
-			jsb.append(",belongDept:" + list.get(i).getDept().getId());
-			if(list.get(i).isAllowTemp()){
+			jsb.append(",text:'" + list.get(i).getKey().getName() + "'");
+			jsb.append(",isAllowTemp:" + list.get(i).getKey().isAllowTemp());
+			jsb.append(",name:'" + list.get(i).getKey().getName() + "'");
+			jsb.append(",kid:" + list.get(i).getKey().getId());
+			jsb.append(",belongDept:" + list.get(i).getKey().getDept().getId());
+			if(list.get(i).getKey().isAllowTemp()){
 				jsb.append(",icon:'../../images/linshicai.png'");
 			}
 			jsb.append("}");
@@ -137,25 +155,21 @@ public class QueryKitchenAction extends DispatchAction {
 		JObject jobject = new JObject();
 		List<Kitchen> root = null;
 		
-		String isPaging = request.getParameter("isPaging");
-		String start = request.getParameter("start");
-		String limit = request.getParameter("limit");
-		
 		try{
 			String pin = (String)request.getAttribute("pin");
-//			String deptID = request.getParameter("deptID");
-			
 			
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
-			root = KitchenDao.getByType(staff, Type.NORMAL);
+//			root = KitchenDao.getByType(staff, Type.NORMAL);
+			root = new DepartmentTree.Builder(DepartmentDao.getByType(staff, Department.Type.NORMAL), KitchenDao.getByType(staff, Kitchen.Type.NORMAL)).build().asKitchenList();
+			
 		}catch(Exception e){
 			e.printStackTrace();
 			jobject.initTip(e);
 		}finally{
 			if(root != null){
 				jobject.setTotalProperty(root.size());
-				jobject.setRoot(DataPaging.getPagingData(root, isPaging, start, limit));
+				jobject.setRoot(root);
 			}
 			response.getWriter().print(jobject.toString());
 		}

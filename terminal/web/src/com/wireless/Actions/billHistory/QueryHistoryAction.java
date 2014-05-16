@@ -12,13 +12,11 @@ import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.orderMgr.OrderDao;
 import com.wireless.db.staffMgr.StaffDao;
-import com.wireless.db.system.SystemDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.OrderSummary;
 import com.wireless.pojo.staffMgr.Staff;
-import com.wireless.pojo.system.DailySettle;
 import com.wireless.util.DateType;
 
 public class QueryHistoryAction extends Action {
@@ -29,27 +27,8 @@ public class QueryHistoryAction extends Action {
 		String start = request.getParameter("start");
 		String limit = request.getParameter("limit");
 		try{
-			String restaurantId = (String) request.getAttribute("restaurantID");
 			String pin = (String)request.getAttribute("pin");
-			String value = request.getParameter("value");
-			
-			String ope = request.getParameter("ope");
-			if(ope != null && !ope.trim().isEmpty()){
-				int opeType = Integer.parseInt(ope);
-				
-				if(opeType == 1){
-					ope = "=";
-				}else if(opeType == 2){
-					ope = ">=";
-				}else if(opeType == 3){
-					ope = "<=";
-				}else{
-					ope = "=";
-				}
-			}else{
-				ope = "=";
-			}
-			
+
 			String comboCond;
 			String comboType = request.getParameter("havingCond");
 			if(comboType != null && !comboType.trim().isEmpty()){
@@ -79,8 +58,49 @@ public class QueryHistoryAction extends Action {
 				comboCond = "";
 			}
 			
-			String filterCond;
+			String filterCond = "";
+			
+			String value = request.getParameter("value");
+			if(value != null && !value.isEmpty()){
+				String ope = request.getParameter("ope");
+				if(ope != null && !ope.trim().isEmpty()){
+					int opeType = Integer.parseInt(ope);
+					
+					if(opeType == 1){
+						ope = "=";
+					}else if(opeType == 2){
+						ope = ">=";
+					}else if(opeType == 3){
+						ope = "<=";
+					}else{
+						ope = "=";
+					}
+				}else{
+					ope = "=";
+				}
+				filterCond += " AND OH.id" + ope + value;
+			}
 			String type = request.getParameter("type");
+			if(Boolean.parseBoolean(type)){
+				String beginDate = request.getParameter("beginDate");
+				String endDate = request.getParameter("endDate");
+				String comboPayType = request.getParameter("comboPayType");
+				String common = request.getParameter("common");
+				
+				filterCond += " AND OH.order_date BETWEEN '" + beginDate + "' AND '" + endDate + "'";
+				
+				if(comboPayType != null && !comboPayType.equals("-1")){
+					//按结帐方式
+					filterCond += " AND OH.pay_type = " + comboPayType;
+				}
+				if(common != null && !common.isEmpty()){
+					filterCond += " AND OH.comment LIKE '%" + common + "%' ";
+				}
+				
+			}
+			
+/*			
+			
 			if(type.equals("1")){
 				//按账单号
 				filterCond = " AND OH.id" + ope + value;
@@ -115,7 +135,7 @@ public class QueryHistoryAction extends Action {
 			}else{
 				filterCond = "";
 			}
-			
+	*/		
 			String orderClause = " ORDER BY OH.order_date ASC " + " LIMIT " + start + "," + limit;
 			
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));

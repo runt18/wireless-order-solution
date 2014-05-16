@@ -54,7 +54,7 @@ public class QueryStockActionAction extends Action{
 			String curmonth = new SimpleDateFormat("yyyy-MM").format(monthly);
 			if(isHistory == null || !Boolean.valueOf(isHistory)){
 				// 只能查询当前会计月份数据
-				extraCond += (" AND S.ori_stock_date BETWEEN '" + curmonth + "-01' AND '" + curmonth + "-31' ");
+				extraCond += (" AND S.ori_stock_date BETWEEN '" + curmonth + "-01' AND '" + curmonth + "-31 23:59:59' ");
 			}else{
 				extraCond += (" AND S.ori_stock_date < '" + curmonth + "'" );
 			}

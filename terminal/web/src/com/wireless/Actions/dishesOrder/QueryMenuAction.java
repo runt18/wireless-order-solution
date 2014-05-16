@@ -18,6 +18,7 @@ import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.json.JObject;
 import com.wireless.json.Jsonable;
 import com.wireless.pojo.menuMgr.Food;
+import com.wireless.pojo.menuMgr.FoodList;
 import com.wireless.pojo.menuMgr.Kitchen.Type;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.util.DataPaging;
@@ -42,13 +43,10 @@ public class QueryMenuAction extends DispatchAction {
 		String start = request.getParameter("start");
 		String limit = request.getParameter("limit");
 		String pinyin = request.getParameter("pinyin");
-		//FIXME
-		String showIndex = request.getParameter("showIndex");
 		try {
 			String pin = (String)request.getAttribute("pin");
 			String cond = "";
 			String orderBy = null;
-			
 			
 			orderBy = " ORDER BY FOOD.food_alias";
 			String kitchenAlias = request.getParameter("kitchenAlias");
@@ -65,10 +63,7 @@ public class QueryMenuAction extends DispatchAction {
 			if(foodAlias != null && !foodAlias.trim().isEmpty()){
 				cond += (" AND FOOD.food_alias like '" + foodAlias.trim() + "%'");
 			}
-			if(showIndex != null && !showIndex.trim().isEmpty()){
-				cond += (" AND FOOD.food_alias <> 0");
-			}
-			root = FoodDao.getByCond(StaffDao.verify(Integer.parseInt(pin)), cond, orderBy);
+			root = new FoodList(FoodDao.getByCond(StaffDao.verify(Integer.parseInt(pin)), cond, orderBy));
 
 		}catch(Exception e){
 			e.printStackTrace();
@@ -82,8 +77,7 @@ public class QueryMenuAction extends DispatchAction {
 							result.add(f);
 						}
 					}
-					root.clear();
-					root.addAll(result);
+					root = result;
 				}
 				jobject.setTotalProperty(root.size());
 				jobject.setRoot(DataPaging.getPagingData(root, isPaging, start, limit));
