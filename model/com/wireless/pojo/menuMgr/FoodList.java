@@ -4,7 +4,6 @@ import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -106,9 +105,9 @@ public class FoodList extends AbstractList<Food> implements Jsonable{
 
 	@Override
 	public Map<String, Object> toJsonMap(int flag) {
-		Map<String, Object> jm = new HashMap<String, Object>();
-		jm.put("foodList", this.mFoods);
-		return Collections.unmodifiableMap(jm);
+		JsonMap jm = new JsonMap();
+		jm.putJsonableList("foodList", this.mFoods, 0);
+		return jm;
 	}
 
 	@Override

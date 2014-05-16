@@ -1,10 +1,8 @@
 package com.wireless.pojo.menuMgr;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -59,10 +57,10 @@ public class DepartmentTree{
 
 		@Override
 		public Map<String, Object> toJsonMap(int flag) {
-			Map<String, Object> jm = new HashMap<String, Object>();
-			jm.put("kitchenNodeKey", getKey());
-			jm.put("kitchenNodeValue", getValue());
-			return Collections.unmodifiableMap(jm);
+			JsonMap jm = new JsonMap();
+			jm.putJsonable("kitchenNodeKey", getKey(), 0);
+			jm.putJsonable("kitchenNodeValue", getValue(), 0);
+			return jm;
 		}
 
 		@Override
@@ -116,10 +114,10 @@ public class DepartmentTree{
 
 		@Override
 		public Map<String, Object> toJsonMap(int flag) {
-			Map<String, Object> jm = new LinkedHashMap<String, Object>();
-			jm.put("deptNodeKey", getKey());
-			jm.put("deptNodeValue", getValue());
-			return Collections.unmodifiableMap(jm);
+			JsonMap jm = new JsonMap();
+			jm.putJsonable("deptNodeKey", getKey(), 0);
+			jm.putJsonableList("deptNodeValue", getValue(), 0);
+			return jm;
 		}
 
 		@Override
