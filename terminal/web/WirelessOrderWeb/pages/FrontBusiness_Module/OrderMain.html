@@ -28,16 +28,43 @@
 <link rel="stylesheet" type="text/css" href="../../css/header.css" />
 
 <script type="text/javascript">
+
+	
 	var Request = new URLParaQuery();
-	var restaurantID = Request["restaurantID"];
-	var tableCategory = Request["category"];
-	var pin = Request['pin'];
-	var tableStatus = Request['ts'];
+	
 	var tableAliasID = Request['tableAliasID'];
 	var orderID = Request['orderID'];
-	var isFree = eval(tableStatus == 0) ? true : false;
+	var isRepaid = false, isFree = true, tableCategory = 1,  isGroup = false;
 	
-	var isGroup = eval(tableCategory == 4) ? true : false;
+	var primaryOrderData;
+	var params;
+	if(typeof orderID != 'undefined'){
+		params = {
+			orderID : orderID,
+			queryType: 'Today'
+		};
+	}else{
+		params = {'tableID' : tableAliasID};
+	}
+	$.ajax({
+		url : '../../QueryOrder.do',
+		type : 'post',
+		async:false,
+		data : params,
+		success : function(jr, status, xhr){
+			primaryOrderData = jr;
+			if(jr.success){
+				orderID = primaryOrderData.other.order.id;
+				isRepaid = eval(primaryOrderData.other.order.statusValue) != 0;
+				isFree = false;
+			}
+
+		},
+		error : function(request, status, err){
+			alert(request.msg);
+		}
+	}); 
+	
 	
 	// global variable
 	var dishOrderCurrRowIndex_ = -1; // the selected row index in the chosen dishes display grid
@@ -78,25 +105,5 @@
 	<script type="text/javascript" src="../../js/FrontBusiness/dishesOrder/dishesOrderFuncLib.js"></script>
 	<script type="text/javascript" src="../../extjs/examples.js"></script>
 	<script type="text/javascript" src="../../js/common/CompareFoodUtil.js"></script>
-<!-- 
-	<div id="tableStatusTableNbr" style="padding-left: 5px;  vertical-align : middle;">
-		<img title="桌号" src='../../images/TableID.png' style='float: left;'/>
-		<div id="tblNbrDivTS" class="tableStatusChar">100&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
-	</div>
-
-	<div id="tableStatusPerCount" style="padding-left: 5px">
-		<img title="人数" src='../../images/DinnerAmount.png' style='float: left;' />
-	</div>
-	
-	<div id="tableStatusDynamic" style="padding-left: 5px">
-		<img title="最低消费" id="minCostImgTS" src='../../images/minCost.png'
-			style='float: left;' />
-		<div id="minCostDivTS" class="tableStatusChar">0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
-		<div id="minCostPlaceHolder" style='float: left;'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
-		<img title="服务费率" id="serviceRateImgTS"
-			src='../../images/serviceRate.png' style='float: left;' />
-		<div id="serviceRateDivTS" class="tableStatusChar">0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
-	</div>
- -->
 </body>
 </html>

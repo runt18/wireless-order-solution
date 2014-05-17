@@ -70,6 +70,7 @@ function addTab(id, title, url){
 	        	render : function(){
 	        		tabIndex = 0;
 	        	},
+	        	//不同版本的事件不一致
 	        	bodyresize : function(e, w, h){
 	        		//改变之前未加载, 不能获取
 	        		//alert(e.getEl().first().first().dom.firstChild);
