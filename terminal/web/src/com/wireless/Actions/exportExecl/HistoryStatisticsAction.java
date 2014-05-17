@@ -38,7 +38,6 @@ import com.wireless.db.shift.ShiftDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.stockMgr.StockActionDao;
 import com.wireless.db.stockMgr.StockReportDao;
-import com.wireless.db.system.SystemDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.billStatistics.CommissionStatistics;
 import com.wireless.pojo.billStatistics.DutyRange;
@@ -61,7 +60,6 @@ import com.wireless.pojo.stockMgr.StockAction.Status;
 import com.wireless.pojo.stockMgr.StockAction.SubType;
 import com.wireless.pojo.stockMgr.StockActionDetail;
 import com.wireless.pojo.stockMgr.StockReport;
-import com.wireless.pojo.system.DailySettle;
 import com.wireless.pojo.util.DateUtil;
 import com.wireless.pojo.util.NumericUtil;
 import com.wireless.util.DateType;
@@ -2981,27 +2979,8 @@ public class HistoryStatisticsAction extends DispatchAction{
 	public ActionForward historyOrder(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws UnsupportedEncodingException, Exception, SQLException, BusinessException{
 		
 		response.setContentType("application/vnd.ms-excel;");
-		String restaurantId = (String) request.getAttribute("restaurantID");
 		String pin = (String)request.getAttribute("pin");
-		String value = request.getParameter("value");
-		
-		String ope = request.getParameter("ope");
-		if(ope != null && !ope.trim().isEmpty()){
-			int opeType = Integer.parseInt(ope);
-			
-			if(opeType == 1){
-				ope = "=";
-			}else if(opeType == 2){
-				ope = ">=";
-			}else if(opeType == 3){
-				ope = "<=";
-			}else{
-				ope = "=";
-			}
-		}else{
-			ope = "=";
-		}
-		
+
 		String comboCond;
 		String comboType = request.getParameter("havingCond");
 		if(comboType != null && !comboType.trim().isEmpty()){
@@ -3021,6 +3000,9 @@ public class HistoryStatisticsAction extends DispatchAction{
 			}else if(comboVal == 5){
 				//是否有抹数
 				comboCond = " AND OH.erase_price > 0 ";				
+			}else if(comboVal == 6){
+				//是否有抹数
+				comboCond = " AND OH.coupon_price > 0 ";				
 			}else{
 				comboCond = "";
 			}
@@ -3028,44 +3010,36 @@ public class HistoryStatisticsAction extends DispatchAction{
 			comboCond = "";
 		}
 		
-		String filterCond;
-		String type = request.getParameter("type");
-		if(type.equals("1")){
-			//按账单号
-			filterCond = " AND OH.id" + ope + value;
-		}else if(type.equals("2")){
-			//按流水号
-			filterCond = " AND OH.seq_id " + ope + value;
-		}else if(type.equals("3")){
-			//按台号
-			filterCond = " AND OH.table_alias != '' " + " AND OH.table_alias" + ope + value;
-		}else if(type.equals("4")){
-			//按日期
-			String[] dutyParams = request.getParameter("value").split("<split>");
-			filterCond = " AND OH.order_date BETWEEN '" + dutyParams[0] + "' AND '" + dutyParams[1] + "'";
-		}else if(type.equals("5")){
-			//按类型
-			filterCond = " AND OH.category " + ope + value;
-		}else if(type.equals("6")){
-			//按结帐方式
-			filterCond = " AND OH.pay_type " + ope + value;
-		}else if(type.equals("7")){
-			//按金额
-			filterCond = " AND OH.total_price " + ope + value;
-		}else if(type.equals("8")){
-			//按实收
-			filterCond = " AND OH.actual_price " + ope + value;
-		}else if(type.equals("9")){
-			DailySettle ds = SystemDao.getDailySettle(Integer.valueOf(restaurantId), SystemDao.MAX_DAILY_SETTLE);
-//			System.out.println("ds: "+ds.getOnDutyFormat()+"  -  "+ds.getOffDutyFormat());
-			filterCond = " AND OH.order_date BETWEEN '" + ds.getOnDutyFormat() + "' AND '" + ds.getOffDutyFormat() + "'";
-		}else{
-			filterCond = "";
+		String filterCond = "";
+		
+		String value = request.getParameter("value");
+		if(value != null && !value.isEmpty()){
+			filterCond += " AND OH.id = " + value;
 		}
+		String type = request.getParameter("type");
+		if(Boolean.parseBoolean(type)){
+			String beginDate = request.getParameter("beginDate");
+			String endDate = request.getParameter("endDate");
+			String comboPayType = request.getParameter("comboPayType");
+			//FIXME 接受中文乱码
+			String common = request.getParameter("common");
+			
+			filterCond += " AND OH.order_date BETWEEN '" + beginDate + "' AND '" + endDate + "'";
+			
+			if(comboPayType != null && !comboPayType.equals("-1")){
+				//按结帐方式
+				filterCond += " AND OH.pay_type = " + comboPayType;
+			}
+			if(common != null && !common.isEmpty()){
+				filterCond += " AND OH.comment LIKE '%" + common + "%' ";
+			}
+			
+		}
+		String orderClause = " ORDER BY OH.order_date ASC ";
 		
 		Staff staff = StaffDao.verify(Integer.parseInt(pin));
 		
-		List<Order> list = OrderDao.getPureOrder(staff, comboCond + filterCond, null, DateType.HISTORY);
+		List<Order> list = OrderDao.getPureOrder(staff, comboCond + filterCond, orderClause, DateType.HISTORY);
 		
 		String title = "历史账单";
 		

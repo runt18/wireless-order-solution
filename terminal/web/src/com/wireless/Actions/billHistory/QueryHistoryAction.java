@@ -62,23 +62,7 @@ public class QueryHistoryAction extends Action {
 			
 			String value = request.getParameter("value");
 			if(value != null && !value.isEmpty()){
-				String ope = request.getParameter("ope");
-				if(ope != null && !ope.trim().isEmpty()){
-					int opeType = Integer.parseInt(ope);
-					
-					if(opeType == 1){
-						ope = "=";
-					}else if(opeType == 2){
-						ope = ">=";
-					}else if(opeType == 3){
-						ope = "<=";
-					}else{
-						ope = "=";
-					}
-				}else{
-					ope = "=";
-				}
-				filterCond += " AND OH.id" + ope + value;
+				filterCond += " AND OH.id = " + value;
 			}
 			String type = request.getParameter("type");
 			if(Boolean.parseBoolean(type)){
@@ -98,44 +82,6 @@ public class QueryHistoryAction extends Action {
 				}
 				
 			}
-			
-/*			
-			
-			if(type.equals("1")){
-				//按账单号
-				filterCond = " AND OH.id" + ope + value;
-			}else if(type.equals("2")){
-				//按流水号
-				filterCond = " AND OH.seq_id " + ope + value;
-			}else if(type.equals("3")){
-				//按台号
-				filterCond = " AND OH.table_alias != '' " + " AND OH.table_alias" + ope + value;
-			}else if(type.equals("4")){
-				//按日期
-				String[] dutyParams = request.getParameter("value").split("<split>");
-				filterCond = " AND OH.order_date BETWEEN '" + dutyParams[0] + "' AND '" + dutyParams[1] + "'";
-			}else if(type.equals("5")){
-				//按类型
-				filterCond = " AND OH.category " + ope + value;
-			}else if(type.equals("6")){
-				//按结帐方式
-				filterCond = " AND OH.pay_type " + ope + value;
-			}else if(type.equals("7")){
-				//按金额
-				filterCond = " AND OH.total_price " + ope + value;
-			}else if(type.equals("8")){
-				//按实收
-				filterCond = " AND OH.actual_price " + ope + value;
-			}else if(type.equals("9")){
-				DailySettle ds = SystemDao.getDailySettle(Integer.valueOf(restaurantId), SystemDao.MAX_DAILY_SETTLE);
-//				System.out.println("ds: "+ds.getOnDutyFormat()+"  -  "+ds.getOffDutyFormat());
-				filterCond = " AND OH.order_date BETWEEN '" + ds.getOnDutyFormat() + "' AND '" + ds.getOffDutyFormat() + "'";
-			}else if(type.equals("10")){
-				filterCond = " AND OH.comment LIKE '%" + value + "%' ";
-			}else{
-				filterCond = "";
-			}
-	*/		
 			String orderClause = " ORDER BY OH.order_date ASC " + " LIMIT " + start + "," + limit;
 			
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));

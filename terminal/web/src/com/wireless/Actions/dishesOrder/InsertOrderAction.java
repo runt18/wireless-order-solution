@@ -59,10 +59,12 @@ public class InsertOrderAction extends Action{
 
 			
 			//TODO Get the json text.
-			String jsonText = "";
-			Order orderToInsert = JObject.parse(Order.JSON_CREATOR, Order.ORDER_JSONABLE_4_COMMIT, jsonText);
-			
 			int type = Integer.parseInt(request.getParameter("type"));
+			
+			String jsonText = request.getParameter("commitOrderData");
+			Order orderToInsert = JObject.parse(Order.JSON_CREATOR, type, jsonText);
+			
+			
 			
 			String notPrint = request.getParameter("notPrint");
 			
