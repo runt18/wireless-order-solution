@@ -569,65 +569,25 @@ co.submit = function(c){
 		foodData = co.newFood.slice(0);
 	}
 	
-/*	var item = null;
-	for ( var i = 0; i < foodData.length; i++) {
-		item = foodData[i];
-		foods += ( i > 0 ? '<<sh>>' : '');
-		if (item.isTemporary) {
-			// 临时菜
-			foods = foods 
-					+ '['
-					+ 'true' + '<<sb>>'
-					+ item.id + '<<sb>>'
-					+ item.name + '<<sb>>'
-					+ item.count + '<<sb>>'
-					+ item.unitPrice + '<<sb>>'
-					+ (typeof item.isHangup != 'boolean' ? false : item.isHangup) + '<<sb>>'
-					+ '1<<sb>>'
-					+ item.kitchen.id
-					+ ']';
-		}else{
-			// 普通菜
-			var normalTaste = '', tmpTaste = '' , tasteGroup = item.tasteGroup;
-			for(var j = 0; j < tasteGroup.normalTasteContent.length; j++){
-				var t = tasteGroup.normalTasteContent[j];
-				normalTaste += ((j > 0 ? '<<stnt>>' : '') + (t.id + '<<stb>>' + t.cateValue + '<<stb>>' + t.cateStatusValue));
-			}
-			if(tasteGroup.tmpTaste != null && typeof tasteGroup.tmpTaste != 'undefined'){
-				if(eval(tasteGroup.tmpTaste.id >= 0))
-					tmpTaste = tasteGroup.tmpTaste.price + '<<sttt>>' + tasteGroup.tmpTaste.name  + '<<sttt>>' + tasteGroup.tmpTaste.id+ '<<sttt>>' + tasteGroup.tmpTaste.alias; 				
-			}
-			foods = foods 
-					+ '['
-					+ 'false' + '<<sb>>'
-					+ item.id + '<<sb>>'
-					+ item.count + '<<sb>>'
-					+ (normalTaste + ' <<st>> ' + tmpTaste) + '<<sb>>'
-					+ item.kitchen.id + '<<sb>>'
-					+ '1' + '<<sb>>'
-					+ (typeof item.isHangup != 'boolean' ? false : item.isHangup)
-					+ ']';
-		}
-	}
-	item = null;*/
-//	var testJson;
-	console.log(co.newFood);
-	console.log(JSON.stringify(co.newFood));
-//	alert(JSON.stringify(co.newFood));
-	var foods = Wireless.ux.createOrder({orderFoods: (typeof c.commitType != 'undefined'? co.newFood.slice(0) : foodData), dataType : 1});
+//	var foods = Wireless.ux.createOrder({orderFoods: (typeof c.commitType != 'undefined'? co.newFood.slice(0) : foodData), dataType : 1});
 	
 	Util.LM.show();
+	var commitOrderData = {
+		tableAlias : co.table.alias,
+		customNum : co.table.customNum,
+		orderFoods : (typeof c.commitType != 'undefined'? co.newFood.slice(0) : foodData),
+		categoryValue :  co.table.categoryValue
+	};
+	if(!isFree){
+		commitOrderData.id = co.order.id;
+		commitOrderData.orderDate = co.order.orderDate;
+	}
 	$.ajax({
 		url : '../InsertOrder.do',
 		type : 'post',
 		data : {
-			tableID : co.table.alias,
-			customNum : co.table.customNum,
+			commitOrderData : JSON.stringify(commitOrderData),
 			type : (typeof c.commitType != 'undefined'? c.commitType : isFree ? 1 : 7),
-			foods : foods,
-			category :  co.table.categoryValue,
-			orderID : isFree ? '' : co.order.id,
-			orderDate : isFree ? '' : co.order.orderDate,
 			notPrint : c.notPrint
 		},
 		success : function(data, status, xhr) {

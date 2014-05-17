@@ -129,8 +129,11 @@ function initFoodData(){
 	Util.LM.show();
 	// 加载菜品数据
 	$.ajax({
-		url : '../TestAction.do',
+		url : '../QueryMenu.do',
 		type : 'post',
+		data : {
+			dataSource : 'foodList'
+		},
 		success : function(data, status, xhr){
 			
 			Util.LM.hide();

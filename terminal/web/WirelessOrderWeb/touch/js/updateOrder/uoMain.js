@@ -354,7 +354,7 @@ uo.saveForUO = function(){
 				//alert(JSON.stringify(uoCancelFoods[y]));//return;
 				if(uoFood[x].id == uoCancelFoods[y].id && uoFood[x].tasteGroup.tastePref == uoCancelFoods[y].dishes){
 					uoFood[x].count = parseFloat(uoFood[x].count + uoCancelFoods[y].count).toFixed(2);
-					uoFood[x].cancelReason = uoCancelFoods[y].reason.id;
+					uoFood[x].cancelReason = uoCancelFoods[y].reason;
 				}
 			}
 		}
@@ -534,63 +534,22 @@ uo.goToCreateOrder = function(){
 uo.submitUpdateOrderHandler = function(c){
 	var orderFoods = c;
 	if(orderFoods.length > 0){
-		var foodPara = Wireless.ux.createOrder({orderFoods: orderFoods, dataType : 1});
-	/*	for ( var i = 0; i < orderFoods.length; i++) {
-			foodPara += ( i > 0 ? '<<sh>>' : '');
-			if (orderFoods[i].isTemporary) {
-				// 临时菜
-				var foodname = orderFoods[i].name;
-				foodPara = foodPara 
-						+ '[' 
-						+ 'true' + '<<sb>>'// 是否临时菜(true)
-						+ orderFoods[i].id + '<<sb>>' // 临时菜1编号
-						+ foodname + '<<sb>>' // 临时菜1名称
-						+ orderFoods[i].count + '<<sb>>' // 临时菜1数量
-						+ orderFoods[i].unitPrice + '<<sb>>' // 临时菜1单价(原料單價)
-						+ orderFoods[i].isHangup +'<<sb>>' // 菜品状态
-						+ '1' + '<<sb>>' // 菜品操作状态 1:已点菜 2:新点菜 3:反结账
-						+ orderFoods[i].kitchen.id + '<<sb>>'	// 临时菜出单厨房
-						+ (typeof orderFoods[i].cancelReason != 'undefined' ?  orderFoods[i].cancelReason : 0)//退菜原因
-						+ ']';
-			}else{
-				// 普通菜
-				var normalTaste = '', tmpTaste = '' , tasteGroup = orderFoods[i].tasteGroup;
-				for(var j = 0; j < tasteGroup.normalTasteContent.length; j++){
-					var t = tasteGroup.normalTasteContent[j];
-					normalTaste += ((j > 0 ? '<<stnt>>' : '') + (t.id + '<<stb>>' + t.cateValue + '<<stb>>' + t.cateStatusValue));
-				}
-				if(tasteGroup.tmpTaste != null && typeof tasteGroup.tmpTaste != 'undefined'){
-					if(eval(tasteGroup.tmpTaste.id >= 0))
-						tmpTaste = tasteGroup.tmpTaste.price + '<<sttt>>' + tasteGroup.tmpTaste.name  + '<<sttt>>' + tasteGroup.tmpTaste.id+ '<<sttt>>' + tasteGroup.tmpTaste.alias; 				
-				}
-				foodPara = foodPara 
-						+ '['
-						+ 'false' + '<<sb>>' // 是否临时菜(false)
-						+ orderFoods[i].id + '<<sb>>' // 菜品1编号
-						+ orderFoods[i].count + '<<sb>>' // 菜品1数量
-						+ (normalTaste + ' <<st>> ' + tmpTaste) + '<<sb>>'
-						+ orderFoods[i].kitchen.id + '<<sb>>'// 厨房1编号
-						+ orderFoods[i].discount + '<<sb>>' // 菜品1折扣
-						+ orderFoods[i].isHangup + '<<sb>>'//是否叫起
-						+ (typeof orderFoods[i].cancelReason != 'undefined' ?  orderFoods[i].cancelReason : 0) //退菜原因
-						+ ']';
-			}
-		}	
-		foodPara = '{' + foodPara + '}';*/	
-		var type = 7;
+		var commitOrderData = {
+			tableAlias : uo.table.alias,
+			customNum : uo.customNum,
+			orderFoods : orderFoods,
+			categoryValue : uoOther.order.categoryValue,
+			id : uoOther.order.id,
+			orderDate : uoOther.order.orderDate
+		};
+
 		Util.LM.show();
 		$.ajax({
 			url : '../InsertOrder.do',
 			type : 'post',
 			data : {
-				pin : pin,
-				tableID : uo.table.alias,
-				orderID : uoOther.order.id,
-				customNum : uo.customNum,
-				type : type,
-				foods : foodPara,
-				category : uoOther.order.categoryValue,
-				orderDate : uoOther.order.orderDate
+				commitOrderData : JSON.stringify(commitOrderData),
+				type : 7
 			},
 			success : function(data, status, xhr){
 				Util.LM.hide();
