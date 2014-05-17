@@ -1,45 +1,18 @@
 ﻿
 //------------------lib
 function billQueryHandler() {
-/*	var sValue = '', sOperator = '', sAdditionFilter = 0;
-	var onDuty = '', offDuty = '';
-	if(sType == 0){
-		sValue = '';
-		searchOperator = '';
-	}else if(sType == 4){
-		var temp = searchValue.split(searchSubSplitSymbol);
-		onDuty = Ext.getCmp(temp[0]).getValue().format('Y-m-d 00:00:00');
-		offDuty = Ext.getCmp(temp[1]).getValue().format('Y-m-d 23:59:59');
-		sValue = onDuty + '<split>' + offDuty;
-	}else if(searchType == 9){
-		sValue = '';
-	}else if(searchType == 10){
-		sValue = searchValue != '' ? Ext.getCmp(searchValue).getValue() : '';
-	}else{
-		sValue = searchValue != '' ? Ext.getCmp(searchValue).getValue() : '';
-		sOperator = searchOperator != '' ? Ext.getCmp(searchOperator).getValue() : '';
-		if(typeof sValue == 'string' && sValue == ''){
-			sType = 0;
-			sValue = '';
-		}
-	}*/
-	
-	
 	var gs = billsGrid.getStore();
 	if(searchType){
 		gs.baseParams['beginDate'] = Ext.getCmp('dateSearchDateBegin').getValue().format('Y-m-d 00:00:00');
 		gs.baseParams['endDate'] = Ext.getCmp('dateSearchDateEnd').getValue().format('Y-m-d 23:59:59');
 		gs.baseParams['comboPayType'] = Ext.getCmp('comboPayType').getValue();
 		gs.baseParams['common'] = Ext.getCmp('textSearchValue').getValue();
+		gs.baseParams['value'] = Ext.getCmp('numberSearchValue').getValue();
 	}else{
-		gs.baseParams['ope'] = Ext.getCmp('comboOperator').getValue();
 		gs.baseParams['value'] = Ext.getCmp('numberSearchValue').getValue();
 	}
 	
 	sAdditionFilter = Ext.getCmp(searchAdditionFilter).inputValue;	
-	
-	gs.baseParams['isPaging'] = true;
-	gs.baseParams['restaurantID'] = restaurantID;
 	
 	gs.baseParams['type'] = searchType;
 
@@ -53,38 +26,32 @@ function billQueryHandler() {
 };
 
 function billQueryExportHandler() {
-	var sType = searchType, sValue = '', sOperator = '', sAdditionFilter = 0;
-	var onDuty = '', offDuty = '';
-	if(sType == 0){
-		sValue = '';
-		searchOperator = '';
-	}else if(sType == 4){
-		var temp = searchValue.split(searchSubSplitSymbol);
-		onDuty = Ext.getCmp(temp[0]).getValue().format('Y-m-d 00:00:00');
-		offDuty = Ext.getCmp(temp[1]).getValue().format('Y-m-d 23:59:59');
-		sValue = onDuty + '<split>' + offDuty;
-	}else if(searchType == 9){
-		sValue = '';
-	}else{
-		sValue = searchValue != '' ? Ext.getCmp(searchValue).getValue() : '';
-		sOperator = searchOperator != '' ? Ext.getCmp(searchOperator).getValue() : '';
-		if(typeof sValue == 'string' && sValue == ''){
-			sType = 0;
-			sValue = '';
-		}
-	}
-	sAdditionFilter = Ext.getCmp(searchAdditionFilter).inputValue;	
-	
-	var url = '../../{0}?type={1}&ope={2}&value={3}&havingCond={4}&dataSource={5}';
-	url = String.format(
+	var url;
+	if(searchType){
+		url = '../../{0}?beginDate={1}&endDate={2}&comboPayType={3}&common={4}&value={5}&type={6}&havingCond={7}&dataSource={8}';
+		url = String.format(
 			url, 
 			'ExportHistoryStatisticsToExecl.do', 
-			sType, 
-			sOperator,
-			sValue,
+			Ext.getCmp('dateSearchDateBegin').getValue().format('Y-m-d 00:00:00'), 
+			Ext.getCmp('dateSearchDateEnd').getValue().format('Y-m-d 23:59:59'),
+			Ext.getCmp('comboPayType').getValue(),
+			Ext.getCmp('textSearchValue').getValue(),
+			Ext.getCmp('numberSearchValue').getValue(),
+			searchType,
 			sAdditionFilter,
 			'historyOrder'
-	);
+		);
+	}else{
+		url = '../../{0}?value={1}&type={2}&havingCond={3}&dataSource={4}';
+		url = String.format(
+				url, 
+				'ExportHistoryStatisticsToExecl.do', 
+				Ext.getCmp('numberSearchValue').getValue(), 
+				searchType,
+				sAdditionFilter,
+				'historyOrder'
+		);
+	}
 	window.location = url;
 };
 
@@ -126,15 +93,6 @@ function billHistoryOnLoad() {
 };
 //-----------
 /* ---------------------------------------------------------------- */
-/*var btnCancelledFood = new Ext.ux.ImageButton({
-	imgPath : '../../images/cancelledFoodStatis.png',
-	imgWidth : 50,
-	imgHeight : 50,
-	tooltip : '退菜统计',
-	handler : function(btn) {
-		cancelledFood();
-	}
-});*/
 
 var regionStatBut = new Ext.ux.ImageButton({
 	imgPath : "../../images/regionStatis.png",
@@ -176,16 +134,6 @@ var dailySettleStatBut = new Ext.ux.ImageButton({
 	}
 });
 
-// --
-/*var pushBackBut = new Ext.ux.ImageButton({
-	imgPath : "../../images/UserLogout.png",
-	imgWidth : 50,
-	imgHeight : 50,
-	tooltip : "返回",
-	handler : function(btn) {
-		location.href = '../PersonLogin.html?'+ strEncode('restaurantID=' + restaurantID, 'mi');
-	}
-});*/
 
 var logOutBut = new Ext.ux.ImageButton({
 	imgPath : "../../images/ResLogout.png",
@@ -341,117 +289,6 @@ function printBillFunc(rowInd) {
 	});
 };
 
-/*
-var h_bills_filterTypeComb = new Ext.form.ComboBox({
-	fieldLabel : '过滤',
-	forceSelection : true,
-	width : 100,
-	value : '全部',
-	id : 'history_bill_filter',
-	store : new Ext.data.SimpleStore({
-		fields : [ 'value', 'text' ],
-		data :  [[0, '全部'], [1, '帐单号'], [2, '流水号'], [3, '台号'], [4, '日期'], [5, '类型'], 
-		         [6, '结帐方式'], [7, '金额'], [8, '实收'], [9, '最近日结'],[10, '备注搜索']]
-	}),
-	valueField : 'value',
-	displayField : 'text',
-	typeAhead : true,
-	mode : 'local',
-	triggerAction : 'all',
-	selectOnFocus : true,
-	readOnly : false,
-	allowBlank : false,
-	listeners : {
-		select : function(combo, record, index) {
-			searchType = combo.getValue();
-			searchValue = '';
-			
-			var comboOperator = Ext.getCmp('comboOperator');
-			var comboTableType = Ext.getCmp('comboTableType');
-			var comboPayType = Ext.getCmp('comboPayType');
-			var dateSearchDateBegin = Ext.getCmp('dateSearchDateBegin');
-			var dateSearchDateEnd = Ext.getCmp('dateSearchDateEnd');
-			var numberSearchValue = Ext.getCmp('numberSearchValue');
-			var tbtextDisplanZ = Ext.getCmp('tbtextDisplanZ');
-			var textSearchValue= Ext.getCmp('textSearchValue');
-			//
-			comboOperator.setVisible(false);
-			comboTableType.setVisible(false);
-			comboPayType.setVisible(false);
-			numberSearchValue.setVisible(false);
-			dateSearchDateBegin.setVisible(false);
-			dateSearchDateEnd.setVisible(false);
-			tbtextDisplanZ.setVisible(false);
-			textSearchValue.setVisible(false);
-			
-			comboOperator.setVisible(true);
-			comboOperator.setValue(1);
-			
-			if (index == 0) {
-				// 全部
-				comboOperator.setVisible(false);
-				searchValue = '';
-			} else if (index == 1) {
-				// 帐单号
-				numberSearchValue.setVisible(true);
-				numberSearchValue.setValue();
-				searchValue = numberSearchValue.getId();
-			} else if (index == 2) {
-				// 流水号
-				numberSearchValue.setVisible(true);
-				numberSearchValue.setValue();
-				searchValue = numberSearchValue.getId();
-			} else if (index == 3) {
-				// 台号
-				numberSearchValue.setVisible(true);
-				numberSearchValue.setValue();
-				searchValue = numberSearchValue.getId();
-			} else if (index == 4) {
-				// 日期
-				comboOperator.setVisible(false);
-				dateSearchDateBegin.setVisible(true);
-				dateSearchDateEnd.setVisible(true);
-				dateSearchDateBegin.setValue(new Date());
-				dateSearchDateEnd.setValue(new Date());
-				tbtextDisplanZ.setVisible(true);
-				searchValue = dateSearchDateBegin.getId() + searchSubSplitSymbol + dateSearchDateEnd.getId();
-			} else if (index == 5) {
-				// 类型
-				comboOperator.setVisible(false);
-				comboTableType.setVisible(true);
-				comboTableType.setValue(1);
-				searchValue = comboTableType.getId();
-			} else if (index == 6) {
-				// 结帐方式
-				comboOperator.setVisible(false);
-				comboPayType.setVisible(true);
-				comboPayType.setValue(1);
-				searchValue = comboPayType.getId();
-			} else if (index == 7) {
-				// 金额
-				numberSearchValue.setVisible(true);
-				numberSearchValue.setValue();
-				searchValue = numberSearchValue.getId();
-			} else if (index == 8) {
-				// 实收
-				numberSearchValue.setVisible(true);
-				numberSearchValue.setValue();
-				searchValue = numberSearchValue.getId();
-			} else if (index == 9) {
-				// 最近日结
-				comboOperator.setVisible(false);
-			}else if(index == 10){
-				//备注搜索
-				comboOperator.setVisible(false);
-				textSearchValue.setVisible(true);
-				searchValue = textSearchValue.getId();
-			}
-			
-		}
-	}
-});
-*/
-
 function billOpt(value, cellmeta, record, rowIndex, columnIndex, store) {
 	return ''
 			+ '<a href=\"javascript:billViewHandler()\">查看</a>'
@@ -521,7 +358,7 @@ Ext.onReady(function() {
 			}, 
 			history_endDate,
 			{xtype : 'tbtext', text : '&nbsp;&nbsp;'},
-			{xtype : 'tbtext', text : '结账方式:'},
+			{xtype : 'tbtext', text : '收款方式:'},
 			{xtype : 'tbtext', text : '&nbsp;&nbsp;'},
 			{
 				xtype : 'combo',
@@ -566,29 +403,6 @@ Ext.onReady(function() {
 		}, 
 		{ xtype:'tbtext', text:'&nbsp;&nbsp;'},
 		{
-			xtype : 'combo',
-			forceSelection : true,
-			width : 100,
-			value : 1,
-			id : 'comboOperator',
-			store : new Ext.data.SimpleStore({
-				fields : [ 'value', 'text' ],
-				data : [[1, '等于'], [2, '大于等于' ], [3, '小于等于']]
-			}),
-			valueField : 'value',
-			displayField : 'text',
-			typeAhead : true,
-			mode : 'local',
-			triggerAction : 'all',
-			selectOnFocus : true,
-			allowBlank : false,
-			readOnly : false,
-			listeners : {
-				select : function(combo, record, index){
-					searchOperator = combo.getId();
-				}
-			}
-		},{
 			xtype : 'numberfield',
 			id : 'numberSearchValue',
 			width : 130

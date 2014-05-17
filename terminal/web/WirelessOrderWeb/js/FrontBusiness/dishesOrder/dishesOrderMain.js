@@ -1,4 +1,158 @@
-﻿var btnPushBack = new Ext.ux.ImageButton({
+﻿//反结账单头
+var dishesOrderNorthPanel = new Ext.Panel({
+	hidden : !isRepaid,
+	region : 'north',
+	height : 62,
+	frame : true,
+	layout : 'column',
+	defaults : {
+		xtype : 'panel',
+		layout : 'column',
+		columnWidth : 1,
+		defaults : {
+			xtype : 'form',
+			layout : 'form',
+			labelWidth : 60,
+			width : 220,
+			defaults : {
+				width : 130
+			}
+		}
+	},
+	items : [{
+		items : [{
+			items : [{
+				xtype : 'textfield',
+				id : 'txtSettleTypeFormat',
+				fieldLabel : '结账方式',
+				value : '一般/会员',
+				disabled : true
+			}]
+		}, {
+			items : [{
+				xtype : 'combo',
+				id : 'comboDiscount',
+				fieldLabel : '折扣方案',
+				readOnly : false,
+				forceSelection : true,
+				store : new Ext.data.JsonStore({
+					root : 'root',
+					fields : [ 'discountID', 'discountName']
+				}),
+				valueField : 'discountID',
+				displayField : 'discountName',
+				typeAhead : true,
+				mode : 'local',
+				triggerAction : 'all',
+				selectOnFocus : true
+			}]
+		}, {
+			width : 135,
+			items : [{
+				xtype : 'numberfield',
+				id : 'numErasePrice',
+				fieldLabel : '抹数金额',
+				width : 60,
+				minValue : 0,
+				value : 0
+			}]
+		}, {
+			xtype : 'panel',
+			width : 150,
+			id : 'panelShowEraseQuota',
+			style : 'font-size:18px;',
+			html : '上限:￥<font id="fontShowEraseQuota" style="color:red;">0.00</font>'
+		}, {
+			width : 130,
+			items : [{
+				xtype : 'numberfield',
+				width : 60,
+				fieldLabel : '服务费',
+				id : 'serviceRate',
+				allowBlank : false,
+				validator : function(v) {
+					if (v < 0 || v > 100 || v.indexOf('.') != -1) {
+						return '服务费率范围是0%至100%,且为整数.';
+					} else {
+						return true;
+					}
+				}
+			}]
+		}, {
+			items : [{
+				xtype : 'panel',
+				style : 'font-size:18px;',
+				html : '%'
+			}]
+		}]
+	}, {
+		defaults : {
+			labelWidth : 1,
+			labelSeparator : ' '
+		},
+		items : [{
+			xtype : 'label',
+			width : 65,
+			text : '收款方式:'
+		}, {
+			width : 80,
+			items : [{
+				xtype : 'radio',
+				name : 'radioPayType',
+				boxLabel : '现金结账',
+				inputValue : '1'
+			}]
+		}, {
+			width : 80,
+			items : [{
+				xtype : 'radio',
+				name : 'radioPayType',
+				boxLabel : '刷卡结账',
+				inputValue : '2'
+			}]
+		}, {
+			width : 80,
+			items : [{
+				xtype : 'radio',
+				name : 'radioPayType',
+				boxLabel : '会员消费',
+				inputValue : '3',
+				disabled : true
+			}]
+		}, {
+			width : 60,
+			items : [{
+				xtype : 'radio',
+				name : 'radioPayType',
+				boxLabel : '签单',
+				inputValue : '4'
+			}]
+		}, {
+			width : 75,
+			items : [{
+				xtype : 'radio',
+				name : 'radioPayType',
+				boxLabel : '挂账',
+				inputValue : '5'
+			}]
+		}, {
+			xtype : 'form',
+			labelWidth : 60,
+			labelSeparator : ':',
+			items : [{
+				xtype : 'textfield',
+				id : 'remark',
+				fieldLabel : '备注',
+				width : 420
+			}]
+		}]
+	}]
+});
+
+
+
+
+var btnPushBack = new Ext.ux.ImageButton({
 	imgPath : "../../images/UserLogout.png",
 	imgWidth : 50,
 	imgHeight : 50,
@@ -34,11 +188,6 @@ addTasteHandler = function(thiz){
 	var hgs = haveTasteGrid.getStore();
 	var sr = thiz.getSelectionModel().getSelections()[0];
 	var cs = true;
-	
-//	if(hgs.getCount() >= 3){
-//		Ext.example.msg('提示', '该菜品已选择三种口味,最多只能选择三种.');
-//		return;
-//	}
 	
 	hgs.each(function(r){
 		if(r.get('taste.alias') == sr.get('taste.alias')){
@@ -83,7 +232,6 @@ var commonTasteGridForTabPanel = new Ext.grid.GridPanel({
 					data = Ext.ux.getSelData(orderSingleGridPanel);
 				}
 				this.baseParams['foodID'] = data.id;
-				this.baseParams['restaurantID'] = restaurantID;
 			},
 			load : function(thiz){
 				if(thiz.getCount() > 0){
@@ -387,10 +535,9 @@ var allFoodTabPanelGridTbar = new Ext.Toolbar({
 		listeners : {
 			render : function(thiz){
 				Ext.Ajax.request({
-					url : '../../QueryMenu.do',
+					url : '../../QueryKitchen.do',
 					params : {
-						dataSource : 'kitchens',
-						restaurantID : restaurantID
+						dataSource : 'normal'
 					},
 					success : function(response, options){
 						var jr = Ext.decode(response.responseText);
@@ -445,8 +592,6 @@ var allFoodTabPanelGridTbar = new Ext.Toolbar({
 			gs.baseParams['foodName'] = searchType == 1 ? searchValue : '';
 			gs.baseParams['pinyin'] = searchType == 2 ? searchValue : '';
 			gs.baseParams['foodAlias'] = searchType == 3 ? searchValue : '';
-			//FIXME
-			gs.baseParams['showIndex'] = searchValue == ''?true:'';
 			gs.load({
 				params : {
 					start : 0,
@@ -665,17 +810,18 @@ var orderPanel = new Ext.Panel({
 		text : '提交',
 		handler : function() {
 			submitOrderHandler({
-				href : 'TableSelect.html'
+				href : (isRepaid ? '' : 'TableSelect.html')
 			});
 		}
 	}, {
 		text : '提交不打印',
+		hidden : isRepaid,
 		handler : function() {
 			var href = '';
 			if(isGroup){
-				href = 'CheckOut.html?'+ 'restaurantID=' + restaurantID + '&orderID=' + orderID + '&category=' + tableCategory;
+				href = 'CheckOut.html?'+ 'orderID=' + orderID + '&category=' + tableCategory;
 			}else{
-				href = 'CheckOut.html?'+ 'restaurantID=' + restaurantID + '&tableID=' + tableAliasID+ '&personCount=1';
+				href = 'CheckOut.html?'+ 'tableID=' + tableAliasID+ '&personCount=1';
 			}
 			submitOrderHandler({
 				notPrint : true,
@@ -684,12 +830,13 @@ var orderPanel = new Ext.Panel({
 		}
 	}, {
 		text : '提交&结帐',
+		hidden : isRepaid,
 		handler : function() {
 			var href = '';
 			if(isGroup){
-				href = 'CheckOut.html?'+ 'restaurantID=' + restaurantID + '&orderID=' + orderID + '&category=' + tableCategory;
+				href = 'CheckOut.html?'+ 'orderID=' + orderID + '&category=' + tableCategory;
 			}else{
-				href = 'CheckOut.html?'+ 'restaurantID=' + restaurantID + '&tableID=' + tableAliasID+ '&personCount=1';
+				href = 'CheckOut.html?'+ 'tableID=' + tableAliasID+ '&personCount=1';
 			}
 			submitOrderHandler({
 				href : href			
@@ -697,7 +844,7 @@ var orderPanel = new Ext.Panel({
 		}
 	}, {
     	text : '刷新',
-    	hidden : isGroup || isFree,
+    	hidden : isFree || isRepaid,
     	handler : function(){
     		refreshOrderHandler();
     	}
@@ -705,7 +852,7 @@ var orderPanel = new Ext.Panel({
 		text : '返回',
 		handler : function() {
 			if (orderIsChanged == false) {
-				location.href = 'TableSelect.html';
+				location.href = isRepaid ? 'Bills.html' : 'TableSelect.html';
 			} else {
 				Ext.MessageBox.show({
 					msg : '下/改单还未提交，是否确认退出？',
@@ -713,7 +860,7 @@ var orderPanel = new Ext.Panel({
 					buttons : Ext.MessageBox.YESNO,
 					fn : function(btn) {
 						if (btn == 'yes') {
-							location.href = 'TableSelect.html';
+							location.href = isRepaid ? 'Bills.html' : 'TableSelect.html';
 						}
 					}
 				});
@@ -722,6 +869,7 @@ var orderPanel = new Ext.Panel({
 	}]
 });
 
+//快捷键面板
 function initKeyBoardEvent(){
 	
 	var foodAlias = new Ext.form.NumberField({
@@ -880,15 +1028,6 @@ function initKeyBoardEvent(){
 	}]);
 }
 
-
-var dishesOrderNorthPanel = new Ext.Panel({
-	id : 'dishesOrderNorthPanel',
-	region : 'north',
-	height : 40,
-	border : false,
-	frame : true
-});
-
 var dishesOrderEastPanel, centerPanel;
 Ext.onReady(function() {
 	var menuTabPanel = new Ext.TabPanel({
@@ -933,17 +1072,27 @@ Ext.onReady(function() {
 		id : 'centerPanel',
 		region : 'center',
 		layout : 'border',
-		items : [ orderPanel, dishesOrderEastPanel ],
+		items : [ orderPanel, dishesOrderEastPanel,dishesOrderNorthPanel],
 		listeners : {
 			render : function(){
-				// 初始化数据
-				loadOrderData();
+				//设置菜品列表title
 				tableStuLoad();
 			}
 		}
 	});
+	var billModCenterPanel = new Ext.Panel({
+		id : "billModCenterPanel",
+		region : "center",
+		layout : "border",
+		frame : false,
+		title : isRepaid ? '&nbsp;<span style="padding-left:2px; color:red;">'+orderID+'</span>&nbsp;号帐单' : null,
+		items : [ centerPanel ]
+	});
 
-	initMainView(null, centerPanel, null);
+	initMainView(null, billModCenterPanel, null);
+	// 初始化菜品数据
+	loadOrderData();
+	
 	getOperatorName("../../");
 	
 	initKeyBoardEvent();

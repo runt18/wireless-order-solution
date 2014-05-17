@@ -234,7 +234,7 @@ Ext.onReady(function() {
 			    ['服务员', 'waiter', 80]
 			],
 			OrderFoodRecord.getKeys(),
-		    [['restaurantID', restaurantID]],
+		    [],
 		    30,
 		    ''
 		);

@@ -8,10 +8,8 @@ function loadDiscountData(_c){
 	Ext.Ajax.request({
 		url : '../../QueryDiscount.do',
 		params : {
-			isCookie : true,
 			dataSource : 'role',
-			roleId : _c.staff.role.id,
-			restaurantID : restaurantID
+			roleId : _c.staff.role.id
 		},
 		success : function(response, options) {
 			var jr = Ext.decode(response.responseText);
@@ -42,43 +40,6 @@ function loadDiscountData(_c){
 	});
 }
 
-/**
- * 加载价格方案信息
- */ 
-function loadPricePlanData(_c){
-	if(_c == null || typeof _c == 'undefined'){
-		_c = {};
-	}
-	Ext.Ajax.request({
-		url : '../../QueryFoodPricePlanByOrder.do',
-		params : {
-			isCookie : true,
-			restaurantID : restaurantID,
-			idList : typeof  checkOutData.other != 'undefined' ? checkOutData.other.idList : ''
-		},
-		success : function(res, opt){
-			var jr = Ext.decode(res.responseText);
-			if(jr.success){
-				pricePlanData = jr;		
-				Ext.getCmp('comboPricePlan').store.loadData(pricePlanData);
-				for(var i = 0; i < pricePlanData.root.length; i++){
-					if(pricePlanData.root[i]['statusValue'] == 1){
-						var pp = Ext.getCmp('comboPricePlan');
-						pp.setValue(pricePlanData.root[i]['id']);
-//						calcPricePlanID = pricePlanData.root[i]['id'];
-						break;
-					}
-				}
-			}else{
-				Ext.ux.showMsg(jr);
-			}
-		},
-		failure : function(res, pot){
-			Ext.ux.showMsg(Ext.decode(res.responseText));
-		},
-		callback : _c.callback
-	});	
-};
 
 /**
  * 加载账单基础汇总信息
@@ -133,10 +94,6 @@ function loadSystemSetting(_c){
 	}
 	Ext.Ajax.request({
 		url : '../../QuerySystemSetting.do',
-		params : {
-			isCookie : true,
-			"restaurantID" : restaurantID
-		},
 		success : function(response, options) {
 			var jr = Ext.decode(response.responseText);
 			if (jr.success == true) {
@@ -180,7 +137,6 @@ function loadTableData(_c){
 	Ext.Ajax.request({
 		url : "../../QueryOrderByCalc.do",
 		params : {
-			restaurantID : restaurantID,
 			tableID : tableID,
 			orderID : orderID,
 			calc : typeof _c.calc == 'boolean' ? _c.calc : true,
@@ -218,124 +174,6 @@ function loadTableData(_c){
 /**
  * 加载餐桌组数据
  */
-function loadTableGroupData(_c){
-	if(_c == null || typeof _c == 'undefined'){
-		_c = {};
-	}
-	var eraseQuota = document.getElementById("txtEraseQuota").value;
-	var serviceRate = document.getElementById("serviceCharge").value;
-	var customNum = document.getElementById("numCustomNum").value;
-	eraseQuota = typeof eraseQuota != 'undefined' && eval(eraseQuota >= 0) ? eraseQuota : 0;
-	serviceRate = typeof serviceRate != 'undefined' && eval(serviceRate >= 0) ? serviceRate : 0;
-	customNum = typeof customNum != 'undefined' && eval(customNum > 0) ? customNum : 0;
-	if(serviceRate > 100){
-		serviceRate = 100;
-		document.getElementById("serviceCharge").value = 100;
-	}
-	Ext.Ajax.request({
-		url : "../../QueryOrderGroup.do",
-		params : {
-			isCookie : true,
-			queryType : 0, 
-			restaurantID : restaurantID,
-			status : 0,
-			tableID : tableID,
-			orderID : orderID,
-			calc : true,
-			discountID : calcDiscountID,
-//			pricePlanID : calcPricePlanID,
-			eraseQuota : eraseQuota,
-			serviceRate : serviceRate,
-			customNum : customNum
-		},
-		success : function(response, options) {
-			var jr = Ext.decode(response.responseText);
-			checkOutForm.buttons[7].setDisabled(false);
-			if (jr.success == true) {
-				setFormButtonStatus(false);
-				checkOutForm.buttons[0].setDisabled(true);
-				// 加载已点菜
-				checkOutData = jr;
-				// 加载账单基础汇总信息
-				orderMsg = jr.other.order;
-				//
-				loadOrderBasicMsg();
-				// 生成账单组信息
-				var activeTab = null;
-				var tabItemsID = 'tabItemsID';
-				for(var i = 0; i < jr.root.length; i++){
-					tableID = jr.root[i].tableAlias;
-					for(var j = 0; j < jr.root[i].orderFoods.length; j++){
-						jr.root[i].orderFoods[j].displayFoodName = '';
-					}
-					var tempID = (tabItemsID + jr.root[i].tableID);
-					var cs = true;
-					tableGroupTab.items.each(function(at){
-						if(at.getId() == tempID){
-							cs = false;
-							return false;
-						}
-					});
-					if(cs){
-						var gp = createGridPanel(
-							tempID,
-						    ('餐桌编号:' + jr.root[i].tableAlias),
-						    '',
-						    '',
-						    '',
-						    [
-							    [true, false, false, false], 
-							    ['菜名', 'displayFoodName', 200] , 
-							    ['口味', 'tastePref', 130] , 
-							    ['口味价钱', 'tastePrice', 100, 'right', 'Ext.ux.txtFormat.gridDou'],
-							    ['数量', 'count', 70, 'right', 'Ext.ux.txtFormat.gridDou'],
-							    ['单价', 'unitPrice', 70, 'right', 'Ext.ux.txtFormat.gridDou'],
-							    ['折扣率', 'discount', 70, 'right', 'Ext.ux.txtFormat.gridDou'],
-							    ['总价', 'totalPrice', 80, 'right', 'Ext.ux.txtFormat.gridDou'],
-							    ['时间', 'orderDateFormat', 130],
-							    ['服务员', 'waiter', 80]
-							],
-							OrderFoodRecord.getKeys(),
-						    [['restaurantID', restaurantID]],
-						    30,
-						    ''
-						);
-						gp.frame = false;
-						gp.getStore().on('load', function(thiz, records){
-							for(var ti = 0; ti < records.length; ti++){
-								Ext.ux.formatFoodName(records[ti], 'displayFoodName', 'foodName');
-							}
-						});
-						gp.getStore().loadData({
-							root : jr.root[i].orderFoods
-						});
-						tableGroupTab.add(gp);
-						if(i==0){
-							activeTab = gp;
-						}
-					}else{
-						Ext.getCmp(tempID).getStore().loadData({
-							root : jr.root[i].orderFoods
-						});
-					}
-				}
-				if(tableGroupTab.getActiveTab() == null){
-					tableGroupTab.setActiveTab(activeTab);
-					checkOutForm.doLayout();			
-				}else{
-					tableGroupTab.fireEvent('tabchange', tableGroupTab, tableGroupTab.getActiveTab());
-				}
-			} else {
-				Ext.ux.showMsg(jr);
-			}
-		},
-		failure : function(response, options) { 
-			checkOutForm.buttons[7].setDisabled(false);
-			Ext.ux.showMsg(Ext.decode(response.responseText));
-		},
-		callback : _c.callback
-	});
-}
 
 var timerCheckCount = 0;
 function refreshCheckOutData(_c){
@@ -480,8 +318,7 @@ showCancelFoodDetail = function(){
 							limit : 200,
 							start : 0,
 							queryType : 'TodayByTbl',
-							tableAlias : tableID,
-							restaurantID : restaurantID
+							tableAlias : tableID
 						},
 						success : function(response, options){
 							createCancelFoodDetail(Ext.decode(response.responseText));

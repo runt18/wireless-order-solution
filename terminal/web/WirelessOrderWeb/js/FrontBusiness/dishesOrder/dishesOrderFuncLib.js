@@ -17,7 +17,7 @@ function orderGroupDisplayRefresh(_c){
 	}
 	if(gs != null){
 		for(var i = 0; i < gs.getCount(); i++){
-			if(gs.getAt(i).data.dataType == 2){
+			if(gs.getAt(i).data.dataType == 2 || isRepaid){
 				frontNewOrderFood.push(gs.getAt(i).data);
 			}else{
 				grid.getView().getRow(i).style.backgroundColor = '#FFFF93';
@@ -30,6 +30,7 @@ function orderGroupDisplayRefresh(_c){
  * 单张账单口味操作
  */
 function orderSingleTasteOperationHandler(_c){
+	
 	var or = Ext.ux.getSelData(_c.grid);
 	var htgs = haveTasteGrid.getStore();
 	var tasteGroup = {
@@ -37,8 +38,7 @@ function orderSingleTasteOperationHandler(_c){
 		normalTasteContent:[],
 		normalTaste:{
 			name : ''
-		}, 
-		tmpTaste:null
+		}
 	};			
 	// 
 	for(var i = 0; i < htgs.data.length; i++){
@@ -48,7 +48,6 @@ function orderSingleTasteOperationHandler(_c){
 	}
 	// 修改原数据
 	for(var i = 0; i < _c.grid.order.orderFoods.length; i++){
-		
 		if(compareDataType(_c.grid.order.orderFoods[i], or)){
 			if(compareTasteGroup(_c.grid.order.orderFoods[i].tasteGroup, or['tasteGroup'])){
 				tasteGroup.tastePref = tasteGroup.normalTaste.name.length > 0 ? tasteGroup.normalTaste.name : '无口味';
@@ -119,7 +118,8 @@ function orderSingleDeleteFoodOperationHandler(_c){
 			if(btn == 'yes'){
 				for(var i = 0; i < _c.grid.order.orderFoods.length; i++){
 					var temp =  _c.grid.order.orderFoods[i];
-					if(compareDataType(temp, data)){
+					//compareDataType对反结账无效
+					if(!isRepaid?compareDataType(temp, data):true){
 						if(compareTasteGroup(data.tasteGroup, temp.tasteGroup)){
 							if(data.id == temp.id){
 								if(typeof _c.count == 'number'){
@@ -206,12 +206,14 @@ function orderSingleFoodCountOperationHandler(_c){
 		return;
 	}
 	var data = Ext.ux.getSelData(_c.grid);
-	if(data.dataType == 2) {
+	if(data.dataType == 2 || isRepaid) {
 		var sindex = null, newCount = 0;
 		for(var i = 0; i < _c.grid.order.orderFoods.length; i++){	
 			var temp = _c.grid.order.orderFoods[i];
-			if(data.id == temp.id && temp.dataType == 2){
-				if(compareDataType(temp, data)){		
+			if(data.id == temp.id && (temp.dataType == 2 || isRepaid)){
+				
+				if(isRepaid ? (data.id == temp.id) : compareDataType(temp, data)){	
+					
 					if(compareTasteGroup(data.tasteGroup, temp.tasteGroup)){
 						sindex = i;
 						newCount = eval(temp.count + _c.count);
@@ -572,7 +574,7 @@ function orderOrderGridPanelTasteRenderer(v, cm, r, ri, ci, store){
  * 菜品数量增加或删除操作入口渲染
  */
 function foodCountAddOrDeleteRenderer(value, cellmeta, record, rowIndex, columnIndex, store){
-	if(record.get('dataType') == 2){
+	if(record.get('dataType') == 2 || isRepaid){
 		return ''
 			+ Ext.ux.txtFormat.gridDou(value)
 			+ '<a href="javascript:orderFoodCountOperationHandler({otype:0,count:1});"><img src="../../images/btnAdd.gif" border="0" title="菜品数量+1"></a>&nbsp;'
@@ -607,7 +609,8 @@ function bindGridData(_c){
 	var sindex = 0;
 	for ( var i = 0; i < grid.order.orderFoods.length; i++) {
 		var temp = grid.order.orderFoods[i];
-		if (temp.id == record.data.id && temp.dataType == 2) {
+		
+		if (temp.id == record.data.id && (temp.dataType == 2 || isRepaid)) {
 			if(temp.tasteGroup.normalTasteContent.length == 0){
 				temp.count += (typeof _c.count == 'number' ? _c.count : 1);
 				isAlreadyOrderd = false;
@@ -766,24 +769,140 @@ function refreshOrder(res){
 };
 
 /**
+ * 反结账时调用
+ * @param {} _c
+ */
+function submitRepaidOrderHandler(_c){
+	var orderFoods = _c.grid.order.orderFoods;
+	if(orderFoods.length > 0){
+		var foodPara = Wireless.ux.createOrder({orderFoods: orderFoods, dataType : 3});
+		var payMannerOut = null;
+		var payManner = document.getElementsByName('radioPayType');
+		for(var i = 0; i < payManner.length; i++){
+			if(payManner[i].checked == true ){
+				payMannerOut = payManner[i].value;
+				break;
+			}
+		}
+		
+		var serviceRate = Ext.getCmp('serviceRate');
+		var commentOut = dishesOrderNorthPanel.findById("remark").getValue();
+		var discountID = Ext.getCmp('comboDiscount');
+		var erasePrice = Ext.getCmp('numErasePrice');
+		
+		if(!serviceRate.isValid()){
+			Ext.example.msg('提示', '服务费率为1-100的正整数,请重新输入.');
+			return;
+		}
+		if(typeof sysSetting.setting != 'undefined' && erasePrice.getValue() > sysSetting.setting.eraseQuota){
+			Ext.example.msg('提示', '抹数金额不能大于系统设置,请重新输入.');
+			return;
+		}
+		//orderFoods = '{' + JSON.stringify(orderFoods) + '}';
+		orderPanel.buttons[0].setDisabled(true);
+		orderPanel.buttons[4].setDisabled(true);
+		Ext.Ajax.request({
+			url : "../../UpdateOrder2.do",
+			params : {
+				"orderID" : _c.grid.order["id"],
+				'tableAlias' : _c.grid.order.table.alias,
+				"category" : _c.grid.order["categoryValue"],
+				"customNum" : _c.grid.order['customNum'],
+				"payType" : _c.grid.order['settleTypeValue'],
+				'discountID' : discountID.getValue(),
+				"payManner" : payMannerOut,
+				"serviceRate" : serviceRate.getValue(),
+				"memberID" : _c.grid.order['memberID'],
+				"comment" : commentOut,
+				"foods" : foodPara,
+				'erasePrice' : erasePrice.getValue()
+			},
+			success : function(response, options) {
+				var resultJSON = Ext.util.JSON.decode(response.responseText);
+				if (resultJSON.success == true) {
+					Ext.MessageBox.show({
+						msg : resultJSON.data + "，是否打印账单？",
+						width : 300,
+						buttons : Ext.MessageBox.YESNO,
+						fn : function(btn) {
+							if (btn == "yes") {
+								var tempMask = new Ext.LoadMask(document.body, {
+									msg : '正在打印请稍候.......',
+									remove : true
+								});
+								tempMask.show();
+								Ext.Ajax.request({
+									url : "../../PrintOrder.do",
+									params : {
+										
+										"orderID" : Request["orderID"],
+										'printType' : 3
+									},
+									success : function(response, options) {
+										tempMask.hide();
+										var jr = Ext.util.JSON.decode(response.responseText);
+										Ext.MessageBox.show({
+											msg : jr.msg,
+											width : 300,
+											buttons : Ext.MessageBox.OK,
+											fn : function() {
+												location.href = "Bills.html";
+											}
+										});
+									},
+									failure : function(response, options) {
+										tempMask.hide();
+										Ext.ux.showMsg(Ext.decode(response.responseText));
+									}
+								});
+							} else {
+								location.href = "Bills.html";
+							}
+						}
+					});
+				} else {
+					orderPanel.buttons[0].setDisabled(false);
+					orderPanel.buttons[4].setDisabled(false);
+					Ext.MessageBox.show({
+						msg : resultJSON.data,
+						width : 300,
+						buttons : Ext.MessageBox.OK
+					});
+				}
+			},
+			failure : function(response, options) {
+				orderPanel.buttons[0].setDisabled(false);
+				orderPanel.buttons[4].setDisabled(false);
+				Ext.MessageBox.show({
+					msg : "Unknow page error",
+					width : 300,
+					buttons : Ext.MessageBox.OK
+				});
+			}
+		});
+	}
+}
+
+/**
  * 单张账单提高操作
  */
 function submitSingleOrderHandler(_c){
 	var orderFoods = _c.grid.order.orderFoods;
 	if(orderFoods.length > 0){
-		var foodPara = Wireless.ux.createOrder({orderFoods: (typeof _c.commitType != 'undefined'? frontNewOrderFood : orderFoods)});
-		
+		var commitOrderData = {
+			tableAlias : tableAliasID,
+			customNum : 1,
+			orderFoods : (typeof _c.commitType != 'undefined'? frontNewOrderFood : orderFoods),
+			categoryValue : tableCategory,
+			id : _c.grid.order.id,
+			orderDate : (typeof _c.grid.order == 'undefined' ? '' : _c.grid.order.orderDate)
+		};
 		setButtonDisabled(true);
 		Ext.Ajax.request({
 			url : '../../InsertOrder.do',
 			params : {
-				tableID : tableAliasID,
-				orderID : _c.grid.order.id,
-				customNum : 1,
+				commitOrderData : JSON.stringify(commitOrderData),
 				type : (typeof _c.commitType != 'undefined'? _c.commitType : isFree ? 1 : 7),
-				foods : foodPara,
-				category : tableCategory,
-				orderDate : (typeof _c.grid.order == 'undefined' ? '' : _c.grid.order.orderDate),
 				notPrint : _c.notPrint === true ? true : false
 			},
 			success : function(response, options) {
@@ -817,73 +936,19 @@ function submitSingleOrderHandler(_c){
 /**
  * 账单组提交
  */
-function submitOrderGroupHandler(_c){
-	var orders = [];
-	var gridOrder, tempOrder, tempOrderFoods = [];
-	for(var i = 0; i < orderGroupGridTabPanel.items.length; i++){
-		gridOrder = orderGroupGridTabPanel.items.get(i).order;
-		tempOrderFoods = [];
-		for(var k = 0; k < gridOrder.orderFoods.length; k++){
-			tempOrderFoods.push({
-				foodName : gridOrder.orderFoods[k].foodName,
-				aliasID : gridOrder.orderFoods[k].aliasID,
-				count : gridOrder.orderFoods[k].count,
-				isHangup : gridOrder.orderFoods[k].hangup,
-				tasteGroup : gridOrder.orderFoods[k].tasteGroup
-			});
-			tempOrderFoods[k].tasteGroup.normalTaste = null;
-		}
-		tempOrder = {
-			tableAlias : gridOrder.tableAlias,
-			tableID : gridOrder.tableID,
-			foods : tempOrderFoods 
-		};
-		if(tableStatus == 1){
-			tempOrder.orderID = gridOrder.id;
-		}
-		orders.push(tempOrder);
-	}
-	orders = Ext.encode(orders);
-	Ext.Ajax.request({
-		url : '../../UpdateOrderGroup.do',
-		params : {
-			'dataSource' : 'updateOrder',
-			'restaurantID' : restaurantID,
-			'parentOrderID' : orderGroupData.root[0].id,
-			'type' : tableStatus == 1 ? 'update' : 'insert',
-			'orders' : orders,
-			'category' : tableCategory
-		},
-		success : function(res, options) {
-			var jr = Ext.util.JSON.decode(res.responseText);
-			_c.title = jr.title;
-			_c.msg = jr.msg;
-			if (jr.success == true) {
-//				Ext.example.msg(jr.title, jr.msg);
-				skip(_c);
-			}else{
-				Ext.ux.showMsg(jr);
-			}
-		},
-		failure : function(res, options) {
-			var jr = Ext.decode(res.responseText);
-			Ext.ux.showMsg(jr);
-			setButtonDisabled(false);
-		}
-	});
-}
 
 /**
  * 提交账单信息
  */
 function submitOrderHandler(_c){
 	_c = _c != null && typeof _c != 'undefined' ? _c : {};
-	if(isGroup){
-		submitOrderGroupHandler(_c);
+	_c.grid = orderSingleGridPanel;
+	if(isRepaid){
+		submitRepaidOrderHandler(_c);
 	}else{
-		_c.grid = orderSingleGridPanel;
 		submitSingleOrderHandler(_c);
 	}
+	
 };
 
 /**

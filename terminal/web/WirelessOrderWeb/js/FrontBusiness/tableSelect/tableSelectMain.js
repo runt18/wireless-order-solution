@@ -11,16 +11,9 @@ var dishesOrderImgBut = new Ext.ux.ImageButton({
 				temp = tableStatusListTSDisplay[i];
 				if (temp.alias == selectedTable) {
 					if (temp.statusValue == TABLE_BUSY) {
-						setDynamicKey("OrderMain.html", 'restaurantID=' + restaurantID
-								+ "&tableAliasID=" + temp.alias
-								+ "&ts=1" 
-								+ "&personCount=" + temp.customNum
-								+ "&category=" + temp.categoryValue);
+						setDynamicKey("OrderMain.html", 'tableAliasID=' + temp.alias);
 					} else if (temp.statusValue == TABLE_IDLE) {
-						setDynamicKey("OrderMain.html", 'restaurantID=' + restaurantID
-								+ "&ts=0"
-								+ "&tableAliasID=" + selectedTable
-								+ "&category=" + CATE_NORMAL);
+						setDynamicKey("OrderMain.html", 'tableAliasID=' + selectedTable);
 					}
 					break;
 				}
@@ -45,8 +38,7 @@ var checkOutImgBut = new Ext.ux.ImageButton({
 					if (temp.statusValue == TABLE_IDLE) {
 						Ext.example.msg('提示', '<font color="red">操作失败, 此桌没有下单, 不能结账, 请重新确认.</font>');
 					} else {
-						setDynamicKey("CheckOut.html", 'restaurantID=' + restaurantID
-								+ "&tableID=" + selectedTable);
+						setDynamicKey("CheckOut.html", 'tableID=' + selectedTable);
 					}
 					break;
 				}
@@ -1447,15 +1439,9 @@ Ext.onReady(function() {
 							temp = tableStatusListTSDisplay[i];
 							if (temp.alias == alias.getValue()) {
 								if (temp.statusValue == TABLE_BUSY) {
-									setDynamicKey("OrderMain.html", 'restaurantID=' + restaurantID
-											+ "&ts=" + TABLE_BUSY
-											+ "&tableAliasID=" + alias.getValue()
-											+ "&category=" + CATE_NORMAL);
+									setDynamicKey("OrderMain.html", 'tableAliasID=' + alias.getValue());
 								} else if (temp.statusValue == TABLE_IDLE) {
-									setDynamicKey("OrderMain.html", 'restaurantID=' + restaurantID
-											+ "&ts=0"
-											+ "&tableAliasID=" + alias.getValue()
-											+ "&category=" + CATE_NORMAL);
+									setDynamicKey("OrderMain.html", 'tableAliasID=' + alias.getValue());
 //										alias.selectText();
 //										Ext.example.msg('提示', '该餐台已结账, 请重新输入.');
 								}
@@ -1487,8 +1473,7 @@ Ext.onReady(function() {
 							temp = tableStatusListTSDisplay[i];
 							if (temp.alias == alias.getValue()) {
 								if (temp.statusValue == TABLE_BUSY) {
-									setDynamicKey("CheckOut.html", 'restaurantID=' + restaurantID
-												+ "&tableID=" + alias.getValue());
+									setDynamicKey("CheckOut.html", 'tableID=' + alias.getValue());
 								} else if (temp.statusValue == TABLE_IDLE) {
 									alias.selectText();
 									Ext.example.msg('提示', '该餐台已结账, 请重新输入.');

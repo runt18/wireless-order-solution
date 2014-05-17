@@ -4,10 +4,7 @@
 	}else{
 		orderPanel.setTitle('已点菜列表 -- 操作类型: <font color="red">改单</font>');
 	}
-	if (isGroup) {
-//		centerPanel.setTitle(centerPanel.title);
-	}else{
-//		centerPanel.setTitle(centerPanel.title + String.format(' -- 餐台号: <font color="red">{0}</font>', tableAliasID));
+	if(!isRepaid){
 		orderPanel.setTitle(orderPanel.title + String.format(' -- 餐台号: <font color="red">{0}</font>', tableAliasID));
 	}
 };
@@ -16,9 +13,7 @@ function tasteOnLoad() {
 	Ext.Ajax.request({
 		url : '../../QueryMenu.do',
 		params : {
-			isCookie : true,
 			dataSource : 'tastes',
-			restaurantID : restaurantID,
 			type : 2
 		},
 		success : function(response, options) {
@@ -49,43 +44,96 @@ function tasteOnLoad() {
 /**
  * 加载单张账单信息
  */
-function loadSingleOrderData(){
+function loadSingleOrderData(resultJSON){
+	
 		// 加载普通账单信息
-		Ext.Ajax.request({
-			url : '../../QueryOrder.do',
-			params : {
-				'tableID' : tableAliasID
-			},
-			success : function(response, options) {
-				var resultJSON = Ext.util.JSON.decode(response.responseText);
-				if (resultJSON.success == true) {
-					orderSingleData = resultJSON;
-					// 更新菜品状态为已点菜
-					refreshOrderFoodDataType(orderSingleData.root);
-					// 初始化界面
-					initOrderSingleUI({
-						callBack : function(grid, c){
-							grid.order = orderSingleData.other.order;
-							grid.order.orderFoods = orderSingleData.root;
-							grid.getStore().loadData(orderSingleData);
-							orderGroupDisplayRefresh({
-								control : grid
-							});
+		if (resultJSON.success == true) {
+			orderSingleData = resultJSON;
+			if(isRepaid){
+				Ext.Ajax.request({
+					url : '../../QuerySystemSetting.do',
+					success : function(res, opt){
+						var jr = Ext.decode(res.responseText);
+						sysSetting = jr.other.systemSetting;
+						var eraseQuota = parseInt(sysSetting.setting.eraseQuota);
+						
+						if(eraseQuota > 0){
+							Ext.getDom('fontShowEraseQuota').innerHTML = eraseQuota.toFixed(2);
+							Ext.getCmp('numErasePrice').setDisabled(false);
+						}else{
+							Ext.getDom('fontShowEraseQuota').innerHTML = 0.00;
+							Ext.getCmp('numErasePrice').setDisabled(true);
 						}
-					});
-				} else {
-					initOrderSingleUI();
-				}
-			},
-			failure : function(response, options) {
-				Ext.ux.showMsg(Ext.decode(response.responseText));
+					},
+					failure : function(res, opt) { 
+						Ext.ux.showMsg(Ext.decode(res.responseText));
+					}
+				});
+				
+				initOrderSingleUI({
+					callBack : function(grid, c){
+						grid.order = orderSingleData.other.order;
+						grid.order.orderFoods = orderSingleData.root;
+						grid.getStore().loadData(orderSingleData);
+					}
+				});
+				// 加载账单基础信息
+				Ext.getCmp('txtSettleTypeFormat').setValue(orderSingleData.other.order.settleTypeText);
+				Ext.getCmp('serviceRate').setValue(orderSingleData.other.order.serviceRate * 100);
+				Ext.getCmp('numErasePrice').setValue(orderSingleData.other.order.erasePrice);
+				
+				Ext.Ajax.request({
+					url : '../../QueryDiscountTree.do',
+					success : function(res, opt) {
+						discountData = eval(res.responseText);
+						var discount = Ext.getCmp('comboDiscount');
+						discount.store.loadData({root:discountData});
+						discount.setValue(orderSingleData.other.order.discount.id);
+						//利用缓时来选中收款方式, 否则不能选中
+						var payManner = document.getElementsByName('radioPayType');
+						for(var i = 0; i < payManner.length; i++){
+							if(payManner[i].value == orderSingleData.other.order.payTypeValue){
+								payManner[i].checked = true;
+								break;
+							}
+						}
+					},
+					failure : function(res, opt) {
+						Ext.MessageBox.show({
+							title : '警告',
+							msg : '加载折扣方案信息失败.',
+							width : 300
+						});
+					}
+				});
+				
+				
+				
+			}else{
+				// 更新菜品状态为已点菜
+				refreshOrderFoodDataType(orderSingleData.root);
+				// 初始化界面
+				initOrderSingleUI({
+					callBack : function(grid, c){
+						grid.order = orderSingleData.other.order;
+						grid.order.orderFoods = orderSingleData.root;
+						grid.getStore().loadData(orderSingleData);
+						orderGroupDisplayRefresh({
+							control : grid
+						});
+					}
+				});
 			}
-		});
+		} else {
+			initOrderSingleUI();
+		}
 }
 
 /**
  * 加载账单组信息
  */
+//FIXME 账单组信息
+/*
 function loadOrderGroupData(){
 	Ext.Ajax.request({
 		url : '../../QueryOrderGroup.do',
@@ -167,6 +215,7 @@ function loadOrderGroupData(){
 		}
 	});
 }
+*/
 
 /**
  * 初始化菜品数量设置菜单
@@ -249,6 +298,7 @@ function createOrderFoodGridPanelTbar(){
 			render : function(e){
 				e.add({
 					text : '选择口味',
+					hidden : isRepaid,
 					iconCls : 'icon_tb_taste',
 					handler : function(){
 						orderTasteRendererHandler();
@@ -297,7 +347,7 @@ function createOrderFoodGridPanelTbar(){
 						orderDeleteFoodOperationHandler();
 					}
 				});
-				if(!isFree && !isGroup){
+				if(!isFree && !isRepaid){
 					e.add('-', {
 						text : '补打总单',
 						iconCls : 'icon_tb_print_all',
@@ -363,7 +413,8 @@ function createOrderFoodGridPanelTbar(){
 						}
 					});
 				}
-				if(isGroup){
+				//FIXME 注释了isGroup
+/*				if(isGroup){
 					e.add('-', {
 						xtype : 'tbtext',
 						text : '&nbsp;账单操作范围:&nbsp;'
@@ -379,7 +430,7 @@ function createOrderFoodGridPanelTbar(){
 						boxLabel : '单张&nbsp;',
 						inputValue : 2
 					});
-				}
+				}*/
 			}
 		}
 	});
@@ -541,14 +592,9 @@ function initPasswordWin(){
 /**
  * 初始化
  */
-function loadOrderData() {
+function loadOrderData() { 
 	// 
 	initMenuForOperationFoodCount();
+	loadSingleOrderData(primaryOrderData);
 	
-	if (isGroup) {
-		loadOrderGroupData();
-	}else{
-		//	加载数据
-		loadSingleOrderData();
-	}
 };

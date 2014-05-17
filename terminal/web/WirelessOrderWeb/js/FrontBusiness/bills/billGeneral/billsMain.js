@@ -47,7 +47,7 @@ function billOptModifyHandler(rowindex) {
 		Ext.example.msg('提示', '会员结账单暂不允许反结账.');
 		return;
 	}
-	setDynamicKey('BillModify.html', 'restaurantID=' + restaurantID + '&orderID=' + data['id']);
+	setDynamicKey('OrderMain.html', 'orderID=' + data['id']);
 };
 
 function showViewBillWin(){
