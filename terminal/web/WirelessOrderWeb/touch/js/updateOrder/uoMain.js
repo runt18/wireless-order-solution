@@ -534,21 +534,19 @@ uo.goToCreateOrder = function(){
 uo.submitUpdateOrderHandler = function(c){
 	var orderFoods = c;
 	if(orderFoods.length > 0){
-		var commitOrderData = {
-			tableAlias : uo.table.alias,
-			customNum : uo.customNum,
-			orderFoods : orderFoods,
-			categoryValue : uoOther.order.categoryValue,
-			id : uoOther.order.id,
-			orderDate : uoOther.order.orderDate
-		};
+		orderDataModel.tableAlias = uo.table.alias;
+		orderDataModel.customNum = uo.customNum;
+		orderDataModel.orderFoods = orderFoods;
+		orderDataModel.categoryValue = uoOther.order.categoryValue;
+		orderDataModel.id = uoOther.order.id,
+		orderDataModel.orderDate = uoOther.order.orderDate;
 
 		Util.LM.show();
 		$.ajax({
 			url : '../InsertOrder.do',
 			type : 'post',
 			data : {
-				commitOrderData : JSON.stringify(commitOrderData),
+				commitOrderData : JSON.stringify(Wireless.ux.commitOrderData(orderDataModel)),
 				type : 7
 			},
 			success : function(data, status, xhr){

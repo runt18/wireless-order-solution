@@ -572,21 +572,21 @@ co.submit = function(c){
 //	var foods = Wireless.ux.createOrder({orderFoods: (typeof c.commitType != 'undefined'? co.newFood.slice(0) : foodData), dataType : 1});
 	
 	Util.LM.show();
-	var commitOrderData = {
-		tableAlias : co.table.alias,
-		customNum : co.table.customNum,
-		orderFoods : (typeof c.commitType != 'undefined'? co.newFood.slice(0) : foodData),
-		categoryValue :  co.table.categoryValue
-	};
+	
+	orderDataModel.tableAlias = co.table.alias;
+	orderDataModel.customNum = co.table.customNum;
+	orderDataModel.orderFoods = (typeof c.commitType != 'undefined'? co.newFood.slice(0) : foodData);
+	orderDataModel.categoryValue =  co.table.categoryValue;
 	if(!isFree){
-		commitOrderData.id = co.order.id;
-		commitOrderData.orderDate = co.order.orderDate;
+		orderDataModel.id = co.order.id;
+		orderDataModel.orderDate = co.order.orderDate;
 	}
+	
 	$.ajax({
 		url : '../InsertOrder.do',
 		type : 'post',
 		data : {
-			commitOrderData : JSON.stringify(commitOrderData),
+			commitOrderData : JSON.stringify(Wireless.ux.commitOrderData(orderDataModel)),
 			type : (typeof c.commitType != 'undefined'? c.commitType : isFree ? 1 : 7),
 			notPrint : c.notPrint
 		},
