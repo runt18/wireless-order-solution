@@ -889,19 +889,18 @@ function submitRepaidOrderHandler(_c){
 function submitSingleOrderHandler(_c){
 	var orderFoods = _c.grid.order.orderFoods;
 	if(orderFoods.length > 0){
-		var commitOrderData = {
-			tableAlias : tableAliasID,
-			customNum : 1,
-			orderFoods : (typeof _c.commitType != 'undefined'? frontNewOrderFood : orderFoods),
-			categoryValue : tableCategory,
-			id : _c.grid.order.id,
-			orderDate : (typeof _c.grid.order == 'undefined' ? '' : _c.grid.order.orderDate)
-		};
+		orderDataModel.tableAlias = tableAliasID;
+		orderDataModel.customNum = 1;
+		orderDataModel.orderFoods = (typeof _c.commitType != 'undefined'? frontNewOrderFood : orderFoods);
+		orderDataModel.categoryValue = tableCategory;
+		orderDataModel.id = _c.grid.order.id;
+		orderDataModel.orderDate = (typeof _c.grid.order == 'undefined' ? '' : _c.grid.order.orderDate);
+		
 		setButtonDisabled(true);
 		Ext.Ajax.request({
 			url : '../../InsertOrder.do',
 			params : {
-				commitOrderData : JSON.stringify(commitOrderData),
+				commitOrderData : JSON.stringify(Wireless.ux.commitOrderData(orderDataModel)),
 				type : (typeof _c.commitType != 'undefined'? _c.commitType : isFree ? 1 : 7),
 				notPrint : _c.notPrint === true ? true : false
 			},
