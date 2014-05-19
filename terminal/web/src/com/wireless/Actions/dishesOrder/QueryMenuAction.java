@@ -1,6 +1,7 @@
 package com.wireless.Actions.dishesOrder;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -17,6 +18,7 @@ import com.wireless.db.menuMgr.MenuDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.json.JObject;
 import com.wireless.json.Jsonable;
+import com.wireless.pojo.menuMgr.DepartmentTree;
 import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.menuMgr.FoodList;
 import com.wireless.pojo.menuMgr.Kitchen.Type;
@@ -25,6 +27,22 @@ import com.wireless.util.DataPaging;
 import com.wireless.util.WebParams;
 
 public class QueryMenuAction extends DispatchAction {
+	/**
+	 * 使用DepartmentTree得到foodList
+	 */
+	public ActionForward foodList(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+		response.setContentType("text/json;charset=utf-8");
+		JObject jobject = new JObject();
+		String pin = (String) request.getAttribute("pin");
+		final DepartmentTree deptTree = new DepartmentTree.Builder(FoodDao.getPureFoods(StaffDao.verify(Integer.parseInt(pin)))).build();
+		jobject.setRoot(deptTree.asDeptNodes());
+		jobject.setOther(new HashMap<Object, Object>(){
+			private static final long serialVersionUID = 1L;
+
+		{put("foodList", new FoodList(deptTree.asFoodList()));}});
+		response.getWriter().print(jobject.toString());
+		return null;
+	}
 	/**
 	 * 
 	 * @param mapping
