@@ -25,7 +25,7 @@ var NormalFoodModel = {
 	cancelReason : 'cancelReason'
 };*/
 
-var FoodModel = {
+var foodModel = {
 	isTemporary : 'isTemporary',
 	id : 'id',
 	foodName : 'foodName',
@@ -35,6 +35,32 @@ var FoodModel = {
 	kitchen : 'kitchen',
 	isHangup : 'isHangup',
 	cancelReason : 'cancelReason'
+};
+
+
+var orderDataModel = {
+	tableAlias : null,
+	customNum : null,
+	orderFoods : null,
+	categoryValue : null,
+	id : null,
+	orderDate : null
+};
+
+/**
+ * 清除为空的字段
+ * @param {} obj
+ * @return {}
+ */
+Wireless.ux.commitOrderData = function(obj){
+	for(var s in obj){
+		if(typeof obj[s] == 'object' && obj[s] != null){
+			Wireless.ux.commitOrderData(obj[s]);
+		}else if (obj[s] == null){
+			delete obj[s];
+		};
+	}
+	return obj;
 };
 
 Wireless.ux.createOrder = function(c){
