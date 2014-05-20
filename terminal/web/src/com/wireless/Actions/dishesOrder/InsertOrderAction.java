@@ -35,36 +35,10 @@ public class InsertOrderAction extends Action{
 		try {
 			final Staff staff = StaffDao.verify(Integer.parseInt((String)request.getAttribute("pin")));
 			
-//			Order orderToInsert = new Order();
-//			int tableAlias = request.getParameter("tableID") != null ? Integer.parseInt(request.getParameter("tableID")) : 0;
-//			orderToInsert.getDestTbl().setTableAlias(tableAlias);
-//		
-//			orderToInsert.setCategory(Short.parseShort(request.getParameter("category")));
-//			orderToInsert.setCustomNum(Integer.parseInt(request.getParameter("customNum")));
-//			if(request.getParameter("orderDate") != null && !request.getParameter("orderDate").trim().isEmpty()){
-//				orderToInsert.setOrderDate(Long.parseLong(request.getParameter("orderDate")));				
-//			}
-//			int type = Integer.parseInt(request.getParameter("type"));
-//			String orderType = null;
-//			
-//			if(type == 1){
-//				orderType = "下单";
-//			}else{
-//				orderType = "改单";
-//				String orderID = request.getParameter("orderID");
-//				if(orderID != null && !orderID.trim().isEmpty())
-//					orderToInsert.setId(Integer.valueOf(orderID));
-//			}
-//			orderToInsert.setOrderFoods(Util.toFoodArray(request.getParameter("foods")));
-
-			
-			//TODO Get the json text.
 			int type = Integer.parseInt(request.getParameter("type"));
 			
 			String jsonText = request.getParameter("commitOrderData");
 			Order orderToInsert = JObject.parse(Order.JSON_CREATOR, type, jsonText);
-			
-			
 			
 			String notPrint = request.getParameter("notPrint");
 			
