@@ -8,6 +8,12 @@ function billQueryHandler() {
 		gs.baseParams['comboPayType'] = Ext.getCmp('comboPayType').getValue();
 		gs.baseParams['common'] = Ext.getCmp('textSearchValue').getValue();
 		gs.baseParams['value'] = Ext.getCmp('numberSearchValue').getValue();
+		if(isNaN(Ext.getCmp('textTableAliasOrName').getValue())){
+			gs.baseParams['tableName'] = Ext.getCmp('textTableAliasOrName').getValue();
+		}else{
+			gs.baseParams['tableAlias'] = Ext.getCmp('textTableAliasOrName').getValue();
+		}
+		gs.baseParams['region'] = Ext.getCmp('history_comboRegion').getValue();
 	}else{
 		gs.baseParams['value'] = Ext.getCmp('numberSearchValue').getValue();
 	}
@@ -332,6 +338,7 @@ Ext.onReady(function() {
 		allowBlank : false
 	});
 	var history_dateCombo = Ext.ux.createDateCombo({
+		width : 90,
 		beginDate : history_beginDate,
 		endDate : history_endDate,
 		callback : function(){
@@ -348,7 +355,7 @@ Ext.onReady(function() {
 			{xtype : 'tbtext', text : '查看日期:'},
 			{xtype : 'tbtext', text : '&nbsp;&nbsp;'},
 			history_dateCombo,
-			{xtype : 'tbtext', text : '&nbsp;&nbsp;'},
+			{xtype : 'tbtext', text : '&nbsp;'},
 			history_beginDate,
 			{
 				xtype : 'label',
@@ -359,11 +366,10 @@ Ext.onReady(function() {
 			history_endDate,
 			{xtype : 'tbtext', text : '&nbsp;&nbsp;'},
 			{xtype : 'tbtext', text : '收款方式:'},
-			{xtype : 'tbtext', text : '&nbsp;&nbsp;'},
 			{
 				xtype : 'combo',
 				forceSelection : true,
-				width : 120,
+				width : 70,
 				value : -1,
 				id : 'comboPayType',
 				store : new Ext.data.SimpleStore({
@@ -380,13 +386,63 @@ Ext.onReady(function() {
 				readOnly : false
 			},
 			{xtype : 'tbtext', text : '&nbsp;&nbsp;'},
-			{xtype : 'tbtext', text : '备注搜索:'},
+			{xtype : 'tbtext', text : '台名/台号:'},
+			{
+				xtype : 'textfield',
+				id : 'textTableAliasOrName',
+				hidden : false,
+				width : 100
+			},
 			{xtype : 'tbtext', text : '&nbsp;&nbsp;'},
+			{xtype : 'tbtext', text : '备注搜索:'},
 			{
 				xtype : 'textfield',
 				id : 'textSearchValue',
 				hidden : false,
-				width : 130
+				width : 100
+			},
+			{xtype : 'tbtext', text : '&nbsp;&nbsp;'},
+			{xtype : 'tbtext', text : '区域:'},
+			{
+				xtype : 'combo',
+				forceSelection : true,
+				width : 90,
+				value : -1,
+				id : 'history_comboRegion',
+				store : new Ext.data.SimpleStore({
+					fields : ['id', 'name']
+				}),
+				valueField : 'id',
+				displayField : 'name',
+				typeAhead : true,
+				mode : 'local',
+				triggerAction : 'all',
+				selectOnFocus : true,
+				allowBlank : false,
+				readOnly : false,
+				listeners : {
+					render : function(thiz){
+						var data = [[-1,'全部']];
+						Ext.Ajax.request({
+							url : '../../QueryRegion.do',
+							params : {
+								dataSource : 'normal'
+							},
+							success : function(res, opt){
+								var jr = Ext.decode(res.responseText);
+								for(var i = 0; i < jr.root.length; i++){
+									data.push([jr.root[i]['id'], jr.root[i]['name']]);
+								}
+								thiz.store.loadData(data);
+								thiz.setValue(-1);
+							},
+							fialure : function(res, opt){
+								thiz.store.loadData(data);
+								thiz.setValue(-1);
+							}
+						});
+					}
+				}
 			}
 		]
 	});

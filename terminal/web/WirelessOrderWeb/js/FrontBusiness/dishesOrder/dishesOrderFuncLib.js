@@ -775,7 +775,7 @@ function refreshOrder(res){
 function submitRepaidOrderHandler(_c){
 	var orderFoods = _c.grid.order.orderFoods;
 	if(orderFoods.length > 0){
-		var foodPara = Wireless.ux.createOrder({orderFoods: orderFoods, dataType : 3});
+		//var foodPara = Wireless.ux.createOrder({orderFoods: orderFoods, dataType : 3});
 		var payMannerOut = null;
 		var payManner = document.getElementsByName('radioPayType');
 		for(var i = 0; i < payManner.length; i++){
@@ -798,71 +798,60 @@ function submitRepaidOrderHandler(_c){
 			Ext.example.msg('提示', '抹数金额不能大于系统设置,请重新输入.');
 			return;
 		}
-		//orderFoods = '{' + JSON.stringify(orderFoods) + '}';
 		orderPanel.buttons[0].setDisabled(true);
-		orderPanel.buttons[4].setDisabled(true);
+		orderPanel.buttons[1].setDisabled(true);
+		orderPanel.buttons[5].setDisabled(true);
+		
+		orderDataModel.tableAlias = _c.grid.order.table.alias;
+		orderDataModel.customNum = _c.grid.order['customNum'];
+		orderDataModel.orderFoods = orderFoods;
+		orderDataModel.categoryValue = _c.grid.order["categoryValue"];
+		orderDataModel.id = _c.grid.order["id"];
+		orderDataModel.orderDate =  _c.grid.order["orderDate"];
+		
 		Ext.Ajax.request({
-			url : "../../UpdateOrder2.do",
+			url : "../../RepaidOrder.do",
 			params : {
-				"orderID" : _c.grid.order["id"],
-				'tableAlias' : _c.grid.order.table.alias,
-				"category" : _c.grid.order["categoryValue"],
-				"customNum" : _c.grid.order['customNum'],
-				"payType" : _c.grid.order['settleTypeValue'],
+				'orderId' : _c.grid.order["id"],
 				'discountID' : discountID.getValue(),
-				"payManner" : payMannerOut,
+				"payType" : payMannerOut,
 				"serviceRate" : serviceRate.getValue(),
 				"memberID" : _c.grid.order['memberID'],
 				"comment" : commentOut,
-				"foods" : foodPara,
-				'erasePrice' : erasePrice.getValue()
+				'erasePrice' : erasePrice.getValue(),
+				"commitOrderData" : JSON.stringify(Wireless.ux.commitOrderData(orderDataModel)),
+				'customNum' : _c.grid.order['customNum']
 			},
 			success : function(response, options) {
 				var resultJSON = Ext.util.JSON.decode(response.responseText);
 				if (resultJSON.success == true) {
-					Ext.MessageBox.show({
-						msg : resultJSON.data + "，是否打印账单？",
-						width : 300,
-						buttons : Ext.MessageBox.YESNO,
-						fn : function(btn) {
-							if (btn == "yes") {
-								var tempMask = new Ext.LoadMask(document.body, {
-									msg : '正在打印请稍候.......',
-									remove : true
-								});
-								tempMask.show();
-								Ext.Ajax.request({
-									url : "../../PrintOrder.do",
-									params : {
-										
-										"orderID" : Request["orderID"],
-										'printType' : 3
-									},
-									success : function(response, options) {
-										tempMask.hide();
-										var jr = Ext.util.JSON.decode(response.responseText);
-										Ext.MessageBox.show({
-											msg : jr.msg,
-											width : 300,
-											buttons : Ext.MessageBox.OK,
-											fn : function() {
-												location.href = "Bills.html";
-											}
-										});
-									},
-									failure : function(response, options) {
-										tempMask.hide();
-										Ext.ux.showMsg(Ext.decode(response.responseText));
-									}
-								});
-							} else {
-								location.href = "Bills.html";
+					if(!_c.notPrint){
+						var tempMask = new Ext.LoadMask(document.body, {
+							msg : '正在打印请稍候.......',
+							remove : true
+						});
+						Ext.Ajax.request({
+							url : "../../PrintOrder.do",
+							params : {
+								"orderID" : Request["orderID"],
+								'printType' : 3
+							},
+							success : function(response, options) {
+								tempMask.hide();
+								skip({href : 'Bills.html', msg : '提交并打印成功'});
+							},
+							failure : function(response, options) {
+								tempMask.hide();
+								Ext.ux.showMsg(Ext.decode(response.responseText));
 							}
-						}
-					});
+						});
+					}else{
+						skip({href : 'Bills.html', msg : resultJSON.data});
+					}
 				} else {
 					orderPanel.buttons[0].setDisabled(false);
-					orderPanel.buttons[4].setDisabled(false);
+					orderPanel.buttons[1].setDisabled(false);
+					orderPanel.buttons[5].setDisabled(false);
 					Ext.MessageBox.show({
 						msg : resultJSON.data,
 						width : 300,
@@ -872,7 +861,8 @@ function submitRepaidOrderHandler(_c){
 			},
 			failure : function(response, options) {
 				orderPanel.buttons[0].setDisabled(false);
-				orderPanel.buttons[4].setDisabled(false);
+				orderPanel.buttons[1].setDisabled(false);
+				orderPanel.buttons[5].setDisabled(false);
 				Ext.MessageBox.show({
 					msg : "Unknow page error",
 					width : 300,
@@ -960,6 +950,7 @@ function setButtonDisabled(s){
 		orderPanel.buttons[2].setDisabled(s);
 		orderPanel.buttons[3].setDisabled(s);
 		orderPanel.buttons[4].setDisabled(s);
+		orderPanel.buttons[5].setDisabled(s);
 	}
 }
 
