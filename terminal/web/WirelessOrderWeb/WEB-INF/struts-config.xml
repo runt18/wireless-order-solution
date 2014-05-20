@@ -569,7 +569,10 @@
 			type="com.wireless.Actions.login.AutoLoginAction"
 			scope="request" >
 		</action>
-
+		<action path="/RepaidOrder"
+			type="com.wireless.Actions.dishesOrder.RepaidOrderAction"
+			scope="request" >
+		</action>
 	</action-mappings>
 
 	<message-resources parameter="com.yourcompany.struts.ApplicationResources" />
