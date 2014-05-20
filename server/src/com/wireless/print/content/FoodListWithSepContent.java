@@ -5,18 +5,17 @@ import java.util.List;
 import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.printScheme.PStyle;
 import com.wireless.pojo.printScheme.PType;
+import com.wireless.print.content.FoodDetailContent.DisplayConfig;
 
 public class FoodListWithSepContent extends ConcreteContent {
 	
-	private String mFormat;
-	private List<OrderFood> mFoods;
-	private PType mPrintType;
+	private final DisplayConfig mDisplayConfig;
+	private final List<OrderFood> mOrderFoods;
 	
-	public FoodListWithSepContent(String format, PType printType, List<OrderFood> foods, PStyle style) {
-		super(PType.PRINT_UNKNOWN, style);
-		mPrintType = printType;
-		mFormat = format;
-		mFoods = foods;
+	public FoodListWithSepContent(DisplayConfig config, List<OrderFood> orderFoods, PType printType, PStyle style) {
+		super(printType, style);
+		mDisplayConfig = config;
+		mOrderFoods = orderFoods;
 	}
 
 	/**
@@ -34,32 +33,18 @@ public class FoodListWithSepContent extends ConcreteContent {
 	 */
 	@Override
 	public String toString(){
-		//generate the separator
-		StringBuilder sep = new StringBuilder();
-		if(mStyle == PStyle.PRINT_STYLE_58MM){
-			for(int i = 0; i < LEN_58MM; i++){
-				sep.append('-');
-			}
-			
-		}else if(mStyle == PStyle.PRINT_STYLE_80MM){
-			for(int i = 0; i < LEN_80MM; i++){
-				sep.append('-');
-			}
-		}
-		sep.insert(0, "\r\n").insert(sep.length(), "\r\n");
-		
 		StringBuilder var = new StringBuilder();
 		int cnt = 0;
-		for(OrderFood of : mFoods){
+		for(OrderFood of : mOrderFoods){
 			if(of.asFood().isCombo()){
-				var.append(new ComboDetail4ListContent(mFormat, of, mStyle).toString());
+				var.append(new ComboDetail4ListContent(mDisplayConfig, of, mPrintType, mStyle).toString());
 			}else{
-				var.append(new FoodDetailContent(mFormat, of, mStyle).toString());
+				var.append(new FoodDetailContent(mDisplayConfig, of, mPrintType, mStyle).toString());
 				if(mPrintType == PType.PRINT_ALL_CANCELLED_FOOD && of.hasCancelReason()){
-					var.append("\r\n").append("原因:" + of.getCancelReason().getReason());
+					var.append(SEP).append("原因:" + of.getCancelReason().getReason());
 				}
 			}
-			var.append((cnt++ < mFoods.size() - 1 ? sep : ""));
+			var.append((cnt++ < mOrderFoods.size() - 1 ? SEP + mSeperatorLine + SEP : ""));
 		}
 		return var.toString();
 	}

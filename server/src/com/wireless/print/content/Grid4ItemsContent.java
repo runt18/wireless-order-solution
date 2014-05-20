@@ -7,8 +7,8 @@ import com.wireless.pojo.printScheme.PType;
 
 public class Grid4ItemsContent extends ConcreteContent {
 
-	private String[] _items;
-	private int[] _pos;
+	private final String[] _items;
+	private final int[] _pos;
 	
 	protected Grid4ItemsContent(String[] items, int[] pos, PType printType, PStyle style) {
 		super(printType, style);

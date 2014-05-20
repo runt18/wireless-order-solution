@@ -5,18 +5,19 @@ import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.printScheme.PStyle;
 import com.wireless.pojo.printScheme.PType;
 import com.wireless.pojo.util.NumericUtil;
+import com.wireless.print.content.FoodDetailContent.DisplayConfig;
 
 public class ComboDetailContent extends ConcreteContent {
 
-	private String _format;
-	private OrderFood _parent;
-	private Food _child;
+	private final DisplayConfig mDisplayConfig;
+	private final OrderFood mParent;
+	private final Food mChild;
 	
-	public ComboDetailContent(String format, OrderFood parent, Food child, PStyle style){
-		super(PType.PRINT_UNKNOWN, style);
-		_format = format;
-		_parent = parent;
-		_child = child;
+	public ComboDetailContent(DisplayConfig config, OrderFood parent, Food child, PType printType, PStyle style){
+		super(printType, style);
+		mDisplayConfig = config;
+		mParent = parent;
+		mChild = child;
 	}
 
 	/**
@@ -30,8 +31,8 @@ public class ComboDetailContent extends ConcreteContent {
 	@Override
 	public String toString(){
 		StringBuilder var = new StringBuilder();
-		var.append(new FoodDetailContent(_format, _parent, mStyle).toString());
-		var.append("\r\n").append(" |-").append(_child.getName() + "(" + NumericUtil.float2String2(_child.getAmount() * _parent.getCount()) + ")");
+		var.append(new FoodDetailContent(mDisplayConfig, mParent, mPrintType, mStyle).toString());
+		var.append(SEP).append(" |-").append(mChild.getName() + "(" + NumericUtil.float2String2(mChild.getAmount() * mParent.getCount()) + ")");
 		return var.toString();
 	}
 	

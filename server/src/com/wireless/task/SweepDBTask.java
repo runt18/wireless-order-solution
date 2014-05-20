@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.text.SimpleDateFormat;
 
 import org.tiling.scheduling.SchedulerTask;
 
@@ -25,19 +24,11 @@ public class SweepDBTask extends SchedulerTask {
 	
 	public void run() {		
 
-		StringBuilder taskInfo = new StringBuilder("Sweeper task starts on " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z").format(new java.util.Date())).append(SEP);
+		StringBuilder taskInfo = new StringBuilder();
 			
 		try {   
 			
-			SweepDB.Result result = SweepDB.exec();
-			
-			taskInfo.append("info : ").append(result.getTotalExpiredOrderDetail()).append(" record(s) are deleted from \"order_food_history\" table").append(SEP);
-			taskInfo.append("info : ").append(result.getTotalExpiredOrder()).append(" record(s) are deleted from \"order_history\" table").append(SEP);
-			taskInfo.append("info : ").append(result.getTotalExpiredTG()).append(" record(s) are deleted from \"taste_group_history\" table").append(SEP);
-			taskInfo.append("info : ").append(result.getTotalExpiredNormalTG()).append(" record(s) are deleted from \"normal_taste_group_history\" table").append(SEP);
-			taskInfo.append("info : ").append(result.getTotalExpiredShift()).append(" record(s) are deleted from \"shift_history\" table").append(SEP);
-			taskInfo.append("info : ").append(result.getTotalExpiredDailySettle()).append(" record(s) are deleted from \"daily_settle_history\" table").append(SEP);
-			taskInfo.append("info : sweep db takes ").append(result.getElapsed()).append(" sec.").append(SEP); 
+			taskInfo.append(SweepDB.exec());
 			
 		}catch(SQLException e){				
 			taskInfo.append("error : ").append(e.getMessage()).append(SEP);

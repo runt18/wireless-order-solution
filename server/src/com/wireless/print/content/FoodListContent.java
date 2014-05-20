@@ -5,16 +5,17 @@ import java.util.List;
 import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.printScheme.PStyle;
 import com.wireless.pojo.printScheme.PType;
+import com.wireless.print.content.FoodDetailContent.DisplayConfig;
 
 public class FoodListContent extends ConcreteContent {
 
-	private String _format;
-	private List<OrderFood> _foods;
+	private final DisplayConfig mDisplayConfig;
+	private final List<OrderFood> mOrderFoods;
 	
-	public FoodListContent(String format, List<OrderFood> foods, PStyle style) {
-		super(PType.PRINT_UNKNOWN, style);
-		_format = format;
-		_foods = foods;
+	public FoodListContent(DisplayConfig format, List<OrderFood> orderFoods, PType printType, PStyle style) {
+		super(printType, style);
+		mDisplayConfig = format;
+		mOrderFoods = orderFoods;
 	}
 
 	/**
@@ -32,11 +33,11 @@ public class FoodListContent extends ConcreteContent {
 	public String toString(){
 		StringBuilder var = new StringBuilder();
 		int cnt = 0;
-		for(OrderFood of : _foods){
+		for(OrderFood of : mOrderFoods){
 			if(of.asFood().isCombo()){
-				var.append(new ComboDetail4ListContent(_format, of, mStyle));
+				var.append(new ComboDetail4ListContent(mDisplayConfig, of, mPrintType, mStyle));
 			}else{
-				var.append(new FoodDetailContent(_format, of, mStyle).toString() + (cnt++ < _foods.size() - 1 ? "\r\n" : ""));
+				var.append(new FoodDetailContent(mDisplayConfig, of, mPrintType, mStyle).toString() + (cnt++ < mOrderFoods.size() - 1 ? SEP : ""));
 			}
 		}
 		return var.toString();

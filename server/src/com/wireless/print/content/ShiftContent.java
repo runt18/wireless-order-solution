@@ -13,11 +13,13 @@ public class ShiftContent extends ConcreteContent {
 
 	private final ShiftDetail mShiftDetail;
 	private String mTemplate;
+	private final String mWaiter;
 	
 	public ShiftContent(ShiftDetail shiftDetail, String waiter, PType printType, PStyle style) {
-		super(null, waiter, printType, style);
+		super(printType, style);
 		mShiftDetail = shiftDetail;
 		mTemplate = WirelessSocketServer.printTemplates.get(PType.PRINT_SHIFT_RECEIPT).get(style);
+		mWaiter = waiter;
 	}
 
 	@Override

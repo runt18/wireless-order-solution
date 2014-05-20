@@ -16,51 +16,54 @@ public class SummaryContent extends ConcreteContent {
 
 	private final List<Department> mDepts = new ArrayList<Department>();
 	private String mTemplate;
-	private final String mFormat;
-
-	public SummaryContent(String format, Order order, String waiter, PType printType, PStyle style) {
-		super(order, waiter, printType, style);
+	private final String mWaiter;
+	private final Order mOrder;
+	
+	public SummaryContent(Order order, String waiter, PType printType, PStyle style) {
+		super(printType, style);
 		mTemplate = WirelessSocketServer.printTemplates.get(PType.PRINT_ORDER).get(style);
-		mFormat = format;
+		mWaiter = waiter;
+		mOrder = order;
 	}
 	
-	public SummaryContent(List<Department> depts, String format, Order order, String waiter, PType printType, PStyle style) {
-		super(order, waiter, printType, style);
+	public SummaryContent(List<Department> depts, Order order, String waiter, PType printType, PStyle style) {
+		super(printType, style);
 		mDepts.addAll(depts);
 		mTemplate = WirelessSocketServer.printTemplates.get(PType.PRINT_ORDER).get(style);
-		mFormat = format;
+		mWaiter = waiter;
+		mOrder = order;
 	}
 
 	@Override
 	public String toString(){
-		String deptName = "";
-		for(Department d : mDepts){
-			if(deptName.isEmpty()){
-				deptName += "-" + d.getName();
-			}else{
-				deptName += "," + d.getName();
-			}
-		}
+//		String deptName = "";
+//		for(Department d : mDepts){
+//			if(deptName.isEmpty()){
+//				deptName += "-" + d.getName();
+//			}else{
+//				deptName += "," + d.getName();
+//			}
+//		}
 		
 		//generate the title and replace the "$(title)" with it
 		if(mPrintType == PType.PRINT_ORDER){
-			mTemplate = mTemplate.replace(PVar.TITLE, new CenterAlignedDecorator("点菜总单" + deptName, mStyle).toString());		
+			mTemplate = mTemplate.replace(PVar.TITLE, new CenterAlignedDecorator("点菜总单", mStyle).toString());		
 			
 		}else if(mPrintType == PType.PRINT_ALL_EXTRA_FOOD){
-			mTemplate = mTemplate.replace(PVar.TITLE, new CenterAlignedDecorator("加菜总单" + deptName, mStyle).toString());
+			mTemplate = mTemplate.replace(PVar.TITLE, new CenterAlignedDecorator("加菜总单", mStyle).toString());
 			
 		}else if(mPrintType == PType.PRINT_ALL_CANCELLED_FOOD){
 			//char[] format = { 0x1D, 0x21, 0x03 };
-			mTemplate = mTemplate.replace(PVar.TITLE, new ExtraFormatDecorator(new CenterAlignedDecorator("退  菜  总  单 !" + deptName, mStyle), 
+			mTemplate = mTemplate.replace(PVar.TITLE, new ExtraFormatDecorator(new CenterAlignedDecorator("退  菜  总  单 !", mStyle), 
 																			   ExtraFormatDecorator.LARGE_FONT_3X).toString());
 			
 		}else if(mPrintType == PType.PRINT_ALL_HURRIED_FOOD){
 			//char[] format = { 0x1D, 0x21, 0x03 };
-			mTemplate = mTemplate.replace(PVar.TITLE, new ExtraFormatDecorator(new CenterAlignedDecorator("催  菜  总  单 !" + deptName, mStyle), 
+			mTemplate = mTemplate.replace(PVar.TITLE, new ExtraFormatDecorator(new CenterAlignedDecorator("催  菜  总  单 !", mStyle), 
 																			   ExtraFormatDecorator.LARGE_FONT_3X).toString());
 			
 		}else{
-			mTemplate = mTemplate.replace(PVar.TITLE, new CenterAlignedDecorator("点菜总单" + deptName, mStyle).toString());
+			mTemplate = mTemplate.replace(PVar.TITLE, new CenterAlignedDecorator("点菜总单", mStyle).toString());
 		}
 		
 		if(mStyle == PStyle.PRINT_STYLE_58MM){
@@ -77,13 +80,13 @@ public class SummaryContent extends ConcreteContent {
 		}
 		
 		mTemplate = mTemplate.replace(PVar.VAR_2, 
-						new Grid2ItemsContent("餐台：" + mOrder.getDestTbl().getAliasId() + (mOrder.getDestTbl().getName().isEmpty() ? "" : ("(" + mOrder.getDestTbl().getName() + ")")), 
+						new Grid2ItemsContent("餐台：" + (mOrder.getDestTbl().getName().isEmpty() ? Integer.toString(mOrder.getDestTbl().getAliasId()) : mOrder.getDestTbl().getName()), 
 											  "人数：" + mOrder.getCustomNum(), 
 											  getStyle()).toString());
 		
 		//generate the order food list and replace the $(var_1) with the ordered foods
 		mTemplate = mTemplate.replace(PVar.VAR_1, 
-									  new FoodListWithSepContent(mFormat, mPrintType, mOrder.getOrderFoods(), mStyle).toString());
+									  new FoodListWithSepContent(FoodDetailContent.DISPLAY_CONFIG_NO_DISCOUNT, mOrder.getOrderFoods(), mPrintType, mStyle).toString());
 		
 		return mTemplate;
 	}

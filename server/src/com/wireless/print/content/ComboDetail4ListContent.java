@@ -5,29 +5,30 @@ import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.printScheme.PStyle;
 import com.wireless.pojo.printScheme.PType;
 import com.wireless.pojo.util.NumericUtil;
+import com.wireless.print.content.FoodDetailContent.DisplayConfig;
 
 public class ComboDetail4ListContent extends ConcreteContent {
 
-	private String _format;
-	private OrderFood _food;
+	private final DisplayConfig mDisplayConfig;
+	private final OrderFood mOrderFood;
 	
-	public ComboDetail4ListContent(String format, OrderFood food, PStyle style) {
-		super(PType.PRINT_UNKNOWN, style);
-		_format = format;
-		_food = food;
+	public ComboDetail4ListContent(DisplayConfig format, OrderFood food, PType printType, PStyle style) {
+		super(printType, style);
+		mDisplayConfig = format;
+		mOrderFood = food;
 	}
 	
 	@Override
 	public String toString(){
-		if(_food.asFood().isCombo()){
+		if(mOrderFood.asFood().isCombo()){
 			StringBuilder var = new StringBuilder();
-			var.append(new FoodDetailContent(_format, _food, mStyle).toString());
-			for(Food subFood : _food.asFood().getChildFoods()){
-				var.append("\r\n").append(" |-").append(subFood.getName() + "(" + NumericUtil.float2String2(subFood.getAmount() * _food.getCount()) + ")");
+			var.append(new FoodDetailContent(mDisplayConfig, mOrderFood, mPrintType, mStyle).toString());
+			for(Food subFood : mOrderFood.asFood().getChildFoods()){
+				var.append(SEP).append(" |-").append(subFood.getName() + "(" + NumericUtil.float2String2(subFood.getAmount() * mOrderFood.getCount()) + ")");
 			}
 			return var.toString();
 		}else{
-			return new FoodDetailContent(_format, _food, mStyle).toString();
+			return new FoodDetailContent(mDisplayConfig, mOrderFood, mPrintType, mStyle).toString();
 		}
 	}
 

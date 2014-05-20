@@ -1,7 +1,6 @@
 package com.wireless.print.scheme;
 
 import java.io.UnsupportedEncodingException;
-import java.util.Date;
 
 import com.wireless.pojo.printScheme.PType;
 import com.wireless.pojo.printScheme.Printer;
@@ -24,7 +23,7 @@ public class JobContent implements Content{
 		mPrinter = printer;
 		mRepeat = repeat;
 		mPrintType = printType;
-		mPrintTime = new Date().getTime();
+		mPrintTime = System.currentTimeMillis();
 		mPrintContent = printContent;
 	}
 	

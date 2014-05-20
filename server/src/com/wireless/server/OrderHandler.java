@@ -366,7 +366,7 @@ class OrderHandler implements Runnable{
 																							  printers,
 																							  diffResult.newOrder));
 				//print the detail to extra foods
-				printHandler.addContent(JobContentFactory.instance().createDetailContent(PType.PRINT_EXTRA_FOOD, 
+				printHandler.addContent(JobContentFactory.instance().createDetailContent(PType.PRINT_EXTRA_FOOD_DETAIL, 
 																							 staff,
 																							 printers,
 																							 diffResult.newOrder));
@@ -380,7 +380,7 @@ class OrderHandler implements Runnable{
 																							  printers,
 																							  diffResult.newOrder));
 				//print the detail to canceled foods
-				printHandler.addContent(JobContentFactory.instance().createDetailContent(PType.PRINT_CANCELLED_FOOD,
+				printHandler.addContent(JobContentFactory.instance().createDetailContent(PType.PRINT_CANCELLED_FOOD_DETAIL,
 																							 staff,
 																							 printers,
 																							 diffResult.newOrder));

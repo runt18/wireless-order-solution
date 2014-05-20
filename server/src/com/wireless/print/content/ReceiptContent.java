@@ -10,8 +10,9 @@ import com.wireless.pojo.printScheme.PType;
 import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.system.Setting;
 import com.wireless.pojo.util.NumericUtil;
-import com.wireless.print.PFormat;
 import com.wireless.print.PVar;
+import com.wireless.print.content.FoodDetailContent.DisplayConfig;
+import com.wireless.print.content.FoodDetailContent.DisplayItem;
 import com.wireless.server.WirelessSocketServer;
 
 public class ReceiptContent extends ConcreteContent {
@@ -19,12 +20,16 @@ public class ReceiptContent extends ConcreteContent {
 	private final Restaurant mRestaurant;
 	private final int mReceiptStyle;
 	private String mTemplate;
-	
+	private final String mWaiter;
+	private final Order mOrder;
+
 	public ReceiptContent(int receiptStyle, Restaurant restaurant, Order order, String waiter, PType printType, PStyle style) {
-		super(order, waiter, printType, style);
+		super(printType, style);
 		mTemplate = WirelessSocketServer.printTemplates.get(PType.PRINT_RECEIPT).get(style);
 		mRestaurant = restaurant;
 		mReceiptStyle = receiptStyle;
+		mWaiter = waiter;
+		mOrder = order;
 	}
 
 	@Override 
@@ -82,9 +87,7 @@ public class ReceiptContent extends ConcreteContent {
 		//replace the "$(waiter)"
 		mTemplate = mTemplate.replace(PVar.WAITER_NAME, mWaiter);
 		
-		StringBuilder tblInfo = new StringBuilder();
-		
-		tblInfo.append(mOrder.getDestTbl().getAliasId() + (mOrder.getDestTbl().getName().trim().length() == 0 ? "" : ("(" + mOrder.getDestTbl().getName() + ")")));
+		String tblInfo = mOrder.getDestTbl().getName().trim().length() == 0 ? Integer.toString(mOrder.getDestTbl().getAliasId()) : mOrder.getDestTbl().getName();
 		//replace the "$(var_5)"
 		mTemplate = mTemplate.replace(PVar.VAR_5, 
 							new Grid2ItemsContent("餐台：" + tblInfo, 
@@ -93,7 +96,7 @@ public class ReceiptContent extends ConcreteContent {
 		
 		
 		//generate the order food list and replace the $(var_1) with the ordered foods
-		mTemplate = mTemplate.replace(PVar.VAR_1, new FoodListContent(buildReciptFormat(), mOrder.getOrderFoods(), mStyle).toString());
+		mTemplate = mTemplate.replace(PVar.VAR_1, new FoodListContent(buildReciptFormat(), mOrder.getOrderFoods(), mPrintType, mStyle).toString());
 		
 		//replace the $(var_3) with the actual price
 		mTemplate = mTemplate.replace(PVar.VAR_3, new RightAlignedDecorator("实收金额：" + NumericUtil.CURRENCY_SIGN + NumericUtil.float2String(mOrder.getActualPrice()), mStyle).toString());
@@ -170,22 +173,22 @@ public class ReceiptContent extends ConcreteContent {
 	 * @param mReceiptStyle
 	 * @return the string format
 	 */
-	public String buildReciptFormat(){
+	public DisplayConfig buildReciptFormat(){
 		if((mReceiptStyle & Setting.RECEIPT_DEF) == Setting.RECEIPT_DEF){
-			return PFormat.RECEIPT_FORMAT_DEF;
+			return FoodDetailContent.DISPLAY_CONFIG_4_RECEIPT;
 			
 		}else{
-			String format = PFormat.RECEIPT_FORMAT_DEF;
+			DisplayConfig config = new DisplayConfig(FoodDetailContent.DISPLAY_CONFIG_4_RECEIPT);
 			if((mReceiptStyle & Setting.RECEIPT_STATUS) == 0){
-				format = format.replace(PVar.FOOD_STATUS, "");
+				config.mask(DisplayItem.STATUS);
 			}
 			if((mReceiptStyle & Setting.RECEIPT_AMOUNT) == 0){
-				format = format.replace(PVar.FOOD_AMOUNT, "");
+				config.mask(DisplayItem.AMOUNT);
 			}
 			if((mReceiptStyle & Setting.RECEIPT_DISCOUNT) == 0){
-				format = format.replace(PVar.FOOD_DISCOUNT, "");
+				config.mask(DisplayItem.DISCOUNT);
 			}
-			return format;
+			return config;
 		}
 	}
 	

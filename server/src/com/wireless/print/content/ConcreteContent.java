@@ -2,18 +2,17 @@ package com.wireless.print.content;
 
 import java.io.UnsupportedEncodingException;
 
-import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.printScheme.PStyle;
 import com.wireless.pojo.printScheme.PType;
 
 
 public abstract class ConcreteContent implements Content {
 	
-	final static int LEN_58MM = 32;
-	final static int LEN_80MM = 48;
+	private final static int LEN_58MM = 32;
+	private final static int LEN_80MM = 48;
 	
-	final static String LINE_58MM = "--------------------------------";
-	final static String LINE_80MM = "-----------------------------------------------";
+	private final static String LINE_58MM = "--------------------------------";
+	private final static String LINE_80MM = "-----------------------------------------------";
 	final static String SEP = "\r\n";
 	final static String CUT = new String(new char[]{ 0x1b, 0x6d });
 	
@@ -22,27 +21,6 @@ public abstract class ConcreteContent implements Content {
 	final int mLen;
 	final PStyle mStyle;
 	final PType mPrintType;
-	
-	final Order mOrder;
-	final String mWaiter;
-
-	protected ConcreteContent(PStyle style){
-		mStyle = style;
-		if(style == PStyle.PRINT_STYLE_58MM){
-			mLen = LEN_58MM;
-			mSeperatorLine = LINE_58MM;
-		}else if(style == PStyle.PRINT_STYLE_80MM){
-			mLen = LEN_80MM;
-			mSeperatorLine = LINE_80MM;
-		}else{
-			mLen = LEN_58MM;
-			mSeperatorLine = LINE_58MM;
-		}
-		
-		mPrintType = PType.PRINT_UNKNOWN;
-		mWaiter = null;
-		mOrder = null;
-	}
 	
 	protected ConcreteContent(PType printType, PStyle style){
 		
@@ -59,30 +37,7 @@ public abstract class ConcreteContent implements Content {
 		}
 		
 		mPrintType = printType;
-		mWaiter = null;
-		mOrder = null;
 	}
-	
-	protected ConcreteContent(Order order, String waiter, PType printType, PStyle style){
-		
-		mStyle = style;
-		if(style == PStyle.PRINT_STYLE_58MM){
-			mLen = LEN_58MM;
-			mSeperatorLine = LINE_58MM;
-		}else if(style == PStyle.PRINT_STYLE_80MM){
-			mLen = LEN_80MM;
-			mSeperatorLine = LINE_80MM;
-		}else{
-			mLen = LEN_58MM;
-			mSeperatorLine = LINE_58MM;
-		}
-		
-		mOrder = new Order();
-		mOrder.copyFrom(order);
-		mWaiter = waiter;
-		mPrintType = printType;
-	}
-	
 	
 	@Override
 	public int getId(){

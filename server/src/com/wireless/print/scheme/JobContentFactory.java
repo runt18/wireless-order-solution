@@ -30,7 +30,6 @@ import com.wireless.pojo.regionMgr.Region;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.staffMgr.Staff;
-import com.wireless.print.PFormat;
 import com.wireless.print.content.Content;
 import com.wireless.print.content.ContentCombinator;
 import com.wireless.print.content.MemberReceiptContent;
@@ -113,27 +112,25 @@ public class JobContentFactory {
 						if(func.isDeptAll()){
 							//Generate the the summary to all departments.
 							jobContents.add(new JobContent(printer, func.getRepeat(), printType, 
-										   				   new SummaryContent(PFormat.FROMAT_NO_DISCOUNT, 
-										   						   			  order,
+										   				   new SummaryContent(order,
 										   						   			  staff.getName(),
 										   						   			  printType, 
 										   						   			  printer.getStyle())));
 						}else{
 							//Generate the summary to specific departments.
-							List<OrderFood> orderFoods = new ArrayList<OrderFood>();
+							List<OrderFood> ofToDept = new ArrayList<OrderFood>();
 							for(OrderFood of : order.getOrderFoods()){
 								if(func.getDepartment().contains(of.asFood().getKitchen().getDept())){
-									orderFoods.add(of);
+									ofToDept.add(of);
 								}
 							}
 							
-							if(!orderFoods.isEmpty()){
+							if(!ofToDept.isEmpty()){
 								Order orderToDept = new Order(0);
 								orderToDept.copyFrom(order);
-								orderToDept.setOrderFoods(orderFoods);
+								orderToDept.setOrderFoods(ofToDept);
 								jobContents.add(new JobContent(printer, func.getRepeat(), printType,
 							   				   new SummaryContent(func.getDepartment(), 
-							   						   			  PFormat.FROMAT_NO_DISCOUNT, 
 							   						   			  orderToDept,
 							   						   			  staff.getName(),
 							   						   			  printType, 
