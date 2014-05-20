@@ -31,6 +31,12 @@ public class QueryHistoryAction extends Action {
 
 			String comboCond;
 			String comboType = request.getParameter("havingCond");
+			String value = request.getParameter("value");
+			String type = request.getParameter("type");
+			String tableAlias = request.getParameter("tableAlias");
+			String tableName = request.getParameter("tableName");
+			String region = request.getParameter("region");
+			
 			if(comboType != null && !comboType.trim().isEmpty()){
 				int comboVal = Integer.valueOf(comboType);
 				if(comboVal == 1){
@@ -60,11 +66,10 @@ public class QueryHistoryAction extends Action {
 			
 			String filterCond = "";
 			
-			String value = request.getParameter("value");
 			if(value != null && !value.isEmpty()){
 				filterCond += " AND OH.id = " + value;
 			}
-			String type = request.getParameter("type");
+			
 			if(Boolean.parseBoolean(type)){
 				String beginDate = request.getParameter("beginDate");
 				String endDate = request.getParameter("endDate");
@@ -82,6 +87,16 @@ public class QueryHistoryAction extends Action {
 				}
 				
 			}
+			if(tableAlias != null && !tableAlias.isEmpty()){
+				filterCond += " AND OH.table_alias = " + tableAlias;
+			}
+			if(tableName != null && !tableName.isEmpty()){
+				filterCond += " AND OH.table_name LIKE '%" + tableName + "%' ";
+			}
+			if(region != null && !region.equals("-1")){
+				filterCond += " AND OH.region_id = " + region;
+			}
+			
 			String orderClause = " ORDER BY OH.order_date ASC " + " LIMIT " + start + "," + limit;
 			
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));

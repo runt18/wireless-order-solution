@@ -27,8 +27,7 @@ public class RepaidOrderAction extends Action{
 		
 		String jsonResp = "{success:$(result), data:'$(value)'}";
 		PrintWriter out = null;
-		int orderId = 0;
-		
+		int orderId = Integer.parseInt(request.getParameter("orderId"));
 		try {
 			// 解决后台中文传到前台乱码
 			
@@ -62,10 +61,10 @@ public class RepaidOrderAction extends Action{
 //			orderToUpdate.setCustomNum(Integer.parseInt(request.getParameter("customNum")));
 
 			//update the order
-			UpdateOrder.execById(staff, JObject.parse(Order.JSON_CREATOR, Order.ORDER_JSONABLE_4_COMMIT, request.getParameter("commitOrderData")));
+			UpdateOrder.execById(staff, JObject.parse(Order.JSON_CREATOR, Order.ORDER_JSONABLE_4_COMMIT_UPDATE, request.getParameter("commitOrderData")));
 			
 			//get the pay manner to this order
-			Order.PayBuilder payBuilder = Order.PayBuilder.build(orderId, PayType.valueOf(Integer.parseInt(request.getParameter("payManner"))));
+			Order.PayBuilder payBuilder = Order.PayBuilder.build(orderId, PayType.valueOf(Integer.parseInt(request.getParameter("payType"))));
 
 			//get the custom number to this order
 			payBuilder.setCustomNum(Integer.parseInt(request.getParameter("customNum")));
