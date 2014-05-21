@@ -1,6 +1,7 @@
 package com.wireless.db.misc;
 
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
@@ -32,14 +33,20 @@ public class SweepDB {
 		@Override
 		public String toString(){
 			final String sep = System.getProperty("line.separator");
-			return "expired order: " + getTotalExpiredOrder() + sep +
-				   "expired order detail: " + getTotalExpiredOrderDetail() + sep +
-				   "expired taste group: " + getTotalExpiredTG() + sep + 
-				   "expired normal taste group: " + getTotalExpiredNormalTG() + sep +
-				   "expired shift: " + getTotalExpiredShift() + sep +
-				   "expired daily shift: " + getTotalExpiredDailySettle() + sep +
-				   "expired member operation: " + getTotalExpiredMemberOperation() + sep +
-				   "expired SMS detail: " + getTotalExpiredSMSDetail();
+			
+			StringBuilder taskInfo = new StringBuilder();
+			taskInfo.append("Sweeper task starts on " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z").format(new java.util.Date())).append(sep);
+			taskInfo.append("info : ").append(getTotalExpiredOrderDetail()).append(" record(s) are deleted from \"order_food_history\" table").append(sep);
+			taskInfo.append("info : ").append(getTotalExpiredOrder()).append(" record(s) are deleted from \"order_history\" table").append(sep);
+			taskInfo.append("info : ").append(getTotalExpiredTG()).append(" record(s) are deleted from \"taste_group_history\" table").append(sep);
+			taskInfo.append("info : ").append(getTotalExpiredNormalTG()).append(" record(s) are deleted from \"normal_taste_group_history\" table").append(sep);
+			taskInfo.append("info : ").append(getTotalExpiredShift()).append(" record(s) are deleted from \"shift_history\" table").append(sep);
+			taskInfo.append("info : ").append(getTotalExpiredDailySettle()).append(" record(s) are deleted from \"daily_settle_history\" table").append(sep);
+			taskInfo.append("info : ").append(getTotalExpiredMemberOperation()).append(" record(s) are deleled from \"member_operation_history\" table").append(sep);
+			taskInfo.append("info : ").append(getTotalExpiredSMSDetail()).append(" record(s) are deleted from \"sms_detail\" table").append(sep);
+			taskInfo.append("info : sweep db takes ").append(getElapsed()).append(" sec.").append(sep);
+			
+			return taskInfo.toString();
 		}
 
 		public int getTotalExpiredSMSDetail(){

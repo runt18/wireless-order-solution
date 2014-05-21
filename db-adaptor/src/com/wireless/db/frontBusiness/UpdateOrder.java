@@ -58,16 +58,16 @@ public class UpdateOrder {
 	 *         - The extra order.<br>
 	 *         - The canceled order.
 	 * @throws BusinessException
-	 *             Throws if one of the cases below.<br>
-	 *             - The terminal is NOT attached to any restaurant.<br>
-	 *             - The terminal is expired.<br>
-	 *             - The order to this id does NOT exist.<br>
-	 *             - The order to this id is expired<br>.
-	 *             - Any food to this order does NOT exist.<br>
-	 *             - Any taste to this order does NOT exist.<br>
-	 *             - Exceed the gift quota.
+	 *             throws if one of the cases below
+	 *             <li>the terminal is NOT attached to any restaurant
+	 *             <li>the terminal is expired
+	 *             <li>the order to this id does NOT exist
+	 *             <li>the order to this id is expired
+	 *             <li>any food to this order does NOT exist
+	 *             <li>any taste to this order does NOT exist
+	 *             <li>exceed the gift quota
 	 * @throws SQLException
-	 *             Throws if fail to execute any SQL statement.
+	 *             throws if fail to execute any SQL statement.
 	 */
 	public static DiffResult execById(Staff staff, Order orderToUpdate) throws BusinessException, SQLException{
 		DBCon dbCon = new DBCon();	
