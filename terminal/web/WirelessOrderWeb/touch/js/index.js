@@ -93,8 +93,8 @@ function updateFoodData(){
 		success : function(data, status, xhr){
 			if(data.success){
 				//重新赋值
-				foodData = {root:data.root.foodList};
-				var tempFoodData = foodData.root.foodList.slice(0);
+				foodData = {root:data.root};
+				var tempFoodData = foodData.root.slice(0);
 				
 				for(var j=0; j < kitchenData.root.length; j++){
 					var temp=kitchenData.root[j];
@@ -103,7 +103,7 @@ function updateFoodData(){
 						if(tempFoodData[i].kitchen.id == temp.id){
 							temp.foods.push(tempFoodData[i]);
 						}else if(temp.id == -1){
-							temp.foods = foodData.root.foodList.slice(0);
+							temp.foods = foodData.root.slice(0);
 						}
 					}
 				}
@@ -142,7 +142,7 @@ function initFoodData(){
 				var deptNodes = data.root;
 				deptData = {root:[]};
 				
-				foodData = {root:data.other.foodList.foodList};
+				foodData = {root:data.other.foodList};
 				
 				kitchenData = {totalProperty:0, root:[]};
 				
