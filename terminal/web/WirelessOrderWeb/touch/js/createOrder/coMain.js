@@ -14,7 +14,8 @@ co.show = function(c){
 					name : c.data.name,
 					unitPrice : c.data.unitPrice,
 					click : 'co.insertFood({foodId:'+c.data.id+'})',
-					foodState : (c.data.status & 1 << 3) != 0 ? '赠' : (c.data.status & 1 << 2) != 0 ? '停' : ''
+					foodState : (c.data.status & 1 << 3) != 0 ? '赠' : (c.data.status & 1 << 2) != 0 ? '停' : '',
+					color : (c.data.status & 1 << 3) != 0 ? 'green' : 'FireBrick'
 				});
 			}
 		});
@@ -97,7 +98,9 @@ co.insertFood = function(c){
 		return;
 	}else{
 		if((data.status & 1 << 2) != 0){
-			alert('此菜品已停售!');
+			Util.msg.alert({
+				msg : '此菜品已停售!'
+			});
 			return;
 		}
 	}

@@ -22,7 +22,7 @@ var Templet={
 		boxFood : '<div data-index={dataIndex} data-value={id} class="main-box-base" onClick="{click}">'
 			+ '{name}'
 			+ '<div style="width:55px;">¥:{unitPrice}</div>'
-			+ '<div style="width:25px;height : 25px;position:absolute;right:0;bottom:0;font-size:25px;color:white;">{foodState}</div>'
+			+ '<div style="width:25px;height : 25px;position:absolute;right:0;bottom:0;font-size:25px;color:{color};">{foodState}</div>'
 			+ '</div>',
 		newFood : '<div data-index={dataIndex} data-value={id} data-type="newFood-select" onClick="co.selectNewFood({event:this, foodId:{id}})">'
 			+ '<div style="line-height: 40px; ">{name} x {count}</div>'
