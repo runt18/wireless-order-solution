@@ -709,21 +709,23 @@ public class OrderFood implements Parcelable, Jsonable {
 		if(flag == OF_JSONABLE_4_COMMIT){
 			if(jsonMap.getBoolean(Key4Json.IS_TEMP.key)){
 				setTemp(true);
-				//name to temporary...necessary
+				//name to temporary...must
 				if(jsonMap.containsKey(Food.Key4Json.FOOD_NAME.key)){
 					mFood.setName(jsonMap.getString(Food.Key4Json.FOOD_NAME.key));
 				}else{
 					throw new IllegalStateException("提交的临时菜数据缺少(" + Food.Key4Json.FOOD_NAME.toString() + ")");
 				}
-				//price to temporary...necessary
+				//price to temporary...must
 				if(jsonMap.containsKey(Food.Key4Json.FOOD_PRICE.key)){
 					mFood.setPrice(jsonMap.getFloat(Food.Key4Json.FOOD_PRICE.key));
 				}else{
 					throw new IllegalStateException("提交的临时菜数据缺少(" + Food.Key4Json.FOOD_PRICE.toString() + ")");
 				}
+				//kitchen to temporary...must
+				mFood.setKitchen(jsonMap.getJsonable(Food.Key4Json.ASSOCIATED_KITCHEN.key, Kitchen.JSON_CREATOR, Kitchen.KITCHEN_JSONABLE_SIMPLE));
 			}else{
 				setTemp(false);
-				//food id...necessary
+				//food id...must
 				if(jsonMap.containsKey(Food.Key4Json.FOOD_ID.key)){
 					mFood.setFoodId(jsonMap.getInt(Food.Key4Json.FOOD_ID.key));
 				}else{
@@ -752,7 +754,6 @@ public class OrderFood implements Parcelable, Jsonable {
 	}
 	
 	public static Jsonable.Creator<OrderFood> JSON_CREATOR = new Jsonable.Creator<OrderFood>() {
-		
 		@Override
 		public OrderFood newInstance() {
 			return new OrderFood(0);

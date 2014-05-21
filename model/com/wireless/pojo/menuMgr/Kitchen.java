@@ -469,8 +469,20 @@ public class Kitchen implements Parcelable, Comparable<Kitchen>, Jsonable{
 
 	@Override
 	public void fromJsonMap(JsonMap jsonMap, int flag) {
-		
+		if(flag == KITCHEN_JSONABLE_SIMPLE){
+			if(jsonMap.containsKey(Key4Json.KITCHEN_ID.key)){
+				setId(jsonMap.getInt(Key4Json.KITCHEN_ID.key));
+			}else{
+				throw new IllegalStateException("厨房数据缺少(" + Key4Json.KITCHEN_ID.toString() + ")");
+			}
+		}
 	}
 
+	public static Jsonable.Creator<Kitchen> JSON_CREATOR = new Jsonable.Creator<Kitchen>() {
+		@Override
+		public Kitchen newInstance() {
+			return new Kitchen(0);
+		}
+	};
 	
 }
