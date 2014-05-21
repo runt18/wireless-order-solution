@@ -63,7 +63,7 @@
 		<action path="/QueryToday" type="com.wireless.Actions.orderMgr.QueryTodayAction"
 			scope="request">
 		</action>
-		<action path="/UpdateOrder2" type="com.wireless.Actions.orderMgr.UpdateOrderAction2"
+		<action path="/RepaidOrder" type="com.wireless.Actions.dishesOrder.RepaidOrderAction"
 			scope="request">
 		</action>
 		<action path="/QueryDetail" type="com.wireless.Actions.orderMgr.QueryDetailAction"
