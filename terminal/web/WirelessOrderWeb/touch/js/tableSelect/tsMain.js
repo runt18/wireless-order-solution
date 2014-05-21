@@ -201,8 +201,6 @@ function inputNum(o){
 //进入点菜界面
 function renderToCreateOrder(tableNo, peopleNo){
 	if(hasTable(tables, tableNo)){
-		//FIXME 每点一次餐台都去更新菜品
-		initFoodData();
 		
 		Util.dialongDisplay({
 			type:'hide', 
