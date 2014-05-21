@@ -141,6 +141,12 @@ public class SortedList<T> extends LinkedList<T> {
         return (Collections.binarySearch(this, paramT, mComparator) > -1);
     }
     
+    @SuppressWarnings("unchecked")
+    @Override
+    public boolean remove(Object obj){
+    	return removeElement((T)obj);
+    }
+    
     /**
      * Removes the first occurrence of the specified element from this list,
      * if it is present based on binary search. 

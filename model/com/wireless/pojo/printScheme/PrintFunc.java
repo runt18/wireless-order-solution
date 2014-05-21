@@ -101,7 +101,7 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 		
 		public static DetailBuilder newCancelledFood(){
 			DetailBuilder builder = new DetailBuilder();
-			builder.setType(PType.PRINT_CANCELLED_FOOD);
+			builder.setType(PType.PRINT_CANCELLED_FOOD_DETAIL);
 			return builder;
 		}
 		public DetailBuilder setRepeat(int repeat){
@@ -335,7 +335,7 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 			
 		}else if(mType == PType.PRINT_ORDER_DETAIL){
 			return typeToCompare == PType.PRINT_ORDER_DETAIL || 
-				   typeToCompare == PType.PRINT_EXTRA_FOOD;
+				   typeToCompare == PType.PRINT_EXTRA_FOOD_DETAIL;
 			
 		}else if(mType == PType.PRINT_RECEIPT){
 			return typeToCompare == PType.PRINT_RECEIPT ||
@@ -349,8 +349,8 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 		}else if(mType == PType.PRINT_TEMP_RECEIPT){
 			return typeToCompare == PType.PRINT_TEMP_RECEIPT;
 			
-		}else if(mType == PType.PRINT_CANCELLED_FOOD){
-			return typeToCompare == PType.PRINT_CANCELLED_FOOD;
+		}else if(mType == PType.PRINT_CANCELLED_FOOD_DETAIL){
+			return typeToCompare == PType.PRINT_CANCELLED_FOOD_DETAIL;
 			
 		}else if(mType == PType.PRINT_TRANSFER_TABLE){
 			return typeToCompare == PType.PRINT_TRANSFER_TABLE;
@@ -442,7 +442,7 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 				depts = "所有部门";
 				deptValues = "";
 			}
-		}else if(this.mType == PType.PRINT_ORDER_DETAIL || this.mType == PType.PRINT_CANCELLED_FOOD){
+		}else if(this.mType == PType.PRINT_ORDER_DETAIL || this.mType == PType.PRINT_CANCELLED_FOOD_DETAIL){
 			regions = "----";
 			depts = "----";
 			if(isKitchenAll()){

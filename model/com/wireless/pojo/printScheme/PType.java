@@ -8,8 +8,8 @@ public enum PType {
 	PRINT_ORDER(Reserved.PRINT_ORDER, "下单"),
 	PRINT_ORDER_DETAIL(Reserved.PRINT_ORDER_DETAIL, "下单详细"),
 	PRINT_RECEIPT(Reserved.PRINT_RECEIPT, "结帐"),
-	PRINT_EXTRA_FOOD(Reserved.PRINT_EXTRA_FOOD, "加菜详细"),
-	PRINT_CANCELLED_FOOD(Reserved.PRINT_CANCELLED_FOOD, "退菜详细"),
+	PRINT_EXTRA_FOOD_DETAIL(Reserved.PRINT_EXTRA_FOOD_DETAIL, "加菜详细"),
+	PRINT_CANCELLED_FOOD_DETAIL(Reserved.PRINT_CANCELLED_FOOD_DETAIL, "退菜详细"),
 	PRINT_TRANSFER_TABLE(Reserved.PRINT_TRANSFER_TABLE, "转台"),
 	PRINT_ALL_EXTRA_FOOD(Reserved.PRINT_ALL_EXTRA_FOOD, "加菜"),
 	PRINT_ALL_CANCELLED_FOOD(Reserved.PRINT_ALL_CANCELLED_FOOD, "退菜"),
@@ -59,8 +59,8 @@ public enum PType {
 	}
 	
 	public boolean isDetail(){
-		return this == PType.PRINT_ORDER_DETAIL || this == PType.PRINT_EXTRA_FOOD || 
-				this == PType.PRINT_CANCELLED_FOOD || this == PType.PRINT_HURRIED_FOOD;
+		return this == PType.PRINT_ORDER_DETAIL || this == PType.PRINT_EXTRA_FOOD_DETAIL || 
+				this == PType.PRINT_CANCELLED_FOOD_DETAIL || this == PType.PRINT_HURRIED_FOOD;
 	}
 	
 	public boolean isTransTbl(){

@@ -2,7 +2,6 @@ package com.wireless.json;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,11 +22,10 @@ public class JObject implements Jsonable {
 	private String msg = WebParams.ERROR_MSG;		// 错误提示信息
 	private String title = WebParams.ERROR_TITLE; 	// 错误信息标题
 	private int lv = WebParams.ERROR_LV;			// 错误等级
-	private Map<Object, Object> other;				// 其他附加信息
+	private Jsonable extra;							// 其他附加信息
 	
 	public JObject(){
-		this.root = new ArrayList<Jsonable>();
-		this.other = new LinkedHashMap<Object, Object>();
+		
 	}
 	
 	public JObject(int totalProperty, List<? extends Jsonable> root){
@@ -94,16 +92,16 @@ public class JObject implements Jsonable {
 	/*-------------------------     config     --------------------------------*/
 	@Override
 	public Map<String, Object> toJsonMap(int flag) {
-		Map<String, Object> jm = new LinkedHashMap<String, Object>();
-		jm.put("success", this.isSuccess());
-		jm.put("totalProperty", this.getTotalProperty());
-		jm.put("root", this.getRoot());
-		jm.put("code", this.getCode());
-		jm.put("msg", this.getMsg());
-		jm.put("title", this.getTitle());
-		jm.put("other", this.getOther());
+		JsonMap jm = new JsonMap();
+		jm.putBoolean("success", this.isSuccess());
+		jm.putInt("totalProperty", this.getTotalProperty());
+		jm.putJsonableList("root", this.getRoot(), flag);
+		jm.putInt("code", this.getCode());
+		jm.putString("msg", this.getMsg());
+		jm.putString("title", this.getTitle());
+		jm.putJsonable("other", this.getExtra(), 0);
 		
-		return Collections.unmodifiableMap(jm);
+		return jm;
 	}
 
 	@Override
@@ -190,11 +188,11 @@ public class JObject implements Jsonable {
 	public void setLv(int lv) {
 		this.lv = lv;
 	}
-	public Map<Object, Object> getOther() {
-		return other;
+	public Jsonable getExtra() {
+		return extra;
 	}
-	public void setOther(Map<Object, Object> other) {
-		this.other = other;
+	public void setExtra(Jsonable other) {
+		this.extra = other;
 	}
 	
 	public static <T extends Jsonable> T parse(Jsonable.Creator<T> creator, int flag, String jsonText){
