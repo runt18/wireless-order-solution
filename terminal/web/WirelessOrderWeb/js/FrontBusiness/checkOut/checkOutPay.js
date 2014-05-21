@@ -68,7 +68,6 @@ var paySubmit = function(submitType) {
 			Ext.Ajax.request({
 				url : "../../PayOrder.do",
 				params : {
-					isCookie : true,
 					"orderID" : orderMsg.id,
 					"cashIncome" : submitPrice,
 					"payType" : payType,
@@ -112,7 +111,7 @@ var paySubmit = function(submitType) {
 								items : [{
 									html : '应收：￥<font color="red">'+countPrice+'</font>'
 								}, {
-									html : '实收：￥<font color="red">'+shouldPay+'</font>'
+									html : '实收：￥<font color="red">'+eval(countPrice-eraseQuota)+'.00</font>'
 								}, {
 									html : '收款：￥<font color="red">'+actualPrice+'</font>'
 								}, {
