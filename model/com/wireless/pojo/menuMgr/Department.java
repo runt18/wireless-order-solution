@@ -384,14 +384,40 @@ public class Department implements Parcelable, Comparable<Department>, Jsonable{
 		}
 	}
 
+	public static enum Key4Json{
+		DEPT_ID("id", "部门id"),
+		DEPT_NAME("name", "部门名称"),
+		RESTAURANT_ID("rid", "餐厅id"),
+		DEPT_TYPE("typeValue", "部门类型");
+		
+		private final String key;
+		private final String desc;
+		
+		Key4Json(String key, String desc){
+			this.key = key;
+			this.desc = desc;
+		}
+		
+		@Override
+		public String toString(){
+			return "key = " + key + ",desc = " + desc;
+		}
+	}
+	
+	public final static int DEPT_JSONABLE_COMPLEX = 0;
+	public final static int DEPT_JSONABLE_SIMPLE = 1;
+	
 	@Override
 	public Map<String, Object> toJsonMap(int flag) {
 		JsonMap jm = new JsonMap();
-		jm.putInt("rid", this.restaurantId);
-		jm.putShort("id", this.deptId);
-		jm.putString("name", this.deptName);
-		jm.putInt("typeValue", this.deptType.getVal());
-		
+		if(flag == DEPT_JSONABLE_SIMPLE){
+			jm.putShort(Key4Json.DEPT_ID.key, this.deptId);
+		}else{
+			jm.putInt(Key4Json.RESTAURANT_ID.key, this.restaurantId);
+			jm.putShort(Key4Json.DEPT_ID.key, this.deptId);
+			jm.putString(Key4Json.DEPT_NAME.key, this.deptName);
+			jm.putInt(Key4Json.DEPT_TYPE.key, this.deptType.getVal());
+		}		
 		return jm;
 	}
 

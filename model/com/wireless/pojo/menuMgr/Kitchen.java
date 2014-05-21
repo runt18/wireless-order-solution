@@ -422,17 +422,48 @@ public class Kitchen implements Parcelable, Comparable<Kitchen>, Jsonable{
 		}
 	}
 
+	public static enum Key4Json{
+		KITCHEN_ID("id", "厨房id"),
+		DISPLAY_ID("alias", "显示id"),
+		RESTAURANT_ID("rid", "餐厅id"),
+		KITCHEN_NAME("name", "厨房名称"),
+		IS_ALLOW_TEMP("isAllowTmp", "是否允许临时菜"),
+		KITCHEN_TYPE("typeValue", "厨房类型"),
+		ASSOCIATED_DEPT("dept", "所属部门");
+		
+		private final String key;
+		private final String desc;
+		
+		Key4Json(String key, String desc){
+			this.key = key;
+			this.desc = desc;
+		}
+		
+		@Override
+		public String toString(){
+			return "key = " + key + ",desc = " + desc;
+		}
+	}
+	
+	public final static int KITCHEN_JSONABLE_COMPLEX = 0;
+	public final static int KITCHEN_JSONABLE_SIMPLE = 1;
+	
 	@Override
 	public Map<String, Object> toJsonMap(int flag) {
 		JsonMap jm = new JsonMap();
-		jm.putInt("id", this.kitchenId);
-		jm.putInt("alias", this.displayId);
-		jm.putInt("rid", this.restaurantId);
-		jm.putString("name", this.name);
-		jm.putBoolean("isAllowTmp", this.isAllowTmp);
-		jm.putInt("typeValue", this.type.getVal());
-		jm.putJsonable("dept", this.dept, 0);
 		
+		if(flag == KITCHEN_JSONABLE_SIMPLE){
+			jm.putInt(Key4Json.KITCHEN_ID.key, this.kitchenId);
+			jm.putJsonable(Key4Json.ASSOCIATED_DEPT.key, this.dept, Department.DEPT_JSONABLE_SIMPLE);
+		}else{
+			jm.putInt(Key4Json.KITCHEN_ID.key, this.kitchenId);
+			jm.putInt(Key4Json.DISPLAY_ID.key, this.displayId);
+			jm.putInt(Key4Json.RESTAURANT_ID.key, this.restaurantId);
+			jm.putString(Key4Json.KITCHEN_NAME.key, this.name);
+			jm.putBoolean(Key4Json.IS_ALLOW_TEMP.key, this.isAllowTmp);
+			jm.putInt(Key4Json.KITCHEN_TYPE.key, this.type.getVal());
+			jm.putJsonable(Key4Json.ASSOCIATED_DEPT.key, this.dept, Department.DEPT_JSONABLE_COMPLEX);
+		}		
 		return jm;
 	}
 

@@ -106,7 +106,7 @@ public class FoodList extends AbstractList<Food> implements Jsonable{
 	@Override
 	public Map<String, Object> toJsonMap(int flag) {
 		JsonMap jm = new JsonMap();
-		jm.putJsonableList("foodList", this.mFoods, 0);
+		jm.putJsonableList("foodList", this.mFoods, Food.FOOD_JSONABLE_SIMPLE);
 		return jm;
 	}
 
