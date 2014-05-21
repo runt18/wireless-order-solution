@@ -3,7 +3,6 @@ package com.wireless.Actions.dailySettle;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
-import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -18,6 +17,8 @@ import com.wireless.db.frontBusiness.DailySettleDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
+import com.wireless.json.JsonMap;
+import com.wireless.json.Jsonable;
 import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.staffMgr.Staff;
 
@@ -29,8 +30,6 @@ public class DailySettleExecAction extends Action {
 
 		JObject jObj = new JObject();		
 		
-		DutyRange dutyRange = null;
-
 		try {
 			// 解决后台中文传到前台乱码
 			
@@ -40,7 +39,23 @@ public class DailySettleExecAction extends Action {
 
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 
-			dutyRange = DailySettleDao.exec(staff).getRange();
+			final DutyRange dutyRange = DailySettleDao.exec(staff).getRange();
+			
+			jObj.setExtra(new Jsonable(){
+
+				@Override
+				public Map<String, Object> toJsonMap(int flag) {
+					JsonMap jm = new JsonMap();
+					jm.putJsonable("dutyRange", dutyRange, 0);
+					return jm;
+				}
+
+				@Override
+				public void fromJsonMap(JsonMap jsonMap, int flag) {
+					
+				}
+				
+			});
 
 			jObj.initTip(true, staff.getName() + "日结成功");
 
@@ -57,10 +72,6 @@ public class DailySettleExecAction extends Action {
 			jObj.initTip(false, "数据库请求发生错误，请确认网络是否连接正常");
 
 		} finally {
-			Map<Object, Object> map = new HashMap<Object, Object>();
-			map.put("dutyRange", dutyRange);
-			
-			jObj.setOther(map);
 			out.write(jObj.toString());
 		}
 

@@ -16,6 +16,8 @@ import com.wireless.db.shift.ShiftDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
+import com.wireless.json.JsonMap;
+import com.wireless.json.Jsonable;
 import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.billStatistics.ShiftDetail;
 import com.wireless.pojo.staffMgr.Staff;
@@ -33,13 +35,9 @@ public class BusinessStatisticsAction extends DispatchAction {
 	 * @return
 	 * @throws Exception
 	 */
-	public ActionForward history(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
+	public ActionForward history(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
-		
-		
-		JObject jobject = new JObject();
+		JObject jObject = new JObject();
 		try{
 			String pin = (String)request.getAttribute("pin");
 			
@@ -49,30 +47,45 @@ public class BusinessStatisticsAction extends DispatchAction {
 			String offDuty = request.getParameter("offDuty");
 			
 			String dutyRange = request.getParameter("dutyRange");
-			ShiftDetail sdetail = new ShiftDetail();
+			final ShiftDetail sdetail;
 			if(!dutyRange.equals("null") && !dutyRange.trim().isEmpty()){
 				DutyRange range = DutyRangeDao.exec(staff, onDuty, offDuty);
 				
 				if(range != null){
 					sdetail = ShiftDao.getByRange(staff, range, DateType.HISTORY);
 				}else{
-					jobject.initTip(false, WebParams.TIP_TITLE_DEFAULT, 1111, "操作成功, 该时间段没有记录, 请重新查询.");
+					sdetail = null;
+					jObject.initTip(false, WebParams.TIP_TITLE_DEFAULT, 1111, "操作成功, 该时间段没有记录, 请重新查询.");
 				}
 			}else{
 				sdetail = ShiftDao.getByRange(staff, new DutyRange(onDuty, offDuty), DateType.HISTORY);
 			}
-			jobject.getOther().put("business", sdetail);
+			
+			jObject.setExtra(new Jsonable(){
+				@Override
+				public Map<String, Object> toJsonMap(int flag) {
+					JsonMap jm = new JsonMap();
+					jm.putJsonable("business", sdetail, 0);
+					return jm;
+				}
+
+				@Override
+				public void fromJsonMap(JsonMap jsonMap, int flag) {
+					
+				}
+				
+			});
 		}catch(BusinessException e){
 			e.printStackTrace();
-			jobject.initTip(e);
+			jObject.initTip(e);
 			
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip(e);
+			jObject.initTip(e);
 			
 		}finally{
 			
-			response.getWriter().print(jobject.toString());
+			response.getWriter().print(jObject.toString());
 		}
 		return null;
 	}
@@ -86,13 +99,11 @@ public class BusinessStatisticsAction extends DispatchAction {
 	 * @return
 	 * @throws Exception
 	 */
-	public ActionForward today(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
+	public ActionForward today(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		
 		
 		
-		JObject jobject = new JObject();
+		JObject jObject = new JObject();
 		try{
 			String pin = (String)request.getAttribute("pin");
 			String restaurantID = request.getParameter("restaurantID");
@@ -108,24 +119,37 @@ public class BusinessStatisticsAction extends DispatchAction {
 			params.put("offDuty", offDuty);
 			params.put("queryPattern", queryPattern);
 			
-			ShiftDetail sdetail = ShiftDao.getByRange(StaffDao.verify(Integer.parseInt(pin)), new DutyRange(onDuty, offDuty), DateType.TODAY);
+			final ShiftDetail sdetail = ShiftDao.getByRange(StaffDao.verify(Integer.parseInt(pin)), new DutyRange(onDuty, offDuty), DateType.TODAY);
 			
 			if(sdetail != null){
-				jobject.getOther().put("business", sdetail);
+				jObject.setExtra(new Jsonable(){
+					@Override
+					public Map<String, Object> toJsonMap(int flag) {
+						JsonMap jm = new JsonMap();
+						jm.putJsonable("business", sdetail, 0);
+						return jm;
+					}
+
+					@Override
+					public void fromJsonMap(JsonMap jsonMap, int flag) {
+						
+					}
+					
+				});
 			}else{
-				jobject.initTip(false, WebParams.TIP_TITLE_DEFAULT, 1111, "操作成功, 该时间段没有记录, 请重新查询.");
+				jObject.initTip(false, WebParams.TIP_TITLE_DEFAULT, 1111, "操作成功, 该时间段没有记录, 请重新查询.");
 			}
 			
 		}catch(BusinessException e){
 			e.printStackTrace();
-			jobject.initTip(e);
+			jObject.initTip(e);
 			
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip(e);
+			jObject.initTip(e);
 			
 		}finally{
-			response.getWriter().print(jobject.toString());
+			response.getWriter().print(jObject.toString());
 		}
 		return null;
 	}

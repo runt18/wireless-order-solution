@@ -2,7 +2,6 @@ package com.wireless.Actions.billStatistics;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -17,6 +16,8 @@ import org.apache.struts.actions.DispatchAction;
 import com.wireless.db.billStatistics.CalcBillStatisticsDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.json.JObject;
+import com.wireless.json.JsonMap;
+import com.wireless.json.Jsonable;
 import com.wireless.pojo.billStatistics.IncomeByCancel;
 import com.wireless.pojo.billStatistics.IncomeByCoupon;
 import com.wireless.pojo.billStatistics.IncomeByDiscount;
@@ -138,11 +139,22 @@ public class BusinessReceiptsStatisticsAction extends DispatchAction {
 				count ++ ;
 			}
 			
-			Map<Object, Object> map = new HashMap<Object, Object>();
-			String chartData = "{\"xAxis\":" + xAxis + ",\"totalMoney\" : " + totalMoney + ",\"avgMoney\" : " + Math.round((totalMoney/count)*100)/100 + ", \"avgCount\" : " + Math.round((totalCount/count)*100)/100 + 
+			final String chartData = "{\"xAxis\":" + xAxis + ",\"totalMoney\" : " + totalMoney + ",\"avgMoney\" : " + Math.round((totalMoney/count)*100)/100 + ", \"avgCount\" : " + Math.round((totalCount/count)*100)/100 + 
 								",\"ser\":[{\"name\":\'营业额\', \"data\" : " + data + "},{\"name\":\'账单数\', \"data\":" + countList + "}]}";
-			map.put("chart", chartData);
-			jobject.setOther(map);
+			jobject.setExtra(new Jsonable(){
+				@Override
+				public Map<String, Object> toJsonMap(int flag) {
+					JsonMap jm = new JsonMap();
+					jm.putString("chart", chartData);
+					return jm;
+				}
+
+				@Override
+				public void fromJsonMap(JsonMap jsonMap, int flag) {
+					
+				}
+			
+			});
 		}catch(Exception e){
 			e.printStackTrace();
 			jobject.initTip(e);

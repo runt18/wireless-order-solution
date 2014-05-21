@@ -60,13 +60,16 @@ public class WXOperateMemberAction extends DispatchAction {
 			dbCon.connect();
 			int mid = WeixinMemberDao.getBoundMemberIdByWeixin(dbCon, openId, formId);
 			int rid = WeixinRestaurantDao.getRestaurantIdByWeixin(dbCon, formId);
-			Restaurant restaurant = RestaurantDao.getById(dbCon, rid);
+			final Restaurant restaurant = RestaurantDao.getById(dbCon, rid);
 			
 			final Member member = MemberDao.getById(dbCon, StaffDao.getStaffs(dbCon, rid).get(0), mid);
 			MemberRank mr = MemberDao.calcMemberRank(StaffDao.getStaffs(dbCon, rid).get(0), mid);
 			DecimalFormat df = new DecimalFormat("#.00");
 			final String rank = df.format(mr.getRank()/mr.getTotal()) + "%";
-			Jsonable j = new Jsonable() {
+			
+			jobject.initTip(true, "操作成功, 已获取微信会员信息.");
+			
+			final Jsonable j = new Jsonable() {
 				
 				@Override
 				public Map<String, Object> toJsonMap(int flag) {
@@ -82,9 +85,23 @@ public class WXOperateMemberAction extends DispatchAction {
 				}
 			};
 			
-			jobject.initTip(true, "操作成功, 已获取微信会员信息.");
-			jobject.getOther().put("member", j);
-			jobject.getOther().put("restaurant", restaurant);
+			jobject.setExtra(new Jsonable(){
+
+				@Override
+				public Map<String, Object> toJsonMap(int flag) {
+					JsonMap jm = new JsonMap();
+					jm.putJsonable("member", j, 0);
+					jm.putJsonable("restaurant", restaurant, 0);
+					return jm;
+				}
+
+				@Override
+				public void fromJsonMap(JsonMap jsonMap, int flag) {
+					
+				}
+				
+			});
+			
 			
 		}catch(BusinessException e){
 			e.printStackTrace();
@@ -130,7 +147,7 @@ public class WXOperateMemberAction extends DispatchAction {
 			dbCon.conn.commit();
 			
 			jobject.initTip(true, "操作成功, 已发送短信验证码, 请注意查看.");
-			jobject.getOther().put("code", sms);
+			jobject.getExtra().put("code", sms);
 			
 		}catch(BusinessException e ){
 			dbCon.conn.rollback();

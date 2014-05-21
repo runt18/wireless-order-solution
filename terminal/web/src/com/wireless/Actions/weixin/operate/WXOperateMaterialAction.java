@@ -5,6 +5,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -22,6 +23,8 @@ import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.weixin.WeixinInfoDao;
 import com.wireless.db.weixin.restaurant.WeixinRestaurantDao;
 import com.wireless.json.JObject;
+import com.wireless.json.JsonMap;
+import com.wireless.json.Jsonable;
 import com.wireless.pojo.weixin.weixinInfo.WeixinInfo.UpdateBuilder;
 import com.wireless.util.OSSUtil;
 import com.wireless.util.WebParams;
@@ -79,9 +82,23 @@ public class WXOperateMaterialAction extends DispatchAction {
 	                		// 原始图片
 	                		OSSUtil.uploadImage(uploadStream, key);
 	                		jobject.initTip(true, "操作成功, 上传图片信息成功!");
-	                		jobject.getOther().put("url", "http://" + getServlet().getInitParameter("oss_bucket_image")
-	                	    		+ "." + getServlet().getInitParameter("oss_outer_point") 
-	                	    		+ "/" + key);
+	                		final String url = getServlet().getInitParameter("oss_bucket_image") +
+	                						   "." + getServlet().getInitParameter("oss_outer_point") + "/" + key;
+	                		jobject.setExtra(new Jsonable(){
+
+								@Override
+								public Map<String, Object> toJsonMap(int flag) {
+									JsonMap jm = new JsonMap();
+									jm.putString("url", url);
+									return jm;
+								}
+
+								@Override
+								public void fromJsonMap(JsonMap jsonMap, int flag) {
+									
+								}
+	                			
+	                		});
 	                	}catch(Exception e){
 	                		jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9993, "操作失败, 读取上传图片信息失败, 请联系客服人员!");
 	                		e.printStackTrace();
@@ -151,15 +168,28 @@ public class WXOperateMaterialAction extends DispatchAction {
 	                		
 	                		// 记录图片素材信息
 //	                		WeixinRestaurantDao.updateLogo(Integer.valueOf(rid), key);
-	                		System.out.println(key);
 	                		WeixinInfoDao.update(StaffDao.getAdminByRestaurant(Integer.valueOf(rid)), new UpdateBuilder(Integer.valueOf(rid)).setWeixinLogo(key));
 	                		
 	                		// 原始图片
 	                		OSSUtil.uploadImage(uploadStream, key);
 	                		jobject.initTip(true, "操作成功, 上传图片信息成功!");
-	                		jobject.getOther().put("url", "http://" + getServlet().getInitParameter("oss_bucket_image")
-	                	    		+ "." + getServlet().getInitParameter("oss_outer_point") 
-	                	    		+ "/" + key);
+	                		final String url = "http://" + getServlet().getInitParameter("oss_bucket_image") +
+	                						   "." + getServlet().getInitParameter("oss_outer_point") + "/" + key;
+	                		jobject.setExtra(new Jsonable(){
+
+								@Override
+								public Map<String, Object> toJsonMap(int flag) {
+									JsonMap jm = new JsonMap();
+									jm.putString("url", url);
+									return jm;
+								}
+
+								@Override
+								public void fromJsonMap(JsonMap jsonMap, int flag) {
+									
+								}
+	                			
+	                		});
 	                		
 	                		// 更新成功后删除原图片
 	                		OSSUtil.deleteImage(oldImg);

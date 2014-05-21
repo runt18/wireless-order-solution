@@ -2,6 +2,7 @@ package com.wireless.Actions.restaurantMgr;
 
 import java.io.PrintWriter;
 import java.sql.SQLException;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -18,6 +19,8 @@ import com.wireless.db.weixin.WeixinInfoDao;
 import com.wireless.db.weixin.restaurant.WeixinRestaurantDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
+import com.wireless.json.JsonMap;
+import com.wireless.json.Jsonable;
 import com.wireless.pojo.restaurantMgr.Module.Code;
 import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.restaurantMgr.Restaurant.InsertBuilder;
@@ -205,12 +208,25 @@ public class OperateRestaurantAction extends DispatchAction {
 	 * @return
 	 * @throws Exception
 	 */
-	public ActionForward getInfo(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
+	public ActionForward getInfo(ActionMapping mapping, ActionForm form, final HttpServletRequest request, HttpServletResponse response) throws Exception {
 		JObject jobject = new JObject();
 		try{
-			jobject.getOther().put("info", WeixinRestaurantDao.getInfo(Integer.valueOf(request.getAttribute("restaurantID").toString())));
+			final String info = WeixinRestaurantDao.getInfo(Integer.valueOf(request.getAttribute("restaurantID").toString()));
+			jobject.setExtra(new Jsonable(){
+
+				@Override
+				public Map<String, Object> toJsonMap(int flag) {
+					JsonMap jm = new JsonMap();
+					jm.putString("info", info);
+					return jm;
+				}
+
+				@Override
+				public void fromJsonMap(JsonMap jsonMap, int flag) {
+					
+				}
+				
+			});
 		}catch(Exception e){
 			e.printStackTrace();
 			jobject.initTip(e);
@@ -234,15 +250,31 @@ public class OperateRestaurantAction extends DispatchAction {
 			throws Exception {
 		JObject jobject = new JObject();
 		try{
-			String logo = WeixinRestaurantDao.getLogo(Integer.valueOf(request.getAttribute("restaurantID").toString()));
-			if(logo == null || logo.trim().isEmpty()){
-				logo = getServlet().getInitParameter("imageBrowseDefaultFile");
+			final StringBuilder logo = new StringBuilder(WeixinRestaurantDao.getLogo(Integer.valueOf(request.getAttribute("restaurantID").toString())));
+			
+			if(logo.length() == 0){
+				logo.setLength(0);
+				logo.append(getServlet().getInitParameter("imageBrowseDefaultFile"));
 			}else{
-				logo = "http://" + getServlet().getInitParameter("oss_bucket_image")
-	    	    		+ "." + getServlet().getInitParameter("oss_outer_point") 
-	    	    		+ "/" + logo;
+				String path = "http://" + getServlet().getInitParameter("oss_bucket_image")	+
+							   "." + getServlet().getInitParameter("oss_outer_point") + "/";
+				logo.insert(0, path);
 			}
-			jobject.getOther().put("logo", logo);
+			jobject.setExtra(new Jsonable(){
+
+				@Override
+				public Map<String, Object> toJsonMap(int flag) {
+					JsonMap jm = new JsonMap();
+					jm.putString("logo", logo.toString());
+					return jm;
+				}
+
+				@Override
+				public void fromJsonMap(JsonMap jsonMap, int flag) {
+					
+				}
+				
+			});
 			jobject.setSuccess(true);
 		}catch(Exception e){
 			e.printStackTrace();

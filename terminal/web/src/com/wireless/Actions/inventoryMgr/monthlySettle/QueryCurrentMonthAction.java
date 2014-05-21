@@ -1,11 +1,11 @@
 package com.wireless.Actions.inventoryMgr.monthlySettle;
 
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -22,6 +22,8 @@ import com.wireless.db.stockMgr.MonthlyBalanceDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.StockError;
 import com.wireless.json.JObject;
+import com.wireless.json.JsonMap;
+import com.wireless.json.Jsonable;
 import com.wireless.pojo.stockMgr.StockTake;
 
 public class QueryCurrentMonthAction extends Action{
@@ -62,9 +64,8 @@ public class QueryCurrentMonthAction extends Action{
 			e.printStackTrace();
 			jobject.initTip(e);
 		}finally{
-			Map<Object, Object> map = new HashMap<Object, Object>();
 			accountMonth.setTimeInMillis(monthly);
-			String date = accountMonth.get(Calendar.YEAR) + "-" + (accountMonth.get(Calendar.MONTH)+1) + "-" + accountMonth.getActualMaximum(Calendar.DAY_OF_MONTH);
+			final String date = accountMonth.get(Calendar.YEAR) + "-" + (accountMonth.get(Calendar.MONTH) + 1) + "-" + accountMonth.getActualMaximum(Calendar.DAY_OF_MONTH);
 			
 			
 			dbCon.connect();
@@ -72,14 +73,32 @@ public class QueryCurrentMonthAction extends Action{
 					" UNION ALL " +
 					" SELECT finish_date AS date FROM " + Params.dbName + ".stock_take WHERE restaurant_id = " + restaurantID + " AND status = " + StockTake.Status.AUDIT.getVal() + ") M";
 			dbCon.rs = dbCon.stmt.executeQuery(selectMaxDate);
+			final Timestamp minDay;
 			if(dbCon.rs.next()){
-				DateFormat minDay = new SimpleDateFormat("yyyy-MM-dd");  
 				if(dbCon.rs.getTimestamp("date") != null){
-					map.put("minDay", minDay.format(dbCon.rs.getTimestamp("date")));
+					minDay = dbCon.rs.getTimestamp("date");
+				}else{
+					minDay = null;
 				}
+			}else{
+				minDay = null;
 			}
-			map.put("currentDay", date);
-			jobject.setOther(map);
+			jobject.setExtra(new Jsonable(){
+
+				@Override
+				public Map<String, Object> toJsonMap(int flag) {
+					JsonMap jm = new JsonMap();
+					jm.putString("currentDay", date);
+					jm.putString("minDay", minDay != null ? new SimpleDateFormat("yyyy-MM-dd").format(minDay) : null);
+					return jm;
+				}
+
+				@Override
+				public void fromJsonMap(JsonMap jsonMap, int flag) {
+					
+				}
+				
+			});
 			dbCon.disconnect();
 			response.getWriter().print(jobject.toString());
 		}

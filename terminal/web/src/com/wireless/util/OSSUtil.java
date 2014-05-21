@@ -78,8 +78,9 @@ public class OSSUtil {
      * @throws ClientException
      */
 	private static void ensureBucketImage() throws OSSException, ClientException{
-		if(imgClientInner == null)
+		if(imgClientInner == null){
 			throw new NullPointerException("错误: 未初始化客户端内网连接池.");
+		}
 		ensureBucket(imgClientInner, BUCKET_IMAGE);
 		imgClientInner.setBucketAcl(BUCKET_IMAGE, CannedAccessControlList.PublicRead);
 		imgListRequest = new ListObjectsRequest(BUCKET_IMAGE);

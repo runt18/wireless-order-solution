@@ -2,7 +2,6 @@ package com.wireless.Actions.client.memberLevel;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -18,6 +17,8 @@ import com.wireless.db.client.member.MemberLevelDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
+import com.wireless.json.JsonMap;
+import com.wireless.json.Jsonable;
 import com.wireless.pojo.client.MemberLevel;
 import com.wireless.pojo.staffMgr.Staff;
 
@@ -40,13 +41,24 @@ public class QueryMemberLevelAction extends DispatchAction{
 				data.add(memberLevelList.get(i).getPointThreshold());
 			}
 			
-			String chart = "{\"xAxis\":"+ xAxis +", \"data\":"+ data +" }";
-			
-			Map<Object, Object> map = new HashMap<Object, Object>();
-			map.put("chart", chart);
+			final String chart = "{\"xAxis\":"+ xAxis +", \"data\":"+ data +" }";
 			
 			jobject.setRoot(memberLevelList);
-			jobject.setOther(map);
+			jobject.setExtra(new Jsonable(){
+
+				@Override
+				public Map<String, Object> toJsonMap(int flag) {
+					JsonMap jm = new JsonMap();
+					jm.putString("chart", chart);
+					return jm;
+				}
+
+				@Override
+				public void fromJsonMap(JsonMap jsonMap, int flag) {
+					
+				}
+				
+			});
 		}catch(BusinessException e){
 			e.printStackTrace();
 			jobject.initTip(e);

@@ -1,8 +1,8 @@
 package com.wireless.Actions.dishesOrder;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -17,6 +17,7 @@ import com.wireless.db.menuMgr.FoodDao;
 import com.wireless.db.menuMgr.MenuDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.json.JObject;
+import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.pojo.menuMgr.DepartmentTree;
 import com.wireless.pojo.menuMgr.Food;
@@ -36,10 +37,22 @@ public class QueryMenuAction extends DispatchAction {
 		String pin = (String) request.getAttribute("pin");
 		final DepartmentTree deptTree = new DepartmentTree.Builder(FoodDao.getPureFoods(StaffDao.verify(Integer.parseInt(pin)))).build();
 		jobject.setRoot(deptTree.asDeptNodes());
-		jobject.setOther(new HashMap<Object, Object>(){
-			private static final long serialVersionUID = 1L;
+		jobject.setExtra(new Jsonable(){
 
-		{put("foodList", new FoodList(deptTree.asFoodList()));}});
+			@Override
+			public Map<String, Object> toJsonMap(int flag) {
+				JsonMap jm = new JsonMap();
+				jm.putJsonableList("foodList", new FoodList(deptTree.asFoodList()), 0);
+				return jm;
+			}
+	
+			@Override
+			public void fromJsonMap(JsonMap jsonMap, int flag) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
+		
 		response.getWriter().print(jobject.toString());
 		return null;
 	}

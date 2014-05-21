@@ -2,6 +2,7 @@ package com.wireless.Actions.dishesOrder;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -16,6 +17,8 @@ import com.wireless.db.orderMgr.OrderDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
+import com.wireless.json.JsonMap;
+import com.wireless.json.Jsonable;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.menuMgr.Kitchen;
@@ -30,7 +33,7 @@ public class QueryOrderAction extends Action {
 		
 		response.setContentType("text/json;charset=utf-8");
 		JObject jobject = new JObject();
-		String idList = "";
+		final StringBuilder idList = new StringBuilder();
 		try {
 			
 			/**
@@ -45,7 +48,7 @@ public class QueryOrderAction extends Action {
 			String restaurantID = (String)request.getAttribute("restaurantID");
 			String oid = request.getParameter("orderID");
 			
-			Order order = new Order();
+			final Order order;
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
 			if(queryType != null && queryType.trim().equals("History")){
@@ -59,15 +62,18 @@ public class QueryOrderAction extends Action {
 					order = OrderDao.getByTableAlias(staff, Integer.parseInt(tid));
 				} else if (oid != null && !oid.trim().isEmpty()){
 					order = OrderDao.getById(staff, Integer.valueOf(oid), DateType.TODAY);
+				}else{
+					order = null;
 				}
 			}			
+			
 			List<OrderFood> root = new ArrayList<OrderFood>();
 			if(order != null && order.hasOrderFood()){
 				OrderFood item = null;
 				int i = 0;
 				for(OrderFood of : order.getOrderFoods()){
-					idList += (i > 0 ? "," : "");
-					idList += of.getFoodId();
+					idList.append(i > 0 ? "," : "");
+					idList.append(of.getFoodId());
 					item = new OrderFood(of);
 					item.getKitchen().setId(of.getKitchen().getId());
 					root.add(item);
@@ -95,8 +101,22 @@ public class QueryOrderAction extends Action {
 			
 			if(order != null){
 				order.setOrderFoods(null);
-				jobject.getOther().put("order", order);
-				jobject.getOther().put("idList", idList);
+				jobject.setExtra(new Jsonable(){
+
+					@Override
+					public Map<String, Object> toJsonMap(int flag) {
+						JsonMap jm = new JsonMap();
+						jm.putJsonable("order", order, 0);
+						jm.putString("idList", idList.toString());
+						return jm;
+					}
+
+					@Override
+					public void fromJsonMap(JsonMap jsonMap, int flag) {
+						
+					}
+					
+				});
 			}
 		} catch (BusinessException e) {
 			e.printStackTrace();

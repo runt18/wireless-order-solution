@@ -14,11 +14,13 @@ import org.apache.struts.action.ActionMapping;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
+import com.wireless.json.JsonMap;
+import com.wireless.json.Jsonable;
 import com.wireless.pojo.staffMgr.Staff;
 
 public class VerifyLoginAction extends Action {
 
-	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception{
+	public ActionForward execute(ActionMapping mapping, ActionForm form, final HttpServletRequest request, HttpServletResponse response) throws Exception{
 		
 		JObject jobject = new JObject();
 		Map<Object, Object> other = new HashMap<Object, Object>();
@@ -41,11 +43,26 @@ public class VerifyLoginAction extends Action {
 			}*/
 			String pin = (String) request.getSession().getAttribute("pin");
 			if(pin != null){
-				Staff staff = StaffDao.verify(Integer.parseInt(pin));
+				final Staff staff = StaffDao.verify(Integer.parseInt(pin));
 				
 				other.put("staff", staff);
 				other.put("sessionId", request.getSession().getId());
-				jobject.setOther(other);
+				jobject.setExtra(new Jsonable(){
+
+					@Override
+					public Map<String, Object> toJsonMap(int flag) {
+						JsonMap jm = new JsonMap();
+						jm.putJsonable("staff", staff, 0);
+						jm.putString("sessionId", request.getSession().getId());
+						return jm;
+					}
+
+					@Override
+					public void fromJsonMap(JsonMap jsonMap, int flag) {
+						
+					}
+					
+				});
 				jobject.initTip(true, "true");
 			}
 			else{

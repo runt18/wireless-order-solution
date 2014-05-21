@@ -26,9 +26,7 @@ import com.wireless.pojo.staffMgr.Staff;
 
 public class WXQueryDeptAction extends DispatchAction{
 	
-	public ActionForward normal(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
+	public ActionForward normal(ActionMapping mapping, ActionForm form,	HttpServletRequest request, HttpServletResponse response) throws Exception {
 		request.setCharacterEncoding("UTF-8");
 		response.setCharacterEncoding("UTF-8");
 		JObject jobject = new JObject();
@@ -69,7 +67,7 @@ public class WXQueryDeptAction extends DispatchAction{
 			depts = null;
 			kitchens = null;
 			tempKitchenList = null;
-			jobject.getOther().put("dept", deptList);
+			jobject.getExtra().put("dept", deptList);
 		}catch(BusinessException e){
 			e.printStackTrace();
 			jobject.initTip(e);

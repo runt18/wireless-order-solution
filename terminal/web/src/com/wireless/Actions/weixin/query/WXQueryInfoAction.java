@@ -1,5 +1,7 @@
 package com.wireless.Actions.weixin.query;
 
+import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -11,6 +13,8 @@ import org.apache.struts.actions.DispatchAction;
 import com.wireless.db.system.BillBoardDao;
 import com.wireless.db.weixin.restaurant.WeixinRestaurantDao;
 import com.wireless.json.JObject;
+import com.wireless.json.JsonMap;
+import com.wireless.json.Jsonable;
 import com.wireless.pojo.system.BillBoard;
 
 public class WXQueryInfoAction extends DispatchAction{
@@ -52,9 +56,7 @@ public class WXQueryInfoAction extends DispatchAction{
 	 * @return
 	 * @throws Exception
 	 */
-	public ActionForward initData(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
+	public ActionForward initData(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)	throws Exception {
 		request.setCharacterEncoding("UTF-8");
 		response.setCharacterEncoding("UTF-8");
 		JObject jobject = new JObject();
@@ -67,7 +69,23 @@ public class WXQueryInfoAction extends DispatchAction{
 			    		+ "." + getServlet().getInitParameter("oss_outer_point") 
 			    		+ "/" + logo;
 			}
-			jobject.getOther().put("logo", logo);
+			
+			final String logoPath = logo;
+			jobject.setExtra(new Jsonable(){
+
+				@Override
+				public Map<String, Object> toJsonMap(int flag) {
+					JsonMap jm = new JsonMap();
+					jm.putString("logo", logoPath);
+					return jm;
+				}
+
+				@Override
+				public void fromJsonMap(JsonMap jsonMap, int flag) {
+					
+				}
+				
+			});
 		}catch(Exception e){
 			e.printStackTrace();
 			jobject.initTip(e);

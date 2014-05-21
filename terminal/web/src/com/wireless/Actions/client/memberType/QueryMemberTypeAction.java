@@ -2,8 +2,6 @@ package com.wireless.Actions.client.memberType;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -212,48 +210,58 @@ public class QueryMemberTypeAction extends DispatchAction {
 		return null;
 	}
 	
-	public ActionForward getMemberLevel(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
+	public ActionForward getMemberLevel(ActionMapping mapping, ActionForm form,	HttpServletRequest request, HttpServletResponse response) throws Exception {
 		JObject jobject = new JObject();
 		try{
 
-			List<Jsonable> result = new ArrayList<Jsonable>();
-			Map<Object, Object> other = new HashMap<Object, Object>();
+			final List<Jsonable> root = new ArrayList<Jsonable>();
+			final JsonMap extra = new JsonMap();
 			String openId = request.getParameter("oid");
 			String formId = request.getParameter("fid");
 			int rid = WeixinRestaurantDao.getRestaurantIdByWeixin(formId);
 			int mid = WeixinMemberDao.getBoundMemberIdByWeixin(openId, formId);
-			Staff staff = StaffDao.getStaffs(rid).get(0);
+			Staff staff = StaffDao.getAdminByRestaurant(rid); 
 			List<MemberLevel> list = MemberLevelDao.getMemberLevels(staff);
 			
 			for (final MemberLevel ml : list) {
 				final List<Member> mlists = MemberDao.getByCond(staff, " AND MT.member_type_id = " + ml.getMemberType().getId() + " AND M.member_id = " + mid, null);
 				if(mlists.size() > 0){
-					other.put("member", mlists.get(0));
+					extra.putJsonable("member", mlists.get(0), 0);
 				}
-				Jsonable j = new Jsonable() {
+				root.add(new Jsonable() {
 					@Override
 					public Map<String, Object> toJsonMap(int flag) {
-						Map<String, Object> jm = new HashMap<String, Object>();
-						jm.put("pointThreshold", ml.getPointThreshold());
-						jm.put("memberTypeName", ml.getMemberType().getName());
-						jm.put("memberType", ml.getMemberType());
-						jm.put("inLevel", mlists.size() != 0 ? true : "");
-						return Collections.unmodifiableMap(jm);
+						JsonMap jm = new JsonMap();
+						jm.putInt("pointThreshold", ml.getPointThreshold());
+						jm.putString("memberTypeName", ml.getMemberType().getName());
+						jm.putJsonable("memberType", ml.getMemberType(), 0);
+						jm.putBoolean("inLevel", mlists.size() != 0 ? true : false);
+						return jm;
 					}
 					
 					@Override
 					public void fromJsonMap(JsonMap jsonMap, int flag) {
 						
 					}
-				};
-				result.add(j);
+				});
+				
 			}
 			
-			jobject.setRoot(result);
-			jobject.setTotalProperty(result.size());
-			jobject.setOther(other);
+			jobject.setRoot(root);
+			jobject.setTotalProperty(root.size());
+			jobject.setExtra(new Jsonable(){
+
+				@Override
+				public Map<String, Object> toJsonMap(int flag) {
+					return extra;
+				}
+
+				@Override
+				public void fromJsonMap(JsonMap jsonMap, int flag) {
+					
+				}
+				
+			});
 		}catch(BusinessException e){
 			e.printStackTrace();
 			jobject.initTip(e);

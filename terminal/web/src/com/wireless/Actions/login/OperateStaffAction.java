@@ -1,7 +1,6 @@
 package com.wireless.Actions.login;
 
 import java.sql.SQLException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -17,6 +16,8 @@ import org.apache.struts.action.ActionMapping;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
+import com.wireless.json.JsonMap;
+import com.wireless.json.Jsonable;
 import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.staffMgr.Staff;
 
@@ -34,27 +35,38 @@ public class OperateStaffAction extends Action{
 				staff = StaffDao.verify(Integer.parseInt(pin));
 			}else{
 				List<Staff> list = StaffDao.getStaffs(Restaurant.ADMIN);
-				if(!list.isEmpty()){
-					for (Staff s : list) {
-						if(s.getName().equals(name)){
-							staff = s;
-						}
+				for (Staff s : list) {
+					if(s.getName().equals(name)){
+						staff = s;
+						break;
 					}
-					if(staff == null){
-						jobject.initTip(false, "账号输入错误");
-					}
+				}
+				if(staff == null){
+					jobject.initTip(false, "账号输入错误");
 				}
 			}
 			 
-			if(staff.getPwd().equals(pwd)){
-				pin = staff.getId()+"";
+			if(staff != null && staff.getPwd().equals(pwd)){
+				pin = staff.getId() + "";
 				HttpSession session = request.getSession();
 				session.setAttribute("pin", pin);
 				session.setAttribute("restaurantID", staff.getRestaurantId()+"");
 				session.setAttribute("dynamicKey", System.currentTimeMillis() % 100000);
-				Map<Object, Object> other = new HashMap<Object, Object>();
-				other.put("staff", staff);
-				jobject.setOther(other);
+				final Staff theStaff = staff;
+				jobject.setExtra(new Jsonable(){
+					@Override
+					public Map<String, Object> toJsonMap(int flag) {
+						JsonMap jm = new JsonMap();
+						jm.putJsonable("staff", theStaff, 0);
+						return jm;
+					}
+
+					@Override
+					public void fromJsonMap(JsonMap jsonMap, int flag) {
+						
+					}
+					
+				});
 				jobject.initTip(true, "登陆成功");
 			}else{
 				jobject.initTip(false, "密码输入错误");
