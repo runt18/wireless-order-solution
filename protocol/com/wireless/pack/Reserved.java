@@ -10,8 +10,8 @@ public final class Reserved {
 	public static final byte PRINT_ORDER = 1;
 	public static final byte PRINT_ORDER_DETAIL = 2;
 	public static final byte PRINT_RECEIPT = 3;
-	public static final byte PRINT_EXTRA_FOOD = 4;
-	public static final byte PRINT_CANCELLED_FOOD = 5;
+	public static final byte PRINT_EXTRA_FOOD_DETAIL = 4;
+	public static final byte PRINT_CANCELLED_FOOD_DETAIL = 5;
 	public static final byte PRINT_TRANSFER_TABLE = 6;
 	public static final byte PRINT_ALL_EXTRA_FOOD = 7;
 	public static final byte PRINT_ALL_CANCELLED_FOOD = 8;
