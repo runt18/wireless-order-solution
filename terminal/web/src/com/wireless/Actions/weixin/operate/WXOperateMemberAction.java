@@ -141,13 +141,27 @@ public class WXOperateMemberAction extends DispatchAction {
 			String mobile = request.getParameter("mobile");
 			String fromId = request.getParameter("fid");
 
-			VerifySMS sms = VerifySMSDao.getById(dbCon, VerifySMSDao.insert(dbCon, new InsertBuilder(ExpiredPeriod.MINUTE_10)));
+			final VerifySMS sms = VerifySMSDao.getById(dbCon, VerifySMSDao.insert(dbCon, new InsertBuilder(ExpiredPeriod.MINUTE_10)));
 			int restaurantId = WeixinRestaurantDao.getRestaurantIdByWeixin(dbCon, fromId);
 			SMS.send(dbCon, StaffDao.getAdminByRestaurant(restaurantId), mobile, new SMS.Msg4Verify(sms.getCode()));
 			dbCon.conn.commit();
 			
 			jobject.initTip(true, "操作成功, 已发送短信验证码, 请注意查看.");
-			jobject.getExtra().put("code", sms);
+			jobject.setExtra(new Jsonable(){
+
+				@Override
+				public Map<String, Object> toJsonMap(int flag) {
+					JsonMap jm = new JsonMap();
+					jm.putJsonable("code", sms, 0);
+					return jm;
+				}
+
+				@Override
+				public void fromJsonMap(JsonMap jsonMap, int flag) {
+					
+				}
+				
+			});
 			
 		}catch(BusinessException e ){
 			dbCon.conn.rollback();
