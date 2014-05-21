@@ -1,8 +1,12 @@
 package com.wireless.pojo.sms;
 
+import java.util.Map;
+
+import com.wireless.json.JsonMap;
+import com.wireless.json.Jsonable;
 import com.wireless.pojo.util.DateUtil;
 
-public class VerifySMS {
+public class VerifySMS implements Jsonable{
 	
 	public static enum ExpiredPeriod{
 		
@@ -134,6 +138,21 @@ public class VerifySMS {
 			   ",code=" + getCode() +
 			   ",created=" + DateUtil.format(getCreated()) +
 			   ",expired=" + DateUtil.format(getExpired()) + ")";
+	}
+
+	@Override
+	public Map<String, Object> toJsonMap(int flag) {
+		JsonMap jm = new JsonMap();
+		jm.putInt("id", id);
+		jm.putInt("code", code);
+		jm.putLong("expired", expired);
+		jm.putLong("created", created);
+		return jm;
+	}
+
+	@Override
+	public void fromJsonMap(JsonMap jsonMap, int flag) {
+		
 	}
 	
 	
