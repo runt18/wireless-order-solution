@@ -681,14 +681,17 @@ function staffLoginHandler(c){
  */
 function loginSuccessCallback(){
 //	alert(foodData.root)
-	
-	initFoodData();
-	
+	//如果是注销再登录则不用再更新菜谱
+	if(typeof foodData.root == 'undefined'){
+		initFoodData();
+		initTableData();
+	}
+	$('#spanStaffNameForDisplayToTS').html(staffData.staffName);
 	Util.toggleContentDisplay({
 		type:'show', 
 		renderTo:'divTableSelect'
 	});
-	initTableData();
+	
 	changeStaff({type:2});
 }
 /**
