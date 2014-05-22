@@ -129,7 +129,7 @@ co.tf = {
 	clearDom : function(){
 		this.nameDom.value = '';
 		this.priceDom.value = '';
-		this.countDom.value = '';
+		this.countDom.value = 1;
 		
 		this.nameDom = null;
 		this.priceDom = null;
