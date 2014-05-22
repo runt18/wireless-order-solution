@@ -16,11 +16,13 @@ import org.apache.struts.actions.DispatchAction;
 import com.wireless.db.DBCon;
 import com.wireless.db.deptMgr.DepartmentDao;
 import com.wireless.db.deptMgr.KitchenDao;
+import com.wireless.db.menuMgr.FoodDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.weixin.restaurant.WeixinRestaurantDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.menuMgr.Department;
+import com.wireless.pojo.menuMgr.DepartmentTree;
 import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.pojo.staffMgr.Staff;
 
@@ -41,13 +43,6 @@ public class WXQueryDeptAction extends DispatchAction{
 			Staff staff = StaffDao.getStaffs(dbCon, rid).get(0);
 			List<Department> depts = DepartmentDao.getByType(dbCon, staff, Department.Type.NORMAL);
 			List<Kitchen> kitchens = KitchenDao.getByType(dbCon, staff, Kitchen.Type.NORMAL);
-//			List<Food> tempFoods = null;
-//			for(int i = kitchens.size() - 1; i >= 0; i--){
-//				tempFoods = FoodDao.getPureFoods(dbCon, staff, " AND FOOD.kitchen_alias = " + kitchens.get(i).getAliasId(), null);
-//				if(tempFoods.size() == 0){
-//					kitchens.remove(i);
-//				}
-//			}
 			
 			List<Map<String, Object>> deptList = new ArrayList<Map<String,Object>>();
 			List<Kitchen> tempKitchenList = null;
@@ -67,7 +62,7 @@ public class WXQueryDeptAction extends DispatchAction{
 			depts = null;
 			kitchens = null;
 			tempKitchenList = null;
-			jobject.getExtra().put("dept", deptList);
+//			jobject.getExtra().put("dept", deptList);
 		}catch(BusinessException e){
 			e.printStackTrace();
 			jobject.initTip(e);
@@ -98,8 +93,8 @@ public class WXQueryDeptAction extends DispatchAction{
 			int rid = WeixinRestaurantDao.getRestaurantIdByWeixin(dbCon, fid);
 			
 			Staff staff = StaffDao.getStaffs(dbCon, rid).get(0);
-			List<Kitchen> kitchens = KitchenDao.getByType(dbCon, staff, Kitchen.Type.NORMAL);
-			jobject.setRoot(kitchens);
+			DepartmentTree deptTree = new DepartmentTree.Builder(FoodDao.getPureFoods(staff)).build();
+			jobject.setRoot(deptTree.asKitchenList());
 			
 		}catch(BusinessException e){
 			e.printStackTrace();
