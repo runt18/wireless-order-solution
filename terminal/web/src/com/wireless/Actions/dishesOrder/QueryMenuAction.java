@@ -42,7 +42,7 @@ public class QueryMenuAction extends DispatchAction {
 			@Override
 			public Map<String, Object> toJsonMap(int flag) {
 				JsonMap jm = new JsonMap();
-				jm.putJsonableList("foodList", new FoodList(deptTree.asFoodList()), 0);
+				jm.putJsonable(new FoodList(deptTree.asFoodList()), 0);
 				return jm;
 			}
 	
