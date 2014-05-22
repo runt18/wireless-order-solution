@@ -1,5 +1,6 @@
 package com.wireless.pojo.menuMgr;
 
+import java.util.Comparator;
 import java.util.Map;
 
 import com.wireless.json.JsonMap;
@@ -10,6 +11,19 @@ import com.wireless.pojo.menuMgr.Department.DeptId;
 
 
 public class Kitchen implements Parcelable, Comparable<Kitchen>, Jsonable{
+	
+	public final static Comparator<Kitchen> BY_DISPLAY = new Comparator<Kitchen>(){
+		@Override
+		public int compare(Kitchen k1, Kitchen k2) {
+			if(k1.displayId > k2.displayId){
+				return 1;
+			}else if(k1.displayId < k2.displayId){
+				return -1;
+			}else{
+				return 0;
+			}
+		}
+	};
 	
 	public static class MoveBuilder{
 		private final int from;

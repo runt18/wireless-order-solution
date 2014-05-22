@@ -17,6 +17,10 @@ public class FoodList extends AbstractList<Food> implements Jsonable{
 	
 	private final SortedList<Food> mFoods;
 	
+	public FoodList(){
+		mFoods = SortedList.newInstance();
+	}
+	
 	public FoodList(List<Food> listElem){
 		mFoods = SortedList.newInstance(listElem);
 	}
