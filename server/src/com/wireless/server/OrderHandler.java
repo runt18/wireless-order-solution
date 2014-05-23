@@ -359,31 +359,35 @@ class OrderHandler implements Runnable{
 			}
 			
 			if(!diffResult.extraFoods.isEmpty()){
-				diffResult.newOrder.setOrderFoods(diffResult.extraFoods);
+				Order extraOrder = new Order();
+				extraOrder.copyFrom(diffResult.newOrder);
+				extraOrder.setOrderFoods(diffResult.extraFoods);
 				//print the summary to extra foods
 				printHandler.addContent(JobContentFactory.instance().createSummaryContent(PType.PRINT_ALL_EXTRA_FOOD, 
 																							  staff,
 																							  printers,
-																							  diffResult.newOrder));
+																							  extraOrder));
 				//print the detail to extra foods
 				printHandler.addContent(JobContentFactory.instance().createDetailContent(PType.PRINT_EXTRA_FOOD_DETAIL, 
 																							 staff,
 																							 printers,
-																							 diffResult.newOrder));
+																							 extraOrder));
 			}
 
 			if(!diffResult.cancelledFoods.isEmpty()){
-				diffResult.newOrder.setOrderFoods(diffResult.cancelledFoods);
+				Order cancelledOrder = new Order();
+				cancelledOrder.copyFrom(diffResult.newOrder);
+				cancelledOrder.setOrderFoods(diffResult.cancelledFoods);
 				//print the summary to canceled foods
 				printHandler.addContent(JobContentFactory.instance().createSummaryContent(PType.PRINT_ALL_CANCELLED_FOOD,
 																							  staff,
 																							  printers,
-																							  diffResult.newOrder));
+																							  cancelledOrder));
 				//print the detail to canceled foods
 				printHandler.addContent(JobContentFactory.instance().createDetailContent(PType.PRINT_CANCELLED_FOOD_DETAIL,
 																							 staff,
 																							 printers,
-																							 diffResult.newOrder));
+																							 cancelledOrder));
 
 			}
 
