@@ -42,7 +42,7 @@ public class QueryMenuAction extends DispatchAction {
 			@Override
 			public Map<String, Object> toJsonMap(int flag) {
 				JsonMap jm = new JsonMap();
-				jm.putJsonable(new FoodList(deptTree.asFoodList()), 0);
+				jm.putJsonableList("foodList", deptTree.asFoodList(), Food.FOOD_JSONABLE_SIMPLE);
 				return jm;
 			}
 	
@@ -69,7 +69,7 @@ public class QueryMenuAction extends DispatchAction {
 			 HttpServletRequest request, HttpServletResponse response) throws Exception {
 		response.setContentType("text/json;charset=utf-8");
 		JObject jobject = new JObject();
-		List<Food> root = null;
+		FoodList root = null;
 		String isPaging = request.getParameter("isPaging");
 		String start = request.getParameter("start");
 		String limit = request.getParameter("limit");
@@ -94,15 +94,16 @@ public class QueryMenuAction extends DispatchAction {
 			if(foodAlias != null && !foodAlias.trim().isEmpty()){
 				cond += (" AND FOOD.food_alias like '" + foodAlias.trim() + "%'");
 			}
-			root = new FoodList(FoodDao.getByCond(StaffDao.verify(Integer.parseInt(pin)), cond, orderBy));
+			root = new FoodList(FoodDao.getByCond(StaffDao.verify(Integer.parseInt(pin)), cond, orderBy), Food.BY_ALIAS);
 
 		}catch(Exception e){
 			e.printStackTrace();
 			jobject.initTip(e);
 		}finally{
 			if(root != null){
-				List<Food> result = new ArrayList<Food>();
+				FoodList result;
 				if(pinyin != null && !pinyin.trim().isEmpty()){
+					result = new FoodList(new ArrayList<Food>());
 					for (Food f : root) {
 						if(f.getPinyinShortcut().contains(pinyin.toLowerCase())){
 							result.add(f);

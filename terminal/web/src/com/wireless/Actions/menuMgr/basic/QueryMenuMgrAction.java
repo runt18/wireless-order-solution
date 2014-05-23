@@ -17,6 +17,7 @@ import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.menuMgr.Food;
+import com.wireless.pojo.menuMgr.FoodList;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.util.DataPaging;
 
@@ -147,7 +148,7 @@ public class QueryMenuMgrAction extends Action {
 				extraCond += strStatus;
 			}
 			
-			root = FoodDao.getPureByCond(staff, extraCond, null);
+			root = new FoodList(FoodDao.getPureByCond(staff, extraCond, null), Food.BY_ALIAS);
 			
 		}catch(BusinessException e){
 			e.printStackTrace();
