@@ -9,6 +9,7 @@ import com.wireless.db.Params;
 import com.wireless.db.regionMgr.TableDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.FrontBusinessError;
+import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.OrderSummary;
 import com.wireless.pojo.distMgr.Discount;
@@ -18,6 +19,34 @@ import com.wireless.util.DateType;
 
 public class OrderDao {
 
+	public static class Filter{
+		private final DateType dateType;
+		private int orderId = -1;
+		private int tableAlias = -1;
+		private String tableName;
+		private short regionId = -1;
+		private DutyRange range;
+		private Order.PayType payType;
+		
+		public Filter(DateType dateType){
+			this.dateType = dateType;
+		}
+		
+		public void setOrderId(int orderId){
+			this.orderId = orderId;
+		}
+		
+		@Override
+		public String toString(){
+			StringBuilder filterCond = new StringBuilder();
+			filterCond.append("AND 1 = 1");
+			if(orderId > 0){
+				filterCond.append("AND O.id = " + orderId);
+			}
+			return filterCond.toString();
+		}
+	}
+	
 	/**
 	 * Get the status to a specific order.
 	 * @param dbCon
@@ -211,8 +240,8 @@ public class OrderDao {
 	
 	/**
 	 * Get the order detail information according to the specific extra condition and order clause. 
-	 * @param term
-	 * 			  the terminal
+	 * @param staff
+	 * 			  the staff to perform this action
 	 * @param extraCond
 	 *            the extra condition to query
 	 * @param orderClause
@@ -225,11 +254,11 @@ public class OrderDao {
 	 * @throws BusinessException 
 	 * 			   throws if any associated taste group is NOT found
 	 */
-	public static List<Order> getByCond(Staff term, String extraCond, String orderClause, DateType dateType) throws SQLException, BusinessException{
+	public static List<Order> getByCond(Staff staff, String extraCond, String orderClause, DateType dateType) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return getByCond(dbCon, term, extraCond, orderClause, dateType);
+			return getByCond(dbCon, staff, extraCond, orderClause, dateType);
 		}finally{
 			dbCon.disconnect();
 		}
