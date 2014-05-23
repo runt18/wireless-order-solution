@@ -69,7 +69,7 @@ public class QueryMenuAction extends DispatchAction {
 			 HttpServletRequest request, HttpServletResponse response) throws Exception {
 		response.setContentType("text/json;charset=utf-8");
 		JObject jobject = new JObject();
-		FoodList root = null;
+		List<Food> root = null;
 		String isPaging = request.getParameter("isPaging");
 		String start = request.getParameter("start");
 		String limit = request.getParameter("limit");
@@ -101,15 +101,15 @@ public class QueryMenuAction extends DispatchAction {
 			jobject.initTip(e);
 		}finally{
 			if(root != null){
-				FoodList result;
+				List<Food> result;
 				if(pinyin != null && !pinyin.trim().isEmpty()){
-					result = new FoodList(new ArrayList<Food>());
+					result = new ArrayList<Food>();
 					for (Food f : root) {
 						if(f.getPinyinShortcut().contains(pinyin.toLowerCase())){
 							result.add(f);
 						}
 					}
-					root = result;
+					root = new FoodList(result, Food.BY_ALIAS);
 				}
 				jobject.setTotalProperty(root.size());
 				jobject.setRoot(DataPaging.getPagingData(root, isPaging, start, limit));
