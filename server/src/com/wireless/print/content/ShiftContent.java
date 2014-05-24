@@ -30,10 +30,16 @@ public class ShiftContent extends ConcreteContent {
 			mTemplate = mTemplate.replace(PVar.TITLE, new ExtraFormatDecorator(  
 														new CenterAlignedDecorator("日结单", getStyle()).toString(), getStyle(), ExtraFormatDecorator.LARGE_FONT_1X).toString());
 			
-		}else{
+		}else if(mPrintType == PType.PRINT_SHIFT_RECEIPT || mPrintType == PType.PRINT_TEMP_SHIFT_RECEIPT || mPrintType == PType.PRINT_HISTORY_SHIFT_RECEIPT){
 			//replace the "$(title)" with "交班对账单"
 			mTemplate = mTemplate.replace(PVar.TITLE, new ExtraFormatDecorator(  
-														new CenterAlignedDecorator("交班对账单", getStyle()).toString(), getStyle(), ExtraFormatDecorator.LARGE_FONT_1X).toString());	
+														new CenterAlignedDecorator("交班对账单", getStyle()).toString(), getStyle(), ExtraFormatDecorator.LARGE_FONT_1X).toString());
+			
+		}else if(mPrintType == PType.PRINT_PAYMENT_RECEIPT || mPrintType == PType.PRINT_HISTORY_PAYMENT_RECEIPT){
+			//replace the "$(title)" with "交班对账单"
+			mTemplate = mTemplate.replace(PVar.TITLE, new ExtraFormatDecorator(  
+														new CenterAlignedDecorator("交款对账单", getStyle()).toString(), getStyle(), ExtraFormatDecorator.LARGE_FONT_1X).toString());
+			
 		}
 		
 		//replace $(order_amount) 
@@ -114,21 +120,26 @@ public class ShiftContent extends ConcreteContent {
 		mTemplate = mTemplate.replace(PVar.VAR_2, var2);
 
 		
-		StringBuilder var3 = new StringBuilder();
-		var3.append(new Grid4ItemsContent(new String[]{ "部门", "折扣", "赠送", "金额" }, pos4Item, mPrintType, mStyle).toString());
-		for(IncomeByDept deptIncome : mShiftDetail.getDeptIncome()){
-			var3.append("\r\n");
-			var3.append(new Grid4ItemsContent(
-					new String[]{ deptIncome.getDept().getName(), 
-								  Float.toString(deptIncome.getDiscount()),
-								  Float.toString(deptIncome.getGift()),
-								  Float.toString(deptIncome.getIncome())
-								 }, 
-					pos4Item, mPrintType, mStyle).toString());
+		if(mPrintType == PType.PRINT_PAYMENT_RECEIPT || mPrintType == PType.PRINT_HISTORY_PAYMENT_RECEIPT){
+			mTemplate = mTemplate.replace(PVar.VAR_3, "");
+		}else{
+			StringBuilder var3 = new StringBuilder();
+			var3.append(new Grid4ItemsContent(new String[]{ "部门", "折扣", "赠送", "金额" }, pos4Item, mPrintType, mStyle).toString());
+			for(IncomeByDept deptIncome : mShiftDetail.getDeptIncome()){
+				var3.append("\r\n");
+				var3.append(new Grid4ItemsContent(
+						new String[]{ deptIncome.getDept().getName(), 
+									  Float.toString(deptIncome.getDiscount()),
+									  Float.toString(deptIncome.getGift()),
+									  Float.toString(deptIncome.getIncome())
+									 }, 
+						pos4Item, mPrintType, mStyle).toString());
 
+			}
+			//replace the $(var_3) with the shift detail
+			mTemplate = mTemplate.replace(PVar.VAR_3, var3);
 		}
-		//replace the $(var_3) with the shift detail
-		mTemplate = mTemplate.replace(PVar.VAR_3, var3);
+
 		
 		//replace the $(var_4) with the shift detail
 		mTemplate = mTemplate.replace(PVar.VAR_4, new ExtraFormatDecorator( 

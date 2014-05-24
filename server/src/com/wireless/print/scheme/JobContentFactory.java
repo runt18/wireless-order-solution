@@ -1,7 +1,6 @@
 package com.wireless.print.scheme;
 
 import java.sql.SQLException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -270,28 +269,26 @@ public class JobContentFactory {
 		return createReceiptContent(printType, term, printers, OrderDao.getById(term, orderId, DateType.TODAY));
 	}
 	
-	public Content createShiftContent(PType printType, Staff staff, List<Printer> printers, long onDuty, long offDuty) throws SQLException{
+	public Content createShiftContent(PType printType, Staff staff, List<Printer> printers, DutyRange range, Region.RegionId regionId) throws SQLException{
 		
 		List<JobContent> jobContents = new ArrayList<JobContent>();
 		
-		Region regionToCompare = new Region(Region.RegionId.REGION_1.getId(), "", staff.getRestaurantId());
+		Region regionToCompare = new Region(regionId.getId(), null, staff.getRestaurantId());
 		
 		for(Printer printer : printers){
 			for(PrintFunc func : printer.getPrintFuncs()){
 				if(func.isTypeMatched(printType) && func.isRegionMatched(regionToCompare)){
 					ShiftDetail shiftDetail;
-					SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 					if(printType == PType.PRINT_DAILY_SETTLE_RECEIPT || 
 					   printType == PType.PRINT_HISTORY_DAILY_SETTLE_RECEIPT ||
-					   printType == PType.PRINT_HISTORY_SHIFT_RECEIPT){
-						/*
-						 * Get the details to daily settlement from history ,
-						 * since records to today has been moved to history before printing daily settlement receipt. 
-						 */
-						shiftDetail = ShiftDao.getByRange(staff, new DutyRange(sdf.format(onDuty), sdf.format(offDuty)), DateType.HISTORY);
+					   printType == PType.PRINT_HISTORY_SHIFT_RECEIPT ||
+					   printType == PType.PRINT_HISTORY_PAYMENT_RECEIPT){
+						 //Get the details to daily settlement from history ,
+						 //since records to today has been moved to history before printing daily settlement receipt. 
+						shiftDetail = ShiftDao.getByRange(staff, range, DateType.HISTORY);
 						
 					}else{
-						shiftDetail = ShiftDao.getByRange(staff, new DutyRange(sdf.format(onDuty), sdf.format(offDuty)), DateType.TODAY);
+						shiftDetail = ShiftDao.getByRange(staff, range, DateType.TODAY);
 					}
 					jobContents.add(new JobContent(printer, func.getRepeat(), printType,
 												   new ShiftContent(shiftDetail, 

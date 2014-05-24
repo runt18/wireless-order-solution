@@ -41,6 +41,7 @@ import com.wireless.pack.resp.RespNAK;
 import com.wireless.pack.resp.RespOTAUpdate;
 import com.wireless.pack.resp.RespPackage;
 import com.wireless.parcel.Parcel;
+import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.client.Member;
 import com.wireless.pojo.client.MemberComment;
 import com.wireless.pojo.client.MemberComment.CommitBuilder;
@@ -502,8 +503,9 @@ class OrderHandler implements Runnable{
 			Parcel p = new Parcel(request.body);
 			long onDuty = p.readLong();
 			long offDuty = p.readLong();
+			Region.RegionId regionId = Region.RegionId.valueOf(p.readShort());
 			new PrintHandler(staff)
-				.addContent(JobContentFactory.instance().createShiftContent(printType, staff, printers, onDuty, offDuty))
+				.addContent(JobContentFactory.instance().createShiftContent(printType, staff, printers, new DutyRange(onDuty, offDuty), regionId))
 				.fireAsync();
 			
 		}else if(printType.isMember()){
