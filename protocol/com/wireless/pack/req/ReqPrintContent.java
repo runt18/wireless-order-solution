@@ -3,29 +3,12 @@ package com.wireless.pack.req;
 import com.wireless.pack.Mode;
 import com.wireless.pack.Type;
 import com.wireless.parcel.Parcel;
+import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.printScheme.PType;
+import com.wireless.pojo.regionMgr.Region;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.staffMgr.Staff;
 
-/******************************************************
- * Design the print order 2 request looks like below
- * <Header>
- * mode : type : seq : reserved : pin[6] : len[2] : print_content
- * mode - PRINT
- * type - PRINT_BILL_2
- * seq - auto calculated and filled in
- * reserved - 0x00	
- * pin[6] - auto calculated and filled in
- * len[2] - length of the <Body>
- * <Body>
- * print_type[4] : order_id[4] : ori_tbl[2] : new_tbl[2] : on_duty[8] : off_duty[8]
- * print_type[4] - 4-byte indicates the print type
- * order_id[4] - 4-byte indicating the order id to print
- * ori_tbl[2] - 2-byte indicating the original table id
- * new_tbl[2] - 2-byte indicating the new table id
- * on_duty[8] - 8-byte indicating the on duty
- * off_duty[8] - 8-byte indicating the off duty
- *******************************************************/
 public class ReqPrintContent extends RequestPackage{
 	
 	public static ReqPrintContent buildReqPrintMemberReceipt(Staff staff, int memberOperationId){
@@ -36,19 +19,19 @@ public class ReqPrintContent extends RequestPackage{
 		return req;
 	}
 	
-	public static ReqPrintContent buildReqPrintShiftReceipt(Staff staff, long onDuty, long offDuty, PType shiftType){
-		if(shiftType != PType.PRINT_SHIFT_RECEIPT &&
-		   shiftType != PType.PRINT_TEMP_SHIFT_RECEIPT &&
-		   shiftType != PType.PRINT_DAILY_SETTLE_RECEIPT &&
-		   shiftType != PType.PRINT_HISTORY_SHIFT_RECEIPT &&
-		   shiftType != PType.PRINT_HISTORY_DAILY_SETTLE_RECEIPT){
-			
+	public static ReqPrintContent buildReqPrintShiftReceipt(Staff staff, DutyRange range, PType shiftType){
+		return buildReqPrintShiftReceipt(staff, range, Region.RegionId.REGION_1, shiftType);
+	}
+	
+	public static ReqPrintContent buildReqPrintShiftReceipt(Staff staff, DutyRange range, Region.RegionId regionId, PType shiftType){
+		if(!shiftType.isShift()){
 			throw new IllegalArgumentException("The shift type(val = " + shiftType + ") is invalid.");
 		}
 		ReqPrintContent req = new ReqPrintContent(staff, shiftType);
 		Parcel p = new Parcel();
-		p.writeLong(onDuty);
-		p.writeLong(offDuty);
+		p.writeLong(range.getOnDuty());
+		p.writeLong(range.getOffDuty());
+		p.writeShort(regionId.getId());
 		req.body = p.marshall();
 		return req;
 	}
