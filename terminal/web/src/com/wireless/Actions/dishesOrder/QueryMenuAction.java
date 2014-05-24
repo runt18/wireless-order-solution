@@ -48,7 +48,6 @@ public class QueryMenuAction extends DispatchAction {
 	
 			@Override
 			public void fromJsonMap(JsonMap jsonMap, int flag) {
-				// TODO Auto-generated method stub
 				
 			}
 		});

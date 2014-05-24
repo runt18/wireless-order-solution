@@ -18,10 +18,11 @@ import com.wireless.exception.ErrorCode;
 import com.wireless.exception.FrontBusinessError;
 import com.wireless.json.JObject;
 import com.wireless.pack.ProtocolPackage;
-import com.wireless.pack.Reserved;
 import com.wireless.pack.Type;
 import com.wireless.pack.req.ReqPrintContent;
 import com.wireless.parcel.Parcel;
+import com.wireless.pojo.billStatistics.DutyRange;
+import com.wireless.pojo.printScheme.PType;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.DateUtil;
@@ -126,19 +127,19 @@ public class PrintOrderAction extends Action{
 					reqPrintContent = ReqPrintContent.buildReqPrintReceipt(staff, orderId);
 					break;
 				case 4:
-					reqPrintContent = ReqPrintContent.buildReqPrintShiftReceipt(staff, onDuty, offDuty, Reserved.PRINT_SHIFT_RECEIPT);
+					reqPrintContent = ReqPrintContent.buildReqPrintShiftReceipt(staff, new DutyRange(onDuty, offDuty), PType.PRINT_SHIFT_RECEIPT);
 					break;
 				case 5:
-					reqPrintContent = ReqPrintContent.buildReqPrintShiftReceipt(staff, onDuty, offDuty, Reserved.PRINT_TEMP_SHIFT_RECEIPT);
+					reqPrintContent = ReqPrintContent.buildReqPrintShiftReceipt(staff, new DutyRange(onDuty, offDuty), PType.PRINT_TEMP_SHIFT_RECEIPT);
 					break;
 				case 6:
-					reqPrintContent = ReqPrintContent.buildReqPrintShiftReceipt(staff, onDuty, offDuty, Reserved.PRINT_DAILY_SETTLE_RECEIPT);
+					reqPrintContent = ReqPrintContent.buildReqPrintShiftReceipt(staff, new DutyRange(onDuty, offDuty), PType.PRINT_DAILY_SETTLE_RECEIPT);
 					break;
 				case 7:
-					reqPrintContent = ReqPrintContent.buildReqPrintShiftReceipt(staff, onDuty, offDuty, Reserved.PRINT_HISTORY_SHIFT_RECEIPT);
+					reqPrintContent = ReqPrintContent.buildReqPrintShiftReceipt(staff, new DutyRange(onDuty, offDuty), PType.PRINT_HISTORY_SHIFT_RECEIPT);
 					break;
 				case 8:
-					reqPrintContent = ReqPrintContent.buildReqPrintShiftReceipt(staff, onDuty, offDuty, Reserved.PRINT_HISTORY_DAILY_SETTLE_RECEIPT);
+					reqPrintContent = ReqPrintContent.buildReqPrintShiftReceipt(staff, new DutyRange(onDuty, offDuty), PType.PRINT_HISTORY_DAILY_SETTLE_RECEIPT);
 					break;
 				default:
 					reqPrintContent = null;
