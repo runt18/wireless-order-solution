@@ -15,6 +15,8 @@ public enum PType {
 	PRINT_ALL_HURRIED_FOOD(9, "催菜"),
 	PRINT_HURRIED_FOOD(10, "催菜"),
 	PRINT_MEMBER_RECEIPT(11, "会员对账单"),
+	PRINT_PAYMENT_RECEIPT(12, "交款表"),
+	PRINT_HISTORY_PAYMENT_RECEIPT(13, "历史交款表"),
 	PRINT_HISTORY_DAILY_SETTLE_RECEIPT(122, "历史日结"),
 	PRINT_HISTORY_SHIFT_RECEIPT(123, "历史交班"),
 	PRINT_DAILY_SETTLE_RECEIPT(124, "日结表"),
@@ -73,7 +75,8 @@ public enum PType {
 	public boolean isShift(){
 		return this == PType.PRINT_SHIFT_RECEIPT || this == PType.PRINT_TEMP_SHIFT_RECEIPT || 
 			   this == PType.PRINT_DAILY_SETTLE_RECEIPT || this == PType.PRINT_HISTORY_DAILY_SETTLE_RECEIPT ||
-			   this == PType.PRINT_HISTORY_SHIFT_RECEIPT;
+			   this == PType.PRINT_HISTORY_SHIFT_RECEIPT || this == PType.PRINT_PAYMENT_RECEIPT ||
+			   this == PType.PRINT_HISTORY_PAYMENT_RECEIPT;
 	}
 	
 	public boolean isMember(){

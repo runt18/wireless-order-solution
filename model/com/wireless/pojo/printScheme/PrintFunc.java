@@ -339,12 +339,8 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 			
 		}else if(mType == PType.PRINT_RECEIPT){
 			return typeToCompare == PType.PRINT_RECEIPT ||
-				   typeToCompare == PType.PRINT_SHIFT_RECEIPT ||
-				   typeToCompare == PType.PRINT_TEMP_SHIFT_RECEIPT ||
-				   typeToCompare == PType.PRINT_DAILY_SETTLE_RECEIPT ||
-				   typeToCompare == PType.PRINT_HISTORY_DAILY_SETTLE_RECEIPT ||
-				   typeToCompare == PType.PRINT_HISTORY_SHIFT_RECEIPT ||
-				   typeToCompare == PType.PRINT_MEMBER_RECEIPT;
+				   typeToCompare == PType.PRINT_MEMBER_RECEIPT ||
+				   typeToCompare.isShift();
 			
 		}else if(mType == PType.PRINT_TEMP_RECEIPT){
 			return typeToCompare == PType.PRINT_TEMP_RECEIPT;
