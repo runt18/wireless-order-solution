@@ -11,6 +11,7 @@ import com.wireless.exception.BusinessException;
 import com.wireless.exception.FrontBusinessError;
 import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.dishesOrder.Order;
+import com.wireless.pojo.dishesOrder.Order.PayType;
 import com.wireless.pojo.dishesOrder.OrderSummary;
 import com.wireless.pojo.distMgr.Discount;
 import com.wireless.pojo.regionMgr.Table;
@@ -19,29 +20,143 @@ import com.wireless.util.DateType;
 
 public class OrderDao {
 
-	public static class Filter{
+	public static class ExtraCond{
 		private final DateType dateType;
 		private int orderId = -1;
 		private int tableAlias = -1;
 		private String tableName;
 		private short regionId = -1;
-		private DutyRange range;
-		private Order.PayType payType;
+		private DutyRange orderRange;
+		private PayType payType;
 		
-		public Filter(DateType dateType){
+		private boolean isRepaid;		//是否有反结帐
+		private boolean isDiscount;		//是否有折扣
+		private boolean isGift;			//是否有赠送
+		private boolean isCancelled;	//是否有退菜
+		private boolean isErased;		//是否有抹数
+		private boolean isCoupon;		//是否有使用优惠券
+		
+		public ExtraCond(DateType dateType){
 			this.dateType = dateType;
 		}
 		
-		public void setOrderId(int orderId){
+		public ExtraCond setOrderId(int orderId){
 			this.orderId = orderId;
+			return this;
+		}
+		
+		public ExtraCond setTableAlias(int tableAlias){
+			this.tableAlias = tableAlias;
+			return this;
+		}
+		
+		public ExtraCond setTableName(String tableName){
+			this.tableName = tableName;
+			return this;
+		}
+		
+		public ExtraCond setRegionId(short regionId){
+			this.regionId = regionId;
+			return this;
+		}
+		
+		public ExtraCond setOrderRange(DutyRange orderRange){
+			this.orderRange = orderRange;
+			return this;
+		}
+		
+		public ExtraCond setPayType(PayType payType){
+			this.payType = payType;
+			return this;
+		}
+		
+		public ExtraCond isRepaid(boolean onOff){
+			this.isRepaid = onOff;
+			return this;
+		}
+		
+		public ExtraCond isDiscount(boolean onOff){
+			this.isDiscount = onOff;
+			return this;
+		}
+		
+		public ExtraCond isGift(boolean onOff){
+			this.isGift = onOff;
+			return this;
+		}
+		
+		public ExtraCond isCancelled(boolean onOff){
+			this.isCancelled = onOff;
+			return this;
+		}
+
+		public ExtraCond isErased(boolean onOff){
+			this.isErased = onOff;
+			return this;
+		}
+		
+		public ExtraCond isCoupon(boolean onOff){
+			this.isCoupon = onOff;
+			return this;
 		}
 		
 		@Override
 		public String toString(){
+			final String orderTbl;
+			if(dateType == DateType.TODAY){
+				orderTbl = "O";
+			}else{
+				orderTbl = "OH";
+			}
 			StringBuilder filterCond = new StringBuilder();
-			filterCond.append("AND 1 = 1");
+			filterCond.append(" AND 1 = 1");
+			
 			if(orderId > 0){
-				filterCond.append("AND O.id = " + orderId);
+				filterCond.append(" AND " + orderTbl + ".id = " + orderId);
+			}
+			
+			if(tableAlias > 0){
+				filterCond.append(" AND " + orderTbl + ".table_alias = " + tableAlias);
+			}
+			
+			if(tableName != null){
+				filterCond.append(" AND " + orderTbl + ".table_name LIKE '%" + tableName + "%'");
+			}
+			
+			if(regionId > 0){
+				filterCond.append(" AND " + orderTbl + ".region_id = " + regionId);
+			}
+			
+			if(orderRange != null){
+				filterCond.append(" AND " + orderTbl + ".order_date BETWEEN '" + orderRange.getOnDutyFormat() + "' AND '" + orderRange.getOffDutyFormat() + "'");
+			}
+			
+			if(payType != null){
+				filterCond.append(" AND " + orderTbl + ".pay_type = " + payType.getVal());
+			}
+			
+			if(isRepaid){
+				filterCond.append(" AND " + orderTbl + ".status = " + Order.Status.REPAID.getVal());
+			}
+			
+			if(isDiscount){
+				filterCond.append(" AND " + orderTbl + ".discount_price > 0");
+			}
+			
+			if(isGift){
+				filterCond.append(" AND " + orderTbl + ".gift_price > 0");
+			}
+			
+			if(isCancelled){
+				filterCond.append(" AND " + orderTbl + ".cancel_price > 0");
+			}
+			
+			if(isErased){
+				filterCond.append(" AND " + orderTbl + ".erase_price > 0");
+			}
+			
+			if(isCoupon){
+				filterCond.append(" AND " + orderTbl + ".coupon_price > 0");
 			}
 			return filterCond.toString();
 		}
@@ -223,14 +338,7 @@ public class OrderDao {
 	 */
 	public static Order getById(DBCon dbCon, Staff staff, int orderId, DateType dateType) throws BusinessException, SQLException{
 		
-		String extraCond = null;
-		if(dateType == DateType.TODAY){
-			extraCond = "AND O.id = " + orderId;
-		}else if(dateType == DateType.HISTORY){
-			extraCond = " AND OH.id = " + orderId;
-		}
-		
-		List<Order> results = getByCond(dbCon, staff, extraCond, null, dateType);
+		List<Order> results = getByCond(dbCon, staff, new ExtraCond(dateType).setOrderId(orderId), null, dateType);
 		if(results.isEmpty()){
 			throw new BusinessException("The order(id = " + orderId + ") does NOT exist.", FrontBusinessError.ORDER_NOT_EXIST);
 		}else{
@@ -254,7 +362,7 @@ public class OrderDao {
 	 * @throws BusinessException 
 	 * 			   throws if any associated taste group is NOT found
 	 */
-	public static List<Order> getByCond(Staff staff, String extraCond, String orderClause, DateType dateType) throws SQLException, BusinessException{
+	public static List<Order> getByCond(Staff staff, ExtraCond extraCond, String orderClause, DateType dateType) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -283,9 +391,9 @@ public class OrderDao {
 	 * @throws BusinessException 
 	 * 			   throws if any associated taste group is NOT found
 	 */
-	public static List<Order> getByCond(DBCon dbCon, Staff staff, String extraCond, String orderClause, DateType dateType) throws SQLException, BusinessException{
+	public static List<Order> getByCond(DBCon dbCon, Staff staff, ExtraCond extraCond, String orderClause, DateType dateType) throws SQLException, BusinessException{
 
-		List<Order> result = getPureOrder(dbCon, staff, extraCond, orderClause, dateType);
+		List<Order> result = getPureOrder(dbCon, staff, extraCond.toString(), orderClause, dateType);
 		
 		for(Order eachOrder : result){
 			//Get the order foods to each order.
@@ -315,7 +423,7 @@ public class OrderDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static List<Order> getPureOrder(DBCon dbCon, Staff staff, String extraCond, String orderClause, DateType dateType) throws SQLException{
+	private static List<Order> getPureOrder(DBCon dbCon, Staff staff, String extraCond, String orderClause, DateType dateType) throws SQLException{
 		String sql;
 		if(dateType == DateType.TODAY){
 			sql = " SELECT " +
@@ -437,11 +545,11 @@ public class OrderDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static List<Order> getPureOrder(Staff staff, String extraCond, String orderClause, DateType dateType) throws SQLException{
+	public static List<Order> getPureOrder(Staff staff, ExtraCond extraCond, String orderClause, DateType dateType) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return getPureOrder(dbCon, staff, extraCond, orderClause, dateType);
+			return getPureOrder(dbCon, staff, extraCond.toString(), orderClause, dateType);
 		}finally{
 			dbCon.disconnect();
 		}
