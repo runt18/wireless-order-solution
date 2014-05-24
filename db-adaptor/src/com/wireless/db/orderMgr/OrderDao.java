@@ -21,13 +21,17 @@ import com.wireless.util.DateType;
 public class OrderDao {
 
 	public static class ExtraCond{
+		public final String orderTbl;
 		private final DateType dateType;
-		private int orderId = -1;
-		private int tableAlias = -1;
-		private String tableName;
-		private short regionId = -1;
-		private DutyRange orderRange;
-		private PayType payType;
+		private int orderId = -1;		//按账单号
+		private int seqId = -1;			//按流水号
+		private int tableAlias = -1;	//按餐台号
+		private String tableName;		//按餐台名称
+		private short regionId = -1;	//按区域
+		private DutyRange orderRange;	//按结账日期
+		private PayType payType;		//按付款类型
+		private String comment;			//按备注
+		private Order.Status status;	//按状态状态
 		
 		private boolean isRepaid;		//是否有反结帐
 		private boolean isDiscount;		//是否有折扣
@@ -38,10 +42,20 @@ public class OrderDao {
 		
 		public ExtraCond(DateType dateType){
 			this.dateType = dateType;
+			if(dateType == DateType.TODAY){
+				orderTbl = "O";
+			}else{
+				orderTbl = "OH";
+			}
 		}
 		
 		public ExtraCond setOrderId(int orderId){
 			this.orderId = orderId;
+			return this;
+		}
+		
+		public ExtraCond setSeqId(int seqId){
+			this.seqId = seqId;
 			return this;
 		}
 		
@@ -67,6 +81,16 @@ public class OrderDao {
 		
 		public ExtraCond setPayType(PayType payType){
 			this.payType = payType;
+			return this;
+		}
+		
+		public ExtraCond setComment(String comment){
+			this.comment = comment;
+			return this;
+		}
+		
+		public ExtraCond setStatus(Order.Status status){
+			this.status = status;
 			return this;
 		}
 		
@@ -102,17 +126,16 @@ public class OrderDao {
 		
 		@Override
 		public String toString(){
-			final String orderTbl;
-			if(dateType == DateType.TODAY){
-				orderTbl = "O";
-			}else{
-				orderTbl = "OH";
-			}
+
 			StringBuilder filterCond = new StringBuilder();
 			filterCond.append(" AND 1 = 1");
 			
 			if(orderId > 0){
 				filterCond.append(" AND " + orderTbl + ".id = " + orderId);
+			}
+			
+			if(seqId > 0){
+				filterCond.append(" AND " + orderTbl + ".seq_id = " + seqId);
 			}
 			
 			if(tableAlias > 0){
@@ -133,6 +156,14 @@ public class OrderDao {
 			
 			if(payType != null){
 				filterCond.append(" AND " + orderTbl + ".pay_type = " + payType.getVal());
+			}
+			
+			if(comment != null){
+				filterCond.append(" AND " + orderTbl + ".comment LIKE '%" + tableName + "%'");
+			}
+			
+			if(status != null){
+				filterCond.append(" AND " + orderTbl + ".status = " + status.getVal());
 			}
 			
 			if(isRepaid){
@@ -338,7 +369,7 @@ public class OrderDao {
 	 */
 	public static Order getById(DBCon dbCon, Staff staff, int orderId, DateType dateType) throws BusinessException, SQLException{
 		
-		List<Order> results = getByCond(dbCon, staff, new ExtraCond(dateType).setOrderId(orderId), null, dateType);
+		List<Order> results = getByCond(dbCon, staff, new ExtraCond(dateType).setOrderId(orderId), null);
 		if(results.isEmpty()){
 			throw new BusinessException("The order(id = " + orderId + ") does NOT exist.", FrontBusinessError.ORDER_NOT_EXIST);
 		}else{
@@ -354,19 +385,17 @@ public class OrderDao {
 	 *            the extra condition to query
 	 * @param orderClause
 	 * 			  the order clause to query
-	 * @param dateType
-	 * 			  indicates which date type {@link DateType} should use
 	 * @return the list holding the result to each order detail information
 	 * @throws SQLException
 	 *             throws if fail to execute any SQL statement
 	 * @throws BusinessException 
 	 * 			   throws if any associated taste group is NOT found
 	 */
-	public static List<Order> getByCond(Staff staff, ExtraCond extraCond, String orderClause, DateType dateType) throws SQLException, BusinessException{
+	public static List<Order> getByCond(Staff staff, ExtraCond extraCond, String orderClause) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return getByCond(dbCon, staff, extraCond, orderClause, dateType);
+			return getByCond(dbCon, staff, extraCond, orderClause);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -383,23 +412,21 @@ public class OrderDao {
 	 *            the extra condition to query
 	 * @param orderClause
 	 * 			  the order clause to query
-	 * @param dateType
-	 * 			  indicates which date type {@link DateType} should use
 	 * @return the list holding the result to each order detail information
 	 * @throws SQLException
 	 *             throws if fail to execute any SQL statement
 	 * @throws BusinessException 
 	 * 			   throws if any associated taste group is NOT found
 	 */
-	public static List<Order> getByCond(DBCon dbCon, Staff staff, ExtraCond extraCond, String orderClause, DateType dateType) throws SQLException, BusinessException{
+	public static List<Order> getByCond(DBCon dbCon, Staff staff, ExtraCond extraCond, String orderClause) throws SQLException, BusinessException{
 
-		List<Order> result = getPureOrder(dbCon, staff, extraCond.toString(), orderClause, dateType);
+		List<Order> result = getPureOrder(dbCon, staff, extraCond.toString(), orderClause, extraCond.dateType);
 		
 		for(Order eachOrder : result){
 			//Get the order foods to each order.
-			if(dateType == DateType.TODAY){
+			if(extraCond.dateType == DateType.TODAY){
 				eachOrder.setOrderFoods(OrderFoodDao.getDetailToday(dbCon, staff, " AND OF.order_id = " + eachOrder.getId(), null));					
-			}else if(dateType == DateType.HISTORY){
+			}else if(extraCond.dateType == DateType.HISTORY){
 				eachOrder.setOrderFoods(OrderFoodDao.getDetailHistory(dbCon, staff, " AND OFH.order_id = " + eachOrder.getId(), null));
 			} 
 		}
@@ -539,17 +566,15 @@ public class OrderDao {
 	 * 			the extra condition
 	 * @param orderClause
 	 * 			the order clause
-	 * @param dateType
-	 * 			  indicates which date type {@link DateType} should use
 	 * @return the list holding the pure order
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static List<Order> getPureOrder(Staff staff, ExtraCond extraCond, String orderClause, DateType dateType) throws SQLException{
+	public static List<Order> getPureOrder(Staff staff, ExtraCond extraCond, String orderClause) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return getPureOrder(dbCon, staff, extraCond.toString(), orderClause, dateType);
+			return getPureOrder(dbCon, staff, extraCond.toString(), orderClause, extraCond.dateType);
 		}finally{
 			dbCon.disconnect();
 		}
