@@ -39,11 +39,11 @@ public class SaleDetailsDao {
 	 * @return
 	 * @throws SQLException
 	 */
-	public static SalesDetail[] execByDept(Staff staff, String onDuty, String offDuty, DateType queryType) throws SQLException{
+	public static SalesDetail[] execByDept(Staff staff, String onDuty, String offDuty, DateType queryType, String extraCond) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return execByDept(dbCon, staff, onDuty, offDuty, queryType);
+			return execByDept(dbCon, staff, onDuty, offDuty, queryType, extraCond);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -66,7 +66,7 @@ public class SaleDetailsDao {
 	 * @throws SQLException
 	 * 			throws if any error occurred while execute any SQL statements.
 	 */
-	public static SalesDetail[] execByDept(DBCon dbCon, Staff staff, String onDuty, String offDuty, DateType queryType) throws SQLException{
+	public static SalesDetail[] execByDept(DBCon dbCon, Staff staff, String onDuty, String offDuty, DateType queryType, String extraCond) throws SQLException{
 		List<IncomeByDept> deptIncomes;
 
 		if(queryType.isHistory()){
@@ -81,10 +81,10 @@ public class SaleDetailsDao {
 			}
 			
 			//Calculate the incomes to each department.
-			deptIncomes = CalcBillStatisticsDao.calcIncomeByDept(dbCon, staff, dutyRange, null, queryType);
+			deptIncomes = CalcBillStatisticsDao.calcIncomeByDept(dbCon, staff, dutyRange, extraCond, queryType);
 		}else{
 			//Calculate the incomes to each department.
-			deptIncomes = CalcBillStatisticsDao.calcIncomeByDept(dbCon, staff, new DutyRange(onDuty, offDuty), null, queryType);
+			deptIncomes = CalcBillStatisticsDao.calcIncomeByDept(dbCon, staff, new DutyRange(onDuty, offDuty), extraCond, queryType);
 		}
 		
 		HashMap<Department, SalesDetail> deptSalesDetail = new HashMap<Department, SalesDetail>();
@@ -169,11 +169,11 @@ public class SaleDetailsDao {
 	 * @return
 	 * @throws SQLException
 	 */
-	public static SalesDetail[] execByKitchen(Staff staff, String onDuty, String offDuty, DateType queryType) throws SQLException{
+	public static SalesDetail[] execByKitchen(Staff staff, String onDuty, String offDuty, DateType queryType, String extraCond) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return execByKitchen(dbCon, staff, onDuty, offDuty, queryType);
+			return execByKitchen(dbCon, staff, onDuty, offDuty, queryType, extraCond);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -189,7 +189,7 @@ public class SaleDetailsDao {
 	 * @return
 	 * @throws SQLException
 	 */
-	public static SalesDetail[] execByKitchen(DBCon dbCon, Staff term, String onDuty, String offDuty, DateType queryType) throws SQLException{
+	public static SalesDetail[] execByKitchen(DBCon dbCon, Staff term, String onDuty, String offDuty, DateType queryType, String extraCond) throws SQLException{
 		
 		List<IncomeByKitchen> kitchenIncomes;
 
@@ -204,12 +204,12 @@ public class SaleDetailsDao {
 				return new SalesDetail[0];
 			}
 			//Calculate the incomes to each kitchen.
-			kitchenIncomes = CalcBillStatisticsDao.calcIncomeByKitchen(dbCon, term, dutyRange, null, queryType);
+			kitchenIncomes = CalcBillStatisticsDao.calcIncomeByKitchen(dbCon, term, dutyRange, extraCond, queryType);
 			
 		}else{
 			
 			//Calculate the incomes to each kitchen.
-			kitchenIncomes = CalcBillStatisticsDao.calcIncomeByKitchen(dbCon, term, new DutyRange(onDuty, offDuty), null, queryType);
+			kitchenIncomes = CalcBillStatisticsDao.calcIncomeByKitchen(dbCon, term, new DutyRange(onDuty, offDuty), extraCond, queryType);
 		}
 		
 		HashMap<Kitchen, SalesDetail> kitchenSalesDetail = new HashMap<Kitchen, SalesDetail>();
@@ -287,11 +287,11 @@ public class SaleDetailsDao {
 	 * @return
 	 * @throws SQLException
 	 */
-	public static SalesDetail[] execByFood(Staff term, String onDuty, String offDuty, int[] deptID, int orderType, DateType queryType, String foodName) throws SQLException{
+	public static SalesDetail[] execByFood(Staff term, String onDuty, String offDuty, int[] deptID, int orderType, DateType queryType, String foodName, int region) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return execByFood(dbCon, term, onDuty, offDuty, deptID, orderType, queryType, foodName);
+			return execByFood(dbCon, term, onDuty, offDuty, deptID, orderType, queryType, foodName, region);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -317,7 +317,7 @@ public class SaleDetailsDao {
 	 * @throws SQLException
 	 * 			throws if any error occurred while execute any SQL statements.
 	 */
-	public static SalesDetail[] execByFood(DBCon dbCon, Staff term, String onDuty, String offDuty, int[] deptID, int orderType, DateType queryType, String foodName) throws SQLException{
+	public static SalesDetail[] execByFood(DBCon dbCon, Staff term, String onDuty, String offDuty, int[] deptID, int orderType, DateType queryType, String foodName, int region) throws SQLException{
 		
 		StringBuilder deptCond = new StringBuilder();
 		if(deptID.length != 0){
@@ -347,7 +347,8 @@ public class SaleDetailsDao {
 				term, 
 				dutyRange,
 				(foodName != null && !foodName.trim().isEmpty() ? " AND OF.name LIKE '%" + foodName + "%'" : "") +
-				(deptID.length != 0 ? " AND OF.dept_id IN(" + deptCond + ")" : ""), 
+				(deptID.length != 0 ? " AND OF.dept_id IN(" + deptCond + ")" : "") +
+				(region != -1 ? (" AND O.region_id = " + region) : ""), 
 				queryType
 			);
 		}else{
@@ -355,7 +356,8 @@ public class SaleDetailsDao {
 				term,
 				new DutyRange(onDuty, offDuty),
 				(foodName != null && !foodName.trim().isEmpty() ? " AND OF.name LIKE '%" + foodName + "%'" : "") +
-				(deptID.length != 0 ? " AND OF.dept_id IN(" + deptCond + ")" : ""), 
+				(deptID.length != 0 ? " AND OF.dept_id IN(" + deptCond + ")" : "") +
+				(region != -1 ? (" AND O.region_id = " + region) : ""), 
 				queryType
 			);
 		}
