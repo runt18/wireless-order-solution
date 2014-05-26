@@ -8,6 +8,7 @@ import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.SMSError;
+import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.sms.SMSDetail;
 import com.wireless.pojo.sms.SMStat;
 import com.wireless.pojo.staffMgr.Staff;
@@ -304,5 +305,26 @@ public class SMStatDao {
 		dbCon.stmt.executeUpdate(sql);
 		sql = " DELETE FROM " + Params.dbName + ".sms_detail WHERE restaurant_id = " + staff.getRestaurantId();
 		dbCon.stmt.executeUpdate(sql);
+	}
+	
+	/**
+	 * Sweep the sms detail records which have been expired.
+	 * @param dbCon
+	 * 			the database connection
+	 * @return the amount of sms detail records to sweep
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static int sweep(DBCon dbCon) throws SQLException{
+		// Delete the SMS details which has been expired.
+		String sql;
+		sql = " DELETE SMS_D FROM " + 
+			  Params.dbName + ".sms_detail AS SMS_D, " +
+			  Params.dbName + ".restaurant AS REST " +
+			  " WHERE 1 = 1 " +
+			  " AND REST.id > " + Restaurant.RESERVED_7 +
+			  " AND SMS_D.restaurant_id = REST.id " +
+			  " AND UNIX_TIMESTAMP(NOW()) - UNIX_TIMESTAMP(SMS_D.modified) > REST.record_alive ";
+		return dbCon.stmt.executeUpdate(sql);
 	}
 }

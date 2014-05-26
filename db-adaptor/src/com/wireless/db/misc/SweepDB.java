@@ -5,6 +5,9 @@ import java.text.SimpleDateFormat;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
+import com.wireless.db.shift.PaymentDao;
+import com.wireless.db.shift.ShiftDao;
+import com.wireless.db.sms.SMStatDao;
 import com.wireless.pojo.restaurantMgr.Restaurant;
 
 /**
@@ -29,6 +32,7 @@ public class SweepDB {
 		private int totalExpiredDailySettle;		//the expired amount of daily settle
 		private int totalExpiredMemberOperation;	//the expired amount of member operation
 		private int totalExpiredSMSDetail;			//the expired amount of sms detail
+		private int totalExpiredPayment;			//the expired amount of payment
 		
 		@Override
 		public String toString(){
@@ -36,53 +40,18 @@ public class SweepDB {
 			
 			StringBuilder taskInfo = new StringBuilder();
 			taskInfo.append("Sweeper task starts on " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z").format(new java.util.Date())).append(sep);
-			taskInfo.append("info : ").append(getTotalExpiredOrderDetail()).append(" record(s) are deleted from \"order_food_history\" table").append(sep);
-			taskInfo.append("info : ").append(getTotalExpiredOrder()).append(" record(s) are deleted from \"order_history\" table").append(sep);
-			taskInfo.append("info : ").append(getTotalExpiredTG()).append(" record(s) are deleted from \"taste_group_history\" table").append(sep);
-			taskInfo.append("info : ").append(getTotalExpiredNormalTG()).append(" record(s) are deleted from \"normal_taste_group_history\" table").append(sep);
-			taskInfo.append("info : ").append(getTotalExpiredShift()).append(" record(s) are deleted from \"shift_history\" table").append(sep);
-			taskInfo.append("info : ").append(getTotalExpiredDailySettle()).append(" record(s) are deleted from \"daily_settle_history\" table").append(sep);
-			taskInfo.append("info : ").append(getTotalExpiredMemberOperation()).append(" record(s) are deleled from \"member_operation_history\" table").append(sep);
-			taskInfo.append("info : ").append(getTotalExpiredSMSDetail()).append(" record(s) are deleted from \"sms_detail\" table").append(sep);
-			taskInfo.append("info : sweep db takes ").append(getElapsed()).append(" sec.").append(sep);
+			taskInfo.append("info : ").append(totalExpiredOrderDetail).append(" record(s) are deleted from \"order_food_history\" table").append(sep);
+			taskInfo.append("info : ").append(totalExpiredOrder).append(" record(s) are deleted from \"order_history\" table").append(sep);
+			taskInfo.append("info : ").append(totalExpiredTG).append(" record(s) are deleted from \"taste_group_history\" table").append(sep);
+			taskInfo.append("info : ").append(totalExpiredNormalTG).append(" record(s) are deleted from \"normal_taste_group_history\" table").append(sep);
+			taskInfo.append("info : ").append(totalExpiredShift).append(" record(s) are deleted from \"shift_history\" table").append(sep);
+			taskInfo.append("info : ").append(totalExpiredDailySettle).append(" record(s) are deleted from \"daily_settle_history\" table").append(sep);
+			taskInfo.append("info : ").append(totalExpiredMemberOperation).append(" record(s) are deleled from \"member_operation_history\" table").append(sep);
+			taskInfo.append("info : ").append(totalExpiredSMSDetail).append(" record(s) are deleted from \"sms_detail\" table").append(sep);
+			taskInfo.append("info : ").append(totalExpiredPayment).append(" record(s) are deleted from \"payment_history\" table").append(sep);
+			taskInfo.append("info : sweep db takes ").append(elapsedTime).append(" sec.").append(sep);
 			
 			return taskInfo.toString();
-		}
-
-		public int getTotalExpiredSMSDetail(){
-			return this.totalExpiredSMSDetail;
-		}
-		
-		public int getTotalExpiredOrder() {
-			return totalExpiredOrder;
-		}
-
-		public int getTotalExpiredOrderDetail() {
-			return totalExpiredOrderDetail;
-		}
-
-		public int getTotalExpiredTG() {
-			return totalExpiredTG;
-		}
-
-		public int getTotalExpiredNormalTG() {
-			return totalExpiredNormalTG;
-		}
-
-		public int getTotalExpiredShift() {
-			return totalExpiredShift;
-		}
-
-		public int getTotalExpiredDailySettle() {
-			return totalExpiredDailySettle;
-		}
-		
-		public int getTotalExpiredMemberOperation(){
-			return totalExpiredMemberOperation;
-		}
-		
-		public int getElapsed(){
-			return this.elapsedTime;
 		}
 
 	}
@@ -143,14 +112,7 @@ public class SweepDB {
 			result.totalExpiredNormalTG = dbCon.stmt.executeUpdate(sql);
 			
 			// Delete the history shift which has been expired.
-			sql = " DELETE SH FROM " + 
-				  Params.dbName + ".shift_history AS SH, " +
-				  Params.dbName + ".restaurant AS REST " +
-				  " WHERE 1 = 1 " +
-				  " AND REST.id > " + Restaurant.RESERVED_7 +
-				  " AND SH.restaurant_id = REST.id " +
-				  " AND UNIX_TIMESTAMP(NOW()) - UNIX_TIMESTAMP(SH.off_duty) > REST.record_alive ";
-			result.totalExpiredShift = dbCon.stmt.executeUpdate(sql);
+			result.totalExpiredShift = ShiftDao.sweep(dbCon);
 
 			// Delete the history daily shift which has been expired.
 			sql = " DELETE DSH FROM " + 
@@ -173,14 +135,10 @@ public class SweepDB {
 			result.totalExpiredMemberOperation = dbCon.stmt.executeUpdate(sql);
 			
 			// Delete the SMS details which has been expired.
-			sql = " DELETE SMS_D FROM " + 
-				  Params.dbName + ".sms_detail SMS_D, " +
-				  Params.dbName + ".restaurant AS REST " +
-				  " WHERE 1 = 1 " +
-				  " AND REST.id > " + Restaurant.RESERVED_7 +
-				  " AND SMS_D.restaurant_id = REST.id " +
-				  " AND UNIX_TIMESTAMP(NOW()) - UNIX_TIMESTAMP(SMS_D.modified) > REST.record_alive ";
-			result.totalExpiredSMSDetail = dbCon.stmt.executeUpdate(sql);
+			result.totalExpiredSMSDetail = SMStatDao.sweep(dbCon);
+			
+			// Delete the history payment records which have been expired.
+			result.totalExpiredPayment = PaymentDao.sweep(dbCon);
 			
 			result.elapsedTime = ((int)(System.currentTimeMillis() - beginTime) / 1000);
 			

@@ -10,6 +10,8 @@ import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.deptMgr.DepartmentDao;
 import com.wireless.db.restaurantMgr.RestaurantDao;
+import com.wireless.db.shift.PaymentDao;
+import com.wireless.db.shift.ShiftDao;
 import com.wireless.db.stockMgr.StockActionDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.billStatistics.DutyRange;
@@ -44,7 +46,6 @@ public class DailySettleDao {
 		private int totalShift;				//当日交班的记录数
 		private int maxOrderId;				//order和order_history表的最大id
 		private int maxOrderFoodId;			//order_food和order_food_history表的最大id
-		private int maxShiftId;				//shift和shift_history表的最大id
 		private int maxTasteGroupId;		//taste_group和taste_group_history表的最大id
 		private int maxNormalTasteGroupId;	//normal_taste_group和normal_taste_group_history表的最大id
 		private int maxMemberOperationId;	//member_operation和member_operation_history表的最大id
@@ -102,14 +103,6 @@ public class DailySettleDao {
 			this.maxOrderFoodId = maxOrderFoodId;
 		}
 		
-		public int getMaxShiftId() {
-			return maxShiftId;
-		}
-		
-		void setMaxShiftId(int maxShiftId) {
-			this.maxShiftId = maxShiftId;
-		}
-		
 		public int getMaxTasteGroupId() {
 			return maxTasteGroupId;
 		}
@@ -153,8 +146,7 @@ public class DailySettleDao {
 			resultInfo.append("info : " + getTotalShift() + " record(s) are moved from \"shift\" to \"shift_history\"").append(sep);
 			resultInfo.append("info : " + 
 							  "maxium order id : " + getMaxOrderId() + ", " +
-							  "maxium order food id : " + getMaxOrderFoodId() + ", " +
-							  "maxium shift id : " + getMaxShiftId()).append(sep);
+							  "maxium order food id : " + getMaxOrderFoodId()).append(sep);
 			resultInfo.append("info : The record movement takes " + getElapsedTime() + " sec.");
 			
 			return resultInfo.toString();
@@ -222,7 +214,6 @@ public class DailySettleDao {
 			result.setTotalShift(result.getTotalShift() + eachResult.getTotalShift());
 			result.setMaxOrderFoodId(eachResult.getMaxOrderFoodId());
 			result.setMaxOrderId(eachResult.getMaxOrderId());
-			result.setMaxShiftId(eachResult.getMaxShiftId());
 		}
 		
 		result.setElapsedTime((int)(System.currentTimeMillis() - beginTime) / 1000);
@@ -411,16 +402,16 @@ public class DailySettleDao {
 		}
 		dbCon.rs.close();
 		
-		//Calculate the max shift id from both today and history.
-		sql = " SELECT MAX(id) + 1 FROM (" +
-			  " SELECT MAX(id) AS id FROM " + Params.dbName + ".shift " +
-			  " UNION " +
-			  " SELECT MAX(id) AS id FROM " + Params.dbName + ".shift_history) AS all_shift";
-		dbCon.rs = dbCon.stmt.executeQuery(sql);
-		if(dbCon.rs.next()){
-			result.setMaxShiftId(dbCon.rs.getInt(1));
-		}
-		dbCon.rs.close();
+//		//Calculate the max shift id from both today and history.
+//		sql = " SELECT MAX(id) + 1 FROM (" +
+//			  " SELECT MAX(id) AS id FROM " + Params.dbName + ".shift " +
+//			  " UNION " +
+//			  " SELECT MAX(id) AS id FROM " + Params.dbName + ".shift_history) AS all_shift";
+//		dbCon.rs = dbCon.stmt.executeQuery(sql);
+//		if(dbCon.rs.next()){
+//			result.setMaxShiftId(dbCon.rs.getInt(1));
+//		}
+//		dbCon.rs.close();
 		
 		//Calculate the max taste group id from both today and history.
 		sql = " SELECT MAX(taste_group_id) + 1 " +
@@ -483,7 +474,7 @@ public class DailySettleDao {
 				"`waiter`, `settle_type`, `pay_type`, `category`, `member_operation_id`, `staff_id`, " +
 				"`region_id`, `region_name`, `table_alias`, `table_name`, `service_rate`, `comment`";
 
-		final String shiftItem = "`id`, `restaurant_id`, `name`, `on_duty`, `off_duty`";
+//		final String shiftItem = "`id`, `restaurant_id`, `name`, `on_duty`, `off_duty`";
 		
 		try{
 			dbCon.conn.setAutoCommit(false);
@@ -511,11 +502,17 @@ public class DailySettleDao {
 				  " WHERE restaurant_id = " + staff.getRestaurantId();
 			dbCon.stmt.executeUpdate(sql);
 			
-			//Move the shift record from 'shift' to 'shift_history'.
-			sql = " INSERT INTO " + Params.dbName + ".shift_history (" + shiftItem + ") " +
-				  " SELECT " + shiftItem + " FROM " + Params.dbName + ".shift " +
-				  " WHERE " + (staff.getRestaurantId() < 0 ? "" : "restaurant_id = " + staff.getRestaurantId());
-			dbCon.stmt.executeUpdate(sql);
+//			//Move the shift record from 'shift' to 'shift_history'.
+//			sql = " INSERT INTO " + Params.dbName + ".shift_history (" + shiftItem + ") " +
+//				  " SELECT " + shiftItem + " FROM " + Params.dbName + ".shift " +
+//				  " WHERE " + (staff.getRestaurantId() < 0 ? "" : "restaurant_id = " + staff.getRestaurantId());
+//			dbCon.stmt.executeUpdate(sql);
+			
+			//Archive the shift records.
+			ShiftDao.archive(dbCon, staff);
+			
+			//Archive the payment records.
+			PaymentDao.archive(dbCon, staff);
 			
 			//Create the daily settle record
 			sql = " INSERT INTO " + Params.dbName + ".daily_settle_history (`restaurant_id`, `name`, `on_duty`, `off_duty`) VALUES (" +
@@ -574,20 +571,20 @@ public class DailySettleDao {
 			
 			}
 			
-			//Delete the shift records belong to this restaurant.
-			sql = " DELETE FROM " + Params.dbName + ".shift WHERE " + (staff.getRestaurantId() < 0 ? "" : "restaurant_id=" + staff.getRestaurantId());
-			dbCon.stmt.executeUpdate(sql);
-			
-			//Delete the shift record belongs to admin.
-			sql = " DELETE FROM " + Params.dbName + ".shift WHERE restaurant_id = " + Restaurant.ADMIN;
-			dbCon.stmt.executeUpdate(sql);
-			
-			//Insert a shift record with the max shift id belongs to admin.
-			sql = "INSERT INTO " + Params.dbName + ".shift (`id`, `restaurant_id`) VALUES (" +
-				  result.getMaxShiftId() + ", " +
-				  Restaurant.ADMIN +
-				  ")";
-			dbCon.stmt.executeUpdate(sql);
+//			//Delete the shift records belong to this restaurant.
+//			sql = " DELETE FROM " + Params.dbName + ".shift WHERE " + (staff.getRestaurantId() < 0 ? "" : "restaurant_id=" + staff.getRestaurantId());
+//			dbCon.stmt.executeUpdate(sql);
+//			
+//			//Delete the shift record belongs to admin.
+//			sql = " DELETE FROM " + Params.dbName + ".shift WHERE restaurant_id = " + Restaurant.ADMIN;
+//			dbCon.stmt.executeUpdate(sql);
+//			
+//			//Insert a shift record with the max shift id belongs to admin.
+//			sql = "INSERT INTO " + Params.dbName + ".shift (`id`, `restaurant_id`) VALUES (" +
+//				  result.getMaxShiftId() + ", " +
+//				  Restaurant.ADMIN +
+//				  ")";
+//			dbCon.stmt.executeUpdate(sql);
 			
 			//Delete the member operation to this restaurant
 			sql = " DELETE FROM " + Params.dbName + ".member_operation WHERE restaurant_id = " + staff.getRestaurantId();

@@ -112,7 +112,7 @@ public class ShiftGeneralDao {
 			  " WHERE 1 = 1 " +
 			  " AND SH.restaurant_id = " + staff.getRestaurantId() +
 			  (extraCond != null ? extraCond : " ") +
-			  (orderClause != null ? orderClause : "");
+			  (orderClause != null ? orderClause : " ORDER BY SH.off_duty ");
 		
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		List<ShiftGeneral> result = new ArrayList<ShiftGeneral>();
