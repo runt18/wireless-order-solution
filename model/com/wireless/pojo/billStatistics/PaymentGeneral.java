@@ -1,6 +1,11 @@
 package com.wireless.pojo.billStatistics;
 
-public class PaymentGeneral {
+import java.util.Map;
+
+import com.wireless.json.JsonMap;
+import com.wireless.json.Jsonable;
+
+public class PaymentGeneral implements Jsonable{
 	private String onDuty;				//开始时间
 	private String offDuty;				//结束时间
 	
@@ -37,6 +42,40 @@ public class PaymentGeneral {
 	
 	public void setOffDuty(String offDuty) {
 		this.offDuty = offDuty;
+	}
+	
+	public static enum Key4Json{
+		STAFF_NAME("staffName", "交款人"),
+		ON_DUTY("onDutyFormat", "开始时间"),
+		OFF_DUTY("offDutyFormat", "结束时间");
+		
+		Key4Json(String key, String desc){
+			this.key = key;
+			this.desc = desc;
+		}
+		
+		private final String key;
+		private final String desc;
+		
+		@Override
+		public String toString(){
+			return "key = " + key + ",desc = " + desc;
+		}
+		
+	}
+
+	@Override
+	public Map<String, Object> toJsonMap(int flag) {
+		JsonMap jm = new JsonMap();
+		jm.putString(Key4Json.STAFF_NAME.key, this.getStaffName());
+		jm.putString(Key4Json.ON_DUTY.key, this.getOnDuty());
+		jm.putString(Key4Json.OFF_DUTY.key, this.getOffDuty());
+		return jm;
+	}
+
+	@Override
+	public void fromJsonMap(JsonMap jsonMap, int flag) {
+		
 	}
 	
 }
