@@ -252,7 +252,7 @@ public class TodayStatisticsAction extends DispatchAction{
 		String region = request.getParameter("region");
 		
 		Staff staff = StaffDao.verify(Integer.parseInt(pin));
-		SalesDetail[] list = SaleDetailsDao.execByKitchen(staff, onDuty, offDuty, DateType.TODAY, (!region.equals("-1")? " AND O.region_id = " + region : ""));
+		SalesDetail[] list = SaleDetailsDao.getByKitchen(staff, onDuty, offDuty, DateType.TODAY, (!region.equals("-1")? " AND O.region_id = " + region : ""));
 		
 		HSSFWorkbook wb = new HSSFWorkbook();
 		HSSFSheet sheet = wb.createSheet("分厨销售统计(" + DateType.HISTORY.getDesc() + ")");

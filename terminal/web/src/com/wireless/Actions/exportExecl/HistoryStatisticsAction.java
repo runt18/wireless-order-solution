@@ -56,6 +56,7 @@ import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.Order.PayType;
 import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.menuMgr.Kitchen;
+import com.wireless.pojo.regionMgr.Region;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.stockMgr.StockAction;
 import com.wireless.pojo.stockMgr.StockAction.Status;
@@ -378,7 +379,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 		if(region != null && !region.equals("-1")){
 			extraCond = " AND O.region_id = " + region;
 		}
-		SalesDetail[] list = SaleDetailsDao.execByKitchen(staff, onDuty, offDuty, DateType.HISTORY, extraCond);
+		SalesDetail[] list = SaleDetailsDao.getByKitchen(staff, onDuty, offDuty, DateType.HISTORY, extraCond);
 		
 		HSSFWorkbook wb = new HSSFWorkbook();
 		HSSFSheet sheet = wb.createSheet("分厨销售统计(" + DateType.HISTORY.getDesc() + ")");
@@ -3063,7 +3064,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 			extraCond.setTableName(tableName);
 		}
 		if(region != null && !region.equals("-1")){
-			extraCond.setRegionId(Short.parseShort(region));
+			extraCond.setRegionId(Region.RegionId.valueOf(Short.parseShort(region)));
 		}
 		if(dateBeg != null && !dateBeg.isEmpty()){
 			DutyRange orderRange = new DutyRange(dateBeg, dateEnd);

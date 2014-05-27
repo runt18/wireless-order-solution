@@ -19,6 +19,7 @@ import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.Order.PayType;
 import com.wireless.pojo.dishesOrder.OrderSummary;
+import com.wireless.pojo.regionMgr.Region;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.util.DataPaging;
@@ -95,7 +96,7 @@ public class QueryOrderStatisticsAction extends Action {
 				extraCond.setTableName(tableName);
 			}
 			if(region != null && !region.equals("-1")){
-				extraCond.setRegionId(Short.parseShort(region));
+				extraCond.setRegionId(Region.RegionId.valueOf(Short.parseShort(region)));
 			}
 			if(dateBeg != null && !dateBeg.isEmpty()){
 				DutyRange orderRange = new DutyRange(dateBeg, dateEnd);

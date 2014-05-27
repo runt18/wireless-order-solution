@@ -118,7 +118,7 @@ public class SalesSubStatisticsAction extends Action {
 	  					foodName,
 	  					Integer.parseInt(region));
 			}else if(qt == SaleDetailsDao.QUERY_BY_KITCHEN){
-				saleDetails = SaleDetailsDao.execByKitchen(
+				saleDetails = SaleDetailsDao.getByKitchen(
 						StaffDao.verify(Integer.parseInt(pin)), 
 						dateBeg, 
 						dateEnd, 
