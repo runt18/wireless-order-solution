@@ -24,7 +24,7 @@ import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.util.DataPaging;
 import com.wireless.util.DateType;
 
-public class QueryTodayAction extends Action {
+public class QueryOrderStatisticsAction extends Action {
 	
 	public ActionForward execute(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
