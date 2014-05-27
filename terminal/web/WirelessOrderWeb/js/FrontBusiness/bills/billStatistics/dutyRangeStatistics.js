@@ -8,8 +8,7 @@
 	Ext.Ajax.request({
 		url : '../../PrintOrder.do',
 		params : {
-			isCookie : true,
-			'printType' : 5,
+			'printType' : statType == 1?5:12,
 			'onDuty' : gs['onDutyFormat'],
 			'offDuty' : gs['offDutyFormat']
 		},
@@ -30,7 +29,7 @@ function dutyRangeStatDetalHandler(){
 		var dutyRangeStatWin = Ext.getCmp('dutyRangeStatWin');
 		if(!dutyRangeStatWin){
 			dutyRangeStatWin = new Ext.Window({
-				title : '营业统计 -- <font style="color:green;">当日</font> -- 交班人:&nbsp;<font style="color:red;">' + gs['staffName'] + '</font>',
+				title : '营业统计 -- <font style="color:green;">当日</font> -- '+(statType == 1?'交班人':'交款人')+':&nbsp;<font style="color:red;">' + gs['staffName'] + '</font>',
 				id : 'dutyRangeStatWin',
 				width : 885,
 				height : 555,
@@ -42,7 +41,7 @@ function dutyRangeStatDetalHandler(){
 					text : '关闭',
 					iconCls : 'btn_close',
 					handler : function(){
-						dutyRangeStatWin.hide();
+						dutyRangeStatWin.destroy();
 					}
 				}],
 				keys : [{
@@ -67,9 +66,10 @@ function dutyRangeStatDetalHandler(){
 							params : {
 								d : '_' + new Date().getTime(),
 								dataSource : 'today',
-								queryPattern : 2,
-								onDuty : gs['onDuty'],
-								offDuty : gs['offDuty']
+								queryPattern : statType == 2? 5 : 2,
+								onDuty : statType == 1?gs['onDuty']:gs['onDutyFormat'],
+								offDuty : statType == 1?gs['offDuty']:gs['offDutyFormat'],
+								businessStatic : statType
 							}
 						});
 					}
@@ -87,24 +87,38 @@ function dutyRangePanelOperationRenderer(){
 		   + '<a href="javascript:dutyRangeStatPrintHandler()">补打</a>';
 }
 
-function dutyRangePanelInit(){
+function dutyRangePanelInit(c){
+	var url = '';
+	//交班
+	if(eval(c.statType == 1)){
+		url = '../../DutyRangeStat.do';
+	}else if(eval(c.statType == 2)){ //交款
+		url = '../../PaymentStat.do';
+	}
 	dutyRangePanelTbar = new Ext.Toolbar({
 		items : ['->', {
 			text : '刷新',
 			id : 'btnRefreshDutyRange',
 			iconCls : 'btn_refresh',
 			handler : function(){
-				loadShiftDuty();
-				// 清除后台返回的交班记录中全天和本班次记录段
-				var tempDate = {root:[]};
-				if(shiftDutyOfToday.root.length > 2){
-					for(var i = 0; i < shiftDutyOfToday.root.length; i++){
-						if(i != 0 && i != shiftDutyOfToday.root.length -1){
-							tempDate.root.push(shiftDutyOfToday.root[i]);
+				if(eval(c.statType == 1)){
+					loadShiftDuty();
+					// 清除后台返回的交班记录中全天和本班次记录段
+					var tempDate = {root:[]};
+					if(shiftDutyOfToday.root.length > 2){
+						for(var i = 0; i < shiftDutyOfToday.root.length; i++){
+							if(i != 0 && i != shiftDutyOfToday.root.length -1){
+								tempDate.root.push(shiftDutyOfToday.root[i]);
+							}
 						}
 					}
+					
+					dutyRangePanel.getStore().loadData(tempDate);
+				}else if(eval(c.statType == 2)){
+					loadPayment();
+					dutyRangePanel.getStore().loadData(paymentOfToday);
 				}
-				dutyRangePanel.getStore().loadData(tempDate);
+
 			}
 		}]
 	});
@@ -114,15 +128,15 @@ function dutyRangePanelInit(){
 		'',
 		'',
 		'',
-		'../../DutyRangeStat.do',
+		url,
 		[[true, false, false, false], 
-	     ['交班人', 'staffName', 60],
+	     [c.statType == 1?'交班人':'交款人', 'staffName', 60],
 	     ['开始时间', 'onDutyFormat'], 
 	     ['结束时间', 'offDutyFormat'], 
 	     ['操作','Operation', 100, 'center', 'dutyRangePanelOperationRenderer']
 		],
-		['staffName', 'onDuty', 'offDuty', 'onDutyFormat', 'offDutyFormat'],
-		[ ['dataSource', 'today'], ['isCookie', true]],
+		['staffName','onDuty','offDuty','onDutyFormat', 'offDutyFormat'],
+		[ ['dataSource', 'today']],
 		0,
 		null,
 		dutyRangePanelTbar
@@ -131,12 +145,12 @@ function dutyRangePanelInit(){
 	dutyRangePanel.border = false; 
 }
 
-function dutyRangeWinInit(){
-	if(!dutyRangePanel){
-		dutyRangePanelInit();
+function dutyRangeWinInit(c){
+	if(!dutyRangePanel || dutyRangePanel == null){
+		dutyRangePanelInit(c);
 	}
 	dutyRangeWin = new Ext.Window({
-		title : '交班记录',
+		title : c.statType == 1?'交班记录':'交款记录',
 		layout : 'fit',
 		resizable : false,
 		modal : true,
@@ -149,14 +163,20 @@ function dutyRangeWinInit(){
 			text : '关闭',
 			iconCls : 'btn_close',
 			handler : function(){
-				dutyRangeWin.hide();
+				dutyRangePanel.destroy();
+				dutyRangeWin.destroy();
+				dutyRangeWin = null;
+				dutyRangePanel = null;
 			}
 		}],
 		keys : [{
 			key : Ext.EventObject.ESC,
 			scope : this,
 			fn : function(){
-				dutyRangeWin.hide();
+				dutyRangePanel.destroy();
+				dutyRangeWin.destroy();
+				dutyRangeWin = null;
+				dutyRangePanel = null;
 			}
 		}],
 		listeners : {
@@ -167,10 +187,14 @@ function dutyRangeWinInit(){
 	});
 }
 
-function dutyRangeSub(){
-	if(!dutyRangeWin){
-		dutyRangeWinInit();
+function dutyRangeSub(c){
+	statType = c.statType;
+	if(!dutyRangeWin || dutyRangeWin == null){
+		dutyRangeWinInit(c);
 	}
 	dutyRangeWin.show();
 	dutyRangeWin.center();
 }
+
+
+

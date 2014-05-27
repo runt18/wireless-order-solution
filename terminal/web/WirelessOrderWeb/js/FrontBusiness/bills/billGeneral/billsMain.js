@@ -4,7 +4,17 @@
 	imgHeight : 50,
 	tooltip : '交班记录',
 	handler : function(btn) {
-		dutyRangeSub();
+		dutyRangeSub({statType : 1});
+	}
+});
+
+var btnPaymentSub = new Ext.ux.ImageButton({
+//	imgPath : '../../images/shiftStatis.png',
+	imgWidth : 50,
+	imgHeight : 50,
+	tooltip : '交款记录',
+	handler : function(btn) {
+		dutyRangeSub({statType : 2});
 	}
 });
 
@@ -387,97 +397,132 @@ function couponPriceHandler(v){
 		return v; 
 	}
 }
+function commentTip(value, meta, rec, rowIdx, colIdx, ds){
+	var subValue = value.length >6 ? value.substring(0,6) + '...' : value ;
+    return '<div ext:qtitle="" ext:qtip="' + value + '">'+ subValue +'</div>';
+}
 
 var billsGrid;
 var foodStatus;
 Ext.onReady(function(){
+	duty = createStatGridTabDutyFn({
+		data : shiftDutyOfToday
+	});
+	var historySBar = new Ext.Toolbar({
+		id : 'historyHighSBar',
+		hidden : true,
+		height : 28,
+		items : [
+			{xtype : 'tbtext', text : '班次:'},
+			duty,
+			{xtype : 'tbtext', text : '&nbsp;&nbsp;'},
+			{xtype : 'tbtext', text : '收款方式:'},
+			{
+				xtype : 'combo',
+				forceSelection : true,
+				width : 70,
+				value : -1,
+				id : 'comboPayType',
+				store : new Ext.data.SimpleStore({
+					fields : [ 'value', 'text' ],
+					data : [[-1, '全部'], [1, '现金' ], [2, '刷卡' ], [3, '会员卡' ], [4, '签单' ], [5, '挂账' ]]
+				}),
+				valueField : 'value',
+				displayField : 'text',
+				typeAhead : true,
+				mode : 'local',
+				triggerAction : 'all',
+				selectOnFocus : true,
+				allowBlank : false,
+				readOnly : false
+			},
+			{xtype : 'tbtext', text : '&nbsp;&nbsp;'},
+			{xtype : 'tbtext', text : '台名/台号:'},
+			{
+				xtype : 'textfield',
+				id : 'textTableAliasOrName',
+				hidden : false,
+				width : 100
+			},
+			{xtype : 'tbtext', text : '&nbsp;&nbsp;'},
+			{xtype : 'tbtext', text : '备注搜索:'},
+			{
+				xtype : 'textfield',
+				id : 'textSearchValue',
+				hidden : false,
+				width : 100
+			},
+			{xtype : 'tbtext', text : '&nbsp;&nbsp;'},
+			{xtype : 'tbtext', text : '区域:'},
+			{
+				xtype : 'combo',
+				forceSelection : true,
+				width : 90,
+				value : -1,
+				id : 'history_comboRegion',
+				store : new Ext.data.SimpleStore({
+					fields : ['id', 'name']
+				}),
+				valueField : 'id',
+				displayField : 'name',
+				typeAhead : true,
+				mode : 'local',
+				triggerAction : 'all',
+				selectOnFocus : true,
+				allowBlank : false,
+				readOnly : false,
+				listeners : {
+					render : function(thiz){
+						var data = [[-1,'全部']];
+						Ext.Ajax.request({
+							url : '../../QueryRegion.do',
+							params : {
+								dataSource : 'normal'
+							},
+							success : function(res, opt){
+								var jr = Ext.decode(res.responseText);
+								for(var i = 0; i < jr.root.length; i++){
+									data.push([jr.root[i]['id'], jr.root[i]['name']]);
+								}
+								thiz.store.loadData(data);
+								thiz.setValue(-1);
+							},
+							fialure : function(res, opt){
+								thiz.store.loadData(data);
+								thiz.setValue(-1);
+							}
+						});
+					}
+				}
+			}
+		]
+	});
+	
+	
 	var billsGridTbar = new Ext.Toolbar({
 		height : 26,
 		items : [{
 			xtype : 'tbtext',
-			text : '过滤:'
+			text : '&nbsp;&nbsp;&nbsp;&nbsp;账单号:'
 		}, 
-		{ xtype:'tbtext', text:'&nbsp;&nbsp;'},
-		f_bills_filterTypeComb,
 		{ xtype:'tbtext', text:'&nbsp;&nbsp;'},
 		{
-			xtype : 'combo',
-			forceSelection : true,
-			width : 100,
-			value : '1',
-			id : 'comboOperator',
-			hidden : true,
-			store : new Ext.data.SimpleStore({
-				fields : [ 'value', 'text' ],
-				data : [[1, '等于'], [2, '大于等于' ], [3, '小于等于']]
-			}),
-			valueField : 'value',
-			displayField : 'text',
-			typeAhead : true,
-			mode : 'local',
-			triggerAction : 'all',
-			selectOnFocus : true,
-			allowBlank : false,
-			readOnly : false,
-			listeners : {
-				select : function(combo, record, index){
-					searchOperator = combo.getId();
-				}
-			}
-		}, {
-			xtype : 'combo',
-			forceSelection : true,
-			width : 120,
-			value : 1,
-			id : 'comboTableType',
-			hidden : true,
-			store : new Ext.data.SimpleStore({
-				fields : [ 'value', 'text' ],
-				data : [[ 1, '一般' ], [2, '外卖' ], [3, '拆台' ], [4, '并台' ]]
-			}),
-			valueField : 'value',
-			displayField : 'text',
-			typeAhead : true,
-			mode : 'local',
-			triggerAction : 'all',
-			selectOnFocus : true,
-			allowBlank : false,
-			readOnly : false
-		}, {
-			xtype : 'combo',
-			forceSelection : true,
-			width : 120,
-			value : 1,
-			id : 'comboPayType',
-			hidden : true,
-			store : new Ext.data.SimpleStore({
-				fields : [ 'value', 'text' ],
-				data : [[1, '现金' ], [2, '刷卡' ], [3, '会员卡' ], [4, '签单' ], [5, '挂账' ]]
-			}),
-			valueField : 'value',
-			displayField : 'text',
-			typeAhead : true,
-			mode : 'local',
-			triggerAction : 'all',
-			selectOnFocus : true,
-			allowBlank : false,
-			readOnly : false
-		}, {
-			xtype : 'timefield',
-			id : 'timeCondition',
-			hidden : true,
-			allowBlank : false,
-			format : 'H:i:s',
-			value : new Date().format('H:i:s'),
-			width : 120
-		}, {
 			xtype : 'numberfield',
 			id : 'numberSearchValue',
-			hidden : true,
 			width : 130
+		},
+		{ xtype:'tbtext', text:'&nbsp;&nbsp;'}, 
+		{
+			xtype : 'tbtext',
+			text : '&nbsp;&nbsp;&nbsp;&nbsp;流水号:'
 		}, 
-		frontBill_combo_staffs,
-		{ xtype:'tbtext', text:'&nbsp;&nbsp;'}, {
+		{ xtype:'tbtext', text:'&nbsp;'},
+		{
+			xtype : 'numberfield',
+			id : 'tbSeqId',
+			width : 130
+		},
+		{ xtype:'tbtext', text:'&nbsp;&nbsp;'},{
 			xtype : 'radio',
 			checked : true,
 			boxLabel : '全部',
@@ -566,17 +611,44 @@ Ext.onReady(function(){
 		'->',
 		{
 			text : '搜索',
+			id : 'fontBill_search',
 			iconCls : 'btn_search',
 			handler : function(e){
 				billQueryHandler();
 			}
 		}, {
-			text : '高级搜索',
-			hidden : true,
-			iconCls : 'btn_search',
-			handler : function(e){
-				advSrchWin.show();
+			text : '高级条件↓',
+	    	id : 'btnBillHeightSearch',
+	    	handler : function(){
+	    		searchType = true;
+				Ext.getCmp('btnBillHeightSearch').hide();
+	    		Ext.getCmp('btnBillCommonSearch').show();
+	    		
+	    		Ext.getCmp('historyHighSBar').show();
+	    		
+	    		billsGrid.setHeight(billsGrid.getHeight()-28);
+	    		billsGrid.syncSize();
+	    		billsGrid.doLayout();//重新布局 	
 			}
+		}, {
+			 text : '高级条件↑',
+	    	 id : 'btnBillCommonSearch',
+	    	 hidden : true,
+	    	 handler : function(thiz){
+	    	 	searchType = false;
+	    		Ext.getCmp('btnBillHeightSearch').show();
+	    		Ext.getCmp('btnBillCommonSearch').hide();
+	    		
+//	    		duty.setValue(2);
+	    		Ext.getCmp('textSearchValue').setValue();
+	    		Ext.getCmp('comboPayType').setValue(-1);
+	    		
+	    		Ext.getCmp('historyHighSBar').hide();
+	    		
+	    		billsGrid.setHeight(billsGrid.getHeight()+28);
+	    		billsGrid.syncSize();
+	    		billsGrid.doLayout();
+	    	 }
 		}]
 	});
 	
@@ -585,7 +657,7 @@ Ext.onReady(function(){
 		'',
 		'',
 		'',
-		'../../QueryToday.do',
+		'../../QueryOrderStatistics.do',
 		[
 			[true, false, false, true], 
 			['帐单号', 'id'],
@@ -599,13 +671,15 @@ Ext.onReady(function(){
 			['应收', 'totalPrice',,'right', 'Ext.ux.txtFormat.gridDou'],
 			['实收', 'actualPrice',,'right', 'Ext.ux.txtFormat.gridDou'],
 			['状态', 'statusText',,'center', 'function(v,m,r){if(r.get("statusValue")==2){return \'<font color=\"#FF0000\">反结账</font>\';}else{return v;}}'],
+			['区域', 'table.region.name'],
+			['备注', 'comment',,'center', 'commentTip'],
 			['操作', 'operator', 270, 'center', 'billOpt']
 		],
 		OrderRecord.getKeys(),
-		[['isPaging', true], ['restaurantID', restaurantID]],
+		[['dataType', 0]],
 		GRID_PADDING_LIMIT_20,
 		'',
-		billsGridTbar
+		[billsGridTbar, historySBar]
 	);
 	billsGrid.region = 'center';
 	billsGrid.on('render', function(){
@@ -656,6 +730,11 @@ Ext.onReady(function(){
 				text:'&nbsp;'
 			},
 			btnDutyRangeSub, 
+			{
+				xtype:'tbtext',
+				text:'&nbsp;&nbsp;&nbsp;'
+			},
+			btnPaymentSub, 
 			{
 				xtype:'tbtext',
 				text:'&nbsp;&nbsp;&nbsp;'

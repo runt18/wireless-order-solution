@@ -9,7 +9,7 @@
 		url : '../../PrintOrder.do',
 		params : {
 			
-			'printType' : 7,
+			'printType' : statType == 1 ? 7 : 12,
 			'onDuty' : gs['onDutyFormat'],
 			'offDuty' : gs['offDutyFormat']
 		},
@@ -30,7 +30,7 @@ function dutyRangeStatDetalHandler(){
 		var dutyRangeStatWin = Ext.getCmp('dutyRangeStatWin');
 		if(!dutyRangeStatWin){
 			dutyRangeStatWin = new Ext.Window({
-				title : '营业统计 -- <font style="color:green;">历史</font> -- 交班人:&nbsp;<font style="color:red;">' + gs['staffName'] + '</font>',
+				title : '营业统计 -- <font style="color:green;">历史</font> -- '+(statType == 1?'交班人':'交款人')+':&nbsp;<font style="color:red;">' + gs['staffName'] + '</font>',
 				id : 'dutyRangeStatWin',
 				width : 885,
 				height : 555,
@@ -42,14 +42,14 @@ function dutyRangeStatDetalHandler(){
 					text : '关闭',
 					iconCls : 'btn_close',
 					handler : function(){
-						dutyRangeStatWin.hide();
+						dutyRangeStatWin.destroy();
 					}
 				}],
 				keys : [{
 					key : Ext.EventObject.ESC,
 					scope : this,
 					fn : function(){
-						dutyRangeStatWin.hide();
+						dutyRangeStatWin.destroy();
 					}
 				}],
 				listeners : {
@@ -67,9 +67,10 @@ function dutyRangeStatDetalHandler(){
 							params : {
 								d : '_' + new Date().getTime(),
 								dataSource : 'history',
-								queryPattern : 2,
-								onDuty : gs['onDuty'],
-								offDuty : gs['offDuty']
+								queryPattern : statType == 2? 5 : 2,
+								onDuty : statType == 1?gs['onDuty']:gs['onDutyFormat'],
+								offDuty : statType == 1?gs['offDuty']:gs['offDutyFormat'],
+								businessStatic : statType
 							}
 						});
 					}
@@ -87,7 +88,7 @@ function dutyRangeStatPanelOperationRenderer(){
 		   + '<a href="javascript:dutyRangeStatPrintHandler()">补打</a>';
 }
 
-function dutyRangeStatPanelInit(){
+function dutyRangeStatPanelInit(c){
 	var beginDate = new Ext.form.DateField({
 		xtype : 'datefield',		
 		format : 'Y-m-d',
@@ -154,21 +155,28 @@ function dutyRangeStatPanelInit(){
 			}
 		}]
 	});
+	var url = '';
+	//交班
+	if(eval(c.statType == 1)){
+		url = '../../DutyRangeStat.do';
+	}else if(eval(c.statType == 2)){ //交款
+		url = '../../PaymentStat.do';
+	}
 	
 	dutyRangeStatPanel = createGridPanel(
 		'',
 		'',
 		'',
 		'',
-		'../../DutyRangeStat.do',
+		url,
 		[[true, false, false, true], 
-	     ['交班人', 'staffName', 60],
+	     [c.statType == 1?'交班人':'交款人', 'staffName', 60],
 	     ['开始时间', 'onDutyFormat'], 
 	     ['结束时间', 'offDutyFormat'], 
 	     ['操作','Operation', 100, 'center', 'dutyRangeStatPanelOperationRenderer']
 		],
 		['staffName', 'onDuty', 'offDuty', 'onDutyFormat', 'offDutyFormat'],
-		[ ['restaurantID', restaurantID], ['dataSource', 'history'], ['isPaging', true]],
+		[ ['dataSource', 'history'], ['isPaging', true]],
 		10,
 		null,
 		dutyRangeStatPanelTbar
@@ -177,12 +185,12 @@ function dutyRangeStatPanelInit(){
 	dutyRangeStatPanel.border = false; 
 }
 
-function dutyRangeStatWinInit(){
-	if(!dutyRangeStatPanel){
-		dutyRangeStatPanelInit();
+function dutyRangeStatWinInit(c){
+	if(!dutyRangeStatPanel || dutyRangeStatPanel == null){
+		dutyRangeStatPanelInit(c);
 	}
 	dutyRangeStatWin = new Ext.Window({
-		title : '交班记录',
+		title : c.statType == 1?'交班记录':'交款记录',
 		layout : 'fit',
 		resizable : false,
 		modal : true,
@@ -195,14 +203,20 @@ function dutyRangeStatWinInit(){
 			text : '关闭',
 			iconCls : 'btn_close',
 			handler : function(){
-				dutyRangeStatWin.hide();
+				dutyRangeStatWin.destroy();
+				dutyRangeStatPanel.destroy();
+				dutyRangeStatWin = null;
+				dutyRangeStatPanel = null;
 			}
 		}],
 		keys : [{
 			key : Ext.EventObject.ESC,
 			scope : this,
 			fn : function(){
-				dutyRangeStatWin.hide();
+				dutyRangeStatWin.destroy();
+				dutyRangeStatPanel.destroy();
+				dutyRangeStatWin = null;
+				dutyRangeStatPanel = null;
 			}
 		}],
 		listeners : {
@@ -213,9 +227,10 @@ function dutyRangeStatWinInit(){
 	});
 }
 
-function dutyRangeStat(){
-	if(!dutyRangeStatWin){
-		dutyRangeStatWinInit();
+function dutyRangeStat(c){	
+	statType = c.statType;
+	if(!dutyRangeStatWin || dutyRangeStatWin == null){
+		dutyRangeStatWinInit(c);
 	}
 	dutyRangeStatWin.show();
 	dutyRangeStatWin.center();

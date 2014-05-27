@@ -472,7 +472,18 @@ Ext.ux.checkPaddingTop = function(e){
 	else
 		e.getEl().dom.parentNode.style.paddingTop = '5px';
 };
-
+//获得某月的天数 
+function getMonthDays(myMonth){ 
+	var now = new Date(); //当前日期 
+	var nowDay = now.getDate(); //当前日 
+	var nowMonth = now.getMonth(); //当前月 
+	var nowYear = now.getYear(); //当前年 
+	nowYear += (nowYear < 2000) ? 1900 : 0; //
+	var monthStartDate = new Date(nowYear, myMonth, 1); 
+	var monthEndDate = new Date(nowYear, myMonth + 1, 1); 
+	var days = (monthEndDate - monthStartDate)/(1000 * 60 * 60 * 24); 
+	return days; 
+}
 /**
  * 创建常用时间集
  */
@@ -480,6 +491,12 @@ Ext.ux.createDateCombo = function(_c){
 	if(_c == null || typeof _c == 'undefined'){
 		_c = {};
 	}
+	var now = new Date(); //当前日期 
+	//var nowDay = now.getDate(); //当前日
+	var nowDayOfWeek = now.getDay(); //今天本周的第几天 
+	var nowMonth = now.getMonth(); //当前月 
+	var nowYear = now.getYear(); //当前年 
+	nowYear += (nowYear < 2000) ? 1900 : 0; //
 	var comboDate = new Ext.form.ComboBox({
 		xtype : 'combo',
 		id : typeof _c.id == 'undefined' ? null : _c.id,
@@ -506,26 +523,42 @@ Ext.ux.createDateCombo = function(_c){
 				if(typeof _c.beginDate == 'undefined' || typeof _c.endDate == 'undefined'){
 					return false;
 				}
-				var now = new Date();
+				if(record == null){
+					var selfRecord = {data : {value : 1}};
+					record = selfRecord;
+				}
+					
 				var dateBegin = typeof _c.beginDate == 'string' ? Ext.getCmp(_c.beginDate) : _c.beginDate;
 				var dateEnd = typeof _c.endDate == 'string' ? Ext.getCmp(_c.endDate) : _c.endDate;
 				dateEnd.setValue(now);
-				if(index == 0){
+				if(record.data.value == 0){//今天
 					
-				}else if(index == 1){
+				}else if(record.data.value == 1){//前一天
 					now.setDate(now.getDate()-1);
 					dateEnd.setValue(now);
-				}else if(index == 2){
+				}else if(record.data.value == 2){//最近7天
 					now.setDate(now.getDate()-7);
-				}else if(index == 3){
+				}else if(record.data.value == 3){//最近一个月
 					now.setMonth(now.getMonth()-1);
-				}else if(index == 4){
+				}else if(record.data.value == 4){//最近三个月
 					now.setMonth(now.getMonth()-3);
+				}else if(record.data.value == 5){//本周
+					now.setDate(now.getDate() - (nowDayOfWeek - 1));
+				}else if(record.data.value == 6){//上周
+					dateEnd.setValue(now.getDate() - nowDayOfWeek);
+					now.setDate(now.getDate() - (nowDayOfWeek + 6));
+				}else if(record.data.value == 7){//本月
+					now.setDate(now.getDate() - (now.getDate() -1));
+				}else if(record.data.value == 8){//上个月
+					//FIXME 月份加减遇12时
+					dateEnd.setValue(new Date(nowYear, nowMonth-1, getMonthDays(nowMonth-1)));
+					now = new Date(nowYear, nowMonth-1, 1);
 				}
 				dateBegin.setValue(now);
 				if(typeof _c.callback == 'function'){
 					_c.callback();
 				}
+				now = new Date();
 			}
 		}
 	});
@@ -631,7 +664,7 @@ var SupplierRecord = Ext.ux.cr(['supplierID', 'restaurantId', 'name', 'tele', 'a
 var KitchenRecord = Ext.ux.cr(['id', 'alias', 'rid', 'name', 'isAllowTmp', 'typeValue', 'dept', 'dept.name']);
 var OrderRecord = Ext.ux.cr(['id', 'seqId', 'rid', 'birthDateFormat', 'orderDate', 'orderDateFormat', 'categoryValue', 'categoryText', 'waiter',
     'statusValue', 'statusText', 'settleTypeValue', 'settleTypeText', 'payTypeValue', 'payTypeText', 'discount', 'pricePlan', 
-    'table', 'table.alias', 'member', 'customNum', 'comment', 'repaidPrice', 'receivedCash', 'serviceRate', 'discountPrice', 
+    'table', 'table.alias','table.region.name', 'member', 'customNum', 'comment', 'repaidPrice', 'receivedCash', 'serviceRate', 'discountPrice', 
     'cancelPrice', 'giftPrice', 'totalPrice', 'erasePrice', 'couponPrice', 'actualPrice', 'orderFoods', 'childOrders', 'actualPriceBeforeDiscount']);
 var OrderFoodRecord = Ext.ux.cr(['dataType', 'orderId', 'orderDateFormat', 'count', 'discount', 'isTemporary', 'totalPrice', 'totalPriceBeforeDiscount',
     'tasteGroup', 'tasteGroup.tastePref', 'tasteGroup.tastePrice', 'waiter', 'actualPrice'], FoodBasicRecord);

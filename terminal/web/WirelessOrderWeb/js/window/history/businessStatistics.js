@@ -93,8 +93,16 @@ Ext.onReady(function(){
 				render : function(thiz){
 					var memberTrEmpty = String.format(memberTrModel, '----', '----', '----', '----', '----', '----');
 					var empty = String.format(trModel, '---', '---', '---', '---');
-					var table = String.format('<table border="1" class="tb_base">{0}{1}</table><br><table border="1" class="tb_base">{2}{3}</table>', 
-												memberTitle, memberTrEmpty, title, empty);
+					//TODO
+					var table;
+					if(eval(businessStatic == 2)){
+						table = String.format('<table border="1" class="tb_base">{0}{1}</table>', 
+								memberTitle, memberTrEmpty);
+					}else{
+						table = String.format('<table border="1" class="tb_base">{0}{1}</table><br><table border="1" class="tb_base">{2}{3}</table>', 
+								memberTitle, memberTrEmpty, title, empty);
+					}
+
 					thiz.body.update(table);
 				}
 			}
@@ -138,12 +146,16 @@ Ext.onReady(function(){
 						params.onDuty  = onDuty.format('Y-m-d 00:00:00');
 						params.offDuty = offDuty.format('Y-m-d 23:59:59');
 					}else if(queryPattern == 4){
+						//TODO
 						beginDate.clearInvalid();
 						endDate.clearInvalid();
 						requestUrl = '../../QueryDailySettleByNow.do';
 						params = {queryType : queryType};
 						Ext.getCmp('total_exoprt_excel').hide();
 						Ext.getCmp('btnSearchForBusinessStatisticsSummaryInformation').hide();
+					}else if(queryPattern == 5){
+						params.onDuty = onDuty;
+						params.offDuty = offDuty;
 					}else{
 						return;
 					}
@@ -172,8 +184,16 @@ Ext.onReady(function(){
 								
 								var memberTrDate = String.format(memberTrModel, business.memberChargeByCash.toFixed(2), business.memberChargeByCard.toFixed(2), business.memberAccountCharge.toFixed(2),
 																business.memberRefund.toFixed(2), 0.00, business.memberAccountRefund.toFixed(2));
-								var table = String.format('<table border="1" class="tb_base">{0}{1}</table><br><table border="1" class="tb_base">{2}{3}</table>', 
-														memberTitle, memberTrDate, title, trContent);
+																//TODO
+								var table;
+								if(eval(businessStatic == 2)){
+									table = String.format('<table border="1" class="tb_base">{0}{1}</table>', 
+											memberTitle, memberTrDate);
+								}else{
+									table = String.format('<table border="1" class="tb_base">{0}{1}</table><br><table border="1" class="tb_base">{2}{3}</table>', 
+											memberTitle, memberTrDate, title, trContent);
+								}			
+								
 								Ext.getCmp('businessStatisticsSummaryInformationCenterPanel').body.update(table);
 								
 								if(dutyRange == "range"){
@@ -283,9 +303,13 @@ Ext.onReady(function(){
 					dateCombo.setDisabled(false);
 					beginDate.setDisabled(false);
 					endDate.setDisabled(false);
-				}else if(queryPattern == 2 || queryPattern == 3 || queryPattern == 4){
+				}else if(queryPattern == 2 || queryPattern == 3 || queryPattern == 4 || queryPattern == 5){
 					beginDate.setValue(onDuty);
 					endDate.setValue(offDuty);
+					
+					beginDate.clearInvalid();
+					endDate.clearInvalid();
+					
 					Ext.getCmp('btnSearchForBusinessStatisticsSummaryInformation').handler();
 					
 					dateCombo.setDisabled(true);

@@ -2,6 +2,52 @@ var salesSubQueryType = 0;
 var salesSubOrderType = 0;
 var salesSubDeptId = -1;
 var SALESSUB_PAGE_LIMIT = 22;
+
+function initRegionCombo(comboId){
+	var combo = {
+		xtype : 'combo',
+		forceSelection : true,
+		width : 90,
+		value : -1,
+		id : comboId,
+		store : new Ext.data.SimpleStore({
+			fields : ['id', 'name']
+		}),
+		valueField : 'id',
+		displayField : 'name',
+		typeAhead : true,
+		mode : 'local',
+		triggerAction : 'all',
+		selectOnFocus : true,
+		allowBlank : false,
+		readOnly : false,
+		listeners : {
+			render : function(thiz){
+				var data = [[-1,'全部']];
+				Ext.Ajax.request({
+					url : '../../QueryRegion.do',
+					params : {
+						dataSource : 'normal'
+					},
+					success : function(res, opt){
+						var jr = Ext.decode(res.responseText);
+						for(var i = 0; i < jr.root.length; i++){
+							data.push([jr.root[i]['id'], jr.root[i]['name']]);
+						}
+						thiz.store.loadData(data);
+						thiz.setValue(-1);
+					},
+					fialure : function(res, opt){
+						thiz.store.loadData(data);
+						thiz.setValue(-1);
+					}
+				});
+			}
+		}
+	}
+	return combo;
+}
+
 function orderFoodStatPanelInit(){
 	orderFoodStatPanelDeptTree = new Ext.tree.TreePanel({
 		id : 'orderFoodStatPanelDeptTree',
@@ -98,6 +144,9 @@ function orderFoodStatPanelInit(){
 		    {xtype:'tbtext',text:'&nbsp;'},  beginDate,
 		    {xtype:'tbtext',text:'&nbsp;至&nbsp;'}, endDate, 
 		    {xtype:'tbtext',text:'&nbsp;&nbsp;菜品:'}, foodName,
+			{xtype : 'tbtext', text : '&nbsp;&nbsp;'},
+			{xtype : 'tbtext', text : '区域:'},
+			initRegionCombo('foodSum_comboRegion'),
 		    '->', {
 			text : '搜索',
 			iconCls : 'btn_search',
@@ -119,6 +168,7 @@ function orderFoodStatPanelInit(){
 				gs.baseParams['dateEnd'] = endDate.getRawValue();
 				gs.baseParams['deptID'] = salesSubDeptId;
 				gs.baseParams['foodName'] = foodName.getValue();
+				gs.baseParams['region'] = Ext.getCmp("foodSum_comboRegion").getValue();
 				gs.load({
 					params : {
 						start : 0,
@@ -140,12 +190,11 @@ function orderFoodStatPanelInit(){
 				}else if(bd == '' && ed != ''){
 					Ext.ux.checkDuft(false, beginDate.getId(), endDate.getId());
 				}
-				var url = '../../{0}?pin={1}&restaurantID={2}&dataSource={3}&onDuty={4}&offDuty={5}&deptID={6}&foodName={7}';
+				var url = '../../{0}?region={1}&dataSource={2}&onDuty={3}&offDuty={4}&deptID={5}&foodName={6}';
 				url = String.format(
 						url, 
 						'ExportHistoryStatisticsToExecl.do', 
-						-10, 
-						restaurantID, 
+						Ext.getCmp("foodSum_comboRegion").getValue(), 
 						'salesFoodDetail',
 						beginDate.getValue().format('Y-m-d 00:00:00'),
 						endDate.getValue().format('Y-m-d 23:59:59'),
@@ -258,7 +307,10 @@ function kitchenStatPanelInit(){
 	var kitchenStatPanelGridTbar = new Ext.Toolbar({
 		height : 26,
 		items : [{xtype:'tbtext',text:'日期:'}, dateCombo, {xtype:'tbtext',text:'&nbsp;'},
-		    beginDate, {xtype:'tbtext',text:'&nbsp;至&nbsp;'}, endDate, '->', {
+		    beginDate, {xtype:'tbtext',text:'&nbsp;至&nbsp;'}, endDate, 
+		    {xtype : 'tbtext', text : '&nbsp;&nbsp;'},
+			{xtype : 'tbtext', text : '区域:'},
+			initRegionCombo('kitchenSum_comboRegion'),'->', {
 			text : '展开/收缩',
 			iconCls : 'icon_tb_toggleAllGroups',
 			handler : function(){
@@ -282,6 +334,7 @@ function kitchenStatPanelInit(){
 				var gs = kitchenStatPanelGrid.getStore();
 				gs.baseParams['dateBeg'] = beginDate.getRawValue();
 				gs.baseParams['dateEnd'] = endDate.getRawValue();
+				gs.baseParams['region'] = Ext.getCmp("kitchenSum_comboRegion").getValue();
 				gs.load();
 				kitchenStatPanelGrid.getView().expandAllGroups();
 			}
@@ -300,12 +353,11 @@ function kitchenStatPanelInit(){
 				}else if(bd == '' && ed != ''){
 					Ext.ux.checkDuft(false, beginDate.getId(), endDate.getId());
 				}
-				var url = '../../{0}?pin={1}&restaurantID={2}&dataSource={3}&onDuty={4}&offDuty={5}';
+				var url = '../../{0}?region={1}&dataSource={2}&onDuty={3}&offDuty={4}';
 				url = String.format(
 						url, 
 						'ExportHistoryStatisticsToExecl.do', 
-						-10, 
-						restaurantID, 
+						Ext.getCmp("kitchenSum_comboRegion").getValue(), 
 						'salesByKitchen',
 						beginDate.getValue().format('Y-m-d 00:00:00'),
 						endDate.getValue().format('Y-m-d 23:59:59')
@@ -393,6 +445,9 @@ function deptStatPanelInit(){
 		height : 26,
 		items : [{xtype:'tbtext',text:'日期:'}, dateCombo, {xtype:'tbtext',text:'&nbsp;'}, 
 		beginDate, {xtype:'tbtext',text:'&nbsp;至&nbsp;'}, endDate, 
+		{xtype : 'tbtext', text : '&nbsp;&nbsp;'},
+		{xtype : 'tbtext', text : '区域:'},
+		initRegionCombo('deptSum_comboRegion'),
 		'->', {
 			text : '搜索',
 			id : 'salesSubBtnSearchByDept',
@@ -411,6 +466,7 @@ function deptStatPanelInit(){
 				var gs = deptStatPanelGrid.getStore();
 				gs.baseParams['dateBeg'] = beginDate.getRawValue();
 				gs.baseParams['dateEnd'] = endDate.getRawValue();
+				gs.baseParams['region'] = Ext.getCmp("deptSum_comboRegion").getValue();
 				gs.load();
 			}
 		}, '-', {
@@ -428,12 +484,11 @@ function deptStatPanelInit(){
 				}else if(bd == '' && ed != ''){
 					Ext.ux.checkDuft(false, beginDate.getId(), endDate.getId());
 				}
-				var url = '../../{0}?pin={1}&restaurantID={2}&dataSource={3}&onDuty={4}&offDuty={5}';
+				var url = '../../{0}?region={1}&dataSource={2}&onDuty={3}&offDuty={4}';
 				url = String.format(
 						url, 
 						'ExportHistoryStatisticsToExecl.do', 
-						-10, 
-						restaurantID, 
+						Ext.getCmp("deptSum_comboRegion").getValue(), 
 						'salesByDept',
 						beginDate.getValue().format('Y-m-d 00:00:00'),
 						endDate.getValue().format('Y-m-d 23:59:59')

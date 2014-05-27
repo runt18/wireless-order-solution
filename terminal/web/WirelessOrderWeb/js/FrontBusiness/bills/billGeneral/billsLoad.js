@@ -92,14 +92,12 @@ function loadAllStaff() {
  * 
  */
 function loadShiftDuty(){
-	Ext.Ajax.request({
+	$.ajax({
 		url : '../../DutyRangeStat.do',
-		params : {
-			isCookie : true,
-			dataSource : 'today'
-		},
-		success : function(res, opt){
-			var jr = Ext.decode(res.responseText);
+		type : 'post',
+		async:false,
+		data : {dataSource : 'today'},
+		success : function(jr, status, xhr){
 			var bd = {root:[]};
 			for(var i = 0; i < jr.root.length; i++){
 				bd.root.push(jr.root[i]);
@@ -107,15 +105,41 @@ function loadShiftDuty(){
 				bd.root[i].displayMsg = (jr.root[i].onDutyFormat + ' -- ' + jr.root[i].offDutyFormat + ' (' + jr.root[i].staffName + ')');
 			}
 			shiftDutyOfToday = bd;
+			duty = createStatGridTabDutyFn({
+				data : shiftDutyOfToday,
+				listeners : {
+					select : function(){
+						Ext.getCmp('salesKitchenSubBtnSearch').handler();
+					}
+				}
+			});
 		},
-		failure : function(res, opt){
-			Ext.ux.showMsg(Ext.util.JSON.decode(res.responseText));
+		error : function(request, status, err){
+			Ext.ux.showMsg(request.responseText);
 		}
-	});
+	}); 
+	
+}
+
+function loadPayment(){
+	$.ajax({
+		url : '../../PaymentStat.do',
+		type : 'post',
+		async:false,
+		data : {dataSource : 'today'},
+		success : function(jr, status, xhr){
+			paymentOfToday = jr;
+		},
+		error : function(request, status, err){
+			Ext.ux.showMsg(request.responseText);
+		}
+	}); 
+	
 }
 
 function billsOnLoad() {
 	loadAllDishes();
 	loadAddKitchens();
 	loadShiftDuty();
+	
 };

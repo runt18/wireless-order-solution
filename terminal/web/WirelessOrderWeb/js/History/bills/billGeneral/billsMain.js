@@ -3,24 +3,22 @@
 function billQueryHandler() {
 	var gs = billsGrid.getStore();
 	if(searchType){
-		gs.baseParams['beginDate'] = Ext.getCmp('dateSearchDateBegin').getValue().format('Y-m-d 00:00:00');
-		gs.baseParams['endDate'] = Ext.getCmp('dateSearchDateEnd').getValue().format('Y-m-d 23:59:59');
+		gs.baseParams['dateBeg'] = Ext.getCmp('dateSearchDateBegin').getValue().format('Y-m-d 00:00:00');
+		gs.baseParams['dateEnd'] = Ext.getCmp('dateSearchDateEnd').getValue().format('Y-m-d 23:59:59');
 		gs.baseParams['comboPayType'] = Ext.getCmp('comboPayType').getValue();
 		gs.baseParams['common'] = Ext.getCmp('textSearchValue').getValue();
-		gs.baseParams['value'] = Ext.getCmp('numberSearchValue').getValue();
 		if(isNaN(Ext.getCmp('textTableAliasOrName').getValue())){
 			gs.baseParams['tableName'] = Ext.getCmp('textTableAliasOrName').getValue();
 		}else{
 			gs.baseParams['tableAlias'] = Ext.getCmp('textTableAliasOrName').getValue();
 		}
 		gs.baseParams['region'] = Ext.getCmp('history_comboRegion').getValue();
-	}else{
-		gs.baseParams['value'] = Ext.getCmp('numberSearchValue').getValue();
 	}
+	gs.baseParams['orderId'] = Ext.getCmp('numberSearchValue').getValue();
 	
 	sAdditionFilter = Ext.getCmp(searchAdditionFilter).inputValue;	
 	
-	gs.baseParams['type'] = searchType;
+	gs.baseParams['dataType'] = 1;
 
 	gs.baseParams['havingCond'] = sAdditionFilter;
 	gs.load({
@@ -33,8 +31,9 @@ function billQueryHandler() {
 
 function billQueryExportHandler() {
 	var url;
+	sAdditionFilter = Ext.getCmp(searchAdditionFilter).inputValue;
 	if(searchType){
-		url = '../../{0}?beginDate={1}&endDate={2}&comboPayType={3}&common={4}&value={5}&type={6}&havingCond={7}&dataSource={8}';
+		url = '../../{0}?dateBeg={1}&dateEnd={2}&comboPayType={3}&common={4}&orderId={5}&tableName={6}&tableAlias={7}&region={8}&havingCond={9}&dataSource={10}&dataType={11}';
 		url = String.format(
 			url, 
 			'ExportHistoryStatisticsToExecl.do', 
@@ -43,17 +42,20 @@ function billQueryExportHandler() {
 			Ext.getCmp('comboPayType').getValue(),
 			Ext.getCmp('textSearchValue').getValue(),
 			Ext.getCmp('numberSearchValue').getValue(),
-			searchType,
+			Ext.getCmp('textTableAliasOrName').getValue(),
+			Ext.getCmp('textTableAliasOrName').getValue(),
+			Ext.getCmp('history_comboRegion').getValue(),
 			sAdditionFilter,
-			'historyOrder'
+			'historyOrder',
+			1
 		);
 	}else{
-		url = '../../{0}?value={1}&type={2}&havingCond={3}&dataSource={4}';
+		url = '../../{0}?orderId={1}&dataType={2}&havingCond={3}&dataSource={4}';
 		url = String.format(
 				url, 
 				'ExportHistoryStatisticsToExecl.do', 
 				Ext.getCmp('numberSearchValue').getValue(), 
-				searchType,
+				1,
 				sAdditionFilter,
 				'historyOrder'
 		);
@@ -126,7 +128,17 @@ var shiftStatBut = new Ext.ux.ImageButton({
 	imgHeight : 50,
 	tooltip : "交班记录",
 	handler : function(btn) {
-		dutyRangeStat();
+		dutyRangeStat({statType : 1});
+	}
+});
+
+var paymentBut = new Ext.ux.ImageButton({
+//	imgPath : "../../images/shiftStatis.png",
+	imgWidth : 50,
+	imgHeight : 50,
+	tooltip : "交款记录",
+	handler : function(btn) {
+		dutyRangeStat({statType : 2});
 	}
 });
 
@@ -343,7 +355,8 @@ Ext.onReady(function() {
 		endDate : history_endDate,
 		callback : function(){
 //			Ext.getCmp('btnSreachForMainOrderGrid').handler();
-		}
+		},
+		data : [[0,'今天'], [1,'前一天'], [5,'本周'], [6, '上周'], [7, '本月'], [8, '上月']]
 	});
 	
 	
@@ -587,7 +600,7 @@ Ext.onReady(function() {
 	    		Ext.getCmp('btnBillHeightSearch').show();
 	    		Ext.getCmp('btnBillCommonSearch').hide();
 	    		
-	    		history_dateCombo.setValue(2);
+	    		history_dateCombo.setValue(1);
 	    		Ext.getCmp('textSearchValue').setValue();
 	    		Ext.getCmp('comboPayType').setValue(-1);
 	    		
@@ -606,7 +619,7 @@ Ext.onReady(function() {
 		'',
 		'',
 		'',
-		'../../QueryHistory.do',
+		'../../QueryOrderStatistics.do',
 		[
 			[true, false, false, true], 
 			['帐单号', 'id'],
@@ -620,19 +633,20 @@ Ext.onReady(function() {
 			['应收', 'totalPrice',,'right', 'Ext.ux.txtFormat.gridDou'],
 			['实收', 'actualPrice',,'right', 'Ext.ux.txtFormat.gridDou'],
 			['状态', 'statusText',,'center', 'function(v,m,r){if(r.get("statusValue")==2){return \'<font color=\"#FF0000\">反结账</font>\';}else{return v;}}'],
+			['区域', 'table.region.name'],
 			['备注', 'comment',,'center', 'commentTip'],
 			['操作', 'operator', 140, 'center', 'billOpt']
 		],
 		OrderRecord.getKeys(),
-		[['isPaging', true], ['restaurantID', restaurantID]],
+		[['dataType', 1]],
 		GRID_PADDING_LIMIT_20,
 		'',
 		[billsGridTbar,historySBar]
 	);
 	billsGrid.region = 'center';
 	billsGrid.on('render', function(){
-		history_dateCombo.setValue(2);
-		history_dateCombo.fireEvent('select', history_dateCombo,null,2);
+		history_dateCombo.setValue(1);
+		history_dateCombo.fireEvent('select', history_dateCombo,null,1);
 	});
 	billsGrid.on('bodyresize', function(e, w, h){
 		
@@ -663,6 +677,8 @@ Ext.onReady(function() {
 			{xtype:'tbtext',text:'&nbsp;'},
 			shiftStatBut, 
 			{xtype:'tbtext',text:'&nbsp;&nbsp;&nbsp;'},
+			paymentBut,
+			{xtype : 'tbtext', text : '&nbsp;&nbsp;'},
 			dailySettleStatBut
 			]
 		})

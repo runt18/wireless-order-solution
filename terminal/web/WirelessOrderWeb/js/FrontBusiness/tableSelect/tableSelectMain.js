@@ -418,6 +418,132 @@ function dailySettleButHandler(){
 }
 
 
+function paymentDaYin(e){
+	var tempMask = new Ext.LoadMask(document.body, {
+		msg : '正在打印请稍候.......',
+		remove : true
+	});
+	tempMask.show();
+	Ext.Ajax.request({
+		url : "../../PrintOrder.do",
+		params : {
+			onDuty : dutyRange.onDutyFormat,
+			offDuty : dutyRange.offDutyFormat,
+			'printType' : 12
+		},
+		success : function(response, options) {
+			tempMask.hide();
+			var resultJSON = Ext.util.JSON.decode(response.responseText);
+			Ext.example.msg('提示', (resultJSON.msg + (omsg.length > 0 ? ('<br/>'+omsg) : '')));
+			if(omsg.length > 0)
+				businessStatWin.destroy();
+			omsg = '';
+		},
+		failure : function(response, options) {
+			tempMask.hide();
+			Ext.ux.showMsg(Ext.decode(response.responseText));
+		}
+	});
+}
+
+function paymentHandler(){
+	
+	businessStatWin = new Ext.Window({
+		title : '<font style="color:green;">交款表</font> -- 交款人 : ' + document.getElementById("optName").innerHTML,
+//		id : 'businessDetailWin',
+		width : 885,
+		height : 580,
+		closable : false,
+		modal : true,
+		resizable : false,	
+		layout: 'fit',
+		bbar : ['->', {
+			text : "交款",
+			icon: '../../images/user.png',
+			id : 'btnPayment',
+			handler : function() {
+				dutyRange = getDutyRange();
+				Ext.MessageBox.show({
+					msg : "确认进行交款？",
+					width : 300,
+					buttons : Ext.MessageBox.YESNO,
+					fn : function(btn){
+						if(btn == "yes"){
+							Ext.Ajax.request({
+								url : "../../DoPayment.do",
+								success : function(response, options) {
+									var resultJSON = Ext.util.JSON.decode(response.responseText);
+									if (resultJSON.success == true) {
+										omsg = resultJSON.msg;
+										dutyRange = resultJSON.other.dutyRange;
+										paymentDaYin(null);
+									} else {
+										Ext.MessageBox.show({
+											msg : resultJSON.msg,
+											width : 300,
+											buttons : Ext.MessageBox.OK
+										});
+									}
+								},
+								failure : function(response, options) {
+									var resultJSON = Ext.util.JSON.decode(response.responseText);
+									Ext.MessageBox.show({
+										msg : resultJSON.data,
+										width : 300,
+										buttons : Ext.MessageBox.OK
+									});
+								}
+							});
+						}
+					}
+				});
+			}
+		}, {
+			text : '预打',
+			id : 'btnPaymentDaYin',
+			icon: '../../images/printShift.png',
+			handler : function(e){
+				dutyRange = getDutyRange();
+				paymentDaYin(e);
+			}
+		},{
+			text : '关闭',
+			iconCls : 'btn_close',
+			handler : function(){
+				businessStatWin.destroy();
+			}
+		}],
+		keys : [{
+			key : Ext.EventObject.ESC,
+			scope : this,
+			fn : function(){
+				businessStatWin.destroy();
+			}
+		}],
+		listeners : {
+			hide : function(thiz){
+				thiz.body.update('');
+			},
+			show : function(thiz){
+				thiz.load({
+					autoLoad : false,
+					url : '../window/history/businessStatistics.jsp',
+					scripts : true,
+					nocache : true,
+					text : '功能加载中, 请稍后......',
+					params : {
+						queryPattern : 4,
+						queryType : 0,
+						businessStatic : 1
+					}
+				});
+			}
+		}
+	});
+	businessStatWin.show();
+	businessStatWin.center();
+}
+
 var shiftBut = new Ext.ux.ImageButton({
 	imgPath : "../../images/shift.png",
 	imgWidth : 50,
@@ -445,6 +571,16 @@ var billsBut = new Ext.ux.ImageButton({
 	tooltip : "账单",
 	handler : function(btn) {
 		location.href = "Bills.html";
+	}
+});
+
+var paymentBut = new Ext.ux.ImageButton({
+//	imgPath : "../../images/shift.png",
+	imgWidth : 50,
+	imgHeight : 50,
+	tooltip : "交款",
+	handler : function(btn) {
+		paymentHandler();
 	}
 });
 
@@ -1403,7 +1539,9 @@ Ext.onReady(function() {
 			shiftBut,
 			{text : "&nbsp;&nbsp;&nbsp;", xtype : 'tbtext' },			
 			dailySettleBut,
-			{text : "&nbsp;&nbsp;&nbsp;", xtype : 'tbtext' },		
+			{text : "&nbsp;&nbsp;&nbsp;", xtype : 'tbtext' },	
+			paymentBut,
+			{text : "&nbsp;&nbsp;&nbsp;", xtype : 'tbtext' },
 			logOutBut ]
 		}),
 		layout : "border",

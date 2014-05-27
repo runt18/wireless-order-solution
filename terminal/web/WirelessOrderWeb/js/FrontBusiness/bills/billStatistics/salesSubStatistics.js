@@ -164,7 +164,7 @@ function orderFoodStatPanelInit(){
          ['赠送额','gifted',,'right','Ext.ux.txtFormat.gridDou']
 		],
 		SalesSubStatRecord.getKeys().concat(['food', 'food.name']),
-		[ ['isPaging', true], ['restaurantID', restaurantID], ['dataType', 0], ['queryType', 1], ['isCookie', true]],
+		[ ['isPaging', true], ['restaurantID', restaurantID], ['dataType', 0], ['queryType', 1]],
 		15,
 		'',
 		orderFoodStatPanelGridTbar
@@ -190,7 +190,8 @@ function kitchenGroupTextTpl(rs){
 }
 
 function kitchenStatPanelInit(){
-	var duty = createStatGridTabDutyFn({
+	//FIXME
+	duty = createStatGridTabDutyFn({
 		data : shiftDutyOfToday,
 		listeners : {
 			select : function(){

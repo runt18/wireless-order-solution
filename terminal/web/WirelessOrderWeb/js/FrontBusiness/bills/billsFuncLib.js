@@ -1,31 +1,31 @@
 ﻿function billQueryHandler() {
-	var sType= 0; sValue = '', sOperator = '', sAdditionFilter = 0;
-	if(searchType == 0){
-		sValue = '';
-		searchOperator = '';
-	}else{
-		sValue = searchValue != '' ? Ext.getCmp(searchValue).getValue() : '';
-		sOperator = searchOperator != '' ? Ext.getCmp(searchOperator).getValue() : '';
-	}
-	sType = sValue == '' ? 0 : searchType;
-	var addition =  Ext.query('input[name=\"conditionRadio\"]');
-	for(var i = 0; i < addition.length; i++){
-		if(addition[i].checked){
-			addition = addition[i].value;
-			break;
-		}
-	}
-	var gs = billsGrid.getStore();
-	gs.baseParams['restaurantID'] = restaurantID;
 	
-	gs.baseParams['type'] = sType;
-	gs.baseParams['ope'] = sOperator;
-	gs.baseParams['value'] = sValue;
-	gs.baseParams['havingCond'] = addition;
+	var gs = billsGrid.getStore();
+	if(searchType){
+		gs.baseParams['dateBeg'] = duty.getValue().split(salesSubSplitSymbol)[0];
+		gs.baseParams['dateEnd'] = duty.getValue().split(salesSubSplitSymbol)[1];
+		gs.baseParams['comboPayType'] = Ext.getCmp('comboPayType').getValue();
+		gs.baseParams['common'] = Ext.getCmp('textSearchValue').getValue();
+		if(isNaN(Ext.getCmp('textTableAliasOrName').getValue())){
+			gs.baseParams['tableName'] = Ext.getCmp('textTableAliasOrName').getValue();
+		}else{
+			gs.baseParams['tableAlias'] = Ext.getCmp('textTableAliasOrName').getValue();
+		}
+		gs.baseParams['region'] = Ext.getCmp('history_comboRegion').getValue();
+	}
+	
+	gs.baseParams['orderId'] = Ext.getCmp('numberSearchValue').getValue();
+	gs.baseParams['seqId'] = Ext.getCmp('tbSeqId').getValue();
+	
+	sAdditionFilter = Ext.getCmp(searchAdditionFilter).inputValue;	
+	
+	gs.baseParams['dataType'] = 0;
+
+	gs.baseParams['havingCond'] = sAdditionFilter;
 	gs.load({
 		params : {
 			start : 0,
-			limit : billsGridDataSize
+			limit : GRID_PADDING_LIMIT_20
 		}
 	});
 };
