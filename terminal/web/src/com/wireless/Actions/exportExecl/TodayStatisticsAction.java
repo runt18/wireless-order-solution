@@ -89,6 +89,7 @@ public class TodayStatisticsAction extends DispatchAction{
 		String offDuty = request.getParameter("offDuty");
 		String deptID = request.getParameter("deptID");
 		String foodName = new String(request.getParameter("foodName").getBytes("ISO8859_1"), "UTF-8");
+		String region = request.getParameter("region");
 		
 		int[] did = null;
 		if(deptID != null && deptID.length() > 0){
@@ -109,7 +110,8 @@ public class TodayStatisticsAction extends DispatchAction{
 				did,
 				SaleDetailsDao.ORDER_BY_SALES,
 				DateType.TODAY,
-				foodName
+				foodName,
+				Integer.parseInt(region)
 		);
 		
 		HSSFWorkbook wb = new HSSFWorkbook();
@@ -247,9 +249,10 @@ public class TodayStatisticsAction extends DispatchAction{
 		String pin = (String)request.getAttribute("pin");
 		String onDuty = request.getParameter("onDuty");
 		String offDuty = request.getParameter("offDuty");
+		String region = request.getParameter("region");
 		
 		Staff staff = StaffDao.verify(Integer.parseInt(pin));
-		SalesDetail[] list = SaleDetailsDao.execByKitchen(staff, onDuty, offDuty, DateType.TODAY);
+		SalesDetail[] list = SaleDetailsDao.execByKitchen(staff, onDuty, offDuty, DateType.TODAY, (!region.equals("-1")? " AND O.region_id = " + region : ""));
 		
 		HSSFWorkbook wb = new HSSFWorkbook();
 		HSSFSheet sheet = wb.createSheet("分厨销售统计(" + DateType.HISTORY.getDesc() + ")");
@@ -379,9 +382,10 @@ public class TodayStatisticsAction extends DispatchAction{
 		String pin = (String)request.getAttribute("pin");
 		String onDuty = request.getParameter("onDuty");
 		String offDuty = request.getParameter("offDuty");
+		String region = request.getParameter("region");
 		
 		Staff staff = StaffDao.verify(Integer.parseInt(pin));
-		SalesDetail[] list = SaleDetailsDao.execByDept(staff, onDuty, offDuty, DateType.TODAY);
+		SalesDetail[] list = SaleDetailsDao.execByDept(staff, onDuty, offDuty, DateType.TODAY, (!region.equals("-1")? " AND O.region_id = " + region : ""));
 		
 		HSSFWorkbook wb = new HSSFWorkbook();
 		HSSFSheet sheet = wb.createSheet("部门销售统计(" + DateType.HISTORY.getDesc() + ")");

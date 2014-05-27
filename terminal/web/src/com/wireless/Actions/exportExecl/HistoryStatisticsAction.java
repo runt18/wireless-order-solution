@@ -34,6 +34,7 @@ import com.wireless.db.billStatistics.SaleDetailsDao;
 import com.wireless.db.client.member.MemberDao;
 import com.wireless.db.client.member.MemberOperationDao;
 import com.wireless.db.orderMgr.OrderDao;
+import com.wireless.db.orderMgr.OrderDao.ExtraCond;
 import com.wireless.db.shift.ShiftDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.stockMgr.StockActionDao;
@@ -52,6 +53,7 @@ import com.wireless.pojo.client.MemberOperation.OperationType;
 import com.wireless.pojo.client.MemberType;
 import com.wireless.pojo.dishesOrder.CancelledFood;
 import com.wireless.pojo.dishesOrder.Order;
+import com.wireless.pojo.dishesOrder.Order.PayType;
 import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.pojo.staffMgr.Staff;
@@ -154,6 +156,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 		String offDuty = request.getParameter("offDuty");
 		String deptID = request.getParameter("deptID");
 		String foodName = new String(request.getParameter("foodName").getBytes("ISO8859_1"), "UTF-8");
+		String region = request.getParameter("region");
 		
 		int[] did = null;
 		if(deptID != null && deptID.length() > 0){
@@ -174,7 +177,8 @@ public class HistoryStatisticsAction extends DispatchAction{
 				did,
 				SaleDetailsDao.ORDER_BY_SALES,
 				DateType.HISTORY,
-				foodName);
+				foodName,
+				Integer.parseInt(region));
 		
 		HSSFWorkbook wb = new HSSFWorkbook();
 		HSSFSheet sheet = wb.createSheet("菜品销售统计(历史)");
@@ -366,8 +370,15 @@ public class HistoryStatisticsAction extends DispatchAction{
 		String onDuty = request.getParameter("onDuty");
 		String offDuty = request.getParameter("offDuty");
 		
+		
 		Staff staff = StaffDao.verify(Integer.parseInt(pin));
-		SalesDetail[] list = SaleDetailsDao.execByKitchen(staff, onDuty, offDuty, DateType.HISTORY);
+		
+		String region = request.getParameter("region");
+		String extraCond = null;
+		if(region != null && !region.equals("-1")){
+			extraCond = " AND O.region_id = " + region;
+		}
+		SalesDetail[] list = SaleDetailsDao.execByKitchen(staff, onDuty, offDuty, DateType.HISTORY, extraCond);
 		
 		HSSFWorkbook wb = new HSSFWorkbook();
 		HSSFSheet sheet = wb.createSheet("分厨销售统计(" + DateType.HISTORY.getDesc() + ")");
@@ -534,8 +545,14 @@ public class HistoryStatisticsAction extends DispatchAction{
 		String onDuty = request.getParameter("onDuty");
 		String offDuty = request.getParameter("offDuty");
 		
+		String region = request.getParameter("region");
+		String extraCond = null;
+		if(region != null && !region.equals("-1")){
+			extraCond = " AND O.region_id = " + region;
+		}
+		
 		Staff staff = StaffDao.verify(Integer.parseInt(pin));
-		SalesDetail[] list = SaleDetailsDao.execByDept(staff, onDuty, offDuty, DateType.HISTORY);
+		SalesDetail[] list = SaleDetailsDao.execByDept(staff, onDuty, offDuty, DateType.HISTORY, extraCond);
 		
 		HSSFWorkbook wb = new HSSFWorkbook();
 		HSSFSheet sheet = wb.createSheet("部门销售统计(历史)");
@@ -2979,67 +2996,84 @@ public class HistoryStatisticsAction extends DispatchAction{
 	public ActionForward historyOrder(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws UnsupportedEncodingException, Exception, SQLException, BusinessException{
 		
 		response.setContentType("application/vnd.ms-excel;");
+		List<Order> list = null;
+		
+		String dateType = request.getParameter("dataType");
+		String dateBeg = request.getParameter("dateBeg");
+		String dateEnd = request.getParameter("dateEnd");
+		
+		OrderDao.ExtraCond extraCond = new ExtraCond(DateType.valueOf(Integer.parseInt(dateType)));
 		String pin = (String)request.getAttribute("pin");
 
-		String comboCond;
 		String comboType = request.getParameter("havingCond");
+		String orderId = request.getParameter("orderId");
+		String seqId = request.getParameter("seqId");
+		String type = request.getParameter("type");
+		String tableAlias = request.getParameter("tableAlias");
+		String tableName = request.getParameter("tableName");
+		String region = request.getParameter("region");
+		// 中文乱码
+		String common = new String(request.getParameter("common").getBytes("ISO8859_1"), "UTF-8");
+		
 		if(comboType != null && !comboType.trim().isEmpty()){
 			int comboVal = Integer.valueOf(comboType);
 			if(comboVal == 1){
 				//是否有反结帐
-				comboCond = " AND OH.status = " + Order.Status.REPAID.getVal();
+				extraCond.isRepaid(true);
 			}else if(comboVal == 2){
 				//是否有折扣
-				comboCond = " AND OH.discount_price > 0 ";
+				extraCond.isDiscount(true);
 			}else if(comboVal == 3){
 				//是否有赠送
-				comboCond = " AND OH.gift_price > 0 ";
+				extraCond.isGift(true);
 			}else if(comboVal == 4){
 				//是否有退菜
-				comboCond = " AND OH.cancel_price > 0 ";
+				extraCond.isCancelled(true);
 			}else if(comboVal == 5){
 				//是否有抹数
-				comboCond = " AND OH.erase_price > 0 ";				
+				extraCond.isErased(true);
 			}else if(comboVal == 6){
-				//是否有抹数
-				comboCond = " AND OH.coupon_price > 0 ";				
-			}else{
-				comboCond = "";
+				//是否有优惠劵
+				extraCond.isCoupon(true);
 			}
-		}else{
-			comboCond = "";
 		}
 		
-		String filterCond = "";
-		
-		String value = request.getParameter("value");
-		if(value != null && !value.isEmpty()){
-			filterCond += " AND OH.id = " + value;
+		if(orderId != null && !orderId.isEmpty()){
+			extraCond.setOrderId(Integer.parseInt(orderId));
 		}
-		String type = request.getParameter("type");
+		if(seqId != null && !seqId.isEmpty()){
+			extraCond.setSeqId(Integer.parseInt(seqId));
+		}
+		
 		if(Boolean.parseBoolean(type)){
-			String beginDate = request.getParameter("beginDate");
-			String endDate = request.getParameter("endDate");
 			String comboPayType = request.getParameter("comboPayType");
-			//FIXME 接受中文乱码
-			String common = request.getParameter("common");
-			
-			filterCond += " AND OH.order_date BETWEEN '" + beginDate + "' AND '" + endDate + "'";
 			
 			if(comboPayType != null && !comboPayType.equals("-1")){
 				//按结帐方式
-				filterCond += " AND OH.pay_type = " + comboPayType;
+				extraCond.setPayType(PayType.valueOf(Integer.parseInt(comboPayType)));
 			}
-			if(common != null && !common.isEmpty()){
-				filterCond += " AND OH.comment LIKE '%" + common + "%' ";
-			}
-			
 		}
-		String orderClause = " ORDER BY OH.order_date ASC ";
+		if(common != null && !common.isEmpty()){
+			extraCond.setComment(common);
+		}
+		if(tableAlias != null && !tableAlias.isEmpty()){
+			extraCond.setTableAlias(Integer.parseInt(tableAlias));
+		}
+		if(tableName != null && !tableName.isEmpty()){
+			extraCond.setTableName(tableName);
+		}
+		if(region != null && !region.equals("-1")){
+			extraCond.setRegionId(Short.parseShort(region));
+		}
+		if(dateBeg != null && !dateBeg.isEmpty()){
+			DutyRange orderRange = new DutyRange(dateBeg, dateEnd);
+			extraCond.setOrderRange(orderRange);
+		}
+		String orderClause = " ORDER BY "+ extraCond.orderTbl +".order_date ASC ";
 		
 		Staff staff = StaffDao.verify(Integer.parseInt(pin));
 		
-		List<Order> list = OrderDao.getPureOrder(staff, comboCond + filterCond, orderClause, DateType.HISTORY);
+		list = OrderDao.getPureOrder(staff, extraCond, orderClause);
 		
 		String title = "历史账单";
 		
@@ -3131,6 +3165,14 @@ public class HistoryStatisticsAction extends DispatchAction{
 		cell.setCellValue("状态");
 		cell.setCellStyle(headerStyle);
 		
+		cell = row.createCell(row.getLastCellNum());
+		cell.setCellValue("区域");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell(row.getLastCellNum());
+		cell.setCellValue("备注");
+		cell.setCellStyle(headerStyle);
+		
 		for (Order o : list) {
 			row = sheet.createRow(sheet.getLastRowNum() + 1);
 			row.setHeight((short) 350);
@@ -3169,6 +3211,14 @@ public class HistoryStatisticsAction extends DispatchAction{
 			
 			cell = row.createCell(row.getLastCellNum());
 			cell.setCellValue(o.getStatus().getDesc());
+			cell.setCellStyle(strStyle);
+			
+			cell = row.createCell(row.getLastCellNum());
+			cell.setCellValue(o.getDestTbl().getRegion().getName());
+			cell.setCellStyle(strStyle);
+			
+			cell = row.createCell(row.getLastCellNum());
+			cell.setCellValue(o.getComment());
 			cell.setCellStyle(strStyle);
 		}
 		OutputStream os = response.getOutputStream();

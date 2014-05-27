@@ -26,6 +26,9 @@ public class QueryHistoryAction extends Action {
 		JObject jobject = new JObject();
 		String start = request.getParameter("start");
 		String limit = request.getParameter("limit");
+		
+		String dateBeg = request.getParameter("beginDate");
+		String dateEnd = request.getParameter("endDate");
 		try{
 			String pin = (String)request.getAttribute("pin");
 
@@ -71,12 +74,11 @@ public class QueryHistoryAction extends Action {
 			}
 			
 			if(Boolean.parseBoolean(type)){
-				String beginDate = request.getParameter("beginDate");
-				String endDate = request.getParameter("endDate");
+
 				String comboPayType = request.getParameter("comboPayType");
 				String common = request.getParameter("common");
 				
-				filterCond += " AND OH.order_date BETWEEN '" + beginDate + "' AND '" + endDate + "'";
+//				filterCond += " AND OH.order_date BETWEEN '" + beginDate + "' AND '" + endDate + "'";
 				
 				if(comboPayType != null && !comboPayType.equals("-1")){
 					//按结帐方式
@@ -95,6 +97,9 @@ public class QueryHistoryAction extends Action {
 			}
 			if(region != null && !region.equals("-1")){
 				filterCond += " AND OH.region_id = " + region;
+			}
+			if(dateBeg != null && !dateBeg.isEmpty()){
+				filterCond += " AND O.order_date BETWEEN '" + dateBeg + "' AND '" + dateEnd + "'" ;
 			}
 			
 			String orderClause = " ORDER BY OH.order_date ASC " + " LIMIT " + start + "," + limit;

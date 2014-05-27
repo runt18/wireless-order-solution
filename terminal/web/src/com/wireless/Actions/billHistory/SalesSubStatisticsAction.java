@@ -69,6 +69,7 @@ public class SalesSubStatisticsAction extends Action {
 			String orderType = request.getParameter("orderType");
 			String deptID = request.getParameter("deptID");
 			String foodName = request.getParameter("foodName");
+			String region = request.getParameter("region");
 			
 			pin = pin != null && pin.length() > 0 ? pin.trim() : "";
 			restaurantId = restaurantId != null && restaurantId.length() > 0 ? restaurantId.trim() : "";
@@ -86,12 +87,17 @@ public class SalesSubStatisticsAction extends Action {
 				dateEnd = dateEnd != null && dateEnd.length() > 0 ? dateEnd.trim() + " 23:59:59" : "";
 			}
 			
+			String extraCond = null;
+			if(region != null && !region.equals("-1")){
+				extraCond = " AND O.region_id = " + region;
+			}
 			if(qt == SaleDetailsDao.QUERY_BY_DEPT){
 				saleDetails = SaleDetailsDao.execByDept(
 						StaffDao.verify(Integer.parseInt(pin)), 
 	  					dateBeg, 
 	  					dateEnd,
-	  					dt);
+	  					dt,
+	  					extraCond);
 				
 			}else if(qt == SaleDetailsDao.QUERY_BY_FOOD){
 				String[] splitDeptID = deptID.split(",");
@@ -109,13 +115,15 @@ public class SalesSubStatisticsAction extends Action {
 	  					did,
 	  					ot,
 	  					dt,
-	  					foodName);
+	  					foodName,
+	  					Integer.parseInt(region));
 			}else if(qt == SaleDetailsDao.QUERY_BY_KITCHEN){
 				saleDetails = SaleDetailsDao.execByKitchen(
 						StaffDao.verify(Integer.parseInt(pin)), 
 						dateBeg, 
 						dateEnd, 
-						dt);
+						dt,
+						extraCond);
 			}
 				
 		} catch(BusinessException e){
