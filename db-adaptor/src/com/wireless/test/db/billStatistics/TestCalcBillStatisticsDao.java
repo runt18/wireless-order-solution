@@ -2,6 +2,7 @@ package com.wireless.test.db.billStatistics;
 
 import java.beans.PropertyVetoException;
 import java.sql.SQLException;
+import java.text.ParseException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,11 +12,13 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.wireless.db.billStatistics.CalcBillStatisticsDao;
+import com.wireless.db.billStatistics.CalcBillStatisticsDao.ExtraCond;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.billStatistics.CancelIncomeByDept;
 import com.wireless.pojo.billStatistics.CancelIncomeByReason;
 import com.wireless.pojo.billStatistics.DutyRange;
+import com.wireless.pojo.billStatistics.HourRange;
 import com.wireless.pojo.billStatistics.IncomeByCancel;
 import com.wireless.pojo.billStatistics.IncomeByDept;
 import com.wireless.pojo.billStatistics.IncomeByFood;
@@ -29,18 +32,24 @@ public class TestCalcBillStatisticsDao {
 	
 	private static Staff mStaff;
 	private static DutyRange mDutyRange;
+	private static ExtraCond mExtraCond;
 	
 	@BeforeClass
-	public static void initDbParam() throws PropertyVetoException, SQLException, BusinessException{
+	public static void initDbParam() throws PropertyVetoException, SQLException, BusinessException, ParseException{
 		TestInit.init();
-		 mStaff = StaffDao.getAdminByRestaurant(37);
-		 mDutyRange = new DutyRange("2014-1-10 23:40:04", "2014-1-26 23:49:36"); 
+		 mStaff = StaffDao.getAdminByRestaurant(40);
+		 mDutyRange = new DutyRange("2014-2-10 23:40:04", "2014-2-26 23:49:36"); 
+		 mExtraCond = new ExtraCond(DateType.HISTORY);
+		 //mExtraCond.setDept(Department.DeptId.DEPT_2);
+		 //mExtraCond.setRegion(Region.RegionId.REGION_1);
+		 //mExtraCond.setFoodName("菜");
+		 mExtraCond.setHourRange(new HourRange("10:00:00", "12:00:00"));
 	}
 	
 	@Test 
 	public void testCalcIncomeByKitchenAndDept() throws BusinessException, SQLException{
 		
-		List<IncomeByKitchen> kitchenIncomes = CalcBillStatisticsDao.calcIncomeByKitchen(mStaff, mDutyRange, null, DateType.HISTORY);
+		List<IncomeByKitchen> kitchenIncomes = CalcBillStatisticsDao.calcIncomeByKitchen(mStaff, mDutyRange, mExtraCond);
 		
 		Map<Department, IncomeByDept> deptIncomeByKitchen = new HashMap<Department, IncomeByDept>();
 		for(IncomeByKitchen kitchenIncome : kitchenIncomes){
@@ -58,7 +67,7 @@ public class TestCalcBillStatisticsDao {
 			}
 		}
 		
-		List<IncomeByDept> deptIncomes = CalcBillStatisticsDao.calcIncomeByDept(mStaff, mDutyRange, null, DateType.HISTORY);
+		List<IncomeByDept> deptIncomes = CalcBillStatisticsDao.calcIncomeByDept(mStaff, mDutyRange, mExtraCond);
 		
 		if(deptIncomeByKitchen.size() != deptIncomes.size()){
 			//Check if the amount of department income is the same as before.
@@ -83,7 +92,7 @@ public class TestCalcBillStatisticsDao {
 	@Test 
 	public void testCalcIncomeByFood() throws BusinessException, SQLException{
 		
-		List<IncomeByFood> foodIncomes = CalcBillStatisticsDao.calcIncomeByFood(mStaff, mDutyRange, null, DateType.HISTORY);
+		List<IncomeByFood> foodIncomes = CalcBillStatisticsDao.calcIncomeByFood(mStaff, mDutyRange, mExtraCond);
 		
 		HashMap<Department, IncomeByDept> deptIncomeByFood = new HashMap<Department, IncomeByDept>();
 		for(IncomeByFood foodIncome : foodIncomes){
@@ -101,7 +110,7 @@ public class TestCalcBillStatisticsDao {
 			}
 		}
 		
-		List<IncomeByDept> deptIncomes = CalcBillStatisticsDao.calcIncomeByDept(mStaff, mDutyRange, null, DateType.HISTORY);
+		List<IncomeByDept> deptIncomes = CalcBillStatisticsDao.calcIncomeByDept(mStaff, mDutyRange, mExtraCond);
 		
 		if(deptIncomeByFood.size() != deptIncomes.size()){
 			//Check if the amount of department income is the same as before.
@@ -110,12 +119,12 @@ public class TestCalcBillStatisticsDao {
 			for(IncomeByDept deptIncome : deptIncomeByFood.values()){
 				for(IncomeByDept deptIncomeToComp : deptIncomes){
 					if(deptIncome.getDept().equals(deptIncomeToComp.getDept())){
-						Assert.assertTrue("The discount to " + deptIncome.getDept() + " is different.", 
-										  Float.valueOf(deptIncome.getDiscount()).intValue() == Float.valueOf(deptIncomeToComp.getDiscount()).intValue());
-						Assert.assertTrue("The gift to " + deptIncome.getDept() + " is different.", 
-										  Float.valueOf(deptIncome.getGift()).intValue() == Float.valueOf(deptIncomeToComp.getGift()).intValue());
-						Assert.assertTrue("The income to " + deptIncome.getDept() + " is different.", 
-										  Float.valueOf(deptIncome.getIncome()).intValue() == Float.valueOf(deptIncomeToComp.getIncome()).intValue());
+						Assert.assertEquals("The discount to " + deptIncome.getDept() + " is different.", 
+										  Float.valueOf(deptIncome.getDiscount()).intValue(), Float.valueOf(deptIncomeToComp.getDiscount()).intValue());
+						Assert.assertEquals("The gift to " + deptIncome.getDept() + " is different.", 
+										  Float.valueOf(deptIncome.getGift()).intValue(), Float.valueOf(deptIncomeToComp.getGift()).intValue());
+						Assert.assertEquals("The income to " + deptIncome.getDept() + " is different.", 
+										  Float.valueOf(deptIncome.getIncome()).intValue(), Float.valueOf(deptIncomeToComp.getIncome()).intValue());
 					}
 				}
 			}

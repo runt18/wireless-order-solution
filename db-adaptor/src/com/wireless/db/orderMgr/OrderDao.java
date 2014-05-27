@@ -10,10 +10,12 @@ import com.wireless.db.regionMgr.TableDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.FrontBusinessError;
 import com.wireless.pojo.billStatistics.DutyRange;
+import com.wireless.pojo.billStatistics.HourRange;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.Order.PayType;
 import com.wireless.pojo.dishesOrder.OrderSummary;
 import com.wireless.pojo.distMgr.Discount;
+import com.wireless.pojo.regionMgr.Region;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.util.DateType;
@@ -27,8 +29,9 @@ public class OrderDao {
 		private int seqId = -1;			//按流水号
 		private int tableAlias = -1;	//按餐台号
 		private String tableName;		//按餐台名称
-		private short regionId = -1;	//按区域
+		private Region.RegionId regionId;	//按区域
 		private DutyRange orderRange;	//按结账日期
+		private HourRange hourRange;	//按时间区间
 		private PayType payType;		//按付款类型
 		private String comment;			//按备注
 		private Order.Status status;	//按状态状态
@@ -69,13 +72,18 @@ public class OrderDao {
 			return this;
 		}
 		
-		public ExtraCond setRegionId(short regionId){
+		public ExtraCond setRegionId(Region.RegionId regionId){
 			this.regionId = regionId;
 			return this;
 		}
 		
 		public ExtraCond setOrderRange(DutyRange orderRange){
 			this.orderRange = orderRange;
+			return this;
+		}
+		
+		public ExtraCond setHourRange(HourRange hourRange){
+			this.hourRange = hourRange;
 			return this;
 		}
 		
@@ -133,59 +141,48 @@ public class OrderDao {
 			if(orderId > 0){
 				filterCond.append(" AND " + orderTbl + ".id = " + orderId);
 			}
-			
 			if(seqId > 0){
 				filterCond.append(" AND " + orderTbl + ".seq_id = " + seqId);
 			}
-			
 			if(tableAlias > 0){
 				filterCond.append(" AND " + orderTbl + ".table_alias = " + tableAlias);
 			}
-			
 			if(tableName != null){
 				filterCond.append(" AND " + orderTbl + ".table_name LIKE '%" + tableName + "%'");
 			}
-			
-			if(regionId > 0){
-				filterCond.append(" AND " + orderTbl + ".region_id = " + regionId);
+			if(regionId != null){
+				filterCond.append(" AND " + orderTbl + ".region_id = " + regionId.getId());
 			}
-			
 			if(orderRange != null){
 				filterCond.append(" AND " + orderTbl + ".order_date BETWEEN '" + orderRange.getOnDutyFormat() + "' AND '" + orderRange.getOffDutyFormat() + "'");
 			}
-			
+			if(hourRange != null){
+				filterCond.append(" AND " + orderTbl + ".TIME(order_date) BETWEEN '" + hourRange.getOpeningFormat() + "' AND '" + hourRange.getEndingFormat() + "'");
+			}
 			if(payType != null){
 				filterCond.append(" AND " + orderTbl + ".pay_type = " + payType.getVal());
 			}
-			
 			if(comment != null){
 				filterCond.append(" AND " + orderTbl + ".comment LIKE '%" + tableName + "%'");
 			}
-			
 			if(status != null){
 				filterCond.append(" AND " + orderTbl + ".status = " + status.getVal());
 			}
-			
 			if(isRepaid){
 				filterCond.append(" AND " + orderTbl + ".status = " + Order.Status.REPAID.getVal());
 			}
-			
 			if(isDiscount){
 				filterCond.append(" AND " + orderTbl + ".discount_price > 0");
 			}
-			
 			if(isGift){
 				filterCond.append(" AND " + orderTbl + ".gift_price > 0");
 			}
-			
 			if(isCancelled){
 				filterCond.append(" AND " + orderTbl + ".cancel_price > 0");
 			}
-			
 			if(isErased){
 				filterCond.append(" AND " + orderTbl + ".erase_price > 0");
 			}
-			
 			if(isCoupon){
 				filterCond.append(" AND " + orderTbl + ".coupon_price > 0");
 			}

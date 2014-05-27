@@ -6,6 +6,7 @@ import java.sql.Timestamp;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.billStatistics.CalcBillStatisticsDao;
+import com.wireless.db.billStatistics.CalcBillStatisticsDao.ExtraCond;
 import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.billStatistics.DutyRange;
@@ -282,7 +283,7 @@ public class ShiftDao {
 		result.setIncomeByCharge(CalcBillStatisticsDao.calcIncomeByCharge(dbCon, staff, range, queryType));
 		
 		//Get the gift, discount & total to each department during this period.
-		result.setDeptIncome(CalcBillStatisticsDao.calcIncomeByDept(dbCon, staff, range, null, queryType));
+		result.setDeptIncome(CalcBillStatisticsDao.calcIncomeByDept(dbCon, staff, range, new ExtraCond(queryType)));
 		
 		return result;
 	}

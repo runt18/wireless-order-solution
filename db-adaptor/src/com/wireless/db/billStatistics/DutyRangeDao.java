@@ -56,7 +56,7 @@ public class DutyRangeDao {
 				return new DutyRange(onDutyString, offDutyString);
 				
 			}else{
-				return null;
+				return new DutyRange(onDuty, offDuty);
 			}
 			
 		}finally{

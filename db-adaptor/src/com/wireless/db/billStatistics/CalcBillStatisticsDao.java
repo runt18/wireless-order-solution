@@ -20,6 +20,7 @@ import com.wireless.pojo.billStatistics.CancelIncomeByReason;
 import com.wireless.pojo.billStatistics.CancelIncomeByReason.IncomeByEachDept;
 import com.wireless.pojo.billStatistics.CommissionStatistics;
 import com.wireless.pojo.billStatistics.DutyRange;
+import com.wireless.pojo.billStatistics.HourRange;
 import com.wireless.pojo.billStatistics.IncomeByCancel;
 import com.wireless.pojo.billStatistics.IncomeByCharge;
 import com.wireless.pojo.billStatistics.IncomeByCoupon;
@@ -41,12 +42,76 @@ import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.menuMgr.Kitchen;
+import com.wireless.pojo.regionMgr.Region;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.DateUtil;
 import com.wireless.util.DateType;
 
 public class CalcBillStatisticsDao {
 
+	public static class ExtraCond{
+		public final DateType dateType;
+		private final String orderTbl;
+		private final String orderFoodTbl;
+		private final String tasteGrpTbl;
+
+		private Region.RegionId regionId;
+		private Department.DeptId deptId;
+		private String foodName;
+		private HourRange hourRange;
+		
+		public ExtraCond(DateType dateType){
+			this.dateType = dateType;
+			if(this.dateType.isHistory()){
+				orderTbl = TBL_ORDER_HISTORY;
+				orderFoodTbl = TBL_ORDER_FOOD_HISTORY;
+				tasteGrpTbl = TBL_TASTE_GROUP_HISTORY;
+			}else{
+				orderTbl = TBL_ORDER_TODAY;
+				orderFoodTbl = TBL_ORDER_FOOD_TODAY;
+				tasteGrpTbl = TBL_TASTE_GROUP_TODAY;
+			}
+		}
+		
+		public ExtraCond setRegion(Region.RegionId regionId){
+			this.regionId = regionId;
+			return this;
+		}
+		
+		public ExtraCond setDept(Department.DeptId deptId){
+			this.deptId = deptId;
+			return this;
+		}
+		
+		public ExtraCond setFoodName(String foodName){
+			this.foodName = foodName;
+			return this;
+		}
+		
+		public ExtraCond setHourRange(HourRange range){
+			this.hourRange = range;
+			return this;
+		}
+		
+		@Override
+		public String toString(){
+			StringBuilder extraCond = new StringBuilder();
+			if(regionId != null){
+				extraCond.append(" AND O.region_id = " + regionId.getId());
+			}
+			if(deptId != null){
+				extraCond.append(" AND OF.dept_id = " + deptId.getVal());
+			}
+			if(foodName != null){
+				extraCond.append(" AND OF.name LIKE '%" + foodName + "%'");
+			}
+			if(hourRange != null){
+				extraCond.append(" AND TIME(O.order_date) BETWEEN '" + hourRange.getOpeningFormat() + "' AND '" + hourRange.getEndingFormat() + "'");
+			}
+			return extraCond.toString();
+		}
+	}
+	
 	private final static String TBL_ORDER_TODAY = "order";
 	private final static String TBL_ORDER_FOOD_TODAY = "order_food";
 	private final static String TBL_TASTE_GROUP_TODAY = "taste_group";
@@ -594,23 +659,7 @@ public class CalcBillStatisticsDao {
 		return serviceIncome;
 	}
 	
-	private static String makeSql4CalcFood(Staff staff, DutyRange range, String extraCond, DateType queryType){
-		String orderTbl = null;
-		String orderFoodTbl = null;
-		String tasteGrpTbl = null;
-		if(queryType.isHistory()){
-			orderTbl = TBL_ORDER_HISTORY;
-			orderFoodTbl = TBL_ORDER_FOOD_HISTORY;
-			tasteGrpTbl = TBL_TASTE_GROUP_HISTORY;
-			
-		}else if(queryType.isToday()){
-			orderTbl = TBL_ORDER_TODAY;
-			orderFoodTbl = TBL_ORDER_FOOD_TODAY;
-			tasteGrpTbl = TBL_TASTE_GROUP_TODAY;
-			
-		}else{
-			throw new IllegalArgumentException("The query type is invalid.");
-		}
+	private static String makeSql4CalcFood(Staff staff, DutyRange range, ExtraCond extraCond){
 		
 		return " SELECT " +
 			   " OF.order_id, OF.food_id, " +
@@ -622,14 +671,14 @@ public class CalcBillStatisticsDao {
 					" WHEN ((OF.food_status & " + Food.GIFT + ") = 0 AND (OF.food_status & " + Food.WEIGHT + ") <> 0) THEN (OF.unit_price * SUM(OF.order_count) + (IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0))) * discount " +
 				  	" ELSE 0 " +
 				  	" END AS food_income " +
-			   " FROM " + Params.dbName + "." + orderFoodTbl + " OF " + 
-			   " JOIN " + Params.dbName + "." + orderTbl + " O ON 1 = 1 " + 
+			   " FROM " + Params.dbName + "." + extraCond.orderFoodTbl + " OF " + 
+			   " JOIN " + Params.dbName + "." + extraCond.orderTbl + " O ON 1 = 1 " + 
 			   " AND OF.order_id = O.id " + 
 			   " AND O.restaurant_id = " + staff.getRestaurantId() + 
 			   " AND O.status <> " + Order.Status.UNPAID.getVal() +
-			   " JOIN " + Params.dbName + "." + tasteGrpTbl + " TG " + " ON OF.taste_group_id = TG.taste_group_id " +
+			   " JOIN " + Params.dbName + "." + extraCond.tasteGrpTbl + " TG " + " ON OF.taste_group_id = TG.taste_group_id " +
 			   " WHERE 1 = 1 " +
-			   (extraCond == null ? "" : extraCond) +
+			   (extraCond == null ? "" : extraCond.toString()) +
 			   " AND O.order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +
 			   " GROUP BY " + " OF.order_id, OF.food_id, OF.taste_group_id " +
 			   " HAVING food_amount > 0 ";
@@ -643,17 +692,17 @@ public class CalcBillStatisticsDao {
 	 * 			the staff to perform this action
 	 * @param range
 	 * 			the duty range
-	 * @param queryType
-	 * 			the query type {@link DateType}
+	 * @param extraCond
+	 * 			the extra condition {@link ExtraCond}
 	 * @return the result {@link IncomeByDept} list
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static List<IncomeByDept> calcIncomeByDept(Staff staff, DutyRange range, String extraCond, DateType queryType) throws SQLException{
+	public static List<IncomeByDept> calcIncomeByDept(Staff staff, DutyRange range, ExtraCond extraCond) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return calcIncomeByDept(dbCon, staff, range, extraCond, queryType);
+			return calcIncomeByDept(dbCon, staff, range, extraCond);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -667,13 +716,13 @@ public class CalcBillStatisticsDao {
 	 * 			the staff to perform this action
 	 * @param range
 	 * 			the duty range
-	 * @param queryType
-	 * 			the query type {@link DateType}
+	 * @param extraCond
+	 * 			the extra condition {@link ExtraCond}
 	 * @return the result {@link IncomeByDept} list
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static List<IncomeByDept> calcIncomeByDept(DBCon dbCon, Staff staff, DutyRange range, String extraCond, DateType queryType) throws SQLException{
+	public static List<IncomeByDept> calcIncomeByDept(DBCon dbCon, Staff staff, DutyRange range, ExtraCond extraCond) throws SQLException{
 		
 		String sql;
 		
@@ -684,7 +733,7 @@ public class CalcBillStatisticsDao {
 			  " ROUND(SUM(food_discount), 2) AS dept_discount, " +
 			  " ROUND(SUM(food_income), 2) AS dept_income " +
 			  " FROM (" + 
-			  	makeSql4CalcFood(staff, range, extraCond, queryType) +
+			  	makeSql4CalcFood(staff, range, extraCond) +
 			  " ) AS TMP " +
 		      " JOIN " + Params.dbName + ".department D " + " ON TMP.dept_id = D.dept_id " + " AND D.restaurant_id = " + staff.getRestaurantId() +
 			  " GROUP BY TMP.dept_id " +
@@ -712,19 +761,22 @@ public class CalcBillStatisticsDao {
 	}
 	
 	/**
-	 * 
+	 * Calculate the income to each kitchen according to extra condition.
 	 * @param staff
+	 * 			the staff to perform this action
 	 * @param range
+	 * 			the duty range
 	 * @param extraCond
-	 * @param queryType
-	 * @return
+	 * 			the extra condition {@link ExtraCond}
+	 * @return the result list {@link IncomeByKitchen}
 	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
 	 */
-	public static List<IncomeByKitchen> calcIncomeByKitchen(Staff staff, DutyRange range, String extraCond, DateType queryType) throws SQLException{
+	public static List<IncomeByKitchen> calcIncomeByKitchen(Staff staff, DutyRange range, ExtraCond extraCond) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return calcIncomeByKitchen(dbCon, staff, range, extraCond, queryType);
+			return calcIncomeByKitchen(dbCon, staff, range, extraCond);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -740,14 +792,12 @@ public class CalcBillStatisticsDao {
 	 * @param range
 	 * 			the duty range
 	 * @param extraCond
-	 * 			the extra condition
-	 * @param queryType
-	 * 			the data type {@link DateType}
+	 * 			the extra condition {@link ExtraCond}
 	 * @return the result list {@link IncomeByKitchen}
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static List<IncomeByKitchen> calcIncomeByKitchen(DBCon dbCon, Staff staff, DutyRange range, String extraCond, DateType queryType) throws SQLException{
+	public static List<IncomeByKitchen> calcIncomeByKitchen(DBCon dbCon, Staff staff, DutyRange range, ExtraCond extraCond) throws SQLException{
 		
 		String sql;
 		
@@ -756,7 +806,7 @@ public class CalcBillStatisticsDao {
 			  " D.dept_id, D.type AS dept_type, D.name AS dept_name, D.display_id AS dept_display_id, " +
 			  " ROUND(SUM(food_gift), 2) AS kitchen_gift, ROUND(SUM(food_discount), 2) AS kitchen_discount, ROUND(SUM(food_income), 2) AS kitchen_income " +
 			  " FROM ( " +
-			  makeSql4CalcFood(staff, range, extraCond, queryType) +
+			  makeSql4CalcFood(staff, range, extraCond) +
 			  " ) AS TMP " +
 			  " JOIN " + Params.dbName + ".kitchen K " + " ON TMP.kitchen_id = K.kitchen_id " + 
 			  " JOIN " + Params.dbName + ".department D " + " ON TMP.dept_id = D.dept_id AND D.restaurant_id = " + staff.getRestaurantId() +
@@ -793,27 +843,43 @@ public class CalcBillStatisticsDao {
 		return kitchenIncomes;
 	}
 	
-	public static List<IncomeByFood> calcIncomeByFood(Staff staff, DutyRange range, String extraCond, DateType queryType) throws SQLException{
+	/**
+	 * Calculate income by each food according to extra condition {@link ExtraCond}
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param range
+	 * 			the duty range
+	 * @param extraCond
+	 * 			the extra condition {@link ExtraCond}
+	 * @return the result list {@link IncomeByFood}
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static List<IncomeByFood> calcIncomeByFood(Staff staff, DutyRange range, ExtraCond extraCond) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return calcIncomeByFood(dbCon, staff, range, extraCond, queryType);
+			return calcIncomeByFood(dbCon, staff, range, extraCond);
 		}finally{
 			dbCon.disconnect();
 		}
 	}
 	
 	/**
-	 * 
+	 * Calculate income by each food according to extra condition {@link ExtraCond}
 	 * @param dbCon
+	 * 			the database connection
 	 * @param staff
+	 * 			the staff to perform this action
 	 * @param range
+	 * 			the duty range
 	 * @param extraCond
-	 * @param queryType
-	 * @return
+	 * 			the extra condition {@link ExtraCond}
+	 * @return the result list {@link IncomeByFood}
 	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
 	 */
-	public static List<IncomeByFood> calcIncomeByFood(DBCon dbCon, Staff staff, DutyRange range, String extraCond, DateType queryType) throws SQLException{
+	public static List<IncomeByFood> calcIncomeByFood(DBCon dbCon, Staff staff, DutyRange range, ExtraCond extraCond) throws SQLException{
 		
 		String sql;
 		
@@ -827,7 +893,7 @@ public class CalcBillStatisticsDao {
 			  " ROUND(SUM(TMP.food_discount), 2) AS food_discount, " +
 			  " ROUND(SUM(TMP.food_income), 2) AS food_income " +
 			  " FROM (" +
-			  makeSql4CalcFood(staff, range, extraCond, queryType) +
+			  makeSql4CalcFood(staff, range, extraCond) +
 			  " ) AS TMP " +
 			  " GROUP BY food_id " +
 			  " ORDER BY food_id ";

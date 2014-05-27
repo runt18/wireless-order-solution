@@ -1,25 +1,19 @@
 package com.wireless.db.billStatistics;
 
 import java.sql.SQLException;
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 
 import com.wireless.db.DBCon;
+import com.wireless.db.billStatistics.CalcBillStatisticsDao.ExtraCond;
 import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.billStatistics.IncomeByDept;
 import com.wireless.pojo.billStatistics.IncomeByFood;
 import com.wireless.pojo.billStatistics.IncomeByKitchen;
 import com.wireless.pojo.billStatistics.SalesDetail;
-import com.wireless.pojo.menuMgr.Department;
-import com.wireless.pojo.menuMgr.Food;
-import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.pojo.staffMgr.Staff;
-import com.wireless.util.DateType;
 
 public class SaleDetailsDao {
 	
@@ -31,19 +25,22 @@ public class SaleDetailsDao {
 	public final static int ORDER_BY_SALES = 1;		//按销量排序
 	
 	/**
-	 * 
+	 * Get the sales details to each department.
 	 * @param staff
-	 * @param onDuty
-	 * @param offDuty
-	 * @param queryType
-	 * @return
+	 * 			the staff to perform this action
+	 * @param range
+	 * 			the duty range
+	 * @param extraCond
+	 * 			the extra condition {@link CalcBillStatisticsDao.ExtraCond}
+	 * @return the result list {@link SalesDetail}
 	 * @throws SQLException
+	 * 			throws if any error occurred while execute any SQL statements
 	 */
-	public static SalesDetail[] execByDept(Staff staff, String onDuty, String offDuty, DateType queryType, String extraCond) throws SQLException{
+	public static List<SalesDetail> execByDept(Staff staff, DutyRange range, ExtraCond extraCond) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return execByDept(dbCon, staff, onDuty, offDuty, queryType, extraCond);
+			return getByDept(dbCon, staff, range, extraCond);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -54,95 +51,48 @@ public class SaleDetailsDao {
 	 * @param dbCon
 	 * 			the database connection
 	 * @param staff
-	 * 			the terminal to query
-	 * @param onDuty
-	 * 			the on duty to query
-	 * @param offDuty
-	 * 			the off duty to query
-	 * @param queryType
-	 * 			The query type
-	 * @return
-	 * 			an array containing department sales details which is sorted by profit in descending order
+	 * 			the staff to perform this action
+	 * @param range
+	 * 			the duty range
+	 * @param extraCond
+	 * 			the extra condition {@link CalcBillStatisticsDao.ExtraCond}
+	 * @return the result list {@link SalesDetail}
 	 * @throws SQLException
-	 * 			throws if any error occurred while execute any SQL statements.
+	 * 			throws if any error occurred while execute any SQL statements
 	 */
-	public static SalesDetail[] execByDept(DBCon dbCon, Staff staff, String onDuty, String offDuty, DateType queryType, String extraCond) throws SQLException{
+	public static List<SalesDetail> getByDept(DBCon dbCon, Staff staff, DutyRange range, ExtraCond extraCond) throws SQLException{
 		List<IncomeByDept> deptIncomes;
 
-		if(queryType.isHistory()){
+		if(extraCond.dateType.isHistory()){
 			
-			/**
-			 * Get the duty range between on and off duty date
-			 */
-			DutyRange dutyRange = DutyRangeDao.exec(dbCon, staff, onDuty, offDuty);
-			
-			if(dutyRange == null){
-				return new SalesDetail[0];
-			}
+			//Get the duty range between on and off duty date
+			DutyRange dutyRange = DutyRangeDao.exec(dbCon, staff, range.getOnDutyFormat(), range.getOffDutyFormat());
 			
 			//Calculate the incomes to each department.
-			deptIncomes = CalcBillStatisticsDao.calcIncomeByDept(dbCon, staff, dutyRange, extraCond, queryType);
+			deptIncomes = CalcBillStatisticsDao.calcIncomeByDept(dbCon, staff, dutyRange, extraCond);
 		}else{
 			//Calculate the incomes to each department.
-			deptIncomes = CalcBillStatisticsDao.calcIncomeByDept(dbCon, staff, new DutyRange(onDuty, offDuty), extraCond, queryType);
+			deptIncomes = CalcBillStatisticsDao.calcIncomeByDept(dbCon, staff, range, extraCond);
 		}
 		
-		HashMap<Department, SalesDetail> deptSalesDetail = new HashMap<Department, SalesDetail>();
+		List<SalesDetail> result = new ArrayList<SalesDetail>();
 		for(IncomeByDept deptIncome : deptIncomes){
 			SalesDetail salesDetail = new SalesDetail(deptIncome.getDept());
 			salesDetail.setGifted(deptIncome.getGift());
 			salesDetail.setDiscount(deptIncome.getDiscount());
 			salesDetail.setIncome(deptIncome.getIncome());
-			deptSalesDetail.put(deptIncome.getDept(), salesDetail);
+			salesDetail.setProfit(salesDetail.getIncome() - salesDetail.getCost());
+			if(salesDetail.getIncome() != 0.00){
+				salesDetail.setProfitRate(salesDetail.getProfit() / salesDetail.getIncome());
+				salesDetail.setCostRate(salesDetail.getCost() / salesDetail.getIncome());
+			}
+			result.add(salesDetail);
 		}
 		
 		/**
-		 * Calculate the cost to each department during this period
-		 */
-		/*for(MaterialDetail materialDetail : materialDetails){
-			SalesDetail salesDetail = deptSalesDetail.get(materialDetail.dept);
-			if(salesDetail != null){
-				salesDetail.setCost(salesDetail.getCost() + Math.abs(materialDetail.calcPrice()));
-			}
-		}*/
-
-		/**
-		 * Remove the invalid department sales detail record
-		 */
-		Iterator<Map.Entry<Department, SalesDetail>> iter = deptSalesDetail.entrySet().iterator();
-		while(iter.hasNext()){
-			Map.Entry<Department, SalesDetail> entry = iter.next();
-			SalesDetail saleDetail = entry.getValue();
-			if(saleDetail.getGifted() == 0 && saleDetail.getIncome() == 0 &&
-			   saleDetail.getDiscount() == 0 && saleDetail.getCost() == 0){
-				iter.remove();
-			}
-		}
-			
-		/**
-		 * Calculate the profit, cost rate, profit rate to each department
-		 */
-		for(Entry<Department, SalesDetail> entry : deptSalesDetail.entrySet()){
-			SalesDetail detail = entry.getValue();
-			detail.setGifted((float)Math.round(detail.getGifted() * 100) / 100);
-			detail.setDiscount((float)Math.round(detail.getDiscount() * 100) / 100);
-			detail.setIncome((float)Math.round(detail.getIncome() * 100) / 100);
-			detail.setCost((float)Math.round(detail.getCost() * 100) / 100);
-				
-			detail.setProfit(detail.getIncome() - detail.getCost());
-			if(detail.getIncome() != 0.00){
-				detail.setProfitRate(detail.getProfit() / detail.getIncome());
-				detail.setCostRate(detail.getCost() / detail.getIncome());
-			}
-			
-			entry.setValue(detail);
-		}
-			
-		SalesDetail[] result = deptSalesDetail.values().toArray(new SalesDetail[deptSalesDetail.values().size()]);
-		/**
 		 * Sort the department sales detail in descending order by profit
 		 */
-		Arrays.sort(result, new Comparator<SalesDetail>(){
+		Collections.sort(result, new Comparator<SalesDetail>(){
 
 			@Override
 			public int compare(SalesDetail result1, SalesDetail result2) {
@@ -161,208 +111,131 @@ public class SaleDetailsDao {
 	}
 
 	/**
-	 * 
+	 * Get the sales detail to each kitchen according to specific range and extra condition.
 	 * @param staff
-	 * @param onDuty
-	 * @param offDuty
-	 * @param queryType
-	 * @return
+	 * 			the staff to perform this action
+	 * @param range
+	 * 			the duty range
+	 * @param extraCond
+	 * 			the extra condition
+	 * @return the result list {@link SalesDetail}
 	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
 	 */
-	public static SalesDetail[] execByKitchen(Staff staff, String onDuty, String offDuty, DateType queryType, String extraCond) throws SQLException{
+	public static List<SalesDetail> getByKitchen(Staff staff, DutyRange range, ExtraCond extraCond) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return execByKitchen(dbCon, staff, onDuty, offDuty, queryType, extraCond);
+			return getByKitchen(dbCon, staff, range, extraCond);
 		}finally{
 			dbCon.disconnect();
 		}
 	}
-	
+
 	/**
-	 * 
+	 * Get the sales detail to each kitchen according to specific range and extra condition.
 	 * @param dbCon
-	 * @param term
-	 * @param onDuty
-	 * @param offDuty
-	 * @param queryType
-	 * @return
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param range
+	 * 			the duty range
+	 * @param extraCond
+	 * 			the extra condition
+	 * @return the result list {@link SalesDetail}
 	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
 	 */
-	public static SalesDetail[] execByKitchen(DBCon dbCon, Staff term, String onDuty, String offDuty, DateType queryType, String extraCond) throws SQLException{
+	public static List<SalesDetail> getByKitchen(DBCon dbCon, Staff staff, DutyRange range, ExtraCond extraCond) throws SQLException{
 		
 		List<IncomeByKitchen> kitchenIncomes;
 
-		if(queryType.isHistory()){
+		if(extraCond.dateType.isHistory()){
 			
-			/**
-			 * Get the duty range between on and off duty date
-			 */
-			DutyRange dutyRange = DutyRangeDao.exec(dbCon, term, onDuty, offDuty);
+			//Get the duty range between on and off duty date
+			DutyRange dutyRange = DutyRangeDao.exec(dbCon, staff, range.getOnDutyFormat(), range.getOffDutyFormat());
 			
-			if(dutyRange == null){
-				return new SalesDetail[0];
-			}
 			//Calculate the incomes to each kitchen.
-			kitchenIncomes = CalcBillStatisticsDao.calcIncomeByKitchen(dbCon, term, dutyRange, extraCond, queryType);
+			kitchenIncomes = CalcBillStatisticsDao.calcIncomeByKitchen(dbCon, staff, dutyRange, extraCond);
 			
 		}else{
-			
 			//Calculate the incomes to each kitchen.
-			kitchenIncomes = CalcBillStatisticsDao.calcIncomeByKitchen(dbCon, term, new DutyRange(onDuty, offDuty), extraCond, queryType);
+			kitchenIncomes = CalcBillStatisticsDao.calcIncomeByKitchen(dbCon, staff, range, extraCond);
 		}
 		
-		HashMap<Kitchen, SalesDetail> kitchenSalesDetail = new HashMap<Kitchen, SalesDetail>();
+		List<SalesDetail> result = new ArrayList<SalesDetail>();
 		for(IncomeByKitchen kitchenIncome : kitchenIncomes){
 			SalesDetail salesDetail = new SalesDetail(kitchenIncome.getKitchen());
 			salesDetail.setGifted(kitchenIncome.getGift());
 			salesDetail.setDiscount(kitchenIncome.getDiscount());
 			salesDetail.setIncome(kitchenIncome.getIncome());
-			kitchenSalesDetail.put(kitchenIncome.getKitchen(), salesDetail);
+			salesDetail.setProfit(salesDetail.getIncome() - salesDetail.getCost());
+			if(salesDetail.getIncome() != 0.00){
+				salesDetail.setProfitRate(salesDetail.getProfit() / salesDetail.getIncome());
+				salesDetail.setCostRate(salesDetail.getCost() / salesDetail.getIncome());
+			}
+			result.add(salesDetail);
 		}
 
-		/**
-		 * Remove the invalid kitchen sales detail record
-		 */
-		Iterator<Map.Entry<Kitchen, SalesDetail>> iter = kitchenSalesDetail.entrySet().iterator();
-		while(iter.hasNext()){
-			Map.Entry<Kitchen, SalesDetail> entry = iter.next();
-			SalesDetail saleDetail = entry.getValue();
-			if(saleDetail.getGifted() == 0 && saleDetail.getIncome() == 0 &&
-			   saleDetail.getDiscount() == 0 && saleDetail.getCost() == 0){
-				iter.remove();
-			}
-		}
-			
-		/**
-		 * Calculate the profit, cost rate, profit rate to each kitchen
-		 */
-		for(Entry<Kitchen, SalesDetail> entry : kitchenSalesDetail.entrySet()){
-			SalesDetail detail = entry.getValue();
-			detail.setGifted((float)Math.round(detail.getGifted() * 100) / 100);
-			detail.setDiscount((float)Math.round(detail.getDiscount() * 100) / 100);
-			detail.setIncome((float)Math.round(detail.getIncome() * 100) / 100);
-			detail.setCost((float)Math.round(detail.getCost() * 100) / 100);
-				
-			detail.setProfit(detail.getIncome() - detail.getCost());
-			if(detail.getIncome() != 0.00){
-				detail.setProfitRate(detail.getProfit() / detail.getIncome());
-				detail.setCostRate(detail.getCost() / detail.getIncome());
-			}
-			
-			entry.setValue(detail);
-		}
-			
-		SalesDetail[] result = kitchenSalesDetail.values().toArray(new SalesDetail[kitchenSalesDetail.values().size()]);
-		/**
-		 * Sort the kitchen sales detail in descending order by profit
-		 */
-		Arrays.sort(result, new Comparator<SalesDetail>(){
-
-			@Override
-			public int compare(SalesDetail result1, SalesDetail result2) {
-				if(result1.getProfit() == result2.getProfit()){
-					return 0;
-				}else if(result1.getProfit() > result2.getProfit()){
-					return -1;
-				}else{
-					return 1;
-				}
-			}
-				
-		});
-			
 		return result;
 	}
 	
 
 	/**
-	 * 
+	 * Get the sales detail to each food according to specific range and extra condition.
+	 * @param dbCon
+	 * 			the database connection
 	 * @param term
-	 * @param onDuty
-	 * @param offDuty
-	 * @param deptID
+	 * 			the staff to perform this action
+	 * @param range
+	 * 			the duty range
+	 * @param extraCond
+	 * 			the extra condition {@link CalcBillStatisticsDao.ExtraCond}
 	 * @param orderType
-	 * @param queryType
-	 * @return
+	 * @return the result list {@link SalesDetail}
 	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
 	 */
-	public static SalesDetail[] execByFood(Staff term, String onDuty, String offDuty, int[] deptID, int orderType, DateType queryType, String foodName, int region) throws SQLException{
+	public static List<SalesDetail> getByFood(Staff term, DutyRange range, ExtraCond extraCond, int orderType) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return execByFood(dbCon, term, onDuty, offDuty, deptID, orderType, queryType, foodName, region);
+			return getByFood(dbCon, term, range, extraCond, orderType);
 		}finally{
 			dbCon.disconnect();
 		}
 	}	
 	
 	/**
-	 * Get the sales details to each food of one or more departments.
+	 * Get the sales detail to each food according to specific range and extra condition.
 	 * @param dbCon
 	 * 			the database connection
 	 * @param term
-	 * 			the terminal to query
-	 * @param onDuty
-	 * 			the on duty to query
-	 * @param offDuty
-	 * 			the off duty to query
-	 * @param deptID
+	 * 			the staff to perform this action
+	 * @param range
+	 * 			the duty range
+	 * @param extraCond
+	 * 			the extra condition {@link CalcBillStatisticsDao.ExtraCond}
 	 * @param orderType
-	 * 			The order type.
-	 * @param queryType
-	 * 			The query type.
-	 * @return
-	 * 			an array containing department sales details which is sorted by profit in descending order
+	 * @return the result list {@link SalesDetail}
 	 * @throws SQLException
-	 * 			throws if any error occurred while execute any SQL statements.
+	 * 			throws if failed to execute any SQL statement
 	 */
-	public static SalesDetail[] execByFood(DBCon dbCon, Staff term, String onDuty, String offDuty, int[] deptID, int orderType, DateType queryType, String foodName, int region) throws SQLException{
-		
-		StringBuilder deptCond = new StringBuilder();
-		if(deptID.length != 0){
-			for(int i = 0; i < deptID.length; i++){
-				if(i == 0){
-					deptCond.append(Integer.toString(deptID[0]));
-				}else{
-					deptCond.append(",").append(deptID[i]);
-				}
-			}
-		}
+	public static List<SalesDetail> getByFood(DBCon dbCon, Staff term, DutyRange range, ExtraCond extraCond, int orderType) throws SQLException{
 		
 		List<IncomeByFood> foodIncomes;
 		
-		if(queryType.isHistory()){
+		if(extraCond.dateType.isHistory()){
 			
-			/**
-			 * Get the duty range between on and off duty date
-			 */
-			DutyRange dutyRange = DutyRangeDao.exec(dbCon, term, onDuty, offDuty);
+			//Get the duty range between on and off duty date
+			DutyRange dutyRange = DutyRangeDao.exec(dbCon, term, range.getOnDutyFormat(), range.getOffDutyFormat());
 			
-			if(dutyRange == null){
-				return new SalesDetail[0];
-			}
-			
-			foodIncomes = CalcBillStatisticsDao.calcIncomeByFood(dbCon, 
-				term, 
-				dutyRange,
-				(foodName != null && !foodName.trim().isEmpty() ? " AND OF.name LIKE '%" + foodName + "%'" : "") +
-				(deptID.length != 0 ? " AND OF.dept_id IN(" + deptCond + ")" : "") +
-				(region != -1 ? (" AND O.region_id = " + region) : ""), 
-				queryType
-			);
+			foodIncomes = CalcBillStatisticsDao.calcIncomeByFood(dbCon,	term, dutyRange, extraCond);
 		}else{
-			foodIncomes = CalcBillStatisticsDao.calcIncomeByFood(dbCon, 
-				term,
-				new DutyRange(onDuty, offDuty),
-				(foodName != null && !foodName.trim().isEmpty() ? " AND OF.name LIKE '%" + foodName + "%'" : "") +
-				(deptID.length != 0 ? " AND OF.dept_id IN(" + deptCond + ")" : "") +
-				(region != -1 ? (" AND O.region_id = " + region) : ""), 
-				queryType
-			);
+			foodIncomes = CalcBillStatisticsDao.calcIncomeByFood(dbCon, term, range, extraCond);
 		}
 		
-		HashMap<Food, SalesDetail> foodSalesDetail = new HashMap<Food, SalesDetail>();
+		List<SalesDetail> result = new ArrayList<SalesDetail>();
 		
 		for(IncomeByFood foodIncome : foodIncomes){
 			SalesDetail detail = new SalesDetail(foodIncome.getFood());
@@ -370,21 +243,7 @@ public class SaleDetailsDao {
 			detail.setGifted(foodIncome.getGift());
 			detail.setIncome(foodIncome.getIncome());
 			detail.setSalesAmount(foodIncome.getSaleAmount());
-			foodSalesDetail.put(foodIncome.getFood(), detail);
-		}
-		
-		/**
-		 * Calculate the profit, cost rate, profit rate, average price, average cost to each food
-		 */
-		for(Map.Entry<Food, SalesDetail> entry : foodSalesDetail.entrySet()){
 			
-			SalesDetail detail = entry.getValue();			
-				
-			detail.setGifted((float)Math.round(detail.getGifted() * 100) / 100);
-			detail.setDiscount((float)Math.round(detail.getDiscount() * 100) / 100);
-			detail.setIncome((float)Math.round(detail.getIncome() * 100) / 100);
-			detail.setCost((float)Math.round(detail.getCost() * 100) / 100);
-				
 			detail.setProfit(detail.getIncome() - detail.getCost());
 			if(detail.getIncome() != 0.00){
 				detail.setProfitRate(detail.getProfit() / detail.getIncome());
@@ -396,13 +255,12 @@ public class SaleDetailsDao {
 				detail.setAvgCost((float)Math.round(detail.getCost() / detail.getSalesAmount() * 100) /100);
 			}
 			
-			entry.setValue(detail)	;
+			result.add(detail);
 		}
 		
-		SalesDetail[] result = foodSalesDetail.values().toArray(new SalesDetail[foodSalesDetail.values().size()]);
 		
 		if(orderType == SaleDetailsDao.ORDER_BY_PROFIT){
-			Arrays.sort(result, new Comparator<SalesDetail>(){
+			Collections.sort(result, new Comparator<SalesDetail>(){
 				@Override
 				public int compare(SalesDetail o1, SalesDetail o2) {
 					if(o1.getProfit() == o2.getProfit()){
@@ -415,7 +273,7 @@ public class SaleDetailsDao {
 				}				
 			});
 		}else if(orderType == SaleDetailsDao.ORDER_BY_SALES){
-			Arrays.sort(result, new Comparator<SalesDetail>(){
+			Collections.sort(result, new Comparator<SalesDetail>(){
 				@Override
 				public int compare(SalesDetail o1, SalesDetail o2) {
 					if(o1.getSalesAmount() == o2.getSalesAmount()){

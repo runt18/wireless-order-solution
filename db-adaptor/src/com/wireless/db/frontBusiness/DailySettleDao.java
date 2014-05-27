@@ -314,27 +314,26 @@ public class DailySettleDao {
 		}
 		
 		String sql;
-		DutyRange range = new DutyRange();
 		
-		/**
-		 * Get the date to last daily settlement.
-		 * Make the 00:00 of today as on duty if no daily settle record exist before. 
-		 */
+		//Get the date to last daily settlement.
+		//Make the 00:00 of today as on duty if no daily settle record exist before. 
 		sql = " SELECT MAX(off_duty) FROM " + Params.dbName + ".daily_settle_history " +
 			  " WHERE " +
 			  " restaurant_id = " + staff.getRestaurantId();
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
+		long onDuty = 0;
 		if(dbCon.rs.next()){
-			Timestamp offDuty = dbCon.rs.getTimestamp(1);
-			if(offDuty != null){
-				range.setOnDuty(offDuty.getTime());
+			if(dbCon.rs.getTimestamp(1) != null){
+				onDuty = dbCon.rs.getTimestamp(1).getTime();
 			}else{
-				range.setOnDuty(RestaurantDao.getById(dbCon, staff.getRestaurantId()).getBirthDate());
+				onDuty = RestaurantDao.getById(dbCon, staff.getRestaurantId()).getBirthDate();
 			}
 		}else{
-			range.setOnDuty(RestaurantDao.getById(dbCon, staff.getRestaurantId()).getBirthDate());
+			onDuty = RestaurantDao.getById(dbCon, staff.getRestaurantId()).getBirthDate();
 		}
-		range.setOffDuty(System.currentTimeMillis());
+		
+		DutyRange range = new DutyRange(onDuty, System.currentTimeMillis());
+
 		result.setRange(range);
 		
 		StringBuilder paidOrderCond = new StringBuilder();
