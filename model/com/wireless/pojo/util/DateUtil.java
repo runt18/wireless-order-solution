@@ -14,8 +14,9 @@ public class DateUtil {
 	
 	public static enum Pattern{
 		MO_SEQ("yyyyMMddHHmmss", "member operation seq"),
-		DATE_TIME("yyyy-MM-dd HH:mm:ss", "local host"),
-		DATE("yyyy-MM-dd", "date");
+		DATE_TIME("yyyy-MM-dd HH:mm:ss", "date_time"),
+		DATE("yyyy-MM-dd", "date"),
+		TIME("HH:mm:ss", "time");
 		
 		private final String pattern;
 		private final String desc;

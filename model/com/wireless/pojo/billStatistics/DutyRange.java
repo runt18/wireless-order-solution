@@ -8,12 +8,8 @@ import com.wireless.pojo.util.DateUtil;
 
 public class DutyRange implements Jsonable{
 	
-	private long onDuty;		// 开始时间
-	private long offDuty;		// 结束时间
-	
-	public DutyRange(){
-		
-	}
+	private final long onDuty;		// 开始时间
+	private final long offDuty;		// 结束时间
 	
 	public DutyRange(long onDuty, long offDuty){
 		this.onDuty = onDuty;
@@ -36,14 +32,9 @@ public class DutyRange implements Jsonable{
 	public long getOnDuty() {
 		return onDuty;
 	}
-	public void setOnDuty(long onDuty) {
-		this.onDuty = onDuty;
-	}
+	
 	public long getOffDuty() {
 		return offDuty;
-	}
-	public void setOffDuty(long offDuty) {
-		this.offDuty = offDuty;
 	}
 
 	@Override
