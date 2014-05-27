@@ -60,7 +60,7 @@
 		<action path="/QueryRestaurant" type="com.wireless.Actions.login.QueryRestaurantAction"
 			scope="request">
 		</action>
-		<action path="/QueryToday" type="com.wireless.Actions.orderMgr.QueryTodayAction"
+		<action path="/QueryOrderStatistics" type="com.wireless.Actions.orderMgr.QueryOrderStatisticsAction"
 			scope="request">
 		</action>
 		<action path="/RepaidOrder" type="com.wireless.Actions.dishesOrder.RepaidOrderAction"
@@ -73,6 +73,9 @@
 			scope="request">
 		</action>
 		<action path="/DoShift" type="com.wireless.Actions.shift.DoShiftAction"
+			scope="request">
+		</action>
+		<action path="/DoPayment" type="com.wireless.Actions.shift.DoPaymentAction"
 			scope="request">
 		</action>
 		<action path="/QueryMenuMgr"
@@ -297,6 +300,10 @@
 		</action>
 		<action path="/DutyRangeStat"
 			type="com.wireless.Actions.billStatistics.DutyRangeStatisticsAction"
+			scope="request" parameter="dataSource">
+		</action>
+		<action path="/PaymentStat"
+			type="com.wireless.Actions.billStatistics.PaymentStatisticsAction"
 			scope="request" parameter="dataSource">
 		</action>
 		<action path="/QueryOrderFromMemberPay"
