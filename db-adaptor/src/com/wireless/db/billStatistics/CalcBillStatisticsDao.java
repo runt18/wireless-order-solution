@@ -1418,7 +1418,7 @@ public class CalcBillStatisticsDao {
 			throw new IllegalArgumentException("The query type is invalid.");
 		}
 		String sql;
-		sql = " SELECT " +
+		sql = " SELECT ROUND(SUM(totalPrice), 2) AS totalPrice, ROUND(SUM(commission), 2) AS commission, MAX(waiter) AS waiter,  MAX(staff_id) AS staff_id  FROM ( SELECT " +
 			  " ROUND(SUM(OFH.unit_price * OFH.order_count), 2) AS totalPrice, " +
 			  " ROUND(SUM(OFH.commission * OFH.order_count), 2) AS commission, MAX(OFH.waiter) AS waiter, " +
 			  " OFH.staff_id " +
@@ -1430,7 +1430,8 @@ public class CalcBillStatisticsDao {
 			  " WHERE (OFH.food_status & " + Food.COMMISSION + ") <> 0 " +
 			  " AND OFH.commission <> 0 " +
 			  (extraCond != null ? extraCond : "") +
-			  " GROUP BY OFH.staff_id ";
+			  " GROUP BY OFH.order_id) AS total" +
+			  " GROUP BY total.staff_id";
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		List<CommissionStatistics> result = new ArrayList<CommissionStatistics>();
 		while(dbCon.rs.next()){
