@@ -533,7 +533,7 @@ function paymentHandler(){
 					text : '功能加载中, 请稍后......',
 					params : {
 						queryPattern : 4,
-						queryType : 0,
+						queryType : 2,
 						businessStatic : 1
 					}
 				});
