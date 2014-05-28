@@ -9,7 +9,7 @@
 		url : '../../PrintOrder.do',
 		params : {
 			
-			'printType' : statType == 1 ? 7 : 12,
+			'printType' : statType == 1 ? 7 : 13,
 			'onDuty' : gs['onDutyFormat'],
 			'offDuty' : gs['offDutyFormat']
 		},

@@ -50,7 +50,7 @@ if(!changePwdWin){
 	changePwdWin = new Ext.Window({
 		layout : 'fit',
 		title : '重置密码',
-		width : 265,
+		width : 280,
 		height : 150,
 		closeAction : 'hide',
 		closable : false,
