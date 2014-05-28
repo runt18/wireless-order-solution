@@ -10,6 +10,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
+import com.wireless.db.shift.PaymentDao;
 import com.wireless.db.shift.ShiftDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.json.JObject;
@@ -32,6 +33,8 @@ public class QueryDailySettleByNowAction extends Action{
 				shiftDetail = ShiftDao.getCurrentShift(StaffDao.verify(Integer.parseInt(pin)));
 			}else if(Integer.valueOf(queryType) == 1){
 				shiftDetail = ShiftDao.getTodayDaily(StaffDao.verify(Integer.parseInt(pin)));
+			}else if(Integer.valueOf(queryType) == 2){
+				shiftDetail = PaymentDao.getCurrentPayment(StaffDao.verify(Integer.parseInt(pin)));
 			}else{
 				shiftDetail = null;
 			}
