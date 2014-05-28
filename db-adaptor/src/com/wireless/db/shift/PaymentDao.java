@@ -11,6 +11,7 @@ import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.billStatistics.PaymentGeneral;
+import com.wireless.pojo.billStatistics.ShiftDetail;
 import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.DateUtil;
@@ -64,6 +65,42 @@ public class PaymentDao {
 		dbCon.stmt.execute(sql);
 		
 		return range;
+	}
+	
+	/**
+	 * Get current payment details.
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @return the details to this payment
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if the restaurant does NOT exist
+	 */
+	public static ShiftDetail getCurrentPayment(Staff staff) throws SQLException, BusinessException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return getCurrentPayment(dbCon, staff);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Get current payment details.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @return the details to this payment
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if the restaurant does NOT exist
+	 */
+	public static ShiftDetail getCurrentPayment(DBCon dbCon, Staff staff) throws SQLException, BusinessException{
+		return ShiftDao.getByRange(dbCon, staff, getCurrentPaymentRange(dbCon, staff), DateType.TODAY);
 	}
 	
 	/**
