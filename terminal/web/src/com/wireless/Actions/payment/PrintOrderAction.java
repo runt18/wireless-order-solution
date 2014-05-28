@@ -144,6 +144,9 @@ public class PrintOrderAction extends Action{
 				case 12:
 					reqPrintContent = ReqPrintContent.buildReqPrintShiftReceipt(staff, new DutyRange(onDuty, offDuty), PType.PRINT_PAYMENT_RECEIPT);
 					break;
+				case 13:
+					reqPrintContent = ReqPrintContent.buildReqPrintShiftReceipt(staff, new DutyRange(onDuty, offDuty), PType.PRINT_HISTORY_PAYMENT_RECEIPT);
+					break;
 				default:
 					reqPrintContent = null;
 					break;
@@ -175,6 +178,9 @@ public class PrintOrderAction extends Action{
 							jobject.initTip("操作成功, 日结信息打印成功.");
 							break;
 						case 12:
+							jobject.initTip("操作成功, 交款对账信息打印成功.");
+							break;
+						case 13:
 							jobject.initTip("操作成功, 交款对账信息打印成功.");
 							break;
 						default:
