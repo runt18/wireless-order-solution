@@ -223,7 +223,7 @@ public class PaymentDao {
 			  Params.dbName + "." + paymentTbl +
 			  " WHERE 1 = 1 " +
 			  " AND restaurant_id = " + staff.getRestaurantId() +
-			  range != null ? (" AND off_duty BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'") : "" +
+			  (range != null ? (" AND off_duty BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'") : "") +
 			  " ORDER BY off_duty ";
 		
 		List<PaymentGeneral> result = new ArrayList<PaymentGeneral>();
