@@ -5,7 +5,6 @@ import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -108,7 +107,7 @@ public class QueryStaffAction extends Action {
 			jobject.setExtra(new Jsonable(){
 
 				@Override
-				public Map<String, Object> toJsonMap(int flag) {
+				public JsonMap toJsonMap(int flag) {
 					return extra;
 				}
 

@@ -1,10 +1,7 @@
 package com.wireless.Actions.restaurantMgr;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -63,28 +60,25 @@ public class QueryRestaurantAction extends Action{
 				restaurant = RestaurantDao.getById(dbCon, Integer.parseInt((String) request.getAttribute("restaurantID")));
 				list.add(restaurant);
 			}else{
-				list = RestaurantDao.getByCond(extraCond, orderClause);
+				list.addAll(RestaurantDao.getByCond(extraCond, orderClause));
 				if(!list.isEmpty()){
-					for (final Restaurant smsr : list) {
+					for(final Restaurant rest : list) {
 						//为restaurant加上短信条数
-						final SMStat sms = SMStatDao.get(dbCon, StaffDao.getAdminByRestaurant(dbCon, smsr.getId()));
-						Jsonable j = new Jsonable() {
-							
+						final SMStat sms = SMStatDao.get(dbCon, StaffDao.getAdminByRestaurant(dbCon, rest.getId()));
+						resList.add(new Jsonable() {
 							@Override
-							public Map<String, Object> toJsonMap(int flag) {
-								Map<String, Object> jm = new HashMap<String, Object>();
-								
-								jm.putAll(smsr.toJsonMap(0));
-								jm.put("smsRemain", sms.getRemaining());
-								return Collections.unmodifiableMap(jm);
+							public JsonMap toJsonMap(int flag) {
+								JsonMap jm = new JsonMap();
+								jm.putJsonable(rest, 0);
+								jm.putInt("smsRemain", sms.getRemaining());
+								return jm;
 							}
 							
 							@Override
 							public void fromJsonMap(JsonMap jsonMap, int flag) {
 								
 							}
-						};
-						resList.add(j);
+						});
 					}
 					jobject.setTotalProperty(list.size());
 					resList = DataPaging.getPagingData(resList, isPaging, start, limit);

@@ -3,7 +3,6 @@ package com.wireless.Actions.billStatistics;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -143,7 +142,7 @@ public class BusinessReceiptsStatisticsAction extends DispatchAction {
 								",\"ser\":[{\"name\":\'营业额\', \"data\" : " + data + "},{\"name\":\'账单数\', \"data\":" + countList + "}]}";
 			jobject.setExtra(new Jsonable(){
 				@Override
-				public Map<String, Object> toJsonMap(int flag) {
+				public JsonMap toJsonMap(int flag) {
 					JsonMap jm = new JsonMap();
 					jm.putString("chart", chartData);
 					return jm;

@@ -3,9 +3,6 @@ package com.wireless.Actions.weixin.operate;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -72,11 +69,11 @@ public class WXOperateMemberAction extends DispatchAction {
 			final Jsonable j = new Jsonable() {
 				
 				@Override
-				public Map<String, Object> toJsonMap(int flag) {
-					Map<String, Object> jm = new HashMap<String, Object>();
-					jm.putAll(member.toJsonMap(0));
-					jm.put("rank", rank);
-					return Collections.unmodifiableMap(jm);
+				public JsonMap toJsonMap(int flag) {
+					JsonMap jm = new JsonMap();
+					jm.putJsonable(member, 0);
+					jm.putString("rank", rank);
+					return jm;
 				}
 				
 				@Override
@@ -88,7 +85,7 @@ public class WXOperateMemberAction extends DispatchAction {
 			jobject.setExtra(new Jsonable(){
 
 				@Override
-				public Map<String, Object> toJsonMap(int flag) {
+				public JsonMap toJsonMap(int flag) {
 					JsonMap jm = new JsonMap();
 					jm.putJsonable("member", j, 0);
 					jm.putJsonable("restaurant", restaurant, 0);
@@ -150,7 +147,7 @@ public class WXOperateMemberAction extends DispatchAction {
 			jobject.setExtra(new Jsonable(){
 
 				@Override
-				public Map<String, Object> toJsonMap(int flag) {
+				public JsonMap toJsonMap(int flag) {
 					JsonMap jm = new JsonMap();
 					jm.putJsonable("code", sms, 0);
 					return jm;

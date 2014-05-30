@@ -2,7 +2,6 @@ package com.wireless.Actions.dishesOrder;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -40,7 +39,7 @@ public class QueryMenuAction extends DispatchAction {
 		jobject.setExtra(new Jsonable(){
 
 			@Override
-			public Map<String, Object> toJsonMap(int flag) {
+			public JsonMap toJsonMap(int flag) {
 				JsonMap jm = new JsonMap();
 				jm.putJsonableList("foodList", deptTree.asFoodList(), Food.FOOD_JSONABLE_SIMPLE);
 				return jm;

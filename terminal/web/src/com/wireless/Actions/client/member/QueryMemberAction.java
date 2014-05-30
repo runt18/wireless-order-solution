@@ -2,9 +2,7 @@ package com.wireless.Actions.client.member;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -53,11 +51,11 @@ public class QueryMemberAction extends DispatchAction {
 				mts.add(new Jsonable() {
 					
 					@Override
-					public Map<String, Object> toJsonMap(int flag) {
-						Map<String, Object> jm = new LinkedHashMap<String, Object>();
-						jm.put("name", mt.getName());
-						jm.put("memberCount", mc);
-						return Collections.unmodifiableMap(jm);
+					public JsonMap toJsonMap(int flag) {
+						JsonMap jm = new JsonMap();
+						jm.putString("name", mt.getName());
+						jm.putInt("memberCount", mc);
+						return jm;
 					}
 
 					@Override
@@ -71,11 +69,11 @@ public class QueryMemberAction extends DispatchAction {
 			final int mTotal = sum;
 			mts.add(new Jsonable() {
 				@Override
-				public Map<String, Object> toJsonMap(int flag) {
-					Map<String, Object> jm = new LinkedHashMap<String, Object>();
-					jm.put("name", "总数");
-					jm.put("memberCount", mTotal);
-					return Collections.unmodifiableMap(jm);
+				public JsonMap toJsonMap(int flag) {
+					JsonMap jm = new JsonMap();
+					jm.putString("name", "总数");
+					jm.putInt("memberCount", mTotal);
+					return jm;
 				}
 				
 				@Override

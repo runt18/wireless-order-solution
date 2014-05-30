@@ -2,7 +2,6 @@ package com.wireless.Actions.restaurantMgr;
 
 import java.io.PrintWriter;
 import java.sql.SQLException;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -215,7 +214,7 @@ public class OperateRestaurantAction extends DispatchAction {
 			jobject.setExtra(new Jsonable(){
 
 				@Override
-				public Map<String, Object> toJsonMap(int flag) {
+				public JsonMap toJsonMap(int flag) {
 					JsonMap jm = new JsonMap();
 					jm.putString("info", info);
 					return jm;
@@ -263,7 +262,7 @@ public class OperateRestaurantAction extends DispatchAction {
 			jobject.setExtra(new Jsonable(){
 
 				@Override
-				public Map<String, Object> toJsonMap(int flag) {
+				public JsonMap toJsonMap(int flag) {
 					JsonMap jm = new JsonMap();
 					jm.putString("logo", logo.toString());
 					return jm;

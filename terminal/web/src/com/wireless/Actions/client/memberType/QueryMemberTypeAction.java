@@ -3,7 +3,6 @@ package com.wireless.Actions.client.memberType;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -230,7 +229,7 @@ public class QueryMemberTypeAction extends DispatchAction {
 				}
 				root.add(new Jsonable() {
 					@Override
-					public Map<String, Object> toJsonMap(int flag) {
+					public JsonMap toJsonMap(int flag) {
 						JsonMap jm = new JsonMap();
 						jm.putInt("pointThreshold", ml.getPointThreshold());
 						jm.putString("memberTypeName", ml.getMemberType().getName());
@@ -252,7 +251,7 @@ public class QueryMemberTypeAction extends DispatchAction {
 			jobject.setExtra(new Jsonable(){
 
 				@Override
-				public Map<String, Object> toJsonMap(int flag) {
+				public JsonMap toJsonMap(int flag) {
 					return extra;
 				}
 

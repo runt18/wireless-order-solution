@@ -1,7 +1,5 @@
 package com.wireless.Actions.weixin.query;
 
-import java.util.Map;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -74,7 +72,7 @@ public class WXQueryInfoAction extends DispatchAction{
 			jobject.setExtra(new Jsonable(){
 
 				@Override
-				public Map<String, Object> toJsonMap(int flag) {
+				public JsonMap toJsonMap(int flag) {
 					JsonMap jm = new JsonMap();
 					jm.putString("logo", logoPath);
 					return jm;

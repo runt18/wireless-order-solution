@@ -1,7 +1,5 @@
 package com.wireless.Actions.weixin.operate;
 
-import java.util.Map;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -44,7 +42,7 @@ public class WXOperateOrderAction extends DispatchAction {
 			jobject.setExtra(new Jsonable(){
 
 				@Override
-				public Map<String, Object> toJsonMap(int flag) {
+				public JsonMap toJsonMap(int flag) {
 					JsonMap jm = new JsonMap();
 					jm.putJsonable("order", order, 0);
 					return jm;

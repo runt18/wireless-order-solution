@@ -1,10 +1,7 @@
 package com.wireless.Actions.distMgr.discountPlan;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -43,20 +40,20 @@ public class QueryDiscountPlanAction extends Action{
 			for (final DiscountPlan plan : list) {
 				Jsonable j = new Jsonable() {
 					@Override
-					public Map<String, Object> toJsonMap(int flag) {
-						Map<String, Object> jm = new LinkedHashMap<String, Object>();
-						jm.put("id", plan.getId());
-						jm.put("discount", plan.getDiscount());
-						jm.put("rate", plan.getRate());
+					public JsonMap toJsonMap(int flag) {
+						JsonMap jm = new JsonMap();
+						jm.putInt("id", plan.getId());
+						jm.putJsonable("discount", plan.getDiscount(), 0);
+						jm.putFloat("rate", plan.getRate());
 						if(plan.getKitchen() != null){
 							plan.getKitchen().setDept(null);
-							jm.put("kitchen", plan.getKitchen());
+							jm.putJsonable("kitchen", plan.getKitchen(), 0);
 						}
 						if(plan.getKitchen() != null){
-							jm.put("dept", plan.getKitchen().getDept());
+							jm.putJsonable("dept", plan.getKitchen().getDept(), 0);
 						}
 						
-						return Collections.unmodifiableMap(jm);
+						return jm;
 					}
 					
 					@Override

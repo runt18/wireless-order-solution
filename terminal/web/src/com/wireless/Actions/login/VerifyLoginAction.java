@@ -50,7 +50,7 @@ public class VerifyLoginAction extends Action {
 				jobject.setExtra(new Jsonable(){
 
 					@Override
-					public Map<String, Object> toJsonMap(int flag) {
+					public JsonMap toJsonMap(int flag) {
 						JsonMap jm = new JsonMap();
 						jm.putJsonable("staff", staff, 0);
 						jm.putString("sessionId", request.getSession().getId());

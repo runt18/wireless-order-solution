@@ -2,7 +2,6 @@ package com.wireless.Actions.login;
 
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -55,7 +54,7 @@ public class OperateStaffAction extends Action{
 				final Staff theStaff = staff;
 				jobject.setExtra(new Jsonable(){
 					@Override
-					public Map<String, Object> toJsonMap(int flag) {
+					public JsonMap toJsonMap(int flag) {
 						JsonMap jm = new JsonMap();
 						jm.putJsonable("staff", theStaff, 0);
 						return jm;

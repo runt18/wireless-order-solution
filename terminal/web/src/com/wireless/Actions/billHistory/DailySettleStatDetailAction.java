@@ -2,10 +2,7 @@ package com.wireless.Actions.billHistory;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -28,33 +25,14 @@ import com.wireless.pojo.billStatistics.ShiftDetail;
 import com.wireless.util.DateType;
 
 public class DailySettleStatDetailAction extends Action {
-	public ActionForward execute(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
+	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+		
 		JObject jobject = new JObject();
 		
 		List<Jsonable> list = new ArrayList<Jsonable>();
 		DBCon dbCon = new DBCon();
 
-/*		PrintWriter out = null;
-
-		List<HashMap<String, Object>> resultList = new ArrayList<HashMap<String, Object>>();
-		HashMap<String, Object> rootMap = new HashMap<String, Object>();*/
-
 		try {
-			// 解决后台中文传到前台乱码
-			
-//			out = response.getWriter();
-
-			/**
-			 * The parameters looks like below. 1st example, filter the order
-			 * whose id equals 321 pin=0x1 & type=1 & ope=1 & value=321 2nd
-			 * example, filter the order date greater than or equal 2011-7-14
-			 * 14:30:00 pin=0x1 & type=3 & ope=2 & value=2011-7-14 14:30:00
-			 * 
-			 * pin : the pin the this terminal foodIDs : array
-			 * "food1,food2,food3" dateBegin: dateEnd :
-			 */
 
 			String pin = (String)request.getAttribute("pin");
 
@@ -69,79 +47,84 @@ public class DailySettleStatDetailAction extends Action {
 										new DutyRange(onDuty, offDuty),
 										DateType.HISTORY);
 
-			/**
-			 */
-
-//			resultList.add(resultMap);
 			dbCon.rs.close();
 			
-			Jsonable j = new Jsonable() {
+			list.add(new Jsonable() {
 				
 				@Override
-				public Map<String, Object> toJsonMap(int flag) {
-					Map<String, Object> resultMap = new HashMap<String, Object>();
-					resultMap.put("allBillCount", result.getOrderAmount());
+				public JsonMap toJsonMap(int flag) {
+					JsonMap jm = new JsonMap();
+					jm.putInt("allBillCount", result.getOrderAmount());
 
-					resultMap.put("cashBillCount", result.getCashAmount());
-					resultMap.put("cashAmount", result.getCashTotalIncome());
-					resultMap.put("cashActual", result.getCashActualIncome());
+					jm.putInt("cashBillCount", result.getCashAmount());
+					jm.putFloat("cashAmount", result.getCashTotalIncome());
+					jm.putFloat("cashActual", result.getCashActualIncome());
 
-					resultMap.put("creditBillCount", result.getCreditCardAmount());
-					resultMap.put("creditAmount", result.getCreditTotalIncome());
-					resultMap.put("creditActual", result.getCreditActualIncome());
+					jm.putInt("creditBillCount", result.getCreditCardAmount());
+					jm.putFloat("creditAmount", result.getCreditTotalIncome());
+					jm.putFloat("creditActual", result.getCreditActualIncome());
 
-					resultMap.put("memberBillCount", result.getMemberCardAmount());
-					resultMap.put("memberAmount", result.getMemberTotalIncome());
-					resultMap.put("memberActual", result.getMemberActualIncome());
+					jm.putInt("memberBillCount", result.getMemberCardAmount());
+					jm.putFloat("memberAmount", result.getMemberTotalIncome());
+					jm.putFloat("memberActual", result.getMemberActualIncome());
 
-					resultMap.put("signBillCount", result.getSignAmount());
-					resultMap.put("signAmount", result.getSignTotalIncome());
-					resultMap.put("signActual", result.getSignActualIncome());
+					jm.putInt("signBillCount", result.getSignAmount());
+					jm.putFloat("signAmount", result.getSignTotalIncome());
+					jm.putFloat("signActual", result.getSignActualIncome());
 
-					resultMap.put("hangBillCount", result.getHangAmount());
-					resultMap.put("hangAmount", result.getHangTotalIncome());
-					resultMap.put("hangActual", result.getHangActualIncome());
+					jm.putInt("hangBillCount", result.getHangAmount());
+					jm.putFloat("hangAmount", result.getHangTotalIncome());
+					jm.putFloat("hangActual", result.getHangActualIncome());
 
-					resultMap.put("discountAmount", result.getDiscountIncome());
-					resultMap.put("discountBillCount", result.getDiscountAmount());
+					jm.putFloat("discountAmount", result.getDiscountIncome());
+					jm.putInt("discountBillCount", result.getDiscountAmount());
 
-					resultMap.put("giftAmount", result.getGiftIncome());
-					resultMap.put("giftBillCount", result.getGiftAmount());
+					jm.putFloat("giftAmount", result.getGiftIncome());
+					jm.putInt("giftBillCount", result.getGiftAmount());
 
-					resultMap.put("returnAmount", result.getCancelIncome());
-					resultMap.put("returnBillCount", result.getCancelAmount());
+					jm.putFloat("returnAmount", result.getCancelIncome());
+					jm.putInt("returnBillCount", result.getCancelAmount());
 
-					resultMap.put("repayAmount", result.getPaidIncome());
-					resultMap.put("repayBillCount", result.getPaidAmount());
+					jm.putFloat("repayAmount", result.getPaidIncome());
+					jm.putInt("repayBillCount", result.getPaidAmount());
 
-					resultMap.put("serviceAmount", result.getServiceIncome());
-					resultMap.put("serviceBillCount", result.getServiceAmount());
+					jm.putFloat("serviceAmount", result.getServiceIncome());
+					jm.putInt("serviceBillCount", result.getServiceAmount());
 					
-					resultMap.put("eraseAmount", result.getEraseIncome());
-					resultMap.put("eraseBillCount", result.getEraseAmount());
+					jm.putFloat("eraseAmount", result.getEraseIncome());
+					jm.putInt("eraseBillCount", result.getEraseAmount());
 
-					List<HashMap<String, Object>> deptList = new ArrayList<HashMap<String, Object>>();
-					for (IncomeByDept deptIncome : result.getDeptIncome()) {
-						HashMap<String, Object> deptMap = new HashMap<String, Object>();
-						deptMap.put("deptName", deptIncome.getDept().getName());
-						deptMap.put("deptDiscount", deptIncome.getDiscount());
-						deptMap.put("deptGift", deptIncome.getGift());
-						deptMap.put("deptAmount", deptIncome.getIncome());
-						deptList.add(deptMap);
+					List<Jsonable> deptList = new ArrayList<Jsonable>(result.getDeptIncome().size());
+					for (final IncomeByDept deptIncome : result.getDeptIncome()) {
+						deptList.add(new Jsonable(){
+							@Override
+							public JsonMap toJsonMap(int flag) {
+								JsonMap jm = new JsonMap();
+								jm.putString("deptName", deptIncome.getDept().getName());
+								jm.putFloat("deptDiscount", deptIncome.getDiscount());
+								jm.putFloat("deptGift", deptIncome.getGift());
+								jm.putFloat("deptAmount", deptIncome.getIncome());
+								return jm;
+							}
+
+							@Override
+							public void fromJsonMap(JsonMap jsonMap, int flag) {
+								
+							};
+						
+						});
 					}
-					resultMap.put("deptInfos", deptList);
+					jm.putJsonableList("deptInfos", deptList, 0);
 
-					resultMap.put("message", "normal");
-					return Collections.unmodifiableMap(resultMap);
+					jm.putString("message", "normal");
+					return jm;
 				}
 				
 				@Override
 				public void fromJsonMap(JsonMap jsonMap, int flag) {
 					
 				}
-			};
-			
-			list.add(j);
+			});
 
 		} catch (BusinessException e) {
 			e.printStackTrace();
@@ -157,22 +140,8 @@ public class DailySettleStatDetailAction extends Action {
 
 		} finally {
 			dbCon.disconnect();
-
 			jobject.setRoot(list);
-			
 			response.getWriter().print(jobject.toString());
-			
-	/*		rootMap.put("root", resultList);
-
-			JsonConfig jsonConfig = new JsonConfig();
-
-			JSONObject obj = JSONObject.fromObject(rootMap, jsonConfig);
-
-			String outputJson = obj.toString();
-
-			// System.out.println(outputJson);
-
-			out.write(outputJson);*/
 		}
 
 		return null;

@@ -63,7 +63,7 @@ public class BusinessStatisticsAction extends DispatchAction {
 			
 			jObject.setExtra(new Jsonable(){
 				@Override
-				public Map<String, Object> toJsonMap(int flag) {
+				public JsonMap toJsonMap(int flag) {
 					JsonMap jm = new JsonMap();
 					jm.putJsonable("business", sdetail, 0);
 					return jm;
@@ -124,7 +124,7 @@ public class BusinessStatisticsAction extends DispatchAction {
 			if(sdetail != null){
 				jObject.setExtra(new Jsonable(){
 					@Override
-					public Map<String, Object> toJsonMap(int flag) {
+					public JsonMap toJsonMap(int flag) {
 						JsonMap jm = new JsonMap();
 						jm.putJsonable("business", sdetail, 0);
 						return jm;

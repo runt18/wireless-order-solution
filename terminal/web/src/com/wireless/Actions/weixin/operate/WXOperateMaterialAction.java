@@ -5,7 +5,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -87,7 +86,7 @@ public class WXOperateMaterialAction extends DispatchAction {
 	                		jobject.setExtra(new Jsonable(){
 
 								@Override
-								public Map<String, Object> toJsonMap(int flag) {
+								public JsonMap toJsonMap(int flag) {
 									JsonMap jm = new JsonMap();
 									jm.putString("url", url);
 									return jm;
@@ -178,7 +177,7 @@ public class WXOperateMaterialAction extends DispatchAction {
 	                		jobject.setExtra(new Jsonable(){
 
 								@Override
-								public Map<String, Object> toJsonMap(int flag) {
+								public JsonMap toJsonMap(int flag) {
 									JsonMap jm = new JsonMap();
 									jm.putString("url", url);
 									return jm;

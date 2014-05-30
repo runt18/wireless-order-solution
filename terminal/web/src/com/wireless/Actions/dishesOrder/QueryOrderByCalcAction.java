@@ -2,7 +2,6 @@ package com.wireless.Actions.dishesOrder;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -124,7 +123,7 @@ public class QueryOrderByCalcAction extends Action{
 //				order.setDiscount(null);
 				jobject.setExtra(new Jsonable(){
 					@Override
-					public Map<String, Object> toJsonMap(int flag) {
+					public JsonMap toJsonMap(int flag) {
 						JsonMap jm = new JsonMap();
 						jm.putJsonable("order", order, 0);
 						jm.putString("idList", idList.toString());

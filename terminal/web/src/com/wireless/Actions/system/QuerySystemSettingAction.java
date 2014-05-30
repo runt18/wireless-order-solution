@@ -1,7 +1,5 @@
 package com.wireless.Actions.system;
 
-import java.util.Map;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -38,7 +36,7 @@ public class QuerySystemSettingAction extends Action{
 			jobject.setExtra(new Jsonable(){
 
 				@Override
-				public Map<String, Object> toJsonMap(int flag) {
+				public JsonMap toJsonMap(int flag) {
 					JsonMap jm = new JsonMap();
 					jm.putJsonable("systemSetting", set, 0);
 					return jm;
