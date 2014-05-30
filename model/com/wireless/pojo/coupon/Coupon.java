@@ -2,9 +2,7 @@ package com.wireless.pojo.coupon;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
@@ -249,19 +247,19 @@ public class Coupon implements Jsonable{
 	}
 
 	@Override
-	public Map<String, Object> toJsonMap(int flag) {
-		Map<String, Object> jm = new HashMap<String, Object>();
-		jm.put("member", this.member);
-		jm.put("couponId", this.id);
-		jm.put("restaurantId", this.restaurantId);
-		jm.put("couponType", this.couponType);
-		jm.put("orderId", this.orderId == 0 ? "----" : this.orderId);
-		jm.put("orderDate", DateUtil.formatToDate(this.getOrderDate()));
-		jm.put("statusText", this.status.desc);
-		jm.put("statusValue", this.status.val);
-		jm.put("createStaff", this.getCreateStaff());
-		jm.put("birthDate", DateUtil.formatToDate(this.getBirthDate()));
-		return Collections.unmodifiableMap(jm);
+	public JsonMap toJsonMap(int flag) {
+		JsonMap jm = new JsonMap();
+		jm.putJsonable("member", this.member, 0);
+		jm.putInt("couponId", this.id);
+		jm.putInt("restaurantId", this.restaurantId);
+		jm.putJsonable("couponType", this.couponType, 0);
+		jm.putString("orderId", this.orderId == 0 ? "----" : Integer.toString(this.orderId));
+		jm.putString("orderDate", DateUtil.formatToDate(this.getOrderDate()));
+		jm.putString("statusText", this.status.desc);
+		jm.putInt("statusValue", this.status.val);
+		jm.putString("createStaff", this.getCreateStaff());
+		jm.putString("birthDate", DateUtil.formatToDate(this.getBirthDate()));
+		return jm;
 	}
 
 	@Override

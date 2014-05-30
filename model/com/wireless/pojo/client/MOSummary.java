@@ -1,9 +1,5 @@
 package com.wireless.pojo.client;
 
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.pojo.util.DateUtil;
@@ -22,22 +18,20 @@ public class MOSummary implements Jsonable {
 	private float moneyAdjust;	// 金额调整
 	
 	@Override
-	public Map<String, Object> toJsonMap(int flag) {
-		Map<String, Object> jm = new LinkedHashMap<String, Object>();
-		jm.put("startDateFormat", DateUtil.format(this.startDate));
-		jm.put("endDateFormat", DateUtil.format(this.endDate));
-		jm.put("chargeMoney", this.chargeMoney);
-		jm.put("consumeAmount", this.consumeAmount);
-		jm.put("payMoney", this.payMoney);
-		jm.put("consumePoint", this.consumePoint);
-		jm.put("pointConsume", this.pointConsume);
-		jm.put("pointAdjust", this.pointAdjust);
-		jm.put("moneyAdjust", this.moneyAdjust);
-		if(this.member != null){
-			jm.put("member", this.member);			
-		}
+	public JsonMap toJsonMap(int flag) {
+		JsonMap jm = new JsonMap();
+		jm.putString("startDateFormat", DateUtil.format(this.startDate));
+		jm.putString("endDateFormat", DateUtil.format(this.endDate));
+		jm.putFloat("chargeMoney", this.chargeMoney);
+		jm.putInt("consumeAmount", this.consumeAmount);
+		jm.putFloat("payMoney", this.payMoney);
+		jm.putFloat("consumePoint", this.consumePoint);
+		jm.putFloat("pointConsume", this.pointConsume);
+		jm.putFloat("pointAdjust", this.pointAdjust);
+		jm.putFloat("moneyAdjust", this.moneyAdjust);
+		jm.putJsonable("member", this.member, 0);			
 		
-		return Collections.unmodifiableMap(jm);
+		return jm;
 	}
 
 	@Override

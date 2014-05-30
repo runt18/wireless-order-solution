@@ -1,9 +1,5 @@
 package com.wireless.pojo.sms;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.pojo.util.DateUtil;
@@ -122,16 +118,16 @@ public class SMSDetail implements Jsonable{
 	}
 
 	@Override
-	public Map<String, Object> toJsonMap(int flag) {
-		Map<String, Object> jm = new HashMap<String, Object>();
-		jm.put("id", this.id);
-		jm.put("modifiedFormad", DateUtil.format(this.modified));
-		jm.put("operationValue", this.operation.getVal());
-		jm.put("operationText", this.operation.getDesc());
-		jm.put("delta", this.delta);
-		jm.put("remaining", this.remaining);
-		jm.put("staffName", this.staff);
-		return Collections.unmodifiableMap(jm);
+	public JsonMap toJsonMap(int flag) {
+		JsonMap jm = new JsonMap();
+		jm.putInt("id", this.id);
+		jm.putString("modifiedFormad", DateUtil.format(this.modified));
+		jm.putInt("operationValue", this.operation.getVal());
+		jm.putString("operationText", this.operation.getDesc());
+		jm.putInt("delta", this.delta);
+		jm.putInt("remaining", this.remaining);
+		jm.putString("staffName", this.staff);
+		return jm;
 	}
 
 	@Override

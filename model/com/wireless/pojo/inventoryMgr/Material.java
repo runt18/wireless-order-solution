@@ -1,9 +1,6 @@
 package com.wireless.pojo.inventoryMgr;
 
 import java.text.DecimalFormat;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
@@ -296,35 +293,35 @@ public class Material implements Jsonable {
 	}
 	
 	@Override
-	public Map<String, Object> toJsonMap(int flag) {
+	public JsonMap toJsonMap(int flag) {
 		DecimalFormat df = new DecimalFormat("0.00");
-		Map<String, Object> jm = new LinkedHashMap<String, Object>();
-		jm.put("id", this.getId());
-		jm.put("pinyin", this.getPinyin());
-		jm.put("rid", this.getRestaurantId());
-		jm.put("price", df.format(this.getPrice()));
-		jm.put("presentPrice", df.format(this.getPrice() + this.getDelta()));
-		jm.put("delta", this.getDelta());
-		jm.put("name", this.getName());
-		jm.put("stock", this.getStock());
-		jm.put("lastModStaff", this.getLastModStaff());
-		jm.put("lastModDate", this.getLastModDate());
-		jm.put("lastModDateFormat", DateUtil.format(this.getLastModDate()));
-		jm.put("pinyin", this.pinyin);
+		JsonMap jm = new JsonMap();
+		jm.putInt("id", this.getId());
+		jm.putString("pinyin", this.getPinyin());
+		jm.putInt("rid", this.getRestaurantId());
+		jm.putString("price", df.format(this.getPrice()));
+		jm.putString("presentPrice", df.format(this.getPrice() + this.getDelta()));
+		jm.putFloat("delta", this.getDelta());
+		jm.putString("name", this.getName());
+		jm.putFloat("stock", this.getStock());
+		jm.putString("lastModStaff", this.getLastModStaff());
+		jm.putLong("lastModDate", this.getLastModDate());
+		jm.putString("lastModDateFormat", DateUtil.format(this.getLastModDate()));
+		jm.putString("pinyin", this.pinyin);
 		if(this.cate != null){
-			jm.put("cateId", this.getCate().getId());
-			jm.put("cateName", this.getCate().getName());
-			jm.put("cateType", this.getCate().getType().getValue());
+			jm.putInt("cateId", this.getCate().getId());
+			jm.putString("cateName", this.getCate().getName());
+			jm.putInt("cateType", this.getCate().getType().getValue());
 		}
 		if(this.status != null){
-			jm.put("statusValue", this.getStatus().getValue());
-			jm.put("statusText", this.getStatus().getText());
+			jm.putInt("statusValue", this.getStatus().getValue());
+			jm.putString("statusText", this.getStatus().getText());
 		}
 		//记录当前价格是否修改
-		jm.put("changed", this.delta != 0 ? true : false);
-		jm.put("isGood", this.isGood);
+		jm.putBoolean("changed", this.delta != 0 ? true : false);
+		jm.putBoolean("isGood", this.isGood);
 		
-		return Collections.unmodifiableMap(jm);
+		return jm;
 	}
 	@Override
 	public void fromJsonMap(JsonMap jsonMap, int flag) {

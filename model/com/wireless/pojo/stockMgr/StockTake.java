@@ -1,10 +1,7 @@
 package com.wireless.pojo.stockMgr;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
@@ -492,28 +489,28 @@ public class StockTake implements Jsonable {
 		return result;
 	}
 	
-	public Map<String, Object> toJsonMap(int flag) {
-		Map<String, Object> jm = new HashMap<String, Object>();
-		jm.put("id", this.id);
-		jm.put("rid", this.restaurantId);
-		jm.put("dept", this.dept);
-		jm.put("cateTypeValue", this.cateType.getValue());
-		jm.put("cateTypeText", this.cateType.getText());
-		jm.put("statusValue", this.status.getVal());
-		jm.put("statusText", this.status.getText());
-		jm.put("operatorId", this.operatorId);
-		jm.put("operator", this.operator);
-		jm.put("startDateFormat", DateUtil.format(this.startDate));
-		jm.put("approverId", this.approverId);
-		jm.put("approver", this.approver);
-		jm.put("finishDateFormat", DateUtil.format(this.finishDate));
+	public JsonMap toJsonMap(int flag) {
+		JsonMap jm = new JsonMap();
+		jm.putInt("id", this.id);
+		jm.putInt("rid", this.restaurantId);
+		jm.putJsonable("dept", this.dept, Department.DEPT_JSONABLE_COMPLEX);
+		jm.putInt("cateTypeValue", this.cateType.getValue());
+		jm.putString("cateTypeText", this.cateType.getText());
+		jm.putInt("statusValue", this.status.getVal());
+		jm.putString("statusText", this.status.getText());
+		jm.putInt("operatorId", this.operatorId);
+		jm.putString("operator", this.operator);
+		jm.putString("startDateFormat", DateUtil.format(this.startDate));
+		jm.putInt("approverId", this.approverId);
+		jm.putString("approver", this.approver);
+		jm.putString("finishDateFormat", DateUtil.format(this.finishDate));
 		if(this.materialCate != null && this.materialCate.getId() > 0){
-			jm.put("materialCate", this.materialCate);			
+			jm.putJsonable("materialCate", this.materialCate, 0);			
 		}
-		jm.put("comment", this.comment);
-		jm.put("detail", this.stockTakeDetails);
+		jm.putString("comment", this.comment);
+		jm.putJsonableList("detail", this.stockTakeDetails, 0);
 		
-		return Collections.unmodifiableMap(jm);
+		return jm;
 	}
 
 	@Override

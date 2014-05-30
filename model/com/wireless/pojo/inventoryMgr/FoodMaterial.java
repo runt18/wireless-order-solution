@@ -1,9 +1,5 @@
 package com.wireless.pojo.inventoryMgr;
 
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 
@@ -126,17 +122,17 @@ public class FoodMaterial implements Jsonable{
 		return "restaurantId=" + this.restaurantId + ", foodId=" + this.foodId + ", materialId=" + this.materialId + ", consumption=" + this.consumption;
 	}
 	@Override
-	public Map<String, Object> toJsonMap(int flag) {
-		Map<String, Object> jm = new LinkedHashMap<String, Object>();
-		jm.put("rid", this.restaurantId);
-		jm.put("foodId", this.foodId);
-		jm.put("foodName", this.foodName);
-		jm.put("materialId", this.materialId);
-		jm.put("consumption", this.consumption);
-		jm.put("materialName", this.materialName);
-		jm.put("materialCateName", this.materialCateName);
+	public JsonMap toJsonMap(int flag) {
+		JsonMap jm = new JsonMap();
+		jm.putInt("rid", this.restaurantId);
+		jm.putInt("foodId", this.foodId);
+		jm.putString("foodName", this.foodName);
+		jm.putInt("materialId", this.materialId);
+		jm.putFloat("consumption", this.consumption);
+		jm.putString("materialName", this.materialName);
+		jm.putString("materialCateName", this.materialCateName);
 		
-		return Collections.unmodifiableMap(jm);
+		return jm;
 	}
 	@Override
 	public void fromJsonMap(JsonMap jsonMap, int flag) {

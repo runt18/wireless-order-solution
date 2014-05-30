@@ -1,9 +1,5 @@
 package com.wireless.pojo.client;
 
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.parcel.Parcel;
@@ -204,15 +200,15 @@ public class MemberComment implements Jsonable, Parcelable{
 	}
 
 	@Override
-	public Map<String, Object> toJsonMap(int flag) {
-		Map<String, Object> jm = new LinkedHashMap<String, Object>();
-		jm.put("staffId", this.staff.getId());
-		jm.put("memberId", this.member.getId());
-		jm.put("comment", this.comment);
-		jm.put("typeText", this.type.getDesc());
-		jm.put("typeValue", this.type.getVal());
-		jm.put("lastModified", DateUtil.formatToDate(this.lastModified));
-		return Collections.unmodifiableMap(jm);
+	public JsonMap toJsonMap(int flag) {
+		JsonMap jm = new JsonMap();
+		jm.putInt("staffId", this.staff.getId());
+		jm.putInt("memberId", this.member.getId());
+		jm.putString("comment", this.comment);
+		jm.putString("typeText", this.type.getDesc());
+		jm.putInt("typeValue", this.type.getVal());
+		jm.putString("lastModified", DateUtil.formatToDate(this.lastModified));
+		return jm;
 	}
 
 	@Override

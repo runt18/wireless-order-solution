@@ -1,9 +1,5 @@
 package com.wireless.pojo.stockMgr;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 
@@ -146,22 +142,22 @@ public class CostAnalyze implements Jsonable{
 		return result;
 	}
 	@Override
-	public Map<String, Object> toJsonMap(int flag) {
-		Map<String, Object> jm = new HashMap<String, Object>();
+	public JsonMap toJsonMap(int flag) {
+		JsonMap jm = new JsonMap();
 		
-		jm.put("deptId", this.getDeptId());
-		jm.put("deptName", this.getDeptName());
-		jm.put("primeMoney", this.getPrimeMoney());
-		jm.put("useMaterialMoney", this.getPickMaterialMoney());
-		jm.put("stockOutMoney", this.getStockOutMoney());
-		jm.put("stockOutTransferMoney", this.getStockOutTransferMoney());
-		jm.put("endMoney", this.getEndMoney());
-		jm.put("costMoney", this.getCostMoney());
-		jm.put("salesMoney", this.getSalesMoney());
-		jm.put("profit", this.getProfit());
-		jm.put("profitRate", this.getProfitRate());
+		jm.putInt("deptId", this.getDeptId());
+		jm.putString("deptName", this.getDeptName());
+		jm.putFloat("primeMoney", this.getPrimeMoney());
+		jm.putFloat("useMaterialMoney", this.getPickMaterialMoney());
+		jm.putFloat("stockOutMoney", this.getStockOutMoney());
+		jm.putFloat("stockOutTransferMoney", this.getStockOutTransferMoney());
+		jm.putFloat("endMoney", this.getEndMoney());
+		jm.putFloat("costMoney", this.getCostMoney());
+		jm.putFloat("salesMoney", this.getSalesMoney());
+		jm.putFloat("profit", this.getProfit());
+		jm.putFloat("profitRate", this.getProfitRate());
 		
-		return Collections.unmodifiableMap(jm);
+		return jm;
 	}
 
 	@Override

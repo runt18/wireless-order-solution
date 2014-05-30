@@ -1,9 +1,7 @@
 package com.wireless.pojo.printScheme;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
@@ -372,7 +370,7 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 	}
 
 	@Override
-	public Map<String, Object> toJsonMap(int flag) {
+	public JsonMap toJsonMap(int flag) {
 		String regions = "";
 		String regionValues = "";
 		
@@ -382,11 +380,11 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 		String depts = "";
 		String deptValues = "";
 		
-		Map<String, Object> jm = new HashMap<String, Object>();
-		jm.put("printFuncId", this.mId);
-		jm.put("pTypeValue", this.mType.getVal());
-		jm.put("pTypeText", this.mType.getDesc());
-		jm.put("repeat", this.mRepeat);
+		JsonMap jm = new JsonMap();
+		jm.putInt("printFuncId", this.mId);
+		jm.putInt("pTypeValue", this.mType.getVal());
+		jm.putString("pTypeText", this.mType.getDesc());
+		jm.putInt("repeat", this.mRepeat);
 		
 		if(this.mRegions.size() > 0){
 			regions = "";
@@ -457,17 +455,17 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 		
 		
 
-		jm.put("regionValues", regionValues);
-		jm.put("regions", regions);
+		jm.putString("regionValues", regionValues);
+		jm.putString("regions", regions);
 
-		jm.put("kitchens", kitchens);
-		jm.put("kitchenValues", kitchenValues);
+		jm.putString("kitchens", kitchens);
+		jm.putString("kitchenValues", kitchenValues);
 		
-		jm.put("dept", depts);
-		jm.put("deptValue", deptValues);
+		jm.putString("dept", depts);
+		jm.putString("deptValue", deptValues);
 		
 		
-		return Collections.unmodifiableMap(jm);
+		return jm;
 	}
 
 	@Override

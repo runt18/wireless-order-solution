@@ -1,10 +1,7 @@
 package com.wireless.pojo.client;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
@@ -12,123 +9,122 @@ import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.util.DateUtil;
 
 public class MemberOperation implements Jsonable {
-	
+
 	/**
-	 * 操作类型
-	 * 1-充值,  2-消费,  3-积分消费,  4-积分调整,  5-金额调整,	6-取款
+	 * 操作类型 1-充值, 2-消费, 3-积分消费, 4-积分调整, 5-金额调整, 6-取款
+	 * 
 	 * @author WuZY
 	 */
-	public static enum OperationType{
-		CHARGE(			2,	1, 	"充值", 			"CZ"), 
-		CONSUME(		1, 	2, 	"消费", 			"XF"),
-		POINT_CONSUME(	3,	3, 	"积分消费",		"JFXF"),
-		POINT_ADJUST(	3, 	4, 	"积分调整", 		"JFTZ"),
-		BALANCE_ADJUST(	4,	5, 	"金额调整", 		"CZTZ"),
-		REFUND(			2, 	6, 	"取款",  	    "QK");
-		
+	public static enum OperationType {
+		CHARGE(2, 1, "充值", "CZ"), CONSUME(1, 2, "消费", "XF"), POINT_CONSUME(3,
+				3, "积分消费", "JFXF"), POINT_ADJUST(3, 4, "积分调整", "JFTZ"), BALANCE_ADJUST(
+				4, 5, "金额调整", "CZTZ"), REFUND(2, 6, "取款", "QK");
+
 		private final int type;
-		private final int value;			//
-		private final String name;			//
-		private final String prefix; 	//流水号前缀
-		
-		OperationType(int type, int value, String name, String prefix){
+		private final int value; //
+		private final String name; //
+		private final String prefix; // 流水号前缀
+
+		OperationType(int type, int value, String name, String prefix) {
 			this.type = type;
 			this.value = value;
 			this.name = name;
 			this.prefix = prefix;
 		}
-		
+
 		@Override
-		public String toString(){
+		public String toString() {
 			return this.getName();
 		}
-		
-		public static OperationType valueOf(int val){
-			for(OperationType ot : values()){
-				if(ot.getValue() == val){
+
+		public static OperationType valueOf(int val) {
+			for (OperationType ot : values()) {
+				if (ot.getValue() == val) {
 					return ot;
 				}
 			}
-			
-			throw new IllegalArgumentException("The operation value(val = " + val + ") passed is invalid.");
+
+			throw new IllegalArgumentException("The operation value(val = "
+					+ val + ") passed is invalid.");
 		}
-		
-		public static List<OperationType> typeOf(int type){
+
+		public static List<OperationType> typeOf(int type) {
 			List<OperationType> list = new ArrayList<OperationType>();
-			for(OperationType ot : values()){
-				if(ot.getType() == type){
+			for (OperationType ot : values()) {
+				if (ot.getType() == type) {
 					list.add(ot);
 				}
 			}
 			return list;
-			//throw new IllegalArgumentException("The operation value(val = " + type + ") passed is invalid.");
+			// throw new IllegalArgumentException("The operation value(val = " +
+			// type + ") passed is invalid.");
 		}
-		
+
 		public int getValue() {
 			return value;
 		}
-		
+
 		public String getName() {
 			return name;
 		}
-		
+
 		public String getPrefix() {
 			return prefix;
 		}
-		
-		public int getType(){
+
+		public int getType() {
 			return type;
 		}
 	}
-	
+
 	/**
-	 * 充值类型操作, 收款方式
-	 * 1-现金  2-刷卡
+	 * 充值类型操作, 收款方式 1-现金 2-刷卡
+	 * 
 	 * @author WuZY
 	 */
-	public static enum ChargeType{
-		
-		CASH( 			1, 	"现金", 	"XJ"),
-		CREDIT_CARD( 	2, 	"刷卡", 	"SK");
-		
+	public static enum ChargeType {
+
+		CASH(1, "现金", "XJ"), CREDIT_CARD(2, "刷卡", "SK");
+
 		private final int value;
 		private final String name;
 		private final String prefix;
-		
-		ChargeType(int value, String name, String prefix){
+
+		ChargeType(int value, String name, String prefix) {
 			this.value = value;
 			this.name = name;
 			this.prefix = prefix;
 		}
-		
+
 		@Override
-		public String toString(){
+		public String toString() {
 			return this.name;
 		}
-		
-		public static ChargeType valueOf(int val){
-			for(ChargeType ct : values()){
-				if(ct.getValue() == val){
+
+		public static ChargeType valueOf(int val) {
+			for (ChargeType ct : values()) {
+				if (ct.getValue() == val) {
 					return ct;
 				}
 			}
-			
-			throw new IllegalArgumentException("The charge type(val = " + val + ") passed is invalid.");
+
+			throw new IllegalArgumentException("The charge type(val = " + val
+					+ ") passed is invalid.");
 		}
-		
+
 		public int getValue() {
 			return value;
 		}
-		
+
 		public String getName() {
 			return name;
 		}
-		
+
 		public String getPrefix() {
 			return prefix;
 		}
 	}
-	
+
 	private int id;
 	private int restaurantId;
 	private int staffId;
@@ -153,12 +149,13 @@ public class MemberOperation implements Jsonable {
 	private float remainingExtraMoney;
 	private int remainingPoint;
 	private String comment;
-	
-	private MemberOperation(){
-		
+
+	private MemberOperation() {
+
 	}
-	
-	public static MemberOperation newMO(int memberId, String name, String mobile, String card){
+
+	public static MemberOperation newMO(int memberId, String name,
+			String mobile, String card) {
 		MemberOperation mo = new MemberOperation();
 		Member member = new Member();
 		member.setId(memberId);
@@ -168,298 +165,300 @@ public class MemberOperation implements Jsonable {
 		mo.setMember(member);
 		return mo;
 	}
-	
-	public float getDeltaTotalMoney(){
+
+	public float getDeltaTotalMoney() {
 		return this.deltaBaseMoney + this.deltaExtraMoney;
-		
+
 	}
-	
-	public float getRemainingTotalMoney(){
+
+	public float getRemainingTotalMoney() {
 		return this.remainingExtraMoney + this.remainingBaseMoney;
 	}
-	
+
 	@Override
-	public Map<String, Object> toJsonMap(int flag) {
-		Map<String, Object> jm = new LinkedHashMap<String, Object>();
-		jm.put("id", this.id);
-		jm.put("seq", this.seq);
-		jm.put("rid", this.restaurantId);
-		jm.put("staffId", this.staffId);
-		jm.put("staffName", this.staffName);
-		jm.put("orderId", this.orderId);
-		jm.put("couponId", this.couponId);
-		jm.put("couponMoney", this.couponMoney);
-		jm.put("couponName", this.couponName);
-		jm.put("deltaBaseMoney", this.deltaBaseMoney);
-		jm.put("deltaExtraMoney", this.deltaExtraMoney);
-		jm.put("deltaPoint", deltaPoint);
-		jm.put("remainingBaseMoney", this.remainingBaseMoney);
-		jm.put("remainingExtraMoney", this.remainingExtraMoney);
-		jm.put("remainingPoint", this.remainingPoint);
-		jm.put("comment", this.comment);
-		jm.put("deltaTotalMoney", this.getDeltaTotalMoney());
-		jm.put("remainingTotalMoney", this.getRemainingTotalMoney());
-		jm.put("operateDateFormat", DateUtil.format(this.operateDate));
-		if(this.member != null){
-			jm.put("member", this.member);			
+	public JsonMap toJsonMap(int flag) {
+		JsonMap jm = new JsonMap();
+		jm.putInt("id", this.id);
+		jm.putString("seq", this.seq);
+		jm.putInt("rid", this.restaurantId);
+		jm.putInt("staffId", this.staffId);
+		jm.putString("staffName", this.staffName);
+		jm.putInt("orderId", this.orderId);
+		jm.putInt("couponId", this.couponId);
+		jm.putFloat("couponMoney", this.couponMoney);
+		jm.putString("couponName", this.couponName);
+		jm.putFloat("deltaBaseMoney", this.deltaBaseMoney);
+		jm.putFloat("deltaExtraMoney", this.deltaExtraMoney);
+		jm.putInt("deltaPoint", deltaPoint);
+		jm.putFloat("remainingBaseMoney", this.remainingBaseMoney);
+		jm.putFloat("remainingExtraMoney", this.remainingExtraMoney);
+		jm.putInt("remainingPoint", this.remainingPoint);
+		jm.putString("comment", this.comment);
+		jm.putFloat("deltaTotalMoney", this.getDeltaTotalMoney());
+		jm.putFloat("remainingTotalMoney", this.getRemainingTotalMoney());
+		jm.putString("operateDateFormat", DateUtil.format(this.operateDate));
+		jm.putJsonable("member", this.member, 0);
+		if (this.operateType != null) {
+			jm.putString("operateTypeText", this.operateType.getName());
+			jm.putInt("operateTypeValue", this.operateType.getValue());
 		}
-		if(this.operateType != null){
-			jm.put("operateTypeText", this.operateType.getName());
-			jm.put("operateTypeValue", this.operateType.getValue());
+		if (this.payType != null) {
+			jm.putString("payTypeText", this.payType.getDesc());
+			jm.putInt("payTypeValue", this.payType.getVal());
+			jm.putFloat("payMoney", this.payMoney);
 		}
-		if(this.payType != null){
-			jm.put("payTypeText", this.payType.getDesc());
-			jm.put("payTypeValue", this.payType.getVal());
-			jm.put("payMoney", this.payMoney);
+		if (this.chargeType != null) {
+			jm.putString("chargeTypeText", this.chargeType.getName());
+			jm.putInt("chargeTypeValue", this.chargeType.getValue());
+			jm.putFloat("chargeMoney", this.chargeMoney);
+			jm.putFloat("takeMoney", this.takeMoney);
 		}
-		if(this.chargeType != null){
-			jm.put("chargeTypeText", this.chargeType.getName());
-			jm.put("chargeTypeValue", this.chargeType.getValue());
-			jm.put("chargeMoney", this.chargeMoney);
-			jm.put("takeMoney", this.takeMoney);
-		}
-		
-		return Collections.unmodifiableMap(jm);
+
+		return jm;
 	}
 
 	@Override
 	public void fromJsonMap(JsonMap jsonMap, int flag) {
-		
+
 	}
-	
+
 	public int getId() {
 		return id;
 	}
+
 	public void setId(int id) {
 		this.id = id;
 	}
+
 	public int getRestaurantId() {
 		return restaurantId;
 	}
+
 	public void setRestaurantId(int restaurantId) {
 		this.restaurantId = restaurantId;
 	}
+
 	public int getStaffId() {
 		return staffId;
 	}
-	
+
 	public void setStaffId(int staffId) {
 		this.staffId = staffId;
 	}
-	
+
 	public String getStaffName() {
-		if(staffName == null){
+		if (staffName == null) {
 			return "";
 		}
 		return staffName;
 	}
-	
+
 	public void setStaffName(String staffName) {
 		this.staffName = staffName;
 	}
-	
-	public void setMember(Member member){
-		if(member != null){
+
+	public void setMember(Member member) {
+		if (member != null) {
 			this.member = member;
 		}
 	}
-	
-	public Member getMember(){
+
+	public Member getMember() {
 		return member;
 	}
-	
+
 	public int getMemberId() {
-		if(member != null){
+		if (member != null) {
 			return this.member.getId();
-		}else{
+		} else {
 			return 0;
 		}
 	}
-	
+
 	public void setMemberId(int memberId) {
 		this.member.setId(memberId);
 	}
-	
-	public String getMemberCard(){
-		if(member != null){
+
+	public String getMemberCard() {
+		if (member != null) {
 			return member.getMemberCard();
-		}else{
+		} else {
 			return "";
 		}
 	}
-	
-	public void setMemberCard(String memberCard){
+
+	public void setMemberCard(String memberCard) {
 		getMember().setMemberCard(memberCard);
 	}
-	
-	public String getMemberName(){
-		if(member != null){
+
+	public String getMemberName() {
+		if (member != null) {
 			return member.getName();
-		}else{
+		} else {
 			return "";
 		}
 	}
-	
-	public void setMemberName(String name){
+
+	public void setMemberName(String name) {
 		getMember().setName(name);
 	}
-	
-	public String getMemberMobile(){
-		if(member != null){
+
+	public String getMemberMobile() {
+		if (member != null) {
 			return member.getMobile();
-		}else{
+		} else {
 			return "";
 		}
 	}
-	
-	public void setMemberMobile(String mobile){
+
+	public void setMemberMobile(String mobile) {
 		getMember().setMobile(mobile);
 	}
-	
+
 	public String getOperateSeq() {
 		return seq;
 	}
-	
+
 	public void setOperateSeq(String seq) {
 		this.seq = seq;
 	}
-	
+
 	public long getOperateDate() {
 		return operateDate;
 	}
-	
+
 	public void setOperateDate(long date) {
 		this.operateDate = date;
 	}
-	
+
 	public OperationType getOperationType() {
 		return operateType;
 	}
-	
+
 	public void setOperationType(int type) {
 		this.operateType = OperationType.valueOf(type);
 	}
-	
-	public void setOperationType(OperationType ot){
+
+	public void setOperationType(OperationType ot) {
 		this.operateType = ot;
 	}
-	
-	public void setOrderId(int orderId){
+
+	public void setOrderId(int orderId) {
 		this.orderId = orderId;
 	}
-	
-	public int getOrderId(){
+
+	public int getOrderId() {
 		return this.orderId;
 	}
-	
-	public Order.PayType getPayType(){
+
+	public Order.PayType getPayType() {
 		return this.payType;
 	}
-	
-	public void setPayType(Order.PayType type){
+
+	public void setPayType(Order.PayType type) {
 		this.payType = type;
 	}
-	
+
 	public float getPayMoney() {
 		return payMoney;
 	}
-	
+
 	public void setPayMoney(float payMoney) {
 		this.payMoney = payMoney;
 	}
-	
-	public void setCouponId(int couponId){
+
+	public void setCouponId(int couponId) {
 		this.couponId = couponId;
 	}
-	
-	public int getCouponId(){
+
+	public int getCouponId() {
 		return this.couponId;
 	}
-	
-	public String getCouponName(){
-		if(couponName != null){
+
+	public String getCouponName() {
+		if (couponName != null) {
 			return this.couponName;
-		}else{
+		} else {
 			return "";
 		}
 	}
-	
-	public void setCoupnName(String name){
+
+	public void setCoupnName(String name) {
 		this.couponName = name;
 	}
-	
-	public float getCouponMoney(){
+
+	public float getCouponMoney() {
 		return this.couponMoney;
 	}
-	
-	public void setCouponMoney(float couponMoney){
+
+	public void setCouponMoney(float couponMoney) {
 		this.couponMoney = couponMoney;
 	}
-	
+
 	public ChargeType getChargeType() {
 		return chargeType;
 	}
-	
-	public void setChargeType(ChargeType type){
+
+	public void setChargeType(ChargeType type) {
 		this.chargeType = type;
 	}
-	
+
 	public void setChargeType(short chargeType) {
 		this.chargeType = ChargeType.valueOf(chargeType);
 	}
-	
+
 	public float getChargeMoney() {
 		return chargeMoney;
 	}
-	
+
 	public void setChargeMoney(float chargeMoney) {
 		this.chargeMoney = chargeMoney;
 	}
-	
+
 	public float getDeltaBaseMoney() {
 		return deltaBaseMoney;
 	}
-	
+
 	public void setDeltaBaseMoney(float deltaBaseMoney) {
 		this.deltaBaseMoney = deltaBaseMoney;
 	}
-	
+
 	public float getDeltaExtraMoney() {
 		return deltaExtraMoney;
 	}
-	
+
 	public void setDeltaExtraMoney(float deltaExtraMoney) {
 		this.deltaExtraMoney = deltaExtraMoney;
 	}
-	
+
 	public float getRemainingBaseMoney() {
 		return remainingBaseMoney;
 	}
-	
+
 	public void setRemainingBaseMoney(float remainingBaseMoney) {
 		this.remainingBaseMoney = remainingBaseMoney;
 	}
-	
+
 	public float getRemainingExtraMoney() {
 		return remainingExtraMoney;
 	}
-	
+
 	public void setRemainingExtraMoney(float remainingExtraMoney) {
 		this.remainingExtraMoney = remainingExtraMoney;
 	}
-	
+
 	public int getDeltaPoint() {
 		return deltaPoint;
 	}
-	
+
 	public void setDeltaPoint(int deltaPoint) {
 		this.deltaPoint = deltaPoint;
 	}
-	
+
 	public int getRemainingPoint() {
 		return remainingPoint;
 	}
-	
+
 	public float getTakeMoney() {
 		return takeMoney;
 	}
@@ -471,39 +470,37 @@ public class MemberOperation implements Jsonable {
 	public void setRemainingPoint(int remainingPoint) {
 		this.remainingPoint = remainingPoint;
 	}
-	
+
 	public String getComment() {
-		if(comment == null){
+		if (comment == null) {
 			return "";
 		}
 		return comment;
 	}
-	
+
 	public void setComment(String comment) {
 		this.comment = comment;
 	}
-	
+
 	@Override
-	public String toString(){
-		return "member operation(" +
-			   "id = " + getId() +
-			   ",ot = " + getOperationType().getName() +
-			   ",member_name = " + getMember().getName() +
-			   ",mobile = " + getMemberMobile() +
-			   ",member_card = " + getMemberCard() + ")";
+	public String toString() {
+		return "member operation(" + "id = " + getId() + ",ot = "
+				+ getOperationType().getName() + ",member_name = "
+				+ getMember().getName() + ",mobile = " + getMemberMobile()
+				+ ",member_card = " + getMemberCard() + ")";
 	}
-	
+
 	@Override
-	public int hashCode(){
+	public int hashCode() {
 		return 17 * 31 + getId();
 	}
-	
+
 	@Override
-	public boolean equals(Object obj){
-		if(obj == null || !(obj instanceof MemberOperation)){
+	public boolean equals(Object obj) {
+		if (obj == null || !(obj instanceof MemberOperation)) {
 			return false;
-		}else{
-			return getId() == ((MemberOperation)obj).getId();
+		} else {
+			return getId() == ((MemberOperation) obj).getId();
 		}
 	}
 

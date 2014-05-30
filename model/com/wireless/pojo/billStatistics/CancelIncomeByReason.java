@@ -1,10 +1,7 @@
 package com.wireless.pojo.billStatistics;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
@@ -54,12 +51,12 @@ public class CancelIncomeByReason {
 		}
 
 		@Override
-		public Map<String, Object> toJsonMap(int flag) {
-			Map<String, Object> jm = new HashMap<String, Object>();
-			jm.put("dept", this.getDept());
-			jm.put("amount", this.getAmount());
-			jm.put("price", this.getPrice());
-			return Collections.unmodifiableMap(jm);
+		public JsonMap toJsonMap(int flag) {
+			JsonMap jm = new JsonMap();
+			jm.putJsonable("dept", this.getDept(), Department.DEPT_JSONABLE_COMPLEX);
+			jm.putFloat("amount", this.getAmount());
+			jm.putFloat("price", this.getPrice());
+			return jm;
 		}
 
 		@Override

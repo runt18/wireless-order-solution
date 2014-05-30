@@ -1,7 +1,6 @@
 package com.wireless.pojo.dishesOrder;
 
 import java.util.List;
-import java.util.Map;
 import java.util.zip.CRC32;
 
 import com.wireless.exception.BusinessException;
@@ -676,7 +675,7 @@ public class OrderFood implements Parcelable, Jsonable {
 	}
 	
 	@Override
-	public Map<String, Object> toJsonMap(int flag) {
+	public JsonMap toJsonMap(int flag) {
 		JsonMap jm = new JsonMap();
 		// extends food
 		jm.putJsonable(this.mFood, 0);

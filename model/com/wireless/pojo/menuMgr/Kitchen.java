@@ -1,7 +1,6 @@
 package com.wireless.pojo.menuMgr;
 
 import java.util.Comparator;
-import java.util.Map;
 
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
@@ -463,7 +462,7 @@ public class Kitchen implements Parcelable, Comparable<Kitchen>, Jsonable{
 	public final static int KITCHEN_JSONABLE_SIMPLE = 1;
 	
 	@Override
-	public Map<String, Object> toJsonMap(int flag) {
+	public JsonMap toJsonMap(int flag) {
 		JsonMap jm = new JsonMap();
 		
 		if(flag == KITCHEN_JSONABLE_SIMPLE){

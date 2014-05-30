@@ -1,9 +1,5 @@
 package com.wireless.pojo.weixin.weixinInfo;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 
@@ -169,14 +165,14 @@ public class WeixinInfo implements Jsonable{
 	}
 	
 	@Override
-	public Map<String, Object> toJsonMap(int flag) {
-		Map<String, Object> jm = new HashMap<String, Object>();
-		jm.put("id", this.restaurantId);
-		jm.put("couponType", this.boundCouponType);
-		jm.put("weixinLogo", this.weixinLogo);
-		jm.put("weixinInfo", this.weixinInfo);
-		jm.put("weixinPromote", this.weixinPromote);
-		return Collections.unmodifiableMap(jm);
+	public JsonMap toJsonMap(int flag) {
+		JsonMap jm = new JsonMap();
+		jm.putInt("id", this.restaurantId);
+		jm.putInt("couponType", this.boundCouponType);
+		jm.putString("weixinLogo", this.weixinLogo);
+		jm.putString("weixinInfo", this.weixinInfo);
+		jm.putString("weixinPromote", this.weixinPromote);
+		return jm;
 	}
 	@Override
 	public void fromJsonMap(JsonMap jsonMap, int flag) {

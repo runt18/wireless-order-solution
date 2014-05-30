@@ -5,10 +5,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
@@ -526,18 +524,18 @@ public class Restaurant implements Parcelable, Jsonable{
 	};
 
 	@Override
-	public Map<String, Object> toJsonMap(int flag) {
+	public JsonMap toJsonMap(int flag) {
 		String moduleDescs = "";
-		Map<String, Object> jm = new HashMap<String, Object>();
-		jm.put("id", this.id);
-		jm.put("account", this.account);
-		jm.put("name", this.restaurantName);
-		jm.put("info", this.restaurantInfo);
-		jm.put("tele1", this.tele1);
-		jm.put("tele2", this.tele2);
-		jm.put("address", this.address);
-		jm.put("liveness", this.liveness);
-		jm.put("modules", this.modules);
+		JsonMap jm = new JsonMap();
+		jm.putInt("id", this.id);
+		jm.putString("account", this.account);
+		jm.putString("name", this.restaurantName);
+		jm.putString("info", this.restaurantInfo);
+		jm.putString("tele1", this.tele1);
+		jm.putString("tele2", this.tele2);
+		jm.putString("address", this.address);
+		jm.putFloat("liveness", this.liveness);
+		jm.putJsonableList("modules", this.modules, 0);
 		if(this.modules.size() > 0){
 			moduleDescs = "";
 			for (Module module : this.modules) {
@@ -548,12 +546,12 @@ public class Restaurant implements Parcelable, Jsonable{
 				}
 			}
 		}
-		jm.put("moduleDescs", moduleDescs);
-		jm.put("recordAliveValue", RecordAlive.valueOfSeconds(this.recordAlive).getVal());
-		jm.put("recordAliveText", RecordAlive.valueOfSeconds(this.recordAlive).getDesc());
-		jm.put("birthDate", DateUtil.formatToDate(this.birthDate));
-		jm.put("expireDate", DateUtil.formatToDate(this.expireDate));
-		return Collections.unmodifiableMap(jm);
+		jm.putString("moduleDescs", moduleDescs);
+		jm.putInt("recordAliveValue", RecordAlive.valueOfSeconds(this.recordAlive).getVal());
+		jm.putString("recordAliveText", RecordAlive.valueOfSeconds(this.recordAlive).getDesc());
+		jm.putString("birthDate", DateUtil.formatToDate(this.birthDate));
+		jm.putString("expireDate", DateUtil.formatToDate(this.expireDate));
+		return jm;
 	}
 
 	@Override

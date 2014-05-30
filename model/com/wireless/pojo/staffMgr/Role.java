@@ -1,9 +1,7 @@
 package com.wireless.pojo.staffMgr;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
@@ -419,17 +417,17 @@ public class Role implements Jsonable, Parcelable{
 	}
 	
 	@Override
-	public Map<String, Object> toJsonMap(int flag) {
-		Map<String, Object> jm = new HashMap<String, Object>();
-		jm.put("id", this.getId());
-		jm.put("name", this.getName());
-		jm.put("restaurantId", this.getRestaurantId());
-		jm.put("categoryValue", this.getCategory().getVal());
-		jm.put("categoryText", this.getCategory().getDesc());
-		jm.put("typeValue", this.getType().getVal());
-		jm.put("typeText", this.getType().getDesc());
+	public JsonMap toJsonMap(int flag) {
+		JsonMap jm = new JsonMap();
+		jm.putInt("id", this.getId());
+		jm.putString("name", this.getName());
+		jm.putInt("restaurantId", this.getRestaurantId());
+		jm.putInt("categoryValue", this.getCategory().getVal());
+		jm.putString("categoryText", this.getCategory().getDesc());
+		jm.putInt("typeValue", this.getType().getVal());
+		jm.putString("typeText", this.getType().getDesc());
 		
-		return Collections.unmodifiableMap(jm);
+		return jm;
 	}
 
 	@Override

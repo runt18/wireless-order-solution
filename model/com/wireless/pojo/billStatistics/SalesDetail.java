@@ -1,9 +1,5 @@
 package com.wireless.pojo.billStatistics;
 
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.pojo.menuMgr.Department;
@@ -124,27 +120,24 @@ public class SalesDetail implements Jsonable{
 	}
 
 	@Override
-	public Map<String, Object> toJsonMap(int flag) {
-		Map<String, Object> jm = new LinkedHashMap<String, Object>();
-		jm.put("income", this.income);
-		jm.put("discount", this.discount);
-		jm.put("gifted", this.gifted);
-		jm.put("couponed", this.gifted);
-		jm.put("cost", this.cost);
-		jm.put("costRate", this.costRate);
-		jm.put("profit", this.profit);
-		jm.put("profitRate", this.profitRate);
-		jm.put("salesAmount", this.salesAmount);
-		jm.put("avgPrice", this.avgPrice);
-		jm.put("avgCost", this.avgCost);
-		if(this.dept != null)
-			jm.put("dept", this.dept);
-		if(this.kitchen != null)
-			jm.put("kitchen", this.kitchen);
-		if(this.food != null)
-			jm.put("food", this.food);
+	public JsonMap toJsonMap(int flag) {
+		JsonMap jm = new JsonMap();
+		jm.putFloat("income", this.income);
+		jm.putFloat("discount", this.discount);
+		jm.putFloat("gifted", this.gifted);
+		jm.putFloat("couponed", this.gifted);
+		jm.putFloat("cost", this.cost);
+		jm.putFloat("costRate", this.costRate);
+		jm.putFloat("profit", this.profit);
+		jm.putFloat("profitRate", this.profitRate);
+		jm.putFloat("salesAmount", this.salesAmount);
+		jm.putFloat("avgPrice", this.avgPrice);
+		jm.putFloat("avgCost", this.avgCost);
+		jm.putJsonable("dept", this.dept, Department.DEPT_JSONABLE_COMPLEX);
+		jm.putJsonable("kitchen", this.kitchen, Kitchen.KITCHEN_JSONABLE_COMPLEX);
+		jm.putJsonable("food", this.food, Food.FOOD_JSONABLE_COMPLEX);
 		
-		return Collections.unmodifiableMap(jm);
+		return jm;
 	}
 
 	@Override

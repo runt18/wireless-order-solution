@@ -1,9 +1,5 @@
 package com.wireless.pojo.billStatistics;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.pojo.dishesOrder.Order;
@@ -107,19 +103,19 @@ public class RepaidStatistics implements Jsonable{
 	
 
 	@Override
-	public Map<String, Object> toJsonMap(int flag) {
-		Map<String, Object> jm = new HashMap<String, Object>();
-		jm.put("orderId", this.mId);
-		jm.put("orderDateFormat", DateUtil.format(this.mOrderDate));
-		jm.put("actualPrice", this.mActualPrice);
-		jm.put("totalPrice", this.mTotalPrice);
-		jm.put("repaidPrice", this.mRepaidPrice);
-		jm.put("payTypeValue", this.mPaymentType.getVal());
-		jm.put("payTypeText", this.mPaymentType.getDesc());
-		jm.put("oldTotalPrice", NumericUtil.roundFloat(this.mTotalPrice - this.mRepaidPrice));
-		jm.put("oldActualPrice", NumericUtil.roundFloat(this.mActualPrice - this.mRepaidPrice));
-		jm.put("operateStaff", this.getStaff().getName());
-		return Collections.unmodifiableMap(jm);
+	public JsonMap toJsonMap(int flag) {
+		JsonMap jm = new JsonMap();
+		jm.putInt("orderId", this.mId);
+		jm.putString("orderDateFormat", DateUtil.format(this.mOrderDate));
+		jm.putFloat("actualPrice", this.mActualPrice);
+		jm.putFloat("totalPrice", this.mTotalPrice);
+		jm.putFloat("repaidPrice", this.mRepaidPrice);
+		jm.putInt("payTypeValue", this.mPaymentType.getVal());
+		jm.putString("payTypeText", this.mPaymentType.getDesc());
+		jm.putFloat("oldTotalPrice", NumericUtil.roundFloat(this.mTotalPrice - this.mRepaidPrice));
+		jm.putFloat("oldActualPrice", NumericUtil.roundFloat(this.mActualPrice - this.mRepaidPrice));
+		jm.putString("operateStaff", this.getStaff().getName());
+		return jm;
 	}
 
 	@Override

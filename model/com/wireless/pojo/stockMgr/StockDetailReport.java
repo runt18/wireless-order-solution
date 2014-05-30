@@ -1,9 +1,5 @@
 package com.wireless.pojo.stockMgr;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.pojo.stockMgr.StockAction.SubType;
@@ -90,50 +86,50 @@ public class StockDetailReport implements Jsonable {
 	}
 	
 	@Override
-	public Map<String, Object> toJsonMap(int flag) {
-		Map<String, Object> jm = new HashMap<String, Object>();
-		jm.put("id", this.getId());
-		jm.put("date", DateUtil.formatToDate(this.getDate()));
-		jm.put("oriStockId", this.getOriStockId());
+	public JsonMap toJsonMap(int flag) {
+		JsonMap jm = new JsonMap();
+		jm.putInt("id", this.getId());
+		jm.putString("date", DateUtil.formatToDate(this.getDate()));
+		jm.putString("oriStockId", this.getOriStockId());
 		if(this.getStockActionSubType() == SubType.STOCK_IN || this.getStockActionSubType() == SubType.MORE || this.getStockActionSubType() == SubType.SPILL){
-			jm.put("dept", this.getDeptIn());
-			jm.put("stockInSubType", this.getStockActionSubType().getText());
-			jm.put("stockInAmount", this.getStockActionAmount());
-			jm.put("stockInMoney", this.totalMoney());
-			jm.put("stockOutSubType", "----");
-			jm.put("stockOutAmount", "----");
-			jm.put("stockOutMoney", "----");
+			jm.putString("dept", this.getDeptIn());
+			jm.putString("stockInSubType", this.getStockActionSubType().getText());
+			jm.putFloat("stockInAmount", this.getStockActionAmount());
+			jm.putFloat("stockInMoney", this.totalMoney());
+			jm.putString("stockOutSubType", "----");
+			jm.putString("stockOutAmount", "----");
+			jm.putString("stockOutMoney", "----");
 			
 		}else if(this.getStockActionSubType() == SubType.STOCK_IN_TRANSFER){
-			jm.put("dept", this.getDeptOut() + " -> " + this.getDeptIn());
-			jm.put("stockInSubType", this.getStockActionSubType().getText());
-			jm.put("stockInAmount", this.getStockActionAmount());
-			jm.put("stockInMoney", this.totalMoney());
-			jm.put("stockOutSubType", "----");
-			jm.put("stockOutAmount", "----");
-			jm.put("stockOutMoney", "----");
+			jm.putString("dept", this.getDeptOut() + " -> " + this.getDeptIn());
+			jm.putString("stockInSubType", this.getStockActionSubType().getText());
+			jm.putFloat("stockInAmount", this.getStockActionAmount());
+			jm.putFloat("stockInMoney", this.totalMoney());
+			jm.putString("stockOutSubType", "----");
+			jm.putString("stockOutAmount", "----");
+			jm.putString("stockOutMoney", "----");
 		}else if(this.getStockActionSubType() == SubType.STOCK_OUT_TRANSFER){
-			jm.put("dept", this.getDeptOut()+ " -> " + this.getDeptIn());
-			jm.put("stockInSubType", "----");
-			jm.put("stockInAmount", "----");
-			jm.put("stockInMoney", "----");
-			jm.put("stockOutSubType", this.getStockActionSubType().getText());
-			jm.put("stockOutAmount", this.getStockActionAmount());
-			jm.put("stockOutMoney", this.totalMoney());
+			jm.putString("dept", this.getDeptOut()+ " -> " + this.getDeptIn());
+			jm.putString("stockInSubType", "----");
+			jm.putString("stockInAmount", "----");
+			jm.putString("stockInMoney", "----");
+			jm.putString("stockOutSubType", this.getStockActionSubType().getText());
+			jm.putFloat("stockOutAmount", this.getStockActionAmount());
+			jm.putFloat("stockOutMoney", this.totalMoney());
 		}
 		else{
-			jm.put("dept", this.getDeptOut());
-			jm.put("stockInSubType", "----");
-			jm.put("stockInAmount", "----");
-			jm.put("stockInMoney", "----");
-			jm.put("stockOutSubType", this.getStockActionSubType().getText());
-			jm.put("stockOutAmount", this.getStockActionAmount());
-			jm.put("stockOutMoney", this.totalMoney());
+			jm.putString("dept", this.getDeptOut());
+			jm.putString("stockInSubType", "----");
+			jm.putString("stockInAmount", "----");
+			jm.putString("stockInMoney", "----");
+			jm.putString("stockOutSubType", this.getStockActionSubType().getText());
+			jm.putFloat("stockOutAmount", this.getStockActionAmount());
+			jm.putFloat("stockOutMoney", this.totalMoney());
 		}
 
-		jm.put("remaining", this.getRemaining());
+		jm.putFloat("remaining", this.getRemaining());
 		
-		return Collections.unmodifiableMap(jm);
+		return jm;
 	}
 	@Override
 	public void fromJsonMap(JsonMap jsonMap, int flag) {

@@ -1,6 +1,5 @@
 package com.wireless.json;
 
-import java.util.Map;
 
 public interface Jsonable {
 
@@ -12,13 +11,13 @@ public interface Jsonable {
 	/**
 	 * Flatten the object to a key-value map.
 	 * @param flag additional flags about how the object should be flatten
-	 * @return the key-value map to the object
+	 * @return the key-value map to the object {@link JsonMap}
 	 */
-	public Map<String, Object> toJsonMap(int flag);
+	public JsonMap toJsonMap(int flag);
 	
 	/**
 	 * Create the object from key-value map.
-	 * @param jsonMap the key-value map to create object
+	 * @param jsonMap the key-value map to create object {@link JsonMap}
 	 * @param flag additional flags about how the object should be created
 	 */
 	public void fromJsonMap(JsonMap jsonMap, int flag);

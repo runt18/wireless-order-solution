@@ -1,9 +1,6 @@
 package com.wireless.pojo.billStatistics;
 
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
@@ -381,61 +378,61 @@ public class ShiftDetail implements Jsonable{
 	}
 
 	@Override
-	public Map<String, Object> toJsonMap(int flag) {
-		Map<String, Object> jm = new HashMap<String, Object>();
-		jm.put("paramsOnDuty", this.onDuty);
-		jm.put("paramsOffDuty", this.offDuty);
-		jm.put("totalActual", this.getTotalActual());
-		jm.put("totalIncome", this.getTotalIncome());
-		jm.put("orderAmount", this.getOrderAmount());
+	public JsonMap toJsonMap(int flag) {
+		JsonMap jm = new JsonMap();
+		jm.putString("paramsOnDuty", this.onDuty);
+		jm.putString("paramsOffDuty", this.offDuty);
+		jm.putFloat("totalActual", this.getTotalActual());
+		jm.putFloat("totalIncome", this.getTotalIncome());
+		jm.putInt("orderAmount", this.getOrderAmount());
 		
-		jm.put("cashIncome2", this.getCashActualIncome());
-		jm.put("cashAmount", this.getCashAmount());
+		jm.putFloat("cashIncome2", this.getCashActualIncome());
+		jm.putInt("cashAmount", this.getCashAmount());
 		
-		jm.put("creditCardIncome2", this.getCreditActualIncome());
-		jm.put("creditCardAmount", this.getCreditCardAmount());
+		jm.putFloat("creditCardIncome2", this.getCreditActualIncome());
+		jm.putInt("creditCardAmount", this.getCreditCardAmount());
 		
-		jm.put("hangIncome2", this.getHangActualIncome());
-		jm.put("hangAmount", this.getHangAmount());
+		jm.putFloat("hangIncome2", this.getHangActualIncome());
+		jm.putInt("hangAmount", this.getHangAmount());
 		
-		jm.put("signIncome2", this.getSignActualIncome());
-		jm.put("signAmount", this.getSignAmount());
+		jm.putFloat("signIncome2", this.getSignActualIncome());
+		jm.putInt("signAmount", this.getSignAmount());
 		
-		jm.put("memberAmount", this.getMemberCardAmount());
-		jm.put("memberActual", this.getMemberActualIncome());
+		jm.putInt("memberAmount", this.getMemberCardAmount());
+		jm.putFloat("memberActual", this.getMemberActualIncome());
 		
-		jm.put("discountIncome", this.getDiscountIncome());
+		jm.putFloat("discountIncome", this.getDiscountIncome());
 		
-		jm.put("giftIncome", this.getGiftIncome());
+		jm.putFloat("giftIncome", this.getGiftIncome());
 		
-		jm.put("couponIncome", this.getCouponIncome());
+		jm.putFloat("couponIncome", this.getCouponIncome());
 		
-		jm.put("cancelIncome", this.getCancelIncome());
+		jm.putFloat("cancelIncome", this.getCancelIncome());
 		
-		jm.put("eraseIncome", this.getEraseIncome());
+		jm.putFloat("eraseIncome", this.getEraseIncome());
 		
-		jm.put("paidIncome", this.getPaidIncome());
-		jm.put("serviceAmount", this.getServiceAmount());
-		jm.put("serviceIncome", this.getServiceIncome());
+		jm.putFloat("paidIncome", this.getPaidIncome());
+		jm.putInt("serviceAmount", this.getServiceAmount());
+		jm.putFloat("serviceIncome", this.getServiceIncome());
 		
-		jm.put("deptStat", this.getDeptIncome());
-		jm.put("paidAmount", this.getPaidAmount());
-		jm.put("eraseAmount", this.getEraseAmount());
-		jm.put("couponAmount", this.getCouponAmount());
-		jm.put("cancelAmount", this.getCancelAmount());
-		jm.put("giftAmount", this.getGiftAmount());
-		jm.put("discountAmount", this.getDiscountAmount());
-		jm.put("signIncome", this.getSignTotalIncome());
-		jm.put("hangIncome", this.getHangTotalIncome());
-		jm.put("creditCardIncome", this.getCreditTotalIncome());
-		jm.put("cashIncome", this.getCashTotalIncome());
-		jm.put("memberIncome", this.getMemberTotalIncome());
-		jm.put("memberChargeByCash", this.getIncomeByCharge().getActualCashCharge());
-		jm.put("memberChargeByCard", this.getIncomeByCharge().getActualCreditCardCharge());
-		jm.put("memberAccountCharge", this.getIncomeByCharge().getTotalAccountCharge());
-		jm.put("memberRefund", this.getIncomeByCharge().getTotalActualRefund());
-		jm.put("memberAccountRefund", this.getIncomeByCharge().getTotalAccountRefund());
-		return Collections.unmodifiableMap(jm);
+		jm.putJsonableList("deptStat", this.getDeptIncome(), 0);
+		jm.putInt("paidAmount", this.getPaidAmount());
+		jm.putInt("eraseAmount", this.getEraseAmount());
+		jm.putInt("couponAmount", this.getCouponAmount());
+		jm.putInt("cancelAmount", this.getCancelAmount());
+		jm.putInt("giftAmount", this.getGiftAmount());
+		jm.putInt("discountAmount", this.getDiscountAmount());
+		jm.putFloat("signIncome", this.getSignTotalIncome());
+		jm.putFloat("hangIncome", this.getHangTotalIncome());
+		jm.putFloat("creditCardIncome", this.getCreditTotalIncome());
+		jm.putFloat("cashIncome", this.getCashTotalIncome());
+		jm.putFloat("memberIncome", this.getMemberTotalIncome());
+		jm.putFloat("memberChargeByCash", this.getIncomeByCharge().getActualCashCharge());
+		jm.putFloat("memberChargeByCard", this.getIncomeByCharge().getActualCreditCardCharge());
+		jm.putFloat("memberAccountCharge", this.getIncomeByCharge().getTotalAccountCharge());
+		jm.putFloat("memberRefund", this.getIncomeByCharge().getTotalActualRefund());
+		jm.putFloat("memberAccountRefund", this.getIncomeByCharge().getTotalAccountRefund());
+		return jm;
 	}
 
 	@Override

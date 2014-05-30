@@ -1,7 +1,5 @@
 package com.wireless.pojo.sms;
 
-import java.util.Map;
-
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.pojo.util.DateUtil;
@@ -141,7 +139,7 @@ public class VerifySMS implements Jsonable{
 	}
 
 	@Override
-	public Map<String, Object> toJsonMap(int flag) {
+	public JsonMap toJsonMap(int flag) {
 		JsonMap jm = new JsonMap();
 		jm.putInt("id", id);
 		jm.putInt("code", code);

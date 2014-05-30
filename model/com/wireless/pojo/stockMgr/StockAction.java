@@ -2,11 +2,8 @@ package com.wireless.pojo.stockMgr;
 
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
@@ -831,40 +828,40 @@ public class StockAction implements Jsonable{
 	}
 
 	@Override
-	public Map<String, Object> toJsonMap(int flag) {
-		Map<String, Object> jm = new HashMap<String, Object>();
-		jm.put("id", this.id);
-		jm.put("restaurantId", this.restaurantId);
-		jm.put("birthDate", this.birthDate);
-		jm.put("birthDateFormat", DateUtil.formatToDate(this.birthDate));
-		jm.put("oriStockId", this.oriStockId);
-		jm.put("oriStockDateFormat", DateUtil.format(this.oriStockDate, DateUtil.Pattern.DATE.getPattern()));
-		jm.put("approverId", this.approverId);
-		jm.put("approverName", this.approver);
-		jm.put("approverDateFormat", DateUtil.formatToDate(this.getApproverDate()));
-		jm.put("deptIn", this.deptIn);
-		jm.put("stockInName",  this.deptIn.getName());
-		jm.put("deptOut", this.deptOut);
-		jm.put("stockOutName",  this.deptOut.getName());
-		jm.put("supplier", this.supplier);
-		jm.put("supplierName", this.supplier.getName());
-		jm.put("operatorId", this.operatorId);
-		jm.put("operatorName", this.operator);
-		jm.put("amount", this.amount);
-		jm.put("price", this.price);
-		jm.put("actualPrice", this.actualPrice);
-		jm.put("cateTypeValue", this.cateType.getValue());
-		jm.put("cateTypeText", this.cateType.getText());
-		jm.put("typeValue", this.type.getVal());
-		jm.put("typeText", this.type.getDesc());
-		jm.put("subTypeValue", this.subType.getVal());
-		jm.put("subTypeText", this.subType.getText());
-		jm.put("statusValue", this.status.getVal());
-		jm.put("statusText", this.status.getDesc());
-		jm.put("comment", this.comment);
-		jm.put("stockDetails", this.stockDetails);
+	public JsonMap toJsonMap(int flag) {
+		JsonMap jm = new JsonMap();
+		jm.putInt("id", this.id);
+		jm.putInt("restaurantId", this.restaurantId);
+		jm.putLong("birthDate", this.birthDate);
+		jm.putString("birthDateFormat", DateUtil.formatToDate(this.birthDate));
+		jm.putString("oriStockId", this.oriStockId);
+		jm.putString("oriStockDateFormat", DateUtil.format(this.oriStockDate, DateUtil.Pattern.DATE.getPattern()));
+		jm.putInt("approverId", this.approverId);
+		jm.putString("approverName", this.approver);
+		jm.putString("approverDateFormat", DateUtil.formatToDate(this.getApproverDate()));
+		jm.putJsonable("deptIn", this.deptIn, Department.DEPT_JSONABLE_COMPLEX);
+		jm.putString("stockInName",  this.deptIn.getName());
+		jm.putJsonable("deptOut", this.deptOut, Department.DEPT_JSONABLE_COMPLEX);
+		jm.putString("stockOutName",  this.deptOut.getName());
+		jm.putJsonable("supplier", this.supplier, 0);
+		jm.putString("supplierName", this.supplier.getName());
+		jm.putInt("operatorId", this.operatorId);
+		jm.putString("operatorName", this.operator);
+		jm.putFloat("amount", this.amount);
+		jm.putFloat("price", this.price);
+		jm.putFloat("actualPrice", this.actualPrice);
+		jm.putInt("cateTypeValue", this.cateType.getValue());
+		jm.putString("cateTypeText", this.cateType.getText());
+		jm.putInt("typeValue", this.type.getVal());
+		jm.putString("typeText", this.type.getDesc());
+		jm.putInt("subTypeValue", this.subType.getVal());
+		jm.putString("subTypeText", this.subType.getText());
+		jm.putInt("statusValue", this.status.getVal());
+		jm.putString("statusText", this.status.getDesc());
+		jm.putString("comment", this.comment);
+		jm.putJsonableList("stockDetails", this.stockDetails, 0);
 		
-		return Collections.unmodifiableMap(jm);
+		return jm;
 	}
 
 	@Override

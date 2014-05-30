@@ -1,9 +1,5 @@
 package com.wireless.pojo.staffMgr;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.parcel.Parcel;
@@ -382,18 +378,18 @@ public class Staff implements Parcelable, Jsonable{
 	};
 
 	@Override
-	public Map<String, Object> toJsonMap(int flag) {
-		Map<String, Object> jm = new HashMap<String, Object>();
-		jm.put("staffID", this.getId());
-		jm.put("staffName", this.getName());
-		jm.put("restaurantId", this.getRestaurantId());
-		jm.put("mobile", this.getMobile());
-		jm.put("typeValue", this.getType().getVal());
-		jm.put("typeText", this.getType().getDesc());
-		jm.put("role", this.getRole());
-		jm.put("roleName", this.getRole() != null?this.getRole().getName() : "未知");
+	public JsonMap toJsonMap(int flag) {
+		JsonMap jm = new JsonMap();
+		jm.putInt("staffID", this.getId());
+		jm.putString("staffName", this.getName());
+		jm.putInt("restaurantId", this.getRestaurantId());
+		jm.putString("mobile", this.getMobile());
+		jm.putInt("typeValue", this.getType().getVal());
+		jm.putString("typeText", this.getType().getDesc());
+		jm.putJsonable("role", this.getRole(), 0);
+		jm.putString("roleName", this.getRole() != null ? this.getRole().getName() : "未知");
 		//jm.put("staffPassword", this.getPwd());
-		return Collections.unmodifiableMap(jm);
+		return jm;
 	}
 
 	@Override

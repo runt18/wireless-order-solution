@@ -2,9 +2,7 @@ package com.wireless.pojo.distMgr;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
@@ -353,17 +351,17 @@ public class Discount implements Jsonable, Parcelable, Comparable<Discount>{
 	};
 
 	@Override
-	public Map<String, Object> toJsonMap(int flag) {
-		LinkedHashMap<String, Object> jm = new LinkedHashMap<String, Object>();
-		jm.put("id", this.id);
-		jm.put("name", this.name);
-		jm.put("rid", this.restaurantId);
+	public JsonMap toJsonMap(int flag) {
+		JsonMap jm = new JsonMap();
+		jm.putInt("id", this.id);
+		jm.putString("name", this.name);
+		jm.putInt("rid", this.restaurantId);
 		//FIXME level not exist
-		jm.put("level", 0);
-		jm.put("status", this.status.getVal());
-		jm.put("isDefault", this.isDefault());
+		jm.putInt("level", 0);
+		jm.putInt("status", this.status.getVal());
+		jm.putBoolean("isDefault", this.isDefault());
 		
-		return Collections.unmodifiableMap(jm);
+		return jm;
 	}
 
 	@Override

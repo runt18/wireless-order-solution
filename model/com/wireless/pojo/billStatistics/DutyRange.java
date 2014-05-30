@@ -1,7 +1,5 @@
 package com.wireless.pojo.billStatistics;
 
-import java.util.Map;
-
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.pojo.util.DateUtil;
@@ -38,7 +36,7 @@ public class DutyRange implements Jsonable{
 	}
 
 	@Override
-	public Map<String, Object> toJsonMap(int flag) {
+	public JsonMap toJsonMap(int flag) {
 		JsonMap jm = new JsonMap();
 		jm.putLong("onDuty", getOnDuty());
 		jm.putLong("offDuty", getOffDuty());

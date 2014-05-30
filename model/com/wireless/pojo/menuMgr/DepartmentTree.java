@@ -56,7 +56,7 @@ public class DepartmentTree{
 		}
 
 		@Override
-		public Map<String, Object> toJsonMap(int flag) {
+		public JsonMap toJsonMap(int flag) {
 			JsonMap jm = new JsonMap();
 			jm.putJsonable("kitchenNodeKey", getKey(), 0);
 			jm.putJsonable("kitchenNodeValue", getValue(), 0);
@@ -113,7 +113,7 @@ public class DepartmentTree{
 		}
 
 		@Override
-		public Map<String, Object> toJsonMap(int flag) {
+		public JsonMap toJsonMap(int flag) {
 			JsonMap jm = new JsonMap();
 			jm.putJsonable("deptNodeKey", getKey(), 0);
 			jm.putJsonableList("deptNodeValue", getValue(), 0);

@@ -1,9 +1,5 @@
 package com.wireless.pojo.billStatistics;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.pojo.util.DateUtil;
@@ -170,56 +166,56 @@ public class IncomeByEachDay implements Jsonable{
 	}
 	
 	@Override
-	public Map<String, Object> toJsonMap(int flag) {
-		Map<String, Object> jm = new HashMap<String, Object>();
-		jm.put("offDutyToDate", this.date);
-		jm.put("totalActual", this.incomeByPay == null ? 0 : this.incomeByPay.getTotalActual());
-		jm.put("totalIncome", this.incomeByPay == null ? 0 : this.incomeByPay.getTotalIncome());
-		jm.put("orderAmount", this.getTotalAmount());
+	public JsonMap toJsonMap(int flag) {
+		JsonMap jm = new JsonMap();
+		jm.putString("offDutyToDate", this.date);
+		jm.putFloat("totalActual", this.incomeByPay == null ? 0 : this.incomeByPay.getTotalActual());
+		jm.putFloat("totalIncome", this.incomeByPay == null ? 0 : this.incomeByPay.getTotalIncome());
+		jm.putInt("orderAmount", this.getTotalAmount());
 		
-		jm.put("cashIncome2", this.incomeByPay == null ? 0 : this.incomeByPay.getCashActual());
-		jm.put("cashAmount", this.incomeByPay == null ? 0 : this.incomeByPay.getCashAmount());
+		jm.putFloat("cashIncome2", this.incomeByPay == null ? 0 : this.incomeByPay.getCashActual());
+		jm.putInt("cashAmount", this.incomeByPay == null ? 0 : this.incomeByPay.getCashAmount());
 		
-		jm.put("creditCardIncome2", this.incomeByPay == null ? 0 : this.incomeByPay.getCreditCardActual());
-		jm.put("creditCardAmount", this.incomeByPay == null ? 0 : this.incomeByPay.getCreditCardAmount());
+		jm.putFloat("creditCardIncome2", this.incomeByPay == null ? 0 : this.incomeByPay.getCreditCardActual());
+		jm.putInt("creditCardAmount", this.incomeByPay == null ? 0 : this.incomeByPay.getCreditCardAmount());
 		
-		jm.put("hangIncome2", this.incomeByPay == null ? 0 : this.incomeByPay.getHangActual());
-		jm.put("hangAmount", this.incomeByPay == null ? 0 : this.incomeByPay.getHangAmount());
+		jm.putFloat("hangIncome2", this.incomeByPay == null ? 0 : this.incomeByPay.getHangActual());
+		jm.putInt("hangAmount", this.incomeByPay == null ? 0 : this.incomeByPay.getHangAmount());
 		
-		jm.put("signIncome2", this.incomeByPay == null ? 0 : this.incomeByPay.getSignActual());
-		jm.put("signAmount", this.incomeByPay == null ? 0 : this.incomeByPay.getSignAmount());
+		jm.putFloat("signIncome2", this.incomeByPay == null ? 0 : this.incomeByPay.getSignActual());
+		jm.putInt("signAmount", this.incomeByPay == null ? 0 : this.incomeByPay.getSignAmount());
 		
-		jm.put("memberAmount", this.incomeByPay == null ? 0 : this.incomeByPay.getMemberCardAmount());
-		jm.put("memberActual", this.incomeByPay == null ? 0 : this.incomeByPay.getMemberCardActual());
+		jm.putFloat("memberActual", this.incomeByPay == null ? 0 : this.incomeByPay.getMemberCardActual());
+		jm.putInt("memberAmount", this.incomeByPay == null ? 0 : this.incomeByPay.getMemberCardAmount());
 		
-		jm.put("discountIncome", this.getIncomeByDiscount().getTotalDiscount());
+		jm.putFloat("discountIncome", this.getIncomeByDiscount().getTotalDiscount());
 		
-		jm.put("giftIncome", this.getIncomeByGift().getTotalGift());
+		jm.putFloat("giftIncome", this.getIncomeByGift().getTotalGift());
 		
-		jm.put("cancelIncome", this.getIncomeByCancel().getTotalCancel());
+		jm.putFloat("cancelIncome", this.getIncomeByCancel().getTotalCancel());
 		
-		jm.put("eraseIncome", this.getIncomeByErase().getTotalErase());
+		jm.putFloat("eraseIncome", this.getIncomeByErase().getTotalErase());
 		
-		jm.put("couponIncome", this.getIncomeByCoupon().getTotalCoupon());
+		jm.putFloat("couponIncome", this.getIncomeByCoupon().getTotalCoupon());
 		
-		jm.put("paidIncome", this.getIncomeByRepaid().getTotalRepaid());
+		jm.putFloat("paidIncome", this.getIncomeByRepaid().getTotalRepaid());
 		
 //		if(flag > 0){
-			jm.put("paidAmount", this.getIncomeByRepaid().getRepaidAmount());
-			jm.put("eraseAmount", this.getIncomeByErase().getEraseAmount());
-			jm.put("couponAmount", this.getIncomeByCoupon().getCouponAmount());
-			jm.put("cancelAmount", this.getIncomeByCancel().getCancelAmount());
-			jm.put("giftAmount", this.getIncomeByGift().getGiftAmount());
-			jm.put("discountAmount", this.getIncomeByDiscount().getDiscountAmount());
-			jm.put("signIncome", this.incomeByPay == null ? 0 : this.incomeByPay.getSignIncome());
-			jm.put("hangIncome", this.incomeByPay == null ? 0 : this.incomeByPay.getHangIncome());
-			jm.put("creditCardIncome", this.incomeByPay == null ? 0 : this.incomeByPay.getCreditCardIncome());
-			jm.put("cashIncome", this.incomeByPay == null ? 0 : this.incomeByPay.getCashIncome());
-			jm.put("memberIncome", this.incomeByPay == null ? 0 : this.incomeByPay.getMemberCardIncome());
-			jm.put("totalActualCharge", this.getIncomeByCharge().getTotalActualCharge());
-			jm.put("totalActualRefund", this.getIncomeByCharge().getTotalActualRefund());
+			jm.putInt("paidAmount", this.getIncomeByRepaid().getRepaidAmount());
+			jm.putInt("eraseAmount", this.getIncomeByErase().getEraseAmount());
+			jm.putInt("couponAmount", this.getIncomeByCoupon().getCouponAmount());
+			jm.putInt("cancelAmount", this.getIncomeByCancel().getCancelAmount());
+			jm.putInt("giftAmount", this.getIncomeByGift().getGiftAmount());
+			jm.putInt("discountAmount", this.getIncomeByDiscount().getDiscountAmount());
+			jm.putFloat("signIncome", this.incomeByPay == null ? 0 : this.incomeByPay.getSignIncome());
+			jm.putFloat("hangIncome", this.incomeByPay == null ? 0 : this.incomeByPay.getHangIncome());
+			jm.putFloat("creditCardIncome", this.incomeByPay == null ? 0 : this.incomeByPay.getCreditCardIncome());
+			jm.putFloat("cashIncome", this.incomeByPay == null ? 0 : this.incomeByPay.getCashIncome());
+			jm.putFloat("memberIncome", this.incomeByPay == null ? 0 : this.incomeByPay.getMemberCardIncome());
+			jm.putFloat("totalActualCharge", this.getIncomeByCharge().getTotalActualCharge());
+			jm.putFloat("totalActualRefund", this.getIncomeByCharge().getTotalActualRefund());
 //		}
-		return Collections.unmodifiableMap(jm);
+		return jm;
 	}
 
 	@Override

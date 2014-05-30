@@ -1,7 +1,5 @@
 package com.wireless.pojo.billStatistics;
 
-import java.util.Map;
-
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 
@@ -65,7 +63,7 @@ public class PaymentGeneral implements Jsonable{
 	}
 
 	@Override
-	public Map<String, Object> toJsonMap(int flag) {
+	public JsonMap toJsonMap(int flag) {
 		JsonMap jm = new JsonMap();
 		jm.putString(Key4Json.STAFF_NAME.key, this.getStaffName());
 		jm.putString(Key4Json.ON_DUTY.key, this.getOnDuty());

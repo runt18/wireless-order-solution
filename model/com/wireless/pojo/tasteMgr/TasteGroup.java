@@ -2,7 +2,6 @@ package com.wireless.pojo.tasteMgr;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
@@ -441,7 +440,7 @@ public class TasteGroup implements Parcelable, Jsonable{
 	}
 	
 	@Override
-	public Map<String, Object> toJsonMap(int flag) {
+	public JsonMap toJsonMap(int flag) {
 		JsonMap jm = new JsonMap();
 		jm.putInt(Key4Json.GROUP_ID.key, this.mGroupId);
 		jm.putString(Key4Json.TASTE_PREF.key, this.getPreference());

@@ -1,9 +1,5 @@
 package com.wireless.pojo.system;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.pojo.restaurantMgr.Restaurant;
@@ -162,23 +158,20 @@ public class BillBoard implements Jsonable {
 	}
 	
 	@Override
-	public Map<String, Object> toJsonMap(int flag) {
-		Map<String, Object> jm = new HashMap<String, Object>();
-		jm.put("id", id);
-		jm.put("title", title);
-		jm.put("desc", desc);
-		jm.put("created", created);
-		jm.put("createdFormat", DateUtil.format(created));
-		jm.put("expired", expired);
-		jm.put("expiredFormat", DateUtil.format(expired));
-		jm.put("typeVal", type.getVal());
-		jm.put("typeDesc", type.getDesc());
+	public JsonMap toJsonMap(int flag) {
+		JsonMap jm = new JsonMap();
+		jm.putInt("id", id);
+		jm.putString("title", title);
+		jm.putString("desc", desc);
+		jm.putLong("created", created);
+		jm.putString("createdFormat", DateUtil.format(created));
+		jm.putLong("expired", expired);
+		jm.putString("expiredFormat", DateUtil.format(expired));
+		jm.putInt("typeVal", type.getVal());
+		jm.putString("typeDesc", type.getDesc());
+		jm.putJsonable("restaurant", restaurant, 0);
 		
-		if(type == Type.RESTAURANT && restaurant != null){
-			jm.put("restaurant", restaurant.toJsonMap(0));
-		}
-		
-		return Collections.unmodifiableMap(jm);
+		return jm;
 	}
 	@Override
 	public void fromJsonMap(JsonMap jsonMap, int flag) {

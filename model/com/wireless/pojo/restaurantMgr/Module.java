@@ -1,9 +1,5 @@
 package com.wireless.pojo.restaurantMgr;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 
@@ -146,11 +142,11 @@ public class Module implements Comparable<Module>, Jsonable{
 	}
 
 	@Override
-	public Map<String, Object> toJsonMap(int flag) {
-		Map<String, Object> jm = new HashMap<String, Object>();
-		jm.put("code", getCode().getVal());
-		jm.put("desc", getCode().getDesc());
-		return Collections.unmodifiableMap(jm);
+	public JsonMap toJsonMap(int flag) {
+		JsonMap jm = new JsonMap();
+		jm.putInt("code", getCode().getVal());
+		jm.putString("desc", getCode().getDesc());
+		return jm;
 	}
 
 	@Override

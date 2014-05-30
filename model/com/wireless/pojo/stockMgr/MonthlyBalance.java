@@ -2,9 +2,7 @@ package com.wireless.pojo.stockMgr;
 
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
@@ -115,14 +113,14 @@ public class MonthlyBalance implements Jsonable{
 		return "monthlyBalance(id = " + this.id + ", staffName = " + this.StaffName + ", month = " + DateUtil.format(this.month) + ")";
 	}
 	@Override
-	public Map<String, Object> toJsonMap(int flag) {
-		Map<String, Object> jm = new HashMap<String, Object>();
-		jm.put("id", this.id);
-		jm.put("restaurantId", this.restaurantId);
-		jm.put("staffName", this.StaffName);
-		jm.put("month", DateUtil.format(this.month));
-		jm.put("details", this.details);
-		return Collections.unmodifiableMap(jm);
+	public JsonMap toJsonMap(int flag) {
+		JsonMap jm = new JsonMap();
+		jm.putInt("id", this.id);
+		jm.putInt("restaurantId", this.restaurantId);
+		jm.putString("staffName", this.StaffName);
+		jm.putString("month", DateUtil.format(this.month));
+		jm.putJsonableList("details", this.details, 0);
+		return jm;
 	}
 	@Override
 	public void fromJsonMap(JsonMap jsonMap, int flag) {

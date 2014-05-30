@@ -1,7 +1,5 @@
 package com.wireless.pojo.regionMgr;
 
-import java.util.Map;
-
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.parcel.Parcel;
@@ -421,7 +419,7 @@ public class Table implements Parcelable, Comparable<Table>, Jsonable{
 	}
 
 	@Override
-	public Map<String, Object> toJsonMap(int flag) {
+	public JsonMap toJsonMap(int flag) {
 		JsonMap jm = new JsonMap();
 		jm.putInt("id", this.tableId);
 		jm.putInt("alias", this.tableAlias);

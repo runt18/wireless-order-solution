@@ -1,9 +1,5 @@
 package com.wireless.pojo.stockMgr;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.pojo.inventoryMgr.Material;
@@ -108,23 +104,21 @@ public class MaterialDept implements Jsonable{
 		return result;
 	}
 	@Override
-	public Map<String, Object> toJsonMap(int flag) {
-		Map<String, Object> jm = new HashMap<String, Object>();
+	public JsonMap toJsonMap(int flag) {
+		JsonMap jm = new JsonMap();
 		
-		jm.put("price", this.material.getPrice());
-		jm.put("restaurantId", this.getRestaurantId());
-		jm.put("stock", this.getStock());
-		jm.put("cost", this.totalCost());
-		if(this.dept != null){
-			jm.put("dept", this.dept);
-		}
+		jm.putFloat("price", this.material.getPrice());
+		jm.putInt("restaurantId", this.getRestaurantId());
+		jm.putFloat("stock", this.getStock());
+		jm.putFloat("cost", this.totalCost());
+		jm.putJsonable("dept", this.dept, Department.DEPT_JSONABLE_COMPLEX);
 		if(this.material != null){
-			jm.put("material", this.material);
-			jm.put("materialId", this.material.getId());
-			jm.put("materialName", this.material.getName());
-			jm.put("materialPinyin", this.material.getPinyin());
+			jm.putJsonable("material", this.material, 0);
+			jm.putInt("materialId", this.material.getId());
+			jm.putString("materialName", this.material.getName());
+			jm.putString("materialPinyin", this.material.getPinyin());
 		}
-		return Collections.unmodifiableMap(jm);
+		return jm;
 	}
 	@Override
 	public void fromJsonMap(JsonMap jsonMap, int flag) {

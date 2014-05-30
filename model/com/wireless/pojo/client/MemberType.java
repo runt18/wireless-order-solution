@@ -2,9 +2,7 @@ package com.wireless.pojo.client;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
@@ -502,32 +500,28 @@ public class MemberType implements Jsonable, Parcelable{
 	}
 
 	@Override
-	public Map<String, Object> toJsonMap(int flag) {
-		Map<String, Object> jm = new LinkedHashMap<String, Object>();
-		jm.put("id", this.id);
-		jm.put("rid", this.restaurantId);
-		jm.put("name", this.name);
-		jm.put("type", this.type.getVal());
-		jm.put("exchangeRate", this.exchangeRate);
-		jm.put("chargeRate", this.chargeRate);
-		jm.put("initialPoint", this.initialPoint);
-		jm.put("desc", this.desc);
+	public JsonMap toJsonMap(int flag) {
+		JsonMap jm = new JsonMap();
+		jm.putInt("id", this.id);
+		jm.putInt("rid", this.restaurantId);
+		jm.putString("name", this.name);
+		jm.putInt("type", this.type.getVal());
+		jm.putFloat("exchangeRate", this.exchangeRate);
+		jm.putFloat("chargeRate", this.chargeRate);
+		jm.putInt("initialPoint", this.initialPoint);
+		jm.putString("desc", this.desc);
 //		if(this.discountType != null){
 //			jm.put("discountTypeText", this.discountType.getDesc());			
 //			jm.put("discountTypeValue", this.discountType.getVal());
 //		}
 		if(this.attribute != null){
-			jm.put("attributeText", this.attribute.getDesc());			
-			jm.put("attributeValue", this.attribute.getVal());
+			jm.putString("attributeText", this.attribute.getDesc());			
+			jm.putInt("attributeValue", this.attribute.getVal());
 		}
-		if(this.defaultDiscount != null){
-			jm.put("discount", this.defaultDiscount);
-		}
-		if(!this.discounts.isEmpty()){
-			jm.put("discounts", this.discounts);
-		}
+		jm.putJsonable("discount", this.defaultDiscount, 0);
+		jm.putJsonableList("discounts", this.discounts, 0);
 		
-		return Collections.unmodifiableMap(jm);
+		return jm;
 	}
 
 	@Override

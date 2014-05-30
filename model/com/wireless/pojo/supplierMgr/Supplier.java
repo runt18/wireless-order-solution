@@ -1,9 +1,5 @@
 package com.wireless.pojo.supplierMgr;
 
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 
@@ -147,17 +143,17 @@ public class Supplier implements Jsonable{
 	}
 
 	@Override
-	public Map<String, Object> toJsonMap(int flag) {
-		Map<String, Object> jm = new LinkedHashMap<String, Object>();
-		jm.put("supplierID", this.supplierId);
-		jm.put("restaurantId", this.restaurantId);
-		jm.put("name", this.name);
-		jm.put("tele", this.tele);
-		jm.put("addr", this.addr);
-		jm.put("contact", this.contact);
-		jm.put("comment", this.comment);
+	public JsonMap toJsonMap(int flag) {
+		JsonMap jm = new JsonMap();
+		jm.putInt("supplierID", this.supplierId);
+		jm.putInt("restaurantId", this.restaurantId);
+		jm.putString("name", this.name);
+		jm.putString("tele", this.tele);
+		jm.putString("addr", this.addr);
+		jm.putString("contact", this.contact);
+		jm.putString("comment", this.comment);
 		
-		return Collections.unmodifiableMap(jm);
+		return jm;
 	}
 
 	@Override

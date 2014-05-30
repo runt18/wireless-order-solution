@@ -1,9 +1,5 @@
 package com.wireless.pojo.client;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 
@@ -126,15 +122,15 @@ public class MemberLevel implements Jsonable{
 		return "id : " + id + ", level: " + levelId;
 	}
 	@Override
-	public Map<String, Object> toJsonMap(int flag) {
-		Map<String, Object> jm = new HashMap<String, Object>();
-		jm.put("id", this.id);
-		jm.put("restaurantId", this.restaurantId);
-		jm.put("levelId", this.levelId);
-		jm.put("pointThreshold", this.pointThreshold);
-		jm.put("memberTypeId", this.memberType.getId());
-		jm.put("memberTypeName", this.memberType.getName());
-		return Collections.unmodifiableMap(jm);
+	public JsonMap toJsonMap(int flag) {
+		JsonMap jm = new JsonMap();
+		jm.putInt("id", this.id);
+		jm.putInt("restaurantId", this.restaurantId);
+		jm.putInt("levelId", this.levelId);
+		jm.putInt("pointThreshold", this.pointThreshold);
+		jm.putInt("memberTypeId", this.memberType.getId());
+		jm.putString("memberTypeName", this.memberType.getName());
+		return jm;
 	}
 	@Override
 	public void fromJsonMap(JsonMap jsonMap, int flag) {

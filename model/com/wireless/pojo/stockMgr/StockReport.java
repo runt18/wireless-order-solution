@@ -1,9 +1,5 @@
 package com.wireless.pojo.stockMgr;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.pojo.inventoryMgr.Material;
@@ -166,27 +162,27 @@ public class StockReport implements Jsonable{
 		return 17 * 31 + material.getId();
 	}
 	@Override
-	public Map<String, Object> toJsonMap(int flag) {
-		Map<String, Object> jm = new HashMap<String, Object>();
-		jm.put("materialId", this.getMaterial().getId());
-		jm.put("materialName", this.getMaterial().getName());
-		jm.put("primeAmount", this.getPrimeAmount());
-		jm.put("stockIn", this.getStockIn());
-		jm.put("stockInTransfer", this.getStockInTransfer());
-		jm.put("stockTakeMore", this.getStockTakeMore());
-		jm.put("stockSpill", this.getStockSpill());
-		jm.put("stockInAmount", this.getStockInAmount());
-		jm.put("stockOut", this.getStockOut());
-		jm.put("stockOutTransfer", this.getStockOutTransfer());
-		jm.put("stockTakeLess", this.getStockTakeLess());
-		jm.put("stockDamage", this.getStockDamage());
-		jm.put("useUp", this.getUseUp());
-		jm.put("stockOutAmount", this.getStockOutAmount());
-		jm.put("finalAmount", this.getFinalAmount());
-		jm.put("finalPrice", this.getFinalPrice());
-		jm.put("finalMoney", this.getFinalMoney());
-		jm.put("primeMoney", this.getPrimeMoney());
-		return Collections.unmodifiableMap(jm);
+	public JsonMap toJsonMap(int flag) {
+		JsonMap jm = new JsonMap();
+		jm.putInt("materialId", this.getMaterial().getId());
+		jm.putString("materialName", this.getMaterial().getName());
+		jm.putFloat("primeAmount", this.getPrimeAmount());
+		jm.putFloat("stockIn", this.getStockIn());
+		jm.putFloat("stockInTransfer", this.getStockInTransfer());
+		jm.putFloat("stockTakeMore", this.getStockTakeMore());
+		jm.putFloat("stockSpill", this.getStockSpill());
+		jm.putFloat("stockInAmount", this.getStockInAmount());
+		jm.putFloat("stockOut", this.getStockOut());
+		jm.putFloat("stockOutTransfer", this.getStockOutTransfer());
+		jm.putFloat("stockTakeLess", this.getStockTakeLess());
+		jm.putFloat("stockDamage", this.getStockDamage());
+		jm.putFloat("useUp", this.getUseUp());
+		jm.putFloat("stockOutAmount", this.getStockOutAmount());
+		jm.putFloat("finalAmount", this.getFinalAmount());
+		jm.putFloat("finalPrice", this.getFinalPrice());
+		jm.putFloat("finalMoney", this.getFinalMoney());
+		jm.putFloat("primeMoney", this.getPrimeMoney());
+		return jm;
 	}
 	@Override
 	public void fromJsonMap(JsonMap jsonMap, int flag) {

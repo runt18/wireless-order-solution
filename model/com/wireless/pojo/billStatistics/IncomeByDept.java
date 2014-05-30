@@ -1,9 +1,5 @@
 package com.wireless.pojo.billStatistics;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.pojo.menuMgr.Department;
@@ -59,13 +55,13 @@ public class IncomeByDept implements Jsonable{
 	}
 
 	@Override
-	public Map<String, Object> toJsonMap(int flag) {
-		Map<String, Object> jm = new HashMap<String, Object>();
-		jm.put("dept", this.mDept);
-		jm.put("discountPrice", this.mDiscountPrice);
-		jm.put("giftPrice", this.mGiftPrice);
-		jm.put("income", this.mIncome);
-		return Collections.unmodifiableMap(jm);
+	public JsonMap toJsonMap(int flag) {
+		JsonMap jm = new JsonMap();
+		jm.putJsonable("dept", this.mDept, Department.DEPT_JSONABLE_COMPLEX);
+		jm.putFloat("discountPrice", this.mDiscountPrice);
+		jm.putFloat("giftPrice", this.mGiftPrice);
+		jm.putFloat("income", this.mIncome);
+		return jm;
 	}
 
 	@Override

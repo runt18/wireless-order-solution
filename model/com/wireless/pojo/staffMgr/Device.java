@@ -1,9 +1,6 @@
 package com.wireless.pojo.staffMgr;
 
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.Locale;
-import java.util.Map;
 
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
@@ -285,17 +282,17 @@ public class Device implements Parcelable, Jsonable{
 	};
 
 	@Override
-	public Map<String, Object> toJsonMap(int flag) {
-		Map<String, Object> jm = new HashMap<String, Object>();
-		jm.put("id", this.id);
-		jm.put("restaurantId", this.restaurantId);
-		jm.put("restaurantText", this.restaurantName);
-		jm.put("deviceId", this.deviceId);
-		jm.put("modelValue", this.model.getVal());
-		jm.put("modelText", this.model.getDesc());
-		jm.put("statusValue", this.status.getVal());
-		jm.put("statusText", this.status.getDesc());
-		return Collections.unmodifiableMap(jm);
+	public JsonMap toJsonMap(int flag) {
+		JsonMap jm = new JsonMap();
+		jm.putInt("id", this.id);
+		jm.putInt("restaurantId", this.restaurantId);
+		jm.putString("restaurantText", this.restaurantName);
+		jm.putString("deviceId", this.deviceId);
+		jm.putInt("modelValue", this.model.getVal());
+		jm.putString("modelText", this.model.getDesc());
+		jm.putInt("statusValue", this.status.getVal());
+		jm.putString("statusText", this.status.getDesc());
+		return jm;
 	}
 
 	@Override

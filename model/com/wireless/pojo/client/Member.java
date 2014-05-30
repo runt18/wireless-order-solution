@@ -3,9 +3,7 @@ package com.wireless.pojo.client;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.MemberError;
@@ -746,45 +744,43 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 	};
 
 	@Override
-	public Map<String, Object> toJsonMap(int flag) {
-		Map<String, Object> jm = new LinkedHashMap<String, Object>();
-		jm.put("id", this.id);
-		jm.put("rid", this.restaurantId);
-		jm.put("totalCharge", this.totalCharge);
-		jm.put("totalPoint", this.totalPoint);
-		jm.put("totalConsumption", this.totalConsumption);
-		jm.put("consumptionAmount", this.consumptionAmount);
-		jm.put("baseBalance", this.baseBalance);
-		jm.put("extraBalance", this.extraBalance);
-		jm.put("totalBalance", this.getTotalBalance());
-		jm.put("usedBalance", this.usedBalance);
-		jm.put("point", this.point);
-		jm.put("usedPoint", this.usedPoint);
+	public JsonMap toJsonMap(int flag) {
+		JsonMap jm = new JsonMap();
+		jm.putInt("id", this.id);
+		jm.putInt("rid", this.restaurantId);
+		jm.putFloat("totalCharge", this.totalCharge);
+		jm.putInt("totalPoint", this.totalPoint);
+		jm.putFloat("totalConsumption", this.totalConsumption);
+		jm.putInt("consumptionAmount", this.consumptionAmount);
+		jm.putFloat("baseBalance", this.baseBalance);
+		jm.putFloat("extraBalance", this.extraBalance);
+		jm.putFloat("totalBalance", this.getTotalBalance());
+		jm.putFloat("usedBalance", this.usedBalance);
+		jm.putInt("point", this.point);
+		jm.putInt("usedPoint", this.usedPoint);
 		if(this.sex != null){
-			jm.put("sexText", this.sex.getDesc());
-			jm.put("sexValue", this.sex.getVal());
+			jm.putString("sexText", this.sex.getDesc());
+			jm.putInt("sexValue", this.sex.getVal());
 		}
-		if(this.memberType != null){
-			jm.put("memberType", this.memberType);
-		}
-		jm.put("name", this.name);
-		jm.put("tele", this.tele);
-		jm.put("mobile", this.mobile);
-		jm.put("birthday", this.birthday);
-		jm.put("birthdayFormat", this.birthday != 0 ? DateUtil.formatToDate(this.birthday) : "");
-		jm.put("idCard", this.idCard);
-		jm.put("company", this.company);
+		jm.putJsonable("memberType", this.memberType, 0);
+		jm.putString("name", this.name);
+		jm.putString("tele", this.tele);
+		jm.putString("mobile", this.mobile);
+		jm.putLong("birthday", this.birthday);
+		jm.putString("birthdayFormat", this.birthday != 0 ? DateUtil.formatToDate(this.birthday) : "");
+		jm.putString("idCard", this.idCard);
+		jm.putString("company", this.company);
 		//jm.put("tastePref", this.tastePref);
 		//jm.put("taboo", this.taboo);
-		jm.put("contactAddress", this.contactAddress);
+		jm.putString("contactAddress", this.contactAddress);
 		//jm.put("comment", this.comment);
-		jm.put("createDate", this.createDate);
-		jm.put("createDateFormat", DateUtil.format(this.createDate));
-		jm.put("memberCard", this.memberCard);
-		jm.put("publicComment", this.publicComments);
-		jm.put("privateComment", this.privateComment);
-		jm.put("acctendtioned", this.attentioned);
-		return Collections.unmodifiableMap(jm);
+		jm.putLong("createDate", this.createDate);
+		jm.putString("createDateFormat", DateUtil.format(this.createDate));
+		jm.putString("memberCard", this.memberCard);
+		jm.putJsonableList("publicComment", this.publicComments, 0);
+		jm.putJsonable("privateComment", this.privateComment, 0);
+		jm.putBoolean("acctendtioned", this.attentioned);
+		return jm;
 	}
 
 	@Override

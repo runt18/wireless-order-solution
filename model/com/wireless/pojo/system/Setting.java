@@ -1,9 +1,5 @@
 package com.wireless.pojo.system;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 
@@ -129,54 +125,61 @@ public class Setting implements Jsonable{
 	public int getRestaurantID() {
 		return restaurantID;
 	}
+	
 	public void setRestaurantID(int restaurantID) {
 		this.restaurantID = restaurantID;
 	}
+	
 	public String getPriceTailText(){
 		return this.priceTail == null ? null : this.priceTail.getText();
 	}
-	public Integer getPriceTailValue(){
+	
+	public int getPriceTailValue(){
 		return this.priceTail == null ? null : this.priceTail.getValue();
 	}
+	
 	public Tail getPriceTail() {
 		return priceTail;
 	}
+	
 	public void setPriceTail(Tail priceTail) {
 		this.priceTail = priceTail;
 	}
+	
 	public void setPriceTail(int priceTail) {
 		this.priceTail = Tail.valueOf(priceTail);
 	}
+	
 	public int getReceiptStyle() {
 		return receiptStyle;
 	}
+	
 	public void setReceiptStyle(int receiptStyle) {
 		this.receiptStyle = receiptStyle;
 	}
+	
 	public int getEraseQuota() {
 		return eraseQuota;
 	}
+	
 	public void setEraseQuota(int eraseQuota) {
 		this.eraseQuota = eraseQuota;
 	}
+	
 	public boolean hasEraseQuota(){
 		return this.eraseQuota != 0;
 	}
+	
 	@Override
-	public Map<String, Object> toJsonMap(int flag) {
-		Map<String, Object> jm = new HashMap<String, Object>();
-		jm.put("id", this.getId());
-		jm.put("restaurantID", this.getRestaurantID());
-		jm.put("priceTailText", this.getPriceTailText());
-		jm.put("priceTailValue", this.getPriceTailValue());
-		jm.put("priceTail", this.getPriceTail());
-		jm.put("receiptStyle", this.getReceiptStyle());
-		jm.put("eraseQuota", this.getEraseQuota());
-//		jm.put("currentMonth", this.getLongCurrentMonth());
-//		
-//		jm.put("intCurrentMonth", this.getIntCurrentMonth());
-//		jm.put("stringCurrentMonth", this.getStringCurrentMonth());
-		return Collections.unmodifiableMap(jm);
+	public JsonMap toJsonMap(int flag) {
+		JsonMap jm = new JsonMap();
+		jm.putInt("id", this.getId());
+		jm.putInt("restaurantID", this.getRestaurantID());
+		jm.putString("priceTailText", this.getPriceTailText());
+		jm.putInt("priceTailValue", this.getPriceTailValue());
+		jm.putInt("receiptStyle", this.getReceiptStyle());
+		jm.putInt("eraseQuota", this.getEraseQuota());
+		return jm;
 	}
 	@Override
 	public void fromJsonMap(JsonMap jsonMap, int flag) {

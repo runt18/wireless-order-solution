@@ -2,9 +2,7 @@ package com.wireless.pojo.printScheme;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JsonMap;
@@ -206,17 +204,17 @@ public class Printer implements Jsonable{
 	}
 
 	@Override
-	public Map<String, Object> toJsonMap(int flag) {
-		Map<String, Object> jm = new HashMap<String, Object>();
-		jm.put("printerId", this.mId);
-		jm.put("restaurantId", this.mRestaurantId);
-		jm.put("name", this.mName);
-		jm.put("alias", this.mAlias);
-		jm.put("styleValue", this.mStyle.getVal());
-		jm.put("styleText", this.mStyle.getDesc());
-		jm.put("isEnabled", this.isEnabled);
-		jm.put("printFunc", this.mFuncs);
-		return Collections.unmodifiableMap(jm);
+	public JsonMap toJsonMap(int flag) {
+		JsonMap jm = new JsonMap();
+		jm.putInt("printerId", this.mId);
+		jm.putInt("restaurantId", this.mRestaurantId);
+		jm.putString("name", this.mName);
+		jm.putString("alias", this.mAlias);
+		jm.putInt("styleValue", this.mStyle.getVal());
+		jm.putString("styleText", this.mStyle.getDesc());
+		jm.putBoolean("isEnabled", this.isEnabled);
+		jm.putJsonableList("printFunc", this.mFuncs, 0);
+		return jm;
 	}
 
 	@Override

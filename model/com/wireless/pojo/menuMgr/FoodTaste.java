@@ -1,9 +1,5 @@
 package com.wireless.pojo.menuMgr;
 
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.pojo.tasteMgr.Taste;
@@ -48,13 +44,13 @@ public class FoodTaste implements Jsonable{
 		return "id=" + this.taste.getTasteId() + ", name=" + this.food.getName() + ", foodId=" + this.getFood().getFoodId();
 	}
 	@Override
-	public Map<String, Object> toJsonMap(int flag) {
-		Map<String, Object> jm = new LinkedHashMap<String, Object>();
+	public JsonMap toJsonMap(int flag) {
+		JsonMap jm = new JsonMap();
 		this.food.setKitchen(null);
-		jm.put("taste", this.taste.toJsonMap(0));
-		jm.put("food", this.food.toJsonMap(0));
+		jm.putJsonable("taste", this.taste, 0);
+		jm.putJsonable("food", this.food, 0);
 		
-		return Collections.unmodifiableMap(jm);
+		return jm;
 	}
 	@Override
 	public void fromJsonMap(JsonMap jsonMap, int flag) {

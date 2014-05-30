@@ -1,9 +1,5 @@
 package com.wireless.pojo.billStatistics;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.pojo.util.DateUtil;
@@ -78,14 +74,14 @@ public class ShiftGeneral implements Jsonable{
 	}
 
 	@Override
-	public Map<String, Object> toJsonMap(int flag) {
-		Map<String, Object> jm = new HashMap<String, Object>();
-		jm.put("staffName", this.staffName);
-		jm.put("onDuty", this.onDuty);
-		jm.put("offDuty", this.offDuty);
-		jm.put("onDutyFormat", DateUtil.format(getOnDuty(), DateUtil.Pattern.DATE_TIME));
-		jm.put("offDutyFormat", DateUtil.format(getOffDuty(), DateUtil.Pattern.DATE_TIME));
-		return Collections.unmodifiableMap(jm);
+	public JsonMap toJsonMap(int flag) {
+		JsonMap jm = new JsonMap();
+		jm.putString("staffName", this.staffName);
+		jm.putLong("onDuty", this.onDuty);
+		jm.putLong("offDuty", this.offDuty);
+		jm.putString("onDutyFormat", DateUtil.format(getOnDuty(), DateUtil.Pattern.DATE_TIME));
+		jm.putString("offDutyFormat", DateUtil.format(getOffDuty(), DateUtil.Pattern.DATE_TIME));
+		return jm;
 	}
 
 	@Override

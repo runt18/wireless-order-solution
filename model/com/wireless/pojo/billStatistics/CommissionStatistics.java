@@ -1,9 +1,5 @@
 package com.wireless.pojo.billStatistics;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.pojo.menuMgr.Department;
@@ -103,21 +99,21 @@ public class CommissionStatistics implements Jsonable{
 		return "CommissionStatistics(orderId = " + orderId + ")";
 	}
 	@Override
-	public Map<String, Object> toJsonMap(int flag) {
-		Map<String, Object> jm = new HashMap<String, Object>();
+	public JsonMap toJsonMap(int flag) {
+		JsonMap jm = new JsonMap();
 		if(flag == 0){
-			jm.put("orderDateFormat", DateUtil.format(orderDate));
-			jm.put("foodName", this.foodName);
-			jm.put("dept", getDept() != null ? getDept().getName() : "");
-			jm.put("orderId", this.orderId);
-			jm.put("unitPrice", this.unitPrice);
-			jm.put("amount", this.amount);
+			jm.putString("orderDateFormat", DateUtil.format(orderDate));
+			jm.putString("foodName", this.foodName);
+			jm.putString("dept", getDept() != null ? getDept().getName() : "");
+			jm.putInt("orderId", this.orderId);
+			jm.putFloat("unitPrice", this.unitPrice);
+			jm.putFloat("amount", this.amount);
 		}
-		jm.put("totalPrice", this.getTotalPrice());
-		jm.put("commission", this.commission);
-		jm.put("staffName",this.waiter);
+		jm.putFloat("totalPrice", this.getTotalPrice());
+		jm.putFloat("commission", this.commission);
+		jm.putString("staffName",this.waiter);
 		
-		return Collections.unmodifiableMap(jm);
+		return jm;
 	}
 	
 	@Override

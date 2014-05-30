@@ -1,9 +1,5 @@
 package com.wireless.pojo.dishesOrder;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.pojo.util.DateUtil;
@@ -110,17 +106,17 @@ public class CancelledFood implements Jsonable{
 		this.reason = reason;
 	}
 	@Override
-	public Map<String, Object> toJsonMap(int flag) {
-		Map<String, Object> jm = new HashMap<String, Object>();
-		jm.put("orderDateFormat", DateUtil.formatToDate(this.orderDate));
-		jm.put("foodName", this.foodName);
-		jm.put("orderID", this.getOrderID());
-		jm.put("unitPrice", this.getUnitPrice());
-		jm.put("count", this.getCount());
-		jm.put("totalPrice", this.getTotalPrice());
-		jm.put("waiter", this.getWaiter());
-		jm.put("reason", this.getReason());
-		return Collections.unmodifiableMap(jm);
+	public JsonMap toJsonMap(int flag) {
+		JsonMap jm = new JsonMap();
+		jm.putString("orderDateFormat", DateUtil.formatToDate(this.orderDate));
+		jm.putString("foodName", this.foodName);
+		jm.putLong("orderID", this.getOrderID());
+		jm.putFloat("unitPrice", this.getUnitPrice());
+		jm.putFloat("count", this.getCount());
+		jm.putFloat("totalPrice", this.getTotalPrice());
+		jm.putString("waiter", this.getWaiter());
+		jm.putString("reason", this.getReason());
+		return jm;
 	}
 	
 	@Override

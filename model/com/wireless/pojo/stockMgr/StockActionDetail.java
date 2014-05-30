@@ -1,9 +1,5 @@
 package com.wireless.pojo.stockMgr;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 
@@ -139,16 +135,16 @@ public class StockActionDetail implements Jsonable{
 	}
 	
 	@Override
-	public Map<String, Object> toJsonMap(int flag) {
-		Map<String, Object> jm = new HashMap<String, Object>();
-		jm.put("id", this.getId());
-		jm.put("stockActionId", this.getStockActionId());
-		jm.put("materialId", this.getMaterialId());
-		jm.put("materialName", this.getName());
-		jm.put("price", this.getPrice());
-		jm.put("amount", this.getAmount());
-		jm.put("remaining", this.getRemaining());
-		return Collections.unmodifiableMap(jm);
+	public JsonMap toJsonMap(int flag) {
+		JsonMap jm = new JsonMap();
+		jm.putInt("id", this.getId());
+		jm.putInt("stockActionId", this.getStockActionId());
+		jm.putInt("materialId", this.getMaterialId());
+		jm.putString("materialName", this.getName());
+		jm.putFloat("price", this.getPrice());
+		jm.putFloat("amount", this.getAmount());
+		jm.putFloat("remaining", this.getRemaining());
+		return jm;
 	}
 	@Override
 	public void fromJsonMap(JsonMap jsonMap, int flag) {

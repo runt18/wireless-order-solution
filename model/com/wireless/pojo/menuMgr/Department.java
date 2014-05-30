@@ -1,7 +1,5 @@
 package com.wireless.pojo.menuMgr;
 
-import java.util.Map;
-
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.parcel.Parcel;
@@ -108,6 +106,16 @@ public class Department implements Parcelable, Comparable<Department>, Jsonable{
 		DEPT_8(7, "部门8", Type.NORMAL),
 		DEPT_9(8, "部门9", Type.NORMAL),
 		DEPT_10(9, "部门10", Type.NORMAL),
+		DEPT_11(10, "部门11", Type.NORMAL),
+		DEPT_12(11, "部门12", Type.NORMAL),
+		DEPT_13(13, "部门13", Type.NORMAL),
+		DEPT_14(14, "部门14", Type.NORMAL),
+		DEPT_15(15, "部门15", Type.NORMAL),
+		DEPT_16(16, "部门16", Type.NORMAL),
+		DEPT_17(17, "部门17", Type.NORMAL),
+		DEPT_18(18, "部门18", Type.NORMAL),
+		DEPT_19(19, "部门19", Type.NORMAL),
+		DEPT_20(20, "部门20", Type.NORMAL),
 		DEPT_WAREHOUSE(252, "总仓", Type.WARE_HOUSE),
 		DEPT_TMP(253, "临时部门", Type.TEMP),
 		//DEPT_ALL(254, "全部部门", Type.RESERVED),
@@ -408,7 +416,7 @@ public class Department implements Parcelable, Comparable<Department>, Jsonable{
 	public final static int DEPT_JSONABLE_SIMPLE = 1;
 	
 	@Override
-	public Map<String, Object> toJsonMap(int flag) {
+	public JsonMap toJsonMap(int flag) {
 		JsonMap jm = new JsonMap();
 		if(flag == DEPT_JSONABLE_SIMPLE){
 			jm.putShort(Key4Json.DEPT_ID.key, this.deptId);

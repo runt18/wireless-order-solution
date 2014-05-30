@@ -3,9 +3,7 @@ package com.wireless.pojo.staffMgr;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
@@ -273,15 +271,15 @@ public class Privilege implements Comparable<Privilege>, Parcelable, Jsonable{
 	};
 
 	@Override
-	public Map<String, Object> toJsonMap(int flag) {
-		Map<String, Object> jm = new HashMap<String, Object>();
-		jm.put("id", this.id);
-		jm.put("codeValue", getCode().getVal());
-		jm.put("codeText", getCode().getDesc());
-		jm.put("restaurantId", this.restaurantId);
-		jm.put("discounts", this.discounts);
+	public JsonMap toJsonMap(int flag) {
+		JsonMap jm = new JsonMap();
+		jm.putInt("id", this.id);
+		jm.putInt("codeValue", getCode().getVal());
+		jm.putString("codeText", getCode().getDesc());
+		jm.putInt("restaurantId", this.restaurantId);
+		jm.putJsonableList("discounts", this.discounts, 0);
 		
-		return Collections.unmodifiableMap(jm);
+		return jm;
 	}
 
 	@Override

@@ -1,9 +1,5 @@
 package com.wireless.pojo.inventoryMgr;
 
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 
@@ -101,17 +97,17 @@ public class MaterialCate implements Jsonable {
 	}
 	
 	@Override
-	public Map<String, Object> toJsonMap(int flag) {
-		Map<String, Object> jm = new LinkedHashMap<String, Object>();
-		jm.put("id", this.id);
-		jm.put("rid", this.restaurantId);
-		jm.put("name", this.name);
+	public JsonMap toJsonMap(int flag) {
+		JsonMap jm = new JsonMap();
+		jm.putInt("id", this.id);
+		jm.putInt("rid", this.restaurantId);
+		jm.putString("name", this.name);
 		if(this.type != null){
-			jm.put("typeValue", this.type.getValue());
-			jm.put("typeText", this.type.getText());			
+			jm.putInt("typeValue", this.type.getValue());
+			jm.putString("typeText", this.type.getText());			
 		}
 		
-		return Collections.unmodifiableMap(jm);
+		return jm;
 	}
 	
 	@Override

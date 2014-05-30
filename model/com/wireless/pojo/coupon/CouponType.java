@@ -1,9 +1,5 @@
 package com.wireless.pojo.coupon;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.pojo.util.DateUtil;
@@ -212,15 +208,15 @@ public class CouponType implements Jsonable{
 	}
 
 	@Override
-	public Map<String, Object> toJsonMap(int flag) {
-		Map<String, Object> jm = new HashMap<String, Object>();
-		jm.put("id", this.id);
-		jm.put("restaurantId", this.restaurantId);
-		jm.put("name", this.name);
-		jm.put("price", this.price);
-		jm.put("expired", this.expired);
-		jm.put("expiredFormat", DateUtil.formatToDate(this.expired));
-		return Collections.unmodifiableMap(jm);
+	public JsonMap toJsonMap(int flag) {
+		JsonMap jm = new JsonMap();
+		jm.putInt("id", this.id);
+		jm.putInt("restaurantId", this.restaurantId);
+		jm.putString("name", this.name);
+		jm.putFloat("price", this.price);
+		jm.putFloat("expired", this.expired);
+		jm.putString("expiredFormat", DateUtil.formatToDate(this.expired));
+		return jm;
 	}
 
 	@Override

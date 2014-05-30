@@ -1,9 +1,7 @@
 package com.wireless.pojo.weixin.order;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
@@ -152,20 +150,17 @@ public class WXOrder implements Jsonable{
 	}
 	
 	@Override
-	public Map<String, Object> toJsonMap(int flag) {
-		Map<String, Object> jm = new HashMap<String, Object>();
-		jm.put("id", this.id);
-		jm.put("rid", this.rid);
-		jm.put("memberSerial", this.memberSerial);
-		jm.put("birthDate", this.birthDate);
-		jm.put("birthDateFormat", this.getBirthDateFormat());
-		jm.put("statusValue", this.status.getValue());
-		jm.put("statusText", this.status.getText());
-		jm.put("code", this.code);
-		
-		if(restaurant != null){
-			jm.put("restaurant", restaurant.toJsonMap(0));
-		}
+	public JsonMap toJsonMap(int flag) {
+		JsonMap jm = new JsonMap();
+		jm.putInt("id", this.id);
+		jm.putInt("rid", this.rid);
+		jm.putString("memberSerial", this.memberSerial);
+		jm.putLong("birthDate", this.birthDate);
+		jm.putString("birthDateFormat", this.getBirthDateFormat());
+		jm.putInt("statusValue", this.status.getValue());
+		jm.putString("statusText", this.status.getText());
+		jm.putInt("code", this.code);
+		jm.putJsonable("restaurant", restaurant, 0);
 		
 		return jm;
 	}

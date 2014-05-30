@@ -1,7 +1,6 @@
 package com.wireless.pojo.billStatistics;
 
 import java.text.ParseException;
-import java.util.Map;
 
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
@@ -38,7 +37,7 @@ public class HourRange implements Jsonable{
 	}
 
 	@Override
-	public Map<String, Object> toJsonMap(int flag) {
+	public JsonMap toJsonMap(int flag) {
 		JsonMap jm = new JsonMap();
 		jm.putLong("openingTime", getOpeningTime());
 		jm.putLong("endingTime", getEndingTime());
