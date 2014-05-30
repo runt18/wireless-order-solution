@@ -519,6 +519,16 @@ public class RestaurantDao {
 		DepartmentDao.insert(dbCon, staff, new Department.InsertBuilder(staff.getRestaurantId(), Department.DeptId.DEPT_8).setType(Department.Type.IDLE));
 		DepartmentDao.insert(dbCon, staff, new Department.InsertBuilder(staff.getRestaurantId(), Department.DeptId.DEPT_9).setType(Department.Type.IDLE));
 		DepartmentDao.insert(dbCon, staff, new Department.InsertBuilder(staff.getRestaurantId(), Department.DeptId.DEPT_10).setType(Department.Type.IDLE));
+		DepartmentDao.insert(dbCon, staff, new Department.InsertBuilder(staff.getRestaurantId(), Department.DeptId.DEPT_11).setType(Department.Type.IDLE));
+		DepartmentDao.insert(dbCon, staff, new Department.InsertBuilder(staff.getRestaurantId(), Department.DeptId.DEPT_12).setType(Department.Type.IDLE));
+		DepartmentDao.insert(dbCon, staff, new Department.InsertBuilder(staff.getRestaurantId(), Department.DeptId.DEPT_13).setType(Department.Type.IDLE));
+		DepartmentDao.insert(dbCon, staff, new Department.InsertBuilder(staff.getRestaurantId(), Department.DeptId.DEPT_14).setType(Department.Type.IDLE));
+		DepartmentDao.insert(dbCon, staff, new Department.InsertBuilder(staff.getRestaurantId(), Department.DeptId.DEPT_15).setType(Department.Type.IDLE));
+		DepartmentDao.insert(dbCon, staff, new Department.InsertBuilder(staff.getRestaurantId(), Department.DeptId.DEPT_16).setType(Department.Type.IDLE));
+		DepartmentDao.insert(dbCon, staff, new Department.InsertBuilder(staff.getRestaurantId(), Department.DeptId.DEPT_17).setType(Department.Type.IDLE));
+		DepartmentDao.insert(dbCon, staff, new Department.InsertBuilder(staff.getRestaurantId(), Department.DeptId.DEPT_18).setType(Department.Type.IDLE));
+		DepartmentDao.insert(dbCon, staff, new Department.InsertBuilder(staff.getRestaurantId(), Department.DeptId.DEPT_19).setType(Department.Type.IDLE));
+		DepartmentDao.insert(dbCon, staff, new Department.InsertBuilder(staff.getRestaurantId(), Department.DeptId.DEPT_20).setType(Department.Type.IDLE));
 		DepartmentDao.insert(dbCon, staff, new Department.InsertBuilder(staff.getRestaurantId(), Department.DeptId.DEPT_TMP));
 		DepartmentDao.insert(dbCon, staff, new Department.InsertBuilder(staff.getRestaurantId(), Department.DeptId.DEPT_NULL));
 		DepartmentDao.insert(dbCon, staff, new Department.InsertBuilder(staff.getRestaurantId(), Department.DeptId.DEPT_WAREHOUSE));

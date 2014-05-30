@@ -39,11 +39,16 @@ public class UpdateOrder {
 	 * 3 - The hurried foods in the new.
 	 */
 	public static class DiffResult{
-		public Order oriOrder;
-		public Order newOrder;
-		public List<OrderFood> extraFoods;
-		public List<OrderFood> cancelledFoods;
-		public List<OrderFood> hurriedFoods;
+		public final Order oriOrder;
+		public final Order newOrder;
+		public final List<OrderFood> extraFoods = new ArrayList<OrderFood>();
+		public final List<OrderFood> cancelledFoods = new ArrayList<OrderFood>();
+		public final List<OrderFood> hurriedFoods = new ArrayList<OrderFood>();
+		
+		public DiffResult(Order oriOrder, Order newOrder) {
+			this.oriOrder = oriOrder;
+			this.newOrder = newOrder;
+		}
 	}
 	
 	/**
@@ -504,16 +509,10 @@ public class UpdateOrder {
 	 * @return the difference result
 	 */
 	private static DiffResult diff(Order oriOrder, Order newOrder){
-		DiffResult result = new DiffResult();
+		DiffResult result = new DiffResult(oriOrder, newOrder);
 
 		List<OrderFood> oriFoods = new ArrayList<OrderFood>(oriOrder.getOrderFoods());
 		List<OrderFood> newFoods = new ArrayList<OrderFood>(newOrder.getOrderFoods());
-		
-		result.oriOrder = oriOrder;
-		result.newOrder = newOrder;		
-		result.extraFoods = new ArrayList<OrderFood>();
-		result.cancelledFoods = new ArrayList<OrderFood>();
-		result.hurriedFoods = new ArrayList<OrderFood>();
 		
 		/**
 		 * Compare the order foods of new order with the ones of original order,

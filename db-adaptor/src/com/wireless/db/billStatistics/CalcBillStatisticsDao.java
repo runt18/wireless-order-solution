@@ -599,12 +599,16 @@ public class CalcBillStatisticsDao {
 	}
 	
 	/**
-	 * 
+	 * Calculate the service income.
 	 * @param staff
+	 * 			the staff to perform this action
 	 * @param range
+	 * 			the duty range
 	 * @param queryType
-	 * @return
+	 * 			the date type
+	 * @return the service income {@link IncomeByService}
 	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
 	 */
 	public static IncomeByService calcServicePrice(Staff staff, DutyRange range, DateType queryType) throws SQLException{
 		DBCon dbCon = new DBCon();
@@ -617,13 +621,18 @@ public class CalcBillStatisticsDao {
 	}
 	
 	/**
-	 * 
+	 * Calculate the service income.
 	 * @param dbCon
+	 * 			the database connection
 	 * @param staff
+	 * 			the staff to perform this action
 	 * @param range
+	 * 			the duty range
 	 * @param queryType
-	 * @return
+	 * 			the date type
+	 * @return the service income {@link IncomeByService}
 	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
 	 */
 	public static IncomeByService calcServicePrice(DBCon dbCon, Staff staff, DutyRange range, DateType queryType) throws SQLException{
 		String orderTbl = null;
