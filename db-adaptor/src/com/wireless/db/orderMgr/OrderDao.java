@@ -157,7 +157,7 @@ public class OrderDao {
 				filterCond.append(" AND " + orderTbl + ".order_date BETWEEN '" + orderRange.getOnDutyFormat() + "' AND '" + orderRange.getOffDutyFormat() + "'");
 			}
 			if(hourRange != null){
-				filterCond.append(" AND " + orderTbl + ".TIME(order_date) BETWEEN '" + hourRange.getOpeningFormat() + "' AND '" + hourRange.getEndingFormat() + "'");
+				filterCond.append(" AND TIME(" + orderTbl + ".order_date) BETWEEN '" + hourRange.getOpeningFormat() + "' AND '" + hourRange.getEndingFormat() + "'");
 			}
 			if(payType != null){
 				filterCond.append(" AND " + orderTbl + ".pay_type = " + payType.getVal());
