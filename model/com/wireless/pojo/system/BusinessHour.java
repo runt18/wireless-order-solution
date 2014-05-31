@@ -36,7 +36,7 @@ public class BusinessHour implements Jsonable{
 		return opening;
 	}
 	public String getOpeningFormat() {
-		return DateUtil.format(opening, Pattern.TIME);
+		return DateUtil.format(opening, Pattern.HOUR);
 	}
 	public void setOpening(long opening) {
 		this.opening = opening;
@@ -45,13 +45,17 @@ public class BusinessHour implements Jsonable{
 		return ending;
 	}
 	public String getEndingFormat() {
-		return DateUtil.format(ending, Pattern.TIME);
+		return DateUtil.format(ending, Pattern.HOUR);
 	}
 	public void setEnding(long ending) {
 		this.ending = ending;
 	}
 	
 	public BusinessHour(){}
+	
+	public BusinessHour(int id){
+		setId(id);
+	}
 	
 	private BusinessHour(UpdateBuilder builder){
 		setId(builder.id);

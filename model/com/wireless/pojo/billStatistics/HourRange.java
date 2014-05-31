@@ -16,8 +16,8 @@ public class HourRange implements Jsonable{
 	}
 	
 	public HourRange(long opening, long ending, DateUtil.Pattern pattern){
-		if(opening < ending){
-			throw new IllegalArgumentException("开始时间不能小于结束时间");
+		if(opening > ending){
+			throw new IllegalArgumentException("开始时间不能大于结束时间");
 		}
 		this.opening = opening;
 		this.ending = ending;
