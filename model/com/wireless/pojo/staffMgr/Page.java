@@ -124,6 +124,7 @@ public class Page{
 	}
 	
 	public static enum System{
+		SHIBIE("businessHourMgr", "市别设置", "", "../../images/businessHour.png"),
 		FORMATPRICE("formatPrice", "收款设置", "", "../../images/formatPrice.png"),
 		RESTAURANT("resturantMgr", "餐厅管理", "", "../../images/resturantMgr.png"),
 		STAFF("staffMgr", "员工管理", "System_Module/StaffManagement.html", "../../images/staffMgr.png");

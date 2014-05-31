@@ -10,6 +10,7 @@ public class RestaurantError extends ErrorEnum{
 	public static final ErrorCode CREATE_RESTAURANT_FAIL = build(9297, "操作失败, 创建餐厅不成功.");
 	public static final ErrorCode RESTAURANT_EXPIRED = build(9296, "餐厅已过期.");
 	public static final ErrorCode DUPLICATED_RESTAURANT_ACCOUNT = build(9295, "餐厅帐号已存在.");
+	public static final ErrorCode BUSINESS_NOT_FOUND = build(9294, "此市别不存在.");
 	
 	private RestaurantError(){
 		
