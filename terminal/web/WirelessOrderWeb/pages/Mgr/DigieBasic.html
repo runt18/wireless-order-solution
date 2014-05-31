@@ -24,6 +24,7 @@
 <script type="text/javascript" src="../../extjs/examples.js"></script>
 
 <script type="text/javascript" src="../../js/basicMgrMain.js"></script>
+<script type="text/javascript" src="../../js/System/systemConfig/businessHour.js"></script>
 
 <script type="text/javascript" src="../../extjs/ext-plugins-define.js"></script>
 
@@ -248,6 +249,10 @@ Ext.onReady(function(){
 							operateWXInfo();
 						}else if(e.attributes.mId == "WXLogo"){
 							operateWXLogo();
+						}else if(e.attributes.mId == "businessHourMgr"){
+							businessHourWin.show();
+							businessHourWin.center();
+							Ext.getCmp('btnRefreshBHGrid').handler();
 						}
 					}
 				}
@@ -295,6 +300,7 @@ Ext.onReady(function(){
     });
 
     initCancelReasonWin();
+    initBusinessHourWin();
     
      Ext.get('btnLoginOut').on('click', function(){
 		Ext.Ajax.request({
