@@ -9,23 +9,35 @@ import com.wireless.pojo.util.DateUtil;
 public class HourRange implements Jsonable{
 	private final long opening;		// 开始时间
 	private final long ending;		// 结束时间
+	private final DateUtil.Pattern pattern;
 	
-	public HourRange(long onDuty, long offDuty){
-		this.opening = onDuty;
-		this.ending = offDuty;
+	public HourRange(long opening, long ending){
+		this(opening, ending, DateUtil.Pattern.TIME);
 	}
 	
-	public HourRange(String onDuty, String offDuty) throws ParseException{
-		this.opening = DateUtil.parseDate(onDuty, DateUtil.Pattern.TIME);
-		this.ending = DateUtil.parseDate(offDuty, DateUtil.Pattern.TIME);
+	public HourRange(long opening, long ending, DateUtil.Pattern pattern){
+		if(opening < ending){
+			throw new IllegalArgumentException("开始时间不能小于结束时间");
+		}
+		this.opening = opening;
+		this.ending = ending;
+		this.pattern = pattern;
+	}
+	
+	public HourRange(String opening, String ending) throws ParseException{
+		this(DateUtil.parseDate(opening, DateUtil.Pattern.TIME), DateUtil.parseDate(ending, DateUtil.Pattern.TIME), DateUtil.Pattern.TIME);
+	}
+	
+	public HourRange(String onDuty, String offDuty, DateUtil.Pattern pattern) throws ParseException{
+		this(DateUtil.parseDate(onDuty, pattern), DateUtil.parseDate(offDuty, pattern), pattern);
 	}
 	
 	public String getOpeningFormat() {
-		return DateUtil.format(opening, DateUtil.Pattern.TIME);
+		return DateUtil.format(opening, this.pattern);
 	}
 	
 	public String getEndingFormat() {
-		return DateUtil.format(ending, DateUtil.Pattern.TIME);
+		return DateUtil.format(ending, this.pattern);
 	}
 	
 	public long getOpeningTime() {
