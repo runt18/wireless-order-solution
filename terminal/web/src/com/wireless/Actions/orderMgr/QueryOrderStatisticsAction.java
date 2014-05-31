@@ -16,12 +16,14 @@ import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.billStatistics.DutyRange;
+import com.wireless.pojo.billStatistics.HourRange;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.Order.PayType;
 import com.wireless.pojo.dishesOrder.OrderSummary;
 import com.wireless.pojo.regionMgr.Region;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.staffMgr.Staff;
+import com.wireless.pojo.util.DateUtil;
 import com.wireless.util.DataPaging;
 import com.wireless.util.DateType;
 
@@ -37,6 +39,9 @@ public class QueryOrderStatisticsAction extends Action {
 		DateType dateTypeEnmu = DateType.valueOf(Integer.parseInt(dateType));
 		String dateBeg = request.getParameter("dateBeg");
 		String dateEnd = request.getParameter("dateEnd");
+		
+		String businessHourBeg = request.getParameter("opening");
+		String businessHourEnd = request.getParameter("ending");
 		String start = request.getParameter("start");
 		String limit = request.getParameter("limit");
 		
@@ -101,6 +106,10 @@ public class QueryOrderStatisticsAction extends Action {
 			if(dateBeg != null && !dateBeg.isEmpty()){
 				DutyRange orderRange = new DutyRange(dateBeg, dateEnd);
 				extraCond.setOrderRange(orderRange);
+			}
+			if(businessHourBeg != null && !businessHourBeg.isEmpty()){
+				HourRange hr = new HourRange(businessHourBeg, businessHourEnd, DateUtil.Pattern.HOUR);
+				extraCond.setHourRange(hr);
 			}
 			String orderClause = " ORDER BY "+ extraCond.orderTbl +".order_date ASC " + " LIMIT " + start + "," + limit;
 			
