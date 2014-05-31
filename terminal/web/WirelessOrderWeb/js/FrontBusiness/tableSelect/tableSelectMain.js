@@ -575,7 +575,7 @@ var billsBut = new Ext.ux.ImageButton({
 });
 
 var paymentBut = new Ext.ux.ImageButton({
-//	imgPath : "../../images/shift.png",
+	imgPath : "../../images/payment.png",
 	imgWidth : 50,
 	imgHeight : 50,
 	tooltip : "交款",

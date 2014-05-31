@@ -501,7 +501,7 @@ Ext.ux.createDateCombo = function(_c){
 		xtype : 'combo',
 		id : typeof _c.id == 'undefined' ? null : _c.id,
 		forceSelection : true,
-		width : typeof _c.width != 'undefined' ? _c.width : 100,
+		width : typeof _c.width != 'undefined' ? _c.width : 85,
 		store : new Ext.data.SimpleStore({
 			fields : ['value', 'text']
 		}),
@@ -516,7 +516,7 @@ Ext.ux.createDateCombo = function(_c){
 				if(_c.data != null && typeof _c.data != 'undefined'){
 					thiz.store.loadData(_c.data);
 				}else{
-					thiz.store.loadData([[0,'今天'], [1,'前一天'], [2,'最近7天'], [3, '最近一个月']]);					
+					thiz.store.loadData([[0,'今天'], [1,'前一天'], [5,'本周'], [6, '上周'], [7, '本月'], [8, '上月']]);					
 				}
 			},
 			select : function(thiz, record, index){

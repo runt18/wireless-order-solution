@@ -13,6 +13,11 @@ function billQueryHandler() {
 			gs.baseParams['tableAlias'] = Ext.getCmp('textTableAliasOrName').getValue();
 		}
 		gs.baseParams['region'] = Ext.getCmp('history_comboRegion').getValue();
+		var businessHour = history_oBusinessHourData({type : 'get'}).data;
+		if(eval(businessHour.businessHourType) != -1){
+			gs.baseParams['opening'] = businessHour.opening;
+			gs.baseParams['ending'] = businessHour.ending;
+		}
 	}
 	gs.baseParams['orderId'] = Ext.getCmp('numberSearchValue').getValue();
 	
@@ -133,7 +138,7 @@ var shiftStatBut = new Ext.ux.ImageButton({
 });
 
 var paymentBut = new Ext.ux.ImageButton({
-//	imgPath : "../../images/shiftStatis.png",
+	imgPath : "../../images/paymentRecord.png",
 	imgWidth : 50,
 	imgHeight : 50,
 	tooltip : "交款记录",
@@ -327,9 +332,124 @@ function couponPriceHandler(v){
 	}
 }
 
+function history_oBusinessHourData(c){
+	if(c == null || c.type == null || typeof c.type == 'undefined')
+		return;
+	var data = {};
+	var apmBegin = Ext.getCmp('history_comboBusinessBeginApm');
+	var openingHour = Ext.getCmp('history_comboBegionHour');
+	var openingMin = Ext.getCmp('history_comboBegionMin');
+	var txtBusinessHourBegin = Ext.getCmp('txtBusinessHourBegin');
+	
+	var apmEnd = Ext.getCmp('history_comboBusinessEndApm');
+	var endingHour = Ext.getCmp('history_comboEndHour');
+	var endingMin = Ext.getCmp('history_comboEndMin');
+	var txtBusinessHourEnd = Ext.getCmp('txtBusinessHourEnd');
+	
+	
+	if(c.type == 'set'){
+		data = c.data == null || typeof c.data == 'undefined' ? {} : c.data;
+		
+		txtBusinessHourBegin.show();
+		txtBusinessHourEnd.show();
+		
+		openingHour.hide();
+		endingHour.hide();
+		openingMin.hide();
+		endingMin.hide();
+		apmBegin.hide();
+		apmEnd.hide();
+		Ext.getCmp('txtBusinessHourBeginText').hide();
+		Ext.getCmp('txtBusinessHourEndText').hide();
+		Ext.getCmp('txtBusinessMinBeginText').hide();
+		Ext.getCmp('txtBusinessMinEndText').hide();		
+		
+		if(typeof data[2] != 'undefined'){
+			
+			txtBusinessHourBegin.setText('<font style="color:green; font-size:20px">'+data[2]+'</font>');
+			txtBusinessHourEnd.setText('<font style="color:green; font-size:20px">'+data[3]+'</font>');
+			
+			beginTimes = data[2].split(':');
+			endTimes = data[3].split(':');
+			
+			if(eval(beginTimes[0]) > 12){
+				apmBegin.setValue(1);
+				var openingHourValue = eval(beginTimes[0]) - 12;
+				openingHourValue = openingHourValue > 9 ? openingHourValue+'' : '0'+openingHourValue;
+				openingHour.setValue(openingHourValue);			
+			}else{
+				apmBegin.setValue(0);
+				openingHour.setValue(beginTimes[0]);
+			}
+			
+			if(eval(endTimes[0]) > 12){
+				apmEnd.setValue(1);
+				var endingHourValue = eval(endTimes[0]) - 12;
+				endingHourValue = endingHourValue > 9 ? endingHourValue+'' : '0'+endingHourValue;
+				endingHour.setValue(endingHourValue);		
+			}else{
+				apmEnd.setValue(0);
+				endingHour.setValue(endTimes[0]);
+			}
+			
+			openingMin.setValue(beginTimes[1]);
+			
+			endingMin.setValue(endTimes[1]);
+			
+		}else{
+			txtBusinessHourBegin.setText('<font style="color:green; font-size:20px">00:00</font>');
+			txtBusinessHourEnd.setText('<font style="color:green; font-size:20px">00:00</font>');
+			
+			if(data[0] == -2){
+				txtBusinessHourBegin.hide();
+				txtBusinessHourEnd.hide();
+				
+				openingHour.setValue('00');
+				endingHour.setValue('00');
+				openingMin.setValue('00');
+				endingMin.setValue('00');
+				apmBegin.setValue(0);
+				apmEnd.setValue(0);
+				
+				openingHour.show();
+				endingHour.show();
+				openingMin.show();
+				endingMin.show();
+				apmBegin.show();
+				apmEnd.show();
+				Ext.getCmp('txtBusinessHourBeginText').show();
+				Ext.getCmp('txtBusinessHourEndText').show();
+				Ext.getCmp('txtBusinessMinBeginText').show();
+				Ext.getCmp('txtBusinessMinEndText').show();
+			}
+			
+		}
+	}else if(c.type == 'get'){
+		openingHour = openingHour.getValue();
+		endingHour = endingHour.getValue();
+		
+		if(apmBegin.getValue() == 1){
+			openingHour = eval(openingHour) + 12;
+		}
+		
+		if(apmEnd.getValue() == 1){
+			endingHour = eval(endingHour) + 12;
+		}
+		
+		data.opening = openingHour + ':' + openingMin.getValue();
+		
+		data.ending = endingHour + ':' + endingMin.getValue();
+		
+		data.businessHourType = Ext.getCmp('history_comboBusinessHour').getValue();
+		
+		c.data = data;
+	}
+	return c;
+};
+
 var billsGrid;
 var foodStatus;
-var historySBar;
+var historyExtraBar;
 Ext.onReady(function() {
 	var history_beginDate = new Ext.form.DateField({
 		xtype : 'datefield',	
@@ -355,30 +475,17 @@ Ext.onReady(function() {
 		endDate : history_endDate,
 		callback : function(){
 //			Ext.getCmp('btnSreachForMainOrderGrid').handler();
-		},
-		data : [[0,'今天'], [1,'前一天'], [5,'本周'], [6, '上周'], [7, '本月'], [8, '上月']]
+		}
 	});
 	
 	
-	historySBar = new Ext.Toolbar({
-		id : 'historyHighSBar',
+	historyExtraBar = new Ext.Toolbar({
+		id : 'historyExtraBar',
 		hidden : true,
 		height : 28,
 		items : [
-			{xtype : 'tbtext', text : '查看日期:'},
-			{xtype : 'tbtext', text : '&nbsp;&nbsp;'},
-			history_dateCombo,
-			{xtype : 'tbtext', text : '&nbsp;'},
-			history_beginDate,
-			{
-				xtype : 'label',
-				hidden : false,
-				id : 'tbtextDisplanZ',
-				text : ' 至 '
-			}, 
-			history_endDate,
-			{xtype : 'tbtext', text : '&nbsp;&nbsp;'},
 			{xtype : 'tbtext', text : '收款方式:'},
+			{xtype : 'tbtext', text : '&nbsp;&nbsp;'},
 			{
 				xtype : 'combo',
 				forceSelection : true,
@@ -457,6 +564,208 @@ Ext.onReady(function() {
 					}
 				}
 			}
+		]
+	});
+	
+	var historyHighTimeBar = new Ext.Toolbar({
+		id : 'historyHighTimeBar',
+		hidden : true,
+		height : 28,
+		items : [
+			{xtype : 'tbtext', text : '&nbsp;&nbsp;&nbsp;&nbsp;'},
+			{xtype : 'tbtext', text : '日期:&nbsp;&nbsp;'},
+			{xtype : 'tbtext', text : '&nbsp;&nbsp;'},
+			history_dateCombo,
+			{xtype : 'tbtext', text : '&nbsp;'},
+			history_beginDate,
+			{
+				xtype : 'label',
+				hidden : false,
+				id : 'tbtextDisplanZ',
+				text : ' 至 '
+			}, 
+			history_endDate,
+			{xtype : 'tbtext', text : '&nbsp;&nbsp;'},
+			{xtype : 'tbtext', text : '市别:'},
+			{
+				xtype : 'combo',
+				forceSelection : true,
+				width : 60,
+				value : -1,
+				id : 'history_comboBusinessHour',
+				store : new Ext.data.SimpleStore({
+					fields : ['id', 'name']
+				}),
+				valueField : 'id',
+				displayField : 'name',
+				typeAhead : true,
+				mode : 'local',
+				triggerAction : 'all',
+				selectOnFocus : true,
+				allowBlank : false,
+				readOnly : false,
+				listeners : {
+					render : function(thiz){
+						var data = [[-1,'全天']];
+						Ext.Ajax.request({
+							url : '../../QueryBusinessHour.do',
+							success : function(res, opt){
+								var jr = Ext.decode(res.responseText);
+								for(var i = 0; i < jr.root.length; i++){
+									data.push([jr.root[i]['id'], jr.root[i]['name'], jr.root[i]['opening'], jr.root[i]['ending']]);
+								}
+								data.push([-2,'自定义']);
+								thiz.store.loadData(data);
+								thiz.setValue(-1);
+							},
+							fialure : function(res, opt){
+								thiz.store.loadData(data);
+								thiz.setValue(-1);
+							}
+						});
+					},
+					select : function(thiz, record, index){
+						history_oBusinessHourData({data : record.json, type : 'set'});
+					}
+				}
+			},
+			{xtype : 'tbtext', text : '&nbsp;&nbsp;'},
+			{xtype : 'tbtext', id : 'txtBusinessHourBegin', text : '<font style="color:green; font-size:20px">00:00</font>'},
+			{
+		    		xtype : 'combo',
+		    		width : 50,
+		    		value : 0,
+		    		id : 'history_comboBusinessBeginApm',
+		    		forceSelection : true,
+					hideLabel : true,
+					hidden : true,
+		    		store : new Ext.data.SimpleStore({
+						fields : [ 'value', 'text' ],
+						data : [[0, '上午'], [1, '下午' ]]
+					}),
+					valueField : 'value',
+					displayField : 'text',
+					typeAhead : true,
+					mode : 'local',
+					triggerAction : 'all',
+					selectOnFocus : true,
+					allowBlank : false,
+					readOnly : false
+		    	
+		    },
+			{
+				xtype : 'combo',
+				forceSelection : true,
+				width : 40,
+				value : '00',
+				id : 'history_comboBegionHour',
+				hidden : true,
+				store : new Ext.data.SimpleStore({
+					fields : [ 'value', 'text' ],
+					data : [['00', '00' ], ['01', '01' ], ['02', '02' ], ['03', '03' ], ['04', '04' ], ['05', '05'], ['06', '06'], ['07', '07'], ['08', '08'], ['09', '09'], ['10', '10'], ['11', '11'], ['12', '12']]
+				}),
+				valueField : 'value',
+				displayField : 'text',
+				typeAhead : true,
+				mode : 'local',
+				triggerAction : 'all',
+				selectOnFocus : true,
+				allowBlank : false,
+				readOnly : false
+			},
+			{xtype : 'tbtext', id:'txtBusinessHourBeginText',hidden : true, text : '时'},
+			{
+				xtype : 'combo',
+				forceSelection : true,
+				width : 40,
+				value : '00',
+				id : 'history_comboBegionMin',
+				hidden : true,
+				store : new Ext.data.SimpleStore({
+					fields : [ 'value', 'text' ],
+					data : [['00', '00'], ['30', '30']]
+				}),
+				valueField : 'value',
+				displayField : 'text',
+				typeAhead : true,
+				mode : 'local',
+				triggerAction : 'all',
+				selectOnFocus : true,
+				allowBlank : false,
+				readOnly : false
+			},
+			{xtype : 'tbtext', id:'txtBusinessMinBeginText',hidden : true,text : '分'},
+			{
+				xtype : 'tbtext',
+				hidden : false,
+				text : '&nbsp;至&nbsp;'
+			}, 
+			{xtype : 'tbtext', id : 'txtBusinessHourEnd', text : '<font style="color:green; font-size:20px">00:00</font>'},
+			{
+		    		xtype : 'combo',
+		    		width : 50,
+		    		value : 0,
+		    		id : 'history_comboBusinessEndApm',
+		    		forceSelection : true,
+					hideLabel : true,
+					hidden : true,
+		    		store : new Ext.data.SimpleStore({
+						fields : [ 'value', 'text' ],
+						data : [[0, '上午'], [1, '下午' ]]
+					}),
+					valueField : 'value',
+					displayField : 'text',
+					typeAhead : true,
+					mode : 'local',
+					triggerAction : 'all',
+					selectOnFocus : true,
+					allowBlank : false,
+					readOnly : false
+		    	
+		    },
+			{
+				xtype : 'combo',
+				forceSelection : true,
+				width : 40,
+				value : '00',
+				id : 'history_comboEndHour',
+				hidden : true,
+				store : new Ext.data.SimpleStore({
+					fields : [ 'value', 'text' ],
+					data : [['00', '00' ], ['01', '01' ], ['02', '02' ], ['03', '03' ], ['04', '04' ], ['05', '05'], ['06', '06'], ['07', '07'], ['08', '08'], ['09', '09'], ['10', '10'], ['11', '11'], ['12', '12']]
+				}),
+				valueField : 'value',
+				displayField : 'text',
+				typeAhead : true,
+				mode : 'local',
+				triggerAction : 'all',
+				selectOnFocus : true,
+				allowBlank : false,
+				readOnly : false
+			},
+			{xtype : 'tbtext', id:'txtBusinessHourEndText',hidden : true, text : '时'},
+			{
+				xtype : 'combo',
+				forceSelection : true,
+				width : 40,
+				value : '00',
+				id : 'history_comboEndMin',
+				hidden : true,
+				store : new Ext.data.SimpleStore({
+					fields : [ 'value', 'text' ],
+					data : [['00', '00'], ['30', '30']]
+				}),
+				valueField : 'value',
+				displayField : 'text',
+				typeAhead : true,
+				mode : 'local',
+				triggerAction : 'all',
+				selectOnFocus : true,
+				allowBlank : false,
+				readOnly : false
+			},
+			{xtype : 'tbtext', id:'txtBusinessMinEndText', hidden : true,text : '分'},
+			{xtype : 'tbtext', text : '&nbsp;&nbsp;'}
 		]
 	});
 	
@@ -585,10 +894,11 @@ Ext.onReady(function() {
 				Ext.getCmp('btnBillHeightSearch').hide();
 	    		Ext.getCmp('btnBillCommonSearch').show();
 	    		
-	    		Ext.getCmp('historyHighSBar').show();
+	    		Ext.getCmp('historyExtraBar').show();
+	    		Ext.getCmp('historyHighTimeBar').show();
 	    		
-	    		billsGrid.setHeight(billsGrid.getHeight()-28);
-	    		billsGrid.syncSize();
+	    		billsGrid.setHeight(billsGrid.getHeight()-56);
+	    		billsGrid.syncSize(); //强制计算高度
 	    		billsGrid.doLayout();//重新布局 	
 			}
 		}, {
@@ -600,14 +910,17 @@ Ext.onReady(function() {
 	    		Ext.getCmp('btnBillHeightSearch').show();
 	    		Ext.getCmp('btnBillCommonSearch').hide();
 	    		
+	    		Ext.getCmp('historyExtraBar').hide();
+	    		Ext.getCmp('historyHighTimeBar').hide();
+	    		
 	    		history_dateCombo.setValue(1);
 	    		Ext.getCmp('textSearchValue').setValue();
 	    		Ext.getCmp('comboPayType').setValue(-1);
+	    		Ext.getCmp('history_comboBusinessHour').setValue(-1);
 	    		
-//	    		Ext.getCmp('btnSreachForMainOrderGrid').handler();
-	    		Ext.getCmp('historyHighSBar').hide();
+
 	    		
-	    		billsGrid.setHeight(billsGrid.getHeight()+28);
+	    		billsGrid.setHeight(billsGrid.getHeight()+56);
 	    		billsGrid.syncSize();
 	    		billsGrid.doLayout();
 	    	 }
@@ -641,7 +954,7 @@ Ext.onReady(function() {
 		[['dataType', 1]],
 		GRID_PADDING_LIMIT_20,
 		'',
-		[billsGridTbar,historySBar]
+		[billsGridTbar,historyHighTimeBar, historyExtraBar]
 	);
 	billsGrid.region = 'center';
 	billsGrid.on('render', function(){
@@ -685,4 +998,6 @@ Ext.onReady(function() {
 	});
 	billHistoryOnLoad();
 	billQueryHandler();
+	
+	
 });

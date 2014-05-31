@@ -93,7 +93,6 @@ Ext.onReady(function(){
 				render : function(thiz){
 					var memberTrEmpty = String.format(memberTrModel, '----', '----', '----', '----', '----', '----');
 					var empty = String.format(trModel, '---', '---', '---', '---');
-					//TODO
 					var table;
 					if(eval(businessStatic == 2)){
 						table = String.format('<table border="1" class="tb_base">{0}{1}</table>', 
@@ -146,7 +145,6 @@ Ext.onReady(function(){
 						params.onDuty  = onDuty.format('Y-m-d 00:00:00');
 						params.offDuty = offDuty.format('Y-m-d 23:59:59');
 					}else if(queryPattern == 4){
-						//TODO
 						beginDate.clearInvalid();
 						endDate.clearInvalid();
 						requestUrl = '../../QueryDailySettleByNow.do';
@@ -184,7 +182,6 @@ Ext.onReady(function(){
 								
 								var memberTrDate = String.format(memberTrModel, business.memberChargeByCash.toFixed(2), business.memberChargeByCard.toFixed(2), business.memberAccountCharge.toFixed(2),
 																business.memberRefund.toFixed(2), 0.00, business.memberAccountRefund.toFixed(2));
-																//TODO
 								var table;
 								if(eval(businessStatic == 2)){
 									table = String.format('<table border="1" class="tb_base">{0}{1}</table>', 

@@ -168,6 +168,7 @@ cancelReasonOperationHandler = function(c){
 		});
 		oPanel.setTitle('添加退菜原因');
 		oPanel.show();
+		cancelReasonWin.syncSize();
 		cancelReasonWin.doLayout();
 	}else if(c.type == bmObj.operation['update']){
 		var sd = Ext.ux.getSelData(crGrid);
@@ -183,6 +184,7 @@ cancelReasonOperationHandler = function(c){
 		});
 		oPanel.setTitle('修改退菜原因');
 		oPanel.show();
+		cancelReasonWin.syncSize();
 		cancelReasonWin.doLayout();
 	}else if(c.type == bmObj.operation['delete']){
 		var sd = Ext.ux.getSelData(crGrid);
@@ -245,6 +247,7 @@ oCancelReasonData = function(c){
 		c.data = data;
 	}
 	reason.clearInvalid();
+	reason.focus(true, 100);
 	return c;
 };
 function initCancelReasonWin(){

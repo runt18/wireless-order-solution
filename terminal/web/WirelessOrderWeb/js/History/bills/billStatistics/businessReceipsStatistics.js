@@ -87,8 +87,8 @@ var receivablesStatResultStore = new Ext.data.Store({
 			var couponIncome = Ext.getDom('panelOfReceivablesStatSumCouponIncome');
 			var couponAmount = Ext.getDom('panelOfReceivablesStatSumCouponAmount');
 			
-			onDuty.innerHTML = Ext.getCmp('receivablesStaticBeginDate').getValue().format('Y-m-d');
-			offDuty.innerHTML = Ext.getCmp('receivablesStaticEndDate').getValue().format('Y-m-d');
+			onDuty.innerHTML = Ext.getCmp('receipts_dateSearchDateBegin').getValue().format('Y-m-d');
+			offDuty.innerHTML = Ext.getCmp('receipts_dateSearchDateEnd').getValue().format('Y-m-d');
 			
 			totalPrice.innerHTML = sr.get('totalActual').toFixed(2);
 			orderAmount.innerHTML = sr.get('orderAmount');
@@ -213,6 +213,33 @@ var receivablesStatResultColumnModel = new Ext.grid.ColumnModel([
 	}
 ]);
 
+var receipts_beginDate = new Ext.form.DateField({
+	xtype : 'datefield',	
+	id : 'receipts_dateSearchDateBegin',
+	format : 'Y-m-d',
+	width : 100,
+	maxValue : new Date(),
+	readOnly : false,
+	allowBlank : false
+});
+var receipts_endDate = new Ext.form.DateField({
+	xtype : 'datefield',
+	id : 'receipts_dateSearchDateEnd',
+	format : 'Y-m-d',
+	width : 100,
+	maxValue : new Date(),
+	readOnly : false,
+	allowBlank : false
+});
+var receipts_dateCombo = Ext.ux.createDateCombo({
+	width : 90,
+	beginDate : receipts_beginDate,
+	endDate : receipts_endDate,
+	callback : function(){
+		Ext.getCmp('btnSearchReceivablesStat').handler();
+	}
+});
+
 var receivablesStatResultGrid = new Ext.grid.GridPanel({
 	xtype : "grid",
 //	frame : true,
@@ -227,81 +254,25 @@ var receivablesStatResultGrid = new Ext.grid.GridPanel({
 	sm : new Ext.grid.RowSelectionModel({
 		singleSelect : true
 	}),
-/*	viewConfig : {
-		forceFit : true
-	},*/
 	tbar : [{
 		xtype : 'tbtext',
 		text : '日期:&nbsp;'
-	}, {
-		xtype : 'combo',
-		id : 'comboBSSearchDate',
-		forceSelection : true,
-		width : 100,
-		store : new Ext.data.SimpleStore({
-			fields : ['value', 'text']
-		}),
-		valueField : 'value',
-		displayField : 'text',
-		typeAhead : true,
-		mode : 'local',
-		triggerAction : 'all',
-		selectOnFocus : true,
-		value : '前一天',
-		listeners : {
-			render : function(thiz){
-				thiz.store.loadData([[0,'今天'], [1,'前一天'], [2,'最近7天'], [3, '最近一个月'], [4, '最近三个月']]);
-			},
-			select : function(thiz, record, index){
-				var now = new Date();
-				var dateBegin = Ext.getCmp('receivablesStaticBeginDate');
-				var dateEnd = Ext.getCmp('receivablesStaticEndDate');
-				dateEnd.setValue(now);
-				if(index == 0){
-					
-				}else if(index == 1){
-					now.setDate(now.getDate()-1);
-					dateEnd.setValue(now);
-				}else if(index == 2){
-					now.setDate(now.getDate()-7);
-				}else if(index == 3){
-					now.setMonth(now.getMonth()-1);
-				}else if(index == 4){
-					now.setMonth(now.getMonth()-3);
-				}
-				dateBegin.setValue(now);
-				Ext.getCmp('btnSearchReceivablesStat').handler();
-			}
-		}
-	}, {
-		xtype : 'tbtext',
-		text : '&nbsp;'
-	},{
-		xtype : "datefield",
-		format : "Y-m-d",
-		id : "receivablesStaticBeginDate",
-		width : 100,
-		maxValue : new Date(),
-		allowBlank : false,
-		readOnly : false
-	}, {
+	},
+	receipts_dateCombo,
+	{xtype : 'tbtext', text : '&nbsp;'},
+	receipts_beginDate,
+	{
 		xtype : 'tbtext',
 		text : '&nbsp;至&nbsp;'
-	}, {
-		xtype : "datefield",
-		format : "Y-m-d",
-		id : "receivablesStaticEndDate",
-		width : 100,
-		maxValue : new Date(),
-		allowBlank : false,
-		readOnly : false
-	}, '->', {
+	},
+	receipts_endDate,
+	'->', {
 		text : '搜索',
 		id : 'btnSearchReceivablesStat',
 		iconCls : 'btn_search',
 		handler : function(){
-			var dateBegin = Ext.getCmp('receivablesStaticBeginDate');
-			var dateEnd = Ext.getCmp('receivablesStaticEndDate');
+			var dateBegin = Ext.getCmp('receipts_dateSearchDateBegin');
+			var dateEnd = Ext.getCmp('receipts_dateSearchDateEnd');
 			
 			if(!dateBegin.isValid() || !dateEnd.isValid()){
 				return;
@@ -322,8 +293,8 @@ var receivablesStatResultGrid = new Ext.grid.GridPanel({
 //		hidden : true,
 		iconCls : 'icon_tb_exoprt_excel',
 		handler : function(){
-			var onDuty = Ext.getCmp('receivablesStaticBeginDate');
-			var offDuty = Ext.getCmp('receivablesStaticEndDate');
+			var onDuty = Ext.getCmp('receipts_dateSearchDateBegin');
+			var offDuty = Ext.getCmp('receipts_dateSearchDateEnd');
 			
 			var url = '../../{0}?pin={1}&restaurantID={2}&dataSource={3}&onDuty={4}&offDuty={5}';
 			url = String.format(
@@ -581,7 +552,7 @@ Ext.onReady(function(){
 		//子集
 		items : [receivablesStatResultGrid, receivablesStatResultSummaryPanel]
 	});
-	Ext.getCmp('comboBSSearchDate').setValue(1);
-	Ext.getCmp('comboBSSearchDate').fireEvent('select', null, null, 1);
+	receipts_dateCombo.setValue(1);
+	receipts_dateCombo.fireEvent('select', null, null, 1);
 //	repaidStatisticsGrid.getStore().load();
 });
