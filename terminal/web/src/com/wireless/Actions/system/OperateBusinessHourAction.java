@@ -36,14 +36,16 @@ public class OperateBusinessHourAction extends DispatchAction{
 			String name = request.getParameter("name");
 			String opening = request.getParameter("opening");
 			String ending = request.getParameter("ending");
-			String restaurantID = (String)request.getAttribute("restaurantID");
 			
-			HourRange hr = new HourRange(opening, ending, DateUtil.Pattern.HOUR);
-			
-			BusinessHour.InsertBuilder insert = new BusinessHour.InsertBuilder(name, Integer.parseInt(restaurantID), hr);
+			BusinessHour.InsertBuilder insert = new BusinessHour.InsertBuilder(name, new HourRange(opening, ending, DateUtil.Pattern.HOUR));
 
 			BusinessHourDao.insert(StaffDao.verify(Integer.parseInt(pin)), insert);
 			jobject.initTip(true, "操作成功, 已添加市别信息.");
+			
+		}catch(BusinessException e){
+			e.printStackTrace();
+			jobject.initTip(e);
+				
 		}catch(Exception e){
 			e.printStackTrace();
 			jobject.initTip(e);
@@ -73,16 +75,18 @@ public class OperateBusinessHourAction extends DispatchAction{
 			String opening = request.getParameter("opening");
 			String ending = request.getParameter("ending");
 			
-			HourRange hr = new HourRange(opening, ending, DateUtil.Pattern.HOUR);
-			
 			BusinessHour.UpdateBuilder update = new BusinessHour.UpdateBuilder(Integer.parseInt(id));
 			update.setName(name);
-			update.setOpening(hr.getOpeningTime());
-			update.setEnding(hr.getEndingTime());
+			update.setHourRange(new HourRange(opening, ending, DateUtil.Pattern.HOUR));
 			
 			BusinessHourDao.update(StaffDao.verify(Integer.parseInt(pin)),update);
 			
 			jobject.initTip(true, "操作成功, 已市别信息.");
+			
+		}catch(BusinessException e){
+			e.printStackTrace();
+			jobject.initTip(e);
+			
 		}catch(Exception e){
 			e.printStackTrace();
 			jobject.initTip(e);

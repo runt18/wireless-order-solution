@@ -104,12 +104,10 @@ public class QueryOrderStatisticsAction extends Action {
 				extraCond.setRegionId(Region.RegionId.valueOf(Short.parseShort(region)));
 			}
 			if(dateBeg != null && !dateBeg.isEmpty()){
-				DutyRange orderRange = new DutyRange(dateBeg, dateEnd);
-				extraCond.setOrderRange(orderRange);
+				extraCond.setOrderRange(new DutyRange(dateBeg, dateEnd));
 			}
 			if(businessHourBeg != null && !businessHourBeg.isEmpty()){
-				HourRange hr = new HourRange(businessHourBeg, businessHourEnd, DateUtil.Pattern.HOUR);
-				extraCond.setHourRange(hr);
+				extraCond.setHourRange(new HourRange(businessHourBeg, businessHourEnd, DateUtil.Pattern.HOUR));
 			}
 			String orderClause = " ORDER BY "+ extraCond.orderTbl +".order_date ASC " + " LIMIT " + start + "," + limit;
 			
@@ -117,7 +115,7 @@ public class QueryOrderStatisticsAction extends Action {
 			
 			list = OrderDao.getPureOrder(staff, extraCond, orderClause);
 			
-			OrderSummary summary = OrderDao.getOrderSummary(staff, extraCond.toString(), dateTypeEnmu);
+			OrderSummary summary = OrderDao.getOrderSummary(staff, extraCond, dateTypeEnmu);
 			
 			jobject.setTotalProperty(summary.getTotalAmount());
 			jobject.setRoot(list);

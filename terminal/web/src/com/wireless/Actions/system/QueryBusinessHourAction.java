@@ -20,7 +20,7 @@ public class QueryBusinessHourAction extends Action{
 		JObject jobject = new JObject();
 		String pin = (String) request.getAttribute("pin");
 		try{
-			jobject.setRoot(BusinessHourDao.getByCond(StaffDao.verify(Integer.parseInt(pin)), null));
+			jobject.setRoot(BusinessHourDao.get(StaffDao.verify(Integer.parseInt(pin))));
 		}catch(Exception e){
 			e.printStackTrace();
 			jobject.initTip(e);

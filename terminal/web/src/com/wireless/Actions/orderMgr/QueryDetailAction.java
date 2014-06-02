@@ -11,6 +11,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.orderMgr.OrderFoodDao;
+import com.wireless.db.orderMgr.OrderFoodDao.ExtraCond;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
@@ -18,6 +19,7 @@ import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.util.DataPaging;
+import com.wireless.util.DateType;
 
 public class QueryDetailAction extends Action {
 	
@@ -41,14 +43,14 @@ public class QueryDetailAction extends Action {
 			
 			
 			if (queryType.equals("Today")) {
-				list = OrderFoodDao.getSingleDetailToday(staff, " AND OF.order_id=" + orderID, " ORDER BY OF.order_date ");
+				list = OrderFoodDao.getSingleDetail(staff, new ExtraCond(DateType.TODAY).setOrderId(Integer.parseInt(orderID)), " ORDER BY OF.order_date ");
 			}else if (queryType.equals("TodayByTbl")) {
 				Table t = new Table();
 				t.setRestaurantId(Integer.valueOf(restaurantID));
 				t.setTableAlias(Integer.valueOf(talias));
-				list = OrderFoodDao.getSingleDetailTodayByTable(staff, null, null, t);
+				list = OrderFoodDao.getSingleDetailByTable(staff, t);
 			}else {
-				list = OrderFoodDao.getSingleDetailHistory(staff, " AND OFH.order_id=" + orderID, " ORDER BY OFH.order_date ");
+				list = OrderFoodDao.getSingleDetail(staff, new ExtraCond(DateType.HISTORY).setOrderId(Integer.parseInt(orderID)), " ORDER BY OFH.order_date ");
 			}
 		}catch(BusinessException e){
 			e.printStackTrace();
