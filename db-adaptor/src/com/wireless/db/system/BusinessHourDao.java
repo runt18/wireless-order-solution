@@ -2,7 +2,6 @@ package com.wireless.db.system;
 
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -118,33 +117,48 @@ public class BusinessHourDao {
 		}
 	}
 	
-	
 	/**
-	 * Get the businessHours according to terminal and extra condition.
-	 * @param dbCon
-	 * 			the database connection
+	 * Get the businessHours to specific restaurant.
 	 * @param staff
-	 * 			the terminal
-	 * @param extraCond
-	 * 			the extra condition
-	 * @param orderClause
-	 * 			the order clause
-	 * @return	the the list holding the table result 
+	 * 			the staff to perform this action
 	 * @throws SQLException
 	 * 			if failed to execute any SQL Statement 
-	 * @throws ParseException 
 	 */
-	public static List<BusinessHour> getByCond(Staff staff, String extraCond) throws SQLException, BusinessException, ParseException{
+	public static List<BusinessHour> get(Staff staff) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return getByCond(dbCon, staff, extraCond, null);
+			return get(dbCon, staff);
 		}finally{
 			dbCon.disconnect();
 		}
 	}
 	
-	public static List<BusinessHour> getByCond(DBCon dbCon, Staff staff, String extraCond, String orderClause) throws SQLException, ParseException{
+	/**
+	 * Get the businessHours to specific restaurant.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @throws SQLException
+	 * 			if failed to execute any SQL Statement 
+	 */
+	public static List<BusinessHour> get(DBCon dbCon, Staff staff) throws SQLException{
+		return getByCond(dbCon, staff, null, null);
+	}
+	
+	/**
+	 * Get the businessHours according extra condition.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param extraCond
+	 * 			the extra condition
+	 * @throws SQLException
+	 * 			if failed to execute any SQL Statement 
+	 */
+	private static List<BusinessHour> getByCond(DBCon dbCon, Staff staff, String extraCond, String orderClause) throws SQLException{
 		List<BusinessHour> result = new ArrayList<BusinessHour>();
 		String sql;
 		sql = " SELECT " +
@@ -162,7 +176,6 @@ public class BusinessHourDao {
 			bh.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
 			bh.setEnding(dbCon.rs.getTime("ending").getTime());
 			bh.setOpening(dbCon.rs.getTime("opening").getTime());
-			
 			result.add(bh);
 		}
 		

@@ -136,7 +136,6 @@ public class OrderDao {
 		public String toString(){
 
 			StringBuilder filterCond = new StringBuilder();
-			filterCond.append(" AND 1 = 1");
 			
 			if(orderId > 0){
 				filterCond.append(" AND " + orderTbl + ".id = " + orderId);
@@ -578,9 +577,7 @@ public class OrderDao {
 	}
 	
 	/**
-	 * Get the summary to orders to specified restaurant defined in {@link terminal} and other condition.
-	 * @param dbCon
-	 * 			the database connection
+	 * Get the summary to orders to specified restaurant defined in {@link Staff} and other condition.
 	 * @param staff
 	 * 			the staff to perform this action
 	 * @param extraCond
@@ -591,7 +588,7 @@ public class OrderDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static OrderSummary getOrderSummary(Staff staff, String extraCond, DateType dateType) throws SQLException{
+	public static OrderSummary getOrderSummary(Staff staff, ExtraCond extraCond, DateType dateType) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -602,7 +599,7 @@ public class OrderDao {
 	}
 	
 	/**
-	 * Get the summary to orders to specified restaurant defined in {@link terminal} and other condition.
+	 * Get the summary to orders to specified restaurant defined in {@link Staff} and other condition.
 	 * @param dbCon
 	 * 			the database connection
 	 * @param staff
@@ -615,7 +612,7 @@ public class OrderDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static OrderSummary getOrderSummary(DBCon dbCon, Staff staff, String extraCond, DateType dateType) throws SQLException{
+	public static OrderSummary getOrderSummary(DBCon dbCon, Staff staff, ExtraCond extraCond, DateType dateType) throws SQLException{
 		
 		String sql;
 		

@@ -8,6 +8,7 @@ import java.util.List;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.orderMgr.OrderFoodDao;
+import com.wireless.db.orderMgr.OrderFoodDao.ExtraCond4CancelFood;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.billStatistics.CancelIncomeByDept;
 import com.wireless.pojo.billStatistics.CancelIncomeByDept.IncomeByEachReason;
@@ -16,6 +17,7 @@ import com.wireless.pojo.billStatistics.CancelIncomeByReason.IncomeByEachDept;
 import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.dishesOrder.CancelledFood;
 import com.wireless.pojo.dishesOrder.OrderFood;
+import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.util.DateType;
 
@@ -331,22 +333,19 @@ public class CancelledFoodDao {
 		List<CancelledFood> list = new ArrayList<CancelledFood>();
 		List<OrderFood> cancelFoods;
 		
+		ExtraCond4CancelFood extraCond = new ExtraCond4CancelFood(queryType);
+		extraCond.setDutyRange(range);
+		if(reasonId != null){
+			extraCond.setReasonId(reasonId);
+		}
+		if(deptId != null && deptId >= 0){
+			extraCond.setDeptId(Department.DeptId.valueOf(deptId));
+		}
+		
 		if(queryType.isHistory()){
-			cancelFoods = OrderFoodDao.getSingleDetailHistory(dbCon, staff, " AND OFH.order_count < 0 " +
-															  (deptId != null && deptId >= 0 ? " AND OFH.dept_id = " + deptId : "") +
-															  (reasonId != null && reasonId > 0 ? " AND OFH.cancel_reason_id = " + reasonId : "") +
-															  " AND OH.restaurant_id = " + staff.getRestaurantId() +
-															  " AND OH.order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" + 
-															  " AND OH.cancel_price <> 0 ", 
-															  " ORDER BY OFH.order_date ASC ");
+			cancelFoods = OrderFoodDao.getSingleDetail(dbCon, staff, extraCond, " ORDER BY OFH.order_date ASC ");
 		}else if(queryType.isToday()){
-			cancelFoods = OrderFoodDao.getSingleDetailToday(dbCon, staff, " AND OF.order_count < 0 " +
-															(deptId != null && deptId >= 0 ? " AND OFH.dept_id = " + deptId : "") +
-					   									   	(reasonId != null && reasonId > 0 ? " AND OFH.cancel_reason_id = " + reasonId : "") +
-															" AND O.restaurant_id = " + staff.getRestaurantId() +
-					   										" AND O.order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +
-					   										" AND O.cancel_price <> 0 ",
-					   									  	" ORDER BY OF.order_date ASC ");
+			cancelFoods = OrderFoodDao.getSingleDetail(dbCon, staff, extraCond," ORDER BY OF.order_date ASC ");
 		}else{
 			throw new IllegalArgumentException("The query type is invalid.");
 		}

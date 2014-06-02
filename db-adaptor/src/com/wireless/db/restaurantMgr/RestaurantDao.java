@@ -1,6 +1,7 @@
  package com.wireless.db.restaurantMgr;
 
 import java.sql.SQLException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,12 +19,14 @@ import com.wireless.db.regionMgr.TableDao;
 import com.wireless.db.sms.SMStatDao;
 import com.wireless.db.staffMgr.RoleDao;
 import com.wireless.db.staffMgr.StaffDao;
+import com.wireless.db.system.BusinessHourDao;
 import com.wireless.db.tasteMgr.TasteCategoryDao;
 import com.wireless.db.tasteMgr.TasteDao;
 import com.wireless.db.weixin.WeixinInfoDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.ModuleError;
 import com.wireless.exception.RestaurantError;
+import com.wireless.pojo.billStatistics.HourRange;
 import com.wireless.pojo.client.MemberType;
 import com.wireless.pojo.crMgr.CancelReason;
 import com.wireless.pojo.distMgr.Discount;
@@ -39,6 +42,7 @@ import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.sms.SMStat;
 import com.wireless.pojo.staffMgr.Role;
 import com.wireless.pojo.staffMgr.Staff;
+import com.wireless.pojo.system.BusinessHour;
 import com.wireless.pojo.tasteMgr.Taste;
 import com.wireless.pojo.tasteMgr.TasteCategory;
 import com.wireless.pojo.util.DateUtil;
@@ -401,6 +405,9 @@ public class RestaurantDao {
 			//Insert the SMS state
 			initSMStat(dbCon, staff);
 			
+			//Insert the business hour
+			initBusinessHour(dbCon, staff);
+			
 			return restaurant.getId();
 			
 		}catch(Exception e){
@@ -410,6 +417,12 @@ public class RestaurantDao {
 			throw new SQLException(e);
 		}
 
+	}
+	
+	private static void initBusinessHour(DBCon dbCon, Staff staff) throws SQLException, ParseException{
+		BusinessHourDao.insert(dbCon, staff, new BusinessHour.InsertBuilder("早市", new HourRange("6:00", "11:00", DateUtil.Pattern.HOUR)));
+		BusinessHourDao.insert(dbCon, staff, new BusinessHour.InsertBuilder("午市", new HourRange("11:00", "15:00", DateUtil.Pattern.HOUR)));
+		BusinessHourDao.insert(dbCon, staff, new BusinessHour.InsertBuilder("晚市", new HourRange("15:00", "23:00", DateUtil.Pattern.HOUR)));
 	}
 	
 	private static void initSMStat(DBCon dbCon, Staff staff) throws SQLException{
@@ -850,6 +863,10 @@ public class RestaurantDao {
 		
 		//Delete the restaurant module
 		sql = " DELETE FROM " + Params.dbName + ".restaurant_module WHERE restaurant_id = " + restaurantId;
+		dbCon.stmt.executeUpdate(sql);
+
+		//Delete the business hour
+		sql = " DELETE FROM " + Params.dbName + ".business_hour WHERE restaurant_id = " + restaurantId;
 		dbCon.stmt.executeUpdate(sql);
 	}
 	
