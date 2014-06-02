@@ -77,11 +77,8 @@ public class JObject implements Jsonable {
 	public void initTip(SQLException e){
 		this.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getErrorCode(), e.getMessage());
 	}
-	public void initTip(IllegalArgumentException e){
-		this.initTip(false, WebParams.TIP_TITLE_DEFAULT, 8888, e.getMessage());
-	}
 	public void initTip(Exception e){
-		this.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
+		this.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, e.getMessage());
 	}
 	
 
@@ -105,38 +102,6 @@ public class JObject implements Jsonable {
 	public void fromJsonMap(JsonMap jsonMap, int flag) {
 		
 	}
-	
-//	@SuppressWarnings("unchecked")
-//	private Map<String, Object> toJsonMap(Map<String, Object> src){
-//		Map<String, Object> map = new LinkedHashMap<String, Object>();
-//		for(Entry<String, Object> entry : src.entrySet()){
-//			if(entry.getValue() instanceof Jsonable){
-//				map.put(entry.getKey(), toJsonMap(((Jsonable)entry.getValue()).toJsonMap(0)));
-//				
-//			}else if(entry.getValue() instanceof Map){
-//				map.put(entry.getKey(), toJsonMap((Map<String, Object>)entry.getValue()));
-//				
-//			}else if(entry.getValue() instanceof List){
-//				List<Map<String, Object>> lm = new ArrayList<Map<String, Object>>();
-//				for(Object item : (List<?>)entry.getValue()){
-//					if(item instanceof Jsonable){
-//						lm.add(toJsonMap(((Jsonable)item).toJsonMap(0)));
-//						
-//					}else if(item instanceof Map){
-//						lm.add(toJsonMap((Map<String, Object>)item));
-//						
-//					}else{
-//						throw new IllegalArgumentException("The item put to json map can ONLY be map or jsonable.");
-//					}
-//				}
-//				map.put(entry.getKey(), lm);	
-//				
-//			}else{
-//				map.put(entry.getKey(), entry.getValue());
-//			}
-//		}
-//		return map;
-//	}
 	
 	public String toString(int flag){
 		return JSON.toJSONString(toJsonMap(flag));

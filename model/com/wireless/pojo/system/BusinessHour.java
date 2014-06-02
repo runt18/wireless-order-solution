@@ -17,44 +17,53 @@ public class BusinessHour implements Jsonable{
 	public int getId() {
 		return id;
 	}
+	
 	public void setId(int id) {
 		this.id = id;
 	}
+	
 	public int getRestaurantId() {
 		return restaurantId;
 	}
+	
 	public void setRestaurantId(int restaurantId) {
 		this.restaurantId = restaurantId;
 	}
+	
 	public String getName() {
 		return this.name != null ? name : "";
 	}
+	
 	public void setName(String name) {
 		this.name = name;
 	}
+	
 	public long getOpening() {
 		return opening;
 	}
+	
 	public String getOpeningFormat() {
 		return DateUtil.format(opening, Pattern.HOUR);
 	}
+	
 	public void setOpening(long opening) {
 		this.opening = opening;
 	}
+	
 	public long getEnding() {
 		return ending;
 	}
+	
 	public String getEndingFormat() {
 		return DateUtil.format(ending, Pattern.HOUR);
 	}
+	
 	public void setEnding(long ending) {
 		this.ending = ending;
 	}
 	
-	public BusinessHour(){}
-	
 	public BusinessHour(int id){
-		setId(id);
+		this.id = id;
 	}
 	
 	private BusinessHour(UpdateBuilder builder){
@@ -67,12 +76,11 @@ public class BusinessHour implements Jsonable{
 	
 	public static class InsertBuilder{
 		BusinessHour data;
-		public InsertBuilder(String name,int restuarantId, HourRange hourRange){
-			data = new BusinessHour();
+		public InsertBuilder(String name, HourRange hourRange){
+			data = new BusinessHour(0);
 			data.setName(name);
 			data.setOpening(hourRange.getOpeningTime());
 			data.setEnding(hourRange.getEndingTime());
-			data.setRestaurantId(restuarantId);
 		}
 		
 		public BusinessHour build(){
@@ -81,7 +89,7 @@ public class BusinessHour implements Jsonable{
 	}
 	
 	public static class UpdateBuilder{
-		private int id;
+		private final int id;
 		private int restaurantId;
 		private String name;
 		private long opening;
@@ -96,13 +104,17 @@ public class BusinessHour implements Jsonable{
 			return this;
 		}
 
-		public UpdateBuilder setOpening(long opening) {
-			this.opening = opening;
-			return this;
+		public boolean isNameChanged(){
+			return this.name != null;
 		}
-
-		public UpdateBuilder setEnding(long ending) {
-			this.ending = ending;
+		
+		public boolean isRangeChanged(){
+			return opening != 0 || ending != 0;
+		}
+		
+		public UpdateBuilder setHourRange(HourRange range){
+			opening = range.getOpeningTime();
+			ending = range.getEndingTime();
 			return this;
 		}
 		
