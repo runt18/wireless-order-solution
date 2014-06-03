@@ -261,7 +261,7 @@ function initTimeBar(c){
 				{
 					xtype : 'combo',
 					forceSelection : true,
-					width : 60,
+					width : 90,
 					value : -1,
 					id : c.statistic+'comboBusinessHour',
 					store : new Ext.data.SimpleStore({
@@ -334,7 +334,7 @@ function initTimeBar(c){
 				{
 					xtype : 'combo',
 					forceSelection : true,
-					width : 60,
+					width : 90,
 					value : -1,
 					id : c.statistic+'comboBusinessHour',
 					store : new Ext.data.SimpleStore({

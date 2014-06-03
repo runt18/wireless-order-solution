@@ -626,7 +626,7 @@ Ext.onReady(function() {
 			{
 				xtype : 'combo',
 				forceSelection : true,
-				width : 60,
+				width : 90,
 				value : -1,
 				id : 'history_comboBusinessHour',
 				store : new Ext.data.SimpleStore({
