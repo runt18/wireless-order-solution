@@ -2,7 +2,6 @@ package com.wireless.print.content;
 
 import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.printScheme.PStyle;
@@ -55,7 +54,7 @@ public class ReceiptContent extends ConcreteContent {
 		mTemplate = mTemplate.replace(PVar.ORDER_ID, Integer.toString(mOrder.getId()));
 		
 		//replace the "$(print_date)"
-		mTemplate = mTemplate.replace(PVar.PRINT_DATE, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
+		mTemplate = mTemplate.replace(PVar.PRINT_DATE, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(System.currentTimeMillis()));
 		
 		//replace the "$(pay_manner)"
 		String payManner;

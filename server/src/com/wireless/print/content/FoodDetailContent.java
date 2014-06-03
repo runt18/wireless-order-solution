@@ -144,7 +144,7 @@ public class FoodDetailContent extends ConcreteContent {
 		
 		if(_displayConfig.contains(DisplayItem.DISCOUNT)){
 			if(!_of.asFood().isSpecial() && _of.getDiscount() != 1){
-				detail.append("(" + Float.toString(_of.getDiscount() * 10) + "殏)");
+				detail.append("(" + Float.toString(NumericUtil.roundFloat(_of.getDiscount() * 10)) + "殏)");
 			}
 		}
 			
@@ -177,81 +177,6 @@ public class FoodDetailContent extends ConcreteContent {
 			}
 			detail.append(status);
 		}
-		//--------------------------------------------------------
-		
-//		_format = _format.replace(PVar.FOOD_NAME, _of.getName());
-//		_format = _format.replace(PVar.FOOD_AMOUNT, "(" + NumericUtil.float2String2(_of.getCount()) + ")");
-//		
-//		String taste = null;
-//		if(_of.hasTasteGroup()){
-//			taste = "-" + _of.getTasteGroup().getPreference();
-//		}
-//		_format = _format.replace(PVar.FOOD_TASTE, taste == null ? "" : taste);				
-//
-//		String combo;
-//		if(_of.asFood().isCombo()){
-//			combo = "(杶)";
-//		}else{
-//			combo = "";
-//		}
-//		_format = _format.replace(PVar.FOOD_COMBO, combo);
-//		
-//		String discount;
-//		if(!_of.asFood().isSpecial() && _of.getDiscount() != 1){
-//			discount = "(" + Float.toString(_of.getDiscount() * 10) + "殏)";
-//		}else{
-//			discount = "";
-//		}
-//		_format = _format.replace(PVar.FOOD_DISCOUNT, discount);
-//		
-//		StringBuilder status = new StringBuilder();
-//		if(_of.asFood().isSpecial()){
-//			if(status.length() != 0){
-//				status.append(",");
-//			}
-//			status.append("杻");
-//		}
-//		if(_of.asFood().isRecommend()){
-//			if(status.length() != 0){
-//				status.append(",");
-//			}
-//			status.append("熱");
-//		}
-//		if(_of.asFood().isGift()){
-//			if(status.length() != 0){
-//				status.append(",");
-//			}
-//			status.append("崌");
-//		}
-//		if(_of.asFood().isWeigh()){
-//			if(status.length() != 0){
-//				status.append(",");
-//			}
-//			status.append("備");
-//		}
-//		if(status.length() != 0){
-//			status.insert(0, "(").append(")");
-//		}
-//		
-//		_format = _format.replace(PVar.FOOD_STATUS, status);
-//		
-//		String hangStatus;
-//		if(_of.isHangup()){
-//			hangStatus = "(請)";
-//		}else{
-//			hangStatus = "";
-//		}
-//		_format = _format.replace(PVar.HANG_STATUS, hangStatus);
-//		
-//		String tempStatus;
-//		if(_of.isTemp()){
-//			tempStatus = "(還)";
-//		}else{
-//			tempStatus = "";
-//		}
-//		_format = _format.replace(PVar.TEMP_STATUS, tempStatus);		
-	
-		//---------------------------------------------------------
 		
 		String foodPrice;
 		if(_displayConfig.contains(DisplayItem.DISCOUNT)){
