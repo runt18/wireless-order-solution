@@ -794,6 +794,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 		sheet.setColumnWidth(13, 3000);
 		sheet.setColumnWidth(14, 3000);
 		sheet.setColumnWidth(15, 3000);
+		sheet.setColumnWidth(16, 3000);
 		
 		// 报表头
 		sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, 16));
@@ -921,7 +922,8 @@ public class HistoryStatisticsAction extends DispatchAction{
 				
 				cell = row.createCell(row.getLastCellNum());
 				cell.setCellValue(item.getTotalAmount());
-				cell.setCellStyle(ts);
+				cell.setCellStyle(normalNumStyle);
+				
 				
 				cell = row.createCell(row.getLastCellNum());
 				cell.setCellValue(item.getIncomeByPay().getCashActual());
