@@ -92,7 +92,8 @@ public class Page{
 		CANCELLED_FOOD("cancelledFood", "退菜统计", "History_Module/CancelledFood.html", "../../images/cancelledFoodStatis.png"),
 		REPAID_STATISTICS("repaidStatistics", "反结账统计", "History_Module/RepaidStatistics.html", "../../images/repaidStatistics.png"),
 		COMMISSION_STATISTICS("commissionStatistics", "提成统计", "History_Module/CommissionStatistics.html", "../../images/commissionStatistics.png"),
-		BUSINESS_CHART("businessChart", "营业走势图", "History_Module/BusinessChart.html", "../../images/businessChart.png");
+		BUSINESS_CHART("businessChart", "营业走势图", "History_Module/BusinessChart.html", "../../images/businessChart.png"),
+		SHIBIE("businessHourMgr", "市别设置", "", "../../images/businessHour.png");
 		
 		private String mgrId;
 		private String desc;
@@ -124,7 +125,6 @@ public class Page{
 	}
 	
 	public static enum System{
-		SHIBIE("businessHourMgr", "市别设置", "", "../../images/businessHour.png"),
 		FORMATPRICE("formatPrice", "收款设置", "", "../../images/formatPrice.png"),
 		RESTAURANT("resturantMgr", "餐厅管理", "", "../../images/resturantMgr.png"),
 		STAFF("staffMgr", "员工管理", "System_Module/StaffManagement.html", "../../images/staffMgr.png");
