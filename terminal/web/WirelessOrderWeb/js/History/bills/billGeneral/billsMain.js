@@ -13,15 +13,21 @@ function billQueryHandler() {
 		gs.baseParams['common'] = Ext.getCmp('textSearchValue').getValue();
 		if(isNaN(Ext.getCmp('textTableAliasOrName').getValue())){
 			gs.baseParams['tableName'] = Ext.getCmp('textTableAliasOrName').getValue();
+			gs.baseParams['tableAlias'] = '';
 		}else{
 			gs.baseParams['tableAlias'] = Ext.getCmp('textTableAliasOrName').getValue();
+			gs.baseParams['tableName'] = '';
 		}
 		gs.baseParams['region'] = Ext.getCmp('history_comboRegion').getValue();
 		var businessHour = history_oBusinessHourData({type : 'get'}).data;
 		if(parseInt(businessHour.businessHourType) != -1){
-			params.opening = businessHour.opening;
-			params.ending = businessHour.ending;
+			gs.baseParams['opening'] = businessHour.opening;
+			gs.baseParams['ending'] = businessHour.ending;
+		}else{
+			gs.baseParams['opening'] = '';
 		}
+	}else{
+		gs.baseParams = {};
 	}
 	gs.baseParams['orderId'] = Ext.getCmp('numberSearchValue').getValue();
 	
@@ -47,8 +53,8 @@ function billQueryExportHandler() {
 			opening = businessHour.opening;
 			ending = businessHour.ending;
 		}else{
-			opening = null;
-			ending = null;
+			opening = '';
+			ending = '';
 		}
 		url = '../../{0}?dateBeg={1}&dateEnd={2}&comboPayType={3}&common={4}&orderId={5}&tableName={6}&tableAlias={7}&region={8}&havingCond={9}&dataSource={10}&dataType={11}&seqId={12}&opening={13}&ending={14}';
 		url = String.format(
