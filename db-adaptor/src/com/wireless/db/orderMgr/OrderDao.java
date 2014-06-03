@@ -162,7 +162,7 @@ public class OrderDao {
 				filterCond.append(" AND " + orderTbl + ".pay_type = " + payType.getVal());
 			}
 			if(comment != null){
-				filterCond.append(" AND " + orderTbl + ".comment LIKE '%" + tableName + "%'");
+				filterCond.append(" AND " + orderTbl + ".comment LIKE '%" + comment + "%'");
 			}
 			if(status != null){
 				filterCond.append(" AND " + orderTbl + ".status = " + status.getVal());
