@@ -3052,8 +3052,13 @@ public class HistoryStatisticsAction extends DispatchAction{
 		String tableAlias = request.getParameter("tableAlias");
 		String tableName = request.getParameter("tableName");
 		String region = request.getParameter("region");
+		String common = request.getParameter("common");
+		
 		// 中文乱码
-		String common = new String(request.getParameter("common").getBytes("ISO8859_1"), "UTF-8");
+		if(common != null && !common.isEmpty()){
+			common = new String(request.getParameter("common").getBytes("ISO8859_1"), "UTF-8");
+		}
+		
 		
 		if(comboType != null && !comboType.trim().isEmpty()){
 			int comboVal = Integer.valueOf(comboType);
