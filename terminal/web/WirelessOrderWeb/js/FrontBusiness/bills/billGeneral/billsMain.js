@@ -9,7 +9,7 @@
 });
 
 var btnPaymentSub = new Ext.ux.ImageButton({
-//	imgPath : '../../images/shiftStatis.png',
+	imgPath : '../../images/paymentRecord.png',
 	imgWidth : 50,
 	imgHeight : 50,
 	tooltip : '交款记录',
@@ -406,10 +406,17 @@ var billsGrid;
 var foodStatus;
 Ext.onReady(function(){
 	duty = createStatGridTabDutyFn({
-		data : shiftDutyOfToday
+		data : shiftDutyOfToday,
+		listeners : {
+			select : function(){
+				if(searchType){
+					Ext.getCmp('fontBill_search').handler();
+				}
+			}
+		}		
 	});
 	var historySBar = new Ext.Toolbar({
-		id : 'historyHighSBar',
+		id : 'todayHighSBar',
 		hidden : true,
 		height : 28,
 		items : [
@@ -434,7 +441,14 @@ Ext.onReady(function(){
 				triggerAction : 'all',
 				selectOnFocus : true,
 				allowBlank : false,
-				readOnly : false
+				readOnly : false,
+				listeners : {
+					select : function(){
+						if(searchType){
+							Ext.getCmp('fontBill_search').handler();
+						}
+					}
+				}					
 			},
 			{xtype : 'tbtext', text : '&nbsp;&nbsp;'},
 			{xtype : 'tbtext', text : '台名/台号:'},
@@ -459,7 +473,7 @@ Ext.onReady(function(){
 				forceSelection : true,
 				width : 90,
 				value : -1,
-				id : 'history_comboRegion',
+				id : 'today_comboRegion',
 				store : new Ext.data.SimpleStore({
 					fields : ['id', 'name']
 				}),
@@ -492,6 +506,11 @@ Ext.onReady(function(){
 								thiz.setValue(-1);
 							}
 						});
+					},
+					select : function(){
+						if(searchType){
+							Ext.getCmp('fontBill_search').handler();
+						}
 					}
 				}
 			}
@@ -624,7 +643,7 @@ Ext.onReady(function(){
 				Ext.getCmp('btnBillHeightSearch').hide();
 	    		Ext.getCmp('btnBillCommonSearch').show();
 	    		
-	    		Ext.getCmp('historyHighSBar').show();
+	    		Ext.getCmp('todayHighSBar').show();
 	    		
 	    		billsGrid.setHeight(billsGrid.getHeight()-28);
 	    		billsGrid.syncSize();
@@ -639,11 +658,12 @@ Ext.onReady(function(){
 	    		Ext.getCmp('btnBillHeightSearch').show();
 	    		Ext.getCmp('btnBillCommonSearch').hide();
 	    		
-//	    		duty.setValue(2);
 	    		Ext.getCmp('textSearchValue').setValue();
+	    		Ext.getCmp('today_comboRegion').setValue(-1);
+	    		
 	    		Ext.getCmp('comboPayType').setValue(-1);
 	    		
-	    		Ext.getCmp('historyHighSBar').hide();
+	    		Ext.getCmp('todayHighSBar').hide();
 	    		
 	    		billsGrid.setHeight(billsGrid.getHeight()+28);
 	    		billsGrid.syncSize();
@@ -662,7 +682,8 @@ Ext.onReady(function(){
 			[true, false, false, true], 
 			['帐单号', 'id'],
 			['流水号', 'seqId'],
-			['台号', 'table.alias'],
+			['台号', 'table.alias',120,,'function(v,m,r){if(r.get("table.name")!=""){return v+\"(\"+r.get("table.name")+\")\";}else{return v;}}'],
+			['区域', 'table.region.name'],
 			['日期', 'orderDateFormat', 150],
 			['账单类型', 'categoryText',,'center'],
 			['结账方式', 'settleTypeText',,'center'],
@@ -671,7 +692,6 @@ Ext.onReady(function(){
 			['应收', 'totalPrice',,'right', 'Ext.ux.txtFormat.gridDou'],
 			['实收', 'actualPrice',,'right', 'Ext.ux.txtFormat.gridDou'],
 			['状态', 'statusText',,'center', 'function(v,m,r){if(r.get("statusValue")==2){return \'<font color=\"#FF0000\">反结账</font>\';}else{return v;}}'],
-			['区域', 'table.region.name'],
 			['备注', 'comment',,'center', 'commentTip'],
 			['操作', 'operator', 270, 'center', 'billOpt']
 		],
@@ -729,12 +749,12 @@ Ext.onReady(function(){
 				xtype:'tbtext',
 				text:'&nbsp;'
 			},
-			btnDutyRangeSub, 
+			btnPaymentSub, 
 			{
 				xtype:'tbtext',
 				text:'&nbsp;&nbsp;&nbsp;'
-			},
-			btnPaymentSub, 
+			},			
+			btnDutyRangeSub, 
 			{
 				xtype:'tbtext',
 				text:'&nbsp;&nbsp;&nbsp;'

@@ -11,7 +11,7 @@
 		}else{
 			gs.baseParams['tableAlias'] = Ext.getCmp('textTableAliasOrName').getValue();
 		}
-		gs.baseParams['region'] = Ext.getCmp('history_comboRegion').getValue();
+		gs.baseParams['region'] = Ext.getCmp('today_comboRegion').getValue();
 	}
 	
 	gs.baseParams['orderId'] = Ext.getCmp('numberSearchValue').getValue();

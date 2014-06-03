@@ -2,6 +2,10 @@
 //------------------lib
 function billQueryHandler() {
 	var gs = billsGrid.getStore();
+	var params = {
+			start : 0,
+			limit : GRID_PADDING_LIMIT_20
+	};
 	if(searchType){
 		gs.baseParams['dateBeg'] = Ext.getCmp('dateSearchDateBegin').getValue().format('Y-m-d 00:00:00');
 		gs.baseParams['dateEnd'] = Ext.getCmp('dateSearchDateEnd').getValue().format('Y-m-d 23:59:59');
@@ -14,12 +18,14 @@ function billQueryHandler() {
 		}
 		gs.baseParams['region'] = Ext.getCmp('history_comboRegion').getValue();
 		var businessHour = history_oBusinessHourData({type : 'get'}).data;
-		if(eval(businessHour.businessHourType) != -1){
-			gs.baseParams['opening'] = businessHour.opening;
-			gs.baseParams['ending'] = businessHour.ending;
+		if(parseInt(businessHour.businessHourType) != -1){
+			params.opening = businessHour.opening;
+			params.ending = businessHour.ending;
 		}
 	}
 	gs.baseParams['orderId'] = Ext.getCmp('numberSearchValue').getValue();
+	
+	gs.baseParams['seqId'] = Ext.getCmp('numberSearchSeqIdValue').getValue();
 	
 	sAdditionFilter = Ext.getCmp(searchAdditionFilter).inputValue;	
 	
@@ -27,10 +33,7 @@ function billQueryHandler() {
 
 	gs.baseParams['havingCond'] = sAdditionFilter;
 	gs.load({
-		params : {
-			start : 0,
-			limit : GRID_PADDING_LIMIT_20
-		}
+		params : params
 	});
 };
 
@@ -38,7 +41,16 @@ function billQueryExportHandler() {
 	var url;
 	sAdditionFilter = Ext.getCmp(searchAdditionFilter).inputValue;
 	if(searchType){
-		url = '../../{0}?dateBeg={1}&dateEnd={2}&comboPayType={3}&common={4}&orderId={5}&tableName={6}&tableAlias={7}&region={8}&havingCond={9}&dataSource={10}&dataType={11}';
+		var businessHour = history_oBusinessHourData({type : 'get'}).data;
+		var opening, ending;
+		if(parseInt(businessHour.businessHourType) != -1){
+			opening = businessHour.opening;
+			ending = businessHour.ending;
+		}else{
+			opening = null;
+			ending = null;
+		}
+		url = '../../{0}?dateBeg={1}&dateEnd={2}&comboPayType={3}&common={4}&orderId={5}&tableName={6}&tableAlias={7}&region={8}&havingCond={9}&dataSource={10}&dataType={11}&seqId={12}&opening={13}&ending={14}';
 		url = String.format(
 			url, 
 			'ExportHistoryStatisticsToExecl.do', 
@@ -52,17 +64,21 @@ function billQueryExportHandler() {
 			Ext.getCmp('history_comboRegion').getValue(),
 			sAdditionFilter,
 			'historyOrder',
-			1
+			1,
+			Ext.getCmp('numberSearchSeqIdValue').getValue(),
+			opening,
+			ending
 		);
 	}else{
-		url = '../../{0}?orderId={1}&dataType={2}&havingCond={3}&dataSource={4}';
+		url = '../../{0}?orderId={1}&dataType={2}&havingCond={3}&dataSource={4}&seqId={5}';
 		url = String.format(
 				url, 
 				'ExportHistoryStatisticsToExecl.do', 
 				Ext.getCmp('numberSearchValue').getValue(), 
 				1,
 				sAdditionFilter,
-				'historyOrder'
+				'historyOrder',
+				Ext.getCmp('numberSearchSeqIdValue').getValue()
 		);
 	}
 	window.location = url;
@@ -372,9 +388,9 @@ function history_oBusinessHourData(c){
 			beginTimes = data[2].split(':');
 			endTimes = data[3].split(':');
 			
-			if(eval(beginTimes[0]) > 12){
+			if(parseInt(beginTimes[0]) > 12){
 				apmBegin.setValue(1);
-				var openingHourValue = eval(beginTimes[0]) - 12;
+				var openingHourValue = parseInt(beginTimes[0]) - 12;
 				openingHourValue = openingHourValue > 9 ? openingHourValue+'' : '0'+openingHourValue;
 				openingHour.setValue(openingHourValue);			
 			}else{
@@ -382,9 +398,9 @@ function history_oBusinessHourData(c){
 				openingHour.setValue(beginTimes[0]);
 			}
 			
-			if(eval(endTimes[0]) > 12){
+			if(parseInt(endTimes[0]) > 12){
 				apmEnd.setValue(1);
-				var endingHourValue = eval(endTimes[0]) - 12;
+				var endingHourValue = parseInt(endTimes[0]) - 12;
 				endingHourValue = endingHourValue > 9 ? endingHourValue+'' : '0'+endingHourValue;
 				endingHour.setValue(endingHourValue);		
 			}else{
@@ -429,11 +445,11 @@ function history_oBusinessHourData(c){
 		endingHour = endingHour.getValue();
 		
 		if(apmBegin.getValue() == 1){
-			openingHour = eval(openingHour) + 12;
+			openingHour = parseInt(openingHour) + 12;
 		}
 		
 		if(apmEnd.getValue() == 1){
-			endingHour = eval(endingHour) + 12;
+			endingHour = parseInt(endingHour) + 12;
 		}
 		
 		data.opening = openingHour + ':' + openingMin.getValue();
@@ -474,7 +490,9 @@ Ext.onReady(function() {
 		beginDate : history_beginDate,
 		endDate : history_endDate,
 		callback : function(){
-//			Ext.getCmp('btnSreachForMainOrderGrid').handler();
+			if(searchType){
+				Ext.getCmp('btnSreachForMainOrderGrid').handler();
+			}
 		}
 	});
 	
@@ -503,7 +521,14 @@ Ext.onReady(function() {
 				triggerAction : 'all',
 				selectOnFocus : true,
 				allowBlank : false,
-				readOnly : false
+				readOnly : false,
+				listeners : {
+					select : function(){
+						if(searchType){
+							Ext.getCmp('btnSreachForMainOrderGrid').handler();
+						}
+					}
+				}
 			},
 			{xtype : 'tbtext', text : '&nbsp;&nbsp;'},
 			{xtype : 'tbtext', text : '台名/台号:'},
@@ -561,6 +586,11 @@ Ext.onReady(function() {
 								thiz.setValue(-1);
 							}
 						});
+					},
+					select : function(){
+						if(searchType){
+							Ext.getCmp('btnSreachForMainOrderGrid').handler();
+						}
 					}
 				}
 			}
@@ -626,6 +656,10 @@ Ext.onReady(function() {
 					},
 					select : function(thiz, record, index){
 						history_oBusinessHourData({data : record.json, type : 'set'});
+						if(searchType){
+							Ext.getCmp('btnSreachForMainOrderGrid').handler();
+						}
+						
 					}
 				}
 			},
@@ -783,9 +817,21 @@ Ext.onReady(function() {
 		{
 			xtype : 'numberfield',
 			id : 'numberSearchValue',
-			width : 130
+			width : 100
 		},
-		{ xtype:'tbtext', text:'&nbsp;&nbsp;'}, {
+		{ xtype:'tbtext', text:'&nbsp;&nbsp;'},
+		{
+			xtype : 'tbtext',
+			text : '&nbsp;&nbsp;&nbsp;&nbsp;流水号:'
+		}, 
+		{ xtype:'tbtext', text:'&nbsp;&nbsp;'},
+		{
+			xtype : 'numberfield',
+			id : 'numberSearchSeqIdValue',
+			width : 100
+		},
+		{ xtype:'tbtext', text:'&nbsp;&nbsp;'},
+		{
 			xtype : 'radio',
 			id : 'searchAdditionFilterAll',
 			checked : true,
@@ -913,10 +959,18 @@ Ext.onReady(function() {
 	    		Ext.getCmp('historyExtraBar').hide();
 	    		Ext.getCmp('historyHighTimeBar').hide();
 	    		
-	    		history_dateCombo.setValue(1);
 	    		Ext.getCmp('textSearchValue').setValue();
-	    		Ext.getCmp('comboPayType').setValue(-1);
+	    		Ext.getCmp('textTableAliasOrName').setValue();
+	    		
+	    		history_dateCombo.setValue(1);
+	    		history_dateCombo.fireEvent('select', history_dateCombo,null,1);
+	    		
+	    		
 	    		Ext.getCmp('history_comboBusinessHour').setValue(-1);
+	    		Ext.getCmp('history_comboBusinessHour').fireEvent('select', Ext.getCmp('history_comboBusinessHour'),-1,-1);
+	    		
+	    		Ext.getCmp('comboPayType').setValue(-1);
+	    		Ext.getCmp('history_comboRegion').setValue(-1);
 	    		
 
 	    		
@@ -936,8 +990,9 @@ Ext.onReady(function() {
 		[
 			[true, false, false, true], 
 			['帐单号', 'id'],
-//			['流水号', 'seqId'],
-			['台号', 'table.alias'],
+			['流水号', 'seqId',70],
+			['台号', 'table.alias',120,,'function(v,m,r){if(r.get("table.name")!=""){return v+\"(\"+r.get("table.name")+\")\";}else{return v;}}'],
+			['区域', 'table.region.name'],
 			['日期', 'orderDateFormat', 150],
 //			['账单类型', 'categoryText',,'center'],
 			['结账方式', 'settleTypeText',,'center'],
@@ -946,7 +1001,6 @@ Ext.onReady(function() {
 			['应收', 'totalPrice',,'right', 'Ext.ux.txtFormat.gridDou'],
 			['实收', 'actualPrice',,'right', 'Ext.ux.txtFormat.gridDou'],
 			['状态', 'statusText',,'center', 'function(v,m,r){if(r.get("statusValue")==2){return \'<font color=\"#FF0000\">反结账</font>\';}else{return v;}}'],
-			['区域', 'table.region.name'],
 			['备注', 'comment',,'center', 'commentTip'],
 			['操作', 'operator', 140, 'center', 'billOpt']
 		],
@@ -988,10 +1042,10 @@ Ext.onReady(function() {
 			height : 55,
 			items : [
 			{xtype:'tbtext',text:'&nbsp;'},
-			shiftStatBut, 
-			{xtype:'tbtext',text:'&nbsp;&nbsp;&nbsp;'},
 			paymentBut,
 			{xtype : 'tbtext', text : '&nbsp;&nbsp;'},
+			shiftStatBut, 
+			{xtype:'tbtext',text:'&nbsp;&nbsp;&nbsp;'},
 			dailySettleStatBut
 			]
 		})

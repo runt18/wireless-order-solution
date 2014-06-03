@@ -545,8 +545,9 @@ Ext.ux.createDateCombo = function(_c){
 				}else if(record.data.value == 5){//本周
 					now.setDate(now.getDate() - (nowDayOfWeek - 1));
 				}else if(record.data.value == 6){//上周
-					dateEnd.setValue(now.getDate() - nowDayOfWeek);
-					now.setDate(now.getDate() - (nowDayOfWeek + 6));
+					now.setDate(now.getDate() - nowDayOfWeek);
+					dateEnd.setValue(now);
+					now.setDate(now.getDate() - 6);
 				}else if(record.data.value == 7){//本月
 					now.setDate(now.getDate() - (now.getDate() -1));
 				}else if(record.data.value == 8){//上个月
@@ -664,7 +665,7 @@ var SupplierRecord = Ext.ux.cr(['supplierID', 'restaurantId', 'name', 'tele', 'a
 var KitchenRecord = Ext.ux.cr(['id', 'alias', 'rid', 'name', 'isAllowTmp', 'typeValue', 'dept', 'dept.name']);
 var OrderRecord = Ext.ux.cr(['id', 'seqId', 'rid', 'birthDateFormat', 'orderDate', 'orderDateFormat', 'categoryValue', 'categoryText', 'waiter',
     'statusValue', 'statusText', 'settleTypeValue', 'settleTypeText', 'payTypeValue', 'payTypeText', 'discount', 'pricePlan', 
-    'table', 'table.alias','table.region.name', 'member', 'customNum', 'comment', 'repaidPrice', 'receivedCash', 'serviceRate', 'discountPrice', 
+    'table', 'table.alias','table.name','table.region.name', 'member', 'customNum', 'comment', 'repaidPrice', 'receivedCash', 'serviceRate', 'discountPrice', 
     'cancelPrice', 'giftPrice', 'totalPrice', 'erasePrice', 'couponPrice', 'actualPrice', 'orderFoods', 'childOrders', 'actualPriceBeforeDiscount']);
 var OrderFoodRecord = Ext.ux.cr(['dataType', 'orderId', 'orderDateFormat', 'count', 'discount', 'isTemporary', 'totalPrice', 'totalPriceBeforeDiscount',
     'tasteGroup', 'tasteGroup.tastePref', 'tasteGroup.tastePrice', 'waiter', 'actualPrice'], FoodBasicRecord);

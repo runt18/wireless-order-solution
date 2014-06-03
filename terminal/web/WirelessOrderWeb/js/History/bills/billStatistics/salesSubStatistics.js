@@ -164,9 +164,9 @@ function statistic_oBusinessHourData(c){
 			beginTimes = data[2].split(':');
 			endTimes = data[3].split(':');
 			
-			if(eval(beginTimes[0]) > 12){
+			if(parseInt(beginTimes[0]) > 12){
 				apmBegin.setValue(1);
-				var openingHourValue = eval(beginTimes[0]) - 12;
+				var openingHourValue = parseInt(beginTimes[0]) - 12;
 				openingHourValue = openingHourValue > 9 ? openingHourValue+'' : '0'+openingHourValue;
 				openingHour.setValue(openingHourValue);			
 			}else{
@@ -174,9 +174,9 @@ function statistic_oBusinessHourData(c){
 				openingHour.setValue(beginTimes[0]);
 			}
 			
-			if(eval(endTimes[0]) > 12){
+			if(parseInt(endTimes[0]) > 12){
 				apmEnd.setValue(1);
-				var endingHourValue = eval(endTimes[0]) - 12;
+				var endingHourValue = parseInt(endTimes[0]) - 12;
 				endingHourValue = endingHourValue > 9 ? endingHourValue+'' : '0'+endingHourValue;
 				endingHour.setValue(endingHourValue);		
 			}else{
@@ -220,11 +220,11 @@ function statistic_oBusinessHourData(c){
 		endingHour = endingHour.getValue();
 		
 		if(apmBegin.getValue() == 1){
-			openingHour = eval(openingHour) + 12;
+			openingHour = parseInt(openingHour) + 12;
 		}
 		
 		if(apmEnd.getValue() == 1){
-			endingHour = eval(endingHour) + 12;
+			endingHour = parseInt(endingHour) + 12;
 		}
 		
 		data.opening = openingHour + ':' + openingMin.getValue();
@@ -522,9 +522,12 @@ function orderFoodStatPanelInit(){
 			gs.baseParams['deptID'] = salesSubDeptId;
 			gs.baseParams['foodName'] = foodName.getValue();
 			gs.baseParams['region'] = Ext.getCmp("foodStatistic_comboRegion").getValue();
-			if(eval(data.businessHourType) != -1){
+			if(parseInt(data.businessHourType) != -1){
 				gs.baseParams['opening'] = data.opening;
 				gs.baseParams['ending'] = data.ending;
+			}else{
+				gs.baseParams['opening'] = '';
+				gs.baseParams['ending'] = '';			
 			}
 			gs.load({
 				params : {
@@ -547,16 +550,29 @@ function orderFoodStatPanelInit(){
 			}else if(bd == '' && ed != ''){
 				Ext.ux.checkDuft(false, beginDate.getId(), endDate.getId());
 			}
-			var url = '../../{0}?region={1}&dataSource={2}&onDuty={3}&offDuty={4}&deptID={5}&foodName={6}';
+			
+			var opening, ending;
+			var businessHour = statistic_oBusinessHourData({type : 'get', statistic : 'foodStatistic_'}).data;
+			if(parseInt(businessHour.businessHourType) != -1){
+				opening = businessHour.opening;
+				ending = businessHour.ending;
+			}else{
+				opening = '';
+				ending = '';
+			}
+			
+			var url = '../../{0}?region={1}&dataSource={2}&onDuty={3}&offDuty={4}&deptID={5}&foodName={6}&opening={7}&ending={8}';
 			url = String.format(
 					url, 
 					'ExportHistoryStatisticsToExecl.do', 
-					Ext.getCmp("foodSum_comboRegion").getValue(), 
+					Ext.getCmp("foodStatistic_comboRegion").getValue(), 
 					'salesFoodDetail',
 					beginDate.getValue().format('Y-m-d 00:00:00'),
 					endDate.getValue().format('Y-m-d 23:59:59'),
 					salesSubDeptId,
-					foodName.getValue()
+					foodName.getValue(),
+					opening,
+					ending
 				);
 			window.location = url;
 		}
@@ -694,9 +710,12 @@ function kitchenStatPanelInit(){
 				gs.baseParams['dateBeg'] = beginDate.getRawValue();
 				gs.baseParams['dateEnd'] = endDate.getRawValue();
 				gs.baseParams['region'] = Ext.getCmp("kitchenStatistic_comboRegion").getValue();
-				if(eval(data.businessHourType) != -1){
+				if(parseInt(data.businessHourType) != -1){
 					gs.baseParams['opening'] = data.opening;
 					gs.baseParams['ending'] = data.ending;
+				}else{
+					gs.baseParams['opening'] = '';
+					gs.baseParams['ending'] = '';					
 				}
 				gs.load();
 				kitchenStatPanelGrid.getView().expandAllGroups();
@@ -716,14 +735,26 @@ function kitchenStatPanelInit(){
 				}else if(bd == '' && ed != ''){
 					Ext.ux.checkDuft(false, beginDate.getId(), endDate.getId());
 				}
-				var url = '../../{0}?region={1}&dataSource={2}&onDuty={3}&offDuty={4}';
+				var opening, ending;
+				var businessHour = statistic_oBusinessHourData({type : 'get', statistic : 'kitchenStatistic_'}).data;
+				if(parseInt(businessHour.businessHourType) != -1){
+					opening = businessHour.opening;
+					ending = businessHour.ending;
+				}else{
+					opening = '';
+					ending = '';
+				}
+				
+				var url = '../../{0}?region={1}&dataSource={2}&onDuty={3}&offDuty={4}&opening={5}&ending={6}';
 				url = String.format(
 						url, 
 						'ExportHistoryStatisticsToExecl.do', 
-						Ext.getCmp("kitchenSum_comboRegion").getValue(), 
+						Ext.getCmp("kitchenStatistic_comboRegion").getValue(), 
 						'salesByKitchen',
 						beginDate.getValue().format('Y-m-d 00:00:00'),
-						endDate.getValue().format('Y-m-d 23:59:59')
+						endDate.getValue().format('Y-m-d 23:59:59'),
+						opening,
+						ending
 					);
 				window.location = url;
 			}
@@ -832,9 +863,12 @@ function deptStatPanelInit(){
 				gs.baseParams['dateBeg'] = beginDate.getRawValue();
 				gs.baseParams['dateEnd'] = endDate.getRawValue();
 				gs.baseParams['region'] = Ext.getCmp("deptStatistic_comboRegion").getValue();
-				if(eval(data.businessHourType) != -1){
+				if(parseInt(data.businessHourType) != -1){
 					gs.baseParams['opening'] = data.opening;
 					gs.baseParams['ending'] = data.ending;
+				}else{
+					gs.baseParams['opening'] = '';
+					gs.baseParams['ending'] = '';
 				}
 				
 				gs.load();
@@ -854,14 +888,28 @@ function deptStatPanelInit(){
 				}else if(bd == '' && ed != ''){
 					Ext.ux.checkDuft(false, beginDate.getId(), endDate.getId());
 				}
-				var url = '../../{0}?region={1}&dataSource={2}&onDuty={3}&offDuty={4}';
+				
+				var opening, ending;
+				var businessHour = statistic_oBusinessHourData({type : 'get', statistic : 'deptStatistic_'}).data;
+				if(parseInt(businessHour.businessHourType) != -1){
+					opening = businessHour.opening;
+					ending = businessHour.ending;
+				}else{
+					opening = '';
+					ending = '';
+				}				
+				
+				
+				var url = '../../{0}?region={1}&dataSource={2}&onDuty={3}&offDuty={4}&opening={5}&ending={6}';
 				url = String.format(
 						url, 
 						'ExportHistoryStatisticsToExecl.do', 
-						Ext.getCmp("deptSum_comboRegion").getValue(), 
+						Ext.getCmp("deptStatistic_comboRegion").getValue(), 
 						'salesByDept',
 						beginDate.getValue().format('Y-m-d 00:00:00'),
-						endDate.getValue().format('Y-m-d 23:59:59')
+						endDate.getValue().format('Y-m-d 23:59:59'),
+						opening,
+						ending
 					);
 				window.location = url;
 			}
