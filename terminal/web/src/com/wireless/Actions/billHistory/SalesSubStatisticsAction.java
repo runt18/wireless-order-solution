@@ -10,6 +10,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
+import com.wireless.db.billStatistics.CalcBillStatisticsDao;
 import com.wireless.db.billStatistics.CalcBillStatisticsDao.ExtraCond;
 import com.wireless.db.billStatistics.SaleDetailsDao;
 import com.wireless.db.staffMgr.StaffDao;
@@ -86,7 +87,7 @@ public class SalesSubStatisticsAction extends Action {
 			Integer qt = Integer.valueOf(queryType), ot = (orderType != null && !orderType.isEmpty()) ? Integer.parseInt(orderType) : SaleDetailsDao.ORDER_BY_SALES;
 			DateType dt = DateType.valueOf(Integer.valueOf(dataType));
 			
-			ExtraCond extraConds = new ExtraCond(dt);
+			CalcBillStatisticsDao.ExtraCond extraConds = new ExtraCond(dt);
 				
 			if(dt.isHistory()){
 				dateBeg = dateBeg != null && dateBeg.length() > 0 ? dateBeg.trim() + " 00:00:00" : "";
@@ -112,7 +113,9 @@ public class SalesSubStatisticsAction extends Action {
 						extraConds);
 				
 			}else if(qt == SaleDetailsDao.QUERY_BY_FOOD){
-				extraConds.setFoodName(foodName);
+				if(foodName != null && !foodName.isEmpty()){
+					extraConds.setFoodName(foodName);
+				}
 				if(deptID != null && !deptID.equals("-1")){
 					extraConds.setDept(Department.DeptId.valueOf(Integer.parseInt(deptID)));
 				}
