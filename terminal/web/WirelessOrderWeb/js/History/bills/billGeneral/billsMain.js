@@ -1048,8 +1048,9 @@ Ext.onReady(function() {
 			height : 55,
 			items : [
 			{xtype:'tbtext',text:'&nbsp;'},
-			paymentBut,
-			{xtype : 'tbtext', text : '&nbsp;&nbsp;'},
+			//FIXME
+//			paymentBut,
+//			{xtype : 'tbtext', text : '&nbsp;&nbsp;'},
 			shiftStatBut, 
 			{xtype:'tbtext',text:'&nbsp;&nbsp;&nbsp;'},
 			dailySettleStatBut

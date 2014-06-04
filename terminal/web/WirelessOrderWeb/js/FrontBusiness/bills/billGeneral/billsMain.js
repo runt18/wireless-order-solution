@@ -749,11 +749,12 @@ Ext.onReady(function(){
 				xtype:'tbtext',
 				text:'&nbsp;'
 			},
-			btnPaymentSub, 
-			{
-				xtype:'tbtext',
-				text:'&nbsp;&nbsp;&nbsp;'
-			},			
+			//FIXME 
+//			btnPaymentSub, 
+//			{
+//				xtype:'tbtext',
+//				text:'&nbsp;&nbsp;&nbsp;'
+//			},			
 			btnDutyRangeSub, 
 			{
 				xtype:'tbtext',

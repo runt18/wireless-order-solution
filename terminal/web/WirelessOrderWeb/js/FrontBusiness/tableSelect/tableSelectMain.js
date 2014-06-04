@@ -1536,8 +1536,9 @@ Ext.onReady(function() {
 			"->",
 			billsBut,
 			{text : "&nbsp;&nbsp;&nbsp;", xtype : 'tbtext' },
-			paymentBut,
-			{text : "&nbsp;&nbsp;&nbsp;", xtype : 'tbtext' },
+			//FIXME 逻辑不对
+//			paymentBut,
+//			{text : "&nbsp;&nbsp;&nbsp;", xtype : 'tbtext' },
 			shiftBut,
 			{text : "&nbsp;&nbsp;&nbsp;", xtype : 'tbtext' },			
 			dailySettleBut,
