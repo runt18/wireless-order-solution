@@ -7,6 +7,7 @@ import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.billStatistics.CalcBillStatisticsDao;
 import com.wireless.db.billStatistics.CalcBillStatisticsDao.ExtraCond;
+import com.wireless.db.billStatistics.CalcBillStatisticsDao.ExtraCond4Charge;
 import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.billStatistics.DutyRange;
@@ -239,51 +240,50 @@ public class ShiftDao {
 	 * 			the staff to request
 	 * @param range
 	 * 			the duty range
-	 * @param queryType
-	 * 			indicate which query type should use
-	 * 			it is one of values below.
-	 * 			- QUERY_TODAY
-	 * 		    - QUERY_HISTORY
+	 * @param dateType
+	 * 			indicate the date type {@link DateType}
 	 * @return the shift detail information
 	 * @throws SQLException
 	 * 			throws if fail to execute any SQL statement
 	 */
-	public static ShiftDetail getByRange(DBCon dbCon, Staff staff, DutyRange range, DateType queryType) throws SQLException{
+	public static ShiftDetail getByRange(DBCon dbCon, Staff staff, DutyRange range, DateType dateType) throws SQLException{
 		
 		ShiftDetail result = new ShiftDetail();
 		result.setOnDuty(range.getOnDutyFormat());
 		result.setOffDuty(range.getOffDutyFormat());
 		
+		ExtraCond extraCond = new ExtraCond(dateType);
+		
 		//Calculate the general income
-		result.setIncomeByPay(CalcBillStatisticsDao.calcIncomeByPayType(dbCon, staff, range, queryType));
+		result.setIncomeByPay(CalcBillStatisticsDao.calcIncomeByPayType(dbCon, staff, range, extraCond));
 		
 		//Calculate the total & amount to erase price
-		result.setEraseIncome(CalcBillStatisticsDao.calcErasePrice(dbCon, staff, range, queryType));
+		result.setEraseIncome(CalcBillStatisticsDao.calcErasePrice(dbCon, staff, range, extraCond));
 		//-----------------------------
 		
 		//Get the total & amount to discount price
-		result.setDiscountIncome(CalcBillStatisticsDao.calcDiscountPrice(dbCon, staff, range, queryType));
+		result.setDiscountIncome(CalcBillStatisticsDao.calcDiscountPrice(dbCon, staff, range, extraCond));
 		
 		//Get the total & amount to gift price
-		result.setGiftIncome(CalcBillStatisticsDao.calcGiftPrice(dbCon, staff, range, queryType));
+		result.setGiftIncome(CalcBillStatisticsDao.calcGiftPrice(dbCon, staff, range, extraCond));
 		
 		//Get the total & amount to cancel price
-		result.setCancelIncome(CalcBillStatisticsDao.calcCancelPrice(dbCon, staff, range, queryType));
+		result.setCancelIncome(CalcBillStatisticsDao.calcCancelPrice(dbCon, staff, range, extraCond));
 		
 		//Get the total & amount to coupon price
-		result.setCouponIncome(CalcBillStatisticsDao.calcCouponPrice(dbCon, staff, range, queryType));
+		result.setCouponIncome(CalcBillStatisticsDao.calcCouponPrice(dbCon, staff, range, extraCond));
 		
 		//Get the total & amount to repaid order
-		result.setRepaidIncome(CalcBillStatisticsDao.calcRepaidPrice(dbCon, staff, range, queryType));
+		result.setRepaidIncome(CalcBillStatisticsDao.calcRepaidPrice(dbCon, staff, range, extraCond));
 		
 		//Get the total & amount to order with service
-		result.setServiceIncome(CalcBillStatisticsDao.calcServicePrice(dbCon, staff, range, queryType));
+		result.setServiceIncome(CalcBillStatisticsDao.calcServicePrice(dbCon, staff, range, extraCond));
 		
 		//Get the income by charge
-		result.setIncomeByCharge(CalcBillStatisticsDao.calcIncomeByCharge(dbCon, staff, range, queryType));
+		result.setIncomeByCharge(CalcBillStatisticsDao.calcIncomeByCharge(dbCon, staff, range, new ExtraCond4Charge(dateType)));
 		
 		//Get the gift, discount & total to each department during this period.
-		result.setDeptIncome(CalcBillStatisticsDao.calcIncomeByDept(dbCon, staff, range, new ExtraCond(queryType)));
+		result.setDeptIncome(CalcBillStatisticsDao.calcIncomeByDept(dbCon, staff, range, extraCond));
 		
 		return result;
 	}

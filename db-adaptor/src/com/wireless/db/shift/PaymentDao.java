@@ -7,6 +7,9 @@ import java.util.List;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
+import com.wireless.db.billStatistics.CalcBillStatisticsDao;
+import com.wireless.db.billStatistics.CalcBillStatisticsDao.ExtraCond;
+import com.wireless.db.billStatistics.CalcBillStatisticsDao.ExtraCond4Charge;
 import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.billStatistics.DutyRange;
@@ -117,7 +120,7 @@ public class PaymentDao {
 	 */
 	private static DutyRange getCurrentPaymentRange(DBCon dbCon, Staff staff) throws SQLException, BusinessException{
 		/**
-		 * Get the latest payment date from tables below.
+		 * Get the latest payment date to this staff from tables below.
 		 * 1 - payment 
 		 * 2 - payment_history
 		 * 3 - daily_settle_history
@@ -126,8 +129,10 @@ public class PaymentDao {
 		 */
 		long onDuty;
 		String sql = "SELECT MAX(off_duty) FROM (" +
-					 "SELECT off_duty FROM " + Params.dbName + ".payment WHERE restaurant_id = " + staff.getRestaurantId() + " UNION " +
-					 "SELECT off_duty FROM " + Params.dbName + ".payment_history WHERE restaurant_id = " + staff.getRestaurantId() + " UNION " +
+					 "SELECT off_duty FROM " + Params.dbName + ".payment WHERE restaurant_id = " + staff.getRestaurantId() + " AND " + " staff_id = " + staff.getId() + 
+					 " UNION " +
+					 "SELECT off_duty FROM " + Params.dbName + ".payment_history WHERE restaurant_id = " + staff.getRestaurantId() + " AND " + " staff_id = " + staff.getId() + 
+					 " UNION " +
 					 "SELECT off_duty FROM " + Params.dbName + ".daily_settle_history WHERE restaurant_id = " + staff.getRestaurantId() +
 					 ") AS all_off_duty";
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
@@ -237,6 +242,80 @@ public class PaymentDao {
 			result.add(detail);
 		}
 		dbCon.rs.close();
+		
+		return result;
+	}
+	
+	/**
+	 * Get the detail to payment to specific range and staff.
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param range
+	 * 			the duty range
+	 * @param dateType
+	 * 			the date type {@link DateType}
+	 * @return the detail to this payment
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static ShiftDetail getDetail(Staff staff, DutyRange range, DateType dateType) throws SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return getDetail(dbCon, staff, range, dateType);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Get the detail to payment to specific range and staff.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param range
+	 * 			the duty range
+	 * @param dateType
+	 * 			the date type {@link DateType}
+	 * @return the detail to this payment
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static ShiftDetail getDetail(DBCon dbCon, Staff staff, DutyRange range, DateType dateType) throws SQLException{
+		ShiftDetail result = new ShiftDetail();
+		result.setOnDuty(range.getOnDutyFormat());
+		result.setOffDuty(range.getOffDutyFormat());
+		
+		ExtraCond extraCond = new ExtraCond(dateType).setStaffId(staff.getId());
+		
+		//Calculate the general income
+		result.setIncomeByPay(CalcBillStatisticsDao.calcIncomeByPayType(dbCon, staff, range, extraCond));
+		
+		//Calculate the total & amount to erase price
+		result.setEraseIncome(CalcBillStatisticsDao.calcErasePrice(dbCon, staff, range, extraCond));
+		//-----------------------------
+		
+		//Get the total & amount to discount price
+		result.setDiscountIncome(CalcBillStatisticsDao.calcDiscountPrice(dbCon, staff, range, extraCond));
+		
+		//Get the total & amount to gift price
+		result.setGiftIncome(CalcBillStatisticsDao.calcGiftPrice(dbCon, staff, range, extraCond));
+		
+		//Get the total & amount to cancel price
+		result.setCancelIncome(CalcBillStatisticsDao.calcCancelPrice(dbCon, staff, range, extraCond));
+		
+		//Get the total & amount to coupon price
+		result.setCouponIncome(CalcBillStatisticsDao.calcCouponPrice(dbCon, staff, range, extraCond));
+		
+		//Get the total & amount to repaid order
+		result.setRepaidIncome(CalcBillStatisticsDao.calcRepaidPrice(dbCon, staff, range, extraCond));
+		
+		//Get the total & amount to order with service
+		result.setServiceIncome(CalcBillStatisticsDao.calcServicePrice(dbCon, staff, range, extraCond));
+		
+		//Get the income by charge
+		result.setIncomeByCharge(CalcBillStatisticsDao.calcIncomeByCharge(dbCon, staff, range, new ExtraCond4Charge(dateType).setStaffId(staff.getId())));
 		
 		return result;
 	}
