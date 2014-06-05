@@ -136,7 +136,7 @@ public class TestCalcBillStatisticsDao {
 		
 		List<CancelIncomeByReason> cancelByReason = CalcBillStatisticsDao.calcCancelIncomeByReason(mStaff, mDutyRange, null, DateType.HISTORY);
 		
-		IncomeByCancel cancelIncome = CalcBillStatisticsDao.calcCancelPrice(mStaff, mDutyRange, DateType.HISTORY);
+		IncomeByCancel cancelIncome = CalcBillStatisticsDao.calcCancelPrice(mStaff, mDutyRange, new ExtraCond(DateType.HISTORY));
 		
 		float totalCancel = 0;
 		for(CancelIncomeByReason cancelByEachReason : cancelByReason){
@@ -154,7 +154,7 @@ public class TestCalcBillStatisticsDao {
 		
 		List<CancelIncomeByDept> cancelByDept = CalcBillStatisticsDao.calcCancelIncomeByDept(staff, range, null, DateType.HISTORY);
 		
-		IncomeByCancel cancelIncome = CalcBillStatisticsDao.calcCancelPrice(staff, range, DateType.HISTORY);
+		IncomeByCancel cancelIncome = CalcBillStatisticsDao.calcCancelPrice(staff, range, new ExtraCond(DateType.HISTORY));
 		
 		float totalCancel = 0;
 		for(CancelIncomeByDept cancelByEachDept : cancelByDept){
