@@ -49,6 +49,36 @@ import com.wireless.util.DateType;
 
 public class CalcBillStatisticsDao {
 
+	public static class ExtraCond4Charge{
+		private final DateType dateType;
+		private final String moTbl;
+		
+		private int staffId;
+		
+		public ExtraCond4Charge(DateType dateType){
+			this.dateType = dateType;
+			if(this.dateType.isHistory()){
+				this.moTbl = TBL_MEMBER_OPERATION_HISTORY;
+			}else{
+				this.moTbl = TBL_MEMBER_OPERATION;
+			}
+		}
+		
+		public ExtraCond4Charge setStaffId(int staffId){
+			this.staffId = staffId;
+			return this;
+		}
+		
+		@Override
+		public String toString(){
+			StringBuilder extraCond = new StringBuilder();
+			if(staffId > 0){
+				extraCond.append(" AND staff_id = " + staffId);
+			}
+			return extraCond.toString();
+		}
+	}
+	
 	public static class ExtraCond{
 		public final DateType dateType;
 		private final String orderTbl;
@@ -59,6 +89,7 @@ public class CalcBillStatisticsDao {
 		private Department.DeptId deptId;
 		private String foodName;
 		private HourRange hourRange;
+		private int staffId;
 		
 		public ExtraCond(DateType dateType){
 			this.dateType = dateType;
@@ -93,6 +124,11 @@ public class CalcBillStatisticsDao {
 			return this;
 		}
 		
+		public ExtraCond setStaffId(int staffId){
+			this.staffId = staffId;
+			return this;
+		}
+		
 		@Override
 		public String toString(){
 			StringBuilder extraCond = new StringBuilder();
@@ -108,6 +144,9 @@ public class CalcBillStatisticsDao {
 			if(hourRange != null){
 				extraCond.append(" AND TIME(O.order_date) BETWEEN '" + hourRange.getOpeningFormat() + "' AND '" + hourRange.getEndingFormat() + "'");
 			}
+			if(staffId > 0){
+				extraCond.append(" AND O.staff_id = " + staffId);
+			}
 			return extraCond.toString();
 		}
 	}
@@ -122,44 +161,42 @@ public class CalcBillStatisticsDao {
 	private final static String TBL_MEMBER_OPERATION_HISTORY = "member_operation_history";
 	
 	/**
-	 * 
+	 * Calculate the income by pay type.
 	 * @param staff
+	 * 			the staff to perform this action
 	 * @param range
-	 * @param queryType
-	 * @return
+	 * 			the duty range
+	 * @param extraCond
+	 * 			the extra condition
+	 * @return the income by pay {@link IncomeByPayType}
 	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
 	 */
-	public static IncomeByPay calcIncomeByPayType(Staff staff, DutyRange range, DateType queryType) throws SQLException{	
+	public static IncomeByPay calcIncomeByPayType(Staff staff, DutyRange range, ExtraCond extraCond) throws SQLException{	
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return calcIncomeByPayType(dbCon, staff, range, queryType);
+			return calcIncomeByPayType(dbCon, staff, range, extraCond);
 		}finally{
 			dbCon.disconnect();
 		}
 	}
 	
 	/**
-	 * 
+	 * Calculate the income by pay type.
 	 * @param dbCon
+	 * 			the database connection
 	 * @param staff
+	 * 			the staff to perform this action
 	 * @param range
-	 * @param queryType
-	 * @return
+	 * 			the duty range
+	 * @param extraCond
+	 * 			the extra condition
+	 * @return the income by pay {@link IncomeByPayType}
 	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
 	 */
-	public static IncomeByPay calcIncomeByPayType(DBCon dbCon, Staff staff, DutyRange range, DateType queryType) throws SQLException{		
-		
-		String orderTbl = null;
-		if(queryType.isHistory()){
-			orderTbl = TBL_ORDER_HISTORY;
-			
-		}else if(queryType.isToday()){
-			orderTbl = TBL_ORDER_TODAY;
-			
-		}else{
-			throw new IllegalArgumentException("The query type is invalid.");
-		}
+	public static IncomeByPay calcIncomeByPayType(DBCon dbCon, Staff staff, DutyRange range, ExtraCond extraCond) throws SQLException{		
 		
 		IncomeByPay incomeByPay = new IncomeByPay();
 		
@@ -168,8 +205,9 @@ public class CalcBillStatisticsDao {
 		sql = " SELECT " +
 			  " pay_type, COUNT(*) AS amount, ROUND(SUM(total_price), 2) AS total, ROUND(SUM(actual_price), 2) AS actual " +
 			  " FROM " +
-			  Params.dbName + "." + orderTbl +
+			  Params.dbName + "." + extraCond.orderTbl + " O " +
 			  " WHERE 1 = 1 " +
+			  (extraCond != null ? extraCond.toString() : "") +
 			  " AND restaurant_id = " + staff.getRestaurantId() + 
 			  " AND order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +
 			  " AND (status = " + Order.Status.PAID.getVal() + " OR " + " status = " + Order.Status.REPAID.getVal() + ")"  +
@@ -213,44 +251,42 @@ public class CalcBillStatisticsDao {
 	}
 	
 	/**
-	 * 
+	 * Calculate the erase price according to extra condition
 	 * @param staff
+	 * 			the staff to perform this action
 	 * @param range
-	 * @param queryType
-	 * @return
+	 * 			the duty range
+	 * @param extraCond
+	 * 			the extra condition
+	 * @return the result to income by erase {@link IncomeByErase}
 	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
 	 */
-	public static IncomeByErase calcErasePrice(Staff staff, DutyRange range, DateType queryType) throws SQLException{
+	public static IncomeByErase calcErasePrice(Staff staff, DutyRange range, ExtraCond extraCond) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return calcErasePrice(dbCon, staff, range, queryType);
+			return calcErasePrice(dbCon, staff, range, extraCond);
 		}finally{
 			dbCon.disconnect();
 		}
 	}
 	
 	/**
-	 * 
+	 * Calculate the erase price according to extra condition
 	 * @param dbCon
+	 * 			the database connection
 	 * @param staff
+	 * 			the staff to perform this action
 	 * @param range
-	 * @param queryType
-	 * @return
+	 * 			the duty range
+	 * @param extraCond
+	 * 			the extra condition
+	 * @return the result to income by erase {@link IncomeByErase}
 	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
 	 */
-	public static IncomeByErase calcErasePrice(DBCon dbCon, Staff staff, DutyRange range, DateType queryType) throws SQLException{
-		
-		String orderTbl = null;
-		if(queryType.isHistory()){
-			orderTbl = TBL_ORDER_HISTORY;
-			
-		}else if(queryType.isToday()){
-			orderTbl = TBL_ORDER_TODAY;
-			
-		}else{
-			throw new IllegalArgumentException("The query type is invalid.");
-		}
+	public static IncomeByErase calcErasePrice(DBCon dbCon, Staff staff, DutyRange range, ExtraCond extraCond) throws SQLException{
 		
 		String sql;
 		
@@ -258,8 +294,9 @@ public class CalcBillStatisticsDao {
 		sql = " SELECT " +
 			  " COUNT(*) AS amount, ROUND(SUM(erase_price), 2) AS total_erase " +
 			  " FROM " +
-			  Params.dbName + "." + orderTbl +
+			  Params.dbName + "." + extraCond.orderTbl + " O " +
 			  " WHERE 1 = 1 " +
+			  (extraCond != null ? extraCond.toString() : "") +
 			  " AND restaurant_id = " + staff.getRestaurantId() +
 			  " AND order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +
 			  " AND erase_price > 0 ";
@@ -276,52 +313,49 @@ public class CalcBillStatisticsDao {
 	}
 	
 	/**
-	 * 
+	 * Calculate the discount price according to extra condition.
 	 * @param staff
+	 * 			the staff to perform this action
 	 * @param range
-	 * @param queryType
-	 * @return
+	 * 			the duty range
+	 * @param extra condition
+	 * @return the result to income by discount {@link IncomeByDiscount}
 	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
 	 */
-	public static IncomeByDiscount calcDiscountPrice(Staff staff, DutyRange range, DateType queryType) throws SQLException{
+	public static IncomeByDiscount calcDiscountPrice(Staff staff, DutyRange range, ExtraCond extraCond) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return calcDiscountPrice(dbCon, staff, range, queryType);
+			return calcDiscountPrice(dbCon, staff, range, extraCond);
 		}finally{
 			dbCon.disconnect();
 		}
 	}
 	
 	/**
-	 * 
+	 * Calculate the discount price according to extra condition.
 	 * @param dbCon
+	 * 			the database connection
 	 * @param staff
+	 * 			the staff to perform this action
 	 * @param range
-	 * @param queryType
-	 * @return
+	 * 			the duty range
+	 * @param extra condition
+	 * @return the result to income by discount {@link IncomeByDiscount}
 	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
 	 */
-	public static IncomeByDiscount calcDiscountPrice(DBCon dbCon, Staff staff, DutyRange range, DateType queryType) throws SQLException{
-		
-		String orderTbl = null;
-		if(queryType.isHistory()){
-			orderTbl = TBL_ORDER_HISTORY;
-			
-		}else if(queryType.isToday()){
-			orderTbl = TBL_ORDER_TODAY;
-			
-		}else{
-			throw new IllegalArgumentException("The query type is invalid.");
-		}
+	public static IncomeByDiscount calcDiscountPrice(DBCon dbCon, Staff staff, DutyRange range, ExtraCond extraCond) throws SQLException{
 		
 		String sql;
 		
 		sql = " SELECT " +
 			  " COUNT(*) AS amount, ROUND(SUM(discount_price), 2) AS total_discount " +
 			  " FROM " +
-			  Params.dbName + "." + orderTbl +
+			  Params.dbName + "." + extraCond.orderTbl + " O " +
 			  " WHERE 1 = 1 " +
+			  (extraCond != null ? extraCond.toString() : "") +
 			  " AND restaurant_id = " + staff.getRestaurantId() +
 			  " AND order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +
 			  " AND discount_price > 0 ";
@@ -338,50 +372,50 @@ public class CalcBillStatisticsDao {
 	}
 	
 	/**
-	 * 
+	 * Calculate the gift price according to extra condition.
 	 * @param staff
+	 * 			the staff to perform this action
 	 * @param range
-	 * @param queryType
-	 * @return
+	 * 			the duty range
+	 * @param extraCond
+	 * 			the extra condition
+	 * @return the result to income by gift {@link IncomeByGift}
 	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
 	 */
-	public static IncomeByGift calcGiftPrice(Staff staff, DutyRange range, DateType queryType) throws SQLException{
+	public static IncomeByGift calcGiftPrice(Staff staff, DutyRange range, ExtraCond extraCond) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return calcGiftPrice(dbCon, staff, range, queryType);
+			return calcGiftPrice(dbCon, staff, range, extraCond);
 		}finally{
 			dbCon.disconnect();
 		}
 	}
 	
 	/**
-	 * 
+	 * Calculate the gift price according to extra condition.
 	 * @param dbCon
+	 * 			the database connection
 	 * @param staff
+	 * 			the staff to perform this action
 	 * @param range
-	 * @param queryType
-	 * @return
+	 * 			the duty range
+	 * @param extraCond
+	 * 			the extra condition
+	 * @return the result to income by gift {@link IncomeByGift}
 	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
 	 */
-	public static IncomeByGift calcGiftPrice(DBCon dbCon, Staff staff, DutyRange range, DateType queryType) throws SQLException{
-		String orderTbl = null;
-		if(queryType.isHistory()){
-			orderTbl = TBL_ORDER_HISTORY;
-			
-		}else if(queryType.isToday()){
-			orderTbl = TBL_ORDER_TODAY;
-			
-		}else{
-			throw new IllegalArgumentException("The query type is invalid.");
-		}
+	public static IncomeByGift calcGiftPrice(DBCon dbCon, Staff staff, DutyRange range, ExtraCond extraCond) throws SQLException{
 		
 		String sql;
 		sql = " SELECT " +
 		      " COUNT(*) AS amount, ROUND(SUM(gift_price), 2) AS total_gift " +
 		      " FROM " +
-		      Params.dbName + "." + orderTbl +
+		      Params.dbName + "." + extraCond.orderTbl + " O " +
 		      " WHERE 1 = 1 " +
+		      (extraCond != null ? extraCond.toString() : "") +
 		      " AND restaurant_id = " + staff.getRestaurantId() +
 		      " AND order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +
 			  " AND gift_price > 0 ";
@@ -409,11 +443,11 @@ public class CalcBillStatisticsDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static IncomeByCancel calcCancelPrice(Staff staff, DutyRange range, DateType queryType) throws SQLException{
+	public static IncomeByCancel calcCancelPrice(Staff staff, DutyRange range, ExtraCond extraCond) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return calcCancelPrice(dbCon, staff, range, queryType);
+			return calcCancelPrice(dbCon, staff, range, extraCond);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -433,26 +467,16 @@ public class CalcBillStatisticsDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static IncomeByCancel calcCancelPrice(DBCon dbCon, Staff staff, DutyRange range, DateType queryType) throws SQLException{
-		
-		String orderTbl = null;
-		if(queryType.isHistory()){
-			orderTbl = TBL_ORDER_HISTORY;
-			
-		}else if(queryType.isToday()){
-			orderTbl = TBL_ORDER_TODAY;
-			
-		}else{
-			throw new IllegalArgumentException("The query type is invalid.");
-		}
+	public static IncomeByCancel calcCancelPrice(DBCon dbCon, Staff staff, DutyRange range, ExtraCond extraCond) throws SQLException{
 		
 		String sql;
 		
 		sql = " SELECT " +
 		      " COUNT(*) AS amount, ROUND(SUM(cancel_price), 2) AS total_cancel " +
 		      " FROM " +
-		      Params.dbName + "." + orderTbl +
+		      Params.dbName + "." + extraCond.orderTbl + " O " +
 		      " WHERE 1 = 1 " +
+		      (extraCond != null ? extraCond.toString() : "") +
 		      " AND restaurant_id = " + staff.getRestaurantId() +
 		      " AND order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +
 			  " AND cancel_price > 0 ";
@@ -480,11 +504,11 @@ public class CalcBillStatisticsDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static IncomeByCoupon calcCouponPrice(Staff staff, DutyRange range, DateType queryType) throws SQLException{
+	public static IncomeByCoupon calcCouponPrice(Staff staff, DutyRange range, ExtraCond extraCond) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return calcCouponPrice(dbCon, staff, range, queryType);
+			return calcCouponPrice(dbCon, staff, range, extraCond);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -504,25 +528,16 @@ public class CalcBillStatisticsDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static IncomeByCoupon calcCouponPrice(DBCon dbCon, Staff staff, DutyRange range, DateType queryType) throws SQLException{
-		String orderTbl = null;
-		if(queryType.isHistory()){
-			orderTbl = TBL_ORDER_HISTORY;
-			
-		}else if(queryType.isToday()){
-			orderTbl = TBL_ORDER_TODAY;
-			
-		}else{
-			throw new IllegalArgumentException("The query type is invalid.");
-		}
+	public static IncomeByCoupon calcCouponPrice(DBCon dbCon, Staff staff, DutyRange range, ExtraCond extraCond) throws SQLException{
 		
 		String sql;
 		
 		sql = " SELECT " +
 		      " COUNT(*) AS amount, ROUND(SUM(coupon_price), 2) AS total_coupon " +
 		      " FROM " +
-		      Params.dbName + "." + orderTbl +
+		      Params.dbName + "." + extraCond.orderTbl + " O " +
 		      " WHERE 1 = 1 " +
+		      (extraCond != null ? extraCond.toString() : "") +
 		      " AND restaurant_id = " + staff.getRestaurantId() +
 		      " AND order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +
 			  " AND coupon_price > 0 ";
@@ -539,49 +554,48 @@ public class CalcBillStatisticsDao {
 	}
 	
 	/**
-	 * 
+	 * Calculate the repaid price according to specific range and extra condition.
 	 * @param staff
+	 * 			the staff to perform this action
 	 * @param range
-	 * @param queryType
-	 * @return
+	 * 			the duty range
+	 * @param extraCond
+	 * 			the extra condition
+	 * @return the result to income by repaid {@link IncomeByRepaid}
 	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
 	 */
-	public static IncomeByRepaid calcRepaidPrice(Staff staff, DutyRange range, DateType queryType) throws SQLException{
+	public static IncomeByRepaid calcRepaidPrice(Staff staff, DutyRange range, ExtraCond extraCond) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return calcRepaidPrice(dbCon, staff, range, queryType);
+			return calcRepaidPrice(dbCon, staff, range, extraCond);
 		}finally{
 			dbCon.disconnect();
 		}
 	}
 	
 	/**
-	 * 
+	 * Calculate the repaid price according to specific range and extra condition.
 	 * @param dbCon
+	 * 			the database connection
 	 * @param staff
+	 * 			the staff to perform this action
 	 * @param range
-	 * @param queryType
-	 * @return
+	 * 			the duty range
+	 * @param extraCond
+	 * 			the extra condition
+	 * @return the result to income by repaid {@link IncomeByRepaid}
 	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
 	 */
-	public static IncomeByRepaid calcRepaidPrice(DBCon dbCon, Staff staff, DutyRange range, DateType queryType) throws SQLException{
-		String orderTbl = null;
-		if(queryType.isHistory()){
-			orderTbl = TBL_ORDER_HISTORY;
-			
-		}else if(queryType.isToday()){
-			orderTbl = TBL_ORDER_TODAY;
-			
-		}else{
-			throw new IllegalArgumentException("The query type is invalid.");
-		}
+	public static IncomeByRepaid calcRepaidPrice(DBCon dbCon, Staff staff, DutyRange range, ExtraCond extraCond) throws SQLException{
 		
 		String sql;
 		sql = " SELECT " +
 		      " COUNT(*) AS amount, ROUND(SUM(repaid_price), 2) AS total_repaid " +
 		      " FROM " +
-		      Params.dbName + "." + orderTbl +
+		      Params.dbName + "." + extraCond.orderTbl + " O " +
 		      " WHERE 1 = 1 " +
 		      " AND restaurant_id = " + staff.getRestaurantId() +
 		      " AND order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +
@@ -610,11 +624,11 @@ public class CalcBillStatisticsDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static IncomeByService calcServicePrice(Staff staff, DutyRange range, DateType queryType) throws SQLException{
+	public static IncomeByService calcServicePrice(Staff staff, DutyRange range, ExtraCond extraCond) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return calcServicePrice(dbCon, staff, range, queryType);
+			return calcServicePrice(dbCon, staff, range, extraCond);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -634,25 +648,16 @@ public class CalcBillStatisticsDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static IncomeByService calcServicePrice(DBCon dbCon, Staff staff, DutyRange range, DateType queryType) throws SQLException{
-		String orderTbl = null;
-		if(queryType.isHistory()){
-			orderTbl = TBL_ORDER_HISTORY;
-			
-		}else if(queryType.isToday()){
-			orderTbl = TBL_ORDER_TODAY;
-			
-		}else{
-			throw new IllegalArgumentException("The query type is invalid.");
-		}
+	public static IncomeByService calcServicePrice(DBCon dbCon, Staff staff, DutyRange range, ExtraCond extraCond) throws SQLException{
 		
 		String sql;
 		
 		sql = " SELECT " +
 			  " COUNT(*) AS amount, ROUND(SUM(total_price * service_rate), 2) AS total_service " +
 			  " FROM " +
-			  Params.dbName + "." + orderTbl +
+			  Params.dbName + "." + extraCond.orderTbl + " O " +
 			  " WHERE 1 = 1 " +
+			  (extraCond != null ? extraCond.toString() : "") +
 			  " AND restaurant_id = " + staff.getRestaurantId() +
 			  " AND order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +
 			  " AND service_rate > 0 ";
@@ -670,27 +675,49 @@ public class CalcBillStatisticsDao {
 	
 	private static String makeSql4CalcFood(Staff staff, DutyRange range, ExtraCond extraCond){
 		
+//		return " SELECT " +
+//			   " OF.order_id, OF.food_id, " +
+// 			   " MAX(OF.food_status) AS food_status, MAX(OF.name) AS food_name,	MAX(OF.dept_id) AS dept_id, MAX(OF.kitchen_id) AS kitchen_id, " +
+//			   " SUM(order_count) AS food_amount, " +
+//			   " CASE WHEN OF.gift_status = 1 THEN (OF.unit_price + IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * discount * SUM(OF.order_count) ELSE 0 END AS food_gift," +
+//			   " (OF.unit_price + IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * (1 - discount) * SUM(OF.order_count) AS food_discount, " +
+//			   " CASE WHEN ((OF.gift_status = 0) AND (OF.food_status & " + Food.WEIGHT + ") = 0) THEN (OF.unit_price + IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * discount * SUM(OF.order_count) " +
+//					" WHEN ((OF.gift_status = 0) AND (OF.food_status & " + Food.WEIGHT + ") <> 0) THEN (OF.unit_price * SUM(OF.order_count) + (IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0))) * discount " +
+//				  	" ELSE 0 " +
+//				  	" END AS food_income " +
+//			   " FROM " + Params.dbName + "." + extraCond.orderFoodTbl + " OF " + 
+//			   " JOIN " + Params.dbName + "." + extraCond.orderTbl + " O ON 1 = 1 " + 
+//			   " AND OF.order_id = O.id " + 
+//			   " AND O.restaurant_id = " + staff.getRestaurantId() + 
+//			   " AND O.status <> " + Order.Status.UNPAID.getVal() +
+//			   " JOIN " + Params.dbName + "." + extraCond.tasteGrpTbl + " TG " + " ON OF.taste_group_id = TG.taste_group_id " +
+//			   " WHERE 1 = 1 " +
+//			   (extraCond == null ? "" : extraCond.toString()) +
+//			   " AND O.order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +
+//			   " GROUP BY " + " OF.order_id, OF.food_id, OF.taste_group_id, OF.gift_status " +
+//			   " HAVING food_amount > 0 ";
+		
 		return " SELECT " +
-			   " OF.order_id, OF.food_id, " +
- 			   " MAX(OF.food_status) AS food_status, MAX(OF.name) AS food_name,	MAX(OF.dept_id) AS dept_id, MAX(OF.kitchen_id) AS kitchen_id, " +
-			   " SUM(order_count) AS food_amount, " +
-			   " CASE WHEN ((OF.food_status & " + Food.GIFT + ") <> 0) THEN (OF.unit_price + IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * discount * SUM(OF.order_count) ELSE 0 END AS food_gift," +
-			   " (OF.unit_price + IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * (1 - discount) * SUM(OF.order_count) AS food_discount, " +
-			   " CASE WHEN ((OF.food_status & " + Food.GIFT + ") = 0 AND (OF.food_status & " + Food.WEIGHT + ") = 0) THEN (OF.unit_price + IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * discount * SUM(OF.order_count) " +
-					" WHEN ((OF.food_status & " + Food.GIFT + ") = 0 AND (OF.food_status & " + Food.WEIGHT + ") <> 0) THEN (OF.unit_price * SUM(OF.order_count) + (IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0))) * discount " +
-				  	" ELSE 0 " +
-				  	" END AS food_income " +
-			   " FROM " + Params.dbName + "." + extraCond.orderFoodTbl + " OF " + 
-			   " JOIN " + Params.dbName + "." + extraCond.orderTbl + " O ON 1 = 1 " + 
-			   " AND OF.order_id = O.id " + 
-			   " AND O.restaurant_id = " + staff.getRestaurantId() + 
-			   " AND O.status <> " + Order.Status.UNPAID.getVal() +
-			   " JOIN " + Params.dbName + "." + extraCond.tasteGrpTbl + " TG " + " ON OF.taste_group_id = TG.taste_group_id " +
-			   " WHERE 1 = 1 " +
-			   (extraCond == null ? "" : extraCond.toString()) +
-			   " AND O.order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +
-			   " GROUP BY " + " OF.order_id, OF.food_id, OF.taste_group_id " +
-			   " HAVING food_amount > 0 ";
+		   " OF.order_id, OF.food_id, " +
+		   " MAX(OF.food_status) AS food_status, MAX(OF.name) AS food_name,	MAX(OF.dept_id) AS dept_id, MAX(OF.kitchen_id) AS kitchen_id, " +
+		   " SUM(order_count) AS food_amount, " +
+		   " CASE WHEN ((OF.food_status & " + Food.GIFT + ") <> 0) THEN (OF.unit_price + IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * discount * SUM(OF.order_count) ELSE 0 END AS food_gift," +
+		   " (OF.unit_price + IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * (1 - discount) * SUM(OF.order_count) AS food_discount, " +
+		   " CASE WHEN ((OF.food_status & " + Food.GIFT + ") = 0 AND (OF.food_status & " + Food.WEIGHT + ") = 0) THEN (OF.unit_price + IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * discount * SUM(OF.order_count) " +
+				" WHEN ((OF.food_status & " + Food.GIFT + ") = 0 AND (OF.food_status & " + Food.WEIGHT + ") <> 0) THEN (OF.unit_price * SUM(OF.order_count) + (IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0))) * discount " +
+			  	" ELSE 0 " +
+			  	" END AS food_income " +
+		   " FROM " + Params.dbName + "." + extraCond.orderFoodTbl + " OF " + 
+		   " JOIN " + Params.dbName + "." + extraCond.orderTbl + " O ON 1 = 1 " + 
+		   " AND OF.order_id = O.id " + 
+		   " AND O.restaurant_id = " + staff.getRestaurantId() + 
+		   " AND O.status <> " + Order.Status.UNPAID.getVal() +
+		   " JOIN " + Params.dbName + "." + extraCond.tasteGrpTbl + " TG " + " ON OF.taste_group_id = TG.taste_group_id " +
+		   " WHERE 1 = 1 " +
+		   (extraCond == null ? "" : extraCond.toString()) +
+		   " AND O.order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +
+		   " GROUP BY " + " OF.order_id, OF.food_id, OF.taste_group_id " +
+		   " HAVING food_amount > 0 ";
 	}
 	
 	/**
@@ -1105,42 +1132,42 @@ public class CalcBillStatisticsDao {
 	 }
 	
 	 /**
-	  * Calculate the charge income.
+	  * Calculate the member charge income according to duty range and extra condition.
 	  * @param staff
+	  * 		the staff to perform this action
 	  * @param range
-	  * @param queryType
+	  * 		the duty range
+	  * @param extraCond
+	  * 		the extra condition
 	  * @return the income by charge refer to {@link IncomeByCharge}
 	  * @throws SQLException
 	  * 			if failed to execute any SQL statement
 	  */
-	 public static IncomeByCharge calcIncomeByCharge(Staff staff, DutyRange range, DateType queryType) throws SQLException{
+	 public static IncomeByCharge calcIncomeByCharge(Staff staff, DutyRange range, ExtraCond4Charge extraCond) throws SQLException{
 		 DBCon dbCon = new DBCon();
 		 try{
 			 dbCon.connect();
-			 return calcIncomeByCharge(dbCon, staff, range, queryType);
+			 return calcIncomeByCharge(dbCon, staff, range, extraCond);
 		 }finally{
 			 dbCon.disconnect();
 		 }
 	 }
 	 
 	 /**
-	  * Calculate the charge income.
+	  * Calculate the member charge income according to duty range and extra condition.
 	  * @param dbCon
+	  * 		the data base connection
 	  * @param staff
+	  * 		the staff to perform this action
 	  * @param range
-	  * @param queryType
+	  * 		the duty range
+	  * @param extraCond
+	  * 		the extra condition
 	  * @return the income by charge refer to {@link IncomeByCharge}
 	  * @throws SQLException
 	  * 			if failed to execute any SQL statement
 	  */
-	 public static IncomeByCharge calcIncomeByCharge(DBCon dbCon, Staff staff, DutyRange range, DateType queryType) throws SQLException{
-		 String moTbl;
-		 if(queryType.isToday()){
-			 moTbl = TBL_MEMBER_OPERATION;
-		 }else{
-			 moTbl = TBL_MEMBER_OPERATION_HISTORY;
-		 }
-		 
+	 public static IncomeByCharge calcIncomeByCharge(DBCon dbCon, Staff staff, DutyRange range, ExtraCond4Charge extraCond) throws SQLException{
 		 String sql;
 		 
 		 // Calculate the charge money. 
@@ -1149,8 +1176,9 @@ public class CalcBillStatisticsDao {
 			   " SUM(delta_base_money + delta_extra_money) AS total_account_charge, " +
 		 	   " SUM(IF(charge_type = " + ChargeType.CASH.getValue() + ", charge_money, 0)) AS total_actual_charge_by_cash, " +
 		 	   " SUM(IF(charge_type = " + ChargeType.CREDIT_CARD.getValue() + ", charge_money, 0)) AS total_actual_charge_by_card " +
-			   " FROM " + Params.dbName + "." + moTbl +
+			   " FROM " + Params.dbName + "." + extraCond.moTbl +
 			   " WHERE 1 = 1 " +
+			   (extraCond != null ? extraCond.toString() : "") +
 			   " AND restaurant_id = " + staff.getRestaurantId() +
 			   " AND operate_type = " + OperationType.CHARGE.getValue() +
 			   " AND operate_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'";
@@ -1173,8 +1201,9 @@ public class CalcBillStatisticsDao {
 			   " COUNT(*) AS refund_amount, " +
 			   " SUM(delta_base_money + delta_extra_money) AS total_account_refund, " +
 		 	   " SUM(charge_money) AS total_actual_refund " +
-			   " FROM " + Params.dbName + "." + moTbl +
+			   " FROM " + Params.dbName + "." + extraCond.moTbl +
 			   " WHERE 1 = 1 " +
+			   (extraCond != null ? extraCond.toString() : "") +
 			   " AND restaurant_id = " + staff.getRestaurantId() +
 			   " AND operate_type = " + OperationType.REFUND.getValue() +
 			   " AND operate_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'";
@@ -1556,31 +1585,31 @@ public class CalcBillStatisticsDao {
 			if(range != null){
 				
 				//Calculate the general income
-				income.setIncomeByPay(calcIncomeByPayType(dbCon, staff, range, DateType.HISTORY));
+				income.setIncomeByPay(calcIncomeByPayType(dbCon, staff, range, new ExtraCond(DateType.HISTORY)));
 				
 				//Calculate the total & amount to erase price
-				income.setIncomeByErase(calcErasePrice(dbCon, staff, range, DateType.HISTORY));
+				income.setIncomeByErase(calcErasePrice(dbCon, staff, range, new ExtraCond(DateType.HISTORY)));
 				
 				//Get the total & amount to discount price
-				income.setIncomeByDiscount(calcDiscountPrice(dbCon, staff, range, DateType.HISTORY));
+				income.setIncomeByDiscount(calcDiscountPrice(dbCon, staff, range, new ExtraCond(DateType.HISTORY)));
 	
 				//Get the total & amount to gift price
-				income.setIncomeByGift(calcGiftPrice(dbCon, staff, range, DateType.HISTORY));
+				income.setIncomeByGift(calcGiftPrice(dbCon, staff, range, new ExtraCond(DateType.HISTORY)));
 				
 				//Get the total & amount to cancel price
-				income.setIncomeByCancel(calcCancelPrice(dbCon, staff, range, DateType.HISTORY));
+				income.setIncomeByCancel(calcCancelPrice(dbCon, staff, range, new ExtraCond(DateType.HISTORY)));
 				
 				//Get the total & amount to coupon price
-				income.setIncomeByCoupon(calcCouponPrice(dbCon, staff, range, DateType.HISTORY));
+				income.setIncomeByCoupon(calcCouponPrice(dbCon, staff, range, new ExtraCond(DateType.HISTORY)));
 				
 				//Get the total & amount to repaid order
-				income.setIncomeByRepaid(calcRepaidPrice(dbCon, staff, range, DateType.HISTORY));
+				income.setIncomeByRepaid(calcRepaidPrice(dbCon, staff, range, new ExtraCond(DateType.HISTORY)));
 				
 				//Get the total & amount to order with service
-				income.setIncomeByService(calcServicePrice(dbCon, staff, range, DateType.HISTORY));
+				income.setIncomeByService(calcServicePrice(dbCon, staff, range, new ExtraCond(DateType.HISTORY)));
 				
 				//Get the charge income by both cash and credit card
-				income.setIncomeByCharge(calcIncomeByCharge(dbCon, staff, range, DateType.HISTORY));
+				income.setIncomeByCharge(calcIncomeByCharge(dbCon, staff, range, new ExtraCond4Charge(DateType.HISTORY)));
 				
 			}
 			result.add(income);
