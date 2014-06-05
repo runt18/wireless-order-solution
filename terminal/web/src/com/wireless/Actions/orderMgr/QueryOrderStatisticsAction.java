@@ -24,7 +24,6 @@ import com.wireless.pojo.regionMgr.Region;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.DateUtil;
-import com.wireless.util.DataPaging;
 import com.wireless.util.DateType;
 
 public class QueryOrderStatisticsAction extends Action {
@@ -135,7 +134,6 @@ public class QueryOrderStatisticsAction extends Action {
 					sum.setActualPrice(sum.getActualPrice() + list.get(i).getActualPrice());
 				}
 				sum.setDestTbl(list.get(0).getDestTbl());
-				list = DataPaging.getPagingData(list, true, start, limit);
 				list.add(sum);
 				jobject.setRoot(list);
 			}
