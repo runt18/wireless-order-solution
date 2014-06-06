@@ -53,6 +53,10 @@ public class ShiftGeneral implements Jsonable{
 			this.paymentGenerals.add(paymentGeneral);
 		}
 		
+		public List<PaymentGeneral> getPayments(){
+			return Collections.unmodifiableList(paymentGenerals);
+		}
+		
 		@Override
 		public JsonMap toJsonMap(int flag) {
 			JsonMap jm = new JsonMap();

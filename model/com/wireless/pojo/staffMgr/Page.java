@@ -85,6 +85,7 @@ public class Page{
 	}
 	
 	public static enum History{
+		SHIBIE("businessHourMgr", "市别设置", "", "../../images/businessHour.png"),
 		HISTORY("history", "历史账单", "History_Module/HistoryStatistics.html", "../../images/history.png"),
 		BIlls("businessStat", "营业统计", "", "../../images/businessStatis.png"),
 		BUSINESS_RECEIPS("businessReceiptsStatistics", "收款统计", "History_Module/BusinessReceiptsStatistics.html", "../../images/businessReceips.png"),
@@ -92,8 +93,8 @@ public class Page{
 		CANCELLED_FOOD("cancelledFood", "退菜统计", "History_Module/CancelledFood.html", "../../images/cancelledFoodStatis.png"),
 		REPAID_STATISTICS("repaidStatistics", "反结账统计", "History_Module/RepaidStatistics.html", "../../images/repaidStatistics.png"),
 		COMMISSION_STATISTICS("commissionStatistics", "提成统计", "History_Module/CommissionStatistics.html", "../../images/commissionStatistics.png"),
-		BUSINESS_CHART("businessChart", "营业走势图", "History_Module/BusinessChart.html", "../../images/businessChart.png"),
-		SHIBIE("businessHourMgr", "市别设置", "", "../../images/businessHour.png");
+		BUSINESS_CHART("businessChart", "营业走势图", "History_Module/BusinessChart.html", "../../images/businessChart.png");
+		
 		
 		private String mgrId;
 		private String desc;
