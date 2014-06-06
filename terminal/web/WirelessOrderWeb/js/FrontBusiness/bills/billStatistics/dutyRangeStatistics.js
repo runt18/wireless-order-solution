@@ -1,4 +1,6 @@
-﻿function dutyRangeStatPrintHandler(rowIndex) {
+﻿floatBarNodeId = "";
+
+function dutyRangeStatPrintHandler(rowIndex) {
 	var tempMask = new Ext.LoadMask(document.body, {
 		msg : '正在打印请稍候.......',
 		remove : true
@@ -87,6 +89,8 @@ function dutyRangePanelOperationRenderer(){
 		   + '<a href="javascript:dutyRangeStatPrintHandler()">补打</a>';
 }
 
+var dutyRangeStatTree,dutyRangeStatGeneral;
+
 function dutyRangePanelInit(c){
 	var url = '';
 	//交班
@@ -143,6 +147,87 @@ function dutyRangePanelInit(c){
 	);
 	dutyRangePanel.frame = false;
 	dutyRangePanel.border = false; 
+	
+	
+	
+	
+	dutyRangeStatTree = new Ext.tree.TreePanel({
+		id : 'today_dutyRangeStatTree',
+		region : 'west',
+		rootVisible : true,
+		frame : true,
+		width : 240,	
+		animate : true,
+		bodyStyle : 'backgroundColor:#FFFFFF; border:1px solid #99BBE8;',
+
+		root: new Ext.tree.AsyncTreeNode({
+			expanded : true,
+            text : '全部',
+            leaf : false,
+            deptID : '-1',
+	        loader:new Ext.tree.TreeLoader({    
+				dataUrl:'../../DutyRangeStat.do',
+		        baseParams : {
+		        	dataSource : 'tree'
+				}
+		    })
+		}),
+        listeners : {
+        	dblclick : function(e){
+        		var treeNode = Ext.ux.getSelNode(dutyRangeStatTree);
+        		if(typeof treeNode.attributes.onDuty != 'undefined'){
+        			//跨域调用
+        			loadPaymentGeneral({
+        				onDuty : treeNode.attributes.onDuty,
+        				offDuty : treeNode.attributes.offDuty,
+        				dataSource : 'today',
+        				queryPattern : 5,
+        				businessStatic : treeNode.isLeaf()? 2 : 1
+        			});	
+        		}
+        		
+        	}
+        }
+	});
+	
+	dutyRangeStatGeneral = new Ext.Panel({
+		id : 'dutyRangeStatGeneral',
+		region : 'center',
+		width : 850,
+		height : 555,
+		closable : false,
+		modal : true,
+		resizable : false,	
+		layout: 'fit',
+		listeners : {
+			hide : function(thiz){
+				thiz.body.update('');
+			},
+			render : function(thiz){
+
+				var treeNode = {attributes:{}};
+				treeNode.attributes['onDutyFormat'] = '';
+				treeNode.attributes['offDutyFormat'] = '';
+				
+				thiz.load({
+					autoLoad : false,
+					url : '../window/history/businessStatistics.jsp',
+					scripts : true,
+					nocache : true,
+					text : '功能加载中, 请稍后......',
+					params : {
+						d : '_' + new Date().getTime(),
+						dataSource : 'today',
+						queryPattern : 5,
+						onDuty : treeNode.attributes['onDutyFormat'],
+						offDuty : treeNode.attributes['offDutyFormat'],
+						businessStatic : statType
+					}
+				});
+			}
+		}
+	});
+
 }
 
 function dutyRangeWinInit(c){
@@ -151,14 +236,14 @@ function dutyRangeWinInit(c){
 	}
 	dutyRangeWin = new Ext.Window({
 		title : c.statType == 1?'交班记录':'交款记录',
-		layout : 'fit',
+		layout : 'border',
 		resizable : false,
 		modal : true,
 		closable : false,
 		constrainHeader : true,
-		width : 600,
-		height : 410,
-		items : [dutyRangePanel],
+		width : 1080,
+		height : 555,
+		items : [dutyRangeStatTree, dutyRangeStatGeneral],
 		bbar : ['->', {
 			text : '关闭',
 			iconCls : 'btn_close',

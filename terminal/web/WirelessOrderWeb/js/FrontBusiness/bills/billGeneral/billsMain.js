@@ -1,4 +1,5 @@
-﻿var btnDutyRangeSub = new Ext.ux.ImageButton({
+﻿
+var btnDutyRangeSub = new Ext.ux.ImageButton({
 	imgPath : '../../images/shiftStatis.png',
 	imgWidth : 50,
 	imgHeight : 50,

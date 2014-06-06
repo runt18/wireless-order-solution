@@ -1,79 +1,7 @@
 var salesSubQueryType = 0;
 var salesSubDeptId = -1;
 var SALESSUB_PAGE_LIMIT = 22;
-var businessHourComboData = [['00', '00' ], ['01', '01' ], ['02', '02' ], ['03', '03' ], ['04', '04' ], ['05', '05'], ['06', '06'], ['07', '07'], ['08', '08'], ['09', '09'], ['10', '10'], ['11', '11'], ['12', '12']];
 
-//生成上下午combo
-function buildBusinessAPMCombo(id){
-	return {
-    		xtype : 'combo',
-    		width : 50,
-    		value : 0,
-    		id : id,
-    		forceSelection : true,
-			hideLabel : true,
-			hidden : true,
-    		store : new Ext.data.SimpleStore({
-				fields : [ 'value', 'text' ],
-				data : [[0, '上午'], [1, '下午' ]]
-			}),
-			valueField : 'value',
-			displayField : 'text',
-			typeAhead : true,
-			mode : 'local',
-			triggerAction : 'all',
-			selectOnFocus : true,
-			allowBlank : false,
-			readOnly : false
-	};
-			    	
-}
-//生成小时combo
-function buildBusinessHourCombo(id){
-	return {
-			xtype : 'combo',
-			forceSelection : true,
-			width : 40,
-			value : '00',
-			id : id,
-			hidden : true,
-			store : new Ext.data.SimpleStore({
-				fields : [ 'value', 'text' ],
-				data : businessHourComboData
-			}),
-			valueField : 'value',
-			displayField : 'text',
-			typeAhead : true,
-			mode : 'local',
-			triggerAction : 'all',
-			selectOnFocus : true,
-			allowBlank : false,
-			readOnly : false
-	};
-}
-//生成分钟combo
-function buildBusinessMinCombo(id){
-	return {
-			xtype : 'combo',
-			forceSelection : true,
-			width : 40,
-			value : '00',
-			id : id,
-			hidden : true,
-			store : new Ext.data.SimpleStore({
-				fields : [ 'value', 'text' ],
-				data : [['00', '00'], ['30', '30']]
-			}),
-			valueField : 'value',
-			displayField : 'text',
-			typeAhead : true,
-			mode : 'local',
-			triggerAction : 'all',
-			selectOnFocus : true,
-			allowBlank : false,
-			readOnly : false
-	};
-}
 //初始化区域combo
 function initRegionCombo(statistic){
 	var combo = {
@@ -116,291 +44,12 @@ function initRegionCombo(statistic){
 				});
 			},
 			select : function(thiz, record, index){
-				Ext.getCmp(statistic+'salesSubBtnSearch').handler();
+				Ext.getCmp(statistic+'SubBtnSearch').handler();
 			}
 		}
 	};
 	return combo;
 }
-
-//市别操作
-function statistic_oBusinessHourData(c){
-	if(c == null || c.type == null || typeof c.type == 'undefined')
-		return;
-	var data = {};
-	var apmBegin = Ext.getCmp(c.statistic+'comboBusinessBeginApm');
-	var openingHour = Ext.getCmp((c.statistic+'comboBegionHour'));
-	var openingMin = Ext.getCmp((c.statistic+'comboBegionMin'));
-	var txtBusinessHourBegin = Ext.getCmp(c.statistic+'txtBusinessHourBegin');
-	
-	var apmEnd = Ext.getCmp(c.statistic+'comboBusinessEndApm');
-	var endingHour = Ext.getCmp(c.statistic+'comboEndHour');
-	var endingMin = Ext.getCmp(c.statistic+'comboEndMin');
-	var txtBusinessHourEnd = Ext.getCmp(c.statistic+'txtBusinessHourEnd');
-	
-	
-	if(c.type == 'set'){
-		data = c.data == null || typeof c.data == 'undefined' ? {} : c.data;
-		
-		txtBusinessHourBegin.show();
-		txtBusinessHourEnd.show();
-		
-		openingHour.hide();
-		endingHour.hide();
-		openingMin.hide();
-		endingMin.hide();
-		apmBegin.hide();
-		apmEnd.hide();
-		Ext.getCmp(c.statistic+'txtBusinessHourBeginText').hide();
-		Ext.getCmp(c.statistic+'txtBusinessHourEndText').hide();
-		Ext.getCmp(c.statistic+'txtBusinessMinBeginText').hide();
-		Ext.getCmp(c.statistic+'txtBusinessMinEndText').hide();	
-		
-		if(typeof data[2] != 'undefined'){
-			
-			txtBusinessHourBegin.setText('<font style="color:green; font-size:20px">'+data[2]+'</font>');
-			txtBusinessHourEnd.setText('<font style="color:green; font-size:20px">'+data[3]+'</font>');
-			
-			beginTimes = data[2].split(':');
-			endTimes = data[3].split(':');
-			
-			if(parseInt(beginTimes[0]) > 12){
-				apmBegin.setValue(1);
-				var openingHourValue = parseInt(beginTimes[0]) - 12;
-				openingHourValue = openingHourValue > 9 ? openingHourValue+'' : '0'+openingHourValue;
-				openingHour.setValue(openingHourValue);			
-			}else{
-				apmBegin.setValue(0);
-				openingHour.setValue(beginTimes[0]);
-			}
-			
-			if(parseInt(endTimes[0]) > 12){
-				apmEnd.setValue(1);
-				var endingHourValue = parseInt(endTimes[0]) - 12;
-				endingHourValue = endingHourValue > 9 ? endingHourValue+'' : '0'+endingHourValue;
-				endingHour.setValue(endingHourValue);		
-			}else{
-				apmEnd.setValue(0);
-				endingHour.setValue(endTimes[0]);
-			}
-			
-			openingMin.setValue(beginTimes[1]);
-			
-			endingMin.setValue(endTimes[1]);
-		}else{
-			txtBusinessHourBegin.setText('<font style="color:green; font-size:20px">00:00</font>');
-			txtBusinessHourEnd.setText('<font style="color:green; font-size:20px">00:00</font>');	
-			
-			if(data[0] == -2){
-				txtBusinessHourBegin.hide();
-				txtBusinessHourEnd.hide();
-				
-				openingHour.setValue('00');
-				endingHour.setValue('00');
-				openingMin.setValue('00');
-				endingMin.setValue('00');
-				apmBegin.setValue(0);
-				apmEnd.setValue(0);				
-				
-				openingHour.show();
-				endingHour.show();
-				openingMin.show();
-				endingMin.show();
-				apmBegin.show();
-				apmEnd.show();
-				Ext.getCmp(c.statistic+'txtBusinessHourBeginText').show();
-				Ext.getCmp(c.statistic+'txtBusinessHourEndText').show();
-				Ext.getCmp(c.statistic+'txtBusinessMinBeginText').show();
-				Ext.getCmp(c.statistic+'txtBusinessMinEndText').show();
-			}
-			
-		}
-	}else if(c.type == 'get'){
-		openingHour = openingHour.getValue();
-		endingHour = endingHour.getValue();
-		
-		if(apmBegin.getValue() == 1){
-			openingHour = parseInt(openingHour) + 12;
-		}
-		
-		if(apmEnd.getValue() == 1){
-			endingHour = parseInt(endingHour) + 12;
-		}
-		
-		data.opening = openingHour + ':' + openingMin.getValue();
-		
-		data.ending = endingHour + ':' + endingMin.getValue();
-		
-		data.businessHourType = Ext.getCmp(c.statistic+'comboBusinessHour').getValue();
-		
-		c.data = data;
-	}
-	return c;
-};
-
-/**
- * 初始化时间工具栏
- * @param {} c
- * @return {}
- */
-function initTimeBar(c){
-	
-	var timeBar;
-	//返回一条完整工具栏
-	if(c.tbarType == 0){
-		timeBar = new Ext.Toolbar({
-			id : c.statistic+'TimeBar',
-			hidden : false,
-			height : 28,
-			items : [
-				{xtype:'tbtext',text:'&nbsp;日期:'}, c.dateCombo, 
-			    {xtype:'tbtext',text:'&nbsp;'},  c.beginDate,
-			    {xtype:'tbtext',text:'&nbsp;至&nbsp;'}, c.endDate, 
-			    {xtype : 'tbtext', text : '&nbsp;&nbsp;'},
-				{xtype : 'tbtext', text : '市别:'},
-				{
-					xtype : 'combo',
-					forceSelection : true,
-					width : 90,
-					value : -1,
-					id : c.statistic+'comboBusinessHour',
-					store : new Ext.data.SimpleStore({
-						fields : ['id', 'name']
-					}),
-					valueField : 'id',
-					displayField : 'name',
-					typeAhead : true,
-					mode : 'local',
-					triggerAction : 'all',
-					selectOnFocus : true,
-					allowBlank : false,
-					readOnly : false,
-					listeners : {
-						render : function(thiz){
-							var data = [[-1,'全天']];
-							Ext.Ajax.request({
-								url : '../../QueryBusinessHour.do',
-								success : function(res, opt){
-									var jr = Ext.decode(res.responseText);
-									for(var i = 0; i < jr.root.length; i++){
-										data.push([jr.root[i]['id'], jr.root[i]['name'], jr.root[i]['opening'], jr.root[i]['ending']]);
-									}
-									data.push([-2,'自定义']);
-									thiz.store.loadData(data);
-									thiz.setValue(-1);
-								},
-								fialure : function(res, opt){
-									thiz.store.loadData(data);
-									thiz.setValue(-1);
-								}
-							});
-						},
-						select : function(thiz, record, index){
-							statistic_oBusinessHourData({data : record.json, type : 'set', statistic : c.statistic});
-							if(record.data.id != -2){
-								Ext.getCmp(c.statistic+'salesSubBtnSearch').handler();
-							}
-						}
-					}
-				},
-				{xtype : 'tbtext', text : '&nbsp;&nbsp;'},
-				{xtype : 'tbtext', id : c.statistic+'txtBusinessHourBegin', text : '<font style="color:green; font-size:20px">00:00</font>'},
-			    buildBusinessAPMCombo(c.statistic+'comboBusinessBeginApm'),
-			    buildBusinessHourCombo(c.statistic+'comboBegionHour'),
-				{xtype : 'tbtext', id:c.statistic+'txtBusinessHourBeginText',hidden : true,text : '时'},
-				buildBusinessMinCombo(c.statistic+'comboBegionMin'),
-				{xtype : 'tbtext', id:c.statistic+'txtBusinessMinBeginText',hidden : true,text : '分'},
-				{
-					xtype : 'tbtext',
-					hidden : false,
-					text : '&nbsp;至&nbsp;'
-				}, 
-				{xtype : 'tbtext', id : c.statistic+'txtBusinessHourEnd', text : '<font style="color:green; font-size:20px">00:00</font>'},
-			    buildBusinessAPMCombo(c.statistic+'comboBusinessEndApm'),
-				buildBusinessHourCombo(c.statistic+'comboEndHour'),
-				{xtype : 'tbtext',id:c.statistic+'txtBusinessHourEndText',hidden : true, text : '时'},
-				buildBusinessMinCombo(c.statistic+'comboEndMin'),
-				{xtype : 'tbtext', id:c.statistic+'txtBusinessMinEndText', hidden : true,text : '分'},
-				{xtype : 'tbtext', text : '&nbsp;&nbsp;'}
-			]
-		});
-	}else{ //返回包含时间工具栏的数组用于拼接
-		timeBar = [
-				{xtype:'tbtext',text:'日期:'}, c.dateCombo, 
-			    {xtype:'tbtext',text:'&nbsp;'},  c.beginDate,
-			    {xtype:'tbtext',text:'&nbsp;至&nbsp;'}, c.endDate, 
-			    {xtype : 'tbtext', text : '&nbsp;&nbsp;'},
-			    {xtype : 'tbtext', text : '市别:'},
-				{
-					xtype : 'combo',
-					forceSelection : true,
-					width : 90,
-					value : -1,
-					id : c.statistic+'comboBusinessHour',
-					store : new Ext.data.SimpleStore({
-						fields : ['id', 'name']
-					}),
-					valueField : 'id',
-					displayField : 'name',
-					typeAhead : true,
-					mode : 'local',
-					triggerAction : 'all',
-					selectOnFocus : true,
-					allowBlank : false,
-					readOnly : false,
-					listeners : {
-						render : function(thiz){
-							var data = [[-1,'全天']];
-							Ext.Ajax.request({
-								url : '../../QueryBusinessHour.do',
-								success : function(res, opt){
-									var jr = Ext.decode(res.responseText);
-									for(var i = 0; i < jr.root.length; i++){
-										data.push([jr.root[i]['id'], jr.root[i]['name'], jr.root[i]['opening'], jr.root[i]['ending']]);
-									}
-									data.push([-2,'自定义']);
-									thiz.store.loadData(data);
-									thiz.setValue(-1);
-								},
-								fialure : function(res, opt){
-									thiz.store.loadData(data);
-									thiz.setValue(-1);
-								}
-							});
-						},
-						select : function(thiz, record, index){
-							statistic_oBusinessHourData({data : record.json, type : 'set', statistic : c.statistic});
-							if(record.data.id != -2){
-								Ext.getCmp(c.statistic+'salesSubBtnSearch').handler();
-							}
-
-						}
-					}
-				},
-				{xtype : 'tbtext', text : '&nbsp;&nbsp;'},
-				{xtype : 'tbtext', id : c.statistic+'txtBusinessHourBegin', text : '<font style="color:green; font-size:20px">00:00</font>'},
-			    buildBusinessAPMCombo(c.statistic+'comboBusinessBeginApm'),
-				 buildBusinessHourCombo(c.statistic+'comboBegionHour'),
-				{xtype : 'tbtext', id:c.statistic+'txtBusinessHourBeginText',hidden : true,text : '时'},
-				buildBusinessMinCombo(c.statistic+'comboBegionMin'),
-				{xtype : 'tbtext', id:c.statistic+'txtBusinessMinBeginText',hidden : true,text : '分'},
-				{
-					xtype : 'tbtext',
-					hidden : false,
-					text : '&nbsp;至&nbsp;'
-				}, 
-				{xtype : 'tbtext', id : c.statistic+'txtBusinessHourEnd', text : '<font style="color:green; font-size:20px">00:00</font>'},
-			    buildBusinessAPMCombo(c.statistic+'comboBusinessEndApm'),
-				 buildBusinessHourCombo(c.statistic+'comboEndHour'),
-				{xtype : 'tbtext',id:c.statistic+'txtBusinessHourEndText',hidden : true, text : '时'},
-				buildBusinessMinCombo(c.statistic+'comboEndMin'),
-				{xtype : 'tbtext', id:c.statistic+'txtBusinessMinEndText', hidden : true,text : '分'},
-				{xtype : 'tbtext', text : '&nbsp;&nbsp;'}];
-	}
-
-	return timeBar;
-}
-
 function orderFoodStatPanelInit(){
 	orderFoodStatPanelDeptTree = new Ext.tree.TreePanel({
 		id : 'orderFoodStatPanelDeptTree',
@@ -452,7 +101,7 @@ function orderFoodStatPanelInit(){
         		salesSubDeptId = e.attributes.deptID;
         	},
         	dblclick : function(e){
-        		Ext.getCmp('foodStatistic_salesSubBtnSearch').handler();
+        		Ext.getCmp('foodStatistic_SubBtnSearch').handler();
         	}
         }
 	});
@@ -484,7 +133,7 @@ function orderFoodStatPanelInit(){
 		beginDate : beginDate,
 		endDate : endDate,
 		callback : function(){
-			Ext.getCmp('foodStatistic_salesSubBtnSearch').handler();
+			Ext.getCmp('foodStatistic_SubBtnSearch').handler();
 		}
 	});
 	var foodName = new Ext.form.TextField({
@@ -502,7 +151,7 @@ function orderFoodStatPanelInit(){
 	    '->', {
 		text : '搜索',
 		iconCls : 'btn_search',
-		id : 'foodStatistic_salesSubBtnSearch',
+		id : 'foodStatistic_SubBtnSearch',
 		handler : function(){
 			var bd = beginDate.getValue();
 			var ed = endDate.getValue();
@@ -516,19 +165,14 @@ function orderFoodStatPanelInit(){
 				Ext.ux.checkDuft(false, beginDate.getId(), endDate.getId());
 			}
 			var gs = orderFoodStatPanelGrid.getStore();
-			var data = statistic_oBusinessHourData({type : 'get', statistic : 'foodStatistic_'}).data;
+			var data = Ext.ux.statistic_oBusinessHourData({type : 'get', statistic : 'foodStatistic_'}).data;
 			gs.baseParams['dateBeg'] = beginDate.getRawValue();
 			gs.baseParams['dateEnd'] = endDate.getRawValue();
 			gs.baseParams['deptID'] = salesSubDeptId;
 			gs.baseParams['foodName'] = foodName.getValue();
 			gs.baseParams['region'] = Ext.getCmp("foodStatistic_comboRegion").getValue();
-			if(parseInt(data.businessHourType) != -1){
-				gs.baseParams['opening'] = data.opening;
-				gs.baseParams['ending'] = data.ending;
-			}else{
-				gs.baseParams['opening'] = '';
-				gs.baseParams['ending'] = '';			
-			}
+			gs.baseParams['opening'] = data.opening;
+			gs.baseParams['ending'] = data.ending;
 			gs.load({
 				params : {
 					start : 0,
@@ -552,7 +196,7 @@ function orderFoodStatPanelInit(){
 			}
 			
 			var opening, ending;
-			var businessHour = statistic_oBusinessHourData({type : 'get', statistic : 'foodStatistic_'}).data;
+			var businessHour = Ext.ux.statistic_oBusinessHourData({type : 'get', statistic : 'foodStatistic_'}).data;
 			if(parseInt(businessHour.businessHourType) != -1){
 				opening = businessHour.opening;
 				ending = businessHour.ending;
@@ -606,13 +250,13 @@ function orderFoodStatPanelInit(){
 		[ ['isPaging', true], ['dataType', 1], ['queryType', 1]],
 		SALESSUB_PAGE_LIMIT,
 		'',
-		[orderFoodStatPanelGridTbar, initTimeBar({beginDate:beginDate, endDate:endDate,dateCombo:dateCombo,statistic : 'foodStatistic_',tbarType: 0})]
+		[orderFoodStatPanelGridTbar, Ext.ux.initTimeBar({beginDate:beginDate, endDate:endDate,dateCombo:dateCombo,statistic : 'foodStatistic_',tbarType: 0})]
 	);
 	orderFoodStatPanelGrid.keys = [{
 		key : Ext.EventObject.ENTER,
 		scope : this,
 		fn : function(){
-			Ext.getCmp('foodStatistic_salesSubBtnSearch').handler();
+			Ext.getCmp('foodStatistic_SubBtnSearch').handler();
 		}
 	}];
 	orderFoodStatPanelGrid.region = 'center';
@@ -678,7 +322,7 @@ function kitchenStatPanelInit(){
 		beginDate : beginDate,
 		endDate : endDate,
 		callback : function(){
-			Ext.getCmp('kitchenStatistic_salesSubBtnSearch').handler();
+			Ext.getCmp('kitchenStatistic_SubBtnSearch').handler();
 		}
 	});
 	
@@ -692,7 +336,7 @@ function kitchenStatPanelInit(){
 			}
 		}, '-', {
 			text : '搜索',
-			id : 'kitchenStatistic_salesSubBtnSearch',
+			id : 'kitchenStatistic_SubBtnSearch',
 			iconCls : 'btn_search',
 			handler : function(){
 				var bd = beginDate.getValue();
@@ -706,17 +350,12 @@ function kitchenStatPanelInit(){
 					Ext.ux.checkDuft(false, beginDate.getId(), endDate.getId());
 				}
 				var gs = kitchenStatPanelGrid.getStore();
-				var data = statistic_oBusinessHourData({type : 'get', statistic : 'kitchenStatistic_'}).data;
+				var data = Ext.ux.statistic_oBusinessHourData({type : 'get', statistic : 'kitchenStatistic_'}).data;
 				gs.baseParams['dateBeg'] = beginDate.getRawValue();
 				gs.baseParams['dateEnd'] = endDate.getRawValue();
 				gs.baseParams['region'] = Ext.getCmp("kitchenStatistic_comboRegion").getValue();
-				if(parseInt(data.businessHourType) != -1){
-					gs.baseParams['opening'] = data.opening;
-					gs.baseParams['ending'] = data.ending;
-				}else{
-					gs.baseParams['opening'] = '';
-					gs.baseParams['ending'] = '';					
-				}
+				gs.baseParams['opening'] = data.opening;
+				gs.baseParams['ending'] = data.ending;
 				gs.load();
 				kitchenStatPanelGrid.getView().expandAllGroups();
 			}
@@ -736,7 +375,7 @@ function kitchenStatPanelInit(){
 					Ext.ux.checkDuft(false, beginDate.getId(), endDate.getId());
 				}
 				var opening, ending;
-				var businessHour = statistic_oBusinessHourData({type : 'get', statistic : 'kitchenStatistic_'}).data;
+				var businessHour = Ext.ux.statistic_oBusinessHourData({type : 'get', statistic : 'kitchenStatistic_'}).data;
 				if(parseInt(businessHour.businessHourType) != -1){
 					opening = businessHour.opening;
 					ending = businessHour.ending;
@@ -762,7 +401,7 @@ function kitchenStatPanelInit(){
 	
 	var kitchenStatPanelGridTbar = new Ext.Toolbar({
 		height : 26,
-		items : [initTimeBar({beginDate:beginDate, endDate:endDate,dateCombo:dateCombo, tbarType : 1, statistic : 'kitchenStatistic_'}).concat(kitchenStatPanelGridTbarItem)]
+		items : [Ext.ux.initTimeBar({beginDate:beginDate, endDate:endDate,dateCombo:dateCombo, tbarType : 1, statistic : 'kitchenStatistic_'}).concat(kitchenStatPanelGridTbarItem)]
 	});
 	
 	kitchenStatPanelGrid = createGridPanel(
@@ -836,7 +475,7 @@ function deptStatPanelInit(){
 		beginDate : beginDate,
 		endDate : endDate,
 		callback : function(){
-			Ext.getCmp('deptStatistic_salesSubBtnSearch').handler();
+			Ext.getCmp('deptStatistic_SubBtnSearch').handler();
 		}
 	});
 	
@@ -845,7 +484,7 @@ function deptStatPanelInit(){
 		initRegionCombo('deptStatistic_'),
 		'->', {
 			text : '搜索',
-			id : 'deptStatistic_salesSubBtnSearch',
+			id : 'deptStatistic_SubBtnSearch',
 			iconCls : 'btn_search',
 			handler : function(){
 				var bd = beginDate.getValue();
@@ -859,17 +498,12 @@ function deptStatPanelInit(){
 					Ext.ux.checkDuft(false, beginDate.getId(), endDate.getId());
 				}
 				var gs = deptStatPanelGrid.getStore();
-				var data = statistic_oBusinessHourData({type : 'get', statistic : 'deptStatistic_'}).data;
+				var data = Ext.ux.statistic_oBusinessHourData({type : 'get', statistic : 'deptStatistic_'}).data;
 				gs.baseParams['dateBeg'] = beginDate.getRawValue();
 				gs.baseParams['dateEnd'] = endDate.getRawValue();
 				gs.baseParams['region'] = Ext.getCmp("deptStatistic_comboRegion").getValue();
-				if(parseInt(data.businessHourType) != -1){
-					gs.baseParams['opening'] = data.opening;
-					gs.baseParams['ending'] = data.ending;
-				}else{
-					gs.baseParams['opening'] = '';
-					gs.baseParams['ending'] = '';
-				}
+				gs.baseParams['opening'] = data.opening;
+				gs.baseParams['ending'] = data.ending;
 				
 				gs.load();
 			}
@@ -890,7 +524,7 @@ function deptStatPanelInit(){
 				}
 				
 				var opening, ending;
-				var businessHour = statistic_oBusinessHourData({type : 'get', statistic : 'deptStatistic_'}).data;
+				var businessHour = Ext.ux.statistic_oBusinessHourData({type : 'get', statistic : 'deptStatistic_'}).data;
 				if(parseInt(businessHour.businessHourType) != -1){
 					opening = businessHour.opening;
 					ending = businessHour.ending;
@@ -917,7 +551,7 @@ function deptStatPanelInit(){
 	
 	deptStatPanelGridTbar = new Ext.Toolbar({
 		height : 26,
-		items : [initTimeBar({dateCombo:dateCombo, beginDate: beginDate, endDate:endDate, statistic : 'deptStatistic_'}).concat(deptStatPanelGridTbarItem)]
+		items : [Ext.ux.initTimeBar({dateCombo:dateCombo, beginDate: beginDate, endDate:endDate, statistic : 'deptStatistic_'}).concat(deptStatPanelGridTbarItem)]
 	});
 	
 	

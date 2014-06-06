@@ -419,6 +419,7 @@ function dailySettleButHandler(){
 
 
 function paymentDaYin(e){
+	var regionId = Ext.getCmp('cbox_paymentRegion').getValue();
 	var tempMask = new Ext.LoadMask(document.body, {
 		msg : '正在打印请稍候.......',
 		remove : true
@@ -429,7 +430,8 @@ function paymentDaYin(e){
 		params : {
 			onDuty : dutyRange.onDutyFormat,
 			offDuty : dutyRange.offDutyFormat,
-			'printType' : 12
+			'printType' : 12,
+			regionId : (regionId ? Ext.getCmp('payment_comboRegion').getValue() : '')
 		},
 		success : function(response, options) {
 			tempMask.hide();
@@ -458,10 +460,91 @@ function paymentHandler(){
 		resizable : false,	
 		layout: 'fit',
 		bbar : ['->', {
+			xtype : 'checkbox',
+			id : 'cbox_paymentRegion',
+			boxLabel : '选择区域&nbsp;&nbsp;',
+			listeners : {
+				check : function(thiz, checked){
+				if(checked){
+					Ext.getCmp('payment_comboRegion').show();
+				}else{
+					Ext.getCmp('payment_comboRegion').hide();
+				}
+			}
+			}
+		},{
+			xtype : 'combo',
+			hidden : true,
+			forceSelection : true,
+			width : 90,
+			value : -1,
+			id : 'payment_comboRegion',
+			store : new Ext.data.SimpleStore({
+				fields : ['id', 'name']
+			}),
+			valueField : 'id',
+			displayField : 'name',
+			typeAhead : true,
+			mode : 'local',
+			triggerAction : 'all',
+			selectOnFocus : true,
+			allowBlank : false,
+			readOnly : false,
+			listeners : {
+				render : function(thiz){
+					var data = [];
+//					Ext.Ajax.request({
+//						url : '../../QueryRegion.do',
+//						params : {
+//							dataSource : 'normal'
+//						},
+//						success : function(res, opt){
+//							var jr = Ext.decode(res.responseText);
+//							for(var i = 0; i < jr.root.length; i++){
+//								data.push([jr.root[i]['id'], jr.root[i]['name']]);
+//							}
+//							thiz.store.loadData(data);
+//							thiz.setValue(jr.root[0].id);
+//						},
+//						fialure : function(res, opt){
+//							thiz.store.loadData(data);
+//							thiz.setValue(-1);
+//						}
+//					});
+					$.ajax({
+						url : '../../QueryRegion.do',
+						type : 'post',
+						async: false,
+						data : {dataSource : 'normal'},
+						success : function(jr, status, xhr){
+//							var jr = Ext.decode(res.responseText);
+							for(var i = 0; i < jr.root.length; i++){
+								data.push([jr.root[i]['id'], jr.root[i]['name']]);
+							}
+							thiz.store.loadData(data);
+							thiz.setValue(jr.root[0].id);
+						},
+						error : function(request, status, err){
+							thiz.store.loadData(data);
+							thiz.setValue(-1);
+						}
+					}); 
+				}
+			}
+		},{
 			text : "交款",
 			icon: '../../images/user.png',
 			id : 'btnPayment',
 			handler : function() {
+				var paymentRegion = '';
+				var paymentCheck = Ext.getCmp('cbox_paymentRegion');
+				if(paymentCheck.getValue()){
+					paymentRegion = Ext.getCmp('payment_comboRegion').getValue();
+					Ext.ux.setCookie(document.domain+'_paymentCheck', true, 3650);
+					Ext.ux.setCookie(document.domain+'_paymentRegion', paymentRegion, 3650);
+				}else{
+					Ext.ux.setCookie(document.domain+'_paymentCheck', false, 3650);
+				}
 				dutyRange = getDutyRange();
 				Ext.MessageBox.show({
 					msg : "确认进行交款？",
@@ -471,6 +554,7 @@ function paymentHandler(){
 						if(btn == "yes"){
 							Ext.Ajax.request({
 								url : "../../DoPayment.do",
+								params : {paymentRegion:paymentRegion},
 								success : function(response, options) {
 									var resultJSON = Ext.util.JSON.decode(response.responseText);
 									if (resultJSON.success == true) {
@@ -497,6 +581,7 @@ function paymentHandler(){
 						}
 					}
 				});
+				
 			}
 		}, {
 			text : '预打',
@@ -534,7 +619,7 @@ function paymentHandler(){
 					params : {
 						queryPattern : 4,
 						queryType : 2,
-						businessStatic : 1
+						businessStatic : 2
 					}
 				});
 			}
@@ -542,6 +627,14 @@ function paymentHandler(){
 	});
 	businessStatWin.show();
 	businessStatWin.center();
+	
+	if(Ext.ux.getCookie(document.domain+'_paymentCheck') == 'true'){
+		Ext.getCmp('cbox_paymentRegion').setValue(true);
+		Ext.getCmp('payment_comboRegion').setValue(parseInt(Ext.ux.getCookie(document.domain+'_paymentRegion')));
+	}else{
+		Ext.getCmp('cbox_paymentRegion').setValue(false);
+	}
+	
 }
 
 var shiftBut = new Ext.ux.ImageButton({
@@ -1536,9 +1629,8 @@ Ext.onReady(function() {
 			"->",
 			billsBut,
 			{text : "&nbsp;&nbsp;&nbsp;", xtype : 'tbtext' },
-			//FIXME 逻辑不对
-//			paymentBut,
-//			{text : "&nbsp;&nbsp;&nbsp;", xtype : 'tbtext' },
+			paymentBut,
+			{text : "&nbsp;&nbsp;&nbsp;", xtype : 'tbtext' },
 			shiftBut,
 			{text : "&nbsp;&nbsp;&nbsp;", xtype : 'tbtext' },			
 			dailySettleBut,

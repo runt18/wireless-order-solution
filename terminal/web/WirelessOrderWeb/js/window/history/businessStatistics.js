@@ -107,6 +107,7 @@ Ext.onReady(function(){
 			}
 		}],
 		tbar : new Ext.Toolbar({
+			id : 'businessStatisticTbar',
 			height : 26,
 			items : [ {
 				xtype : 'tbtext',
@@ -127,7 +128,6 @@ Ext.onReady(function(){
 					var params = {
 							dataSource : dataSource,
 							queryPattern : queryPattern,
-							restaurantID : restaurantID,
 							onDuty : paramsOnDuty,
 							offDuty : paramsOffDuty,
 							dutyRange : dutyRange
@@ -169,16 +169,19 @@ Ext.onReady(function(){
 								var deptStat = business.deptStat;
 								
 								var trContent = '';
-								for(var i = 0; i < deptStat.length; i++){
-									var temp = deptStat[i];
-									trContent += (String.format(trModel, 
-											temp.dept.name, 
-											temp.discountPrice.toFixed(2), 
-											temp.giftPrice.toFixed(2), 
-											temp.income.toFixed(2)
-										)
-									);
+								if(businessStatic != 2){
+									for(var i = 0; i < deptStat.length; i++){
+										var temp = deptStat[i];
+										trContent += (String.format(trModel, 
+												temp.dept.name, 
+												temp.discountPrice.toFixed(2), 
+												temp.giftPrice.toFixed(2), 
+												temp.income.toFixed(2)
+											)
+										);
+									}
 								}
+
 								
 								var memberTrDate = String.format(memberTrModel, business.memberChargeByCash.toFixed(2), business.memberChargeByCard.toFixed(2), business.memberAccountCharge.toFixed(2),
 																business.memberRefund.toFixed(2), 0.00, business.memberAccountRefund.toFixed(2));
@@ -312,6 +315,10 @@ Ext.onReady(function(){
 					dateCombo.setDisabled(true);
 					beginDate.setDisabled(true);
 					endDate.setDisabled(true);
+					
+					if(queryPattern == 5){
+						Ext.getCmp('businessStatisticTbar').hide();
+					}
 				}
 			}
 		}
@@ -324,4 +331,13 @@ function getDutyRange(){
 	dutyRangeForPrinter.onDutyFormat = business.paramsOnDuty;
 	dutyRangeForPrinter.offDutyFormat = business.paramsOffDuty;
 	return dutyRangeForPrinter;
+}
+
+function loadPaymentGeneral(c){
+	onDuty = c.onDuty;
+	offDuty = c.offDuty;
+	dataSource = c.dataSource;
+	queryPattern = c.queryPattern;
+	businessStatic = c.businessStatic;
+	Ext.getCmp('btnSearchForBusinessStatisticsSummaryInformation').handler();
 }

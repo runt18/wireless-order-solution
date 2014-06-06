@@ -1,274 +1,386 @@
 ﻿receivablesStaticRecordCount = 22;
+var highChart;
 
-var receivablesStatResultStore = new Ext.data.Store({
-	proxy : new Ext.data.HttpProxy({
-		url : "../../BusinessReceiptsStatistics.do"
-	}),
-	baseParams : {
-		dataSource : 'normal',
-		restaurantID : restaurantID,
-		isPaging : true,
-		StatisticsType : 'History'
-	},
-	reader : new Ext.data.JsonReader({
-		totalProperty : "totalProperty",
-		root : "root"
-	}, [ {
-		name : "offDuty"
-	}, {
-		name : 'offDutyToDate'
-	}, {
-		name : "orderAmount"
-	}, {
-		name : "cashAmount"
-	}, {
-		name : "cashIncome2"
-	}, {
-		name : "creditCardAmount"
-	},{
-		name : "creditCardIncome2"
-	}, {
-		name : "hangAmount"
-	}, {
-		name : "hangIncome2"
-	}, {
-		name : "signAmount"
-	}, {
-		name : "signIncome2"
-	}, {
-		name : "memberAmount"
-	}, {
-		name : "memberActual"
-	}, {
-		name : "paidIncome"
-	}, {
-		name : "discountIncome"
-	}, {
-		name : "giftIncome"
-	}, {
-		name : "cancelIncome"
-	}, {
-		name : "eraseAmount"
-	}, {
-		name : "eraseIncome"
-	}, {
-		name : "couponAmount"
-	}, {
-		name : "couponIncome"
-	}, {
-		name : "totalIncome"
-	}, {
-		name : "totalActual"
-	}, {
-		name : "totalActualCharge"
-	}, {
-		name : "totalActualRefund"
-	}]),
-	listeners : {
-		load : function(thiz, rs, options){
-			var sr = rs[rs.length-1];
-			thiz.remove(sr);
+var tempLoadMask = new Ext.LoadMask(document.body, {
+	msg : '正在获取信息, 请稍候......',
+	remove : true
+});
+
+
+function initBusinessReceipsData(c){
+	tempLoadMask.show();
+	Ext.Ajax.request({
+		url : '../../BusinessReceiptsStatistics.do',
+		params : {
+			includingChart : true,
+			dataSource : 'normal',
+			isPaging : true,
+			StatisticsType : 'History',
+			dateBegin : c.dateBegin,
+			dateEnd : c.dateEnd,
+			opening : c.opening,
+			ending : c.ending
 			
-			var onDuty = Ext.getDom('panelOfReceivablesStatOnDuty');
-			var offDuty = Ext.getDom('panelOfReceivablesStatOffDuty');
-			var totalPrice = Ext.getDom('panelOfReceivablesStatSumTotalPrice');
-			var orderAmount = Ext.getDom('panelOfReceivablesStatSumOrderAmount');
+		},
+		success : function(res, opt){
+			tempLoadMask.hide();
+			var jr = Ext.util.JSON.decode(res.responseText);
+			if(jr.success){
+				receivablesStatResultGrid.getStore().loadData(jr);
+				showChart(jr);
+			}else{
+				Ext.ux.showMsg(jr);
+			}
 			
-			var cashIncome = Ext.getDom('panelOfReceivablesStatSumCashIncome');
-			var cashAmount = Ext.getDom('panelOfReceivablesStatSumCashAmount');
-			var creditCardIncome = Ext.getDom('panelOfReceivablesStatSumCreditCardIncome');
-			var creditCardAmount = Ext.getDom('panelOfReceivablesStatSumCreditCardAmount');
-			var hangIncome = Ext.getDom('panelOfReceivablesStatSumHangIncome');
-			var hangAmount = Ext.getDom('panelOfReceivablesStatSumHangAmount');
-			var signIncome = Ext.getDom('panelOfReceivablesStatSumSignIncome');
-			var signAmount = Ext.getDom('panelOfReceivablesStatSumSignAmount');
-			var memberActual = Ext.getDom('panelOfReceivablesStatSumMemberActual');
-			var memberAmount = Ext.getDom('panelOfReceivablesStatSumMemberAmount');
-			var couponIncome = Ext.getDom('panelOfReceivablesStatSumCouponIncome');
-			var couponAmount = Ext.getDom('panelOfReceivablesStatSumCouponAmount');
-			
-			onDuty.innerHTML = Ext.getCmp('receipts_dateSearchDateBegin').getValue().format('Y-m-d');
-			offDuty.innerHTML = Ext.getCmp('receipts_dateSearchDateEnd').getValue().format('Y-m-d');
-			
-			totalPrice.innerHTML = sr.get('totalActual').toFixed(2);
-			orderAmount.innerHTML = sr.get('orderAmount');
-			
-			cashIncome.innerHTML = sr.get('cashIncome2').toFixed(2);
-			cashAmount.innerHTML = sr.get('cashAmount');
-			creditCardIncome.innerHTML = sr.get('creditCardIncome2').toFixed(2);
-			creditCardAmount.innerHTML = sr.get('creditCardAmount');
-			hangIncome.innerHTML = sr.get('hangIncome2').toFixed(2);
-			hangAmount.innerHTML = sr.get('hangAmount');
-			signIncome.innerHTML = sr.get('signIncome2').toFixed(2);
-			signAmount.innerHTML = sr.get('signAmount');
-			memberActual.innerHTML = sr.get('memberActual').toFixed(2);
-			memberAmount.innerHTML = sr.get('memberAmount');
-			couponIncome.innerHTML = sr.get('couponIncome').toFixed(2);
-			couponAmount.innerHTML = sr.get('couponAmount');
+		},
+		failure : function(res, opt){
+			tempLoadMask.hide();
+			Ext.ux.showMsg(Ext.util.JSON.decode(res.responseText));
 		}
-	}
-});
+	});
+}
 
-// 2，栏位模型
-var receivablesStatResultColumnModel = new Ext.grid.ColumnModel([
-	new Ext.grid.RowNumberer(), {
-		header : '日期',
-		dataIndex : 'offDutyToDate',
-		width : 100
-	}, {
-		header : '应收',
-		dataIndex : 'totalIncome',
-		renderer : Ext.ux.txtFormat.gridDou,
-		align : 'right',
-		width : 100
-	}, {
-		header : '实收',
-		dataIndex : 'totalActual',
-		renderer : Ext.ux.txtFormat.gridDou,
-		align : 'right',
-		width : 100
-	}, {
-		header : '账单数',
-		dataIndex : 'orderAmount',
-		align : 'right',
-		width : 70
-	}, {
-		header : '现金',
-		dataIndex : 'cashIncome2',
-		renderer : Ext.ux.txtFormat.gridDou,
-		align : 'right',
-		width : 100
-	}, {
-		header : '刷卡',
-		dataIndex : 'creditCardIncome2',
-		renderer : Ext.ux.txtFormat.gridDou,
-		align : 'right',
-		width : 70
-	}, {
-		header : '会员',
-		dataIndex : 'memberActual',
-		renderer : Ext.ux.txtFormat.gridDou,
-		align : 'right',
-		width : 70
-	}, {
-		header : '挂账',
-		dataIndex : 'hangIncome2',
-		renderer : Ext.ux.txtFormat.gridDou,
-		align : 'right',
-		width : 70
-	}, {
-		header : '签单',
-		dataIndex : 'signIncome2',
-		renderer : Ext.ux.txtFormat.gridDou,
-		align : 'right',
-		width : 70
-	}, {
-		header : '折扣',
-		dataIndex : 'discountIncome',
-		renderer : Ext.ux.txtFormat.gridDou,
-		align : 'right',
-		width : 70
-	}, {
-		header : '赠送',
-		dataIndex : 'giftIncome',
-		renderer : Ext.ux.txtFormat.gridDou,
-		align : 'right',
-		width : 70
-	}, {
-		header : '退菜',
-		dataIndex : 'cancelIncome',
-		renderer : Ext.ux.txtFormat.gridDou,
-		align : 'right',
-		width : 70
-	}, {
-		header : '抹数',
-		dataIndex : 'eraseIncome',
-		renderer : Ext.ux.txtFormat.gridDou,
-		align : 'right',
-		width : 70
-	}, {
-		header : '反结帐',
-		dataIndex : 'paidIncome',
-		renderer : Ext.ux.txtFormat.gridDou,
-		align : 'right',
-		width : 70
-	}, {
-		header : '优惠劵',
-		dataIndex : 'couponIncome',
-		renderer : Ext.ux.txtFormat.gridDou,
-		align : 'right',
-		width : 70
-	}, {
-		header : '会员充值',
-		dataIndex : 'totalActualCharge',
-		renderer : Ext.ux.txtFormat.gridDou,
-		align : 'right',
-		width : 90
-	}, {
-		header : '会员退款',
-		dataIndex : 'totalActualRefund',
-		renderer : Ext.ux.txtFormat.gridDou,
-		align : 'right',
-		width : 90
-	}
-]);
+function newDate(str) { 
+	str = str.split('-'); 
+	var date = new Date(); 
+	date.setUTCFullYear(str[0], str[1] - 1, str[2]); 
+	date.setUTCHours(0, 0, 0, 0); 
+	return date; 
+} 
 
-var receipts_beginDate = new Ext.form.DateField({
-	xtype : 'datefield',	
-	id : 'receipts_dateSearchDateBegin',
-	format : 'Y-m-d',
-	width : 100,
-	maxValue : new Date(),
-	readOnly : false,
-	allowBlank : false
-});
-var receipts_endDate = new Ext.form.DateField({
-	xtype : 'datefield',
-	id : 'receipts_dateSearchDateEnd',
-	format : 'Y-m-d',
-	width : 100,
-	maxValue : new Date(),
-	readOnly : false,
-	allowBlank : false
-});
-var receipts_dateCombo = Ext.ux.createDateCombo({
-	width : 90,
-	beginDate : receipts_beginDate,
-	endDate : receipts_endDate,
-	callback : function(){
-		Ext.getCmp('btnSearchReceivablesStat').handler();
-	}
-});
+function each(x){
+	var date = newDate(x).getTime();
+	businessStatWin = new Ext.Window({
+		title : '营业统计 -- <font style="color:green;">历史</font>',
+		id : 'businessDetailWin',
+		width : 885,
+		height : 580,
+		closable : false,
+		modal : true,
+		resizable : false,	
+		layout: 'fit',
+		bbar : ['->', {
+			text : '关闭',
+			iconCls : 'btn_close',
+			handler : function(){
+				businessStatWin.destroy();
+			}
+		}],
+		keys : [{
+			key : Ext.EventObject.ESC,
+			scope : this,
+			fn : function(){
+				businessStatWin.destroy();
+			}
+		}],
+		listeners : {
+			hide : function(thiz){
+				thiz.body.update('');
+			},
+			show : function(thiz){
+				thiz.load({
+					autoLoad : false,
+					url : '../window/history/businessStatistics.jsp',
+					scripts : true,
+					nocache : true,
+					text : '功能加载中, 请稍后......',
+					params : {
+						dataSource : 'history',
+						dutyRange : "range",
+						offDuty : date,
+						onDuty : date,
+						queryPattern : 3
+					}
+				});
+			}
+		}
+	});
+	businessStatWin.show();
+	businessStatWin.center();
+}
 
-var receivablesStatResultGrid = new Ext.grid.GridPanel({
-	xtype : "grid",
-//	frame : true,
-	border : false,
-	region : 'center',
-	ds : receivablesStatResultStore,
-	autoScroll : true,
-	loadMask : {
-		msg : "数据加载中，请稍等..."
-	},
-	cm : receivablesStatResultColumnModel,
-	sm : new Ext.grid.RowSelectionModel({
-		singleSelect : true
-	}),
-	tbar : [{
-		xtype : 'tbtext',
-		text : '日期:&nbsp;'
-	},
-	receipts_dateCombo,
-	{xtype : 'tbtext', text : '&nbsp;'},
-	receipts_beginDate,
-	{
-		xtype : 'tbtext',
-		text : '&nbsp;至&nbsp;'
-	},
-	receipts_endDate,
-	'->', {
+function showChart(jdata){
+	var dateBegin = Ext.getCmp('receipts_dateSearchDateBegin').getValue().format('Y-m-d');
+	var dateEnd = Ext.getCmp('receipts_dateSearchDateEnd').getValue().format('Y-m-d');
+	
+	var chartData = eval('(' + jdata.other.chart + ')');
+	highChart = new Highcharts.Chart({
+		plotOptions : {
+			line : {
+				cursor : 'pointer',
+				dataLabels : {
+					enabled : true,
+					style : {
+						fontWeight: 'bold', 
+						color: 'green' 
+					}
+				},
+				events : {
+					click : function(e){
+						each(e.point.category);
+					}
+				}
+			}
+		},
+        chart: {  
+        	renderTo: 'businessReceiptsChart'
+    	}, 
+        title: {
+            text: '<b>营业走势图（'+dateBegin+ '至' +dateEnd+'）</b>'
+        },
+        labels: {
+        	items : [{
+        		html : '<b>总营业额:' + chartData.totalMoney + ' 元</b><br><b>日均收入:' + chartData.avgMoney + ' 元</b><br><b>日均账单:' + chartData.avgCount + ' 张</b>',
+	        	style : {left :($('#businessReceiptsChart').width()*0.80), top: '0px'}
+        	}]
+        },
+        xAxis: {
+            categories: chartData.xAxis,
+            labels : {
+            	formatter : function(){
+            		return this.value.substring(5);
+            	}
+            }
+        },
+        yAxis: {
+        	min: 0,
+            title: {
+                text: '金额 (元)'
+            },
+            plotLines: [{
+                value: 0,
+                width: 2,
+                color: '#808080'
+            }]
+        },
+        tooltip: {
+//	        	crosshairs: true,
+            formatter: function() {
+                return '<b>' + this.series.name + '</b><br/>'+
+                    this.x +': '+ '<b>'+this.y+'</b> ';
+            }
+        },
+//	        series : [{  
+//	            name: 'aaaaaa',  
+//	            data: [6, 9, 2, 7, 13, 21, 10]
+//	        }],
+        series : chartData.ser,
+        exporting : {
+        	enabled : true
+        },
+        credits : {
+        	enabled : false
+        }
+	});
+}
+
+var receivablesStatResultGrid, receipts_dateCombo;
+function initBusinessReceipsGrid(c){
+	if(c.data == null || typeof c.data == 'undefined'){
+		c.data = {successProperty : true, totalProperty:2, root: []};
+	}
+	var receivablesStatResultStore = new Ext.data.Store({
+//		proxy : new Ext.data.HttpProxy({
+//			url : "../../BusinessReceiptsStatistics.do"
+//		}),
+		proxy : new Ext.data.MemoryProxy(c.data),
+//		baseParams : {
+//			dataSource : 'normal',
+//			restaurantID : restaurantID,
+//			isPaging : true,
+//			StatisticsType : 'History'
+//		},
+		reader : new Ext.data.JsonReader({
+			totalProperty : "totalProperty",
+			root : "root"
+		}, [ {
+			name : "totalIncome"
+		}, {
+			name : 'offDutyToDate'
+		}, {
+			name : "orderAmount"
+		}, {
+			name : "cashAmount"
+		}, {
+			name : "cashIncome2"
+		}, {
+			name : "creditCardAmount"
+		},{
+			name : "creditCardIncome2"
+		}, {
+			name : "hangAmount"
+		}, {
+			name : "hangIncome2"
+		}, {
+			name : "signAmount"
+		}, {
+			name : "signIncome2"
+		}, {
+			name : "memberAmount"
+		}, {
+			name : "memberActual"
+		}, {
+			name : "paidIncome"
+		}, {
+			name : "discountIncome"
+		}, {
+			name : "giftIncome"
+		}, {
+			name : "cancelIncome"
+		}, {
+			name : "eraseAmount"
+		}, {
+			name : "eraseIncome"
+		}, {
+			name : "couponAmount"
+		}, {
+			name : "couponIncome"
+		}, {
+			name : "offDuty"
+		}, {
+			name : "totalActual"
+		}, {
+			name : "totalActualCharge"
+		}, {
+			name : "totalActualRefund"
+		}
+		])
+	});
+	
+	// 2，栏位模型
+	var receivablesStatResultColumnModel = new Ext.grid.ColumnModel([
+		new Ext.grid.RowNumberer(), {
+			header : '日期',
+			dataIndex : 'offDutyToDate',
+			width : 100
+		}, {
+			header : '应收',
+			dataIndex : 'totalIncome',
+			renderer : Ext.ux.txtFormat.gridDou,
+			align : 'right',
+			width : 100
+		}, {
+			header : '实收',
+			dataIndex : 'totalActual',
+			renderer : Ext.ux.txtFormat.gridDou,
+			align : 'right',
+			width : 100
+		}, {
+			header : '账单数',
+			dataIndex : 'orderAmount',
+			align : 'right',
+			width : 70
+		}, {
+			header : '现金',
+			dataIndex : 'cashIncome2',
+			renderer : Ext.ux.txtFormat.gridDou,
+			align : 'right',
+			width : 100
+		}, {
+			header : '刷卡',
+			dataIndex : 'creditCardIncome2',
+			renderer : Ext.ux.txtFormat.gridDou,
+			align : 'right',
+			width : 70
+		}, {
+			header : '会员',
+			dataIndex : 'memberActual',
+			renderer : Ext.ux.txtFormat.gridDou,
+			align : 'right',
+			width : 70
+		}, {
+			header : '挂账',
+			dataIndex : 'hangIncome2',
+			renderer : Ext.ux.txtFormat.gridDou,
+			align : 'right',
+			width : 70
+		}, {
+			header : '签单',
+			dataIndex : 'signIncome2',
+			renderer : Ext.ux.txtFormat.gridDou,
+			align : 'right',
+			width : 70
+		}, {
+			header : '折扣',
+			dataIndex : 'discountIncome',
+			renderer : Ext.ux.txtFormat.gridDou,
+			align : 'right',
+			width : 70
+		}, {
+			header : '赠送',
+			dataIndex : 'giftIncome',
+			renderer : Ext.ux.txtFormat.gridDou,
+			align : 'right',
+			width : 70
+		}, {
+			header : '退菜',
+			dataIndex : 'cancelIncome',
+			renderer : Ext.ux.txtFormat.gridDou,
+			align : 'right',
+			width : 70
+		}, {
+			header : '抹数',
+			dataIndex : 'eraseIncome',
+			renderer : Ext.ux.txtFormat.gridDou,
+			align : 'right',
+			width : 70
+		}, {
+			header : '反结帐',
+			dataIndex : 'paidIncome',
+			renderer : Ext.ux.txtFormat.gridDou,
+			align : 'right',
+			width : 70
+		}, {
+			header : '优惠劵',
+			dataIndex : 'couponIncome',
+			renderer : Ext.ux.txtFormat.gridDou,
+			align : 'right',
+			width : 70
+		}, {
+			header : '会员充值',
+			dataIndex : 'totalActualCharge',
+			renderer : Ext.ux.txtFormat.gridDou,
+			align : 'right',
+			width : 90
+		}, {
+			header : '会员退款',
+			dataIndex : 'totalActualRefund',
+			renderer : Ext.ux.txtFormat.gridDou,
+			align : 'right',
+			width : 90
+		}
+	]);
+	
+	var receipts_beginDate = new Ext.form.DateField({
+		xtype : 'datefield',	
+		id : 'receipts_dateSearchDateBegin',
+		format : 'Y-m-d',
+		width : 100,
+		maxValue : new Date(),
+		readOnly : false,
+		allowBlank : false
+	});
+	var receipts_endDate = new Ext.form.DateField({
+		xtype : 'datefield',
+		id : 'receipts_dateSearchDateEnd',
+		format : 'Y-m-d',
+		width : 100,
+		maxValue : new Date(),
+		readOnly : false,
+		allowBlank : false
+	});
+	receipts_dateCombo = Ext.ux.createDateCombo({
+		width : 90,
+		beginDate : receipts_beginDate,
+		endDate : receipts_endDate,
+		callback : function(){
+			Ext.getCmp('businessReceipt_SubBtnSearch').handler();
+		}
+	});
+	
+	var businessReceiptGridTbarItem = ['->', {
 		text : '搜索',
-		id : 'btnSearchReceivablesStat',
+		id : 'businessReceipt_SubBtnSearch',
 		iconCls : 'btn_search',
 		handler : function(){
 			var dateBegin = Ext.getCmp('receipts_dateSearchDateBegin');
@@ -277,20 +389,17 @@ var receivablesStatResultGrid = new Ext.grid.GridPanel({
 			if(!dateBegin.isValid() || !dateEnd.isValid()){
 				return;
 			}
-			
-			var gs = receivablesStatResultGrid.getStore();
-			gs.baseParams['dateBegin'] = dateBegin.getValue().format('Y-m-d 00:00:00');
-			gs.baseParams['dateEnd'] = dateEnd.getValue().format('Y-m-d 23:59:59');
-			gs.load({
-				params : {
-					start : 0,
-					limit : receivablesStaticRecordCount
-				}
+			var data = Ext.ux.statistic_oBusinessHourData({type : 'get', statistic : 'businessReceipt_'}).data;
+			initBusinessReceipsData({
+				dateBegin : dateBegin.getValue().format('Y-m-d 00:00:00'), 
+				dateEnd :dateEnd.getValue().format('Y-m-d 23:59:59'),
+				opening : data.opening,
+				ending : data.ending
 			});
+			
 		}
 	}, '-', {
 		text : '导出',
-//		hidden : true,
 		iconCls : 'icon_tb_exoprt_excel',
 		handler : function(){
 			var onDuty = Ext.getCmp('receipts_dateSearchDateBegin');
@@ -309,249 +418,93 @@ var receivablesStatResultGrid = new Ext.grid.GridPanel({
 			
 			window.location = url;
 		}
-	}],
-	bbar : new Ext.PagingToolbar({
-		pageSize : receivablesStaticRecordCount,
-		store : receivablesStatResultStore,
-		displayInfo : true,
-		displayMsg : '显示第 {0} 条到 {1} 条记录，共 {2} 条',
-		emptyMsg : "没有记录"
-	})
-});
-
-var receivablesStatResultSummaryPanel = new Ext.Panel({
-	region : 'south',
-	frame : true,
-	height : 100,
-	items : [new Ext.form.FieldSet({
-		xtype : 'fieldset',
-		title : '汇总',
-		layout : 'column',
-		height : Ext.isIE ? 70 : 80 ,
-		defaults : {
-			columnWidth : .085,
-			defaults : {
-				xtype : 'panel',
-				html : '----'
+	}];
+	
+	var businessReceiptGridTbar = new Ext.Toolbar({
+		height : 26,
+		items : [Ext.ux.initTimeBar({beginDate:receipts_beginDate, endDate:receipts_endDate,dateCombo:receipts_dateCombo, tbarType : 1, statistic : 'businessReceipt_'}).concat(businessReceiptGridTbarItem)]
+	});
+	
+	receivablesStatResultGrid = new Ext.grid.GridPanel({
+		xtype : "grid",
+	//	frame : true,
+		border : false,
+		region : 'center',
+		ds : receivablesStatResultStore,
+		autoScroll : true,
+		loadMask : {
+			msg : "数据加载中，请稍等..."
+		},
+		cm : receivablesStatResultColumnModel,
+		sm : new Ext.grid.RowSelectionModel({
+			singleSelect : true
+		}),
+		listeners : {
+			dblclick : function(){
+				var data = Ext.ux.getSelData(receivablesStatResultGrid);
+				each(data['offDutyToDate']);
 			}
 		},
-		items : [{
-			columnWidth : .061,
-			items : [{
-				style : 'color:#15428B;margin-left:7px;',
-				html : '开始时间:'
-			}]
-		}, {
-			items : [{
-				style : 'text-align:right;',
-				id : 'panelOfReceivablesStatOnDuty',
-				html : '----'
-			}]
-		},{
-			items : [{
-				style : 'color:#15428B;margin-left:7px;',
-				html : '实收总额:'
-			}]
-		}, {
-			columnWidth : .035,
-			items : [{
-				style : 'text-align:right;',
-				id : 'panelOfReceivablesStatSumTotalPrice',
-				html : '----'
-			}]
-		}, {
-			items : [{
-				style : 'color:#15428B;margin-left:7px;',
-				html : '现金单总额:'
-			}]
-		}, {
-			columnWidth : .035,
-			items : [{
-				style : 'text-align:right;',
-				id : 'panelOfReceivablesStatSumCashIncome',
-				html : '----'
-			}]
-		}, {
-			items : [{
-				style : 'color:#15428B;margin-left:7px;',
-				html : '刷卡单总额:'
-			}]
-		}, {
-			columnWidth : .035,
-			items : [{
-				style : 'text-align:right;',
-				id : 'panelOfReceivablesStatSumCreditCardIncome',
-				html : '----'
-			}]
-		}, {
-			items : [{
-				style : 'color:#15428B;margin-left:7px;',
-				html : '会员单总额:'
-			}]
-		}, {
-			columnWidth : .035,
-			items : [{
-				style : 'text-align:right;',
-				id : 'panelOfReceivablesStatSumMemberActual',
-				html : '----'
-			}]
-		}, {
-			items : [{
-				style : 'color:#15428B;margin-left:7px;',
-				html : '挂账单总额:'
-			}]
-		}, {
-			columnWidth : .035,
-			items : [{
-				style : 'text-align:right;',
-				id : 'panelOfReceivablesStatSumHangIncome',
-				html : '----'
-			}]
-		}, {
-			items : [{
-				style : 'color:#15428B;margin-left:7px;',
-				html : '签单单总额:'
-			}]
-		}, {
-			columnWidth : .035,
-			items : [{
-				style : 'text-align:right;',
-				id : 'panelOfReceivablesStatSumSignIncome',
-				html : '----'
-			}]
-		},
-		{
-			items : [{
-				style : 'color:#15428B;margin-left:7px;',
-				html : '优惠劵总额:'
-			}]
-		}, {
-			columnWidth : .035,
-			items : [{
-				style : 'text-align:right;',
-				id : 'panelOfReceivablesStatSumCouponIncome',
-				html : '----'
-			}]
-		}, 
-		//***********
-		{
-			columnWidth : 1,
-			height : 10
-		}, 
-		//***********
-		{
-			columnWidth : .061,
-			items : [{
-				style : 'color:#15428B;margin-left:7px;',
-				html : '结束时间:'
-			}]
-		}, {
-			items : [{
-				id : 'panelOfReceivablesStatOffDuty',
-				style : 'text-align:right;',
-				html : '----'
-			}]
-		},  {
-			items : [{
-				style : 'color:#15428B;margin-left:7px;',
-				html : '账单总数:'
-			}]
-		}, {
-			columnWidth : .035,
-			items : [{
-				id : 'panelOfReceivablesStatSumOrderAmount',
-				style : 'text-align:right;',
-				html : '----'
-			}]
-		}, {
-			items : [{
-				style : 'color:#15428B;margin-left:7px;',
-				html : '现金单总数:'
-			}]
-		}, {
-			columnWidth : .035,
-			items : [{
-				style : 'text-align:right;',
-				id : 'panelOfReceivablesStatSumCashAmount',
-				html : '----'
-			}]
-		}, {
-			items : [{
-				style : 'color:#15428B;margin-left:7px;',
-				html : '刷卡单总数:'
-			}]
-		}, {
-			columnWidth : .035,
-			items : [{
-				style : 'text-align:right;',
-				id : 'panelOfReceivablesStatSumCreditCardAmount',
-				html : '----'
-			}]
-		},{
-			items : [{
-				style : 'color:#15428B;margin-left:7px;',
-				html : '会员单总数:'
-			}]
-		}, {
-			columnWidth : .035,
-			items : [{
-				style : 'text-align:right;',
-				id : 'panelOfReceivablesStatSumMemberAmount',
-				html : '----'
-			}]
-		},  {
-			items : [{
-				style : 'color:#15428B;margin-left:7px;',
-				html : '挂账单总数:'
-			}]
-		}, {
-			columnWidth : .035,
-			items : [{
-				style : 'text-align:right;',
-				id : 'panelOfReceivablesStatSumHangAmount',
-				html : '----'
-			}]
-		}, {
-			items : [{
-				style : 'color:#15428B;margin-left:7px;',
-				html : '签单单总数:'
-			}]
-		}, {
-			columnWidth : .035,
-			items : [{
-				style : 'text-align:right;',
-				id : 'panelOfReceivablesStatSumSignAmount',
-				html : '----'
-			}]
-		}, {
-			items : [{
-				style : 'color:#15428B;margin-left:7px;',
-				html : '优惠劵单数:'
-			}]
-		}, {
-			columnWidth : .035,
-			items : [{
-				style : 'text-align:right;',
-				id : 'panelOfReceivablesStatSumCouponAmount',
-				html : '----'
-			}]
-		}]
-	})]
-});
+		tbar : businessReceiptGridTbar,
+		bbar : new Ext.PagingToolbar({
+			pageSize : receivablesStaticRecordCount,
+			store : receivablesStatResultStore,
+			displayInfo : true,
+			displayMsg : '显示第 {0} 条到 {1} 条记录，共 {2} 条',
+			emptyMsg : "没有记录"
+		})
+	});
+	
+	receivablesStatResultStore.load();
+
+}
+
+function changeChartWidth(w,h){
+	if(highChart != undefined){
+		highChart.setSize(w, h);
+	}
+	
+}
+
 
 Ext.onReady(function(){
-
-	new Ext.Panel({
+	initBusinessReceipsGrid({data : null});
+	
+	var businessPanelHeight = 0;
+	
+	var businessPanel = new Ext.Panel({
 		renderTo : 'divBusinessReceiptStatistics',//渲染到
 		id : 'businessReceiptStatisticsPanel',
 		//solve不跟随窗口的变化而变化
 		width : parseInt(Ext.getDom('divBusinessReceiptStatistics').parentElement.style.width.replace(/px/g,'')),
-		height : parseInt(Ext.getDom('divBusinessReceiptStatistics').parentElement.style.height.replace(/px/g,'')),
+		height : parseInt(Ext.getDom('divBusinessReceiptStatistics').parentElement.style.height.replace(/px/g,'')) - 250,
 		layout:'border',
 		frame : true, //边框
 		//子集
-		items : [receivablesStatResultGrid, receivablesStatResultSummaryPanel]
+		items : [receivablesStatResultGrid],
+		listeners : {
+			bodyresize : function(e, w, h){
+				var chartHeight;
+				if(h < businessPanelHeight){
+					chartHeight = 250 + (businessPanelHeight - h);
+				}else{
+					chartHeight = 250 + (h - businessPanelHeight);
+				}
+				changeChartWidth(w,chartHeight);
+			}
+		}
 	});
+	
+	businessPanelHeight = businessPanel.getHeight();
+	
+	var rz = new Ext.Resizable(businessPanel.getEl(), {
+        wrap: true, //在构造Resizable时自动在制定的id的外边包裹一层div
+        minHeight:100, //限制改变的最小的高度
+        pinned:false, //控制可拖动区域的显示状态，false是鼠标悬停在拖拉区域上才出现
+        handles: 's'//设置拖拉的方向（n,s,e,w,all...）
+    });
+    rz.on('resize', businessPanel.syncSize, businessPanel);//注册事件(作用:将调好的大小传个scope执行)
+	
 	receipts_dateCombo.setValue(1);
 	receipts_dateCombo.fireEvent('select', null, null, 1);
 //	repaidStatisticsGrid.getStore().load();
