@@ -29,9 +29,9 @@ public class ShiftGeneralDao {
 		public ExtraCond(DateType dateType){
 			this.dateType = dateType;
 			if(this.dateType == DateType.HISTORY){
-				shiftTbl = "shift";
-			}else{
 				shiftTbl = "shift_history";
+			}else{
+				shiftTbl = "shift";
 			}
 		}
 		
@@ -115,7 +115,7 @@ public class ShiftGeneralDao {
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return getTodayShift(dbCon, staff);
+			return getToday(dbCon, staff);
 		}finally{
 			dbCon.disconnect();
 		}

@@ -135,6 +135,8 @@ public class PaymentDao {
 		return ShiftDao.getByRange(dbCon, staff, getCurrentPaymentRange(dbCon, staff), DateType.TODAY);
 	}
 	
+
+	
 	/**
 	 * Get the range to current payment.
 	 * @param dbCon
@@ -147,6 +149,16 @@ public class PaymentDao {
 	 * @throws BusinessException 
 	 * 			throws if the restaurant does NOT exist
 	 */
+	public static DutyRange getCurrentPaymentRange(Staff staff) throws SQLException, BusinessException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return getCurrentPaymentRange(dbCon, staff);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
 	private static DutyRange getCurrentPaymentRange(DBCon dbCon, Staff staff) throws SQLException, BusinessException{
 		/**
 		 * Get the latest payment date to this staff from tables below.
