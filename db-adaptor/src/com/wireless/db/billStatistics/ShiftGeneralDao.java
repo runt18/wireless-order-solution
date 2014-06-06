@@ -7,7 +7,6 @@ import java.util.List;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.shift.PaymentDao;
-import com.wireless.db.shift.PaymentDao.ExtraCond;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.billStatistics.DutyRange;
@@ -21,6 +20,37 @@ import com.wireless.util.DateType;
 
 public class ShiftGeneralDao {
 
+	public static class ExtraCond{
+		
+		private final DateType dateType;
+		private final String shiftTbl;
+		private DutyRange range; 
+		
+		public ExtraCond(DateType dateType){
+			this.dateType = dateType;
+			if(this.dateType == DateType.HISTORY){
+				shiftTbl = "shift";
+			}else{
+				shiftTbl = "shift_history";
+			}
+		}
+		
+		public ExtraCond setRange(DutyRange range){
+			this.range = range;
+			return this;
+		}
+		
+		@Override
+		public String toString(){
+			StringBuilder extraCond = new StringBuilder();
+			if(range != null){
+				extraCond.append(" AND ").append("off_duty BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'");
+			}
+			return extraCond.toString();
+		}
+		
+	}
+	
 	/**
 	 * Get the today shift general.
 	 * @param staff
@@ -29,11 +59,11 @@ public class ShiftGeneralDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static List<ShiftGeneral> getToday(Staff staff) throws SQLException{
+	public static List<ShiftGeneral> getTodayShift(Staff staff) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return getToday(dbCon, staff);
+			return getTodayShift(dbCon, staff);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -49,7 +79,7 @@ public class ShiftGeneralDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static List<ShiftGeneral> getToday(DBCon dbCon, Staff staff) throws SQLException{
+	public static List<ShiftGeneral> getTodayShift(DBCon dbCon, Staff staff) throws SQLException{
 		String sql;
 		sql = " SELECT name, on_duty, off_duty " +
 			  " FROM " +
@@ -69,6 +99,42 @@ public class ShiftGeneralDao {
 			result.add(item);
 		}
 		dbCon.rs.close();
+		
+		return result;
+	}
+	
+	/**
+	 * Get the shift and associated payment info to today.
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @return the list result {@link ShiftGeneral}
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static List<ShiftGeneral> getToday(Staff staff) throws SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return getTodayShift(dbCon, staff);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Get the shift and associated payment info to today.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @return the list result {@link ShiftGeneral}
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static List<ShiftGeneral> getToday(DBCon dbCon, Staff staff) throws SQLException{
+		String sql;
+		
+		List<ShiftGeneral> result = getByCond(dbCon, staff, new ExtraCond(DateType.TODAY), null);
 		
 		for(ShiftGeneral eachShift : result){
 			//计算每个员工的应交款项
@@ -91,7 +157,7 @@ public class ShiftGeneralDao {
 			
 			//统计交班时间内每个员工的应交款项
 			for(StaffPayment eachPayment : eachShift.getPayments()){
-				for(PaymentGeneral eachPayGeneral : PaymentDao.getByCond(dbCon, staff, new DutyRange(eachShift.getOnDuty(), eachShift.getOffDuty()), new ExtraCond(DateType.TODAY).setStaffId(eachPayment.getStaffId()))){
+				for(PaymentGeneral eachPayGeneral : PaymentDao.getByCond(dbCon, staff, new DutyRange(eachShift.getOnDuty(), eachShift.getOffDuty()), new PaymentDao.ExtraCond(DateType.TODAY).setStaffId(eachPayment.getStaffId()))){
 					eachPayment.addPaymentGeneral(eachPayGeneral);
 					try {
 						eachPayment.setActualPrice(eachPayment.getActualPrice() + PaymentDao.getDetail(dbCon, StaffDao.getStaffById(eachPayment.getStaffId()), new DutyRange(eachPayGeneral.getOnDuty(), eachPayGeneral.getOffDuty()), DateType.TODAY).getTotalActual());
@@ -108,19 +174,15 @@ public class ShiftGeneralDao {
 	 * Get the history shift general according to date range. 
 	 * @param staff
 	 * 			the staff to perform this action
-	 * @param onDuty
-	 * 			the on duty
-	 * @param offDuty
-	 * 			the off duty
 	 * @return the shift general among the range.
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static List<ShiftGeneral> getByRange(Staff staff, String onDuty, String offDuty) throws SQLException{
+	public static List<ShiftGeneral> getByRange(Staff staff, ExtraCond extraCond) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return getByRange(dbCon, staff, onDuty, offDuty);
+			return getByRange(dbCon, staff, extraCond);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -132,27 +194,23 @@ public class ShiftGeneralDao {
 	 * 			the database connection
 	 * @param staff
 	 * 			the staff to perform this action
-	 * @param onDuty
-	 * 			the on duty
-	 * @param offDuty
-	 * 			the off duty
 	 * @return the shift general among the range.
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static List<ShiftGeneral> getByRange(DBCon dbCon, Staff staff, String onDuty, String offDuty) throws SQLException{
-		return getByCond(dbCon, staff, " AND SH.off_duty BETWEEN '" + onDuty + "' AND '" + offDuty + "'", null);
+	public static List<ShiftGeneral> getByRange(DBCon dbCon, Staff staff, ExtraCond extraCond) throws SQLException{
+		return getByCond(dbCon, staff, extraCond, null);
 	}
 	
-	private static List<ShiftGeneral> getByCond(DBCon dbCon, Staff staff, String extraCond, String orderClause) throws SQLException{
+	private static List<ShiftGeneral> getByCond(DBCon dbCon, Staff staff, ExtraCond extraCond, String orderClause) throws SQLException{
 		String sql;
 		sql = " SELECT " + 
-			  " SH.restaurant_id, SH.id, SH.name, SH.on_duty, SH.off_duty " + 
-			  " FROM shift_history SH "	+
+			  " restaurant_id, id, name, on_duty, off_duty " + 
+			  " FROM " + Params.dbName + "." + extraCond.shiftTbl +
 			  " WHERE 1 = 1 " +
-			  " AND SH.restaurant_id = " + staff.getRestaurantId() +
+			  " AND restaurant_id = " + staff.getRestaurantId() +
 			  (extraCond != null ? extraCond : " ") +
-			  (orderClause != null ? orderClause : " ORDER BY SH.off_duty ");
+			  (orderClause != null ? orderClause : " ORDER BY off_duty ");
 		
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		List<ShiftGeneral> result = new ArrayList<ShiftGeneral>();
