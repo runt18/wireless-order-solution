@@ -17,7 +17,10 @@ import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.billStatistics.DutyRange;
+import com.wireless.pojo.billStatistics.PaymentGeneral;
 import com.wireless.pojo.billStatistics.ShiftGeneral;
+import com.wireless.pojo.billStatistics.ShiftGeneral.StaffPayment;
+import com.wireless.pojo.util.DateUtil;
 import com.wireless.util.DataPaging;
 import com.wireless.util.DateType;
 import com.wireless.util.WebParams;
@@ -42,7 +45,7 @@ public class DutyRangeStatisticsAction extends DispatchAction {
 		List<ShiftGeneral> list = null;
 		try{
 			String pin = (String)request.getAttribute("pin");
-			list = ShiftGeneralDao.getToday(StaffDao.verify(Integer.parseInt(pin)));
+			list = ShiftGeneralDao.getTodayShift(StaffDao.verify(Integer.parseInt(pin)));
 		}catch(BusinessException e){
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getCode(), e.getMessage());
 			e.printStackTrace();
@@ -58,6 +61,90 @@ public class DutyRangeStatisticsAction extends DispatchAction {
 		return null;
 	}
 	
+	/**
+	 * 当日交班树
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward tree(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		
+		StringBuilder jsonTree = new StringBuilder();
+		JObject jobject = new JObject();
+		List<ShiftGeneral> list = null;
+		try{
+			String pin = (String)request.getAttribute("pin");
+			list = ShiftGeneralDao.getToday(StaffDao.verify(Integer.parseInt(pin)));
+			
+			for (int i = 0; i < list.size(); i++) {
+				jsonTree.append(i > 0 ? "," : "");
+				jsonTree.append("{");
+				jsonTree.append("text:'" + DateUtil.format(list.get(i).getOnDuty()).substring(11) + " -- " + DateUtil.format(list.get(i).getOffDuty()).substring(11) + " (交班" +(i+1)+")' ");
+				jsonTree.append(",onDuty:'" + DateUtil.format(list.get(i).getOnDuty()) + "'");
+				jsonTree.append(",offDuty:'" + DateUtil.format(list.get(i).getOffDuty()) + "'");
+				jsonTree.append(",expanded : true");
+				jsonTree.append(",expandable : true");
+				jsonTree.append(",children:[");
+				jsonTree.append(getChildren(list.get(i).getPayments()));
+				jsonTree.append("]");
+				jsonTree.append("}");
+			}
+		}catch(BusinessException e){
+			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getCode(), e.getMessage());
+			e.printStackTrace();
+			
+		}catch(SQLException e){
+			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getErrorCode(), e.getMessage());
+			e.printStackTrace();
+			
+		}finally{
+			response.getWriter().print("[" + jsonTree.toString() + "]");
+		}
+		return null;
+	}
+	
+	private StringBuilder getChildren(List<StaffPayment> list) throws SQLException{
+		StringBuilder jsb = new StringBuilder();
+		
+		for(int i = 0; i < list.size(); i++){
+			if(i > 0){
+				jsb.append(",");
+			}
+			jsb.append("{");
+			jsb.append("text:'" + list.get(i).getStaffName() + " ("+ list.get(i).getTotalPrice()+" ，"+ list.get(i).getActualPrice() +")'");
+			jsb.append(",expanded : false");
+			jsb.append(",expandable : true");
+			jsb.append(",children:[");
+			jsb.append(getChildrenPayments(list.get(i).getPayments()));
+			jsb.append("]");
+			jsb.append("}");
+		}
+		
+		return jsb;
+	}
+	
+	private StringBuilder getChildrenPayments(List<PaymentGeneral> list) throws SQLException{
+		StringBuilder jsb = new StringBuilder();
+		
+		for(int i = 0; i < list.size(); i++){
+			if(i > 0){
+				jsb.append(",");
+			}
+			jsb.append("{");
+			jsb.append("leaf:true");
+			jsb.append(",text:'" + list.get(i).getOnDuty().substring(11) + " -- " + list.get(i).getOffDuty().substring(11) + "'");
+			jsb.append(",onDuty:'" + list.get(i).getOnDuty() + "'");
+			jsb.append(",offDuty:'" + list.get(i).getOffDuty() + "'");
+			jsb.append("}");
+		}
+		
+		return jsb;
+	}
 	/**
 	 * 历史交班记录
 	 * @param mapping

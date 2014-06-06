@@ -15,6 +15,8 @@ import com.wireless.json.JObject;
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.pojo.billStatistics.ShiftDetail;
+import com.wireless.pojo.staffMgr.Staff;
+import com.wireless.util.DateType;
 
 public class QueryDailySettleByNowAction extends Action{
 
@@ -25,6 +27,7 @@ public class QueryDailySettleByNowAction extends Action{
 		try{
 			String pin = (String)request.getAttribute("pin");
 			String queryType = request.getParameter("queryType");
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
 			final ShiftDetail shiftDetail;
 			if(Integer.valueOf(queryType) == 0){
@@ -32,7 +35,7 @@ public class QueryDailySettleByNowAction extends Action{
 			}else if(Integer.valueOf(queryType) == 1){
 				shiftDetail = ShiftDao.getTodayDaily(StaffDao.verify(Integer.parseInt(pin)));
 			}else if(Integer.valueOf(queryType) == 2){
-				shiftDetail = PaymentDao.getCurrentPayment(StaffDao.verify(Integer.parseInt(pin)));
+				shiftDetail = PaymentDao.getDetail(staff, PaymentDao.getCurrentPaymentRange(staff), DateType.TODAY);
 			}else{
 				shiftDetail = null;
 			}

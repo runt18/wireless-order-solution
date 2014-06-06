@@ -1,8 +1,5 @@
 package com.wireless.Actions.billStatistics;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -106,18 +103,8 @@ public class BusinessStatisticsAction extends DispatchAction {
 		JObject jObject = new JObject();
 		try{
 			String pin = (String)request.getAttribute("pin");
-			String restaurantID = request.getParameter("restaurantID");
 			String onDuty = request.getParameter("onDuty");
 			String offDuty = request.getParameter("offDuty");
-			String queryPattern = request.getParameter("queryPattern");
-			
-			Map<Object, Object> params = new HashMap<Object, Object>();
-			params.put(DateType.TODAY, DateType.TODAY.getValue());
-			params.put("pin", pin);
-			params.put("restaurantID", restaurantID);
-			params.put("onDuty", onDuty);
-			params.put("offDuty", offDuty);
-			params.put("queryPattern", queryPattern);
 			
 			final ShiftDetail sdetail = ShiftDao.getByRange(StaffDao.verify(Integer.parseInt(pin)), new DutyRange(onDuty, offDuty), DateType.TODAY);
 			

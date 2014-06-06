@@ -17,14 +17,7 @@ import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.json.JObject;
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
-import com.wireless.pojo.billStatistics.IncomeByCancel;
-import com.wireless.pojo.billStatistics.IncomeByCoupon;
-import com.wireless.pojo.billStatistics.IncomeByDiscount;
 import com.wireless.pojo.billStatistics.IncomeByEachDay;
-import com.wireless.pojo.billStatistics.IncomeByErase;
-import com.wireless.pojo.billStatistics.IncomeByGift;
-import com.wireless.pojo.billStatistics.IncomeByPay;
-import com.wireless.pojo.billStatistics.IncomeByRepaid;
 import com.wireless.pojo.util.DateUtil;
 import com.wireless.util.DataPaging;
 
@@ -36,6 +29,8 @@ public class BusinessReceiptsStatisticsAction extends DispatchAction {
 		String isPaging = request.getParameter("isPaging");
 		String start = request.getParameter("start");
 		String limit = request.getParameter("limit");
+		String includingChart = request.getParameter("includingChart");
+		
 		JObject jobject = new JObject();
 		List<IncomeByEachDay> incomesByEachDay = new ArrayList<IncomeByEachDay>();
 		try{
@@ -53,7 +48,7 @@ public class BusinessReceiptsStatisticsAction extends DispatchAction {
 				jobject.setRoot(null);
 				
 			}else{
-				IncomeByEachDay total = new IncomeByEachDay(start);
+/*				IncomeByEachDay total = new IncomeByEachDay(start);
 				IncomeByPay payTotal = new IncomeByPay();
 				IncomeByCancel cancelTotal = new IncomeByCancel();
 				IncomeByDiscount discountTotal = new IncomeByDiscount();
@@ -87,14 +82,47 @@ public class BusinessReceiptsStatisticsAction extends DispatchAction {
 				total.setIncomeByGift(giftTotal);
 				total.setIncomeByPay(payTotal);
 				total.setIncomeByRepaid(repaidTotal);
-				total.setIncomeByCoupon(couponTotal);
+				total.setIncomeByCoupon(couponTotal);*/
 				
 				jobject.setTotalProperty(incomesByEachDay.size());
 				incomesByEachDay = DataPaging.getPagingData(incomesByEachDay, isPaging, start, limit);
 				
-				incomesByEachDay.add(total);
+//				incomesByEachDay.add(total);
 				jobject.setRoot(incomesByEachDay);
 			}
+			if(includingChart != null && !includingChart.isEmpty()){
+				List<String> xAxis = new ArrayList<String>();
+				List<Float> data = new ArrayList<Float>();
+				List<Integer> countList = new ArrayList<Integer>();
+				float totalMoney = 0, totalCount = 0;
+				int count = 0;
+				for (IncomeByEachDay e : incomesByEachDay) {
+					xAxis.add("\'"+e.getDate()+"\'");
+					data.add(e.getIncomeByPay().getTotalActual());
+					countList.add(e.getTotalAmount());
+					totalMoney += e.getIncomeByPay().getTotalActual();
+					totalCount += e.getTotalAmount();
+					count ++ ;
+				}
+				
+				final String chartData = "{\"xAxis\":" + xAxis + ",\"totalMoney\" : " + totalMoney + ",\"avgMoney\" : " + Math.round((totalMoney/count)*100)/100 + ", \"avgCount\" : " + Math.round((totalCount/count)*100)/100 + 
+									",\"ser\":[{\"name\":\'营业额\', \"data\" : " + data + "},{\"name\":\'账单数\', \"data\":" + countList + "}]}";
+				jobject.setExtra(new Jsonable(){
+					@Override
+					public JsonMap toJsonMap(int flag) {
+						JsonMap jm = new JsonMap();
+						jm.putString("chart", chartData);
+						return jm;
+					}
+
+					@Override
+					public void fromJsonMap(JsonMap jsonMap, int flag) {
+						
+					}
+				
+				});
+			}
+			
 			response.getWriter().print(jobject.toString());
 		}
 		return null;

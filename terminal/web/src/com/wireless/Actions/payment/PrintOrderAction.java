@@ -23,6 +23,7 @@ import com.wireless.pack.req.ReqPrintContent;
 import com.wireless.parcel.Parcel;
 import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.printScheme.PType;
+import com.wireless.pojo.regionMgr.Region;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.DateUtil;
@@ -112,6 +113,14 @@ public class PrintOrderAction extends Action{
 				offDuty = DateUtil.parseDate(request.getParameter("offDuty"));
 			}
 			
+			String regionId = request.getParameter("regionId");
+			boolean paymentRegion;
+			if(regionId != null && !regionId.isEmpty()){
+				paymentRegion = true;
+			}else{
+				paymentRegion = false;
+			}
+			
 			ReqPrintContent reqPrintContent = null;
 			String pt = request.getParameter("printType");
 			int printType = Integer.valueOf(pt);
@@ -142,7 +151,11 @@ public class PrintOrderAction extends Action{
 					reqPrintContent = ReqPrintContent.buildReqPrintShiftReceipt(staff, new DutyRange(onDuty, offDuty), PType.PRINT_HISTORY_DAILY_SETTLE_RECEIPT);
 					break;
 				case 12:
-					reqPrintContent = ReqPrintContent.buildReqPrintShiftReceipt(staff, new DutyRange(onDuty, offDuty), PType.PRINT_PAYMENT_RECEIPT);
+					if(paymentRegion){
+						reqPrintContent = ReqPrintContent.buildReqPrintShiftReceipt(staff, new DutyRange(onDuty, offDuty), Region.RegionId.valueOf(Integer.parseInt(regionId)), PType.PRINT_PAYMENT_RECEIPT);
+					}else{
+						reqPrintContent = ReqPrintContent.buildReqPrintShiftReceipt(staff, new DutyRange(onDuty, offDuty), PType.PRINT_PAYMENT_RECEIPT);
+					}
 					break;
 				case 13:
 					reqPrintContent = ReqPrintContent.buildReqPrintShiftReceipt(staff, new DutyRange(onDuty, offDuty), PType.PRINT_HISTORY_PAYMENT_RECEIPT);

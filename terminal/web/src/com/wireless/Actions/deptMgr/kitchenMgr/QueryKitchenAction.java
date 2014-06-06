@@ -116,8 +116,6 @@ public class QueryKitchenAction extends DispatchAction {
 	private StringBuilder getChildren(List<KitchenNode> list) throws SQLException{
 		StringBuilder jsb = new StringBuilder();
 		
-//		List<Kitchen> list = KitchenDao.getByDept(staff, Department.DeptId.valueOf(deptId));
-		
 		for(int i = 0; i < list.size(); i++){
 			if(i > 0){
 				jsb.append(",");

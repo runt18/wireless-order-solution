@@ -33,6 +33,7 @@ public class QueryOrderStatisticsAction extends Action {
 			throws Exception {
 		JObject jobject = new JObject();
 		List<Order> list = null;
+		List<Order> totalList = null;
 		
 		String dateType = request.getParameter("dataType");
 		DateType dateTypeEnmu = DateType.valueOf(Integer.parseInt(dateType));
@@ -108,11 +109,15 @@ public class QueryOrderStatisticsAction extends Action {
 			if(businessHourBeg != null && !businessHourBeg.isEmpty()){
 				extraCond.setHourRange(new HourRange(businessHourBeg, businessHourEnd, DateUtil.Pattern.HOUR));
 			}
+			extraCond.addStatus(Order.Status.PAID);
+			extraCond.addStatus(Order.Status.REPAID);
+			
 			String orderClause = " ORDER BY "+ extraCond.orderTbl +".order_date ASC " + " LIMIT " + start + "," + limit;
 			
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
 			list = OrderDao.getPureOrder(staff, extraCond, orderClause);
+			totalList = OrderDao.getPureOrder(staff, extraCond, null);
 			
 			OrderSummary summary = OrderDao.getOrderSummary(staff, extraCond, dateTypeEnmu);
 			
@@ -129,11 +134,11 @@ public class QueryOrderStatisticsAction extends Action {
 			if(!list.isEmpty() && dateTypeEnmu == DateType.TODAY){
 				Order sum = new Order();
 				sum.setDestTbl(new Table());
-				for(int i = 0; i < list.size(); i++){
-					sum.setTotalPrice(sum.getTotalPrice() + list.get(i).getTotalPrice());
-					sum.setActualPrice(sum.getActualPrice() + list.get(i).getActualPrice());
+				for(int i = 0; i < totalList.size(); i++){
+					sum.setTotalPrice(sum.getTotalPrice() + totalList.get(i).getTotalPrice());
+					sum.setActualPrice(sum.getActualPrice() + totalList.get(i).getActualPrice());
 				}
-				sum.setDestTbl(list.get(0).getDestTbl());
+				sum.setDestTbl(totalList.get(0).getDestTbl());
 				list.add(sum);
 				jobject.setRoot(list);
 			}
