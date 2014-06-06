@@ -1,16 +1,81 @@
 package com.wireless.pojo.billStatistics;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.pojo.util.DateUtil;
 
 public class ShiftGeneral implements Jsonable{
 
+	public static class StaffPayment implements Jsonable{
+		private String staffName;
+		private int staffId;
+		private float totalPrice;			//应交款项
+		private float actualPrice;			//实交款项
+		private List<PaymentGeneral> paymentGenerals = new ArrayList<PaymentGeneral>();
+		
+		public String getStaffName(){
+			return this.staffName;
+		}
+		
+		public void setStaffName(String name){
+			this.staffName = name;
+		}
+		
+		public int getStaffId(){
+			return this.staffId;
+		}
+		
+		public void setStaffId(int staffId){
+			this.staffId = staffId;
+		}
+		
+		public float getTotalPrice(){
+			return this.totalPrice;
+		}
+		
+		public void setTotalPrice(float totalPrice){
+			this.totalPrice = totalPrice;
+		}
+		
+		public float getActualPrice(){
+			return this.actualPrice;
+		}
+		
+		public void setActualPrice(float actualPrice){
+			this.actualPrice = actualPrice;
+		}
+
+		public void addPaymentGeneral(PaymentGeneral paymentGeneral){
+			this.paymentGenerals.add(paymentGeneral);
+		}
+		
+		@Override
+		public JsonMap toJsonMap(int flag) {
+			JsonMap jm = new JsonMap();
+			jm.putInt("staffId", staffId);
+			jm.putString("staffName", staffName);
+			jm.putFloat("totalPayment", totalPrice);
+			jm.putFloat("actualPayment", actualPrice);
+			jm.putJsonableList("paymentGenerals", paymentGenerals, 0);
+			return jm;
+		}
+
+		@Override
+		public void fromJsonMap(JsonMap jsonMap, int flag) {
+			
+		}
+	}
+	
 	private final int id;
 	private String staffName;
 	private long onDuty;
 	private long offDuty;
 	private int restaurantId;
+	private List<StaffPayment> payments = new ArrayList<StaffPayment>();
 	
 	public ShiftGeneral(int id){
 		this.id = id;
@@ -52,6 +117,14 @@ public class ShiftGeneral implements Jsonable{
 		return id;
 	}
 	
+	public void addPayment(StaffPayment payment){
+		payments.add(payment);
+	}
+	
+	public List<StaffPayment> getPayments(){
+		return Collections.unmodifiableList(payments);
+	}
+	
 	@Override 
 	public int hashCode(){
 		return id * 17 + 31;
@@ -81,6 +154,7 @@ public class ShiftGeneral implements Jsonable{
 		jm.putLong("offDuty", this.offDuty);
 		jm.putString("onDutyFormat", DateUtil.format(getOnDuty(), DateUtil.Pattern.DATE_TIME));
 		jm.putString("offDutyFormat", DateUtil.format(getOffDuty(), DateUtil.Pattern.DATE_TIME));
+		jm.putJsonableList("payments", payments, 0);
 		return jm;
 	}
 
