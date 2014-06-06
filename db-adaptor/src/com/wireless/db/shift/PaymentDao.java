@@ -8,7 +8,6 @@ import java.util.List;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.billStatistics.CalcBillStatisticsDao;
-import com.wireless.db.billStatistics.CalcBillStatisticsDao.ExtraCond;
 import com.wireless.db.billStatistics.CalcBillStatisticsDao.ExtraCond4Charge;
 import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.exception.BusinessException;
@@ -22,6 +21,36 @@ import com.wireless.util.DateType;
 
 public class PaymentDao {
 
+	public static class ExtraCond{
+		private final DateType dateType;
+		private final String paymentTbl;
+		
+		private int staffId;
+		
+		public ExtraCond(DateType dateType){
+			this.dateType = dateType;
+			if(this.dateType == DateType.TODAY){
+				paymentTbl = "payment";
+			}else{
+				paymentTbl = "payment_history";
+			}
+		}
+		
+		public ExtraCond setStaffId(int staffId){
+			this.staffId = staffId;
+			return this;
+		}
+		
+		@Override
+		public String toString(){
+			StringBuilder extraCond = new StringBuilder();
+			if(staffId > 0){
+				extraCond.append(" AND staff_id = " + staffId);
+			}
+			return extraCond.toString();
+		}
+	}
+	
 	/**
 	 * Do the payment to specific staff.
 	 * @param staff
@@ -180,7 +209,7 @@ public class PaymentDao {
 	 * 			throws if failed to execute any SQL statement
 	 */
 	public static List<PaymentGeneral> getToday(DBCon dbCon, Staff staff) throws SQLException{
-		return get(dbCon, staff, null, DateType.TODAY);
+		return getByCond(dbCon, staff, null, new ExtraCond(DateType.TODAY));
 	}
 	
 	/**
@@ -212,23 +241,32 @@ public class PaymentDao {
 	 * 			throws if failed to execute any SQL statement
 	 */
 	public static List<PaymentGeneral> getHistory(DBCon dbCon, Staff staff, DutyRange range) throws SQLException{
-		return get(dbCon, staff, range, DateType.HISTORY);
+		return getByCond(dbCon, staff, range, new ExtraCond(DateType.HISTORY));
 	}
 	
-	private static List<PaymentGeneral> get(DBCon dbCon, Staff staff, DutyRange range, DateType dateType) throws SQLException{
-		final String paymentTbl;
-		if(dateType == DateType.TODAY){
-			paymentTbl = "payment";
-		}else{
-			paymentTbl = "payment_history";
-		}
+	/**
+	 * Get the payment general according to specific duty range and extra condition.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param range
+	 * 			the duty range
+	 * @param extraCond
+	 * 			the extra condition
+	 * @return the result to payment general
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static List<PaymentGeneral> getByCond(DBCon dbCon, Staff staff, DutyRange range, ExtraCond extraCond) throws SQLException{
 		
 		String sql;
 		sql = " SELECT restaurant_id, staff_id, staff_name, on_duty, off_duty FROM " +
-			  Params.dbName + "." + paymentTbl +
+			  Params.dbName + "." + extraCond.paymentTbl +
 			  " WHERE 1 = 1 " +
 			  " AND restaurant_id = " + staff.getRestaurantId() +
-			  (range != null ? (" AND off_duty BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'") : "") +
+			  (extraCond != null ? extraCond.toString() : "") +
+			  (range != null ? " AND off_duty BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" : "") +
 			  " ORDER BY off_duty ";
 		
 		List<PaymentGeneral> result = new ArrayList<PaymentGeneral>();
@@ -287,7 +325,7 @@ public class PaymentDao {
 		result.setOnDuty(range.getOnDutyFormat());
 		result.setOffDuty(range.getOffDutyFormat());
 		
-		ExtraCond extraCond = new ExtraCond(dateType).setStaffId(staff.getId());
+		CalcBillStatisticsDao.ExtraCond extraCond = new CalcBillStatisticsDao.ExtraCond(dateType).setStaffId(staff.getId());
 		
 		//Calculate the general income
 		result.setIncomeByPay(CalcBillStatisticsDao.calcIncomeByPayType(dbCon, staff, range, extraCond));

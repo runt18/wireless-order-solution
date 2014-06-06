@@ -344,7 +344,7 @@ public class OrderFoodDao {
 			  Params.dbName +	".order_food OF " +
 			  " WHERE 1 = 1 " +
 			  (extraCond == null ? "" : extraCond) +
-			  " GROUP BY OF.food_id, OF.taste_group_id, OF.hang_status, OF.is_temporary " + 
+			  " GROUP BY OF.food_id, OF.taste_group_id, OF.is_temporary " + 
 			  " HAVING " +
 			  " order_sum > 0 " +
 			  (orderClause == null ? " ORDER BY id ASC " : " " + orderClause);

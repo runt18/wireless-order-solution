@@ -2,13 +2,22 @@ package com.wireless.db.billStatistics;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
+import com.wireless.db.shift.PaymentDao;
+import com.wireless.db.shift.PaymentDao.ExtraCond;
+import com.wireless.db.staffMgr.StaffDao;
+import com.wireless.exception.BusinessException;
+import com.wireless.pojo.billStatistics.DutyRange;
+import com.wireless.pojo.billStatistics.PaymentGeneral;
 import com.wireless.pojo.billStatistics.ShiftGeneral;
+import com.wireless.pojo.billStatistics.ShiftGeneral.StaffPayment;
+import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.staffMgr.Staff;
+import com.wireless.pojo.util.DateUtil;
+import com.wireless.util.DateType;
 
 public class ShiftGeneralDao {
 
@@ -61,7 +70,38 @@ public class ShiftGeneralDao {
 		}
 		dbCon.rs.close();
 		
-		return Collections.unmodifiableList(result);
+		for(ShiftGeneral eachShift : result){
+			//计算每个员工的应交款项
+			sql = " SELECT SUM(actual_price) AS total_payment, MAX(waiter) AS waiter, staff_id " +
+				  " FROM " + Params.dbName + ".order " +
+				  " WHERE 1 = 1 " +
+				  " AND restaurant_id = " + staff.getRestaurantId() +
+				  " AND status <> " + Order.Status.UNPAID.getVal() +
+				  " AND order_date BETWEEN '" + DateUtil.format(eachShift.getOnDuty()) + "' AND '" + DateUtil.format(eachShift.getOffDuty()) + "'" +
+				  " GROUP BY staff_id ";
+			dbCon.rs = dbCon.stmt.executeQuery(sql);
+			while(dbCon.rs.next()){
+				StaffPayment payment = new StaffPayment();
+				payment.setStaffName(dbCon.rs.getString("waiter"));
+				payment.setStaffId(dbCon.rs.getInt("staff_id"));
+				payment.setTotalPrice(dbCon.rs.getFloat("total_payment"));
+				eachShift.addPayment(payment);
+			}
+			dbCon.rs.close();
+			
+			//统计交班时间内每个员工的应交款项
+			for(StaffPayment eachPayment : eachShift.getPayments()){
+				for(PaymentGeneral eachPayGeneral : PaymentDao.getByCond(dbCon, staff, new DutyRange(eachShift.getOnDuty(), eachShift.getOffDuty()), new ExtraCond(DateType.TODAY).setStaffId(eachPayment.getStaffId()))){
+					eachPayment.addPaymentGeneral(eachPayGeneral);
+					try {
+						eachPayment.setActualPrice(eachPayment.getActualPrice() + PaymentDao.getDetail(dbCon, StaffDao.getStaffById(eachPayment.getStaffId()), new DutyRange(eachPayGeneral.getOnDuty(), eachPayGeneral.getOffDuty()), DateType.TODAY).getTotalActual());
+					} catch (BusinessException ignored) {
+					}
+				}
+			}
+		}
+		
+		return result;
 	}
 	
 	/**
@@ -126,6 +166,6 @@ public class ShiftGeneralDao {
 		}
 		dbCon.rs.close();
 		
-		return Collections.unmodifiableList(result);
+		return result;
 	}
 }

@@ -69,7 +69,11 @@ public class SaleDetailsDao {
 			DutyRange dutyRange = DutyRangeDao.exec(dbCon, staff, range.getOnDutyFormat(), range.getOffDutyFormat());
 			
 			//Calculate the incomes to each department.
-			deptIncomes = CalcBillStatisticsDao.calcIncomeByDept(dbCon, staff, dutyRange, extraCond);
+			if(dutyRange != null){
+				deptIncomes = CalcBillStatisticsDao.calcIncomeByDept(dbCon, staff, dutyRange, extraCond);
+			}else{
+				deptIncomes = CalcBillStatisticsDao.calcIncomeByDept(dbCon, staff, range, extraCond);
+			}
 		}else{
 			//Calculate the incomes to each department.
 			deptIncomes = CalcBillStatisticsDao.calcIncomeByDept(dbCon, staff, range, extraCond);
@@ -156,7 +160,11 @@ public class SaleDetailsDao {
 			DutyRange dutyRange = DutyRangeDao.exec(dbCon, staff, range.getOnDutyFormat(), range.getOffDutyFormat());
 			
 			//Calculate the incomes to each kitchen.
-			kitchenIncomes = CalcBillStatisticsDao.calcIncomeByKitchen(dbCon, staff, dutyRange, extraCond);
+			if(dutyRange != null){
+				kitchenIncomes = CalcBillStatisticsDao.calcIncomeByKitchen(dbCon, staff, dutyRange, extraCond);
+			}else{
+				kitchenIncomes = CalcBillStatisticsDao.calcIncomeByKitchen(dbCon, staff, range, extraCond);
+			}
 			
 		}else{
 			//Calculate the incomes to each kitchen.
@@ -210,7 +218,7 @@ public class SaleDetailsDao {
 	 * Get the sales detail to each food according to specific range and extra condition.
 	 * @param dbCon
 	 * 			the database connection
-	 * @param term
+	 * @param staff
 	 * 			the staff to perform this action
 	 * @param range
 	 * 			the duty range
@@ -221,18 +229,22 @@ public class SaleDetailsDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static List<SalesDetail> getByFood(DBCon dbCon, Staff term, DutyRange range, ExtraCond extraCond, int orderType) throws SQLException{
+	public static List<SalesDetail> getByFood(DBCon dbCon, Staff staff, DutyRange range, ExtraCond extraCond, int orderType) throws SQLException{
 		
 		List<IncomeByFood> foodIncomes;
 		
 		if(extraCond.dateType.isHistory()){
 			
 			//Get the duty range between on and off duty date
-			DutyRange dutyRange = DutyRangeDao.exec(dbCon, term, range.getOnDutyFormat(), range.getOffDutyFormat());
+			DutyRange dutyRange = DutyRangeDao.exec(dbCon, staff, range.getOnDutyFormat(), range.getOffDutyFormat());
 			
-			foodIncomes = CalcBillStatisticsDao.calcIncomeByFood(dbCon,	term, dutyRange, extraCond);
+			if(dutyRange != null){
+				foodIncomes = CalcBillStatisticsDao.calcIncomeByFood(dbCon,	staff, dutyRange, extraCond);
+			}else{
+				foodIncomes = CalcBillStatisticsDao.calcIncomeByFood(dbCon,	staff, range, extraCond);
+			}
 		}else{
-			foodIncomes = CalcBillStatisticsDao.calcIncomeByFood(dbCon, term, range, extraCond);
+			foodIncomes = CalcBillStatisticsDao.calcIncomeByFood(dbCon, staff, range, extraCond);
 		}
 		
 		List<SalesDetail> result = new ArrayList<SalesDetail>();

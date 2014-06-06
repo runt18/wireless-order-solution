@@ -1,7 +1,6 @@
 package com.wireless.db.billStatistics;
 
 import java.sql.SQLException;
-import java.text.SimpleDateFormat;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
@@ -30,33 +29,18 @@ public class DutyRangeDao {
 	public static DutyRange exec(DBCon dbCon, Staff staff, String onDuty, String offDuty) throws SQLException{
 		try{
 			String sql;
-			sql = " SELECT MIN(on_duty) AS on_duty, MAX(off_duty) AS off_duty FROM "
-					+ Params.dbName
-					+ ".daily_settle_history "
-					+ " WHERE "
-					+ " restaurant_id = "
-					+ staff.getRestaurantId()
-					+ " AND "
-					+ " off_duty >= "
-					+ "'" + onDuty + "'"
-					+ " AND off_duty <= "
-					+ "'" + offDuty + "'"  
-					+ " GROUP BY restaurant_id ";
+			sql = " SELECT MIN(on_duty) AS on_duty, MAX(off_duty) AS off_duty FROM " + 
+				  Params.dbName + ".daily_settle_history " +
+				  " WHERE 1 = 1 "	+
+				  " AND restaurant_id = " + staff.getRestaurantId()	+
+				  " AND off_duty >= '" + onDuty + "'" +
+				  " AND off_duty <= '" + offDuty + "'" + 
+				  " GROUP BY restaurant_id ";
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
 			if(dbCon.rs.next()){
-				
-				java.sql.Timestamp onDutyTimeStamp = dbCon.rs.getTimestamp("on_duty");
-				String onDutyString;
-				onDutyString = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(onDutyTimeStamp.getTime());
-				
-				java.sql.Timestamp offDutyTimeStamp = dbCon.rs.getTimestamp("off_duty");
-				String offDutyString;
-				offDutyString = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(offDutyTimeStamp.getTime());
-				
-				return new DutyRange(onDutyString, offDutyString);
-				
+				return new DutyRange(dbCon.rs.getTimestamp("on_duty").getTime(), dbCon.rs.getTimestamp("off_duty").getTime());
 			}else{
-				return new DutyRange(onDuty, offDuty);
+				return null;
 			}
 			
 		}finally{
@@ -79,13 +63,11 @@ public class DutyRangeDao {
 	 * @throws SQLException
 	 * 			throws if any error occurred while execute any SQL statements
 	 */
-	public static DutyRange exec(Staff staff, String onDuty, String offDuty) throws Exception{
+	public static DutyRange exec(Staff staff, String onDuty, String offDuty) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
 			return DutyRangeDao.exec(dbCon, staff, onDuty, offDuty);
-		}catch(Exception e){
-			throw e;
 		}finally{
 			dbCon.disconnect();
 		}

@@ -213,20 +213,17 @@ public class ShiftDao {
 	 * 			the staff to request
 	 * @param range
 	 * 			the duty range
-	 * @param queryType
-	 * 			indicate which query type should use
-	 * 			it is one of values below.
-	 * 			- QUERY_TODAY
-	 * 		    - QUERY_HISTORY
+	 * @param dateType
+	 * 			indicate the date type {@link DateType}
 	 * @return the shift detail information
 	 * @throws SQLException
 	 * 			throws if fail to execute any SQL statement
 	 */
-	public static ShiftDetail getByRange(Staff staff, DutyRange range, DateType queryType) throws SQLException{
+	public static ShiftDetail getByRange(Staff staff, DutyRange range, DateType dateType) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return getByRange(dbCon, staff, range, queryType);
+			return getByRange(dbCon, staff, range, dateType);
 		}finally{
 			dbCon.disconnect();
 		}

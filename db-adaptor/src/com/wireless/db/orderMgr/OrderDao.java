@@ -34,7 +34,7 @@ public class OrderDao {
 		private HourRange hourRange;	//按时间区间
 		private PayType payType;		//按付款类型
 		private String comment;			//按备注
-		private Order.Status status;	//按状态状态
+		private List<Order.Status> statusList = new ArrayList<Order.Status>();	//按状态状态
 		
 		private boolean isRepaid;		//是否有反结帐
 		private boolean isDiscount;		//是否有折扣
@@ -97,8 +97,8 @@ public class OrderDao {
 			return this;
 		}
 		
-		public ExtraCond setStatus(Order.Status status){
-			this.status = status;
+		public ExtraCond addStatus(Order.Status status){
+			this.statusList.add(status);
 			return this;
 		}
 		
@@ -164,8 +164,13 @@ public class OrderDao {
 			if(comment != null){
 				filterCond.append(" AND " + orderTbl + ".comment LIKE '%" + comment + "%'");
 			}
-			if(status != null){
-				filterCond.append(" AND " + orderTbl + ".status = " + status.getVal());
+			if(!statusList.isEmpty()){
+				filterCond.append(" AND " + orderTbl + ".status IN(");
+				for(Order.Status status : statusList){
+					filterCond.append(status.getVal() + ",");
+				}
+				filterCond.deleteCharAt(filterCond.length() - 1);
+				filterCond.append(")");
 			}
 			if(isRepaid){
 				filterCond.append(" AND " + orderTbl + ".status = " + Order.Status.REPAID.getVal());
