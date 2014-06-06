@@ -1,5 +1,6 @@
 package com.wireless.Actions.billStatistics;
 
+import java.sql.SQLException;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -42,9 +43,14 @@ public class DutyRangeStatisticsAction extends DispatchAction {
 		try{
 			String pin = (String)request.getAttribute("pin");
 			list = ShiftGeneralDao.getToday(StaffDao.verify(Integer.parseInt(pin)));
-		}catch(Exception e){
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, "操作失败, 数据库操作请求发生错误!");
+		}catch(BusinessException e){
+			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getCode(), e.getMessage());
 			e.printStackTrace();
+			
+		}catch(SQLException e){
+			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getErrorCode(), e.getMessage());
+			e.printStackTrace();
+			
 		}finally{
 			jobject.setRoot(list);
 			response.getWriter().print(jobject.toString());
@@ -80,9 +86,9 @@ public class DutyRangeStatisticsAction extends DispatchAction {
 		}catch(BusinessException e){	
 			e.printStackTrace();
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getCode(), e.getDesc());
-		}catch(Exception e){
+		}catch(SQLException e){
 			e.printStackTrace();
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, "操作失败, 数据库操作请求发生错误!");
+			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getErrorCode(), e.getMessage());
 		}finally{
 			if(list != null){
 				jobject.setTotalProperty(list.size());
