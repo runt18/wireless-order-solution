@@ -19,7 +19,7 @@
 		dataSource = dataSource != 'null' && (dataSource == 'today' || dataSource == 'history') ? dataSource : 'today';
 		var dutyRange = '<%=request.getParameter("dutyRange") %>';
 		var queryType = '<%=request.getParameter("queryType") %>';
-		//标示是否显示部门的汇总
+		//标示是否显示部门的汇总。2：交款
 		var businessStatic = '<%=request.getParameter("businessStatic") %>';
 		
 		queryPattern = queryPattern == null ? dateType.USE_SELF_DATE : parseInt(queryPattern);
