@@ -10,6 +10,7 @@ import com.wireless.db.client.member.MemberDao;
 import com.wireless.db.client.member.MemberOperationDao;
 import com.wireless.db.orderMgr.OrderDao;
 import com.wireless.db.restaurantMgr.RestaurantDao;
+import com.wireless.db.shift.PaymentDao;
 import com.wireless.db.shift.ShiftDao;
 import com.wireless.db.system.SystemDao;
 import com.wireless.exception.BusinessException;
@@ -279,10 +280,15 @@ public class JobContentFactory {
 			for(PrintFunc func : printer.getPrintFuncs()){
 				if(func.isTypeMatched(printType) && func.isRegionMatched(regionToCompare)){
 					ShiftDetail shiftDetail;
-					if(printType == PType.PRINT_DAILY_SETTLE_RECEIPT || 
+					if(printType == PType.PRINT_PAYMENT_RECEIPT){
+						shiftDetail = PaymentDao.getDetail(staff, range, DateType.TODAY);
+						
+					}else if(printType == PType.PRINT_HISTORY_PAYMENT_RECEIPT){
+						shiftDetail = PaymentDao.getDetail(staff, range, DateType.TODAY);
+						
+					}else if(printType == PType.PRINT_DAILY_SETTLE_RECEIPT || 
 					   printType == PType.PRINT_HISTORY_DAILY_SETTLE_RECEIPT ||
-					   printType == PType.PRINT_HISTORY_SHIFT_RECEIPT ||
-					   printType == PType.PRINT_HISTORY_PAYMENT_RECEIPT){
+					   printType == PType.PRINT_HISTORY_SHIFT_RECEIPT){
 						 //Get the details to daily settlement from history ,
 						 //since records to today has been moved to history before printing daily settlement receipt. 
 						shiftDetail = ShiftDao.getByRange(staff, range, DateType.HISTORY);
