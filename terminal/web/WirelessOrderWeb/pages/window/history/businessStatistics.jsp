@@ -19,6 +19,7 @@
 		dataSource = dataSource != 'null' && dataSource != '' ? dataSource : 'today';
 		var dutyRange = '<%=request.getParameter("dutyRange") %>';
 		var queryType = '<%=request.getParameter("queryType") %>';
+		var staffId = '<%=request.getParameter("staffId") %>';
 		//标示是否显示部门的汇总。2：交款
 		var businessStatic = '<%=request.getParameter("businessStatic") %>';
 		
