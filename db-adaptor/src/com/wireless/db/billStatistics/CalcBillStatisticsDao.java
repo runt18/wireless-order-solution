@@ -1585,31 +1585,31 @@ public class CalcBillStatisticsDao {
 			if(range != null){
 				
 				//Calculate the general income
-				income.setIncomeByPay(calcIncomeByPayType(dbCon, staff, range, new ExtraCond(DateType.HISTORY)));
+				income.setIncomeByPay(calcIncomeByPayType(dbCon, staff, range, extraCond));
 				
 				//Calculate the total & amount to erase price
-				income.setIncomeByErase(calcErasePrice(dbCon, staff, range, new ExtraCond(DateType.HISTORY)));
+				income.setIncomeByErase(calcErasePrice(dbCon, staff, range, extraCond));
 				
 				//Get the total & amount to discount price
-				income.setIncomeByDiscount(calcDiscountPrice(dbCon, staff, range, new ExtraCond(DateType.HISTORY)));
+				income.setIncomeByDiscount(calcDiscountPrice(dbCon, staff, range, extraCond));
 	
 				//Get the total & amount to gift price
-				income.setIncomeByGift(calcGiftPrice(dbCon, staff, range, new ExtraCond(DateType.HISTORY)));
+				income.setIncomeByGift(calcGiftPrice(dbCon, staff, range, extraCond));
 				
 				//Get the total & amount to cancel price
-				income.setIncomeByCancel(calcCancelPrice(dbCon, staff, range, new ExtraCond(DateType.HISTORY)));
+				income.setIncomeByCancel(calcCancelPrice(dbCon, staff, range, extraCond));
 				
 				//Get the total & amount to coupon price
-				income.setIncomeByCoupon(calcCouponPrice(dbCon, staff, range, new ExtraCond(DateType.HISTORY)));
+				income.setIncomeByCoupon(calcCouponPrice(dbCon, staff, range, extraCond));
 				
 				//Get the total & amount to repaid order
-				income.setIncomeByRepaid(calcRepaidPrice(dbCon, staff, range, new ExtraCond(DateType.HISTORY)));
+				income.setIncomeByRepaid(calcRepaidPrice(dbCon, staff, range, extraCond));
 				
 				//Get the total & amount to order with service
-				income.setIncomeByService(calcServicePrice(dbCon, staff, range, new ExtraCond(DateType.HISTORY)));
+				income.setIncomeByService(calcServicePrice(dbCon, staff, range, extraCond));
 				
 				//Get the charge income by both cash and credit card
-				income.setIncomeByCharge(calcIncomeByCharge(dbCon, staff, range, new ExtraCond4Charge(DateType.HISTORY)));
+				income.setIncomeByCharge(calcIncomeByCharge(dbCon, staff, range, new ExtraCond4Charge(DateType.HISTORY).setStaffId(extraCond.staffId)));
 				
 			}
 			result.add(income);
