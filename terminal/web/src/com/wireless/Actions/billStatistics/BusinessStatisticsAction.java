@@ -9,6 +9,7 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
 import com.wireless.db.billStatistics.DutyRangeDao;
+import com.wireless.db.shift.PaymentDao;
 import com.wireless.db.shift.ShiftDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
@@ -107,6 +108,57 @@ public class BusinessStatisticsAction extends DispatchAction {
 			String offDuty = request.getParameter("offDuty");
 			
 			final ShiftDetail sdetail = ShiftDao.getByRange(StaffDao.verify(Integer.parseInt(pin)), new DutyRange(onDuty, offDuty), DateType.TODAY);
+			
+			if(sdetail != null){
+				jObject.setExtra(new Jsonable(){
+					@Override
+					public JsonMap toJsonMap(int flag) {
+						JsonMap jm = new JsonMap();
+						jm.putJsonable("business", sdetail, 0);
+						return jm;
+					}
+
+					@Override
+					public void fromJsonMap(JsonMap jsonMap, int flag) {
+						
+					}
+					
+				});
+			}else{
+				jObject.initTip(false, WebParams.TIP_TITLE_DEFAULT, 1111, "操作成功, 该时间段没有记录, 请重新查询.");
+			}
+			
+		}catch(BusinessException e){
+			e.printStackTrace();
+			jObject.initTip(e);
+			
+		}catch(Exception e){
+			e.printStackTrace();
+			jObject.initTip(e);
+			
+		}finally{
+			response.getWriter().print(jObject.toString());
+		}
+		return null;
+	}
+	
+	/**
+	 * payment
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward paymentToday(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+		JObject jObject = new JObject();
+		try{
+			String pin = (String)request.getAttribute("pin");
+			String onDuty = request.getParameter("onDuty");
+			String offDuty = request.getParameter("offDuty");
+			
+			final ShiftDetail sdetail = PaymentDao.getDetail(StaffDao.verify(Integer.parseInt(pin)), new DutyRange(onDuty, offDuty), DateType.TODAY);
 			
 			if(sdetail != null){
 				jObject.setExtra(new Jsonable(){
