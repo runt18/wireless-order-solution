@@ -266,8 +266,8 @@ public class JobContentFactory {
 		}
 	}
 	
-	public Content createReceiptContent(PType printType, Staff term, List<Printer> printers, int orderId) throws BusinessException, SQLException{
-		return createReceiptContent(printType, term, printers, OrderDao.getById(term, orderId, DateType.TODAY));
+	public Content createReceiptContent(PType printType, Staff staff, List<Printer> printers, int orderId) throws BusinessException, SQLException{
+		return createReceiptContent(printType, staff, printers, OrderDao.getById(staff, orderId, DateType.TODAY));
 	}
 	
 	public Content createShiftContent(PType printType, Staff staff, List<Printer> printers, DutyRange range, Region.RegionId regionId) throws SQLException{
@@ -281,10 +281,10 @@ public class JobContentFactory {
 				if(func.isTypeMatched(printType) && func.isRegionMatched(regionToCompare)){
 					ShiftDetail shiftDetail;
 					if(printType == PType.PRINT_PAYMENT_RECEIPT){
-						shiftDetail = PaymentDao.getDetail(staff, range, DateType.TODAY);
+						shiftDetail = PaymentDao.getDetail(staff, range, new PaymentDao.ExtraCond(DateType.TODAY).setStaffId(staff.getId()));
 						
 					}else if(printType == PType.PRINT_HISTORY_PAYMENT_RECEIPT){
-						shiftDetail = PaymentDao.getDetail(staff, range, DateType.TODAY);
+						shiftDetail = PaymentDao.getDetail(staff, range, new PaymentDao.ExtraCond(DateType.HISTORY).setStaffId(staff.getId()));
 						
 					}else if(printType == PType.PRINT_DAILY_SETTLE_RECEIPT || 
 					   printType == PType.PRINT_HISTORY_DAILY_SETTLE_RECEIPT ||
