@@ -16,7 +16,7 @@
 		var dataSource = '<%=request.getParameter("dataSource") %>';
 		var queryPattern = <%=request.getParameter("queryPattern") %>;
 		
-		dataSource = dataSource != 'null' && (dataSource == 'today' || dataSource == 'history') ? dataSource : 'today';
+		dataSource = dataSource != 'null' && dataSource != '' ? dataSource : 'today';
 		var dutyRange = '<%=request.getParameter("dutyRange") %>';
 		var queryType = '<%=request.getParameter("queryType") %>';
 		//标示是否显示部门的汇总。2：交款
