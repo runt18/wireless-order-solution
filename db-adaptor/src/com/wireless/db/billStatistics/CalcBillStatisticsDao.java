@@ -1556,23 +1556,23 @@ public class CalcBillStatisticsDao {
 	 * 			the database connection
 	 * @param staff
 	 * 			the staff to perform this action
-	 * @param onDuty
-	 * 			the on duty
-	 * @param offDuty
-	 * 			the off duty
+	 * @param range
+	 * 			the duty range
+	 * @param extraCond
+	 * 			the extra condition
 	 * @return the income by each during on & off duty
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 * @throws ParseException
 	 * 			throws if failed to parse the on or off duty string
 	 */
-	public static List<IncomeByEachDay> calcIncomeByEachDay(DBCon dbCon, Staff staff, String onDuty, String offDuty) throws SQLException, ParseException{
+	public static List<IncomeByEachDay> calcIncomeByEachDay(DBCon dbCon, Staff staff, DutyRange dutyRange, ExtraCond extraCond) throws SQLException, ParseException{
 		
 		List<IncomeByEachDay> result = new ArrayList<IncomeByEachDay>();
 		
 		Calendar c = Calendar.getInstance();
-		Date dateBegin = new SimpleDateFormat("yyyy-MM-dd").parse(onDuty);
-		Date dateEnd = new SimpleDateFormat("yyyy-MM-dd").parse(offDuty);
+		Date dateBegin = new SimpleDateFormat("yyyy-MM-dd").parse(dutyRange.getOnDutyFormat());
+		Date dateEnd = new SimpleDateFormat("yyyy-MM-dd").parse(dutyRange.getOffDutyFormat());
 		c.setTime(dateBegin);
 		while (dateBegin.compareTo(dateEnd) <= 0) {
 			c.add(Calendar.DATE, 1);
@@ -1617,28 +1617,28 @@ public class CalcBillStatisticsDao {
 			dateBegin = c.getTime();
 		}
 		
-		return Collections.unmodifiableList(result);
+		return result;
 	}
 
 	/**
 	 * Get income to each day during on & off duty.
 	 * @param staff
 	 * 			the staff to perform this action
-	 * @param onDuty
-	 * 			the on duty
-	 * @param offDuty
-	 * 			the off duty
+	 * @param range
+	 * 			the duty range
+	 * @param extraCond
+	 * 			the extra condition
 	 * @return the income by each during on & off duty
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 * @throws ParseException
 	 * 			throws if failed to parse the on or off duty string
 	 */
-	public static List<IncomeByEachDay> calcIncomeByEachDay(Staff staff, String onDuty, String offDuty) throws SQLException, ParseException{
+	public static List<IncomeByEachDay> calcIncomeByEachDay(Staff staff, DutyRange range, ExtraCond extraCond) throws SQLException, ParseException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return calcIncomeByEachDay(dbCon, staff, onDuty, offDuty);
+			return calcIncomeByEachDay(dbCon, staff, range, extraCond);
 		}finally{
 			dbCon.disconnect();
 		}
