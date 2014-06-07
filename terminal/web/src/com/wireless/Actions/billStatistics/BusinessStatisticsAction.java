@@ -157,8 +157,71 @@ public class BusinessStatisticsAction extends DispatchAction {
 			String pin = (String)request.getAttribute("pin");
 			String onDuty = request.getParameter("onDuty");
 			String offDuty = request.getParameter("offDuty");
+			String staffId = request.getParameter("staffId");
+			PaymentDao.ExtraCond extraCond = new PaymentDao.ExtraCond(DateType.TODAY);
 			
-			final ShiftDetail sdetail = PaymentDao.getDetail(StaffDao.verify(Integer.parseInt(pin)), new DutyRange(onDuty, offDuty), DateType.TODAY);
+			if(staffId != null && !staffId.isEmpty()){
+				extraCond.setStaffId(Integer.parseInt(staffId));
+			}
+			
+			final ShiftDetail sdetail = PaymentDao.getDetail(StaffDao.verify(Integer.parseInt(pin)), new DutyRange(onDuty, offDuty), extraCond);
+			
+			if(sdetail != null){
+				jObject.setExtra(new Jsonable(){
+					@Override
+					public JsonMap toJsonMap(int flag) {
+						JsonMap jm = new JsonMap();
+						jm.putJsonable("business", sdetail, 0);
+						return jm;
+					}
+
+					@Override
+					public void fromJsonMap(JsonMap jsonMap, int flag) {
+						
+					}
+					
+				});
+			}else{
+				jObject.initTip(false, WebParams.TIP_TITLE_DEFAULT, 1111, "操作成功, 该时间段没有记录, 请重新查询.");
+			}
+			
+		}catch(BusinessException e){
+			e.printStackTrace();
+			jObject.initTip(e);
+			
+		}catch(Exception e){
+			e.printStackTrace();
+			jObject.initTip(e);
+			
+		}finally{
+			response.getWriter().print(jObject.toString());
+		}
+		return null;
+	}
+	
+	/**
+	 * payment
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward paymentHistory(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+		JObject jObject = new JObject();
+		try{
+			String pin = (String)request.getAttribute("pin");
+			String onDuty = request.getParameter("onDuty");
+			String offDuty = request.getParameter("offDuty");
+			String staffId = request.getParameter("staffId");
+			PaymentDao.ExtraCond extraCond = new PaymentDao.ExtraCond(DateType.HISTORY);
+			
+			if(staffId != null && !staffId.isEmpty()){
+				extraCond.setStaffId(Integer.parseInt(staffId));
+			}
+			
+			final ShiftDetail sdetail = PaymentDao.getDetail(StaffDao.verify(Integer.parseInt(pin)), new DutyRange(onDuty, offDuty), extraCond);
 			
 			if(sdetail != null){
 				jObject.setExtra(new Jsonable(){

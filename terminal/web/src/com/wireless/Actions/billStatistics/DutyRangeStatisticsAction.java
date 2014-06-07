@@ -88,7 +88,7 @@ public class DutyRangeStatisticsAction extends DispatchAction {
 				jsonTree.append("text:'" + DateUtil.format(list.get(i).getOnDuty()).substring(11) + " -- " + DateUtil.format(list.get(i).getOffDuty()).substring(11) + " (交班人：" +list.get(i).getStaffName()+")' ");
 				jsonTree.append(",onDuty:'" + DateUtil.format(list.get(i).getOnDuty()) + "'");
 				jsonTree.append(",offDuty:'" + DateUtil.format(list.get(i).getOffDuty()) + "'");
-				jsonTree.append(",expanded : " + (list.get(i).getPayments().isEmpty() ? true : false));
+				jsonTree.append(",expanded : " + (list.get(i).getPayments().isEmpty() ? false : true));
 				jsonTree.append(",expandable : true");
 				jsonTree.append(",children:[");
 				jsonTree.append(getChildren(list.get(i).getPayments()));
@@ -142,6 +142,7 @@ public class DutyRangeStatisticsAction extends DispatchAction {
 			jsb.append(",text:'" + list.get(i).getOnDuty().substring(11) + " -- " + list.get(i).getOffDuty().substring(11) + "'");
 			jsb.append(",onDuty:'" + list.get(i).getOnDuty() + "'");
 			jsb.append(",offDuty:'" + list.get(i).getOffDuty() + "'");
+			jsb.append(",staffId:'" + list.get(i).getStaffId() + "'");
 			jsb.append("}");
 		}
 		

@@ -17,9 +17,13 @@ import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.json.JObject;
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
+import com.wireless.pojo.billStatistics.DutyRange;
+import com.wireless.pojo.billStatistics.HourRange;
 import com.wireless.pojo.billStatistics.IncomeByEachDay;
 import com.wireless.pojo.util.DateUtil;
+import com.wireless.pojo.util.DateUtil.Pattern;
 import com.wireless.util.DataPaging;
+import com.wireless.util.DateType;
 
 public class BusinessReceiptsStatisticsAction extends DispatchAction {
 	
@@ -37,8 +41,19 @@ public class BusinessReceiptsStatisticsAction extends DispatchAction {
 			String pin = (String)request.getAttribute("pin");
 			String onDuty = request.getParameter("dateBegin");
 			String offDuty = request.getParameter("dateEnd");
+			String opening = request.getParameter("opening");
+			String ending = request.getParameter("ending");
 			
-			incomesByEachDay.addAll(CalcBillStatisticsDao.calcIncomeByEachDay(StaffDao.verify(Integer.parseInt(pin)), onDuty, offDuty));
+
+			
+			CalcBillStatisticsDao.ExtraCond extraCond = new CalcBillStatisticsDao.ExtraCond(DateType.HISTORY);
+			if(opening != null && !opening.isEmpty()){
+				HourRange hr = new HourRange(opening, ending, Pattern.HOUR);
+				extraCond.setHourRange(hr);
+			}
+
+			
+			incomesByEachDay.addAll(CalcBillStatisticsDao.calcIncomeByEachDay(StaffDao.verify(Integer.parseInt(pin)), new DutyRange(onDuty, offDuty), extraCond));
 			
 		}catch(Exception e){
 			e.printStackTrace();
@@ -148,7 +163,7 @@ public class BusinessReceiptsStatisticsAction extends DispatchAction {
 		List<IncomeByEachDay> incomesByEachDay = new ArrayList<IncomeByEachDay>();
 		try{
 			String pin = (String)request.getAttribute("pin");
-			incomesByEachDay.addAll(CalcBillStatisticsDao.calcIncomeByEachDay(StaffDao.verify(Integer.parseInt(pin)), DateUtil.format(c.getTime()), DateUtil.format(endDate.getTime())));
+			incomesByEachDay.addAll(CalcBillStatisticsDao.calcIncomeByEachDay(StaffDao.verify(Integer.parseInt(pin)), new DutyRange(DateUtil.format(c.getTime()), DateUtil.format(endDate.getTime())), new CalcBillStatisticsDao.ExtraCond(DateType.HISTORY)));
 			
 //			jobject.setRoot(incomesByEachDay);
 			

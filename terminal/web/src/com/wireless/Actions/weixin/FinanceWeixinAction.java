@@ -357,11 +357,12 @@ public class FinanceWeixinAction extends Action {
 			long beginDate = c.getTimeInMillis();
 			
 			List<IncomeByEachDay> incomes = CalcBillStatisticsDao.calcIncomeByEachDay(StaffDao.getStaffs(dbCon, restaurantId).get(0), 
+														new DutyRange(
 														DateUtil.format(beginDate, DateUtil.Pattern.DATE),
-														DateUtil.format(endDate, DateUtil.Pattern.DATE)
+														DateUtil.format(endDate, DateUtil.Pattern.DATE)),
 														//"2013-08-1",
 														//"2013-08-5"
-														);
+														new CalcBillStatisticsDao.ExtraCond(DateType.HISTORY));
 			
 			final String fileNameJpg = "trend_chart_" + msg.getFromUserName() + ".jpg";
 			

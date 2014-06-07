@@ -29,13 +29,20 @@ public class QueryDailySettleByNowAction extends Action{
 			String queryType = request.getParameter("queryType");
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
+			String staffId = request.getParameter("staffId");
+			PaymentDao.ExtraCond extraCond = new PaymentDao.ExtraCond(DateType.TODAY);
+			
+			if(staffId != null && !staffId.isEmpty()){
+				extraCond.setStaffId(Integer.parseInt(staffId));
+			}
+			
 			final ShiftDetail shiftDetail;
 			if(Integer.valueOf(queryType) == 0){
 				shiftDetail = ShiftDao.getCurrentShift(StaffDao.verify(Integer.parseInt(pin)));
 			}else if(Integer.valueOf(queryType) == 1){
 				shiftDetail = ShiftDao.getTodayDaily(StaffDao.verify(Integer.parseInt(pin)));
 			}else if(Integer.valueOf(queryType) == 2){
-				shiftDetail = PaymentDao.getDetail(staff, PaymentDao.getCurrentPaymentRange(staff), DateType.TODAY);
+				shiftDetail = PaymentDao.getDetail(staff, PaymentDao.getCurrentPaymentRange(staff),extraCond);
 			}else{
 				shiftDetail = null;
 			}
