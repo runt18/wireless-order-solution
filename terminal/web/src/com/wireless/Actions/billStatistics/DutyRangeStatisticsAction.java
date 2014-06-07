@@ -88,7 +88,7 @@ public class DutyRangeStatisticsAction extends DispatchAction {
 				jsonTree.append("text:'" + DateUtil.format(list.get(i).getOnDuty()).substring(11) + " -- " + DateUtil.format(list.get(i).getOffDuty()).substring(11) + " (交班人：" +list.get(i).getStaffName()+")' ");
 				jsonTree.append(",onDuty:'" + DateUtil.format(list.get(i).getOnDuty()) + "'");
 				jsonTree.append(",offDuty:'" + DateUtil.format(list.get(i).getOffDuty()) + "'");
-				jsonTree.append(",expanded : true");
+				jsonTree.append(",expanded : " + (list.get(i).getPayments().isEmpty() ? true : false));
 				jsonTree.append(",expandable : true");
 				jsonTree.append(",children:[");
 				jsonTree.append(getChildren(list.get(i).getPayments()));
