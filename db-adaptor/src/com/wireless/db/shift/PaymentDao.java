@@ -287,6 +287,7 @@ public class PaymentDao {
 			PaymentGeneral detail = new PaymentGeneral();
 			detail.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
 			detail.setStaffName(dbCon.rs.getString("staff_name"));
+			detail.setStaffId(dbCon.rs.getInt("staff_id"));
 			detail.setOnDuty(DateUtil.format(dbCon.rs.getTimestamp("on_duty").getTime()));
 			detail.setOffDuty(DateUtil.format(dbCon.rs.getTimestamp("off_duty").getTime()));
 			result.add(detail);
