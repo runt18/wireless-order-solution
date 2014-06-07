@@ -306,7 +306,11 @@ public class OrderFoodDao {
 		 */
 		for(OrderFood orderFood : orderFoods){
 			if(orderFood.hasTasteGroup()){
-				orderFood.setTasteGroup(TasteGroupDao.getHistoryById(dbCon, staff, orderFood.getTasteGroup().getGroupId()));
+				if(dateType.isToday()){
+					orderFood.setTasteGroup(TasteGroupDao.getTodayById(dbCon, staff, orderFood.getTasteGroup().getGroupId()));
+				}else{
+					orderFood.setTasteGroup(TasteGroupDao.getHistoryById(dbCon, staff, orderFood.getTasteGroup().getGroupId()));
+				}
 			}
 		}
 		

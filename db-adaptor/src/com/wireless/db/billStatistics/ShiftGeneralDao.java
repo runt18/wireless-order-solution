@@ -7,8 +7,6 @@ import java.util.List;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.shift.PaymentDao;
-import com.wireless.db.staffMgr.StaffDao;
-import com.wireless.exception.BusinessException;
 import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.billStatistics.PaymentGeneral;
 import com.wireless.pojo.billStatistics.ShiftGeneral;
@@ -159,10 +157,10 @@ public class ShiftGeneralDao {
 			for(StaffPayment eachPayment : eachShift.getPayments()){
 				for(PaymentGeneral eachPayGeneral : PaymentDao.getByCond(dbCon, staff, new DutyRange(eachShift.getOnDuty(), eachShift.getOffDuty()), new PaymentDao.ExtraCond(DateType.TODAY).setStaffId(eachPayment.getStaffId()))){
 					eachPayment.addPaymentGeneral(eachPayGeneral);
-					try {
-						eachPayment.setActualPrice(eachPayment.getActualPrice() + PaymentDao.getDetail(dbCon, StaffDao.getStaffById(eachPayment.getStaffId()), new DutyRange(eachPayGeneral.getOnDuty(), eachPayGeneral.getOffDuty()), DateType.TODAY).getTotalActual());
-					} catch (BusinessException ignored) {
-					}
+					eachPayment.setActualPrice(eachPayment.getActualPrice() + 
+											   PaymentDao.getDetail(dbCon, staff, 
+													   			    new DutyRange(eachPayGeneral.getOnDuty(), eachPayGeneral.getOffDuty()), 
+													   			    new PaymentDao.ExtraCond(DateType.TODAY).setStaffId(eachPayment.getStaffId())).getTotalActual());
 				}
 			}
 		}

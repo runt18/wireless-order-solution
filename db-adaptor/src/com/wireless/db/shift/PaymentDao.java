@@ -302,17 +302,17 @@ public class PaymentDao {
 	 * 			the staff to perform this action
 	 * @param range
 	 * 			the duty range
-	 * @param dateType
-	 * 			the date type {@link DateType}
+	 * @param extraCond
+	 * 			the extra condition
 	 * @return the detail to this payment
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static ShiftDetail getDetail(Staff staff, DutyRange range, DateType dateType) throws SQLException{
+	public static ShiftDetail getDetail(Staff staff, DutyRange range, ExtraCond extraCond) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return getDetail(dbCon, staff, range, dateType);
+			return getDetail(dbCon, staff, range, extraCond);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -326,46 +326,45 @@ public class PaymentDao {
 	 * 			the staff to perform this action
 	 * @param range
 	 * 			the duty range
-	 * @param dateType
-	 * 			the date type {@link DateType}
+	 * @param extraCond
+	 * 			the extra condition
 	 * @return the detail to this payment
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static ShiftDetail getDetail(DBCon dbCon, Staff staff, DutyRange range, DateType dateType) throws SQLException{
+	public static ShiftDetail getDetail(DBCon dbCon, Staff staff, DutyRange range, ExtraCond extraCond) throws SQLException{
 		ShiftDetail result = new ShiftDetail();
 		result.setOnDuty(range.getOnDutyFormat());
 		result.setOffDuty(range.getOffDutyFormat());
 		
-		CalcBillStatisticsDao.ExtraCond extraCond = new CalcBillStatisticsDao.ExtraCond(dateType).setStaffId(staff.getId());
-		
+		CalcBillStatisticsDao.ExtraCond extraCond4CalcBill = new CalcBillStatisticsDao.ExtraCond(extraCond.dateType).setStaffId(extraCond.staffId);
 		//Calculate the general income
-		result.setIncomeByPay(CalcBillStatisticsDao.calcIncomeByPayType(dbCon, staff, range, extraCond));
+		result.setIncomeByPay(CalcBillStatisticsDao.calcIncomeByPayType(dbCon, staff, range, extraCond4CalcBill));
 		
 		//Calculate the total & amount to erase price
-		result.setEraseIncome(CalcBillStatisticsDao.calcErasePrice(dbCon, staff, range, extraCond));
+		result.setEraseIncome(CalcBillStatisticsDao.calcErasePrice(dbCon, staff, range, extraCond4CalcBill));
 		//-----------------------------
 		
 		//Get the total & amount to discount price
-		result.setDiscountIncome(CalcBillStatisticsDao.calcDiscountPrice(dbCon, staff, range, extraCond));
+		result.setDiscountIncome(CalcBillStatisticsDao.calcDiscountPrice(dbCon, staff, range, extraCond4CalcBill));
 		
 		//Get the total & amount to gift price
-		result.setGiftIncome(CalcBillStatisticsDao.calcGiftPrice(dbCon, staff, range, extraCond));
+		result.setGiftIncome(CalcBillStatisticsDao.calcGiftPrice(dbCon, staff, range, extraCond4CalcBill));
 		
 		//Get the total & amount to cancel price
-		result.setCancelIncome(CalcBillStatisticsDao.calcCancelPrice(dbCon, staff, range, extraCond));
+		result.setCancelIncome(CalcBillStatisticsDao.calcCancelPrice(dbCon, staff, range, extraCond4CalcBill));
 		
 		//Get the total & amount to coupon price
-		result.setCouponIncome(CalcBillStatisticsDao.calcCouponPrice(dbCon, staff, range, extraCond));
+		result.setCouponIncome(CalcBillStatisticsDao.calcCouponPrice(dbCon, staff, range, extraCond4CalcBill));
 		
 		//Get the total & amount to repaid order
-		result.setRepaidIncome(CalcBillStatisticsDao.calcRepaidPrice(dbCon, staff, range, extraCond));
+		result.setRepaidIncome(CalcBillStatisticsDao.calcRepaidPrice(dbCon, staff, range, extraCond4CalcBill));
 		
 		//Get the total & amount to order with service
-		result.setServiceIncome(CalcBillStatisticsDao.calcServicePrice(dbCon, staff, range, extraCond));
+		result.setServiceIncome(CalcBillStatisticsDao.calcServicePrice(dbCon, staff, range, extraCond4CalcBill));
 		
 		//Get the income by charge
-		result.setIncomeByCharge(CalcBillStatisticsDao.calcIncomeByCharge(dbCon, staff, range, new ExtraCond4Charge(dateType).setStaffId(staff.getId())));
+		result.setIncomeByCharge(CalcBillStatisticsDao.calcIncomeByCharge(dbCon, staff, range, new ExtraCond4Charge(extraCond.dateType).setStaffId(extraCond.staffId)));
 		
 		return result;
 	}
