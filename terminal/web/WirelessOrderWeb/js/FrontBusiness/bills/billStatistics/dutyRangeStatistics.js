@@ -194,7 +194,8 @@ function dutyRangePanelInit(c){
         				offDuty : treeNode.attributes.offDuty,
         				dataSource : treeNode.isLeaf()? 'paymentToday' : 'today',
         				queryPattern : 5,
-        				businessStatic : treeNode.isLeaf()? 2 : 1
+        				businessStatic : treeNode.isLeaf()? 2 : 1,
+        				staffId : treeNode.isLeaf()?treeNode.attributes.staffId : ''
         			});	
         		}
         		if(typeof treeNode.attributes.onDuty != 'undefined' && treeNode.isLeaf()){

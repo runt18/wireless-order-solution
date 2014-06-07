@@ -66,11 +66,12 @@ function dutyRangeStatDetalHandler(){
 							text : '功能加载中, 请稍后......',
 							params : {
 								d : '_' + new Date().getTime(),
-								dataSource : 'history',
+								dataSource : statType == 2?'paymentHistory':'history',
 								queryPattern : statType == 2? 5 : 2,
 								onDuty : statType == 1?gs['onDuty']:gs['onDutyFormat'],
 								offDuty : statType == 1?gs['offDuty']:gs['offDutyFormat'],
-								businessStatic : statType
+								businessStatic : statType,
+								staffId : statType == 2?gs['staffId']:''
 							}
 						});
 					}
@@ -175,7 +176,7 @@ function dutyRangeStatPanelInit(c){
 	     ['结束时间', 'offDutyFormat'], 
 	     ['操作','Operation', 100, 'center', 'dutyRangeStatPanelOperationRenderer']
 		],
-		['staffName', 'onDuty', 'offDuty', 'onDutyFormat', 'offDutyFormat'],
+		['staffId','staffName', 'onDuty', 'offDuty', 'onDutyFormat', 'offDutyFormat'],
 		[ ['dataSource', 'history'], ['isPaging', true]],
 		10,
 		null,

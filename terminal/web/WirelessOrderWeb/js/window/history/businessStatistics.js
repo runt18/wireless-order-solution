@@ -130,7 +130,8 @@ Ext.onReady(function(){
 							queryPattern : queryPattern,
 							onDuty : paramsOnDuty,
 							offDuty : paramsOffDuty,
-							dutyRange : dutyRange
+							dutyRange : dutyRange,
+							staffId : staffId
 					};
 					if(queryPattern == 1){
 						if(!beginDate.isValid() || !endDate.isValid()){
@@ -339,5 +340,6 @@ function loadPaymentGeneral(c){
 	dataSource = c.dataSource;
 	queryPattern = c.queryPattern;
 	businessStatic = c.businessStatic;
+	staffId = c.staffId
 	Ext.getCmp('btnSearchForBusinessStatisticsSummaryInformation').handler();
 }
