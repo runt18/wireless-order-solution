@@ -180,7 +180,7 @@ function dutyRangePanelInit(c){
         			loadPaymentGeneral({
         				onDuty : treeNode.attributes.onDuty,
         				offDuty : treeNode.attributes.offDuty,
-        				dataSource : 'today',
+        				dataSource : treeNode.isLeaf()? 'paymentToday' : 'today',
         				queryPattern : 5,
         				businessStatic : treeNode.isLeaf()? 2 : 1
         			});	
