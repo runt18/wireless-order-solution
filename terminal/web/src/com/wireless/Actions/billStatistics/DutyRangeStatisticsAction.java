@@ -21,6 +21,7 @@ import com.wireless.pojo.billStatistics.PaymentGeneral;
 import com.wireless.pojo.billStatistics.ShiftGeneral;
 import com.wireless.pojo.billStatistics.ShiftGeneral.StaffPayment;
 import com.wireless.pojo.util.DateUtil;
+import com.wireless.pojo.util.NumericUtil;
 import com.wireless.util.DataPaging;
 import com.wireless.util.DateType;
 import com.wireless.util.WebParams;
@@ -84,7 +85,7 @@ public class DutyRangeStatisticsAction extends DispatchAction {
 			for (int i = 0; i < list.size(); i++) {
 				jsonTree.append(i > 0 ? "," : "");
 				jsonTree.append("{");
-				jsonTree.append("text:'" + DateUtil.format(list.get(i).getOnDuty()).substring(11) + " -- " + DateUtil.format(list.get(i).getOffDuty()).substring(11) + " (交班" +(i+1)+")' ");
+				jsonTree.append("text:'" + DateUtil.format(list.get(i).getOnDuty()).substring(11) + " -- " + DateUtil.format(list.get(i).getOffDuty()).substring(11) + " (交班人：" +list.get(i).getStaffName()+")' ");
 				jsonTree.append(",onDuty:'" + DateUtil.format(list.get(i).getOnDuty()) + "'");
 				jsonTree.append(",offDuty:'" + DateUtil.format(list.get(i).getOffDuty()) + "'");
 				jsonTree.append(",expanded : true");
@@ -116,8 +117,9 @@ public class DutyRangeStatisticsAction extends DispatchAction {
 				jsb.append(",");
 			}
 			jsb.append("{");
-			jsb.append("text:'" + list.get(i).getStaffName() + " ("+ list.get(i).getTotalPrice()+" ，"+ list.get(i).getActualPrice() +")'");
-			jsb.append(",expanded : false");
+			jsb.append("text:'" + list.get(i).getStaffName() + " (应收款：<font style=\"color :green;font-weight:bolder\">"+ NumericUtil.float2String2(list.get(i).getTotalPrice())
+						+"</font> ，实收款：<font style=\"color :red;font-weight:bolder\">"+ NumericUtil.float2String2(list.get(i).getActualPrice()) +"</font>)'");
+			jsb.append(",expanded : " + (list.get(i).getPayments().isEmpty() ? true : false));
 			jsb.append(",expandable : true");
 			jsb.append(",children:[");
 			jsb.append(getChildrenPayments(list.get(i).getPayments()));
