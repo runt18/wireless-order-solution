@@ -52,6 +52,7 @@ public class PaymentGeneral implements Jsonable{
 	}
 	
 	public static enum Key4Json{
+		STAFF_ID("staffId", "交款人id"),
 		STAFF_NAME("staffName", "交款人"),
 		ON_DUTY("onDutyFormat", "开始时间"),
 		OFF_DUTY("offDutyFormat", "结束时间");
@@ -77,6 +78,7 @@ public class PaymentGeneral implements Jsonable{
 		jm.putString(Key4Json.STAFF_NAME.key, this.getStaffName());
 		jm.putString(Key4Json.ON_DUTY.key, this.getOnDuty());
 		jm.putString(Key4Json.OFF_DUTY.key, this.getOffDuty());
+		jm.putInt(Key4Json.STAFF_ID.key, this.getStaffId());
 		return jm;
 	}
 
