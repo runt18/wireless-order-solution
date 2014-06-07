@@ -9,6 +9,7 @@ public class PaymentGeneral implements Jsonable{
 	
 	private int restaurantId;			//餐厅编号
 	private String staff;				//交款人
+	private int staffId;				//交款人Id
 	
 	public int getRestaurantId(){
 		return this.restaurantId;
@@ -40,6 +41,14 @@ public class PaymentGeneral implements Jsonable{
 	
 	public void setOffDuty(String offDuty) {
 		this.offDuty = offDuty;
+	}
+	
+	public void setStaffId(int staffId){
+		this.staffId = staffId;
+	}
+	
+	public int getStaffId(){
+		return this.staffId;
 	}
 	
 	public static enum Key4Json{
