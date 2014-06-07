@@ -1,28 +1,40 @@
 ﻿floatBarNodeId = "";
 
 function dutyRangeStatPrintHandler(rowIndex) {
-	var tempMask = new Ext.LoadMask(document.body, {
-		msg : '正在打印请稍候.......',
-		remove : true
-	});
-	tempMask.show();
-	var gs = Ext.ux.getSelData(dutyRangePanel);
-	Ext.Ajax.request({
-		url : '../../PrintOrder.do',
-		params : {
-			'printType' : statType == 1?5:12,
-			'onDuty' : gs['onDutyFormat'],
-			'offDuty' : gs['offDutyFormat']
-		},
-		success : function(response, options) {
-			tempMask.hide();
-			Ext.ux.showMsg(Ext.decode(response.responseText));
-		},
-		failure : function(response, options){
-			tempMask.hide();
-			Ext.ux.showMsg(Ext.decode(response.responseText));
+
+	var sn = Ext.ux.getSelNode(dutyRangeStatTree);
+	if(!sn){
+		Ext.example.msg('提示', '操作失败, 请选中一条数据再进行操作.');
+		return;
+	}else{
+		if(typeof sn.attributes.onDuty != 'undefined'){
+			var tempMask = new Ext.LoadMask(document.body, {
+				msg : '正在打印请稍候.......',
+				remove : true
+			});
+			tempMask.show();
+			Ext.Ajax.request({
+				url : '../../PrintOrder.do',
+				params : {
+					'printType' : statType == 1?5:12,
+					'onDuty' : sn.attributes.onDuty,
+					'offDuty' : sn.attributes.offDuty
+				},
+				success : function(response, options) {
+					tempMask.hide();
+					Ext.ux.showMsg(Ext.decode(response.responseText));
+				},
+				failure : function(response, options){
+					tempMask.hide();
+					Ext.ux.showMsg(Ext.decode(response.responseText));
+				}
+			});			
+		}else{
+			Ext.example.msg('提示', '操作失败, 请选中交班或者交款时间段.');
+			return;
 		}
-	});
+	}
+
 };
 
 function dutyRangeStatDetalHandler(){
@@ -154,9 +166,9 @@ function dutyRangePanelInit(c){
 	dutyRangeStatTree = new Ext.tree.TreePanel({
 		id : 'today_dutyRangeStatTree',
 		region : 'west',
-		rootVisible : true,
+		rootVisible : false,
 		frame : true,
-		width : 240,	
+		width : 290,	
 		animate : true,
 		bodyStyle : 'backgroundColor:#FFFFFF; border:1px solid #99BBE8;',
 
@@ -173,7 +185,7 @@ function dutyRangePanelInit(c){
 		    })
 		}),
         listeners : {
-        	dblclick : function(e){
+        	click : function(e){
         		var treeNode = Ext.ux.getSelNode(dutyRangeStatTree);
         		if(typeof treeNode.attributes.onDuty != 'undefined'){
         			//跨域调用
@@ -185,7 +197,11 @@ function dutyRangePanelInit(c){
         				businessStatic : treeNode.isLeaf()? 2 : 1
         			});	
         		}
-        		
+        		if(typeof treeNode.attributes.onDuty != 'undefined' && treeNode.isLeaf()){
+        			statType = 2;
+        		}else{
+        			statType = 1;
+        		}
         	}
         }
 	});
@@ -241,10 +257,16 @@ function dutyRangeWinInit(c){
 		modal : true,
 		closable : false,
 		constrainHeader : true,
-		width : 1080,
+		width : 1130,
 		height : 555,
 		items : [dutyRangeStatTree, dutyRangeStatGeneral],
 		bbar : ['->', {
+			text : '补打',
+			icon : '../../images/printShift.png',
+			handler : function(){
+				dutyRangeStatPrintHandler();
+			}
+		},{
 			text : '关闭',
 			iconCls : 'btn_close',
 			handler : function(){

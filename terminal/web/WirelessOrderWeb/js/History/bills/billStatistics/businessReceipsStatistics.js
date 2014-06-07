@@ -374,13 +374,13 @@ function initBusinessReceipsGrid(c){
 		beginDate : receipts_beginDate,
 		endDate : receipts_endDate,
 		callback : function(){
-			Ext.getCmp('businessReceipt_SubBtnSearch').handler();
+			Ext.getCmp('businessReceipt_btnSearch').handler();
 		}
 	});
 	
 	var businessReceiptGridTbarItem = ['->', {
 		text : '搜索',
-		id : 'businessReceipt_SubBtnSearch',
+		id : 'businessReceipt_btnSearch',
 		iconCls : 'btn_search',
 		handler : function(){
 			var dateBegin = Ext.getCmp('receipts_dateSearchDateBegin');

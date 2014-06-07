@@ -139,6 +139,7 @@ Ext.override(Ext.grid.CellSelectionModel, {
 // GridPanel默认分页条数
 var GRID_PADDING_LIMIT_10 = 10;
 var GRID_PADDING_LIMIT_20 = 20;
+var GRID_PADDING_LIMIT_25 = 25;
 var GRID_PADDING_LIMIT_30 = 30;
 var GRID_PADDING_LIMIT_50 = 50;
 // 操作类型

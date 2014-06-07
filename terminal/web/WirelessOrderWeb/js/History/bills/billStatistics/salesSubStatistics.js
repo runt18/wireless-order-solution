@@ -44,7 +44,7 @@ function initRegionCombo(statistic){
 				});
 			},
 			select : function(thiz, record, index){
-				Ext.getCmp(statistic+'SubBtnSearch').handler();
+				Ext.getCmp(statistic+'btnSearch').handler();
 			}
 		}
 	};
@@ -101,7 +101,7 @@ function orderFoodStatPanelInit(){
         		salesSubDeptId = e.attributes.deptID;
         	},
         	dblclick : function(e){
-        		Ext.getCmp('foodStatistic_SubBtnSearch').handler();
+        		Ext.getCmp('foodStatistic_btnSearch').handler();
         	}
         }
 	});
@@ -133,7 +133,7 @@ function orderFoodStatPanelInit(){
 		beginDate : beginDate,
 		endDate : endDate,
 		callback : function(){
-			Ext.getCmp('foodStatistic_SubBtnSearch').handler();
+			Ext.getCmp('foodStatistic_btnSearch').handler();
 		}
 	});
 	var foodName = new Ext.form.TextField({
@@ -151,7 +151,7 @@ function orderFoodStatPanelInit(){
 	    '->', {
 		text : '搜索',
 		iconCls : 'btn_search',
-		id : 'foodStatistic_SubBtnSearch',
+		id : 'foodStatistic_btnSearch',
 		handler : function(){
 			var bd = beginDate.getValue();
 			var ed = endDate.getValue();
@@ -256,7 +256,7 @@ function orderFoodStatPanelInit(){
 		key : Ext.EventObject.ENTER,
 		scope : this,
 		fn : function(){
-			Ext.getCmp('foodStatistic_SubBtnSearch').handler();
+			Ext.getCmp('foodStatistic_btnSearch').handler();
 		}
 	}];
 	orderFoodStatPanelGrid.region = 'center';
@@ -322,7 +322,7 @@ function kitchenStatPanelInit(){
 		beginDate : beginDate,
 		endDate : endDate,
 		callback : function(){
-			Ext.getCmp('kitchenStatistic_SubBtnSearch').handler();
+			Ext.getCmp('kitchenStatistic_btnSearch').handler();
 		}
 	});
 	
@@ -336,7 +336,7 @@ function kitchenStatPanelInit(){
 			}
 		}, '-', {
 			text : '搜索',
-			id : 'kitchenStatistic_SubBtnSearch',
+			id : 'kitchenStatistic_btnSearch',
 			iconCls : 'btn_search',
 			handler : function(){
 				var bd = beginDate.getValue();
@@ -475,7 +475,7 @@ function deptStatPanelInit(){
 		beginDate : beginDate,
 		endDate : endDate,
 		callback : function(){
-			Ext.getCmp('deptStatistic_SubBtnSearch').handler();
+			Ext.getCmp('deptStatistic_btnSearch').handler();
 		}
 	});
 	
@@ -484,7 +484,7 @@ function deptStatPanelInit(){
 		initRegionCombo('deptStatistic_'),
 		'->', {
 			text : '搜索',
-			id : 'deptStatistic_SubBtnSearch',
+			id : 'deptStatistic_btnSearch',
 			iconCls : 'btn_search',
 			handler : function(){
 				var bd = beginDate.getValue();

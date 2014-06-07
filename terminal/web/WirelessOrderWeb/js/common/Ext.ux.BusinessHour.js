@@ -253,7 +253,7 @@ Ext.ux.initTimeBar = function(c){
 						select : function(thiz, record, index){
 							Ext.ux.statistic_oBusinessHourData({data : record.json, type : 'set', statistic : c.statistic});
 							if(record.data.id != -2){
-								Ext.getCmp(c.statistic+'SubBtnSearch').handler();
+								Ext.getCmp(c.statistic+'btnSearch').handler();
 							}
 						}
 					}
@@ -326,7 +326,7 @@ Ext.ux.initTimeBar = function(c){
 						select : function(thiz, record, index){
 							Ext.ux.statistic_oBusinessHourData({data : record.json, type : 'set', statistic : c.statistic});
 							if(record.data.id != -2){
-								Ext.getCmp(c.statistic+'SubBtnSearch').handler();
+								Ext.getCmp(c.statistic+'btnSearch').handler();
 							}
 
 						}
