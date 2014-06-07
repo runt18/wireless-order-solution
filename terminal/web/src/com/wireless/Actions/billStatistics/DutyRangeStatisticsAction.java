@@ -117,8 +117,8 @@ public class DutyRangeStatisticsAction extends DispatchAction {
 				jsb.append(",");
 			}
 			jsb.append("{");
-			jsb.append("text:'" + list.get(i).getStaffName() + " (应收款：<font style=\"color :green;font-weight:bolder\">"+ NumericUtil.float2String2(list.get(i).getTotalPrice())
-						+"</font> ，实收款：<font style=\"color :red;font-weight:bolder\">"+ NumericUtil.float2String2(list.get(i).getActualPrice()) +"</font>)'");
+			jsb.append("text:'" + list.get(i).getStaffName() + " (应交款：<font style=\"color :green;font-weight:bolder\">"+ NumericUtil.float2String2(list.get(i).getTotalPrice())
+						+"</font> ，实交款：<font style=\"color :red;font-weight:bolder\">"+ NumericUtil.float2String2(list.get(i).getActualPrice()) +"</font>)'");
 			jsb.append(",expanded : " + (list.get(i).getPayments().isEmpty() ? true : false));
 			jsb.append(",expandable : true");
 			jsb.append(",children:[");
