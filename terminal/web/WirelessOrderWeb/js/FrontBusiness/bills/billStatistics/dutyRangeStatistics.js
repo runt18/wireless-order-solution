@@ -197,6 +197,23 @@ function dutyRangePanelInit(c){
         				businessStatic : treeNode.isLeaf()? 2 : 1,
         				staffId : treeNode.isLeaf()?treeNode.attributes.staffId : ''
         			});	
+        		}else{
+        			dutyRangeStatGeneral.load({
+						autoLoad : false,
+						url : '../window/history/businessStatistics.jsp',
+						scripts : true,
+						nocache : true,
+						text : '功能加载中, 请稍后......',
+						params : {
+							d : '_' + new Date().getTime(),
+							dataSource : 'today',
+							queryPattern : 6,
+							onDuty : treeNode.attributes['onDutyFormat'],
+							offDuty : treeNode.attributes['offDutyFormat'],
+							businessStatic : statType
+						}
+					});	
+        			
         		}
         		if(typeof treeNode.attributes.onDuty != 'undefined' && treeNode.isLeaf()){
         			statType = 2;

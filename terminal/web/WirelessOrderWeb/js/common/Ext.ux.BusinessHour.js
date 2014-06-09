@@ -1,5 +1,168 @@
 Ext.ux.businessHourComboData = [['00', '00' ], ['01', '01' ], ['02', '02' ], ['03', '03' ], ['04', '04' ], ['05', '05'], ['06', '06'], ['07', '07'], ['08', '08'], ['09', '09'], ['10', '10'], ['11', '11'], ['12', '12']];
 
+/**
+ * 初始化时间工具栏
+ * @param {} c
+ * @return {}
+ */
+Ext.ux.initTimeBar = function(c){
+	
+	var timeBar;
+	//返回一条完整工具栏
+	if(c.tbarType == 0){
+		timeBar = new Ext.Toolbar({
+			id : c.statistic+'TimeBar',
+			hidden : false,
+			height : 28,
+			items : [
+				{xtype:'tbtext',text:'&nbsp;日期:'}, c.dateCombo, 
+			    {xtype:'tbtext',text:'&nbsp;'},  c.beginDate,
+			    {xtype:'tbtext',text:'&nbsp;至&nbsp;'}, c.endDate, 
+			    {xtype : 'tbtext', text : '&nbsp;&nbsp;'},
+				{xtype : 'tbtext', text : '市别:'},
+				{
+					xtype : 'combo',
+					forceSelection : true,
+					width : 90,
+					value : -1,
+					id : c.statistic+'comboBusinessHour',
+					store : new Ext.data.SimpleStore({
+						fields : ['id', 'name']
+					}),
+					valueField : 'id',
+					displayField : 'name',
+					typeAhead : true,
+					mode : 'local',
+					triggerAction : 'all',
+					selectOnFocus : true,
+					allowBlank : false,
+					readOnly : false,
+					listeners : {
+						render : function(thiz){
+							var data = [[-1,'全天']];
+							Ext.Ajax.request({
+								url : '../../QueryBusinessHour.do',
+								success : function(res, opt){
+									var jr = Ext.decode(res.responseText);
+									for(var i = 0; i < jr.root.length; i++){
+										data.push([jr.root[i]['id'], jr.root[i]['name'], jr.root[i]['opening'], jr.root[i]['ending']]);
+									}
+									data.push([-2,'自定义']);
+									thiz.store.loadData(data);
+									thiz.setValue(-1);
+								},
+								fialure : function(res, opt){
+									thiz.store.loadData(data);
+									thiz.setValue(-1);
+								}
+							});
+						},
+						select : function(thiz, record, index){
+							Ext.ux.statistic_oBusinessHourData({data : record.json, type : 'set', statistic : c.statistic});
+							if(record.data.id != -2){
+								Ext.getCmp(c.statistic+'btnSearch').handler();
+							}
+						}
+					}
+				},
+				{xtype : 'tbtext', text : '&nbsp;&nbsp;'},
+				{xtype : 'tbtext', id : c.statistic+'txtBusinessHourBegin', text : '<font style="color:green; font-size:20px">00:00</font>'},
+			    buildBusinessAPMCombo(c.statistic+'comboBusinessBeginApm'),
+			    buildBusinessHourCombo(c.statistic+'comboBegionHour'),
+				{xtype : 'tbtext', id:c.statistic+'txtBusinessHourBeginText',hidden : true,text : '时'},
+				buildBusinessMinCombo(c.statistic+'comboBegionMin'),
+				{xtype : 'tbtext', id:c.statistic+'txtBusinessMinBeginText',hidden : true,text : '分'},
+				{
+					xtype : 'tbtext',
+					hidden : false,
+					text : '&nbsp;至&nbsp;'
+				}, 
+				{xtype : 'tbtext', id : c.statistic+'txtBusinessHourEnd', text : '<font style="color:green; font-size:20px">00:00</font>'},
+			    buildBusinessAPMCombo(c.statistic+'comboBusinessEndApm'),
+				buildBusinessHourCombo(c.statistic+'comboEndHour'),
+				{xtype : 'tbtext',id:c.statistic+'txtBusinessHourEndText',hidden : true, text : '时'},
+				buildBusinessMinCombo(c.statistic+'comboEndMin'),
+				{xtype : 'tbtext', id:c.statistic+'txtBusinessMinEndText', hidden : true,text : '分'},
+				{xtype : 'tbtext', text : '&nbsp;&nbsp;'}
+			]
+		});
+	}else{ //返回包含时间工具栏的数组用于拼接
+		timeBar = [
+				{xtype:'tbtext',text:'日期:'}, c.dateCombo, 
+			    {xtype:'tbtext',text:'&nbsp;'},  c.beginDate,
+			    {xtype:'tbtext',text:'&nbsp;至&nbsp;'}, c.endDate, 
+			    {xtype : 'tbtext', text : '&nbsp;&nbsp;'},
+			    {xtype : 'tbtext', text : '市别:'},
+				{
+					xtype : 'combo',
+					forceSelection : true,
+					width : 90,
+					value : -1,
+					id : c.statistic+'comboBusinessHour',
+					store : new Ext.data.SimpleStore({
+						fields : ['id', 'name']
+					}),
+					valueField : 'id',
+					displayField : 'name',
+					typeAhead : true,
+					mode : 'local',
+					triggerAction : 'all',
+					selectOnFocus : true,
+					allowBlank : false,
+					readOnly : false,
+					listeners : {
+						render : function(thiz){
+							var data = [[-1,'全天']];
+							Ext.Ajax.request({
+								url : '../../QueryBusinessHour.do',
+								success : function(res, opt){
+									var jr = Ext.decode(res.responseText);
+									for(var i = 0; i < jr.root.length; i++){
+										data.push([jr.root[i]['id'], jr.root[i]['name'], jr.root[i]['opening'], jr.root[i]['ending']]);
+									}
+									data.push([-2,'自定义']);
+									thiz.store.loadData(data);
+									thiz.setValue(-1);
+								},
+								fialure : function(res, opt){
+									thiz.store.loadData(data);
+									thiz.setValue(-1);
+								}
+							});
+						},
+						select : function(thiz, record, index){
+							Ext.ux.statistic_oBusinessHourData({data : record.json, type : 'set', statistic : c.statistic});
+							if(record.data.id != -2){
+								Ext.getCmp(c.statistic+'btnSearch').handler();
+							}
+
+						}
+					}
+				},
+				{xtype : 'tbtext', text : '&nbsp;&nbsp;'},
+				{xtype : 'tbtext', id : c.statistic+'txtBusinessHourBegin', text : '<font style="color:green; font-size:20px">00:00</font>'},
+			    buildBusinessAPMCombo(c.statistic+'comboBusinessBeginApm'),
+				 buildBusinessHourCombo(c.statistic+'comboBegionHour'),
+				{xtype : 'tbtext', id:c.statistic+'txtBusinessHourBeginText',hidden : true,text : '时'},
+				buildBusinessMinCombo(c.statistic+'comboBegionMin'),
+				{xtype : 'tbtext', id:c.statistic+'txtBusinessMinBeginText',hidden : true,text : '分'},
+				{
+					xtype : 'tbtext',
+					hidden : false,
+					text : '&nbsp;至&nbsp;'
+				}, 
+				{xtype : 'tbtext', id : c.statistic+'txtBusinessHourEnd', text : '<font style="color:green; font-size:20px">00:00</font>'},
+			    buildBusinessAPMCombo(c.statistic+'comboBusinessEndApm'),
+				 buildBusinessHourCombo(c.statistic+'comboEndHour'),
+				{xtype : 'tbtext',id:c.statistic+'txtBusinessHourEndText',hidden : true, text : '时'},
+				buildBusinessMinCombo(c.statistic+'comboEndMin'),
+				{xtype : 'tbtext', id:c.statistic+'txtBusinessMinEndText', hidden : true,text : '分'},
+				{xtype : 'tbtext', text : '&nbsp;&nbsp;'}];
+	}
+
+	return timeBar;
+};
+
 //生成上下午combo
 function buildBusinessAPMCombo(id){
 	return {
@@ -193,165 +356,3 @@ Ext.ux.statistic_oBusinessHourData = function(c){
 	return c;
 };
 
-/**
- * 初始化时间工具栏
- * @param {} c
- * @return {}
- */
-Ext.ux.initTimeBar = function(c){
-	
-	var timeBar;
-	//返回一条完整工具栏
-	if(c.tbarType == 0){
-		timeBar = new Ext.Toolbar({
-			id : c.statistic+'TimeBar',
-			hidden : false,
-			height : 28,
-			items : [
-				{xtype:'tbtext',text:'&nbsp;日期:'}, c.dateCombo, 
-			    {xtype:'tbtext',text:'&nbsp;'},  c.beginDate,
-			    {xtype:'tbtext',text:'&nbsp;至&nbsp;'}, c.endDate, 
-			    {xtype : 'tbtext', text : '&nbsp;&nbsp;'},
-				{xtype : 'tbtext', text : '市别:'},
-				{
-					xtype : 'combo',
-					forceSelection : true,
-					width : 90,
-					value : -1,
-					id : c.statistic+'comboBusinessHour',
-					store : new Ext.data.SimpleStore({
-						fields : ['id', 'name']
-					}),
-					valueField : 'id',
-					displayField : 'name',
-					typeAhead : true,
-					mode : 'local',
-					triggerAction : 'all',
-					selectOnFocus : true,
-					allowBlank : false,
-					readOnly : false,
-					listeners : {
-						render : function(thiz){
-							var data = [[-1,'全天']];
-							Ext.Ajax.request({
-								url : '../../QueryBusinessHour.do',
-								success : function(res, opt){
-									var jr = Ext.decode(res.responseText);
-									for(var i = 0; i < jr.root.length; i++){
-										data.push([jr.root[i]['id'], jr.root[i]['name'], jr.root[i]['opening'], jr.root[i]['ending']]);
-									}
-									data.push([-2,'自定义']);
-									thiz.store.loadData(data);
-									thiz.setValue(-1);
-								},
-								fialure : function(res, opt){
-									thiz.store.loadData(data);
-									thiz.setValue(-1);
-								}
-							});
-						},
-						select : function(thiz, record, index){
-							Ext.ux.statistic_oBusinessHourData({data : record.json, type : 'set', statistic : c.statistic});
-							if(record.data.id != -2){
-								Ext.getCmp(c.statistic+'btnSearch').handler();
-							}
-						}
-					}
-				},
-				{xtype : 'tbtext', text : '&nbsp;&nbsp;'},
-				{xtype : 'tbtext', id : c.statistic+'txtBusinessHourBegin', text : '<font style="color:green; font-size:20px">00:00</font>'},
-			    buildBusinessAPMCombo(c.statistic+'comboBusinessBeginApm'),
-			    buildBusinessHourCombo(c.statistic+'comboBegionHour'),
-				{xtype : 'tbtext', id:c.statistic+'txtBusinessHourBeginText',hidden : true,text : '时'},
-				buildBusinessMinCombo(c.statistic+'comboBegionMin'),
-				{xtype : 'tbtext', id:c.statistic+'txtBusinessMinBeginText',hidden : true,text : '分'},
-				{
-					xtype : 'tbtext',
-					hidden : false,
-					text : '&nbsp;至&nbsp;'
-				}, 
-				{xtype : 'tbtext', id : c.statistic+'txtBusinessHourEnd', text : '<font style="color:green; font-size:20px">00:00</font>'},
-			    buildBusinessAPMCombo(c.statistic+'comboBusinessEndApm'),
-				buildBusinessHourCombo(c.statistic+'comboEndHour'),
-				{xtype : 'tbtext',id:c.statistic+'txtBusinessHourEndText',hidden : true, text : '时'},
-				buildBusinessMinCombo(c.statistic+'comboEndMin'),
-				{xtype : 'tbtext', id:c.statistic+'txtBusinessMinEndText', hidden : true,text : '分'},
-				{xtype : 'tbtext', text : '&nbsp;&nbsp;'}
-			]
-		});
-	}else{ //返回包含时间工具栏的数组用于拼接
-		timeBar = [
-				{xtype:'tbtext',text:'日期:'}, c.dateCombo, 
-			    {xtype:'tbtext',text:'&nbsp;'},  c.beginDate,
-			    {xtype:'tbtext',text:'&nbsp;至&nbsp;'}, c.endDate, 
-			    {xtype : 'tbtext', text : '&nbsp;&nbsp;'},
-			    {xtype : 'tbtext', text : '市别:'},
-				{
-					xtype : 'combo',
-					forceSelection : true,
-					width : 90,
-					value : -1,
-					id : c.statistic+'comboBusinessHour',
-					store : new Ext.data.SimpleStore({
-						fields : ['id', 'name']
-					}),
-					valueField : 'id',
-					displayField : 'name',
-					typeAhead : true,
-					mode : 'local',
-					triggerAction : 'all',
-					selectOnFocus : true,
-					allowBlank : false,
-					readOnly : false,
-					listeners : {
-						render : function(thiz){
-							var data = [[-1,'全天']];
-							Ext.Ajax.request({
-								url : '../../QueryBusinessHour.do',
-								success : function(res, opt){
-									var jr = Ext.decode(res.responseText);
-									for(var i = 0; i < jr.root.length; i++){
-										data.push([jr.root[i]['id'], jr.root[i]['name'], jr.root[i]['opening'], jr.root[i]['ending']]);
-									}
-									data.push([-2,'自定义']);
-									thiz.store.loadData(data);
-									thiz.setValue(-1);
-								},
-								fialure : function(res, opt){
-									thiz.store.loadData(data);
-									thiz.setValue(-1);
-								}
-							});
-						},
-						select : function(thiz, record, index){
-							Ext.ux.statistic_oBusinessHourData({data : record.json, type : 'set', statistic : c.statistic});
-							if(record.data.id != -2){
-								Ext.getCmp(c.statistic+'btnSearch').handler();
-							}
-
-						}
-					}
-				},
-				{xtype : 'tbtext', text : '&nbsp;&nbsp;'},
-				{xtype : 'tbtext', id : c.statistic+'txtBusinessHourBegin', text : '<font style="color:green; font-size:20px">00:00</font>'},
-			    buildBusinessAPMCombo(c.statistic+'comboBusinessBeginApm'),
-				 buildBusinessHourCombo(c.statistic+'comboBegionHour'),
-				{xtype : 'tbtext', id:c.statistic+'txtBusinessHourBeginText',hidden : true,text : '时'},
-				buildBusinessMinCombo(c.statistic+'comboBegionMin'),
-				{xtype : 'tbtext', id:c.statistic+'txtBusinessMinBeginText',hidden : true,text : '分'},
-				{
-					xtype : 'tbtext',
-					hidden : false,
-					text : '&nbsp;至&nbsp;'
-				}, 
-				{xtype : 'tbtext', id : c.statistic+'txtBusinessHourEnd', text : '<font style="color:green; font-size:20px">00:00</font>'},
-			    buildBusinessAPMCombo(c.statistic+'comboBusinessEndApm'),
-				 buildBusinessHourCombo(c.statistic+'comboEndHour'),
-				{xtype : 'tbtext',id:c.statistic+'txtBusinessHourEndText',hidden : true, text : '时'},
-				buildBusinessMinCombo(c.statistic+'comboEndMin'),
-				{xtype : 'tbtext', id:c.statistic+'txtBusinessMinEndText', hidden : true,text : '分'},
-				{xtype : 'tbtext', text : '&nbsp;&nbsp;'}];
-	}
-
-	return timeBar;
-};

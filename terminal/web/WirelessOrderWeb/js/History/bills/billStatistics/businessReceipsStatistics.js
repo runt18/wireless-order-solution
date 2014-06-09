@@ -103,6 +103,9 @@ function showChart(jdata){
 	var dateBegin = Ext.getCmp('receipts_dateSearchDateBegin').getValue().format('Y-m-d');
 	var dateEnd = Ext.getCmp('receipts_dateSearchDateEnd').getValue().format('Y-m-d');
 	
+	var hourBegin = Ext.getCmp('businessReceipt_txtBusinessHourBegin').getEl().dom.textContent;
+	var hourEnd = Ext.getCmp('businessReceipt_txtBusinessHourEnd').getEl().dom.textContent;
+	
 	var chartData = eval('(' + jdata.other.chart + ')');
 	highChart = new Highcharts.Chart({
 		plotOptions : {
@@ -126,7 +129,7 @@ function showChart(jdata){
         	renderTo: 'businessReceiptsChart'
     	}, 
         title: {
-            text: '<b>营业走势图（'+dateBegin+ '至' +dateEnd+'）</b>'
+            text: '<b>营业走势图（'+dateBegin+ '至' +dateEnd+'）'+hourBegin+ ' - ' + hourEnd + '</b>'
         },
         labels: {
         	items : [{

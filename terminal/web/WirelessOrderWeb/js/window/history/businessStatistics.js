@@ -320,6 +320,8 @@ Ext.onReady(function(){
 					if(queryPattern == 5){
 						Ext.getCmp('businessStatisticTbar').hide();
 					}
+				}else if(queryPattern == 6){
+					Ext.getCmp('businessStatisticTbar').hide();
 				}
 			}
 		}
@@ -340,6 +342,6 @@ function loadPaymentGeneral(c){
 	dataSource = c.dataSource;
 	queryPattern = c.queryPattern;
 	businessStatic = c.businessStatic;
-	staffId = c.staffId
+	staffId = c.staffId;
 	Ext.getCmp('btnSearchForBusinessStatisticsSummaryInformation').handler();
 }
