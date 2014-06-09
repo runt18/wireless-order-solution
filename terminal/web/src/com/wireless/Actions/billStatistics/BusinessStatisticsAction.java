@@ -52,8 +52,7 @@ public class BusinessStatisticsAction extends DispatchAction {
 				if(range != null){
 					sdetail = ShiftDao.getByRange(staff, range, DateType.HISTORY);
 				}else{
-					sdetail = null;
-					jObject.initTip(false, WebParams.TIP_TITLE_DEFAULT, 1111, "操作成功, 该时间段没有记录, 请重新查询.");
+					sdetail = ShiftDao.getByRange(staff, new DutyRange(onDuty, offDuty), DateType.HISTORY);
 				}
 			}else{
 				sdetail = ShiftDao.getByRange(staff, new DutyRange(onDuty, offDuty), DateType.HISTORY);
