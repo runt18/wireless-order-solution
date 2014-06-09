@@ -462,7 +462,7 @@ function paymentHandler(){
 		bbar : ['->', {
 			xtype : 'checkbox',
 			id : 'cbox_paymentRegion',
-			boxLabel : '选择区域&nbsp;&nbsp;',
+			boxLabel : '打印位置&nbsp;&nbsp;',
 			listeners : {
 				check : function(thiz, checked){
 				if(checked){
