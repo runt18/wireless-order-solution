@@ -121,6 +121,7 @@ public class DutyRangeStatisticsAction extends DispatchAction {
 						+"</font> ，实交款：<font style=\"color :red;font-weight:bolder\">"+ NumericUtil.float2String2(list.get(i).getActualPrice()) +"</font>)'");
 			jsb.append(",expanded : " + (list.get(i).getPayments().isEmpty() ? true : false));
 			jsb.append(",expandable : true");
+			jsb.append(",icon : '../../images/user.png'");
 			jsb.append(",children:[");
 			jsb.append(getChildrenPayments(list.get(i).getPayments()));
 			jsb.append("]");
