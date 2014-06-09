@@ -1,4 +1,4 @@
-﻿receivablesStaticRecordCount = 22;
+﻿receivablesStaticRecordCount = 93;
 var highChart;
 
 var tempLoadMask = new Ext.LoadMask(document.body, {
@@ -134,7 +134,7 @@ function showChart(jdata){
         labels: {
         	items : [{
         		html : '<b>总营业额:' + chartData.totalMoney + ' 元</b><br><b>日均收入:' + chartData.avgMoney + ' 元</b><br><b>日均账单:' + chartData.avgCount + ' 张</b>',
-	        	style : {left :($('#businessReceiptsChart').width()*0.80), top: '0px'}
+	        	style : {left :/*($('#businessReceiptsChart').width()*0.80)*/'0px', top: '0px'}
         	}]
         },
         xAxis: {
