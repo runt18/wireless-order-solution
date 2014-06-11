@@ -34,6 +34,7 @@ import com.wireless.pojo.billStatistics.IncomeByKitchen;
 import com.wireless.pojo.billStatistics.IncomeByPay;
 import com.wireless.pojo.billStatistics.IncomeByRepaid;
 import com.wireless.pojo.billStatistics.IncomeByService;
+import com.wireless.pojo.billStatistics.IncomeTrendByDept;
 import com.wireless.pojo.billStatistics.RepaidStatistics;
 import com.wireless.pojo.client.MemberOperation.ChargeType;
 import com.wireless.pojo.client.MemberOperation.OperationType;
@@ -675,49 +676,49 @@ public class CalcBillStatisticsDao {
 	
 	private static String makeSql4CalcFood(Staff staff, DutyRange range, ExtraCond extraCond){
 		
-//		return " SELECT " +
-//			   " OF.order_id, OF.food_id, " +
-// 			   " MAX(OF.food_status) AS food_status, MAX(OF.name) AS food_name,	MAX(OF.dept_id) AS dept_id, MAX(OF.kitchen_id) AS kitchen_id, " +
-//			   " SUM(order_count) AS food_amount, " +
-//			   " CASE WHEN OF.is_gift = 1 THEN (OF.unit_price + IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * discount * SUM(OF.order_count) ELSE 0 END AS food_gift," +
-//			   " (OF.unit_price + IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * (1 - discount) * SUM(OF.order_count) AS food_discount, " +
-//			   " CASE WHEN ((OF.is_gift = 0) AND (OF.food_status & " + Food.WEIGHT + ") = 0) THEN (OF.unit_price + IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * discount * SUM(OF.order_count) " +
-//					" WHEN ((OF.is_gift = 0) AND (OF.food_status & " + Food.WEIGHT + ") <> 0) THEN (OF.unit_price * SUM(OF.order_count) + (IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0))) * discount " +
-//				  	" ELSE 0 " +
-//				  	" END AS food_income " +
-//			   " FROM " + Params.dbName + "." + extraCond.orderFoodTbl + " OF " + 
-//			   " JOIN " + Params.dbName + "." + extraCond.orderTbl + " O ON 1 = 1 " + 
-//			   " AND OF.order_id = O.id " + 
-//			   " AND O.restaurant_id = " + staff.getRestaurantId() + 
-//			   " AND O.status <> " + Order.Status.UNPAID.getVal() +
-//			   " JOIN " + Params.dbName + "." + extraCond.tasteGrpTbl + " TG " + " ON OF.taste_group_id = TG.taste_group_id " +
-//			   " WHERE 1 = 1 " +
-//			   (extraCond == null ? "" : extraCond.toString()) +
-//			   " AND O.order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +
-//			   " GROUP BY OF.order_id, OF.food_id, OF.taste_group_id, OF.is_gift " +
-//			   " HAVING food_amount > 0 ";
-		
 		return " SELECT " +
-		   " OF.order_id, OF.food_id, " +
-		   " MAX(OF.food_status) AS food_status, MAX(OF.name) AS food_name,	MAX(OF.dept_id) AS dept_id, MAX(OF.kitchen_id) AS kitchen_id, " +
-		   " SUM(order_count) AS food_amount, " +
-		   " CASE WHEN ((OF.food_status & " + Food.GIFT + ") <> 0) THEN (OF.unit_price + IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * discount * SUM(OF.order_count) ELSE 0 END AS food_gift," +
-		   " (OF.unit_price + IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * (1 - discount) * SUM(OF.order_count) AS food_discount, " +
-		   " CASE WHEN ((OF.food_status & " + Food.GIFT + ") = 0 AND (OF.food_status & " + Food.WEIGHT + ") = 0) THEN (OF.unit_price + IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * discount * SUM(OF.order_count) " +
-				" WHEN ((OF.food_status & " + Food.GIFT + ") = 0 AND (OF.food_status & " + Food.WEIGHT + ") <> 0) THEN (OF.unit_price * SUM(OF.order_count) + (IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0))) * discount " +
-			  	" ELSE 0 " +
-			  	" END AS food_income " +
-		   " FROM " + Params.dbName + "." + extraCond.orderFoodTbl + " OF " + 
-		   " JOIN " + Params.dbName + "." + extraCond.orderTbl + " O ON 1 = 1 " + 
-		   " AND OF.order_id = O.id " + 
-		   " AND O.restaurant_id = " + staff.getRestaurantId() + 
-		   " AND O.status <> " + Order.Status.UNPAID.getVal() +
-		   " JOIN " + Params.dbName + "." + extraCond.tasteGrpTbl + " TG " + " ON OF.taste_group_id = TG.taste_group_id " +
-		   " WHERE 1 = 1 " +
-		   (extraCond == null ? "" : extraCond.toString()) +
-		   " AND O.order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +
-		   " GROUP BY " + " OF.order_id, OF.food_id, OF.taste_group_id " +
-		   " HAVING food_amount > 0 ";
+			   " OF.order_id, OF.food_id, " +
+ 			   " MAX(OF.food_status) AS food_status, MAX(OF.name) AS food_name,	MAX(OF.dept_id) AS dept_id, MAX(OF.kitchen_id) AS kitchen_id, " +
+			   " SUM(order_count) AS food_amount, " +
+			   " CASE WHEN OF.is_gift = 1 THEN (OF.unit_price + IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * discount * SUM(OF.order_count) ELSE 0 END AS food_gift," +
+			   " (OF.unit_price + IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * (1 - discount) * SUM(OF.order_count) AS food_discount, " +
+			   " CASE WHEN ((OF.is_gift = 0) AND (OF.food_status & " + Food.WEIGHT + ") = 0) THEN (OF.unit_price + IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * discount * SUM(OF.order_count) " +
+					" WHEN ((OF.is_gift = 0) AND (OF.food_status & " + Food.WEIGHT + ") <> 0) THEN (OF.unit_price * SUM(OF.order_count) + (IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0))) * discount " +
+				  	" ELSE 0 " +
+				  	" END AS food_income " +
+			   " FROM " + Params.dbName + "." + extraCond.orderFoodTbl + " OF " + 
+			   " JOIN " + Params.dbName + "." + extraCond.orderTbl + " O ON 1 = 1 " + 
+			   " AND OF.order_id = O.id " + 
+			   " AND O.restaurant_id = " + staff.getRestaurantId() + 
+			   " AND O.status <> " + Order.Status.UNPAID.getVal() +
+			   " JOIN " + Params.dbName + "." + extraCond.tasteGrpTbl + " TG " + " ON OF.taste_group_id = TG.taste_group_id " +
+			   " WHERE 1 = 1 " +
+			   (extraCond == null ? "" : extraCond.toString()) +
+			   " AND O.order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +
+			   " GROUP BY OF.order_id, OF.food_id, OF.taste_group_id, OF.is_gift " +
+			   " HAVING food_amount > 0 ";
+		
+//		return " SELECT " +
+//		   " OF.order_id, OF.food_id, " +
+//		   " MAX(OF.food_status) AS food_status, MAX(OF.name) AS food_name,	MAX(OF.dept_id) AS dept_id, MAX(OF.kitchen_id) AS kitchen_id, " +
+//		   " SUM(order_count) AS food_amount, " +
+//		   " CASE WHEN ((OF.food_status & " + Food.GIFT + ") <> 0) THEN (OF.unit_price + IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * discount * SUM(OF.order_count) ELSE 0 END AS food_gift," +
+//		   " (OF.unit_price + IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * (1 - discount) * SUM(OF.order_count) AS food_discount, " +
+//		   " CASE WHEN ((OF.food_status & " + Food.GIFT + ") = 0 AND (OF.food_status & " + Food.WEIGHT + ") = 0) THEN (OF.unit_price + IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * discount * SUM(OF.order_count) " +
+//				" WHEN ((OF.food_status & " + Food.GIFT + ") = 0 AND (OF.food_status & " + Food.WEIGHT + ") <> 0) THEN (OF.unit_price * SUM(OF.order_count) + (IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0))) * discount " +
+//			  	" ELSE 0 " +
+//			  	" END AS food_income " +
+//		   " FROM " + Params.dbName + "." + extraCond.orderFoodTbl + " OF " + 
+//		   " JOIN " + Params.dbName + "." + extraCond.orderTbl + " O ON 1 = 1 " + 
+//		   " AND OF.order_id = O.id " + 
+//		   " AND O.restaurant_id = " + staff.getRestaurantId() + 
+//		   " AND O.status <> " + Order.Status.UNPAID.getVal() +
+//		   " JOIN " + Params.dbName + "." + extraCond.tasteGrpTbl + " TG " + " ON OF.taste_group_id = TG.taste_group_id " +
+//		   " WHERE 1 = 1 " +
+//		   (extraCond == null ? "" : extraCond.toString()) +
+//		   " AND O.order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +
+//		   " GROUP BY " + " OF.order_id, OF.food_id, OF.taste_group_id " +
+//		   " HAVING food_amount > 0 ";
 	}
 	
 	/**
@@ -1550,6 +1551,74 @@ public class CalcBillStatisticsDao {
 		return Collections.unmodifiableList(result);
 	}
 
+	/**
+	 * Calculate the income trend according to specific duty range and department.
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param dutyRange
+	 * 			the duty range
+	 * @param deptId
+	 * 			the department 
+	 * @return the result to income trend {@link IncomeTrendByDept}
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws ParseException
+	 * 			throws if failed to parse the duty range
+	 */
+	public static List<IncomeTrendByDept> calcIncomeTrendByDept(Staff staff, DutyRange dutyRange, Department.DeptId deptId) throws SQLException, ParseException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return calcIncomeTrendByDept(dbCon, staff, dutyRange, deptId);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	
+	/**
+	 * Calculate the income trend according to specific duty range and department.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param dutyRange
+	 * 			the duty range
+	 * @param deptId
+	 * 			the department 
+	 * @return the result to income trend {@link IncomeTrendByDept}
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws ParseException
+	 * 			throws if failed to parse the duty range
+	 */
+	public static List<IncomeTrendByDept> calcIncomeTrendByDept(DBCon dbCon, Staff staff, DutyRange dutyRange, Department.DeptId deptId) throws SQLException, ParseException{
+		
+		List<IncomeTrendByDept> result = new ArrayList<IncomeTrendByDept>();
+		
+		Calendar c = Calendar.getInstance();
+		Date dateBegin = new SimpleDateFormat("yyyy-MM-dd").parse(dutyRange.getOnDutyFormat());
+		Date dateEnd = new SimpleDateFormat("yyyy-MM-dd").parse(dutyRange.getOffDutyFormat());
+		c.setTime(dateBegin);
+		while (dateBegin.compareTo(dateEnd) <= 0) {
+			c.add(Calendar.DATE, 1);
+			dateBegin = c.getTime();
+			
+			DutyRange range = DutyRangeDao.exec(dbCon, staff, 
+												DateUtil.format(dateBegin, DateUtil.Pattern.DATE_TIME), 
+												DateUtil.format(c.getTime(), DateUtil.Pattern.DATE_TIME));
+			
+			List<IncomeByDept> deptIncomes = calcIncomeByDept(dbCon, staff, range, new ExtraCond(DateType.HISTORY).setDept(deptId));
+			if(deptIncomes.isEmpty()){
+				result.add(new IncomeTrendByDept(range, IncomeByDept.DUMMY));
+			}else{
+				result.add(new IncomeTrendByDept(range, deptIncomes.get(0)));
+			}
+		}
+		
+		return result;
+	}
+	
 	/**
 	 * Get income to each day during on & off duty.
 	 * @param dbCon
