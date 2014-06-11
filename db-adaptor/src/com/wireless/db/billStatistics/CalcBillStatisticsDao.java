@@ -1552,24 +1552,24 @@ public class CalcBillStatisticsDao {
 	}
 
 	/**
-	 * Calculate the income trend according to specific duty range and department.
+	 * Calculate the income trend according to specific duty range and extra condition.
 	 * @param staff
 	 * 			the staff to perform this action
 	 * @param dutyRange
 	 * 			the duty range
-	 * @param deptId
-	 * 			the department 
+	 * @param extraCond
+	 * 			the extra condition 
 	 * @return the result to income trend {@link IncomeTrendByDept}
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 * @throws ParseException
 	 * 			throws if failed to parse the duty range
 	 */
-	public static List<IncomeTrendByDept> calcIncomeTrendByDept(Staff staff, DutyRange dutyRange, Department.DeptId deptId) throws SQLException, ParseException{
+	public static List<IncomeTrendByDept> calcIncomeTrendByDept(Staff staff, DutyRange dutyRange, ExtraCond extraCond) throws SQLException, ParseException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return calcIncomeTrendByDept(dbCon, staff, dutyRange, deptId);
+			return calcIncomeTrendByDept(dbCon, staff, dutyRange, extraCond);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -1577,22 +1577,22 @@ public class CalcBillStatisticsDao {
 	
 	
 	/**
-	 * Calculate the income trend according to specific duty range and department.
+	 * Calculate the income trend according to specific duty range and extra condition.
 	 * @param dbCon
 	 * 			the database connection
 	 * @param staff
 	 * 			the staff to perform this action
 	 * @param dutyRange
 	 * 			the duty range
-	 * @param deptId
-	 * 			the department 
+	 * @param extraCond
+	 * 			the extra condition 
 	 * @return the result to income trend {@link IncomeTrendByDept}
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 * @throws ParseException
 	 * 			throws if failed to parse the duty range
 	 */
-	public static List<IncomeTrendByDept> calcIncomeTrendByDept(DBCon dbCon, Staff staff, DutyRange dutyRange, Department.DeptId deptId) throws SQLException, ParseException{
+	public static List<IncomeTrendByDept> calcIncomeTrendByDept(DBCon dbCon, Staff staff, DutyRange dutyRange, ExtraCond extraCond) throws SQLException, ParseException{
 		
 		List<IncomeTrendByDept> result = new ArrayList<IncomeTrendByDept>();
 		
@@ -1608,7 +1608,7 @@ public class CalcBillStatisticsDao {
 												DateUtil.format(dateBegin, DateUtil.Pattern.DATE_TIME), 
 												DateUtil.format(c.getTime(), DateUtil.Pattern.DATE_TIME));
 			
-			List<IncomeByDept> deptIncomes = calcIncomeByDept(dbCon, staff, range, new ExtraCond(DateType.HISTORY).setDept(deptId));
+			List<IncomeByDept> deptIncomes = calcIncomeByDept(dbCon, staff, range, extraCond);
 			if(deptIncomes.isEmpty()){
 				result.add(new IncomeTrendByDept(range, IncomeByDept.DUMMY));
 			}else{
