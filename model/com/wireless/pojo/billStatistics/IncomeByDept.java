@@ -6,6 +6,8 @@ import com.wireless.pojo.menuMgr.Department;
 
 public class IncomeByDept implements Jsonable{
 
+	public final static IncomeByDept DUMMY = new IncomeByDept();
+	
 	private Department mDept;				//某个部门的信息
 	private float mGiftPrice;				//某个部门的赠送额
 	private float mDiscountPrice;			//某个部门的折扣额
