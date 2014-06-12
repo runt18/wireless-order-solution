@@ -11,15 +11,15 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import com.wireless.db.billStatistics.CancelledFoodDao;
+import com.wireless.db.billStatistics.CalcCancelStatisticsDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.json.Jsonable;
-import com.wireless.pojo.billStatistics.CancelIncomeByDept;
-import com.wireless.pojo.billStatistics.CancelIncomeByDept.IncomeByEachReason;
-import com.wireless.pojo.billStatistics.CancelIncomeByReason;
-import com.wireless.pojo.billStatistics.CancelIncomeByReason.IncomeByEachDept;
+import com.wireless.pojo.billStatistics.cancel.CancelIncomeByDept;
+import com.wireless.pojo.billStatistics.cancel.CancelIncomeByReason;
+import com.wireless.pojo.billStatistics.cancel.CancelIncomeByDept.IncomeByEachReason;
+import com.wireless.pojo.billStatistics.cancel.CancelIncomeByReason.IncomeByEachDept;
 import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.crMgr.CancelReason;
 import com.wireless.pojo.dishesOrder.CancelledFood;
@@ -73,7 +73,7 @@ public class QueryCancelledFoodAction extends Action {
 				return null;
 			}
 			if(otype == null || otype.trim().isEmpty()){
-				otype = CancelledFoodDao.ORDER_BY_COUNT + "";
+				otype = CalcCancelStatisticsDao.ORDER_BY_COUNT + "";
 			}
 			if(deptID == null || deptID.trim().isEmpty()){
 				deptID = "-1";
@@ -88,8 +88,8 @@ public class QueryCancelledFoodAction extends Action {
 			DutyRange queryDate = new DutyRange(dateBeg, dateEnd);
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
-			if(qt == CancelledFoodDao.QUERY_BY_DEPT){
-				CancelIncomeByDept dept = CancelledFoodDao.getCancelledFoodByDept(staff, queryDate, did, dt, ot);
+			if(qt == CalcCancelStatisticsDao.QUERY_BY_DEPT){
+				CancelIncomeByDept dept = CalcCancelStatisticsDao.getCancelledFoodByDept(staff, queryDate, did, dt, ot);
 				if(dept != null){
 					list = dept.getIncomeByEachReason();
 					if(list != null && list.size() > 0){
@@ -102,8 +102,8 @@ public class QueryCancelledFoodAction extends Action {
 						sum = tempSum;
 					}
 				}
-			}else if(qt == CancelledFoodDao.QUERY_BY_REASON){
-				CancelIncomeByReason reason = CancelledFoodDao.getCancelledFoodByReason(staff, queryDate, rid, dt, ot);
+			}else if(qt == CalcCancelStatisticsDao.QUERY_BY_REASON){
+				CancelIncomeByReason reason = CalcCancelStatisticsDao.getCancelledFoodByReason(staff, queryDate, rid, dt, ot);
 				if(reason != null){
 					list = reason.getIncomeByEachDept();
 					if(list != null && list.size() > 0){
@@ -116,8 +116,8 @@ public class QueryCancelledFoodAction extends Action {
 						sum = tempSum;
 					}
 				}
-			}else if(qt == CancelledFoodDao.QUERY_BY_FOOD){
-				list = CancelledFoodDao.getCancelledFoodDetail(staff, queryDate, dt, did, rid);
+			}else if(qt == CalcCancelStatisticsDao.QUERY_BY_FOOD){
+				list = CalcCancelStatisticsDao.getCancelledFoodDetail(staff, queryDate, dt, did, rid);
 				if(list != null && list.size() > 0){
 					CancelledFood tempSum = new CancelledFood(), tempItem = null;
 					for(int i = 0; i < list.size(); i++){

@@ -30,7 +30,7 @@ import org.apache.struts.actions.DispatchAction;
 
 import com.wireless.db.billStatistics.CalcBillStatisticsDao;
 import com.wireless.db.billStatistics.CalcBillStatisticsDao.ExtraCond;
-import com.wireless.db.billStatistics.CancelledFoodDao;
+import com.wireless.db.billStatistics.CalcCancelStatisticsDao;
 import com.wireless.db.billStatistics.SaleDetailsDao;
 import com.wireless.db.client.member.MemberDao;
 import com.wireless.db.client.member.MemberOperationDao;
@@ -2176,7 +2176,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 		String reasonID = request.getParameter("reasonID");
 		
 		if(otype == null || otype.trim().isEmpty()){
-			otype = CancelledFoodDao.ORDER_BY_COUNT + "";
+			otype = CalcCancelStatisticsDao.ORDER_BY_COUNT + "";
 		}
 		if(deptID == null || deptID.trim().isEmpty()){
 			deptID = "-1";
@@ -2191,7 +2191,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 		Staff staff = StaffDao.verify(Integer.parseInt(pin));
 		
 		
-		list = CancelledFoodDao.getCancelledFoodDetail(staff, queryDate, dt, did, rid);
+		list = CalcCancelStatisticsDao.getCancelledFoodDetail(staff, queryDate, dt, did, rid);
 		CancelledFood tempSum = new CancelledFood();
 		if(list != null && list.size() > 0){
 			CancelledFood tempItem = null;
