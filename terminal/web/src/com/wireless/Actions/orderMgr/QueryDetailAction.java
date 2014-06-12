@@ -50,7 +50,7 @@ public class QueryDetailAction extends Action {
 				t.setTableAlias(Integer.valueOf(talias));
 				list = OrderFoodDao.getSingleDetailByTable(staff, t);
 			}else {
-				list = OrderFoodDao.getSingleDetail(staff, new ExtraCond(DateType.HISTORY).setOrderId(Integer.parseInt(orderID)), " ORDER BY OFH.order_date ");
+				list = OrderFoodDao.getSingleDetail(staff, new ExtraCond(DateType.HISTORY).setOrderId(Integer.parseInt(orderID)), " ORDER BY OF.order_date ");
 			}
 		}catch(BusinessException e){
 			e.printStackTrace();
