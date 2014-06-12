@@ -15,12 +15,13 @@ public class FoodDetailContent extends ConcreteContent {
 		TEMP(2, "(ÁÙ)"),
 		HANG(3, "(½Ð)"),
 		HURRIED(4, "(´ß)"),
-		NAME(5, "²ËÃû"),
-		AMOUNT(6, "ÊýÁ¿"),
-		TASTE(7, "¿ÚÎ¶"),
-		COMBO(8, "(Ì×)"),
-		DISCOUNT(9, "ÕÛ¿Û"),
-		STATUS(10, "×´Ì¬");
+		GIFT(5, "(Ôù)"),
+		NAME(6, "²ËÃû"),
+		AMOUNT(7, "ÊýÁ¿"),
+		TASTE(8, "¿ÚÎ¶"),
+		COMBO(9, "(Ì×)"),
+		DISCOUNT(10, "ÕÛ¿Û"),
+		STATUS(11, "×´Ì¬");
 		
 		private final int id;
 		private final String desc;
@@ -106,7 +107,7 @@ public class FoodDetailContent extends ConcreteContent {
 	 * Generate a single line of order food to print.
 	 * The style to this food list is like below.<br>
 	 * -----------------------------------------------------<br>
-	 * (³Æ)(ÁÙ)(½Ð)Food-Taste(1)(Ì×)(8.5ÕÛ)(ÌØ,Ôù)  $32.00<br>
+	 * (³Æ)(ÁÙ)(½Ð)(Ôù)Food-Taste(1)(Ì×)(8.5ÕÛ)(ÌØ)  $32.00<br>
 	 * -----------------------------------------------------<br>
 	 */
 	@Override
@@ -132,6 +133,9 @@ public class FoodDetailContent extends ConcreteContent {
 			detail.append("(½Ð)");
 		}
 		
+		if(_displayConfig.contains(DisplayItem.GIFT) && _of.isGift()){
+			detail.append("(Ôù)");
+		}
 		detail.append(_of.getName());
 		
 		if(_displayConfig.contains(DisplayItem.AMOUNT)){
@@ -160,18 +164,6 @@ public class FoodDetailContent extends ConcreteContent {
 				}
 				status.append("ÌØ");
 			}
-	//		if(_of.asFood().isRecommend()){
-	//			if(status.length() != 0){
-	//				status.append(",");
-	//			}
-	//			status.append("¼ö");
-	//		}
-			if(_of.asFood().isGift()){
-				if(status.length() != 0){
-					status.append(",");
-				}
-				status.append("Ôù");
-			}
 			if(status.length() != 0){
 				status.insert(0, "(").append(")");
 			}
@@ -180,7 +172,7 @@ public class FoodDetailContent extends ConcreteContent {
 		
 		String foodPrice;
 		if(_displayConfig.contains(DisplayItem.DISCOUNT)){
-			foodPrice = NumericUtil.CURRENCY_SIGN + NumericUtil.float2String(_of.calcPriceWithTaste());
+			foodPrice = NumericUtil.CURRENCY_SIGN + NumericUtil.float2String(_of.calcPrice());
 		}else{
 			foodPrice = NumericUtil.CURRENCY_SIGN + NumericUtil.float2String(_of.calcPriceBeforeDiscount());
 		}
