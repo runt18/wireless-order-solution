@@ -45,10 +45,10 @@ public class OrderFoodDao {
 		public String toString(){
 			StringBuilder extraCond = new StringBuilder();
 			if(reasonId > 0){
-				extraCond.append(" AND " + orderFoodTbl + ".cancel_reason_id = " + reasonId);
+				extraCond.append(" AND " + orderFoodTblAlias + ".cancel_reason_id = " + reasonId);
 			}
-			extraCond.append(" AND " + orderTbl + ".cancel_price <> 0");
-			extraCond.append(" AND " + orderFoodTbl + ".order_count < 0");
+			extraCond.append(" AND " + orderTblAlias + ".cancel_price <> 0");
+			extraCond.append(" AND " + orderFoodTblAlias + ".order_count < 0");
 			extraCond.append(super.toString());
 			
 			return extraCond.toString();
@@ -57,6 +57,8 @@ public class OrderFoodDao {
 	
 	public static class ExtraCond{
 		private final DateType dateType;
+		final String orderFoodTblAlias = "OF";
+		final String orderTblAlias = "O";
 		final String orderFoodTbl;
 		final String orderTbl;
 		
@@ -67,12 +69,12 @@ public class OrderFoodDao {
 		
 		public ExtraCond(DateType dateType){
 			this.dateType = dateType;
-			if(this.dateType.isHistory()){
-				orderTbl = "OH";
-				orderFoodTbl = "OFH";
+			if(dateType.isToday()){
+				orderTbl = "order";
+				orderFoodTbl = "order_food";
 			}else{
-				orderTbl = "O";
-				orderFoodTbl = "OF";
+				orderTbl = "order_history";
+				orderFoodTbl = "order_food_history";
 			}
 		}
 		
@@ -100,16 +102,16 @@ public class OrderFoodDao {
 		public String toString(){
 			StringBuilder extraCond = new StringBuilder();
 			if(orderId > 0){
-				extraCond.append(" AND " + orderTbl + ".id = " + orderId);
+				extraCond.append(" AND " + orderTblAlias + ".id = " + orderId);
 			}
 			if(deptId != null){
-				extraCond.append(" AND " + orderFoodTbl + ".dept_id = " + deptId.getVal());
+				extraCond.append(" AND " + orderFoodTblAlias + ".dept_id = " + deptId.getVal());
 			}
 			if(dutyRange != null){
-				extraCond.append(" AND " + orderTbl + ".order_date BETWEEN '" + dutyRange.getOnDutyFormat() + "' AND '" + dutyRange.getOffDutyFormat() + "'");
+				extraCond.append(" AND " + orderTblAlias + ".order_date BETWEEN '" + dutyRange.getOnDutyFormat() + "' AND '" + dutyRange.getOffDutyFormat() + "'");
 			}
 			if(hourRange != null){
-				extraCond.append(" AND TIME(" + orderTbl + ".order_date) BETWEEN '" + hourRange.getOpeningFormat() + "' AND '" + hourRange.getEndingFormat() + "'");
+				extraCond.append(" AND TIME(" + orderTblAlias + ".order_date) BETWEEN '" + hourRange.getOpeningFormat() + "' AND '" + hourRange.getEndingFormat() + "'");
 			}
 			return extraCond.toString();
 		}
@@ -225,18 +227,18 @@ public class OrderFoodDao {
 		String sql;
 
 		if(dateType.isHistory()){
-		sql = "SELECT OFH.order_id, OFH.taste_group_id, OFH.is_temporary, " +
-				" OFH.restaurant_id, OFH.food_id, OFH.name, OFH.food_status, OFH.is_paid, " +
-				" OFH.unit_price, OFH.order_count, OFH.waiter, OFH.order_date, OFH.discount, OFH.order_date, " +
-				" OFH.cancel_reason_id, IF(OFH.cancel_reason_id = 1, '无原因', OFH.cancel_reason) cancel_reason, " +
-				" OFH.kitchen_id, (CASE WHEN K.kitchen_id IS NULL THEN '已删除厨房' ELSE K.name END) AS kitchen_name, " +
-				" OFH.dept_id, (CASE WHEN D.dept_id IS NULL THEN '已删除部门' ELSE D.name END) as dept_name " +
-				" FROM " + Params.dbName + ".order_food_history OFH " +
-				" JOIN " + Params.dbName + ".order_history OH ON OH.id = OFH.order_id " +
-				" LEFT JOIN " + Params.dbName + ".kitchen K ON OFH.kitchen_id = K.kitchen_id " +
+		sql = "SELECT OF.order_id, OF.taste_group_id, OF.is_temporary, " +
+				" OF.restaurant_id, OF.food_id, OF.name, OF.food_status, OF.is_paid, " +
+				" OF.unit_price, OF.order_count, OF.waiter, OF.order_date, OF.discount, OF.order_date, " +
+				" OF.cancel_reason_id, IF(OF.cancel_reason_id = 1, '无原因', OF.cancel_reason) cancel_reason, " +
+				" OF.kitchen_id, (CASE WHEN K.kitchen_id IS NULL THEN '已删除厨房' ELSE K.name END) AS kitchen_name, " +
+				" OF.dept_id, (CASE WHEN D.dept_id IS NULL THEN '已删除部门' ELSE D.name END) as dept_name " +
+				" FROM " + Params.dbName + ".order_food_history OF " +
+				" JOIN " + Params.dbName + ".order_history O ON O.id = OF.order_id " +
+				" LEFT JOIN " + Params.dbName + ".kitchen K ON OF.kitchen_id = K.kitchen_id " +
 				" LEFT JOIN " + Params.dbName + ".department D ON D.dept_id = K.dept_id AND D.restaurant_id = K.restaurant_id " +
 				" WHERE 1 = 1 " +
-				" AND OH.restaurant_id = " + staff.getRestaurantId() +
+				" AND O.restaurant_id = " + staff.getRestaurantId() +
 				(extraCond == null ? "" : extraCond) +
 				(orderClause == null ? "" : " " + orderClause);
 		
@@ -316,230 +318,83 @@ public class OrderFoodDao {
 		
 		return orderFoods;
 	}
-	
+
 	/**
-	 * Create the foods from database table 'order_food' according an extra
-	 * condition. Note that the database should be connected before invoking
-	 * this method.
-	 * 
+	 * Get the detail according to extra condition
 	 * @param dbCon
-	 *            the database connection
+	 * 			the database connection
 	 * @param staff
-	 * 			  the staff to perform this action
+	 * 			the staff to perform this action
 	 * @param extraCond
-	 *            the extra condition to search the foods
-	 * @param orderClause
-	 *            the order clause to search the foods
-	 * @return an array of foods
+	 * 			the extra condition
+	 * @return the order food
 	 * @throws SQLException
-	 *             throws if fail to execute the SQL statement
-	 * @throws BusinessException 
-	 * 				throws if the any associated taste group is NOT found
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if any taste group does NOT exist 
 	 */
-	public static List<OrderFood> getDetailToday(DBCon dbCon, Staff staff, String extraCond, String orderClause) throws SQLException, BusinessException {
+	public static List<OrderFood> getDetail(DBCon dbCon, Staff staff, ExtraCond extraCond) throws SQLException, BusinessException{
 		String sql;
 
-		sql = " SELECT OF.order_id, OF.food_id, OF.taste_group_id, OF.is_temporary, " +
+		sql = " SELECT OF.order_id, OF.food_id, OF.taste_group_id, OF.is_temporary, OF.is_gift, " +
 			  " MIN(OF.id) AS id, MAX(OF.restaurant_id) AS restaurant_id, MAX(OF.kitchen_id) AS kitchen_id, " + 
-		      " MAX(OF.name) AS name, MAX(OF.food_status) AS food_status, " +
-		      " MAX(OF.unit_price) AS unit_price, MAX(OF.commission) AS commission, MAX(OF.waiter) AS waiter, MAX(OF.order_date) AS order_date, MAX(OF.discount) AS discount, " +
+			  " MAX(OF.name) AS name, MAX(OF.food_status) AS food_status, " +
+			  " MAX(OF.unit_price) AS unit_price, MAX(OF.commission) AS commission, MAX(OF.waiter) AS waiter, MAX(OF.order_date) AS order_date, MAX(OF.discount) AS discount, " +
 			  " MAX(OF.dept_id) AS dept_id, MAX(OF.id) AS id, MAX(OF.order_date) AS pay_datetime, SUM(OF.order_count) AS order_sum " +
-			  " FROM " +
-			  Params.dbName +	".order_food OF " +
+			  " FROM " + Params.dbName + "." + extraCond.orderFoodTbl + " " + extraCond.orderFoodTblAlias +
+			  " JOIN " + Params.dbName + "." + extraCond.orderTbl + " " + extraCond.orderTblAlias +
+			  " ON OF.order_id = O.id " +
 			  " WHERE 1 = 1 " +
 			  (extraCond == null ? "" : extraCond) +
-			  " GROUP BY OF.food_id, OF.taste_group_id, OF.is_temporary " + 
-			  " HAVING " +
-			  " order_sum > 0 " +
-			  (orderClause == null ? " ORDER BY id ASC " : " " + orderClause);
-		
-		dbCon.rs = dbCon.stmt.executeQuery(sql);
-		ArrayList<OrderFood> orderFoods = new ArrayList<OrderFood>();
-		while (dbCon.rs.next()) {
-			OrderFood food = new OrderFood(dbCon.rs.getLong("id"));
-			food.asFood().setFoodId(dbCon.rs.getInt("food_id"));
-			food.asFood().setName(dbCon.rs.getString("name"));
-			food.asFood().setRestaurantId(dbCon.rs.getInt("restaurant_id"));
-			food.asFood().setStatus(dbCon.rs.getShort("food_status"));
-			int tasteGroupId = dbCon.rs.getInt("taste_group_id");
-			if(tasteGroupId != TasteGroup.EMPTY_TASTE_GROUP_ID){
-				food.makeTasteGroup(tasteGroupId, null, null);
-			}
-			food.setCount(dbCon.rs.getFloat("order_sum"));
-			food.asFood().setPrice(dbCon.rs.getFloat("unit_price"));
-			food.asFood().setCommission(dbCon.rs.getFloat("commission"));
-			food.setOrderDate(dbCon.rs.getTimestamp("pay_datetime").getTime());
-			food.setWaiter(dbCon.rs.getString("waiter"));
-			food.getKitchen().setRestaurantId(dbCon.rs.getInt("restaurant_id"));
-			food.getKitchen().setId(dbCon.rs.getInt("kitchen_id"));
-			food.getKitchen().getDept().setRestaurantId(dbCon.rs.getInt("restaurant_id"));
-			food.getKitchen().getDept().setId(dbCon.rs.getShort("dept_id"));
-			food.setDiscount(dbCon.rs.getFloat("discount"));
-			food.setTemp(dbCon.rs.getBoolean("is_temporary"));
-			food.asFood().setChildFoods(FoodDao.getChildrenByParent(staff, food.asFood().getFoodId()));
-			orderFoods.add(food);
-		}
-		dbCon.rs.close();
-		
-		/**
-		 * Get the taste group to order food which has taste
-		 */
-		for(OrderFood orderFood : orderFoods){
-			if(orderFood.hasTasteGroup()){
-				orderFood.setTasteGroup(TasteGroupDao.getTodayById(dbCon, staff, orderFood.getTasteGroup().getGroupId()));
-			}
-		}
-		
-		return orderFoods;
-	}
-	
-	/**
-	 * Create the foods from database table 'order_food' according an extra
-	 * condition. Note that the database should be connected before invoking
-	 * this method.
-	 * 
-	 * @param staff
-	 * 			  the staff to perform this action
-	 * @param extraCond
-	 *            the extra condition to search the foods
-	 * @param orderClause
-	 *            the order clause to search the foods
-	 * @return an array of foods
-	 * @throws SQLException
-	 *             throws if fail to execute the SQL statement
-	 * @throws BusinessException 
-	 * 				throws if the any associated taste group is NOT found
-	 */
-	public static List<OrderFood> getDetailToday(Staff staff, String extraCond, String orderClause) throws Exception {
-		DBCon dbCon = new DBCon();
-		try{
-			dbCon.connect();
-			return OrderFoodDao.getDetailToday(dbCon, staff, extraCond, orderClause);
-		}catch(Exception e){
-			throw e;
-		}finally{
-			dbCon.disconnect();
-		}
-	}
-	
-	/**
-	 * Create the foods from database table 'order_food_history' according an
-	 * extra condition. Note that the database should be connected before
-	 * invoking this method.
-	 * 
-	 * @param dbCon
-	 *            the database connection
-	 * @param staff
-	 * 			  the staff to perform this action
-	 * @param extraCond
-	 *            the extra condition to search the foods
-	 * @param orderClause
-	 *            the order clause to search the foods
-	 * @return an array of foods
-	 * @throws SQLException
-	 *             throws if fail to execute the SQL statement
-	 * @throws BusinessException 
-	 * 			   throws if any associated taste group does NOT exist
-	 */
-	public static List<OrderFood> getDetailHistory(DBCon dbCon, Staff staff, String extraCond, String orderClause) throws SQLException, BusinessException {
-		String sql;
-
-		sql = " SELECT OFH.order_id, OFH.food_id, OFH.taste_group_id, OFH.is_temporary, " +
-			  " MIN(OFH.id) AS id, MAX(OFH.restaurant_id) AS restaurant_id, MAX(OFH.kitchen_id) AS kitchen_id, " +
-			  " MAX(OFH.name) AS name, MAX(OFH.food_status) AS food_status, " +
-			  " MAX(OFH.unit_price) AS unit_price, MAX(OFH.commission) AS commission, MAX(OFH.waiter) AS waiter, MAX(OFH.order_date) AS order_date, MAX(OFH.discount) AS discount, " +
-			  " MAX(OFH.dept_id) AS dept_id, MAX(OFH.id) AS id, MAX(OFH.order_date) AS pay_datetime, SUM(OFH.order_count) AS order_sum " +
-			  " FROM " +
-			  Params.dbName + ".order_food_history OFH " +
-			  " WHERE 1 = 1 " +
-			  (extraCond == null ? "" : extraCond) +
-			  " GROUP BY OFH.food_id, OFH.taste_group_id, OFH.is_temporary " +
+			  " GROUP BY OF.food_id, OF.taste_group_id, OF.is_temporary, OF.is_gift " + 
 			  " HAVING order_sum > 0 " +
-			  (orderClause == null ? " ORDER BY id ASC " : " " + orderClause);
+			  " ORDER BY id ASC ";
 		
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
-		ArrayList<OrderFood> orderFoods = new ArrayList<OrderFood>();
+		List<OrderFood> orderFoods = new ArrayList<OrderFood>();
 		while (dbCon.rs.next()) {
-			OrderFood food = new OrderFood();
-			food.asFood().setFoodId(dbCon.rs.getInt("food_id"));
-			food.asFood().setName(dbCon.rs.getString("name"));
-			food.asFood().setRestaurantId(dbCon.rs.getInt("restaurant_id"));
-			food.asFood().setStatus(dbCon.rs.getShort("food_status"));
+			OrderFood of = new OrderFood(dbCon.rs.getLong("id"));
+			of.asFood().setFoodId(dbCon.rs.getInt("food_id"));
+			of.asFood().setName(dbCon.rs.getString("name"));
+			of.asFood().setRestaurantId(dbCon.rs.getInt("restaurant_id"));
+			of.asFood().setStatus(dbCon.rs.getShort("food_status"));
 			int tasteGroupId = dbCon.rs.getInt("taste_group_id");
 			if(tasteGroupId != TasteGroup.EMPTY_TASTE_GROUP_ID){
-				food.makeTasteGroup(tasteGroupId, null, null);
+				of.makeTasteGroup(tasteGroupId, null, null);
 			}
-			food.setCount(dbCon.rs.getFloat("order_sum"));
-			food.asFood().setPrice(dbCon.rs.getFloat("unit_price"));
-			food.asFood().setCommission(dbCon.rs.getFloat("commission"));
-			food.setWaiter(dbCon.rs.getString("waiter"));
-			food.setOrderDate(dbCon.rs.getTimestamp("pay_datetime").getTime());
-			food.getKitchen().setRestaurantId(dbCon.rs.getInt("restaurant_id"));
-			food.getKitchen().setId(dbCon.rs.getInt("kitchen_id"));
-			food.getKitchen().getDept().setRestaurantId(dbCon.rs.getInt("restaurant_id"));
-			food.getKitchen().getDept().setId(dbCon.rs.getShort("dept_id"));
-			food.setDiscount(dbCon.rs.getFloat("discount"));
-			food.setTemp(dbCon.rs.getBoolean("is_temporary"));
-			orderFoods.add(food);
+			of.setCount(dbCon.rs.getFloat("order_sum"));
+			of.asFood().setPrice(dbCon.rs.getFloat("unit_price"));
+			of.asFood().setCommission(dbCon.rs.getFloat("commission"));
+			of.setOrderDate(dbCon.rs.getTimestamp("pay_datetime").getTime());
+			of.setWaiter(dbCon.rs.getString("waiter"));
+			of.getKitchen().setRestaurantId(dbCon.rs.getInt("restaurant_id"));
+			of.getKitchen().setId(dbCon.rs.getInt("kitchen_id"));
+			of.getKitchen().getDept().setRestaurantId(dbCon.rs.getInt("restaurant_id"));
+			of.getKitchen().getDept().setId(dbCon.rs.getShort("dept_id"));
+			of.setDiscount(dbCon.rs.getFloat("discount"));
+			of.setTemp(dbCon.rs.getBoolean("is_temporary"));
+			of.setGift(dbCon.rs.getBoolean("is_gift"));
+			orderFoods.add(of);
 		}
 		dbCon.rs.close();
 		
 		/**
 		 * Get the taste group to order food which has taste
 		 */
-		for(OrderFood orderFood : orderFoods){
-			if(orderFood.hasTasteGroup()){
-				orderFood.setTasteGroup(TasteGroupDao.getHistoryById(dbCon, staff, orderFood.getTasteGroup().getGroupId()));
+		for(OrderFood eachOrderFood : orderFoods){
+			if(eachOrderFood.hasTasteGroup()){
+				if(extraCond.dateType.isToday()){
+					if(eachOrderFood.asFood().isCombo()){
+						eachOrderFood.asFood().setChildFoods(FoodDao.getChildrenByParent(dbCon, staff, eachOrderFood.asFood().getFoodId()));
+					}
+					eachOrderFood.setTasteGroup(TasteGroupDao.getTodayById(dbCon, staff, eachOrderFood.getTasteGroup().getGroupId()));
+				}else{
+					eachOrderFood.setTasteGroup(TasteGroupDao.getHistoryById(dbCon, staff, eachOrderFood.getTasteGroup().getGroupId()));
+				}
 			}
 		}
 		
 		return orderFoods;
 	}
 	
-	/**
-	 * Get the foods from database table 'order_food_history' according an extra condition.
-	 * @param staff
-	 * 			  the staff to perform this action
-	 * @param extraCond
-	 *            the extra condition to search the foods
-	 * @param orderClause
-	 *            the order clause to search the foods
-	 * @return an array of foods
-	 * @throws SQLException
-	 *             throws if fail to execute the SQL statement
-	 * @throws BusinessException 
-	 * 			   throws if any associated taste group does NOT exist
-	 */
-	public static List<OrderFood> getDetailHistory(Staff staff, String extraCond, String orderClause) throws Exception {
-		DBCon dbCon = new DBCon();
-		try{
-			dbCon.connect();
-			return OrderFoodDao.getDetailHistory(dbCon, staff, extraCond, orderClause);
-		}catch(Exception e){
-			throw e;
-		}finally{
-			dbCon.disconnect();
-		}
-	}
-	/**
-	 * 
-	 * @param dbCon
-	 * @param term
-	 * @param extraCond
-	 * @return
-	 * @throws SQLException
-	 */
-	public static float getSalesMoney(DBCon dbCon, Staff term, String extraCond) throws SQLException{
-		String sql = "SELECT SUM(unit_price * order_count) as money FROM " + Params.dbName + ".order_food_history " +
-				 " WHERE restaurant_id = " + term.getRestaurantId() + 
-				 (extraCond == null ? "" : extraCond);
-		dbCon.rs = dbCon.stmt.executeQuery(sql);
-		if(dbCon.rs.next()){
-			return dbCon.rs.getFloat("money");
-		}else{
-			return 0;
-		}
-		
-				
-	}
 }

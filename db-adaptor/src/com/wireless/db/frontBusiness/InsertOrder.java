@@ -2,7 +2,6 @@ package com.wireless.db.frontBusiness;
 
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.List;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
@@ -147,14 +146,9 @@ public class InsertOrder {
 		
 		if(orderToInsert.getDestTbl().isIdle()){
 			
-			List<OrderFood> foodsToInsert = orderToInsert.getOrderFoods();
-			for(OrderFood of : foodsToInsert){
+			for(OrderFood of : orderToInsert.getOrderFoods()){
 				//Skip the food whose order count is less than zero.
 				if(of.getCount() > 0){				
-					/**
-					 * Get all the food's detail info submitted by terminal.
-					 * If the food does NOT exist, tell the terminal that the food menu has been expired.
-					 */
 					if(of.isTemp()){
 						of.asFood().setKitchen(KitchenDao.getById(dbCon, staff, of.getKitchen().getId()));
 						
@@ -163,7 +157,7 @@ public class InsertOrder {
 						of.asFood().copyFrom(FoodDao.getById(dbCon, staff, of.getFoodId()));
 						
 						//Check to see whether the staff has the privilege to present the food.
-						if(of.asFood().isGift() && !staff.getRole().hasPrivilege(Privilege.Code.GIFT)){
+						if(of.isGift() && !staff.getRole().hasPrivilege(Privilege.Code.GIFT)){
 							throw new BusinessException(StaffError.GIFT_NOT_ALLOW);
 						}
 						
@@ -320,7 +314,8 @@ public class InsertOrder {
 				  " `restaurant_id`, `order_id`, `food_id`, `order_count`, `unit_price`, `commission`, `name`, " +
 				  " `food_status`, `discount`, `taste_group_id`, " +
 				  " `dept_id`, `kitchen_id`, " +
-				  " `staff_id`, `waiter`, `order_date`, `is_temporary` " +
+				  " `staff_id`, `waiter`, `order_date`, " +
+				  " `is_temporary`, `is_gift` " +
 				  " ) " +
 				  " VALUES " +
 				  " ( " +	
@@ -328,7 +323,7 @@ public class InsertOrder {
 				  orderToInsert.getId() + ", " +
 				  foodToInsert.getFoodId() + ", " +
 				  foodToInsert.getCount() + ", " + 
-				  foodToInsert.getPrice() + ", " + 
+				  foodToInsert.asFood().getPrice() + ", " + 
 				  foodToInsert.asFood().getCommission() + ",'" +
 				  foodToInsert.getName() + "', " +
 				  foodToInsert.asFood().getStatus() + ", " +
@@ -338,7 +333,8 @@ public class InsertOrder {
 				  foodToInsert.getKitchen().getId() + ", " +
 				  staff.getId() + "," +
 				  "'" + staff.getName() + "', NOW(), " + 
-				  (foodToInsert.isTemp() ? "1" : "0") + 
+				  (foodToInsert.isTemp() ? "1" : "0") + ", " +
+				  (foodToInsert.isGift() ? "1" : "0") +
 				  " ) ";
 				
 			dbCon.stmt.executeUpdate(sql);

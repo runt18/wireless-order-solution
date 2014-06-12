@@ -34,13 +34,15 @@ public class UpdateOrder {
 	
 	/**
 	 * The difference result between two orders, which consists of several things below.
-	 * 1 - The extra foods more than the original.
-	 * 2 - The cancelled foods less than the original.
-	 * 3 - The hurried foods in the new.
+	 * <li>The extra foods more than the original.
+	 * <li>The cancelled foods less than the original.
+	 * <li>The hurried foods in the new.
+	 * <li>The gift foods in the new. 
 	 */
 	public static class DiffResult{
 		public final Order oriOrder;
 		public final Order newOrder;
+		public final List<OrderFood> giftFoods = new ArrayList<OrderFood>();
 		public final List<OrderFood> extraFoods = new ArrayList<OrderFood>();
 		public final List<OrderFood> cancelledFoods = new ArrayList<OrderFood>();
 		public final List<OrderFood> hurriedFoods = new ArrayList<OrderFood>();
@@ -219,17 +221,13 @@ public class UpdateOrder {
 		//Calculate the difference between the original and new order.
 		DiffResult diffResult = diff(oriOrder, newOrder);
 		
-		//Check to see whether the staff has privilege to cancel the food
 		if(!diffResult.cancelledFoods.isEmpty() && !staff.getRole().hasPrivilege(Privilege.Code.CANCEL_FOOD)){
+			//Check to see whether the staff has privilege to cancel the food
 			throw new BusinessException(StaffError.CANCEL_FOOD_NOT_ALLOW);
 			
-		}else if(!diffResult.extraFoods.isEmpty()){
+		}else if(!diffResult.giftFoods.isEmpty() && !staff.getRole().hasPrivilege(Privilege.Code.GIFT)){
 			//Check to see whether the staff has privilege to present the food
-			for(OrderFood extraFood : diffResult.extraFoods){
-				if(extraFood.asFood().isGift() && !staff.getRole().hasPrivilege(Privilege.Code.GIFT)){
-					throw new BusinessException(StaffError.GIFT_NOT_ALLOW);
-				}
-			}
+			throw new BusinessException(StaffError.GIFT_NOT_ALLOW);
 		}
 		
 		return diffResult;
@@ -327,7 +325,7 @@ public class UpdateOrder {
 				  diffResult.newOrder.getId() + ", " +
 				  extraFood.getFoodId() + ", " +
 				  extraFood.getCount() + ", " + 
-				  extraFood.getPrice() + ", " + 
+				  extraFood.asFood().getPrice() + ", " + 
 				  extraFood.asFood().getCommission() + ", " +
 				  "'" + extraFood.getName() + "', " + 
 				  extraFood.asFood().getStatus() + ", " +
@@ -364,7 +362,7 @@ public class UpdateOrder {
 				  diffResult.newOrder.getId() + ", " +
 				  cancelledFood.getFoodId() + ", " +
 				  "-" + cancelledFood.getCount() + ", " + 
-				  cancelledFood.getPrice() + ", " + 
+				  cancelledFood.asFood().getPrice() + ", " + 
 				  cancelledFood.asFood().getCommission() + "," +
 				  "'" + cancelledFood.getName() + "', " + 
 				  cancelledFood.asFood().getStatus() + ", " +
@@ -534,6 +532,10 @@ public class UpdateOrder {
 			
 			if(newFood.isHurried()){
 				result.hurriedFoods.add(newFood);
+			}
+			
+			if(newFood.isGift()){
+				result.giftFoods.add(newFood);
 			}
 			
 			Iterator<OrderFood> iterOri = oriFoods.iterator();

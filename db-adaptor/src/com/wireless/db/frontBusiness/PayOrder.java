@@ -96,7 +96,7 @@ public class PayOrder {
 					sql = " UPDATE " + Params.dbName + ".order_food " +
 						  " SET " +
 						  " discount = " + food.getDiscount() + ", " +
-						  " unit_price = " + food.getPrice() +
+						  " unit_price = " + food.asFood().getPrice() +
 						  " WHERE order_id = " + orderCalculated.getId() + 
 						  " AND food_id = " + food.getFoodId();
 					dbCon.stmt.executeUpdate(sql);				
@@ -291,7 +291,7 @@ public class PayOrder {
 					  " SET " +
 					  " food_id = " + food.getFoodId() +
 					  " ,discount = " + food.getDiscount() + 
-					  " ,unit_price = " + food.getPrice() +
+					  " ,unit_price = " + food.asFood().getPrice() +
 					  " WHERE order_id = " + orderCalculated.getId() + 
 					  " AND food_id = " + food.getFoodId();
 				dbCon.stmt.executeUpdate(sql);				

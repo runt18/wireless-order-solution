@@ -494,7 +494,7 @@ public class FoodDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	private static List<Food> getChildrenByParent(DBCon dbCon, Staff staff, int parentId) throws SQLException{
+	public static List<Food> getChildrenByParent(DBCon dbCon, Staff staff, int parentId) throws SQLException{
 		
 		List<Food> childFoods = new ArrayList<Food>();
 		
