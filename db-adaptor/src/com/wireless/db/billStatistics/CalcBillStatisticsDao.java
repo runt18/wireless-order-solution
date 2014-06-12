@@ -7,17 +7,11 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.exception.BusinessException;
-import com.wireless.pojo.billStatistics.CancelIncomeByDept;
-import com.wireless.pojo.billStatistics.CancelIncomeByDept.IncomeByEachReason;
-import com.wireless.pojo.billStatistics.CancelIncomeByDeptAndReason;
-import com.wireless.pojo.billStatistics.CancelIncomeByReason;
-import com.wireless.pojo.billStatistics.CancelIncomeByReason.IncomeByEachDept;
 import com.wireless.pojo.billStatistics.CommissionStatistics;
 import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.billStatistics.HourRange;
@@ -38,7 +32,6 @@ import com.wireless.pojo.billStatistics.IncomeTrendByDept;
 import com.wireless.pojo.billStatistics.RepaidStatistics;
 import com.wireless.pojo.client.MemberOperation.ChargeType;
 import com.wireless.pojo.client.MemberOperation.OperationType;
-import com.wireless.pojo.crMgr.CancelReason;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.menuMgr.Food;
@@ -966,172 +959,6 @@ public class CalcBillStatisticsDao {
 		return foodIncomes;
 	}
 
-	/**
-	 * 
-	 * @param staff
-	 * @param range
-	 * @param extraCond
-	 * @param queryType
-	 * @return
-	 * @throws SQLException
-	 */
-	public static List<CancelIncomeByDept> calcCancelIncomeByDept(Staff staff, DutyRange range, String extraCond, DateType queryType) throws SQLException{
-		DBCon dbCon = new DBCon();
-		try{
-			dbCon.connect();
-			return calcCancelIncomeByDept(dbCon, staff, range, extraCond, queryType);
-		}finally{
-			dbCon.disconnect();
-		}
-	}
-	
-	/**
-	 * 
-	 * @param dbCon
-	 * @param staff
-	 * @param range
-	 * @param extraCond
-	 * @param queryType
-	 * @return
-	 * @throws SQLException
-	 */
-	public static List<CancelIncomeByDept> calcCancelIncomeByDept(DBCon dbCon, Staff staff, DutyRange range, String extraCond, DateType queryType) throws SQLException{
-		HashMap<Department, CancelIncomeByDept> result = new HashMap<Department, CancelIncomeByDept>();
-		List<CancelIncomeByDeptAndReason> list = calcCancelIncomeByDeptAndReason(dbCon, staff, range, extraCond, queryType);
-		for(CancelIncomeByDeptAndReason income : list){
-			CancelIncomeByDept incomeByDept = result.get(income.getDept());
-			if(incomeByDept != null){
-				incomeByDept.getIncomeByEachReason().add(new IncomeByEachReason(income.getReason(),
-																				income.getCancelAmount(),
-																				income.getCancelPrice()));
-			}else{
-				List<IncomeByEachReason> incomeByEachReason = new ArrayList<IncomeByEachReason>();
-				incomeByEachReason.add(new IncomeByEachReason(income.getReason(),
-															  income.getCancelAmount(),
-															  income.getCancelPrice()));
-				result.put(income.getDept(), new CancelIncomeByDept(income.getDept(), incomeByEachReason));
-			}
-			
-		}
-		return result.values().size() > 0 ? new ArrayList<CancelIncomeByDept>(result.values()) : new ArrayList<CancelIncomeByDept>(0);
-	}
-	
-	/**
-	 * 
-	 * @param staff
-	 * @param range
-	 * @param extraCond
-	 * @param queryType
-	 * @return
-	 * @throws SQLException
-	 */
-	public static List<CancelIncomeByReason> calcCancelIncomeByReason(Staff staff, DutyRange range, String extraCond, DateType queryType) throws SQLException{
-		DBCon dbCon = new DBCon();
-		try{
-			dbCon.connect();
-			return calcCancelIncomeByReason(dbCon, staff, range, extraCond, queryType);
-		}finally{
-			dbCon.disconnect();
-		}
-	}
-	
-	/**
-	 * 
-	 * @param dbCon
-	 * @param staff
-	 * @param range
-	 * @param extraCond
-	 * @param queryType
-	 * @return
-	 * @throws SQLException
-	 */
-	public static List<CancelIncomeByReason> calcCancelIncomeByReason(DBCon dbCon, Staff staff, DutyRange range, String extraCond, DateType queryType) throws SQLException{
-		HashMap<CancelReason, CancelIncomeByReason> result = new HashMap<CancelReason, CancelIncomeByReason>();
-		List<CancelIncomeByDeptAndReason> list = calcCancelIncomeByDeptAndReason(dbCon, staff, range, extraCond, queryType);
-		for(CancelIncomeByDeptAndReason income : list){
-			CancelIncomeByReason incomeByReason = result.get(income.getReason());
-			if(incomeByReason != null){
-				incomeByReason.getIncomeByEachDept().add(new IncomeByEachDept(income.getDept(),
-																			  income.getCancelAmount(),
-																			  income.getCancelPrice()));
-			}else{
-				List<IncomeByEachDept> incomeByEachDept = new ArrayList<IncomeByEachDept>();
-				incomeByEachDept.add(new IncomeByEachDept(income.getDept(),
-														  income.getCancelAmount(),
-														  income.getCancelPrice()));
-				result.put(income.getReason(), new CancelIncomeByReason(income.getReason(), incomeByEachDept));
-			}
-		}
-		return result.values().size() > 0 ? new ArrayList<CancelIncomeByReason>(result.values()) : new ArrayList<CancelIncomeByReason>(0);
-	}
-	
-	/**
-	 * 
-	 * @param dbCon
-	 * @param staff
-	 * @param range
-	 * @param extraCond
-	 * @param queryType
-	 * @return
-	 * @throws SQLException
-	 */
-	 private static List<CancelIncomeByDeptAndReason> calcCancelIncomeByDeptAndReason(DBCon dbCon, Staff staff, DutyRange range, String extraCond, DateType queryType) throws SQLException{
-		String orderFoodTbl = null;
-		String tasteGrpTbl = null;
-		if(queryType.isHistory()){
-			orderFoodTbl = TBL_ORDER_FOOD_HISTORY;
-			tasteGrpTbl = TBL_TASTE_GROUP_HISTORY;
-			
-		}else if(queryType.isToday()){
-			orderFoodTbl = TBL_ORDER_FOOD_TODAY;
-			tasteGrpTbl = TBL_TASTE_GROUP_TODAY;
-			
-		}else{
-			throw new IllegalArgumentException("The query type is invalid.");
-		}
-		
-		String sql;
-		
-		sql = " SELECT " +
-			  " MAX(D.dept_id) AS dept_id, MAX(D.display_id) AS dept_display_id, MAX(D.name) AS dept_name, " +
-			  " MAX(D.restaurant_id) AS restaurant_id, MAX(D.type) AS dept_type, " +
-			  " OF.cancel_reason_id, " +
-			  " CASE WHEN OF.cancel_reason_id = 1 THEN '无原因' ELSE MAX(OF.cancel_reason) END AS cancel_reason, " +
-			  " ABS(SUM(OF.order_count)) AS cancel_amount, " +
-			  " ABS(ROUND(SUM((OF.unit_price + IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * OF.order_count * OF.discount), 2)) AS cancel_price " +
-			  " FROM " + Params.dbName + "." + orderFoodTbl + " OF " +
-			  " JOIN " + Params.dbName + ".order_history O ON 1 = 1" +
-			  " AND OF.order_id = O.id " +
-			  " AND O.restaurant_id = " + staff.getRestaurantId() +
-			  " AND O.order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +
-			  " AND O.cancel_price <> 0 " +
-			  " JOIN " + Params.dbName + "." + tasteGrpTbl + " TG " + " ON OF.taste_group_id = TG.taste_group_id " +
-			  " JOIN " + Params.dbName + ".department D " + " ON OF.dept_id = D.dept_id AND OF.restaurant_id = D.restaurant_id AND D.type = " + Department.Type.NORMAL.getVal() +
-			  " WHERE 1 = 1 " +
-			  (extraCond == null ? "" : extraCond) +
-			  " AND OF.order_count < 0 " +
-			  " GROUP BY OF.dept_id, OF.cancel_reason_id " +
-			  " ORDER BY dept_display_id ";
-		
-		List<CancelIncomeByDeptAndReason> cancelByDept = new ArrayList<CancelIncomeByDeptAndReason>();
-		dbCon.rs = dbCon.stmt.executeQuery(sql);
-		while(dbCon.rs.next()){
-			cancelByDept.add(new CancelIncomeByDeptAndReason(new Department(dbCon.rs.getString("dept_name"), 
-					 											   		    dbCon.rs.getShort("dept_id"),
-					 											   		    dbCon.rs.getInt("restaurant_id"),
-					 											   		    Department.Type.valueOf(dbCon.rs.getInt("dept_type")),
-					 											   		    dbCon.rs.getInt("dept_display_id")),
-					 										 new CancelReason(dbCon.rs.getInt("cancel_reason_id"),
-					 												 		  dbCon.rs.getString("cancel_reason"),
-					 												 		  dbCon.rs.getInt("restaurant_id")),
-					 										 dbCon.rs.getFloat("cancel_amount"),
-					 										 dbCon.rs.getFloat("cancel_price")));
-		}
-		dbCon.rs.close();
-		
-		return cancelByDept;
-	 }
-	
 	 /**
 	  * Calculate the member charge income according to duty range and extra condition.
 	  * @param staff

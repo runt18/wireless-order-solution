@@ -15,11 +15,8 @@ import com.wireless.db.billStatistics.CalcBillStatisticsDao;
 import com.wireless.db.billStatistics.CalcBillStatisticsDao.ExtraCond;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
-import com.wireless.pojo.billStatistics.CancelIncomeByDept;
-import com.wireless.pojo.billStatistics.CancelIncomeByReason;
 import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.billStatistics.HourRange;
-import com.wireless.pojo.billStatistics.IncomeByCancel;
 import com.wireless.pojo.billStatistics.IncomeByDept;
 import com.wireless.pojo.billStatistics.IncomeByFood;
 import com.wireless.pojo.billStatistics.IncomeByKitchen;
@@ -131,36 +128,4 @@ public class TestCalcBillStatisticsDao {
 		}
 	}
 	
-	@Test
-	public void testCalcCancelIncomeByReason() throws SQLException, BusinessException{
-		
-		List<CancelIncomeByReason> cancelByReason = CalcBillStatisticsDao.calcCancelIncomeByReason(mStaff, mDutyRange, null, DateType.HISTORY);
-		
-		IncomeByCancel cancelIncome = CalcBillStatisticsDao.calcCancelPrice(mStaff, mDutyRange, new ExtraCond(DateType.HISTORY));
-		
-		float totalCancel = 0;
-		for(CancelIncomeByReason cancelByEachReason : cancelByReason){
-			totalCancel += cancelByEachReason.getTotalCancelPrice();
-		}
-		
-		Assert.assertEquals("", Float.valueOf(cancelIncome.getTotalCancel()).intValue(), Float.valueOf(totalCancel).intValue());
-	}
-	
-	@Test
-	public void testCalcCancelIncomeByDept() throws SQLException, BusinessException{
-		Staff staff = StaffDao.getStaffs(37).get(0);
-		
-		DutyRange range = new DutyRange("2013-12-10 23:40:04", "2013-12-26 23:49:36"); 
-		
-		List<CancelIncomeByDept> cancelByDept = CalcBillStatisticsDao.calcCancelIncomeByDept(staff, range, null, DateType.HISTORY);
-		
-		IncomeByCancel cancelIncome = CalcBillStatisticsDao.calcCancelPrice(staff, range, new ExtraCond(DateType.HISTORY));
-		
-		float totalCancel = 0;
-		for(CancelIncomeByDept cancelByEachDept : cancelByDept){
-			totalCancel += cancelByEachDept.getTotalCancelPrice();
-		}
-		
-		Assert.assertEquals(Float.valueOf(cancelIncome.getTotalCancel()).intValue(), Float.valueOf(totalCancel).intValue());
-	}
 }

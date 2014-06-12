@@ -14,6 +14,7 @@ import com.wireless.pojo.crMgr.CancelReason;
 import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.menuMgr.Kitchen;
+import com.wireless.pojo.regionMgr.Region;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.tasteMgr.TasteGroup;
@@ -66,6 +67,9 @@ public class OrderFoodDao {
 		private Department.DeptId deptId;
 		private DutyRange dutyRange;
 		private HourRange hourRange;
+		private Region.RegionId regionId;
+		private int staffId;
+		private String foodName;
 		
 		public ExtraCond(DateType dateType){
 			this.dateType = dateType;
@@ -98,6 +102,21 @@ public class OrderFoodDao {
 			return this;
 		}
 		
+		public ExtraCond setRegionId(Region.RegionId regionId){
+			this.regionId = regionId;
+			return this;
+		}
+		
+		public ExtraCond setFoodName(String foodName){
+			this.foodName = foodName;
+			return this;
+		}
+		
+		public ExtraCond setStaffId(int staffId){
+			this.staffId = staffId;
+			return this;
+		}
+		
 		@Override
 		public String toString(){
 			StringBuilder extraCond = new StringBuilder();
@@ -112,6 +131,15 @@ public class OrderFoodDao {
 			}
 			if(hourRange != null){
 				extraCond.append(" AND TIME(" + orderTblAlias + ".order_date) BETWEEN '" + hourRange.getOpeningFormat() + "' AND '" + hourRange.getEndingFormat() + "'");
+			}
+			if(regionId != null){
+				extraCond.append(" AND " + orderTblAlias + ".region_id = " + regionId.getId());
+			}
+			if(staffId > 0){
+				extraCond.append(" AND " + orderFoodTblAlias + ".staff_id = " + staffId);
+			}
+			if(foodName != null){
+				extraCond.append(" AND " + orderFoodTblAlias + ".name LIKE '%" + foodName + "%'");
 			}
 			return extraCond.toString();
 		}
