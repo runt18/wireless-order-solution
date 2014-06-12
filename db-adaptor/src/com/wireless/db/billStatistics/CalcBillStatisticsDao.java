@@ -676,49 +676,49 @@ public class CalcBillStatisticsDao {
 	
 	private static String makeSql4CalcFood(Staff staff, DutyRange range, ExtraCond extraCond){
 		
-//		return " SELECT " +
-//			   " OF.order_id, OF.food_id, " +
-// 			   " MAX(OF.food_status) AS food_status, MAX(OF.name) AS food_name,	MAX(OF.dept_id) AS dept_id, MAX(OF.kitchen_id) AS kitchen_id, " +
-//			   " SUM(order_count) AS food_amount, " +
-//			   " CASE WHEN OF.is_gift = 1 THEN (OF.unit_price + IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * discount * SUM(OF.order_count) ELSE 0 END AS food_gift," +
-//			   " (OF.unit_price + IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * (1 - discount) * SUM(OF.order_count) AS food_discount, " +
-//			   " CASE WHEN ((OF.is_gift = 0) AND (OF.food_status & " + Food.WEIGHT + ") = 0) THEN (OF.unit_price + IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * discount * SUM(OF.order_count) " +
-//					" WHEN ((OF.is_gift = 0) AND (OF.food_status & " + Food.WEIGHT + ") <> 0) THEN (OF.unit_price * SUM(OF.order_count) + (IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0))) * discount " +
-//				  	" ELSE 0 " +
-//				  	" END AS food_income " +
-//			   " FROM " + Params.dbName + "." + extraCond.orderFoodTbl + " OF " + 
-//			   " JOIN " + Params.dbName + "." + extraCond.orderTbl + " O ON 1 = 1 " + 
-//			   " AND OF.order_id = O.id " + 
-//			   " AND O.restaurant_id = " + staff.getRestaurantId() + 
-//			   " AND O.status <> " + Order.Status.UNPAID.getVal() +
-//			   " JOIN " + Params.dbName + "." + extraCond.tasteGrpTbl + " TG " + " ON OF.taste_group_id = TG.taste_group_id " +
-//			   " WHERE 1 = 1 " +
-//			   (extraCond == null ? "" : extraCond.toString()) +
-//			   " AND O.order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +
-//			   " GROUP BY OF.order_id, OF.food_id, OF.taste_group_id, OF.is_gift " +
-//			   " HAVING food_amount > 0 ";
-		
 		return " SELECT " +
-		   " OF.order_id, OF.food_id, " +
-		   " MAX(OF.food_status) AS food_status, MAX(OF.name) AS food_name,	MAX(OF.dept_id) AS dept_id, MAX(OF.kitchen_id) AS kitchen_id, " +
-		   " SUM(order_count) AS food_amount, " +
-		   " CASE WHEN ((OF.food_status & " + Food.GIFT + ") <> 0) THEN (OF.unit_price + IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * discount * SUM(OF.order_count) ELSE 0 END AS food_gift," +
-		   " (OF.unit_price + IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * (1 - discount) * SUM(OF.order_count) AS food_discount, " +
-		   " CASE WHEN ((OF.food_status & " + Food.GIFT + ") = 0 AND (OF.food_status & " + Food.WEIGHT + ") = 0) THEN (OF.unit_price + IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * discount * SUM(OF.order_count) " +
-				" WHEN ((OF.food_status & " + Food.GIFT + ") = 0 AND (OF.food_status & " + Food.WEIGHT + ") <> 0) THEN (OF.unit_price * SUM(OF.order_count) + (IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0))) * discount " +
-			  	" ELSE 0 " +
-			  	" END AS food_income " +
-		   " FROM " + Params.dbName + "." + extraCond.orderFoodTbl + " OF " + 
-		   " JOIN " + Params.dbName + "." + extraCond.orderTbl + " O ON 1 = 1 " + 
-		   " AND OF.order_id = O.id " + 
-		   " AND O.restaurant_id = " + staff.getRestaurantId() + 
-		   " AND O.status <> " + Order.Status.UNPAID.getVal() +
-		   " JOIN " + Params.dbName + "." + extraCond.tasteGrpTbl + " TG " + " ON OF.taste_group_id = TG.taste_group_id " +
-		   " WHERE 1 = 1 " +
-		   (extraCond == null ? "" : extraCond.toString()) +
-		   " AND O.order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +
-		   " GROUP BY " + " OF.order_id, OF.food_id, OF.taste_group_id " +
-		   " HAVING food_amount > 0 ";
+			   " OF.order_id, OF.food_id, " +
+ 			   " MAX(OF.food_status) AS food_status, MAX(OF.name) AS food_name,	MAX(OF.dept_id) AS dept_id, MAX(OF.kitchen_id) AS kitchen_id, " +
+			   " SUM(order_count) AS food_amount, " +
+			   " CASE WHEN OF.is_gift = 1 THEN (OF.unit_price + IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * discount * SUM(OF.order_count) ELSE 0 END AS food_gift," +
+			   " (OF.unit_price + IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * (1 - discount) * SUM(OF.order_count) AS food_discount, " +
+			   " CASE WHEN ((OF.is_gift = 0) AND (OF.food_status & " + Food.WEIGHT + ") = 0) THEN (OF.unit_price + IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * discount * SUM(OF.order_count) " +
+					" WHEN ((OF.is_gift = 0) AND (OF.food_status & " + Food.WEIGHT + ") <> 0) THEN (OF.unit_price * SUM(OF.order_count) + (IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0))) * discount " +
+				  	" ELSE 0 " +
+				  	" END AS food_income " +
+			   " FROM " + Params.dbName + "." + extraCond.orderFoodTbl + " OF " + 
+			   " JOIN " + Params.dbName + "." + extraCond.orderTbl + " O ON 1 = 1 " + 
+			   " AND OF.order_id = O.id " + 
+			   " AND O.restaurant_id = " + staff.getRestaurantId() + 
+			   " AND O.status <> " + Order.Status.UNPAID.getVal() +
+			   " JOIN " + Params.dbName + "." + extraCond.tasteGrpTbl + " TG " + " ON OF.taste_group_id = TG.taste_group_id " +
+			   " WHERE 1 = 1 " +
+			   (extraCond == null ? "" : extraCond.toString()) +
+			   " AND O.order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +
+			   " GROUP BY OF.order_id, OF.food_id, OF.taste_group_id, OF.is_gift " +
+			   " HAVING food_amount > 0 ";
+		
+//		return " SELECT " +
+//		   " OF.order_id, OF.food_id, " +
+//		   " MAX(OF.food_status) AS food_status, MAX(OF.name) AS food_name,	MAX(OF.dept_id) AS dept_id, MAX(OF.kitchen_id) AS kitchen_id, " +
+//		   " SUM(order_count) AS food_amount, " +
+//		   " CASE WHEN ((OF.food_status & " + Food.GIFT + ") <> 0) THEN (OF.unit_price + IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * discount * SUM(OF.order_count) ELSE 0 END AS food_gift," +
+//		   " (OF.unit_price + IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * (1 - discount) * SUM(OF.order_count) AS food_discount, " +
+//		   " CASE WHEN ((OF.food_status & " + Food.GIFT + ") = 0 AND (OF.food_status & " + Food.WEIGHT + ") = 0) THEN (OF.unit_price + IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0)) * discount * SUM(OF.order_count) " +
+//				" WHEN ((OF.food_status & " + Food.GIFT + ") = 0 AND (OF.food_status & " + Food.WEIGHT + ") <> 0) THEN (OF.unit_price * SUM(OF.order_count) + (IFNULL(TG.normal_taste_price, 0) + IFNULL(TG.tmp_taste_price, 0))) * discount " +
+//			  	" ELSE 0 " +
+//			  	" END AS food_income " +
+//		   " FROM " + Params.dbName + "." + extraCond.orderFoodTbl + " OF " + 
+//		   " JOIN " + Params.dbName + "." + extraCond.orderTbl + " O ON 1 = 1 " + 
+//		   " AND OF.order_id = O.id " + 
+//		   " AND O.restaurant_id = " + staff.getRestaurantId() + 
+//		   " AND O.status <> " + Order.Status.UNPAID.getVal() +
+//		   " JOIN " + Params.dbName + "." + extraCond.tasteGrpTbl + " TG " + " ON OF.taste_group_id = TG.taste_group_id " +
+//		   " WHERE 1 = 1 " +
+//		   (extraCond == null ? "" : extraCond.toString()) +
+//		   " AND O.order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +
+//		   " GROUP BY " + " OF.order_id, OF.food_id, OF.taste_group_id " +
+//		   " HAVING food_amount > 0 ";
 	}
 	
 	/**
