@@ -53,6 +53,9 @@ public class OrderFood implements Parcelable, Jsonable {
 	
 	//indicates the order food is need to be hang up
 	private boolean isHangup = false;
+
+	//indicates the order food is gift
+	private boolean isGift = false;
 	
 	//the discount to this food represent as integer
 	private float mDiscount = 1;	 
@@ -89,6 +92,14 @@ public class OrderFood implements Parcelable, Jsonable {
 	
 	public boolean isHurried(){
 		return this.isHurried;
+	}
+	
+	public boolean isGift(){
+		return this.isGift;
+	}
+	
+	public void setGift(boolean isGift){
+		this.isGift = isGift;
 	}
 	
 	/**
@@ -207,53 +218,127 @@ public class OrderFood implements Parcelable, Jsonable {
 	}
 	
 	/**
-	 * Calculate the price with taste before discount to a specific food.
-	 * @return The price represented as float.
-	 */	
-	public float calcPriceBeforeDiscount(){
-		if(mFood.isWeigh()){
-			return NumericUtil.roundFloat(getUnitPriceWithTaste() * getCount()  + (hasTasteGroup() ? mTasteGroup.getPrice() : 0));			
-		}else{
-			return NumericUtil.roundFloat(getUnitPriceWithTaste() * getCount());
-		}
-	}
-	
-	/**
 	 * The unit price with taste to a specific food is as below.
-	 * unit_price = food_price * discount + taste_price + tmp_taste_price
-	 * If taste price is calculated by rate, then
-	 * taste_price = food_price * taste_rate
-	 * @return the unit price represented as a Float
+	 * <pre>
+	 * if(isWeight){
+	 *     unit_price = food_price + taste_price;
+	 * }else{
+	 *     unit_price = food_price;
+	 * } 
+	 * </pre>
+	 * @return the unit price to this order food
 	 */
-	public float getUnitPriceWithTaste(){
+	private float getUnitPrice(){
 		return NumericUtil.roundFloat(mFood.getPrice() + (!hasTasteGroup() || mFood.isWeigh() ? 0 : mTasteGroup.getPrice()));
 	}
 	
 	/**
-	 * Calculate the total price to this food along with taste as below<br>.
-	 * price = ((food_price + taste_price) * discount) * count 
-	 * @return the total price to this food represented as float
+	 * The unit price with taste to a specific food is as below.
+	 * <pre>
+	 * if(isGift){
+	 *     return 0;
+	 * }else{
+	 * 	   return {@link getUnitPrice}
+	 * } 
+	 * </pre>
+	 * @return the unit price to this order food
 	 */
-	public float calcPriceWithTaste(){
-		if(mFood.isWeigh()){
-			return NumericUtil.roundFloat((getUnitPriceWithTaste() * getCount() + (hasTasteGroup() ? mTasteGroup.getPrice() : 0)) * getDiscount());			
+	public float calcUnitPrice(){
+		if(isGift){
+			return 0;
 		}else{
-			return NumericUtil.roundFloat(getUnitPriceWithTaste() * getCount()  * getDiscount());	
+			return getUnitPrice();
+		}
+	}
+	
+	/**
+	 * Calculate the total price to this order food along with taste before discount.
+	 * <pre>
+	 * if(isWeight){
+	 *    return {@link OrderFood#getUnitPrice()} * count + tastePrice
+	 * }else{
+	 *    return {@link OrderFood#getUnitPrice()} * count 
+	 * }
+	 * @return the total price to this food before discount
+	 */
+	private float getPriceBeforeDiscount(){
+		if(mFood.isWeigh()){
+			return NumericUtil.roundFloat(getUnitPrice() * getCount() + (hasTasteGroup() ? mTasteGroup.getPrice() : 0));			
+		}else{
+			return NumericUtil.roundFloat(getUnitPrice() * getCount());	
+		}
+	}
+	
+	/**
+	 * Calculate the price with taste before discount to a specific food.
+	 * <pre>
+	 * if(isGift){
+	 *    return 0;
+	 * }else{
+	 *    return {@link OrderFood#getPriceBeforeDiscount()}
+	 * }
+	 * @return The price represented as float.
+	 */	
+	public float calcPriceBeforeDiscount(){
+		if(isGift){
+			return 0;
+		}else {
+			return getPriceBeforeDiscount();
+		}
+	}
+	
+	/**
+	 * Calculate the total price to this order food along with taste as below.
+	 * <pre>
+	 * if(isGift){
+	 *    return 0;
+	 * }else{
+	 *    return {@link OrderFood#getPriceBeforeDiscount} * discount
+	 * }
+	 * @return the total price to this order food 
+	 */
+	public float calcPrice(){
+		if(isGift){
+			return 0;
+		}else{
+			return NumericUtil.roundFloat(getPriceBeforeDiscount() * getDiscount());
 		}
 	}
 	
 	/**
 	 * Calculate the discount price to this food as below.<br>
-	 * price = unit_price * (1 - discount)
+	 * <pre>
+	 * if(isGift){
+	 *     return 0;
+	 * }else{
+	 *     return {@link OrderFood#getPriceBeforeDiscount} * (1 - discount)
+	 * }
+	 * </pre>
 	 * @return the discount price to this food represented as an float
 	 */
 	public float calcDiscountPrice(){
-		if(getDiscount() != 1){
-			return NumericUtil.roundFloat((mFood.getPrice() + (mTasteGroup == null ? 0 : mTasteGroup.getPrice())) * getCount() * (1 - getDiscount()));
+		if(getDiscount() != 1 && !isGift){
+			return NumericUtil.roundFloat(getPriceBeforeDiscount() * (1 - getDiscount()));
 		}else{
 			return 0;
 		}
 	}	
+	
+	/**
+	 * Calculate the gift price to this order food.
+	 * <pre>
+	 * if(isGift){
+	 *     return {@link OrderFood#getPriceBeforeDiscount()}
+	 * }
+	 * @return the gift price to this order food
+	 */
+	public float calcGiftPrice(){
+		if(isGift){
+			return getPriceBeforeDiscount();
+		}else{
+			return 0;
+		}
+	}
 	
 	public OrderFood(){
 		
@@ -443,7 +528,7 @@ public class OrderFood implements Parcelable, Jsonable {
 		return mFood.getName();
 	}
 	
-	public float getPrice(){
+	private float getPrice(){
 		return mFood.getPrice();
 	}
 	
@@ -485,9 +570,10 @@ public class OrderFood implements Parcelable, Jsonable {
 	
 	/**
 	 * There are three ways to determine whether two foods is the same as each other.
-	 * 1 - If one food is temporary while the other NOT, means they are NOT the same.
-	 * 2 - If both of foods are temporary, check to see whether their names and price are the same.
-	 * 3 - If both of foods is NOT temporary, check to see the food along with its associated tastes.
+	 * <li>If one food is gift while the order NOT, means they are NOT the same.
+	 * <li>If one food is temporary while the other NOT, means they are NOT the same.
+	 * <li>If both of foods are temporary, check to see whether their names and price are the same.
+	 * <li>If both of foods is NOT temporary, check to see the food along with its associated tastes.
 	 */
 	@Override
 	public boolean equals(Object obj){
@@ -496,7 +582,10 @@ public class OrderFood implements Parcelable, Jsonable {
 			
 		}else{
 			OrderFood of = (OrderFood)obj;
-			if(isTemporary != of.isTemporary){
+			if(isGift != of.isGift){
+				return false;
+				
+			}else if(isTemporary != of.isTemporary){
 				return false;
 				
 			}else if(isTemporary && of.isTemporary){
@@ -538,6 +627,7 @@ public class OrderFood implements Parcelable, Jsonable {
 	public void writeToParcel(Parcel dest, int flag) {
 		dest.writeByte(flag);
 		dest.writeBoolean(this.isTemporary);
+		dest.writeBoolean(this.isGift);
 		if(flag == OF_PARCELABLE_4_QUERY){
 
 			if(!this.isTemporary){
@@ -582,6 +672,7 @@ public class OrderFood implements Parcelable, Jsonable {
 		short flag = source.readByte();
 		
 		this.isTemporary = source.readBoolean();
+		this.isGift = source.readBoolean();
 		
 		if(flag == OF_PARCELABLE_4_QUERY){
 			if(!isTemporary){
@@ -694,7 +785,7 @@ public class OrderFood implements Parcelable, Jsonable {
 		jm.putFloat(Key4Json.COUNT.key, this.getCount());
 		jm.putFloat(Key4Json.UNIT_PRICE.key, this.getPrice());
 		jm.putFloat(Key4Json.ACTUAL_PRICE.key, this.getPrice());
-		jm.putFloat(Key4Json.TOTAL_PRICE.key, this.calcPriceWithTaste());
+		jm.putFloat(Key4Json.TOTAL_PRICE.key, this.calcPrice());
 		jm.putJsonable(Key4Json.TASTE_GROUP.key, this.getTasteGroup(), 0);
 		jm.putFloat(Key4Json.TOTAL_PRICE_BEFORE_DISCOUNT.key, this.calcPriceBeforeDiscount());
 		

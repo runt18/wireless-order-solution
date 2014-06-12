@@ -25,9 +25,9 @@ public class CancelledFood implements Jsonable{
 		this.foodName = of.getName();
 		this.deptID = of.getKitchen().getDept().getId();
 		this.deptName = of.getKitchen().getDept().getName();
-		this.unitPrice = Math.abs(of.getPrice());
+		this.unitPrice = Math.abs(of.asFood().getPrice());
 		this.count = Math.abs(of.getCount());
-		this.totalPrice = Math.abs(of.calcPriceWithTaste());
+		this.totalPrice = Math.abs(of.calcPrice());
 		this.waiter = of.getWaiter();
 		this.reason = of.getCancelReason().getReason();
 	}

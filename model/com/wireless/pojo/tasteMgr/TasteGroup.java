@@ -198,7 +198,7 @@ public class TasteGroup implements Parcelable, Jsonable{
 		}else{
 			float tastePrice = 0;
 			for(Taste t : getNormalTastes()){
-				tastePrice += t.isCalcByPrice() ? t.getPrice() : (mAttachedOrderFood.getPrice() * t.getRate());
+				tastePrice += t.isCalcByPrice() ? t.getPrice() : (mAttachedOrderFood.asFood().getPrice() * t.getRate());
 			}
 			return NumericUtil.roundFloat(tastePrice);
 		}

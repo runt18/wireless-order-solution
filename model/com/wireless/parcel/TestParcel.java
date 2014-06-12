@@ -462,7 +462,7 @@ public class TestParcel {
 			assertEquals("name to temporary food", of1.getName(), of2.getName());
 			
 			// Check the unit price to temporary food
-			assertEquals("price to temporary food", of1.getPrice(), of2.getPrice(), 0.01);
+			assertEquals("price to temporary food", of1.asFood().getPrice(), of2.asFood().getPrice(), 0.01);
 			
 			// Check the kitchen alias to temporary food
 			assertEquals("kitchen display id to temporary food", of1.getKitchen().getDisplayId(), of2.getKitchen().getDisplayId());
@@ -636,7 +636,7 @@ public class TestParcel {
 			assertEquals("name to temporary food", of1.getName(), of2.getName());
 			
 			// Check the unit price to temporary food
-			assertEquals("price to temporary food", of1.getPrice(), of2.getPrice(), 0.01);
+			assertEquals("price to temporary food", of1.asFood().getPrice(), of2.asFood().getPrice(), 0.01);
 			
 			// Check the kitchen alias to temporary food
 			assertEquals("kitchen display id to temporary food", of1.getKitchen().getDisplayId(), of2.getKitchen().getDisplayId());
