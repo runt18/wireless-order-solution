@@ -161,7 +161,7 @@ public class Department implements Parcelable, Comparable<Department>, Jsonable{
 	
 	public static enum Type{
 		NORMAL(0, "普通"),
-		IDLE(1, "保留"),
+		IDLE(1, "空闲"),
 		WARE_HOUSE(2, "总仓"),
 		TEMP(3, "临时"),
 		NULL(4, "空");
