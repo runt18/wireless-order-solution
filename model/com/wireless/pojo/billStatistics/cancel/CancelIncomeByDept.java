@@ -6,7 +6,7 @@ import com.wireless.pojo.menuMgr.Department;
 
 public class CancelIncomeByDept implements Jsonable{
 	
-	private Department mDept;								//部门信息
+	private Department mDept;					//部门信息
 	private final float mCancelAmount;			//退菜数量
 	private final float mCancelPrice;			//退菜金额
 	
