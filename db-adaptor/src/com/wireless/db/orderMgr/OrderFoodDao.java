@@ -70,6 +70,8 @@ public class OrderFoodDao {
 		private Region.RegionId regionId;
 		private int staffId;
 		private String foodName;
+		private boolean isGift;
+		private String countCond;
 		
 		public ExtraCond(DateType dateType){
 			this.dateType = dateType;
@@ -117,6 +119,16 @@ public class OrderFoodDao {
 			return this;
 		}
 		
+		public ExtraCond setGift(boolean onOff){
+			this.isGift = onOff;
+			return this;
+		}
+		
+		public ExtraCond setCountCond(String countCond){
+			this.countCond = countCond;
+			return this;
+		}
+		
 		@Override
 		public String toString(){
 			StringBuilder extraCond = new StringBuilder();
@@ -140,6 +152,12 @@ public class OrderFoodDao {
 			}
 			if(foodName != null){
 				extraCond.append(" AND " + orderFoodTblAlias + ".name LIKE '%" + foodName + "%'");
+			}
+			if(isGift){
+				extraCond.append(" AND " + orderFoodTblAlias + ".is_gift = 1");
+			}
+			if(countCond != null){
+				extraCond.append(" AND " + orderFoodTblAlias + ".order_count " + countCond);
 			}
 			return extraCond.toString();
 		}
@@ -327,7 +345,6 @@ public class OrderFoodDao {
 											   dbCon.rs.getInt("restaurant_id"));
 			food.setCancelReason(cr);
 			
-			food.asFood().setChildFoods(FoodDao.getChildrenByParent(staff, food.asFood().getFoodId()));
 			orderFoods.add(food);
 		}
 		dbCon.rs.close();
