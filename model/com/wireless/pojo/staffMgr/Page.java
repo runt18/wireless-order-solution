@@ -93,6 +93,7 @@ public class Page{
 		CANCELLED_FOOD("cancelledFood", "退菜统计", "History_Module/CancelledFood.html", "../../images/cancelledFoodStatis.png"),
 		REPAID_STATISTICS("repaidStatistics", "反结账统计", "History_Module/RepaidStatistics.html", "../../images/repaidStatistics.png"),
 		COMMISSION_STATISTICS("commissionStatistics", "提成统计", "History_Module/CommissionStatistics.html", "../../images/commissionStatistics.png"),
+		GIFT_STATISTICS("giftStatistics", "赠送统计", "History_Module/GiftStatistics.html", "../../images/giftStatistics.png"),
 		BUSINESS_CHART("businessChart", "营业走势图", "History_Module/BusinessChart.html", "../../images/businessChart.png");
 		
 		

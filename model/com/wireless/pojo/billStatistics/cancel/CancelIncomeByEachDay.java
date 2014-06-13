@@ -32,6 +32,10 @@ public class CancelIncomeByEachDay implements Jsonable{
 		return this.mCancelPrice;
 	}
 	
+	public DutyRange getDutyRange(){
+		return this.range;
+	}
+	
 	@Override
 	public void fromJsonMap(JsonMap jsonMap, int flag) {
 		
