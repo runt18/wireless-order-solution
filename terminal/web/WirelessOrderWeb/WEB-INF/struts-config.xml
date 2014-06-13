@@ -188,7 +188,7 @@
 		</action>
 		<action path="/QueryCancelledFood"
 			type="com.wireless.Actions.billHistory.QueryCancelledFoodAction"
-			scope="request">
+			scope="request" parameter="dataSource">
 		</action>
 		<action path="/QueryFoodTaste"
 			type="com.wireless.Actions.menuMgr.taste.QueryFoodTasteAction" scope="request">
@@ -586,6 +586,14 @@
 		<action path="/OperateBusinessHour" type="com.wireless.Actions.system.OperateBusinessHourAction"
 			scope="request" parameter="dataSource">
 		</action>
+		<action path="/SaleStatisticChart"
+			type="com.wireless.Actions.billStatistics.SalesSubStatisticsChartAction"
+			scope="request">
+		</action>
+		<action path="/QueryGiftStatistic"
+			type="com.wireless.Actions.billStatistics.QueryGiftStatisticAction"
+			scope="request">
+		</action>		
 	</action-mappings>
 
 	<message-resources parameter="com.yourcompany.struts.ApplicationResources" />
