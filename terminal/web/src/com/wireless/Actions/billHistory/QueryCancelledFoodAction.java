@@ -6,64 +6,47 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.apache.struts.actions.DispatchAction;
 
 import com.wireless.db.billStatistics.CalcCancelStatisticsDao;
+import com.wireless.db.orderMgr.OrderFoodDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
+import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
-import com.wireless.pojo.billStatistics.cancel.CancelIncomeByDept;
-import com.wireless.pojo.billStatistics.cancel.CancelIncomeByReason;
-import com.wireless.pojo.billStatistics.cancel.CancelIncomeByDept.IncomeByEachReason;
-import com.wireless.pojo.billStatistics.cancel.CancelIncomeByReason.IncomeByEachDept;
 import com.wireless.pojo.billStatistics.DutyRange;
-import com.wireless.pojo.crMgr.CancelReason;
-import com.wireless.pojo.dishesOrder.CancelledFood;
-import com.wireless.pojo.menuMgr.Department;
+import com.wireless.pojo.billStatistics.cancel.CancelIncomeByDept;
+import com.wireless.pojo.billStatistics.cancel.CancelIncomeByEachDay;
+import com.wireless.pojo.billStatistics.cancel.CancelIncomeByReason;
+import com.wireless.pojo.billStatistics.cancel.CancelIncomeByStaff;
+import com.wireless.pojo.dishesOrder.OrderFood;
+import com.wireless.pojo.menuMgr.Department.DeptId;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.util.DataPaging;
 import com.wireless.util.DateType;
 import com.wireless.util.WebParams;
 
-public class QueryCancelledFoodAction extends Action {
+public class QueryCancelledFoodAction extends DispatchAction{
 	
-	@SuppressWarnings("unchecked")
-	public ActionForward execute(ActionMapping mapping, ActionForm form,
+	public ActionForward getDetail(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
-		
-		
-		
-		JObject jobject = new JObject();
-		@SuppressWarnings("rawtypes")
-		List list = new ArrayList();
-		Jsonable sum = null;
-		String isPaging = request.getParameter("isPaging");
 		String limit = request.getParameter("limit");
 		String start = request.getParameter("start");
 		
+		JObject jobject = new JObject();
 		try{
 			String pin = (String)request.getAttribute("pin");
-			String qtype = request.getParameter("qtype");
-			String otype = request.getParameter("otype");
-			String dtype = request.getParameter("dtype");
 			String dateBeg = request.getParameter("dateBeg");
 			String dateEnd = request.getParameter("dateEnd");
 			String deptID = request.getParameter("deptID");
 			String reasonID = request.getParameter("reasonID");
+			String staffID = request.getParameter("staffID");
 			
-			if(dtype == null || dtype.trim().isEmpty()){
-				jobject.initTip(false, WebParams.TIP_TITLE_ERROE, WebParams.TIP_CODE_ERROE, "操作失败, 请指定查询当日数据或历史数据.");
-				return null;
-			}
-			if(qtype == null || qtype.trim().isEmpty()){
-				jobject.initTip(false, WebParams.TIP_TITLE_ERROE, WebParams.TIP_CODE_ERROE, "操作失败, 请指定统计数据来源.");
-				return null;
-			}
 			if(dateBeg == null || dateBeg.trim().isEmpty()){
 				jobject.initTip(false, WebParams.TIP_TITLE_ERROE, WebParams.TIP_CODE_ERROE, "操作失败, 请指定统计日期开始时间.");
 				return null;
@@ -72,81 +55,251 @@ public class QueryCancelledFoodAction extends Action {
 				jobject.initTip(false, WebParams.TIP_TITLE_ERROE, WebParams.TIP_CODE_ERROE, "操作失败, 请指定统计日期结束时间.");
 				return null;
 			}
-			if(otype == null || otype.trim().isEmpty()){
-				otype = CalcCancelStatisticsDao.ORDER_BY_COUNT + "";
-			}
-			if(deptID == null || deptID.trim().isEmpty()){
-				deptID = "-1";
-			}
-			if(reasonID == null || reasonID.trim().isEmpty()){
-				reasonID = "-1";
-			}
-			Integer qt = Integer.valueOf(qtype), ot = Integer.valueOf(otype); 
-			DateType dt = DateType.valueOf(Integer.valueOf(dtype));
-			Integer did = Integer.valueOf(deptID), rid = Integer.valueOf(reasonID);
 			
-			DutyRange queryDate = new DutyRange(dateBeg, dateEnd);
+			
+			Integer did = Integer.valueOf(deptID);
+			
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+
+			OrderFoodDao.ExtraCond4CancelFood extraCond = new OrderFoodDao.ExtraCond4CancelFood(DateType.HISTORY);
 			
-			if(qt == CalcCancelStatisticsDao.QUERY_BY_DEPT){
-				CancelIncomeByDept dept = CalcCancelStatisticsDao.getCancelledFoodByDept(staff, queryDate, did, dt, ot);
-				if(dept != null){
-					list = dept.getIncomeByEachReason();
-					if(list != null && list.size() > 0){
-						IncomeByEachReason tempSum = new IncomeByEachReason(new CancelReason(0, "汇总", 0),0,0), tempItem = null;
-						for(int i = 0; i < list.size(); i++){
-							tempItem = (IncomeByEachReason) list.get(i);
-							tempSum.setAmount(tempSum.getAmount() + tempItem.getAmount());
-							tempSum.setPrice(tempSum.getPrice() + tempItem.getPrice());
-						}
-						sum = tempSum;
-					}
-				}
-			}else if(qt == CalcCancelStatisticsDao.QUERY_BY_REASON){
-				CancelIncomeByReason reason = CalcCancelStatisticsDao.getCancelledFoodByReason(staff, queryDate, rid, dt, ot);
-				if(reason != null){
-					list = reason.getIncomeByEachDept();
-					if(list != null && list.size() > 0){
-						IncomeByEachDept tempSum = new IncomeByEachDept(new Department(0, (short)0, "汇总"), 0, 0), tempItem = null;
-						for(int i = 0; i < list.size(); i++){
-							tempItem = (IncomeByEachDept) list.get(i);
-							tempSum.setAmount(tempSum.getAmount() + tempItem.getAmount());
-							tempSum.setPrice(tempSum.getPrice() + tempItem.getPrice());
-						}
-						sum = tempSum;
-					}
-				}
-			}else if(qt == CalcCancelStatisticsDao.QUERY_BY_FOOD){
-				list = CalcCancelStatisticsDao.getCancelledFoodDetail(staff, queryDate, dt, did, rid);
-				if(list != null && list.size() > 0){
-					CancelledFood tempSum = new CancelledFood(), tempItem = null;
-					for(int i = 0; i < list.size(); i++){
-						tempItem = (CancelledFood) list.get(i);
-						tempSum.setCount(tempSum.getCount() + tempItem.getCount());
-						tempSum.setTotalPrice(tempSum.getTotalPrice() + tempItem.getTotalPrice());
-					}
-					sum = tempSum;
-				}
+			extraCond.setDutyRange(new DutyRange(dateBeg, dateEnd));
+			
+			if(reasonID != null && !reasonID.isEmpty() && !reasonID.equals("-1")){
+				extraCond.setReasonId(Integer.valueOf(reasonID));
 			}
+			if(did != -1){
+				extraCond.setDeptId(DeptId.valueOf(did));
+			}
+			if(staffID != null && !staffID.isEmpty() && !staffID.equals("-1")){
+				extraCond.setStaffId(Integer.valueOf(staffID));
+			}
+			
+			List<OrderFood> cancelList = OrderFoodDao.getSingleDetail(staff, extraCond, null);
+			
+			
+			if(!cancelList.isEmpty()){
+				jobject.setTotalProperty(cancelList.size());
+				cancelList = DataPaging.getPagingData(cancelList, true, start, limit);
+				
+				
+/*				List<String> xAxis = new ArrayList<String>();
+				List<Float> data = new ArrayList<Float>();
+				for (CancelIncomeByEachDay c : cancelList) {
+					xAxis.add("\'"+c.getDutyRange().getOffDutyFormat()+"\'");
+					data.add(c.getCancelPrice());
+					
+					totalCount += c.getCancelAmount();
+					totalPrice += c.getCancelPrice();
+				}
+				CancelIncomeByEachDay total = new CancelIncomeByEachDay(new DutyRange(dateBeg, dateEnd), totalCount, totalPrice);
+				
+				cancelList = DataPaging.getPagingData(cancelList, true, start, limit);
+				
+				cancelList.add(total);*/
+			}
+			jobject.setRoot(cancelList);
 		}catch(BusinessException e){
 			e.printStackTrace();
 			jobject.initTip(e);
-			list = null;
 			
 		} catch(Exception e){
 			e.printStackTrace();
 			jobject.initTip(e);
-			list = null;
 		} finally{
-			if(list != null && list.size() > 0){
-				jobject.setTotalProperty(list.size());
-				list = DataPaging.getPagingData(list, isPaging, start, limit);
-				if(sum != null)
-					list.add(sum);
-				jobject.setRoot(list);
-			}
 			response.getWriter().print(jobject.toString());
 		}
+		return null;
+	}
+	
+	public ActionForward getDetailChart(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		String pin = (String)request.getAttribute("pin");
+		String dateBeg = request.getParameter("dateBeg");
+		String dateEnd = request.getParameter("dateEnd");
+		String deptID = request.getParameter("deptID");
+		String reasonID = request.getParameter("reasonID");
+		String staffID = request.getParameter("staffID");
+		
+		JObject jobject = new JObject();
+		
+		try{
+			CalcCancelStatisticsDao.ExtraCond extraCond = new CalcCancelStatisticsDao.ExtraCond(DateType.HISTORY);
+			
+			if(reasonID != null && !reasonID.isEmpty() && !reasonID.equals("-1")){
+				extraCond.setReasonId(Integer.valueOf(reasonID));
+			}
+			if(deptID != null && !deptID.isEmpty() && !deptID.equals("-1")){
+				extraCond.setDeptId(DeptId.valueOf(deptID));
+			}
+			if(staffID != null && !staffID.isEmpty() && !staffID.equals("-1")){
+				extraCond.setStaffId(Integer.valueOf(staffID));
+			}
+			
+			List<CancelIncomeByEachDay> cancelList = CalcCancelStatisticsDao.calcCancelIncomeByEachDay(StaffDao.verify(Integer.parseInt(pin)), new DutyRange(dateBeg, dateEnd), extraCond);
+			
+			List<String> xAxis = new ArrayList<String>();
+			List<Float> data = new ArrayList<Float>();
+			float totalMoney = 0;
+			for (CancelIncomeByEachDay c : cancelList) {
+				xAxis.add("\'"+c.getDutyRange().getOffDutyFormat()+"\'");
+				data.add(c.getCancelPrice());
+			}
+			
+			final String chartData = "{\"xAxis\":" + xAxis + ",\"totalMoney\" : " + totalMoney + ",\"avgMoney\" : " + Math.round((totalMoney/cancelList.size())*100)/100 + 
+					",\"ser\":[{\"name\":\'退菜金额\', \"data\" : " + data + "}]}";
+			jobject.setExtra(new Jsonable(){
+				@Override
+				public JsonMap toJsonMap(int flag) {
+					JsonMap jm = new JsonMap();
+					jm.putString("chart", chartData);
+					return jm;
+				}
+				
+				@Override
+				public void fromJsonMap(JsonMap jsonMap, int flag) {
+					
+				}
+			
+			});
+			
+		}catch(BusinessException e){
+			e.printStackTrace();
+			jobject.initTip(e);
+		}catch(Exception e){
+			e.printStackTrace();
+			jobject.initTip(e);
+		}finally{
+			response.getWriter().print(jobject.toString());
+		}
+
+		return null;
+	}
+	
+	public ActionForward getReasonChart(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		String pin = (String)request.getAttribute("pin");
+		String dateBeg = request.getParameter("dateBeg");
+		String dateEnd = request.getParameter("dateEnd");
+		String deptID = request.getParameter("deptID");
+		String reasonID = request.getParameter("reasonID");
+		String staffID = request.getParameter("staffID");
+		
+		JObject jobject = new JObject();
+		
+		try{
+			CalcCancelStatisticsDao.ExtraCond extraCond = new CalcCancelStatisticsDao.ExtraCond(DateType.HISTORY);
+			
+			if(reasonID != null && !reasonID.isEmpty() && !reasonID.equals("-1")){
+				extraCond.setReasonId(Integer.valueOf(reasonID));
+			}
+			if(deptID != null && !deptID.isEmpty() && !deptID.equals("-1")){
+				extraCond.setDeptId(DeptId.valueOf(deptID));
+			}
+			if(staffID != null && !staffID.isEmpty() && !staffID.equals("-1")){
+				extraCond.setStaffId(Integer.valueOf(staffID));
+			}
+			
+			List<CancelIncomeByReason> cancelList = CalcCancelStatisticsDao.calcCancelIncomeByReason(StaffDao.verify(Integer.parseInt(pin)), new DutyRange(dateBeg, dateEnd), extraCond);
+			
+			jobject.setRoot(cancelList);
+			
+		}catch(BusinessException e){
+			e.printStackTrace();
+			jobject.initTip(e);
+		}catch(Exception e){
+			e.printStackTrace();
+			jobject.initTip(e);
+		}finally{
+			response.getWriter().print(jobject.toString());
+		}
+
+		return null;
+	}
+	
+	public ActionForward getStaffChart(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		String pin = (String)request.getAttribute("pin");
+		String dateBeg = request.getParameter("dateBeg");
+		String dateEnd = request.getParameter("dateEnd");
+		String deptID = request.getParameter("deptID");
+		String reasonID = request.getParameter("reasonID");
+		String staffID = request.getParameter("staffID");
+		
+		JObject jobject = new JObject();
+		
+		try{
+			CalcCancelStatisticsDao.ExtraCond extraCond = new CalcCancelStatisticsDao.ExtraCond(DateType.HISTORY);
+			
+			if(reasonID != null && !reasonID.isEmpty() && !reasonID.equals("-1")){
+				extraCond.setReasonId(Integer.valueOf(reasonID));
+			}
+			if(deptID != null && !deptID.isEmpty() && !deptID.equals("-1")){
+				extraCond.setDeptId(DeptId.valueOf(deptID));
+			}
+			if(staffID != null && !staffID.isEmpty() && !staffID.equals("-1")){
+				extraCond.setStaffId(Integer.valueOf(staffID));
+			}
+			
+			List<CancelIncomeByStaff> cancelList = CalcCancelStatisticsDao.calcCancelIncomeByStaff(StaffDao.verify(Integer.parseInt(pin)), new DutyRange(dateBeg, dateEnd), extraCond);
+			
+			jobject.setRoot(cancelList);
+			
+		}catch(BusinessException e){
+			e.printStackTrace();
+			jobject.initTip(e);
+		}catch(Exception e){
+			e.printStackTrace();
+			jobject.initTip(e);
+		}finally{
+			response.getWriter().print(jobject.toString());
+		}
+
+		return null;
+	}
+	
+	public ActionForward getDeptChart(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		String pin = (String)request.getAttribute("pin");
+		String dateBeg = request.getParameter("dateBeg");
+		String dateEnd = request.getParameter("dateEnd");
+		String deptID = request.getParameter("deptID");
+		String reasonID = request.getParameter("reasonID");
+		String staffID = request.getParameter("staffID");
+		
+		JObject jobject = new JObject();
+		
+		try{
+			CalcCancelStatisticsDao.ExtraCond extraCond = new CalcCancelStatisticsDao.ExtraCond(DateType.HISTORY);
+			
+			if(reasonID != null && !reasonID.isEmpty() && !reasonID.equals("-1")){
+				extraCond.setReasonId(Integer.valueOf(reasonID));
+			}
+			if(deptID != null && !deptID.isEmpty() && !deptID.equals("-1")){
+				extraCond.setDeptId(DeptId.valueOf(deptID));
+			}
+			if(staffID != null && !staffID.isEmpty() && !staffID.equals("-1")){
+				extraCond.setStaffId(Integer.valueOf(staffID));
+			}
+			
+			List<CancelIncomeByDept> cancelList = CalcCancelStatisticsDao.calcCancelIncomeByDept(StaffDao.verify(Integer.parseInt(pin)), new DutyRange(dateBeg, dateEnd), extraCond);
+			
+			jobject.setRoot(cancelList);
+			
+		}catch(BusinessException e){
+			e.printStackTrace();
+			jobject.initTip(e);
+		}catch(Exception e){
+			e.printStackTrace();
+			jobject.initTip(e);
+		}finally{
+			response.getWriter().print(jobject.toString());
+		}
+
 		return null;
 	}
 	
