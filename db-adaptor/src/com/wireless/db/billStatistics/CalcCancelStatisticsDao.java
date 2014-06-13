@@ -100,65 +100,6 @@ public class CalcCancelStatisticsDao {
 		}
 	}
 	
-	
-//	/**
-//	 * 
-//	 * @param staff
-//	 * @param range
-//	 * @param queryType
-//	 * @param deptID
-//	 * @return
-//	 * @throws SQLException
-//	 * @throws BusinessException 
-//	 */
-//	public static List<CancelledFood> getCancelledFoodDetail(Staff staff, DutyRange range, DateType queryType, Integer deptID, Integer reasonID) throws SQLException, BusinessException{
-//		DBCon dbCon = new DBCon();
-//		try{
-//			dbCon.connect();
-//			return getCancelledFoodDetail(dbCon, staff, range, queryType, deptID, reasonID);
-//		}finally{
-//			dbCon.disconnect();
-//		}
-//	}
-//
-//	/**
-//	 * 
-//	 * @param dbCon
-//	 * @param staff
-//	 * @param range
-//	 * @param queryType
-//	 * @param deptId
-//	 * @param reasonId
-//	 * @return
-//	 * @throws SQLException
-//	 * @throws BusinessException
-//	 */
-//	public static List<CancelledFood> getCancelledFoodDetail(DBCon dbCon, Staff staff, DutyRange range, DateType queryType, Integer deptId, Integer reasonId) throws SQLException, BusinessException{
-//		List<CancelledFood> list = new ArrayList<CancelledFood>();
-//		List<OrderFood> cancelFoods;
-//		
-//		ExtraCond4CancelFood extraCond = new ExtraCond4CancelFood(queryType);
-//		extraCond.setDutyRange(range);
-//		if(reasonId != null){
-//			extraCond.setReasonId(reasonId);
-//		}
-//		if(deptId != null && deptId >= 0){
-//			extraCond.setDeptId(Department.DeptId.valueOf(deptId));
-//		}
-//		
-//		if(queryType.isHistory()){
-//			cancelFoods = OrderFoodDao.getSingleDetail(dbCon, staff, extraCond, " ORDER BY OFH.order_date ASC ");
-//		}else if(queryType.isToday()){
-//			cancelFoods = OrderFoodDao.getSingleDetail(dbCon, staff, extraCond," ORDER BY OF.order_date ASC ");
-//		}else{
-//			throw new IllegalArgumentException("The query type is invalid.");
-//		}
-//		for(OrderFood of : cancelFoods){
-//			list.add(new CancelledFood(of));
-//		}
-//		return list;
-//	}
-	
 	/**
 	 * Calculate the cancel income by each day according to specific range and extra condition.
 	 * @param staff
