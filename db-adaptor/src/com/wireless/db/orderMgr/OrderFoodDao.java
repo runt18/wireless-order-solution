@@ -71,7 +71,6 @@ public class OrderFoodDao {
 		private int staffId;
 		private String foodName;
 		private boolean isGift;
-		private String countCond;
 		
 		public ExtraCond(DateType dateType){
 			this.dateType = dateType;
@@ -124,11 +123,6 @@ public class OrderFoodDao {
 			return this;
 		}
 		
-		public ExtraCond setCountCond(String countCond){
-			this.countCond = countCond;
-			return this;
-		}
-		
 		@Override
 		public String toString(){
 			StringBuilder extraCond = new StringBuilder();
@@ -155,9 +149,6 @@ public class OrderFoodDao {
 			}
 			if(isGift){
 				extraCond.append(" AND " + orderFoodTblAlias + ".is_gift = 1");
-			}
-			if(countCond != null){
-				extraCond.append(" AND " + orderFoodTblAlias + ".order_count " + countCond);
 			}
 			return extraCond.toString();
 		}
