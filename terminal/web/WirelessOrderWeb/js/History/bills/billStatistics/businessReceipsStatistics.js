@@ -1,6 +1,10 @@
 ﻿receivablesStaticRecordCount = 93;
 var highChart;
 
+var businessPanelHeight = 0, panelDrag = false;
+
+var southPanel;
+
 var tempLoadMask = new Ext.LoadMask(document.body, {
 	msg : '正在获取信息, 请稍候......',
 	remove : true
@@ -27,6 +31,7 @@ function initBusinessReceipsData(c){
 			var jr = Ext.util.JSON.decode(res.responseText);
 			if(jr.success){
 				receivablesStatResultGrid.getStore().loadData(jr);
+				Ext.get('businessReceiptsChart').setHeight(southPanel.getHeight());
 				showChart(jr);
 			}else{
 				Ext.ux.showMsg(jr);
@@ -48,11 +53,10 @@ function newDate(str) {
 	return date; 
 } 
 
-function each(x){
+function loadBusinessStatistic(x){
 	var date = newDate(x).getTime();
 	businessStatWin = new Ext.Window({
 		title : '营业统计 -- <font style="color:green;">历史</font>',
-		id : 'businessDetailWin',
 		width : 885,
 		height : 580,
 		closable : false,
@@ -120,7 +124,7 @@ function showChart(jdata){
 				},
 				events : {
 					click : function(e){
-						each(e.point.category);
+						loadBusinessStatistic(e.point.category);
 					}
 				}
 			}
@@ -179,6 +183,7 @@ function showChart(jdata){
 
 var receivablesStatResultGrid, receipts_dateCombo;
 function initBusinessReceipsGrid(c){
+	
 	if(c.data == null || typeof c.data == 'undefined'){
 		c.data = {successProperty : true, totalProperty:2, root: []};
 	}
@@ -445,7 +450,26 @@ function initBusinessReceipsGrid(c){
 		listeners : {
 			dblclick : function(){
 				var data = Ext.ux.getSelData(receivablesStatResultGrid);
-				each(data['offDutyToDate']);
+				loadBusinessStatistic(data['offDutyToDate']);
+			},
+			bodyresize : function(e, w, h){
+				var chartHeight;
+				if(h < businessPanelHeight){
+					chartHeight = 250 + (businessPanelHeight - h);
+				}else{
+					chartHeight = 250 + (h - businessPanelHeight);
+				}
+				changeChartWidth(w,chartHeight);
+				
+				southPanel.getEl().setTop((h+55)) ;
+				
+				if(panelDrag){
+					southPanel.setHeight(chartHeight);
+				}
+				
+				receivablesStatResultGrid.getEl().parent().setWidth(w);
+				receivablesStatResultGrid.doLayout();
+				
 			}
 		},
 		tbar : businessReceiptGridTbar,
@@ -457,9 +481,6 @@ function initBusinessReceipsGrid(c){
 			emptyMsg : "没有记录"
 		})
 	});
-	
-	receivablesStatResultStore.load();
-
 }
 
 function changeChartWidth(w,h){
@@ -471,44 +492,39 @@ function changeChartWidth(w,h){
 
 
 Ext.onReady(function(){
+	southPanel = new Ext.Panel({
+		contentEl : 'businessReceiptsChart',
+		region : 'south'
+	});
+	
 	initBusinessReceipsGrid({data : null});
 	
-	var businessPanelHeight = 0;
-	
-	var businessPanel = new Ext.Panel({
+	new Ext.Panel({
 		renderTo : 'divBusinessReceiptStatistics',//渲染到
 		id : 'businessReceiptStatisticsPanel',
 		//solve不跟随窗口的变化而变化
 		width : parseInt(Ext.getDom('divBusinessReceiptStatistics').parentElement.style.width.replace(/px/g,'')),
-		height : parseInt(Ext.getDom('divBusinessReceiptStatistics').parentElement.style.height.replace(/px/g,'')) - 250,
+		height : parseInt(Ext.getDom('divBusinessReceiptStatistics').parentElement.style.height.replace(/px/g,'')),
 		layout:'border',
 		frame : true, //边框
-		//子集
-		items : [receivablesStatResultGrid],
-		listeners : {
-			bodyresize : function(e, w, h){
-				var chartHeight;
-				if(h < businessPanelHeight){
-					chartHeight = 250 + (businessPanelHeight - h);
-				}else{
-					chartHeight = 250 + (h - businessPanelHeight);
-				}
-				changeChartWidth(w,chartHeight);
-			}
-		}
+		items : [receivablesStatResultGrid,southPanel]
 	});
 	
-	businessPanelHeight = businessPanel.getHeight();
+	businessPanelHeight = receivablesStatResultGrid.getHeight();
 	
-	var rz = new Ext.Resizable(businessPanel.getEl(), {
+	var rz = new Ext.Resizable(receivablesStatResultGrid.getEl(), {
         wrap: true, //在构造Resizable时自动在制定的id的外边包裹一层div
         minHeight:100, //限制改变的最小的高度
         pinned:false, //控制可拖动区域的显示状态，false是鼠标悬停在拖拉区域上才出现
-        handles: 's'//设置拖拉的方向（n,s,e,w,all...）
+        handles: 's',//设置拖拉的方向（n,s,e,w,all...）
+        listeners : {
+        	resize : function(thiz, w, h, e){
+        		panelDrag = true;
+        	}
+        }
     });
-    rz.on('resize', businessPanel.syncSize, businessPanel);//注册事件(作用:将调好的大小传个scope执行)
+    rz.on('resize', receivablesStatResultGrid.syncSize, receivablesStatResultGrid);//注册事件(作用:将调好的大小传个scope执行)
 	
 	receipts_dateCombo.setValue(1);
 	receipts_dateCombo.fireEvent('select', null, null, 1);
-//	repaidStatisticsGrid.getStore().load();
 });

@@ -446,8 +446,134 @@ function kitchenStatPanelInit(){
 	});	
 }
 
+function loadDeptStatisticChartData(c){
+	var tempLoadMask = new Ext.LoadMask(document.body, {
+		msg : '正在生成走势图, 请稍候......',
+		remove : true
+	});
+	tempLoadMask.show();
+	Ext.Ajax.request({
+		url : '../../SaleStatisticChart.do',
+		params : {
+			dateBeg : c.dateBeg,
+			dateEnd : c.dateEnd,
+			region : c.region,
+			opening : c.opening,
+			ending : c.ending,
+			deptId : c.deptId
+		},
+		success : function(res, opt){
+			var jdata = Ext.util.JSON.decode(res.responseText);
+			if(jdata.success){
+				tempLoadMask.hide();
+				showDeptStatisticChart(jdata);
+			}
+			
+		},
+		failure : function(res, opt){
+			tempLoadMask.hide();
+			Ext.ux.showMsg(Ext.util.JSON.decode(res.responseText));
+		}
+	});
+}
+
+function showDeptStatisticChart(jdata){
+	
+	var dateBegin = Ext.getCmp('deptStatistic_dateSearchDateBegin').getValue().format('Y-m-d');
+	var dateEnd = Ext.getCmp('deptStatistic_dateSearchDateEnd').getValue().format('Y-m-d');
+	
+	var hourBegin = Ext.getCmp('deptStatistic_txtBusinessHourBegin').getEl().dom.textContent;
+	var hourEnd = Ext.getCmp('deptStatistic_txtBusinessHourEnd').getEl().dom.textContent;
+	
+	var chartData = eval('(' + jdata.other.chart + ')');
+	highChart = new Highcharts.Chart({
+		plotOptions : {
+			line : {
+				cursor : 'pointer',
+				dataLabels : {
+					enabled : true,
+					style : {
+						fontWeight: 'bold', 
+						color: 'green' 
+					}
+				},
+				events : {
+					click : function(e){
+//						each(e.point.category);
+					}
+				}
+			}
+		},
+        chart: {  
+        	renderTo: 'divSalesSubStatisticDeptChart'
+    	}, 
+        title: {
+            text: '<b>营业走势图（'+dateBegin+ '至' +dateEnd+'）'+hourBegin+ ' - ' + hourEnd + '</b>'
+        },
+        labels: {
+        	items : [{
+        		html : '<b>总营业额:' + chartData.totalMoney + ' 元</b><br><b>日均收入:' + chartData.avgMoney + ' 元</b>',
+	        	style : {left :'0px', top: '0px'}
+        	}]
+        },
+        xAxis: {
+            categories: chartData.xAxis,
+            labels : {
+            	formatter : function(){
+            		return this.value.substring(5,10);
+            	}
+            }
+        },
+        yAxis: {
+        	min: 0,
+            title: {
+                text: '金额 (元)'
+            },
+            plotLines: [{
+                value: 0,
+                width: 2,
+                color: '#808080'
+            }]
+        },
+        tooltip: {
+//	        	crosshairs: true,
+            formatter: function() {
+                return '<b>' + this.series.name + '</b><br/>'+
+                    this.x.substring(0,10) +': '+ '<b>'+this.y+'</b> ';
+            }
+        },
+//	        series : [{  
+//	            name: 'aaaaaa',  
+//	            data: [6, 9, 2, 7, 13, 21, 10]
+//	        }],
+        series : chartData.ser,
+        exporting : {
+        	enabled : true
+        },
+        credits : {
+        	enabled : false
+        }
+	});	
+}
+
+function loadChartRender(){
+	return '<a href="javascript:Ext.getCmp(\'deptStatistic_btnSearch\').handler(true)">查看走势图</a>';
+}
+
 function deptStatPanelInit(){
+	
+	var southDeptChart = new Ext.Panel({
+		id : 'southDeptChartPanel',
+		region : 'south',
+		title : '走势图',
+		collapsible : true,
+		collapsed : true,
+		contentEl : 'divSalesSubStatisticDeptChart'
+	});
+	
+	
 	var beginDate = new Ext.form.DateField({
+		id : 'deptStatistic_dateSearchDateBegin',
 		xtype : 'datefield',		
 		format : 'Y-m-d',
 		width : 90,
@@ -460,6 +586,7 @@ function deptStatPanelInit(){
 		}
 	});
 	var endDate = new Ext.form.DateField({
+		id : 'deptStatistic_dateSearchDateEnd',
 		xtype : 'datefield',
 		format : 'Y-m-d',
 		width : 90,
@@ -486,7 +613,7 @@ function deptStatPanelInit(){
 			text : '搜索',
 			id : 'deptStatistic_btnSearch',
 			iconCls : 'btn_search',
-			handler : function(){
+			handler : function(e){
 				var bd = beginDate.getValue();
 				var ed = endDate.getValue();
 				if(bd == '' && ed == ''){
@@ -497,15 +624,29 @@ function deptStatPanelInit(){
 				}else if(bd == '' && ed != ''){
 					Ext.ux.checkDuft(false, beginDate.getId(), endDate.getId());
 				}
-				var gs = deptStatPanelGrid.getStore();
-				var data = Ext.ux.statistic_oBusinessHourData({type : 'get', statistic : 'deptStatistic_'}).data;
-				gs.baseParams['dateBeg'] = beginDate.getRawValue();
-				gs.baseParams['dateEnd'] = endDate.getRawValue();
-				gs.baseParams['region'] = Ext.getCmp("deptStatistic_comboRegion").getValue();
-				gs.baseParams['opening'] = data.opening;
-				gs.baseParams['ending'] = data.ending;
 				
-				gs.load();
+				var data = Ext.ux.statistic_oBusinessHourData({type : 'get', statistic : 'deptStatistic_'}).data;
+				
+				if(typeof e != 'undefined' && typeof e == 'boolean'){
+					Ext.getCmp('southDeptChartPanel').expand();
+					var gn = Ext.ux.getSelData(deptStatPanelGrid);
+					loadDeptStatisticChartData({dateBeg : beginDate.getRawValue() + ' 00:00:00', 
+						dateEnd : endDate.getRawValue() + ' 23:59:59', 
+						region : Ext.getCmp("deptStatistic_comboRegion").getValue(),
+						opening : data.opening,
+						ending : data.ending,
+						deptId : gn.dept.id});
+				}else{
+//					Ext.getCmp('southDeptChartPanel').collapse();
+					var gs = deptStatPanelGrid.getStore();
+					gs.baseParams['dateBeg'] = beginDate.getRawValue();
+					gs.baseParams['dateEnd'] = endDate.getRawValue();
+					gs.baseParams['region'] = Ext.getCmp("deptStatistic_comboRegion").getValue();
+					gs.baseParams['opening'] = data.opening;
+					gs.baseParams['ending'] = data.ending;
+					
+					gs.load();					
+				}
 			}
 		}, '-', {
 			text : '导出',
@@ -569,14 +710,16 @@ function deptStatPanelInit(){
 	     ['成本','cost','','right','Ext.ux.txtFormat.gridDou'], 
          ['成本率','costRate','','right','Ext.ux.txtFormat.gridDou'], 
          ['毛利','profit','','right','Ext.ux.txtFormat.gridDou'], 
-         ['毛利率','profitRate','','right','Ext.ux.txtFormat.gridDou']
+         ['毛利率','profitRate','','right','Ext.ux.txtFormat.gridDou'],
+         ['操作','operateChart','','center','loadChartRender']
 		],
-		SalesSubStatRecord.getKeys().concat(['dept', 'dept.name']),
+		SalesSubStatRecord.getKeys().concat(['dept', 'dept.name', 'dept.id']),
 		[['dataType', 1], ['queryType', 0]],
 		SALESSUB_PAGE_LIMIT,
 		null,
 		[deptStatPanelGridTbar]
 	);
+	deptStatPanelGrid.region = "center";
 	deptStatPanelGrid.getStore().on('load', function(store, records, options){
 		if(store.getCount() > 0){
 			var sumRow = deptStatPanelGrid.getView().getRow(store.getCount()-1);	
@@ -589,17 +732,27 @@ function deptStatPanelInit(){
 			}
 			deptStatPanelGrid.getView().getCell(store.getCount()-1, 6).innerHTML = '--';
 			deptStatPanelGrid.getView().getCell(store.getCount()-1, 8).innerHTML = '--';
+			deptStatPanelGrid.getView().getCell(store.getCount()-1, 9).innerHTML = '--';
 		}
 	});
 	deptStatPanelGrid.on('render', function(){
 		dateCombo.setValue(1);
 		dateCombo.fireEvent('select', dateCombo, null, 1);
 	});
+	
+	
 	deptStatPanel = new Ext.Panel({
 		title : '部门统计',
-		layout : 'fit',
-		items : [deptStatPanelGrid]
+		layout : 'border',
+		items : [deptStatPanelGrid, southDeptChart],
+		listeners : {
+			show : function(){
+				$('#divSalesSubStatisticDeptChart').show();
+			}
+		}
 	});
+	
+	
 }
 
 function salesSubWinTabPanelInit(){
@@ -619,7 +772,7 @@ function salesSubWinTabPanelInit(){
 		frame : true,
 		activeTab : 0,
 		border : false,
-		items : [orderFoodStatPanel, kitchenStatPanel, deptStatPanel],
+		items : [orderFoodStatPanel,kitchenStatPanel,deptStatPanel],
 		listeners : {
 			tabchange : function(thiz, tab){
 			
@@ -639,7 +792,7 @@ Ext.onReady(function(){
 		//solve不跟随窗口的变化而变化
 		width : parseInt(Ext.getDom('divSalesSubStatistics').parentElement.style.width.replace(/px/g,'')),
 		height : parseInt(Ext.getDom('divSalesSubStatistics').parentElement.style.height.replace(/px/g,'')),
-		layout:'border',
+		layout:'fit',
 		frame : true, //边框
 		//子集
 		items : [salesSubWinTabPanel]
