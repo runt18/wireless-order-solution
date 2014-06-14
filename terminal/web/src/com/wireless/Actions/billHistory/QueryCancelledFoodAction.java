@@ -131,7 +131,7 @@ public class QueryCancelledFoodAction extends DispatchAction{
 				extraCond.setReasonId(Integer.valueOf(reasonID));
 			}
 			if(deptID != null && !deptID.isEmpty() && !deptID.equals("-1")){
-				extraCond.setDeptId(DeptId.valueOf(deptID));
+				extraCond.setDeptId(DeptId.valueOf(Integer.parseInt(deptID)));
 			}
 			if(staffID != null && !staffID.isEmpty() && !staffID.equals("-1")){
 				extraCond.setStaffId(Integer.valueOf(staffID));
@@ -196,7 +196,7 @@ public class QueryCancelledFoodAction extends DispatchAction{
 				extraCond.setReasonId(Integer.valueOf(reasonID));
 			}
 			if(deptID != null && !deptID.isEmpty() && !deptID.equals("-1")){
-				extraCond.setDeptId(DeptId.valueOf(deptID));
+				extraCond.setDeptId(DeptId.valueOf(Integer.parseInt(deptID)));
 			}
 			if(staffID != null && !staffID.isEmpty() && !staffID.equals("-1")){
 				extraCond.setStaffId(Integer.valueOf(staffID));
@@ -238,7 +238,7 @@ public class QueryCancelledFoodAction extends DispatchAction{
 				extraCond.setReasonId(Integer.valueOf(reasonID));
 			}
 			if(deptID != null && !deptID.isEmpty() && !deptID.equals("-1")){
-				extraCond.setDeptId(DeptId.valueOf(deptID));
+				extraCond.setDeptId(DeptId.valueOf(Integer.parseInt(deptID)));
 			}
 			if(staffID != null && !staffID.isEmpty() && !staffID.equals("-1")){
 				extraCond.setStaffId(Integer.valueOf(staffID));
@@ -280,7 +280,7 @@ public class QueryCancelledFoodAction extends DispatchAction{
 				extraCond.setReasonId(Integer.valueOf(reasonID));
 			}
 			if(deptID != null && !deptID.isEmpty() && !deptID.equals("-1")){
-				extraCond.setDeptId(DeptId.valueOf(deptID));
+				extraCond.setDeptId(DeptId.valueOf(Integer.parseInt(deptID)));
 			}
 			if(staffID != null && !staffID.isEmpty() && !staffID.equals("-1")){
 				extraCond.setStaffId(Integer.valueOf(staffID));
