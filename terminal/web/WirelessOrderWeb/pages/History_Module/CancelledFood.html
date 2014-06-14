@@ -3,6 +3,11 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>Insert title here</title>
+<style type="text/css">
+	.changeChart{
+		margin-left: 10px;
+	}
+</style>
 <script type="text/javascript">
 	//退菜统计
 	var cancelFoodStatWin, cancelFoodStatWinTabPanel, cancelFoodDetailsStatPanel, cancelFoodByDeptStatPanel, cancelFoodByReasonStatPanel;
@@ -12,9 +17,25 @@
 <body>
 <div id="divCancelledFood"></div>
 
-<div id="divCancelledDetailChart" style="height : 300px;"></div>
-<div id="divCancelledReasonChart" style="height : 300px;display:none"></div>
-<div id="divCancelledDeptChart" style="height : 300px;display:none"></div>
-<div id="divCancelledStaffChart" style="height : 300px;display:none"></div>
+
+<div id="divCancelledDetailChart" data-type="chart" data-value="detailChart" style="height : 300px;"></div>
+
+<div id="divCancelledReasonCharts" >
+	<div id="divCancelledReasonChartChange" style="display:none;"><a href="#" class="changeChart">切换视图</a></div>
+	<div id="divCancelledReasonChart" data-type="chart" data-value="reasonChart" style="height : 300px;display:none"></div>
+	<div id="divCancelledReasonColumnChart" data-type="chart" data-value="reasonChart" style="height : 300px;display:none"></div>
+</div>
+
+<div id="divCancelledStaffCharts" >
+	<div id="divCancelledStaffChartChange" style="display:none;"><a href="#" class="changeChart">切换视图</a></div>
+	<div id="divCancelledStaffChart" data-type="chart" data-value="staffChart" style="height : 300px;display:none"></div>
+	<div id="divCancelledStaffColumnChart" data-type="chart" data-value="staffChart" style="height : 300px;display:none"></div>
+</div>
+
+<div id="divCancelledDeptCharts" >
+	<div id="divCancelledDeptChartChange" style="display:none;"><a href="#" class="changeChart">切换视图</a></div>
+	<div id="divCancelledDeptChart" data-type="chart" data-value="deptChart" style="height : 300px;display:none"></div>
+	<div id="divCancelledDeptColumnChart" data-type="chart" data-value="deptChart" style="height : 300px;display:none"></div>
+</div>
 </body>
 </html>
