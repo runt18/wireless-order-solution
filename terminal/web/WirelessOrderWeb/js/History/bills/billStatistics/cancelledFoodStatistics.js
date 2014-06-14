@@ -29,7 +29,7 @@ function cancellFood_showBillDetailWin(){
 					url : '../window/history/orderDetail.jsp', 
 					scripts : true,
 					params : {
-						orderId : sd.orderID,
+						orderId : sd.orderId,
 						foodStatus : 'isReturn'
 					},
 					method : 'post'
@@ -85,40 +85,43 @@ function cancelFoodDetailsStatPanelInit(){
 		}
 	});
 	var reasonCombo = new Ext.form.ComboBox({
-		xtype : 'combo',
 		forceSelection : true,
-		width : 150,
-		store : new Ext.data.Store({
-			proxy : new Ext.data.HttpProxy({
-				url : '../../QueryCancelReason.do'
-			}),
-			baseParams : { 
-				restaurantID : restaurantID 
-			},
-			reader: new Ext.data.JsonReader({
-				totalProperty : 'totalProperty',
-				root : 'root',
-				fields : ['id', 'reason', 'restaurantID']
-			}),
-			listeners : {
-				load : function(thiz){
-					thiz.insert(0, new Ext.data.Record({
-						id : -1,
-						reason : '全部',
-						restaurantID : restaurantID
-					}));
-					
-					thiz.setValue(-1);
-				}
-			}
+		width : 90,
+		value : -1,
+		store : new Ext.data.SimpleStore({
+			fields : ['id', 'reason']
 		}),
 		valueField : 'id',
 		displayField : 'reason',
 		typeAhead : true,
-//		mode : 'remote',
-		readOnly : false,
+		mode : 'local',
 		triggerAction : 'all',
-		selectOnFocus : true
+		selectOnFocus : true,
+		allowBlank : false,
+		readOnly : false,
+		listeners : {
+			render : function(thiz){
+				var data = [[-1,'全部']];
+				Ext.Ajax.request({
+					url : '../../QueryCancelReason.do',
+					success : function(res, opt){
+						var jr = Ext.decode(res.responseText);
+						for(var i = 0; i < jr.root.length; i++){
+							data.push([jr.root[i]['id'], jr.root[i]['reason']]);
+						}
+						thiz.store.loadData(data);
+						thiz.setValue(-1);
+					},
+					fialure : function(res, opt){
+						thiz.store.loadData(data);
+						thiz.setValue(-1);
+					}
+				});				
+			},
+			select : function(){
+				Ext.getCmp('btnSearchForCancelFoodDetailsStat').handler();
+			}
+		}
 	});
 	
 	var deptCombo = new Ext.form.ComboBox({
@@ -154,6 +157,9 @@ function cancelFoodDetailsStatPanelInit(){
 						thiz.setValue(-1);
 					}
 				});				
+			},
+			select : function(){
+				Ext.getCmp('btnSearchForCancelFoodDetailsStat').handler();
 			}
 		}
 	});
@@ -266,15 +272,27 @@ function cancelFoodDetailsStatPanelInit(){
 				
 				//is(":visible"):第一次切换tab才去生成chart
 				if(typeof reasonChart != 'undefined' && typeof cancelledReasonChartPanel.hasRender != 'undefined'){
-					loadReasonChart();
+					getRaasonChartData();
+//					if(cancelledReasonChartPanel.isVisible()){
+						$('#divCancelledReasonColumnChart').is(':visible')? loadReasonColumnChart() : loadReasonChart();
+						reasonChart.setSize(cancelFoodStatChartTabPanel.getWidth(), cancelFoodStatChartTabPanel.getHeight()-30);
+/*					}else{
+						loadReasonColumnChart();
+						loadReasonChart();
+					}*/
+					
 				}
 				
 				if(typeof staffChart != 'undefined' && typeof cancelledStaffChartPanel.hasRender != 'undefined'){
-					loadStaffChart();
+					getStaffChartData();
+					$('#divCancelledStaffColumnChart').is(':visible')? loadStaffColumnChart() : loadStaffChart();
+					staffChart.setSize(cancelFoodStatChartTabPanel.getWidth(), cancelFoodStatChartTabPanel.getHeight()-30);
 				}
 				
 				if(typeof deptChart != 'undefined' && typeof cancelledDeptChartPanel.hasRender != 'undefined'){
-					loadDeptChart();
+					getDeptChartData();
+					$('#divCancelledDeptColumnChart').is(':visible')? loadDeptColumnChart() : loadDeptChart();
+					deptChart.setSize(cancelFoodStatChartTabPanel.getWidth(), cancelFoodStatChartTabPanel.getHeight()-30);
 				}
 			}
 		},{
@@ -363,150 +381,299 @@ function cancelFoodDetailsStatPanelInit(){
 		title : '明细汇总',
 		layout : 'border',
 		region : 'center',
-		items : [/*cfdsTree, */cfdsGrid]
+		items : [/*cfdsTree, */cfdsGrid],
+		listeners : {
+			bodyresize : function(e, w, h){
+				if(typeof businessPanelHeight != 'undefined'){
+				
+					var chartHeight;
+					if(h < businessPanelHeight){
+						chartHeight = 300 + (businessPanelHeight - h);
+					}else{
+						chartHeight = 300 + (h - businessPanelHeight);
+					}
+					changeChartWidth(w,(chartHeight-30));
+					
+					cancelFoodStatChartTabPanel.getEl().setTop((h+30)) ;
+					
+					if(panelDrag){
+						cancelFoodStatChartTabPanel.setHeight(chartHeight);
+					}
+					
+	//				receivablesStatResultGrid.getEl().parent().setWidth(w);
+					cancelFoodDetailsStatPanel.doLayout();
+				}
+			}
+		}
 	});
 }
 
+function changeChartWidth(w,h){
+	eval($('div:visible[data-type=chart]').attr('data-value')).setSize(w, h);
+}
 
-function loadReasonChart(){
-	
-	var chartData = {type : 'pie', name : '比例', data : []};
+function getRaasonChartData(){
 	requestParams.dataSource = 'getReasonChart';
-	Ext.Ajax.request({
+	$.ajax({
 		url : '../../QueryCancelledFood.do',
-		params : requestParams,
-		success : function(res, opt){
-			var jr = Ext.decode(res.responseText);
-			
+		type : 'post',
+		async : false,
+		data : requestParams,
+		success : function(jr, status, xhr){
+			reasonChartData.chartData.data = [];
+			reasonChartData.reasonColumnChart.xAxis = [];
+			reasonChartData.reasonColumnChart.yAxis.data = [];
 			for (var i = 0; i < jr.root.length; i++) {
-				chartData.data.push([jr.root[i].reason, jr.root[i].cancelAmount]);
+				reasonChartData.chartData.data.push([jr.root[i].reason, jr.root[i].cancelAmount]);
+				reasonChartData.reasonColumnChart.xAxis.push(jr.root[i].reason);
+				reasonChartData.reasonColumnChart.yAxis.data.push({y : jr.root[i].cancelAmount, color : colors[i]}); 
 			}
-			reasonChart = new Highcharts.Chart({
-			    chart: {
-			    	renderTo : 'divCancelledReasonChart',
-			        plotBackgroundColor: null,
-			        plotBorderWidth: null,
-			        plotShadow: false
-			    },
-			    title: {
-			        text: '原因比例图'
-			    },
-			    tooltip: {
-				    pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
-			    },
-			    plotOptions: {
-			        pie: {
-			            allowPointSelect: true,
-			            cursor: 'pointer',
-			            dataLabels: {
-			                enabled: true,
-			                color: '#000000',
-			                connectorColor: '#000000',
-			                format: '<b>{point.name}</b>: {point.percentage:.1f} %'
-			            }
-			        }
-			    },
-			    series: [chartData]
-			});				
 		},
 		failure : function(res, opt){
 		
 		}
 	});
+	
+}
+
+function getStaffChartData(){
+	requestParams.dataSource = 'getStaffChart';
+	$.ajax({
+		url : '../../QueryCancelledFood.do',
+		type : 'post',
+		async : false,
+		data : requestParams,
+		success : function(jr, status, xhr){
+			staffChartData.chartData.data = [];
+			staffChartData.staffColumnChart.xAxis = [];
+			staffChartData.staffColumnChart.yAxis.data = [];
+			for (var i = 0; i < jr.root.length; i++) {
+				staffChartData.chartData.data.push([jr.root[i].cancelStaff, jr.root[i].cancelPrice]);
+				staffChartData.staffColumnChart.xAxis.push(jr.root[i].cancelStaff);
+				staffChartData.staffColumnChart.yAxis.data.push({y : jr.root[i].cancelPrice, color : colors[i]}); 
+			}
+		},
+		failure : function(res, opt){
+		
+		}
+	});
+	
+}
+
+function getDeptChartData(){
+	requestParams.dataSource = 'getDeptChart';
+	$.ajax({
+		url : '../../QueryCancelledFood.do',
+		type : 'post',
+		async : false,
+		data : requestParams,
+		success : function(jr, status, xhr){
+			deptChartData.chartData.data = [];
+			deptChartData.deptColumnChart.xAxis = [];
+			deptChartData.deptColumnChart.yAxis.data = [];
+			for (var i = 0; i < jr.root.length; i++) {
+				deptChartData.chartData.data.push([jr.root[i].cancelDept.name, jr.root[i].cancelPrice]);
+				deptChartData.deptColumnChart.xAxis.push(jr.root[i].cancelDept.name);
+				deptChartData.deptColumnChart.yAxis.data.push({y : jr.root[i].cancelPrice, color : colors[i]}); 
+			}
+		},
+		failure : function(res, opt){
+		
+		}
+	});
+	
+}
+
+
+function loadReasonColumnChart(){
+ 	reasonChart = new Highcharts.Chart({
+        chart: {
+            type: 'column',
+            renderTo : 'divCancelledReasonColumnChart'
+        },
+        title: {
+            text: '退菜原因柱状图'
+        },
+        xAxis: {
+            categories: reasonChartData.reasonColumnChart.xAxis
+        },
+        yAxis: {
+            min: 0,
+            title: {
+                text: '数量 (份)'
+            }
+        },
+        tooltip: {
+            pointFormat: '<table><tbody><tr><td style="color:red;padding:0">数量: </td><td style="padding:0"><b>{point.y} 份</b></td></tr></tbody></table>',
+            shared: true,
+            useHTML: true
+        },
+        plotOptions: {
+            column: {
+                pointPadding: 0.2,
+                borderWidth: 0
+            }
+        },
+        series: [reasonChartData.reasonColumnChart.yAxis]
+    });	
+}
+
+function loadStaffColumnChart(){
+ 	staffChart = new Highcharts.Chart({
+        chart: {
+            type: 'column',
+            renderTo : 'divCancelledStaffColumnChart'
+        },
+        title: {
+            text: '员工退菜金额柱状图'
+        },
+        xAxis: {
+            categories: staffChartData.staffColumnChart.xAxis
+        },
+        yAxis: {
+            min: 0,
+            title: {
+                text: '金额 (份)'
+            }
+        },
+        tooltip: {
+            pointFormat: '<table><tbody><tr><td style="color:red;padding:0">金额: </td><td style="padding:0"><b>{point.y} 份</b></td></tr></tbody></table>',
+            shared: true,
+            useHTML: true
+        },
+        plotOptions: {
+            column: {
+                pointPadding: 0.2,
+                borderWidth: 0
+            }
+        },
+        series: [staffChartData.staffColumnChart.yAxis]
+    });	
+}
+
+function loadDeptColumnChart(){
+ 	deptChart = new Highcharts.Chart({
+        chart: {
+            type: 'column',
+            renderTo : 'divCancelledDeptColumnChart'
+        },
+        title: {
+            text: '部门退菜金额柱状图'
+        },
+        xAxis: {
+            categories: deptChartData.deptColumnChart.xAxis
+        },
+        yAxis: {
+            min: 0,
+            title: {
+                text: '金额 (份)'
+            }
+        },
+        tooltip: {
+            pointFormat: '<table><tbody><tr><td style="color:red;padding:0">金额: </td><td style="padding:0"><b>{point.y} 份</b></td></tr></tbody></table>',
+            shared: true,
+            useHTML: true
+        },
+        plotOptions: {
+            column: {
+                pointPadding: 0.2,
+                borderWidth: 0
+            }
+        },
+        series: [deptChartData.deptColumnChart.yAxis]
+    });	
+}
+
+function loadReasonChart(){
+	reasonChart = new Highcharts.Chart({
+	    chart: {
+	    	renderTo : 'divCancelledReasonChart',
+	        plotBackgroundColor: null,
+	        plotBorderWidth: null,
+	        plotShadow: false
+	    },
+	    title: {
+	        text: '原因比例图'
+	    },
+	    tooltip: {
+		    pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+	    },
+	    plotOptions: {
+	        pie: {
+	            allowPointSelect: true,
+	            cursor: 'pointer',
+	            dataLabels: {
+	                enabled: true,
+	                color: '#000000',
+	                connectorColor: '#000000',
+	                format: '<b>{point.name}</b>: {point.percentage:.1f} %'
+	            }
+	        }
+	    },
+	    series: [reasonChartData.chartData]
+	});				
+	
 }
 
 function loadStaffChart(){
 	
-	var chartData = {type : 'pie', name : '比例', data : []};
-	requestParams.dataSource = 'getStaffChart';
-	Ext.Ajax.request({
-		url : '../../QueryCancelledFood.do',
-		params : requestParams,
-		success : function(res, opt){
-			var jr = Ext.decode(res.responseText);
-			
-			for (var i = 0; i < jr.root.length; i++) {
-				chartData.data.push([jr.root[i].cancelStaff, jr.root[i].cancelPrice]);
-			}
-			staffChart = new Highcharts.Chart({
-			    chart: {
-			    	renderTo : 'divCancelledStaffChart',
-			        plotBackgroundColor: null,
-			        plotBorderWidth: null,
-			        plotShadow: false
-			    },
-			    title: {
-			        text: '员工退菜金额比例图'
-			    },
-			    tooltip: {
-				    pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
-			    },
-			    plotOptions: {
-			        pie: {
-			            allowPointSelect: true,
-			            cursor: 'pointer',
-			            dataLabels: {
-			                enabled: true,
-			                color: '#000000',
-			                connectorColor: '#000000',
-			                format: '<b>{point.name}</b>: {point.percentage:.1f} %'
-			            }
-			        }
-			    },
-			    series: [chartData]
-			});				
-		},
-		failure : function(res, opt){
-		
-		}
-	});
+	staffChart = new Highcharts.Chart({
+	    chart: {
+	    	renderTo : 'divCancelledStaffChart',
+	        plotBackgroundColor: null,
+	        plotBorderWidth: null,
+	        plotShadow: false
+	    },
+	    title: {
+	        text: '员工退菜金额比例图'
+	    },
+	    tooltip: {
+		    pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+	    },
+	    plotOptions: {
+	        pie: {
+	            allowPointSelect: true,
+	            cursor: 'pointer',
+	            dataLabels: {
+	                enabled: true,
+	                color: '#000000',
+	                connectorColor: '#000000',
+	                format: '<b>{point.name}</b>: {point.percentage:.1f} %'
+	            }
+	        }
+	    },
+	    series: [staffChartData.chartData]
+	});				
 }
 
 function loadDeptChart(){
-	
-	var chartData = {type : 'pie', name : '比例', data : []};
-	requestParams.dataSource = 'getDeptChart';
-	Ext.Ajax.request({
-		url : '../../QueryCancelledFood.do',
-		params : requestParams,
-		success : function(res, opt){
-			var jr = Ext.decode(res.responseText);
-			
-			for (var i = 0; i < jr.root.length; i++) {
-				chartData.data.push([jr.root[i].cancelDept.name, jr.root[i].cancelPrice]);
-			}
-			deptChart = new Highcharts.Chart({
-			    chart: {
-			    	renderTo : 'divCancelledDeptChart',
-			        plotBackgroundColor: null,
-			        plotBorderWidth: null,
-			        plotShadow: false
-			    },
-			    title: {
-			        text: '部门退菜金额比例图'
-			    },
-			    tooltip: {
-				    pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
-			    },
-			    plotOptions: {
-			        pie: {
-			            allowPointSelect: true,
-			            cursor: 'pointer',
-			            dataLabels: {
-			                enabled: true,
-			                color: '#000000',
-			                connectorColor: '#000000',
-			                format: '<b>{point.name}</b>: {point.percentage:.1f} %'
-			            }
-			        }
-			    },
-			    series: [chartData]
-			});				
-		},
-		failure : function(res, opt){
-		
-		}
-	});
+	deptChart = new Highcharts.Chart({
+	    chart: {
+	    	renderTo : 'divCancelledDeptChart',
+	        plotBackgroundColor: null,
+	        plotBorderWidth: null,
+	        plotShadow: false
+	    },
+	    title: {
+	        text: '部门退菜金额比例图'
+	    },
+	    tooltip: {
+		    pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+	    },
+	    plotOptions: {
+	        pie: {
+	            allowPointSelect: true,
+	            cursor: 'pointer',
+	            dataLabels: {
+	                enabled: true,
+	                color: '#000000',
+	                connectorColor: '#000000',
+	                format: '<b>{point.name}</b>: {point.percentage:.1f} %'
+	            }
+	        }
+	    },
+	    series: [deptChartData.chartData]
+	});				
 }
 
 function showCancelDetailChart(jdata){
@@ -583,8 +750,12 @@ function showCancelDetailChart(jdata){
 }
 
 var requestParams;
-var reasonChart, detailChart, staffChart, deptChart;
+var cancelFoodStatChartTabPanel, reasonChart, detailChart, staffChart, deptChart;
 var cancelledReasonChartPanel, cancelledStaffChartPanel, cancelledDeptChartPanel;
+var colors = Highcharts.getOptions().colors;
+var reasonChartData = {chartData : {type : 'pie', name : '比例', data : []}, reasonColumnChart : {xAxis : [], yAxis : {name : '退菜原因', data : []}}};
+var staffChartData = {chartData : {type : 'pie', name : '比例', data : []}, staffColumnChart : {xAxis : [], yAxis : {name : '员工退菜', data : []}}};
+var deptChartData = {chartData : {type : 'pie', name : '比例', data : []}, deptColumnChart : {xAxis : [], yAxis : {name : '部门退菜', data : []}}};
 Ext.onReady(function(){
 	cancelFoodDetailsStatPanelInit();
 	
@@ -593,7 +764,8 @@ Ext.onReady(function(){
 		contentEl : 'divCancelledDetailChart',
 		listeners : {
 			show : function(thiz){
-				if(detailChart){
+				//thiz.getEl(): 刚打开页面时thiz.getWidth无效
+				if(detailChart && typeof thiz.getEl() != 'undefined'){
 					detailChart.setSize(thiz.getWidth(), thiz.getHeight());
 				}
 			}
@@ -602,16 +774,21 @@ Ext.onReady(function(){
 	
 	cancelledReasonChartPanel = new Ext.Panel({
 		title : '原因汇总',
-		contentEl : 'divCancelledReasonChart',
+		contentEl : 'divCancelledReasonCharts',
+		height : 320,
 		listeners : {
 			show : function(thiz){
-				if($('#divCancelledReasonChart').is(":visible")){
+				if($('#divCancelledReasonChart').is(":visible") || $('#divCancelledReasonColumnChart').is(":visible")){
 					reasonChart.setSize(thiz.getWidth(), thiz.getHeight());
 				}else{
+					$('#divCancelledReasonChartChange').show();
 					$('#divCancelledReasonChart').show();
 				}
 				if(!reasonChart){
+					getRaasonChartData();
 					loadReasonChart();
+					//第一次加载时thiz.El()未渲染
+					reasonChart.setSize(cancelFoodStatChartTabPanel.getWidth(), cancelFoodStatChartTabPanel.getHeight()-30);
 				}
 			},
 			render : function(thiz){
@@ -622,16 +799,20 @@ Ext.onReady(function(){
 	
 	cancelledStaffChartPanel = new Ext.Panel({
 		title : '员工退菜',
-		contentEl : 'divCancelledStaffChart',
+		contentEl : 'divCancelledStaffCharts',
 		listeners : {
 			show : function(thiz){
-				if($('#divCancelledStaffChart').is(":visible")){
+				if($('#divCancelledStaffChart').is(":visible") || $('#divCancelledStaffColumnChart').is(":visible")){
 					staffChart.setSize(thiz.getWidth(), thiz.getHeight());
 				}else{
+					$('#divCancelledStaffChartChange').show();
 					$('#divCancelledStaffChart').show();
 				}
 				if(!staffChart){
+					getStaffChartData();
 					loadStaffChart();
+					
+					staffChart.setSize(cancelFoodStatChartTabPanel.getWidth(), cancelFoodStatChartTabPanel.getHeight()-30);
 				}
 			},
 			render : function(thiz){
@@ -642,16 +823,20 @@ Ext.onReady(function(){
 	
 	cancelledDeptChartPanel = new Ext.Panel({
 		title : '部门退菜',
-		contentEl : 'divCancelledDeptChart',
+		contentEl : 'divCancelledDeptCharts',
 		listeners : {
 			show : function(thiz){
-				if($('#divCancelledDeptChart').is(":visible")){
+				if($('#divCancelledDeptChart').is(":visible") || $('#divCancelledDeptColumnChart').is(":visible")){
 					deptChart.setSize(thiz.getWidth(), thiz.getHeight());
 				}else{
+					$('#divCancelledDeptChartChange').show();
 					$('#divCancelledDeptChart').show();
 				}
 				if(!deptChart){
+					getDeptChartData();
 					loadDeptChart();
+					
+					deptChart.setSize(cancelFoodStatChartTabPanel.getWidth(), cancelFoodStatChartTabPanel.getHeight()-30);
 				}
 			},
 			render : function(thiz){
@@ -660,7 +845,7 @@ Ext.onReady(function(){
 		}
 	});	
 	
-	var cancelFoodStatChartTabPanel = new Ext.TabPanel({
+	cancelFoodStatChartTabPanel = new Ext.TabPanel({
 		region : 'south',
 		height : 330,
 		items : [cancelledDetailChartPanel, cancelledReasonChartPanel, cancelledStaffChartPanel, cancelledDeptChartPanel],
@@ -685,4 +870,75 @@ Ext.onReady(function(){
 		items : [cancelFoodDetailsStatPanel, cancelFoodStatChartTabPanel]
 	});
 	
+	
+	businessPanelHeight = cancelFoodDetailsStatPanel.getHeight();
+	
+	var rz = new Ext.Resizable(cancelFoodDetailsStatPanel.getEl(), {
+        wrap: true, //在构造Resizable时自动在制定的id的外边包裹一层div
+        minHeight:100, //限制改变的最小的高度
+        pinned:false, //控制可拖动区域的显示状态，false是鼠标悬停在拖拉区域上才出现
+        handles: 's',//设置拖拉的方向（n,s,e,w,all...）
+        listeners : {
+        	resize : function(thiz, w, h, e){
+        		panelDrag = true;
+        	}
+        }
+    });
+    rz.on('resize', cancelFoodDetailsStatPanel.syncSize, cancelFoodDetailsStatPanel);//注册事件(作用:将调好的大小传个scope执行)
+	
+	
+	
+	$('#divCancelledReasonChartChange').toggle(
+		function(){
+			$('#divCancelledReasonChart').hide();
+			
+			$('#divCancelledReasonColumnChart').show();
+			loadReasonColumnChart();
+			reasonChart.setSize(cancelFoodStatChartTabPanel.getWidth(), cancelFoodStatChartTabPanel.getHeight()-30);
+		},
+		function(){
+			$('#divCancelledReasonColumnChart').hide();
+			
+			$('#divCancelledReasonChart').show();
+			loadReasonChart();
+			reasonChart.setSize(cancelFoodStatChartTabPanel.getWidth(), cancelFoodStatChartTabPanel.getHeight()-30);
+		}		
+	);
+	
+	$('#divCancelledStaffChartChange').toggle(
+		function(){
+			$('#divCancelledStaffChart').hide();
+			
+			$('#divCancelledStaffColumnChart').show();
+			loadStaffColumnChart();
+			staffChart.setSize(cancelFoodStatChartTabPanel.getWidth(), cancelFoodStatChartTabPanel.getHeight()-30);
+		},
+		function(){
+			$('#divCancelledStaffColumnChart').hide();
+			
+			$('#divCancelledStaffChart').show();
+			loadStaffChart();
+			staffChart.setSize(cancelFoodStatChartTabPanel.getWidth(), cancelFoodStatChartTabPanel.getHeight()-30);
+		}		
+	);
+	$('#divCancelledDeptChartChange').toggle(
+		function(){
+			$('#divCancelledDeptChart').hide();
+			
+			$('#divCancelledDeptColumnChart').show();
+			loadDeptColumnChart();
+			deptChart.setSize(cancelFoodStatChartTabPanel.getWidth(), cancelFoodStatChartTabPanel.getHeight()-30);
+		},
+		function(){
+			$('#divCancelledDeptColumnChart').hide();
+			
+			$('#divCancelledDeptChart').show();
+			loadDeptChart();
+			deptChart.setSize(cancelFoodStatChartTabPanel.getWidth(), cancelFoodStatChartTabPanel.getHeight()-30);
+		}		
+	);	
+	
+/*	$('.changeChart').click(function(){
+		eval($('div:visible[data-type=chart]').attr('data-value')).setSize(cancelFoodStatChartTabPanel.getWidth(), cancelFoodStatChartTabPanel.getHeight()-30);
+	});*/
 });
