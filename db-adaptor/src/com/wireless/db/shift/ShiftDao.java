@@ -245,9 +245,7 @@ public class ShiftDao {
 	 */
 	public static ShiftDetail getByRange(DBCon dbCon, Staff staff, DutyRange range, DateType dateType) throws SQLException{
 		
-		ShiftDetail result = new ShiftDetail();
-		result.setOnDuty(range.getOnDutyFormat());
-		result.setOffDuty(range.getOffDutyFormat());
+		ShiftDetail result = new ShiftDetail(range);
 		
 		ExtraCond extraCond = new ExtraCond(dateType);
 		

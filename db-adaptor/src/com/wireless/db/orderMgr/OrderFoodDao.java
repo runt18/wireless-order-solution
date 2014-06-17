@@ -12,12 +12,12 @@ import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.billStatistics.HourRange;
 import com.wireless.pojo.crMgr.CancelReason;
 import com.wireless.pojo.dishesOrder.OrderFood;
+import com.wireless.pojo.dishesOrder.TasteGroup;
 import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.pojo.regionMgr.Region;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.staffMgr.Staff;
-import com.wireless.pojo.tasteMgr.TasteGroup;
 import com.wireless.util.DateType;
 
 /**
@@ -301,21 +301,24 @@ public class OrderFoodDao {
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		List<OrderFood> orderFoods = new ArrayList<OrderFood>();
 		while (dbCon.rs.next()) {
-			OrderFood food = new OrderFood();
-			food.setOrderId(dbCon.rs.getInt("order_id"));
-			food.asFood().setFoodId(dbCon.rs.getInt("food_id"));
-			food.asFood().setName(dbCon.rs.getString("name"));
-			food.asFood().setRestaurantId(dbCon.rs.getInt("restaurant_id"));
-			food.asFood().setStatus(dbCon.rs.getShort("food_status"));
-			food.setRepaid(dbCon.rs.getBoolean("is_paid"));
+			OrderFood of = new OrderFood();
+			of.setOrderId(dbCon.rs.getInt("order_id"));
+			of.asFood().setFoodId(dbCon.rs.getInt("food_id"));
+			of.asFood().setName(dbCon.rs.getString("name"));
+			of.asFood().setRestaurantId(dbCon.rs.getInt("restaurant_id"));
+			of.asFood().setStatus(dbCon.rs.getShort("food_status"));
+			of.setRepaid(dbCon.rs.getBoolean("is_paid"));
+			
 			int tasteGroupId = dbCon.rs.getInt("taste_group_id");
+			//Get the detail to taste group.
 			if(tasteGroupId != TasteGroup.EMPTY_TASTE_GROUP_ID){
-				food.makeTasteGroup(tasteGroupId, null, null);
+				of.setTasteGroup(TasteGroupDao.getById(staff, tasteGroupId, dateType));
 			}
-			food.setCount(dbCon.rs.getFloat("order_count"));
-			food.asFood().setPrice(dbCon.rs.getFloat("unit_price"));
-			food.setOrderDate(dbCon.rs.getTimestamp("order_date").getTime());
-			food.setWaiter(dbCon.rs.getString("waiter"));
+			
+			of.setCount(dbCon.rs.getFloat("order_count"));
+			of.asFood().setPrice(dbCon.rs.getFloat("unit_price"));
+			of.setOrderDate(dbCon.rs.getTimestamp("order_date").getTime());
+			of.setWaiter(dbCon.rs.getString("waiter"));
 			
 			Kitchen kitchen = new Kitchen(dbCon.rs.getInt("kitchen_id"));
 			kitchen.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
@@ -326,31 +329,19 @@ public class OrderFoodDao {
 			dept.setName(dbCon.rs.getString("dept_name"));
 			
 			kitchen.setDept(dept);
-			food.asFood().setKitchen(kitchen);
+			of.asFood().setKitchen(kitchen);
 			
-			food.setDiscount(dbCon.rs.getFloat("discount"));
-			food.setTemp(dbCon.rs.getBoolean("is_temporary"));
+			of.setDiscount(dbCon.rs.getFloat("discount"));
+			of.setTemp(dbCon.rs.getBoolean("is_temporary"));
 			
 			CancelReason cr = new CancelReason(dbCon.rs.getInt("cancel_reason_id"),
 											   dbCon.rs.getString("cancel_reason"),
 											   dbCon.rs.getInt("restaurant_id"));
-			food.setCancelReason(cr);
+			of.setCancelReason(cr);
 			
-			orderFoods.add(food);
+			orderFoods.add(of);
 		}
 		dbCon.rs.close();
-		/**
-		 * Get the taste group to order food which has taste
-		 */
-		for(OrderFood orderFood : orderFoods){
-			if(orderFood.hasTasteGroup()){
-				if(dateType.isToday()){
-					orderFood.setTasteGroup(TasteGroupDao.getTodayById(dbCon, staff, orderFood.getTasteGroup().getGroupId()));
-				}else{
-					orderFood.setTasteGroup(TasteGroupDao.getHistoryById(dbCon, staff, orderFood.getTasteGroup().getGroupId()));
-				}
-			}
-		}
 		
 		return orderFoods;
 	}
@@ -394,9 +385,12 @@ public class OrderFoodDao {
 			of.asFood().setName(dbCon.rs.getString("name"));
 			of.asFood().setRestaurantId(dbCon.rs.getInt("restaurant_id"));
 			of.asFood().setStatus(dbCon.rs.getShort("food_status"));
+			if(of.asFood().isCombo() && extraCond.dateType.isToday()){
+				of.asFood().setChildFoods(FoodDao.getChildrenByParent(staff, of.asFood().getFoodId()));
+			}
 			int tasteGroupId = dbCon.rs.getInt("taste_group_id");
 			if(tasteGroupId != TasteGroup.EMPTY_TASTE_GROUP_ID){
-				of.makeTasteGroup(tasteGroupId, null, null);
+				of.setTasteGroup(TasteGroupDao.getById(staff, tasteGroupId, extraCond.dateType));
 			}
 			of.setCount(dbCon.rs.getFloat("order_sum"));
 			of.asFood().setPrice(dbCon.rs.getFloat("unit_price"));
@@ -413,22 +407,6 @@ public class OrderFoodDao {
 			orderFoods.add(of);
 		}
 		dbCon.rs.close();
-		
-		/**
-		 * Get the taste group to order food which has taste
-		 */
-		for(OrderFood eachOrderFood : orderFoods){
-			if(eachOrderFood.hasTasteGroup()){
-				if(extraCond.dateType.isToday()){
-					if(eachOrderFood.asFood().isCombo()){
-						eachOrderFood.asFood().setChildFoods(FoodDao.getChildrenByParent(dbCon, staff, eachOrderFood.asFood().getFoodId()));
-					}
-					eachOrderFood.setTasteGroup(TasteGroupDao.getTodayById(dbCon, staff, eachOrderFood.getTasteGroup().getGroupId()));
-				}else{
-					eachOrderFood.setTasteGroup(TasteGroupDao.getHistoryById(dbCon, staff, eachOrderFood.getTasteGroup().getGroupId()));
-				}
-			}
-		}
 		
 		return orderFoods;
 	}

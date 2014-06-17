@@ -1,7 +1,6 @@
 package com.wireless.db.frontBusiness;
 
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -14,6 +13,7 @@ import com.wireless.db.distMgr.DiscountDao;
 import com.wireless.db.menuMgr.FoodDao;
 import com.wireless.db.orderMgr.OrderDao;
 import com.wireless.db.orderMgr.OrderFoodDao;
+import com.wireless.db.orderMgr.TasteGroupDao;
 import com.wireless.db.regionMgr.TableDao;
 import com.wireless.db.tasteMgr.TasteDao;
 import com.wireless.exception.BusinessException;
@@ -23,11 +23,11 @@ import com.wireless.exception.StaffError;
 import com.wireless.pojo.crMgr.CancelReason;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.OrderFood;
+import com.wireless.pojo.dishesOrder.TasteGroup;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.tasteMgr.Taste;
-import com.wireless.pojo.tasteMgr.TasteGroup;
 import com.wireless.util.DateType;
 
 public class UpdateOrder {
@@ -259,57 +259,63 @@ public class UpdateOrder {
 		for(OrderFood extraFood : diffResult.extraFoods){
 
 			/**
-			 * Insert the taste group info if containing taste and the extra taste group is new
+			 * Insert the taste group info if containing taste.
 			 */
-			if(extraFood.hasTasteGroup() && extraFood.getTasteGroup().getGroupId() == TasteGroup.NEW_TASTE_GROUP_ID){
+			if(extraFood.hasTasteGroup()){
 				
-				TasteGroup tg = extraFood.getTasteGroup();					
-				/**
-				 * Insert the taste group if containing taste.
-				 */
-				sql = " INSERT INTO " + Params.dbName + ".taste_group " +
-					  " ( " +
-					  " `normal_taste_group_id`, `normal_taste_pref`, `normal_taste_price`, " +
-					  " `tmp_taste_id`, `tmp_taste_pref`, `tmp_taste_price` " +
-					  " ) " +
-					  " SELECT " +
-					  (tg.hasNormalTaste() ? "MAX(normal_taste_group_id) + 1" : TasteGroup.EMPTY_NORMAL_TASTE_GROUP_ID) + ", " +
-					  (tg.hasNormalTaste() ? ("'" + tg.getNormalTastePref() + "'") : "NULL") + ", " +
-					  (tg.hasNormalTaste() ? tg.getNormalTastePrice() : "NULL") + ", " +
-					  (tg.hasTmpTaste() ? tg.getTmpTaste().getTasteId() : "NULL") + ", " +
-					  (tg.hasTmpTaste() ? ("'" + tg.getTmpTastePref() + "'") : "NULL") + ", " +
-					  (tg.hasTmpTaste() ? tg.getTmpTastePrice() : "NULL") +
-					  " FROM " + 
-					  Params.dbName + ".taste_group" +
-					  " LIMIT 1 ";
-				dbCon.stmt.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
-				//get the generated id to taste group 
-				dbCon.rs = dbCon.stmt.getGeneratedKeys();
-				if(dbCon.rs.next()){
-					tg.setGroupId(dbCon.rs.getInt(1));
-				}else{
-					throw new SQLException("The id of taste group is not generated successfully.");
-				}
+				TasteGroup tg = extraFood.getTasteGroup();		
 				
-				/**
-				 * Insert the normal taste group if containing normal tastes.
-				 */
-				if(tg.hasNormalTaste()){
-					for(Taste normalTaste : tg.getNormalTastes()){
-						sql = " INSERT INTO " + Params.dbName + ".normal_taste_group " +
-							  " ( " +
-							  " `normal_taste_group_id`, `taste_id` " +
-							  " ) " +
-							  " VALUES " +
-							  " ( " +
-							  " (SELECT normal_taste_group_id FROM " + Params.dbName + ".taste_group " + 
-							  " WHERE " +
-							  " taste_group_id = " + tg.getGroupId() + ")" + " , " +
-							  normalTaste.getTasteId() + 
-							  " ) ";
-						dbCon.stmt.executeUpdate(sql);
-					}
-				}
+				int tgId = TasteGroupDao.insert(dbCon, staff, new TasteGroup.InsertBuilder(extraFood)
+			     															.addAllTastes(tg.getNormalTastes())
+			     															.setTmpTaste(tg.getTmpTaste()));
+				tg.setGroupId(tgId);
+				
+//				/**
+//				 * Insert the taste group if containing taste.
+//				 */
+//				sql = " INSERT INTO " + Params.dbName + ".taste_group " +
+//					  " ( " +
+//					  " `normal_taste_group_id`, `normal_taste_pref`, `normal_taste_price`, " +
+//					  " `tmp_taste_id`, `tmp_taste_pref`, `tmp_taste_price` " +
+//					  " ) " +
+//					  " SELECT " +
+//					  (tg.hasNormalTaste() ? "MAX(normal_taste_group_id) + 1" : TasteGroup.EMPTY_NORMAL_TASTE_GROUP_ID) + ", " +
+//					  (tg.hasNormalTaste() ? ("'" + tg.getNormalTastePref() + "'") : "NULL") + ", " +
+//					  (tg.hasNormalTaste() ? tg.getNormalTastePrice() : "NULL") + ", " +
+//					  (tg.hasTmpTaste() ? tg.getTmpTaste().getTasteId() : "NULL") + ", " +
+//					  (tg.hasTmpTaste() ? ("'" + tg.getTmpTastePref() + "'") : "NULL") + ", " +
+//					  (tg.hasTmpTaste() ? tg.getTmpTastePrice() : "NULL") +
+//					  " FROM " + 
+//					  Params.dbName + ".taste_group" +
+//					  " LIMIT 1 ";
+//				dbCon.stmt.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
+//				//get the generated id to taste group 
+//				dbCon.rs = dbCon.stmt.getGeneratedKeys();
+//				if(dbCon.rs.next()){
+//					tg.setGroupId(dbCon.rs.getInt(1));
+//				}else{
+//					throw new SQLException("The id of taste group is not generated successfully.");
+//				}
+//				
+//				/**
+//				 * Insert the normal taste group if containing normal tastes.
+//				 */
+//				if(tg.hasNormalTaste()){
+//					for(Taste normalTaste : tg.getNormalTastes()){
+//						sql = " INSERT INTO " + Params.dbName + ".normal_taste_group " +
+//							  " ( " +
+//							  " `normal_taste_group_id`, `taste_id` " +
+//							  " ) " +
+//							  " VALUES " +
+//							  " ( " +
+//							  " (SELECT normal_taste_group_id FROM " + Params.dbName + ".taste_group " + 
+//							  " WHERE " +
+//							  " taste_group_id = " + tg.getGroupId() + ")" + " , " +
+//							  normalTaste.getTasteId() + 
+//							  " ) ";
+//						dbCon.stmt.executeUpdate(sql);
+//					}
+//				}
 			}
 			
 			sql = " INSERT INTO " + Params.dbName + ".order_food " +
@@ -330,7 +336,7 @@ public class UpdateOrder {
 				  "'" + extraFood.getName() + "', " + 
 				  extraFood.asFood().getStatus() + ", " +
 				  extraFood.getDiscount() + ", " +
-				  (extraFood.hasTasteGroup() ? extraFood.getTasteGroup().getGroupId() : TasteGroup.EMPTY_TASTE_GROUP_ID) + ", " +
+				  extraFood.getTasteGroup().getGroupId() + ", " +
 				  extraFood.getKitchen().getDept().getId() + ", " +
 				  extraFood.getKitchen().getId() + ", " +
 				  staff.getId() + ", " +
@@ -484,8 +490,8 @@ public class UpdateOrder {
 				if(foodToFill.getTasteGroup().hasSpec()){
 					foodToFill.getTasteGroup().getSpec().copyFrom(TasteDao.getTasteById(dbCon, staff, foodToFill.getTasteGroup().getSpec().getTasteId()));
 				}
+				foodToFill.getTasteGroup().refresh();
 			}			
-	
 		}		
 	}
 	
@@ -562,9 +568,6 @@ public class UpdateOrder {
 		}
 		
 		for(OrderFood newExtraFood : newFoods){
-			if(newExtraFood.hasTasteGroup()){
-				newExtraFood.getTasteGroup().setGroupId(TasteGroup.NEW_TASTE_GROUP_ID);
-			}
 			result.extraFoods.add(newExtraFood);
 		}
 		//result.extraFoods.addAll(newFoods);		

@@ -334,9 +334,7 @@ public class PaymentDao {
 	 * 			throws if failed to execute any SQL statement
 	 */
 	public static ShiftDetail getDetail(DBCon dbCon, Staff staff, DutyRange range, ExtraCond extraCond) throws SQLException{
-		ShiftDetail result = new ShiftDetail();
-		result.setOnDuty(range.getOnDutyFormat());
-		result.setOffDuty(range.getOffDutyFormat());
+		ShiftDetail result = new ShiftDetail(range);
 		
 		CalcBillStatisticsDao.ExtraCond extraCond4CalcBill = new CalcBillStatisticsDao.ExtraCond(extraCond.dateType).setStaffId(extraCond.staffId);
 		//Calculate the general income

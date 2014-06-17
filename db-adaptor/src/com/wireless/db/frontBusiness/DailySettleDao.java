@@ -16,6 +16,7 @@ import com.wireless.db.stockMgr.StockActionDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.dishesOrder.Order;
+import com.wireless.pojo.dishesOrder.TasteGroup;
 import com.wireless.pojo.inventoryMgr.MaterialCate;
 import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.restaurantMgr.Restaurant;
@@ -23,7 +24,6 @@ import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.stockMgr.StockAction;
 import com.wireless.pojo.stockMgr.StockAction.AuditBuilder;
 import com.wireless.pojo.stockMgr.StockActionDetail;
-import com.wireless.pojo.tasteMgr.TasteGroup;
 
 public class DailySettleDao {
 	
