@@ -12,7 +12,6 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
-import com.wireless.db.billStatistics.CalcBillStatisticsDao;
 import com.wireless.db.billStatistics.CalcRepaidStatisticsDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
@@ -20,9 +19,10 @@ import com.wireless.json.JObject;
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.pojo.billStatistics.DutyRange;
-import com.wireless.pojo.billStatistics.RepaidStatistics;
+import com.wireless.pojo.billStatistics.HourRange;
 import com.wireless.pojo.billStatistics.repaid.RepaidIncomeByEachDay;
 import com.wireless.pojo.billStatistics.repaid.RepaidIncomeByStaff;
+import com.wireless.pojo.billStatistics.repaid.RepaidStatistics;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.util.DataPaging;
 import com.wireless.util.DateType;
@@ -39,15 +39,24 @@ public class QueryRepaidReportAction extends DispatchAction{
 		String beginDate = request.getParameter("beginDate");
 		String endDate = request.getParameter("endDate");
 		String staffId = request.getParameter("staffId");
+		String opening = request.getParameter("opening");
+		String ending = request.getParameter("ending");
 		try{
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
-			DutyRange range = new DutyRange(beginDate, endDate);
-			List<RepaidStatistics> list;
-			if(staffId != null && !staffId.equals("-1") && !staffId.isEmpty()){
-				list = CalcBillStatisticsDao.calcRepaidStatByStaff(staff, range, Integer.parseInt(staffId), DateType.HISTORY);
-			}else{
-				list = CalcBillStatisticsDao.calcRepaidStat(staff, range, DateType.HISTORY);
+			
+			CalcRepaidStatisticsDao.ExtraCond extraCond = new CalcRepaidStatisticsDao.ExtraCond(DateType.HISTORY);
+			
+			if(opening != null && !opening.isEmpty()){
+				extraCond.setHourRange(new HourRange(opening, ending));
 			}
+			
+			if(staffId != null && !staffId.isEmpty() && !staffId.equals("-1")){
+				extraCond.setStaffId(Integer.valueOf(staffId));
+			}
+			
+			List<RepaidStatistics> list;
+			list = CalcRepaidStatisticsDao.getRepaidIncomeDetail(staff, new DutyRange(beginDate, endDate), extraCond);
+			
 			if(!list.isEmpty()){
 				jobject.setTotalProperty(list.size());
 				RepaidStatistics total = new RepaidStatistics();
@@ -77,6 +86,8 @@ public class QueryRepaidReportAction extends DispatchAction{
 		String dateBeg = request.getParameter("dateBeg");
 		String dateEnd = request.getParameter("dateEnd");
 		String staffID = request.getParameter("staffID");
+		String opening = request.getParameter("opening");
+		String ending = request.getParameter("ending");
 		
 		JObject jobject = new JObject();
 		
@@ -85,6 +96,9 @@ public class QueryRepaidReportAction extends DispatchAction{
 			
 			if(staffID != null && !staffID.isEmpty() && !staffID.equals("-1")){
 				extraCond.setStaffId(Integer.valueOf(staffID));
+			}
+			if(opening != null && !opening.isEmpty()){
+				extraCond.setHourRange(new HourRange(opening, ending));
 			}
 			
 			List<RepaidIncomeByEachDay> cancelList = CalcRepaidStatisticsDao.calcRepaidIncomeByEachDay(StaffDao.verify(Integer.parseInt(pin)), new DutyRange(dateBeg, dateEnd), extraCond);
@@ -134,6 +148,8 @@ public class QueryRepaidReportAction extends DispatchAction{
 		String dateBeg = request.getParameter("dateBeg");
 		String dateEnd = request.getParameter("dateEnd");
 		String staffID = request.getParameter("staffID");
+		String opening = request.getParameter("opening");
+		String ending = request.getParameter("ending");
 		
 		JObject jobject = new JObject();
 		
@@ -142,6 +158,10 @@ public class QueryRepaidReportAction extends DispatchAction{
 			
 			if(staffID != null && !staffID.isEmpty() && !staffID.equals("-1")){
 				extraCond.setStaffId(Integer.valueOf(staffID));
+			}
+			
+			if(opening != null && !opening.isEmpty()){
+				extraCond.setHourRange(new HourRange(opening, ending));
 			}
 			
 			List<RepaidIncomeByStaff> cancelList = CalcRepaidStatisticsDao.calcRepaidIncomeByStaff(StaffDao.verify(Integer.parseInt(pin)), new DutyRange(dateBeg, dateEnd), extraCond);
