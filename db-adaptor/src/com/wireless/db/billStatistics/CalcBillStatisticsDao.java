@@ -29,7 +29,7 @@ import com.wireless.pojo.billStatistics.IncomeByPay;
 import com.wireless.pojo.billStatistics.IncomeByRepaid;
 import com.wireless.pojo.billStatistics.IncomeByService;
 import com.wireless.pojo.billStatistics.IncomeTrendByDept;
-import com.wireless.pojo.billStatistics.RepaidStatistics;
+import com.wireless.pojo.billStatistics.repaid.RepaidStatistics;
 import com.wireless.pojo.client.MemberOperation.ChargeType;
 import com.wireless.pojo.client.MemberOperation.OperationType;
 import com.wireless.pojo.dishesOrder.Order;
