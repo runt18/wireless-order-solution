@@ -45,24 +45,24 @@ public class BusinessStatisticsAction extends DispatchAction {
 			String offDuty = request.getParameter("offDuty");
 			
 			String dutyRange = request.getParameter("dutyRange");
-			final ShiftDetail sdetail;
+			final ShiftDetail shiftDetail;
 			if(!dutyRange.equals("null") && !dutyRange.trim().isEmpty()){
 				DutyRange range = DutyRangeDao.exec(staff, onDuty, offDuty);
 				
 				if(range != null){
-					sdetail = ShiftDao.getByRange(staff, range, DateType.HISTORY);
+					shiftDetail = ShiftDao.getByRange(staff, range, DateType.HISTORY);
 				}else{
-					sdetail = ShiftDao.getByRange(staff, new DutyRange(onDuty, offDuty), DateType.HISTORY);
+					shiftDetail = new ShiftDetail(new DutyRange(onDuty, offDuty));
 				}
 			}else{
-				sdetail = ShiftDao.getByRange(staff, new DutyRange(onDuty, offDuty), DateType.HISTORY);
+				shiftDetail = ShiftDao.getByRange(staff, new DutyRange(onDuty, offDuty), DateType.HISTORY);
 			}
 			
 			jObject.setExtra(new Jsonable(){
 				@Override
 				public JsonMap toJsonMap(int flag) {
 					JsonMap jm = new JsonMap();
-					jm.putJsonable("business", sdetail, 0);
+					jm.putJsonable("business", shiftDetail, 0);
 					return jm;
 				}
 
