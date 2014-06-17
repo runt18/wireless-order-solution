@@ -1,5 +1,6 @@
 package com.wireless.pojo.billStatistics;
 
+import java.util.Collections;
 import java.util.List;
 
 import com.wireless.json.JsonMap;
@@ -7,8 +8,8 @@ import com.wireless.json.Jsonable;
 import com.wireless.pojo.util.DateUtil;
 
 public class ShiftDetail implements Jsonable{
-	private String onDuty;				//开始时间
-	private String offDuty;				//结束时间
+	private final String onDuty;				//开始时间
+	private final String offDuty;				//结束时间
 	
 	private IncomeByPay incomeByPay;	//各种收款方式数据
 	
@@ -30,20 +31,17 @@ public class ShiftDetail implements Jsonable{
 	
 	private List<IncomeByDept> deptIncome;	//所有部门营业额
 
+	public ShiftDetail(DutyRange range){
+		this.onDuty = range.getOnDutyFormat();
+		this.offDuty = range.getOffDutyFormat();
+	}
+	
 	public String getOnDuty() {
 		return onDuty;
 	}
 	
-	public void setOnDuty(String onDuty) {
-		this.onDuty = onDuty;
-	}
-	
 	public String getOffDuty() {
 		return offDuty;
-	}
-	
-	public void setOffDuty(String offDuty) {
-		this.offDuty = offDuty;
 	}
 	
 	public int getOrderAmount() {
@@ -327,6 +325,9 @@ public class ShiftDetail implements Jsonable{
 	}
 	
 	public List<IncomeByDept> getDeptIncome() {
+		if(deptIncome == null){
+			return Collections.emptyList();
+		}
 		return deptIncome;
 	}
 	

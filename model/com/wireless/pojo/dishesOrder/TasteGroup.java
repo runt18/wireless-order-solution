@@ -1,5 +1,6 @@
-package com.wireless.pojo.tasteMgr;
+package com.wireless.pojo.dishesOrder;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -7,23 +8,52 @@ import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.parcel.Parcel;
 import com.wireless.parcel.Parcelable;
-import com.wireless.pojo.dishesOrder.OrderFood;
+import com.wireless.pojo.tasteMgr.Taste;
 import com.wireless.pojo.util.NumericUtil;
 import com.wireless.pojo.util.SortedList;
 
 public class TasteGroup implements Parcelable, Jsonable{
 	
+	public static class InsertBuilder{
+		private List<Taste> normalTastes = new ArrayList<Taste>();
+		private Taste tmpTaste;
+		private final OrderFood attachedOrderFood;
+		
+		public InsertBuilder(OrderFood of){
+			this.attachedOrderFood = of;
+		}
+		
+		public InsertBuilder addTaste(Taste taste){ 
+			normalTastes.add(taste);
+			return this;
+		}
+		
+		public InsertBuilder addAllTastes(List<Taste> tastes){
+			normalTastes.addAll(tastes);
+			return this;
+		}
+		
+		public InsertBuilder setTmpTaste(Taste tmpTaste){
+			this.tmpTaste = tmpTaste;
+			return this;
+		}
+		
+		public TasteGroup build(){
+			return new TasteGroup(this);
+		}
+	}
+	
 	public static final TasteGroup EMPTY = new TasteGroup(){
+		@Override
+		public int getGroupId(){
+			return EMPTY_TASTE_GROUP_ID;
+		}
 		@Override
 		public void setGroupId(int groupId){
 			throw new UnsupportedOperationException("Empty taste group does NOT support this operation.");
 		}
 		@Override
 		public void setTmpTaste(Taste tmpTaste){
-			throw new UnsupportedOperationException("Empty taste group does NOT support this operation.");
-		}
-		@Override
-		public void setAttachedFood(OrderFood attachedFood){
 			throw new UnsupportedOperationException("Empty taste group does NOT support this operation.");
 		}
 		@Override
@@ -37,11 +67,10 @@ public class TasteGroup implements Parcelable, Jsonable{
 	
 	private final static String NO_TASTE_PREF = "无口味";
 	
-	public final static int NEW_TASTE_GROUP_ID = 0;
 	public final static int EMPTY_TASTE_GROUP_ID = 1;
 	public final static int EMPTY_NORMAL_TASTE_GROUP_ID = 1;
 	
-	int mGroupId = EMPTY_TASTE_GROUP_ID;
+	private int mGroupId = EMPTY_TASTE_GROUP_ID;
 	
 	private OrderFood mAttachedOrderFood;
 	
@@ -50,27 +79,78 @@ public class TasteGroup implements Parcelable, Jsonable{
 	
 	private Taste mTmpTaste;
 	private Taste mNormalTaste;
-	private boolean hasCalc = false;
+	
+	private TasteGroup(InsertBuilder builder){
+		this.mAttachedOrderFood = builder.attachedOrderFood;
+		if(builder.normalTastes != null){
+			for(Taste t : builder.normalTastes){
+				addTaste(t);
+			}
+			refresh();
+		}
+		this.mTmpTaste = builder.tmpTaste;
+	}
 	
 	public TasteGroup(){
 		
 	}
 	
-	public TasteGroup(int groupId, Taste normalTaste, Taste tmpTaste){
-		this.hasCalc = true;
+	public TasteGroup(int groupId, Taste normalTaste, List<Taste> normalDetails, Taste tmpTaste){
 		this.mGroupId = groupId;
 		this.mNormalTaste = normalTaste;
 		this.mTmpTaste = tmpTaste; 
-	}
-	
-	public TasteGroup(OrderFood attachedOrderFood, List<Taste> normalTastes, Taste tmpTaste){
-		this.mAttachedOrderFood = attachedOrderFood;
-		if(normalTastes != null){
-			for(Taste t : normalTastes){
-				addTaste(t);
+		if(normalDetails != null){
+			for(Taste tasteToAdd : normalDetails){
+				addTaste(tasteToAdd);
 			}
 		}
-		this.mTmpTaste = tmpTaste;
+	}
+	
+	TasteGroup(OrderFood attachedOrderFood){
+		this.mAttachedOrderFood = attachedOrderFood;
+	}
+	
+	private float makeNormalTastePrice(){ 
+		float tastePrice = 0;
+		for(Taste t : getNormalTastes()){
+			tastePrice += t.isCalcByPrice() ? t.getPrice() : (mAttachedOrderFood.asFood().getPrice() * t.getRate());
+		}
+		return NumericUtil.roundFloat(tastePrice);
+	}
+	
+	/**
+	 * Make the preference to normal tastes which is combined by every normal taste and spec.
+	 * @return the preference to normal tastes
+	 */
+	private String makeNormalTastePref(){
+		
+		StringBuilder tastePref = new StringBuilder();
+		
+		for(Taste taste : mTastes){
+			if(tastePref.length() == 0){
+				tastePref.append(taste.getPreference());
+			}else{
+				tastePref.append(",").append(taste.getPreference());
+			}
+		}
+		
+		if(hasSpec()){
+			if(tastePref.length() == 0){
+				tastePref.append(mSpec.getPreference());
+			}else{
+				tastePref.append(",").append(mSpec.getPreference());
+			}
+		}
+		
+		return tastePref.toString();
+	}
+	
+	public void refresh(){
+		if(mNormalTaste == null){
+			mNormalTaste = new Taste(0);
+		}
+		mNormalTaste.setPreference(makeNormalTastePref());
+		mNormalTaste.setPrice(makeNormalTastePrice());
 	}
 	
 	/**
@@ -79,7 +159,7 @@ public class TasteGroup implements Parcelable, Jsonable{
 	 * 			the taste to add
 	 * @return true if the taste to add NOT exist before and succeed to add to list, otherwise return false
 	 */
-	public boolean addTaste(Taste tasteToAdd){
+	boolean addTaste(Taste tasteToAdd){
 		if(tasteToAdd.isTaste()){
 			if(mTastes.containsElement(tasteToAdd)){
 				return false;
@@ -107,14 +187,13 @@ public class TasteGroup implements Parcelable, Jsonable{
 	 * 			The taste to remove.
 	 * @return	true if taste exist before and succeed to be removed, otherwise return false
 	 */
-	public boolean removeTaste(Taste tasteToRemove){
+	boolean removeTaste(Taste tasteToRemove){
 		if(tasteToRemove.isTaste()){
 			return mTastes.removeElement(tasteToRemove);
 			
 		}else if(tasteToRemove.isSpec() && tasteToRemove.equals(mSpec)){
 			mSpec = null;
 			return true;
-			
 		}else{
 			return false;
 		}
@@ -193,15 +272,7 @@ public class TasteGroup implements Parcelable, Jsonable{
 	 * @return the price to normal taste
 	 */
 	public float getNormalTastePrice(){
-		if(hasCalc){
-			return mNormalTaste == null ? 0 : mNormalTaste.getPrice();
-		}else{
-			float tastePrice = 0;
-			for(Taste t : getNormalTastes()){
-				tastePrice += t.isCalcByPrice() ? t.getPrice() : (mAttachedOrderFood.asFood().getPrice() * t.getRate());
-			}
-			return NumericUtil.roundFloat(tastePrice);
-		}
+		return mNormalTaste == null ? 0 : mNormalTaste.getPrice();
 	}
 	
 	/**
@@ -209,11 +280,7 @@ public class TasteGroup implements Parcelable, Jsonable{
 	 * @return the price to temporary taste
 	 */
 	public float getTmpTastePrice(){
-		if(mTmpTaste != null){
-			return mTmpTaste.getPrice();
-		}else{
-			return 0;
-		}
+		return mTmpTaste == null ? 0 : mTmpTaste.getPrice();
 	}
 	
 	/**
@@ -231,31 +298,7 @@ public class TasteGroup implements Parcelable, Jsonable{
 	 * @return the preference string to normal tastes
 	 */
 	public String getNormalTastePref(){
-		
-		if(hasTaste() || hasSpec()){
-			StringBuilder tastePref = new StringBuilder();
-			
-			for(Taste taste : mTastes){
-				if(tastePref.length() == 0){
-					tastePref.append(taste.getPreference());
-				}else{
-					tastePref.append(",").append(taste.getPreference());
-				}
-			}
-
-			if(hasSpec()){
-				if(tastePref.length() == 0){
-					tastePref.append(mSpec.getPreference());
-				}else{
-					tastePref.append(",").append(mSpec.getPreference());
-				}
-			}
-			
-			return tastePref.toString();
-		}else{
-			return NO_TASTE_PREF;
-		}
-		
+		return mNormalTaste != null ? mNormalTaste.getPreference() : NO_TASTE_PREF;
 	}
 	
 	/**
@@ -271,38 +314,18 @@ public class TasteGroup implements Parcelable, Jsonable{
 	 * @return the preference string along with both normal and temporary tastes
 	 */
 	public String getPreference(){
-		if(hasCalc){
-			if(mGroupId == EMPTY_TASTE_GROUP_ID){
-				return NO_TASTE_PREF;
-				
-			}else if(mNormalTaste != null && mTmpTaste == null){
-				return mNormalTaste.getPreference();
-				
-			}else if(mNormalTaste == null && mTmpTaste != null){
-				return mTmpTaste.getPreference();
-				
-			}else{
-				return mNormalTaste.getPreference() + "," + mTmpTaste.getPreference();
-			}
+		if(hasNormalTaste() && hasTmpTaste()){
+			return getNormalTastePref() + "," + getTmpTastePref();
+			
+		}else if(!hasNormalTaste() && !hasTmpTaste()){
+			return NO_TASTE_PREF;
+			
+		}else if(hasNormalTaste() && !hasTmpTaste()){
+			return getNormalTastePref();
 			
 		}else{
-			if(hasNormalTaste() && hasTmpTaste()){
-				return getNormalTastePref() + "," + getTmpTastePref();
-				
-			}else if(!hasNormalTaste() && !hasTmpTaste()){
-				return NO_TASTE_PREF;
-				
-			}else if(hasNormalTaste() && !hasTmpTaste()){
-				return getNormalTastePref();
-				
-			}else{
-				return getTmpTastePref();				
-			}
-		}		
-	}
-	
-	public boolean hasTaste(){
-		return !mTastes.isEmpty();
+			return getTmpTastePref();				
+		}
 	}
 	
 	public boolean hasSpec(){
@@ -310,11 +333,7 @@ public class TasteGroup implements Parcelable, Jsonable{
 	}
 	
 	public boolean hasNormalTaste(){
-		if(hasCalc){
-			return true;
-		}else{
-			return hasTaste() || hasSpec();
-		}
+		return mNormalTaste != null;
 	}
 	
 	public boolean hasTmpTaste(){
@@ -339,6 +358,10 @@ public class TasteGroup implements Parcelable, Jsonable{
 	
 	public Taste getSpec(){
 		return mSpec;
+	}
+	
+	public Taste getNormalTaste(){
+		return mNormalTaste;
 	}
 	
 	public List<Taste> getNormalTastes(){
@@ -387,6 +410,7 @@ public class TasteGroup implements Parcelable, Jsonable{
 			dest.writeParcelList(this.mTastes, Taste.TASTE_PARCELABLE_SIMPLE);
 			dest.writeParcel(this.mSpec, Taste.TASTE_PARCELABLE_SIMPLE);
 			dest.writeParcel(this.mTmpTaste, Taste.TASTE_PARCELABLE_COMPLEX);
+			dest.writeParcel(this.mNormalTaste, Taste.TASTE_PARCELABLE_COMPLEX);
 		}
 	}
 
@@ -401,6 +425,7 @@ public class TasteGroup implements Parcelable, Jsonable{
 			this.mTastes = SortedList.newInstance((source.readParcelList(Taste.CREATOR)));
 			this.mSpec = source.readParcel(Taste.CREATOR);
 			this.mTmpTaste = source.readParcel(Taste.CREATOR);
+			this.mNormalTaste = source.readParcel(Taste.CREATOR);
 		}
 	}
 	

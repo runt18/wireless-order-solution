@@ -15,7 +15,6 @@ import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.tasteMgr.Taste;
-import com.wireless.pojo.tasteMgr.TasteGroup;
 import com.wireless.pojo.util.DateUtil;
 import com.wireless.pojo.util.NumericUtil;
 
@@ -373,18 +372,18 @@ public class OrderFood implements Parcelable, Jsonable {
 	}
 	
 	public TasteGroup makeTasteGroup(){
-		mTasteGroup = new TasteGroup();
-		mTasteGroup.setAttachedFood(this);
+		mTasteGroup = new TasteGroup(this);
 		return mTasteGroup;
 	}
 	
 	public TasteGroup makeTasteGroup(List<Taste> normal, Taste tmp){
-		mTasteGroup = new TasteGroup(this, normal, tmp);
-		return mTasteGroup;
-	}
-	
-	public TasteGroup makeTasteGroup(int groupId, Taste normal, Taste tmp){
-		mTasteGroup = new TasteGroup(groupId, normal, tmp);
+		mTasteGroup = new TasteGroup(this);
+		if(normal != null){
+			for(Taste t : normal){
+				addTaste(t);
+			}
+		}
+		setTmpTaste(tmp);
 		return mTasteGroup;
 	}
 	
@@ -408,21 +407,31 @@ public class OrderFood implements Parcelable, Jsonable {
 
 	public boolean addTaste(Taste tasteToAdd){
 		if(mTasteGroup == null){
-			makeTasteGroup();
+			mTasteGroup = new TasteGroup(this);
 		}
-		return mTasteGroup.addTaste(tasteToAdd);
+		if(mTasteGroup.addTaste(tasteToAdd)){
+			mTasteGroup.refresh();
+			return true;
+		}else{
+			return false;
+		}
 	}
 	
 	public void setTmpTaste(Taste tmpTaste){
 		if(mTasteGroup == null){
-			makeTasteGroup();
+			mTasteGroup = new TasteGroup(this);
 		}
 		mTasteGroup.setTmpTaste(tmpTaste);
 	}
 	
 	public boolean removeTaste(Taste tasteToRemove){
 		if(mTasteGroup != null){
-			return mTasteGroup.removeTaste(tasteToRemove);
+			if(mTasteGroup.removeTaste(tasteToRemove)){
+				mTasteGroup.refresh();
+				return true;
+			}else{
+				return false;
+			}
 		}else{
 			return false;
 		}

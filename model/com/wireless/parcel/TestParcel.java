@@ -3,6 +3,7 @@ package com.wireless.parcel;
 import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -13,6 +14,7 @@ import com.wireless.exception.BusinessException;
 import com.wireless.pojo.crMgr.CancelReason;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.OrderFood;
+import com.wireless.pojo.dishesOrder.TasteGroup;
 import com.wireless.pojo.distMgr.Discount;
 import com.wireless.pojo.distMgr.DiscountPlan;
 import com.wireless.pojo.menuMgr.Department;
@@ -27,7 +29,6 @@ import com.wireless.pojo.staffMgr.Role;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.tasteMgr.Taste;
 import com.wireless.pojo.tasteMgr.TasteCategory;
-import com.wireless.pojo.tasteMgr.TasteGroup;
 
 public class TestParcel {
 
@@ -384,20 +385,30 @@ public class TestParcel {
 
 	@Test
 	public void testComplexTasteGroupParcel(){
-		TasteGroup tgToParcel = new TasteGroup();
+		//TasteGroup tgToParcel = new TasteGroup();
 		
-		tgToParcel.setGroupId(100);
+		//tgToParcel.setGroupId(100);
 		
-		tgToParcel.addTaste(new Taste(100, TasteCategory.Status.TASTE));
-		tgToParcel.addTaste(new Taste(101, TasteCategory.Status.TASTE));
-		tgToParcel.addTaste(new Taste(102, TasteCategory.Status.TASTE));
-		tgToParcel.addTaste(new Taste(103, TasteCategory.Status.TASTE));
-		tgToParcel.addTaste(new Taste(104, TasteCategory.Status.TASTE));
+//		tgToParcel.addTaste(new Taste(100, TasteCategory.Status.TASTE));
+//		tgToParcel.addTaste(new Taste(101, TasteCategory.Status.TASTE));
+//		tgToParcel.addTaste(new Taste(102, TasteCategory.Status.TASTE));
+//		tgToParcel.addTaste(new Taste(103, TasteCategory.Status.TASTE));
+//		tgToParcel.addTaste(new Taste(104, TasteCategory.Status.TASTE));
+		
+		List<Taste> tastes = Arrays.asList(new Taste[]{
+				new Taste(100, TasteCategory.Status.TASTE),
+				new Taste(101, TasteCategory.Status.TASTE),
+				new Taste(102, TasteCategory.Status.TASTE),
+				new Taste(103, TasteCategory.Status.TASTE),
+				new Taste(104, TasteCategory.Status.TASTE)
+			  });
 		
 		Taste tmpTaste = new Taste(302);
 		tmpTaste.setPreference("临时口味");
 		tmpTaste.setPrice(2.3f);
-		tgToParcel.setTmpTaste(tmpTaste);
+		//tgToParcel.setTmpTaste(tmpTaste);
+		
+		TasteGroup tgToParcel = new TasteGroup(100, null, tastes, tmpTaste);
 		
 		Parcel p = new Parcel();
 		tgToParcel.writeToParcel(p, TasteGroup.TG_PARCELABLE_COMPLEX);
@@ -529,21 +540,36 @@ public class TestParcel {
 		foods[0].asFood().setHot(true);
 		foods[0].asFood().setWeigh(true);
 		foods[0].setHangup(true);
-		foods[0].setOrderDate(new Date().getTime());
+		foods[0].setOrderDate(System.currentTimeMillis());
 		foods[0].setWaiter("张宁远");
 		
-		foods[0].makeTasteGroup().setGroupId(100);
-		
-		foods[0].getTasteGroup().addTaste(new Taste(100, TasteCategory.Status.TASTE));
-		foods[0].getTasteGroup().addTaste(new Taste(101, TasteCategory.Status.TASTE));
-		foods[0].getTasteGroup().addTaste(new Taste(102, TasteCategory.Status.TASTE));
-		foods[0].getTasteGroup().addTaste(new Taste(103, TasteCategory.Status.TASTE));
-		foods[0].getTasteGroup().addTaste(new Taste(104, TasteCategory.Status.TASTE));
+		List<Taste> tastes = Arrays.asList(new Taste[]{
+				new Taste(100, TasteCategory.Status.TASTE),
+				new Taste(101, TasteCategory.Status.TASTE),
+				new Taste(102, TasteCategory.Status.TASTE),
+				new Taste(103, TasteCategory.Status.TASTE),
+				new Taste(104, TasteCategory.Status.TASTE)
+			  });
 		
 		Taste tmpTaste = new Taste(302);
 		tmpTaste.setPreference("临时口味");
 		tmpTaste.setPrice(2.3f);
-		foods[0].getTasteGroup().setTmpTaste(tmpTaste);
+		//tgToParcel.setTmpTaste(tmpTaste);
+		
+		foods[0].setTasteGroup(new TasteGroup(100, null, tastes, tmpTaste));
+		
+		//foods[0].makeTasteGroup().setGroupId(100);
+		
+//		foods[0].getTasteGroup().addTaste(new Taste(100, TasteCategory.Status.TASTE));
+//		foods[0].getTasteGroup().addTaste(new Taste(101, TasteCategory.Status.TASTE));
+//		foods[0].getTasteGroup().addTaste(new Taste(102, TasteCategory.Status.TASTE));
+//		foods[0].getTasteGroup().addTaste(new Taste(103, TasteCategory.Status.TASTE));
+//		foods[0].getTasteGroup().addTaste(new Taste(104, TasteCategory.Status.TASTE));
+//		
+//		Taste tmpTaste = new Taste(302);
+//		tmpTaste.setPreference("临时口味");
+//		tmpTaste.setPrice(2.3f);
+//		foods[0].getTasteGroup().setTmpTaste(tmpTaste);
 		
 		orderToParcel.addFood(foods[0], mStaff);
 		
