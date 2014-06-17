@@ -3,6 +3,11 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>Insert title here</title>
+<style type="text/css">
+	.changeChart{
+		margin-left: 10px;
+	}
+</style>
 <script type="text/javascript">
 	var repaidStatisticsGrid, repaidOrderDetailWin;
 	var limitCount = 20;
@@ -11,5 +16,13 @@
 </head>
 <body>
 <div id="divRepaidStatistics"></div>
+
+<div id="divRepaidDetailChart" data-type="repaidChart" data-value="repaidDetailChart" style="height : 300px;"></div>
+
+<div id="divRepaidStaffCharts" >
+	<div id="divRepaidStaffChartChange" style="display:none;"><a href="#" class="changeChart">切换视图</a></div>
+	<div id="divRepaidStaffChart" data-type="repaidChart" data-value="repaidStaffChart" style="height : 300px;display:none"></div>
+	<div id="divRepaidStaffColumnChart" data-type="repaidChart" data-value="repaidStaffChart" style="height : 300px;display:none"></div>
+</div>
 </body>
 </html>
