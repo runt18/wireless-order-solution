@@ -1,4 +1,4 @@
-package com.wireless.pojo.billStatistics;
+package com.wireless.pojo.billStatistics.repaid;
 
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
