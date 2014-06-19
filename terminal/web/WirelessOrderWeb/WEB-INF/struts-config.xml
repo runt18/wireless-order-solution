@@ -193,18 +193,6 @@
 		<action path="/QueryFoodTaste"
 			type="com.wireless.Actions.menuMgr.taste.QueryFoodTasteAction" scope="request">
 		</action>
-		<action path="/InsertFoodTaste"
-			type="com.wireless.Actions.menuMgr.taste.InsertFoodTasteAction"
-			scope="request">
-		</action>
-		<action path="/DeleteFoodTaste"
-			type="com.wireless.Actions.menuMgr.taste.DeleteFoodTasteAction"
-			scope="request">
-		</action>
-		<action path="/UpdateFoodTaste"
-			type="com.wireless.Actions.menuMgr.taste.UpdateFoodTasteAction"
-			scope="request">
-		</action>
 		<action path="/QueryFoodCombination"
 			type="com.wireless.Actions.menuMgr.combo.QueryFoodCombinationAction"
 			scope="request">
