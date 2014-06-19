@@ -78,8 +78,8 @@ public class FoodMenu implements Parcelable{
 			
 			//Get the detail to each child food in case of combo.
 			if(eachFood.isCombo()){
-				for(Food eachChildFood : eachFood.getChildFoods()){
-					eachChildFood.copyFrom(foods.find(eachChildFood));
+				for(ComboFood eachChildFood : eachFood.getChildFoods()){
+					eachChildFood.asFood().copyFrom(foods.find(eachChildFood.asFood()));
 				}
 			}
 			

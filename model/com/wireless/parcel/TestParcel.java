@@ -17,6 +17,7 @@ import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.dishesOrder.TasteGroup;
 import com.wireless.pojo.distMgr.Discount;
 import com.wireless.pojo.distMgr.DiscountPlan;
+import com.wireless.pojo.menuMgr.ComboFood;
 import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.menuMgr.FoodStatistics;
@@ -69,17 +70,17 @@ public class TestParcel {
 		popTastes.add(new Taste(10));
 		foodToParcel.setPopTastes(popTastes);
 		
-		List<Food> childFoods = new ArrayList<Food>();
-		childFoods.add(new Food(0, 1, 0));
-		childFoods.add(new Food(0, 2, 0));
-		childFoods.add(new Food(0, 3, 0));
-		childFoods.add(new Food(0, 4, 0));
-		childFoods.add(new Food(0, 5, 0));
-		childFoods.add(new Food(0, 6, 0));
-		childFoods.add(new Food(0, 7, 0));
-		childFoods.add(new Food(0, 8, 0));
-		childFoods.add(new Food(0, 9, 0));
-		childFoods.add(new Food(0, 10, 0));
+		List<ComboFood> childFoods = new ArrayList<ComboFood>();
+		childFoods.add(new ComboFood(new Food(1), 1));
+		childFoods.add(new ComboFood(new Food(2), 2));
+		childFoods.add(new ComboFood(new Food(3), 3));
+		childFoods.add(new ComboFood(new Food(4), 4));
+		childFoods.add(new ComboFood(new Food(5), 5));
+		childFoods.add(new ComboFood(new Food(6), 6));
+		childFoods.add(new ComboFood(new Food(7), 7));
+		childFoods.add(new ComboFood(new Food(8), 8));
+		childFoods.add(new ComboFood(new Food(9), 9));
+		childFoods.add(new ComboFood(new Food(10), 10));
 		foodToParcel.setChildFoods(childFoods);
 		
 		Parcel p = new Parcel();
@@ -116,7 +117,7 @@ public class TestParcel {
 		assertEquals("food image", foodToParcel.getImage(), parcelableFood.getImage());
 
 		// Check the the order count
-		assertEquals("order count to food", foodToParcel.statistics.getOrderCnt(), parcelableFood.statistics.getOrderCnt());
+		assertEquals("order count to food", foodToParcel.getStatistics().getOrderCnt(), parcelableFood.getStatistics().getOrderCnt());
 		
 		// Check the pop tastes
 		assertEquals("pop tastes to food", foodToParcel.getPopTastes(), parcelableFood.getPopTastes());
@@ -441,19 +442,13 @@ public class TestParcel {
 		orderFoodToParcel.setOrderDate(new Date().getTime());
 		orderFoodToParcel.setWaiter("张宁远");
 		
-		orderFoodToParcel.makeTasteGroup().setGroupId(100);
-		
-		orderFoodToParcel.addTaste(new Taste(100, TasteCategory.Status.TASTE));
-		orderFoodToParcel.addTaste(new Taste(101, TasteCategory.Status.TASTE));
-		orderFoodToParcel.addTaste(new Taste(102, TasteCategory.Status.TASTE));
-		orderFoodToParcel.addTaste(new Taste(103, TasteCategory.Status.TASTE));
-		orderFoodToParcel.addTaste(new Taste(104, TasteCategory.Status.TASTE));
-		
-		Taste tmpTaste = new Taste(302);
-		tmpTaste.setPreference("临时口味");
-		tmpTaste.setPrice(2.3f);
-		orderFoodToParcel.setTmpTaste(tmpTaste);
-		
+		orderFoodToParcel.setTasteGroup(new TasteGroup(100, null, Arrays.asList(new Taste[]{
+				new Taste(100, TasteCategory.Status.TASTE),
+				new Taste(101, TasteCategory.Status.TASTE),
+				new Taste(102, TasteCategory.Status.TASTE),
+				new Taste(103, TasteCategory.Status.TASTE),
+				new Taste(104, TasteCategory.Status.TASTE)
+			}), Taste.newTmpTaste("临时口味", 2.3f)));
 		
 		Parcel p = new Parcel();
 		orderFoodToParcel.writeToParcel(p, OrderFood.OF_PARCELABLE_4_QUERY);
@@ -630,19 +625,13 @@ public class TestParcel {
 		orderFoodToParcel.setHurried(true);
 		orderFoodToParcel.setCancelReason(new CancelReason(120));
 		
-		orderFoodToParcel.makeTasteGroup().setGroupId(100);
-		
-		orderFoodToParcel.addTaste(new Taste(100, TasteCategory.Status.TASTE));
-		orderFoodToParcel.addTaste(new Taste(101, TasteCategory.Status.TASTE));
-		orderFoodToParcel.addTaste(new Taste(102, TasteCategory.Status.TASTE));
-		orderFoodToParcel.addTaste(new Taste(103, TasteCategory.Status.TASTE));
-		orderFoodToParcel.addTaste(new Taste(104, TasteCategory.Status.TASTE));
-		
-		Taste tmpTaste = new Taste(302);
-		tmpTaste.setPreference("临时口味");
-		tmpTaste.setPrice(2.3f);
-		orderFoodToParcel.setTmpTaste(tmpTaste);
-		
+		orderFoodToParcel.setTasteGroup(new TasteGroup(100, null, Arrays.asList(new Taste[]{
+				new Taste(100, TasteCategory.Status.TASTE),
+				new Taste(101, TasteCategory.Status.TASTE),
+				new Taste(102, TasteCategory.Status.TASTE),
+				new Taste(103, TasteCategory.Status.TASTE),
+				new Taste(104, TasteCategory.Status.TASTE)
+			}), Taste.newTmpTaste("临时口味", 2.3f)));
 		
 		Parcel p = new Parcel();
 		orderFoodToParcel.writeToParcel(p, OrderFood.OF_PARCELABLE_4_COMMIT);

@@ -391,11 +391,7 @@ public class TasteGroup implements Parcelable, Jsonable{
 		}
 	}
 	
-	public OrderFood getAttachedFood(){
-		return mAttachedOrderFood;
-	}
-	
-	public void setAttachedFood(OrderFood attachedFood){
+	void setAttachedFood(OrderFood attachedFood){
 		this.mAttachedOrderFood = attachedFood;
 	}
 
