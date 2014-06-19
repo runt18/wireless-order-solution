@@ -108,9 +108,9 @@ public class CalcFoodGroupDao {
 				Collections.sort(smallFoods, new Comparator<Food>(){
 					@Override
 					public int compare(Food f1, Food f2) {
-						if(f1.statistics.getOrderCnt() < f2.statistics.getOrderCnt()){
+						if(f1.getStatistics().getOrderCnt() < f2.getStatistics().getOrderCnt()){
 							return 1;
-						}else if(f1.statistics.getOrderCnt() > f2.statistics.getOrderCnt()){
+						}else if(f1.getStatistics().getOrderCnt() > f2.getStatistics().getOrderCnt()){
 							return -1;
 						}else{
 							return 0;

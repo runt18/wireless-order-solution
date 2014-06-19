@@ -14,6 +14,7 @@ import com.wireless.db.inventoryMgr.MaterialDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.FoodError;
 import com.wireless.pojo.dishesOrder.Order;
+import com.wireless.pojo.menuMgr.ComboFood;
 import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.menuMgr.Department.DeptId;
 import com.wireless.pojo.menuMgr.Food;
@@ -405,7 +406,7 @@ public class FoodDao {
 		Food f = builder.build();
 		
 		Food parent = getPureById(dbCon, staff, f.getFoodId());
-		for(Food child : f.getChildFoods()){
+		for(ComboFood child : f.getChildFoods()){
 			parent.addChildFood(child);
 		}
 		
@@ -416,11 +417,11 @@ public class FoodDao {
 		if(parent.hasChildFoods()){
 			update(dbCon, staff, new Food.UpdateBuilder(parent.getFoodId()).setCombo(true));
 			
-			for(Food child : parent.getChildFoods()){
+			for(ComboFood child : parent.getChildFoods()){
 				sql = " INSERT INTO " + Params.dbName + ".combo" +
 					  " (`food_id`, `sub_food_id`, `restaurant_id`, `amount`) VALUES(" +
 					  parent.getFoodId() + "," +
-					  child.getFoodId() + "," +
+					  child.asFood().getFoodId() + "," +
 					  staff.getRestaurantId() + "," +
 					  child.getAmount() +
 					  ")";
@@ -494,73 +495,90 @@ public class FoodDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static List<Food> getChildrenByParent(DBCon dbCon, Staff staff, int parentId) throws SQLException{
+	public static List<ComboFood> getChildrenByParent(DBCon dbCon, Staff staff, int parentId) throws SQLException{
 		
-		List<Food> childFoods = new ArrayList<Food>();
+		List<ComboFood> result = new ArrayList<ComboFood>();
 		
 		String sql;
-		sql = " SELECT " +
-			  " FOOD.restaurant_id, FOOD.food_id, FOOD.food_alias, FOOD.stock_status, " +
-			  " FOOD.name, FOOD.price, FOOD.commission, FOOD.status, FOOD.taste_ref_type, " +
-			  " FOOD.desc, FOOD.img, " +
-			  " KITCHEN.kitchen_id, KITCHEN.name AS kitchen_name, KITCHEN.display_id AS kitchen_display_id, " +
-			  " KITCHEN.type AS kitchen_type, KITCHEN.is_allow_temp AS is_allow_temp, " +
-			  " DEPT.dept_id, DEPT.name AS dept_name, DEPT.type AS dept_type, DEPT.display_id AS dept_display_id, " +
-			  " COMBO.amount " +
-			  " FROM " +
-			  Params.dbName + ".food FOOD " + 
-			  " JOIN " +
-			  Params.dbName + ".combo COMBO " +
-			  " ON FOOD.food_id = COMBO.sub_food_id " + 
-			  " LEFT OUTER JOIN " +
-			  Params.dbName + ".kitchen KITCHEN " +
-			  " ON FOOD.kitchen_id = KITCHEN.kitchen_id " +
-			  " LEFT OUTER JOIN " +
-			  Params.dbName + ".department DEPT " +
-			  " ON KITCHEN.dept_id = DEPT.dept_id AND KITCHEN.restaurant_id = DEPT.restaurant_id " +
-			  " WHERE COMBO.food_id = " + parentId;
+
+		sql = " SELECT sub_food_id FROM " + Params.dbName + ".combo WHERE food_id = " + parentId;
+		
+		for(Food subFood : getPureByCond(dbCon, staff, " AND FOOD.food_id IN (" + sql + ")", null)){
 			
-		dbCon.rs = dbCon.stmt.executeQuery(sql);
+			sql = " SELECT amount FROM " + Params.dbName + ".combo WHERE food_id = " + parentId + " AND sub_food_id = " + subFood.getFoodId();
+			dbCon.rs = dbCon.stmt.executeQuery(sql);
+			int amount;
+			if(dbCon.rs.next()){
+				amount = dbCon.rs.getInt("amount");
+			}else{
+				amount = 0;
+			}
+			dbCon.rs.close();
 			
-		while(dbCon.rs.next()){
-				
-			int foodId = dbCon.rs.getInt("food_id");
-			int restaurantId = dbCon.rs.getInt("restaurant_id");
-			
-			Food childFood = new Food(foodId);
-			childFood.setRestaurantId(restaurantId);
-			childFood.setAliasId(dbCon.rs.getInt("food_alias"));
-			childFood.setName(dbCon.rs.getString("name"));
-			
-			//Generate the pinyin to each food
-			childFood.setPinyin(PinyinUtil.cn2Spell(childFood.getName()));
-			childFood.setPinyinShortcut(PinyinUtil.cn2FirstSpell(childFood.getName()));
-			
-			childFood.setPrice(dbCon.rs.getFloat("price"));
-			childFood.setCommission(dbCon.rs.getFloat("commission"));
-			childFood.setStatus(dbCon.rs.getShort("status"));
-			childFood.setTasteRefType(dbCon.rs.getShort("taste_ref_type"));
-			childFood.setDesc(dbCon.rs.getString("desc"));
-			childFood.setImage(dbCon.rs.getString("img"));
-			childFood.setKitchen(new Kitchen.QueryBuilder(dbCon.rs.getInt("kitchen_id"), dbCon.rs.getString("kitchen_name")) 
-	 				   				   		.setRestaurantId(restaurantId)
-	 				   				   		.setDisplayId(dbCon.rs.getInt("kitchen_display_id"))
-	 				   				   		.setAllowTemp(dbCon.rs.getBoolean("is_allow_temp"))
-	 				   				   		.setType(dbCon.rs.getShort("kitchen_type"))
-	 				   				   		.setDept(new Department(dbCon.rs.getString("dept_name"), 
-	 				   				    		   		  	    dbCon.rs.getShort("dept_id"), 
-	 				   				    		   		  	    restaurantId,
-	 				   				    		   		  	    Department.Type.valueOf(dbCon.rs.getShort("dept_type")),
-	 				   				    		   		  	    dbCon.rs.getInt("dept_display_id")))
-	 				   				     .build());
-			childFood.setStockStatus(dbCon.rs.getInt("stock_status"));
-			
-			childFood.setAmount(dbCon.rs.getInt("amount"));
-			
-			childFoods.add(childFood);
-		}				
-		dbCon.rs.close();
-		return childFoods;
+			result.add(new ComboFood(subFood, amount));
+		}
+		
+//		sql = " SELECT " +
+//			  " FOOD.restaurant_id, FOOD.food_id, FOOD.food_alias, FOOD.stock_status, " +
+//			  " FOOD.name, FOOD.price, FOOD.commission, FOOD.status, " +
+//			  " FOOD.desc, FOOD.img, " +
+//			  " KITCHEN.kitchen_id, KITCHEN.name AS kitchen_name, KITCHEN.display_id AS kitchen_display_id, " +
+//			  " KITCHEN.type AS kitchen_type, KITCHEN.is_allow_temp AS is_allow_temp, " +
+//			  " DEPT.dept_id, DEPT.name AS dept_name, DEPT.type AS dept_type, DEPT.display_id AS dept_display_id, " +
+//			  " COMBO.amount " +
+//			  " FROM " +
+//			  Params.dbName + ".food FOOD " + 
+//			  " JOIN " +
+//			  Params.dbName + ".combo COMBO " +
+//			  " ON FOOD.food_id = COMBO.sub_food_id " + 
+//			  " LEFT OUTER JOIN " +
+//			  Params.dbName + ".kitchen KITCHEN " +
+//			  " ON FOOD.kitchen_id = KITCHEN.kitchen_id " +
+//			  " LEFT OUTER JOIN " +
+//			  Params.dbName + ".department DEPT " +
+//			  " ON KITCHEN.dept_id = DEPT.dept_id AND KITCHEN.restaurant_id = DEPT.restaurant_id " +
+//			  " WHERE COMBO.food_id = " + parentId;
+//			
+//		dbCon.rs = dbCon.stmt.executeQuery(sql);
+//			
+//		while(dbCon.rs.next()){
+//				
+//			int foodId = dbCon.rs.getInt("food_id");
+//			int restaurantId = dbCon.rs.getInt("restaurant_id");
+//			
+//			Food childFood = new Food(foodId);
+//			childFood.setRestaurantId(restaurantId);
+//			childFood.setAliasId(dbCon.rs.getInt("food_alias"));
+//			childFood.setName(dbCon.rs.getString("name"));
+//			
+//			//Generate the pinyin to each food
+//			childFood.setPinyin(PinyinUtil.cn2Spell(childFood.getName()));
+//			childFood.setPinyinShortcut(PinyinUtil.cn2FirstSpell(childFood.getName()));
+//			
+//			childFood.setPrice(dbCon.rs.getFloat("price"));
+//			childFood.setCommission(dbCon.rs.getFloat("commission"));
+//			childFood.setStatus(dbCon.rs.getShort("status"));
+//			childFood.setDesc(dbCon.rs.getString("desc"));
+//			childFood.setImage(dbCon.rs.getString("img"));
+//			childFood.setKitchen(new Kitchen.QueryBuilder(dbCon.rs.getInt("kitchen_id"), dbCon.rs.getString("kitchen_name")) 
+//	 				   				   		.setRestaurantId(restaurantId)
+//	 				   				   		.setDisplayId(dbCon.rs.getInt("kitchen_display_id"))
+//	 				   				   		.setAllowTemp(dbCon.rs.getBoolean("is_allow_temp"))
+//	 				   				   		.setType(dbCon.rs.getShort("kitchen_type"))
+//	 				   				   		.setDept(new Department(dbCon.rs.getString("dept_name"), 
+//	 				   				    		   		  	    dbCon.rs.getShort("dept_id"), 
+//	 				   				    		   		  	    restaurantId,
+//	 				   				    		   		  	    Department.Type.valueOf(dbCon.rs.getShort("dept_type")),
+//	 				   				    		   		  	    dbCon.rs.getInt("dept_display_id")))
+//	 				   				     .build());
+//			childFood.setStockStatus(dbCon.rs.getInt("stock_status"));
+//			
+//			childFood.setAmount(dbCon.rs.getInt("amount"));
+//			
+//			result.add(childFood);
+//		}				
+//		dbCon.rs.close();
+		return result;
 				
 	}
 
@@ -574,7 +592,7 @@ public class FoodDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static List<Food> getChildrenByParent(Staff staff, int parentId) throws SQLException{
+	public static List<ComboFood> getChildrenByParent(Staff staff, int parentId) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -601,7 +619,7 @@ public class FoodDao {
 	    //get all the food information to this restaurant
 		String sql = " SELECT " +
 					 " FOOD.restaurant_id, FOOD.food_id, FOOD.food_alias, FOOD.stock_status, " +
-					 " FOOD.name, FOOD.price, FOOD.commission, FOOD.status, FOOD.taste_ref_type, " +
+					 " FOOD.name, FOOD.price, FOOD.commission, FOOD.status, " +
 					 " FOOD.desc, FOOD.img, " +
 					 " FOOD.order_amount, " +
 					 " KITCHEN.kitchen_id, KITCHEN.display_id AS kitchen_display_id, KITCHEN.name AS kitchen_name, " +
@@ -637,7 +655,6 @@ public class FoodDao {
 			f.setCommission(dbCon.rs.getFloat("commission"));
 			f.setStatistics(new FoodStatistics(dbCon.rs.getInt("order_amount")));
 			f.setStatus(dbCon.rs.getShort("status"));
-			f.setTasteRefType(dbCon.rs.getShort("taste_ref_type"));
 			f.setDesc(dbCon.rs.getString("desc"));
 			f.setImage(dbCon.rs.getString("img"));
 			f.setKitchen(new Kitchen.QueryBuilder(dbCon.rs.getInt("kitchen_id"), dbCon.rs.getString("kitchen_name")) 
@@ -916,7 +933,7 @@ public class FoodDao {
 	 * 			the database connection
 	 * @param staff
 	 * 			the staff to perform this action
-	 * @param extraCondition
+	 * @param extraCond
 	 * 			the extra condition to SQL statement
 	 * @param order clause
 	 * 			the order clause to SQL statement
@@ -924,7 +941,7 @@ public class FoodDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statements
 	 */			
-	public static List<Food> getByCond(DBCon dbCon, Staff staff, String extraCondition, String orderClause) throws SQLException{
+	public static List<Food> getByCond(DBCon dbCon, Staff staff, String extraCond, String orderClause) throws SQLException{
 
 		//Using link hash map to keep original order after retrieving the foods by order clause defined in SQL statement.
 		Map<Integer, Food> foods = new LinkedHashMap<Integer, Food>();
@@ -933,7 +950,7 @@ public class FoodDao {
 			orderClause = " ORDER BY FOOD.food_alias, food_id ";
 		}
 		//Get the basic detail to each food.
-		List<Food> pureFoods = getPureByCond(dbCon, staff, extraCondition, orderClause);
+		List<Food> pureFoods = getPureByCond(dbCon, staff, extraCond, orderClause);
 
 		StringBuilder foodCond = new StringBuilder();
 

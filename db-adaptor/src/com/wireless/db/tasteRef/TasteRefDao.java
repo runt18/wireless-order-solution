@@ -114,10 +114,6 @@ public class TasteRefDao {
 	 */
 	public static void execByFood(DBCon dbCon, Food food) throws SQLException, BusinessException{
 		
-		if(!food.isTasteSmartRef()){
-			throw new BusinessException("");
-		}
-		
 		/**
 		 * Get all taste reference record to this food.
 		 */
@@ -222,7 +218,7 @@ public class TasteRefDao {
 		/**
 		 * Get all the foods whose taste reference type is smart
 		 */
-		List<Food> foods = FoodDao.getPureByCond("AND FOOD.taste_ref_type=" + Food.TasteRef.SMART.getVal(), null);
+		List<Food> foods = FoodDao.getPureByCond(dbCon, null, null);
 		
 		if(!foods.isEmpty()){
 			
@@ -426,8 +422,7 @@ public class TasteRefDao {
 		 */
 		sql = " DELETE FROM " + Params.dbName + ".food_taste_rank" +
 			  " WHERE food_id IN (" +
-			  " SELECT food_id FROM " + Params.dbName + ".food " +
-			  " WHERE taste_ref_type=" + Food.TasteRef.SMART.getVal() + ")";
+			  " SELECT food_id FROM " + Params.dbName + ".food)";
 		dbCon.stmt.executeUpdate(sql);
 		
 	

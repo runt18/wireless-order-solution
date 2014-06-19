@@ -148,7 +148,7 @@ public class MenuDao {
 		Kitchen kitchen = null;
 			
 		String selectSQL = "SELECT" 
-				+ " A.food_id, A.food_alias, A.restaurant_id, A.name food_name, A.pinyin, A.status, A.taste_ref_type, "
+				+ " A.food_id, A.food_alias, A.restaurant_id, A.name food_name, A.pinyin, A.status, "
 				+ " A.desc, A.img, A.kitchen_id, A.stock_status,  "
 				+ " B.name kitchen_name, B.display_id AS kitchen_display_id, B.dept_id, C.unit_price "
 				+ " FROM " + Params.dbName + ".food A" 
@@ -171,7 +171,6 @@ public class MenuDao {
 			item.setPinyin(dbCon.rs.getString("pinyin"));
 			item.setPrice(dbCon.rs.getFloat("unit_price"));
 			item.setStatus(dbCon.rs.getShort("status"));
-			item.setTasteRefType(dbCon.rs.getInt("taste_ref_type"));
 			item.setDesc(dbCon.rs.getString("desc"));
 			item.setImage(dbCon.rs.getString("img"));
 			item.setStockStatus(dbCon.rs.getInt("stock_status"));
