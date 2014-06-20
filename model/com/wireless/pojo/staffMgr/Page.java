@@ -91,8 +91,9 @@ public class Page{
 		BUSINESS_RECEIPS("businessReceiptsStatistics", "收款统计", "History_Module/BusinessReceiptsStatistics.html", "../../images/businessReceips.png"),
 		SALES_SUB("salesSubStatistics", "销售统计", "History_Module/SalesSubStatistics.html", "../../images/salesStat.png"),
 		CANCELLED_FOOD("cancelledFood", "退菜统计", "History_Module/CancelledFood.html", "../../images/cancelledFoodStatis.png"),
-		REPAID_STATISTICS("repaidStatistics", "反结账统计", "History_Module/RepaidStatistics.html", "../../images/repaidStatistics.png"),
+		REPAID_STATISTICS("repaidStatistics", "反结账统计", "History_Module/RepaidStatistics.html", "../../images/commissionStatistics.png"),
 		COMMISSION_STATISTICS("commissionStatistics", "提成统计", "History_Module/CommissionStatistics.html", "../../images/commissionStatistics.png"),
+		DISCOUNT_STATISTICS("discountStatistics", "折扣统计", "History_Module/DiscountStatistics.html", "../../images/discountStatistics.png"),
 		GIFT_STATISTICS("giftStatistics", "赠送统计", "History_Module/GiftStatistics.html", "../../images/giftStatistics.png"),
 		BUSINESS_CHART("businessChart", "营业走势图", "History_Module/BusinessChart.html", "../../images/businessChart.png");
 		

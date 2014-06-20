@@ -537,7 +537,7 @@ public class OrderFood implements Parcelable, Jsonable {
 		return mFood.getName();
 	}
 	
-	private float getPrice(){
+	public float getPrice(){
 		return mFood.getPrice();
 	}
 	
