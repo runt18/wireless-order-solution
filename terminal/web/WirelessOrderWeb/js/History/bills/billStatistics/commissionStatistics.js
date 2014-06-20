@@ -74,7 +74,7 @@ function commissionDetailInit(){
 			Ext.getCmp('btnSearchForCommissionStatistics').handler();
 		}
 	});
-	var deptCombo = new Ext.form.ComboBox({
+	var commission_deptCombo = new Ext.form.ComboBox({
 		forceSelection : true,
 		width : 90,
 		value : -1,
@@ -109,7 +109,7 @@ function commissionDetailInit(){
 				});				
 			},
 			select : function(){
-				Ext.getCmp('btnSearchForCommissionFoodDetailsStat').handler();
+				Ext.getCmp('btnSearchForCommissionStatistics').handler();
 			}
 		}
 	});	
@@ -187,12 +187,6 @@ function commissionDetailInit(){
 	var commissionStatisticsTbar = new Ext.Toolbar({
 		items : [{
 				xtype : 'tbtext',
-				text : String.format(
-					Ext.ux.txtFormat.typeName,
-					'部门','lblCommissionDept','----'
-				)
-			},{
-				xtype : 'tbtext',
 				text : '日期:'
 			}, commission_dateCombo, {
 				xtype : 'tbtext',
@@ -209,8 +203,8 @@ function commissionDetailInit(){
 			}, commission_combo_staffs, 
 			{
 				xtype : 'tbtext',
-				text : '部门:'
-			},deptCombo ,'->', {
+				text : '&nbsp;&nbsp;部门:'
+			},commission_deptCombo ,'->', {
 				text : '搜索',
 				id : 'btnSearchForCommissionStatistics',
 				iconCls : 'btn_search',
@@ -223,7 +217,7 @@ function commissionDetailInit(){
 					store.baseParams['beginDate'] = commission_beginDate.getValue().format('Y-m-d 00:00:00');
 					store.baseParams['endDate'] = commission_endDate.getValue().format('Y-m-d 23:59:59');
 					store.baseParams['staffId'] = commission_combo_staffs.getValue();
-					store.baseParams['deptId'] = deptCombo.getValue();
+					store.baseParams['deptId'] = commission_deptCombo.getValue();
 					store.load({
 						params : {
 							start : 0,
@@ -231,12 +225,11 @@ function commissionDetailInit(){
 						}
 					});
 					
-					
 					requestParams = {
 						dataSource : 'getDetailChart',
 						dateBeg : commission_beginDate.getValue().format('Y-m-d 00:00:00'),
 						dateEnd : commission_endDate.getValue().format('Y-m-d 23:59:59'),
-						deptID : deptCombo.getValue(),
+						deptID : commission_deptCombo.getValue(),
 						staffID : commission_combo_staffs.getValue()					
 					};
 					
@@ -269,7 +262,6 @@ function commissionDetailInit(){
 				if(!commission_beginDate.isValid() || !commission_endDate.isValid()){
 					return;
 				}
-				var sn = commissionDeptTree.getSelectionModel().getSelectedNode();
 				var url = '../../{0}?beginDate={1}&endDate={2}&staffId={3}&deptId={4}&dataSource={5}';
 				url = String.format(
 						url, 
@@ -277,7 +269,7 @@ function commissionDetailInit(){
 						commission_beginDate.getValue().format('Y-m-d 00:00:00'), 
 						commission_endDate.getValue().format('Y-m-d 23:59:59'),
 						commission_combo_staffs.getValue(),
-						sn ? sn.id : "-1",
+						commission_deptCombo.getValue(),
 						'commissionStatisticsList'
 				);
 				window.location = url;
@@ -495,7 +487,7 @@ function commission_loadStaffChart(){
 	                enabled: true,
 	                color: '#000000',
 	                connectorColor: '#000000',
-	                format: '<b>{point.name}</b>: {point.percentage:.1f} %'
+	                format: '<b>{point.name}</b>: {point.y} 元'
 	            }
 	        }
 	    },
@@ -542,7 +534,18 @@ var commissionStatChartTabPanel;
 var commissionDetailChart, commissionStaffChartPanel;
 var commissionDetailChart, commissionStaffChart;
 var colors = Highcharts.getOptions().colors;
-var commissionStaffChartData = {chartData : {type : 'pie', name : '比例', data : []}, staffColumnChart : {xAxis : [], yAxis : {name : '员工提成', data : []}}};
+var commissionStaffChartData = {chartData : {type : 'pie', name : '比例', data : []}, staffColumnChart : {xAxis : [], yAxis : {name : '员工提成', data : [],
+							dataLabels: {
+				                enabled: true,
+				                color: 'green',
+				                align: 'center',
+				                style: {
+				                    fontSize: '13px',
+				                    fontFamily: 'Verdana, sans-serif',
+				                    fontWeight : 'bold'
+				                },
+				                format: '{point.y} 元'
+				            }}}};
 Ext.onReady(function(){
 	commissionDetailInit();
 	

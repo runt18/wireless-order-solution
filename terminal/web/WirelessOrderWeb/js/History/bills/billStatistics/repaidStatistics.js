@@ -74,7 +74,7 @@ function linkOrderId(v){
 	return '<a href=\"javascript:res_billDetailHandler('+ v +')\">'+ v +'</a>';
 }
 
-function showCancelDetailChart(jdata){
+function showRepaidDetailChart(jdata){
 	var dateBegin = repaid_beginDate.getValue().format('Y-m-d');
 	var dateEnd = repaid_endDate.getValue().format('Y-m-d');
 	
@@ -171,7 +171,7 @@ function repaid_loadStaffChart(){
 	                enabled: true,
 	                color: '#000000',
 	                connectorColor: '#000000',
-	                format: '<b>{point.name}</b>: {point.percentage:.1f} %'
+	                format: '<b>{point.name}</b>: {point.y} 元'
 	            }
 	        }
 	    },
@@ -321,7 +321,7 @@ function initGrid(){
 						params : requestParams,
 						success : function(res, opt){
 							var jr = Ext.decode(res.responseText);
-							showCancelDetailChart(jr);
+							showRepaidDetailChart(jr);
 						},
 						failure : function(res, opt){
 						
@@ -331,7 +331,7 @@ function initGrid(){
 					if(typeof repaidStaffChart != 'undefined'){
 						repaid_getStaffChartData();
 						$('#divRepaidStaffColumnChart').is(':visible')? repaid_loadStaffColumnChart() : repaid_loadStaffChart();
-						repaidStaffChart.setSize(repaidStatChartTabPanel.getWidth(), panelDrag ? repaidStatChartTabPanel.getHeight() - 60 : repaidStatChartTabPanel.getHeight()-30);
+						repaidStaffChart.setSize(repaidStatChartTabPanel.getWidth(), repaid_panelDrag ? repaidStatChartTabPanel.getHeight() - 60 : repaidStatChartTabPanel.getHeight()-30);
 					}						
 					
 				}
@@ -423,7 +423,7 @@ function initGrid(){
 					
 					repaid_changeChartWidth(w,chartHeight-60);
 					
-					if(panelDrag){
+					if(repaid_panelDrag){
 						repaidStatChartTabPanel.setHeight(chartHeight);
 					}
 				}
@@ -473,10 +473,21 @@ function res_showBillDetailWin(){
 	});
 }
 var requestParams, repaid_tabPanelHeight, repaidPanelHeight;
-var colors = Highcharts.getOptions().colors, panelDrag = false;
+var colors = Highcharts.getOptions().colors, repaid_panelDrag = false;
 var repaidStaffChart, repaidDetailChart;
 var repaidDetailPanel, repaidDetailChartPanel, repaidStaffChartPanel, repaidStatChartTabPanel;
-var repaid_staffChartData = {chartData : {type : 'pie', name : '比例', data : []}, staffColumnChart : {xAxis : [], yAxis : {name : '员工反结账', data : []}}};
+var repaid_staffChartData = {chartData : {type : 'pie', name : '比例', data : []}, staffColumnChart : {xAxis : [], yAxis : {name : '员工反结账', data : [],
+							dataLabels: {
+				                enabled: true,
+				                color: 'green',
+				                align: 'center',
+				                style: {
+				                    fontSize: '13px',
+				                    fontFamily: 'Verdana, sans-serif',
+				                    fontWeight : 'bold'
+				                },
+				                format: '{point.y} 元'
+				            }}}};
 
 Ext.onReady(function(){
 
@@ -489,7 +500,7 @@ Ext.onReady(function(){
 			show : function(thiz){
 				//thiz.getEl(): 刚打开页面时thiz.getWidth无效
 				if(repaidDetailChart && typeof thiz.getEl() != 'undefined'){
-					repaidDetailChart.setSize(thiz.getWidth(), panelDrag ? repaidStatChartTabPanel.getHeight() - 60 : repaidStatChartTabPanel.getHeight()-30);
+					repaidDetailChart.setSize(thiz.getWidth(), repaid_panelDrag ? repaidStatChartTabPanel.getHeight() - 60 : repaidStatChartTabPanel.getHeight()-30);
 				}
 			}
 		}		
@@ -501,7 +512,7 @@ Ext.onReady(function(){
 		listeners : {
 			show : function(thiz){
 				if($('#divRepaidStaffChart').is(":visible") || $('#divRepaidStaffColumnChart').is(":visible")){
-					repaidStaffChart.setSize(thiz.getWidth(), panelDrag ? repaidStatChartTabPanel.getHeight() - 60 : repaidStatChartTabPanel.getHeight()-30);
+					repaidStaffChart.setSize(thiz.getWidth(), repaid_panelDrag ? repaidStatChartTabPanel.getHeight() - 60 : repaidStatChartTabPanel.getHeight()-30);
 				}else{
 					$('#divRepaidStaffChartChange').show();
 					$('#divRepaidStaffChart').show();
@@ -509,7 +520,7 @@ Ext.onReady(function(){
 				if(!repaidStaffChart){
 					repaid_getStaffChartData();
 					repaid_loadStaffChart();
-					repaidStaffChart.setSize(repaidStatChartTabPanel.getWidth(), panelDrag ? repaidStatChartTabPanel.getHeight() - 60 : repaidStatChartTabPanel.getHeight()-30);
+					repaidStaffChart.setSize(repaidStatChartTabPanel.getWidth(), repaid_panelDrag ? repaidStatChartTabPanel.getHeight() - 60 : repaidStatChartTabPanel.getHeight()-30);
 				}
 			},
 			render : function(thiz){
@@ -553,7 +564,7 @@ Ext.onReady(function(){
         handles: 's',//设置拖拉的方向（n,s,e,w,all...）
         listeners : {
         	resize : function(thiz, w, h, e){
-        		panelDrag = true;
+        		repaid_panelDrag = true;
         	}
         }
     });
@@ -565,14 +576,14 @@ Ext.onReady(function(){
 			
 			$('#divRepaidStaffColumnChart').show();
 			repaid_loadStaffColumnChart();
-			repaidStaffChart.setSize(repaidStatChartTabPanel.getWidth(), panelDrag ? repaidStatChartTabPanel.getHeight() - 60 : repaidStatChartTabPanel.getHeight()-30);
+			repaidStaffChart.setSize(repaidStatChartTabPanel.getWidth(), repaid_panelDrag ? repaidStatChartTabPanel.getHeight() - 60 : repaidStatChartTabPanel.getHeight()-30);
 		},
 		function(){
 			$('#divRepaidStaffColumnChart').hide();
 			
 			$('#divRepaidStaffChart').show();
 			repaid_loadStaffChart();
-			repaidStaffChart.setSize(repaidStatChartTabPanel.getWidth(), panelDrag ? repaidStatChartTabPanel.getHeight() - 60 : repaidStatChartTabPanel.getHeight()-30);
+			repaidStaffChart.setSize(repaidStatChartTabPanel.getWidth(), repaid_panelDrag ? repaidStatChartTabPanel.getHeight() - 60 : repaidStatChartTabPanel.getHeight()-30);
 		}		
 	);    
 });
