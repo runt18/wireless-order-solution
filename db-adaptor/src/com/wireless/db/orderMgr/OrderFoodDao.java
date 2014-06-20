@@ -136,7 +136,7 @@ public class OrderFoodDao {
 				extraCond.append(" AND " + orderTblAlias + ".order_date BETWEEN '" + dutyRange.getOnDutyFormat() + "' AND '" + dutyRange.getOffDutyFormat() + "'");
 			}
 			if(hourRange != null){
-				extraCond.append(" AND TIME(" + orderTblAlias + ".order_date) BETWEEN '" + hourRange.getOpeningFormat() + "' AND '" + hourRange.getEndingFormat() + "'");
+				extraCond.append(" AND TIME(" + orderFoodTblAlias + ".order_date) BETWEEN '" + hourRange.getOpeningFormat() + "' AND '" + hourRange.getEndingFormat() + "'");
 			}
 			if(regionId != null){
 				extraCond.append(" AND " + orderTblAlias + ".region_id = " + regionId.getId());
