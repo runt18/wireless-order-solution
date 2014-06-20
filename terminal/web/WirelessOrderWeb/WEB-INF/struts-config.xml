@@ -477,7 +477,7 @@
 			scope="request" parameter="dataSource">
 		</action>
 		<action path="/QueryRepaidStatistics" type="com.wireless.Actions.dishesOrder.QueryRepaidReportAction"
-			scope="request">
+			scope="request" parameter="dataSource">
 		</action>
 		
 		<action path="/WXEntry"
@@ -518,7 +518,7 @@
 		</action>
 		
 		<action path="/QueryCommissionStatistics" type="com.wireless.Actions.dishesOrder.QueryCommissionStatisticsAction"
-			scope="request">
+			scope="request" parameter="dataSource">
 		</action>
 		<action path="/QueryCommissionTotal" type="com.wireless.Actions.dishesOrder.QueryCommissionTotalAction"
 			scope="request">
@@ -581,7 +581,11 @@
 		<action path="/QueryGiftStatistic"
 			type="com.wireless.Actions.billStatistics.QueryGiftStatisticAction"
 			scope="request">
-		</action>		
+		</action>	
+		<action path="/QueryDiscountStatistics"
+			type="com.wireless.Actions.distMgr.discount.QueryDiscountStatisticsAction"
+			scope="request" parameter="dataSource">
+		</action>	
 	</action-mappings>
 
 	<message-resources parameter="com.yourcompany.struts.ApplicationResources" />
