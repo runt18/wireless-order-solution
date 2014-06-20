@@ -65,8 +65,8 @@ public class QueryRepaidReportAction extends DispatchAction{
 				}
 				list = DataPaging.getPagingData(list, true, start, limit);
 				list.add(total);
-				jobject.setRoot(list);
 			}
+			jobject.setRoot(list);
 		}catch (SQLException e) {
 			e.printStackTrace();
 			jobject.initTip(e);

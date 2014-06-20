@@ -29,33 +29,37 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
 import com.wireless.db.billStatistics.CalcBillStatisticsDao;
+import com.wireless.db.billStatistics.CalcCommissionStatisticsDao;
+import com.wireless.db.billStatistics.CalcDiscountStatisticsDao;
+import com.wireless.db.billStatistics.CalcRepaidStatisticsDao;
 import com.wireless.db.billStatistics.CalcBillStatisticsDao.ExtraCond;
-import com.wireless.db.billStatistics.CalcCancelStatisticsDao;
 import com.wireless.db.billStatistics.SaleDetailsDao;
 import com.wireless.db.client.member.MemberDao;
 import com.wireless.db.client.member.MemberOperationDao;
 import com.wireless.db.orderMgr.OrderDao;
+import com.wireless.db.orderMgr.OrderFoodDao;
 import com.wireless.db.shift.ShiftDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.stockMgr.StockActionDao;
 import com.wireless.db.stockMgr.StockReportDao;
 import com.wireless.exception.BusinessException;
+import com.wireless.pojo.billStatistics.CommissionStatistics;
 import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.billStatistics.HourRange;
 import com.wireless.pojo.billStatistics.IncomeByDept;
 import com.wireless.pojo.billStatistics.IncomeByEachDay;
-import com.wireless.pojo.billStatistics.RepaidStatistics;
 import com.wireless.pojo.billStatistics.SalesDetail;
 import com.wireless.pojo.billStatistics.ShiftDetail;
-import com.wireless.pojo.billStatistics.commission.CommissionStatistics;
+import com.wireless.pojo.billStatistics.repaid.RepaidStatistics;
 import com.wireless.pojo.client.Member;
 import com.wireless.pojo.client.MemberOperation;
 import com.wireless.pojo.client.MemberOperation.OperationType;
 import com.wireless.pojo.client.MemberType;
-import com.wireless.pojo.dishesOrder.CancelledFood;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.Order.PayType;
+import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.menuMgr.Department;
+import com.wireless.pojo.menuMgr.Department.DeptId;
 import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.pojo.regionMgr.Region;
 import com.wireless.pojo.regionMgr.Region.RegionId;
@@ -2159,47 +2163,43 @@ public class HistoryStatisticsAction extends DispatchAction{
 		
 		
 		response.setContentType("application/vnd.ms-excel;");
-		List<CancelledFood> list = new ArrayList<CancelledFood>();
-		//Object sum = null;
-		
 		String pin = (String)request.getAttribute("pin");
-		//String isPaging = request.getParameter("isPaging");
-/*		String limit = request.getParameter("limit");
-		String start = request.getParameter("start");*/
-		
-		//String qtype = request.getParameter("qtype");
-		String otype = request.getParameter("otype");
-		String dtype = request.getParameter("dtype");
 		String dateBeg = request.getParameter("dateBeg");
 		String dateEnd = request.getParameter("dateEnd");
 		String deptID = request.getParameter("deptID");
 		String reasonID = request.getParameter("reasonID");
+		String staffID = request.getParameter("staffID");
+		String opening = request.getParameter("opening");
+		String ending = request.getParameter("ending");
 		
-		if(otype == null || otype.trim().isEmpty()){
-			otype = CalcCancelStatisticsDao.ORDER_BY_COUNT + "";
-		}
-		if(deptID == null || deptID.trim().isEmpty()){
-			deptID = "-1";
-		}
-		if(reasonID == null || reasonID.trim().isEmpty()){
-			reasonID = "-1";
-		}
-		DateType dt = DateType.valueOf(Integer.valueOf(dtype));
-		Integer did = Integer.valueOf(deptID), rid = Integer.valueOf(reasonID);
+		Integer did = Integer.valueOf(deptID);
 		
-		DutyRange queryDate = new DutyRange(dateBeg, dateEnd);
 		Staff staff = StaffDao.verify(Integer.parseInt(pin));
+
+		OrderFoodDao.ExtraCond4CancelFood extraCond = new OrderFoodDao.ExtraCond4CancelFood(DateType.HISTORY);
 		
+		extraCond.setDutyRange(new DutyRange(dateBeg, dateEnd));
 		
-		list = CalcCancelStatisticsDao.getCancelledFoodDetail(staff, queryDate, dt, did, rid);
-		CancelledFood tempSum = new CancelledFood();
-		if(list != null && list.size() > 0){
-			CancelledFood tempItem = null;
-			for(int i = 0; i < list.size(); i++){
-				tempItem = list.get(i);
-				tempSum.setCount(tempSum.getCount() + tempItem.getCount());
-				tempSum.setTotalPrice(tempSum.getTotalPrice() + tempItem.getTotalPrice());
-			}
+		if(reasonID != null && !reasonID.isEmpty() && !reasonID.equals("-1")){
+			extraCond.setReasonId(Integer.valueOf(reasonID));
+		}
+		if(did != -1){
+			extraCond.setDeptId(DeptId.valueOf(did));
+		}
+		if(staffID != null && !staffID.isEmpty() && !staffID.equals("-1")){
+			extraCond.setStaffId(Integer.valueOf(staffID));
+		}
+		if(opening != null && !opening.isEmpty()){
+			extraCond.setHourRange(new HourRange(opening, ending, DateUtil.Pattern.HOUR));
+		}
+		
+		List<OrderFood> cancelList = OrderFoodDao.getSingleDetail(staff, extraCond, null);
+		
+		float totalAmount = 0, totalPrice = 0;
+		
+		for (OrderFood o : cancelList) {
+			totalAmount += o.getCount();
+			totalPrice += o.calcPrice();
 		}
 		
 		String title = "退菜明细表";
@@ -2241,7 +2241,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 		
 		cell = row.createCell(0);
 		
-		cell.setCellValue("总数量: " + tempSum.getCount() + "         总金额 :" + tempSum.getTotalPrice());
+		cell.setCellValue("总数量: " + totalAmount + "         总金额 :" + totalPrice);
 //		cell.setCellStyle(strStyle);
 		
 		sheet.addMergedRegion(new CellRangeAddress(sheet.getLastRowNum(), sheet.getLastRowNum(), 0, 8));
@@ -2292,44 +2292,44 @@ public class HistoryStatisticsAction extends DispatchAction{
 		cell.setCellStyle(headerStyle);
 		
 		
-		for (CancelledFood cf : list) {
+		for (OrderFood orderFood : cancelList) {
 			row = sheet.createRow(sheet.getLastRowNum() + 1);
 			row.setHeight((short) 350);
 			
 			cell = row.createCell(0);
-			cell.setCellValue(cf.getOrderDateFormat());
+			cell.setCellValue(DateUtil.format(orderFood.getOrderDate()));
 			cell.setCellStyle(strStyle);
 			
 			cell = row.createCell(row.getLastCellNum());
-			cell.setCellValue(cf.getFoodName());
+			cell.setCellValue(orderFood.getName());
 			cell.setCellStyle(strStyle);
 			
 			cell = row.createCell(row.getLastCellNum());
-			cell.setCellValue(cf.getDeptName());
+			cell.setCellValue(orderFood.getKitchen().getDept().getName());
 			cell.setCellStyle(strStyle);
 			
 			cell = row.createCell(row.getLastCellNum());
-			cell.setCellValue(cf.getOrderID());
+			cell.setCellValue(orderFood.getOrderId());
 			cell.setCellStyle(strStyle);
 			
 			cell = row.createCell(row.getLastCellNum());
-			cell.setCellValue(cf.getUnitPrice());
+			cell.setCellValue(orderFood.getPrice());
 			cell.setCellStyle(numStyle);
 			
 			cell = row.createCell(row.getLastCellNum());
-			cell.setCellValue(cf.getCount());
+			cell.setCellValue(orderFood.getCount());
 			cell.setCellStyle(numStyle);
 			
 			cell = row.createCell(row.getLastCellNum());
-			cell.setCellValue(cf.getTotalPrice());
+			cell.setCellValue(orderFood.calcPrice());
 			cell.setCellStyle(numStyle);
 			
 			cell = row.createCell(row.getLastCellNum());
-			cell.setCellValue(cf.getWaiter());
+			cell.setCellValue(orderFood.getWaiter());
 			cell.setCellStyle(strStyle);
 			
 			cell = row.createCell(row.getLastCellNum());
-			cell.setCellValue(cf.getReason());
+			cell.setCellValue(orderFood.getCancelReason().getReason());
 			cell.setCellStyle(strStyle);
 			
 		}
@@ -2607,20 +2607,19 @@ public class HistoryStatisticsAction extends DispatchAction{
 		String staffId = request.getParameter("staffId");
 		String deptId = request.getParameter("deptId");
 		
-		DutyRange range = new DutyRange(beginDate, endDate);
 		List<CommissionStatistics> list;
+		
+		CalcCommissionStatisticsDao.ExtraCond extraCond = new CalcCommissionStatisticsDao.ExtraCond(DateType.HISTORY);
+		
 		if(staffId != null && !staffId.equals("-1") && !staffId.isEmpty()){
-			if(deptId != null && !deptId.equals("-1")){
-				list = CalcBillStatisticsDao.calcCommissionStatByDeptAndStaff(staff, range, Integer.parseInt(staffId), Integer.parseInt(deptId), DateType.HISTORY);
-			}else{
-				list = CalcBillStatisticsDao.calcCommissionStatByStaff(staff, range, Integer.parseInt(staffId), DateType.HISTORY);
-			}
-			
-		}else if(deptId != null && !deptId.equals("-1")){
-			list = CalcBillStatisticsDao.calcCommissionStatByDeptId(staff, range, Integer.parseInt(deptId), DateType.HISTORY);
-		}else{
-			list = CalcBillStatisticsDao.calcCommissionStatistics(staff, range, DateType.HISTORY);
+			extraCond.setStaffId(Integer.valueOf(staffId));
 		}
+		
+		if(deptId != null && !deptId.equals("-1")){
+			extraCond.setDeptId(DeptId.valueOf(Integer.parseInt(deptId)));
+		}
+		list = CalcCommissionStatisticsDao.getCommissionStatisticsDetail(staff, new DutyRange(beginDate, endDate), extraCond);
+		
 		CommissionStatistics total = new CommissionStatistics();
 		total.setCommission(0);
 		if(!list.isEmpty() && list.size() != 0){
@@ -2767,6 +2766,165 @@ public class HistoryStatisticsAction extends DispatchAction{
 		return null;
 	}
 	
+	/**
+	 * 折扣统计
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws UnsupportedEncodingException
+	 * @throws Exception
+	 * @throws SQLException
+	 * @throws BusinessException
+	 */
+	public ActionForward discountStatisticsList(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws UnsupportedEncodingException, Exception, SQLException, BusinessException{
+		response.setContentType("application/vnd.ms-excel;");
+		
+		String pin = (String) request.getAttribute("pin");
+		String beginDate = request.getParameter("beginDate");
+		String endDate = request.getParameter("endDate");
+		String staffId = request.getParameter("staffID");
+		String deptID = request.getParameter("deptID");
+		
+		Staff staff = StaffDao.verify(Integer.parseInt(pin));
+		List<Order> list;
+		
+		CalcDiscountStatisticsDao.ExtraCond extraCond = new CalcDiscountStatisticsDao.ExtraCond(DateType.HISTORY);
+		
+		if(staffId != null && !staffId.equals("-1") && !staffId.isEmpty()){
+			extraCond.setStaffId(Integer.valueOf(staffId));
+		}
+		
+		if(deptID != null && !deptID.isEmpty() && !deptID.equals("-1")){
+			extraCond.setDeptId(DeptId.valueOf(Integer.parseInt(deptID)));
+		}
+		
+		list = CalcDiscountStatisticsDao.getDiscountStatisticsDetail(staff, new DutyRange(beginDate, endDate), extraCond);
+		
+		float totalDiscountPrice = 0;
+		if(!list.isEmpty()){
+			for (Order item : list) {
+				totalDiscountPrice += item.getDiscountPrice();
+			}
+		}
+		
+		String title = "折扣统计";
+		
+		//标题
+		response.addHeader("Content-Disposition", "attachment;filename=" + new String( ("折扣统计.xls").getBytes("GBK"),  "ISO8859_1"));
+		HSSFWorkbook wb = new HSSFWorkbook();
+		HSSFSheet sheet = wb.createSheet(title);
+		HSSFRow row = null;
+		HSSFCell cell = null;
+		initParams(wb);
+		
+		sheet.setColumnWidth(0, 5000);
+		sheet.setColumnWidth(1, 3000);
+		sheet.setColumnWidth(2, 3000);
+		sheet.setColumnWidth(3, 3000);
+		sheet.setColumnWidth(4, 3000);
+		sheet.setColumnWidth(5, 7000);
+		
+		//冻结行
+		sheet.createFreezePane(0, 4, 0, 4);
+		
+//------------------报表头
+		row = sheet.createRow(0);
+		row.setHeight((short) 550);
+		
+		cell = row.createCell(0);
+		cell.setCellValue(title);
+		cell.setCellStyle(titleStyle);
+		
+		//合并单元格
+		sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, 5));
+//---------------摘要------------------		
+		row = sheet.createRow(sheet.getLastRowNum() + 1);
+		row.setHeight((short) 350);
+		
+		cell = row.createCell(0);
+		
+		cell.setCellValue("日期: " + beginDate + "  至  " + endDate +  "         折扣总额: " + totalDiscountPrice);
+//		cell.setCellStyle(strStyle);
+		
+		sheet.addMergedRegion(new CellRangeAddress(sheet.getLastRowNum(), sheet.getLastRowNum(), 0, 5));
+//----------------		
+//----------------空白
+		row = sheet.createRow(sheet.getLastRowNum() + 1);
+		row.setHeight((short) 350);
+		sheet.addMergedRegion(new CellRangeAddress(sheet.getLastRowNum(), sheet.getLastRowNum(), 0, 5));
+		
+		row = sheet.createRow(sheet.getLastRowNum() + 1);
+		row.setHeight((short) 350);
+		
+		cell = row.createCell(0);
+		cell.setCellValue("日期");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell(row.getLastCellNum());
+		cell.setCellValue("账单号");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell(row.getLastCellNum());
+		cell.setCellValue("折扣额");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell(row.getLastCellNum());
+		cell.setCellValue("实收金额");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell(row.getLastCellNum());
+		cell.setCellValue("操作人");
+		cell.setCellStyle(headerStyle);
+		
+		cell = row.createCell(row.getLastCellNum());
+		cell.setCellValue("备注");
+		cell.setCellStyle(headerStyle);
+		
+		for (Order order : list) {
+			row = sheet.createRow(sheet.getLastRowNum() + 1);
+			row.setHeight((short) 350);
+			
+			cell = row.createCell(0);
+			cell.setCellValue(DateUtil.format(order.getOrderDate()));
+			cell.setCellStyle(strStyle);
+			
+			cell = row.createCell(row.getLastCellNum());
+			cell.setCellValue(order.getId());
+			cell.setCellStyle(strStyle);
+			
+			cell = row.createCell(row.getLastCellNum());
+			cell.setCellValue(order.getDiscountPrice());
+			cell.setCellStyle(numStyle);
+			
+			cell = row.createCell(row.getLastCellNum());
+			cell.setCellValue(order.calcTotalPrice());
+			cell.setCellStyle(numStyle);
+			
+			cell = row.createCell(row.getLastCellNum());
+			cell.setCellValue(order.getActualPrice());
+			cell.setCellStyle(numStyle);
+			
+			cell = row.createCell(row.getLastCellNum());
+			cell.setCellValue(order.getWaiter());
+			cell.setCellStyle(strStyle);
+			
+			cell = row.createCell(row.getLastCellNum());
+			cell.setCellValue(order.getComment());
+			cell.setCellStyle(strStyle);
+			
+		}
+		
+		OutputStream os = response.getOutputStream();
+		wb.write(os);
+		os.flush();
+		os.close();
+		
+		return null;
+	}	
+	
+	
 	public ActionForward commissionTotalList(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws UnsupportedEncodingException, Exception, SQLException, BusinessException{
 		response.setContentType("application/vnd.ms-excel;");
 		
@@ -2885,14 +3043,21 @@ public class HistoryStatisticsAction extends DispatchAction{
 		String beginDate = request.getParameter("beginDate");
 		String endDate = request.getParameter("endDate");
 		String staffId = request.getParameter("staffId");
+		String opening = request.getParameter("opening");
+		String ending = request.getParameter("ending");
 		
-		DutyRange range = new DutyRange(beginDate, endDate);
-		List<RepaidStatistics> list = new ArrayList<RepaidStatistics>();
-		if(staffId != null && !staffId.equals("-1") && !staffId.isEmpty()){
-			list = CalcBillStatisticsDao.calcRepaidStatByStaff(staff, range, Integer.parseInt(staffId), DateType.HISTORY);
-		}else{
-			list = CalcBillStatisticsDao.calcRepaidStat(staff, range, DateType.HISTORY);
+		CalcRepaidStatisticsDao.ExtraCond extraCond = new CalcRepaidStatisticsDao.ExtraCond(DateType.HISTORY);
+		
+		if(opening != null && !opening.isEmpty()){
+			extraCond.setHourRange(new HourRange(opening, ending));
 		}
+		
+		if(staffId != null && !staffId.isEmpty() && !staffId.equals("-1")){
+			extraCond.setStaffId(Integer.valueOf(staffId));
+		}
+		
+		List<RepaidStatistics> list;
+		list = CalcRepaidStatisticsDao.getRepaidIncomeDetail(staff, new DutyRange(beginDate, endDate), extraCond);
 		
 		String title = "反结账统计";
 		

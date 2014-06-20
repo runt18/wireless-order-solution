@@ -19,6 +19,7 @@ import com.wireless.json.JObject;
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.pojo.billStatistics.DutyRange;
+import com.wireless.pojo.billStatistics.HourRange;
 import com.wireless.pojo.billStatistics.cancel.CancelIncomeByDept;
 import com.wireless.pojo.billStatistics.cancel.CancelIncomeByEachDay;
 import com.wireless.pojo.billStatistics.cancel.CancelIncomeByReason;
@@ -26,6 +27,7 @@ import com.wireless.pojo.billStatistics.cancel.CancelIncomeByStaff;
 import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.menuMgr.Department.DeptId;
 import com.wireless.pojo.staffMgr.Staff;
+import com.wireless.pojo.util.DateUtil;
 import com.wireless.util.DataPaging;
 import com.wireless.util.DateType;
 import com.wireless.util.WebParams;
@@ -46,6 +48,8 @@ public class QueryCancelledFoodAction extends DispatchAction{
 			String deptID = request.getParameter("deptID");
 			String reasonID = request.getParameter("reasonID");
 			String staffID = request.getParameter("staffID");
+			String opening = request.getParameter("opening");
+			String ending = request.getParameter("ending");
 			
 			if(dateBeg == null || dateBeg.trim().isEmpty()){
 				jobject.initTip(false, WebParams.TIP_TITLE_ERROE, WebParams.TIP_CODE_ERROE, "操作失败, 请指定统计日期开始时间.");
@@ -73,6 +77,9 @@ public class QueryCancelledFoodAction extends DispatchAction{
 			}
 			if(staffID != null && !staffID.isEmpty() && !staffID.equals("-1")){
 				extraCond.setStaffId(Integer.valueOf(staffID));
+			}
+			if(opening != null && !opening.isEmpty()){
+				extraCond.setHourRange(new HourRange(opening, ending, DateUtil.Pattern.HOUR));
 			}
 			
 			List<OrderFood> cancelList = OrderFoodDao.getSingleDetail(staff, extraCond, null);
@@ -121,6 +128,8 @@ public class QueryCancelledFoodAction extends DispatchAction{
 		String deptID = request.getParameter("deptID");
 		String reasonID = request.getParameter("reasonID");
 		String staffID = request.getParameter("staffID");
+		String opening = request.getParameter("opening");
+		String ending = request.getParameter("ending");
 		
 		JObject jobject = new JObject();
 		
@@ -135,6 +144,9 @@ public class QueryCancelledFoodAction extends DispatchAction{
 			}
 			if(staffID != null && !staffID.isEmpty() && !staffID.equals("-1")){
 				extraCond.setStaffId(Integer.valueOf(staffID));
+			}
+			if(opening != null && !opening.isEmpty()){
+				extraCond.setHourRange(new HourRange(opening, ending, DateUtil.Pattern.HOUR));
 			}
 			
 			List<CancelIncomeByEachDay> cancelList = CalcCancelStatisticsDao.calcCancelIncomeByEachDay(StaffDao.verify(Integer.parseInt(pin)), new DutyRange(dateBeg, dateEnd), extraCond);
@@ -186,6 +198,8 @@ public class QueryCancelledFoodAction extends DispatchAction{
 		String deptID = request.getParameter("deptID");
 		String reasonID = request.getParameter("reasonID");
 		String staffID = request.getParameter("staffID");
+		String opening = request.getParameter("opening");
+		String ending = request.getParameter("ending");
 		
 		JObject jobject = new JObject();
 		
@@ -200,6 +214,9 @@ public class QueryCancelledFoodAction extends DispatchAction{
 			}
 			if(staffID != null && !staffID.isEmpty() && !staffID.equals("-1")){
 				extraCond.setStaffId(Integer.valueOf(staffID));
+			}
+			if(opening != null && !opening.isEmpty()){
+				extraCond.setHourRange(new HourRange(opening, ending, DateUtil.Pattern.HOUR));
 			}
 			
 			List<CancelIncomeByReason> cancelList = CalcCancelStatisticsDao.calcCancelIncomeByReason(StaffDao.verify(Integer.parseInt(pin)), new DutyRange(dateBeg, dateEnd), extraCond);
@@ -228,6 +245,8 @@ public class QueryCancelledFoodAction extends DispatchAction{
 		String deptID = request.getParameter("deptID");
 		String reasonID = request.getParameter("reasonID");
 		String staffID = request.getParameter("staffID");
+		String opening = request.getParameter("opening");
+		String ending = request.getParameter("ending");
 		
 		JObject jobject = new JObject();
 		
@@ -242,6 +261,9 @@ public class QueryCancelledFoodAction extends DispatchAction{
 			}
 			if(staffID != null && !staffID.isEmpty() && !staffID.equals("-1")){
 				extraCond.setStaffId(Integer.valueOf(staffID));
+			}
+			if(opening != null && !opening.isEmpty()){
+				extraCond.setHourRange(new HourRange(opening, ending, DateUtil.Pattern.HOUR));
 			}
 			
 			List<CancelIncomeByStaff> cancelList = CalcCancelStatisticsDao.calcCancelIncomeByStaff(StaffDao.verify(Integer.parseInt(pin)), new DutyRange(dateBeg, dateEnd), extraCond);
@@ -270,6 +292,8 @@ public class QueryCancelledFoodAction extends DispatchAction{
 		String deptID = request.getParameter("deptID");
 		String reasonID = request.getParameter("reasonID");
 		String staffID = request.getParameter("staffID");
+		String opening = request.getParameter("opening");
+		String ending = request.getParameter("ending");
 		
 		JObject jobject = new JObject();
 		
@@ -284,6 +308,9 @@ public class QueryCancelledFoodAction extends DispatchAction{
 			}
 			if(staffID != null && !staffID.isEmpty() && !staffID.equals("-1")){
 				extraCond.setStaffId(Integer.valueOf(staffID));
+			}
+			if(opening != null && !opening.isEmpty()){
+				extraCond.setHourRange(new HourRange(opening, ending, DateUtil.Pattern.HOUR));
 			}
 			
 			List<CancelIncomeByDept> cancelList = CalcCancelStatisticsDao.calcCancelIncomeByDept(StaffDao.verify(Integer.parseInt(pin)), new DutyRange(dateBeg, dateEnd), extraCond);
