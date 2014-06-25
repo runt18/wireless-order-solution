@@ -5,7 +5,7 @@ import java.util.Date;
 
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.OrderFood;
-import com.wireless.pojo.menuMgr.Food;
+import com.wireless.pojo.menuMgr.ComboFood;
 import com.wireless.pojo.printScheme.PStyle;
 import com.wireless.pojo.printScheme.PType;
 import com.wireless.print.PVar;
@@ -15,11 +15,11 @@ public class OrderDetailContent extends ConcreteContent {
 
 	private String mPrintTemplate;
 	private final OrderFood mParent;
-	private final Food mChild;
+	private final ComboFood mChild;
 	private final String mWaiter;
 	private final Order mOrder;
 
-	public OrderDetailContent(OrderFood parent, Food child, Order order, String waiter, PType printType, PStyle style) {
+	public OrderDetailContent(OrderFood parent, ComboFood child, Order order, String waiter, PType printType, PStyle style) {
 		super(printType, style);		
 		mPrintTemplate = WirelessSocketServer.printTemplates.get(PType.PRINT_ORDER_DETAIL).get(style);
 		mParent = parent;

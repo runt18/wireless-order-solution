@@ -21,7 +21,7 @@ import com.wireless.pojo.client.MemberOperation;
 import com.wireless.pojo.client.MemberType.Attribute;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.OrderFood;
-import com.wireless.pojo.menuMgr.Food;
+import com.wireless.pojo.menuMgr.ComboFood;
 import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.pojo.printScheme.PType;
 import com.wireless.pojo.printScheme.PrintFunc;
@@ -159,7 +159,7 @@ public class JobContentFactory {
 					if(func.isTypeMatched(printType)){
 						for(OrderFood of : order.getOrderFoods()){
 							if(of.asFood().isCombo()){
-								for(Food childFood : of.asFood().getChildFoods()){
+								for(ComboFood childFood : of.asFood().getChildFoods()){
 									if(func.isKitchenAll()){
 										//Add the detail content of this child order food to the job contents.
 										jobContents.add(new JobContent(printer, func.getRepeat(), printType,
@@ -171,7 +171,7 @@ public class JobContentFactory {
 																			   				  printer.getStyle())));
 									}else{
 										for(Kitchen kitchen : func.getKitchens()){
-											if(kitchen.equals(childFood.getKitchen())){
+											if(kitchen.equals(childFood.asFood().getKitchen())){
 												//Add the detail content of this child order food matched the kitchen to the job contents.
 												jobContents.add(new JobContent(printer, func.getRepeat(), printType,
 																			   new OrderDetailContent(of, 

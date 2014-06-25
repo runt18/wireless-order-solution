@@ -1,7 +1,7 @@
 package com.wireless.print.content;
 
 import com.wireless.pojo.dishesOrder.OrderFood;
-import com.wireless.pojo.menuMgr.Food;
+import com.wireless.pojo.menuMgr.ComboFood;
 import com.wireless.pojo.printScheme.PStyle;
 import com.wireless.pojo.printScheme.PType;
 import com.wireless.pojo.util.NumericUtil;
@@ -23,7 +23,7 @@ public class ComboDetail4ListContent extends ConcreteContent {
 		if(mOrderFood.asFood().isCombo()){
 			StringBuilder var = new StringBuilder();
 			var.append(new FoodDetailContent(mDisplayConfig, mOrderFood, mPrintType, mStyle).toString());
-			for(Food subFood : mOrderFood.asFood().getChildFoods()){
+			for(ComboFood subFood : mOrderFood.asFood().getChildFoods()){
 				var.append(SEP).append(" |-").append(subFood.getName() + "(" + NumericUtil.float2String2(subFood.getAmount() * mOrderFood.getCount()) + ")");
 			}
 			return var.toString();

@@ -1,7 +1,7 @@
 package com.wireless.print.content;
 
 import com.wireless.pojo.dishesOrder.OrderFood;
-import com.wireless.pojo.menuMgr.Food;
+import com.wireless.pojo.menuMgr.ComboFood;
 import com.wireless.pojo.printScheme.PStyle;
 import com.wireless.pojo.printScheme.PType;
 import com.wireless.pojo.util.NumericUtil;
@@ -11,9 +11,9 @@ public class ComboDetailContent extends ConcreteContent {
 
 	private final DisplayConfig mDisplayConfig;
 	private final OrderFood mParent;
-	private final Food mChild;
+	private final ComboFood mChild;
 	
-	public ComboDetailContent(DisplayConfig config, OrderFood parent, Food child, PType printType, PStyle style){
+	public ComboDetailContent(DisplayConfig config, OrderFood parent, ComboFood child, PType printType, PStyle style){
 		super(printType, style);
 		mDisplayConfig = config;
 		mParent = parent;
