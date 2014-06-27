@@ -38,8 +38,14 @@ var co={
 	table : {},
 	newFood : [],
 	ot : {
-		newTaste : []
-	}
+		newTaste : [],
+		allBillTaste : []
+	},
+	kitchenPagingStart : 0,
+	kitchenPagingLimit : 10,
+	kitchenPagingData : [],
+	deptPagingStart : 0,
+	deptPagingLimit : 11,
 };
 //查看和修改账单操作包,cf为cancelFood缩写
 var uo={
@@ -186,7 +192,7 @@ var ss = {
 
 <div id="divCreateOrder" class="box-vertical content">
 	<div id="divNorthForCreateOrder" class="box-horizontal" style="margin-right: 2px;">
-    	<div style="width: 218px; margin-right: 2px;">
+    	<div style="width: 137px; margin-right: 2px;">
     		<div id="divNFCOTableBasicMsg" class="button-base" style="line-height: 30px; height: 60px; background: #FFD700; ">
     			<div>888</div>
     			<div>一路发</div>
@@ -196,8 +202,12 @@ var ss = {
     		</div>
 		</div>
 		<div class="div-full">
-			<div id="divSelectDeptForOrder" class="box-horizontal" > </div>
-			<div id="divSelectKitchenForOrder" class="box-horizontal"> </div>
+			<div id="divSelectDeptForOrder" class="box-horizontal" ></div>
+			<div > 
+				<div id="divSelectKitchenForOrder" class="box-horizontal" style="float : left"></div>
+				<div id="divKitchenPagingPrevious" onClick="co.kitchenGetPreviousPage()" style="float : left;margin-top: 1px;display:none;line-height:60px;width:60px !important;" class="button-base-paging">上页</div>
+				<div id="divKitchenPagingNext" onClick="co.kitchenGetNextPage()" style="float : left;margin-top: 1px;display:none;line-height:60px; margin-left: 1px;" class="button-base-paging">下页</div>
+			</div>
 		</div>
   	</div>
   	<div id="divCenterForCreateOrde" class="box-horizontal">
@@ -212,6 +222,13 @@ var ss = {
 	      	<!-- <div class="button-base" >催菜</div> -->
 	      	<div class="button-base" onClick="co.foodHangup({type:2})">叫起</div>
 	      	<div class="button-base" onClick="co.foodHangup({type:1})">全单叫起</div>
+	      	<div id="divCFCOHandlerMore" class="button-base" >更多</div>
+	      	
+	      	<div id="divCFCOHandlerMoreContent" style="position : relative;top : -61px;left: 80px;z-index:9999;display : none;">
+	      		<div style="float :left; margin-left: 1px;" class="button-base" onClick="">操作一</div>
+	      		<div style="position : relative; top : -61px; left: 81px;float :left; margin-left: 1px;" class="button-base" onClick="">操作二</div>
+	      	</div>
+	      
     	</div>
     	<div id="divCFCOAllFood" class="div-full" style="overflow-y: auto;"></div>
   	</div>
@@ -225,7 +242,7 @@ var ss = {
   		<div class="button-base" style="margin-right: 2px;" onClick="Util.scroll({otype:'down', content:'divCFCONewFood', size:80})">下翻</div>
   		<div class="div-full">&nbsp;</div>
   		<div class="button-base" style="margin-left: 2px; " onClick="co.submit({notPrint : false})">下单</div>
-  		<div class="button-base" style="margin-left: 2px; width: 100px;" onClick="co.submit({notPrint : true})">下单不打印</div>
+  		<div class="button-base" style="margin-left: 2px; width: 100px;" onClick="validNotPrint({notPrint : true})">下单不打印</div>
   		<div class="button-base" style="margin-left: 2px; width: 90px;" onClick="co.submit({notPrint : false, tempPrint: true})">下单暂结</div>
   		<div class="button-base" style="margin-left: 2px;" onClick="co.s.entry()">搜索</div>
   		<div class="button-base" style="margin-left: 2px;" onClick="co.s.foodAlias()">助记码</div>
@@ -281,8 +298,9 @@ var ss = {
 		<div id="divCenterForOperateTaste" class="box-vertical" style="width: 310px; border-left: 1px solid #FFF;">
 			<div id="divCFOTTasteChange" class="box-horizontal" style="line-height: 60px;">
 				<div id="divButtonForCommonTaste" class="button-base" style="width: 103px;" onClick="co.ot.changeTaste({type:parseInt(this.getAttribute('data-value'))})" data-value=1>常用口味</div>
-				<div id="divButtonForAllTaste" class="button-base" style="width: 100px; margin: 0 1px 0 1px;" onClick="co.ot.changeTaste({type:parseInt(this.getAttribute('data-value'))})" data-value=2>所有口味</div>
-				<div id="divButtonForGuiGeTaste" class="button-base" style="width: 103px;" onClick="co.ot.changeTaste({type:parseInt(this.getAttribute('data-value'))})" data-value=3>口味组</div>
+				<!-- <div id="divButtonForAllTaste" class="button-base" style="width: 100px; margin: 0 1px 0 1px;" onClick="co.ot.changeTaste({type:parseInt(this.getAttribute('data-value'))})" data-value=2>所有口味</div> -->
+				<div id="divButtonForGuiGeTaste" class="button-base" style="width: 100px;margin: 0 1px 0 1px;" onClick="co.ot.changeTaste({type:parseInt(this.getAttribute('data-value'))})" data-value=3>口味组</div>
+				<div id="divButtonForTempTaste" class="button-base" style="width: 103px;" onClick="co.ot.changeTaste({type:parseInt(this.getAttribute('data-value'))})" data-value=4>临时口味</div>
 			</div>
 			<div id="divCFOTTasteSelectContent" class="div-full"></div>
 		</div>
