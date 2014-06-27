@@ -915,7 +915,7 @@ function showCancelDetailChart(jdata){
         tooltip: {
             formatter: function() {
                 return '<b>' + this.series.name + '</b><br/>'+
-                    this.x +': '+ '<b>'+this.y+'</b> ';
+                    this.x.substring(0, 10) +': '+ '<b>'+this.y+'</b> ';
             }
         },
         series : chartData.ser,
