@@ -306,7 +306,8 @@ co.ot.show = function(c){
 		});
 		return;
 	}
-	co.ot.foodData = foodData;
+	//全单口味
+	co.ot.foodData = c.type == 1 ? {} :foodData;
 	
 	Util.dialongDisplay({
 		type : 'show',
@@ -327,12 +328,32 @@ co.ot.show = function(c){
 	
 	co.ot.changeTaste({
 		foodData : co.ot.foodData,
-		type : 1,
+		type : c.type == 1 ? 2 :1,//全单口味时显示所有口味
 		event : $('#divCFOTTasteChange > div[data-value=1]'),
 		change : true
 	});
-	//
-	co.ot.newTaste = typeof co.ot.foodData.tasteGroup == 'undefined' ? [] : co.ot.foodData.tasteGroup.normalTasteContent.slice(0);
+	
+	var foodTasteGroup = [];
+	
+	//普通口味时
+	if(c.type == 2){
+		if(typeof co.ot.foodData.tasteGroup != 'undefined'){
+			foodTasteGroup = co.ot.foodData.tasteGroup.normalTasteContent.slice(0);
+			//临时口味
+			if(typeof co.ot.foodData.tasteGroup.tmpTaste != 'undefined'){
+				foodTasteGroup.push(co.ot.foodData.tasteGroup.tmpTaste);
+			}
+		}	
+	}else{
+		if(co.ot.allBillTaste.length != 0){
+			foodTasteGroup = foodTasteGroup.concat(co.ot.allBillTaste);
+		}
+	}
+
+	
+	//全单口味则只把全单类型的放入
+	co.ot.newTaste = foodTasteGroup;
+	
 	co.ot.initNewTasteContent();
 };
 /**
@@ -343,6 +364,8 @@ co.ot.back = function(){
 		type:'hide', 
 		renderTo:'divOperateBoxForFoodTaste'
 	});
+	//清空临时口味id
+	co.ot.tasteId = null;
 	co.ot.foodData = null;
 	co.ot.newTaste = [];
 	$('#divCFOTHasTasteContent').html('');
@@ -392,14 +415,43 @@ co.ot.changeTaste = function(c){
 				alert('加载菜品常用口味数据失败.');
 			}
 		});
-	}else if(c.type == 2){
+	}
+	else if(c.type == 2){
 		// 所有口味
 		co.ot.tp = co.ot.atp;
 		co.ot.tp.getFirstPage();
-	}else if(c.type == 3){
+	}
+	else if(c.type == 3){
 		// 口味组
 		co.ot.tp = co.ot.tctp;
 		co.ot.tp.getFirstPage();
+	}else if(c.type == 4){
+		var tempHtml = '<div style="color: #FFF; font-weight: bold; font-size: 28px; line-height : 40px;height : 40px">' +
+							'口味名称:<input value="临时口味" id="txtTempTasteName" type="text" style="width: 150px; height: 35px; background: yellow; font-weight: bold; font-size: 28px">' +
+						'</div>' +
+						'<div style="color: #FFF; font-weight: bold; font-size: 28px; line-height : 40px;height : 40px;margin-top:5px;">' +
+							'口味价钱:<input value="88" id="txtTempTasteUnitPrice" type="text" style="width: 150px; height: 35px; background: yellow; font-weight: bold; font-size: 28px">' +
+						'</div>'+
+						'<div id="divNumForTempTaste">'+
+							'<div class="button-base" onClick="co.setValueToTasteUnitPrice({value:7})">7</div>' +
+							'<div class="button-base" onClick="co.setValueToTasteUnitPrice({value:8})">8</div>' +
+							'<div class="button-base" onClick="co.setValueToTasteUnitPrice({value:9})">9</div>' +
+							'<div class="button-base" onClick="co.setValueToTasteUnitPrice({value:4})">4</div>' +
+							'<div class="button-base" onClick="co.setValueToTasteUnitPrice({value:5})">5</div>' +
+							'<div class="button-base" onClick="co.setValueToTasteUnitPrice({value:6})">6</div>' +
+							'<div class="button-base" onClick="co.setValueToTasteUnitPrice({value:1})">1</div>' +
+							'<div class="button-base" onClick="co.setValueToTasteUnitPrice({value:2})">2</div>' +
+							'<div class="button-base" onClick="co.setValueToTasteUnitPrice({value:3})">3</div>' +
+							'<div class="button-base" onClick="co.setValueToTasteUnitPrice({value:0})">0</div>' +
+							'<div class="button-base" onClick="co.setValueToTasteUnitPrice({type:1})">&laquo;</div>' +
+							'<div class="button-base" onClick="co.setValueToTasteUnitPrice({type:2})">&laquo;&laquo;</div>' +
+						'</div>' +
+						'<div class="box-horizontal" style="line-height:40px; width: 100%;">' +
+							'<div style="font-weight:bold;text-align:center;background: #4EEE99;line-height: 40px; width: 49%;" onClick="co.insertNewTempTaste()">添加</div>' +
+							'<div style="font-weight:bold;text-align:center;background: #4EEE99;line-height: 40px; width: 49%; margin-left: 2%;" onClick="co.clearTempTaste()">清空</div>' +
+						'</div>';
+		getDom('divCFOTTasteSelectContent').innerHTML = tempHtml;
+	
 	}
 };
 /**
@@ -441,17 +493,22 @@ co.ot.insertTaste = function(c){
 	}
 	var has = false;
 	var data = {};
-	for(var i = 0; i < co.ot.tp.getPageData().length; i++){
-		if(co.ot.tp.getPageData()[i].taste.id == c.tasteId){
-			data = co.ot.tp.getPageData()[i].taste;
-			// 
-			for(var j = 0; j < co.ot.newTaste.length; j++){
-				if(co.ot.newTaste[j].id == data.id){
-					has = true;
-					break;
+	//临时口味
+	if(c.data){
+		data = c.data;
+	}else{
+		for(var i = 0; i < co.ot.tp.getPageData().length; i++){
+			if(co.ot.tp.getPageData()[i].taste.id == c.tasteId){
+				data = co.ot.tp.getPageData()[i].taste;
+				// 
+				for(var j = 0; j < co.ot.newTaste.length; j++){
+					if(co.ot.newTaste[j].id == data.id){
+						has = true;
+						break;
+					}
 				}
+				break;
 			}
-			break;
 		}
 	}
 	if(!has){
@@ -476,6 +533,23 @@ co.ot.deleteTaste = function(c){
 	}
 	//
 	co.ot.initNewTasteContent();
+};
+
+co.ot.updateTaste = function(c){
+	if(c == null || typeof c.tasteId != 'number'){
+		return;
+	}
+	$('#divButtonForTempTaste').click();
+	co.ot.tasteId = c.tasteId;
+	co.ot.updateTempTaste = true;
+	for(var i = 0; i < co.ot.newTaste.length; i++){
+		if(co.ot.newTaste[i].id == c.tasteId){
+			getDom('txtTempTasteUnitPrice').value = co.ot.newTaste[i].price;
+			getDom('txtTempTasteName').value = co.ot.newTaste[i].name;
+			break;
+		}
+	}
+	
 };
 
 function clone(myObj){
@@ -507,34 +581,89 @@ co.ot.save = function(c){
 	tasteGroup.normalTaste.name = '';
 	tasteGroup.normalTaste.price = 0;
 	tasteGroup.normalTasteContent = [];
+	if(typeof tasteGroup.tmpTaste != 'undefined'){
+		delete tasteGroup.tmpTaste;
+	}
 	
 	var temp = null;
 	for(var i = 0; i < co.ot.newTaste.length; i++){
 		temp = co.ot.newTaste[i];
-		tasteGroup.normalTasteContent.push(temp);
-		tasteGroup.normalTaste.name += (i > 0 ? ',' + temp.name : temp.name);
-		if(temp.cateStatusValue == 2){
-			tasteGroup.normalTaste.price += temp.price;
-		}else if(temp.cateStatusValue == 1){
-			tasteGroup.normalTaste.price += co.ot.foodData.unitPrice * temp.rate;
+		if(co.ot.allBill == 1){
+			temp.allBill = true;
+		}
+		//临时口味
+		if(temp.isTemp){
+			tasteGroup.tmpTaste = temp;
+			tasteGroup.normalTaste.name += (i > 0 ? ',' + temp.name : temp.name);
+			tasteGroup.normalTaste.price += parseInt(temp.price);
+		}else{
+			tasteGroup.normalTasteContent.push(temp);
+			tasteGroup.normalTaste.name += (i > 0 ? ',' + temp.name : temp.name);
+			if(temp.cateStatusValue == 2){
+				tasteGroup.normalTaste.price += temp.price;
+			}else if(temp.cateStatusValue == 1){
+				tasteGroup.normalTaste.price += co.ot.foodData.unitPrice * temp.rate;
+			}
 		}
 	}
 	tasteGroup.tastePref = tasteGroup.normalTaste.name;
 	tasteGroup.price = tasteGroup.normalTaste.price;
 	
 	if(co.ot.allBill == 1){
+		co.ot.allBillTaste = co.ot.newTaste;
 		for(var i = 0; i < co.newFood.length; i++){
+			
 			if(typeof co.newFood[i].isTemporary == 'undefined'){
-				co.newFood[i].tasteGroup = clone(tasteGroup);
+				
+//				co.newFood[i].tasteGroup = clone(tasteGroup);
+				
+				//全单口味应该是拼接普通口味
+				if(co.newFood[i].tasteGroup.tastePref == "无口味"){
+					co.newFood[i].tasteGroup.tastePref = "";
+				} 
+				
+				//全单口味重新赋值
+				for (var j = 0; j < co.newFood[i].tasteGroup.normalTasteContent.length; j++) {
+					if(co.newFood[i].tasteGroup.normalTasteContent[j].allBill){
+						co.newFood[i].tasteGroup.normalTasteContent.splice(j, 1);
+						j --;
+					}
+				}
+				
+				if(co.newFood[i].tmpTaste){
+					delete co.newFood[i].tmpTaste;
+				}
+				
+				co.newFood[i].tasteGroup.tastePref = '';
+				co.newFood[i].tasteGroup.price = 0;
+				
+				for (var k = 0; k < co.newFood[i].tasteGroup.normalTasteContent.length; k++) {
+					
+					if(!co.newFood[i].tasteGroup.normalTasteContent[k].allBill){
+						co.newFood[i].tasteGroup.tastePref +=  co.newFood[i].tasteGroup.normalTasteContent[k].name;
+						co.newFood[i].tasteGroup.price += co.newFood[i].tasteGroup.normalTasteContent[k].price;
+					}
+
+				}
+				
+				co.newFood[i].tasteGroup.tastePref += co.newFood[i].tasteGroup.tastePref.trim().length > 0  ? (tasteGroup.tastePref.trim().length>0 ? "," + tasteGroup.tastePref : '') : tasteGroup.tastePref;
+				co.newFood[i].tasteGroup.price += tasteGroup.price;
+				
+				co.newFood[i].tasteGroup.normalTasteContent = co.newFood[i].tasteGroup.normalTasteContent.concat(tasteGroup.normalTasteContent);
+				
+				if(tasteGroup.tmpTaste){
+					co.newFood[i].tasteGroup.tmpTaste = clone(tasteGroup.tmpTaste);
+				}
 			}
 		}
+		
 		co.initNewFoodContent();
 		
 	}else if(co.ot.allBill == 2){
 		for(var i = 0; i < co.newFood.length; i++){
 			if(co.newFood[i].id == co.ot.foodData.id){
 				co.newFood[i].tasteGroup = tasteGroup;
-				break;
+				break; 
 			}
 		}
 		co.initNewFoodContent({
@@ -548,6 +677,22 @@ co.ot.save = function(c){
 };
 
 /*** -------------------------------------------------- ***/
+
+function validNotPrint(c){
+	Util.msg.alert({
+		title : '提示',
+		msg : '是否不打印?', 
+		buttons : 'YESBACK',
+		fn : function(btn){
+			if(btn == 'yes'){
+				co.submit(c);
+			}else{
+				return;
+			}
+		}
+	});
+}
+
 /**
  * 账单提交
  */
@@ -562,7 +707,7 @@ co.submit = function(c){
 		});
 		return;
 	}
-	
+
 	var foodData = [], isFree = true;
 	if(co.table.statusValue == 1){
 		isFree = false;
@@ -729,3 +874,76 @@ co.setValueToFoodAlias = function (c){
 	alias.focus();
 };
 
+
+co.setValueToTasteUnitPrice = function (c){
+	var unitPrice = getDom('txtTempTasteUnitPrice');
+	if(c.type === 1){
+		unitPrice.value=unitPrice.value.substring(0, unitPrice.value.length - 1);
+	}else if(c.type === 2){
+		unitPrice.value='';
+	}else{
+		unitPrice.value=unitPrice.value + '' + c.value;
+	}
+	unitPrice.focus();
+};
+
+function getRandomNum()
+{   
+	var Range = 99;   
+	var Rand = Math.random();   
+	return -(1 + Math.round(Rand * Range));   
+}   
+
+co.insertNewTempTaste = function(){
+	var name = getDom('txtTempTasteName').value;
+	var price = getDom('txtTempTasteUnitPrice').value;
+	if(name == ''){
+		return;
+	}else if(price == ''){
+		price = 0;
+	}
+	//当临时口味是修改状态时
+	if(co.ot.updateTempTaste){
+		for(var i = 0; i < co.ot.newTaste.length; i++){
+			if(co.ot.newTaste[i].id == co.ot.tasteId){
+				co.ot.newTaste[i].name = name;
+				co.ot.newTaste[i].price = price;
+				co.ot.initNewTasteContent();
+				break;
+			}
+		}
+	}else{
+		if(co.ot.tasteId){
+			co.ot.updateTempTaste = true;
+			co.insertNewTempTaste();
+		}else{
+			var tasteId = 10;
+			var tempTasteData = {
+				id : tasteId,
+				cateStatusValue : 2,
+				name : name,
+				price : price,
+				isTemp : true
+			};	
+			//FIXME 临时口味Id
+			co.ot.tasteId = tasteId;
+			co.ot.insertTaste({data:tempTasteData, tasteId:tasteId});
+		}
+	}
+	co.ot.updateTempTaste = false;
+	
+};
+
+co.clearTempTaste = function(){
+	getDom('txtTempTasteUnitPrice').value = '';
+	getDom('txtTempTasteName').value = '';
+	getDom('txtTempTasteName').focus();
+	
+	for(var i = 0; i < co.ot.newTaste.length; i++){
+		if(co.ot.newTaste[i].id == co.ot.tasteId){
+			co.ot.newTaste.splice(i, 1);
+			co.ot.initNewTasteContent();
+			break;
+		}
+	}
+};

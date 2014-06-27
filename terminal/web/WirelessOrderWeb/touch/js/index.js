@@ -15,9 +15,9 @@ var Templet={
 			+ 'onClick="ts.findTableByRegion({event:this, regionId:{value}})">{text}</div>'
 	},
 	co : {
-		dept : '<div class="button-base" data-value={value} data-type="dept-select" '
+		dept : '<div class="button-base-deptKitchen" data-value={value} data-type="dept-select" '
 			+ 'onClick="co.initKitchenContent({event:this, deptId:{value}})">{text}</div>',
-		kitchen : '<div class="button-base" data-value={value} data-type="kitchen-select" '
+		kitchen : '<div class="button-base-deptKitchen" data-value={value} data-type="kitchen-select" '
 			+ 'onClick="co.findFoodByKitchen({event:this, kitchenId:{value}})">{text}</div>',
 		boxFood : '<div data-index={dataIndex} data-value={id} class="main-box-base" onClick="{click}">'
 			+ '{name}'
@@ -43,7 +43,11 @@ var Templet={
   	  	boxNewTaste : '<div data-value={id} class="main-box-base" onClick="co.ot.deleteTaste({event:this, tasteId:{id}})">'
   	  		+ '{name}'
   	  		+ '<div>{mark}:{markText}</div>'
-  	  		+ '</div>'
+  	  		+ '</div>',
+  	  	boxNewTempTaste : '<div data-value={id} class="main-box-base" onClick="co.ot.updateTaste({event:this, tasteId:{id}})">'
+  	  		+ '{name}'
+  	  		+ '<div>{mark}:{markText}</div>'
+  	  		+ '</div>'  	  		
 	},
 	uo : {
 		orderFood : '<tr data-index={dataIndex} data-value={id} id="truoFood{dataIndex}" onclick="selectUOFood(this)">'
@@ -513,6 +517,16 @@ $(function(){
 	}else{
 		initRestaurantContent();
 	}
+	
+	$('#divCFCOHandlerMore').toggle(
+		function(){
+			$('#divCFCOHandlerMoreContent').show();
+		},
+		function(){
+			$('#divCFCOHandlerMoreContent').hide();
+		}
+	);
+	
 });
 
 /**

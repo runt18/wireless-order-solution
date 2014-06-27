@@ -14,7 +14,8 @@ co.initNewFoodContent = function(c){
 		tempUnitPrice = typeof temp.tasteGroup.price != 'number' ? 0 : parseFloat(temp.unitPrice + temp.tasteGroup.price);
 		sumCount += temp.count;
 		sumPrice += temp.count * tempUnitPrice;
-		html.push(Templet.co.newFood.format({
+		
+		var orderFoodHtmlData = {
 			dataIndex : i,
 			id : temp.id,
 			name : temp.name,
@@ -22,11 +23,20 @@ co.initNewFoodContent = function(c){
 			unitPrice : tempUnitPrice.toFixed(2),
 			totalPrice : tempUnitPrice.toFixed(2),
 			isHangup : typeof temp.isHangup == 'boolean' && temp.isHangup ? '叫起' : '',
-			isTemporary : typeof temp.isTemporary == 'boolean' && temp.isTemporary ? '临时菜' : '',
-			tasteDisplay : typeof temp.tasteGroup == 'undefined' 
+			isTemporary : typeof temp.isTemporary == 'boolean' && temp.isTemporary ? '临时菜' : ''
+		};
+		//临时口味
+		if(typeof temp.tasteGroup.tmpTaste != 'undefined'){
+			orderFoodHtmlData.tasteDisplay = temp.isTemporary == true ? '' : temp.tasteGroup.tastePref;
+		}else{
+			orderFoodHtmlData.tasteDisplay = typeof temp.tasteGroup == 'undefined' 
 				|| typeof temp.tasteGroup.normalTasteContent == 'undefined' 
-					|| temp.tasteGroup.normalTasteContent.length <= 0 || temp.isTemporary == true ? '' : temp.tasteGroup.tastePref
-		}));
+					|| temp.tasteGroup.normalTasteContent.length <= 0 || temp.isTemporary == true ? '' : temp.tasteGroup.tastePref;
+		}
+		
+		html.push(Templet.co.newFood.format(orderFoodHtmlData));
+		
+		orderFoodHtmlData = null;
 	}
 	temp = null;
 	tempUnitPrice = null;
@@ -60,14 +70,46 @@ co.initNewFoodContent = function(c){
 co.initDeptContent = function(c){
 	var dc = getDom('divSelectDeptForOrder');
 	var html = '';
-	for(var i = 0; i < deptData.root.length; i++){
-		html += Templet.co.dept.format({
-			value : deptData.root[i].id,
-			text : deptData.root[i].name
-		});
-	}
+	
+	co.deptPagingLimit = deptData.root.length > 11 ? 10 : 11;
+	
+	var limit = deptData.root.length >= co.deptPagingStart + co.deptPagingLimit ? co.deptPagingLimit : co.deptPagingLimit - (co.deptPagingStart + co.deptPagingLimit - deptData.root.length);
+	
+	if(deptData.root.length > 0){
+		for (var i = 0; i < limit ; i++) {
+			html += Templet.co.dept.format({
+				value : deptData.root[co.deptPagingStart + i].id,
+				text : deptData.root[co.deptPagingStart + i].name
+			});
+		}
+	}	
+		//FIXME 部门分页
+	if(deptData.root.length > 11){
+		html += '<div id="divDeptPagingPrevious" onClick="co.deptGetPreviousPage()" style="line-height:60px;width:60px !important;" class="button-base-paging">上页</div>' +
+				'<div id="divDeptPagingNext" onClick="co.deptGetNextPage()" style="line-height:60px; margin-left: 1px;" class="button-base-paging">下页</div>';
+	}	
 	dc.innerHTML = html;
 };
+
+co.deptGetNextPage = function(){
+	co.deptPagingStart += co.deptPagingLimit;
+	if(co.deptPagingStart > deptData.root.length){
+		co.deptPagingStart -= co.deptPagingLimit;
+		return;
+	}
+	co.initDeptContent();
+};
+
+co.deptGetPreviousPage = function(){
+	co.deptPagingStart -= co.deptPagingLimit;
+	if(co.deptPagingStart < 0){
+		co.deptPagingStart += co.deptPagingLimit;
+		return;
+	}
+	co.initDeptContent();
+};
+
+
 /**
  * 初始化分厨选择
  * @param c
@@ -80,27 +122,25 @@ co.initKitchenContent = function(c){
 		$(sl[i]).removeClass('div-deptOrKitchen-select');
 	}
 	$(c.event).addClass('div-deptOrKitchen-select');
-	// 
-	var kc = getDom('divSelectKitchenForOrder');
-	var html = Templet.co.kitchen.format({
-		value : -1,
-		text : '全部分厨'
-	});
+
+	co.kitchenPagingStart = 0;
+	co.kitchenPagingData = [];
 	var tempFoodData = []; // 菜品数据
 	var temp = null;
 	for(var i = 0; i < kitchenData.root.length; i++){
 		temp = kitchenData.root[i];
 		if(typeof c.deptId == 'number' && c.deptId != -1){
 			if(temp.dept.id == c.deptId){
-				html += Templet.co.kitchen.format({
+				co.kitchenPagingData.push({
 					value : temp.id,
 					text : temp.name
 				});
 				tempFoodData = tempFoodData.concat(temp.foods);
+				
 			}
 		}else{
 			if(temp.dept.id != -1){
-				html += Templet.co.kitchen.format({
+				co.kitchenPagingData.push({
 					value : temp.id,
 					text : temp.name
 				});
@@ -109,12 +149,65 @@ co.initKitchenContent = function(c){
 		}
 	}
 	temp = null;
-	kc.innerHTML = html;
+	
+	//FIXME
+	co.showKitchenPaging();
 	//
 	co.fp.init({
 		data : tempFoodData
 	});
 	co.fp.getFirstPage();
+};
+
+co.kitchenGetNextPage = function(){
+	co.kitchenPagingStart += co.kitchenPagingLimit;
+	if(co.kitchenPagingStart > co.kitchenPagingData.length){
+		co.kitchenPagingStart -= co.kitchenPagingLimit;
+		return;
+	}
+	co.showKitchenPaging();
+};
+
+co.kitchenGetPreviousPage = function(){
+	co.kitchenPagingStart -= co.kitchenPagingLimit;
+	if(co.kitchenPagingStart < 0){
+		co.kitchenPagingStart += co.kitchenPagingLimit;
+		return;
+	}
+	co.showKitchenPaging();
+};
+
+//显示厨房分页
+co.showKitchenPaging = function(){
+	var kc = getDom('divSelectKitchenForOrder');
+	var html = Templet.co.kitchen.format({
+		value : -1,
+		text : '全部分厨'
+	});	
+	
+	//FIXME 厨房分页
+	if(co.kitchenPagingData.length > 10){
+		co.kitchenPagingLimit = 9;
+		$('#divKitchenPagingNext').show();
+		$('#divKitchenPagingPrevious').show();
+	}else{
+		$('#divKitchenPagingNext').hide();
+		$('#divKitchenPagingPrevious').hide();
+	}	
+	
+	var limit = co.kitchenPagingData.length >= co.kitchenPagingStart + co.kitchenPagingLimit ? co.kitchenPagingLimit : co.kitchenPagingLimit - (co.kitchenPagingStart + co.kitchenPagingLimit -co.kitchenPagingData.length);
+	
+	if(co.kitchenPagingData.length > 0){
+		for (var i = 0; i < limit ; i++) {
+			html += Templet.co.kitchen.format({
+				value : co.kitchenPagingData[co.kitchenPagingStart + i].value,
+				text : co.kitchenPagingData[co.kitchenPagingStart + i].text
+			});
+		}
+	}
+	kc.innerHTML = html;	
+	
+
 };
 
 /*** -------------------------------------------------- ***/
@@ -217,12 +310,24 @@ co.ot.initNewTasteContent = function(){
 	var html = '', temp = null;
 	for(var i = 0; i < co.ot.newTaste.length; i++){
 		temp = co.ot.newTaste[i];
-		html += Templet.co.boxNewTaste.format({
-			id : temp.id,
-			name : temp.name,
-			mark : temp.cateStatusValue == 1 ? '¥' : temp.cateStatusValue == 2 ? '比例' : '',
-			markText : temp.cateStatusValue == 1 ? temp.price : temp.cateStatusValue == 2 ? temp.rate : '0.00'
-		});
+		//临时口味, 再次点击时是修改而不是删除
+		if(temp.isTemp){
+			//菜品只能有一个临时菜
+			co.ot.tasteId = temp.id;
+			html += Templet.co.boxNewTempTaste.format({
+				id : temp.id,
+				name : temp.name,
+				mark : temp.cateStatusValue == 2 ? '¥' : temp.cateStatusValue == 1 ? '比例' : '',
+				markText : temp.cateStatusValue == 2 ? temp.price : temp.cateStatusValue == 1 ? temp.rate : '0.00'
+			});			
+		}else{
+			html += Templet.co.boxNewTaste.format({
+				id : temp.id,
+				name : temp.name,
+				mark : temp.cateStatusValue == 2 ? '¥' : temp.cateStatusValue == 1 ? '比例' : '',
+				markText : temp.cateStatusValue == 2 ? temp.price : temp.cateStatusValue == 1 ? temp.rate : '0.00'
+			});
+		}
 	}
 	temp = null;
 	getDom('divCFOTHasTasteContent').innerHTML = html;
