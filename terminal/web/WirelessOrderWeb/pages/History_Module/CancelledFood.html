@@ -22,19 +22,29 @@
 
 <div id="divCancelledReasonCharts" >
 	<div id="divCancelledReasonChartChange" style="display:none;"><a href="#" class="changeChart">切换视图</a></div>
-	<div id="divCancelledReasonChart" data-type="chart" data-value="reasonChart" style="height : 300px;display:none"></div>
-	<div id="divCancelledReasonColumnChart" data-type="chart" data-value="reasonChart" style="height : 300px;display:none"></div>
+	<div>
+		<div id="divCancelledCountReasonChart" data-type="chart" data-value="reasonChart" style="height : 300px;width:50%; float : left;display:none;"></div>
+		<div id="divCancelledPriceReasonChart" data-type="chart" data-value="reasonChart_price" style="height : 300px;width:50%;float : left;display:none;"></div>
+	</div>
+	
+	<div id="divCancelledReasonColumnChart" data-type="chart" data-value="reasonColumnChart" style="height : 300px;display:none"></div>
 </div>
 
 <div id="divCancelledStaffCharts" >
 	<div id="divCancelledStaffChartChange" style="display:none;"><a href="#" class="changeChart">切换视图</a></div>
-	<div id="divCancelledStaffChart" data-type="chart" data-value="cancel_staffChart" style="height : 300px;display:none"></div>
-	<div id="divCancelledStaffColumnChart" data-type="chart" data-value="cancel_staffChart" style="height : 300px;display:none"></div>
+	<div>
+		<div id="divCancelledCountStaffChart" data-type="chart" data-value="cancel_staffChart_amount" style="height : 300px;display:none;width:50%; float : left;"></div>
+		<div id="divCancelledPriceStaffChart" data-type="chart" data-value="cancel_staffChart" style="height : 300px;display:none;width:50%; float : left;"></div>
+	</div>
+	<div id="divCancelledStaffColumnChart" data-type="chart" data-value="cancel_staffColumnChart" style="height : 300px;display:none"></div>
 </div>
 
 <div id="divCancelledDeptCharts" >
 	<div id="divCancelledDeptChartChange" style="display:none;"><a href="#" class="changeChart">切换视图</a></div>
-	<div id="divCancelledDeptChart" data-type="chart" data-value="cancel_deptChart" style="height : 300px;display:none"></div>
+	<div>
+		<div id="divCancelledCountDeptChart" data-type="chart" data-value="cancel_deptChart_amount" style="height : 300px;display:none;width:50%; float : left;"></div>
+		<div id="divCancelledPriceDeptChart" data-type="chart" data-value="cancel_deptChart" style="height : 300px;display:none;width:50%; float : left;"></div>
+	</div>	
 	<div id="divCancelledDeptColumnChart" data-type="chart" data-value="cancel_deptChart" style="height : 300px;display:none"></div>
 </div>
 </body>

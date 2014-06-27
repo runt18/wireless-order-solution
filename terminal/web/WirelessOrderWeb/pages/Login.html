@@ -332,7 +332,7 @@ function getStaff(restaurantID){
   								$('#form').hide();
   								$('#staffForm').show();
   								if($('#rememberRestaurant').is(':checked')){
-  	 								setCookie(domain+'_restaurant', jr.root[0].id, 30);
+  	 								setCookie(domain+'_restaurant', jr.root[0].id, 3600);
   								}
   								getStaff(jr.root[0].id);
   								$('#name').val("");
