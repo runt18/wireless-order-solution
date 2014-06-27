@@ -225,6 +225,18 @@ function commissionDetailInit(){
 						}
 					});
 					
+					if(commission_deptCombo.getValue() && commission_deptCombo.getValue() != -1){
+						titleCommissionDeptName = commission_deptCombo.getEl().dom.value + " -- "  ;
+					}else{
+						titleCommissionDeptName = '';
+					}
+
+					if(commission_combo_staffs.getValue() && commission_combo_staffs.getValue() != -1){
+						titleCommissionStaffName = '员工 : '+ commission_combo_staffs.getEl().dom.value ;
+					}else{
+						titleCommissionStaffName = '';
+					}
+					
 					requestParams = {
 						dataSource : 'getDetailChart',
 						dateBeg : commission_beginDate.getValue().format('Y-m-d 00:00:00'),
@@ -247,10 +259,16 @@ function commissionDetailInit(){
 					
 					if(typeof commissionStaffChart != 'undefined'){
 						commission_getStaffChartData();
-						console.log(1111);
-						$('#divCommissionStaffColumnChart').is(':visible')? commission_loadStaffColumnChart() : commission_loadStaffChart();
-						console.log($('#divCommissionStaffColumnChart').is(':visible') + ", " + commissionStatChartTabPanel.getHeight());
-						commissionStaffChart.setSize(commissionStatChartTabPanel.getWidth(), panelDrag ? commissionStatChartTabPanel.getHeight() - 60 : commissionStatChartTabPanel.getHeight()-30);
+						if($('#divCommissionStaffColumnChart').is(':visible')){
+							commission_loadStaffColumnChart();
+							commissionStaffChart.setSize(commissionStatChartTabPanel.getWidth(), panelDrag ? commissionStatChartTabPanel.getHeight() - 60 : commissionStatChartTabPanel.getHeight()-30);
+						}else{
+							commission_loadStaffChart();
+							commission_loadAmountStaffChart();
+							commissionStaffChart.setSize(commissionStatChartTabPanel.getWidth()/2, panelDrag ? commissionStatChartTabPanel.getHeight() - 60 : commissionStatChartTabPanel.getHeight()-30);
+							commissionStaffChart_amount.setSize(commissionStatChartTabPanel.getWidth()/2, panelDrag ? commissionStatChartTabPanel.getHeight() - 60 : commissionStatChartTabPanel.getHeight()-30);						
+						}
+						
 					}					
 					
 					
@@ -357,7 +375,12 @@ function commissionDetailInit(){
 
 function commission_changeChartWidth(w,h){
 	if(eval($('div:visible[data-type=commissionChart]').attr('data-value'))){
-		eval($('div:visible[data-type=commissionChart]').attr('data-value')).setSize(w, h);
+		if($('div:visible[data-type=commissionChart]').length == 1){
+			eval($('div:visible[data-type=commissionChart]').attr('data-value')).setSize(w, h);
+		}else if($('div:visible[data-type=commissionChart]').length > 1){
+			eval($($('div:visible[data-type=commissionChart]')[0]).attr('data-value')).setSize(w/2, h);
+			eval($($('div:visible[data-type=commissionChart]')[1]).attr('data-value')).setSize(w/2, h);				
+		}
 	}
 	
 }
@@ -392,7 +415,7 @@ function showCommissionDetailChart(jdata){
         	renderTo: 'divCommissionDetailChart'
     	}, 
         title: {
-            text: '<b>提成走势图（'+dateBegin+ '至' +dateEnd+'）</b>'
+            text: '<b>'+ titleCommissionDeptName +'提成走势图（'+dateBegin+ '至' +dateEnd+'）'+ titleCommissionStaffName +'</b>'
         },
         labels: {
         	items : [{
@@ -448,12 +471,16 @@ function commission_getStaffChartData(){
 		data : requestParams,
 		success : function(jr, status, xhr){
 			commissionStaffChartData.chartData.data = [];
+			commissionStaffChartData.chartAmountData.data = [];
 			commissionStaffChartData.staffColumnChart.xAxis = [];
 			commissionStaffChartData.staffColumnChart.yAxis.data = [];
+			commissionStaffChartData.staffColumnChart.yAxisAmount.data = [];
 			for (var i = 0; i < jr.root.length; i++) {
 				commissionStaffChartData.chartData.data.push([jr.root[i].staffName, jr.root[i].commissionPrice]);
+				commissionStaffChartData.chartAmountData.data.push([jr.root[i].staffName, jr.root[i].commissionAmount]);
 				commissionStaffChartData.staffColumnChart.xAxis.push(jr.root[i].staffName);
 				commissionStaffChartData.staffColumnChart.yAxis.data.push({y : jr.root[i].commissionPrice, color : colors[i]}); 
+				commissionStaffChartData.staffColumnChart.yAxisAmount.data.push({y : jr.root[i].commissionAmount, color : colors[i]});
 			}
 		},
 		failure : function(res, opt){
@@ -468,7 +495,7 @@ function commission_loadStaffChart(){
 	
 	commissionStaffChart = new Highcharts.Chart({
 	    chart: {
-	    	renderTo : 'divCommissionStaffChart',
+	    	renderTo : 'divCommissionPriceStaffChart',
 	        plotBackgroundColor: null,
 	        plotBorderWidth: null,
 	        plotShadow: false
@@ -495,6 +522,37 @@ function commission_loadStaffChart(){
 	});				
 }
 
+function commission_loadAmountStaffChart(){
+	
+	commissionStaffChart_amount = new Highcharts.Chart({
+	    chart: {
+	    	renderTo : 'divCommissionAmountStaffChart',
+	        plotBackgroundColor: null,
+	        plotBorderWidth: null,
+	        plotShadow: false
+	    },
+	    title: {
+	        text: '员工提成数量比例图'
+	    },
+	    tooltip: {
+		    pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+	    },
+	    plotOptions: {
+	        pie: {
+	            allowPointSelect: true,
+	            cursor: 'pointer',
+	            dataLabels: {
+	                enabled: true,
+	                color: '#000000',
+	                connectorColor: '#000000',
+	                format: '<b>{point.name}</b>: {point.y} 份'
+	            }
+	        }
+	    },
+	    series: [commissionStaffChartData.chartAmountData]
+	});				
+}
+
 
 function commission_loadStaffColumnChart(){
  	commissionStaffChart = new Highcharts.Chart({
@@ -511,11 +569,11 @@ function commission_loadStaffColumnChart(){
         yAxis: {
             min: 0,
             title: {
-                text: '金额 (元)'
+                text: '金额 / 数量'
             }
         },
         tooltip: {
-            pointFormat: '<table><tbody><tr><td style="color:red;padding:0">金额: </td><td style="padding:0"><b>{point.y} 元</b></td></tr></tbody></table>',
+            pointFormat: '<table><tbody><tr><td style="color:red;padding:0">{series.name}: </td><td style="padding:0"><b>{point.y} </b></td></tr></tbody></table>',
             shared: true,
             useHTML: true
         },
@@ -525,16 +583,19 @@ function commission_loadStaffColumnChart(){
                 borderWidth: 0
             }
         },
-        series: [commissionStaffChartData.staffColumnChart.yAxis]
+        series: [commissionStaffChartData.staffColumnChart.yAxis, commissionStaffChartData.staffColumnChart.yAxisAmount]
     });	
 }
 
 var requestParams, panelDrag = false;
 var commissionStatChartTabPanel;
 var commissionDetailChart, commissionStaffChartPanel;
-var commissionDetailChart, commissionStaffChart;
+var commissionDetailChart, commissionStaffChart, commissionStaffChart_amount;
 var colors = Highcharts.getOptions().colors;
-var commissionStaffChartData = {chartData : {type : 'pie', name : '比例', data : []}, staffColumnChart : {xAxis : [], yAxis : {name : '员工提成', data : [],
+var commissionStaffChartData = {chartData : {type : 'pie', name : '比例', data : []}, 
+							chartAmountData : {type : 'pie', name : '比例', data : []},
+							staffColumnChart : {xAxis : [], 
+							yAxis : {name : '员工提成金额', data : [],
 							dataLabels: {
 				                enabled: true,
 				                color: 'green',
@@ -545,7 +606,21 @@ var commissionStaffChartData = {chartData : {type : 'pie', name : '比例', data
 				                    fontWeight : 'bold'
 				                },
 				                format: '{point.y} 元'
+				            }}, 
+							yAxisAmount : {name : '员工提成数量', data : [],
+							dataLabels: {
+				                enabled: true,
+				                color: 'green',
+				                align: 'center',
+				                style: {
+				                    fontSize: '13px',
+				                    fontFamily: 'Verdana, sans-serif',
+				                    fontWeight : 'bold'
+				                },
+				                format: '{point.y} 份'
 				            }}}};
+
+var titleCommissionDeptName, titleCommissionStaffName;
 Ext.onReady(function(){
 	commissionDetailInit();
 	
@@ -567,17 +642,22 @@ Ext.onReady(function(){
 		contentEl : 'divCommissionStaffCharts',
 		listeners : {
 			show : function(thiz){
-				if($('#divCommissionStaffChart').is(":visible") || $('#divCommissionStaffColumnChart').is(":visible")){
+				if($('#divCommissionStaffColumnChart').is(":visible")){
 					commissionStaffChart.setSize(thiz.getWidth(), panelDrag ? commissionStatChartTabPanel.getHeight() - 60 : commissionStatChartTabPanel.getHeight()-30);
+				}else if($('#divCommissionPriceStaffChart').is(":visible")){
+					commissionStaffChart.setSize(commissionStatChartTabPanel.getWidth()/2, panelDrag ? commissionStatChartTabPanel.getHeight() - 60 : commissionStatChartTabPanel.getHeight()-30);
+					commissionStaffChart_amount.setSize(commissionStatChartTabPanel.getWidth()/2, panelDrag ? commissionStatChartTabPanel.getHeight() - 60 : commissionStatChartTabPanel.getHeight()-30);				
 				}else{
 					$('#divCommissionStaffChartChange').show();
-					$('#divCommissionStaffChart').show();
+					$('#divCommissionPriceStaffChart').show();
+					$('#divCommissionAmountStaffChart').show();
 				}
 				if(!commissionStaffChart){
 					commission_getStaffChartData();
 					commission_loadStaffChart();
-					
-					commissionStaffChart.setSize(commissionStatChartTabPanel.getWidth(), commissionStatChartTabPanel.getHeight()-30);
+					commission_loadAmountStaffChart();
+					commissionStaffChart.setSize(commissionStatChartTabPanel.getWidth()/2, panelDrag ? commissionStatChartTabPanel.getHeight() - 60 : commissionStatChartTabPanel.getHeight()-30);
+					commissionStaffChart_amount.setSize(commissionStatChartTabPanel.getWidth()/2, panelDrag ? commissionStatChartTabPanel.getHeight() - 60 : commissionStatChartTabPanel.getHeight()-30);
 				}
 			},
 			render : function(thiz){
@@ -629,7 +709,8 @@ Ext.onReady(function(){
 	
 	$('#divCommissionStaffChartChange').toggle(
 		function(){
-			$('#divCommissionStaffChart').hide();
+			$('#divCommissionAmountStaffChart').hide();
+			$('#divCommissionPriceStaffChart').hide();
 			
 			$('#divCommissionStaffColumnChart').show();
 			commission_loadStaffColumnChart();
@@ -638,9 +719,12 @@ Ext.onReady(function(){
 		function(){
 			$('#divCommissionStaffColumnChart').hide();
 			
-			$('#divCommissionStaffChart').show();
+			$('#divCommissionAmountStaffChart').show();
+			$('#divCommissionPriceStaffChart').show();
 			commission_loadStaffChart();
-			commissionStaffChart.setSize(commissionStatChartTabPanel.getWidth(), panelDrag ? commissionStatChartTabPanel.getHeight() - 60 : commissionStatChartTabPanel.getHeight()-30);
+			commission_loadAmountStaffChart();
+			commissionStaffChart.setSize(commissionStatChartTabPanel.getWidth()/2, panelDrag ? commissionStatChartTabPanel.getHeight() - 60 : commissionStatChartTabPanel.getHeight()-30);
+			commissionStaffChart_amount.setSize(commissionStatChartTabPanel.getWidth()/2, panelDrag ? commissionStatChartTabPanel.getHeight() - 60 : commissionStatChartTabPanel.getHeight()-30);
 		}		
 	);	
 //	commissionStatisticsGrid.getStore().load();

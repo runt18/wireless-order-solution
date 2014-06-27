@@ -508,7 +508,7 @@ function showDeptStatisticChart(jdata){
         	renderTo: 'divSalesSubStatisticDeptChart'
     	}, 
         title: {
-            text: '<b>营业走势图（'+dateBegin+ '至' +dateEnd+'）'+hourBegin+ ' - ' + hourEnd + '</b>'
+            text: '<b>'+ titleDeptName +' -- 营业走势图（'+dateBegin+ '至' +dateEnd+'）'+hourBegin+ ' - ' + hourEnd + titleRegionName + '</b>'
         },
         labels: {
         	items : [{
@@ -630,6 +630,7 @@ function deptStatPanelInit(){
 				if(typeof e != 'undefined' && typeof e == 'boolean'){
 					Ext.getCmp('southDeptChartPanel').expand();
 					var gn = Ext.ux.getSelData(deptStatPanelGrid);
+					titleDeptName = gn.dept.name;
 					loadDeptStatisticChartData({dateBeg : beginDate.getRawValue() + ' 00:00:00', 
 						dateEnd : endDate.getRawValue() + ' 23:59:59', 
 						region : Ext.getCmp("deptStatistic_comboRegion").getValue(),
@@ -637,7 +638,9 @@ function deptStatPanelInit(){
 						ending : data.ending,
 						deptId : gn.dept.id});
 				}else{
-//					Ext.getCmp('southDeptChartPanel').collapse();
+					Ext.getCmp('southDeptChartPanel').collapse();
+					titleDeptName = '';
+					titleRegionName = Ext.getCmp("deptStatistic_comboRegion").getValue() == -1 ? '' : ', ' + Ext.getCmp('deptStatistic_comboRegion').getEl().dom.value;
 					var gs = deptStatPanelGrid.getStore();
 					gs.baseParams['dateBeg'] = beginDate.getRawValue();
 					gs.baseParams['dateEnd'] = endDate.getRawValue();
@@ -781,6 +784,7 @@ function salesSubWinTabPanelInit(){
 	});	
 }
 
+var titleDeptName, titleRegionName;
 Ext.onReady(function(){
 	if(!salesSubWinTabPanel){
 		salesSubWinTabPanelInit();
