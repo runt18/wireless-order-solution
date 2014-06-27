@@ -13,22 +13,27 @@
 	box-flex: 1;
 	-webkit-box-flex: 1;
 }
-#divSelectDeptForOrder div[class="button-base"]{
+#divSelectDeptForOrder div[class="button-base-deptKitchen"]{
 	margin-right: 1px;
 	line-height: 60px;
 }
 #divSelectDeptForOrder{
-	width: 100%; 
 	overflow: hide;
 	height: 60px;
 }
 
-#divSelectKitchenForOrder div[class="button-base"]{
+#divSelectKitchenForOrder div[class="button-base-deptKitchen"]{
 	margin-right: 1px;
 	line-height: 60px;
 }
+/*
+//FIXME
+	³ø·¿·ÖÒ³
+*/
+
 #divSelectKitchenForOrder{
-	width: 100%; 
+	
+	/* width: 100%;  */
 	overflow: hide;
 	margin-top: 1px;
 	height: 60px;
@@ -152,7 +157,24 @@
 	margin: 10px 0 0 30px;
 }
 
+
 #divNumForFoodAlias > div[class*=button-base]{
+	width: 80px;
+	line-height: 60px;
+	float: left;
+	margin-top: 5px;
+	margin-right: 5px;
+	font-weight: bold;
+	font-size: 28px;
+}
+
+#divNumForTempTaste{
+	width: 280px;
+	height: 280px;
+	margin: 10px 0 0 30px;
+}
+
+#divNumForTempTaste > div[class*=button-base]{
 	width: 80px;
 	line-height: 60px;
 	float: left;

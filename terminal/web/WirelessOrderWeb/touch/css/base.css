@@ -133,6 +133,24 @@ body{ overflow: hidden; }
 	text-align: center;
 	font-weight: bold; 
 }
+
+.button-base-deptKitchen{
+	width: 80px;
+	min-height: 60px;
+	background: #4EEE99;
+	text-align: center;
+	font-weight: bold; 
+	overflow:hidden;
+}
+
+.button-base-paging{
+	width: 60px;
+	min-height: 60px;
+	background: #4EEE99;
+	text-align: center;
+	font-weight: bold; 
+}
+
 .button-base:active, .main-box-base:active{ background: #FFD700; }
 
 .main-box-base{
