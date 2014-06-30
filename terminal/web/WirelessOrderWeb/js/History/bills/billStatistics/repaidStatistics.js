@@ -106,7 +106,7 @@ function showRepaidDetailChart(jdata){
         },
         labels: {
         	items : [{
-        		html : '<b>总反结账金额:' + chartData.totalMoney + ' 元</b><br><b>日均反结账额:' + chartData.avgMoney + ' 元</b>',
+        		html : '<b>总反结账金额:' + chartData.totalMoney + ' 元</b><br><b>日均反结账额:' + chartData.avgMoney + ' 元</b><br><b>日均反结账量:' + chartData.avgCount + ' 份</b>',
 	        	style : {left :/*($('#businessReceiptsChart').width()*0.80)*/'0px', top: '0px'}
         	}]
         },
@@ -614,7 +614,7 @@ Ext.onReady(function(){
 	
 	repaidStatChartTabPanel = new Ext.TabPanel({
 		region : 'south',
-		height : 330,
+		height : 430,
 		items : [repaidDetailChartPanel, repaidStaffChartPanel],
 		listeners : {
 			render : function(thiz){

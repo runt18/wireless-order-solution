@@ -349,7 +349,7 @@ function showDiscountDetailChart(jdata){
         },
         labels: {
         	items : [{
-        		html : '<b>总折扣金额:' + chartData.totalMoney + ' 元</b><br><b>日均折扣额:' + chartData.avgMoney + ' 元</b>',
+        		html : '<b>总折扣金额:' + chartData.totalMoney + ' 元</b><br><b>日均折扣金额:' + chartData.avgMoney + ' 元</b><br><b>日均折扣数量:' + chartData.avgCount + ' 份</b>',
 	        	style : {left :/*($('#businessReceiptsChart').width()*0.80)*/'0px', top: '0px'}
         	}]
         },
@@ -746,6 +746,7 @@ Ext.onReady(function(){
 					$('#divDiscountPriceStaffChart').show();
 				}
 				if(!discount_staffChart){
+					discount_getStaffChartData();
 					discount_loadStaffChart();
 					discount_loadAmountStaffChart();
 					discount_staffChart.setSize(discountStatChartTabPanel.getWidth()/2, discount_panelDrag ? discountStatChartTabPanel.getHeight() - 60 : discountStatChartTabPanel.getHeight()-30);
@@ -791,7 +792,7 @@ Ext.onReady(function(){
 
 	discountStatChartTabPanel = new Ext.TabPanel({
 		region : 'south',
-		height : 330,
+		height : 430,
 		items : [discountDetailChartPanel, discountStaffChartPanel, discountDeptChartPanel],
 		listeners : {
 			render : function(thiz){

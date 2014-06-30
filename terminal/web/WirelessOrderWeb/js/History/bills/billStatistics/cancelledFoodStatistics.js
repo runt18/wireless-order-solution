@@ -397,9 +397,12 @@ function cancelFoodDetailsStatPanelInit(){
 		dateCombo.setValue(1);
 		dateCombo.fireEvent('select', dateCombo, null, 1);
 	});
-/*	cfdsGrid.getStore().on('load', function(store, records, options){
+	cfdsGrid.getStore().on('load', function(store, records, options){
 		if(store.getCount() > 0){
 			var sumRow = cfdsGrid.getView().getRow(store.getCount()-1);	
+			
+			var sumData = store.getAt(store.getCount()-1);
+			
 			sumRow.style.backgroundColor = '#EEEEEE';			
 			
 			for(var i = 0; i < cfdsGrid.getColumnModel().getColumnCount(); i++){
@@ -413,10 +416,11 @@ function cancelFoodDetailsStatPanelInit(){
 			cfdsGrid.getView().getCell(store.getCount()-1, 3).innerHTML = '--';
 			cfdsGrid.getView().getCell(store.getCount()-1, 4).innerHTML = '--';
 			cfdsGrid.getView().getCell(store.getCount()-1, 5).innerHTML = '--';
+			cfdsGrid.getView().getCell(store.getCount()-1, 7).innerHTML = sumData.get('unitPrice').toFixed(2);
 			cfdsGrid.getView().getCell(store.getCount()-1, 8).innerHTML = '--';
 			cfdsGrid.getView().getCell(store.getCount()-1, 9).innerHTML = '--';
 		}
-	});*/
+	});
 	//
 	cancelFoodDetailsStatPanel = new Ext.Panel({
 		title : '明细汇总',
@@ -889,7 +893,7 @@ function showCancelDetailChart(jdata){
         },
         labels: {
         	items : [{
-        		html : '<b>总退菜金额:' + chartData.totalMoney + ' 元</b><br><b>日均退菜额:' + chartData.avgMoney + ' 元</b>',
+        		html : '<b>总退菜金额: ' + chartData.totalMoney + ' 元</b><br><b>日均退菜额: ' + chartData.avgMoney + ' 元</b><br><b>日均退菜量: ' + chartData.avgCount + ' 份</b>',
 	        	style : {left :/*($('#businessReceiptsChart').width()*0.80)*/'0px', top: '0px'}
         	}]
         },
@@ -1129,7 +1133,7 @@ Ext.onReady(function(){
 	
 	cancelFoodStatChartTabPanel = new Ext.TabPanel({
 		region : 'south',
-		height : 330,
+		height : 430,
 		items : [cancelledDetailChartPanel, cancelledReasonChartPanel, cancelledStaffChartPanel, cancelledDeptChartPanel],
 		listeners : {
 			render : function(thiz){

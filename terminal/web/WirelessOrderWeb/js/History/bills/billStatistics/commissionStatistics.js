@@ -419,7 +419,7 @@ function showCommissionDetailChart(jdata){
         },
         labels: {
         	items : [{
-        		html : '<b>总提成金额:' + chartData.totalMoney + ' 元</b><br><b>日均提成额:' + chartData.avgMoney + ' 元</b>',
+        		html : '<b>总提成金额:' + chartData.totalMoney + ' 元</b><br><b>日均提成金额:' + chartData.avgMoney + ' 元</b><br><b>日均提成数量:' + chartData.avgCount + ' 份</b>',
 	        	style : {left :/*($('#businessReceiptsChart').width()*0.80)*/'0px', top: '0px'}
         	}]
         },
@@ -668,7 +668,7 @@ Ext.onReady(function(){
 	
 	commissionStatChartTabPanel = new Ext.TabPanel({
 		region : 'south',
-		height : 330,
+		height : 430,
 		items : [commissionDetailChartPanel, commissionStaffChartPanel],
 		listeners : {
 			render : function(thiz){

@@ -32,7 +32,7 @@ function initBusinessReceipsData(c){
 			if(jr.success){
 				receivablesStatResultGrid.getStore().loadData(jr);
 				Ext.get('businessReceiptsChart').setHeight(southPanel.getHeight());
-				showChart(jr);
+				recipe_showChart(jr);
 			}else{
 				Ext.ux.showMsg(jr);
 			}
@@ -103,7 +103,7 @@ function loadBusinessStatistic(x){
 	businessStatWin.center();
 }
 
-function showChart(jdata){
+function recipe_showChart(jdata){
 	var dateBegin = Ext.getCmp('receipts_dateSearchDateBegin').getValue().format('Y-m-d');
 	var dateEnd = Ext.getCmp('receipts_dateSearchDateEnd').getValue().format('Y-m-d');
 	
