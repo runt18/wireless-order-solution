@@ -105,14 +105,19 @@ public class QueryCommissionStatisticsAction extends DispatchAction{
 			
 			List<String> xAxis = new ArrayList<String>();
 			List<Float> data = new ArrayList<Float>();
-			float totalMoney = 0;
+			List<Float> amountData = new ArrayList<Float>();
+			float totalMoney = 0, totalCount = 0;
 			for (CommissionIncomeByEachDay c : cancelList) {
 				xAxis.add("\'"+c.getRange().getOffDutyFormat()+"\'");
 				data.add(c.getmCommissionPrice());
+				amountData.add(c.getmCommissionAmount());
+				
+				totalMoney += c.getmCommissionPrice();
+				totalCount += c.getmCommissionAmount();
 			}
 			
-			final String chartData = "{\"xAxis\":" + xAxis + ",\"totalMoney\" : " + totalMoney + ",\"avgMoney\" : " + Math.round((totalMoney/cancelList.size())*100)/100 + 
-					",\"ser\":[{\"name\":\'提成金额\', \"data\" : " + data + "}]}";
+			final String chartData = "{\"xAxis\":" + xAxis + ",\"totalMoney\" : " + totalMoney + ",\"avgMoney\" : " + Math.round((totalMoney/cancelList.size())*100)/100 + ",\"avgCount\" : " + Math.round((totalCount/cancelList.size())*100)/100 + 
+					",\"ser\":[{\"name\":\'提成金额\', \"data\" : " + data + "}, {\"name\":\'提成数量\', \"data\" : " + amountData + "}]}";
 			jobject.setExtra(new Jsonable(){
 				@Override
 				public JsonMap toJsonMap(int flag) {

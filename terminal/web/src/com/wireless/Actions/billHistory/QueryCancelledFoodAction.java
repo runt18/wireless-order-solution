@@ -26,6 +26,7 @@ import com.wireless.pojo.billStatistics.cancel.CancelIncomeByReason;
 import com.wireless.pojo.billStatistics.cancel.CancelIncomeByStaff;
 import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.menuMgr.Department.DeptId;
+import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.DateUtil;
 import com.wireless.util.DataPaging;
@@ -83,27 +84,28 @@ public class QueryCancelledFoodAction extends DispatchAction{
 			}
 			
 			List<OrderFood> cancelList = OrderFoodDao.getSingleDetail(staff, extraCond, null);
-			
-			
 			if(!cancelList.isEmpty()){
 				jobject.setTotalProperty(cancelList.size());
-				cancelList = DataPaging.getPagingData(cancelList, true, start, limit);
-				
-				
-/*				List<String> xAxis = new ArrayList<String>();
-				List<Float> data = new ArrayList<Float>();
-				for (CancelIncomeByEachDay c : cancelList) {
-					xAxis.add("\'"+c.getDutyRange().getOffDutyFormat()+"\'");
-					data.add(c.getCancelPrice());
-					
-					totalCount += c.getCancelAmount();
-					totalPrice += c.getCancelPrice();
+				float totalPrice = 0, totalCount = 0;
+				for (OrderFood orderFood : cancelList) {
+					totalPrice += orderFood.calcPrice();
+					totalCount += orderFood.getCount();
 				}
-				CancelIncomeByEachDay total = new CancelIncomeByEachDay(new DutyRange(dateBeg, dateEnd), totalCount, totalPrice);
+				
+				Food totalFood = new Food(0);
+				totalFood.setKitchen(cancelList.get(0).asFood().getKitchen());
+				totalFood.setPrice(totalPrice);
+				
+				OrderFood total = new OrderFood(totalFood);
+				
+				total.setCount(totalCount);
+				
+				total.setCancelReason(cancelList.get(0).getCancelReason());
 				
 				cancelList = DataPaging.getPagingData(cancelList, true, start, limit);
 				
-				cancelList.add(total);*/
+				cancelList.add(total);
+				
 			}
 			jobject.setRoot(cancelList);
 		}catch(BusinessException e){
@@ -153,14 +155,22 @@ public class QueryCancelledFoodAction extends DispatchAction{
 			
 			List<String> xAxis = new ArrayList<String>();
 			List<Float> data = new ArrayList<Float>();
-			float totalMoney = 0;
+			
+			List<Float> amountData = new ArrayList<Float>();
+			
+			float totalMoney = 0, totalCount = 0;
 			for (CancelIncomeByEachDay c : cancelList) {
 				xAxis.add("\'"+c.getDutyRange().getOffDutyFormat()+"\'");
 				data.add(c.getCancelPrice());
+				amountData.add(c.getCancelAmount());
+				
+				totalMoney += c.getCancelPrice();
+				totalCount += c.getCancelAmount();
+				
 			}
 			
-			final String chartData = "{\"xAxis\":" + xAxis + ",\"totalMoney\" : " + totalMoney + ",\"avgMoney\" : " + Math.round((totalMoney/cancelList.size())*100)/100 + 
-					",\"ser\":[{\"name\":\'退菜金额\', \"data\" : " + data + "}]}";
+			final String chartData = "{\"xAxis\":" + xAxis + ",\"totalMoney\" : " + totalMoney + ",\"avgMoney\" : " + Math.round((totalMoney/cancelList.size())*100)/100 + ",\"avgCount\" : " + Math.round((totalCount/cancelList.size())*100)/100 +
+					",\"ser\":[{\"name\":\'退菜金额\', \"data\" : " + data + "},{\"name\":\'退菜数量\', \"data\" : " + amountData + "}]}";
 			jobject.setExtra(new Jsonable(){
 				@Override
 				public JsonMap toJsonMap(int flag) {
