@@ -1,0 +1,169 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<script type="text/javascript" src="../../js/History/bills/billStatistics/businessSubStatistics.js"></script>
+<script type="text/javascript">
+	function linkToBusinessStatistics(c){
+		var dateBegin = Ext.getCmp('businessSub_dateSearchDateBegin');
+		var dateEnd = Ext.getCmp('businessSub_dateSearchDateEnd');
+		
+		if(!dateBegin.isValid() || !dateEnd.isValid()){
+			return;
+		}
+		
+		sendToStatisticsPageBeginDate = dateBegin.getValue();
+		sendToStatisticsPageEndDate = dateEnd.getValue();
+		sendToPageOperation = true;
+		
+		if(c.type == 1){//折扣统计
+			addTab('discountStatistics', '折扣统计', 'History_Module/DiscountStatistics.html');
+		}else if(c.type == 2){//赠送统计
+			addTab('giftStatistics', '赠送统计', 'History_Module/GiftStatistics.html');
+		}else if(c.type == 3){//退菜统计
+			addTab('cancelledFood', '退菜统计', 'History_Module/CancelledFood.html');
+		}else if(c.type == 4){//反结账统计
+			addTab('repaidStatistics', '反结账统计', 'History_Module/RepaidStatistics.html');
+		}else{
+			return;
+		}
+		
+	}
+</script>
+<title>Insert title here</title>
+</head>
+<body>
+<div id="divBusinessSubStatistics"></div>
+<div id="divBusinessSubStatisticsDetailChart" style="height : 280px;"></div>
+	<table id="businessStatisticsSummary" border="1" class="tb_base" style="width : 100%">
+		<tr>
+			<th class="table_title text_center">收款方式</th>
+			<th class="table_title text_center">账单数</th>
+			<th class="table_title text_center">应收总额</th>
+			<th class="table_title text_center">实收总额</th>
+		</tr>
+		<tr>
+			<th>现金</th>
+			<td class="text_right" id="bssiCashAmount">---</td>
+			<td class="text_right" id="bssiCashIncome">---</td>
+			<td class="text_right" id="bssiCashIncome2">---</td>
+		</tr>
+		<tr>
+			<th>刷卡</th>
+			<td class="text_right" id="bssiCreditCardAmount">---</td>
+			<td class="text_right" id="bssiCreditCardIncome">---</td>
+			<td class="text_right" id="bssiCreditCardIncome2">---</td>
+		</tr>
+		<tr>
+			<th>会员卡</th>
+			<td class="text_right" id="bssiMemeberCardAmount">---</td>
+			<td class="text_right" id="bssiMemeberCardIncome">---</td>
+			<td class="text_right" id="bssiMemeberCardIncome2">---</td>
+		</tr>
+		<tr>
+			<th>签单</th>
+			<td class="text_right" id="bssiSignAmount">---</td>
+			<td class="text_right" id="bssiSignIncome">---</td>
+			<td class="text_right" id="bssiSignIncome2">---</td>
+		</tr>
+		<tr>
+			<th>挂账</th>
+			<td class="text_right" id="bssiHangAmount">---</td>
+			<td class="text_right" id="bssiHangIncome">---</td>
+			<td class="text_right" id="bssiHangIncome2">---</td>
+		</tr>
+		<tr>
+			<th class="table_title">合计</th>
+			<td class="text_right" id="bssiSumAmount">---</td>
+			<td class="text_right" id="bssiSumIncome">---</td>
+			<td class="text_right" id="bssiSumIncome2">---</td>
+		</tr>
+		<tr style="height:15px;">
+			<td colspan="4"></td>
+		</tr>
+		<tr>
+			<th class="table_title text_center">操作类型</th>
+			<th class="table_title text_center">账单数</th>
+			<th class="table_title text_center">金额</th>
+			<th class="table_title text_center">操作</th>
+		</tr>
+		<tr>
+			<th>抹数</th>
+			<td class="text_right" id="bssiEraseAmount">---</td>
+			<td class="text_right" id="bssiEraseIncome">---</td>
+			<td class="text_center">----</td>
+		</tr>
+		<tr>
+			<th>折扣</th>
+			<td class="text_right" id="bssiDiscountAmount">---</td>
+			<td class="text_right" id="bssiDiscountIncome">---</td>
+			<td class="text_center"><a href="javascript:void(0)" onclick="linkToBusinessStatistics({type : 1})">查看详情</a></td>
+		</tr>
+		<tr>
+			<th>赠送</th>
+			<td class="text_right" id="bssiGiftAmount">---</td>
+			<td class="text_right" id="bssiGiftIncome">---</td>
+			<td class="text_center"><a href="javascript:void(0)" onclick="linkToBusinessStatistics({type : 2})">查看详情</a></td>
+		</tr>
+		<tr>
+			<th>退菜</th>
+			<td class="text_right" id="bssiCancelAmount">---</td>
+			<td class="text_right" id="bssiCancelIncome">---</td>
+			<td class="text_center"><a href="javascript:void(0)" onclick="linkToBusinessStatistics({type : 3})">查看详情</a></td>
+		</tr>
+		<tr>
+			<th>反结帐</th>
+			<td class="text_right" id="bssiPaidAmount">---</td>
+			<td class="text_right" id="bssiPaidIncome">---</td>
+			<td class="text_center"><a href="javascript:void(0)" onclick="linkToBusinessStatistics({type : 4})">查看详情</a></td>
+		</tr>
+		<tr>
+			<th>服务费收入</th>
+			<td class="text_right" id="bssiServiceAmount">---</td>
+			<td class="text_right" id="bssiServiceIncome">---</td>
+			<td class="text_center">----</td>
+		</tr>
+		<tr>
+			<th>优惠劵</th>
+			<td class="text_right" id="bssiCouponAmount">---</td>
+			<td class="text_right" id="bssiCouponIncome">---</td>
+			<td class="text_center">----</td>
+		</tr>
+	</table>
+	<div id="businessStatisticsTotals">	
+	<table id="businessStatisticsMemberGeneral" border="1" class="tb_base" style="width : 100%">
+		<tr> 
+			<th class="table_title text_center">会员操作</th>
+	 		<th class="table_title text_center">现金</th>
+	 		<th class="table_title text_center">刷卡</th>
+	 		<th class="table_title text_center">账户实充/扣额</th>
+ 		</tr>	
+		<tr>
+			<th>会员充值</th>
+			<td class="text_right" id="bussiMemberChargeByCash">---</td>
+			<td class="text_right" id="bussiMemberChargeByCard">---</td>
+			<td class="text_right" id="bussiMemberAccountCharge">---</td>
+			</tr>
+			<tr>
+			<th>会员退款</th>
+			<td class="text_right" id="bussiMemberRefund">---</td>
+			<td class="text_right" id="bussiMemberRefundByCard">---</td>
+			<td class="text_right" id="bussiMemberAccountRefund">---</td>
+		</tr>
+		<tr style="height:15px;">
+			<td colspan="4"></td>
+		</tr>
+	</table>
+	<table id="businessStatisticsDeptGeneral" border="1" class="tb_base" style="width : 100%">	
+		<tr>
+			  <th class="table_title text_center">部门汇总</th>
+			  <th class="table_title text_center">折扣总额</th>
+			  <th class="table_title text_center">赠送总额</th>
+			  <th class="table_title text_center">应收总额</th>
+		</tr>
+	</table>
+	</div>
+	
+	
+</body>
+</html>
