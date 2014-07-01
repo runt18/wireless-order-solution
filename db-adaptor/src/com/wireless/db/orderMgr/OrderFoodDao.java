@@ -6,11 +6,16 @@ import java.util.List;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
+import com.wireless.db.crMgr.CancelReasonDao;
+import com.wireless.db.deptMgr.KitchenDao;
 import com.wireless.db.menuMgr.FoodDao;
+import com.wireless.db.menuMgr.FoodDao.ExtraCond4Combo;
+import com.wireless.db.tasteMgr.TasteDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.billStatistics.HourRange;
 import com.wireless.pojo.crMgr.CancelReason;
+import com.wireless.pojo.dishesOrder.ComboOrderFood;
 import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.dishesOrder.TasteGroup;
 import com.wireless.pojo.menuMgr.Department;
@@ -18,6 +23,7 @@ import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.pojo.regionMgr.Region;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.staffMgr.Staff;
+import com.wireless.pojo.tasteMgr.Taste;
 import com.wireless.util.DateType;
 
 /**
@@ -365,6 +371,7 @@ public class OrderFoodDao {
 
 		sql = " SELECT OF.order_id, OF.food_id, OF.taste_group_id, OF.is_temporary, OF.is_gift, " +
 			  " MIN(OF.id) AS id, MAX(OF.restaurant_id) AS restaurant_id, MAX(OF.kitchen_id) AS kitchen_id, " + 
+			  (extraCond.dateType.isToday() ? " MAX(OF.combo_id) AS combo_id, " : "") +
 			  " MAX(OF.name) AS name, MAX(OF.food_status) AS food_status, " +
 			  " MAX(OF.unit_price) AS unit_price, MAX(OF.commission) AS commission, MAX(OF.waiter) AS waiter, MAX(OF.order_date) AS order_date, MAX(OF.discount) AS discount, " +
 			  " MAX(OF.dept_id) AS dept_id, MAX(OF.id) AS id, MAX(OF.order_date) AS pay_datetime, SUM(OF.order_count) AS order_sum " +
@@ -378,19 +385,24 @@ public class OrderFoodDao {
 			  " ORDER BY id ASC ";
 		
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
-		List<OrderFood> orderFoods = new ArrayList<OrderFood>();
+		List<OrderFood> result = new ArrayList<OrderFood>();
 		while (dbCon.rs.next()) {
 			OrderFood of = new OrderFood(dbCon.rs.getLong("id"));
 			of.asFood().setFoodId(dbCon.rs.getInt("food_id"));
 			of.asFood().setName(dbCon.rs.getString("name"));
 			of.asFood().setRestaurantId(dbCon.rs.getInt("restaurant_id"));
 			of.asFood().setStatus(dbCon.rs.getShort("food_status"));
-			if(of.asFood().isCombo() && extraCond.dateType.isToday()){
-				of.asFood().setChildFoods(FoodDao.getChildrenByParent(staff, of.asFood().getFoodId()));
+			if(extraCond.dateType.isToday()){
+				int comboId = dbCon.rs.getInt("combo_id");
+				if(comboId > 0){
+					for(ComboOrderFood cof : ComboDao.getByComboId(staff, comboId, extraCond.dateType)){
+						of.addCombo(cof);
+					}
+				}
 			}
-			int tasteGroupId = dbCon.rs.getInt("taste_group_id");
-			if(tasteGroupId != TasteGroup.EMPTY_TASTE_GROUP_ID){
-				of.setTasteGroup(TasteGroupDao.getById(staff, tasteGroupId, extraCond.dateType));
+			int tgId = dbCon.rs.getInt("taste_group_id");
+			if(tgId != TasteGroup.EMPTY_TASTE_GROUP_ID){
+				of.setTasteGroup(new TasteGroup(tgId, null, null, null));
 			}
 			of.setCount(dbCon.rs.getFloat("order_sum"));
 			of.asFood().setPrice(dbCon.rs.getFloat("unit_price"));
@@ -404,11 +416,163 @@ public class OrderFoodDao {
 			of.setDiscount(dbCon.rs.getFloat("discount"));
 			of.setTemp(dbCon.rs.getBoolean("is_temporary"));
 			of.setGift(dbCon.rs.getBoolean("is_gift"));
-			orderFoods.add(of);
+			result.add(of);
 		}
 		dbCon.rs.close();
 		
-		return orderFoods;
+		if(extraCond.dateType.isToday()){
+			for(OrderFood of : result){
+				if(of.asFood().isCombo()){
+					of.asFood().setChildFoods(FoodDao.getComboByCond(dbCon, staff, new ExtraCond4Combo(of.asFood().getFoodId())));
+				}
+				if(of.getTasteGroup() != null){
+					of.setTasteGroup(TasteGroupDao.getById(staff, of.getTasteGroup().getGroupId(), extraCond.dateType));
+				}
+			}
+		}
+		
+		return result;
+	}
+	
+	public static class ExtraBuilder{
+		private final int orderId;
+		private final OrderFood extra;
+		private boolean isPaid = false;
+		
+		public ExtraBuilder(int orderId, OrderFood extra){
+			this.orderId = orderId;
+			this.extra = extra;
+		}
+		
+		public ExtraBuilder setPaid(boolean isPaid){
+			this.isPaid = isPaid;
+			return this;
+		}
+	}
+	
+	static void insertExtra(DBCon dbCon, Staff staff, ExtraBuilder builder) throws SQLException{
+		/**
+		 * Insert the taste group info if containing taste.
+		 */
+		if(builder.extra.hasTasteGroup()){
+			
+			TasteGroup tg = builder.extra.getTasteGroup();		
+			
+			int tgId = TasteGroupDao.insert(dbCon, staff, new TasteGroup.InsertBuilder(builder.extra.asFood())
+		     															.addTastes(tg.getNormalTastes())
+		     															.setTmpTaste(tg.getTmpTaste()));
+			tg.setGroupId(tgId);
+			
+		}
+		
+		//Insert the combo order food
+		int comboId = 0;
+		if(builder.extra.hasCombo()){
+			comboId = ComboDao.insert(dbCon, staff, builder.extra.getCombo());
+		}
+
+		String sql;
+		sql = " INSERT INTO " + Params.dbName + ".order_food " +
+			  " ( " + 
+			  " `restaurant_id`, `order_id`, `food_id`, `order_count`, `unit_price`, `commission`, `name`, `food_status`, " +
+			  " `discount`, `taste_group_id`, " +
+			  " `dept_id`, `kitchen_id`, " +
+			  " `staff_id`, `waiter`, `order_date`, `is_temporary`, `is_paid`, " +
+			  " `combo_id` " +
+			  " ) " +
+			  " VALUES " +
+			  "(" +
+			  staff.getRestaurantId() + ", " +
+			  builder.orderId + ", " +
+			  builder.extra.getFoodId() + ", " +
+			  builder.extra.getCount() + ", " + 
+			  builder.extra.asFood().getPrice() + ", " + 
+			  builder.extra.asFood().getCommission() + ", " +
+			  "'" + builder.extra.getName() + "', " + 
+			  builder.extra.asFood().getStatus() + ", " +
+			  builder.extra.getDiscount() + ", " +
+			  (builder.extra.hasTasteGroup() ? builder.extra.getTasteGroup().getGroupId() : TasteGroup.EMPTY_TASTE_GROUP_ID) + ", " +
+			  builder.extra.getKitchen().getDept().getId() + ", " +
+			  builder.extra.getKitchen().getId() + ", " +
+			  staff.getId() + ", " +
+			  "'" + staff.getName() + "', " +
+			  "NOW(), " + 
+			  (builder.extra.isTemp() ? 1 : 0) + ", " +
+			  (builder.isPaid ? 1 : 0) + "," +
+			  (comboId != 0 ? comboId : "NULL") +
+			  " ) ";
+		dbCon.stmt.executeUpdate(sql);	
+		
+		//FIXME Insert the temporary food to menu.
+//		if(builder.extra.isTemp()){
+//			try{
+//				FoodDao.insert(dbCon, staff, new Food.InsertBuilder(builder.extra.getName(), builder.extra.getPrice(), builder.extra.getKitchen()).setTemp(true));
+//			}catch(BusinessException ingored){}
+//		}
+	}
+	
+	/**
+	 * Fill the detail to this order food.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param src
+	 * 			the source to order food
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if cases below<br>
+	 * 			<li>any cancel reason does NOT exist
+	 * 			<li>the associated food does NOT exist
+	 * 			<li>and taste does NOT exist
+	 */
+	static void fill(DBCon dbCon, Staff staff, OrderFood src) throws SQLException, BusinessException{
+		//Get the details to cancel reason if contained.
+		if(src.hasCancelReason()){
+			src.setCancelReason(CancelReasonDao.getReasonById(dbCon, staff, src.getCancelReason().getId()));
+		}
+		
+		if(src.isTemp()){
+			src.asFood().setKitchen(KitchenDao.getById(dbCon, staff, src.getKitchen().getId()));
+			
+		}else{		
+			//Get the details to each order food.
+			src.asFood().copyFrom(FoodDao.getById(dbCon, staff, src.getFoodId()));
+			
+			//Get the details to normal tastes.
+			if(src.hasNormalTaste()){
+				//Get the detail to each taste.
+				for(Taste t : src.getTasteGroup().getTastes()){
+					t.copyFrom(TasteDao.getTasteById(dbCon, staff, t.getTasteId()));
+				}
+				//Get the detail to each spec.
+				if(src.getTasteGroup().hasSpec()){
+					src.getTasteGroup().getSpec().copyFrom(TasteDao.getTasteById(dbCon, staff, src.getTasteGroup().getSpec().getTasteId()));
+				}
+				src.getTasteGroup().refresh();
+			}
+			
+			//Get the detail to combo
+			if(src.hasCombo()){
+				for(ComboOrderFood cof : src.getCombo()){
+					//Get the details to combo food.
+					cof.asComboFood().copyFrom(FoodDao.getComboByCond(dbCon, staff, new ExtraCond4Combo(src.asFood().getFoodId()).setChildId(cof.asComboFood().getFoodId())).get(0));
+					//Get the details to normal tastes of combo
+					if(cof.hasTasteGroup() && cof.getTasteGroup().hasNormalTaste()){
+						//Get the details to each taste of combo.
+						for(Taste t : cof.getTasteGroup().getTastes()){
+							t.copyFrom(TasteDao.getTasteById(dbCon, staff, t.getTasteId()));
+						}
+						//Get the detail to each spec of combo
+						if(cof.getTasteGroup().hasSpec()){
+							cof.getTasteGroup().getSpec().copyFrom(TasteDao.getTasteById(dbCon, staff, cof.getTasteGroup().getSpec().getTasteId()));
+						}
+						cof.getTasteGroup().refresh();
+					}
+				}
+			}
+		}
 	}
 	
 }

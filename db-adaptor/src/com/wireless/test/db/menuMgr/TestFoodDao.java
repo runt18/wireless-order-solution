@@ -10,6 +10,7 @@ import org.junit.Test;
 
 import com.wireless.db.deptMgr.KitchenDao;
 import com.wireless.db.menuMgr.FoodDao;
+import com.wireless.db.menuMgr.FoodDao.ExtraCond4Combo;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.FoodError;
@@ -64,7 +65,7 @@ public class TestFoodDao {
 					Assert.assertEquals("failed to delete the food", FoodError.FOOD_NOT_EXIST, e.getErrCode());
 				}
 				
-				Assert.assertEquals("failed to delete the child foods", 0, FoodDao.getChildrenByParent(mStaff, foodId).size());
+				Assert.assertEquals("failed to delete the child foods", 0, FoodDao.getComboByCond(mStaff, new ExtraCond4Combo(foodId)).size());
 			}
 		}
 	}

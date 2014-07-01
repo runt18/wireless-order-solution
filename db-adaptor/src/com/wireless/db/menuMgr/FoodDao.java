@@ -26,6 +26,31 @@ import com.wireless.util.PinyinUtil;
 
 public class FoodDao {
 	
+	public static class ExtraCond4Combo{
+		private final int parentId;
+		
+		private int childId;
+		
+		public ExtraCond4Combo(int parentId){
+			this.parentId = parentId;
+		}
+		
+		public ExtraCond4Combo setChildId(int childId){
+			this.childId = childId;
+			return this;
+		}
+		
+		@Override
+		public String toString(){
+			StringBuilder extraCond = new StringBuilder();
+			extraCond.append(" AND combo.food_id = " + parentId);
+			if(childId > 0){
+				extraCond.append(" AND combo.sub_food_id = " + childId);
+			}
+			return extraCond.toString();
+		}
+	}
+	
 	/**
 	 * Check to see whether the food alias is duplicated.
 	 * @param dbCon
@@ -400,13 +425,18 @@ public class FoodDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 * @throws BusinessException
-	 * 			throws if the parent or any child food does NOT exist
+	 * 			throws if either cases below<br>
+	 * 			<li>the parent or any child food does NOT exist
+	 * 			<li>and child food belongs to combo
 	 */
 	public static void buildCombo(DBCon dbCon, Staff staff, Food.ComboBuilder builder) throws SQLException, BusinessException{
 		Food f = builder.build();
 		
 		Food parent = getPureById(dbCon, staff, f.getFoodId());
 		for(ComboFood child : f.getChildFoods()){
+			if(child.asFood().isCombo()){
+				throw new BusinessException(FoodError.CHILD_FOOD_CAN_NOT_BE_COMBO);
+			}
 			parent.addChildFood(child);
 		}
 		
@@ -489,23 +519,23 @@ public class FoodDao {
 	 * 			the database connection
 	 * @param staff
 	 * 			the staff to perform this action
-	 * @param parentId
-	 * 			the id parent food 
+	 * @param extraCond
+	 * 			the extra condition {@link ExtraCond4Combo}
 	 * @return	a food list containing the child foods
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static List<ComboFood> getChildrenByParent(DBCon dbCon, Staff staff, int parentId) throws SQLException{
+	public static List<ComboFood> getComboByCond(DBCon dbCon, Staff staff, ExtraCond4Combo extraCond) throws SQLException{
 		
 		List<ComboFood> result = new ArrayList<ComboFood>();
 		
 		String sql;
 
-		sql = " SELECT sub_food_id FROM " + Params.dbName + ".combo WHERE food_id = " + parentId;
+		sql = " SELECT sub_food_id FROM " + Params.dbName + ".combo WHERE 1 = 1 " + extraCond;
 		
 		for(Food subFood : getPureByCond(dbCon, staff, " AND FOOD.food_id IN (" + sql + ")", null)){
 			
-			sql = " SELECT amount FROM " + Params.dbName + ".combo WHERE food_id = " + parentId + " AND sub_food_id = " + subFood.getFoodId();
+			sql = " SELECT amount FROM " + Params.dbName + ".combo WHERE food_id = " + extraCond.parentId + " AND sub_food_id = " + subFood.getFoodId();
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
 			int amount;
 			if(dbCon.rs.next()){
@@ -518,66 +548,6 @@ public class FoodDao {
 			result.add(new ComboFood(subFood, amount));
 		}
 		
-//		sql = " SELECT " +
-//			  " FOOD.restaurant_id, FOOD.food_id, FOOD.food_alias, FOOD.stock_status, " +
-//			  " FOOD.name, FOOD.price, FOOD.commission, FOOD.status, " +
-//			  " FOOD.desc, FOOD.img, " +
-//			  " KITCHEN.kitchen_id, KITCHEN.name AS kitchen_name, KITCHEN.display_id AS kitchen_display_id, " +
-//			  " KITCHEN.type AS kitchen_type, KITCHEN.is_allow_temp AS is_allow_temp, " +
-//			  " DEPT.dept_id, DEPT.name AS dept_name, DEPT.type AS dept_type, DEPT.display_id AS dept_display_id, " +
-//			  " COMBO.amount " +
-//			  " FROM " +
-//			  Params.dbName + ".food FOOD " + 
-//			  " JOIN " +
-//			  Params.dbName + ".combo COMBO " +
-//			  " ON FOOD.food_id = COMBO.sub_food_id " + 
-//			  " LEFT OUTER JOIN " +
-//			  Params.dbName + ".kitchen KITCHEN " +
-//			  " ON FOOD.kitchen_id = KITCHEN.kitchen_id " +
-//			  " LEFT OUTER JOIN " +
-//			  Params.dbName + ".department DEPT " +
-//			  " ON KITCHEN.dept_id = DEPT.dept_id AND KITCHEN.restaurant_id = DEPT.restaurant_id " +
-//			  " WHERE COMBO.food_id = " + parentId;
-//			
-//		dbCon.rs = dbCon.stmt.executeQuery(sql);
-//			
-//		while(dbCon.rs.next()){
-//				
-//			int foodId = dbCon.rs.getInt("food_id");
-//			int restaurantId = dbCon.rs.getInt("restaurant_id");
-//			
-//			Food childFood = new Food(foodId);
-//			childFood.setRestaurantId(restaurantId);
-//			childFood.setAliasId(dbCon.rs.getInt("food_alias"));
-//			childFood.setName(dbCon.rs.getString("name"));
-//			
-//			//Generate the pinyin to each food
-//			childFood.setPinyin(PinyinUtil.cn2Spell(childFood.getName()));
-//			childFood.setPinyinShortcut(PinyinUtil.cn2FirstSpell(childFood.getName()));
-//			
-//			childFood.setPrice(dbCon.rs.getFloat("price"));
-//			childFood.setCommission(dbCon.rs.getFloat("commission"));
-//			childFood.setStatus(dbCon.rs.getShort("status"));
-//			childFood.setDesc(dbCon.rs.getString("desc"));
-//			childFood.setImage(dbCon.rs.getString("img"));
-//			childFood.setKitchen(new Kitchen.QueryBuilder(dbCon.rs.getInt("kitchen_id"), dbCon.rs.getString("kitchen_name")) 
-//	 				   				   		.setRestaurantId(restaurantId)
-//	 				   				   		.setDisplayId(dbCon.rs.getInt("kitchen_display_id"))
-//	 				   				   		.setAllowTemp(dbCon.rs.getBoolean("is_allow_temp"))
-//	 				   				   		.setType(dbCon.rs.getShort("kitchen_type"))
-//	 				   				   		.setDept(new Department(dbCon.rs.getString("dept_name"), 
-//	 				   				    		   		  	    dbCon.rs.getShort("dept_id"), 
-//	 				   				    		   		  	    restaurantId,
-//	 				   				    		   		  	    Department.Type.valueOf(dbCon.rs.getShort("dept_type")),
-//	 				   				    		   		  	    dbCon.rs.getInt("dept_display_id")))
-//	 				   				     .build());
-//			childFood.setStockStatus(dbCon.rs.getInt("stock_status"));
-//			
-//			childFood.setAmount(dbCon.rs.getInt("amount"));
-//			
-//			result.add(childFood);
-//		}				
-//		dbCon.rs.close();
 		return result;
 				
 	}
@@ -588,15 +558,17 @@ public class FoodDao {
 	 * 			the id to parent food
 	 * @param staff
 	 * 			the staff to perform this action
+	 * @param extraCond
+	 * 			the extra condition {@link ExtraCond4Combo}
 	 * @return	a food list containing the child foods
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static List<ComboFood> getChildrenByParent(Staff staff, int parentId) throws SQLException{
+	public static List<ComboFood> getComboByCond(Staff staff, ExtraCond4Combo extraCond) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return getChildrenByParent(dbCon, staff, parentId);
+			return getComboByCond(dbCon, staff, extraCond);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -996,7 +968,7 @@ public class FoodDao {
 		//Get the combo detail to each food if belongs to combo. 
 		for(Entry<Integer, Food> entry : foods.entrySet()){
 			if(entry.getValue().isCombo()){
-				entry.getValue().setChildFoods(getChildrenByParent(dbCon, staff, entry.getValue().getFoodId()));
+				entry.getValue().setChildFoods(getComboByCond(dbCon, staff, new ExtraCond4Combo(entry.getValue().getFoodId())));
 			}
 		}
 		

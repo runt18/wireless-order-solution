@@ -1,4 +1,4 @@
-package com.wireless.db.frontBusiness;
+package com.wireless.db.orderMgr;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -8,7 +8,6 @@ import com.wireless.db.Params;
 import com.wireless.db.client.member.MemberDao;
 import com.wireless.db.coupon.CouponDao;
 import com.wireless.db.distMgr.DiscountDao;
-import com.wireless.db.orderMgr.OrderDao;
 import com.wireless.db.system.SystemDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.FrontBusinessError;

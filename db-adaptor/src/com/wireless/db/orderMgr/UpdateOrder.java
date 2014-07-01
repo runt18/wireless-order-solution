@@ -1,4 +1,4 @@
-package com.wireless.db.frontBusiness;
+package com.wireless.db.orderMgr;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -7,15 +7,8 @@ import java.util.List;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
-import com.wireless.db.crMgr.CancelReasonDao;
-import com.wireless.db.deptMgr.KitchenDao;
 import com.wireless.db.distMgr.DiscountDao;
-import com.wireless.db.menuMgr.FoodDao;
-import com.wireless.db.orderMgr.OrderDao;
-import com.wireless.db.orderMgr.OrderFoodDao;
-import com.wireless.db.orderMgr.TasteGroupDao;
 import com.wireless.db.regionMgr.TableDao;
-import com.wireless.db.tasteMgr.TasteDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.FrontBusinessError;
 import com.wireless.exception.ProtocolError;
@@ -27,7 +20,6 @@ import com.wireless.pojo.dishesOrder.TasteGroup;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.staffMgr.Staff;
-import com.wireless.pojo.tasteMgr.Taste;
 import com.wireless.util.DateType;
 
 public class UpdateOrder {
@@ -210,7 +202,8 @@ public class UpdateOrder {
 		//Fill the detail to each new order food
 		List<OrderFood> newFoods = newOrder.getOrderFoods(); 
 		for(OrderFood of : newFoods){
-			fillFoodDetail(dbCon, staff, of);
+			OrderFoodDao.fill(dbCon, staff, of);
+			//fillFoodDetail(dbCon, staff, of);
 		}
 		
 		//Set the default discount to new order if original order is unpaid
@@ -258,94 +251,50 @@ public class UpdateOrder {
 		//insert the extra order food records
 		for(OrderFood extraFood : diffResult.extraFoods){
 
-			/**
-			 * Insert the taste group info if containing taste.
-			 */
-			if(extraFood.hasTasteGroup()){
-				
-				TasteGroup tg = extraFood.getTasteGroup();		
-				
-				int tgId = TasteGroupDao.insert(dbCon, staff, new TasteGroup.InsertBuilder(extraFood)
-			     															.addAllTastes(tg.getNormalTastes())
-			     															.setTmpTaste(tg.getTmpTaste()));
-				tg.setGroupId(tgId);
-				
-//				/**
-//				 * Insert the taste group if containing taste.
-//				 */
-//				sql = " INSERT INTO " + Params.dbName + ".taste_group " +
-//					  " ( " +
-//					  " `normal_taste_group_id`, `normal_taste_pref`, `normal_taste_price`, " +
-//					  " `tmp_taste_id`, `tmp_taste_pref`, `tmp_taste_price` " +
-//					  " ) " +
-//					  " SELECT " +
-//					  (tg.hasNormalTaste() ? "MAX(normal_taste_group_id) + 1" : TasteGroup.EMPTY_NORMAL_TASTE_GROUP_ID) + ", " +
-//					  (tg.hasNormalTaste() ? ("'" + tg.getNormalTastePref() + "'") : "NULL") + ", " +
-//					  (tg.hasNormalTaste() ? tg.getNormalTastePrice() : "NULL") + ", " +
-//					  (tg.hasTmpTaste() ? tg.getTmpTaste().getTasteId() : "NULL") + ", " +
-//					  (tg.hasTmpTaste() ? ("'" + tg.getTmpTastePref() + "'") : "NULL") + ", " +
-//					  (tg.hasTmpTaste() ? tg.getTmpTastePrice() : "NULL") +
-//					  " FROM " + 
-//					  Params.dbName + ".taste_group" +
-//					  " LIMIT 1 ";
-//				dbCon.stmt.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
-//				//get the generated id to taste group 
-//				dbCon.rs = dbCon.stmt.getGeneratedKeys();
-//				if(dbCon.rs.next()){
-//					tg.setGroupId(dbCon.rs.getInt(1));
-//				}else{
-//					throw new SQLException("The id of taste group is not generated successfully.");
-//				}
-//				
-//				/**
-//				 * Insert the normal taste group if containing normal tastes.
-//				 */
-//				if(tg.hasNormalTaste()){
-//					for(Taste normalTaste : tg.getNormalTastes()){
-//						sql = " INSERT INTO " + Params.dbName + ".normal_taste_group " +
-//							  " ( " +
-//							  " `normal_taste_group_id`, `taste_id` " +
-//							  " ) " +
-//							  " VALUES " +
-//							  " ( " +
-//							  " (SELECT normal_taste_group_id FROM " + Params.dbName + ".taste_group " + 
-//							  " WHERE " +
-//							  " taste_group_id = " + tg.getGroupId() + ")" + " , " +
-//							  normalTaste.getTasteId() + 
-//							  " ) ";
-//						dbCon.stmt.executeUpdate(sql);
-//					}
-//				}
-			}
+			OrderFoodDao.insertExtra(dbCon, staff, new OrderFoodDao.ExtraBuilder(diffResult.newOrder.getId(), extraFood).setPaid(diffResult.oriOrder.isUnpaid()));
 			
-			sql = " INSERT INTO " + Params.dbName + ".order_food " +
-				  " ( " + 
-				  " `restaurant_id`, `order_id`, `food_id`, `order_count`, `unit_price`, `commission`, `name`, `food_status`, " +
-				  " `discount`, `taste_group_id`, " +
-				  " `dept_id`, `kitchen_id`, " +
-				  " `staff_id`, `waiter`, `order_date`, `is_temporary`, `is_paid` " +
-				  " ) " +
-				  " VALUES " +
-				  "(" +
-				  staff.getRestaurantId() + ", " +
-				  diffResult.newOrder.getId() + ", " +
-				  extraFood.getFoodId() + ", " +
-				  extraFood.getCount() + ", " + 
-				  extraFood.asFood().getPrice() + ", " + 
-				  extraFood.asFood().getCommission() + ", " +
-				  "'" + extraFood.getName() + "', " + 
-				  extraFood.asFood().getStatus() + ", " +
-				  extraFood.getDiscount() + ", " +
-				  extraFood.getTasteGroup().getGroupId() + ", " +
-				  extraFood.getKitchen().getDept().getId() + ", " +
-				  extraFood.getKitchen().getId() + ", " +
-				  staff.getId() + ", " +
-				  "'" + staff.getName() + "', " +
-				  "NOW(), " + 
-				  (extraFood.isTemp() ? 1 : 0) + ", " +
-				  (diffResult.oriOrder.isUnpaid() ? 0 : 1) +
-				  " ) ";
-			dbCon.stmt.executeUpdate(sql);		
+//			/**
+//			 * Insert the taste group info if containing taste.
+//			 */
+//			if(extraFood.hasTasteGroup()){
+//				
+//				TasteGroup tg = extraFood.getTasteGroup();		
+//				
+//				int tgId = TasteGroupDao.insert(dbCon, staff, new TasteGroup.InsertBuilder(extraFood.asFood())
+//			     															.addTastes(tg.getNormalTastes())
+//			     															.setTmpTaste(tg.getTmpTaste()));
+//				tg.setGroupId(tgId);
+//				
+//			}
+//			
+//			sql = " INSERT INTO " + Params.dbName + ".order_food " +
+//				  " ( " + 
+//				  " `restaurant_id`, `order_id`, `food_id`, `order_count`, `unit_price`, `commission`, `name`, `food_status`, " +
+//				  " `discount`, `taste_group_id`, " +
+//				  " `dept_id`, `kitchen_id`, " +
+//				  " `staff_id`, `waiter`, `order_date`, `is_temporary`, `is_paid` " +
+//				  " ) " +
+//				  " VALUES " +
+//				  "(" +
+//				  staff.getRestaurantId() + ", " +
+//				  diffResult.newOrder.getId() + ", " +
+//				  extraFood.getFoodId() + ", " +
+//				  extraFood.getCount() + ", " + 
+//				  extraFood.asFood().getPrice() + ", " + 
+//				  extraFood.asFood().getCommission() + ", " +
+//				  "'" + extraFood.getName() + "', " + 
+//				  extraFood.asFood().getStatus() + ", " +
+//				  extraFood.getDiscount() + ", " +
+//				  extraFood.getTasteGroup().getGroupId() + ", " +
+//				  extraFood.getKitchen().getDept().getId() + ", " +
+//				  extraFood.getKitchen().getId() + ", " +
+//				  staff.getId() + ", " +
+//				  "'" + staff.getName() + "', " +
+//				  "NOW(), " + 
+//				  (extraFood.isTemp() ? 1 : 0) + ", " +
+//				  (diffResult.oriOrder.isUnpaid() ? 0 : 1) +
+//				  " ) ";
+//			dbCon.stmt.executeUpdate(sql);		
 			
 			//FIXME Insert the temporary food to menu.
 //			if(extraFood.isTemp()){
@@ -464,36 +413,36 @@ public class UpdateOrder {
 	 * @throws SQLException
 	 * 			throws if fail to execute any SQL statement
 	 */
-	private static void fillFoodDetail(DBCon dbCon, Staff staff, OrderFood foodToFill) throws BusinessException, SQLException{
-		
-		//Get the details to cancel reason if contained.
-		if(foodToFill.hasCancelReason()){
-			foodToFill.setCancelReason(CancelReasonDao.getReasonById(dbCon, staff, foodToFill.getCancelReason().getId()));
-		}
-		
-		if(foodToFill.isTemp()){
-			// Get the associated kitchen detail in case of temporary.
-			foodToFill.asFood().setKitchen(KitchenDao.getById(dbCon, staff, foodToFill.getKitchen().getId()));
-			
-		}else{
-			//Get the details to each order food			
-			foodToFill.asFood().copyFrom(FoodDao.getById(dbCon, staff, foodToFill.getFoodId()));
-			
-			//Get the details to each normal tastes.
-			if(foodToFill.hasNormalTaste()){
-				//Get the detail to each tastes.
-				for(Taste taste : foodToFill.getTasteGroup().getTastes()){
-					taste.copyFrom(TasteDao.getTasteById(dbCon, staff, taste.getTasteId()));
-				}
-				
-				//Get the detail to each spec.
-				if(foodToFill.getTasteGroup().hasSpec()){
-					foodToFill.getTasteGroup().getSpec().copyFrom(TasteDao.getTasteById(dbCon, staff, foodToFill.getTasteGroup().getSpec().getTasteId()));
-				}
-				foodToFill.getTasteGroup().refresh();
-			}			
-		}		
-	}
+//	private static void fillFoodDetail(DBCon dbCon, Staff staff, OrderFood foodToFill) throws BusinessException, SQLException{
+//		
+//		//Get the details to cancel reason if contained.
+//		if(foodToFill.hasCancelReason()){
+//			foodToFill.setCancelReason(CancelReasonDao.getReasonById(dbCon, staff, foodToFill.getCancelReason().getId()));
+//		}
+//		
+//		if(foodToFill.isTemp()){
+//			// Get the associated kitchen detail in case of temporary.
+//			foodToFill.asFood().setKitchen(KitchenDao.getById(dbCon, staff, foodToFill.getKitchen().getId()));
+//			
+//		}else{
+//			//Get the details to each order food			
+//			foodToFill.asFood().copyFrom(FoodDao.getById(dbCon, staff, foodToFill.getFoodId()));
+//			
+//			//Get the details to each normal tastes.
+//			if(foodToFill.hasNormalTaste()){
+//				//Get the detail to each tastes.
+//				for(Taste taste : foodToFill.getTasteGroup().getTastes()){
+//					taste.copyFrom(TasteDao.getTasteById(dbCon, staff, taste.getTasteId()));
+//				}
+//				
+//				//Get the detail to each spec.
+//				if(foodToFill.getTasteGroup().hasSpec()){
+//					foodToFill.getTasteGroup().getSpec().copyFrom(TasteDao.getTasteById(dbCon, staff, foodToFill.getTasteGroup().getSpec().getTasteId()));
+//				}
+//				foodToFill.getTasteGroup().refresh();
+//			}			
+//		}		
+//	}
 	
 	/**
 	 * Compare the order foods of new order with the ones of original order,

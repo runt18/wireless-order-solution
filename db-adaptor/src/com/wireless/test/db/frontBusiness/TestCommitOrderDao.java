@@ -9,11 +9,11 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.wireless.db.frontBusiness.CancelOrder;
-import com.wireless.db.frontBusiness.InsertOrder;
-import com.wireless.db.frontBusiness.UpdateOrder;
 import com.wireless.db.menuMgr.FoodDao;
+import com.wireless.db.orderMgr.CancelOrder;
+import com.wireless.db.orderMgr.InsertOrder;
 import com.wireless.db.orderMgr.OrderDao;
+import com.wireless.db.orderMgr.UpdateOrder;
 import com.wireless.db.regionMgr.TableDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
