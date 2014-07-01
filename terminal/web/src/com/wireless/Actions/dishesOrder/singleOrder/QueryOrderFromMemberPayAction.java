@@ -12,7 +12,7 @@ import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.client.member.MemberDao;
 import com.wireless.db.coupon.CouponDao;
-import com.wireless.db.frontBusiness.PayOrder;
+import com.wireless.db.orderMgr.PayOrder;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.MemberError;

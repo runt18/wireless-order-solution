@@ -11,8 +11,8 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import com.wireless.db.frontBusiness.PayOrder;
-import com.wireless.db.frontBusiness.UpdateOrder;
+import com.wireless.db.orderMgr.PayOrder;
+import com.wireless.db.orderMgr.UpdateOrder;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
