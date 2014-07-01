@@ -67,7 +67,7 @@ function commissionDetailInit(){
 		readOnly : false,
 		allowBlank : false
 	});
-	var commission_dateCombo = Ext.ux.createDateCombo({
+	commission_dateCombo = Ext.ux.createDateCombo({
 		beginDate : commission_beginDate,
 		endDate : commission_endDate,
 		callback : function(){
@@ -245,10 +245,13 @@ function commissionDetailInit(){
 						staffID : commission_combo_staffs.getValue()					
 					};
 					
+					
+					commission_chartLoadMarsk.show();
 					Ext.Ajax.request({
 						url : '../../QueryCommissionStatistics.do',
 						params : requestParams,
 						success : function(res, opt){
+							commission_chartLoadMarsk.hide();
 							var jr = Ext.decode(res.responseText);
 							showCommissionDetailChart(jr);
 						},
@@ -319,10 +322,7 @@ function commissionDetailInit(){
 	    bbar : pagingBar
 	});
 	commissionStatisticsGrid.region = 'center';
-	commissionStatisticsGrid.on('render', function(){
-		commission_dateCombo.setValue(1);
-		commission_dateCombo.fireEvent('select', commission_dateCombo, null, 1);
-	});
+	
 	commissionStatisticsGrid.getStore().on('load', function(store, records, options){
 		
 		if(store.getCount() > 0){
@@ -621,6 +621,7 @@ var commissionStaffChartData = {chartData : {type : 'pie', name : '比例', data
 				            }}}};
 
 var titleCommissionDeptName, titleCommissionStaffName;
+var commission_chartLoadMarsk, commission_dateCombo;
 Ext.onReady(function(){
 	commissionDetailInit();
 	
@@ -727,5 +728,12 @@ Ext.onReady(function(){
 			commissionStaffChart_amount.setSize(commissionStatChartTabPanel.getWidth()/2, panelDrag ? commissionStatChartTabPanel.getHeight() - 60 : commissionStatChartTabPanel.getHeight()-30);
 		}		
 	);	
-//	commissionStatisticsGrid.getStore().load();
+	
+	commission_chartLoadMarsk = new Ext.LoadMask(commissionStatChartTabPanel.getEl().dom, {
+	    msg  : '数据统计中，请稍候......',
+	    disabled : false
+	});
+	
+	commission_dateCombo.setValue(1);
+	commission_dateCombo.fireEvent('select', commission_dateCombo, null, 1);
 });

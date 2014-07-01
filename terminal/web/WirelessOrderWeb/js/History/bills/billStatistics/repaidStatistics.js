@@ -259,6 +259,7 @@ function repaid_getStaffChartData(){
 		async : false,
 		data : requestParams,
 		success : function(jr, status, xhr){
+			repaid_chartLoadMarsk.hide();
 			repaid_staffChartData.chartData.data = [];
 			repaid_staffChartData.chartAmountData.data = [];
 			repaid_staffChartData.staffColumnChart.xAxis = [];
@@ -370,10 +371,13 @@ function initGrid(){
 						staffID : repaid_combo_staffs.getValue()					
 					};
 					
+					repaid_chartLoadMarsk.show();
+					
 					Ext.Ajax.request({
 						url : '../../QueryRepaidStatistics.do',
 						params : requestParams,
 						success : function(res, opt){
+							repaid_chartLoadMarsk.hide();
 							var jr = Ext.decode(res.responseText);
 							showRepaidDetailChart(jr);
 						},
@@ -441,10 +445,6 @@ function initGrid(){
 	    bbar : pagingBar
 	});
 	repaidStatisticsGrid.region = 'center';
-	repaidStatisticsGrid.on('render', function(){
-		repaid_dateCombo.setValue(1);
-		repaid_dateCombo.fireEvent('select', repaid_dateCombo, null, 1);
-	});
 	
 	repaidStatisticsGrid.getStore().on('load', function(store, records, options){
 		
@@ -565,7 +565,8 @@ var repaid_staffChartData = {chartData : {type : 'pie', name : '比例', data : 
 				                format: '{point.y} 份'
 				            }}}};
 
-var titleRepaidStaffName;				            
+var titleRepaidStaffName;		
+var repaid_chartLoadMarsk;
 Ext.onReady(function(){
 
 	initGrid();
@@ -672,5 +673,20 @@ Ext.onReady(function(){
 			repaidStaffChart.setSize(repaidStatChartTabPanel.getWidth()/2, repaid_panelDrag ? repaidStatChartTabPanel.getHeight() - 60 : repaidStatChartTabPanel.getHeight()-30);
 			repaidStaffChart_amount.setSize(repaidStatChartTabPanel.getWidth()/2, repaid_panelDrag ? repaidStatChartTabPanel.getHeight() - 60 : repaidStatChartTabPanel.getHeight()-30);
 		}		
-	);    
+	);  
+	
+	repaid_chartLoadMarsk = new Ext.LoadMask(repaidStatChartTabPanel.getEl().dom, {
+	    msg  : '数据统计中，请稍候......',
+	    disabled : false
+	});
+	
+	if(sendToPageOperation){
+		repaid_beginDate.setValue(sendToStatisticsPageBeginDate);
+		repaid_endDate.setValue(sendToStatisticsPageEndDate);		
+		Ext.getCmp('btnSearchForRepaidStatistics').handler();
+		sendToPageOperation = false;
+	}else{
+		repaid_dateCombo.setValue(1);
+		repaid_dateCombo.fireEvent('select', repaid_dateCombo, null, 1);			
+	}		
 });

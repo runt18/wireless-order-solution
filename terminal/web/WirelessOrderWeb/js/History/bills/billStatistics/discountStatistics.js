@@ -27,7 +27,7 @@ function initDiscountGrid(){
 			}
 		}
 	});
-	var dateCombo = Ext.ux.createDateCombo({
+	discount_dateCombo = Ext.ux.createDateCombo({
 		beginDate : beginDate,
 		endDate : endDate,
 		callback : function(){
@@ -120,7 +120,7 @@ function initDiscountGrid(){
 		items : [{
 				xtype : 'tbtext',
 				text : '日期:'
-			}, dateCombo, {
+			}, discount_dateCombo, {
 				xtype : 'tbtext',
 				text : '&nbsp;'
 			}, beginDate , {
@@ -172,11 +172,13 @@ function initDiscountGrid(){
 						deptID : discount_deptCombo.getValue(),
 						staffId : discount_combo_staffs.getValue()					
 					};
-					
+					discount_chartLoadMarsk.show();
 					Ext.Ajax.request({
 						url : '../../QueryDiscountStatistics.do',
 						params : requestParams,
 						success : function(res, opt){
+							discount_chartLoadMarsk.hide();
+							
 							var jr = Ext.decode(res.responseText);
 							showDiscountDetailChart(jr);
 						},
@@ -257,10 +259,6 @@ function initDiscountGrid(){
 		[discountStatisticsGridTbar]
 	);
 	discountStatisticsGrid.region = 'center';
-	discountStatisticsGrid.on('render', function(){
-		dateCombo.setValue(1);
-		dateCombo.fireEvent('select', dateCombo, null, 1);
-	});
 	discountStatisticsGrid.getStore().on('load', function(store, records, options){
 		if(store.getCount() > 0){
 			var sumRow = discountStatisticsGrid.getView().getRow(store.getCount()-1);	
@@ -400,6 +398,7 @@ function discount_getStaffChartData(){
 		async : false,
 		data : requestParams,
 		success : function(jr, status, xhr){
+			discount_chartLoadMarsk.hide();
 			discount_staffChartData.chartData.data = [];
 			discount_staffChartData.chartAmountData.data = [];
 			discount_staffChartData.staffColumnChart.xAxis = [];
@@ -421,7 +420,6 @@ function discount_getStaffChartData(){
 }
 
 function discount_loadStaffChart(){
-	
 	discount_staffChart = new Highcharts.Chart({
 	    chart: {
 	    	renderTo : 'divDiscountPriceStaffChart',
@@ -714,6 +712,8 @@ var discount_deptChartData = {chartData : {type : 'pie', name : '比例', data :
 				                },
 				                format: '{point.y} 份'
 				            }}}};
+				            
+var discount_chartLoadMarsk, discount_dateCombo ;
 Ext.onReady(function(){
 	initDiscountGrid();
 	
@@ -874,5 +874,19 @@ Ext.onReady(function(){
 		}		
 	);	
 	
+	discount_chartLoadMarsk = new Ext.LoadMask(discountStatChartTabPanel.getEl().dom, {
+	    msg  : '数据统计中，请稍候......',
+	    disabled : false
+	});	
+	if(sendToPageOperation){
+		Ext.getCmp('discount_dateSearchDateBegin').setValue(sendToStatisticsPageBeginDate);
+		Ext.getCmp('discount_dateSearchDateEnd').setValue(sendToStatisticsPageEndDate);		
+		Ext.getCmp('btnSearchForDiscountStatistics').handler();
+		sendToPageOperation = false;
+	}else{
+		discount_dateCombo.setValue(1);
+		discount_dateCombo.fireEvent('select', discount_dateCombo, null, 1);			
+	}					
+
 	
 });

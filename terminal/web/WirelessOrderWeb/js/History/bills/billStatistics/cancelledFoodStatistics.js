@@ -1,5 +1,6 @@
 var cfdsGrid;
 var CANCELL_FOOD_PAGE_LIMIT = 22;
+
 function cancellFood_showBillDetailWin(){
 	cancellFoodOrderDetailWin = new Ext.Window({
 		layout : 'fit',
@@ -77,7 +78,7 @@ function cancelFoodDetailsStatPanelInit(){
 			}
 		}
 	});
-	var dateCombo = Ext.ux.createDateCombo({
+	cancel_dateCombo = Ext.ux.createDateCombo({
 		beginDate : beginDate,
 		endDate : endDate,
 		callback : function(){
@@ -204,7 +205,7 @@ function cancelFoodDetailsStatPanelInit(){
 		}
 	});
 	
-	var cfdsGridDateTbar = Ext.ux.initTimeBar({beginDate:beginDate, endDate:endDate,dateCombo:dateCombo, tbarType : 0, statistic : 'cancel_'});
+	var cfdsGridDateTbar = Ext.ux.initTimeBar({beginDate:beginDate, endDate:endDate,dateCombo:cancel_dateCombo, tbarType : 0, statistic : 'cancel_'});
 	
 	var cfdsGridTbar = new Ext.Toolbar({
 		height : 26,
@@ -228,8 +229,8 @@ function cancelFoodDetailsStatPanelInit(){
 				var bd = beginDate.getValue();
 				var ed = endDate.getValue();
 				if(bd == '' && ed == ''){
-					dateCombo.setValue(0);
-					dateCombo.fireEvent('select',dateCombo,null,0);
+					cancel_dateCombo.setValue(0);
+					cancel_dateCombo.fireEvent('select',cancel_dateCombo,null,0);
 					return;
 				}else if(bd != '' && ed == ''){
 					Ext.ux.checkDuft(true, beginDate.getId(), endDate.getId());
@@ -282,11 +283,13 @@ function cancelFoodDetailsStatPanelInit(){
 					opening : opening,
 					ending : ending
 				};
+				cancel_chartLoadMarsk.show();
 				
 				Ext.Ajax.request({
 					url : '../../QueryCancelledFood.do',
 					params : cancel_requestParams,
 					success : function(res, opt){
+						cancel_chartLoadMarsk.hide();
 						var jr = Ext.decode(res.responseText);
 						showCancelDetailChart(jr);
 					},
@@ -393,10 +396,7 @@ function cancelFoodDetailsStatPanelInit(){
 		[cfdsGridTbar, cfdsGridDateTbar]
 	);
 	cfdsGrid.region = 'center';
-	cfdsGrid.on('render', function(){
-		dateCombo.setValue(1);
-		dateCombo.fireEvent('select', dateCombo, null, 1);
-	});
+
 	cfdsGrid.getStore().on('load', function(store, records, options){
 		if(store.getCount() > 0){
 			var sumRow = cfdsGrid.getView().getRow(store.getCount()-1);	
@@ -1025,7 +1025,10 @@ var cancel_deptChartData = {chartData : {type : 'pie', name : '比例', data : [
 				                format: '{point.y} 份'
 				            }}}};
 				            
-var titleCancelStaffName, titleCancelDeptName;				            
+var titleCancelStaffName, titleCancelDeptName;		
+
+
+var cancel_chartLoadMarsk, cancel_dateCombo;
 Ext.onReady(function(){
 	cancelFoodDetailsStatPanelInit();
 	
@@ -1237,9 +1240,20 @@ Ext.onReady(function(){
 			cancel_deptChart.setSize(cancelFoodStatChartTabPanel.getWidth()/2, cancel_panelDrag ? cancelFoodStatChartTabPanel.getHeight() - 60 : cancelFoodStatChartTabPanel.getHeight()-30);
 			cancel_deptChart_amount.setSize(cancelFoodStatChartTabPanel.getWidth()/2, cancel_panelDrag ? cancelFoodStatChartTabPanel.getHeight() - 60 : cancelFoodStatChartTabPanel.getHeight()-30);
 		}		
-	);	
+	);
 	
-/*	$('.changeChart').click(function(){
-		eval($('div:visible[data-type=chart]').attr('data-value')).setSize(cancelFoodStatChartTabPanel.getWidth(), cancel_panelDrag ? cancelFoodStatChartTabPanel.getHeight() - 60 : cancelFoodStatChartTabPanel.getHeight()-30);
-	});*/
+	cancel_chartLoadMarsk = new Ext.LoadMask(cancelFoodStatChartTabPanel.getEl().dom, {
+	    msg  : '数据统计中，请稍候......',
+	    disabled : false
+	});	
+	
+	if(sendToPageOperation){
+		Ext.getCmp('cancel_dateSearchDateBegin').setValue(sendToStatisticsPageBeginDate);
+		Ext.getCmp('cancel_dateSearchDateEnd').setValue(sendToStatisticsPageEndDate);		
+		Ext.getCmp('cancel_btnSearch').handler();
+		sendToPageOperation = false;
+	}else{
+		cancel_dateCombo.setValue(1);
+		cancel_dateCombo.fireEvent('select', cancel_dateCombo, null, 1);			
+	}	
 });
