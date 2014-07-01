@@ -13,10 +13,8 @@ import com.wireless.pack.Type;
 import com.wireless.pack.req.ReqQueryOrderByTable;
 import com.wireless.parcel.Parcel;
 import com.wireless.pojo.dishesOrder.Order;
-import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.menuMgr.FoodMenu;
 import com.wireless.pojo.staffMgr.Staff;
-import com.wireless.pojo.tasteMgr.Taste;
 import com.wireless.sccon.ServerConnector;
 
 public abstract class QueryOrderTask extends AsyncTask<Void, Void, Order>{
@@ -25,6 +23,7 @@ public abstract class QueryOrderTask extends AsyncTask<Void, Void, Order>{
 	
 	protected int mTblAlias;
 
+	@SuppressWarnings("unused")
 	private final FoodMenu mFoodMenu;
 	
 	private final Staff mStaff;
@@ -45,16 +44,16 @@ public abstract class QueryOrderTask extends AsyncTask<Void, Void, Order>{
 				order = new Parcel(resp.body).readParcel(Order.CREATOR);
 				
 				//Get the detail to each order food
-				for(OrderFood eachOrderFood : order.getOrderFoods()){
+//				for(OrderFood eachOrderFood : order.getOrderFoods()){
 					//eachOrderFood.asFood().copyFrom(mFoodMenu.foods.find(eachOrderFood.asFood()));
 					
-					if(eachOrderFood.hasNormalTaste()){
-						//Get the normal taste detail to each order food
-						for(Taste eachNormalTaste : eachOrderFood.getTasteGroup().getNormalTastes()){
-							eachNormalTaste.copyFrom(mFoodMenu.tastes.get(mFoodMenu.tastes.indexOf(eachNormalTaste)));
-						}
-					}
-				}
+//					if(eachOrderFood.hasNormalTaste()){
+//						//Get the normal taste detail to each order food
+//						for(Taste eachNormalTaste : eachOrderFood.getTasteGroup().getNormalTastes()){
+//							eachNormalTaste.copyFrom(mFoodMenu.tastes.get(mFoodMenu.tastes.indexOf(eachNormalTaste)));
+//						}
+//					}
+//				}
 				
 			}else{
 				

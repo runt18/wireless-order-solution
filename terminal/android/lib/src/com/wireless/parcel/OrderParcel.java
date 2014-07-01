@@ -39,9 +39,8 @@ public class OrderParcel implements Parcelable{
 			mSrcOrder.setTotalPrice(NumericUtil.int2Float(in.readInt()));
 			mSrcOrder.setActualPrice(NumericUtil.int2Float(in.readInt()));
 			//unmarshal the foods		
-			List<OrderFoodParcel> foodParcels = in.createTypedArrayList(OrderFoodParcel.CREATOR);
 			List<OrderFood> orderFoods = new LinkedList<OrderFood>();
-			for(OrderFoodParcel foodParcel : foodParcels){
+			for(OrderFoodParcel foodParcel : in.createTypedArrayList(OrderFoodParcel.CREATOR)){
 				orderFoods.add(foodParcel.asOrderFood());
 			}
 			mSrcOrder.setOrderFoods(orderFoods);

@@ -6,8 +6,8 @@ import java.util.List;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.wireless.pojo.dishesOrder.TasteGroup;
 import com.wireless.pojo.tasteMgr.Taste;
-import com.wireless.pojo.tasteMgr.TasteGroup;
 
 public class TasteGroupParcel implements Parcelable{
 
@@ -25,29 +25,36 @@ public class TasteGroupParcel implements Parcelable{
 	
 	private TasteGroupParcel(Parcel in){
 		if(in.readInt() != 1){
-			mSrcTG = new TasteGroup();
 			
 			//un-marshal the group id
-			mSrcTG.setGroupId(in.readInt());
+			int tgId = in.readInt();
 			
 			//un-marshal the normal tastes
 			List<TasteParcel> normalTasteParcels = in.createTypedArrayList(TasteParcel.CREATOR);
+			List<Taste> normalTastes = new ArrayList<Taste>();
 			for(TasteParcel tp : normalTasteParcels){
-				mSrcTG.addTaste(tp.asTaste());
+				normalTastes.add(tp.asTaste());
 			}
 			
+			//un-marshal the normal taste
+			Taste normalTaste = TasteParcel.CREATOR.createFromParcel(in).asTaste();
+			
 			//un-marshal the temporary taste
-			mSrcTG.setTmpTaste(TasteParcel.CREATOR.createFromParcel(in).asTaste());
+			Taste tmpTaste = TasteParcel.CREATOR.createFromParcel(in).asTaste();
+			
+			mSrcTG = new TasteGroup(tgId, normalTaste, normalTastes, tmpTaste);
 		}else{		
 			mSrcTG = null;
 		}
 	}
 
     public static final Parcelable.Creator<TasteGroupParcel> CREATOR = new Parcelable.Creator<TasteGroupParcel>() {
+    	@Override
     	public TasteGroupParcel createFromParcel(Parcel in) {
     		return new TasteGroupParcel(in);
     	}
 
+    	@Override
     	public TasteGroupParcel[] newArray(int size) {
     		return new TasteGroupParcel[size];
     	}
@@ -74,6 +81,9 @@ public class TasteGroupParcel implements Parcelable{
 				normalTastes.add(new TasteParcel(t));
 			}
 			parcel.writeTypedList(normalTastes);
+			
+			//marshal the normal taste
+			new TasteParcel(mSrcTG.getNormalTaste()).writeToParcel(parcel, flags);
 			
 			//marshal the temporary taste
 			new TasteParcel(mSrcTG.getTmpTaste()).writeToParcel(parcel, flags);

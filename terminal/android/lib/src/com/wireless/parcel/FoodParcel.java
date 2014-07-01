@@ -6,6 +6,7 @@ import java.util.List;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.wireless.pojo.menuMgr.ComboFood;
 import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.tasteMgr.Taste;
 
@@ -23,8 +24,10 @@ public class FoodParcel implements Parcelable{
 		if(in.readInt() != 1){
 			mSrcFood = new Food(in.readInt());
 			mSrcFood.setAliasId(in.readInt());
+			mSrcFood.setPrice(in.readFloat());
 			mSrcFood.setRestaurantId(in.readInt());
 			mSrcFood.setKitchen(KitchenParcel.CREATOR.createFromParcel(in).asKitchen());
+			mSrcFood.setStatus(in.readInt());
 			mSrcFood.setName(in.readString());
 			mSrcFood.setPinyin(in.readString());
 			mSrcFood.setPinyinShortcut(in.readString());
@@ -39,13 +42,11 @@ public class FoodParcel implements Parcelable{
 			}
 			mSrcFood.setPopTastes(popTastes);
 			
-			mSrcFood.setAmount(in.readInt());
-			
 			//un-marshal the child foods
-			List<FoodParcel> childFoodsParcels = in.createTypedArrayList(FoodParcel.CREATOR);
-			List<Food> childFoods = new ArrayList<Food>(childFoodsParcels.size());
-			for(FoodParcel fp : childFoodsParcels){
-				childFoods.add(fp.asFood());
+			List<ComboFoodParcel> childFoodsParcels = in.createTypedArrayList(ComboFoodParcel.CREATOR);
+			List<ComboFood> childFoods = new ArrayList<ComboFood>(childFoodsParcels.size());
+			for(ComboFoodParcel cfp : childFoodsParcels){
+				childFoods.add(cfp.asComboFood());
 			}
 			mSrcFood.setChildFoods(childFoods);
 			
@@ -60,10 +61,12 @@ public class FoodParcel implements Parcelable{
 	}
 	
 	public static final Parcelable.Creator<FoodParcel> CREATOR = new Parcelable.Creator<FoodParcel>() {
+		@Override
 		public FoodParcel createFromParcel(Parcel in) {
 			return new FoodParcel(in);
 		}
 
+		@Override
 		public FoodParcel[] newArray(int size) {
 			return new FoodParcel[size];
 		}
@@ -83,8 +86,10 @@ public class FoodParcel implements Parcelable{
 			
 			dest.writeInt(mSrcFood.getFoodId());
 			dest.writeInt(mSrcFood.getAliasId());
+			dest.writeFloat(mSrcFood.getPrice());
 			dest.writeInt(mSrcFood.getRestaurantId());
 			new KitchenParcel(mSrcFood.getKitchen()).writeToParcel(dest, flags);
+			dest.writeInt(mSrcFood.getStatus());
 			dest.writeString(mSrcFood.getName());
 			dest.writeString(mSrcFood.getPinyin());
 			dest.writeString(mSrcFood.getPinyinShortcut());
@@ -98,11 +103,10 @@ public class FoodParcel implements Parcelable{
 			}
 			dest.writeTypedList(popTasteParcels);
 			
-			dest.writeInt(mSrcFood.getAmount());
 			//marshal the child foods
-			List<FoodParcel> childFoodParcels = new ArrayList<FoodParcel>(mSrcFood.getChildFoods().size());
-			for(Food childFood : mSrcFood.getChildFoods()){
-				childFoodParcels.add(new FoodParcel(childFood));
+			List<ComboFoodParcel> childFoodParcels = new ArrayList<ComboFoodParcel>(mSrcFood.getChildFoods().size());
+			for(ComboFood childFood : mSrcFood.getChildFoods()){
+				childFoodParcels.add(new ComboFoodParcel(childFood));
 			}
 			dest.writeTypedList(childFoodParcels);
 			

@@ -6,9 +6,8 @@ import java.util.List;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.wireless.pojo.dishesOrder.ComboOrderFood;
 import com.wireless.pojo.dishesOrder.OrderFood;
-import com.wireless.pojo.menuMgr.Food;
-import com.wireless.pojo.tasteMgr.Taste;
 import com.wireless.pojo.util.NumericUtil;
 
 public class OrderFoodParcel implements Parcelable{
@@ -29,34 +28,17 @@ public class OrderFoodParcel implements Parcelable{
 		if(in.readInt() != 1){
 			mSrcOrderFood = new OrderFood();
 			mSrcOrderFood.asFood().setFoodId(in.readInt());
-			mSrcOrderFood.asFood().setAliasId(in.readInt());
-			mSrcOrderFood.asFood().getKitchen().setId(in.readInt());
-			mSrcOrderFood.asFood().setName(in.readString());
-			mSrcOrderFood.asFood().setDesc(in.readString());
-			mSrcOrderFood.asFood().setImage(in.readString());
+			mSrcOrderFood.asFood().copyFrom(FoodParcel.CREATOR.createFromParcel(in).asFood());
 			mSrcOrderFood.setHangup(in.readInt() == 1 ? true : false);
 			mSrcOrderFood.setTemp(in.readInt() == 1 ? true : false);
-			mSrcOrderFood.asFood().setStatus((short)in.readInt());
+			mSrcOrderFood.setGift(in.readInt() == 1 ? true : false);
 			mSrcOrderFood.setOrderDate(in.readLong());
 			mSrcOrderFood.setWaiter(in.readString());
 			mSrcOrderFood.setCount(NumericUtil.int2Float(in.readInt()));
-			mSrcOrderFood.asFood().setPrice(NumericUtil.int2Float(in.readInt()));
 			mSrcOrderFood.setTasteGroup(TasteGroupParcel.CREATOR.createFromParcel(in).asTasteGroup());
-			//un-marshal the most popular taste references
-			List<TasteParcel> popTasteParcels = in.createTypedArrayList(TasteParcel.CREATOR);
-			List<Taste> popTastes = new ArrayList<Taste>();
-			for(TasteParcel tp : popTasteParcels){
-				popTastes.add(tp.asTaste());
+			for(ComboOrderFoodParcel comboParcel : in.createTypedArrayList(ComboOrderFoodParcel.CREATOR)){
+				mSrcOrderFood.addCombo(comboParcel.asComboOrderFood());
 			}
-			mSrcOrderFood.asFood().setPopTastes(popTastes);
-			
-			//un-marshal the child foods
-			List<FoodParcel> childFoodsParcels = in.createTypedArrayList(FoodParcel.CREATOR);
-			List<Food> childFoods = new ArrayList<Food>(childFoodsParcels.size());
-			for(FoodParcel fp : childFoodsParcels){
-				childFoods.add(fp.asFood());
-			}
-			mSrcOrderFood.asFood().setChildFoods(childFoods);
 			
 		}else{
 			mSrcOrderFood = null;
@@ -64,10 +46,12 @@ public class OrderFoodParcel implements Parcelable{
 	}
 	
 	public static final Parcelable.Creator<OrderFoodParcel> CREATOR = new Parcelable.Creator<OrderFoodParcel>() {
+		@Override
 		public OrderFoodParcel createFromParcel(Parcel in) {
 			return new OrderFoodParcel(in);
 		}
 
+		@Override
 		public OrderFoodParcel[] newArray(int size) {
 			return new OrderFoodParcel[size];
 		}
@@ -85,35 +69,19 @@ public class OrderFoodParcel implements Parcelable{
 		}else{
 			parcel.writeInt(0);
 			parcel.writeInt(mSrcOrderFood.getFoodId());
-			parcel.writeInt(mSrcOrderFood.getAliasId());
-			parcel.writeInt(mSrcOrderFood.getKitchen().getId());
-			parcel.writeString(mSrcOrderFood.getName());
-			parcel.writeString(mSrcOrderFood.asFood().getDesc());
-			parcel.writeString(mSrcOrderFood.asFood().getImage());
+			new FoodParcel(mSrcOrderFood.asFood()).writeToParcel(parcel, flags);
 			parcel.writeInt(mSrcOrderFood.isHangup() ? 1 : 0);
 			parcel.writeInt(mSrcOrderFood.isTemp() ? 1 : 0);
-			parcel.writeInt(mSrcOrderFood.asFood().getStatus());
+			parcel.writeInt(mSrcOrderFood.isGift() ? 1 : 0);
 			parcel.writeLong(mSrcOrderFood.getOrderDate());
 			parcel.writeString(mSrcOrderFood.getWaiter());
 			parcel.writeInt(NumericUtil.float2Int(mSrcOrderFood.getCount()));
-			parcel.writeInt(NumericUtil.float2Int(mSrcOrderFood.getPrice()));
-			//marshal the taste group
 			new TasteGroupParcel(mSrcOrderFood.getTasteGroup()).writeToParcel(parcel, flags);			
-			//marshal the most popular taste references
-			List<TasteParcel> popTasteParcels = new ArrayList<TasteParcel>();
-			for(Taste popTaste : mSrcOrderFood.asFood().getPopTastes()){
-				popTasteParcels.add(new TasteParcel(popTaste));
+			List<ComboOrderFoodParcel> comboParcels = new ArrayList<ComboOrderFoodParcel>(mSrcOrderFood.getCombo().size());
+			for(ComboOrderFood cof : mSrcOrderFood.getCombo()){
+				comboParcels.add(new ComboOrderFoodParcel(cof));
 			}
-			parcel.writeTypedList(popTasteParcels);
-				
-			
-			//marshal the child foods
-			List<FoodParcel> childFoodParcels = new ArrayList<FoodParcel>(mSrcOrderFood.asFood().getChildFoods().size());
-			for(Food childFood : mSrcOrderFood.asFood().getChildFoods()){
-				childFoodParcels.add(new FoodParcel(childFood));
-			}
-			parcel.writeTypedList(childFoodParcels);
-			
+			parcel.writeTypedList(comboParcels);
 		}
 
 	}
