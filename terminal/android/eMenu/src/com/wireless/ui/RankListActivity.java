@@ -266,9 +266,9 @@ public class RankListActivity extends Activity {
 					Collections.sort(allFoods, new Comparator<Food>(){
 						@Override
 						public int compare(Food lhs, Food rhs) {
-							if(lhs.statistics.getOrderCnt() > rhs.statistics.getOrderCnt())
+							if(lhs.getStatistics().getOrderCnt() > rhs.getStatistics().getOrderCnt())
 								return -1;
-							else if(lhs.statistics.getOrderCnt() < rhs.statistics.getOrderCnt())
+							else if(lhs.getStatistics().getOrderCnt() < rhs.getStatistics().getOrderCnt())
 								return 1;
 							else return 0;
 						}
@@ -440,23 +440,23 @@ public class RankListActivity extends Activity {
 		public void handleMessage(Message msg) {
 			final RankListActivity activity = mActivity.get();
 			//替换图片
-			OrderFood food = ((OrderFoodParcel) msg.getData().getParcelable(RankListActivity.CURRENT_FOOD)).asOrderFood();
+			OrderFood of = ((OrderFoodParcel) msg.getData().getParcelable(RankListActivity.CURRENT_FOOD)).asOrderFood();
 			
-			if(food.asFood().hasImage()){
-				activity.mImageFetcher.loadImage(food.asFood().getImage(), mImageView);
+			if(of.asFood().hasImage()){
+				activity.mImageFetcher.loadImage(of.asFood().getImage(), mImageView);
 			}else{
 				mImageView.setImageResource(R.drawable.null_pic);
 			}
 			
-			mNameTextView.setText(food.getName());
-			mPriceTextView.setText(NumericUtil.float2String2(food.getPrice()));
-			addBtn.setTag(food);
+			mNameTextView.setText(of.getName());
+			mPriceTextView.setText(NumericUtil.float2String2(of.asFood().getPrice()));
+			addBtn.setTag(of);
 			
-			food = ShoppingCart.instance().searchFood(food.asFood());
-			if(food != null)
+			of = ShoppingCart.instance().searchFood(of.asFood());
+			if(of != null)
 			{
 				pickedHintView.setVisibility(View.VISIBLE);
-				mPickedText.setText(NumericUtil.float2String2(food.getCount()));
+				mPickedText.setText(NumericUtil.float2String2(of.getCount()));
 				mPickedText.setVisibility(View.VISIBLE);
 			} else {
 				mPickedText.setVisibility(View.GONE);

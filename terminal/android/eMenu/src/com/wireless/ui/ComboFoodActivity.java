@@ -24,6 +24,7 @@ import com.wireless.common.WirelessOrder;
 import com.wireless.ordermenu.R;
 import com.wireless.parcel.OrderFoodParcel;
 import com.wireless.pojo.dishesOrder.OrderFood;
+import com.wireless.pojo.menuMgr.ComboFood;
 import com.wireless.pojo.menuMgr.Food;
 import com.wireless.util.imgFetcher.ImageFetcher;
 
@@ -107,7 +108,7 @@ public class ComboFoodActivity extends Activity{
 		OrderFoodParcel foodParcel = getIntent().getParcelableExtra(OrderFoodParcel.KEY_VALUE);
 		OrderFood comboFood = foodParcel.asOrderFood();
 		//显示套餐总价
-		((TextView) findViewById(R.id.textView_foodDetail_price)).setText(String.valueOf(comboFood.getPrice()));
+		((TextView) findViewById(R.id.textView_foodDetail_price)).setText(String.valueOf(comboFood.asFood().getPrice()));
 		Log.i(TAG, "ComboFood name: "+ comboFood.getName());
 		((TextView) findViewById(R.id.textView_combo_food_name)).setText(comboFood.getName());
 		
@@ -148,15 +149,15 @@ public class ComboFoodActivity extends Activity{
 		});
 		
 		//获得所有套餐菜，以第一个菜为默认
-		List<Food> sourceChildFoods = comboFood.asFood().getChildFoods();
+		List<ComboFood> sourceChildFoods = comboFood.asFood().getChildFoods();
 		//FIXME 该数据源没有售罄的数据，导致售罄菜品依然会显示
-		List<Food> childFoods = new ArrayList<Food>();
-		for(Food f: sourceChildFoods){
-			if(f.hasImage() && !f.isSellOut())
+		List<ComboFood> childFoods = new ArrayList<ComboFood>();
+		for(ComboFood f: sourceChildFoods){
+			if(f.asFood().hasImage() && !f.asFood().isSellOut())
 				childFoods.add(f);
 		}
 		mComboFoodsAmount  = childFoods.size();
-		mShowingFood = childFoods.get(0);
+		mShowingFood = childFoods.get(0).asFood();
 		
 		mImageFetcher.setImageSize(245, 160);
 		LayoutParams lp = new LayoutParams(245, 160);
@@ -186,7 +187,7 @@ public class ComboFoodActivity extends Activity{
 		LayoutInflater inflater = getLayoutInflater();
 		//设置每个菜的图层
 		for (int i = 0; i < childFoods.size(); i++) {
-			final Food f = childFoods.get(i);
+			final Food f = childFoods.get(i).asFood();
 			View foodView = inflater.inflate(R.layout.combo_food_item, null);
 			ImageView image = (ImageView) foodView.findViewById(R.id.imageView1);
 			TextView text = (TextView) foodView.findViewById(R.id.textView_combo_name);

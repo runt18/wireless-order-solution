@@ -67,7 +67,7 @@ public class FoodDetailActivity extends Activity{
 			//设置菜品名称
 			((TextView)activity.findViewById(R.id.txtView_foodName_foodDetail)).setText(activity.mOrderFood.getName());
 			//设置菜品价格
-			((TextView)activity.findViewById(R.id.txtView_foodPrice_foodDetail)).setText(NumericUtil.float2String2(activity.mOrderFood.getUnitPriceWithTaste()));
+			((TextView)activity.findViewById(R.id.txtView_foodPrice_foodDetail)).setText(NumericUtil.float2String2(activity.mOrderFood.calcUnitPrice()));
 				
 		}
 	}

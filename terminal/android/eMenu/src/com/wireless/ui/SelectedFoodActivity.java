@@ -179,9 +179,9 @@ public class SelectedFoodActivity extends Activity
 				for(OrderFood f : ShoppingCart.instance().getNewFoods()){
 					Map<String, Object> map = new HashMap<String, Object>();
 					map.put(ITEM_FOOD_NAME, f.getName());
-					map.put(ITEM_FOOD_ORI_PRICE, String.valueOf(NumericUtil.float2String2(f.getUnitPriceWithTaste())));
+					map.put(ITEM_FOOD_ORI_PRICE, String.valueOf(NumericUtil.float2String2(f.calcUnitPrice())));
 					map.put(ITEM_FOOD_COUNT, String.valueOf(f.getCount()));
-					map.put(ITEM_FOOD_SUM_PRICE, String.valueOf(NumericUtil.float2String2(f.calcPriceWithTaste())));
+					map.put(ITEM_FOOD_SUM_PRICE, String.valueOf(NumericUtil.float2String2(f.calcPrice())));
 					map.put(ITEM_THE_FOOD, f);
 					newFoodDatas.add(map);
 				}
@@ -200,9 +200,9 @@ public class SelectedFoodActivity extends Activity
 						Map<String, Object> map = new HashMap<String, Object>();
 						map.put(ITEM_IS_ORI_FOOD, true);
 						map.put(ITEM_FOOD_NAME, f.getName());
-						map.put(ITEM_FOOD_ORI_PRICE, NumericUtil.float2String2(f.getUnitPriceWithTaste()));
+						map.put(ITEM_FOOD_ORI_PRICE, NumericUtil.float2String2(f.calcUnitPrice()));
 						map.put(ITEM_FOOD_COUNT, String.valueOf(f.getCount()));
-						map.put(ITEM_FOOD_SUM_PRICE, NumericUtil.float2String2(f.calcPriceWithTaste()));
+						map.put(ITEM_FOOD_SUM_PRICE, NumericUtil.float2String2(f.calcPrice()));
 						map.put(ITEM_THE_FOOD, f);
 						pickedFoodDatas.add(map);
 					}
@@ -210,9 +210,9 @@ public class SelectedFoodActivity extends Activity
 						Map<String, Object> map = new HashMap<String, Object>();
 						map.put(ITEM_IS_ORI_FOOD, true);
 						map.put(ITEM_FOOD_NAME, f.getName());
-						map.put(ITEM_FOOD_ORI_PRICE, NumericUtil.float2String2(f.getUnitPriceWithTaste()));
+						map.put(ITEM_FOOD_ORI_PRICE, NumericUtil.float2String2(f.calcUnitPrice()));
 						map.put(ITEM_FOOD_COUNT, String.valueOf(f.getCount()));
-						map.put(ITEM_FOOD_SUM_PRICE, NumericUtil.float2String2(f.calcPriceWithTaste()));
+						map.put(ITEM_FOOD_SUM_PRICE, NumericUtil.float2String2(f.calcPrice()));
 						map.put(ITEM_THE_FOOD, f);
 						map.put(ITEM_IS_OFFSET, true);
 						map.put(ITEM_FOOD_OFFSET, NumericUtil.float2String2(f.getDelta()));
@@ -329,13 +329,13 @@ public class SelectedFoodActivity extends Activity
 				
 				//设置菜品基本数据的显示
 				((TextView) layout.findViewById(R.id.textView_picked_food_name_item)).setText(orderFood.getName());
-				((TextView) layout.findViewById(R.id.textView_picked_food_price_item)).setText(NumericUtil.float2String2(orderFood.getUnitPriceWithTaste()));
+				((TextView) layout.findViewById(R.id.textView_picked_food_price_item)).setText(NumericUtil.float2String2(orderFood.calcUnitPrice()));
 
 				//数量显示
 				final Button countEditText = (Button) layout.findViewById(R.id.textView_picked_food_count_item);
 				final TextView sumPriceTextView = (TextView) layout.findViewById(R.id.textView_picked_food_sum_price);
 				countEditText.setText(NumericUtil.float2String2(orderFood.getCount()));
-				sumPriceTextView.setText(NumericUtil.float2String2(orderFood.calcPriceWithTaste()));
+				sumPriceTextView.setText(NumericUtil.float2String2(orderFood.calcPrice()));
 
 				Button button1 = (Button)layout.findViewById(R.id.button_operation_1_pickedFood_list_item);
 				Button button2 = (Button)layout.findViewById(R.id.button_operation_2_pickedFood_list_item);
