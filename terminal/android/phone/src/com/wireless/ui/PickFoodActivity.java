@@ -26,6 +26,7 @@ import com.wireless.parcel.OrderParcel;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.util.NumericUtil;
+import com.wireless.ui.dialog.AskOrderAmountDialog.ActionType;
 import com.wireless.ui.dialog.AskOrderAmountDialog.OnFoodPickedListener;
 
 public class PickFoodActivity extends FragmentActivity 
@@ -259,24 +260,25 @@ public class PickFoodActivity extends FragmentActivity
 	
 	/**
 	 * 选中菜品后添加到新点菜列表中
-	 * 
 	 * @param food
 	 *            选中菜品的信息
 	 */
 	@Override
-	public void onFoodPicked(OrderFood food) {
-		try{
-			mTmpOrder.addFood(food, WirelessOrder.loginStaff);
-			
-			TextView amountTxtView = ((TextView)findViewById(R.id.txtView_amount_left_topBar));
-			amountTxtView.setVisibility(View.VISIBLE);
-			amountTxtView.setText(mTmpOrder.getOrderFoods().size() + "");
-			
-			Toast.makeText(this, "添加"	+ (food.isHangup() ? "并叫起\"" : "\"") + food.toString() + "\"" +
-								 NumericUtil.float2String2(food.getCount()) + "份", Toast.LENGTH_SHORT).show();
-
-		}catch(BusinessException e){
-			Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
+	public void onFoodPicked(OrderFood food, ActionType actionType) {
+		if(actionType == ActionType.ADD){
+			try{
+				mTmpOrder.addFood(food, WirelessOrder.loginStaff);
+				
+				TextView amountTxtView = ((TextView)findViewById(R.id.txtView_amount_left_topBar));
+				amountTxtView.setVisibility(View.VISIBLE);
+				amountTxtView.setText(mTmpOrder.getOrderFoods().size() + "");
+				
+				Toast.makeText(this, "添加"	+ (food.isHangup() ? "并叫起\"" : "\"") + food.toString() + "\"" +
+									 NumericUtil.float2String2(food.getCount()) + "份", Toast.LENGTH_SHORT).show();
+	
+			}catch(BusinessException e){
+				Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
+			}
 		}
 	}
 

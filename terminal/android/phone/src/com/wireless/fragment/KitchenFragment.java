@@ -33,6 +33,7 @@ import com.wireless.pojo.menuMgr.FoodList;
 import com.wireless.pojo.util.NumericUtil;
 import com.wireless.ui.R;
 import com.wireless.ui.dialog.AskOrderAmountDialog;
+import com.wireless.ui.dialog.AskOrderAmountDialog.ActionType;
 
 public class KitchenFragment extends Fragment {
 
@@ -324,7 +325,7 @@ public class KitchenFragment extends Fragment {
 					Food food = (Food) view.getTag();
 					if(!food.isSellOut()){
 						((TextView)view.findViewById(R.id.textView_sellout_pickFoodFgm_item)).setVisibility(View.GONE);
-						AskOrderAmountDialog.newInstance(food, getId()).show(getFragmentManager(), AskOrderAmountDialog.TAG);
+						AskOrderAmountDialog.newInstance(food, ActionType.ADD, getId()).show(getFragmentManager(), AskOrderAmountDialog.TAG);
 						//new AskOrderAmountDialog(getActivity(), food, mFoodPickedListener, null).show();
 					}else{
 						((TextView)view.findViewById(R.id.textView_sellout_pickFoodFgm_item)).setVisibility(View.VISIBLE);

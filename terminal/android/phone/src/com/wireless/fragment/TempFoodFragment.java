@@ -33,6 +33,7 @@ import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.pojo.util.NumericUtil;
 import com.wireless.ui.R;
+import com.wireless.ui.dialog.AskOrderAmountDialog.ActionType;
 import com.wireless.ui.dialog.AskOrderAmountDialog.OnFoodPickedListener;
 
 public class TempFoodFragment extends Fragment {
@@ -64,9 +65,11 @@ public class TempFoodFragment extends Fragment {
 				kitchenTextView.setText(food.getKitchen().getName());
 				foodNameEditText.setText(food.getName());
 				amountEditText.setText(NumericUtil.float2String2(food.getCount()));
-				if(food.getPrice() != 0f)
-					priceEdittext.setText(NumericUtil.float2String2(food.getPrice()));
-				else priceEdittext.setText("");
+				if(food.asFood().getPrice() != 0f){
+					priceEdittext.setText(NumericUtil.float2String2(food.asFood().getPrice()));
+				}else{
+					priceEdittext.setText("");
+				}
 			}
 		}
 	}
@@ -158,7 +161,7 @@ public class TempFoodFragment extends Fragment {
 		if(!isSent){
 			if(mFoodPickedListener != null)
 				for(OrderFood of: getValidTempFood()){
-					mFoodPickedListener.onFoodPicked(of);
+					mFoodPickedListener.onFoodPicked(of, ActionType.ADD);
 				}
 		}
 		super.onStop();
@@ -272,7 +275,7 @@ public class TempFoodFragment extends Fragment {
 			//¼Û¸ñ¸³Öµ
 			if(holder.priceEdittext.getTag() != null)
 				holder.priceEdittext.removeTextChangedListener((TextWatcher) holder.priceEdittext.getTag());
-			holder.priceEdittext.setText(NumericUtil.float2String2(food.getPrice()));
+			holder.priceEdittext.setText(NumericUtil.float2String2(food.asFood().getPrice()));
 			
 			FoodPriceTextWatcher priceWatcher = new FoodPriceTextWatcher();
 			priceWatcher.setFood(food, position);

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/dropchilditem_selector"
     android:minHeight="70dip" >
@@ -16,11 +16,21 @@
         android:textStyle="bold"
         android:typeface="sans" />
 
+    <LinearLayout
+        android:id="@+id/linearLayout_comboList_orderChildItem"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@id/txtView_foodName_orderChildItem"
+        android:layout_below="@id/txtView_foodName_orderChildItem"
+        android:layout_marginLeft="10dip"
+        android:orientation="vertical" >
+    </LinearLayout>
+
     <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
-        android:layout_below="@id/txtView_foodName_orderChildItem"
+        android:layout_below="@id/linearLayout_comboList_orderChildItem"
         android:layout_marginLeft="10dip"
         android:layout_toLeftOf="@+id/releativeLayout_right_orderChildItem" >
 
@@ -63,8 +73,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/txtView_amount_orderChildItem"
-            android:textColor="#FF0000"
             android:text="无口味"
+            android:textColor="#FF0000"
             android:textSize="18sp" />
     </RelativeLayout>
 

@@ -28,6 +28,7 @@ import com.wireless.fragment.PickFoodFragment;
 import com.wireless.parcel.OrderParcel;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.OrderFood;
+import com.wireless.ui.dialog.AskOrderAmountDialog.ActionType;
 import com.wireless.ui.dialog.AskOrderAmountDialog.OnFoodPickedListener;
 import com.wireless.ui.dialog.QuickPickCommitDialog;
 
@@ -281,8 +282,10 @@ public class QuickPickActivity extends FragmentActivity implements OnFoodPickedL
 	}
 	
 	@Override
-	public void onFoodPicked(OrderFood food) {
-		((OrderFoodFragment)getSupportFragmentManager().findFragmentById(R.id.fgm_orderFood_quickPick)).addFood(food);
+	public void onFoodPicked(OrderFood food, ActionType type) {
+		if(type == ActionType.ADD){
+			((OrderFoodFragment)getSupportFragmentManager().findFragmentById(R.id.fgm_orderFood_quickPick)).addFood(food);
+		}
 	}
 
 	@Override

@@ -14,7 +14,9 @@ import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.TextView;
 
+import com.wireless.parcel.ComboOrderFoodParcel;
 import com.wireless.parcel.OrderFoodParcel;
+import com.wireless.pojo.dishesOrder.ComboOrderFood;
 import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.tasteMgr.Taste;
 import com.wireless.pojo.util.NumericUtil;
@@ -28,6 +30,14 @@ public class PopTasteFragment extends Fragment{
 	}
 	
 	private OnTastePickedListener mTastePickedListener;
+	
+	public static PopTasteFragment newInstance(ComboOrderFood cof){
+		PopTasteFragment fgm = new PopTasteFragment();
+		Bundle bundles = new Bundle();
+		bundles.putParcelable(ComboOrderFoodParcel.KEY_VALUE, new ComboOrderFoodParcel(cof));
+		fgm.setArguments(bundles);
+		return fgm;
+	}
 	
 	public static PopTasteFragment newInstance(OrderFood orderFood){
 		PopTasteFragment fgm = new PopTasteFragment();
@@ -54,29 +64,52 @@ public class PopTasteFragment extends Fragment{
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View view = inflater.inflate(R.layout.pick_taste_by_pop_fgm, container, false);
 		
-		OrderFoodParcel orderFroodParcel = getArguments().getParcelable(OrderFoodParcel.KEY_VALUE);
+		OrderFoodParcel orderFoodParcel = getArguments().getParcelable(OrderFoodParcel.KEY_VALUE);
+		if(orderFoodParcel != null){
+			//显示常用口味
+			((GridView)view.findViewById(R.id.gridView_tastes_popTastesFgm)).setAdapter(new TasteAdapter(orderFoodParcel.asOrderFood(), mTastePickedListener));
+		}
 		
-		//显示常用口味
-		((GridView)view.findViewById(R.id.gridView_tastes_popTastesFgm)).setAdapter(new TasteAdapter(orderFroodParcel.asOrderFood(), mTastePickedListener));
-		
+		ComboOrderFoodParcel comboParcel = getArguments().getParcelable(ComboOrderFoodParcel.KEY_VALUE);
+		if(comboParcel != null){
+			//显示常用口味
+			((GridView)view.findViewById(R.id.gridView_tastes_popTastesFgm)).setAdapter(new TasteAdapter(comboParcel.asComboOrderFood(), mTastePickedListener));
+		}
 		return view;
 	}
 	
 	//常用口味显示的adapter
 	static class TasteAdapter extends BaseAdapter{
 
-		List<Taste> mTastes;
-		OrderFood mSelectedFood;
-		OnTastePickedListener mTastePickedListener;
+		final List<Taste> mTastes;
+		final OrderFood mSelectedFood;
+		final ComboOrderFood mSelectedCombo;
+		final OnTastePickedListener mTastePickedListener;
+		
+		TasteAdapter(ComboOrderFood cof, OnTastePickedListener tastePickedListener){
+			mSelectedCombo = cof;
+			mSelectedFood = null;
+			mTastePickedListener = tastePickedListener;
+			mTastes = new ArrayList<Taste>(cof.asComboFood().asFood().getPopTastes());
+		}
 		
 		TasteAdapter(OrderFood of, OnTastePickedListener tastePickedListener){
 			mSelectedFood = of;
+			mSelectedCombo = null;
 			mTastePickedListener = tastePickedListener;
 			mTastes = new ArrayList<Taste>(of.asFood().getPopTastes());
 		}
 		
 		TasteAdapter(OrderFood of, List<Taste> tastes, OnTastePickedListener tastePickedListener){
 			mSelectedFood = of;
+			mSelectedCombo = null;
+			mTastePickedListener = tastePickedListener;
+			mTastes = new ArrayList<Taste>(tastes);
+		}
+		
+		TasteAdapter(ComboOrderFood cof, List<Taste> tastes, OnTastePickedListener tastePickedListener){
+			mSelectedFood = null;
+			mSelectedCombo = cof;
 			mTastePickedListener = tastePickedListener;
 			mTastes = new ArrayList<Taste>(tastes);
 		}
@@ -112,15 +145,25 @@ public class PopTasteFragment extends Fragment{
 
 				@Override
 				public void onClick(View v) {
-					if(mSelectedFood.addTaste(taste)){
-						
-						if(mTastePickedListener != null){
-							mTastePickedListener.onTastePicked(taste);
+					if(mSelectedFood != null){
+						if(mSelectedFood.addTaste(taste)){
+							if(mTastePickedListener != null){
+								mTastePickedListener.onTastePicked(taste);
+							}
+						}else if(mSelectedFood.removeTaste(taste)){
+							if(mTastePickedListener != null){
+								mTastePickedListener.onTasteRemoved(taste);
+							}
 						}
-					}else if(mSelectedFood.removeTaste(taste)){
-						
-						if(mTastePickedListener != null){
-							mTastePickedListener.onTasteRemoved(taste);
+					}else if(mSelectedCombo != null){
+						if(mSelectedCombo.addTaste(taste)){
+							if(mTastePickedListener != null){
+								mTastePickedListener.onTastePicked(taste);
+							}
+						}else if(mSelectedCombo.removeTaste(taste)){
+							if(mTastePickedListener != null){
+								mTastePickedListener.onTasteRemoved(taste);
+							}
 						}
 					}
 					notifyDataSetChanged();
@@ -147,8 +190,12 @@ public class PopTasteFragment extends Fragment{
 			//显示背景颜色
 			view.findViewById(R.id.imgView_bg_pickTasteFgm_item).setBackgroundResource(R.color.green);
 			//高亮显示已有口味
-			if(mSelectedFood.hasNormalTaste()){
+			if(mSelectedFood != null && mSelectedFood.hasNormalTaste()){
 				if(mSelectedFood.getTasteGroup().contains(taste)){
+					view.findViewById(R.id.imgView_bg_pickTasteFgm_item).setBackgroundResource(R.color.yellow);
+				}
+			}else if(mSelectedCombo != null && mSelectedCombo.hasTasteGroup()){
+				if(mSelectedCombo.getTasteGroup().contains(taste)){
 					view.findViewById(R.id.imgView_bg_pickTasteFgm_item).setBackgroundResource(R.color.yellow);
 				}
 			}

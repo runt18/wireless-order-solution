@@ -29,12 +29,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.wireless.common.WirelessOrder;
-import com.wireless.exception.StaffError;
 import com.wireless.pojo.menuMgr.Food;
-import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.util.NumericUtil;
 import com.wireless.ui.R;
 import com.wireless.ui.dialog.AskOrderAmountDialog;
+import com.wireless.ui.dialog.AskOrderAmountDialog.ActionType;
 
 public class PickFoodFragment extends Fragment{
 	private static final int REFRESH_FOODS = 43552;
@@ -111,14 +110,10 @@ public class PickFoodFragment extends Fragment{
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 				Food food = (Food) view.getTag();
-				if(food.isGift() && !WirelessOrder.loginStaff.getRole().hasPrivilege(Privilege.Code.GIFT)){
-					Toast.makeText(getActivity(), StaffError.GIFT_NOT_ALLOW.getDesc(), Toast.LENGTH_SHORT).show();
-					
-				}else if(food.isSellOut()){
+				if(food.isSellOut()){
 					Toast.makeText(getActivity(), food.getName() + "ÒÑÊÛóÀ", Toast.LENGTH_SHORT).show();
-					
 				}else{
-					AskOrderAmountDialog.newInstance(food, getId()).show(getFragmentManager(), AskOrderAmountDialog.TAG);
+					AskOrderAmountDialog.newInstance(food, ActionType.ADD, getId()).show(getFragmentManager(), AskOrderAmountDialog.TAG);
 				}
 			}
         });
@@ -249,6 +244,11 @@ public class PickFoodFragment extends Fragment{
 				((TextView)view.findViewById(R.id.textView_sellout_pickFoodFgm_item)).setVisibility(View.VISIBLE);
 				((TextView)view.findViewById(R.id.textView_sellout_pickFoodFgm_item)).setText("Ôù");
 				((TextView)view.findViewById(R.id.textView_sellout_pickFoodFgm_item)).setTextColor(getResources().getColor(R.color.maroon));
+				
+			}else if(food.isCombo()){
+				((TextView)view.findViewById(R.id.textView_sellout_pickFoodFgm_item)).setVisibility(View.VISIBLE);
+				((TextView)view.findViewById(R.id.textView_sellout_pickFoodFgm_item)).setText("Ì×");
+				((TextView)view.findViewById(R.id.textView_sellout_pickFoodFgm_item)).setTextColor(getResources().getColor(R.color.green));
 			}else{
 				((TextView)view.findViewById(R.id.textView_sellout_pickFoodFgm_item)).setVisibility(View.GONE);
 			}

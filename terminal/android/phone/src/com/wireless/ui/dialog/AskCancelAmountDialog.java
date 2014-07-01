@@ -254,12 +254,4 @@ public class AskCancelAmountDialog extends DialogFragment {
 		return view;
 	}
 	
-	@Override 
-	public void onActivityCreated(Bundle savedInstanceState){
-		super.onActivityCreated(savedInstanceState);
-		//((EditText)getView().findViewById(R.id.editText_ask_cancel_amountDialog)).selectAll();
-	}
-	
-
-	
 }

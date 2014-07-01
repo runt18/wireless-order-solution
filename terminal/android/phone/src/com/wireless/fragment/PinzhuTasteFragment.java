@@ -16,7 +16,9 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
+import com.wireless.parcel.ComboOrderFoodParcel;
 import com.wireless.parcel.OrderFoodParcel;
+import com.wireless.pojo.dishesOrder.ComboOrderFood;
 import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.tasteMgr.Taste;
 import com.wireless.pojo.util.NumericUtil;
@@ -32,6 +34,14 @@ public class PinzhuTasteFragment extends Fragment{
 	private float mPriceToPinZhu;
 	
 	private OnTmpTastePickedListener mTmpTastePickedListener;
+	
+	public static PinzhuTasteFragment newInstance(ComboOrderFood comboFood){
+		PinzhuTasteFragment fgm = new PinzhuTasteFragment();
+		Bundle bundles = new Bundle();
+		bundles.putParcelable(ComboOrderFoodParcel.KEY_VALUE, new ComboOrderFoodParcel(comboFood));
+		fgm.setArguments(bundles);
+		return fgm;
+	}
 	
 	public static PinzhuTasteFragment newInstance(OrderFood orderFood){
 		PinzhuTasteFragment fgm = new PinzhuTasteFragment();
@@ -58,19 +68,31 @@ public class PinzhuTasteFragment extends Fragment{
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View view = inflater.inflate(R.layout.pick_taste_by_pinzhu_fgm, container, false);
 		
-		OrderFoodParcel orderFroodParcel = getArguments().getParcelable(OrderFoodParcel.KEY_VALUE);
-		
-		OrderFood selectedFood = orderFroodParcel.asOrderFood();
+		final OrderFoodParcel orderFroodParcel = getArguments().getParcelable(OrderFoodParcel.KEY_VALUE);
+		final ComboOrderFoodParcel comboParcel = getArguments().getParcelable(ComboOrderFoodParcel.KEY_VALUE);
 		
 		final EditText pinZhuEdtTxt = ((EditText)view.findViewById(R.id.txtView_pinzhu_pickPinzhuFgm));
 		final EditText priceEdtTxt = ((EditText)view.findViewById(R.id.edtTxt_price_pickPinzhuFgm));
 		
-		mPinZhu = selectedFood.getTasteGroup().getTmpTastePref();
-		mPriceToPinZhu = selectedFood.getTasteGroup().getTmpTastePrice();
-		
-		if(selectedFood.hasTmpTaste()){
-			pinZhuEdtTxt.setText(mPinZhu);
-			priceEdtTxt.setText(NumericUtil.float2String2(mPriceToPinZhu));
+		if(orderFroodParcel != null){
+			OrderFood selectedFood = orderFroodParcel.asOrderFood();
+			mPinZhu = selectedFood.getTasteGroup().getTmpTastePref();
+			mPriceToPinZhu = selectedFood.getTasteGroup().getTmpTastePrice();
+			
+			if(selectedFood.hasTmpTaste()){
+				pinZhuEdtTxt.setText(mPinZhu);
+				priceEdtTxt.setText(NumericUtil.float2String2(mPriceToPinZhu));
+			}
+			
+		}else if(comboParcel != null){
+			ComboOrderFood comboFood = comboParcel.asComboOrderFood();
+			mPinZhu = comboFood.getTasteGroup().getTmpTastePref();
+			mPriceToPinZhu = comboFood.getTasteGroup().getTmpTastePrice();
+			
+			if(comboFood.hasTmpTaste()){
+				pinZhuEdtTxt.setText(mPinZhu);
+				priceEdtTxt.setText(NumericUtil.float2String2(mPriceToPinZhu));
+			}
 		}
 		
         // Request pinzhu focus and show soft keyboard automatically and select all the content
@@ -114,15 +136,22 @@ public class PinzhuTasteFragment extends Fragment{
 			@Override
 			public void afterTextChanged(Editable s) {
 				mPinZhu = s.toString().trim();
+				
+				final Taste tmpTaste;
    				if(mPinZhu.length() != 0 || mPriceToPinZhu != 0){
-   					if(mTmpTastePickedListener != null){
-   						mTmpTastePickedListener.onTmpTastePicked(Taste.newTmpTaste(mPinZhu, mPriceToPinZhu));
-   					}
+   					tmpTaste = Taste.newTmpTaste(mPinZhu, mPriceToPinZhu);
    				}else{
-   					if(mTmpTastePickedListener != null){
-   						mTmpTastePickedListener.onTmpTastePicked(null);
-   					}
+   					tmpTaste = null;
    				}
+   				
+				if(orderFroodParcel != null){
+					orderFroodParcel.asOrderFood().setTmpTaste(tmpTaste);
+				}else if(comboParcel != null){
+					comboParcel.asComboOrderFood().setTmpTaste(tmpTaste);
+				}
+				if(mTmpTastePickedListener != null){
+					mTmpTastePickedListener.onTmpTastePicked(tmpTaste);
+				}
 			}
 
 			@Override
@@ -175,15 +204,22 @@ public class PinzhuTasteFragment extends Fragment{
 						mPriceToPinZhu = Float.valueOf(s.toString());
 					}
 					
+					final Taste tmpTaste;
 	   				if(mPinZhu.length() != 0 || mPriceToPinZhu != 0){
-	   					if(mTmpTastePickedListener != null){
-	   						mTmpTastePickedListener.onTmpTastePicked(Taste.newTmpTaste(mPinZhu, mPriceToPinZhu));
-	   					}
+	   					tmpTaste = Taste.newTmpTaste(mPinZhu, mPriceToPinZhu);
 	   				}else{
-	   					if(mTmpTastePickedListener != null){
-	   						mTmpTastePickedListener.onTmpTastePicked(null);
-	   					}
+	   					tmpTaste = null;
 	   				}
+	   				
+					if(orderFroodParcel != null){
+						orderFroodParcel.asOrderFood().setTmpTaste(tmpTaste);
+					}else if(comboParcel != null){
+						comboParcel.asComboOrderFood().setTmpTaste(tmpTaste);
+					}
+					if(mTmpTastePickedListener != null){
+						mTmpTastePickedListener.onTmpTastePicked(tmpTaste);
+					}
+					
 				}catch(NumberFormatException e){
 					Toast.makeText(getActivity(), "临时口味的价钱格式不正确，请重新输入", Toast.LENGTH_SHORT).show();
 				}
@@ -202,7 +238,7 @@ public class PinzhuTasteFragment extends Fragment{
 			
 		});
 		
-		//品注的删除Button处理函数
+		//品注价钱的删除Button处理函数
 		((ImageButton)view.findViewById(R.id.imgButton_deletePrice_pickPinzhuFgm)).setOnClickListener(new OnClickListener(){
 			@Override
 			public void onClick(View v) {

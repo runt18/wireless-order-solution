@@ -62,6 +62,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="false"
+        android:layout_alignBottom="@+id/imageView_pickFoodFragment_item"
         android:layout_alignRight="@+id/imageView_pickFoodFragment_item"
         android:layout_centerVertical="true"
         android:text="停"

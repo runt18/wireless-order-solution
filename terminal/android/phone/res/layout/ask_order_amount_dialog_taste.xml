@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <GridView
+        android:id="@+id/gridView_askOrderAmount_dialog"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:horizontalSpacing="2dp"
+        android:numColumns="4"
+        android:verticalSpacing="2dp" >
+    </GridView>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:baselineAligned="false"
+        android:orientation="horizontal"
+        android:weightSum="5" >
+
+        <RelativeLayout
+            android:id="@+id/relativeLayout_pinzhu_askOrderAmount_dialog"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="2" >
+
+            <EditText
+                android:id="@+id/edtTxt_pinzhu_askOrderAmount_dialog"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="4dp"
+                android:layout_marginLeft="4dp"
+                android:layout_marginRight="4dp"
+                android:layout_marginTop="4dp"
+                android:hint="品注"
+                android:singleLine="true" />
+
+            <ImageButton
+                android:id="@+id/imgButton_deletePinZhu_askOrderAmount_dialog"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignRight="@+id/edtTxt_pinzhu_askOrderAmount_dialog"
+                android:layout_centerInParent="true"
+                android:layout_marginRight="5dp"
+                android:background="@null"
+                android:src="@drawable/erase_selector" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/relativeLayout_pinzhuPrice_askOrderAmount_dialog"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="3" >
+
+            <EditText
+                android:id="@+id/edtTxt_pinzhuPrice_askOrderAmount_dialog"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="4dp"
+                android:layout_marginLeft="4dp"
+                android:layout_marginRight="4dp"
+                android:layout_marginTop="4dp"
+                android:digits="0123456789."
+                android:hint="价钱"
+                android:inputType="number" />
+
+            <ImageButton
+                android:id="@+id/imgButton_deletePrice_askOrderAmount_dialog"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignRight="@+id/edtTxt_pinzhuPrice_askOrderAmount_dialog"
+                android:layout_centerInParent="true"
+                android:layout_marginRight="5dp"
+                android:background="@null"
+                android:src="@drawable/erase_selector" />
+        </RelativeLayout>
+    </LinearLayout>
+
+</LinearLayout>

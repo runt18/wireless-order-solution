@@ -20,7 +20,9 @@ import android.widget.TextView;
 import com.wireless.common.WirelessOrder;
 import com.wireless.fragment.PopTasteFragment.OnTastePickedListener;
 import com.wireless.fragment.PopTasteFragment.TasteAdapter;
+import com.wireless.parcel.ComboOrderFoodParcel;
 import com.wireless.parcel.OrderFoodParcel;
+import com.wireless.pojo.dishesOrder.ComboOrderFood;
 import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.tasteMgr.Taste;
 import com.wireless.pojo.tasteMgr.TasteCategory;
@@ -29,6 +31,8 @@ import com.wireless.ui.R;
 public class TasteFragment extends Fragment {
 	
 	private OrderFood mSelectedFood;
+	
+	private ComboOrderFood mSelectedCombo;
 	
 	private OnTastePickedListener mTastePickedListener;
 	
@@ -67,8 +71,15 @@ public class TasteFragment extends Fragment {
 				}
 			}
 			//显示选中类型的口味
-			((GridView)fragment.getView().findViewById(R.id.gridView_taste_allTasteFgm)).setAdapter(
-											new TasteAdapter(fragment.mSelectedFood, tastes, fragment.mTastePickedListener));
+			if(fragment.mSelectedFood != null){
+				((GridView)fragment.getView().findViewById(R.id.gridView_taste_allTasteFgm)).setAdapter(
+												new TasteAdapter(fragment.mSelectedFood, tastes, fragment.mTastePickedListener));
+				
+			}else if(fragment.mSelectedCombo != null){
+				((GridView)fragment.getView().findViewById(R.id.gridView_taste_allTasteFgm)).setAdapter(
+						new TasteAdapter(fragment.mSelectedCombo, tastes, fragment.mTastePickedListener));
+			}
+			
 		}
 	}
 	
@@ -138,6 +149,14 @@ public class TasteFragment extends Fragment {
 		}
 	}
 	
+	public static TasteFragment newInstance(ComboOrderFood cof){
+		TasteFragment fgm = new TasteFragment();
+		Bundle bundles = new Bundle();
+		bundles.putParcelable(ComboOrderFoodParcel.KEY_VALUE, new ComboOrderFoodParcel(cof));
+		fgm.setArguments(bundles);
+		return fgm;
+	}
+	
 	public static TasteFragment newInstance(OrderFood orderFood){
 		TasteFragment fgm = new TasteFragment();
 		Bundle bundles = new Bundle();
@@ -170,8 +189,15 @@ public class TasteFragment extends Fragment {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View view = inflater.inflate(R.layout.pick_taste_by_all_fgm, container, false);
 		
-		OrderFoodParcel orderFroodParcel = getArguments().getParcelable(OrderFoodParcel.KEY_VALUE);
-		mSelectedFood = orderFroodParcel.asOrderFood();
+		OrderFoodParcel orderFoodParcel = getArguments().getParcelable(OrderFoodParcel.KEY_VALUE);
+		if(orderFoodParcel != null){
+			mSelectedFood = orderFoodParcel.asOrderFood();
+		}
+		
+		ComboOrderFoodParcel comboParcel = getArguments().getParcelable(ComboOrderFoodParcel.KEY_VALUE);
+		if(comboParcel != null){
+			mSelectedCombo = comboParcel.asComboOrderFood();
+		}
 		
 		return view;
 	}

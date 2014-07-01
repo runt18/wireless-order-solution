@@ -15,10 +15,11 @@
             android:id="@+id/button_askOrderAmount_minus"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
+            android:layout_marginLeft="3dp"
+            android:layout_marginRight="3dp"
+            android:layout_weight="1"
             android:background="@null"
-            android:padding="9dp"
+            android:padding="5dp"
             android:src="@drawable/reduc_selector" />
 
         <EditText
@@ -38,22 +39,31 @@
             android:id="@+id/button_askOrderAmount_plus"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
+            android:layout_marginLeft="3dp"
+            android:layout_marginRight="3dp"
             android:layout_weight="1"
             android:background="@null"
-            android:padding="9dp"
+            android:padding="5dp"
             android:src="@drawable/add_selector" />
 
-        <CheckBox
-            android:id="@+id/checkBox_askOrderAmount_hurry"
+        <ToggleButton
+            android:id="@+id/toggleButton_askOrderAmount_hangUp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="2"
-            android:focusable="false"
-            android:gravity="bottom"
-            android:textColor="@color/white"
-            android:textSize="18sp" />
+            android:layout_gravity="bottom"
+            android:layout_weight="1"
+            android:textOff="叫起"
+            android:textOn="叫起" />
+
+        <ToggleButton
+            android:id="@+id/toggleButton_askOrderAmount_gift"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:layout_marginRight="3dp"
+            android:layout_weight="1"
+            android:textOff="赠送"
+            android:textOn="赠送" />
     </LinearLayout>
 
     <com.wireless.ui.view.ScrollLayout
@@ -62,46 +72,6 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/linearLayout_top_askOrderAmount_dialog"
         android:layout_gravity="center" >
-
-        <GridView
-            android:id="@+id/gridView_askOrderAmount_dialog"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:horizontalSpacing="2dp"
-            android:numColumns="4"
-            android:verticalSpacing="2dp" >
-        </GridView>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:orientation="vertical" >
-
-            <EditText
-                android:id="@+id/edtTxt_pinzhu_askOrderAmount_dialog"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="4dp"
-                android:layout_marginLeft="4dp"
-                android:layout_marginRight="4dp"
-                android:layout_marginTop="4dp"
-                android:hint="品注"
-                android:singleLine="true" />
-
-            <EditText
-                android:id="@+id/edtTxt_pinzhuPrice_askOrderAmount_dialog"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="4dp"
-                android:layout_marginLeft="4dp"
-                android:layout_marginRight="4dp"
-                android:layout_marginTop="4dp"
-                android:digits="0123456789."
-                android:hint="价钱"
-                android:inputType="number" />
-        </LinearLayout>
     </com.wireless.ui.view.ScrollLayout>
 
     <LinearLayout
@@ -131,7 +101,6 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="更多口味" />
-
     </LinearLayout>
 
 </RelativeLayout>

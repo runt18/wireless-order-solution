@@ -17,13 +17,15 @@ import com.wireless.fragment.PinzhuTasteFragment.OnTmpTastePickedListener;
 import com.wireless.fragment.PopTasteFragment;
 import com.wireless.fragment.PopTasteFragment.OnTastePickedListener;
 import com.wireless.fragment.TasteFragment;
+import com.wireless.parcel.ComboOrderFoodParcel;
 import com.wireless.parcel.OrderFoodParcel;
+import com.wireless.parcel.TasteGroupParcel;
+import com.wireless.pojo.dishesOrder.ComboOrderFood;
 import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.tasteMgr.Taste;
 
-public class PickTasteActivity extends FragmentActivity 
-							   implements OnTastePickedListener,
-							   			  OnTmpTastePickedListener
+public class PickTasteActivity extends FragmentActivity  implements OnTastePickedListener,
+							   			  							OnTmpTastePickedListener
 {
 	
 	public static final String PICK_ALL_ORDER_TASTE = "pick_all_order_taste";
@@ -31,6 +33,8 @@ public class PickTasteActivity extends FragmentActivity
 	public final static String PICK_TASTE_INIT_FGM = "pick_taste_initial_fgm";
 	
 	private OrderFood mSelectedFood;
+	
+	private ComboOrderFood mSelectedCombo;
 	
 	//每个口味方式的标签
 	public static final int POP_TASTE_FRAGMENT = 0;		//常用
@@ -66,21 +70,33 @@ public class PickTasteActivity extends FragmentActivity
 				activity.findViewById(R.id.imgButton_pop_pickTaste).setPressed(true);
 				activity.mCurFg = POP_TASTE_FRAGMENT;
 				//jump to pop taste fragment
-				fgTrans.replace(R.id.frameLayout_container_pickTaste, PopTasteFragment.newInstance(activity.mSelectedFood)).commit();
+				if(activity.mSelectedFood != null){
+					fgTrans.replace(R.id.frameLayout_container_pickTaste, PopTasteFragment.newInstance(activity.mSelectedFood)).commit();
+				}else if(activity.mSelectedCombo != null){
+					fgTrans.replace(R.id.frameLayout_container_pickTaste, PopTasteFragment.newInstance(activity.mSelectedCombo)).commit();
+				}
 
 			}else if(msg.what == ALL_TASTE_FRAGMENT && activity.mCurFg != ALL_TASTE_FRAGMENT){
 				mTitleTextView.setText("全部口味");
 				activity.mCurFg = ALL_TASTE_FRAGMENT;
 				activity.findViewById(R.id.imgButton_all_pickTaste).setPressed(true);
 				//jump to all taste fragment
-				fgTrans.replace(R.id.frameLayout_container_pickTaste, TasteFragment.newInstance(activity.mSelectedFood)).commit();
+				if(activity.mSelectedFood != null){
+					fgTrans.replace(R.id.frameLayout_container_pickTaste, TasteFragment.newInstance(activity.mSelectedFood)).commit();
+				}else if(activity.mSelectedCombo != null){
+					fgTrans.replace(R.id.frameLayout_container_pickTaste, TasteFragment.newInstance(activity.mSelectedCombo)).commit();
+				}
 				
 			}else if(msg.what == PINZHU_FRAGMENT && activity.mCurFg != PINZHU_FRAGMENT){
 				mTitleTextView.setText("品注");
 				activity.findViewById(R.id.imgButton_pinzhu_pickTaste).setPressed(true);
 				activity.mCurFg = PINZHU_FRAGMENT;
 				//jump to pinzhu fragment
-				fgTrans.replace(R.id.frameLayout_container_pickTaste, PinzhuTasteFragment.newInstance(activity.mSelectedFood)).commit();
+				if(activity.mSelectedFood != null){
+					fgTrans.replace(R.id.frameLayout_container_pickTaste, PinzhuTasteFragment.newInstance(activity.mSelectedFood)).commit();
+				}else if(activity.mSelectedCombo != null){
+					fgTrans.replace(R.id.frameLayout_container_pickTaste, PinzhuTasteFragment.newInstance(activity.mSelectedCombo)).commit();
+				}
 				
 			}
 		}
@@ -97,7 +113,11 @@ public class PickTasteActivity extends FragmentActivity
 		@Override
 		public void handleMessage(Message message){
 			final PickTasteActivity theActivity = mActivity.get();
-			((TextView)theActivity.findViewById(R.id.txtView_foodTaste_pickTaste)).setText(theActivity.mSelectedFood.toString());
+			if(theActivity.mSelectedFood != null){
+				((TextView)theActivity.findViewById(R.id.txtView_foodTaste_pickTaste)).setText(theActivity.mSelectedFood.toString());
+			}else if(theActivity.mSelectedCombo != null){
+				((TextView)theActivity.findViewById(R.id.txtView_foodTaste_pickTaste)).setText(theActivity.mSelectedCombo.toString());
+			}
 		}
 	};
 	
@@ -108,9 +128,13 @@ public class PickTasteActivity extends FragmentActivity
 		
 		//get the food parcel from the intent
 		OrderFoodParcel foodParcel = getIntent().getParcelableExtra(OrderFoodParcel.KEY_VALUE);
-		mSelectedFood = foodParcel.asOrderFood();
-		if(!mSelectedFood.hasTasteGroup()){
-			mSelectedFood.makeTasteGroup();
+		if(foodParcel != null){
+			mSelectedFood = foodParcel.asOrderFood();
+		}
+		
+		ComboOrderFoodParcel comboParcel = getIntent().getParcelableExtra(ComboOrderFoodParcel.KEY_VALUE);
+		if(comboParcel != null){
+			mSelectedCombo = comboParcel.asComboOrderFood();
 		}
 
 		setContentView(R.layout.pick_taste_activity);
@@ -173,7 +197,13 @@ public class PickTasteActivity extends FragmentActivity
 		mFgmHandler.post(new Runnable() {
 			@Override
 			public void run() {
-				if(initFgm == POP_TASTE_FRAGMENT && !mSelectedFood.asFood().hasPopTastes()){
+				boolean hasPopTastes = false;
+				if(mSelectedFood != null){
+					hasPopTastes = mSelectedFood.hasTasteGroup();
+				}else if(mSelectedCombo != null){
+					hasPopTastes = mSelectedCombo.hasTasteGroup();
+				}
+				if(initFgm == POP_TASTE_FRAGMENT && !hasPopTastes){
 					mFgmHandler.sendEmptyMessage(ALL_TASTE_FRAGMENT);
 				}else{
 					mFgmHandler.sendEmptyMessage(initFgm);
@@ -185,12 +215,16 @@ public class PickTasteActivity extends FragmentActivity
 	
 	@Override
 	public void onBackPressed(){
-		if(!mSelectedFood.hasTasteGroup()){
-			mSelectedFood.clearTasetGroup();
-		}
+		
 		Intent intent = new Intent(); 
 		Bundle bundle = new Bundle();
-		bundle.putParcelable(OrderFoodParcel.KEY_VALUE, new OrderFoodParcel(mSelectedFood));
+		if(mSelectedFood != null && mSelectedFood.hasTasteGroup()){
+			bundle.putParcelable(TasteGroupParcel.KEY_VALUE, new TasteGroupParcel(mSelectedFood.getTasteGroup()));
+		}else if(mSelectedCombo != null && mSelectedCombo.hasTasteGroup()){
+			bundle.putParcelable(TasteGroupParcel.KEY_VALUE, new TasteGroupParcel(mSelectedCombo.getTasteGroup()));
+		}else{
+			bundle.putParcelable(TasteGroupParcel.KEY_VALUE, new TasteGroupParcel(null));
+		}
 		intent.putExtras(bundle);
 		setResult(RESULT_OK, intent);
 		super.onBackPressed();
@@ -198,21 +232,18 @@ public class PickTasteActivity extends FragmentActivity
 	
 	@Override
 	public void onTastePicked(Taste tasteToPick) {
-		mSelectedFood.getTasteGroup().addTaste(tasteToPick);
 		mTasteHandler.sendEmptyMessage(0);
 	}
 
 
 	@Override
 	public void onTasteRemoved(Taste tasteToRemove) {
-		mSelectedFood.getTasteGroup().removeTaste(tasteToRemove);
 		mTasteHandler.sendEmptyMessage(0);
 	}
 
 
 	@Override
 	public void onTmpTastePicked(Taste tmpTaste) {
-		mSelectedFood.getTasteGroup().setTmpTaste(tmpTaste);
 		mTasteHandler.sendEmptyMessage(0);
 	}	
 	
