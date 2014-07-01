@@ -1,10 +1,10 @@
 package com.wireless.print.content;
 
+import com.wireless.pojo.dishesOrder.ComboOrderFood;
 import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.menuMgr.ComboFood;
 import com.wireless.pojo.printScheme.PStyle;
 import com.wireless.pojo.printScheme.PType;
-import com.wireless.pojo.util.NumericUtil;
 import com.wireless.print.content.FoodDetailContent.DisplayConfig;
 
 public class ComboDetailContent extends ConcreteContent {
@@ -32,7 +32,14 @@ public class ComboDetailContent extends ConcreteContent {
 	public String toString(){
 		StringBuilder var = new StringBuilder();
 		var.append(new FoodDetailContent(mDisplayConfig, mParent, mPrintType, mStyle).toString());
-		var.append(SEP).append(" |-").append(mChild.getName() + "(" + NumericUtil.float2String2(mChild.getAmount() * mParent.getCount()) + ")");
+		String foodName = mChild.getName();
+		for(ComboOrderFood cof : mParent.getCombo()){
+			if(cof.asComboFood().equals(mChild)){
+				foodName = cof.toString();
+				break;
+			}
+		}
+		var.append(SEP).append(" |-").append(foodName);
 		return var.toString();
 	}
 	
