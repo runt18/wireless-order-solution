@@ -1,5 +1,6 @@
 package com.wireless.pojo.dishesOrder;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.zip.CRC32;
@@ -11,6 +12,7 @@ import com.wireless.json.Jsonable;
 import com.wireless.parcel.Parcel;
 import com.wireless.parcel.Parcelable;
 import com.wireless.pojo.crMgr.CancelReason;
+import com.wireless.pojo.menuMgr.ComboFood;
 import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.pojo.staffMgr.Privilege;
@@ -68,7 +70,7 @@ public class OrderFood implements Parcelable, Jsonable {
 	//the last order amount to this order food
 	private float mLastCnt;	
 
-	private List<OrderFood> combo;
+	private List<ComboOrderFood> combo;
 	
 	private final Food mFood = new Food(0);
 	
@@ -76,21 +78,24 @@ public class OrderFood implements Parcelable, Jsonable {
 		return mFood;
 	}
 	
-	public void addCombo(OrderFood comboFood){
+	public void addCombo(ComboOrderFood comboFood){
+		if(combo == null){
+			combo = new ArrayList<ComboOrderFood>();
+		}
 		combo.add(comboFood);
 	}
 	
-	public List<OrderFood> getCombo(){
+	public List<ComboOrderFood> getCombo(){
 		if(combo != null){
 			return Collections.unmodifiableList(combo);
 		}else{
-			List<OrderFood> result = Collections.emptyList();
+			List<ComboOrderFood> result = Collections.emptyList();
 			return result;
 		}
 	}
 	
 	public boolean hasCombo(){
-		return combo != null ? combo.isEmpty() : false;
+		return combo != null ? !combo.isEmpty() : false;
 	}
 	
 	public void setHangup(boolean isHangup){
@@ -401,13 +406,13 @@ public class OrderFood implements Parcelable, Jsonable {
 	public void setTasteGroup(TasteGroup tg){
 		if(tg != null){
 			mTasteGroup = tg;
-			mTasteGroup.setAttachedFood(this);
+			mTasteGroup.setAttachedFood(mFood);
 		}
 	}
 
 	public boolean addTaste(Taste tasteToAdd){
 		if(mTasteGroup == null){
-			mTasteGroup = new TasteGroup(this);
+			mTasteGroup = new TasteGroup(mFood);
 		}
 		if(mTasteGroup.addTaste(tasteToAdd)){
 			mTasteGroup.refresh();
@@ -419,7 +424,7 @@ public class OrderFood implements Parcelable, Jsonable {
 	
 	public void setTmpTaste(Taste tmpTaste){
 		if(mTasteGroup == null){
-			mTasteGroup = new TasteGroup(this);
+			mTasteGroup = new TasteGroup(mFood);
 		}
 		mTasteGroup.setTmpTaste(tmpTaste);
 	}
@@ -647,6 +652,9 @@ public class OrderFood implements Parcelable, Jsonable {
 			dest.writeString(mFood.getName());
 			dest.writeFloat(mFood.getPrice());
 			dest.writeParcel(mFood.getKitchen(), Kitchen.KITCHEN_PARCELABLE_SIMPLE);
+			if(mFood.isCombo()){
+				dest.writeParcelList(mFood.getChildFoods(), ComboFood.COMBO_FOOD_PARCELABLE_SIMPLE);
+			}
 			dest.writeInt(this.getFoodId());
 			dest.writeShort(this.getAliasId());
 			dest.writeFloat(this.getDiscount());
@@ -654,6 +662,7 @@ public class OrderFood implements Parcelable, Jsonable {
 			dest.writeBoolean(this.isHangup());
 			dest.writeLong(this.getOrderDate());
 			dest.writeString(this.getWaiter());
+			dest.writeParcelList(this.combo, 0);
 
 		}else if(flag == OF_PARCELABLE_4_COMMIT){
 			if(this.isTemporary){
@@ -673,6 +682,7 @@ public class OrderFood implements Parcelable, Jsonable {
 			dest.writeString(this.mWaiter);
 			dest.writeBoolean(this.isHurried);
 			dest.writeParcel(this.mCancelReason, CancelReason.CR_PARCELABLE_SIMPLE);
+			dest.writeParcelList(this.combo, 0);
 		}
 	}
 	
@@ -686,12 +696,15 @@ public class OrderFood implements Parcelable, Jsonable {
 		if(flag == OF_PARCELABLE_4_QUERY){
 			if(!isTemporary){
 				mFood.setStatus(source.readShort());
-				setTasteGroup(source.readParcel(TasteGroup.TG_CREATOR));
+				setTasteGroup(source.readParcel(TasteGroup.CREATOR));
 			}
 			this.setId(source.readLong());
 			mFood.setName(source.readString());
 			mFood.setPrice(source.readFloat());
 			mFood.setKitchen(source.readParcel(Kitchen.CREATOR));
+			if(mFood.isCombo()){
+				mFood.setChildFoods(source.readParcelList(ComboFood.CREATOR));
+			}
 			mFood.setFoodId(source.readInt());
 			mFood.setAliasId(source.readShort());
 			this.setDiscount(source.readFloat());
@@ -699,6 +712,7 @@ public class OrderFood implements Parcelable, Jsonable {
 			this.setHangup(source.readBoolean());
 			this.setOrderDate(source.readLong());
 			this.setWaiter(source.readString());
+			this.combo = source.readParcelList(ComboOrderFood.CREATOR);
 			
 		}else if(flag == OF_PARCELABLE_4_COMMIT){
 			if(isTemporary){
@@ -707,7 +721,7 @@ public class OrderFood implements Parcelable, Jsonable {
 				mFood.setKitchen(source.readParcel(Kitchen.CREATOR));
 			}else{
 				mFood.setStatus(source.readShort());
-				setTasteGroup(source.readParcel(TasteGroup.TG_CREATOR));
+				setTasteGroup(source.readParcel(TasteGroup.CREATOR));
 			}
 			this.setId(source.readLong());
 			mFood.setFoodId(source.readInt());
@@ -717,7 +731,8 @@ public class OrderFood implements Parcelable, Jsonable {
 			this.mOrderDate = source.readLong();
 			this.mWaiter = source.readString();
 			this.isHurried = source.readBoolean();
-			this.mCancelReason = source.readParcel(CancelReason.CR_CREATOR);
+			this.mCancelReason = source.readParcel(CancelReason.CREATOR);
+			this.combo = source.readParcelList(ComboOrderFood.CREATOR);
 		}
 		
 	}

@@ -414,7 +414,7 @@ public class TestParcel {
 		Parcel p = new Parcel();
 		tgToParcel.writeToParcel(p, TasteGroup.TG_PARCELABLE_COMPLEX);
 		
-		TasteGroup parcelabledTG = new TasteGroup();
+		TasteGroup parcelabledTG = new TasteGroup(0, null, null, null);
 		parcelabledTG.createFromParcel(new Parcel(p.marshall()));
 		
 		// Check the taste group id

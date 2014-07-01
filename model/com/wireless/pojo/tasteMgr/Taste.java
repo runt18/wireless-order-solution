@@ -325,8 +325,7 @@ public class Taste implements Parcelable, Comparable<Taste>, Jsonable{
 		if(preference == null){
 			return NO_PREFERENCE;
 		}else{
-			String pref = preference.trim();
-			return pref.length() == 0 ? NO_PREFERENCE : pref;
+			return preference.trim();
 		}
 	}
 	

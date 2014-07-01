@@ -156,7 +156,7 @@ public class CancelReason implements Parcelable, Jsonable{
 		}
 	}
 
-	public final static Parcelable.Creator<CancelReason> CR_CREATOR = new Parcelable.Creator<CancelReason>() {
+	public final static Parcelable.Creator<CancelReason> CREATOR = new Parcelable.Creator<CancelReason>() {
 		
 		public CancelReason[] newInstance(int size) {
 			return new CancelReason[size];

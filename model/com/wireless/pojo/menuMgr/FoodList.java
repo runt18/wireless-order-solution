@@ -15,13 +15,16 @@ import com.wireless.pojo.util.SortedList;
 public class FoodList extends AbstractList<Food> implements Jsonable{
 	
 	private final SortedList<Food> mFoods;
+	private final SortedList<Food> mFoodsByAlias;
 	
-	public FoodList(){
+	FoodList(){
 		mFoods = SortedList.newInstance();
+		mFoodsByAlias = SortedList.newInstance(Food.BY_ALIAS);
 	}
 	
 	public FoodList(List<Food> listElem){
 		mFoods = SortedList.newInstance(listElem);
+		mFoodsByAlias = SortedList.newInstance(listElem, Food.BY_ALIAS);
 	}
 	
 	/**
@@ -31,6 +34,7 @@ public class FoodList extends AbstractList<Food> implements Jsonable{
 	 */
     public FoodList(List<Food> listElem, Comparator<? super Food> comparator) {
     	mFoods = SortedList.newInstance(listElem, comparator);
+    	mFoodsByAlias = SortedList.newInstance(listElem, Food.BY_ALIAS);
     }
     
     /**
@@ -53,11 +57,10 @@ public class FoodList extends AbstractList<Food> implements Jsonable{
     
     public List<Food> filter(String filterCond){
     	if(filterCond == null){
-    		return new ArrayList<Food>(mFoods);
+    		return mFoodsByAlias;
     		
     	}else if(filterCond.length() != 0){
-			List<Food> tmpFoods;
-			tmpFoods = new ArrayList<Food>(this.mFoods);
+			List<Food> tmpFoods = new ArrayList<Food>(this.mFoods);
 			Iterator<Food> iter = tmpFoods.iterator();
 			while(iter.hasNext()){
 				Food f = iter.next();
@@ -79,7 +82,8 @@ public class FoodList extends AbstractList<Food> implements Jsonable{
 			return tmpFoods;
 			
 		}else{
-			return SortedList.newInstance(mFoods, Food.BY_ALIAS);
+			//return SortedList.newInstance(mFoods, Food.BY_ALIAS);
+			return mFoodsByAlias;
 		}
 		
     }

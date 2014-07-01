@@ -8,6 +8,7 @@ import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.parcel.Parcel;
 import com.wireless.parcel.Parcelable;
+import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.tasteMgr.Taste;
 import com.wireless.pojo.util.NumericUtil;
 import com.wireless.pojo.util.SortedList;
@@ -17,10 +18,10 @@ public class TasteGroup implements Parcelable, Jsonable{
 	public static class InsertBuilder{
 		private List<Taste> normalTastes = new ArrayList<Taste>();
 		private Taste tmpTaste;
-		private final OrderFood attachedOrderFood;
+		private final Food attachedFood;
 		
-		public InsertBuilder(OrderFood of){
-			this.attachedOrderFood = of;
+		public InsertBuilder(Food f){
+			this.attachedFood = f;
 		}
 		
 		public InsertBuilder addTaste(Taste taste){ 
@@ -28,7 +29,7 @@ public class TasteGroup implements Parcelable, Jsonable{
 			return this;
 		}
 		
-		public InsertBuilder addAllTastes(List<Taste> tastes){
+		public InsertBuilder addTastes(List<Taste> tastes){
 			normalTastes.addAll(tastes);
 			return this;
 		}
@@ -72,7 +73,7 @@ public class TasteGroup implements Parcelable, Jsonable{
 	
 	private int mGroupId = EMPTY_TASTE_GROUP_ID;
 	
-	private OrderFood mAttachedOrderFood;
+	private Food mAttachedFood;
 	
 	private SortedList<Taste> mTastes = SortedList.newInstance();
 	private Taste mSpec;
@@ -81,7 +82,7 @@ public class TasteGroup implements Parcelable, Jsonable{
 	private Taste mNormalTaste;
 	
 	private TasteGroup(InsertBuilder builder){
-		this.mAttachedOrderFood = builder.attachedOrderFood;
+		this.mAttachedFood = builder.attachedFood;
 		if(builder.normalTastes != null){
 			for(Taste t : builder.normalTastes){
 				addTaste(t);
@@ -91,7 +92,7 @@ public class TasteGroup implements Parcelable, Jsonable{
 		this.mTmpTaste = builder.tmpTaste;
 	}
 	
-	public TasteGroup(){
+	private TasteGroup(){
 		
 	}
 	
@@ -106,14 +107,14 @@ public class TasteGroup implements Parcelable, Jsonable{
 		}
 	}
 	
-	TasteGroup(OrderFood attachedOrderFood){
-		this.mAttachedOrderFood = attachedOrderFood;
+	TasteGroup(Food attachedFood){
+		this.mAttachedFood = attachedFood;
 	}
 	
 	private float makeNormalTastePrice(){ 
 		float tastePrice = 0;
 		for(Taste t : getNormalTastes()){
-			tastePrice += t.isCalcByPrice() ? t.getPrice() : (mAttachedOrderFood.asFood().getPrice() * t.getRate());
+			tastePrice += t.isCalcByPrice() ? t.getPrice() : (mAttachedFood.getPrice() * t.getRate());
 		}
 		return NumericUtil.roundFloat(tastePrice);
 	}
@@ -146,11 +147,15 @@ public class TasteGroup implements Parcelable, Jsonable{
 	}
 	
 	public void refresh(){
-		if(mNormalTaste == null){
-			mNormalTaste = new Taste(0);
+		if(!mTastes.isEmpty() || mSpec != null){
+			if(mNormalTaste == null){
+				mNormalTaste = new Taste(0);
+			}
+			mNormalTaste.setPreference(makeNormalTastePref());
+			mNormalTaste.setPrice(makeNormalTastePrice());
+		}else{
+			mNormalTaste = null;
 		}
-		mNormalTaste.setPreference(makeNormalTastePref());
-		mNormalTaste.setPrice(makeNormalTastePrice());
 	}
 	
 	/**
@@ -391,8 +396,8 @@ public class TasteGroup implements Parcelable, Jsonable{
 		}
 	}
 	
-	void setAttachedFood(OrderFood attachedFood){
-		this.mAttachedOrderFood = attachedFood;
+	void setAttachedFood(Food attachedFood){
+		this.mAttachedFood = attachedFood;
 	}
 
 	@Override
@@ -425,7 +430,7 @@ public class TasteGroup implements Parcelable, Jsonable{
 		}
 	}
 	
-	public final static Parcelable.Creator<TasteGroup> TG_CREATOR = new Parcelable.Creator<TasteGroup>() {
+	public final static Parcelable.Creator<TasteGroup> CREATOR = new Parcelable.Creator<TasteGroup>() {
 		
 		@Override
 		public TasteGroup[] newInstance(int size) {

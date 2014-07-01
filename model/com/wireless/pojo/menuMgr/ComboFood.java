@@ -21,6 +21,13 @@ public class ComboFood implements Parcelable, Jsonable{
 		this.amount = amount;
 	}
 	
+	public void copyFrom(ComboFood src){
+		if(src != null && this != src){
+			food.copyFrom(src.food);
+			amount = src.amount;
+		}
+	}
+	
 	@Override
 	public int hashCode(){
 		return food.hashCode();
@@ -66,15 +73,22 @@ public class ComboFood implements Parcelable, Jsonable{
 
 	@Override
 	public void writeToParcel(Parcel dest, int flag) {
-		dest.writeInt(food.getFoodId());
-		dest.writeInt(food.getRestaurantId());
+		dest.writeByte(flag);
+		if(flag == COMBO_FOOD_PARCELABLE_SIMPLE){
+			dest.writeParcel(food, Food.FOOD_PARCELABLE_SIMPLE);
+			
+		}else if(flag == COMBO_FOOD_PARCELABLE_COMPLEX){
+			dest.writeParcel(food, Food.FOOD_PARCELABLE_COMPLEX);
+		}
+		
 		dest.writeInt(amount);
+
 	}
 
 	@Override
 	public void createFromParcel(Parcel source) {
-		food = new Food(source.readInt());
-		food.setRestaurantId(source.readInt());
+		source.readByte();
+		food = source.readParcel(Food.CREATOR);
 		amount = source.readInt();
 	}
 	
