@@ -936,6 +936,15 @@ function showCancelDetailChart(jdata){
 	}
 }
 
+var cancel_setStatisticsDate = function(){
+	if(sendToPageOperation){
+		Ext.getCmp('cancel_dateSearchDateBegin').setValue(sendToStatisticsPageBeginDate);
+		Ext.getCmp('cancel_dateSearchDateEnd').setValue(sendToStatisticsPageEndDate);		
+		Ext.getCmp('cancel_btnSearch').handler();
+		sendToPageOperation = false;
+	}
+};
+
 var cancel_requestParams, cancel_panelDrag=false, cancelPanelHeight, cancelTabPanelHeight;
 var cancelFoodStatChartTabPanel, reasonChart, cancel_detailChart, cancel_staffChart, cancel_staffChart_amount, cancel_staffColumnChart, cancel_deptChart, reasonChart_price, reasonColumnChart, cancel_deptChart_amount;
 var cancelledDetailChartPanel, cancelledReasonChartPanel, cancelledStaffChartPanel, cancelledDeptChartPanel;
@@ -1248,12 +1257,11 @@ Ext.onReady(function(){
 	});	
 	
 	if(sendToPageOperation){
-		Ext.getCmp('cancel_dateSearchDateBegin').setValue(sendToStatisticsPageBeginDate);
-		Ext.getCmp('cancel_dateSearchDateEnd').setValue(sendToStatisticsPageEndDate);		
-		Ext.getCmp('cancel_btnSearch').handler();
-		sendToPageOperation = false;
+		cancel_setStatisticsDate();
 	}else{
 		cancel_dateCombo.setValue(1);
 		cancel_dateCombo.fireEvent('select', cancel_dateCombo, null, 1);			
 	}	
+	
+	Ext.getCmp('cancelledFood').updateStatisticsDate = cancel_setStatisticsDate;
 });

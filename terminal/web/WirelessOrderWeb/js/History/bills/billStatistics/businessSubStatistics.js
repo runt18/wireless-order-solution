@@ -2,6 +2,65 @@
 
 var businessSubGeneralPanel;
 
+function newDate(str) { 
+	str = str.split('-'); 
+	var date = new Date(); 
+	date.setUTCFullYear(str[0], str[1] - 1, str[2]); 
+	date.setUTCHours(0, 0, 0, 0); 
+	return date; 
+} 
+
+function businessSub_showBusinessStatWin(x){
+	var date = newDate(x).getTime();
+	businessSub_businessStatWin = new Ext.Window({
+		title : '营业统计 -- <font style="color:green;">历史</font>',
+		id : 'businessSub_businessStatWin',
+		width : 885,
+		height : 580,
+		closable : false,
+		modal : true,
+		resizable : false,	
+		layout: 'fit',
+		bbar : ['->', {
+			text : '关闭',
+			iconCls : 'btn_close',
+			handler : function(){
+				businessSub_businessStatWin.destroy();
+			}
+		}],
+		keys : [{
+			key : Ext.EventObject.ESC,
+			scope : this,
+			fn : function(){
+				businessSub_businessStatWin.destroy();
+			}
+		}],
+		listeners : {
+			hide : function(thiz){
+				thiz.body.update('');
+			},
+			show : function(thiz){
+				thiz.load({
+					autoLoad : false,
+					url : '../window/history/businessStatistics.jsp',
+					scripts : true,
+					nocache : true,
+					text : '功能加载中, 请稍后......',
+					params : {
+						dataSource : 'history',
+						dutyRange : "range",
+						offDuty : date,
+						onDuty : date,
+						queryPattern : 3
+					}
+				});
+			}
+		}
+	});
+	businessSub_businessStatWin.show();
+	businessSub_businessStatWin.center();
+}
+
 function businessSub_initRegionCombo(statistic){
 	var combo = {
 		xtype : 'combo',
@@ -74,7 +133,7 @@ function businessSub_showChart(c){
 				},
 				events : {
 					click : function(e){
-//						loadBusinessStatistic(e.point.category);
+						businessSub_showBusinessStatWin(e.point.category);
 					}
 				}
 			}
@@ -237,55 +296,61 @@ Ext.onReady(function(){
 									temp.income.toFixed(2)
 								)
 							);
-						}						
+						}	
+						trContent += '<tr>'
+						  + '<th class="table_title ">操作</th>'
+						  + '<th class="text_right">---</th>'
+						  + '<th class="text_right">---</th>'
+						  + '<th class="text_center"><a href="javascript:void(0)" onclick="linkToBusinessStatistics({type : 5})">查看详情</a></th>'
+						  + '</tr>';
 					}
 						
 				
 					
-					Ext.getDom('bssiCashAmount').innerHTML = businessSub_business.cashAmount;
-					Ext.getDom('bssiCashIncome').innerHTML = businessSub_business.cashIncome.toFixed(2);
-					Ext.getDom('bssiCashIncome2').innerHTML = businessSub_business.cashIncome2.toFixed(2);
+					Ext.getDom('businessSub_bssiCashAmount').innerHTML = businessSub_business.cashAmount;
+					Ext.getDom('businessSub_bssiCashIncome').innerHTML = businessSub_business.cashIncome.toFixed(2);
+					Ext.getDom('businessSub_bssiCashIncome2').innerHTML = businessSub_business.cashIncome2.toFixed(2);
 					
-					Ext.getDom('bssiCreditCardAmount').innerHTML = businessSub_business.creditCardAmount;
-					Ext.getDom('bssiCreditCardIncome').innerHTML = businessSub_business.creditCardIncome.toFixed(2);
-					Ext.getDom('bssiCreditCardIncome2').innerHTML = businessSub_business.creditCardIncome2.toFixed(2);
+					Ext.getDom('businessSub_bssiCreditCardAmount').innerHTML = businessSub_business.creditCardAmount;
+					Ext.getDom('businessSub_bssiCreditCardIncome').innerHTML = businessSub_business.creditCardIncome.toFixed(2);
+					Ext.getDom('businessSub_bssiCreditCardIncome2').innerHTML = businessSub_business.creditCardIncome2.toFixed(2);
 					
-					Ext.getDom('bssiMemeberCardAmount').innerHTML = businessSub_business.memberAmount;
-					Ext.getDom('bssiMemeberCardIncome').innerHTML = businessSub_business.memberIncome.toFixed(2);
-					Ext.getDom('bssiMemeberCardIncome2').innerHTML = businessSub_business.memberActual.toFixed(2);
+					Ext.getDom('businessSub_bssiMemeberCardAmount').innerHTML = businessSub_business.memberAmount;
+					Ext.getDom('businessSub_bssiMemeberCardIncome').innerHTML = businessSub_business.memberIncome.toFixed(2);
+					Ext.getDom('businessSub_bssiMemeberCardIncome2').innerHTML = businessSub_business.memberActual.toFixed(2);
 					
-					Ext.getDom('bssiSignAmount').innerHTML = businessSub_business.signAmount;
-					Ext.getDom('bssiSignIncome').innerHTML = businessSub_business.signIncome.toFixed(2);
-					Ext.getDom('bssiSignIncome2').innerHTML = businessSub_business.signIncome2.toFixed(2);
+					Ext.getDom('businessSub_bssiSignAmount').innerHTML = businessSub_business.signAmount;
+					Ext.getDom('businessSub_bssiSignIncome').innerHTML = businessSub_business.signIncome.toFixed(2);
+					Ext.getDom('businessSub_bssiSignIncome2').innerHTML = businessSub_business.signIncome2.toFixed(2);
 					
-					Ext.getDom('bssiHangAmount').innerHTML = businessSub_business.hangAmount;
-					Ext.getDom('bssiHangIncome').innerHTML = businessSub_business.hangIncome.toFixed(2);
-					Ext.getDom('bssiHangIncome2').innerHTML = businessSub_business.hangIncome2.toFixed(2);
+					Ext.getDom('businessSub_bssiHangAmount').innerHTML = businessSub_business.hangAmount;
+					Ext.getDom('businessSub_bssiHangIncome').innerHTML = businessSub_business.hangIncome.toFixed(2);
+					Ext.getDom('businessSub_bssiHangIncome2').innerHTML = businessSub_business.hangIncome2.toFixed(2);
 					//
-					Ext.getDom('bssiSumAmount').innerHTML = businessSub_business.orderAmount;
-					Ext.getDom('bssiSumIncome').innerHTML = businessSub_business.totalIncome.toFixed(2);
-					Ext.getDom('bssiSumIncome2').innerHTML = businessSub_business.totalActual.toFixed(2);
+					Ext.getDom('businessSub_bssiSumAmount').innerHTML = businessSub_business.orderAmount;
+					Ext.getDom('businessSub_bssiSumIncome').innerHTML = businessSub_business.totalIncome.toFixed(2);
+					Ext.getDom('businessSub_bssiSumIncome2').innerHTML = businessSub_business.totalActual.toFixed(2);
 					
-					Ext.getDom('bssiEraseAmount').innerHTML = businessSub_business.eraseAmount;
-					Ext.getDom('bssiEraseIncome').innerHTML = businessSub_business.eraseIncome.toFixed(2);
+					Ext.getDom('businessSub_bssiEraseAmount').innerHTML = businessSub_business.eraseAmount;
+					Ext.getDom('businessSub_bssiEraseIncome').innerHTML = businessSub_business.eraseIncome.toFixed(2);
 					
-					Ext.getDom('bssiDiscountAmount').innerHTML = businessSub_business.discountAmount;
-					Ext.getDom('bssiDiscountIncome').innerHTML = businessSub_business.discountIncome.toFixed(2);
+					Ext.getDom('businessSub_bssiDiscountAmount').innerHTML = businessSub_business.discountAmount;
+					Ext.getDom('businessSub_bssiDiscountIncome').innerHTML = businessSub_business.discountIncome.toFixed(2);
 					
-					Ext.getDom('bssiGiftAmount').innerHTML = businessSub_business.giftAmount;
-					Ext.getDom('bssiGiftIncome').innerHTML = businessSub_business.giftIncome.toFixed(2);
+					Ext.getDom('businessSub_bssiGiftAmount').innerHTML = businessSub_business.giftAmount;
+					Ext.getDom('businessSub_bssiGiftIncome').innerHTML = businessSub_business.giftIncome.toFixed(2);
 					
-					Ext.getDom('bssiCouponAmount').innerHTML = businessSub_business.couponAmount;
-					Ext.getDom('bssiCouponIncome').innerHTML = businessSub_business.couponIncome.toFixed(2);
+					Ext.getDom('businessSub_bssiCouponAmount').innerHTML = businessSub_business.couponAmount;
+					Ext.getDom('businessSub_bssiCouponIncome').innerHTML = businessSub_business.couponIncome.toFixed(2);
 					
-					Ext.getDom('bssiCancelAmount').innerHTML = businessSub_business.cancelAmount;
-					Ext.getDom('bssiCancelIncome').innerHTML = businessSub_business.cancelIncome.toFixed(2);
+					Ext.getDom('businessSub_bssiCancelAmount').innerHTML = businessSub_business.cancelAmount;
+					Ext.getDom('businessSub_bssiCancelIncome').innerHTML = businessSub_business.cancelIncome.toFixed(2);
 					
-					Ext.getDom('bssiPaidAmount').innerHTML = businessSub_business.paidAmount;
-					Ext.getDom('bssiPaidIncome').innerHTML = businessSub_business.paidIncome.toFixed(2);
+					Ext.getDom('businessSub_bssiPaidAmount').innerHTML = businessSub_business.paidAmount;
+					Ext.getDom('businessSub_bssiPaidIncome').innerHTML = businessSub_business.paidIncome.toFixed(2);
 					
-					Ext.getDom('bssiServiceAmount').innerHTML = businessSub_business.serviceAmount;
-					Ext.getDom('bssiServiceIncome').innerHTML = businessSub_business.serviceIncome.toFixed(2);	
+					Ext.getDom('businessSub_bssiServiceAmount').innerHTML = businessSub_business.serviceAmount;
+					Ext.getDom('businessSub_bssiServiceIncome').innerHTML = businessSub_business.serviceIncome.toFixed(2);	
 					
 					Ext.getDom('bussiMemberChargeByCash').innerHTML = businessSub_business.memberChargeByCash.toFixed(2);
 					Ext.getDom('bussiMemberChargeByCard').innerHTML = businessSub_business.memberChargeByCard.toFixed(2);

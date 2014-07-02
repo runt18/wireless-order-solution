@@ -652,6 +652,16 @@ function discount_loadAmountDeptChart(){
 	});				
 }
 
+var discount_setStatisticsDate = function(){
+	if(sendToPageOperation){
+		Ext.getCmp('discount_dateSearchDateBegin').setValue(sendToStatisticsPageBeginDate);
+		Ext.getCmp('discount_dateSearchDateEnd').setValue(sendToStatisticsPageEndDate);		
+		Ext.getCmp('btnSearchForDiscountStatistics').handler();
+		sendToPageOperation = false;		
+	}
+
+};
+
 var titleDiscountDeptName, titleDiscountStaffName;
 var discount_detailChart, discount_staffChart, discount_staffChart_amount, discount_deptChart, discount_deptChart_amount;
 
@@ -879,14 +889,11 @@ Ext.onReady(function(){
 	    disabled : false
 	});	
 	if(sendToPageOperation){
-		Ext.getCmp('discount_dateSearchDateBegin').setValue(sendToStatisticsPageBeginDate);
-		Ext.getCmp('discount_dateSearchDateEnd').setValue(sendToStatisticsPageEndDate);		
-		Ext.getCmp('btnSearchForDiscountStatistics').handler();
-		sendToPageOperation = false;
+		discount_setStatisticsDate();
 	}else{
 		discount_dateCombo.setValue(1);
 		discount_dateCombo.fireEvent('select', discount_dateCombo, null, 1);			
-	}					
-
+	}		
 	
+	Ext.getCmp('discountStatistics').updateStatisticsDate = discount_setStatisticsDate;
 });

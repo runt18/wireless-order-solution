@@ -533,6 +533,16 @@ function res_showBillDetailWin(){
 		}
 	});
 }
+
+var repaid_setStatisticsDate = function(){
+	if(sendToPageOperation){
+		repaid_beginDate.setValue(sendToStatisticsPageBeginDate);
+		repaid_endDate.setValue(sendToStatisticsPageEndDate);		
+		Ext.getCmp('btnSearchForRepaidStatistics').handler();
+		sendToPageOperation = false;
+	}
+};
+
 var requestParams, repaid_tabPanelHeight, repaidPanelHeight;
 var colors = Highcharts.getOptions().colors, repaid_panelDrag = false;
 var repaidStaffChart, repaidDetailChart, repaidStaffChart_amount;
@@ -681,12 +691,11 @@ Ext.onReady(function(){
 	});
 	
 	if(sendToPageOperation){
-		repaid_beginDate.setValue(sendToStatisticsPageBeginDate);
-		repaid_endDate.setValue(sendToStatisticsPageEndDate);		
-		Ext.getCmp('btnSearchForRepaidStatistics').handler();
-		sendToPageOperation = false;
+		repaid_setStatisticsDate();
 	}else{
 		repaid_dateCombo.setValue(1);
 		repaid_dateCombo.fireEvent('select', repaid_dateCombo, null, 1);			
-	}		
+	}	
+	
+	Ext.getCmp('repaidStatistics').updateStatisticsDate = repaid_setStatisticsDate;
 });

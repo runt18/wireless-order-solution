@@ -261,8 +261,11 @@ function orderFoodStatPanelInit(){
 	}];
 	orderFoodStatPanelGrid.region = 'center';
 	orderFoodStatPanelGrid.on('render', function(){
-		dateCombo.setValue(1);
-		dateCombo.fireEvent('select', dateCombo, null, 1);
+		if(sendToPageOperation){
+			dateCombo.setValue(1);
+			dateCombo.fireEvent('select', dateCombo, null, 1);		
+		}
+
 	});
 	orderFoodStatPanelGrid.getStore().on('load', function(store, records, options){
 		if(store.getCount() > 0){
@@ -739,8 +742,10 @@ function deptStatPanelInit(){
 		}
 	});
 	deptStatPanelGrid.on('render', function(){
-		dateCombo.setValue(1);
-		dateCombo.fireEvent('select', dateCombo, null, 1);
+		if(!sendToPageOperation){
+			dateCombo.setValue(1);
+			dateCombo.fireEvent('select', dateCombo, null, 1);		
+		}
 	});
 	
 	
@@ -784,12 +789,22 @@ function salesSubWinTabPanelInit(){
 	});	
 }
 
+var saleSub_setStatisticsDate = function(){
+	if(sendToPageOperation){
+		salesSubWinTabPanel.setActiveTab(deptStatPanel);
+		Ext.getCmp('deptStatistic_dateSearchDateBegin').setValue(sendToStatisticsPageBeginDate);
+		Ext.getCmp('deptStatistic_dateSearchDateEnd').setValue(sendToStatisticsPageEndDate);		
+		Ext.getCmp('deptStatistic_btnSearch').handler();
+		sendToPageOperation = false;		
+	}	
+};
+
 var titleDeptName, titleRegionName;
 Ext.onReady(function(){
 	if(!salesSubWinTabPanel){
 		salesSubWinTabPanelInit();
 	}
-	salesSubWinTabPanel.setActiveTab(orderFoodStatPanel);
+	
 	new Ext.Panel({
 		renderTo : 'divSalesSubStatistics',//渲染到
 		id : 'salesSubStatisticsPanel',
@@ -801,5 +816,13 @@ Ext.onReady(function(){
 		//子集
 		items : [salesSubWinTabPanel]
 	});
+	
+	if(sendToPageOperation){
+		saleSub_setStatisticsDate();		
+	}else{
+		salesSubWinTabPanel.setActiveTab(orderFoodStatPanel);
+	}
+	
+	Ext.getCmp('salesSubStatistics').updateStatisticsDate = saleSub_setStatisticsDate;
 	
 });
