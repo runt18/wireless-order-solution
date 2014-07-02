@@ -92,6 +92,11 @@ function addTab(id, title, url, callback){
 	        		} 
 	        		e.doLayout();
  	        		tabChildrenPage = true; 
+	        	},
+	        	show : function(thiz){
+	        		if(thiz.updateStatisticsDate){
+	        			thiz.updateStatisticsDate();
+	        		}
 	        	}
 	        	//
 /* 	        	,activate:function(){
