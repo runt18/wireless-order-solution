@@ -87,15 +87,17 @@ public class Page{
 	public static enum History{
 		SHIBIE("businessHourMgr", "市别设置", "", "../../images/businessHour.png"),
 		HISTORY("history", "历史账单", "History_Module/HistoryStatistics.html", "../../images/history.png"),
-		BIlls("businessStat", "营业统计", "", "../../images/businessStatis.png"),
+		BUSINESS_STATISTICS("businessSubStatistics", "营业统计", "History_Module/BusinessSubStatistics.html", "../../images/businessChart.png"),
+//		BIlls("businessStat", "营业统计", "", "../../images/businessStatis.png"),
 		BUSINESS_RECEIPS("businessReceiptsStatistics", "收款统计", "History_Module/BusinessReceiptsStatistics.html", "../../images/businessReceips.png"),
 		SALES_SUB("salesSubStatistics", "销售统计", "History_Module/SalesSubStatistics.html", "../../images/salesStat.png"),
 		CANCELLED_FOOD("cancelledFood", "退菜统计", "History_Module/CancelledFood.html", "../../images/cancelledFoodStatis.png"),
 		REPAID_STATISTICS("repaidStatistics", "反结账统计", "History_Module/RepaidStatistics.html", "../../images/commissionStatistics.png"),
 		COMMISSION_STATISTICS("commissionStatistics", "提成统计", "History_Module/CommissionStatistics.html", "../../images/commissionStatistics.png"),
 		DISCOUNT_STATISTICS("discountStatistics", "折扣统计", "History_Module/DiscountStatistics.html", "../../images/discountStatistics.png"),
-		GIFT_STATISTICS("giftStatistics", "赠送统计", "History_Module/GiftStatistics.html", "../../images/giftStatistics.png"),
-		BUSINESS_CHART("businessChart", "营业走势图", "History_Module/BusinessChart.html", "../../images/businessChart.png");
+		GIFT_STATISTICS("giftStatistics", "赠送统计", "History_Module/GiftStatistics.html", "../../images/giftStatistics.png");
+//		BUSINESS_CHART("businessChart", "营业走势图", "History_Module/BusinessChart.html", "../../images/businessChart.png"),
+		
 		
 		
 		private String mgrId;
