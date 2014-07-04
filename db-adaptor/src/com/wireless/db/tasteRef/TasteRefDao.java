@@ -18,7 +18,6 @@ import com.wireless.pojo.dishesOrder.TasteGroup;
 import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.menuMgr.Kitchen;
-import com.wireless.pojo.staffMgr.Staff;
 
 public class TasteRefDao {
 	
@@ -444,36 +443,7 @@ public class TasteRefDao {
 		dbCon.stmt.executeBatch();
 		
 	}
-	/**
-	 * 批量更新
-	 * @param modTastes
-	 */
-	public static boolean update(Staff terminal,String modTastes){
-		try{
-			DBCon dbCon = new DBCon();
-			dbCon.connect();
-			String[] records = modTastes.split("record_separator");//记录
-			dbCon.connect();
-			for(int i = 0;i < records.length; i++){
-				String[] fields = records[i].split("field_separator");
-				String tID = fields[0];
-				String tAlias = fields[1];
-				String tName = fields[2];
-				String tPrice = fields[3];
-				String tRate = fields[4];
-				String tCategory = fields[5];
-				String sql = "UPDATE "+Params.dbName+".taste SET "+Params.dbName+".taste.preference = '"+tName+"',"+Params.dbName+".taste.rate="+tRate+","+Params.dbName+".taste.calc = "+tCategory+","+Params.dbName+".taste.price = "+tPrice+","+Params.dbName+".taste.taste_alias = "+tAlias+" WHERE "+Params.dbName+".taste.restaurant_id = "+terminal.getRestaurantId()+" AND "+Params.dbName+".taste.taste_id = "+tID;
-				dbCon.stmt.addBatch(sql);
-			}
-			dbCon.stmt.executeBatch();
-			dbCon.disconnect();
-			return true;
-		}
-		catch(Exception e){
-			e.printStackTrace();
-			return false;
-		}
-	}
+	
 	/**
 	 * Get the kitchen taste reference count.
 	 * @param dbCon

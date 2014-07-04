@@ -10,6 +10,7 @@ import com.wireless.db.tasteMgr.TasteDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.TasteError;
 import com.wireless.pojo.dishesOrder.TasteGroup;
+import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.tasteMgr.Taste;
 import com.wireless.util.DateType;
@@ -193,4 +194,123 @@ public class TasteGroupDao {
 		return new TasteGroup(tgId, normal, normalTastes, tmp);
 	}
 	
+	public static class ArchiveResult{
+		private final int tgAmount;
+		private final int ntgAmount;
+		private final int tgMaxId;
+		private final int ntgMaxId;
+		
+		public ArchiveResult(int tgAmount, int ntgAmount, int tgMaxId, int ntgMaxId){
+			this.tgAmount = tgAmount;
+			this.ntgAmount = ntgAmount;
+			this.tgMaxId = tgMaxId;
+			this.ntgMaxId = ntgMaxId;
+		}
+		public int getTgAmount(){
+			return this.tgAmount;
+		}
+		
+		public int getNTgAmount(){
+			return this.ntgAmount;
+		}
+		
+		public int getTgMaxId(){
+			return this.tgMaxId;
+		}
+		
+		public int getNTgMaxId(){
+			return this.ntgMaxId;
+		}
+		
+		@Override
+		public String toString(){
+			return tgAmount + " taste group record(s) are moved to history, maxium id : " + tgMaxId + System.getProperty("line.separator") +
+				   ntgAmount + " normal taste group record(s) are moved to history, maxium id : " + ntgMaxId;
+		}
+	}
+	
+	static ArchiveResult archive(DBCon dbCon, Staff staff, String paidOrder) throws SQLException{
+		
+		String sql;
+		
+		final String tasteGroupItem = "`taste_group_id`, `normal_taste_group_id`, `normal_taste_pref`, `normal_taste_price`, " +
+				  					  "`tmp_taste_id`, `tmp_taste_pref`, `tmp_taste_price`";
+		
+		//Move the taste group to history
+		sql = " INSERT INTO " + Params.dbName + ".taste_group_history (" + tasteGroupItem + " ) " +
+			  " SELECT " + tasteGroupItem + " FROM " + Params.dbName + ".taste_group" +
+			  " WHERE " +
+			  " taste_group_id <> " + TasteGroup.EMPTY_TASTE_GROUP_ID +
+			  " AND taste_group_id IN (" +
+			  " SELECT taste_group_id FROM " + Params.dbName + ".order_food WHERE order_id IN (" + paidOrder + " ) " +
+			  " ) ";
+		
+		int tgAmount = dbCon.stmt.executeUpdate(sql);
+		
+		final String normalTasteGroupItem = "`normal_taste_group_id`, `taste_id`";
+		//Move the normal taste group to history.
+		sql = " INSERT INTO " + Params.dbName + ".normal_taste_group_history (" + normalTasteGroupItem + ")" +
+			  " SELECT " + normalTasteGroupItem + " FROM " + Params.dbName + ".normal_taste_group" +
+			  " WHERE " +
+			  " normal_taste_group_id <> " + TasteGroup.EMPTY_NORMAL_TASTE_GROUP_ID +
+			  " AND " +
+			  " normal_taste_group_id IN(" +
+			  " SELECT normal_taste_group_id " +
+			  " FROM " + Params.dbName + ".order_food OF " + " JOIN " + Params.dbName + ".taste_group TG" +
+			  " ON OF.taste_group_id = TG.taste_group_id " +
+			  " WHERE " +
+			  " OF.order_id IN (" + paidOrder + ")" +
+			  " ) ";
+		
+		int ntgAmount = dbCon.stmt.executeUpdate(sql);
+		
+		//Calculate the max taste group id from both today and history.
+		int maxTgId = 0;
+		sql = " SELECT MAX(taste_group_id) + 1 " +
+			  " FROM " +
+			  " (SELECT MAX(taste_group_id) AS taste_group_id FROM " + Params.dbName + ".taste_group" +
+			  " UNION " +
+			  " SELECT MAX(taste_group_id) AS taste_group_id FROM " + Params.dbName + ".taste_group_history) AS all_taste_group";
+		dbCon.rs = dbCon.stmt.executeQuery(sql);
+		if(dbCon.rs.next()){
+			maxTgId = dbCon.rs.getInt(1);
+		}
+		dbCon.rs.close();
+		
+		//Calculate the max normal taste group id from both today and history
+		int maxNormalTgId = 0;
+		sql = " SELECT MAX(normal_taste_group_id) + 1 " +
+			  " FROM " +
+			  " (SELECT MAX(normal_taste_group_id) AS normal_taste_group_id FROM " + Params.dbName + ".normal_taste_group" +
+			  " UNION " +
+			  " SELECT MAX(normal_taste_group_id) AS normal_taste_group_id FROM " + Params.dbName + ".normal_taste_group_history) AS all_normal_taste_group";
+		dbCon.rs = dbCon.stmt.executeQuery(sql);
+		if(dbCon.rs.next()){
+			maxNormalTgId = dbCon.rs.getInt(1);
+		}
+		dbCon.rs.close();
+		
+		//Update the max taste group id
+		sql = " DELETE FROM " + Params.dbName + ".taste_group WHERE taste_group_id IN (" +
+			  " SELECT taste_group_id FROM " + Params.dbName + ".order_food WHERE restaurant_id = " + Restaurant.ADMIN +
+			  " ) ";
+		dbCon.stmt.executeUpdate(sql);
+		
+		//Insert a record with the max taste group id and max normal taste group id.
+		sql = " INSERT INTO " + Params.dbName + ".taste_group" +
+			  " (`taste_group_id`, `normal_taste_group_id`) " +
+			  " VALUES " +
+			  " ( " +
+			  maxTgId + ", " +
+			  maxNormalTgId +
+			  " ) ";
+		dbCon.stmt.executeUpdate(sql);
+		
+		//Update the taste group id of order food to max.
+		sql = " UPDATE " + Params.dbName + ".order_food SET taste_group_id = " + maxTgId + 
+			  " WHERE restaurant_id = " + Restaurant.ADMIN;
+		dbCon.stmt.executeUpdate(sql);
+		
+		return new ArchiveResult(tgAmount, ntgAmount, maxTgId, maxNormalTgId);
+	}
 }

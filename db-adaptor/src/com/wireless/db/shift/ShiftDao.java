@@ -124,7 +124,7 @@ public class ShiftDao {
 		}
 		dbCon.rs.close();
 		
-		return getByRange(dbCon, staff, new DutyRange(onDuty, System.currentTimeMillis()), DateType.TODAY);
+		return getByRange(dbCon, staff, new DutyRange(onDuty, System.currentTimeMillis()), new ExtraCond(DateType.TODAY));
 	}
 	
 	/**
@@ -161,7 +161,7 @@ public class ShiftDao {
 	 * 	 			throws if the restaurant does NOT exist 
 	 */
 	private static ShiftDetail getCurrentShift(DBCon dbCon, Staff staff) throws SQLException, BusinessException{
-		return getByRange(dbCon, staff, getCurrentShiftRange(dbCon, staff), DateType.TODAY);
+		return getByRange(dbCon, staff, getCurrentShiftRange(dbCon, staff), new ExtraCond(DateType.TODAY));
 	}
 	
 	/**
@@ -213,17 +213,17 @@ public class ShiftDao {
 	 * 			the staff to request
 	 * @param range
 	 * 			the duty range
-	 * @param dateType
-	 * 			indicate the date type {@link DateType}
+	 * @param extraCond
+	 * 			the extra condition {@link CalcBillStatisticsDao.ExtraCond}
 	 * @return the shift detail information
 	 * @throws SQLException
 	 * 			throws if fail to execute any SQL statement
 	 */
-	public static ShiftDetail getByRange(Staff staff, DutyRange range, DateType dateType) throws SQLException{
+	public static ShiftDetail getByRange(Staff staff, DutyRange range, ExtraCond extraCond) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return getByRange(dbCon, staff, range, dateType);
+			return getByRange(dbCon, staff, range, extraCond);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -237,17 +237,15 @@ public class ShiftDao {
 	 * 			the staff to request
 	 * @param range
 	 * 			the duty range
-	 * @param dateType
-	 * 			indicate the date type {@link DateType}
+	 * @param extraCond
+	 * 			the extra condition {@link CalcBillStatisticsDao.ExtraCond}
 	 * @return the shift detail information
 	 * @throws SQLException
 	 * 			throws if fail to execute any SQL statement
 	 */
-	public static ShiftDetail getByRange(DBCon dbCon, Staff staff, DutyRange range, DateType dateType) throws SQLException{
+	public static ShiftDetail getByRange(DBCon dbCon, Staff staff, DutyRange range, ExtraCond extraCond) throws SQLException{
 		
 		ShiftDetail result = new ShiftDetail(range);
-		
-		ExtraCond extraCond = new ExtraCond(dateType);
 		
 		//Calculate the general income
 		result.setIncomeByPay(CalcBillStatisticsDao.calcIncomeByPayType(dbCon, staff, range, extraCond));
@@ -275,7 +273,7 @@ public class ShiftDao {
 		result.setServiceIncome(CalcBillStatisticsDao.calcServicePrice(dbCon, staff, range, extraCond));
 		
 		//Get the income by charge
-		result.setIncomeByCharge(CalcBillStatisticsDao.calcIncomeByCharge(dbCon, staff, range, new ExtraCond4Charge(dateType)));
+		result.setIncomeByCharge(CalcBillStatisticsDao.calcIncomeByCharge(dbCon, staff, range, new ExtraCond4Charge(extraCond.dateType)));
 		
 		//Get the gift, discount & total to each department during this period.
 		result.setDeptIncome(CalcBillStatisticsDao.calcIncomeByDept(dbCon, staff, range, extraCond));

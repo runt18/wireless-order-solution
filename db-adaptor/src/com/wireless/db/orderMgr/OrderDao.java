@@ -17,6 +17,7 @@ import com.wireless.pojo.dishesOrder.OrderSummary;
 import com.wireless.pojo.distMgr.Discount;
 import com.wireless.pojo.regionMgr.Region;
 import com.wireless.pojo.regionMgr.Table;
+import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.util.DateType;
 
@@ -697,6 +698,90 @@ public class OrderDao {
 		dbCon.rs.close();
 		
 		return orderId;
+	}
+	
+	public static void archive(DBCon dbCon, Staff staff) throws SQLException{
+		StringBuilder paidOrderCond = new StringBuilder();
+		
+		
+		String sql;
+		//Get the amount and id to paid orders
+		sql = " SELECT id FROM " + Params.dbName + ".order " +
+			  " WHERE " +
+			  " (status = " + Order.Status.PAID.getVal() + " OR status = " + Order.Status.REPAID.getVal() + ")" +
+			 (staff.getRestaurantId() < 0 ? "" : "AND restaurant_id=" + staff.getRestaurantId());
+		dbCon.rs = dbCon.stmt.executeQuery(sql);
+		while(dbCon.rs.next()){
+			paidOrderCond.append(dbCon.rs.getInt("id")).append(",");
+		}
+		dbCon.rs.close();
+		
+		if(paidOrderCond.length() > 0){
+			paidOrderCond.deleteCharAt(paidOrderCond.length() - 1);
+			
+			//Archive the order
+			archive(dbCon, staff, paidOrderCond.toString());
+			
+			//Archive the order food
+			OrderFoodDao.archive(dbCon, staff, paidOrderCond.toString());
+
+			//Archive the taste group
+			TasteGroupDao.archive(dbCon, staff, paidOrderCond.toString());
+		}
+		
+	}
+	
+	public static class ArchiveResult{
+		private final int maxId;
+		private final int orderAmount;
+		public ArchiveResult(int maxId, int orderAmount){
+			this.maxId = maxId;
+			this.orderAmount = orderAmount;
+		}
+		
+		public int getMaxId(){
+			return this.maxId;
+		}
+		
+		public int getAmount(){
+			return this.orderAmount;
+		}
+		
+		@Override
+		public String toString(){
+			return orderAmount + " record(s) are moved to history, maxium id : " + maxId;
+		}
+	}
+	
+	private static ArchiveResult archive(DBCon dbCon, Staff staff, String paidOrder) throws SQLException{
+		final String orderItem = "`id`, `seq_id`, `restaurant_id`, `birth_date`, `order_date`, `status`, " +
+				"`cancel_price`, `discount_price`, `gift_price`, `coupon_price`, `repaid_price`, `erase_price`, `total_price`, `actual_price`, `custom_num`," + 
+				"`waiter`, `settle_type`, `pay_type`, `category`, `member_operation_id`, `staff_id`, " +
+				"`region_id`, `region_name`, `table_alias`, `table_name`, `service_rate`, `comment`";
+		
+		String sql;
+		//Move the paid order from "order" to "order_history".
+		sql = " INSERT INTO " + Params.dbName + ".order_history (" + orderItem + ") " + 
+			  " SELECT " + orderItem + " FROM " + Params.dbName + ".order WHERE id IN " + "(" + paidOrder + ")";
+		int amount = dbCon.stmt.executeUpdate(sql);
+		
+		//Calculate the max order id from both today and history.
+		int maxId = 0;
+		sql = " SELECT MAX(id) + 1 FROM (" + 
+			  " SELECT MAX(id) AS id FROM " + Params.dbName + ".order " +
+			  " UNION " +
+			  " SELECT MAX(id) AS id FROM " + Params.dbName + ".order_history) AS all_order";
+		dbCon.rs = dbCon.stmt.executeQuery(sql);
+		if(dbCon.rs.next()){
+			maxId = dbCon.rs.getInt(1);
+		}
+		dbCon.rs.close();
+		
+		sql = " UPDATE " + Params.dbName + ".order SET id = " + maxId +
+			  " WHERE restaurant_id = " + Restaurant.ADMIN;
+		dbCon.stmt.executeUpdate(sql);
+		
+		return new ArchiveResult(maxId, amount);
 	}
 	
 }

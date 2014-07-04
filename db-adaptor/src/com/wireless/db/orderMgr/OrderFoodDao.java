@@ -22,6 +22,7 @@ import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.pojo.regionMgr.Region;
 import com.wireless.pojo.regionMgr.Table;
+import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.tasteMgr.Taste;
 import com.wireless.util.DateType;
@@ -573,6 +574,64 @@ public class OrderFoodDao {
 				}
 			}
 		}
+	}
+	
+	public static class ArchiveResult{
+		private final int maxId;
+		private final int orderAmount;
+		public ArchiveResult(int maxId, int orderAmount){
+			this.maxId = maxId;
+			this.orderAmount = orderAmount;
+		}
+		
+		public int getMaxId(){
+			return this.maxId;
+		}
+		
+		public int getAmount(){
+			return this.orderAmount;
+		}
+		
+		@Override
+		public String toString(){
+			return orderAmount + " record(s) are moved to history, maxium id : " + maxId;
+		}
+	}
+	
+	static ArchiveResult archive(DBCon dbCon, Staff staff, String paidOrder) throws SQLException{
+		
+		final String orderFoodItem = "`id`,`restaurant_id`, `order_id`, `food_id`, `order_date`, `order_count`," + 
+				"`unit_price`, `commission`, `name`, `food_status`, `taste_group_id`, `cancel_reason_id`, `cancel_reason`," +
+				"`discount`, `dept_id`, `kitchen_id`, " +
+				"`staff_id`, `waiter`, `is_temporary`, `is_paid`";
+
+		String sql;
+		
+		//Move the records from today to history.
+		sql = " INSERT INTO " + Params.dbName + ".order_food_history (" + orderFoodItem + ") " +
+			  " SELECT " + orderFoodItem + " FROM " + Params.dbName + ".order_food " +
+			  " WHERE " +
+			  " order_id IN ( " + paidOrder + " ) ";
+		
+		int orderAmount = dbCon.stmt.executeUpdate(sql);
+		
+		int maxId = 0;
+		//Calculate the max order food id from both today and history.
+		sql = " SELECT MAX(id) + 1 FROM (" +
+			  " SELECT MAX(id) AS id FROM " + Params.dbName + ".order_food " +
+			  " UNION " +
+			  " SELECT MAX(id) AS id FROM " + Params.dbName + ".order_food_history) AS all_order_food";
+		dbCon.rs = dbCon.stmt.executeQuery(sql);
+		if(dbCon.rs.next()){
+			maxId = dbCon.rs.getInt(1);
+		}
+		dbCon.rs.close();
+		
+		//Update the id to max.
+		sql = " UPDATE " + Params.dbName + ".order_food SET id = " + maxId + " WHERE restaurant_id = " + Restaurant.ADMIN;
+		dbCon.stmt.executeUpdate(sql);
+		
+		return new ArchiveResult(maxId, orderAmount);
 	}
 	
 }

@@ -132,7 +132,7 @@ public class PaymentDao {
 	 * 			throws if the restaurant does NOT exist
 	 */
 	public static ShiftDetail getCurrentPayment(DBCon dbCon, Staff staff) throws SQLException, BusinessException{
-		return ShiftDao.getByRange(dbCon, staff, getCurrentPaymentRange(dbCon, staff), DateType.TODAY);
+		return ShiftDao.getByRange(dbCon, staff, getCurrentPaymentRange(dbCon, staff), new CalcBillStatisticsDao.ExtraCond(DateType.TODAY));
 	}
 	
 
