@@ -24,7 +24,6 @@ import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.billStatistics.IncomeByEachDay;
 import com.wireless.pojo.billStatistics.ShiftDetail;
 import com.wireless.pojo.staffMgr.Staff;
-import com.wireless.pojo.util.DateUtil;
 import com.wireless.util.DateType;
 import com.wireless.util.WebParams;
 
@@ -51,9 +50,6 @@ public class BusinessStatisticsAction extends DispatchAction {
 			String offDuty = request.getParameter("offDuty");
 			
 			String dutyRange = request.getParameter("dutyRange");
-			
-			String opening = request.getParameter("opening");
-			String ending = request.getParameter("ending");
 			
 			final String chart = request.getParameter("chart");
 			
@@ -88,12 +84,12 @@ public class BusinessStatisticsAction extends DispatchAction {
 				DutyRange range = DutyRangeDao.exec(staff, onDuty, offDuty);
 				
 				if(range != null){
-					shiftDetail = ShiftDao.getByRange(staff, range, DateType.HISTORY);
+					shiftDetail = ShiftDao.getByRange(staff, range, new CalcBillStatisticsDao.ExtraCond(DateType.HISTORY));
 				}else{
 					shiftDetail = new ShiftDetail(new DutyRange(onDuty, offDuty));
 				}
 			}else{
-				shiftDetail = ShiftDao.getByRange(staff, new DutyRange(onDuty, offDuty), DateType.HISTORY);
+				shiftDetail = ShiftDao.getByRange(staff, new DutyRange(onDuty, offDuty), new CalcBillStatisticsDao.ExtraCond(DateType.HISTORY));
 			}
 			
 			jObject.setExtra(new Jsonable(){
@@ -147,7 +143,7 @@ public class BusinessStatisticsAction extends DispatchAction {
 			String onDuty = request.getParameter("onDuty");
 			String offDuty = request.getParameter("offDuty");
 			
-			final ShiftDetail sdetail = ShiftDao.getByRange(StaffDao.verify(Integer.parseInt(pin)), new DutyRange(onDuty, offDuty), DateType.TODAY);
+			final ShiftDetail sdetail = ShiftDao.getByRange(StaffDao.verify(Integer.parseInt(pin)), new DutyRange(onDuty, offDuty), new CalcBillStatisticsDao.ExtraCond(DateType.TODAY));
 			
 			if(sdetail != null){
 				jObject.setExtra(new Jsonable(){

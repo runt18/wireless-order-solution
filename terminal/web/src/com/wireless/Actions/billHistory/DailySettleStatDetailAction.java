@@ -13,6 +13,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.DBCon;
+import com.wireless.db.billStatistics.CalcBillStatisticsDao;
 import com.wireless.db.shift.ShiftDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
@@ -45,7 +46,7 @@ public class DailySettleStatDetailAction extends Action {
 			final ShiftDetail result = ShiftDao.getByRange(dbCon, 
 										StaffDao.verify(dbCon, Integer.parseInt(pin)), 
 										new DutyRange(onDuty, offDuty),
-										DateType.HISTORY);
+										new CalcBillStatisticsDao.ExtraCond(DateType.HISTORY));
 
 			dbCon.rs.close();
 			

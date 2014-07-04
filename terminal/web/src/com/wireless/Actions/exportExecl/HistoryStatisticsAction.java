@@ -1054,7 +1054,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 		params.put("queryPattern", queryPattern);*/
 		
 		Staff staff = StaffDao.verify(Integer.parseInt(pin));
-		ShiftDetail business = ShiftDao.getByRange(staff, new DutyRange(onDuty, offDuty), DateType.HISTORY);
+		ShiftDetail business = ShiftDao.getByRange(staff, new DutyRange(onDuty, offDuty), new CalcBillStatisticsDao.ExtraCond(DateType.HISTORY));
 		
 		// 创建excel主页
 		HSSFWorkbook wb = new HSSFWorkbook();

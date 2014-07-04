@@ -249,7 +249,7 @@ public class FinanceWeixinAction extends Action {
 				
 				ShiftDetail detail = ShiftDao.getByRange(dbCon, StaffDao.getStaffs(dbCon, restaurantId).get(0), 
 													    new DutyRange(onDuty, offDuty), 
-														DateType.HISTORY);
+														new CalcBillStatisticsDao.ExtraCond(DateType.HISTORY));
 				StringBuilder content = new StringBuilder();
 				content.append(centerAligned("最近日结") + "\n");
 				content.append("-----------------\n");
