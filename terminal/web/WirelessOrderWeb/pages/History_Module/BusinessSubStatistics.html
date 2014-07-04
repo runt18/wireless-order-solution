@@ -25,11 +25,13 @@
 		}else if(c.type == 4){//反结账统计
 			addTab('repaidStatistics', '反结账统计', 'History_Module/RepaidStatistics.html');
 		}else if(c.type == 5){//部门统计
+			sendToStatisticsPageDeptId = c.deptId;
+			sendToStatisticsPageDeptName = c.deptName;
 			addTab('salesSubStatistics', '销售统计', 'History_Module/SalesSubStatistics.html');
+			
 		}else{
 			return;
 		}
-		
 	}
 </script>
 <title>Insert title here</title>
@@ -37,7 +39,7 @@
 <body>
 <div id="divBusinessSubStatistics"></div>
 <div id="divBusinessSubStatisticsDetailChart" style="height : 280px;"></div>
-	<table id="businessStatisticsSummary" border="1" class="tb_base" style="width : 100%">
+	<table id="businessStatisticsSummary" border="1" class="tb_base" style="width : 100%; height : 100%">
 		<tr>
 			<th class="table_title text_center">收款方式</th>
 			<th class="table_title text_center">账单数</th>
@@ -162,6 +164,7 @@
 			  <th class="table_title text_center">折扣总额</th>
 			  <th class="table_title text_center">赠送总额</th>
 			  <th class="table_title text_center">应收总额</th>
+			  <th class="table_title text_center">操作</th>
 		</tr>
 	</table>
 	</div>
