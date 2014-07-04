@@ -381,30 +381,17 @@ Ext.onReady(function(){
 		id : 'total_exoprt_excel',
 		iconCls : 'icon_tb_exoprt_excel',
 		handler : function(){
-			var paramsOnDuty = '', paramsOffDuty;
-			if(queryPattern == 1){
-				if(!beginDate.isValid() || !endDate.isValid()){
+			if(!businessSub_beginDate.isValid() || !businessSub_endDate.isValid()){
 					return;
-				}
-				paramsOnDuty = beginDate.getValue().format('Y-m-d 00:00:00');
-				paramsOffDuty = endDate.getValue().format('Y-m-d 23:59:59');
-			}else if(queryPattern == 2){
-				paramsOnDuty = onDuty.format('Y-m-d H:i:s');
-				paramsOffDuty = offDuty.format('Y-m-d H:i:s');
-			}else{
-				return;
 			}
-			var url = '../../{0}?pin={1}&restaurantID={2}&dataSource={3}&onDuty={4}&offDuty={5}&queryPattern={6}&dataType={7}&isCookie=true';
+			var url = '../../{0}?dataSource={1}&onDuty={2}&offDuty={3}&dataType={4}';
 			url = String.format(
 					url, 
 					'ExportHistoryStatisticsToExecl.do', 
-					-10, 
-					restaurantID, 
 					'business',
-					paramsOnDuty,
-					paramsOffDuty,
-					queryPattern,
-					dataSource
+					businessSub_beginDate.getValue().format('Y-m-d 00:00:00'),
+					businessSub_endDate.getValue().format('Y-m-d 23:59:59'),
+					'history'
 				);
 			window.location = url;
 		}
