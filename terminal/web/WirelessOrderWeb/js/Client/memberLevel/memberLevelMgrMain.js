@@ -1,6 +1,6 @@
 function initAddLevelWin(){
 	memberLevelAddWin = new Ext.Window({
-		id : 'takeMoneyWin',
+		id : 'memberLevelAddWin',
 		title : '添加等级',
 		closable : false,
 		modal : true,

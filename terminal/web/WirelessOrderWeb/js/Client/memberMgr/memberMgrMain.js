@@ -410,6 +410,140 @@ function queryMemberOperationSummaryHandler(){
 	}
 	mr_queryMemberConsumeSummaryWin.show();*/
 };
+
+
+function initMemberCouponWin(){
+	if(!memberCouponWin){
+		memberCouponWin = new Ext.Window({
+			id : 'memberCouponWin',
+			title : '选择优惠劵',
+			closable : false,
+			modal : true,
+			resizable : false,
+			width : 250,
+			keys : [{
+				key : Ext.EventObject.ESC,
+				scope : this,
+				fn : function(){
+					memberCouponWin.hide();
+				}
+			}],
+			bbar : ['->',{
+				text : '发送',
+				id : 'btn_memberCouponSend',
+				iconCls : 'btn_save',
+				handler : function(){
+					var members = memberBasicGrid.getSelectionModel().getSelections();
+					if(members.length < 1){
+						Ext.example.msg('提示', '请选中会员后进行操作.');
+						return;
+					}	
+					var coupon = Ext.getCmp('member_comboCoupon');
+					var membersData = '';
+					for (var i = 0; i < members.length; i++) {
+						if(i > 0){
+							membersData += ',';
+						}
+						membersData += members[i].get('id');
+					}
+					
+					Ext.Ajax.request({
+						url : '../../OperateCoupon.do',
+						params : {
+							membersData : membersData,
+							coupon : coupon.getValue(),
+							dataSource : 'sendCoupon'
+						},
+						success : function(res, opt){
+							var jr = Ext.decode(res.responseText);
+							if(jr.success){
+								Ext.ux.showMsg(jr);
+								memberCouponWin.hide();
+							}else{
+								Ext.ux.showMsg(jr);
+							}
+							
+						},
+						failure : function(res, opt){
+							Ext.ux.showMsg(Ext.util.JSON.decode(res.responseText));
+						}
+					});
+				}
+			}, {
+				text : '取消',
+				id : 'btn_cancelMmemberLevelWin',
+				iconCls : 'btn_close',
+				handler : function(){
+					memberCouponWin.hide();
+				}
+			}],
+			keys: [{
+				key : Ext.EventObject.ENTER,
+				scope : this,
+				fn : function(){
+					Ext.getCmp('btn_memberCouponSend').handler();
+				}
+			},{
+				key : Ext.EventObject.ESC,
+				scope : this,
+				fn : function(){
+					memberCouponWin.hide();
+				}
+			}],
+			items : [{
+				layout : 'form',
+				labelWidth : 60,
+				width : 250,
+				border : false,
+				frame : true,
+				items : [{
+					xtype : 'combo',
+					id : 'member_comboCoupon',
+					fieldLabel : '优惠劵',
+					readOnly : false,
+					forceSelection : true,
+					width : 130,
+					listWidth : 120,
+					store : new Ext.data.SimpleStore({
+						fields : ['id', 'couponName']
+					}),
+					valueField : 'id',
+					displayField : 'couponName',
+					typeAhead : true,
+					mode : 'local',
+					triggerAction : 'all',
+					selectOnFocus : true,
+					allowBlank : false,					
+					listeners : {
+						render : function(thiz){
+							var data = [];
+							Ext.Ajax.request({
+								url : '../../QueryCouponType.do',
+								params : {
+									dataSource : 'unExpired'
+								},								
+								success : function(res, opt){
+									var jr = Ext.decode(res.responseText);
+									for(var i = 0; i < jr.length; i++){
+										data.push([jr[i]['couponTypeId'], jr[i]['typeName']]);
+									}
+									thiz.store.loadData(data);
+	//								thiz.setValue(data[0]);
+								},
+								fialure : function(res, opt){
+									thiz.store.loadData(data);
+	//								thiz.setValue(-1);
+								}
+							});
+						}
+					}
+				}]
+			}]
+		});
+	}
+}
+
+
 /**
  * 
  */
@@ -720,6 +854,174 @@ function treeInit(){
 };
 
 function gridInit(){
+	var member_beginDate = new Ext.form.DateField({
+		xtype : 'datefield',	
+		id : 'dateSearchDateBegin',
+		format : 'Y-m-d',
+		width : 100,
+		maxValue : new Date(),
+		readOnly : false,
+		allowBlank : false
+	});
+	var member_endDate = new Ext.form.DateField({
+		xtype : 'datefield',
+		id : 'dateSearchDateEnd',
+		format : 'Y-m-d',
+		width : 100,
+		maxValue : new Date(),
+		readOnly : false,
+		allowBlank : false
+	});
+	var member_dateCombo = Ext.ux.createDateCombo({
+		width : 75,
+		data : [[3, '近一个月'], [4, '近三个月'], [9, '近半年']],
+		beginDate : member_beginDate,
+		endDate : member_endDate,
+		callback : function(){
+			if(member_searchType){
+				Ext.getCmp('btnSearchMember').handler();
+			}
+		}
+	});
+	
+	var memberBasicGridExcavateMemberTbar = new Ext.Toolbar({
+		hidden : true,
+		height : 28,		
+		items : [
+			{xtype : 'tbtext', text : '日期:&nbsp;&nbsp;'},
+			{xtype : 'tbtext', text : '&nbsp;&nbsp;'},
+			member_dateCombo,
+			{xtype : 'tbtext', text : '&nbsp;'},
+			member_beginDate,
+			{
+				xtype : 'label',
+				hidden : false,
+				id : 'tbtextDisplanZ',
+				text : ' 至 '
+			}, 
+			member_endDate,
+			{xtype : 'tbtext', text : '&nbsp;&nbsp;'},			
+			{xtype : 'tbtext', text : '消费金额:'},
+			{
+				id : 'usedBalanceEqual',
+				xtype : 'combo',
+				readOnly : false,
+				forceSelection : true,
+				value : '=',
+				width : 70,
+				store : new Ext.data.SimpleStore({
+					fields : ['value', 'text'],
+					data : [['=', '等于'], ['>=', '大于等于'], ['<=', '小于等于']]
+				}),
+				valueField : 'value',
+				displayField : 'text',
+				typeAhead : true,
+				mode : 'local',
+				triggerAction : 'all',
+				selectOnFocus : true
+			},			
+			{
+				xtype : 'numberfield',
+				id : 'textTotalMemberCost',
+				width : 60
+			},
+			{xtype : 'tbtext', text : '&nbsp;&nbsp;'},	
+			{xtype : 'tbtext', text : '消费次数:'},
+			{
+				id : 'consumptionAmountEqual',
+				xtype : 'combo',
+				readOnly : false,
+				forceSelection : true,
+				value : '=',
+				width : 70,
+				store : new Ext.data.SimpleStore({
+					fields : ['value', 'text'],
+					data : [['=', '等于'], ['>=', '大于等于'], ['<=', '小于等于']]
+				}),
+				valueField : 'value',
+				displayField : 'text',
+				typeAhead : true,
+				mode : 'local',
+				triggerAction : 'all',
+				selectOnFocus : true
+			},			
+			{
+				xtype : 'numberfield',
+				id : 'textTotalMemberCostCount',
+				width : 50
+			},
+/*			{xtype : 'tbtext', text : '&nbsp;&nbsp;'},	
+			{xtype : 'tbtext', text : '当前积分:'},
+			{
+				xtype : 'numberfield',
+				id : 'textMemberPoint',
+				width : 60
+			},*/
+			{xtype : 'tbtext', text : '&nbsp;&nbsp;'},	
+			{xtype : 'tbtext', text : '余额:'},
+			{
+				id : 'memberBalanceEqual',
+				xtype : 'combo',
+				readOnly : false,
+				forceSelection : true,
+				value : '=',
+				width : 70,
+				store : new Ext.data.SimpleStore({
+					fields : ['value', 'text'],
+					data : [['=', '等于'], ['>=', '大于等于'], ['<=', '小于等于']]
+				}),
+				valueField : 'value',
+				displayField : 'text',
+				typeAhead : true,
+				mode : 'local',
+				triggerAction : 'all',
+				selectOnFocus : true
+			},				
+			{
+				xtype : 'numberfield',
+				id : 'textMemberBalance',
+				width : 60
+			}]
+		
+	});
+	
+	var memberBasicGridOtherMemberTbar = new Ext.Toolbar({
+		hidden : true,
+		height : 28,		
+		items : [
+			{xtype : 'tbtext', text : '当前积分:'},
+			{
+				id : 'memberCurrentPointEqual',
+				xtype : 'combo',
+				readOnly : false,
+				forceSelection : true,
+				value : '=',
+				width : 70,
+				store : new Ext.data.SimpleStore({
+					fields : ['value', 'text'],
+					data : [['=', '等于'], ['>=', '大于等于'], ['<=', '小于等于']]
+				}),
+				valueField : 'value',
+				displayField : 'text',
+				typeAhead : true,
+				mode : 'local',
+				triggerAction : 'all',
+				selectOnFocus : true
+			},			
+			{
+				xtype : 'numberfield',
+				id : 'textMemberCurrentPoint',
+				width : 60
+			},
+			{xtype : 'tbtext', text : '&nbsp;&nbsp;'},	
+			{xtype : 'tbtext', text : '客户名称:'},
+			{
+				xtype : 'textfield',
+				id : 'textMemberName',
+				width : 50
+			}]
+		
+	});	
 	var memberBasicGridTbar = new Ext.Toolbar({
 		items : [{
 			xtype : 'tbtext',
@@ -727,10 +1029,8 @@ function gridInit(){
 		}, {
 			xtype : 'tbtext',
 			text : '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
-		}, {
-			xtype : 'tbtext',
-			text : '过滤:'
-		}, {
+		}, 
+/*		{
 			disabled : false,
 			xtype : 'combo',
 			id : 'mr_comboMemberSearchType',
@@ -802,18 +1102,64 @@ function gridInit(){
 			triggerAction : 'all',
 			selectOnFocus : true,
 			hidden : true
-		}, {
+		}, */
+		{
+			xtype : 'tbtext',
+			text : '会员手机/会员卡号:'
+		}, 			
+		{
 			xtype : 'numberfield',
-			id : 'numberSearchValueByNumber',
-			hidden : true
+			id : 'numberSearchByMemberPhoneOrCard'
 		}, '->', {
+			text : '高级条件↓',
+	    	id : 'member_btnHeightSearch',
+	    	handler : function(){
+	    		member_searchType = true;
+				Ext.getCmp('member_btnCommonSearch').show();
+	    		Ext.getCmp('member_btnHeightSearch').hide();
+	    		
+	    		memberBasicGrid.setHeight(memberBasicGrid.getHeight()-28);
+	    		
+	    		memberBasicGridExcavateMemberTbar.show();
+	    		
+	    		
+	    		memberBasicGrid.syncSize(); //强制计算高度
+	    		memberBasicGrid.doLayout();//重新布局 	
+			}
+		}, {
+			text : '高级条件↑',
+	    	id : 'member_btnCommonSearch',
+			hidden : true,
+	    	handler : function(){
+	    		member_searchType = true;
+				Ext.getCmp('member_btnHeightSearch').show();
+	    		Ext.getCmp('member_btnCommonSearch').hide();
+	    		
+	    		memberBasicGridExcavateMemberTbar.hide();
+	    		
+	    		memberBasicGrid.setHeight(memberBasicGrid.getHeight()+28);
+	    		memberBasicGrid.syncSize(); //强制计算高度
+	    		memberBasicGrid.doLayout();//重新布局 	
+	    		
+	    		member_dateCombo.setValue(4);
+	    		member_dateCombo.fireEvent('select', member_dateCombo,null,4);
+	    		
+	    		Ext.getCmp('textTotalMemberCost').setValue();
+	    		Ext.getCmp('usedBalanceEqual').setValue('=');
+	    		Ext.getCmp('textTotalMemberCostCount').setValue();
+	    		Ext.getCmp('consumptionAmountEqual').setValue('=');
+	    		Ext.getCmp('numberSearchByMemberPhoneOrCard').setValue();
+	    		Ext.getCmp('memberBalanceEqual').setValue('=');
+			}
+		},{xtype : 'tbtext', text : '&nbsp;&nbsp;'},	 
+		{
 			text : '搜索',
 			id : 'btnSearchMember',
 			iconCls : 'btn_search',
 			handler : function(){
 				var memberTypeNode = memberTypeTree.getSelectionModel().getSelectedNode();
-				var searchType = Ext.getCmp('mr_comboMemberSearchType').getValue();
-				var searchValue = Ext.getCmp(mObj.searchValue) ? Ext.getCmp(mObj.searchValue).getValue() : '';
+//				var searchType = Ext.getCmp('mr_comboMemberSearchType').getValue();
+//				var searchValue = Ext.getCmp(mObj.searchValue) ? Ext.getCmp(mObj.searchValue).getValue() : '';
 				
 				var gs = memberBasicGrid.getStore();
 				
@@ -835,20 +1181,22 @@ function gridInit(){
 					gs.baseParams['memberTypeAttr'] = '';
 				}
 				
-				gs.baseParams['name'] = searchType == 1 ? searchValue : '';
-				gs.baseParams['memberCard'] = searchType == 2 ? searchValue : '';
-				gs.baseParams['mobile'] = searchType == 3 ? searchValue : '';
-				gs.baseParams['totalBalance'] = searchType == 4 ? searchValue : '';
-				gs.baseParams['usedBalance'] = searchType == 5 ? searchValue : '';
-				gs.baseParams['consumptionAmount'] = searchType == 6 ? searchValue : '';
-				gs.baseParams['point'] = searchType == 7 ? searchValue : '';
-				gs.baseParams['usedPoint'] = searchType == 8 ? searchValue : '';
-
-				gs.baseParams['so'] = Ext.getCmp('comboSearchValueByOperation').getValue();
+//				gs.baseParams['name'] = searchType == 1 ? searchValue : '';
+				gs.baseParams['memberCardOrMobile'] = Ext.getCmp('numberSearchByMemberPhoneOrCard').getValue();
+//				gs.baseParams['totalBalance'] = searchType == 4 ? searchValue : '';
+				gs.baseParams['usedBalance'] = Ext.getCmp('textTotalMemberCost').getValue();
+				gs.baseParams['usedBalanceEqual'] = Ext.getCmp('usedBalanceEqual').getValue();
+				gs.baseParams['consumptionAmount'] = Ext.getCmp('textTotalMemberCostCount').getValue();
+				gs.baseParams['consumptionAmountEqual'] = Ext.getCmp('consumptionAmountEqual').getValue();
+//				gs.baseParams['point'] = Ext.getCmp('numberSearchByMemberPhoneOrCard').getValue();
+//				gs.baseParams['usedPoint'] = Ext.getCmp('numberSearchByMemberPhoneOrCard').getValue();
+				gs.baseParams['memberBalance'] = Ext.getCmp('numberSearchByMemberPhoneOrCard').getValue();
+				gs.baseParams['memberBalanceEqual'] = Ext.getCmp('memberBalanceEqual').getValue();
+//				gs.baseParams['so'] = Ext.getCmp('comboSearchValueByOperation').getValue();
 				gs.load({
 					params : {
 						start : 0,
-						limit : GRID_PADDING_LIMIT_20
+						limit : 200
 					}
 				});
 				gs.on('load', function(store, records, options){
@@ -859,7 +1207,10 @@ function gridInit(){
 							}
 						}
 					}
+					memberBasicGrid.getSelectionModel().selectAll();
 				});
+				
+				
 			}
 		}, {
 			hidden : true,
@@ -912,7 +1263,7 @@ function gridInit(){
 			}
 		}, '-', {
 			text : '导出',
-			iconCls : 'icon_tb_setting',
+			iconCls : 'icon_tb_exoprt_excel',
 			handler : function(e){
 
 				var memberTypeNode = memberTypeTree.getSelectionModel().getSelectedNode();
@@ -969,7 +1320,7 @@ function gridInit(){
 		'',
 		'../../QueryMember.do',
 		[
-			[true, false, false, true],
+			[true, true, false, true],
 			['名称', 'name'],
 			['类型', 'memberType.name'],
 			['消费次数', 'consumptionAmount',,'right', 'Ext.ux.txtFormat.gridDou'],
@@ -984,11 +1335,12 @@ function gridInit(){
 		],
 		MemberBasicRecord.getKeys(),
 		[['isPaging', true], ['restaurantID', restaurantID],  ['dataSource', 'normal']],
-		GRID_PADDING_LIMIT_20,
+		200,
 		'',
-		memberBasicGridTbar
+		[memberBasicGridTbar, memberBasicGridExcavateMemberTbar]
 	);	
 	memberBasicGrid.region = 'center';
+	
 	
 	
 	memberBasicGrid.on('render', function(e){
@@ -1175,6 +1527,23 @@ var btnRechargeDetail = new Ext.ux.ImageButton({
 	}
 });
 
+var btnMemberCouponWin = new Ext.ux.ImageButton({
+	imgPath : '../../images/sendCoupon.png',
+	imgWidth : 50,
+	imgHeight : 50,
+	tooltip : '发送优惠劵',
+	handler : function(e){
+		var data = memberBasicGrid.getSelectionModel().getSelections();
+		if(data.length < 1){
+			Ext.example.msg('提示', '请选中会员后进行操作.');
+			return;
+		}		
+		
+		initMemberCouponWin();
+		memberCouponWin.show();
+	}
+});
+
 /**********************************************************************/
 Ext.onReady(function(){
 	treeInit();
@@ -1204,7 +1573,9 @@ Ext.onReady(function(){
 			    {xtype : 'tbtext', text : '&nbsp;&nbsp;'},
 			    btnConsumeDetail,
 			    {xtype : 'tbtext', text : '&nbsp;&nbsp;'},
-			    btnRechargeDetail
+			    btnRechargeDetail,
+			    {xtype : 'tbtext', text : '&nbsp;&nbsp;'},
+			    btnMemberCouponWin
 			]
 		})
 	});

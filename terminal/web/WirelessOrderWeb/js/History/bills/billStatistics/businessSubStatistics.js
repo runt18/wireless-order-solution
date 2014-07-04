@@ -199,6 +199,7 @@ var businessSub_trModel = '<tr>'
 			+ '<td class="text_right">{1}</td>'
 			+ '<td class="text_right">{2}</td>'
 			+ '<td class="text_right">{3}</td>'
+			+ '<td class="text_center"><a href="javascript:void(0)" onclick="linkToBusinessStatistics({type : 5, deptId : {4}, deptName : \'{5}\'})">查看详情</a></td>'
 			+ '</tr>';
 var businessSub_titleRegionName = '', businessSub_panelDrag = false;
 var businessSub_chartPanel, businessSub_generalPanelHeight, businessSub_chartPanelHeight, businessSub_highChart;
@@ -285,6 +286,7 @@ Ext.onReady(function(){
 					  + '<th class="table_title text_center">折扣总额</th>'
 					  + '<th class="table_title text_center">赠送总额</th>'
 					  + '<th class="table_title text_center">应收总额</th>'
+					  + '<th class="table_title text_center">操作</th>'
 					  + '</tr>';
 					if(deptStat.length > 0){
 						for(var i = 0; i < deptStat.length; i++){
@@ -293,16 +295,12 @@ Ext.onReady(function(){
 									temp.dept.name, 
 									temp.discountPrice.toFixed(2), 
 									temp.giftPrice.toFixed(2), 
-									temp.income.toFixed(2)
+									temp.income.toFixed(2),
+									temp.dept.id,
+									temp.dept.name
 								)
 							);
 						}	
-						trContent += '<tr>'
-						  + '<th class="table_title ">操作</th>'
-						  + '<th class="text_right">---</th>'
-						  + '<th class="text_right">---</th>'
-						  + '<th class="text_center"><a href="javascript:void(0)" onclick="linkToBusinessStatistics({type : 5})">查看详情</a></th>'
-						  + '</tr>';
 					}
 						
 				

@@ -641,7 +641,9 @@ function deptStatPanelInit(){
 						ending : data.ending,
 						deptId : gn.dept.id});
 				}else{
-					Ext.getCmp('southDeptChartPanel').collapse();
+					if(!sendToPageOperation){
+						Ext.getCmp('southDeptChartPanel').collapse();
+					}
 					titleDeptName = '';
 					titleRegionName = Ext.getCmp("deptStatistic_comboRegion").getValue() == -1 ? '' : ', ' + Ext.getCmp('deptStatistic_comboRegion').getEl().dom.value;
 					var gs = deptStatPanelGrid.getStore();
@@ -702,7 +704,7 @@ function deptStatPanelInit(){
 	});
 	
 	
-	var deptStatPanelGrid = createGridPanel(
+	deptStatPanelGrid = createGridPanel(
 		'',
 		'',
 		'',
@@ -739,6 +741,19 @@ function deptStatPanelInit(){
 			deptStatPanelGrid.getView().getCell(store.getCount()-1, 6).innerHTML = '--';
 			deptStatPanelGrid.getView().getCell(store.getCount()-1, 8).innerHTML = '--';
 			deptStatPanelGrid.getView().getCell(store.getCount()-1, 9).innerHTML = '--';
+		}
+		
+		if(sendToPageOperation){
+			Ext.getCmp('southDeptChartPanel').expand();
+			titleDeptName = sendToStatisticsPageDeptName;
+			loadDeptStatisticChartData({dateBeg : beginDate.getRawValue() + ' 00:00:00', 
+				dateEnd : endDate.getRawValue() + ' 23:59:59', 
+				region : Ext.getCmp("deptStatistic_comboRegion").getValue(),
+				opening : data.opening,
+				ending : data.ending,
+				deptId : sendToStatisticsPageDeptId});	
+		
+			sendToPageOperation = false;		
 		}
 	});
 	deptStatPanelGrid.on('render', function(){
@@ -791,15 +806,16 @@ function salesSubWinTabPanelInit(){
 
 var saleSub_setStatisticsDate = function(){
 	if(sendToPageOperation){
-		salesSubWinTabPanel.setActiveTab(deptStatPanel);
 		Ext.getCmp('deptStatistic_dateSearchDateBegin').setValue(sendToStatisticsPageBeginDate);
 		Ext.getCmp('deptStatistic_dateSearchDateEnd').setValue(sendToStatisticsPageEndDate);		
-		Ext.getCmp('deptStatistic_btnSearch').handler();
-		sendToPageOperation = false;		
+		salesSubWinTabPanel.setActiveTab(deptStatPanel);
+		Ext.getCmp('deptStatistic_btnSearch').handler();		
+	
 	}	
 };
 
 var titleDeptName, titleRegionName;
+var deptStatPanelGrid;
 Ext.onReady(function(){
 	if(!salesSubWinTabPanel){
 		salesSubWinTabPanelInit();

@@ -190,7 +190,7 @@ function createGridPanel(id, title, height, width, url, cmData, readerData,
 		baseParams, pageSize, group, tbar, bbar, rid) {
 
 	var g_ckbox = new Ext.grid.CheckboxSelectionModel({
-				handleMouseDown : Ext.emptyFn	//只能通过点击复选框才能选中复选框
+//				handleMouseDown : Ext.emptyFn	//只能通过点击复选框才能选中复选框
 			}); 
 	var g_rowNum = new Ext.grid.RowNumberer(); // 自动行号
 
@@ -554,6 +554,8 @@ Ext.ux.createDateCombo = function(_c){
 					//FIXME 月份加减遇12时
 					dateEnd.setValue(new Date(nowYear, nowMonth-1, getMonthDays(nowMonth-1)));
 					now = new Date(nowYear, nowMonth-1, 1);
+				}else if(record.data.value == 9){//最近半年
+					now.setMonth(now.getMonth()-6);
 				}
 				dateBegin.setValue(now);
 				if(typeof _c.callback == 'function'){
