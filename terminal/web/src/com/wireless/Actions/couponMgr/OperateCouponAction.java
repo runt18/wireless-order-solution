@@ -57,5 +57,39 @@ public class OperateCouponAction extends DispatchAction{
 		
 		return null;
 	}
+	
+	public ActionForward sendCoupon(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		String membersData = request.getParameter("membersData");
+		String coupon = request.getParameter("coupon");
+		
+		String pin = (String) request.getAttribute("pin");
+		String[] membersDatas = null;
+		JObject jobject = new JObject();
+		try{
+			Coupon.InsertAllBuilder builder = new Coupon.InsertAllBuilder(Integer.parseInt(coupon));
+			membersDatas = membersData.split(",");
+			for (int i = 0; i < membersDatas.length; i++) {
+				builder.addMemberId(Integer.parseInt(membersDatas[i]));
+			}
+			CouponDao.insertAll(StaffDao.verify(Integer.parseInt(pin)), builder);
+			
+			jobject.initTip(true, "发放成功");
+		}catch(BusinessException e){
+			e.printStackTrace();
+			jobject.initTip(e);
+		}catch(SQLException e){
+			e.printStackTrace();
+			jobject.initTip(e);
+		}catch(Exception e){
+			e.printStackTrace();
+			jobject.initTip(e);
+		}finally{
+			response.getWriter().print(jobject.toString());
+		}
+		
+		return null;
+	}	
 
 }

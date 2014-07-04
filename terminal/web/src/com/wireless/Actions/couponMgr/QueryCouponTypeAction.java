@@ -57,5 +57,43 @@ public class QueryCouponTypeAction extends DispatchAction{
 		}
 		return null;
 	}
+	
+	public ActionForward unExpired(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		String pin = (String) request.getAttribute("pin");
+		StringBuilder tree = new StringBuilder();
+		
+		List<CouponType> list = null;
+		try{
+			list = CouponTypeDao.get(StaffDao.verify(Integer.parseInt(pin)));
+			tree.append("[");
+			for (int i = 0; i < list.size(); i++) {
+				if(!list.get(i).isExpired()){
+					tree.append(i > 0 ? "," : "");
+					tree.append("{");
+					tree.append("text:'" + list.get(i).getName() + "'");
+					tree.append(",typeName:'" + list.get(i).getName() + "'");
+					tree.append(",leaf:true");
+					tree.append(",couponTypeId:" + list.get(i).getId());
+					tree.append(",price:" + list.get(i).getPrice());
+					tree.append(",date:'" + list.get(i).getExpiredFormat()+ "'");
+					tree.append(",desc:'" + list.get(i).getComment() + "'");
+	
+					tree.append("}");
+				}
+			}
+			tree.append("]");
+		}catch(BusinessException e){
+			e.printStackTrace();
+		}catch(SQLException e){
+			e.printStackTrace();
+		}catch(Exception e){
+			e.printStackTrace();
+		}finally{
+			response.getWriter().print(tree.toString());
+		}
+		return null;
+	}	
 
 }

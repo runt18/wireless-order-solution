@@ -21,9 +21,12 @@ import com.wireless.json.JObject;
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.pojo.billStatistics.DutyRange;
+import com.wireless.pojo.billStatistics.HourRange;
 import com.wireless.pojo.billStatistics.IncomeByEachDay;
 import com.wireless.pojo.billStatistics.ShiftDetail;
+import com.wireless.pojo.regionMgr.Region.RegionId;
 import com.wireless.pojo.staffMgr.Staff;
+import com.wireless.pojo.util.DateUtil;
 import com.wireless.util.DateType;
 import com.wireless.util.WebParams;
 
@@ -51,13 +54,29 @@ public class BusinessStatisticsAction extends DispatchAction {
 			
 			String dutyRange = request.getParameter("dutyRange");
 			
+			String opening = request.getParameter("opening");
+			String ending = request.getParameter("ending");
+			
+			String region = request.getParameter("region");
+			
 			final String chart = request.getParameter("chart");
+			
+			CalcBillStatisticsDao.ExtraCond extraCond = new CalcBillStatisticsDao.ExtraCond(DateType.HISTORY); 
+			
+			if(opening != null && !opening.isEmpty()){
+				extraCond.setHourRange(new HourRange(opening, ending, DateUtil.Pattern.HOUR));
+			}
+			
+			if(region != null && !region.equals("-1")){
+				extraCond.setRegion(RegionId.valueOf(Integer.parseInt(region)));
+			}
 			
 			List<IncomeByEachDay> incomesByEachDay;
 			String chartData = null ;
 			if(chart != null && !chart.isEmpty()){
 				incomesByEachDay = new ArrayList<IncomeByEachDay>();
-				incomesByEachDay.addAll(CalcBillStatisticsDao.calcIncomeByEachDay(StaffDao.verify(Integer.parseInt(pin)), new DutyRange(onDuty, offDuty), new CalcBillStatisticsDao.ExtraCond(DateType.HISTORY)));
+				
+				incomesByEachDay.addAll(CalcBillStatisticsDao.calcIncomeByEachDay(StaffDao.verify(Integer.parseInt(pin)), new DutyRange(onDuty, offDuty), extraCond));
 				
 				List<String> xAxis = new ArrayList<String>();
 				List<Float> data = new ArrayList<Float>();
@@ -78,18 +97,17 @@ public class BusinessStatisticsAction extends DispatchAction {
 				
 			}
 			final String chartDatas = chartData;
-			
 			final ShiftDetail shiftDetail;
 			if(!dutyRange.equals("null") && !dutyRange.trim().isEmpty()){
 				DutyRange range = DutyRangeDao.exec(staff, onDuty, offDuty);
 				
 				if(range != null){
-					shiftDetail = ShiftDao.getByRange(staff, range, new CalcBillStatisticsDao.ExtraCond(DateType.HISTORY));
+					shiftDetail = ShiftDao.getByRange(staff, range, extraCond);
 				}else{
 					shiftDetail = new ShiftDetail(new DutyRange(onDuty, offDuty));
 				}
 			}else{
-				shiftDetail = ShiftDao.getByRange(staff, new DutyRange(onDuty, offDuty), new CalcBillStatisticsDao.ExtraCond(DateType.HISTORY));
+				shiftDetail = ShiftDao.getByRange(staff, new DutyRange(onDuty, offDuty), extraCond);
 			}
 			
 			jObject.setExtra(new Jsonable(){

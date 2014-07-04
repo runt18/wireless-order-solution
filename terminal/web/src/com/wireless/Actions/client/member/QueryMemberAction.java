@@ -123,58 +123,41 @@ public class QueryMemberAction extends DispatchAction {
 			String memberType = request.getParameter("memberType");
 			String memberTypeAttr = request.getParameter("memberTypeAttr");
 			String name = request.getParameter("name");
-			String memberCard = request.getParameter("memberCard");
-			String mobile = request.getParameter("mobile");
-			String totalBalance = request.getParameter("totalBalance");
+			String memberCardOrMobile = request.getParameter("memberCardOrMobile");
+//			String totalBalance = request.getParameter("usedBalance");
 			String usedBalance = request.getParameter("usedBalance");
 			String consumptionAmount = request.getParameter("consumptionAmount");
-			String point = request.getParameter("point");
-			String usedPoint = request.getParameter("usedPoint");
-			String so = request.getParameter("so");
+			
+//			String point = request.getParameter("point");
+//			String usedPoint = request.getParameter("usedPoint");
+			String usedBalanceEqual = request.getParameter("usedBalanceEqual");
+			String consumptionAmountEqual = request.getParameter("consumptionAmountEqual");
 			
 			if(id != null && !id.trim().isEmpty() && Integer.valueOf(id.trim()) > 0){
 				extraCond += (" AND M.member_id = " + id);
 			}else{
-				if(so != null){
-					so = so.trim();
-					if(so.equals("0")){
-						so = "=";
-					}else if(so.equals("1")){
-						so = ">=";
-					}else if(so.equals("2")){
-						so = "<=";
-					}else{
-						so = "=";
-					}
-				}else{
-					so = "=";
-				}
-				
 				if(memberType != null && !memberType.trim().isEmpty())
 					extraCond += (" AND M.member_type_id = " + memberType);
 				if(name != null && !name.trim().isEmpty())
 					extraCond += (" AND M.name like '%" + name.trim() + "%'");
 				
-				if(memberCard != null && !memberCard.trim().isEmpty())
-					extraCond += (" AND M.member_card like '%" + memberCard.trim() + "%'");
-				
-				if(mobile != null && !mobile.trim().isEmpty())
-					extraCond += (" AND M.mobile like '%" + mobile.trim() + "%'");
+				if(memberCardOrMobile != null && !memberCardOrMobile.trim().isEmpty())
+					extraCond += (" AND (M.member_card like '%" + memberCardOrMobile.trim() + "%'  OR M.mobile like '%" + memberCardOrMobile.trim() + "%')");
 					
-				if(totalBalance != null && !totalBalance.trim().isEmpty())
-					extraCond += (" AND (M.base_balance + M.extra_balance) " + so + totalBalance);
+/*				if(totalBalance != null && !totalBalance.trim().isEmpty())
+					extraCond += (" AND (M.base_balance + M.extra_balance) " + so + totalBalance);*/
 				
 				if(usedBalance != null && !usedBalance.trim().isEmpty())
-					extraCond += (" AND M.used_balance " + so + usedBalance);
+					extraCond += (" AND M.used_balance " + usedBalanceEqual + usedBalance);
 				
 				if(consumptionAmount != null && !consumptionAmount.trim().isEmpty())
-					extraCond += (" AND M.consumption_amount " + so + consumptionAmount);
+					extraCond += (" AND M.consumption_amount " + consumptionAmountEqual + consumptionAmount);
 				
-				if(usedPoint != null && !usedPoint.trim().isEmpty())
+/*				if(usedPoint != null && !usedPoint.trim().isEmpty())
 					extraCond += (" AND M.total_point " + so + usedPoint);
 				
 				if(point != null && !point.trim().isEmpty())
-					extraCond += (" AND M.point " + so + point);
+					extraCond += (" AND M.point " + so + point);*/
 			}
 			
 			orderClause = " ORDER BY M.member_id ";
