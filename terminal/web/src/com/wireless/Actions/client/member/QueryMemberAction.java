@@ -123,7 +123,7 @@ public class QueryMemberAction extends DispatchAction {
 			String memberType = request.getParameter("memberType");
 			String memberTypeAttr = request.getParameter("memberTypeAttr");
 			String name = request.getParameter("name");
-			String memberCardOrMobile = request.getParameter("memberCardOrMobile");
+			String memberCardOrMobileOrName = request.getParameter("memberCardOrMobileOrName");
 //			String totalBalance = request.getParameter("usedBalance");
 			String usedBalance = request.getParameter("usedBalance");
 			String consumptionAmount = request.getParameter("consumptionAmount");
@@ -141,8 +141,8 @@ public class QueryMemberAction extends DispatchAction {
 				if(name != null && !name.trim().isEmpty())
 					extraCond += (" AND M.name like '%" + name.trim() + "%'");
 				
-				if(memberCardOrMobile != null && !memberCardOrMobile.trim().isEmpty())
-					extraCond += (" AND (M.member_card like '%" + memberCardOrMobile.trim() + "%'  OR M.mobile like '%" + memberCardOrMobile.trim() + "%')");
+				if(memberCardOrMobileOrName != null && !memberCardOrMobileOrName.trim().isEmpty())
+					extraCond += (" AND (M.member_card like '%" + memberCardOrMobileOrName.trim() + "%'  OR M.mobile like '%" + memberCardOrMobileOrName.trim() + "%')");
 					
 /*				if(totalBalance != null && !totalBalance.trim().isEmpty())
 					extraCond += (" AND (M.base_balance + M.extra_balance) " + so + totalBalance);*/
