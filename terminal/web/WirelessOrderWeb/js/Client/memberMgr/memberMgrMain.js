@@ -1,4 +1,5 @@
-﻿//-------------------------lib.js
+﻿
+//-------------------------lib.js
 /**********************************************************************/
 function insertMemberHandler(){
 	memberOperationHandler({
@@ -206,8 +207,6 @@ function initRechargeWin(){
 							Ext.getCmp('btnSearchMember').handler();
 						}
 					});
-					
-
 					
 				}
 			}, {
@@ -420,7 +419,7 @@ function initMemberCouponWin(){
 			closable : false,
 			modal : true,
 			resizable : false,
-			width : 250,
+			width : 300,
 			keys : [{
 				key : Ext.EventObject.ESC,
 				scope : this,
@@ -428,46 +427,108 @@ function initMemberCouponWin(){
 					memberCouponWin.hide();
 				}
 			}],
-			bbar : ['->',{
-				text : '发送',
+			bbar : [{
+				xtype : 'checkbox',
+				id : 'chbSendCouponSms',
+				checked : true,
+				boxLabel : '发送通知短信'+(Ext.ux.smsCount >= 20 ? '(<font style="color:green;font-weight:bolder">剩余'+Ext.ux.smsCount+'条</font>)' : '(<font style="color:red;font-weight:bolder">剩余'+Ext.ux.smsCount+'条, 请及时充值</font>)'),
+				hidden : !Ext.ux.smsModule
+			},'->',{
+				text : '发放',
 				id : 'btn_memberCouponSend',
 				iconCls : 'btn_save',
 				handler : function(){
+					var sendSms = Ext.getCmp('chbSendCouponSms').getValue();
+					if(sendSms){
+						Ext.ux.setCookie(document.domain+'_couponSms', true, 3650);
+					}else{
+						Ext.ux.setCookie(document.domain+'_couponSms', false, 3650);
+					}		
+					
+					if(!Ext.getCmp('member_comboCoupon').isValid()){
+						return;
+					}
+					
 					var members = memberBasicGrid.getSelectionModel().getSelections();
 					if(members.length < 1){
 						Ext.example.msg('提示', '请选中会员后进行操作.');
 						return;
-					}	
-					var coupon = Ext.getCmp('member_comboCoupon');
-					var membersData = '';
-					for (var i = 0; i < members.length; i++) {
-						if(i > 0){
-							membersData += ',';
-						}
-						membersData += members[i].get('id');
 					}
 					
-					Ext.Ajax.request({
-						url : '../../OperateCoupon.do',
-						params : {
-							membersData : membersData,
-							coupon : coupon.getValue(),
-							dataSource : 'sendCoupon'
-						},
-						success : function(res, opt){
-							var jr = Ext.decode(res.responseText);
-							if(jr.success){
-								Ext.ux.showMsg(jr);
-								memberCouponWin.hide();
-							}else{
-								Ext.ux.showMsg(jr);
+					if(sendSms){
+						Ext.Msg.confirm(
+							'提示',
+							'总共 '+ members.length +' 条短信, 是否发送' ,
+							function(e){
+								if(e == 'yes'){
+									var coupon = Ext.getCmp('member_comboCoupon');
+									var membersData = '';
+									for (var i = 0; i < members.length; i++) {
+										if(i > 0){
+											membersData += ',';
+										}
+										membersData += members[i].get('id');
+									}
+									
+									Ext.Ajax.request({
+										url : '../../OperateCoupon.do',
+										params : {
+											membersData : membersData,
+											coupon : coupon.getValue(),
+											sendSms : sendSms?true : '',
+											dataSource : 'sendCoupon'
+										},
+										success : function(res, opt){
+											var jr = Ext.decode(res.responseText);
+											if(jr.success){
+												Ext.ux.showMsg(jr);
+												memberCouponWin.hide();
+											}else{
+												Ext.ux.showMsg(jr);
+											}
+											
+										},
+										failure : function(res, opt){
+											Ext.ux.showMsg(Ext.util.JSON.decode(res.responseText));
+										}
+									});
+								}
 							}
-							
-						},
-						failure : function(res, opt){
-							Ext.ux.showMsg(Ext.util.JSON.decode(res.responseText));
+						);						
+					}else{
+						var coupon = Ext.getCmp('member_comboCoupon');
+						var membersData = '';
+						for (var i = 0; i < members.length; i++) {
+							if(i > 0){
+								membersData += ',';
+							}
+							membersData += members[i].get('id');
 						}
-					});
+						
+						Ext.Ajax.request({
+							url : '../../OperateCoupon.do',
+							params : {
+								membersData : membersData,
+								coupon : coupon.getValue(),
+								dataSource : 'sendCoupon'
+							},
+							success : function(res, opt){
+								var jr = Ext.decode(res.responseText);
+								if(jr.success){
+									Ext.ux.showMsg(jr);
+									memberCouponWin.hide();
+								}else{
+									Ext.ux.showMsg(jr);
+								}
+								
+							},
+							failure : function(res, opt){
+								Ext.ux.showMsg(Ext.util.JSON.decode(res.responseText));
+							}
+						});
+					}
+					
+			
 				}
 			}, {
 				text : '取消',
@@ -492,14 +553,14 @@ function initMemberCouponWin(){
 			}],
 			items : [{
 				layout : 'form',
-				labelWidth : 60,
-				width : 250,
+				labelWidth : 80,
+				width : 300,
 				border : false,
 				frame : true,
 				items : [{
 					xtype : 'combo',
 					id : 'member_comboCoupon',
-					fieldLabel : '优惠劵',
+					fieldLabel : '优惠劵类型',
 					readOnly : false,
 					forceSelection : true,
 					width : 130,
@@ -528,11 +589,9 @@ function initMemberCouponWin(){
 										data.push([jr[i]['couponTypeId'], jr[i]['typeName']]);
 									}
 									thiz.store.loadData(data);
-	//								thiz.setValue(data[0]);
 								},
 								fialure : function(res, opt){
 									thiz.store.loadData(data);
-	//								thiz.setValue(-1);
 								}
 							});
 						}
@@ -541,6 +600,12 @@ function initMemberCouponWin(){
 			}]
 		});
 	}
+	if(Ext.ux.getCookie(document.domain+'_couponSms') == 'true'){
+		Ext.getCmp('chbSendCouponSms').setValue(true);
+	}else{
+		Ext.getCmp('chbSendCouponSms').setValue(false);
+	}	
+	memberCouponWin.show();
 }
 
 
@@ -1105,11 +1170,11 @@ function gridInit(){
 		}, */
 		{
 			xtype : 'tbtext',
-			text : '会员手机/会员卡号:'
+			text : '会员手机/会员卡号/会员名:'
 		}, 			
 		{
 			xtype : 'numberfield',
-			id : 'numberSearchByMemberPhoneOrCard'
+			id : 'numberSearchByMemberPhoneOrCardOrName'
 		}, '->', {
 			text : '高级条件↓',
 	    	id : 'member_btnHeightSearch',
@@ -1157,12 +1222,12 @@ function gridInit(){
 			id : 'btnSearchMember',
 			iconCls : 'btn_search',
 			handler : function(){
+				
 				var memberTypeNode = memberTypeTree.getSelectionModel().getSelectedNode();
-//				var searchType = Ext.getCmp('mr_comboMemberSearchType').getValue();
-//				var searchValue = Ext.getCmp(mObj.searchValue) ? Ext.getCmp(mObj.searchValue).getValue() : '';
 				
 				var gs = memberBasicGrid.getStore();
 				
+				var beforeLoadCount = gs.getTotalCount();
 				if(memberTypeNode){
 					if(memberTypeNode.childNodes.length > 0 && memberTypeNode.attributes.memberTypeId != -1){
 						gs.baseParams['memberType'] = '';
@@ -1181,8 +1246,7 @@ function gridInit(){
 					gs.baseParams['memberTypeAttr'] = '';
 				}
 				
-//				gs.baseParams['name'] = searchType == 1 ? searchValue : '';
-				gs.baseParams['memberCardOrMobile'] = Ext.getCmp('numberSearchByMemberPhoneOrCard').getValue();
+				gs.baseParams['memberCardOrMobileOrName'] = Ext.getCmp('numberSearchByMemberPhoneOrCardOrName').getValue();
 //				gs.baseParams['totalBalance'] = searchType == 4 ? searchValue : '';
 				gs.baseParams['usedBalance'] = Ext.getCmp('textTotalMemberCost').getValue();
 				gs.baseParams['usedBalanceEqual'] = Ext.getCmp('usedBalanceEqual').getValue();
@@ -1190,7 +1254,7 @@ function gridInit(){
 				gs.baseParams['consumptionAmountEqual'] = Ext.getCmp('consumptionAmountEqual').getValue();
 //				gs.baseParams['point'] = Ext.getCmp('numberSearchByMemberPhoneOrCard').getValue();
 //				gs.baseParams['usedPoint'] = Ext.getCmp('numberSearchByMemberPhoneOrCard').getValue();
-				gs.baseParams['memberBalance'] = Ext.getCmp('numberSearchByMemberPhoneOrCard').getValue();
+				gs.baseParams['memberBalance'] = Ext.getCmp('textMemberBalance').getValue();
 				gs.baseParams['memberBalanceEqual'] = Ext.getCmp('memberBalanceEqual').getValue();
 //				gs.baseParams['so'] = Ext.getCmp('comboSearchValueByOperation').getValue();
 				gs.load({
@@ -1207,7 +1271,12 @@ function gridInit(){
 							}
 						}
 					}
-					memberBasicGrid.getSelectionModel().selectAll();
+					if(beforeLoadCount > 0){
+						memberBasicGrid.getSelectionModel().selectAll();
+//						if(Ext.ux.getCookie(document.domain+'_memberTip') != 'true'){
+							memberTipWin.show();
+//						}					
+					}
 				});
 				
 				
@@ -1540,9 +1609,16 @@ var btnMemberCouponWin = new Ext.ux.ImageButton({
 		}		
 		
 		initMemberCouponWin();
-		memberCouponWin.show();
 	}
 });
+
+function fnRemberTip(){
+	if(Ext.getDom('chxMemberTip').checked){
+		Ext.ux.setCookie(document.domain+'_memberTip', true, 3650);
+	}else{
+		Ext.ux.setCookie(document.domain+'_memberTip', false, 3650);
+	}
+}
 
 /**********************************************************************/
 Ext.onReady(function(){
@@ -1583,5 +1659,16 @@ Ext.onReady(function(){
 	winInit();
 	memberBasicWin.render(document.body);
 	Ext.ux.checkSmStat();
+	
+	memberTipWin = Ext.ux.ToastWindow({
+		width : 260,
+		height : 152,
+		html : '<div style="position:relative;background-color: whitesmoke;height :120px;" align="center">' +
+				'<br><p style="color: #f00;text-shadow: 1px 1px 0px #212121;font-size: 19px;">您可以对会员进行如下操作 : </p><br>' +
+				'<input type="button" value="发送优惠劵" class="operationBtn" style="margin-right:10px;" onclick="javascript:initMemberCouponWin();memberTipWin.hide();"/>' +
+				'<input  class="operationBtn" type="button" value="发送问候短信"/><br>' +
+				'<div style="position:absolute;left : 0; bottom: 3px;"><input id="chxMemberTip" type="checkbox" onclick="javascript:fnRemberTip()" />不再显示</div>'+
+			'</div>'
+	});
+	
 });
-
