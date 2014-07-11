@@ -102,13 +102,11 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 	
 	public static class InsertBuilder{
 		private Member data;
-		public InsertBuilder(int restaurantId, String name, String mobile, int memberTypeId, Sex sex){
+		public InsertBuilder(String name, String mobile, int memberTypeId){
 			this.data = new Member();
-			this.data.setRestaurantId(restaurantId);
 			this.data.setName(name);
 			this.data.setMobile(mobile);
 			this.data.setMemberType(new MemberType(memberTypeId));
-			this.data.setSex(sex);
 		}
 		
 		public InsertBuilder setSex(Sex sex){
