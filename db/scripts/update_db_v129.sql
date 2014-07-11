@@ -57,18 +57,13 @@ ALTER TABLE `wireless_order_db`.`coupon_type`
 ADD COLUMN `image` VARCHAR(50) NULL DEFAULT NULL AFTER `comment`;
 
 -- -----------------------------------------------------
--- Add the field 'weixin_card' to table 'weixin_member'
+-- Add the field 'weixin_card' to table 'weixin_member' as primary key
 -- -----------------------------------------------------
 ALTER TABLE `wireless_order_db`.`weixin_member` 
-ADD COLUMN `weixin_card` INT NOT NULL AFTER `status`,
-ADD INDEX `ix_weixin_card` (`weixin_card` ASC);
+AUTO_INCREMENT = 10000000 ,
+ADD COLUMN `weixin_card` INT UNSIGNED NOT NULL AUTO_INCREMENT FIRST,
+ADD PRIMARY KEY (`weixin_card`);
 
--- -----------------------------------------------------
--- Update the weixin card
--- -----------------------------------------------------
-SET @x = 10000000;
-UPDATE wireless_order_db.weixin_member SET
-weixin_card = (@x := @x + 1);
 
 -- -----------------------------------------------------
 -- Modify the field 'weixin_serial_crc' to unsigned int
