@@ -39,7 +39,7 @@ public class TestCouponDao {
 		int couponTypeId = 0;
 		try{
 			//Insert a new coupon type.
-			CouponType.InsertBuilder insertBuilder = new CouponType.InsertBuilder("测试优惠券类型", 30).setComment("测试备注");//.setExpired(System.currentTimeMillis() / 1000 * 1000);
+			CouponType.InsertBuilder insertBuilder = new CouponType.InsertBuilder("测试优惠券类型", 30).setComment("测试备注").setImage("2912w3slka.jpg");//.setExpired(System.currentTimeMillis() / 1000 * 1000);
 			couponTypeId = CouponTypeDao.insert(mStaff, insertBuilder);
 			
 			CouponType expectedCouponType = insertBuilder.build();
@@ -51,6 +51,7 @@ public class TestCouponDao {
 			Assert.assertEquals("restaurant : insert coupon type", mStaff.getRestaurantId(), actualCouponType.getRestaurantId());
 			Assert.assertEquals("expired : insert coupon type", expectedCouponType.getExpired(), actualCouponType.getExpired());
 			Assert.assertEquals("comment : insert coupon type", expectedCouponType.getComment(), actualCouponType.getComment());
+			Assert.assertEquals("image : insert image", expectedCouponType.getImage(), actualCouponType.getImage());
 			
 			//Insert a new coupon and assign to member1 & member2.
 			List<Member> members = MemberDao.getByCond(mStaff, null, null);
@@ -112,7 +113,7 @@ public class TestCouponDao {
 
 			//Update the coupon type.
 			CouponType.UpdateBuilder updateBuilder = new CouponType.UpdateBuilder(couponTypeId, "修改优惠券类型").setExpired(System.currentTimeMillis() / 1000 * 1000)
-																   .setComment("修改备注");
+																   .setComment("修改备注").setImage("1235slkj.jpg");
 			CouponTypeDao.update(mStaff, updateBuilder);
 			expectedCouponType = updateBuilder.build();
 			actualCouponType = CouponTypeDao.getById(mStaff, couponTypeId);
@@ -121,7 +122,7 @@ public class TestCouponDao {
 			Assert.assertEquals("restaurant : update coupon type", mStaff.getRestaurantId(), actualCouponType.getRestaurantId());
 			Assert.assertEquals("expired : update coupon type", expectedCouponType.getExpired(), actualCouponType.getExpired());
 			Assert.assertEquals("comment : update coupon type", expectedCouponType.getComment(), actualCouponType.getComment());
-			
+			Assert.assertEquals("image : insert image", expectedCouponType.getImage(), actualCouponType.getImage());
 			
 		}finally{
 			if(couponTypeId != 0){

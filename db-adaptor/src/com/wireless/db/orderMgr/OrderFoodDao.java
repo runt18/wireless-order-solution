@@ -421,14 +421,14 @@ public class OrderFoodDao {
 		}
 		dbCon.rs.close();
 		
-		if(extraCond.dateType.isToday()){
-			for(OrderFood of : result){
+		for(OrderFood of : result){
+			if(extraCond.dateType.isToday()){
 				if(of.asFood().isCombo()){
 					of.asFood().setChildFoods(FoodDao.getComboByCond(dbCon, staff, new ExtraCond4Combo(of.asFood().getFoodId())));
 				}
-				if(of.getTasteGroup() != null){
-					of.setTasteGroup(TasteGroupDao.getById(staff, of.getTasteGroup().getGroupId(), extraCond.dateType));
-				}
+			}
+			if(of.getTasteGroup() != null){
+				of.setTasteGroup(TasteGroupDao.getById(staff, of.getTasteGroup().getGroupId(), extraCond.dateType));
 			}
 		}
 		
@@ -627,8 +627,19 @@ public class OrderFoodDao {
 		}
 		dbCon.rs.close();
 		
-		//Update the id to max.
-		sql = " UPDATE " + Params.dbName + ".order_food SET id = " + maxId + " WHERE restaurant_id = " + Restaurant.ADMIN;
+		sql = " DELETE FROM " + Params.dbName + ".order_food WHERE restaurant_id = " + Restaurant.ADMIN;
+		dbCon.stmt.executeUpdate(sql);
+		
+		//Insert the max id.
+		sql = " INSERT INTO " + Params.dbName + ".order_food " +
+			  " (id, restaurant_id) VALUES(" +
+			  maxId + "," +
+			  Restaurant.ADMIN + 
+			  ")";
+		dbCon.stmt.executeUpdate(sql);
+		
+		//Delete the paid order food from 'order_food' table.
+		sql = " DELETE FROM " + Params.dbName + ".order_food WHERE order_id IN (" + paidOrder + ")";
 		dbCon.stmt.executeUpdate(sql);
 		
 		return new ArchiveResult(maxId, orderAmount);

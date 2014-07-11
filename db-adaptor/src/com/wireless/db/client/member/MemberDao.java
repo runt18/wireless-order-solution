@@ -18,6 +18,7 @@ import com.wireless.db.weixin.member.WeixinMemberDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.MemberError;
 import com.wireless.exception.ModuleError;
+import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.client.Member;
 import com.wireless.pojo.client.MemberComment.CommitBuilder;
 import com.wireless.pojo.client.MemberLevel;
@@ -36,6 +37,122 @@ import com.wireless.pojo.util.SortedList;
 import com.wireless.util.SQLUtil;
 
 public class MemberDao {
+	
+	public static class ExtraCond{
+		private int id;
+		private String card;
+		private String mobile;
+		private String name;
+		private String fuzzy;
+		private int memberTypeId;
+		private int minConsumeAmount;
+		private int maxConsumeAmount;
+		private int minTotalConsume;
+		private int maxTotalConsume;
+		private DutyRange range;
+		
+		public ExtraCond setId(int id){
+			this.id = id;
+			return this;
+		}
+		
+		public ExtraCond setCard(String card){
+			this.card = card;
+			return this;
+		}
+		
+		public ExtraCond setMobile(String mobile){
+			this.mobile = mobile;
+			return this;
+		}
+		
+		public ExtraCond setFuzzyName(String fuzzy){
+			this.fuzzy = fuzzy;
+			return this;
+		}
+		
+		public ExtraCond setMemberType(int typeId){
+			this.memberTypeId = typeId;
+			return this;
+		}
+		
+		public ExtraCond greaterConsume(int amount){
+			this.minConsumeAmount = amount;
+			this.maxConsumeAmount = 0;
+			return this;
+		}
+		
+		public ExtraCond lessConsume(int amount){
+			this.maxConsumeAmount = amount;
+			this.minConsumeAmount = 0;
+			return this;
+		}
+		
+		public ExtraCond setConsumeRange(int min, int max){
+			this.minConsumeAmount = min;
+			this.maxConsumeAmount = max;
+			return this;
+		}
+		
+		public ExtraCond greaterTotalConsume(int totalConsume){
+			this.minTotalConsume = totalConsume;
+			this.maxTotalConsume = 0;
+			return this;
+		}
+		
+		public ExtraCond lessTotalConsume(int totalConsume){
+			this.maxTotalConsume = totalConsume;
+			this.minTotalConsume = 0;
+			return this;
+		}
+		
+		public ExtraCond setTotalConsume(int min, int max){
+			this.minTotalConsume = min;
+			this.maxTotalConsume = max;
+			return this;
+		}
+		
+		@Override
+		public String toString(){
+			StringBuilder extraCond = new StringBuilder();
+			if(fuzzy != null){
+				extraCond.append(" AND (M.name LIKE '%" + fuzzy + "%' OR M.member_card LIKE '%" + fuzzy + "%' OR M.mobile LIKE '%" + fuzzy + "%')");
+			}
+			if(id > 0){
+				extraCond.append(" AND M.member_id = " + id);
+			}
+			if(card != null){
+				extraCond.append(" AND M.member_card_crc = CRC32('" + card + "') AND M.member_card = '" + card + "'");
+			}
+			if(mobile != null){
+				extraCond.append(" AND M.mobile_crc = CRC32('" + mobile + "') AND M.mobile = '" + mobile + "'");
+			}
+			if(name != null){
+				extraCond.append(" AND M.name = '" + name + "'");
+			}
+			if(memberTypeId > 0){
+				extraCond.append(" AND MT.member_type_id = " + memberTypeId);
+			}
+			
+			if(minConsumeAmount > 0 && maxConsumeAmount == 0){
+				extraCond.append(" AND M.consumption_amount > " + minConsumeAmount);
+			}else if(maxConsumeAmount > 0 && minConsumeAmount == 0){
+				extraCond.append(" AND M.consumption_amount < " + maxConsumeAmount);
+			}else if(maxConsumeAmount > 0 && minConsumeAmount > 0){
+				extraCond.append(" AND M.consumption_amount BETWEEN " + minConsumeAmount + " AND " + maxConsumeAmount);
+			}
+			
+			if(minTotalConsume > 0 && maxTotalConsume == 0){
+				extraCond.append(" AND M.total_consumption > " + minConsumeAmount);
+			}else if(maxTotalConsume > 0 && minTotalConsume == 0){
+				extraCond.append(" AND M.total_consumption < " + maxConsumeAmount);
+			}else if(maxTotalConsume > 0 && minTotalConsume > 0){
+				extraCond.append(" AND M.total_consumption BETWEEN " + minConsumeAmount + " AND " + maxConsumeAmount);
+			}
+			
+			return extraCond.toString();
+		}
+	}
 	
 	public final static class UpgradeResult{
 		private final int elapsedTime;
@@ -175,8 +292,8 @@ public class MemberDao {
 	 * @throws BusinessException
 	 * 			throws if any member type does NOT exist
 	 */
-	private static List<Member> getDetail(DBCon dbCon, Staff staff, String extraCond, String orderClause) throws SQLException, BusinessException{
-		List<Member> result = getByCond(dbCon, staff, extraCond, orderClause);
+	private static List<Member> getDetail(DBCon dbCon, Staff staff, ExtraCond extraCond, String orderClause) throws SQLException, BusinessException{
+		List<Member> result = getByCond(dbCon, staff, extraCond.toString(), orderClause);
 		
 		for(Member eachMember : result){
 			
@@ -303,7 +420,7 @@ public class MemberDao {
 	 * @throws BusinessException 
 	 * 			throws if any member type does NOT exist
 	 */
-	public static List<Member> getByCond(DBCon dbCon, Staff staff, String extraCond, String orderClause) throws SQLException, BusinessException{
+	private static List<Member> getByCond(DBCon dbCon, Staff staff, String extraCond, String orderClause) throws SQLException, BusinessException{
 		List<Member> result = new ArrayList<Member>();
 		String sql;
 		sql = " SELECT "	+
@@ -371,18 +488,23 @@ public class MemberDao {
 	/**
 	 * Get member by extra condition
 	 * @param extraCond
-	 * 			the extra condition
+	 * 			the extra condition {@link ExtraCond}
 	 * @param orderClause
 	 * 			the order clause 
 	 * @return the list holding the result
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static List<Member> getByCond(Staff staff, String extraCond, String orderClause) throws SQLException, BusinessException{
+	public static List<Member> getByCond(Staff staff, ExtraCond extraCond, String orderClause) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return MemberDao.getByCond(dbCon, staff, extraCond, orderClause);
+			if(extraCond.range != null){
+				//FIXME
+				return null;
+			}else{
+				return MemberDao.getByCond(dbCon, staff, extraCond != null ? extraCond.toString() : null, orderClause);
+			}
 		}finally{
 			dbCon.disconnect();
 		}
@@ -424,7 +546,7 @@ public class MemberDao {
 	 * 			throws if failed to execute any SQL statement
 	 */
 	public static Member getById(DBCon dbCon, Staff staff, int memberId) throws BusinessException, SQLException{
-		List<Member> ml = MemberDao.getDetail(dbCon, staff, " AND M.member_id = " + memberId, null);
+		List<Member> ml = MemberDao.getDetail(dbCon, staff, new ExtraCond().setId(memberId), null);
 		if(ml.isEmpty()){
 			throw new BusinessException(MemberError.MEMBER_NOT_EXIST);
 		}else{
@@ -444,7 +566,7 @@ public class MemberDao {
 	 * 			throws the member to this card does NOT exist
 	 */
 	public static Member getByCard(DBCon dbCon, Staff staff, String cardAlias) throws SQLException, BusinessException{
-		List<Member> ml = MemberDao.getDetail(dbCon, staff, " AND M.member_card = '" + cardAlias + "'", null);
+		List<Member> ml = MemberDao.getDetail(dbCon, staff, new ExtraCond().setCard(cardAlias), null);
 		if(ml.isEmpty()){
 			throw new BusinessException(MemberError.MEMBER_NOT_EXIST);
 		}else{
@@ -487,7 +609,7 @@ public class MemberDao {
 	 * 			throws if the member to this mobile does NOT exist
 	 */
 	public static Member getByMobile(DBCon dbCon, Staff staff, String mobile) throws SQLException, BusinessException{
-		List<Member> result = MemberDao.getDetail(dbCon, staff, " AND M.mobile = '" + mobile + "'", null);
+		List<Member> result = MemberDao.getDetail(dbCon, staff, new ExtraCond().setMobile(mobile), null);
 		if(result.isEmpty()){
 			throw new BusinessException(MemberError.MEMBER_NOT_EXIST);
 		}else{
@@ -597,26 +719,29 @@ public class MemberDao {
 		//检查是否信息有重复
 		checkValid(dbCon, member);
 		
-		String insertSQL = " INSERT INTO " + Params.dbName + ".member " 
-			+ "(member_type_id, member_card, restaurant_id, name, sex, tele, mobile, birthday, " 
-			+ " id_card, company, contact_addr, create_date, point)" 
-			+ " VALUES( " 
-			+ member.getMemberType().getId() 
-			+ ",'" + member.getMemberCard() + "'"
-			+ "," + member.getRestaurantId() 
-			+ ",'" + member.getName() + "'" 
-			+ "," + member.getSex().getVal() 
-			+ ",'" + member.getTele() + "'" 
-			+ ",'" + member.getMobile() + "'" 
-			+ "," + (member.getBirthday() != 0 ? ("'" + DateUtil.format(member.getBirthday()) + "'") : "NULL") 
-			+ ",'" + member.getIdCard() + "'" 
-			+ ",'" + member.getCompany()+ "'"
-			+ ",'" + member.getContactAddress() + "'"
-			+ ",'" + DateUtil.format(member.getCreateDate()) + "'"
-			+ "," + "(SELECT initial_point FROM member_type WHERE member_type_id = " + member.getMemberType().getId() + ")" + 
-		")";
+		String sql;
+		sql = " INSERT INTO " + Params.dbName + ".member " +
+			  " (member_type_id, member_card, member_card_crc, restaurant_id, name, sex, tele, mobile, mobile_crc, birthday, " +
+			  " id_card, company, contact_addr, create_date, point)" +
+			  " VALUES( " +
+			  member.getMemberType().getId() + "," + 
+			  "'" + member.getMemberCard() + "'," +
+			  " CRC32('" + member.getMemberCard() + "')," +
+			  member.getRestaurantId() + "," + 
+			  "'" + member.getName() + "'," + 
+			  member.getSex().getVal() + "," + 
+			  "'" + member.getTele() + "'," + 
+			  "'" + member.getMobile() + "'," +
+			  " CRC32('" + member.getMobile() + "')," +
+			 (member.getBirthday() != 0 ? ("'" + DateUtil.format(member.getBirthday()) + "'") : "NULL")	+ "," +
+			 "'" + member.getIdCard() + "'," + 
+			 "'" + member.getCompany()+ "'," +
+			 "'" + member.getContactAddress() + "'," +
+			 "'" + DateUtil.format(member.getCreateDate()) + "'," +
+			 " (SELECT initial_point FROM member_type WHERE member_type_id = " + member.getMemberType().getId() + ")" + 
+			 ")";
 		
-		dbCon.stmt.executeUpdate(insertSQL, Statement.RETURN_GENERATED_KEYS);
+		dbCon.stmt.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
 		dbCon.rs = dbCon.stmt.getGeneratedKeys();
 		int memberId = 0;
 		if(dbCon.rs.next()){
@@ -706,8 +831,10 @@ public class MemberDao {
 			+ " member_id = " + member.getId()  
 			+ (builder.isNameChanged() ? " ,name = '" + member.getName() + "'" : "")
 			+ (builder.isMobileChanged() ? " ,mobile = " + "'" + member.getMobile() + "'" : "") 
+			+ (builder.isMobileChanged() ? " ,mobile_crc = CRC32('" + member.getMobile() + "')" : "") 
 			+ (builder.isMemberTypeChanged() ? " ,member_type_id = " + member.getMemberType().getId() : "")
 			+ (builder.isMemberCardChanged() ? " ,member_card = '" + member.getMemberCard() + "'" : "") 
+			+ (builder.isMemberCardChanged() ? ", member_card_crc = CRC32('" + member.getMemberCard() + "')" : "")
 			+ (builder.isTeleChanged() ? " ,tele = '" + member.getTele() + "'" : "") 
 			+ (builder.isSexChanged() ? " ,sex = " + member.getSex().getVal() : "") 
 			+ (builder.isIdChardChanged() ? " ,id_card = '" + member.getIdCard() + "'" : "") 

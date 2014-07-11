@@ -718,15 +718,16 @@ public class OrderDao {
 		
 		if(paidOrderCond.length() > 0){
 			paidOrderCond.deleteCharAt(paidOrderCond.length() - 1);
-			
-			//Archive the order
-			archive(dbCon, staff, paidOrderCond.toString());
+
+			//Archive the taste group
+			TasteGroupDao.archive(dbCon, staff, paidOrderCond.toString());
 			
 			//Archive the order food
 			OrderFoodDao.archive(dbCon, staff, paidOrderCond.toString());
 
-			//Archive the taste group
-			TasteGroupDao.archive(dbCon, staff, paidOrderCond.toString());
+			//Archive the order
+			OrderDao.archive(dbCon, staff, paidOrderCond.toString());
+			
 		}
 		
 	}
@@ -777,8 +778,16 @@ public class OrderDao {
 		}
 		dbCon.rs.close();
 		
-		sql = " UPDATE " + Params.dbName + ".order SET id = " + maxId +
-			  " WHERE restaurant_id = " + Restaurant.ADMIN;
+		sql = " DELETE FROM " + Params.dbName + ".order WHERE restaurant_id = " + Restaurant.ADMIN;
+		dbCon.stmt.executeUpdate(sql);
+		
+		sql = " INSERT INTO " + Params.dbName + ".order " +
+			  " ( id, restaurant_id ) VALUES " +
+			 "(" + maxId + "," + Restaurant.ADMIN + ")";
+		dbCon.stmt.executeUpdate(sql);
+		
+		//Delete the paid order from "order" table.
+		sql = " DELETE FROM " + Params.dbName + ".order WHERE id IN ( " + paidOrder + ")";
 		dbCon.stmt.executeUpdate(sql);
 		
 		return new ArchiveResult(maxId, amount);

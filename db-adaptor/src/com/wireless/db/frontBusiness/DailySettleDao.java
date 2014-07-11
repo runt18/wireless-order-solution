@@ -9,6 +9,7 @@ import java.util.List;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.deptMgr.DepartmentDao;
+import com.wireless.db.orderMgr.OrderDao;
 import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.db.shift.PaymentDao;
 import com.wireless.db.shift.ShiftDao;
@@ -336,39 +337,6 @@ public class DailySettleDao {
 
 		result.setRange(range);
 		
-		StringBuilder paidOrderCond = new StringBuilder();
-		
-		//Get the amount and id to paid orders
-		sql = " SELECT id FROM " + Params.dbName + ".order " +
-			  " WHERE " +
-			  " (status = " + Order.Status.PAID.getVal() + " OR " + " status = " + Order.Status.REPAID.getVal() + ")" +
-			 (staff.getRestaurantId() < 0 ? "" : "AND restaurant_id=" + staff.getRestaurantId());
-		dbCon.rs = dbCon.stmt.executeQuery(sql);
-		while(dbCon.rs.next()){
-			
-			int orderId = dbCon.rs.getInt("id");
-			
-			paidOrderCond.append(orderId).append(",");
-			result.setTotalOrder(result.getTotalOrder() + 1);
-			
-		}
-		dbCon.rs.close();		
-		
-		if(paidOrderCond.length() > 0){
-			paidOrderCond.deleteCharAt(paidOrderCond.length() - 1);
-		}
-		
-		if(paidOrderCond.length() > 0){			
-			
-			//get the amount to order detail 
-			sql = " SELECT COUNT(*) FROM " + Params.dbName + ".order_food WHERE order_id IN (" + paidOrderCond + ")";
-			dbCon.rs = dbCon.stmt.executeQuery(sql);
-			if(dbCon.rs.next()){
-				result.setTotalOrderDetail(dbCon.rs.getInt(1));				
-			}
-			dbCon.rs.close();
-		}
-		
 		//get the amount to shift record
 		sql = " SELECT COUNT(*) FROM " + Params.dbName + ".shift " +
 			  " WHERE 1=1 " +
@@ -379,62 +347,6 @@ public class DailySettleDao {
 		}
 		dbCon.rs.close();
 		
-		//Calculate the max order id from both today and history.
-		sql = " SELECT MAX(id) + 1 FROM (" + 
-			  " SELECT MAX(id) AS id FROM " + Params.dbName + ".order " +
-			  " UNION " +
-			  " SELECT MAX(id) AS id FROM " + Params.dbName + ".order_history) AS all_order";
-		dbCon.rs = dbCon.stmt.executeQuery(sql);
-		if(dbCon.rs.next()){
-			result.setMaxOrderId(dbCon.rs.getInt(1));
-		}
-		dbCon.rs.close();
-		
-		//Calculate the max order food id from both today and history.
-		sql = " SELECT MAX(id) + 1 FROM (" +
-			  " SELECT MAX(id) AS id FROM " + Params.dbName + ".order_food " +
-			  " UNION " +
-			  " SELECT MAX(id) AS id FROM " + Params.dbName + ".order_food_history) AS all_order_food";
-		dbCon.rs = dbCon.stmt.executeQuery(sql);
-		if(dbCon.rs.next()){
-			result.setMaxOrderFoodId(dbCon.rs.getInt(1));
-		}
-		dbCon.rs.close();
-		
-//		//Calculate the max shift id from both today and history.
-//		sql = " SELECT MAX(id) + 1 FROM (" +
-//			  " SELECT MAX(id) AS id FROM " + Params.dbName + ".shift " +
-//			  " UNION " +
-//			  " SELECT MAX(id) AS id FROM " + Params.dbName + ".shift_history) AS all_shift";
-//		dbCon.rs = dbCon.stmt.executeQuery(sql);
-//		if(dbCon.rs.next()){
-//			result.setMaxShiftId(dbCon.rs.getInt(1));
-//		}
-//		dbCon.rs.close();
-		
-		//Calculate the max taste group id from both today and history.
-		sql = " SELECT MAX(taste_group_id) + 1 " +
-			  " FROM " +
-			  " (SELECT MAX(taste_group_id) AS taste_group_id FROM " + Params.dbName + ".taste_group" +
-			  " UNION " +
-			  " SELECT MAX(taste_group_id) AS taste_group_id FROM " + Params.dbName + ".taste_group_history) AS all_taste_group";
-		dbCon.rs = dbCon.stmt.executeQuery(sql);
-		if(dbCon.rs.next()){
-			result.setMaxTasteGroupId(dbCon.rs.getInt(1));
-		}
-		dbCon.rs.close();
-		
-		//Calculate the max normal taste group id from both today and history
-		sql = " SELECT MAX(normal_taste_group_id) + 1 " +
-			  " FROM " +
-			  " (SELECT MAX(normal_taste_group_id) AS normal_taste_group_id FROM " + Params.dbName + ".normal_taste_group" +
-			  " UNION " +
-			  " SELECT MAX(normal_taste_group_id) AS normal_taste_group_id FROM " + Params.dbName + ".normal_taste_group_history) AS all_normal_taste_group";
-		dbCon.rs = dbCon.stmt.executeQuery(sql);
-		if(dbCon.rs.next()){
-			result.setMaxNormalTasteGroupId(dbCon.rs.getInt(1));
-		}
-		dbCon.rs.close();
 		
 		//Calculate the max member operation id from both today and history
 		sql = " SELECT MAX(id) + 1 " +
@@ -448,52 +360,10 @@ public class DailySettleDao {
 		}
 		dbCon.rs.close();
 		
-		int orderIdToAdmin = 0;
-		//Get the order id attached to admin.
-		sql = "SELECT id FROM " + Params.dbName + ".order WHERE restaurant_id=" + Restaurant.ADMIN;
-		dbCon.rs = dbCon.stmt.executeQuery(sql);
-		if(dbCon.rs.next()){
-			orderIdToAdmin = dbCon.rs.getInt("id");
-		}
-		dbCon.rs.close();
-		
-		int ofIdToAdmin = 0;
-		int tgIdToAdmin = 0;
-		//Get the order food id and taste group id attached to admin.
-		sql = "SELECT id, taste_group_id FROM " + Params.dbName + ".order_food WHERE order_id=" + orderIdToAdmin;
-		dbCon.rs = dbCon.stmt.executeQuery(sql);
-		if(dbCon.rs.next()){
-			ofIdToAdmin = dbCon.rs.getInt("id");
-			tgIdToAdmin = dbCon.rs.getInt("taste_group_id");
-		}
-		dbCon.rs.close();
-		
-		final String orderItem = "`id`, `seq_id`, `restaurant_id`, `birth_date`, `order_date`, `status`, " +
-				"`cancel_price`, `discount_price`, `gift_price`, `coupon_price`, `repaid_price`, `erase_price`, `total_price`, `actual_price`, `custom_num`," + 
-				"`waiter`, `settle_type`, `pay_type`, `category`, `member_operation_id`, `staff_id`, " +
-				"`region_id`, `region_name`, `table_alias`, `table_name`, `service_rate`, `comment`";
-
-//		final String shiftItem = "`id`, `restaurant_id`, `name`, `on_duty`, `off_duty`";
 		
 		try{
 			dbCon.conn.setAutoCommit(false);
 			
-			if(result.getTotalOrder() > 0){
-			
-				//Move the paid order from "order" to "order_history".
-				sql = " INSERT INTO " + Params.dbName + ".order_history (" + orderItem + ") " + 
-					  " SELECT " + orderItem + " FROM " + Params.dbName + ".order WHERE id IN " + "(" + paidOrderCond + ")";
-				dbCon.stmt.executeUpdate(sql);
-			
-				//Move the paid order details from "order_food" to "order_food_history".
-				moveOrderFood(dbCon, paidOrderCond.toString());
-			
-				//Move the paid order taste group from 'taste_group' to 'taste_group_history' except the empty taste group.
-				moveTasteGroup(dbCon, paidOrderCond.toString());
-				
-				//Move the paid order normal taste group from 'normal_taste_group' to 'normal_taste_group_history' except the empty normal taste group.
-				moveNormalTasteGroup(dbCon, paidOrderCond.toString());
-			}
 			
 			//Move the member operation record from 'member_operation' to 'member_operation_history'
 			sql = " INSERT INTO " + Params.dbName + ".member_operation_history" +
@@ -501,11 +371,8 @@ public class DailySettleDao {
 				  " WHERE restaurant_id = " + staff.getRestaurantId();
 			dbCon.stmt.executeUpdate(sql);
 			
-//			//Move the shift record from 'shift' to 'shift_history'.
-//			sql = " INSERT INTO " + Params.dbName + ".shift_history (" + shiftItem + ") " +
-//				  " SELECT " + shiftItem + " FROM " + Params.dbName + ".shift " +
-//				  " WHERE " + (staff.getRestaurantId() < 0 ? "" : "restaurant_id = " + staff.getRestaurantId());
-//			dbCon.stmt.executeUpdate(sql);
+			//Archive the order and associated order food, taste group records.
+			OrderDao.archive(dbCon, staff);
 			
 			//Archive the shift records.
 			ShiftDao.archive(dbCon, staff);
@@ -531,59 +398,6 @@ public class DailySettleDao {
 				}
 			}
 			
-			if(paidOrderCond.length() > 0){
-			
-				//Delete the paid order normal taste group except the empty normal taste group
-				sql = " DELETE FROM " + Params.dbName + ".normal_taste_group " +
-					  " WHERE " +
-					  " normal_taste_group_id IN (" +
-					  " SELECT normal_taste_group_id " +
-					  " FROM " + Params.dbName + ".order_food OF " + " JOIN " + Params.dbName + ".taste_group TG" +
-					  " ON OF.taste_group_id = TG.taste_group_id " +
-					  " WHERE " +
-					  " OF.order_id IN (" + paidOrderCond + ")" +
-					  " ) " + 
-					  " AND " +
-					  " normal_taste_group_id <> " + TasteGroup.EMPTY_NORMAL_TASTE_GROUP_ID;
-				dbCon.stmt.executeUpdate(sql);
-				
-				//Delete the paid order taste group except the empty taste group
-				sql = " DELETE FROM " + Params.dbName + ".taste_group" +
-					  " WHERE " +
-					  " taste_group_id IN (" +
-					  " SELECT taste_group_id FROM " + Params.dbName + ".order_food" +
-					  " WHERE " + 
-					  " order_id IN (" + paidOrderCond + ")" +
-					  " ) " + 
-					  " AND " +
-					  " taste_group_id <> " + TasteGroup.EMPTY_TASTE_GROUP_ID;
-				dbCon.stmt.executeUpdate(sql);				
-			
-				
-				//Delete the paid order food from 'order_food' table.
-				sql = " DELETE FROM " + Params.dbName + ".order_food WHERE order_id IN (" + paidOrderCond + ")";
-				dbCon.stmt.executeUpdate(sql);
-				
-				//Delete the paid order from "order" table.
-				sql = " DELETE FROM " + Params.dbName + ".order WHERE id IN ( " + paidOrderCond + ")";
-				dbCon.stmt.executeUpdate(sql);
-			
-			}
-			
-//			//Delete the shift records belong to this restaurant.
-//			sql = " DELETE FROM " + Params.dbName + ".shift WHERE " + (staff.getRestaurantId() < 0 ? "" : "restaurant_id=" + staff.getRestaurantId());
-//			dbCon.stmt.executeUpdate(sql);
-//			
-//			//Delete the shift record belongs to admin.
-//			sql = " DELETE FROM " + Params.dbName + ".shift WHERE restaurant_id = " + Restaurant.ADMIN;
-//			dbCon.stmt.executeUpdate(sql);
-//			
-//			//Insert a shift record with the max shift id belongs to admin.
-//			sql = "INSERT INTO " + Params.dbName + ".shift (`id`, `restaurant_id`) VALUES (" +
-//				  result.getMaxShiftId() + ", " +
-//				  Restaurant.ADMIN +
-//				  ")";
-//			dbCon.stmt.executeUpdate(sql);
 			
 			//Delete the member operation to this restaurant
 			sql = " DELETE FROM " + Params.dbName + ".member_operation WHERE restaurant_id = " + staff.getRestaurantId();
@@ -601,45 +415,6 @@ public class DailySettleDao {
 				  result.getMaxMemberOperationId() + "," +
 				  Restaurant.ADMIN + "," +
 				  " 0, 0, '', '', '', 0, 0 " +
-				  " ) ";
-			dbCon.stmt.executeUpdate(sql);
-			
-			//Delete the taste group record belongs to admin.
-			sql = " DELETE FROM " + Params.dbName + ".taste_group WHERE taste_group_id = " + tgIdToAdmin;
-			dbCon.stmt.executeUpdate(sql);
-			
-			//Delete the order_food record belongs to admin.
-			sql = " DELETE FROM " + Params.dbName + ".order_food WHERE id = " + ofIdToAdmin;
-			dbCon.stmt.executeUpdate(sql);
-			
-			//Delete the order record with max id.
-			sql = " DELETE FROM " + Params.dbName + ".order WHERE restaurant_id=" + Restaurant.ADMIN;
-			dbCon.stmt.executeUpdate(sql);
-			
-			//Insert a order record with the max order id belongs to admin.
-			sql = "INSERT INTO " + Params.dbName + ".order (`id`, `restaurant_id`, `order_date`) VALUES (" + 
-				  result.getMaxOrderId() + ", " +
-				  Restaurant.ADMIN + ", " +
-				  0 +
-				  ")";
-			dbCon.stmt.executeUpdate(sql);
-			
-			//Insert a order_food record with the max order food id, max taste group id belongs to admin.
-			sql = "INSERT INTO " + Params.dbName + ".order_food (`id`, `order_id`, `taste_group_id`, `order_date`) VALUES (" +
-				  result.getMaxOrderFoodId() + ", " +
-				  result.getMaxOrderId() + ", " +
-				  result.getMaxTasteGroupId() + ", " +
-				  0 +
-				  ")";
-			dbCon.stmt.executeUpdate(sql);
-			
-			//Insert a record with the max taste group id and max normal taste group id.
-			sql = " INSERT INTO " + Params.dbName + ".taste_group" +
-				  " (`taste_group_id`, `normal_taste_group_id`) " +
-				  " VALUES " +
-				  " ( " +
-				  result.getMaxTasteGroupId() + ", " +
-				  result.getMaxNormalTasteGroupId() +
 				  " ) ";
 			dbCon.stmt.executeUpdate(sql);
 			

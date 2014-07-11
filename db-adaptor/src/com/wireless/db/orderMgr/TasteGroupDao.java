@@ -233,12 +233,12 @@ public class TasteGroupDao {
 		
 		String sql;
 		
-		final String tasteGroupItem = "`taste_group_id`, `normal_taste_group_id`, `normal_taste_pref`, `normal_taste_price`, " +
+		final String tgItem = "`taste_group_id`, `normal_taste_group_id`, `normal_taste_pref`, `normal_taste_price`, " +
 				  					  "`tmp_taste_id`, `tmp_taste_pref`, `tmp_taste_price`";
 		
 		//Move the taste group to history
-		sql = " INSERT INTO " + Params.dbName + ".taste_group_history (" + tasteGroupItem + " ) " +
-			  " SELECT " + tasteGroupItem + " FROM " + Params.dbName + ".taste_group" +
+		sql = " INSERT INTO " + Params.dbName + ".taste_group_history (" + tgItem + " ) " +
+			  " SELECT " + tgItem + " FROM " + Params.dbName + ".taste_group" +
 			  " WHERE " +
 			  " taste_group_id <> " + TasteGroup.EMPTY_TASTE_GROUP_ID +
 			  " AND taste_group_id IN (" +
@@ -247,10 +247,10 @@ public class TasteGroupDao {
 		
 		int tgAmount = dbCon.stmt.executeUpdate(sql);
 		
-		final String normalTasteGroupItem = "`normal_taste_group_id`, `taste_id`";
+		final String ntgItem = "`normal_taste_group_id`, `taste_id`";
 		//Move the normal taste group to history.
-		sql = " INSERT INTO " + Params.dbName + ".normal_taste_group_history (" + normalTasteGroupItem + ")" +
-			  " SELECT " + normalTasteGroupItem + " FROM " + Params.dbName + ".normal_taste_group" +
+		sql = " INSERT INTO " + Params.dbName + ".normal_taste_group_history (" + ntgItem + ")" +
+			  " SELECT " + ntgItem + " FROM " + Params.dbName + ".normal_taste_group" +
 			  " WHERE " +
 			  " normal_taste_group_id <> " + TasteGroup.EMPTY_NORMAL_TASTE_GROUP_ID +
 			  " AND " +
@@ -310,6 +310,32 @@ public class TasteGroupDao {
 		sql = " UPDATE " + Params.dbName + ".order_food SET taste_group_id = " + maxTgId + 
 			  " WHERE restaurant_id = " + Restaurant.ADMIN;
 		dbCon.stmt.executeUpdate(sql);
+		
+		//Delete the paid order normal taste group except the empty normal taste group
+		sql = " DELETE FROM " + Params.dbName + ".normal_taste_group " +
+			  " WHERE " +
+			  " normal_taste_group_id IN (" +
+			  " SELECT normal_taste_group_id " +
+			  " FROM " + Params.dbName + ".order_food OF " + " JOIN " + Params.dbName + ".taste_group TG" +
+			  " ON OF.taste_group_id = TG.taste_group_id " +
+			  " WHERE " +
+			  " OF.order_id IN (" + paidOrder + ")" +
+			  " ) " + 
+			  " AND " +
+			  " normal_taste_group_id <> " + TasteGroup.EMPTY_NORMAL_TASTE_GROUP_ID;
+		dbCon.stmt.executeUpdate(sql);
+		
+		//Delete the paid order taste group except the empty taste group
+		sql = " DELETE FROM " + Params.dbName + ".taste_group" +
+			  " WHERE " +
+			  " taste_group_id IN (" +
+			  " SELECT taste_group_id FROM " + Params.dbName + ".order_food" +
+			  " WHERE " + 
+			  " order_id IN (" + paidOrder + ")" +
+			  " ) " + 
+			  " AND " +
+			  " taste_group_id <> " + TasteGroup.EMPTY_TASTE_GROUP_ID;
+		dbCon.stmt.executeUpdate(sql);	
 		
 		return new ArchiveResult(tgAmount, ntgAmount, maxTgId, maxNormalTgId);
 	}
