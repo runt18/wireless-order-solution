@@ -223,7 +223,7 @@ public class QueryMemberTypeAction extends DispatchAction {
 			List<MemberLevel> list = MemberLevelDao.getMemberLevels(staff);
 			
 			for (final MemberLevel ml : list) {
-				final List<Member> mlists = MemberDao.getByCond(staff, " AND MT.member_type_id = " + ml.getMemberType().getId() + " AND M.member_id = " + mid, null);
+				final List<Member> mlists = MemberDao.getByCond(staff, new MemberDao.ExtraCond().setMemberType(ml.getMemberType().getId()).setId(mid), null);
 				if(mlists.size() > 0){
 					extra.putJsonable("member", mlists.get(0), 0);
 				}

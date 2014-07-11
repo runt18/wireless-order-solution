@@ -1,7 +1,6 @@
 package com.wireless.Actions.couponMgr;
 
 import java.sql.SQLException;
-import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -34,8 +33,7 @@ public class OperateCouponAction extends DispatchAction{
 			Coupon.InsertAllBuilder builder = new Coupon.InsertAllBuilder(Integer.parseInt(typeId));
 			memberType = memberTypes.split(",");
 			for (int i = 0; i < memberType.length; i++) {
-				List<Member> list = MemberDao.getByCond(StaffDao.verify(Integer.parseInt(pin)), " AND M.member_type_id = " + memberType[i], null);
-				for (Member m : list) {
+				for (Member m : MemberDao.getByCond(StaffDao.verify(Integer.parseInt(pin)), new MemberDao.ExtraCond().setMemberType(Integer.parseInt(memberType[i])), null)) {
 					builder.addMemberId(m.getId());
 				}
 			}
