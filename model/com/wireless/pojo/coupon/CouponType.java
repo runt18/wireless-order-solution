@@ -11,6 +11,7 @@ public class CouponType implements Jsonable{
 		private final float price;
 		private long expired;
 		private String comment;
+		private String image;
 		
 		public InsertBuilder(String name, float price){
 			this.name = name;
@@ -34,6 +35,11 @@ public class CouponType implements Jsonable{
 			return this;
 		}
 		
+		public InsertBuilder setImage(String image){
+			this.image = image;
+			return this;
+		}
+		
 		public CouponType build(){
 			return new CouponType(this);
 		}
@@ -44,6 +50,7 @@ public class CouponType implements Jsonable{
 		private final String name;
 		private long expired = Integer.MIN_VALUE;
 		private String comment;
+		private String image;
 		
 		public UpdateBuilder(int id, String name){
 			this.id = id;
@@ -79,6 +86,15 @@ public class CouponType implements Jsonable{
 			return this;
 		}
 		
+		public UpdateBuilder setImage(String image){
+			this.image = image;
+			return this;
+		}
+		
+		public boolean isImageChanged(){
+			return this.image != null;
+		}
+		
 		public CouponType build(){
 			return new CouponType(this);
 		}
@@ -90,12 +106,14 @@ public class CouponType implements Jsonable{
 	private float price;
 	private long expired;
 	private String comment;
+	private String image;
 	
 	private CouponType(UpdateBuilder builder){
 		setId(builder.id);
 		setName(builder.name);
 		setExpired(builder.expired);
 		setComment(builder.comment);
+		setImage(builder.image);
 	}
 	
 	private CouponType(InsertBuilder builder){
@@ -103,6 +121,7 @@ public class CouponType implements Jsonable{
 		setPrice(builder.price);
 		setExpired(builder.expired);
 		setComment(builder.comment);
+		setImage(builder.image);
 	}
 	
 	public CouponType(int id){
@@ -117,6 +136,7 @@ public class CouponType implements Jsonable{
 			setPrice(src.getPrice());
 			setExpired(src.getExpired());
 			setComment(src.getComment());
+			setImage(src.getImage());
 		}
 	}
 	
@@ -186,6 +206,18 @@ public class CouponType implements Jsonable{
 			return "";
 		}
 		return this.comment;
+	}
+	
+	public String getImage(){
+		if(image != null){
+			return image;
+		}else{
+			return "";
+		}
+	}
+	
+	public void setImage(String image){
+		this.image = image;
 	}
 	
 	@Override
