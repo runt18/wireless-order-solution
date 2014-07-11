@@ -15,14 +15,12 @@ import org.apache.struts.actions.DispatchAction;
 import com.wireless.db.DBCon;
 import com.wireless.db.client.member.MemberDao;
 import com.wireless.db.client.member.MemberDao.MemberRank;
-import com.wireless.db.client.member.MemberTypeDao;
 import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.db.sms.VerifySMSDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.weixin.member.WeixinMemberDao;
 import com.wireless.db.weixin.restaurant.WeixinRestaurantDao;
 import com.wireless.exception.BusinessException;
-import com.wireless.exception.MemberError;
 import com.wireless.json.JObject;
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
@@ -32,7 +30,6 @@ import com.wireless.pojo.sms.VerifySMS;
 import com.wireless.pojo.sms.VerifySMS.ExpiredPeriod;
 import com.wireless.pojo.sms.VerifySMS.InsertBuilder;
 import com.wireless.pojo.sms.VerifySMS.VerifyBuilder;
-import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.util.sms.SMS;
 
 public class WXOperateMemberAction extends DispatchAction {
@@ -210,34 +207,11 @@ public class WXOperateMemberAction extends DispatchAction {
 			dbCon.connect();
 			dbCon.conn.setAutoCommit(false);
 			
-			int restaurantId = WeixinRestaurantDao.getRestaurantIdByWeixin(dbCon, formId);
-			
 			// 验证验证码
 			VerifySMSDao.verify(dbCon, new VerifyBuilder(Integer.valueOf(codeId), Integer.valueOf(code)));
-			Staff staff = StaffDao.getStaffs(dbCon, restaurantId).get(0);
 			
-			// 绑定会员信息
-			int mid = 0;
-			try{
-				mid = MemberDao.getByMobile(dbCon, staff, request.getParameter("mobile")).getId();
-				WeixinMemberDao.bindExistMember(dbCon, mid, openId, formId);
-			}catch(BusinessException e){
-				if(e.getErrCode() == MemberError.MEMBER_NOT_EXIST){
-					WeixinMemberDao.bindNewMember(dbCon, 
-						new Member.InsertBuilder(
-							restaurantId,
-							request.getParameter("name"),
-							request.getParameter("mobile"),
-							MemberTypeDao.getWeixinMemberType(dbCon, staff).getId(), 
-							Member.Sex.valueOf(Integer.valueOf(request.getParameter("sex")))
-						), 
-						openId, 
-						formId
-					);
-				}else{
-					throw e;
-				}
-			}
+			WeixinMemberDao.bind(request.getParameter("mobile"), openId, formId);
+			
 			dbCon.conn.commit();
 			jobject.initTip(true, "操作成功, 已绑定会员信息.");
 		}catch(BusinessException e){
