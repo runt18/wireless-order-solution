@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import com.wireless.db.DBCon;
+import com.wireless.db.billStatistics.CalcBillStatisticsDao;
 import com.wireless.db.client.member.MemberDao;
 import com.wireless.db.client.member.MemberOperationDao;
 import com.wireless.db.orderMgr.OrderDao;
@@ -291,10 +292,10 @@ public class JobContentFactory {
 					   printType == PType.PRINT_HISTORY_SHIFT_RECEIPT){
 						 //Get the details to daily settlement from history ,
 						 //since records to today has been moved to history before printing daily settlement receipt. 
-						shiftDetail = ShiftDao.getByRange(staff, range, DateType.HISTORY);
+						shiftDetail = ShiftDao.getByRange(staff, range, new CalcBillStatisticsDao.ExtraCond(DateType.HISTORY));
 						
 					}else{
-						shiftDetail = ShiftDao.getByRange(staff, range, DateType.TODAY);
+						shiftDetail = ShiftDao.getByRange(staff, range, new CalcBillStatisticsDao.ExtraCond(DateType.TODAY));
 					}
 					jobContents.add(new JobContent(printer, func.getRepeat(), printType,
 												   new ShiftContent(shiftDetail, 
