@@ -10,7 +10,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.wireless.db.client.member.MemberDao;
-import com.wireless.db.client.member.MemberTypeDao;
 import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.weixin.CalcWeixinSignature;
@@ -41,40 +40,37 @@ public class TestWeixinMemberDao {
 		final String nonce = "jingyang";
 		WeixinRestaurantDao.verify(account, CalcWeixinSignature.calc(RestaurantDao.getByAccount(account).getAccount(), timestamp, nonce), timestamp, nonce);
 		WeixinRestaurantDao.bind(WEIXIN_RESTAURANT_SERIAL, account);
-		
+
 		Restaurant restaurant = RestaurantDao.getByAccount(account);
+		Staff staff = StaffDao.getAdminByRestaurant(restaurant.getId());
+		
 		try{
 			WeixinMemberDao.interest(WEIXIN_RESTAURANT_SERIAL, WEIXIN_MEMBER_SERIAL);
-			List<Member> memberList = MemberDao.getByCond(StaffDao.getStaffs(restaurant.getId()).get(0), null, null);
-			Staff staff = StaffDao.getStaffs(restaurant.getId()).get(0);
+			List<Member> memberList = MemberDao.getByCond(staff, null, null);
 			
 			if(!memberList.isEmpty()){
 				//Test to bind the exist member
-				WeixinMemberDao.bindExistMember(memberList.get(0).getId(), WEIXIN_MEMBER_SERIAL, WEIXIN_RESTAURANT_SERIAL);
+				WeixinMemberDao.bind(memberList.get(0).getMobile(), WEIXIN_MEMBER_SERIAL, WEIXIN_RESTAURANT_SERIAL);
 				Assert.assertEquals("bind exist member", memberList.get(0).getId(), WeixinMemberDao.getBoundMemberIdByWeixin(WEIXIN_MEMBER_SERIAL, WEIXIN_RESTAURANT_SERIAL));
 				
-				String mobileToUpdate = Long.valueOf((Long.parseLong(memberList.get(0).getMobile()) + 1)).toString();
+				//String mobileToUpdate = Long.valueOf((Long.parseLong(memberList.get(0).getMobile()) + 1)).toString();
 				//Test to change the bound mobile of exist member 
-				WeixinMemberDao.updateMobile(mobileToUpdate, WEIXIN_MEMBER_SERIAL, WEIXIN_RESTAURANT_SERIAL);
-				Assert.assertEquals("change the mobile to exist member", mobileToUpdate, MemberDao.getById(staff, memberList.get(0).getId()).getMobile());
+				//WeixinMemberDao.updateMobile(mobileToUpdate, WEIXIN_MEMBER_SERIAL, WEIXIN_RESTAURANT_SERIAL);
+				//Assert.assertEquals("change the mobile to exist member", mobileToUpdate, MemberDao.getById(staff, memberList.get(0).getId()).getMobile());
 				
 			}
 			
 			int memberId = 0;
 			try{
 				//Test to bind a new member
-				Member.InsertBuilder builder = new Member.InsertBuilder(restaurant.getId(), "张菁洋", "18520590932", 
-																		MemberTypeDao.getWeixinMemberType(staff).getId(), 
-																		Member.Sex.FEMALE);
-				memberId = WeixinMemberDao.bindNewMember(builder, WEIXIN_MEMBER_SERIAL, WEIXIN_RESTAURANT_SERIAL);
+				memberId = WeixinMemberDao.bind("18520590932", WEIXIN_MEMBER_SERIAL, WEIXIN_RESTAURANT_SERIAL);
 				
 				Member memberJustInserted = MemberDao.getById(staff, WeixinMemberDao.getBoundMemberIdByWeixin(WEIXIN_MEMBER_SERIAL, WEIXIN_RESTAURANT_SERIAL)); 
 				
 				Assert.assertEquals("id to new member just bound", memberId, memberJustInserted.getId());
-				Assert.assertEquals("name to new member just bound", "张菁洋", memberJustInserted.getName());
+				Assert.assertEquals("name to new member just bound", "微信会员", memberJustInserted.getName());
 				Assert.assertEquals("mobile to new member just bound", "18520590932", memberJustInserted.getMobile());
 				Assert.assertEquals("type to new member just bound", MemberType.Type.WEIXIN, memberJustInserted.getMemberType().getType());
-				Assert.assertEquals("sex to new member just bound", Member.Sex.FEMALE, memberJustInserted.getSex());
 				
 			}finally{
 				if(memberId != 0){

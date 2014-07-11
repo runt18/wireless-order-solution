@@ -127,7 +127,8 @@ public class TestMemberDao {
 		try{
 			
 			//Insert a new member
-			Member.InsertBuilder builder = new Member.InsertBuilder(mStaff.getRestaurantId(), "张三", "13694260535", memberType.getId(), Sex.FEMALE)
+			Member.InsertBuilder builder = new Member.InsertBuilder("张三", "13694260535", memberType.getId())
+													 .setSex(Sex.FEMALE)
 													 .setBirthday(DateUtil.parseDate("1981-03-15"))
 													 .setCompany("Digie Co.,Ltd")
 													 .setContactAddr("广州市东圃镇晨晖商务大厦")
@@ -151,6 +152,7 @@ public class TestMemberDao {
 			
 			Member expect = builder.build();
 			expect.setId(memberId);
+			expect.setRestaurantId(mStaff.getRestaurantId());
 			expect.setMemberType(memberType);
 			expect.setPoint(memberType.getInitialPoint());
 			//Set the initial point to expected member

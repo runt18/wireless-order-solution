@@ -482,7 +482,7 @@ public class MemberDao {
 		}
 		dbCon.rs.close();
 		
-		return Collections.unmodifiableList(result);
+		return result;
 	}
 	
 	/**
@@ -499,11 +499,15 @@ public class MemberDao {
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			if(extraCond.range != null){
-				//FIXME
-				return null;
+			if(extraCond != null){
+				if(extraCond.range != null){
+					//FIXME
+					return null;
+				}else{
+					return MemberDao.getByCond(dbCon, staff, extraCond.toString(), orderClause);
+				}
 			}else{
-				return MemberDao.getByCond(dbCon, staff, extraCond != null ? extraCond.toString() : null, orderClause);
+				return MemberDao.getByCond(dbCon, staff, null, orderClause);
 			}
 		}finally{
 			dbCon.disconnect();
@@ -644,6 +648,9 @@ public class MemberDao {
 	/**
 	 * Check to see whether the member is valid before insert or update.
 	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
 	 * @param memberToCheck
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
@@ -652,31 +659,14 @@ public class MemberDao {
 	 * 			throws if the card to new member has been exist before
 	 * 			throws if the member type does NOT exist
 	 */
-	public static void checkValid(DBCon dbCon, Member memberToCheck) throws SQLException, BusinessException{
-		String querySQL;
-		// 检查手机号码
-		querySQL = "SELECT member_id FROM " + Params.dbName + ".member "
-				 + " WHERE restaurant_id = " + memberToCheck.getRestaurantId()
-				 + " AND mobile = '" + memberToCheck.getMobile() + "'";
-		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
-		if(dbCon.rs != null && dbCon.rs.next() && dbCon.rs.getInt(1) > 0){
-			if(memberToCheck.getId() != dbCon.rs.getInt(1)){
-				throw new BusinessException(MemberError.HAS_MOBLIE);
-			}
+	public static void checkValid(DBCon dbCon, Staff staff, Member memberToCheck) throws SQLException, BusinessException{
+		
+		if(!getByCond(dbCon, staff, new ExtraCond().setMobile(memberToCheck.getMobile()).toString(), null).isEmpty()){
+			throw new BusinessException(MemberError.MOBLIE_DUPLICATED);
 		}
-		dbCon.rs.close();
-		// 检查会员卡号
-		if(memberToCheck.hasMemberCard()){
-			querySQL = "SELECT member_id FROM " + Params.dbName + ".member "
-					 + " WHERE restaurant_id = " + memberToCheck.getRestaurantId()
-					 + " AND member_card = '" + memberToCheck.getMemberCard() + "'";
-			dbCon.rs = dbCon.stmt.executeQuery(querySQL);
-			if(dbCon.rs != null && dbCon.rs.next() && dbCon.rs.getInt(1) > 0){
-				if(memberToCheck.getId() != dbCon.rs.getInt(1)){
-					throw new BusinessException(MemberError.HAS_MEMBER_CARD);
-				}
-			}
-			dbCon.rs.close();
+		
+		if(!memberToCheck.getMemberCard().isEmpty() && !getByCond(dbCon, staff, new ExtraCond().setCard(memberToCheck.getMemberCard()).toString(), null).isEmpty()){
+			throw new BusinessException(MemberError.MEMBER_CARD_DUPLICATED);
 		}
 		
 	}
@@ -698,26 +688,25 @@ public class MemberDao {
 	 * 			throws if the member type does NOT exist
 	 */
 	public static int insert(DBCon dbCon, Staff staff, Member.InsertBuilder builder) throws SQLException, BusinessException{
-		Restaurant restaurant = RestaurantDao.getById(staff.getRestaurantId());
 		//判断是否有会员模块
-		if(!restaurant.hasModule(Module.Code.MEMBER)){
+		if(!RestaurantDao.getById(staff.getRestaurantId()).hasModule(Module.Code.MEMBER)){
 			//限制添加条数
-			final int memberLimit = 50;
 			String sql = "SELECT COUNT(*) FROM " + Params.dbName + ".member WHERE restaurant_id = " + staff.getRestaurantId();
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
 			int memberCount = 0;
 			if(dbCon.rs.next()){
 				memberCount = dbCon.rs.getInt(1);
 			}
-			if(memberCount > memberLimit){
+			dbCon.rs.close(); 
+			if(memberCount > 50){
 				throw new BusinessException(ModuleError.MEMBER_LIMIT);
 			}
-			dbCon.rs.close(); 
 		}
+		
 		Member member = builder.build();
 
 		//检查是否信息有重复
-		checkValid(dbCon, member);
+		checkValid(dbCon, staff, member);
 		
 		String sql;
 		sql = " INSERT INTO " + Params.dbName + ".member " +
@@ -727,7 +716,7 @@ public class MemberDao {
 			  member.getMemberType().getId() + "," + 
 			  "'" + member.getMemberCard() + "'," +
 			  " CRC32('" + member.getMemberCard() + "')," +
-			  member.getRestaurantId() + "," + 
+			  staff.getRestaurantId() + "," + 
 			  "'" + member.getName() + "'," + 
 			  member.getSex().getVal() + "," + 
 			  "'" + member.getTele() + "'," + 
@@ -825,7 +814,7 @@ public class MemberDao {
 			}
 		}
 
-		checkValid(dbCon, member);
+		checkValid(dbCon, staff, member);
 		
 		String updateSQL = " UPDATE " + Params.dbName + ".member SET " 
 			+ " member_id = " + member.getId()  

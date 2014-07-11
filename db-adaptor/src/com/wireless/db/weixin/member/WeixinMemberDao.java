@@ -5,9 +5,11 @@ import java.sql.SQLException;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.client.member.MemberDao;
+import com.wireless.db.client.member.MemberTypeDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.weixin.restaurant.WeixinRestaurantDao;
 import com.wireless.exception.BusinessException;
+import com.wireless.exception.MemberError;
 import com.wireless.exception.WeixinMemberError;
 import com.wireless.pojo.client.Member;
 import com.wireless.pojo.staffMgr.Staff;
@@ -110,10 +112,8 @@ public class WeixinMemberDao {
 	
 	/**
 	 * Bind the weixin serial to exist member.
-	 * @param dbCon
-	 * 			the database connection
-	 * @param memberId
-	 * 			the exist member to which the weixin serial bind
+	 * @param mobile
+	 * 			the mobile to bind
 	 * @param weixinMemberSerial
 	 * 			the serial of member to bind
 	 * @param weixinRestaurantSerial
@@ -123,11 +123,11 @@ public class WeixinMemberDao {
 	 * @throws BusinessException
 	 * 			throws if the weixin member has NOT been interested in restaurant
 	 */
-	public static void bindExistMember(int memberId, String weixinMemberSerial, String weixinRestaurantSerial) throws SQLException, BusinessException{
+	public static int bind(String mobile, String weixinMemberSerial, String weixinRestaurantSerial) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			bindExistMember(dbCon, memberId, weixinMemberSerial, weixinRestaurantSerial);
+			return bind(dbCon, mobile, weixinMemberSerial, weixinRestaurantSerial);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -137,8 +137,8 @@ public class WeixinMemberDao {
 	 * Bind the weixin serial to exist member.
 	 * @param dbCon
 	 * 			the database connection
-	 * @param memberId
-	 * 			the exist member id to which the weixin serial bind
+	 * @param mobile
+	 * 			the mobile to bind
 	 * @param weixinMemberSerial
 	 * 			the serial of member to bind
 	 * @param weixinRestaurantSerial
@@ -146,89 +146,83 @@ public class WeixinMemberDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 * @throws BusinessException
-	 * 			throws if either cases below<br>
-	 * 			<li>throws if the member to be bound does NOT exist
-	 * 			<li>throws if the weixin member has NOT been interested in restaurant
+	 * 			throws if the weixin member has NOT been interested in restaurant
 	 */
-	public static void bindExistMember(DBCon dbCon, int memberId, String weixinMemberSerial, String weixinRestaurantSerial) throws SQLException, BusinessException{
-		
+	public static int bind(DBCon dbCon, String mobile, String weixinMemberSerial, String weixinRestaurantSerial) throws SQLException, BusinessException{
 		int restaurantId = WeixinRestaurantDao.getRestaurantIdByWeixin(dbCon, weixinRestaurantSerial);
-		
-		Member member = MemberDao.getById(dbCon, StaffDao.getStaffs(restaurantId).get(0), memberId);
-		
-		String sql;
-		sql = " UPDATE " + Params.dbName + ".weixin_member SET " +
-			  " status = " + Status.BOUND.getVal() + "," +
-			  " bind_date = NOW(), " +
-			  " member_id = " + member.getId() +
-			  " WHERE 1 = 1 " +
-			  " AND weixin_serial_crc = CRC32('" + weixinMemberSerial + "')" +
-			  " AND weixin_serial = '" + weixinMemberSerial + "'";
-		
-		if(dbCon.stmt.executeUpdate(sql) == 0){
-			throw new BusinessException(WeixinMemberError.WEIXIN_MEMBER_NOT_INTEREST);
-		}
+		return bind(dbCon, StaffDao.getAdminByRestaurant(restaurantId), mobile, getCardByWeixin(dbCon, weixinMemberSerial, weixinRestaurantSerial));
 	}
-	
+
 	/**
-	 * Bind the weixin to a new member. 
-	 * @param builder
-	 * 			the builder of new member to which the weixin bind
-	 * @param weixinMemberSerial
-	 * 			the weixin to bind
-	 * @param weixinRestaurantSerial
-	 * 			the weixin restaurant serial
-	 * @return the id to member just inserted
+	 * Bind the mobile with weixin card.
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param mobile
+	 * 			the mobile to bind
+	 * @param weixinCard
+	 * 			the weixin card to bind
+	 * @return the id to member binded
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
-	 * @throws BusinessException	
-	 * 			throws if failed to insert the new member<br>
-	 * 			throws if the weixin serial has NOT been interested before
+	 * @throws BusinessException
+	 * 			throws if the weixin to this card has NOT been interested
+	 * 			
 	 */
-	public static int bindNewMember(Member.InsertBuilder builder, String weixinMemberSerial, String weixinRestaurantSerial) throws SQLException, BusinessException{
+	public static int bind(Staff staff, String mobile, int weixinCard) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return bindNewMember(dbCon, builder, weixinMemberSerial, weixinRestaurantSerial);
+			return bind(dbCon, staff, mobile, weixinCard);
 		}finally{
 			dbCon.disconnect();
 		}
 	}
 	
 	/**
-	 * Bind the weixin to a new member. 
+	 * Bind the mobile with weixin card.
 	 * @param dbCon
-	 * 			the database connectin
-	 * @param builder
-	 * 			the builder of new member to which the weixin bind
-	 * @param weixinMemberSerial
-	 * 			the weixin to bind
-	 * @param weixinRestaurantSerial
-	 * 			the weixin restaurant serial
-	 * @return the id to member just inserted  
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param mobile
+	 * 			the mobile to bind
+	 * @param weixinCard
+	 * 			the weixin card to bind
+	 * @return the id to member binded
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
-	 * @throws BusinessException	
-	 * 			throws if failed to insert the new member<br>
-	 * 			throws if the weixin serial has NOT been interested before
+	 * @throws BusinessException
+	 * 			throws if the weixin to this card has NOT been interested
+	 * 			
 	 */
-	public static int bindNewMember(DBCon dbCon, Member.InsertBuilder builder, String weixinMemberSerial, String weixinRestaurantSerial) throws SQLException, BusinessException{
+	public static int bind(DBCon dbCon, Staff staff, String mobile, int weixinCard) throws SQLException, BusinessException{
 		
-		int restaurantId = WeixinRestaurantDao.getRestaurantIdByWeixin(dbCon, weixinRestaurantSerial);
-		int memberId = MemberDao.insert(dbCon, StaffDao.getStaffs(dbCon, restaurantId).get(0), builder);
+		int memberId = 0;
 		
+		try{
+			memberId = MemberDao.getByMobile(dbCon, staff, mobile).getId();
+		}catch(BusinessException e){
+			//Insert a new if the member associated with this mobile does NOT exist. 
+			if(e.getErrCode().equals(MemberError.MEMBER_NOT_EXIST)){
+				memberId = MemberDao.insert(dbCon, staff, new Member.InsertBuilder("微信会员", mobile, MemberTypeDao.getWeixinMemberType(staff).getId()));
+			}else{
+				throw e;
+			}
+		}
+		
+		//Bind mobile to member.
 		String sql;
 		sql = " UPDATE " + Params.dbName + ".weixin_member SET " +
 			  " status = " + Status.BOUND.getVal() + "," +
 			  " bind_date = NOW(), " +
 			  " member_id = " + memberId +
 			  " WHERE 1 = 1 " +
-			  " AND weixin_serial_crc = CRC32('" + weixinMemberSerial + "')" +
-			  " AND weixin_serial = '" + weixinMemberSerial + "'";
+			  " AND weixin_card = " + weixinCard;
 		
 		if(dbCon.stmt.executeUpdate(sql) == 0){
 			throw new BusinessException(WeixinMemberError.WEIXIN_MEMBER_NOT_INTEREST);
 		}
+		
 		return memberId;
 	}
 	
@@ -280,7 +274,7 @@ public class WeixinMemberDao {
 		Staff staff = StaffDao.getStaffs(dbCon, restaurantId).get(0);
 		Member member = MemberDao.getById(dbCon, staff, memberId);
 		member.setMobile(mobile);
-		MemberDao.checkValid(dbCon, member);
+		MemberDao.checkValid(dbCon, staff, member);
 		String updateSQL = " UPDATE " + Params.dbName + ".member SET mobile = " + "'" + member.getMobile() + "' WHERE member_id = " + member.getId(); 
 		dbCon.stmt.executeUpdate(updateSQL);
 //		MemberDao.update(dbCon, staff, new Member.UpdateBuilder(memberId, restaurantId).setMobile(mobile));
@@ -391,4 +385,27 @@ public class WeixinMemberDao {
 		return memberId;
 	}
 
+	public static int getCardByWeixin(DBCon dbCon, String weixinMemberSerial, String weixinRestaurantSerial) throws SQLException, BusinessException{
+		
+		int restaurantId = WeixinRestaurantDao.getRestaurantIdByWeixin(dbCon, weixinRestaurantSerial);
+		
+		String sql;
+		sql = " SELECT weixin_card FROM " + Params.dbName + ".weixin_member " +
+		      " WHERE 1 = 1 " +
+			  " AND weixin_serial_crc = CRC32('" + weixinMemberSerial + "')" +
+			  " AND weixin_serial = '" + weixinMemberSerial + "'" + 
+			  " AND restaurant_id = " + restaurantId;
+		
+		dbCon.rs = dbCon.stmt.executeQuery(sql);
+		int weixinCard = 0;
+		if(dbCon.rs.next()){
+			weixinCard = dbCon.rs.getInt("weixin_card");
+		}else{
+			throw new BusinessException(WeixinMemberError.WEIXIN_MEMBER_NOT_INTEREST);
+		}
+		dbCon.rs.close();
+		
+		return weixinCard;
+	}
+	
 }
