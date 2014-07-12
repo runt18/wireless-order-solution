@@ -61,8 +61,9 @@ public class OperateMemberAction extends DispatchAction{
 			
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
-			Member.InsertBuilder ib = new Member.InsertBuilder(staff.getRestaurantId(), name, mobile, Integer.valueOf(memberTypeId), Member.Sex.valueOf(Integer.valueOf(sex)));
+			Member.InsertBuilder ib = new Member.InsertBuilder(name, mobile, Integer.valueOf(memberTypeId));
 			ib.setBirthday(birthday)
+			  .setSex(Member.Sex.valueOf(Integer.valueOf(sex)))
 			  .setMemberCard(memberCard)
 			  .setTele(tele)
 			  .setIdCard(idCard)
