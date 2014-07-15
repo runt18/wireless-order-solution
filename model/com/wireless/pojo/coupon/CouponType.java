@@ -220,6 +220,10 @@ public class CouponType implements Jsonable{
 		this.image = image;
 	}
 	
+	public boolean hasImage(){
+		return image != null ? image.length() != 0 : false;
+	}
+	
 	@Override
 	public int hashCode(){
 		return id * 17 + 31;
@@ -248,6 +252,7 @@ public class CouponType implements Jsonable{
 		jm.putFloat("price", this.price);
 		jm.putFloat("expired", this.expired);
 		jm.putString("expiredFormat", DateUtil.formatToDate(this.expired));
+		jm.putString("image", this.image);
 		return jm;
 	}
 
