@@ -953,7 +953,7 @@ function operateWXLogo(c){
 	 	    height : 200,
 	 	    autoEl : {
 	 	    	tag : 'img',
-	 	    	title : '菜品图预览.'
+	 	    	title : '图片预览.'
 	 	    }
 		});
 		var imgFile = Ext.ux.plugins.createImageFile({

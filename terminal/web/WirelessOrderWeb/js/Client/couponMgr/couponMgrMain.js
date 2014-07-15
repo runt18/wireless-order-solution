@@ -4,6 +4,91 @@
  * 修改部门信息
  */
 function initCouponTypeWin(){
+		var coupon_uploadMask = new Ext.LoadMask(document.body, {
+			msg : '正在上传图片...'
+		});
+		var box = new Ext.BoxComponent({
+			xtype : 'box',
+	 	    columnWidth : 1,
+	 	    height : 200,
+	 	    width : 300,
+	 	    autoEl : {
+	 	    	tag : 'img',
+	 	    	title : '优惠券图片预览'
+	 	    }
+		});
+		var imgFile = Ext.ux.plugins.createImageFile({
+			img : box,
+			width : 300,
+			height : 200
+		});	
+		var btnUpload = new Ext.Button({
+			columnWidth : .18,
+ 	        text : '上传图片',
+ 	        listeners : {
+ 	        	render : function(thiz){
+ 	        		thiz.getEl().setWidth(60, true);
+ 	        	}
+ 	        },
+ 	        handler : function(e){
+ 	        	var check = true, img = '';
+	        	if(Ext.isIE){
+	        		Ext.getDom(imgFile.getId()).select();
+	        		img = document.selection.createRange().text;
+	        	}else{
+	 	        	img = Ext.getDom(imgFile.getId()).value;
+	        	}
+	        	if(typeof(img) != 'undefined' && img.length > 0){
+		 	        var type = img.substring(img.lastIndexOf('.') + 1, img.length);
+		 	        check = false;
+		 	        for(var i = 0; i < Ext.ux.plugins.imgTypes.length; i++){
+		 	        	if(type.toLowerCase() == Ext.ux.plugins.imgTypes[i].toLowerCase()){
+		 	        		check = true;
+			 	           	break;
+			 	        }
+		 	        }
+		 	        if(!check){
+			 	       	Ext.example.msg('提示', '图片类型不正确.');
+			 	        return;
+	 	        	}
+	        	}else{
+	        		Ext.example.msg('提示', '未选择图片.');
+	 	        	return;
+	        	}
+	        	var couponImgId = '';
+	        	if(operateCouponTypeWin.otype == 'update'){
+	        		couponImgId = Ext.getCmp('txtCouponTypeId').getValue();
+	        	}
+ 	        	coupon_uploadMask.show();
+ 	        	Ext.Ajax.request({
+ 	        		url : '../../OperateCouponType.do?dataSource=updateCouponImg&couponTypeId' + couponImgId,
+	 	   			isUpload : true,
+	 	   			form : form.getForm().getEl(),
+	 	   			success : function(response, options){
+	 	   				coupon_uploadMask.hide();
+	 	   				var jr = Ext.decode(response.responseText.replace(/<\/?[^>]*>/g,''));
+	 	   				operateCouponTypeWin.image = jr.other.imagePath;
+	 	   				Ext.ux.showMsg(jr);
+	 	   			},
+	 	   			failure : function(response, options){
+	 	   				coupon_uploadMask.hide();
+	 	   				Ext.ux.showMsg(Ext.decode(response.responseText.replace(/<\/?[^>]*>/g,'')));
+	 	   			}
+ 	        	});
+ 	        }
+		});	
+		var form = new Ext.form.FormPanel({
+			columnWidth : .82,
+			labelWidth : 60,
+			fileUpload : true,
+			items : [imgFile],
+			listeners : {
+ 	    		render : function(e){
+ 	    			Ext.getDom(e.getId()).setAttribute('enctype', 'multipart/form-data');
+	 	  		}
+ 	    	}
+		});	
+	
 	var minDate = new Date();
 	minDate.getDate() - 1;
 	operateCouponTypeWin = Ext.getCmp('operateCouponTypeWin');
@@ -14,45 +99,98 @@ function initCouponTypeWin(){
 			closable : false,
 			resizable : false,
 			modal : true,
-			width : 245,			
+			width : 600,			
 			items : [{
-				xtype : 'form',
-				layout : 'form',
-				width : 245,
-				labelWidth : 65,
-				frame : true,
+				layout : 'column',
+				frame : false,
 				items : [{
-					xtype : 'textfield',
-					id : 'txtCouponTypeName',
-					width : 130,
-					fieldLabel : '名称',
-					allowBlank : false
-				}, {
-					xtype : 'numberfield',
-					id : 'numCouponPrice',
-					width : 130,
-					fieldLabel : '面额',
-					allowBlank : false
+					columnWidth : .4,
+					xtype : 'form',
+					layout : 'form',
+					width : 300,
+					height : 260,
+					labelWidth : 65,
+					frame : true,
+					items : [{
+						xtype : 'textfield',
+						id : 'txtCouponTypeName',
+						width : 130,
+						fieldLabel : '名称',
+						allowBlank : false
+					}, {
+						xtype : 'numberfield',
+						id : 'numCouponPrice',
+						width : 130,
+						fieldLabel : '面额',
+						allowBlank : false
+					},{
+						id : 'dateForExpired',
+						xtype : 'datefield',
+						minValue : minDate,
+						width : 130,
+						fieldLabel : '有效期至',
+						format : 'Y-m-d',
+						readOnly : false,
+						allowBlank : false,
+						blankText : '日期不能为空.'
+					},{
+						xtype : 'textarea',
+						id : 'txtDirectionsForCouponType',
+						fieldLabel : '备注',
+						width : 130
+					},{
+						xtype : 'hidden',
+						id : 'txtCouponTypeId'
+					}]	
+		 	    	
 				},{
-					id : 'dateForExpired',
-					xtype : 'datefield',
-					minValue : minDate,
-					width : 130,
-					fieldLabel : '有效期至',
-					format : 'Y-m-d',
-					readOnly : false,
-					allowBlank : false,
-					blankText : '日期不能为空.'
-				},{
-					xtype : 'textarea',
-					id : 'txtDirectionsForCouponType',
-					fieldLabel : '备注',
-					width : 130
-				},{
-					xtype : 'hidden',
-					id : 'txtCouponTypeId'
+					columnWidth : .6,
+					xtype : 'panel',
+					layout : 'column',
+					frame : true,
+					items : [box, {
+							columnWidth: 1, 
+							height: 20,
+							html : '<sapn style="font-size:13px;color:green;">提示: 单张图片大小不能超过100KB.</span>'
+						},
+						form,
+						btnUpload],
+					listeners : {
+		 	    		render : function(e){
+		 	    			Ext.getDom(e.getId()).setAttribute('enctype', 'multipart/form-data');
+			 	  		}
+		 	    	}					
 				}]
-			}],
+			}],			
+			listeners : {
+				show : function(){
+					if(operateCouponTypeWin.otype == 'update'){
+						Ext.Ajax.request({
+							url : '../../QueryCouponType.do',
+							params : {
+								dataSource : 'getImage',
+								couponTypeId : Ext.getCmp('txtCouponTypeId').getValue()
+							},
+							success : function(res, opt){
+								var jr = Ext.decode(res.responseText);
+//								imgFile.setImg('http://food-image-test.oss.aliyuncs.com/WXMaterial/40/20140709154426549.png');
+								if(jr.success){
+									imgFile.setImg(jr.other.image);
+								}
+								
+							},
+							fialure : function(res, opt){
+								wx.lm.hide();
+								Ext.ux.showMsg(res.responseText);
+							}
+						});
+					}
+				},
+				hide : function(){
+					imgFile.setImg();
+					delete operateCouponTypeWin.image; 
+				}
+			},			
 			bbar : [
 				'->',
 				{
@@ -86,7 +224,8 @@ function initCouponTypeWin(){
 								typeName : name.getValue(),
 								price : price.getValue(),
 								date : date.getValue().getTime(),
-								desc : desc.getValue()
+								desc : desc.getValue(),
+								image : operateCouponTypeWin.image 
 							},
 							success : function(res, opt){
 								var jr = Ext.util.JSON.decode(res.responseText);
@@ -347,14 +486,16 @@ function couponTypeOperation(c){
 		price.disable();
 	}
 	
-	operateCouponTypeWin.show();
-	operateCouponTypeWin.center();
+
 	
 	id.setValue(data.attributes.couponTypeId);
 	name.setValue(data.attributes.typeName);
 	price.setValue(data.attributes.price);
 	date.setValue(data.attributes.date);
 	desc.setValue(data.attributes.desc);
+	
+	operateCouponTypeWin.show();
+	operateCouponTypeWin.center();	
 	
 	name.focus(true, 100);
 	
