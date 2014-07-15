@@ -468,7 +468,7 @@ public class CouponDao {
 		String sql;
 		sql = " SELECT " +
 			  " C.coupon_id, C.restaurant_id, C.coupon_type_id, C.birth_date, C.create_staff, C.member_id, C.order_id, C.order_date, C.status, " +
-			  " CT.name, CT.price, CT.expired, " +
+			  " CT.name, CT.price, CT.expired, CT.image, " +
 			  " M.name AS member_name, M.mobile, M.member_card " +
 			  " FROM " + Params.dbName + ".coupon C " +
 			  " JOIN " + Params.dbName + ".coupon_type CT ON C.coupon_type_id = CT.coupon_type_id " +
@@ -486,6 +486,7 @@ public class CouponDao {
 			ct.setPrice(dbCon.rs.getFloat("price"));
 			ct.setName(dbCon.rs.getString("name"));
 			ct.setExpired(dbCon.rs.getTimestamp("expired").getTime());
+			ct.setImage(dbCon.rs.getString("image"));
 			coupon.setCouponType(ct);
 			coupon.setBirthDate(dbCon.rs.getTimestamp("birth_date").getTime());
 			coupon.setCreateStaff(dbCon.rs.getString("create_staff"));
