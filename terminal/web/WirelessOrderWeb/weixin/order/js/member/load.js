@@ -47,6 +47,7 @@ $(function(){
 				});
 			}else{
 				if(data.code == 7400){
+					$('#divMemberCard').css('display', 'block');
 					$('#divVerifyAndBind').css('display', 'block');
 				}else{
 					Util.dialog.show({msg: data.msg});
@@ -59,7 +60,11 @@ $(function(){
 		}
 	});
 	
-
+var autoWidth = function()
+{
+	 calcFloatDivs();
+};
+window.onresize = autoWidth;
 
 	
 });

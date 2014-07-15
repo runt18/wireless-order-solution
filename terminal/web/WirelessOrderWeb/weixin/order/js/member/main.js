@@ -59,16 +59,19 @@ function setBtnDisabledByReset(s){
  */
 function getVerifyCode(c){
 	c = c == null ? {} : c;
+	var btnVerifyCode = $('#btnGetVerifyCode');
+	var btnBindMember = $('#btnBindMember');
 	var mobile = $('#txtVerifyMobile');
+	
 	if(!params.MobileCode.code.test(mobile.val().trim())){
-		Util.dialog.show({msg: params.MobileCode.text});
+		Util.dialog.show({msg: params.MobileCode.text, callback : function(){showMemberBind();}});
 		return;
 	}
 	
-	c.event = typeof c.event == 'undefined' ? document.getElementById('btnVerifyCode') : c.event;
-	var btnBindMember = document.getElementById('btnBindMember');
+	c.event =  document.getElementById('btnVerifyCode');
 	
-	setBtnDisabled(true);
+	
+//	setBtnDisabled(true);
 	mobile.attr('disabled', true);
 	verifyMobile = mobile;
 	$.ajax({
@@ -84,22 +87,25 @@ function getVerifyCode(c){
 		success : function(data, status, xhr){
 			if(data.success){
 				verifyCode = data.other.code;
-				btnBindMember.removeAttribute('disabled');
 				Util.lineTD($('#divVerifyAndBind > div[data-type=detail]'), 'show');
 				var interval = null, time = 60;
+				btnVerifyCode.hide();
+				btnBindMember.show();
+								
 				interval = window.setInterval(function(){
 					if(time == 0){
-						c.event.innerHTML = '点击获取验证码';
-						c.event.removeAttribute('disabled');
 						window.clearInterval(interval);
 						mobile.removeAttr('disabled');
+						btnBindMember.hide();
+						btnVerifyCode.show();
+						c.event.innerHTML ="";
 					}else{
 						c.event.innerHTML = '<font color="red">'+time+'</font>秒后可重新获取';
 					}
 					time--;
 				}, 1000);
 			}else{
-				setBtnDisabled(false);
+//				setBtnDisabled(false);
 				Util.dialog.show({msg: "获取验证码失败, 请稍候再试."});
 			}
 		},
@@ -174,7 +180,7 @@ function getVerifyCodeByReset(c){
 	c = c == null ? {} : c;
 	var mobile = $('#txtVerifyMobileByReset');
 	if(!params.MobileCode.code.test(mobile.val().trim())){
-		Util.dialog.show({msg: params.MobileCode.text});
+		Util.dialog.show({msg: params.MobileCode.text, callback : function(){showMemberBind();}});
 		return;
 	}
 	if(mobile.val().trim() == member.mobile){
@@ -373,21 +379,51 @@ function toggleRechargeDetails(){
 		}
 	});
 }
+
+function calcFloatDivs(){
+	var divCouponsW = $('#divMemberCouponContentView').width();
+	var i = member.couponCount;
+	var totalW = 130 * i;
+	while(totalW > divCouponsW){
+		i --;
+		totalW = 130 * i;
+	}
+	
+	var paddingW = divCouponsW - totalW;
+	var divPadding = 0;
+	if(paddingW > 0){
+		divPadding = paddingW/2;
+	}
+	
+	var rowCount = (130 * member.couponCount) / divCouponsW;
+	var divCouponsH = 0 + 'px';
+	if(0 < rowCount && rowCount <1){
+		divCouponsH = 160 + 'px';
+	}else if(1 < rowCount && rowCount < 2){
+		divCouponsH = 160*2 +'px';
+	}else if(2 < rowCount && rowCount < 3){
+		divCouponsH = 160*3 +'px';
+	}	
+	
+	$('#divMemberCouponContentView').css({'padding-left' : divPadding+'px'});
+	$('#divMemberCouponContentView').css({'height' : divCouponsH});
+	
+} 
+
+
 /**
  * 现有优惠券
  */
 function toggleCouponContent(){
 	var mainView = $('#divMemberCouponContentView');
-	var tbody = mainView.find('table > tbody');
-	var templet = '<tr class="d-list-item">'
-		+ '<td>{name}</td>'
-		+ '<td>{price}</td>'
-		+ '<td>{expiredTime}</td>'
-		+ '</tr>';
+	
+	var templet = '<div class="box">' +
+					'<div class="box_in"><img src="{couponImg}"></div>' +
+					'<span>{name}</span><br><span>到期 : {expiredTime}</span>' +
+				  '</div>';	
 	mainView.fadeToggle(function(){
 		if(mainView.css('display') == 'block'){
 			if(!toggleCouponContent.load){
-				// 加载近5条消费记录
 				toggleCouponContent.load = function(){
 					Util.lm.show();
 					$.ajax({
@@ -403,15 +439,23 @@ function toggleCouponContent(){
 							Util.lm.hide();
 							if(data.success){
 								var html = [], temp = null;
-								for(var i = 0; i < data.root.length; i++){
-									temp = data.root[i];
-									html.push(templet.format({
-										name : temp.couponType.name,
-										price : temp.couponType.price.toFixed(2),
-										expiredTime : temp.couponType.expiredFormat
-									}));
+								member.couponCount = data.root.length;
+								if(data.root.length > 0){
+									for(var i = 0; i < data.root.length; i++){
+										temp = data.root[i];
+										html.push(templet.format({
+											couponImg : temp.couponType.image,
+											name : temp.couponType.name,
+											expiredTime : temp.couponType.expiredFormat
+										}));
+									}
+									mainView.html(html);
+									
+									calcFloatDivs();
+									
+								}else{
+									mainView.html('暂无优惠券');
 								}
-								tbody.html(html.length == 0 ? '暂无优惠券' : html.join(''));
 							}else{
 								Util.dialog.show({title: data.title, msg: data.msg});						
 							}
@@ -425,7 +469,7 @@ function toggleCouponContent(){
 			}
 			toggleCouponContent.load();
 		}else{
-			tbody.html('');
+			mainView.html('');
 		}
 	});
 }
@@ -526,4 +570,13 @@ function toggleMemberLevel(){
 			mainView.html('');
 		}
 	});
+}
+
+
+function showMemberBind(){
+	$('#ulVerifyAndBind').show();
+	$('#divOccupyHtml').show();
+	$('html, body').animate({scrollTop: $(document).height()}, 'fast'); 
+
+	$('#txtVerifyMobile').focus();
 }

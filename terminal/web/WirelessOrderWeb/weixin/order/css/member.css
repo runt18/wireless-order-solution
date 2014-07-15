@@ -54,7 +54,7 @@ input[type=text], input[type=number]{
 	border: 0;
 	background: #fff;
 }
-#btnBindMember, #btnBindMemberByReset{
+#btnBindMember, #btnBindMemberByReset, #btnGetVerifyCode{
 	width: 200px;
 	letter-spacing: 10px;
 	padding: 3px 5px 3px 5px;

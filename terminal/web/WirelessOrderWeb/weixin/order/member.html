@@ -4,6 +4,100 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no,maximum-scale=1">
 <title>会员中心</title>
+<style>
+
+.box {
+	/* position:relative;  */
+	float :left;
+	margin-left : 10px;
+	margin-top : 5px;
+	line-height : 15px;
+	border:solid 5px #fff;
+	width:112px;
+	height:145px;
+	/* margin:0 auto; */
+	/* border-radius: 255px 15px 225px 15px/15px 225px 15px 255px; */
+	border:1px solid;
+	border-radius:8px;	
+	padding:2px;
+	color:#666;
+	box-shadow:2px 3px 1px rgba(0, 0, 0, .75)
+}
+.box_in {
+	/* position:relative; */
+	float :left;
+	background:#fff;
+	border:solid 5px #fff;
+	width:112px;
+	height:145px;
+	/* margin:0 auto; */
+	border-radius: 255px 15px 225px 15px/15px 225px 15px 255px;
+	padding:2px;
+	color:#666;
+	box-shadow:2px 3px 1px rgba(0, 0, 0, .75)
+}
+.box .box_in {
+/* 	position:absolute; */
+	top:5px;
+	left:5px;
+	width:100px;
+	height:100px;
+	border-color:#593207;
+	box-shadow:none;
+}
+.box span{
+	margin-left: 5px;font-size: 10px;
+	font-family:microsoft yahei, Arial, Helvetica, sans-serif;
+}
+
+.box_in img{
+	width : 100px;height : 100px;
+}
+
+
+.a_demo_two {
+    background-color:#6fba26;
+    padding:5px 70px 5px;
+    position:relative;
+    font-family: 'Open Sans', sans-serif;
+    font-size:12px;
+    text-decoration:none;
+    color:#fff;
+    background-image: linear-gradient(bottom, rgb(100,170,30) 0%, rgb(129,212,51) 100%);
+    box-shadow: inset 0px 1px 0px #2ab7ec, 0px 3px 0px 0px #156785, 0px 4px 4px #999;
+    border-radius: 5px;
+}
+ 
+.a_demo_two:active {
+    top:4px;
+    background-image: linear-gradient(bottom, rgb(100,170,30) 100%, rgb(129,212,51) 0%);
+    box-shadow: inset 0px 1px 0px #2ab7ec, 0px 2px 0px 0px #156785, 0px 5px 3px #999;
+    color: #156785;
+    text-shadow: 0px 1px 1px rgba(255,255,255,0.3);
+    background: rgb(44,160,202);
+}
+.a_demo_two:before {
+    background-color:#072239 ;
+    content:"";
+    display:block; 
+    position:absolute;
+    width:100%;
+    height:100%;
+    padding-left:2px;
+    padding-right:2px;
+    padding-bottom:4px;
+    left:-2px;
+     z-index:-1;
+/*    top:5px;
+     border-radius: 6px;
+   box-shadow:inset 0px 1px 0px #2ab7ec, 0px 5px 0px 0px #032b3a, 0px 10px 5px #999 ; */
+}
+ 
+.a_demo_two:active::before {
+    top:-2px;
+}
+
+</style>
 <link rel="stylesheet" href="./css/base.css">
 <link rel="stylesheet" href="./css/member.css">
 <link type="text/css" rel="stylesheet" href="./css/mbar.css">
@@ -43,6 +137,7 @@ var totalMath = 0;
 </div>
 
 <div id="divMemberContent" class="main-box">
+
 <ul class="m-b-list">
 	<!-- <li class="box-horizontal" onclick="Util.skip('member_data_dateil.html')"> -->
 	<li class="box-horizontal">
@@ -131,19 +226,35 @@ var totalMath = 0;
 		<div id="divMyCoupon" class="event">&nbsp;<font>&gt;</font></div>
 	</li>
 	<li>
-		<div id="divMemberCouponContentView" style="display:none; width:100%; ">
-		<table class="d-list">
-			<thead>
-			<tr class="d-list-title">
-				<td style="width:40%;">券名</td>
-				<td style="width:25%;">面额</td>
-				<td style="width:35%;">到期时间</td>
-			</tr>
-			</thead>
-			<tbody>
-			</tbody>
-		</table>
-		<div style="color:#595959;" onclick="toggleCouponContent.load()">提示:显示现有优惠券.<span style="color:#898989;">点击刷新</span></div>
+		<div id="divMemberCouponContentView" style="display:none; width:100%;" >
+		<div id="divMemberCouponContentViews">
+	<!-- 		<div class="box">
+				<div class="box_in">
+					<img src="images/wugu.jpg">
+				</div>
+				
+				<span>优惠一只鸡</span><br>
+				<span>到期 : 2014-07-09</span>
+			</div>
+			
+			<div class="box">
+				<div class="box_in">
+					<img src="images/donggu.jpg">
+				</div>
+				
+				<span>优惠一只鸭</span><br>
+				<span>到期 : 2014-07-09</span>
+			</div>
+			<div class="box">
+				<div class="box_in">
+					<img src="images/QQ20140326103344.jpg">
+				</div>
+				
+				<span>优惠一只鹅</span><br>
+				<span>到期 : 2014-07-09</span>
+			</div> -->
+		</div>	
+		<!-- <div style="color:#595959;" onclick="toggleCouponContent.load()">提示:显示现有优惠券.<span style="color:#898989;">点击刷新</span></div> -->
 		</div>
 	</li>
 </ul>
@@ -157,6 +268,7 @@ var totalMath = 0;
 	</li>
 	<li>
 		<div id="divMemberCouponConsumeDetails" style="display:none; width:100%; ">
+		
 		<table class="d-list">
 			<thead>
 			<tr class="d-list-title">
@@ -174,26 +286,41 @@ var totalMath = 0;
 </ul>
 </div>
 
-<div id="divVerifyAndBind" class="main-box">
-<ul class="m-b-list">
-	<li class="none-line title" >请绑定会员</li>
+<div id="divVerifyAndBind" class="main-box" style="margin-top: 10px;">
+
+
+<ul class="m-b-list" >
+	<li class="box-horizontal" >
+		<!-- <div style="line-height: 55px;" onclick="javascript:$('#ulVerifyAndBind').hide();">激活后可享受更多优惠</div> -->
+		<div style="margin-top: 3px;height: 40px;width: 100%;text-align: center;" >
+			<a href="#" class="a_demo_two" style="font-size: 20px;font-weight: bold;" onclick="showMemberBind()">激活</a>	
+		
+		</div>
+	</li>		
+	<li id="ulVerifyAndBind" style="display: none;">
+	<ul class="m-b-list">
 	<li class="none-line" style="line-height: 50px;">
 		手机号: <input id="txtVerifyMobile" type="text" maxlength="11"/>
 	</li>
 	<li class="none-line" style="line-height: 50px;">
-		验证码: <input id="txtVerifyCode" type="number" maxlength="4" style="width:80px;"/>
-		<div id="btnVerifyCode" onClick="getVerifyCode({event:this})">点击获取验证码</div>
+		验证码: <input id="txtVerifyCode" type="text" maxlength="4" style="width:80px;"/>
+<!-- 		<div style="border:1px solid;
+					border-radius:5px;background-color: cyan" id="btnVerifyCode" onClick="getVerifyCode({event:this})">点击获取验证码</div> -->
+		<a id="btnVerifyCode" href="#" style="color: blue; font-size: 18px;" ></a>
 	</li>
-	<li class="none-line">
+<!-- 	<li class="none-line">
 		会员名: <input id="txtVerifyName" type="text"/>
 	</li>
 	<li class="none-line" style="line-height:50px;">
 		性&nbsp;&nbsp;别: 
 		<span onclick="this.childNodes[0].checked=true;"><input type="radio" value="0" name="radioVerifySex" checked/>&nbsp;男</span>&nbsp;&nbsp;
 		<span onclick="this.childNodes[0].checked=true;"><input type="radio" value="1" name="radioVerifySex"/>&nbsp;女</span>
-	</li>
+	</li> -->
 	<li style="text-align: center;">
-		<input id="btnBindMember" type="button" value="确认绑定" disabled onClick="bindMember({event:this})">
+		<input id="btnGetVerifyCode" type="button" value="获取验证码" onClick="getVerifyCode({event:this})">
+		<input id="btnBindMember" type="button" value="确认绑定" style="display: none;" onClick="bindMember({event:this})">
+	</li>
+	</ul>
 	</li>
 </ul>
 </div>
@@ -206,7 +333,8 @@ var totalMath = 0;
 	</li>
 	<li class="none-line" style="line-height: 50px;">
 		验证码: <input id="txtVerifyCodeByReset" type="number" maxlength="4" style="width:80px;"/>
-		<button id="btnVerifyCodeByReset" onClick="getVerifyCodeByReset({event:this})">点击获取验证码</button>
+		<!-- <button id="btnVerifyCodeByReset" onClick="getVerifyCodeByReset({event:this})">点击获取验证码</button> -->
+		<a href="#" onClick="getVerifyCodeByReset({event:this})">点击获取验证码</a>
 	</li>
 	<li style="text-align: center;">
 		<input id="btnBindMemberByReset" type="button" value="确认绑定" disabled onClick="bindMemberByReset({event:this})">
@@ -215,6 +343,7 @@ var totalMath = 0;
 </div>
 
 <div id="divInsertBefore"></div>
+<div id="divOccupyHtml" style="height :200px;"></div>
 <div class="footer">&copy; 2014 技术支持：智易科技</div>
 <div style="height: 45px;">&nbsp;</div>
  
