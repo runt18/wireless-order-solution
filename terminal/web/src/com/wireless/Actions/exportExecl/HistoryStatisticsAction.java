@@ -2348,64 +2348,47 @@ public class HistoryStatisticsAction extends DispatchAction{
 		
 		String pin = (String)request.getAttribute("pin");
 		Staff staff = StaffDao.verify(Integer.parseInt(pin));
+		List<Member> list = null;
 		
-		String extraCond = " ", orderClause = " ";
+		String  orderClause = " ";
 		String id = request.getParameter("id");
 		String memberType = request.getParameter("memberType");
 		String memberTypeAttr = request.getParameter("memberTypeAttr");
-		String name = request.getParameter("name");
-		String memberCard = request.getParameter("memberCard");
-		String mobile = request.getParameter("mobile");
-		String totalBalance = request.getParameter("totalBalance");
+		String memberCardOrMobileOrName = request.getParameter("memberCardOrMobileOrName");
+//		String totalBalance = request.getParameter("usedBalance");
 		String usedBalance = request.getParameter("usedBalance");
 		String consumptionAmount = request.getParameter("consumptionAmount");
-		String point = request.getParameter("point");
-		String usedPoint = request.getParameter("usedPoint");
-		String so = request.getParameter("so");
+		
+//		String point = request.getParameter("point");
+//		String usedPoint = request.getParameter("usedPoint");
+//		String usedBalanceEqual = request.getParameter("usedBalanceEqual");
+//		String consumptionAmountEqual = request.getParameter("consumptionAmountEqual");
+		
+		MemberDao.ExtraCond extraCond = new MemberDao.ExtraCond();
 		
 		if(id != null && !id.trim().isEmpty() && Integer.valueOf(id.trim()) > 0){
-			extraCond += (" AND M.member_id = " + id);
+			extraCond.setId(Integer.parseInt(id));
 		}else{
-			if(so != null){
-				so = so.trim();
-				if(so.equals("0")){
-					so = "=";
-				}else if(so.equals("1")){
-					so = ">=";
-				}else if(so.equals("2")){
-					so = "<=";
-				}else{
-					so = "=";
-				}
-			}else{
-				so = "=";
-			}
-			
 			if(memberType != null && !memberType.trim().isEmpty())
-				extraCond += (" AND M.member_type_id = " + memberType);
-			if(name != null && !name.trim().isEmpty())
-				extraCond += (" AND M.name like '%" + name.trim() + "%'");
+				extraCond.setMemberType(Integer.parseInt(memberType));
 			
-			if(memberCard != null && !memberCard.trim().isEmpty())
-				extraCond += (" AND M.member_card like '%" + memberCard.trim() + "%'");
-			
-			if(mobile != null && !mobile.trim().isEmpty())
-				extraCond += (" AND M.mobile like '%" + mobile.trim() + "%'");
-				
-			if(totalBalance != null && !totalBalance.trim().isEmpty())
-				extraCond += (" AND (M.base_balance + M.extra_balance) " + so + totalBalance);
+			if(memberCardOrMobileOrName != null && !memberCardOrMobileOrName.trim().isEmpty())
+				extraCond.setFuzzyName(memberCardOrMobileOrName);
+/*				if(totalBalance != null && !totalBalance.trim().isEmpty())
+				extraCond += (" AND (M.base_balance + M.extra_balance) " + so + totalBalance);*/
 			
 			if(usedBalance != null && !usedBalance.trim().isEmpty())
-				extraCond += (" AND M.used_balance " + so + usedBalance);
+				extraCond.setTotalConsume(0, Integer.parseInt(usedBalance));
+				
 			
 			if(consumptionAmount != null && !consumptionAmount.trim().isEmpty())
-				extraCond += (" AND M.consumption_amount " + so + consumptionAmount);
+				extraCond.setConsumeRange(0, Integer.parseInt(consumptionAmount));
 			
-			if(usedPoint != null && !usedPoint.trim().isEmpty())
+/*				if(usedPoint != null && !usedPoint.trim().isEmpty())
 				extraCond += (" AND M.total_point " + so + usedPoint);
 			
 			if(point != null && !point.trim().isEmpty())
-				extraCond += (" AND M.point " + so + point);
+				extraCond += (" AND M.point " + so + point);*/
 		}
 		
 		orderClause = " ORDER BY M.member_id ";
@@ -2420,12 +2403,12 @@ public class HistoryStatisticsAction extends DispatchAction{
 			// 分页
 			orderClause += " LIMIT " + start + "," + limit;
 		}*/
-		List<Member> list = MemberDao.getByCond(staff, extraCond, orderClause);
+		list = MemberDao.getByCond(staff, extraCond, orderClause);
 		List<Member> newList = new ArrayList<Member>(list);  
 		if(memberTypeAttr != null && !memberTypeAttr.trim().isEmpty()){
 			newList.clear();
 			if(Integer.parseInt(memberTypeAttr) == MemberType.Attribute.INTERESTED.getVal()){
-				newList.addAll(MemberDao.getInterestedMember(staff, extraCond));
+				newList.addAll(MemberDao.getInterestedMember(staff, extraCond.toString()));
 			}else{
 				List<Member> attrMember = new ArrayList<Member>();  
 				for (Member member : list) {

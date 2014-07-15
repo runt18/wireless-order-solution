@@ -73,6 +73,15 @@ public class OperateCouponAction extends DispatchAction{
 			}
 			CouponDao.insertAll(StaffDao.verify(Integer.parseInt(pin)), builder);
 			
+/*			try{
+				//Send SMS.
+				SMS.send(StaffDao.verify(Integer.parseInt(pin)), mo.getMemberMobile(), new SMS.Msg4Charge(mo));
+				jobject.setMsg(jobject.getMsg() + "充值短信发送成功.");
+			}catch(Exception e){
+				jobject.setMsg(jobject.getMsg() + "充值短信发送失败(" + e.getMessage() + ")");
+				e.printStackTrace();
+			}*/
+			
 			jobject.initTip(true, "发放成功");
 		}catch(BusinessException e){
 			e.printStackTrace();

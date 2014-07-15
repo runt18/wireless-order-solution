@@ -24,6 +24,8 @@ import com.wireless.json.JObject;
 import com.wireless.pojo.client.MemberOperation;
 import com.wireless.pojo.coupon.Coupon;
 import com.wireless.pojo.staffMgr.Staff;
+import com.wireless.util.OSSParams;
+import com.wireless.util.OSSUtil;
 import com.wireless.util.SQLUtil;
 
 public class WXQueryMemberOperationAction extends DispatchAction{
@@ -168,6 +170,7 @@ public class WXQueryMemberOperationAction extends DispatchAction{
 		response.setCharacterEncoding("UTF-8");
 		
 		JObject jobject = new JObject();
+		String imageBrowseDefaultFile = this.getServlet().getInitParameter("imageBrowseDefaultFile");
 		DBCon dbCon = null;
 		try{
 			dbCon = new DBCon();
@@ -200,6 +203,14 @@ public class WXQueryMemberOperationAction extends DispatchAction{
 			}
 			
 			jobject.getOther().put("root", root);*/
+			for (Coupon temp : couponList) {
+				if(temp.getCouponType().hasImage()){
+					temp.getCouponType().setImage(("http://" + OSSUtil.BUCKET_IMAGE + "." + OSSParams.instance().OSS_OUTER_POINT + "/" + temp.getRestaurantId() + "/" + temp.getCouponType().getImage()));
+				}else{
+					temp.getCouponType().setImage(imageBrowseDefaultFile);
+				}
+			}
+			
 			jobject.setRoot(couponList);
 		}catch(BusinessException e){	
 			e.printStackTrace();

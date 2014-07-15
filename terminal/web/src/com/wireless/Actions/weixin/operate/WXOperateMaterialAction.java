@@ -81,7 +81,7 @@ public class WXOperateMaterialAction extends DispatchAction {
 	                		// 原始图片
 	                		OSSUtil.uploadImage(uploadStream, key);
 	                		jobject.initTip(true, "操作成功, 上传图片信息成功!");
-	                		final String url = getServlet().getInitParameter("oss_bucket_image") +
+	                		final String url = "http://" + getServlet().getInitParameter("oss_bucket_image") +
 	                						   "." + getServlet().getInitParameter("oss_outer_point") + "/" + key;
 	                		jobject.setExtra(new Jsonable(){
 
