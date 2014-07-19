@@ -478,7 +478,7 @@ public class OrderFoodDao {
 			  " `restaurant_id`, `order_id`, `food_id`, `order_count`, `unit_price`, `commission`, `name`, `food_status`, " +
 			  " `discount`, `taste_group_id`, " +
 			  " `dept_id`, `kitchen_id`, " +
-			  " `staff_id`, `waiter`, `order_date`, `is_temporary`, `is_paid`, " +
+			  " `staff_id`, `waiter`, `order_date`, `is_temporary`, `is_paid`, `is_gift`, " +
 			  " `combo_id` " +
 			  " ) " +
 			  " VALUES " +
@@ -500,6 +500,7 @@ public class OrderFoodDao {
 			  "NOW(), " + 
 			  (builder.extra.isTemp() ? 1 : 0) + ", " +
 			  (builder.isPaid ? 1 : 0) + "," +
+			  (builder.extra.isGift() ? 1 : 0) + "," +
 			  (comboId != 0 ? comboId : "NULL") +
 			  " ) ";
 		dbCon.stmt.executeUpdate(sql);	

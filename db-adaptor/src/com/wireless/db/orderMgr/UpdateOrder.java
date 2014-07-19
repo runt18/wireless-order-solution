@@ -34,7 +34,6 @@ public class UpdateOrder {
 	public static class DiffResult{
 		public final Order oriOrder;
 		public final Order newOrder;
-		public final List<OrderFood> giftFoods = new ArrayList<OrderFood>();
 		public final List<OrderFood> extraFoods = new ArrayList<OrderFood>();
 		public final List<OrderFood> cancelledFoods = new ArrayList<OrderFood>();
 		public final List<OrderFood> hurriedFoods = new ArrayList<OrderFood>();
@@ -217,10 +216,6 @@ public class UpdateOrder {
 		if(!diffResult.cancelledFoods.isEmpty() && !staff.getRole().hasPrivilege(Privilege.Code.CANCEL_FOOD)){
 			//Check to see whether the staff has privilege to cancel the food
 			throw new BusinessException(StaffError.CANCEL_FOOD_NOT_ALLOW);
-			
-		}else if(!diffResult.giftFoods.isEmpty() && !staff.getRole().hasPrivilege(Privilege.Code.GIFT)){
-			//Check to see whether the staff has privilege to present the food
-			throw new BusinessException(StaffError.GIFT_NOT_ALLOW);
 		}
 		
 		return diffResult;
@@ -252,49 +247,6 @@ public class UpdateOrder {
 		for(OrderFood extraFood : diffResult.extraFoods){
 
 			OrderFoodDao.insertExtra(dbCon, staff, new OrderFoodDao.ExtraBuilder(diffResult.newOrder.getId(), extraFood).setPaid(diffResult.oriOrder.isUnpaid()));
-			
-//			/**
-//			 * Insert the taste group info if containing taste.
-//			 */
-//			if(extraFood.hasTasteGroup()){
-//				
-//				TasteGroup tg = extraFood.getTasteGroup();		
-//				
-//				int tgId = TasteGroupDao.insert(dbCon, staff, new TasteGroup.InsertBuilder(extraFood.asFood())
-//			     															.addTastes(tg.getNormalTastes())
-//			     															.setTmpTaste(tg.getTmpTaste()));
-//				tg.setGroupId(tgId);
-//				
-//			}
-//			
-//			sql = " INSERT INTO " + Params.dbName + ".order_food " +
-//				  " ( " + 
-//				  " `restaurant_id`, `order_id`, `food_id`, `order_count`, `unit_price`, `commission`, `name`, `food_status`, " +
-//				  " `discount`, `taste_group_id`, " +
-//				  " `dept_id`, `kitchen_id`, " +
-//				  " `staff_id`, `waiter`, `order_date`, `is_temporary`, `is_paid` " +
-//				  " ) " +
-//				  " VALUES " +
-//				  "(" +
-//				  staff.getRestaurantId() + ", " +
-//				  diffResult.newOrder.getId() + ", " +
-//				  extraFood.getFoodId() + ", " +
-//				  extraFood.getCount() + ", " + 
-//				  extraFood.asFood().getPrice() + ", " + 
-//				  extraFood.asFood().getCommission() + ", " +
-//				  "'" + extraFood.getName() + "', " + 
-//				  extraFood.asFood().getStatus() + ", " +
-//				  extraFood.getDiscount() + ", " +
-//				  extraFood.getTasteGroup().getGroupId() + ", " +
-//				  extraFood.getKitchen().getDept().getId() + ", " +
-//				  extraFood.getKitchen().getId() + ", " +
-//				  staff.getId() + ", " +
-//				  "'" + staff.getName() + "', " +
-//				  "NOW(), " + 
-//				  (extraFood.isTemp() ? 1 : 0) + ", " +
-//				  (diffResult.oriOrder.isUnpaid() ? 0 : 1) +
-//				  " ) ";
-//			dbCon.stmt.executeUpdate(sql);		
 			
 			//FIXME Insert the temporary food to menu.
 //			if(extraFood.isTemp()){
@@ -487,10 +439,6 @@ public class UpdateOrder {
 			
 			if(newFood.isHurried()){
 				result.hurriedFoods.add(newFood);
-			}
-			
-			if(newFood.isGift()){
-				result.giftFoods.add(newFood);
 			}
 			
 			Iterator<OrderFood> iterOri = oriFoods.iterator();

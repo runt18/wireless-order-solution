@@ -700,7 +700,37 @@ public class OrderDao {
 		return orderId;
 	}
 	
-	public static void archive(DBCon dbCon, Staff staff) throws SQLException{
+	public static class Result{
+		private final OrderDao.ArchiveResult orderArchive;
+		private final OrderFoodDao.ArchiveResult ofArchive;
+		private final TasteGroupDao.ArchiveResult tgArchive;
+		
+		Result(OrderDao.ArchiveResult orderArchive, OrderFoodDao.ArchiveResult orderFoodArchive, TasteGroupDao.ArchiveResult tgArchive){
+			this.orderArchive = orderArchive;
+			this.ofArchive = orderFoodArchive;
+			this.tgArchive = tgArchive;
+		}
+		
+		Result(){
+			orderArchive = new OrderDao.ArchiveResult(0, 0);
+			ofArchive = new OrderFoodDao.ArchiveResult(0, 0);
+			tgArchive = new TasteGroupDao.ArchiveResult(0, 0, 0, 0);
+		}
+		
+		public OrderDao.ArchiveResult getOrderArchive(){
+			return this.orderArchive;
+		}
+		
+		public OrderFoodDao.ArchiveResult getOrderFoodArchive(){
+			return this.ofArchive;
+		}
+		
+		public TasteGroupDao.ArchiveResult getTgArchive(){
+			return this.tgArchive;
+		}
+	}
+	
+	public static Result archive(DBCon dbCon, Staff staff) throws SQLException{
 		StringBuilder paidOrderCond = new StringBuilder();
 		
 		
@@ -720,14 +750,18 @@ public class OrderDao {
 			paidOrderCond.deleteCharAt(paidOrderCond.length() - 1);
 
 			//Archive the taste group
-			TasteGroupDao.archive(dbCon, staff, paidOrderCond.toString());
+			TasteGroupDao.ArchiveResult tgArchive = TasteGroupDao.archive(dbCon, staff, paidOrderCond.toString());
 			
 			//Archive the order food
-			OrderFoodDao.archive(dbCon, staff, paidOrderCond.toString());
+			OrderFoodDao.ArchiveResult ofArchive = OrderFoodDao.archive(dbCon, staff, paidOrderCond.toString());
 
 			//Archive the order
-			OrderDao.archive(dbCon, staff, paidOrderCond.toString());
+			OrderDao.ArchiveResult orderArchive = OrderDao.archive(dbCon, staff, paidOrderCond.toString());
 			
+			return new Result(orderArchive, ofArchive, tgArchive);
+			
+		}else{
+			return new Result();
 		}
 		
 	}

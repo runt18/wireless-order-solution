@@ -8,8 +8,11 @@ import java.util.List;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
+import com.wireless.db.client.member.MemberOperationDao;
 import com.wireless.db.deptMgr.DepartmentDao;
 import com.wireless.db.orderMgr.OrderDao;
+import com.wireless.db.orderMgr.OrderFoodDao;
+import com.wireless.db.orderMgr.TasteGroupDao;
 import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.db.shift.PaymentDao;
 import com.wireless.db.shift.ShiftDao;
@@ -17,7 +20,6 @@ import com.wireless.db.stockMgr.StockActionDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.dishesOrder.Order;
-import com.wireless.pojo.dishesOrder.TasteGroup;
 import com.wireless.pojo.inventoryMgr.MaterialCate;
 import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.restaurantMgr.Restaurant;
@@ -42,15 +44,12 @@ public class DailySettleDao {
 	public static final class Result{
 		
 		private int elapsedTime;			//日结消耗的时间
-		private int totalOrder;				//当日已结帐的账单数
-		private int totalOrderDetail;		//当日已结帐的账单明细数
 		private int totalShift;				//当日交班的记录数
-		private int maxOrderId;				//order和order_history表的最大id
-		private int maxOrderFoodId;			//order_food和order_food_history表的最大id
-		private int maxTasteGroupId;		//taste_group和taste_group_history表的最大id
-		private int maxNormalTasteGroupId;	//normal_taste_group和normal_taste_group_history表的最大id
-		private int maxMemberOperationId;	//member_operation和member_operation_history表的最大id
 		private DutyRange range;
+		
+		private OrderDao.ArchiveResult orderArchive;
+		private OrderFoodDao.ArchiveResult orderFoodArchive;
+		private TasteGroupDao.ArchiveResult tgArchive;
 		
 		Result(){
 			
@@ -64,68 +63,12 @@ public class DailySettleDao {
 			this.elapsedTime = elapsedTime;
 		}
 		
-		public int getTotalOrder() {
-			return totalOrder;
-		}
-		
-		void setTotalOrder(int totalOrder) {
-			this.totalOrder = totalOrder;
-		}
-		
-		public int getTotalOrderDetail() {
-			return totalOrderDetail;
-		}
-		
-		void setTotalOrderDetail(int totalOrderDetail) {
-			this.totalOrderDetail = totalOrderDetail;
-		}
-		
 		public int getTotalShift() {
 			return totalShift;
 		}
 		
 		void setTotalShift(int totalShift) {
 			this.totalShift = totalShift;
-		}
-		
-		public int getMaxOrderId() {
-			return maxOrderId;
-		}
-		
-		void setMaxOrderId(int maxOrderId) {
-			this.maxOrderId = maxOrderId;
-		}
-		
-		public int getMaxOrderFoodId() {
-			return maxOrderFoodId;
-		}
-		
-		void setMaxOrderFoodId(int maxOrderFoodId) {
-			this.maxOrderFoodId = maxOrderFoodId;
-		}
-		
-		public int getMaxTasteGroupId() {
-			return maxTasteGroupId;
-		}
-		
-		void setMaxTasteGroupId(int maxTasteGroupId) {
-			this.maxTasteGroupId = maxTasteGroupId;
-		}
-		
-		public int getMaxNormalTasteGroupId() {
-			return maxNormalTasteGroupId;
-		}
-		
-		void setMaxNormalTasteGroupId(int maxNormalTasteGroupId) {
-			this.maxNormalTasteGroupId = maxNormalTasteGroupId;
-		}
-		
-		public int getMaxMemberOperationId() {
-			return maxMemberOperationId;
-		}
-		
-		void setMaxMemberOperationId(int maxMemberOperationId) {
-			this.maxMemberOperationId = maxMemberOperationId;
 		}
 		
 		void setRange(DutyRange range){
@@ -142,12 +85,14 @@ public class DailySettleDao {
 			final String sep = System.getProperty("line.separator");
 
 			StringBuilder resultInfo = new StringBuilder();
-			resultInfo.append("info : " + getTotalOrder() + " record(s) are moved from \"order\" to \"order_history\"").append(sep);
-			resultInfo.append("info : " + getTotalOrderDetail() + " record(s) are moved from \"order_food\" to \"order_food_history\"").append(sep);
+			resultInfo.append("info : " + orderArchive.getAmount() + " record(s) are moved from \"order\" to \"order_history\"").append(sep);
+			resultInfo.append("info : " + orderFoodArchive.getAmount() + " record(s) are moved from \"order_food\" to \"order_food_history\"").append(sep);
 			resultInfo.append("info : " + getTotalShift() + " record(s) are moved from \"shift\" to \"shift_history\"").append(sep);
 			resultInfo.append("info : " + 
-							  "maxium order id : " + getMaxOrderId() + ", " +
-							  "maxium order food id : " + getMaxOrderFoodId()).append(sep);
+							  "maxium order id : " + orderArchive.getMaxId() + ", " +
+							  "maxium order food id : " + orderFoodArchive.getMaxId()).append(sep);
+			resultInfo.append("info : " +
+							  "maxium taste group id : " + tgArchive.getTgMaxId()).append(sep);
 			resultInfo.append("info : The record movement takes " + getElapsedTime() + " sec.");
 			
 			return resultInfo.toString();
@@ -206,17 +151,21 @@ public class DailySettleDao {
 		}
 		dbCon.rs.close();		
 		
-		Result result = new Result();
+		int totalOrder = 0, totalOrderFood = 0, totalShift = 0, maxOrderId = 0, maxOrderFoodId = 0;
 		for(Staff staff : staffs){			
 			Result eachResult = exec(dbCon, staff, SettleType.AUTO_MATION);
 			
-			result.setTotalOrder(result.getTotalOrder() + eachResult.getTotalOrder());
-			result.setTotalOrderDetail(result.getTotalOrderDetail()	+ eachResult.getTotalOrderDetail());
-			result.setTotalShift(result.getTotalShift() + eachResult.getTotalShift());
-			result.setMaxOrderFoodId(eachResult.getMaxOrderFoodId());
-			result.setMaxOrderId(eachResult.getMaxOrderId());
+			totalOrder += eachResult.orderArchive.getAmount();
+			maxOrderId = eachResult.orderArchive.getMaxId(); 
+			totalOrderFood += eachResult.orderFoodArchive.getAmount();
+			maxOrderFoodId = eachResult.orderFoodArchive.getMaxId();
+			totalShift += eachResult.getTotalShift();
 		}
 		
+		Result result = new Result();
+		result.orderArchive = new OrderDao.ArchiveResult(maxOrderId, totalOrder);
+		result.orderFoodArchive = new OrderFoodDao.ArchiveResult(maxOrderFoodId, totalOrderFood);
+		result.setTotalShift(totalShift);
 		result.setElapsedTime((int)(System.currentTimeMillis() - beginTime) / 1000);
 		
 		return result;
@@ -348,37 +297,22 @@ public class DailySettleDao {
 		dbCon.rs.close();
 		
 		
-		//Calculate the max member operation id from both today and history
-		sql = " SELECT MAX(id) + 1 " +
-			  " FROM " +
-			  " (SELECT MAX(id) AS id FROM " + Params.dbName + ".member_operation" +
-			  " UNION " +
-			  " SELECT MAX(id) AS id FROM " + Params.dbName + ".member_operation_history) AS all_mo_id ";
-		dbCon.rs = dbCon.stmt.executeQuery(sql);
-		if(dbCon.rs.next()){
-			result.setMaxMemberOperationId(dbCon.rs.getInt(1));
-		}
-		dbCon.rs.close();
-		
-		
 		try{
 			dbCon.conn.setAutoCommit(false);
 			
-			
-			//Move the member operation record from 'member_operation' to 'member_operation_history'
-			sql = " INSERT INTO " + Params.dbName + ".member_operation_history" +
-				  " SELECT * FROM " + Params.dbName + ".member_operation" + 
-				  " WHERE restaurant_id = " + staff.getRestaurantId();
-			dbCon.stmt.executeUpdate(sql);
-			
 			//Archive the order and associated order food, taste group records.
-			OrderDao.archive(dbCon, staff);
+			OrderDao.Result orderResult = OrderDao.archive(dbCon, staff);
+			result.orderArchive = orderResult.getOrderArchive();
+			result.orderFoodArchive = orderResult.getOrderFoodArchive();
 			
 			//Archive the shift records.
 			ShiftDao.archive(dbCon, staff);
 			
 			//Archive the payment records.
 			PaymentDao.archive(dbCon, staff);
+			
+			//Archive the member operation records.
+			MemberOperationDao.archive(dbCon, staff);
 			
 			//Create the daily settle record
 			sql = " INSERT INTO " + Params.dbName + ".daily_settle_history (`restaurant_id`, `name`, `on_duty`, `off_duty`) VALUES (" +
@@ -393,30 +327,10 @@ public class DailySettleDao {
 				dbCon.stmt.executeUpdate(sql);				
 			}else{
 				//Insert the record if the amount of rest orders is greater than zero in case of automation.
-				if(result.getTotalOrder() > 0){
+				if(result.orderArchive.getAmount() > 0){
 					dbCon.stmt.executeUpdate(sql);
 				}
 			}
-			
-			
-			//Delete the member operation to this restaurant
-			sql = " DELETE FROM " + Params.dbName + ".member_operation WHERE restaurant_id = " + staff.getRestaurantId();
-			dbCon.stmt.executeUpdate(sql);
-			
-			//Delete the member operation belongs to admin.
-			sql = " DELETE FROM " + Params.dbName + ".member_operation WHERE restaurant_id = " + Restaurant.ADMIN;
-			dbCon.stmt.executeUpdate(sql);
-			
-			//Insert a record with max member operation id 
-			sql = " INSERT INTO " + Params.dbName + ".member_operation" +
-				  " (`id`, `restaurant_id`, `staff_id`, `member_id`, `member_name`, `member_mobile`, `operate_seq`, `operate_date`, `operate_type`) " +
-				  " VALUES " +
-				  " ( " +
-				  result.getMaxMemberOperationId() + "," +
-				  Restaurant.ADMIN + "," +
-				  " 0, 0, '', '', '', 0, 0 " +
-				  " ) ";
-			dbCon.stmt.executeUpdate(sql);
 			
 			dbCon.conn.commit();
 			
@@ -433,63 +347,6 @@ public class DailySettleDao {
 		}
 		
 		return result;
-	}
-	
-	private static void moveOrderFood(DBCon dbCon, String orderIdCond) throws SQLException{
-		
-		final String orderFoodItem = "`id`,`restaurant_id`, `order_id`, `food_id`, `order_date`, `order_count`," + 
-				"`unit_price`, `commission`, `name`, `food_status`, `taste_group_id`, `cancel_reason_id`, `cancel_reason`," +
-				"`discount`, `dept_id`, `kitchen_id`, " +
-				"`staff_id`, `waiter`, `is_temporary`, `is_paid`";
-
-		
-		String sql;
-		
-		sql = " INSERT INTO " + Params.dbName + ".order_food_history (" + orderFoodItem + ") " +
-			  " SELECT " + orderFoodItem + " FROM " + Params.dbName + ".order_food " +
-			  " WHERE " +
-			  " order_id IN ( " + orderIdCond + " ) ";
-		
-		dbCon.stmt.executeUpdate(sql);
-	}
-	
-	private static void moveTasteGroup(DBCon dbCon, String orderIdCond) throws SQLException{
-		
-		final String tasteGroupItem = "`taste_group_id`, `normal_taste_group_id`, `normal_taste_pref`, `normal_taste_price`, " +
-				  "`tmp_taste_id`, `tmp_taste_pref`, `tmp_taste_price`";
-		
-		String sql;
-		
-		sql = " INSERT INTO " + Params.dbName + ".taste_group_history (" + tasteGroupItem + " ) " +
-			  " SELECT " + tasteGroupItem + " FROM " + Params.dbName + ".taste_group" +
-			  " WHERE " +
-			  " taste_group_id <> " + TasteGroup.EMPTY_TASTE_GROUP_ID +
-			  " AND taste_group_id IN (" +
-			  " SELECT taste_group_id FROM " + Params.dbName + ".order_food WHERE order_id IN (" + orderIdCond + " ) " +
-			  " ) ";
-		
-		dbCon.stmt.executeUpdate(sql);
-	}
-	
-	private static void moveNormalTasteGroup(DBCon dbCon, String orderIdCond) throws SQLException{
-		
-		final String normalTasteGroupItem = "`normal_taste_group_id`, `taste_id`";
-		
-		String sql;
-		sql = " INSERT INTO " + Params.dbName + ".normal_taste_group_history (" + normalTasteGroupItem + ")" +
-			  " SELECT " + normalTasteGroupItem + " FROM " + Params.dbName + ".normal_taste_group" +
-			  " WHERE " +
-			  " normal_taste_group_id <> " + TasteGroup.EMPTY_NORMAL_TASTE_GROUP_ID +
-			  " AND " +
-			  " normal_taste_group_id IN(" +
-			  " SELECT normal_taste_group_id " +
-			  " FROM " + Params.dbName + ".order_food OF " + " JOIN " + Params.dbName + ".taste_group TG" +
-			  " ON OF.taste_group_id = TG.taste_group_id " +
-			  " WHERE " +
-			  " OF.order_id IN (" + orderIdCond + ")" +
-			  " ) ";
-		
-		dbCon.stmt.executeUpdate(sql);
 	}
 	
 	/**

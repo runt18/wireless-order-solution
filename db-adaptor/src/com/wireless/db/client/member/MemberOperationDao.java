@@ -18,6 +18,7 @@ import com.wireless.pojo.client.MOSummary;
 import com.wireless.pojo.client.MemberOperation;
 import com.wireless.pojo.client.MemberOperation.OperationType;
 import com.wireless.pojo.dishesOrder.Order;
+import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.DateUtil;
 import com.wireless.pojo.util.DateUtil.Pattern;
@@ -721,5 +722,84 @@ public class MemberOperationDao {
 		}finally{
 			dbCon.disconnect();
 		}
+	}
+	
+	public static class ArchiveResult{
+		private final int maxId;
+		private final int moAmount;
+		public ArchiveResult(int maxId, int moAmount){
+			this.maxId = maxId;
+			this.moAmount = moAmount;
+		}
+		
+		public int getMaxId(){
+			return this.maxId;
+		}
+		
+		public int getAmount(){
+			return this.moAmount;
+		}
+		
+		@Override
+		public String toString(){
+			return moAmount + " record(s) are moved to history, maxium id : " + maxId;
+		}
+	}
+	
+	public static ArchiveResult archive(DBCon dbCon, Staff staff) throws SQLException{
+		String sql;
+		
+		sql = " SELECT COUNT(*) FROM " + Params.dbName + ".member_operation WHERE restaurant_id = " + staff.getRestaurantId();
+		dbCon.rs = dbCon.stmt.executeQuery(sql);
+		int moAmount = 0;
+		if(dbCon.rs.next()){
+			moAmount = dbCon.rs.getInt(1);
+		}
+		dbCon.rs.close();
+		
+		if(moAmount == 0){
+			return new ArchiveResult(0, 0);
+		}
+		
+		//Calculate the max member operation id from both today and history
+		sql = " SELECT MAX(id) + 1 " +
+			  " FROM " +
+			  " (SELECT MAX(id) AS id FROM " + Params.dbName + ".member_operation" +
+			  " UNION " +
+			  " SELECT MAX(id) AS id FROM " + Params.dbName + ".member_operation_history) AS all_mo_id ";
+		dbCon.rs = dbCon.stmt.executeQuery(sql);
+		
+		int maxId = 0;
+		if(dbCon.rs.next()){
+			maxId = dbCon.rs.getInt(1);
+		}
+		dbCon.rs.close();
+		
+		//Move the member operation record from 'member_operation' to 'member_operation_history'
+		sql = " INSERT INTO " + Params.dbName + ".member_operation_history" +
+			  " SELECT * FROM " + Params.dbName + ".member_operation" + 
+			  " WHERE restaurant_id = " + staff.getRestaurantId();
+		moAmount = dbCon.stmt.executeUpdate(sql);
+		
+		//Delete the member operation to this restaurant
+		sql = " DELETE FROM " + Params.dbName + ".member_operation WHERE restaurant_id = " + staff.getRestaurantId();
+		dbCon.stmt.executeUpdate(sql);
+		
+		//Delete the member operation belongs to admin.
+		sql = " DELETE FROM " + Params.dbName + ".member_operation WHERE restaurant_id = " + Restaurant.ADMIN;
+		dbCon.stmt.executeUpdate(sql);
+		
+		//Insert a record with max member operation id 
+		sql = " INSERT INTO " + Params.dbName + ".member_operation" +
+			  " (`id`, `restaurant_id`, `staff_id`, `member_id`, `member_name`, `member_mobile`, `operate_seq`, `operate_date`, `operate_type`) " +
+			  " VALUES " +
+			  " ( " +
+			  maxId + "," +
+			  Restaurant.ADMIN + "," +
+			  " 0, 0, '', '', '', 0, 0 " +
+			  " ) ";
+		dbCon.stmt.executeUpdate(sql);
+		
+		return new ArchiveResult(maxId, moAmount);
 	}
 }

@@ -64,10 +64,12 @@ public class TasteGroupDao {
 		String sql;
 		sql = " INSERT INTO " + Params.dbName + ".taste_group " +
 			  " ( " +
+			  " `restaurant_id`, " +
 			  " `normal_taste_group_id`, `normal_taste_pref`, `normal_taste_price`, " +
 			  " `tmp_taste_id`, `tmp_taste_pref`, `tmp_taste_price` " +
 			  " ) " +
 			  " SELECT " +
+			  staff.getRestaurantId() + ", " +
 			  (tg.hasNormalTaste() ? "MAX(normal_taste_group_id) + 1" : TasteGroup.EMPTY_NORMAL_TASTE_GROUP_ID) + ", " +
 			  (tg.hasNormalTaste() ? ("'" + tg.getNormalTastePref() + "'") : "NULL") + ", " +
 			  (tg.hasNormalTaste() ? tg.getNormalTastePrice() : "NULL") + ", " +
@@ -291,24 +293,18 @@ public class TasteGroupDao {
 		dbCon.rs.close();
 		
 		//Update the max taste group id
-		sql = " DELETE FROM " + Params.dbName + ".taste_group WHERE taste_group_id IN (" +
-			  " SELECT taste_group_id FROM " + Params.dbName + ".order_food WHERE restaurant_id = " + Restaurant.ADMIN +
-			  " ) ";
+		sql = " DELETE FROM " + Params.dbName + ".taste_group WHERE restaurant_id = " + Restaurant.ADMIN;
 		dbCon.stmt.executeUpdate(sql);
 		
 		//Insert a record with the max taste group id and max normal taste group id.
 		sql = " INSERT INTO " + Params.dbName + ".taste_group" +
-			  " (`taste_group_id`, `normal_taste_group_id`) " +
+			  " (`taste_group_id`, `normal_taste_group_id`, `restaurant_id`) " +
 			  " VALUES " +
 			  " ( " +
 			  maxTgId + ", " +
-			  maxNormalTgId +
+			  maxNormalTgId + ", " +
+			  Restaurant.ADMIN +
 			  " ) ";
-		dbCon.stmt.executeUpdate(sql);
-		
-		//Update the taste group id of order food to max.
-		sql = " UPDATE " + Params.dbName + ".order_food SET taste_group_id = " + maxTgId + 
-			  " WHERE restaurant_id = " + Restaurant.ADMIN;
 		dbCon.stmt.executeUpdate(sql);
 		
 		//Delete the paid order normal taste group except the empty normal taste group

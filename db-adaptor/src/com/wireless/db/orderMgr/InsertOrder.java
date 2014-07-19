@@ -231,57 +231,6 @@ public class InsertOrder {
 			
 			OrderFoodDao.insertExtra(dbCon, staff, new OrderFoodDao.ExtraBuilder(orderToInsert.getId(), foodToInsert));
 			
-			//Insert the taste group
-//			if(foodToInsert.hasTasteGroup()){
-//			
-//				TasteGroup tg = foodToInsert.getTasteGroup();
-//				
-//				int tgId = TasteGroupDao.insert(dbCon, staff, new TasteGroup.InsertBuilder(foodToInsert.asFood())
-//															     .addTastes(tg.getNormalTastes())
-//															     .setTmpTaste(tg.getTmpTaste()));
-//				tg.setGroupId(tgId);
-//			}
-//			
-//			//Insert the combo order food
-//			int comboId = 0;
-//			if(foodToInsert.hasCombo()){
-//				comboId = ComboDao.insert(dbCon, staff, foodToInsert.getCombo());
-//			}
-//			
-//			//Insert the record to table "order_food"
-//			sql = " INSERT INTO `" + Params.dbName + "`.`order_food` " +
-//				  " ( " +
-//				  " `restaurant_id`, `order_id`, `food_id`, `order_count`, `unit_price`, `commission`, `name`, " +
-//				  " `food_status`, `discount`, `taste_group_id`, " +
-//				  " `dept_id`, `kitchen_id`, " +
-//				  " `staff_id`, `waiter`, `order_date`, " +
-//				  " `combo_id`, " +
-//				  " `is_temporary`, `is_gift` " +
-//				  " ) " +
-//				  " VALUES " +
-//				  " ( " +	
-//				  staff.getRestaurantId() + ", " +
-//				  orderToInsert.getId() + ", " +
-//				  foodToInsert.getFoodId() + ", " +
-//				  foodToInsert.getCount() + ", " + 
-//				  foodToInsert.asFood().getPrice() + ", " + 
-//				  foodToInsert.asFood().getCommission() + ",'" +
-//				  foodToInsert.getName() + "', " +
-//				  foodToInsert.asFood().getStatus() + ", " +
-//				  foodToInsert.getDiscount() + ", " +
-//				  foodToInsert.getTasteGroup().getGroupId() + ", " +
-//				  foodToInsert.getKitchen().getDept().getId() + ", " +
-//				  foodToInsert.getKitchen().getId() + ", " +
-//				  staff.getId() + "," +
-//				  "'" + staff.getName() + "', " + 
-//				  " NOW(), " +
-//				  (comboId != 0 ? comboId : "NULL") + ", " +
-//				  (foodToInsert.isTemp() ? "1" : "0") + ", " +
-//				  (foodToInsert.isGift() ? "1" : "0") +
-//				  " ) ";
-//				
-//			dbCon.stmt.executeUpdate(sql);
-
 			//FIXME Insert the temporary food to menu.
 //			if(foodToInsert.isTemp()){
 //				try{
