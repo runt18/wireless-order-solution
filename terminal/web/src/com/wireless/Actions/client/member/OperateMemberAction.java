@@ -70,7 +70,8 @@ public class OperateMemberAction extends DispatchAction{
 			  .setCompany(company)
 			  .setPrivateComment(privateComment)
 			  .setPublicComment(publicComment)
-			  .setContactAddr(addr);
+			  .setContactAddr(addr)
+			  .setSex(Member.Sex.valueOf(Integer.valueOf(sex)));
 			
 			MemberDao.insert(staff, ib);
 			jobject.initTip(true, "操作成功, 新会员资料已添加.");

@@ -118,40 +118,52 @@ public class QueryMemberAction extends DispatchAction {
 			String pin = (String)request.getAttribute("pin");
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
-			String extraCond = " ", orderClause = " ";
+			String  orderClause = " ";
 			String id = request.getParameter("id");
 			String memberType = request.getParameter("memberType");
 			String memberTypeAttr = request.getParameter("memberTypeAttr");
-			String name = request.getParameter("name");
 			String memberCardOrMobileOrName = request.getParameter("memberCardOrMobileOrName");
 //			String totalBalance = request.getParameter("usedBalance");
-			String usedBalance = request.getParameter("usedBalance");
-			String consumptionAmount = request.getParameter("consumptionAmount");
+			String MaxTotalMemberCost = request.getParameter("MaxTotalMemberCost");
+			String MinTotalMemberCost = request.getParameter("MinTotalMemberCost");
+			String consumptionMinAmount = request.getParameter("consumptionMinAmount");
+			String consumptionMaxAmount = request.getParameter("consumptionMaxAmount");
 			
 //			String point = request.getParameter("point");
 //			String usedPoint = request.getParameter("usedPoint");
-			String usedBalanceEqual = request.getParameter("usedBalanceEqual");
-			String consumptionAmountEqual = request.getParameter("consumptionAmountEqual");
+//			String usedBalanceEqual = request.getParameter("usedBalanceEqual");
+//			String consumptionAmountEqual = request.getParameter("consumptionAmountEqual");
+			
+			MemberDao.ExtraCond extraCond = new MemberDao.ExtraCond();
 			
 			if(id != null && !id.trim().isEmpty() && Integer.valueOf(id.trim()) > 0){
-				extraCond += (" AND M.member_id = " + id);
+				extraCond.setId(Integer.parseInt(id));
 			}else{
 				if(memberType != null && !memberType.trim().isEmpty())
-					extraCond += (" AND M.member_type_id = " + memberType);
-				if(name != null && !name.trim().isEmpty())
-					extraCond += (" AND M.name like '%" + name.trim() + "%'");
+					extraCond.setMemberType(Integer.parseInt(memberType));
 				
 				if(memberCardOrMobileOrName != null && !memberCardOrMobileOrName.trim().isEmpty())
-					extraCond += (" AND (M.member_card like '%" + memberCardOrMobileOrName.trim() + "%'  OR M.mobile like '%" + memberCardOrMobileOrName.trim() + "%')");
-					
-/*				if(totalBalance != null && !totalBalance.trim().isEmpty())
-					extraCond += (" AND (M.base_balance + M.extra_balance) " + so + totalBalance);*/
+					extraCond.setFuzzyName(memberCardOrMobileOrName);
 				
-				if(usedBalance != null && !usedBalance.trim().isEmpty())
-					extraCond += (" AND M.used_balance " + usedBalanceEqual + usedBalance);
+				if((MinTotalMemberCost != null && !MinTotalMemberCost.trim().isEmpty()) ||  (MaxTotalMemberCost != null && !MaxTotalMemberCost.trim().isEmpty())){
+					if(!MinTotalMemberCost.isEmpty()  && !MaxTotalMemberCost.isEmpty()){
+						extraCond.setTotalConsume(Integer.parseInt(MinTotalMemberCost), Integer.parseInt(MaxTotalMemberCost));
+					}else if(!MinTotalMemberCost.isEmpty() && MaxTotalMemberCost.isEmpty()){
+						extraCond.setTotalConsume(Integer.parseInt(MinTotalMemberCost), Integer.MAX_VALUE);
+					}else if(MinTotalMemberCost.isEmpty() && !MaxTotalMemberCost.isEmpty()){
+						extraCond.setTotalConsume(0, Integer.parseInt(MaxTotalMemberCost));
+					}
+				}	
 				
-				if(consumptionAmount != null && !consumptionAmount.trim().isEmpty())
-					extraCond += (" AND M.consumption_amount " + consumptionAmountEqual + consumptionAmount);
+				if((consumptionMinAmount != null && !consumptionMinAmount.trim().isEmpty()) || (consumptionMaxAmount != null && !consumptionMaxAmount.trim().isEmpty())){
+					if(consumptionMinAmount != null && MaxTotalMemberCost != null){
+						extraCond.setTotalConsume(Integer.parseInt(consumptionMinAmount), Integer.parseInt(consumptionMaxAmount));
+					}else if(consumptionMinAmount != null && MaxTotalMemberCost == null){
+						extraCond.setTotalConsume(Integer.parseInt(consumptionMinAmount), Integer.MAX_VALUE);
+					}else if(consumptionMinAmount == null && MaxTotalMemberCost != null){
+						extraCond.setTotalConsume(-1, Integer.parseInt(consumptionMaxAmount));
+					}
+				}
 				
 /*				if(usedPoint != null && !usedPoint.trim().isEmpty())
 					extraCond += (" AND M.total_point " + so + usedPoint);
@@ -177,7 +189,7 @@ public class QueryMemberAction extends DispatchAction {
 			if(memberTypeAttr != null && !memberTypeAttr.trim().isEmpty()){
 				newList.clear();
 				if(Integer.parseInt(memberTypeAttr) == MemberType.Attribute.INTERESTED.getVal()){
-					newList.addAll(MemberDao.getInterestedMember(staff, extraCond));
+					newList.addAll(MemberDao.getInterestedMember(staff, extraCond.toString()));
 				}else{
 					List<Member> attrMember = new ArrayList<Member>();  
 					for (Member member : list) {

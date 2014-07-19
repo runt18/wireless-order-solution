@@ -30,6 +30,7 @@ import com.wireless.pojo.sms.VerifySMS;
 import com.wireless.pojo.sms.VerifySMS.ExpiredPeriod;
 import com.wireless.pojo.sms.VerifySMS.InsertBuilder;
 import com.wireless.pojo.sms.VerifySMS.VerifyBuilder;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.util.sms.SMS;
 
 public class WXOperateMemberAction extends DispatchAction {
@@ -271,4 +272,56 @@ public class WXOperateMemberAction extends DispatchAction {
 		}
 		return null;
 	}
+	
+	/**
+	 * 
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward weixinFrontBind(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)	throws Exception {
+		request.setCharacterEncoding("UTF-8");
+		response.setCharacterEncoding("UTF-8");
+		
+		String pin = (String) request.getAttribute("pin");
+		String restaurantId = (String) request.getAttribute("restaurantID");
+		JObject jobject = new JObject();
+		try{
+			String weixinMemberCard = request.getParameter("weixinMemberCard");
+			String weixinMemberPhone = request.getParameter("weixinMemberPhone");
+			String weixinMemberName = request.getParameter("weixinMemberName");
+			String weixinMemberSex = request.getParameter("weixinMemberSex");
+			
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			
+			int memberId = WeixinMemberDao.bind(staff, weixinMemberPhone, Integer.parseInt(weixinMemberCard));
+			
+			Member.UpdateBuilder builder = new Member.UpdateBuilder(memberId, Integer.parseInt(restaurantId));
+			
+			if(weixinMemberSex != null && !weixinMemberSex.isEmpty()){
+				builder.setSex(Member.Sex.valueOf(Integer.valueOf(weixinMemberSex)));
+			}
+			
+			if(weixinMemberName != null && !weixinMemberName.isEmpty()){
+				builder.setName(weixinMemberName);
+			}
+			
+			MemberDao.update(staff, builder);
+			
+			jobject.initTip(true, "操作成功, 已绑定会员信息.");
+		}catch(BusinessException e){
+			e.printStackTrace();
+			jobject.initTip(e);
+			
+		}catch(SQLException e){
+			e.printStackTrace();
+			jobject.initTip(e);
+		}finally{
+			response.getWriter().print(jobject.toString());
+		}
+		return null;
+	}	
 }
