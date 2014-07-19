@@ -28,6 +28,7 @@ import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
@@ -44,6 +45,7 @@ import com.wireless.pojo.tasteMgr.Taste;
 import com.wireless.pojo.util.NumericUtil;
 import com.wireless.ui.PickTasteActivity;
 import com.wireless.ui.R;
+import com.wireless.ui.view.IndicatorView;
 import com.wireless.ui.view.ScrollLayout;
 import com.wireless.ui.view.ScrollLayout.OnViewChangedListener;
 
@@ -96,10 +98,20 @@ public class AskOrderAmountDialog extends DialogFragment {
 		@Override
 		public void handleMessage(Message msg) {
 			AskOrderAmountDialog thisDlgFgm = mDlgFgm.get();
-			//更新Dialog的Title
 			if((Boolean)thisDlgFgm.mCurrentTasteView.getTag(R.id.combo_of_indicator_key)){
+				thisDlgFgm.getView().findViewById(R.id.linearLayout_top_askOrderAmount_dialog).setVisibility(View.INVISIBLE);
+				thisDlgFgm.getView().findViewById(R.id.linearLayout_combo_askOrderAmount_dialog).setVisibility(View.VISIBLE);
+				
 				ComboOrderFood cof = (ComboOrderFood)thisDlgFgm.mCurrentTasteView.getTag(R.id.combo_of_key);
-				thisDlgFgm.getDialog().setTitle(cof.toString());
+				//显示Title
+				thisDlgFgm.getDialog().setTitle(thisDlgFgm.mSelectedFood.getName() + "#" + cof.getName());
+				//显示数量和口味
+				((TextView)thisDlgFgm.getView().findViewById(R.id.txtView_comboAmount_askOrderAmount_dialog)).setText(Integer.toString(cof.asComboFood().getAmount()) + "份");
+				if(cof.hasTasteGroup()){
+					((TextView)thisDlgFgm.getView().findViewById(R.id.txtView_comboTaste_askOrderAmount_dialog)).setText(cof.getTasteGroup().getPreference());
+				}else{
+					((TextView)thisDlgFgm.getView().findViewById(R.id.txtView_comboTaste_askOrderAmount_dialog)).setText("无口味");
+				}
 				if(cof.hasTmpTaste()){
 					EditText pinzhuEdtTxt = ((EditText) thisDlgFgm.mCurrentTasteView.findViewById(R.id.edtTxt_pinzhu_askOrderAmount_dialog));
 					pinzhuEdtTxt.removeTextChangedListener((TextWatcher)pinzhuEdtTxt.getTag());
@@ -109,6 +121,14 @@ public class AskOrderAmountDialog extends DialogFragment {
 				
 			}else{
 				thisDlgFgm.getDialog().setTitle(thisDlgFgm.mSelectedFood.toString());
+				thisDlgFgm.getView().findViewById(R.id.linearLayout_combo_askOrderAmount_dialog).setVisibility(View.INVISIBLE);
+				thisDlgFgm.getView().findViewById(R.id.linearLayout_top_askOrderAmount_dialog).setVisibility(View.VISIBLE);
+				
+				//显示叫起状态
+				((ToggleButton) thisDlgFgm.getView().findViewById(R.id.toggleButton_askOrderAmount_hangUp)).setChecked(thisDlgFgm.mSelectedFood.isHangup());
+				//显示赠送状态
+				((ToggleButton) thisDlgFgm.getView().findViewById(R.id.toggleButton_askOrderAmount_gift)).setChecked(thisDlgFgm.mSelectedFood.isGift());
+				
 				if(thisDlgFgm.mSelectedFood.hasTmpTaste()){
 					EditText pinzhuEdtTxt = ((EditText) thisDlgFgm.mCurrentTasteView.findViewById(R.id.edtTxt_pinzhu_askOrderAmount_dialog));
 					pinzhuEdtTxt.removeTextChangedListener((TextWatcher)pinzhuEdtTxt.getTag());
@@ -121,11 +141,16 @@ public class AskOrderAmountDialog extends DialogFragment {
 					priceEdtTxt.addTextChangedListener((TextWatcher)priceEdtTxt.getTag());
 				}
 			}
-			//刷新常用口味GridView
-			//((BaseAdapter)((GridView)mCurrentTasteView.findViewById(R.id.gridView_askOrderAmount_dialog)).getAdapter()).notifyDataSetChanged();
-			((GridView)thisDlgFgm.mCurrentTasteView.findViewById(R.id.gridView_askOrderAmount_dialog)).invalidateViews();
+			if(msg.what == REFRESH_ALL){
+				//刷新常用口味GridView
+				//((BaseAdapter)((GridView)mCurrentTasteView.findViewById(R.id.gridView_askOrderAmount_dialog)).getAdapter()).notifyDataSetChanged();
+				((GridView)thisDlgFgm.mCurrentTasteView.findViewById(R.id.gridView_askOrderAmount_dialog)).invalidateViews();
+			}
 		}
 	}
+	
+	private final static int REFRESH_ALL = 0;
+	private final static int REFRESH_EXCEPT_GRID = 1;
 	
 	private static final int PICK_WITH_TASTE = 1;
 
@@ -306,16 +331,16 @@ public class AskOrderAmountDialog extends DialogFragment {
 
 		// "叫起"Toggle
 		ToggleButton hangupToggle = (ToggleButton) view.findViewById(R.id.toggleButton_askOrderAmount_hangUp);
-		hangupToggle.setChecked(mSelectedFood.isHangup());
-		hangupToggle.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+		hangupToggle.setOnClickListener(new OnClickListener() {
 			@Override
-			public void onCheckedChanged(CompoundButton buttonView,	boolean isChecked) {
-				if (isChecked) {
-					mSelectedFood.setHangup(true);
-					Toast.makeText(getActivity(), "叫起\"" + mSelectedFood.toString() + "\"", Toast.LENGTH_SHORT).show();
-				} else {
+			public void onClick(View v) {
+				if(mSelectedFood.isHangup()){
 					mSelectedFood.setHangup(false);
+				}else{
+					mSelectedFood.setHangup(true);;
+					Toast.makeText(getActivity(), "叫起\"" + mSelectedFood.toString() + "\"", Toast.LENGTH_SHORT).show();
 				}
+				mRefreshHandler.sendEmptyMessage(REFRESH_EXCEPT_GRID);
 			}
 		});
 
@@ -323,15 +348,16 @@ public class AskOrderAmountDialog extends DialogFragment {
 		ToggleButton giftedToggle = (ToggleButton) view.findViewById(R.id.toggleButton_askOrderAmount_gift);
 		if (WirelessOrder.loginStaff.getRole().hasPrivilege(Privilege.Code.GIFT) && mSelectedFood.asFood().isGift()) {
 			giftedToggle.setVisibility(View.VISIBLE);
-			giftedToggle.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+			giftedToggle.setOnClickListener(new OnClickListener() {
 				@Override
-				public void onCheckedChanged(CompoundButton buttonView,	boolean isChecked) {
-					if (isChecked) {
+				public void onClick(View v) {
+					if (mSelectedFood.isGift()) {
+						mSelectedFood.setGift(false);
+					} else {
 						mSelectedFood.setGift(true);
 						Toast.makeText(getActivity(), "赠送\"" + mSelectedFood.toString() + "\"", Toast.LENGTH_SHORT).show();
-					} else {
-						mSelectedFood.setGift(false);
 					}
+					mRefreshHandler.sendEmptyMessage(REFRESH_EXCEPT_GRID);
 				}
 			});
 		} else {
@@ -341,36 +367,49 @@ public class AskOrderAmountDialog extends DialogFragment {
 		final ScrollLayout scrollLayout = (ScrollLayout) view.findViewById(R.id.scrollLayout_askOrderAmount_dialog);
 
 		scrollLayout.setOnViewChangedListener(new OnViewChangedListener() {
+			
+			Handler waitHandler = new Handler();
+			Runnable refreshRunnable = new Runnable() {
+				@Override
+				public void run() {
+					//刷新数据
+					mRefreshHandler.sendEmptyMessage(REFRESH_EXCEPT_GRID);					
+				}
+			};
+			
 			@Override
 			public void onViewChanged(int curScreen, View parent, View curView) {
 				((InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(scrollLayout.getWindowToken(), 0);
 				mCurrentTasteView = curView;
-				//更新Dialog的Title
-				if((Boolean)mCurrentTasteView.getTag(R.id.combo_of_indicator_key)){
-					getDialog().setTitle(((ComboOrderFood)mCurrentTasteView.getTag(R.id.combo_of_key)).toString());
-				}else{
-					getDialog().setTitle(mSelectedFood.toString());
-				}
+				//设置Indicator
+				((IndicatorView)view.findViewById(R.id.indicator_askOrderAmount_dialog)).setCurr(curScreen);
+				
+				waitHandler.removeCallbacks(refreshRunnable);
+				waitHandler.postDelayed(refreshRunnable, 300);
 			}
 		});
 
 		//增加菜品的常用口味和品注
-		scrollLayout.addView(mCurrentTasteView = setTasteView());
+		scrollLayout.addView(mCurrentTasteView = setTasteView(container));
 		
 		//增加子菜的常用口味和品注(如果是套菜)
 		if (mSelectedFood.asFood().isCombo()) {
 			for (ComboFood combo : mSelectedFood.asFood().getChildFoods()) {
-				scrollLayout.addView(setComboTasteView(combo));
+				scrollLayout.addView(setComboTasteView(container, combo));
 			}
+			((IndicatorView)view.findViewById(R.id.indicator_askOrderAmount_dialog)).setTotal(mSelectedFood.asFood().getChildFoods().size() + 1);
+		}else{
+			view.findViewById(R.id.indicator_askOrderAmount_dialog).setVisibility(View.GONE);
 		}
 		
 		mRefreshHandler = new DialogRefreshHandler(this);
+		mRefreshHandler.sendEmptyMessage(REFRESH_EXCEPT_GRID);
 		
 		return view;
 	}
 
-	private View setTasteView() {
-		final View tasteView = LayoutInflater.from(getActivity()).inflate(R.layout.ask_order_amount_dialog_taste, null);
+	private View setTasteView(final ViewGroup container) {
+		final View tasteView = LayoutInflater.from(getActivity()).inflate(R.layout.ask_order_amount_dialog_taste, container, false);
 		// 设置常用口味GridView
 		GridView tasteGridView = (GridView) tasteView.findViewById(R.id.gridView_askOrderAmount_dialog);
 
@@ -390,7 +429,26 @@ public class AskOrderAmountDialog extends DialogFragment {
 
 				@Override
 				public View getView(int position, View convertView,	ViewGroup parent) {
-					CheckBox checkBox = (CheckBox) LayoutInflater.from(getActivity()).inflate(R.layout.ask_order_amount_dialog_item, null);
+					CheckBox checkBox;
+					if(convertView != null){
+						checkBox = (CheckBox)convertView;
+					}else{
+						checkBox = (CheckBox) LayoutInflater.from(getActivity()).inflate(R.layout.ask_order_amount_dialog_item, container, false);
+						checkBox.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+
+							@Override
+							public void onCheckedChanged(CompoundButton buttonView,	boolean isChecked) {
+								Taste taste = (Taste) buttonView.getTag();
+								if (mSelectedFood.getTasteGroup().contains(taste)) {
+									mSelectedFood.removeTaste(taste);
+								} else {
+									mSelectedFood.addTaste(taste);
+								}
+								mRefreshHandler.sendEmptyMessage(0);
+							}
+						});
+					}
+					
 					Taste thisTaste = popTastes.get(position);
 					checkBox.setTag(thisTaste);
 					checkBox.setText(thisTaste.getPreference());
@@ -401,19 +459,7 @@ public class AskOrderAmountDialog extends DialogFragment {
 						checkBox.setBackgroundColor(getResources().getColor(R.color.green));
 					}
 
-					checkBox.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 
-						@Override
-						public void onCheckedChanged(CompoundButton buttonView,	boolean isChecked) {
-							Taste taste = (Taste) buttonView.getTag();
-							if (mSelectedFood.getTasteGroup().contains(taste)) {
-								mSelectedFood.removeTaste(taste);
-							} else {
-								mSelectedFood.addTaste(taste);
-							}
-							mRefreshHandler.sendEmptyMessage(0);
-						}
-					});
 					return checkBox;
 				}
 
@@ -542,8 +588,8 @@ public class AskOrderAmountDialog extends DialogFragment {
 		return null;
 	}
 	
-	private View setComboTasteView(final ComboFood comboFood){
-		final View comboTasteView = LayoutInflater.from(getActivity()).inflate(R.layout.ask_order_amount_dialog_taste, null);
+	private View setComboTasteView(final ViewGroup container, final ComboFood comboFood){
+		final View comboTasteView = LayoutInflater.from(getActivity()).inflate(R.layout.ask_order_amount_dialog_taste, container, false);
 		//设置常用口味GridView
 		GridView tasteGridView = (GridView)comboTasteView.findViewById(R.id.gridView_askOrderAmount_dialog);
     	
@@ -570,7 +616,34 @@ public class AskOrderAmountDialog extends DialogFragment {
 				
 				@Override
 				public View getView(int position, View convertView, ViewGroup parent) {
-					CheckBox checkBox = (CheckBox) LayoutInflater.from(getActivity()).inflate(R.layout.ask_order_amount_dialog_item, null);
+					CheckBox checkBox;
+					if(convertView != null){
+						checkBox = (CheckBox)convertView;
+					}else{
+						checkBox = (CheckBox) LayoutInflater.from(getActivity()).inflate(R.layout.ask_order_amount_dialog_item, container, false);
+						checkBox.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+							
+							@Override
+							public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+								//Check to see whether this combo food is contained in this order food.
+								ComboOrderFood thisCombo = matchComboFood(comboFood);
+								
+								if(thisCombo == null){
+									thisCombo = (ComboOrderFood)comboTasteView.getTag(R.id.combo_of_key);
+									mSelectedFood.addCombo(thisCombo);
+								}
+								
+								Taste taste = (Taste) buttonView.getTag();
+								if(thisCombo.getTasteGroup().contains(taste)){
+									thisCombo.removeTaste(taste);
+								} else {
+									thisCombo.addTaste(taste);
+								}
+								mRefreshHandler.sendEmptyMessage(0);
+							}
+						});
+					}
+					
 					Taste thisTaste = popTastes.get(position);
 					checkBox.setTag(thisTaste);
 					checkBox.setText(thisTaste.getPreference());
@@ -583,28 +656,7 @@ public class AskOrderAmountDialog extends DialogFragment {
 					}else{
 						checkBox.setBackgroundColor(getResources().getColor(R.color.green));
 					}
-					
-					checkBox.setOnCheckedChangeListener(new OnCheckedChangeListener() {
-						
-						@Override
-						public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-							//Check to see whether this combo food is contained in this order food.
-							ComboOrderFood thisCombo = matchComboFood(comboFood);
-							
-							if(thisCombo == null){
-								thisCombo = (ComboOrderFood)comboTasteView.getTag(R.id.combo_of_key);
-								mSelectedFood.addCombo(thisCombo);
-							}
-							
-							Taste taste = (Taste) buttonView.getTag();
-							if(thisCombo.getTasteGroup().contains(taste)){
-								thisCombo.removeTaste(taste);
-							} else {
-								thisCombo.addTaste(taste);
-							}
-							mRefreshHandler.sendEmptyMessage(0);
-						}
-					});
+
 					return checkBox;
 				}
 				
@@ -646,7 +698,11 @@ public class AskOrderAmountDialog extends DialogFragment {
 				
 				if(s.toString().trim().length() != 0){
 					thisCombo.setTmpTaste(Taste.newTmpTaste(s.toString().trim(), 0f));
-					getDialog().setTitle(thisCombo.toString());
+				}
+				if(thisCombo.hasTasteGroup()){
+					((TextView)getView().findViewById(R.id.txtView_comboTaste_askOrderAmount_dialog)).setText(thisCombo.getTasteGroup().getPreference());
+				}else{
+					((TextView)getView().findViewById(R.id.txtView_comboTaste_askOrderAmount_dialog)).setText("无口味");
 				}
 			}
 

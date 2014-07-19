@@ -592,7 +592,7 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 				});
 				
 				if(mPopup == null){
-					View popupLayout = getActivity().getLayoutInflater().inflate(R.layout.order_activity_operate_popup, null);
+					View popupLayout = getActivity().getLayoutInflater().inflate(R.layout.order_activity_operate_popup, parent, false);
 					mPopup = new PopupWindow(popupLayout, LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
 					mPopup.setOutsideTouchable(true);
 					mPopup.setBackgroundDrawable(getResources().getDrawable(R.drawable.popup_small));
@@ -721,7 +721,7 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 	
 	@Override
 	public View onCreateView (LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
-		return inflater.inflate(R.layout.order_food_activity, null);
+		return inflater.inflate(R.layout.order_food_activity, container, false);
 	}
 
 	
@@ -779,9 +779,9 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 				
 				mAllFoodTastes.clear();
 				
-				OrderFoodParcel foodParcel = data.getParcelableExtra(OrderFoodParcel.KEY_VALUE);
-				if(foodParcel.asOrderFood().hasTasteGroup()){
-					mAllFoodTastes.addAll(foodParcel.asOrderFood().getTasteGroup().getNormalTastes());
+				TasteGroupParcel tgParcel = data.getParcelableExtra(TasteGroupParcel.KEY_VALUE);
+				if(tgParcel.asTasteGroup() != null){
+					mAllFoodTastes.addAll(tgParcel.asTasteGroup().getNormalTastes());
 					//为所有新点菜添加口味,临时菜除外
 					for(OrderFood of : mNewFoodList){
 						if(!of.isTemp()){

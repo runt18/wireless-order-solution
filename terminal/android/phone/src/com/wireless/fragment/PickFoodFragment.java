@@ -30,6 +30,7 @@ import android.widget.Toast;
 
 import com.wireless.common.WirelessOrder;
 import com.wireless.pojo.menuMgr.Food;
+import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.util.NumericUtil;
 import com.wireless.ui.R;
 import com.wireless.ui.dialog.AskOrderAmountDialog;
@@ -217,7 +218,7 @@ public class PickFoodFragment extends Fragment{
 		public View getView(int position, View convertView, ViewGroup parent) {
 			View view;
 			if(convertView == null){
-				view = LayoutInflater.from(parent.getContext()).inflate(R.layout.pick_food_by_pinyin_fgm_item, null);
+				view = LayoutInflater.from(parent.getContext()).inflate(R.layout.pick_food_by_pinyin_fgm_item, parent, false);
 			}else{
 				view = convertView;
 			}
@@ -240,7 +241,7 @@ public class PickFoodFragment extends Fragment{
 				((TextView)view.findViewById(R.id.textView_sellout_pickFoodFgm_item)).setText("Í£");
 				((TextView)view.findViewById(R.id.textView_sellout_pickFoodFgm_item)).setTextColor(getResources().getColor(R.color.red));
 				
-			}else if(food.isGift()){
+			}else if(food.isGift() && WirelessOrder.loginStaff.getRole().hasPrivilege(Privilege.Code.GIFT)){
 				((TextView)view.findViewById(R.id.textView_sellout_pickFoodFgm_item)).setVisibility(View.VISIBLE);
 				((TextView)view.findViewById(R.id.textView_sellout_pickFoodFgm_item)).setText("Ôù");
 				((TextView)view.findViewById(R.id.textView_sellout_pickFoodFgm_item)).setTextColor(getResources().getColor(R.color.maroon));
