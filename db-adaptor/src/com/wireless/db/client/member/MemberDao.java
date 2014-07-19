@@ -134,20 +134,22 @@ public class MemberDao {
 				extraCond.append(" AND MT.member_type_id = " + memberTypeId);
 			}
 			
-			if(minConsumeAmount > 0 && maxConsumeAmount == 0){
-				extraCond.append(" AND M.consumption_amount > " + minConsumeAmount);
-			}else if(maxConsumeAmount > 0 && minConsumeAmount == 0){
-				extraCond.append(" AND M.consumption_amount < " + maxConsumeAmount);
-			}else if(maxConsumeAmount > 0 && minConsumeAmount > 0){
+//			if(minConsumeAmount > 0 && maxConsumeAmount == 0){
+//				extraCond.append(" AND M.consumption_amount > " + minConsumeAmount);
+//			}else if(maxConsumeAmount > 0 && minConsumeAmount == 0){
+//				extraCond.append(" AND M.consumption_amount < " + maxConsumeAmount);
+//			}else if(maxConsumeAmount > 0 && minConsumeAmount > 0){
+			if(minConsumeAmount != 0 || maxConsumeAmount != 0){
 				extraCond.append(" AND M.consumption_amount BETWEEN " + minConsumeAmount + " AND " + maxConsumeAmount);
 			}
 			
-			if(minTotalConsume > 0 && maxTotalConsume == 0){
+/*			if(minTotalConsume > 0 && maxTotalConsume == 0){
 				extraCond.append(" AND M.total_consumption > " + minConsumeAmount);
 			}else if(maxTotalConsume > 0 && minTotalConsume == 0){
 				extraCond.append(" AND M.total_consumption < " + maxConsumeAmount);
-			}else if(maxTotalConsume > 0 && minTotalConsume > 0){
-				extraCond.append(" AND M.total_consumption BETWEEN " + minConsumeAmount + " AND " + maxConsumeAmount);
+			}else if(maxTotalConsume > 0 && minTotalConsume > 0){*/
+			if(minTotalConsume != 0 || maxTotalConsume != 0){
+				extraCond.append(" AND M.total_consumption BETWEEN " + minTotalConsume + " AND " + maxTotalConsume);
 			}
 			
 			return extraCond.toString();
