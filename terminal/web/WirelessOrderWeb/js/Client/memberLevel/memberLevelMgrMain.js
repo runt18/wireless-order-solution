@@ -6,13 +6,6 @@ function initAddLevelWin(){
 		modal : true,
 		resizable : false,
 		width : 250,
-		keys : [{
-			key : Ext.EventObject.ESC,
-			scope : this,
-			fn : function(){
-				memberLevelAddWin.hide();
-			}
-		}],
 		bbar : [{
 			text : '删除',
 			id : 'btn_memberLevelDel',

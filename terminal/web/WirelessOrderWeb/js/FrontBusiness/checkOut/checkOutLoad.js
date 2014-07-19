@@ -13,7 +13,7 @@ function loadDiscountData(_c){
 		},
 		success : function(response, options) {
 			var jr = Ext.decode(response.responseText);
-			checkOutForm.buttons[7].setDisabled(false);
+//			checkOutForm.buttons[7].setDisabled(false);
 			discountData = jr.root;
 			var discount = Ext.getCmp('comboDiscount');
 			discount.store.loadData({root:discountData});
@@ -33,13 +33,18 @@ function loadDiscountData(_c){
 //			}
 		},
 		failure : function(response, options) {
-			checkOutForm.buttons[7].setDisabled(false);
+//			checkOutForm.buttons[7].setDisabled(false);
 			Ext.ux.showMsg(Ext.decode(response.responseText));
 		},
 		callback : _c.callback
 	});
 }
 
+function checkDot(c)
+{
+	var r= /^[+-]?[1-9]?[0-9]*\.[0-9]*$/;
+	return r.test(c);
+}
 
 /**
  * 加载账单基础汇总信息
@@ -49,25 +54,27 @@ function loadOrderBasicMsg(){
 //	calcPricePlanID = orderMsg.pricePlan.id; // i
 	document.getElementById('spanDisplayCurrentDiscount').innerHTML = orderMsg.discount.name;
 	
-	document.getElementById("serviceCharge").value = orderMsg.serviceRate * 100;
+//	document.getElementById("serviceCharge").value = orderMsg.serviceRate * 100;
 //	var actualCount = document.getElementById("actualCount").value;
-	document.getElementById("totalCount").innerHTML = parseFloat(orderMsg.totalPrice).toFixed(2);
-	document.getElementById("shouldPay").innerHTML = parseFloat(orderMsg.actualPrice).toFixed(2);
+	document.getElementById("totalCount").innerHTML = checkDot(orderMsg.totalPrice)?parseFloat(orderMsg.totalPrice).toFixed(2) : orderMsg.totalPrice;
+	document.getElementById("shouldPay").innerHTML = checkDot(orderMsg.actualPrice)?parseFloat(orderMsg.actualPrice).toFixed(2) : orderMsg.actualPrice;
 	document.getElementById("forFree").innerHTML = parseFloat(orderMsg.giftPrice).toFixed(2);
 	document.getElementById("spanCancelFoodAmount").innerHTML = parseFloat(orderMsg.cancelPrice).toFixed(2);
-	var change = '0.00';
+	document.getElementById("discountPrice").innerHTML = parseFloat(orderMsg.discountPrice).toFixed(2);
+	
+//	var change = '0.00';
 	
 //	if(actualCount == '' || actualCount < orderMsg.actualPrice){
 //		document.getElementById("actualCount").value = parseFloat(orderMsg.actualPrice).toFixed(2);
 //	}else{
 //		change = parseFloat(actualCount - orderMsg.actualPrice).toFixed(2);
 //	}
-	document.getElementById("actualCount").value = parseFloat(orderMsg.actualPrice).toFixed(2);
+//	document.getElementById("actualCount").value = parseFloat(orderMsg.actualPrice).toFixed(2);
 	
-	document.getElementById("change").innerHTML = change;
-	Ext.getCmp('numCustomNum').setValue(orderMsg.customNum > 0 ? orderMsg.customNum : 1);
+//	document.getElementById("change").innerHTML = change;
+//	Ext.getCmp('numCustomNum').setValue(orderMsg.customNum > 0 ? orderMsg.customNum : 1);
 	if(eval(orderMsg.category != 4)){
-		Ext.getCmp('numCustomNum').setDisabled(false);
+//		Ext.getCmp('numCustomNum').setDisabled(false);
 	}
 	if(eval(orderMsg.category != 4) && eval(orderMsg.cancelPrice > 0)){
 		Ext.getDom('spanSeeCancelFoodAmount').style.visibility = 'inherit';		
@@ -83,6 +90,8 @@ function loadOrderBasicMsg(){
 	if(orderMsg.category != 4){
 		checkOutMainPanel.setTitle(checkOutMainPanel.title + ' -- 餐桌号:<font color="red">' + orderMsg.table.alias + '</font>');
 	}
+	
+	Ext.getCmp('txtEraseQuota').setValue();
 }
 
 /**
@@ -125,14 +134,14 @@ function loadTableData(_c){
 		_c = {};
 	}
 	var eraseQuota = document.getElementById("txtEraseQuota").value;
-	var serviceRate = document.getElementById("serviceCharge").value;
-	var customNum = Ext.getCmp("numCustomNum").getValue();
+	var serviceRate = Ext.getCmp("serviceCharge").getValue();
+//	var customNum = Ext.getCmp("numCustomNum").getValue();
 	eraseQuota = typeof eraseQuota != 'undefined' && eval(eraseQuota >= 0) ? eraseQuota : 0;
 	serviceRate = typeof serviceRate != 'undefined' && eval(serviceRate >= 0) ? serviceRate : 0;
-	customNum = typeof customNum != 'undefined' && eval(customNum > 0) ? customNum : 0;
+//	customNum = typeof customNum != 'undefined' && eval(customNum > 0) ? customNum : 0;
 	if(serviceRate > 100){
 		serviceRate = 100;
-		document.getElementById("serviceCharge").value = 100;
+		Ext.getCmp("serviceCharge").setValue(100);
 	}
 	Ext.Ajax.request({
 		url : "../../QueryOrderByCalc.do",
@@ -142,19 +151,21 @@ function loadTableData(_c){
 			calc : typeof _c.calc == 'boolean' ? _c.calc : true,
 			discountID : calcDiscountID,
 //			pricePlanID : calcPricePlanID,
-			eraseQuota : eraseQuota,
-			serviceRate : serviceRate,
-			customNum : customNum
+//			eraseQuota : eraseQuota,
+			serviceRate : serviceRate
 		},
 		success : function(response, options) {
 			var jr = Ext.decode(response.responseText);
-			checkOutForm.buttons[7].setDisabled(false);
+//			checkOutForm.buttons[7].setDisabled(false);
 			if (jr.success == true) {
 				setFormButtonStatus(false);
 				// 加载已点菜
 				checkOutData = jr;
 				// 加载显示账单基础信息
 				orderMsg = jr.other.order;
+				
+				//赋值总额用于抹数计算
+				checkOut_actualPrice = jr.other.order.actualPrice;
 				
 				loadOrderBasicMsg();
 				// 
@@ -210,6 +221,28 @@ function refreshCheckOutData(_c){
 }
 
 function checkOutOnLoad() {	
+	new Ext.form.TextField({
+		id : 'txtEraseQuota',
+		width : 70,
+		height : 30,
+		style : 'font-size:20px;',
+		renderTo : 'spanHasEraseQuota',
+		listeners : {
+			'render': {
+			    fn: function(c){
+			        c.getEl().on(
+			            'keyup',
+			            function() {
+			            		var shouldPay = checkOut_actualPrice - c.getEl().dom.value;
+			            		Ext.getDom('shouldPay').innerHTML = checkDot(shouldPay)?shouldPay.toFixed(2) : shouldPay;
+			            }
+			        );
+			    },
+			    scope: this
+			 
+			}						
+		}
+	});
 	getOperatorName("../../", function(staff){
 		// 加载折扣方案
 		loadDiscountData({
@@ -351,5 +384,123 @@ showCancelFoodDetail = function(){
 	}
 	showCancelFoodDetailWin.show();
 };
+
+function fnRemberIsFastOrInput(){
+	if(Ext.getDom('chkCalcReturn').checked){
+		showInputReciptWin();
+		Ext.ux.setCookie(document.domain+'_calcReturn', true, 3650);
+	}else{
+		Ext.ux.setCookie(document.domain+'_calcReturn', false, 3650);
+		paySubmit(1);
+	}	
+}
+
+function showInputReciptWin(){
+	
+	if(!inputReciptWin){
+		inputReciptWin = new Ext.Window({
+			id : 'checkOut_inputRecipt',
+			closable : false, //是否可关闭
+			resizable : false, //大小调整
+			modal : true,
+			width : 300,			
+			items : [{
+				layout : 'form',
+				frame : true,
+				border : true,
+				labelWidth : 120,
+				labelAlign : 'right',
+//				height : Ext.isIE ? 150 : null,
+				items : [{
+					xtype : 'textfield',
+					id : 'txtShouldToRecipt',
+					width : 130,
+					fieldLabel : '<font style="font-size:25px;text-align:right">消费金额</font>',
+					style : 'font-size:26px;height:30px;',
+					disabled : true
+				},{
+					xtype : 'numberfield',
+					id : 'txtInputRecipt',
+					width : 130,
+					fieldLabel : '<font style="font-size:25px;">输入收款</font>',
+					allowBlank : false,
+					style : 'font-size:26px;height:30px;',
+					enableKeyEvent : true,
+					validator : function(v){
+						if(Ext.util.Format.trim(v).length > 0){
+							if((v - Ext.getCmp('txtShouldToRecipt').getValue()) >= 0){
+								return true;
+							}else{
+								return '收款金额不能小于消费金额';
+							}
+						}else{
+							return '收款不允许为空';
+						}
+					},
+					listeners : {
+						'render': {
+						    fn: function(c){
+						        c.getEl().on(
+						            'keyup',
+						            function() {
+						            	if((c.getEl().dom.value - Ext.getCmp('txtShouldToRecipt').getValue()) > -1){
+						            		Ext.getCmp('txtReciptReturn').setValue(eval(c.getEl().dom.value - Ext.getCmp('txtShouldToRecipt').getValue()));
+						            	}else{
+						            		Ext.getCmp('txtReciptReturn').setValue();
+						            	}
+						            	 
+						            }
+						        );
+						    },
+						    scope: this
+						 
+						}						
+					}
+					
+				},{
+					xtype : 'numberfield',
+					id : 'txtReciptReturn',
+					width : 130,
+					fieldLabel : '<font style="font-size:25px;text-align:right">找零</font>',
+					style : 'font-size:26px;height:30px;',
+					disabled : true
+				}]				
+			}],
+			bbar : ['->',{
+				text : '结账',
+				id : 'btnPayInputRecipt',
+				iconCls : 'btn_save',
+				handler : function(e){
+					
+				}				
+			},{
+				text : '关闭',
+				id : 'btnCloseInputReciptWin',
+				iconCls : 'btn_close',
+				handler : function(e){
+					inputReciptWin.hide();
+				}				
+			}],
+			listeners : {
+				hide : function(){
+					Ext.getCmp('txtShouldToRecipt').setValue();
+					Ext.getCmp('txtInputRecipt').setValue();
+					Ext.getCmp('txtReciptReturn').setValue();
+					Ext.getCmp('txtInputRecipt').clearInvalid();				
+				}
+			},
+			keys : [{
+				 key : Ext.EventObject.ENTER,
+				 fn : function(){ 
+					 Ext.getCmp('btnPayInputRecipt').handler();
+				 },
+				 scope : this 
+			 }]			
+		});
+	}
+	inputReciptWin.show();
+	Ext.getCmp('txtShouldToRecipt').setValue(Ext.get('shouldPay').dom.innerHTML);
+	Ext.getCmp('txtInputRecipt').focus(true, 100);
+}
 
 

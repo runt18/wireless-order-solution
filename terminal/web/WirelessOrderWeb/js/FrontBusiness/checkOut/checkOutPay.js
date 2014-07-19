@@ -12,12 +12,18 @@ var paySubmit = function(submitType) {
 			setFormButtonStatus(true);
 			var canSubmit = true;
 			var forFree = document.getElementById("forFree").innerHTML;
-			var change = document.getElementById("change").innerHTML;
+			var change;
+			if(inputReciptWin){
+				change = Ext.getCmp('txtReciptReturn').getValue();
+			}else{
+				change = 0;
+			}
 			var cancelledFoodAmount = document.getElementById("spanCancelFoodAmount").innerHTML;
-			var actualPrice = document.getElementById("actualCount").value;
+			var actualPrice = checkOut_actualPrice;
 			var countPrice = document.getElementById("totalCount").innerHTML;
 			var shouldPay = document.getElementById("shouldPay").innerHTML;
-			var serviceRate = document.getElementById("serviceCharge").value;
+//			var serviceRate = document.getElementById("serviceCharge").value;
+			var serviceRate = 0;
 			var eraseQuota = document.getElementById("txtEraseQuota").value;
 			var submitPrice = -1;
 			
@@ -75,11 +81,11 @@ var paySubmit = function(submitType) {
 					"payManner" : payManner,
 					"tempPay" : tempPay,
 					"memberID" : actualMemberID,
-					"comment" : Ext.getCmp("remark").getValue(),
-					"serviceRate" : serviceRate,
-					'eraseQuota' : eraseQuota,
+					"comment" : Ext.getDom("remark").value,
+					"serviceRate" : serviceRate
+//					'eraseQuota' : eraseQuota
 //					'pricePlanID' : calcPricePlanID,
-					'customNum' : Ext.getCmp('numCustomNum').getValue()
+//					'customNum' : Ext.getCmp('numCustomNum').getValue()
 				},
 				success : function(response, options) {
 					isPaying = false;

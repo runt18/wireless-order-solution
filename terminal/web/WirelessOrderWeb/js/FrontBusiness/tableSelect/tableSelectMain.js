@@ -171,6 +171,158 @@ var btnPayOrderGroup = new Ext.ux.ImageButton({
 	}
 });
 
+
+var bindWeixinMember = new Ext.ux.ImageButton({
+	imgPath : "",
+	imgWidth : 50,
+	imgHeight : 50,
+	tooltip : "微信绑定",
+	handler : function(btn) {
+		showWeixinMemberBindWin();
+	}	
+});
+
+
+function showWeixinMemberBindWin(){
+	
+	if(!weixinMemberBindWin){
+		weixinMemberBindWin = new Ext.Window({
+			title : '绑定微信会员',
+			closable : false,
+			modal : true,
+			resizable : false,
+			width : 250,	
+			items : [{
+				layout : 'form',
+				labelWidth : 60,
+				width : 250,
+				border : false,
+				frame : true,
+				items : [{
+					xtype : 'numberfield',
+					fieldLabel : '手机号',
+					id : 'txtWeixinMemberPhone',
+					allowBlank : false,
+					width : 130,
+					validator : function(v){
+						if(Ext.util.Format.trim(v).length > 0){
+							return true;
+						}else{
+							return '手机号不能为空.';
+						}
+					}
+				},{
+					xtype : 'numberfield',
+					fieldLabel : '微信卡号',
+					id : 'txtWeixinMemberCard',
+					allowBlank : false,
+					width : 130,
+					validator : function(v){
+						if(Ext.util.Format.trim(v).length > 0){
+							return true;
+						}else{
+							return '卡号不能为空.';
+						}
+					}
+				},{
+					xtype : 'textfield',
+					fieldLabel : '会员名称',
+					id : 'txtWeixinMemberName',
+					width : 130
+				},{
+					xtype : 'combo',
+					id : 'wx_comboMemberSex',
+					fieldLabel : '性别',
+					width : 130,
+					readOnly : false,
+					forceSelection : true,
+					value : 0,
+					store : new Ext.data.SimpleStore({
+						fields : ['value', 'text'],
+						data : [[0,'男'], [1, '女']]
+					}),
+					valueField : 'value',
+					displayField : 'text',
+					typeAhead : true,
+					mode : 'local',
+					triggerAction : 'all',
+					selectOnFocus : true
+				}]
+			}],
+			bbar : ['->',{
+				text : '绑定',
+				id : 'btn_bindWeixinMember',
+				iconCls : 'btn_save',
+				handler : function(){
+					var weixinMemberPhone = Ext.getCmp('txtWeixinMemberPhone');
+					var weixinMemberCard = Ext.getCmp('txtWeixinMemberCard');
+					var weixinMemberName = Ext.getCmp('txtWeixinMemberName');
+					var weixinMemberSex = Ext.getCmp('wx_comboMemberSex');
+					
+					if(!weixinMemberPhone.isValid() || !weixinMemberCard.isValid()){
+						return;
+					}
+					Ext.Ajax.request({
+						url : '../../weixinFrontBind.do',
+						params : {
+							weixinMemberPhone : weixinMemberPhone.getValue(),
+							weixinMemberCard : weixinMemberCard.getValue(),
+							weixinMemberSex : weixinMemberSex,
+							weixinMemberName : weixinMemberName,
+							dataSource : 'weixinFrontBind'
+						},
+						success : function(res, opt){
+							var jr = Ext.decode(res.responseText);
+							if(jr.success){
+								Ext.ux.showMsg(jr);
+								weixinMemberBindWin.hide();
+							}else{
+								Ext.ux.showMsg(jr);
+							}
+							
+						},
+						failure : function(res, opt){
+							Ext.ux.showMsg(Ext.util.JSON.decode(res.responseText));
+						}
+					});
+				}
+			}, {
+				text : '取消',
+				id : 'btn_cancelWeixinMmemberWin',
+				iconCls : 'btn_close',
+				handler : function(){
+					weixinMemberBindWin.hide();
+				}
+			}],	
+			keys : [{
+				key : Ext.EventObject.ENTER,
+				scope : this,
+				fn : function(){
+					Ext.getCmp('btn_bindWeixinMember').handler();
+				}
+			},{
+				key : Ext.EventObject.ESC,
+				scope : this,
+				fn : function(){
+					weixinMemberBindWin.hide();
+				}
+			}],
+			listeners : {
+				hide : function(){
+					Ext.getCmp('txtWeixinMemberPhone').setValue();
+					Ext.getCmp('txtWeixinMemberPhone').clearInvalid();
+					Ext.getCmp('txtWeixinMemberCard').setValue();
+					Ext.getCmp('txtWeixinMemberCard').clearInvalid();
+					Ext.getCmp('txtWeixinMemberName').setValue();
+					Ext.getCmp('wx_comboMemberSex').setValue();
+				}
+			}
+		});
+	}
+	weixinMemberBindWin.show();
+	Ext.getCmp('txtWeixinMemberPhone').focus(true, 100);
+}
+
 function jiaoBanDaYin(e){
 	var tempMask = new Ext.LoadMask(document.body, {
 		msg : '正在打印请稍候.......',
@@ -1622,6 +1774,8 @@ Ext.onReady(function() {
 			btnMemberRecharge,
 			{text : "&nbsp;&nbsp;&nbsp;", xtype : 'tbtext' },
 			btnControlMember,
+			{text : "&nbsp;&nbsp;&nbsp;", xtype : 'tbtext' },
+			bindWeixinMember,
 			{text : "&nbsp;&nbsp;&nbsp;", xtype : 'tbtext' },
 			btnQueryConsumeDetail,
 			{text : "&nbsp;&nbsp;&nbsp;", xtype : 'tbtext' },			

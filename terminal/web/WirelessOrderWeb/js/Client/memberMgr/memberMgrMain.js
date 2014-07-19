@@ -968,51 +968,33 @@ function gridInit(){
 			{xtype : 'tbtext', text : '&nbsp;&nbsp;'},			
 			{xtype : 'tbtext', text : '消费金额:'},
 			{
-				id : 'usedBalanceEqual',
-				xtype : 'combo',
-				readOnly : false,
-				forceSelection : true,
-				value : '=',
-				width : 70,
-				store : new Ext.data.SimpleStore({
-					fields : ['value', 'text'],
-					data : [['=', '等于'], ['>=', '大于等于'], ['<=', '小于等于']]
-				}),
-				valueField : 'value',
-				displayField : 'text',
-				typeAhead : true,
-				mode : 'local',
-				triggerAction : 'all',
-				selectOnFocus : true
+				xtype : 'numberfield',
+				id : 'textTotalMinMemberCost',
+				width : 60
+			},
+			{
+				xtype : 'tbtext',
+				text : '&nbsp;-&nbsp;'
 			},			
 			{
 				xtype : 'numberfield',
-				id : 'textTotalMemberCost',
+				id : 'textTotalMaxMemberCost',
 				width : 60
 			},
 			{xtype : 'tbtext', text : '&nbsp;&nbsp;'},	
 			{xtype : 'tbtext', text : '消费次数:'},
 			{
-				id : 'consumptionAmountEqual',
-				xtype : 'combo',
-				readOnly : false,
-				forceSelection : true,
-				value : '=',
-				width : 70,
-				store : new Ext.data.SimpleStore({
-					fields : ['value', 'text'],
-					data : [['=', '等于'], ['>=', '大于等于'], ['<=', '小于等于']]
-				}),
-				valueField : 'value',
-				displayField : 'text',
-				typeAhead : true,
-				mode : 'local',
-				triggerAction : 'all',
-				selectOnFocus : true
+				xtype : 'numberfield',
+				id : 'textTotalMinMemberCostCount',
+				width : 50
+			},
+			{
+				xtype : 'tbtext',
+				text : '&nbsp;-&nbsp;'
 			},			
 			{
 				xtype : 'numberfield',
-				id : 'textTotalMemberCostCount',
+				id : 'textTotalMaxMemberCostCount',
 				width : 50
 			},
 /*			{xtype : 'tbtext', text : '&nbsp;&nbsp;'},	
@@ -1095,79 +1077,6 @@ function gridInit(){
 			xtype : 'tbtext',
 			text : '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
 		}, 
-/*		{
-			disabled : false,
-			xtype : 'combo',
-			id : 'mr_comboMemberSearchType',
-			fieldLabel : '过滤',
-			readOnly : false,
-			forceSelection : true,
-			value : 0,
-			width : 80,
-			store : new Ext.data.SimpleStore({
-				fields : ['value', 'text'],
-				data : searchTypeData
-			}),
-			valueField : 'value',
-			displayField : 'text',
-			typeAhead : true,
-			mode : 'local',
-			triggerAction : 'all',
-			selectOnFocus : true,
-			listeners : {
-				select : function(thiz, record, index){
-					var value = thiz.getValue();
-					var text = Ext.getCmp('txtSearchValueByText');
-					var comboOperation = Ext.getCmp('comboSearchValueByOperation');
-					var number = Ext.getCmp('numberSearchValueByNumber');
-					if(value == 0){
-						text.setVisible(false);
-						comboOperation.setVisible(false);
-						number.setVisible(false);
-						mObj.searchValue = '';
-						Ext.getCmp('btnSearchMember').handler();
-					}else if(value == 1){
-						text.setVisible(true);
-						number.setVisible(false);
-						text.setValue();
-						mObj.searchValue = text.getId();
-					}else{
-						text.setVisible(false);
-						number.setVisible(true);
-						number.setValue();
-						mObj.searchValue = number.getId();
-						comboOperation.setValue(0);
-						comboOperation.setVisible(!(value == 2 || value == 3));
-					}
-				}
-			}
-		}, {
-			xtype : 'tbtext',
-			text : '&nbsp;&nbsp;'
-		}, {
-			xtype : 'textfield',
-			id : 'txtSearchValueByText',
-			hidden : true
-		}, {
-			disabled : false,
-			xtype : 'combo',
-			id : 'comboSearchValueByOperation',
-			readOnly : false,
-			forceSelection : true,
-			value : 0,
-			width : 80,
-			store : new Ext.data.SimpleStore({
-				fields : ['value', 'text'],
-				data : [[0, '等于'], [1, '大于等于'], [2, '小于等于']]
-			}),
-			valueField : 'value',
-			displayField : 'text',
-			typeAhead : true,
-			mode : 'local',
-			triggerAction : 'all',
-			selectOnFocus : true,
-			hidden : true
-		}, */
 		{
 			xtype : 'tbtext',
 			text : '会员手机/会员卡号/会员名:'
@@ -1227,7 +1136,8 @@ function gridInit(){
 				
 				var gs = memberBasicGrid.getStore();
 				
-				var beforeLoadCount = gs.getTotalCount();
+				var tipWinShow = false;
+				
 				if(memberTypeNode){
 					if(memberTypeNode.childNodes.length > 0 && memberTypeNode.attributes.memberTypeId != -1){
 						gs.baseParams['memberType'] = '';
@@ -1248,10 +1158,10 @@ function gridInit(){
 				
 				gs.baseParams['memberCardOrMobileOrName'] = Ext.getCmp('numberSearchByMemberPhoneOrCardOrName').getValue();
 //				gs.baseParams['totalBalance'] = searchType == 4 ? searchValue : '';
-				gs.baseParams['usedBalance'] = Ext.getCmp('textTotalMemberCost').getValue();
-				gs.baseParams['usedBalanceEqual'] = Ext.getCmp('usedBalanceEqual').getValue();
-				gs.baseParams['consumptionAmount'] = Ext.getCmp('textTotalMemberCostCount').getValue();
-				gs.baseParams['consumptionAmountEqual'] = Ext.getCmp('consumptionAmountEqual').getValue();
+				gs.baseParams['MinTotalMemberCost'] = Ext.getCmp('textTotalMinMemberCost').getValue();
+				gs.baseParams['MaxTotalMemberCost'] = Ext.getCmp('textTotalMaxMemberCost').getValue();
+				gs.baseParams['consumptionMinAmount'] = Ext.getCmp('textTotalMinMemberCostCount').getValue();
+				gs.baseParams['consumptionMaxAmount'] = Ext.getCmp('textTotalMaxMemberCostCount').getValue();
 //				gs.baseParams['point'] = Ext.getCmp('numberSearchByMemberPhoneOrCard').getValue();
 //				gs.baseParams['usedPoint'] = Ext.getCmp('numberSearchByMemberPhoneOrCard').getValue();
 				gs.baseParams['memberBalance'] = Ext.getCmp('textMemberBalance').getValue();
@@ -1271,12 +1181,14 @@ function gridInit(){
 							}
 						}
 					}
-					if(beforeLoadCount > 0){
+					if(gs.getTotalCount() > 0 && tipWinShow){
 						memberBasicGrid.getSelectionModel().selectAll();
 //						if(Ext.ux.getCookie(document.domain+'_memberTip') != 'true'){
 							memberTipWin.show();
 //						}					
 					}
+					
+					tipWinShow = true;
 				});
 				
 				
