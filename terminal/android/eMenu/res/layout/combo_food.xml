@@ -2,7 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
-
+
     <RelativeLayout
         android:id="@+id/relativeLayout1"
         android:layout_width="match_parent"
@@ -19,7 +19,7 @@
             android:gravity="center"
             android:text=" "
             android:textAppearance="?android:attr/textAppearanceLarge" />
-
+
         <HorizontalScrollView
             android:id="@+id/horizontalScrollView1"
             android:layout_width="match_parent"
@@ -80,10 +80,10 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_alignParentTop="false"
-            android:layout_below="@+id/relativeLayout1" />
+            android:layout_below="@+id/relativeLayout31" />
 
         <RelativeLayout
-            android:id="@+id/relativeLayout1"
+            android:id="@+id/relativeLayout31"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
@@ -94,7 +94,7 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/relativeLayout1"
+            android:layout_below="@+id/relativeLayout31"
             android:background="@drawable/combo_right_subtop_bg" >
 
             <TextView
