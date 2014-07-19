@@ -7,6 +7,12 @@
 <link rel="stylesheet" type="text/css" href="../../extjs/resources/css/ext-all.css" />
 <link rel="stylesheet" type="text/css" href="../../css/myExt.css" />
 <link rel="stylesheet" type="text/css" href="../../extjs/ext-patch.css" />
+
+<style type="text/css">
+.payOrderButton{
+	font-size:30px;cursor: pointer;padding: 3px auto;width: 150px;
+}
+</style>
 <script type="text/javascript" src="../../extjs/ext-base.js"></script>
 <script type="text/javascript" src="../../extjs/ext-all.js"></script>
 <script type="text/javascript" src="../../js/common/Ext.ux.js"></script>
@@ -25,7 +31,7 @@
 	var tableID = Request["tableID"];
 	var orderID = Request["orderID"];
 	var orderMsg = {}, checkOutData = {totalProperty:0,root:[]}, discountPlanData = {root:{}}, cancelFoodDetailData = {};
-	var gridHeightOffset = 75; 
+	var gridHeightOffset = 105; 
 	var checkOutDataDisplay = {totalProperty:0,root:[]};
 	var discountData = [], dishTasteData = [], pricePlanData = [], restaurantData = [];
 	var discountType = 1, payType = 1, actualMemberID = -1, mBalance = -1, originalTotalCount = -1;
@@ -36,6 +42,9 @@
 	
 	var timerCheckParams;
 	var isPaying = false;
+	var checkOut_actualPrice ;
+	//输入收款窗口
+	var inputReciptWin;
 </script>
 
 <script type="text/javascript"
@@ -65,43 +74,115 @@
 	<div id="payInfo" class="billList" style="text-align:left;">
 		<table>
 			<tr>
-				<td>服务费：</td>
+<!-- 				<td>服务费：</td>
 				<td>
 					<input id="serviceCharge" type="text" value="0" style="width: 50px;"></input>
 				</td>
 				<td>%</td>
-				<td style="width: 20px;">&nbsp;</td>
-				<td rowspan="2" style="font-size:30px;">实收：￥<span id="shouldPay" style="color:rgb(21, 66, 139); font-weight: bold;"></span></td>
-				<td style="width: 20px;">&nbsp;</td>
+				<td style="width: 20px;">&nbsp;</td> -->
+				<td rowspan="2" style="font-size:30px;">实收：￥<span id="aashouldPay" style="color:rgb(21, 66, 139); font-weight: bold;"></span></td>
 				<td>应收：￥<span id="totalCount"></span></td>
-				<td style="width: 20px;">&nbsp;</td>
+				<td style="width: 10px;">&nbsp;</td>
 				<td>赠送：￥<span id="forFree"></span></td>
-				<td style="width: 20px;">&nbsp;</td>
+				<td style="width: 10px;">&nbsp;</td>
+				<td>退菜金额：￥</td>
+				<td><span id="spanCancelFoodAmount"></span><span id="spanSeeCancelFoodAmount" style="visibility:hidden;">&nbsp;<a href="javascript:showCancelFoodDetail()" >查看</a></span></td>
+				<td style="width: 10px;">&nbsp;</td>
 				<td colspan="4">
 					<div id="div_showEraseQuota" style="display: none;">
 						抹数金额：￥
-						<input id="txtEraseQuota" type="text" value="0" style="width: 50px;" />
+						<span id="aspanHasEraseQuota"><!-- <input id="txtEraseQuota" type="text" value="0" style="width: 50px;" /> --></span>
 						<span id="span_showEraseQuota">
 							上限:￥<font id="font_showEraseQuota" style="color:red;"></font>
 						</span>
 					</div>
 				</td>
+				<td style="width: 10px;height : 55px;">&nbsp;</td>
+				<td >
+					<!-- <input type="button" value="计算" style="width: 80px;" onclick="refreshCheckOutData()"></input> -->
+					<input type="button" value="会员" class="payOrderButton" onclick="memberPay()"></input>
+				</td>
+				<td style="width: 10px;">&nbsp;</td>
+				<td >
+					<input type="button" value="现金(+)" class="payOrderButton" onclick="fnRemberIsFastOrInput()"></input>
+					<input id="chkCalcReturn" type="checkbox" />计算找零
+				</td>				
 			</tr>
 			<tr>
-				<td>收款：￥</td>
-				<td><input id="actualCount" type="text" style="width: 50px;"></input></td>
-				<td colspan="2">&nbsp;&nbsp;&nbsp;</td>
-				<td style="width: 20px;">&nbsp;</td>
-				<td>数量：￥<span id="spanSumFoodCount"></span></td>
-				<td style="width: 20px;">&nbsp;</td>
-				<td>找零：￥<span id="change"></span></td>
-				<td style="width: 20px;">&nbsp;</td>
-				<td>退菜金额：￥</td>
-				<td><span id="spanCancelFoodAmount"></span><span id="spanSeeCancelFoodAmount" style="visibility:hidden;">&nbsp;<a href="javascript:showCancelFoodDetail()" >查看</a></span></td>
-				<td style="width: 20px;">&nbsp;</td>
-				<td>
-					<input type="button" value="计算" style="width: 80px;" onclick="refreshCheckOutData()"></input>
+				<td colspan="11" >备注:<input id="remark" type="text"  style="width: 80%;height: 30px;font-size: 18px;" /></td>
+				<td style="width: 10px;height : 40px;">&nbsp;</td>
+				<td >
+					<input type="button" value="刷卡" class="payOrderButton" onclick="paySubmit(2)"></input>
 				</td>
+				<td style="width: 10px;">&nbsp;</td>
+				<td >
+					<input type="button" value="暂结" class="payOrderButton" onclick="paySubmit(6)"></input>
+				</td>			
+			</tr>
+		</table>
+	</div>
+	
+	<div id="divWestPayOrderGeneral">
+		<table style="width: 100%">
+			<tr>
+				<td colspan="3" style="font-size:35px;">实收：￥<span id="shouldPay" style="color:rgb(21, 66, 139); font-weight: bold;"></span></td>
+			</tr>
+			<tr>
+				<td colspan="3" style="font-size:35px;">应收：￥<span id="totalCount"></span></td>
+				
+			</tr>
+			<tr>
+				<td colspan="3" style="font-size:35px;">赠送：￥<span id="forFree"></span></td>
+			</tr>
+			<tr>
+				<td colspan="3" style="font-size:35px;">折扣：￥<span id="discountPrice"></span></td>
+				
+			</tr>			
+			<tr>
+				<td colspan="3" style="font-size:35px;height: 50px;">退菜：￥<span id="spanCancelFoodAmount"></span><span id="spanSeeCancelFoodAmount" style="visibility:hidden;">&nbsp;<a href="javascript:showCancelFoodDetail()" >查看</a></span></td>
+				
+			</tr>
+			<tr>
+				<td colspan="3" style="font-size:20px;height: 50px;">
+					<div id="div_showEraseQuota" style="display: none;">
+						抹数金额：￥
+						<span id="spanHasEraseQuota"><!-- <input id="txtEraseQuota" type="text" value="0" style="width: 50px;" /> --></span>
+						<span id="span_showEraseQuota">
+							上限:￥<font id="font_showEraseQuota" style="color:red;"></font>
+						</span>
+					</div>
+				</td>			
+			</tr>
+			<tr>
+				<td colspan="3" style="font-size:20px;height: 50px;">备注:<input id="remark" type="text"  style="width: 80%;height: 30px;font-size: 18px;" /></td>
+			</tr>
+			<tr style="height: 70px;">
+
+				<td align="center" style="padding-top: 15px;">
+					<input type="button" value="现金(+)" class="payOrderButton" onclick="fnRemberIsFastOrInput()"></input><br>
+					<input id="chkCalcReturn" type="checkbox" />计算找零
+				</td>	
+				<td align="center">
+					<!-- <input type="button" value="计算" style="width: 80px;" onclick="refreshCheckOutData()"></input> -->
+					<input type="button" value="会员" class="payOrderButton" onclick="memberPay()"></input>
+				</td>						
+			</tr>
+			<tr style="height: 70px;">
+				
+				<td align="center">
+					<input type="button" value="刷卡" class="payOrderButton" onclick="paySubmit(2)"></input>
+				</td>
+				<td align="center">
+					<input type="button" value="暂结(-)" class="payOrderButton" onclick="paySubmit(6)"></input>
+				</td>					
+			</tr>			
+			<tr style="height: 70px;">
+				<td align="center">
+					<input type="button" value="签单" class="payOrderButton" onclick="paySubmit(4)"></input>
+				</td>
+				<td align="center">
+					<input type="button" value="挂账"  class="payOrderButton"  onclick="paySubmit(5)"></input>
+				</td>				
 			</tr>
 		</table>
 	</div>
