@@ -80,9 +80,26 @@ ADD COLUMN `member_card_crc` INT UNSIGNED NULL AFTER `member_card`,
 ADD INDEX `ix_mobile_crc` (`mobile_crc` ASC),
 ADD INDEX `ix_member_card_crc` (`member_card_crc` ASC);
 
+-- -----------------------------------------------------
+-- Update the crc to mobile and member card
+-- -----------------------------------------------------
 UPDATE wireless_order_db.member
 SET mobile_crc = CRC32(mobile),
 member_card_crc = CRC32(member_card);
+
+-- -----------------------------------------------------
+-- Add the field 'restaurant_id' to table 'taste_group'
+-- -----------------------------------------------------
+ALTER TABLE `wireless_order_db`.`taste_group` 
+ADD COLUMN `restaurant_id` INT NOT NULL AFTER `taste_group_id`;
+
+UPDATE `wireless_order_db`.`taste_group` TG
+JOIN wireless_order_db.order_food OF ON TG.taste_group_id = OF.taste_group_id
+SET TG.restaurant_id = OF.restaurant_id;
+
+UPDATE wireless_order_db.taste_group
+SET restaurant_id = 0
+WHERE taste_group_id = 1;
 
 SET SQL_SAFE_UPDATES = @OLD_SAFE_UPDATES;
 
