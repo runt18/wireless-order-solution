@@ -35,10 +35,12 @@ $(function(){
 					},
 					dataType : 'json',
 					success : function(data, status, xhr){
-						if(data.root.length > 0){
-							$('#divMyCoupon').prepend('<img src="../../images/WXnew.png" style="margin-top: 10px;"></img>');
-						}else{
-							$('#divMyCoupon img').html('');
+						if(data.success){
+							if(data.root.length > 0){
+								$('#divMyCoupon').prepend('<img src="../../images/WXnew.png" style="margin-top: 10px;"></img>');
+							}else{
+								$('#divMyCoupon img').html('');
+							}						
 						}
 					},
 					error : function(data, errotType, eeor){
@@ -60,11 +62,15 @@ $(function(){
 		}
 	});
 	
-var autoWidth = function()
-{
-	 calcFloatDivs();
-};
-window.onresize = autoWidth;
+	var autoWidth = function()
+	{
+		 calcFloatDivs();
+	};
+	window.onresize = autoWidth;
+	
+	$('#txtVerifyCode').focus(function(){
+		$('html, body').animate({scrollTop: 250}, 'fast'); 
+	});
 
 	
 });

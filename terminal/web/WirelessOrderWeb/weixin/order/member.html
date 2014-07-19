@@ -300,13 +300,13 @@ var totalMath = 0;
 	<li id="ulVerifyAndBind" style="display: none;">
 	<ul class="m-b-list">
 	<li class="none-line" style="line-height: 50px;">
-		手机号: <input id="txtVerifyMobile" type="text" maxlength="11"/>
+		手机号: <input id="txtVerifyMobile" type="number" maxlength="11"/>
 	</li>
 	<li class="none-line" style="line-height: 50px;">
-		验证码: <input id="txtVerifyCode" type="text" maxlength="4" style="width:80px;"/>
+		验证码: <input id="txtVerifyCode" type="number" maxlength="4" style="width:80px;"/>
 <!-- 		<div style="border:1px solid;
 					border-radius:5px;background-color: cyan" id="btnVerifyCode" onClick="getVerifyCode({event:this})">点击获取验证码</div> -->
-		<a id="btnVerifyCode" href="#" style="color: blue; font-size: 18px;" ></a>
+		<a id="btnVerifyCode" href="#" style="color: blue;" ></a>
 	</li>
 <!-- 	<li class="none-line">
 		会员名: <input id="txtVerifyName" type="text"/>
@@ -318,7 +318,7 @@ var totalMath = 0;
 	</li> -->
 	<li style="text-align: center;">
 		<input id="btnGetVerifyCode" type="button" value="获取验证码" onClick="getVerifyCode({event:this})">
-		<input id="btnBindMember" type="button" value="确认绑定" style="display: none;" onClick="bindMember({event:this})">
+		<input id="btnBindMember" type="button" value="确认绑定"  style="display: none;"  onClick="bindMember({event:this})">
 	</li>
 	</ul>
 	</li>

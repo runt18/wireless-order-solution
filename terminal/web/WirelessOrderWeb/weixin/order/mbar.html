@@ -63,11 +63,14 @@ $.ajax({
 	},
 	dataType : 'json',
 	success : function(data, status, xhr){
-		if(data.root.length > 0){
-			$('#mbarMemberCenter').prepend('<img id="imgNewCouponTip" src="../../images/WXnew.gif" style="float : right;"></img>');
-		}else{
-			$('#mbarMemberCenter img').html('');
+		if(data.success){
+			if(data.root.length > 0){
+				$('#mbarMemberCenter').prepend('<img id="imgNewCouponTip" src="../../images/WXnew.gif" style="float : right;"></img>');
+			}else{
+				$('#mbarMemberCenter img').html('');
+			}			
 		}
+
 	},
 	error : function(data, errotType, eeor){
 		Util.dialog.show({msg: '服务器请求失败, 请稍候再试.'});

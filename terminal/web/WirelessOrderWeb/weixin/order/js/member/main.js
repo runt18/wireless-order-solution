@@ -72,7 +72,7 @@ function getVerifyCode(c){
 	
 	
 //	setBtnDisabled(true);
-	mobile.attr('disabled', true);
+//	mobile.attr('disabled', true);
 	verifyMobile = mobile;
 	$.ajax({
 		url : '../../WXOperateMember.do',
@@ -122,19 +122,17 @@ function getVerifyCode(c){
 function bindMember(c){
 	c = c == null ? {} : c;
 	var mobile = $('#txtVerifyMobile');
-	var name = $('#txtVerifyName');
+//	var name = $('#txtVerifyName');
 	var code = $('#txtVerifyCode');
-	var sex = $('input[name=radioVerifySex]');
-	for(var i = 0; i < sex.length; i++){
-		if(sex[i].checked){
-			sex = sex[i];
-			break;
-		}
-	}
-	if(!params.UserNameCode.code.test(name.val().trim())){
-		Util.dialog.show({msg: params.UserNameCode.text});
-		return;
-	}
+//	var sex = $('input[name=radioVerifySex]');
+//	for(var i = 0; i < sex.length; i++){
+//		if(sex[i].checked){
+//			sex = sex[i];
+//			break;
+//		}
+//	}
+	
+	
 	if(!params.VerifyCode.code.test(code.val().trim())){
 		Util.dialog.show({msg: params.VerifyCode.text});
 		return;
@@ -151,9 +149,7 @@ function bindMember(c){
 			fid : Util.mp.fid,
 			codeId : verifyCode.id,
 			code : code.val().trim(),
-			name : name.val().trim(),
-			mobile : mobile.val().trim(),
-			sex : sex.value
+			mobile : mobile.val().trim()
 		},
 		dataType : 'json',
 		success : function(data, status, xhr){
@@ -572,11 +568,15 @@ function toggleMemberLevel(){
 	});
 }
 
+function weixinPhoneFocus(){
+	$('#txtVerifyMobile').focus();
+}
+
 
 function showMemberBind(){
 	$('#ulVerifyAndBind').show();
-	$('#divOccupyHtml').show();
-	$('html, body').animate({scrollTop: $(document).height()}, 'fast'); 
-
-	$('#txtVerifyMobile').focus();
+//	$('#divOccupyHtml').show();
+	$('html, body').animate({scrollTop: 250}, 'fast'); 
+//	$('#txtVerifyMobile').focus();
+	weixinPhoneFocus();
 }
