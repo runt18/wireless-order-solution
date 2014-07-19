@@ -634,7 +634,7 @@ public class OrderFood implements Parcelable, Jsonable {
 	 */
 	@Override
 	public String toString(){
-		return mFood.getName() + (hasTasteGroup() ? ("-" + mTasteGroup.toString()) : "");
+		return mFood.getName() + (hasTasteGroup() ? ("-" + mTasteGroup.getPreference()) : "");
 	}
 	
 	@Override
@@ -660,6 +660,7 @@ public class OrderFood implements Parcelable, Jsonable {
 			dest.writeFloat(this.getDiscount());
 			dest.writeFloat(this.getCount());
 			dest.writeBoolean(this.isHangup());
+			dest.writeBoolean(this.isGift());
 			dest.writeLong(this.getOrderDate());
 			dest.writeString(this.getWaiter());
 			dest.writeParcelList(this.combo, 0);
@@ -677,7 +678,8 @@ public class OrderFood implements Parcelable, Jsonable {
 			dest.writeInt(this.getFoodId());
 			dest.writeShort(this.getAliasId());
 			dest.writeFloat(this.getCount());
-			dest.writeBoolean(this.isHangup);
+			dest.writeBoolean(this.isHangup());
+			dest.writeBoolean(this.isGift());
 			dest.writeLong(this.mOrderDate);
 			dest.writeString(this.mWaiter);
 			dest.writeBoolean(this.isHurried);
@@ -710,6 +712,7 @@ public class OrderFood implements Parcelable, Jsonable {
 			this.setDiscount(source.readFloat());
 			this.setCount(source.readFloat());
 			this.setHangup(source.readBoolean());
+			this.setGift(source.readBoolean());
 			this.setOrderDate(source.readLong());
 			this.setWaiter(source.readString());
 			this.combo = source.readParcelList(ComboOrderFood.CREATOR);
@@ -727,7 +730,8 @@ public class OrderFood implements Parcelable, Jsonable {
 			mFood.setFoodId(source.readInt());
 			mFood.setAliasId(source.readShort());
 			this.setCount(source.readFloat());
-			this.isHangup = source.readBoolean();
+			this.setHangup(source.readBoolean());
+			this.setGift(source.readBoolean());
 			this.mOrderDate = source.readLong();
 			this.mWaiter = source.readString();
 			this.isHurried = source.readBoolean();

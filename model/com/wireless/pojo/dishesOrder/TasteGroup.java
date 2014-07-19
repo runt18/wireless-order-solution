@@ -320,11 +320,8 @@ public class TasteGroup implements Parcelable, Jsonable{
 	 */
 	public String getPreference(){
 		if(hasNormalTaste() && hasTmpTaste()){
-			if(mNormalTaste.getTasteId() != 0){
-				return getNormalTastePref() + "," + getTmpTastePref();
-			}else{
-				return getTmpTastePref();
-			}
+			return getNormalTastePref() + "," + getTmpTastePref();
+			
 		}else if(!hasNormalTaste() && !hasTmpTaste()){
 			return NO_TASTE_PREF;
 			
