@@ -23,4 +23,15 @@
         <item name="android:shadowRadius">1.0</item>
     </style>
 
+    <declare-styleable name="indicator">
+
+        <!-- 当前索引图标 -->
+        <attr name="actived" format="reference" />
+        <!-- 非当前索引图标 -->
+        <attr name="unactived" format="reference" />
+        <!-- 指示标志间距 -->
+        <attr name="space" format="dimension" />
+        <attr name="total" format="integer" />
+    </declare-styleable>
+
 </resources>

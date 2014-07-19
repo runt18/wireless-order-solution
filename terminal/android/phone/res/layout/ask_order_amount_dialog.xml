@@ -1,7 +1,61 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:indicat="http://schemas.android.com/apk/res/com.wireless.ui"
     android:layout_width="match_parent"
     android:layout_height="wrap_content" >
+
+    <LinearLayout
+        android:id="@+id/linearLayout_combo_askOrderAmount_dialog"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="8dip"
+        android:orientation="vertical"
+        android:visibility="invisible" >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal" >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="数量 - "
+                android:textColor="@color/yellow"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/txtView_comboAmount_askOrderAmount_dialog"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="1份"
+                android:textColor="#FF6600"
+                android:textSize="18sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal" >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="口味 - "
+                android:textColor="@color/yellow"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/txtView_comboTaste_askOrderAmount_dialog"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="加辣"
+                android:textColor="#FF6600"
+                android:textSize="18sp" />
+        </LinearLayout>
+    </LinearLayout>
 
     <LinearLayout
         android:id="@+id/linearLayout_top_askOrderAmount_dialog"
@@ -71,14 +125,27 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/linearLayout_top_askOrderAmount_dialog"
-        android:layout_gravity="center" >
+        android:layout_gravity="center"
+        android:layout_marginBottom="2dip" >
     </com.wireless.ui.view.ScrollLayout>
+
+    <com.wireless.ui.view.IndicatorView
+        android:id="@+id/indicator_askOrderAmount_dialog"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/scrollLayout_askOrderAmount_dialog"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="2dip"
+        indicat:actived="@drawable/indicator_active"
+        indicat:space="6dip"
+        indicat:total="5"
+        indicat:unactived="@drawable/indicator_unactive" />
 
     <LinearLayout
         android:id="@+id/linearLayout_bottom_askOrderAmount_dialog"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/scrollLayout_askOrderAmount_dialog"
+        android:layout_below="@id/indicator_askOrderAmount_dialog"
         android:weightSum="3" >
 
         <Button
