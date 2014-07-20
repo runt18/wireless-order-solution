@@ -278,7 +278,7 @@ public class CalcCommissionStatisticsDao {
 			  " AND O.restaurant_id = " + staff.getRestaurantId() +
 			  " AND O.order_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +
 			  " AND (OF.food_status & " + Food.COMMISSION + ") <> 0 " +
-			  " AND OF.commission <> 0 " +
+			  //" AND OF.commission <> 0 " +
 			  extraCond;
 		
 		return sql;

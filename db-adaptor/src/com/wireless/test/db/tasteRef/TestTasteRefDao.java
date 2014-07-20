@@ -18,7 +18,7 @@ public class TestTasteRefDao {
 	
 	
 	@Test 
-	public void testSmartCalc() throws SQLException{
+	public void testTasteRefDao() throws SQLException{
 		System.out.println(TasteRefDao.exec());
 	}
 }

@@ -152,6 +152,7 @@ public class DailySettleDao {
 		dbCon.rs.close();		
 		
 		int totalOrder = 0, totalOrderFood = 0, totalShift = 0, maxOrderId = 0, maxOrderFoodId = 0;
+		int maxTgId = 0, maxNTgId = 0;
 		for(Staff staff : staffs){			
 			Result eachResult = exec(dbCon, staff, SettleType.AUTO_MATION);
 			
@@ -159,12 +160,15 @@ public class DailySettleDao {
 			maxOrderId = eachResult.orderArchive.getMaxId(); 
 			totalOrderFood += eachResult.orderFoodArchive.getAmount();
 			maxOrderFoodId = eachResult.orderFoodArchive.getMaxId();
+			maxTgId = eachResult.tgArchive.getTgMaxId();
+			maxNTgId = eachResult.tgArchive.getNTgMaxId();
 			totalShift += eachResult.getTotalShift();
 		}
 		
 		Result result = new Result();
 		result.orderArchive = new OrderDao.ArchiveResult(maxOrderId, totalOrder);
 		result.orderFoodArchive = new OrderFoodDao.ArchiveResult(maxOrderFoodId, totalOrderFood);
+		result.tgArchive = new TasteGroupDao.ArchiveResult(0, 0, maxTgId, maxNTgId);
 		result.setTotalShift(totalShift);
 		result.setElapsedTime((int)(System.currentTimeMillis() - beginTime) / 1000);
 		
