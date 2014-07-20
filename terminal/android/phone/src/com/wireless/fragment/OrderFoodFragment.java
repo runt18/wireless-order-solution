@@ -9,6 +9,7 @@ import java.util.Map;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -17,13 +18,16 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.Fragment;
+import android.text.method.DigitsKeyListener;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
+import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ExpandableListView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -367,31 +371,10 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 			if(!map.containsKey(ITEM_IS_ORI_FOOD)){
 				
 				layout.setOnClickListener(new OnClickListener(){
-	
 					@Override
 					public void onClick(View v) {
-						//FIXME 
 						AskOrderAmountDialog.newInstance(of, ActionType.MODIFY, getId()).show(getFragmentManager(), AskOrderAmountDialog.TAG);
-//						new AlertDialog.Builder(getActivity())
-//						.setTitle("提示")
-//						.setMessage("叫起" + of.getName() + "吗？")
-//						.setNeutralButton("是", new DialogInterface.OnClickListener() {
-//								@Override
-//								public void onClick(DialogInterface dialog,	int which){
-//									of.setHangup(true);
-//									mFoodListHandler.sendEmptyMessage(0);
-//								}
-//							})
-//							.setNegativeButton("否", new DialogInterface.OnClickListener() {
-//								@Override
-//								public void onClick(DialogInterface dialog,	int which){
-//									of.setHangup(false);
-//									mFoodListHandler.sendEmptyMessage(0);
-//								}
-//							})
-//							.show();	
 					}
-					
 				});
 				
 				//"口味"操作			 
@@ -666,6 +649,61 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 							}
 						}
 					});
+					
+					//分席Button
+					((Button)popupLayout.findViewById(R.id.button_orderActivity_operate_popup_multi)).setOnClickListener(new OnClickListener() {
+						@Override
+						public void onClick(View v) {
+							if(mNewFoodList.isEmpty()){
+								Toast.makeText(getActivity(), "您还没有点菜", Toast.LENGTH_SHORT).show();
+							}else{
+								final EditText edtTextMulti = new EditText(getActivity());
+								edtTextMulti.setKeyListener(new DigitsKeyListener(false, false));
+								
+								Dialog dialog = new AlertDialog.Builder(getActivity()).setTitle("请输入分席数量")
+									.setIcon(android.R.drawable.ic_dialog_info)
+									.setView(edtTextMulti)
+									.setPositiveButton("确定", new DialogInterface.OnClickListener(){
+										@Override
+										public void onClick(DialogInterface dialog, int which) {
+											int amount = 0;
+											try{
+												amount = Integer.parseInt(edtTextMulti.getText().toString());
+												if(amount <= 1){
+													throw new NumberFormatException();
+												}
+												
+												for(OrderFood of : mNewFoodList){
+													of.setCount(amount);
+													if(of.hasTmpTaste()){
+														Taste tmpTaste = of.getTasteGroup().getTmpTaste();
+														if(!tmpTaste.getPreference().contains("分席上")){
+															tmpTaste.setPreference((tmpTaste.getPreference().length() != 0 ? tmpTaste.getPreference() + "," : "") + "分席上");
+														}
+													}else{
+														of.setTmpTaste(Taste.newTmpTaste("分席上", 0));
+													}
+												}
+												mFoodListHandler.sendEmptyMessage(0);
+												
+											}catch(NumberFormatException e){
+												Toast.makeText(getActivity(), "您输入的分席数量不正确", Toast.LENGTH_SHORT).show();
+											}finally{
+												mPopup.dismiss();
+											}
+										}
+		
+									})
+									.setNegativeButton("取消", null).show();		
+								
+								//只用下面这一行弹出对话框时需要点击输入框才能弹出软键盘
+								dialog.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
+								//加上下面这一行弹出对话框时软键盘随之弹出
+								dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+							}
+	
+						}
+					});
 				}
 				
 				View orderOperateBtn = layout.findViewById(R.id.button_orderActivity_opera);
@@ -673,7 +711,7 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 				orderOperateBtn.setOnClickListener(new View.OnClickListener() {
 					@Override
 					public void onClick(View v) {
-						mPopup.showAsDropDown(v);
+						mPopup.showAsDropDown(v, -10, 0);
 					}
 				});
 	

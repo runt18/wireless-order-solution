@@ -5,7 +5,7 @@
 
     <Button
         android:id="@+id/button_orderActivity_operate_popup_remark"
-        android:layout_width="80dp"
+        android:layout_width="70dp"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
@@ -13,10 +13,18 @@
 
     <Button
         android:id="@+id/button_orderActivity_operate_popup_callUp"
-        android:layout_width="80dp"
+        android:layout_width="70dp"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_below="@+id/button_orderActivity_operate_popup_remark"
         android:text="叫起" />
+
+    <Button
+        android:id="@+id/button_orderActivity_operate_popup_multi"
+        android:layout_width="70dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/button_orderActivity_operate_popup_callUp"
+        android:text="分席" />
 
 </RelativeLayout>
