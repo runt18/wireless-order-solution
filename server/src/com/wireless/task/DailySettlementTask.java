@@ -63,14 +63,14 @@ public class DailySettlementTask extends SchedulerTask{
 			//Perform to upgrade member level
 			taskInfo.append("info : " + MemberDao.upgrade()).append(sep);
 			
-		}catch(SQLException e){
+		}catch(SQLException | BusinessException e){
 			taskInfo.append("error : " + e.getMessage()).append(sep);
 			e.printStackTrace();
 			
-		}catch(BusinessException e){
+		}catch(Exception e){
 			taskInfo.append("error : " + e.getMessage()).append(sep);
 			e.printStackTrace();
-			
+		
 		}finally{
 			
 			//append to the log file

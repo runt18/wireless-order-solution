@@ -130,7 +130,7 @@ class OrderHandler implements Runnable{
 					
 				}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_REGION){
 					//handle query region request
-					response = new RespPackage(request.header, RegionDao.getRegions(staff, null, null), Region.REGION_PARCELABLE_COMPLEX);
+					response = new RespPackage(request.header, RegionDao.getByStatus(staff, Region.Status.BUSY), Region.REGION_PARCELABLE_COMPLEX);
 					
 				}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_FOOD_ASSOCIATION){
 					//handle query the associated food
