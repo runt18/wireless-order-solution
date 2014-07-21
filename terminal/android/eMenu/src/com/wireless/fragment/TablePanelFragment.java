@@ -203,7 +203,7 @@ public class TablePanelFragment extends Fragment implements OnGestureListener {
 			 */
 			HashSet<Short> validRegionID = new HashSet<Short>();
 			for(Table tbl : WirelessOrder.tables){
-				validRegionID.add(tbl.getRegion().getRegionId());
+				validRegionID.add(tbl.getRegion().getId());
 			}
 			
 			/*
@@ -212,7 +212,7 @@ public class TablePanelFragment extends Fragment implements OnGestureListener {
 			final List<Region> validRegions = new ArrayList<Region>();
 			validRegions.add(new Region(FILTER_REGION_ALL, REGION_ALL_STR, 0));
 			for(Region region : WirelessOrder.regions){
-				if(validRegionID.contains(region.getRegionId())){
+				if(validRegionID.contains(region.getId())){
 					validRegions.add(region);
 				}
 			}
@@ -229,7 +229,7 @@ public class TablePanelFragment extends Fragment implements OnGestureListener {
 					@Override
 					public void onClick(View v) {
 						Region region = (Region) v.getTag();
-						fragment.mRegionCond = region.getRegionId();
+						fragment.mRegionCond = region.getId();
 						fragment.mTableRefreshHandler.sendEmptyMessage(0);
 					}
 				});
@@ -273,34 +273,34 @@ public class TablePanelFragment extends Fragment implements OnGestureListener {
 				}else if(fragment.mTableCond == FILTER_TABLE_BUSY && !t.isBusy()){
 					iter.remove();
 					
-				}else if(fragment.mRegionCond == Region.RegionId.REGION_1.getId() && t.getRegion().getRegionId() != Region.RegionId.REGION_1.getId()){
+				}else if(fragment.mRegionCond == Region.RegionId.REGION_1.getId() && t.getRegion().getId() != Region.RegionId.REGION_1.getId()){
 					iter.remove();
 					
-				}else if(fragment.mRegionCond == Region.RegionId.REGION_2.getId() && t.getRegion().getRegionId() != Region.RegionId.REGION_2.getId()){
+				}else if(fragment.mRegionCond == Region.RegionId.REGION_2.getId() && t.getRegion().getId() != Region.RegionId.REGION_2.getId()){
 					iter.remove();
 					
-				}else if(fragment.mRegionCond == Region.RegionId.REGION_3.getId() && t.getRegion().getRegionId() != Region.RegionId.REGION_3.getId()){
+				}else if(fragment.mRegionCond == Region.RegionId.REGION_3.getId() && t.getRegion().getId() != Region.RegionId.REGION_3.getId()){
 					iter.remove();
 					
-				}else if(fragment.mRegionCond == Region.RegionId.REGION_4.getId() && t.getRegion().getRegionId() != Region.RegionId.REGION_4.getId()){
+				}else if(fragment.mRegionCond == Region.RegionId.REGION_4.getId() && t.getRegion().getId() != Region.RegionId.REGION_4.getId()){
 					iter.remove();
 					
-				}else if(fragment.mRegionCond == Region.RegionId.REGION_5.getId() && t.getRegion().getRegionId() != Region.RegionId.REGION_5.getId()){
+				}else if(fragment.mRegionCond == Region.RegionId.REGION_5.getId() && t.getRegion().getId() != Region.RegionId.REGION_5.getId()){
 					iter.remove();
 					
-				}else if(fragment.mRegionCond == Region.RegionId.REGION_6.getId() && t.getRegion().getRegionId() != Region.RegionId.REGION_6.getId()){
+				}else if(fragment.mRegionCond == Region.RegionId.REGION_6.getId() && t.getRegion().getId() != Region.RegionId.REGION_6.getId()){
 					iter.remove();
 					
-				}else if(fragment.mRegionCond == Region.RegionId.REGION_7.getId() && t.getRegion().getRegionId() != Region.RegionId.REGION_7.getId()){
+				}else if(fragment.mRegionCond == Region.RegionId.REGION_7.getId() && t.getRegion().getId() != Region.RegionId.REGION_7.getId()){
 					iter.remove();
 					
-				}else if(fragment.mRegionCond == Region.RegionId.REGION_8.getId() && t.getRegion().getRegionId() != Region.RegionId.REGION_8.getId()){
+				}else if(fragment.mRegionCond == Region.RegionId.REGION_8.getId() && t.getRegion().getId() != Region.RegionId.REGION_8.getId()){
 					iter.remove();
 					
-				}else if(fragment.mRegionCond == Region.RegionId.REGION_9.getId() && t.getRegion().getRegionId() != Region.RegionId.REGION_9.getId()){
+				}else if(fragment.mRegionCond == Region.RegionId.REGION_9.getId() && t.getRegion().getId() != Region.RegionId.REGION_9.getId()){
 					iter.remove();
 					
-				}else if(fragment.mRegionCond == Region.RegionId.REGION_10.getId() && t.getRegion().getRegionId() != Region.RegionId.REGION_10.getId()){
+				}else if(fragment.mRegionCond == Region.RegionId.REGION_10.getId() && t.getRegion().getId() != Region.RegionId.REGION_10.getId()){
 					iter.remove();
 					
 				}else if(fragment.mFilterCond.length() != 0){
