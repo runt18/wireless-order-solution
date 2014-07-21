@@ -121,13 +121,13 @@ public class TableActivity extends FragmentActivity implements OnTableSelectedLi
 			 */
 			HashSet<Short> validRegionID = new HashSet<Short>();
 			for(Table tbl : WirelessOrder.tables){
-				validRegionID.add(tbl.getRegion().getRegionId());
+				validRegionID.add(tbl.getRegion().getId());
 			}
 				
 			final List<Region> validRegions = new ArrayList<Region>();
 			validRegions.add(new Region(FILTER_REGION_ALL, REGION_ALL_STR, 0));
 			for(Region region : WirelessOrder.regions){
-				if(validRegionID.contains(region.getRegionId())){
+				if(validRegionID.contains(region.getId())){
 					validRegions.add(region);
 				}
 			}
@@ -209,7 +209,7 @@ public class TableActivity extends FragmentActivity implements OnTableSelectedLi
 					}
 					allCnt++;
 					
-				}else if(theActivity.mRegionCond == t.getRegion().getRegionId()){
+				}else if(theActivity.mRegionCond == t.getRegion().getId()){
 					if(t.isBusy()){
 						busyCnt++;
 					}else if(t.isIdle()){
@@ -225,34 +225,34 @@ public class TableActivity extends FragmentActivity implements OnTableSelectedLi
 				}else if(theActivity.mTableCond == FILTER_TABLE_BUSY && !t.isBusy()){
 					iter.remove();
 					
-				}else if(theActivity.mRegionCond == Region.RegionId.REGION_1.getId() && t.getRegion().getRegionId() != Region.RegionId.REGION_1.getId()){
+				}else if(theActivity.mRegionCond == Region.RegionId.REGION_1.getId() && t.getRegion().getId() != Region.RegionId.REGION_1.getId()){
 					iter.remove();
 					
-				}else if(theActivity.mRegionCond == Region.RegionId.REGION_2.getId() && t.getRegion().getRegionId() != Region.RegionId.REGION_2.getId()){
+				}else if(theActivity.mRegionCond == Region.RegionId.REGION_2.getId() && t.getRegion().getId() != Region.RegionId.REGION_2.getId()){
 					iter.remove();
 					
-				}else if(theActivity.mRegionCond == Region.RegionId.REGION_3.getId() && t.getRegion().getRegionId() != Region.RegionId.REGION_3.getId()){
+				}else if(theActivity.mRegionCond == Region.RegionId.REGION_3.getId() && t.getRegion().getId() != Region.RegionId.REGION_3.getId()){
 					iter.remove();
 					
-				}else if(theActivity.mRegionCond == Region.RegionId.REGION_4.getId() && t.getRegion().getRegionId() != Region.RegionId.REGION_4.getId()){
+				}else if(theActivity.mRegionCond == Region.RegionId.REGION_4.getId() && t.getRegion().getId() != Region.RegionId.REGION_4.getId()){
 					iter.remove();
 					
-				}else if(theActivity.mRegionCond == Region.RegionId.REGION_5.getId() && t.getRegion().getRegionId() != Region.RegionId.REGION_5.getId()){
+				}else if(theActivity.mRegionCond == Region.RegionId.REGION_5.getId() && t.getRegion().getId() != Region.RegionId.REGION_5.getId()){
 					iter.remove();
 					
-				}else if(theActivity.mRegionCond == Region.RegionId.REGION_6.getId() && t.getRegion().getRegionId() != Region.RegionId.REGION_6.getId()){
+				}else if(theActivity.mRegionCond == Region.RegionId.REGION_6.getId() && t.getRegion().getId() != Region.RegionId.REGION_6.getId()){
 					iter.remove();
 					
-				}else if(theActivity.mRegionCond == Region.RegionId.REGION_7.getId() && t.getRegion().getRegionId() != Region.RegionId.REGION_7.getId()){
+				}else if(theActivity.mRegionCond == Region.RegionId.REGION_7.getId() && t.getRegion().getId() != Region.RegionId.REGION_7.getId()){
 					iter.remove();
 					
-				}else if(theActivity.mRegionCond == Region.RegionId.REGION_8.getId() && t.getRegion().getRegionId() != Region.RegionId.REGION_8.getId()){
+				}else if(theActivity.mRegionCond == Region.RegionId.REGION_8.getId() && t.getRegion().getId() != Region.RegionId.REGION_8.getId()){
 					iter.remove();
 					
-				}else if(theActivity.mRegionCond == Region.RegionId.REGION_9.getId() && t.getRegion().getRegionId() != Region.RegionId.REGION_9.getId()){
+				}else if(theActivity.mRegionCond == Region.RegionId.REGION_9.getId() && t.getRegion().getId() != Region.RegionId.REGION_9.getId()){
 					iter.remove();
 					
-				}else if(theActivity.mRegionCond == Region.RegionId.REGION_10.getId() && t.getRegion().getRegionId() != Region.RegionId.REGION_10.getId()){
+				}else if(theActivity.mRegionCond == Region.RegionId.REGION_10.getId() && t.getRegion().getId() != Region.RegionId.REGION_10.getId()){
 					iter.remove();
 					
 				}else if(theActivity.mFilterCond.length() != 0){
@@ -685,7 +685,7 @@ public class TableActivity extends FragmentActivity implements OnTableSelectedLi
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 				Region region = (Region)view.getTag();
-				mRegionCond = region.getRegionId();
+				mRegionCond = region.getId();
 				mDataHandler.sendEmptyMessage(0);
 				mPopWnd.dismiss();
 			}
