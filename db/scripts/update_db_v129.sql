@@ -101,6 +101,92 @@ UPDATE wireless_order_db.taste_group
 SET restaurant_id = 0
 WHERE taste_group_id = 1;
 
+-- -----------------------------------------------------
+-- Add the region 11 - 20
+-- -----------------------------------------------------
+INSERT INTO wireless_order_db.region
+(restaurant_id, region_id, name)
+SELECT id, 10, '区域11'
+FROM wireless_order_db.restaurant WHERE id > 10;
+
+INSERT INTO wireless_order_db.region
+(restaurant_id, region_id, name)
+SELECT id, 11, '区域12'
+FROM wireless_order_db.restaurant WHERE id > 10;
+
+INSERT INTO wireless_order_db.region
+(restaurant_id, region_id, name)
+SELECT id, 12, '区域13'
+FROM wireless_order_db.restaurant WHERE id > 10;
+
+INSERT INTO wireless_order_db.region
+(restaurant_id, region_id, name)
+SELECT id, 13, '区域14'
+FROM wireless_order_db.restaurant WHERE id > 10;
+
+INSERT INTO wireless_order_db.region
+(restaurant_id, region_id, name)
+SELECT id, 14, '区域15'
+FROM wireless_order_db.restaurant WHERE id > 10;
+
+INSERT INTO wireless_order_db.region
+(restaurant_id, region_id, name)
+SELECT id, 15, '区域16'
+FROM wireless_order_db.restaurant WHERE id > 10;
+
+INSERT INTO wireless_order_db.region
+(restaurant_id, region_id, name)
+SELECT id, 16, '区域17'
+FROM wireless_order_db.restaurant WHERE id > 10;
+
+INSERT INTO wireless_order_db.region
+(restaurant_id, region_id, name)
+SELECT id, 17, '区域18'
+FROM wireless_order_db.restaurant WHERE id > 10;
+
+INSERT INTO wireless_order_db.region
+(restaurant_id, region_id, name)
+SELECT id, 18, '区域19'
+FROM wireless_order_db.restaurant WHERE id > 10;
+
+INSERT INTO wireless_order_db.region
+(restaurant_id, region_id, name)
+SELECT id, 19, '区域20'
+FROM wireless_order_db.restaurant WHERE id > 10;
+
+-- -----------------------------------------------------
+-- Add the field 'status' & 'display_id' to table 'region'
+-- -----------------------------------------------------
+ALTER TABLE `wireless_order_db`.`region` 
+ADD COLUMN `status` TINYINT NOT NULL DEFAULT 1 COMMENT 'the status as below\n 1 - busy\n 2 - idle' AFTER `name`,
+ADD COLUMN `display_id` TINYINT NOT NULL DEFAULT 0 AFTER `status`;
+
+-- -----------------------------------------------------
+-- Add the index 'ix_region_id'
+-- -----------------------------------------------------
+ALTER TABLE `wireless_order_db`.`table` 
+ADD INDEX `ix_region_id` (`region_id` ASC);
+
+-- -----------------------------------------------------
+-- Update the display_id to each region
+-- -----------------------------------------------------
+UPDATE wireless_order_db.region
+SET display_id = region_id + 1;
+
+-- -----------------------------------------------------
+-- Update the region which has no tables to be idle.
+-- -----------------------------------------------------
+UPDATE 
+wireless_order_db.region R,
+(SELECT region_id, restaurant_id FROM wireless_order_db.region R
+WHERE 1 = 1
+AND NOT EXISTS( SELECT * FROM wireless_order_db.table T WHERE T.region_id = R.region_id AND T.restaurant_id = R.restaurant_id)
+AND R.name LIKE '区域%'
+) AS R_UNUSED
+SET 
+R.status = 2
+WHERE R.region_id = R_UNUSED.region_id AND R.restaurant_id = R_UNUSED.restaurant_id;
+
 SET SQL_SAFE_UPDATES = @OLD_SAFE_UPDATES;
 
 
