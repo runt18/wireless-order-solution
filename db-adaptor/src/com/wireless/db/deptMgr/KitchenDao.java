@@ -67,7 +67,6 @@ public class KitchenDao {
 				  " WHERE 1 = 1 " +
 				  " AND display_id > " + from.getDisplayId() +
 				  " AND display_id < " + to.getDisplayId() + 
-				  " AND type = " + Kitchen.Type.NORMAL.getVal() +
 				  " AND restaurant_id = " + staff.getRestaurantId();
 			dbCon.stmt.executeUpdate(sql);
 			
@@ -82,7 +81,6 @@ public class KitchenDao {
 				  " WHERE 1 = 1 " +
 				  " AND display_id >= " + to.getDisplayId() +
 				  " AND display_id < " + from.getDisplayId() +
-				  " AND type = " + Kitchen.Type.NORMAL.getVal() +
 				  " AND restaurant_id = " + staff.getRestaurantId();
 			dbCon.stmt.executeUpdate(sql);
 			

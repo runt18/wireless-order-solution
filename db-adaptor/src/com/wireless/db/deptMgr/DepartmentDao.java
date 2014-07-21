@@ -63,7 +63,7 @@ public class DepartmentDao {
 				  " WHERE 1 = 1 " +
 				  " AND display_id > " + from.getDisplayId() +
 				  " AND display_id < " + to.getDisplayId() + 
-				  " AND type = " + Department.Type.NORMAL.getVal() +
+				  //" AND type = " + Department.Type.NORMAL.getVal() +
 				  " AND restaurant_id = " + staff.getRestaurantId();
 			dbCon.stmt.executeUpdate(sql);
 			
@@ -79,7 +79,7 @@ public class DepartmentDao {
 				  " WHERE 1 = 1 " +
 				  " AND display_id >= " + to.getDisplayId() +
 				  " AND display_id < " + from.getDisplayId() +
-				  " AND type = " + Department.Type.NORMAL.getVal() +
+				  //" AND type = " + Department.Type.NORMAL.getVal() +
 				  " AND restaurant_id = " + staff.getRestaurantId();
 			dbCon.stmt.executeUpdate(sql);
 			
@@ -283,8 +283,8 @@ public class DepartmentDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 * @throws BusinessException
-	 * 			throws if the department is NOT empty
-	 * 			throws if the department to remove does NOT exist
+	 * 			<li>throws if the department is NOT empty
+	 * 			<li>throws if the department to remove does NOT exist
 	 */
 	public static void remove(DBCon dbCon, Staff staff, int deptId) throws SQLException, BusinessException{
 		String sql;
@@ -353,8 +353,8 @@ public class DepartmentDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 * @throws BusinessException
-	 * 			throws if insufficient idle department
-	 * 			throws if the department to add 
+	 * 			<li>throws if insufficient idle department
+	 * 			<li>throws if the department to add 
 	 */
 	public static short add(DBCon dbCon, Staff staff, Department.AddBuilder builder) throws SQLException, BusinessException{
 		String sql;

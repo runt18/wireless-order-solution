@@ -156,12 +156,12 @@ public class DailySettleDao {
 		for(Staff staff : staffs){			
 			Result eachResult = exec(dbCon, staff, SettleType.AUTO_MATION);
 			
-			totalOrder += eachResult.orderArchive.getAmount();
-			maxOrderId = eachResult.orderArchive.getMaxId(); 
-			totalOrderFood += eachResult.orderFoodArchive.getAmount();
-			maxOrderFoodId = eachResult.orderFoodArchive.getMaxId();
-			maxTgId = eachResult.tgArchive.getTgMaxId();
-			maxNTgId = eachResult.tgArchive.getNTgMaxId();
+			totalOrder += eachResult.orderArchive != null ? eachResult.orderArchive.getAmount() : 0;
+			maxOrderId = eachResult.orderArchive != null ? eachResult.orderArchive.getMaxId() : 0; 
+			totalOrderFood += eachResult.orderFoodArchive != null ? eachResult.orderFoodArchive.getAmount() : 0;
+			maxOrderFoodId = eachResult.orderFoodArchive != null ? eachResult.orderFoodArchive.getMaxId() : 0;
+			maxTgId = eachResult.tgArchive != null ? eachResult.tgArchive.getTgMaxId() : 0;
+			maxNTgId = eachResult.tgArchive != null ? eachResult.tgArchive.getNTgMaxId() : 0;
 			totalShift += eachResult.getTotalShift();
 		}
 		

@@ -509,16 +509,26 @@ public class RestaurantDao {
 	}
 	
 	private static void initRegion(DBCon dbCon, Staff staff) throws SQLException{
-		RegionDao.insert(dbCon, staff, new Region.InsertBuilder(staff.getRestaurantId(), Region.RegionId.REGION_1));
-		RegionDao.insert(dbCon, staff, new Region.InsertBuilder(staff.getRestaurantId(), Region.RegionId.REGION_2));
-		RegionDao.insert(dbCon, staff, new Region.InsertBuilder(staff.getRestaurantId(), Region.RegionId.REGION_3));
-		RegionDao.insert(dbCon, staff, new Region.InsertBuilder(staff.getRestaurantId(), Region.RegionId.REGION_4));
-		RegionDao.insert(dbCon, staff, new Region.InsertBuilder(staff.getRestaurantId(), Region.RegionId.REGION_5));
-		RegionDao.insert(dbCon, staff, new Region.InsertBuilder(staff.getRestaurantId(), Region.RegionId.REGION_6));
-		RegionDao.insert(dbCon, staff, new Region.InsertBuilder(staff.getRestaurantId(), Region.RegionId.REGION_7));
-		RegionDao.insert(dbCon, staff, new Region.InsertBuilder(staff.getRestaurantId(), Region.RegionId.REGION_8));
-		RegionDao.insert(dbCon, staff, new Region.InsertBuilder(staff.getRestaurantId(), Region.RegionId.REGION_9));
-		RegionDao.insert(dbCon, staff, new Region.InsertBuilder(staff.getRestaurantId(), Region.RegionId.REGION_10));
+		RegionDao.insert(dbCon, staff, new Region.InsertBuilder(Region.RegionId.REGION_1, "大厅", Region.Status.BUSY));
+		RegionDao.insert(dbCon, staff, new Region.InsertBuilder(Region.RegionId.REGION_2, "包房", Region.Status.BUSY));
+		RegionDao.insert(dbCon, staff, new Region.InsertBuilder(Region.RegionId.REGION_3, "外卖", Region.Status.BUSY));
+		RegionDao.insert(dbCon, staff, new Region.InsertBuilder(Region.RegionId.REGION_4));
+		RegionDao.insert(dbCon, staff, new Region.InsertBuilder(Region.RegionId.REGION_5));
+		RegionDao.insert(dbCon, staff, new Region.InsertBuilder(Region.RegionId.REGION_6));
+		RegionDao.insert(dbCon, staff, new Region.InsertBuilder(Region.RegionId.REGION_7));
+		RegionDao.insert(dbCon, staff, new Region.InsertBuilder(Region.RegionId.REGION_8));
+		RegionDao.insert(dbCon, staff, new Region.InsertBuilder(Region.RegionId.REGION_9));
+		RegionDao.insert(dbCon, staff, new Region.InsertBuilder(Region.RegionId.REGION_10));
+		RegionDao.insert(dbCon, staff, new Region.InsertBuilder(Region.RegionId.REGION_11));
+		RegionDao.insert(dbCon, staff, new Region.InsertBuilder(Region.RegionId.REGION_12));
+		RegionDao.insert(dbCon, staff, new Region.InsertBuilder(Region.RegionId.REGION_13));
+		RegionDao.insert(dbCon, staff, new Region.InsertBuilder(Region.RegionId.REGION_14));
+		RegionDao.insert(dbCon, staff, new Region.InsertBuilder(Region.RegionId.REGION_15));
+		RegionDao.insert(dbCon, staff, new Region.InsertBuilder(Region.RegionId.REGION_16));
+		RegionDao.insert(dbCon, staff, new Region.InsertBuilder(Region.RegionId.REGION_17));
+		RegionDao.insert(dbCon, staff, new Region.InsertBuilder(Region.RegionId.REGION_18));
+		RegionDao.insert(dbCon, staff, new Region.InsertBuilder(Region.RegionId.REGION_19));
+		RegionDao.insert(dbCon, staff, new Region.InsertBuilder(Region.RegionId.REGION_20));
 	}
 	
 	private static void initDepartmentAndKitchen(DBCon dbCon, Staff staff) throws SQLException, BusinessException{

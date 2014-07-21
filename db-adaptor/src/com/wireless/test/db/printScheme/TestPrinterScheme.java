@@ -84,7 +84,7 @@ public class TestPrinterScheme {
 			
 			List<Department> depts = DepartmentDao.getByType(dbCon, mStaff, Department.Type.NORMAL);
 			List<Kitchen> kitchens = KitchenDao.getByType(dbCon, mStaff, Kitchen.Type.NORMAL);
-			List<Region> regions = RegionDao.getRegions(dbCon, mStaff, null, null);
+			List<Region> regions = RegionDao.getByStatus(dbCon, mStaff, Region.Status.BUSY);
 			
 			Printer.InsertBuilder builder = new Printer.InsertBuilder("GP-80250-200", PStyle.PRINT_STYLE_58MM, mStaff.getRestaurantId())
 													   .setAlias("海鲜打印机");
@@ -144,15 +144,15 @@ public class TestPrinterScheme {
 			PrintFunc.Builder transferTableBuilder = Builder.newTransferTable()
 															.setRepeat(3)
 															.addRegion(regions.get(2))
-															.addRegion(regions.get(5));
+															.addRegion(regions.get(3));
 			
 			int transferTableId = PrintFuncDao.addFunc(dbCon, mStaff, printerId, transferTableBuilder);
 			
 			//催菜
 			PrintFunc.Builder allHurriedFoodBuilder = Builder.newAllHurriedFood()
 															.setRepeat(1)
-															.addRegion(regions.get(4))
-															.addRegion(regions.get(6));
+															.addRegion(regions.get(2))
+															.addRegion(regions.get(3));
 			int allHurriedFoodId = PrintFuncDao.addFunc(dbCon, mStaff, printerId, allHurriedFoodBuilder);
 			
 			

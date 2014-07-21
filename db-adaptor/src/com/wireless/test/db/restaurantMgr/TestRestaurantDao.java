@@ -244,7 +244,7 @@ public class TestRestaurantDao {
 			   t.getAliasId() == 9 ||
 			   t.getAliasId() == 10){
 				Assert.assertEquals("table associated restaurant id", t.getRestaurantId(), restaurantId);
-				Assert.assertEquals("table associated region id", t.getRegion().getRegionId(), Region.RegionId.REGION_1.getId());
+				Assert.assertEquals("table associated region id", t.getRegion().getId(), Region.RegionId.REGION_1.getId());
 			}else{
 				Assert.assertTrue(false);
 			}
@@ -252,11 +252,16 @@ public class TestRestaurantDao {
 	}
 	
 	private void compareRegion(Staff staff, int restaurantId) throws SQLException{
-		List<Region> regions = RegionDao.getRegions(staff, null, null);
+		List<Region> regions = RegionDao.getAll(staff);
 		for(Region r : regions){
-			Region.RegionId regionId = Region.RegionId.valueOf(r.getRegionId());
-			Assert.assertEquals("region name", r.getName(), regionId.getName());
+			Region.RegionId regionId = Region.RegionId.valueOf(r.getId());
 			Assert.assertEquals("region associated restaurant id", r.getRestaurantId(), restaurantId);
+			if(regionId == Region.RegionId.REGION_1 || regionId == Region.RegionId.REGION_2 || regionId == Region.RegionId.REGION_3){
+				Assert.assertEquals("region status", r.getStatus(), Region.Status.BUSY);
+			}else{
+				Assert.assertEquals("region name", r.getName(), regionId.getName());
+				Assert.assertEquals("region status", r.getStatus(), Region.Status.IDLE);
+			}
 		}
 	}
 	

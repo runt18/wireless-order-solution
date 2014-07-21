@@ -309,7 +309,7 @@ public class UpdateOrder {
 			//Update the region and table status only if the order is unpaid.
 			sql = " UPDATE " + 
 				  Params.dbName + ".order SET " +
-				  " region_id = " + diffResult.newOrder.getRegion().getRegionId() + ", " +
+				  " region_id = " + diffResult.newOrder.getRegion().getId() + ", " +
 				  " region_name = '" + diffResult.newOrder.getRegion().getName() + "', " +
 				  " table_id = " + diffResult.newOrder.getDestTbl().getTableId() + ", " +
 				  " table_alias = " + diffResult.newOrder.getDestTbl().getAliasId() + ", " +

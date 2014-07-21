@@ -41,7 +41,7 @@ public class TestTableDao {
 		assertEquals("associated restaurant id", expected.getRestaurantId(), actual.getRestaurantId(), 0.01);
 		assertEquals("table service rate", expected.getServiceRate(), actual.getServiceRate(), 0.01);
 		assertEquals("table name", expected.getName(), actual.getName());
-		assertEquals("associated region id", expected.getRegion().getRegionId(), actual.getRegion().getRegionId());
+		assertEquals("associated region id", expected.getRegion().getId(), actual.getRegion().getId());
 	}
 	
 	@Test

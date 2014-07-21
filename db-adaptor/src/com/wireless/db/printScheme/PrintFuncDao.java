@@ -104,7 +104,7 @@ public class PrintFuncDao {
 				  "( func_id, region_id, restaurant_id )" +
 				  " VALUES( " +
 				  funcId + "," +
-				  region.getRegionId() + "," +
+				  region.getId() + "," +
 				  staff.getRestaurantId() +
 				  ")";
 			dbCon.stmt.executeUpdate(sql);
@@ -289,7 +289,7 @@ public class PrintFuncDao {
 				  "( func_id, region_id, restaurant_id )" +
 				  " VALUES( " +
 				  funcId + "," +
-				  region.getRegionId() + "," +
+				  region.getId() + "," +
 				  staff.getRestaurantId() +
 				  ")";
 			dbCon.stmt.executeUpdate(sql);
@@ -378,8 +378,7 @@ public class PrintFuncDao {
 			      " WHERE FR.func_id = " + func.getId();
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
 			while(dbCon.rs.next()){
-				Region regionToAdd = new Region();
-				regionToAdd.setRegionId(dbCon.rs.getShort("region_id"));
+				Region regionToAdd = new Region(dbCon.rs.getShort("region_id"));
 				regionToAdd.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
 				regionToAdd.setName(dbCon.rs.getString("name"));
 				func.addRegion(regionToAdd);

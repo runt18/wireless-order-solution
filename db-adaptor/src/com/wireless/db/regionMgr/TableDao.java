@@ -140,8 +140,7 @@ public class TableDao {
 		
 		while (dbCon.rs.next()) {
 			Table table = new Table();
-			Region region = new Region();
-			region.setRegionId(dbCon.rs.getShort("region_id"));
+			Region region = new Region(dbCon.rs.getShort("region_id"));
 			region.setName(dbCon.rs.getString("region_name"));
 			region.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
 			table.setRegion(region);
@@ -199,7 +198,7 @@ public class TableDao {
 	 */
 	public static void updateById(DBCon dbCon, Staff term, Table tblToUpdate) throws SQLException, BusinessException{
 		String updateSQL = " UPDATE " + Params.dbName + ".table SET " +
-						   " region_id = " + tblToUpdate.getRegion().getRegionId() + "," +
+						   " region_id = " + tblToUpdate.getRegion().getId() + "," +
 						   " name = '" + tblToUpdate.getName() + "'," +
 						   " minimum_cost = " + tblToUpdate.getMinimumCost() + "," +
 						   " service_rate = " + tblToUpdate.getServiceRate() + "," +
@@ -266,7 +265,7 @@ public class TableDao {
 			  tblToInsert.getAliasId() + ", " + 
 			  tblToInsert.getRestaurantId() + ", " +
 			  "'" + tblToInsert.getName() + "', " +
-			  tblToInsert.getRegion().getRegionId() + ", " +
+			  tblToInsert.getRegion().getId() + ", " +
 			  tblToInsert.getMinimumCost() + "," +
 			  tblToInsert.getServiceRate() + "," +
 			  tblToInsert.getCustomNum() +

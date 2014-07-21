@@ -192,7 +192,7 @@ public class InsertOrder {
 			  " `birth_date`, `order_date`, `custom_num`, `staff_id`, `waiter`, `discount_id`) VALUES (" +
 			  orderToInsert.getDestTbl().getRestaurantId() + ", " + 
 			  orderToInsert.getCategory().getVal() + ", " +
-			  orderToInsert.getRegion().getRegionId() + ", '" +
+			  orderToInsert.getRegion().getId() + ", '" +
 			  orderToInsert.getRegion().getName() + "', " +
 			  orderToInsert.getDestTbl().getTableId() + ", " +
 			  orderToInsert.getDestTbl().getAliasId() + ", " +
