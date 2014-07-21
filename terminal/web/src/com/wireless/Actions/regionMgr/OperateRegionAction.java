@@ -38,7 +38,7 @@ public class OperateRegionAction extends DispatchAction{
 			String id = request.getParameter("id");
 			String name = request.getParameter("name");
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
-			RegionDao.update(staff, new Region.UpdateBuilder(staff.getRestaurantId(), Region.RegionId.valueOf(Short.valueOf(id)), name.trim()));
+			RegionDao.update(staff, new Region.UpdateBuilder(Short.valueOf(id), name.trim()));
 			jobject.initTip(true, "操作成功, 已修改区域信息.");
 		}catch(BusinessException e){
 			e.printStackTrace();

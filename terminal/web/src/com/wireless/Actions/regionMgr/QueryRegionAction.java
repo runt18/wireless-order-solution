@@ -36,8 +36,7 @@ public class QueryRegionAction extends DispatchAction{
 		try{
 			String pin = (String)request.getAttribute("pin");
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
-			List<Region> list = RegionDao.getRegions(staff, " AND REGION.restaurant_id = " + staff.getRestaurantId(), null);
-			jobject.setRoot(list);
+			jobject.setRoot(RegionDao.getByStatus(staff, Region.Status.BUSY));
 			
 		}catch(Exception e){
 			e.printStackTrace();
@@ -66,7 +65,7 @@ public class QueryRegionAction extends DispatchAction{
 		try{
 			String pin = (String)request.getAttribute("pin");
 			Staff staff = StaffDao.getStaffById(Integer.parseInt(pin));
-			List<Region> list = RegionDao.getRegions(staff, " AND REGION.restaurant_id = " + staff.getRestaurantId(), null);
+			List<Region> list = RegionDao.getByStatus(staff, Region.Status.BUSY);
 			if(!list.isEmpty()){
 				tsb.append("[");
 				Region temp;
@@ -76,9 +75,9 @@ public class QueryRegionAction extends DispatchAction{
 					   .append("{")
 					   .append("leaf:" + true)
 					   .append(",")
-					   .append("id:" + temp.getRegionId())
+					   .append("id:" + temp.getId())
 					   .append(",")
-					   .append("regionId:" + temp.getRegionId())
+					   .append("regionId:" + temp.getId())
 					   .append(",")
 					   .append("regionName:'" + temp.getName() + "'")
 					   .append(",")
