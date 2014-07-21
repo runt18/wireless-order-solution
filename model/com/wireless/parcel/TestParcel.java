@@ -323,18 +323,17 @@ public class TestParcel {
 	
 	@Test
 	public void testComplexRegionParcel(){
-		Region expected = new Region();
-		expected.setRegionId(Region.RegionId.REGION_10.getId());
+		Region expected = new Region(Region.RegionId.REGION_10.getId());
 		expected.setName("测试区域");
 		
 		Parcel p = new Parcel();
 		expected.writeToParcel(p, Region.REGION_PARCELABLE_COMPLEX);
 		
-		Region actual = new Region();
+		Region actual = new Region(0);
 		actual.createFromParcel(new Parcel(p.marshall()));
 		
 		// Check the region id
-		assertEquals("region id", expected.getRegionId(), actual.getRegionId());
+		assertEquals("region id", expected.getId(), actual.getId());
 		
 		// Check the region name
 		assertEquals("region name", expected.getName(), actual.getName());
@@ -366,7 +365,7 @@ public class TestParcel {
 		assertEquals("table name", expected.getName(), actual.getName());
 		
 		// Check the associated region id
-		assertEquals("table region id", expected.getRegion().getRegionId(), actual.getRegion().getRegionId());
+		assertEquals("table region id", expected.getRegion().getId(), actual.getRegion().getId());
 		
 		// Check the service rate
 		assertEquals("table service rate", expected.getServiceRate(), actual.getServiceRate(), 0.01);

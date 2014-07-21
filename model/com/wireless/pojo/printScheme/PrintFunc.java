@@ -390,10 +390,10 @@ public class PrintFunc implements Comparable<PrintFunc>, Jsonable{
 			regions = "";
 			for (Region region : this.mRegions) {
 				if(regions == ""){
-					regionValues += region.getRegionId();
+					regionValues += region.getId();
 					regions += region.getName();
 				}else{
-					regionValues += ("," + region.getRegionId());
+					regionValues += ("," + region.getId());
 					regions += ("," + region.getName());
 				}
 			}

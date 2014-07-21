@@ -16,6 +16,61 @@ public class Region implements Parcelable, Jsonable, Comparable<Region>{
 	private short id;
 	private String name;
 	private int restaurantId;
+	private Status status = Status.BUSY;
+	private int displayId;
+	
+	public static class MoveBuilder{
+		private final int from;
+		private final int to;
+		
+		public MoveBuilder(int from, int to){
+			this.from = from;
+			this.to = to;
+		}
+		
+		public int from(){
+			return this.from;
+		}
+		
+		public int to(){
+			return this.to;
+		}
+	}
+	
+	public static enum Status{
+		BUSY(1, "使用"),
+		IDLE(2, "空闲");
+		
+		private final int val;
+		private final String desc;
+		
+		private Status(int val, String desc){
+			this.val = val;
+			this.desc = desc;
+		}
+		
+		public int getVal(){
+			return this.val;
+		}
+		
+		public String getDesc(){
+			return this.desc;
+		}
+		
+		public static Status valueOf(int val){
+			for(Status type : values()){
+				if(type.val == val){
+					return type;
+				}
+			}
+			throw new IllegalArgumentException("The department type(value = " + val + ") passed is invaild.");
+		}
+		
+		@Override
+		public String toString(){
+			return "Type(code = " + val + ",desc = " + desc + ")";
+		}
+	}
 	
 	public static enum RegionId{
 		REGION_1(0, "大厅"),
@@ -27,7 +82,17 @@ public class Region implements Parcelable, Jsonable, Comparable<Region>{
 		REGION_7(6, "区域7"),
 		REGION_8(7, "区域8"),
 		REGION_9(8, "区域9"),
-		REGION_10(9, "区域10");
+		REGION_10(9, "区域10"),
+		REGION_11(10, "区域11"),
+		REGION_12(11, "区域12"),
+		REGION_13(12, "区域13"),
+		REGION_14(13, "区域14"),
+		REGION_15(14, "区域15"),
+		REGION_16(15, "区域16"),
+		REGION_17(16, "区域17"),
+		REGION_18(17, "区域18"),
+		REGION_19(18, "区域19"),
+		REGION_20(19, "区域20");
 		
 		private final int id;
 		private final String name;
@@ -63,17 +128,33 @@ public class Region implements Parcelable, Jsonable, Comparable<Region>{
 	//The helper class to insert a new region
 	public static class InsertBuilder{
 		private final String name;
-		private final int restaurantId;
 		private final short regionId;
+		private final Status status;
 		
-		public InsertBuilder(int restaurantId, RegionId regionId){
-			this(restaurantId, regionId, regionId.name);
+		public InsertBuilder(RegionId regionId){
+			this(regionId, regionId.name, Status.IDLE);
 		}
 		
-		public InsertBuilder(int restaurantId, RegionId regionId, String name){
-			this.restaurantId = restaurantId;
+		public InsertBuilder(RegionId regionId, Status status){
+			this(regionId, regionId.name, status);
+		}
+		
+		public InsertBuilder(RegionId regionId, String name, Status status){
 			this.name = name;
 			this.regionId = regionId.getId();
+			this.status = status;
+		}
+		
+		public Region build(){
+			return new Region(this);
+		}
+	}
+	
+	public static class AddBuilder{
+		private final String name;
+		
+		public AddBuilder(String name){
+			this.name = name;
 		}
 		
 		public Region build(){
@@ -84,13 +165,11 @@ public class Region implements Parcelable, Jsonable, Comparable<Region>{
 	//The helper class to update region
 	public static class UpdateBuilder{
 		private final String name;
-		private final int restaurantId;
 		private final short regionId;
 		
-		public UpdateBuilder(int restaurantId, RegionId regionId, String name){
-			this.restaurantId = restaurantId;
+		public UpdateBuilder(int regionId, String name){
 			this.name = name;
-			this.regionId = regionId.getId();
+			this.regionId = (short)regionId;
 		}
 		
 		public Region build(){
@@ -99,21 +178,26 @@ public class Region implements Parcelable, Jsonable, Comparable<Region>{
 	}
 	
 	private Region(InsertBuilder builder){
-		this.restaurantId = builder.restaurantId;
 		this.name = builder.name;
 		this.id = builder.regionId;
+		this.status = builder.status;
+	}
+	
+	private Region(AddBuilder builder){
+		this.name = builder.name;
+		this.status = Status.BUSY;
 	}
 	
 	private Region(UpdateBuilder builder){
-		this.restaurantId = builder.restaurantId;
 		this.name = builder.name;
 		this.id = builder.regionId;
+		this.status = Status.BUSY;
 	}
 	
-	public Region(){}
+	private Region(){}
 	
-	public Region(short id){
-		this.id = id;
+	public Region(int id){
+		this.id = (short)id;
 	}
 	
 	public Region(short id, String name){
@@ -121,13 +205,13 @@ public class Region implements Parcelable, Jsonable, Comparable<Region>{
 		this.name = name;
 	}
 	
-	public Region(short id, String name, int restaurantID){
+	public Region(short id, String name, int restaurantId){
 		this.id = id;
 		this.name = name;
-		this.restaurantId = restaurantID;
+		this.restaurantId = restaurantId;
 	}
 	
-	public short getRegionId() {
+	public short getId() {
 		return id;
 	}
 	
@@ -137,7 +221,7 @@ public class Region implements Parcelable, Jsonable, Comparable<Region>{
 	
 	public String getName() {
 		if(name == null){
-			name = "";
+			return "";
 		}
 		return name;
 	}
@@ -152,6 +236,30 @@ public class Region implements Parcelable, Jsonable, Comparable<Region>{
 	
 	public void setRestaurantId(int restaurantID) {
 		this.restaurantId = restaurantID;
+	}
+	
+	public void setStatus(Status status){
+		this.status = status;
+	}
+	
+	public Status getStatus(){
+		return this.status;
+	}
+	
+	public boolean isIdle(){
+		return this.status == Status.IDLE;
+	}
+	
+	public boolean isBusy(){
+		return this.status == Status.BUSY;
+	}
+	
+	public void setDisplayId(int displayId){
+		this.displayId = displayId;
+	}
+	
+	public int getDisplayId(){
+		return this.displayId;
 	}
 	
 	@Override
@@ -219,7 +327,7 @@ public class Region implements Parcelable, Jsonable, Comparable<Region>{
 		}else{
 			map.putBoolean("leaf", false);
 		}
-		map.putInt("id", getRegionId());
+		map.putInt("id", getId());
 		map.putString("name", getName());
 		map.putInt("rid", getRestaurantId());
 		map.putString("text", getName());
@@ -234,9 +342,9 @@ public class Region implements Parcelable, Jsonable, Comparable<Region>{
 
 	@Override
 	public int compareTo(Region o) {
-		if(getRegionId() > o.getRegionId()){
+		if(getId() > o.getId()){
 			return 1;
-		}else if(getRegionId() < o.getRegionId()){
+		}else if(getId() < o.getId()){
 			return -1;
 		}else{
 			return 0;
