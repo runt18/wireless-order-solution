@@ -38,6 +38,11 @@
 	
 	var primaryOrderData;
 	var params;
+	
+	var giftRender = {checkeds : [], id : 0};
+	
+	var reloadData;
+	
 	if(typeof orderID != 'undefined'){
 		params = {
 			orderID : orderID,
@@ -46,6 +51,37 @@
 	}else{
 		params = {'tableID' : tableAliasID};
 	}
+//验证员工权限	
+	$.ajax({
+		url : "../../QueryStaff.do",
+		type : 'post',
+		async:false,
+		data : {
+			"type" : 0,
+			"isPaging" : false,
+			"isName" : true
+		},
+		success : function(jr, status, xhr){
+			if(jr.success){
+				if(jr.other.staff != null){
+					for (var index = 0; index < jr.other.staff.role.privileges.length; index++) {
+						var temp = jr.other.staff.role.privileges[index];
+						if(temp.codeValue == 1003){
+							Ext.ux.staffGift = true;
+							temp = null;
+							break;
+						}
+					}
+				}
+			}else{
+				jr.icon = Ext.MessageBox.OK;
+				Ext.ux.showMsg(jr);
+			}
+		},
+		error : function(request, status, err){
+		}
+	}); 	
+	
 	$.ajax({
 		url : '../../QueryOrder.do',
 		type : 'post',
@@ -105,5 +141,6 @@
 	<script type="text/javascript" src="../../js/FrontBusiness/dishesOrder/dishesOrderFuncLib.js"></script>
 	<script type="text/javascript" src="../../extjs/examples.js"></script>
 	<script type="text/javascript" src="../../js/common/CompareFoodUtil.js"></script>
+	
 </body>
 </html>
