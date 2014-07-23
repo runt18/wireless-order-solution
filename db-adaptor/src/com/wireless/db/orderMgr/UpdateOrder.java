@@ -264,7 +264,7 @@ public class UpdateOrder {
 				  " `restaurant_id`, `order_id`, `food_id`, `order_count`, `unit_price`, `commission`, `name`, `food_status`, " +
 				  " `discount`, `taste_group_id`, `cancel_reason_id`, `cancel_reason`, " +
 				  " `dept_id`, `kitchen_id`, " +
-				  " `staff_id`, `waiter`, `order_date`, `is_temporary`, `is_paid`) VALUES (" +
+				  " `staff_id`, `waiter`, `order_date`, `is_temporary`, `is_paid`, `is_gift`) VALUES (" +
 				  staff.getRestaurantId() + ", " +
 				  diffResult.newOrder.getId() + ", " +
 				  cancelledFood.getFoodId() + ", " +
@@ -283,7 +283,8 @@ public class UpdateOrder {
 				  "'" + staff.getName() + "', " +
 				  "NOW(), " + 
 				  (cancelledFood.isTemp() ? 1 : 0) + ", " +
-				  (diffResult.oriOrder.isUnpaid() ? 0 : 1) +
+				  (diffResult.oriOrder.isUnpaid() ? 0 : 1) + ", " +
+				  (cancelledFood.isGift()? 1 : 0 ) +
 				  " ) ";
 			dbCon.stmt.executeUpdate(sql);			
 		}
