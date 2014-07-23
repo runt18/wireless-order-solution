@@ -16,6 +16,7 @@ import com.wireless.db.distMgr.DiscountDao;
 import com.wireless.db.printScheme.PrinterDao;
 import com.wireless.db.regionMgr.RegionDao;
 import com.wireless.db.regionMgr.TableDao;
+import com.wireless.db.serviceRate.ServicePlanDao;
 import com.wireless.db.sms.SMStatDao;
 import com.wireless.db.staffMgr.RoleDao;
 import com.wireless.db.staffMgr.StaffDao;
@@ -39,6 +40,7 @@ import com.wireless.pojo.regionMgr.Region;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.restaurantMgr.Module;
 import com.wireless.pojo.restaurantMgr.Restaurant;
+import com.wireless.pojo.serviceRate.ServicePlan;
 import com.wireless.pojo.sms.SMStat;
 import com.wireless.pojo.staffMgr.Role;
 import com.wireless.pojo.staffMgr.Staff;
@@ -384,6 +386,9 @@ public class RestaurantDao {
 			//Insert the '无折扣'折扣方案
 			initDiscount(dbCon, staff);
 			
+			//Insert the '免服务费'方案
+			initServicePlan(dbCon, staff);
+			
 			//Insert the popular cancel reasons
 			initCancelReason(dbCon, staff);
 			
@@ -627,6 +632,9 @@ public class RestaurantDao {
 		
 	}
 	
+	private static void initServicePlan(DBCon dbCon, Staff staff) throws SQLException{
+		ServicePlanDao.insert(dbCon, staff, new ServicePlan.InsertBuilder("免服务费").setType(ServicePlan.Type.RESERVED).setStatus(ServicePlan.Status.DEFAULT));
+	}
 	
 	private static void initDiscount(DBCon dbCon, Staff staff) throws SQLException{
 		DiscountDao.insert(dbCon, staff, new Discount.NoDiscountBuilder());

@@ -24,6 +24,7 @@ import com.wireless.db.printScheme.PrinterDao;
 import com.wireless.db.regionMgr.RegionDao;
 import com.wireless.db.regionMgr.TableDao;
 import com.wireless.db.restaurantMgr.RestaurantDao;
+import com.wireless.db.serviceRate.ServicePlanDao;
 import com.wireless.db.sms.SMStatDao;
 import com.wireless.db.staffMgr.RoleDao;
 import com.wireless.db.staffMgr.StaffDao;
@@ -42,6 +43,7 @@ import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.restaurantMgr.Module;
 import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.restaurantMgr.Restaurant.RecordAlive;
+import com.wireless.pojo.serviceRate.ServicePlan;
 import com.wireless.pojo.sms.SMStat;
 import com.wireless.pojo.staffMgr.Role;
 import com.wireless.pojo.staffMgr.Staff;
@@ -86,6 +88,9 @@ public class TestRestaurantDao {
 			
 			//Compare the '无折扣'
 			compareDiscount(staff, restaurantId);
+			
+			//Compare the '免服务费'
+			compareServicePlan(staff, restaurantId);
 			
 			//Compare the kitchens ranged from 1 to 50
 			compareKitchens(staff, restaurantId);
@@ -303,6 +308,15 @@ public class TestRestaurantDao {
 		Assert.assertEquals("kitchen type", kitchenToTemp.getType(), Kitchen.Type.TEMP);
 		Assert.assertEquals("kitchen associated restaurant", kitchenToTemp.getRestaurantId(), restaurantId);
 		Assert.assertEquals("display id", kitchenToTemp.getDisplayId(), 0);
+	}
+	
+	private void compareServicePlan(Staff staff, int restaurantId) throws SQLException{
+		ServicePlan actual = ServicePlanDao.getAll(staff).get(0);
+		Assert.assertEquals("service plan name", "免服务费", actual.getName());
+		Assert.assertEquals("service plan restaurant", restaurantId, actual.getRestaurantId());
+		Assert.assertEquals("service plan type", ServicePlan.Type.RESERVED, actual.getType());
+		Assert.assertEquals("service plan status", ServicePlan.Status.DEFAULT, actual.getStatus());
+
 	}
 	
 	private void compareDiscount(Staff staff, int restaurantId) throws SQLException{
