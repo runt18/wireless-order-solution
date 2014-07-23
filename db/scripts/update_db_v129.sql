@@ -187,6 +187,47 @@ SET
 R.status = 2
 WHERE R.region_id = R_UNUSED.region_id AND R.restaurant_id = R_UNUSED.restaurant_id;
 
+-- -----------------------------------------------------
+-- Table `wireless_order_db`.`service_rate`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `wireless_order_db`.`service_rate` ;
+
+CREATE TABLE IF NOT EXISTS `wireless_order_db`.`service_rate` (
+  `rate_id` INT NOT NULL AUTO_INCREMENT,
+  `plan_id` INT NOT NULL,
+  `restaurant_id` INT NOT NULL,
+  `region_id` INT NOT NULL,
+  `rate` FLOAT NOT NULL DEFAULT 0,
+  PRIMARY KEY (`rate_id`),
+  INDEX `ix_region_id` (`restaurant_id` ASC, `region_id` ASC),
+  INDEX `ix_plan_id` (`plan_id` ASC))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
+-- -----------------------------------------------------
+-- Table `wireless_order_db`.`service_plan`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `wireless_order_db`.`service_plan` ;
+
+CREATE TABLE IF NOT EXISTS `wireless_order_db`.`service_plan` (
+  `plan_id` INT NOT NULL AUTO_INCREMENT,
+  `restaurant_id` INT NOT NULL,
+  `name` VARCHAR(45) NOT NULL,
+  `type` TINYINT NOT NULL DEFAULT 1 COMMENT 'the type as below.\n1 - normal\n2 - reserved',
+  `status` TINYINT NOT NULL DEFAULT 1 COMMENT 'the status as below\n1 - normal\n2 - reserved',
+  PRIMARY KEY (`plan_id`),
+  INDEX `ix_restaurant_id` (`restaurant_id` ASC))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
+-- -----------------------------------------------------
+-- Insert '免服务费' plan to each restaurant
+-- -----------------------------------------------------
+INSERT INTO wireless_order_db.service_plan
+(restaurant_id, name, type, status)
+SELECT id, '免服务费', 2, 2
+FROM wireless_order_db.restaurant WHERE id > 10;
+
 SET SQL_SAFE_UPDATES = @OLD_SAFE_UPDATES;
 
 
