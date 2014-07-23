@@ -8,6 +8,7 @@ import com.wireless.db.Params;
 import com.wireless.db.client.member.MemberDao;
 import com.wireless.db.coupon.CouponDao;
 import com.wireless.db.distMgr.DiscountDao;
+import com.wireless.db.serviceRate.ServicePlanDao;
 import com.wireless.db.system.SystemDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.FrontBusinessError;
@@ -463,11 +464,9 @@ public class PayOrder {
 			orderToCalc.setCouponPrice(CouponDao.getById(dbCon, staff, payBuilder.getCouponId()).getPrice());
 		}
 		
-		//If the service rate is set, just use it, otherwise use the one associated with the table belongs to this order.
-		if(payBuilder.hasServiceRate()){
-			orderToCalc.setServiceRate(payBuilder.getServiceRate());
-		}else{
-			orderToCalc.setServiceRate(orderToCalc.getDestTbl().getServiceRate());
+		//If the service plan is set, use to get the rate to region belongs to this order
+		if(payBuilder.hasServicePlan()){
+			orderToCalc.setServiceRate(ServicePlanDao.getRateByRegion(dbCon, staff, payBuilder.getServicePlanId(), orderToCalc.getRegion()));
 		}
 		
 		//If the discount is set, check to see whether it is the same as before.
