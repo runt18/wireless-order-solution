@@ -1,5 +1,5 @@
 #divMainForTableSelect, #divTableShowForSelect, 
-#divRightForShowMessageTS, #divRightForTransTableTS{
+#divRightForShowMessageTS, #divRightForTransTableTS, #divRightForInputPay{
 	-moz-box-flex: 1;
 	-webkit-box-flex: 1;
 	box-flex: 1;
@@ -23,6 +23,15 @@
 	position: absolute;
 	background-color: #6395EC;  
 }
+
+#divInputForPay{  
+	width: 580px;  
+	height: 310px;  
+	border: 2px solid #fff;  
+	position: absolute;
+	background-color: #6395EC;  
+}
+
 #divTopForShowMessageTS, #divTopForTransTableTS{
 	margin: 5px;	
 }
@@ -34,13 +43,19 @@
 	width: 190px;
 	height: 100%;
 }
-#divRightForShowMessageTS, #divRightForTransTableTS{
+
+#divLeftForInputPay{
+	width: 235px;
+	height: 100%;
+}
+#divRightForShowMessageTS, #divRightForTransTableTS, #divRightForInputPay{
 	height: 100%;
 }
 
 #divShowMessageForTableSelect .button-base,
 #divSelectTableNumForTs .button-base,
-#divTransTableForTableSelect .button-base{
+#divTransTableForTableSelect .button-base,
+#divInputForPay .button-base{
 	width: 80px;
 	float: left;
 	margin: 5px 2px;
@@ -94,6 +109,15 @@
 	width: 100px; 
 	margin: 3px;
 	margin-left: -10px;
+	font-size: 25px;
+	background-color: yellow;
+}
+
+.input-desk-number{
+	height: 59px; 
+	width: 100px; 
+	margin-left: -10px;
+	margin-top : 10px;
 	font-size: 25px;
 	background-color: yellow;
 }

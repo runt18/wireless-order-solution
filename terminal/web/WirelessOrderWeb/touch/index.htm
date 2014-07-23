@@ -53,6 +53,7 @@ var uo={
 	table : {},
 	updateOrder : [],
 	cf : {},
+	ip : {},
 	printTemp : false
 }
 
@@ -170,6 +171,7 @@ var ss = {
 	<div id="divSouthForUpdateOrder" class="box-horizontal">
 		<div class="button-base" style="margin-left: 2px; width: 120px;" onClick= "uo.cancelForUO()">返回</div>
   		<div class="div-full">&nbsp;</div>
+  		<!-- <div class="button-base" style="margin-left: 2px; width: 120px;" onClick="uo.inputForPay()">快速结账</div> -->
   		<div class="button-base" style="margin-left: 2px; width: 120px;" onClick="uo.saveForUO()">确定修改</div>
   		<div class="button-base" style="margin-left: 2px;" onClick="uo.cd.show()">折扣</div>
   		<div class="button-base" style="margin-left: 2px;" onClick="uo.showdivKeyboardPeopleForUO({type : 'setCountForPeople'})">人数</div>
@@ -217,16 +219,17 @@ var ss = {
 	      	<div class="button-base" onClick="co.cutFood()">数量-1</div>
 	      	<div class="button-base" onClick="co.setFood()">数量=</div>
 	      	<div class="button-base" onClick="co.deleteFood()">删除</div>
+	      	<div id="divOperateGiftFood" class="button-base" onClick="co.giftFood()" style="display: none;">赠送</div>
 	      	<div class="button-base" onClick="co.ot.show({type:2})">口味</div>
-	      	<div class="button-base" onClick="co.ot.show({type:1})">全单口味</div>
+	      	<!-- <div class="button-base" onClick="co.ot.show({type:1})">全单口味</div> -->
 	      	<!-- <div class="button-base" >催菜</div> -->
 	      	<div class="button-base" onClick="co.foodHangup({type:2})">叫起</div>
-	      	<div class="button-base" onClick="co.foodHangup({type:1})">全单叫起</div>
+	      	<!-- <div class="button-base" onClick="co.foodHangup({type:1})">全单叫起</div> -->
 	      	<div id="divCFCOHandlerMore" class="button-base" >更多</div>
 	      	
 	      	<div id="divCFCOHandlerMoreContent" style="position : relative;top : -61px;left: 80px;z-index:9999;display : none;">
-	      		<div style="float :left; margin-left: 1px;" class="button-base" onClick="">操作一</div>
-	      		<div style="position : relative; top : -61px; left: 81px;float :left; margin-left: 1px;" class="button-base" onClick="">操作二</div>
+	      		<div style="float :left; margin-left: 1px;" class="button-base" onClick="co.ot.show({type:1})">全单口味</div>
+	      		<div style="position : relative; top : -61px; left: 81px;float :left; margin-left: 1px;" class="button-base" onClick="co.foodHangup({type:1})">全单叫起</div>
 	      	</div>
 	      
     	</div>
@@ -543,6 +546,37 @@ var ss = {
 		</div>
 
 </div>
+
+<div id="divInputForPay">
+	<div id="divCenterForInputPay" class="box-horizontal">
+		<div id="divLeftForInputPay" >
+			<span style="font-size: 20px; font-weight: bold; padding-right: 0; color: #FFF;">消费金额：</span>
+			<input type="text" id="txtShouldToReceipt" class="desk-number" onClick='ts.selectInput({renderTo: this.id})'/><br>
+			<span style="font-size: 20px; font-weight: bold; color: #FFF;">输入金额：</span>
+			<input type="text" id="numInputReceipt" class="input-desk-number" onClick='ts.selectInput({renderTo: this.id})'/><br>
+			<span style="font-size: 20px; font-weight: bold; color: #FFF;">&nbsp;&nbsp;&nbsp;&nbsp;找零：</span>
+			<input type="text" id="txtReciptReturn" class="input-desk-number" onClick='ts.selectInput({renderTo: this.id})'/>
+		</div>
+		<div id="divRightForInputPay">
+			<div class="button-base" onClick="uo.inputPay({type:1})">&laquo;</div>
+			<div class="button-base" onClick="uo.inputPay({value:7})">7</div>
+			<div class="button-base" onClick="uo.inputPay({value:8})">8</div>
+			<div class="button-base" onClick="uo.inputPay({value:9})">9</div>
+			<div class="button-base" onClick="ts.selectingTxt({renderTo : 'numInputReceipt'})">选中</div>
+			<div class="button-base" onClick="uo.inputPay({value:4})">4</div>
+			<div class="button-base" onClick="uo.inputPay({value:5})">5</div>
+			<div class="button-base" onClick="uo.inputPay({value:6})">6</div>
+			<div class="button-base" onClick="uo.inputPay({value:0})">0</div>
+			<div class="button-base" onClick="uo.inputPay({value:1})">1</div>
+			<div class="button-base" onClick="uo.inputPay({value:2})">2</div>
+			<div class="button-base" onClick="uo.inputPay({value:3})">3</div>
+		</div>
+	</div>
+	<div id="divBottomForInputPay">
+		<div class="button-base" style="width: 150px; margin-left: 100px;" onClick="ts.tt.submit()">确定</div>
+		<div class="button-base" style="width: 150px; margin-left: 60px;" onClick="up.ip.back()">返回</div>
+	</div>
+</div>	
 
 </body>
 </html>

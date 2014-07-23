@@ -23,7 +23,8 @@ co.initNewFoodContent = function(c){
 			unitPrice : tempUnitPrice.toFixed(2),
 			totalPrice : tempUnitPrice.toFixed(2),
 			isHangup : typeof temp.isHangup == 'boolean' && temp.isHangup ? '叫起' : '',
-			isTemporary : typeof temp.isTemporary == 'boolean' && temp.isTemporary ? '临时菜' : ''
+			isTemporary : typeof temp.isTemporary == 'boolean' && temp.isTemporary ? '临时菜' : '',
+			isGift : typeof temp.isGift == 'boolean' && temp.isGift ? '赠送' : ''
 		};
 		//临时口味
 		if(typeof temp.tasteGroup.tmpTaste != 'undefined'){

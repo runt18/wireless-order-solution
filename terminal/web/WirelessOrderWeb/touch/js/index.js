@@ -29,6 +29,7 @@ var Templet={
   			+ '<div>{tasteDisplay}</div>'
   			+ '<div class="box-horizontal" style="text-align: right; padding-right: 5px;">'
   				+ '<div style="color: #FF0000;">{isTemporary}</div>'
+  				+ '<div style="color: #FF0000; -webkit-box-flex: 1;">{isGift}</div>'
   				+ '<div style="color: #FF0000; -webkit-box-flex: 1;">{isHangup}</div>'
   				+ '<div style="min-width: 100px;">¥:{totalPrice}</div>'
   			+'</div>'
@@ -662,6 +663,16 @@ function staffLoginHandler(c){
 			if(data.success){
 				pin = staffId;
 				staffData = data.other.staff;
+				for (var index = 0; index < staffData.role.privileges.length; index++) {
+					var temp = staffData.role.privileges[index];
+					if(temp.codeValue == 1003){
+						Wireless.ux.staffGift = true;
+						$('#divOperateGiftFood').show();
+						temp = null;
+						break;
+					}
+				}		
+				 
 				if(c.refresh === true){
 					loginSuccessCallback();
 				}else{

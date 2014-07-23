@@ -14,7 +14,7 @@ co.show = function(c){
 					name : c.data.name,
 					unitPrice : c.data.unitPrice,
 					click : 'co.insertFood({foodId:'+c.data.id+'})',
-					foodState : (c.data.status & 1 << 3) != 0 ? '赠' : (c.data.status & 1 << 2) != 0 ? '停' : '',
+					foodState : ((c.data.status & 1 << 3) != 0 && Wireless.ux.staffGift) ? '赠' : (c.data.status & 1 << 2) != 0 ? '停' : '',
 					color : (c.data.status & 1 << 3) != 0 ? 'green' : 'FireBrick'
 				});
 			}
@@ -51,6 +51,10 @@ co.clear = function(){
 	co.newFood = [];
 	co.callback = null;
 	co.initNewFoodContent();
+	if($('#divCFCOHandlerMoreContent').is(':visible')){
+		$('#divCFCOHandlerMore').click();
+	}
+	
 };
 /**
  * 菜品操作返回
@@ -276,7 +280,32 @@ co.foodHangup = function(c){
 			data : data
 		});
 	}
+	//FIXME用区域以外法
+	if($('#divCFCOHandlerMoreContent').is(':visible')){
+		$('#divCFCOHandlerMore').click();
+	}	
+};
+
+co.giftFood = function(c){
+	var foodContent = $('#divCFCONewFood > div[class*=div-newFood-select]');
+	if(foodContent.length != 1){
+		Util.msg.alert({
+			msg : '请选中一道菜品'
+		});
+		return;
+	}
+	var data = co.newFood[foodContent.attr('data-index')];
+	if((data.status& 1 << 3) == 0){
+		Util.msg.alert({
+			msg : '此菜品不可赠送'
+		});
+		return;	
+	}
 	
+	data.isGift = typeof data.isGift != 'boolean' ? true : !data.isGift;;
+	co.initNewFoodContent({
+		data : data
+	});
 };
 
 /*** -------------------------------------------------- ***/
@@ -355,6 +384,11 @@ co.ot.show = function(c){
 	co.ot.newTaste = foodTasteGroup;
 	
 	co.ot.initNewTasteContent();
+	
+	//FIXME用区域以外法
+	if($('#divCFCOHandlerMoreContent').is(':visible')){
+		$('#divCFCOHandlerMore').click();
+	}	
 };
 /**
  * 口味操作返回

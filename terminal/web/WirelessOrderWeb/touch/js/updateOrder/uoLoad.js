@@ -139,7 +139,7 @@ function showOrder(){
 		html += Templet.uo.orderFood.format({
 			dataIndex : i + 1,
 			id : uoFood[i].id,
-			name : uoFood[i].name,
+			name : uoFood[i].name + (uoFood[i].isGift?'&nbsp;[<font style="font-weight:bold;">已赠送</font>]':''),
 			count : uoFood[i].count.toFixed(2),
 			tastePref : uoFood[i].tasteGroup.tastePref,
 			actualPrice : (uoFood[i].actualPrice + uoFood[i].tasteGroup.tastePrice).toFixed(2),

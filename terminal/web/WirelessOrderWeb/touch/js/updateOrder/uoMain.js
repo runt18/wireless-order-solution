@@ -683,6 +683,36 @@ uo.tempPayForUO = function(c){
 	}
 };
 
+uo.inputForPay = function(){
+	Util.dialongDisplay({
+		type : 'show',
+		renderTo : 'divInputForPay'
+	});
+	$("#txtNewTableForTS").focus();	
+};
+
+uo.inputPay = function (c){
+	var inputPay=getDom('numInputReceipt');
+	if(c.type === 1){
+		inputPay.value=inputPay.value.substring(0, inputPay.value.length - 1);
+	}else if(c.type === 2){
+		inputPay.value='';
+	}else{
+		inputPay.value=inputPay.value + '' + c.value;
+	}
+	inputPay.focus();
+};
+
+uo.ip.back = function(){
+	Util.dialongDisplay({
+		type : 'hide',
+		renderTo : 'divInputForPay'
+	});
+	$("#txtShouldToReceipt").val();
+	$("#numInputReceipt").val();
+	$('#txtReciptReturn').val();
+};
+
 /**
  * 设置折扣
  */
