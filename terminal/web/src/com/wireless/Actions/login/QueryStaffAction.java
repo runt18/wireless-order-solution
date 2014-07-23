@@ -64,7 +64,7 @@ public class QueryStaffAction extends Action {
 				staff = StaffDao.verify(Integer.parseInt(pin));
 			}
 			if(isName != null){
-				extra.putJsonable("staff", staff, 0);
+				extra.putJsonable("staff", staff, 1);
 				Restaurant restaurant;
 				if(request.getSession().getAttribute("restaurantID") == null){
 					restaurant = new Restaurant();

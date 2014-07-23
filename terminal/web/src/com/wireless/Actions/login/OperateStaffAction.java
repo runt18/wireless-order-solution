@@ -56,7 +56,7 @@ public class OperateStaffAction extends Action{
 					@Override
 					public JsonMap toJsonMap(int flag) {
 						JsonMap jm = new JsonMap();
-						jm.putJsonable("staff", theStaff, 0);
+						jm.putJsonable("staff", theStaff, 1);
 						return jm;
 					}
 
