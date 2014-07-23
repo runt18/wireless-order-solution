@@ -257,6 +257,7 @@ function getOperatorName(actionPath, callback) {
 				if(jr.other.staff != null){
 					document.getElementById("optName").innerHTML = jr.other.staff.staffName;
 					document.getElementById("restaurantName").innerHTML = jr.other.restaurant.name;
+					
 					if(typeof callback == 'function'){
 						callback(jr.other.staff);
 					}
@@ -269,6 +270,8 @@ function getOperatorName(actionPath, callback) {
 		failure : function(response, options) {
 		}
 	});
+	
+	
 };
 /**
  * 验证员工权限

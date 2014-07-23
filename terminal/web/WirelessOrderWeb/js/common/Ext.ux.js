@@ -434,8 +434,9 @@ Ext.ux.cfs = Ext.ux.checkFoodStatus;
 
 /**
  * 格式化菜品显示名称(包含状态)
+ * type:0表示点菜列表,1表示已点菜列表 
  */
-Ext.ux.formatFoodName = function(record, iname, name){
+Ext.ux.formatFoodName = function(record, iname, name, type){
 	var img = '';
 	var status = record.get('status');
 	if(Ext.ux.cfs.isSpecial(status))
@@ -444,8 +445,14 @@ Ext.ux.formatFoodName = function(record, iname, name){
 		img += '&nbsp;<img src="../../images/icon_tip_jian.png"></img>';
 	if(Ext.ux.cfs.isStop(status))
 		img += '&nbsp;<img src="../../images/icon_tip_ting.png"></img>';
-	if(Ext.ux.cfs.isGift(status))
-		img += '&nbsp;<img src="../../images/forFree.png"></img>';
+	if(type == 0){
+		if(Ext.ux.cfs.isGift(status) && Ext.ux.staffGift)
+			img += '&nbsp;<img src="../../images/forFree.png"></img>';	
+	}else if(type == 1){
+		if(Ext.ux.cfs.isGift(status) && record.get('isGift'))
+			img += '&nbsp;<img src="../../images/forFree.png"></img>';	
+	}
+
 	if(Ext.ux.cfs.isCurrPrice(status))
 		img += '&nbsp;<img src="../../images/currPrice.png"></img>';
 	if(Ext.ux.cfs.isCombo(status))
@@ -764,7 +771,7 @@ var OrderRecord = Ext.ux.cr(['id', 'seqId', 'rid', 'birthDateFormat', 'orderDate
     'statusValue', 'statusText', 'settleTypeValue', 'settleTypeText', 'payTypeValue', 'payTypeText', 'discount', 'pricePlan', 
     'table', 'table.alias','table.name','table.region.name', 'member', 'customNum', 'comment', 'repaidPrice', 'receivedCash', 'serviceRate', 'discountPrice', 
     'cancelPrice', 'giftPrice', 'totalPrice', 'erasePrice', 'couponPrice', 'actualPrice', 'orderFoods', 'childOrders', 'actualPriceBeforeDiscount']);
-var OrderFoodRecord = Ext.ux.cr(['dataType', 'orderId', 'orderDateFormat', 'count', 'discount', 'isTemporary', 'totalPrice', 'totalPriceBeforeDiscount',
+var OrderFoodRecord = Ext.ux.cr(['dataType', 'orderId', 'orderDateFormat', 'count', 'discount', 'isTemporary', 'isGift','totalPrice', 'totalPriceBeforeDiscount',
     'tasteGroup', 'tasteGroup.tastePref', 'tasteGroup.tastePrice', 'waiter', 'actualPrice'], FoodBasicRecord);
 var FoodPricePlanRecord = Ext.ux.cr(['planId', 'foodId', 'rid', 'unitPrice', 'foodAlias', 'foodName', 
     'kitchenId', 'kitchenAlias', 'kitchenName', 'pricePlan', 'pricePlan.name']);

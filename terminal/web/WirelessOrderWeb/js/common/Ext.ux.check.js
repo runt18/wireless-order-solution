@@ -154,6 +154,7 @@ Ext.ux.checkDuft = function(_s, _bid, _eid, _num){
 };
 
 Ext.ux.smsModule = false;
+Ext.ux.staffGift = false;
 Ext.ux.smsCount = 0;
 Ext.ux.checkSmStat = function(){
 	Ext.Ajax.request({
@@ -174,7 +175,7 @@ Ext.ux.checkSmStat = function(){
 		failure : function(res, opt){
 		}
 	});
-}
+};
 Ext.ux.getCookie = function(cookieName) {
 	var result = "";
 	var mycookie = document.cookie;

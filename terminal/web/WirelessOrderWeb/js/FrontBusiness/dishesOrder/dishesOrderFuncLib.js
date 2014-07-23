@@ -16,10 +16,12 @@ function orderGroupDisplayRefresh(_c){
 		gs = grid.getStore();
 	}
 	if(gs != null){
+		
 		for(var i = 0; i < gs.getCount(); i++){
 			if(gs.getAt(i).data.dataType == 2 || isRepaid){
 				frontNewOrderFood.push(gs.getAt(i).data);
 			}else{
+				
 				grid.getView().getRow(i).style.backgroundColor = '#FFFF93';
 			}
 		}
@@ -363,6 +365,7 @@ function addOrderSingleFoodHandler(_c){
 	}else if(Ext.ux.cfs.isStop(r.get('status'))){
 		Ext.example.msg('提示', '该菜品已停售, 请重新选择.');
 	}else{
+		r.isGift = false;
 		bindGridData({
 			grid : orderSingleGridPanel,
 			record : r,
@@ -480,6 +483,65 @@ function orderDeleteFoodOperationHandler(_c){
 		}
 	}
 };
+
+function orderFood_formatFoodName(record, iname, name, type){
+	var img = '';
+	var status = record.get('status');
+	if(Ext.ux.cfs.isSpecial(status))
+		img += '&nbsp;<img src="../../images/icon_tip_te.png"></img>';
+	if(Ext.ux.cfs.isRecommend(status)) 
+		img += '&nbsp;<img src="../../images/icon_tip_jian.png"></img>';
+	if(Ext.ux.cfs.isStop(status))
+		img += '&nbsp;<img src="../../images/icon_tip_ting.png"></img>';
+	if(type == 0){
+		if(Ext.ux.cfs.isGift(status) && Ext.ux.staffGift)
+			img += '&nbsp;<img src="../../images/forFree.png"></img>';	
+	}else if(type == 1){
+		if(Ext.ux.cfs.isGift(status) && record.get('isGift'))
+			img += '&nbsp;<img src="../../images/forFree.png"></img>';	
+	}
+
+	if(Ext.ux.cfs.isCurrPrice(status))
+		img += '&nbsp;<img src="../../images/currPrice.png"></img>';
+	if(Ext.ux.cfs.isCombo(status))
+		img += '&nbsp;<img src="../../images/combination.png"></img>';
+	if(Ext.ux.cfs.isHot(status))
+		img += '&nbsp;<img src="../../images/hot.png"></img>';
+	if(Ext.ux.cfs.isWeigh(status))
+		img += '&nbsp;<img src="../../images/weight.png"></img>';
+	if(Ext.ux.cfs.isCommission(status))
+		img += '&nbsp;<img src="../../images/commission.png"></img>';
+	if (record.get('temporary') || record.get('isTemporary'))
+		img += '&nbsp;<img src="../../images/tempDish.png"></img>';
+	
+	record.set(iname, record.get(name) + img);	
+	record.commit();
+}
+
+function orderGiftFoodOperationHandler(c){
+	var record = orderSingleGridPanel.getSelectionModel().getSelected();
+	reloadData = c.id;
+	for(var i = 0; i < orderSingleGridPanel.order.orderFoods.length; i++){	
+		var temp = orderSingleGridPanel.order.orderFoods[i];
+		if(record.get('id') == temp.id){
+			if(c.checked == true){
+//				
+				temp.isGift = true;
+				record.set('isGift', true);
+				orderFood_formatFoodName(record, 'displayFoodName', 'name', 1);
+				$('#'+c.id).attr('checked', 'checked');
+				
+			}else{
+				temp.isGift = false;
+				record.set('isGift', false);
+				orderFood_formatFoodName(record, 'displayFoodName', 'name', 1);
+			}	
+		}
+
+	}
+	reloadData = null;
+	
+}
 /**
  * 修改菜品数量入口
  */
@@ -574,18 +636,35 @@ function orderOrderGridPanelTasteRenderer(v, cm, r, ri, ci, store){
  * 菜品数量增加或删除操作入口渲染
  */
 function foodCountAddOrDeleteRenderer(value, cellmeta, record, rowIndex, columnIndex, store){
+
 	if(record.get('dataType') == 2 || isRepaid){
 		return ''
 			+ Ext.ux.txtFormat.gridDou(value)
 			+ '<a href="javascript:orderFoodCountOperationHandler({otype:0,count:1});"><img src="../../images/btnAdd.gif" border="0" title="菜品数量+1"></a>&nbsp;'
 			+ '<a href="javascript:orderFoodCountOperationHandler({otype:0,count:-1});"><img src="../../images/btnDelete.png" border="0" title="菜品数量-1"></a>&nbsp;'
 			+ '<a onClick="orderFoodCountRendererHandler({x:event.clientX,y:event.clientY})"><img src="../../images/icon_tb_setting.png" border="0" title="菜品数量设置"></a>&nbsp;'
-			+ '<a href="javascript:orderDeleteFoodOperationHandler()"><img src="../../images/btnCancel.png" border="0" title="删除菜品"/></a>';
+			+ '<a href="javascript:orderDeleteFoodOperationHandler()"><img src="../../images/btnCancel.png" border="0" title="删除菜品"/></a>' ;
 	}else{
 		return Ext.ux.txtFormat.gridDou(value)
 			+ '<a href="javascript:orderDeleteFoodOperationHandler()"><img src="../../images/btnCancel.png" border="0" title="删除菜品"/></a>';
 	}
 };
+
+function orderGiftRenderer(value, cellmeta, record, rowIndex, columnIndex, store){
+	
+	giftRender.id ++;
+	if(Ext.ux.cfs.isGift(record.get('status'))){
+		var checkId= 'checked'+giftRender.id;
+		if(record.get('isGift') == true){
+			giftRender.checkeds.push(checkId);
+		}
+		
+		value = Ext.ux.staffGift?'&nbsp;<input type="checkbox" id="'+(reloadData?reloadData:checkId)+'" style="height:18px;width:18px;vertical-align: middle;" onclick="orderGiftFoodOperationHandler(this)"/>赠送':'';
+	}	
+	return value;	
+
+}
+
 
 /**
  * 判定单签账单组账单操作类型, 1:单一 2:全组, 
@@ -640,7 +719,8 @@ function bindGridData(_c){
 				normalTaste : null,
 				normalTasteContent : [],
 				tempTaste : null
-			}
+			},
+			isGift : record.isGift
 		});
 		sindex = grid.getStore().getCount();
 	}
@@ -654,7 +734,7 @@ function bindGridData(_c){
 /**
  * 刷新账单信息 
  */
-function refreshOrderHandler(){
+function refreshOrderHandler(c){
 	var girdData = orderSingleGridPanel.order.orderFoods;
 	var selData = new Array();
 	
@@ -692,7 +772,9 @@ function refreshOrderHandler(){
 				orderGroupDisplayRefresh({
 					control : orderSingleGridPanel
 				});
-				Ext.example.msg('提示', '已更新已点菜列表,请继续操作.');
+				if(!c){
+					Ext.example.msg('提示', '已更新已点菜列表,请继续操作.');
+				}
 			} else {
 				Ext.ux.showMsg(jr);
 			}

@@ -3,6 +3,10 @@ var billDetailGrid;
 function detailIsPaidRenderer(v){
 	return eval(v) ? '是' : '否';
 }
+
+function detailIsGiftRenderer(v){
+	return eval(v) ? '是' : '否';
+}
 function load(){
 	billDetailGrid.getStore().load({
 		params : {
@@ -28,6 +32,7 @@ Ext.onReady(function(){
 		    ['口味价钱','tasteGroup.tastePrice', 60, 'right', 'Ext.ux.txtFormat.gridDou'],
 		    ['厨房','kitchen.name', 60],
 		    ['反结账','isRepaid', 60, 'center', 'detailIsPaidRenderer'],
+		    ['赠送','isGift', 60, 'center', 'detailIsGiftRenderer'],
 		    ['服务员','waiter', 60],
 		    ['退菜原因', 'cancelReason.reason']
 		],

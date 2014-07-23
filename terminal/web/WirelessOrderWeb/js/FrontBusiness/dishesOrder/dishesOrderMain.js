@@ -627,9 +627,11 @@ allFoodTabPanelGrid.on('render', function(thiz){
 	Ext.getCmp('btnSearchMenu').handler();
 });
 allFoodTabPanelGrid.getStore().on('load', function(thiz, records){
+	
 	for(var i = 0; i < records.length; i++){
-		Ext.ux.formatFoodName(records[i], 'displayFoodName', 'name');
+		Ext.ux.formatFoodName(records[i], 'displayFoodName', 'name', 0);
 	}
+		
 });
 allFoodTabPanelGrid.on('rowclick', function(thiz, ri, e){
 	addOrderFoodHandler({
@@ -1038,6 +1040,7 @@ function initKeyBoardEvent(){
 
 var dishesOrderEastPanel, centerPanel;
 Ext.onReady(function() {
+	
 	var menuTabPanel = new Ext.TabPanel({
 		id : 'menuTabPanel',
 		activeItem : 0,
@@ -1098,10 +1101,17 @@ Ext.onReady(function() {
 	});
 
 	initMainView(null, billModCenterPanel, null);
-	// 初始化菜品数据
-	loadOrderData();
 	
 	getOperatorName("../../");
 	
+	// 初始化菜品数据
+	loadOrderData();
+	
 	initKeyBoardEvent();
+	
+	if(!isFree && !isRepaid){
+		refreshOrderHandler(true);
+	}
+	
+	
 });

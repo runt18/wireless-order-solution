@@ -45,6 +45,17 @@ function load(){
 		}
 	});
 }
+
+function viewBill_formatFoodName(record, iname, name){
+	var img = '';
+	if(record.get('isGift'))
+		img += '&nbsp;<img src="../../images/forFree.png"></img>';
+	
+	record.set(iname, record.get(name) + img);
+	record.commit();		
+}
+
+
 Ext.onReady(function(){
 	
 	history_viewBillGrid = createGridPanel(
@@ -55,7 +66,7 @@ Ext.onReady(function(){
 	    '',
 	    [
 		    [true, false, false, false], 
-		    ['菜名', 'name', 130] , 
+		    ['菜名', 'displayFoodName', 130] , 
 		    ['口味', 'tasteGroup.tastePref', 100],
 		    ['数量', 'count', 50, 'right', 'Ext.ux.txtFormat.gridDou'],
 		    ['折扣', 'discount', 50, 'right', 'Ext.ux.txtFormat.gridDou'],
@@ -69,7 +80,14 @@ Ext.onReady(function(){
 	history_viewBillGrid.frame = false;
 	history_viewBillGrid.border = false;
 	history_viewBillGrid.region = 'center';
-
+	history_viewBillGrid.getStore().on('load', function(thiz, records){
+		for(var i = 0; i < records.length; i++){
+			viewBill_formatFoodName(records[i], 'displayFoodName', 'name');
+//			Ext.ux.formatFoodName(records[i], 'displayFoodName', 'name');
+		}
+	});
+	
+	
 	viewBillGenPanel = new Ext.Panel({
 		region : 'north',
 		height : 120,

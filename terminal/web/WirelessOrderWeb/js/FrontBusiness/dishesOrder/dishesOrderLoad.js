@@ -97,6 +97,7 @@ function loadSingleOrderData(resultJSON){
 								break;
 							}
 						}
+						orderSingleGridPanel.getStore().loadData({root:orderSingleGridPanel.order.orderFoods});
 					},
 					failure : function(res, opt) {
 						Ext.MessageBox.show({
@@ -456,7 +457,8 @@ function initOrderSingleUI(_c){
 				['数量', 'count', 130, 'right', 'foodCountAddOrDeleteRenderer'],
 				['单价', 'unitPrice', 80, 'right', 'Ext.ux.txtFormat.gridDou'],
 				['下单时间', 'orderDateFormat', 150],
-				['服务员', 'waiter', 80]
+				['服务员', 'waiter', 80],
+				['操作','operate', 80, 'cneter', 'orderGiftRenderer']
 			],
 			OrderFoodRecord.getKeys(),
 			[],
@@ -467,7 +469,10 @@ function initOrderSingleUI(_c){
 		orderSingleGridPanel.order = {orderFoods:[]};
 		orderSingleGridPanel.getStore().on('load', function(thiz, records){
 			for(var i = 0; i < records.length; i++){
-				Ext.ux.formatFoodName(records[i], 'displayFoodName', 'name');
+				Ext.ux.formatFoodName(records[i], 'displayFoodName', 'name', 1);
+			}
+			for (var j = 0; j < giftRender.checkeds.length; j++) {
+				$('#'+giftRender.checkeds[j]).attr('checked', 'checked');
 			}
 		});
 		orderPanel.add(orderSingleGridPanel);
