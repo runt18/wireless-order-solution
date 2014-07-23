@@ -383,6 +383,7 @@ public class OrderFood implements Parcelable, Jsonable {
 		this.mOrderId = src.mOrderId;
 		this.mWaiter = src.mWaiter;
 		this.isHangup = src.isHangup;
+		this.isGift = src.isGift;
 		this.isTemporary = src.isTemporary;
 		this.mDiscount = src.mDiscount;
 		this.mLastCnt = src.mLastCnt;
@@ -802,7 +803,7 @@ public class OrderFood implements Parcelable, Jsonable {
 		jm.putBoolean(Key4Json.IS_REPAID.key, this.isRepaid);
 		jm.putBoolean(Key4Json.IS_HURRIED.key, this.isHurried);
 		jm.putBoolean(Key4Json.IS_HANG.key, this.isHangup);
-		jm.putBoolean(Key4Json.IS_GIFT.key, this.mFood.isGift());
+		jm.putBoolean(Key4Json.IS_GIFT.key, this.isGift);
 		jm.putBoolean(Key4Json.IS_COMMISSION.key, this.mFood.isCommission());
 		jm.putBoolean(Key4Json.IS_RETURN.key, this.getCount() < 0 ? true : false);
 		jm.putFloat(Key4Json.DISCOUNT.key, this.mDiscount);
@@ -855,6 +856,11 @@ public class OrderFood implements Parcelable, Jsonable {
 			
 			if(jsonMap.containsKey(Key4Json.IS_HANG.key)){
 				setHangup(jsonMap.getBoolean(Key4Json.IS_HANG.key));
+			}
+			
+			
+			if(jsonMap.containsKey(Key4Json.IS_GIFT.key)){
+				setGift(jsonMap.getBoolean(Key4Json.IS_GIFT.key));
 			}
 			
 			if(jsonMap.containsKey(Key4Json.TASTE_GROUP.key)){

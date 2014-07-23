@@ -427,6 +427,10 @@ public class Role implements Jsonable, Parcelable{
 		jm.putInt("typeValue", this.getType().getVal());
 		jm.putString("typeText", this.getType().getDesc());
 		
+		if(flag == 1){
+			jm.putJsonableList("privileges", getPrivileges(), 0);
+		}
+		
 		return jm;
 	}
 
