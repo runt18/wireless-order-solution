@@ -73,7 +73,7 @@ public class RepaidOrderAction extends Action{
 			payBuilder.setDiscountId(Integer.parseInt(request.getParameter("discountID")));
 			
 			//get the service rate to this order
-			payBuilder.setServiceRate(NumericUtil.int2Float(Integer.parseInt(request.getParameter("serviceRate"))));
+			payBuilder.setServicePlan(NumericUtil.int2Float(Integer.parseInt(request.getParameter("serviceRate"))));
 
 			//get the erasePrice rate to this order
 			payBuilder.setErasePrice(Integer.valueOf(request.getParameter("erasePrice")));

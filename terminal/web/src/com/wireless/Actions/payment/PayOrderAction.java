@@ -123,8 +123,9 @@ public class PayOrderAction extends Action{
 			}
 			
 			if(request.getParameter("serviceRate") != null){
-				payBuilder.setServiceRate(NumericUtil.int2Float(Integer.parseInt(request.getParameter("serviceRate"))));
+				payBuilder.setServicePlan(NumericUtil.int2Float(Integer.parseInt(request.getParameter("serviceRate"))));
 			}
+			payBuilder.setServicePlan(1);
 			
 			if(request.getParameter("eraseQuota") != null){
 				payBuilder.setErasePrice(Integer.parseInt(request.getParameter("eraseQuota")));

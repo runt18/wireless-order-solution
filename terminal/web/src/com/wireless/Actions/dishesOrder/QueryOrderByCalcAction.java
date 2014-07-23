@@ -76,7 +76,7 @@ public class QueryOrderByCalcAction extends Action{
 				}
 				if(serviceRate != null && !serviceRate.trim().isEmpty()){
 					if(Float.valueOf(serviceRate.trim()) > 0){
-						payParam.setServiceRate(Float.valueOf(serviceRate) / 100);						
+						payParam.setServicePlan(Float.valueOf(serviceRate) / 100);						
 					}
 				}
 				
