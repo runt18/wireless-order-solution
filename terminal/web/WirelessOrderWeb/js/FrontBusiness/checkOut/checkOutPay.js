@@ -22,7 +22,7 @@ var paySubmit = function(submitType) {
 			var actualPrice = checkOut_actualPrice;
 			var countPrice = document.getElementById("totalCount").innerHTML;
 			var shouldPay = document.getElementById("shouldPay").innerHTML;
-//			var serviceRate = document.getElementById("serviceCharge").value;
+			var servicePlan = Ext.getCmp("comboServicePlan").getValue();
 			var serviceRate = 0;
 			var eraseQuota = document.getElementById("txtEraseQuota").value;
 			var submitPrice = -1;
@@ -82,7 +82,7 @@ var paySubmit = function(submitType) {
 					"tempPay" : tempPay,
 					"memberID" : actualMemberID,
 					"comment" : Ext.getDom("remark").value,
-					"serviceRate" : serviceRate
+					"servicePlan" : servicePlan
 //					'eraseQuota' : eraseQuota
 //					'pricePlanID' : calcPricePlanID,
 //					'customNum' : Ext.getCmp('numCustomNum').getValue()

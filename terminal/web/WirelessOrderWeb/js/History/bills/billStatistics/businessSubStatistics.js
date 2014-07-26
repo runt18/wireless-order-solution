@@ -441,6 +441,8 @@ Ext.onReady(function(){
 	});
 	
 	businessSub_chartPanel = new Ext.Panel({
+		collapsible : true,
+		title : '走势图',
 		region : 'south',
 		frame : true,
 		contentEl : 'divBusinessSubStatisticsDetailChart',
@@ -448,7 +450,7 @@ Ext.onReady(function(){
 			show : function(thiz){
 				//thiz.getEl(): 刚打开页面时thiz.getWidth无效
 				if(businessSub_highChart && typeof thiz.getEl() != 'undefined'){
-					businessSub_highChart.setSize(thiz.getWidth(), businessSub_panelDrag ? businessSub_chartPanel.getHeight() - 30 : businessSub_chartPanel.getHeight());
+					businessSub_highChart.setSize(thiz.getWidth(), businessSub_panelDrag ? businessSub_chartPanel.getHeight() - 45 : businessSub_chartPanel.getHeight()-25);
 				}				
 			}
 		}

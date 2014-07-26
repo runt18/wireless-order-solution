@@ -134,15 +134,10 @@ function loadTableData(_c){
 		_c = {};
 	}
 	var eraseQuota = document.getElementById("txtEraseQuota").value;
-	var serviceRate = Ext.getCmp("serviceCharge").getValue();
+	var servicePlan = Ext.getCmp("comboServicePlan").getValue();
 //	var customNum = Ext.getCmp("numCustomNum").getValue();
 	eraseQuota = typeof eraseQuota != 'undefined' && eval(eraseQuota >= 0) ? eraseQuota : 0;
-	serviceRate = typeof serviceRate != 'undefined' && eval(serviceRate >= 0) ? serviceRate : 0;
 //	customNum = typeof customNum != 'undefined' && eval(customNum > 0) ? customNum : 0;
-	if(serviceRate > 100){
-		serviceRate = 100;
-		Ext.getCmp("serviceCharge").setValue(100);
-	}
 	Ext.Ajax.request({
 		url : "../../QueryOrderByCalc.do",
 		params : {
@@ -152,7 +147,7 @@ function loadTableData(_c){
 			discountID : calcDiscountID,
 //			pricePlanID : calcPricePlanID,
 //			eraseQuota : eraseQuota,
-			serviceRate : serviceRate
+			servicePlan : servicePlan
 		},
 		success : function(response, options) {
 			var jr = Ext.decode(response.responseText);

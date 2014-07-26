@@ -423,7 +423,8 @@ function initTasteOperatorWin(){
 								Ext.example.msg(jr.title, jr.msg);
 								if(tasteOperatorWin.otype.toLowerCase() == 'insert'){
 									var bToolBar = Ext.getCmp('taste_grid').getBottomToolbar();
-									bToolBar.onClick(bToolBar.last);
+									var totalCount = Ext.getCmp('taste_grid').getStore().getTotalCount();
+									bToolBar.changePage(Math.ceil(totalCount/GRID_PADDING_LIMIT_20));
 								}else{
 									tasteGrid.getStore().reload();
 								}

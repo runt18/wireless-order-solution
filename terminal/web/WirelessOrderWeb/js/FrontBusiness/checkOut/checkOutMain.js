@@ -42,29 +42,49 @@ var checkOutMainPanelTbar = new Ext.Toolbar({
 		text : '&nbsp;&nbsp;当前折扣方案:&nbsp;<span id="spanDisplayCurrentDiscount" style="color:rgb(21, 66, 139); font-weight:bold;font-size:18px; ">&nbsp;&nbsp;</span>'
 	}, {
 		xtype : 'tbtext',
-		text : '&nbsp;&nbsp;服务费:'
+		text : '&nbsp;&nbsp;服务费方案:'
 	},{
-		xtype : 'numberfield',
-		id : 'serviceCharge',
-		width : 40,
+		xtype : 'combo',
+		id : 'comboServicePlan',
+		width : 100,
+		readOnly : false,
+		forceSelection : true,
+		store : new Ext.data.SimpleStore({
+			fields : ['planId', 'name']
+		}),
+		valueField : 'planId',
+		displayField : 'name',
+		typeAhead : true,
+		mode : 'local',
+		triggerAction : 'all',
+		selectOnFocus : true,
 		listeners : {
-			'render': {
-			    fn: function(c){
-			        c.getEl().on(
-			            'keyup',
-			            function() {
-			            	loadTableData();
-			            }
-			        );
-			    },
-			    scope: this
-			 
-			}						
+			render : function(thiz){
+				var data = [];
+				Ext.Ajax.request({
+					url : '../../QueryServicePlan.do',
+					success : function(res, opt){
+						var jr = Ext.decode(res.responseText);
+						var defaultId='';
+						for(var i = 0; i < jr.length; i++){
+							data.push([jr[i]['planId'], jr[i]['text']]);
+							if(jr[i]['status'] == 2){
+								defaultId = jr[i]['planId'];
+							}
+						}
+						thiz.store.loadData(data);
+						
+						thiz.setValue(defaultId);
+					},
+					fialure : function(res, opt){
+						thiz.store.loadData(data);
+					}
+				});
+			},
+			select : function(){
+				loadTableData();
+			}
 		}
-		
-	},{
-		xtype : 'tbtext',
-		text : '%'
 	}, '->', {
 		text : '返回',
 		handler : function(){

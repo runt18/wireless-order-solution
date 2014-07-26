@@ -12,18 +12,8 @@ Ext.Ajax.on('requestcomplete',checkUserSessionStatus, this);
 function checkUserSessionStatus(conn,response,options){     
    //Ext重新封装了response对象
     if(response.getResponseHeader && response.getResponseHeader("session_status")){ 
-  		var interval = 3;
+		var interval = 3;
 		var action = '<br>&nbsp;&nbsp;&nbsp;<span id="returnInterval" style="color:red;"></span>&nbsp;之后自动跳转';
-		new Ext.util.TaskRunner().start({
-			run: function(){
-				if(interval < 1){
-					location.href = response.getResponseHeader("root_path") + '/pages/Login.html';								
-				}
-				Ext.getDom('returnInterval').innerHTML = interval;
-				interval--;
-			},
-			interval : 1000
-		});  
 		Ext.MessageBox.show({
 			title : '提示',
 			msg : '操作已超时, 请重新登陆' + action,
@@ -36,6 +26,17 @@ function checkUserSessionStatus(conn,response,options){
 				}
 			}
 		});
+
+		new Ext.util.TaskRunner().start({
+			run: function(){
+				if(interval < 1){
+					location.href = response.getResponseHeader("root_path") + '/pages/Login.html';								
+				}
+				Ext.getDom('returnInterval').innerHTML = interval;
+				interval--;
+			},
+			interval : 1000
+		});  
     }     
 } 
 
