@@ -49,7 +49,7 @@ public class QueryOrderByCalcAction extends Action{
 			String calc = request.getParameter("calc");
 			String discountId = request.getParameter("discountID");
 			String eraseQuota = request.getParameter("eraseQuota");
-			String serviceRate = request.getParameter("serviceRate");
+			String servicePlan = request.getParameter("servicePlan");
 			String customNum = request.getParameter("customNum");
 			
 			final Order order;
@@ -74,10 +74,8 @@ public class QueryOrderByCalcAction extends Action{
 				if(customNum != null && !customNum.trim().isEmpty() && Integer.valueOf(customNum.trim()) > 0){
 					payParam.setCustomNum(Short.valueOf(customNum));
 				}
-				if(serviceRate != null && !serviceRate.trim().isEmpty()){
-					if(Float.valueOf(serviceRate.trim()) > 0){
-						payParam.setServicePlan(Float.valueOf(serviceRate) / 100);						
-					}
+				if(servicePlan != null && !servicePlan.trim().isEmpty()){
+					payParam.setServicePlan(Integer.parseInt(servicePlan));
 				}
 				
 				order.copyFrom(PayOrder.calc(staff, payParam));

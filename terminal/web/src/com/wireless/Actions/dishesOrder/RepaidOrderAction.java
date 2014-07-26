@@ -20,7 +20,6 @@ import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.Order.PayType;
 import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.staffMgr.Staff;
-import com.wireless.pojo.util.NumericUtil;
 
 public class RepaidOrderAction extends Action{
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
@@ -73,7 +72,7 @@ public class RepaidOrderAction extends Action{
 			payBuilder.setDiscountId(Integer.parseInt(request.getParameter("discountID")));
 			
 			//get the service rate to this order
-			payBuilder.setServicePlan(NumericUtil.int2Float(Integer.parseInt(request.getParameter("serviceRate"))));
+			payBuilder.setServicePlan(Integer.parseInt(request.getParameter("servicePlan")));
 
 			//get the erasePrice rate to this order
 			payBuilder.setErasePrice(Integer.valueOf(request.getParameter("erasePrice")));

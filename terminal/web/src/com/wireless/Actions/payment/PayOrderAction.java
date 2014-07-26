@@ -27,7 +27,6 @@ import com.wireless.pojo.client.MemberOperation;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.PrintOption;
 import com.wireless.pojo.staffMgr.Staff;
-import com.wireless.pojo.util.NumericUtil;
 import com.wireless.sccon.ServerConnector;
 import com.wireless.util.DateType;
 import com.wireless.util.sms.SMS;
@@ -122,10 +121,9 @@ public class PayOrderAction extends Action{
 				payBuilder.setCouponId(Integer.parseInt(request.getParameter("couponID")));
 			}
 			
-			if(request.getParameter("serviceRate") != null){
-				payBuilder.setServicePlan(NumericUtil.int2Float(Integer.parseInt(request.getParameter("serviceRate"))));
+			if(request.getParameter("servicePlan") != null){
+				payBuilder.setServicePlan(Integer.parseInt(request.getParameter("servicePlan")));
 			}
-			payBuilder.setServicePlan(1);
 			
 			if(request.getParameter("eraseQuota") != null){
 				payBuilder.setErasePrice(Integer.parseInt(request.getParameter("eraseQuota")));
