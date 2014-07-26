@@ -24,11 +24,15 @@ public class GiftIncomeByEachDay implements Jsonable {
 		return jm;
 	}
 
-	public float getCancelAmount(){
+	public DutyRange getRange() {
+		return range;
+	}
+	
+	public float getGiftAmount(){
 		return this.mGiftAmount;
 	}
 	
-	public float getCancelPrice(){
+	public float getGiftPrice(){
 		return this.mGiftPrice;
 	}
 	
