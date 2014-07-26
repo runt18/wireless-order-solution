@@ -36,6 +36,7 @@ public class CalcGiftStatisticsDao {
 		private int staffId;
 		private Region.RegionId regionId;
 		private HourRange hourRange;
+		private String foodName;
 		
 		public ExtraCond(DateType dateType){
 			this.dateType = dateType;
@@ -65,6 +66,11 @@ public class CalcGiftStatisticsDao {
 			return this;
 		}
 		
+		public ExtraCond setFoodName(String foodName){
+			this.foodName = foodName;
+			return this;
+		}
+		
 		public ExtraCond setHourRange(HourRange hourRange){
 			this.hourRange = hourRange;
 			return this;
@@ -81,6 +87,9 @@ public class CalcGiftStatisticsDao {
 			}
 			if(regionId != null){
 				extraCond.append(" AND O.region_id = " + regionId.getId());
+			}
+			if(foodName != null){
+				extraCond.append(" AND OF.name LIKE '%" + foodName + "%'");
 			}
 			if(hourRange != null){
 				extraCond.append(" AND TIME(O.order_date) BETWEEN '" + hourRange.getOpeningFormat() + "' AND '" + hourRange.getEndingFormat() + "'");
