@@ -178,7 +178,7 @@ public class DailySettleDao {
 	/**
 	 * Perform to daily settle according to a terminal.
 	 * @param staff
-	 * 			  the terminal with both user name and restaurant id
+	 * 			  the staff to perform this action
 	 * @return the result to daily settle
 	 * @throws SQLException
 	 *             throws if fail to execute any SQL statement
