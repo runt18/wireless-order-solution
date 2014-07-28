@@ -15,6 +15,7 @@
     <color name="yellow">#fbd67e</color>
     <color name="brown">#A52A2A</color>
     <color name="maroon">#800000</color>
+    <color name="dodger_blue">#1E90FF</color>
 
     <drawable name="nullbg">#00ffffff</drawable>
     <drawable name="orange_drawable">#feb041</drawable>

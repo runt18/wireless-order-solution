@@ -28,6 +28,7 @@ import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
@@ -98,6 +99,25 @@ public class AskOrderAmountDialog extends DialogFragment {
 		@Override
 		public void handleMessage(Message msg) {
 			AskOrderAmountDialog thisDlgFgm = mDlgFgm.get();
+			
+			int index = (Integer)thisDlgFgm.mCurrentTasteView.getTag(R.id.combo_of_index);
+			//设置Indicator
+			((IndicatorView)thisDlgFgm.getView().findViewById(R.id.indicator_askOrderAmount_dialog)).setCurr(index);
+			
+			//设置套菜NaviBar
+			LinearLayout comboLinearLayout = (LinearLayout)thisDlgFgm.getView().findViewById(R.id.linearLayout_comboFood_askOrderAmount_dialog);
+			for(int i = 0; i < comboLinearLayout.getChildCount(); i++){
+				if(i == index){
+					comboLinearLayout.getChildAt(i).setBackgroundColor(thisDlgFgm.getResources().getColor(R.color.orange));
+					((TextView)comboLinearLayout.getChildAt(i).findViewById(R.id.txtView_foodName_comboFood_item)).setTextColor(thisDlgFgm.getResources().getColor(R.color.black));
+					((TextView)comboLinearLayout.getChildAt(i).findViewById(R.id.txtView_status_comboFood_item)).setTextColor(thisDlgFgm.getResources().getColor(R.color.black));
+				}else{
+					comboLinearLayout.getChildAt(i).setBackgroundColor(thisDlgFgm.getResources().getColor(R.color.dodger_blue));
+					((TextView)comboLinearLayout.getChildAt(i).findViewById(R.id.txtView_foodName_comboFood_item)).setTextColor(thisDlgFgm.getResources().getColor(R.color.white));
+					((TextView)comboLinearLayout.getChildAt(i).findViewById(R.id.txtView_status_comboFood_item)).setTextColor(thisDlgFgm.getResources().getColor(R.color.white));
+				}
+			}
+			
 			if((Boolean)thisDlgFgm.mCurrentTasteView.getTag(R.id.combo_of_indicator_key)){
 				thisDlgFgm.getView().findViewById(R.id.linearLayout_top_askOrderAmount_dialog).setVisibility(View.INVISIBLE);
 				thisDlgFgm.getView().findViewById(R.id.linearLayout_combo_askOrderAmount_dialog).setVisibility(View.VISIBLE);
@@ -147,6 +167,7 @@ public class AskOrderAmountDialog extends DialogFragment {
 				((GridView)thisDlgFgm.mCurrentTasteView.findViewById(R.id.gridView_askOrderAmount_dialog)).invalidateViews();
 			}
 		}
+		
 	}
 	
 	private final static int REFRESH_ALL = 0;
@@ -381,22 +402,52 @@ public class AskOrderAmountDialog extends DialogFragment {
 			public void onViewChanged(int curScreen, View parent, View curView) {
 				((InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(scrollLayout.getWindowToken(), 0);
 				mCurrentTasteView = curView;
-				//设置Indicator
-				((IndicatorView)view.findViewById(R.id.indicator_askOrderAmount_dialog)).setCurr(curScreen);
+				mCurrentTasteView.setTag(R.id.combo_of_index, Integer.valueOf(curScreen));
 				
 				waitHandler.removeCallbacks(refreshRunnable);
-				waitHandler.postDelayed(refreshRunnable, 300);
+				waitHandler.postDelayed(refreshRunnable, 100);
 			}
 		});
 
 		//增加菜品的常用口味和品注
 		scrollLayout.addView(mCurrentTasteView = setTasteView(container));
+		mCurrentTasteView.setTag(R.id.combo_of_index, Integer.valueOf(0));
 		
 		//增加子菜的常用口味和品注(如果是套菜)
 		if (mSelectedFood.asFood().isCombo()) {
-			for (ComboFood combo : mSelectedFood.asFood().getChildFoods()) {
-				scrollLayout.addView(setComboTasteView(container, combo));
+			//显示套菜快速导航的主菜部分
+			LinearLayout hsvContainer = (LinearLayout)view.findViewById(R.id.linearLayout_comboFood_askOrderAmount_dialog);
+			View mainFoodView = inflater.inflate(R.layout.combo_food_item, hsvContainer, false);
+			((TextView)mainFoodView.findViewById(R.id.txtView_status_comboFood_item)).setText("(主)");
+			((TextView)(TextView)mainFoodView.findViewById(R.id.txtView_foodName_comboFood_item)).setText(mSelectedFood.asFood().getName().substring(0, 4));
+			
+			mainFoodView.setOnClickListener(new OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					scrollLayout.setToScreen(0);
+				}
+			});
+			hsvContainer.addView(mainFoodView);
+			
+			int index = 1;
+			for (final ComboFood eachChild : mSelectedFood.asFood().getChildFoods()) {
+				
+				scrollLayout.addView(setComboTasteView(container, eachChild));
+				View childFoodView = inflater.inflate(R.layout.combo_food_item, hsvContainer, false);
+				((TextView)childFoodView.findViewById(R.id.txtView_status_comboFood_item)).setText("(套" + index + ")");
+				//显示套菜快速导航的子菜部分
+				((TextView)childFoodView.findViewById(R.id.txtView_foodName_comboFood_item)).setText(eachChild.asFood().getName().substring(0, 4));
+				final int i = index++;
+				childFoodView.setOnClickListener(new OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						scrollLayout.setToScreen(i);
+					}
+				});
+				hsvContainer.addView(childFoodView);
 			}
+			
+			//显示Indicator
 			((IndicatorView)view.findViewById(R.id.indicator_askOrderAmount_dialog)).setTotal(mSelectedFood.asFood().getChildFoods().size() + 1);
 		}else{
 			view.findViewById(R.id.indicator_askOrderAmount_dialog).setVisibility(View.GONE);
