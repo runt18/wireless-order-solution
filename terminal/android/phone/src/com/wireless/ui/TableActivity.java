@@ -3,7 +3,6 @@ package com.wireless.ui;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -116,32 +115,16 @@ public class TableActivity extends FragmentActivity implements OnTableSelectedLi
 
 			final TableActivity theActivity = mActivity.get();
 	
-			/**
-			 * Filter the region containing data.
-			 */
-			HashSet<Short> validRegionID = new HashSet<Short>();
-			for(Table tbl : WirelessOrder.tables){
-				validRegionID.add(tbl.getRegion().getId());
-			}
-				
-			final List<Region> validRegions = new ArrayList<Region>();
-			validRegions.add(new Region(FILTER_REGION_ALL, REGION_ALL_STR, 0));
-			for(Region region : WirelessOrder.regions){
-				if(validRegionID.contains(region.getId())){
-					validRegions.add(region);
-				}
-			}
-			
-			ListView popListView = (ListView)theActivity.mPopWnd.getContentView().findViewById(R.id.popWndList);
+			ListView popListView = (ListView)theActivity.mPopWnd.getContentView().findViewById(R.id.listView_region_popup);
 
 			popListView.setAdapter(new BaseAdapter() {
 				
 				@Override
 				public View getView(int position, View convertView, ViewGroup parent) {
 					TextView view;
-					Region region = validRegions.get(position);
+					Region region = WirelessOrder.regions.get(position);
 					if(convertView == null){
-						view =(TextView) LayoutInflater.from(theActivity.getApplicationContext()).inflate(R.layout.pop_wnd_item, null);
+						view =(TextView) LayoutInflater.from(theActivity.getApplicationContext()).inflate(R.layout.region_popup_wnd_item, parent, false);
 					}else{
 						view = (TextView)convertView;
 					}
@@ -159,12 +142,12 @@ public class TableActivity extends FragmentActivity implements OnTableSelectedLi
 				
 				@Override
 				public Object getItem(int position) {
-					return validRegions.get(position);
+					return WirelessOrder.regions.get(position);
 				}
 				
 				@Override
 				public int getCount() {
-					return validRegions.size();
+					return WirelessOrder.regions.size();
 				}
 			});
 			
@@ -668,18 +651,15 @@ public class TableActivity extends FragmentActivity implements OnTableSelectedLi
 		});
 		
 		// 创建点击餐台状态后弹出区域的View
-		View popupView = getLayoutInflater().inflate(R.layout.main_pop_window, null);
+		View popupView = getLayoutInflater().inflate(R.layout.region_popup_wnd, null);
 
 		// 创建与这个View关联的pop-up window
-		mPopWnd = new PopupWindow(
-				popupView,
-				LayoutParams.WRAP_CONTENT,
-				LayoutParams.WRAP_CONTENT, true);
+		mPopWnd = new PopupWindow(popupView, LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, true);
 		mPopWnd.setOutsideTouchable(true);
 		mPopWnd.setBackgroundDrawable(new BitmapDrawable());
 		mPopWnd.update();
 		
-		ListView popListView = (ListView)popupView.findViewById(R.id.popWndList);
+		ListView popListView = (ListView)popupView.findViewById(R.id.listView_region_popup);
 		popListView.setOnItemClickListener(new OnItemClickListener(){
 
 			@Override
