@@ -42,7 +42,7 @@ public class RegionDao {
 			
 			sql = " UPDATE " + Params.dbName + ".region SET " +
 				  " display_id = " + (to.getDisplayId() - 1) +
-				  " WHERE retion_id = " + from.getId() + 
+				  " WHERE region_id = " + from.getId() + 
 				  " AND restaurant_id = " + staff.getRestaurantId();
 			dbCon.stmt.executeUpdate(sql);
 			
@@ -63,7 +63,15 @@ public class RegionDao {
 		}
 		
 	}
-	
+	public static void move(Staff staff, Region.MoveBuilder builder) throws SQLException, BusinessException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			move(dbCon, staff, builder);
+		}finally{
+			dbCon.disconnect();
+		}
+	}	
 	/**
 	 * Insert a new region.
 	 * @param staff
