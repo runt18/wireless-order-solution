@@ -123,17 +123,13 @@ function deleteTableBasicHandler(){
 	});
 }
 
-function updateRegionHandler(){
-	var node = Ext.ux.getSelNode(regionTree);
-	if (!node || node.attributes.regionId == -1) {
-		Ext.example.msg('提示', '操作失败, 请选择一个区域再进行修改.');
-		return;
-	}
+function updateRegionHandler(c){
 	var operateRegionWin = Ext.getCmp('operateRegionWin');
+	var title;
+
 	if(!operateRegionWin){
 		operateRegionWin = new Ext.Window({
 			id : 'operateRegionWin',
-			title : '修改区域信息',
 			modal : true,
 			closable : false,
 			resizeble : false,
@@ -175,11 +171,16 @@ function updateRegionHandler(){
 					if(!name.isValid()){
 						return;
 					}
+					var dataSource='';
+					if(c.otype == 'insert'){
+						dataSource = 'insert';
+					}else if(c.otype == 'update'){
+						dataSource = 'update';
+					}
 					Ext.Ajax.request({
 						url : '../../OperateRegion.do',
 						params : {
-							dataSource : 'update',
-							
+							dataSource : dataSource,
 							id : id.getValue(),
 							name : name.getValue()
 						},
@@ -189,7 +190,7 @@ function updateRegionHandler(){
 								Ext.example.msg(jr.title, jr.msg);
 								operateRegionWin.hide();
 								regionTree.getRootNode().reload();
-								Ext.getCmp('btnSearchForTable').handler();
+//								Ext.getCmp('btnSearchForTable').handler();
 							}else{
 								Ext.ux.showMsg(jr);
 							}
@@ -208,11 +209,54 @@ function updateRegionHandler(){
 			}]
 		});
 	}
+	if(c.otype == 'insert'){
+		title = '添加区域';
+		Ext.getCmp('txtRegionName').setValue();
+		
+	}else{
+		var node = Ext.ux.getSelNode(regionTree);
+		if (!node || node.attributes.regionId == -1) {
+			Ext.example.msg('提示', '操作失败, 请选择一个区域再进行修改.');
+			return;
+		}	
+		title = '修改区域';
+		Ext.getCmp('hideRegionId').setValue(node.attributes.regionId);
+		Ext.getCmp('txtRegionName').setValue(node.attributes.regionName);
+	}	
+	
+	operateRegionWin.setTitle(title);
 	operateRegionWin.show();
 	operateRegionWin.center();
-	Ext.getCmp('hideRegionId').setValue(node.attributes.regionId);
-	Ext.getCmp('txtRegionName').setValue(node.attributes.regionName);
+	
 	Ext.getCmp('txtRegionName').focus(true, 100);
+	operateRegionWin.otype = c.otype;
+}
+
+function deleteRegionHandler(){
+		var node = Ext.ux.getSelNode(regionTree);
+		if (!node || node.attributes.regionId == -1) {
+			Ext.example.msg('提示', '操作失败, 请选择一个区域再进行删除.');
+			return;
+		}		
+		Ext.Ajax.request({
+			url : '../../OperateRegion.do',
+			params : {
+				dataSource : 'delete',
+				id : node.attributes.regionId
+			},
+			success : function(res, opt){
+				var jr = Ext.decode(res.responseText);
+				if(jr.success){
+					Ext.example.msg(jr.title, jr.msg);
+					regionTree.getRootNode().reload();
+				}else{
+					Ext.ux.showMsg(jr);
+				}
+			},
+			failure : function(res, opt){
+				Ext.ux.showMsg(Ext.decode(res.responseText));
+			}
+		});	
 }
 
 //---------------
@@ -238,6 +282,7 @@ function initTree(){
 		border : true,
 		rootVisible : true,
 		autoScroll : true,
+		enableDD : true,
 		frame : true,
 		bodyStyle : 'backgroundColor:#FFFFFF; border:1px solid #99BBE8;',
 		root : new Ext.tree.AsyncTreeNode({
@@ -260,10 +305,16 @@ function initTree(){
 			}
 		}),
 		tbar : [ '->', {
+			text : '添加',
+			iconCls : 'btn_add',
+			handler : function(){
+				updateRegionHandler({otype : 'insert'});
+			}
+		},{
 			text : '修改',
 			iconCls : 'btn_edit',
 			handler : function(e) {
-				updateRegionHandler();
+				updateRegionHandler({otype : 'update'});
 			}
 		}, {
 			text : '刷新',
@@ -281,6 +332,25 @@ function initTree(){
 			click : function(node){
 				Ext.getDom('displaySearchRegion').innerHTML = node.text ;
 				Ext.getCmp('btnSearchForTable').handler();
+			},
+			nodedrop : function(e){
+				Ext.Ajax.request({
+					url : '../../OperateRegion.do',
+					params : {
+						dataSource : 'swap',
+						regionA : e.dropNode.attributes.regionId,
+						regionB : e.target.attributes.regionId						
+					},
+					success : function(res, opt){
+						var jr = Ext.decode(res.responseText);
+						if(jr.success){
+							regionTree.getRootNode().reload();
+						}
+					},
+					failure : function(res, opt){
+						Ext.ux.show(Ext.decode(res.responseText));
+					}
+				});				
 			}
 		}
 	});
@@ -532,7 +602,7 @@ function initWin(){
 
 //----------
 
-var region_obj = {treeId : 'regionTree', option : [{name : '修改', fn : 'updateRegionHandler()'}]};
+var region_obj = {treeId : 'regionTree', option : [{name : '修改', fn : "updateRegionHandler({otype:'update'})"},{name : '删除', fn : "deleteRegionHandler()"} ]};
 Ext.onReady(function(){
 	//
 	initTree();
