@@ -588,8 +588,12 @@
 		</action>	
 		<action path="/QueryServicePlan"
 			type="com.wireless.Actions.servicePlan.QueryServicePlanAction"
-			scope="request">
+			scope="request" parameter="dataSource">
 		</action>
+		<action path="/OperateServicePlan"
+			type="com.wireless.Actions.servicePlan.OperateServicePlanAction"
+			scope="request" parameter="dataSource">
+		</action>		
 	</action-mappings>
 
 	<message-resources parameter="com.yourcompany.struts.ApplicationResources" />
