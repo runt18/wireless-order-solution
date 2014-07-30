@@ -198,12 +198,12 @@ function initDiscountGrid(){
 						discount_getStaffChartData();
 						if($('#divDiscountStaffColumnChart').is(':visible')){
 							discount_loadStaffColumnChart();
-							discount_staffChart.setSize(discountStatChartTabPanel.getWidth(), discount_panelDrag ? discountStatChartTabPanel.getHeight() - 60 : discountStatChartTabPanel.getHeight()-30);
+							discount_staffChart.setSize(discountStatChartTabPanel.getWidth(), discount_panelDrag ? discountStatChartTabPanel.getHeight() - 245 : discountStatChartTabPanel.getHeight()-30);
 						}else{
 							discount_loadStaffChart();
 							discount_loadAmountStaffChart();
-							discount_staffChart.setSize(discountStatChartTabPanel.getWidth()/2, discount_panelDrag ? discountStatChartTabPanel.getHeight() - 60 : discountStatChartTabPanel.getHeight()-30);
-							discount_staffChart_amount.setSize(discountStatChartTabPanel.getWidth()/2, discount_panelDrag ? discountStatChartTabPanel.getHeight() - 60 : discountStatChartTabPanel.getHeight()-30);						
+							discount_staffChart.setSize(discountStatChartTabPanel.getWidth()/2, discount_panelDrag ? discountStatChartTabPanel.getHeight() - 245 : discountStatChartTabPanel.getHeight()-30);
+							discount_staffChart_amount.setSize(discountStatChartTabPanel.getWidth()/2, discount_panelDrag ? discountStatChartTabPanel.getHeight() - 245 : discountStatChartTabPanel.getHeight()-30);						
 						}
 						
 					}
@@ -211,12 +211,12 @@ function initDiscountGrid(){
 						discount_getDeptChartData();
 						if($('#divDiscountDeptColumnChart').is(':visible')){
 							discount_loadDeptColumnChart();
-							discount_deptChart.setSize(discountStatChartTabPanel.getWidth(), discount_panelDrag ? discountStatChartTabPanel.getHeight() - 60 : discountStatChartTabPanel.getHeight()-30);
+							discount_deptChart.setSize(discountStatChartTabPanel.getWidth(), discount_panelDrag ? discountStatChartTabPanel.getHeight() - 245 : discountStatChartTabPanel.getHeight()-30);
 						}else{
 							discount_loadDeptChart();
 							discount_loadAmountDeptChart();
-							discount_deptChart.setSize(discountStatChartTabPanel.getWidth()/2, discount_panelDrag ? discountStatChartTabPanel.getHeight() - 60 : discountStatChartTabPanel.getHeight()-30);
-							discount_deptChart_amount.setSize(discountStatChartTabPanel.getWidth()/2, discount_panelDrag ? discountStatChartTabPanel.getHeight() - 60 : discountStatChartTabPanel.getHeight()-30);
+							discount_deptChart.setSize(discountStatChartTabPanel.getWidth()/2, discount_panelDrag ? discountStatChartTabPanel.getHeight() - 245 : discountStatChartTabPanel.getHeight()-30);
+							discount_deptChart_amount.setSize(discountStatChartTabPanel.getWidth()/2, discount_panelDrag ? discountStatChartTabPanel.getHeight() - 245 : discountStatChartTabPanel.getHeight()-30);
 						}
 						
 					}					
@@ -296,7 +296,7 @@ function initDiscountGrid(){
 					
 					discountStatChartTabPanel.getEl().setTop((h+30)) ;
 					
-					discount_changeChartWidth(w,chartHeight+30);
+					discount_changeChartWidth(w,chartHeight-180);
 					
 					if(discount_panelDrag){
 						discountStatChartTabPanel.setHeight(chartHeight+70);
@@ -741,7 +741,7 @@ Ext.onReady(function(){
 			show : function(thiz){
 				//thiz.getEl(): 刚打开页面时thiz.getWidth无效
 				if(discount_detailChart && typeof thiz.getEl() != 'undefined'){
-					discount_detailChart.setSize(thiz.getWidth(), discount_panelDrag ? discountStatChartTabPanel.getHeight() - 60 : discountStatChartTabPanel.getHeight()-30);
+					discount_detailChart.setSize(thiz.getWidth(), discount_panelDrag ? discountStatChartTabPanel.getHeight() - 245 : discountStatChartTabPanel.getHeight()-30);
 				}
 			}
 		}		
@@ -753,10 +753,10 @@ Ext.onReady(function(){
 		listeners : {
 			show : function(thiz){
 				if($('#divDiscountStaffColumnChart').is(":visible")){
-					discount_staffChart.setSize(thiz.getWidth(), discount_panelDrag ? discountStatChartTabPanel.getHeight() - 60 : discountStatChartTabPanel.getHeight()-30);
+					discount_staffChart.setSize(thiz.getWidth(), discount_panelDrag ? discountStatChartTabPanel.getHeight() - 245 : discountStatChartTabPanel.getHeight()-30);
 				}else if($('#divDiscountAmountStaffChart').is(":visible")){
-					discount_staffChart.setSize(discountStatChartTabPanel.getWidth()/2, discount_panelDrag ? discountStatChartTabPanel.getHeight() - 60 : discountStatChartTabPanel.getHeight()-30);
-					discount_staffChart_amount.setSize(discountStatChartTabPanel.getWidth()/2, discount_panelDrag ? discountStatChartTabPanel.getHeight() - 60 : discountStatChartTabPanel.getHeight()-30);				
+					discount_staffChart.setSize(discountStatChartTabPanel.getWidth()/2, discount_panelDrag ? discountStatChartTabPanel.getHeight() - 245 : discountStatChartTabPanel.getHeight()-30);
+					discount_staffChart_amount.setSize(discountStatChartTabPanel.getWidth()/2, discount_panelDrag ? discountStatChartTabPanel.getHeight() - 245 : discountStatChartTabPanel.getHeight()-30);				
 				}else{
 					$('#divDiscountStaffChartChange').show();
 					$('#divDiscountAmountStaffChart').show();
@@ -766,8 +766,8 @@ Ext.onReady(function(){
 					discount_getStaffChartData();
 					discount_loadStaffChart();
 					discount_loadAmountStaffChart();
-					discount_staffChart.setSize(discountStatChartTabPanel.getWidth()/2, discount_panelDrag ? discountStatChartTabPanel.getHeight() - 60 : discountStatChartTabPanel.getHeight()-30);
-					discount_staffChart_amount.setSize(discountStatChartTabPanel.getWidth()/2, discount_panelDrag ? discountStatChartTabPanel.getHeight() - 60 : discountStatChartTabPanel.getHeight()-30);
+					discount_staffChart.setSize(discountStatChartTabPanel.getWidth()/2, discount_panelDrag ? discountStatChartTabPanel.getHeight() - 245 : discountStatChartTabPanel.getHeight()-30);
+					discount_staffChart_amount.setSize(discountStatChartTabPanel.getWidth()/2, discount_panelDrag ? discountStatChartTabPanel.getHeight() - 245 : discountStatChartTabPanel.getHeight()-30);
 				}
 			},
 			render : function(thiz){
@@ -782,10 +782,10 @@ Ext.onReady(function(){
 		listeners : {
 			show : function(thiz){
 				if($('#divDiscountDeptColumnChart').is(":visible")){
-					discount_deptChart.setSize(thiz.getWidth(), discount_panelDrag ? discountStatChartTabPanel.getHeight() - 60 : discountStatChartTabPanel.getHeight()-30);
+					discount_deptChart.setSize(thiz.getWidth(), discount_panelDrag ? discountStatChartTabPanel.getHeight() - 245 : discountStatChartTabPanel.getHeight()-30);
 				}else if($('#divDiscountAmountDeptChart').is(":visible")){
-					discount_deptChart.setSize(discountStatChartTabPanel.getWidth()/2, discount_panelDrag ? discountStatChartTabPanel.getHeight() - 60 : discountStatChartTabPanel.getHeight()-30);
-					discount_deptChart_amount.setSize(discountStatChartTabPanel.getWidth()/2, discount_panelDrag ? discountStatChartTabPanel.getHeight() - 60 : discountStatChartTabPanel.getHeight()-30);				
+					discount_deptChart.setSize(discountStatChartTabPanel.getWidth()/2, discount_panelDrag ? discountStatChartTabPanel.getHeight() - 245 : discountStatChartTabPanel.getHeight()-30);
+					discount_deptChart_amount.setSize(discountStatChartTabPanel.getWidth()/2, discount_panelDrag ? discountStatChartTabPanel.getHeight() - 245 : discountStatChartTabPanel.getHeight()-30);				
 				}else{
 					$('#divDiscountDeptChartChange').show();
 					$('#divDiscountAmountDeptChart').show();
@@ -795,8 +795,8 @@ Ext.onReady(function(){
 					discount_getDeptChartData();
 					discount_loadDeptChart();
 					discount_loadAmountDeptChart();
-					discount_deptChart.setSize(discountStatChartTabPanel.getWidth()/2, discount_panelDrag ? discountStatChartTabPanel.getHeight() - 60 : discountStatChartTabPanel.getHeight()-30);
-					discount_deptChart_amount.setSize(discountStatChartTabPanel.getWidth()/2, discount_panelDrag ? discountStatChartTabPanel.getHeight() - 60 : discountStatChartTabPanel.getHeight()-30);
+					discount_deptChart.setSize(discountStatChartTabPanel.getWidth()/2, discount_panelDrag ? discountStatChartTabPanel.getHeight() - 245 : discountStatChartTabPanel.getHeight()-30);
+					discount_deptChart_amount.setSize(discountStatChartTabPanel.getWidth()/2, discount_panelDrag ? discountStatChartTabPanel.getHeight() - 245 : discountStatChartTabPanel.getHeight()-30);
 				}
 			},
 			render : function(thiz){
@@ -857,7 +857,7 @@ Ext.onReady(function(){
 			
 			$('#divDiscountStaffColumnChart').show();
 			discount_loadStaffColumnChart();
-			discount_staffChart.setSize(discountStatChartTabPanel.getWidth(), discount_panelDrag ? discountStatChartTabPanel.getHeight() - 60 : discountStatChartTabPanel.getHeight()-30);
+			discount_staffChart.setSize(discountStatChartTabPanel.getWidth(), discount_panelDrag ? discountStatChartTabPanel.getHeight() - 245 : discountStatChartTabPanel.getHeight()-30);
 		},
 		function(){
 			$('#divDiscountStaffColumnChart').hide();
@@ -866,8 +866,8 @@ Ext.onReady(function(){
 			$('#divDiscountPriceStaffChart').show();
 			discount_loadStaffChart();
 			discount_loadAmountStaffChart();
-			discount_staffChart.setSize(discountStatChartTabPanel.getWidth()/2, discount_panelDrag ? discountStatChartTabPanel.getHeight() - 60 : discountStatChartTabPanel.getHeight()-30);
-			discount_staffChart_amount.setSize(discountStatChartTabPanel.getWidth()/2, discount_panelDrag ? discountStatChartTabPanel.getHeight() - 60 : discountStatChartTabPanel.getHeight()-30);
+			discount_staffChart.setSize(discountStatChartTabPanel.getWidth()/2, discount_panelDrag ? discountStatChartTabPanel.getHeight() - 245 : discountStatChartTabPanel.getHeight()-30);
+			discount_staffChart_amount.setSize(discountStatChartTabPanel.getWidth()/2, discount_panelDrag ? discountStatChartTabPanel.getHeight() - 245 : discountStatChartTabPanel.getHeight()-30);
 		}		
 	);
 	$('#divDiscountDeptChartChange').toggle(
@@ -877,7 +877,7 @@ Ext.onReady(function(){
 			
 			$('#divDiscountDeptColumnChart').show();
 			discount_loadDeptColumnChart();
-			discount_deptChart.setSize(discountStatChartTabPanel.getWidth(), discount_panelDrag ? discountStatChartTabPanel.getHeight() - 60 : discountStatChartTabPanel.getHeight()-30);
+			discount_deptChart.setSize(discountStatChartTabPanel.getWidth(), discount_panelDrag ? discountStatChartTabPanel.getHeight() - 245 : discountStatChartTabPanel.getHeight()-30);
 		},
 		function(){
 			$('#divDiscountDeptColumnChart').hide();
@@ -886,8 +886,8 @@ Ext.onReady(function(){
 			$('#divDiscountPriceDeptChart').show();
 			discount_loadDeptChart();
 			discount_loadAmountDeptChart();
-			discount_deptChart.setSize(discountStatChartTabPanel.getWidth()/2, discount_panelDrag ? discountStatChartTabPanel.getHeight() - 60 : discountStatChartTabPanel.getHeight()-30);
-			discount_deptChart_amount.setSize(discountStatChartTabPanel.getWidth()/2, discount_panelDrag ? discountStatChartTabPanel.getHeight() - 60 : discountStatChartTabPanel.getHeight()-30);
+			discount_deptChart.setSize(discountStatChartTabPanel.getWidth()/2, discount_panelDrag ? discountStatChartTabPanel.getHeight() - 245 : discountStatChartTabPanel.getHeight()-30);
+			discount_deptChart_amount.setSize(discountStatChartTabPanel.getWidth()/2, discount_panelDrag ? discountStatChartTabPanel.getHeight() - 245 : discountStatChartTabPanel.getHeight()-30);
 		}		
 	);	
 	
