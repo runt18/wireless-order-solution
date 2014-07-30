@@ -1,8 +1,10 @@
 package com.wireless.pojo.serviceRate;
 
+import com.wireless.json.JsonMap;
+import com.wireless.json.Jsonable;
 import com.wireless.pojo.regionMgr.Region;
 
-public class ServiceRate {
+public class ServiceRate implements Jsonable{
 
 	private int rateId;
 	private int planId;
@@ -59,5 +61,21 @@ public class ServiceRate {
 	@Override
 	public String toString(){
 		return "rate : " + rate + ",region_id : " + region.getId();
+	}
+
+	@Override
+	public JsonMap toJsonMap(int flag) {
+		JsonMap jm = new JsonMap();
+		jm.putInt("planId", planId);
+		jm.putInt("rateId", rateId);
+		jm.putString("rate", Math.ceil(rate*100) + "%");
+		jm.putJsonable("region", region, 0);
+		
+		return jm;
+	}
+
+	@Override
+	public void fromJsonMap(JsonMap jsonMap, int flag) {
+		
 	}
 }
