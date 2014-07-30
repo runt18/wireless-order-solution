@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>Insert title here</title>
 <script type="text/javascript">
-	var grid_giftStatistics;
+	var grid_giftStatistics, giftViewBillWin;
 </script>
 <script type="text/javascript" src="../../js/History/bills/billStatistics/giftStatistics.js"></script>
 </head>
@@ -14,7 +14,9 @@
 <div id="divGiftDetailChart" data-type="giftChart" data-value="gift_detailChart" style="height : 400px;"></div>
 
 <div id="divGiftStaffCharts" >
-	<div id="divGiftStaffChartChange" style="display:none;"><a id="linkToChangeStaffChart" href="#" class="changeChart">查看金额比例图</a></div>
+	<div id="divGiftStaffChartChange" style="display:none;padding-top: 3px;">
+		&nbsp;&nbsp;<input type="radio" name="staffChange" checked="checked" onclick="fnChangeStaffChart(1)" />按数量显示 &nbsp;&nbsp;&nbsp;<input type="radio" name="staffChange" onclick="fnChangeStaffChart(0)" />按金额显示 
+	</div>
 	<div>
 		<div id="divGiftStaffAmountPieChart" data-type="giftChart" data-value="gift_staffPieChart" style="height : 300px;display:none;width:50%;float:left;"></div>
 		<div id="divGiftStaffAmountColumnChart" data-type="giftChart" data-value="gift_staffColumnChart" style="height : 300px;display:none;width:50%;float:left;"></div>
@@ -23,7 +25,10 @@
 </div>
 
 <div id="divGiftDeptCharts" >
-	<div id="divGiftDeptChartChange" style="display:none;"><a id="linkToChangeDeptChart" href="#" class="changeChart">查看数量比例图</a></div>
+	<div id="divGiftDeptChartChange" style="display:none;padding-top: 3px;">
+		<!-- <a id="linkToChangeDeptChart" href="#" class="changeChart">查看数量比例图</a> -->
+		&nbsp;&nbsp;<input type="radio" name="deptChange" checked="checked" onclick="fnChangeDeptChart(0)" />按金额显示 &nbsp;&nbsp;&nbsp;<input type="radio" name="deptChange" onclick="fnChangeDeptChart(1)" />按数量显示  
+	</div>
 	<div>
 		<div id="divGiftDeptPieChart" data-type="giftChart" data-value="gift_deptPieChart" style="height : 300px;display:none;width:50%;float:left;"></div>
 		<div id="divGiftDeptColumnChart" data-type="giftChart" data-value="gift_deptColumnChart" style="height : 300px;display:none;width:50%;float:left;"></div>

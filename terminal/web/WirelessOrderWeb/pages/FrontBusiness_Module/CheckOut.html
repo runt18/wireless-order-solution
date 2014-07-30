@@ -12,6 +12,9 @@
 .payOrderButton{
 	font-size:30px;cursor: pointer;padding: 3px auto;width: 150px;
 }
+.renderStyle{
+	font-size:30px;
+}
 </style>
 <script type="text/javascript" src="../../extjs/ext-base.js"></script>
 <script type="text/javascript" src="../../extjs/ext-all.js"></script>
@@ -71,10 +74,10 @@
 	</div>
 	
 	<!-- pay infomation -->
-	<div id="payInfo" class="billList" style="text-align:left;">
+<!-- 	<div id="payInfo" class="billList" style="text-align:left;">
 		<table>
 			<tr>
-				<td rowspan="2" style="font-size:30px;">实收：￥<span id="aashouldPay" style="color:rgb(21, 66, 139); font-weight: bold;"></span></td>
+				<td rowspan="2" style="font-size:30px;">实收：￥<span id="aashouldPay" style="color:green; font-weight: bold;"></span></td>
 				<td>应收：￥<span id="totalCount"></span></td>
 				<td style="width: 10px;">&nbsp;</td>
 				<td>赠送：￥<span id="forFree"></span></td>
@@ -85,7 +88,7 @@
 				<td colspan="4">
 					<div id="div_showEraseQuota" style="display: none;">
 						抹数金额：￥
-						<span id="aspanHasEraseQuota"><!-- <input id="txtEraseQuota" type="text" value="0" style="width: 50px;" /> --></span>
+						<span id="aspanHasEraseQuota"><input id="txtEraseQuota" type="text" value="0" style="width: 50px;" /></span>
 						<span id="span_showEraseQuota">
 							上限:￥<font id="font_showEraseQuota" style="color:red;"></font>
 						</span>
@@ -93,7 +96,7 @@
 				</td>
 				<td style="width: 10px;height : 55px;">&nbsp;</td>
 				<td >
-					<!-- <input type="button" value="计算" style="width: 80px;" onclick="refreshCheckOutData()"></input> -->
+					<input type="button" value="计算" style="width: 80px;" onclick="refreshCheckOutData()"></input>
 					<input type="button" value="会员" class="payOrderButton" onclick="memberPay()"></input>
 				</td>
 				<td style="width: 10px;">&nbsp;</td>
@@ -114,12 +117,12 @@
 				</td>			
 			</tr>
 		</table>
-	</div>
+	</div> -->
 	
 	<div id="divWestPayOrderGeneral">
 		<table style="width: 100%">
 			<tr>
-				<td colspan="3" style="font-size:35px;">实收：￥<span id="shouldPay" style="color:rgb(21, 66, 139); font-weight: bold;"></span></td>
+				<td colspan="3" style="font-size:35px;">实收：￥<span id="shouldPay" style="color:green; font-weight: bold;"></span></td>
 			</tr>
 			<tr>
 				<td colspan="3" style="font-size:35px;">应收：￥<span id="totalCount"></span></td>
