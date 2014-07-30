@@ -1,27 +1,33 @@
 package com.wireless.Actions.servicePlan;
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.apache.struts.actions.DispatchAction;
 
 import com.wireless.db.serviceRate.ServicePlanDao;
+import com.wireless.db.serviceRate.ServicePlanDao.ShowType;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
+import com.wireless.json.JObject;
 import com.wireless.pojo.serviceRate.ServicePlan;
+import com.wireless.pojo.serviceRate.ServiceRate;
 
-public class QueryServicePlanAction extends Action{
+public class QueryServicePlanAction extends DispatchAction{
 	
-	public ActionForward execute(ActionMapping mapping, ActionForm form,
+	public ActionForward planTree(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
 		
 		String pin = (String) request.getAttribute("pin");
 		
 		StringBuilder spTree = new StringBuilder();
+		
 		try{
 			
 			int i = 0;
@@ -30,6 +36,7 @@ public class QueryServicePlanAction extends Action{
 				spTree.append("{");
 				spTree.append("leaf : true");
 				spTree.append(",text:'" + sp.getName() + "'");
+				spTree.append(",planName:'" + sp.getName() + "'");
 				spTree.append(",planId :" + sp.getPlanId());
 				spTree.append(",type:" + sp.getType().getVal());
 				spTree.append(",status:" + sp.getStatus().getVal());
@@ -46,6 +53,35 @@ public class QueryServicePlanAction extends Action{
 			response.getWriter().print("[" + spTree.toString() + "]");
 		}
 		
+		return null;
+	}
+	
+	public ActionForward getRates(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		String pin = (String) request.getAttribute("pin");
+		
+		String planId = request.getParameter("planId");
+		
+		JObject jobject = new JObject();
+		
+		try{
+			ServicePlan plan = ServicePlanDao.getById(StaffDao.verify(Integer.parseInt(pin)), Integer.parseInt(planId), ShowType.BY_PLAN);
+			
+			List<ServiceRate> rates = plan.getRates();	
+			
+			jobject.setTotalProperty(rates.size());
+			
+			jobject.setRoot(rates);
+			
+			
+		}catch(BusinessException e){
+			e.printStackTrace();
+		}catch(Exception e){
+			e.printStackTrace();
+		}finally{
+			response.getWriter().print(jobject.toString());
+		}
 		return null;
 	}
 

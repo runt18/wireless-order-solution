@@ -34,6 +34,8 @@ public class QueryStaffAction extends Action {
 		String isName =request.getParameter("isName");
 		String name = request.getParameter("name");
 		String cate = request.getParameter("cate");
+		String privilege = request.getParameter("privilege");
+		int flag = 0;
 		
 		JObject jobject = new JObject();
 		List<Staff> staffList = new ArrayList<Staff>();
@@ -117,7 +119,10 @@ public class QueryStaffAction extends Action {
 				}
 				
 			});
-			out.write(jobject.toString());
+			if(privilege != null){
+				flag = 1;
+			}
+			out.write(jobject.toString(flag));
 		}
 
 		return null;
