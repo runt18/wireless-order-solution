@@ -103,6 +103,13 @@ function initDiscountGrid(){
 						}
 						thiz.store.loadData(data);
 						thiz.setValue(-1);
+						
+						if(sendToPageOperation){
+							discount_setStatisticsDate();
+						}else{
+							discount_dateCombo.setValue(1);
+							discount_dateCombo.fireEvent('select', discount_dateCombo, null, 1);			
+						}							
 					},
 					fialure : function(res, opt){
 						thiz.store.loadData(data);
@@ -888,12 +895,15 @@ Ext.onReady(function(){
 	    msg  : '数据统计中，请稍候......',
 	    disabled : false
 	});	
-	if(sendToPageOperation){
-		discount_setStatisticsDate();
-	}else{
-		discount_dateCombo.setValue(1);
-		discount_dateCombo.fireEvent('select', discount_dateCombo, null, 1);			
-	}		
+	
+    var discount_totalHeight = Ext.getCmp('discountStatisticsPanel').getHeight();
+    
+    discountDetailsStatPanel.setHeight(discount_totalHeight*0.4);
+    discountDetailsStatPanel.getEl().parent().setHeight(discount_totalHeight*0.4);
+    
+    discountStatChartTabPanel.setHeight(discount_totalHeight*0.6);	
+    
+    discount_rz.resizeTo(discountDetailsStatPanel.getWidth(), discountDetailsStatPanel.getHeight());	
 	
 	Ext.getCmp('discountStatistics').updateStatisticsDate = discount_setStatisticsDate;
 });

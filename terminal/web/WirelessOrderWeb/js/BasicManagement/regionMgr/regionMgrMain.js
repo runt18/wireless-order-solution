@@ -237,26 +237,35 @@ function deleteRegionHandler(){
 		if (!node || node.attributes.regionId == -1) {
 			Ext.example.msg('提示', '操作失败, 请选择一个区域再进行删除.');
 			return;
-		}		
-		Ext.Ajax.request({
-			url : '../../OperateRegion.do',
-			params : {
-				dataSource : 'delete',
-				id : node.attributes.regionId
-			},
-			success : function(res, opt){
-				var jr = Ext.decode(res.responseText);
-				if(jr.success){
-					Ext.example.msg(jr.title, jr.msg);
-					regionTree.getRootNode().reload();
-				}else{
-					Ext.ux.showMsg(jr);
+		}	
+		Ext.Msg.confirm(
+			'提示',
+			'是否删除区域:&nbsp;<font color="red">' + node.text + '</font>',
+			function(e){
+				if(e == 'yes'){
+					Ext.Ajax.request({
+						url : '../../OperateRegion.do',
+						params : {
+							dataSource : 'delete',
+							id : node.attributes.regionId
+						},
+						success : function(res, opt){
+							var jr = Ext.decode(res.responseText);
+							if(jr.success){
+								Ext.example.msg(jr.title, jr.msg);
+								regionTree.getRootNode().reload();
+							}else{
+								Ext.ux.showMsg(jr);
+							}
+						},
+						failure : function(res, opt){
+							Ext.ux.showMsg(Ext.decode(res.responseText));
+						}
+					});	
 				}
 			},
-			failure : function(res, opt){
-				Ext.ux.showMsg(Ext.decode(res.responseText));
-			}
-		});	
+			this
+		);		
 }
 
 //---------------
@@ -296,6 +305,7 @@ function initTree(){
 			}),
 			listeners : {
 				load : function(thiz, node, response){
+					comboRegionData = [];
 					for(var i = 0; i < thiz.childNodes.length; i++){
 						var temp = thiz.childNodes[i];
 						comboRegionData.push([temp.attributes['regionId'], temp.attributes['regionName']]);
@@ -420,7 +430,7 @@ function initGrid(){
 			['餐台名称', 'name'],
 			['最低消费', 'minimumCost',,'right', 'Ext.ux.txtFormat.gridDou'],
 			['服务费率', 'serviceRate',,'right', 'Ext.ux.txtFormat.gridDou'],
-			['就餐人数', 'customNum',,'right'],
+//			['就餐人数', 'customNum',,'right'],
 			['餐台状态', 'statusText',,'center'],
 			['操作', 'operate', 200 ,'center', 'tableBasicGridOperateRenderer']
 		],

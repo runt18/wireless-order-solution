@@ -192,6 +192,13 @@ function cancelFoodDetailsStatPanelInit(){
 						}
 						thiz.store.loadData(data);
 						thiz.setValue(-1);
+						
+						if(sendToPageOperation){
+							cancel_setStatisticsDate();
+						}else{
+							cancel_dateCombo.setValue(1);
+							cancel_dateCombo.fireEvent('select', cancel_dateCombo, null, 1);			
+						}							
 					},
 					fialure : function(res, opt){
 						thiz.store.loadData(data);
@@ -1256,12 +1263,14 @@ Ext.onReady(function(){
 	    disabled : false
 	});	
 	
-	if(sendToPageOperation){
-		cancel_setStatisticsDate();
-	}else{
-		cancel_dateCombo.setValue(1);
-		cancel_dateCombo.fireEvent('select', cancel_dateCombo, null, 1);			
-	}	
+    var cancel_totalHeight = Ext.getCmp('cancelledFoodPanel').getHeight();
+    
+    cancelFoodDetailsStatPanel.setHeight(cancel_totalHeight*0.4);
+    cancelFoodDetailsStatPanel.getEl().parent().setHeight(cancel_totalHeight*0.4);
+    
+    cancelFoodStatChartTabPanel.setHeight(cancel_totalHeight*0.6);	
+    
+    cancel_rz.resizeTo(cancelFoodDetailsStatPanel.getWidth(), cancelFoodDetailsStatPanel.getHeight());
 	
 	Ext.getCmp('cancelledFood').updateStatisticsDate = cancel_setStatisticsDate;
 });

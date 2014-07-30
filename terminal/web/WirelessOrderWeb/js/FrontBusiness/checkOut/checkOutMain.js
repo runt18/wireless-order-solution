@@ -11,10 +11,13 @@
 });
 
 var checkOutMainPanelTbar = new Ext.Toolbar({
-	height : 26,
+	height : 30,
 	items : [{
 		xtype : 'tbtext',
-		text : '&nbsp;&nbsp;&nbsp;折扣方案:&nbsp;&nbsp;'
+		text : '&nbsp;&nbsp;<font style="font-size:18px;">当前折扣方案:</font>&nbsp;<span id="spanDisplayCurrentDiscount" style="color:rgb(21, 66, 139); font-weight:bold;font-size:18px; ">&nbsp;&nbsp;</span>'
+	}, {
+		xtype : 'tbtext',
+		text : '&nbsp;&nbsp;&nbsp;<font style="font-size:18px;">折扣方案:</font>&nbsp;&nbsp;'
 	}, {
 		xtype : 'combo',
 		id : 'comboDiscount',
@@ -37,12 +40,12 @@ var checkOutMainPanelTbar = new Ext.Toolbar({
 				refreshCheckOutData();
 			}
 		}
+	},{
+		xtype : 'tbtext',
+		text : '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font style="font-size:18px;">当前服务费:</font>&nbsp;<span id="spanDisplayCurrentServiceRate" style="color:rgb(21, 66, 139); font-weight:bold;font-size:18px; ">&nbsp;&nbsp;</span>'
 	}, {
 		xtype : 'tbtext',
-		text : '&nbsp;&nbsp;当前折扣方案:&nbsp;<span id="spanDisplayCurrentDiscount" style="color:rgb(21, 66, 139); font-weight:bold;font-size:18px; ">&nbsp;&nbsp;</span>'
-	}, {
-		xtype : 'tbtext',
-		text : '&nbsp;&nbsp;服务费方案:'
+		text : '&nbsp;&nbsp;<font style="font-size:18px;">服务费方案:</font>'
 	},{
 		xtype : 'combo',
 		id : 'comboServicePlan',
@@ -63,6 +66,7 @@ var checkOutMainPanelTbar = new Ext.Toolbar({
 				var data = [];
 				Ext.Ajax.request({
 					url : '../../QueryServicePlan.do',
+					params : {dataSource : 'planTree'},
 					success : function(res, opt){
 						var jr = Ext.decode(res.responseText);
 						var defaultId='';
@@ -229,6 +233,13 @@ var checkOutCenterPanel = new Ext.Panel({
 	items : [ checkOutForm ]
 });
 
+function orderCountFormat(v, m, r, ri, ci, s){
+	if(Ext.ux.cfs.isWeigh(r.get('status'))){
+		v = '<font style="color:green; font-size:18px;">' + v + '</font>';
+	}
+	return v;
+}
+
 Ext.onReady(function() {
 	initMainView(
 		new Ext.Panel({
@@ -277,7 +288,7 @@ Ext.onReady(function() {
 			    ['菜名', 'displayFoodName', 220] , 
 			    ['口味', 'tasteGroup.tastePref', 130] , 
 			    ['口味价钱', 'tasteGroup.tastePrice', 80, 'right', 'Ext.ux.txtFormat.gridDou'],
-			    ['数量', 'count', 70, 'right', 'Ext.ux.txtFormat.gridDou'],
+			    ['数量', 'count', 70, 'right', 'orderCountFormat'],
 			    ['单价', 'unitPrice', 70, 'right', 'Ext.ux.txtFormat.gridDou'],
 			    ['折扣率', 'discount', 70, 'right', 'Ext.ux.txtFormat.gridDou'],
 			    ['总价', 'totalPrice', 80, 'right', 'Ext.ux.txtFormat.gridDou'],
@@ -290,15 +301,28 @@ Ext.onReady(function() {
 		    ''
 		);
 		checkOutGrid.frame = false;
-//		checkOutGrid.style = 'backgroundColor:#FFFFFF;border:1px solid #99BBE8;';
 		checkOutGrid.stripeRows = true;
 		checkOutGrid.getStore().on('load', function(thiz, records){
 			if(checkOutGrid.isVisible()){
 				for(var i = 0; i < records.length; i++){
-					Ext.ux.formatFoodName(records[i], 'displayFoodName', 'name');
+					Ext.ux.formatFoodName(records[i], 'displayFoodName', 'name', 1);
+					if(Ext.ux.cfs.isWeigh(records[i].get('status'))){
+						checkOutGrid.getView().getRow(i).style.backgroundColor = 'Pink';
+					}
+						
 				}				
 			}
 		});
+		checkOutGrid.on('afterrender', function(){
+			
+//               var elments = Ext.select(".x-grid3-row");//.x-grid3-hd   
+//               console.log(elments.length)
+//                elments.each(function(el) {   
+//                           el.setStyle("font-size", '30px');// 设置不同的颜色  
+//                        }, this) ; 
+                        
+//               alert($('.x-grid3-row').length);
+         });
 		
 		
 		// 加载界面

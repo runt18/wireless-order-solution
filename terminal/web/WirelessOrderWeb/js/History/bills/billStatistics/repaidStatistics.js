@@ -50,6 +50,14 @@ var repaid_combo_staffs = new Ext.form.ComboBox({
 					}
 					thiz.store.loadData(data);
 					thiz.setValue(-1);
+					
+					if(sendToPageOperation){
+						repaid_setStatisticsDate();
+					}else{
+						repaid_dateCombo.setValue(1);
+						repaid_dateCombo.fireEvent('select', repaid_dateCombo, null, 1);			
+					}	
+					
 				},
 				fialure : function(res, opt){
 					thiz.store.loadData(data);
@@ -577,6 +585,7 @@ var repaid_staffChartData = {chartData : {type : 'pie', name : '比例', data : 
 
 var titleRepaidStaffName;		
 var repaid_chartLoadMarsk;
+var repaid_totalHeight;
 Ext.onReady(function(){
 
 	initGrid();
@@ -690,12 +699,14 @@ Ext.onReady(function(){
 	    disabled : false
 	});
 	
-	if(sendToPageOperation){
-		repaid_setStatisticsDate();
-	}else{
-		repaid_dateCombo.setValue(1);
-		repaid_dateCombo.fireEvent('select', repaid_dateCombo, null, 1);			
-	}	
+    var repaid_totalHeight = Ext.getCmp('repaidStatisticsPanel').getHeight();
+    
+    repaidDetailPanel.setHeight(repaid_totalHeight*0.4);
+    repaidDetailPanel.getEl().parent().setHeight(repaid_totalHeight*0.4);
+    
+    repaidStatChartTabPanel.setHeight(repaid_totalHeight*0.6);	
+    
+    repaid_rz.resizeTo(repaidDetailPanel.getWidth(), repaidDetailPanel.getHeight());
 	
 	Ext.getCmp('repaidStatistics').updateStatisticsDate = repaid_setStatisticsDate;
 });

@@ -346,6 +346,7 @@ function createGridPanel(id, title, height, width, url, cmData, readerData,
 		autoScroll : true,
 		height : height, // 高度
 		width : width, // 宽度
+		cls : 'renderStyle',
 		trackMouseOver : true,// 鼠标悬浮
 		autoSizeColumns: true,// 自动分配列宽
 		viewConfig : {

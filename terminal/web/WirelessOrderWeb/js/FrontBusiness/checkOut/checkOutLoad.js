@@ -54,6 +54,7 @@ function loadOrderBasicMsg(){
 //	calcPricePlanID = orderMsg.pricePlan.id; // i
 	document.getElementById('spanDisplayCurrentDiscount').innerHTML = orderMsg.discount.name;
 	
+	document.getElementById('spanDisplayCurrentServiceRate').innerHTML = (orderMsg.serviceRate*100)+'%';
 //	document.getElementById("serviceCharge").value = orderMsg.serviceRate * 100;
 //	var actualCount = document.getElementById("actualCount").value;
 	document.getElementById("totalCount").innerHTML = checkDot(orderMsg.totalPrice)?parseFloat(orderMsg.totalPrice).toFixed(2) : orderMsg.totalPrice;

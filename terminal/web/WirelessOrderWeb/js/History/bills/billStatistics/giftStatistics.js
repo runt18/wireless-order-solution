@@ -46,6 +46,56 @@ function initRegionCombo(statistic){
 	};
 	return combo;
 }
+function gift_linkOrderId(v){
+	if(!isNaN(v)){
+		return '<a href=\"javascript:gift_showBillDetailWin('+ v +')\">'+ v +'</a>';
+	}else{
+		return v;
+	}
+}
+
+function gift_showBillDetailWin(orderID){
+	giftViewBillWin = new Ext.Window({
+		layout : 'fit',
+		title : '查看账单',
+		width : 510,
+		height : 550,
+		resizable : false,
+		closable : false,
+		modal : true,
+		bbar : ['->', {
+			text : '关闭',
+			iconCls : 'btn_close',
+			handler : function() {
+				giftViewBillWin.destroy();
+			}
+		}],
+		keys : [{
+			key : Ext.EventObject.ESC,
+			scope : this,
+			fn : function(){
+				giftViewBillWin.destroy();
+			}
+		}],
+		listeners : {
+			show : function(thiz) {
+				var sd = Ext.ux.getSelData(grid_giftStatistics);
+				thiz.load({
+					url : '../window/history/viewBillDetail.jsp', 
+					scripts : true,
+					params : {
+						orderId : sd.orderId,
+						queryType : 'History'
+					},
+					method : 'post'
+				});
+				thiz.center();	
+			}
+		}
+	});
+	giftViewBillWin.show();
+	giftViewBillWin.center();
+}
 function initGiftStatisticsGrid(){
 	var beginDate = new Ext.form.DateField({
 		id : 'gift_dateSearchDateBegin',
@@ -103,13 +153,27 @@ function initGiftStatisticsGrid(){
 				var data = [[-1,'全部']];
 				Ext.Ajax.request({
 					url : '../../QueryStaff.do',
+					params : {privilege : 'true'},
 					success : function(res, opt){
 						var jr = Ext.decode(res.responseText);
 						for(var i = 0; i < jr.root.length; i++){
-							data.push([jr.root[i]['staffID'], jr.root[i]['staffName']]);
+							var temp = jr.root[i]['role']['privileges'];
+							for (var j = 0; j < temp.length; j++) {
+								if(temp[j]['codeValue'] == 1003){
+									data.push([jr.root[i]['staffID'], jr.root[i]['staffName']]);
+									break;
+								}
+							}
 						}
 						thiz.store.loadData(data);
 						thiz.setValue(-1);
+
+						if(sendToPageOperation){
+							gift_setStatisticsDate();
+						}else{
+							gift_dateCombo.setValue(1);
+							gift_dateCombo.fireEvent('select', gift_dateCombo, null, 1);				
+						}							
 					},
 					fialure : function(res, opt){
 						thiz.store.loadData(data);
@@ -201,11 +265,11 @@ function initGiftStatisticsGrid(){
 				});	
 				
 				if(typeof gift_staffPieChart != 'undefined' && typeof giftStaffChartPanel.hasRender != 'undefined'){
-					gift_getDeptChartData();
-					gift_loadDeptAmountChart(giftStaffChartPanel.otype);
-					gift_loadDeptColumnChart(giftStaffChartPanel.otype);
-					gift_deptPieChart.setSize(giftStatChartTabPanel.getWidth()/2, gift_panelDrag ? giftStatChartTabPanel.getHeight() - 60 : giftStatChartTabPanel.getHeight()-45);
-					gift_deptColumnChart.setSize(giftStatChartTabPanel.getWidth()/2, gift_panelDrag ? giftStatChartTabPanel.getHeight() - 60 : giftStatChartTabPanel.getHeight()-45);					
+					gift_getStaffChartData();
+					gift_loadStaffAmountChart(giftStaffChartPanel.otype);
+					gift_loadStaffColumnChart(giftStaffChartPanel.otype);
+					gift_staffPieChart.setSize(giftStatChartTabPanel.getWidth()/2, gift_panelDrag ? giftStatChartTabPanel.getHeight() - 60 : giftStatChartTabPanel.getHeight()-30);
+					gift_staffColumnChart.setSize(giftStatChartTabPanel.getWidth()/2, gift_panelDrag ? giftStatChartTabPanel.getHeight() - 60 : giftStatChartTabPanel.getHeight()-30);					
 					
 				}
 				
@@ -213,8 +277,8 @@ function initGiftStatisticsGrid(){
 					gift_getDeptChartData();
 					gift_loadDeptAmountChart(giftDeptChartPanel.otype);
 					gift_loadDeptColumnChart(giftDeptChartPanel.otype);
-					gift_deptPieChart.setSize(giftStatChartTabPanel.getWidth()/2, gift_panelDrag ? giftStatChartTabPanel.getHeight() - 60 : giftStatChartTabPanel.getHeight()-45);
-					gift_deptColumnChart.setSize(giftStatChartTabPanel.getWidth()/2, gift_panelDrag ? giftStatChartTabPanel.getHeight() - 60 : giftStatChartTabPanel.getHeight()-45);					
+					gift_deptPieChart.setSize(giftStatChartTabPanel.getWidth()/2, gift_panelDrag ? giftStatChartTabPanel.getHeight() - 60 : giftStatChartTabPanel.getHeight()-30);
+					gift_deptColumnChart.setSize(giftStatChartTabPanel.getWidth()/2, gift_panelDrag ? giftStatChartTabPanel.getHeight() - 60 : giftStatChartTabPanel.getHeight()-30);					
 					
 				}
 				
@@ -224,14 +288,14 @@ function initGiftStatisticsGrid(){
 	});
 	
 	grid_giftStatistics = createGridPanel(
-		'aaabbb',
+		'',
 		'',
 		'',
 	    '',
 	    '../../QueryGiftStatistic.do',
 	    [
 		    [true, false, false, false], 
-		    ['单据编号','orderId',100],
+		    ['单据编号','orderId',100,,'gift_linkOrderId'],
 		    ['赠送日期','orderDateFormat',100],
 		    ['菜品名称','name', 100], 
 		    ['数量','count', 60, 'right', 'Ext.ux.txtFormat.gridDou'],
@@ -251,7 +315,6 @@ function initGiftStatisticsGrid(){
 	grid_giftStatistics.region = 'center';
 	
 	giftDetailsStatPanel = new Ext.Panel({
-		id : 'aaabbb2',
 		title : '赠送明细',
 		layout : 'border',
 		region : 'center',
@@ -263,7 +326,7 @@ function initGiftStatisticsGrid(){
 					
 					giftStatChartTabPanel.getEl().setTop((h+30)) ;
 					
-					gift_changeChartWidth(w,chartHeight-80);
+					gift_changeChartWidth(w,chartHeight-70);
 					
 					if(gift_panelDrag){
 						giftStatChartTabPanel.setHeight(chartHeight);
@@ -576,6 +639,20 @@ function gift_loadDeptColumnChart(type){
     giftDeptChartPanel.otype = type;
 }
 
+function fnChangeStaffChart(v){
+	gift_loadStaffAmountChart(v);
+	gift_loadStaffColumnChart(v);
+	gift_staffPieChart.setSize(giftStatChartTabPanel.getWidth()/2, gift_panelDrag ? giftStatChartTabPanel.getHeight() - 65 : giftStatChartTabPanel.getHeight()-30);
+	gift_staffColumnChart.setSize(giftStatChartTabPanel.getWidth()/2, gift_panelDrag ? giftStatChartTabPanel.getHeight() - 65 : giftStatChartTabPanel.getHeight()-30);
+}
+
+function fnChangeDeptChart(v){
+	gift_loadDeptAmountChart(v);
+	gift_loadDeptColumnChart(v);
+	gift_deptPieChart.setSize(giftStatChartTabPanel.getWidth()/2, gift_panelDrag ? giftStatChartTabPanel.getHeight() - 65 : giftStatChartTabPanel.getHeight()-30);
+	gift_deptColumnChart.setSize(giftStatChartTabPanel.getWidth()/2, gift_panelDrag ? giftStatChartTabPanel.getHeight() - 65 : giftStatChartTabPanel.getHeight()-30);
+}
+
 var gift_setStatisticsDate = function(){
 	if(sendToPageOperation){
 		Ext.getCmp('gift_dateSearchDateBegin').setValue(sendToStatisticsPageBeginDate);
@@ -653,7 +730,7 @@ var gift_deptChartData = {chartPriceData : {type : 'pie', name : '比例', data 
 Ext.onReady(function(){
 	
 	giftDetailChartPanel = new Ext.Panel({
-		title : '按赠送走势',
+		title : '赠送走势',
 		contentEl : 'divGiftDetailChart',
 		listeners : {
 			show : function(thiz){
@@ -662,17 +739,18 @@ Ext.onReady(function(){
 					gift_detailChart.setSize(thiz.getWidth(), gift_panelDrag ? giftStatChartTabPanel.getHeight() - 60 : giftStatChartTabPanel.getHeight()-30);
 				}
 			}
+			
 		}		
 	});
 
 	giftStaffChartPanel = new Ext.Panel({
-		title : '按员工赠送',
+		title : '按员工汇总',
 		contentEl : 'divGiftStaffCharts',
 		listeners : {
 			show : function(thiz){
 				if($('#divGiftStaffAmountColumnChart').is(":visible")){
-					gift_staffPieChart.setSize(giftStatChartTabPanel.getWidth()/2, gift_panelDrag ? giftStatChartTabPanel.getHeight() - 75 : giftStatChartTabPanel.getHeight()-45);
-					gift_staffColumnChart.setSize(giftStatChartTabPanel.getWidth()/2, gift_panelDrag ? giftStatChartTabPanel.getHeight() - 75 : giftStatChartTabPanel.getHeight()-45);				
+					gift_staffPieChart.setSize(giftStatChartTabPanel.getWidth()/2, gift_panelDrag ? giftStatChartTabPanel.getHeight() - 65 : giftStatChartTabPanel.getHeight()-40);
+					gift_staffColumnChart.setSize(giftStatChartTabPanel.getWidth()/2, gift_panelDrag ? giftStatChartTabPanel.getHeight() - 65 : giftStatChartTabPanel.getHeight()-40);				
 				}else{
 					$('#divGiftStaffChartChange').show();
 					$('#divGiftStaffAmountPieChart').show();
@@ -682,8 +760,8 @@ Ext.onReady(function(){
 					gift_getStaffChartData();
 					gift_loadStaffAmountChart(1);
 					gift_loadStaffColumnChart(1);
-					gift_staffPieChart.setSize(giftStatChartTabPanel.getWidth()/2, gift_panelDrag ? giftStatChartTabPanel.getHeight() - 75 : giftStatChartTabPanel.getHeight()-45);
-					gift_staffColumnChart.setSize(giftStatChartTabPanel.getWidth()/2, gift_panelDrag ? giftStatChartTabPanel.getHeight() - 75 : giftStatChartTabPanel.getHeight()-45);
+					gift_staffPieChart.setSize(giftStatChartTabPanel.getWidth()/2, gift_panelDrag ? giftStatChartTabPanel.getHeight() - 65 : giftStatChartTabPanel.getHeight()-40);
+					gift_staffColumnChart.setSize(giftStatChartTabPanel.getWidth()/2, gift_panelDrag ? giftStatChartTabPanel.getHeight() - 65 : giftStatChartTabPanel.getHeight()-40);
 				}
 			},
 			render : function(thiz){
@@ -693,13 +771,13 @@ Ext.onReady(function(){
 	});		
 	
 	giftDeptChartPanel = new Ext.Panel({
-		title : '按部门赠送',
+		title : '按部门汇总',
 		contentEl : 'divGiftDeptCharts',
 		listeners : {
 			show : function(thiz){
 				if($('#divGiftDeptPieChart').is(":visible")){
-					gift_deptPieChart.setSize(giftStatChartTabPanel.getWidth()/2, gift_panelDrag ? giftStatChartTabPanel.getHeight() - 75 : giftStatChartTabPanel.getHeight()-45);
-					gift_deptColumnChart.setSize(giftStatChartTabPanel.getWidth()/2, gift_panelDrag ? giftStatChartTabPanel.getHeight() - 75 : giftStatChartTabPanel.getHeight()-45);				
+					gift_deptPieChart.setSize(giftStatChartTabPanel.getWidth()/2, gift_panelDrag ? giftStatChartTabPanel.getHeight() - 65 : giftStatChartTabPanel.getHeight()-40);
+					gift_deptColumnChart.setSize(giftStatChartTabPanel.getWidth()/2, gift_panelDrag ? giftStatChartTabPanel.getHeight() - 65 : giftStatChartTabPanel.getHeight()-40);				
 				}else{
 					$('#divGiftDeptChartChange').show();
 					$('#divGiftDeptPieChart').show();
@@ -709,8 +787,8 @@ Ext.onReady(function(){
 					gift_getDeptChartData();
 					gift_loadDeptAmountChart(0);
 					gift_loadDeptColumnChart(0);
-					gift_deptPieChart.setSize(giftStatChartTabPanel.getWidth()/2, gift_panelDrag ? giftStatChartTabPanel.getHeight() - 75 : giftStatChartTabPanel.getHeight()-45);
-					gift_deptColumnChart.setSize(giftStatChartTabPanel.getWidth()/2, gift_panelDrag ? giftStatChartTabPanel.getHeight() - 75 : giftStatChartTabPanel.getHeight()-45);
+					gift_deptPieChart.setSize(giftStatChartTabPanel.getWidth()/2, gift_panelDrag ? giftStatChartTabPanel.getHeight() - 65 : giftStatChartTabPanel.getHeight()-40);
+					gift_deptColumnChart.setSize(giftStatChartTabPanel.getWidth()/2, gift_panelDrag ? giftStatChartTabPanel.getHeight() - 65 : giftStatChartTabPanel.getHeight()-40);
 				}
 			},
 			render : function(thiz){
@@ -721,7 +799,7 @@ Ext.onReady(function(){
 	
 	giftStatChartTabPanel = new Ext.TabPanel({
 		title : '图形报表',
-		collapsible : true,
+//		collapsible : true,
 //		titleCollapse : true,
 		region : 'south',
 		height : 430,
@@ -771,49 +849,19 @@ Ext.onReady(function(){
         	}
         }
     });
-    gift_rz.on('resize', giftDetailsStatPanel.syncSize, giftDetailsStatPanel);//注册事件(作用:将调好的大小传个scope执行)	
-	
-	$('#divGiftStaffChartChange').toggle(
-		function(){
-			gift_loadStaffAmountChart(0);
-			gift_loadStaffColumnChart(0);
-			gift_staffPieChart.setSize(giftStatChartTabPanel.getWidth()/2, gift_panelDrag ? giftStatChartTabPanel.getHeight() - 60 : giftStatChartTabPanel.getHeight()-45);
-			gift_staffColumnChart.setSize(giftStatChartTabPanel.getWidth()/2, gift_panelDrag ? giftStatChartTabPanel.getHeight() - 60 : giftStatChartTabPanel.getHeight()-45);
-			$('#linkToChangeStaffChart').html('查看数量比例图');
-		},
-		function(){
-			gift_loadStaffAmountChart(1);
-			gift_loadStaffColumnChart(1);
-			gift_staffPieChart.setSize(giftStatChartTabPanel.getWidth()/2, gift_panelDrag ? giftStatChartTabPanel.getHeight() - 60 : giftStatChartTabPanel.getHeight()-45);
-			gift_staffColumnChart.setSize(giftStatChartTabPanel.getWidth()/2, gift_panelDrag ? giftStatChartTabPanel.getHeight() - 60 : giftStatChartTabPanel.getHeight()-45);
-			$('#linkToChangeStaffChart').html('查看金额比例图');
-		}		
-	);	
-
-	$('#divGiftDeptChartChange').toggle(
-		function(){
-			gift_loadDeptAmountChart(1);
-			gift_loadDeptColumnChart(1);
-			gift_deptPieChart.setSize(giftStatChartTabPanel.getWidth()/2, gift_panelDrag ? giftStatChartTabPanel.getHeight() - 60 : giftStatChartTabPanel.getHeight()-45);
-			gift_deptColumnChart.setSize(giftStatChartTabPanel.getWidth()/2, gift_panelDrag ? giftStatChartTabPanel.getHeight() - 60 : giftStatChartTabPanel.getHeight()-45);
-			$('#linkToChangeDeptChart').html('查看金额比例图');
-		},
-		function(){
-			gift_loadDeptAmountChart(0);
-			gift_loadDeptColumnChart(0);
-			gift_deptPieChart.setSize(giftStatChartTabPanel.getWidth()/2, gift_panelDrag ? giftStatChartTabPanel.getHeight() - 60 : giftStatChartTabPanel.getHeight()-45);
-			gift_deptColumnChart.setSize(giftStatChartTabPanel.getWidth()/2, gift_panelDrag ? giftStatChartTabPanel.getHeight() - 60 : giftStatChartTabPanel.getHeight()-45);
-			$('#linkToChangeDeptChart').html('查看数量比例图');
-		}		
-	);	
-
-	if(sendToPageOperation){
-		gift_setStatisticsDate();
-	}else{
-		gift_dateCombo.setValue(1);
-		gift_dateCombo.fireEvent('select', gift_dateCombo, null, 1);				
-	}		
-	
+    gift_rz.on('resize', giftDetailsStatPanel.syncSize, giftDetailsStatPanel);//注册事件(作用:将调好的大小传个scope执行)
+    
+    
+    
+    var gift_totalHeight = Ext.getCmp('giftStatistics').getHeight();
+    
+    giftDetailsStatPanel.setHeight(gift_totalHeight*0.4);
+    giftDetailsStatPanel.getEl().parent().setHeight(gift_totalHeight*0.4);
+    
+    giftStatChartTabPanel.setHeight(gift_totalHeight*0.6);
+    
+    gift_rz.resizeTo(giftDetailsStatPanel.getWidth(), giftDetailsStatPanel.getHeight());
+    
 	Ext.getCmp('giftStatistics').updateStatisticsDate = gift_setStatisticsDate;	
 	
 	

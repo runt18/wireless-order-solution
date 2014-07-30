@@ -106,7 +106,9 @@ function commissionDetailInit(){
 						thiz.store.loadData(data);
 						thiz.setValue(-1);
 					}
-				});				
+				});		
+				commission_dateCombo.setValue(1);
+				commission_dateCombo.fireEvent('select', commission_dateCombo, null, 1);				
 			},
 			select : function(){
 				Ext.getCmp('btnSearchForCommissionStatistics').handler();
@@ -246,12 +248,12 @@ function commissionDetailInit(){
 					};
 					
 					
-					commission_chartLoadMarsk.show();
+//					commission_chartLoadMarsk.show();
 					Ext.Ajax.request({
 						url : '../../QueryCommissionStatistics.do',
 						params : requestParams,
 						success : function(res, opt){
-							commission_chartLoadMarsk.hide();
+//							commission_chartLoadMarsk.hide();
 							var jr = Ext.decode(res.responseText);
 							showCommissionDetailChart(jr);
 						},
@@ -734,6 +736,13 @@ Ext.onReady(function(){
 	    disabled : false
 	});
 	
-	commission_dateCombo.setValue(1);
-	commission_dateCombo.fireEvent('select', commission_dateCombo, null, 1);
+    var commission_totalHeight = Ext.getCmp('commissionStatisticsPanel').getHeight();
+    
+    commissionDetailPanel.setHeight(commission_totalHeight*0.4);
+    commissionDetailPanel.getEl().parent().setHeight(commission_totalHeight*0.4);
+    
+    commissionStatChartTabPanel.setHeight(commission_totalHeight*0.6);	
+    
+    commissionRZ.resizeTo(commissionDetailPanel.getWidth(), commissionDetailPanel.getHeight());
+	
 });
