@@ -268,8 +268,8 @@ function initGiftStatisticsGrid(){
 					gift_getStaffChartData();
 					gift_loadStaffAmountChart(giftStaffChartPanel.otype);
 					gift_loadStaffColumnChart(giftStaffChartPanel.otype);
-					gift_staffPieChart.setSize(giftStatChartTabPanel.getWidth()/2, gift_panelDrag ? giftStatChartTabPanel.getHeight() - 60 : giftStatChartTabPanel.getHeight()-30);
-					gift_staffColumnChart.setSize(giftStatChartTabPanel.getWidth()/2, gift_panelDrag ? giftStatChartTabPanel.getHeight() - 60 : giftStatChartTabPanel.getHeight()-30);					
+					gift_staffPieChart.setSize(giftStatChartTabPanel.getWidth()/2, gift_panelDrag ? giftStatChartTabPanel.getHeight() - 65 : giftStatChartTabPanel.getHeight()-30);
+					gift_staffColumnChart.setSize(giftStatChartTabPanel.getWidth()/2, gift_panelDrag ? giftStatChartTabPanel.getHeight() - 65 : giftStatChartTabPanel.getHeight()-30);					
 					
 				}
 				
@@ -277,8 +277,8 @@ function initGiftStatisticsGrid(){
 					gift_getDeptChartData();
 					gift_loadDeptAmountChart(giftDeptChartPanel.otype);
 					gift_loadDeptColumnChart(giftDeptChartPanel.otype);
-					gift_deptPieChart.setSize(giftStatChartTabPanel.getWidth()/2, gift_panelDrag ? giftStatChartTabPanel.getHeight() - 60 : giftStatChartTabPanel.getHeight()-30);
-					gift_deptColumnChart.setSize(giftStatChartTabPanel.getWidth()/2, gift_panelDrag ? giftStatChartTabPanel.getHeight() - 60 : giftStatChartTabPanel.getHeight()-30);					
+					gift_deptPieChart.setSize(giftStatChartTabPanel.getWidth()/2, gift_panelDrag ? giftStatChartTabPanel.getHeight() - 65 : giftStatChartTabPanel.getHeight()-30);
+					gift_deptColumnChart.setSize(giftStatChartTabPanel.getWidth()/2, gift_panelDrag ? giftStatChartTabPanel.getHeight() - 65 : giftStatChartTabPanel.getHeight()-30);					
 					
 				}
 				
