@@ -14,8 +14,10 @@ public class StaffError extends ErrorEnum{
 	public static final ErrorCode GIFT_NOT_ALLOW = build(7607, "你没有使用赠送的权限");
 	public static final ErrorCode ORDER_NOT_ALLOW = build(7608, "你没有点菜的权限");
 	public static final ErrorCode VERIFY_PWD = build(7609, "原密码输入错误");
-	public static final ErrorCode PRIVILEGE_NOT_MODIFY_BY_RESERVED_ROLE = build(7610, "保留的角色的权限不能修改");
-	public static final ErrorCode TEMP_PAYMENT_NOT_ALLOW = build(7611, "你没有暂结的权限");
+	public static final ErrorCode TEMP_PAYMENT_NOT_ALLOW = build(7610, "你没有暂结的权限");
+	public static final ErrorCode RESERVED_ROLE_NOT_ALLOW_MODIFY = build(7611, "系统保留的角色不能修改");
+	public static final ErrorCode RESERVED_STAFF_NOT_ALLOW_MODIFY = build(7611, "系统保留的员工不能修改");
+	
 	private StaffError(){
 		
 	}

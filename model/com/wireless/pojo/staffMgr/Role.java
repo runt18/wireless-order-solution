@@ -95,8 +95,8 @@ public class Role implements Jsonable, Parcelable{
 	}
 	
 	//The helper insert builder for '管理员'
-	public static class DefAdminBuilder extends InsertBuilder{
-		public DefAdminBuilder(int restaurantId){
+	public static class AdminBuilder extends InsertBuilder{
+		public AdminBuilder(int restaurantId){
 			super(restaurantId, Category.ADMIN.getDesc());
 			setType(Type.RESERVED);
 			setCategoty(Category.ADMIN);
@@ -109,8 +109,8 @@ public class Role implements Jsonable, Parcelable{
 	}
 	
 	//The helper insert builder for '老板'
-	public static class DefBossBuilder extends InsertBuilder{
-		public DefBossBuilder(int restaurantId){
+	public static class BossBuilder extends InsertBuilder{
+		public BossBuilder(int restaurantId){
 			super(restaurantId, Category.BOSS.getDesc());
 			setType(Type.RESERVED);
 			setCategoty(Category.BOSS);
@@ -122,8 +122,8 @@ public class Role implements Jsonable, Parcelable{
 	}
 	
 	//The helper insert builder for '财务'
-	public static class DefFinanceBuilder extends InsertBuilder{
-		public DefFinanceBuilder(int restaurantId){
+	public static class FinancerBuilder extends InsertBuilder{
+		public FinancerBuilder(int restaurantId){
 			super(restaurantId, Category.FINANCE.getDesc());
 			setType(Type.NORMAL);
 			setCategoty(Category.FINANCE);
@@ -144,8 +144,8 @@ public class Role implements Jsonable, Parcelable{
 	}
 	
 	//The helper insert builder for '店长'
-	public static class DefManagerBuilder extends InsertBuilder{
-		public DefManagerBuilder(int restaurantId){
+	public static class ManagerBuilder extends InsertBuilder{
+		public ManagerBuilder(int restaurantId){
 			super(restaurantId, Category.MANAGER.getDesc());
 			setType(Type.NORMAL);
 			setCategoty(Category.MANAGER);
@@ -161,8 +161,8 @@ public class Role implements Jsonable, Parcelable{
 	}
 	
 	//The helper insert builder for '收银员'
-	public static class DefCashierBuilder extends InsertBuilder{
-		public DefCashierBuilder(int restaurantId){
+	public static class CashierBuilder extends InsertBuilder{
+		public CashierBuilder(int restaurantId){
 			super(restaurantId, Category.CASHIER.getDesc());
 			setType(Type.NORMAL);
 			setCategoty(Category.CASHIER);
@@ -192,7 +192,7 @@ public class Role implements Jsonable, Parcelable{
 		private final String name;
 		private Type type = Type.NORMAL;
 		private Category categoty = Category.OTHER;
-		private List<Privilege> privileges = SortedList.newInstance();
+		private final List<Privilege> privileges = SortedList.newInstance();
 		
 		public InsertBuilder(int restaurantId, String name){
 			this.restaurantId = restaurantId;
@@ -211,7 +211,7 @@ public class Role implements Jsonable, Parcelable{
 			return type;
 		}
 		
-		public InsertBuilder setType(Type type) {
+		InsertBuilder setType(Type type) {
 			this.type = type;
 			return this;
 		}

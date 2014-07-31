@@ -125,7 +125,7 @@ public class ServicePlan {
 		
 		public static Status valueOf(int val){
 			for(Status status : values()){
-				if(status.getVal() == val){
+				if(status.val == val){
 					return status;
 				}
 			}

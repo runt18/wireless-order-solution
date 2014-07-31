@@ -346,7 +346,6 @@ public class TestParcel {
 		expected.setTableAlias(100);
 		expected.setTableName("测试餐台");
 		expected.setRegion(new Region(Region.RegionId.REGION_10.getId()));
-		expected.setServiceRate(0.2f);
 		expected.setMinimumCost(23.4f);
 		expected.setStatus(Table.Status.IDLE);
 		expected.setCategory(Order.Category.NORMAL);
@@ -366,9 +365,6 @@ public class TestParcel {
 		
 		// Check the associated region id
 		assertEquals("table region id", expected.getRegion().getId(), actual.getRegion().getId());
-		
-		// Check the service rate
-		assertEquals("table service rate", expected.getServiceRate(), actual.getServiceRate(), 0.01);
 		
 		// Check the minimum cost
 		assertEquals("table minimum cost", expected.getMinimumCost(), actual.getMinimumCost(), 0.01);

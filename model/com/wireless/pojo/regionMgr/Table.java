@@ -85,7 +85,6 @@ public class Table implements Parcelable, Comparable<Table>, Jsonable{
 		private short regionId = Region.RegionId.REGION_1.getId();
 		private String tableName;
 		private int miniCost;
-		private float serviceRate;
 		
 		public Table build(){
 			return new Table(this);
@@ -129,14 +128,6 @@ public class Table implements Parcelable, Comparable<Table>, Jsonable{
 			return this;
 		}
 
-		public float getServiceRate() {
-			return serviceRate;
-		}
-
-		public UpdateBuilder setServiceRate(float serviceRate) {
-			this.serviceRate = serviceRate;
-			return this;
-		}
 	}
 	
 	/**
@@ -188,7 +179,6 @@ public class Table implements Parcelable, Comparable<Table>, Jsonable{
 	private int customNum;
 	private Category category = Category.NORMAL;;
 	private Status status = Status.IDLE;
-	private float serviceRate;
 	private Region region;
 	
 	public Table(){
@@ -204,14 +194,12 @@ public class Table implements Parcelable, Comparable<Table>, Jsonable{
 		setRestaurantId(builder.getRestaurantId());
 		setRegion(new Region(builder.getRegionId(), null));
 		setMinimumCost(builder.getMiniCost());
-		setServiceRate(builder.getServiceRate());
 		setTableName(builder.getTableName());
 	}
 	
 	private Table(UpdateBuilder builder){
 		setMinimumCost(builder.getMiniCost());
 		setRegion(new Region(builder.getRegionId(), null));
-		setServiceRate(builder.getServiceRate());
 		setTableId(builder.getTableId());
 		setTableName(builder.getTableName());
 	}
@@ -310,17 +298,6 @@ public class Table implements Parcelable, Comparable<Table>, Jsonable{
 		return this.status == Status.BUSY;
 	}
 	
-	public float getServiceRate() {
-		return serviceRate;
-	}
-	
-	public void setServiceRate(float serviceRate) {
-		if(serviceRate < 0 || serviceRate > 1){
-			throw new IllegalArgumentException("The service rate (val = " + serviceRate + ") exceed range.");
-		}
-		this.serviceRate = serviceRate;
-	}
-	
 	public Region getRegion() {
 		if(region == null){
 			region = new Region(Region.RegionId.REGION_1.getId());
@@ -368,7 +345,6 @@ public class Table implements Parcelable, Comparable<Table>, Jsonable{
 			dest.writeShort(this.tableAlias);
 			dest.writeString(this.tableName);
 			dest.writeParcel(this.region, Region.REGION_PARCELABLE_SIMPLE);
-			dest.writeShort(NumericUtil.float2Int(this.serviceRate));
 			dest.writeInt(NumericUtil.float2Int(this.minimumCost));
 			dest.writeByte(this.status.getVal());
 			dest.writeByte(this.category.getVal());
@@ -386,7 +362,6 @@ public class Table implements Parcelable, Comparable<Table>, Jsonable{
 			this.tableAlias = source.readShort();
 			this.tableName = source.readString();
 			this.region = source.readParcel(Region.CREATOR);
-			this.serviceRate = NumericUtil.int2Float(source.readShort());
 			this.minimumCost = NumericUtil.int2Float(source.readInt());
 			this.status = Status.valueOf(source.readByte());
 			this.category = Category.valueOf(source.readByte());
@@ -427,7 +402,6 @@ public class Table implements Parcelable, Comparable<Table>, Jsonable{
 		jm.putString("name", this.tableName);
 		jm.putInt("customNum", this.customNum);
 		jm.putFloat("minimumCost", this.minimumCost);
-		jm.putFloat("serviceRate", this.serviceRate);
 		jm.putInt("categoryValue", this.category.getVal());
 		jm.putString("categoryText", this.category.getDesc());
 		jm.putInt("statusValue", this.status.getVal());
