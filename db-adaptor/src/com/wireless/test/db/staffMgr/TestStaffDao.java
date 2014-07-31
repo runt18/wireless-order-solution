@@ -1,9 +1,9 @@
 package com.wireless.test.db.staffMgr;
 
 import static org.junit.Assert.assertEquals;
+
 import java.beans.PropertyVetoException;
 import java.sql.SQLException;
-import java.util.List;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -11,9 +11,10 @@ import org.junit.Test;
 import com.wireless.db.staffMgr.RoleDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
+import com.wireless.exception.StaffError;
+import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.staffMgr.Role;
 import com.wireless.pojo.staffMgr.Staff;
-import com.wireless.pojo.staffMgr.Staff.DefAdminBuilder;
 import com.wireless.pojo.staffMgr.Staff.InsertBuilder;
 import com.wireless.pojo.staffMgr.Staff.UpdateBuilder;
 import com.wireless.test.db.TestInit;
@@ -25,7 +26,7 @@ public class TestStaffDao {
 	public static void initDBParam() throws PropertyVetoException, BusinessException{
 		TestInit.init();
 		try{
-			mStaff = StaffDao.getStaffs(37).get(0);
+			mStaff = StaffDao.getByRestaurant(37).get(0);
 		}catch(SQLException e){
 			e.printStackTrace();
 		}
@@ -42,50 +43,21 @@ public class TestStaffDao {
 	}
 	
 	@Test
-	public void TestStaff() throws SQLException, BusinessException{
-		//get all role
-		List<Role> roles = RoleDao.getRoles(mStaff, null, null);
+	public void testStaffDao() throws SQLException, BusinessException{
 		
-		int staffId = 0, adminId = 0;
+		int staffId = 0;
 		try{
-			Role staffRole = null;
-			for (Role role : roles) {
-				if(role.getCategory() == Role.Category.ADMIN){
-					staffRole = role;
-				}
-			}
-			//添加默认管理员
-			DefAdminBuilder admin = new DefAdminBuilder("123", mStaff.getRestaurantId(), staffRole);
-			//admin.setRestaurantId(mStaff.getRestaurantId());
-
-			adminId = StaffDao.insertStaff(admin);
-			
-			Staff expected = admin.build();
-			expected.setId(adminId);
-			expected.setPwd("202cb962ac59075b964b07152d234b70");
-			
-			Staff actual = StaffDao.getStaffById(adminId);
-			//compare
-			compare(expected, actual);
-			
-			//财务
-			for (Role role : roles) {
-				if(role.getCategory() == Role.Category.FINANCE){
-					staffRole = role;
-				}
-			}
 			//添加新员工
-			InsertBuilder builder = new InsertBuilder("鸣人", "123", mStaff.getRestaurantId(), staffRole);
-
-			builder.setMobile("13533464033");
+			InsertBuilder builder = new InsertBuilder("鸣人", "123", RoleDao.getByCategory(mStaff, Role.Category.FINANCE).get(0)).setMobile("13533464033");
 			
-			staffId = StaffDao.insertStaff(builder);
+			staffId = StaffDao.insert(mStaff, builder);
 			
-			expected = builder.build();
+			Staff expected = builder.build();
 			expected.setId(staffId);
+			expected.setRestaurantId(mStaff.getRestaurantId());
 			expected.setPwd("202cb962ac59075b964b07152d234b70");
 			
-			actual = StaffDao.getStaffById(staffId);
+			Staff actual = StaffDao.getById(staffId);
 			//compare
 			compare(expected, actual);
 			
@@ -95,25 +67,30 @@ public class TestStaffDao {
 			updateBuilder.setStaffPwd("321");
 			updateBuilder.setStaffName("佐助");
 			updateBuilder.setMobile("13433464033");
-			updateBuilder.setRoleId(staffRole.getId());
+			updateBuilder.setRoleId(RoleDao.getByCategory(mStaff, Role.Category.BOSS).get(0).getId());
 			
-			StaffDao.updateStaff(updateBuilder);
+			expected = updateBuilder.build();
+			expected.setRestaurantId(mStaff.getRestaurantId());
+			expected.setRole(RoleDao.getByCategory(mStaff, Role.Category.BOSS).get(0));
+			expected.setPwd("caf1a3dfb505ffed0d024130f58c5cfa");
 			
-			Staff currentStaff = StaffDao.getStaffById(staffId);
+			StaffDao.update(mStaff, updateBuilder);
 			
-			actual.setPwd("caf1a3dfb505ffed0d024130f58c5cfa");
-			actual.setName("佐助");
-			actual.setMobile("13433464033");
+			actual = StaffDao.getById(staffId);
 			
-			compare(actual, currentStaff);
+			compare(expected, actual);
 			
+			StaffDao.getByCond(mStaff, new StaffDao.ExtraCond().addPrivilegeCode(Privilege.Code.ADD_FOOD).addPrivilegeCode(Privilege.Code.ADD_FOOD));
 			
 		}finally{
-			StaffDao.deleteStaff(adminId);
-			StaffDao.deleteStaff(staffId);
-			
-			StaffDao.getStaffById(adminId);
-			StaffDao.getStaffById(staffId);
+			if(staffId != 0){
+				StaffDao.delete(mStaff, staffId);
+				try{
+					StaffDao.getById(staffId);
+				}catch(BusinessException e){
+					assertEquals("failed to delete the staff", StaffError.STAFF_NOT_EXIST, e.getErrCode());
+				}
+			}
 		}
 
 		

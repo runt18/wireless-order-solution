@@ -2,7 +2,6 @@ package com.wireless.db.staffMgr;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import com.mysql.jdbc.Statement;
@@ -36,8 +35,8 @@ public class RoleDao {
 	 * @throws BusinessException
 	 * 			throws if the role to this id does NOT exist
 	 */
-	public static Role getRoleById(DBCon dbCon, Staff staff, int roleId) throws SQLException, BusinessException{
-		List<Role> result = getRoles(dbCon, staff, " AND role_id = " + roleId, null);
+	public static Role getById(DBCon dbCon, Staff staff, int roleId) throws SQLException, BusinessException{
+		List<Role> result = getByCond(dbCon, staff, " AND role_id = " + roleId, null);
 		if(result.isEmpty()){
 			throw new BusinessException(StaffError.ROLE_NOT_EXIST);
 		}else{
@@ -56,17 +55,53 @@ public class RoleDao {
 	 * @throws BusinessException
 	 * 			throws if the role to this id does NOT exist
 	 */
-	public static Role getRoleById(Staff staff, int roleId) throws SQLException, BusinessException{
+	public static Role getyById(Staff staff, int roleId) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return getRoleById(dbCon, staff, roleId);
+			return getById(dbCon, staff, roleId);
 		}finally{
 			dbCon.disconnect();
 		}
 	}
 	
-	private static List<Role> getRoles(DBCon dbCon, Staff staff, String extraCond, String orderClause) throws SQLException{
+	/**
+	 * Get the roles to specific category {@link Role#Category}
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param category
+	 * 			the role category
+	 * @return the roles to this category
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static List<Role> getByCategory(Staff staff, Role.Category category) throws SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return getByCategory(dbCon, staff, category);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Get the roles to specific category {@link Role#Category}
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param category
+	 * 			the role category
+	 * @return the roles to this category
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static List<Role> getByCategory(DBCon dbCon, Staff staff, Role.Category category) throws SQLException{
+		return getByCond(dbCon, staff, " AND cate = " + category.getVal(), null);
+	}
+	
+	private static List<Role> getByCond(DBCon dbCon, Staff staff, String extraCond, String orderClause) throws SQLException{
 		String sql;
 		
 		//Get the basic info to each role
@@ -115,7 +150,7 @@ public class RoleDao {
 			}
 		}
 		
-		return Collections.unmodifiableList(roles);
+		return roles;
 	}
 	
 	
@@ -134,7 +169,7 @@ public class RoleDao {
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return getRoles(dbCon, staff, extraCond, otherClause);
+			return getByCond(dbCon, staff, extraCond, otherClause);
 			
 		}finally{
 			dbCon.disconnect();
@@ -291,11 +326,18 @@ public class RoleDao {
 
 		Role role = builder.build();
 
-		if(getRoleById(dbCon, staff, role.getId()).getType() == Role.Type.RESERVED){
-			throw new BusinessException(StaffError.PRIVILEGE_NOT_MODIFY_BY_RESERVED_ROLE);
-		}
-		
 		String sql ;
+		
+		//Check if the role belongs to reserved.
+		sql = " SELECT type FROM " + Params.dbName + ".role WHERE role_id = " + role.getId();
+		dbCon.rs = dbCon.stmt.executeQuery(sql);
+		if(dbCon.rs.next()){
+			if(Role.Type.valueOf(dbCon.rs.getInt("type")) == Role.Type.RESERVED){
+				throw new BusinessException(StaffError.RESERVED_ROLE_NOT_ALLOW_MODIFY);
+			}
+		}
+		dbCon.rs.close();
+		
 		sql = " UPDATE " + Params.dbName + ".role SET " +
 			  " role_id = " + role.getId() +
 			  (builder.isNameChanged() ? (" ,name = '" + role.getName() + "'") : "") +
@@ -319,34 +361,56 @@ public class RoleDao {
 	}
 	
 	/**
-	 * Delete the Role.
+	 * Delete the specific role
 	 * @param dbCon
 	 * 			the database connection
 	 * @param roleId
+	 * 			the role id to delete
 	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException 
+	 * 			<li>throws if the role to delete belongs to reserved
+	 * 			<li>throws if the role to delete does NOT exist
 	 */
-	public static void deleteRole(DBCon dbCon, int roleId) throws SQLException{
-		String sql = "DELETE FROM " + Params.dbName + ".role" + 
-					" WHERE role_id = " + roleId;
-		dbCon.stmt.executeUpdate(sql);
+	public static void deleteRole(DBCon dbCon, int roleId) throws SQLException, BusinessException{
+		String sql;
+		
+		//Check if the role belongs to reserved.
+		sql = " SELECT type FROM " + Params.dbName + ".role WHERE role_id = " + roleId;
+		dbCon.rs = dbCon.stmt.executeQuery(sql);
+		if(dbCon.rs.next()){
+			if(Role.Type.valueOf(dbCon.rs.getInt("type")) == Role.Type.RESERVED){
+				throw new BusinessException(StaffError.RESERVED_ROLE_NOT_ALLOW_MODIFY);
+			}
+		}
+		dbCon.rs.close();
+		
+		sql = " DELETE FROM " + Params.dbName + ".role WHERE role_id = " + roleId;
+		if(dbCon.stmt.executeUpdate(sql) == 0){
+			throw new BusinessException(StaffError.ROLE_NOT_EXIST);
+		}
 		//删除权限关联
-		String delRPSql = "DELETE FROM " + Params.dbName + ".role_privilege" +
-							" WHERE role_id = " + roleId;
-		dbCon.stmt.executeUpdate(delRPSql);
+		sql = "DELETE FROM " + Params.dbName + ".role_privilege WHERE role_id = " + roleId;
+		dbCon.stmt.executeUpdate(sql);
 		//删除折扣关联
-		String delRDSql = "DELETE FROM " + Params.dbName + ".role_discount" + 
-							" WHERE role_id = " + roleId;
-		dbCon.stmt.executeUpdate(delRDSql);
+		sql = "DELETE FROM " + Params.dbName + ".role_discount WHERE role_id = " + roleId;
+		dbCon.stmt.executeUpdate(sql);
 		
 	}
 	
 	/**
-	 * Delete the Role.
+	 * Delete the specific role
+	 * @param dbCon
+	 * 			the database connection
 	 * @param roleId
-	 * 			the id of Role
+	 * 			the role id to delete
 	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException 
+	 * 			<li>throws if the role to delete belongs to reserved
+	 * 			<li>throws if the role to delete does NOT exist
 	 */
-	public static void deleteRole(int roleId) throws SQLException{
+	public static void deleteRole(int roleId) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();

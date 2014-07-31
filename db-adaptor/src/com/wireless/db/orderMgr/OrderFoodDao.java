@@ -605,7 +605,7 @@ public class OrderFoodDao {
 		final String orderFoodItem = "`id`,`restaurant_id`, `order_id`, `food_id`, `order_date`, `order_count`," + 
 				"`unit_price`, `commission`, `name`, `food_status`, `taste_group_id`, `cancel_reason_id`, `cancel_reason`," +
 				"`discount`, `dept_id`, `kitchen_id`, " +
-				"`staff_id`, `waiter`, `is_temporary`, `is_paid`";
+				"`staff_id`, `waiter`, `is_temporary`, `is_paid`, `is_gift`";
 
 		String sql;
 		

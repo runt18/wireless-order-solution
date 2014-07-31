@@ -290,7 +290,8 @@ public class RestaurantDao {
 		
 		//Update the password to administrator of restaurant.
 		if(builder.isPwdChanged()){
-			StaffDao.updateStaff(dbCon, new Staff.UpdateBuilder(StaffDao.getAdminByRestaurant(dbCon, builder.getId()).getId()).setStaffPwd(builder.getPwd()));
+			Staff admin = StaffDao.getAdminByRestaurant(dbCon, builder.getId());
+			StaffDao.update(dbCon, admin, new Staff.UpdateBuilder(admin.getId()).setStaffPwd(builder.getPwd()));
 		}
 	}
 	
@@ -750,25 +751,21 @@ public class RestaurantDao {
 		Staff staff = new Staff();
 		staff.setRestaurantId(restaurantId);
 		//insert '管理员' role
-		int adminRoleId = RoleDao.insertRole(dbCon, staff, new Role.DefAdminBuilder(restaurantId));
+		int adminRoleId = RoleDao.insertRole(dbCon, staff, new Role.AdminBuilder(restaurantId));
 		//insert '管理员' staff
-		int staffId = StaffDao.insertStaff(dbCon, new Staff.DefAdminBuilder(pwd, restaurantId, new Role(adminRoleId)));
+		int staffId = StaffDao.insert(dbCon, staff, new Staff.AdminBuilder(pwd, new Role(adminRoleId)));
 		//insert '老板' role
-		RoleDao.insertRole(dbCon, staff, new Role.DefBossBuilder(restaurantId));
+		RoleDao.insertRole(dbCon, staff, new Role.BossBuilder(restaurantId));
 		//insert '财务' role
-		RoleDao.insertRole(dbCon, staff, new Role.DefFinanceBuilder(restaurantId));
+		RoleDao.insertRole(dbCon, staff, new Role.FinancerBuilder(restaurantId));
 		//insert '店长' role
-		RoleDao.insertRole(dbCon, staff, new Role.DefManagerBuilder(restaurantId));
+		RoleDao.insertRole(dbCon, staff, new Role.ManagerBuilder(restaurantId));
 		//insert '收银员' role
-		RoleDao.insertRole(dbCon, staff, new Role.DefCashierBuilder(restaurantId));
+		RoleDao.insertRole(dbCon, staff, new Role.CashierBuilder(restaurantId));
 		//insert '服务员' role
 		RoleDao.insertRole(dbCon, staff, new Role.DefWaiterBuilder(restaurantId));
 		
-		staff = new Staff.DefAdminBuilder(pwd, restaurantId, new Role(adminRoleId)).build();
-		staff.setRestaurantId(restaurantId);
-		staff.setId(staffId);
-		
-		return staff;
+		return StaffDao.getById(dbCon, staffId);
 	}
 	
 	private static void initMaterialCate(DBCon dbCon, int restaurantId) throws SQLException{
@@ -824,6 +821,14 @@ public class RestaurantDao {
 		
 		//Delete the '无折扣'折扣方案
 		sql = " DELETE FROM " + Params.dbName + ".discount WHERE restaurant_id = " + restaurantId;
+		dbCon.stmt.executeUpdate(sql);
+		
+		//Delete the '免服务费'方案
+		sql = " DELETE FROM " + Params.dbName + ".service_rate WHERE plan_id IN " +
+			  " ( SELECT plan_id FROM " + Params.dbName + ".service_plan WHERE restaurant_id = " + restaurantId + ")";
+		dbCon.stmt.executeUpdate(sql);
+		
+		sql = " DELETE FROM " + Params.dbName + ".service_plan WHERE restaurant_id = " + restaurantId;
 		dbCon.stmt.executeUpdate(sql);
 		
 		//Delete the kitchens

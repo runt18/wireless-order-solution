@@ -22,7 +22,7 @@ public class TestMaterialDao {
 	public static void beforeClass() throws PropertyVetoException, BusinessException{
 		TestInit.init();
 		try {
-			staff = StaffDao.getStaffs(26).get(0);
+			staff = StaffDao.getByRestaurant(26).get(0);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}

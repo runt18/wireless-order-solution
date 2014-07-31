@@ -364,11 +364,11 @@ public class TestRestaurantDao {
 	
 	private Staff compareRoleAndStaff(int restaurantId) throws SQLException, BusinessException{
 		
-		Staff expectedStaff = StaffDao.getStaffs(restaurantId).get(0);
+		Staff expectedStaff = StaffDao.getByRestaurant(restaurantId).get(0);
 		Assert.assertEquals("admin staff restaurant id", expectedStaff.getRestaurantId(), restaurantId);
 		Assert.assertEquals("admin staff type", expectedStaff.getType().getVal(), Staff.Type.RESERVED.getVal());
 		Assert.assertEquals("admin staff role type", expectedStaff.getRole().getCategory().getVal(), Role.Category.ADMIN.getVal());
-		Assert.assertEquals("admin staff name", expectedStaff.getName(), Staff.DefAdminBuilder.ADMIN);
+		Assert.assertEquals("admin staff name", expectedStaff.getName(), Staff.AdminBuilder.ADMIN);
 		
 		compareRole(restaurantId, expectedStaff, Role.Category.ADMIN, Role.Type.RESERVED);
 		

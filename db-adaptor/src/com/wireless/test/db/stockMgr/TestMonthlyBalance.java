@@ -26,7 +26,7 @@ public class TestMonthlyBalance {
 	public static void initDBParam() throws BusinessException, PropertyVetoException{
 		TestInit.init();
 		try{
-			mStaff = StaffDao.getStaffs(26).get(0);
+			mStaff = StaffDao.getByRestaurant(26).get(0);
 		}catch(SQLException e){
 			e.printStackTrace();
 		}

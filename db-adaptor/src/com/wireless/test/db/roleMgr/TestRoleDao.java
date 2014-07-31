@@ -19,7 +19,6 @@ import com.wireless.pojo.staffMgr.Privilege.Code;
 import com.wireless.pojo.staffMgr.Role;
 import com.wireless.pojo.staffMgr.Role.Category;
 import com.wireless.pojo.staffMgr.Role.InsertBuilder;
-import com.wireless.pojo.staffMgr.Role.Type;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.test.db.TestInit;
 
@@ -31,7 +30,7 @@ public class TestRoleDao {
 	public static void initDBParam() throws PropertyVetoException, BusinessException{
 		TestInit.init();
 		try{
-			mStaff = StaffDao.getStaffs(37).get(0);
+			mStaff = StaffDao.getByRestaurant(37).get(0);
 		}catch(SQLException e){
 			e.printStackTrace();
 		}
@@ -86,7 +85,6 @@ public class TestRoleDao {
 			//创建新角色
 			InsertBuilder newBuilder = new InsertBuilder(mStaff.getRestaurantId(), "副部长")
 										   .setCategoty(Category.OTHER)
-										   .setType(Type.NORMAL)
 										   .addPrivilege(Privilege.Code.ADD_FOOD)
 										   .addPrivilege(Privilege.Code.BASIC)
 										   .addDiscount(discounts.get(0))
@@ -97,7 +95,7 @@ public class TestRoleDao {
 			Role expected = newBuilder.build();
 			expected.setId(roleId);
 			
-			Role actual = RoleDao.getRoleById(mStaff, roleId);
+			Role actual = RoleDao.getyById(mStaff, roleId);
 			//compare
 			compare(expected, actual);
 			
@@ -109,7 +107,7 @@ public class TestRoleDao {
 													   .addDiscount(discounts.get(1));
 			
 			RoleDao.updateRole(mStaff, updateBuilder);
-			actual = RoleDao.getRoleById(mStaff, roleId);
+			actual = RoleDao.getyById(mStaff, roleId);
 			expected = updateBuilder.build();
 			
 			Assert.assertEquals("restaurantId", mStaff.getRestaurantId(), actual.getRestaurantId());
@@ -125,7 +123,7 @@ public class TestRoleDao {
 			if(roleId != 0){
 				RoleDao.deleteRole(roleId);
 				try{
-					RoleDao.getRoleById(mStaff, roleId);
+					RoleDao.getyById(mStaff, roleId);
 					Assert.assertTrue("failed to delete role", false);
 				}catch(BusinessException e){
 					Assert.assertEquals("failed to delete role", StaffError.ROLE_NOT_EXIST, e.getErrCode());

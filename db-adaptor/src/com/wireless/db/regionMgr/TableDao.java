@@ -127,7 +127,7 @@ public class TableDao {
 		String querySQL = " SELECT " +
 						  " REGION.name AS region_name, REGION.region_id, REGION.restaurant_id, " +
 						  " TBL.table_id, TBL.table_alias, TBL.name AS tbl_name, TBL.category, TBL.custom_num, " +
-						  " TBL.minimum_cost, TBL.service_rate, TBL.status " + 
+						  " TBL.minimum_cost, TBL.status " + 
 						  " FROM " + Params.dbName + ".table TBL " +
 						  " LEFT JOIN " + Params.dbName + ".region REGION " +
 						  " ON REGION.region_id = TBL.region_id AND REGION.restaurant_id = TBL.restaurant_id " +
@@ -146,7 +146,6 @@ public class TableDao {
 			table.setRegion(region);
 			table.setMinimumCost(dbCon.rs.getFloat("minimum_cost"));
 			table.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
-			table.setServiceRate(dbCon.rs.getFloat("service_rate"));
 			table.setStatus(dbCon.rs.getInt("status"));
 			if(table.isBusy()){
 				table.setCategory(dbCon.rs.getInt("category"));
@@ -201,7 +200,6 @@ public class TableDao {
 						   " region_id = " + tblToUpdate.getRegion().getId() + "," +
 						   " name = '" + tblToUpdate.getName() + "'," +
 						   " minimum_cost = " + tblToUpdate.getMinimumCost() + "," +
-						   " service_rate = " + tblToUpdate.getServiceRate() + "," +
 						   " custom_num = " + tblToUpdate.getCustomNum() +
 						   " WHERE " +
 						   " table_id = " + tblToUpdate.getTableId();
@@ -261,13 +259,12 @@ public class TableDao {
 		}
 		dbCon.rs.close();
 		sql = " INSERT INTO " + Params.dbName + ".table " +
-		 	  "(`table_alias`, `restaurant_id`, `name`, `region_id`, `minimum_cost`, `service_rate`, `custom_num`) VALUES( " +
+		 	  "(`table_alias`, `restaurant_id`, `name`, `region_id`, `minimum_cost`, `custom_num`) VALUES( " +
 			  tblToInsert.getAliasId() + ", " + 
 			  tblToInsert.getRestaurantId() + ", " +
 			  "'" + tblToInsert.getName() + "', " +
 			  tblToInsert.getRegion().getId() + ", " +
 			  tblToInsert.getMinimumCost() + "," +
-			  tblToInsert.getServiceRate() + "," +
 			  tblToInsert.getCustomNum() +
 			  " ) ";
 		

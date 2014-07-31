@@ -37,7 +37,7 @@ public class TestMemberDao {
 	public static void initDbParam() throws PropertyVetoException, BusinessException{
 		TestInit.init();
 		try {
-			mStaff = StaffDao.getStaffs(63).get(0);
+			mStaff = StaffDao.getByRestaurant(63).get(0);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}

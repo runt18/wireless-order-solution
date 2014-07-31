@@ -271,7 +271,7 @@ public class WeixinMemberDao {
 	public static void updateMobile(DBCon dbCon, String mobile, String weixinMemberSerial, String weixinRestaurantSerial) throws SQLException, BusinessException{
 		int memberId = getBoundMemberIdByWeixin(dbCon, weixinMemberSerial, weixinRestaurantSerial);
 		int restaurantId = WeixinRestaurantDao.getRestaurantIdByWeixin(dbCon, weixinRestaurantSerial);
-		Staff staff = StaffDao.getStaffs(dbCon, restaurantId).get(0);
+		Staff staff = StaffDao.getByRestaurant(dbCon, restaurantId).get(0);
 		Member member = MemberDao.getById(dbCon, staff, memberId);
 		member.setMobile(mobile);
 		MemberDao.checkValid(dbCon, staff, member);

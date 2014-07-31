@@ -25,7 +25,7 @@ public class TestTableDao {
 	public static void initDbParam() throws PropertyVetoException, BusinessException {
 		TestInit.init();
 		try {
-			mStaff = StaffDao.getStaffs(37).get(0);
+			mStaff = StaffDao.getByRestaurant(37).get(0);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -39,7 +39,6 @@ public class TestTableDao {
 		assertEquals("table status", expected.getStatus(), actual.getStatus());
 		assertEquals("table minimum cost", expected.getMinimumCost(), actual.getMinimumCost(), 0.01);
 		assertEquals("associated restaurant id", expected.getRestaurantId(), actual.getRestaurantId(), 0.01);
-		assertEquals("table service rate", expected.getServiceRate(), actual.getServiceRate(), 0.01);
 		assertEquals("table name", expected.getName(), actual.getName());
 		assertEquals("associated region id", expected.getRegion().getId(), actual.getRegion().getId());
 	}
@@ -50,7 +49,6 @@ public class TestTableDao {
 		Table oriTbl = TableDao.getTables(mStaff, null, null).get(0);
 		
 		Table.UpdateBuilder builder = new Table.UpdateBuilder(oriTbl.getTableId()).setMiniCost(20)
-																				  .setServiceRate(0.1f)
 																				  .setTableName("测试餐台")
 																				  .setRegionId(Region.RegionId.REGION_1.getId());
 		Table expected = builder.build();

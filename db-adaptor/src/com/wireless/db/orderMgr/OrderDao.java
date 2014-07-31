@@ -453,7 +453,7 @@ public class OrderDao {
 		if(dateType == DateType.TODAY){
 			sql = " SELECT " +
 				  " O.id, O.order_date, O.seq_id, O.custom_num, O.table_id, O.table_alias, O.table_name, " +
-				  " T.minimum_cost, T.service_rate AS tbl_service_rate, T.status AS table_status, " +
+				  " T.minimum_cost, T.status AS table_status, " +
 				  " O.waiter, " +
 				  " O.region_id, O.region_name, O.restaurant_id, " +
 				  " O.member_operation_id, " +
@@ -516,7 +516,6 @@ public class OrderDao {
 			if(dateType == DateType.TODAY){
 				table.setStatus(dbCon.rs.getShort("table_status"));
 				table.setMinimumCost(dbCon.rs.getFloat("minimum_cost"));
-				table.setServiceRate(dbCon.rs.getFloat("tbl_service_rate"));
 			}
 			orderInfo.setDestTbl(table);
 			orderInfo.getRegion().setRegionId(dbCon.rs.getShort("region_id"));
