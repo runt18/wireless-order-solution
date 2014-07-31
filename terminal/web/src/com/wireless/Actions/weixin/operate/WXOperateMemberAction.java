@@ -57,8 +57,8 @@ public class WXOperateMemberAction extends DispatchAction {
 			int rid = WeixinRestaurantDao.getRestaurantIdByWeixin(dbCon, formId);
 			final Restaurant restaurant = RestaurantDao.getById(dbCon, rid);
 			
-			final Member member = MemberDao.getById(dbCon, StaffDao.getStaffs(dbCon, rid).get(0), mid);
-			MemberRank mr = MemberDao.calcMemberRank(StaffDao.getStaffs(dbCon, rid).get(0), mid);
+			final Member member = MemberDao.getById(dbCon, StaffDao.getByRestaurant(dbCon, rid).get(0), mid);
+			MemberRank mr = MemberDao.calcMemberRank(StaffDao.getByRestaurant(dbCon, rid).get(0), mid);
 			DecimalFormat df = new DecimalFormat("#.00");
 			final String rank = df.format(mr.getRank()/mr.getTotal()) + "%";
 			

@@ -38,7 +38,7 @@ public class QueryPrivilegeAction extends DispatchAction{
 		try{
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			//根据id获取role
-			Role role = RoleDao.getRoleById(staff, Integer.parseInt(roleId));
+			Role role = RoleDao.getyById(staff, Integer.parseInt(roleId));
 			if(role != null){
 				rolePrivilege = role.getPrivileges();
 			}
@@ -129,7 +129,7 @@ public class QueryPrivilegeAction extends DispatchAction{
 			
 			tree.append("[");
 			
-			List<Privilege> privileges = new ArrayList<Privilege>(RoleDao.getRoleById(staff, staff.getRole().getId()).getPrivileges());
+			List<Privilege> privileges = new ArrayList<Privilege>(RoleDao.getyById(staff, staff.getRole().getId()).getPrivileges());
 			Collections.sort(privileges, Privilege.BY_CATE);
 			
 			for (Privilege privilege : privileges) {
@@ -291,7 +291,7 @@ public class QueryPrivilegeAction extends DispatchAction{
 		try{
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			//根据id获取role
-			Role role = RoleDao.getRoleById(staff, Integer.parseInt(roleId));
+			Role role = RoleDao.getyById(staff, Integer.parseInt(roleId));
 			if(role != null){
 				rolePrivilege = role.getPrivileges();
 			}

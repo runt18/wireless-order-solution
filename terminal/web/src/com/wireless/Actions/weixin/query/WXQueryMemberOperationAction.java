@@ -112,7 +112,7 @@ public class WXQueryMemberOperationAction extends DispatchAction{
 			// 获取会员编号
 			int mid = WeixinMemberDao.getBoundMemberIdByWeixin(dbCon, memberSerial, restaurantSerial);
 			//
-			Staff staff = StaffDao.getStaffs(dbCon, rid).get(0);
+			Staff staff = StaffDao.getByRestaurant(dbCon, rid).get(0);
 			
 			// 查询条件(核心)
 			String extra = "";
@@ -182,7 +182,7 @@ public class WXQueryMemberOperationAction extends DispatchAction{
 			// 获取会员编号
 			int mid = WeixinMemberDao.getBoundMemberIdByWeixin(dbCon, memberSerial, restaurantSerial);
 			//
-			Staff staff = StaffDao.getStaffs(dbCon, rid).get(0);
+			Staff staff = StaffDao.getByRestaurant(dbCon, rid).get(0);
 			
 //			List<CouponType> couponTypeList = CouponTypeDao.get(dbCon, staff);
 			List<Coupon> couponList = CouponDao.getAvailByMember(staff, mid);

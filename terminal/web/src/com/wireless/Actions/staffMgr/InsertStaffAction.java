@@ -35,10 +35,9 @@ public class InsertStaffAction extends Action {
 			String roleId = request.getParameter("roleId");
 			String tele = request.getParameter("tele");
 			
-			InsertBuilder builder = new InsertBuilder(staffName, staffPwd, staff.getRestaurantId(), new Role(Integer.parseInt(roleId)));
-			builder.setMobile(tele);
+			InsertBuilder builder = new InsertBuilder(staffName, staffPwd, new Role(Integer.parseInt(roleId))).setMobile(tele);
 			
-			StaffDao.insertStaff(builder);
+			StaffDao.insert(staff, builder);
 			jobject.initTip(true, "添加成功");
 
 		} catch (SQLException e) {

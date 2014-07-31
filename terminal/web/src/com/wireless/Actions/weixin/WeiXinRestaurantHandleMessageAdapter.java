@@ -161,7 +161,7 @@ public class WeiXinRestaurantHandleMessageAdapter implements HandleMessageListen
 			dataItem = new Data4Item();
 			try{
 				int memberId = WeixinMemberDao.getBoundMemberIdByWeixin(msg.getFromUserName(), msg.getToUserName());
-				Staff staff = StaffDao.getStaffs(rid).get(0);
+				Staff staff = StaffDao.getByRestaurant(rid).get(0);
 				List<Coupon> couponList = CouponDao.getAvailByMember(staff, memberId);
 				if(couponList.size() > 0){
 					dataItem.setTitle("会员资料 | 您有新优惠劵!");

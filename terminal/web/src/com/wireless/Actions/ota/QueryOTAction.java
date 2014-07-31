@@ -52,7 +52,7 @@ public class QueryOTAction extends Action {
 				
 			}else if(funCode == 2){
 				int pin = Integer.parseInt(request.getParameter("pin"));
-				Staff staff = StaffDao.getStaffById(pin);
+				Staff staff = StaffDao.getById(pin);
 				// 获取图片操作路径(物理路径)
 				String url = "http://" + OSSUtil.BUCKET_IMAGE + "." + OSSParams.instance().OSS_OUTER_POINT + "/" + staff.getRestaurantId() + "/";
 				result = result.replace("$(result)", "true").replace("$(value)", url);

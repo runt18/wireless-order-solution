@@ -95,7 +95,7 @@ public class QueryDiscountAction extends DispatchAction{
 			String pin = (String)request.getAttribute("pin");
 			
 			int i = 0;
-			for(Discount discount : DiscountDao.getPureAll(dbCon, StaffDao.getStaffById(Integer.parseInt(pin)))){
+			for(Discount discount : DiscountDao.getPureAll(dbCon, StaffDao.getById(Integer.parseInt(pin)))){
 				tsb.append(i > 0 ? "," : "");
 				tsb.append("{");
 				tsb.append("leaf:true");

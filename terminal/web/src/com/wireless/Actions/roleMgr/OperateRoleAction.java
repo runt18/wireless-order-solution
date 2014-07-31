@@ -37,7 +37,7 @@ public class OperateRoleAction extends DispatchAction{
 			InsertBuilder builder = new InsertBuilder(staff.getRestaurantId(), roleName);
 			
 			if(modelId != null && !modelId.trim().isEmpty()){
-				Role model = RoleDao.getRoleById(staff, Integer.parseInt(modelId));
+				Role model = RoleDao.getyById(staff, Integer.parseInt(modelId));
 				builder.getPrivileges().addAll(model.getPrivileges());
 			}
 
@@ -142,7 +142,7 @@ public class OperateRoleAction extends DispatchAction{
 		JObject jobject = new JObject();
 		try{
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
-			List<Staff> list = StaffDao.getStaffs(staff.getRestaurantId());
+			List<Staff> list = StaffDao.getByRestaurant(staff.getRestaurantId());
 			for (Staff s : list) {
 				if((s.getRole().getId()+"").equals(roleId)){
 					throw new BusinessException("删除失败, 此角色有员工在使用中");

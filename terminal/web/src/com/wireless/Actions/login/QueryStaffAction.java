@@ -76,14 +76,14 @@ public class QueryStaffAction extends Action {
 				extra.putJsonable("restaurant", restaurant, 0);
 			}else {
 				if(name != null && !name.trim().isEmpty()){
-					staffList = StaffDao.getStaffsByName(staff, name);
+					staffList = StaffDao.getByName(staff, name);
 				}else if(cate != null && !cate.trim().isEmpty()){
-					staffList = StaffDao.getStaffsByRoleId(staff, Integer.parseInt(cate));
+					staffList = StaffDao.getByRole(staff, Integer.parseInt(cate));
 				}else{
 					if(restaurantID == null){
 						restaurantID = (String) request.getSession().getAttribute("restaurantID");
 					}
-					staffList = StaffDao.getStaffs(Integer.parseInt(restaurantID));
+					staffList = StaffDao.getByRestaurant(Integer.parseInt(restaurantID));
 				}
 				Restaurant restaurant = RestaurantDao.getById(Integer.parseInt(restaurantID));
 				extra.putJsonable("restaurant", restaurant, 0);

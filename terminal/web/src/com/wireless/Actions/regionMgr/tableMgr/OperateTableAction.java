@@ -81,11 +81,9 @@ public class OperateTableAction extends DispatchAction{
 			String name = request.getParameter("name");
 			String regionId = request.getParameter("regionId"); 
 			String minimumCost = request.getParameter("minimumCost");
-			String serviceRate = request.getParameter("serviceRate");
 			
 			Table.UpdateBuilder builder = new Table.UpdateBuilder(Integer.valueOf(id)).setMiniCost(Integer.valueOf(minimumCost))
 					.setRegionId(Short.valueOf(regionId))
-					.setServiceRate(Float.valueOf(serviceRate))
 					.setTableName(name);
 			TableDao.updateById(StaffDao.verify(Integer.parseInt(pin)), builder.build());
 			jobject.initTip(true, "操作成功, 已修改餐台信息.");

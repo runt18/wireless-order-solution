@@ -40,7 +40,7 @@ public class WXQueryDeptAction extends DispatchAction{
 			String fid = request.getParameter("fid");
 			int rid = WeixinRestaurantDao.getRestaurantIdByWeixin(dbCon, fid);
 			
-			Staff staff = StaffDao.getStaffs(dbCon, rid).get(0);
+			Staff staff = StaffDao.getByRestaurant(dbCon, rid).get(0);
 			List<Department> depts = DepartmentDao.getByType(dbCon, staff, Department.Type.NORMAL);
 			List<Kitchen> kitchens = KitchenDao.getByType(dbCon, staff, Kitchen.Type.NORMAL);
 			
@@ -92,7 +92,7 @@ public class WXQueryDeptAction extends DispatchAction{
 			String fid = request.getParameter("fid");
 			int rid = WeixinRestaurantDao.getRestaurantIdByWeixin(dbCon, fid);
 			
-			Staff staff = StaffDao.getStaffs(dbCon, rid).get(0);
+			Staff staff = StaffDao.getByRestaurant(dbCon, rid).get(0);
 			DepartmentTree deptTree = new DepartmentTree.Builder(FoodDao.getPureFoods(staff)).build();
 			jobject.setRoot(deptTree.asKitchenList());
 			

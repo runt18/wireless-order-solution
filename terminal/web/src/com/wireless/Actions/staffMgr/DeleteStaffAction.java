@@ -22,8 +22,9 @@ public class DeleteStaffAction extends Action {
 		JObject jobject = new JObject();
 		try {
 			// get the query condition
+			String pin = (String)request.getAttribute("pin");
 			int staffId = Integer.parseInt(request.getParameter("staffId"));
-			StaffDao.deleteStaff(staffId);
+			StaffDao.delete(StaffDao.verify(Integer.parseInt(pin)), staffId);
 			jobject.initTip(true, "删除成功");
 
 		}  catch (SQLException e) {

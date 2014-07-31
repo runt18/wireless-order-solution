@@ -64,7 +64,7 @@ public class QueryRegionAction extends DispatchAction{
 		StringBuilder tsb = new StringBuilder();
 		try{
 			String pin = (String)request.getAttribute("pin");
-			Staff staff = StaffDao.getStaffById(Integer.parseInt(pin));
+			Staff staff = StaffDao.getById(Integer.parseInt(pin));
 			List<Region> list = RegionDao.getByStatus(staff, Region.Status.BUSY);
 			if(!list.isEmpty()){
 				tsb.append("[");

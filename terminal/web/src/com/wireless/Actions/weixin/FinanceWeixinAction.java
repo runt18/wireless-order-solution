@@ -247,7 +247,7 @@ public class FinanceWeixinAction extends Action {
 				
 				dbCon.rs.close();
 				
-				ShiftDetail detail = ShiftDao.getByRange(dbCon, StaffDao.getStaffs(dbCon, restaurantId).get(0), 
+				ShiftDetail detail = ShiftDao.getByRange(dbCon, StaffDao.getByRestaurant(dbCon, restaurantId).get(0), 
 													    new DutyRange(onDuty, offDuty), 
 														new CalcBillStatisticsDao.ExtraCond(DateType.HISTORY));
 				StringBuilder content = new StringBuilder();
@@ -356,7 +356,7 @@ public class FinanceWeixinAction extends Action {
 			c.add(Calendar.DAY_OF_MONTH, -4);
 			long beginDate = c.getTimeInMillis();
 			
-			List<IncomeByEachDay> incomes = CalcBillStatisticsDao.calcIncomeByEachDay(StaffDao.getStaffs(dbCon, restaurantId).get(0), 
+			List<IncomeByEachDay> incomes = CalcBillStatisticsDao.calcIncomeByEachDay(StaffDao.getByRestaurant(dbCon, restaurantId).get(0), 
 														new DutyRange(
 														DateUtil.format(beginDate, DateUtil.Pattern.DATE),
 														DateUtil.format(endDate, DateUtil.Pattern.DATE)),

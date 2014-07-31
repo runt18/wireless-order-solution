@@ -18,16 +18,14 @@ import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.staffMgr.Staff.UpdateBuilder;
 
 public class UpdateStaffAction extends Action {
-	public ActionForward execute(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
+	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 
 		JObject jobject = new JObject();
 		try {
-			// 解决后台中文传到前台乱码
-			
-
 			// get parameter
+			
+			String pin = (String)request.getAttribute("pin");
+			
 			String staffId = request.getParameter("staffId");
 			String staffName = request.getParameter("staffName");
 			String oldPwd = request.getParameter("oldPwd");
@@ -42,14 +40,13 @@ public class UpdateStaffAction extends Action {
 					throw new BusinessException(StaffError.VERIFY_PWD);
 				}
 			}
-			
-			UpdateBuilder builder = new UpdateBuilder(Integer.parseInt(staffId))
-			 .setStaffName(staffName)
-			 .setStaffPwd(staffPwd)
-			 .setMobile(tele)
-			 .setRoleId(Integer.parseInt(roleId));
 
-			StaffDao.updateStaff(builder);
+			StaffDao.update(StaffDao.verify(Integer.parseInt(pin)),
+							new UpdateBuilder(Integer.parseInt(staffId))
+			 						.setStaffName(staffName)
+			 						.setStaffPwd(staffPwd)
+			 						.setMobile(tele)
+			 						.setRoleId(Integer.parseInt(roleId)));
 			
 			jobject.initTip(true, "修改成功");
 			
