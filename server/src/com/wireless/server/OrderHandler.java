@@ -104,7 +104,7 @@ class OrderHandler implements Runnable{
 			}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.QUERY_STAFF){
 				//handle the query staff request
 				Device device = DeviceDao.getWorkingDeviceById(new Parcel(request.body).readParcel(Device.CREATOR).getDeviceId());
-				response = new RespPackage(request.header, StaffDao.getStaffs(device.getRestaurantId()), Staff.ST_PARCELABLE_COMPLEX);
+				response = new RespPackage(request.header, StaffDao.getByRestaurant(device.getRestaurantId()), Staff.ST_PARCELABLE_COMPLEX);
 				
 			}else{
 				
