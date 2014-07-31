@@ -228,6 +228,13 @@ INSERT INTO wireless_order_db.service_plan
 SELECT id, '免服务费', 2, 2
 FROM wireless_order_db.restaurant WHERE id > 10;
 
+-- -----------------------------------------------------
+-- Drop the field 'service_rate' & 'enabled' from table 'table'
+-- -----------------------------------------------------
+ALTER TABLE `wireless_order_db`.`table` 
+DROP COLUMN `service_rate`,
+DROP COLUMN `enabled`;
+
 SET SQL_SAFE_UPDATES = @OLD_SAFE_UPDATES;
 
 
