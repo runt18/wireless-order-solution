@@ -12,6 +12,7 @@ import com.wireless.db.serviceRate.ServicePlanDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
+import com.wireless.pojo.regionMgr.Region;
 import com.wireless.pojo.serviceRate.ServicePlan;
 import com.wireless.pojo.staffMgr.Staff;
 
@@ -143,5 +144,41 @@ public class OperateServicePlanAction extends DispatchAction{
 		
 		return null;
 	} 
+	
+	public ActionForward updateAllRate(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		JObject jobject = new JObject();
+		
+		try{
+			
+			String pin = (String)request.getAttribute("pin");
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			
+			String servicePlanId = request.getParameter("planId");
+			String rate = request.getParameter("rate");
+			
+			
+			ServicePlan.UpdateBuilder builder = new ServicePlan.UpdateBuilder(Integer.parseInt(servicePlanId));
+			
+			for (Region.RegionId region : Region.RegionId.values()) {
+				builder.addRate(region.getId(), Float.parseFloat(rate));
+			}
+			
+			ServicePlanDao.update(staff, builder);
+			
+			jobject.initTip(true, "操作成功, 已修改该方案下所有服务费率.");
+		
+		}catch(BusinessException e){
+			e.printStackTrace();
+			jobject.initTip(e);
+		}catch(Exception e){
+			e.printStackTrace();
+			jobject.initTip(e);
+		}finally{
+			response.getWriter().print(jobject.toString());
+		}
+		return null;
+	}	
 
 }

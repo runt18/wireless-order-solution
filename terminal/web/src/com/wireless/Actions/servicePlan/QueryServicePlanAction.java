@@ -66,7 +66,7 @@ public class QueryServicePlanAction extends DispatchAction{
 		JObject jobject = new JObject();
 		
 		try{
-			ServicePlan plan = ServicePlanDao.getById(StaffDao.verify(Integer.parseInt(pin)), Integer.parseInt(planId), ShowType.BY_PLAN);
+			ServicePlan plan = ServicePlanDao.getById(StaffDao.verify(Integer.parseInt(pin)), Integer.parseInt(planId), ShowType.BY_REGION);
 			
 			List<ServiceRate> rates = plan.getRates();	
 			

@@ -33,6 +33,7 @@ import com.wireless.db.billStatistics.CalcBillStatisticsDao.ExtraCond;
 import com.wireless.db.billStatistics.CalcCommissionStatisticsDao;
 import com.wireless.db.billStatistics.CalcDiscountStatisticsDao;
 import com.wireless.db.billStatistics.CalcRepaidStatisticsDao;
+import com.wireless.db.billStatistics.DutyRangeDao;
 import com.wireless.db.billStatistics.SaleDetailsDao;
 import com.wireless.db.client.member.MemberDao;
 import com.wireless.db.client.member.MemberOperationDao;
@@ -1035,7 +1036,11 @@ public class HistoryStatisticsAction extends DispatchAction{
 		//String restaurantID = request.getParameter("restaurantID");
 		String onDuty = request.getParameter("onDuty");
 		String offDuty = request.getParameter("offDuty");
-		//String queryPattern = request.getParameter("queryPattern");
+		
+		String opening = request.getParameter("opening");
+		String ending = request.getParameter("ending");
+		String region = request.getParameter("region");
+		
 		String dataType = request.getParameter("dataType");
 		
 		DateType dt = DateType.HISTORY;
@@ -1045,16 +1050,28 @@ public class HistoryStatisticsAction extends DispatchAction{
 		
 		response.addHeader("Content-Disposition","attachment;filename=" + new String(("营业汇总(" + dt.getDesc() + ").xls").getBytes("GBK"), "ISO8859_1"));
 		
-/*		Map<Object, Object> params = new HashMap<Object, Object>();
-		params.put(dt, dt.getValue());
-		params.put("pin", pin);
-		params.put("restaurantID", restaurantID);
-		params.put("onDuty", onDuty);
-		params.put("offDuty", offDuty);
-		params.put("queryPattern", queryPattern);*/
 		
 		Staff staff = StaffDao.verify(Integer.parseInt(pin));
-		ShiftDetail business = ShiftDao.getByRange(staff, new DutyRange(onDuty, offDuty), new CalcBillStatisticsDao.ExtraCond(DateType.HISTORY));
+		
+		ShiftDetail business;
+
+		CalcBillStatisticsDao.ExtraCond extraCond = new CalcBillStatisticsDao.ExtraCond(DateType.HISTORY); 
+		
+		if(opening != null && !opening.isEmpty()){
+			extraCond.setHourRange(new HourRange(opening, ending, DateUtil.Pattern.HOUR));
+		}
+		
+		if(region != null && !region.equals("-1")){
+			extraCond.setRegion(RegionId.valueOf(Integer.parseInt(region)));
+		}		
+		
+		DutyRange range = DutyRangeDao.exec(staff, onDuty, offDuty);
+		
+		if(range != null){
+			business = ShiftDao.getByRange(staff, range, extraCond);
+		}else{
+			business = new ShiftDetail(new DutyRange(onDuty, offDuty));
+		}		
 		
 		// 创建excel主页
 		HSSFWorkbook wb = new HSSFWorkbook();
