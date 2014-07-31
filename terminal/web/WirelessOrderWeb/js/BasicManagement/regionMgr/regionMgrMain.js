@@ -133,7 +133,7 @@ function updateRegionHandler(c){
 			modal : true,
 			closable : false,
 			resizeble : false,
-			width : 250,
+			width : 260,
 			items : [{
 				layout : 'form',
 				labelWidth : 60,
@@ -429,7 +429,7 @@ function initGrid(){
 			['区域', 'region.name'],
 			['餐台名称', 'name'],
 			['最低消费', 'minimumCost',,'right', 'Ext.ux.txtFormat.gridDou'],
-			['服务费率', 'serviceRate',,'right', 'Ext.ux.txtFormat.gridDou'],
+//			['服务费率', 'serviceRate',,'right', 'Ext.ux.txtFormat.gridDou'],
 //			['就餐人数', 'customNum',,'right'],
 			['餐台状态', 'statusText',,'center'],
 			['操作', 'operate', 200 ,'center', 'tableBasicGridOperateRenderer']
@@ -522,7 +522,7 @@ function initWin(){
 					minValue : 0,
 					value : 0
 				}, {
-					xtype : 'numberfield',
+					xtype : 'hidden',
 					id : 'numServiceRate',
 					fieldLabel : '服务费率',
 					allowBlank : false,

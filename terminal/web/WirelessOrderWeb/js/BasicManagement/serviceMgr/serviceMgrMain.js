@@ -52,7 +52,7 @@ function servicePlanOperationHandler(c){
 	}else if(c.type == dmObj.operation.update){
 		
 		var sn = Ext.ux.getSelNode(servicePlanTree);
-		if(!sn || sn.attributes.discountID == -1){
+		if(!sn || sn.attributes.planId == -1){
 			Ext.example.msg('提示', '请选中一个方案再进行操作.');
 			return;
 		}
@@ -69,9 +69,9 @@ function servicePlanOperationHandler(c){
 		addServicePlanWin.setTitle('修改方案');
 	}
 	
-	addServicePlanWin.operationType = c.type;
-	addServicePlanWin.center();
 	addServicePlanWin.show();
+	addServicePlanWin.center();
+	addServicePlanWin.operationType = c.type;
 };
 
 function serviceRateOperationHandler(c){
@@ -79,13 +79,13 @@ function serviceRateOperationHandler(c){
 		return;
 	}
 	
-	var region = Ext.getCmp('cboServiceRateRegion');
-	var rate = Ext.getCmp('numServiceRate');
+	var region = Ext.getCmp('hideServiceRateRegion');
+	var rate = Ext.getCmp('numSetServiceRate');
 	
 	var tempRoot = {root:[]};
-	for(var i = 0; i < programData.root.length; i++){
-		if(eval(programData.root[i].status != 2)){
-			tempRoot.root.push(programData.root[i]);
+	for(var i = 0; i < service_programData.root.length; i++){
+		if(eval(service_programData.root[i].status != 2)){
+			tempRoot.root.push(service_programData.root[i]);
 		}
 	}
 	
@@ -99,14 +99,15 @@ function serviceRateOperationHandler(c){
 		}
 		rate.setValue(sd['rate']);
 		region.setValue(sd['region']['id']);
-		serviceRate_addProgramWin.setTitle('修改服务费率');
+		serviceRate_addProgramWin.setTitle('修改服务费率--- ' + sd['region']['name']);
 	}
 	
 	rate.clearInvalid();
 	
-	serviceRate_addProgramWin.operationType = c.type;
-	serviceRate_addProgramWin.center();
 	serviceRate_addProgramWin.show();
+	serviceRate_addProgramWin.center();
+	serviceRate_addProgramWin.operationType = c.type;
+	rate.focus(true, 100);
 };
 
 function updateServiceRateOperationHandler(){
@@ -116,10 +117,6 @@ function updateServiceRateOperationHandler(){
 };
 
 
-function discountIsDefaultRenderer(val, md, record){
-	return eval(record.get('discount.status') == 1) ? '是' : '否';
-};
-
 function serviceRateOperationRenderer(){
 	return '<a href="javascript:updateServiceRateOperationHandler()">修改</a>';
 };
@@ -128,7 +125,7 @@ var servicePlanTree;
 var serviceRateGrid;
 var serviceRate_addProgramWin;
 var addServicePlanWin;
-var updateDiscountRateWin;
+var updateServiceRateWin;
 var servicePlan_obj = {treeId : 'servicePlan_tree', option : [{name:'修改', fn:"servicePlanOperationHandler({type:dmObj.operation.update})"},{name:'删除', fn:"deleteServicePlanHandler()"}]};
 Ext.onReady(function(){
 	
@@ -207,7 +204,7 @@ Ext.onReady(function(){
 							if(rn[i].attributes.status == 2){
 								rn[i].setText('<font color=\"red\">' + rn[i].attributes.planName + '&nbsp;(默认方案)</font>');
 							}
-							programData.root[i] = {
+							service_programData.root[i] = {
 								planId : rn[i].attributes.planId,
 								planName : rn[i].attributes.planName,
 								status : rn[i].attributes.status
@@ -251,12 +248,11 @@ Ext.onReady(function(){
 				});
 			}
 		},{
-			text : '添加',
-			iconCls : 'btn_add',
+			text : '一键修改服务费率',
+			iconCls : 'btn_edit_all',
 			handler : function(){
-				serviceRateOperationHandler({
-					type : dmObj.operation.insert
-				});
+				updateServiceRateWin.show();
+				Ext.getCmp('numUpdateAllRateByServicePlan').focus(true, 100);
 			}
 		}]
 	});
@@ -301,7 +297,7 @@ Ext.onReady(function(){
 			closable : false,
 			resizable : false,
 			modal : true,
-			width : 250,
+			width : 200,
 			items : [{
 				xtype : 'panel',
 			    layout : 'column',
@@ -315,50 +311,15 @@ Ext.onReady(function(){
 			    	columnWidth : 1,
 			    	labelWidth : 65,
 			    	items : [{
-						id : 'cboServiceRateRegion',
-						xtype : 'combo',
-						fieldLabel : '所属区域',
-						forceSelection : true,
-						width : 130,
-						store : new Ext.data.SimpleStore({
-							fields : ['value', 'text']
-						}),
-						valueField : 'value',
-						displayField : 'text',
-						typeAhead : true,
-						mode : 'local',
-						triggerAction : 'all',
-						selectOnFocus : true,
-						allowBlank : false,
-						listeners : {
-							render : function(thiz){
-								var data = [];
-								Ext.Ajax.request({
-									url : '../../QueryRegion.do',
-									params : {
-										dataSource : 'normal'
-									},									
-									success : function(res, opt){
-										var jr = Ext.decode(res.responseText);
-										for(var i = 0; i < jr.root.length; i++){
-											data.push([jr.root[i]['id'], jr.root[i]['name']]);
-										}
-										thiz.store.loadData(data);
-										thiz.setValue(jr.root[0]['id']);
-									},
-									fialure : function(res, opt){
-										thiz.store.loadData(data);
-									}
-								});
-							}
-						}					
+						id : 'hideServiceRateRegion',
+						xtype : 'hidden'				
 			    	}]
 			    },{
-			    	columnWidth : 0.55,
+			    	columnWidth : 0.7,
 			    	labelWidth : 65,
 			    	items : [{
 						xtype : 'numberfield',
-						id : 'numServiceRate',
+						id : 'numSetServiceRate',
 						width : 50,
 						style : 'text-align:right;',
 						fieldLabel : '服务费率'
@@ -380,8 +341,8 @@ Ext.onReady(function(){
 					var sn = servicePlanTree.getSelectionModel().getSelectedNode();
 					var planId = sn.attributes.planId;
 					
-					var region = Ext.getCmp('cboServiceRateRegion');
-					var rate = Ext.getCmp('numServiceRate').getValue();
+					var region = Ext.getCmp('hideServiceRateRegion');
+					var rate = Ext.getCmp('numSetServiceRate').getValue();
 					
 					//判断是否有效
 					if(!region.isValid()){
@@ -432,7 +393,7 @@ Ext.onReady(function(){
 			}],
 			listeners : {
 				show : function(){
-					Ext.getCmp('numServiceRate').clearInvalid();
+					Ext.getCmp('numSetServiceRate').clearInvalid();
 				}
 			},
 			keys : [{
@@ -443,7 +404,6 @@ Ext.onReady(function(){
 				 scope : this 
 			 }]
 		});
-		serviceRate_addProgramWin.render(document.body);
 	}
 	
 	if(!addServicePlanWin){
@@ -559,8 +519,153 @@ Ext.onReady(function(){
 				 scope : this 
 			 }]
 		});
-		addServicePlanWin.render(document.body);
 	}
-	
+	updateServiceRateWin = new Ext.Window({
+		title : '一键修改服务费率',
+		closable : false,
+		resizable : false,
+		modal : true,
+		width : 250,
+		items : [{
+				xtype : 'panel',
+			    layout : 'column',
+			    frame : true,
+			    defaults : {
+			    	xtype : 'panel',
+			    	layout : 'form'
+			    	
+			    },
+			    items : [{
+			    	columnWidth : 1,
+			    	labelWidth : 65,
+			    	items : [{
+			    	    xtype : 'combo',
+			    	    id : 'comboUpdateAllRateByService',
+			    	    fieldLabel : '方案名称',
+			    	    width : 130,
+			    	    store : new Ext.data.JsonStore({
+			    	    	root : 'root',
+							fields : [ 'planId', 'planName' ]
+						}),
+						valueField : 'planId',
+						displayField : 'planName',
+						mode : 'local',
+						triggerAction : 'all',
+						typeAhead : true,
+						selectOnFocus : true,
+						forceSelection : true,
+						allowBlank : false,
+						readOnly : false
+			    	}]
+			    },{
+			    	columnWidth : 0.55,
+			    	labelWidth : 65,
+			    	items : [{
+						xtype : 'numberfield',
+						id : 'numUpdateAllRateByServicePlan',
+						width : 50,
+						style : 'text-align:right;',
+						fieldLabel : '服务费率'
+			    	}]
+			    },{
+			    	columnWidth : 0.2,
+			    	style : 'color:#15428B;vertical-align: middle;margin-top:4px;',
+			    	html : '%'
+			    }]
+			}],
+		bbar : [ '->', {
+			text : '保存',
+			id : 'btnSaveUpdateServicePlanRate',
+			iconCls : 'btn_save',
+			handler : function(e){
+				var servicePlan = Ext.getCmp('comboUpdateAllRateByService');
+				var rate = Ext.getCmp('numUpdateAllRateByServicePlan');
+				
+				if(!servicePlan.isValid()){
+					return;
+				}
+				
+				Ext.Msg.confirm(
+					'提示', 
+					'是否将服务方案"<font color="red">'+servicePlan.getRawValue()+'</font>"下所有区域服务率修改为"<font color="red"> '+rate.getValue()+'% </font>"?',
+					function(e){
+						if(e == 'yes'){
+							var save = Ext.getCmp('btnSaveUpdateServicePlanRate');
+							var cancel = Ext.getCmp('btnCancelUpdateServicePlanRate');
+							
+							save.setDisabled(true);
+							cancel.setDisabled(true);
+							
+							Ext.Ajax.request({
+								url : '../../OperateServicePlan.do',
+								params : {
+									dataSource : 'updateAllRate',
+									planId : servicePlan.getValue(),
+									rate : (rate.getValue() == ''? 0 : rate.getValue()/100)
+								},
+								success : function(res, opt){
+									var jr = Ext.util.JSON.decode(res.responseText);
+									if(jr.success){
+										updateServiceRateWin.hide();
+										Ext.example.msg(jr.title, jr.msg);
+										var treeRoot = servicePlanTree.getRootNode().childNodes;
+										for(var i = 0; i < treeRoot.length; i++){
+											if(treeRoot[i].attributes.planId  == servicePlan.getValue()){
+												treeRoot[i].select();
+												treeRoot[i].fireEvent('click', treeRoot[i]);
+												break;
+											}
+										}
+									}else{
+										Ext.ux.showMsg(jr);
+									}
+									save.setDisabled(false);
+									cancel.setDisabled(false);
+								},
+								failure : function(res, opt){
+									Ext.ux.showMsg(Ext.util.JSON.decode(res.responseText));
+									save.setDisabled(false);
+									cancel.setDisabled(false);
+								}
+							});
+						}
+					}
+				);
+			}
+		}, {
+			text : '关闭',
+			id : 'btnCancelUpdateServicePlanRate',
+			iconCls : 'btn_close',
+			handler : function(e){
+				updateServiceRateWin.hide();
+			}
+		}],
+		listeners : {
+			show : function(){
+				var servicePlan = Ext.getCmp('comboUpdateAllRateByService');
+//				rate.setValue(1.00);
+//				var tempRoot = {root:[]};
+//				for(var i = 0; i < service_programData.root.length; i++){
+//					tempRoot.root.push(service_programData.root[i]);
+//				}
+				servicePlan.store.loadData(service_programData);
+				
+				var node = Ext.ux.getSelNode(servicePlanTree);
+				if(node){
+					servicePlan.setValue(node.attributes.planId);
+				}else{
+					servicePlan.setValue();
+				}
+				servicePlan.clearInvalid();
+			}
+		},
+		keys : [{
+			 key : Ext.EventObject.ENTER,
+			 fn : function(){ 
+				 Ext.getCmp('btnSaveUpdateServicePlanRate').handler();
+			 },
+			 scope : this 
+		 }]
+	});	
 	showFloatOption(servicePlan_obj);	
 });

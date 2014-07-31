@@ -109,12 +109,20 @@ function loadSystemSetting(_c){
 			if (jr.success == true) {
 				restaurantData = jr.other.systemSetting;
 				if(restaurantData.setting.eraseQuota > 0){
+					
+					$('#trEraseQuota').show();
 					Ext.getDom('div_showEraseQuota').style.display = 'block';
 					Ext.getDom('font_showEraseQuota').innerHTML = parseFloat(restaurantData.setting.eraseQuota).toFixed(2);
 				}else{
+//					Ext.getDom('trEraseQuota').style.display = 'none';
 					Ext.getDom('div_showEraseQuota').style.display = 'none';
 					Ext.getDom('font_showEraseQuota').innerHTML = '';
+					
 				}
+				var pheight = $('#divWestPayOrderGeneral').parent().height();
+				var sheight = $('#divWestPayOrderGeneral').height();
+				
+				$('#btnCheckOutBack').css('margin-top', (pheight - sheight)+'px');				
 			} else {
 				jr.success = true;
 				Ext.ux.showMsg(jr);

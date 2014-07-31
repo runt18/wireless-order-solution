@@ -384,14 +384,20 @@ Ext.onReady(function(){
 			if(!businessSub_beginDate.isValid() || !businessSub_endDate.isValid()){
 					return;
 			}
-			var url = '../../{0}?dataSource={1}&onDuty={2}&offDuty={3}&dataType={4}';
+			var data = Ext.ux.statistic_oBusinessHourData({type : 'get', statistic : 'businessSub_'}).data;
+			var region = Ext.getCmp('businessSub_comboRegion');
+			
+			var url = '../../{0}?dataSource={1}&onDuty={2}&offDuty={3}&dataType={4}&opening={5}&ending={6}&region={7}';
 			url = String.format(
 					url, 
 					'ExportHistoryStatisticsToExecl.do', 
 					'business',
 					businessSub_beginDate.getValue().format('Y-m-d 00:00:00'),
 					businessSub_endDate.getValue().format('Y-m-d 23:59:59'),
-					'history'
+					'history',
+					data.opening,
+					data.ending,
+					region.getValue()
 				);
 			window.location = url;
 		}

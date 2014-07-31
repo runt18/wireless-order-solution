@@ -23,6 +23,7 @@ var checkOutMainPanelTbar = new Ext.Toolbar({
 		id : 'comboDiscount',
 		labelStyle : 'font-size:14px;font-weight:bold;',
 		readOnly : false,
+		width : 120,
 		forceSelection : true,
 		store : new Ext.data.JsonStore({
 			root : 'root',
@@ -89,12 +90,6 @@ var checkOutMainPanelTbar = new Ext.Toolbar({
 				loadTableData();
 			}
 		}
-	}, '->', {
-		text : '返回',
-		handler : function(){
-			location.href = 'TableSelect.html';
-		}
-		
 	}]
 });
 
@@ -240,11 +235,18 @@ function orderCountFormat(v, m, r, ri, ci, s){
 	return v;
 }
 
+function fnFoodNameFormat(v, m, r, ri, ci, s){
+	if(Ext.ux.cfs.isWeigh(r.get('status'))){
+		v = '<font style="color:green; font-size:18px;font-weight:bold">' + v + '&nbsp;</font>'+'[称重确认]';
+	}
+	return v;
+}
+
 Ext.onReady(function() {
 	initMainView(
 		new Ext.Panel({
 			region : 'west',
-			width : 360,
+			width : 400,
 			frame : true,
 			title : '收款',
 			contentEl : 'divWestPayOrderGeneral'
@@ -285,7 +287,7 @@ Ext.onReady(function() {
 		    '',
 		    [
 			    [true, false, false, false], 
-			    ['菜名', 'displayFoodName', 220] , 
+			    ['菜名', 'displayFoodName', 220,,'fnFoodNameFormat'] , 
 			    ['口味', 'tasteGroup.tastePref', 130] , 
 			    ['口味价钱', 'tasteGroup.tastePrice', 80, 'right', 'Ext.ux.txtFormat.gridDou'],
 			    ['数量', 'count', 70, 'right', 'orderCountFormat'],
@@ -307,22 +309,12 @@ Ext.onReady(function() {
 				for(var i = 0; i < records.length; i++){
 					Ext.ux.formatFoodName(records[i], 'displayFoodName', 'name', 1);
 					if(Ext.ux.cfs.isWeigh(records[i].get('status'))){
-						checkOutGrid.getView().getRow(i).style.backgroundColor = 'Pink';
+						checkOutGrid.getView().getRow(i).style.backgroundColor = 'SkyBlue';
 					}
 						
 				}				
 			}
 		});
-		checkOutGrid.on('afterrender', function(){
-			
-//               var elments = Ext.select(".x-grid3-row");//.x-grid3-hd   
-//               console.log(elments.length)
-//                elments.each(function(el) {   
-//                           el.setStyle("font-size", '30px');// 设置不同的颜色  
-//                        }, this) ; 
-                        
-//               alert($('.x-grid3-row').length);
-         });
 		
 		
 		// 加载界面
@@ -351,18 +343,9 @@ Ext.onReady(function() {
 	}]);
 	Ext.ux.checkSmStat();
 	
-
 });
 
 function setFormButtonStatus(_s){
-//	checkOutForm.buttons[0].setDisabled(_s);
-//	checkOutForm.buttons[1].setDisabled(_s);
-//	checkOutForm.buttons[2].setDisabled(_s);
-//	checkOutForm.buttons[3].setDisabled(_s);
-//	checkOutForm.buttons[4].setDisabled(_s);
-//	checkOutForm.buttons[5].setDisabled(_s);
-//	checkOutForm.buttons[6].setDisabled(_s);
-//	checkOutForm.buttons[7].setDisabled(_s);
 	var $testDoc = $('#divWestPayOrderGeneral input[type=button]');
 	for (var i = 0; i < $testDoc.length; i++) {
 		if(_s){
@@ -372,7 +355,6 @@ function setFormButtonStatus(_s){
 		}
 		
 	}
-//	$('#divWestPayOrderGeneral input[type=button]')[0].setAttribute('disabled', 'disabled');
 	
 	var btnSave = Ext.getCmp('btnSaveForConfirmCashPayWin');
 	if(btnSave) btnSave.setDisabled(_s);
