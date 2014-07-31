@@ -369,22 +369,22 @@ showCancelFoodDetail = function(){
 			}
 		});
 		
-		grid.getStore().on('load', function(store){
-			var count = store.getCount();
-			if(count > 0){
-				var sumRow = grid.getView().getRow(count - 1);
-				sumRow.style.backgroundColor = '#EEEEEE';
-				sumRow.style.color = 'green';
-				for(var i = 0; i < grid.getColumnModel().getColumnCount(); i++){
-					if(i == 0 || 3 || 4){
-						var item = grid.getView().getCell(count-1, i);
-						item.style.fontSize = '15px';
-						item.style.fontWeight = 'bold';
-						item = null;
-					}
-				}
-			}
-		});
+//		grid.getStore().on('load', function(store){
+//			var count = store.getCount();
+//			if(count > 0){
+//				var sumRow = grid.getView().getRow(count - 1);
+//				sumRow.style.backgroundColor = '#EEEEEE';
+//				sumRow.style.color = 'green';
+//				for(var i = 0; i < grid.getColumnModel().getColumnCount(); i++){
+//					if(i == 0 || 3 || 4){
+//						var item = grid.getView().getCell(count-1, i);
+//						item.style.fontSize = '15px';
+//						item.style.fontWeight = 'bold';
+//						item = null;
+//					}
+//				}
+//			}
+//		});
 	}
 	showCancelFoodDetailWin.show();
 };
