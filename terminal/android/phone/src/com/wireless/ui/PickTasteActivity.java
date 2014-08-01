@@ -179,7 +179,7 @@ public class PickTasteActivity extends FragmentActivity  implements OnTastePicke
 		//品注Button
 		if(getIntent().getBooleanExtra(PICK_ALL_ORDER_TASTE, false)){
 			//全单备注下不显示品注
-			((ImageButton)findViewById(R.id.imgButton_pinzhu_pickTaste)).setVisibility(View.GONE);
+			((ImageButton)findViewById(R.id.imgButton_pinzhu_pickTaste)).setEnabled(false);
 		}else {
 			((ImageButton)findViewById(R.id.imgButton_pinzhu_pickTaste)).setOnClickListener(new View.OnClickListener() {			
 				@Override

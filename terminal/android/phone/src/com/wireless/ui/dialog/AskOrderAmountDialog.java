@@ -389,14 +389,14 @@ public class AskOrderAmountDialog extends DialogFragment {
 
 		scrollLayout.setOnViewChangedListener(new OnViewChangedListener() {
 			
-			Handler waitHandler = new Handler();
-			Runnable refreshRunnable = new Runnable() {
-				@Override
-				public void run() {
-					//刷新数据
-					mRefreshHandler.sendEmptyMessage(REFRESH_EXCEPT_GRID);					
-				}
-			};
+//			Handler waitHandler = new Handler();
+//			Runnable refreshRunnable = new Runnable() {
+//				@Override
+//				public void run() {
+//					//刷新数据
+//					mRefreshHandler.sendEmptyMessage(REFRESH_EXCEPT_GRID);					
+//				}
+//			};
 			
 			@Override
 			public void onViewChanged(int curScreen, View parent, View curView) {
@@ -404,8 +404,9 @@ public class AskOrderAmountDialog extends DialogFragment {
 				mCurrentTasteView = curView;
 				mCurrentTasteView.setTag(R.id.combo_of_index, Integer.valueOf(curScreen));
 				
-				waitHandler.removeCallbacks(refreshRunnable);
-				waitHandler.postDelayed(refreshRunnable, 100);
+//				waitHandler.removeCallbacks(refreshRunnable);
+//				waitHandler.postDelayed(refreshRunnable, 100);
+				mRefreshHandler.sendEmptyMessage(REFRESH_EXCEPT_GRID);	
 			}
 		});
 
