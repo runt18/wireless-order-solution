@@ -36,7 +36,7 @@ public class QueryDiscountAction extends DispatchAction{
 		JObject jobject = new JObject();
 		try{
 			Staff staff = StaffDao.verify(Integer.parseInt((String) request.getAttribute("pin")));
-			Role role = new Role(Integer.valueOf(request.getParameter("roleId")));
+			Role role = new Role(Integer.valueOf(staff.getRole().getId()));
 			List<Discount> root = DiscountDao.getByRole(staff, role);
 			jobject.setRoot(root);
 			jobject.setTotalProperty(root.size());

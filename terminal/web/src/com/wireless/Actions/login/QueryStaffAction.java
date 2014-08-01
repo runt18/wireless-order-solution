@@ -66,14 +66,14 @@ public class QueryStaffAction extends Action {
 				staff = StaffDao.verify(Integer.parseInt(pin));
 			}
 			if(isName != null){
-				extra.putJsonable("staff", staff, 0);
+				extra.putJsonable("staff", staff, 1);
 				Restaurant restaurant;
 				if(request.getSession().getAttribute("restaurantID") == null){
 					restaurant = new Restaurant();
 				}else{
 					restaurant = RestaurantDao.getById(Integer.parseInt((String) request.getSession().getAttribute("restaurantID")));
 				}
-				extra.putJsonable("restaurant", restaurant, 0);
+				extra.putJsonable("restaurant", restaurant, 1);
 			}else {
 				if(name != null && !name.trim().isEmpty()){
 					staffList = StaffDao.getByName(staff, name);
@@ -88,6 +88,11 @@ public class QueryStaffAction extends Action {
 					}
 					
 					staffList = StaffDao.getByCond(staff, extraCond);
+					
+					if(staffList.contains(staff)){
+						extra.putBoolean("havePrivileges", true);
+						staffList.clear();
+					}
 				}else{
 					if(restaurantID == null){
 						restaurantID = (String) request.getSession().getAttribute("restaurantID");
