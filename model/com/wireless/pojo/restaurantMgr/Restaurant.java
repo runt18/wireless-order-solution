@@ -530,27 +530,31 @@ public class Restaurant implements Parcelable, Jsonable{
 		jm.putInt("id", this.id);
 		jm.putString("account", this.account);
 		jm.putString("name", this.restaurantName);
-		jm.putString("info", this.restaurantInfo);
-		jm.putString("tele1", this.tele1);
-		jm.putString("tele2", this.tele2);
-		jm.putString("address", this.address);
-		jm.putFloat("liveness", this.liveness);
-		jm.putJsonableList("modules", this.modules, 0);
-		if(this.modules.size() > 0){
-			moduleDescs = "";
-			for (Module module : this.modules) {
-				if(moduleDescs == ""){
-					moduleDescs += module.getCode().getDesc();
-				}else{
-					moduleDescs += ("，" + module.getCode().getDesc());
+		
+		if(flag == RESTAURANT_PARCELABLE_COMPLEX){
+			jm.putString("info", this.restaurantInfo);
+			jm.putString("tele1", this.tele1);
+			jm.putString("tele2", this.tele2);
+			jm.putString("address", this.address);
+			jm.putFloat("liveness", this.liveness);
+			jm.putJsonableList("modules", this.modules, 0);
+			if(this.modules.size() > 0){
+				moduleDescs = "";
+				for (Module module : this.modules) {
+					if(moduleDescs == ""){
+						moduleDescs += module.getCode().getDesc();
+					}else{
+						moduleDescs += ("，" + module.getCode().getDesc());
+					}
 				}
 			}
+			jm.putString("moduleDescs", moduleDescs);
+			jm.putInt("recordAliveValue", RecordAlive.valueOfSeconds(this.recordAlive).getVal());
+			jm.putString("recordAliveText", RecordAlive.valueOfSeconds(this.recordAlive).getDesc());
+			jm.putString("birthDate", DateUtil.formatToDate(this.birthDate));
+			jm.putString("expireDate", DateUtil.formatToDate(this.expireDate));
 		}
-		jm.putString("moduleDescs", moduleDescs);
-		jm.putInt("recordAliveValue", RecordAlive.valueOfSeconds(this.recordAlive).getVal());
-		jm.putString("recordAliveText", RecordAlive.valueOfSeconds(this.recordAlive).getDesc());
-		jm.putString("birthDate", DateUtil.formatToDate(this.birthDate));
-		jm.putString("expireDate", DateUtil.formatToDate(this.expireDate));
+
 		return jm;
 	}
 

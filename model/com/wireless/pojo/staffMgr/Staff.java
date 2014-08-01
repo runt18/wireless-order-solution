@@ -355,13 +355,20 @@ public class Staff implements Parcelable, Jsonable{
 	public JsonMap toJsonMap(int flag) {
 		JsonMap jm = new JsonMap();
 		jm.putInt("staffID", this.getId());
-		jm.putString("staffName", this.getName());
-		jm.putInt("restaurantId", this.getRestaurantId());
-		jm.putString("mobile", this.getMobile());
-		jm.putInt("typeValue", this.getType().getVal());
-		jm.putString("typeText", this.getType().getDesc());
-		jm.putJsonable("role", this.getRole(), flag);
-		jm.putString("roleName", this.getRole() != null ? this.getRole().getName() : "未知");
+		jm.putString("staffName", this.getName());		
+		if(flag == ST_PARCELABLE_COMPLEX){
+			jm.putInt("restaurantId", this.getRestaurantId());
+			jm.putString("mobile", this.getMobile());
+			jm.putInt("typeValue", this.getType().getVal());
+			jm.putString("typeText", this.getType().getDesc());
+			jm.putJsonable("role", this.getRole(), flag);
+			jm.putString("roleName", this.getRole() != null ? this.getRole().getName() : "未知");
+		}
+
+
+		
+		
+		
 		//jm.put("staffPassword", this.getPwd());
 		return jm;
 	}
