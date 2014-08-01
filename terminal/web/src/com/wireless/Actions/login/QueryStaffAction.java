@@ -21,6 +21,7 @@ import com.wireless.json.JObject;
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.pojo.restaurantMgr.Restaurant;
+import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.util.DataPaging;
 
@@ -34,8 +35,7 @@ public class QueryStaffAction extends Action {
 		String isName =request.getParameter("isName");
 		String name = request.getParameter("name");
 		String cate = request.getParameter("cate");
-		String privilege = request.getParameter("privilege");
-		int flag = 0;
+		String privileges = request.getParameter("privileges");
 		
 		JObject jobject = new JObject();
 		List<Staff> staffList = new ArrayList<Staff>();
@@ -66,7 +66,7 @@ public class QueryStaffAction extends Action {
 				staff = StaffDao.verify(Integer.parseInt(pin));
 			}
 			if(isName != null){
-				extra.putJsonable("staff", staff, 1);
+				extra.putJsonable("staff", staff, 0);
 				Restaurant restaurant;
 				if(request.getSession().getAttribute("restaurantID") == null){
 					restaurant = new Restaurant();
@@ -79,14 +79,25 @@ public class QueryStaffAction extends Action {
 					staffList = StaffDao.getByName(staff, name);
 				}else if(cate != null && !cate.trim().isEmpty()){
 					staffList = StaffDao.getByRole(staff, Integer.parseInt(cate));
+				}else if(privileges != null && !privileges.isEmpty()){
+					String privilegeCodes[] = privileges.split(",");
+					StaffDao.ExtraCond extraCond = new StaffDao.ExtraCond();
+					
+					for (String pc : privilegeCodes) {
+						extraCond.addPrivilegeCode(Privilege.Code.valueOf(Integer.parseInt(pc)));
+					}
+					
+					staffList = StaffDao.getByCond(staff, extraCond);
 				}else{
 					if(restaurantID == null){
 						restaurantID = (String) request.getSession().getAttribute("restaurantID");
 					}
 					staffList = StaffDao.getByRestaurant(Integer.parseInt(restaurantID));
 				}
-				Restaurant restaurant = RestaurantDao.getById(Integer.parseInt(restaurantID));
-				extra.putJsonable("restaurant", restaurant, 0);
+				if(restaurantID != null){
+					Restaurant restaurant = RestaurantDao.getById(Integer.parseInt(restaurantID));
+					extra.putJsonable("restaurant", restaurant, 0);					
+				}
 				jobject.setTotalProperty(staffList.size());
 				staffList = DataPaging.getPagingData(staffList, isPaging, index, pageSize);
 				jobject.setRoot(staffList);
@@ -119,10 +130,7 @@ public class QueryStaffAction extends Action {
 				}
 				
 			});
-			if(privilege != null){
-				flag = 1;
-			}
-			out.write(jobject.toString(flag));
+			out.write(jobject.toString());
 		}
 
 		return null;
