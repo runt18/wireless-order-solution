@@ -57,21 +57,12 @@
 		type : 'post',
 		async:false,
 		data : {
-			"type" : 0,
-			"isPaging" : false,
-			"isName" : true
+			"privileges" : 1003
 		},
 		success : function(jr, status, xhr){
 			if(jr.success){
-				if(jr.other.staff != null){
-					for (var index = 0; index < jr.other.staff.role.privileges.length; index++) {
-						var temp = jr.other.staff.role.privileges[index];
-						if(temp.codeValue == 1003){
-							Ext.ux.staffGift = true;
-							temp = null;
-							break;
-						}
-					}
+				if(jr.other.havePrivileges != null){
+					Ext.ux.staffGift = true;
 				}
 			}else{
 				jr.icon = Ext.MessageBox.OK;

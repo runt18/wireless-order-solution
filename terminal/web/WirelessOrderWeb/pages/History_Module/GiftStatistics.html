@@ -3,6 +3,11 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>Insert title here</title>
+<style type="text/css">
+#divGiftStaffChartChange span, #divGiftDeptChartChange span{
+	cursor: pointer;
+}
+</style>
 <script type="text/javascript">
 	var grid_giftStatistics, giftViewBillWin;
 </script>
@@ -14,24 +19,26 @@
 <div id="divGiftDetailChart" data-type="giftChart" data-value="gift_detailChart" style="height : 400px;"></div>
 
 <div id="divGiftStaffCharts" >
-	<div id="divGiftStaffChartChange" style="display:none;padding-top: 3px;">
-		&nbsp;&nbsp;<input type="radio" name="staffChange" checked="checked" onclick="fnChangeStaffChart(1)" />按数量显示 &nbsp;&nbsp;&nbsp;<input type="radio" name="staffChange" onclick="fnChangeStaffChart(0)" />按金额显示 
+	<div id="divGiftStaffChartChange" style="display:none;padding-top: 10px;">
+		&nbsp;&nbsp;<span onclick="fnChangeStaffChart('staffChartCount',1)"><input id="staffChartCount" type="radio" name="staffChange" checked="checked"  />按数量显示</span> &nbsp;&nbsp;&nbsp;
+		<span onclick="fnChangeStaffChart('staffChartPrice',0)"><input id="staffChartPrice" type="radio" name="staffChange"  />按金额显示</span> 
 	</div>
 	<div>
-		<div id="divGiftStaffAmountPieChart" data-type="giftChart" data-value="gift_staffPieChart" style="height : 300px;display:none;width:50%;float:left;"></div>
-		<div id="divGiftStaffAmountColumnChart" data-type="giftChart" data-value="gift_staffColumnChart" style="height : 300px;display:none;width:50%;float:left;"></div>
+		<div id="divGiftStaffAmountPieChart" data-type="giftChart" data-value="gift_staffPieChart" style="height : 300px;display:none;width:40%;float:left;"></div>
+		<div id="divGiftStaffAmountColumnChart" data-type="giftChart" data-value="gift_staffColumnChart" style="height : 300px;display:none;width:60%;float:left;"></div>
 	</div>
 	
 </div>
 
 <div id="divGiftDeptCharts" >
-	<div id="divGiftDeptChartChange" style="display:none;padding-top: 3px;">
+	<div id="divGiftDeptChartChange" style="display:none;padding-top: 10px;">
 		<!-- <a id="linkToChangeDeptChart" href="#" class="changeChart">查看数量比例图</a> -->
-		&nbsp;&nbsp;<input type="radio" name="deptChange" checked="checked" onclick="fnChangeDeptChart(0)" />按金额显示 &nbsp;&nbsp;&nbsp;<input type="radio" name="deptChange" onclick="fnChangeDeptChart(1)" />按数量显示  
+		&nbsp;&nbsp;<span onclick="fnChangeDeptChart('deptChartCount',0)"><input id="deptChartCount" type="radio" name="deptChange" checked="checked"  />按金额显示</span> &nbsp;&nbsp;&nbsp;
+		<span onclick="fnChangeDeptChart('deptChartPrice',1)"><input id="deptChartPrice" type="radio" name="deptChange"  />按数量显示</span>  
 	</div>
 	<div>
-		<div id="divGiftDeptPieChart" data-type="giftChart" data-value="gift_deptPieChart" style="height : 300px;display:none;width:50%;float:left;"></div>
-		<div id="divGiftDeptColumnChart" data-type="giftChart" data-value="gift_deptColumnChart" style="height : 300px;display:none;width:50%;float:left;"></div>
+		<div id="divGiftDeptPieChart" data-type="giftChart" data-value="gift_deptPieChart" style="height : 300px;display:none;width:40%;float:left;"></div>
+		<div id="divGiftDeptColumnChart" data-type="giftChart" data-value="gift_deptColumnChart" style="height : 300px;display:none;width:60%;float:left;"></div>
 	</div>
 </div>
 
