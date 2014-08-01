@@ -212,6 +212,7 @@ function checkOutListRefresh(){
  * 
  */
 function memberPay(){
+	Ext.ux.checkSmStat();
 	var bindMemberWin = Ext.getCmp('co_bindMemberWin');
 	if(!bindMemberWin){
 		bindMemberWin = new Ext.Window({

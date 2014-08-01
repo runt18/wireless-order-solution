@@ -322,12 +322,6 @@ Ext.onReady(function() {
 		checkOutMainPanel.doLayout();
 	}
 	
-	if(Ext.ux.getCookie(document.domain+'_calcReturn') == 'true'){
-		Ext.getDom('chkCalcReturn').checked = true;
-	}else{
-		Ext.getDom('chkCalcReturn').checked = false;
-	}	
-	
 	new Ext.KeyMap(document.body, [{
 		key: 107,
 		scope : this,
@@ -341,7 +335,7 @@ Ext.onReady(function() {
 			paySubmit(6);
 		}
 	}]);
-	Ext.ux.checkSmStat();
+//	Ext.ux.checkSmStat();
 	
 });
 

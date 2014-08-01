@@ -153,17 +153,11 @@ function initGiftStatisticsGrid(){
 				var data = [[-1,'全部']];
 				Ext.Ajax.request({
 					url : '../../QueryStaff.do',
-					params : {privilege : 'true'},
+					params : {privileges : '1003'},
 					success : function(res, opt){
 						var jr = Ext.decode(res.responseText);
 						for(var i = 0; i < jr.root.length; i++){
-							var temp = jr.root[i]['role']['privileges'];
-							for (var j = 0; j < temp.length; j++) {
-								if(temp[j]['codeValue'] == 1003){
-									data.push([jr.root[i]['staffID'], jr.root[i]['staffName']]);
-									break;
-								}
-							}
+							data.push([jr.root[i]['staffID'], jr.root[i]['staffName']]);
 						}
 						thiz.store.loadData(data);
 						thiz.setValue(-1);

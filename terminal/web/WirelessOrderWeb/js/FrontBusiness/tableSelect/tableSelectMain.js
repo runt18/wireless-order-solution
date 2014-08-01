@@ -173,7 +173,7 @@ var btnPayOrderGroup = new Ext.ux.ImageButton({
 
 
 var bindWeixinMember = new Ext.ux.ImageButton({
-	imgPath : "",
+	imgPath : "../../images/weixinFrontBand.png",
 	imgWidth : 50,
 	imgHeight : 50,
 	tooltip : "微信绑定",

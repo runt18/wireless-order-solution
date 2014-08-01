@@ -157,14 +157,33 @@ Ext.ux.smsModule = false;
 Ext.ux.staffGift = false;
 Ext.ux.smsCount = 0;
 Ext.ux.checkSmStat = function(){
-	Ext.Ajax.request({
-		url : "../../QueryModule.do",
-		params : {
+//	Ext.Ajax.request({
+//		url : "../../QueryModule.do",
+//		params : {
+//			dataSource : 'checkModule',
+//			code : 4000
+//		},
+//		success : function(res, opt){
+//			var jr = Ext.decode(res.responseText);
+//			if(jr.success){
+//				Ext.ux.smsModule = true;
+//				Ext.ux.smsCount = jr.code;
+//			}else{
+//				Ext.ux.smsModule = false;
+//			}
+//		},
+//		failure : function(res, opt){
+//		}
+//	});
+	$.ajax({
+		url : '../../QueryModule.do',
+		type : 'post',
+		async:false,
+		data : {
 			dataSource : 'checkModule',
 			code : 4000
 		},
-		success : function(res, opt){
-			var jr = Ext.decode(res.responseText);
+		success : function(jr, status, xhr){
 			if(jr.success){
 				Ext.ux.smsModule = true;
 				Ext.ux.smsCount = jr.code;
@@ -172,9 +191,10 @@ Ext.ux.checkSmStat = function(){
 				Ext.ux.smsModule = false;
 			}
 		},
-		failure : function(res, opt){
+		error : function(request, status, err){
+			alert(request.msg);
 		}
-	});
+	}); 	
 };
 Ext.ux.getCookie = function(cookieName) {
 	var result = "";

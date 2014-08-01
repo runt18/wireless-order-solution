@@ -59,9 +59,9 @@ function loadOrderBasicMsg(){
 //	var actualCount = document.getElementById("actualCount").value;
 	document.getElementById("totalCount").innerHTML = checkDot(orderMsg.totalPrice)?parseFloat(orderMsg.totalPrice).toFixed(2) : orderMsg.totalPrice;
 	document.getElementById("shouldPay").innerHTML = checkDot(orderMsg.actualPrice)?parseFloat(orderMsg.actualPrice).toFixed(2) : orderMsg.actualPrice;
-	document.getElementById("forFree").innerHTML = parseFloat(orderMsg.giftPrice).toFixed(2);
-	document.getElementById("spanCancelFoodAmount").innerHTML = parseFloat(orderMsg.cancelPrice).toFixed(2);
-	document.getElementById("discountPrice").innerHTML = parseFloat(orderMsg.discountPrice).toFixed(2);
+	document.getElementById("forFree").innerHTML = checkDot(orderMsg.giftPrice)?parseFloat(orderMsg.giftPrice).toFixed(2) : orderMsg.giftPrice;
+	document.getElementById("spanCancelFoodAmount").innerHTML = checkDot(orderMsg.cancelPrice)?parseFloat(orderMsg.cancelPrice).toFixed(2) : orderMsg.cancelPrice;
+	document.getElementById("discountPrice").innerHTML = checkDot(orderMsg.discountPrice)?parseFloat(orderMsg.discountPrice).toFixed(2) : orderMsg.discountPrice;
 	
 //	var change = '0.00';
 	
@@ -78,6 +78,7 @@ function loadOrderBasicMsg(){
 //		Ext.getCmp('numCustomNum').setDisabled(false);
 	}
 	if(eval(orderMsg.category != 4) && eval(orderMsg.cancelPrice > 0)){
+		Ext.getDom('spanSeeCancelFoodAmountOperate').style.display = 'none';
 		Ext.getDom('spanSeeCancelFoodAmount').style.visibility = 'inherit';		
 	}
 	
@@ -119,10 +120,6 @@ function loadSystemSetting(_c){
 					Ext.getDom('font_showEraseQuota').innerHTML = '';
 					
 				}
-				var pheight = $('#divWestPayOrderGeneral').parent().height();
-				var sheight = $('#divWestPayOrderGeneral').height();
-				
-				$('#btnCheckOutBack').css('margin-top', (pheight - sheight)+'px');				
 			} else {
 				jr.success = true;
 				Ext.ux.showMsg(jr);
@@ -227,9 +224,9 @@ function refreshCheckOutData(_c){
 function checkOutOnLoad() {	
 	new Ext.form.TextField({
 		id : 'txtEraseQuota',
-		width : 70,
+		width : 95,
 		height : 30,
-		style : 'font-size:20px;',
+		style : 'font-size:20px;background: #f9f9c0 repeat-x 0 0;',
 		renderTo : 'spanHasEraseQuota',
 		listeners : {
 			'render': {
@@ -389,12 +386,10 @@ showCancelFoodDetail = function(){
 	showCancelFoodDetailWin.show();
 };
 
-function fnRemberIsFastOrInput(){
-	if(Ext.getDom('chkCalcReturn').checked){
+function fnRemberIsFastOrInput(type){
+	if(type){
 		showInputReciptWin();
-		Ext.ux.setCookie(document.domain+'_calcReturn', true, 3650);
 	}else{
-		Ext.ux.setCookie(document.domain+'_calcReturn', false, 3650);
 		paySubmit(1);
 	}	
 }
