@@ -13,6 +13,7 @@ import com.wireless.exception.ServiceRateError;
 import com.wireless.pojo.regionMgr.Region;
 import com.wireless.pojo.serviceRate.ServicePlan;
 import com.wireless.pojo.serviceRate.ServicePlan.Status;
+import com.wireless.pojo.serviceRate.ServicePlan.Type;
 import com.wireless.pojo.serviceRate.ServiceRate;
 import com.wireless.pojo.staffMgr.Staff;
 
@@ -22,6 +23,7 @@ public class ServicePlanDao {
 		private int planId;
 		private int regionId;
 		private Status status;
+		private Type type;
 		
 		public ExtraCond setPlanId(int planId){
 			this.planId = planId;
@@ -38,6 +40,11 @@ public class ServicePlanDao {
 			return this;
 		}
 		
+		public ExtraCond setType(Type type){
+			this.type = type;
+			return this;
+		}
+		
 		String toPlan(){
 			StringBuilder planCond = new StringBuilder();
 			if(this.planId > 0){
@@ -46,13 +53,17 @@ public class ServicePlanDao {
 			if(this.status != null){
 				planCond.append(" AND status = " + status.getVal());
 			}
+			if(this.type != null){
+				planCond.append(" AND type = " + type.getVal());
+			}
 			return planCond.toString();
 		}
 		
 		String toRate(){
 			StringBuilder rateCond = new StringBuilder();
 			if(this.regionId > 0){
-				rateCond.append(" AND SR.region_id = " + regionId);			}
+				rateCond.append(" AND SR.region_id = " + regionId);		
+			}
 			return rateCond.toString();
 		}
 	}
@@ -322,15 +333,48 @@ public class ServicePlanDao {
 		}
 	}
 	
+	/**
+	 * Get the service rate to specific plan and region.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param planId
+	 * 			the id to service plan
+	 * @param region
+	 * 			the region
+	 * @return the service rate to plan and region
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
 	public static float getRateByRegion(DBCon dbCon, Staff staff, int planId, Region region) throws SQLException{
 		List<ServicePlan> result = getByCond(dbCon, staff, 
-											 new ServicePlanDao.ExtraCond()
- 													.setPlanId(planId)
- 													.setRegion(region.getId()), 
+											 new ServicePlanDao.ExtraCond().setPlanId(planId).setRegion(region.getId()), 
  											 ShowType.BY_PLAN);
 		
 		if(result.isEmpty()){
-			result = getByCond(dbCon, staff, new ExtraCond().setStatus(Status.DEFAULT), ShowType.BY_PLAN);
+			return getDefaultRate(dbCon, staff, region);
+		}else{
+			return result.get(0).hasRates() ? result.get(0).getRates().get(0).getRate() : 0;
+		}
+	}
+	
+	/**
+	 * Get the default rate to specific region.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param region
+	 * 			the region
+	 * @return the default service rate to this region
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static float getDefaultRate(DBCon dbCon, Staff staff, Region region) throws SQLException{
+		List<ServicePlan> result = getByCond(dbCon, staff, new ExtraCond().setStatus(Status.DEFAULT), ShowType.BY_PLAN);
+		if(result.isEmpty()){
+			result = getByCond(dbCon, staff, new ExtraCond().setType(Type.RESERVED), ShowType.BY_PLAN);
 			if(result.isEmpty()){
 				return 0;
 			}else{
@@ -490,6 +534,7 @@ public class ServicePlanDao {
 						  " LEFT JOIN " + Params.dbName + ".service_rate SR " +
 						  " ON R.region_id = SR.region_id AND SR.plan_id = " + eachPlan.getPlanId() +
 						  " WHERE 1 = 1 " +
+						  " AND R.status = " + Region.Status.BUSY.getVal() + 
 						  " AND R.restaurant_id = " + staff.getRestaurantId() +
   						  (extraCond != null ? extraCond.toRate() : "") +
 						  " ORDER BY R.display_id ";

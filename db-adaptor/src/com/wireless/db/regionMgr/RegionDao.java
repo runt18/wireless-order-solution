@@ -300,12 +300,6 @@ public class RegionDao {
 		}
 		dbCon.rs.close();
 		
-		//Delete the print scheme associated with this region.
-		sql = " DELETE FROM " + Params.dbName + ".func_region WHERE 1 = 1 " +
-			  " AND region_id = " + regionId +
-			  " AND restaurant_id = " + staff.getRestaurantId();
-		dbCon.stmt.executeUpdate(sql);
-		
 		//Update the department status to idle.
 		sql = " UPDATE " + Params.dbName + ".region SET " +
 			  " region_id = " + regionId +
@@ -316,6 +310,19 @@ public class RegionDao {
 		if(dbCon.stmt.executeUpdate(sql) == 0){
 			throw new BusinessException(RegionError.REGION_NOT_EXIST);
 		}
+		
+		//Delete the print scheme associated with this region.
+		sql = " DELETE FROM " + Params.dbName + ".func_region WHERE 1 = 1 " +
+			  " AND region_id = " + regionId +
+			  " AND restaurant_id = " + staff.getRestaurantId();
+		dbCon.stmt.executeUpdate(sql);
+		
+		//Delete the service rate associated with this region
+		sql = " DELETE FROM " + Params.dbName + ".service_rate WHERE 1 = 1 " +
+			  " AND region_id = " + regionId +
+			  " AND restaurant_id = " + staff.getRestaurantId();
+		dbCon.stmt.executeUpdate(sql);
+
 	}
 	
 	/**
