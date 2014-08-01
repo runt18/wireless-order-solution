@@ -262,8 +262,8 @@ function initGiftStatisticsGrid(){
 					gift_getStaffChartData();
 					gift_loadStaffAmountChart(giftStaffChartPanel.otype);
 					gift_loadStaffColumnChart(giftStaffChartPanel.otype);
-					gift_staffPieChart.setSize(giftStatChartTabPanel.getWidth()/2, gift_panelDrag ? giftStatChartTabPanel.getHeight() - 65 : giftStatChartTabPanel.getHeight()-30);
-					gift_staffColumnChart.setSize(giftStatChartTabPanel.getWidth()/2, gift_panelDrag ? giftStatChartTabPanel.getHeight() - 65 : giftStatChartTabPanel.getHeight()-30);					
+					gift_staffPieChart.setSize(giftStatChartTabPanel.getWidth()*0.4, gift_panelDrag ? giftStatChartTabPanel.getHeight() - gift_cutDragChartHeight : giftStatChartTabPanel.getHeight()-gift_cutChartHeight);
+					gift_staffColumnChart.setSize(giftStatChartTabPanel.getWidth()*0.6, gift_panelDrag ? giftStatChartTabPanel.getHeight() - gift_cutDragChartHeight : giftStatChartTabPanel.getHeight()-gift_cutChartHeight);					
 					
 				}
 				
@@ -271,8 +271,8 @@ function initGiftStatisticsGrid(){
 					gift_getDeptChartData();
 					gift_loadDeptAmountChart(giftDeptChartPanel.otype);
 					gift_loadDeptColumnChart(giftDeptChartPanel.otype);
-					gift_deptPieChart.setSize(giftStatChartTabPanel.getWidth()/2, gift_panelDrag ? giftStatChartTabPanel.getHeight() - 65 : giftStatChartTabPanel.getHeight()-30);
-					gift_deptColumnChart.setSize(giftStatChartTabPanel.getWidth()/2, gift_panelDrag ? giftStatChartTabPanel.getHeight() - 65 : giftStatChartTabPanel.getHeight()-30);					
+					gift_deptPieChart.setSize(giftStatChartTabPanel.getWidth()*0.4, gift_panelDrag ? giftStatChartTabPanel.getHeight() - gift_cutDragChartHeight : giftStatChartTabPanel.getHeight()-gift_cutChartHeight);
+					gift_deptColumnChart.setSize(giftStatChartTabPanel.getWidth()*0.6, gift_panelDrag ? giftStatChartTabPanel.getHeight() - gift_cutDragChartHeight : giftStatChartTabPanel.getHeight()-gift_cutChartHeight);					
 					
 				}
 				
@@ -341,8 +341,8 @@ function gift_changeChartWidth(w,h){
 		if($('div:visible[data-type=giftChart]').length == 1){
 			eval($('div:visible[data-type=giftChart]').attr('data-value')).setSize(w, h);
 		}else if($('div:visible[data-type=giftChart]').length > 1){
-			eval($($('div:visible[data-type=giftChart]')[0]).attr('data-value')).setSize(w/2, h);
-			eval($($('div:visible[data-type=giftChart]')[1]).attr('data-value')).setSize(w/2, h);				
+			eval($($('div:visible[data-type=giftChart]')[0]).attr('data-value')).setSize(w*0.4, h);
+			eval($($('div:visible[data-type=giftChart]')[1]).attr('data-value')).setSize(w*0.6, h);				
 		}
 	}	
 }
@@ -559,6 +559,7 @@ function gift_loadStaffColumnChart(type){
         	enabled : false
         }
     });	
+    
 	giftStaffChartPanel.otype = type;
 }
 
@@ -633,18 +634,30 @@ function gift_loadDeptColumnChart(type){
     giftDeptChartPanel.otype = type;
 }
 
-function fnChangeStaffChart(v){
+function fnChangeStaffChart(id, v){
+	$('#'+id).attr('checked', 'checked');
 	gift_loadStaffAmountChart(v);
 	gift_loadStaffColumnChart(v);
-	gift_staffPieChart.setSize(giftStatChartTabPanel.getWidth()/2, gift_panelDrag ? giftStatChartTabPanel.getHeight() - 65 : giftStatChartTabPanel.getHeight()-30);
-	gift_staffColumnChart.setSize(giftStatChartTabPanel.getWidth()/2, gift_panelDrag ? giftStatChartTabPanel.getHeight() - 65 : giftStatChartTabPanel.getHeight()-30);
+	gift_staffPieChart.setSize(giftStatChartTabPanel.getWidth()*0.4, gift_panelDrag ? giftStatChartTabPanel.getHeight() - gift_cutDragChartHeight : giftStatChartTabPanel.getHeight()-gift_cutChartHeight);
+	gift_staffColumnChart.setSize(giftStatChartTabPanel.getWidth()*0.6, gift_panelDrag ? giftStatChartTabPanel.getHeight() - gift_cutDragChartHeight : giftStatChartTabPanel.getHeight()-gift_cutChartHeight);
 }
 
-function fnChangeDeptChart(v){
+function fnChangeDeptChart(id, v){
+	$('#'+id).attr('checked', 'checked');
 	gift_loadDeptAmountChart(v);
 	gift_loadDeptColumnChart(v);
-	gift_deptPieChart.setSize(giftStatChartTabPanel.getWidth()/2, gift_panelDrag ? giftStatChartTabPanel.getHeight() - 65 : giftStatChartTabPanel.getHeight()-30);
-	gift_deptColumnChart.setSize(giftStatChartTabPanel.getWidth()/2, gift_panelDrag ? giftStatChartTabPanel.getHeight() - 65 : giftStatChartTabPanel.getHeight()-30);
+	gift_deptPieChart.setSize(giftStatChartTabPanel.getWidth()*0.4, gift_panelDrag ? giftStatChartTabPanel.getHeight() - gift_cutDragChartHeight : giftStatChartTabPanel.getHeight()-gift_cutChartHeight);
+	gift_deptColumnChart.setSize(giftStatChartTabPanel.getWidth()*0.6, gift_panelDrag ? giftStatChartTabPanel.getHeight() - gift_cutDragChartHeight : giftStatChartTabPanel.getHeight()-gift_cutChartHeight);
+}
+
+function fnChangeToStaffCount(){
+	
+	fnChangeStaffChart(1);
+}
+
+function fnChangeToStaffPrice(){
+	$('#staffChartPrice').attr('checked', 'checked');
+	fnChangeStaffChart(0);
 }
 
 var gift_setStatisticsDate = function(){
@@ -657,6 +670,7 @@ var gift_setStatisticsDate = function(){
 
 };
 
+var gift_cutDragChartHeight=75, gift_cutChartHeight=70;
 var giftDetailsStatPanel, giftStatChartTabPanel, giftDetailChartPanel, giftStaffChartPanel, giftDeptChartPanel;
 var gift_detailChart, gift_staffPieChart, gift_staffColumnChart, gift_deptPieChart, gift_deptColumnChart;
 var requestParams, gift_dateCombo;
@@ -743,8 +757,8 @@ Ext.onReady(function(){
 		listeners : {
 			show : function(thiz){
 				if($('#divGiftStaffAmountColumnChart').is(":visible")){
-					gift_staffPieChart.setSize(giftStatChartTabPanel.getWidth()/2, gift_panelDrag ? giftStatChartTabPanel.getHeight() - 65 : giftStatChartTabPanel.getHeight()-40);
-					gift_staffColumnChart.setSize(giftStatChartTabPanel.getWidth()/2, gift_panelDrag ? giftStatChartTabPanel.getHeight() - 65 : giftStatChartTabPanel.getHeight()-40);				
+					gift_staffPieChart.setSize(giftStatChartTabPanel.getWidth()*0.4, gift_panelDrag ? giftStatChartTabPanel.getHeight() - gift_cutDragChartHeight : giftStatChartTabPanel.getHeight()-gift_cutChartHeight);
+					gift_staffColumnChart.setSize(giftStatChartTabPanel.getWidth()*0.6, gift_panelDrag ? giftStatChartTabPanel.getHeight() - gift_cutDragChartHeight : giftStatChartTabPanel.getHeight()-gift_cutChartHeight);				
 				}else{
 					$('#divGiftStaffChartChange').show();
 					$('#divGiftStaffAmountPieChart').show();
@@ -754,8 +768,8 @@ Ext.onReady(function(){
 					gift_getStaffChartData();
 					gift_loadStaffAmountChart(1);
 					gift_loadStaffColumnChart(1);
-					gift_staffPieChart.setSize(giftStatChartTabPanel.getWidth()/2, gift_panelDrag ? giftStatChartTabPanel.getHeight() - 65 : giftStatChartTabPanel.getHeight()-40);
-					gift_staffColumnChart.setSize(giftStatChartTabPanel.getWidth()/2, gift_panelDrag ? giftStatChartTabPanel.getHeight() - 65 : giftStatChartTabPanel.getHeight()-40);
+					gift_staffPieChart.setSize(giftStatChartTabPanel.getWidth()*0.4, gift_panelDrag ? giftStatChartTabPanel.getHeight() - gift_cutDragChartHeight : giftStatChartTabPanel.getHeight()-gift_cutChartHeight);
+					gift_staffColumnChart.setSize(giftStatChartTabPanel.getWidth()*0.6, gift_panelDrag ? giftStatChartTabPanel.getHeight() - gift_cutDragChartHeight : giftStatChartTabPanel.getHeight()-gift_cutChartHeight);
 				}
 			},
 			render : function(thiz){
@@ -770,8 +784,8 @@ Ext.onReady(function(){
 		listeners : {
 			show : function(thiz){
 				if($('#divGiftDeptPieChart').is(":visible")){
-					gift_deptPieChart.setSize(giftStatChartTabPanel.getWidth()/2, gift_panelDrag ? giftStatChartTabPanel.getHeight() - 65 : giftStatChartTabPanel.getHeight()-40);
-					gift_deptColumnChart.setSize(giftStatChartTabPanel.getWidth()/2, gift_panelDrag ? giftStatChartTabPanel.getHeight() - 65 : giftStatChartTabPanel.getHeight()-40);				
+					gift_deptPieChart.setSize(giftStatChartTabPanel.getWidth()*0.4, gift_panelDrag ? giftStatChartTabPanel.getHeight() - gift_cutDragChartHeight : giftStatChartTabPanel.getHeight()-gift_cutChartHeight);
+					gift_deptColumnChart.setSize(giftStatChartTabPanel.getWidth()*0.6, gift_panelDrag ? giftStatChartTabPanel.getHeight() - gift_cutDragChartHeight : giftStatChartTabPanel.getHeight()-gift_cutChartHeight);				
 				}else{
 					$('#divGiftDeptChartChange').show();
 					$('#divGiftDeptPieChart').show();
@@ -781,8 +795,8 @@ Ext.onReady(function(){
 					gift_getDeptChartData();
 					gift_loadDeptAmountChart(0);
 					gift_loadDeptColumnChart(0);
-					gift_deptPieChart.setSize(giftStatChartTabPanel.getWidth()/2, gift_panelDrag ? giftStatChartTabPanel.getHeight() - 65 : giftStatChartTabPanel.getHeight()-40);
-					gift_deptColumnChart.setSize(giftStatChartTabPanel.getWidth()/2, gift_panelDrag ? giftStatChartTabPanel.getHeight() - 65 : giftStatChartTabPanel.getHeight()-40);
+					gift_deptPieChart.setSize(giftStatChartTabPanel.getWidth()*0.4, gift_panelDrag ? giftStatChartTabPanel.getHeight() - gift_cutDragChartHeight : giftStatChartTabPanel.getHeight()-gift_cutChartHeight);
+					gift_deptColumnChart.setSize(giftStatChartTabPanel.getWidth()*0.6, gift_panelDrag ? giftStatChartTabPanel.getHeight() - gift_cutDragChartHeight : giftStatChartTabPanel.getHeight()-gift_cutChartHeight);
 				}
 			},
 			render : function(thiz){
@@ -815,7 +829,7 @@ Ext.onReady(function(){
 	
 	new Ext.Panel({
 		renderTo : 'divGiftStatistics',
-		id : 'giftStatistics',
+		id : 'giftStatisticsPanel',
 		frame : false,
 		layout : 'border',
 		width : parseInt(Ext.getDom('divGiftStatistics').parentElement.style.width.replace(/px/g,'')),
@@ -845,9 +859,7 @@ Ext.onReady(function(){
     });
     gift_rz.on('resize', giftDetailsStatPanel.syncSize, giftDetailsStatPanel);//注册事件(作用:将调好的大小传个scope执行)
     
-    
-    
-    var gift_totalHeight = Ext.getCmp('giftStatistics').getHeight();
+    var gift_totalHeight = Ext.getCmp('giftStatisticsPanel').getHeight();
     
     giftDetailsStatPanel.setHeight(gift_totalHeight*0.4);
     giftDetailsStatPanel.getEl().parent().setHeight(gift_totalHeight*0.4);
@@ -856,7 +868,8 @@ Ext.onReady(function(){
     
     gift_rz.resizeTo(giftDetailsStatPanel.getWidth(), giftDetailsStatPanel.getHeight());
     
-	Ext.getCmp('giftStatistics').updateStatisticsDate = gift_setStatisticsDate;	
+     Ext.getCmp('giftStatistics').updateStatisticsDate = gift_setStatisticsDate;	
+	
 	
 	
 });

@@ -413,6 +413,7 @@ Ext.onReady(function(){
 		border : false,
 		region : 'center',
 		layout : 'border',
+		height : 420,
 		tbar : businessSubStatisticsTbar,
 		autoScroll : true,
 		items : [{
@@ -448,6 +449,7 @@ Ext.onReady(function(){
 	
 	businessSub_chartPanel = new Ext.Panel({
 		collapsible : true,
+		collapsed : true,
 		title : '走势图',
 		region : 'south',
 		frame : true,
@@ -458,6 +460,16 @@ Ext.onReady(function(){
 				if(businessSub_highChart && typeof thiz.getEl() != 'undefined'){
 					businessSub_highChart.setSize(thiz.getWidth(), businessSub_panelDrag ? businessSub_chartPanel.getHeight() - 45 : businessSub_chartPanel.getHeight()-25);
 				}				
+			},
+			expand : function(thiz){
+				//thiz.getEl(): 刚打开页面时thiz.getWidth无效
+				if(businessSub_highChart && typeof thiz.getEl() != 'undefined'){
+					businessSub_highChart.setSize(thiz.getWidth(), businessSub_panelDrag ? businessSub_chartPanel.getHeight() - 35 : businessSub_chartPanel.getHeight());
+				}	
+				
+			},
+			collapse : function(thiz){
+				businessSubGeneralPanel.getEl().parent().setHeight(Ext.getCmp('businessSubStatisticsPanel').getHeight() - 15);
 			}
 		}
 	});
@@ -491,6 +503,10 @@ Ext.onReady(function(){
 	businessSub_generalPanelHeight = businessSubGeneralPanel.getHeight();
 	
 	businessSub_chartPanelHeight = businessSub_chartPanel.getHeight();	
+	
+	if(Ext.getCmp('businessSubStatisticsPanel').getHeight() - 440 > 250){
+		businessSub_chartPanel.expand();
+	}
 	
 	businessSub_dateCombo.setValue(1);
 	businessSub_dateCombo.fireEvent('select', businessSub_dateCombo, null, 1);	
