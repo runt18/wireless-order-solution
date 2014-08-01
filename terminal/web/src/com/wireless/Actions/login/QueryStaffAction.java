@@ -42,7 +42,7 @@ public class QueryStaffAction extends Action {
 		Staff staff = new Staff();
 		int index = 0;
 		int pageSize = 0;
-		if (!(start == null)) {
+		if (start != null) {
 			index = Integer.parseInt(start);
 			pageSize = Integer.parseInt(limit);
 		}
