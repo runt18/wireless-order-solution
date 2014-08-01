@@ -176,7 +176,7 @@ function initGiftStatisticsGrid(){
 				});
 			},
 			select : function(){
-				Ext.getCmp('btnSearchForCancelFoodDetailsStat').handler();
+				Ext.getCmp('giftStatistic_btnSearch').handler();
 			}
 		}
 	});

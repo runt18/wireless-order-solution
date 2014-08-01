@@ -8,8 +8,7 @@ function loadDiscountData(_c){
 	Ext.Ajax.request({
 		url : '../../QueryDiscount.do',
 		params : {
-			dataSource : 'role',
-			roleId : _c.staff.role.id
+			dataSource : 'role'
 		},
 		success : function(response, options) {
 			var jr = Ext.decode(response.responseText);
