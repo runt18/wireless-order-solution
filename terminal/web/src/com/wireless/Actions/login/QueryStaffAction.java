@@ -36,6 +36,7 @@ public class QueryStaffAction extends Action {
 		String name = request.getParameter("name");
 		String cate = request.getParameter("cate");
 		String privileges = request.getParameter("privileges");
+		String checkPrivilege = request.getParameter("checkPrivilege");
 		
 		JObject jobject = new JObject();
 		List<Staff> staffList = new ArrayList<Staff>();
@@ -91,10 +92,12 @@ public class QueryStaffAction extends Action {
 					
 					if(staffList.contains(staff)){
 						extra.putBoolean("havePrivileges", true);
+					}
+					if(checkPrivilege != null && !checkPrivilege.isEmpty()){
 						staffList.clear();
 					}
 				}else{
-					if(restaurantID == null){
+					if(restaurantID == null || restaurantID.isEmpty()){
 						restaurantID = (String) request.getSession().getAttribute("restaurantID");
 					}
 					staffList = StaffDao.getByRestaurant(Integer.parseInt(restaurantID));
