@@ -20,7 +20,7 @@ public class ReqPrintContent extends RequestPackage{
 	}
 	
 	public static ReqPrintContent buildReqPrintShiftReceipt(Staff staff, DutyRange range, PType shiftType){
-		return buildReqPrintShiftReceipt(staff, range, Region.RegionId.REGION_1, shiftType);
+		return buildReqPrintShiftReceipt(staff, range, Region.RegionId.REGION_NULL, shiftType);
 	}
 	
 	public static ReqPrintContent buildReqPrintShiftReceipt(Staff staff, DutyRange range, Region.RegionId regionId, PType shiftType){
