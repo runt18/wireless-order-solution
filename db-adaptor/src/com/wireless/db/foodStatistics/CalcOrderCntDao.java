@@ -33,34 +33,29 @@ public class CalcOrderCntDao {
 	 * 			Throws if failed to execute the SQL statement.
 	 */
 	public static void exec(DBCon dbCon) throws SQLException{
+		
+		dbCon.stmt.execute("SET SQL_SAFE_UPDATES = 0");
+		
 		String sql;
 		
+		sql = " UPDATE " + Params.dbName + ".food F " +
+			  " SET F.order_amount = 0 ";
+		dbCon.stmt.executeUpdate(sql);
+		
 		sql = " SELECT " +
-			  " food_id, SUM(order_count) AS order_cnt " +
-			  " FROM " +
-			  Params.dbName + ".order_food_history " +
-			  " WHERE food_id IS NOT NULL " +
-			  " GROUP BY food_id " +
+			  " OFH.food_id, SUM(order_count) AS order_cnt " +
+			  " FROM " + Params.dbName + ".order_food_history OFH " +
+			  " JOIN " + Params.dbName + ".food F ON OFH.food_id = F.food_id " +
+			  " WHERE OFH.food_id IS NOT NULL " +
+			  //" AND OFH.order_date BETWEEN DATE_SUB(CURDATE(), INTERVAL 90 DAY) AND CURDATE() " +
+			  " GROUP BY OFH.food_id " +
 			  " HAVING order_cnt > 0 ";
 		
-		dbCon.rs = dbCon.stmt.executeQuery(sql);
+		sql = " UPDATE " + Params.dbName + ".food F " +
+			  " JOIN ( " + sql + " ) AS TMP ON F.food_id = TMP.food_id " +
+			  " SET F.order_amount = TMP.order_cnt ";
 		
-		dbCon.stmt.clearBatch();
-		while(dbCon.rs.next()){
-			
-			final int foodId = dbCon.rs.getInt("food_id");
-			final int orderCnt = dbCon.rs.getInt("order_cnt");
-			
-			sql = " UPDATE " + Params.dbName + ".food " +
-				  " SET order_amount = " + orderCnt + 
-				  " WHERE " +
-				  " food_id = " + foodId;
-			dbCon.stmt.addBatch(sql);
-			
-		}
-		dbCon.rs.close();
-		
-		dbCon.stmt.executeBatch();
+		dbCon.stmt.executeUpdate(sql);
 		
 	}
 }

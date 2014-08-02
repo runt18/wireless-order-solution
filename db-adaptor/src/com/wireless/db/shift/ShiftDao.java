@@ -294,7 +294,7 @@ public class ShiftDao {
 	public static int archive(DBCon dbCon, Staff staff) throws SQLException{
 		String sql;
 		
-		final String shiftItem = "`id`, `restaurant_id`, `name`, `on_duty`, `off_duty`";
+		final String shiftItem = "`restaurant_id`, `name`, `on_duty`, `off_duty`";
 		
 		//Move the shift record from 'shift' to 'shift_history'.
 		sql = " INSERT INTO " + Params.dbName + ".shift_history (" + shiftItem + ") " +

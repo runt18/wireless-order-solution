@@ -10,6 +10,15 @@ import com.wireless.pojo.restaurantMgr.Restaurant;
 
 public class CalcFoodWeightDao {
 
+	public static void exec() throws SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
 	public static void exec(DBCon dbCon) throws SQLException{
 		String sql;
 		sql = " SELECT id " + " FROM " + Params.dbName + ".restaurant" + " WHERE " + " id > " + Restaurant.RESERVED_7;
@@ -36,6 +45,13 @@ public class CalcFoodWeightDao {
 		
 		//Get the total order amount to this restaurant.
 		int totalOrderAmount = 0;
+		
+		sql = " UPDATE " + Params.dbName + ".food " + 
+			  " SET restaurant_id = restaurant_id " +
+			  " ,weight = 0 " +
+			  " ,probability = 0 " +
+			  " WHERE restaurant_id = " + restaurantId;
+		dbCon.stmt.executeUpdate(sql);
 		
 		sql = " SELECT COUNT(*) " + " FROM " + Params.dbName + ".order_history " + " WHERE " + " restaurant_id = " + restaurantId;
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
@@ -66,47 +82,33 @@ public class CalcFoodWeightDao {
 				  " COUNT(A.order_id) / @total_order_amount AS probability, " +
 				  " (SUM(A.order_food_amount) / @total_order_food_amount * LOG(@total_order_amount / COUNT(A.order_id))) AS weight " +
 				  " FROM " + 
-				  " ((SELECT " +
-				  " order_id, food_id, SUM(order_count) AS order_food_amount " + " FROM " + Params.dbName + ".order_food_history " +
-				  " WHERE " + 
-				  " food_id IN ( " +
-				  " SELECT food_id FROM " + Params.dbName + ".food" + " WHERE " +
-				  " restaurant_id = " + restaurantId + " AND " + 
-				  " name NOT LIKE '送%' " + " AND " +
-				  " name NOT LIKE '赠送%' " + " AND " + 
-				  " name NOT LIKE '配%' " + " AND " +
-				  " name NOT LIKE '白饭%' " + " AND " +
-				  " name NOT LIKE '%打包%' " + " AND " +
-				  " name NOT LIKE '%茶位%' " + " AND " +
-				  " name NOT LIKE '%饭盒%' " + " AND " +
-				  " name NOT LIKE '%饭合%' " + " AND " +
-				  " name NOT LIKE '%纸巾%' " + 
-				  " ) " + 
-				  " GROUP BY " + 
-				  " order_id, food_id ) AS A) " +
-				  " GROUP BY " +
-				  " A.food_id " + ";";
+				  " ( " + 
+					  " SELECT " +
+					  " OFH.order_id, OFH.food_id, SUM(OFH.order_count) AS order_food_amount " + 
+					  " FROM " + Params.dbName + ".order_food_history OFH " +
+					  " JOIN " + Params.dbName + ".food F ON OFH.food_id = F.food_id " +
+					  " WHERE 1 = 1 " + 
+					  " AND F.restaurant_id = " + restaurantId +
+					  " AND F.name NOT LIKE '送%' " + 
+					  " AND F.name NOT LIKE '赠送%' " + 
+					  " AND F.name NOT LIKE '配%' " + 
+					  " AND F.name NOT LIKE '白饭%' " + 
+					  " AND F.name NOT LIKE '%打包%' " + 
+					  " AND F.name NOT LIKE '%茶位%' " + 
+					  " AND F.name NOT LIKE '%饭盒%' " + 
+					  " AND F.name NOT LIKE '%饭合%' " + 
+					  " AND F.name NOT LIKE '%纸巾%' " + 
+					  " GROUP BY OFH.order_id, OFH.food_id " + 
+				  " ) AS A " +
+				  " GROUP BY A.food_id ";
 
-			dbCon.stmt.clearBatch();
+			sql = " UPDATE " + Params.dbName + ".food F " +
+				  " JOIN ( " + sql + " ) AS TMP ON F.food_id = TMP.food_id " +
+			      " SET " + 
+				  " F.weight = TMP.weight, " +
+			      " F.probability = TMP.probability ";
+			dbCon.stmt.executeUpdate(sql);
 			
-			dbCon.rs = dbCon.stmt.executeQuery(sql);
-			while(dbCon.rs.next()){
-				final int foodId = dbCon.rs.getInt("food_id");
-				final float probability = dbCon.rs.getFloat("probability");
-				final float weight = dbCon.rs.getFloat("weight");
-				
-				//Insert the probability & weight of each food to this restaurant.
-				sql = " UPDATE " + Params.dbName + ".food SET " +
-					  " weight = " + weight +
-					  " ,probability = " + probability +
-					  " WHERE " +
-					  " food_id = " + foodId;
-				dbCon.stmt.addBatch(sql);
-				
-			}
-			dbCon.rs.close();
-
-			dbCon.stmt.executeBatch();
 		}
 		
 	}
