@@ -4416,7 +4416,7 @@ body.ext-ie6.x-body-masked .x-window select {
 }
 
 .x-html-editor-tb .x-edit-bold, .x-menu-item img.x-edit-bold {
-    background-position:0 0;
+    background-position:-224px 0;
     background-image:url(../images/default/editor/tb-sprite.gif);    
 }
 
@@ -5649,7 +5649,7 @@ ul.x-tab-strip-bottom{
 }
 
 .x-grid3-row-alt{
-	background-color:#fafafa;
+	background-color:#ddd;
 }
 
 .x-grid3-row-over {

@@ -1,5 +1,5 @@
 var Wireless = {
-	ux : {}
+	ux : {staffGift : false}
 };
 
 /*var TempFoodModel = {

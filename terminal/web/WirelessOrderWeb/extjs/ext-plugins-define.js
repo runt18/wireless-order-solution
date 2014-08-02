@@ -146,7 +146,7 @@ Ext.ux.plugins.HEInsertImage = function(config){
 		 	    height : 300,
 		 	    autoEl : {
 		 	    	tag : 'img',
-		 	    	title : '菜品图预览.'
+		 	    	title : '图片预览.'
 		 	    }
 			});
     		var imgFile = Ext.ux.plugins.createImageFile({
@@ -198,6 +198,7 @@ Ext.ux.plugins.HEInsertImage = function(config){
 		 	   				if(jr.success){
 		 	   					config.win.hide();
 		 	   					if(!heObject.activated){ heObject.onFirstFocus(); };
+		 	   					console.log(jr.other.url);
 		 	   					var imsg = '<div align="center" style="width:100%;"><img src="' + jr.other.url + '" style="max-width:95%;"/></div>';
 		 	   					heObject.focus();
 		 	   					if(Ext.isIE){
