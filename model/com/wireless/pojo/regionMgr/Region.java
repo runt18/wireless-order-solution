@@ -73,6 +73,7 @@ public class Region implements Parcelable, Jsonable, Comparable<Region>{
 	}
 	
 	public static enum RegionId{
+		REGION_NULL(Short.MAX_VALUE, "空区域"),
 		REGION_1(0, "大厅"),
 		REGION_2(1, "区域2"),
 		REGION_3(2, "区域3"),
