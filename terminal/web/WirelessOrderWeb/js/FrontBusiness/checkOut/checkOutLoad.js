@@ -469,7 +469,8 @@ function showInputReciptWin(){
 				id : 'btnPayInputRecipt',
 				iconCls : 'btn_save',
 				handler : function(e){
-					
+					paySubmit(1);
+					inputReciptWin.hide();
 				}				
 			},{
 				text : '关闭',
@@ -479,6 +480,13 @@ function showInputReciptWin(){
 					inputReciptWin.hide();
 				}				
 			}],
+			keys : [{
+				 key : Ext.EventObject.ENTER,
+				 fn : function(){ 
+					 Ext.getCmp('btnPayInputRecipt').handler();
+				 },
+				 scope : this 
+			}],
 			listeners : {
 				hide : function(){
 					Ext.getCmp('txtShouldToRecipt').setValue();
@@ -486,14 +494,7 @@ function showInputReciptWin(){
 					Ext.getCmp('txtReciptReturn').setValue();
 					Ext.getCmp('txtInputRecipt').clearInvalid();				
 				}
-			},
-			keys : [{
-				 key : Ext.EventObject.ENTER,
-				 fn : function(){ 
-					 Ext.getCmp('btnPayInputRecipt').handler();
-				 },
-				 scope : this 
-			 }]			
+			}		
 		});
 	}
 	inputReciptWin.show();

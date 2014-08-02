@@ -70,12 +70,17 @@ var checkOutMainPanelTbar = new Ext.Toolbar({
 					params : {dataSource : 'planTree'},
 					success : function(res, opt){
 						var jr = Ext.decode(res.responseText);
-						var defaultId='';
+						var defaultId='', reserved='';
 						for(var i = 0; i < jr.length; i++){
 							data.push([jr[i]['planId'], jr[i]['text']]);
 							if(jr[i]['status'] == 2){
 								defaultId = jr[i]['planId'];
+							}else if(jr[i]['type'] == 2){
+								reserved = jr[i]['planId'];
 							}
+						}
+						if(defaultId == ''){
+							defaultId = reserved;
 						}
 						thiz.store.loadData(data);
 						
@@ -243,6 +248,8 @@ function fnFoodNameFormat(v, m, r, ri, ci, s){
 }
 
 Ext.onReady(function() {
+	Ext.getDom('remark').value="";
+	
 	initMainView(
 		new Ext.Panel({
 			region : 'west',

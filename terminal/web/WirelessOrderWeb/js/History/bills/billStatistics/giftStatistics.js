@@ -442,8 +442,13 @@ function gift_getStaffChartData(){
 			
 			
 			for (var i = 0; i < jr.root.length; i++) {
-				gift_staffChartData.chartPriceData.data.push([jr.root[i].giftStaff, jr.root[i].giftPrice]);
-				gift_staffChartData.chartAmountData.data.push([jr.root[i].giftStaff, jr.root[i].giftAmount]);
+				if(jr.root[i].giftPrice != 0){
+					gift_staffChartData.chartPriceData.data.push([jr.root[i].giftStaff, jr.root[i].giftPrice]);
+				}
+				if(jr.root[i].giftAmount != 0){
+					gift_staffChartData.chartAmountData.data.push([jr.root[i].giftStaff, jr.root[i].giftAmount]);
+				}
+				
 				gift_staffChartData.staffAmountColumnChart.xAxis.push(jr.root[i].giftStaff);
 				gift_staffChartData.staffPriceColumnChart.xAxis.push(jr.root[i].giftStaff);
 				gift_staffChartData.staffPriceColumnChart.yAxis.data.push({y : jr.root[i].giftPrice, color : colors[i]}); 
@@ -476,8 +481,12 @@ function gift_getDeptChartData(){
 			
 			
 			for (var i = 0; i < jr.root.length; i++) {
-				gift_deptChartData.chartPriceData.data.push([jr.root[i].giftDept.name, jr.root[i].giftPrice]);
-				gift_deptChartData.chartAmountData.data.push([jr.root[i].giftDept.name, jr.root[i].giftAmount]);
+				if(jr.root[i].giftPrice != 0){
+					gift_deptChartData.chartPriceData.data.push([jr.root[i].giftDept.name, jr.root[i].giftPrice]);
+				}
+				if(jr.root[i].giftAmount != 0){
+					gift_deptChartData.chartAmountData.data.push([jr.root[i].giftDept.name, jr.root[i].giftAmount]);
+				}
 				gift_deptChartData.deptAmountColumnChart.xAxis.push(jr.root[i].giftDept.name);
 				gift_deptChartData.deptPriceColumnChart.xAxis.push(jr.root[i].giftDept.name);
 				gift_deptChartData.deptPriceColumnChart.yAxis.data.push({y : jr.root[i].giftPrice, color : colors[i]}); 
