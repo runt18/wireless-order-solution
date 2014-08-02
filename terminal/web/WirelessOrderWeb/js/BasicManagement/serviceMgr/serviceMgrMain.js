@@ -5,6 +5,10 @@ function deleteServicePlanHandler(){
 		Ext.example.msg('提示', '请选中一个方案再进行操作.');
 		return;
 	}
+	if(sn.attributes.type == 2){
+		Ext.example.msg('提示', '保留方案不能删除.');
+		return;	
+	}
 	Ext.Msg.confirm(
 		'提示',
 		'是否删除方案:&nbsp;<font color="red">' + sn.text + '</font>',

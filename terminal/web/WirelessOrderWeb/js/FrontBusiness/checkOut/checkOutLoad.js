@@ -78,7 +78,7 @@ function loadOrderBasicMsg(){
 	}
 	if(eval(orderMsg.category != 4) && eval(orderMsg.cancelPrice > 0)){
 		Ext.getDom('spanSeeCancelFoodAmountOperate').style.display = 'none';
-		Ext.getDom('spanSeeCancelFoodAmount').style.visibility = 'inherit';		
+		Ext.getDom('spanSeeCancelFoodAmount').style.display = 'block';		
 	}
 	
 	var sumFoodCount = 0;
