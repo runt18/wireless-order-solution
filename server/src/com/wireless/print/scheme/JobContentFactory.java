@@ -271,6 +271,21 @@ public class JobContentFactory {
 		return createReceiptContent(printType, staff, printers, OrderDao.getById(staff, orderId, DateType.TODAY));
 	}
 	
+	/**
+	 * Create the shift content
+	 * @param printType
+	 * 			the print type {@link PType}
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param printers
+	 * 			the printers
+	 * @param range
+	 * 			the range to shift
+	 * @param regionId
+	 * @return the shift content
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
 	public Content createShiftContent(PType printType, Staff staff, List<Printer> printers, DutyRange range, Region.RegionId regionId) throws SQLException{
 		
 		List<JobContent> jobContents = new ArrayList<JobContent>();

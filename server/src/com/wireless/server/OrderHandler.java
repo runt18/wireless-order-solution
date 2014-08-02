@@ -145,16 +145,14 @@ class OrderHandler implements Runnable{
 					
 				}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.MAKE_FOOD_SELL_OUT){
 					//handle update the food to be sell out
-					List<Food> toSellOut = new Parcel(request.body).readParcelList(Food.CREATOR);
-					for(Food f : toSellOut){
+					for(Food f : new Parcel(request.body).readParcelList(Food.CREATOR)){
 						FoodDao.update(staff, new Food.UpdateBuilder(f.getFoodId()).setSellOut(true));
 					}
 					response = new RespACK(request.header);
 					
 				}else if(request.header.mode == Mode.ORDER_BUSSINESS && request.header.type == Type.MAKE_FOOD_ON_SALE){
 					//handle update the food to be on sale 
-					List<Food> toOnSale = new Parcel(request.body).readParcelList(Food.CREATOR);
-					for(Food f : toOnSale){
+					for(Food f : new Parcel(request.body).readParcelList(Food.CREATOR)){
 						FoodDao.update(staff, new Food.UpdateBuilder(f.getFoodId()).setSellOut(false));
 					}
 					response = new RespACK(request.header);
@@ -504,6 +502,12 @@ class OrderHandler implements Runnable{
 			long onDuty = p.readLong();
 			long offDuty = p.readLong();
 			Region.RegionId regionId = Region.RegionId.valueOf(p.readShort());
+			if(regionId == Region.RegionId.REGION_NULL){
+				List<Region> regions = RegionDao.getByStatus(staff, Region.Status.BUSY);
+				if(!regions.isEmpty()){
+					regionId = Region.RegionId.valueOf(regions.get(0).getId());
+				}
+			}
 			new PrintHandler(staff)
 				.addContent(JobContentFactory.instance().createShiftContent(printType, staff, printers, new DutyRange(onDuty, offDuty), regionId))
 				.fireAsync();
