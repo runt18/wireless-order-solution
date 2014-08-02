@@ -8,6 +8,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
+import com.wireless.db.regionMgr.RegionDao;
 import com.wireless.db.serviceRate.ServicePlanDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
@@ -161,7 +162,7 @@ public class OperateServicePlanAction extends DispatchAction{
 			
 			ServicePlan.UpdateBuilder builder = new ServicePlan.UpdateBuilder(Integer.parseInt(servicePlanId));
 			
-			for (Region.RegionId region : Region.RegionId.values()) {
+			for (Region region : RegionDao.getByStatus(staff, Region.Status.BUSY)) {
 				builder.addRate(region.getId(), Float.parseFloat(rate));
 			}
 			
