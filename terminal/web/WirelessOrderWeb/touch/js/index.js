@@ -663,16 +663,36 @@ function staffLoginHandler(c){
 			if(data.success){
 				pin = staffId;
 				staffData = data.other.staff;
-				for (var index = 0; index < staffData.role.privileges.length; index++) {
-					var temp = staffData.role.privileges[index];
-					if(temp.codeValue == 1003){
-						Wireless.ux.staffGift = true;
-						$('#divOperateGiftFood').show();
-						temp = null;
-						break;
+//				for (var index = 0; index < staffData.role.privileges.length; index++) {
+//					var temp = staffData.role.privileges[index];
+//					if(temp.codeValue == 1003){
+//						Wireless.ux.staffGift = true;
+//						$('#divOperateGiftFood').show();
+//						temp = null;
+//						break;
+//					}
+//				}		
+				//验证员工权限	
+				$.ajax({
+					url : "../QueryStaff.do",
+					type : 'post',
+					async:false,
+					data : {
+						"privileges" : 1003,
+						"checkPrivilege" : true
+					},
+					success : function(jr, status, xhr){
+						if(jr.success){
+							if(jr.other.havePrivileges != null){
+								Wireless.ux.staffGift = true;
+								$('#divOperateGiftFood').show();
+							}
+						}
+					},
+					error : function(request, status, err){
 					}
-				}		
-				 
+				}); 	
+				
 				if(c.refresh === true){
 					loginSuccessCallback();
 				}else{
