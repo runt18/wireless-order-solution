@@ -152,6 +152,13 @@ public class ShiftGeneralDao {
 				eachShift.addPayment(payment);
 			}
 			dbCon.rs.close();
+
+			for(PaymentGeneral eachPayment : PaymentDao.getByCond(dbCon, staff, new DutyRange(eachShift.getOnDuty(), eachShift.getOffDuty()), new PaymentDao.ExtraCond(DateType.TODAY))){
+				StaffPayment payment = new StaffPayment();
+				payment.setStaffName(eachPayment.getStaffName());
+				payment.setStaffId(eachPayment.getStaffId());
+				eachShift.addPayment(payment);
+			}
 			
 			//统计交班时间内每个员工的应交款项
 			for(StaffPayment eachPayment : eachShift.getPayments()){

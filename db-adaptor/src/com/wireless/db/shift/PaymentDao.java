@@ -100,7 +100,9 @@ public class PaymentDao {
 	}
 	
 	/**
-	 * Get current payment details.
+	 * Get current payment detail to the staff performed this action.
+	 * @param dbCon
+	 * 			the database connection
 	 * @param staff
 	 * 			the staff to perform this action
 	 * @return the details to this payment
@@ -120,7 +122,7 @@ public class PaymentDao {
 	}
 	
 	/**
-	 * Get current payment details.
+	 * Get current payment detail to the staff performed this action.
 	 * @param dbCon
 	 * 			the database connection
 	 * @param staff
@@ -132,7 +134,7 @@ public class PaymentDao {
 	 * 			throws if the restaurant does NOT exist
 	 */
 	public static ShiftDetail getCurrentPayment(DBCon dbCon, Staff staff) throws SQLException, BusinessException{
-		return ShiftDao.getByRange(dbCon, staff, getCurrentPaymentRange(dbCon, staff), new CalcBillStatisticsDao.ExtraCond(DateType.TODAY));
+		return getDetail(dbCon, staff, getCurrentPaymentRange(dbCon, staff), new ExtraCond(DateType.TODAY).setStaffId(staff.getId()));
 	}
 	
 
