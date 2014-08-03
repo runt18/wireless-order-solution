@@ -7,10 +7,11 @@ import java.util.List;
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.pojo.util.DateUtil;
+import com.wireless.pojo.util.SortedList;
 
 public class ShiftGeneral implements Jsonable{
 
-	public static class StaffPayment implements Jsonable{
+	public static class StaffPayment implements Jsonable, Comparable<StaffPayment>{
 		private String staffName;
 		private int staffId;
 		private float totalPrice;			//应交款项
@@ -72,6 +73,17 @@ public class ShiftGeneral implements Jsonable{
 		public void fromJsonMap(JsonMap jsonMap, int flag) {
 			
 		}
+
+		@Override
+		public int compareTo(StaffPayment o) {
+			if(this.staffId > o.staffId){
+				return 1;
+			}else if(this.staffId < o.staffId){
+				return -1;
+			}else{
+				return 0;
+			}
+		}
 	}
 	
 	private final int id;
@@ -79,7 +91,7 @@ public class ShiftGeneral implements Jsonable{
 	private long onDuty;
 	private long offDuty;
 	private int restaurantId;
-	private List<StaffPayment> payments = new ArrayList<StaffPayment>();
+	private List<StaffPayment> payments = SortedList.newInstance();
 	
 	public ShiftGeneral(int id){
 		this.id = id;
@@ -122,7 +134,9 @@ public class ShiftGeneral implements Jsonable{
 	}
 	
 	public void addPayment(StaffPayment payment){
-		payments.add(payment);
+		if(!payments.contains(payment)){
+			payments.add(payment);
+		}
 	}
 	
 	public List<StaffPayment> getPayments(){
