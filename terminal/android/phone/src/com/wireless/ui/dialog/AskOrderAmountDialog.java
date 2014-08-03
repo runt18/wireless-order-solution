@@ -420,7 +420,7 @@ public class AskOrderAmountDialog extends DialogFragment {
 			LinearLayout hsvContainer = (LinearLayout)view.findViewById(R.id.linearLayout_comboFood_askOrderAmount_dialog);
 			View mainFoodView = inflater.inflate(R.layout.combo_food_item, hsvContainer, false);
 			((TextView)mainFoodView.findViewById(R.id.txtView_status_comboFood_item)).setText("(主)");
-			((TextView)(TextView)mainFoodView.findViewById(R.id.txtView_foodName_comboFood_item)).setText(mSelectedFood.asFood().getName().substring(0, 4));
+			((TextView)(TextView)mainFoodView.findViewById(R.id.txtView_foodName_comboFood_item)).setText(mSelectedFood.asFood().getName().length() > 4 ? mSelectedFood.asFood().getName().substring(0, 4) : mSelectedFood.asFood().getName());
 			
 			mainFoodView.setOnClickListener(new OnClickListener() {
 				@Override
@@ -437,7 +437,7 @@ public class AskOrderAmountDialog extends DialogFragment {
 				View childFoodView = inflater.inflate(R.layout.combo_food_item, hsvContainer, false);
 				((TextView)childFoodView.findViewById(R.id.txtView_status_comboFood_item)).setText("(套" + index + ")");
 				//显示套菜快速导航的子菜部分
-				((TextView)childFoodView.findViewById(R.id.txtView_foodName_comboFood_item)).setText(eachChild.asFood().getName().substring(0, 4));
+				((TextView)childFoodView.findViewById(R.id.txtView_foodName_comboFood_item)).setText(eachChild.asFood().getName().length() > 4 ? eachChild.asFood().getName().substring(0, 4) : eachChild.asFood().getName());
 				final int i = index++;
 				childFoodView.setOnClickListener(new OnClickListener() {
 					@Override

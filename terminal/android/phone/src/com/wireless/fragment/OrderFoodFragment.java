@@ -719,11 +719,9 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 														of.addCount(of.getCount() * (amount - 1));
 														if(of.hasTmpTaste()){
 															Taste tmpTaste = of.getTasteGroup().getTmpTaste();
-															if(!tmpTaste.getPreference().contains("分席上")){
-																tmpTaste.setPreference((tmpTaste.getPreference().length() != 0 ? tmpTaste.getPreference() + "," : "") + "分席上");
-															}
+															tmpTaste.setPreference((tmpTaste.getPreference().length() != 0 ? tmpTaste.getPreference() + "," : "") + ("分" + amount + "席上"));
 														}else{
-															of.setTmpTaste(Taste.newTmpTaste("分席上", 0));
+															of.setTmpTaste(Taste.newTmpTaste("分" + amount + "席上", 0));
 														}
 													}
 													//设置状态为'已分席'
@@ -733,17 +731,15 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 
 											}catch(NumberFormatException e){
 												Toast.makeText(getActivity(), "您输入的分席数量不正确", Toast.LENGTH_SHORT).show();
-												
 											} catch (BusinessException e) {
 												Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_SHORT).show();
-												
-											}finally{
-												mPopup.dismiss();
 											}
 										}
 		
 									})
 									.setNegativeButton("取消", null).show();		
+								
+								mPopup.dismiss();
 								
 								//只用下面这一行弹出对话框时需要点击输入框才能弹出软键盘
 								dialog.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
@@ -755,12 +751,7 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 									of.setCount(of.getCount() - Math.abs(of.getDelta()));
 									if(of.hasTmpTaste()){
 										Taste tmpTaste = of.getTasteGroup().getTmpTaste();
-										if(tmpTaste.getPreference().contains(",分席上")){
-											tmpTaste.setPreference((tmpTaste.getPreference().replace(",分席上", "")));
-											
-										}else if(tmpTaste.getPreference().contains("分席上")){
-											tmpTaste.setPreference((tmpTaste.getPreference().replace("分席上", "")));
-										}
+										tmpTaste.setPreference(tmpTaste.getPreference().replaceAll("分.席上", ""));
 										if(tmpTaste.getPreference().length() == 0){
 											of.setTmpTaste(null);
 										}
