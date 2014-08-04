@@ -35,6 +35,7 @@ public class OrderDao {
 		private HourRange hourRange;	//按时间区间
 		private PayType payType;		//按付款类型
 		private String comment;			//按备注
+		private int staffId;			//按员工
 		private List<Order.Status> statusList = new ArrayList<Order.Status>();	//按状态状态
 		
 		private boolean isRepaid;		//是否有反结帐
@@ -65,6 +66,11 @@ public class OrderDao {
 		
 		public ExtraCond setTableAlias(int tableAlias){
 			this.tableAlias = tableAlias;
+			return this;
+		}
+		
+		public ExtraCond setStaffId(int staffId){
+			this.staffId = staffId;
 			return this;
 		}
 		
@@ -146,6 +152,9 @@ public class OrderDao {
 			}
 			if(tableAlias > 0){
 				filterCond.append(" AND " + orderTbl + ".table_alias = " + tableAlias);
+			}
+			if(staffId > 0){
+				filterCond.append(" AND " + orderTbl + ".staff_id = " + staffId);
 			}
 			if(tableName != null){
 				filterCond.append(" AND " + orderTbl + ".table_name LIKE '%" + tableName + "%'");
@@ -452,7 +461,7 @@ public class OrderDao {
 		String sql;
 		if(dateType == DateType.TODAY){
 			sql = " SELECT " +
-				  " O.id, O.order_date, O.seq_id, O.custom_num, O.table_id, O.table_alias, O.table_name, " +
+				  " O.id, O.order_date, O.seq_id, O.custom_num, O.table_id, O.table_alias, O.table_name, O.staff_id, " +
 				  " T.minimum_cost, T.status AS table_status, " +
 				  " O.waiter, " +
 				  " O.region_id, O.region_name, O.restaurant_id, " +
