@@ -323,7 +323,20 @@ function showWeixinMemberBindWin(){
 	Ext.getCmp('txtWeixinMemberPhone').focus(true, 100);
 }
 
+function font_setPrintRegion(){
+	var paymentRegion = '';
+	var paymentCheck = Ext.getCmp('cbox_paymentRegion');
+	if(paymentCheck.getValue()){
+		paymentRegion = Ext.getCmp('payment_comboRegion').getValue();
+		Ext.ux.setCookie(document.domain+'_paymentCheck', true, 3650);
+		Ext.ux.setCookie(document.domain+'_paymentRegion', paymentRegion, 3650);
+	}else{
+		Ext.ux.setCookie(document.domain+'_paymentCheck', false, 3650);
+	}
+}
+
 function jiaoBanDaYin(e){
+	var regionId = Ext.getCmp('cbox_paymentRegion').getValue();
 	var tempMask = new Ext.LoadMask(document.body, {
 		msg : '正在打印请稍候.......',
 		remove : true
@@ -334,7 +347,8 @@ function jiaoBanDaYin(e){
 		params : {
 			onDuty : dutyRange.onDutyFormat,
 			offDuty : dutyRange.offDutyFormat,
-			'printType' : e == null ? 4 : 5
+			'printType' : e == null ? 4 : 5,
+			regionId : (regionId ? Ext.getCmp('payment_comboRegion').getValue() : '')
 		},
 		success : function(response, options) {
 			tempMask.hide();
@@ -362,10 +376,64 @@ function shiftButHandler(){
 		resizable : false,	
 		layout: 'fit',
 		bbar : ['->', {
+			xtype : 'checkbox',
+			id : 'cbox_paymentRegion',
+			boxLabel : '打印位置&nbsp;&nbsp;',
+			listeners : {
+				check : function(thiz, checked){
+				if(checked){
+					Ext.getCmp('payment_comboRegion').show();
+				}else{
+					Ext.getCmp('payment_comboRegion').hide();
+				}
+			}
+			}
+		},{
+			xtype : 'combo',
+			hidden : true,
+			forceSelection : true,
+			width : 90,
+			value : -1,
+			id : 'payment_comboRegion',
+			store : new Ext.data.SimpleStore({
+				fields : ['id', 'name']
+			}),
+			valueField : 'id',
+			displayField : 'name',
+			typeAhead : true,
+			mode : 'local',
+			triggerAction : 'all',
+			selectOnFocus : true,
+			allowBlank : false,
+			readOnly : false,
+			listeners : {
+				render : function(thiz){
+					var data = [];
+					$.ajax({
+						url : '../../QueryRegion.do',
+						type : 'post',
+						async: false,
+						data : {dataSource : 'normal'},
+						success : function(jr, status, xhr){
+							for(var i = 0; i < jr.root.length; i++){
+								data.push([jr.root[i]['id'], jr.root[i]['name']]);
+							}
+							thiz.store.loadData(data);
+							thiz.setValue(jr.root[0].id);
+						},
+						error : function(request, status, err){
+							thiz.store.loadData(data);
+							thiz.setValue(-1);
+						}
+					}); 
+				}
+			}
+		}, {
 			text : "交班",
 			icon: '../../images/user.png',
 			id : 'btnJiaoBan',
 			handler : function() {
+				font_setPrintRegion();
 				dutyRange = getDutyRange();
 				Ext.MessageBox.show({
 					msg : "确认进行交班？",
@@ -407,6 +475,7 @@ function shiftButHandler(){
 			id : 'btnJiaoBanDaYin',
 			icon: '../../images/printShift.png',
 			handler : function(e){
+				font_setPrintRegion();
 				dutyRange = getDutyRange();
 				jiaoBanDaYin(e);
 			}
@@ -445,10 +514,17 @@ function shiftButHandler(){
 	});
 	businessStatWin.show();
 	businessStatWin.center();
+	
+	if(Ext.ux.getCookie(document.domain+'_paymentCheck') == 'true'){
+		Ext.getCmp('cbox_paymentRegion').setValue(true);
+		Ext.getCmp('payment_comboRegion').setValue(parseInt(Ext.ux.getCookie(document.domain+'_paymentRegion')));
+	}else{
+		Ext.getCmp('cbox_paymentRegion').setValue(false);
+	}	
 }
 
 function riJieDaYin(e){
-
+	var regionId = Ext.getCmp('cbox_paymentRegion').getValue();
 	var tempMask = new Ext.LoadMask(document.body, {
 		msg : '正在打印请稍候.......',
 		remove : true
@@ -459,7 +535,8 @@ function riJieDaYin(e){
 		params : {
 			onDuty : dutyRange.onDutyFormat,
 			offDuty : dutyRange.offDutyFormat,
-			'printType' : e == null ? 6 : 5
+			'printType' : e == null ? 6 : 5,
+			regionId : (regionId ? Ext.getCmp('payment_comboRegion').getValue() : '')
 		},
 		success : function(response, options) {
 			tempMask.hide();
@@ -487,10 +564,64 @@ function dailySettleButHandler(){
 		resizable : false,	
 		layout: 'fit',
 		bbar : ['->',{
+			xtype : 'checkbox',
+			id : 'cbox_paymentRegion',
+			boxLabel : '打印位置&nbsp;&nbsp;',
+			listeners : {
+				check : function(thiz, checked){
+				if(checked){
+					Ext.getCmp('payment_comboRegion').show();
+				}else{
+					Ext.getCmp('payment_comboRegion').hide();
+				}
+			}
+			}
+		},{
+			xtype : 'combo',
+			hidden : true,
+			forceSelection : true,
+			width : 90,
+			value : -1,
+			id : 'payment_comboRegion',
+			store : new Ext.data.SimpleStore({
+				fields : ['id', 'name']
+			}),
+			valueField : 'id',
+			displayField : 'name',
+			typeAhead : true,
+			mode : 'local',
+			triggerAction : 'all',
+			selectOnFocus : true,
+			allowBlank : false,
+			readOnly : false,
+			listeners : {
+				render : function(thiz){
+					var data = [];
+					$.ajax({
+						url : '../../QueryRegion.do',
+						type : 'post',
+						async: false,
+						data : {dataSource : 'normal'},
+						success : function(jr, status, xhr){
+							for(var i = 0; i < jr.root.length; i++){
+								data.push([jr.root[i]['id'], jr.root[i]['name']]);
+							}
+							thiz.store.loadData(data);
+							thiz.setValue(jr.root[0].id);
+						},
+						error : function(request, status, err){
+							thiz.store.loadData(data);
+							thiz.setValue(-1);
+						}
+					}); 
+				}
+			}
+		},{
 			text : "日结",
 			id : 'btnRiJie',
 			icon: '../../images/user.png',
 			handler : function() {
+				font_setPrintRegion();
 				dutyRange = getDutyRange();
 				Ext.MessageBox.show({
 					msg : "确认进行日结？",
@@ -529,6 +660,7 @@ function dailySettleButHandler(){
 			id : 'btnRiJieDaYin',
 			icon: '../../images/printShift.png',
 			handler : function(e){
+				font_setPrintRegion();
 				dutyRange = getDutyRange();
 				riJieDaYin(e);
 			}
@@ -567,6 +699,14 @@ function dailySettleButHandler(){
 	});
 	businessStatWin.show();
 	businessStatWin.center();
+	
+	if(Ext.ux.getCookie(document.domain+'_paymentCheck') == 'true'){
+		Ext.getCmp('cbox_paymentRegion').setValue(true);
+		Ext.getCmp('payment_comboRegion').setValue(parseInt(Ext.ux.getCookie(document.domain+'_paymentRegion')));
+	}else{
+		Ext.getCmp('cbox_paymentRegion').setValue(false);
+	}	
+	
 }
 
 
@@ -645,31 +785,12 @@ function paymentHandler(){
 			listeners : {
 				render : function(thiz){
 					var data = [];
-//					Ext.Ajax.request({
-//						url : '../../QueryRegion.do',
-//						params : {
-//							dataSource : 'normal'
-//						},
-//						success : function(res, opt){
-//							var jr = Ext.decode(res.responseText);
-//							for(var i = 0; i < jr.root.length; i++){
-//								data.push([jr.root[i]['id'], jr.root[i]['name']]);
-//							}
-//							thiz.store.loadData(data);
-//							thiz.setValue(jr.root[0].id);
-//						},
-//						fialure : function(res, opt){
-//							thiz.store.loadData(data);
-//							thiz.setValue(-1);
-//						}
-//					});
 					$.ajax({
 						url : '../../QueryRegion.do',
 						type : 'post',
 						async: false,
 						data : {dataSource : 'normal'},
 						success : function(jr, status, xhr){
-//							var jr = Ext.decode(res.responseText);
 							for(var i = 0; i < jr.root.length; i++){
 								data.push([jr.root[i]['id'], jr.root[i]['name']]);
 							}
@@ -688,15 +809,7 @@ function paymentHandler(){
 			icon: '../../images/user.png',
 			id : 'btnPayment',
 			handler : function() {
-				var paymentRegion = '';
-				var paymentCheck = Ext.getCmp('cbox_paymentRegion');
-				if(paymentCheck.getValue()){
-					paymentRegion = Ext.getCmp('payment_comboRegion').getValue();
-					Ext.ux.setCookie(document.domain+'_paymentCheck', true, 3650);
-					Ext.ux.setCookie(document.domain+'_paymentRegion', paymentRegion, 3650);
-				}else{
-					Ext.ux.setCookie(document.domain+'_paymentCheck', false, 3650);
-				}
+				font_setPrintRegion();
 				dutyRange = getDutyRange();
 				Ext.MessageBox.show({
 					msg : "确认进行交款？",
@@ -706,7 +819,7 @@ function paymentHandler(){
 						if(btn == "yes"){
 							Ext.Ajax.request({
 								url : "../../DoPayment.do",
-								params : {paymentRegion:paymentRegion},
+//								params : {paymentRegion:paymentRegion},
 								success : function(response, options) {
 									var resultJSON = Ext.util.JSON.decode(response.responseText);
 									if (resultJSON.success == true) {

@@ -12,7 +12,6 @@ function loadDiscountData(_c){
 		},
 		success : function(response, options) {
 			var jr = Ext.decode(response.responseText);
-//			checkOutForm.buttons[7].setDisabled(false);
 			discountData = jr.root;
 			var discount = Ext.getCmp('comboDiscount');
 			discount.store.loadData({root:discountData});
@@ -26,13 +25,8 @@ function loadDiscountData(_c){
 					defaultsID = discountData[i].id;
 				}
 			}
-//			if(defaultsID != null && typeof defaultsID != 'undefined' && defaultsID != ''){
-//				discount.setValue(defaultsID);
-//				discount.fireEvent('select', discount, null, null);
-//			}
 		},
 		failure : function(response, options) {
-//			checkOutForm.buttons[7].setDisabled(false);
 			Ext.ux.showMsg(Ext.decode(response.responseText));
 		},
 		callback : _c.callback
@@ -50,12 +44,10 @@ function checkDot(c)
  */
 function loadOrderBasicMsg(){
 	calcDiscountID = orderMsg.discount.id; // i
-//	calcPricePlanID = orderMsg.pricePlan.id; // i
 	document.getElementById('spanDisplayCurrentDiscount').innerHTML = orderMsg.discount.name;
 	
 	document.getElementById('spanDisplayCurrentServiceRate').innerHTML = (orderMsg.serviceRate*100)+'%';
 //	document.getElementById("serviceCharge").value = orderMsg.serviceRate * 100;
-//	var actualCount = document.getElementById("actualCount").value;
 	document.getElementById("totalCount").innerHTML = checkDot(orderMsg.totalPrice)?parseFloat(orderMsg.totalPrice).toFixed(2) : orderMsg.totalPrice;
 	document.getElementById("shouldPay").innerHTML = checkDot(orderMsg.actualPrice)?parseFloat(orderMsg.actualPrice).toFixed(2) : orderMsg.actualPrice;
 	document.getElementById("forFree").innerHTML = checkDot(orderMsg.giftPrice)?parseFloat(orderMsg.giftPrice).toFixed(2) : orderMsg.giftPrice;
@@ -283,13 +275,6 @@ function createCancelFoodDetail(_data){
 	}
 	cancelFoodPrice = cancelFoodPrice.toFixed(2);
 	sumAmount = sumAmount.toFixed(2);
-/*	cancelFoodDetailData.root.push({
-		orderDateFormat : '汇总',		
-		count : sumAmount,
-		totalPrice : cancelFoodPrice,
-		'kitchen' : {},
-		'tasteGroup' : {}
-	});*/
 	cancelFoodDetailData.totalProperty = cancelFoodDetailData.root.length;
 	
 //	Ext.getDom('spanCancelFoodAmount').innerHTML = cancelFoodPrice;

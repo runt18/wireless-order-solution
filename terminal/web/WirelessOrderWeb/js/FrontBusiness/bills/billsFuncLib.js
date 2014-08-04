@@ -12,6 +12,8 @@
 			gs.baseParams['tableAlias'] = Ext.getCmp('textTableAliasOrName').getValue();
 		}
 		gs.baseParams['region'] = Ext.getCmp('today_comboRegion').getValue();
+		
+		gs.baseParams['staffId'] = frontBill_combo_staffs.getValue();
 	}
 	
 	gs.baseParams['orderId'] = Ext.getCmp('numberSearchValue').getValue();

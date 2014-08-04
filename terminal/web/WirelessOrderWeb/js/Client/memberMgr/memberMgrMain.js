@@ -1301,7 +1301,7 @@ function gridInit(){
 		'',
 		'../../QueryMember.do',
 		[
-			[true, true, false, true],
+			[true, false, false, true],
 			['名称', 'name'],
 			['类型', 'memberType.name'],
 			['消费次数', 'consumptionAmount',,'right', 'Ext.ux.txtFormat.gridDou'],

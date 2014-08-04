@@ -19,6 +19,7 @@ function billQueryHandler() {
 			gs.baseParams['tableName'] = '';
 		}
 		gs.baseParams['region'] = Ext.getCmp('history_comboRegion').getValue();
+		gs.baseParams['staffId'] = Ext.getCmp('historyBill_combo_staffs').getValue();
 		var businessHour = history_oBusinessHourData({type : 'get'}).data;
 		if(parseInt(businessHour.businessHourType) != -1){
 			gs.baseParams['opening'] = businessHour.opening;
@@ -469,6 +470,49 @@ function history_oBusinessHourData(c){
 	return c;
 };
 
+var historyBill_combo_staffs = new Ext.form.ComboBox({
+	id : 'historyBill_combo_staffs',
+	readOnly : false,
+	forceSelection : true,
+	width : 100,
+	listWidth : 120,
+	store : new Ext.data.SimpleStore({
+		fields : ['staffID', 'staffName']
+	}),
+	valueField : 'staffID',
+	displayField : 'staffName',
+	typeAhead : true,
+	mode : 'local',
+	triggerAction : 'all',
+	selectOnFocus : true,
+	listeners : {
+		render : function(thiz){
+			var staffData = [[-1,'全部']];
+			Ext.Ajax.request({
+				url : '../../QueryStaff.do',
+				params : {privileges : 1005},
+				success : function(res, opt){
+					var jr = Ext.decode(res.responseText);
+					for(var i = 0; i < jr.root.length; i++){
+						staffData.push([jr.root[i]['staffID'], jr.root[i]['staffName']]);
+					}
+					thiz.store.loadData(staffData);
+					thiz.setValue(-1);
+				},
+				fialure : function(res, opt){
+					thiz.store.loadData(staffData);
+					thiz.setValue(-1);
+				}
+			});
+		},
+		select : function(){
+			if(searchType){
+				Ext.getCmp('btnSreachForMainOrderGrid').handler();
+			}
+		}
+	}
+});
+
 var billsGrid;
 var foodStatus;
 var historyExtraBar;
@@ -507,7 +551,15 @@ Ext.onReady(function() {
 		id : 'historyExtraBar',
 		hidden : true,
 		height : 28,
-		items : [
+		items : [{xtype : 'tbtext', text : '&nbsp;&nbsp;&nbsp;&nbsp;'},
+			{xtype : 'tbtext', text : '台名/台号:'},
+			{
+				xtype : 'textfield',
+				id : 'textTableAliasOrName',
+				hidden : false,
+				width : 100
+			},
+			{xtype : 'tbtext', text : '&nbsp;&nbsp;'},
 			{xtype : 'tbtext', text : '收款方式:'},
 			{xtype : 'tbtext', text : '&nbsp;&nbsp;'},
 			{
@@ -537,21 +589,8 @@ Ext.onReady(function() {
 				}
 			},
 			{xtype : 'tbtext', text : '&nbsp;&nbsp;'},
-			{xtype : 'tbtext', text : '台名/台号:'},
-			{
-				xtype : 'textfield',
-				id : 'textTableAliasOrName',
-				hidden : false,
-				width : 100
-			},
-			{xtype : 'tbtext', text : '&nbsp;&nbsp;'},
-			{xtype : 'tbtext', text : '备注搜索:'},
-			{
-				xtype : 'textfield',
-				id : 'textSearchValue',
-				hidden : false,
-				width : 100
-			},
+			{xtype : 'tbtext', text : '操作人员:'},
+			historyBill_combo_staffs,
 			{xtype : 'tbtext', text : '&nbsp;&nbsp;'},
 			{xtype : 'tbtext', text : '区域:'},
 			{
@@ -599,6 +638,14 @@ Ext.onReady(function() {
 						}
 					}
 				}
+			},
+			{xtype : 'tbtext', text : '&nbsp;&nbsp;'},
+			{xtype : 'tbtext', text : '备注搜索:'},
+			{
+				xtype : 'textfield',
+				id : 'textSearchValue',
+				hidden : false,
+				width : 100
 			}
 		]
 	});
@@ -977,6 +1024,7 @@ Ext.onReady(function() {
 	    		
 	    		Ext.getCmp('comboPayType').setValue(-1);
 	    		Ext.getCmp('history_comboRegion').setValue(-1);
+	    		Ext.getCmp('historyBill_combo_staffs').setValue(-1);
 	    		
 
 	    		

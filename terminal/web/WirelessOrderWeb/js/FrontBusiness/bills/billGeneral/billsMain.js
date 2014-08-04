@@ -225,13 +225,12 @@ var frontBill_combo_staffs = new Ext.form.ComboBox({
 	id : 'frontBill_combo_staffs',
 	readOnly : false,
 	forceSelection : true,
-	width : 103,
+	width : 100,
 	listWidth : 120,
-	hidden : true,
 	store : new Ext.data.SimpleStore({
 		fields : ['staffID', 'staffName']
 	}),
-	valueField : 'staffName',
+	valueField : 'staffID',
 	displayField : 'staffName',
 	typeAhead : true,
 	mode : 'local',
@@ -239,25 +238,28 @@ var frontBill_combo_staffs = new Ext.form.ComboBox({
 	selectOnFocus : true,
 	listeners : {
 		render : function(thiz){
-			var data = [['全部','全部']];
+			var staffData = [[-1,'全部']];
 			Ext.Ajax.request({
 				url : '../../QueryStaff.do',
+				params : {privileges : 1005},
 				success : function(res, opt){
 					var jr = Ext.decode(res.responseText);
 					for(var i = 0; i < jr.root.length; i++){
-						data.push([jr.root[i]['staffID'], jr.root[i]['staffName']]);
+						staffData.push([jr.root[i]['staffID'], jr.root[i]['staffName']]);
 					}
-					thiz.store.loadData(data);
-					thiz.setValue('全部');
+					thiz.store.loadData(staffData);
+					thiz.setValue(-1);
 				},
 				fialure : function(res, opt){
-					thiz.store.loadData(data);
-					thiz.setValue('全部');
+					thiz.store.loadData(staffData);
+					thiz.setValue(-1);
 				}
 			});
 		},
 		select : function(){
-			//Ext.getCmp('btnSearchForCommissionStatistics').handler();
+			if(searchType){
+				Ext.getCmp('fontBill_search').handler();
+			}
 		}
 	}
 });
@@ -424,11 +426,20 @@ Ext.onReady(function(){
 			{xtype : 'tbtext', text : '班次:'},
 			duty,
 			{xtype : 'tbtext', text : '&nbsp;&nbsp;'},
+			{xtype : 'tbtext', text : '台名/台号:'},
+			{
+				xtype : 'textfield',
+				id : 'textTableAliasOrName',
+				hidden : false,
+				width : 100
+			},
+			{xtype : 'tbtext', text : '&nbsp;&nbsp;'},
+			
 			{xtype : 'tbtext', text : '收款方式:'},
 			{
 				xtype : 'combo',
 				forceSelection : true,
-				width : 70,
+				width : 80,
 				value : -1,
 				id : 'comboPayType',
 				store : new Ext.data.SimpleStore({
@@ -452,27 +463,14 @@ Ext.onReady(function(){
 				}					
 			},
 			{xtype : 'tbtext', text : '&nbsp;&nbsp;'},
-			{xtype : 'tbtext', text : '台名/台号:'},
-			{
-				xtype : 'textfield',
-				id : 'textTableAliasOrName',
-				hidden : false,
-				width : 100
-			},
-			{xtype : 'tbtext', text : '&nbsp;&nbsp;'},
-			{xtype : 'tbtext', text : '备注搜索:'},
-			{
-				xtype : 'textfield',
-				id : 'textSearchValue',
-				hidden : false,
-				width : 100
-			},
+			{xtype : 'tbtext', text : '操作员工:'},
+			frontBill_combo_staffs,
 			{xtype : 'tbtext', text : '&nbsp;&nbsp;'},
 			{xtype : 'tbtext', text : '区域:'},
 			{
 				xtype : 'combo',
 				forceSelection : true,
-				width : 90,
+				width : 100,
 				value : -1,
 				id : 'today_comboRegion',
 				store : new Ext.data.SimpleStore({
@@ -514,6 +512,14 @@ Ext.onReady(function(){
 						}
 					}
 				}
+			},
+			{xtype : 'tbtext', text : '&nbsp;&nbsp;'},
+			{xtype : 'tbtext', text : '备注搜索:'},
+			{
+				xtype : 'textfield',
+				id : 'textSearchValue',
+				hidden : false,
+				width : 100
 			}
 		]
 	});
@@ -663,6 +669,7 @@ Ext.onReady(function(){
 	    		Ext.getCmp('today_comboRegion').setValue(-1);
 	    		
 	    		Ext.getCmp('comboPayType').setValue(-1);
+	    		Ext.getCmp('frontBill_combo_staffs').setValue(-1);
 	    		
 	    		Ext.getCmp('todayHighSBar').hide();
 	    		
