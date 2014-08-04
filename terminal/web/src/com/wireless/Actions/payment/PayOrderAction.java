@@ -131,7 +131,7 @@ public class PayOrderAction extends Action{
 			
 			//Get the first 20 characters of the comment
 			String comment = request.getParameter("comment");
-			if(comment != null){
+			if(comment != null && !comment.isEmpty()){
 				payBuilder.setComment(comment.substring(0, comment.length() < 20 ? comment.length() : 20));
 			}	
 

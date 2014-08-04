@@ -136,13 +136,25 @@ public class PrintOrderAction extends Action{
 					reqPrintContent = ReqPrintContent.buildReqPrintReceipt(staff, orderId);
 					break;
 				case 4:
-					reqPrintContent = ReqPrintContent.buildReqPrintShiftReceipt(staff, new DutyRange(onDuty, offDuty), PType.PRINT_SHIFT_RECEIPT);
+					if(paymentRegion){
+						reqPrintContent = ReqPrintContent.buildReqPrintShiftReceipt(staff, new DutyRange(onDuty, offDuty), Region.RegionId.valueOf(Integer.parseInt(regionId)), PType.PRINT_SHIFT_RECEIPT);
+					}else{
+						reqPrintContent = ReqPrintContent.buildReqPrintShiftReceipt(staff, new DutyRange(onDuty, offDuty), PType.PRINT_SHIFT_RECEIPT);
+					}
 					break;
 				case 5:
-					reqPrintContent = ReqPrintContent.buildReqPrintShiftReceipt(staff, new DutyRange(onDuty, offDuty), PType.PRINT_TEMP_SHIFT_RECEIPT);
+					if(paymentRegion){
+						reqPrintContent = ReqPrintContent.buildReqPrintShiftReceipt(staff, new DutyRange(onDuty, offDuty), Region.RegionId.valueOf(Integer.parseInt(regionId)), PType.PRINT_TEMP_SHIFT_RECEIPT);
+					}else{
+						reqPrintContent = ReqPrintContent.buildReqPrintShiftReceipt(staff, new DutyRange(onDuty, offDuty), PType.PRINT_TEMP_SHIFT_RECEIPT);
+					}
 					break;
 				case 6:
-					reqPrintContent = ReqPrintContent.buildReqPrintShiftReceipt(staff, new DutyRange(onDuty, offDuty), PType.PRINT_DAILY_SETTLE_RECEIPT);
+					if(paymentRegion){
+						reqPrintContent = ReqPrintContent.buildReqPrintShiftReceipt(staff, new DutyRange(onDuty, offDuty), Region.RegionId.valueOf(Integer.parseInt(regionId)), PType.PRINT_DAILY_SETTLE_RECEIPT);
+					}else{
+						reqPrintContent = ReqPrintContent.buildReqPrintShiftReceipt(staff, new DutyRange(onDuty, offDuty), PType.PRINT_DAILY_SETTLE_RECEIPT);
+					}
 					break;
 				case 7:
 					reqPrintContent = ReqPrintContent.buildReqPrintShiftReceipt(staff, new DutyRange(onDuty, offDuty), PType.PRINT_HISTORY_SHIFT_RECEIPT);

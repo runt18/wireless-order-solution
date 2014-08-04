@@ -55,6 +55,7 @@ public class QueryOrderStatisticsAction extends Action {
 			String tableAlias = request.getParameter("tableAlias");
 			String tableName = request.getParameter("tableName");
 			String region = request.getParameter("region");
+			String staffId = request.getParameter("staffId");
 			String common = request.getParameter("common");
 			String comboPayType = request.getParameter("comboPayType");
 			
@@ -99,6 +100,9 @@ public class QueryOrderStatisticsAction extends Action {
 			}
 			if(tableName != null && !tableName.isEmpty()){
 				extraCond.setTableName(tableName);
+			}
+			if(staffId != null && !staffId.isEmpty() && !staffId.equals("-1")){
+				extraCond.setStaffId(Integer.parseInt(staffId));
 			}
 			if(region != null && !region.equals("-1")){
 				extraCond.setRegionId(Region.RegionId.valueOf(Short.parseShort(region)));
