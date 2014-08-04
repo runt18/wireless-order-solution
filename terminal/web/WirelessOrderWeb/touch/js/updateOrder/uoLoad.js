@@ -161,8 +161,8 @@ function showOrder(){
 function showDescForUpdateOrder(){
 	var html = "";
 	html = "<div>" +
-	"<span style = 'margin-left: 500px;'>菜品数量：" + uoFood.length + "</span>" +
-	"<span style = 'margin-left: 50px;'>消费总额：</span>" + "<span id = 'spanTotalPriceUO'></span>" +	
+//	"<span style = 'margin-left: 500px;'>菜品数量：" + uoFood.length + "</span>" +
+	"<span style = 'margin-left: 500px;'>消费总额：</span>" + "<span id = 'spanTotalPriceUO'></span>" +	
 	"</div>";
 	$("#divDescForUpdateOrder").html(html);
 	$("#spanTotalPriceUO").html(uo.getTotalPriceUO().toFixed(2) + "元");

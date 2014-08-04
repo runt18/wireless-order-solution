@@ -638,7 +638,7 @@ uo.tempPayForUO = function(c){
 				payManner : uo.order.payTypeValue,
 				serviceRate : uo.order.serviceRate,
 				cashIncome : '-1',
-				comment : uo.order.comment,
+//				comment : uo.order.comment,
 				customNum : uo.order.customNum,
 				discountID : typeof c.discountId != 'undefined' ? c.discountId : uo.order.discount.id,
 				tempPay : true,
