@@ -250,6 +250,11 @@ public class PickFoodFragment extends Fragment{
 				((TextView)view.findViewById(R.id.textView_sellout_pickFoodFgm_item)).setVisibility(View.VISIBLE);
 				((TextView)view.findViewById(R.id.textView_sellout_pickFoodFgm_item)).setText("Ì×");
 				((TextView)view.findViewById(R.id.textView_sellout_pickFoodFgm_item)).setTextColor(getResources().getColor(R.color.green));
+				
+			}else if(food.isWeigh()){
+				((TextView)view.findViewById(R.id.textView_sellout_pickFoodFgm_item)).setVisibility(View.VISIBLE);
+				((TextView)view.findViewById(R.id.textView_sellout_pickFoodFgm_item)).setText("³Æ");
+				((TextView)view.findViewById(R.id.textView_sellout_pickFoodFgm_item)).setTextColor(getResources().getColor(R.color.green));
 			}else{
 				((TextView)view.findViewById(R.id.textView_sellout_pickFoodFgm_item)).setVisibility(View.GONE);
 			}

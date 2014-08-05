@@ -179,7 +179,7 @@ public class PickTasteActivity extends FragmentActivity  implements OnTastePicke
 		//品注Button
 		if(getIntent().getBooleanExtra(PICK_ALL_ORDER_TASTE, false)){
 			//全单备注下不显示品注
-			((ImageButton)findViewById(R.id.imgButton_pinzhu_pickTaste)).setEnabled(false);
+			findViewById(R.id.linearLayout_bottom_pickTaste).setVisibility(View.GONE);
 		}else {
 			((ImageButton)findViewById(R.id.imgButton_pinzhu_pickTaste)).setOnClickListener(new View.OnClickListener() {			
 				@Override
@@ -199,9 +199,9 @@ public class PickTasteActivity extends FragmentActivity  implements OnTastePicke
 			public void run() {
 				boolean hasPopTastes = false;
 				if(mSelectedFood != null){
-					hasPopTastes = mSelectedFood.hasTasteGroup();
+					hasPopTastes = mSelectedFood.asFood().hasPopTastes();
 				}else if(mSelectedCombo != null){
-					hasPopTastes = mSelectedCombo.hasTasteGroup();
+					hasPopTastes = mSelectedCombo.asComboFood().asFood().hasPopTastes();
 				}
 				if(initFgm == POP_TASTE_FRAGMENT && !hasPopTastes){
 					mFgmHandler.sendEmptyMessage(ALL_TASTE_FRAGMENT);
