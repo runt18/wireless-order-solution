@@ -37,8 +37,9 @@ public class FoodListContent extends ConcreteContent {
 			if(of.asFood().isCombo()){
 				var.append(new ComboDetail4ListContent(mDisplayConfig, of, mPrintType, mStyle));
 			}else{
-				var.append(new FoodDetailContent(mDisplayConfig, of, mPrintType, mStyle).toString() + (cnt++ < mOrderFoods.size() - 1 ? SEP : ""));
+				var.append(new FoodDetailContent(mDisplayConfig, of, mPrintType, mStyle).toString());
 			}
+			var.append(cnt++ < mOrderFoods.size() - 1 ? SEP : "");
 		}
 		return var.toString();
 	}

@@ -5,6 +5,7 @@ import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.menuMgr.ComboFood;
 import com.wireless.pojo.printScheme.PStyle;
 import com.wireless.pojo.printScheme.PType;
+import com.wireless.pojo.util.NumericUtil;
 import com.wireless.print.content.FoodDetailContent.DisplayConfig;
 
 public class ComboDetailContent extends ConcreteContent {
@@ -39,7 +40,8 @@ public class ComboDetailContent extends ConcreteContent {
 				break;
 			}
 		}
-		var.append(SEP).append(" |-").append(foodName);
+		float amount = mChild.getAmount() * mParent.getCount();
+		var.append(SEP).append(" |-").append(foodName).append("(" + NumericUtil.float2String2(amount) + ")");
 		return var.toString();
 	}
 	
