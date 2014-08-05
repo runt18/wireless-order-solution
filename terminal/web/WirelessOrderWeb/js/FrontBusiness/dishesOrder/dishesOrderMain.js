@@ -63,21 +63,13 @@ var dishesOrderNorthPanel = new Ext.Panel({
 			style : 'font-size:18px;',
 			html : '上限:￥<font id="fontShowEraseQuota" style="color:red;">0.00</font>'
 		}, {
-			width : 130,
+			width : 80,
 			items : [{
-				xtype : 'numberfield',
-				width : 60,
+				xtype : 'label',
+				width : 50,
 				fieldLabel : '服务费',
 				id : 'serviceRate',
-				style : 'text-align:right;',
-				allowBlank : false,
-				validator : function(v) {
-					if (v < 0 || v > 100 || v.indexOf('.') != -1) {
-						return '服务费率范围是0%至100%,且为整数.';
-					} else {
-						return true;
-					}
-				}
+				style : 'font-size:15px;text-align:right;'
 			}]
 		}, {
 			width : 40,

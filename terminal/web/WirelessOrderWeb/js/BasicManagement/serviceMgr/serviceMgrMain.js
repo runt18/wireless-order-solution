@@ -82,6 +82,10 @@ function servicePlanOperationHandler(c){
 			name.setDisabled(false);
 		}
 		
+		if(sn.attributes.status == 2){
+			isDefault.setValue(true);
+		}
+		
 		addServicePlanWin.setTitle('修改方案');
 	}
 	name.clearInvalid();

@@ -80,7 +80,7 @@ function loadSingleOrderData(resultJSON){
 				// 加载账单基础信息
 				Ext.getCmp('txtSettleTypeFormat').setValue(orderSingleData.other.order.settleTypeText);
 				Ext.getCmp('numErasePrice').setValue(orderSingleData.other.order.erasePrice);
-				Ext.getCmp('serviceRate').setValue(orderSingleData.other.order.serviceRate * 100);
+				Ext.getCmp('serviceRate').setText(orderSingleData.other.order.serviceRate * 100);
 				Ext.getCmp('repaid_comboServicePlan').setValue(orderSingleData.other.order.servicePlanId);
 				
 				

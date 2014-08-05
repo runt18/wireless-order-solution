@@ -867,16 +867,11 @@ function submitRepaidOrderHandler(_c){
 			}
 		}
 		
-		var serviceRate = Ext.getCmp('serviceRate');
 		var commentOut = dishesOrderNorthPanel.findById("remark").getValue();
 		var discountID = Ext.getCmp('comboDiscount');
 		var servicePlan = Ext.getCmp('repaid_comboServicePlan');
 		var erasePrice = Ext.getCmp('numErasePrice');
 		
-		if(!serviceRate.isValid()){
-			Ext.example.msg('提示', '服务费率为1-100的正整数,请重新输入.');
-			return;
-		}
 		if(typeof sysSetting.setting != 'undefined' && erasePrice.getValue() > sysSetting.setting.eraseQuota){
 			Ext.example.msg('提示', '抹数金额不能大于系统设置,请重新输入.');
 			return;
@@ -899,7 +894,6 @@ function submitRepaidOrderHandler(_c){
 				'discountID' : discountID.getValue(),
 				'servicePlan' : servicePlan.getValue(),
 				"payType" : payMannerOut,
-				"serviceRate" : serviceRate.getValue(),
 				"memberID" : _c.grid.order['memberID'],
 				"comment" : commentOut,
 				'erasePrice' : erasePrice.getValue(),
