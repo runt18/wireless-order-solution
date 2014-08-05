@@ -29,11 +29,16 @@ public class OperateServicePlanAction extends DispatchAction{
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			String name = request.getParameter("name");
 			String isDeafault = request.getParameter("isDeafault");
+			String deafaultRate = request.getParameter("deafaultRate");
 			
 			ServicePlan.InsertBuilder build = new ServicePlan.InsertBuilder(name);
 			
 			if(Boolean.parseBoolean(isDeafault)){
 				build.setStatus(ServicePlan.Status.DEFAULT);
+			}
+			
+			if(deafaultRate != null && !deafaultRate.isEmpty()){
+				build.setRate(Float.parseFloat(deafaultRate));
 			}
 			
 			ServicePlanDao.insert(staff, build);
