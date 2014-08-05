@@ -214,7 +214,7 @@ CREATE TABLE IF NOT EXISTS `wireless_order_db`.`service_plan` (
   `restaurant_id` INT NOT NULL,
   `name` VARCHAR(45) NOT NULL,
   `type` TINYINT NOT NULL DEFAULT 1 COMMENT 'the type as below.\n1 - normal\n2 - reserved',
-  `status` TINYINT NOT NULL DEFAULT 1 COMMENT 'the status as below\n1 - normal\n2 - reserved',
+  `status` TINYINT NOT NULL DEFAULT 1 COMMENT 'the status as below\n1 - normal\n2 - default',
   PRIMARY KEY (`plan_id`),
   INDEX `ix_restaurant_id` (`restaurant_id` ASC))
 ENGINE = InnoDB
@@ -234,6 +234,22 @@ FROM wireless_order_db.restaurant WHERE id > 10;
 ALTER TABLE `wireless_order_db`.`table` 
 DROP COLUMN `service_rate`,
 DROP COLUMN `enabled`;
+
+-- -----------------------------------------------------
+-- Add the field 'service_id' to table 'order'
+-- -----------------------------------------------------
+ALTER TABLE `wireless_order_db`.`order` 
+ADD COLUMN `service_id` INT NULL DEFAULT NULL COMMENT 'the id to service plan' AFTER `discount_id`;
+
+-- -----------------------------------------------------
+-- Update the service_id to order which is un-paid to free service plan
+-- -----------------------------------------------------
+UPDATE wireless_order_db.order O,
+wireless_order_db.service_plan SP
+SET O.service_id = SP.plan_id
+WHERE O.restaurant_id = SP.restaurant_id
+AND O.status <> 0
+AND SP.type = 2;
 
 SET SQL_SAFE_UPDATES = @OLD_SAFE_UPDATES;
 
