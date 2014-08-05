@@ -324,19 +324,19 @@ public class TableActivity extends FragmentActivity implements OnTableSelectedLi
 			 */
 			switch(theActivity.mTableCond){
 			case FILTER_TABLE_ALL:
-				theActivity.regionAllBtn.setImageResource(R.drawable.alldown);
-				theActivity.idleBtn.setImageResource(R.drawable.free);
-				theActivity.busyBtn.setImageResource(R.drawable.eating);
+				theActivity.regionAllBtn.setImageResource(R.drawable.all_down);
+				theActivity.idleBtn.setImageResource(R.drawable.table_idle);
+				theActivity.busyBtn.setImageResource(R.drawable.table_busy);
 				break;
 			case FILTER_TABLE_IDLE:
 				theActivity.regionAllBtn.setImageResource(R.drawable.all);
-				theActivity.idleBtn.setImageResource(R.drawable.freedown);
-				theActivity.busyBtn.setImageResource(R.drawable.eating);
+				theActivity.idleBtn.setImageResource(R.drawable.table_idle_down);
+				theActivity.busyBtn.setImageResource(R.drawable.table_busy);
 				break;
 			case FILTER_TABLE_BUSY:
 				theActivity.regionAllBtn.setImageResource(R.drawable.all);
-				theActivity.idleBtn.setImageResource(R.drawable.free);
-				theActivity.busyBtn.setImageResource(R.drawable.eatingdown);
+				theActivity.idleBtn.setImageResource(R.drawable.table_idle);
+				theActivity.busyBtn.setImageResource(R.drawable.table_busy_down);
 			}
 			
 			theActivity.mListView.setAdapter(new SimpleAdapter(theActivity.getApplicationContext(), 
@@ -639,7 +639,7 @@ public class TableActivity extends FragmentActivity implements OnTableSelectedLi
 		 * region all button
 		 */
 		regionAllBtn = (ImageButton)findViewById(R.id.imgButton_all_table);
-		regionAllBtn.setImageResource(R.drawable.alldown);
+		regionAllBtn.setImageResource(R.drawable.all_down);
 		regionAllBtn.setOnClickListener(new OnClickListener() {
 			
 			@Override
