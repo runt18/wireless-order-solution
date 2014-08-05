@@ -168,7 +168,9 @@ public class JsonMap implements Map<String, Object>{
 		if(jsonables != null){
 			List<Map<String, Object>> lm = new ArrayList<Map<String, Object>>(jsonables.size());
 			for(Jsonable jsonable : jsonables){
-				lm.add(jsonable.toJsonMap(flag));
+				if(jsonable != null){
+					lm.add(jsonable.toJsonMap(flag));
+				}
 			}
 			jmap.put(key, lm);
 		}
