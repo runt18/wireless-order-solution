@@ -835,15 +835,15 @@ var orderPanel = new Ext.Panel({
 			});
 		}
 	},
-//	{
-//		text : '提交并打印',
-//		hidden : !isRepaid,
-//		handler : function() {
-//			submitOrderHandler({
-//				notPrint : false		
-//			});
-//		}
-//	}, 
+	{
+		text : '提交并打印',
+		hidden : true,
+		handler : function() {
+			submitOrderHandler({
+				notPrint : false		
+			});
+		}
+	}, 
 	{
 		text : '提交不打印',
 		hidden : isRepaid,
