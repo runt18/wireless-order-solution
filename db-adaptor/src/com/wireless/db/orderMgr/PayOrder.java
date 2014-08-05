@@ -21,6 +21,7 @@ import com.wireless.pojo.dishesOrder.Order.PayBuilder;
 import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.distMgr.Discount;
 import com.wireless.pojo.regionMgr.Table;
+import com.wireless.pojo.serviceRate.ServicePlan;
 import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.system.Setting;
@@ -276,6 +277,7 @@ public class PayOrder {
 				  " ,pay_type = " + orderCalculated.getPaymentType().getVal() +  
 				  " ,settle_type = " + orderCalculated.getSettleType().getVal() + 
 				  " ,discount_id = " + orderCalculated.getDiscount().getId() + 
+				  " ,service_id = " + orderCalculated.getServiceId() +
 				  " ,service_rate = " + orderCalculated.getServiceRate() + 
 				  " ,status = " + (orderCalculated.isUnpaid() ? Order.Status.PAID.getVal() : Order.Status.REPAID.getVal()) +  
 				  (orderCalculated.isUnpaid() ? (" ,seq_id = " + orderCalculated.getSeqId()) : "") +
@@ -467,9 +469,21 @@ public class PayOrder {
 		
 		//If the service plan is set, use to get the rate to region belongs to this order
 		if(payBuilder.hasServicePlan()){
-			orderToCalc.setServiceRate(ServicePlanDao.getRateByRegion(dbCon, staff, payBuilder.getServicePlanId(), orderToCalc.getRegion()));
+			ServicePlan sp = ServicePlanDao.getByRegion(dbCon, staff, payBuilder.getServicePlanId(), orderToCalc.getRegion());
+			orderToCalc.setServiceId(sp.getPlanId());
+			if(sp.hasRates()){
+				orderToCalc.setServiceRate(sp.getRates().get(0).getRate());
+			}else{
+				orderToCalc.setServiceRate(0);
+			}
 		}else{
-			orderToCalc.setServiceRate(ServicePlanDao.getDefaultRate(dbCon, staff, orderToCalc.getRegion()));
+			ServicePlan sp = ServicePlanDao.getDefaultByRegion(dbCon, staff, orderToCalc.getRegion());
+			orderToCalc.setServiceId(sp.getPlanId());
+			if(sp.hasRates()){
+				orderToCalc.setServiceRate(sp.getRates().get(0).getRate());
+			}else{		
+				orderToCalc.setServiceRate(0);
+			}
 		}
 		
 		//If the discount is set, check to see whether it is the same as before.

@@ -346,16 +346,18 @@ public class ServicePlanDao {
 	 * @return the service rate to plan and region
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException 
+	 * 			throws if the service plan to this region does NOT exist
 	 */
-	public static float getRateByRegion(DBCon dbCon, Staff staff, int planId, Region region) throws SQLException{
+	public static ServicePlan getByRegion(DBCon dbCon, Staff staff, int planId, Region region) throws SQLException, BusinessException{
 		List<ServicePlan> result = getByCond(dbCon, staff, 
 											 new ServicePlanDao.ExtraCond().setPlanId(planId).setRegion(region.getId()), 
  											 ShowType.BY_PLAN);
 		
 		if(result.isEmpty()){
-			return getDefaultRate(dbCon, staff, region);
+			return getReservedByRegion(dbCon, staff, region);
 		}else{
-			return result.get(0).hasRates() ? result.get(0).getRates().get(0).getRate() : 0;
+			return result.get(0);
 		}
 	}
 	
@@ -370,18 +372,38 @@ public class ServicePlanDao {
 	 * @return the default service rate to this region
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException 
+	 * 			throws if the default service plan does NOT exist
 	 */
-	public static float getDefaultRate(DBCon dbCon, Staff staff, Region region) throws SQLException{
-		List<ServicePlan> result = getByCond(dbCon, staff, new ExtraCond().setStatus(Status.DEFAULT), ShowType.BY_PLAN);
+	public static ServicePlan getDefaultByRegion(DBCon dbCon, Staff staff, Region region) throws SQLException, BusinessException{
+		List<ServicePlan> result = getByCond(dbCon, staff, new ExtraCond().setStatus(Status.DEFAULT).setRegion(region.getId()), ShowType.BY_PLAN);
 		if(result.isEmpty()){
-			result = getByCond(dbCon, staff, new ExtraCond().setType(Type.RESERVED), ShowType.BY_PLAN);
-			if(result.isEmpty()){
-				return 0;
-			}else{
-				return result.get(0).hasRates() ? result.get(0).getRates().get(0).getRate() : 0;
-			}
+			return getReservedByRegion(dbCon, staff, region);
 		}else{
-			return result.get(0).hasRates() ? result.get(0).getRates().get(0).getRate() : 0;
+			return result.get(0);
+		}
+	}
+	
+	/**
+	 * Get the reserved rate to specific region.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param region
+	 * 			the region
+	 * @return the default service rate to this region
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException 
+	 * 			throws if the reserved service plan does NOT exist
+	 */
+	private static ServicePlan getReservedByRegion(DBCon dbCon, Staff staff, Region region) throws SQLException, BusinessException{
+		List<ServicePlan> result = getByCond(dbCon, staff, new ExtraCond().setType(Type.RESERVED).setRegion(region.getId()), ShowType.BY_PLAN);
+		if(result.isEmpty()){
+			throw new BusinessException(ServiceRateError.SERVICE_RATE_PLAN_NOT_EXIST);
+		}else{
+			return result.get(0);
 		}
 	}
 	

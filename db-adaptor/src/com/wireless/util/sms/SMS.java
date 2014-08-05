@@ -273,7 +273,7 @@ public final class SMS {
 
                 if (gzip.length > 0 && gzip[0].getValue().equalsIgnoreCase("gzip")) {
                     GZIPInputStream gzin = new GZIPInputStream(new ByteArrayInputStream(bos.toByteArray()));
-                    StringBuffer sb = new StringBuffer();
+                    StringBuilder sb = new StringBuilder();
                     int size;
                     while ((size = gzin.read(buf)) != -1) {
                         sb.append(new String(buf, 0, size, "utf-8"));

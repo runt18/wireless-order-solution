@@ -466,7 +466,7 @@ public class OrderDao {
 				  " O.waiter, " +
 				  " O.region_id, O.region_name, O.restaurant_id, " +
 				  " O.member_operation_id, " +
-				  " O.settle_type, O.pay_type, O.category, O.status, O.service_rate, O.comment, " +
+				  " O.settle_type, O.pay_type, O.category, O.status, O.service_id, O.service_rate, O.comment, " +
 				  " O.discount_id, DIST.name AS discount_name, " +
 				  " O.gift_price, O.cancel_price, O.discount_price, O.repaid_price, O.erase_price, O.coupon_price, O.total_price, O.actual_price " +
 				  " FROM " + 
@@ -545,6 +545,9 @@ public class OrderDao {
 				orderInfo.setMemberOperationId(dbCon.rs.getInt("member_operation_id"));
 			}
 			orderInfo.setStatus(dbCon.rs.getInt("status"));
+			if(dateType == DateType.TODAY){
+				orderInfo.setServiceId(dbCon.rs.getInt("service_id"));
+			}
 			orderInfo.setServiceRate(dbCon.rs.getFloat("service_rate"));
 			orderInfo.setComment(dbCon.rs.getString("comment"));
 			orderInfo.setGiftPrice(dbCon.rs.getFloat("gift_price"));
