@@ -411,7 +411,11 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 	
 				//"数量"操作
 				ImageView amountImgView = (ImageView)layout.findViewById(R.id.imgView_right_orderFoodListView_childItem);
-				amountImgView.setBackgroundResource(R.drawable.amount_selector);
+				if(of.asFood().isWeigh()){
+					amountImgView.setBackgroundResource(R.drawable.weight_selector);
+				}else{
+					amountImgView.setBackgroundResource(R.drawable.amount_selector);
+				}
 				amountImgView.setTag(of);
 				amountImgView.setOnClickListener(new OnClickListener() {
 					@Override
@@ -428,7 +432,11 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 				
 				//"加菜"Button
 				ImageView addImgView = (ImageView) layout.findViewById(R.id.imgView_right_orderFoodListView_childItem);
-				addImgView.setBackgroundResource(R.drawable.amount_selector);
+				if(of.asFood().isWeigh()){
+					addImgView.setBackgroundResource(R.drawable.weight_selector);
+				}else{
+					addImgView.setBackgroundResource(R.drawable.amount_selector);
+				}
 				
 				//"取消退菜"or"取消加菜"Button
 				Button restoreBtn = (Button) layout.findViewById(R.id.button_orderFoodListView_childItem_restore);
