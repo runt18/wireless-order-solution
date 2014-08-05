@@ -3,6 +3,7 @@ package com.wireless.Actions.weixin.operate;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -14,6 +15,7 @@ import org.apache.struts.actions.DispatchAction;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.client.member.MemberDao;
+import com.wireless.db.client.member.MemberTypeDao;
 import com.wireless.db.client.member.MemberDao.MemberRank;
 import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.db.sms.VerifySMSDao;
@@ -21,10 +23,12 @@ import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.weixin.member.WeixinMemberDao;
 import com.wireless.db.weixin.restaurant.WeixinRestaurantDao;
 import com.wireless.exception.BusinessException;
+import com.wireless.exception.WeixinMemberError;
 import com.wireless.json.JObject;
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.pojo.client.Member;
+import com.wireless.pojo.client.MemberType;
 import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.sms.VerifySMS;
 import com.wireless.pojo.sms.VerifySMS.ExpiredPeriod;
@@ -49,12 +53,15 @@ public class WXOperateMemberAction extends DispatchAction {
 		response.setCharacterEncoding("UTF-8");
 		JObject jobject = new JObject();
 		DBCon dbCon = new DBCon();
+		String openId = request.getParameter("oid");
+		String formId = request.getParameter("fid");
+		int rid = 0;
 		try{
-			String openId = request.getParameter("oid");
-			String formId = request.getParameter("fid");
+
 			dbCon.connect();
+			rid = WeixinRestaurantDao.getRestaurantIdByWeixin(dbCon, formId);
 			int mid = WeixinMemberDao.getBoundMemberIdByWeixin(dbCon, openId, formId);
-			int rid = WeixinRestaurantDao.getRestaurantIdByWeixin(dbCon, formId);
+			
 			final Restaurant restaurant = RestaurantDao.getById(dbCon, rid);
 			
 			final Member member = MemberDao.getById(dbCon, StaffDao.getByRestaurant(dbCon, rid).get(0), mid);
@@ -78,7 +85,9 @@ public class WXOperateMemberAction extends DispatchAction {
 				public void fromJsonMap(JsonMap jsonMap, int flag) {
 					
 				}
-			};
+			};				
+			
+			final int weixinCard = WeixinMemberDao.getCardByWeixin(dbCon, openId, formId);
 			
 			jobject.setExtra(new Jsonable(){
 
@@ -87,6 +96,8 @@ public class WXOperateMemberAction extends DispatchAction {
 					JsonMap jm = new JsonMap();
 					jm.putJsonable("member", j, 0);
 					jm.putJsonable("restaurant", restaurant, 0);
+					jm.putInt("status", WeixinMemberDao.Status.BOUND.getVal());
+					jm.putInt("weixinCard", weixinCard);
 					return jm;
 				}
 
@@ -97,10 +108,34 @@ public class WXOperateMemberAction extends DispatchAction {
 				
 			});
 			
-			
 		}catch(BusinessException e){
-			e.printStackTrace();
-			jobject.initTip(e);
+			
+			if(e.getErrCode() == WeixinMemberError.WEIXIN_MEMBER_NOT_BOUND){
+				
+				final int weixinCard = WeixinMemberDao.getCardByWeixin(dbCon, openId, formId);
+				
+				final List<MemberType> list = MemberTypeDao.getMemberType(StaffDao.getAdminByRestaurant(rid), " AND MT.type = " + MemberType.Type.WEIXIN.getVal(), " ORDER BY MT.member_type_id ");
+				jobject.setExtra(new Jsonable(){
+
+					@Override
+					public JsonMap toJsonMap(int flag) {
+						JsonMap jm = new JsonMap();
+						jm.putJsonableList("memberType", list, 0);
+						jm.putInt("status", WeixinMemberDao.Status.INTERESTED.getVal());
+						jm.putInt("weixinCard", weixinCard);
+						return jm;
+					}
+
+					@Override
+					public void fromJsonMap(JsonMap jsonMap, int flag) {
+						
+					}
+					
+				});				
+			}else{
+				e.printStackTrace();
+				jobject.initTip(e);
+			}
 			
 		}catch(SQLException e){
 			e.printStackTrace();

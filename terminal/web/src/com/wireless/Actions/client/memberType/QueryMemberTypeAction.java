@@ -49,9 +49,18 @@ public class QueryMemberTypeAction extends DispatchAction {
 		try{
 			
 			String pin = (String)request.getAttribute("pin");
+			String rid = request.getParameter("rid");
+			Staff staff;
+			
+			if(pin != null){
+				staff = StaffDao.verify(Integer.parseInt(pin));
+			}else{
+				staff = StaffDao.getAdminByRestaurant(Integer.parseInt(rid));
+			}
 			
 			String name = request.getParameter("name");
 			String attr = request.getParameter("attr");
+			String type = request.getParameter("type");
 			
 			String extraCond = "";
 			if(name != null && !name.trim().isEmpty()){
@@ -61,8 +70,11 @@ public class QueryMemberTypeAction extends DispatchAction {
 			if(attr != null && !attr.trim().isEmpty()){
 				extraCond += (" AND MT.attribute = " + attr);
 			}
+			if(type != null && !type.isEmpty()){
+				extraCond += (" AND MT.type = " + type);
+			}
 			
-			list = MemberTypeDao.getMemberType(StaffDao.verify(Integer.parseInt(pin)), extraCond, " ORDER BY MT.member_type_id ");
+			list = MemberTypeDao.getMemberType(staff, extraCond, " ORDER BY MT.member_type_id ");
 			
 		}catch(BusinessException e){
 			e.printStackTrace();
