@@ -5,27 +5,27 @@ function initMemberMsg(c){
 	c = c == null ? {} : c;
 	var data = typeof c.data == 'undefined' ? {} : c.data;
 	
-	var restaurantName = $('#divRestaurantName');
+//	var restaurantName = $('#divRestaurantName');
 	var name = $('#spanMemberName');
 	var mobile = $('#spanMemberMobile');
 	var point = $('#spanMemberPoint');
 	var totalBalance = $('#spanMemberTotalBalance');
 	var typeName = $('#spanMemberTypeName');
 	var typeNameInCard = $('#divMemberTypeName');
+	var weixinMemberCard = $('#divWXMemberCard');
 	var defaultMemberDiscount = $('#fontMemberDiscount');
 	var memberTotalPoint = $('#fontMemberPoint');
-//	var typeDesc = $('#divMemberTypeDesc');
 	
-	restaurantName.html(typeof data.restaurant == 'undefined' ? '--' : data.restaurant.name);
+//	restaurantName.html(typeof data.restaurant == 'undefined' ? '--' : data.restaurant.name);
 	name.html(typeof data.name == 'undefined' ? '--' : data.name);
 	mobile.html(typeof data.mobile == 'undefined' ? '--' : data.mobile);
 	point.html(typeof data.point == 'undefined' ? '--' : data.point.toFixed(2));
 	totalBalance.html(typeof data.totalBalance == 'undefined' ? '--' : data.totalBalance.toFixed(2));
 	typeName.html(typeof data.memberType.name == 'undefined' ? '--' : data.memberType.name);
-	typeNameInCard.html(typeof data.memberType.name == 'undefined' ? '' : data.memberType.name);
+	typeNameInCard.html(typeof data.memberType.name == 'undefined' ? '未激活' : data.memberType.name);
+//	weixinMemberCard.html(typeof data.memberType.name == 'undefined' ? '未激活' : data.memberType.name);
 	defaultMemberDiscount.html(typeof data.memberType.discount == 'undefined' ? '' : data.memberType.discount.name);
 	memberTotalPoint.html(typeof data.totalPoint == 'undefined' ? '--' : data.totalPoint);
-//	typeDesc.html(typeof data.memberType.desc == 'undefined' ? '&nbsp;' : data.memberType.desc);
 	
 }
 
@@ -576,7 +576,7 @@ function weixinPhoneFocus(){
 function showMemberBind(){
 	$('#ulVerifyAndBind').show();
 //	$('#divOccupyHtml').show();
-	$('html, body').animate({scrollTop: 250}, 'fast'); 
+	$('html, body').animate({scrollTop: 250+$('#divMemberPrivilegeDetail').height()}, 'fast'); 
 //	$('#txtVerifyMobile').focus();
 	weixinPhoneFocus();
 }

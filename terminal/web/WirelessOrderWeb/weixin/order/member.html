@@ -88,13 +88,22 @@
     padding-bottom:4px;
     left:-2px;
      z-index:-1;
-/*    top:5px;
-     border-radius: 6px;
-   box-shadow:inset 0px 1px 0px #2ab7ec, 0px 5px 0px 0px #032b3a, 0px 10px 5px #999 ; */
 }
  
 .a_demo_two:active::before {
     top:-2px;
+}
+
+#ulMemberPrivilegeDetail{
+	margin-left: 25px;
+}
+#ulMemberPrivilegeDetail li{
+	list-style:disc !important;
+	font-family:  'Microsoft YaHei';
+	color : maroon ;
+	font-weight : bold;
+	font-size: 20px;
+	font-style: italic;
 }
 
 </style>
@@ -131,8 +140,9 @@ var totalMath = 0;
 
 <div id="divMemberCard" class="main-box">
 <div data-type="r">
-	<div id="divRestaurantName" data-type="top">--</div>
-	<div id="divMemberTypeName" data-type="bottom">--</div>
+	<!-- <div id="divRestaurantName" data-type="top">--</div> -->
+	<div id="divMemberTypeName" data-type="bottom">未激活</div>
+	<div id="divWXMemberCard" data-type="bottom">1000000</div>
 </div>
 </div>
 
@@ -286,9 +296,20 @@ var totalMath = 0;
 </ul>
 </div>
 
+<div>
+	
+</div>
+
+<div id="divMemberPrivilegeDetail" class="main-box" style="margin-top: 10px;padding-top: 5px;padding-bottom: 5px;">
+	<span style="margin-left: 5px;font-size: 19px;">激活成为微信会员，可享受:</span>
+	<ul id="ulMemberPrivilegeDetail" >
+<!-- 		<li>全单8折优惠</li>
+		<li>1.1倍充值特权，充100送10元</li>
+		<li>1.1倍积分特权，消费1元积1.1分</li> -->
+	</ul>
+</div>
+
 <div id="divVerifyAndBind" class="main-box" style="margin-top: 10px;">
-
-
 <ul class="m-b-list" >
 	<li class="box-horizontal" >
 		<!-- <div style="line-height: 55px;" onclick="javascript:$('#ulVerifyAndBind').hide();">激活后可享受更多优惠</div> -->
@@ -343,7 +364,7 @@ var totalMath = 0;
 </div>
 
 <div id="divInsertBefore"></div>
-<div id="divOccupyHtml" style="height :200px;"></div>
+<div id="divOccupyHtml" style="height :400px;"></div>
 <div class="footer">&copy; 2014 技术支持：智易科技</div>
 <div style="height: 45px;">&nbsp;</div>
  
