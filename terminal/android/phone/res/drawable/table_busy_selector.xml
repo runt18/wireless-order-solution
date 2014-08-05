@@ -6,13 +6,13 @@
 
 	<!--  Active tab -->
 	<item android:state_selected="true" android:state_focused="false"
-		android:state_pressed="false" android:drawable="@drawable/freedown" />
+		android:state_pressed="false" android:drawable="@drawable/table_busy_down" />
 	<!--  Inactive tab -->
 	<item android:state_selected="false" android:state_focused="false"
-		android:state_pressed="false" android:drawable="@drawable/free" />
+		android:state_pressed="false" android:drawable="@drawable/table_busy" />
 	<!--  Pressed tab -->
-	<item android:state_pressed="true" android:drawable="@drawable/freedown" />
+	<item android:state_pressed="true" android:drawable="@drawable/table_busy_down" />
 	<!--  Selected tab (using d-pad) -->
 	<item android:state_focused="true" android:state_selected="true"
-		android:state_pressed="false" android:drawable="@drawable/freedown" />
+		android:state_pressed="false" android:drawable="@drawable/table_busy_down" />
 </selector> 

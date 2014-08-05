@@ -90,7 +90,7 @@
             android:layout_alignParentRight="true"
             android:layout_alignParentTop="true"
             android:background="@color/transparent"
-            android:src="@drawable/eating_selector" />
+            android:src="@drawable/table_busy_selector" />
 
         <ImageButton
             android:id="@+id/imgButton_idle_table"
@@ -99,7 +99,7 @@
             android:layout_alignParentTop="true"
             android:layout_centerHorizontal="true"
             android:background="@color/transparent"
-            android:src="@drawable/free_selector" />
+            android:src="@drawable/table_idle_selector" />
 
         <TextView
             android:id="@+id/txtView_allAmount_table"

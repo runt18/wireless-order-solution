@@ -2,7 +2,7 @@
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
 
     <!-- When selected, use grey -->
-    <item android:drawable="@drawable/kouweidown" android:state_selected="true"/>
+    <item android:drawable="@drawable/kouwei_down" android:state_selected="true"/>
     <!-- When not selected, use white -->
     <item android:drawable="@drawable/kouwei"/>
 
