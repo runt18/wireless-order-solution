@@ -10,7 +10,7 @@ function setOrderDetail(orderDetail){
 	Ext.getDom('billDateBV').innerHTML = orderDetail['orderDateFormat'];
 	Ext.getDom('payTypeBV').innerHTML = orderDetail['settleTypeText'];
 	Ext.getDom('payMannerBV').innerHTML = orderDetail['payTypeText'];
-	Ext.getDom('serviceRateBV').innerHTML = orderDetail['serviceRate'] + '％';
+	Ext.getDom('serviceRateBV').innerHTML = (orderDetail['serviceRate']*100) + '％';
 	Ext.getDom('serviceStaffBV').innerHTML = orderDetail['waiter'];
 	Ext.getDom('forFreeBV').innerHTML = '￥' + orderDetail['giftPrice'].toFixed(2);
 	Ext.getDom('shouldPayBV').innerHTML = '￥' + orderDetail['totalPrice'].toFixed(2);

@@ -427,7 +427,7 @@ Ext.onReady(function(){
 			closable : false,
 			resizable : false,
 			modal : true,
-			width : 250,
+			width : 270,
 			items : [{
 				xtype : 'panel',
 			    layout : 'column',
@@ -453,7 +453,7 @@ Ext.onReady(function(){
 			    	items : [{
 						xtype : 'numberfield',
 						id : 'numDefaultServiceRate',
-						width : 50,
+						width : 60,
 						style : 'text-align:right;',
 						fieldLabel : '服务费率'
 			    	}]
