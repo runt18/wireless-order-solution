@@ -12,7 +12,7 @@ var dishesOrderNorthPanel = new Ext.Panel({
 		defaults : {
 			xtype : 'form',
 			layout : 'form',
-			labelWidth : 60,
+			labelWidth : 65,
 			width : 220,
 			defaults : {
 				width : 130
@@ -69,6 +69,7 @@ var dishesOrderNorthPanel = new Ext.Panel({
 				width : 60,
 				fieldLabel : '服务费',
 				id : 'serviceRate',
+				style : 'text-align:right;',
 				allowBlank : false,
 				validator : function(v) {
 					if (v < 0 || v > 100 || v.indexOf('.') != -1) {
@@ -79,10 +80,28 @@ var dishesOrderNorthPanel = new Ext.Panel({
 				}
 			}]
 		}, {
+			width : 40,
 			items : [{
 				xtype : 'panel',
-				style : 'font-size:18px;',
+				style : 'font-size:15px;',
 				html : '%'
+			}]
+		}, {
+			items : [{
+				xtype : 'combo',
+				id : 'repaid_comboServicePlan',
+				fieldLabel : '服务费方案',
+				readOnly : false,
+				forceSelection : true,
+				store : new Ext.data.JsonStore({
+					fields : [ 'planId', 'planName']
+				}),
+				valueField : 'planId',
+				displayField : 'planName',
+				typeAhead : true,
+				mode : 'local',
+				triggerAction : 'all',
+				selectOnFocus : true				
 			}]
 		}]
 	}, {

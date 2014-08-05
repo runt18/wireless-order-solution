@@ -47,11 +47,20 @@ function servicePlanOperationHandler(c){
 	var id = Ext.getCmp('hideServicePlanId');
 	var name = Ext.getCmp('txtServicePlanName');
 	var isDefault = Ext.getCmp('chbServicePlanIsDefault');
+	var deafaultServiceRate = Ext.getCmp('numDefaultServiceRate');
+	var deafaultServiceRateFh = Ext.getCmp('numDefaultServiceRateFh');
 	name.setDisabled(false);
+	deafaultServiceRate.setValue();
+	
+	addServicePlanWin.show();
+	addServicePlanWin.operationType = c.type;	
 	if(c.type == dmObj.operation.insert){
+		deafaultServiceRate.show();
+		deafaultServiceRateFh.show();
+		deafaultServiceRate.getEl().up('.x-form-item').setDisplayed(true);
+		
 		isDefault.setValue(false);
 		name.setValue();
-		name.focus(true, 100);
 		addServicePlanWin.setTitle('添加方案');
 	}else if(c.type == dmObj.operation.update){
 		
@@ -63,7 +72,10 @@ function servicePlanOperationHandler(c){
 		id.setValue(sn.attributes.planId); 
 		isDefault.setValue(eval(sn.attributes.isDefault));
 		name.setValue(sn.attributes.planName); 
-		name.focus(true, 100);
+		
+		deafaultServiceRate.getEl().up('.x-form-item').setDisplayed(false);
+		deafaultServiceRate.hide();
+		deafaultServiceRateFh.hide();
 		if(sn.attributes.type == 2){
 			name.setDisabled(true);
 		}else{
@@ -72,10 +84,9 @@ function servicePlanOperationHandler(c){
 		
 		addServicePlanWin.setTitle('修改方案');
 	}
-	
-	addServicePlanWin.show();
+	name.clearInvalid();
+	name.focus(true, 100);
 	addServicePlanWin.center();
-	addServicePlanWin.operationType = c.type;
 };
 
 function serviceRateOperationHandler(c){
@@ -416,38 +427,61 @@ Ext.onReady(function(){
 			closable : false,
 			resizable : false,
 			modal : true,
-			width : 235,
+			width : 250,
 			items : [{
-				xtype : 'form',
-				layout : 'form',
-				frame : true,
-				labelWidth : 65,
-				width : 234,
-				defaults : {
-					width : 120
-				},
-				items : [ {
- 	    	    	xtype : 'textfield',
- 	    	    	id : 'txtServicePlanName',
- 	    	    	fieldLabel : '方案名称',
- 	    	    	allowBlank : false,
- 	    	    	selectOnFocus : true
- 	    	    },{
-					xtype : 'checkbox',
-					id : 'chbServicePlanIsDefault',
-					hideLabel : true,
-					checked : true,
-					boxLabel : '默认方案',
-					listeners : {
-						check : function(thiz){
-							
+				xtype : 'panel',
+			    layout : 'column',
+			    frame : true,
+			    defaults : {
+			    	xtype : 'panel',
+			    	layout : 'form'
+			    	
+			    },
+			    items : [{
+			    	columnWidth : 1,
+			    	labelWidth : 65,
+			    	items : [{
+	 	    	    	xtype : 'textfield',
+	 	    	    	id : 'txtServicePlanName',
+	 	    	    	fieldLabel : '方案名称',
+	 	    	    	allowBlank : false,
+	 	    	    	selectOnFocus : true
+			    	}]
+			    },{
+			    	columnWidth : 0.55,
+			    	labelWidth : 65,
+			    	items : [{
+						xtype : 'numberfield',
+						id : 'numDefaultServiceRate',
+						width : 50,
+						style : 'text-align:right;',
+						fieldLabel : '服务费率'
+			    	}]
+			    },{
+			    	columnWidth : 0.2,
+			    	id : 'numDefaultServiceRateFh',
+			    	style : 'color:#15428B;vertical-align: middle;margin-top:4px;',
+			    	html : '%'
+			    },{
+			    	columnWidth : 1,
+			    	labelWidth : 65,
+			    	items : [{
+						xtype : 'checkbox',
+						id : 'chbServicePlanIsDefault',
+						hideLabel : true,
+						checked : true,
+						boxLabel : '默认方案',
+						listeners : {
+							check : function(thiz){
+								
+							}
 						}
-					}
-				},{
-					xtype : 'hidden',
-					id : 'hideServicePlanId'
-				}]
-			}],
+			    	},{
+						xtype : 'hidden',
+						id : 'hideServicePlanId'
+					}]
+			    }]
+			}],			
 			bbar : [{
 				xtype : 'tbtext',
 				text : ' '
@@ -458,6 +492,7 @@ Ext.onReady(function(){
 				handler : function(e){					
 					var name = Ext.getCmp('txtServicePlanName');
 					var servicePlanId = Ext.getCmp('hideServicePlanId');
+					var deafaultServiceRate = Ext.getCmp('numDefaultServiceRate').getValue();
 					var isDeafault = Ext.getCmp('chbServicePlanIsDefault');
 					
 					var dataSource = '';
@@ -485,6 +520,7 @@ Ext.onReady(function(){
 						params : {
 							name : name.getValue(), 
 							servicePlanId : servicePlanId.getValue(),
+							deafaultRate : (deafaultServiceRate == ''? 0 : deafaultServiceRate/100),
 							isDeafault : isDeafault.getValue(),
 							dataSource : dataSource
 						},

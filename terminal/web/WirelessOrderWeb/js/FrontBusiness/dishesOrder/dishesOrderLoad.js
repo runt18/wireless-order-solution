@@ -79,8 +79,11 @@ function loadSingleOrderData(resultJSON){
 				});
 				// 加载账单基础信息
 				Ext.getCmp('txtSettleTypeFormat').setValue(orderSingleData.other.order.settleTypeText);
-				Ext.getCmp('serviceRate').setValue(orderSingleData.other.order.serviceRate * 100);
 				Ext.getCmp('numErasePrice').setValue(orderSingleData.other.order.erasePrice);
+				Ext.getCmp('serviceRate').setValue(orderSingleData.other.order.serviceRate * 100);
+				Ext.getCmp('repaid_comboServicePlan').setValue(orderSingleData.other.order.servicePlanId);
+				
+				
 				
 				Ext.Ajax.request({
 					url : '../../QueryDiscountTree.do',
@@ -108,6 +111,24 @@ function loadSingleOrderData(resultJSON){
 					}
 				});
 				
+				Ext.Ajax.request({
+					url : '../../QueryServicePlan.do',
+					params : {dataSource : 'planTree'},
+					success : function(res, opt) {
+						servicePlanData = eval(res.responseText);
+						var servicePlan = Ext.getCmp('repaid_comboServicePlan');
+						servicePlan.store.loadData(servicePlanData);
+						servicePlan.setValue(orderSingleData.other.order.servicePlanId);
+					},
+					failure : function(res, opt) {
+						Ext.MessageBox.show({
+							title : '警告',
+							msg : '加载方案信息失败.',
+							width : 300
+						});
+					}
+				});				
+				
 				
 				
 			}else{
@@ -130,93 +151,6 @@ function loadSingleOrderData(resultJSON){
 		}
 }
 
-/**
- * 加载账单组信息
- */
-//FIXME 账单组信息
-/*
-function loadOrderGroupData(){
-	Ext.Ajax.request({
-		url : '../../QueryOrderGroup.do',
-		params : {
-			'restaurantID' : restaurantID,
-			'queryType' : 0,
-			'childTableAliasID' : tableAliasID,
-			'hasFood' : true
-		},
-		success : function(response, options) {
-			var jr = Ext.decode(response.responseText);
-			if(jr.success){
-				orderGroupData = jr;
-				initOrderGroupUI({
-					callBack : function(grid, e){
-						var og = orderGroupData.root;
-						var activeTab=null;
-						for(var i = 0; i < og[0].childOrder.length; i++){
-							var tempItem = og[0].childOrder[i];
-							var tempID = 'orderGridItemID';
-							tempID = tempID + '_' + tempItem.tableID;
-							var orderGridItem = Ext.getCmp(tempID);
-							if(!orderGridItem){
-								orderGridItem = createGridPanel(
-									tempID,
-									'',
-									'',
-									'',
-									'',
-									[
-									 [true, false, false, false], 
-									 ['菜名', 'displayFoodName', 200] , 
-									 ['口味', 'tastePref', 160] , 
-									 ['数量', 'count', 130, 'right', 'foodCountAddOrDeleteRenderer'],
-									 ['单价', 'unitPrice', 80, 'right', 'Ext.ux.txtFormat.gridDou'],
-									 ['下单时间', 'orderDateFormat', 150],
-									 ['服务员', 'waiter', 80],
-									 ['操作', 'operation', , 'center', 'orderOrderGridPanelRenderer']
-									 ],
-									 ['seqID', 'displayFoodName', 'foodName', 'foodID', 'aliasID', 'tastePref', 'tastePrice', 'tasteGroup', 'isHangup', 'discount',
-									  'count', 'unitPrice', 'acturalPrice', 'discount', 'totalPrice', 'orderDateFormat', 'waiter', 'special', 'soldout', 'dataType',
-									  'weight', 'stop', 'gift', 'hot', 'recommend', 'currPrice', 'combination', 'temporary','tmpTastePrice', 'dataType'],
-									  [],
-									  0,
-									  ''
-								);
-								orderGridItem.frame = false;
-								orderGridItem.getStore().on('load', function(thiz, records){
-									for(var ti = 0; ti < records.length; ti++){
-										Ext.ux.formatFoodName(records[ti], 'displayFoodName', 'foodName');
-									}
-								});
-								orderGridItem.render(document.body, 0);
-								orderGridItem.setTitle('账单号:'+tempItem.id);
-								orderGroupGridTabPanel.add(orderGridItem);
-								activeTab = i == 0 ? orderGridItem : activeTab;
-							}
-							// 设置已点菜状态
-							refreshOrderFoodDataType(tempItem.orderFoods);
-							orderGridItem.order = tempItem;
-							orderGridItem.getStore().loadData({
-								root : tempItem.orderFoods
-							});
-							orderGroupDisplayRefresh({
-								control : orderGridItem
-							});
-							if(activeTab != null && orderGroupGridTabPanel.getActiveTab() == null){
-								orderGroupGridTabPanel.setActiveTab(activeTab);
-							}
-						}
-					}
-				});
-			}else{
-				Ext.ux.showMsg(jr);
-			}
-		},
-		failure : function(response, options) {
-			Ext.ux.showMsg(Ext.decode(response.responseText));
-		}
-	});
-}
-*/
 
 /**
  * 初始化菜品数量设置菜单

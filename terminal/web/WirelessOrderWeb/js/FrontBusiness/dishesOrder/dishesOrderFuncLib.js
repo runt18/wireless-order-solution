@@ -870,6 +870,7 @@ function submitRepaidOrderHandler(_c){
 		var serviceRate = Ext.getCmp('serviceRate');
 		var commentOut = dishesOrderNorthPanel.findById("remark").getValue();
 		var discountID = Ext.getCmp('comboDiscount');
+		var servicePlan = Ext.getCmp('repaid_comboServicePlan');
 		var erasePrice = Ext.getCmp('numErasePrice');
 		
 		if(!serviceRate.isValid()){
@@ -896,6 +897,7 @@ function submitRepaidOrderHandler(_c){
 			params : {
 				'orderId' : _c.grid.order["id"],
 				'discountID' : discountID.getValue(),
+				'servicePlan' : servicePlan.getValue(),
 				"payType" : payMannerOut,
 				"serviceRate" : serviceRate.getValue(),
 				"memberID" : _c.grid.order['memberID'],
