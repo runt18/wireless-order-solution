@@ -104,7 +104,7 @@ function loadSystemSetting(_c){
 					
 					$('#trEraseQuota').show();
 					Ext.getDom('div_showEraseQuota').style.display = 'block';
-					Ext.getDom('font_showEraseQuota').innerHTML = parseFloat(restaurantData.setting.eraseQuota).toFixed(2);
+					Ext.getDom('font_showEraseQuota').innerHTML = restaurantData.setting.eraseQuota;
 				}else{
 //					Ext.getDom('trEraseQuota').style.display = 'none';
 					Ext.getDom('div_showEraseQuota').style.display = 'none';
