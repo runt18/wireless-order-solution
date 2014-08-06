@@ -285,10 +285,8 @@ function rechargeLoadMemberData(c){
 	Ext.Ajax.request({
 		url : '../../QueryMember.do',
 		params : {
-			isCookie : true,
 			dataSource : 'normal',
-			mobile : c.read == 1 ? mobile.getValue() : '',
-			memberCard : c.read == 2 ? card.getValue() : ''
+			memberCardOrMobileOrName : c.read == 1 ? mobile.getValue() : (c.read == 2 ? card.getValue() : '')
 		},
 		success : function(res, opt){
 			var jr = Ext.decode(res.responseText);
