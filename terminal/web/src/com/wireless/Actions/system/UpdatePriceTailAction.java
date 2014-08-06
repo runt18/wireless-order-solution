@@ -26,7 +26,7 @@ public class UpdatePriceTailAction extends Action{
 			String pin = (String)request.getAttribute("pin");
 			StaffDao.verify(Integer.parseInt(pin));
 			
-			String restaurantID = request.getParameter("restaurantID");
+			String restaurantID = (String) request.getAttribute("restaurantID");
 			String priceTail = request.getParameter("priceTail");
 			String eraseQuota = request.getParameter("eraseQuota");
 			
