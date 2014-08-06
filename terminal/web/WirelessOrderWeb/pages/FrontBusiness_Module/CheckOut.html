@@ -10,11 +10,11 @@
 
 <style type="text/css">
 .payOrderButton{
-	font-size:25px;cursor: pointer;padding: 3px auto;width: 150px;
+	font-size:22px;cursor: pointer;padding: 3px auto;width: 150px;
 }
 
 .payOrderButtonUnCommon{
-	font-size:25px;cursor: pointer;padding: 3px auto;width: 340px;
+	font-size:23px;cursor: pointer;padding: 3px auto;width: 340px;
 }
 
 .renderStyle{
@@ -128,72 +128,26 @@
 		<div id="serviceRateDivTS" class="tableStatusChar">&nbsp;</div>
 	</div>
 	
-	<!-- pay infomation -->
-<!-- 	<div id="payInfo" class="billList" style="text-align:left;">
-		<table>
-			<tr>
-				<td rowspan="2" style="font-size:30px;">实收：￥<span id="aashouldPay" style="color:green; font-weight: bold;"></span></td>
-				<td>应收：￥<span id="totalCount"></span></td>
-				<td style="width: 10px;">&nbsp;</td>
-				<td>赠送：￥<span id="forFree"></span></td>
-				<td style="width: 10px;">&nbsp;</td>
-				<td>退菜金额：￥</td>
-				<td><span id="spanCancelFoodAmount"></span><span id="spanSeeCancelFoodAmount" style="visibility:hidden;">&nbsp;<a href="javascript:showCancelFoodDetail()" >查看</a></span></td>
-				<td style="width: 10px;">&nbsp;</td>
-				<td colspan="4">
-					<div id="div_showEraseQuota" style="display: none;">
-						抹数金额：￥
-						<span id="aspanHasEraseQuota"><input id="txtEraseQuota" type="text" value="0" style="width: 50px;" /></span>
-						<span id="span_showEraseQuota">
-							上限:￥<font id="font_showEraseQuota" style="color:red;"></font>
-						</span>
-					</div>
-				</td>
-				<td style="width: 10px;height : 55px;">&nbsp;</td>
-				<td >
-					<input type="button" value="计算" style="width: 80px;" onclick="refreshCheckOutData()"></input>
-					<input type="button" value="会员" class="payOrderButton" onclick="memberPay()"></input>
-				</td>
-				<td style="width: 10px;">&nbsp;</td>
-				<td >
-					<input type="button" value="现金(+)" class="payOrderButton" onclick="fnRemberIsFastOrInput()"></input>
-					<input id="chkCalcReturn" type="checkbox" />计算找零
-				</td>				
-			</tr>
-			<tr>
-				<td colspan="11" >备注:<input id="remark" type="text"  style="width: 80%;height: 30px;font-size: 18px;" /></td>
-				<td style="width: 10px;height : 40px;">&nbsp;</td>
-				<td >
-					<input type="button" value="刷卡" class="payOrderButton" onclick="paySubmit(2)"></input>
-				</td>
-				<td style="width: 10px;">&nbsp;</td>
-				<td >
-					<input type="button" value="暂结" class="payOrderButton" onclick="paySubmit(6)"></input>
-				</td>			
-			</tr>
-		</table>
-	</div> -->
-	
 	<div id="divWestPayOrderGeneral">
 		<table border="1" class="pay_tb_base" style="width : 100%;">
 			<tr><th class="pay_table_title text_center" >收款</th><th class="pay_table_title text_center">金额</th><th class="pay_table_title text_center">操作</th></tr>
 			<tr>
-				<th style="font-size:35px;" width="105px">实收：</th> <td style="font-size:35px;" align="right"><span id="shouldPay" style="color:green; font-weight: bold;"></span></td> <td align="center">----</td>
+				<th style="font-size:25px;" width="105px">实收：</th> <td style="font-size:25px;" align="right"><span id="shouldPay" style="color:green; font-weight: bold;"></span></td> <td align="center">----</td>
 			</tr>
 			<tr>
-				<th style="font-size:35px;">应收：</th> <td style="font-size:35px;" align="right"> <span id="totalCount"></span></td> <td align="center">----</td>
+				<th style="font-size:25px;">应收：</th> <td style="font-size:25px;" align="right"> <span id="totalCount"></span></td> <td align="center">----</td>
 				
 			</tr>
 			<tr>
-				<th style="font-size:35px;">赠送：</th> <td style="font-size:35px;" align="right"><span id="forFree"></span></td> <td align="center">----</td>
+				<th style="font-size:25px;">赠送：</th> <td style="font-size:25px;" align="right"><span id="forFree"></span></td> <td align="center">----</td>
 			</tr>
 			<tr>
-				<th style="font-size:35px;">折扣：</th> <td style="font-size:35px;" align="right"><span id="discountPrice"></span></td> <td align="center">----</td>
+				<th style="font-size:25px;">折扣：</th> <td style="font-size:25px;" align="right"><span id="discountPrice"></span></td> <td align="center">----</td>
 				
 			</tr>			
 			<tr>
-				<th style="font-size:35px;height: 50px;">退菜：</th> 
-				<td style="font-size:35px;" align="right"><span id="spanCancelFoodAmount"></span></td> 
+				<th style="font-size:25px;">退菜：</th> 
+				<td style="font-size:25px;" align="right"><span id="spanCancelFoodAmount"></span></td> 
 				<td align="center">
 					<span id="spanSeeCancelFoodAmountOperate" >----</span>
 					<span id="spanSeeCancelFoodAmount" style="display: none;" ><a href="javascript:showCancelFoodDetail()" ><font style="font-size:25px;">查看</font></a></span>
@@ -203,7 +157,7 @@
 		</table>	
 		<table border="1" class="pay_tb_base2 "   style="width : 100%;">	
 			<tr id="trEraseQuota" style="display: none;">
-				<td colspan="3" style="font-size:20px;height: 50px;">
+				<td colspan="3" style="font-size:20px;height: 40px;">
 					<div id="div_showEraseQuota" style="display: none;">
 						抹数金额(<span id="span_showEraseQuota">上限:￥<font id="font_showEraseQuota" style="color:red;"></font></span>)：￥
 						<span id="spanHasEraseQuota"><!-- <input id="txtEraseQuota" type="text" value="0" style="width: 50px;" /> --></span>
@@ -211,11 +165,11 @@
 				</td>			
 			</tr>
 			<tr>
-				<td colspan="3" style="font-size:20px;height: 50px;">备注:<input id="remark" type="text" style="width: 80%;height: 30px;font-size: 18px;border: 1px solid #CCC;background: #f9f9c0 repeat-x 0 0;" /></td>
+				<td colspan="3" style="font-size:20px;height: 40px;">备注:<input id="remark" type="text" style="width: 80%;height: 30px;font-size: 18px;border: 1px solid #CCC;background: #f9f9c0 repeat-x 0 0;" /></td>
 			</tr>
 		</table>
 			<table style="width: 100%;">
-				<tr style="height: 50px;">
+				<tr style="height: 40px;">
 	
 					<td align="center" >
 						<input type="button" value="现金(+)" class="payOrderButton" onclick="fnRemberIsFastOrInput(false)"></input><br>
@@ -225,7 +179,7 @@
 						<input type="button" value="刷卡" class="payOrderButton" onclick="paySubmit(2)"></input>
 					</td>					
 				</tr>
-				<tr style="height: 50px;">
+				<tr style="height: 40px;">
 					<td align="center">
 						<input type="button" value="签单" class="payOrderButton" onclick="paySubmit(4)"></input>
 					</td>	
@@ -234,24 +188,23 @@
 					</td>									
 									
 				</tr>	
-				<tr>
+				<tr style="height: 43px;">
 					<td colspan="2" align="center">
 						<input type="button" value="现金收款"  class="payOrderButtonUnCommon" onclick="fnRemberIsFastOrInput(true)"></input>
-					</td>		
+					</td>
 				</tr>						
-				<tr style="height: 50px;">
+				<tr style="height: 43px;">
 					<td colspan="2" align="center">
 						<!-- <input type="button" value="计算" style="width: 80px;" onclick="refreshCheckOutData()"></input> -->
 						<input type="button" value="会员结账" class="payOrderButtonUnCommon" onclick="memberPay()"></input>
 					</td>	
-			
 				</tr>
-				<tr style="height: 50px;">
+				<tr style="height: 43px;">
 					<td colspan="2" align="center">
 						<input type="button" value="暂结(-)" class="payOrderButtonUnCommon" onclick="paySubmit(6)"></input>
 					</td>						
 				</tr>
-				<tr>
+				<tr style="height: 43px;">
 					<td colspan="2" align="center">
 						<input type="button" value="返回"  class="payOrderButtonUnCommon" onclick="javascript:location.href = 'TableSelect.html';"></input>
 					</td>		
