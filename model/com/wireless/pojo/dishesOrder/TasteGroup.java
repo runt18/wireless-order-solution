@@ -486,6 +486,7 @@ public class TasteGroup implements Parcelable, Jsonable{
 			if(jsonMap.containsKey(Key4Json.NORMAL_TASTE_LIST.key)){
 				for(Taste t : jsonMap.getJsonableList(Key4Json.NORMAL_TASTE_LIST.key, Taste.JSON_CREATOR, Taste.TASTE_JSONABLE_4_COMMIT)){
 					addTaste(t);
+					refresh();
 				}
 			}
 			if(jsonMap.containsKey(Key4Json.TMP_TASTE.key)){
