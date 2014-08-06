@@ -83,7 +83,7 @@ var paySubmit = function(submitType) {
 					"memberID" : actualMemberID,
 					"comment" : Ext.getDom("remark").value,
 					"servicePlan" : servicePlan,
-					'eraseQuota' : eraseQuota
+					'eraseQuota' : eraseQuota == ''?0:eraseQuota
 //					'pricePlanID' : calcPricePlanID,
 //					'customNum' : Ext.getCmp('numCustomNum').getValue()
 				},
