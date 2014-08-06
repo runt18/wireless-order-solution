@@ -32,9 +32,9 @@ var paySubmit = function(submitType) {
 
 			// 现金
 			if (submitType == 1) {
-				submitPrice = shouldPay;
+				submitPrice = actualPrice;
 			} else {
-				submitPrice = shouldPay;
+				
 			}
 			// 暂结，调整参数
 			if (submitType == 6) {
@@ -82,8 +82,8 @@ var paySubmit = function(submitType) {
 					"tempPay" : tempPay,
 					"memberID" : actualMemberID,
 					"comment" : Ext.getDom("remark").value,
-					"servicePlan" : servicePlan
-//					'eraseQuota' : eraseQuota
+					"servicePlan" : servicePlan,
+					'eraseQuota' : eraseQuota
 //					'pricePlanID' : calcPricePlanID,
 //					'customNum' : Ext.getCmp('numCustomNum').getValue()
 				},
