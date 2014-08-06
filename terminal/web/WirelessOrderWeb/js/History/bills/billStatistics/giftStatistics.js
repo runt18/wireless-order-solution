@@ -875,7 +875,7 @@ Ext.onReady(function(){
     
     giftStatChartTabPanel.setHeight(gift_totalHeight*0.6);
     
-    gift_rz.resizeTo(giftDetailsStatPanel.getWidth(), giftDetailsStatPanel.getHeight());
+    gift_rz.resizeTo(giftDetailsStatPanel.getWidth(), gift_totalHeight*0.4);
     
      Ext.getCmp('giftStatistics').updateStatisticsDate = gift_setStatisticsDate;	
 	

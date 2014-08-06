@@ -1122,6 +1122,7 @@ Ext.onReady(function() {
 	
 	initKeyBoardEvent();
 	
+	//FIXME 重新刷新一次解决赠送bug
 	if(!isFree && !isRepaid){
 		refreshOrderHandler(true);
 	}

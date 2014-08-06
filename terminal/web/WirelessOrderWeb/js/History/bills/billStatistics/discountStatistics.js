@@ -903,7 +903,7 @@ Ext.onReady(function(){
     
     discountStatChartTabPanel.setHeight(discount_totalHeight*0.6);	
     
-    discount_rz.resizeTo(discountDetailsStatPanel.getWidth(), discountDetailsStatPanel.getHeight());	
+    discount_rz.resizeTo(discountDetailsStatPanel.getWidth(), discount_totalHeight*0.4);	
 	
 	Ext.getCmp('discountStatistics').updateStatisticsDate = discount_setStatisticsDate;
 });

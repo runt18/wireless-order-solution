@@ -706,7 +706,7 @@ Ext.onReady(function(){
     
     repaidStatChartTabPanel.setHeight(repaid_totalHeight*0.6);	
     
-    repaid_rz.resizeTo(repaidDetailPanel.getWidth(), repaidDetailPanel.getHeight());
+    repaid_rz.resizeTo(repaidDetailPanel.getWidth(), repaid_totalHeight*0.4);
 	
 	Ext.getCmp('repaidStatistics').updateStatisticsDate = repaid_setStatisticsDate;
 });

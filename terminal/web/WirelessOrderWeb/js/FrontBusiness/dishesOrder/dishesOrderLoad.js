@@ -408,6 +408,7 @@ function initOrderSingleUI(_c){
 			for (var j = 0; j < giftRender.checkeds.length; j++) {
 				$('#'+giftRender.checkeds[j]).attr('checked', 'checked');
 			}
+			
 		});
 		orderPanel.add(orderSingleGridPanel);
 		orderPanel.doLayout();

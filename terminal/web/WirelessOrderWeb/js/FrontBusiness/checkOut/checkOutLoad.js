@@ -226,6 +226,7 @@ function checkOutOnLoad() {
 			            'keyup',
 			            function() {
 			            		var shouldPay = checkOut_actualPrice - c.getEl().dom.value;
+			            		shouldPay = shouldPay < 0 ? 0 : shouldPay;
 			            		Ext.getDom('shouldPay').innerHTML = checkDot(shouldPay)?shouldPay.toFixed(2) : shouldPay;
 			            }
 			        );

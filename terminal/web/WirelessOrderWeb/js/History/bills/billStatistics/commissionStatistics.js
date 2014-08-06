@@ -738,11 +738,11 @@ Ext.onReady(function(){
 	
     var commission_totalHeight = Ext.getCmp('commissionStatisticsPanel').getHeight();
     
-    commissionDetailPanel.setHeight(commission_totalHeight*0.4);
-    commissionDetailPanel.getEl().parent().setHeight(commission_totalHeight*0.4);
+    commissionDetailPanel.setHeight(commission_totalHeight*0.45);
+    commissionDetailPanel.getEl().parent().setHeight(commission_totalHeight*0.45);
     
-    commissionStatChartTabPanel.setHeight(commission_totalHeight*0.6);	
+    commissionStatChartTabPanel.setHeight(commission_totalHeight*0.55);	
     
-    commissionRZ.resizeTo(commissionDetailPanel.getWidth(), commissionDetailPanel.getHeight());
+    commissionRZ.resizeTo(commissionDetailPanel.getWidth(), commission_totalHeight*0.45);
 	
 });

@@ -765,8 +765,29 @@ function refreshOrderHandler(c){
 					jr.root.push(selData[i]);
 				}
 				
+						// 合并重复数据
+						var tempData = {root:[]};
+						for(var i = 0; i < jr.root.length; i++){
+							
+							var cs = true;
+							for(var j = 0; j < tempData.root.length; j++){
+								if(compareDataType(tempData.root[j], jr.root[i])){
+									if(compareTasteGroup(tempData.root[j].tasteGroup,  jr.root[i].tasteGroup)){
+										if(tempData.root[j].id == jr.root[i].id){
+											cs = false;
+											tempData.root[j].count += jr.root[i].count;
+										}
+					
+									}
+								}
+							}
+							if(cs){
+								tempData.root.push(jr.root[i]);
+							}
+						}	
+				
 				orderSingleGridPanel.order = jr.other.order;
-				orderSingleGridPanel.order.orderFoods = jr.root;
+				orderSingleGridPanel.order.orderFoods = tempData.root;
 				orderSingleGridPanel.getStore().loadData({root:orderSingleGridPanel.order.orderFoods});
 				
 				orderGroupDisplayRefresh({

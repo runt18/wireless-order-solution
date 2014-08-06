@@ -1265,12 +1265,12 @@ Ext.onReady(function(){
 	
     var cancel_totalHeight = Ext.getCmp('cancelledFoodPanel').getHeight();
     
-    cancelFoodDetailsStatPanel.setHeight(cancel_totalHeight*0.4);
-    cancelFoodDetailsStatPanel.getEl().parent().setHeight(cancel_totalHeight*0.4);
+    cancelFoodDetailsStatPanel.setHeight(cancel_totalHeight*0.45);
+    cancelFoodDetailsStatPanel.getEl().parent().setHeight(cancel_totalHeight*0.45);
     
-    cancelFoodStatChartTabPanel.setHeight(cancel_totalHeight*0.6);	
+    cancelFoodStatChartTabPanel.setHeight(cancel_totalHeight*0.55);	
     
-    cancel_rz.resizeTo(cancelFoodDetailsStatPanel.getWidth(), cancelFoodDetailsStatPanel.getHeight());
+    cancel_rz.resizeTo(cancelFoodDetailsStatPanel.getWidth(), cancel_totalHeight*0.45);
 	
 	Ext.getCmp('cancelledFood').updateStatisticsDate = cancel_setStatisticsDate;
 });
