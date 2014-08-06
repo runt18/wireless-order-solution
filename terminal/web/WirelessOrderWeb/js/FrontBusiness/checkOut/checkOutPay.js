@@ -34,7 +34,7 @@ var paySubmit = function(submitType) {
 			if (submitType == 1) {
 				submitPrice = shouldPay;
 			} else {
-				
+				submitPrice = shouldPay;
 			}
 			// 暂结，调整参数
 			if (submitType == 6) {
