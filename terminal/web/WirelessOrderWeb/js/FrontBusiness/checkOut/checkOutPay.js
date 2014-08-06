@@ -32,7 +32,7 @@ var paySubmit = function(submitType) {
 
 			// 现金
 			if (submitType == 1) {
-				submitPrice = actualPrice;
+				submitPrice = shouldPay;
 			} else {
 				
 			}
