@@ -247,6 +247,10 @@ function fnFoodNameFormat(v, m, r, ri, ci, s){
 	return v;
 }
 
+function renderTimeFormat(v){
+	return v.substring(10);
+}
+
 Ext.onReady(function() {
 	Ext.getDom('remark').value="";
 	
@@ -294,14 +298,14 @@ Ext.onReady(function() {
 		    '',
 		    [
 			    [true, false, false, false], 
-			    ['菜名', 'displayFoodName', 220,,'fnFoodNameFormat'] , 
-			    ['口味', 'tasteGroup.tastePref', 130] , 
+			    ['菜名', 'displayFoodName', 200,,'fnFoodNameFormat'] , 
+			    ['口味', 'tasteGroup.tastePref', 100] , 
 			    ['口味价钱', 'tasteGroup.tastePrice', 80, 'right', 'Ext.ux.txtFormat.gridDou'],
 			    ['数量', 'count', 70, 'right', 'orderCountFormat'],
 			    ['单价', 'unitPrice', 70, 'right', 'Ext.ux.txtFormat.gridDou'],
 			    ['折扣率', 'discount', 70, 'right', 'Ext.ux.txtFormat.gridDou'],
 			    ['总价', 'totalPrice', 80, 'right', 'Ext.ux.txtFormat.gridDou'],
-			    ['时间', 'orderDateFormat', 130],
+			    ['时间', 'orderDateFormat', 80,,'renderTimeFormat'],
 			    ['服务员', 'waiter', 80]
 			],
 			OrderFoodRecord.getKeys(),
