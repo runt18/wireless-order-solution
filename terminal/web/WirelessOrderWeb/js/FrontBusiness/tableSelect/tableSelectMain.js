@@ -629,7 +629,6 @@ function dailySettleButHandler(){
 					buttons : Ext.MessageBox.YESNO,
 					fn : function(btn) {
 						if (btn == "yes") {
-							businessStatWin.destroy();
 							
 							// 未交班帳單檢查
 							Ext.Ajax.request({
@@ -642,6 +641,7 @@ function dailySettleButHandler(){
 										document.getElementById("unShiftBillWarnMsg").innerHTML = resultJSON.msg;
 										unShiftBillWarnWin.show();
 									}
+									
 								},
 								failure : function(response, options) {
 									Ext.MessageBox.show({
