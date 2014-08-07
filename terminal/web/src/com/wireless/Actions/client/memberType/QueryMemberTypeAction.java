@@ -25,6 +25,7 @@ import com.wireless.json.Jsonable;
 import com.wireless.pojo.client.Member;
 import com.wireless.pojo.client.MemberLevel;
 import com.wireless.pojo.client.MemberType;
+import com.wireless.pojo.distMgr.Discount;
 import com.wireless.pojo.staffMgr.Staff;
 
 public class QueryMemberTypeAction extends DispatchAction {
@@ -106,15 +107,38 @@ public class QueryMemberTypeAction extends DispatchAction {
 			throws Exception {
 		
 		
-		StringBuilder tsb = new StringBuilder();
+		StringBuilder typeNode = new StringBuilder();
 		try{
 			String pin = (String)request.getAttribute("pin");
-			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+//			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			List<MemberType> list = MemberTypeDao.getMemberType(StaffDao.verify(Integer.parseInt(pin)), null, " ORDER BY MT.member_type_id ");
-			List<MemberLevel> levelList = MemberLevelDao.getMemberLevels(staff);
-			List<Member> interestedMembers = MemberDao.getInterestedMember(staff, null);
+//			List<MemberLevel> levelList = MemberLevelDao.getMemberLevels(staff);
+//			List<Member> interestedMembers = MemberDao.getInterestedMember(staff, null);
 			MemberType item = null;
-			StringBuilder typeNode = new StringBuilder(), levelNode = new StringBuilder();
+			
+			for(int i = 0; i < list.size(); i++){
+				item = list.get(i);
+				if(i > 0){
+					typeNode.append(",");
+				}
+				typeNode.append("{")
+				.append("text:'" + item.getName() + "'")
+				.append(",leaf:true")
+				.append(",memberTypeId:" + item.getId())
+				.append(",memberTypeName:'" + item.getName() + "'")
+				.append(",type:" + item.getType().getVal())
+				.append(",chargeRate:" + item.getChargeRate())
+				.append(",exchangeRate:" + item.getExchangeRate())
+				.append(",initialPoint:" + item.getInitialPoint())
+				.append(",attributeValue:" + item.getAttribute().getVal())
+				.append(",desc:'" + item.getDesc() + "'")
+				.append(",discounts:[" + children(item.getDiscounts()) + "]" )
+				.append(",discount:" + item.getDefaultDiscount().getId())
+				.append("}");				
+			}
+			
+			
+/*			
 			typeNode.append("{")
 					.append("text:'会员类型'")
 					.append(", MemberTypeId : -1")
@@ -176,25 +200,48 @@ public class QueryMemberTypeAction extends DispatchAction {
 				 .append("}");
 				tsb.append(",").append(interested);
 			}
-			tsb.append("]");
+			tsb.append("]");*/
 			
 		}catch(Exception e){
 			e.printStackTrace();
 		}finally{
-			response.getWriter().print(tsb.toString());
+			response.getWriter().print("[" + typeNode.toString() + "]");
 		}
 		return null;
 	}
 	
-	private StringBuilder children(MemberType item, StringBuilder sb){
-		sb.append("{")
-			.append("text:'" + item.getName() + "'")
-			.append(",leaf:true")
-			.append(",memberTypeId:" + item.getId())
-			.append(",memberTypeName:'" + item.getName() + "'")
+//	private StringBuilder children(MemberType item, StringBuilder sb){
+//		sb.append("{")
+//			.append("text:'" + item.getName() + "'")
+//			.append(",leaf:true")
+//			.append(",memberTypeId:" + item.getId())
+//			.append(",memberTypeName:'" + item.getName() + "'")
+//			.append(",type:" + item.getType().getVal())
+//			.append(",chargeRate:" + item.getChargeRate())
+//			.append(",exchangeRate:" + item.getExchangeRate())
+//			.append(",initialPoint:" + item.getInitialPoint())
+//			.append(",attributeValue:" + item.getAttribute().getVal())
+//			.append(",desc:'" + item.getDesc() + "'")
+//			.append(",discount:" + item.getDefaultDiscount().getId() )
+////			.append(",discounts:" + item.getDiscounts())
+//			.append("}");
+//		return sb;
+//	}
+	
+	private StringBuilder children(List<Discount> items){
+		StringBuilder sb = new StringBuilder();
+		for (int i = 0; i < items.size(); i++) {
+			if(i > 0){
+				sb.append(",");
+			}
+			sb.append("{")
+			.append("discountId:" + items.get(i).getId())
+			.append(",discountName:'" + items.get(i).getName() + "'")
 			.append("}");
-		return sb;
-	}
+		}
+		return sb;	
+
+	}	
 	
 	public ActionForward notBelongType(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)

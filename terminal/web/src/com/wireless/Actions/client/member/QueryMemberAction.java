@@ -139,7 +139,7 @@ public class QueryMemberAction extends DispatchAction {
 			if(id != null && !id.trim().isEmpty() && Integer.valueOf(id.trim()) > 0){
 				extraCond.setId(Integer.parseInt(id));
 			}else{
-				if(memberType != null && !memberType.trim().isEmpty())
+				if(memberType != null && !memberType.trim().isEmpty() && !memberType.equals("-1"))
 					extraCond.setMemberType(Integer.parseInt(memberType));
 				
 				if(memberCardOrMobileOrName != null && !memberCardOrMobileOrName.trim().isEmpty())
