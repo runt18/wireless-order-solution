@@ -29,8 +29,15 @@
 	var mObj = {
 		searchValue : ''
 	};
+	var mtObj = {
+			operation : {
+				'insert' : 'INSERT',
+				'update' : 'UPDATE',
+				'delete' : 'DELETE'
+			}
+	};	
 		
-	var memberTypeTree, memberBasicGrid, memberBasicWin, adjustPointWin, memberCouponWin;
+	var memberTypeTree, memberBasicGrid, memberBasicWin, adjustPointWin, memberCouponWin,m_memberTypeWin;
 </script>
 
 <script type="text/javascript" src="../../js/Client/memberMgr/memberMgrMain.js"></script>
@@ -39,6 +46,7 @@
 <body> 
 	<div id="divMember"></div>
 	
+	<div id="divMemberTypeLevelChart" style="width: 250px;"></div>
 <!-- <div id="divMemberOperationTip" style="position:relative;height:118px;" align="center"> -->
 
 </body>
