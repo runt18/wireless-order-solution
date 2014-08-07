@@ -1999,7 +1999,7 @@ function memberTypeOperationHandler(c){
 
 
 //************************会员等级
-function commission_loadStaffColumnChart(){
+function member_loadMemberTypeChart(){
  	var commissionStaffChart = new Highcharts.Chart({
         chart: {
             type: 'bar',
@@ -2022,7 +2022,6 @@ function commission_loadStaffColumnChart(){
 					},
 					events : {
 						click : function(e){
-							alert(111)
 //							chart_operateMemberLevel(e.point.y, e.point.category);
 //							operateMemberLevel({otype:'update'});
 						}
@@ -2085,12 +2084,12 @@ function commission_loadStaffColumnChart(){
 }
 var memberMgr_obj = {treeId : 'tree_memberTypeMgr', option : [{name:'修改', fn:"updateMemberTypeHandler()"},{name:'删除', fn:"deleteMemberTypeHandler()"}]};
 Ext.onReady(function(){
-	member_dataInit();
+//	member_dataInit();
 	
 	treeInit();
 	gridInit();
 	
-	commission_loadStaffColumnChart();
+//	member_loadMemberTypeChart();
 	
 	var memberTypePanel = new Ext.Panel({
 		layout : 'border',
