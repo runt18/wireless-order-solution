@@ -37,7 +37,7 @@ public class OperateMemberTypeAction extends DispatchAction{
 			String pin = (String)request.getAttribute("pin");
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
-			String restaurantID = request.getParameter("restaurantID");
+			String restaurantID = (String) request.getAttribute("restaurantID");
 			String typeName = request.getParameter("typeName");
 			String discountID = request.getParameter("discountID");
 			String exchangeRate = request.getParameter("exchangeRate");
