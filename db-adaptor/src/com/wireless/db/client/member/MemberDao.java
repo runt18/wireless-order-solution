@@ -663,11 +663,11 @@ public class MemberDao {
 	 */
 	public static void checkValid(DBCon dbCon, Staff staff, Member memberToCheck) throws SQLException, BusinessException{
 		
-		if(!getByCond(dbCon, staff, new ExtraCond().setMobile(memberToCheck.getMobile()).toString(), null).isEmpty()){
+		if(!getByCond(dbCon, staff, new ExtraCond().setMobile(memberToCheck.getMobile()).toString() + (memberToCheck.getId() != 0 ? " AND M.member_id != " + memberToCheck.getId() : ""), null).isEmpty()){
 			throw new BusinessException(MemberError.MOBLIE_DUPLICATED);
 		}
 		
-		if(!memberToCheck.getMemberCard().isEmpty() && !getByCond(dbCon, staff, new ExtraCond().setCard(memberToCheck.getMemberCard()).toString(), null).isEmpty()){
+		if(!memberToCheck.getMemberCard().isEmpty() && !getByCond(dbCon, staff, new ExtraCond().setCard(memberToCheck.getMemberCard()).toString() + (memberToCheck.getId() != 0 ? " AND M.member_id != " + memberToCheck.getId() : ""), null).isEmpty()){
 			throw new BusinessException(MemberError.MEMBER_CARD_DUPLICATED);
 		}
 		
