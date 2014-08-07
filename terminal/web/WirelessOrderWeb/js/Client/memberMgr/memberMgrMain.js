@@ -277,12 +277,12 @@ function initTakeMoneyWin(){
 						isPrint : Ext.getCmp('chbPrintTakeMoney').getValue(),
 						callback : function(_c){
 							takeMoneyWin.hide();
-							var st = Ext.getCmp('mr_comboMemberSearchType');
-							st.setValue(2);
-							st.fireEvent('select', st, null, null);
-							var n = Ext.getCmp('numberSearchValueByNumber');
-							n.setValue(_c.data.memberCard);
-							Ext.getCmp('btnSearchMember').handler();
+//							var st = Ext.getCmp('mr_comboMemberSearchType');
+//							st.setValue(2);
+//							st.fireEvent('select', st, null, null);
+//							var n = Ext.getCmp('numberSearchValueByNumber');
+//							n.setValue(_c.data.memberCard);
+//							Ext.getCmp('btnSearchMember').handler();
 						}
 					});
 				}
@@ -841,27 +841,37 @@ function memberOperationSend(){
 } 
 
 memberOperationRenderer = function(val, m, record){
-	var attendtion;
-	if(record.data['acctendtioned']){
-		attendtion = '<a href="javascript:cancelAttentionHandler()">取消关注</a>';
-	}else{
-		attendtion = '<a href="javascript:attentionHandler()">添加关注</a>';
-	}
+//	var attendtion;
+//	if(record.data['acctendtioned']){
+//		attendtion = '<a href="javascript:cancelAttentionHandler()">取消关注</a>';
+//	}else{
+//		attendtion = '<a href="javascript:attentionHandler()">添加关注</a>';
+//	}
 	return ''
 		+ '<a href="javascript:updateMemberHandler()">修改</a>'
 		+ '&nbsp;&nbsp;&nbsp;&nbsp;'
 		+ '<a href="javascript:deleteMemberHandler()">删除</a>'
 		+ '&nbsp;&nbsp;&nbsp;&nbsp;'
+		+ '<a href="javascript:rechargeHandler()">充值</a>'
+		+ '&nbsp;&nbsp;&nbsp;'
+		+ '<a href="javascript:takeMoneyHandler()">取款</a>'
+		+ '&nbsp;&nbsp;&nbsp;'
 		+ '<a href="javascript:memberOperationSend() ">操作明细</a>'
-		+ '&nbsp;&nbsp;&nbsp;&nbsp;'
-		+ attendtion;
+		+ '&nbsp;&nbsp;&nbsp;&nbsp;';
 //		+ '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
 //		+ '<a href="javascript:adjustPoint()">积分调整</a>';
 };
 /**************************************************/
 function treeInit(){
 	var memberTypeTreeTbar = new Ext.Toolbar({
-		items : ['->', {
+		items : ['->',{
+			text : '添加',
+			iconCls : 'btn_add',
+			handler : function(){
+				insertMemberTypeHandler();
+			}			
+			
+		},{
 			text : '刷新',
 			id : 'btnRefreshMemberType',
 			iconCls : 'btn_refresh',
@@ -873,12 +883,13 @@ function treeInit(){
 	});
 	
 	memberTypeTree = new Ext.tree.TreePanel({
-		id : 'tree_memberMgr',
+		id : 'tree_memberTypeMgr',
 		title : '会员类型',
-		region : 'west',
+//		region : 'west',
+		region : 'center',
 		width : 200,
 		border : true,
-		rootVisible : false,
+		rootVisible : true,
 		singleExpand : true,
 		autoScroll : true,
 		frame : true,
@@ -1136,37 +1147,21 @@ function gridInit(){
 				
 				var gs = memberBasicGrid.getStore();
 				
-				var tipWinShow = false;
+//				var tipWinShow = false;
 				
 				if(memberTypeNode){
-					if(memberTypeNode.childNodes.length > 0 && memberTypeNode.attributes.memberTypeId != -1){
-						gs.baseParams['memberType'] = '';
-						gs.baseParams['memberTypeAttr'] = memberTypeNode.attributes.attr;
-					}else{
-						if(memberTypeNode.attributes.attr >= 0){
-							gs.baseParams['memberType'] = '';
-							gs.baseParams['memberTypeAttr'] = memberTypeNode.attributes.attr;
-						}else{
-							gs.baseParams['memberType'] = memberTypeNode.attributes.memberTypeId;
-							gs.baseParams['memberTypeAttr'] = '';
-						}
-					}
+					gs.baseParams['memberType'] = memberTypeNode.attributes.memberTypeId;
 				}else{
 					gs.baseParams['memberType'] = '';
-					gs.baseParams['memberTypeAttr'] = '';
 				}
 				
 				gs.baseParams['memberCardOrMobileOrName'] = Ext.getCmp('numberSearchByMemberPhoneOrCardOrName').getValue();
-//				gs.baseParams['totalBalance'] = searchType == 4 ? searchValue : '';
 				gs.baseParams['MinTotalMemberCost'] = Ext.getCmp('textTotalMinMemberCost').getValue();
 				gs.baseParams['MaxTotalMemberCost'] = Ext.getCmp('textTotalMaxMemberCost').getValue();
 				gs.baseParams['consumptionMinAmount'] = Ext.getCmp('textTotalMinMemberCostCount').getValue();
 				gs.baseParams['consumptionMaxAmount'] = Ext.getCmp('textTotalMaxMemberCostCount').getValue();
-//				gs.baseParams['point'] = Ext.getCmp('numberSearchByMemberPhoneOrCard').getValue();
-//				gs.baseParams['usedPoint'] = Ext.getCmp('numberSearchByMemberPhoneOrCard').getValue();
 				gs.baseParams['memberBalance'] = Ext.getCmp('textMemberBalance').getValue();
 				gs.baseParams['memberBalanceEqual'] = Ext.getCmp('memberBalanceEqual').getValue();
-//				gs.baseParams['so'] = Ext.getCmp('comboSearchValueByOperation').getValue();
 				gs.load({
 					params : {
 						start : 0,
@@ -1181,14 +1176,14 @@ function gridInit(){
 							}
 						}
 					}
-					if(gs.getTotalCount() > 0 && tipWinShow){
-						memberBasicGrid.getSelectionModel().selectAll();
-//						if(Ext.ux.getCookie(document.domain+'_memberTip') != 'true'){
-							memberTipWin.show();
-//						}					
-					}
-					
-					tipWinShow = true;
+//					if(gs.getTotalCount() > 0 && tipWinShow){
+//						memberBasicGrid.getSelectionModel().selectAll();
+////						if(Ext.ux.getCookie(document.domain+'_memberTip') != 'true'){
+//							memberTipWin.show();
+////						}					
+//					}
+//					
+//					tipWinShow = true;
 				});
 				
 				
@@ -1248,44 +1243,25 @@ function gridInit(){
 			handler : function(e){
 
 				var memberTypeNode = memberTypeTree.getSelectionModel().getSelectedNode();
-				var searchType = Ext.getCmp('mr_comboMemberSearchType').getValue();
-				var searchValue = Ext.getCmp(mObj.searchValue) ? Ext.getCmp(mObj.searchValue).getValue() : '';
-				
-				var memberType, memberTypeAttr;
-				
+//				var tipWinShow = false;
+				var memberType = '';
 				if(memberTypeNode){
-					if(memberTypeNode.childNodes.length > 0 && memberTypeNode.attributes.memberTypeId != -1){
-						memberType = '';
-						memberTypeAttr = memberTypeNode.attributes.attr;
-					}else{
-						if(memberTypeNode.attributes.attr >= 0){
-							memberType = '';
-							memberTypeAttr = memberTypeNode.attributes.attr;
-						}else{
-							memberType = memberTypeNode.attributes.memberTypeId;
-							memberTypeAttr = '';
-						}
-					}
-				}else{
-					memberType = '';
-					memberTypeAttr = '';
+					memberType = memberTypeNode.attributes.memberTypeId;
 				}
-				var url = '../../{0}?memberType={1}&memberTypeAttr={2}&name={3}&memberCard={4}&mobile={5}&totalBalance={6}' +
-						'&usedBalance={7}&consumptionAmount={8}&point={9}&usedPoint={10}&so={11}&dataSource={12}';
+				
+				var url = '../../{0}?memberType={1}&memberCardOrMobileOrName={2}&MinTotalMemberCost={3}' +
+						'&MaxTotalMemberCost={4}&consumptionMinAmount={5}&consumptionMaxAmount={6}&memberBalance={7}&memberBalanceEqual={8}&dataSource={9}';
 				url = String.format(
 					url, 
 					'ExportHistoryStatisticsToExecl.do', 
 					memberType,
-					memberTypeAttr,
-					searchType == 1 ? searchValue : '',
-					searchType == 2 ? searchValue : '',
-					searchType == 3 ? searchValue : '',
-					searchType == 4 ? searchValue : '',
-					searchType == 5 ? searchValue : '',
-					searchType == 6 ? searchValue : '',
-					searchType == 7 ? searchValue : '',
-					searchType == 8 ? searchValue : '',
-					Ext.getCmp('comboSearchValueByOperation').getValue(),
+					Ext.getCmp('numberSearchByMemberPhoneOrCardOrName').getValue(),
+					Ext.getCmp('textTotalMinMemberCost').getValue(),
+					Ext.getCmp('textTotalMaxMemberCost').getValue(),
+					Ext.getCmp('textTotalMinMemberCostCount').getValue(),
+					Ext.getCmp('textTotalMaxMemberCostCount').getValue(),
+					Ext.getCmp('textMemberBalance').getValue(),
+					Ext.getCmp('memberBalanceEqual').getValue(),
 					'memberList'
 				);
 				
@@ -1321,7 +1297,7 @@ function gridInit(){
 		[memberBasicGridTbar, memberBasicGridExcavateMemberTbar]
 	);	
 	memberBasicGrid.region = 'center';
-	
+	memberBasicGrid.loadMask = null;
 	
 	
 	memberBasicGrid.on('render', function(e){
@@ -1369,10 +1345,10 @@ function winInit(){
 							Ext.TaskMgr.stop(this);
 						}
 					},
-					interval: 500
+					interval: 1000
 				};
 				
-				thiz.center();
+				
 				thiz.load({
 					url : '../window/client/controlMember.jsp', 
 					scripts : true,
@@ -1381,8 +1357,20 @@ function winInit(){
 					},
 					callback : function(){
 						Ext.TaskMgr.start(task);
+//							var data = {};
+//							if(memberBasicWin.otype == Ext.ux.otype['update']){
+//								data = Ext.ux.getSelData(memberBasicGrid);
+//								data = !data ? {status:0} : data;
+//							}else{
+//								data = {status:0};
+//							}
+//							cm_operationMemberBasicMsg({
+//								type : 'SET',
+//								data : data
+//							});						
 					}
 				});
+				thiz.center();
 			}
 		},
 		keys : [{
@@ -1508,21 +1496,21 @@ var btnRechargeDetail = new Ext.ux.ImageButton({
 	}
 });
 
-var btnMemberCouponWin = new Ext.ux.ImageButton({
-	imgPath : '../../images/sendCoupon.png',
-	imgWidth : 50,
-	imgHeight : 50,
-	tooltip : '发送优惠劵',
-	handler : function(e){
-		var data = memberBasicGrid.getSelectionModel().getSelections();
-		if(data.length < 1){
-			Ext.example.msg('提示', '请选中会员后进行操作.');
-			return;
-		}		
-		
-		initMemberCouponWin();
-	}
-});
+//var btnMemberCouponWin = new Ext.ux.ImageButton({
+//	imgPath : '../../images/sendCoupon.png',
+//	imgWidth : 50,
+//	imgHeight : 50,
+//	tooltip : '发送优惠劵',
+//	handler : function(e){
+//		var data = memberBasicGrid.getSelectionModel().getSelections();
+//		if(data.length < 1){
+//			Ext.example.msg('提示', '请选中会员后进行操作.');
+//			return;
+//		}		
+//		
+//		initMemberCouponWin();
+//	}
+//});
 
 function fnRemberTip(){
 	if(Ext.getDom('chxMemberTip').checked){
@@ -1532,10 +1520,591 @@ function fnRemberTip(){
 	}
 }
 
-/**********************************************************************/
+/*会员类型********************************************************/
+function member_dataInit(){
+	Ext.Ajax.request({
+		url : '../../QueryDiscountTree.do',
+		params : {
+			restaurantID : restaurantID
+			
+		},
+		success : function(res, opt){
+			discountData = eval(res.responseText);
+
+		},
+		failure : function(res, opt){
+			Ext.ux.showMsg(Ext.decode(res.responseText));
+		}
+	});
+};
+function checkLabel(t){
+	if(t.length > 5){
+		var after = t.substring(0, 5);
+		return after;
+	}else{
+		return t;
+	}
+}
+function m_memberTypeWinInit(){
+	if(!m_memberTypeWin){
+		m_memberTypeWin = new Ext.Window({
+			id : 'm_memberTypeWin',
+			title : '会员类型',
+			closable : false,
+			modal : true,
+			resizable : false,
+			width : 275,
+			items : [{
+				xtype : 'form',
+				layout : 'form',
+				frame : true,
+				width : 275,
+				labelWidth : 70,
+				labelAlign : 'right',
+				defaults : {
+					width : 160
+				},
+				items : [{
+					xtype : 'hidden',
+					id : 'numTypeID',
+					fieldLabel : '类型编号'
+				}, {
+					xtype : 'textfield',
+					id : 'txtTypeName',
+					fieldLabel : '类型名称' + Ext.ux.txtFormat.xh,
+					allowBlank : false,
+					blankText : '类型名称不能为空.',
+					value : "",
+					selectOnFocus : true
+				}, {
+					xtype : 'numberfield',
+					id : 'numExchangeRate',
+					fieldLabel : '积分比率' + Ext.ux.txtFormat.xh,
+					value : 1,
+					minValue : 0.00,
+					allowBlank : false,
+					blankText : '积分比率不能为空.',
+					selectOnFocus : true
+				}, {
+					xtype : 'label',
+					width : 200,
+					style : 'color:green;font-szie:12px;',
+					text : '说明:  使用会员结账时, 消费金额兑换积分的利率, 如金额 100 元兑换 150 积分, 则输入 1.5, 默认 1.'
+				}, {
+					xtype : 'numberfield',
+					id : 'numInitialPoint',
+					fieldLabel : '初始积分' + Ext.ux.txtFormat.xh,
+					value : 1,
+					minValue : 0.00,
+					allowBlank : false,
+					blankText : '初始积分不能为空.',
+					selectOnFocus : true
+				}, {
+					xtype : 'label',
+					style : 'color:green;font-szie:12px;',
+					text : '说明:  新会员赠送积分.'
+				}, {
+					xtype : 'combo',
+					id : 'comboAttribute',
+					fieldLabel : '会员属性' + Ext.ux.txtFormat.xh,
+					forceSelection : true,
+					width : 130,
+					value : 0,
+					store : new Ext.data.SimpleStore({
+						fields : [ 'value', 'text' ],
+						data : memberAttributeData
+					}),
+					valueField : 'value',
+					displayField : 'text',
+					typeAhead : true,
+					mode : 'local',
+					triggerAction : 'all',
+					selectOnFocus : true,
+					allowBlank : false,
+					blankText : '会员属性不能为空.',
+					listeners : {
+						render : function(e){
+							e.setValue(0);
+							e.fireEvent('select', e);
+						},
+						select : function(e, rocord, index){
+							var cr = Ext.getCmp('numChargeRate');
+							if(e.getValue() == 0){
+								cr.setValue(1);
+								cr.setDisabled(false);
+							}else if(e.getValue() == 1){
+								cr.setValue(0);
+								cr.setDisabled(true);
+							}
+							cr.clearInvalid();
+						}
+					}
+				}, {
+					xtype : 'label',
+					autoWidth : true,
+					style : 'color:green;font-szie:12px;width : 250px',
+					text : '说明:  所有属性都可使用积分功能, 积分类型只使用该会员类型的折扣信息, 充值则可使用会员资料中基本金额、赠送金额等更多信息'
+				}, {
+					xtype : 'numberfield',
+					id : 'numChargeRate',
+					fieldLabel : '充值比率' + Ext.ux.txtFormat.xh,
+					value : 1.00,
+					minValue : 0.00,
+					minText : '充值比率最小为 0.00.',
+					decimalPrecision : 2,
+					allowBlank : false,
+					blankText : '充值比率不能为空.',
+					selectOnFocus : true,
+					disabled : true
+				}, {
+					xtype : 'label',
+					autoWidth : true,
+					style : 'color:green;font-szie:12px;',
+					text : '说明:充100.00元送50.00元, 充值比率输入  1.5, 默认 1 '
+				}, {
+					xtype : 'textarea',
+					height : 40,
+					id : 'txtCommentForMemberType',
+					fieldLabel : '特权说明'
+				},{
+					xtype : 'panel',
+					layout : 'column',
+					id : 'formMemberDiscount',
+					frame : true,
+					width : 255,
+					defaults : {
+						columnWidth : .333,
+						layout : 'form',
+						labelWidth : 80
+					},
+					items : [{
+						columnWidth : 1,
+						xtype : 'label',
+						id : 'txtTest',
+						style : 'text-align:left;padding-bottom:3px;',
+						text : '折扣方案:'
+						
+					}]
+					
+				},{
+					xtype : 'combo',
+					id : 'comboDiscount',
+					fieldLabel : '默认方案' + Ext.ux.txtFormat.xh,
+					forceSelection : true,
+					allowBlank : false,
+					blankText : '折扣方案不能为空.',
+					store : new Ext.data.JsonStore({
+						fields : [ 'discountID', 'text' ]
+					}),
+					valueField : 'discountID',
+					displayField : 'text',
+					typeAhead : true,
+					mode : 'local',
+					triggerAction : 'all',
+					selectOnFocus : true,
+					listeners : {
+						focus  : function(thiz){
+							var mDiscountSelectedList = []; 
+							var mDiscountSelecteds = document.getElementsByName('memberDiscount');
+							for (var i = 0; i < mDiscountSelecteds.length; i++) {
+								if(mDiscountSelecteds[i].checked){
+									mDiscountSelectedList.push({'discountID':mDiscountSelecteds[i].value,'text':mDiscountSelecteds[i].nextSibling.innerHTML});
+								}
+								
+							}
+							thiz.store.loadData(mDiscountSelectedList);
+						}
+					}
+				}]
+			}],
+			bbar : ['->', {
+				text : '保存',
+				id : 'btnSaveMemberType',
+				iconCls : 'btn_save',
+				handler : function(e){
+					var typeID = Ext.getCmp('numTypeID');
+					var typeName = Ext.getCmp('txtTypeName');
+					var chargeRate = Ext.getCmp('numChargeRate');
+					var exchangeRate = Ext.getCmp('numExchangeRate');
+					var initialPoint = Ext.getCmp('numInitialPoint');
+					var discount = Ext.getCmp('comboDiscount');
+					var attribute = Ext.getCmp('comboAttribute');
+					var desc = Ext.getCmp('txtCommentForMemberType');
+					
+					if(!typeName.isValid() || !chargeRate.isValid() || !exchangeRate.isValid() 
+							|| !initialPoint.isValid() || !attribute.isValid() || !discount.isValid()){
+						return;
+					}
+					var memberDiscountCheckeds = "";
+					
+					var save = Ext.getCmp('btnSaveMemberType');
+					var close = Ext.getCmp('btnCloseMemberType');
+					
+					save.setDisabled(true);
+					close.setDisabled(true);
+					Ext.Ajax.request({
+						url : '../../OperateMemberType.do',
+						params : {
+							dataSource : m_memberTypeWin.otype.toLowerCase(),
+							restaurantID : restaurantID,
+							typeID : typeID.getValue(),
+							typeName : typeName.getValue(),
+							discountID : discount.getValue(),
+							exchangeRate : exchangeRate.getValue(),
+							initialPoint : initialPoint.getValue(),
+							chargeRate : chargeRate.getValue(),
+							attr : attribute.getValue(),
+							desc : desc.getValue(),
+							memberDiscountCheckeds : getChecked(memberDiscountCheckeds, document.getElementsByName('memberDiscount'))
+						},
+						success : function(res, opt){
+							var jr = Ext.decode(res.responseText);
+							if(jr.success){
+								Ext.example.msg(jr.title, jr.msg);
+								m_memberTypeWin.hide();
+								Ext.getCmp('btnRefreshMemberType').handler();
+							}else{
+								Ext.ux.showMsg(jr);								
+							}
+							save.setDisabled(false);
+							close.setDisabled(false);
+						},
+						failure : function(res, opt){
+							Ext.ux.showMsg(Ext.decode(res.responseText));
+							save.setDisabled(false);
+							close.setDisabled(false);
+						}
+					});
+				}
+			}, {
+				text : '关闭',
+				id : 'btnCloseMemberType',
+				iconCls : 'btn_close',
+				handler : function(e){
+					m_memberTypeWin.hide();
+					Ext.getCmp('txtTypeName').enable();
+				}
+			}],
+			listeners : {
+				beforeshow : function(e){
+					if(document.getElementsByName('memberDiscount').length == 0){
+						for (var i = 0; i < discountData.length; i++) {
+							var c = {items : [{
+								xtype : "checkbox", 
+								name : "memberDiscount",
+								boxLabel : checkLabel(discountData[i].text) , 
+								hideLabel : true, 
+								inputValue :  discountData[i].discountID,
+								listeners : {
+									focus : function(){
+										Ext.getCmp('comboDiscount').setValue();
+										Ext.getCmp('comboDiscount').clearInvalid();
+									},
+									check : function(){
+										Ext.getCmp('comboDiscount').setValue();
+										Ext.getCmp('comboDiscount').clearInvalid();
+									}
+								}
+							}]};
+							Ext.getCmp('formMemberDiscount').add(c);
+							//solveIE自动换行时格式错乱
+							if((i+1)%6 == 0){
+								Ext.getCmp('formMemberDiscount').add({columnWidth : 1});
+							}
+							Ext.getCmp('formMemberDiscount').doLayout();
+						}
+					}
+				},
+				hide : function(){
+					var discounts = document.getElementsByName('memberDiscount');
+					for (var i = 0; i < discounts.length; i++) {
+						if(discounts[i].checked){
+							discounts[i].checked = false;
+						}
+					}
+				}
+			},
+			keys : [{
+				key : Ext.EventObject.ENTER,
+				fn : function(){
+					Ext.getCmp('btnSaveMemberType').handler();
+				},
+				scope : this
+			}, {
+				key : Ext.EventObject.ESC,
+				fn : function(){
+					Ext.getCmp('btnCloseMemberType').handler();
+				},
+				scope : this
+			}]
+		});
+	}
+
+};
+
+
+function insertMemberTypeHandler(){
+	memberTypeOperationHandler({
+		type : mtObj.operation['insert']
+	});
+};
+function updateMemberTypeHandler(){
+	memberTypeOperationHandler({
+		type : mtObj.operation['update']
+	});
+};
+function deleteMemberTypeHandler(){
+	memberTypeOperationHandler({
+		type : mtObj.operation['delete']
+	});
+};
+
+function bindMemberTypeData(d){
+	var typeID = Ext.getCmp('numTypeID');
+	var typeName = Ext.getCmp('txtTypeName');
+	var chargeRate = Ext.getCmp('numChargeRate');
+	var exchangeRate = Ext.getCmp('numExchangeRate');
+	var initialPoint = Ext.getCmp('numInitialPoint');
+	var discount = Ext.getCmp('comboDiscount');
+	var attribute = Ext.getCmp('comboAttribute');
+	var desc = Ext.getCmp('txtCommentForMemberType');
+	
+	typeID.setValue(d['memberTypeId']);
+	typeName.setValue(d['memberTypeName']);
+	//是微信就不能该名字
+	if(d['type'] == 2){
+		typeName.disable();
+	}
+	exchangeRate.setValue(d['exchangeRate']);
+	initialPoint.setValue(typeof d['initialPoint'] != 'undefined' ? d['initialPoint'] : 0);
+	
+	if(typeof d['attributeValue'] == 'undefined'){
+		attribute.setValue(1);
+	}else{
+		attribute.setValue(d['attributeValue']);
+	}
+	attribute.fireEvent('select', attribute);
+	chargeRate.setValue(d['chargeRate']);
+	discount.setValue(d['discount']);
+	desc.setValue(d['desc']);
+	
+	typeID.clearInvalid();
+	typeName.clearInvalid();
+	chargeRate.clearInvalid();
+	initialPoint.clearInvalid();
+	attribute.clearInvalid();
+	discount.clearInvalid();
+};
+
+function getChecked(checkeds, checkBoxs){
+	for (var i = 0; i < checkBoxs.length; i++) {
+		if(checkBoxs[i].checked){
+			if(checkeds == ""){
+				checkeds += checkBoxs[i].value;
+			}else{
+				checkeds += "," + checkBoxs[i].value;
+			}
+		}
+	}
+	return checkeds;
+}
+
+function memberTypeOperationHandler(c){
+	if(c == null || typeof c == 'undefined' || typeof c.type == 'undefined'){
+		return;
+	}
+	m_memberTypeWinInit();
+	m_memberTypeWin.otype = c.type;
+	if(c.type == mtObj.operation['insert']){
+		m_memberTypeWin.setTitle('添加会员类型');
+		m_memberTypeWin.show();
+		m_memberTypeWin.center();
+		Ext.getCmp('txtTypeName').focus(true, 100);
+		
+		bindMemberTypeData({
+			discountType : 0,
+			chargeRate : 1.00,
+			exchangeRate : 1.00,
+			initialPoint : 0
+		});
+		
+	}else if(c.type == mtObj.operation['update']){
+		var sd = Ext.ux.getSelNode(memberTypeTree);
+		if(!sd){
+			Ext.example.msg('提示', '请选中一个会员类型再进行操作.');
+			return;
+		}
+		m_memberTypeWin.setTitle('修改会员类型');
+		m_memberTypeWin.show();
+		
+		var discounts = document.getElementsByName('memberDiscount');
+		for (var i = 0; i < sd.attributes['discounts'].length; i++) {
+			for (var j = 0; j < discounts.length; j++) {
+				if(sd.attributes['discounts'][i].discountId == discounts[j].value){
+					
+					discounts[j].checked = true;
+				}
+			}
+		}
+		var mDiscountSelectedList = []; 
+		var mDiscountSelecteds = document.getElementsByName('memberDiscount');
+		for (var i = 0; i < mDiscountSelecteds.length; i++) {
+			if(mDiscountSelecteds[i].checked){
+				mDiscountSelectedList.push({'discountID':mDiscountSelecteds[i].value,'text':mDiscountSelecteds[i].nextSibling.innerHTML});
+			}
+			
+		}
+		Ext.getCmp('comboDiscount').store.loadData(mDiscountSelectedList);
+		
+		bindMemberTypeData(sd.attributes);
+		
+		m_memberTypeWin.center();
+	}else if(c.type == mtObj.operation['delete']){
+		var sd = Ext.ux.getSelNode(memberTypeTree);
+		if(!sd){
+			Ext.example.msg('提示', '请选中一个会员类型再进行操作.');
+			return;
+		}
+		Ext.Msg.show({
+			title : '提示',
+			msg : '是否删除会员类型?<br><font color="red">提示:如果该类型下已有会员则删除失败.</font>',
+			buttons : Ext.Msg.YESNO,
+			fn : function(e){
+				if(e == 'yes'){
+					Ext.Ajax.request({
+						url : '../../OperateMemberType.do',
+						params : {
+							dataSource : 'delete',
+							typeID : sd.attributes.memberTypeId
+						},
+						success : function(res, opt){
+							var jr = Ext.decode(res.responseText);
+							if(jr.success){
+								Ext.example.msg(jr.title, jr.msg);
+								Ext.getCmp('btnRefreshMemberType').handler();
+							}else{
+								Ext.ux.showMsg(jr);
+							}
+						},
+						failure : function(res, opt){
+							Ext.ux.showMsg(Ext.decode(res.responseText));
+						}
+					});
+				}
+			}
+		});
+	}
+	
+};
+
+
+//************************会员等级
+function commission_loadStaffColumnChart(){
+ 	var commissionStaffChart = new Highcharts.Chart({
+        chart: {
+            type: 'bar',
+            renderTo : 'divMemberTypeLevelChart'
+        },
+        title: {
+            text : '<font style="font-size:15px;color:red;font-weight:bold;textShadow: \'0 0 3px black\'">★点击等级条可设置积分</font>',
+            align : 'right'
+        },
+	    	plotOptions : {
+				column : {
+					allowPointSelect :true,
+					cursor : 'pointer',
+					dataLabels : {
+						enabled : true,
+						style : {
+							fontWeight: 'bold', 
+							color: 'green' 
+						}
+					},
+					events : {
+						click : function(e){
+							alert(111)
+//							chart_operateMemberLevel(e.point.y, e.point.category);
+//							operateMemberLevel({otype:'update'});
+						}
+					}
+				}
+			},        
+//        xAxis: {
+//            categories: commissionStaffChartData.staffColumnChart.xAxis
+//        },
+        xAxis: {                                                           
+            categories: ['first', 'second', 'three'],
+            title: {                                                       
+                text: null                                                 
+            }                                                              
+        },          
+        yAxis: {
+            min: 0,
+            title: {
+                text: '积分'
+            }
+        },
+        tooltip: {
+            pointFormat: '<table><tbody><tr><td style="color:red;padding:0">{series.name}: </td><td style="padding:0"><b>{point.y} </b></td></tr></tbody></table>',
+            shared: true,
+            useHTML: true
+        },
+        plotOptions: {
+            column: {
+                pointPadding: 0.2,
+                borderWidth: 0
+            }
+        },
+       legend: {                                                          
+            enabled : false
+        },
+        credits : {
+        	enabled : false
+        },         
+        exporting : {
+        	enabled : false
+        },
+        series: [{                                                         
+            name: '积分',                                             
+            data: [{y : 110, color : 'SpringGreen'}, {y : 120, color : 'GreenYellow'}, {y : 130, color : 'cyan'}],
+            dataLabels: {
+                enabled: true,
+                color: 'black',
+                align: 'right',
+                x: 0,
+                y: 0,
+                style: {
+                    fontSize: '15px',
+                    fontFamily: 'Verdana, sans-serif'
+//                    textShadow: '0 0 3px black'
+                }
+            }            
+        }]         
+//        series: [commissionStaffChartData.staffColumnChart.yAxis, commissionStaffChartData.staffColumnChart.yAxisAmount]
+    });	
+}
+var memberMgr_obj = {treeId : 'tree_memberTypeMgr', option : [{name:'修改', fn:"updateMemberTypeHandler()"},{name:'删除', fn:"deleteMemberTypeHandler()"}]};
 Ext.onReady(function(){
+	member_dataInit();
+	
 	treeInit();
 	gridInit();
+	
+	commission_loadStaffColumnChart();
+	
+	var memberTypePanel = new Ext.Panel({
+		layout : 'border',
+		width : 210,
+		frame : false,
+		region : 'west',
+		items : [memberTypeTree
+//				, new Ext.Panel({
+//					title : '会员等级分布图',
+//					region : 'south',
+//					contentEl : 'divMemberTypeLevelChart'
+//				})
+		]
+	});
 	
 	new Ext.Panel({
 		renderTo : 'divMember',
@@ -1543,7 +2112,7 @@ Ext.onReady(function(){
 		//width : parseInt(Ext.getDom('divMember').parentElement.style.width.replace(/px/g,'')),
 		height : parseInt(Ext.getDom('divMember').parentElement.style.height.replace(/px/g,'')),
 		layout : 'border',
-		items : [memberTypeTree, memberBasicGrid],
+		items : [memberTypePanel, memberBasicGrid],
 		autoScroll : true,
 		tbar : new Ext.Toolbar({
 			height : 55,
@@ -1561,9 +2130,7 @@ Ext.onReady(function(){
 			    {xtype : 'tbtext', text : '&nbsp;&nbsp;'},
 			    btnConsumeDetail,
 			    {xtype : 'tbtext', text : '&nbsp;&nbsp;'},
-			    btnRechargeDetail,
-			    {xtype : 'tbtext', text : '&nbsp;&nbsp;'},
-			    btnMemberCouponWin
+			    btnRechargeDetail
 			]
 		})
 	});
@@ -1582,5 +2149,5 @@ Ext.onReady(function(){
 				'<div style="position:absolute;left : 0; bottom: 3px;"><input id="chxMemberTip" type="checkbox" onclick="javascript:fnRemberTip()" />不再显示</div>'+
 			'</div>'
 	});
-	
+	showFloatOption(memberMgr_obj);
 });
