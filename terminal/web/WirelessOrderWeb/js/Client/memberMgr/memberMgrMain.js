@@ -2084,7 +2084,7 @@ function member_loadMemberTypeChart(){
 }
 var memberMgr_obj = {treeId : 'tree_memberTypeMgr', option : [{name:'修改', fn:"updateMemberTypeHandler()"},{name:'删除', fn:"deleteMemberTypeHandler()"}]};
 Ext.onReady(function(){
-//	member_dataInit();
+	member_dataInit();
 	
 	treeInit();
 	gridInit();
