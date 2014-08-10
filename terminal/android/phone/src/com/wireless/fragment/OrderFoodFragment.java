@@ -310,12 +310,7 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 		
 		@Override
 		public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
-			final View layout;
-			if(convertView != null){
-				layout = convertView;
-			}else{
-				layout = super.getChildView(groupPosition, childPosition, isLastChild,	convertView, parent);
-			}
+			final View layout = super.getChildView(groupPosition, childPosition, isLastChild,	convertView, parent);;
 			
 			Map<String, ?> map = mChildData.get(groupPosition).get(childPosition);
 			final OrderFood of = (OrderFood) map.get(ITEM_THE_FOOD);
@@ -351,8 +346,8 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 			}
 			
 			detail.append(status);
-			
-			((TextView) layout.findViewById(R.id.txtView_foodName_orderChildItem)).setText(detail);
+			//œ‘ æ≤À√˚
+			((TextView)layout.findViewById(R.id.txtView_foodName_orderChildItem)).setText(detail);
 			
 			if(of.asFood().isCombo()){
 				LinearLayout comboLinearLayout = (LinearLayout)layout.findViewById(R.id.linearLayout_comboList_orderChildItem);
@@ -556,12 +551,7 @@ public class OrderFoodFragment extends Fragment implements OnCancelAmountChanged
 	
 		@Override
 		public View getGroupView(int groupPosition, boolean isExpanded,	View convertView, ViewGroup parent) {
-			final View layout;
-			if(convertView != null){
-				layout = convertView;
-			}else{
-				layout = super.getGroupView(groupPosition, isExpanded, convertView, parent);
-			}
+			final View layout = super.getGroupView(groupPosition, isExpanded, convertView, parent);
 			
 			Map<String, ?> map = mGroupData.get(groupPosition);
 			
