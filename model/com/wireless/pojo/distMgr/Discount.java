@@ -14,13 +14,15 @@ public class Discount implements Jsonable, Parcelable, Comparable<Discount>{
 	
 	public final static List<Discount> EMPTY_LIST = Collections.emptyList();
 	
+	public final static Discount EMPTY = new EmptyBuilder().build();
+	
 	public final static byte DISCOUNT_PARCELABLE_COMPLEX = 0;
 	public final static byte DISCOUNT_PARCELABLE_SIMPLE = 1;
 	
 	//The helper class insert a '无折扣'
-	public static class NoDiscountBuilder extends InsertBuilder{
+	public static class EmptyBuilder extends InsertBuilder{
 		public final static String TAG = "无折扣";
-		public NoDiscountBuilder(){
+		public EmptyBuilder(){
 			super(TAG, Status.DEFAULT, Type.RESERVED);
 			setRate(1);
 		}
