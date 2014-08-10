@@ -638,7 +638,7 @@ public class RestaurantDao {
 	}
 	
 	private static void initDiscount(DBCon dbCon, Staff staff) throws SQLException{
-		DiscountDao.insert(dbCon, staff, new Discount.NoDiscountBuilder());
+		DiscountDao.insert(dbCon, staff, new Discount.EmptyBuilder());
 	}
 	
 	private static void initTastes(DBCon dbCon, Staff staff) throws SQLException, BusinessException{

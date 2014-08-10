@@ -320,7 +320,7 @@ public class TestRestaurantDao {
 	}
 	
 	private void compareDiscount(Staff staff, int restaurantId) throws SQLException{
-		Discount expected = new Discount.NoDiscountBuilder().build();
+		Discount expected = Discount.EMPTY;
 		
 		Discount actual = DiscountDao.getAll(staff).get(0);
 

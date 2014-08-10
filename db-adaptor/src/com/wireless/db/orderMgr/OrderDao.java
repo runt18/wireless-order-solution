@@ -533,11 +533,14 @@ public class OrderDao {
 			orderInfo.setCustomNum(dbCon.rs.getShort("custom_num"));
 			orderInfo.setCategory(dbCon.rs.getShort("category"));
 			
-			Discount discount = new Discount(dbCon.rs.getInt("discount_id"));
-			if(dateType == DateType.TODAY){
-				discount.setName(dbCon.rs.getString("discount_name"));
+			int discountId = dbCon.rs.getInt("discount_id");
+			if(discountId != 0){
+				Discount discount = new Discount(discountId);
+				if(dateType == DateType.TODAY){
+					discount.setName(dbCon.rs.getString("discount_name"));
+				}
+				orderInfo.setDiscount(discount);
 			}
-			orderInfo.setDiscount(discount);
 			
 			orderInfo.setPaymentType(dbCon.rs.getShort("pay_type"));
 			orderInfo.setSettleType(dbCon.rs.getShort("settle_type"));

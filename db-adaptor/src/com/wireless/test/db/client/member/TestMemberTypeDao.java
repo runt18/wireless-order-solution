@@ -92,7 +92,7 @@ public class TestMemberTypeDao {
 					assertTrue("fail to delete member type", false);
 				}catch(BusinessException ingored){}
 				
-				assertTrue("fail to delete discounts associated with this member type", DiscountDao.getByMemberType(mStaff, memberTypeId).isEmpty());
+				assertTrue("fail to delete discounts associated with this member type", DiscountDao.getByMemberType(mStaff, new MemberType(memberTypeId)).isEmpty());
 			}
 		}
 	}

@@ -486,37 +486,42 @@ public class PayOrder {
 			}
 		}
 		
-		//If the discount is set, check to see whether it is the same as before.
-		try{
-			if(payBuilder.hasDiscount()){
-				//If the discount to set is the same as before, just use original.
-				if(orderToCalc.getDiscount().getId() == payBuilder.getDiscountId()){
-					orderToCalc.setDiscount(DiscountDao.getById(dbCon, staff, orderToCalc.getDiscount().getId()));
-				}else{
-					List<Discount> discounts;
-					//If the discount to set is NOT the same as before, check to see whether the discount is permitted to use.
-					if(payBuilder.getSettleType() == Order.SettleType.MEMBER){
-						discounts = DiscountDao.getByMemberType(dbCon, staff, MemberDao.getById(dbCon, staff, payBuilder.getMemberId()).getMemberType().getId());
-					}else{
-						discounts = DiscountDao.getByRole(dbCon, staff, staff.getRole());
-					}
-					
-					int index = discounts.indexOf(new Discount(payBuilder.getDiscountId()));
-					if(index < 0){
-						throw new BusinessException(StaffError.DISCOUNT_NOT_ALLOW);
-					}else{
-						orderToCalc.setDiscount(discounts.get(index));
-					}
-				}
+		if(payBuilder.hasDiscount()){
+			
+			List<Discount> allowDiscounts;
+			if(payBuilder.getSettleType() == Order.SettleType.MEMBER){
+				//Get the allowed discounts to the member type if paid by member.
+				allowDiscounts = DiscountDao.getByCond(dbCon, staff, 
+													   new DiscountDao.ExtraCond().setMemberType(MemberDao.getById(dbCon, staff, payBuilder.getMemberId()).getMemberType()).setDiscountId(payBuilder.getDiscountId()), 
+													   DiscountDao.ShowType.BY_PLAN);
 			}else{
-				//If the discount NOT set, just use the original.
-				orderToCalc.setDiscount(DiscountDao.getById(dbCon, staff, orderToCalc.getDiscount().getId()));
+				//Get the allowed discounts to role if paid by normal.
+				allowDiscounts = DiscountDao.getByCond(dbCon, staff, 
+													   new DiscountDao.ExtraCond().setRole(staff.getRole()).setDiscountId(payBuilder.getDiscountId()),
+													   DiscountDao.ShowType.BY_PLAN);
+
 			}
-		}catch(BusinessException e){
-			if(e.getErrCode() == DiscountError.DISCOUNT_NOT_EXIST){
+			
+			if(allowDiscounts.isEmpty()){
+				throw new BusinessException(StaffError.DISCOUNT_NOT_ALLOW);
+			}else{
+				orderToCalc.setDiscount(allowDiscounts.get(0));
+			}
+			
+		}else{
+			//If the discount NOT set, just use the original.
+			if(orderToCalc.getDiscount() == Discount.EMPTY){
 				orderToCalc.setDiscount(DiscountDao.getDefault(dbCon, staff));
 			}else{
-				throw e;
+				try{
+					orderToCalc.setDiscount(DiscountDao.getById(dbCon, staff, orderToCalc.getDiscount().getId()));
+				}catch(BusinessException e){
+					if(e.getErrCode() == DiscountError.DISCOUNT_NOT_EXIST){
+						orderToCalc.setDiscount(DiscountDao.getDefault(dbCon, staff));
+					}else{
+						throw e;
+					}
+				}
 			}
 		}
 		

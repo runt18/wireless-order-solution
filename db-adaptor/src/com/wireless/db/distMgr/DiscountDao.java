@@ -2,7 +2,6 @@ package com.wireless.db.distMgr;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import com.mysql.jdbc.Statement;
@@ -11,6 +10,7 @@ import com.wireless.db.Params;
 import com.wireless.db.deptMgr.KitchenDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.DiscountError;
+import com.wireless.pojo.client.MemberType;
 import com.wireless.pojo.distMgr.Discount;
 import com.wireless.pojo.distMgr.Discount.Status;
 import com.wireless.pojo.distMgr.Discount.Type;
@@ -21,6 +21,68 @@ import com.wireless.pojo.staffMgr.Role;
 import com.wireless.pojo.staffMgr.Staff;
 
 public class DiscountDao {
+	
+	public static class ExtraCond{
+		private int discountId;
+		private Discount.Type type;
+		private Discount.Status status;
+		private MemberType memberType;
+		private Role role;
+		private String roleCond;
+		
+		public ExtraCond setDiscountId(int discountId){
+			this.discountId = discountId;
+			return this;
+		}
+		
+		public ExtraCond setType(Discount.Type type){
+			this.type = type;
+			return this;
+		}
+		
+		public ExtraCond setStatus(Discount.Status status){
+			this.status = status;
+			return this;
+		}
+		
+		public ExtraCond setMemberType(MemberType memberType){
+			this.memberType = memberType;
+			return this;
+		}
+		
+		public ExtraCond setMemberType(int memberTypeId){
+			this.memberType = new MemberType(memberTypeId);
+			return this;
+		}
+		
+		public ExtraCond setRole(Role role){
+			this.role = role;
+			return this;
+		}
+		
+		@Override
+		public String toString(){
+			StringBuilder extraCond = new StringBuilder();
+			if(discountId != 0){
+				extraCond.append(" AND DIST.discount_id = " + discountId);
+			}
+			if(type != null){
+				extraCond.append(" AND DIST.type = " + type.getVal());
+			}
+			if(status != null){
+				extraCond.append(" AND DIST.status = " + status.getVal());
+			}
+			if(memberType != null){
+				String sql;
+				sql = " SELECT discount_id FROM " + Params.dbName + ".member_type_discount WHERE member_type_id = " + memberType.getId();
+				extraCond.append(" AND DIST.discount_id IN (" + sql + ")");
+			}
+			if(roleCond != null){
+				extraCond.append(" AND DIST.discount_id IN(" + roleCond + ")");
+			}
+			return extraCond.toString();
+		}
+	}
 	
 	public static enum ShowType{
 		BY_PLAN("按方案显示"),
@@ -67,9 +129,9 @@ public class DiscountDao {
 	 * 			throws if failed to execute any SQL statement
 	 */
 	public static Discount getDefault(DBCon dbCon, Staff staff) throws SQLException{
-		List<Discount> result = getByCond(dbCon, staff, " AND DIST.status = " + Discount.Status.DEFAULT.getVal(), null, ShowType.BY_PLAN);
+		List<Discount> result = getByCond(dbCon, staff, new ExtraCond().setStatus(Discount.Status.DEFAULT), ShowType.BY_PLAN);
 		if(result.isEmpty()){
-			return getByCond(dbCon, staff, " AND DIST.type = " + Discount.Type.RESERVED.getVal(), null, ShowType.BY_PLAN).get(0);
+			return getByCond(dbCon, staff, new ExtraCond().setType(Discount.Type.RESERVED), ShowType.BY_PLAN).get(0);
 		}else{
 			return result.get(0);
 		}
@@ -86,19 +148,9 @@ public class DiscountDao {
 	 * @return the discounts to this member type
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
-	 * @throws BusinessException
-	 * 			throws if the member type does NOT exist
 	 */
-	public static List<Discount> getByMemberType(DBCon dbCon, Staff staff, int memberTypeId) throws SQLException, BusinessException{
-		String sql;
-		sql = " SELECT discount_id FROM " + Params.dbName + ".member_type_discount WHERE member_type_id = " + memberTypeId;
-		dbCon.rs = dbCon.stmt.executeQuery(sql);
-		if(dbCon.rs.next()){
-			dbCon.rs.close();
-			return getByCond(dbCon, staff, " AND DIST.discount_id IN (" + sql + ")", null, ShowType.BY_PLAN);
-		}else{
-			return Collections.emptyList();
-		}
+	public static List<Discount> getByMemberType(DBCon dbCon, Staff staff, MemberType memberType) throws SQLException{
+		return getByCond(dbCon, staff, new ExtraCond().setMemberType(memberType), ShowType.BY_PLAN);
 	}
 	
 	/**
@@ -110,14 +162,12 @@ public class DiscountDao {
 	 * @return the discounts to this member type
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
-	 * @throws BusinessException
-	 * 			throws if the member type does NOT exist
 	 */
-	public static List<Discount> getByMemberType(Staff staff, int memberTypeId) throws SQLException, BusinessException{
+	public static List<Discount> getByMemberType(Staff staff, MemberType memberType) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return getByMemberType(dbCon, staff, memberTypeId);
+			return getByMemberType(dbCon, staff, memberType);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -156,16 +206,7 @@ public class DiscountDao {
 	 * 			throws if failed to execute any SQL statement
 	 */
 	public static List<Discount> getByRole(DBCon dbCon, Staff staff, Role role) throws SQLException{
-		String sql;
-		sql = " SELECT discount_id FROM " + Params.dbName + ".role_discount WHERE role_id = " + role.getId();
-		dbCon.rs = dbCon.stmt.executeQuery(sql);
-		if(dbCon.rs.next()){
-			dbCon.rs.close();
-			return getByCond(dbCon, staff, " AND DIST.discount_id IN (" + sql + ")", null, ShowType.BY_PLAN);
-		}else{
-			dbCon.rs.close();
-			return getByCond(dbCon, staff, null, null, ShowType.BY_PLAN);
-		}
+		return getByCond(dbCon, staff, new ExtraCond().setRole(role), ShowType.BY_PLAN);
 	}
 	
 	/**
@@ -249,7 +290,7 @@ public class DiscountDao {
 	 * 			throws if the discount to this id does NOT exist
 	 */
 	public static Discount getById(DBCon dbCon, Staff staff, int discountId, ShowType showType) throws SQLException, BusinessException{
-		List<Discount> result = getByCond(dbCon, staff, " AND DIST.discount_id = " + discountId, null, showType);
+		List<Discount> result = getByCond(dbCon, staff, new ExtraCond().setDiscountId(discountId), showType);
 		if(result.isEmpty()){
 			throw new BusinessException(DiscountError.DISCOUNT_NOT_EXIST);
 		}else{
@@ -286,7 +327,7 @@ public class DiscountDao {
 	 * 			throws if failed to execute any SQL statement
 	 */
 	public static List<Discount> getAll(DBCon dbCon, Staff staff) throws SQLException{
-		return getByCond(dbCon, staff, null, null, ShowType.BY_PLAN);
+		return getByCond(dbCon, staff, null, ShowType.BY_PLAN);
 	}
 	
 	/**
@@ -303,9 +344,9 @@ public class DiscountDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	private static List<Discount> getByCond(DBCon dbCon, Staff staff, String extraCond, String orderClause, ShowType showType) throws SQLException{
+	public static List<Discount> getByCond(DBCon dbCon, Staff staff, ExtraCond extraCond, ShowType showType) throws SQLException{
 		
-		List<Discount> result = getPureByCond(dbCon, staff, extraCond, orderClause);
+		List<Discount> result = getPureByCond(dbCon, staff, extraCond, null);
 		for(Discount each : result){
 			String sql;
 			if(showType == ShowType.BY_PLAN){
@@ -434,8 +475,22 @@ public class DiscountDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	private static List<Discount> getPureByCond(DBCon dbCon, Staff staff, String extraCond, String orderClause) throws SQLException{
+	private static List<Discount> getPureByCond(DBCon dbCon, Staff staff, ExtraCond extraCond, String orderClause) throws SQLException{
 		String sql;
+		
+		if(extraCond != null && extraCond.role != null){
+			sql = "SELECT COUNT(*) FROM " + Params.dbName + ".role_discount WHERE role_id = " + extraCond.role.getId();
+			dbCon.rs = dbCon.stmt.executeQuery(sql);
+			if(dbCon.rs.next()){
+				if(dbCon.rs.getInt(1) == 0){
+					extraCond.roleCond = " SELECT discount_id FROM " + Params.dbName + ".discount WHERE restaurant_id = " + staff.getRestaurantId();
+				}else{
+					extraCond.roleCond = " SELECT discount_id FROM " + Params.dbName + ".role_discount WHERE role_id = " + extraCond.role.getId();
+				}
+			}
+			dbCon.rs.close();
+		}
+		
 		sql = " SELECT " +
 			  " DIST.discount_id, DIST.restaurant_id, DIST.name AS dist_name, DIST.status, DIST.type " +
 			  " FROM " +  Params.dbName + ".discount DIST " +

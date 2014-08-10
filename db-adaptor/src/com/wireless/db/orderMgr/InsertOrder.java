@@ -5,7 +5,6 @@ import java.sql.Statement;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
-import com.wireless.db.distMgr.DiscountDao;
 import com.wireless.db.regionMgr.TableDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.FrontBusinessError;
@@ -152,7 +151,7 @@ public class InsertOrder {
 			}
 
 			//Set the default discount.
-			orderToInsert.setDiscount(DiscountDao.getDefault(dbCon, staff));
+			//orderToInsert.setDiscount(DiscountDao.getDefault(dbCon, staff));
 			
 		}else if(orderToInsert.getDestTbl().isBusy()){
 			int orderId = OrderDao.getOrderIdByUnPaidTable(dbCon, staff, orderToInsert.getDestTbl());

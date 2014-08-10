@@ -7,7 +7,6 @@ import java.util.List;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
-import com.wireless.db.distMgr.DiscountDao;
 import com.wireless.db.regionMgr.TableDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.FrontBusinessError;
@@ -20,6 +19,7 @@ import com.wireless.pojo.dishesOrder.TasteGroup;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.staffMgr.Privilege;
 import com.wireless.pojo.staffMgr.Staff;
+import com.wireless.pojo.util.NumericUtil;
 import com.wireless.util.DateType;
 
 public class UpdateOrder {
@@ -206,9 +206,9 @@ public class UpdateOrder {
 		}
 		
 		//Set the default discount to new order if original order is unpaid
-		if(oriOrder.isUnpaid()){
-			newOrder.setDiscount(DiscountDao.getDefault(dbCon, staff));
-		}
+//		if(oriOrder.isUnpaid()){
+//			newOrder.setDiscount(DiscountDao.getDefault(dbCon, staff));
+//		}
 		
 		//Calculate the difference between the original and new order.
 		DiffResult diffResult = diff(oriOrder, newOrder);
@@ -346,56 +346,6 @@ public class UpdateOrder {
 		return diffResult;
 	}
 	
-	/**
-	 * Fill the detail to food.
-	 * The basic information consists of alias id, discount, taste id, hang status and so on.
-	 * @param dbCon
-	 * 			The db connection
-	 * @param staff
-	 * 			The terminal associated with this request
-	 * @param foodToFill
-	 * 			The food instance with the basic information
-	 * @return 
-	 * 			The food instance with the detail information
-	 * @throws BusinessException
-	 * 			throws if cases below
-	 * 			<li>the associated cancel reason does NOT exist
-	 * 			<li>the associated kitchen does NOT exist
-	 * 			<li>the associated food does NOT exist
-	 * 			<li>the associated taste does NOT exist
-	 * @throws SQLException
-	 * 			throws if fail to execute any SQL statement
-	 */
-//	private static void fillFoodDetail(DBCon dbCon, Staff staff, OrderFood foodToFill) throws BusinessException, SQLException{
-//		
-//		//Get the details to cancel reason if contained.
-//		if(foodToFill.hasCancelReason()){
-//			foodToFill.setCancelReason(CancelReasonDao.getReasonById(dbCon, staff, foodToFill.getCancelReason().getId()));
-//		}
-//		
-//		if(foodToFill.isTemp()){
-//			// Get the associated kitchen detail in case of temporary.
-//			foodToFill.asFood().setKitchen(KitchenDao.getById(dbCon, staff, foodToFill.getKitchen().getId()));
-//			
-//		}else{
-//			//Get the details to each order food			
-//			foodToFill.asFood().copyFrom(FoodDao.getById(dbCon, staff, foodToFill.getFoodId()));
-//			
-//			//Get the details to each normal tastes.
-//			if(foodToFill.hasNormalTaste()){
-//				//Get the detail to each tastes.
-//				for(Taste taste : foodToFill.getTasteGroup().getTastes()){
-//					taste.copyFrom(TasteDao.getTasteById(dbCon, staff, taste.getTasteId()));
-//				}
-//				
-//				//Get the detail to each spec.
-//				if(foodToFill.getTasteGroup().hasSpec()){
-//					foodToFill.getTasteGroup().getSpec().copyFrom(TasteDao.getTasteById(dbCon, staff, foodToFill.getTasteGroup().getSpec().getTasteId()));
-//				}
-//				foodToFill.getTasteGroup().refresh();
-//			}			
-//		}		
-//	}
 	
 	/**
 	 * Compare the order foods of new order with the ones of original order,
@@ -448,11 +398,11 @@ public class UpdateOrder {
 				if(newFood.equals(oriFood)){
 					float diff = newFood.getCount() - oriFood.getCount();
 					if(diff > 0){
-						oriFood.setCount((float)Math.round(Math.abs(diff) * 100) / 100);
+						oriFood.setCount(NumericUtil.roundFloat(Math.abs(diff)));
 						result.extraFoods.add(oriFood);
 						
 					}else if(diff < 0){
-						oriFood.setCount((float)Math.round(Math.abs(diff) * 100) / 100);
+						oriFood.setCount(NumericUtil.roundFloat(Math.abs(diff)));
 						oriFood.setCancelReason(newFood.getCancelReason());
 						result.cancelledFoods.add(oriFood);
 					}

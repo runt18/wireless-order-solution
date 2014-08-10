@@ -460,11 +460,12 @@ public class OrderFoodDao {
 			
 			TasteGroup tg = builder.extra.getTasteGroup();		
 			
-			int tgId = TasteGroupDao.insert(dbCon, staff, new TasteGroup.InsertBuilder(builder.extra.asFood())
-		     															.addTastes(tg.getNormalTastes())
-		     															.setTmpTaste(tg.getTmpTaste()));
-			tg.setGroupId(tgId);
-			
+			if(tg.getGroupId() == TasteGroup.EMPTY_TASTE_GROUP_ID){
+				int tgId = TasteGroupDao.insert(dbCon, staff, new TasteGroup.InsertBuilder(builder.extra.asFood())
+			     															.addTastes(tg.getNormalTastes())
+			     															.setTmpTaste(tg.getTmpTaste()));
+				tg.setGroupId(tgId);
+			}			
 		}
 		
 		//Insert the combo order food
