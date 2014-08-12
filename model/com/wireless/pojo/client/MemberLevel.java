@@ -18,33 +18,42 @@ public class MemberLevel implements Jsonable{
 	public int getId() {
 		return id;
 	}
+	
 	public void setId(int id) {
 		this.id = id;
 	}
+	
 	public int getRestaurantId() {
 		return restaurantId;
 	}
+	
 	public void setRestaurantId(int restaurantId) {
 		this.restaurantId = restaurantId;
 	}
+	
 	public int getLevelId() {
 		return levelId;
 	}
+	
 	public void setLevelId(int levelId) {
 		this.levelId = levelId;
 	}
+	
 	public int getPointThreshold() {
 		return pointThreshold;
 	}
+	
 	public void setPointThreshold(int pointThreshold) {
 		this.pointThreshold = pointThreshold;
 	}
+	
 	public MemberType getMemberType() {
 		if(memberType == null){
 			memberType = new MemberType(-1);
 		}
 		return memberType;
 	}
+	
 	public void setMemberType(MemberType memberType) {
 		this.memberType = memberType;
 	}

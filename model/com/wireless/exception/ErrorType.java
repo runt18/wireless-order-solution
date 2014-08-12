@@ -26,6 +26,7 @@ public enum ErrorType {
 	 *  MODULE : 7350 - 7399
 	 *  REGION : 7300 - 7349
 	 *  SERVICE_RATE : 7250 - 7299
+	 *  PROMOTION : 7200 - 7249
 	 */
 	UNKNOWN(1, "unknown"),
 	PROTOCOL(2, "protocol"),
@@ -51,7 +52,8 @@ public enum ErrorType {
 	SMS(22, "sms"),
 	MODULE(23, "module"),
 	REGION(24, "region"),
-	SERVICE_RATE(25, "service_rate");
+	SERVICE_RATE(25, "service_rate"),
+	PROMOTION(26, "promotion");
 	
 	private final String desc;
 	
