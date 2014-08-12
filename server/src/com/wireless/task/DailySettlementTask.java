@@ -60,9 +60,6 @@ public class DailySettlementTask extends SchedulerTask{
 			//Perform to calculate member recommended foods.
 			taskInfo.append("info : " + MemberDao.calcRecommendFoods()).append(sep);
 			
-			//Perform to upgrade member level
-			taskInfo.append("info : " + MemberDao.upgrade()).append(sep);
-			
 		}catch(SQLException | BusinessException e){
 			taskInfo.append("error : " + e.getMessage()).append(sep);
 			e.printStackTrace();

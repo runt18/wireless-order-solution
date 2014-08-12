@@ -13,6 +13,8 @@ import java.util.List;
 
 import com.wireless.db.client.member.MemberCommentDao;
 import com.wireless.db.client.member.MemberDao;
+import com.wireless.db.client.member.MemberLevelDao;
+import com.wireless.db.client.member.MemberOperationDao;
 import com.wireless.db.foodAssociation.QueryFoodAssociationDao;
 import com.wireless.db.foodGroup.CalcFoodGroupDao;
 import com.wireless.db.frontBusiness.QueryMenu;
@@ -45,6 +47,7 @@ import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.client.Member;
 import com.wireless.pojo.client.MemberComment;
 import com.wireless.pojo.client.MemberComment.CommitBuilder;
+import com.wireless.pojo.client.MemberOperation;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.PrintOption;
 import com.wireless.pojo.foodGroup.Pager;
@@ -57,6 +60,9 @@ import com.wireless.pojo.staffMgr.Device;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.print.scheme.JobContentFactory;
 import com.wireless.sccon.ServerConnector;
+import com.wireless.sms.SMS;
+import com.wireless.sms.msg.Msg4Consume;
+import com.wireless.sms.msg.Msg4Upgrade;
 /**
  * @author yzhang
  *
@@ -422,8 +428,8 @@ class OrderHandler implements Runnable{
 		return new RespACK(request.header);
 	}
 	
-	private RespPackage doPayOrder(Staff staff, ProtocolPackage request)  throws SQLException, BusinessException{
-		Order.PayBuilder payParam = new Parcel(request.body).readParcel(Order.PayBuilder.CREATOR);
+	private RespPackage doPayOrder(final Staff staff, ProtocolPackage request)  throws SQLException, BusinessException{
+		final Order.PayBuilder payParam = new Parcel(request.body).readParcel(Order.PayBuilder.CREATOR);
 		
 		List<Printer> printers = PrinterDao.getPrinters(staff);
 		
@@ -446,6 +452,33 @@ class OrderHandler implements Runnable{
 		}else{
 			
 			final Order order = PayOrder.pay(staff, payParam);
+			
+			//Perform SMS notification to member consumption & upgrade in another thread
+			//so that not affect the order payment.
+			if(payParam.getSettleType() == Order.SettleType.MEMBER){
+				WirelessSocketServer.threadPool.execute(new Runnable(){
+					@Override
+					public void run() {
+						try{
+							//Perform the member upgrade
+							Msg4Upgrade msg4Upgrade = MemberLevelDao.upgrade(staff, payParam.getMemberId());
+
+							if(payParam.isSendSMS()){
+								MemberOperation mo = MemberOperationDao.getTodayById(staff, order.getMemberOperationId());
+								//Send SMS if perform member consumption
+								SMS.send(staff, mo.getMemberMobile(), new Msg4Consume(mo));
+								//Send SMS if member upgrade
+								if(msg4Upgrade != null){
+									SMS.send(staff, mo.getMemberMobile(), msg4Upgrade);
+								}
+
+							}
+						}catch(Exception e){
+							e.printStackTrace();
+						}
+					}
+				});
+			}
 			
 			PrintHandler printHandler = new PrintHandler(staff);
 			
