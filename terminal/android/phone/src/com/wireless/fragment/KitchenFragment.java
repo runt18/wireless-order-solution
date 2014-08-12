@@ -12,7 +12,6 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.BaseAdapter;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.ExpandableListView;
 import android.widget.ExpandableListView.OnGroupCollapseListener;
@@ -30,7 +29,6 @@ import com.wireless.pojo.menuMgr.DepartmentTree.DeptNode;
 import com.wireless.pojo.menuMgr.DepartmentTree.KitchenNode;
 import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.menuMgr.FoodList;
-import com.wireless.pojo.util.NumericUtil;
 import com.wireless.ui.R;
 import com.wireless.ui.dialog.AskOrderAmountDialog;
 import com.wireless.ui.dialog.AskOrderAmountDialog.ActionType;
@@ -218,26 +216,7 @@ public class KitchenFragment extends Fragment {
 		private final List<KitchenNode> mKitchenNodes;
 		
 		KitchenExpandableListAdapter(List<KitchenNode> kitchenNodes){
-			
 			this.mKitchenNodes = kitchenNodes;
-			
-//			this.mFoodsByKitchen = new ArrayList<Entry<PKitchen, FoodList>>(foodsByKitchen.entrySet());
-//			
-//			//要显示的厨房按编号排序
-//			Collections.sort(this.mFoodsByKitchen, new Comparator<Entry<PKitchen, FoodList>>(){
-//
-//				@Override
-//				public int compare(Entry<PKitchen, FoodList> lhs,	Entry<PKitchen, FoodList> rhs) {
-//					if(lhs.getKey().getAliasId() > rhs.getKey().getAliasId()){
-//						return 1;
-//					}else if(lhs.getKey().getAliasId() < rhs.getKey().getAliasId()){
-//						return -1;
-//					}else{
-//						return 0;
-//					}
-//				}
-//				
-//			});
 		}
 
 		@Override
@@ -316,7 +295,7 @@ public class KitchenFragment extends Fragment {
 			FoodList foodsToKitchen = mKitchenNodes.get(groupPosition).getValue();
 			int start = childPosition * mEachRowAmount;
 			int end = start + mEachRowAmount;
-			gridView.setAdapter(new GridAdapter(foodsToKitchen.subList(start, end > foodsToKitchen.size() ? foodsToKitchen.size() : end)));
+			gridView.setAdapter(new PickFoodFragment.PickFoodAdapter(KitchenFragment.this.getActivity(), foodsToKitchen.subList(start, end > foodsToKitchen.size() ? foodsToKitchen.size() : end)));
 			
 			//设置侦听器
 			gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -343,62 +322,6 @@ public class KitchenFragment extends Fragment {
 		}
 	}
 
-	
-	private class GridAdapter extends BaseAdapter{
-		private final List<Food> mFoods;
-		
-		public GridAdapter(List<Food> mFoods) {
-			this.mFoods = mFoods;
-		}
-
-		@Override
-		public int getCount() {
-			return mFoods.size();
-		}
-
-		@Override
-		public Object getItem(int position) {
-			return mFoods.get(position);
-		}
-
-		@Override
-		public long getItemId(int position) {
-			return position;
-		}
-
-		@Override
-		public View getView(int position, View convertView, ViewGroup parent) {
-			final View view;
-			if(convertView == null){
-				view = View.inflate(getActivity(), R.layout.pick_food_by_pinyin_fgm_item, null);
-			}else{
-				view = convertView;
-			}
-			
-			Food food = mFoods.get(position);
-			
-			view.setTag(food);
-			
-			if(food.getName().length() >= 10){
-				((TextView) view.findViewById(R.id.textView_foodName_pickFoodFragment_item)).setText(food.getName().substring(0, 10));
-			}else{
-				((TextView) view.findViewById(R.id.textView_foodName_pickFoodFragment_item)).setText(food.getName());
-			}
-
-			//设置该项的显示
-			((TextView) view.findViewById(R.id.textView_num_pickFoodFragment_item)).setText(Integer.toString(food.getAliasId()));
-			((TextView) view.findViewById(R.id.textView_price_pickFoodFragment_item)).setText(NumericUtil.float2String2(food.getPrice()));
-			
-			if(food.isSellOut())
-				((TextView)view.findViewById(R.id.textView_sellout_pickFoodFgm_item)).setVisibility(View.VISIBLE);
-			else {
-				((TextView)view.findViewById(R.id.textView_sellout_pickFoodFgm_item)).setVisibility(View.GONE);
-			}
-			
-			return view;
-		}
-		
-	}
 }
 
 

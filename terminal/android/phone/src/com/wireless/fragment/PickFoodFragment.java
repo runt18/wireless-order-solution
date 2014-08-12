@@ -59,7 +59,7 @@ public class PickFoodFragment extends Fragment{
 		public void handleMessage(Message msg){
 			PickFoodFragment fragment = mFragment.get();
 			//将所有菜品进行条件筛选后存入adapter
-			fragment.mGridView.setAdapter(fragment.new FoodAdapter(WirelessOrder.foodMenu.foods.filter(fragment.mFilterCond)));
+			fragment.mGridView.setAdapter(new PickFoodAdapter(fragment.getActivity(), WirelessOrder.foodMenu.foods.filter(fragment.mFilterCond)));
 		}
 	}
 	
@@ -191,11 +191,13 @@ public class PickFoodFragment extends Fragment{
 	}
 
 	//菜品显示的adapter
-	private class FoodAdapter extends BaseAdapter{
+	static class PickFoodAdapter extends BaseAdapter{
 
-		private List<Food> mFoods;
+		private final List<Food> mFoods;
+		private final Context mContext;
 
-		FoodAdapter(List<Food> foods){
+		PickFoodAdapter(Context context, List<Food> foods){
+			mContext = context;
 			mFoods = foods;
 		}
 		
@@ -239,22 +241,22 @@ public class PickFoodFragment extends Fragment{
 			if(food.isSellOut()){
 				((TextView)view.findViewById(R.id.textView_sellout_pickFoodFgm_item)).setVisibility(View.VISIBLE);
 				((TextView)view.findViewById(R.id.textView_sellout_pickFoodFgm_item)).setText("停");
-				((TextView)view.findViewById(R.id.textView_sellout_pickFoodFgm_item)).setTextColor(getResources().getColor(R.color.red));
+				((TextView)view.findViewById(R.id.textView_sellout_pickFoodFgm_item)).setTextColor(mContext.getResources().getColor(R.color.red));
 				
 			}else if(food.isGift() && WirelessOrder.loginStaff.getRole().hasPrivilege(Privilege.Code.GIFT)){
 				((TextView)view.findViewById(R.id.textView_sellout_pickFoodFgm_item)).setVisibility(View.VISIBLE);
 				((TextView)view.findViewById(R.id.textView_sellout_pickFoodFgm_item)).setText("赠");
-				((TextView)view.findViewById(R.id.textView_sellout_pickFoodFgm_item)).setTextColor(getResources().getColor(R.color.maroon));
+				((TextView)view.findViewById(R.id.textView_sellout_pickFoodFgm_item)).setTextColor(mContext.getResources().getColor(R.color.maroon));
 				
 			}else if(food.isCombo()){
 				((TextView)view.findViewById(R.id.textView_sellout_pickFoodFgm_item)).setVisibility(View.VISIBLE);
 				((TextView)view.findViewById(R.id.textView_sellout_pickFoodFgm_item)).setText("套");
-				((TextView)view.findViewById(R.id.textView_sellout_pickFoodFgm_item)).setTextColor(getResources().getColor(R.color.green));
+				((TextView)view.findViewById(R.id.textView_sellout_pickFoodFgm_item)).setTextColor(mContext.getResources().getColor(R.color.green));
 				
 			}else if(food.isWeigh()){
 				((TextView)view.findViewById(R.id.textView_sellout_pickFoodFgm_item)).setVisibility(View.VISIBLE);
 				((TextView)view.findViewById(R.id.textView_sellout_pickFoodFgm_item)).setText("称");
-				((TextView)view.findViewById(R.id.textView_sellout_pickFoodFgm_item)).setTextColor(getResources().getColor(R.color.green));
+				((TextView)view.findViewById(R.id.textView_sellout_pickFoodFgm_item)).setTextColor(mContext.getResources().getColor(R.color.green));
 			}else{
 				((TextView)view.findViewById(R.id.textView_sellout_pickFoodFgm_item)).setVisibility(View.GONE);
 			}
