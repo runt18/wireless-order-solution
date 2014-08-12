@@ -2,7 +2,7 @@ package com.wireless.db.client.member;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import com.mysql.jdbc.Statement;
@@ -10,11 +10,14 @@ import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.MemberError;
+import com.wireless.pojo.client.Member;
 import com.wireless.pojo.client.MemberLevel;
 import com.wireless.pojo.client.MemberLevel.InsertBuilder;
 import com.wireless.pojo.client.MemberLevel.UpdateBuilder;
 import com.wireless.pojo.client.MemberType;
 import com.wireless.pojo.staffMgr.Staff;
+import com.wireless.pojo.util.SortedList;
+import com.wireless.sms.msg.Msg4Upgrade;
 
 public class MemberLevelDao {
 	/**
@@ -207,11 +210,11 @@ public class MemberLevelDao {
 		}else if(maxPoint <= memberLevel.getPointThreshold()){
 			throw new BusinessException(MemberError.MEMBER_LEVEL_MORE_POINT);
 		}
-		sql = "UPDATE " + Params.dbName + ".member_level SET " +
-						" id = " + memberLevel.getId() +
-						(builder.isPointThresholdChange()?" ,point_threshold = " + memberLevel.getPointThreshold() : "")+
-						(builder.isMemberTypeIdChange()?" ,member_type_id = " + memberLevel.getMemberType().getId() : "") +
-					  " WHERE id = " + memberLevel.getId();
+		sql = " UPDATE " + Params.dbName + ".member_level SET " +
+			  " id = " + memberLevel.getId() +
+			  (builder.isPointThresholdChange() ? " ,point_threshold = " + memberLevel.getPointThreshold() : "")+
+			  (builder.isMemberTypeIdChange() ? " ,member_type_id = " + memberLevel.getMemberType().getId() : "") +
+			  " WHERE id = " + memberLevel.getId();
 		dbCon.stmt.executeUpdate(sql);
 	}
 	
@@ -251,11 +254,11 @@ public class MemberLevelDao {
 	 * @throws BusinessException 
 	 * 	 		throws if the any member type in levels does NOT exist
 	 */
-	public static List<MemberLevel> getMemberLevels(Staff staff) throws SQLException, BusinessException{
+	public static List<MemberLevel> get(Staff staff) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return getMemberLevels(dbCon, staff);
+			return get(dbCon, staff);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -273,8 +276,8 @@ public class MemberLevelDao {
 	 * @throws BusinessException 
 	 * 	 		throws if the any member type in levels does NOT exist
 	 */
-	public static List<MemberLevel> getMemberLevels(DBCon dbCon, Staff staff) throws SQLException, BusinessException{
-		return getMemberLevels(dbCon, staff, null, null);
+	public static List<MemberLevel> get(DBCon dbCon, Staff staff) throws SQLException, BusinessException{
+		return getByCond(dbCon, staff, null, null);
 	}
 	
 	/**
@@ -287,23 +290,26 @@ public class MemberLevelDao {
 	 * @throws BusinessException 
 	 * 	 		throws if the any member type in levels does NOT exist
 	 */
-	private static List<MemberLevel> getMemberLevels(DBCon dbCon, Staff staff, String extraCond, String otherClause) throws SQLException, BusinessException{
-		List<MemberLevel> list = new ArrayList<MemberLevel>();
+	private static List<MemberLevel> getByCond(DBCon dbCon, Staff staff, String extraCond, String otherClause) throws SQLException, BusinessException{
+		
+		List<MemberLevel> result = new ArrayList<MemberLevel>();
+		
 		String sql = "SELECT ML.* FROM " + Params.dbName + ".member_level ML" +
 					" WHERE ML.restaurant_id = " + staff.getRestaurantId() +
 					(extraCond != null ? extraCond : " ")+
 					(otherClause != null ? otherClause : " ORDER BY level_id");
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		while(dbCon.rs.next()){
-			MemberLevel mLevel = new MemberLevel(dbCon.rs.getInt("id"));
-			MemberType mType = MemberTypeDao.getMemberTypeById(staff, dbCon.rs.getInt("member_type_id"));
-			mLevel.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
-			mLevel.setLevelId(dbCon.rs.getInt("level_id"));
-			mLevel.setPointThreshold(dbCon.rs.getInt("point_threshold"));
-			mLevel.setMemberType(mType);
-			list.add(mLevel);
+			MemberLevel level = new MemberLevel(dbCon.rs.getInt("id"));
+			MemberType type = MemberTypeDao.getMemberTypeById(staff, dbCon.rs.getInt("member_type_id"));
+			level.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
+			level.setLevelId(dbCon.rs.getInt("level_id"));
+			level.setPointThreshold(dbCon.rs.getInt("point_threshold"));
+			level.setMemberType(type);
+			result.add(level);
 		}
-		return Collections.unmodifiableList(list);
+		
+		return result;
 	}
 	
 	/**
@@ -316,19 +322,96 @@ public class MemberLevelDao {
 	 * @throws BusinessException
 	 * 			throw if 该会员等级不存在或已被删除
 	 */
-	public static MemberLevel getMemberLevelById(Staff staff, int id) throws SQLException, BusinessException{
+	public static MemberLevel getById(Staff staff, int id) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			List<MemberLevel> list = getMemberLevels(dbCon, staff, " AND ML.id = " + id, null);
-			if(!list.isEmpty()){
-				return list.get(0);
-			}else{
+			List<MemberLevel> list = getByCond(dbCon, staff, " AND ML.id = " + id, null);
+			if(list.isEmpty()){
 				throw new BusinessException(MemberError.MEMBER_LEVEL_NOT_EXIST);
+			}else{
+				return list.get(0);
 			}
 		}finally{
 			dbCon.disconnect();
 		}
 	}
 
+	/**
+	 * Upgrade the member
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param memberId
+	 * 			the member to upgrade
+	 * @return the level this member upgrade to, <code>null</code> means no level upgrade
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if the member to upgrade does NOT exist
+	 */
+	public static Msg4Upgrade upgrade(Staff staff, int memberId) throws SQLException, BusinessException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return upgrade(dbCon, staff, memberId);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Upgrade the member
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param memberId
+	 * 			the member to upgrade
+	 * @return the level this member upgrade to, <code>null</code> means no level upgrade
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			throws if the member to upgrade does NOT exist
+	 */
+	public static Msg4Upgrade upgrade(DBCon dbCon, Staff staff, int memberId) throws SQLException, BusinessException{
+		//Check to see whether the member level to this restaurant exist.
+		List<MemberLevel> lvs = MemberLevelDao.get(dbCon, staff);
+		if(lvs.isEmpty()){
+			return null;
+		}
+		
+		//Sorted the level using threshold by descend 
+		List<MemberLevel> upLvs = SortedList.newInstance(lvs, new Comparator<MemberLevel>(){
+			@Override
+			public int compare(MemberLevel lv1, MemberLevel lv2) {
+				if(lv1.getPointThreshold() > lv2.getPointThreshold()){
+					return -1;
+				}else if(lv1.getPointThreshold() < lv2.getPointThreshold()){
+					return 1;
+				}else{
+					return 0;
+				}
+			}
+		});
+		
+		Member member = MemberDao.getById(dbCon, staff, memberId);
+		
+		for(MemberLevel lv : lvs){
+			//If the member type belongs to level route and its total point is greater than the threshold, then perform member level upgrade.
+			if(member.getMemberType().equals(lv.getMemberType()) && member.getTotalPoint() > lv.getPointThreshold()){
+				for(MemberLevel lvToUpgrade : upLvs){
+					//upgrade the member to level whose threshold is nearest the member's
+					if(member.getTotalPoint() > lvToUpgrade.getPointThreshold()){
+						if(!member.getMemberType().equals(lvToUpgrade.getMemberType())){
+							MemberDao.update(dbCon, staff, new Member.UpdateBuilder(member.getId(), staff.getRestaurantId()).setMemberTypeId(lvToUpgrade.getMemberType().getId()));
+						}
+						return new Msg4Upgrade(member, lvToUpgrade);
+					}
+				}
+			}
+		}
+		
+		return null;
+	}
+	
 }

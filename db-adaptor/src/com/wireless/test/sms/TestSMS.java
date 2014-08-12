@@ -14,8 +14,9 @@ import com.wireless.exception.BusinessException;
 import com.wireless.pojo.sms.SMSDetail;
 import com.wireless.pojo.sms.SMStat;
 import com.wireless.pojo.staffMgr.Staff;
+import com.wireless.sms.SMS;
+import com.wireless.sms.msg.Msg4Verify;
 import com.wireless.test.db.TestInit;
-import com.wireless.util.sms.SMS;
 
 public class TestSMS {
 	
@@ -30,6 +31,6 @@ public class TestSMS {
 	@Test
 	public void testSMS() throws ClientProtocolException, IOException, SQLException, BusinessException{
 		SMStatDao.update(mStaff, new SMStat.UpdateBuilder(mStaff.getRestaurantId(), SMSDetail.Operation.ADD).setAmount(1));
-		SMS.send(mStaff, "18520590932", new SMS.Msg4Verify(1000));
+		SMS.send(mStaff, "18520590932", new Msg4Verify(1000));
 	}
 }

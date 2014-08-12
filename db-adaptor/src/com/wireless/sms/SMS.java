@@ -1,4 +1,4 @@
-package com.wireless.util.sms;
+package com.wireless.sms;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -31,85 +31,18 @@ import com.wireless.db.DBCon;
 import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.db.sms.SMStatDao;
 import com.wireless.exception.BusinessException;
-import com.wireless.exception.ModuleError;
 import com.wireless.exception.SMSError;
-import com.wireless.pojo.client.MemberOperation;
-import com.wireless.pojo.client.MemberOperation.OperationType;
 import com.wireless.pojo.restaurantMgr.Module;
 import com.wireless.pojo.restaurantMgr.Restaurant;
-import com.wireless.pojo.sms.SMSDetail;
 import com.wireless.pojo.sms.SMStat;
 import com.wireless.pojo.staffMgr.Staff;
-import com.wireless.pojo.util.NumericUtil;
+import com.wireless.sms.msg.Msg;
 
 public final class SMS {
 	
 	private final static String API_KEY = "api:1f93e050d9f9dcb083c4c2782074d67b";
 	
 	private SMS(){}
-	
-	static class Msg{
-		private final String sign;
-		private final String content;
-		private final SMSDetail.Operation operation;
-		
-		Msg(String content, String sign, SMSDetail.Operation operation){
-			this.content = content;
-			this.sign = sign;
-			this.operation = operation;
-		}
-		
-		@Override
-		public String toString(){
-			return content + "【" + (sign.trim().isEmpty() ? "微信餐厅" : sign) + "】";
-		}
-	}
-	
-	public static class Msg4Verify extends Msg{
-		public Msg4Verify(int code){
-			super("您本次操作的验证码是" + code, null, SMSDetail.Operation.USE_VERIFY);
-		}
-	}
-	
-	public static class Msg4Consume extends Msg{
-		public Msg4Consume(MemberOperation mo){
-			super("尊敬的会员，您本次消费" + NumericUtil.float2String(mo.getPayMoney()) + "元" +
-				  (mo.getDeltaPoint() > 0 ? ("，积分" + mo.getDeltaPoint()) : "") +
-				  "，余额" + (mo.getRemainingBaseMoney() + mo.getRemainingExtraMoney()) + "元" +
-				  "，谢谢您的光临", 
-				  null, SMSDetail.Operation.USE_CONSUME);
-			
-			if(mo.getOperationType() != OperationType.CONSUME){
-				throw new IllegalArgumentException();
-			}
-		}
-	}
-	
-	public static class Msg4Charge extends Msg{
-		public Msg4Charge(MemberOperation mo){
-			super("尊敬的会员，您本次充值实收" + NumericUtil.float2String2(mo.getChargeMoney()) + "元" +
-				  "，充额" + NumericUtil.float2String2(mo.getDeltaBaseMoney() + mo.getDeltaExtraMoney()) + "元" +
-				  "，余额" + NumericUtil.float2String2(mo.getRemainingBaseMoney() + mo.getRemainingExtraMoney()) + "元", 
-				  null, SMSDetail.Operation.USE_CHARGE);
-			
-			if(mo.getOperationType() != OperationType.CHARGE){
-				throw new IllegalArgumentException();
-			}
-		}
-	}
-	
-	public static class Msg4Refund extends Msg{
-		public Msg4Refund(MemberOperation mo){
-			super("尊敬的会员，您本次退款实退" + NumericUtil.float2String2(Math.abs(mo.getChargeMoney())) + "元" +
-				  "，扣额" + NumericUtil.float2String2(Math.abs(mo.getDeltaBaseMoney() + mo.getDeltaExtraMoney())) + "元" +
-				  "，余额" + NumericUtil.float2String2(mo.getRemainingBaseMoney() + mo.getRemainingExtraMoney()) + "元", 
-				  null, SMSDetail.Operation.USE_CHARGE);
-			
-			if(mo.getOperationType() != OperationType.REFUND){
-				throw new IllegalArgumentException();
-			}
-		}
-	}
 	
 	public static enum Status{
 		_0(0, "发送成功"),
@@ -172,12 +105,10 @@ public final class SMS {
 	 * 			throws if cases below.
 	 * 			<li>the restaurant does NOT has SMS module
 	 * 			<li>insufficient SMS to send
-	 * @throws ClientProtocolException
-	 * 			throws if failed to send SMS
 	 * @throws IOException
 	 * 			throws if failed to send SMS
 	 */
-	public static void send(Staff staff, String mobile, SMS.Msg msg) throws SQLException, BusinessException, ClientProtocolException, IOException{
+	public static void send(Staff staff, String mobile, Msg msg) throws SQLException, BusinessException, IOException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -203,21 +134,19 @@ public final class SMS {
 	 * 			throws if cases below.
 	 * 			<li>the restaurant does NOT has SMS module
 	 * 			<li>insufficient SMS to send
-	 * @throws ClientProtocolException
-	 * 			throws if failed to send SMS
 	 * @throws IOException
 	 * 			throws if failed to send SMS
 	 */
-	public static void send(DBCon dbCon, Staff staff, String mobile, SMS.Msg msg) throws SQLException, BusinessException, ClientProtocolException, IOException{
+	public static void send(DBCon dbCon, Staff staff, String mobile, Msg msg) throws SQLException, BusinessException, IOException{
 		//Check to see whether the restaurant has SMS module.
 		Restaurant restaurant = RestaurantDao.getById(dbCon, staff.getRestaurantId());
 		if(restaurant.hasModule(Module.Code.SMS)){
 			//Check to see whether has the remaining SMS to send.
 			if(SMStatDao.get(dbCon, staff).getRemaining() > 0){
-				Status status = send(mobile, new Msg(msg.content, restaurant.getName(), msg.operation));
+				Status status = send(mobile, new Msg(msg.getContent(), restaurant.getName(), msg.getOperation()));
 				if(status.isSuccess()){
 					//Log the SMS record if succeed to send.
-					SMStatDao.update(dbCon, staff, new SMStat.UpdateBuilder(staff.getRestaurantId(), msg.operation).setAmount(1));
+					SMStatDao.update(dbCon, staff, new SMStat.UpdateBuilder(staff.getRestaurantId(), msg.getOperation()).setAmount(1));
 				}else{
 					throw new BusinessException(status.msg);
 				}
@@ -225,11 +154,11 @@ public final class SMS {
 				throw new BusinessException(SMSError.INSUFFICIENT_SMS_AMOUNT);
 			}
 		}else{
-			throw new BusinessException(ModuleError.SMS_LIMIT);
+			//throw new BusinessException(ModuleError.SMS_LIMIT);
 		}
 	}
 	
-	private static Status send(String mobile, Msg msg) throws ClientProtocolException, IOException{
+	private static Status send(String mobile, Msg msg) throws IOException{
         DefaultHttpClient client = new DefaultHttpClient();
 
         client.addRequestInterceptor(new HttpRequestInterceptor() {
@@ -292,6 +221,9 @@ public final class SMS {
                 throw new IOException("error code is " + response.getStatusLine().getStatusCode());
             }
 
+        }catch(ClientProtocolException e){
+        	throw new IOException(e);
+        	
         } finally {
             if (bis != null) {
                 try {

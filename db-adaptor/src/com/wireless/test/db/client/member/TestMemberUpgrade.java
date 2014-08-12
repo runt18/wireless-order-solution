@@ -6,7 +6,6 @@ import java.sql.SQLException;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.wireless.db.client.member.MemberDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.test.db.TestInit;
 
@@ -19,6 +18,6 @@ public class TestMemberUpgrade {
 	
 	@Test
 	public void testMemberUpgrade() throws SQLException, BusinessException{
-		System.out.println(MemberDao.upgrade());
+		//System.out.println(MemberDao.upgrade());
 	}
 }

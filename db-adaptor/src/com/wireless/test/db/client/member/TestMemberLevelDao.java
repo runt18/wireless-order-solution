@@ -61,7 +61,7 @@ public class TestMemberLevelDao {
 			
 			MemberLevel expected = insertBuilder.build();
 			
-			MemberLevel actual = MemberLevelDao.getMemberLevelById(mStaff, memberLevelId);
+			MemberLevel actual = MemberLevelDao.getById(mStaff, memberLevelId);
 			
 			expected.setId(memberLevelId);
 			expected.setLevelId(actual.getLevelId());
@@ -75,7 +75,7 @@ public class TestMemberLevelDao {
 			MemberLevelDao.update(mStaff, updateBuilder);
 			
 			expected = updateBuilder.build();
-			actual = MemberLevelDao.getMemberLevelById(mStaff, memberLevelId);
+			actual = MemberLevelDao.getById(mStaff, memberLevelId);
 			
 			expected.setLevelId(actual.getLevelId());
 			
@@ -84,7 +84,7 @@ public class TestMemberLevelDao {
 		}finally{
 			MemberLevelDao.delete(memberLevelId);
 			try{
-				MemberLevelDao.getMemberLevelById(mStaff, memberLevelId);
+				MemberLevelDao.getById(mStaff, memberLevelId);
 				assertEquals("failed to delete memberLevel", false);
 			}catch(Exception e){}
 		}
