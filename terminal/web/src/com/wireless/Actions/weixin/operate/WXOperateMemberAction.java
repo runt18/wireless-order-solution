@@ -15,8 +15,8 @@ import org.apache.struts.actions.DispatchAction;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.client.member.MemberDao;
-import com.wireless.db.client.member.MemberTypeDao;
 import com.wireless.db.client.member.MemberDao.MemberRank;
+import com.wireless.db.client.member.MemberTypeDao;
 import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.db.sms.VerifySMSDao;
 import com.wireless.db.staffMgr.StaffDao;
@@ -35,7 +35,8 @@ import com.wireless.pojo.sms.VerifySMS.ExpiredPeriod;
 import com.wireless.pojo.sms.VerifySMS.InsertBuilder;
 import com.wireless.pojo.sms.VerifySMS.VerifyBuilder;
 import com.wireless.pojo.staffMgr.Staff;
-import com.wireless.util.sms.SMS;
+import com.wireless.sms.SMS;
+import com.wireless.sms.msg.Msg4Verify;
 
 public class WXOperateMemberAction extends DispatchAction {
 	
@@ -173,7 +174,7 @@ public class WXOperateMemberAction extends DispatchAction {
 
 			final VerifySMS sms = VerifySMSDao.getById(dbCon, VerifySMSDao.insert(dbCon, new InsertBuilder(ExpiredPeriod.MINUTE_10)));
 			int restaurantId = WeixinRestaurantDao.getRestaurantIdByWeixin(dbCon, fromId);
-			SMS.send(dbCon, StaffDao.getAdminByRestaurant(restaurantId), mobile, new SMS.Msg4Verify(sms.getCode()));
+			SMS.send(dbCon, StaffDao.getAdminByRestaurant(restaurantId), mobile, new Msg4Verify(sms.getCode()));
 			dbCon.conn.commit();
 			
 			jobject.initTip(true, "操作成功, 已发送短信验证码, 请注意查看.");

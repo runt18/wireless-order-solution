@@ -44,11 +44,15 @@ import org.jfree.ui.TextAnchor;
 import org.marker.weixin.DefaultSession;
 import org.marker.weixin.HandleMessageAdapter;
 import org.marker.weixin.MySecurity;
+import org.marker.weixin.api.Button;
+import org.marker.weixin.api.Menu;
+import org.marker.weixin.api.Token;
 import org.marker.weixin.msg.Data4Item;
 import org.marker.weixin.msg.Msg;
 import org.marker.weixin.msg.Msg4Event;
 import org.marker.weixin.msg.Msg4ImageText;
 import org.marker.weixin.msg.Msg4Text;
+import org.marker.weixin.msg.Msg4Event.Event;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
@@ -137,14 +141,54 @@ public class FinanceWeixinAction extends Action {
 			
 			@Override
 			public void onEventMsg(Msg4Event msg){
-				if(msg.getEvent().equals(Msg4Event.SUBSCRIBE)){
+				if(msg.getEvent() == Event.SUBSCRIBE){
 					Msg4Text rmsg =	new Msg4Text();
 					rmsg.setFromUserName(msg.getToUserName());
 					rmsg.setToUserName(msg.getFromUserName());
-					rmsg.setContent("欢迎关注智易云平台:-)\n" + 
-									"请输入下面命令绑定餐厅\n" +
-									"bd 帐号 密码");
-					session.callback(rmsg);
+					if(msg.getTicket().isEmpty()){
+						rmsg.setContent("欢迎关注志易云平台:-)");
+						session.callback(rmsg);
+					}else{
+						session.callback(doBinding(msg, msg.getEventKey().replace("qrscene_", "")));
+					}
+					
+				}else if(msg.getEvent() == Event.SCAN){
+					session.callback(doBinding(msg, msg.getEventKey()));
+					
+				}else if(msg.getEvent() == Event.CLICK){
+					
+					//FIXME
+					Msg4Text rmsg =	new Msg4Text();
+					rmsg.setFromUserName(msg.getToUserName());
+					rmsg.setToUserName(msg.getFromUserName());
+					
+					if(msg.getEventKey().equals(TODAY_EVENT_KEY)){
+						//TODO
+						rmsg.setContent(TODAY_EVENT_KEY);
+						session.callback(rmsg);
+						
+					}else if(msg.getEventKey().equals(YESTERDAY_EVENT_KEY)){
+						session.callback(doCheckRecentDailySettlement(msg));
+						
+					}else if(msg.getEventKey().equals(THIS_WEEK_EVENT_KEY)){
+						//TODO
+						session.callback(doFocusedStatistics(msg));
+						
+					}else if(msg.getEventKey().equals(LAST_WEEK_EVENT_KEY)){
+						//TODO
+						rmsg.setContent(LAST_WEEK_EVENT_KEY);
+						session.callback(rmsg);
+						
+					}else if(msg.getEventKey().equals(THIS_MONTH_EVENT_KEY)){
+						//TODO
+						rmsg.setContent(THIS_MONTH_EVENT_KEY);
+						session.callback(rmsg);
+						
+					}else if(msg.getEventKey().equals(LAST_MONTH_EVENT_KEY)){
+						//TODO
+						rmsg.setContent(LAST_MONTH_EVENT_KEY);
+						session.callback(rmsg);
+					}
 				}
 			}
 			
@@ -186,6 +230,28 @@ public class FinanceWeixinAction extends Action {
 	 * @param pwd
 	 * @return
 	 */
+	private Msg doBinding(Msg msg, String restaurantId){
+		Msg4Text rmsg =	new Msg4Text();
+		rmsg.setFromUserName(msg.getToUserName());
+		rmsg.setToUserName(msg.getFromUserName());
+
+		try{
+			Restaurant restaurant = WeixinFinanceDao.bind(msg.getFromUserName(), Integer.parseInt(restaurantId));
+			rmsg.setContent("亲，恭喜您已成功绑定'" + restaurant.getName() + "':-)\n");
+		}catch(BusinessException | SQLException | NumberFormatException e){
+			rmsg.setContent("对不起，您要绑定的餐厅不存在");
+		}
+		
+		return rmsg;
+	}
+	
+	/**
+	 * 绑定微信号和餐厅
+	 * @param msg
+	 * @param account
+	 * @param pwd
+	 * @return
+	 */
 	private Msg doBinding(Msg4Text msg, String account, String pwd){
 		
 		Msg4Text rmsg =	new Msg4Text();
@@ -193,20 +259,10 @@ public class FinanceWeixinAction extends Action {
 		rmsg.setToUserName(msg.getFromUserName());
 
 		try{
-			WeixinFinanceDao.bindRestaurant(msg.getFromUserName(), account, pwd);
+			WeixinFinanceDao.bind(msg.getFromUserName(), account, pwd);
 			Restaurant restaurant = RestaurantDao.getByAccount(account);
 			StringBuilder content = new StringBuilder();
-			content.append("恭喜您, 已成功绑定'" + restaurant.getName() + "':-)\n" );
-			content.append("--------1--------\n")
-			   	   .append("描述：绑定餐厅\n")
-			   	   .append("输入：bd  帐号名  密码\n");
-			content.append("--------2--------\n")
-			   	   .append("描述：查看最近日结\n")
-			   	   .append("输入：rj\n");
-			content.append("--------3--------\n")
-		   	       .append("描述：查看近5天营业信息\n")
-		   	       .append("输入：yy\n");
-			rmsg.setContent(content.toString());
+			content.append("恭喜您, 已成功绑定'" + restaurant.getName() + "':-)");
 			return rmsg;
 			
 		}catch(BusinessException e){
@@ -224,7 +280,7 @@ public class FinanceWeixinAction extends Action {
 	 * @param msg
 	 * @return
 	 */
-	private Msg doCheckRecentDailySettlement(Msg4Text msg){
+	private Msg doCheckRecentDailySettlement(Msg msg){
 		Msg4Text rmsg =	new Msg4Text();
 		rmsg.setFromUserName(msg.getToUserName());
 		rmsg.setToUserName(msg.getFromUserName());
@@ -336,7 +392,7 @@ public class FinanceWeixinAction extends Action {
 	 * @throws SQLException 
 	 * @throws IOException 
 	 */
-	private Msg doFocusedStatistics(Msg4Text msg) {
+	private Msg doFocusedStatistics(Msg msg) {
 
 		Msg4ImageText mit = new Msg4ImageText();
 		
@@ -421,7 +477,7 @@ public class FinanceWeixinAction extends Action {
 	 * @throws BusinessException 
 	 * @throws ParseException 
 	 */
-	public CategoryDataset createDataSet(Msg4Text msg, List<IncomeByEachDay> incomes) throws SQLException, BusinessException, ParseException {
+	public CategoryDataset createDataSet(Msg msg, List<IncomeByEachDay> incomes) throws SQLException, BusinessException, ParseException {
 			
 		Calendar c = Calendar.getInstance();
 		c.add(Calendar.DATE, -5);
@@ -444,7 +500,7 @@ public class FinanceWeixinAction extends Action {
 	 * @throws BusinessException 
 	 * @throws SQLException 
 	 */
-	public JFreeChart createChart(Msg4Text msg, List<IncomeByEachDay> incomes) throws SQLException, BusinessException, ParseException {
+	public JFreeChart createChart(Msg msg, List<IncomeByEachDay> incomes) throws SQLException, BusinessException, ParseException {
 		// 字体
 		final Font PLOT_FONT = new Font("宋体", Font.BOLD, 15);
 		
@@ -600,5 +656,40 @@ public class FinanceWeixinAction extends Action {
 		}catch(UnsupportedEncodingException e){
 			return "Unsupported Encoding";
 		}
+	}
+	
+	private final static String TODAY_EVENT_KEY = "today";
+	private final static String YESTERDAY_EVENT_KEY = "yesterday";
+	private final static String THIS_WEEK_EVENT_KEY = "this_week";
+	private final static String LAST_WEEK_EVENT_KEY = "last_week";
+	private final static String THIS_MONTH_EVENT_KEY = "this_month";
+	private final static String LAST_MONTH_EVENT_KEY = "last_month";
+	
+	public static void main(String[] args) throws IOException{
+		Token token = Token.newInstance();
+		
+		System.out.println(Menu.delete(token));
+
+		Menu menu = new Menu();
+		
+		Button b1 = new Button.ClickBuilder("营业日报", "AAA")
+							.addChild(new Button.ClickBuilder("即时战报", TODAY_EVENT_KEY))
+							.addChild(new Button.ClickBuilder("最近日结", YESTERDAY_EVENT_KEY))
+							.build();
+		menu.set1stButton(b1);
+		
+		Button b2 = new Button.ClickBuilder("周报", "BBB")
+							.addChild(new Button.ClickBuilder("本周报表", THIS_WEEK_EVENT_KEY))
+							.addChild(new Button.ClickBuilder("上周报表", LAST_WEEK_EVENT_KEY))
+							.build();
+		menu.set2ndButton(b2);
+
+		Button b3 = new Button.ClickBuilder("月报", "AAA")
+							.addChild(new Button.ClickBuilder("本月报表", THIS_MONTH_EVENT_KEY))
+							.addChild(new Button.ClickBuilder("上月报表", LAST_MONTH_EVENT_KEY))
+							.build();
+		menu.set3rdButton(b3);
+		
+		System.out.println(menu.create(token));
 	}
 }

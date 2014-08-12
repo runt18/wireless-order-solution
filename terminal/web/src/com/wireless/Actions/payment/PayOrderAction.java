@@ -13,8 +13,6 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.client.member.MemberDao;
-import com.wireless.db.client.member.MemberOperationDao;
-import com.wireless.db.orderMgr.OrderDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.ErrorCode;
@@ -23,13 +21,10 @@ import com.wireless.pack.Type;
 import com.wireless.pack.req.ReqPayOrder;
 import com.wireless.parcel.Parcel;
 import com.wireless.pojo.client.Member;
-import com.wireless.pojo.client.MemberOperation;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.PrintOption;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.sccon.ServerConnector;
-import com.wireless.util.DateType;
-import com.wireless.util.sms.SMS;
 
 public class PayOrderAction extends Action{
 	
@@ -102,8 +97,18 @@ public class PayOrderAction extends Action{
 			
 			Member member = null;
 			if(settleType == Order.SettleType.MEMBER){
+				boolean sendSMS = false;
+				//Send SMS if paid by charge member.
+				for(Cookie cookie : request.getCookies()){
+				    if(cookie.getName().equals((request.getServerName() + "_consumeSms"))){
+				    	if(cookie.getValue().equals("true")){
+				    		sendSMS = true;
+				    		break;
+				    	}
+				    }
+				}
 				member = MemberDao.getById(staff, Integer.valueOf(request.getParameter("memberID")));
-				payBuilder = Order.PayBuilder.build4Member(orderId, member, payType);
+				payBuilder = Order.PayBuilder.build4Member(orderId, member, payType, sendSMS);
 			}else{
 				payBuilder = Order.PayBuilder.build(orderId, payType);
 			}
@@ -165,33 +170,7 @@ public class PayOrderAction extends Action{
 				if(payBuilder.isTemp()){
 					jsonResp = jsonResp.replace("$(value)", payBuilder.getOrderId() + "号账单暂结成功");
 				}else{
-					boolean sendSMS = false;
-					//Send SMS if paid by charge member.
-					if(settleType == Order.SettleType.MEMBER){
-						if(member.getMemberType().isCharge()){
-							for(Cookie cookie : request.getCookies()){
-							    if(cookie.getName().equals((request.getServerName() + "_consumeSms"))){
-							    	if(cookie.getValue().equals("true")){
-							    		sendSMS = true;
-							    		break;
-							    	}
-							    }
-							}
-						}
-					}
-					
-					if(sendSMS){
-			    		try{
-							MemberOperation mo = MemberOperationDao.getTodayById(staff, OrderDao.getById(staff, orderId, DateType.TODAY).getMemberOperationId());
-							SMS.send(staff, mo.getMemberMobile(), new SMS.Msg4Consume(mo));
-							jsonResp = jsonResp.replace("$(value)", payBuilder.getOrderId() + "号账单结帐并发送短信成功");
-			    		}catch(Exception e){
-							jsonResp = jsonResp.replace("$(value)", payBuilder.getOrderId() + "号账单结帐成功, 但短信发送失败(" + e.getMessage() + ")");
-							e.printStackTrace();
-						}
-					}else{
-						jsonResp = jsonResp.replace("$(value)", payBuilder.getOrderId() + "号账单结帐成功");
-					}
+					jsonResp = jsonResp.replace("$(value)", payBuilder.getOrderId() + "号账单结帐成功");
 		    	}
 				
 			}else if(resp.header.type == Type.NAK){

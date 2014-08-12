@@ -24,8 +24,9 @@ import com.wireless.pojo.client.MemberOperation;
 import com.wireless.pojo.client.MemberOperation.ChargeType;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.sccon.ServerConnector;
+import com.wireless.sms.SMS;
+import com.wireless.sms.msg.Msg4Charge;
 import com.wireless.util.WebParams;
-import com.wireless.util.sms.SMS;
 
 public class OperateMemberAction extends DispatchAction{
 	
@@ -226,7 +227,7 @@ public class OperateMemberAction extends DispatchAction{
 			    	if(cookie.getValue().equals("true")){
 						try{
 							//Send SMS.
-							SMS.send(staff, mo.getMemberMobile(), new SMS.Msg4Charge(mo));
+							SMS.send(staff, mo.getMemberMobile(), new Msg4Charge(mo));
 							jobject.setMsg(jobject.getMsg() + "充值短信发送成功.");
 						}catch(Exception e){
 							jobject.setMsg(jobject.getMsg() + "充值短信发送失败(" + e.getMessage() + ")");
