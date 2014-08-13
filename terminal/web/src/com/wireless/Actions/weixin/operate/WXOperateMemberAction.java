@@ -35,8 +35,8 @@ import com.wireless.pojo.sms.VerifySMS.ExpiredPeriod;
 import com.wireless.pojo.sms.VerifySMS.InsertBuilder;
 import com.wireless.pojo.sms.VerifySMS.VerifyBuilder;
 import com.wireless.pojo.staffMgr.Staff;
-import com.wireless.sms.SMS;
-import com.wireless.sms.msg.Msg4Verify;
+import com.wireless.util.sms.SMS;
+import com.wireless.util.sms.SMS.Msg4Verify;
 
 public class WXOperateMemberAction extends DispatchAction {
 	

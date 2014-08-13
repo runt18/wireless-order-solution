@@ -51,6 +51,10 @@ public class ImageFileUploadAction extends Action{
 			String foodID = request.getParameter("foodID");
 			String otype = request.getParameter("otype");
 			
+			if(restaurantID == null){
+				restaurantID = (String)request.getAttribute("restaurantID");
+			}
+			
 			try{
 				Integer.parseInt(restaurantID);
 				Integer.parseInt(foodID);
