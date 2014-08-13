@@ -118,7 +118,7 @@ public class PayOrderAction extends Action{
 				payBuilder.setReceivedCash(Float.parseFloat(request.getParameter("cashIncome")));
 			}
 			
-			if(request.getParameter("discountID") != null && !request.getParameter("discountID").equals("-1")){
+			if(request.getParameter("discountID") != null && !request.getParameter("discountID").isEmpty() && !request.getParameter("discountID").equals("-1")){
 				payBuilder.setDiscountId(Integer.parseInt(request.getParameter("discountID")));
 			}
 			
