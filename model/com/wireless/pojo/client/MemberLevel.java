@@ -91,7 +91,9 @@ public class MemberLevel implements Jsonable{
 	}
 	
 	public static class UpdateBuilder extends Builder{
+		
 		public UpdateBuilder(int id){
+			data.setPointThreshold(-1);
 			data.setId(id);
 		}
 		
@@ -110,7 +112,7 @@ public class MemberLevel implements Jsonable{
 		}
 		
 		public boolean isPointThresholdChange(){
-			return data.pointThreshold > 0;
+			return data.pointThreshold >= 0;
 		}
 	}
 	
