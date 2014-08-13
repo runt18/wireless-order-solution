@@ -887,7 +887,7 @@ function treeInit(){
 		title : '会员类型',
 //		region : 'west',
 		region : 'center',
-		width : 200,
+		width : 240,
 		border : true,
 		rootVisible : true,
 		singleExpand : true,
@@ -1999,109 +1999,464 @@ function memberTypeOperationHandler(c){
 
 
 //************************会员等级
-function member_loadMemberTypeChart(){
- 	var commissionStaffChart = new Highcharts.Chart({
-        chart: {
-            type: 'bar',
-            renderTo : 'divMemberTypeLevelChart'
-        },
-        title: {
-            text : '<font style="font-size:15px;color:red;font-weight:bold;textShadow: \'0 0 3px black\'">★点击等级条可设置积分</font>',
-            align : 'right'
-        },
-	    	plotOptions : {
-				column : {
-					allowPointSelect :true,
-					cursor : 'pointer',
-					dataLabels : {
-						enabled : true,
-						style : {
-							fontWeight: 'bold', 
-							color: 'green' 
+function deleteMemberLevel(){
+	if(!memberLevelDetail){
+		Ext.example.msg('提示', '操作失败, 请选中一条数据再进行操作.');
+		return;
+	}
+	Ext.Msg.confirm(
+		'提示',
+		'是否删除: ' + memberLevelDetail['xAxisText'],
+		function(e){
+			if(e == 'yes'){
+				Ext.Ajax.request({
+					url : '../../OperateMemberLevel.do',
+					params : {
+						id : memberLevelDetail['id'],
+						dataSource : 'delete'
+					},
+					success : function(res, opt){
+						var jr = Ext.util.JSON.decode(res.responseText);
+						if(jr.success){
+							Ext.example.msg(jr.title, String.format(Ext.ux.txtFormat.deleteSuccess, memberLevelDetail['xAxisText']));
+							memberLevelAddWin.hide();
+							member_loadMemberTypeChart();
+							
+						}else{
+							Ext.ux.showMsg(jr);
 						}
 					},
-					events : {
-						click : function(e){
-//							chart_operateMemberLevel(e.point.y, e.point.category);
-//							operateMemberLevel({otype:'update'});
+					failure : function(res, opt){
+						Ext.ux.showMsg(Ext.util.JSON.decode(res.responseText));
+					}
+				});
+			}
+		}
+	);
+
+}
+function initAddLevelWin(){
+	memberLevelAddWin = new Ext.Window({
+		id : 'memberLevelAddWin',
+		title : '添加等级',
+		closable : false,
+		modal : true,
+		resizable : false,
+		width : 250,
+		bbar : [{
+			text : '删除',
+			id : 'btn_memberLevelDel',
+			iconCls : 'btn_delete',
+			handler : function(){
+				deleteMemberLevel();
+			}
+		},'->',{
+			text : '保存',
+			id : 'btn_memberLevelAdd',
+			iconCls : 'btn_save',
+			handler : function(){
+				var pointThreshold = Ext.getCmp('txtPointThreshold');
+				var combo_memberTypeId = Ext.getCmp('combo_memberLevel_mType');
+				
+				if(!pointThreshold.isValid() || !combo_memberTypeId.isValid()){
+					return;
+				}
+				Ext.Ajax.request({
+					url : '../../OperateMemberLevel.do',
+					params : {
+						id : Ext.getCmp('txtMemberLevelId').getValue(),
+						pointThreshold : pointThreshold.getValue(),
+						memberTypeId : combo_memberTypeId.getValue(),
+						dataSource : memberLevelAddWin.otype
+					},
+					success : function(res, opt){
+						var jr = Ext.decode(res.responseText);
+						if(jr.success){
+							Ext.ux.showMsg(jr);
+							memberLevelAddWin.hide();
+							member_loadMemberTypeChart();
+						}else{
+							Ext.ux.showMsg(jr);
 						}
+						
+					},
+					failure : function(res, opt){
+						Ext.ux.showMsg(Ext.util.JSON.decode(res.responseText));
+					}
+				});
+			}
+		}, {
+			text : '取消',
+			id : 'btn_cancelMmemberLevelWin',
+			iconCls : 'btn_close',
+			handler : function(){
+				memberLevelAddWin.hide();
+			}
+		}],
+		keys: [{
+			key : Ext.EventObject.ENTER,
+			scope : this,
+			fn : function(){
+				Ext.getCmp('btn_memberLevelAdd').handler();
+			}
+		},{
+			key : Ext.EventObject.ESC,
+			scope : this,
+			fn : function(){
+				memberLevelAddWin.hide();
+			}
+		}],
+		listeners : {
+			show : function(){
+				var data = {};
+				if(memberLevelAddWin.otype == 'update'){
+					data = memberLevelDetail;
+					Ext.getCmp('btn_memberLevelDel').show();
+				}else if(memberLevelAddWin.otype == 'insert'){
+					data = {};
+					Ext.getCmp('btn_memberLevelDel').hide();
+				}
+//				Ext.getCmp('combo_memberLevel_mType').store.loadData(memberTypeData.root);
+				operateMemberLevelData({
+					type : 'SET',
+					data : data
+				});
+			},
+			hide : function(){
+				memberLevelDetail="";
+			}
+		},
+		items : [{
+			layout : 'form',
+			labelWidth : 60,
+			width : 250,
+			border : false,
+			frame : true,
+			items : [{
+				xtype : 'numberfield',
+				fieldLabel : '积分',
+				id : 'txtPointThreshold',
+				allowBlank : false,
+				width : 130,
+				validator : function(v){
+					if(Ext.util.Format.trim(v).length > 0){
+						return true;
+					}else{
+						return '积分不能为空.';
 					}
 				}
-			},        
-//        xAxis: {
-//            categories: commissionStaffChartData.staffColumnChart.xAxis
-//        },
-        xAxis: {                                                           
-            categories: ['first', 'second', 'three'],
-            title: {                                                       
-                text: null                                                 
-            }                                                              
-        },          
-        yAxis: {
-            min: 0,
-            title: {
-                text: '积分'
-            }
-        },
-        tooltip: {
-            pointFormat: '<table><tbody><tr><td style="color:red;padding:0">{series.name}: </td><td style="padding:0"><b>{point.y} </b></td></tr></tbody></table>',
-            shared: true,
-            useHTML: true
-        },
-        plotOptions: {
-            column: {
-                pointPadding: 0.2,
-                borderWidth: 0
-            }
-        },
-       legend: {                                                          
-            enabled : false
-        },
-        credits : {
-        	enabled : false
-        },         
-        exporting : {
-        	enabled : false
-        },
-        series: [{                                                         
-            name: '积分',                                             
-            data: [{y : 110, color : 'SpringGreen'}, {y : 120, color : 'GreenYellow'}, {y : 130, color : 'cyan'}],
-            dataLabels: {
-                enabled: true,
-                color: 'black',
-                align: 'right',
-                x: 0,
-                y: 0,
-                style: {
-                    fontSize: '15px',
-                    fontFamily: 'Verdana, sans-serif'
-//                    textShadow: '0 0 3px black'
-                }
-            }            
-        }]         
-//        series: [commissionStaffChartData.staffColumnChart.yAxis, commissionStaffChartData.staffColumnChart.yAxisAmount]
-    });	
+			},{
+				xtype : 'combo',
+				id : 'combo_memberLevel_mType',
+				fieldLabel : '会员类型',
+				readOnly : false,
+				forceSelection : true,
+				width : 130,
+				listWidth : 120,
+				store : new Ext.data.SimpleStore({
+					fields : ['id', 'name']
+				}),
+				valueField : 'id',
+				displayField : 'name',
+				typeAhead : true,
+				mode : 'local',
+				triggerAction : 'all',
+				selectOnFocus : true,
+				allowBlank : false
+			}, {
+				xtype : 'hidden',
+				id : 'txtMemberLevelId'
+			}]
+		}]
+	});
+}
+
+function initMemberTypeData(){
+	combo_memberTypeData = [];
+	var thiz = Ext.getCmp('combo_memberLevel_mType');
+	Ext.Ajax.request({
+		url : '../../QueryMemberType.do',
+		params : {
+			dataSource : 'notBelongType'
+		},
+		success : function(res, opt){
+			var jr = Ext.decode(res.responseText);
+			for(var i = 0; i < jr.root.length; i++){
+				combo_memberTypeData.push([jr.root[i]['id'], jr.root[i]['name']]);
+			}
+			thiz.store.loadData(combo_memberTypeData);
+		},
+		fialure : function(res, opt){
+			thiz.store.loadData(combo_memberTypeData);
+		}
+	});
+}
+
+function member_operateMemberLevel(y, x){
+	initMemberTypeData();
+	var list = memberLevels;
+	var otype = 'insert';
+	for (var i = 0; i < list.length; i++) {
+		if(list[i].pointThreshold == y){
+			otype = 'update';
+			memberLevelDetail = list[i];
+			memberLevelDetail['xAxisText'] = x;
+			combo_memberTypeData.push([memberLevelDetail['memberTypeId'], memberLevelDetail['memberTypeName']]);
+			Ext.getCmp('combo_memberLevel_mType').store.loadData(combo_memberTypeData);
+		}
+	}
+	
+	operateMemberLevel({otype:otype});
+}
+
+function operateMemberLevel(c){
+	if(c == null || typeof c == 'undefined' || typeof c.otype == 'undefined'){
+		return;
+	}
+	memberLevelAddWin.otype = c.otype;
+	if(c.otype == 'insert'){
+		memberLevelAddWin.setTitle('添加等级');
+//		initMemberTypeData();
+	}else if(c.otype == 'update'){
+		memberLevelAddWin.setTitle('修改等级');
+	}
+	memberLevelAddWin.show();
+	memberLevelAddWin.center();
+}
+
+function operateMemberLevelData(c){
+	if(c == null || typeof c == 'undefined' || typeof c.type == 'undefined'){
+		return;
+	}
+	var data = {};
+	var pointThreshold = Ext.getCmp('txtPointThreshold');
+	var combo_memberTypeId = Ext.getCmp('combo_memberLevel_mType');
+	var memberLevelId = Ext.getCmp('txtMemberLevelId');
+	if(c.type.toUpperCase() == Ext.ux.otype['set'].toUpperCase()){
+		data = c.data;
+		pointThreshold.setValue(data['pointThreshold']);
+		
+		if(data['memberTypeId']){
+			combo_memberTypeId.setValue(data['memberTypeId']);
+		}else{
+			combo_memberTypeId.setValue();
+		}
+		memberLevelId.setValue(data['id']);
+		pointThreshold.focus(true, 100);
+		
+	}else if(c.type.toUpperCase() == Ext.ux.otype['get'].toUpperCase()){
+		data = {
+			memberLevelId : memberLevelId.getValue(),
+			memberTypeId : combo_memberTypeId.getValue(),
+			pointThreshold : pointThreshold.getValue()
+		};
+		c.data = data;
+	}
+	
+	pointThreshold.clearInvalid();
+	combo_memberTypeId.clearInvalid();
+	return c;
+}
+var colors = ['SpringGreen', 'GreenYellow', 'cyan'];
+var member_compare = function (obj1, obj2) {
+    var val1 = obj1.y;
+    var val2 = obj2.y;
+    if (val1 < val2) {
+        return -1;
+    } else if (val1 > val2) {
+        return 1;
+    } else {
+        return 0;
+    }            
+}; 
+function member_loadMemberTypeChart(){
+	$.ajaxSetup({async : false});
+	var xAxisData = [], yAxisData = [];
+	$.post('../../QueryMemberLevel.do', {dataSource : 'chart'}, function(res){
+		memberLevels = res.root;
+		chartDatas = eval('(' + res.other.chart + ')');
+
+		//重新根据积分排序
+		yAxisData = chartDatas.data.sort(member_compare);
+		
+		for (var i = 0; i < yAxisData.length; i++) {
+			xAxisData.push(yAxisData[i].x);
+			delete yAxisData[i].x;
+			if(yAxisData[i].color){
+				yAxisData[i].dataLabels = {
+		            enabled: true,
+		            color: 'black',
+		            align: 'right',
+		            style: {
+		                fontSize: '15px',
+		                fontFamily: 'Verdana, sans-serif'
+		            }
+		        };
+			}
+		}		
+	 	var chart = {
+/*			    chart: {
+			        type: 'bar',
+			        renderTo : 'divMemberTypeLevelChart'
+			    },
+			    title: {
+			        text : '<font style="font-size:15px;color:red;font-weight:bold;textShadow: \'0 0 3px black\'">★点击等级条可设置积分</font>'
+			    },
+				plotOptions : {
+					bar : {
+						allowPointSelect :true,
+						cursor : 'pointer',
+						events : {
+							click : function(e){
+								member_operateMemberLevel(e.point.y, e.point.category);
+							}
+						}
+					}
+				},        
+			    xAxis: {                                                           
+			        categories: xAxisData,
+			        labels : {
+			        	style : {
+							color : 'green',
+							fontWeight : 'bold',
+							fontSize : '15px'
+			        	}
+			        },
+			        title: {                                                       
+			            text: null                                                 
+			        }                                                              
+			    },          
+			    yAxis: {
+			        min: 0,
+			        align: 'right',
+			        title: {
+			            text: '积分'
+			        }
+			    },
+			    tooltip: {
+			    	enabled : false,
+			        pointFormat: '<table><tbody><tr><td style="color:red;padding:0">{series.name}: </td><td style="padding:0"><b>{point.y} </b></td></tr></tbody></table>',
+			        shared: true,
+			        useHTML: true
+			    },
+			   legend: {                                                          
+			        enabled : false
+			    },
+			    credits : {
+			    	enabled : false
+			    },         
+			    exporting : {
+			    	enabled : false
+			    },
+			    series: [{                                                         
+			        name: '积分',                                             
+			        data: yAxisData
+           
+			    }]     
+			    
+			    */
+			    
+			    chart: {
+			        type: 'spline',
+			        inverted: true,
+			        renderTo : 'divMemberTypeLevelChart'
+			    },
+			    title: {
+			        text: ''
+			    },
+			    xAxis: {
+			    	reversed : false,
+			        title: {
+			            enabled: true,
+			            text: '积分'
+			        },
+			        labels: {
+			            formatter: function() {
+			                return this.value +'分';
+			            }
+			        },
+			        min: -10,
+			        showLastLabel: true
+			    },
+			    yAxis: {
+			        title: {
+			            text: '等级'
+			        },
+			        labels: {
+			            formatter: function() {
+			                return this.value ;
+			            }
+			        },
+			        lineWidth: 2
+			    },
+			    legend: {
+			        enabled: false
+			    },
+			    tooltip: {
+			        headerFormat: '<b>{series.name}</b><br/>',
+			        pointFormat: '{point.x} km: {point.y}°C'
+			    },
+			    plotOptions: {
+			        spline: {
+			            marker: {
+			                enable: false
+			            }
+			        }
+			    },
+				plotOptions : {
+					line : {
+						cursor : 'pointer',
+						dataLabels : {
+							enabled : true,
+							style : {
+								fontWeight: 'bold', 
+								color: 'green' 
+							}
+						},
+						events : {
+							click : function(e){
+								each(e.point.category);
+							}
+						}
+					}
+				},			    
+			    credits : {
+			    	enabled : false
+			    },         
+			    exporting : {
+			    	enabled : false
+			    },			    
+			    series: [{
+			        name: 'Temperature',
+			        data: [[0, 15], [10, 15], [100, 15]]
+			    }]			    
+			};
+			new Highcharts.Chart(chart);
+	});
 }
 var memberMgr_obj = {treeId : 'tree_memberTypeMgr', option : [{name:'修改', fn:"updateMemberTypeHandler()"},{name:'删除', fn:"deleteMemberTypeHandler()"}]};
+var memberLevels, memberLevelDetail;
 Ext.onReady(function(){
 	member_dataInit();
 	
 	treeInit();
 	gridInit();
 	
-//	member_loadMemberTypeChart();
+	member_dataInit();
+	
+	member_loadMemberTypeChart();
 	
 	var memberTypePanel = new Ext.Panel({
 		layout : 'border',
-		width : 210,
+		width : 240,
 		frame : false,
 		region : 'west',
 		items : [memberTypeTree
-//				, new Ext.Panel({
-//					title : '会员等级分布图',
-//					region : 'south',
-//					contentEl : 'divMemberTypeLevelChart'
-//				})
+				, new Ext.Panel({
+					title : '会员等级路线图',
+					region : 'south',
+					contentEl : 'divMemberTypeLevelChart'
+				})
 		]
 	});
 	
@@ -2149,4 +2504,6 @@ Ext.onReady(function(){
 			'</div>'
 	});
 	showFloatOption(memberMgr_obj);
+	
+	initAddLevelWin();
 });

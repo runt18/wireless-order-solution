@@ -194,31 +194,20 @@ function initDiscountGrid(){
 						}
 					});	
 					
-					if(typeof discount_staffChart != 'undefined' && typeof discountStaffChartPanel.hasRender != 'undefined'){
+					if(typeof discount_staffPieChart != 'undefined' && typeof discountStaffChartPanel.hasRender != 'undefined'){
 						discount_getStaffChartData();
-						if($('#divDiscountStaffColumnChart').is(':visible')){
-							discount_loadStaffColumnChart();
-							discount_staffChart.setSize(discountStatChartTabPanel.getWidth(), discount_panelDrag ? discountStatChartTabPanel.getHeight() - 245 : discountStatChartTabPanel.getHeight()-30);
-						}else{
-							discount_loadStaffChart();
-							discount_loadAmountStaffChart();
-							discount_staffChart.setSize(discountStatChartTabPanel.getWidth()/2, discount_panelDrag ? discountStatChartTabPanel.getHeight() - 245 : discountStatChartTabPanel.getHeight()-30);
-							discount_staffChart_amount.setSize(discountStatChartTabPanel.getWidth()/2, discount_panelDrag ? discountStatChartTabPanel.getHeight() - 245 : discountStatChartTabPanel.getHeight()-30);						
-						}
+						discount_staffPieChart = discount_loadStaffPieChart(discountDetailsStatPanel.otype);
+						discount_staffColumnChart = discount_loadStaffColumnChart(discountDetailsStatPanel.otype);
+						discount_staffPieChart.setSize(discountStatChartTabPanel.getWidth()*0.4, discount_panelDrag ? discountStatChartTabPanel.getHeight() - discount_cutAfterDrag : discountStatChartTabPanel.getHeight()-discount_cutChartHeight);
+						discount_staffColumnChart.setSize(discountStatChartTabPanel.getWidth()*0.6, discount_panelDrag ? discountStatChartTabPanel.getHeight() - discount_cutAfterDrag : discountStatChartTabPanel.getHeight()-discount_cutChartHeight);
 						
 					}
-					if(typeof discount_deptChart != 'undefined' && typeof discountDeptChartPanel.hasRender != 'undefined'){
+					if(typeof discount_deptPieChart != 'undefined' && typeof discountDeptChartPanel.hasRender != 'undefined'){
 						discount_getDeptChartData();
-						if($('#divDiscountDeptColumnChart').is(':visible')){
-							discount_loadDeptColumnChart();
-							discount_deptChart.setSize(discountStatChartTabPanel.getWidth(), discount_panelDrag ? discountStatChartTabPanel.getHeight() - 245 : discountStatChartTabPanel.getHeight()-30);
-						}else{
-							discount_loadDeptChart();
-							discount_loadAmountDeptChart();
-							discount_deptChart.setSize(discountStatChartTabPanel.getWidth()/2, discount_panelDrag ? discountStatChartTabPanel.getHeight() - 245 : discountStatChartTabPanel.getHeight()-30);
-							discount_deptChart_amount.setSize(discountStatChartTabPanel.getWidth()/2, discount_panelDrag ? discountStatChartTabPanel.getHeight() - 245 : discountStatChartTabPanel.getHeight()-30);
-						}
-						
+						discount_deptPieChart = discount_loadDeptPieChart(discountDetailsStatPanel.otype);
+						discount_deptColumnChart = discount_loadDeptColumnChart(discountDetailsStatPanel.otype);
+						discount_deptPieChart.setSize(discountStatChartTabPanel.getWidth()*0.4, discount_panelDrag ? discountStatChartTabPanel.getHeight() - discount_cutAfterDrag : discountStatChartTabPanel.getHeight()-discount_cutChartHeight);
+						discount_deptColumnChart.setSize(discountStatChartTabPanel.getWidth()*0.6, discount_panelDrag ? discountStatChartTabPanel.getHeight() - discount_cutAfterDrag : discountStatChartTabPanel.getHeight()-discount_cutChartHeight);
 					}					
 					
 				}
@@ -296,10 +285,10 @@ function initDiscountGrid(){
 					
 					discountStatChartTabPanel.getEl().setTop((h+30)) ;
 					
-					discount_changeChartWidth(w,chartHeight-180);
+					discount_changeChartWidth(w,chartHeight-discount_cutAfterDrag);
 					
 					if(discount_panelDrag){
-						discountStatChartTabPanel.setHeight(chartHeight+70);
+						discountStatChartTabPanel.setHeight(chartHeight);
 					}
 					discountStatChartTabPanel.doLayout();					
 				}
@@ -312,10 +301,10 @@ function initDiscountGrid(){
 function discount_changeChartWidth(w,h){
 	if(eval($('div:visible[data-type=discountChart]').attr('data-value'))){
 		if($('div:visible[data-type=discountChart]').length == 1){
-			eval($('div:visible[data-type=discountChart]').attr('data-value')).setSize(w, h);
+			eval($('div:visible[data-type=discountChart]').attr('data-value')).setSize(w, h+20);
 		}else if($('div:visible[data-type=discountChart]').length > 1){
-			eval($($('div:visible[data-type=discountChart]')[0]).attr('data-value')).setSize(w/2, h);
-			eval($($('div:visible[data-type=discountChart]')[1]).attr('data-value')).setSize(w/2, h);				
+			eval($($('div:visible[data-type=discountChart]')[0]).attr('data-value')).setSize(w*0.4, h);
+			eval($($('div:visible[data-type=discountChart]')[1]).attr('data-value')).setSize(w*0.6, h);				
 		}
 	}	
 }
@@ -397,7 +386,7 @@ function showDiscountDetailChart(jdata){
 	}
 }
 
-function discount_getStaffChartData(){
+var discount_getStaffChartData = function(){
 	requestParams.dataSource = 'getStaffChart';
 	$.ajax({
 		url : '../../QueryDiscountStatistics.do',
@@ -406,130 +395,43 @@ function discount_getStaffChartData(){
 		data : requestParams,
 		success : function(jr, status, xhr){
 			discount_chartLoadMarsk.hide();
-			discount_staffChartData.chartData.data = [];
-			discount_staffChartData.chartAmountData.data = [];
-			discount_staffChartData.staffColumnChart.xAxis = [];
-			discount_staffChartData.staffColumnChart.yAxis.data = [];
-			discount_staffChartData.staffColumnChart.yAxisAmount.data = [];
+			resetChartDate(discount_staffChartData);
+			
 			for (var i = 0; i < jr.root.length; i++) {
-				discount_staffChartData.chartData.data.push([jr.root[i].staffName, jr.root[i].discountPrice]);
+				discount_staffChartData.chartPriceData.data.push([jr.root[i].staffName, jr.root[i].discountPrice]);
 				discount_staffChartData.chartAmountData.data.push([jr.root[i].staffName, jr.root[i].discountAmount]);
-				discount_staffChartData.staffColumnChart.xAxis.push(jr.root[i].staffName);
-				discount_staffChartData.staffColumnChart.yAxis.data.push({y : jr.root[i].discountPrice, color : colors[i]}); 
-				discount_staffChartData.staffColumnChart.yAxisAmount.data.push({y : jr.root[i].discountAmount, color : colors[i]});
+				discount_staffChartData.priceColumnChart.xAxis.push(jr.root[i].staffName);
+				discount_staffChartData.priceColumnChart.yAxis.data.push({y : jr.root[i].discountPrice, color : colors[i]}); 
+				discount_staffChartData.amountColumnChart.yAxis.data.push({y : jr.root[i].discountAmount, color : colors[i]});
 			}
 		},
 		failure : function(res, opt){
 		
 		}
 	});
+};
+
+var discount_loadStaffPieChart = function(type){
+	var content = {};
+	content.title = type==1?'员工折扣数量比例图':'员工折扣金额比例图';
+	content.unit = type==1?'份':'元';
+	content.series = type==1?discount_staffChartData.chartAmountData:discount_staffChartData.chartPriceData;
 	
-}
+	return newPieChart({rt: 'divDiscountStaffPieChart', title : content.title, unit: content.unit, series: content.series});	
+};
 
-function discount_loadStaffChart(){
-	discount_staffChart = new Highcharts.Chart({
-	    chart: {
-	    	renderTo : 'divDiscountPriceStaffChart',
-	        plotBackgroundColor: null,
-	        plotBorderWidth: null,
-	        plotShadow: false
-	    },
-	    title: {
-	        text: '员工折扣金额比例图'
-	    },
-	    tooltip: {
-		    pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
-	    },
-	    plotOptions: {
-	        pie: {
-	            allowPointSelect: true,
-	            cursor: 'pointer',
-	            dataLabels: {
-	                enabled: true,
-	                color: '#000000',
-	                connectorColor: '#000000',
-	                format: '<b>{point.name}</b>: {point.y} 元'
-	            }
-	        }
-	    },
-	    series: [discount_staffChartData.chartData],
-        credits : {
-        	enabled : false
-        }
-	});				
-}
-
-function discount_loadAmountStaffChart(){
-	
-	discount_staffChart_amount = new Highcharts.Chart({
-	    chart: {
-	    	renderTo : 'divDiscountAmountStaffChart',
-	        plotBackgroundColor: null,
-	        plotBorderWidth: null,
-	        plotShadow: false
-	    },
-	    title: {
-	        text: '员工折扣数量比例图'
-	    },
-	    tooltip: {
-		    pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
-	    },
-	    plotOptions: {
-	        pie: {
-	            allowPointSelect: true,
-	            cursor: 'pointer',
-	            dataLabels: {
-	                enabled: true,
-	                color: '#000000',
-	                connectorColor: '#000000',
-	                format: '<b>{point.name}</b>: {point.y} 份'
-	            }
-	        }
-	    },
-	    series: [discount_staffChartData.chartAmountData],
-        credits : {
-        	enabled : false
-        }
-	});				
-}
-
-function discount_loadStaffColumnChart(){
- 	discount_staffChart = new Highcharts.Chart({
-        chart: {
-            type: 'column',
-            renderTo : 'divDiscountStaffColumnChart'
-        },
-        title: {
-            text: '员工折扣金额柱状图'
-        },
-        xAxis: {
-            categories: discount_staffChartData.staffColumnChart.xAxis
-        },
-        yAxis: {
-            min: 0,
-            title: {
-                text: '金额 (元)'
-            }
-        },
-        tooltip: {
-            pointFormat: '<table><tbody><tr><td style="color:red;padding:0">{series.name}: </td><td style="padding:0"><b>{point.y} </b></td></tr></tbody></table>',
-            shared: true,
-            useHTML: true
-        },
-        plotOptions: {
-            column: {
-                pointPadding: 0.2,
-                borderWidth: 0
-            }
-        },
-        series: [discount_staffChartData.staffColumnChart.yAxis, discount_staffChartData.staffColumnChart.yAxisAmount],
-        credits : {
-        	enabled : false
-        }
+var discount_loadStaffColumnChart = function(type){
+	var content = {};
+	content.title = type==1?'员工折扣账数量柱状图':'员工折扣金额柱状图';
+	content.unit = type==1?'份':'元';
+	content.series = type==1?discount_staffChartData.amountColumnChart.yAxis : discount_staffChartData.priceColumnChart.yAxis;	
+    
+    return newColumnChart({
+    	rt: 'divDiscountStaffColumnChart', title : content.title, unit: content.unit, series: content.series, xAxis:discount_staffChartData.priceColumnChart.xAxis	
     });	
-}
+};
 
-function discount_getDeptChartData(){
+var discount_getDeptChartData = function(){
 	requestParams.dataSource = 'getDeptChart';
 	$.ajax({
 		url : '../../QueryDiscountStatistics.do',
@@ -537,17 +439,15 @@ function discount_getDeptChartData(){
 		async : false,
 		data : requestParams,
 		success : function(jr, status, xhr){
-			discount_deptChartData.chartData.data = [];
-			discount_deptChartData.chartAmountData.data = [];
-			discount_deptChartData.deptColumnChart.xAxis = [];
-			discount_deptChartData.deptColumnChart.yAxis.data = [];
-			discount_deptChartData.deptColumnChart.yAxisAmount.data = [];
+			resetChartDate(discount_deptChartData);
 			for (var i = 0; i < jr.root.length; i++) {
-				discount_deptChartData.chartData.data.push([jr.root[i].discountDept.name, jr.root[i].discountPrice]);
-				discount_deptChartData.chartAmountData.data.push([jr.root[i].discountDept.name, jr.root[i].discountAmount]);
-				discount_deptChartData.deptColumnChart.xAxis.push(jr.root[i].discountDept.name);
-				discount_deptChartData.deptColumnChart.yAxis.data.push({y : jr.root[i].discountPrice, color : colors[i]}); 
-				discount_deptChartData.deptColumnChart.yAxisAmount.data.push({y : jr.root[i].discountAmount, color : colors[i]});
+				if(jr.root[i].discountPrice != 0)
+					discount_deptChartData.chartPriceData.data.push([jr.root[i].discountDept.name, jr.root[i].discountPrice]);
+				if(jr.root[i].discountAmount != 0)
+					discount_deptChartData.chartAmountData.data.push([jr.root[i].discountDept.name, jr.root[i].discountAmount]);
+				discount_deptChartData.priceColumnChart.xAxis.push(jr.root[i].discountDept.name);
+				discount_deptChartData.priceColumnChart.yAxis.data.push({y : jr.root[i].discountPrice, color : colors[i]}); 
+				discount_deptChartData.amountColumnChart.yAxisAmount.data.push({y : jr.root[i].discountAmount, color : colors[i]});
 			}
 		},
 		failure : function(res, opt){
@@ -555,109 +455,27 @@ function discount_getDeptChartData(){
 		}
 	});
 	
-}
+};
 
-function discount_loadDeptColumnChart(){
- 	discount_deptChart = new Highcharts.Chart({
-        chart: {
-            type: 'column',
-            renderTo : 'divDiscountDeptColumnChart'
-        },
-        title: {
-            text: '部门折扣柱状图'
-        },
-        xAxis: {
-            categories: discount_deptChartData.deptColumnChart.xAxis
-        },
-        yAxis: {
-            min: 0,
-            title: {
-                text: '金额 / 数量'
-            }
-        },
-        tooltip: {
-            pointFormat: '<table><tbody><tr><td style="color:red;padding:0">{series.name}: </td><td style="padding:0"><b>{point.y} </b></td></tr></tbody></table>',
-            shared: true,
-            useHTML: true
-        },
-        plotOptions: {
-            column: {
-                pointPadding: 0.2,
-                borderWidth: 0
-            }
-        },
-        series: [discount_deptChartData.deptColumnChart.yAxis, discount_deptChartData.deptColumnChart.yAxisAmount],
-        credits : {
-        	enabled : false
-        }
+var discount_loadDeptColumnChart = function(type){
+	var content = {};
+	content.title = type==1?'部门折扣数量柱状图':'部门折扣金额柱状图';
+	content.unit = type==1?'份':'元';
+	content.series = type==1?discount_deptChartData.amountColumnChart.yAxis : discount_deptChartData.priceColumnChart.yAxis;	
+    
+    return newColumnChart({
+    	rt: 'divDiscountDeptColumnChart', title : content.title, unit: content.unit, series: content.series, xAxis:discount_deptChartData.priceColumnChart.xAxis	
     });	
-}
+};
 
-function discount_loadDeptChart(){
-	discount_deptChart = new Highcharts.Chart({
-	    chart: {
-	    	renderTo : 'divDiscountPriceDeptChart',
-	        plotBackgroundColor: null,
-	        plotBorderWidth: null,
-	        plotShadow: false
-	    },
-	    title: {
-	        text: '部门折扣金额比例图'
-	    },
-	    tooltip: {
-		    pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
-	    },
-	    plotOptions: {
-	        pie: {
-	            allowPointSelect: true,
-	            cursor: 'pointer',
-	            dataLabels: {
-	                enabled: true,
-	                color: '#000000',
-	                connectorColor: '#000000',
-	                format: '<b>{point.name}</b>: {point.y} 元'
-	            }
-	        }
-	    },
-	    series: [discount_deptChartData.chartData],
-        credits : {
-        	enabled : false
-        }
-	});				
-}
-
-function discount_loadAmountDeptChart(){
-	discount_deptChart_amount = new Highcharts.Chart({
-	    chart: {
-	    	renderTo : 'divDiscountAmountDeptChart',
-	        plotBackgroundColor: null,
-	        plotBorderWidth: null,
-	        plotShadow: false
-	    },
-	    title: {
-	        text: '部门折扣数量比例图'
-	    },
-	    tooltip: {
-		    pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
-	    },
-	    plotOptions: {
-	        pie: {
-	            allowPointSelect: true,
-	            cursor: 'pointer',
-	            dataLabels: {
-	                enabled: true,
-	                color: '#000000',
-	                connectorColor: '#000000',
-	                format: '<b>{point.name}</b>: {point.y} 份'
-	            }
-	        }
-	    },
-	    series: [discount_deptChartData.chartAmountData],
-        credits : {
-        	enabled : false
-        }
-	});				
-}
+var discount_loadDeptPieChart = function(type){
+	var content = {};
+	content.title = type==1?'部门折扣数量比例图':'部门折扣金额比例图';
+	content.unit = type==1?'份':'元';
+	content.series = type==1?discount_deptChartData.chartAmountData:discount_deptChartData.chartPriceData;
+	
+	return newPieChart({rt: 'divDiscountDeptPieChart', title : content.title, unit: content.unit, series: content.series});
+};
 
 var discount_setStatisticsDate = function(){
 	if(sendToPageOperation){
@@ -669,66 +487,35 @@ var discount_setStatisticsDate = function(){
 
 };
 
+function discount_fnChangeStaffChart(thiz, v){
+	$(thiz).find('input').attr('checked', 'checked');
+	discount_staffPieChart = discount_loadStaffPieChart(v);
+	discount_staffColumnChart = discount_loadStaffColumnChart(v);
+	discount_staffPieChart.setSize(discountStatChartTabPanel.getWidth()*0.4, discount_panelDrag ? discountStatChartTabPanel.getHeight() - discount_cutAfterDrag : discountStatChartTabPanel.getHeight()-discount_cutChartHeight);
+	discount_staffColumnChart.setSize(discountStatChartTabPanel.getWidth()*0.6, discount_panelDrag ? discountStatChartTabPanel.getHeight() - discount_cutAfterDrag : discountStatChartTabPanel.getHeight()-discount_cutChartHeight);
+	
+	discountDetailsStatPanel.otype = v;
+}
+
+function discount_fnChangeDeptChart(thiz, v){
+	$(thiz).find('input').attr('checked', 'checked');
+	discount_deptPieChart = discount_loadDeptPieChart(v);
+	discount_deptColumnChart = discount_loadDeptColumnChart(v);
+	discount_deptPieChart.setSize(discountStatChartTabPanel.getWidth()*0.4, discount_panelDrag ? discountStatChartTabPanel.getHeight() - discount_cutAfterDrag : discountStatChartTabPanel.getHeight()-discount_cutChartHeight);
+	discount_deptColumnChart.setSize(discountStatChartTabPanel.getWidth()*0.6, discount_panelDrag ? discountStatChartTabPanel.getHeight() - discount_cutAfterDrag : discountStatChartTabPanel.getHeight()-discount_cutChartHeight);
+	
+	discountDetailsStatPanel.otype = v;
+}
+
+var discount_cutAfterDrag = 190, discount_cutBeforeDrag = 40;
 var titleDiscountDeptName, titleDiscountStaffName;
-var discount_detailChart, discount_staffChart, discount_staffChart_amount, discount_deptChart, discount_deptChart_amount;
+var discount_detailChart, discount_staffPieChart, discount_staffColumnChart, discount_deptPieChart, discount_deptColumnChart;
 
 var discountDetailChartPanel, discountStatChartTabPanel;
 var discountPanelHeight, discount_tabPanelHeight;
 var discount_panelDrag = false, colors = Highcharts.getOptions().colors;
-var discount_staffChartData = {chartData : {type : 'pie', name : '比例', data : []}, 
-							chartAmountData : {type : 'pie', name : '比例', data : []},
-							staffColumnChart : {xAxis : [], 
-							yAxis : {name : '员工折扣金额', data : [],
-							dataLabels: {
-				                enabled: true,
-				                color: 'green',
-				                align: 'center',
-				                style: {
-				                    fontSize: '13px',
-				                    fontFamily: 'Verdana, sans-serif',
-				                    fontWeight : 'bold'
-				                },
-				                format: '{point.y} 元'
-				            }}, 
-							yAxisAmount : {name : '员工折扣数量', data : [],
-							dataLabels: {
-				                enabled: true,
-				                color: 'green',
-				                align: 'center',
-				                style: {
-				                    fontSize: '13px',
-				                    fontFamily: 'Verdana, sans-serif',
-				                    fontWeight : 'bold'
-				                },
-				                format: '{point.y} 份'
-				            }}}};
-var discount_deptChartData = {chartData : {type : 'pie', name : '比例', data : []}, 
-							chartAmountData : {type : 'pie', name : '比例', data : []},
-							deptColumnChart : {xAxis : [], 
-							yAxis : {name : '部门折扣金额', data : [],
-							dataLabels: {
-				                enabled: true,
-				                color: 'green',
-				                align: 'center',
-				                style: {
-				                    fontSize: '13px',
-				                    fontFamily: 'Verdana, sans-serif',
-				                    fontWeight : 'bold'
-				                },
-				                format: '{point.y} 元'
-				            }}, 
-							yAxisAmount : {name : '部门折扣数量', data : [],
-							dataLabels: {
-				                enabled: true,
-				                color: 'green',
-				                align: 'center',
-				                style: {
-				                    fontSize: '13px',
-				                    fontFamily: 'Verdana, sans-serif',
-				                    fontWeight : 'bold'
-				                },
-				                format: '{point.y} 份'
-				            }}}};
+var discount_staffChartData = Wireless.chart.initChartData({priceName:'员工折扣金额', countName:'员工折扣数量'});
+var discount_deptChartData = Wireless.chart.initChartData({priceName:'部门折扣金额', countName:'部门折扣数量'});
 				            
 var discount_chartLoadMarsk, discount_dateCombo ;
 Ext.onReady(function(){
@@ -741,35 +528,16 @@ Ext.onReady(function(){
 			show : function(thiz){
 				//thiz.getEl(): 刚打开页面时thiz.getWidth无效
 				if(discount_detailChart && typeof thiz.getEl() != 'undefined'){
-					discount_detailChart.setSize(thiz.getWidth(), discount_panelDrag ? discountStatChartTabPanel.getHeight() - 245 : discountStatChartTabPanel.getHeight()-30);
+					discount_detailChart.setSize(thiz.getWidth(), discount_panelDrag ? discountStatChartTabPanel.getHeight() - 170 : discountStatChartTabPanel.getHeight()-30);
 				}
 			}
 		}		
 	});
 	
 	discountStaffChartPanel = new Ext.Panel({
-		title : '员工折扣',
+		title : '按员工汇总',
 		contentEl : 'divDiscountStaffCharts',
 		listeners : {
-			show : function(thiz){
-				if($('#divDiscountStaffColumnChart').is(":visible")){
-					discount_staffChart.setSize(thiz.getWidth(), discount_panelDrag ? discountStatChartTabPanel.getHeight() - 245 : discountStatChartTabPanel.getHeight()-30);
-				}else if($('#divDiscountAmountStaffChart').is(":visible")){
-					discount_staffChart.setSize(discountStatChartTabPanel.getWidth()/2, discount_panelDrag ? discountStatChartTabPanel.getHeight() - 245 : discountStatChartTabPanel.getHeight()-30);
-					discount_staffChart_amount.setSize(discountStatChartTabPanel.getWidth()/2, discount_panelDrag ? discountStatChartTabPanel.getHeight() - 245 : discountStatChartTabPanel.getHeight()-30);				
-				}else{
-					$('#divDiscountStaffChartChange').show();
-					$('#divDiscountAmountStaffChart').show();
-					$('#divDiscountPriceStaffChart').show();
-				}
-				if(!discount_staffChart){
-					discount_getStaffChartData();
-					discount_loadStaffChart();
-					discount_loadAmountStaffChart();
-					discount_staffChart.setSize(discountStatChartTabPanel.getWidth()/2, discount_panelDrag ? discountStatChartTabPanel.getHeight() - 245 : discountStatChartTabPanel.getHeight()-30);
-					discount_staffChart_amount.setSize(discountStatChartTabPanel.getWidth()/2, discount_panelDrag ? discountStatChartTabPanel.getHeight() - 245 : discountStatChartTabPanel.getHeight()-30);
-				}
-			},
 			render : function(thiz){
 				thiz.hasRender = true;
 			}
@@ -777,28 +545,9 @@ Ext.onReady(function(){
 	});	
 	
 	discountDeptChartPanel = new Ext.Panel({
-		title : '部门折扣',
+		title : '按部门汇总',
 		contentEl : 'divDiscountDeptCharts',
 		listeners : {
-			show : function(thiz){
-				if($('#divDiscountDeptColumnChart').is(":visible")){
-					discount_deptChart.setSize(thiz.getWidth(), discount_panelDrag ? discountStatChartTabPanel.getHeight() - 245 : discountStatChartTabPanel.getHeight()-30);
-				}else if($('#divDiscountAmountDeptChart').is(":visible")){
-					discount_deptChart.setSize(discountStatChartTabPanel.getWidth()/2, discount_panelDrag ? discountStatChartTabPanel.getHeight() - 245 : discountStatChartTabPanel.getHeight()-30);
-					discount_deptChart_amount.setSize(discountStatChartTabPanel.getWidth()/2, discount_panelDrag ? discountStatChartTabPanel.getHeight() - 245 : discountStatChartTabPanel.getHeight()-30);				
-				}else{
-					$('#divDiscountDeptChartChange').show();
-					$('#divDiscountAmountDeptChart').show();
-					$('#divDiscountPriceDeptChart').show();
-				}
-				if(!discount_deptChart){
-					discount_getDeptChartData();
-					discount_loadDeptChart();
-					discount_loadAmountDeptChart();
-					discount_deptChart.setSize(discountStatChartTabPanel.getWidth()/2, discount_panelDrag ? discountStatChartTabPanel.getHeight() - 245 : discountStatChartTabPanel.getHeight()-30);
-					discount_deptChart_amount.setSize(discountStatChartTabPanel.getWidth()/2, discount_panelDrag ? discountStatChartTabPanel.getHeight() - 245 : discountStatChartTabPanel.getHeight()-30);
-				}
-			},
 			render : function(thiz){
 				thiz.hasRender = true;
 			}
@@ -817,6 +566,53 @@ Ext.onReady(function(){
 			}
 		}
 	});
+
+	discountStaffChartPanel.addListener('show', function(){
+		var charts = Wireless.chart.initChartPanel({
+			divLeftShowChart : 'divDiscountStaffPieChart',
+			divRightShowChart : 'divDiscountStaffColumnChart',
+			generalName : 'discountStaff_',
+			getChartData : discount_getStaffChartData,
+			leftChartLoad : discount_loadStaffPieChart,
+			rightChartLoad : discount_loadStaffColumnChart,
+			panelDrag : true,
+			leftChart : discount_staffPieChart,
+			rightChart : discount_staffColumnChart,
+			loadType : 1,
+			tabPanel : discountStatChartTabPanel,
+			cutAfterDrag : discount_cutAfterDrag,
+			cutBeforeDrag : discount_cutBeforeDrag		
+			
+		});	
+		discount_staffPieChart = charts.pie;
+		discount_staffColumnChart = charts.column;
+		
+		charts = null;
+	});	
+	
+	discountDeptChartPanel.addListener('show', function(){
+		var charts = Wireless.chart.initChartPanel({
+			divLeftShowChart : 'divDiscountDeptPieChart',
+			divRightShowChart : 'divDiscountDeptColumnChart',
+			generalName : 'discountDept_',
+			getChartData : discount_getDeptChartData,
+			leftChartLoad : discount_loadDeptPieChart,
+			rightChartLoad : discount_loadDeptColumnChart,
+			panelDrag : true,
+			leftChart : discount_deptPieChart,
+			rightChart : discount_deptColumnChart,
+			loadType : 1,
+			tabPanel : discountStatChartTabPanel,
+			cutAfterDrag : discount_cutAfterDrag,
+			cutBeforeDrag : discount_cutBeforeDrag		
+			
+		});	
+		discount_deptPieChart = charts.pie;
+		discount_deptColumnChart = charts.column;
+		
+		charts = null;
+		
+	});		
 	
 	new Ext.Panel({
 		renderTo : 'divDiscountStatistics',//渲染到
@@ -848,48 +644,6 @@ Ext.onReady(function(){
         }
     });
     discount_rz.on('resize', discountDetailsStatPanel.syncSize, discountDetailsStatPanel);//注册事件(作用:将调好的大小传个scope执行)
-	
-	
-	$('#divDiscountStaffChartChange').toggle(
-		function(){
-			$('#divDiscountAmountStaffChart').hide();
-			$('#divDiscountPriceStaffChart').hide();
-			
-			$('#divDiscountStaffColumnChart').show();
-			discount_loadStaffColumnChart();
-			discount_staffChart.setSize(discountStatChartTabPanel.getWidth(), discount_panelDrag ? discountStatChartTabPanel.getHeight() - 245 : discountStatChartTabPanel.getHeight()-30);
-		},
-		function(){
-			$('#divDiscountStaffColumnChart').hide();
-			
-			$('#divDiscountAmountStaffChart').show();
-			$('#divDiscountPriceStaffChart').show();
-			discount_loadStaffChart();
-			discount_loadAmountStaffChart();
-			discount_staffChart.setSize(discountStatChartTabPanel.getWidth()/2, discount_panelDrag ? discountStatChartTabPanel.getHeight() - 245 : discountStatChartTabPanel.getHeight()-30);
-			discount_staffChart_amount.setSize(discountStatChartTabPanel.getWidth()/2, discount_panelDrag ? discountStatChartTabPanel.getHeight() - 245 : discountStatChartTabPanel.getHeight()-30);
-		}		
-	);
-	$('#divDiscountDeptChartChange').toggle(
-		function(){
-			$('#divDiscountAmountDeptChart').hide();
-			$('#divDiscountPriceDeptChart').hide();
-			
-			$('#divDiscountDeptColumnChart').show();
-			discount_loadDeptColumnChart();
-			discount_deptChart.setSize(discountStatChartTabPanel.getWidth(), discount_panelDrag ? discountStatChartTabPanel.getHeight() - 245 : discountStatChartTabPanel.getHeight()-30);
-		},
-		function(){
-			$('#divDiscountDeptColumnChart').hide();
-			
-			$('#divDiscountAmountDeptChart').show();
-			$('#divDiscountPriceDeptChart').show();
-			discount_loadDeptChart();
-			discount_loadAmountDeptChart();
-			discount_deptChart.setSize(discountStatChartTabPanel.getWidth()/2, discount_panelDrag ? discountStatChartTabPanel.getHeight() - 245 : discountStatChartTabPanel.getHeight()-30);
-			discount_deptChart_amount.setSize(discountStatChartTabPanel.getWidth()/2, discount_panelDrag ? discountStatChartTabPanel.getHeight() - 245 : discountStatChartTabPanel.getHeight()-30);
-		}		
-	);	
 	
 	discount_chartLoadMarsk = new Ext.LoadMask(discountStatChartTabPanel.getEl().dom, {
 	    msg  : '数据统计中，请稍候......',

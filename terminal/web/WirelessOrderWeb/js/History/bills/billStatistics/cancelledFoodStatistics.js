@@ -306,43 +306,28 @@ function cancelFoodDetailsStatPanelInit(){
 				});
 				
 				//is(":visible"):第一次切换tab才去生成chart
-				if(typeof reasonChart != 'undefined' && typeof cancelledReasonChartPanel.hasRender != 'undefined'){
-					getRaasonChartData();
-					if($('#divCancelledReasonColumnChart').is(':visible')){
-						loadReasonColumnChart();
-						reasonColumnChart.setSize(cancelFoodStatChartTabPanel.getWidth(), cancel_panelDrag ? cancelFoodStatChartTabPanel.getHeight() - 60 : cancelFoodStatChartTabPanel.getHeight()-30);
-					}else{
-						loadReasonChart();
-						loadPriceReasonChart();
-						reasonChart.setSize(cancelFoodStatChartTabPanel.getWidth()/2, cancel_panelDrag ? cancelFoodStatChartTabPanel.getHeight() - 60 : cancelFoodStatChartTabPanel.getHeight()-30);
-						reasonChart_price.setSize(cancelFoodStatChartTabPanel.getWidth()/2, cancel_panelDrag ? cancelFoodStatChartTabPanel.getHeight() - 60 : cancelFoodStatChartTabPanel.getHeight()-30);							
-					}
+				if(typeof cancel_reasonPieChart != 'undefined' && typeof cancelledReasonChartPanel.hasRender != 'undefined'){
+					cancel_getRaasonChartData();
+					cancel_reasonPieChart = cancel_loadReasonPieChart(cancelFoodDetailsStatPanel.otype);
+					cancel_reasonColumnChart = cancel_loadReasonColumnChart(cancelFoodDetailsStatPanel.otype);
+					cancel_reasonPieChart.setSize(cancelFoodStatChartTabPanel.getWidth()*0.4, cancel_panelDrag ? cancelFoodStatChartTabPanel.getHeight() - cancel_cutAfterDrag : cancelFoodStatChartTabPanel.getHeight()-cancel_cutChartHeight);
+					cancel_reasonColumnChart.setSize(cancelFoodStatChartTabPanel.getWidth()*0.6, cancel_panelDrag ? cancelFoodStatChartTabPanel.getHeight() - cancel_cutAfterDrag : cancelFoodStatChartTabPanel.getHeight()-cancel_cutChartHeight);
 				}
 				
 				if(typeof cancel_staffChart != 'undefined' && typeof cancelledStaffChartPanel.hasRender != 'undefined'){
 					cancel_getStaffChartData();
-					if($('#divCancelledStaffColumnChart').is(':visible')){
-						cancel_loadStaffColumnChart();
-						cancel_staffColumnChart.setSize(cancelFoodStatChartTabPanel.getWidth(), cancel_panelDrag ? cancelFoodStatChartTabPanel.getHeight() - 60 : cancelFoodStatChartTabPanel.getHeight()-30);
-					}else{
-						cancel_loadStaffChart();
-						cancel_loadAmountStaffChart();
-						cancel_staffChart.setSize(cancelFoodStatChartTabPanel.getWidth()/2, cancel_panelDrag ? cancelFoodStatChartTabPanel.getHeight() - 60 : cancelFoodStatChartTabPanel.getHeight()-30);
-						cancel_staffChart_amount.setSize(cancelFoodStatChartTabPanel.getWidth()/2, cancel_panelDrag ? cancelFoodStatChartTabPanel.getHeight() - 60 : cancelFoodStatChartTabPanel.getHeight()-30);
-					}
+					cancel_staffPieChart = cancel_loadStaffPieChart(cancelFoodDetailsStatPanel.otype);
+					cancel_staffColumnChart = cancel_loadStaffColumnChart(cancelFoodDetailsStatPanel.otype);
+					cancel_staffPieChart.setSize(cancelFoodStatChartTabPanel.getWidth()*0.4, cancel_panelDrag ? cancelFoodStatChartTabPanel.getHeight() - cancel_cutAfterDrag : cancelFoodStatChartTabPanel.getHeight()-cancel_cutChartHeight);
+					cancel_staffColumnChart.setSize(cancelFoodStatChartTabPanel.getWidth()*0.6, cancel_panelDrag ? cancelFoodStatChartTabPanel.getHeight() - cancel_cutAfterDrag : cancelFoodStatChartTabPanel.getHeight()-cancel_cutChartHeight);
 				}
 				
 				if(typeof cancel_deptChart != 'undefined' && typeof cancelledDeptChartPanel.hasRender != 'undefined'){
 					cancel_getDeptChartData();
-					if($('#divCancelledDeptColumnChart').is(':visible')){
-						cancel_loadDeptColumnChart();
-						cancel_deptChart.setSize(cancelFoodStatChartTabPanel.getWidth(), cancel_panelDrag ? cancelFoodStatChartTabPanel.getHeight() - 60 : cancelFoodStatChartTabPanel.getHeight()-30);
-					}else{
-						cancel_loadDeptChart();
-						cancel_loadAmountDeptChart();
-						cancel_deptChart.setSize(cancelFoodStatChartTabPanel.getWidth()/2, cancel_panelDrag ? cancelFoodStatChartTabPanel.getHeight() - 60 : cancelFoodStatChartTabPanel.getHeight()-30);
-						cancel_deptChart_amount.setSize(cancelFoodStatChartTabPanel.getWidth()/2, cancel_panelDrag ? cancelFoodStatChartTabPanel.getHeight() - 60 : cancelFoodStatChartTabPanel.getHeight()-30);						
-					} 
+					cancel_deptPieChart = cancel_loadDeptPieChart(v);
+					cancel_deptColumnChart = cancel_loadDeptColumnChart(v);
+					cancel_deptPieChart.setSize(cancelFoodStatChartTabPanel.getWidth()*0.4, cancel_panelDrag ? cancelFoodStatChartTabPanel.getHeight() - cancel_cutAfterDrag : cancelFoodStatChartTabPanel.getHeight()-cancel_cutChartHeight);
+					cancel_deptColumnChart.setSize(cancelFoodStatChartTabPanel.getWidth()*0.6, cancel_panelDrag ? cancelFoodStatChartTabPanel.getHeight() - cancel_cutAfterDrag : cancelFoodStatChartTabPanel.getHeight()-cancel_cutChartHeight);
 					
 				}
 			}
@@ -441,7 +426,7 @@ function cancelFoodDetailsStatPanelInit(){
 					
 					cancelFoodStatChartTabPanel.getEl().setTop((h+30)) ;
 					
-					cancel_changeChartWidth(w,chartHeight-60);
+					cancel_changeChartWidth(w,chartHeight-cancel_cutAfterDrag);
 					
 					if(cancel_panelDrag){
 						cancelFoodStatChartTabPanel.setHeight(chartHeight);
@@ -454,17 +439,17 @@ function cancelFoodDetailsStatPanelInit(){
 }
 
 function cancel_changeChartWidth(w,h){
-	if(eval($('div:visible[data-type=chart]').attr('data-value'))){
-		if($('div:visible[data-type=chart]').length == 1){
-			eval($('div:visible[data-type=chart]').attr('data-value')).setSize(w, h);
-		}else if($('div:visible[data-type=chart]').length > 1){
-			eval($($('div:visible[data-type=chart]')[0]).attr('data-value')).setSize(w/2, h);
-			eval($($('div:visible[data-type=chart]')[1]).attr('data-value')).setSize(w/2, h);				
+	if(eval($('div:visible[data-type=cancelChart]').attr('data-value'))){
+		if($('div:visible[data-type=cancelChart]').length == 1){
+			eval($('div:visible[data-type=cancelChart]').attr('data-value')).setSize(w, h);
+		}else if($('div:visible[data-type=cancelChart]').length > 1){
+			eval($($('div:visible[data-type=cancelChart]')[0]).attr('data-value')).setSize(w*0.4, h);
+			eval($($('div:visible[data-type=cancelChart]')[1]).attr('data-value')).setSize(w*0.6, h);				
 		}
 	}
 }
 
-function getRaasonChartData(){
+var cancel_getRaasonChartData = function(){
 	cancel_requestParams.dataSource = 'getReasonChart';
 	$.ajax({
 		url : '../../QueryCancelledFood.do',
@@ -472,17 +457,15 @@ function getRaasonChartData(){
 		async : false,
 		data : cancel_requestParams,
 		success : function(jr, status, xhr){
-			reasonChartData.chartData.data = [];
-			reasonChartData.chartData1.data = [];
-			reasonChartData.reasonColumnChart.xAxis = [];
-			reasonChartData.reasonColumnChart.yAxis.data = [];
-			reasonChartData.reasonColumnChart.yAxis1.data = [];
+			resetChartDate(reasonChartData);
 			for (var i = 0; i < jr.root.length; i++) {
-				reasonChartData.chartData.data.push([jr.root[i].reason, jr.root[i].cancelAmount]);
-				reasonChartData.chartData1.data.push([jr.root[i].reason, jr.root[i].cancelPrice]);
-				reasonChartData.reasonColumnChart.xAxis.push(jr.root[i].reason);
-				reasonChartData.reasonColumnChart.yAxis.data.push({y : jr.root[i].cancelAmount, color : colors[i]});
-				reasonChartData.reasonColumnChart.yAxis1.data.push({y : jr.root[i].cancelPrice, color : colors[i]});
+				if(jr.root[i].cancelAmount != 0)
+					reasonChartData.chartPriceData.data.push([jr.root[i].reason, jr.root[i].cancelAmount]);
+				if(jr.root[i].cancelPrice != 0)	
+					reasonChartData.chartAmountData.data.push([jr.root[i].reason, jr.root[i].cancelPrice]);
+				reasonChartData.priceColumnChart.xAxis.push(jr.root[i].reason);
+				reasonChartData.amountColumnChart.yAxis.data.push({y : jr.root[i].cancelAmount, color : colors[i]});
+				reasonChartData.priceColumnChart.yAxis.data.push({y : jr.root[i].cancelPrice, color : colors[i]});
 				
 			}
 		},
@@ -490,10 +473,9 @@ function getRaasonChartData(){
 		
 		}
 	});
-	
-}
+};
 
-function cancel_getStaffChartData(){
+var cancel_getStaffChartData = function(){
 	cancel_requestParams.dataSource = 'getStaffChart';
 	$.ajax({
 		url : '../../QueryCancelledFood.do',
@@ -501,28 +483,24 @@ function cancel_getStaffChartData(){
 		async : false,
 		data : cancel_requestParams,
 		success : function(jr, status, xhr){
-			cancel_staffChartData.chartData.data = [];
-			cancel_staffChartData.chartAmountData.data = [];
-			
-			cancel_staffChartData.staffColumnChart.xAxis = [];
-			cancel_staffChartData.staffColumnChart.yAxis.data = [];
-			cancel_staffChartData.staffColumnChart.yAxisAmount.data = [];
+			resetChartDate(cancel_staffChartData);
 			for (var i = 0; i < jr.root.length; i++) {
-				cancel_staffChartData.chartData.data.push([jr.root[i].cancelStaff, jr.root[i].cancelPrice]);
-				cancel_staffChartData.chartAmountData.data.push([jr.root[i].cancelStaff, jr.root[i].cancelAmount]);
-				cancel_staffChartData.staffColumnChart.xAxis.push(jr.root[i].cancelStaff);
-				cancel_staffChartData.staffColumnChart.yAxis.data.push({y : jr.root[i].cancelPrice, color : colors[i]}); 
-				cancel_staffChartData.staffColumnChart.yAxisAmount.data.push({y : jr.root[i].cancelAmount, color : colors[i]});
+				if(jr.root[i].cancelPrice != 0)
+					cancel_staffChartData.chartPriceData.data.push([jr.root[i].cancelStaff, jr.root[i].cancelPrice]);
+				if(jr.root[i].cancelAmount != 0)
+					cancel_staffChartData.chartAmountData.data.push([jr.root[i].cancelStaff, jr.root[i].cancelAmount]);
+				cancel_staffChartData.priceColumnChart.xAxis.push(jr.root[i].cancelStaff);
+				cancel_staffChartData.priceColumnChart.yAxis.data.push({y : jr.root[i].cancelPrice, color : colors[i]}); 
+				cancel_staffChartData.amountColumnChart.yAxis.data.push({y : jr.root[i].cancelAmount, color : colors[i]});
 			}
 		},
 		failure : function(res, opt){
 		
 		}
 	});
-	
-}
+};
 
-function cancel_getDeptChartData(){
+var cancel_getDeptChartData = function(){
 	cancel_requestParams.dataSource = 'getDeptChart';
 	$.ajax({
 		url : '../../QueryCancelledFood.do',
@@ -530,341 +508,85 @@ function cancel_getDeptChartData(){
 		async : false,
 		data : cancel_requestParams,
 		success : function(jr, status, xhr){
-			cancel_deptChartData.chartData.data = [];
-			cancel_deptChartData.chartAmountData.data = [];
-			
-			cancel_deptChartData.deptColumnChart.xAxis = [];
-			cancel_deptChartData.deptColumnChart.yAxis.data = [];
-			cancel_deptChartData.deptColumnChart.yAxisAmount.data = [];
+			resetChartDate(cancel_deptChartData);
 			for (var i = 0; i < jr.root.length; i++) {
-				cancel_deptChartData.chartData.data.push([jr.root[i].cancelDept.name, jr.root[i].cancelPrice]);
-				cancel_deptChartData.chartAmountData.data.push([jr.root[i].cancelDept.name, jr.root[i].cancelAmount]);
+				if(jr.root[i].cancelPrice != 0)
+					cancel_deptChartData.chartPriceData.data.push([jr.root[i].cancelDept.name, jr.root[i].cancelPrice]);
+				if(jr.root[i].cancelAmount != 0)
+					cancel_deptChartData.chartAmountData.data.push([jr.root[i].cancelDept.name, jr.root[i].cancelAmount]);
 				
-				cancel_deptChartData.deptColumnChart.xAxis.push(jr.root[i].cancelDept.name);
-				cancel_deptChartData.deptColumnChart.yAxis.data.push({y : jr.root[i].cancelPrice, color : colors[i]}); 
-				cancel_deptChartData.deptColumnChart.yAxisAmount.data.push({y : jr.root[i].cancelAmount, color : colors[i]});
+				cancel_deptChartData.priceColumnChart.xAxis.push(jr.root[i].cancelDept.name);
+				cancel_deptChartData.priceColumnChart.yAxis.data.push({y : jr.root[i].cancelPrice, color : colors[i]}); 
+				cancel_deptChartData.amountColumnChart.yAxis.data.push({y : jr.root[i].cancelAmount, color : colors[i]});
 			}
 		},
 		failure : function(res, opt){
 		
 		}
 	});
-	
-}
+};
 
-
-function loadReasonColumnChart(){
- 	reasonColumnChart = new Highcharts.Chart({
-        chart: {
-            type: 'column',
-            renderTo : 'divCancelledReasonColumnChart'
-        },
-        title: {
-            text: '退菜原因柱状图'
-        },
-        xAxis: {
-            categories: reasonChartData.reasonColumnChart.xAxis
-        },
-        yAxis: {
-            min: 0,
-            title: {
-                text: '数量 / 金额'
-            }
-        },
-        tooltip: {
-            pointFormat: '<table><tbody><tr><td style="color:red;padding:0">{series.name}: </td><td style="padding:0"><b>{point.y} </b></td></tr></tbody></table>',
-            shared: true,
-            useHTML: true
-        },
-        plotOptions: {
-            column: {
-                pointPadding: 0.2,
-                borderWidth: 0
-            }
-        },
-        series: [reasonChartData.reasonColumnChart.yAxis, reasonChartData.reasonColumnChart.yAxis1],
-        credits : {
-        	enabled : false
-        }
+var cancel_loadReasonColumnChart = function(type){
+	var content = {};
+	content.title = type==1?'退菜原因数量柱状图':'退菜原因金额柱状图';
+	content.unit = type==1?'份':'元';
+	content.series = type==1?reasonChartData.amountColumnChart.yAxis : reasonChartData.priceColumnChart.yAxis;	
+    
+    return newColumnChart({
+    	rt: 'divCancelReasonColumnChart', title : content.title, unit: content.unit, series: content.series, xAxis:reasonChartData.priceColumnChart.xAxis	
     });	
-}
+};
 
-function cancel_loadStaffColumnChart(){
- 	cancel_staffColumnChart = new Highcharts.Chart({
-        chart: {
-            type: 'column',
-            renderTo : 'divCancelledStaffColumnChart'
-        },
-        title: {
-            text: '员工退菜柱状图'
-        },
-        xAxis: {
-            categories: cancel_staffChartData.staffColumnChart.xAxis
-        },
-        yAxis: {
-            min: 0,
-            title: {
-                text: '金额 / 数量'
-            }
-        },
-        tooltip: {
-            pointFormat: '<table><tbody><tr><td style="color:red;padding:0">{series.name}: </td><td style="padding:0"><b>{point.y} </b></td></tr></tbody></table>',
-            shared: true,
-            useHTML: true
-        },
-        plotOptions: {
-            column: {
-                pointPadding: 0.2,
-                borderWidth: 0              
-            }
-        },
-        series: [cancel_staffChartData.staffColumnChart.yAxis, cancel_staffChartData.staffColumnChart.yAxisAmount],
-        credits : {
-        	enabled : false
-        }
+var cancel_loadStaffColumnChart = function(type){
+	
+	var content = {};
+	content.title = type==1?'员工退菜数量柱状图':'员工退菜金额柱状图';
+	content.unit = type==1?'份':'元';
+	content.series = type==1?cancel_staffChartData.amountColumnChart.yAxis : cancel_staffChartData.priceColumnChart.yAxis;	
+    
+    return newColumnChart({
+    	rt: 'divCancelStaffAmountColumnChart', title : content.title, unit: content.unit, series: content.series, xAxis:cancel_staffChartData.priceColumnChart.xAxis	
+    });
+};
+
+var cancel_loadDeptColumnChart = function(type){
+	var content = {};
+	content.title = type==1?'部门退菜数量柱状图':'部门退菜金额柱状图';
+	content.unit = type==1?'份':'元';
+	content.series = type==1?cancel_deptChartData.amountColumnChart.yAxis : cancel_deptChartData.priceColumnChart.yAxis;	
+    
+    return newColumnChart({
+    	rt: 'divCancelDeptColumnChart', title : content.title, unit: content.unit, series: content.series, xAxis:cancel_deptChartData.priceColumnChart.xAxis	
     });	
-}
+};
 
-function cancel_loadDeptColumnChart(){
- 	cancel_deptChart = new Highcharts.Chart({
-        chart: {
-            type: 'column',
-            renderTo : 'divCancelledDeptColumnChart'
-        },
-        title: {
-            text: '部门退菜柱状图'
-        },
-        xAxis: {
-            categories: cancel_deptChartData.deptColumnChart.xAxis
-        },
-        yAxis: {
-            min: 0,
-            title: {
-                text: '金额 / 数量'
-            }
-        },
-        tooltip: {
-            pointFormat: '<table><tbody><tr><td style="color:red;padding:0">{series.name}: </td><td style="padding:0"><b>{point.y} </b></td></tr></tbody></table>',
-            shared: true,
-            useHTML: true
-        },
-        plotOptions: {
-            column: {
-                pointPadding: 0.2,
-                borderWidth: 0
-            }
-        },
-        series: [cancel_deptChartData.deptColumnChart.yAxis, cancel_deptChartData.deptColumnChart.yAxisAmount],
-        credits : {
-        	enabled : false
-        }
-    });	
-}
-
-function loadReasonChart(){
-	reasonChart = new Highcharts.Chart({
-	    chart: {
-	    	renderTo : 'divCancelledCountReasonChart',
-	        plotBackgroundColor: null,
-	        plotBorderWidth: null,
-	        plotShadow: false
-	    },
-	    title: {
-	        text: '原因比例图'
-	    },
-	    credits : {
-	    	enabled : false
-	    },
-	    tooltip: {
-		    pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
-	    },
-	    plotOptions: {
-	        pie: {
-	            allowPointSelect: true,
-	            cursor: 'pointer',
-	            dataLabels: {
-	                enabled: true,
-	                color: '#000000',
-	                connectorColor: '#000000',
-	                format: '<b>{point.name}</b>: {point.y} 份'
-	            }
-	        }
-	    },
-	    series: [reasonChartData.chartData]
-	});				
+var cancel_loadReasonPieChart = function(type){
 	
-}
-
-function loadPriceReasonChart(){
-	reasonChart_price = new Highcharts.Chart({
-	    chart: {
-	    	renderTo : 'divCancelledPriceReasonChart',
-	        plotBackgroundColor: null,
-	        plotBorderWidth: null,
-	        plotShadow: false
-	    },
-	    title: {
-	        text: '原因金额比例图'
-	    },
-	    tooltip: {
-		    pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
-	    },
-	    plotOptions: {
-	        pie: {
-	            allowPointSelect: true,
-	            cursor: 'pointer',
-	            dataLabels: {
-	                enabled: true,
-	                color: '#000000',
-	                connectorColor: '#000000',
-	                format: '<b>{point.name}</b>: {point.y} 元'
-	            }
-	        }
-	    },
-	    series: [reasonChartData.chartData1],
-        credits : {
-        	enabled : false
-        }
-	});				
+	var content = {};
+	content.title = type==1?'退菜原因数量比例图':'退菜原因金额比例图';
+	content.unit = type==1?'份':'元';
+	content.series = type==1?reasonChartData.chartAmountData:reasonChartData.chartPriceData;
 	
-}
+	return newPieChart({rt: 'divCancelReasonPieChart', title : content.title, unit: content.unit, series: content.series});	
+};
 
-function cancel_loadStaffChart(){
+var cancel_loadStaffPieChart = function(type){
+	var content = {};
+	content.title = type==1?'员工退菜数量比例图':'员工退菜金额比例图';
+	content.unit = type==1?'份':'元';
+	content.series = type==1?cancel_staffChartData.chartAmountData:cancel_staffChartData.chartPriceData;
 	
-	cancel_staffChart = new Highcharts.Chart({
-	    chart: {
-	    	renderTo : 'divCancelledPriceStaffChart',
-	        plotBackgroundColor: null,
-	        plotBorderWidth: null,
-	        plotShadow: false
-	    },
-	    title: {
-	        text: '员工退菜金额比例图'
-	    },
-	    tooltip: {
-		    pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
-	    },
-	    plotOptions: {
-	        pie: {
-	            allowPointSelect: true,
-	            cursor: 'pointer',
-	            dataLabels: {
-	                enabled: true,
-	                color: '#000000',
-	                connectorColor: '#000000',
-	                format: '<b>{point.name}</b>: {point.y} 元'
-	            }
-	        }
-	    },
-	    series: [cancel_staffChartData.chartData],
-        credits : {
-        	enabled : false
-        }
-	});				
-}
+	return newPieChart({rt: 'divCancelStaffAmountPieChart', title : content.title, unit: content.unit, series: content.series});	
+};
 
-
-function cancel_loadAmountStaffChart(){
+var cancel_loadDeptPieChart = function(type){
+	var content = {};
+	content.title = type==1?'部门退菜数量比例图':'部门退菜金额比例图';
+	content.unit = type==1?'份':'元';
+	content.series = type==1?cancel_deptChartData.chartAmountData:cancel_deptChartData.chartPriceData;
 	
-	cancel_staffChart_amount = new Highcharts.Chart({
-	    chart: {
-	    	renderTo : 'divCancelledCountStaffChart',
-	        plotBackgroundColor: null,
-	        plotBorderWidth: null,
-	        plotShadow: false
-	    },
-	    title: {
-	        text: '员工退菜数量比例图'
-	    },
-	    tooltip: {
-		    pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
-	    },
-	    plotOptions: {
-	        pie: {
-	            allowPointSelect: true,
-	            cursor: 'pointer',
-	            dataLabels: {
-	                enabled: true,
-	                color: '#000000',
-	                connectorColor: '#000000',
-	                format: '<b>{point.name}</b>: {point.y} 份'
-	            }
-	        }
-	    },
-	    series: [cancel_staffChartData.chartAmountData],
-        credits : {
-        	enabled : false
-        }
-	});				
-}
-
-function cancel_loadDeptChart(){
-	cancel_deptChart = new Highcharts.Chart({
-
-	    chart: {
-	    	renderTo : 'divCancelledCountDeptChart',
-	        plotBackgroundColor: null,
-	        plotBorderWidth: null,
-	        plotShadow: false
-	    },
-	    title: {
-	        text: '部门退菜金额比例图'
-	    },
-	    tooltip: {
-		    pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
-	    },
-	    plotOptions: {
-	        pie: {
-	            allowPointSelect: true,
-	            cursor: 'pointer',
-	            dataLabels: {
-	                enabled: true,
-	                color: '#000000',
-	                connectorColor: '#000000',
-	                format: '<b>{point.name}</b>: {point.y} 元'
-	            }
-	        }
-	    },
-	    series: [cancel_deptChartData.chartData],
-        credits : {
-        	enabled : false
-        }
-	});				
-}
-
-function cancel_loadAmountDeptChart(){
-	cancel_deptChart_amount = new Highcharts.Chart({
-
-	    chart: {
-	    	renderTo : 'divCancelledPriceDeptChart',
-	        plotBackgroundColor: null,
-	        plotBorderWidth: null,
-	        plotShadow: false
-	    },
-	    title: {
-	        text: '部门退菜数量比例图'
-	    },
-	    tooltip: {
-		    pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
-	    },
-	    plotOptions: {
-	        pie: {
-	            allowPointSelect: true,
-	            cursor: 'pointer',
-	            dataLabels: {
-	                enabled: true,
-	                color: '#000000',
-	                connectorColor: '#000000',
-	                format: '<b>{point.name}</b>: {point.y} 份'
-	            }
-	        }
-	    },
-	    series: [cancel_deptChartData.chartAmountData],
-        credits : {
-        	enabled : false
-        }
-	});				
-}
+	return newPieChart({rt: 'divCancelDeptPieChart', title : content.title, unit: content.unit, series: content.series});
+};
 
 function showCancelDetailChart(jdata){
 	var dateBegin = Ext.getCmp('cancel_dateSearchDateBegin').getValue().format('Y-m-d');
@@ -943,6 +665,36 @@ function showCancelDetailChart(jdata){
 	}
 }
 
+function cancel_fnChangeReasonChart(thiz, v){
+	$(thiz).find('input').attr('checked', 'checked');
+	
+	cancel_reasonPieChart = cancel_loadReasonPieChart(v);
+	cancel_reasonColumnChart = cancel_loadReasonColumnChart(v);
+	cancel_reasonPieChart.setSize(cancelFoodStatChartTabPanel.getWidth()*0.4, cancel_panelDrag ? cancelFoodStatChartTabPanel.getHeight() - cancel_cutAfterDrag : cancelFoodStatChartTabPanel.getHeight()-cancel_cutChartHeight);
+	cancel_reasonColumnChart.setSize(cancelFoodStatChartTabPanel.getWidth()*0.6, cancel_panelDrag ? cancelFoodStatChartTabPanel.getHeight() - cancel_cutAfterDrag : cancelFoodStatChartTabPanel.getHeight()-cancel_cutChartHeight);
+	
+	cancelFoodDetailsStatPanel.otype = v;
+}
+
+function cancel_fnChangeDeptChart(thiz, v){
+	$(thiz).find('input').attr('checked', 'checked');
+	cancel_deptPieChart = cancel_loadDeptPieChart(v);
+	cancel_deptColumnChart = cancel_loadDeptColumnChart(v);
+	cancel_deptPieChart.setSize(cancelFoodStatChartTabPanel.getWidth()*0.4, cancel_panelDrag ? cancelFoodStatChartTabPanel.getHeight() - cancel_cutAfterDrag : cancelFoodStatChartTabPanel.getHeight()-cancel_cutChartHeight);
+	cancel_deptColumnChart.setSize(cancelFoodStatChartTabPanel.getWidth()*0.6, cancel_panelDrag ? cancelFoodStatChartTabPanel.getHeight() - cancel_cutAfterDrag : cancelFoodStatChartTabPanel.getHeight()-cancel_cutChartHeight);
+	
+	cancelFoodDetailsStatPanel.otype = v;
+}
+function cancel_fnChangeStaffChart(thiz, v){
+	$(thiz).find('input').attr('checked', 'checked');
+	cancel_staffPieChart = cancel_loadStaffPieChart(v);
+	cancel_staffColumnChart = cancel_loadStaffColumnChart(v);
+	cancel_staffPieChart.setSize(cancelFoodStatChartTabPanel.getWidth()*0.4, cancel_panelDrag ? cancelFoodStatChartTabPanel.getHeight() - cancel_cutAfterDrag : cancelFoodStatChartTabPanel.getHeight()-cancel_cutChartHeight);
+	cancel_staffColumnChart.setSize(cancelFoodStatChartTabPanel.getWidth()*0.6, cancel_panelDrag ? cancelFoodStatChartTabPanel.getHeight() - cancel_cutAfterDrag : cancelFoodStatChartTabPanel.getHeight()-cancel_cutChartHeight);
+	
+	cancelFoodDetailsStatPanel.otype = v;
+}
+
 var cancel_setStatisticsDate = function(){
 	if(sendToPageOperation){
 		Ext.getCmp('cancel_dateSearchDateBegin').setValue(sendToStatisticsPageBeginDate);
@@ -951,95 +703,14 @@ var cancel_setStatisticsDate = function(){
 		sendToPageOperation = false;
 	}
 };
-
+var cancel_cutAfterDrag=70, cancel_cutBeforeDrag=40;
 var cancel_requestParams, cancel_panelDrag=false, cancelPanelHeight, cancelTabPanelHeight;
-var cancelFoodStatChartTabPanel, reasonChart, cancel_detailChart, cancel_staffChart, cancel_staffChart_amount, cancel_staffColumnChart, cancel_deptChart, reasonChart_price, reasonColumnChart, cancel_deptChart_amount;
-var cancelledDetailChartPanel, cancelledReasonChartPanel, cancelledStaffChartPanel, cancelledDeptChartPanel;
+var cancel_detailChart, cancel_staffPieChart, cancel_staffColumnChart, cancel_deptPieChart, cancel_deptColumnChart, cancel_reasonPieChart, cancel_reasonColumnChart;
+var cancelledDetailChartPanel, cancelledReasonChartPanel, cancelledStaffChartPanel, cancelledDeptChartPanel, cancelFoodStatChartTabPanel;
 var colors = Highcharts.getOptions().colors;
-var reasonChartData = {chartData : {type : 'pie', name : '比例', data : []}, 
-					chartData1 : {type : 'pie', name : '比例', data : []},
-					reasonColumnChart : {xAxis : [], 
-						yAxis : {name : '退菜原因数量', 
-						data : [],
-						dataLabels: {
-			                enabled: true,
-			                color: 'green',
-			                align: 'center',
-			                style: {
-			                    fontSize: '13px',
-			                    fontFamily: 'Verdana, sans-serif',
-			                    fontWeight : 'bold'
-			                },
-			                format: '{point.y} 份'
-			            }},
-			            yAxis1 : {name : '退菜原因金额', 
-						data : [],
-						dataLabels: {
-			                enabled: true,
-			                color: 'green',
-			                align: 'center',
-			                style: {
-			                    fontSize: '13px',
-			                    fontFamily: 'Verdana, sans-serif',
-			                    fontWeight : 'bold'
-			                },
-			                format: '{point.y} 元'
-			            }}
-			            }};
-var cancel_staffChartData = {chartData : {type : 'pie', name : '比例', data : []},
-							chartAmountData : {type : 'pie', name : '比例', data : []},
-							staffColumnChart : {xAxis : [], 
-							yAxis : {name : '员工退菜金额', data : [],
-							dataLabels: {
-				                enabled: true,
-				                color: 'green',
-				                align: 'center',
-				                style: {
-				                    fontSize: '13px',
-				                    fontFamily: 'Verdana, sans-serif',
-				                    fontWeight : 'bold'
-				                },
-				                format: '{point.y} 元'
-				            }},
-				            yAxisAmount : {name : '员工退菜数量', data : [],
-							dataLabels: {
-				                enabled: true,
-				                color: 'green',
-				                align: 'center',
-				                style: {
-				                    fontSize: '13px',
-				                    fontFamily: 'Verdana, sans-serif',
-				                    fontWeight : 'bold'
-				                },
-				                format: '{point.y} 份'
-				            }}}};
-var cancel_deptChartData = {chartData : {type : 'pie', name : '比例', data : []}, 
-							chartAmountData : {type : 'pie', name : '比例', data : []},
-							deptColumnChart : {xAxis : [], 
-							yAxis : {name : '部门退菜金额', data : [],
-							dataLabels: {
-				                enabled: true,
-				                color: 'green',
-				                align: 'center',
-				                style: {
-				                    fontSize: '13px',
-				                    fontFamily: 'Verdana, sans-serif',
-				                    fontWeight : 'bold'
-				                },
-				                format: '{point.y} 元'
-				            }},
-				            yAxisAmount : {name : '部门退菜数量', data : [],
-							dataLabels: {
-				                enabled: true,
-				                color: 'green',
-				                align: 'center',
-				                style: {
-				                    fontSize: '13px',
-				                    fontFamily: 'Verdana, sans-serif',
-				                    fontWeight : 'bold'
-				                },
-				                format: '{point.y} 份'
-				            }}}};
+var reasonChartData = Wireless.chart.initChartData({priceName:'退菜原因金额', countName:'退菜原因数量'});
+var cancel_staffChartData = Wireless.chart.initChartData({priceName:'员工退菜金额', countName:'员工退菜数量'});
+var cancel_deptChartData = Wireless.chart.initChartData({priceName:'部门退菜金额', countName:'部门退菜数量'});
 				            
 var titleCancelStaffName, titleCancelDeptName;		
 
@@ -1055,37 +726,17 @@ Ext.onReady(function(){
 			show : function(thiz){
 				//thiz.getEl(): 刚打开页面时thiz.getWidth无效
 				if(cancel_detailChart && typeof thiz.getEl() != 'undefined'){
-					cancel_detailChart.setSize(thiz.getWidth(), cancel_panelDrag ? cancelFoodStatChartTabPanel.getHeight() - 60 : cancelFoodStatChartTabPanel.getHeight()-30);
+					cancel_detailChart.setSize(thiz.getWidth(), cancel_panelDrag ? cancelFoodStatChartTabPanel.getHeight() - (cancel_cutAfterDrag-20) : cancelFoodStatChartTabPanel.getHeight()-30);
 				}
 			}
 		}		
 	});
 	
 	cancelledReasonChartPanel = new Ext.Panel({
-		title : '原因汇总',
+		title : '按原因汇总',
 		contentEl : 'divCancelledReasonCharts',
 		height : 320,
 		listeners : {
-			show : function(thiz){
-				if($('#divCancelledReasonColumnChart').is(":visible")){
-					reasonChart.setSize(thiz.getWidth(), cancel_panelDrag ? cancelFoodStatChartTabPanel.getHeight() - 60 : cancelFoodStatChartTabPanel.getHeight()-30);
-				}else if($('#divCancelledPriceReasonChart').is(":visible")){
-					reasonChart.setSize(cancelFoodStatChartTabPanel.getWidth()/2, cancel_panelDrag ? cancelFoodStatChartTabPanel.getHeight() - 60 : cancelFoodStatChartTabPanel.getHeight()-30);
-					reasonChart_price.setSize(cancelFoodStatChartTabPanel.getWidth()/2, cancel_panelDrag ? cancelFoodStatChartTabPanel.getHeight() - 60 : cancelFoodStatChartTabPanel.getHeight()-30);
-				}else{
-					$('#divCancelledReasonChartChange').show();
-					$('#divCancelledCountReasonChart').show();
-					$('#divCancelledPriceReasonChart').show();
-				}
-				if(!reasonChart){
-					getRaasonChartData();
-					loadReasonChart();
-					loadPriceReasonChart();
-					//第一次加载时thiz.El()未渲染
-					reasonChart.setSize(cancelFoodStatChartTabPanel.getWidth()/2, cancel_panelDrag ? cancelFoodStatChartTabPanel.getHeight() - 60 : cancelFoodStatChartTabPanel.getHeight()-30);
-					reasonChart_price.setSize(cancelFoodStatChartTabPanel.getWidth()/2, cancel_panelDrag ? cancelFoodStatChartTabPanel.getHeight() - 60 : cancelFoodStatChartTabPanel.getHeight()-30);
-				}
-			},
 			render : function(thiz){
 				thiz.hasRender = true;
 			}
@@ -1093,28 +744,9 @@ Ext.onReady(function(){
 	});
 	
 	cancelledStaffChartPanel = new Ext.Panel({
-		title : '员工退菜',
+		title : '按员工汇总',
 		contentEl : 'divCancelledStaffCharts',
 		listeners : {
-			show : function(thiz){
-				if($('#divCancelledStaffColumnChart').is(":visible")){
-					cancel_staffColumnChart.setSize(thiz.getWidth(), cancel_panelDrag ? cancelFoodStatChartTabPanel.getHeight() - 60 : cancelFoodStatChartTabPanel.getHeight()-30);
-				}else if($('#divCancelledPriceStaffChart').is(":visible")){
-					cancel_staffChart.setSize(cancelFoodStatChartTabPanel.getWidth()/2, cancel_panelDrag ? cancelFoodStatChartTabPanel.getHeight() - 60 : cancelFoodStatChartTabPanel.getHeight()-30);
-					cancel_staffChart_amount.setSize(cancelFoodStatChartTabPanel.getWidth()/2, cancel_panelDrag ? cancelFoodStatChartTabPanel.getHeight() - 60 : cancelFoodStatChartTabPanel.getHeight()-30);					
-				}else{
-					$('#divCancelledStaffChartChange').show();
-					$('#divCancelledPriceStaffChart').show();
-					$('#divCancelledCountStaffChart').show();
-				}
-				if(!cancel_staffChart){
-					cancel_getStaffChartData();
-					cancel_loadStaffChart();
-					cancel_loadAmountStaffChart();
-					cancel_staffChart.setSize(cancelFoodStatChartTabPanel.getWidth()/2, cancel_panelDrag ? cancelFoodStatChartTabPanel.getHeight() - 60 : cancelFoodStatChartTabPanel.getHeight()-30);
-					cancel_staffChart_amount.setSize(cancelFoodStatChartTabPanel.getWidth()/2, cancel_panelDrag ? cancelFoodStatChartTabPanel.getHeight() - 60 : cancelFoodStatChartTabPanel.getHeight()-30);
-				}
-			},
 			render : function(thiz){
 				thiz.hasRender = true;
 			}
@@ -1122,28 +754,9 @@ Ext.onReady(function(){
 	});	
 	
 	cancelledDeptChartPanel = new Ext.Panel({
-		title : '部门退菜',
+		title : '按部门汇总',
 		contentEl : 'divCancelledDeptCharts',
 		listeners : {
-			show : function(thiz){
-				if($('#divCancelledDeptColumnChart').is(":visible")){
-					cancel_deptChart.setSize(thiz.getWidth(), cancel_panelDrag ? cancelFoodStatChartTabPanel.getHeight() - 60 : cancelFoodStatChartTabPanel.getHeight()-30);
-				}else if($('#divCancelledPriceDeptChart').is(":visible")){
-					cancel_deptChart.setSize(cancelFoodStatChartTabPanel.getWidth()/2, cancel_panelDrag ? cancelFoodStatChartTabPanel.getHeight() - 60 : cancelFoodStatChartTabPanel.getHeight()-30);
-					cancel_deptChart_amount.setSize(cancelFoodStatChartTabPanel.getWidth()/2, cancel_panelDrag ? cancelFoodStatChartTabPanel.getHeight() - 60 : cancelFoodStatChartTabPanel.getHeight()-30);				
-				}else{
-					$('#divCancelledDeptChartChange').show();
-					$('#divCancelledCountDeptChart').show();
-					$('#divCancelledPriceDeptChart').show();
-				}
-				if(!cancel_deptChart){
-					cancel_getDeptChartData();
-					cancel_loadDeptChart();
-					cancel_loadAmountDeptChart();
-					cancel_deptChart.setSize(cancelFoodStatChartTabPanel.getWidth()/2, cancel_panelDrag ? cancelFoodStatChartTabPanel.getHeight() - 60 : cancelFoodStatChartTabPanel.getHeight()-30);
-					cancel_deptChart_amount.setSize(cancelFoodStatChartTabPanel.getWidth()/2, cancel_panelDrag ? cancelFoodStatChartTabPanel.getHeight() - 60 : cancelFoodStatChartTabPanel.getHeight()-30);
-				}
-			},
 			render : function(thiz){
 				thiz.hasRender = true;
 			}
@@ -1161,7 +774,75 @@ Ext.onReady(function(){
 		}
 	});
 	
+	cancelledReasonChartPanel.addListener('show', function(){
+		var charts = Wireless.chart.initChartPanel({
+			divLeftShowChart : 'divCancelReasonPieChart',
+			divRightShowChart : 'divCancelReasonColumnChart',
+			generalName : 'cancelReason_',
+			getChartData : cancel_getRaasonChartData,
+			leftChartLoad : cancel_loadReasonPieChart,
+			rightChartLoad : cancel_loadReasonColumnChart,
+			panelDrag : true,
+			leftChart : cancel_reasonPieChart,
+			rightChart : cancel_reasonColumnChart,
+			loadType : 0,
+			tabPanel : cancelFoodStatChartTabPanel,
+			cutAfterDrag : cancel_cutAfterDrag,
+			cutBeforeDrag : cancel_cutBeforeDrag		
+			
+		});	
+		cancel_reasonPieChart = charts.pie;
+		cancel_reasonColumnChart = charts.column;
+		
+		charts = null;
+	});	
 	
+	cancelledStaffChartPanel.addListener('show', function(){
+		var charts = Wireless.chart.initChartPanel({
+			divLeftShowChart : 'divCancelStaffAmountPieChart',
+			divRightShowChart : 'divCancelStaffAmountColumnChart',
+			generalName : 'cancelStaff_',
+			getChartData : cancel_getStaffChartData,
+			leftChartLoad : cancel_loadStaffPieChart,
+			rightChartLoad : cancel_loadStaffColumnChart,
+			panelDrag : true,
+			leftChart : cancel_staffPieChart,
+			rightChart : cancel_staffColumnChart,
+			loadType : 1,
+			tabPanel : cancelFoodStatChartTabPanel,
+			cutAfterDrag : cancel_cutAfterDrag,
+			cutBeforeDrag : cancel_cutBeforeDrag		
+			
+		});	
+		cancel_staffPieChart = charts.pie;
+		cancel_staffColumnChart = charts.column;
+		
+		charts = null;
+	});		
+	
+	cancelledDeptChartPanel.addListener('show', function(){
+		var charts = Wireless.chart.initChartPanel({
+			divLeftShowChart : 'divCancelDeptPieChart',
+			divRightShowChart : 'divCancelDeptColumnChart',
+			generalName : 'cancelDept_',
+			getChartData : cancel_getDeptChartData,
+			leftChartLoad : cancel_loadDeptPieChart,
+			rightChartLoad : cancel_loadDeptColumnChart,
+			panelDrag : true,
+			leftChart : cancel_deptPieChart,
+			rightChart : cancel_deptColumnChart,
+			loadType : 0,
+			tabPanel : cancelFoodStatChartTabPanel,
+			cutAfterDrag : cancel_cutAfterDrag,
+			cutBeforeDrag : cancel_cutBeforeDrag		
+			
+		});	
+		cancel_deptPieChart = charts.pie;
+		cancel_deptColumnChart = charts.column;
+		
+		charts = null;
+		
+	});		
 	
 	new Ext.Panel({
 		renderTo : 'divCancelledFood',//渲染到
@@ -1192,71 +873,6 @@ Ext.onReady(function(){
         }
     });
     cancel_rz.on('resize', cancelFoodDetailsStatPanel.syncSize, cancelFoodDetailsStatPanel);//注册事件(作用:将调好的大小传个scope执行)
-	
-	
-	
-	$('#divCancelledReasonChartChange').toggle(
-		function(){
-			$('#divCancelledCountReasonChart').hide();
-			$('#divCancelledPriceReasonChart').hide();
-			
-			$('#divCancelledReasonColumnChart').show();
-			loadReasonColumnChart();
-			reasonColumnChart.setSize(cancelFoodStatChartTabPanel.getWidth(), cancel_panelDrag ? cancelFoodStatChartTabPanel.getHeight() - 60 : cancelFoodStatChartTabPanel.getHeight()-30);
-		},
-		function(){
-			$('#divCancelledReasonColumnChart').hide();
-			
-			$('#divCancelledCountReasonChart').show();
-			$('#divCancelledPriceReasonChart').show();
-			loadReasonChart();
-			loadPriceReasonChart();
-			reasonChart.setSize(cancelFoodStatChartTabPanel.getWidth()/2, cancel_panelDrag ? cancelFoodStatChartTabPanel.getHeight() - 60 : cancelFoodStatChartTabPanel.getHeight()-30);
-			reasonChart_price.setSize(cancelFoodStatChartTabPanel.getWidth()/2, cancel_panelDrag ? cancelFoodStatChartTabPanel.getHeight() - 60 : cancelFoodStatChartTabPanel.getHeight()-30);
-		}		
-	);
-	
-	$('#divCancelledStaffChartChange').toggle(
-		function(){
-			$('#divCancelledPriceStaffChart').hide();
-			$('#divCancelledCountStaffChart').hide();
-			
-			$('#divCancelledStaffColumnChart').show();
-			cancel_loadStaffColumnChart();
-			cancel_staffColumnChart.setSize(cancelFoodStatChartTabPanel.getWidth(), cancel_panelDrag ? cancelFoodStatChartTabPanel.getHeight() - 60 : cancelFoodStatChartTabPanel.getHeight()-30);
-		},
-		function(){
-			$('#divCancelledStaffColumnChart').hide();
-			
-			$('#divCancelledPriceStaffChart').show();
-			$('#divCancelledCountStaffChart').show();
-			cancel_loadStaffChart();
-			cancel_loadAmountStaffChart();
-			cancel_staffChart.setSize(cancelFoodStatChartTabPanel.getWidth()/2, cancel_panelDrag ? cancelFoodStatChartTabPanel.getHeight() - 60 : cancelFoodStatChartTabPanel.getHeight()-30);
-			cancel_staffChart_amount.setSize(cancelFoodStatChartTabPanel.getWidth()/2, cancel_panelDrag ? cancelFoodStatChartTabPanel.getHeight() - 60 : cancelFoodStatChartTabPanel.getHeight()-30);
-		}		
-	);
-	
-	$('#divCancelledDeptChartChange').toggle(
-		function(){
-			$('#divCancelledPriceDeptChart').hide();
-			$('#divCancelledCountDeptChart').hide();
-			
-			$('#divCancelledDeptColumnChart').show();
-			cancel_loadDeptColumnChart();
-			cancel_deptChart.setSize(cancelFoodStatChartTabPanel.getWidth(), cancel_panelDrag ? cancelFoodStatChartTabPanel.getHeight() - 60 : cancelFoodStatChartTabPanel.getHeight()-30);
-		},
-		function(){
-			$('#divCancelledDeptColumnChart').hide();
-			
-			$('#divCancelledPriceDeptChart').show();
-			$('#divCancelledCountDeptChart').show();
-			cancel_loadDeptChart();
-			cancel_loadAmountDeptChart();
-			cancel_deptChart.setSize(cancelFoodStatChartTabPanel.getWidth()/2, cancel_panelDrag ? cancelFoodStatChartTabPanel.getHeight() - 60 : cancelFoodStatChartTabPanel.getHeight()-30);
-			cancel_deptChart_amount.setSize(cancelFoodStatChartTabPanel.getWidth()/2, cancel_panelDrag ? cancelFoodStatChartTabPanel.getHeight() - 60 : cancelFoodStatChartTabPanel.getHeight()-30);
-		}		
-	);
 	
 	cancel_chartLoadMarsk = new Ext.LoadMask(cancelFoodStatChartTabPanel.getEl().dom, {
 	    msg  : '数据统计中，请稍候......',

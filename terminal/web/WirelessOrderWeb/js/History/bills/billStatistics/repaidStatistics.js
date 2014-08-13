@@ -157,109 +157,29 @@ function showRepaidDetailChart(jdata){
 	}
 }
 
-function repaid_loadStaffChart(){
-	repaidStaffChart = new Highcharts.Chart({
-	    chart: {
-	    	renderTo : 'divRepaidStaffChart',
-	        plotBackgroundColor: null,
-	        plotBorderWidth: null,
-	        plotShadow: false
-	    },
-	    title: {
-	        text: '员工反结账金额比例图'
-	    },
-	    tooltip: {
-		    pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
-	    },
-	    plotOptions: {
-	        pie: {
-	            allowPointSelect: true,
-	            cursor: 'pointer',
-	            dataLabels: {
-	                enabled: true,
-	                color: '#000000',
-	                connectorColor: '#000000',
-	                format: '<b>{point.name}</b>: {point.y} 元'
-	            }
-	        }
-	    },
-	    series: [repaid_staffChartData.chartData],
-        credits : {
-        	enabled : false
-        }
-	});				
-}
+var repaid_loadStaffPieChart = function(type){
+	
+	var content = {};
+	content.title = type==1?'员工反结账数量比例图':'员工反结账金额比例图';
+	content.unit = type==1?'份':'元';
+	content.series = type==1?repaid_staffChartData.chartAmountData:repaid_staffChartData.chartPriceData;
+	
+	return newPieChart({rt: 'divRepaidStaffPieChart', title : content.title, unit: content.unit, series: content.series});
+};
 
-function repaid_loadAmountStaffChart(){
-	repaidStaffChart_amount = new Highcharts.Chart({
-	    chart: {
-	    	renderTo : 'divRepaidAmountStaffChart',
-	        plotBackgroundColor: null,
-	        plotBorderWidth: null,
-	        plotShadow: false
-	    },
-	    title: {
-	        text: '员工反结账数量比例图'
-	    },
-	    tooltip: {
-		    pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
-	    },
-	    plotOptions: {
-	        pie: {
-	            allowPointSelect: true,
-	            cursor: 'pointer',
-	            dataLabels: {
-	                enabled: true,
-	                color: '#000000',
-	                connectorColor: '#000000',
-	                format: '<b>{point.name}</b>: {point.y} 份'
-	            }
-	        }
-	    },
-	    series: [repaid_staffChartData.chartAmountData],
-        credits : {
-        	enabled : false
-        }
-	});				
-}
 
-function repaid_loadStaffColumnChart(){
- 	repaidStaffChart = new Highcharts.Chart({
-        chart: {
-            type: 'column',
-            renderTo : 'divRepaidStaffColumnChart'
-        },
-        title: {
-            text: '员工反结账柱状图'
-        },
-        xAxis: {
-            categories: repaid_staffChartData.staffColumnChart.xAxis
-        },
-        yAxis: {
-            min: 0,
-            title: {
-                text: '金额 / 数量'
-            }
-        },
-        tooltip: {
-            pointFormat: '<table><tbody><tr><td style="color:red;padding:0">{series.name}: </td><td style="padding:0"><b>{point.y} </b></td></tr></tbody></table>',
-            shared: true,
-            useHTML: true
-        },
-        plotOptions: {
-            column: {
-                pointPadding: 0.2,
-                borderWidth: 0
-            }
-        },
-        series: [repaid_staffChartData.staffColumnChart.yAxis, repaid_staffChartData.staffColumnChart.yAxisAmount],
-        credits : {
-        	enabled : false
-        }
-    });	
-}
+var repaid_loadStaffColumnChart = function(type){
+	var content = {};
+	content.title = type==1?'员工反结账数量柱状图':'员工反结账金额柱状图';
+	content.unit = type==1?'份':'元';
+	content.series = type==1?repaid_staffChartData.amountColumnChart.yAxis : repaid_staffChartData.priceColumnChart.yAxis;	
+    
+    return newColumnChart({
+    	rt: 'divRepaidStaffColumnChart', title : content.title, unit: content.unit, series: content.series, xAxis:repaid_staffChartData.priceColumnChart.xAxis	
+    });
+};
 
-function repaid_getStaffChartData(){
+var repaid_getStaffChartData = function(){
 	requestParams.dataSource = 'getStaffChart';
 	$.ajax({
 		url : '../../QueryRepaidStatistics.do',
@@ -268,17 +188,16 @@ function repaid_getStaffChartData(){
 		data : requestParams,
 		success : function(jr, status, xhr){
 			repaid_chartLoadMarsk.hide();
-			repaid_staffChartData.chartData.data = [];
-			repaid_staffChartData.chartAmountData.data = [];
-			repaid_staffChartData.staffColumnChart.xAxis = [];
-			repaid_staffChartData.staffColumnChart.yAxis.data = [];
-			repaid_staffChartData.staffColumnChart.yAxisAmount.data = [];
+			resetChartDate(repaid_staffChartData);
+			
 			for (var i = 0; i < jr.root.length; i++) {
-				repaid_staffChartData.chartData.data.push([jr.root[i].staffName, jr.root[i].repaidPrice]);
-				repaid_staffChartData.chartAmountData.data.push([jr.root[i].staffName, jr.root[i].repaidAmount]);
-				repaid_staffChartData.staffColumnChart.xAxis.push(jr.root[i].staffName);
-				repaid_staffChartData.staffColumnChart.yAxis.data.push({y : jr.root[i].repaidPrice, color : colors[i]}); 
-				repaid_staffChartData.staffColumnChart.yAxisAmount.data.push({y : jr.root[i].repaidAmount, color : colors[i]});
+				if(jr.root[i].repaidPrice != 0)
+					repaid_staffChartData.chartPriceData.data.push([jr.root[i].staffName, jr.root[i].repaidPrice]);
+				if(jr.root[i].repaidAmount != 0)
+					repaid_staffChartData.chartAmountData.data.push([jr.root[i].staffName, jr.root[i].repaidAmount]);
+				repaid_staffChartData.priceColumnChart.xAxis.push(jr.root[i].staffName);
+				repaid_staffChartData.priceColumnChart.yAxis.data.push({y : jr.root[i].repaidPrice, color : colors[i]}); 
+				repaid_staffChartData.amountColumnChart.yAxis.data.push({y : jr.root[i].repaidAmount, color : colors[i]});
 			}
 		},
 		failure : function(res, opt){
@@ -286,14 +205,14 @@ function repaid_getStaffChartData(){
 		}
 	});
 	
-}
+};
 function repaid_changeChartWidth(w,h){
 	if(eval($('div:visible[data-type=repaidChart]').attr('data-value'))){
 		if($('div:visible[data-type=repaidChart]').length == 1){
 			eval($('div:visible[data-type=repaidChart]').attr('data-value')).setSize(w, h);
 		}else if($('div:visible[data-type=repaidChart]').length > 1){
-			eval($($('div:visible[data-type=repaidChart]')[0]).attr('data-value')).setSize(w/2, h);
-			eval($($('div:visible[data-type=repaidChart]')[1]).attr('data-value')).setSize(w/2, h);				
+			eval($($('div:visible[data-type=repaidChart]')[0]).attr('data-value')).setSize(w*0.4, h);
+			eval($($('div:visible[data-type=repaidChart]')[1]).attr('data-value')).setSize(w*0.6, h);				
 		}
 	}	
 }
@@ -394,17 +313,12 @@ function initGrid(){
 						}
 					});		
 					
-					if(typeof repaidStaffChart != 'undefined'){
+					if(typeof repaid_staffPieChart != 'undefined'){
 						repaid_getStaffChartData();
-						if($('#divRepaidStaffColumnChart').is(':visible')){
-							repaid_loadStaffColumnChart();
-							repaidStaffChart.setSize(repaidStatChartTabPanel.getWidth(), repaid_panelDrag ? repaidStatChartTabPanel.getHeight() - 60 : repaidStatChartTabPanel.getHeight()-30);
-						}else{
-							repaid_loadStaffChart();
-							repaid_loadAmountStaffChart();
-							repaidStaffChart.setSize(repaidStatChartTabPanel.getWidth()/2, repaid_panelDrag ? repaidStatChartTabPanel.getHeight() - 60 : repaidStatChartTabPanel.getHeight()-30);
-							repaidStaffChart_amount.setSize(repaidStatChartTabPanel.getWidth()/2, repaid_panelDrag ? repaidStatChartTabPanel.getHeight() - 60 : repaidStatChartTabPanel.getHeight()-30);							
-						}
+						repaid_staffPieChart = repaid_loadStaffPieChart(repaidStaffChartPanel.otype);
+						repaid_staffColumnChart = repaid_loadStaffColumnChart(repaidStaffChartPanel.otype);
+						repaid_staffPieChart.setSize(repaidStatChartTabPanel.getWidth()*0.4, repaid_panelDrag ? repaidStatChartTabPanel.getHeight() - repaid_cutAfterDrag : repaidStatChartTabPanel.getHeight()-30);
+						repaid_staffColumnChart.setSize(repaidStatChartTabPanel.getWidth()*0.6, repaid_panelDrag ? repaidStatChartTabPanel.getHeight() - repaid_cutAfterDrag : repaidStatChartTabPanel.getHeight()-30);
 					}						
 					
 				}
@@ -490,7 +404,7 @@ function initGrid(){
 					
 					repaidStatChartTabPanel.getEl().setTop((h+30)) ;
 					
-					repaid_changeChartWidth(w,chartHeight-60);
+					repaid_changeChartWidth(w,chartHeight-repaid_cutAfterDrag);
 					
 					if(repaid_panelDrag){
 						repaidStatChartTabPanel.setHeight(chartHeight);
@@ -542,6 +456,16 @@ function res_showBillDetailWin(){
 	});
 }
 
+function repaid_fnChangeStaffChart(thiz, v){
+	$(thiz).find('input').attr('checked', 'checked');
+	repaid_staffPieChart = repaid_loadStaffPieChart(v);
+	repaid_staffColumnChart = repaid_loadStaffColumnChart(v);
+	repaid_staffPieChart.setSize(repaidStatChartTabPanel.getWidth()*0.4, repaid_panelDrag ? repaidStatChartTabPanel.getHeight() - repaid_cutAfterDrag : repaidStatChartTabPanel.getHeight()-30);
+	repaid_staffColumnChart.setSize(repaidStatChartTabPanel.getWidth()*0.6, repaid_panelDrag ? repaidStatChartTabPanel.getHeight() - repaid_cutAfterDrag : repaidStatChartTabPanel.getHeight()-30);
+	
+	repaidStaffChartPanel.otype = v;
+}	
+
 var repaid_setStatisticsDate = function(){
 	if(sendToPageOperation){
 		repaid_beginDate.setValue(sendToStatisticsPageBeginDate);
@@ -551,37 +475,14 @@ var repaid_setStatisticsDate = function(){
 	}
 };
 
-var requestParams, repaid_tabPanelHeight, repaidPanelHeight;
+
+var repaid_cutAfterDrag=70, repaid_cutBeforeDrag=0;
+var requestParams = {}, repaid_tabPanelHeight, repaidPanelHeight;
 var colors = Highcharts.getOptions().colors, repaid_panelDrag = false;
-var repaidStaffChart, repaidDetailChart, repaidStaffChart_amount;
+var repaidDetailChart, repaid_staffPieChart, repaid_staffColumnChart;
 var repaidDetailPanel, repaidDetailChartPanel, repaidStaffChartPanel, repaidStatChartTabPanel;
-var repaid_staffChartData = {chartData : {type : 'pie', name : '比例', data : []}, 
-							chartAmountData : {type : 'pie', name : '比例', data : []}, 
-							staffColumnChart : {xAxis : [], 
-							yAxis : {name : '员工反结账金额', data : [],
-							dataLabels: {
-				                enabled: true,
-				                color: 'green',
-				                align: 'center',
-				                style: {
-				                    fontSize: '13px',
-				                    fontFamily: 'Verdana, sans-serif',
-				                    fontWeight : 'bold'
-				                },
-				                format: '{point.y} 元'
-				            }}, 
-							yAxisAmount : {name : '员工反结账数量', data : [],
-							dataLabels: {
-				                enabled: true,
-				                color: 'green',
-				                align: 'center',
-				                style: {
-				                    fontSize: '13px',
-				                    fontFamily: 'Verdana, sans-serif',
-				                    fontWeight : 'bold'
-				                },
-				                format: '{point.y} 份'
-				            }}}};
+
+var repaid_staffChartData = Wireless.chart.initChartData({priceName:'员工反结账金额', countName:'员工反结账数量'});
 
 var titleRepaidStaffName;		
 var repaid_chartLoadMarsk;
@@ -604,33 +505,15 @@ Ext.onReady(function(){
 	});
 	
 	repaidStaffChartPanel = new Ext.Panel({
-		title : '员工反结账',
+		title :'按员工汇总',
 		contentEl : 'divRepaidStaffCharts',
 		listeners : {
-			show : function(thiz){
-				if($('#divRepaidStaffColumnChart').is(":visible")){
-					repaidStaffChart.setSize(thiz.getWidth(), repaid_panelDrag ? repaidStatChartTabPanel.getHeight() - 60 : repaidStatChartTabPanel.getHeight()-30);
-				}else if($('#divRepaidStaffChart').is(":visible")){
-					repaidStaffChart.setSize(repaidStatChartTabPanel.getWidth()/2, repaid_panelDrag ? repaidStatChartTabPanel.getHeight() - 60 : repaidStatChartTabPanel.getHeight()-30);
-					repaidStaffChart_amount.setSize(repaidStatChartTabPanel.getWidth()/2, repaid_panelDrag ? repaidStatChartTabPanel.getHeight() - 60 : repaidStatChartTabPanel.getHeight()-30);				
-				}else{
-					$('#divRepaidStaffChartChange').show();
-					$('#divRepaidStaffChart').show();
-					$('#divRepaidAmountStaffChart').show();
-				}
-				if(!repaidStaffChart){
-					repaid_getStaffChartData();
-					repaid_loadStaffChart();
-					repaid_loadAmountStaffChart();
-					repaidStaffChart.setSize(repaidStatChartTabPanel.getWidth()/2, repaid_panelDrag ? repaidStatChartTabPanel.getHeight() - 60 : repaidStatChartTabPanel.getHeight()-30);
-					repaidStaffChart_amount.setSize(repaidStatChartTabPanel.getWidth()/2, repaid_panelDrag ? repaidStatChartTabPanel.getHeight() - 60 : repaidStatChartTabPanel.getHeight()-30);
-				}
-			},
 			render : function(thiz){
 				thiz.hasRender = true;
 			}
-		}
+		}		
 	});	
+	
 	
 	repaidStatChartTabPanel = new Ext.TabPanel({
 		region : 'south',
@@ -642,6 +525,28 @@ Ext.onReady(function(){
 			}
 		}
 	});	
+	
+	repaidStaffChartPanel.addListener('show', function(){
+		var charts = Wireless.chart.initChartPanel({
+			divLeftShowChart : 'divRepaidStaffPieChart',
+			divRightShowChart : 'divRepaidStaffColumnChart',
+			generalName : 'repaid_',
+			getChartData : repaid_getStaffChartData,
+			leftChartLoad : repaid_loadStaffPieChart,
+			rightChartLoad : repaid_loadStaffColumnChart,
+			panelDrag : true,
+			leftChart : repaid_staffPieChart,
+			rightChart : repaid_staffColumnChart,
+			loadType : 1,
+			tabPanel : repaidStatChartTabPanel,
+			cutAfterDrag : repaid_cutAfterDrag,
+			cutBeforeDrag : repaid_cutBeforeDrag		
+			
+		});	
+		repaid_staffPieChart = charts.pie;
+		repaid_staffColumnChart = charts.column;
+		
+	});
 	
 
 
@@ -657,9 +562,15 @@ Ext.onReady(function(){
 		items : [repaidDetailPanel, repaidStatChartTabPanel]
 	});
 	
+	repaid_chartLoadMarsk = new Ext.LoadMask(repaidStatChartTabPanel.getEl().dom, {
+	    msg  : '数据统计中，请稍候......',
+	    disabled : false
+	});	
+	
 	repaidPanelHeight = repaidDetailPanel.getHeight();
 	
 	repaid_tabPanelHeight = repaidStatChartTabPanel.getHeight();
+	
 	var repaid_rz = new Ext.Resizable(repaidDetailPanel.getEl(), {
         wrap: true, //在构造Resizable时自动在制定的id的外边包裹一层div
         minHeight:100, //限制改变的最小的高度
@@ -673,32 +584,8 @@ Ext.onReady(function(){
     });
     repaid_rz.on('resize', repaidDetailPanel.syncSize, repaidDetailPanel);//注册事件(作用:将调好的大小传个scope执行)
 //	repaidStatisticsGrid.getStore().load();
-	$('#divRepaidStaffChartChange').toggle(
-		function(){
-			$('#divRepaidStaffChart').hide();
-			$('#divRepaidAmountStaffChart').hide();
-			
-			$('#divRepaidStaffColumnChart').show();
-			repaid_loadStaffColumnChart();
-			repaidStaffChart.setSize(repaidStatChartTabPanel.getWidth(), repaid_panelDrag ? repaidStatChartTabPanel.getHeight() - 60 : repaidStatChartTabPanel.getHeight()-30);
-		},
-		function(){
-			$('#divRepaidStaffColumnChart').hide();
-			
-			$('#divRepaidStaffChart').show();
-			$('#divRepaidAmountStaffChart').show();
-			repaid_loadStaffChart();
-			repaid_loadAmountStaffChart();
-			repaidStaffChart.setSize(repaidStatChartTabPanel.getWidth()/2, repaid_panelDrag ? repaidStatChartTabPanel.getHeight() - 60 : repaidStatChartTabPanel.getHeight()-30);
-			repaidStaffChart_amount.setSize(repaidStatChartTabPanel.getWidth()/2, repaid_panelDrag ? repaidStatChartTabPanel.getHeight() - 60 : repaidStatChartTabPanel.getHeight()-30);
-		}		
-	);  
 	
-	repaid_chartLoadMarsk = new Ext.LoadMask(repaidStatChartTabPanel.getEl().dom, {
-	    msg  : '数据统计中，请稍候......',
-	    disabled : false
-	});
-	
+
     var repaid_totalHeight = Ext.getCmp('repaidStatisticsPanel').getHeight();
     
     repaidDetailPanel.setHeight(repaid_totalHeight*0.4);

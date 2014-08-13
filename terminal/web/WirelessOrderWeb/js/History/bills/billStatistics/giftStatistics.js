@@ -260,19 +260,19 @@ function initGiftStatisticsGrid(){
 				
 				if(typeof gift_staffPieChart != 'undefined' && typeof giftStaffChartPanel.hasRender != 'undefined'){
 					gift_getStaffChartData();
-					gift_loadStaffAmountChart(giftStaffChartPanel.otype);
-					gift_loadStaffColumnChart(giftStaffChartPanel.otype);
-					gift_staffPieChart.setSize(giftStatChartTabPanel.getWidth()*0.4, gift_panelDrag ? giftStatChartTabPanel.getHeight() - gift_cutDragChartHeight : giftStatChartTabPanel.getHeight()-gift_cutChartHeight);
-					gift_staffColumnChart.setSize(giftStatChartTabPanel.getWidth()*0.6, gift_panelDrag ? giftStatChartTabPanel.getHeight() - gift_cutDragChartHeight : giftStatChartTabPanel.getHeight()-gift_cutChartHeight);					
+					gift_staffPieChart = gift_loadStaffPieChart(giftStaffChartPanel.otype);
+					gift_staffColumnChart = gift_loadStaffColumnChart(giftStaffChartPanel.otype);
+					gift_staffPieChart.setSize(giftStatChartTabPanel.getWidth()*0.4, gift_panelDrag ? giftStatChartTabPanel.getHeight() - gift_cutAfterDrag : giftStatChartTabPanel.getHeight()-gift_cutChartHeight);
+					gift_staffColumnChart.setSize(giftStatChartTabPanel.getWidth()*0.6, gift_panelDrag ? giftStatChartTabPanel.getHeight() - gift_cutAfterDrag : giftStatChartTabPanel.getHeight()-gift_cutChartHeight);					
 					
 				}
 				
 				if(typeof gift_deptPieChart != 'undefined' && typeof giftDeptChartPanel.hasRender != 'undefined'){
 					gift_getDeptChartData();
-					gift_loadDeptAmountChart(giftDeptChartPanel.otype);
-					gift_loadDeptColumnChart(giftDeptChartPanel.otype);
-					gift_deptPieChart.setSize(giftStatChartTabPanel.getWidth()*0.4, gift_panelDrag ? giftStatChartTabPanel.getHeight() - gift_cutDragChartHeight : giftStatChartTabPanel.getHeight()-gift_cutChartHeight);
-					gift_deptColumnChart.setSize(giftStatChartTabPanel.getWidth()*0.6, gift_panelDrag ? giftStatChartTabPanel.getHeight() - gift_cutDragChartHeight : giftStatChartTabPanel.getHeight()-gift_cutChartHeight);					
+					gift_deptPieChart = gift_loadDeptPieChart(giftDeptChartPanel.otype);
+					gift_deptColumnChart = gift_loadDeptColumnChart(giftDeptChartPanel.otype);
+					gift_deptPieChart.setSize(giftStatChartTabPanel.getWidth()*0.4, gift_panelDrag ? giftStatChartTabPanel.getHeight() - gift_cutAfterDrag : giftStatChartTabPanel.getHeight()-gift_cutChartHeight);
+					gift_deptColumnChart.setSize(giftStatChartTabPanel.getWidth()*0.6, gift_panelDrag ? giftStatChartTabPanel.getHeight() - gift_cutAfterDrag : giftStatChartTabPanel.getHeight()-gift_cutChartHeight);					
 					
 				}
 				
@@ -424,7 +424,7 @@ function showGiftDetailChart(jdata){
 	}
 }
 
-function gift_getStaffChartData(){
+var gift_getStaffChartData = function(){
 	requestParams.dataSource = 'getStaffChart';
 	$.ajax({
 		url : '../../QueryGiftStatistic.do',
@@ -433,12 +433,7 @@ function gift_getStaffChartData(){
 		data : requestParams,
 		success : function(jr, status, xhr){
 			gift_chartLoadMarsk.hide();
-			gift_staffChartData.chartPriceData.data = [];
-			gift_staffChartData.chartAmountData.data = [];
-			gift_staffChartData.staffPriceColumnChart.xAxis = [];
-			gift_staffChartData.staffAmountColumnChart.xAxis = [];
-			gift_staffChartData.staffPriceColumnChart.yAxis.data = [];
-			gift_staffChartData.staffAmountColumnChart.yAxisAmount.data = [];
+			resetChartDate(gift_staffChartData);
 			
 			
 			for (var i = 0; i < jr.root.length; i++) {
@@ -449,10 +444,9 @@ function gift_getStaffChartData(){
 					gift_staffChartData.chartAmountData.data.push([jr.root[i].giftStaff, jr.root[i].giftAmount]);
 				}
 				
-				gift_staffChartData.staffAmountColumnChart.xAxis.push(jr.root[i].giftStaff);
-				gift_staffChartData.staffPriceColumnChart.xAxis.push(jr.root[i].giftStaff);
-				gift_staffChartData.staffPriceColumnChart.yAxis.data.push({y : jr.root[i].giftPrice, color : colors[i]}); 
-				gift_staffChartData.staffAmountColumnChart.yAxisAmount.data.push({y : jr.root[i].giftAmount, color : colors[i]});
+				gift_staffChartData.priceColumnChart.xAxis.push(jr.root[i].giftStaff);
+				gift_staffChartData.priceColumnChart.yAxis.data.push({y : jr.root[i].giftPrice, color : colors[i]}); 
+				gift_staffChartData.amountColumnChart.yAxis.data.push({y : jr.root[i].giftAmount, color : colors[i]});
 			}
 		},
 		failure : function(res, opt){
@@ -460,10 +454,10 @@ function gift_getStaffChartData(){
 		}
 	});
 	
-}
+};
 
 
-function gift_getDeptChartData(){
+var gift_getDeptChartData = function(){
 	requestParams.dataSource = 'getDeptChart';
 	$.ajax({
 		url : '../../QueryGiftStatistic.do',
@@ -472,12 +466,7 @@ function gift_getDeptChartData(){
 		data : requestParams,
 		success : function(jr, status, xhr){
 			gift_chartLoadMarsk.hide();
-			gift_deptChartData.chartPriceData.data = [];
-			gift_deptChartData.chartAmountData.data = [];
-			gift_deptChartData.deptPriceColumnChart.xAxis = [];
-			gift_deptChartData.deptAmountColumnChart.xAxis = [];
-			gift_deptChartData.deptPriceColumnChart.yAxis.data = [];
-			gift_deptChartData.deptAmountColumnChart.yAxisAmount.data = [];
+			resetChartDate(gift_deptChartData);
 			
 			
 			for (var i = 0; i < jr.root.length; i++) {
@@ -487,10 +476,9 @@ function gift_getDeptChartData(){
 				if(jr.root[i].giftAmount != 0){
 					gift_deptChartData.chartAmountData.data.push([jr.root[i].giftDept.name, jr.root[i].giftAmount]);
 				}
-				gift_deptChartData.deptAmountColumnChart.xAxis.push(jr.root[i].giftDept.name);
-				gift_deptChartData.deptPriceColumnChart.xAxis.push(jr.root[i].giftDept.name);
-				gift_deptChartData.deptPriceColumnChart.yAxis.data.push({y : jr.root[i].giftPrice, color : colors[i]}); 
-				gift_deptChartData.deptAmountColumnChart.yAxisAmount.data.push({y : jr.root[i].giftAmount, color : colors[i]});
+				gift_deptChartData.priceColumnChart.xAxis.push(jr.root[i].giftDept.name);
+				gift_deptChartData.priceColumnChart.yAxis.data.push({y : jr.root[i].giftPrice, color : colors[i]}); 
+				gift_deptChartData.amountColumnChart.yAxis.data.push({y : jr.root[i].giftAmount, color : colors[i]});
 			}
 		},
 		failure : function(res, opt){
@@ -498,175 +486,69 @@ function gift_getDeptChartData(){
 		}
 	});
 	
-}
+};
 
 //type=0:金额, type=1:数量
-function gift_loadStaffAmountChart(type){
-	gift_staffPieChart = new Highcharts.Chart({
-	    chart: {
-	    	renderTo : 'divGiftStaffAmountPieChart',
-	        plotBackgroundColor: null,
-	        plotBorderWidth: null,
-	        plotShadow: false
-	    },
-	    title: {
-	        text: type==1?'员工赠送数量比例图':'员工赠送金额比例图'
-	    },
-	    tooltip: {
-		    pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
-	    },
-	    plotOptions: {
-	        pie: {
-	            allowPointSelect: true,
-	            cursor: 'pointer',
-	            dataLabels: {
-	                enabled: true,
-	                color: '#000000',
-	                connectorColor: '#000000',
-	                format: '<b>{point.name}</b>: {point.y} '+(type==1?'份':'元')
-	            }
-	        }
-	    },
-	    series: [(type==1?gift_staffChartData.chartAmountData:gift_staffChartData.chartPriceData)],
-        credits : {
-        	enabled : false
-        }
-	});				
-}
-
-function gift_loadStaffColumnChart(type){
- 	gift_staffColumnChart = new Highcharts.Chart({
-        chart: {
-            type: 'column',
-            renderTo : 'divGiftStaffAmountColumnChart'
-        },
-        title: {
-            text: type==1?'员工赠送数量柱状图':'员工赠送金额柱状图'
-        },
-        xAxis: {
-            categories: gift_staffChartData.staffPriceColumnChart.xAxis
-        },
-        yAxis: {
-            min: 0,
-            title: {
-                text: type==1?'数量 (份)':'金额 (元)'
-            }
-        },
-        tooltip: {
-            pointFormat: '<table><tbody><tr><td style="color:red;padding:0">{series.name}: </td><td style="padding:0"><b>{point.y} </b></td></tr></tbody></table>',
-            shared: true,
-            useHTML: true
-        },
-        plotOptions: {
-            column: {
-                pointPadding: 0.2,
-                borderWidth: 0
-            }
-        },
-        series: [(type==1?gift_staffChartData.staffAmountColumnChart.yAxisAmount : gift_staffChartData.staffPriceColumnChart.yAxis) ],
-        credits : {
-        	enabled : false
-        }
-    });	
-    
-	giftStaffChartPanel.otype = type;
-}
-
-//type=0:金额, type=1:数量
-function gift_loadDeptAmountChart(type){
-	gift_deptPieChart = new Highcharts.Chart({
-	    chart: {
-	    	renderTo : 'divGiftDeptPieChart',
-	        plotBackgroundColor: null,
-	        plotBorderWidth: null,
-	        plotShadow: false
-	    },
-	    title: {
-	        text: type==1?'部门赠送数量比例图':'部门赠送金额比例图'
-	    },
-	    tooltip: {
-		    pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
-	    },
-	    plotOptions: {
-	        pie: {
-	            allowPointSelect: true,
-	            cursor: 'pointer',
-	            dataLabels: {
-	                enabled: true,
-	                color: '#000000',
-	                connectorColor: '#000000',
-	                format: '<font style="font-weight:bold;font-size:15px;">{point.name}</font>: {point.y} '+(type==1?'份':'元')
-	            }
-	        }
-	    },
-	    series: [(type==1?gift_deptChartData.chartAmountData : gift_deptChartData.chartPriceData)],
-        credits : {
-        	enabled : false
-        }
-	});		
-}
-
-function gift_loadDeptColumnChart(type){
- 	gift_deptColumnChart = new Highcharts.Chart({
-        chart: {
-            type: 'column',
-            renderTo : 'divGiftDeptColumnChart'
-        },
-        title: {
-            text: type==1?'部门赠送数量柱状图':'部门赠送金额柱状图'
-        },
-        xAxis: {
-            categories: gift_deptChartData.deptPriceColumnChart.xAxis
-        },
-        yAxis: {
-            min: 0,
-            title: {
-                text: type==1?'数量 (份)':'金额 (元)'
-            }
-        },
-        tooltip: {
-            pointFormat: '<table><tbody><tr><td style="color:red;padding:0">{series.name}: </td><td style="padding:0"><b>{point.y} </b></td></tr></tbody></table>',
-            shared: true,
-            useHTML: true
-        },
-        plotOptions: {
-            column: {
-                pointPadding: 0.2,
-                borderWidth: 0
-            }
-        },
-        series: [(type==1?gift_deptChartData.deptAmountColumnChart.yAxisAmount : gift_deptChartData.deptPriceColumnChart.yAxis) ],
-        credits : {
-        	enabled : false
-        }
-    });	
-    giftDeptChartPanel.otype = type;
-}
-
-function fnChangeStaffChart(id, v){
-	$('#'+id).attr('checked', 'checked');
-	gift_loadStaffAmountChart(v);
-	gift_loadStaffColumnChart(v);
-	gift_staffPieChart.setSize(giftStatChartTabPanel.getWidth()*0.4, gift_panelDrag ? giftStatChartTabPanel.getHeight() - gift_cutDragChartHeight : giftStatChartTabPanel.getHeight()-gift_cutChartHeight);
-	gift_staffColumnChart.setSize(giftStatChartTabPanel.getWidth()*0.6, gift_panelDrag ? giftStatChartTabPanel.getHeight() - gift_cutDragChartHeight : giftStatChartTabPanel.getHeight()-gift_cutChartHeight);
-}
-
-function fnChangeDeptChart(id, v){
-	$('#'+id).attr('checked', 'checked');
-	gift_loadDeptAmountChart(v);
-	gift_loadDeptColumnChart(v);
-	gift_deptPieChart.setSize(giftStatChartTabPanel.getWidth()*0.4, gift_panelDrag ? giftStatChartTabPanel.getHeight() - gift_cutDragChartHeight : giftStatChartTabPanel.getHeight()-gift_cutChartHeight);
-	gift_deptColumnChart.setSize(giftStatChartTabPanel.getWidth()*0.6, gift_panelDrag ? giftStatChartTabPanel.getHeight() - gift_cutDragChartHeight : giftStatChartTabPanel.getHeight()-gift_cutChartHeight);
-}
-
-function fnChangeToStaffCount(){
+var gift_loadStaffPieChart = function(type){
 	
-	fnChangeStaffChart(1);
+	var content = {};
+	content.title = type==1?'员工赠送数量比例图':'员工赠送金额比例图';
+	content.unit = type==1?'份':'元';
+	content.series = type==1?gift_staffChartData.chartAmountData:gift_staffChartData.chartPriceData;
+	
+	return newPieChart({rt: 'divGiftStaffAmountPieChart', title : content.title, unit: content.unit, series: content.series});			
+};
+
+var gift_loadStaffColumnChart = function(type){
+	var content = {};
+	content.title = type==1?'员工赠送数量柱状图':'员工赠送金额柱状图';
+	content.unit = type==1?'份':'元';
+	content.series = type==1?gift_staffChartData.amountColumnChart.yAxis : gift_staffChartData.priceColumnChart.yAxis;	
+    
+    return newColumnChart({
+    	rt: 'divGiftStaffAmountColumnChart', title : content.title, unit: content.unit, series: content.series, xAxis:gift_staffChartData.amountColumnChart.xAxis	
+    });	
+	giftStaffChartPanel.otype = type;
+};
+
+//type=0:金额, type=1:数量
+var gift_loadDeptPieChart = function(type){
+	
+	var content = {};
+	content.title = type==1?'部门赠送数量比例图':'部门赠送金额比例图';
+	content.unit = type==1?'份':'元';
+	content.series = type==1?gift_deptChartData.chartAmountData:gift_deptChartData.chartPriceData;
+	
+	return newPieChart({rt: 'divGiftDeptPieChart', title : content.title, unit: content.unit, series: content.series});		
+};
+
+var gift_loadDeptColumnChart = function(type){
+	var content = {};
+	content.title = type==1?'部门赠送数量柱状图':'部门赠送金额柱状图';
+	content.unit = type==1?'份':'元';
+	content.series = type==1?gift_deptChartData.amountColumnChart.yAxis : gift_deptChartData.priceColumnChart.yAxis;	
+    
+    return newColumnChart({
+    	rt: 'divGiftDeptColumnChart', title : content.title, unit: content.unit, series: content.series, xAxis:gift_deptChartData.amountColumnChart.xAxis	
+    });	
+   
+    giftDeptChartPanel.otype = type;
+};
+
+function gift_fnChangeStaffChart(thiz, v){
+	$(thiz).find('input').attr('checked', 'checked');
+	gift_staffPieChart = gift_loadStaffPieChart(v);
+	gift_staffColumnChart = gift_loadStaffColumnChart(v);
+	gift_staffPieChart.setSize(giftStatChartTabPanel.getWidth()*0.4, gift_panelDrag ? giftStatChartTabPanel.getHeight() - gift_cutAfterDrag : giftStatChartTabPanel.getHeight()-gift_cutChartHeight);
+	gift_staffColumnChart.setSize(giftStatChartTabPanel.getWidth()*0.6, gift_panelDrag ? giftStatChartTabPanel.getHeight() - gift_cutAfterDrag : giftStatChartTabPanel.getHeight()-gift_cutChartHeight);
 }
 
-function fnChangeToStaffPrice(){
-	$('#staffChartPrice').attr('checked', 'checked');
-	fnChangeStaffChart(0);
+function gift_fnChangeDeptChart(thiz, v){
+	$(thiz).find('input').attr('checked', 'checked');
+	gift_deptPieChart = gift_loadDeptPieChart(v);
+	gift_deptColumnChart = gift_loadDeptColumnChart(v);
+	gift_deptPieChart.setSize(giftStatChartTabPanel.getWidth()*0.4, gift_panelDrag ? giftStatChartTabPanel.getHeight() - gift_cutAfterDrag : giftStatChartTabPanel.getHeight()-gift_cutChartHeight);
+	gift_deptColumnChart.setSize(giftStatChartTabPanel.getWidth()*0.6, gift_panelDrag ? giftStatChartTabPanel.getHeight() - gift_cutAfterDrag : giftStatChartTabPanel.getHeight()-gift_cutChartHeight);
 }
 
 var gift_setStatisticsDate = function(){
@@ -679,7 +561,7 @@ var gift_setStatisticsDate = function(){
 
 };
 
-var gift_cutDragChartHeight=75, gift_cutChartHeight=70;
+var gift_cutAfterDrag=75, gift_cutBeforeDrag=70;
 var giftDetailsStatPanel, giftStatChartTabPanel, giftDetailChartPanel, giftStaffChartPanel, giftDeptChartPanel;
 var gift_detailChart, gift_staffPieChart, gift_staffColumnChart, gift_deptPieChart, gift_deptColumnChart;
 var requestParams, gift_dateCombo;
@@ -687,62 +569,8 @@ var gift_panelDrag = false, colors = Highcharts.getOptions().colors, gift_chartL
 var giftPanelHeight, gift_tabPanelHeight;
 var titleGiftStaffName;
 
-var gift_staffChartData = {chartPriceData : {type : 'pie', name : '比例', data : []}, 
-							chartAmountData : {type : 'pie', name : '比例', data : []},
-							staffPriceColumnChart : {xAxis : [], 
-							yAxis : {name : '员工赠送金额', data : [],
-							dataLabels: {
-				                enabled: true,
-				                color: 'green',
-				                align: 'center',
-				                style: {
-				                    fontSize: '13px',
-				                    fontFamily: 'Verdana, sans-serif',
-				                    fontWeight : 'bold'
-				                },
-				                format: '{point.y} 元'
-				            }}},
-				            staffAmountColumnChart : {xAxis : [], 
-							yAxisAmount : {name : '员工赠送数量', data : [],
-							dataLabels: {
-				                enabled: true,
-				                color: 'green',
-				                align: 'center',
-				                style: {
-				                    fontSize: '13px',
-				                    fontFamily: 'Verdana, sans-serif',
-				                    fontWeight : 'bold'
-				                },
-				                format: '{point.y} 份'
-				            }}}};
-var gift_deptChartData = {chartPriceData : {type : 'pie', name : '比例', data : []}, 
-							chartAmountData : {type : 'pie', name : '比例', data : []},
-							deptPriceColumnChart : {xAxis : [], 
-							yAxis : {name : '部门赠送金额', data : [],
-							dataLabels: {
-				                enabled: true,
-				                color: 'green',
-				                align: 'center',
-				                style: {
-				                    fontSize: '13px',
-				                    fontFamily: 'Verdana, sans-serif',
-				                    fontWeight : 'bold'
-				                },
-				                format: '{point.y} 元'
-				            }}},
-				            deptAmountColumnChart : {xAxis : [], 
-							yAxisAmount : {name : '部门赠送数量', data : [],
-							dataLabels: {
-				                enabled: true,
-				                color: 'green',
-				                align: 'center',
-				                style: {
-				                    fontSize: '13px',
-				                    fontFamily: 'Verdana, sans-serif',
-				                    fontWeight : 'bold'
-				                },
-				                format: '{point.y} 份'
-				            }}}};
+var gift_staffChartData = Wireless.chart.initChartData({priceName:'员工赠送金额', countName:'员工赠送数量'});
+var gift_deptChartData = Wireless.chart.initChartData({priceName:'部门赠送金额', countName:'部门赠送数量'});
 				            
 Ext.onReady(function(){
 	
@@ -764,50 +592,18 @@ Ext.onReady(function(){
 		title : '按员工汇总',
 		contentEl : 'divGiftStaffCharts',
 		listeners : {
-			show : function(thiz){
-				if($('#divGiftStaffAmountColumnChart').is(":visible")){
-					gift_staffPieChart.setSize(giftStatChartTabPanel.getWidth()*0.4, gift_panelDrag ? giftStatChartTabPanel.getHeight() - gift_cutDragChartHeight : giftStatChartTabPanel.getHeight()-gift_cutChartHeight);
-					gift_staffColumnChart.setSize(giftStatChartTabPanel.getWidth()*0.6, gift_panelDrag ? giftStatChartTabPanel.getHeight() - gift_cutDragChartHeight : giftStatChartTabPanel.getHeight()-gift_cutChartHeight);				
-				}else{
-					$('#divGiftStaffChartChange').show();
-					$('#divGiftStaffAmountPieChart').show();
-					$('#divGiftStaffAmountColumnChart').show();
-				}
-				if(!gift_staffPieChart){
-					gift_getStaffChartData();
-					gift_loadStaffAmountChart(1);
-					gift_loadStaffColumnChart(1);
-					gift_staffPieChart.setSize(giftStatChartTabPanel.getWidth()*0.4, gift_panelDrag ? giftStatChartTabPanel.getHeight() - gift_cutDragChartHeight : giftStatChartTabPanel.getHeight()-gift_cutChartHeight);
-					gift_staffColumnChart.setSize(giftStatChartTabPanel.getWidth()*0.6, gift_panelDrag ? giftStatChartTabPanel.getHeight() - gift_cutDragChartHeight : giftStatChartTabPanel.getHeight()-gift_cutChartHeight);
-				}
-			},
 			render : function(thiz){
 				thiz.hasRender = true;
 			}
 		}
+		
+		
 	});		
 	
 	giftDeptChartPanel = new Ext.Panel({
 		title : '按部门汇总',
 		contentEl : 'divGiftDeptCharts',
 		listeners : {
-			show : function(thiz){
-				if($('#divGiftDeptPieChart').is(":visible")){
-					gift_deptPieChart.setSize(giftStatChartTabPanel.getWidth()*0.4, gift_panelDrag ? giftStatChartTabPanel.getHeight() - gift_cutDragChartHeight : giftStatChartTabPanel.getHeight()-gift_cutChartHeight);
-					gift_deptColumnChart.setSize(giftStatChartTabPanel.getWidth()*0.6, gift_panelDrag ? giftStatChartTabPanel.getHeight() - gift_cutDragChartHeight : giftStatChartTabPanel.getHeight()-gift_cutChartHeight);				
-				}else{
-					$('#divGiftDeptChartChange').show();
-					$('#divGiftDeptPieChart').show();
-					$('#divGiftDeptColumnChart').show();
-				}
-				if(!gift_deptPieChart){
-					gift_getDeptChartData();
-					gift_loadDeptAmountChart(0);
-					gift_loadDeptColumnChart(0);
-					gift_deptPieChart.setSize(giftStatChartTabPanel.getWidth()*0.4, gift_panelDrag ? giftStatChartTabPanel.getHeight() - gift_cutDragChartHeight : giftStatChartTabPanel.getHeight()-gift_cutChartHeight);
-					gift_deptColumnChart.setSize(giftStatChartTabPanel.getWidth()*0.6, gift_panelDrag ? giftStatChartTabPanel.getHeight() - gift_cutDragChartHeight : giftStatChartTabPanel.getHeight()-gift_cutChartHeight);
-				}
-			},
 			render : function(thiz){
 				thiz.hasRender = true;
 			}
@@ -835,6 +631,54 @@ Ext.onReady(function(){
 	});	
 	
 	initGiftStatisticsGrid();
+	
+	giftStaffChartPanel.addListener('show', function(){
+		var charts = Wireless.chart.initChartPanel({
+			divLeftShowChart : 'divGiftStaffAmountPieChart',
+			divRightShowChart : 'divGiftStaffAmountColumnChart',
+			generalName : 'giftStaff_',
+			getChartData : gift_getStaffChartData,
+			leftChartLoad : gift_loadStaffPieChart,
+			rightChartLoad : gift_loadStaffColumnChart,
+			panelDrag : true,
+			leftChart : gift_staffPieChart,
+			rightChart : gift_staffColumnChart,
+			loadType : 1,
+			tabPanel : giftStatChartTabPanel,
+			cutAfterDrag : gift_cutAfterDrag,
+			cutBeforeDrag : gift_cutBeforeDrag		
+			
+		});	
+		gift_staffPieChart = charts.pie;
+		gift_staffColumnChart = charts.column;
+		
+		charts = null;
+	});	
+	
+	giftDeptChartPanel.addListener('show', function(){
+		var charts = Wireless.chart.initChartPanel({
+			divLeftShowChart : 'divGiftDeptPieChart',
+			divRightShowChart : 'divGiftDeptColumnChart',
+			generalName : 'giftDept_',
+			getChartData : gift_getDeptChartData,
+			leftChartLoad : gift_loadDeptPieChart,
+			rightChartLoad : gift_loadDeptColumnChart,
+			panelDrag : true,
+			leftChart : gift_deptPieChart,
+			rightChart : gift_deptColumnChart,
+			loadType : 1,
+			tabPanel : giftStatChartTabPanel,
+			cutAfterDrag : gift_cutAfterDrag,
+			cutBeforeDrag : gift_cutBeforeDrag		
+			
+		});	
+		gift_deptPieChart = charts.pie;
+		gift_deptColumnChart = charts.column;
+		
+		charts = null;
+		
+	});		
+	
 	
 	new Ext.Panel({
 		renderTo : 'divGiftStatistics',
