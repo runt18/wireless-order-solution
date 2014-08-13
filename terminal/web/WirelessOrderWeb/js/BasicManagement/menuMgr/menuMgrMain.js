@@ -1746,7 +1746,7 @@ function uploadFoodImage(c){
 	foodImageUpdateLoaddingMask.show();		
 	
 	Ext.Ajax.request({
-		url : '../../ImageFileUpload.do?restaurantID=' + restaurantID + '&foodID=' + c.id + '&otype=' + otype + '&time=' + new Date(),
+		url : '../../ImageFileUpload.do?foodID=' + c.id + '&otype=' + otype + '&time=' + new Date(),
 		isUpload : true,
 		form : Ext.getCmp('imgFileUploadForm').getForm().getEl(),
 		success : function(response, options){
