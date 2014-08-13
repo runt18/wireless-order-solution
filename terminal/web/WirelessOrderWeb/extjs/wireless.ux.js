@@ -1,29 +1,162 @@
 var Wireless = {
-	ux : {staffGift : false}
+	ux : {staffGift : false},
+	chart : {}
 };
 
-/*var TempFoodModel = {
-	isTemporary : 'isTemporary',
-	id : 'id',
-	foodName : 'foodName',
-	count : 'count',
-	unitPrice : 'unitPrice',
-	isHangup : 'isHangup',
-	dataType : 'dataType',
-	kitchen : 'kitchen',
-	cancelReason : 'cancelReason'
+Wireless.chart.initChartPanel = function(c){
+	if($('#' + c.divLeftShowChart).is(":visible")){
+		c.leftChart.setSize(c.tabPanel.getWidth()*0.4, c.panelDrag ? c.tabPanel.getHeight() - c.cutAfterDrag : c.tabPanel.getHeight()-c.cutBeforeDrag);
+		c.rightChart.setSize(c.tabPanel.getWidth()*0.6, c.panelDrag ? c.tabPanel.getHeight() - c.cutAfterDrag : c.tabPanel.getHeight()-c.cutBeforeDrag);				
+	}else{
+		$('#'+c.generalName+'DivChartChange').show();
+		$('#'+c.divLeftShowChart).show();
+		$('#'+c.divRightShowChart).show();
+	}
+	if(!c.leftChart){
+//		alert(c.cutAfterDrag+','+c.panelDrag)
+		c.getChartData();
+		c.leftChart = c.leftChartLoad(c.loadType);
+		c.rightChart = c.rightChartLoad(c.loadType);
+		c.leftChart.setSize(c.tabPanel.getWidth()*0.4, c.panelDrag ? c.tabPanel.getHeight() - c.cutAfterDrag : c.tabPanel.getHeight()-c.cutBeforeDrag);
+		c.rightChart.setSize(c.tabPanel.getWidth()*0.6, c.panelDrag ? c.tabPanel.getHeight() - c.cutAfterDrag : c.tabPanel.getHeight()-c.cutBeforeDrag);
+	}
+	
+	return {pie:c.leftChart, column:c.rightChart};
 };
 
-var NormalFoodModel = {
-	isTemporary : 'isTemporary',
-	id : 'id',
-	count : 'count',
-	tasteGroup : 'tasteGroup',
-	discount : 'discount',
-	kitchen : 'kitchen',
-	isHangup : 'isHangup',
-	cancelReason : 'cancelReason'
-};*/
+
+function newPieChart(c){
+	return new Highcharts.Chart({
+	    chart: {
+	    	renderTo : c.rt,
+	        plotBackgroundColor: null,
+	        plotBorderWidth: null,
+	        plotShadow: false
+	    },
+	    title: {
+	        text: c.title
+	    },
+	    tooltip: {
+		    pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+	    },
+	    plotOptions: {
+	        pie: {
+	            allowPointSelect: true,
+	            cursor: 'pointer',
+	            dataLabels: {
+	                enabled: true,
+	                color: '#000000',
+	                connectorColor: '#000000',
+	                format: '<b>{point.name}</b>: {point.y} '+c.unit
+	            }
+	        }
+	    },
+	    series: [c.series],
+        credits : {
+        	enabled : false
+        }
+	});	
+
+}
+function newColumnChart(c){
+	return  new Highcharts.Chart({
+        chart: {
+            type: 'column',
+            renderTo : c.rt
+        },
+        title: {
+            text: c.title
+        },
+        xAxis: {
+            categories: c.xAxis
+        },
+        yAxis: {
+            min: 0,
+            title: {
+                text: c.yAxis
+            }
+        },
+        tooltip: {
+            pointFormat: '<table><tbody><tr><td style="color:red;padding:0">{series.name}: </td><td style="padding:0"><b>{point.y} </b></td></tr></tbody></table>',
+            shared: true,
+            useHTML: true
+        },
+        plotOptions: {
+            column: {
+                pointPadding: 0.2,
+                borderWidth: 0
+            }
+        },
+        series: [c.series],
+        credits : {
+        	enabled : false
+        }
+    });	
+}
+
+
+Wireless.chart.initChartData = function(c){
+	return {chartPriceData : {type : 'pie', name : '比例', data : []}, 
+				chartAmountData : {type : 'pie', name : '比例', data : []},
+				
+				priceColumnChart : {xAxis : [], 
+				yAxis : {name : c.priceName, data : [],
+				dataLabels: {
+		            enabled: true,
+		            color: 'green',
+		            align: 'center',
+		            style: {
+		                fontSize: '13px',
+		                fontFamily: 'Verdana, sans-serif',
+		                fontWeight : 'bold'
+		            },
+		            format: '{point.y} 元'
+		        }}},
+		        
+		        amountColumnChart : {xAxis : [], 
+				yAxis : {name : c.countName, data : [],
+				dataLabels: {
+		            enabled: true,
+		            color: 'green',
+		            align: 'center',
+		            style: {
+		                fontSize: '13px',
+		                fontFamily: 'Verdana, sans-serif',
+		                fontWeight : 'bold'
+		            },
+		            format: '{point.y} 份'
+		        }}}};
+};
+
+function resetChartDate(chartData){
+	chartData.chartPriceData.data = [];
+	chartData.chartAmountData.data = [];
+	chartData.priceColumnChart.xAxis = [];
+	chartData.amountColumnChart.xAxis = [];
+	chartData.priceColumnChart.yAxis.data = [];
+	chartData.amountColumnChart.yAxis.data = [];	
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 var foodModel = {
 	isTemporary : 'isTemporary',
