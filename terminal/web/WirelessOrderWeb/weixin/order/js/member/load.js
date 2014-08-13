@@ -56,7 +56,7 @@ $(function(){
 					$('#ulMemberPrivilegeDetail').append('<li>'+ memberType.discount.name +'优惠</li>');	
 					$('#ulMemberPrivilegeDetail').append(memberType.chargeRate >1 ? '<li>'+ memberType.chargeRate +'倍充值优惠, 充100送'+(memberType.chargeRate-1)*100+'元</li>':'');
 					$('#ulMemberPrivilegeDetail').append(memberType.exchangeRate >1 ? '<li>'+ memberType.exchangeRate +'倍积分特权, 消费1元积'+memberType.exchangeRate+'分</li>':'');
-					$('#ulMemberPrivilegeDetail').append(memberType.desc != '' ? '<li>'+ memberType.desc +'</li>':'');	
+					$('#ulMemberPrivilegeDetail').append(typeof memberType.desc != 'undefined' && memberType.desc != '' ? '<li>'+ memberType.desc +'</li>':'');	
 					
 					$('#divMemberCard').css('display', 'block');
 					$('#divVerifyAndBind').css('display', 'block');
