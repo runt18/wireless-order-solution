@@ -8,6 +8,7 @@
 		margin-left: 10px;
 	}
 </style>
+<script type="text/javascript" src="../../extjs/wireless.ux.js"></script>
 <script type="text/javascript">
 	var repaidStatisticsGrid, repaidOrderDetailWin;
 	var limitCount = 20;
@@ -20,12 +21,14 @@
 <div id="divRepaidDetailChart" data-type="repaidChart" data-value="repaidDetailChart" style="height : 400px;"></div>
 
 <div id="divRepaidStaffCharts" >
-	<div id="divRepaidStaffChartChange" style="display:none;"><a href="#" class="changeChart">切换视图</a></div>
-	<div>
-		<div id="divRepaidStaffChart" data-type="repaidChart" data-value="repaidStaffChart" style="height : 300px;display:none;width : 50%;float:left;"></div>
-		<div id="divRepaidAmountStaffChart" data-type="repaidChart" data-value="repaidStaffChart_amount" style="height : 300px;display:none;width : 50%;float:left;"></div>
+	<div id="repaid_DivChartChange" style="display:none;padding-top: 10px;">
+		&nbsp;&nbsp;<span onclick="repaid_fnChangeStaffChart(this,1)"><input  type="radio" name="repaid_staffChange" checked="checked"  />按数量显示</span> &nbsp;&nbsp;&nbsp;
+		<span onclick="repaid_fnChangeStaffChart(this,0)"><input type="radio" name="repaid_staffChange"  />按金额显示</span> 
 	</div>	
-	<div id="divRepaidStaffColumnChart" data-type="repaidChart" data-value="repaidStaffChart" style="height : 300px;display:none"></div>
+	<div>
+		<div id="divRepaidStaffPieChart" data-type="repaidChart" data-value="repaid_staffPieChart" style="height : 300px;display:none;width : 40%;float:left;"></div>
+		<div id="divRepaidStaffColumnChart" data-type="repaidChart" data-value="repaid_staffColumnChart" style="height : 300px;display:none;width : 60%;float:left;"></div>
+	</div>	
 </div>
 </body>
 </html>

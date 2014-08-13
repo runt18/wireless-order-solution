@@ -8,6 +8,7 @@
 		margin-left: 10px;
 	}
 </style>
+<script type="text/javascript" src="../../extjs/wireless.ux.js"></script>
 <script type="text/javascript">
 	//退菜统计
 	var cancelFoodStatWin, cancelFoodStatWinTabPanel, cancelFoodDetailsStatPanel, cancelFoodByDeptStatPanel, cancelFoodByReasonStatPanel;
@@ -21,31 +22,38 @@
 <div id="divCancelledDetailChart" data-type="chart" data-value="cancel_detailChart" style="height : 400px;"></div>
 
 <div id="divCancelledReasonCharts" >
-	<div id="divCancelledReasonChartChange" style="display:none;"><a href="#" class="changeChart">切换视图</a></div>
-	<div>
-		<div id="divCancelledCountReasonChart" data-type="chart" data-value="reasonChart" style="height : 300px;width:50%; float : left;display:none;"></div>
-		<div id="divCancelledPriceReasonChart" data-type="chart" data-value="reasonChart_price" style="height : 300px;width:50%;float : left;display:none;"></div>
+	<div id="cancelReason_DivChartChange" style="display:none;padding-top: 10px;">
+		<!-- <a id="linkToChangeDeptChart" href="#" class="changeChart">查看数量比例图</a> -->
+		&nbsp;&nbsp;<span onclick="cancel_fnChangeReasonChart(this,0)"><input type="radio" name="reasonChange" checked="checked"  />按金额显示</span> &nbsp;&nbsp;&nbsp;
+		<span onclick="cancel_fnChangeReasonChart(this,1)"><input type="radio" name="reasonChange"  />按数量显示</span>  
 	</div>
-	
-	<div id="divCancelledReasonColumnChart" data-type="chart" data-value="reasonColumnChart" style="height : 300px;display:none"></div>
+	<div>
+		<div id="divCancelReasonPieChart" data-type="cancelChart" data-value="cancel_reasonPieChart" style="height : 300px;display:none;width:40%;float:left;"></div>
+		<div id="divCancelReasonColumnChart" data-type="cancelChart" data-value="cancel_reasonColumnChart" style="height : 300px;display:none;width:60%;float:left;"></div>
+	</div>
 </div>
 
 <div id="divCancelledStaffCharts" >
-	<div id="divCancelledStaffChartChange" style="display:none;"><a href="#" class="changeChart">切换视图</a></div>
-	<div>
-		<div id="divCancelledCountStaffChart" data-type="chart" data-value="cancel_staffChart_amount" style="height : 300px;display:none;width:50%; float : left;"></div>
-		<div id="divCancelledPriceStaffChart" data-type="chart" data-value="cancel_staffChart" style="height : 300px;display:none;width:50%; float : left;"></div>
+	<div id="cancelStaff_DivChartChange" style="display:none;padding-top: 10px;">
+		&nbsp;&nbsp;<span onclick="cancel_fnChangeStaffChart(this,1)"><input  type="radio" name="cancel_staffChange" checked="checked"  />按数量显示</span> &nbsp;&nbsp;&nbsp;
+		<span onclick="cancel_fnChangeStaffChart(this,0)"><input type="radio" name="cancel_staffChange"  />按金额显示</span> 
 	</div>
-	<div id="divCancelledStaffColumnChart" data-type="chart" data-value="cancel_staffColumnChart" style="height : 300px;display:none"></div>
+	<div>
+		<div id="divCancelStaffAmountPieChart" data-type="cancelChart" data-value="cancel_staffPieChart" style="height : 300px;display:none;width:40%;float:left;"></div>
+		<div id="divCancelStaffAmountColumnChart" data-type="cancelChart" data-value="cancel_staffColumnChart" style="height : 300px;display:none;width:60%;float:left;"></div>
+	</div>
 </div>
 
 <div id="divCancelledDeptCharts" >
-	<div id="divCancelledDeptChartChange" style="display:none;"><a href="#" class="changeChart">切换视图</a></div>
+	<div id="cancelDept_DivChartChange" style="display:none;padding-top: 10px;">
+		<!-- <a id="linkToChangeDeptChart" href="#" class="changeChart">查看数量比例图</a> -->
+		&nbsp;&nbsp;<span onclick="cancel_fnChangeDeptChart(this,0)"><input type="radio" name="cancel_deptChange" checked="checked"  />按金额显示</span> &nbsp;&nbsp;&nbsp;
+		<span onclick="cancel_fnChangeDeptChart(this,1)"><input type="radio" name="cancel_deptChange"  />按数量显示</span>  
+	</div>
 	<div>
-		<div id="divCancelledCountDeptChart" data-type="chart" data-value="cancel_deptChart_amount" style="height : 300px;display:none;width:50%; float : left;"></div>
-		<div id="divCancelledPriceDeptChart" data-type="chart" data-value="cancel_deptChart" style="height : 300px;display:none;width:50%; float : left;"></div>
-	</div>	
-	<div id="divCancelledDeptColumnChart" data-type="chart" data-value="cancel_deptChart" style="height : 300px;display:none"></div>
+		<div id="divCancelDeptPieChart" data-type="cancelChart" data-value="cancel_deptPieChart" style="height : 300px;display:none;width:40%;float:left;"></div>
+		<div id="divCancelDeptColumnChart" data-type="cancelChart" data-value="cancel_deptColumnChart" style="height : 300px;display:none;width:60%;float:left;"></div>
+	</div>
 </div>
 </body>
 </html>
