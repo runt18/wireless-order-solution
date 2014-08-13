@@ -640,7 +640,7 @@ uo.tempPayForUO = function(c){
 				cashIncome : '-1',
 //				comment : uo.order.comment,
 				customNum : uo.order.customNum,
-				discountID : typeof c.discountId != 'undefined' ? c.discountId : uo.order.discount.id,
+				discountID : typeof c.discountId != 'undefined' ? c.discountId : '',
 				tempPay : true,
 				isPrint : typeof c.isPrint == 'boolean' ? c.isPrint : true
 			},
