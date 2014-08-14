@@ -58,9 +58,9 @@ public class QueryMemberLevelAction extends DispatchAction{
 						y.append(",x:0");
 					}
 					if(i == 0){
-						y.append(", marker:{symbol:\'triangle\'}");
+						y.append(", marker:{symbol:\'circle\'}");
 						y.append(", status : 2");
-						y.append(", color : \'red\'");
+						y.append(", color : \'maroon\'");
 						y.append(data.isEmpty()?", first:true":"");
 					}else{
 						y.append(", marker:{symbol:\'square\'}");
