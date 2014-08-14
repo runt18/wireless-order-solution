@@ -106,3 +106,9 @@ a:hover {
 	border : 1px solid #4881f3;
 	background:#f9f9c0 repeat-x 0 0;
 }
+
+.chartChangeFont{
+	display:none;
+	padding-top: 10px;
+	font:15px tahoma !important;
+}
