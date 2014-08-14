@@ -297,7 +297,7 @@ public class MemberLevelDao {
 		String sql = "SELECT ML.* FROM " + Params.dbName + ".member_level ML" +
 					" WHERE ML.restaurant_id = " + staff.getRestaurantId() +
 					(extraCond != null ? extraCond : " ")+
-					(otherClause != null ? otherClause : " ORDER BY level_id");
+					(otherClause != null ? otherClause : " ORDER BY point_threshold");
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		while(dbCon.rs.next()){
 			MemberLevel level = new MemberLevel(dbCon.rs.getInt("id"));
