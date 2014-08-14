@@ -447,7 +447,7 @@ var discount_getDeptChartData = function(){
 					discount_deptChartData.chartAmountData.data.push([jr.root[i].discountDept.name, jr.root[i].discountAmount]);
 				discount_deptChartData.priceColumnChart.xAxis.push(jr.root[i].discountDept.name);
 				discount_deptChartData.priceColumnChart.yAxis.data.push({y : jr.root[i].discountPrice, color : colors[i]}); 
-				discount_deptChartData.amountColumnChart.yAxisAmount.data.push({y : jr.root[i].discountAmount, color : colors[i]});
+				discount_deptChartData.amountColumnChart.yAxis.data.push({y : jr.root[i].discountAmount, color : colors[i]});
 			}
 		},
 		failure : function(res, opt){

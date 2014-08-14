@@ -262,8 +262,8 @@ function initGiftStatisticsGrid(){
 					gift_getStaffChartData();
 					gift_staffPieChart = gift_loadStaffPieChart(giftStaffChartPanel.otype);
 					gift_staffColumnChart = gift_loadStaffColumnChart(giftStaffChartPanel.otype);
-					gift_staffPieChart.setSize(giftStatChartTabPanel.getWidth()*0.4, gift_panelDrag ? giftStatChartTabPanel.getHeight() - gift_cutAfterDrag : giftStatChartTabPanel.getHeight()-gift_cutChartHeight);
-					gift_staffColumnChart.setSize(giftStatChartTabPanel.getWidth()*0.6, gift_panelDrag ? giftStatChartTabPanel.getHeight() - gift_cutAfterDrag : giftStatChartTabPanel.getHeight()-gift_cutChartHeight);					
+					gift_staffPieChart.setSize(giftStatChartTabPanel.getWidth()*0.4, gift_panelDrag ? giftStatChartTabPanel.getHeight() - gift_cutAfterDrag : giftStatChartTabPanel.getHeight()-gift_cutBeforeDrag);
+					gift_staffColumnChart.setSize(giftStatChartTabPanel.getWidth()*0.6, gift_panelDrag ? giftStatChartTabPanel.getHeight() - gift_cutAfterDrag : giftStatChartTabPanel.getHeight()-gift_cutBeforeDrag);					
 					
 				}
 				
@@ -271,8 +271,8 @@ function initGiftStatisticsGrid(){
 					gift_getDeptChartData();
 					gift_deptPieChart = gift_loadDeptPieChart(giftDeptChartPanel.otype);
 					gift_deptColumnChart = gift_loadDeptColumnChart(giftDeptChartPanel.otype);
-					gift_deptPieChart.setSize(giftStatChartTabPanel.getWidth()*0.4, gift_panelDrag ? giftStatChartTabPanel.getHeight() - gift_cutAfterDrag : giftStatChartTabPanel.getHeight()-gift_cutChartHeight);
-					gift_deptColumnChart.setSize(giftStatChartTabPanel.getWidth()*0.6, gift_panelDrag ? giftStatChartTabPanel.getHeight() - gift_cutAfterDrag : giftStatChartTabPanel.getHeight()-gift_cutChartHeight);					
+					gift_deptPieChart.setSize(giftStatChartTabPanel.getWidth()*0.4, gift_panelDrag ? giftStatChartTabPanel.getHeight() - gift_cutAfterDrag : giftStatChartTabPanel.getHeight()-gift_cutBeforeDrag);
+					gift_deptColumnChart.setSize(giftStatChartTabPanel.getWidth()*0.6, gift_panelDrag ? giftStatChartTabPanel.getHeight() - gift_cutAfterDrag : giftStatChartTabPanel.getHeight()-gift_cutBeforeDrag);					
 					
 				}
 				
@@ -506,7 +506,7 @@ var gift_loadStaffColumnChart = function(type){
 	content.series = type==1?gift_staffChartData.amountColumnChart.yAxis : gift_staffChartData.priceColumnChart.yAxis;	
     
     return newColumnChart({
-    	rt: 'divGiftStaffAmountColumnChart', title : content.title, unit: content.unit, series: content.series, xAxis:gift_staffChartData.amountColumnChart.xAxis	
+    	rt: 'divGiftStaffAmountColumnChart', title : content.title, unit: content.unit, series: content.series, xAxis:gift_staffChartData.priceColumnChart.xAxis	
     });	
 	giftStaffChartPanel.otype = type;
 };
@@ -529,7 +529,7 @@ var gift_loadDeptColumnChart = function(type){
 	content.series = type==1?gift_deptChartData.amountColumnChart.yAxis : gift_deptChartData.priceColumnChart.yAxis;	
     
     return newColumnChart({
-    	rt: 'divGiftDeptColumnChart', title : content.title, unit: content.unit, series: content.series, xAxis:gift_deptChartData.amountColumnChart.xAxis	
+    	rt: 'divGiftDeptColumnChart', title : content.title, unit: content.unit, series: content.series, xAxis:gift_deptChartData.priceColumnChart.xAxis	
     });	
    
     giftDeptChartPanel.otype = type;
@@ -539,16 +539,16 @@ function gift_fnChangeStaffChart(thiz, v){
 	$(thiz).find('input').attr('checked', 'checked');
 	gift_staffPieChart = gift_loadStaffPieChart(v);
 	gift_staffColumnChart = gift_loadStaffColumnChart(v);
-	gift_staffPieChart.setSize(giftStatChartTabPanel.getWidth()*0.4, gift_panelDrag ? giftStatChartTabPanel.getHeight() - gift_cutAfterDrag : giftStatChartTabPanel.getHeight()-gift_cutChartHeight);
-	gift_staffColumnChart.setSize(giftStatChartTabPanel.getWidth()*0.6, gift_panelDrag ? giftStatChartTabPanel.getHeight() - gift_cutAfterDrag : giftStatChartTabPanel.getHeight()-gift_cutChartHeight);
+	gift_staffPieChart.setSize(giftStatChartTabPanel.getWidth()*0.4, gift_panelDrag ? giftStatChartTabPanel.getHeight() - gift_cutAfterDrag : giftStatChartTabPanel.getHeight()-gift_cutBeforeDrag);
+	gift_staffColumnChart.setSize(giftStatChartTabPanel.getWidth()*0.6, gift_panelDrag ? giftStatChartTabPanel.getHeight() - gift_cutAfterDrag : giftStatChartTabPanel.getHeight()-gift_cutBeforeDrag);
 }
 
 function gift_fnChangeDeptChart(thiz, v){
 	$(thiz).find('input').attr('checked', 'checked');
 	gift_deptPieChart = gift_loadDeptPieChart(v);
 	gift_deptColumnChart = gift_loadDeptColumnChart(v);
-	gift_deptPieChart.setSize(giftStatChartTabPanel.getWidth()*0.4, gift_panelDrag ? giftStatChartTabPanel.getHeight() - gift_cutAfterDrag : giftStatChartTabPanel.getHeight()-gift_cutChartHeight);
-	gift_deptColumnChart.setSize(giftStatChartTabPanel.getWidth()*0.6, gift_panelDrag ? giftStatChartTabPanel.getHeight() - gift_cutAfterDrag : giftStatChartTabPanel.getHeight()-gift_cutChartHeight);
+	gift_deptPieChart.setSize(giftStatChartTabPanel.getWidth()*0.4, gift_panelDrag ? giftStatChartTabPanel.getHeight() - gift_cutAfterDrag : giftStatChartTabPanel.getHeight()-gift_cutBeforeDrag);
+	gift_deptColumnChart.setSize(giftStatChartTabPanel.getWidth()*0.6, gift_panelDrag ? giftStatChartTabPanel.getHeight() - gift_cutAfterDrag : giftStatChartTabPanel.getHeight()-gift_cutBeforeDrag);
 }
 
 var gift_setStatisticsDate = function(){
