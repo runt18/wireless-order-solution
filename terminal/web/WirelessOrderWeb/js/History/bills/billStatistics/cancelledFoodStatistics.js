@@ -314,7 +314,7 @@ function cancelFoodDetailsStatPanelInit(){
 					cancel_reasonColumnChart.setSize(cancelFoodStatChartTabPanel.getWidth()*0.6, cancel_panelDrag ? cancelFoodStatChartTabPanel.getHeight() - cancel_cutAfterDrag : cancelFoodStatChartTabPanel.getHeight()-cancel_cutChartHeight);
 				}
 				
-				if(typeof cancel_staffChart != 'undefined' && typeof cancelledStaffChartPanel.hasRender != 'undefined'){
+				if(typeof cancel_staffPieChart != 'undefined' && typeof cancelledStaffChartPanel.hasRender != 'undefined'){
 					cancel_getStaffChartData();
 					cancel_staffPieChart = cancel_loadStaffPieChart(cancelFoodDetailsStatPanel.otype);
 					cancel_staffColumnChart = cancel_loadStaffColumnChart(cancelFoodDetailsStatPanel.otype);
@@ -322,7 +322,7 @@ function cancelFoodDetailsStatPanelInit(){
 					cancel_staffColumnChart.setSize(cancelFoodStatChartTabPanel.getWidth()*0.6, cancel_panelDrag ? cancelFoodStatChartTabPanel.getHeight() - cancel_cutAfterDrag : cancelFoodStatChartTabPanel.getHeight()-cancel_cutChartHeight);
 				}
 				
-				if(typeof cancel_deptChart != 'undefined' && typeof cancelledDeptChartPanel.hasRender != 'undefined'){
+				if(typeof cancel_deptPieChart != 'undefined' && typeof cancelledDeptChartPanel.hasRender != 'undefined'){
 					cancel_getDeptChartData();
 					cancel_deptPieChart = cancel_loadDeptPieChart(v);
 					cancel_deptColumnChart = cancel_loadDeptColumnChart(v);

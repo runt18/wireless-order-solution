@@ -1983,6 +1983,7 @@ function memberTypeOperationHandler(c){
 							if(jr.success){
 								Ext.example.msg(jr.title, jr.msg);
 								Ext.getCmp('btnRefreshMemberType').handler();
+								member_loadMemberTypeChart();
 							}else{
 								Ext.ux.showMsg(jr);
 							}
@@ -2193,6 +2194,8 @@ function initMemberTypeData(){
 				combo_memberTypeData.push([jr.root[i]['id'], jr.root[i]['name']]);
 			}
 			thiz.store.loadData(combo_memberTypeData);
+			
+			thiz.setValue(combo_memberTypeData[0][0]);
 		},
 		fialure : function(res, opt){
 			thiz.store.loadData(combo_memberTypeData);
@@ -2302,9 +2305,9 @@ function getLevelChartInfo(x){
 	for (var i = 0; i < yAxisData.length; i++) {
 		if(yAxisData[i].x == x){
 			if(yAxisData[i].status == 1){
-				return '<span style="font-size : 13px;">' + yAxisData[i].level + '-' + yAxisData[i].x +'分</span>';
+				return '<span style="font-size : 13px;">' + yAxisData[i].level + (yAxisData[i].x >0 ? '-' + yAxisData[i].x +'分' :'')+ '</span>';
 			}else if(yAxisData[i].status == 2){
-				return '<span style="font-size : 13px;color:red">点击设定-' + yAxisData[i].level + '</span>';
+				return '<span style="font-size : 13px;color:Maroon">点击设定-' + yAxisData[i].level + '</span>';
 			}else if(yAxisData[i].status == 3){
 				return '<span style="font-size : 13px;color:gray">' + yAxisData[i].level + '-未设定</span>';
 			}
