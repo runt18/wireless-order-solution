@@ -8,7 +8,6 @@
 		margin-left: 10px;
 	}
 </style>
-<script type="text/javascript" src="../../extjs/wireless.ux.js"></script>
 <script type="text/javascript">
 	var repaidStatisticsGrid, repaidOrderDetailWin;
 	var limitCount = 20;
@@ -21,7 +20,7 @@
 <div id="divRepaidDetailChart" data-type="repaidChart" data-value="repaidDetailChart" style="height : 400px;"></div>
 
 <div id="divRepaidStaffCharts" >
-	<div id="repaid_DivChartChange" style="display:none;padding-top: 10px;">
+	<div id="repaid_DivChartChange" class="chartChangeFont">
 		&nbsp;&nbsp;<span onclick="repaid_fnChangeStaffChart(this,1)"><input  type="radio" name="repaid_staffChange" checked="checked"  />按数量显示</span> &nbsp;&nbsp;&nbsp;
 		<span onclick="repaid_fnChangeStaffChart(this,0)"><input type="radio" name="repaid_staffChange"  />按金额显示</span> 
 	</div>	
