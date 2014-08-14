@@ -13,12 +13,14 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
 import com.wireless.db.client.member.MemberLevelDao;
+import com.wireless.db.client.member.MemberTypeDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.pojo.client.MemberLevel;
+import com.wireless.pojo.client.MemberType;
 import com.wireless.pojo.staffMgr.Staff;
 
 public class QueryMemberLevelAction extends DispatchAction{
@@ -27,22 +29,55 @@ public class QueryMemberLevelAction extends DispatchAction{
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
 		JObject jobject = new JObject();
-		List<String> xAxis = new ArrayList<String>();
-		List<Integer> data = new ArrayList<Integer>();
+		List<String> ydata = new ArrayList<String>();
+		List<Float> data = new ArrayList<Float>();
 		List<MemberLevel> memberLevelList = new ArrayList<MemberLevel>(); 
 		try{
 			String pin = (String) request.getAttribute("pin");
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
-			memberLevelList = MemberLevelDao.get(staff);
-			for (int i = 0; i < memberLevelList.size(); i++) {
-				String x = "\'" + memberLevelList.get(i).getMemberType().getName() + "\'";
-				xAxis.add(x);
-				data.add(memberLevelList.get(i).getPointThreshold());
+			memberLevelList = MemberLevelDao.getMemberLevels(staff);
+			
+			List<MemberType> memberTypeList = MemberTypeDao.getMemberType(StaffDao.verify(Integer.parseInt(pin)), null, null);
+			
+			for (int j = 0; j < memberLevelList.size(); j++) {
+					ydata.add("{y:5, level : \'" +  memberLevelList.get(j).getMemberType().getName() 
+								+ "\', x:" + memberLevelList.get(j).getPointThreshold() 
+								+ ", marker: {symbol:\'diamond\'}, status : 1"+ (data.isEmpty()?", first:true":"") +"}" );
+					data.add((float) memberLevelList.get(j).getPointThreshold());
 			}
 			
-			final String chart = "{\"xAxis\":"+ xAxis +", \"data\":"+ data +" }";
+			int levelCount = data.size();
+			int delta = memberTypeList.size() - data.size();
+			if(memberTypeList.size() > data.size()){
+				for (int i = 0; i < delta; i++) {
+					StringBuilder y = new StringBuilder();
+					y.append("{y : 5, level : \'等级" + ((i+1)+levelCount) + "\'");
+					if(data.size() > 0){
+						y.append(",x:" + (data.get(levelCount + i - 1)*1.5 + 1.3));
+					}else{
+						y.append(",x:0");
+					}
+					if(i == 0){
+						y.append(", marker:{symbol:\'triangle\'}");
+						y.append(", status : 2");
+						y.append(", color : \'red\'");
+						y.append(data.isEmpty()?", first:true":"");
+					}else{
+						y.append(", marker:{symbol:\'square\'}");
+						y.append(", status : 3");
+						y.append(", color : \'Gray\'");
+					}
+					y.append("}");
+					ydata.add(y.toString());
+					data.add((float) (data.size() > 0 ? (data.get(levelCount + i - 1)*1.5 + 1.3) : 0));
+				}
+			}
+			
+			
+			final String chart = "{\"data\":"+ ydata +" }";
 			
 			jobject.setRoot(memberLevelList);
+			
 			jobject.setExtra(new Jsonable(){
 
 				@Override
