@@ -324,8 +324,8 @@ function cancelFoodDetailsStatPanelInit(){
 				
 				if(typeof cancel_deptPieChart != 'undefined' && typeof cancelledDeptChartPanel.hasRender != 'undefined'){
 					cancel_getDeptChartData();
-					cancel_deptPieChart = cancel_loadDeptPieChart(v);
-					cancel_deptColumnChart = cancel_loadDeptColumnChart(v);
+					cancel_deptPieChart = cancel_loadDeptPieChart(cancelFoodDetailsStatPanel.otype);
+					cancel_deptColumnChart = cancel_loadDeptColumnChart(cancelFoodDetailsStatPanel.otype);
 					cancel_deptPieChart.setSize(cancelFoodStatChartTabPanel.getWidth()*0.4, cancel_panelDrag ? cancelFoodStatChartTabPanel.getHeight() - cancel_cutAfterDrag : cancelFoodStatChartTabPanel.getHeight()-cancel_cutChartHeight);
 					cancel_deptColumnChart.setSize(cancelFoodStatChartTabPanel.getWidth()*0.6, cancel_panelDrag ? cancelFoodStatChartTabPanel.getHeight() - cancel_cutAfterDrag : cancelFoodStatChartTabPanel.getHeight()-cancel_cutChartHeight);
 					

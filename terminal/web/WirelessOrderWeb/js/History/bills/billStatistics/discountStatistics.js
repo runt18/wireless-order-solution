@@ -1,5 +1,54 @@
 
+function discount_linkOrderId(v){
+	if(!isNaN(v)){
+		return '<a href=\"javascript:discount_showBillDetailWin('+ v +')\">'+ v +'</a>';
+	}else{
+		return v;
+	}
+}
 
+function discount_showBillDetailWin(orderID){
+	discountViewBillWin = new Ext.Window({
+		layout : 'fit',
+		title : '查看账单',
+		width : 510,
+		height : 550,
+		resizable : false,
+		closable : false,
+		modal : true,
+		bbar : ['->', {
+			text : '关闭',
+			iconCls : 'btn_close',
+			handler : function() {
+				discountViewBillWin.destroy();
+			}
+		}],
+		keys : [{
+			key : Ext.EventObject.ESC,
+			scope : this,
+			fn : function(){
+				discountViewBillWin.destroy();
+			}
+		}],
+		listeners : {
+			show : function(thiz) {
+				var sd = Ext.ux.getSelData(discountStatisticsGrid);
+				thiz.load({
+					url : '../window/history/viewBillDetail.jsp', 
+					scripts : true,
+					params : {
+						orderId : sd.id,
+						queryType : 'History'
+					},
+					method : 'post'
+				});
+				thiz.center();	
+			}
+		}
+	});
+	discountViewBillWin.show();
+	discountViewBillWin.center();
+}
 function initDiscountGrid(){
 	var beginDate = new Ext.form.DateField({
 		id : 'discount_dateSearchDateBegin',
@@ -242,7 +291,7 @@ function initDiscountGrid(){
 		'../../QueryDiscountStatistics.do',
 		[[true, false, false, true], 
 		 ['日期','orderDateFormat'], 
-		 ['账单号', 'id'],
+		 ['账单号', 'id',,,'discount_linkOrderId'],
          ['折扣额','discountPrice',,'right','Ext.ux.txtFormat.gridDou'], 
          ['实收金额','actualPrice',,'right','Ext.ux.txtFormat.gridDou'],
          ['操作人','waiter'], 
