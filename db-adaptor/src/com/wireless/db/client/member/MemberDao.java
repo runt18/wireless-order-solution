@@ -10,7 +10,7 @@ import java.util.Map;
 import com.mysql.jdbc.Statement;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
-import com.wireless.db.coupon.CouponDao;
+import com.wireless.db.promotion.CouponDao;
 import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.db.weixin.member.WeixinMemberDao;
 import com.wireless.exception.BusinessException;
@@ -22,10 +22,10 @@ import com.wireless.pojo.client.MemberComment.CommitBuilder;
 import com.wireless.pojo.client.MemberOperation;
 import com.wireless.pojo.client.MemberOperation.ChargeType;
 import com.wireless.pojo.client.MemberType;
-import com.wireless.pojo.coupon.Coupon;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.distMgr.Discount;
 import com.wireless.pojo.menuMgr.Food;
+import com.wireless.pojo.promotion.Coupon;
 import com.wireless.pojo.restaurantMgr.Module;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.DateUtil;
@@ -643,32 +643,6 @@ public class MemberDao {
 	}
 	
 	/**
-	 * Check to see whether the member is valid before insert or update.
-	 * @param dbCon
-	 * 			the database connection
-	 * @param staff
-	 * 			the staff to perform this action
-	 * @param memberToCheck
-	 * @throws SQLException
-	 * 			throws if failed to execute any SQL statement
-	 * @throws BusinessException
-	 * 			throws if the mobile to new member has been exist before
-	 * 			throws if the card to new member has been exist before
-	 * 			throws if the member type does NOT exist
-	 */
-	public static void checkValid(DBCon dbCon, Staff staff, Member memberToCheck) throws SQLException, BusinessException{
-		
-		if(!getByCond(dbCon, staff, new ExtraCond().setMobile(memberToCheck.getMobile()).toString() + (memberToCheck.getId() != 0 ? " AND M.member_id != " + memberToCheck.getId() : ""), null).isEmpty()){
-			throw new BusinessException(MemberError.MOBLIE_DUPLICATED);
-		}
-		
-		if(!memberToCheck.getMemberCard().isEmpty() && !getByCond(dbCon, staff, new ExtraCond().setCard(memberToCheck.getMemberCard()).toString() + (memberToCheck.getId() != 0 ? " AND M.member_id != " + memberToCheck.getId() : ""), null).isEmpty()){
-			throw new BusinessException(MemberError.MEMBER_CARD_DUPLICATED);
-		}
-		
-	}
-	
-	/**
 	 * Insert a new member.
 	 * @param dbCon
 	 * 			the database connection
@@ -703,7 +677,13 @@ public class MemberDao {
 		Member member = builder.build();
 
 		//检查是否信息有重复
-		checkValid(dbCon, staff, member);
+		//Check to see whether the mobile or member card is duplicated.
+		if(!getByCond(dbCon, staff, new ExtraCond().setMobile(member.getMobile()).toString(), null).isEmpty()){
+			throw new BusinessException(MemberError.MOBLIE_DUPLICATED);
+		}
+		if(member.hasMemberCard() && !getByCond(dbCon, staff, new ExtraCond().setCard(member.getMemberCard()).toString(), null).isEmpty()){
+			throw new BusinessException(MemberError.MEMBER_CARD_DUPLICATED);
+		}
 		
 		String sql;
 		sql = " INSERT INTO " + Params.dbName + ".member " +
@@ -788,48 +768,57 @@ public class MemberDao {
 	/**
 	 * Update a member.
 	 * @param staff
-	 * 			the terminal
+	 * 			the staff to perform this action
 	 * @param builder
 	 * 			the builder to update member
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 * @throws BusinessException
-	 * 			throws if cases below<br>
-	 * 			the mobile to new member has been exist before<br>
-	 * 			the card to new member has been exist before<br>
-	 * 			the member to update does NOT exist
+	 * 			<li>throws if the mobile to new member has been exist before
+	 * 			<li>throws if the card to new member has been exist before
+	 * 			<li>throws if the member to update does NOT exist
 	 */
 	public static void update(DBCon dbCon, Staff staff, Member.UpdateBuilder builder) throws SQLException, BusinessException{
 		Member member = builder.build();
-		MemberType mType = MemberTypeDao.getMemberTypeById(staff, member.getMemberType().getId());
 		// 旧会员类型是充值属性, 修改为优惠属性时, 检查是否还有余额, 有则不允许修改
-		Member old = MemberDao.getById(staff, member.getId());
-		if(mType.getAttribute() != old.getMemberType().getAttribute() 
-				&& old.getMemberType().getAttribute() == MemberType.Attribute.CHARGE){
-			if(old.getTotalBalance() > 0){
-				throw new BusinessException(MemberError.UPDATE_FAIL_HAS_BALANCE);
+		if(builder.isMemberTypeChanged()){
+			MemberType newType = MemberTypeDao.getMemberTypeById(dbCon, staff, member.getMemberType().getId());
+			Member oriMember = MemberDao.getById(staff, member.getId());
+			if(newType.isPoint() && oriMember.getMemberType().isCharge() && oriMember.getTotalBalance() > 0){
+				throw new BusinessException("该会员还有余额, 不允许设为优惠属性的类型会员", MemberError.UPDATE_FAIL);
 			}
 		}
-
-		checkValid(dbCon, staff, member);
 		
-		String updateSQL = " UPDATE " + Params.dbName + ".member SET " 
-			+ " member_id = " + member.getId()  
-			+ (builder.isNameChanged() ? " ,name = '" + member.getName() + "'" : "")
-			+ (builder.isMobileChanged() ? " ,mobile = " + "'" + member.getMobile() + "'" : "") 
-			+ (builder.isMobileChanged() ? " ,mobile_crc = CRC32('" + member.getMobile() + "')" : "") 
-			+ (builder.isMemberTypeChanged() ? " ,member_type_id = " + member.getMemberType().getId() : "")
-			+ (builder.isMemberCardChanged() ? " ,member_card = '" + member.getMemberCard() + "'" : "") 
-			+ (builder.isMemberCardChanged() ? ", member_card_crc = CRC32('" + member.getMemberCard() + "')" : "")
-			+ (builder.isTeleChanged() ? " ,tele = '" + member.getTele() + "'" : "") 
-			+ (builder.isSexChanged() ? " ,sex = " + member.getSex().getVal() : "") 
-			+ (builder.isIdChardChanged() ? " ,id_card = '" + member.getIdCard() + "'" : "") 
-			+ (builder.isBirthdayChanged() ? " ,birthday = '" + DateUtil.format(member.getBirthday()) + "'" : "") 
-			+ (builder.isCompanyChanged() ? " ,company = '" + member.getCompany() + "'" : "") 
-			+ (builder.isContactAddrChanged() ? " ,contact_addr = '" + member.getContactAddress() + "'" : "") 
-			+ " WHERE member_id = " + member.getId(); 
+		//Check to see whether the mobile or member card is duplicated.
+		if(builder.isMobileChanged()){
+			if(!getByCond(dbCon, staff, new ExtraCond().setMobile(member.getMobile()) + " AND M.member_id <> " + member.getId(), null).isEmpty()){
+				throw new BusinessException(MemberError.MOBLIE_DUPLICATED);
+			}
+		}
+		if(builder.isMemberCardChanged()){
+			if(member.hasMemberCard() && !getByCond(dbCon, staff, new ExtraCond().setCard(member.getMemberCard()) + " AND M.member_id <> " + member.getId(), null).isEmpty()){
+				throw new BusinessException(MemberError.MEMBER_CARD_DUPLICATED);
+			}
+		}
 		
-		if(dbCon.stmt.executeUpdate(updateSQL) == 0){
+		String sql;
+		sql = " UPDATE " + Params.dbName + ".member SET " +
+			  " member_id = " + member.getId() +
+			  (builder.isNameChanged() ? " ,name = '" + member.getName() + "'" : "") +
+			  (builder.isMobileChanged() ? " ,mobile = " + "'" + member.getMobile() + "'" : "") +
+			  (builder.isMobileChanged() ? " ,mobile_crc = CRC32('" + member.getMobile() + "')" : "") +
+			  (builder.isMemberTypeChanged() ? " ,member_type_id = " + member.getMemberType().getId() : "")	+
+			  (builder.isMemberCardChanged() ? " ,member_card = '" + member.getMemberCard() + "'" : "")	+
+			  (builder.isMemberCardChanged() ? ", member_card_crc = CRC32('" + member.getMemberCard() + "')" : "") +
+			  (builder.isTeleChanged() ? " ,tele = '" + member.getTele() + "'" : "") +
+			  (builder.isSexChanged() ? " ,sex = " + member.getSex().getVal() : "")	+
+			  (builder.isIdChardChanged() ? " ,id_card = '" + member.getIdCard() + "'" : "") +
+			  (builder.isBirthdayChanged() ? " ,birthday = '" + DateUtil.format(member.getBirthday()) + "'" : "") +
+			  (builder.isCompanyChanged() ? " ,company = '" + member.getCompany() + "'" : "") +
+			  (builder.isContactAddrChanged() ? " ,contact_addr = '" + member.getContactAddress() + "'" : "") +
+			  " WHERE member_id = " + member.getId(); 
+		
+		if(dbCon.stmt.executeUpdate(sql) == 0){
 			throw new BusinessException(MemberError.MEMBER_NOT_EXIST);
 		}
 		
@@ -919,7 +908,7 @@ public class MemberDao {
 	public static void deleteById(DBCon dbCon, Staff staff, int memberId) throws SQLException{
 		String sql;
 		//Delete the coupon associated with this member
-		CouponDao.deleteByMember(dbCon, staff, memberId);
+		CouponDao.delete(dbCon, staff, new CouponDao.ExtraCond().setMember(memberId));
 		
 		//Delete the interested member.
 		sql = " DELETE FROM " + Params.dbName + ".interested_member WHERE member_id = " + memberId;

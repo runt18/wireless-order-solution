@@ -1,4 +1,4 @@
-package com.wireless.db.coupon;
+package com.wireless.db.promotion;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -9,9 +9,9 @@ import com.mysql.jdbc.Statement;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.exception.BusinessException;
-import com.wireless.exception.MemberError;
-import com.wireless.pojo.coupon.Coupon;
-import com.wireless.pojo.coupon.CouponType;
+import com.wireless.exception.PromotionError;
+import com.wireless.pojo.promotion.Coupon;
+import com.wireless.pojo.promotion.CouponType;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.DateUtil;
 
@@ -141,7 +141,7 @@ public class CouponTypeDao {
 			  (builder.isImageChanged() ? " ,image = '" + type.getImage() + "'" : "") +
 			  " WHERE coupon_type_id = " + type.getId();
 		if(dbCon.stmt.executeUpdate(sql) == 0){
-			throw new BusinessException(MemberError.COUPON_TYPE_NOT_EXIST);
+			throw new BusinessException(PromotionError.COUPON_TYPE_NOT_EXIST);
 		}
 	}
 	
@@ -186,15 +186,15 @@ public class CouponTypeDao {
 	 * 			throws if the coupon type to delete does NOT exist
 	 */
 	public static void delete(DBCon dbCon, Staff staff, int couponTypeId) throws SQLException, BusinessException{
-		String sql;
 		
 		//Delete the associated coupon.
-		CouponDao.deleteByType(dbCon, staff, couponTypeId);
+		CouponDao.delete(dbCon, staff, new CouponDao.ExtraCond().setCouponType(couponTypeId));
 		
+		String sql;
 		//Delete the coupon type.
 		sql = " DELETE FROM " + Params.dbName + ".coupon_type WHERE coupon_type_id = " + couponTypeId;
 		if(dbCon.stmt.executeUpdate(sql) == 0){
-			throw new BusinessException(MemberError.COUPON_TYPE_NOT_EXIST);
+			throw new BusinessException(PromotionError.COUPON_TYPE_NOT_EXIST);
 		}
 	}
 	
@@ -269,7 +269,7 @@ public class CouponTypeDao {
 	public static CouponType getById(DBCon dbCon, Staff staff, int couponTypeId) throws SQLException, BusinessException{
 		List<CouponType> result = getByCond(dbCon, staff, " AND coupon_type_id = " + couponTypeId, null);
 		if(result.isEmpty()){
-			throw new BusinessException(MemberError.COUPON_TYPE_NOT_EXIST);
+			throw new BusinessException(PromotionError.COUPON_TYPE_NOT_EXIST);
 		}else{
 			return result.get(0);
 		}

@@ -14,7 +14,7 @@ import com.wireless.db.client.member.MemberCommentDao;
 import com.wireless.db.client.member.MemberDao;
 import com.wireless.db.client.member.MemberOperationDao;
 import com.wireless.db.client.member.MemberTypeDao;
-import com.wireless.db.coupon.CouponDao;
+import com.wireless.db.promotion.CouponDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.client.Member;
@@ -174,7 +174,7 @@ public class TestMemberDao {
 			compareMember(expect, actual);
 			
 			//Update the member just inserted
-			Member.UpdateBuilder updateBuilder = new Member.UpdateBuilder(memberId, mStaff.getRestaurantId())
+			Member.UpdateBuilder updateBuilder = new Member.UpdateBuilder(memberId)
 														   .setName("李四")
 														   .setMobile("18520590931")
 														   .setMemberTypeId(memberType.getId())
@@ -257,7 +257,7 @@ public class TestMemberDao {
 				//assertTrue("failed to delete history member operation", MemberOperationDao.getHistoryByMemberId(mStaff, memberId).isEmpty());
 				
 				//Check to see whether the coupon associated with this member are deleted
-				assertTrue("failed to delete the coupons associated with this member", CouponDao.getByMember(mStaff, memberId).isEmpty());
+				assertTrue("failed to delete the coupons associated with this member", CouponDao.getByCond(mStaff, new CouponDao.ExtraCond().setMember(memberId), null).isEmpty());
 			}
 		}
 

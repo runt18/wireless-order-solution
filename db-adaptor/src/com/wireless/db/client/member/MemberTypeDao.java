@@ -116,11 +116,31 @@ public class MemberTypeDao {
 	 */
 	public static void deleteById(DBCon dbCon, Staff staff, int memberTypeId) throws BusinessException, SQLException{
 		String sql;
-		sql = "SELECT * FROM " + Params.dbName + ".member WHERE restaurant_id = " + staff.getRestaurantId() + " AND member_type_id = " + memberTypeId;
+		
+		//Check to see any member associated with this type exist.
+		sql = "SELECT COUNT(*) FROM " + Params.dbName + ".member WHERE restaurant_id = " + staff.getRestaurantId() + " AND member_type_id = " + memberTypeId;
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		if(dbCon.rs.next()){
-			throw new BusinessException(MemberError.TYPE_DELETE_ISNOT_EMPTY);
+			if(dbCon.rs.getInt(1) > 0){
+				throw new BusinessException(MemberError.TYPE_DELETE_FAIL_BECAUSE_MEMBER_NOT_EMPTY);
+			}
 		}
+		dbCon.rs.close();
+		
+		//Check to see whether the member level related to this type is in used.
+		sql = " SELECT COUNT(*) FROM " + Params.dbName + ".member_level WHERE member_type_id = " + memberTypeId;
+		dbCon.rs = dbCon.stmt.executeQuery(sql);
+		if(dbCon.rs.next()){
+			if(dbCon.rs.getInt(1) > 0){
+				throw new BusinessException(MemberError.TYPE_DELETE_FAIL_BECAUSE_LEVEL_IN_USED);
+			}
+		}
+		dbCon.rs.close();
+		
+		//Delete the member level associated with this member type
+		sql = " DELETE FROM " + Params.dbName + ".member_level WHERE member_type_id = " + memberTypeId;
+		dbCon.stmt.executeUpdate(sql);
+		
 		//Delete the discounts associated with this member type.
 		sql = " DELETE FROM " + Params.dbName + ".member_type_discount WHERE member_type_id = " + memberTypeId;
 		dbCon.stmt.executeUpdate(sql);
@@ -128,7 +148,7 @@ public class MemberTypeDao {
 		//Delete the member type.
 		sql = " DELETE FROM " + Params.dbName + ".member_type WHERE member_type_id = " + memberTypeId;
 		if(dbCon.stmt.executeUpdate(sql) == 0){
-			throw new BusinessException(MemberError.TYPE_DELETE_ISNOT_EMPTY);
+			throw new BusinessException(MemberError.TYPE_DELETE_FAIL_BECAUSE_MEMBER_NOT_EMPTY);
 		}
 	}
 	

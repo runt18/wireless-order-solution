@@ -403,7 +403,7 @@ public class MemberLevelDao {
 					//upgrade the member to level whose threshold is nearest the member's
 					if(member.getTotalPoint() > lvToUpgrade.getPointThreshold()){
 						if(!member.getMemberType().equals(lvToUpgrade.getMemberType())){
-							MemberDao.update(dbCon, staff, new Member.UpdateBuilder(member.getId(), staff.getRestaurantId()).setMemberTypeId(lvToUpgrade.getMemberType().getId()));
+							MemberDao.update(dbCon, staff, new Member.UpdateBuilder(member.getId()).setMemberTypeId(lvToUpgrade.getMemberType().getId()));
 						}
 						return new Msg4Upgrade(member, lvToUpgrade);
 					}
