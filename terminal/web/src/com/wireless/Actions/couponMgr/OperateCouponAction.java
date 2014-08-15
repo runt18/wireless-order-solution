@@ -11,12 +11,12 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
 import com.wireless.db.client.member.MemberDao;
-import com.wireless.db.coupon.CouponDao;
+import com.wireless.db.promotion.CouponDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.client.Member;
-import com.wireless.pojo.coupon.Coupon;
+import com.wireless.pojo.promotion.Coupon;
 
 public class OperateCouponAction extends DispatchAction{
 
@@ -30,14 +30,14 @@ public class OperateCouponAction extends DispatchAction{
 		String[] memberType = null;
 		JObject jobject = new JObject();
 		try{
-			Coupon.InsertAllBuilder builder = new Coupon.InsertAllBuilder(Integer.parseInt(typeId));
+			Coupon.CreateBuilder builder = new Coupon.CreateBuilder(Integer.parseInt(typeId));
 			memberType = memberTypes.split(",");
 			for (int i = 0; i < memberType.length; i++) {
 				for (Member m : MemberDao.getByCond(StaffDao.verify(Integer.parseInt(pin)), new MemberDao.ExtraCond().setMemberType(Integer.parseInt(memberType[i])), null)) {
 					builder.addMemberId(m.getId());
 				}
 			}
-			CouponDao.insertAll(StaffDao.verify(Integer.parseInt(pin)), builder);
+			CouponDao.create(StaffDao.verify(Integer.parseInt(pin)), builder);
 			
 			jobject.initTip(true, "发放成功");
 		}catch(BusinessException e){
@@ -66,12 +66,12 @@ public class OperateCouponAction extends DispatchAction{
 		String[] membersDatas = null;
 		JObject jobject = new JObject();
 		try{
-			Coupon.InsertAllBuilder builder = new Coupon.InsertAllBuilder(Integer.parseInt(coupon));
+			Coupon.CreateBuilder builder = new Coupon.CreateBuilder(Integer.parseInt(coupon));
 			membersDatas = membersData.split(",");
 			for (int i = 0; i < membersDatas.length; i++) {
 				builder.addMemberId(Integer.parseInt(membersDatas[i]));
 			}
-			CouponDao.insertAll(StaffDao.verify(Integer.parseInt(pin)), builder);
+			CouponDao.create(StaffDao.verify(Integer.parseInt(pin)), builder);
 			
 /*			try{
 				//Send SMS.

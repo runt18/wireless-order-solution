@@ -35,8 +35,8 @@ import com.wireless.pojo.sms.VerifySMS.ExpiredPeriod;
 import com.wireless.pojo.sms.VerifySMS.InsertBuilder;
 import com.wireless.pojo.sms.VerifySMS.VerifyBuilder;
 import com.wireless.pojo.staffMgr.Staff;
-import com.wireless.util.sms.SMS;
-import com.wireless.util.sms.SMS.Msg4Verify;
+import com.wireless.sms.SMS;
+import com.wireless.sms.msg.Msg4Verify;
 
 public class WXOperateMemberAction extends DispatchAction {
 	
@@ -275,37 +275,37 @@ public class WXOperateMemberAction extends DispatchAction {
 	 * @throws Exception
 	 */
 	public ActionForward rebind(ActionMapping mapping, ActionForm form,	HttpServletRequest request, HttpServletResponse response) throws Exception {
-		request.setCharacterEncoding("UTF-8");
-		response.setCharacterEncoding("UTF-8");
-		JObject jobject = new JObject();
-		DBCon dbCon = new DBCon();
-		try{
-			String openId = request.getParameter("oid");
-			String formId = request.getParameter("fid");
-			String codeId = request.getParameter("codeId");
-			String code = request.getParameter("code");
-			
-			dbCon.connect();
-			dbCon.conn.setAutoCommit(false);
-			
-			// 验证验证码
-			VerifySMSDao.verify(dbCon, new VerifyBuilder(Integer.valueOf(codeId), Integer.valueOf(code)));
-			// 修改手机号码
-			WeixinMemberDao.updateMobile(dbCon, request.getParameter("mobile"), openId, formId);
-			
-			dbCon.conn.commit();
-			jobject.initTip(true, "操作成功, 已重新绑定手机号码.");
-			
-		}catch(BusinessException e){
-			e.printStackTrace();
-			jobject.initTip(e);
-		}catch(SQLException e){
-			e.printStackTrace();
-			jobject.initTip(e);
-		}finally{
-			dbCon.disconnect();
-			response.getWriter().print(jobject.toString());
-		}
+//		request.setCharacterEncoding("UTF-8");
+//		response.setCharacterEncoding("UTF-8");
+//		JObject jobject = new JObject();
+//		DBCon dbCon = new DBCon();
+//		try{
+//			String openId = request.getParameter("oid");
+//			String formId = request.getParameter("fid");
+//			String codeId = request.getParameter("codeId");
+//			String code = request.getParameter("code");
+//			
+//			dbCon.connect();
+//			dbCon.conn.setAutoCommit(false);
+//			
+//			// 验证验证码
+//			VerifySMSDao.verify(dbCon, new VerifyBuilder(Integer.valueOf(codeId), Integer.valueOf(code)));
+//			// 修改手机号码
+//			WeixinMemberDao.updateMobile(dbCon, request.getParameter("mobile"), openId, formId);
+//			
+//			dbCon.conn.commit();
+//			jobject.initTip(true, "操作成功, 已重新绑定手机号码.");
+//			
+//		}catch(BusinessException e){
+//			e.printStackTrace();
+//			jobject.initTip(e);
+//		}catch(SQLException e){
+//			e.printStackTrace();
+//			jobject.initTip(e);
+//		}finally{
+//			dbCon.disconnect();
+//			response.getWriter().print(jobject.toString());
+//		}
 		return null;
 	}
 	
@@ -323,7 +323,6 @@ public class WXOperateMemberAction extends DispatchAction {
 		response.setCharacterEncoding("UTF-8");
 		
 		String pin = (String) request.getAttribute("pin");
-		String restaurantId = (String) request.getAttribute("restaurantID");
 		JObject jobject = new JObject();
 		try{
 			String weixinMemberCard = request.getParameter("weixinMemberCard");
@@ -335,7 +334,7 @@ public class WXOperateMemberAction extends DispatchAction {
 			
 			int memberId = WeixinMemberDao.bind(staff, weixinMemberPhone, Integer.parseInt(weixinMemberCard));
 			
-			Member.UpdateBuilder builder = new Member.UpdateBuilder(memberId, Integer.parseInt(restaurantId));
+			Member.UpdateBuilder builder = new Member.UpdateBuilder(memberId);
 			
 			if(weixinMemberSex != null && !weixinMemberSex.isEmpty()){
 				builder.setSex(Member.Sex.valueOf(Integer.valueOf(weixinMemberSex)));

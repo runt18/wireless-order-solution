@@ -18,13 +18,13 @@ import org.marker.weixin.msg.Msg4Video;
 import org.marker.weixin.msg.Msg4Voice;
 
 import com.wireless.Actions.init.InitServlet;
-import com.wireless.db.coupon.CouponDao;
+import com.wireless.db.promotion.CouponDao;
 import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.weixin.member.WeixinMemberDao;
 import com.wireless.db.weixin.restaurant.WeixinRestaurantDao;
 import com.wireless.exception.BusinessException;
-import com.wireless.pojo.coupon.Coupon;
+import com.wireless.pojo.promotion.Coupon;
 import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.DateUtil;

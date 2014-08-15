@@ -11,8 +11,8 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.client.member.MemberDao;
-import com.wireless.db.coupon.CouponDao;
 import com.wireless.db.orderMgr.PayOrder;
+import com.wireless.db.promotion.CouponDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.MemberError;
@@ -20,8 +20,8 @@ import com.wireless.json.JObject;
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.pojo.client.Member;
-import com.wireless.pojo.coupon.Coupon;
 import com.wireless.pojo.dishesOrder.Order;
+import com.wireless.pojo.promotion.Coupon;
 import com.wireless.pojo.staffMgr.Staff;
 
 public class QueryOrderFromMemberPayAction extends Action{
@@ -63,7 +63,7 @@ public class QueryOrderFromMemberPayAction extends Action{
 			}
 			final Order order = PayOrder.calc(staff, payBuilder);
 			
-			final List<Coupon> coupons = CouponDao.getAvailByMember(staff, m.getId());
+			final List<Coupon> coupons = CouponDao.getByCond(staff, new CouponDao.ExtraCond().setMember(m.getId()).setStatus(Coupon.Status.DRAWN), null);
 			
 			jobject.setExtra(new Jsonable(){
 

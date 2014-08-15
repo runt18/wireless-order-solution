@@ -75,7 +75,7 @@ import com.wireless.util.OSSUtil;
 
 public class FinanceWeixinAction extends Action {
 	
-	private final static int WEIXIN_CONTENT_LENGTH = 32;
+	private final static int WEIXIN_CONTENT_LENGTH = 34;
 	
 	private String financeBucket;
 	
@@ -163,29 +163,28 @@ public class FinanceWeixinAction extends Action {
 					rmsg.setToUserName(msg.getFromUserName());
 					
 					if(msg.getEventKey().equals(TODAY_EVENT_KEY)){
-						//TODO
-						rmsg.setContent(TODAY_EVENT_KEY);
-						session.callback(rmsg);
+						session.callback(doToday(msg));
 						
 					}else if(msg.getEventKey().equals(YESTERDAY_EVENT_KEY)){
-						session.callback(doCheckRecentDailySettlement(msg));
+						//最近日结
+						session.callback(doYesterday(msg));
 						
 					}else if(msg.getEventKey().equals(THIS_WEEK_EVENT_KEY)){
-						//TODO
-						session.callback(doFocusedStatistics(msg));
+						//TODO 本周周报
+						session.callback(doThisweek(msg));
 						
 					}else if(msg.getEventKey().equals(LAST_WEEK_EVENT_KEY)){
-						//TODO
+						//TODO 上周周报
 						rmsg.setContent(LAST_WEEK_EVENT_KEY);
 						session.callback(rmsg);
 						
 					}else if(msg.getEventKey().equals(THIS_MONTH_EVENT_KEY)){
-						//TODO
+						//TODO 本月月报
 						rmsg.setContent(THIS_MONTH_EVENT_KEY);
 						session.callback(rmsg);
 						
 					}else if(msg.getEventKey().equals(LAST_MONTH_EVENT_KEY)){
-						//TODO
+						//TODO 上月月报
 						rmsg.setContent(LAST_MONTH_EVENT_KEY);
 						session.callback(rmsg);
 					}
@@ -203,11 +202,11 @@ public class FinanceWeixinAction extends Action {
 					
 				}else if(opeCodes[0].equals("rj")){
 					//查看最近日结信息
-					session.callback(doCheckRecentDailySettlement(msg));
+					session.callback(doYesterday(msg));
 					
 				}else if(opeCodes[0].equals("yy")){
 					//查看今日关注
-					session.callback(doFocusedStatistics(msg));
+					session.callback(doThisweek(msg));
 					
 				}else{
 					//显示使用说明
@@ -275,12 +274,38 @@ public class FinanceWeixinAction extends Action {
 		}
 	}
 	
+	private Msg doToday(Msg msg){
+		Msg4Text rmsg =	new Msg4Text();
+		rmsg.setFromUserName(msg.getToUserName());
+		rmsg.setToUserName(msg.getFromUserName());
+		
+		DBCon dbCon = null;
+		try{
+			dbCon = new DBCon();
+			dbCon.connect();
+			
+			int restaurantId = WeixinFinanceDao.getRestaurantIdByWeixin(dbCon, msg.getFromUserName());
+			
+			rmsg.setContent(makeShiftContent("即时战报", RestaurantDao.getById(restaurantId), ShiftDao.getTodayDaily(dbCon, StaffDao.getAdminByRestaurant(restaurantId))));
+			
+		}catch(SQLException | BusinessException | ParseException e){
+			rmsg.setContent("对不起，暂时查询不到即时战报的信息:-(");
+			
+		}finally{
+			if(dbCon != null){
+				dbCon.disconnect();
+			}
+		}
+		
+		return rmsg;
+	}
+	
 	/**
 	 * 查看最近日结信息
 	 * @param msg
 	 * @return
 	 */
-	private Msg doCheckRecentDailySettlement(Msg msg){
+	private Msg doYesterday(Msg msg){
 		Msg4Text rmsg =	new Msg4Text();
 		rmsg.setFromUserName(msg.getToUserName());
 		rmsg.setToUserName(msg.getFromUserName());
@@ -303,52 +328,18 @@ public class FinanceWeixinAction extends Action {
 				
 				dbCon.rs.close();
 				
-				ShiftDetail detail = ShiftDao.getByRange(dbCon, StaffDao.getByRestaurant(dbCon, restaurantId).get(0), 
+				ShiftDetail detail = ShiftDao.getByRange(dbCon, StaffDao.getAdminByRestaurant(restaurantId), 
 													    new DutyRange(onDuty, offDuty), 
 														new CalcBillStatisticsDao.ExtraCond(DateType.HISTORY));
-				StringBuilder content = new StringBuilder();
-				content.append(centerAligned("最近日结") + "\n");
-				content.append("-----------------\n");
-				content.append("餐厅:" + RestaurantDao.getById(dbCon, restaurantId).getName() + "\n");
-				content.append("开始时间:" + new SimpleDateFormat("M月d日 HH:mm").format(onDuty) + "\n");
-				content.append("结束时间:" + new SimpleDateFormat("M月d日 HH:mm").format(offDuty) + "\n");
 				
-				content.append("-----------------\n")
-					   .append(grid3Item(new String[]{"收款", "账单数", "金额"}, new int[]{10, 20}) + "\n")
-					   .append(grid3Item(new String[]{"现金", Integer.toString(detail.getCashAmount()), NumericUtil.CURRENCY_SIGN + NumericUtil.float2String2(detail.getCashActualIncome())}, new int[]{10, 16}) + "\n")
-					   .append(grid3Item(new String[]{"刷卡", Integer.toString(detail.getCreditCardAmount()), NumericUtil.CURRENCY_SIGN + NumericUtil.float2String2(detail.getCreditActualIncome())}, new int[]{10, 16}) + "\n");
-				
-				if(detail.getMemberCardAmount() > 0){
-					content.append(grid3Item(new String[]{"会员", Integer.toString(detail.getMemberCardAmount()), NumericUtil.CURRENCY_SIGN + NumericUtil.float2String2(detail.getMemberActualIncome())}, new int[]{10, 16}) + "\n");
-				}
-				if(detail.getSignAmount() > 0){
-					content.append(grid3Item(new String[]{"签单", Integer.toString(detail.getSignAmount()), NumericUtil.CURRENCY_SIGN + NumericUtil.float2String2(detail.getSignActualIncome())}, new int[]{10, 16}) + "\n");
-				}
-				if(detail.getHangAmount() > 0){
-					content.append(grid3Item(new String[]{"挂账", Integer.toString(detail.getHangAmount()), NumericUtil.CURRENCY_SIGN + NumericUtil.float2String2(detail.getHangActualIncome())}, new int[]{10, 16}) + "\n");
-				}
-				
-				content.append("-----------------"
-						+ "\n").append(grid2Item("部门", "销售额", 18) + "\n");
-				for(IncomeByDept incomeByDept : detail.getDeptIncome()){
-					content.append(grid2Item(incomeByDept.getDept().getName(), NumericUtil.CURRENCY_SIGN + NumericUtil.float2String2(incomeByDept.getIncome()), 16)).append("\n");
-					
-				}
-
-				content.append("-----------------\n")
-					   .append("实收总额：" + NumericUtil.CURRENCY_SIGN + NumericUtil.float2String2(detail.getTotalActual()) + "\n");
-				
-				rmsg.setContent(content.toString());
+				rmsg.setContent(makeShiftContent("最近日结", RestaurantDao.getById(restaurantId), detail));
 				
 			}else{
 				throw new BusinessException("");
 			}
 
 			
-		}catch(SQLException e){
-			rmsg.setContent("对不起，暂时查询不到最近日结的信息:-(");
-			
-		}catch (BusinessException e) {
+		}catch(SQLException | BusinessException | ParseException e){
 			rmsg.setContent("对不起，暂时查询不到最近日结的信息:-(");
 			
 		}finally{
@@ -358,6 +349,42 @@ public class FinanceWeixinAction extends Action {
 		}
 		
 		return rmsg;
+	}
+	
+	private String makeShiftContent(String title, Restaurant restaurant, ShiftDetail detail) throws ParseException{
+		StringBuilder content = new StringBuilder();
+		content.append(centerAligned(title) + "\n");
+		content.append("-------------------\n");
+		content.append("餐厅:" + restaurant.getName() + "\n");
+		content.append("开始时间:" + new SimpleDateFormat("M月d日 HH:mm").format(DateUtil.parseDate(detail.getOnDuty())) + "\n");
+		content.append("结束时间:" + new SimpleDateFormat("M月d日 HH:mm").format(DateUtil.parseDate(detail.getOffDuty())) + "\n");
+		
+		content.append("-------------------\n")
+			   .append(grid3Item(new String[]{"收款", "账单数", "金额"}, new int[]{10, 20}) + "\n")
+			   .append(grid3Item(new String[]{"现金", Integer.toString(detail.getCashAmount()), NumericUtil.CURRENCY_SIGN + NumericUtil.float2String2(detail.getCashActualIncome())}, new int[]{10, 16}) + "\n")
+			   .append(grid3Item(new String[]{"刷卡", Integer.toString(detail.getCreditCardAmount()), NumericUtil.CURRENCY_SIGN + NumericUtil.float2String2(detail.getCreditActualIncome())}, new int[]{10, 16}) + "\n");
+		
+		if(detail.getMemberCardAmount() > 0){
+			content.append(grid3Item(new String[]{"会员", Integer.toString(detail.getMemberCardAmount()), NumericUtil.CURRENCY_SIGN + NumericUtil.float2String2(detail.getMemberActualIncome())}, new int[]{10, 16}) + "\n");
+		}
+		if(detail.getSignAmount() > 0){
+			content.append(grid3Item(new String[]{"签单", Integer.toString(detail.getSignAmount()), NumericUtil.CURRENCY_SIGN + NumericUtil.float2String2(detail.getSignActualIncome())}, new int[]{10, 16}) + "\n");
+		}
+		if(detail.getHangAmount() > 0){
+			content.append(grid3Item(new String[]{"挂账", Integer.toString(detail.getHangAmount()), NumericUtil.CURRENCY_SIGN + NumericUtil.float2String2(detail.getHangActualIncome())}, new int[]{10, 16}) + "\n");
+		}
+		
+		content.append("-------------------"
+				+ "\n").append(grid2Item("部门", "销售额", 18) + "\n");
+		for(IncomeByDept incomeByDept : detail.getDeptIncome()){
+			content.append(grid2Item(incomeByDept.getDept().getName(), NumericUtil.CURRENCY_SIGN + NumericUtil.float2String2(incomeByDept.getIncome()), 16)).append("\n");
+			
+		}
+
+		content.append("-------------------\n")
+			   .append("实收总额：" + NumericUtil.CURRENCY_SIGN + NumericUtil.float2String2(detail.getTotalActual()) + "\n");
+		
+		return content.toString();
 	}
 	
 	/**
@@ -386,13 +413,13 @@ public class FinanceWeixinAction extends Action {
 	}
 	
 	/**
-	 * 生成今日关注信息
+	 * 生成本周周报
 	 * @param msg
 	 * @return
 	 * @throws SQLException 
 	 * @throws IOException 
 	 */
-	private Msg doFocusedStatistics(Msg msg) {
+	private Msg doThisweek(Msg msg) {
 
 		Msg4ImageText mit = new Msg4ImageText();
 		
@@ -409,10 +436,10 @@ public class FinanceWeixinAction extends Action {
 			c.add(Calendar.DAY_OF_MONTH, -1);
 			long endDate = c.getTimeInMillis();
 			
-			c.add(Calendar.DAY_OF_MONTH, -4);
+			c.add(Calendar.DAY_OF_MONTH, -(c.get(Calendar.DAY_OF_WEEK) - 2));
 			long beginDate = c.getTimeInMillis();
 			
-			List<IncomeByEachDay> incomes = CalcBillStatisticsDao.calcIncomeByEachDay(StaffDao.getByRestaurant(dbCon, restaurantId).get(0), 
+			List<IncomeByEachDay> incomes = CalcBillStatisticsDao.calcIncomeByEachDay(StaffDao.getAdminByRestaurant(restaurantId), 
 														new DutyRange(
 														DateUtil.format(beginDate, DateUtil.Pattern.DATE),
 														DateUtil.format(endDate, DateUtil.Pattern.DATE)),

@@ -35,7 +35,7 @@ public class QueryMemberLevelAction extends DispatchAction{
 		try{
 			String pin = (String) request.getAttribute("pin");
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
-			memberLevelList = MemberLevelDao.getMemberLevels(staff);
+			memberLevelList = MemberLevelDao.get(staff);
 			
 			List<MemberType> memberTypeList = MemberTypeDao.getMemberType(StaffDao.verify(Integer.parseInt(pin)), null, null);
 			

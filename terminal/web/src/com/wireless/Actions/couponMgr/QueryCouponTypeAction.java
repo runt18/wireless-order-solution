@@ -11,13 +11,13 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
-import com.wireless.db.coupon.CouponTypeDao;
+import com.wireless.db.promotion.CouponTypeDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
-import com.wireless.pojo.coupon.CouponType;
+import com.wireless.pojo.promotion.CouponType;
 
 public class QueryCouponTypeAction extends DispatchAction{
 

@@ -121,7 +121,7 @@ public class OperateMemberAction extends DispatchAction{
 			
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
-			Member.UpdateBuilder ub = new Member.UpdateBuilder(Integer.valueOf(id), staff.getRestaurantId())
+			Member.UpdateBuilder ub = new Member.UpdateBuilder(Integer.valueOf(id))
 											    .setName(name)
 											    .setMobile(mobile)
 											    .setMemberTypeId(Integer.valueOf(memberTypeId))

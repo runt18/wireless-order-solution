@@ -10,10 +10,10 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import com.wireless.db.coupon.CouponDao;
+import com.wireless.db.promotion.CouponDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.json.JObject;
-import com.wireless.pojo.coupon.Coupon;
+import com.wireless.pojo.promotion.Coupon;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.util.DataPaging;
 
