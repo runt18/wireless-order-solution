@@ -473,7 +473,7 @@ class OrderHandler implements Runnable{
 								}
 
 							}
-						}catch(Exception e){
+						}catch(BusinessException | SQLException | IOException e){
 							e.printStackTrace();
 						}
 					}
