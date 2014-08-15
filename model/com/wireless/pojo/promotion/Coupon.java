@@ -1,4 +1,4 @@
-package com.wireless.pojo.coupon;
+package com.wireless.pojo.promotion;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -13,25 +13,32 @@ import com.wireless.pojo.util.SortedList;
 
 public class Coupon implements Jsonable{
 
-	public static class InsertAllBuilder{
+	public static class CreateBuilder{
 		private final int couponTypeId;
+		private final int promotionId;
 		private final List<Integer> members = SortedList.newInstance();
 		
-		public InsertAllBuilder(int couponTypeId){
+		public CreateBuilder(int couponTypeId, int promotionId){
 			this.couponTypeId = couponTypeId;
+			this.promotionId = promotionId;
 		}
 		
-		public InsertAllBuilder addMemberId(int memberId){
+		public CreateBuilder addMemberId(int memberId){
 			if(!members.contains(memberId)){
 				members.add(memberId);
 			}
 			return this;
 		}
 		
+		public CreateBuilder setMembers(List<Integer> members){
+			this.members.addAll(members);
+			return this;
+		}
+		
 		public List<InsertBuilder> build(){
 			List<InsertBuilder> builders = new ArrayList<InsertBuilder>();
 			for(int memberId : members){
-				builders.add(new InsertBuilder(couponTypeId, memberId));
+				builders.add(new InsertBuilder(couponTypeId, memberId, promotionId));
 			}
 			return Collections.unmodifiableList(builders);
 		}
@@ -39,11 +46,13 @@ public class Coupon implements Jsonable{
 	
 	public static class InsertBuilder{
 		private final int couponTypeId;
+		private final int promotionId;
 		private final int memberId;
 		
-		public InsertBuilder(int couponTypeId, int memberId){
+		public InsertBuilder(int couponTypeId, int memberId, int promotionId){
 			this.couponTypeId = couponTypeId;
 			this.memberId = memberId;
+			this.promotionId = promotionId;
 		}
 		
 		public Coupon build(){
@@ -53,9 +62,11 @@ public class Coupon implements Jsonable{
 	
 	public static enum Status{
 		UNKNOWN(0, "未知"),
-		CREATED(1, "已发放"),
-		USED(2, "已使用"),
-		EXPIRED(3, "已过期");
+		CREATED(1, "已创建"),
+		PUBLISHED(2, "已发布"),
+		DRAWN(3, "已领取"),
+		USED(4, "已使用"),
+		EXPIRED(5, "已过期");
 		
 		private final int val;
 		private final String desc;
@@ -91,8 +102,8 @@ public class Coupon implements Jsonable{
 	private int id;
 	private int restaurantId;
 	private CouponType couponType;
+	private Promotion promotion;
 	private long birthDate;
-	private String createStaff;
 	private Member member;
 	private int orderId;
 	private long orderDate;
@@ -101,6 +112,7 @@ public class Coupon implements Jsonable{
 	private Coupon(InsertBuilder builder){
 		setCouponType(new CouponType(builder.couponTypeId));
 		setMember(new Member(builder.memberId));
+		setPromotion(new Promotion(builder.promotionId));
 		setStatus(Status.CREATED);
 		setBirthDate(System.currentTimeMillis());
 	}
@@ -154,6 +166,14 @@ public class Coupon implements Jsonable{
 		this.member = member;
 	}
 
+	public Promotion getPromotion(){
+		return this.promotion;
+	}
+	
+	public void setPromotion(Promotion promotion){
+		this.promotion = promotion;
+	}
+	
 	public int getOrderId() {
 		return orderId;
 	}
@@ -170,17 +190,6 @@ public class Coupon implements Jsonable{
 		this.orderDate = orderDate;
 	}
 
-	public String getCreateStaff(){
-		if(this.createStaff == null){
-			return "";
-		}
-		return this.createStaff;
-	}
-	
-	public void setCreateStaff(String createStaff){
-		this.createStaff = createStaff;
-	}
-	
 	public Status getStatus() {
 		return status;
 	}
@@ -257,7 +266,6 @@ public class Coupon implements Jsonable{
 		jm.putString("orderDate", DateUtil.formatToDate(this.getOrderDate()));
 		jm.putString("statusText", this.status.desc);
 		jm.putInt("statusValue", this.status.val);
-		jm.putString("createStaff", this.getCreateStaff());
 		jm.putString("birthDate", DateUtil.formatToDate(this.getBirthDate()));
 		return jm;
 	}

@@ -26,17 +26,16 @@ public class MemberError extends ErrorEnum{
 	public static final ErrorCode MEMBER_CARD_DUPLICATED = build(9789, "操作失败, 该会员卡已存在, 请重新输入.");
 	public static final ErrorCode ADJUST_POINT_FAIL = build(9788, "操作失败, 会员积分调整失败, 请检查数据格式.");
 	public static final ErrorCode CONSUME_POINT_FAIL = build(9787, "操作失败, 会员积分消费失败, 请检查数据格式.");
-	public static final ErrorCode UPDATE_FAIL_HAS_BALANCE = build(9786, "操作失败, 该会员还有余额, 不允许设为优惠属性的类型会员.");
 	
 	/* memberCard 9700 - 9749 */
-	public static final ErrorCode CARD_INSERT_FAIL = build(9749, "操作失败, 添加新会员卡信息失败, 请尝试更换其他会员卡.");
-	public static final ErrorCode CARD_DELETE_FAIL = build(9748, "操作失败, 删除会员卡信息失败, 请检查数据内容正确.");
-	public static final ErrorCode CARD_UPDATE_FAIL = build(9747, "操作失败, 修改会员卡信息失败, 请检查数据内容正确.");
-	public static final ErrorCode CARD_UPDATE_STATUS = build(9746, "操作失败, 修改会员卡状态失败.");
-	public static final ErrorCode CARD_STATUS_IS_ACTIVE = build(9745, "操作失败, 该会员卡已被使用.");
-	public static final ErrorCode CARD_STATUS_IS_DISABLE = build(9744, "操作失败, 该会员卡已被禁用.");
-	public static final ErrorCode CARD_STATUS_IS_LOST = build(9743, "操作失败, 该会员卡已被挂失.");
-	public static final ErrorCode CARD_IS_EQUAL = build(9742, "操作失败, 新旧卡一样, 无需修改.");
+//	public static final ErrorCode CARD_INSERT_FAIL = build(9749, "操作失败, 添加新会员卡信息失败, 请尝试更换其他会员卡.");
+//	public static final ErrorCode CARD_DELETE_FAIL = build(9748, "操作失败, 删除会员卡信息失败, 请检查数据内容正确.");
+//	public static final ErrorCode CARD_UPDATE_FAIL = build(9747, "操作失败, 修改会员卡信息失败, 请检查数据内容正确.");
+//	public static final ErrorCode CARD_UPDATE_STATUS = build(9746, "操作失败, 修改会员卡状态失败.");
+//	public static final ErrorCode CARD_STATUS_IS_ACTIVE = build(9745, "操作失败, 该会员卡已被使用.");
+//	public static final ErrorCode CARD_STATUS_IS_DISABLE = build(9744, "操作失败, 该会员卡已被禁用.");
+//	public static final ErrorCode CARD_STATUS_IS_LOST = build(9743, "操作失败, 该会员卡已被挂失.");
+//	public static final ErrorCode CARD_IS_EQUAL = build(9742, "操作失败, 新旧卡一样, 无需修改.");
 	
 	/* memberOperation 9650 - 9699 */
 	public static final ErrorCode OPERATION_INSERT = build(9699, "操作失败, 添加充值操作日志失败, 请联系客服人员!");
@@ -49,7 +48,8 @@ public class MemberError extends ErrorEnum{
 	public static final ErrorCode MEMBER_TYPE_NOT_EXIST = build(9648, "操作失败, 该会员类型不存在或已被删除");
 	public static final ErrorCode TYPE_UPDATE = build(9647, "操作失败, 修改充值操作日志失败, 请检查数据内容是否正确.");
 	public static final ErrorCode TYPE_SET_ORDER_DISCOUNT = build(9647, "操作失败, 设置会员类型全单折扣信息失败, 未知错误.");
-	public static final ErrorCode TYPE_DELETE_ISNOT_EMPTY = build(9646, "操作失败, 该类型下已有会员, 不允许删除.");
+	public static final ErrorCode TYPE_DELETE_FAIL_BECAUSE_MEMBER_NOT_EMPTY = build(9646, "操作失败, 该类型下已有会员, 不允许删除.");
+	public static final ErrorCode TYPE_DELETE_FAIL_BECAUSE_LEVEL_IN_USED = build(9616, "操作失败, 该类型在会员升级路线图使用, 不允许删除.");
 	
 	/* memberType 9600 - 9619 */
 	public static final ErrorCode MEMBER_LEVEL_NOT_EXIST = build(9619, "操作失败, 该会员等级不存在或已被删除");
@@ -57,15 +57,12 @@ public class MemberError extends ErrorEnum{
 	public static final ErrorCode MEMBER_LEVEL_LESS_POINT = build(9617, "操作失败, 积分必须大于低等级的");
 	public static final ErrorCode MEMBER_LEVEL_MORE_POINT = build(9616, "操作失败, 积分必须小于高等级的");
 	public static final ErrorCode MEMBER_LEVEL_HIGHEST = build(9617, "操作失败, 积分必须最高等级的");
-	
-	public static final ErrorCode COUPON_TYPE_NOT_EXIST = build(9600, "操作失败, 该优惠券类型不存在");
-	public static final ErrorCode COUPON_NOT_EXIST = build(9601, "操作失败, 该优惠券不存在");
-	public static final ErrorCode COUPON_EXPIRED = build(9602, "操作失败, 该优惠券已过期");
+
 	
 	private MemberError(){
 		
 	}
-	private static ErrorCode build(int code, String desc){
+	static ErrorCode build(int code, String desc){
 		return build(ErrorType.MEMBER, code, desc, ErrorLevel.ERROR);
 	}
 	public static ErrorCode valueOf(int code){

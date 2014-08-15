@@ -13,9 +13,9 @@ import com.wireless.parcel.Parcel;
 import com.wireless.parcel.Parcelable;
 import com.wireless.pojo.client.MemberOperation.ChargeType;
 import com.wireless.pojo.client.MemberOperation.OperationType;
-import com.wireless.pojo.coupon.Coupon;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.menuMgr.Food;
+import com.wireless.pojo.promotion.Coupon;
 import com.wireless.pojo.util.DateUtil;
 import com.wireless.pojo.util.SortedList;
 
@@ -157,7 +157,6 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 	public static class UpdateBuilder{
 		
 		private final int memberId;
-		private final int restaurantId;
 		
 		private String name;				// 客户名称
 		private Sex sex;					// 性别
@@ -172,9 +171,8 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 		private String privateComment;		// 私人评论
 		private String publicComment;		// 公开评论
 		
-		public UpdateBuilder(int memberId, int restaurantId){
+		public UpdateBuilder(int memberId){
 			this.memberId = memberId;
-			this.restaurantId = restaurantId;
 		}
 		
 		public UpdateBuilder setName(String name){
@@ -355,7 +353,6 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 	private Member(UpdateBuilder builder){
 		
 		setId(builder.memberId);
-		setRestaurantId(builder.restaurantId);
 		
 		if(builder.isNameChanged()){
 			setName(builder.name);

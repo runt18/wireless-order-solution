@@ -1,4 +1,4 @@
-package com.wireless.pojo.coupon;
+package com.wireless.pojo.promotion;
 
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
