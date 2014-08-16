@@ -14,6 +14,9 @@
 		
 		sendToStatisticsPageBeginDate = dateBegin.getValue();
 		sendToStatisticsPageEndDate = dateEnd.getValue();
+		sendToStatisticsPageHours = Ext.ux.statistic_oBusinessHourData({type : 'get', statistic : 'businessSub_'}).data; 
+		sendToStatisticsPageHours.hourComboValue = Ext.getCmp('businessSub_comboBusinessHour').getValue();
+		
 		sendToPageOperation = true;
 		
 		if(c.type == 1){//折扣统计
@@ -29,6 +32,8 @@
 			sendToStatisticsPageDeptName = c.deptName;
 			addTab('salesSubStatistics', '销售统计', 'History_Module/SalesSubStatistics.html');
 			
+		}else if(c.type == 6){//收款统计
+			addTab('businessReceiptsStatistics', '收款统计', 'History_Module/BusinessReceiptsStatistics.html');			
 		}else{
 			return;
 		}
@@ -38,7 +43,13 @@
 </head>
 <body>
 <div id="divBusinessSubStatistics"></div>
-<div id="divBusinessSubStatisticsDetailChart" style="height : 255px;"></div>
+
+<div id="divBusinessSubStatisticsDetailChartPanel" >
+	<div style="font-size: 15px;text-align: right;overflow: visible;background-color: white;">
+		<a href="javascript:void(0)" style="width:100px;margin-right: 10px;"  onclick="linkToBusinessStatistics({type : 6})">查看收款详情</a>
+	</div>
+	<div id="divBusinessSubStatisticsDetailChart" style="height : 250px;"></div>
+</div>
 	<table id="businessStatisticsSummary" border="1" class="tb_base" style="width : 100%;">
 		<tr>
 			<th class="table_title text_center">收款方式</th>
