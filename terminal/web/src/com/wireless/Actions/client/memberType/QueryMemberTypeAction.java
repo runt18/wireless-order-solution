@@ -279,7 +279,7 @@ public class QueryMemberTypeAction extends DispatchAction {
 			int rid = WeixinRestaurantDao.getRestaurantIdByWeixin(formId);
 			int mid = WeixinMemberDao.getBoundMemberIdByWeixin(openId, formId);
 			Staff staff = StaffDao.getAdminByRestaurant(rid); 
-			List<MemberLevel> list = MemberLevelDao.get(staff);
+			List<MemberLevel> list = MemberLevelDao.getMemberLevels(staff);
 			
 			for (final MemberLevel ml : list) {
 				final List<Member> mlists = MemberDao.getByCond(staff, new MemberDao.ExtraCond().setMemberType(ml.getMemberType().getId()).setId(mid), null);
