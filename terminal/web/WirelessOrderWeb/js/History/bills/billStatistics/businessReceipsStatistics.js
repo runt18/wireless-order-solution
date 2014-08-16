@@ -397,7 +397,13 @@ function initBusinessReceipsGrid(c){
 			if(!dateBegin.isValid() || !dateEnd.isValid()){
 				return;
 			}
-			var data = Ext.ux.statistic_oBusinessHourData({type : 'get', statistic : 'businessReceipt_'}).data;
+			var data;
+			if(receipt_hours){
+				data = receipt_hours;
+			}else{
+				data = Ext.ux.statistic_oBusinessHourData({type : 'get', statistic : 'businessReceipt_'}).data;
+			}
+			
 			initBusinessReceipsData({
 				dateBegin : dateBegin.getValue().format('Y-m-d 00:00:00'), 
 				dateEnd :dateEnd.getValue().format('Y-m-d 23:59:59'),
@@ -490,7 +496,19 @@ function changeChartWidth(w,h){
 	
 }
 
+var receipts_setStatisticsDate = function(){
+	if(sendToPageOperation){
+		Ext.getCmp('receipts_dateSearchDateBegin').setValue(sendToStatisticsPageBeginDate);
+		Ext.getCmp('receipts_dateSearchDateEnd').setValue(sendToStatisticsPageEndDate);	
+		receipt_hours = sendToStatisticsPageHours;
+		Ext.getCmp('businessReceipt_comboBusinessHour').setValue(sendToStatisticsPageHours.hourComboValue);
+		Ext.getCmp('businessReceipt_btnSearch').handler();
+		sendToPageOperation = false;		
+	}
 
+};
+
+var receipt_hours;
 Ext.onReady(function(){
 	southPanel = new Ext.Panel({
 		contentEl : 'businessReceiptsChart',
@@ -525,6 +543,12 @@ Ext.onReady(function(){
     });
     rz.on('resize', receivablesStatResultGrid.syncSize, receivablesStatResultGrid);//注册事件(作用:将调好的大小传个scope执行)
 	
-	receipts_dateCombo.setValue(1);
-	receipts_dateCombo.fireEvent('select', null, null, 1);
+	Ext.getCmp('businessReceiptsStatistics').updateStatisticsDate = receipts_setStatisticsDate;
+	
+	if(sendToPageOperation){
+		receipts_setStatisticsDate();
+	}else{
+		receipts_dateCombo.setValue(1);
+		receipts_dateCombo.fireEvent('select', null, null, 1);			
+	}
 });

@@ -133,6 +133,7 @@ function commissionDetailInit(){
 				var data = [[-1,'全部']];
 				Ext.Ajax.request({
 					url : '../../QueryStaff.do',
+					params : {privileges : '1000'},
 					success : function(res, opt){
 						var jr = Ext.decode(res.responseText);
 						for(var i = 0; i < jr.root.length; i++){
