@@ -3,6 +3,13 @@ var Wireless = {
 	chart : {}
 };
 
+function isEmptyObject(obj){
+    for(var n in obj){
+		return false;
+    }
+    return true; 
+} 
+
 Wireless.chart.initChartPanel = function(c){
 	if($('#' + c.divLeftShowChart).is(":visible")){
 		c.leftChart.setSize(c.tabPanel.getWidth()*0.4, c.panelDrag ? c.tabPanel.getHeight() - c.cutAfterDrag : c.tabPanel.getHeight()-c.cutBeforeDrag);
@@ -12,8 +19,8 @@ Wireless.chart.initChartPanel = function(c){
 		$('#'+c.divLeftShowChart).show();
 		$('#'+c.divRightShowChart).show();
 	}
-	if(!c.leftChart){
-//		alert(c.cutAfterDrag+','+c.panelDrag)
+	
+	if(!c.leftChart || !isEmptyObject(c.leftChart)){
 		c.getChartData();
 		c.leftChart = c.leftChartLoad(c.loadType);
 		c.rightChart = c.rightChartLoad(c.loadType);
