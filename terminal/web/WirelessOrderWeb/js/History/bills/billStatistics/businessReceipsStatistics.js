@@ -501,9 +501,12 @@ var receipts_setStatisticsDate = function(){
 		Ext.getCmp('receipts_dateSearchDateBegin').setValue(sendToStatisticsPageBeginDate);
 		Ext.getCmp('receipts_dateSearchDateEnd').setValue(sendToStatisticsPageEndDate);	
 		receipt_hours = sendToStatisticsPageHours;
-		Ext.getCmp('businessReceipt_comboBusinessHour').setValue(sendToStatisticsPageHours.hourComboValue);
+		
 		Ext.getCmp('businessReceipt_btnSearch').handler();
+		Ext.getCmp('businessReceipt_txtBusinessHourBegin').setText('<font style="color:green; font-size:20px">'+receipt_hours.opening+'</font>');
+		Ext.getCmp('businessReceipt_txtBusinessHourEnd').setText('<font style="color:green; font-size:20px">'+receipt_hours.ending+'</font>');
 		sendToPageOperation = false;		
+		Ext.getCmp('businessReceipt_comboBusinessHour').setValue(sendToStatisticsPageHours.hourComboValue);
 	}
 
 };

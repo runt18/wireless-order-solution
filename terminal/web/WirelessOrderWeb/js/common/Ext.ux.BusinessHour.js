@@ -113,7 +113,7 @@ Ext.ux.initTimeBar = function(c){
 					listeners : {
 						render : function(thiz){
 							var data = [[-1,'全天']];
-							Ext.Ajax.request({
+/*							Ext.Ajax.request({
 								url : '../../QueryBusinessHour.do',
 								success : function(res, opt){
 									var jr = Ext.decode(res.responseText);
@@ -127,6 +127,23 @@ Ext.ux.initTimeBar = function(c){
 								fialure : function(res, opt){
 									thiz.store.loadData(data);
 									thiz.setValue(-1);
+								}
+							});*/
+							$.ajax({
+								url : '../../QueryBusinessHour.do',
+								type : 'post',
+								async : false,
+								success : function(jr, status, xhr){
+									for(var i = 0; i < jr.root.length; i++){
+										data.push([jr.root[i]['id'], jr.root[i]['name'], jr.root[i]['opening'], jr.root[i]['ending']]);
+									}
+									data.push([-2,'自定义']);
+									thiz.store.loadData(data);
+									thiz.setValue(-1);								
+								},
+								error : function(result, status, xhr){
+									thiz.store.loadData(data);
+									thiz.setValue(-1);								
 								}
 							});
 						},
