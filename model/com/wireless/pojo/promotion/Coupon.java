@@ -99,6 +99,32 @@ public class Coupon implements Jsonable{
 		}
 	}
 	
+	public class DrawProgress{
+		private final int point;
+		private DrawProgress(int point){
+			this.point = point;
+		}
+		
+		public int getPoint(){
+			return this.point;
+		}
+		
+		public boolean isOk(){
+			if(promotion.getType() == Promotion.Type.FREE){
+				return true;
+			}else if(promotion.getType() == Promotion.Type.ONCE || promotion.getType() == Promotion.Type.TOTAL){
+				return point >= promotion.getPoint();
+			}else{
+				return false;
+			}
+		}
+		
+		@Override
+		public String toString(){
+			return promotion.getType().toString() + promotion.getPoint() + ", 当前积分" + point;
+		}
+	}
+	
 	private int id;
 	private int restaurantId;
 	private CouponType couponType;
@@ -108,6 +134,7 @@ public class Coupon implements Jsonable{
 	private int orderId;
 	private long orderDate;
 	private Status status = Status.UNKNOWN;
+	private DrawProgress drawProgress;
 	
 	private Coupon(InsertBuilder builder){
 		setCouponType(new CouponType(builder.couponTypeId));
@@ -232,6 +259,14 @@ public class Coupon implements Jsonable{
 		}else{
 			return 0;
 		}
+	}
+	
+	public void setDrawProgress(int point){
+		drawProgress = new DrawProgress(point);
+	}
+	
+	public DrawProgress getDrawProgress(){
+		return this.drawProgress;
 	}
 	
 	@Override

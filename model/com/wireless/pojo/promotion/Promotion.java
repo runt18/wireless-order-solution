@@ -13,6 +13,7 @@ public class Promotion {
 		private final String title;
 		private final String body;
 		private Type type = Type.FREE;
+		private int point;
 		private final CouponType.InsertBuilder typeBuilder;
 		private final List<Integer> members = SortedList.newInstance();
 		
@@ -25,6 +26,11 @@ public class Promotion {
 		
 		public CreateBuilder setType(Type type){
 			this.type = type;
+			return this;
+		}
+		
+		public CreateBuilder setPoint(int point){
+			this.point = point;
 			return this;
 		}
 		
@@ -120,6 +126,7 @@ public class Promotion {
 	private CouponType couponType;
 	private Status status = Status.CREATED;
 	private Type type = Type.FREE;
+	private int point;
 	
 	private Promotion(CreateBuilder builder){
 		this.createDate = System.currentTimeMillis();
@@ -127,6 +134,7 @@ public class Promotion {
 		this.title = builder.title;
 		this.body = builder.body;
 		this.type = builder.type;
+		this.point = builder.point;
 		this.couponType = builder.typeBuilder.build();
 		this.status = Status.CREATED;
 	}
@@ -211,6 +219,14 @@ public class Promotion {
 	
 	public void setCouponType(CouponType couponType){
 		this.couponType = couponType;
+	}
+	
+	public int getPoint(){
+		return this.point;
+	}
+	
+	public void setPoint(int point){
+		this.point = point;
 	}
 	
 	@Override

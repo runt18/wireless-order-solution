@@ -13,6 +13,7 @@ public class PromotionError extends ErrorEnum{
 	public static final ErrorCode COUPON_TYPE_NOT_EXIST = MemberError.build(7231, "操作失败, 该优惠券类型不存在");
 	public static final ErrorCode COUPON_NOT_EXIST = MemberError.build(7232, "操作失败, 该优惠券不存在");
 	public static final ErrorCode COUPON_EXPIRED = MemberError.build(7233, "操作失败, 该优惠券已过期");
+	public static final ErrorCode COUPON_DRAW_NOT_ALLOW = build(7202, "优惠券不能领取");
 	
 	private PromotionError(){
 		
