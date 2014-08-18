@@ -15,17 +15,22 @@ $(function(){
 			if(data.success){
 				//会员卡号
 				$('#divWXMemberCard').html(data.other.weixinCard);
+//				member_loadMemberTypeChart();
 				if(data.other.status == 2){
 					$('#divMemberCard').css('display', 'block');
 					$('#divMemberContent').css('display', 'block');
 					$('#divMemberTypeContent').css('display', 'block');
 					$('#divMemberPointContent').css('display', 'block');
 					$('#divMemberBalanceContent').css('display', 'block');
-					$('#divMemberCouponContent').css('display', 'block');
-					$('#divMemberCouponConsume').css('display', 'block');
+//					$('#divMemberCouponContent').css('display', 'block');
+//					$('#divMemberCouponConsume').css('display', 'block');
+					
 					member = data.other.member;
 					member.restaurant = data.other.restaurant;
 					initMemberMsg({data:member});
+					
+					//添加会员等级当前位置
+					currentMemberLevelData = {y : 0, memberTypeName : '您的积分', x:member.point, discount:{type :2},chargeRate:-1, exchangeRate:-1, pointThreshold:member.point, marker:{symbol:'url(../../images/currentPosition.png)'}, color : 'red', dataLabels : {x:-1, align : 'right', style : {fontWeight: 'bold',color: 'red'}}};
 					//设置会员排名
 					$('#fontDefeatMemberCount').text(member.rank);
 					$.ajax({
@@ -79,7 +84,7 @@ $(function(){
 	window.onresize = autoWidth;
 	
 	$('#txtVerifyCode').focus(function(){
-		$('html, body').animate({scrollTop: 250}, 'fast'); 
+		$('html, body').animate({scrollTop: 200}, 'fast'); 
 	});
 
 	

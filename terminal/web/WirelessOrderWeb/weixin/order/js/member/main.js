@@ -527,13 +527,13 @@ function toggleCouponConsumeDetails(){
 }
 
 function toggleMemberLevel(){
-	var mainView = $('#divMemberTypeDesc');
+	var mainView = $('#divMemberLevelChart');
 	mainView.fadeToggle(function(){
 		if(mainView.css('display') == 'block'){
 			if(!toggleMemberLevel.load){
 				toggleMemberLevel.load = function(){
 					Util.lm.show();
-					$.post('../../QueryMemberType.do', {dataSource : 'getMemberLevel', fid : Util.mp.fid, oid : Util.mp.oid}, function(result){
+/*					$.post('../../QueryMemberType.do', {dataSource : 'getMemberLevel', fid : Util.mp.fid, oid : Util.mp.oid}, function(result){
 						if(result.success){
 							totalMath = result.root[result.root.length - 1].pointThreshold;
 							member.totalPoint = member.totalPoint >= totalMath ? totalMath : member.totalPoint; 
@@ -558,7 +558,39 @@ function toggleMemberLevel(){
 							$('#divMemberTypeDesc').append('<div>会员等级建立中...</div>');
 						}
 						Util.lm.hide();
-					});
+					});*/
+					
+					$.post('../../QueryMemberLevel.do', {dataSource : 'chart', rid:member.restaurant.id}, function(result){
+						if(result.success){
+//							totalMath = result.root[result.root.length - 1].pointThreshold;
+//							member.totalPoint = member.totalPoint >= totalMath ? totalMath : member.totalPoint; 
+							mainView.prepend('<h3>会员等级列表</h3>');
+							mainView.css('margin-left', '-45%');
+							
+							memberLevelData = result.root;
+							memberLevelData.push(currentMemberLevelData);
+							
+							chartDatas = eval('(' + result.other.chart + ')');
+					
+							yAxisData = chartDatas.data;
+							
+							var chartMinAndMax;
+							
+							if(yAxisData[yAxisData.length-1].x >= currentMemberLevelData.x){
+								chartMinAndMax = yAxisData[yAxisData.length-1].x;
+							}else{
+								chartMinAndMax = currentMemberLevelData.x;
+							}
+							yAxisData.push(currentMemberLevelData);
+							
+							member_loadMemberTypeChart({minY:-chartMinAndMax * 0.15, maxY:chartMinAndMax * 1.16, series:yAxisData});
+							
+						}else{
+							mainView.css('height', 'auto');
+							mainView.append('<div>会员等级建立中...</div>');
+						}
+						Util.lm.hide();
+					});					
 				};
 			}
 			toggleMemberLevel.load();
@@ -576,7 +608,98 @@ function weixinPhoneFocus(){
 function showMemberBind(){
 	$('#ulVerifyAndBind').show();
 //	$('#divOccupyHtml').show();
-	$('html, body').animate({scrollTop: 250+$('#divMemberPrivilegeDetail').height()}, 'fast'); 
+	$('html, body').animate({scrollTop: 180+$('#divMemberPrivilegeDetail').height()}, 'fast'); 
 //	$('#txtVerifyMobile').focus();
 	weixinPhoneFocus();
+}
+
+function getLevelChartInfo(x){
+	for (var i = 0; i < memberLevelData.length; i++) {
+		if(memberLevelData[i].pointThreshold == x){
+			return '<span style="font-size : 15px;">' + memberLevelData[i].memberTypeName + (memberLevelData[i].pointThreshold >0 ? '-' + memberLevelData[i].pointThreshold +'分' :'')+ '</span>'
+					+ (memberLevelData[i].discount.type != 2 ? '<br/>' + '<font style="color:maroon">' + memberLevelData[i].discount.name : '') + '</font>' 
+					+ (memberLevelData[i].chargeRate >1 ? '<br/>'+ '<font style="color:maroon">' + memberLevelData[i].chargeRate +'倍充值优惠, 充100送'+parseInt((memberLevelData[i].chargeRate-1)*100)+'元':'')  + '</font>' 
+					+ (memberLevelData[i].exchangeRate >1 ? '<br/>'+ '<font style="color:maroon">' + memberLevelData[i].exchangeRate +'倍积分特权, 消费1元积'+parseInt(memberLevelData[i].exchangeRate)+'分':'') + '</font>' 
+					;
+		}
+	}		
+}
+
+function member_loadMemberTypeChart(c){
+	 	var chart = {
+			    chart: {
+			        type: 'spline',
+			        inverted: true,
+			        renderTo : 'divMemberLevelChart'
+			    },
+			    title: {
+			        text: ''
+			    },
+			    xAxis: {
+			    	reversed : false,
+			        title: {
+			            enabled: false,
+			            text: '积分',
+			            align : 'high'
+			        },
+			        labels: {
+			            formatter: function() {
+			                return this.value;
+			            }
+			        },
+			        max : c.maxY,
+			        min: c.minY,
+			        showLastLabel: true
+			    },
+			    yAxis: {
+			        title: {
+			            text: '等级'
+			        },
+			        labels: {
+			            formatter: function() {
+			                return '' ;
+			            }
+			        },
+			        lineWidth: 2
+			    },
+			    legend: {
+			        enabled: false
+			    },
+			    tooltip: {
+			        headerFormat: '<b>{series.name}</b><br/>',
+			        pointFormat: '{point.x} km: {point.y}°C',
+			        followPointer : true
+			    },
+				plotOptions : {
+					spline : {
+						cursor : 'pointer',
+						dataLabels : {
+							x: 10,
+							y : 23,							
+							align : 'left',
+							enabled : true,
+							style : {
+								fontWeight: 'bold', 
+								color: 'green'
+							},
+							formatter : function(){
+				                return getLevelChartInfo(this.x);
+							}
+						},
+						marker: {
+							radius: 8,
+		                    lineColor: 'white',
+		                    lineWidth: 1
+			            }
+					}
+				},			    
+			    credits : {
+			    	enabled : false
+			    },         
+			    exporting : {
+			    	enabled : false
+			    },			    
+			    series:	[{data:c.series}]	    
+			};
+			new Highcharts.Chart(chart);
 }

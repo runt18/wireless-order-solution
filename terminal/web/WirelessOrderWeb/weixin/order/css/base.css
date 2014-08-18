@@ -54,7 +54,7 @@
 	color: #999999;
 }
 .m-b-list > li{
-	line-height: 30px;
+	line-height: 50px;
 	border-bottom: 1px solid #eee;
 }
 .m-b-list > li[class*=title]{
