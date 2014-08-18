@@ -2321,7 +2321,7 @@ var yAxisData = [];
 function member_loadMemberTypeChart(){
 	$.ajaxSetup({async : false});
 	var chartMinX;
-	$.post('../../QueryMemberLevel.do', {dataSource : 'chart'}, function(res){
+	$.post('../../QueryMemberLevel.do', {dataSource : 'chart', webMemberLevelChart : true}, function(res){
 		memberLevels = res.root;
 		chartDatas = eval('(' + res.other.chart + ')');
 
