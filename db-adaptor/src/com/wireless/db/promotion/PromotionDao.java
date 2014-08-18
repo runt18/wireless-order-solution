@@ -110,12 +110,12 @@ public class PromotionDao {
 		}
 		
 		//Insert the associated coupon type
-		int typeId = CouponTypeDao.insert(dbCon, staff, builder.getTypeBuilder());
+		int couponTypeId = CouponTypeDao.insert(dbCon, staff, builder.getTypeBuilder());
 		
 		//Insert the promotion.
 		String sql;
 		sql = " INSERT INTO " + Params.dbName + ".promotion " +
-			  " (restaurant_id, create_date, start_date, finish_date, title, body, coupon_type_id, type, status) " +
+			  " (restaurant_id, create_date, start_date, finish_date, title, body, coupon_type_id, type, point, status) " +
 			  " VALUES ( " +
 			  staff.getRestaurantId() + "," +
 			  "'" + DateUtil.format(promotion.getCreateDate(), DateUtil.Pattern.DATE) + "'," +
@@ -123,8 +123,9 @@ public class PromotionDao {
 			  "'" + promotion.getDateRange().getEndingFormat() + "'," +
 			  "'" + promotion.getTitle() + "'," +
 			  "'" + promotion.getBody() + "'," +
-			  typeId + "," +
+			  couponTypeId + "," +
 			  promotion.getType().getVal() + "," +
+			  promotion.getPoint() + "," +
 			  promotion.getStatus().getVal() +
 			  ")";
 		
@@ -138,7 +139,7 @@ public class PromotionDao {
 		}
 		
 		//Create the coupon with members.
-		CouponDao.create(dbCon, staff, new Coupon.CreateBuilder(typeId, promotionId).setMembers(builder.getMembers()));
+		CouponDao.create(dbCon, staff, new Coupon.CreateBuilder(couponTypeId, promotionId).setMembers(builder.getMembers()));
 
 		return promotionId;
 	}
@@ -374,7 +375,7 @@ public class PromotionDao {
 		List<Promotion> result = new ArrayList<Promotion>();
 		
 		String sql;
-		sql = " SELECT P.promotion_id, P.restaurant_id, P.create_date, P.start_date, P.finish_date, P.title, P.body, P.type, P.status, " +
+		sql = " SELECT P.promotion_id, P.restaurant_id, P.create_date, P.start_date, P.finish_date, P.title, P.body, P.type, P.point, P.status, " +
 			  " P.coupon_type_id, CT.name " +
 			  " FROM " + Params.dbName + ".promotion P " +
 			  " JOIN " + Params.dbName + ".coupon_type CT ON P.coupon_type_id = CT.coupon_type_id " +
@@ -392,6 +393,7 @@ public class PromotionDao {
 			promotion.setTitle(dbCon.rs.getString("title"));
 			promotion.setBody(dbCon.rs.getString("body"));
 			promotion.setType(Promotion.Type.valueOf(dbCon.rs.getInt("type")));
+			promotion.setPoint(dbCon.rs.getInt("point"));
 			promotion.setStatus(Promotion.Status.valueOf(dbCon.rs.getInt("status")));
 			
 			CouponType type = new CouponType(dbCon.rs.getInt("coupon_type_id"));
@@ -461,5 +463,30 @@ public class PromotionDao {
 		}
 	}
 	
+	/**
+	 * Update the promotion status after published in daily settlement.
+	 * @param dbCon
+	 * 			the database connection
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static void update(DBCon dbCon) throws SQLException{
+		String sql;
+		//Update the promotion has been published to 'PROGRESS' if the start date exceed now. 
+		sql = " UPDATE " + Params.dbName + ".promotion SET " +
+			  " status = " + Promotion.Status.PROGRESS.getVal() + 
+			  " WHERE 1 = 1 " +
+			  " AND start_date > NOW() " +
+			  " AND status = " + Promotion.Status.PUBLISH.getVal();
+		dbCon.stmt.executeUpdate(sql);
+		
+		//Update the promotion has been progressed to 'FINISH' if the finish date exceed now. 
+		sql = " UPDATE " + Params.dbName + ".promotion SET " +
+			  " status = " + Promotion.Status.FINISH.getVal() +
+			  " WHERE 1 = 1 " +
+			  " AND finish_date > NOW() " +
+			  " AND status = " + Promotion.Status.PROGRESS.getVal();
+		dbCon.stmt.executeUpdate(sql);
+	}
 	
 }

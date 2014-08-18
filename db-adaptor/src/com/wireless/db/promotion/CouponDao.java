@@ -13,6 +13,7 @@ import com.wireless.exception.BusinessException;
 import com.wireless.exception.MemberError;
 import com.wireless.exception.PromotionError;
 import com.wireless.pojo.client.Member;
+import com.wireless.pojo.client.MemberOperation;
 import com.wireless.pojo.promotion.Coupon;
 import com.wireless.pojo.promotion.CouponType;
 import com.wireless.pojo.promotion.Promotion;
@@ -183,6 +184,27 @@ public class CouponDao {
 		return amount;
 	}
 	
+	public static void draw(DBCon dbCon, Staff staff, int couponId) throws SQLException, BusinessException{
+		
+		Coupon coupon = getById(dbCon, staff, couponId);
+		
+		if(coupon.getPromotion().getStatus() != Promotion.Status.PROGRESS){
+			throw new BusinessException("只有【进行中】的优惠活动才可领取优惠券", PromotionError.COUPON_DRAW_NOT_ALLOW);
+		}
+		
+		if(coupon.getDrawProgress().isOk()){
+			String sql;
+			sql = " UPDATE " + Params.dbName + ".coupon SET " +
+				  " status = " + Coupon.Status.DRAWN.getVal() +
+				  " WHERE coupon_id = " + couponId;
+			if(dbCon.stmt.executeUpdate(sql) == 0){
+				throw new BusinessException(PromotionError.COUPON_NOT_EXIST);
+			}
+		}else{
+			throw new BusinessException("只有【进行中】的优惠活动才可领取优惠券", PromotionError.COUPON_DRAW_NOT_ALLOW);
+		}
+	}
+	
 	/**
 	 * Use the coupon.
 	 * @param dbCon
@@ -286,9 +308,38 @@ public class CouponDao {
 			throw new BusinessException(PromotionError.COUPON_NOT_EXIST);
 		}else{
 			Coupon coupon = result.get(0);
+
 			coupon.setCouponType(CouponTypeDao.getById(dbCon, staff, coupon.getCouponType().getId()));
 			coupon.setMember(MemberDao.getById(dbCon, staff, coupon.getMember().getId()));
-			coupon.setPromotion(PromotionDao.getById(dbCon, staff, coupon.getPromotion().getId()));
+			Promotion promotion = PromotionDao.getById(dbCon, staff, coupon.getPromotion().getId());
+			coupon.setPromotion(promotion);
+
+			if(promotion.getStatus() == Promotion.Status.PROGRESS){
+				String sql;
+				sql = " SELECT delta_point FROM " + Params.dbName + ".member_operation " +
+					  " WHERE 1 = 1 " +
+					  " AND member_id = " + coupon.getMember().getId() +
+					  " AND operate_type = " + MemberOperation.OperationType.CONSUME.getValue() + 
+					  " AND operate_date BETWEEN '" + promotion.getDateRange().getOpeningFormat() + "' AND '" + promotion.getDateRange().getEndingFormat() + "'" +
+					  " UNION " +
+					  " SELECT delta_point FROM " + Params.dbName + ".member_operation_history " +
+					  " WHERE 1 = 1 " +
+					  " AND member_id = " + coupon.getMember().getId() +
+					  " AND operate_type = " + MemberOperation.OperationType.CONSUME.getValue() + 
+					  " AND operate_date BETWEEN '" + promotion.getDateRange().getOpeningFormat() + "' AND '" + promotion.getDateRange().getEndingFormat() + "'";
+				
+				if(promotion.getType() == Promotion.Type.ONCE){
+					sql = " SELECT MAX(delta_point) AS max_point FROM ( " + sql + " ) AS TMP ";
+				}else if(promotion.getType() == Promotion.Type.TOTAL){
+					sql = " SELECT SUM(delta_point) AS total_point FROM ( " + sql + " ) AS TMP ";
+				}
+				
+				dbCon.rs = dbCon.stmt.executeQuery(sql);
+				if(dbCon.rs.next()){
+					coupon.setDrawProgress(dbCon.rs.getInt(1));
+				}
+				dbCon.rs.close();
+			}
 			return coupon;
 		}
 	}
