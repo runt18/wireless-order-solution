@@ -19,6 +19,7 @@
 				/WXOperateMember.do,
 				/WXQueryMemberOperation.do,
 				/QueryMemberType.do,
+				/QueryMemberLevel.do,
 				/QueryFood_q.do,
 				/FinanceWeixin.do,
 
@@ -29,7 +30,7 @@
 				/OperateStaff.do,
 				/QueryStaff.do,
 				/QueryOTA.do,
-
+				
 				/Login.html,
 				/LoginAdmin.html,
 				/PersonLoginTimeout.html,
@@ -44,7 +45,7 @@
 				/RestaurantMgr.html,
 				/MemberConsumeDetails.html,
 				/MemberRechargeDetails.html,
-				/DigieBasic.html
+				/DigieBasic.html,
 
 			</param-value>
 		</init-param>
