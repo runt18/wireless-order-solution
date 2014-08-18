@@ -358,6 +358,7 @@ public class Discount implements Jsonable, Parcelable, Comparable<Discount>{
 		jm.putInt("id", this.id);
 		jm.putString("name", this.name);
 		jm.putInt("rid", this.restaurantId);
+		jm.putInt("type", this.getType().getVal());
 		//FIXME level not exist
 		jm.putInt("level", 0);
 		jm.putInt("status", this.status.getVal());
