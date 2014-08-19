@@ -470,7 +470,7 @@ public class PromotionDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static void update(DBCon dbCon) throws SQLException{
+	public static void updateStatus(DBCon dbCon) throws SQLException{
 		String sql;
 		//Update the promotion has been published to 'PROGRESS' if the start date exceed now. 
 		sql = " UPDATE " + Params.dbName + ".promotion SET " +

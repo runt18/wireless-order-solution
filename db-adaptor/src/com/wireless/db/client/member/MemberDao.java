@@ -3,7 +3,6 @@ package com.wireless.db.client.member;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -357,7 +356,7 @@ public class MemberDao {
 			
 		}
 		
-		return Collections.unmodifiableList(result);
+		return result;
 	}
 	
 	/**

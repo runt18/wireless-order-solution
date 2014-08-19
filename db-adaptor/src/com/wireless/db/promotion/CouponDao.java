@@ -184,9 +184,29 @@ public class CouponDao {
 		return amount;
 	}
 	
+	/**
+	 * Draw a coupon to specific id.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param couponId
+	 * 			the coupon to draw
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			<li>throws if the coupon to draw does NOT exist
+	 * 			<li>throws if coupon is NOT in 'PUBLISH' status
+	 * 			<li>throws if the promotion associated with this coupon is NOT in 'PROGRESS' status
+	 * 			<li>throws if the coupon is NOT qualified to draw
+	 */
 	public static void draw(DBCon dbCon, Staff staff, int couponId) throws SQLException, BusinessException{
 		
 		Coupon coupon = getById(dbCon, staff, couponId);
+		
+		if(coupon.getStatus() != Coupon.Status.PUBLISHED){
+			throw new BusinessException("只有【已发布】的优惠券才可领取", PromotionError.COUPON_DRAW_NOT_ALLOW);
+		}
 		
 		if(coupon.getPromotion().getStatus() != Promotion.Status.PROGRESS){
 			throw new BusinessException("只有【进行中】的优惠活动才可领取优惠券", PromotionError.COUPON_DRAW_NOT_ALLOW);
@@ -201,7 +221,7 @@ public class CouponDao {
 				throw new BusinessException(PromotionError.COUPON_NOT_EXIST);
 			}
 		}else{
-			throw new BusinessException("只有【进行中】的优惠活动才可领取优惠券", PromotionError.COUPON_DRAW_NOT_ALLOW);
+			throw new BusinessException("优惠券还没符合领取条件", PromotionError.COUPON_DRAW_NOT_ALLOW);
 		}
 	}
 	
@@ -218,9 +238,17 @@ public class CouponDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 * @throws BusinessException
-	 * 			throws if the coupon to use does NOT exist
+	 * 			<li>throws if the coupon to use does NOT exist
+	 * 			<li>throws if the coupon has NOT been drawn before
 	 */
 	public static void use(DBCon dbCon, Staff staff, int couponId, int orderId) throws SQLException, BusinessException{
+		
+		Coupon coupon = getById(dbCon, staff, couponId);
+		
+		if(coupon.getStatus() != Coupon.Status.DRAWN){
+			throw new BusinessException("只有【已领取】的优惠券才可使用", PromotionError.COUPON_DRAW_NOT_ALLOW);
+		}
+		
 		String sql;
 		sql = " UPDATE " + Params.dbName + ".coupon SET " +
 			  " coupon_id = " + couponId +
@@ -314,7 +342,7 @@ public class CouponDao {
 			Promotion promotion = PromotionDao.getById(dbCon, staff, coupon.getPromotion().getId());
 			coupon.setPromotion(promotion);
 
-			if(promotion.getStatus() == Promotion.Status.PROGRESS){
+			if(coupon.getStatus() == Coupon.Status.PUBLISHED && promotion.getStatus() == Promotion.Status.PROGRESS){
 				String sql;
 				sql = " SELECT delta_point FROM " + Params.dbName + ".member_operation " +
 					  " WHERE 1 = 1 " +
@@ -443,5 +471,23 @@ public class CouponDao {
 		
 		return dbCon.stmt.executeUpdate(sql);
 	}
+	
+	/**
+	 * Update the coupon status while perform daily settlement.
+	 * @param dbCon
+	 * 			the database connection
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static void updateStatus(DBCon dbCon) throws SQLException{
+		String sql;
+		//Update the coupon to be expired if the coupon has been drawn and exceeded now.
+		sql = " SELECT coupon_type_id FROM " + Params.dbName + ".coupon_type WHERE expired > NOW() ";
+		sql = " UPDATE " + Params.dbName + ".coupon SET " +
+			  " status = " + Coupon.Status.EXPIRED.getVal() +
+			  " WHERE status = " + Coupon.Status.DRAWN.getVal() +
+			  " AND coupon_type_id IN (" + sql + ")";
+		dbCon.stmt.executeUpdate(sql);
+	} 
 	
 }

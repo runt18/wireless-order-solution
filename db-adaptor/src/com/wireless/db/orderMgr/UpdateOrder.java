@@ -246,7 +246,7 @@ public class UpdateOrder {
 		//insert the extra order food records
 		for(OrderFood extraFood : diffResult.extraFoods){
 
-			OrderFoodDao.insertExtra(dbCon, staff, new OrderFoodDao.ExtraBuilder(diffResult.newOrder.getId(), extraFood).setPaid(diffResult.oriOrder.isUnpaid()));
+			OrderFoodDao.insertExtra(dbCon, staff, new OrderFoodDao.ExtraBuilder(diffResult.newOrder.getId(), extraFood).setPaid(!diffResult.oriOrder.isUnpaid()));
 			
 			//FIXME Insert the temporary food to menu.
 //			if(extraFood.isTemp()){
