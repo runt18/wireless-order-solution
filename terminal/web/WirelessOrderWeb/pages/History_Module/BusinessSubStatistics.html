@@ -16,6 +16,8 @@
 		sendToStatisticsPageEndDate = dateEnd.getValue();
 		sendToStatisticsPageHours = Ext.ux.statistic_oBusinessHourData({type : 'get', statistic : 'businessSub_'}).data; 
 		sendToStatisticsPageHours.hourComboValue = Ext.getCmp('businessSub_comboBusinessHour').getValue();
+		sendToStatisticsPageHours.deptId = c.deptId;
+		sendToStatisticsPageHours.deptName = c.deptName;
 		
 		sendToPageOperation = true;
 		
@@ -34,6 +36,8 @@
 			
 		}else if(c.type == 6){//收款统计
 			addTab('businessReceiptsStatistics', '收款统计', 'History_Module/BusinessReceiptsStatistics.html');			
+		}else if(c.type == 7){//提成统计
+			addTab('commissionStatistics', '提成统计', 'History_Module/CommissionStatistics.html');			
 		}else{
 			return;
 		}
@@ -48,7 +52,7 @@
 	<div style="font-size: 15px;text-align: right;overflow: visible;background-color: white;">
 		<a href="javascript:void(0)" style="width:100px;margin-right: 10px;"  onclick="linkToBusinessStatistics({type : 6})">查看收款详情</a>
 	</div>
-	<div id="divBusinessSubStatisticsDetailChart" style="height : 250px;"></div>
+	<div id="divBusinessSubStatisticsDetailChart" style="height : 240px;"></div>
 </div>
 	<table id="businessStatisticsSummary" border="1" class="tb_base" style="width : 100%;">
 		<tr>
@@ -132,6 +136,12 @@
 			<td class="text_right" id="businessSub_bssiPaidIncome">---</td>
 			<td class="text_center"><a href="javascript:void(0)" onclick="linkToBusinessStatistics({type : 4})">查看详情</a></td>
 		</tr>
+		<tr>
+			<th>提成</th>
+			<td class="text_right" id="businessSub_bssiPaidAmount">---</td>
+			<td class="text_right" id="businessSub_bssiPaidIncome">---</td>
+			<td class="text_center"><a href="javascript:void(0)" onclick="linkToBusinessStatistics({type : 7})">查看详情</a></td>
+		</tr>		
 		<tr>
 			<th>服务费收入</th>
 			<td class="text_right" id="businessSub_bssiServiceAmount">---</td>
