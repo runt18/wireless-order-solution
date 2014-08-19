@@ -2,7 +2,6 @@ package com.wireless.Actions.weixin;
 
 import java.sql.SQLException;
 import java.util.Date;
-import java.util.List;
 
 import org.marker.weixin.DefaultSession;
 import org.marker.weixin.HandleMessageListener;
@@ -18,15 +17,11 @@ import org.marker.weixin.msg.Msg4Video;
 import org.marker.weixin.msg.Msg4Voice;
 
 import com.wireless.Actions.init.InitServlet;
-import com.wireless.db.promotion.CouponDao;
 import com.wireless.db.restaurantMgr.RestaurantDao;
-import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.weixin.member.WeixinMemberDao;
 import com.wireless.db.weixin.restaurant.WeixinRestaurantDao;
 import com.wireless.exception.BusinessException;
-import com.wireless.pojo.promotion.Coupon;
 import com.wireless.pojo.restaurantMgr.Restaurant;
-import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.DateUtil;
 
 public class WeiXinRestaurantHandleMessageAdapter implements HandleMessageListener {
@@ -160,14 +155,15 @@ public class WeiXinRestaurantHandleMessageAdapter implements HandleMessageListen
 			
 			dataItem = new Data4Item();
 			try{
-				int memberId = WeixinMemberDao.getBoundMemberIdByWeixin(msg.getFromUserName(), msg.getToUserName());
-				Staff staff = StaffDao.getByRestaurant(rid).get(0);
+				WeixinMemberDao.getBoundMemberIdByWeixin(msg.getFromUserName(), msg.getToUserName());
+/*				Staff staff = StaffDao.getByRestaurant(rid).get(0);
 				List<Coupon> couponList = CouponDao.getAvailByMember(staff, memberId);
 				if(couponList.size() > 0){
 					dataItem.setTitle("会员资料 | 您有新优惠劵!");
 				}else{
 					dataItem.setTitle("会员资料");
-				}
+				}*/
+				dataItem.setTitle("会员资料");
 			}catch(BusinessException e){
 				dataItem.setTitle("会员资料 | 请绑定会员");
 			}

@@ -15,17 +15,13 @@ import org.apache.struts.actions.DispatchAction;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.client.member.MemberOperationDao;
-import com.wireless.db.promotion.CouponDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.weixin.member.WeixinMemberDao;
 import com.wireless.db.weixin.restaurant.WeixinRestaurantDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.client.MemberOperation;
-import com.wireless.pojo.promotion.Coupon;
 import com.wireless.pojo.staffMgr.Staff;
-import com.wireless.util.OSSParams;
-import com.wireless.util.OSSUtil;
 import com.wireless.util.SQLUtil;
 
 public class WXQueryMemberOperationAction extends DispatchAction{
@@ -163,7 +159,7 @@ public class WXQueryMemberOperationAction extends DispatchAction{
 	 * @return
 	 * @throws Exception
 	 */
-	public ActionForward hasCouponDetails(ActionMapping mapping, ActionForm form,
+/*	public ActionForward hasCouponDetails(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
 		request.setCharacterEncoding("UTF-8");
@@ -188,7 +184,7 @@ public class WXQueryMemberOperationAction extends DispatchAction{
 			List<Coupon> couponList = CouponDao.getAvailByMember(staff, mid);
 			
 			//获取所有优惠券
-/*			List<Map<String, Object>> root = new ArrayList<Map<String, Object>>(), asItems;
+			List<Map<String, Object>> root = new ArrayList<Map<String, Object>>(), asItems;
 			Map<String, Object> item = null;
 			for(CouponType listTemp : couponTypeList){
 				item = new HashMap<String, Object>(listTemp.toJsonMap(0));
@@ -202,7 +198,7 @@ public class WXQueryMemberOperationAction extends DispatchAction{
 				root.add(item);
 			}
 			
-			jobject.getOther().put("root", root);*/
+			jobject.getOther().put("root", root);
 			for (Coupon temp : couponList) {
 				if(temp.getCouponType().hasImage()){
 					temp.getCouponType().setImage(("http://" + OSSUtil.BUCKET_IMAGE + "." + OSSParams.instance().OSS_OUTER_POINT + "/" + temp.getRestaurantId() + "/" + temp.getCouponType().getImage()));
@@ -224,6 +220,6 @@ public class WXQueryMemberOperationAction extends DispatchAction{
 		}
 		
 		return null;
-	}
+	}*/
 	
 }
