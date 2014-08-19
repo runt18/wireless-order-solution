@@ -20,11 +20,13 @@ import com.wireless.json.JObject;
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.pojo.billStatistics.DutyRange;
+import com.wireless.pojo.billStatistics.HourRange;
 import com.wireless.pojo.billStatistics.gift.GiftIncomeByDept;
 import com.wireless.pojo.billStatistics.gift.GiftIncomeByEachDay;
 import com.wireless.pojo.billStatistics.gift.GiftIncomeByStaff;
 import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.regionMgr.Region.RegionId;
+import com.wireless.pojo.util.DateUtil;
 import com.wireless.util.DataPaging;
 import com.wireless.util.DateType;
 
@@ -41,6 +43,8 @@ public class QueryGiftStatisticAction extends DispatchAction{
 		String region = request.getParameter("region");
 		String foodName = request.getParameter("foodName");
 		String giftStaffId = request.getParameter("giftStaffId");
+		String opening = request.getParameter("opening");
+		String ending = request.getParameter("ending");
 		
 		JObject jobject = new JObject();
 		try{
@@ -61,7 +65,9 @@ public class QueryGiftStatisticAction extends DispatchAction{
 			if(giftStaffId != null && !giftStaffId.isEmpty() && !giftStaffId.equals("-1")){
 				extraCond.setStaffId(Integer.parseInt(giftStaffId));
 			}
-			
+			if(opening != null && !opening.isEmpty()){
+				extraCond.setHourRange(new HourRange(opening, ending, DateUtil.Pattern.HOUR));
+			}
 			List<OrderFood> orderFoodList = OrderFoodDao.getSingleDetail(StaffDao.verify(Integer.parseInt(pin)), extraCond, null);
 			
 			jobject.setTotalProperty(orderFoodList.size());
@@ -96,6 +102,8 @@ public class QueryGiftStatisticAction extends DispatchAction{
 		String region = request.getParameter("region");
 		String foodName = request.getParameter("foodName");
 		String giftStaffId = request.getParameter("giftStaffId");
+		String opening = request.getParameter("opening");
+		String ending = request.getParameter("ending");
 		
 		JObject jobject = new JObject();
 		
@@ -112,6 +120,9 @@ public class QueryGiftStatisticAction extends DispatchAction{
 			
 			if(giftStaffId != null && !giftStaffId.isEmpty() && !giftStaffId.equals("-1")){
 				extraCond.setStaffId(Integer.parseInt(giftStaffId));
+			}
+			if(opening != null && !opening.isEmpty()){
+				extraCond.setHourRange(new HourRange(opening, ending, DateUtil.Pattern.HOUR));
 			}
 			
 			List<GiftIncomeByEachDay> giftList = CalcGiftStatisticsDao.calcGiftIncomeByEachDay(StaffDao.verify(Integer.parseInt(pin)), new DutyRange(dateBeg, dateEnd), extraCond);
@@ -167,6 +178,8 @@ public class QueryGiftStatisticAction extends DispatchAction{
 		String region = request.getParameter("region");
 		String foodName = request.getParameter("foodName");
 		String giftStaffId = request.getParameter("giftStaffId");
+		String opening = request.getParameter("opening");
+		String ending = request.getParameter("ending");
 		
 		JObject jobject = new JObject();
 		
@@ -183,6 +196,9 @@ public class QueryGiftStatisticAction extends DispatchAction{
 			
 			if(giftStaffId != null && !giftStaffId.isEmpty() && !giftStaffId.equals("-1")){
 				extraCond.setStaffId(Integer.parseInt(giftStaffId));
+			}
+			if(opening != null && !opening.isEmpty()){
+				extraCond.setHourRange(new HourRange(opening, ending, DateUtil.Pattern.HOUR));
 			}
 			
 			List<GiftIncomeByStaff> giftList = CalcGiftStatisticsDao.calcGiftIncomeByStaff(StaffDao.verify(Integer.parseInt(pin)), new DutyRange(dateBeg, dateEnd), extraCond);
@@ -211,6 +227,8 @@ public class QueryGiftStatisticAction extends DispatchAction{
 		String region = request.getParameter("region");
 		String foodName = request.getParameter("foodName");
 		String giftStaffId = request.getParameter("giftStaffId");
+		String opening = request.getParameter("opening");
+		String ending = request.getParameter("ending");
 		
 		JObject jobject = new JObject();
 		
@@ -228,7 +246,9 @@ public class QueryGiftStatisticAction extends DispatchAction{
 			if(giftStaffId != null && !giftStaffId.isEmpty() && !giftStaffId.equals("-1")){
 				extraCond.setStaffId(Integer.parseInt(giftStaffId));
 			}
-			
+			if(opening != null && !opening.isEmpty()){
+				extraCond.setHourRange(new HourRange(opening, ending, DateUtil.Pattern.HOUR));
+			}
 			List<GiftIncomeByDept> giftList = CalcGiftStatisticsDao.calcGiftIncomeByDept(StaffDao.verify(Integer.parseInt(pin)), new DutyRange(dateBeg, dateEnd), extraCond);
 			
 			jobject.setRoot(giftList);

@@ -19,12 +19,14 @@ import com.wireless.json.JObject;
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.pojo.billStatistics.DutyRange;
+import com.wireless.pojo.billStatistics.HourRange;
 import com.wireless.pojo.billStatistics.commission.CommissionIncomeByEachDay;
 import com.wireless.pojo.billStatistics.commission.CommissionIncomeByStaff;
 import com.wireless.pojo.billStatistics.commission.CommissionStatistics;
 import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.menuMgr.Department.DeptId;
 import com.wireless.pojo.staffMgr.Staff;
+import com.wireless.pojo.util.DateUtil;
 import com.wireless.util.DataPaging;
 import com.wireless.util.DateType;
 
@@ -41,6 +43,8 @@ public class QueryCommissionStatisticsAction extends DispatchAction{
 		String endDate = request.getParameter("endDate");
 		String staffId = request.getParameter("staffId");
 		String deptId = request.getParameter("deptId");
+		String opening = request.getParameter("opening");
+		String ending = request.getParameter("ending");
 		try{
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			List<CommissionStatistics> list;
@@ -54,6 +58,11 @@ public class QueryCommissionStatisticsAction extends DispatchAction{
 			if(deptId != null && !deptId.equals("-1")){
 				extraCond.setDeptId(DeptId.valueOf(Integer.parseInt(deptId)));
 			}
+			
+			if(opening != null && !opening.isEmpty()){
+				extraCond.setHourRange(new HourRange(opening, ending, DateUtil.Pattern.HOUR));
+			}
+			
 			list = CalcCommissionStatisticsDao.getCommissionStatisticsDetail(staff, new DutyRange(beginDate, endDate), extraCond);
 			
 			if(!list.isEmpty()){
@@ -88,6 +97,8 @@ public class QueryCommissionStatisticsAction extends DispatchAction{
 		String dateEnd = request.getParameter("dateEnd");
 		String deptID = request.getParameter("deptID");
 		String staffID = request.getParameter("staffID");
+		String opening = request.getParameter("opening");
+		String ending = request.getParameter("ending");
 		
 		JObject jobject = new JObject();
 		
@@ -99,6 +110,10 @@ public class QueryCommissionStatisticsAction extends DispatchAction{
 			}
 			if(staffID != null && !staffID.isEmpty() && !staffID.equals("-1")){
 				extraCond.setStaffId(Integer.valueOf(staffID));
+			}
+			
+			if(opening != null && !opening.isEmpty()){
+				extraCond.setHourRange(new HourRange(opening, ending, DateUtil.Pattern.HOUR));
 			}
 			
 			List<CommissionIncomeByEachDay> cancelList = CalcCommissionStatisticsDao.calcCommissionIncomeByEachDay(StaffDao.verify(Integer.parseInt(pin)), new DutyRange(dateBeg, dateEnd), extraCond);
@@ -154,6 +169,8 @@ public class QueryCommissionStatisticsAction extends DispatchAction{
 		String dateEnd = request.getParameter("dateEnd");
 		String deptID = request.getParameter("deptID");
 		String staffID = request.getParameter("staffID");
+		String opening = request.getParameter("opening");
+		String ending = request.getParameter("ending");
 		
 		JObject jobject = new JObject();
 		
@@ -164,6 +181,9 @@ public class QueryCommissionStatisticsAction extends DispatchAction{
 			}
 			if(staffID != null && !staffID.isEmpty() && !staffID.equals("-1")){
 				extraCond.setStaffId(Integer.valueOf(staffID));
+			}
+			if(opening != null && !opening.isEmpty()){
+				extraCond.setHourRange(new HourRange(opening, ending, DateUtil.Pattern.HOUR));
 			}
 			
 			List<CommissionIncomeByStaff> cancelList = CalcCommissionStatisticsDao.calcCommissionIncomeByStaff(StaffDao.verify(Integer.parseInt(pin)), new DutyRange(dateBeg, dateEnd), extraCond);

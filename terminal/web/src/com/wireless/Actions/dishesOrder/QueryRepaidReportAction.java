@@ -24,6 +24,7 @@ import com.wireless.pojo.billStatistics.repaid.RepaidIncomeByEachDay;
 import com.wireless.pojo.billStatistics.repaid.RepaidIncomeByStaff;
 import com.wireless.pojo.billStatistics.repaid.RepaidStatistics;
 import com.wireless.pojo.staffMgr.Staff;
+import com.wireless.pojo.util.DateUtil;
 import com.wireless.util.DataPaging;
 import com.wireless.util.DateType;
 
@@ -47,7 +48,7 @@ public class QueryRepaidReportAction extends DispatchAction{
 			CalcRepaidStatisticsDao.ExtraCond extraCond = new CalcRepaidStatisticsDao.ExtraCond(DateType.HISTORY);
 			
 			if(opening != null && !opening.isEmpty()){
-				extraCond.setHourRange(new HourRange(opening, ending));
+				extraCond.setHourRange(new HourRange(opening, ending, DateUtil.Pattern.HOUR));
 			}
 			
 			if(staffId != null && !staffId.isEmpty() && !staffId.equals("-1")){
@@ -98,7 +99,7 @@ public class QueryRepaidReportAction extends DispatchAction{
 				extraCond.setStaffId(Integer.valueOf(staffID));
 			}
 			if(opening != null && !opening.isEmpty()){
-				extraCond.setHourRange(new HourRange(opening, ending));
+				extraCond.setHourRange(new HourRange(opening, ending, DateUtil.Pattern.HOUR));
 			}
 			
 			List<RepaidIncomeByEachDay> cancelList = CalcRepaidStatisticsDao.calcRepaidIncomeByEachDay(StaffDao.verify(Integer.parseInt(pin)), new DutyRange(dateBeg, dateEnd), extraCond);
@@ -166,7 +167,7 @@ public class QueryRepaidReportAction extends DispatchAction{
 			}
 			
 			if(opening != null && !opening.isEmpty()){
-				extraCond.setHourRange(new HourRange(opening, ending));
+				extraCond.setHourRange(new HourRange(opening, ending, DateUtil.Pattern.HOUR));
 			}
 			
 			List<RepaidIncomeByStaff> cancelList = CalcRepaidStatisticsDao.calcRepaidIncomeByStaff(StaffDao.verify(Integer.parseInt(pin)), new DutyRange(dateBeg, dateEnd), extraCond);

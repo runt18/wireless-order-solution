@@ -19,12 +19,14 @@ import com.wireless.json.JObject;
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.pojo.billStatistics.DutyRange;
+import com.wireless.pojo.billStatistics.HourRange;
 import com.wireless.pojo.billStatistics.discount.DiscountIncomeByDept;
 import com.wireless.pojo.billStatistics.discount.DiscountIncomeByEachDay;
 import com.wireless.pojo.billStatistics.discount.DiscountIncomeByStaff;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.menuMgr.Department.DeptId;
 import com.wireless.pojo.staffMgr.Staff;
+import com.wireless.pojo.util.DateUtil;
 import com.wireless.util.DataPaging;
 import com.wireless.util.DateType;
 
@@ -41,6 +43,9 @@ public class QueryDiscountStatisticsAction extends DispatchAction{
 		String endDate = request.getParameter("endDate");
 		String staffId = request.getParameter("staffID");
 		String deptID = request.getParameter("deptID");
+		String opening = request.getParameter("opening");
+		String ending = request.getParameter("ending");
+		
 		try{
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			List<Order> list;
@@ -53,6 +58,9 @@ public class QueryDiscountStatisticsAction extends DispatchAction{
 			
 			if(deptID != null && !deptID.isEmpty() && !deptID.equals("-1")){
 				extraCond.setDeptId(DeptId.valueOf(Integer.parseInt(deptID)));
+			}
+			if(opening != null && !opening.isEmpty()){
+				extraCond.setHourRange(new HourRange(opening, ending, DateUtil.Pattern.HOUR));
 			}
 			
 			list = CalcDiscountStatisticsDao.getDiscountStatisticsDetail(staff, new DutyRange(beginDate, endDate), extraCond);
@@ -90,6 +98,8 @@ public class QueryDiscountStatisticsAction extends DispatchAction{
 		String dateEnd = request.getParameter("dateEnd");
 		String deptID = request.getParameter("deptID");
 		String staffID = request.getParameter("staffId");
+		String opening = request.getParameter("opening");
+		String ending = request.getParameter("ending");
 		
 		JObject jobject = new JObject();
 		
@@ -102,7 +112,9 @@ public class QueryDiscountStatisticsAction extends DispatchAction{
 			if(staffID != null && !staffID.isEmpty() && !staffID.equals("-1")){
 				extraCond.setStaffId(Integer.valueOf(staffID));
 			}
-			
+			if(opening != null && !opening.isEmpty()){
+				extraCond.setHourRange(new HourRange(opening, ending, DateUtil.Pattern.HOUR));
+			}
 			List<DiscountIncomeByEachDay> cancelList = CalcDiscountStatisticsDao.calcDiscountIncomeByEachDay(StaffDao.verify(Integer.parseInt(pin)), new DutyRange(dateBeg, dateEnd), extraCond);
 			
 			List<String> xAxis = new ArrayList<String>();
@@ -156,6 +168,8 @@ public class QueryDiscountStatisticsAction extends DispatchAction{
 		String dateEnd = request.getParameter("dateEnd");
 		String deptID = request.getParameter("deptID");
 		String staffID = request.getParameter("staffId");
+		String opening = request.getParameter("opening");
+		String ending = request.getParameter("ending");
 		
 		JObject jobject = new JObject();
 		
@@ -167,7 +181,9 @@ public class QueryDiscountStatisticsAction extends DispatchAction{
 			if(staffID != null && !staffID.isEmpty() && !staffID.equals("-1")){
 				extraCond.setStaffId(Integer.valueOf(staffID));
 			}
-			
+			if(opening != null && !opening.isEmpty()){
+				extraCond.setHourRange(new HourRange(opening, ending, DateUtil.Pattern.HOUR));
+			}
 			List<DiscountIncomeByStaff> cancelList = CalcDiscountStatisticsDao.calcDiscountIncomeByStaff(StaffDao.verify(Integer.parseInt(pin)), new DutyRange(dateBeg, dateEnd), extraCond);
 			
 			jobject.setRoot(cancelList);
@@ -193,6 +209,8 @@ public class QueryDiscountStatisticsAction extends DispatchAction{
 		String dateEnd = request.getParameter("dateEnd");
 		String deptID = request.getParameter("deptID");
 		String staffID = request.getParameter("staffId");
+		String opening = request.getParameter("opening");
+		String ending = request.getParameter("ending");
 		
 		JObject jobject = new JObject();
 		
@@ -205,7 +223,9 @@ public class QueryDiscountStatisticsAction extends DispatchAction{
 			if(staffID != null && !staffID.isEmpty() && !staffID.equals("-1")){
 				extraCond.setStaffId(Integer.valueOf(staffID));
 			}
-			
+			if(opening != null && !opening.isEmpty()){
+				extraCond.setHourRange(new HourRange(opening, ending, DateUtil.Pattern.HOUR));
+			}
 			List<DiscountIncomeByDept> cancelList = CalcDiscountStatisticsDao.calcDiscountIncomeByDept(StaffDao.verify(Integer.parseInt(pin)), new DutyRange(dateBeg, dateEnd), extraCond);
 			
 			jobject.setRoot(cancelList);
