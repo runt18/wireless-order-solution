@@ -436,7 +436,7 @@ function initBusinessReceipsGrid(c){
 	
 	var businessReceiptGridTbar = new Ext.Toolbar({
 		height : 26,
-		items : [Ext.ux.initTimeBar({beginDate:receipts_beginDate, endDate:receipts_endDate,dateCombo:receipts_dateCombo, tbarType : 1, statistic : 'businessReceipt_'}).concat(businessReceiptGridTbarItem)]
+		items : [Ext.ux.initTimeBar({beginDate:receipts_beginDate, endDate:receipts_endDate,dateCombo:receipts_dateCombo, tbarType : 1, statistic : 'businessReceipt_', callback : function businessHourSelect(){receipt_hours = null;}}).concat(businessReceiptGridTbarItem)]
 	});
 	
 	receivablesStatResultGrid = new Ext.grid.GridPanel({
@@ -505,8 +505,9 @@ var receipts_setStatisticsDate = function(){
 		Ext.getCmp('businessReceipt_btnSearch').handler();
 		Ext.getCmp('businessReceipt_txtBusinessHourBegin').setText('<font style="color:green; font-size:20px">'+receipt_hours.opening+'</font>');
 		Ext.getCmp('businessReceipt_txtBusinessHourEnd').setText('<font style="color:green; font-size:20px">'+receipt_hours.ending+'</font>');
-		sendToPageOperation = false;		
 		Ext.getCmp('businessReceipt_comboBusinessHour').setValue(sendToStatisticsPageHours.hourComboValue);
+		
+		sendToPageOperation = false;		
 	}
 
 };

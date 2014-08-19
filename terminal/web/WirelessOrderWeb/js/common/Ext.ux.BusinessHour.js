@@ -6,6 +6,21 @@ Ext.ux.businessHourComboData = [['00', '00' ], ['01', '01' ], ['02', '02' ], ['0
  * @return {}
  */
 Ext.ux.initTimeBar = function(c){
+	var businessHourData = [[-1,'全天']];
+	$.ajax({
+		url : '../../QueryBusinessHour.do',
+		type : 'post',
+		async : false,
+		success : function(jr, status, xhr){
+			for(var i = 0; i < jr.root.length; i++){
+				businessHourData.push([jr.root[i]['id'], jr.root[i]['name'], jr.root[i]['opening'], jr.root[i]['ending']]);
+			}
+			businessHourData.push([-2,'自定义']);
+		},
+		error : function(result, status, xhr){
+		}
+	});
+	
 	
 	var timeBar;
 	//返回一条完整工具栏
@@ -39,29 +54,18 @@ Ext.ux.initTimeBar = function(c){
 					readOnly : false,
 					listeners : {
 						render : function(thiz){
-							var data = [[-1,'全天']];
-							Ext.Ajax.request({
-								url : '../../QueryBusinessHour.do',
-								success : function(res, opt){
-									var jr = Ext.decode(res.responseText);
-									for(var i = 0; i < jr.root.length; i++){
-										data.push([jr.root[i]['id'], jr.root[i]['name'], jr.root[i]['opening'], jr.root[i]['ending']]);
-									}
-									data.push([-2,'自定义']);
-									thiz.store.loadData(data);
-									thiz.setValue(-1);
-								},
-								fialure : function(res, opt){
-									thiz.store.loadData(data);
-									thiz.setValue(-1);
-								}
-							});
+							thiz.store.loadData(businessHourData);
+							thiz.setValue(-1);
 						},
 						select : function(thiz, record, index){
 							Ext.ux.statistic_oBusinessHourData({data : record.json, type : 'set', statistic : c.statistic});
+							if(c.callback && typeof c.callback == 'function'){
+								c.callback();
+							}
 							if(record.data.id != -2){
 								Ext.getCmp(c.statistic+'btnSearch').handler();
 							}
+							
 						}
 					}
 				},
@@ -112,7 +116,6 @@ Ext.ux.initTimeBar = function(c){
 					readOnly : false,
 					listeners : {
 						render : function(thiz){
-							var data = [[-1,'全天']];
 /*							Ext.Ajax.request({
 								url : '../../QueryBusinessHour.do',
 								success : function(res, opt){
@@ -129,30 +132,18 @@ Ext.ux.initTimeBar = function(c){
 									thiz.setValue(-1);
 								}
 							});*/
-							$.ajax({
-								url : '../../QueryBusinessHour.do',
-								type : 'post',
-								async : false,
-								success : function(jr, status, xhr){
-									for(var i = 0; i < jr.root.length; i++){
-										data.push([jr.root[i]['id'], jr.root[i]['name'], jr.root[i]['opening'], jr.root[i]['ending']]);
-									}
-									data.push([-2,'自定义']);
-									thiz.store.loadData(data);
-									thiz.setValue(-1);								
-								},
-								error : function(result, status, xhr){
-									thiz.store.loadData(data);
-									thiz.setValue(-1);								
-								}
-							});
+							thiz.store.loadData(businessHourData);
+							thiz.setValue(-1);
 						},
 						select : function(thiz, record, index){
 							Ext.ux.statistic_oBusinessHourData({data : record.json, type : 'set', statistic : c.statistic});
+							if(c.callback && typeof c.callback == 'function'){
+								c.callback();
+							}
 							if(record.data.id != -2){
 								Ext.getCmp(c.statistic+'btnSearch').handler();
 							}
-
+							
 						}
 					}
 				},

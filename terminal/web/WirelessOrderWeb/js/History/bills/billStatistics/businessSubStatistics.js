@@ -94,6 +94,9 @@ function businessSub_initRegionCombo(statistic){
 						}
 						thiz.store.loadData(data);
 						thiz.setValue(-1);
+						
+						businessSub_dateCombo.setValue(1);
+						businessSub_dateCombo.fireEvent('select', businessSub_dateCombo, null, 1);						
 					},
 					fialure : function(res, opt){
 						thiz.store.loadData(data);
@@ -203,6 +206,7 @@ var businessSub_trModel = '<tr>'
 			+ '</tr>';
 var businessSub_titleRegionName = '', businessSub_panelDrag = false;
 var businessSub_chartPanel, businessSub_generalPanelHeight, businessSub_chartPanelHeight, businessSub_highChart;
+var business_chartData;
 Ext.onReady(function(){
 	var businessSub_beginDate = new Ext.form.DateField({
 		xtype : 'datefield',	
@@ -276,6 +280,7 @@ Ext.onReady(function(){
 					bssifLoadMarsk.hide();	
 					var jr = Ext.decode(res.responseText);
 					
+					business_chartData = jr;
 					var businessSub_business = jr.other.business;
 					
 					var deptStat = businessSub_business.deptStat;
@@ -430,20 +435,21 @@ Ext.onReady(function(){
 			contentEl : 'businessStatisticsTotals'
 		}],
 		listeners : {
-			bodyresize : function(e, w, h){
-				if(typeof businessSub_generalPanelHeight != 'undefined'){
-					var chartHeight = businessSub_chartPanelHeight + (businessSub_generalPanelHeight - h);
-					
-					businessSub_chartPanel.getEl().setTop((h+30)) ;
-					
-					businessSub_changeChartWidth(w,chartHeight - 30);
-					
-					if(businessSub_panelDrag){
-						businessSub_chartPanel.setHeight(chartHeight);
-					}
-					businessSub_chartPanel.doLayout();					
-				}
-			}
+//			bodyresize : function(e, w, h){
+//				console.log(businessSub_generalPanelHeight)
+//				if(typeof businessSub_generalPanelHeight != 'undefined'){
+//					var chartHeight = businessSub_chartPanelHeight + (businessSub_generalPanelHeight - h);
+//					
+//					businessSub_chartPanel.getEl().setTop((h+30)) ;
+//					
+//					businessSub_changeChartWidth(w,chartHeight - 30);
+//					
+//					if(businessSub_panelDrag){
+//						businessSub_chartPanel.setHeight(chartHeight);
+//					}
+//					businessSub_chartPanel.doLayout();					
+//				}
+//			}
 		}		
 	});
 	
@@ -458,14 +464,15 @@ Ext.onReady(function(){
 			show : function(thiz){
 				//thiz.getEl(): 刚打开页面时thiz.getWidth无效
 				if(businessSub_highChart && typeof thiz.getEl() != 'undefined'){
-					businessSub_highChart.setSize(thiz.getWidth(), businessSub_panelDrag ? businessSub_chartPanel.getHeight() - 55 : businessSub_chartPanel.getHeight()-25);
+					businessSub_highChart.setSize(thiz.getWidth(), businessSub_panelDrag ? businessSub_chartPanel.getHeight() - 60 : businessSub_chartPanel.getHeight()-45);
 				}				
 			},
 			expand : function(thiz){
 				//thiz.getEl(): 刚打开页面时thiz.getWidth无效
 				if(businessSub_highChart && typeof thiz.getEl() != 'undefined'){
-					businessSub_highChart.setSize(thiz.getWidth(), businessSub_panelDrag ? businessSub_chartPanel.getHeight() - 45 : businessSub_chartPanel.getHeight());
+					businessSub_highChart.setSize(thiz.getWidth(), businessSub_chartPanel.getHeight() - 45);
 				}	
+//				businessSubGeneralPanel.getEl().parent().setHeight(Ext.getCmp('businessSubStatisticsPanel').getHeight() - 300);
 				
 			},
 			collapse : function(thiz){
@@ -486,18 +493,18 @@ Ext.onReady(function(){
 		items : [businessSubGeneralPanel, businessSub_chartPanel]		
 	});
 	
-	var businessSub_rz = new Ext.Resizable(businessSubGeneralPanel.getEl(), {
-        wrap: true, //在构造Resizable时自动在制定的id的外边包裹一层div
-        minHeight:100, //限制改变的最小的高度
-        pinned:false, //控制可拖动区域的显示状态，false是鼠标悬停在拖拉区域上才出现
-        handles: 's',//设置拖拉的方向（n,s,e,w,all...）
-        listeners : {
-        	resize : function(thiz, w, h, e){
-        		businessSub_panelDrag = true;
-        	}
-        }
-    });
-    businessSub_rz.on('resize', businessSubGeneralPanel.syncSize, businessSubGeneralPanel);//注册事件(作用:将调好的大小传个scope执行)	
+//	var businessSub_rz = new Ext.Resizable(businessSubGeneralPanel.getEl(), {
+//        wrap: true, //在构造Resizable时自动在制定的id的外边包裹一层div
+//        minHeight:100, //限制改变的最小的高度
+//        pinned:false, //控制可拖动区域的显示状态，false是鼠标悬停在拖拉区域上才出现
+//        handles: 's',//设置拖拉的方向（n,s,e,w,all...）
+//        listeners : {
+//        	resize : function(thiz, w, h, e){
+//        		businessSub_panelDrag = true;
+//        	}
+//        }
+//    });
+//    businessSub_rz.on('resize', businessSubGeneralPanel.syncSize, businessSubGeneralPanel);//注册事件(作用:将调好的大小传个scope执行)	
     
 	
 	businessSub_generalPanelHeight = businessSubGeneralPanel.getHeight();
@@ -508,6 +515,4 @@ Ext.onReady(function(){
 		businessSub_chartPanel.expand();
 	}
 	
-	businessSub_dateCombo.setValue(1);
-	businessSub_dateCombo.fireEvent('select', businessSub_dateCombo, null, 1);	
 });

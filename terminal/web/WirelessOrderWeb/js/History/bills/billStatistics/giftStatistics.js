@@ -184,15 +184,6 @@ function initGiftStatisticsGrid(){
 	var grid_giftStatisticsTbar = new Ext.Toolbar({
 		items : [{
 			xtype:'tbtext',
-			text:'日期:'
-		}, gift_dateCombo, {
-			xtype:'tbtext',
-			text:'&nbsp;'
-		}, beginDate, {
-			xtype:'tbtext',
-			text:'&nbsp;至&nbsp;'
-		}, endDate, {
-			xtype:'tbtext',
 			text:'&nbsp;'
 		},{
 			xtype : 'tbtext',
@@ -216,12 +207,22 @@ function initGiftStatisticsGrid(){
 				if(!beginDate.isValid() || !endDate.isValid()){
 					return;
 				}
+				
+				var businessHour;
+				if(giftStatistic_hours){
+					businessHour = giftStatistic_hours;
+				}else{
+					businessHour = Ext.ux.statistic_oBusinessHourData({type : 'get', statistic : 'giftStatistic_'}).data;
+				}					
+				
 				var gs = grid_giftStatistics.getStore();
 				gs.baseParams['onDuty'] = beginDate.getValue().format('Y-m-d 00:00:00');
 				gs.baseParams['offDuty'] = endDate.getValue().format('Y-m-d 23:59:59');
 				gs.baseParams['region'] = Ext.getCmp('giftStatistic_comboRegion').getValue();
 				gs.baseParams['foodName'] = Ext.getCmp('gift_foodName').getValue();
 				gs.baseParams['giftStaffId'] = gift_combo_staffs.getValue();
+				gs.baseParams['opening'] = businessHour.opening;
+				gs.baseParams['ending'] = businessHour.ending;
 				gs.load({
 					params : {
 						start : 0,
@@ -241,7 +242,9 @@ function initGiftStatisticsGrid(){
 					dateEnd : endDate.getValue().format('Y-m-d 23:59:59'),
 					region : Ext.getCmp('giftStatistic_comboRegion').getValue(),
 					giftStaffId : gift_combo_staffs.getValue(),
-					foodName : Ext.getCmp('gift_foodName').getValue()
+					foodName : Ext.getCmp('gift_foodName').getValue(),
+					opening : businessHour.opening,
+					ending : businessHour.ending
 				};
 				gift_chartLoadMarsk.show();
 				Ext.Ajax.request({
@@ -301,7 +304,7 @@ function initGiftStatisticsGrid(){
 	    [ ['dataSource', 'normal']],
 	    GRID_PADDING_LIMIT_20,
 	    '',
-	    grid_giftStatisticsTbar
+	    [grid_giftStatisticsTbar, Ext.ux.initTimeBar({beginDate:beginDate, endDate:endDate,dateCombo:gift_dateCombo,statistic : 'giftStatistic_',tbarType: 0, callback : function businessHourSelect(){giftStatistic_hours = null;}})]
 	);
 	
 	grid_giftStatistics.frame = false;
@@ -351,8 +354,8 @@ function showGiftDetailChart(jdata){
 	var dateBegin = Ext.getCmp('gift_dateSearchDateBegin').getValue().format('Y-m-d');
 	var dateEnd = Ext.getCmp('gift_dateSearchDateEnd').getValue().format('Y-m-d');
 	
-/*	var hourBegin = Ext.getCmp('gift_txtBusinessHourBegin').getEl().dom.textContent;
-	var hourEnd = Ext.getCmp('gift_txtBusinessHourEnd').getEl().dom.textContent;*/
+	var hourBegin = Ext.getCmp('giftStatistic_txtBusinessHourBegin').getEl().dom.textContent;
+	var hourEnd = Ext.getCmp('giftStatistic_txtBusinessHourEnd').getEl().dom.textContent;
 	
 	var chartData = eval('(' + jdata.other.chart + ')');
 	gift_detailChart = new Highcharts.Chart({
@@ -377,7 +380,7 @@ function showGiftDetailChart(jdata){
         	renderTo: 'divGiftDetailChart'
     	}, 
         title: {
-            text: '<b>赠送走势图（'+dateBegin+ '至' +dateEnd+'）'+titleGiftStaffName+'</b>'
+            text: '<b>赠送走势图（'+dateBegin+ '至' +dateEnd+'）'+hourBegin+ ' - ' + hourEnd + titleGiftStaffName+'</b>'
         },
         labels: {
         	items : [{
@@ -555,13 +558,21 @@ var gift_setStatisticsDate = function(){
 	if(sendToPageOperation){
 		Ext.getCmp('gift_dateSearchDateBegin').setValue(sendToStatisticsPageBeginDate);
 		Ext.getCmp('gift_dateSearchDateEnd').setValue(sendToStatisticsPageEndDate);		
+		
+		giftStatistic_hours = sendToStatisticsPageHours;
+		
 		Ext.getCmp('giftStatistic_btnSearch').handler();
+		
+		Ext.getCmp('giftStatistic_txtBusinessHourBegin').setText('<font style="color:green; font-size:20px">'+giftStatistic_hours.opening+'</font>');
+		Ext.getCmp('giftStatistic_txtBusinessHourEnd').setText('<font style="color:green; font-size:20px">'+giftStatistic_hours.ending+'</font>');
+		Ext.getCmp('giftStatistic_comboBusinessHour').setValue(giftStatistic_hours.hourComboValue);
+		
 		sendToPageOperation = false;		
 	}
 
 };
 
-var gift_cutAfterDrag=75, gift_cutBeforeDrag=70;
+var gift_cutAfterDrag=75, gift_cutBeforeDrag=70, giftStatistic_hours;
 var giftDetailsStatPanel, giftStatChartTabPanel, giftDetailChartPanel, giftStaffChartPanel, giftDeptChartPanel;
 var gift_detailChart, gift_staffPieChart, gift_staffColumnChart, gift_deptPieChart, gift_deptColumnChart;
 var requestParams, gift_dateCombo;

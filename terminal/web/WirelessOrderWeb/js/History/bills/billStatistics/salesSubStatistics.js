@@ -36,6 +36,7 @@ function initRegionCombo(statistic){
 						}
 						thiz.store.loadData(data);
 						thiz.setValue(-1);
+						
 					},
 					fialure : function(res, opt){
 						thiz.store.loadData(data);
@@ -628,23 +629,29 @@ function deptStatPanelInit(){
 					Ext.ux.checkDuft(false, beginDate.getId(), endDate.getId());
 				}
 				
-				var data = Ext.ux.statistic_oBusinessHourData({type : 'get', statistic : 'deptStatistic_'}).data;
+				var data;
+				if(salesSub_hours){
+					data = salesSub_hours;
+				}else{
+					data = Ext.ux.statistic_oBusinessHourData({type : 'get', statistic : 'deptStatistic_'}).data;
+				}				
 				
 				if(typeof e != 'undefined' && typeof e == 'boolean'){
 					Ext.getCmp('southDeptChartPanel').expand();
 					var gn = Ext.ux.getSelData(deptStatPanelGrid);
 					titleDeptName = gn.dept.name;
+					selectDeptId = gn.dept.id;
 					loadDeptStatisticChartData({dateBeg : beginDate.getRawValue() + ' 00:00:00', 
 						dateEnd : endDate.getRawValue() + ' 23:59:59', 
 						region : Ext.getCmp("deptStatistic_comboRegion").getValue(),
 						opening : data.opening,
 						ending : data.ending,
-						deptId : gn.dept.id});
+						deptId : selectDeptId});
 				}else{
-					if(!sendToPageOperation){
-						Ext.getCmp('southDeptChartPanel').collapse();
-					}
-					titleDeptName = '';
+//					if(!sendToPageOperation){
+//						Ext.getCmp('southDeptChartPanel').collapse();
+//					}
+//					titleDeptName = '';
 					titleRegionName = Ext.getCmp("deptStatistic_comboRegion").getValue() == -1 ? '' : ', ' + Ext.getCmp('deptStatistic_comboRegion').getEl().dom.value;
 					var gs = deptStatPanelGrid.getStore();
 					gs.baseParams['dateBeg'] = beginDate.getRawValue();
@@ -653,7 +660,16 @@ function deptStatPanelInit(){
 					gs.baseParams['opening'] = data.opening;
 					gs.baseParams['ending'] = data.ending;
 					
-					gs.load();					
+					gs.load();			
+					
+					if(selectDeptId){
+						loadDeptStatisticChartData({dateBeg : beginDate.getRawValue() + ' 00:00:00', 
+							dateEnd : endDate.getRawValue() + ' 23:59:59', 
+							region : Ext.getCmp("deptStatistic_comboRegion").getValue(),
+							opening : data.opening,
+							ending : data.ending,
+							deptId : selectDeptId});						
+					}
 				}
 			}
 		}, '-', {
@@ -700,7 +716,7 @@ function deptStatPanelInit(){
 	
 	deptStatPanelGridTbar = new Ext.Toolbar({
 		height : 26,
-		items : [Ext.ux.initTimeBar({dateCombo:dateCombo, beginDate: beginDate, endDate:endDate, statistic : 'deptStatistic_'}).concat(deptStatPanelGridTbarItem)]
+		items : [Ext.ux.initTimeBar({dateCombo:dateCombo, beginDate: beginDate, endDate:endDate, statistic : 'deptStatistic_', callback : function businessHourSelect(){salesSub_hours = null;}}).concat(deptStatPanelGridTbarItem)]
 	});
 	
 	
@@ -807,15 +823,32 @@ function salesSubWinTabPanelInit(){
 var saleSub_setStatisticsDate = function(){
 	if(sendToPageOperation){
 		Ext.getCmp('deptStatistic_dateSearchDateBegin').setValue(sendToStatisticsPageBeginDate);
-		Ext.getCmp('deptStatistic_dateSearchDateEnd').setValue(sendToStatisticsPageEndDate);		
+		Ext.getCmp('deptStatistic_dateSearchDateEnd').setValue(sendToStatisticsPageEndDate);
+		
+		salesSub_hours = sendToStatisticsPageHours;
+		
 		salesSubWinTabPanel.setActiveTab(deptStatPanel);
-		Ext.getCmp('deptStatistic_btnSearch').handler();		
+		Ext.getCmp('deptStatistic_btnSearch').handler();	
+		
+		Ext.getCmp('deptStatistic_comboBusinessHour').setValue(sendToStatisticsPageHours.hourComboValue);
+		
+		if(salesSub_hours.opening){
+			Ext.getCmp('deptStatistic_txtBusinessHourBegin').setText('<font style="color:green; font-size:20px">'+salesSub_hours.opening+'</font>');
+			Ext.getCmp('deptStatistic_txtBusinessHourEnd').setText('<font style="color:green; font-size:20px">'+salesSub_hours.ending+'</font>');		
+		}
+		
+		if(salesSub_hours.deptId){
+			titleDeptName = salesSub_hours.deptName;
+			selectDeptId = salesSub_hours.deptId;
+		}
+		
+		sendToPageOperation = false;		
 	
 	}	
 };
 
-var titleDeptName, titleRegionName;
-var deptStatPanelGrid;
+var titleDeptName, titleRegionName, selectDeptId;
+var deptStatPanelGrid, salesSub_hours;
 Ext.onReady(function(){
 	if(!salesSubWinTabPanel){
 		salesSubWinTabPanelInit();
@@ -832,13 +865,12 @@ Ext.onReady(function(){
 		//子集
 		items : [salesSubWinTabPanel]
 	});
-	
-	if(sendToPageOperation){
-		saleSub_setStatisticsDate();		
-	}else{
-		salesSubWinTabPanel.setActiveTab(orderFoodStatPanel);
-	}
-	
+							
+		if(sendToPageOperation){
+			saleSub_setStatisticsDate();		
+		}else{
+			salesSubWinTabPanel.setActiveTab(orderFoodStatPanel);
+		}
 	Ext.getCmp('salesSubStatistics').updateStatisticsDate = saleSub_setStatisticsDate;
 	
 });

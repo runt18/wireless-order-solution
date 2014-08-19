@@ -49,38 +49,39 @@ function discount_showBillDetailWin(orderID){
 	discountViewBillWin.show();
 	discountViewBillWin.center();
 }
+var discount_beginDate = new Ext.form.DateField({
+	id : 'discount_dateSearchDateBegin',
+	xtype : 'datefield',		
+	format : 'Y-m-d',
+	width : 100,
+	maxValue : new Date(),
+	readOnly : false,
+	listeners : {
+		blur : function(thiz){									
+			Ext.ux.checkDuft(true, thiz.getId(), endDate.getId());
+		}
+	}
+});
+var discount_endDate = new Ext.form.DateField({
+	id : 'discount_dateSearchDateEnd',
+	xtype : 'datefield',
+	format : 'Y-m-d',
+	width : 100,
+	maxValue : new Date(),
+	readOnly : false,
+	listeners : {
+		blur : function(thiz){									
+			Ext.ux.checkDuft(false, beginDate.getId(), thiz.getId());
+		}
+	}
+});
 function initDiscountGrid(){
-	var beginDate = new Ext.form.DateField({
-		id : 'discount_dateSearchDateBegin',
-		xtype : 'datefield',		
-		format : 'Y-m-d',
-		width : 100,
-		maxValue : new Date(),
-		readOnly : false,
-		listeners : {
-			blur : function(thiz){									
-				Ext.ux.checkDuft(true, thiz.getId(), endDate.getId());
-			}
-		}
-	});
-	var endDate = new Ext.form.DateField({
-		id : 'discount_dateSearchDateEnd',
-		xtype : 'datefield',
-		format : 'Y-m-d',
-		width : 100,
-		maxValue : new Date(),
-		readOnly : false,
-		listeners : {
-			blur : function(thiz){									
-				Ext.ux.checkDuft(false, beginDate.getId(), thiz.getId());
-			}
-		}
-	});
+
 	discount_dateCombo = Ext.ux.createDateCombo({
-		beginDate : beginDate,
-		endDate : endDate,
+		beginDate : discount_beginDate,
+		endDate : discount_endDate,
 		callback : function(){
-			Ext.getCmp('btnSearchForDiscountStatistics').handler();
+			Ext.getCmp('discount_btnSearch').handler();
 		}
 	});
 	
@@ -120,7 +121,7 @@ function initDiscountGrid(){
 				});
 			},
 			select : function(){
-				Ext.getCmp('btnSearchForDiscountStatistics').handler();
+				Ext.getCmp('discount_btnSearch').handler();
 			}
 		}
 	});
@@ -168,121 +169,124 @@ function initDiscountGrid(){
 				});				
 			},
 			select : function(){
-				Ext.getCmp('btnSearchForDiscountStatistics').handler();
+				Ext.getCmp('discount_btnSearch').handler();
 			}
 		}
 	});	
 	
-	var discountStatisticsGridTbar = new Ext.Toolbar({
-		items : [{
-				xtype : 'tbtext',
-				text : '日期:'
-			}, discount_dateCombo, {
-				xtype : 'tbtext',
-				text : '&nbsp;'
-			}, beginDate , {
-				xtype : 'tbtext',
-				text : '&nbsp;至&nbsp;'
-			}, endDate, {
-				xtype : 'tbtext',
-				text : '&nbsp;&nbsp;员工: '
-			},discount_combo_staffs,{
-				xtype : 'tbtext',
-				text : '&nbsp;&nbsp;部门: '
-			}, discount_deptCombo ,'->',{
-				text : '搜索',
-				id : 'btnSearchForDiscountStatistics',
-				iconCls : 'btn_search',
-				handler : function(e){
-					if(!beginDate.isValid() || !endDate.isValid()){
-						return;
-					}
-					var store = discountStatisticsGrid.getStore();
-					store.baseParams['dataSource'] = 'normal',
-					store.baseParams['beginDate'] = beginDate.getValue().format('Y-m-d 00:00:00');
-					store.baseParams['endDate'] = endDate.getValue().format('Y-m-d 23:59:59');
-					store.baseParams['staffID'] = discount_combo_staffs.getValue();
-					store.baseParams['deptID'] = discount_deptCombo.getValue();
-					store.load({
-						params : {
-							start : 0,
-							limit : GRID_PADDING_LIMIT_20
-						}
-					});
-					
-					if(discount_deptCombo.getValue() && discount_deptCombo.getValue() != -1){
-						titleDiscountDeptName = Ext.getCmp('discount_deptCombo').getEl().dom.value + ' -- ';
-					}else{
-						titleDiscountDeptName = '';
-					}
-					
-					if(discount_combo_staffs.getValue() && discount_combo_staffs.getValue() != -1){
-						titleDiscountStaffName = ' 操作员 : ' + Ext.getCmp('discount_combo_staffs').getEl().dom.value;
-					}else{
-						titleDiscountStaffName = '';
-					}
-					
-					requestParams = {
-						dataSource : 'getDetailChart',
-						dateBeg : beginDate.getValue().format('Y-m-d 00:00:00'),
-						dateEnd : endDate.getValue().format('Y-m-d 23:59:59'),
-						deptID : discount_deptCombo.getValue(),
-						staffId : discount_combo_staffs.getValue()					
-					};
-					discount_chartLoadMarsk.show();
-					Ext.Ajax.request({
-						url : '../../QueryDiscountStatistics.do',
-						params : requestParams,
-						success : function(res, opt){
-							discount_chartLoadMarsk.hide();
-							
-							var jr = Ext.decode(res.responseText);
-							showDiscountDetailChart(jr);
-						},
-						failure : function(res, opt){
-						
-						}
-					});	
-					
-					if(typeof discount_staffPieChart != 'undefined' && typeof discountStaffChartPanel.hasRender != 'undefined'){
-						discount_getStaffChartData();
-						discount_staffPieChart = discount_loadStaffPieChart(discountDetailsStatPanel.otype);
-						discount_staffColumnChart = discount_loadStaffColumnChart(discountDetailsStatPanel.otype);
-						discount_staffPieChart.setSize(discountStatChartTabPanel.getWidth()*0.4, discount_panelDrag ? discountStatChartTabPanel.getHeight() - discount_cutAfterDrag : discountStatChartTabPanel.getHeight()-discount_cutChartHeight);
-						discount_staffColumnChart.setSize(discountStatChartTabPanel.getWidth()*0.6, discount_panelDrag ? discountStatChartTabPanel.getHeight() - discount_cutAfterDrag : discountStatChartTabPanel.getHeight()-discount_cutChartHeight);
-						
-					}
-					if(typeof discount_deptPieChart != 'undefined' && typeof discountDeptChartPanel.hasRender != 'undefined'){
-						discount_getDeptChartData();
-						discount_deptPieChart = discount_loadDeptPieChart(discountDetailsStatPanel.otype);
-						discount_deptColumnChart = discount_loadDeptColumnChart(discountDetailsStatPanel.otype);
-						discount_deptPieChart.setSize(discountStatChartTabPanel.getWidth()*0.4, discount_panelDrag ? discountStatChartTabPanel.getHeight() - discount_cutAfterDrag : discountStatChartTabPanel.getHeight()-discount_cutChartHeight);
-						discount_deptColumnChart.setSize(discountStatChartTabPanel.getWidth()*0.6, discount_panelDrag ? discountStatChartTabPanel.getHeight() - discount_cutAfterDrag : discountStatChartTabPanel.getHeight()-discount_cutChartHeight);
-					}					
-					
-				}
-			},'-', {
-			text : '导出',
-			iconCls : 'icon_tb_exoprt_excel',
-			handler : function(){
-				if(!beginDate.isValid() || !endDate.isValid()){
+	var discountStatisticsGridTbarItem = [{
+			xtype : 'tbtext',
+			text : '&nbsp;&nbsp;员工: '
+		},discount_combo_staffs,{
+			xtype : 'tbtext',
+			text : '&nbsp;&nbsp;部门: '
+		}, discount_deptCombo ,'->',{
+			text : '搜索',
+			id : 'discount_btnSearch',
+			iconCls : 'btn_search',
+			handler : function(e){
+				if(!discount_beginDate.isValid() || !discount_endDate.isValid()){
 					return;
 				}
-				var url = '../../{0}?beginDate={1}&endDate={2}&staffID={3}&deptID={4}&dataSource={5}';
-				url = String.format(
-						url, 
-						'ExportHistoryStatisticsToExecl.do', 
-						beginDate.getValue().format('Y-m-d 00:00:00'),
-						endDate.getValue().format('Y-m-d 23:59:59'),
-						discount_combo_staffs.getValue(),
-						discount_deptCombo.getValue(),
-						'discountStatisticsList'
-				);
-				window.location = url;
+				
+				var businessHour;
+				if(discount_hours){
+					businessHour = discount_hours;
+				}else{
+					businessHour = Ext.ux.statistic_oBusinessHourData({type : 'get', statistic : 'discount_'}).data;
+				}	
+				
+				var store = discountStatisticsGrid.getStore();
+				store.baseParams['dataSource'] = 'normal',
+				store.baseParams['beginDate'] = discount_beginDate.getValue().format('Y-m-d 00:00:00');
+				store.baseParams['endDate'] = discount_endDate.getValue().format('Y-m-d 23:59:59');
+				store.baseParams['staffID'] = discount_combo_staffs.getValue();
+				store.baseParams['deptID'] = discount_deptCombo.getValue();
+				store.baseParams['opening'] = businessHour.opening;
+				store.baseParams['ending'] = businessHour.ending;	
+				
+				store.load({
+					params : {
+						start : 0,
+						limit : GRID_PADDING_LIMIT_20
+					}
+				});
+				
+				if(discount_deptCombo.getValue() && discount_deptCombo.getValue() != -1){
+					titleDiscountDeptName = Ext.getCmp('discount_deptCombo').getEl().dom.value + ' -- ';
+				}else{
+					titleDiscountDeptName = '';
+				}
+				
+				if(discount_combo_staffs.getValue() && discount_combo_staffs.getValue() != -1){
+					titleDiscountStaffName = ' 操作员 : ' + Ext.getCmp('discount_combo_staffs').getEl().dom.value;
+				}else{
+					titleDiscountStaffName = '';
+				}
+				
+				requestParams = {
+					dataSource : 'getDetailChart',
+					dateBeg : discount_beginDate.getValue().format('Y-m-d 00:00:00'),
+					dateEnd : discount_endDate.getValue().format('Y-m-d 23:59:59'),
+					deptID : discount_deptCombo.getValue(),
+					staffId : discount_combo_staffs.getValue(),
+					opening : businessHour.opening,
+					ending : businessHour.ending				
+				};
+				discount_chartLoadMarsk.show();
+				Ext.Ajax.request({
+					url : '../../QueryDiscountStatistics.do',
+					params : requestParams,
+					success : function(res, opt){
+						discount_chartLoadMarsk.hide();
+						
+						var jr = Ext.decode(res.responseText);
+						showDiscountDetailChart(jr);
+					},
+					failure : function(res, opt){
+					
+					}
+				});	
+				
+				if(typeof discount_staffPieChart != 'undefined' && typeof discountStaffChartPanel.hasRender != 'undefined'){
+					discount_getStaffChartData();
+					discount_staffPieChart = discount_loadStaffPieChart(discountDetailsStatPanel.otype);
+					discount_staffColumnChart = discount_loadStaffColumnChart(discountDetailsStatPanel.otype);
+					discount_staffPieChart.setSize(discountStatChartTabPanel.getWidth()*0.4, discount_panelDrag ? discountStatChartTabPanel.getHeight() - discount_cutAfterDrag : discountStatChartTabPanel.getHeight()-discount_cutChartHeight);
+					discount_staffColumnChart.setSize(discountStatChartTabPanel.getWidth()*0.6, discount_panelDrag ? discountStatChartTabPanel.getHeight() - discount_cutAfterDrag : discountStatChartTabPanel.getHeight()-discount_cutChartHeight);
+					
+				}
+				if(typeof discount_deptPieChart != 'undefined' && typeof discountDeptChartPanel.hasRender != 'undefined'){
+					discount_getDeptChartData();
+					discount_deptPieChart = discount_loadDeptPieChart(discountDetailsStatPanel.otype);
+					discount_deptColumnChart = discount_loadDeptColumnChart(discountDetailsStatPanel.otype);
+					discount_deptPieChart.setSize(discountStatChartTabPanel.getWidth()*0.4, discount_panelDrag ? discountStatChartTabPanel.getHeight() - discount_cutAfterDrag : discountStatChartTabPanel.getHeight()-discount_cutChartHeight);
+					discount_deptColumnChart.setSize(discountStatChartTabPanel.getWidth()*0.6, discount_panelDrag ? discountStatChartTabPanel.getHeight() - discount_cutAfterDrag : discountStatChartTabPanel.getHeight()-discount_cutChartHeight);
+				}					
+				
 			}
-		}]
-	});
+		},'-', {
+		text : '导出',
+		iconCls : 'icon_tb_exoprt_excel',
+		handler : function(){
+			if(!beginDate.isValid() || !endDate.isValid()){
+				return;
+			}
+			var url = '../../{0}?beginDate={1}&endDate={2}&staffID={3}&deptID={4}&dataSource={5}';
+			url = String.format(
+					url, 
+					'ExportHistoryStatisticsToExecl.do', 
+					beginDate.getValue().format('Y-m-d 00:00:00'),
+					endDate.getValue().format('Y-m-d 23:59:59'),
+					discount_combo_staffs.getValue(),
+					discount_deptCombo.getValue(),
+					'discountStatisticsList'
+			);
+			window.location = url;
+		}
+	}];
 	
+	var discountStatisticsGridTbar = Ext.ux.initTimeBar({beginDate:discount_beginDate, endDate:discount_endDate,dateCombo:discount_dateCombo, tbarType : 1, statistic : 'discount_', callback : function businessHourSelect(){discount_hours = null;}}).concat(discountStatisticsGridTbarItem);
 	
 	discountStatisticsGrid = createGridPanel(
 		'',
@@ -363,8 +367,8 @@ function showDiscountDetailChart(jdata){
 	var dateBegin = Ext.getCmp('discount_dateSearchDateBegin').getValue().format('Y-m-d');
 	var dateEnd = Ext.getCmp('discount_dateSearchDateEnd').getValue().format('Y-m-d');
 	
-/*	var hourBegin = Ext.getCmp('discount_txtBusinessHourBegin').getEl().dom.textContent;
-	var hourEnd = Ext.getCmp('discount_txtBusinessHourEnd').getEl().dom.textContent;*/
+	var hourBegin = Ext.getCmp('discount_txtBusinessHourBegin').getEl().dom.textContent;
+	var hourEnd = Ext.getCmp('discount_txtBusinessHourEnd').getEl().dom.textContent;
 	
 	var chartData = eval('(' + jdata.other.chart + ')');
 	discount_detailChart = new Highcharts.Chart({
@@ -389,7 +393,7 @@ function showDiscountDetailChart(jdata){
         	renderTo: 'divDiscountDetailChart'
     	}, 
         title: {
-            text: '<b>'+titleDiscountDeptName+'折扣额走势图（'+dateBegin+ '至' +dateEnd+'）'+titleDiscountStaffName+'</b>'
+            text: '<b>'+titleDiscountDeptName+'折扣额走势图（'+dateBegin+ '至' +dateEnd+'）'+hourBegin+ ' - ' + hourEnd + titleDiscountStaffName+'</b>'
         },
         labels: {
         	items : [{
@@ -530,8 +534,16 @@ var discount_loadDeptPieChart = function(type){
 var discount_setStatisticsDate = function(){
 	if(sendToPageOperation){
 		Ext.getCmp('discount_dateSearchDateBegin').setValue(sendToStatisticsPageBeginDate);
-		Ext.getCmp('discount_dateSearchDateEnd').setValue(sendToStatisticsPageEndDate);		
-		Ext.getCmp('btnSearchForDiscountStatistics').handler();
+		Ext.getCmp('discount_dateSearchDateEnd').setValue(sendToStatisticsPageEndDate);	
+		
+		discount_hours = sendToStatisticsPageHours;
+		
+		Ext.getCmp('discount_btnSearch').handler();
+		
+		Ext.getCmp('discount_txtBusinessHourBegin').setText('<font style="color:green; font-size:20px">'+discount_hours.opening+'</font>');
+		Ext.getCmp('discount_txtBusinessHourEnd').setText('<font style="color:green; font-size:20px">'+discount_hours.ending+'</font>');
+		Ext.getCmp('discount_comboBusinessHour').setValue(discount_hours.hourComboValue);		
+		
 		sendToPageOperation = false;		
 	}
 
@@ -557,7 +569,7 @@ function discount_fnChangeDeptChart(thiz, v){
 	discountDetailsStatPanel.otype = v;
 }
 
-var discount_cutAfterDrag = 190, discount_cutBeforeDrag = 40;
+var discount_cutAfterDrag = 190, discount_cutBeforeDrag = 40, discount_hours;
 var titleDiscountDeptName, titleDiscountStaffName;
 var discount_detailChart, discount_staffPieChart, discount_staffColumnChart, discount_deptPieChart, discount_deptColumnChart;
 

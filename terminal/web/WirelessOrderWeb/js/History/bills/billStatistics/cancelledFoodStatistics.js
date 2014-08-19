@@ -1,5 +1,5 @@
 var cfdsGrid;
-var CANCELL_FOOD_PAGE_LIMIT = 22;
+var cancel_FOOD_PAGE_LIMIT = 22;
 
 function cancellFood_showBillDetailWin(){
 	cancellFoodOrderDetailWin = new Ext.Window({
@@ -213,7 +213,7 @@ function cancelFoodDetailsStatPanelInit(){
 		}
 	});
 	
-	var cfdsGridDateTbar = Ext.ux.initTimeBar({beginDate:beginDate, endDate:endDate,dateCombo:cancel_dateCombo, tbarType : 0, statistic : 'cancel_'});
+	var cfdsGridDateTbar = Ext.ux.initTimeBar({beginDate:beginDate, endDate:endDate,dateCombo:cancel_dateCombo, tbarType : 0, statistic : 'cancel_', callback : function businessHourSelect(){cancel_hours = null;}});
 	
 	var cfdsGridTbar = new Ext.Toolbar({
 		height : 26,
@@ -246,7 +246,14 @@ function cancelFoodDetailsStatPanelInit(){
 					Ext.ux.checkDuft(false, beginDate.getId(), endDate.getId());
 				}
 				var opening, ending;
-				var businessHour = Ext.ux.statistic_oBusinessHourData({type : 'get', statistic : 'cancel_'}).data;
+				
+				var businessHour;
+				if(cancel_hours){
+					businessHour = cancel_hours;
+				}else{
+					businessHour = Ext.ux.statistic_oBusinessHourData({type : 'get', statistic : 'cancel_'}).data;
+				}
+				
 				if(businessHour.businessHourType != -1){
 					opening = businessHour.opening;
 					ending = businessHour.ending;
@@ -265,7 +272,7 @@ function cancelFoodDetailsStatPanelInit(){
 				gs.load({
 					params : {
 						start : 0,
-						limit : CANCELL_FOOD_PAGE_LIMIT
+						limit : cancel_FOOD_PAGE_LIMIT
 					}
 				});
 				
@@ -384,7 +391,7 @@ function cancelFoodDetailsStatPanelInit(){
 		],
 		['orderDateFormat', 'name', 'kitchen.dept.name', 'orderId', 'unitPrice', 'count', 'totalPrice', 'waiter', 'cancelReason.reason'],
 		[ ['dataSource', 'getDetail']],
-		CANCELL_FOOD_PAGE_LIMIT,
+		cancel_FOOD_PAGE_LIMIT,
 		null,
 		[cfdsGridTbar, cfdsGridDateTbar]
 	);
@@ -699,13 +706,21 @@ function cancel_fnChangeStaffChart(thiz, v){
 var cancel_setStatisticsDate = function(){
 	if(sendToPageOperation){
 		Ext.getCmp('cancel_dateSearchDateBegin').setValue(sendToStatisticsPageBeginDate);
-		Ext.getCmp('cancel_dateSearchDateEnd').setValue(sendToStatisticsPageEndDate);		
+		Ext.getCmp('cancel_dateSearchDateEnd').setValue(sendToStatisticsPageEndDate);	
+		
+		cancel_hours = sendToStatisticsPageHours;
+		
 		Ext.getCmp('cancel_btnSearch').handler();
+		
+		Ext.getCmp('cancel_txtBusinessHourBegin').setText('<font style="color:green; font-size:20px">'+cancel_hours.opening+'</font>');
+		Ext.getCmp('cancel_txtBusinessHourEnd').setText('<font style="color:green; font-size:20px">'+cancel_hours.ending+'</font>');
+		Ext.getCmp('cancel_comboBusinessHour').setValue(cancel_hours.hourComboValue);		
+		
 		sendToPageOperation = false;
 	}
 };
 var cancel_cutAfterDrag=70, cancel_cutBeforeDrag=40;
-var cancel_requestParams, cancel_panelDrag=false, cancelPanelHeight, cancelTabPanelHeight;
+var cancel_requestParams, cancel_panelDrag=false, cancelPanelHeight, cancelTabPanelHeight, cancel_hours;
 var cancel_detailChart, cancel_staffPieChart, cancel_staffColumnChart, cancel_deptPieChart, cancel_deptColumnChart, cancel_reasonPieChart, cancel_reasonColumnChart;
 var cancelledDetailChartPanel, cancelledReasonChartPanel, cancelledStaffChartPanel, cancelledDeptChartPanel, cancelFoodStatChartTabPanel;
 var colors = Highcharts.getOptions().colors;

@@ -19,7 +19,7 @@ var repaid_dateCombo = Ext.ux.createDateCombo({
 	beginDate : repaid_beginDate,
 	endDate : repaid_endDate,
 	callback : function(){
-		Ext.getCmp('btnSearchForRepaidStatistics').handler();
+		Ext.getCmp('repaid_btnSearch').handler();
 	}
 });
 
@@ -67,7 +67,7 @@ var repaid_combo_staffs = new Ext.form.ComboBox({
 			});
 		},
 		select : function(){
-			Ext.getCmp('btnSearchForRepaidStatistics').handler();
+			Ext.getCmp('repaid_btnSearch').handler();
 		}
 	}
 });
@@ -87,6 +87,8 @@ function showRepaidDetailChart(jdata){
 	var dateBegin = repaid_beginDate.getValue().format('Y-m-d');
 	var dateEnd = repaid_endDate.getValue().format('Y-m-d');
 	
+	var hourBegin = Ext.getCmp('repaid_txtBusinessHourBegin').getEl().dom.textContent;
+	var hourEnd = Ext.getCmp('repaid_txtBusinessHourEnd').getEl().dom.textContent;	
 	
 	var chartData = eval('(' + jdata.other.chart + ')');
 	repaidDetailChart = new Highcharts.Chart({
@@ -111,7 +113,7 @@ function showRepaidDetailChart(jdata){
         	renderTo: 'divRepaidDetailChart'
     	}, 
         title: {
-            text: '<b>反结账走势图（'+dateBegin+ '至' +dateEnd+'）'+titleRepaidStaffName+'</b>'
+            text: '<b>反结账走势图（'+dateBegin+ '至' +dateEnd+'）'+hourBegin+ ' - ' + hourEnd + ' '+titleRepaidStaffName+' </b>'
         },
         labels: {
         	items : [{
@@ -250,99 +252,100 @@ function initGrid(){
 		
 	});
 	
-	var repaidStatisticsTbar = new Ext.Toolbar({
-		items : [{
-				xtype : 'tbtext',
-				text : '日期:'
-			}, repaid_dateCombo, {
-				xtype : 'tbtext',
-				text : '&nbsp;'
-			}, repaid_beginDate , {
-				xtype : 'tbtext',
-				text : '&nbsp;至&nbsp;'
-			}, repaid_endDate, {
-				xtype : 'tbtext',
-				text : '&nbsp;&nbsp;'
-			},{
-				xtype : 'tbtext',
-				text : '操作人员:'
-			}, repaid_combo_staffs, '->', {
-				text : '搜索',
-				id : 'btnSearchForRepaidStatistics',
-				iconCls : 'btn_search',
-				handler : function(e){
-					if(!repaid_beginDate.isValid() || !repaid_endDate.isValid()){
-						return;
-					}
-					var store = repaidStatisticsGrid.getStore();
-					store.baseParams['dataSource'] = 'normal',
-					store.baseParams['beginDate'] = repaid_beginDate.getValue().format('Y-m-d 00:00:00');
-					store.baseParams['endDate'] = repaid_endDate.getValue().format('Y-m-d 23:59:59');
-					store.baseParams['staffId'] = repaid_combo_staffs.getValue();
-					store.load({
-						params : {
-							start : 0,
-							limit : limitCount
-						}
-					});
-					
-					if(repaid_combo_staffs.getValue() && repaid_combo_staffs.getValue() != -1){
-						titleRepaidStaffName = '操作人 : ' + repaid_combo_staffs.getEl().dom.value;
-					}else{
-						titleRepaidStaffName = '';
-					}
-					
-					requestParams = {
-						dataSource : 'getDetailChart',
-						dateBeg : repaid_beginDate.getValue().format('Y-m-d 00:00:00'),
-						dateEnd : repaid_endDate.getValue().format('Y-m-d 23:59:59'),
-						staffID : repaid_combo_staffs.getValue()					
-					};
-					
-					repaid_chartLoadMarsk.show();
-					
-					Ext.Ajax.request({
-						url : '../../QueryRepaidStatistics.do',
-						params : requestParams,
-						success : function(res, opt){
-							repaid_chartLoadMarsk.hide();
-							var jr = Ext.decode(res.responseText);
-							showRepaidDetailChart(jr);
-						},
-						failure : function(res, opt){
-						
-						}
-					});		
-					
-					if(typeof repaid_staffPieChart != 'undefined'){
-						repaid_getStaffChartData();
-						repaid_staffPieChart = repaid_loadStaffPieChart(repaidStaffChartPanel.otype);
-						repaid_staffColumnChart = repaid_loadStaffColumnChart(repaidStaffChartPanel.otype);
-						repaid_staffPieChart.setSize(repaidStatChartTabPanel.getWidth()*0.4, repaid_panelDrag ? repaidStatChartTabPanel.getHeight() - repaid_cutAfterDrag : repaidStatChartTabPanel.getHeight()-30);
-						repaid_staffColumnChart.setSize(repaidStatChartTabPanel.getWidth()*0.6, repaid_panelDrag ? repaidStatChartTabPanel.getHeight() - repaid_cutAfterDrag : repaidStatChartTabPanel.getHeight()-30);
-					}						
-					
-				}
-			},'-', {
-			text : '导出',
-			iconCls : 'icon_tb_exoprt_excel',
-			handler : function(){
+	var repaidStatisticsTbarItem = [{
+			xtype : 'tbtext',
+			text : '操作人员:'
+		}, repaid_combo_staffs, '->', {
+			text : '搜索',
+			id : 'repaid_btnSearch',
+			iconCls : 'btn_search',
+			handler : function(e){
 				if(!repaid_beginDate.isValid() || !repaid_endDate.isValid()){
 					return;
 				}
-				var url = '../../{0}?beginDate={1}&endDate={2}&staffId={3}&dataSource={4}';
-				url = String.format(
-						url, 
-						'ExportHistoryStatisticsToExecl.do', 
-						repaid_beginDate.getValue().format('Y-m-d 00:00:00'), 
-						repaid_endDate.getValue().format('Y-m-d 23:59:59'),
-						repaid_combo_staffs.getValue(),
-						'repaidStatisticsList'
-					);
-				window.location = url;
+				
+				var businessHour;
+				if(repaid_hours){
+					businessHour = repaid_hours;
+				}else{
+					businessHour = Ext.ux.statistic_oBusinessHourData({type : 'get', statistic : 'repaid_'}).data;
+				}				
+				
+				var store = repaidStatisticsGrid.getStore();
+				store.baseParams['dataSource'] = 'normal',
+				store.baseParams['beginDate'] = repaid_beginDate.getValue().format('Y-m-d 00:00:00');
+				store.baseParams['endDate'] = repaid_endDate.getValue().format('Y-m-d 23:59:59');
+				store.baseParams['staffId'] = repaid_combo_staffs.getValue();
+				store.baseParams['opening'] = businessHour.opening;
+				store.baseParams['ending'] = businessHour.ending;				
+				store.load({
+					params : {
+						start : 0,
+						limit : limitCount
+					}
+				});
+				
+				if(repaid_combo_staffs.getValue() && repaid_combo_staffs.getValue() != -1){
+					titleRepaidStaffName = '操作人 : ' + repaid_combo_staffs.getEl().dom.value;
+				}else{
+					titleRepaidStaffName = '';
+				}
+				
+				requestParams = {
+					dataSource : 'getDetailChart',
+					dateBeg : repaid_beginDate.getValue().format('Y-m-d 00:00:00'),
+					dateEnd : repaid_endDate.getValue().format('Y-m-d 23:59:59'),
+					staffID : repaid_combo_staffs.getValue(),
+					opening : businessHour.opening,
+					ending : businessHour.ending
+				};
+				
+				repaid_chartLoadMarsk.show();
+				
+				Ext.Ajax.request({
+					url : '../../QueryRepaidStatistics.do',
+					params : requestParams,
+					success : function(res, opt){
+						repaid_chartLoadMarsk.hide();
+						var jr = Ext.decode(res.responseText);
+						showRepaidDetailChart(jr);
+					},
+					failure : function(res, opt){
+					
+					}
+				});		
+				
+				if(typeof repaid_staffPieChart != 'undefined'){
+					repaid_getStaffChartData();
+					repaid_staffPieChart = repaid_loadStaffPieChart(repaidStaffChartPanel.otype);
+					repaid_staffColumnChart = repaid_loadStaffColumnChart(repaidStaffChartPanel.otype);
+					repaid_staffPieChart.setSize(repaidStatChartTabPanel.getWidth()*0.4, repaid_panelDrag ? repaidStatChartTabPanel.getHeight() - repaid_cutAfterDrag : repaidStatChartTabPanel.getHeight()-30);
+					repaid_staffColumnChart.setSize(repaidStatChartTabPanel.getWidth()*0.6, repaid_panelDrag ? repaidStatChartTabPanel.getHeight() - repaid_cutAfterDrag : repaidStatChartTabPanel.getHeight()-30);
+				}						
+				
 			}
-		}]
-	});
+		},'-', {
+		text : '导出',
+		iconCls : 'icon_tb_exoprt_excel',
+		handler : function(){
+			if(!repaid_beginDate.isValid() || !repaid_endDate.isValid()){
+				return;
+			}
+			var url = '../../{0}?beginDate={1}&endDate={2}&staffId={3}&dataSource={4}';
+			url = String.format(
+					url, 
+					'ExportHistoryStatisticsToExecl.do', 
+					repaid_beginDate.getValue().format('Y-m-d 00:00:00'), 
+					repaid_endDate.getValue().format('Y-m-d 23:59:59'),
+					repaid_combo_staffs.getValue(),
+					'repaidStatisticsList'
+				);
+			window.location = url;
+		}
+	}];
+	
+	var repaidStatisticsTbar = Ext.ux.initTimeBar({beginDate:repaid_beginDate, endDate:repaid_endDate,dateCombo:repaid_dateCombo, tbarType : 1, statistic : 'repaid_', callback : function businessHourSelect(){repaid_hours = null;}}).concat(repaidStatisticsTbarItem);
+	
 	var pagingBar = new Ext.PagingToolbar({
 	   pageSize : limitCount,	//显示记录条数
 	   store : ds,	//定义数据源
@@ -470,15 +473,23 @@ function repaid_fnChangeStaffChart(thiz, v){
 var repaid_setStatisticsDate = function(){
 	if(sendToPageOperation){
 		repaid_beginDate.setValue(sendToStatisticsPageBeginDate);
-		repaid_endDate.setValue(sendToStatisticsPageEndDate);		
-		Ext.getCmp('btnSearchForRepaidStatistics').handler();
+		repaid_endDate.setValue(sendToStatisticsPageEndDate);	
+		
+		repaid_hours = sendToStatisticsPageHours;
+		
+		Ext.getCmp('repaid_btnSearch').handler();
+		
+		Ext.getCmp('repaid_txtBusinessHourBegin').setText('<font style="color:green; font-size:20px">'+repaid_hours.opening+'</font>');
+		Ext.getCmp('repaid_txtBusinessHourEnd').setText('<font style="color:green; font-size:20px">'+repaid_hours.ending+'</font>');
+		Ext.getCmp('repaid_comboBusinessHour').setValue(repaid_hours.hourComboValue);	
+		
 		sendToPageOperation = false;
 	}
 };
 
 
 var repaid_cutAfterDrag=70, repaid_cutBeforeDrag=0;
-var requestParams = {}, repaid_tabPanelHeight, repaidPanelHeight;
+var requestParams = {}, repaid_tabPanelHeight, repaidPanelHeight, repaid_hours;
 var colors = Highcharts.getOptions().colors, repaid_panelDrag = false;
 var repaidDetailChart, repaid_staffPieChart, repaid_staffColumnChart;
 var repaidDetailPanel, repaidDetailChartPanel, repaidStaffChartPanel, repaidStatChartTabPanel;
