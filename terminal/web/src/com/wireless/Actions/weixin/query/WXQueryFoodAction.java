@@ -129,8 +129,8 @@ public class WXQueryFoodAction extends DispatchAction{
 						temp.setImage(imageBrowseDefaultFile);
 					}
 				}
-				jobject.setRoot(root);
 			}
+			jobject.setRoot(root);
 			response.getWriter().print(jobject.toString());
 		}
 		
