@@ -422,7 +422,7 @@ function toggleCouponContent(){
 			if(!toggleCouponContent.load){
 				toggleCouponContent.load = function(){
 					Util.lm.show();
-					$.ajax({
+/*					$.ajax({
 						url : '../../WXQueryMemberOperation.do',
 						type : 'post',
 						data : {
@@ -460,7 +460,7 @@ function toggleCouponContent(){
 							Util.lm.hide();
 							Util.dialog.show({msg: '服务器请求失败, 请稍候再试.'});
 						}
-					});
+					});*/
 				};
 			}
 			toggleCouponContent.load();

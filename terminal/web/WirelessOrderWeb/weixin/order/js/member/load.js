@@ -33,7 +33,7 @@ $(function(){
 					currentMemberLevelData = {y : 0, memberTypeName : '您的积分', x:member.point, discount:{type :2},chargeRate:-1, exchangeRate:-1, pointThreshold:member.point, marker:{symbol:'url(../../images/currentPosition.png)'}, color : 'red', dataLabels : {x:-1, align : 'right', style : {fontWeight: 'bold',color: 'red'}}};
 					//设置会员排名
 					$('#fontDefeatMemberCount').text(member.rank);
-					$.ajax({
+/*					$.ajax({
 						url : '../../WXQueryMemberOperation.do',
 						type : 'post',
 						data : {
@@ -54,7 +54,7 @@ $(function(){
 						error : function(data, errotType, eeor){
 							Util.dialog.show({msg: '服务器请求失败, 请稍候再试.'});
 						}
-					});				
+					});			*/	
 				}else if(data.other.status == 1){
 					
 					var memberType = data.other.memberType[0];
