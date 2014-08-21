@@ -203,8 +203,8 @@ public class Page{
 	public static enum Member{
 //		MEMBER_TYPE("memberType", "会员类型", "Client_Module/MemberTypeManagement.html", "../../images/memberTypeMgr.png"),
 		MEMBER("memberMgr", "会员管理", "Client_Module/MemberManagement.html", "../../images/memberMgr.png"),
-		MEMBER_LEVEL("memberLevel", "会员等级", "Client_Module/MemberLevelManagement.html", "../../images/memberLevel.png"),
-		COUPON("coupon", "优惠劵管理", "Client_Module/CouponManagement.html", "../../images/book.png" );
+		MEMBER_LEVEL("memberLevel", "会员等级", "Client_Module/MemberLevelManagement.html", "../../images/memberLevel.png");
+//		COUPON("coupon", "优惠劵管理", "Client_Module/CouponManagement.html", "../../images/book.png" );
 		
 		private String mgrId;
 		private String desc;
