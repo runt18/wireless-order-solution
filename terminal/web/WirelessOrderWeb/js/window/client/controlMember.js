@@ -63,8 +63,8 @@ Ext.onReady(function(){
 				readOnly : false,
 				forceSelection : true,
 				store : new Ext.data.JsonStore({
-					url: '../../QueryMemberType.do?dataSource=normal&isCookie=true&restaurantID=' + restaurantID,
-					root : 'root',
+//					url: '../../QueryMemberType.do?dataSource=normal',
+//					root : 'root',
 					fields : ['id', 'name', 'attributeValue']
 				}),
 				valueField : 'id',
@@ -76,10 +76,24 @@ Ext.onReady(function(){
 				allowBlank : false,
 				blankText : '类型不允许为空.',
 				listeners : {
-					render : function(thiz){
-						thiz.store.load();
+					select : function(thiz, record, index){
+						var firstCharge = Ext.getCmp('cm_numFirstCharge');
+						if(cm_obj.otype.toLowerCase() == Ext.ux.otype['insert'].toLowerCase() && record.get('attributeValue') == 0){
+							firstCharge.show();
+							firstCharge.getEl().up('.x-form-item').setDisplayed(true);		
+						}else{
+							firstCharge.hide();
+							firstCharge.getEl().up('.x-form-item').setDisplayed(false);	
+						}						
 					}
 				}
+			}]
+		}, {
+			items : [{
+				hidden : true,
+				xtype : 'numberfield',
+				id : 'cm_numFirstCharge',
+				fieldLabel : '首次充值'
 			}]
 		}, {
 			items : [{
@@ -119,11 +133,6 @@ Ext.onReady(function(){
 				id : 'cm_txtMemberIDCard',
 				fieldLabel : '身份证'
 			}]
-		}, {
-			items : [{
-				id : 'cm_txtMemberCompany',
-				fieldLabel : '公司'
-			}]
 		}, 
 /*		{
 			items : [{
@@ -143,7 +152,8 @@ Ext.onReady(function(){
 				fieldLabel : '联系地址',
 				width : 535
 			}]
-		}, {
+		}
+/*		, {
 			columnWidth : 1,
 			items : [{
 				id : 'cm_txtMemberPublicComment',
@@ -157,7 +167,8 @@ Ext.onReady(function(){
 				fieldLabel : '私有评论',
 				width : 535
 			}]
-		}, {
+		}*/
+		, {
 			columnWidth : 1,
 			xtype : 'panel',
 			html : '<hr style="width: 100%; color: #DDD;">'
@@ -218,17 +229,20 @@ Ext.onReady(function(){
 function cm_operationMemberData(c){
 	if(c == null || c.type == null || typeof c.type == 'undefined')
 		return;
+		
 	var data = {};
+	var memberType = Ext.getCmp('cm_comboMemberType');
+	var firstCharge = Ext.getCmp('cm_numFirstCharge');	
 	var memberID = Ext.getCmp('cm_numberMemberId');
 	var name = Ext.getCmp('cm_txtMemberName');
 	var mobile = Ext.getCmp('cm_txtMemberMobile');
 	var memberCard = Ext.getCmp('cm_numberMemberCard');
-	var memberType = Ext.getCmp('cm_comboMemberType');
+
+	
 	var sex = Ext.getCmp('cm_comboMemberSex');
 	var birthday = Ext.getCmp('cm_dateMemberBirthday');
 	var tele = Ext.getCmp('cm_txtMemberTele');
 	var idCard = Ext.getCmp('cm_txtMemberIDCard');
-	var company = Ext.getCmp('cm_txtMemberCompany');
 	var addr = Ext.getCmp('cm_txtMemberContactAddress');
 	
 	var totalBalance = Ext.getCmp('cm_numberTotalBalance');
@@ -238,10 +252,17 @@ function cm_operationMemberData(c){
 	var point = Ext.getCmp('cm_numberMmeberPoint');
 	var usedPoint = Ext.getCmp('cm_numberUserPoint');
 	
-	var publicComment = Ext.getCmp('cm_txtMemberPublicComment');
-	var privateComment = Ext.getCmp('cm_txtMemberPrivateComment');
+	
+	
+	firstCharge.setValue();
+//	var publicComment = Ext.getCmp('cm_txtMemberPublicComment');
+//	var privateComment = Ext.getCmp('cm_txtMemberPrivateComment');
+	
+	
 	
 	if(c.type.toUpperCase() == Ext.ux.otype['set'].toUpperCase()){
+		firstCharge.getEl().up('.x-form-item').setDisplayed(false);
+		memberType.store.loadData(c.data.memberTypeData);
 		data = c.data == null || typeof c.data == 'undefined' ? {} : c.data;
 		memberID.setValue(data['id']);
 		name.setValue(data['name']);
@@ -255,10 +276,8 @@ function cm_operationMemberData(c){
 		}
 		tele.setValue(data['tele']);
 		idCard.setValue(data['idCard']);
-		company.setValue(data['company']);
 		addr.setValue(data['contactAddress']);
 		
-		//totalBalance.setValue(parseFloat(data['totalBalance']).toFixed(2));
 		totalBalance.setValue(parseFloat(data['totalBalance']).toFixed(2));
 		baseBalance.setValue(data['baseBalance']);
 		extraBalance.setValue(data['extraBalance']);
@@ -266,7 +285,7 @@ function cm_operationMemberData(c){
 		point.setValue(data['point']);
 		usedPoint.setValue(data['usedPoint']);
 		
-		if(!data['privateComment']){
+/*		if(!data['privateComment']){
 			privateComment.setValue();
 			privateComment.enable();
 		}else{
@@ -284,33 +303,21 @@ function cm_operationMemberData(c){
 			}
 			publicComment.setValue(comments);
 			publicComment.disable();
-		}
-		
-
-
+		}*/
 
 		if(typeof data['memberType'] != 'undefined'){
-			var task = {
-				run: function(){
-					if(memberType.store.getCount() > 0){
-						memberType.setValue(data['memberType']['id']);
-						Ext.TaskMgr.stop(this);
-					}
-				},
-				interval: 250 
-			};
-			Ext.TaskMgr.start(task);
+			memberType.setValue(data['memberType']['id']);
 		}else{
 			memberType.setValue();
 		}
 		
-		if(data['name']){
+/*		if(data['name']){
 			publicComment.getEl().dom.readOnly = true;
 			privateComment.getEl().dom.readOnly = true;
 		}else{
 			publicComment.getEl().dom.readOnly = false;
 			privateComment.getEl().dom.readOnly = false;
-		}
+		}*/
 	}else if(c.type.toUpperCase() == Ext.ux.otype['get'].toUpperCase()){
 		data = {
 			id : memberID.getValue(),
@@ -361,6 +368,7 @@ function operateMemberHandler(c){
 	var memberMobile = Ext.getCmp('cm_txtMemberMobile');
 	var memberSex = Ext.getCmp('cm_comboMemberSex');
 	var birthday = Ext.getCmp('cm_dateMemberBirthday');
+	var firstCharge = Ext.getCmp('cm_numFirstCharge');
 	
 	if(cm_obj.otype.toLowerCase() == Ext.ux.otype['update'].toLowerCase()){
 		// 验证旧类型为充值属性(后台验证)
@@ -401,10 +409,8 @@ function operateMemberHandler(c){
 			birthday : birthday.getValue() ? birthday.getValue().format('Y-m-d') : '',
 			telt : Ext.getCmp('cm_txtMemberTele').getValue(),
 			idCard : Ext.getCmp('cm_txtMemberIDCard').getValue(),
-			company : Ext.getCmp('cm_txtMemberCompany').getValue(),
-			addr : Ext.getCmp('cm_txtMemberContactAddress').getValue(),
-			privateComment : Ext.getCmp('cm_txtMemberPrivateComment').getValue(),
-			publicComment : Ext.getCmp('cm_txtMemberPublicComment').getValue()
+			firstCharge : firstCharge.getValue(),
+			addr : Ext.getCmp('cm_txtMemberContactAddress').getValue()
 		},
 		success : function(res, opt){
 			c.setButtonStatus(false);

@@ -241,7 +241,7 @@ function memberPay(){
 				text : '暂结',
 				handler : function(e){
 					if(memberPayOrderHandler){
-						Ext.getCmp('mpo_txtDiscountForPayOrder').fireEvent('select', Ext.getCmp('mpo_txtDiscountForPayOrder'));
+//						Ext.getCmp('mpo_txtDiscountForPayOrder').fireEvent('select', Ext.getCmp('mpo_txtDiscountForPayOrder'));
 						memberPayOrderHandler({
 							tempPay : true,
 							
@@ -275,7 +275,7 @@ function memberPay(){
 						Ext.ux.setCookie(document.domain+'_consumeSms', false, 3650);
 					}
 					if(memberPayOrderHandler){
-						Ext.getCmp('mpo_txtDiscountForPayOrder').fireEvent('select', Ext.getCmp('mpo_txtDiscountForPayOrder'));
+//						Ext.getCmp('mpo_txtDiscountForPayOrder').fireEvent('select', Ext.getCmp('mpo_txtDiscountForPayOrder'));
 						memberPayOrderHandler({
 							tempPay : false,
 							

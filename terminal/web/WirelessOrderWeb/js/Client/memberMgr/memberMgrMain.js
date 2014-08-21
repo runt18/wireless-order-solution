@@ -912,8 +912,9 @@ function treeInit(){
 					memberTypeData.root = [];
 					for(var i = 0; i < thiz.childNodes.length; i++){
 						memberTypeData.root.push({
-							memberTypeID : thiz.childNodes[i].attributes['memberTypeId'],
-							memberTypeName : thiz.childNodes[i].attributes['memberTypeName']
+							id : thiz.childNodes[i].attributes['memberTypeId'],
+							name : thiz.childNodes[i].attributes['memberTypeName'],
+							attributeValue : thiz.childNodes[i].attributes['attributeValue']
 						});
 					}
 				}
@@ -1319,7 +1320,7 @@ function winInit(){
 	memberBasicWin = new Ext.Window({
 		title : '&nbsp;',
 		width : 660,
-		height : Ext.isIE ? 330 : 296,
+		height : Ext.isIE ? 280 : 240,
 		modal : true,
 		resizable : false,
 		closable : false,
@@ -1338,6 +1339,7 @@ function winInit(){
 							}else{
 								data = {status:0};
 							}
+							data.memberTypeData = memberTypeData.root;
 							cm_operationMemberBasicMsg({
 								type : 'SET',
 								data : data
@@ -1357,17 +1359,6 @@ function winInit(){
 					},
 					callback : function(){
 						Ext.TaskMgr.start(task);
-//							var data = {};
-//							if(memberBasicWin.otype == Ext.ux.otype['update']){
-//								data = Ext.ux.getSelData(memberBasicGrid);
-//								data = !data ? {status:0} : data;
-//							}else{
-//								data = {status:0};
-//							}
-//							cm_operationMemberBasicMsg({
-//								type : 'SET',
-//								data : data
-//							});						
 					}
 				});
 				thiz.center();
@@ -1415,6 +1406,7 @@ function winInit(){
 			iconCls : 'btn_close',
 			handler : function(){
 				memberBasicWin.hide();
+				cm_operationMemberBasicMsg = null;
 			}
 		}]
 	});
@@ -1545,6 +1537,42 @@ function checkLabel(t){
 		return t;
 	}
 }
+
+var defaultMemberTypeDiscount = {
+	columnWidth : 1,
+	items : [{
+		xtype : 'combo',
+		id : 'comboDiscount',
+		fieldLabel : '默认方案' + Ext.ux.txtFormat.xh,
+		forceSelection : true,
+		allowBlank : false,
+		blankText : '折扣方案不能为空.',
+		width : 135,
+		store : new Ext.data.JsonStore({
+			fields : [ 'discountID', 'text' ]
+		}),
+		valueField : 'discountID',
+		displayField : 'text',
+		typeAhead : true,
+		mode : 'local',
+		triggerAction : 'all',
+		selectOnFocus : true,
+		listeners : {
+			focus  : function(thiz){
+				var mDiscountSelectedList = []; 
+				var mDiscountSelecteds = document.getElementsByName('memberDiscount');
+				for (var i = 0; i < mDiscountSelecteds.length; i++) {
+					if(mDiscountSelecteds[i].checked){
+						mDiscountSelectedList.push({'discountID':mDiscountSelecteds[i].value,'text':mDiscountSelecteds[i].nextSibling.innerHTML});
+					}
+					
+				}
+				thiz.store.loadData(mDiscountSelectedList);
+			}
+		}
+	}]
+	
+};
 function m_memberTypeWinInit(){
 	if(!m_memberTypeWin){
 		m_memberTypeWin = new Ext.Window({
@@ -1576,11 +1604,77 @@ function m_memberTypeWinInit(){
 					blankText : '类型名称不能为空.',
 					value : "",
 					selectOnFocus : true
+				},{
+					xtype : 'panel',
+					layout : 'column',
+					id : 'radioMemberTypes',
+					frame : false,
+					width : 255,
+					defaults : {
+						columnWidth : .5,
+						layout : 'form',
+						labelWidth : 80
+					},
+					items : [{
+						columnWidth : .3,
+				    	items : [{
+							xtype : 'label',
+							html :  '&nbsp;&nbsp;会员属性' + Ext.ux.txtFormat.xh
+				    	}]
+				    },{
+						columnWidth : .25,
+				    	labelWidth : 65,
+				    	items : [{
+							xtype : "radio",
+							id : 'rdoMemberType4Charge',
+							name : "radioMemberType",
+							boxLabel : '充值' , 
+							hideLabel : true,
+							checked : true,
+							inputValue :  0,
+							listeners : {
+								render : function(e){
+//									Ext.ux.checkPaddingTop(e);
+									Ext.getDom('rdoMemberType4Charge').onclick = function(){
+										e.setValue(true);
+										Ext.getCmp('numChargeRate').setValue(1.0);
+										Ext.getCmp('numChargeRate').setDisabled(false);											
+										m_memberTypeWin.s_memberType = e.inputValue;
+									};
+								}
+							}
+							
+				    	}]
+				    },{
+						columnWidth : .25,
+				    	labelWidth : 65,
+				    	items : [{
+							xtype : "radio", 
+							id : 'rdoMemberType4Piont',
+							name : "radioMemberType",
+							boxLabel : '积分' , 
+							hideLabel : true, 
+							inputValue :  1,
+							listeners : {
+								render : function(e){
+//									Ext.ux.checkPaddingTop(e);
+									Ext.getDom('rdoMemberType4Piont').onclick = function(){
+										e.setValue(true);
+										Ext.getCmp('numChargeRate').setValue(0);
+										Ext.getCmp('numChargeRate').setDisabled(true);										
+										m_memberTypeWin.s_memberType = e.inputValue;
+									};
+								}
+							}
+							
+				    	}]
+				    }]
+					
 				}, {
 					xtype : 'numberfield',
 					id : 'numExchangeRate',
 					fieldLabel : '积分比率' + Ext.ux.txtFormat.xh,
-					value : 1,
+					value : 1.0,
 					minValue : 0.00,
 					allowBlank : false,
 					blankText : '积分比率不能为空.',
@@ -1588,8 +1682,8 @@ function m_memberTypeWinInit(){
 				}, {
 					xtype : 'label',
 					width : 200,
-					style : 'color:green;font-szie:12px;',
-					text : '说明:  使用会员结账时, 消费金额兑换积分的利率, 如金额 100 元兑换 150 积分, 则输入 1.5, 默认 1.'
+					style : 'color:green;fontSize:14px;',
+					text : '输入 1.5, 表示消费 100 元兑换 150 积分'
 				}, {
 					xtype : 'numberfield',
 					id : 'numInitialPoint',
@@ -1601,50 +1695,16 @@ function m_memberTypeWinInit(){
 					selectOnFocus : true
 				}, {
 					xtype : 'label',
-					style : 'color:green;font-szie:12px;',
+					style : 'color:green;fontSize:15px;',
 					text : '说明:  新会员赠送积分.'
-				}, {
-					xtype : 'combo',
-					id : 'comboAttribute',
-					fieldLabel : '会员属性' + Ext.ux.txtFormat.xh,
-					forceSelection : true,
-					width : 130,
-					value : 0,
-					store : new Ext.data.SimpleStore({
-						fields : [ 'value', 'text' ],
-						data : memberAttributeData
-					}),
-					valueField : 'value',
-					displayField : 'text',
-					typeAhead : true,
-					mode : 'local',
-					triggerAction : 'all',
-					selectOnFocus : true,
-					allowBlank : false,
-					blankText : '会员属性不能为空.',
-					listeners : {
-						render : function(e){
-							e.setValue(0);
-							e.fireEvent('select', e);
-						},
-						select : function(e, rocord, index){
-							var cr = Ext.getCmp('numChargeRate');
-							if(e.getValue() == 0){
-								cr.setValue(1);
-								cr.setDisabled(false);
-							}else if(e.getValue() == 1){
-								cr.setValue(0);
-								cr.setDisabled(true);
-							}
-							cr.clearInvalid();
-						}
-					}
-				}, {
+				}
+/*				, {
 					xtype : 'label',
 					autoWidth : true,
 					style : 'color:green;font-szie:12px;width : 250px',
 					text : '说明:  所有属性都可使用积分功能, 积分类型只使用该会员类型的折扣信息, 充值则可使用会员资料中基本金额、赠送金额等更多信息'
-				}, {
+				}*/
+				, {
 					xtype : 'numberfield',
 					id : 'numChargeRate',
 					fieldLabel : '充值比率' + Ext.ux.txtFormat.xh,
@@ -1659,13 +1719,8 @@ function m_memberTypeWinInit(){
 				}, {
 					xtype : 'label',
 					autoWidth : true,
-					style : 'color:green;font-szie:12px;',
-					text : '说明:充100.00元送50.00元, 充值比率输入  1.5, 默认 1 '
-				}, {
-					xtype : 'textarea',
-					height : 40,
-					id : 'txtCommentForMemberType',
-					fieldLabel : '特权说明'
+					style : 'color:green;fontSize:15px;',
+					text : '输入 1.5, 表示 100 元送 50 元'
 				},{
 					xtype : 'panel',
 					layout : 'column',
@@ -1682,39 +1737,18 @@ function m_memberTypeWinInit(){
 						xtype : 'label',
 						id : 'txtTest',
 						style : 'text-align:left;padding-bottom:3px;',
-						text : '折扣方案:'
+						text : '选择折扣方案:'
 						
 					}]
 					
-				},{
-					xtype : 'combo',
-					id : 'comboDiscount',
-					fieldLabel : '默认方案' + Ext.ux.txtFormat.xh,
-					forceSelection : true,
-					allowBlank : false,
-					blankText : '折扣方案不能为空.',
-					store : new Ext.data.JsonStore({
-						fields : [ 'discountID', 'text' ]
-					}),
-					valueField : 'discountID',
-					displayField : 'text',
-					typeAhead : true,
-					mode : 'local',
-					triggerAction : 'all',
-					selectOnFocus : true,
-					listeners : {
-						focus  : function(thiz){
-							var mDiscountSelectedList = []; 
-							var mDiscountSelecteds = document.getElementsByName('memberDiscount');
-							for (var i = 0; i < mDiscountSelecteds.length; i++) {
-								if(mDiscountSelecteds[i].checked){
-									mDiscountSelectedList.push({'discountID':mDiscountSelecteds[i].value,'text':mDiscountSelecteds[i].nextSibling.innerHTML});
-								}
-								
-							}
-							thiz.store.loadData(mDiscountSelectedList);
-						}
-					}
+				}, {
+					xtype : 'label',
+					html : '&nbsp;'
+				}, {
+					xtype : 'textarea',
+					height : 40,
+					id : 'txtCommentForMemberType',
+					fieldLabel : '特权说明'
 				}]
 			}],
 			bbar : ['->', {
@@ -1728,11 +1762,11 @@ function m_memberTypeWinInit(){
 					var exchangeRate = Ext.getCmp('numExchangeRate');
 					var initialPoint = Ext.getCmp('numInitialPoint');
 					var discount = Ext.getCmp('comboDiscount');
-					var attribute = Ext.getCmp('comboAttribute');
+					var attribute = m_memberTypeWin.s_memberType;
 					var desc = Ext.getCmp('txtCommentForMemberType');
 					
 					if(!typeName.isValid() || !chargeRate.isValid() || !exchangeRate.isValid() 
-							|| !initialPoint.isValid() || !attribute.isValid() || !discount.isValid()){
+							|| !initialPoint.isValid() || !discount.isValid()){
 						return;
 					}
 					var memberDiscountCheckeds = "";
@@ -1753,7 +1787,7 @@ function m_memberTypeWinInit(){
 							exchangeRate : exchangeRate.getValue(),
 							initialPoint : initialPoint.getValue(),
 							chargeRate : chargeRate.getValue(),
-							attr : attribute.getValue(),
+							attr : attribute,
 							desc : desc.getValue(),
 							memberDiscountCheckeds : getChecked(memberDiscountCheckeds, document.getElementsByName('memberDiscount'))
 						},
@@ -1814,6 +1848,7 @@ function m_memberTypeWinInit(){
 							}
 							Ext.getCmp('formMemberDiscount').doLayout();
 						}
+						Ext.getCmp('formMemberDiscount').add(defaultMemberTypeDiscount);
 					}
 				},
 				hide : function(){
@@ -1867,7 +1902,6 @@ function bindMemberTypeData(d){
 	var exchangeRate = Ext.getCmp('numExchangeRate');
 	var initialPoint = Ext.getCmp('numInitialPoint');
 	var discount = Ext.getCmp('comboDiscount');
-	var attribute = Ext.getCmp('comboAttribute');
 	var desc = Ext.getCmp('txtCommentForMemberType');
 	
 	typeID.setValue(d['memberTypeId']);
@@ -1880,11 +1914,14 @@ function bindMemberTypeData(d){
 	initialPoint.setValue(typeof d['initialPoint'] != 'undefined' ? d['initialPoint'] : 0);
 	
 	if(typeof d['attributeValue'] == 'undefined'){
-		attribute.setValue(1);
+		Ext.getDom('rdoMemberType4Charge').onclick();
 	}else{
-		attribute.setValue(d['attributeValue']);
+		if(d['attributeValue'] == 0){
+			Ext.getDom('rdoMemberType4Charge').onclick();
+		}else if(d['attributeValue'] == 1){
+			Ext.getDom('rdoMemberType4Piont').onclick();
+		}
 	}
-	attribute.fireEvent('select', attribute);
 	chargeRate.setValue(d['chargeRate']);
 	discount.setValue(d['discount']);
 	desc.setValue(d['desc']);
@@ -1893,7 +1930,6 @@ function bindMemberTypeData(d){
 	typeName.clearInvalid();
 	chargeRate.clearInvalid();
 	initialPoint.clearInvalid();
-	attribute.clearInvalid();
 	discount.clearInvalid();
 };
 
