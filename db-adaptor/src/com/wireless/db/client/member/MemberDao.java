@@ -36,6 +36,7 @@ public class MemberDao {
 		private int id;
 		private String card;
 		private String mobile;
+		private String mobileOrCard;
 		private String name;
 		private String fuzzy;
 		private int memberTypeId;
@@ -58,7 +59,12 @@ public class MemberDao {
 		public ExtraCond setMobile(String mobile){
 			this.mobile = mobile;
 			return this;
-		}
+		} 
+		
+		public ExtraCond setMobileOrCard(String mobileOrCard){
+			this.mobileOrCard = mobileOrCard;
+			return this;
+		} 
 		
 		public ExtraCond setFuzzyName(String fuzzy){
 			this.fuzzy = fuzzy;
@@ -121,6 +127,10 @@ public class MemberDao {
 			if(mobile != null){
 				extraCond.append(" AND M.mobile_crc = CRC32('" + mobile + "') AND M.mobile = '" + mobile + "'");
 			}
+			if(mobileOrCard != null){
+				extraCond.append(" AND (M.mobile = '" + mobileOrCard + "' OR M.member_card = '" + mobileOrCard + "')");
+			}
+			
 			if(name != null){
 				extraCond.append(" AND M.name = '" + name + "'");
 			}
