@@ -19,6 +19,17 @@
 		sendToStatisticsPageHours.deptId = c.deptId;
 		sendToStatisticsPageHours.deptName = c.deptName;
 		
+		if(!sendToStatisticsPageHours.opening){
+			sendToStatisticsPageHours.openingText = "00:00";
+			sendToStatisticsPageHours.endingText = "00:00";
+		}else{
+			sendToStatisticsPageHours.openingText = sendToStatisticsPageHours.opening;
+			sendToStatisticsPageHours.endingText = sendToStatisticsPageHours.ending;
+		}
+		
+		console.log('page')
+		console.log(sendToStatisticsPageHours)
+		
 		sendToPageOperation = true;
 		
 		if(c.type == 1){//折扣统计
