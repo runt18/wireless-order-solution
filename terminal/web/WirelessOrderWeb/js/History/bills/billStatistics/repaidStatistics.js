@@ -479,8 +479,8 @@ var repaid_setStatisticsDate = function(){
 		
 		Ext.getCmp('repaid_btnSearch').handler();
 		
-		Ext.getCmp('repaid_txtBusinessHourBegin').setText('<font style="color:green; font-size:20px">'+repaid_hours.opening+'</font>');
-		Ext.getCmp('repaid_txtBusinessHourEnd').setText('<font style="color:green; font-size:20px">'+repaid_hours.ending+'</font>');
+		Ext.getCmp('repaid_txtBusinessHourBegin').setText('<font style="color:green; font-size:20px">'+repaid_hours.openingText+'</font>');
+		Ext.getCmp('repaid_txtBusinessHourEnd').setText('<font style="color:green; font-size:20px">'+repaid_hours.endingText+'</font>');
 		Ext.getCmp('repaid_comboBusinessHour').setValue(repaid_hours.hourComboValue);	
 		
 		sendToPageOperation = false;

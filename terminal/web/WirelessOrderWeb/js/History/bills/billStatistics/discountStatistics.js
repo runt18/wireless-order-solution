@@ -540,8 +540,8 @@ var discount_setStatisticsDate = function(){
 		
 		Ext.getCmp('discount_btnSearch').handler();
 		
-		Ext.getCmp('discount_txtBusinessHourBegin').setText('<font style="color:green; font-size:20px">'+discount_hours.opening+'</font>');
-		Ext.getCmp('discount_txtBusinessHourEnd').setText('<font style="color:green; font-size:20px">'+discount_hours.ending+'</font>');
+		Ext.getCmp('discount_txtBusinessHourBegin').setText('<font style="color:green; font-size:20px">'+discount_hours.openingText+'</font>');
+		Ext.getCmp('discount_txtBusinessHourEnd').setText('<font style="color:green; font-size:20px">'+discount_hours.endingText+'</font>');
 		Ext.getCmp('discount_comboBusinessHour').setValue(discount_hours.hourComboValue);		
 		
 		sendToPageOperation = false;		

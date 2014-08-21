@@ -712,8 +712,8 @@ var cancel_setStatisticsDate = function(){
 		
 		Ext.getCmp('cancel_btnSearch').handler();
 		
-		Ext.getCmp('cancel_txtBusinessHourBegin').setText('<font style="color:green; font-size:20px">'+cancel_hours.opening+'</font>');
-		Ext.getCmp('cancel_txtBusinessHourEnd').setText('<font style="color:green; font-size:20px">'+cancel_hours.ending+'</font>');
+		Ext.getCmp('cancel_txtBusinessHourBegin').setText('<font style="color:green; font-size:20px">'+cancel_hours.openingText+'</font>');
+		Ext.getCmp('cancel_txtBusinessHourEnd').setText('<font style="color:green; font-size:20px">'+cancel_hours.endingText+'</font>');
 		Ext.getCmp('cancel_comboBusinessHour').setValue(cancel_hours.hourComboValue);		
 		
 		sendToPageOperation = false;

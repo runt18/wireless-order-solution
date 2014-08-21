@@ -563,8 +563,8 @@ var gift_setStatisticsDate = function(){
 		
 		Ext.getCmp('giftStatistic_btnSearch').handler();
 		
-		Ext.getCmp('giftStatistic_txtBusinessHourBegin').setText('<font style="color:green; font-size:20px">'+giftStatistic_hours.opening+'</font>');
-		Ext.getCmp('giftStatistic_txtBusinessHourEnd').setText('<font style="color:green; font-size:20px">'+giftStatistic_hours.ending+'</font>');
+		Ext.getCmp('giftStatistic_txtBusinessHourBegin').setText('<font style="color:green; font-size:20px">'+giftStatistic_hours.openingText+'</font>');
+		Ext.getCmp('giftStatistic_txtBusinessHourEnd').setText('<font style="color:green; font-size:20px">'+giftStatistic_hours.endingText+'</font>');
 		Ext.getCmp('giftStatistic_comboBusinessHour').setValue(giftStatistic_hours.hourComboValue);
 		
 		sendToPageOperation = false;		

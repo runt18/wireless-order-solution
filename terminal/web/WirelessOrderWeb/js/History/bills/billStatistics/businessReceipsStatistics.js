@@ -503,8 +503,8 @@ var receipts_setStatisticsDate = function(){
 		receipt_hours = sendToStatisticsPageHours;
 		
 		Ext.getCmp('businessReceipt_btnSearch').handler();
-		Ext.getCmp('businessReceipt_txtBusinessHourBegin').setText('<font style="color:green; font-size:20px">'+receipt_hours.opening+'</font>');
-		Ext.getCmp('businessReceipt_txtBusinessHourEnd').setText('<font style="color:green; font-size:20px">'+receipt_hours.ending+'</font>');
+		Ext.getCmp('businessReceipt_txtBusinessHourBegin').setText('<font style="color:green; font-size:20px">'+receipt_hours.openingText+'</font>');
+		Ext.getCmp('businessReceipt_txtBusinessHourEnd').setText('<font style="color:green; font-size:20px">'+receipt_hours.endingText+'</font>');
 		Ext.getCmp('businessReceipt_comboBusinessHour').setValue(sendToStatisticsPageHours.hourComboValue);
 		
 		sendToPageOperation = false;		

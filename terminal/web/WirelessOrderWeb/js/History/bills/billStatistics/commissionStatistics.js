@@ -537,8 +537,8 @@ var commission_setStatisticsDate = function(){
 		
 		Ext.getCmp('commission_btnSearch').handler();
 		
-		Ext.getCmp('commission_txtBusinessHourBegin').setText('<font style="color:green; font-size:20px">'+commission_hours.opening+'</font>');
-		Ext.getCmp('commission_txtBusinessHourEnd').setText('<font style="color:green; font-size:20px">'+commission_hours.ending+'</font>');
+		Ext.getCmp('commission_txtBusinessHourBegin').setText('<font style="color:green; font-size:20px">'+commission_hours.openingText+'</font>');
+		Ext.getCmp('commission_txtBusinessHourEnd').setText('<font style="color:green; font-size:20px">'+commission_hours.endingText+'</font>');
 		Ext.getCmp('commission_comboBusinessHour').setValue(commission_hours.hourComboValue);	
 		
 		sendToPageOperation = false;
