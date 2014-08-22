@@ -20,6 +20,8 @@ import com.wireless.db.weixin.member.WeixinMemberDao;
 import com.wireless.db.weixin.restaurant.WeixinRestaurantDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
+import com.wireless.json.JsonMap;
+import com.wireless.json.Jsonable;
 import com.wireless.pojo.client.MemberOperation;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.util.SQLUtil;
@@ -61,6 +63,24 @@ public class WXQueryMemberOperationAction extends DispatchAction{
 		response.getWriter().print(getData(2, request.getParameter("fid"), request.getParameter("oid")).toString());
 		return null;
 	}
+	
+	/**
+	 * 获取充值和消费的最近记录
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward chargeAndPointTitle(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		request.setCharacterEncoding("UTF-8");
+		response.setCharacterEncoding("UTF-8");
+		response.getWriter().print(getGeneral(request.getParameter("fid"), request.getParameter("oid")).toString());
+		return null;
+	}	
 	
 	/**
 	 * 近5条优惠券使用记录
@@ -149,6 +169,104 @@ public class WXQueryMemberOperationAction extends DispatchAction{
 		}
 		return jobject;
 	}
+	
+	private synchronized static JObject getGeneral(String restaurantSerial, String memberSerial){
+		JObject jobject = new JObject();
+		
+		DBCon dbCon = null;
+		try{
+			dbCon = new DBCon();
+			dbCon.connect();
+			
+			List<MemberOperation> chargeDetail = new ArrayList<MemberOperation>();
+			List<MemberOperation> consumeDetail = new ArrayList<MemberOperation>();
+			Map<Object, Object> params = new HashMap<Object, Object>();
+			
+			// 获取餐厅编号
+			int rid = WeixinRestaurantDao.getRestaurantIdByWeixin(dbCon, restaurantSerial);
+			// 获取会员编号
+			int mid = WeixinMemberDao.getBoundMemberIdByWeixin(dbCon, memberSerial, restaurantSerial);
+			//
+			Staff staff = StaffDao.getByRestaurant(dbCon, rid).get(0);
+			
+			// 查询条件(核心)
+			String extra = "";
+			extra = " AND MO.member_id = " + mid + " AND MO.operate_type = " + MemberOperation.OperationType.CHARGE.getValue();
+			
+			// 查询记录数
+			int queryCount = 1;
+			// 
+			params.put(SQLUtil.SQL_PARAMS_EXTRA, extra);
+			params.put(SQLUtil.SQL_PARAMS_ORDERBY, " ORDER BY MO.operate_date DESC ");
+			params.put(SQLUtil.SQL_PARAMS_LIMIT_OFFSET, 0);
+			params.put(SQLUtil.SQL_PARAMS_LIMIT_ROWCOUNT, queryCount);
+			//
+			chargeDetail = MemberOperationDao.getToday(dbCon, staff, params);
+			// 当日数据不足查询记录数时, 获取历史数据填充满
+			if(chargeDetail.size() < 1){
+				params.put(SQLUtil.SQL_PARAMS_LIMIT_ROWCOUNT, queryCount - chargeDetail.size());
+				chargeDetail.addAll(MemberOperationDao.getHistory(dbCon, staff, params));
+			}
+			
+			
+			//查询消费记录
+			
+			extra = " AND MO.member_id = " + mid + " AND MO.operate_type = " + MemberOperation.OperationType.CONSUME.getValue();
+			// 
+			params.put(SQLUtil.SQL_PARAMS_EXTRA, extra);
+			params.put(SQLUtil.SQL_PARAMS_ORDERBY, " ORDER BY MO.operate_date DESC ");
+			params.put(SQLUtil.SQL_PARAMS_LIMIT_OFFSET, 0);
+			params.put(SQLUtil.SQL_PARAMS_LIMIT_ROWCOUNT, queryCount);
+			//
+			consumeDetail = MemberOperationDao.getToday(dbCon, staff, params);
+			// 当日数据不足查询记录数时, 获取历史数据填充满
+			if(consumeDetail.size() < 1){
+				params.put(SQLUtil.SQL_PARAMS_LIMIT_ROWCOUNT, queryCount - consumeDetail.size());
+				consumeDetail.addAll(MemberOperationDao.getHistory(dbCon, staff, params));
+			}
+			final MemberOperation charge_mo;
+			if(!chargeDetail.isEmpty()){
+				charge_mo = chargeDetail.get(0);
+			}else{
+				charge_mo = null;
+			}
+			
+			final MemberOperation consume_mo;
+			
+			if(!consumeDetail.isEmpty()){
+				consume_mo = consumeDetail.get(0);
+			}else{
+				consume_mo = null;
+			}
+			
+			jobject.setExtra(new Jsonable(){
+
+				@Override
+				public JsonMap toJsonMap(int flag) {
+					JsonMap jm = new JsonMap();
+					jm.putFloat("nearByCharge", charge_mo != null? charge_mo.getChargeMoney() : -1);
+					jm.putFloat("nearByConsume", consume_mo != null? consume_mo.getPayMoney() : -1);
+					return jm;
+				}
+
+				@Override
+				public void fromJsonMap(JsonMap jsonMap, int flag) {
+					
+				}
+				
+			});
+			
+		}catch(BusinessException e){	
+			e.printStackTrace();
+			jobject.initTip(e);
+		}catch(Exception e){
+			e.printStackTrace();
+			jobject.initTip(e);
+		}finally{
+			if(dbCon != null) dbCon.disconnect();
+		}
+		return jobject;
+	}	
 	
 	/**
 	 * 现有优惠券

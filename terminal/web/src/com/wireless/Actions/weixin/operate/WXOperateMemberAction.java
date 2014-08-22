@@ -2,7 +2,6 @@ package com.wireless.Actions.weixin.operate;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.text.DecimalFormat;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -67,8 +66,9 @@ public class WXOperateMemberAction extends DispatchAction {
 			
 			final Member member = MemberDao.getById(dbCon, StaffDao.getByRestaurant(dbCon, rid).get(0), mid);
 			MemberRank mr = MemberDao.calcMemberRank(StaffDao.getByRestaurant(dbCon, rid).get(0), mid);
-			DecimalFormat df = new DecimalFormat("#.00");
-			final String rank = df.format(mr.getRank()/mr.getTotal()) + "%";
+//			System.out.println(mr.getRank()/mr.getTotal());
+//			DecimalFormat df = new DecimalFormat("#.00");
+			final String rank = mr.getRank()/mr.getTotal() + "%";
 			
 			jobject.initTip(true, "操作成功, 已获取微信会员信息.");
 			
