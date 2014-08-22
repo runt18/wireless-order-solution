@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.Callable;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -50,9 +51,9 @@ import org.marker.weixin.api.Token;
 import org.marker.weixin.msg.Data4Item;
 import org.marker.weixin.msg.Msg;
 import org.marker.weixin.msg.Msg4Event;
+import org.marker.weixin.msg.Msg4Event.Event;
 import org.marker.weixin.msg.Msg4ImageText;
 import org.marker.weixin.msg.Msg4Text;
-import org.marker.weixin.msg.Msg4Event.Event;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
@@ -143,88 +144,108 @@ public class FinanceWeixinAction extends Action {
 		
 		final DefaultSession session = DefaultSession.newInstance(); 
 		
-		session.addOnHandleMessageListener(new HandleMessageAdapter(){
-			
-			@Override
-			public void onEventMsg(Msg4Event msg){
-				if(msg.getEvent() == Event.SUBSCRIBE){
-					Msg4Text rmsg =	new Msg4Text();
-					rmsg.setFromUserName(msg.getToUserName());
-					rmsg.setToUserName(msg.getFromUserName());
-					if(msg.getTicket().isEmpty()){
-						rmsg.setContent("欢迎关注志易云平台:-)");
-						session.callback(rmsg);
-					}else{
-						session.callback(doBinding(msg, msg.getEventKey().replace("qrscene_", "")));
-					}
-					
-				}else if(msg.getEvent() == Event.SCAN){
-					session.callback(doBinding(msg, msg.getEventKey()));
-					
-				}else if(msg.getEvent() == Event.CLICK){
-					
-					//FIXME
-					Msg4Text rmsg =	new Msg4Text();
-					rmsg.setFromUserName(msg.getToUserName());
-					rmsg.setToUserName(msg.getFromUserName());
-					
-					if(msg.getEventKey().equals(TODAY_EVENT_KEY)){
-						//即时战报
-						session.callback(doToday(msg));
+		try{
+			session.addOnHandleMessageListener(new HandleMessageAdapter(){
+				
+				@Override
+				public void onEventMsg(final Msg4Event msg){
+					if(msg.getEvent() == Event.SUBSCRIBE){
+						if(msg.getTicket().isEmpty()){
+							Msg4Text rmsg =	new Msg4Text(msg);
+							rmsg.setContent("欢迎关注志易云平台:-)");
+							session.callback(rmsg);
+						}else{
+							session.callback(doBinding(msg, msg.getEventKey().replace("qrscene_", "")));
+						}
 						
-					}else if(msg.getEventKey().equals(YESTERDAY_EVENT_KEY)){
-						//最近日结
+					}else if(msg.getEvent() == Event.SCAN){
+						session.callback(doBinding(msg, msg.getEventKey()));
+						
+					}else if(msg.getEvent() == Event.CLICK){
+						
+						if(msg.getEventKey().equals(TODAY_EVENT_KEY)){
+							//即时战报
+							session.callback(doToday(msg));
+							
+						}else if(msg.getEventKey().equals(YESTERDAY_EVENT_KEY)){
+							//最近日结
+							session.callback(doYesterday(msg));
+							
+						}else if(msg.getEventKey().equals(THIS_WEEK_EVENT_KEY)){
+							//本周周报
+							session.callback(doThisWeek(msg));
+							
+						}else if(msg.getEventKey().equals(LAST_WEEK_EVENT_KEY)){
+							//上周周报
+							session.callback(doLastweek(msg));
+							
+						}else if(msg.getEventKey().equals(THIS_MONTH_EVENT_KEY)){
+							//本月月报
+							try {
+								session.callback(Token.newInstance(APP_ID, APP_SECRET), new Callable<Msg>(){
+									@Override
+									public Msg call() throws Exception {
+										return doThisMonth(msg);
+									}
+									
+								});
+							} catch (IOException e) {
+								session.callback(new Msg4Text(msg, e.getMessage()));
+							}
+							
+						}else if(msg.getEventKey().equals(LAST_MONTH_EVENT_KEY)){
+							//上月月报
+							try {
+								session.callback(Token.newInstance(APP_ID, APP_SECRET), new Callable<Msg>(){
+									@Override
+									public Msg call() throws Exception {
+										return doLastMonth(msg);
+									}
+									
+								});
+							} catch (IOException e) {
+								session.callback(new Msg4Text(msg, e.getMessage()));
+							}
+						}
+					}
+				}
+				
+				@Override
+				public void onTextMsg(Msg4Text msg) {
+					
+					String[] opeCodes = msg.getContent().split(" ");
+					
+					if(opeCodes[0].equals("bd")){
+						//绑定微信号和餐厅
+						session.callback(doBinding(msg, opeCodes[1], opeCodes[2]));
+						
+					}else if(opeCodes[0].equals("rj")){
+						//查看最近日结信息
 						session.callback(doYesterday(msg));
 						
-					}else if(msg.getEventKey().equals(THIS_WEEK_EVENT_KEY)){
-						//本周周报
-						session.callback(doThisweek(msg));
+					}else if(opeCodes[0].equals("yy")){
+						//查看今日关注
+						session.callback(doThisWeek(msg));
 						
-					}else if(msg.getEventKey().equals(LAST_WEEK_EVENT_KEY)){
-						//上周周报
-						session.callback(doLastweek(msg));
-						
-					}else if(msg.getEventKey().equals(THIS_MONTH_EVENT_KEY)){
-						//TODO 本月月报
-						rmsg.setContent(THIS_MONTH_EVENT_KEY);
-						session.callback(doThisMonth(msg));
-						
-					}else if(msg.getEventKey().equals(LAST_MONTH_EVENT_KEY)){
-						//TODO 上月月报
-						session.callback(doLastMonth(msg));
+					}else{
+						//显示使用说明
+						session.callback(doManual(msg));
 					}
+					
 				}
-			}
+				
+				@Override
+				public void onErrorMsg(int errorCode) {
+				}
+			});
 			
-			@Override
-			public void onTextMsg(Msg4Text msg) {
-				
-				String[] opeCodes = msg.getContent().split(" ");
-				
-				if(opeCodes[0].equals("bd")){
-					//绑定微信号和餐厅
-					session.callback(doBinding(msg, opeCodes[1], opeCodes[2]));
-					
-				}else if(opeCodes[0].equals("rj")){
-					//查看最近日结信息
-					session.callback(doYesterday(msg));
-					
-				}else if(opeCodes[0].equals("yy")){
-					//查看今日关注
-					session.callback(doThisweek(msg));
-					
-				}else{
-					//显示使用说明
-					session.callback(doManual(msg));
-				}
-				
-			}
-		});
-		
-		//必须调用这两个方法
-        //如果不调用close方法，将会出现响应数据串到其它Servlet中。
-		session.process(is, os);//处理微信消息 
-		session.close();//关闭Session
+			//处理微信消息 
+			session.process(is, os);
+			
+		}finally{
+			//如果不调用close方法，将会出现响应数据串到其它Servlet中。
+			session.close();
+		}
 	}
 	
 	/**
@@ -235,9 +256,7 @@ public class FinanceWeixinAction extends Action {
 	 * @return
 	 */
 	private Msg doBinding(Msg msg, String restaurantId){
-		Msg4Text rmsg =	new Msg4Text();
-		rmsg.setFromUserName(msg.getToUserName());
-		rmsg.setToUserName(msg.getFromUserName());
+		Msg4Text rmsg =	new Msg4Text(msg);
 
 		try{
 			Restaurant restaurant = WeixinFinanceDao.bind(msg.getFromUserName(), Integer.parseInt(restaurantId));
@@ -258,15 +277,12 @@ public class FinanceWeixinAction extends Action {
 	 */
 	private Msg doBinding(Msg4Text msg, String account, String pwd){
 		
-		Msg4Text rmsg =	new Msg4Text();
-		rmsg.setFromUserName(msg.getToUserName());
-		rmsg.setToUserName(msg.getFromUserName());
+		Msg4Text rmsg =	new Msg4Text(msg);
 
 		try{
 			WeixinFinanceDao.bind(msg.getFromUserName(), account, pwd);
 			Restaurant restaurant = RestaurantDao.getByAccount(account);
-			StringBuilder content = new StringBuilder();
-			content.append("恭喜您, 已成功绑定'" + restaurant.getName() + "':-)");
+			rmsg.setContent("恭喜您, 已成功绑定'" + restaurant.getName() + "':-)");
 			return rmsg;
 			
 		}catch(BusinessException e){
@@ -280,9 +296,7 @@ public class FinanceWeixinAction extends Action {
 	}
 	
 	private Msg doToday(Msg msg){
-		Msg4Text rmsg =	new Msg4Text();
-		rmsg.setFromUserName(msg.getToUserName());
-		rmsg.setToUserName(msg.getFromUserName());
+		Msg4Text rmsg =	new Msg4Text(msg);
 		
 		try{
 			int restaurantId = WeixinFinanceDao.getRestaurantIdByWeixin(msg.getFromUserName());
@@ -300,9 +314,8 @@ public class FinanceWeixinAction extends Action {
 	 * @return
 	 */
 	private Msg doYesterday(Msg msg){
-		Msg4Text rmsg =	new Msg4Text();
-		rmsg.setFromUserName(msg.getToUserName());
-		rmsg.setToUserName(msg.getFromUserName());
+		
+		Msg4Text rmsg =	new Msg4Text(msg);
 		
 		DBCon dbCon = null;
 		try{
@@ -316,22 +329,21 @@ public class FinanceWeixinAction extends Action {
 				  " restaurant_id = " + restaurantId +
 				  " ORDER BY id DESC LIMIT 1 ";
 			dbCon.rs = dbCon.stmt.executeQuery(sql);
+			long onDuty, offDuty;
 			if(dbCon.rs.next()){
-				long onDuty = dbCon.rs.getTimestamp("on_duty").getTime();
-				long offDuty = dbCon.rs.getTimestamp("off_duty").getTime();
-				
-				dbCon.rs.close();
-				
-				ShiftDetail detail = ShiftDao.getByRange(dbCon, StaffDao.getAdminByRestaurant(restaurantId), 
-													    new DutyRange(onDuty, offDuty), 
-														new CalcBillStatisticsDao.ExtraCond(DateType.HISTORY));
-				
-				rmsg.setContent(makeShiftContent("最近日结", RestaurantDao.getById(restaurantId), detail));
-				
+				onDuty = dbCon.rs.getTimestamp("on_duty").getTime();
+				offDuty = dbCon.rs.getTimestamp("off_duty").getTime();
 			}else{
 				throw new BusinessException("");
 			}
+			
+			dbCon.rs.close();
+			
+			ShiftDetail detail = ShiftDao.getByRange(dbCon, StaffDao.getAdminByRestaurant(restaurantId), 
+				    								 new DutyRange(onDuty, offDuty), 
+				    								 new CalcBillStatisticsDao.ExtraCond(DateType.HISTORY));
 
+			rmsg.setContent(makeShiftContent("最近日结", RestaurantDao.getById(restaurantId), detail));
 			
 		}catch(SQLException | BusinessException | ParseException e){
 			rmsg.setContent("对不起，暂时查询不到最近日结的信息:-(");
@@ -385,9 +397,7 @@ public class FinanceWeixinAction extends Action {
 	 * @return
 	 */
 	private Msg doThisMonth(Msg msg){
-		Msg4Text rmsg =	new Msg4Text();
-		rmsg.setFromUserName(msg.getToUserName());
-		rmsg.setToUserName(msg.getFromUserName());
+		Msg4Text rmsg =	new Msg4Text(msg);
 		
 		try{
 			Calendar c = Calendar.getInstance();
@@ -419,9 +429,7 @@ public class FinanceWeixinAction extends Action {
 	 * @return
 	 */
 	private Msg doLastMonth(Msg msg){
-		Msg4Text rmsg =	new Msg4Text();
-		rmsg.setFromUserName(msg.getToUserName());
-		rmsg.setToUserName(msg.getFromUserName());
+		Msg4Text rmsg =	new Msg4Text(msg);
 		
 		try{
 			Calendar c = Calendar.getInstance();
@@ -454,9 +462,7 @@ public class FinanceWeixinAction extends Action {
 	 * @return
 	 */
 	private Msg doManual(Msg4Text msg){
-		Msg4Text rmsg =	new Msg4Text();
-		rmsg.setFromUserName(msg.getToUserName());
-		rmsg.setToUserName(msg.getFromUserName());
+		Msg4Text rmsg =	new Msg4Text(msg);
 		StringBuilder content = new StringBuilder();
 		content.append(centerAligned("使用说明") + "\n");
 		content.append("--------1--------\n")
@@ -478,18 +484,23 @@ public class FinanceWeixinAction extends Action {
 	 * @param msg
 	 * @return
 	 */
-	private Msg doThisweek(Msg msg) {
+	private Msg doThisWeek(Msg msg) {
 
-		Msg4ImageText mit = new Msg4ImageText();
+		Msg4ImageText mit = new Msg4ImageText(msg);
 		
 		try{
 			int restaurantId = WeixinFinanceDao.getRestaurantIdByWeixin(msg.getFromUserName());
 			Calendar c = Calendar.getInstance();
-			c.add(Calendar.DAY_OF_MONTH, -(c.get(Calendar.DAY_OF_WEEK) - 2));
+			c.setFirstDayOfWeek(Calendar.MONDAY);
+			// first day of this week
+			c.set(Calendar.DAY_OF_WEEK, c.getFirstDayOfWeek());
 			long beginDate = c.getTimeInMillis();
 			
 			c.setTimeInMillis(System.currentTimeMillis());
-			c.add(Calendar.DAY_OF_MONTH, -1);
+			// the day before now of this week
+			if(c.get(Calendar.DAY_OF_WEEK) != Calendar.MONDAY){
+				c.add(Calendar.DAY_OF_WEEK, -1);
+			}
 			long endDate = c.getTimeInMillis();
 			
 			List<IncomeByEachDay> incomes = CalcBillStatisticsDao.calcIncomeByEachDay(StaffDao.getAdminByRestaurant(restaurantId), 
@@ -525,9 +536,6 @@ public class FinanceWeixinAction extends Action {
 			Data4Item d3 = new Data4Item("本周平均营业额：" + NumericUtil.CURRENCY_SIGN + NumericUtil.float2String2(averageIncome), 
 					 					 "", "http://www.yl-blog.com/template/ylblog/images/logo.png", ""); 
 			      
-			mit.setFromUserName(msg.getToUserName());
-			mit.setToUserName(msg.getFromUserName()); 
-			mit.setCreateTime(msg.getCreateTime());
 			mit.addItem(d1);
 			mit.addItem(d2);
 			mit.addItem(d3);
@@ -535,9 +543,7 @@ public class FinanceWeixinAction extends Action {
 			return mit;
 			
 		} catch (Exception e) {
-			Msg4Text rmsg =	new Msg4Text();
-			rmsg.setFromUserName(msg.getToUserName());
-			rmsg.setToUserName(msg.getFromUserName());
+			Msg4Text rmsg =	new Msg4Text(msg);
 			rmsg.setContent(e.getMessage());
 			//rmsg.setContent("对不起,暂时不能生成今日关注信息哦:-(");
 			return rmsg;
@@ -551,17 +557,24 @@ public class FinanceWeixinAction extends Action {
 	 */
 	private Msg doLastweek(Msg msg) {
 
-		Msg4ImageText mit = new Msg4ImageText();
+		Msg4ImageText mit = new Msg4ImageText(msg);
 		
 		try{
 			int restaurantId = WeixinFinanceDao.getRestaurantIdByWeixin(msg.getFromUserName());
 			
 			Calendar c = Calendar.getInstance();
-			c.add(Calendar.DAY_OF_MONTH, -(c.get(Calendar.DAY_OF_WEEK) + 5));
+			c.setFirstDayOfWeek(Calendar.MONDAY);
+		    // last week
+	        c.add(Calendar.WEEK_OF_YEAR, -1);
+	        // first day of last week
+	        c.set(Calendar.DAY_OF_WEEK, c.getFirstDayOfWeek());
 			long beginDate = c.getTimeInMillis();
 			
 			c.setTimeInMillis(System.currentTimeMillis());
-			c.add(Calendar.DAY_OF_MONTH, -(c.get(Calendar.DAY_OF_WEEK) - 1));
+	        // first day of this week
+	        c.set(Calendar.DAY_OF_WEEK, c.getFirstDayOfWeek());
+	        // last day of previous week
+	        c.add(Calendar.DAY_OF_MONTH, -1);
 			long endDate = c.getTimeInMillis();
 			
 			List<IncomeByEachDay> incomes = CalcBillStatisticsDao.calcIncomeByEachDay(StaffDao.getAdminByRestaurant(restaurantId), 
@@ -594,18 +607,13 @@ public class FinanceWeixinAction extends Action {
 			Data4Item d2 = new Data4Item("上周平均营业额：" + NumericUtil.CURRENCY_SIGN + NumericUtil.float2String2(averageIncome), 
 					 					 "", "http://www.yl-blog.com/template/ylblog/images/logo.png", ""); 
 			      
-			mit.setFromUserName(msg.getToUserName());
-			mit.setToUserName(msg.getFromUserName()); 
-			mit.setCreateTime(msg.getCreateTime());
 			mit.addItem(d1);
 			mit.addItem(d2);
 
 			return mit;
 			
 		} catch (Exception e) {
-			Msg4Text rmsg =	new Msg4Text();
-			rmsg.setFromUserName(msg.getToUserName());
-			rmsg.setToUserName(msg.getFromUserName());
+			Msg4Text rmsg =	new Msg4Text(msg);
 			rmsg.setContent(e.getMessage());
 			//rmsg.setContent("对不起,暂时不能生成今日关注信息哦:-(");
 			return rmsg;
@@ -821,13 +829,13 @@ public class FinanceWeixinAction extends Action {
 							.build();
 		menu.set1stButton(b1);
 		
-		Button b2 = new Button.ClickBuilder("周报", "BBB")
+		Button b2 = new Button.ClickBuilder("营业周报", "BBB")
 							.addChild(new Button.ClickBuilder("本周报表", THIS_WEEK_EVENT_KEY))
 							.addChild(new Button.ClickBuilder("上周报表", LAST_WEEK_EVENT_KEY))
 							.build();
 		menu.set2ndButton(b2);
 
-		Button b3 = new Button.ClickBuilder("月报", "AAA")
+		Button b3 = new Button.ClickBuilder("营业月报", "AAA")
 							.addChild(new Button.ClickBuilder("本月报表", THIS_MONTH_EVENT_KEY))
 							.addChild(new Button.ClickBuilder("上月报表", LAST_MONTH_EVENT_KEY))
 							.build();

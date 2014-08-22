@@ -19,12 +19,11 @@ import com.oreilly.servlet.multipart.FilePart;
 import com.oreilly.servlet.multipart.MultipartParser;
 import com.oreilly.servlet.multipart.Part;
 import com.wireless.db.staffMgr.StaffDao;
-import com.wireless.db.weixin.WeixinInfoDao;
 import com.wireless.db.weixin.restaurant.WeixinRestaurantDao;
 import com.wireless.json.JObject;
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
-import com.wireless.pojo.weixin.weixinInfo.WeixinInfo.UpdateBuilder;
+import com.wireless.pojo.weixin.restaurant.WeixinRestaurant;
 import com.wireless.util.OSSUtil;
 import com.wireless.util.WebParams;
 
@@ -76,7 +75,7 @@ public class WXOperateMaterialAction extends DispatchAction {
 	                		jobject.initTip(true, "操作成功, 读取上传图片信息成功!");
 	                		
 	                		// 记录图片素材信息
-	                		WeixinRestaurantDao.addImageMateril(Integer.valueOf(rid), key);
+	                		//WeixinRestaurantDao.addImageMaterial(Integer.valueOf(rid), key);
 	                		
 	                		// 原始图片
 	                		OSSUtil.uploadImage(uploadStream, key);
@@ -135,7 +134,7 @@ public class WXOperateMaterialAction extends DispatchAction {
 		JObject jobject = new JObject();
 		try{
 			int rid = Integer.valueOf(request.getAttribute("restaurantID").toString());
-			String oldImg = WeixinRestaurantDao.getLogo(rid);
+			String oldImg = WeixinRestaurantDao.get(StaffDao.getAdminByRestaurant(rid)).getWeixinInfo();
 			MultipartParser parser = null;
 			try{
 				parser = new MultipartParser(request, (100 * 1024), true, true);
@@ -166,8 +165,7 @@ public class WXOperateMaterialAction extends DispatchAction {
 
 	                		
 	                		// 记录图片素材信息
-//	                		WeixinRestaurantDao.updateLogo(Integer.valueOf(rid), key);
-	                		WeixinInfoDao.update(StaffDao.getAdminByRestaurant(Integer.valueOf(rid)), new UpdateBuilder(Integer.valueOf(rid)).setWeixinLogo(key));
+	                		WeixinRestaurantDao.update(StaffDao.getAdminByRestaurant(rid), new WeixinRestaurant.UpdateBuilder().setWeixinLogo(key));
 	                		
 	                		// 原始图片
 	                		OSSUtil.uploadImage(uploadStream, key);

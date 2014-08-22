@@ -14,7 +14,6 @@ import org.apache.struts.actions.DispatchAction;
 import com.wireless.db.DBCon;
 import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.db.staffMgr.StaffDao;
-import com.wireless.db.weixin.WeixinInfoDao;
 import com.wireless.db.weixin.restaurant.WeixinRestaurantDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
@@ -26,7 +25,7 @@ import com.wireless.pojo.restaurantMgr.Restaurant.InsertBuilder;
 import com.wireless.pojo.restaurantMgr.Restaurant.RecordAlive;
 import com.wireless.pojo.restaurantMgr.Restaurant.UpdateBuilder;
 import com.wireless.pojo.util.DateUtil;
-import com.wireless.pojo.weixin.weixinInfo.WeixinInfo;
+import com.wireless.pojo.weixin.restaurant.WeixinRestaurant;
 
 public class OperateRestaurantAction extends DispatchAction {
 	public ActionForward insert(ActionMapping mapping, ActionForm form,
@@ -174,15 +173,15 @@ public class OperateRestaurantAction extends DispatchAction {
 		JObject jobject = new JObject();
 		try{
 			String info = request.getParameter("info");
-			String rid = request.getAttribute("restaurantID").toString();
+			int rid = Integer.parseInt(request.getAttribute("restaurantID").toString());
 			
 			if(!info.isEmpty()){
-				info = info.replaceAll("&", "&amp;")
-						.replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll("\"", "&quot;")
-						.replaceAll("\n\r", "&#10;").replaceAll("\r\n", "&#10;").replaceAll("\n", "&#10;")
-						.replaceAll(" ", "&#032;").replaceAll("'", "&#039;").replaceAll("!", "&#033;");
+//				info = info.replaceAll("&", "&amp;")
+//						.replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll("\"", "&quot;")
+//						.replaceAll("\n\r", "&#10;").replaceAll("\r\n", "&#10;").replaceAll("\n", "&#10;")
+//						.replaceAll(" ", "&#032;").replaceAll("'", "&#039;").replaceAll("!", "&#033;");
 	    		
-	    		WeixinInfoDao.update(StaffDao.getAdminByRestaurant(Integer.parseInt(rid)), new WeixinInfo.UpdateBuilder(Integer.parseInt(rid)).setWeixinInfo(info));
+				WeixinRestaurantDao.update(StaffDao.getAdminByRestaurant(rid), new WeixinRestaurant.UpdateBuilder().setWeixinInfo(info));
 			}
 
     		
@@ -210,7 +209,7 @@ public class OperateRestaurantAction extends DispatchAction {
 	public ActionForward getInfo(ActionMapping mapping, ActionForm form, final HttpServletRequest request, HttpServletResponse response) throws Exception {
 		JObject jobject = new JObject();
 		try{
-			final String info = WeixinRestaurantDao.getInfo(Integer.valueOf(request.getAttribute("restaurantID").toString()));
+			final String info = WeixinRestaurantDao.get(StaffDao.getAdminByRestaurant(Integer.valueOf(request.getAttribute("restaurantID").toString()))).getWeixinInfo();
 			jobject.setExtra(new Jsonable(){
 
 				@Override
@@ -249,8 +248,7 @@ public class OperateRestaurantAction extends DispatchAction {
 			throws Exception {
 		JObject jobject = new JObject();
 		try{
-			final StringBuilder logo = new StringBuilder(WeixinRestaurantDao.getLogo(Integer.valueOf(request.getAttribute("restaurantID").toString())));
-			
+			final StringBuilder logo = new StringBuilder(WeixinRestaurantDao.get(StaffDao.getAdminByRestaurant(Integer.valueOf(request.getAttribute("restaurantID").toString()))).getWeixinLogo());
 			if(logo.length() == 0){
 				logo.setLength(0);
 				logo.append(getServlet().getInitParameter("imageBrowseDefaultFile"));

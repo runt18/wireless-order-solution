@@ -8,6 +8,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
+import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.system.BillBoardDao;
 import com.wireless.db.weixin.restaurant.WeixinRestaurantDao;
 import com.wireless.json.JObject;
@@ -59,8 +60,9 @@ public class WXQueryInfoAction extends DispatchAction{
 		response.setCharacterEncoding("UTF-8");
 		JObject jobject = new JObject();
 		try{
-			String logo = WeixinRestaurantDao.getLogoByRestaurantSerial(request.getParameter("fid"));
-			if(logo == null || logo.trim().isEmpty()){
+			int restaurantId = WeixinRestaurantDao.getRestaurantIdByWeixin(request.getParameter("fid"));
+			String logo = WeixinRestaurantDao.get(StaffDao.getAdminByRestaurant(restaurantId)).getWeixinLogo();
+			if(logo.trim().isEmpty()){
 				logo = getServlet().getInitParameter("imageBrowseDefaultFile");
 			}else{
 				logo = "http://" + getServlet().getInitParameter("oss_bucket_image")

@@ -1,8 +1,12 @@
 package com.wireless.Actions.weixin;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Writer;
+import java.sql.SQLException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -12,8 +16,15 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.marker.weixin.DefaultSession;
+import org.marker.weixin.api.Button;
+import org.marker.weixin.api.Menu;
+import org.marker.weixin.api.Token;
 
+import com.wireless.db.restaurantMgr.RestaurantDao;
+import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.weixin.restaurant.WeixinRestaurantDao;
+import com.wireless.exception.BusinessException;
+import com.wireless.pojo.weixin.restaurant.WeixinRestaurant;
 
 public class EntryAction extends Action{
 	
@@ -26,12 +37,37 @@ public class EntryAction extends Action{
 	 * @return
 	 * @throws Exception
 	 */
-	public ActionForward execute(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
+	public ActionForward execute(ActionMapping mapping, ActionForm form, final HttpServletRequest request, HttpServletResponse response) throws Exception {
 		String method = request.getMethod();
-		if(method.toLowerCase().equals("get")){
+		if(method.equalsIgnoreCase("get")){
 			verify(request, response);
+			final String appId = request.getParameter("appid");
+			final String appSecret = request.getParameter("secret");
+			//System.out.println("appId:" + appId + ", appSecret:" + appSecret);
+			if(appId != null && appSecret != null){
+				Executors.newScheduledThreadPool(1).schedule(new Runnable(){
+
+					@Override
+					public void run() {
+						try{
+							Menu menu = new Menu();
+							Token token = Token.newInstance(appId, appSecret);
+							Menu.delete(token);
+							menu.set1stButton(new Button.ClickBuilder("餐厅导航", WeiXinHandleMessage.NAVI_EVENT_KEY).build());
+							menu.set2ndButton(new Button.ClickBuilder("最新优惠", WeiXinHandleMessage.PROMOTION_EVENT_KEY).build());
+							menu.set3rdButton(new Button.ClickBuilder("会员信息", WeiXinHandleMessage.MEMBER_EVENT_KEY).build());
+							if(menu.create(token).isOk()){
+								//Record the app id & secret.
+								WeixinRestaurantDao.update(StaffDao.getAdminByRestaurant(RestaurantDao.getByAccount(request.getParameter("account")).getId()), 
+														   new WeixinRestaurant.UpdateBuilder().setWeixinAppId(appId).setWeixinAppSecret(appSecret));
+							}
+						} catch (IOException | SQLException | BusinessException e) {
+							e.printStackTrace();
+						}
+					}
+					
+				}, 5, TimeUnit.SECONDS);
+			}
 		}else{
 			reply(request, response);
 		}
@@ -42,28 +78,18 @@ public class EntryAction extends Action{
 	 * 回复信息
 	 * @param request
 	 * @param response
-	 * @throws Exception
+	 * @throws IOException 
 	 */
-	public void reply(HttpServletRequest request, HttpServletResponse response) throws Exception {
+	private void reply(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		InputStream is = request.getInputStream();
 		OutputStream os = response.getOutputStream();
 		DefaultSession session = DefaultSession.newInstance();
 		try{
 			String account = request.getParameter("account");
-			session.addOnHandleMessageListener(new WeiXinRestaurantHandleMessageAdapter(session, account));
-		}finally{
+			session.addOnHandleMessageListener(new WeiXinHandleMessage(session, account));
 			session.process(is, os);
+		}finally{
 			session.close();
-			session = null;
-			if(is != null){
-				is.close();
-				is = null;
-			}
-			if(os != null){
-				os.flush();
-				os.close();
-				os = null;
-			}
 		}
 	}
 	
@@ -71,9 +97,9 @@ public class EntryAction extends Action{
 	 * 验证
 	 * @param request
 	 * @param response
-	 * @throws Exception
+	 * @throws IOException 
 	 */
-	public void verify(HttpServletRequest request, HttpServletResponse response) throws Exception {
+	private void verify(HttpServletRequest request, HttpServletResponse response) throws IOException  {
 		Writer out = response.getWriter();
 		String account = request.getParameter("account");
 		String result = "";
