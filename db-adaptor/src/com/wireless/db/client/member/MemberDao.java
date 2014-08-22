@@ -23,6 +23,7 @@ import com.wireless.pojo.client.MemberOperation.ChargeType;
 import com.wireless.pojo.client.MemberType;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.distMgr.Discount;
+import com.wireless.pojo.distMgr.Discount.Type;
 import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.promotion.Coupon;
 import com.wireless.pojo.restaurantMgr.Module;
@@ -309,7 +310,7 @@ public class MemberDao {
 			eachMember.getMemberType().copyFrom(MemberTypeDao.getMemberTypeById(dbCon, staff, eachMember.getMemberType().getId()));
 			
 			//Get the discounts to each member
-			sql = " SELECT MD.discount_id, MD.type, D.name FROM " + Params.dbName + ".member_type_discount MD " +
+			sql = " SELECT MD.discount_id, MD.type, D.name, D.type AS d_type FROM " + Params.dbName + ".member_type_discount MD " +
 					" JOIN " + Params.dbName + ".discount D " +
 					" ON MD.discount_id = D.discount_id " +
 					" WHERE member_type_id = " + eachMember.getMemberType().getId();
@@ -317,6 +318,7 @@ public class MemberDao {
 			while(dbCon.rs.next()){
 				Discount discount = new Discount(dbCon.rs.getInt("MD.discount_id"));
 				discount.setName(dbCon.rs.getString("D.name"));
+				discount.setType(Type.valueOf(dbCon.rs.getInt("d_type")));
 				eachMember.getMemberType().addDiscount(discount);
 				if(MemberType.DiscountType.valueOf(dbCon.rs.getInt("type")) == MemberType.DiscountType.DEFAULT){
 					eachMember.getMemberType().setDefaultDiscount(discount);
