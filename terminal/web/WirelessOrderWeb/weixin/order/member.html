@@ -90,10 +90,45 @@
     left:-2px;
      z-index:-1;
 }
- 
-.a_demo_two:active::before {
-    top:-2px;
+
+.a_demo_twos {
+    background-color:#6fba26;
+    padding:5px 15px 5px;
+    position:relative;
+    font-family: 'Open Sans', sans-serif;
+    font-size:12px;
+    text-decoration:none;
+    color:#fff;
+    background-image: linear-gradient(bottom, rgb(100,170,30) 0%, rgb(129,212,51) 100%);
+    box-shadow: inset 0px 1px 0px #2ab7ec, 0px 3px 0px 0px #156785, 0px 4px 4px #999;
+    border-radius: 5px;
 }
+ 
+.a_demo_twos:active {
+    top:4px;
+    background-image: linear-gradient(bottom, rgb(100,170,30) 100%, rgb(129,212,51) 0%);
+    box-shadow: inset 0px 1px 0px #2ab7ec, 0px 2px 0px 0px #156785, 0px 5px 3px #999;
+    color: #156785;
+    text-shadow: 0px 1px 1px rgba(255,255,255,0.3);
+    background: rgb(44,160,202);
+}
+.a_demo_twos:before {
+    background-color:#072239 ;
+    content:"";
+    display:block; 
+    position:absolute;
+    width:100%;
+    height:100%;
+    padding-left:2px;
+    padding-right:2px;
+    padding-bottom:4px;
+    left:-2px;
+     z-index:-1;
+}
+ 
+/* .a_demo_two:active::before {
+    top:-2px;
+} */
 
 #ulMemberPrivilegeDetail{
 	margin-left: 25px;
@@ -105,6 +140,11 @@
 	font-weight : bold;
 	font-size: 20px;
 	font-style: italic;
+}
+
+.memberTypeBaseDesc{
+	color:maroon;
+	font-size: 14px;
 }
 
 </style>
@@ -144,8 +184,8 @@ var totalMath = 0;
 <div id="divMemberCard" class="main-box">
 <div data-type="r">
 	<!-- <div id="divRestaurantName" data-type="top">--</div> -->
+	<div id="divWXMemberCard" data-type="bottom">微信卡号:1000000</div>
 	<div id="divMemberTypeName" data-type="bottom">未激活</div>
-	<div id="divWXMemberCard" data-type="bottom">1000000</div>
 </div>
 </div>
 
@@ -154,31 +194,21 @@ var totalMath = 0;
 <ul class="m-b-list">
 	<!-- <li class="box-horizontal" onclick="Util.skip('member_data_dateil.html')"> -->
 	<li class="box-horizontal">
-		<div>会员名: <span id="spanMemberName">--</span></div>
-		<!-- <div class="event">完善资料&nbsp;&gt;</div> -->
+		<div style="width:45%">会员名: <span id="spanMemberName">--</span></div>
+		<div>手机号: <span id="spanMemberMobile">--</span></div>
 	</li>
-	<li class="box-horizontal">
+<!-- 	<li class="box-horizontal">
 		<div>手机号: <span id="spanMemberMobile">--</span></div>
 		<div class="event"><a onclick="Util.dialog.show({ msg : '重新绑定手机号需要到前台办理.' })">重新绑定</a>&nbsp;&gt;</div>
-	</li>
+	</li> -->
 </ul>
 </div>
 
-<div id="divMemberTypeContent" class="main-box">
+<div id="divMemberBalanceAndPiont" class="main-box">
 <ul class="m-b-list">
-	<li class="box-horizontal">
-		<div >等&nbsp;&nbsp;级: <span id="spanMemberTypeName" >--.--</span>&nbsp;<font id="fontMemberDiscount" style="color : red;font-size: 13px;font-weight: bold;">8.8</font></div>
-		<!-- <div class="event">完善资料&nbsp;&gt;</div> -->
-		
-	</li>
-	<li class="box-horizontal none-line" onclick="toggleMemberLevel()">
-		<div style="font-size: 13px;font-weight: bold;">累计积分:<font id="fontMemberPoint" style="color : red;">0</font>分,打败了<font id="fontDefeatMemberCount" style="color : red;">0%</font>的会员</div>
-		<div class="event">更多等级&nbsp;&gt;</div>
-	</li>
-	<li style="overflow: hidden;"><div></div>
-		<div id="divMemberLevelChart" style="height: 400px;display:none;"></div>
-		<!-- <div id="divMemberTypeDesc" style="display:none;"> </div>-->
-		
+	<li class="box-horizontal none-line" >
+		<div style="width:45%">余&nbsp;&nbsp;额: <span id="spanMemberTotalBalance" style="color:#26a9d0;">--.--</span>&nbsp;元</div>
+		<div >当前积分: <span id="spanMemberPoint" style="color:#FF4500;">--.--</span>&nbsp;分</div>
 	</li>
 </ul>
 </div>
@@ -186,23 +216,22 @@ var totalMath = 0;
 <div id="divMemberPointContent" class="main-box">
 <ul class="m-b-list">
 	<li class="box-horizontal none-line" onclick="toggleConsumeDetails()">
-		<div >当前积分: <span id="spanMemberPoint" style="color:#FF4500;">--.--</span>&nbsp;分</div>
+		<div >最近消费: <span id="spanNearByCost" style="color:#FF4500;">0</span>&nbsp;元</div>
 		<div class="event">消费记录&nbsp;&gt;</div>
 	</li>
 	<li>
-		<div id="divConsumeDetails" style="display:none; width:100%; ">
-		<table class="d-list" style="">
-			<thead>
-			<tr class="d-list-title">
-				<td style="width:50%;">消费时间</td>
-				<td style="width:25%;">消费金额</td>
-				<td style="width:25%;">消费积分</td>
-			</tr>
-			</thead>
-			<tbody>
-			</tbody>
-		</table>
-		<div style="color:#595959;" onclick="toggleConsumeDetails.load()">提示:显示近5条消费记录.<span style="color:#898989;">点击刷新</span></div>
+		<div id="divConsumeDetails" style="display:none; width:97%;border:groove 3px Gainsboro;border-radius:5px;margin-bottom: 5px;	">
+			<table class="d-list" style="">
+				<thead>
+				<tr class="d-list-title">
+					<td style="width:50%;text-align: center;">消费时间</td>
+					<td style="width:25%;">消费金额</td>
+					<td style="width:25%;">消费积分</td>
+				</tr>
+				</thead>
+				<tbody>
+				</tbody>
+			</table>
 		</div>
 	</li>
 </ul>
@@ -211,26 +240,51 @@ var totalMath = 0;
 <div id="divMemberBalanceContent" class="main-box">
 <ul class="m-b-list">
 	<li class="box-horizontal none-line" onclick="toggleRechargeDetails()">
-		<div>余&nbsp;&nbsp;额: <span id="spanMemberTotalBalance" style="color:#26a9d0;">--.--</span>&nbsp;元</div>
+		<div >最近充值: <span id="spanNearByCharge" style="color:#FF4500;">0</span>&nbsp;元</div>
 		<div class="event">充值记录&nbsp;&gt;</div>
 	</li>
 	<li>
-		<div id="divRechargeDetails" style="display:none; width:100%; ">
-		<table class="d-list">
-			<thead>
-			<tr class="d-list-title">
-				<td style="width:50%;">充值时间</td>
-				<td style="width:25%;">充值实收</td>
-				<td style="width:25%;">充值金额</td>
-			</tr>
-			</thead>
-			<tbody>
-			</tbody>
-		</table>
-		<div style="color:#595959;" onclick="toggleRechargeDetails.load()">提示:显示近5条充值记录.<span style="color:#898989;">点击刷新</span></div>
+		<div id="divRechargeDetails" style="display:none;width:97%;border:groove 3px Gainsboro;border-radius:5px;margin-bottom: 5px;">
+			<table class="d-list">
+				<thead>
+				<tr class="d-list-title">
+					<td style="width:50%;text-align: center;">充值时间</td>
+					<td style="width:25%;">充值实收</td>
+					<td style="width:25%;">充值金额</td>
+				</tr>
+				</thead>
+				<tbody>
+				</tbody>
+			</table>
 		</div>
 	</li>
 </ul>
+</div>
+
+<div id="divMemberTypeContent" class="main-box">
+<ul class="m-b-list">
+	<li class="box-horizontal">
+		<div >等&nbsp;&nbsp;级: <span id="spanMemberTypeName" >--.--</span>&nbsp;<font id="fontMemberDiscount" style="color : red;font-size: 13px;font-weight: bold;">8.8折扣</font></div>
+		<!-- <div class="event">完善资料&nbsp;&gt;</div> -->
+		
+	</li>
+	<li class="box-horizontal none-line" onclick="toggleMemberLevel()">
+		<div style="font-size: 13px;font-weight: bold;">累计积分:<font id="fontMemberPoint" style="color : red;">0</font>分,打败了<font id="fontDefeatMemberCount" style="color : red;">0%</font>的会员</div>
+		<div class="event">更多等级&nbsp;&gt;</div>
+	</li>
+	<li style="overflow: hidden;"><div></div>
+		<div id="divMemberLevelChart" style="height: 320px;display:none;"></div>
+		<!-- <div id="divMemberTypeDesc" style="display:none;"> </div>-->
+		
+	</li>
+</ul>
+</div>
+
+<div id="divCurrentMemberTypeDesc" class="main-box">
+	<div style="margin: 10px;">
+		<span>会员特权:</span>
+		<span id="spanCurrentMemberTypeDesc" style="font-size: 15px;color:maroon"></span>
+	</div> 
 </div>
 
 <div id="divMemberCouponContent" class="main-box">
@@ -304,47 +358,36 @@ var totalMath = 0;
 	
 </div>
 
-<div id="divMemberPrivilegeDetail" class="main-box" style="margin-top: 10px;padding-top: 5px;padding-bottom: 5px;">
+<div id="divMemberPrivilegeDetail" class="main-box" style="margin-top: 10px;padding-top: 5px;padding-bottom: 5px;display: none;">
 	<span style="margin-left: 5px;font-size: 19px;">激活成为微信会员，可享受:</span>
-	<ul id="ulMemberPrivilegeDetail" >
-<!-- 		<li>全单8折优惠</li>
-		<li>1.1倍充值特权，充100送10元</li>
-		<li>1.1倍积分特权，消费1元积1.1分</li> -->
-	</ul>
+	<ul id="ulMemberPrivilegeDetail" ></ul>
 </div>
 
 <div id="divVerifyAndBind" class="main-box" style="margin-top: 10px;">
 <ul class="m-b-list" >
 	<li class="box-horizontal" >
 		<!-- <div style="line-height: 55px;" onclick="javascript:$('#ulVerifyAndBind').hide();">激活后可享受更多优惠</div> -->
-		<div style="margin-top: 3px;height: 55px;width: 100%;text-align: center;" >
+		<div id="btn_activate" style="margin-top: 3px;height: 55px;width: 100%;text-align: center;" >
 			<a href="#" class="a_demo_two" style="font-size: 20px;font-weight: bold;" onclick="showMemberBind()">激活</a>	
 		
 		</div>
 	</li>		
 	<li id="ulVerifyAndBind" style="display: none;">
 	<ul class="m-b-list">
-	<li class="none-line" style="line-height: 50px;">
-		手机号: <input id="txtVerifyMobile" type="number" maxlength="11"/>
-	</li>
-	<li class="none-line" style="line-height: 50px;">
-		验证码: <input id="txtVerifyCode" type="number" maxlength="4" style="width:80px;"/>
-<!-- 		<div style="border:1px solid;
-					border-radius:5px;background-color: cyan" id="btnVerifyCode" onClick="getVerifyCode({event:this})">点击获取验证码</div> -->
-		<a id="btnVerifyCode" href="#" style="color: blue;" ></a>
-	</li>
-<!-- 	<li class="none-line">
-		会员名: <input id="txtVerifyName" type="text"/>
-	</li>
-	<li class="none-line" style="line-height:50px;">
-		性&nbsp;&nbsp;别: 
-		<span onclick="this.childNodes[0].checked=true;"><input type="radio" value="0" name="radioVerifySex" checked/>&nbsp;男</span>&nbsp;&nbsp;
-		<span onclick="this.childNodes[0].checked=true;"><input type="radio" value="1" name="radioVerifySex"/>&nbsp;女</span>
-	</li> -->
-	<li style="text-align: center;">
-		<input id="btnGetVerifyCode" type="button" value="获取验证码" onClick="getVerifyCode({event:this})">
-		<input id="btnBindMember" type="button" value="确认绑定"  style="display: none;"  onClick="bindMember({event:this})">
-	</li>
+		<li class="none-line" style="line-height: 50px;padding-top: 10px;">
+			手机号: <input id="txtVerifyMobile" type="number" maxlength="11"/>
+		</li>
+		<li class="none-line" style="line-height: 50px;">
+			<div style="width:100%;">
+				验证码: <input id="txtVerifyCode" type="number" maxlength="4" style="width:80px;"/>&nbsp;&nbsp;&nbsp;
+	<!-- 			<a id="btnVerifyCode" href="#" style="color: blue;" ></a> -->
+				<input id="btnGetVerifyCode" type="button" value="获取验证码" onClick="getVerifyCode({event:this})">
+				<input id="btnBindMember" type="button" value="确认绑定"  style="display: none;"  onClick="bindMember({event:this})">
+			</div>
+		<li style="text-align: center;">
+			<a id="btnVerifyCode" href="#" style="color: blue;" ></a>
+	
+		</li>
 	</ul>
 	</li>
 </ul>

@@ -24,9 +24,8 @@ function initMemberMsg(c){
 	typeName.html(typeof data.memberType.name == 'undefined' ? '--' : data.memberType.name);
 	typeNameInCard.html(typeof data.memberType.name == 'undefined' ? '未激活' : data.memberType.name);
 //	weixinMemberCard.html(typeof data.memberType.name == 'undefined' ? '未激活' : data.memberType.name);
-	defaultMemberDiscount.html(typeof data.memberType.discount == 'undefined' ? '' : data.memberType.discount.name);
+	defaultMemberDiscount.html(typeof data.memberType.discount != 'undefined' && data.memberType.discount.type != 2 ? data.memberType.discount.name : '');
 	memberTotalPoint.html(typeof data.totalPoint == 'undefined' ? '--' : data.totalPoint);
-	
 }
 
 function setBtnDisabled(s){
@@ -263,10 +262,20 @@ function bindMemberByReset(c){
 		}
 	});
 }
+
+function fnDateInChinese(date){
+	var month = date.substring(5, 7);
+	var day = date.substring(8, 10);
+	var time = date.substring(11, date.length - 3);
+	
+	return month+ '月' +day + '日' + ' ' + time;
+	
+}
 /**
  * 查看消费明细
  */
 function toggleConsumeDetails(){
+	
 	var mainView = $('#divConsumeDetails');
 	var tbody = mainView.find('table > tbody');
 	var templet = '<tr class="d-list-item">'
@@ -276,6 +285,8 @@ function toggleConsumeDetails(){
 		+ '</tr>';
 	mainView.fadeToggle(function(){
 		if(mainView.css('display') == 'block'){
+			$('html, body').animate({scrollTop: 0}, 'fast'); 
+			$('html, body').animate({scrollTop: 300}, 'fast'); 
 			if(!toggleConsumeDetails.load){
 				// 加载近5条消费记录
 				toggleConsumeDetails.load = function(){
@@ -296,7 +307,7 @@ function toggleConsumeDetails(){
 								for(var i = 0; i < data.root.length; i++){
 									temp = data.root[i];
 									html.push(templet.format({
-										date : temp.operateDateFormat.substring(0, temp.operateDateFormat.length - 3),
+										date : fnDateInChinese(temp.operateDateFormat),
 										balance : temp.deltaTotalMoney.toFixed(2),
 										point : temp.deltaPoint.toFixed(0)
 									}));
@@ -332,6 +343,9 @@ function toggleRechargeDetails(){
 		+ '</tr>';
 	mainView.fadeToggle(function(){
 		if(mainView.css('display') == 'block'){
+			$('html, body').animate({scrollTop: 0}, 'fast');
+//			console.log(300+$('#divMemberBalanceContent').height() - $(document).scrollTop())
+			$('html, body').animate({scrollTop: 270+$('#divMemberBalanceContent').height()}, 'fast');
 			if(!toggleRechargeDetails.load){
 				// 加载近5条消费记录
 				toggleRechargeDetails.load = function(){
@@ -352,7 +366,7 @@ function toggleRechargeDetails(){
 								for(var i = 0; i < data.root.length; i++){
 									temp = data.root[i];
 									html.push(templet.format({
-										date : temp.operateDateFormat.substring(0, temp.operateDateFormat.length - 3),
+										date : fnDateInChinese(temp.operateDateFormat),
 										chargeMoney : temp.chargeMoney.toFixed(2),
 										deltaTotalMoney : temp.deltaTotalMoney.toFixed(2)
 									}));
@@ -559,13 +573,14 @@ function toggleMemberLevel(){
 						}
 						Util.lm.hide();
 					});*/
-					
+					$('html, body').animate({scrollTop: 0});
+					$('html, body').animate({scrollTop: 300+$('#divMemberPointContent').height()+$('#divMemberBalanceContent').height()}, 'fast');					
 					$.post('../../QueryMemberLevel.do', {dataSource : 'chart', rid:member.restaurant.id}, function(result){
 						if(result.success){
 //							totalMath = result.root[result.root.length - 1].pointThreshold;
 //							member.totalPoint = member.totalPoint >= totalMath ? totalMath : member.totalPoint; 
 							mainView.prepend('<h3>会员等级列表</h3>');
-							mainView.css('margin-left', '-45%');
+							mainView.css('margin-left', '-40%');
 							
 							memberLevelData = result.root;
 							memberLevelData.push(currentMemberLevelData);
@@ -606,23 +621,32 @@ function weixinPhoneFocus(){
 
 
 function showMemberBind(){
+	$('#btn_activate').hide();
 	$('#ulVerifyAndBind').show();
 //	$('#divOccupyHtml').show();
-	$('html, body').animate({scrollTop: 180+$('#divMemberPrivilegeDetail').height()}, 'fast'); 
+	$('html, body').animate({scrollTop: 160+$('#divMemberPrivilegeDetail').height()}, 'fast'); 
 //	$('#txtVerifyMobile').focus();
+	weixinPhoneFocus();
 	weixinPhoneFocus();
 }
 
-function getLevelChartInfo(x){
-	for (var i = 0; i < memberLevelData.length; i++) {
-		if(memberLevelData[i].pointThreshold == x){
-			return '<span style="font-size : 15px;">' + memberLevelData[i].memberTypeName + (memberLevelData[i].pointThreshold >0 ? '-' + memberLevelData[i].pointThreshold +'分' :'')+ '</span>'
-					+ (memberLevelData[i].discount.type != 2 ? '<br/>' + '<font style="color:maroon">' + memberLevelData[i].discount.name : '') + '</font>' 
-					+ (memberLevelData[i].chargeRate >1 ? '<br/>'+ '<font style="color:maroon">' + memberLevelData[i].chargeRate +'倍充值优惠, 充100送'+parseInt((memberLevelData[i].chargeRate-1)*100)+'元':'')  + '</font>' 
-					+ (memberLevelData[i].exchangeRate >1 ? '<br/>'+ '<font style="color:maroon">' + memberLevelData[i].exchangeRate +'倍积分特权, 消费1元积'+parseInt(memberLevelData[i].exchangeRate)+'分':'') + '</font>' 
-					;
-		}
-	}		
+function getLevelChartInfo(x,point){
+	var temp = {};
+	if(point){
+		temp = currentMemberLevelData;
+	}else{
+		for (var i = 0; i < memberLevelData.length; i++) {
+			if(memberLevelData[i].pointThreshold == x){
+				temp = memberLevelData[i];
+				break;
+			}
+		}	
+	}
+	return '<span style="font-size : 15px;">' + temp.memberTypeName + (temp.pointThreshold >0 || point? '-' + temp.pointThreshold +'分' :'')+ '</span>'
+			+ (temp.discount.type != 2 ? '<br/>' + '<font style="font-size: 13px;color:maroon">' + temp.discount.name : '') + '</font>' 
+			+ (temp.chargeRate >1 ? '<br/>'+ '<font style="font-size: 13px;color:maroon">' + temp.chargeRate +'倍充值优惠, 充100送'+parseInt((temp.chargeRate-1)*100)+'元':'')  + '</font>' 
+			+ (temp.exchangeRate >1 ? '<br/>'+ '<font style="font-size: 13px;color:maroon">' + temp.exchangeRate +'倍积分特权, 消费1元积'+parseInt(temp.exchangeRate)+'分':'') + '</font>' 
+			;		
 }
 
 function member_loadMemberTypeChart(c){
@@ -666,6 +690,7 @@ function member_loadMemberTypeChart(c){
 			        enabled: false
 			    },
 			    tooltip: {
+			    	enabled : false,
 			        headerFormat: '<b>{series.name}</b><br/>',
 			        pointFormat: '{point.x} km: {point.y}°C',
 			        followPointer : true
@@ -683,7 +708,7 @@ function member_loadMemberTypeChart(c){
 								color: 'green'
 							},
 							formatter : function(){
-				                return getLevelChartInfo(this.x);
+				                return getLevelChartInfo(this.x, this.point.memberTypeName);
 							}
 						},
 						marker: {
