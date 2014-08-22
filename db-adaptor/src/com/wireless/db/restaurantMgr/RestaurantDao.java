@@ -23,7 +23,7 @@ import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.system.BusinessHourDao;
 import com.wireless.db.tasteMgr.TasteCategoryDao;
 import com.wireless.db.tasteMgr.TasteDao;
-import com.wireless.db.weixin.WeixinInfoDao;
+import com.wireless.db.weixin.restaurant.WeixinRestaurantDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.ModuleError;
 import com.wireless.exception.RestaurantError;
@@ -48,7 +48,6 @@ import com.wireless.pojo.system.BusinessHour;
 import com.wireless.pojo.tasteMgr.Taste;
 import com.wireless.pojo.tasteMgr.TasteCategory;
 import com.wireless.pojo.util.DateUtil;
-import com.wireless.pojo.weixin.weixinInfo.WeixinInfo;
 
 public class RestaurantDao {
 	
@@ -402,8 +401,8 @@ public class RestaurantDao {
 			//Insert the printers
 			initPrinter(dbCon, staff);
 			
-			//Insert the weixin_misc
-			initWeixinMisc(dbCon, staff);
+			//Insert the weixin restaurant
+			initWeixinRestaurant(dbCon, staff);
 			
 			//Insert the module
 			initModule(dbCon, staff, restaurant);
@@ -460,8 +459,8 @@ public class RestaurantDao {
 		}
 	}
 	
-	private static void initWeixinMisc(DBCon dbCon, Staff staff) throws SQLException{
-		WeixinInfoDao.insert(dbCon, staff, new WeixinInfo.InsertBuilder(staff.getRestaurantId()));
+	private static void initWeixinRestaurant(DBCon dbCon, Staff staff) throws SQLException{
+		WeixinRestaurantDao.insert(dbCon, staff);
 	}
 	
 	private static void initPrinter(DBCon dbCon, Staff staff) throws SQLException, BusinessException{
@@ -881,7 +880,7 @@ public class RestaurantDao {
 		dbCon.stmt.executeUpdate(sql);
 		
 		//Delete the weixin misc
-		sql = " DELETE FROM " + Params.dbName + ".weixin_misc WHERE restaurant_id = " + restaurantId;
+		sql = " DELETE FROM " + Params.dbName + ".weixin_restaurant WHERE restaurant_id = " + restaurantId;
 		dbCon.stmt.executeUpdate(sql);
 		
 		//Delete the restaurant module
