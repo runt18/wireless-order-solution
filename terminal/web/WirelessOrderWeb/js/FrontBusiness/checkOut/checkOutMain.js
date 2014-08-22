@@ -95,6 +95,13 @@ var checkOutMainPanelTbar = new Ext.Toolbar({
 				loadTableData();
 			}
 		}
+	}, {
+		xtype : 'tbtext',
+		text : '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font style="font-size:16px;">人数:</font>'
+	},{
+		xtype : 'numberfield',
+		id : 'numCustomNum',
+		width : 50
 	}]
 });
 

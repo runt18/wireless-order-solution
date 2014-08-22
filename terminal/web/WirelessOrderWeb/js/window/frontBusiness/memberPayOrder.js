@@ -95,7 +95,7 @@ Ext.onReady(function(){
 			xtype : 'panel',
 			region : 'north',
 //			width : 400,
-			height : 85,
+			height : 95,
 			layout : 'column',
 			defaults : {
 				layout : 'form',
@@ -109,13 +109,17 @@ Ext.onReady(function(){
 				}
 			},
 			items : [{
-				labelWidth : 80,
+				columnWidth : .4,
+				labelWidth : 120,
 				items : [{
 					xtype : 'numberfield',
 					id : 'mpo_numMemberMobileForPayOrder',
-					fieldLabel : '手机号/卡号',
+					fieldLabel : '<font style="font-size:18px;">手机号/卡号</font>',
 					disabled : false,
-//					value : 13533464033,
+					width : 150,
+					height : 30,
+					style : 'font-size:20px;color:Brown',					
+//					value : '手机号/卡号',
 					listeners : {
 						render : function(thiz){
 							thiz.setDisabled(false);
@@ -134,10 +138,12 @@ Ext.onReady(function(){
 				html : ['',
 //				    '<input type="button" value="查找" onClick="memberPayOrderSreachMemberCard()" style="cursor:pointer; width:50px; " />',
 //				    '&nbsp;&nbsp;',
-				    '&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" value="读取会员" onClick="memberPayOrderToLoadData({otype:0})" style="cursor:pointer; width:70px; " />'
+				    '<input type="button" value="读取会员" onClick="memberPayOrderToLoadData({otype:0})" style="cursor:pointer;width:90px;font-size:18px;" />'
 //				    '&nbsp;&nbsp;',
 //				    '<input type="button" value="充值" onClick="memberPayOrderRecharge()" style="cursor:pointer; width:50px;" />',
 				].join('')
+			}, {
+				columnWidth : 1
 			}, {
 				items : [{
 					id : 'mpo_txtNameForPayOrder',
@@ -150,20 +156,20 @@ Ext.onReady(function(){
 					fieldLabel : '会员类型',
 					text : '----'
 				}]
-			}, {
-				columnWidth : 1
 			},{
 				items : [{
 					id : 'mpo_txtTotalBalanceForPayOrder',
-					fieldLabel : '余额总额',
+					fieldLabel : '会员余额',
 					text : '----'
 				}]
 			},{
 				items : [{
 					id : 'mpo_txtTotalPointForPayOrder',
-					fieldLabel : '剩余积分',
+					fieldLabel : '会员积分',
 					text : '----'
 				}]
+			}, {
+				columnWidth : 1
 			}, 
 			{
 				items : [{
@@ -203,7 +209,7 @@ Ext.onReady(function(){
 										});	
 										mpo_memberDetailData.newOrder = no;
 										checkOut_actualPrice = no['actualPrice'];
-										Ext.getCmp('mpo_txtMemberPriceForPayOrder').setText(no['actualPrice'].toFixed(2));
+//										Ext.getCmp('mpo_txtMemberPriceForPayOrder').setText(no['actualPrice'].toFixed(2));
 										Ext.getDom('mpo_txtPayMoneyForPayOrder').text = no['actualPrice'].toFixed(2);
 									}else{
 										Ext.example.msg(jr.title, jr.msg);
@@ -215,31 +221,6 @@ Ext.onReady(function(){
 							});
 						}
 					}
-				}]
-			},{
-				items : [{
-					id : 'mpo_txtOrderPriceForPayOrder',
-					fieldLabel : '账单原价',
-					text : '----'
-				}]
-			}, {
-				columnWidth : 1
-			}, {
-				items : [{
-					id : 'mpo_txtMemberPriceForPayOrder',
-					fieldLabel : '会员价',
-					text : '----'
-				}]
-			}, {
-				items : [{
-					xtype : 'numberfield',
-					id : 'mpo_numCustomNumberForPayOrder',
-					fieldLabel : '就餐人数',
-					value : 1,
-					allowBlank : false,
-					maxValue : 65535,
-					minValue : 1,
-					disabled : false
 				}]
 			}, {
 				items : [{
@@ -257,6 +238,17 @@ Ext.onReady(function(){
 					mode : 'local',
 					triggerAction : 'all',
 					selectOnFocus : true
+				}]
+			}, {
+				items : [{
+					xtype : 'numberfield',
+					id : 'mpo_numCustomNumberForPayOrder',
+					fieldLabel : '就餐人数',
+					value : 1,
+					allowBlank : false,
+					maxValue : 65535,
+					minValue : 1,
+					disabled : false
 				}]
 			}, {
 				items : [{
@@ -295,7 +287,7 @@ Ext.onReady(function(){
 											data : jr
 										});	
 										mpo_memberDetailData.newOrder = no;
-										Ext.getCmp('mpo_txtMemberPriceForPayOrder').setText(no['actualPrice'].toFixed(2));
+//										Ext.getCmp('mpo_txtMemberPriceForPayOrder').setText(no['actualPrice'].toFixed(2));
 										Ext.getDom('mpo_txtPayMoneyForPayOrder').value = no['actualPrice'].toFixed(2);
 									}else{
 										Ext.example.msg(jr.title, jr.msg);
@@ -393,8 +385,8 @@ function memberPayOrderToBindData(_c){
 //	var extraBalance = Ext.getCmp('mpo_txtExtraBalanceForPayOrder');
 	var discountCbo = Ext.getCmp('mpo_txtDiscountForPayOrder');
 //	var discountRate = Ext.getCmp('mpo_txtDiscountRateForPayOrder');
-	var orderPrice = Ext.getCmp('mpo_txtOrderPriceForPayOrder');
-	var memberPrice = Ext.getCmp('mpo_txtMemberPriceForPayOrder');
+//	var orderPrice = Ext.getCmp('mpo_txtOrderPriceForPayOrder');
+//	var memberPrice = Ext.getCmp('mpo_txtMemberPriceForPayOrder');
 	var payManner = Ext.getCmp('mpo_comPayMannerForPayOrder');
 	var payMoney = $('#mpo_txtPayMoneyForPayOrder');
 	var customNum = Ext.getCmp('mpo_numCustomNumberForPayOrder');
@@ -460,13 +452,13 @@ function memberPayOrderToBindData(_c){
 	
 	if(typeof newOrder['orderFoods'] != 'undefined'){
 		mpo_orderFoodGrid.getStore().loadData({root:newOrder['orderFoods']});
-		orderPrice.setText(newOrder['actualPriceBeforeDiscount'].toFixed(2));
-		memberPrice.setText(newOrder['actualPrice'].toFixed(2));
+//		orderPrice.setText(newOrder['actualPriceBeforeDiscount'].toFixed(2));
+//		memberPrice.setText(newOrder['actualPrice'].toFixed(2));
 		payMoney.html(newOrder['actualPrice'].toFixed(2));
 	}else{
 		mpo_orderFoodGrid.getStore().removeAll();
-		orderPrice.setText('----');
-		memberPrice.setText('----');
+//		orderPrice.setText('----');
+//		memberPrice.setText('----');
 		payMoney.html('0.00');
 	}
 }

@@ -26,6 +26,7 @@ var paySubmit = function(submitType) {
 			var serviceRate = 0;
 			var eraseQuota = document.getElementById("txtEraseQuota").value;
 			var submitPrice = -1;
+			var customNum = Ext.getCmp("numCustomNum").getValue();
 			
 			var payManner = -1;
 			var tempPay;
@@ -83,7 +84,8 @@ var paySubmit = function(submitType) {
 					"memberID" : actualMemberID,
 					"comment" : Ext.getDom("remark").value,
 					"servicePlan" : servicePlan,
-					'eraseQuota' : eraseQuota == ''?0:eraseQuota
+					'eraseQuota' : eraseQuota == ''?0:eraseQuota,
+					'customNum' : customNum
 //					'pricePlanID' : calcPricePlanID,
 //					'customNum' : Ext.getCmp('numCustomNum').getValue()
 				},
