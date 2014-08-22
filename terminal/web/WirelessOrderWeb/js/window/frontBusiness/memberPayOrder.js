@@ -99,7 +99,7 @@ Ext.onReady(function(){
 			layout : 'column',
 			defaults : {
 				layout : 'form',
-				labelWidth : 60,
+				labelWidth : 70,
 				labelAlign : 'right',
 				columnWidth : .25,
 				defaults : {
@@ -147,7 +147,7 @@ Ext.onReady(function(){
 			}, {
 				items : [{
 					id : 'mpo_txtNameForPayOrder',
-					fieldLabel : '会员名称',
+					fieldLabel : '&nbsp;&nbsp;&nbsp;会员名称',
 					text : '----'
 				}]
 			}, {
