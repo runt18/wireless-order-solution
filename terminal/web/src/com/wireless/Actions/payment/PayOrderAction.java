@@ -141,7 +141,7 @@ public class PayOrderAction extends Action{
 			}	
 
 			//Get the custom number.
-			if(request.getParameter("customNum") != null){
+			if(request.getParameter("customNum") != null && !request.getParameter("customNum").isEmpty()){
 				payBuilder.setCustomNum(Integer.valueOf(request.getParameter("customNum")));
 			}
 			
