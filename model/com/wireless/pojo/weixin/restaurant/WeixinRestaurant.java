@@ -1,12 +1,59 @@
 package com.wireless.pojo.weixin.restaurant;
 
-import com.wireless.pojo.restaurantMgr.Restaurant;
 
 public class WeixinRestaurant {
 
+	public static class UpdateBuilder{
+		private String weixinLogo;
+		private String weixinInfo;
+		private String weixinAppId;
+		private String weixinAppSecret;
+		
+		public UpdateBuilder setWeixinLogo(String logo){
+			this.weixinLogo = logo;
+			return this;
+		}
+		
+		public boolean isWeixinLogoChanged(){
+			return this.weixinLogo != null;
+		}
+		
+		public UpdateBuilder setWeixinInfo(String info){
+			this.weixinInfo = info;
+			return this;
+		}
+		
+		public boolean isWeixinInfoChanged(){
+			return this.weixinInfo != null;
+		}
+		
+		public UpdateBuilder setWeixinAppId(String appId){
+			this.weixinAppId = appId;
+			return this;
+		}
+		
+		public boolean isWeixinAppIdChanged(){
+			return this.weixinAppId != null;
+		}
+		
+		public UpdateBuilder setWeixinAppSecret(String secret){
+			this.weixinAppSecret = secret;
+			return this;
+		}
+		
+		public boolean isWeixinSecretChanged(){
+			return this.weixinAppSecret != null;
+		}
+		
+		public WeixinRestaurant build(){
+			return new WeixinRestaurant(this);
+		}
+	}
+	
 	public static enum Status{
-		VERIFIED(1, "已验证"),
-		BOUND(2, "已绑定");
+		CREATED(1, "已创建"),
+		VERIFIED(2, "已验证"),
+		BOUND(3, "已绑定");
 		
 		private final int val;
 		private final String desc;
@@ -39,9 +86,24 @@ public class WeixinRestaurant {
 	}
 	
 	private String weixinSerial;
-	private Restaurant restaurant;
+	private int restaurantId;
 	private long bindDate;
-	private Status status = Status.VERIFIED;
+	private Status status = Status.CREATED;
+	private String weixinLogo;
+	private String weixinInfo;
+	private String weixinAppId;
+	private String weixinAppSecret;
+	
+	private WeixinRestaurant(UpdateBuilder builder){
+		this.weixinLogo = builder.weixinLogo;
+		this.weixinInfo = builder.weixinInfo;
+		this.weixinAppId = builder.weixinAppId;
+		this.weixinAppSecret = builder.weixinAppSecret;
+	}
+	
+	public WeixinRestaurant(int restaurantId){
+		this.restaurantId = restaurantId;
+	}
 	
 	public String getWeixinSerial() {
 		return weixinSerial;
@@ -51,12 +113,12 @@ public class WeixinRestaurant {
 		this.weixinSerial = weixinSerial;
 	}
 
-	public Restaurant getRestaurant() {
-		return restaurant;
+	public int getRestaurantId() {
+		return restaurantId;
 	}
 
-	public void setRestaurant(Restaurant restaurant) {
-		this.restaurant = restaurant;
+	public void setRestaurantId(int restaurantId) {
+		this.restaurantId = restaurantId;
 	}
 
 	public long getBindDate() {
@@ -75,6 +137,50 @@ public class WeixinRestaurant {
 		this.status = status;
 	}
 	
+	public String getWeixinLogo() {
+		if(weixinLogo == null){
+			return "";
+		}
+		return weixinLogo;
+	}
+
+	public void setWeixinLogo(String weixinLogo) {
+		this.weixinLogo = weixinLogo;
+	}
+
+	public String getWeixinInfo() {
+		if(weixinInfo == null){
+			return "";
+		}
+		return weixinInfo;
+	}
+
+	public void setWeixinInfo(String weixinInfo) {
+		this.weixinInfo = weixinInfo;
+	}
+
+	public String getWeixinAppId() {
+		if(weixinAppId == null){
+			return "";
+		}
+		return weixinAppId;
+	}
+
+	public void setWeixinAppId(String weixinAppId) {
+		this.weixinAppId = weixinAppId;
+	}
+
+	public String getWeixinAppSecret() {
+		if(weixinAppSecret == null){
+			return "";
+		}
+		return weixinAppSecret;
+	}
+
+	public void setWeixinAppSecret(String weixinAppSecret) {
+		this.weixinAppSecret = weixinAppSecret;
+	}
+
 	@Override
 	public int hashCode(){
 		return getWeixinSerial().hashCode();
@@ -91,6 +197,6 @@ public class WeixinRestaurant {
 	
 	@Override
 	public String toString(){
-		return "weixin_restaurant(" + getWeixinSerial() + "," + getRestaurant().getId() + ")";
+		return "weixin_restaurant(" + getWeixinSerial() + "," + restaurantId + ")";
 	}
 }

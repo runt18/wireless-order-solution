@@ -152,6 +152,18 @@ public class JsonMap implements Map<String, Object>{
 		jmap.put(key, boolValue);
 	}
 	
+	public void putJsonMap(String key, JsonMap jm){
+		if(jm != null){
+			jmap.put(key, jm);
+		}
+	}
+	
+	public void putJsonMap(JsonMap jm){
+		if(jm != null){
+			jmap.putAll(jm);
+		}
+	}
+	
 	public void putJsonable(String key, Jsonable jsonable, int flag){
 		if(jsonable != null){
 			jmap.put(key, jsonable.toJsonMap(flag));
