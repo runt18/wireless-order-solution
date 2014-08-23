@@ -307,7 +307,7 @@ function toggleConsumeDetails(){
 								for(var i = 0; i < data.root.length; i++){
 									temp = data.root[i];
 									html.push(templet.format({
-										date : fnDateInChinese(temp.operateDateFormat) + '</br>(' + temp.orderId + ')',
+										date : fnDateInChinese(temp.operateDateFormat) + '</br><font style="font-size:13px;">账单号:' + temp.orderId + '</font>',
 										balance : (checkDot(temp.deltaTotalMoney)?parseFloat(temp.deltaTotalMoney).toFixed(2) : temp.deltaTotalMoney) + '元',
 										point : temp.deltaPoint.toFixed(0) + '分'
 									}));
