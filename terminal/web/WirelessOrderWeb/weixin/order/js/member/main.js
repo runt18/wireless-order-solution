@@ -344,7 +344,7 @@ function toggleRechargeDetails(){
 	mainView.fadeToggle(function(){
 		if(mainView.css('display') == 'block'){
 			$('html, body').animate({scrollTop: 0}, 'fast');
-			$('html, body').animate({scrollTop: (350+$('#table_consumeDetails').height())}, 'fast');
+			$('html, body').animate({scrollTop: (370+$('#table_consumeDetails').height())}, 'fast');
 			if(!toggleRechargeDetails.load){
 				// 加载近5条消费记录
 				toggleRechargeDetails.load = function(){
@@ -573,7 +573,7 @@ function toggleMemberLevel(){
 						Util.lm.hide();
 					});*/
 					$('html, body').animate({scrollTop: 0});
-					$('html, body').animate({scrollTop: 300+$('#divMemberPointContent').height()+$('#divMemberBalanceContent').height()}, 'fast');					
+					$('html, body').animate({scrollTop: 310+$('#divMemberPointContent').height()+$('#divMemberBalanceContent').height()}, 'fast');					
 					$.post('../../QueryMemberLevel.do', {dataSource : 'chart', rid:member.restaurant.id}, function(result){
 						if(result.success){
 //							totalMath = result.root[result.root.length - 1].pointThreshold;
@@ -597,7 +597,7 @@ function toggleMemberLevel(){
 							}
 							yAxisData.push(currentMemberLevelData);
 							
-							member_loadMemberTypeChart({minY:-chartMinAndMax * 0.15, maxY:chartMinAndMax * 1.16, series:yAxisData});
+							member_loadMemberTypeChart({minY:-chartMinAndMax * 0.15, maxY:chartMinAndMax * 1.2, series:yAxisData});
 							
 						}else{
 							mainView.css('height', 'auto');
@@ -644,7 +644,7 @@ function getLevelChartInfo(x,point){
 	return '<span style="font-size : 14px;">' + temp.memberTypeName + (temp.pointThreshold >0 || point? '--' + temp.pointThreshold +'分' :'')+ '</span>'
 			+ (temp.discount.type != 2 ? '<br/>' + '<font style="font-size: 13px;color:maroon">' + temp.discount.name : '') + '</font>' 
 			+ (temp.chargeRate >1 ? '<br/>'+ '<font style="font-size: 13px;color:maroon">' + temp.chargeRate +'倍充值优惠, 充100送'+parseInt((temp.chargeRate-1)*100)+'元':'')  + '</font>' 
-			+ (temp.exchangeRate >1 ? '<br/>'+ '<font style="font-size: 13px;color:maroon">' + temp.exchangeRate +'倍积分特权, 消费1元积'+parseInt(temp.exchangeRate)+'分':'') + '</font>' 
+			+ (temp.exchangeRate >1 ? '<br/>'+ '<font style="font-size: 12px;color:maroon">' + temp.exchangeRate +'倍积分特权, 消费1元积'+temp.exchangeRate+'分':'') + '</font>' 
 			;		
 }
 

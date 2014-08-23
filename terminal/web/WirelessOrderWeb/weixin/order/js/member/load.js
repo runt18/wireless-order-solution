@@ -103,5 +103,5 @@ $(function(){
 		$('html, body').animate({scrollTop: 200}, 'fast'); 
 	});
 
-	
+	$('html, body').animate({scrollTop: 0}, 'fast'); 
 });
