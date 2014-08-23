@@ -263,12 +263,12 @@ function showWeixinMemberBindWin(){
 						return;
 					}
 					Ext.Ajax.request({
-						url : '../../weixinFrontBind.do',
+						url : '../../WXOperateMember.do',
 						params : {
 							weixinMemberPhone : weixinMemberPhone.getValue(),
 							weixinMemberCard : weixinMemberCard.getValue(),
-							weixinMemberSex : weixinMemberSex,
-							weixinMemberName : weixinMemberName,
+							weixinMemberSex : weixinMemberSex.getValue(),
+							weixinMemberName : weixinMemberName.getValue(),
 							dataSource : 'weixinFrontBind'
 						},
 						success : function(res, opt){
