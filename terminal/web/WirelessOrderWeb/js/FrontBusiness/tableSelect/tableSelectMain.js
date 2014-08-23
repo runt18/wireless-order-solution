@@ -1257,7 +1257,7 @@ var btnQueryConsumeDetail = new Ext.ux.ImageButton({
 		if(!ts_queryMemberOperationWin){
 			ts_queryMemberOperationWin = new Ext.Window({
 				id : 'ts_queryMemberOperationWin',
-				title : '会员操作明细',
+				title : '会员消费明细',
 				modal : true,
 				closable : false,
 				resizable : false,
@@ -1284,10 +1284,10 @@ var btnQueryConsumeDetail = new Ext.ux.ImageButton({
 					show : function(thiz){
 						thiz.center();
 						thiz.load({
-							url : '../window/client/memberOperation.jsp',
+							url : '../Client_Module/MemberConsumeDetails.jsp',
 							scripts : true,
 							params : {
-								modal : false
+								otype : 0
 							}
 						});
 					}

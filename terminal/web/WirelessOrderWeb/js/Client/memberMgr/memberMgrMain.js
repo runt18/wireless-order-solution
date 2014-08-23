@@ -199,12 +199,12 @@ function initRechargeWin(){
 						isPrint : Ext.getCmp('chbPrintRecharge').getValue(),
 						callback : function(_c){
 							rechargeWin.hide();
-							var st = Ext.getCmp('mr_comboMemberSearchType');
-							st.setValue(2);
-							st.fireEvent('select', st, null, null);
-							var n = Ext.getCmp('numberSearchValueByNumber');
-							n.setValue(_c.data.memberCard);
-							Ext.getCmp('btnSearchMember').handler();
+//							var st = Ext.getCmp('mr_comboMemberSearchType');
+//							st.setValue(2);
+//							st.fireEvent('select', st, null, null);
+//							var n = Ext.getCmp('numberSearchValueByNumber');
+//							n.setValue(_c.data.memberCard);
+//							Ext.getCmp('btnSearchMember').handler();
 						}
 					});
 					
@@ -1470,8 +1470,8 @@ var btnConsumeDetail = new Ext.ux.ImageButton({
 	imgHeight : 50,
 	tooltip : '消费明细',
 	handler : function(e){
-		queryMemberOperationHandler('会员消费明细', '../Client_Module/MemberConsumeDetails.html', {
-			modal : true
+		queryMemberOperationHandler('会员消费明细', '../Client_Module/MemberConsumeDetails.jsp', {
+			otype : 1
 		});
 	}
 });

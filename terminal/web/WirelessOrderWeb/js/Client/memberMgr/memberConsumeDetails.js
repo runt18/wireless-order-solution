@@ -1,7 +1,7 @@
 var mcd_mo_grid, mcd_panelMemberOperationContent;
 var mcd_search_comboOperateType, mcd_search_memberType, mcd_search_memerbMobile, mcd_search_memerbCard
 	,mcd_search_onDuty, mcd_search_offDuty, mcd_search_memberName;
-var mcd_modal = true;
+var mcd_modal = true, queryType = 'History';
 
 function member_showViewBillWin(){
 	member_viewBillWin = new Ext.Window({
@@ -34,7 +34,7 @@ function member_showViewBillWin(){
 					scripts : true,
 					params : {
 						orderId : sd.orderId,
-						queryType : 'History'
+						queryType : queryType
 					},
 					method : 'post'
 				});
@@ -183,7 +183,7 @@ Ext.onReady(function(){
 		}, {
 			xtype : 'radio',
 			name : 'mcd_search_radioDataSource',
-			
+			id : 'memberConsume_today',
 			inputValue : 'today',
 			boxLabel : '当日&nbsp;',
 			listeners : {
@@ -192,6 +192,7 @@ Ext.onReady(function(){
 						mcd_search_onDuty.setDisabled(true);
 						mcd_search_offDuty.setDisabled(true);
 						mcd_search_dateCombo.setDisabled(true);
+						queryType = 'Today'
 					}
 				}
 			}
@@ -209,6 +210,7 @@ Ext.onReady(function(){
 						mcd_search_onDuty.setDisabled(false);
 						mcd_search_offDuty.setDisabled(false);
 						mcd_search_dateCombo.setDisabled(false);
+						queryType = 'History';
 					}
 				}
 			}
@@ -316,10 +318,7 @@ Ext.onReady(function(){
 	);
 	mcd_mo_grid.frame = false;
 	mcd_mo_grid.border = false;
-	mcd_mo_grid.on('render', function(thiz){
-		mcd_search_dateCombo.setValue(1);
-		mcd_search_dateCombo.fireEvent('select', mcd_search_dateCombo, null, 1);
-	});
+
 	mcd_mo_grid.getStore().on('load', function(){
 //		mcd_search_memerbCard.setValue();
 	});
@@ -361,9 +360,12 @@ Ext.onReady(function(){
 			memberSumView.getCell(store.getCount()-1, 8).innerHTML = '--';
 		}
 	});
-	
-	
-	
+	if(otype && otype == 0){
+		Ext.getDom('memberConsume_today').checked = true;
+		Ext.getCmp('memberConsume_today').fireEvent('check', Ext.getCmp('memberConsume_today'), true);
+	}	
+	mcd_search_dateCombo.setValue(1);
+	mcd_search_dateCombo.fireEvent('select', mcd_search_dateCombo, null, 1);	
 	
 });
 function mcd_searchMemberOperation(){
