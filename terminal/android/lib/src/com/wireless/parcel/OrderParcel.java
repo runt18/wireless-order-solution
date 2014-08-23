@@ -12,7 +12,7 @@ import com.wireless.pojo.util.NumericUtil;
 
 public class OrderParcel implements Parcelable{
 
-	public static final String KEY_VALUE = "com.wireless.lib.parcel.OrderParcel";
+	public static final String KEY_VALUE = OrderParcel.class.getName();
 	
 	private final Order mSrcOrder;
 	

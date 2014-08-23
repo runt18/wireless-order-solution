@@ -11,7 +11,7 @@ import com.wireless.pojo.tasteMgr.Taste;
 
 public class TasteGroupParcel implements Parcelable{
 
-	public static final String KEY_VALUE = "com.wireless.lib.parcel.TasteGroupParcel";
+	public static final String KEY_VALUE = TasteGroupParcel.class.getName();
 	
 	private final TasteGroup mSrcTG;
 	

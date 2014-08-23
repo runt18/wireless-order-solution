@@ -7,7 +7,8 @@ import com.wireless.pojo.dishesOrder.ComboOrderFood;
 import com.wireless.pojo.menuMgr.ComboFood;
 
 public class ComboOrderFoodParcel implements Parcelable{
-	public static final String KEY_VALUE = "com.wireless.lib.parcel.ComboOrderFoodParcel";
+	
+	public static final String KEY_VALUE = ComboOrderFoodParcel.class.getName();
 	
 	private final ComboOrderFood mSrc;
 	

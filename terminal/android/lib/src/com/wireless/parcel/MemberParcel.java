@@ -10,7 +10,8 @@ import com.wireless.pojo.client.Member;
 import com.wireless.pojo.menuMgr.Food;
 
 public class MemberParcel implements Parcelable {
-	public static final String KEY_VALUE = "com.wireless.lib.parcel.MemberParcel";
+	
+	public static final String KEY_VALUE = MemberParcel.class.getName();
 	
 	private final Member mSrcMember;
 	

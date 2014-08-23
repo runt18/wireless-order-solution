@@ -8,7 +8,7 @@ import com.wireless.pojo.menuMgr.Food;
 
 public class ComboFoodParcel implements Parcelable{
 
-	public static final String KEY_VALUE = "com.wireless.lib.parcel.ComboFoodParcel";
+	public static final String KEY_VALUE = ComboFoodParcel.class.getName();
 	
 	private final ComboFood mSrc;
 	

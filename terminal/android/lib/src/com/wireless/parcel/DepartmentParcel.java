@@ -7,7 +7,7 @@ import com.wireless.pojo.menuMgr.Department;
 
 public class DepartmentParcel implements Parcelable{
 
-	public static final String KEY_VALUE = "com.wireless.lib.parcel.DepartmentParcel";
+	public static final String KEY_VALUE = DepartmentParcel.class.getName();
 	
 	private final Department mSrcDept;
 	

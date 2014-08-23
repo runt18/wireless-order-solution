@@ -12,7 +12,7 @@ import com.wireless.pojo.tasteMgr.Taste;
 
 public class FoodParcel implements Parcelable{
 
-	public static final String KEY_VALUE = "com.wireless.lib.parcel.FoodParcel";
+	public static final String KEY_VALUE = FoodParcel.class.getName();
 	
 	private final Food mSrcFood;
 	

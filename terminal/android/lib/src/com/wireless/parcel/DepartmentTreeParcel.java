@@ -12,7 +12,7 @@ import com.wireless.pojo.menuMgr.FoodList;
 
 public class DepartmentTreeParcel implements Parcelable{
 
-	public static final String KEY_VALUE = "com.wireless.lib.parcel.DepartmentTreeParcel";
+	public static final String KEY_VALUE = DepartmentTreeParcel.class.getName();
 	
 	private FoodList mFoodList;
 	

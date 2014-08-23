@@ -8,9 +8,9 @@ import com.wireless.pojo.util.NumericUtil;
 
 public class TableParcel extends Table implements Parcelable {
 
-	private boolean nIsNull = false;
+	private boolean isNull = false;
 	
-	public static final String KEY_VALUE = "com.wireless.lib.parcel.TableParcel";
+	public static final String KEY_VALUE = TableParcel.class.getName();
 	
 	public TableParcel(Table table){
 		if(table != null){
@@ -23,9 +23,8 @@ public class TableParcel extends Table implements Parcelable {
 			this.setTableName(table.getName());
 			this.getRegion().setRegionId(table.getRegion().getId());
 			this.setMinimumCost(table.getMinimumCost());
-			this.setServiceRate(table.getServiceRate());			
 		}else{
-			nIsNull = true;
+			isNull = true;
 		}
 	}
 	
@@ -39,7 +38,6 @@ public class TableParcel extends Table implements Parcelable {
 		this.setTableName(in.readString());
 		this.getRegion().setRegionId((short)in.readInt());
 		this.setMinimumCost(NumericUtil.int2Float(in.readInt()));
-		this.setServiceRate(NumericUtil.int2Float(in.readInt()));
 	}
 	
 	public static final Parcelable.Creator<TableParcel> CREATOR = new Parcelable.Creator<TableParcel>() {
@@ -64,7 +62,7 @@ public class TableParcel extends Table implements Parcelable {
 
 	@Override
 	public void writeToParcel(Parcel parcel, int flags) {
-		if(nIsNull){
+		if(isNull){
 			parcel.writeInt(1);
 		}else{
 			parcel.writeInt(0);
@@ -77,7 +75,6 @@ public class TableParcel extends Table implements Parcelable {
 			parcel.writeString(this.getName());
 			parcel.writeInt(this.getRegion().getId());
 			parcel.writeInt(NumericUtil.float2Int(this.getMinimumCost()));
-			parcel.writeInt(NumericUtil.float2Int(this.getServiceRate()));
 		}
 	}
 

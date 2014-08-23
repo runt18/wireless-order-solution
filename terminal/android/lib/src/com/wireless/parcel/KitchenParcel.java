@@ -7,7 +7,7 @@ import com.wireless.pojo.menuMgr.Kitchen;
 
 public class KitchenParcel implements Parcelable{
 
-	public static final String KEY_VALUE = "com.wireless.lib.parcel.KitchenParcel";
+	public static final String KEY_VALUE = KitchenParcel.class.getName();
 	
 	private final Kitchen mSrcKitchen;
 	

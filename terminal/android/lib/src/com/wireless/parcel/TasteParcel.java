@@ -8,7 +8,7 @@ import com.wireless.pojo.util.NumericUtil;
 
 public class TasteParcel implements Parcelable{
 
-	public static final String KEY_VALUE = "com.wireless.lib.parcel.TasteParcel";
+	public static final String KEY_VALUE = TasteParcel.class.getName();
 	
 	private final Taste mSrcTaste;
 	

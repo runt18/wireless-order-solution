@@ -7,7 +7,7 @@ import com.wireless.pojo.tasteMgr.TasteCategory;
 
 public class TasteCategoryParcel implements Parcelable{
 	
-	public static final String KEY_VALUE = "com.wireless.lib.parcel.TasteCategoryParcel";
+	public static final String KEY_VALUE = TasteCategoryParcel.class.getName();
 	
 	private final TasteCategory mSrcCategory;
 	
