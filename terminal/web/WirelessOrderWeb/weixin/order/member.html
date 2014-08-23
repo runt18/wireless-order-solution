@@ -208,7 +208,7 @@ var totalMath = 0;
 <ul class="m-b-list">
 	<li class="box-horizontal none-line" >
 		<div style="width:45%">余&nbsp;&nbsp;额: <span id="spanMemberTotalBalance" style="color:#26a9d0;">--.--</span>&nbsp;元</div>
-		<div >当前积分: <span id="spanMemberPoint" style="color:#FF4500;">--.--</span>&nbsp;分</div>
+		<div >积&nbsp;&nbsp;分: <span id="spanMemberPoint" style="color:#FF4500;">--.--</span>&nbsp;分</div>
 	</li>
 </ul>
 </div>
@@ -221,12 +221,12 @@ var totalMath = 0;
 	</li>
 	<li>
 		<div id="divConsumeDetails" style="display:none; width:97%;border:groove 3px Gainsboro;border-radius:5px;margin-bottom: 5px;	">
-			<table class="d-list" style="">
+			<table id="table_consumeDetails" class="d-list" >
 				<thead>
 				<tr class="d-list-title">
-					<td style="width:50%;text-align: center;">消费时间</td>
-					<td style="width:25%;">消费金额</td>
-					<td style="width:25%;">消费积分</td>
+					<td style="width:50%;text-align: center;">消费时间(账单号)</td>
+					<td style="width:25%;">金额</td>
+					<td style="width:25%;">积分</td>
 				</tr>
 				</thead>
 				<tbody>
@@ -249,8 +249,8 @@ var totalMath = 0;
 				<thead>
 				<tr class="d-list-title">
 					<td style="width:50%;text-align: center;">充值时间</td>
-					<td style="width:25%;">充值实收</td>
-					<td style="width:25%;">充值金额</td>
+					<td style="width:25%;">实收</td>
+					<td style="width:25%;">实充</td>
 				</tr>
 				</thead>
 				<tbody>

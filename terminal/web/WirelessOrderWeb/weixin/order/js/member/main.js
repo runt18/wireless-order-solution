@@ -278,7 +278,7 @@ function toggleConsumeDetails(){
 	
 	var mainView = $('#divConsumeDetails');
 	var tbody = mainView.find('table > tbody');
-	var templet = '<tr class="d-list-item">'
+	var templet = '<tr class="d-list-item-consume">'
 		+ '<td>{date}</td>'
 		+ '<td>{balance}</td>'
 		+ '<td>{point}</td>'
@@ -307,7 +307,7 @@ function toggleConsumeDetails(){
 								for(var i = 0; i < data.root.length; i++){
 									temp = data.root[i];
 									html.push(templet.format({
-										date : fnDateInChinese(temp.operateDateFormat),
+										date : fnDateInChinese(temp.operateDateFormat) + '</br>(' + temp.orderId + ')',
 										balance : (checkDot(temp.deltaTotalMoney)?parseFloat(temp.deltaTotalMoney).toFixed(2) : temp.deltaTotalMoney) + '元',
 										point : temp.deltaPoint.toFixed(0) + '分'
 									}));
@@ -344,8 +344,7 @@ function toggleRechargeDetails(){
 	mainView.fadeToggle(function(){
 		if(mainView.css('display') == 'block'){
 			$('html, body').animate({scrollTop: 0}, 'fast');
-//			console.log(300+$('#divMemberBalanceContent').height() - $(document).scrollTop())
-			$('html, body').animate({scrollTop: 270+$('#divMemberBalanceContent').height()}, 'fast');
+			$('html, body').animate({scrollTop: (350+$('#table_consumeDetails').height())}, 'fast');
 			if(!toggleRechargeDetails.load){
 				// 加载近5条消费记录
 				toggleRechargeDetails.load = function(){
@@ -642,7 +641,7 @@ function getLevelChartInfo(x,point){
 			}
 		}	
 	}
-	return '<span style="font-size : 15px;">' + temp.memberTypeName + (temp.pointThreshold >0 || point? '-' + temp.pointThreshold +'分' :'')+ '</span>'
+	return '<span style="font-size : 14px;">' + temp.memberTypeName + (temp.pointThreshold >0 || point? '--' + temp.pointThreshold +'分' :'')+ '</span>'
 			+ (temp.discount.type != 2 ? '<br/>' + '<font style="font-size: 13px;color:maroon">' + temp.discount.name : '') + '</font>' 
 			+ (temp.chargeRate >1 ? '<br/>'+ '<font style="font-size: 13px;color:maroon">' + temp.chargeRate +'倍充值优惠, 充100送'+parseInt((temp.chargeRate-1)*100)+'元':'')  + '</font>' 
 			+ (temp.exchangeRate >1 ? '<br/>'+ '<font style="font-size: 13px;color:maroon">' + temp.exchangeRate +'倍积分特权, 消费1元积'+parseInt(temp.exchangeRate)+'分':'') + '</font>' 
