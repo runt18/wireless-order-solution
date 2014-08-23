@@ -66,9 +66,7 @@ public class WXOperateMemberAction extends DispatchAction {
 			
 			final Member member = MemberDao.getById(dbCon, StaffDao.getByRestaurant(dbCon, rid).get(0), mid);
 			MemberRank mr = MemberDao.calcMemberRank(StaffDao.getByRestaurant(dbCon, rid).get(0), mid);
-//			System.out.println(mr.getRank()/mr.getTotal());
-//			DecimalFormat df = new DecimalFormat("#.00");
-			final String rank = mr.getRank()/mr.getTotal() + "%";
+			final int rank = (mr.getRank() * 100)/mr.getTotal();
 			
 			jobject.initTip(true, "操作成功, 已获取微信会员信息.");
 			
@@ -78,7 +76,7 @@ public class WXOperateMemberAction extends DispatchAction {
 				public JsonMap toJsonMap(int flag) {
 					JsonMap jm = new JsonMap();
 					jm.putJsonable(member, 0);
-					jm.putString("rank", rank);
+					jm.putInt("rank", rank);
 					return jm;
 				}
 				

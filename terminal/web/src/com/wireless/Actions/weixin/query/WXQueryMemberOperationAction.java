@@ -24,6 +24,7 @@ import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.pojo.client.MemberOperation;
 import com.wireless.pojo.staffMgr.Staff;
+import com.wireless.pojo.util.NumericUtil;
 import com.wireless.util.SQLUtil;
 
 public class WXQueryMemberOperationAction extends DispatchAction{
@@ -244,8 +245,8 @@ public class WXQueryMemberOperationAction extends DispatchAction{
 				@Override
 				public JsonMap toJsonMap(int flag) {
 					JsonMap jm = new JsonMap();
-					jm.putFloat("nearByCharge", charge_mo != null? charge_mo.getChargeMoney() : -1);
-					jm.putFloat("nearByConsume", consume_mo != null? consume_mo.getPayMoney() : -1);
+					jm.putString("nearByCharge", charge_mo != null? NumericUtil.float2String2(charge_mo.getChargeMoney()) : (-1 + ""));
+					jm.putString("nearByConsume", consume_mo != null? NumericUtil.float2String2(consume_mo.getPayMoney()) : (-1 + ""));
 					return jm;
 				}
 
