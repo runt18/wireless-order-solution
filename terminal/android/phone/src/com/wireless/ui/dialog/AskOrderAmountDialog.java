@@ -163,7 +163,6 @@ public class AskOrderAmountDialog extends DialogFragment {
 			}
 			if(msg.what == REFRESH_ALL){
 				//刷新常用口味GridView
-				//((BaseAdapter)((GridView)mCurrentTasteView.findViewById(R.id.gridView_askOrderAmount_dialog)).getAdapter()).notifyDataSetChanged();
 				((GridView)thisDlgFgm.mCurrentTasteView.findViewById(R.id.gridView_askOrderAmount_dialog)).invalidateViews();
 			}
 		}
@@ -473,9 +472,9 @@ public class AskOrderAmountDialog extends DialogFragment {
 
 			final List<Taste> popTastes = new ArrayList<Taste>(mSelectedFood.asFood().getPopTastes());
 			// 只显示前8个常用口味
-			while (popTastes.size() > 8) {
-				popTastes.remove(popTastes.size() - 1);
-			}
+//			while (popTastes.size() > 8) {
+//				popTastes.remove(popTastes.size() - 1);
+//			}
 
 			tasteGridView.setAdapter(new BaseAdapter() {
 
@@ -793,9 +792,15 @@ public class AskOrderAmountDialog extends DialogFragment {
 			if (requestCode == PICK_WITH_TASTE) {
 
 				TasteGroupParcel tgParcel = data.getParcelableExtra(TasteGroupParcel.KEY_VALUE);
+				
 				if(tgParcel.asTasteGroup() != null){
 					if((Boolean)mCurrentTasteView.getTag(R.id.combo_of_indicator_key)){
-						((ComboOrderFood)mCurrentTasteView.getTag(R.id.combo_of_key)).setTasteGroup(tgParcel.asTasteGroup());
+						ComboOrderFood cof = (ComboOrderFood)mCurrentTasteView.getTag(R.id.combo_of_key);
+						cof.setTasteGroup(tgParcel.asTasteGroup());
+						//Add the combo order food if NOT contained in this order food before.
+						if(matchComboFood(cof.asComboFood()) == null){
+							mSelectedFood.addCombo(cof);
+						}
 					}else{
 						mSelectedFood.setTasteGroup(tgParcel.asTasteGroup());
 					}
