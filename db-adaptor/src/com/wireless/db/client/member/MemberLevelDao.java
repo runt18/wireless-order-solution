@@ -404,8 +404,8 @@ public class MemberLevelDao {
 					if(member.getTotalPoint() > lvToUpgrade.getPointThreshold()){
 						if(!member.getMemberType().equals(lvToUpgrade.getMemberType())){
 							MemberDao.update(dbCon, staff, new Member.UpdateBuilder(member.getId()).setMemberTypeId(lvToUpgrade.getMemberType().getId()));
+							return new Msg4Upgrade(member, lvToUpgrade);
 						}
-						return new Msg4Upgrade(member, lvToUpgrade);
 					}
 				}
 			}
