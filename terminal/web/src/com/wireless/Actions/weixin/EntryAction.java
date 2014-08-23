@@ -41,6 +41,7 @@ public class EntryAction extends Action{
 		String method = request.getMethod();
 		if(method.equalsIgnoreCase("get")){
 			verify(request, response);
+			final String account = request.getParameter("account");
 			final String appId = request.getParameter("appid");
 			final String appSecret = request.getParameter("secret");
 			//System.out.println("appId:" + appId + ", appSecret:" + appSecret);
@@ -58,7 +59,7 @@ public class EntryAction extends Action{
 							menu.set3rdButton(new Button.ClickBuilder("会员信息", WeiXinHandleMessage.MEMBER_EVENT_KEY).build());
 							if(menu.create(token).isOk()){
 								//Record the app id & secret.
-								WeixinRestaurantDao.update(StaffDao.getAdminByRestaurant(RestaurantDao.getByAccount(request.getParameter("account")).getId()), 
+								WeixinRestaurantDao.update(StaffDao.getAdminByRestaurant(RestaurantDao.getByAccount(account).getId()), 
 														   new WeixinRestaurant.UpdateBuilder().setWeixinAppId(appId).setWeixinAppSecret(appSecret));
 							}
 						} catch (IOException | SQLException | BusinessException e) {

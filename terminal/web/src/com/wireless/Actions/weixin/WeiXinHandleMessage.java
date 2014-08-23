@@ -19,6 +19,7 @@ import com.wireless.db.weixin.member.WeixinMemberDao;
 import com.wireless.db.weixin.restaurant.WeixinRestaurantDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.client.Member;
+import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.util.NumericUtil;
 
 public class WeiXinHandleMessage extends HandleMessageAdapter {
@@ -28,13 +29,13 @@ public class WeiXinHandleMessage extends HandleMessageAdapter {
 	private static final String WEIXIN_FOOD = WEIXIN_BASE_SERVER + "/weixin/order/food.html";
 	private static final String WEIXIN_RFOOD = WEIXIN_BASE_SERVER + "/weixin/order/rfood.html";
 	private static final String WEIXIN_ABOUT = WEIXIN_BASE_SERVER + "/weixin/order/about.html";
-	private static final String WEIXIN_SALES = WEIXIN_BASE_SERVER + "/weixin/order/sales.html";
+//	private static final String WEIXIN_SALES = WEIXIN_BASE_SERVER + "/weixin/order/sales.html";
 	private static final String WEIXIN_MEMBER = WEIXIN_BASE_SERVER + "/weixin/order/member.html";
 	
 	private static final String WEIXIN_FOOD_ICON = WEIXIN_BASE_SERVER + "/weixin/order/images/icon_food.png";
 	private static final String WEIXIN_RFOOD_ICON = WEIXIN_BASE_SERVER + "/weixin/order/images/icon_rfood.png";
 	private static final String WEIXIN_ABOUT_ICON = WEIXIN_BASE_SERVER + "/weixin/order/images/icon_about.png";
-	private static final String WEIXIN_SALES_ICON = WEIXIN_BASE_SERVER + "/weixin/order/images/icon_sales.png";
+//	private static final String WEIXIN_SALES_ICON = WEIXIN_BASE_SERVER + "/weixin/order/images/icon_sales.png";
 	private static final String WEIXIN_MEMBER_ICON = WEIXIN_BASE_SERVER + "/weixin/order/images/icon_member.png";
 	
 	public final static String NAVI_EVENT_KEY = "navi_event_key";
@@ -58,23 +59,27 @@ public class WeiXinHandleMessage extends HandleMessageAdapter {
 	}
 	
 	private Msg createNavi(Msg msg){
-		String logo;
+		
+		Msg4ImageText naviItem = new Msg4ImageText(msg);
+
+		Data4Item mainItem;
+		Restaurant restaurant = null;
 		try {
-			logo = WeixinRestaurantDao.get(StaffDao.getAdminByRestaurant(RestaurantDao.getByAccount(account).getId())).getWeixinInfo();
+			restaurant = RestaurantDao.getByAccount(account);
+			String logo = WeixinRestaurantDao.get(StaffDao.getAdminByRestaurant(restaurant.getId())).getWeixinLogo();
 			if(logo.isEmpty()){
-				logo = InitServlet.getConfig().getInitParameter("imageBrowseDefaultFile");
+				mainItem = new Data4Item(restaurant.getName(), "点击查看【" + restaurant.getName() + "】主页", 
+						   				 "", createUrl(msg, WEIXIN_INDEX));
 			}else{
 				logo = "http://" + InitServlet.getConfig().getInitParameter("oss_bucket_image")	+ "." + 
 					   InitServlet.getConfig().getInitParameter("oss_outer_point")	+ "/" + 
 					   logo;
+				mainItem = new Data4Item(restaurant.getName(), "", logo, createUrl(msg, WEIXIN_INDEX)); 
 			}
 		} catch (SQLException | BusinessException e) {
-			logo = InitServlet.getConfig().getInitParameter("imageBrowseDefaultFile");
+			mainItem = new Data4Item(restaurant != null ? restaurant.getName() : "", "点击查看主页", "", createUrl(msg, WEIXIN_INDEX));
 		}
 		
-		Msg4ImageText naviItem = new Msg4ImageText(msg);
-		
-		Data4Item mainItem = new Data4Item(" ", " ", logo, createUrl(msg, WEIXIN_INDEX)); 
 		naviItem.addItem(mainItem);
 		
 		Data4Item item4Order = new Data4Item();
@@ -103,11 +108,11 @@ public class WeiXinHandleMessage extends HandleMessageAdapter {
 		memberItem.setPicUrl(WEIXIN_MEMBER_ICON);
 		naviItem.addItem(memberItem);
 		
-		Data4Item promotionItem = new Data4Item();
-		promotionItem.setTitle("优惠信息");
-		promotionItem.setUrl(createUrl(msg, WEIXIN_SALES));
-		promotionItem.setPicUrl(WEIXIN_SALES_ICON);
-		naviItem.addItem(promotionItem);
+//		Data4Item promotionItem = new Data4Item();
+//		promotionItem.setTitle("优惠信息");
+//		promotionItem.setUrl(createUrl(msg, WEIXIN_SALES));
+//		promotionItem.setPicUrl(WEIXIN_SALES_ICON);
+//		naviItem.addItem(promotionItem);
 		
 		Data4Item intrcItem = new Data4Item();
 		intrcItem.setTitle("餐厅简介");
