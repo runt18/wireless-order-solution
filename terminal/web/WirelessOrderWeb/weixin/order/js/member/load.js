@@ -60,7 +60,11 @@ $(function(){
 					currentMemberLevelData = {y : 0, memberTypeName : '您的积分', currentPoint:true, x:member.point, pointThreshold:member.point, discount:{type :2},chargeRate:-1, exchangeRate:-1, marker:{symbol:'url(../../images/currentPosition.png)'}, color : 'red', dataLabels : {x:-1, align : 'right', style : {fontWeight: 'bold',color: 'red'}}};
 					
 					//设置会员排名
-					$('#fontDefeatMemberCount').text(member.rank);
+					if(member.rank > 0){
+						$('#fontDefeatMemberCount').text(member.rank);
+						$('#span_currentMemberDefeat').show();
+					}
+					
 				}else if(data.other.status == 1){
 					
 					var memberType = data.other.memberType[0];

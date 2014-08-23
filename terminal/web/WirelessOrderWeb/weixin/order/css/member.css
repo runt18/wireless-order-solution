@@ -4,7 +4,7 @@ body{
 
 /**************************************************/
 #divMemberCard, #divMemberContent, #divVerifyAndBind, #divResetMobile, #divMemberTypeContent,#divCurrentMemberTypeDesc,#divMemberBalanceAndPiont,
-#divMemberPointContent, #divMemberBalanceContent, #divMemberCouponContent, #divMemberCouponConsume, #divMemberPrivilegeDetail{
+#divMemberPointContent, #divMemberBalanceContent, #divMemberCouponContent, #divMemberCouponConsume, #divMemberPrivilegeDetail,#span_currentMemberDefeat{
 	display: none;
 }
 

@@ -19,8 +19,8 @@ function initMemberMsg(c){
 //	restaurantName.html(typeof data.restaurant == 'undefined' ? '--' : data.restaurant.name);
 	name.html(typeof data.name == 'undefined' ? '--' : data.name);
 	mobile.html(typeof data.mobile == 'undefined' ? '--' : data.mobile);
-	point.html(typeof data.point == 'undefined' ? '--' : data.point.toFixed(2));
-	totalBalance.html(typeof data.totalBalance == 'undefined' ? '--' : data.totalBalance.toFixed(2));
+	point.html(typeof data.point == 'undefined' ? '--' : data.point);
+	totalBalance.html(typeof data.totalBalance == 'undefined' ? '--' : checkDot(data.totalBalance)?parseFloat(data.totalBalance).toFixed(2) : data.totalBalance);
 	typeName.html(typeof data.memberType.name == 'undefined' ? '--' : data.memberType.name);
 	typeNameInCard.html(typeof data.memberType.name == 'undefined' ? '未激活' : data.memberType.name);
 //	weixinMemberCard.html(typeof data.memberType.name == 'undefined' ? '未激活' : data.memberType.name);
@@ -308,8 +308,8 @@ function toggleConsumeDetails(){
 									temp = data.root[i];
 									html.push(templet.format({
 										date : fnDateInChinese(temp.operateDateFormat),
-										balance : temp.deltaTotalMoney.toFixed(2),
-										point : temp.deltaPoint.toFixed(0)
+										balance : (checkDot(temp.deltaTotalMoney)?parseFloat(temp.deltaTotalMoney).toFixed(2) : temp.deltaTotalMoney) + '元',
+										point : temp.deltaPoint.toFixed(0) + '分'
 									}));
 								}
 								tbody.html(html.length == 0 ? '暂无消费记录' : html.join(''));
@@ -367,8 +367,8 @@ function toggleRechargeDetails(){
 									temp = data.root[i];
 									html.push(templet.format({
 										date : fnDateInChinese(temp.operateDateFormat),
-										chargeMoney : temp.chargeMoney.toFixed(2),
-										deltaTotalMoney : temp.deltaTotalMoney.toFixed(2)
+										chargeMoney : (checkDot(temp.chargeMoney)?parseFloat(temp.chargeMoney).toFixed(2) : temp.chargeMoney) + '元',
+										deltaTotalMoney : (checkDot(temp.deltaTotalMoney)?parseFloat(temp.deltaTotalMoney).toFixed(2) : temp.deltaTotalMoney) + '元'
 									}));
 								}
 								tbody.html(html.length == 0 ? '暂无充值记录' : html.join(''));

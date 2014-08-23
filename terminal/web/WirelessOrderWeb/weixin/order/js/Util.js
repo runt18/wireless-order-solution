@@ -175,6 +175,13 @@ Util.dialog = {
 		if(this.box){ this.box.style.display = 'none'; }
 	}
 };
+
+function checkDot(c)
+{
+	var r= /^[+-]?[1-9]?[0-9]*\.[0-9]*$/;
+	return r.test(c);
+}
+
 document.addEventListener('WeixinJSBridgeReady', function onBridgeReady() {
 //	WeixinJSBridge.call('hideToolbar');
 });
