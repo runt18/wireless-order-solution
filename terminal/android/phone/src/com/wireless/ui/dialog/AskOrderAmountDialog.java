@@ -13,12 +13,14 @@ import android.os.Message;
 import android.support.v4.app.DialogFragment;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
+import android.view.ViewGroup.LayoutParams;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.BaseAdapter;
 import android.widget.Button;
@@ -475,6 +477,12 @@ public class AskOrderAmountDialog extends DialogFragment {
 //			while (popTastes.size() > 8) {
 //				popTastes.remove(popTastes.size() - 1);
 //			}
+			if(popTastes.size() <= 8){
+				tasteGridView.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
+			}else{
+				tasteGridView.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, 
+											 (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 134, getResources().getDisplayMetrics())));
+			}
 
 			tasteGridView.setAdapter(new BaseAdapter() {
 
@@ -659,8 +667,15 @@ public class AskOrderAmountDialog extends DialogFragment {
 			
 			final List<Taste> popTastes = new ArrayList<Taste>(comboFood.asFood().getPopTastes());
 			//只显示前8个常用口味
-			while(popTastes.size() > 8){
-				popTastes.remove(popTastes.size() - 1);
+//			while(popTastes.size() > 8){
+//				popTastes.remove(popTastes.size() - 1);
+//			}
+			
+			if(popTastes.size() <= 8){
+				tasteGridView.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
+			}else{
+				tasteGridView.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, 
+											 (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 134, getResources().getDisplayMetrics())));
 			}
 			
 			tasteGridView.setAdapter(new BaseAdapter() {
