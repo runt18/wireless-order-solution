@@ -18,6 +18,7 @@ Ext.onReady(function(){
 		border : false,
 		layout : 'column',
 		width : 670,
+		height : 185,
 		defaults : {
 			xtype : 'form',
 			layout : 'form',
@@ -79,11 +80,15 @@ Ext.onReady(function(){
 					select : function(thiz, record, index){
 						var firstCharge = Ext.getCmp('cm_numFirstCharge');
 						var firstActualCharge = Ext.getCmp('cm_numFirstActualCharge');
+						var rechargeType = Ext.getCmp('rd_comboFirstRechargeType');
 						if(cm_obj.otype.toLowerCase() == Ext.ux.otype['insert'].toLowerCase() && record.get('attributeValue') == 0){
 							firstCharge.show();
 							firstCharge.getEl().up('.x-form-item').setDisplayed(true);	
 							firstActualCharge.show();
 							firstActualCharge.getEl().up('.x-form-item').setDisplayed(true);
+							rechargeType.show();
+							rechargeType.getEl().up('.x-form-item').setDisplayed(true);
+							
 							chargeRate = record.get('chargeRate');
 							
 							Ext.getCmp('chbPrintFirstRecharge').show();
@@ -96,6 +101,8 @@ Ext.onReady(function(){
 							firstCharge.getEl().up('.x-form-item').setDisplayed(false);	
 							firstActualCharge.hide();
 							firstActualCharge.getEl().up('.x-form-item').setDisplayed(false);	
+							rechargeType.hide();
+							rechargeType.getEl().up('.x-form-item').setDisplayed(false);							
 							
 							Ext.getCmp('chbPrintFirstRecharge').hide();
 							Ext.getCmp('chbSendFirstCharge').hide();
@@ -136,7 +143,27 @@ Ext.onReady(function(){
 				id : 'cm_numFirstActualCharge',
 				fieldLabel : '账户充额'
 			}]
-		}, {
+		}, 	{
+			items : [{
+				xtype : 'combo',
+				id : 'rd_comboFirstRechargeType',
+				fieldLabel : '收款方式',
+				readOnly : false,
+				forceSelection : true,
+				value : 1,
+				store : new Ext.data.SimpleStore({
+					fields : ['text', 'value'],
+					data : [['现金', 1], ['刷卡', 2]]
+				}),
+				valueField : 'value',
+				displayField : 'text',
+				typeAhead : true,
+				mode : 'local',
+				triggerAction : 'all',
+				selectOnFocus : true,
+				allowBlank : false
+			}]
+			}, {
 			items : [{
 				xtype : 'combo',
 				id : 'cm_comboMemberSex',
@@ -163,11 +190,6 @@ Ext.onReady(function(){
 				id : 'cm_dateMemberBirthday',
 				fieldLabel : '生日',
 				format : 'Y-m-d'
-			}]
-		}, {
-			items : [{
-				id : 'cm_txtMemberTele',
-				fieldLabel : '电话'
 			}]
 		}, 
 /*		{
@@ -270,6 +292,7 @@ function cm_operationMemberData(c){
 	var memberType = Ext.getCmp('cm_comboMemberType');
 	var firstCharge = Ext.getCmp('cm_numFirstCharge');	
 	var firstActualCharge = Ext.getCmp('cm_numFirstActualCharge');	
+	var rechargeType = Ext.getCmp('rd_comboFirstRechargeType');
 	var memberID = Ext.getCmp('cm_numberMemberId');
 	var name = Ext.getCmp('cm_txtMemberName');
 	var mobile = Ext.getCmp('cm_txtMemberMobile');
@@ -278,7 +301,6 @@ function cm_operationMemberData(c){
 	
 	var sex = Ext.getCmp('cm_comboMemberSex');
 	var birthday = Ext.getCmp('cm_dateMemberBirthday');
-	var tele = Ext.getCmp('cm_txtMemberTele');
 	var addr = Ext.getCmp('cm_txtMemberContactAddress');
 	
 	var totalBalance = Ext.getCmp('cm_numberTotalBalance');
@@ -300,6 +322,8 @@ function cm_operationMemberData(c){
 	if(c.type.toUpperCase() == Ext.ux.otype['set'].toUpperCase()){
 		firstCharge.getEl().up('.x-form-item').setDisplayed(false);
 		firstActualCharge.getEl().up('.x-form-item').setDisplayed(false);
+		rechargeType.getEl().up('.x-form-item').setDisplayed(false);
+		
 		memberType.store.loadData(c.data.memberTypeData);
 		data = c.data == null || typeof c.data == 'undefined' ? {} : c.data;
 		memberID.setValue(data['id']);
@@ -312,7 +336,6 @@ function cm_operationMemberData(c){
 		}else{
 			birthday.setValue();
 		}
-		tele.setValue(data['tele']);
 		addr.setValue(data['contactAddress']);
 		
 		totalBalance.setValue(parseFloat(data['totalBalance']).toFixed(2));
@@ -422,6 +445,7 @@ function operateMemberHandler(c){
 	var birthday = Ext.getCmp('cm_dateMemberBirthday');
 	var firstCharge = Ext.getCmp('cm_numFirstCharge');
 	var firstActualCharge = Ext.getCmp('cm_numFirstActualCharge');
+	var rechargeType = Ext.getCmp('rd_comboFirstRechargeType');
 	
 	if(cm_obj.otype.toLowerCase() == Ext.ux.otype['update'].toLowerCase()){
 		// 验证旧类型为充值属性(后台验证)
@@ -452,7 +476,6 @@ function operateMemberHandler(c){
 		url : '../../OperateMember.do',                                                                            
 		params : {
 			dataSource : cm_obj.otype.toLowerCase(),
-			isCookie : true,
 			id : Ext.getCmp('cm_numberMemberId').getValue(),
 			name : memberName.getValue(),
 			mobile : memberMobile.getValue(),
@@ -460,9 +483,9 @@ function operateMemberHandler(c){
 			sex : memberSex.getValue(),
 			memberCard :Ext.getCmp('cm_numberMemberCard').getValue(),
 			birthday : birthday.getValue() ? birthday.getValue().format('Y-m-d') : '',
-			telt : Ext.getCmp('cm_txtMemberTele').getValue(),
 			firstCharge : firstCharge.getValue(),
 			firstActualCharge : firstActualCharge.getValue(),
+			rechargeType : rechargeType.getValue(),
 			isPrint : Ext.getCmp('chbPrintFirstRecharge').getValue(),
 			addr : Ext.getCmp('cm_txtMemberContactAddress').getValue()
 		},

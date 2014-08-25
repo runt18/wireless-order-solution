@@ -1182,7 +1182,7 @@ var btnControlMember = new Ext.ux.ImageButton({
 			ts_controlMemberWin = new Ext.Window({
 				title : '添加会员',
 				width : 660,
-				height : 240,
+				height : 235,
 				modal : true,
 				resizable : false,
 				closable : false,
