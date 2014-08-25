@@ -65,7 +65,7 @@ Ext.onReady(function(){
 				store : new Ext.data.JsonStore({
 //					url: '../../QueryMemberType.do?dataSource=normal',
 //					root : 'root',
-					fields : ['id', 'name', 'attributeValue']
+					fields : ['id', 'name', 'attributeValue', 'chargeRate']
 				}),
 				valueField : 'id',
 				displayField : 'name',
@@ -78,12 +78,27 @@ Ext.onReady(function(){
 				listeners : {
 					select : function(thiz, record, index){
 						var firstCharge = Ext.getCmp('cm_numFirstCharge');
+						var firstActualCharge = Ext.getCmp('cm_numFirstActualCharge');
 						if(cm_obj.otype.toLowerCase() == Ext.ux.otype['insert'].toLowerCase() && record.get('attributeValue') == 0){
 							firstCharge.show();
-							firstCharge.getEl().up('.x-form-item').setDisplayed(true);		
+							firstCharge.getEl().up('.x-form-item').setDisplayed(true);	
+							firstActualCharge.show();
+							firstActualCharge.getEl().up('.x-form-item').setDisplayed(true);
+							chargeRate = record.get('chargeRate');
+							
+							Ext.getCmp('chbPrintFirstRecharge').show();
+							
+							if(Ext.ux.smsModule)
+								Ext.getCmp('chbSendFirstCharge').show();
+							
 						}else{
 							firstCharge.hide();
 							firstCharge.getEl().up('.x-form-item').setDisplayed(false);	
+							firstActualCharge.hide();
+							firstActualCharge.getEl().up('.x-form-item').setDisplayed(false);	
+							
+							Ext.getCmp('chbPrintFirstRecharge').hide();
+							Ext.getCmp('chbSendFirstCharge').hide();
 						}						
 					}
 				}
@@ -93,7 +108,33 @@ Ext.onReady(function(){
 				hidden : true,
 				xtype : 'numberfield',
 				id : 'cm_numFirstCharge',
-				fieldLabel : '首次充值'
+				fieldLabel : '首次充值',
+				listeners : {
+					render : function(thiz){
+						Ext.getDom(thiz.getId()).onkeyup = function(){
+							if(thiz.getRawValue() != ''){
+								var iv = thiz.getValue();
+								iv = parseInt(iv);
+								if(iv < 1)
+									iv = 0;
+								if(iv > 100000)
+									iv = 100000;
+								thiz.setValue(parseInt(iv));
+								
+								var rm = thiz.getValue();
+								var pmm = Ext.getCmp('cm_numFirstActualCharge');
+								pmm.setValue(Math.round(rm * chargeRate));
+							}
+						};
+					}
+				}
+			}]
+		}, {
+			items : [{
+				hidden : true,
+				xtype : 'numberfield',
+				id : 'cm_numFirstActualCharge',
+				fieldLabel : '账户充额'
 			}]
 		}, {
 			items : [{
@@ -127,11 +168,6 @@ Ext.onReady(function(){
 			items : [{
 				id : 'cm_txtMemberTele',
 				fieldLabel : '电话'
-			}]
-		}, {
-			items : [{
-				id : 'cm_txtMemberIDCard',
-				fieldLabel : '身份证'
 			}]
 		}, 
 /*		{
@@ -233,6 +269,7 @@ function cm_operationMemberData(c){
 	var data = {};
 	var memberType = Ext.getCmp('cm_comboMemberType');
 	var firstCharge = Ext.getCmp('cm_numFirstCharge');	
+	var firstActualCharge = Ext.getCmp('cm_numFirstActualCharge');	
 	var memberID = Ext.getCmp('cm_numberMemberId');
 	var name = Ext.getCmp('cm_txtMemberName');
 	var mobile = Ext.getCmp('cm_txtMemberMobile');
@@ -242,7 +279,6 @@ function cm_operationMemberData(c){
 	var sex = Ext.getCmp('cm_comboMemberSex');
 	var birthday = Ext.getCmp('cm_dateMemberBirthday');
 	var tele = Ext.getCmp('cm_txtMemberTele');
-	var idCard = Ext.getCmp('cm_txtMemberIDCard');
 	var addr = Ext.getCmp('cm_txtMemberContactAddress');
 	
 	var totalBalance = Ext.getCmp('cm_numberTotalBalance');
@@ -255,6 +291,7 @@ function cm_operationMemberData(c){
 	
 	
 	firstCharge.setValue();
+	firstActualCharge.setValue();
 //	var publicComment = Ext.getCmp('cm_txtMemberPublicComment');
 //	var privateComment = Ext.getCmp('cm_txtMemberPrivateComment');
 	
@@ -262,6 +299,7 @@ function cm_operationMemberData(c){
 	
 	if(c.type.toUpperCase() == Ext.ux.otype['set'].toUpperCase()){
 		firstCharge.getEl().up('.x-form-item').setDisplayed(false);
+		firstActualCharge.getEl().up('.x-form-item').setDisplayed(false);
 		memberType.store.loadData(c.data.memberTypeData);
 		data = c.data == null || typeof c.data == 'undefined' ? {} : c.data;
 		memberID.setValue(data['id']);
@@ -275,7 +313,6 @@ function cm_operationMemberData(c){
 			birthday.setValue();
 		}
 		tele.setValue(data['tele']);
-		idCard.setValue(data['idCard']);
 		addr.setValue(data['contactAddress']);
 		
 		totalBalance.setValue(parseFloat(data['totalBalance']).toFixed(2));
@@ -384,6 +421,7 @@ function operateMemberHandler(c){
 	var memberSex = Ext.getCmp('cm_comboMemberSex');
 	var birthday = Ext.getCmp('cm_dateMemberBirthday');
 	var firstCharge = Ext.getCmp('cm_numFirstCharge');
+	var firstActualCharge = Ext.getCmp('cm_numFirstActualCharge');
 	
 	if(cm_obj.otype.toLowerCase() == Ext.ux.otype['update'].toLowerCase()){
 		// 验证旧类型为充值属性(后台验证)
@@ -423,8 +461,9 @@ function operateMemberHandler(c){
 			memberCard :Ext.getCmp('cm_numberMemberCard').getValue(),
 			birthday : birthday.getValue() ? birthday.getValue().format('Y-m-d') : '',
 			telt : Ext.getCmp('cm_txtMemberTele').getValue(),
-			idCard : Ext.getCmp('cm_txtMemberIDCard').getValue(),
 			firstCharge : firstCharge.getValue(),
+			firstActualCharge : firstActualCharge.getValue(),
+			isPrint : Ext.getCmp('chbPrintFirstRecharge').getValue(),
 			addr : Ext.getCmp('cm_txtMemberContactAddress').getValue()
 		},
 		success : function(res, opt){

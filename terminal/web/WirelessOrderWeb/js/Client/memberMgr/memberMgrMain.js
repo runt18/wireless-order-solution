@@ -36,6 +36,8 @@ function memberOperationHandler(c){
 	if(c == null || typeof c == 'undefined' || typeof c.type == 'undefined'){
 		return;
 	}
+	winInit();	
+	
 	memberBasicWin.otype = c.type;
 	if(c.type == Ext.ux.otype['insert']){
 		memberBasicWin.setTitle('添加会员资料');
@@ -199,12 +201,6 @@ function initRechargeWin(){
 						isPrint : Ext.getCmp('chbPrintRecharge').getValue(),
 						callback : function(_c){
 							rechargeWin.hide();
-//							var st = Ext.getCmp('mr_comboMemberSearchType');
-//							st.setValue(2);
-//							st.fireEvent('select', st, null, null);
-//							var n = Ext.getCmp('numberSearchValueByNumber');
-//							n.setValue(_c.data.memberCard);
-//							Ext.getCmp('btnSearchMember').handler();
 						}
 					});
 					
@@ -914,7 +910,8 @@ function treeInit(){
 						memberTypeData.root.push({
 							id : thiz.childNodes[i].attributes['memberTypeId'],
 							name : thiz.childNodes[i].attributes['memberTypeName'],
-							attributeValue : thiz.childNodes[i].attributes['attributeValue']
+							attributeValue : thiz.childNodes[i].attributes['attributeValue'],
+							chargeRate : thiz.childNodes[i].attributes['chargeRate']
 						});
 					}
 				}
@@ -1317,99 +1314,130 @@ function gridInit(){
 };
 
 function winInit(){
-	memberBasicWin = new Ext.Window({
-		title : '&nbsp;',
-		width : 660,
-		height : Ext.isIE ? 280 : 240,
-		modal : true,
-		resizable : false,
-		closable : false,
-		listeners : {
-			hide : function(thiz){
-				thiz.body.update('');
-			},
-			show : function(thiz){
-				var task = {
-					run : function(){
-						if(typeof cm_operationMemberBasicMsg == 'function'){
-							var data = {};
-							if(memberBasicWin.otype == Ext.ux.otype['update']){
-								data = Ext.ux.getSelData(memberBasicGrid);
-								data = !data ? {status:0} : data;
-							}else{
-								data = {status:0};
+	if(!memberBasicWin){
+		memberBasicWin = new Ext.Window({
+			title : '&nbsp;',
+			width : 660,
+			height : Ext.isIE ? 280 : 240,
+			modal : true,
+			resizable : false,
+			closable : false,
+			listeners : {
+				hide : function(thiz){
+					thiz.body.update('');
+				},
+				show : function(thiz){
+					var task = {
+						run : function(){
+							if(typeof cm_operationMemberBasicMsg == 'function'){
+								var data = {};
+								if(memberBasicWin.otype == Ext.ux.otype['update']){
+									data = Ext.ux.getSelData(memberBasicGrid);
+									data = !data ? {status:0} : data;
+								}else{
+									data = {status:0};
+								}
+								data.memberTypeData = memberTypeData.root;
+								cm_operationMemberBasicMsg({
+									type : 'SET',
+									data : data
+								});
+								Ext.TaskMgr.stop(this);
 							}
-							data.memberTypeData = memberTypeData.root;
-							cm_operationMemberBasicMsg({
-								type : 'SET',
-								data : data
-							});
-							Ext.TaskMgr.stop(this);
-						}
-					},
-					interval: 1000
-				};
-				
-				
-				thiz.load({
-					url : '../window/client/controlMember.jsp', 
-					scripts : true,
-					params : {
-						otype : memberBasicWin.otype
-					},
-					callback : function(){
-						Ext.TaskMgr.start(task);
-					}
-				});
-				thiz.center();
-			}
-		},
-		keys : [{
-			key : Ext.EventObject.ESC,
-			scope : this,
-			fn : function(){
-				memberBasicWin.hide();
-			}
-		}],
-		bbar : ['->', {
-			text : '保存',
-			id : 'btnSaveControlMemberBasicMsg',
-			iconCls : 'btn_save',
-			handler : function(e){
-				if(typeof operateMemberHandler != 'function'){
-					Ext.example.msg('提示', '操作失败, 请求异常, 请尝试刷新页面后重试.');
-				}else{
-					var btnClose = Ext.getCmp('btnCloseControlMemberBasicMsg');
-					operateMemberHandler({
-						type : memberBasicWin.otype,
-						data : memberBasicWin.otype == Ext.ux.otype['update'] ? Ext.ux.getSelData(memberBasicGrid) : null,
-						setButtonStatus : function(s){
-							e.setDisabled(s);
-							btnClose.setDisabled(s);
 						},
-						callback : function(memberData, c, res){
-							if(res.success){
-								memberBasicWin.hide();
-								Ext.example.msg(res.title, res.msg);
-								Ext.getCmp('btnSearchMember').handler();
-								memberTypeTree.getRootNode().reload();
+						interval: 1000
+					};
+					
+					
+					thiz.load({
+						url : '../window/client/controlMember.jsp', 
+						scripts : true,
+						params : {
+							otype : memberBasicWin.otype
+						},
+						callback : function(){
+							Ext.TaskMgr.start(task);
+							if(Ext.ux.getCookie(document.domain+'_chargeSms') == 'true'){
+								Ext.getCmp('chbSendFirstCharge').setValue(true);
 							}else{
-								Ext.ux.showMsg(res);
-							}
+								Ext.getCmp('chbSendFirstCharge').setValue(false);
+							}						
 						}
-					});							
+					});
+					thiz.center();
 				}
-			}
-		}, {
-			text : '关闭',
-			id : 'btnCloseControlMemberBasicMsg',
-			iconCls : 'btn_close',
-			handler : function(){
-				memberBasicWin.hide();
-				cm_operationMemberBasicMsg = null;
-			}
-		}]
-	});
+			},
+			keys : [{
+				key : Ext.EventObject.ESC,
+				scope : this,
+				fn : function(){
+					memberBasicWin.hide();
+				}
+			}],
+			bbar : [{
+					xtype : 'checkbox',
+					id : 'chbPrintFirstRecharge',
+					checked : true,
+					hidden : true,
+					boxLabel : '打印充值信息'
+				},{
+					xtype : 'tbtext',
+					text : '&nbsp;&nbsp;'
+				},{
+					xtype : 'checkbox',
+					id : 'chbSendFirstCharge',
+					checked : true,
+					boxLabel : '发送充值信息'+(Ext.ux.smsCount >= 20 ? '(<font style="color:green;font-weight:bolder">剩余'+Ext.ux.smsCount+'条</font>)' : '(<font style="color:red;font-weight:bolder">剩余'+Ext.ux.smsCount+'条, 请及时充值</font>)'),
+					hidden : true
+				},'->', {
+					text : '保存',
+					id : 'btnSaveControlMemberBasicMsg',
+					iconCls : 'btn_save',
+					handler : function(e){
+						if(typeof operateMemberHandler != 'function'){
+							Ext.example.msg('提示', '操作失败, 请求异常, 请尝试刷新页面后重试.');
+						}else{
+							var sendSms = Ext.getCmp('chbSendFirstCharge').getValue();
+							if(sendSms){
+								Ext.ux.setCookie(document.domain+'_chargeSms', true, 3650);
+							}else{
+								Ext.ux.setCookie(document.domain+'_chargeSms', false, 3650);
+							}
+							var btnClose = Ext.getCmp('btnCloseControlMemberBasicMsg');
+							operateMemberHandler({
+								type : memberBasicWin.otype,
+								data : memberBasicWin.otype == Ext.ux.otype['update'] ? Ext.ux.getSelData(memberBasicGrid) : null,
+								setButtonStatus : function(s){
+									e.setDisabled(s);
+									btnClose.setDisabled(s);
+								},
+								callback : function(memberData, c, res){
+									if(res.success){
+										memberBasicWin.hide();
+										Ext.example.msg(res.title, res.msg);
+										Ext.getCmp('btnSearchMember').handler();
+										memberTypeTree.getRootNode().reload();
+									}else{
+										Ext.ux.showMsg(res);
+									}
+								}
+							});							
+						}
+					}
+			}, {
+				text : '关闭',
+				id : 'btnCloseControlMemberBasicMsg',
+				iconCls : 'btn_close',
+				handler : function(){
+					memberBasicWin.hide();
+					Ext.getCmp('chbPrintFirstRecharge').hide();
+					Ext.getCmp('chbSendFirstCharge').hide();
+					cm_operationMemberBasicMsg = null;
+				}
+			}]
+		});	
+	}
+
 }
 
 //----------------
@@ -2506,8 +2534,7 @@ Ext.onReady(function(){
 		})
 	});
 	 
-	winInit();
-	memberBasicWin.render(document.body);
+//	memberBasicWin.render(document.body);
 	Ext.ux.checkSmStat();
 	
 	memberTipWin = Ext.ux.ToastWindow({

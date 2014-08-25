@@ -1181,8 +1181,8 @@ var btnControlMember = new Ext.ux.ImageButton({
 		if(!ts_controlMemberWin){
 			ts_controlMemberWin = new Ext.Window({
 				title : '添加会员',
-				width : 650,
-				height : 296,
+				width : 660,
+				height : 240,
 				modal : true,
 				resizable : false,
 				closable : false,
@@ -1214,6 +1214,11 @@ var btnControlMember = new Ext.ux.ImageButton({
 							},
 							callback : function(){
 								Ext.TaskMgr.start(task);
+								if(Ext.ux.getCookie(document.domain+'_chargeSms') == 'true'){
+									Ext.getCmp('chbSendFirstCharge').setValue(true);
+								}else{
+									Ext.getCmp('chbSendFirstCharge').setValue(false);
+								}									
 							}
 						});
 					}
@@ -1225,7 +1230,23 @@ var btnControlMember = new Ext.ux.ImageButton({
 						ts_controlMemberWin.hide();
 					}
 				}],
-				bbar : ['->', {
+				bbar : [{
+					xtype : 'checkbox',
+					id : 'chbPrintFirstRecharge',
+					checked : true,
+					hidden : true,
+					boxLabel : '打印充值信息'
+				},{
+					xtype : 'tbtext',
+					text : '&nbsp;&nbsp;'
+				},{
+					xtype : 'checkbox',
+					id : 'chbSendFirstCharge',
+					checked : true,
+					boxLabel : '发送充值信息'+(Ext.ux.smsCount >= 20 ? '(<font style="color:green;font-weight:bolder">剩余'+Ext.ux.smsCount+'条</font>)' : '(<font style="color:red;font-weight:bolder">剩余'+Ext.ux.smsCount+'条, 请及时充值</font>)'),
+	//				hidden : !Ext.ux.smsModule
+					hidden : true
+				},'->', {
 					text : '保存',
 					id : 'btnSaveControlMemberBasicMsg',
 					iconCls : 'btn_save',
@@ -1257,6 +1278,8 @@ var btnControlMember = new Ext.ux.ImageButton({
 					iconCls : 'btn_close',
 					handler : function(){
 						ts_controlMemberWin.hide();
+						Ext.getCmp('chbPrintFirstRecharge').hide();
+						Ext.getCmp('chbSendFirstCharge').hide();						
 					}
 				}]
 			});

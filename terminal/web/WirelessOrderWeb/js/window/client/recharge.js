@@ -121,12 +121,8 @@ Ext.onReady(function(){
 									
 									var rm = thiz.getValue();
 									var pmm = Ext.getCmp('rd_numRechargeMoney');
-									//var gm = Ext.getCmp('rd_numGiftMoney');
-									//var gp = Ext.getCmp('rd_numGiftPoint');
 									var tempMT = rechargeOperateData.memberType;
 									pmm.setValue(Math.round(rm * tempMT.chargeRate));
-									//gm.setValue(parseInt(rm * Math.abs((tempMT.chargeRate - 1))));
-									//gp.setValue(Math.round(rm * tempMT.exchangeRate));
 								}
 							};
 						}
