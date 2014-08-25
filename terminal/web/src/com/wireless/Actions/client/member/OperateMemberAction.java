@@ -54,11 +54,13 @@ public class OperateMemberAction extends DispatchAction{
 			String memberCard = request.getParameter("memberCard");
 			String birthday = request.getParameter("birthday");
 			String tele = request.getParameter("telt");
-			String idCard = request.getParameter("idCard");
 			String company = request.getParameter("company");
 			String addr = request.getParameter("addr");
-			String privateComment = request.getParameter("privateComment");
-			String publicComment = request.getParameter("publicComment");
+			String isPrint = request.getParameter("isPrint");
+			String firstCharge = request.getParameter("firstCharge");
+			String firstActualCharge = request.getParameter("firstActualCharge");
+//			String privateComment = request.getParameter("privateComment");
+//			String publicComment = request.getParameter("publicComment");
 			
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
@@ -67,15 +69,51 @@ public class OperateMemberAction extends DispatchAction{
 			  .setSex(Member.Sex.valueOf(Integer.valueOf(sex)))
 			  .setMemberCard(memberCard)
 			  .setTele(tele)
-			  .setIdCard(idCard)
 			  .setCompany(company)
-			  .setPrivateComment(privateComment)
-			  .setPublicComment(publicComment)
+//			  .setPrivateComment(privateComment)
+//			  .setPublicComment(publicComment)
 			  .setContactAddr(addr)
 			  .setSex(Member.Sex.valueOf(Integer.valueOf(sex)));
 			
-			MemberDao.insert(staff, ib);
+			int memberID = MemberDao.insert(staff, ib);
 			jobject.initTip(true, "操作成功, 新会员资料已添加.");
+			
+			if(firstActualCharge != null && !firstActualCharge.isEmpty()){
+				if(firstCharge.isEmpty()){
+					firstCharge = "0";
+				}
+				MemberOperation mo = MemberDao.charge(staff, memberID, Float.valueOf(firstCharge), Float.valueOf(firstActualCharge), ChargeType.CASH);
+				jobject.setMsg(jobject.getMsg() + "会员充值成功.");
+				if(isPrint != null && Boolean.valueOf(isPrint)){
+					try{
+						ProtocolPackage resp = ServerConnector.instance().ask(ReqPrintContent.buildReqPrintMemberReceipt(staff, mo.getId()));
+						if(resp.header.type == Type.ACK){
+							jobject.setMsg(jobject.getMsg() + "打印充值信息成功.");
+						}else{
+							jobject.setMsg(jobject.getMsg() + "打印充值信息失败.");
+						}
+					}catch(IOException e){
+						e.printStackTrace();
+						jobject.setMsg(jobject.getMsg() + "打印操作请求失败.");
+					}
+				}
+				for(Cookie cookie : request.getCookies()){
+				    if(cookie.getName().equals((request.getServerName() + "_chargeSms"))){
+				    	if(cookie.getValue().equals("true")){
+							try{
+								//Send SMS.
+								SMS.send(staff, mo.getMemberMobile(), new Msg4Charge(mo));
+								jobject.setMsg(jobject.getMsg() + "充值短信发送成功.");
+							}catch(Exception e){
+								jobject.setMsg(jobject.getMsg() + "充值短信发送失败(" + e.getMessage() + ")");
+								e.printStackTrace();
+							}
+				    	}
+					    break;
+				    }
+				}
+			}
+			
 		}catch(BusinessException e){
 			e.printStackTrace();
 			jobject.initTip(e);
@@ -113,9 +151,8 @@ public class OperateMemberAction extends DispatchAction{
 			String memberCard = request.getParameter("memberCard");
 			String birthday = request.getParameter("birthday");
 			String tele = request.getParameter("telt");
-			String idCard = request.getParameter("idCard");
 			String addr = request.getParameter("addr");
-			String privateComment = request.getParameter("privateComment");
+//			String privateComment = request.getParameter("privateComment");
 			//String publicComment = request.getParameter("publicComment");
 			String phonePublicComment = request.getParameter("phonePublicComment");
 			
@@ -129,8 +166,7 @@ public class OperateMemberAction extends DispatchAction{
 											    .setBirthday(birthday)
 											    .setMemberCard(memberCard)
 											    .setTele(tele)
-											    .setIdCard(idCard)
-											    .setPrivateComment(privateComment)
+//											    .setPrivateComment(privateComment)
 											    .setContactAddr(addr);
 			if(phonePublicComment != null && !phonePublicComment.isEmpty()){
 				ub.setPublicComment(phonePublicComment);
