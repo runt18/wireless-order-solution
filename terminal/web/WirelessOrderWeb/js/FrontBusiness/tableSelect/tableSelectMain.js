@@ -1109,7 +1109,7 @@ var btnMemberRecharge = new Ext.ux.ImageButton({
 				modal : true,
 				resizable : false,
 				width : 680,
-				height : 350,
+				height : 290,
 				listeners : {
 					hide : function(thiz){
 						thiz.body.update('');
