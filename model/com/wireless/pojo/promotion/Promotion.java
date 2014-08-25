@@ -12,7 +12,7 @@ public class Promotion {
 		private final DateRange range;
 		private final String title;
 		private final String body;
-		private Type type = Type.FREE;
+		private Type type = Type.DISPLAY_ONLY;
 		private int point;
 		private final CouponType.InsertBuilder typeBuilder;
 		private final List<Integer> members = SortedList.newInstance();
@@ -35,6 +35,9 @@ public class Promotion {
 		}
 		
 		public CreateBuilder addMember(int memberId){
+			if(type == Type.DISPLAY_ONLY){
+				throw new IllegalStateException("【" + Type.DISPLAY_ONLY.desc + "】类型的优惠活动不能发放优惠券");
+			}
 			if(!members.contains(memberId)){
 				members.add(memberId);
 			}
@@ -55,9 +58,10 @@ public class Promotion {
 	}
 	
 	public static enum Type{
-		FREE(1, "免费领取"),
-		ONCE(2, "单次积分符合条件领取"),
-		TOTAL(3, "累计积分符合条件领取");
+		DISPLAY_ONLY(1, "只展示"),
+		FREE(2, "免费领取"),
+		ONCE(3, "单次积分符合条件领取"),
+		TOTAL(4, "累计积分符合条件领取");
 		
 		private final int val;
 		private final String desc;
