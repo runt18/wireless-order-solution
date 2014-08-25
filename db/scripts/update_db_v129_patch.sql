@@ -57,10 +57,10 @@ CREATE TABLE IF NOT EXISTS `wireless_order_db`.`promotion` (
   `finish_date` DATE NOT NULL,
   `title` VARCHAR(45) NOT NULL,
   `body` TEXT NOT NULL,
-  `type` TINYINT NOT NULL COMMENT 'the type as below\n1 - 免费领取\n2 - 单次消费满X积分\n3 - 累计消费满X积分',
+  `type` TINYINT NOT NULL DEFAULT 1 COMMENT 'the type as below\n1 - 只展现\n2 - 免费领取\n3 - 单次消费满X积分\n4 - 累计消费满X积分',
   `point` INT NOT NULL DEFAULT 0,
   `status` TINYINT NOT NULL COMMENT 'the status as below.\n1 - 已创建\n2 - 已发布\n3 - 进行中\n4 - 已结束',
-  `coupon_type_id` INT NOT NULL,
+  `coupon_type_id` INT DEFAULT NULL,
   PRIMARY KEY (`promotion_id`),
   INDEX `ix_restaurant_id` (`restaurant_id` ASC),
   INDEX `ix_coupon_type_id` (`coupon_type_id` ASC))
