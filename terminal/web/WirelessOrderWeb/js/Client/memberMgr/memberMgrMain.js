@@ -1094,7 +1094,7 @@ function gridInit(){
 			text : '会员手机/会员卡号/会员名:'
 		}, 			
 		{
-			xtype : 'numberfield',
+			xtype : 'textfield',
 			id : 'numberSearchByMemberPhoneOrCardOrName'
 		}, '->', {
 			text : '高级条件↓',

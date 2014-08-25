@@ -1188,15 +1188,32 @@ var btnControlMember = new Ext.ux.ImageButton({
 				closable : false,
 				listeners : {
 					hide : function(thiz){
-						thiz.body.update();
+						thiz.body.update('');
 					},
 					show : function(thiz){
-						thiz.center();
+						var task = {
+							run : function(){
+								if(typeof cm_operationMemberBasicMsg == 'function'){
+									var data = {status:0};
+//									data.memberTypeData = memberTypeData.root;
+									cm_operationMemberBasicMsg({
+										type : 'SET',
+										data : data
+									});
+									Ext.TaskMgr.stop(this);
+								}
+							},
+							interval: 1000
+						};	
+						
 						thiz.load({
 							url : '../window/client/controlMember.jsp',
 							scripts : true,
 							params : {
 								otype : 'insert'
+							},
+							callback : function(){
+								Ext.TaskMgr.start(task);
 							}
 						});
 					}

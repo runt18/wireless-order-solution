@@ -342,6 +342,21 @@ function cm_operationMemberBasicMsg(c){
 	if(c == null || c.type == null || typeof c.type == 'undefined')
 		return;
 	if(c.type.toUpperCase() == Ext.ux.otype['set'].toUpperCase()){
+		if(!c.data.memberTypeData){
+			$.ajax({
+				url : '../../QueryMemberType.do',
+				type : 'post',
+				async:false,
+				data : {dataSource : 'normal'},
+				success : function(jr, status, xhr){
+					c.data.memberTypeData = jr.root;
+				},
+				error : function(request, status, err){
+					alert(request.msg);
+				}
+			}); 			
+		}
+		
 		cm_obj.data = c.data;
 		cm_operationMemberData({
 			type : c.type,
