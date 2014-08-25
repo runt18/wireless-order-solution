@@ -138,9 +138,10 @@ public class PromotionDao {
 			throw new SQLException("Failed to generated the promotion id.");
 		}
 		
-		//Create the coupon with members.
-		CouponDao.create(dbCon, staff, new Coupon.CreateBuilder(couponTypeId, promotionId).setMembers(builder.getMembers()));
-
+		//Create the coupon with members if the promotion type NOT belong to 'DISPLAY_ONLY'.
+		if(promotion.getType() != Promotion.Type.DISPLAY_ONLY){
+			CouponDao.create(dbCon, staff, new Coupon.CreateBuilder(couponTypeId, promotionId).setMembers(builder.getMembers()));
+		}
 		return promotionId;
 	}
 	

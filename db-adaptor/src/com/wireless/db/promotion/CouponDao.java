@@ -186,6 +186,35 @@ public class CouponDao {
 	
 	/**
 	 * Draw a coupon to specific id.
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param couponId
+	 * 			the coupon to draw
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			<li>throws if the coupon to draw does NOT exist
+	 * 			<li>throws if coupon is NOT in 'PUBLISH' status
+	 * 			<li>throws if the promotion associated with this coupon is NOT in 'PROGRESS' status
+	 * 			<li>throws if the coupon is NOT qualified to draw
+	 */
+	public static void draw(Staff staff, int couponId) throws SQLException, BusinessException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			dbCon.conn.setAutoCommit(false);
+			draw(dbCon, staff, couponId);
+			dbCon.conn.commit();
+		}catch(SQLException | BusinessException e){
+			dbCon.conn.rollback();
+			throw e;
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Draw a coupon to specific id.
 	 * @param dbCon
 	 * 			the database connection
 	 * @param staff
