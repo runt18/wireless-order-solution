@@ -116,7 +116,7 @@
 		</init-param>
 		<init-param>
 			<param-name>imageUploadType</param-name>
-			<param-value>jpg,gif,png,bmp</param-value>
+			<param-value>jpg,jpeg,gif,png,bmp</param-value>
 		</init-param>
 		<init-param>
 			<param-name>oss_access_id</param-name>
