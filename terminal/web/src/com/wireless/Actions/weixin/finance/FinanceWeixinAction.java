@@ -1,4 +1,4 @@
-package com.wireless.Actions.weixin;
+package com.wireless.Actions.weixin.finance;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -48,6 +48,7 @@ import org.marker.weixin.MySecurity;
 import org.marker.weixin.api.Button;
 import org.marker.weixin.api.Menu;
 import org.marker.weixin.api.Token;
+import org.marker.weixin.api.User;
 import org.marker.weixin.msg.Data4Item;
 import org.marker.weixin.msg.Msg;
 import org.marker.weixin.msg.Msg4Event;
@@ -76,15 +77,18 @@ import com.wireless.util.OSSUtil;
 
 public class FinanceWeixinAction extends Action {
 	
-	//private final static String APP_ID = "wx6fde9cd2c7fc791e";
-	//private final static String APP_SECRET = "0a360a43b80e3a334e5e52da706a3134";
+	final static String APP_ID = "wx6fde9cd2c7fc791e";
+	final static String APP_SECRET = "0a360a43b80e3a334e5e52da706a3134";
 	//FIXME just 4 test
-	private final static String APP_ID = "wxa7b4687daedda86f";
-	private final static String APP_SECRET = "4322fbf1c4bba4cccd90424e2e16306b";
+	//final static String APP_ID = "wxa7b4687daedda86f";
+	//final static String APP_SECRET = "4322fbf1c4bba4cccd90424e2e16306b";
 	
 	private final static int WEIXIN_CONTENT_LENGTH = 34;
 	
 	private String financeBucket;
+	
+	private final static String PROMPT_HELP_MSG = "用管理员账号登陆后台，按图片提示，扫描验证二维码绑定您的餐厅";
+	private final static String PROMPT_HELP_PIC_URL = "http://wx.e-tones.net/web-term/images/interestHelp.png";
 	
 	//TOKEN 是你在微信平台开发模式中设置的哦
 	public static final String TOKEN = "xxx";
@@ -151,12 +155,15 @@ public class FinanceWeixinAction extends Action {
 				public void onEventMsg(final Msg4Event msg){
 					if(msg.getEvent() == Event.SUBSCRIBE){
 						if(msg.getTicket().isEmpty()){
-							Msg4Text rmsg =	new Msg4Text(msg);
-							rmsg.setContent("欢迎关注志易云平台:-)");
-							session.callback(rmsg);
+							session.callback(new Msg4ImageText(msg).addItem(new Data4Item("欢迎关注志易云服务", PROMPT_HELP_MSG, PROMPT_HELP_PIC_URL, "")));
 						}else{
 							session.callback(doBinding(msg, msg.getEventKey().replace("qrscene_", "")));
 						}
+						
+					}else if(msg.getEvent() == Event.UNSUBSCRIBE){
+						try{
+							WeixinFinanceDao.cancel(msg.getFromUserName());
+						}catch(SQLException ignored){}
 						
 					}else if(msg.getEvent() == Event.SCAN){
 						session.callback(doBinding(msg, msg.getEventKey()));
@@ -260,9 +267,16 @@ public class FinanceWeixinAction extends Action {
 
 		try{
 			Restaurant restaurant = WeixinFinanceDao.bind(msg.getFromUserName(), Integer.parseInt(restaurantId));
-			rmsg.setContent("亲，恭喜您已成功绑定'" + restaurant.getName() + "':-)\n");
+			Token token = Token.newInstance(APP_ID, APP_SECRET);
+			User user = User.newInstance(token, msg.getFromUserName());
+			user.remark(token, restaurant.getName());
+			rmsg.setContent("亲爱的" + user.getNickName() + "，您已成功绑定【" + restaurant.getName() + "】\n");
+			
 		}catch(BusinessException | SQLException | NumberFormatException e){
 			rmsg.setContent("对不起，您要绑定的餐厅不存在");
+			
+		}catch(IOException ignored){
+			
 		}
 		
 		return rmsg;
@@ -282,7 +296,7 @@ public class FinanceWeixinAction extends Action {
 		try{
 			WeixinFinanceDao.bind(msg.getFromUserName(), account, pwd);
 			Restaurant restaurant = RestaurantDao.getByAccount(account);
-			rmsg.setContent("恭喜您, 已成功绑定'" + restaurant.getName() + "':-)");
+			rmsg.setContent("恭喜您, 已成功绑定【" + restaurant.getName() + "】:-)");
 			return rmsg;
 			
 		}catch(BusinessException e){
@@ -296,16 +310,18 @@ public class FinanceWeixinAction extends Action {
 	}
 	
 	private Msg doToday(Msg msg){
-		Msg4Text rmsg =	new Msg4Text(msg);
 		
 		try{
 			int restaurantId = WeixinFinanceDao.getRestaurantIdByWeixin(msg.getFromUserName());
-			rmsg.setContent(makeShiftContent("即时战报", RestaurantDao.getById(restaurantId), ShiftDao.getTodayDaily(StaffDao.getAdminByRestaurant(restaurantId))));
-		}catch(SQLException | BusinessException | ParseException e){
-			rmsg.setContent("对不起，暂时查询不到即时战报的信息:-(");
+			return new Msg4Text(msg, (makeShiftContent("即时战报", RestaurantDao.getById(restaurantId), ShiftDao.getTodayDaily(StaffDao.getAdminByRestaurant(restaurantId)))));
+			
+		}catch(BusinessException e){
+			return new Msg4ImageText(msg).addItem(new Data4Item(e.getMessage(), PROMPT_HELP_MSG, PROMPT_HELP_PIC_URL, ""));
+			
+		}catch(SQLException | ParseException e){
+			return new Msg4Text(msg, "对不起，暂时查询不到即时战报的信息:-(");
 		}
 		
-		return rmsg;
 	}
 	
 	/**
@@ -314,8 +330,6 @@ public class FinanceWeixinAction extends Action {
 	 * @return
 	 */
 	private Msg doYesterday(Msg msg){
-		
-		Msg4Text rmsg =	new Msg4Text(msg);
 		
 		DBCon dbCon = null;
 		try{
@@ -343,10 +357,13 @@ public class FinanceWeixinAction extends Action {
 				    								 new DutyRange(onDuty, offDuty), 
 				    								 new CalcBillStatisticsDao.ExtraCond(DateType.HISTORY));
 
-			rmsg.setContent(makeShiftContent("最近日结", RestaurantDao.getById(restaurantId), detail));
+			return new Msg4Text(msg, makeShiftContent("最近日结", RestaurantDao.getById(restaurantId), detail));
 			
-		}catch(SQLException | BusinessException | ParseException e){
-			rmsg.setContent("对不起，暂时查询不到最近日结的信息:-(");
+		}catch(BusinessException e){
+			return new Msg4ImageText(msg).addItem(new Data4Item(e.getMessage(), PROMPT_HELP_MSG, PROMPT_HELP_PIC_URL, ""));
+			
+		}catch(SQLException | ParseException e){
+			return new Msg4Text(msg, "对不起，暂时查询不到最近日结的信息:-(");
 			
 		}finally{
 			if(dbCon != null){
@@ -354,7 +371,6 @@ public class FinanceWeixinAction extends Action {
 			}
 		}
 		
-		return rmsg;
 	}
 	
 	private String makeShiftContent(String title, Restaurant restaurant, ShiftDetail detail) throws ParseException{
@@ -397,7 +413,6 @@ public class FinanceWeixinAction extends Action {
 	 * @return
 	 */
 	private Msg doThisMonth(Msg msg){
-		Msg4Text rmsg =	new Msg4Text(msg);
 		
 		try{
 			Calendar c = Calendar.getInstance();
@@ -413,14 +428,13 @@ public class FinanceWeixinAction extends Action {
 													 new DutyRange(DateUtil.format(beginDate, DateUtil.Pattern.DATE), DateUtil.format(endDate, DateUtil.Pattern.DATE)), 
 													 new CalcBillStatisticsDao.ExtraCond(DateType.HISTORY));
 			
-			rmsg.setContent(makeShiftContent("本月周报", RestaurantDao.getById(restaurantId), detail));
+			return new Msg4Text(msg, makeShiftContent("本月月报", RestaurantDao.getById(restaurantId), detail));
 			
 		}catch(SQLException | BusinessException | ParseException e){
-			rmsg.setContent("对不起，暂时查询不到本月周报的信息:-(");
+			return new Msg4Text(msg, "对不起，暂时查询不到本月周报的信息:-(");
 			
 		}
 		
-		return rmsg;
 	}
 	
 	/**
@@ -429,7 +443,6 @@ public class FinanceWeixinAction extends Action {
 	 * @return
 	 */
 	private Msg doLastMonth(Msg msg){
-		Msg4Text rmsg =	new Msg4Text(msg);
 		
 		try{
 			Calendar c = Calendar.getInstance();
@@ -446,14 +459,13 @@ public class FinanceWeixinAction extends Action {
 													 new DutyRange(DateUtil.format(beginDate, DateUtil.Pattern.DATE), DateUtil.format(endDate, DateUtil.Pattern.DATE)), 
 													 new CalcBillStatisticsDao.ExtraCond(DateType.HISTORY));
 			
-			rmsg.setContent(makeShiftContent("上月周报", RestaurantDao.getById(restaurantId), detail));
+			return new Msg4Text(msg, makeShiftContent("上月月报", RestaurantDao.getById(restaurantId), detail));
 			
 		}catch(SQLException | BusinessException | ParseException e){
-			rmsg.setContent("对不起，暂时查询不到上月周报的信息:-(");
+			return new Msg4Text(msg, "对不起，暂时查询不到上月周报的信息:-(");
 			
 		}
 		
-		return rmsg;
 	}
 	
 	/**
@@ -472,7 +484,7 @@ public class FinanceWeixinAction extends Action {
 			   .append("描述：查看最近日结\n")
 			   .append("输入：rj\n");
 		content.append("--------3--------\n")
-		   	   .append("描述：查看近5天营业信息\n")
+		   	   .append("描述：查看本周营业信息\n")
 		   	   .append("输入：yy\n");
 
 		rmsg.setContent(content.toString());
@@ -505,10 +517,10 @@ public class FinanceWeixinAction extends Action {
 			
 			List<IncomeByEachDay> incomes = CalcBillStatisticsDao.calcIncomeByEachDay(StaffDao.getAdminByRestaurant(restaurantId), 
 														new DutyRange(
-														//DateUtil.format(beginDate, DateUtil.Pattern.DATE),
-														//DateUtil.format(endDate, DateUtil.Pattern.DATE)),
-														"2014-08-18",
-														"2014-08-18"),
+														DateUtil.format(beginDate, DateUtil.Pattern.DATE),
+														DateUtil.format(endDate, DateUtil.Pattern.DATE)),
+														//"2014-08-18",
+														//"2014-08-18"),
 														new CalcBillStatisticsDao.ExtraCond(DateType.HISTORY));
 			
 			final String fileNameJpg = "trend_chart_" + msg.getFromUserName() + ".jpg";
@@ -525,7 +537,7 @@ public class FinanceWeixinAction extends Action {
 										 "走势图", "http://" + financeBucket + "." + OSSParams.instance().OSS_OUTER_POINT + "/" + fileNameJpg + "?" + System.currentTimeMillis(), "");
 			
 			Data4Item d2 = new Data4Item("最近一天营业额：" + NumericUtil.CURRENCY_SIGN + NumericUtil.float2String2(incomes.get(incomes.size() - 1).getIncomeByPay().getTotalActual()), 
-										 "", "http://www.yl-blog.com/template/ylblog/images/logo.png", ""); 
+										 "", "http://wx.e-tones.net/web-term/images/recentIncome.png", ""); 
 
 			
 			float averageIncome = 0;
@@ -534,7 +546,7 @@ public class FinanceWeixinAction extends Action {
 			}
 			averageIncome = averageIncome / incomes.size();
 			Data4Item d3 = new Data4Item("本周平均营业额：" + NumericUtil.CURRENCY_SIGN + NumericUtil.float2String2(averageIncome), 
-					 					 "", "http://www.yl-blog.com/template/ylblog/images/logo.png", ""); 
+					 					 "", "http://wx.e-tones.net/web-term/images/averageIncome.png", ""); 
 			      
 			mit.addItem(d1);
 			mit.addItem(d2);
@@ -543,10 +555,7 @@ public class FinanceWeixinAction extends Action {
 			return mit;
 			
 		} catch (Exception e) {
-			Msg4Text rmsg =	new Msg4Text(msg);
-			rmsg.setContent(e.getMessage());
-			//rmsg.setContent("对不起,暂时不能生成今日关注信息哦:-(");
-			return rmsg;
+			return new Msg4ImageText(msg).addItem(new Data4Item(e.getMessage(), PROMPT_HELP_MSG, PROMPT_HELP_PIC_URL, ""));
 		}
 	}
 	
@@ -605,7 +614,7 @@ public class FinanceWeixinAction extends Action {
 			}
 			averageIncome = averageIncome / incomes.size();
 			Data4Item d2 = new Data4Item("上周平均营业额：" + NumericUtil.CURRENCY_SIGN + NumericUtil.float2String2(averageIncome), 
-					 					 "", "http://www.yl-blog.com/template/ylblog/images/logo.png", ""); 
+					 					 "", "http://wx.e-tones.net/web-term/images/averageIncome.png", ""); 
 			      
 			mit.addItem(d1);
 			mit.addItem(d2);
@@ -613,10 +622,7 @@ public class FinanceWeixinAction extends Action {
 			return mit;
 			
 		} catch (Exception e) {
-			Msg4Text rmsg =	new Msg4Text(msg);
-			rmsg.setContent(e.getMessage());
-			//rmsg.setContent("对不起,暂时不能生成今日关注信息哦:-(");
-			return rmsg;
+			return new Msg4ImageText(msg).addItem(new Data4Item(e.getMessage(), PROMPT_HELP_MSG, PROMPT_HELP_PIC_URL, ""));
 		}
 	}
 	
@@ -829,13 +835,13 @@ public class FinanceWeixinAction extends Action {
 							.build();
 		menu.set1stButton(b1);
 		
-		Button b2 = new Button.ClickBuilder("营业周报", "BBB")
+		Button b2 = new Button.ClickBuilder("周报", "BBB")
 							.addChild(new Button.ClickBuilder("本周报表", THIS_WEEK_EVENT_KEY))
 							.addChild(new Button.ClickBuilder("上周报表", LAST_WEEK_EVENT_KEY))
 							.build();
 		menu.set2ndButton(b2);
 
-		Button b3 = new Button.ClickBuilder("营业月报", "AAA")
+		Button b3 = new Button.ClickBuilder("月报", "AAA")
 							.addChild(new Button.ClickBuilder("本月报表", THIS_MONTH_EVENT_KEY))
 							.addChild(new Button.ClickBuilder("上月报表", LAST_MONTH_EVENT_KEY))
 							.build();

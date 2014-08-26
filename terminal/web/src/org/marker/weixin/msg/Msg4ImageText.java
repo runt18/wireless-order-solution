@@ -48,9 +48,10 @@ public class Msg4ImageText extends Msg {
 	public void read(Document document) {
 	}
 
-	public void addItem(Data4Item item) {
+	public Msg4ImageText addItem(Data4Item item) {
 		this.items.add(item);
 		reflushArticleCount();
+		return this;
 	}
 
 	public void removeItem(int index) {

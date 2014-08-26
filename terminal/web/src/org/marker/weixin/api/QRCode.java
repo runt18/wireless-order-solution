@@ -30,7 +30,7 @@ public class QRCode implements Jsonable{
 		}
 	}
 	
-	private int expired = 1800;
+	private int expired = 900;
 	private int sceneId;
 	private String ticket;
 	private ActionName actionName = ActionName.TEMP;
@@ -130,8 +130,8 @@ public class QRCode implements Jsonable{
 	};
 	
 	public static void main(String[] args) throws IOException{
-		String appId = "wxa7b4687daedda86f";
-		String appSecret = "4322fbf1c4bba4cccd90424e2e16306b";
-		System.out.println(new QRCode().setSceneId(40).createUrl(Token.newInstance(appId, appSecret)));
+		String appId = "wx6fde9cd2c7fc791e";
+		String appSecret = "0a360a43b80e3a334e5e52da706a3134";
+		System.out.println(new QRCode().setSceneId(98).createUrl(Token.newInstance(appId, appSecret)));
 	}
 }
