@@ -390,7 +390,10 @@ function memberPayOrderToBindData(_c){
 	var payManner = Ext.getCmp('mpo_comPayMannerForPayOrder');
 	var payMoney = $('#mpo_txtPayMoneyForPayOrder');
 	var customNum = Ext.getCmp('mpo_numCustomNumberForPayOrder');
-	Ext.getCmp('txtMemberEraseQuota').setValue();
+	if(Ext.getCmp('txtMemberEraseQuota')){
+		Ext.getCmp('txtMemberEraseQuota').setValue();
+	}
+	
 	
 //	var coupon = Ext.getCmp('mpo_couponForPayOrder');
 	
@@ -722,7 +725,7 @@ function memberPayOrderHandler(_c){
 	var customNum = Ext.getCmp('mpo_numCustomNumberForPayOrder');
 	var chooseDiscount = Ext.getCmp('mpo_txtDiscountForPayOrder');
 //	var chooseCoupon = Ext.getCmp('mpo_couponForPayOrder');
-	var eraseQuota = document.getElementById("txtMemberEraseQuota").value;
+	var eraseQuota = document.getElementById("txtMemberEraseQuota");
 	
 	if(!payManner.isValid() || !customNum.isValid()){
 		return;
@@ -754,7 +757,7 @@ function memberPayOrderHandler(_c){
 			memberID : member['id'],
 			comment : '',
 			serviceRate : (order['serviceRate'] * 100),
-			eraseQuota : eraseQuota?eraseQuota:0,
+			eraseQuota : eraseQuota?eraseQuota.value:0,
 //			pricePlanID : order['pricePlan']['id'],
 			customNum : customNum.getValue()
 		},
