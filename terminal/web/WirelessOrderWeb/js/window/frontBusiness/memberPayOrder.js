@@ -324,7 +324,7 @@ function loadSystemSetting(_c){
 			if (jr.success == true) {
 				restaurantData = jr.other.systemSetting;
 				if(restaurantData.setting.eraseQuota > 0){
-					new Ext.form.TextField({
+					new Ext.form.NumberField({
 						id : 'txtMemberEraseQuota',
 						width : 95,
 						height : 30,
@@ -731,8 +731,9 @@ function memberPayOrderHandler(_c){
 		return;
 	}
 				// 抹数金额
-	if(!isNaN(eraseQuota) && eraseQuota >=0 && eraseQuota > restaurantData.setting.eraseQuota){
+	if(eraseQuota && !isNaN(eraseQuota.value) && eraseQuota.value >=0 && eraseQuota.value > restaurantData.setting.eraseQuota){
 		Ext.Msg.alert("提示", "<b>抹数金额大于设置上限，不能结帐！</b>");
+		return;
 	}
 	if(eval(memberType.attributeValue == 0) && eval(client.clientTypeID != 0)){
 		if(eval(member.totalBalance < order.acturalPrice)){
@@ -746,7 +747,6 @@ function memberPayOrderHandler(_c){
 	Ext.Ajax.request({
 		url : "../../PayOrder.do",
 		params : {
-			pin : _c.pin,
 			orderID : order['id'],
 			cashIncome : order['actualPrice'],
 			payType : 2,
@@ -757,7 +757,7 @@ function memberPayOrderHandler(_c){
 			memberID : member['id'],
 			comment : '',
 			serviceRate : (order['serviceRate'] * 100),
-			eraseQuota : eraseQuota?eraseQuota.value:0,
+			eraseQuota : eraseQuota?(eraseQuota.value?eraseQuota.value:0):0,
 //			pricePlanID : order['pricePlan']['id'],
 			customNum : customNum.getValue()
 		},

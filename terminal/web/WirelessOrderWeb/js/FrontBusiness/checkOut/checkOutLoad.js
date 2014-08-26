@@ -213,7 +213,7 @@ function refreshCheckOutData(_c){
 }
 
 function checkOutOnLoad() {	
-	new Ext.form.TextField({
+	new Ext.form.NumberField({
 		id : 'txtEraseQuota',
 		width : 95,
 		height : 30,
