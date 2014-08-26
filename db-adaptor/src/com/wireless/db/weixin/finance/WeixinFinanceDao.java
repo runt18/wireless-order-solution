@@ -151,6 +151,43 @@ public class WeixinFinanceDao {
 	}
 	
 	/**
+	 * Cancel the relationship.
+	 * @param weixinSerial
+	 * 			the weixin serial
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static void cancel(String weixinSerial) throws SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			cancel(dbCon, weixinSerial);
+		}finally{
+			dbCon.disconnect();
+		}
+		
+	}
+	
+	/**
+	 * Cancel the relationship.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param weixinSerial
+	 * 			the weixin serial
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static void cancel(DBCon dbCon, String weixinSerial) throws SQLException{
+		String sql;
+		
+		//Delete the previous bind relationship.
+		sql = " DELETE FROM " + Params.dbName + ".weixin_finance " +
+			  " WHERE weixin_serial_crc = CRC32('" + weixinSerial + "')" +
+			  " AND weixin_serial = '" + weixinSerial + "'";
+		dbCon.stmt.executeUpdate(sql);
+	}
+	
+	/**
 	 * Get the restaurant id to the specific weixin serial.
 	 * @param weixinSerial
 	 * 			the weinxin serial
@@ -192,7 +229,7 @@ public class WeixinFinanceDao {
 		if(dbCon.rs.next()){
 			restaurantId = dbCon.rs.getInt("restaurant_id");
 		}else{
-			throw new BusinessException(WeixinFinanceError.WEIXIN_SERIAL_NOT_EXIST);
+			throw new BusinessException(WeixinFinanceError.WEIXIN_SERIAL_NOT_BOUND);
 		}
 		dbCon.rs.close();
 		
