@@ -1099,7 +1099,7 @@ function showWeixinVerifyCode(){
 	});
 	if(!verifyCodeWin){
 		verifyCodeWin = new Ext.Window({
-			title : '',
+			title : '志易云服务验证二维码',
 			closable : true,
 			resizeble : false,
 			closeAction : 'hide',
