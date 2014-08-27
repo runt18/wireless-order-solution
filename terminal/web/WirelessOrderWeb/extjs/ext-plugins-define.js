@@ -2,7 +2,7 @@
  * 自定义插件
  */
 Ext.namespace('Ext.ux', 'Ext.ux.plugins');
-Ext.ux.plugins.imgTypes = ['jpg', 'gif', 'bmp', 'png'];
+Ext.ux.plugins.imgTypes = ['jpg','jpeg', 'gif', 'bmp', 'png'];
 Ext.ux.plugins.createImageFile = function(config){
 	config = config || {};
 	var img = new Ext.form.TextField({
