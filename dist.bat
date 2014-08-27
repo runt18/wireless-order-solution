@@ -45,11 +45,11 @@ IF NOT EXIST www GOTO www_not_exist
 
 Rem copy the web-term files
 :web_term_files
-IF EXIST terminal\web\WirelessOrderWeb GOTO web_term_exist
-IF NOT EXIST terminal\web\WirelessOrderWeb GOTO web_term_not_exist
+IF EXIST terminal\web\web-term GOTO web_term_exist
+IF NOT EXIST terminal\web\web-term GOTO web_term_not_exist
 :web_term_exist
 	@echo copying the web-term files...
-	@xcopy /s/y terminal\web\WirelessOrderWeb dist\www\web-term\ > nul
+	@xcopy /s/y terminal\web\web-term dist\www\web-term\ > nul
 
 	GOTO android_apk
 
