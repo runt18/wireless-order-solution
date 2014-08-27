@@ -882,6 +882,7 @@ function operateWXInfo(){
 			buttons : [btnPreview, btnClear, btnSave, btnClose]
 		});
 		var center = new Ext.Panel({
+			id : 'showDivHtml',
 			region : 'center',
 			style : 'background-color: #fff; border: 1px solid #ccc; padding: 5px 5px 5px 5px;',
 			bodyStyle : 'overflow-y: auto; word-wrap:break-word;',
@@ -1080,3 +1081,38 @@ function warnModule(msg){
 	info.msg = msg;
 	Ext.ux.showMsg(info);
 }
+
+var verifyCodeWin;
+function showWeixinVerifyCode(){
+	$('#weixinVerifyCode').html();
+	Ext.Ajax.request({
+		url : '../../FinanceQRCode.do',
+		success : function(res, opt){
+			var jr = Ext.decode(res.responseText);
+			var img = '<img alt="" src="'+ jr.other.qrcode_url +'" width="480px" height="480px">';
+			$('#weixinVerifyCode').html(img);
+		},
+		fialure : function(res, opt){
+			wx.lm.hide();
+			Ext.ux.showMsg(res.responseText);
+		}
+	});
+	if(!verifyCodeWin){
+		verifyCodeWin = new Ext.Window({
+			title : '',
+			closable : true,
+			resizeble : false,
+			closeAction : 'hide',
+			modal : true,
+			width : 500,
+			height : 500,
+			items : [new Ext.Panel({
+				contentEl : 'weixinVerifyCode'
+			})]
+		});		
+	}
+	
+	verifyCodeWin.show();
+	
+}
+
