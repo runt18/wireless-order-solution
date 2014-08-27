@@ -100,7 +100,7 @@ $(function(){
 	window.onresize = autoWidth;
 	
 	$('#txtVerifyCode').focus(function(){
-		$('html, body').animate({scrollTop: 200}, 'fast'); 
+		$('html, body').animate({scrollTop: 190+($('#divMemberPrivilegeDetail').height()>=30?$('#divMemberPrivilegeDetail').height():-15)}, 'fast'); 
 	});
 
 	$('html, body').animate({scrollTop: 0}, 'fast'); 

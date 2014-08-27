@@ -344,7 +344,7 @@ function toggleRechargeDetails(){
 	mainView.fadeToggle(function(){
 		if(mainView.css('display') == 'block'){
 			$('html, body').animate({scrollTop: 0}, 'fast');
-			$('html, body').animate({scrollTop: (370+$('#table_consumeDetails').height())}, 'fast');
+			$('html, body').animate({scrollTop: (370+($('#table_consumeDetails').height() != 0?$('#table_consumeDetails').height():-55))}, 'fast');
 			if(!toggleRechargeDetails.load){
 				// 加载近5条消费记录
 				toggleRechargeDetails.load = function(){
@@ -623,7 +623,7 @@ function showMemberBind(){
 	$('#btn_activate').hide();
 	$('#ulVerifyAndBind').show();
 //	$('#divOccupyHtml').show();
-	$('html, body').animate({scrollTop: 160+$('#divMemberPrivilegeDetail').height()}, 'fast'); 
+	$('html, body').animate({scrollTop: 190+($('#divMemberPrivilegeDetail').height()>=30?$('#divMemberPrivilegeDetail').height():-25)}, 'fast'); 
 //	$('#txtVerifyMobile').focus();
 	weixinPhoneFocus();
 	weixinPhoneFocus();

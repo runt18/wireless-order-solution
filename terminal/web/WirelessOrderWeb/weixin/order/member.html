@@ -380,13 +380,19 @@ var totalMath = 0;
 		<li class="none-line" style="line-height: 50px;">
 			<div style="width:100%;">
 				验证码: <input id="txtVerifyCode" type="number" maxlength="4" style="width:80px;"/>&nbsp;&nbsp;&nbsp;
-	<!-- 			<a id="btnVerifyCode" href="#" style="color: blue;" ></a> -->
-				<input id="btnGetVerifyCode" type="button" value="获取验证码" onClick="getVerifyCode({event:this})">
-				<input id="btnBindMember" type="button" value="确认绑定"  style="display: none;"  onClick="bindMember({event:this})">
+				<span id="btnVerifyCode" style="color: blue;font-size: 14px;" >59秒后可重新获取</span>
+<!-- 				<input id="btnGetVerifyCode" type="button" value="获取验证码" onClick="getVerifyCode({event:this})">
+				<input id="btnBindMember" type="button" value="确认绑定"  style="display: none;"  onClick="bindMember({event:this})"> -->
 			</div>
-		<li style="text-align: center;">
-			<a id="btnVerifyCode" href="#" style="color: blue;" ></a>
-	
+		<li class="none-line">
+			<div id="btnGetVerifyCode" style="height: 55px;width: 100%;text-align: center;" >
+				<a class="a_demo_two" style="font-size: 20px;font-weight: bold;" onclick="getVerifyCode({event:this})">获取验证码</a>	
+			
+			</div>	
+			<div id="btnBindMember" style="margin-top: 3px;height: 55px;width: 100%;text-align: center;display: none;" >
+				<a class="a_demo_two" style="font-size: 20px;font-weight: bold;" onclick="bindMember({event:this})">确认绑定</a>	
+			
+			</div>							
 		</li>
 	</ul>
 	</li>
