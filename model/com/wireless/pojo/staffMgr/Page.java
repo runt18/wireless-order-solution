@@ -133,7 +133,9 @@ public class Page{
 	public static enum System{
 		FORMATPRICE("formatPrice", "收款设置", "", "../../images/formatPrice.png"),
 		RESTAURANT("resturantMgr", "餐厅管理", "", "../../images/resturantMgr.png"),
-		STAFF("staffMgr", "员工管理", "System_Module/StaffManagement.html", "../../images/staffMgr.png");
+		STAFF("staffMgr", "员工管理", "System_Module/StaffManagement.html", "../../images/staffMgr.png"),
+		VERIFY_CODE("verifyCode", "验证二维码", "", "../../images/weixinCode.jpg");
+		
 		
 		private String mgrId;
 		private String desc;
@@ -202,9 +204,10 @@ public class Page{
 	
 	public static enum Member{
 //		MEMBER_TYPE("memberType", "会员类型", "Client_Module/MemberTypeManagement.html", "../../images/memberTypeMgr.png"),
-		MEMBER("memberMgr", "会员管理", "Client_Module/MemberManagement.html", "../../images/memberMgr.png");
+		MEMBER("memberMgr", "会员管理", "Client_Module/MemberManagement.html", "../../images/memberMgr.png"),
+		ACTIVE("activeMgr", "优惠活动管理", "Client_Module/ActiveManagement.html", "../../images/memberMgr.png"),
 //		MEMBER_LEVEL("memberLevel", "会员等级", "Client_Module/MemberLevelManagement.html", "../../images/memberLevel.png");
-//		COUPON("coupon", "优惠劵管理", "Client_Module/CouponManagement.html", "../../images/book.png" )
+		COUPON("coupon", "优惠劵管理", "Client_Module/CouponManagement.html", "../../images/book.png" );
 		
 		private String mgrId;
 		private String desc;
