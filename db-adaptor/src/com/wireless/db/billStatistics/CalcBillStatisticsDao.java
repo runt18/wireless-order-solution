@@ -1043,6 +1043,8 @@ public class CalcBillStatisticsDao {
 			 incomeByCharge.setTotalAccountRefund(Math.abs(dbCon.rs.getFloat("total_account_refund")));
 		 }
 		 
+		 dbCon.rs.close();
+		 
 		 return incomeByCharge;
 		 
 	 }
