@@ -1735,7 +1735,7 @@ public class MemberDao {
 		dbCon.rs.close();
 		
 		int rank = 0;
-		sql = " SELECT COUNT(*) FROM " + Params.dbName + ".member WHERE total_point >= " + member.getTotalPoint();
+		sql = " SELECT COUNT(*) FROM " + Params.dbName + ".member WHERE restaurant_id = " + staff.getRestaurantId() + " AND total_point >= " + member.getTotalPoint();
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		if(dbCon.rs.next()){
 			rank = dbCon.rs.getInt(1);
