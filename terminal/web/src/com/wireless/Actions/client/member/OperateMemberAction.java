@@ -53,12 +53,14 @@ public class OperateMemberAction extends DispatchAction{
 			String sex = request.getParameter("sex");
 			String memberCard = request.getParameter("memberCard");
 			String birthday = request.getParameter("birthday");
-			String tele = request.getParameter("telt");
+//			String tele = request.getParameter("telt");
 			String company = request.getParameter("company");
 			String addr = request.getParameter("addr");
 			String isPrint = request.getParameter("isPrint");
 			String firstCharge = request.getParameter("firstCharge");
 			String firstActualCharge = request.getParameter("firstActualCharge");
+			String rechargeType = request.getParameter("rechargeType");
+					
 //			String privateComment = request.getParameter("privateComment");
 //			String publicComment = request.getParameter("publicComment");
 			
@@ -68,7 +70,7 @@ public class OperateMemberAction extends DispatchAction{
 			ib.setBirthday(birthday)
 			  .setSex(Member.Sex.valueOf(Integer.valueOf(sex)))
 			  .setMemberCard(memberCard)
-			  .setTele(tele)
+//			  .setTele(tele)
 			  .setCompany(company)
 //			  .setPrivateComment(privateComment)
 //			  .setPublicComment(publicComment)
@@ -82,7 +84,7 @@ public class OperateMemberAction extends DispatchAction{
 				if(firstCharge.isEmpty()){
 					firstCharge = "0";
 				}
-				MemberOperation mo = MemberDao.charge(staff, memberID, Float.valueOf(firstCharge), Float.valueOf(firstActualCharge), ChargeType.CASH);
+				MemberOperation mo = MemberDao.charge(staff, memberID, Float.valueOf(firstCharge), Float.valueOf(firstActualCharge), ChargeType.valueOf(Integer.valueOf(rechargeType)));
 				jobject.setMsg(jobject.getMsg() + "会员充值成功.");
 				if(isPrint != null && Boolean.valueOf(isPrint)){
 					try{
