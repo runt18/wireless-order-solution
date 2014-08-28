@@ -102,5 +102,4 @@ $(function(){
 	$('#txtVerifyCode').focus(function(){
 		$('html, body').animate({scrollTop: 190+($('#divMemberPrivilegeDetail').height()>=30?$('#divMemberPrivilegeDetail').height():-15)}, 'fast'); 
 	});
-
 });

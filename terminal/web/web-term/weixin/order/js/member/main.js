@@ -117,6 +117,7 @@ function getVerifyCode(c){
  * @param c
  */
 function bindMember(c){
+	$('html, body').animate({scrollTop: 0}, 'fast');  
 	c = c == null ? {} : c;
 	var mobile = $('#txtVerifyMobile');
 
@@ -138,7 +139,7 @@ function bindMember(c){
 	
 	c.event = typeof c.event == 'undefined' ? document.getElementById('btnBindMember') : c.event;
 	setBtnDisabled(true);
-	$('html, body').animate({scrollTop: 0}, 'fast');  
+	
 	$.ajax({
 		url : '../../WXOperateMember.do',
 		type : 'post',
@@ -154,8 +155,8 @@ function bindMember(c){
 		success : function(data, status, xhr){
 			Util.dialog.show({title: data.title, msg: data.msg});
 			if(data.success){
-				window.location.reload();
 				$('html, body').animate({scrollTop: 0}, 'fast'); 
+				window.location.href = window.location.href;
 			}
 			setBtnDisabled(false);
 		},
