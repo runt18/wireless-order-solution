@@ -29,7 +29,7 @@ function initMemberMsg(c){
 }
 
 function setBtnDisabled(s){
-	var btnVerifyCode = document.getElementById('btnVerifyCode');
+	var btnVerifyCode = document.getElementById('btnGetVerifyCode');
 	var btnBindMember = document.getElementById('btnBindMember');
 	
 	if(s===false){
@@ -69,10 +69,9 @@ function getVerifyCode(c){
 	
 	c.event =  document.getElementById('btnVerifyCode');
 	
-	
-//	setBtnDisabled(true);
-//	mobile.attr('disabled', true);
 	verifyMobile = mobile;
+	btnVerifyCode.hide();
+	btnBindMember.show();	
 	$.ajax({
 		url : '../../WXOperateMember.do',
 		type : 'post',
@@ -88,8 +87,6 @@ function getVerifyCode(c){
 				verifyCode = data.other.code;
 				Util.lineTD($('#divVerifyAndBind > div[data-type=detail]'), 'show');
 				var interval = null, time = 60;
-				btnVerifyCode.hide();
-				btnBindMember.show();
 								
 				interval = window.setInterval(function(){
 					if(time == 0){
@@ -104,8 +101,9 @@ function getVerifyCode(c){
 					time--;
 				}, 1000);
 			}else{
-//				setBtnDisabled(false);
 				Util.dialog.show({msg: "获取验证码失败, 请稍候再试."});
+				btnVerifyCode.show();
+				btnBindMember.hide();				
 			}
 		},
 		error : function(data, errotType, eeor){
@@ -121,15 +119,16 @@ function getVerifyCode(c){
 function bindMember(c){
 	c = c == null ? {} : c;
 	var mobile = $('#txtVerifyMobile');
-//	var name = $('#txtVerifyName');
+
 	var code = $('#txtVerifyCode');
-//	var sex = $('input[name=radioVerifySex]');
-//	for(var i = 0; i < sex.length; i++){
-//		if(sex[i].checked){
-//			sex = sex[i];
-//			break;
-//		}
-//	}
+/*	var name = $('#txtVerifyName');	
+	var sex = $('input[name=radioVerifySex]');
+	for(var i = 0; i < sex.length; i++){
+		if(sex[i].checked){
+			sex = sex[i];
+			break;
+		}
+	}*/
 	
 	
 	if(!params.VerifyCode.code.test(code.val().trim())){
@@ -139,6 +138,7 @@ function bindMember(c){
 	
 	c.event = typeof c.event == 'undefined' ? document.getElementById('btnBindMember') : c.event;
 	setBtnDisabled(true);
+	$('html, body').animate({scrollTop: 0}, 'fast');  
 	$.ajax({
 		url : '../../WXOperateMember.do',
 		type : 'post',
@@ -155,6 +155,7 @@ function bindMember(c){
 			Util.dialog.show({title: data.title, msg: data.msg});
 			if(data.success){
 				window.location.reload();
+				$('html, body').animate({scrollTop: 0}, 'fast'); 
 			}
 			setBtnDisabled(false);
 		},
@@ -546,38 +547,10 @@ function toggleMemberLevel(){
 			if(!toggleMemberLevel.load){
 				toggleMemberLevel.load = function(){
 					Util.lm.show();
-/*					$.post('../../QueryMemberType.do', {dataSource : 'getMemberLevel', fid : Util.mp.fid, oid : Util.mp.oid}, function(result){
-						if(result.success){
-							totalMath = result.root[result.root.length - 1].pointThreshold;
-							member.totalPoint = member.totalPoint >= totalMath ? totalMath : member.totalPoint; 
-							mainView.append('<h3>会员等级列表</h3>');
-							for(var i in result.root){
-								var levelWidth = result.root[i].pointThreshold / totalMath * 100;
-								var memberLevelWidth = member.totalPoint / totalMath * 100;
-								var tipHtml = result.root[i].inLevel == true ? '<div id="positionTip" class="tooltip" style="left : -13%">'+ member.totalPoint +'分</div>' : '';
-								var spanHtml = result.root[i].inLevel == true ? '<span style="width:'+ memberLevelWidth +'%;background-color:'+ colors[1] +';word-break:keep-all;white-space:nowrap;">'+ result.root[i].pointThreshold +'分&nbsp;('+ result.root[i].memberType.discount.name +')</span>'
-																				: '<span style="width:'+ levelWidth +'%;background-color:'+ colors[2] +';word-break:keep-all;white-space:nowrap;">'+ result.root[i].pointThreshold +'分&nbsp;('+ result.root[i].memberType.discount.name +')</span>';
-								
-								mainView.append('<div class="memberLevelList"><div class="memberLevelHead"><p class="memberLevelHeadFont">'+ result.root[i].memberTypeName+'</div>'
-										+ '<div class="memberLevelBody">'
-										+ '<div class="graph">' + spanHtml 
-										+ tipHtml
-										+ '</div></div></div>');
-							}
-							var width = ((member.totalPoint/totalMath) - .13) * 100 + '%';
-							$('#positionTip').css({left : width});
-							
-						}else{
-							$('#divMemberTypeDesc').append('<div>会员等级建立中...</div>');
-						}
-						Util.lm.hide();
-					});*/
 					$('html, body').animate({scrollTop: 0});
 					$('html, body').animate({scrollTop: 310+$('#divMemberPointContent').height()+$('#divMemberBalanceContent').height()}, 'fast');					
 					$.post('../../QueryMemberLevel.do', {dataSource : 'chart', rid:member.restaurant.id}, function(result){
 						if(result.success){
-//							totalMath = result.root[result.root.length - 1].pointThreshold;
-//							member.totalPoint = member.totalPoint >= totalMath ? totalMath : member.totalPoint; 
 							mainView.prepend('<h3>会员等级列表</h3>');
 							mainView.css('margin-left', '-40%');
 							
@@ -622,9 +595,7 @@ function weixinPhoneFocus(){
 function showMemberBind(){
 	$('#btn_activate').hide();
 	$('#ulVerifyAndBind').show();
-//	$('#divOccupyHtml').show();
 	$('html, body').animate({scrollTop: 190+($('#divMemberPrivilegeDetail').height()>=30?$('#divMemberPrivilegeDetail').height():-25)}, 'fast'); 
-//	$('#txtVerifyMobile').focus();
 	weixinPhoneFocus();
 	weixinPhoneFocus();
 }
