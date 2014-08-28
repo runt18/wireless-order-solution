@@ -1,4 +1,5 @@
 $(function(){
+	$('html, body').animate({scrollTop: 0}, 'fast');
 	Util.lbar('', function(html){ $(document.body).append(html);  });
 	Util.lm.show();
 	$.ajax({

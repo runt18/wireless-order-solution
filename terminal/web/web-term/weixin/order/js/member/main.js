@@ -87,7 +87,6 @@ function getVerifyCode(c){
 				verifyCode = data.other.code;
 				Util.lineTD($('#divVerifyAndBind > div[data-type=detail]'), 'show');
 				var interval = null, time = 60;
-								
 				interval = window.setInterval(function(){
 					if(time == 0){
 						window.clearInterval(interval);
@@ -100,6 +99,8 @@ function getVerifyCode(c){
 					}
 					time--;
 				}, 1000);
+				
+				
 			}else{
 				Util.dialog.show({msg: "获取验证码失败, 请稍候再试."});
 				btnVerifyCode.show();
@@ -117,7 +118,7 @@ function getVerifyCode(c){
  * @param c
  */
 function bindMember(c){
-	$('html, body').animate({scrollTop: 0}, 'fast');  
+  
 	c = c == null ? {} : c;
 	var mobile = $('#txtVerifyMobile');
 
@@ -131,40 +132,43 @@ function bindMember(c){
 		}
 	}*/
 	
-	
+	code.blur();
 	if(!params.VerifyCode.code.test(code.val().trim())){
 		Util.dialog.show({msg: params.VerifyCode.text});
 		return;
 	}
 	
-	c.event = typeof c.event == 'undefined' ? document.getElementById('btnBindMember') : c.event;
-	setBtnDisabled(true);
-	
-	$.ajax({
-		url : '../../WXOperateMember.do',
-		type : 'post',
-		data : {
-			dataSource : 'bind',
-			oid : Util.mp.oid,
-			fid : Util.mp.fid,
-			codeId : verifyCode.id,
-			code : code.val().trim(),
-			mobile : mobile.val().trim()
-		},
-		dataType : 'json',
-		success : function(data, status, xhr){
-			Util.dialog.show({title: data.title, msg: data.msg});
-			if(data.success){
-				$('html, body').animate({scrollTop: 0}, 'fast'); 
-				window.location.href = window.location.href;
+	$('html, body').animate({scrollTop: 0}, 'fast',function(){
+		c.event = typeof c.event == 'undefined' ? document.getElementById('btnBindMember') : c.event;
+		setBtnDisabled(true);
+		
+		$.ajax({
+			url : '../../WXOperateMember.do',
+			type : 'post',
+			data : {
+				dataSource : 'bind',
+				oid : Util.mp.oid,
+				fid : Util.mp.fid,
+				codeId : verifyCode.id,
+				code : code.val().trim(),
+				mobile : mobile.val().trim()
+			},
+			dataType : 'json',
+			success : function(data, status, xhr){
+				Util.dialog.show({title: data.title, msg: data.msg});
+				if(data.success){
+					window.location.reload();
+				}
+				setBtnDisabled(false);
+			},
+			error : function(data, errotType, eeor){
+				setBtnDisabled(false);
+				Util.dialog.show({msg: '服务器请求失败, 请稍候再试.'});
 			}
-			setBtnDisabled(false);
-		},
-		error : function(data, errotType, eeor){
-			setBtnDisabled(false);
-			Util.dialog.show({msg: '服务器请求失败, 请稍候再试.'});
-		}
+		});
 	});
+	
+
 }
 /**
  * 重新绑定手机号码
