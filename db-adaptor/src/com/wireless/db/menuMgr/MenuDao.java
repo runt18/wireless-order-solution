@@ -13,12 +13,7 @@ import com.wireless.pojo.crMgr.CancelReason;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.menuMgr.Food;
-import com.wireless.pojo.menuMgr.FoodTaste;
 import com.wireless.pojo.menuMgr.Kitchen;
-import com.wireless.pojo.tasteMgr.Taste;
-import com.wireless.pojo.tasteMgr.TasteCategory;
-import com.wireless.pojo.tasteMgr.TasteCategory.Status;
-import com.wireless.pojo.tasteMgr.TasteCategory.Type;
 import com.wireless.util.SQLUtil;
 
 public class MenuDao {
@@ -203,65 +198,6 @@ public class MenuDao {
 		}finally{
 			dbCon.disconnect();
 		}
-	}
-	
-	/**
-	 * 
-	 * @param restaurantID
-	 * @return
-	 * @throws Exception
-	 */
-	public static List<FoodTaste> getFoodTaste(int restaurantID) throws Exception{
-		return MenuDao.getFoodTaste(" and A.restaurant_id = " + restaurantID, " order by A.taste_id");
-	}
-	
-	/**
-	 * 
-	 * @param cond
-	 * @param orderBy
-	 * @return
-	 * @throws SQLException
-	 */
-	public static List<FoodTaste> getFoodTaste(String cond, String orderBy) throws SQLException{
-		List<FoodTaste> list = new ArrayList<FoodTaste>();
-		FoodTaste item = null;
-		Taste taste = null;
-		DBCon dbCon = new DBCon();
-		try{
-			dbCon.connect();
-			String querySQL = "SELECT "
-							+ " A.taste_id, A.restaurant_id, A.preference, A.price, A.category_id, A.rate, A.calc, A.type, "
-							+ " B.name category_name, B.type category_type, B.status category_status"
-							+ " FROM " + Params.dbName + ".taste A LEFT JOIN " + Params.dbName + ".taste_category B ON A.category_id = B.category_id "
-							+ " WHERE 1=1 "
-							+ (cond != null && cond.trim().length() > 0 ? " " + cond : "")
-							+ (orderBy != null && orderBy.trim().length() > 0 ? " " + orderBy : "");
-			dbCon.rs = dbCon.stmt.executeQuery(querySQL);
-			while(dbCon.rs != null && dbCon.rs.next()){
-				taste = new Taste(dbCon.rs.getInt("taste_id"));
-				taste.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
-				taste.setPreference(dbCon.rs.getString("preference"));
-				taste.setPrice(dbCon.rs.getFloat("price"));
-				taste.setCategory(new TasteCategory(dbCon.rs.getInt("category_id"), dbCon.rs.getString("category_name")));
-				taste.getCategory().setType(Type.valueOf(dbCon.rs.getInt("category_type")));
-				taste.getCategory().setStatus(Status.valueOf(dbCon.rs.getInt("category_status")));
-				taste.setRate(dbCon.rs.getFloat("rate"));
-				taste.setCalc(dbCon.rs.getInt("calc"));
-				taste.setType(dbCon.rs.getInt("type"));
-				
-				item = new FoodTaste(taste);
-				
-				list.add(item);
-				taste = null;
-				item = null;
-			}
-			
-		}catch(SQLException e){
-			throw e;
-		}finally{
-			dbCon.disconnect();
-		}
-		return list;
 	}
 	
 	/**
