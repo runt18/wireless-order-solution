@@ -151,7 +151,7 @@ co.initKitchenContent = function(c){
 	}
 	temp = null;
 	
-	//FIXME
+	//FIXME 厨房分页
 	co.showKitchenPaging();
 	//
 	co.fp.init({
@@ -231,6 +231,52 @@ co.ot.initBarForCommomTaste = function(){
 		}
 	});
 };
+
+//FIXME 临时加分区调出常用口味
+co.ot.initBarForCommomFloatTaste = function(c){
+	
+	co.ot.initBarForCommomTaste();
+	var sf = $('#divCFCONewFood > div[class*=div-newFood-select]');
+	co.ot.foodData = typeof co.newFood[sf.attr('data-index')] != 'undefined' ? co.newFood[sf.attr('data-index')] : co.newFood[0];
+	
+	co.ot.allBill = 2;
+
+	$.ajax({
+		url : '../QueryFoodTaste.do',
+		type : 'post',
+		data : {
+			foodID : c.foodId
+		},
+		success : function(data, status, xhr){
+			co.ot.tp = co.ot.ctp;
+			if(data.success && data.root.length > 0){
+				co.ot.ctp.init({
+					data : data.root.slice(0)
+				});	
+				co.ot.tp.getFirstPage();
+				var html = ''
+				for (var i = 0; i < data.root.length; i++) {
+					html += Templet.co.boxSelectTasteFloat.format({
+						dataIndex : i,
+						id : data.root[i].taste.id,
+						name : data.root[i].taste.name,
+						mark : data.root[i].taste.cateStatusValue == 2 ? '¥' : data.root[i].taste.cateStatusValue == 1 ? '比例' : '',
+						markText : data.root[i].taste.cateStatusValue == 2 ? data.root[i].taste.price : data.root[i].taste.cateStatusValue == 1 ? data.root[i].taste.rate : '0.00'
+					});					
+				}
+				$('#spanTasteFloatFoodName').html(data.root[0].food.name);
+				$('#divFloatFoodTastes').html(html);
+				$('#divFoodTasteFloat').show();
+			}else{
+				$('#divFoodTasteFloat').hide();
+			}
+		},
+		error : function(request, status, err){
+			alert('加载菜品常用口味数据失败.');
+		}
+	});	
+};
+
 /**
  * 初始化所有口味数据操作工具
  */

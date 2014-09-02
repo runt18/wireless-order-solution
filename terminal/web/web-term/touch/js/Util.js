@@ -156,6 +156,7 @@ Util.padding = function(c){
 
 				}
 				temp = null;
+				
 				this.dom.innerHTML = html;
 			}
 			this.showMsg();

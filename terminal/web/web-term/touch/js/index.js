@@ -38,6 +38,10 @@ var Templet={
   	  		+ '{name}'
   	  		+ '<div>{mark}:{markText}</div>'
   	  		+ '</div>',
+  	  	boxSelectTasteFloat : '<div data-index={dataIndex} data-value={id} class="main-box-base" onClick="co.ot.insertTaste({event:this, tasteId:{id}, fTaste:true})">'
+  	  		+ '{name}'
+  	  		+ '<div>{mark}:{markText}</div>'
+  	  		+ '</div>',  	  		
   	  	boxTasteCategory : '<div style="background-color:yellow;" data-index={dataIndex} data-value={id} class="main-box-base" onClick="co.ot.changeTasteCategory({event:this, tasteId:{id}})">'
   	  		+ '{name}'
   	  		+ '</div>',

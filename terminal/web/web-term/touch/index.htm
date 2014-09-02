@@ -64,6 +64,21 @@ var ss = {
 	allStopFood : []
 };
 
+var mouseOutFoodSelect = false;
+
+$(document).bind("click",function(e){ 
+	var target = $(e.target); 
+	if(mouseOutFoodSelect){
+		if($('#divFoodTasteFloat').is(':visible')){
+	 		if(target.closest(".tasteFloat").length == 0){ 
+				$(".tasteFloat").hide(); 
+			}
+		}		
+	}
+
+}) 
+
+
 </script>
 <script type="text/javascript" src="./js/tableSelect/tsLoad.js"></script>
 <script type="text/javascript" src="./js/tableSelect/tsMain.js"></script>
@@ -233,8 +248,19 @@ var ss = {
 	      	</div>
 	      
     	</div>
-    	<div id="divCFCOAllFood" class="div-full" style="overflow-y: auto;"></div>
+    	<div id="divCFCOAllFood" class="div-full" style="overflow-y: auto;" onmouseout="javascript:mouseOutFoodSelect = true;" onmouseover="javascript:mouseOutFoodSelect = false;"></div>
   	</div>
+  	<div id="divFoodTasteFloat" class="tasteFloat">
+		<div style="color: #FFF; font-weight: bold; font-size: 25px; line-height : 50px;height : 50px">
+			<span id="spanTasteFloatFoodName">菜品</span>-常用口味:
+			<div style="text-align:center;font-weight:bold;color:black;background: #4EEE99;line-height: 50px; width: 100px;float: right;margin-left: 10px;" onclick="co.ot.back()">关闭</div>
+			<div style="text-align:center;font-weight:bold;color:black;background: #4EEE99;line-height: 50px; width: 100px;float: right;margin-left: 10px;" onclick="co.ot.save()">确定</div>			
+			
+		</div>  		
+		<div id="divFloatFoodTastes"></div>  	
+  	</div>
+  	
+  	
   	<div id="divDescForCreateOrde" class="box-horizontal">
   		<div style="width: 300px;">&nbsp;</div>
   		<div id="divDescForCreateOrde-padding-msg" class="div-full"></div>

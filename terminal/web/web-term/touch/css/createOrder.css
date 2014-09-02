@@ -183,3 +183,15 @@
 	font-weight: bold;
 	font-size: 28px;
 }
+
+.tasteFloat{
+	width: 610px; height: 220px;position : absolute;bottom : 90px;left: 383px;z-index:9999;background: MediumPurple; border: 1px solid #FFF;display: none;
+}
+
+.show_tasteFloatBackGround{
+	background-color: #87CEEA;
+}
+
+.select_tasteFloatBackGround{
+	background-color: yellow;
+}

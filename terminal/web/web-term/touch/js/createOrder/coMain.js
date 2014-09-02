@@ -135,6 +135,9 @@ co.insertFood = function(c){
 	if(typeof c.callback == 'function'){
 		c.callback();
 	}
+	
+	co.ot.initBarForCommomFloatTaste(c);
+
 };
 
 /**
@@ -403,6 +406,7 @@ co.ot.back = function(){
 	co.ot.foodData = null;
 	co.ot.newTaste = [];
 	$('#divCFOTHasTasteContent').html('');
+	$('#divFoodTasteFloat').hide()
 };
 
 /**
@@ -527,6 +531,12 @@ co.ot.insertTaste = function(c){
 	}
 	var has = false;
 	var data = {};
+	if($(c.event).hasClass('select_tasteFloatBackGround')){
+		$(c.event).removeClass('select_tasteFloatBackGround');
+	}else{
+		$(c.event).addClass('select_tasteFloatBackGround');
+	}
+	
 	//临时口味
 	if(c.data){
 		data = c.data;
@@ -549,6 +559,16 @@ co.ot.insertTaste = function(c){
 		co.ot.newTaste.push(data);
 		data = null;
 	}
+
+	if(c.fTaste && !$(c.event).hasClass('select_tasteFloatBackGround')){
+		for (var i = 0; i < co.ot.newTaste.length; i++) {
+			if(co.ot.newTaste[i].id == c.tasteId){
+				co.ot.newTaste.splice(i,1);
+				return;
+			}
+		}
+	}
+	
 	// 
 	co.ot.initNewTasteContent();
 };
@@ -708,6 +728,7 @@ co.ot.save = function(c){
 	//
 	co.ot.back();
 	tasteGroup = null;
+	$('#divFoodTasteFloat').hide();
 };
 
 /*** -------------------------------------------------- ***/
