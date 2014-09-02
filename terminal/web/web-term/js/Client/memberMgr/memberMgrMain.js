@@ -884,6 +884,7 @@ function treeInit(){
 //		region : 'west',
 		region : 'center',
 		width : 240,
+		height : 220,
 		border : true,
 		rootVisible : true,
 		singleExpand : true,
@@ -1006,13 +1007,6 @@ function gridInit(){
 				id : 'textTotalMaxMemberCostCount',
 				width : 50
 			},
-/*			{xtype : 'tbtext', text : '&nbsp;&nbsp;'},	
-			{xtype : 'tbtext', text : '当前积分:'},
-			{
-				xtype : 'numberfield',
-				id : 'textMemberPoint',
-				width : 60
-			},*/
 			{xtype : 'tbtext', text : '&nbsp;&nbsp;'},	
 			{xtype : 'tbtext', text : '余额:'},
 			{
@@ -1040,44 +1034,6 @@ function gridInit(){
 			}]
 		
 	});
-	
-/*	var memberBasicGridOtherMemberTbar = new Ext.Toolbar({
-		hidden : true,
-		height : 28,		
-		items : [
-			{xtype : 'tbtext', text : '当前积分:'},
-			{
-				id : 'memberCurrentPointEqual',
-				xtype : 'combo',
-				readOnly : false,
-				forceSelection : true,
-				value : '=',
-				width : 70,
-				store : new Ext.data.SimpleStore({
-					fields : ['value', 'text'],
-					data : [['=', '等于'], ['>=', '大于等于'], ['<=', '小于等于']]
-				}),
-				valueField : 'value',
-				displayField : 'text',
-				typeAhead : true,
-				mode : 'local',
-				triggerAction : 'all',
-				selectOnFocus : true
-			},			
-			{
-				xtype : 'numberfield',
-				id : 'textMemberCurrentPoint',
-				width : 60
-			},
-			{xtype : 'tbtext', text : '&nbsp;&nbsp;'},	
-			{xtype : 'tbtext', text : '客户名称:'},
-			{
-				xtype : 'textfield',
-				id : 'textMemberName',
-				width : 50
-			}]
-		
-	});	*/
 	var memberBasicGridTbar = new Ext.Toolbar({
 		items : [{
 			xtype : 'tbtext',
@@ -1174,6 +1130,7 @@ function gridInit(){
 							}
 						}
 					}
+					//ＦＩＸＭＥ
 //					if(gs.getTotalCount() > 0 && tipWinShow){
 //						memberBasicGrid.getSelectionModel().selectAll();
 ////						if(Ext.ux.getCookie(document.domain+'_memberTip') != 'true'){
@@ -1300,6 +1257,8 @@ function gridInit(){
 	
 	memberBasicGrid.on('render', function(e){
 		Ext.getCmp('btnSearchMember').handler();
+		console.log('h')
+		console.log(memberBasicGrid.getHeight())
 	});
 	memberBasicGrid.on('rowdblclick', function(e){
 		updateMemberHandler();
@@ -2476,11 +2435,11 @@ function member_loadMemberTypeChart(){
 //			        data : [{y:5, level : '微信会员', x:0, marker: {symbol:'diamond'}, status : 1}, {y : 5, level : '等级2',x:0.01.3, marker:{symbol:'triangle'}, status : 2, color : 'red'}, {y : 5, level : '等级3',x:1.94999992847442631.3, marker:{symbol:'square'}, status : 3, color : 'Gray'}]
 			    }]			    
 			};
-			new Highcharts.Chart(chart);
+			memberTypeLevelChart = new Highcharts.Chart(chart);
 	});
 }
 var memberMgr_obj = {treeId : 'tree_memberTypeMgr', option : [{name:'修改', fn:"updateMemberTypeHandler()"},{name:'删除', fn:"deleteMemberTypeHandler()"}]};
-var memberLevels, memberLevelDetail;
+var memberLevels, memberLevelDetail,memberTypeLevelChart;
 Ext.onReady(function(){
 	member_dataInit();
 	
@@ -2498,6 +2457,7 @@ Ext.onReady(function(){
 		region : 'west',
 		items : [memberTypeTree
 				, new Ext.Panel({
+					id : 'memberTypeLevelChartsPanel',
 					title : '会员等级路线图',
 					region : 'south',
 					contentEl : 'divMemberTypeLevelCharts'
@@ -2537,6 +2497,11 @@ Ext.onReady(function(){
 //	memberBasicWin.render(document.body);
 	Ext.ux.checkSmStat();
 	
+	memberTypeLevelChart.setSize(240, memberBasicGrid.getHeight() * 0.65-80);
+	Ext.getCmp('memberTypeLevelChartsPanel').setHeight(memberBasicGrid.getHeight() * 0.65);
+	Ext.getCmp('memberTypeLevelChartsPanel').getEl().setTop(memberBasicGrid.getHeight() * 0.35);
+	memberTypeTree.setHeight(memberBasicGrid.getHeight() * 0.35);
+	
 	memberTipWin = Ext.ux.ToastWindow({
 		width : 260,
 		height : 152,
@@ -2550,4 +2515,5 @@ Ext.onReady(function(){
 	showFloatOption(memberMgr_obj);
 	
 	initAddLevelWin();
+	
 });

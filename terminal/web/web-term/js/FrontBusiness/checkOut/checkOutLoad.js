@@ -153,7 +153,8 @@ function loadTableData(_c){
 			if (jr.success == true) {
 				setFormButtonStatus(false);
 				// 加载已点菜
-				checkOutData = {root:jr.other.order.orderFoods};
+				checkOutData = jr;
+				checkOutData.root = jr.other.order.orderFoods;
 				// 加载显示账单基础信息
 				orderMsg = jr.other.order;
 				
