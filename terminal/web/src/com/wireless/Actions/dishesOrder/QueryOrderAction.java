@@ -1,8 +1,5 @@
 package com.wireless.Actions.dishesOrder;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -11,7 +8,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
-import com.wireless.db.menuMgr.MenuDao;
+import com.wireless.db.deptMgr.KitchenDao;
 import com.wireless.db.orderMgr.OrderDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
@@ -20,7 +17,6 @@ import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.pojo.dishesOrder.Order;
 import com.wireless.pojo.dishesOrder.OrderFood;
-import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.util.DateType;
 
@@ -32,7 +28,6 @@ public class QueryOrderAction extends Action {
 		
 		response.setContentType("text/json;charset=utf-8");
 		JObject jobject = new JObject();
-		final StringBuilder idList = new StringBuilder();
 		try {
 			
 			/**
@@ -44,7 +39,7 @@ public class QueryOrderAction extends Action {
 			String pin = (String)request.getAttribute("pin");
 			String queryType = request.getParameter("queryType");
 			String tid = request.getParameter("tableID");
-			String restaurantID = (String)request.getAttribute("restaurantID");
+			//String restaurantID = (String)request.getAttribute("restaurantID");
 			String oid = request.getParameter("orderID");
 			
 			final Order order;
@@ -66,57 +61,32 @@ public class QueryOrderAction extends Action {
 				}
 			}			
 			
-			List<OrderFood> root = new ArrayList<OrderFood>();
-			if(order != null && order.hasOrderFood()){
-				OrderFood item = null;
-				int i = 0;
-				for(OrderFood of : order.getOrderFoods()){
-					idList.append(i > 0 ? "," : "");
-					idList.append(of.getFoodId());
-					item = new OrderFood(of);
-					item.getKitchen().setId(of.getKitchen().getId());
-					root.add(item);
-					item = null;
-					i++;
+			final StringBuilder idList = new StringBuilder();
+			for(OrderFood of : order.getOrderFoods()){
+				if(idList.length() > 0){
+					idList.append(",");
 				}
+				idList.append(of.getFoodId());
+				
+				of.getKitchen().copyFrom(KitchenDao.getById(staff, of.getKitchen().getId()));
 			}
 			
-			if(restaurantID != null && !restaurantID.trim().isEmpty()){
-				List<Kitchen> kl = MenuDao.getKitchen(Integer.parseInt(restaurantID));
-				for(OrderFood of : root){
-					for(Kitchen temp : kl){
-						if(of.getKitchen().getId() == temp.getId()){
-							of.asFood().setKitchen(temp);
-							of.getKitchen().setDept(null);
-							break;
-						}
-					}
+			jobject.setExtra(new Jsonable(){
+				@Override
+				public JsonMap toJsonMap(int flag) {
+					JsonMap jm = new JsonMap();
+					jm.putJsonable("order", order, 0);
+					jm.putString("idList", idList.toString());
+					return jm;
 				}
-			}
-			
-			jobject.setSuccess(true);
-			jobject.setTotalProperty(root.size());
-			jobject.setRoot(root);
-			
-			if(order != null){
-				order.setOrderFoods(null);
-				jobject.setExtra(new Jsonable(){
 
-					@Override
-					public JsonMap toJsonMap(int flag) {
-						JsonMap jm = new JsonMap();
-						jm.putJsonable("order", order, 0);
-						jm.putString("idList", idList.toString());
-						return jm;
-					}
-
-					@Override
-					public void fromJsonMap(JsonMap jsonMap, int flag) {
-						
-					}
+				@Override
+				public void fromJsonMap(JsonMap jsonMap, int flag) {
 					
-				});
-			}
+				}
+				
+			});
+			
 		} catch (BusinessException e) {
 			e.printStackTrace();
 			jobject.initTip(e);
