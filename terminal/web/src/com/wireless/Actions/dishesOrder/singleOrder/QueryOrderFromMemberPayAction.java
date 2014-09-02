@@ -1,6 +1,5 @@
 package com.wireless.Actions.dishesOrder.singleOrder;
 
-import java.sql.SQLException;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -70,8 +69,9 @@ public class QueryOrderFromMemberPayAction extends Action{
 			}else{
 				throw new BusinessException(MemberError.MEMBER_NOT_EXIST);
 			}
-			
+			membersByType.set(0, MemberDao.getById(staff, membersByType.get(0).getId()));
 			Order.PayBuilder payBuilder = Order.PayBuilder.build4Member(Integer.valueOf(orderID), membersByType.get(0), Order.PayType.CASH);
+			
 			if(discountId != null && !discountId.trim().isEmpty()){
 				payBuilder.setDiscountId(Integer.valueOf(discountId));
 			}else{
@@ -96,12 +96,7 @@ public class QueryOrderFromMemberPayAction extends Action{
 					if(members.size() > 1){
 						jm.putJsonableList("members", members, 0);
 					}else{
-						
-						try {
-							jm.putJsonable("member", MemberDao.getByMobile(staff, members.get(0).getMobile()), 0);
-						} catch (SQLException | BusinessException e) {
-							e.printStackTrace();
-						}						
+						jm.putJsonable("member", members.get(0), 0);					
 					}
 					jm.putJsonable("newOrder", order, 0);
 //					jm.putJsonableList("coupons", coupons, 0);
