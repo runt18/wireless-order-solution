@@ -80,6 +80,7 @@
 		async:false,
 		data : params,
 		success : function(jr, status, xhr){
+			jr.root = jr.other?jr.other.order.orderFoods : [];
 			primaryOrderData = jr;
 			if(jr.success){
 				orderID = primaryOrderData.other.order.id;
