@@ -256,6 +256,8 @@ co.ot.initBarForCommomFloatTaste = function(c){
 				co.ot.tp.getFirstPage();
 				var html = ''
 				for (var i = 0; i < data.root.length; i++) {
+					if(i == 10) 
+						break;
 					html += Templet.co.boxSelectTasteFloat.format({
 						dataIndex : i,
 						id : data.root[i].taste.id,
