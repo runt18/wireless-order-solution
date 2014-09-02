@@ -680,8 +680,8 @@ var resturantMgr = new Ext.Window({
 				   url: '../../QueryRestaurants.do',
 				   success: function(response,options){
 					   var resultJSON = Ext.util.JSON.decode(response.responseText);
-					   if(resultJSON.success){
-						   Ext.getCmp('restaurant_info').setValue(resultJSON.root[0].restaurant_info);
+					   if(resultJSON.success && resultJSON.root.length > 0){
+						   Ext.getCmp('restaurant_info').setValue(resultJSON.root[0].info);
 						   Ext.getCmp('address').setValue(resultJSON.root[0].address);
 						   Ext.getCmp('tel1').setValue(resultJSON.root[0].tele1);
 						   Ext.getCmp('tel2').setValue(resultJSON.root[0].tele2);   

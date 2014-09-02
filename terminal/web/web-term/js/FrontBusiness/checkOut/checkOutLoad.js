@@ -64,7 +64,7 @@ function loadOrderBasicMsg(){
 //	document.getElementById("actualCount").value = parseFloat(orderMsg.actualPrice).toFixed(2);
 	
 //	document.getElementById("change").innerHTML = change;
-//	Ext.getCmp('numCustomNum').setValue(orderMsg.customNum > 0 ? orderMsg.customNum : 1);
+	Ext.getCmp('numCustomNum').setValue(orderMsg.customNum > 0 ? orderMsg.customNum : 1);
 	if(eval(orderMsg.category != 4)){
 //		Ext.getCmp('numCustomNum').setDisabled(false);
 	}
@@ -132,9 +132,9 @@ function loadTableData(_c){
 	}
 	var eraseQuota = document.getElementById("txtEraseQuota").value;
 	var servicePlan = Ext.getCmp("comboServicePlan").getValue();
-//	var customNum = Ext.getCmp("numCustomNum").getValue();
+	var customNum = Ext.getCmp("numCustomNum").getValue();
 	eraseQuota = typeof eraseQuota != 'undefined' && eval(eraseQuota >= 0) ? eraseQuota : 0;
-//	customNum = typeof customNum != 'undefined' && eval(customNum > 0) ? customNum : 0;
+	customNum = typeof customNum != 'undefined' && eval(customNum > 0) ? customNum : 1;
 	Ext.Ajax.request({
 		url : "../../QueryOrderByCalc.do",
 		params : {
@@ -144,6 +144,7 @@ function loadTableData(_c){
 			discountID : calcDiscountID,
 //			pricePlanID : calcPricePlanID,
 //			eraseQuota : eraseQuota,
+			customNum : customNum,
 			servicePlan : servicePlan
 		},
 		success : function(response, options) {
