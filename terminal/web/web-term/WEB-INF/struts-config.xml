@@ -125,9 +125,6 @@
 		<action path="/OperateDept" type="com.wireless.Actions.deptMgr.OperateDeptAction"
 			scope="request" parameter="dataSource">
 		</action>
-		<action path="/UpdateDepartment"
-			type="com.wireless.Actions.deptMgr.UpdateDepartmentAction" scope="request">
-		</action>
 		<action path="/InsertFoodMaterial"
 			type="com.wireless.Actions.menuMgr.material.InsertFoodMaterialAction"
 			scope="request">
