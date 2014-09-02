@@ -759,10 +759,10 @@ function refreshOrderHandler(c){
 			var jr = Ext.util.JSON.decode(response.responseText);
 			if (jr.success == true) {
 				// 更新菜品状态为已点菜
-				refreshOrderFoodDataType(jr.root);
+				refreshOrderFoodDataType(jr.other.order.orderFoods);
 				
 				for(var i = (selData.length - 1); i >= 0 ; i--){
-					jr.root.push(selData[i]);
+					jr.other.order.orderFoods.push(selData[i]);
 				}
 				
 //						// 合并重复数据
@@ -787,7 +787,6 @@ function refreshOrderHandler(c){
 //						}	
 				
 				orderSingleGridPanel.order = jr.other.order;
-				orderSingleGridPanel.order.orderFoods = jr.root;
 				orderSingleGridPanel.getStore().loadData({root:orderSingleGridPanel.order.orderFoods});
 				
 				orderGroupDisplayRefresh({

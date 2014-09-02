@@ -34,7 +34,7 @@ function load(){
 			var jr = Ext.decode(response.responseText);
 			if (jr.success == true) {
 				setOrderDetail(jr.other.order);
-				history_viewBillGrid.getStore().loadData(jr);
+				history_viewBillGrid.getStore().loadData({root:jr.other.order.orderFoods});
 			} else {
 				Ext.ux.showMsg(jr);
 			}

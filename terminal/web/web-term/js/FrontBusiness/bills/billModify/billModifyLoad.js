@@ -409,8 +409,7 @@ function billModifyOnLoad() {
 			var resultJSON = Ext.util.JSON.decode(response.responseText);
 			if (resultJSON.success == true) {
 				orderedGrid.order = resultJSON.other.order;
-				orderedGrid.order.orderFoods = resultJSON.root;
-				orderedGrid.getStore().loadData(resultJSON);
+				orderedGrid.getStore().loadData({root:orderedGrid.order.orderFoods});
 				
 				// 加载账单基础信息
 				Ext.getCmp('txtSettleTypeFormat').setValue(orderedGrid.order.settleTypeText);

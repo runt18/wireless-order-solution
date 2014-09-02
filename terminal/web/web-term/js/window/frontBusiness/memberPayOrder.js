@@ -144,7 +144,7 @@ Ext.onReady(function(){
 				].join('')
 			}, {
 				columnWidth : 1
-			}, {
+			},{
 				items : [{
 					id : 'mpo_txtNameForPayOrder',
 					fieldLabel : '&nbsp;&nbsp;&nbsp;会员名称',
