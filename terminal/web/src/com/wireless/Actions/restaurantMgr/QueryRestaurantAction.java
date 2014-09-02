@@ -59,6 +59,7 @@ public class QueryRestaurantAction extends Action{
 			if(Boolean.parseBoolean(byId)){
 				restaurant = RestaurantDao.getById(dbCon, Integer.parseInt((String) request.getAttribute("restaurantID")));
 				list.add(restaurant);
+				jobject.setRoot(list);
 			}else{
 				list.addAll(RestaurantDao.getByCond(extraCond, orderClause));
 				if(!list.isEmpty()){
@@ -83,8 +84,9 @@ public class QueryRestaurantAction extends Action{
 					jobject.setTotalProperty(list.size());
 					resList = DataPaging.getPagingData(resList, isPaging, start, limit);
 				}
+				jobject.setRoot(resList);
 			}
-			jobject.setRoot(resList);
+			
 		}finally{
 			dbCon.disconnect();
 			response.getWriter().print(jobject.toString());

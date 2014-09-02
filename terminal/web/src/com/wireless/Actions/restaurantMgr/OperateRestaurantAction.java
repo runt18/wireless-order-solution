@@ -129,21 +129,22 @@ public class OperateRestaurantAction extends DispatchAction {
 		PrintWriter out = response.getWriter();
 		JObject jobject = new JObject();
 		try{
-			String restaurant_name = request.getParameter("restaurant_name");
+
 			String restaurant_info = request.getParameter("restaurant_info");
 			String address = request.getParameter("address");
 			String tele1 = request.getParameter("tel1");
 			String tele2 = request.getParameter("tel2");
-			String id = request.getParameter("restaurantID"); 
+			String id = (String) request.getAttribute("restaurantID");
 			
 			Restaurant restaurant = RestaurantDao.getById(Integer.parseInt(id));
 			
 			Restaurant.UpdateBuilder builder = new UpdateBuilder(Integer.parseInt(id), restaurant.getAccount());
-			builder.setRestaurantName(restaurant_name)
-					.setTele1(tele1)
+			builder.setTele1(tele1)
 					.setTele2(tele2)
 					.setAddress(address)
-					.setRestaurantInfo(restaurant_info);
+					.setRestaurantInfo(restaurant_info)
+					.setRecordAlive(Restaurant.RecordAlive.valueOfSeconds(restaurant.getRecordAlive()))
+					.setRestaurantName(restaurant.getName());
 			
 			RestaurantDao.update(builder);
 			

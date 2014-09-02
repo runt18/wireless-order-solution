@@ -81,7 +81,9 @@ public class QueryOrderByCalcAction extends Action{
 				order.copyFrom(PayOrder.calc(staff, payParam));
 				
 			}else{
-				order.copyFrom(PayOrder.calc(staff, Order.PayBuilder.build(order.getId())));
+				Order.PayBuilder payParam = Order.PayBuilder.build(order.getId());
+				payParam.setCustomNum(order.getCustomNum());
+				order.copyFrom(PayOrder.calc(staff, payParam));
 			}
 			
 			List<OrderFood> root = new ArrayList<OrderFood>();
