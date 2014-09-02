@@ -35,7 +35,7 @@ function initOrderData(c){
 		type : 'post',
 		data : {
 			restaurantID : restaurantID,
-			tableID : c.table.alias,			
+			tableID : c.table.alias		
 		},
 //		async : false,
 		success : function(data, status, xhr){
@@ -43,9 +43,9 @@ function initOrderData(c){
 			if(data.success){
 				uo.order = data.other.order;
 				uo.table = c.table;
-				uo.order.orderFoods = data.root;
-				for(x in data.root){
-					uoFood.push(data.root[x]);
+				uo.order.orderFoods = data.other.order.orderFoods;
+				for(x in  data.other.order.orderFoods){
+					uoFood.push( data.other.order.orderFoods[x]);
 				}
 				uoOther = data.other;
 				showNorthForUpdateOrder();
@@ -61,7 +61,7 @@ function initOrderData(c){
 				Util.msg.alert({
 					title : data.title,
 					msg : data.msg, 
-					time : 3,
+					time : 3
 				});
 			}
 		},
@@ -69,7 +69,7 @@ function initOrderData(c){
 			Util.msg.alert({
 				title : '温馨提示',
 				msg : '初始化菜单数据失败.', 
-				time : 3,
+				time : 3
 			});
 		}
 	});	
@@ -84,7 +84,7 @@ function initCancelReason(){
 		type : 'post',
 		dataType : 'json',
 		data : {
-			restaurantID : restaurantID,
+			restaurantID : restaurantID
 		},
 		success : function(data, status, xhr){
 			cancelReasonData = data.root;
@@ -93,7 +93,7 @@ function initCancelReason(){
 			Util.msg.alert({
 				title : '温馨提示',
 				msg : '初始化退菜原因失败.', 
-				time : 3,
+				time : 3
 			});
 		}
 	});
