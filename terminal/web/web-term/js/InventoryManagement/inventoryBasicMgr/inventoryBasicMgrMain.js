@@ -161,6 +161,7 @@ function operateMaterialCateHandler(c){
 		cateId.setValue();
 		cateName.setValue();
 		cateName.clearInvalid();
+		cateName.focus(true, 100);
 	}else if(c.otype == Ext.ux.otype['update']){
 		var sn = materialCateTree.getSelectionModel().getSelectedNode();
 		if(!sn || sn.attributes.cateID == -1){
@@ -170,6 +171,7 @@ function operateMaterialCateHandler(c){
 		operateMaterialCateWin.show();
 		cateId.setValue(sn.attributes.cateId);
 		cateName.setValue(sn.attributes.name);
+		cateName.focus(true, 100);
 	}else if(c.otype == Ext.ux.otype['delete']){
 		var sn = materialCateTree.getSelectionModel().getSelectedNode();
 		if(!sn || sn.attributes.cateID == -1){
@@ -407,6 +409,8 @@ function operateMaterialHandler(c){
 		if(node && typeof node.attributes.cateId != 'undefined' && node.attributes.cateId != -1) {
 			materialCate.setValue(node.attributes.cateId);
 		}
+		
+		materialName.focus(true, 100);
 	}else if(c.otype == Ext.ux.otype['update']){
 		var data = Ext.ux.getSelData(inventory_materialBasicGrid);
 		if(!data){
@@ -419,7 +423,7 @@ function operateMaterialHandler(c){
 		materialName.setValue(data['name']);
 		materialCate.setValue(data['cateId']);
 		
-		//materialCate.setDisabled(true);
+		materialName.focus(true, 100);
 	}else if(c.otype == Ext.ux.otype['delete']){
 		var data = Ext.ux.getSelData(inventory_materialBasicGrid);
 		if(!data){
