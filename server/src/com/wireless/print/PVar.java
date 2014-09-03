@@ -13,6 +13,8 @@ public final class PVar{
 	public final static String ORDER_CATE = "$(order_cate)";
 	public final static String TABLE_ID = "$(table)";
 	public final static String CUSTOM_NUM = "$(custom_num)";
+	public final static String RECEIPT_ENDING = "$(receipt_ending)";
+	public final static String RECEIPT_COMMENT = "$(receipt_comment)";
 	public final static String VAR_1 = "$(var_1)";
 	public final static String VAR_2 = "$(var_2)";
 	public final static String VAR_3 = "$(var_3)";

@@ -135,7 +135,7 @@ public class WirelessSocketServer {
 				for(int i = 0; i < nl.getLength(); i++){
 					int func = Integer.parseInt(((Element)nl.item(i)).getAttribute("func"));
 					NodeList fileList = ((Element)nl.item(i)).getElementsByTagName("file");
-					HashMap<PStyle, String> templates = new HashMap<PStyle, String>();
+					Map<PStyle, String> templates = new HashMap<PStyle, String>();
 					for(int j = 0; j < fileList.getLength(); j++){
 						int style = Integer.parseInt(((Element)fileList.item(j)).getAttribute("style"));
 						FileInputStream fis = new FileInputStream(new File(((Element)fileList.item(j)).getAttribute("path")));

@@ -28,17 +28,17 @@ public class ShiftContent extends ConcreteContent {
 		if(mPrintType == PType.PRINT_DAILY_SETTLE_RECEIPT || mPrintType == PType.PRINT_HISTORY_DAILY_SETTLE_RECEIPT){
 			//replace the "$(title)" with "日结单"
 			mTemplate = mTemplate.replace(PVar.TITLE, new ExtraFormatDecorator(  
-														new CenterAlignedDecorator("日结单", getStyle()).toString(), getStyle(), ExtraFormatDecorator.LARGE_FONT_1X).toString());
+														new CenterAlignedDecorator("日结单", getStyle()).toString(), getStyle(), ExtraFormatDecorator.LARGE_FONT_V_1X).toString());
 			
 		}else if(mPrintType == PType.PRINT_SHIFT_RECEIPT || mPrintType == PType.PRINT_TEMP_SHIFT_RECEIPT || mPrintType == PType.PRINT_HISTORY_SHIFT_RECEIPT){
 			//replace the "$(title)" with "交班对账单"
 			mTemplate = mTemplate.replace(PVar.TITLE, new ExtraFormatDecorator(  
-														new CenterAlignedDecorator("交班对账单", getStyle()).toString(), getStyle(), ExtraFormatDecorator.LARGE_FONT_1X).toString());
+														new CenterAlignedDecorator("交班对账单", getStyle()).toString(), getStyle(), ExtraFormatDecorator.LARGE_FONT_V_1X).toString());
 			
 		}else if(mPrintType == PType.PRINT_PAYMENT_RECEIPT || mPrintType == PType.PRINT_HISTORY_PAYMENT_RECEIPT){
 			//replace the "$(title)" with "交班对账单"
 			mTemplate = mTemplate.replace(PVar.TITLE, new ExtraFormatDecorator(  
-														new CenterAlignedDecorator("交款对账单", getStyle()).toString(), getStyle(), ExtraFormatDecorator.LARGE_FONT_1X).toString());
+														new CenterAlignedDecorator("交款对账单", getStyle()).toString(), getStyle(), ExtraFormatDecorator.LARGE_FONT_V_1X).toString());
 			
 		}
 		
@@ -144,7 +144,7 @@ public class ShiftContent extends ConcreteContent {
 		//replace the $(var_4) with the shift detail
 		mTemplate = mTemplate.replace(PVar.VAR_4, new ExtraFormatDecorator( 
 													new RightAlignedDecorator("实收总额：" + NumericUtil.CURRENCY_SIGN + NumericUtil.float2String(mShiftDetail.getTotalActual()), mStyle).toString(),
-														mStyle, ExtraFormatDecorator.LARGE_FONT_1X).toString());
+														mStyle, ExtraFormatDecorator.LARGE_FONT_V_1X).toString());
 		
 		IncomeByCharge incomeByCharge = mShiftDetail.getIncomeByCharge();
 		if(incomeByCharge.getTotalAccountCharge() != 0 || incomeByCharge.getTotalAccountRefund() != 0){

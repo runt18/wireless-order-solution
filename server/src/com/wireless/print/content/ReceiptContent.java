@@ -86,26 +86,52 @@ public class ReceiptContent extends ConcreteContent {
 		//replace the "$(waiter)"
 		mTemplate = mTemplate.replace(PVar.WAITER_NAME, mWaiter);
 		
-		String tblInfo = mOrder.getDestTbl().getName().trim().length() == 0 ? Integer.toString(mOrder.getDestTbl().getAliasId()) : mOrder.getDestTbl().getName();
+		String tblName;
+		if(mOrder.getDestTbl().getName().isEmpty()){
+			tblName = Integer.toString(mOrder.getDestTbl().getAliasId());
+		}else{
+			tblName = mOrder.getDestTbl().getAliasId() + "(" + mOrder.getDestTbl().getName() + ")";
+		}
+		
 		//replace the "$(var_5)"
 		mTemplate = mTemplate.replace(PVar.VAR_5, 
-							new Grid2ItemsContent("餐台：" + tblInfo, 
+						new ExtraFormatDecorator(
+							new Grid2ItemsContent("餐台：" + tblName, 
 												  "人数：" + mOrder.getCustomNum(), 
-												  getStyle()).toString());
+												  getStyle()), ExtraFormatDecorator.LARGE_FONT_V_1X).toString());
 		
 		
 		//generate the order food list and replace the $(var_1) with the ordered foods
 		mTemplate = mTemplate.replace(PVar.VAR_1, new FoodListContent(buildReciptFormat(), mOrder.getOrderFoods(), mPrintType, mStyle).toString());
 		
 		//replace the $(var_3) with the actual price
-		mTemplate = mTemplate.replace(PVar.VAR_3, new RightAlignedDecorator("实收金额：" + NumericUtil.CURRENCY_SIGN + NumericUtil.float2String(mOrder.getActualPrice()), mStyle).toString());
+		mTemplate = mTemplate.replace(PVar.VAR_3, 
+				new ExtraFormatDecorator(new RightAlignedDecorator("实收金额：" + NumericUtil.CURRENCY_SIGN + NumericUtil.float2String(mOrder.getActualPrice()), mStyle), ExtraFormatDecorator.LARGE_FONT_V_1X).toString());
 		
 		//generate the comment and replace the $(var_3)
 		if(mOrder.getComment().isEmpty()){
-			mTemplate = mTemplate.replace(PVar.VAR_4, "");
+			mTemplate = mTemplate.replace(PVar.RECEIPT_COMMENT, "");
 		}else{
-			mTemplate = mTemplate.replace(PVar.VAR_4, "备注：" + mOrder.getComment());
+			mTemplate = mTemplate.replace(PVar.RECEIPT_COMMENT, "备注：" + mOrder.getComment());
 		}
+		
+		StringBuilder ending = new StringBuilder();
+		if(!mRestaurant.getAddress().isEmpty()){
+			ending.append(new CenterAlignedDecorator(mRestaurant.getAddress(), mStyle).toString());
+		}
+		if(!mRestaurant.getTele1().isEmpty()){
+			if(ending.length() != 0){
+				ending.append(SEP);
+			}
+			ending.append(new CenterAlignedDecorator(mRestaurant.getTele1(), mStyle).toString());
+		}
+		
+		if(ending.length() != 0){
+			mTemplate = mTemplate.replace(PVar.RECEIPT_ENDING, ending.toString());
+		}else{
+			mTemplate = mTemplate.replace(PVar.RECEIPT_ENDING, new CenterAlignedDecorator("欢迎您再次光临", mStyle).toString());
+		}
+		
 		
 		return mTemplate;
 	}
@@ -130,9 +156,7 @@ public class ReceiptContent extends ConcreteContent {
 		if(mOrder.isPayByCash() && !isTempReceipt && mOrder.getReceivedCash() != 0){
 			float chargeMoney = NumericUtil.roundFloat(mOrder.getReceivedCash() - mOrder.getActualPrice());
 			
-			java.text.DecimalFormat df = new java.text.DecimalFormat("0.00");
-
-			line2.append("找零：" + NumericUtil.CURRENCY_SIGN + df.format(chargeMoney))
+			line2.append("找零：" + NumericUtil.CURRENCY_SIGN + NumericUtil.float2String(chargeMoney))
 				 .append("  ")
 				 .append("收款：" + NumericUtil.CURRENCY_SIGN + NumericUtil.float2String(mOrder.getReceivedCash()));
 			

@@ -30,10 +30,10 @@ public class MemberReceiptContent extends ConcreteContent {
 		StringBuilder s = new StringBuilder();
 		
 		s.append(new ExtraFormatDecorator(
-					new CenterAlignedDecorator(mRestaurant.getName(), getStyle()), ExtraFormatDecorator.LARGE_FONT_1X)).append(SEP);
+					new CenterAlignedDecorator(mRestaurant.getName(), getStyle()), ExtraFormatDecorator.LARGE_FONT_V_1X)).append(SEP);
 		
 		s.append(new ExtraFormatDecorator(
-					new CenterAlignedDecorator("会员对账单", getStyle()), ExtraFormatDecorator.LARGE_FONT_1X)).append(SEP);
+					new CenterAlignedDecorator("会员对账单", getStyle()), ExtraFormatDecorator.LARGE_FONT_V_1X)).append(SEP);
 
 		s.append(mSeperatorLine);
 

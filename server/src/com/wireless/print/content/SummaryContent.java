@@ -55,12 +55,12 @@ public class SummaryContent extends ConcreteContent {
 		}else if(mPrintType == PType.PRINT_ALL_CANCELLED_FOOD){
 			//char[] format = { 0x1D, 0x21, 0x03 };
 			mTemplate = mTemplate.replace(PVar.TITLE, new ExtraFormatDecorator(new CenterAlignedDecorator("退  菜  总  单 !", mStyle), 
-																			   ExtraFormatDecorator.LARGE_FONT_3X).toString());
+																			   ExtraFormatDecorator.LARGE_FONT_V_3X).toString());
 			
 		}else if(mPrintType == PType.PRINT_ALL_HURRIED_FOOD){
 			//char[] format = { 0x1D, 0x21, 0x03 };
 			mTemplate = mTemplate.replace(PVar.TITLE, new ExtraFormatDecorator(new CenterAlignedDecorator("催  菜  总  单 !", mStyle), 
-																			   ExtraFormatDecorator.LARGE_FONT_3X).toString());
+																			   ExtraFormatDecorator.LARGE_FONT_V_3X).toString());
 			
 		}else{
 			mTemplate = mTemplate.replace(PVar.TITLE, new CenterAlignedDecorator("点菜总单", mStyle).toString());
@@ -79,8 +79,15 @@ public class SummaryContent extends ConcreteContent {
 			mTemplate = mTemplate.replace(PVar.WAITER_NAME, mWaiter);			
 		}
 		
+		String tblName;
+		if(mOrder.getDestTbl().getName().isEmpty()){
+			tblName = Integer.toString(mOrder.getDestTbl().getAliasId());
+		}else{
+			tblName = mOrder.getDestTbl().getAliasId() + "(" + mOrder.getDestTbl().getName() + ")";
+		}
+		
 		mTemplate = mTemplate.replace(PVar.VAR_2, 
-						new Grid2ItemsContent("餐台：" + (mOrder.getDestTbl().getName().isEmpty() ? Integer.toString(mOrder.getDestTbl().getAliasId()) : mOrder.getDestTbl().getName()), 
+						new Grid2ItemsContent("餐台：" + tblName, 
 											  "人数：" + mOrder.getCustomNum(), 
 											  getStyle()).toString());
 		
