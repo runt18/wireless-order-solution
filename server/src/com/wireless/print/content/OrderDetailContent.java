@@ -50,13 +50,13 @@ public class OrderDetailContent extends ConcreteContent {
 			mPrintTemplate = mPrintTemplate.replace(PVar.TITLE,
 													new ExtraFormatDecorator(
 														new CenterAlignedDecorator("点菜" + (mParent.isHangup() ? "叫起" : "") + "单(详细)-" + tblName, mStyle), 
-														ExtraFormatDecorator.LARGE_FONT_V_1X).toString());
+														ExtraFormatDecorator.LARGE_FONT_V_3X).toString());
 			
 		}else if(mPrintType == PType.PRINT_EXTRA_FOOD_DETAIL){
 			mPrintTemplate = mPrintTemplate.replace(PVar.TITLE,
 													new ExtraFormatDecorator(
 														new CenterAlignedDecorator("加菜" + (mParent.isHangup() ? "叫起" : "") + "单(详细)-" + tblName, mStyle),
-														ExtraFormatDecorator.LARGE_FONT_V_1X).toString());
+														ExtraFormatDecorator.LARGE_FONT_V_3X).toString());
 			
 		}else if(mPrintType == PType.PRINT_CANCELLED_FOOD_DETAIL){
 			mPrintTemplate = mPrintTemplate.replace(PVar.TITLE,
@@ -74,7 +74,7 @@ public class OrderDetailContent extends ConcreteContent {
 			mPrintTemplate = mPrintTemplate.replace(PVar.TITLE,
 													new ExtraFormatDecorator(
 															new CenterAlignedDecorator("点菜单(详细)-" + tblName, mStyle),
-															ExtraFormatDecorator.LARGE_FONT_V_1X).toString());
+															ExtraFormatDecorator.LARGE_FONT_V_3X).toString());
 		}
 
 		if(mStyle == PStyle.PRINT_STYLE_58MM){
@@ -102,7 +102,7 @@ public class OrderDetailContent extends ConcreteContent {
 			if(mPrintType == PType.PRINT_CANCELLED_FOOD_DETAIL){
 				var1.append(new ExtraFormatDecorator("(退)" + mParent.getName() + "(" + NumericUtil.float2String2(mParent.getCount()) + ")", mStyle, ExtraFormatDecorator.LARGE_FONT_VH_1X).toString()).append(SEP);
 			}else{
-				var1.append(new ExtraFormatDecorator(mParent.getName() + "(" + NumericUtil.float2String2(mParent.getCount()) + ")", mStyle, ExtraFormatDecorator.LARGE_FONT_VH_1X).toString()).append(SEP);
+				var1.append(new ExtraFormatDecorator(new FoodDetailContent(FoodDetailContent.DISPLAY_CONFIG_4_DETAIL, mParent, mPrintType, mStyle), ExtraFormatDecorator.LARGE_FONT_VH_1X).toString()).append(SEP);
 			}
 			
 			StringBuilder tastePref = new StringBuilder();
@@ -114,7 +114,11 @@ public class OrderDetailContent extends ConcreteContent {
 				}
 			}
 			if(tastePref.length() > 0){
-				var1.append(new ExtraFormatDecorator("口味:" + tastePref.toString(), mStyle, ExtraFormatDecorator.LARGE_FONT_VH_1X)).append(SEP);
+				if(mPrintType == PType.PRINT_CANCELLED_FOOD_DETAIL){
+					var1.append(SEP).append(new ExtraFormatDecorator("口味：" + tastePref.toString(), mStyle, ExtraFormatDecorator.LARGE_FONT_V_1X)).append(SEP);
+				}else{
+					var1.append(new ExtraFormatDecorator("口味:" + tastePref.toString(), mStyle, ExtraFormatDecorator.LARGE_FONT_VH_1X)).append(SEP);
+				}
 			}
 
 			//退菜详细单，显示退菜原因
@@ -139,7 +143,7 @@ public class OrderDetailContent extends ConcreteContent {
 			//generate the combo detail info and replace the $(var_1) with it
 			mPrintTemplate = mPrintTemplate.replace(PVar.VAR_1,
 												    new ExtraFormatDecorator(
-												    	new ComboDetailContent(FoodDetailContent.DISPLAY_CONFIG_NO_DISCOUNT, mParent, mChild, mPrintType, mStyle),
+												    	new ComboDetailContent(FoodDetailContent.DISPLAY_CONFIG_4_SUMMARY, mParent, mChild, mPrintType, mStyle),
 												    	ExtraFormatDecorator.LARGE_FONT_V_2X).toString());
 		}
 		

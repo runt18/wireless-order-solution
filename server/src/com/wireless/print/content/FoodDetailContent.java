@@ -21,7 +21,8 @@ public class FoodDetailContent extends ConcreteContent {
 		TASTE(8, "¿ÚÎ¶"),
 		COMBO(9, "(Ì×)"),
 		DISCOUNT(10, "ÕÛ¿Û"),
-		STATUS(11, "×´Ì¬");
+		STATUS(11, "×´Ì¬"),
+		PRICE(12, "¼ÛÇ®");
 		
 		private final int id;
 		private final String desc;
@@ -45,7 +46,14 @@ public class FoodDetailContent extends ConcreteContent {
 		}
 	};
 	
-	public final static DisplayConfig DISPLAY_CONFIG_NO_DISCOUNT = new DisplayConfig(new DisplayItem[]{ DisplayItem.DISCOUNT }){
+	public final static DisplayConfig DISPLAY_CONFIG_4_SUMMARY = new DisplayConfig(new DisplayItem[]{ DisplayItem.DISCOUNT, DisplayItem.STATUS }){
+		@Override
+		public DisplayConfig mask(DisplayItem item){
+			throw new UnsupportedOperationException();
+		}
+	}; 
+	
+	public final static DisplayConfig DISPLAY_CONFIG_4_DETAIL = new DisplayConfig(new DisplayItem[]{ DisplayItem.PRICE, DisplayItem.TASTE, DisplayItem.STATUS }){
 		@Override
 		public DisplayConfig mask(DisplayItem item){
 			throw new UnsupportedOperationException();
@@ -177,7 +185,11 @@ public class FoodDetailContent extends ConcreteContent {
 			foodPrice = NumericUtil.CURRENCY_SIGN + NumericUtil.float2String(_of.calcPriceBeforeDiscount());
 		}
 		
-		return new Grid2ItemsContent(detail.toString(), foodPrice, getStyle()).toString();
+		if(_displayConfig.contains(DisplayItem.PRICE)){
+			return new Grid2ItemsContent(detail.toString(), foodPrice, getStyle()).toString();
+		}else{
+			return detail.toString();
+		}
 
 	}
 	

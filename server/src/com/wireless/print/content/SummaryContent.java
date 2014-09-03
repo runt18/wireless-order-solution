@@ -36,14 +36,6 @@ public class SummaryContent extends ConcreteContent {
 
 	@Override
 	public String toString(){
-//		String deptName = "";
-//		for(Department d : mDepts){
-//			if(deptName.isEmpty()){
-//				deptName += "-" + d.getName();
-//			}else{
-//				deptName += "," + d.getName();
-//			}
-//		}
 		
 		//generate the title and replace the "$(title)" with it
 		if(mPrintType == PType.PRINT_ORDER){
@@ -93,7 +85,7 @@ public class SummaryContent extends ConcreteContent {
 		
 		//generate the order food list and replace the $(var_1) with the ordered foods
 		mTemplate = mTemplate.replace(PVar.VAR_1, 
-									  new FoodListWithSepContent(FoodDetailContent.DISPLAY_CONFIG_NO_DISCOUNT, mOrder.getOrderFoods(), mPrintType, mStyle).toString());
+									  new FoodListWithSepContent(FoodDetailContent.DISPLAY_CONFIG_4_SUMMARY, mOrder.getOrderFoods(), mPrintType, mStyle).toString());
 		
 		return mTemplate;
 	}
