@@ -532,6 +532,8 @@ $(function(){
 		}
 	);
 	
+	$('#divFoodTasteFloat').width($('#divFoodTasteFloat').width() - 390);
+	
 });
 
 /**
