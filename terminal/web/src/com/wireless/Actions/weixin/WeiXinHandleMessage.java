@@ -167,6 +167,7 @@ public class WeiXinHandleMessage extends HandleMessageAdapter {
 					
 				}else if(msg.getEventKey().equals(PROMOTION_EVENT_KEY)){
 					//TODO 最新优惠
+					session.callback(new Msg4Text(msg, "亲。。。暂时还没有优惠活动哦"));
 					
 				}else if(msg.getEventKey().equals(MEMBER_EVENT_KEY)){
 					//会员信息

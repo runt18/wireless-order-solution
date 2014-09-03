@@ -11,13 +11,15 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
+import com.wireless.db.deptMgr.DepartmentDao;
 import com.wireless.db.deptMgr.KitchenDao;
 import com.wireless.db.menuMgr.FoodDao;
-import com.wireless.db.menuMgr.MenuDao;
+import com.wireless.db.menuMgr.FoodTasteDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.json.JObject;
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
+import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.menuMgr.DepartmentTree;
 import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.menuMgr.FoodList;
@@ -136,17 +138,11 @@ public class QueryMenuAction extends DispatchAction {
 		String limit = request.getParameter("limit");
 		response.setContentType("text/json;charset=utf-8");
 		try{
-			String restaurantID = (String)request.getAttribute("restaurantID");
-			try{
-				Integer.parseInt(restaurantID);
-			}catch(NumberFormatException e){
-				jobject.initTip(false, WebParams.TIP_TITLE_ERROE, 9998, "操作失败, 获取餐厅编号失败.");
-				return null;
-			}
-			root = MenuDao.getFoodTaste(Integer.parseInt(restaurantID));
+			String restaurantId = (String)request.getAttribute("restaurantID");
+			root = FoodTasteDao.getFoodTaste(Integer.parseInt(restaurantId));
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, WebParams.TIP_CODE_EXCEPTION, WebParams.TIP_CONTENT_SQLEXCEPTION);
+			jobject.initTip(false, WebParams.TIP_TITLE_WARNING, WebParams.TIP_CODE_EXCEPTION, e.getMessage());
 		}finally{
 			if(root != null){
 				jobject.setTotalProperty(root.size());
@@ -210,17 +206,11 @@ public class QueryMenuAction extends DispatchAction {
 		String limit = request.getParameter("limit");
 		
 		try{
-			String restaurantID = (String)request.getAttribute("restaurantID");
-			try{
-				Integer.parseInt(restaurantID);
-			}catch(NumberFormatException e){
-				jobject.initTip(false, WebParams.TIP_TITLE_ERROE, 9998, "操作失败, 获取餐厅编号失败.");
-				return null;
-			}
-			root = MenuDao.getDepartment(Integer.parseInt(restaurantID));
+			String restaurantId = (String)request.getAttribute("restaurantID");
+			root = DepartmentDao.getByType(StaffDao.getAdminByRestaurant(Integer.parseInt(restaurantId)), Department.Type.NORMAL);
 		}catch(Exception e){
 			e.printStackTrace();
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, WebParams.TIP_CODE_EXCEPTION, WebParams.TIP_CONTENT_SQLEXCEPTION);
+			jobject.initTip(false, WebParams.TIP_TITLE_WARNING, WebParams.TIP_CODE_EXCEPTION, e.getMessage());
 		}finally{
 			if(root != null){
 				jobject.setTotalProperty(root.size());

@@ -2,6 +2,7 @@ package org.marker.weixin;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import org.marker.weixin.msg.Msg4Event;
 import org.marker.weixin.msg.Msg4Image;
 import org.marker.weixin.msg.Msg4Link;

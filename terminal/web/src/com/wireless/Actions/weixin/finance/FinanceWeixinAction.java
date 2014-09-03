@@ -88,7 +88,7 @@ public class FinanceWeixinAction extends Action {
 	private String financeBucket;
 	
 	private final static String PROMPT_HELP_MSG = "用管理员账号登陆后台，按图片提示，扫描验证二维码绑定您的餐厅";
-	private final static String PROMPT_HELP_PIC_URL = "http://wx.e-tones.net/web-term/images/interestHelp.png";
+	private final static String PROMPT_HELP_PIC_URL = "http://wx.e-tones.net/web-term/images/interestHelp.jpg?" + System.currentTimeMillis();
 	
 	//TOKEN 是你在微信平台开发模式中设置的哦
 	public static final String TOKEN = "xxx";
