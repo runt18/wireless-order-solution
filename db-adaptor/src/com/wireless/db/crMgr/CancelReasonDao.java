@@ -16,23 +16,31 @@ public class CancelReasonDao {
 	/**
 	 * Get the cancel reason to a specified restaurant defined in {@link Staff} and other extra condition.
 	 * @param staff 
-	 * 			the terminal
-	 * @param extraCond
-	 * 			the extra condition to query SQL statement
-	 * @param orderClause
-	 * 			the order clause to query SQL statement
+	 * 			the staff to perform this action
 	 * @return an array containing the result to cancel reasons
 	 * @throws SQLException
 	 * 			throws if failed to execute the SQL statement
 	 */
-	public static List<CancelReason> getReasons(Staff staff, String extraCond, String orderClause) throws SQLException{
+	public static List<CancelReason> get(Staff staff) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return getReasons(dbCon, staff, extraCond, orderClause);
+			return get(dbCon, staff);
 		}finally{
 			dbCon.disconnect();
 		}
+	}
+	
+	/**
+	 * Get the cancel reason to a specified restaurant defined in {@link Staff}.
+	 * @param staff 
+	 * 			the staff to perform this action
+	 * @return an array containing the result to cancel reasons
+	 * @throws SQLException
+	 * 			throws if failed to execute the SQL statement
+	 */
+	public static List<CancelReason> get(DBCon dbCon, Staff staff) throws SQLException{
+		return getByCond(dbCon, staff, null, null);
 	}
 	
 	/**
@@ -49,7 +57,7 @@ public class CancelReasonDao {
 	 * @throws SQLException
 	 * 			throws if failed to execute the SQL statement
 	 */
-	public static List<CancelReason> getReasons(DBCon dbCon, Staff staff, String extraCond, String orderClause) throws SQLException{
+	private static List<CancelReason> getByCond(DBCon dbCon, Staff staff, String extraCond, String orderClause) throws SQLException{
 		String sql;
 		sql = " SELECT " + 
 			  " cancel_reason_id, reason, restaurant_id " +
@@ -82,11 +90,11 @@ public class CancelReasonDao {
 	 * @throws BusinessException
 	 * 			throws if the cancel reason to this id is NOT found
 	 */
-	public static CancelReason getReasonById(Staff staff, int reasonId) throws SQLException, BusinessException{
+	public static CancelReason getById(Staff staff, int reasonId) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return getReasonById(dbCon, staff, reasonId);
+			return getById(dbCon, staff, reasonId);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -106,8 +114,8 @@ public class CancelReasonDao {
 	 * @throws BusinessException
 	 * 			throws if the cancel reason to this id is NOT found
 	 */
-	public static CancelReason getReasonById(DBCon dbCon, Staff staff, int reasonId) throws SQLException, BusinessException{
-		List<CancelReason> result = getReasons(dbCon, staff, " AND CR.cancel_reason_id = " + reasonId, null);
+	public static CancelReason getById(DBCon dbCon, Staff staff, int reasonId) throws SQLException, BusinessException{
+		List<CancelReason> result = getByCond(dbCon, staff, " AND CR.cancel_reason_id = " + reasonId, null);
 		if(result.isEmpty()){
 			throw new BusinessException("The cancel reason(id = " + reasonId + ") is NOT found.");
 		}else{

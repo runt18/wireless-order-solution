@@ -534,7 +534,7 @@ public class OrderFoodDao {
 	static void fill(DBCon dbCon, Staff staff, OrderFood src) throws SQLException, BusinessException{
 		//Get the details to cancel reason if contained.
 		if(src.hasCancelReason()){
-			src.setCancelReason(CancelReasonDao.getReasonById(dbCon, staff, src.getCancelReason().getId()));
+			src.setCancelReason(CancelReasonDao.getById(dbCon, staff, src.getCancelReason().getId()));
 		}
 		
 		if(src.isTemp()){

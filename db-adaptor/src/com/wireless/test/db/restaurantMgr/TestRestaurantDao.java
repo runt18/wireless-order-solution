@@ -222,7 +222,7 @@ public class TestRestaurantDao {
 	}
 	
 	private void compareCancelReason(Staff staff, int restaurantId) throws SQLException{
-		List<CancelReason> cancelReasons = CancelReasonDao.getReasons(staff, null, null);
+		List<CancelReason> cancelReasons = CancelReasonDao.get(staff);
 		for(CancelReason.DefaultCR defCR : CancelReason.DefaultCR.values()){
 			boolean isExist = false;
 			for(CancelReason cr : cancelReasons){
