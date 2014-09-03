@@ -39,7 +39,7 @@ public class QueryMemberOperationSummaryAction extends DispatchAction{
 			String pin = (String)request.getAttribute("pin");
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
-			String restaurantID = request.getParameter("restaurantID");
+			String restaurantID = (String) request.getAttribute("restaurantID");
 			String dataSource = request.getParameter("dataSource");
 			String operateType = request.getParameter("operateType");
 			String memberType = request.getParameter("memberType");

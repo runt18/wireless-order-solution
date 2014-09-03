@@ -47,7 +47,7 @@ public class ImageFileUploadAction extends Action{
 			String pin = (String)request.getAttribute("pin");
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
-			String restaurantID = request.getParameter("restaurantID");
+			String restaurantID = (String) request.getAttribute("restaurantID");
 			String foodID = request.getParameter("foodID");
 			String otype = request.getParameter("otype");
 			

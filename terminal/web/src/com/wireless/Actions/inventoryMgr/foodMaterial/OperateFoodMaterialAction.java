@@ -39,7 +39,7 @@ public class OperateFoodMaterialAction extends DispatchAction{
 			String pin = (String)request.getAttribute("pin");
 			StaffDao.verify(Integer.parseInt(pin));
 			
-			String restaurantId = request.getParameter("restaurantId");
+			String restaurantId = (String) request.getAttribute("restaurantID");
 			String foodId = request.getParameter("foodId");
 			String content = request.getParameter("content");
 			

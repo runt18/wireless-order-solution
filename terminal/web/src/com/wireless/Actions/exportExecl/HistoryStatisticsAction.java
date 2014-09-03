@@ -756,7 +756,7 @@ public class HistoryStatisticsAction extends DispatchAction{
 		response.addHeader("Content-Disposition","attachment;filename=" + new String("收款明细(历史).xls".getBytes("GBK"), "ISO8859_1"));
 		
 		String pin = (String)request.getAttribute("pin");
-		String restaurantID = request.getParameter("restaurantID");
+		String restaurantID = (String) request.getAttribute("restaurantID");
 		String onDuty = request.getParameter("onDuty");
 		String offDuty = request.getParameter("offDuty");
 		

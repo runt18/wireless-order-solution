@@ -37,7 +37,7 @@ public class OperateMaterialCateAction extends DispatchAction {
 			String pin = (String)request.getAttribute("pin");
 			StaffDao.verify(Integer.parseInt(pin));
 			
-			String restaurantID = request.getParameter("restaurantID");
+			String restaurantID = (String) request.getAttribute("restaurantID");
 			String name = request.getParameter("name");
 			MaterialCate mc = new MaterialCate(Integer.valueOf(restaurantID), name);
 			MaterialCateDao.insert(mc);
@@ -70,7 +70,7 @@ public class OperateMaterialCateAction extends DispatchAction {
 		
 		JObject jobject = new JObject();
 		try{
-			String restaurantID = request.getParameter("restaurantID");
+			String restaurantID = (String) request.getAttribute("restaurantID");
 			String cateId = request.getParameter("cateId");
 			String name = request.getParameter("name");
 			MaterialCate mc = new MaterialCate(Integer.valueOf(cateId), Integer.valueOf(restaurantID), name);

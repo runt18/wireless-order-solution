@@ -42,7 +42,7 @@ public class QueryMaterialAction extends DispatchAction{
 			String pin = (String)request.getAttribute("pin");
 			StaffDao.verify(Integer.parseInt(pin));
 			
-			String restaurantID = request.getParameter("restaurantID");
+			String restaurantID = (String) request.getAttribute("restaurantID");
 			String name = request.getParameter("name");
 			String cateId = request.getParameter("cateId");
 			String cateType = request.getParameter("cateType");
