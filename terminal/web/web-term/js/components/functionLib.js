@@ -3,6 +3,8 @@ Ext.onReady(function() {
 	Ext.form.Field.prototype.msgTarget = 'side';  
 	Ext.QuickTips.init();
 	Ext.lib.Ajax.defaultPostHeader += '; charset=utf-8';
+	
+	Ext.Ajax.timeout = 120000;
 });
 
 /**
