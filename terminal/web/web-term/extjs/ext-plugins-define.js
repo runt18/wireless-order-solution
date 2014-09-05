@@ -9,6 +9,7 @@ Ext.ux.plugins.createImageFile = function(config){
 		id : config.id,
 		name : 'imgFile',
 		fieldLabel : '选择图片',
+		hideLabel : true,
 		height : 22,
 		inputType : 'file',
 		listeners : {
