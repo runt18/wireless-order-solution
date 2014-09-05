@@ -373,6 +373,26 @@ function bindActiveEvent(id, sbg, bg, href){
 	return active;
 }
 
+function promotion_showFloatOptionForMult(node, mult){
+		for (var j = 0; j < mult.length; j++) {
+			if(node.attributes.status == mult[j].status){
+				if(!$("#div_floatBar").status || $("#div_floatBar").status != node.attributes.status){
+					$('#div_floatBar').html("");
+					for (var i = 0; i < mult[j].option.length; i++) {
+						if(i > 0){
+							$("#div_floatBar").append('|&nbsp;');
+						}
+						$("#div_floatBar").append('<a href="javascript:void(0)" onclick='+mult[j].option[i].fn+'>'+ mult[j].option[i].name +'</a>&nbsp;');
+					}	
+					$("#div_floatBar").status = node.attributes.status; 
+					
+					break;
+				}
+
+			}
+		}
+}
+
 function showFloatOption(obj_b){
 	//记录节点的位置和鼠标位置
 	var nodex=0;
@@ -380,14 +400,18 @@ function showFloatOption(obj_b){
 	//把bar加到tree上
 	$("#"+obj_b.treeId).mouseover(function(){
 		//生成浮动bar
-		if($("#div_floatBar").find("a").length == 0){
-			for (var i = 0; i < obj_b.option.length; i++) {
-				if(i > 0){
-					$("#div_floatBar").append('|&nbsp;');
+		
+		if(!obj_b.mult){//有多种浮动框情况时不执行单一浮动框
+			if($("#div_floatBar").find("a").length == 0){
+				for (var i = 0; i < obj_b.option.length; i++) {
+					if(i > 0){
+						$("#div_floatBar").append('|&nbsp;');
+					}
+					$("#div_floatBar").append('<a href="javascript:void(0)" onclick='+obj_b.option[i].fn+'>'+ obj_b.option[i].name +'</a>&nbsp;');
 				}
-				$("#div_floatBar").append('<a href="javascript:void(0)" onclick='+obj_b.option[i].fn+'>'+ obj_b.option[i].name +'</a>&nbsp;');
-			}
+			}		
 		}
+
 
 		liOffset = $("#"+obj_b.treeId).find("ul").offset();
 		nodey = liOffset.top;
@@ -398,8 +422,20 @@ function showFloatOption(obj_b){
 			offset = $(this).find("a").offset();
 			nodex = offset.left - 18;
 			barX = (offset.left + $(this).find("a").width() + 100);
-			$('#div_floatBar').css({left:offset.left+$(this).find("a").width(), top:(Ext.isIE?(offset.top-12):(offset.top-2))});
-			$('#div_floatBar').show();
+			if(obj_b.mult){
+				promotion_showFloatOptionForMult(Ext.getCmp(obj_b.treeId).getNodeById(floatBarNodeId), obj_b.mult);
+			}
+			
+			if($('#div_floatBar').html()){
+				$('#div_floatBar').css({left:offset.left+$(this).find("a").width(), top:(Ext.isIE?(offset.top-12):(offset.top-2))});
+				$('#div_floatBar').show();			
+			}else{
+				$('#div_floatBar').hide();		
+			}
+
+			
+			
+			
 		});
 		
 		$(document).mousemove(function(event){

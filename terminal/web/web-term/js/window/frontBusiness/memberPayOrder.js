@@ -395,7 +395,7 @@ function memberPayOrderToBindData(_c){
 	}
 	
 	
-//	var coupon = Ext.getCmp('mpo_couponForPayOrder');
+	var coupon = Ext.getCmp('mpo_couponForPayOrder');
 	
 	var data = typeof _c.data == 'undefined' || typeof _c.data.other == 'undefined' ? {} : _c.data.other;
 	
@@ -405,7 +405,7 @@ function memberPayOrderToBindData(_c){
 	var discountMsgs = typeof memberType.discounts == 'undefined' ? {discounts:[{id:-1, name:'全部'}]} : memberType.discounts;
 	var newOrder = typeof data.newOrder == 'undefined' ? {} : data.newOrder;
 	
-/*	var coupons = typeof data.coupons == 'undefined' ? null : data.coupons;
+	var coupons = typeof data.coupons == 'undefined' ? null : data.coupons;
 	coupon.getEl().up('.x-form-item').setDisplayed(false);
 	if(coupons){
 		coupon.getEl().up('.x-form-item').setDisplayed(true);
@@ -416,7 +416,7 @@ function memberPayOrderToBindData(_c){
 		if(coupon.store.getCount() == 0){
 			coupon.store.loadData(list);
 		}
-	}*/
+	}
 	
 	
 //	mobile.setValue(member['mobile']);
@@ -724,7 +724,7 @@ function memberPayOrderHandler(_c){
 	var payManner = Ext.getCmp('mpo_comPayMannerForPayOrder');
 	var customNum = Ext.getCmp('mpo_numCustomNumberForPayOrder');
 	var chooseDiscount = Ext.getCmp('mpo_txtDiscountForPayOrder');
-//	var chooseCoupon = Ext.getCmp('mpo_couponForPayOrder');
+	var chooseCoupon = Ext.getCmp('mpo_couponForPayOrder');
 	var eraseQuota = document.getElementById("txtMemberEraseQuota");
 	
 	if(!payManner.isValid() || !customNum.isValid()){
@@ -751,7 +751,7 @@ function memberPayOrderHandler(_c){
 			cashIncome : order['actualPrice'],
 			payType : 2,
 			discountID : chooseDiscount.getValue(),
-//			couponID : chooseCoupon.getValue(),
+			couponID : chooseCoupon.getValue(),
 			payManner : payManner.getValue(),
 			tempPay : _c.tempPay,
 			memberID : member['id'],
