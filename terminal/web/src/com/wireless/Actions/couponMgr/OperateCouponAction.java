@@ -10,8 +10,11 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
+import com.wireless.db.DBCon;
 import com.wireless.db.client.member.MemberDao;
+import com.wireless.db.promotion.CouponDao;
 import com.wireless.db.staffMgr.StaffDao;
+import com.wireless.db.weixin.restaurant.WeixinRestaurantDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.client.Member;
@@ -50,6 +53,38 @@ public class OperateCouponAction extends DispatchAction{
 			e.printStackTrace();
 			jobject.initTip(e);
 		}finally{
+			response.getWriter().print(jobject.toString());
+		}
+		
+		return null;
+	}
+	
+	public ActionForward draw(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		String couponId = request.getParameter("couponId");
+		
+		String formId = request.getParameter("fid");
+		int rid = 0;
+		DBCon dbCon = new DBCon();
+		dbCon.connect();
+		rid = WeixinRestaurantDao.getRestaurantIdByWeixin(dbCon, formId);
+		
+		JObject jobject = new JObject();
+		try{
+			CouponDao.draw(StaffDao.getByRestaurant(dbCon, rid).get(0), Integer.parseInt(couponId));
+			
+		}catch(BusinessException e){
+			e.printStackTrace();
+			jobject.initTip(e);
+		}catch(SQLException e){
+			e.printStackTrace();
+			jobject.initTip(e);
+		}catch(Exception e){
+			e.printStackTrace();
+			jobject.initTip(e);
+		}finally{
+			dbCon.disconnect();
 			response.getWriter().print(jobject.toString());
 		}
 		

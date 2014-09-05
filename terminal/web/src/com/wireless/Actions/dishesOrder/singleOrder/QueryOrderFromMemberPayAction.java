@@ -12,6 +12,7 @@ import org.apache.struts.action.ActionMapping;
 
 import com.wireless.db.client.member.MemberDao;
 import com.wireless.db.orderMgr.PayOrder;
+import com.wireless.db.promotion.CouponDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.MemberError;
@@ -20,6 +21,7 @@ import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.pojo.client.Member;
 import com.wireless.pojo.dishesOrder.Order;
+import com.wireless.pojo.promotion.Coupon;
 import com.wireless.pojo.staffMgr.Staff;
 
 public class QueryOrderFromMemberPayAction extends Action{
@@ -83,10 +85,12 @@ public class QueryOrderFromMemberPayAction extends Action{
 			}
 			final Order order = PayOrder.calc(staff, payBuilder);
 			
-//			final List<Coupon> coupons = CouponDao.getByCond(staff, new CouponDao.ExtraCond().setMember(m.getId()).setStatus(Coupon.Status.DRAWN), null);
+			
 //			final List<Coupon> coupons = new ArrayList<>();
 //			final Member m;			
 			final List<Member> members = membersByType;
+			
+			final List<Coupon> coupons = CouponDao.getByCond(staff, new CouponDao.ExtraCond().setMember(members.get(0).getId()).setStatus(Coupon.Status.DRAWN), null);
 			jobject.setExtra(new Jsonable(){
 
 				@Override
@@ -99,7 +103,10 @@ public class QueryOrderFromMemberPayAction extends Action{
 						jm.putJsonable("member", members.get(0), 0);					
 					}
 					jm.putJsonable("newOrder", order, 0);
-//					jm.putJsonableList("coupons", coupons, 0);
+					if(!coupons.isEmpty()){
+						jm.putJsonableList("coupons", coupons, Coupon.ST_PARCELABLE_SIMPLE);
+					}
+					
 					return jm;
 				}
 

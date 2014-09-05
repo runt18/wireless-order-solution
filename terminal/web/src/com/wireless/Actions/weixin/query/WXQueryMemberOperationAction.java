@@ -15,6 +15,7 @@ import org.apache.struts.actions.DispatchAction;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.client.member.MemberOperationDao;
+import com.wireless.db.promotion.CouponDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.weixin.member.WeixinMemberDao;
 import com.wireless.db.weixin.restaurant.WeixinRestaurantDao;
@@ -23,8 +24,11 @@ import com.wireless.json.JObject;
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.pojo.client.MemberOperation;
+import com.wireless.pojo.promotion.Coupon;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.NumericUtil;
+import com.wireless.util.OSSParams;
+import com.wireless.util.OSSUtil;
 import com.wireless.util.SQLUtil;
 
 public class WXQueryMemberOperationAction extends DispatchAction{
@@ -181,6 +185,7 @@ public class WXQueryMemberOperationAction extends DispatchAction{
 			
 			List<MemberOperation> chargeDetail = new ArrayList<MemberOperation>();
 			List<MemberOperation> consumeDetail = new ArrayList<MemberOperation>();
+			List<MemberOperation> couponDetail = new ArrayList<MemberOperation>();
 			Map<Object, Object> params = new HashMap<Object, Object>();
 			
 			// 获取餐厅编号
@@ -225,6 +230,24 @@ public class WXQueryMemberOperationAction extends DispatchAction{
 				params.put(SQLUtil.SQL_PARAMS_LIMIT_ROWCOUNT, queryCount - consumeDetail.size());
 				consumeDetail.addAll(MemberOperationDao.getHistory(dbCon, staff, params));
 			}
+			
+			//查询优惠劵
+			
+			extra = " AND MO.member_id = " + mid + " AND MO.operate_type = " + MemberOperation.OperationType.CONSUME.getValue() + " AND MO.coupon_id > 0 ";
+			// 
+			params.put(SQLUtil.SQL_PARAMS_EXTRA, extra);
+			params.put(SQLUtil.SQL_PARAMS_ORDERBY, " ORDER BY MO.operate_date DESC ");
+			params.put(SQLUtil.SQL_PARAMS_LIMIT_OFFSET, 0);
+			params.put(SQLUtil.SQL_PARAMS_LIMIT_ROWCOUNT, queryCount);
+			//
+			couponDetail = MemberOperationDao.getToday(dbCon, staff, params);
+			// 当日数据不足查询记录数时, 获取历史数据填充满
+			if(couponDetail.size() < 1){
+				params.put(SQLUtil.SQL_PARAMS_LIMIT_ROWCOUNT, queryCount - couponDetail.size());
+				couponDetail.addAll(MemberOperationDao.getHistory(dbCon, staff, params));
+			}
+			
+			
 			final MemberOperation charge_mo;
 			if(!chargeDetail.isEmpty()){
 				charge_mo = chargeDetail.get(0);
@@ -240,6 +263,14 @@ public class WXQueryMemberOperationAction extends DispatchAction{
 				consume_mo = null;
 			}
 			
+			final MemberOperation coupon_mo;
+			
+			if(!couponDetail.isEmpty()){
+				coupon_mo = couponDetail.get(0);
+			}else{
+				coupon_mo = null;
+			}			
+			
 			jobject.setExtra(new Jsonable(){
 
 				@Override
@@ -247,6 +278,7 @@ public class WXQueryMemberOperationAction extends DispatchAction{
 					JsonMap jm = new JsonMap();
 					jm.putString("nearByCharge", charge_mo != null? NumericUtil.float2String2(charge_mo.getChargeMoney()) : (-1 + ""));
 					jm.putString("nearByConsume", consume_mo != null? NumericUtil.float2String2(consume_mo.getPayMoney()) : (-1 + ""));
+					jm.putString("couponConsume", coupon_mo != null? NumericUtil.float2String2(coupon_mo.getPayMoney()) : (-1 + ""));
 					return jm;
 				}
 
@@ -278,7 +310,7 @@ public class WXQueryMemberOperationAction extends DispatchAction{
 	 * @return
 	 * @throws Exception
 	 */
-/*	public ActionForward hasCouponDetails(ActionMapping mapping, ActionForm form,
+	public ActionForward hasCouponDetails(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
 		request.setCharacterEncoding("UTF-8");
@@ -300,10 +332,10 @@ public class WXQueryMemberOperationAction extends DispatchAction{
 			Staff staff = StaffDao.getByRestaurant(dbCon, rid).get(0);
 			
 //			List<CouponType> couponTypeList = CouponTypeDao.get(dbCon, staff);
-			List<Coupon> couponList = CouponDao.getAvailByMember(staff, mid);
+			List<Coupon> couponList = CouponDao.getByCond(staff, new CouponDao.ExtraCond().setMember(mid).setStatus(Coupon.Status.DRAWN), null);
 			
 			//获取所有优惠券
-			List<Map<String, Object>> root = new ArrayList<Map<String, Object>>(), asItems;
+/*			List<Map<String, Object>> root = new ArrayList<Map<String, Object>>(), asItems;
 			Map<String, Object> item = null;
 			for(CouponType listTemp : couponTypeList){
 				item = new HashMap<String, Object>(listTemp.toJsonMap(0));
@@ -317,7 +349,7 @@ public class WXQueryMemberOperationAction extends DispatchAction{
 				root.add(item);
 			}
 			
-			jobject.getOther().put("root", root);
+			jobject.getOther().put("root", root);*/
 			for (Coupon temp : couponList) {
 				if(temp.getCouponType().hasImage()){
 					temp.getCouponType().setImage(("http://" + OSSUtil.BUCKET_IMAGE + "." + OSSParams.instance().OSS_OUTER_POINT + "/" + temp.getRestaurantId() + "/" + temp.getCouponType().getImage()));
@@ -335,10 +367,10 @@ public class WXQueryMemberOperationAction extends DispatchAction{
 			jobject.initTip(e);
 		}finally{
 			if(dbCon != null) dbCon.disconnect();
-			response.getWriter().print(jobject.toString());
+			response.getWriter().print(jobject.toString(Coupon.ST_PARCELABLE_SIMPLE));
 		}
 		
 		return null;
-	}*/
+	}
 	
 }

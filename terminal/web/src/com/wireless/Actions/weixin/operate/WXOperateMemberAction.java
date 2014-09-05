@@ -16,6 +16,7 @@ import com.wireless.db.DBCon;
 import com.wireless.db.client.member.MemberDao;
 import com.wireless.db.client.member.MemberDao.MemberRank;
 import com.wireless.db.client.member.MemberTypeDao;
+import com.wireless.db.promotion.CouponDao;
 import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.db.sms.VerifySMSDao;
 import com.wireless.db.staffMgr.StaffDao;
@@ -28,6 +29,7 @@ import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.pojo.client.Member;
 import com.wireless.pojo.client.MemberType;
+import com.wireless.pojo.promotion.Coupon;
 import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.sms.VerifySMS;
 import com.wireless.pojo.sms.VerifySMS.ExpiredPeriod;
@@ -64,8 +66,8 @@ public class WXOperateMemberAction extends DispatchAction {
 			
 			final Restaurant restaurant = RestaurantDao.getById(dbCon, rid);
 			
-			final Member member = MemberDao.getById(dbCon, StaffDao.getByRestaurant(dbCon, rid).get(0), mid);
-			MemberRank mr = MemberDao.calcMemberRank(StaffDao.getByRestaurant(dbCon, rid).get(0), mid);
+			final Member member = MemberDao.getById(dbCon, StaffDao.getAdminByRestaurant(rid), mid);
+			MemberRank mr = MemberDao.calcMemberRank(StaffDao.getAdminByRestaurant(rid), mid);
 			
 			final int rank = ((mr.getTotal() - mr.getRank()) * 100)/mr.getTotal();
 			
@@ -87,6 +89,8 @@ public class WXOperateMemberAction extends DispatchAction {
 				}
 			};				
 			
+			final List<Coupon> couponList = CouponDao.getByCond(StaffDao.getAdminByRestaurant(rid), new CouponDao.ExtraCond().setMember(mid).setStatus(Coupon.Status.DRAWN), null);
+			
 			final int weixinCard = WeixinMemberDao.getCardByWeixin(dbCon, openId, formId);
 			
 			jobject.setExtra(new Jsonable(){
@@ -98,6 +102,9 @@ public class WXOperateMemberAction extends DispatchAction {
 					jm.putJsonable("restaurant", restaurant, 0);
 					jm.putInt("status", WeixinMemberDao.Status.BOUND.getVal());
 					jm.putInt("weixinCard", weixinCard);
+					if(!couponList.isEmpty()){
+						jm.putBoolean("hasCoupon", true);
+					}
 					return jm;
 				}
 
