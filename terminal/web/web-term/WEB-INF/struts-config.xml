@@ -540,7 +540,7 @@
 			parameter="dataSource">
 		</action>
 		<action path="/QueryCoupon" type="com.wireless.Actions.couponMgr.QueryCouponAction"
-			scope="request">
+			scope="request" parameter="dataSource">
 		</action>
 		<action path="/OperateCoupon"
 			type="com.wireless.Actions.couponMgr.OperateCouponAction" scope="request"
@@ -595,6 +595,10 @@
 			type="com.wireless.Actions.servicePlan.OperateServicePlanAction"
 			scope="request" parameter="dataSource">
 		</action>
+		<action path="/OperatePromotion"
+			type="com.wireless.Actions.couponMgr.OperatePromotionAction"
+			scope="request" parameter="dataSource">
+		</action>		
 	</action-mappings>
 
 	<message-resources parameter="com.yourcompany.struts.ApplicationResources" />
