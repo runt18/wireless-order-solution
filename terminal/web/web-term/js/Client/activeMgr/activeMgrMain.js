@@ -263,6 +263,12 @@ Ext.onReady(function() {
 			region : 'center',
 			style : 'background-color: red; border: 1px solid #ccc; padding: 5px 5px 5px 5px;',
 			html : '&nbsp;'			
+		}), new Ext.Panel({
+			id : 'promotionGeneral',
+			region : 'east',
+			width : 450,
+			style : 'background-color: yellow; border: 1px solid #ccc; padding: 5px 5px 5px 5px;',
+			html : '&nbsp;'			
 		})]
 	});
 	
