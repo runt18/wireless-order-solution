@@ -30,6 +30,9 @@
 				/OperateStaff.do,
 				/QueryStaff.do,
 				/QueryOTA.do,
+				/OperatePromotion.do,
+				/QueryCoupon.do,
+				/OperateCoupon.do,
 				
 				/Login.html,
 				/LoginAdmin.html,
@@ -83,7 +86,7 @@
 		</init-param>
 		<init-param>
 			<param-name>db_host</param-name>
-			<param-value>192.168.110.100</param-value>
+			<param-value>127.0.0.1</param-value>
 		</init-param>
 		<init-param>
 			<param-name>db_port</param-name>
@@ -95,7 +98,7 @@
 		</init-param>
 		<init-param>
 			<param-name>db_pwd</param-name>
-			<param-value>HelloZ315</param-value>
+			<param-value>root</param-value>
 		</init-param>
 		<!-- Below is the configuration parameters to socket -->
 		<init-param>
@@ -116,7 +119,7 @@
 		</init-param>
 		<init-param>
 			<param-name>imageUploadType</param-name>
-			<param-value>jpg,jpeg,gif,png,bmp</param-value>
+			<param-value>jpg,gif,png,bmp</param-value>
 		</init-param>
 		<init-param>
 			<param-name>oss_access_id</param-name>
