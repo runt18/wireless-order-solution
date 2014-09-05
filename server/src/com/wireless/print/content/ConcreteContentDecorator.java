@@ -5,7 +5,7 @@ import com.wireless.pojo.printScheme.PType;
 
 public abstract class ConcreteContentDecorator extends ConcreteContent{
 	
-	protected Content _content;
+	protected ConcreteContent _content;
 	
 	protected ConcreteContentDecorator(final String value, PStyle style){
 		super(PType.PRINT_UNKNOWN, style);

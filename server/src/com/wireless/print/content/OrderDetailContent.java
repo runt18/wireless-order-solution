@@ -8,7 +8,6 @@ import com.wireless.pojo.dishesOrder.OrderFood;
 import com.wireless.pojo.menuMgr.ComboFood;
 import com.wireless.pojo.printScheme.PStyle;
 import com.wireless.pojo.printScheme.PType;
-import com.wireless.pojo.tasteMgr.Taste;
 import com.wireless.pojo.util.NumericUtil;
 import com.wireless.print.PVar;
 import com.wireless.server.WirelessSocketServer;
@@ -105,19 +104,11 @@ public class OrderDetailContent extends ConcreteContent {
 				var1.append(new ExtraFormatDecorator(new FoodDetailContent(FoodDetailContent.DISPLAY_CONFIG_4_DETAIL, mParent, mPrintType, mStyle), ExtraFormatDecorator.LARGE_FONT_VH_1X).toString()).append(SEP);
 			}
 			
-			StringBuilder tastePref = new StringBuilder();
-			for(Taste taste : mParent.getTasteGroup().getTastes()){
-				if(tastePref.length() != 0){
-					tastePref.append("," + taste.getPreference());
-				}else{
-					tastePref.append(taste.getPreference());
-				}
-			}
-			if(tastePref.length() > 0){
+			if(mParent.hasTasteGroup()){
 				if(mPrintType == PType.PRINT_CANCELLED_FOOD_DETAIL){
-					var1.append(SEP).append(new ExtraFormatDecorator("口味：" + tastePref.toString(), mStyle, ExtraFormatDecorator.LARGE_FONT_V_1X)).append(SEP);
+					var1.append(SEP).append(new ExtraFormatDecorator("口味：" + mParent.getTasteGroup().getPreference(), mStyle, ExtraFormatDecorator.LARGE_FONT_V_1X)).append(SEP);
 				}else{
-					var1.append(new ExtraFormatDecorator("口味:" + tastePref.toString(), mStyle, ExtraFormatDecorator.LARGE_FONT_VH_1X)).append(SEP);
+					var1.append(new ExtraFormatDecorator("口味:" + mParent.getTasteGroup().getPreference(), mStyle, ExtraFormatDecorator.LARGE_FONT_VH_1X)).append(SEP);
 				}
 			}
 
