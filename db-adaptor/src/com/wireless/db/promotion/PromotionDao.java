@@ -392,7 +392,19 @@ public class PromotionDao {
 			promotion.setCreateDate(dbCon.rs.getTimestamp("create_date").getTime());
 			promotion.setDateRange(new DateRange(dbCon.rs.getTimestamp("start_date").getTime(), dbCon.rs.getTimestamp("finish_date").getTime()));
 			promotion.setTitle(dbCon.rs.getString("title"));
-			promotion.setBody(dbCon.rs.getString("body"));
+			String body = dbCon.rs.getString("body");
+			if(!body.isEmpty()){
+				promotion.setBody(body.replaceAll("&amp;", "&")
+								     .replaceAll("&lt;", "<")
+								     .replaceAll("&gt;", ">")
+								     .replaceAll("&quot;", "\"")
+								     .replaceAll("\r&#10;", "　\n")
+								     .replaceAll("&#10;", "　\n")
+								     .replaceAll("&#032;", " ")
+								     .replaceAll("&#039;", "'")
+								     .replaceAll("&#033;", "!"));
+				
+			}			
 			promotion.setType(Promotion.Type.valueOf(dbCon.rs.getInt("type")));
 			promotion.setPoint(dbCon.rs.getInt("point"));
 			promotion.setStatus(Promotion.Status.valueOf(dbCon.rs.getInt("status")));
