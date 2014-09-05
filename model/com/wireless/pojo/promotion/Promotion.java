@@ -3,10 +3,12 @@ package com.wireless.pojo.promotion;
 import java.util.Collections;
 import java.util.List;
 
+import com.wireless.json.JsonMap;
+import com.wireless.json.Jsonable;
 import com.wireless.pojo.billStatistics.DateRange;
 import com.wireless.pojo.util.SortedList;
 
-public class Promotion {
+public class Promotion implements Jsonable{
 
 	public static class CreateBuilder{
 		private final DateRange range;
@@ -250,6 +252,27 @@ public class Promotion {
 	@Override
 	public String toString(){
 		return title;
+	}
+
+	@Override
+	public JsonMap toJsonMap(int flag) {
+		JsonMap jm = new JsonMap();
+		jm.putInt("id", this.id);
+		jm.putInt("rid", this.restaurantId);
+		jm.putString("promotionBeginDate", this.dateRange.getOpeningFormat());
+		jm.putString("promotionEndDate", this.dateRange.getEndingFormat());
+		jm.putString("title", this.title);
+		jm.putString("body", this.body);
+		jm.putInt("point", this.point);
+		jm.putInt("status", this.status.getVal());
+		jm.putInt("pType", this.type.getVal());
+		jm.putJsonable("coupon", this.couponType, 0);
+		return jm;
+	}
+
+	@Override
+	public void fromJsonMap(JsonMap jsonMap, int flag) {
+		
 	}
 	
 }

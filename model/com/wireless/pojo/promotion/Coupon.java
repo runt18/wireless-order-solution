@@ -13,6 +13,9 @@ import com.wireless.pojo.util.SortedList;
 
 public class Coupon implements Jsonable{
 
+	public final static byte ST_PARCELABLE_COMPLEX = 0;
+	public final static byte ST_PARCELABLE_SIMPLE = 1;	
+	
 	public static class CreateBuilder{
 		private final int couponTypeId;
 		private final int promotionId;
@@ -99,7 +102,7 @@ public class Coupon implements Jsonable{
 		}
 	}
 	
-	public class DrawProgress{
+	public class DrawProgress implements Jsonable{
 		private final int point;
 		private DrawProgress(int point){
 			this.point = point;
@@ -122,6 +125,19 @@ public class Coupon implements Jsonable{
 		@Override
 		public String toString(){
 			return promotion.getType().toString() + promotion.getPoint() + ", 当前积分" + point;
+		}
+
+		@Override
+		public JsonMap toJsonMap(int flag) {
+			JsonMap jm = new JsonMap();
+			jm.putInt("point", this.point);
+			jm.putBoolean("isOk", this.isOk());
+			return jm;
+		}
+
+		@Override
+		public void fromJsonMap(JsonMap jsonMap, int flag) {
+			
 		}
 	}
 	
@@ -302,6 +318,12 @@ public class Coupon implements Jsonable{
 		jm.putString("statusText", this.status.desc);
 		jm.putInt("statusValue", this.status.val);
 		jm.putString("birthDate", DateUtil.formatToDate(this.getBirthDate()));
+		
+		if(flag == ST_PARCELABLE_COMPLEX){
+			jm.putJsonable("promotion", this.promotion, 0);
+			jm.putJsonable("drawProgress", getDrawProgress(), 0);			
+		}
+
 		return jm;
 	}
 
