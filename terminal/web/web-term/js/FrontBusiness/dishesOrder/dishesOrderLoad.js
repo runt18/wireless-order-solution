@@ -5,7 +5,7 @@
 		orderPanel.setTitle('已点菜列表 -- 操作类型: <font color="red">改单</font>');
 	}
 	if(!isRepaid){
-		orderPanel.setTitle(orderPanel.title + String.format(' -- 餐台号: <font color="red">{0}</font>', tableAliasID));
+		orderPanel.setTitle(orderPanel.title + String.format(' -- 餐台号: <font color="red">{0}</font>&nbsp;<font color="red" size="3">({1})</font>', tableAliasID, tableDate.name));
 	}
 };
 // loading taste 
