@@ -41,7 +41,24 @@
 	
 	var giftRender = {checkeds : [], id : 0};
 	
-	var reloadData;
+	var reloadData, tableDate;
+	
+	//获取餐台信息
+	$.ajax({
+		url : "../../QueryTable.do",
+		type : 'post',
+		async:false,
+		data : {
+			"alias" : tableAliasID
+		},
+		success : function(jr, status, xhr){
+			if(jr.success){
+				tableDate = jr.root[0];
+			}
+		},
+		error : function(request, status, err){
+		}
+	}); 	
 	
 	if(typeof orderID != 'undefined'){
 		params = {
@@ -134,6 +151,5 @@
 	<script type="text/javascript" src="../../js/FrontBusiness/dishesOrder/dishesOrderFuncLib.js"></script>
 	<script type="text/javascript" src="../../extjs/examples.js"></script>
 	<script type="text/javascript" src="../../js/common/CompareFoodUtil.js"></script>
-	
 </body>
 </html>

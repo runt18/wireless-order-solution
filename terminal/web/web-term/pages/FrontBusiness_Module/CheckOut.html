@@ -98,11 +98,28 @@
 	var checkOutGrid, checkOutStore, checkOutColumnModel;
 	var tableGroupTab;
 	
-	var timerCheckParams;
+	var timerCheckParams, tableDate;
 	var isPaying = false;
 	var checkOut_actualPrice ;
 	//输入收款窗口
 	var inputReciptWin;
+	
+	//获取餐台信息
+	$.ajax({
+		url : "../../QueryTable.do",
+		type : 'post',
+		async:false,
+		data : {
+			"alias" : tableID
+		},
+		success : function(jr, status, xhr){
+			if(jr.success){
+				tableDate = jr.root[0];
+			}
+		},
+		error : function(request, status, err){
+		}
+	}); 	
 </script>
 
 <script type="text/javascript"
