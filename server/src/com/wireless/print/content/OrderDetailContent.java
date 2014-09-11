@@ -76,7 +76,7 @@ public class OrderDetailContent extends ConcreteContent {
 															ExtraFormatDecorator.LARGE_FONT_V_3X).toString());
 		}
 
-		if(mStyle == PStyle.PRINT_STYLE_58MM){
+		if(mStyle == PStyle.PRINT_STYLE_58MM || mStyle == PStyle.PRINT_STYLE_76MM){
 			mPrintTemplate = mPrintTemplate.replace(PVar.VAR_3, 
 												    "账单号：" + mOrder.getId() + SEP + 
 												    "时间：" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
@@ -88,12 +88,18 @@ public class OrderDetailContent extends ConcreteContent {
 													  getStyle()).toString());
 		}
 
-		mPrintTemplate = mPrintTemplate.replace(PVar.VAR_2, 
-				new ExtraFormatDecorator(
-					new Grid2ItemsContent("餐台：" + tblName, 
-										  "服务员：" + mWaiter, 
-									      getStyle()),
-					ExtraFormatDecorator.LARGE_FONT_V_1X).toString());
+		if(mStyle == PStyle.PRINT_STYLE_76MM){
+			mPrintTemplate = mPrintTemplate.replace(PVar.VAR_2, 
+					new ExtraFormatDecorator("餐台：" + tblName + SEP + "服务员：" + mWaiter, mStyle, ExtraFormatDecorator.LARGE_FONT_V_1X).toString());
+			
+		}else{
+			mPrintTemplate = mPrintTemplate.replace(PVar.VAR_2, 
+					new ExtraFormatDecorator(
+						new Grid2ItemsContent("餐台：" + tblName, 
+											  "服务员：" + mWaiter, 
+										      getStyle()),
+						ExtraFormatDecorator.LARGE_FONT_V_1X).toString());
+		}
 			
 		if(mChild == null){
 			//generate the order food detail info and replace the $(var_1) with it
@@ -122,11 +128,14 @@ public class OrderDetailContent extends ConcreteContent {
 			}
 			
 			var1.append(mSeperatorLine);
-
-			var1.append(new ExtraFormatDecorator(
-							new Grid2ItemsContent("餐台：" + tblName, "价钱：￥" + NumericUtil.float2String2(mParent.calcPriceBeforeDiscount()), mStyle),
-							ExtraFormatDecorator.LARGE_FONT_V_1X).toString());
 			
+			if(mStyle == PStyle.PRINT_STYLE_76MM){
+				var1.append(new ExtraFormatDecorator("价钱：￥" + NumericUtil.float2String2(mParent.calcPriceBeforeDiscount()), mStyle, ExtraFormatDecorator.LARGE_FONT_V_1X).toString());
+			}else{
+				var1.append(new ExtraFormatDecorator(
+								new Grid2ItemsContent("餐台：" + tblName, "价钱：￥" + NumericUtil.float2String2(mParent.calcPriceBeforeDiscount()), mStyle),
+								ExtraFormatDecorator.LARGE_FONT_V_1X).toString());
+			}			
 			
 			mPrintTemplate = mPrintTemplate.replace(PVar.VAR_1, var1.toString());
 			

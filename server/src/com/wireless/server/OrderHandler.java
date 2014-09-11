@@ -350,17 +350,19 @@ class OrderHandler implements Runnable{
 			PrintHandler printHandler = new PrintHandler(staff);
 			
 			if(!diffResult.hurriedFoods.isEmpty()){
-				diffResult.newOrder.setOrderFoods(diffResult.hurriedFoods);
+				Order hurriedOrder = new Order();
+				hurriedOrder.copyFrom(diffResult.newOrder);
+				hurriedOrder.setOrderFoods(diffResult.hurriedFoods);
 				//print the summary to hurried foods
 				printHandler.addContent(JobContentFactory.instance().createSummaryContent(PType.PRINT_ALL_HURRIED_FOOD, 
 																							  staff, 
 																							  printers,
-																							  diffResult.newOrder));
+																							  hurriedOrder));
 				//print the detail to hurried foods
 				printHandler.addContent(JobContentFactory.instance().createDetailContent(PType.PRINT_HURRIED_FOOD, 
 																							 staff,
 																							 printers,
-																							 diffResult.newOrder));
+																							 hurriedOrder));
 			}
 			
 			if(!diffResult.extraFoods.isEmpty()){
@@ -524,8 +526,8 @@ class OrderHandler implements Runnable{
 		}else if(printType.isTransTbl()){
 			Parcel p = new Parcel(request.body);
 			int orderId = p.readInt();
-			Table srcTbl = p.readParcel(Table.CREATOR);
-			Table destTbl = p.readParcel(Table.CREATOR);
+			Table srcTbl = TableDao.getTableByAlias(staff, p.readParcel(Table.CREATOR).getAliasId());
+			Table destTbl = TableDao.getTableByAlias(staff, p.readParcel(Table.CREATOR).getAliasId());
 			new PrintHandler(staff)
 				.addContent(JobContentFactory.instance().createTransContent(printType, staff, printers, orderId, srcTbl, destTbl))
 				.fireSync();

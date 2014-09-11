@@ -44,7 +44,11 @@ public class FoodListWithSepContent extends ConcreteContent {
 					var.append(SEP).append("‘≠“Ú:" + of.getCancelReason().getReason());
 				}
 			}
-			var.append((cnt++ < mOrderFoods.size() - 1 ? SEP + mSeperatorLine + SEP : ""));
+			if(mStyle == PStyle.PRINT_STYLE_76MM){
+				var.append((cnt++ < mOrderFoods.size() - 1 ? SEP + "---------------------------------" + SEP : ""));
+			}else{
+				var.append((cnt++ < mOrderFoods.size() - 1 ? SEP + mSeperatorLine + SEP : ""));
+			}
 		}
 		return var.toString();
 	}

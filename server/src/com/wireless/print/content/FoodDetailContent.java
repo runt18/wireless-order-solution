@@ -46,14 +46,14 @@ public class FoodDetailContent extends ConcreteContent {
 		}
 	};
 	
-	public final static DisplayConfig DISPLAY_CONFIG_4_SUMMARY = new DisplayConfig(new DisplayItem[]{ DisplayItem.DISCOUNT, DisplayItem.STATUS }){
+	public final static DisplayConfig DISPLAY_CONFIG_4_SUMMARY = new DisplayConfig(new DisplayItem[]{ DisplayItem.DISCOUNT }){
 		@Override
 		public DisplayConfig mask(DisplayItem item){
 			throw new UnsupportedOperationException();
 		}
 	}; 
 	
-	public final static DisplayConfig DISPLAY_CONFIG_4_DETAIL = new DisplayConfig(new DisplayItem[]{ DisplayItem.PRICE, DisplayItem.TASTE, DisplayItem.STATUS }){
+	public final static DisplayConfig DISPLAY_CONFIG_4_DETAIL = new DisplayConfig(new DisplayItem[]{ DisplayItem.PRICE, DisplayItem.TASTE, DisplayItem.STATUS, DisplayItem.DISCOUNT }){
 		@Override
 		public DisplayConfig mask(DisplayItem item){
 			throw new UnsupportedOperationException();

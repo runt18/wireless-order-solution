@@ -9,9 +9,11 @@ import com.wireless.pojo.printScheme.PType;
 public abstract class ConcreteContent implements Content {
 	
 	private final static int LEN_58MM = 32;
+	private final static int LEN_76MM = 40;
 	private final static int LEN_80MM = 48;
 	
 	private final static String LINE_58MM = "--------------------------------";
+	private final static String LINE_76MM = "---------------------------------------";
 	private final static String LINE_80MM = "-----------------------------------------------";
 	final static String SEP = "\r\n";
 	final static String CUT = new String(new char[]{ 0x1b, 0x6d });
@@ -31,6 +33,9 @@ public abstract class ConcreteContent implements Content {
 		}else if(style == PStyle.PRINT_STYLE_80MM){
 			mLen = LEN_80MM;
 			mSeperatorLine = LINE_80MM;
+		}else if(style == PStyle.PRINT_STYLE_76MM){
+			mLen = LEN_76MM;
+			mSeperatorLine = LINE_76MM;
 		}else{
 			mLen = LEN_58MM;
 			mSeperatorLine = LINE_58MM;

@@ -39,10 +39,12 @@ public class SummaryContent extends ConcreteContent {
 		
 		//generate the title and replace the "$(title)" with it
 		if(mPrintType == PType.PRINT_ORDER){
-			mTemplate = mTemplate.replace(PVar.TITLE, new CenterAlignedDecorator("点菜总单", mStyle).toString());		
+			mTemplate = mTemplate.replace(PVar.TITLE, new ExtraFormatDecorator(
+															new CenterAlignedDecorator("点菜总单", mStyle), ExtraFormatDecorator.LARGE_FONT_V_1X).toString());		
 			
 		}else if(mPrintType == PType.PRINT_ALL_EXTRA_FOOD){
-			mTemplate = mTemplate.replace(PVar.TITLE, new CenterAlignedDecorator("加菜总单", mStyle).toString());
+			mTemplate = mTemplate.replace(PVar.TITLE, new ExtraFormatDecorator(
+															new CenterAlignedDecorator("加菜总单", mStyle), ExtraFormatDecorator.LARGE_FONT_V_1X).toString());
 			
 		}else if(mPrintType == PType.PRINT_ALL_CANCELLED_FOOD){
 			//char[] format = { 0x1D, 0x21, 0x03 };
@@ -55,10 +57,10 @@ public class SummaryContent extends ConcreteContent {
 																			   ExtraFormatDecorator.LARGE_FONT_V_3X).toString());
 			
 		}else{
-			mTemplate = mTemplate.replace(PVar.TITLE, new CenterAlignedDecorator("点菜总单", mStyle).toString());
+			mTemplate = mTemplate.replace(PVar.TITLE, new CenterAlignedDecorator(new ExtraFormatDecorator("点菜总单", mStyle, ExtraFormatDecorator.LARGE_FONT_V_1X)).toString());
 		}
 		
-		if(mStyle == PStyle.PRINT_STYLE_58MM){
+		if(mStyle == PStyle.PRINT_STYLE_58MM || mStyle == PStyle.PRINT_STYLE_76MM){
 			mTemplate = mTemplate.replace(PVar.ORDER_ID, Integer.toString(mOrder.getId()));
 			mTemplate = mTemplate.replace(PVar.WAITER_NAME, mWaiter);
 			mTemplate = mTemplate.replace(PVar.PRINT_DATE, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
@@ -78,14 +80,15 @@ public class SummaryContent extends ConcreteContent {
 			tblName = mOrder.getDestTbl().getAliasId() + "(" + mOrder.getDestTbl().getName() + ")";
 		}
 		
-		mTemplate = mTemplate.replace(PVar.VAR_2, 
-						new Grid2ItemsContent("餐台：" + tblName, 
-											  "人数：" + mOrder.getCustomNum(), 
-											  getStyle()).toString());
+		mTemplate = mTemplate.replace(PVar.VAR_2,
+						new ExtraFormatDecorator(
+							new Grid2ItemsContent("餐台：" + tblName, 
+												  "人数：" + mOrder.getCustomNum(), getStyle()), ExtraFormatDecorator.LARGE_FONT_V_1X).toString());
 		
 		//generate the order food list and replace the $(var_1) with the ordered foods
 		mTemplate = mTemplate.replace(PVar.VAR_1, 
-									  new FoodListWithSepContent(FoodDetailContent.DISPLAY_CONFIG_4_SUMMARY, mOrder.getOrderFoods(), mPrintType, mStyle).toString());
+						new ExtraFormatDecorator(
+							new FoodListWithSepContent(FoodDetailContent.DISPLAY_CONFIG_4_SUMMARY, mOrder.getOrderFoods(), mPrintType, mStyle), ExtraFormatDecorator.LARGE_FONT_V_1X).toString());
 		
 		return mTemplate;
 	}
