@@ -816,7 +816,13 @@ if(!printerWin){
 					name : 'pStyle',
 					inputValue : 1,
 					hideLabel : true,
-					boxLabel : '50mm'
+					boxLabel : '58mm'
+				}, {
+					xtype : 'radio',
+					name : 'pStyle',
+					inputValue : 3,
+					hideLabel : true,
+					boxLabel : '76mm'
 				}]
 				
 			},{
@@ -1067,9 +1073,12 @@ function operatePrinterHandler(c){
 	
 		if(styles[0].value == sn.attributes.styleValue){
 			styles[0].checked = true;
-		}else{
+		}else if(styles[1].value == sn.attributes.styleValue){
 			styles[1].checked = true;
+		}else{
+			styles[2].checked = true;
 		}
+		
 		if(sn.attributes.isEnabled ){
 			document.getElementById('enabled').checked = true;
 		}else{
