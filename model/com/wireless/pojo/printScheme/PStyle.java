@@ -4,7 +4,8 @@ public enum PStyle{
 	
 	PRINT_STYLE_UNKNOWN(0, "未知类型"),
 	PRINT_STYLE_58MM(1, "58mm"),
-	PRINT_STYLE_80MM(2, "80mm");
+	PRINT_STYLE_80MM(2, "80mm"),
+	PRINT_STYLE_76MM(3, "76mm");
 	
 	private final int mVal;
 	
