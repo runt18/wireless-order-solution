@@ -19,26 +19,31 @@
 	<monitor_listen>33333</monitor_listen>
 	<!-- the template to print order -->
 	<print_template func="1">		
+		<file style="3" path="ptemp/order_76mm"/><!-- 76mm -->
 		<file style="2" path="ptemp/order_80mm"/><!-- 80mm -->
         <file style="1" path="ptemp/order_58mm"/><!-- 58mm -->
 	</print_template>
 	<!-- the template to print order detail -->
 	<print_template func="2">
+		<file style="3" path="ptemp/order_detail_76mm"/><!-- 76mm -->
 		<file style="2" path="ptemp/order_detail_80mm"/><!-- 80mm -->
 		<file style="1" path="ptemp/order_detail_58mm"/><!-- 58mm -->
 	</print_template>
 	<!-- the template to print receipt -->
 	<print_template func="3">
+		<file style="3" path="ptemp/receipt_76mm"/><!-- 76mm -->
         <file style="2" path="ptemp/receipt_80mm"/><!-- 80mm -->
 		<file style="1" path="ptemp/receipt_58mm"/><!-- 58mm -->
 	</print_template>
     <!-- the template to print table transfer -->
 	<print_template func="6">
+		<file style="3" path="ptemp/transfer_76mm"/><!-- 76mm -->
         <file style="2" path="ptemp/transfer_80mm"/><!-- 80mm -->
 		<file style="1" path="ptemp/transfer_58mm"/><!-- 58mm -->
 	</print_template>
 	<!-- the template to print shift receipt -->
 	<print_template func="126">
+		<file style="3" path="ptemp/shift_76mm"/><!-- 76mm -->
         <file style="2" path="ptemp/shift_80mm"/><!-- 80mm -->
 		<file style="1" path="ptemp/shift_58mm"/><!-- 58mm -->
 	</print_template>
