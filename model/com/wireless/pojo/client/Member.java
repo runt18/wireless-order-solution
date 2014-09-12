@@ -342,7 +342,7 @@ public class Member implements Parcelable, Jsonable, Comparable<Member>{
 	});
 	private MemberComment privateComment;	//某个员工的私有评论
 	
-	public Member(){
+	private Member(){
 		
 	}
 	

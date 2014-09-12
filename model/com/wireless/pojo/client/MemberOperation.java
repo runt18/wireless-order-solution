@@ -157,8 +157,7 @@ public class MemberOperation implements Jsonable {
 	public static MemberOperation newMO(int memberId, String name,
 			String mobile, String card) {
 		MemberOperation mo = new MemberOperation();
-		Member member = new Member();
-		member.setId(memberId);
+		Member member = new Member(memberId);
 		member.setName(name);
 		member.setMobile(mobile);
 		member.setMemberCard(card);
