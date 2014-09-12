@@ -12,6 +12,7 @@ import org.junit.Test;
 
 import com.wireless.db.client.member.MemberCommentDao;
 import com.wireless.db.client.member.MemberDao;
+import com.wireless.db.client.member.MemberDao.ActiveExtraCond;
 import com.wireless.db.client.member.MemberOperationDao;
 import com.wireless.db.client.member.MemberTypeDao;
 import com.wireless.db.promotion.CouponDao;
@@ -37,7 +38,7 @@ public class TestMemberDao {
 	public static void initDbParam() throws PropertyVetoException, BusinessException{
 		TestInit.init();
 		try {
-			mStaff = StaffDao.getByRestaurant(63).get(0);
+			mStaff = StaffDao.getByRestaurant(40).get(0);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -315,6 +316,11 @@ public class TestMemberDao {
 		
 		compareMember(expect, MemberDao.getById(mStaff, expect.getId()));
 		compareMemberOperation(mo, MemberOperationDao.getTodayById(mStaff, mo.getId()));
+	}
+	
+	@Test
+	public void testSearchActiveMember() throws SQLException, BusinessException{
+		MemberDao.getByCond(mStaff, ActiveExtraCond.instance().setFuzzyName("张"), null);
 	}
 	
 	@Test

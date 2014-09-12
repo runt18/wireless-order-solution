@@ -20,8 +20,8 @@ public class TableDao {
 	 * Get the table detail according to table id.
 	 * @param dbCon
 	 * 			the database connection
-	 * @param term
-	 * 			the terminal
+	 * @param staff
+	 * 			the staff to perform this action
 	 * @param tableId
 	 * 			the table id to query
 	 * @return the detail to this table id
@@ -30,9 +30,9 @@ public class TableDao {
 	 * @throws BusinessException
 	 * 			if the table to query does NOT exist
 	 */
-	public static Table getTableById(DBCon dbCon, Staff term, int tableId) throws SQLException, BusinessException{
+	public static Table getTableById(DBCon dbCon, Staff staff, int tableId) throws SQLException, BusinessException{
 		
-		List<Table> result = getTables(dbCon, term, "AND TBL.table_id = " + tableId, null);
+		List<Table> result = getTables(dbCon, staff, "AND TBL.table_id = " + tableId, null);
 		if(result.isEmpty()){
 			throw new BusinessException(ProtocolError.TABLE_NOT_EXIST);
 		}else{
@@ -42,8 +42,8 @@ public class TableDao {
 	
 	/**
 	 * Get the table detail according to table id.
-	 * @param term
-	 * 			the terminal
+	 * @param staff
+	 * 			the staff to perform this action
 	 * @param tableId
 	 * 			the table id to query
 	 * @return the detail to this table id
@@ -52,11 +52,11 @@ public class TableDao {
 	 * @throws BusinessException
 	 * 			if the table to query does NOT exist
 	 */
-	public static Table getTableById(Staff term, int tableId) throws SQLException, BusinessException{
+	public static Table getTableById(Staff staff, int tableId) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return getTableById(dbCon, term, tableId);
+			return getTableById(dbCon, staff, tableId);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -112,8 +112,8 @@ public class TableDao {
 	 * Get the tables according to a specified restaurant defined in {@link Staff} and other condition.
 	 * @param dbCon
 	 * 			the database connection
-	 * @param term
-	 * 			the terminal
+	 * @param staff
+	 * 			the staff to perform this action
 	 * @param extraCond
 	 * 			the extra condition
 	 * @param orderClause
@@ -122,7 +122,7 @@ public class TableDao {
 	 * @throws SQLException
 	 * 			if failed to execute any SQL statement
 	 */
-	public static List<Table> getTables(DBCon dbCon, Staff term, String extraCond, String orderClause) throws SQLException{
+	public static List<Table> getTables(DBCon dbCon, Staff staff, String extraCond, String orderClause) throws SQLException{
 		List<Table> result = new ArrayList<Table>();
 		String querySQL = " SELECT " +
 						  " REGION.name AS region_name, REGION.region_id, REGION.restaurant_id, " +
@@ -132,7 +132,7 @@ public class TableDao {
 						  " LEFT JOIN " + Params.dbName + ".region REGION " +
 						  " ON REGION.region_id = TBL.region_id AND REGION.restaurant_id = TBL.restaurant_id " +
 						  " WHERE 1 = 1 " +
-						  " AND TBL.restaurant_id = " + term.getRestaurantId() + " " +
+						  " AND TBL.restaurant_id = " + staff.getRestaurantId() + " " +
 						  (extraCond != null ? extraCond : "") + " " + 
 						  (orderClause != null ? orderClause : "");
 		

@@ -3,6 +3,7 @@ package com.wireless.db.client.member;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 
@@ -32,6 +33,41 @@ import com.wireless.pojo.util.DateUtil;
 import com.wireless.util.SQLUtil;
 
 public class MemberDao {
+	
+	public static class IdleExtraCond extends ExtraCond{
+		private final static IdleExtraCond mInstance = new IdleExtraCond();
+		
+		public static IdleExtraCond instance(){
+			return mInstance;
+		}
+		
+		private IdleExtraCond(){
+			//活跃会员的条件：3个月内消费不足3次
+			Calendar c = Calendar.getInstance();
+			c.add(Calendar.MONTH, -3);
+			super.range = new DutyRange(c.getTime().getTime(), System.currentTimeMillis());
+			
+			super.maxConsumeAmount = 3;
+		}
+	}
+	
+	public static class ActiveExtraCond extends ExtraCond{
+		private final static ActiveExtraCond mInstance = new ActiveExtraCond();
+		
+		public static ActiveExtraCond instance(){
+			return mInstance;
+		}
+		
+		private ActiveExtraCond(){
+			//活跃会员的条件：3个月内消费5次
+			Calendar c = Calendar.getInstance();
+			c.add(Calendar.MONTH, -3);
+			super.range = new DutyRange(c.getTime().getTime(), System.currentTimeMillis());
+			
+			super.minConsumeAmount = 5;
+
+		}
+	}
 	
 	public static class ExtraCond{
 		private int id;
@@ -139,22 +175,52 @@ public class MemberDao {
 				extraCond.append(" AND MT.member_type_id = " + memberTypeId);
 			}
 			
-//			if(minConsumeAmount > 0 && maxConsumeAmount == 0){
-//				extraCond.append(" AND M.consumption_amount > " + minConsumeAmount);
-//			}else if(maxConsumeAmount > 0 && minConsumeAmount == 0){
-//				extraCond.append(" AND M.consumption_amount < " + maxConsumeAmount);
-//			}else if(maxConsumeAmount > 0 && minConsumeAmount > 0){
-			if(minConsumeAmount != 0 || maxConsumeAmount != 0){
-				extraCond.append(" AND M.consumption_amount BETWEEN " + minConsumeAmount + " AND " + maxConsumeAmount);
-			}
-			
-/*			if(minTotalConsume > 0 && maxTotalConsume == 0){
-				extraCond.append(" AND M.total_consumption > " + minConsumeAmount);
-			}else if(maxTotalConsume > 0 && minTotalConsume == 0){
-				extraCond.append(" AND M.total_consumption < " + maxConsumeAmount);
-			}else if(maxTotalConsume > 0 && minTotalConsume > 0){*/
-			if(minTotalConsume != 0 || maxTotalConsume != 0){
-				extraCond.append(" AND M.total_consumption BETWEEN " + minTotalConsume + " AND " + maxTotalConsume);
+			if(range != null){
+				
+				StringBuilder havingCond = new StringBuilder();
+				if(minConsumeAmount > 0 && maxConsumeAmount == 0){
+					havingCond.append(" AND COUNT(*) >= " + minConsumeAmount);
+				}else if(maxConsumeAmount > 0 && minConsumeAmount == 0){
+					havingCond.append(" AND COUNT(*) <= " + maxConsumeAmount);
+				}else if(maxConsumeAmount > 0 && minConsumeAmount > 0){
+					havingCond.append(" AND COUNT(*) BETWEEN " + minConsumeAmount + " AND " + maxConsumeAmount);
+				}
+				
+				if(minTotalConsume > 0 && maxTotalConsume == 0){
+					havingCond.append(" AND SUM(pay_money) >= " + minConsumeAmount);
+				}else if(maxTotalConsume > 0 && minTotalConsume == 0){
+					havingCond.append(" AND SUM(pay_money) <= " + maxConsumeAmount);
+				}else if(maxTotalConsume > 0 && minTotalConsume > 0){
+					havingCond.append(" AND SUM(pay_money) BETWEEN " + minTotalConsume + " AND " + maxTotalConsume);
+				}
+				String sql;
+				sql = " SELECT member_id FROM " + Params.dbName + ".member_operation_history " +
+					  " WHERE 1 = 1 " +
+					  " AND operate_type = " + MemberOperation.OperationType.CONSUME.getValue() + 
+					  " AND operate_date BETWEEN '" + range.getOnDutyFormat() + "' AND '" + range.getOffDutyFormat() + "'" +
+					  " GROUP BY member_id " +
+					  " HAVING 1 = 1 " +
+					  havingCond.toString();
+				
+				extraCond.append(" AND M.member_id IN ( " + sql + ")");
+				
+			}else{
+				if(minConsumeAmount > 0 && maxConsumeAmount == 0){
+					extraCond.append(" AND M.consumption_amount >= " + minConsumeAmount);
+				}else if(maxConsumeAmount > 0 && minConsumeAmount == 0){
+					extraCond.append(" AND M.consumption_amount <= " + maxConsumeAmount);
+				}else if(maxConsumeAmount > 0 && minConsumeAmount > 0){
+					extraCond.append(" AND M.consumption_amount BETWEEN " + minConsumeAmount + " AND " + maxConsumeAmount);
+				}
+				
+				if(minTotalConsume > 0 && maxTotalConsume == 0){
+					extraCond.append(" AND M.total_consumption >= " + minConsumeAmount);
+				}else if(maxTotalConsume > 0 && minTotalConsume == 0){
+					extraCond.append(" AND M.total_consumption <= " + maxConsumeAmount);
+				}else if(maxTotalConsume > 0 && minTotalConsume > 0){
+					extraCond.append(" AND M.total_consumption BETWEEN " + minTotalConsume + " AND " + maxTotalConsume);
+				}
+				
 			}
 			
 			return extraCond.toString();
@@ -447,8 +513,7 @@ public class MemberDao {
 			
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		while(dbCon.rs.next()){
-			Member member = new Member();
-			member.setId(dbCon.rs.getInt("member_id"));
+			Member member = new Member(dbCon.rs.getInt("member_id"));
 			member.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
 			member.setBaseBalance(dbCon.rs.getFloat("base_balance"));
 			member.setExtraBalance(dbCon.rs.getFloat("extra_balance"));
@@ -508,12 +573,7 @@ public class MemberDao {
 		try{
 			dbCon.connect();
 			if(extraCond != null){
-				if(extraCond.range != null){
-					//FIXME
-					return null;
-				}else{
-					return MemberDao.getByCond(dbCon, staff, extraCond.toString(), orderClause);
-				}
+				return MemberDao.getByCond(dbCon, staff, extraCond.toString(), orderClause);
 			}else{
 				return MemberDao.getByCond(dbCon, staff, null, orderClause);
 			}
