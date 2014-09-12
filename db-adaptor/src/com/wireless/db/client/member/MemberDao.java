@@ -16,6 +16,8 @@ import com.wireless.db.weixin.member.WeixinMemberDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.MemberError;
 import com.wireless.exception.ModuleError;
+import com.wireless.json.JsonMap;
+import com.wireless.json.Jsonable;
 import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.client.Member;
 import com.wireless.pojo.client.MemberComment.CommitBuilder;
@@ -34,38 +36,61 @@ import com.wireless.util.SQLUtil;
 
 public class MemberDao {
 	
-	public static class IdleExtraCond extends ExtraCond{
-		private final static IdleExtraCond mInstance = new IdleExtraCond();
+	public static class IdleExtraCond implements Jsonable{
 		
-		public static IdleExtraCond instance(){
-			return mInstance;
+		private static final ExtraCond mExtraCond = new ExtraCond();
+		
+		public static ExtraCond instance(){
+			return mExtraCond;
 		}
 		
 		private IdleExtraCond(){
 			//活跃会员的条件：3个月内消费不足3次
 			Calendar c = Calendar.getInstance();
 			c.add(Calendar.MONTH, -3);
-			super.range = new DutyRange(c.getTime().getTime(), System.currentTimeMillis());
+			mExtraCond.range = new DutyRange(c.getTime().getTime(), System.currentTimeMillis());
 			
-			super.maxConsumeAmount = 3;
+			mExtraCond.maxConsumeAmount = 3;
+		}
+
+		@Override
+		public JsonMap toJsonMap(int flag) {
+			// TODO 
+			return null;
+		}
+
+		@Override
+		public void fromJsonMap(JsonMap jsonMap, int flag) {
 		}
 	}
 	
-	public static class ActiveExtraCond extends ExtraCond{
-		private final static ActiveExtraCond mInstance = new ActiveExtraCond();
+	public static class ActiveExtraCond implements Jsonable{
 		
-		public static ActiveExtraCond instance(){
-			return mInstance;
+		private static final ExtraCond mExtraCond = new ExtraCond();
+		
+		public static ExtraCond instance(){
+			return mExtraCond;
 		}
 		
 		private ActiveExtraCond(){
 			//活跃会员的条件：3个月内消费5次
 			Calendar c = Calendar.getInstance();
 			c.add(Calendar.MONTH, -3);
-			super.range = new DutyRange(c.getTime().getTime(), System.currentTimeMillis());
+			mExtraCond.range = new DutyRange(c.getTime().getTime(), System.currentTimeMillis());
 			
-			super.minConsumeAmount = 5;
+			mExtraCond.minConsumeAmount = 5;
 
+		}
+
+		@Override
+		public JsonMap toJsonMap(int flag) {
+			// TODO 
+			return null;
+		}
+
+		@Override
+		public void fromJsonMap(JsonMap jsonMap, int flag) {
+			
 		}
 	}
 	
