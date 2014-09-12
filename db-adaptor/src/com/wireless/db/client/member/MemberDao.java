@@ -36,56 +36,61 @@ import com.wireless.util.SQLUtil;
 
 public class MemberDao {
 	
-	public static class IdleExtraCond implements Jsonable{
+	public static class IdleExtraCond extends ExtraCond implements Jsonable{
+		private final static IdleExtraCond mInstance = new IdleExtraCond();
 		
-		private static final ExtraCond mExtraCond = new ExtraCond();
-		
-		public static ExtraCond instance(){
-			return mExtraCond;
+		public static IdleExtraCond instance(){
+			return mInstance;
 		}
 		
 		private IdleExtraCond(){
 			//活跃会员的条件：3个月内消费不足3次
 			Calendar c = Calendar.getInstance();
 			c.add(Calendar.MONTH, -3);
-			mExtraCond.range = new DutyRange(c.getTime().getTime(), System.currentTimeMillis());
+			super.range = new DutyRange(c.getTime().getTime(), System.currentTimeMillis());
 			
-			mExtraCond.maxConsumeAmount = 3;
+			super.maxConsumeAmount = 3;
 		}
 
 		@Override
 		public JsonMap toJsonMap(int flag) {
-			// TODO 
-			return null;
+			JsonMap jm = new JsonMap();
+			jm.putInt("maxConsumeAmount", super.maxConsumeAmount);
+			jm.putString("beginDate", super.range.getOnDutyFormat());
+			jm.putString("endDate", super.range.getOffDutyFormat());
+			return jm;
 		}
 
 		@Override
 		public void fromJsonMap(JsonMap jsonMap, int flag) {
+			
 		}
 	}
 	
-	public static class ActiveExtraCond implements Jsonable{
+	public static class ActiveExtraCond extends ExtraCond implements Jsonable{
+		private final static ActiveExtraCond mInstance = new ActiveExtraCond();
 		
-		private static final ExtraCond mExtraCond = new ExtraCond();
-		
-		public static ExtraCond instance(){
-			return mExtraCond;
+		public static ActiveExtraCond instance(){
+			return mInstance;
 		}
 		
 		private ActiveExtraCond(){
 			//活跃会员的条件：3个月内消费5次
 			Calendar c = Calendar.getInstance();
 			c.add(Calendar.MONTH, -3);
-			mExtraCond.range = new DutyRange(c.getTime().getTime(), System.currentTimeMillis());
+			super.range = new DutyRange(c.getTime().getTime(), System.currentTimeMillis());
 			
-			mExtraCond.minConsumeAmount = 5;
+			super.minConsumeAmount = 5;
 
 		}
 
 		@Override
 		public JsonMap toJsonMap(int flag) {
-			// TODO 
-			return null;
+			JsonMap jm = new JsonMap();
+			jm.putInt("minConsumeAmount", super.maxConsumeAmount);
+			jm.putString("beginDate", super.range.getOnDutyFormat());
+			jm.putString("endDate", super.range.getOffDutyFormat());
+			return jm;
 		}
 
 		@Override
