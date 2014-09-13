@@ -367,7 +367,7 @@ public class WXQueryMemberOperationAction extends DispatchAction{
 			jobject.initTip(e);
 		}finally{
 			if(dbCon != null) dbCon.disconnect();
-			response.getWriter().print(jobject.toString(Coupon.ST_PARCELABLE_SIMPLE));
+			response.getWriter().print(jobject.toString(Coupon.ST_PARCELABLE_COMPLEX));
 		}
 		
 		return null;

@@ -59,7 +59,7 @@ public class OperatePromotionAction extends DispatchAction{
 			
 			CouponType.InsertBuilder typeInsertBuilder = new CouponType.InsertBuilder(couponName, Integer.parseInt(price)).setComment("活动优惠劵").setImage(image).setExpired(DateUtil.parseDate(expiredDate));
 			Promotion.CreateBuilder promotionCreateBuilder = new Promotion.CreateBuilder(title, new DateRange(beginDate, endDate), body, typeInsertBuilder)
-					.setPoint(Integer.parseInt(point))
+					.setPoint(point != null && !point.isEmpty()?Integer.parseInt(point):0)
 			  		.setType(Promotion.Type.valueOf(Integer.parseInt(pType))
 );
 			
@@ -109,6 +109,12 @@ public class OperatePromotionAction extends DispatchAction{
 		JObject jobject = new JObject();
 		try{
 			Promotion promo = PromotionDao.getById(staff, Integer.parseInt(promotionId));
+			
+			String image = "http://" + getServlet().getInitParameter("oss_bucket_image")
+	        		+ "." + getServlet().getInitParameter("oss_outer_point") 
+	        		+ "/" + staff.getRestaurantId() + "/" + promo.getCouponType().getImage();
+			
+			promo.getCouponType().setImage(image);
 			List<Promotion> p_List = new ArrayList<>();
 			p_List.add(promo);
 			jobject.setRoot(p_List);
@@ -157,6 +163,62 @@ public class OperatePromotionAction extends DispatchAction{
 		
 	}		
 	
+	public ActionForward cancelPublish(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		String pin = (String) request.getAttribute("pin");
+		String promotionId = request.getParameter("promotionId");
+		
+		JObject jobject = new JObject();
+		try{
+			PromotionDao.cancelPublish(StaffDao.verify(Integer.parseInt(pin)), Integer.parseInt(promotionId));
+			
+			jobject.initTip(true, "活动撤销成功");
+		}catch(BusinessException e){
+			e.printStackTrace();
+			jobject.initTip(e);
+		}catch(SQLException e){
+			e.printStackTrace();
+			jobject.initTip(e);
+		}catch(Exception e){
+			e.printStackTrace();
+			jobject.initTip(e);
+		}finally{
+			response.getWriter().print(jobject.toString());
+		}
+		
+		return null;		
+		
+	}		
+	
+	public ActionForward delete(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		String pin = (String) request.getAttribute("pin");
+		String promotionId = request.getParameter("promotionId");
+		
+		JObject jobject = new JObject();
+		try{
+			PromotionDao.delete(StaffDao.verify(Integer.parseInt(pin)), Integer.parseInt(promotionId));
+			
+			jobject.initTip(true, "活动删除成功");
+		}catch(BusinessException e){
+			e.printStackTrace();
+			jobject.initTip(e);
+		}catch(SQLException e){
+			e.printStackTrace();
+			jobject.initTip(e);
+		}catch(Exception e){
+			e.printStackTrace();
+			jobject.initTip(e);
+		}finally{
+			response.getWriter().print(jobject.toString());
+		}
+		
+		return null;		
+		
+	}		
+	
 	public ActionForward getPromotionTree(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
@@ -182,7 +244,7 @@ public class OperatePromotionAction extends DispatchAction{
 				}
 				
 				String progress = children(staff, new PromotionDao.ExtraCond().setStatus(Status.PROGRESS));
-				if(!publish.isEmpty()){
+				if(!progress.isEmpty()){
 					pTree.append(",{")
 					.append("text:'进行中'")
 					.append(", status : " + Promotion.Status.PROGRESS.getVal())

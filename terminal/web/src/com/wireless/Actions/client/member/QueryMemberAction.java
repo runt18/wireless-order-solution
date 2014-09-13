@@ -15,12 +15,15 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
 import com.wireless.db.client.member.MemberDao;
+import com.wireless.db.client.member.MemberDao.ActiveExtraCond;
+import com.wireless.db.client.member.MemberDao.IdleExtraCond;
 import com.wireless.db.client.member.MemberTypeDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
+import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.client.Member;
 import com.wireless.pojo.client.MemberType;
 import com.wireless.pojo.staffMgr.Staff;
@@ -128,6 +131,8 @@ public class QueryMemberAction extends DispatchAction {
 			String MinTotalMemberCost = request.getParameter("MinTotalMemberCost");
 			String consumptionMinAmount = request.getParameter("consumptionMinAmount");
 			String consumptionMaxAmount = request.getParameter("consumptionMaxAmount");
+			String beginDate = request.getParameter("beginDate");
+			String endDate = request.getParameter("endDate");
 			
 //			String point = request.getParameter("point");
 //			String usedPoint = request.getParameter("usedPoint");
@@ -145,24 +150,25 @@ public class QueryMemberAction extends DispatchAction {
 				if(memberCardOrMobileOrName != null && !memberCardOrMobileOrName.trim().isEmpty())
 					extraCond.setFuzzyName(memberCardOrMobileOrName);
 				
-				if((MinTotalMemberCost != null && !MinTotalMemberCost.trim().isEmpty()) ||  (MaxTotalMemberCost != null && !MaxTotalMemberCost.trim().isEmpty())){
-					if(!MinTotalMemberCost.isEmpty()  && !MaxTotalMemberCost.isEmpty()){
-						extraCond.setTotalConsume(Integer.parseInt(MinTotalMemberCost), Integer.parseInt(MaxTotalMemberCost));
-					}else if(!MinTotalMemberCost.isEmpty() && MaxTotalMemberCost.isEmpty()){
-						extraCond.setTotalConsume(Integer.parseInt(MinTotalMemberCost), Integer.MAX_VALUE);
-					}else if(MinTotalMemberCost.isEmpty() && !MaxTotalMemberCost.isEmpty()){
-						extraCond.setTotalConsume(0, Integer.parseInt(MaxTotalMemberCost));
-					}
-				}	
+				if(MinTotalMemberCost != null && !MinTotalMemberCost.isEmpty()){
+					extraCond.greaterTotalConsume(Integer.parseInt(MinTotalMemberCost));
+				}
 				
-				if((consumptionMinAmount != null && !consumptionMinAmount.trim().isEmpty()) || (consumptionMaxAmount != null && !consumptionMaxAmount.trim().isEmpty())){
-					if(consumptionMinAmount != null && MaxTotalMemberCost != null){
-						extraCond.setTotalConsume(Integer.parseInt(consumptionMinAmount), Integer.parseInt(consumptionMaxAmount));
-					}else if(consumptionMinAmount != null && MaxTotalMemberCost == null){
-						extraCond.setTotalConsume(Integer.parseInt(consumptionMinAmount), Integer.MAX_VALUE);
-					}else if(consumptionMinAmount == null && MaxTotalMemberCost != null){
-						extraCond.setTotalConsume(-1, Integer.parseInt(consumptionMaxAmount));
-					}
+				if(MaxTotalMemberCost != null && !MaxTotalMemberCost.isEmpty()){
+					extraCond.lessTotalConsume(Integer.parseInt(MaxTotalMemberCost));
+				}
+				
+				if(consumptionMinAmount != null && !consumptionMinAmount.isEmpty()){
+					extraCond.greaterConsume(Integer.parseInt(consumptionMinAmount));
+				}
+				
+				if(consumptionMaxAmount != null && !consumptionMaxAmount.isEmpty()){
+					extraCond.lessConsume(Integer.parseInt(consumptionMaxAmount));
+				}
+				
+				
+				if(beginDate != null && !beginDate.isEmpty()){
+					extraCond.setRange(new DutyRange(beginDate, endDate));
 				}
 				
 /*				if(usedPoint != null && !usedPoint.trim().isEmpty())
@@ -218,5 +224,61 @@ public class QueryMemberAction extends DispatchAction {
 		}
 		return null;
 	}
+	
+	public ActionForward idle(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		JObject jobject = new JObject();
+		String pin = (String) request.getAttribute("pin");
+		
+		try{
+			
+			List<Member> list = MemberDao.getByCond(StaffDao.verify(Integer.parseInt(pin)), IdleExtraCond.instance(), null);
+			
+			jobject.setRoot(list);
+			
+			jobject.setExtra(IdleExtraCond.instance());	
+			
+		}catch(BusinessException e){
+			e.printStackTrace();
+			jobject.initTip(e);
+			
+		}catch(Exception e){
+			e.printStackTrace();
+			jobject.initTip(e);
+			
+		}finally{
+			response.getWriter().print(jobject.toString());
+		}
+		return null;
+	}	
+	
+	public ActionForward active(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		JObject jobject = new JObject();
+		String pin = (String) request.getAttribute("pin");
+		
+		try{
+			
+			List<Member> list = MemberDao.getByCond(StaffDao.verify(Integer.parseInt(pin)), MemberDao.ActiveExtraCond.instance(), null);
+			
+			jobject.setRoot(list);
+			
+			jobject.setExtra(ActiveExtraCond.instance());	
+			
+		}catch(BusinessException e){
+			e.printStackTrace();
+			jobject.initTip(e);
+			
+		}catch(Exception e){
+			e.printStackTrace();
+			jobject.initTip(e);
+			
+		}finally{
+			response.getWriter().print(jobject.toString());
+		}
+		return null;
+	}	
 	
 }
