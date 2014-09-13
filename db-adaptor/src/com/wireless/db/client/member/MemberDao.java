@@ -58,6 +58,7 @@ public class MemberDao {
 			jm.putInt("maxConsumeAmount", super.maxConsumeAmount);
 			jm.putString("beginDate", super.range.getOnDutyFormat());
 			jm.putString("endDate", super.range.getOffDutyFormat());
+			jm.putInt("range", 4);
 			return jm;
 		}
 
@@ -87,9 +88,10 @@ public class MemberDao {
 		@Override
 		public JsonMap toJsonMap(int flag) {
 			JsonMap jm = new JsonMap();
-			jm.putInt("minConsumeAmount", super.maxConsumeAmount);
+			jm.putInt("minConsumeAmount", super.minConsumeAmount);
 			jm.putString("beginDate", super.range.getOnDutyFormat());
 			jm.putString("endDate", super.range.getOffDutyFormat());
+			jm.putInt("range", 4);
 			return jm;
 		}
 
@@ -145,37 +147,42 @@ public class MemberDao {
 		
 		public ExtraCond greaterConsume(int amount){
 			this.minConsumeAmount = amount;
-			this.maxConsumeAmount = 0;
+//			this.maxConsumeAmount = 0;
 			return this;
 		}
 		
 		public ExtraCond lessConsume(int amount){
 			this.maxConsumeAmount = amount;
-			this.minConsumeAmount = 0;
+//			this.minConsumeAmount = 0;
 			return this;
 		}
 		
-		public ExtraCond setConsumeRange(int min, int max){
+/*		public ExtraCond setConsumeRange(int min, int max){
 			this.minConsumeAmount = min;
 			this.maxConsumeAmount = max;
 			return this;
-		}
+		}*/
 		
 		public ExtraCond greaterTotalConsume(int totalConsume){
 			this.minTotalConsume = totalConsume;
-			this.maxTotalConsume = 0;
+//			this.maxTotalConsume = 0;
 			return this;
 		}
 		
 		public ExtraCond lessTotalConsume(int totalConsume){
 			this.maxTotalConsume = totalConsume;
-			this.minTotalConsume = 0;
+//			this.minTotalConsume = 0;
 			return this;
 		}
 		
-		public ExtraCond setTotalConsume(int min, int max){
+/*		public ExtraCond setTotalConsume(int min, int max){
 			this.minTotalConsume = min;
 			this.maxTotalConsume = max;
+			return this;
+		}*/
+		
+		public ExtraCond setRange(DutyRange range){
+			this.range = range;
 			return this;
 		}
 		

@@ -372,30 +372,35 @@ public class CouponDao {
 			coupon.setPromotion(promotion);
 
 			if(coupon.getStatus() == Coupon.Status.PUBLISHED && promotion.getStatus() == Promotion.Status.PROGRESS){
-				String sql;
-				sql = " SELECT delta_point FROM " + Params.dbName + ".member_operation " +
-					  " WHERE 1 = 1 " +
-					  " AND member_id = " + coupon.getMember().getId() +
-					  " AND operate_type = " + MemberOperation.OperationType.CONSUME.getValue() + 
-					  " AND operate_date BETWEEN '" + promotion.getDateRange().getOpeningFormat() + "' AND '" + promotion.getDateRange().getEndingFormat() + "'" +
-					  " UNION " +
-					  " SELECT delta_point FROM " + Params.dbName + ".member_operation_history " +
-					  " WHERE 1 = 1 " +
-					  " AND member_id = " + coupon.getMember().getId() +
-					  " AND operate_type = " + MemberOperation.OperationType.CONSUME.getValue() + 
-					  " AND operate_date BETWEEN '" + promotion.getDateRange().getOpeningFormat() + "' AND '" + promotion.getDateRange().getEndingFormat() + "'";
-				
-				if(promotion.getType() == Promotion.Type.ONCE){
-					sql = " SELECT MAX(delta_point) AS max_point FROM ( " + sql + " ) AS TMP ";
-				}else if(promotion.getType() == Promotion.Type.TOTAL){
-					sql = " SELECT SUM(delta_point) AS total_point FROM ( " + sql + " ) AS TMP ";
+				if(promotion.getType() == Promotion.Type.FREE){
+					coupon.setDrawProgress(0);
+				}else{
+					String sql;
+					sql = " SELECT delta_point FROM " + Params.dbName + ".member_operation " +
+						  " WHERE 1 = 1 " +
+						  " AND member_id = " + coupon.getMember().getId() +
+						  " AND operate_type = " + MemberOperation.OperationType.CONSUME.getValue() + 
+						  " AND operate_date BETWEEN '" + promotion.getDateRange().getOpeningFormat() + "' AND '" + promotion.getDateRange().getEndingFormat() + "'" +
+						  " UNION " +
+						  " SELECT delta_point FROM " + Params.dbName + ".member_operation_history " +
+						  " WHERE 1 = 1 " +
+						  " AND member_id = " + coupon.getMember().getId() +
+						  " AND operate_type = " + MemberOperation.OperationType.CONSUME.getValue() + 
+						  " AND operate_date BETWEEN '" + promotion.getDateRange().getOpeningFormat() + "' AND '" + promotion.getDateRange().getEndingFormat() + "'";
+					
+					if(promotion.getType() == Promotion.Type.ONCE){
+						sql = " SELECT MAX(delta_point) AS max_point FROM ( " + sql + " ) AS TMP ";
+					}else if(promotion.getType() == Promotion.Type.TOTAL){
+						sql = " SELECT SUM(delta_point) AS total_point FROM ( " + sql + " ) AS TMP ";
+					}
+					
+					dbCon.rs = dbCon.stmt.executeQuery(sql);
+					if(dbCon.rs.next()){
+						coupon.setDrawProgress(dbCon.rs.getInt(1));
+					}
+					dbCon.rs.close();				
 				}
-				
-				dbCon.rs = dbCon.stmt.executeQuery(sql);
-				if(dbCon.rs.next()){
-					coupon.setDrawProgress(dbCon.rs.getInt(1));
-				}
-				dbCon.rs.close();
+
 			}
 			return coupon;
 		}
