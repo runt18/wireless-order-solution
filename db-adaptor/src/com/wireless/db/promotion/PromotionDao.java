@@ -112,8 +112,11 @@ public class PromotionDao {
 			throw new BusinessException(PromotionError.PROMOTION_START_DATE_EXCEED_NOW);
 		}
 		
-		//Insert the associated coupon type
-		int couponTypeId = CouponTypeDao.insert(dbCon, staff, builder.getTypeBuilder());
+		//Insert the associated coupon type.
+		int couponTypeId = 0;
+		if(promotion.getType() != Promotion.Type.DISPLAY_ONLY){
+			couponTypeId = CouponTypeDao.insert(dbCon, staff, builder.getTypeBuilder());
+		}
 		
 		//Insert the promotion.
 		String sql;
@@ -141,10 +144,9 @@ public class PromotionDao {
 			throw new SQLException("Failed to generated the promotion id.");
 		}
 		
-		//Create the coupon with members if the promotion type NOT belong to 'DISPLAY_ONLY'.
-		if(promotion.getType() != Promotion.Type.DISPLAY_ONLY){
-			CouponDao.create(dbCon, staff, new Coupon.CreateBuilder(couponTypeId, promotionId).setMembers(builder.getMembers()));
-		}
+		//Create the coupon with members.
+		CouponDao.create(dbCon, staff, new Coupon.CreateBuilder(couponTypeId, promotionId).setMembers(builder.getMembers()));
+		
 		return promotionId;
 	}
 	
@@ -206,7 +208,7 @@ public class PromotionDao {
 		}
 		
 		//Update the coupon type.
-		if(builder.isCouponTypeChanged()){
+		if(builder.isCouponTypeChanged() && original.getType() != Promotion.Type.DISPLAY_ONLY){
 			CouponTypeDao.update(dbCon, staff, builder.getCouponTypeBuilder());
 		}
 		
@@ -218,21 +220,15 @@ public class PromotionDao {
 			  (builder.isPointChanged() ? ",point = " + promotion.getPoint() : "") +
 			  (builder.isRangeChanged() ? ",start_date = '" + promotion.getDateRange().getOpeningFormat() + "',finish_date = '" + promotion.getDateRange().getEndingFormat() + "'" : "") +
 			  (builder.isTitleChanged() ? ",title = '" + promotion.getTitle() + "'" : "") +
-			  (builder.isTypeChanged() ? " ,type = " + promotion.getType().getVal() : "") +
 			  " WHERE promotion_id = " + promotion.getId();
 		if(dbCon.stmt.executeUpdate(sql) == 0){
 			throw new BusinessException(PromotionError.PROMOTION_NOT_EXIST);
 		}
 		
-		if(promotion.getType() == Promotion.Type.DISPLAY_ONLY){
-			//Delete the associated coupons if promotion type belongs to 'DISPLAY_ONLY'.
+		//Create the associated coupons if the member changed.
+		if(builder.isMemberChanged()){
 			CouponDao.delete(dbCon, staff, new CouponDao.ExtraCond().setPromotion(promotion.getId()));
-		}else{
-			//Create the associated coupons if the member changed.
-			if(builder.isMemberChanged()){
-				CouponDao.delete(dbCon, staff, new CouponDao.ExtraCond().setPromotion(promotion.getId()));
-				CouponDao.create(dbCon, staff, new Coupon.CreateBuilder(original.getCouponType().getId(), promotion.getId()).setMembers(builder.getMembers()));
-			}
+			CouponDao.create(dbCon, staff, new Coupon.CreateBuilder(original.getCouponType().getId(), promotion.getId()).setMembers(builder.getMembers()));
 		}
 		
 	} 
@@ -535,7 +531,7 @@ public class PromotionDao {
 		sql = " SELECT P.promotion_id, P.restaurant_id, P.create_date, P.start_date, P.finish_date, P.title, P.body, P.type, P.point, P.status, " +
 			  " P.coupon_type_id, CT.name " +
 			  " FROM " + Params.dbName + ".promotion P " +
-			  " JOIN " + Params.dbName + ".coupon_type CT ON P.coupon_type_id = CT.coupon_type_id " +
+			  " LEFT JOIN " + Params.dbName + ".coupon_type CT ON P.coupon_type_id = CT.coupon_type_id " +
 			  " WHERE 1 = 1 " +
 			  " AND P.restaurant_id = " + staff.getRestaurantId() +
 			  (extraCond != null ? extraCond : "") +
@@ -565,9 +561,11 @@ public class PromotionDao {
 			promotion.setPoint(dbCon.rs.getInt("point"));
 			promotion.setStatus(Promotion.Status.valueOf(dbCon.rs.getInt("status")));
 			
-			CouponType type = new CouponType(dbCon.rs.getInt("coupon_type_id"));
-			type.setName(dbCon.rs.getString("name"));
-			promotion.setCouponType(type);
+			if(promotion.getType() != Promotion.Type.DISPLAY_ONLY){
+				CouponType type = new CouponType(dbCon.rs.getInt("coupon_type_id"));
+				type.setName(dbCon.rs.getString("name"));
+				promotion.setCouponType(type);
+			}
 			
 			result.add(promotion);
 		}

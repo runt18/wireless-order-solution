@@ -50,9 +50,9 @@ public class TestPromotionDao {
 			
 			//--------Test to create a promotion-----------
 			CouponType.InsertBuilder typeInsertBuilder = new CouponType.InsertBuilder("测试优惠券类型", 30).setComment("测试备注").setImage("2912w3slka.jpg");//.setExpired(System.currentTimeMillis() / 1000 * 1000);
-			Promotion.CreateBuilder promotionCreateBuilder = new Promotion.CreateBuilder("测试优惠活动", new DateRange("2015-1-1", "2015-2-1"), "hello world<br>", typeInsertBuilder)
-																		  .setType(Promotion.Type.FREE)
-																		  .addMember(m1.getId()).addMember(m2.getId());
+			Promotion.CreateBuilder promotionCreateBuilder = Promotion.CreateBuilder
+																	  .newInstance("测试优惠活动", new DateRange("2015-1-1", "2015-2-1"), "hello world<br>", Promotion.Type.FREE, typeInsertBuilder)
+																	  .addMember(m1.getId()).addMember(m2.getId());
 			promotionId = PromotionDao.create(mStaff, promotionCreateBuilder);
 			
 			Promotion expected = promotionCreateBuilder.build();
@@ -73,7 +73,6 @@ public class TestPromotionDao {
 			Promotion.UpdateBuilder promotionUpdateBuilder = new Promotion.UpdateBuilder(promotionId).setRange(new DateRange("2015-2-1", "2015-3-1"))
 																									 .setTitle("修改优惠活动")
 																									 .setBody("hello jingjing<br>")
-																									 .setType(Promotion.Type.FREE)
 																									 .addMember(m1.getId()).addMember(m2.getId()).addMember(m3.getId())
 																									 .setCouponTypeBuilder(typeUpdateBuilder);
 			expected = promotionUpdateBuilder.build();
