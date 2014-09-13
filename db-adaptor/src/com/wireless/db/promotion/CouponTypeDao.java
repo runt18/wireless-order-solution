@@ -136,6 +136,7 @@ public class CouponTypeDao {
 		sql = " UPDATE " + Params.dbName + ".coupon_type SET " +
 			  " coupon_type_id = " + type.getId() +
 			  (builder.isNameChanged() ? " ,name = '" + type.getName() + "'" : "") +
+			  (builder.isPriceChanged() ? " ,price = " + type.getPrice() : "") +
 			  (builder.isExpiredChanged() ? " ,expired = '" + DateUtil.format(type.getExpired()) + "'" : "") +
 			  (builder.isCommentChanged() ? " ,comment = '" + type.getComment() + "'" : "") +
 			  (builder.isImageChanged() ? " ,image = '" + type.getImage() + "'" : "") +

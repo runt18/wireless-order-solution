@@ -2,6 +2,7 @@ package com.wireless.db.promotion;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import com.mysql.jdbc.Statement;
@@ -105,7 +106,9 @@ public class PromotionDao {
 		Promotion promotion = builder.build();
 		
 		//Check to see whether the start date exceed now.
-		if(promotion.getDateRange().getOpeningTime() < System.currentTimeMillis()){
+		Calendar c = Calendar.getInstance();
+		c.add(Calendar.DAY_OF_YEAR, -1);
+		if(promotion.getDateRange().getOpeningTime() < c.getTimeInMillis()){
 			throw new BusinessException(PromotionError.PROMOTION_START_DATE_EXCEED_NOW);
 		}
 		
@@ -144,6 +147,95 @@ public class PromotionDao {
 		}
 		return promotionId;
 	}
+	
+	/**
+	 * Update the promotion according to specific builder.
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param builder
+	 * 			the update builder {@link Promotion#UpdateBuilder}
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			<li>throws if the promotion status does NOT belong to 'CREATED'
+	 * 			<li>throws if the promotion to update does NOT exist
+	 * 			<li>throws if the promotion's start exceed now if date range changed
+	 */
+	public static void update(Staff staff, Promotion.UpdateBuilder builder) throws SQLException, BusinessException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			update(dbCon, staff, builder);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * Update the promotion according to specific builder.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param builder
+	 * 			the update builder {@link Promotion#UpdateBuilder}
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			<li>throws if the promotion status does NOT belong to 'CREATED'
+	 * 			<li>throws if the promotion to update does NOT exist
+	 * 			<li>throws if the promotion's start exceed now if date range changed
+	 */
+	public static void update(DBCon dbCon, Staff staff, Promotion.UpdateBuilder builder) throws SQLException, BusinessException{
+
+		Promotion promotion = builder.build();
+		
+		Promotion original = getById(dbCon, staff, promotion.getId());
+		if(original.getStatus() != Promotion.Status.CREATED){
+			throw new BusinessException("只有【已创建】状态的活动才能修改", PromotionError.PROMOTION_UPDATE_NOT_ALLOW);
+		}
+
+		//Update the date range to promotion.
+		if(builder.isRangeChanged()){
+			//Check to see whether the start date exceed now.
+			Calendar c = Calendar.getInstance();
+			c.add(Calendar.DAY_OF_YEAR, -1);
+			if(promotion.getDateRange().getOpeningTime() < c.getTimeInMillis()){
+				throw new BusinessException(PromotionError.PROMOTION_START_DATE_EXCEED_NOW);
+			}
+		}
+		
+		//Update the coupon type.
+		if(builder.isCouponTypeChanged()){
+			CouponTypeDao.update(dbCon, staff, builder.getCouponTypeBuilder());
+		}
+		
+		//Update the promotion.
+		String sql;
+		sql = " UPDATE " + Params.dbName + ".promotion SET " +
+			  " promotion_id = " + promotion.getId() +
+			  (builder.isBodyChanged() ? " ,body = '" + promotion.getBody() + "'" : "") +
+			  (builder.isPointChanged() ? ",point = " + promotion.getPoint() : "") +
+			  (builder.isRangeChanged() ? ",start_date = '" + promotion.getDateRange().getOpeningFormat() + "',finish_date = '" + promotion.getDateRange().getEndingFormat() + "'" : "") +
+			  (builder.isTitleChanged() ? ",title = '" + promotion.getTitle() + "'" : "") +
+			  (builder.isTypeChanged() ? " ,type = " + promotion.getType().getVal() : "") +
+			  " WHERE promotion_id = " + promotion.getId();
+		if(dbCon.stmt.executeUpdate(sql) == 0){
+			throw new BusinessException(PromotionError.PROMOTION_NOT_EXIST);
+		}
+		
+		if(promotion.getType() == Promotion.Type.DISPLAY_ONLY){
+			//Delete the associated coupons if promotion type belongs to 'DISPLAY_ONLY'.
+			CouponDao.delete(dbCon, staff, new CouponDao.ExtraCond().setPromotion(promotion.getId()));
+		}else{
+			//Create the associated coupons if the member changed.
+			if(builder.isMemberChanged()){
+				CouponDao.delete(dbCon, staff, new CouponDao.ExtraCond().setPromotion(promotion.getId()));
+				CouponDao.create(dbCon, staff, new Coupon.CreateBuilder(original.getCouponType().getId(), promotion.getId()).setMembers(builder.getMembers()));
+			}
+		}
+		
+	} 
 	
 	/**
 	 * Publish the promotion.
@@ -251,6 +343,7 @@ public class PromotionDao {
 			dbCon.disconnect();
 		}
 	}
+	
 	/**
 	 * cancel the promotion published.
 	 * @param dbCon
@@ -287,6 +380,69 @@ public class PromotionDao {
 		//Update the coupon status to be published.
 		sql = " UPDATE " + Params.dbName + ".coupon SET " +
 			  " status = " + Coupon.Status.CREATED.getVal() +
+			  " WHERE promotion_id = " + promotionId;
+		
+		return dbCon.stmt.executeUpdate(sql);
+	}
+	
+	/**
+	 * finish the promotion in progressed.
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param promotionId
+	 * 			the id of promotion to finish
+	 * @return the amount of associated coupon to finish publish
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			<li>throws if the promotion does NOT exist
+	 * 			<li>throws if the promotion does NOT belong to progressed status
+	 */
+	public static int finish(Staff staff, int promotionId) throws SQLException, BusinessException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			return finish(dbCon, staff, promotionId);
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	/**
+	 * finish the promotion in progressed.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param promotionId
+	 * 			the id of promotion to finish
+	 * @return the amount of associated coupon to finish publish
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException
+	 * 			<li>throws if the promotion does NOT exist
+	 * 			<li>throws if the promotion does NOT belong to progressed status
+	 */
+	public static int finish(DBCon dbCon, Staff staff, int promotionId) throws SQLException, BusinessException{
+		Promotion promotion = getById(dbCon, staff, promotionId);
+		
+		//Assure the status to this promotion should be progressed.
+		if(promotion.getStatus() != Promotion.Status.PROGRESS){
+			throw new BusinessException("只有【进行中】状态的活动才能结束", PromotionError.PROMOTION_FINISH_NOT_ALLOW);
+		}
+		
+		String sql;
+		//Update the promotion status to be finish. 
+		sql = " UPDATE " + Params.dbName + ".promotion SET " +
+			  " status = " + Promotion.Status.FINISH.getVal() +
+			  " WHERE promotion_id = " + promotionId;
+		if(dbCon.stmt.executeUpdate(sql) == 0){
+			throw new BusinessException(PromotionError.PROMOTION_NOT_EXIST);
+		}
+		
+		//Update the coupon status to be finish.
+		sql = " UPDATE " + Params.dbName + ".coupon SET " +
+			  " status = " + Coupon.Status.FINISH.getVal() +
 			  " WHERE promotion_id = " + promotionId;
 		
 		return dbCon.stmt.executeUpdate(sql);
@@ -464,15 +620,18 @@ public class PromotionDao {
 	 */
 	public static void delete(DBCon dbCon, Staff staff, int promotionId) throws SQLException, BusinessException{
 		Promotion promotion = getById(dbCon, staff, promotionId);
-		if(promotion.getStatus() == Promotion.Status.CREATED){
+		if(promotion.getStatus() == Promotion.Status.CREATED || promotion.getStatus() == Promotion.Status.FINISH){
+			//Delete the associated coupon type & coupons.
 			CouponTypeDao.delete(dbCon, staff, promotion.getCouponType().getId());
+			
 			String sql;
+			//Delete the promotion.
 			sql = " DELETE FROM " + Params.dbName + ".promotion WHERE promotion_id = " + promotionId;
 			if(dbCon.stmt.executeUpdate(sql) == 0){
 				throw new BusinessException(PromotionError.PROMOTION_NOT_EXIST);
 			}
 		}else{
-			throw new BusinessException("只有【已创建】状态的活动才能删除", PromotionError.PROMOTION_DELETE_NOT_ALLOW);
+			throw new BusinessException("只有【已创建】或【已结束】状态的活动才能删除", PromotionError.PROMOTION_DELETE_NOT_ALLOW);
 		}
 	}
 	
