@@ -37,9 +37,9 @@ public class Promotion implements Jsonable{
 		}
 		
 		public CreateBuilder addMember(int memberId){
-			if(type == Type.DISPLAY_ONLY){
+/*			if(type == Type.DISPLAY_ONLY){
 				throw new IllegalStateException("【" + Type.DISPLAY_ONLY.desc + "】类型的优惠活动不能发放优惠券");
-			}
+			}*/
 			if(!members.contains(memberId)){
 				members.add(memberId);
 			}
@@ -380,8 +380,8 @@ public class Promotion implements Jsonable{
 		JsonMap jm = new JsonMap();
 		jm.putInt("id", this.id);
 		jm.putInt("rid", this.restaurantId);
-		jm.putString("promotionBeginDate", this.dateRange.getOpeningFormat());
-		jm.putString("promotionEndDate", this.dateRange.getEndingFormat());
+		jm.putString("promotionBeginDate", this.dateRange != null ? this.dateRange.getOpeningFormat() : "");
+		jm.putString("promotionEndDate", this.dateRange != null ? this.dateRange.getEndingFormat() : "");
 		jm.putString("title", this.title);
 		jm.putString("body", this.body);
 		jm.putInt("point", this.point);
