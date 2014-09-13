@@ -57,11 +57,16 @@ public class OperatePromotionAction extends DispatchAction{
 					   .replaceAll("'", "&#039;")
 					   .replaceAll("!", "&#033;");
 			
-			CouponType.InsertBuilder typeInsertBuilder = new CouponType.InsertBuilder(couponName, Integer.parseInt(price)).setComment("活动优惠劵").setImage(image).setExpired(DateUtil.parseDate(expiredDate));
-			Promotion.CreateBuilder promotionCreateBuilder = new Promotion.CreateBuilder(title, new DateRange(beginDate, endDate), body, typeInsertBuilder)
-					.setPoint(point != null && !point.isEmpty()?Integer.parseInt(point):0)
-			  		.setType(Promotion.Type.valueOf(Integer.parseInt(pType))
-);
+			
+			Promotion.CreateBuilder promotionCreateBuilder;
+			if(Promotion.Type.valueOf(Integer.parseInt(pType)) == Promotion.Type.DISPLAY_ONLY){
+				promotionCreateBuilder = Promotion.CreateBuilder.newInstance(title, new DateRange(beginDate, endDate), body);
+			}else{
+//				CouponType.InsertBuilder typeInsertBuilder = new CouponType.InsertBuilder(couponName, Integer.parseInt(price)).setComment("活动优惠劵").setImage(image).setExpired(DateUtil.parseDate(expiredDate));
+				promotionCreateBuilder = Promotion.CreateBuilder.newInstance(title, new DateRange(beginDate, endDate), body, Promotion.Type.valueOf(Integer.parseInt(pType)), new CouponType.InsertBuilder(couponName, Integer.parseInt(price)).setComment("活动优惠劵").setImage(image).setExpired(DateUtil.parseDate(expiredDate)));
+				promotionCreateBuilder.setPoint(Integer.parseInt(point));
+			}
+			
 			
 			String[] memberList = members.split(",");
 			
