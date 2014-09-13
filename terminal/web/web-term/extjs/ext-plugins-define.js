@@ -5,6 +5,7 @@ Ext.namespace('Ext.ux', 'Ext.ux.plugins');
 Ext.ux.plugins.imgTypes = ['jpg','jpeg', 'gif', 'bmp', 'png'];
 Ext.ux.plugins.createImageFile = function(config){
 	config = config || {};
+	var check = false;
 	var img = new Ext.form.TextField({
 		id : config.id,
 		name : 'imgFile',
@@ -25,7 +26,7 @@ Ext.ux.plugins.createImageFile = function(config){
 	 						if(imgURL && imgURL.length > 0){
 	 							var index = imgURL.lastIndexOf('.');
  	        	    			var type = imgURL.substring(index+1, img.length);
- 	        	    			var check = false;
+ 	        	    			check = false;
  	        	    			for(var i = 0; i < Ext.ux.plugins.imgTypes.length; i++){
  	        	    				if(type.toLowerCase() == Ext.ux.plugins.imgTypes[i].toLowerCase()){
  	        	    					check = true;
@@ -50,7 +51,7 @@ Ext.ux.plugins.createImageFile = function(config){
 	 						if(file.files && file.files[0]){
 	 							var index = file.value.lastIndexOf('.');
  	        	    			var type = file.value.substring(index+1, img.length);
- 	        	    			var check = false;
+ 	        	    			check = false;
  	        	    			for(var i = 0; i < Ext.ux.plugins.imgTypes.length; i++){
  	        	    				if(type.toLowerCase() == Ext.ux.plugins.imgTypes[i].toLowerCase()){
  	        	    					check = true;
@@ -70,6 +71,10 @@ Ext.ux.plugins.createImageFile = function(config){
 					} catch(e){
 						Ext.example.msg('提示', '操作失败, 无法获取图片信息. 请换浏览器后重试.');
 					}
+					
+	 	        	if(typeof config.callback == 'function' && check){
+    					config.callback();
+    				}					
 				}, this);
 			}
 		}
