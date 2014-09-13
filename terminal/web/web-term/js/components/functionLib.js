@@ -56,7 +56,8 @@ Ext.override(Ext.tree.TreeEventModel, {
         }
         else if(this.getNodeTarget(e)){
         	if(this.tree.getSelectionModel().selNode){
-        		if(this.tree.getSelectionModel().selNode.ui != "null"){
+        		
+        		if(this.tree.getSelectionModel().selNode.ui != null){
         			this.tree.getSelectionModel().selNode.ui.onSelectedChange(false);
         		}
         	}
