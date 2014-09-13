@@ -59,6 +59,105 @@ public class Promotion implements Jsonable{
 		}
 	}
 	
+	public static class UpdateBuilder{
+		private final int id;
+		private DateRange range;
+		private String title;
+		private String body;
+		private Type type = Type.DISPLAY_ONLY;
+		private int point = -1;
+		private CouponType.UpdateBuilder typeBuilder;
+		private List<Integer> members;
+		
+		public UpdateBuilder(int id){
+			this.id = id;
+		}
+		
+		public UpdateBuilder setTitle(String title){
+			this.title = title;
+			return this;
+		}
+		
+		public boolean isTitleChanged(){
+			return this.title != null;
+		}
+		
+		public UpdateBuilder setBody(String body){
+			this.body = body;
+			return this;
+		}
+		
+		public boolean isBodyChanged(){
+			return this.body != null;
+		}
+		
+		public UpdateBuilder setRange(DateRange range){
+			this.range = range;
+			return this;
+		}
+		
+		public boolean isRangeChanged(){
+			return this.range != null;
+		}
+		
+		public UpdateBuilder setType(Type type){
+			this.type = type;
+			return this;
+		}
+		
+		public boolean isTypeChanged(){
+			return this.type != null;
+		}
+		
+		public UpdateBuilder setPoint(int point){
+			this.point = point;
+			return this;
+		}
+		
+		public boolean isPointChanged(){
+			return this.point != -1;
+		}
+		
+		public UpdateBuilder addMember(int memberId){
+			if(members == null){
+				 members = SortedList.newInstance();
+			}
+			if(!members.contains(memberId)){
+				members.add(memberId);
+			}
+			return this;
+		}
+		
+		public boolean isMemberChanged(){
+			return members != null;
+		}
+		
+		public List<Integer> getMembers(){
+			if(members != null){
+				return Collections.unmodifiableList(members);
+			}else{
+				return Collections.emptyList();
+			}
+		}
+		
+		public UpdateBuilder setCouponTypeBuilder(CouponType.UpdateBuilder builder){
+			this.typeBuilder = builder;
+			return this;
+		}
+		
+		public CouponType.UpdateBuilder getCouponTypeBuilder(){
+			return this.typeBuilder;
+		}
+		
+		public boolean isCouponTypeChanged(){
+			return this.typeBuilder != null;
+		}
+		
+		public Promotion build(){
+			return new Promotion(this);
+		}
+	}
+	
 	public static enum Type{
 		DISPLAY_ONLY(1, "只展示"),
 		FREE(2, "免费领取"),
@@ -143,6 +242,28 @@ public class Promotion implements Jsonable{
 		this.point = builder.point;
 		this.couponType = builder.typeBuilder.build();
 		this.status = Status.CREATED;
+	}
+	
+	private Promotion(UpdateBuilder builder){
+		this.id = builder.id;
+		if(builder.isRangeChanged()){
+			this.dateRange = builder.range;
+		}
+		if(builder.isTitleChanged()){
+			this.title = builder.title;
+		}
+		if(builder.isBodyChanged()){
+			this.body = builder.body;
+		}
+		if(builder.isTypeChanged()){
+			this.type = builder.type;
+		}
+		if(builder.isPointChanged()){
+			this.point = builder.point;
+		}
+		if(builder.isCouponTypeChanged()){
+			this.couponType = builder.typeBuilder.build();
+		}
 	}
 	
 	public Promotion(int id){

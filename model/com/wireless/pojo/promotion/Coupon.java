@@ -69,7 +69,8 @@ public class Coupon implements Jsonable{
 		PUBLISHED(2, "已发布"),
 		DRAWN(3, "已领取"),
 		USED(4, "已使用"),
-		EXPIRED(5, "已过期");
+		EXPIRED(5, "已过期"),
+		FINISH(6, "已结束");
 		
 		private final int val;
 		private final String desc;

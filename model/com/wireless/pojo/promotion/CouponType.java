@@ -51,6 +51,7 @@ public class CouponType implements Jsonable{
 		private long expired = Integer.MIN_VALUE;
 		private String comment;
 		private String image;
+		private float price = -1;
 		
 		public UpdateBuilder(int id, String name){
 			this.id = id;
@@ -93,6 +94,15 @@ public class CouponType implements Jsonable{
 		
 		public boolean isImageChanged(){
 			return this.image != null;
+		}
+		
+		public UpdateBuilder setPrice(float price){
+			this.price = price;
+			return this;
+		}
+		
+		public boolean isPriceChanged(){
+			return this.price != -1;
 		}
 		
 		public CouponType build(){
