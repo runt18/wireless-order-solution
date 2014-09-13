@@ -46,6 +46,7 @@ public class TestPromotionDao {
 			List<Member> members = MemberDao.getByCond(mStaff, null, null);
 			Member m1 = members.get(0);
 			Member m2 = members.get(1);
+			Member m3 = members.get(2);
 			
 			//--------Test to create a promotion-----------
 			CouponType.InsertBuilder typeInsertBuilder = new CouponType.InsertBuilder("测试优惠券类型", 30).setComment("测试备注").setImage("2912w3slka.jpg");//.setExpired(System.currentTimeMillis() / 1000 * 1000);
@@ -73,7 +74,7 @@ public class TestPromotionDao {
 																									 .setTitle("修改优惠活动")
 																									 .setBody("hello jingjing<br>")
 																									 .setType(Promotion.Type.FREE)
-																									 .addMember(m1.getId()).addMember(m2.getId())
+																									 .addMember(m1.getId()).addMember(m2.getId()).addMember(m3.getId())
 																									 .setCouponTypeBuilder(typeUpdateBuilder);
 			expected = promotionUpdateBuilder.build();
 			expected.setCouponType(typeUpdateBuilder.build());
@@ -87,6 +88,7 @@ public class TestPromotionDao {
 			//Compare the coupon related to this promotion.
 			compare(promotionId, Coupon.Status.CREATED, couponTypeId, m1, CouponDao.getByCond(mStaff, new CouponDao.ExtraCond().setMember(m1).setPromotion(promotionId), null).get(0));
 			compare(promotionId, Coupon.Status.CREATED, couponTypeId, m2, CouponDao.getByCond(mStaff, new CouponDao.ExtraCond().setMember(m2).setPromotion(promotionId), null).get(0));
+			compare(promotionId, Coupon.Status.CREATED, couponTypeId, m3, CouponDao.getByCond(mStaff, new CouponDao.ExtraCond().setMember(m3).setPromotion(promotionId), null).get(0));
 
 			//--------Test to cancel publish a promotion whose status is NOT 'CREATE'-----------
 			try{
