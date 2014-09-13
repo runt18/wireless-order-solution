@@ -14,21 +14,30 @@ public class Promotion implements Jsonable{
 		private final DateRange range;
 		private final String title;
 		private final String body;
-		private Type type = Type.DISPLAY_ONLY;
+		private final Type type;
 		private int point;
 		private final CouponType.InsertBuilder typeBuilder;
 		private final List<Integer> members = SortedList.newInstance();
 		
-		public CreateBuilder(String title, DateRange range, String body, CouponType.InsertBuilder typeBuilder){
+		private CreateBuilder(String title, DateRange range, String body, Type type, CouponType.InsertBuilder typeBuilder){
 			this.title = title;
 			this.range = range;
 			this.body = body;
+			this.type = type;
 			this.typeBuilder = typeBuilder;
 		}
 		
-		public CreateBuilder setType(Type type){
-			this.type = type;
-			return this;
+		public static CreateBuilder newInstance(String title, DateRange range, String body, Type type, CouponType.InsertBuilder typeBuilder){
+			if(type == Type.DISPLAY_ONLY){
+				throw new IllegalArgumentException("【" + Type.DISPLAY_ONLY.desc + "】类型不能创建优惠券");
+			}
+			CreateBuilder instance = new CreateBuilder(title, range, body, type, typeBuilder);
+			return instance;
+		}
+		
+		public static CreateBuilder newInstance(String title, DateRange range, String body){
+			CreateBuilder instance = new CreateBuilder(title, range, body, Type.DISPLAY_ONLY, null);
+			return instance;
 		}
 		
 		public CreateBuilder setPoint(int point){
@@ -64,7 +73,6 @@ public class Promotion implements Jsonable{
 		private DateRange range;
 		private String title;
 		private String body;
-		private Type type = Type.DISPLAY_ONLY;
 		private int point = -1;
 		private CouponType.UpdateBuilder typeBuilder;
 		private List<Integer> members;
@@ -98,15 +106,6 @@ public class Promotion implements Jsonable{
 		
 		public boolean isRangeChanged(){
 			return this.range != null;
-		}
-		
-		public UpdateBuilder setType(Type type){
-			this.type = type;
-			return this;
-		}
-		
-		public boolean isTypeChanged(){
-			return this.type != null;
 		}
 		
 		public UpdateBuilder setPoint(int point){
@@ -240,7 +239,9 @@ public class Promotion implements Jsonable{
 		this.body = builder.body;
 		this.type = builder.type;
 		this.point = builder.point;
-		this.couponType = builder.typeBuilder.build();
+		if(builder.type != Type.DISPLAY_ONLY){
+			this.couponType = builder.typeBuilder.build();
+		}
 		this.status = Status.CREATED;
 	}
 	
@@ -254,9 +255,6 @@ public class Promotion implements Jsonable{
 		}
 		if(builder.isBodyChanged()){
 			this.body = builder.body;
-		}
-		if(builder.isTypeChanged()){
-			this.type = builder.type;
 		}
 		if(builder.isPointChanged()){
 			this.point = builder.point;
