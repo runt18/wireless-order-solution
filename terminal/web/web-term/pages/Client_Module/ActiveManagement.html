@@ -25,7 +25,7 @@
 	src="../../js/Client/activeMgr/activeMgrMain.js"></script>
 <script>
 var active_memberList = '', couponTypeId = 0, promotionType = 4;
-var promotionTree;
+var promotionTree, operatePromotTypeWin;
 function buildPreviewHead(){
 	var head = '';
 	if(Ext.getCmp('active_title').getValue()){
@@ -137,12 +137,16 @@ $(function (){
         		Ext.getCmp('active_title').focus(true, 100);
         		Ext.getCmp('btnSecondStepEastBody').handler();
         	}else if(currentIndex == 2){
+        		console.log('jin2')
         		Ext.getCmp('threeStepEastBody').body.update(buildPreviewHead()+Ext.getCmp('secondStep_edit').getValue());
         	}
         },
         onStepChanging : function(event, currentIndex, newIndex){
         	if(currentIndex == 1 && newIndex == 2){
         		return fnValidSecondSteps();
+        	}else if(currentIndex == 1 && newIndex == 0 && operatePromotTypeWin.otype == 'update'){
+        		Ext.example.msg('提示', '不能修改活动类型');
+        		return false;
         	}else{
         		return true;
         	}
