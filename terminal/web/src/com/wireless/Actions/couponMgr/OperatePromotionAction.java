@@ -69,7 +69,10 @@ public class OperatePromotionAction extends DispatchAction{
 			}else{
 //				CouponType.InsertBuilder typeInsertBuilder = new CouponType.InsertBuilder(couponName, Integer.parseInt(price)).setComment("活动优惠劵").setImage(image).setExpired(DateUtil.parseDate(expiredDate));
 				promotionCreateBuilder = Promotion.CreateBuilder.newInstance(title, new DateRange(beginDate, endDate), body, Promotion.Type.valueOf(Integer.parseInt(pType)), new CouponType.InsertBuilder(couponName, Integer.parseInt(price)).setComment("活动优惠劵").setImage(image).setExpired(DateUtil.parseDate(expiredDate)));
-				promotionCreateBuilder.setPoint(Integer.parseInt(point));
+				if(point != null && !point.isEmpty()){
+					promotionCreateBuilder.setPoint(Integer.parseInt(point));
+				}
+				
 			}
 			
 			
@@ -136,12 +139,17 @@ public class OperatePromotionAction extends DispatchAction{
 										 .setTitle(title)
 										 .setBody(body);
 			}else{
-				CouponType.UpdateBuilder typeUpdateBuilder = new CouponType.UpdateBuilder(Integer.parseInt(couponTypeId), couponName).setComment("").setImage(image).setPrice(Integer.parseInt(price)).setExpired(expiredDate);
+				CouponType.UpdateBuilder typeUpdateBuilder = new CouponType.UpdateBuilder(Integer.parseInt(couponTypeId), couponName).setComment("").setPrice(Integer.parseInt(price)).setExpired(expiredDate);
+				if(image != null && !image.isEmpty()){
+					typeUpdateBuilder.setImage(image);
+				}
 				promotionUpdateBuilder = new Promotion.UpdateBuilder(Integer.parseInt(pId)).setRange(new DateRange(beginDate, endDate))
 										 .setTitle(title)
 										 .setBody(body)
-										 .setPoint(Integer.parseInt(point))
 										 .setCouponTypeBuilder(typeUpdateBuilder);
+				if(point != null && !point.isEmpty()){
+					promotionUpdateBuilder.setPoint(Integer.parseInt(point));
+				}
 			}
 			
 			
