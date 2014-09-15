@@ -14,6 +14,7 @@ import com.wireless.exception.MemberError;
 import com.wireless.exception.PromotionError;
 import com.wireless.pojo.client.Member;
 import com.wireless.pojo.client.MemberOperation;
+import com.wireless.pojo.client.MemberType;
 import com.wireless.pojo.promotion.Coupon;
 import com.wireless.pojo.promotion.CouponType;
 import com.wireless.pojo.promotion.Promotion;
@@ -448,12 +449,13 @@ public class CouponDao {
 		sql = " SELECT " +
 			  " C.coupon_id, C.restaurant_id, C.birth_date, C.order_id, C.order_date, C.status, " +
 			  " C.coupon_type_id, CT.name, CT.price, CT.expired, CT.image, " +
-			  " C.member_id, M.name AS member_name, M.mobile, M.member_card, " +
+			  " C.member_id, M.name AS member_name, M.mobile, M.member_card, M.`consumption_amount`, M.point, M.`base_balance`, M.`extra_balance`, MT.name AS memberTypeName, " +
 			  " C.promotion_id, P.title " +
 			  " FROM " + Params.dbName + ".coupon C " +
 			  " JOIN " + Params.dbName + ".coupon_type CT ON C.coupon_type_id = CT.coupon_type_id " +
 			  " JOIN " + Params.dbName + ".promotion P ON C.promotion_id = P.promotion_id " +
 			  " JOIN " + Params.dbName + ".member M ON C.member_id = M.member_id " +
+			  " JOIN " + Params.dbName + ".member_type MT ON M.member_type_id = MT.member_type_id " +
 			  " WHERE 1 = 1 " +
 			  " AND C.restaurant_id = " + staff.getRestaurantId() +
 			  (extraCond != null ? extraCond : " ") +
@@ -482,6 +484,13 @@ public class CouponDao {
 			m.setName(dbCon.rs.getString("member_name"));
 			m.setMobile(dbCon.rs.getString("mobile"));
 			m.setMemberCard(dbCon.rs.getString("member_card"));
+			m.setPoint(dbCon.rs.getInt("point"));
+			m.setBaseBalance(dbCon.rs.getFloat("base_balance"));
+			m.setExtraBalance(dbCon.rs.getFloat("extra_balance"));
+			m.setConsumptionAmount(dbCon.rs.getInt("consumption_amount"));
+			MemberType mt = new MemberType(0);
+			mt.setName(dbCon.rs.getString("memberTypeName"));
+			m.setMemberType(mt);
 			coupon.setMember(m);
 			
 			Promotion promotion = new Promotion(dbCon.rs.getInt("promotion_id"));
