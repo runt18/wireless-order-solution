@@ -158,7 +158,7 @@ $(function(){
 		params = {
 			dataSource : 'byId',
 			fid : Util.mp.fid,	
-			couponId : 38
+			couponId : 42
 		}
 	}
 	
@@ -193,7 +193,7 @@ $(function(){
 				
 				
 				if(data.root[0].statusValue < 3){
-					if(((data.root[0].drawProgress && data.root[0].drawProgress.point>=temp.point) && temp.pType == 2) && !day_closeToPromotion(temp.promotionBeginDate)){
+					if(((data.root[0].drawProgress && data.root[0].drawProgress.point>=temp.point) && temp.pType > 1) && !day_closeToPromotion(temp.promotionBeginDate)){
 						$('#div_getCouponBtn').show();
 					}else{
 						$('#div_getCouponBtn').hide();							
