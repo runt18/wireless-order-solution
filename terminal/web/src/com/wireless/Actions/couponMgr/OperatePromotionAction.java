@@ -13,12 +13,17 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
 import com.wireless.db.DBCon;
+import com.wireless.db.promotion.CouponDao;
 import com.wireless.db.promotion.PromotionDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.weixin.restaurant.WeixinRestaurantDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
+import com.wireless.json.JsonMap;
+import com.wireless.json.Jsonable;
 import com.wireless.pojo.billStatistics.DateRange;
+import com.wireless.pojo.client.Member;
+import com.wireless.pojo.promotion.Coupon;
 import com.wireless.pojo.promotion.CouponType;
 import com.wireless.pojo.promotion.Promotion;
 import com.wireless.pojo.promotion.Promotion.Status;
@@ -91,6 +96,78 @@ public class OperatePromotionAction extends DispatchAction{
 		
 		return null;
 	}
+
+	public ActionForward update(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		String pId = request.getParameter("id");
+		String title = request.getParameter("title");
+		String beginDate = request.getParameter("beginDate");
+		String endDate = request.getParameter("endDate");
+		String body = request.getParameter("body");
+		String pType = request.getParameter("pType");
+		String point = request.getParameter("point");
+		String members = request.getParameter("members");
+		
+		String couponTypeId = request.getParameter("cId");
+		String couponName = request.getParameter("couponName");
+		String price = request.getParameter("price");
+		String expiredDate = request.getParameter("expiredDate");
+		String image = request.getParameter("image");		
+		
+		String pin = (String) request.getAttribute("pin");
+		JObject jobject = new JObject();
+		try{
+			body = body.replaceAll("&", "&amp;")
+					   .replaceAll("<", "&lt;")
+					   .replaceAll(">", "&gt;")
+					   .replaceAll("\"", "&quot;")
+					   .replaceAll("\n\r", "&#10;")
+					   .replaceAll("\r\n", "&#10;")
+					   .replaceAll("\n", "&#10;")
+					   .replaceAll(" ", "&#032;")
+					   .replaceAll("'", "&#039;")
+					   .replaceAll("!", "&#033;");
+			
+			
+			Promotion.UpdateBuilder promotionUpdateBuilder;
+			if(Promotion.Type.valueOf(Integer.parseInt(pType)) == Promotion.Type.DISPLAY_ONLY){
+				promotionUpdateBuilder = new Promotion.UpdateBuilder(Integer.parseInt(pId)).setRange(new DateRange(beginDate, endDate))
+										 .setTitle(title)
+										 .setBody(body);
+			}else{
+				CouponType.UpdateBuilder typeUpdateBuilder = new CouponType.UpdateBuilder(Integer.parseInt(couponTypeId), couponName).setComment("").setImage(image).setPrice(Integer.parseInt(price)).setExpired(expiredDate);
+				promotionUpdateBuilder = new Promotion.UpdateBuilder(Integer.parseInt(pId)).setRange(new DateRange(beginDate, endDate))
+										 .setTitle(title)
+										 .setBody(body)
+										 .setPoint(Integer.parseInt(point))
+										 .setCouponTypeBuilder(typeUpdateBuilder);
+			}
+			
+			
+			String[] memberList = members.split(",");
+			
+			for (String member : memberList) {
+				promotionUpdateBuilder.addMember(Integer.parseInt(member));
+			}
+			
+			PromotionDao.update(StaffDao.verify(Integer.parseInt(pin)), promotionUpdateBuilder);
+			jobject.initTip(true, "活动修改成功");
+		}catch(BusinessException e){
+			e.printStackTrace();
+			jobject.initTip(e);
+		}catch(SQLException e){
+			e.printStackTrace();
+			jobject.initTip(e);
+		}catch(Exception e){
+			e.printStackTrace();
+			jobject.initTip(e);
+		}finally{
+			response.getWriter().print(jobject.toString());
+		}
+		
+		return null;
+	}	
 	
 	public ActionForward getPromotion(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
@@ -139,6 +216,63 @@ public class OperatePromotionAction extends DispatchAction{
 		return null;		
 		
 	}	
+	
+	public ActionForward getById(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		String pin = (String) request.getAttribute("pin");
+		
+		Staff staff = StaffDao.verify(Integer.parseInt(pin));
+		String promotionId = request.getParameter("promotionId");
+		
+		JObject jobject = new JObject();
+		try{
+			final Promotion p = PromotionDao.getById(staff, Integer.parseInt(promotionId));
+			
+			String image = "http://" + getServlet().getInitParameter("oss_bucket_image")
+	        		+ "." + getServlet().getInitParameter("oss_outer_point") 
+	        		+ "/" + staff.getRestaurantId() + "/" + p.getCouponType().getImage();
+			
+			p.getCouponType().setImage(image);
+			
+			final Promotion promo = p;
+			List<Coupon> p_List = CouponDao.getByCond(staff, new CouponDao.ExtraCond().setPromotion(p.getId()), null);
+			List<Member> members = new ArrayList<>();
+			for (Coupon coupon : p_List) {
+				members.add(coupon.getMember());
+			}
+			final List<Member> memberList = members;
+			jobject.setExtra(new Jsonable() {
+				
+				@Override
+				public JsonMap toJsonMap(int flag) {
+					JsonMap jm = new JsonMap();
+					jm.putJsonable(promo, 0);
+					jm.putJsonableList("members", memberList, 0);
+					return jm;
+				}
+				
+				@Override
+				public void fromJsonMap(JsonMap jsonMap, int flag) {
+					
+				}
+			});
+		}catch(BusinessException e){
+			e.printStackTrace();
+			jobject.initTip(e);
+		}catch(SQLException e){
+			e.printStackTrace();
+			jobject.initTip(e);
+		}catch(Exception e){
+			e.printStackTrace();
+			jobject.initTip(e);
+		}finally{
+			response.getWriter().print(jobject.toString());
+		}
+		
+		return null;		
+		
+	}		
 	
 	public ActionForward publish(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
@@ -194,7 +328,7 @@ public class OperatePromotionAction extends DispatchAction{
 		
 		return null;		
 		
-	}		
+	}	
 	
 	public ActionForward delete(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
@@ -207,6 +341,34 @@ public class OperatePromotionAction extends DispatchAction{
 			PromotionDao.delete(StaffDao.verify(Integer.parseInt(pin)), Integer.parseInt(promotionId));
 			
 			jobject.initTip(true, "活动删除成功");
+		}catch(BusinessException e){
+			e.printStackTrace();
+			jobject.initTip(e);
+		}catch(SQLException e){
+			e.printStackTrace();
+			jobject.initTip(e);
+		}catch(Exception e){
+			e.printStackTrace();
+			jobject.initTip(e);
+		}finally{
+			response.getWriter().print(jobject.toString());
+		}
+		
+		return null;		
+		
+	}		
+	
+	public ActionForward finish(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		String pin = (String) request.getAttribute("pin");
+		String promotionId = request.getParameter("promotionId");
+		
+		JObject jobject = new JObject();
+		try{
+			PromotionDao.finish(StaffDao.verify(Integer.parseInt(pin)), Integer.parseInt(promotionId));
+			
+			jobject.initTip(true, "活动结束成功");
 		}catch(BusinessException e){
 			e.printStackTrace();
 			jobject.initTip(e);
