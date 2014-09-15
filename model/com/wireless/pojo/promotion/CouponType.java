@@ -124,6 +124,7 @@ public class CouponType implements Jsonable{
 		setExpired(builder.expired);
 		setComment(builder.comment);
 		setImage(builder.image);
+		setPrice(builder.price);
 	}
 	
 	private CouponType(InsertBuilder builder){
