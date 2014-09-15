@@ -36,6 +36,9 @@ $(function(){
 								$('#spanNearByCost').html(data.other.nearByConsume);
 								$('#divMemberPointContent').css('display', 'block');
 							}
+							if(data.other.couponConsume >= 0){
+								$('#divMemberCouponConsume').css('display', 'block');
+							}							
 						},
 						error : function(data, errotType, eeor){
 							Util.dialog.show({msg: '服务器请求超时, 请刷新.'});
@@ -47,11 +50,18 @@ $(function(){
 					$('#divMemberContent').css('display', 'block');
 					$('#divMemberTypeContent').css('display', 'block');
 					$('#divMemberBalanceAndPiont').css('display', 'block');
-						
+					
 					if(data.other.member.memberType.desc){
 						$('#divCurrentMemberTypeDesc').css('display', 'block');
 						$('#spanCurrentMemberTypeDesc').html(data.other.member.memberType.desc);
 					}
+					
+					if(data.other.hasCoupon){
+						$('#divMemberCouponContent').css('display', 'block');
+						if(Util.mp.extra && Util.mp.extra == 'coupon'){
+							$('#li_myCoupon').click();
+						}
+					}					
 									
 					member = data.other.member;
 					member.restaurant = data.other.restaurant;
@@ -94,11 +104,12 @@ $(function(){
 		}
 	});
 	
-	var autoWidth = function()
+	//优惠劵宽度自适应
+/*	var autoWidth = function()
 	{
 		 calcFloatDivs();
 	};
-	window.onresize = autoWidth;
+	window.onresize = autoWidth;*/
 	
 	$('#txtVerifyCode').focus(function(){
 		$('html, body').animate({scrollTop: 190+($('#divMemberPrivilegeDetail').height()>=30?$('#divMemberPrivilegeDetail').height():-15)}, 'fast'); 

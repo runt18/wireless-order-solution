@@ -5,149 +5,6 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no,maximum-scale=1">
 <title>会员中心</title>
 
-<style>
-
-.box {
-	/* position:relative;  */
-	float :left;
-	margin-left : 10px;
-	margin-top : 5px;
-	line-height : 15px;
-	border:solid 5px #fff;
-	width:112px;
-	height:145px;
-	/* margin:0 auto; */
-	/* border-radius: 255px 15px 225px 15px/15px 225px 15px 255px; */
-	border:1px solid;
-	border-radius:8px;	
-	padding:2px;
-	color:#666;
-	box-shadow:2px 3px 1px rgba(0, 0, 0, .75)
-}
-.box_in {
-	/* position:relative; */
-	float :left;
-	background:#fff;
-	border:solid 5px #fff;
-	width:112px;
-	height:145px;
-	/* margin:0 auto; */
-	border-radius: 255px 15px 225px 15px/15px 225px 15px 255px;
-	padding:2px;
-	color:#666;
-	box-shadow:2px 3px 1px rgba(0, 0, 0, .75)
-}
-.box .box_in {
-/* 	position:absolute; */
-	top:5px;
-	left:5px;
-	width:100px;
-	height:100px;
-	border-color:#593207;
-	box-shadow:none;
-}
-.box span{
-	margin-left: 5px;font-size: 10px;
-	font-family:microsoft yahei, Arial, Helvetica, sans-serif;
-}
-
-.box_in img{
-	width : 100px;height : 100px;
-}
-
-
-.a_demo_two {
-    background-color:#6fba26;
-    padding:5px 70px 5px;
-    position:relative;
-    font-family: 'Open Sans', sans-serif;
-    font-size:12px;
-    text-decoration:none;
-    color:#fff;
-    background-image: linear-gradient(bottom, rgb(100,170,30) 0%, rgb(129,212,51) 100%);
-    box-shadow: inset 0px 1px 0px #2ab7ec, 0px 3px 0px 0px #156785, 0px 4px 4px #999;
-    border-radius: 5px;
-}
- 
-.a_demo_two:active {
-    top:4px;
-    background-image: linear-gradient(bottom, rgb(100,170,30) 100%, rgb(129,212,51) 0%);
-    box-shadow: inset 0px 1px 0px #2ab7ec, 0px 2px 0px 0px #156785, 0px 5px 3px #999;
-    color: #156785;
-    text-shadow: 0px 1px 1px rgba(255,255,255,0.3);
-    background: rgb(44,160,202);
-}
-.a_demo_two:before {
-    background-color:#072239 ;
-    content:"";
-    display:block; 
-    position:absolute;
-    width:100%;
-    height:100%;
-    padding-left:2px;
-    padding-right:2px;
-    padding-bottom:4px;
-    left:-2px;
-     z-index:-1;
-}
-
-.a_demo_twos {
-    background-color:#6fba26;
-    padding:5px 15px 5px;
-    position:relative;
-    font-family: 'Open Sans', sans-serif;
-    font-size:12px;
-    text-decoration:none;
-    color:#fff;
-    background-image: linear-gradient(bottom, rgb(100,170,30) 0%, rgb(129,212,51) 100%);
-    box-shadow: inset 0px 1px 0px #2ab7ec, 0px 3px 0px 0px #156785, 0px 4px 4px #999;
-    border-radius: 5px;
-}
- 
-.a_demo_twos:active {
-    top:4px;
-    background-image: linear-gradient(bottom, rgb(100,170,30) 100%, rgb(129,212,51) 0%);
-    box-shadow: inset 0px 1px 0px #2ab7ec, 0px 2px 0px 0px #156785, 0px 5px 3px #999;
-    color: #156785;
-    text-shadow: 0px 1px 1px rgba(255,255,255,0.3);
-    background: rgb(44,160,202);
-}
-.a_demo_twos:before {
-    background-color:#072239 ;
-    content:"";
-    display:block; 
-    position:absolute;
-    width:100%;
-    height:100%;
-    padding-left:2px;
-    padding-right:2px;
-    padding-bottom:4px;
-    left:-2px;
-     z-index:-1;
-}
- 
-/* .a_demo_two:active::before {
-    top:-2px;
-} */
-
-#ulMemberPrivilegeDetail{
-	margin-left: 25px;
-}
-#ulMemberPrivilegeDetail li{
-	list-style:disc !important;
-	font-family:  'Microsoft YaHei';
-	color : maroon ;
-	font-weight : bold;
-	font-size: 20px;
-	font-style: italic;
-}
-
-.memberTypeBaseDesc{
-	color:maroon;
-	font-size: 14px;
-}
-
-</style>
 <link rel="stylesheet" href="./css/base.css">
 <link rel="stylesheet" href="./css/member.css">
 <link type="text/css" rel="stylesheet" href="./css/mbar.css">
@@ -289,40 +146,13 @@ var totalMath = 0;
 
 <div id="divMemberCouponContent" class="main-box">
 <ul class="m-b-list">
-	<li class="box-horizontal none-line" onclick="toggleCouponContent()">
+	<li id="li_myCoupon" class="box-horizontal none-line" onclick="toggleCouponContent()">
 		<div>我的优惠券</div>
 		<div id="divMyCoupon" class="event">&nbsp;<font>&gt;</font></div>
 	</li>
-	<li>
+	<li style="overflow: hidden;padding-bottom: 3px;">
 		<div id="divMemberCouponContentView" style="display:none; width:100%;" >
-		<div id="divMemberCouponContentViews">
-	<!-- 		<div class="box">
-				<div class="box_in">
-					<img src="images/wugu.jpg">
-				</div>
-				
-				<span>优惠一只鸡</span><br>
-				<span>到期 : 2014-07-09</span>
-			</div>
-			
-			<div class="box">
-				<div class="box_in">
-					<img src="images/donggu.jpg">
-				</div>
-				
-				<span>优惠一只鸭</span><br>
-				<span>到期 : 2014-07-09</span>
-			</div>
-			<div class="box">
-				<div class="box_in">
-					<img src="images/QQ20140326103344.jpg">
-				</div>
-				
-				<span>优惠一只鹅</span><br>
-				<span>到期 : 2014-07-09</span>
-			</div> -->
-		</div>	
-		<!-- <div style="color:#595959;" onclick="toggleCouponContent.load()">提示:显示现有优惠券.<span style="color:#898989;">点击刷新</span></div> -->
+			<div id="divMemberCouponContentViews"></div>	
 		</div>
 	</li>
 </ul>
@@ -335,21 +165,19 @@ var totalMath = 0;
 		<div class="event">&nbsp;&gt;</div>
 	</li>
 	<li>
-		<div id="divMemberCouponConsumeDetails" style="display:none; width:100%; ">
-		
-		<table class="d-list">
-			<thead>
-			<tr class="d-list-title">
-				<td style="width:50%;">日期</td>
-				<td style="width:25%;">消费金额</td>
-				<td style="width:25%;">优惠金额</td>
-			</tr>
-			</thead>
-			<tbody>
-			</tbody>
-		</table>
-		<div style="color:#595959;" onclick="toggleCouponConsumeDetails.load()">提示:显示近5条优惠券使用记录.<span style="color:#898989;">点击刷新</span></div>
-		</div>
+		<div id="divMemberCouponConsumeDetails" style="display:none;width:97%;border:groove 3px Gainsboro;border-radius:5px;margin-bottom: 5px;">
+			<table class="d-list">
+				<thead>
+				<tr class="d-list-title">
+					<td style="width:50%;text-align: center;">日期</td>
+					<td style="width:25%;">消费金额</td>
+					<td style="width:25%;">优惠金额</td>
+				</tr>
+				</thead>
+				<tbody>
+				</tbody>
+			</table>
+		</div>	
 	</li>
 </ul>
 </div>
@@ -387,11 +215,9 @@ var totalMath = 0;
 		<li class="none-line">
 			<div id="btnGetVerifyCode" style="height: 55px;width: 100%;text-align: center;" >
 				<a class="a_demo_two" style="font-size: 20px;font-weight: bold;" onclick="getVerifyCode({event:this})">获取验证码</a>	
-			
 			</div>	
 			<div id="btnBindMember" style="margin-top: 3px;height: 55px;width: 100%;text-align: center;display: none;" >
 				<a class="a_demo_two" style="font-size: 20px;font-weight: bold;" onclick="bindMember({event:this})">确认绑定</a>	
-			
 			</div>							
 		</li>
 	</ul>

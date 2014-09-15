@@ -64,6 +64,7 @@ var Util = {
 		this.hparam = str.split('&');
 		this.mp.oid = Util.getParam('m');
 		this.mp.fid = Util.getParam('r');
+		this.mp.extra = Util.getParam('e');
 	},
 	getParam : function(key){
 		var temp;
@@ -89,8 +90,8 @@ var Util = {
 		//this.mp.oid = 'o_da4uFcIRO1-WkbnEfebmstqFQw'; this.mp.fid = 'gh_cbad03f831ab';
 		return this.URLTemplet.format(page, this.mp.oid, this.mp.fid, new Date().getTime());
 	},
-	skip : function(page){
-		window.location.href = this.defineURL(page);
+	skip : function(page, extra){
+		window.location.href = this.defineURL(page) + (extra?'&e='+extra:'');
 	},
 	lbar : function(addr, cb){
 		$.ajax({

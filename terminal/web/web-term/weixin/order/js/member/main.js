@@ -432,16 +432,18 @@ function calcFloatDivs(){
 function toggleCouponContent(){
 	var mainView = $('#divMemberCouponContentView');
 	
-	var templet = '<div class="box">' +
+	var templet = '<div class="box" onclick="Util.skip(\'sales.html\', {couponId})">' +
 					'<div class="box_in"><img src="{couponImg}"></div>' +
-					'<span>{name}</span><br><span>到期 : {expiredTime}</span>' +
+					'<span>{name}</span><br><span>面额 : {cPrice} 元</span><br><span>到期 : {expiredTime}</span><br><span>来自 : {promotionName}</span>' +
 				  '</div>';	
 	mainView.fadeToggle(function(){
 		if(mainView.css('display') == 'block'){
+			$('html, body').animate({scrollTop: 0});
+			$('html, body').animate({scrollTop: 310+$('#divMemberPointContent').height()+$('#divMemberBalanceContent').height()+$('#divMemberTypeContent').height()}, 'fast');			
 			if(!toggleCouponContent.load){
 				toggleCouponContent.load = function(){
 					Util.lm.show();
-/*					$.ajax({
+					$.ajax({
 						url : '../../WXQueryMemberOperation.do',
 						type : 'post',
 						data : {
@@ -461,12 +463,16 @@ function toggleCouponContent(){
 										html.push(templet.format({
 											couponImg : temp.couponType.image,
 											name : temp.couponType.name,
-											expiredTime : temp.couponType.expiredFormat
+											cPrice : temp.couponType.price,
+											expiredTime : temp.couponType.expiredFormat,
+											promotionName : temp.promotion.title,
+											couponId : temp.couponId
 										}));
 									}
 									mainView.html(html);
 									
-									calcFloatDivs();
+									//计算图片居中
+//									calcFloatDivs();
 									
 								}else{
 									mainView.html('暂无优惠券');
@@ -479,7 +485,7 @@ function toggleCouponContent(){
 							Util.lm.hide();
 							Util.dialog.show({msg: '服务器请求失败, 请稍候再试.'});
 						}
-					});*/
+					});
 				};
 			}
 			toggleCouponContent.load();
@@ -494,7 +500,7 @@ function toggleCouponContent(){
 function toggleCouponConsumeDetails(){
 	var mainView = $('#divMemberCouponConsumeDetails');
 	var tbody = mainView.find('table > tbody');
-	var templet = '<tr class="d-list-item">'
+	var templet = '<tr class="d-list-item-consume">'
 		+ '<td>{time}</td>'
 		+ '<td>{payMoney}</td>'
 		+ '<td>{couponMoney}</td>'
@@ -521,9 +527,9 @@ function toggleCouponConsumeDetails(){
 								for(var i = 0; i < data.root.length; i++){
 									temp = data.root[i];
 									html.push(templet.format({
-										time : temp.operateDateFormat,
-										payMoney : temp.payMoney.toFixed(2),
-										couponMoney : temp.couponMoney.toFixed(2)
+										time : fnDateInChinese(temp.operateDateFormat) + '</br><font style="font-size:13px;">账单号:' + temp.orderId + '</font>',
+										payMoney : (checkDot(temp.payMoney)?parseFloat(temp.payMoney).toFixed(2) : temp.payMoney) + '元',
+										couponMoney : (checkDot(temp.couponMoney)?parseFloat(temp.couponMoney).toFixed(2) : temp.couponMoney) + '元'
 									}));
 								}
 								tbody.html(html.length == 0 ? '暂无优惠券使用记录.' : html.join(''));
