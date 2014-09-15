@@ -3,12 +3,11 @@
 /**
  * 修改部门信息
  */
-function initCouponTypeWin(){
+function initCouponTypeWin(c){
 	operatePromotTypeWin = Ext.getCmp('operatePromotTypeWin');
 	if(!operatePromotTypeWin){
 		operatePromotTypeWin = new Ext.Window({
 			id : 'operatePromotTypeWin',
-			title : '添加优惠活动',
 			closable : true,
 			closeAction:'hide',
 			resizable : false,
@@ -18,8 +17,24 @@ function initCouponTypeWin(){
 			bodyStyle : 'backgroundColor:#FFFFFF; border:1px solid #99BBE8;',
 			contentEl : 'divActiveInsert',
 			listeners : {
-				show : function(){
-//					$('#active_secendStepPanel').find('.x-form-label-right').width(-50);
+				beforehide : function(){
+/*					
+					if($("#wizard").steps("getCurrentIndex") == 1){
+						$("#wizard").steps("next");
+						
+						var task = {
+							run : function(){
+								console.log('jin')
+								if($("#wizard").steps("getCurrentIndex") != 1){
+									console.log('jin1')	
+									Ext.TaskMgr.stop(this);
+								}
+							},
+							interval: 200
+						};
+					
+						Ext.TaskMgr.start(task);						
+					}*/
 				},
 				hide : function(){
 					$('#span_firstModel').click();
@@ -48,6 +63,8 @@ function initCouponTypeWin(){
 					Ext.getCmp('active_memberTypeCombo').setValue(-1);
 					active_memberList = '';
 					
+					operatePromotTypeWin.otype = '';
+					
 					$("#wizard").steps("previous");
 					$("#wizard").steps("previous");
 				}
@@ -61,6 +78,8 @@ function initCouponTypeWin(){
 			 }]
 		});
 	}
+	operatePromotTypeWin.otype = c.type;
+	operatePromotTypeWin.setTitle(c.type == 'insert'?'添加优惠活动':'修改优惠活动');
 };
 
 function chooseCouponModel(e, h){
@@ -239,15 +258,107 @@ function fnDeletePromotionPromotion(){
 	);
 }
 
+function fnFinishPromotion(){
+	var node = Ext.ux.getSelNode(promotionTree);
+	if (!node || node.attributes.id == -1) {
+		Ext.example.msg('提示', '操作失败, 请选择一个活动再进行操作.');
+		return;
+	}	
+	Ext.Msg.confirm(
+		'提示',
+		'是否结束活动:&nbsp;<font color="red">' + node.text + '</font>',
+		function(e){
+			if(e == 'yes'){
+				Ext.Ajax.request({
+					url : '../../OperatePromotion.do',
+					params : {promotionId : node.attributes.id, dataSource : 'finish'},
+					success : function(res, opt){
+						var jr = Ext.decode(res.responseText);
+						if(jr.success){
+							Ext.example.msg(jr.title, jr.msg);
+							promotionTree.getRootNode().reload();
+						}
+					},
+					failure : function(res, opt){
+						Ext.ux.showMsg(Ext.decode(res.responseText));
+					}
+				});
+			}
+		},
+		this
+	);
+}
+
+function operatePromotionData(data){
+	var title = Ext.getCmp('active_title');
+	var beginDate = Ext.getCmp('active_beginDate');
+	var endDate = Ext.getCmp('active_endDate');
+	var point = Ext.getCmp('active_point');
+	var couponName = Ext.getCmp('active_couponName');
+	var price = Ext.getCmp('active_price');
+	var expiredDate= Ext.getCmp('active_couponExpiredDate');
+	var imgBox = Ext.getCmp('p_couponImg');
+	var editBody = Ext.getCmp('secondStep_edit');
+	
+	title.setValue(data.title);
+	beginDate.setValue(data.promotionBeginDate);
+	endDate.setValue(data.promotionEndDate);
+	point.setValue(data.point);
+	editBody.setValue(data.body);
+	
+	if(promotionType > 1){
+		Ext.getDom('radioSelfCoupon').checked = true; 
+		couponName.setValue(data.coupon.name);
+		price.setValue(data.coupon.price);
+		expiredDate.setValue(data.coupon.expiredFormat);
+		Ext.getCmp('couponTypeBox').setImg(data.coupon.image);
+	}
+	
+	Ext.getCmp('active_memberBasicGrid').getStore().loadData({
+		totalProperty : data.members.length,
+		root : data.members.slice(0, 200)								
+	});
+}
+
+function fnUpdatePromotion(){
+	var node = Ext.ux.getSelNode(promotionTree);
+	if (!node || node.attributes.id == -1) {
+		Ext.example.msg('提示', '操作失败, 请选择一个活动再进行操作.');
+		return;
+	}	
+	promotionType = node.attributes.pType;
+	choosePromotionModel();
+	initCouponTypeWin({type : 'update'});
+	
+	Ext.Ajax.request({
+		url : '../../OperatePromotion.do',
+		params : {promotionId : node.attributes.id, dataSource : 'getById'},
+		success : function(res, opt){
+			var jr = Ext.decode(res.responseText);
+			if(jr.success){
+				Ext.get('divActiveInsert').show();
+//				console.log(jr.other);
+				operatePromotionData(jr.other);
+				operatePromotTypeWin.show();	
+				$("#wizard").steps("next");
+			}
+		},
+		failure : function(res, opt){
+			Ext.ux.showMsg(Ext.decode(res.responseText));
+		}
+	});
+	
+}
+
 var promotionPreviewPanel, memberCountGrid;
-var operatePromotTypeWin, sendCouponWin, couponViewBillWin;
+var sendCouponWin, couponViewBillWin;
 var member_searchType = false;
-var bar = {treeId : 'promotionTree', mult : [{status : 1, option :[{name : '发布', fn : "fnPublishPromotion()"}, {name : '修改', fn : "floatBarUpdateHandler()"}, {name : '删除', fn : "fnDeletePromotionPromotion()"}]}, 
+var bar = {treeId : 'promotionTree', mult : [{status : 1, option :[{name : '发布', fn : "fnPublishPromotion()"}, {name : '修改', fn : "fnUpdatePromotion()"}, {name : '删除', fn : "fnDeletePromotionPromotion()"}]}, 
 											{status : 2, option :[{name : '撤销', fn : "fnCancelPublishPromotion()"}]},
-											{status : 3, option :[]},
-											{status : 4, option :[]} ]};
+											{status : 3, option :[{name : '结束', fn : "fnFinishPromotion()"}]},
+											{status : 4, option :[{name : '删除', fn : "fnDeletePromotionPromotion()"}]} ]};
 Ext.onReady(function() {
-	initCouponTypeWin();
+	initCouponTypeWin({type:'insert'});
 	promotionTree = new Ext.tree.TreePanel({
 		title : '活动信息',
 		id : 'promotionTree',
@@ -718,6 +829,7 @@ Ext.onReady(function() {
 						},{
 							items : [{
 								xtype : 'radio',
+								id : 'radioSelfCoupon',
 								name : 'radioActiveType',
 								inputValue : 3,
 								hideLabel : true,
@@ -1143,7 +1255,7 @@ Ext.onReady(function() {
 			['类型', 'memberType.name'],
 			['消费次数', 'consumptionAmount',,'right', 'Ext.ux.txtFormat.gridDou'],
 			['当前积分', 'point',,'right', 'Ext.ux.txtFormat.gridDou'],
-			['账户余额', 'totalBalance',,'right', 'Ext.ux.txtFormat.gridDou']
+			['账户余额', 'totalBalance',180,'right', 'Ext.ux.txtFormat.gridDou']
 		],
 		MemberBasicRecord.getKeys(),
 		[['isPaging', true], ['restaurantID', 40],  ['dataSource', 'normal']],

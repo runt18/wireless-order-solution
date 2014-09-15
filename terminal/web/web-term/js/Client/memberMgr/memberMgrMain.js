@@ -1257,8 +1257,6 @@ function gridInit(){
 	
 	memberBasicGrid.on('render', function(e){
 		Ext.getCmp('btnSearchMember').handler();
-		console.log('h')
-		console.log(memberBasicGrid.getHeight())
 	});
 	memberBasicGrid.on('rowdblclick', function(e){
 		updateMemberHandler();
