@@ -94,11 +94,11 @@
 function promotionRule(pType, point){
 	var rule = '';
 	if(pType == 3){
-		rule = '单次消费积分满<font style="color: red">' + point + '</font>分即可领取优惠劵';
+		rule = '活动规则: 单次消费积分满<font color="red">' + point + '</font>分即可领取优惠劵';
 	}else if(pType == 4){
-		rule = '累计消费积分满<font style="color: red">' + point + '</font>分即可领取优惠劵';
+		rule = '活动规则: 累计消费积分满<font color="red">' + point + '</font>分即可领取优惠劵';
 	}
-	return '<div style="margin: 10px 10px 10px 10px; font-szie:14px;font-weight:bold;">'+ rule +'</div>';
+	return '<div style="margin: 10px 10px 10px 10px; font-size:15px;font-weight:bold;color:LightSkyBlue;"> '+ rule +'</div>';
 }
 
 function day_closeToPromotion(p_beginDate){
@@ -110,7 +110,7 @@ function day_closeToPromotion(p_beginDate){
 	var closeDay = Math.ceil((beginDate.getTime() - newDate.getTime()) / (1000* 3600 * 24));	
 	
 	if(closeDay > 0){
-		return '<div style="margin: 10px 10px 10px 10px; font-size: 14px;font-weight: bold;text-align: right;">距离活动开始还有<font style="color: red">' + closeDay + '</font>天</div>'
+		return '<div style="margin: 10px 10px 10px 10px; font-size: 15px;font-weight: bold;text-align: right;color:LightSkyBlue; ">温馨提示: 距离活动开始还有<font style="color: red">' + closeDay + '</font>天</div>'
 	}else{
 		return '';
 	}
@@ -172,7 +172,7 @@ $(function(){
 				
 				var temp = data.root[0].promotion;
 				Util.getDom('divInfoContent').innerHTML =  '<div style="margin: 10px 10px 10px 10px; text-align:center; font-size: 26px; font-weight: bold; word-wrap:break-word; color: #D2691E;">' + temp.title + '</div>'
-					+ '<div style="margin: 10px 10px 10px 10px; color:#aaa; font-szie:12px;">活动日期 : ' + temp.promotionBeginDate + '&nbsp;至&nbsp;' + temp.promotionEndDate + '</div>'
+					+ '<div style="margin: 10px 10px 10px 10px; color:LightSkyBlue ; font-size:15px;font-weight:bold;">活动日期 : <font color="red">' + temp.promotionBeginDate + '</font>&nbsp;至&nbsp;<font color="red">' + temp.promotionEndDate + '</font></div>'
 					+ promotionRule(temp.pType, temp.point) 
 					+ '<div style="margin: 10px 10px 10px 10px; word-wrap:break-word;">' + temp.body + '</div>'
 					+ '<hr><div style="margin: 10px 10px 10px 10px; font-size: 14px;font-weight: bold;">'
@@ -193,7 +193,7 @@ $(function(){
 				
 				
 				if(data.root[0].statusValue < 3){
-					if(((data.root[0].drawProgress && data.root[0].drawProgress.point>=temp.point) && temp.pType > 1) && !day_closeToPromotion(temp.promotionBeginDate)){
+					if(((data.root[0].drawProgress && data.root[0].drawProgress.isOk) && temp.pType > 1) && !day_closeToPromotion(temp.promotionBeginDate)){
 						$('#div_getCouponBtn').show();
 					}else{
 						$('#div_getCouponBtn').hide();							
