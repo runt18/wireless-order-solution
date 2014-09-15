@@ -17,24 +17,30 @@ function initCouponTypeWin(c){
 			bodyStyle : 'backgroundColor:#FFFFFF; border:1px solid #99BBE8;',
 			contentEl : 'divActiveInsert',
 			listeners : {
-				beforehide : function(){
-/*					
+				beforehide : function(thiz){
+					winUnhide = false;
+					//先让操作跳到第三部再关闭, 否则样式有误
+					var result = false;
 					if($("#wizard").steps("getCurrentIndex") == 1){
 						$("#wizard").steps("next");
-						
+						var i = 0
 						var task = {
 							run : function(){
-								console.log('jin')
-								if($("#wizard").steps("getCurrentIndex") != 1){
-									console.log('jin1')	
+								if(i > 0){
 									Ext.TaskMgr.stop(this);
+									thiz.hide();
 								}
+								i ++ ;
 							},
-							interval: 200
+							interval: 300
 						};
 					
 						Ext.TaskMgr.start(task);						
-					}*/
+					}else{
+						result = true;
+					}
+					
+					return result;
 				},
 				hide : function(){
 					$('#span_firstModel').click();
@@ -122,6 +128,7 @@ function choosePromotionModel(){
 		Ext.getCmp('active_secendStep2CouponDetail').show();
 		Ext.getCmp('active_secendStep2SelectCoupon').show();
 		Ext.getCmp('active_point').hide();
+		Ext.getCmp('active_point').setValue(0);
 		Ext.getCmp('active_point').getEl().up('.x-form-item').setDisplayed(false);
 		Ext.getCmp('hide_activeOccupy').show();
 		Ext.getCmp('secondStep_edit').setHeight(348);
@@ -161,7 +168,7 @@ function promotionRule(pType, point){
 		}else if(pType == 4){
 			rule = '累计消费积分满<font style="color: red">' + point + '</font>分即可领取优惠劵';
 		}
-		return '<div style="margin: 10px 10px 10px 10px;color:#aaa; font-szie:14px;font-weight:bold;">'+ rule +'</div>';	
+		return '<div style="margin: 10px 10px 10px 10px;color:LightSkyBlue; font-szie:14px;font-weight:bold;">'+ rule +'</div>';	
 	}else{
 		return '';
 	}
@@ -177,7 +184,7 @@ function getPromotionBodyById(id){
 			var jr = Ext.decode(res.responseText);
 			if(jr.success){
 				Ext.getCmp('promotionPreviewBody').body.update('<div style="text-align:center; font-size: 30px; font-weight: bold; word-wrap:break-word; color: #D2691E;">' + jr.root[0].title + '</div>' +
-																'<div style="margin: 10px 10px 10px 10px; color:#aaa; font-szie:12px;">活动日期 : ' + jr.root[0].promotionBeginDate + '&nbsp;至&nbsp;' + jr.root[0].promotionEndDate + '</div>' +
+																'<div style="margin: 10px 10px 10px 10px; color:LightSkyBlue; font-szie:15px;font-weight:bold">活动日期 : <font color="red">' + jr.root[0].promotionBeginDate + '</font>&nbsp;至&nbsp;<font color="red">' + jr.root[0].promotionEndDate + '</font></div>' +
 																promotionRule(jr.root[0].pType, jr.root[0].point) +
 																jr.root[0].body);
 																
@@ -201,6 +208,8 @@ function fnPublishPromotion(){
 			if(jr.success){
 				Ext.example.msg(jr.title, jr.msg);
 				promotionTree.getRootNode().reload();
+			}else{
+				Ext.ux.showMsg(jr);
 			}
 		},
 		failure : function(res, opt){
@@ -306,18 +315,34 @@ function operatePromotionData(data){
 	point.setValue(data.point);
 	editBody.setValue(data.body);
 	
+	
 	if(promotionType > 1){
 		Ext.getDom('radioSelfCoupon').checked = true; 
+		couponTypeId = data.coupon.id;
 		couponName.setValue(data.coupon.name);
 		price.setValue(data.coupon.price);
 		expiredDate.setValue(data.coupon.expiredFormat);
 		Ext.getCmp('couponTypeBox').setImg(data.coupon.image);
 	}
 	
-	Ext.getCmp('active_memberBasicGrid').getStore().loadData({
-		totalProperty : data.members.length,
-		root : data.members.slice(0, 200)								
-	});
+	if(data.members.length > 0){
+		var gs = Ext.getCmp('active_memberBasicGrid').getStore();
+		gs.on('load', function(store, records, options){
+			active_memberList = '';
+			for (var i = 0; i < records.length; i++) {
+				if(i > 0){
+					active_memberList += ",";
+				}
+				active_memberList += records[i].get('id');
+			}
+		});		
+		gs.loadData({
+			totalProperty : data.members.length,
+			root : data.members.slice(0, 200)								
+		});	
+	}
+	
+
 }
 
 function fnUpdatePromotion(){
@@ -329,6 +354,7 @@ function fnUpdatePromotion(){
 	promotionType = node.attributes.pType;
 	choosePromotionModel();
 	initCouponTypeWin({type : 'update'});
+	operatePromotTypeWin.pId = node.attributes.id;
 	
 	Ext.Ajax.request({
 		url : '../../OperatePromotion.do',
@@ -337,7 +363,6 @@ function fnUpdatePromotion(){
 			var jr = Ext.decode(res.responseText);
 			if(jr.success){
 				Ext.get('divActiveInsert').show();
-//				console.log(jr.other);
 				operatePromotionData(jr.other);
 				operatePromotTypeWin.show();	
 				$("#wizard").steps("next");
