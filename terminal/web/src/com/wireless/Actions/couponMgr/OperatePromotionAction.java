@@ -237,11 +237,14 @@ public class OperatePromotionAction extends DispatchAction{
 		try{
 			final Promotion p = PromotionDao.getById(staff, Integer.parseInt(promotionId));
 			
-			String image = "http://" + getServlet().getInitParameter("oss_bucket_image")
-	        		+ "." + getServlet().getInitParameter("oss_outer_point") 
-	        		+ "/" + staff.getRestaurantId() + "/" + p.getCouponType().getImage();
-			
-			p.getCouponType().setImage(image);
+			if(p.getType() != Promotion.Type.DISPLAY_ONLY){
+				String image = "http://" + getServlet().getInitParameter("oss_bucket_image")
+		        		+ "." + getServlet().getInitParameter("oss_outer_point") 
+		        		+ "/" + staff.getRestaurantId() + "/" + p.getCouponType().getImage();
+				
+				p.getCouponType().setImage(image);				
+			}
+
 			
 			final Promotion promo = p;
 			List<Coupon> p_List = CouponDao.getByCond(staff, new CouponDao.ExtraCond().setPromotion(p.getId()), null);
@@ -401,16 +404,24 @@ public class OperatePromotionAction extends DispatchAction{
 		Staff staff = StaffDao.verify(Integer.parseInt(pin));
 		StringBuilder pTree = new StringBuilder();
 		try{
-				pTree.append("{")
-				.append("text:'已创建'")
-				.append(", status : " + Promotion.Status.CREATED.getVal())
-				.append(",expanded:true")
-				.append(",children:[" + children(staff, new PromotionDao.ExtraCond().setStatus(Status.CREATED)) + "]") 
-				.append("}");	
+			
+				String p_create = children(staff, new PromotionDao.ExtraCond().setStatus(Status.CREATED));
+				if(!p_create.isEmpty()){
+					pTree.append("{")
+					.append("text:'已创建'")
+					.append(", status : " + Promotion.Status.CREATED.getVal())
+					.append(",expanded:true")
+					.append(",children:[" + p_create + "]") 
+					.append("}");						
+				}
+
 				
 				String publish = children(staff, new PromotionDao.ExtraCond().setStatus(Status.PUBLISH));
 				if(!publish.isEmpty()){
-					pTree.append(",{")
+					if(!pTree.toString().isEmpty()){
+						pTree.append(",");
+					}
+					pTree.append("{")
 					.append("text:'已发布'")
 					.append(", status : " + Promotion.Status.PUBLISH.getVal())
 					.append(",expanded:true")
@@ -420,7 +431,10 @@ public class OperatePromotionAction extends DispatchAction{
 				
 				String progress = children(staff, new PromotionDao.ExtraCond().setStatus(Status.PROGRESS));
 				if(!progress.isEmpty()){
-					pTree.append(",{")
+					if(!pTree.toString().isEmpty()){
+						pTree.append(",");
+					}
+					pTree.append("{")
 					.append("text:'进行中'")
 					.append(", status : " + Promotion.Status.PROGRESS.getVal())
 					.append(",expanded:true")
@@ -430,7 +444,10 @@ public class OperatePromotionAction extends DispatchAction{
 	
 				String finish = children(staff, new PromotionDao.ExtraCond().setStatus(Status.FINISH));
 				if(!finish.isEmpty()){
-					pTree.append(",{")
+					if(!pTree.toString().isEmpty()){
+						pTree.append(",");
+					}
+					pTree.append("{")
 					.append("text:'已结束'")
 					.append(", status : " + Promotion.Status.FINISH.getVal())
 					.append(",expanded:true")
