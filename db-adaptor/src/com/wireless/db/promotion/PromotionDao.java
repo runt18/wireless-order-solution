@@ -487,7 +487,10 @@ public class PromotionDao {
 			throw new BusinessException(PromotionError.PROMOTION_NOT_EXIST);
 		}else{
 			Promotion promotion = result.get(0);
-			promotion.setCouponType(CouponTypeDao.getById(dbCon, staff, promotion.getCouponType().getId()));
+			if(promotion.getType() != Promotion.Type.DISPLAY_ONLY){
+				promotion.setCouponType(CouponTypeDao.getById(dbCon, staff, promotion.getCouponType().getId()));
+			}
+			
 			return promotion;
 		}
 	}
