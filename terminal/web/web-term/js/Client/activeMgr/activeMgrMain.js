@@ -67,6 +67,10 @@ function initCouponTypeWin(c){
 					
 					Ext.getCmp('active_memberBasicGrid').getStore().removeAll();
 					Ext.getCmp('active_memberTypeCombo').setValue(-1);
+					
+					Ext.getCmp('active_textTotalMemberCost').setValue();
+					Ext.getCmp('active_textTotalMemberCostCount').setValue();
+					
 					active_memberList = '';
 					
 					operatePromotTypeWin.otype = '';
@@ -100,10 +104,10 @@ function changeCouponModel(type){
 	var couponName = Ext.getCmp('active_couponName');
 	var price = Ext.getCmp('active_price');
 	if(type == 1){
-		couponName.setValue('十元中秋卷');
+		couponName.setValue();
 		price.setValue(10);
 	}else if(type == 2){
-		couponName.setValue('二十元中秋卷');
+		couponName.setValue();
 		price.setValue(20);	
 	}else if(type == 3){
 		couponName.setValue();
@@ -112,6 +116,7 @@ function changeCouponModel(type){
 	couponTypeId = type;
 	couponName.clearInvalid();
 	price.clearInvalid();
+	couponName.focus();
 }
 
 //1表示无优惠劵纯展示; 2表示无条件领取优惠劵
@@ -717,7 +722,6 @@ Ext.onReady(function() {
 					id : 'active_title',
 					xtype : 'textfield',
 					width : 200,
-					value : '中秋月圆',
 					fieldLabel : '&nbsp;&nbsp;&nbsp;活动标题',
 					allowBlank : false
 				}]
@@ -728,7 +732,6 @@ Ext.onReady(function() {
 					width : 90,
 					fieldLabel : '&nbsp;&nbsp;&nbsp;活动日期',
 					format : 'Y-m-d',
-					value : '2014-09-10',
 					readOnly : false,
 					allowBlank : false,
 					minValue : new Date(),
@@ -753,7 +756,6 @@ Ext.onReady(function() {
 					width : 90,
 					fieldLabel : '',
 					format : 'Y-m-d',
-					value : '2014-09-30',
 					readOnly : false,
 					allowBlank : false,
 					minValue : new Date(),
@@ -764,7 +766,6 @@ Ext.onReady(function() {
 				items : [{
 					id : 'active_point',
 					xtype : 'numberfield',
-					value : 100,
 					width : 90,
 					fieldLabel : '单次消费积分满/累计积分满',
 					allowBlank : false
@@ -892,7 +893,6 @@ Ext.onReady(function() {
 						items : [{
 							id : 'active_couponName',
 							xtype : 'textfield',
-							value : '十元中秋券',
 							fieldLabel : '优惠劵名称',
 							allowBlank : false
 						}]
@@ -910,7 +910,6 @@ Ext.onReady(function() {
 							xtype : 'datefield',
 							width : 130,
 							fieldLabel : '&nbsp;&nbsp;&nbsp;有效期至',
-							value : '2014-10-30',
 							format : 'Y-m-d',
 							readOnly : false,
 							allowBlank : false,
@@ -964,8 +963,7 @@ Ext.onReady(function() {
 		format : 'Y-m-d',
 		width : 100,
 		maxValue : new Date(),
-		readOnly : false,
-		allowBlank : false
+		readOnly : false
 	});
 	var active_member_endDate = new Ext.form.DateField({
 		xtype : 'datefield',
@@ -973,8 +971,7 @@ Ext.onReady(function() {
 		format : 'Y-m-d',
 		width : 100,
 		maxValue : new Date(),
-		readOnly : false,
-		allowBlank : false
+		readOnly : false
 	});
 	var active_member_dateCombo = Ext.ux.createDateCombo({
 		id : 'active_dateSearchDateCombo',
