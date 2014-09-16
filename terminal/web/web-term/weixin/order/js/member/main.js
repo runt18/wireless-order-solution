@@ -500,7 +500,7 @@ function toggleCouponContent(){
 function toggleCouponConsumeDetails(){
 	var mainView = $('#divMemberCouponConsumeDetails');
 	var tbody = mainView.find('table > tbody');
-	var templet = '<tr class="d-list-item-consume">'
+	var templet = '<tr class="d-list-item-coupon">'
 		+ '<td>{time}</td>'
 		+ '<td>{payMoney}</td>'
 		+ '<td>{couponMoney}</td>'
@@ -527,7 +527,7 @@ function toggleCouponConsumeDetails(){
 								for(var i = 0; i < data.root.length; i++){
 									temp = data.root[i];
 									html.push(templet.format({
-										time : fnDateInChinese(temp.operateDateFormat) + '</br><font style="font-size:13px;">账单号:' + temp.orderId + '</font>',
+										time : fnDateInChinese(temp.operateDateFormat) + '</br><font style="font-size:13px;">' + temp.couponName +'</font></br><font style="font-size:13px;">账单号:' + temp.orderId + '</font>',
 										payMoney : (checkDot(temp.payMoney)?parseFloat(temp.payMoney).toFixed(2) : temp.payMoney) + '元',
 										couponMoney : (checkDot(temp.couponMoney)?parseFloat(temp.couponMoney).toFixed(2) : temp.couponMoney) + '元'
 									}));
