@@ -70,6 +70,7 @@ function initCouponTypeWin(c){
 					active_memberList = '';
 					
 					operatePromotTypeWin.otype = '';
+					operatePromotTypeWin.pId = '';
 					
 					$("#wizard").steps("previous");
 					$("#wizard").steps("previous");
@@ -164,9 +165,9 @@ function promotionRule(pType, point){
 	if(point){
 		var rule = '';
 		if(pType == 3){
-			rule = '单次消费积分满<font style="color: red">' + point + '</font>分即可领取优惠劵';
+			rule = '活动规则 : 单次消费积分满<font style="color: red">' + point + '</font>分即可领取优惠劵';
 		}else if(pType == 4){
-			rule = '累计消费积分满<font style="color: red">' + point + '</font>分即可领取优惠劵';
+			rule = '活动规则 : 累计消费积分满<font style="color: red">' + point + '</font>分即可领取优惠劵';
 		}
 		return '<div style="margin: 10px 10px 10px 10px;color:LightSkyBlue; font-szie:14px;font-weight:bold;">'+ rule +'</div>';	
 	}else{
@@ -189,7 +190,7 @@ function getPromotionBodyById(id){
 																jr.root[0].body);
 																
 				Ext.getCmp('promotionCouponPreview').body.update('<div style="text-align:left; margin: 10px 10px 10px 20px;float:left;"><img height="160"  src="' + jr.root[0].coupon.image + '" /></div>'
-																+ '<div style="float:left;vertical-align: middle;line-height: 40px;"><br><span style="margin-top: 15px;">中秋十元优惠劵</span><br><span >面额 : 10 元</span><br><span >到期 : 2014-02-12</span></div>');												
+																+ '<div style="float:left;vertical-align: middle;line-height: 40px;"><br><span style="margin-top: 15px;">' + jr.root[0].coupon.name + '</span><br><span >面额 : ' + jr.root[0].coupon.price + ' 元</span><br><span >到期 : ' + jr.root[0].coupon.expiredFormat + '</span></div>');												
 			}
 		},
 		failure : function(res, opt){
@@ -431,6 +432,7 @@ Ext.onReady(function() {
 				handler : function(e){
 					Ext.get('divActiveInsert').show();
 					choosePromotionModel();
+					initCouponTypeWin({type : 'insert'});
 					operatePromotTypeWin.show();			
 				}
 			},{
