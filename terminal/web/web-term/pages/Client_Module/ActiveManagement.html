@@ -42,7 +42,6 @@ function buildPreviewHead(){
 //	if(Ext.getCmp('active_point').isValid()){
 		head += promotionRule(promotionType, Ext.getCmp('active_point').getValue());
 //	}
-	
 	return head;
 }	
 var operatePromotion = function(){
@@ -129,12 +128,17 @@ function fnValidSecondSteps(){
 		return false;
 	}
 	
+	if(promotionType != 1 && !Ext.getCmp('active_couponName').isValid()){
+		Ext.example.msg(title, '请填写优惠劵名称');
+		return false;
+	}
+	
 	if(promotionType != 1 && !Ext.getCmp('active_couponExpiredDate').isValid()){
 		Ext.example.msg(title, '请填写优惠劵到期时间');
 		return false;
 	}
 	
-	if((Ext.getCmp('active_couponExpiredDate').getValue().getTime() + 86000000) < (new Date()).getTime()){
+	if(promotionType != 1 && (Ext.getCmp('active_couponExpiredDate').getValue().getTime() + 86000000) < (new Date()).getTime()){
 		Ext.example.msg(title, '优惠劵有效期要大于当前时间');
 		return false;
 	}	
