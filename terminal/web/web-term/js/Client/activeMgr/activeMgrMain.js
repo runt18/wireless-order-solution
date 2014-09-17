@@ -76,6 +76,8 @@ function initCouponTypeWin(c){
 					operatePromotTypeWin.otype = '';
 					operatePromotTypeWin.pId = '';
 					
+					winUnhide = true;
+					
 					$("#wizard").steps("previous");
 					$("#wizard").steps("previous");
 				}
@@ -104,10 +106,10 @@ function changeCouponModel(type){
 	var couponName = Ext.getCmp('active_couponName');
 	var price = Ext.getCmp('active_price');
 	if(type == 1){
-		couponName.setValue();
+		couponName.setValue('十元优惠劵');
 		price.setValue(10);
 	}else if(type == 2){
-		couponName.setValue();
+		couponName.setValue('二十元优惠劵');
 		price.setValue(20);	
 	}else if(type == 3){
 		couponName.setValue();
@@ -125,9 +127,10 @@ function choosePromotionModel(){
 		Ext.getCmp('active_secendStep2CouponImg').hide();
 		Ext.getCmp('active_secendStep2CouponDetail').hide();
 		Ext.getCmp('active_secendStep2SelectCoupon').hide();
-		Ext.getCmp('secondStep_edit').setHeight(463);
+		Ext.getCmp('secondStep_edit').setHeight(440);
 		Ext.getCmp('active_point').hide();
 		Ext.getCmp('active_point').getEl().up('.x-form-item').setDisplayed(false);
+		Ext.getCmp('active_pointLastText').hide();
 		Ext.getCmp('hide_activeOccupy').show();
 	}else if(promotionType == 2){
 		Ext.getCmp('active_secendStep2CouponImg').show();
@@ -136,21 +139,23 @@ function choosePromotionModel(){
 		Ext.getCmp('active_point').hide();
 		Ext.getCmp('active_point').setValue(0);
 		Ext.getCmp('active_point').getEl().up('.x-form-item').setDisplayed(false);
+		Ext.getCmp('active_pointLastText').hide();
 		Ext.getCmp('hide_activeOccupy').show();
-		Ext.getCmp('secondStep_edit').setHeight(348);
+		Ext.getCmp('secondStep_edit').setHeight(325);
 	}else{
 		Ext.getCmp('active_secendStep2CouponImg').show();
 		Ext.getCmp('active_secendStep2CouponDetail').show();
 		Ext.getCmp('active_secendStep2SelectCoupon').show();
 		Ext.getCmp('active_point').show();
+		Ext.getCmp('active_pointLastText').show();
 		Ext.getCmp('active_point').getEl().up('.x-form-item').setDisplayed(true);	
 		Ext.getCmp('hide_activeOccupy').hide();
-		Ext.getCmp('secondStep_edit').setHeight(348);
+		Ext.getCmp('secondStep_edit').setHeight(325);
 		
 		if(promotionType == 3){
-			Ext.getCmp('active_point').label.dom.innerHTML = '单次消费积分满:'
+			Ext.getCmp('active_point').label.dom.innerHTML = '活动规则: 单次消费积分满'
 		}else if(promotionType == 4){
-			Ext.getCmp('active_point').label.dom.innerHTML = '累计积分满:'
+			Ext.getCmp('active_point').label.dom.innerHTML = '活动规则: 累计积分满'
 		}
 		
 		
@@ -636,7 +641,7 @@ Ext.onReady(function() {
 		id : 'secondStep_edit',
 		hideLabel : true,
 		width : 510,
-		height : 350,
+		height : 325,
 		enableAlignments: false,
         enableColors: true,
         enableFont: false,
@@ -676,6 +681,7 @@ Ext.onReady(function() {
 	});
 	var secendStepWest = new Ext.form.FormPanel({
 		width : 510,
+		title : '编辑活动内容:',
 		items : [p_edit],
 		style : 'marginLeft:40px;',
 		buttonAlign : 'center',
@@ -718,12 +724,19 @@ Ext.onReady(function() {
 					html : '单次消费积分满/累计积分满-有优惠劵'
 				}]
 			},{
+				columnWidth : .3,
 				items : [{
 					id : 'active_title',
 					xtype : 'textfield',
 					width : 200,
 					fieldLabel : '&nbsp;&nbsp;&nbsp;活动标题',
-					allowBlank : false
+					style : 'overflow: hidden;',
+					allowBlank : false,
+					listeners : {
+						blur : function(){
+							Ext.getCmp('btnSecondStepEastBody').handler();
+						}
+					}
 				}]
 			}, {
 				items : [{
@@ -739,7 +752,10 @@ Ext.onReady(function() {
 					listeners : {
 						invalid : function(thiz){
 							thiz.clearInvalid();
-						}
+						},
+						blur : function(){
+							Ext.getCmp('btnSecondStepEastBody').handler();
+						}						
 					}					
 				}]				
 			}, {
@@ -759,16 +775,39 @@ Ext.onReady(function() {
 					readOnly : false,
 					allowBlank : false,
 					minValue : new Date(),
-					blankText : '日期不能为空.'				
+					blankText : '日期不能为空.',
+					listeners : {
+						blur : function(){
+							Ext.getCmp('btnSecondStepEastBody').handler();
+						}
+					}				
 				}]				
 			},{
-				labelWidth : 95,
+				labelWidth : 125,
 				items : [{
 					id : 'active_point',
 					xtype : 'numberfield',
 					width : 90,
 					fieldLabel : '单次消费积分满/累计积分满',
-					allowBlank : false
+					allowBlank : false,
+					listeners : {
+						blur : function(){
+							Ext.getCmp('btnSecondStepEastBody').handler();
+						}
+					}	
+				}]
+			},{
+				labelWidth : 95,
+				items : [{
+					id : 'active_pointLastText',
+					xtype : 'label',
+					width : 90,
+					text : '可领取优惠劵',
+					listeners : {
+						render : function(e){
+							e.getEl().dom.parentNode.style.paddingTop = '3px';
+						}
+					}
 				}]
 			}]
 		}]
@@ -894,6 +933,7 @@ Ext.onReady(function() {
 							id : 'active_couponName',
 							xtype : 'textfield',
 							fieldLabel : '优惠劵名称',
+							value : '十元优惠劵',
 							allowBlank : false
 						}]
 					},{
@@ -1119,7 +1159,7 @@ Ext.onReady(function() {
 				handler : function(e){
 					Ext.getCmp('active_member_btnHeightSearch').handler();
 					var gs = memberBasicGrid.getStore();
-					Ext.getCmp('active_dateSearchDateCombo').fireEvent('select', Ext.getCmp('active_dateSearchDateCombo'), null, 4);
+//					Ext.getCmp('active_dateSearchDateCombo').fireEvent('select', Ext.getCmp('active_dateSearchDateCombo'), null, 4);
 					Ext.Ajax.request({
 						url : '../../QueryMember.do',
 						params : {dataSource : 'active'},
@@ -1149,6 +1189,7 @@ Ext.onReady(function() {
 				text : '沉睡会员',
 				iconCls : 'btn_edit',
 				handler : function(e){
+					Ext.getCmp('active_member_btnHeightSearch').handler();
 					var gs = memberBasicGrid.getStore();
 					Ext.Ajax.request({
 						url : '../../QueryMember.do',
@@ -1163,7 +1204,7 @@ Ext.onReady(function() {
 							Ext.getCmp('active_dateSearchDateBegin').setValue(jr.other.beginDate.substring(0,10));
 							Ext.getCmp('active_dateSearchDateEnd').setValue(jr.other.endDate.substring(0,10));
 							Ext.getCmp('active_dateSearchDateCombo').setValue(jr.other.range);
-							Ext.getCmp('active_textTotalMaxMemberCostCount').setValue(jr.other.maxConsumeAmount);
+							Ext.getCmp('active_textTotalMemberCostCount').setValue(jr.other.maxConsumeAmount);
 							Ext.getCmp('active_memberAmountEqual').setValue(2);
 							
 							gs.baseParams['consumptionMaxAmount'] = jr.other.maxConsumeAmount;
@@ -1327,4 +1368,5 @@ Ext.onReady(function() {
  	$('#secondStepEastBody').children().first().children().first().css('overflow-y', 'visible');
  	$('#threeStepEastBody').children().first().children().first().css('overflow-y', 'visible');
  	$('#promotionPreviewBody').children().first().children().first().css('overflow-y', 'visible');
+ 	
 });
