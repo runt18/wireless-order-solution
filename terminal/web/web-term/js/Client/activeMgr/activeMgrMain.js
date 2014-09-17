@@ -783,7 +783,7 @@ Ext.onReady(function() {
 					}				
 				}]				
 			},{
-				labelWidth : 125,
+				labelWidth : 145,
 				items : [{
 					id : 'active_point',
 					xtype : 'numberfield',
