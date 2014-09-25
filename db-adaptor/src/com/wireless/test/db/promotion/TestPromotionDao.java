@@ -1,6 +1,9 @@
 package com.wireless.test.db.promotion;
 
 import java.beans.PropertyVetoException;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.List;
@@ -9,28 +12,39 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import com.aliyun.openservices.oss.OSSClient;
+import com.aliyun.openservices.oss.OSSException;
 import com.wireless.db.client.member.MemberDao;
+import com.wireless.db.oss.OssImageDao;
 import com.wireless.db.promotion.CouponDao;
 import com.wireless.db.promotion.CouponTypeDao;
 import com.wireless.db.promotion.PromotionDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
+import com.wireless.exception.OssImageError;
 import com.wireless.exception.PromotionError;
 import com.wireless.pojo.billStatistics.DateRange;
 import com.wireless.pojo.client.Member;
+import com.wireless.pojo.oss.OssImage;
 import com.wireless.pojo.promotion.Coupon;
 import com.wireless.pojo.promotion.CouponType;
 import com.wireless.pojo.promotion.Promotion;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.test.db.TestInit;
+import com.wireless.test.db.oss.TestOssImage;
 
 public class TestPromotionDao {
 
 	private static Staff mStaff;
 	
+	private static OSSClient ossClient;
+	
 	@BeforeClass
 	public static void initDbParam() throws PropertyVetoException, BusinessException{
 		TestInit.init();
+		ossClient = new OSSClient("http://" + OssImage.Params.instance().getOssParam().OSS_INNER_POINT, 
+								  OssImage.Params.instance().getOssParam().ACCESS_OSS_ID, 
+								  OssImage.Params.instance().getOssParam().ACCESS_OSS_KEY);
 		try {
 			mStaff = StaffDao.getByRestaurant(63).get(0);
 		} catch (SQLException e) {
@@ -39,7 +53,7 @@ public class TestPromotionDao {
 	}
 	
 	@Test 
-	public void testCreatePromotion() throws SQLException, BusinessException, ParseException{
+	public void testCreatePromotion() throws SQLException, BusinessException, ParseException, IOException{
 		int promotionId = 0;
 		int couponTypeId = 0;
 		try{
@@ -49,7 +63,13 @@ public class TestPromotionDao {
 			Member m3 = members.get(2);
 			
 			//--------Test to create a promotion-----------
-			CouponType.InsertBuilder typeInsertBuilder = new CouponType.InsertBuilder("测试优惠券类型", 30).setComment("测试备注").setImage("2912w3slka.jpg");//.setExpired(System.currentTimeMillis() / 1000 * 1000);
+			String fileName = System.getProperty("user.dir") + "/src/" + TestOssImage.class.getPackage().getName().replaceAll("\\.", "/") + "/test.jpg";
+			
+			int ossImageId = OssImageDao.insert(mStaff, new OssImage.InsertBuilder(OssImage.Type.WX_PROMOTION, 1).setImgResource(OssImage.ImageType.JPG, new FileInputStream(new File(fileName))));
+
+			CouponType.InsertBuilder typeInsertBuilder = new CouponType.InsertBuilder("测试优惠券类型", 30)
+																	   .setComment("测试备注")
+																	   .setImage(ossImageId);//.setExpired(System.currentTimeMillis() / 1000 * 1000);
 			Promotion.CreateBuilder promotionCreateBuilder = Promotion.CreateBuilder
 																	  .newInstance("测试优惠活动", new DateRange("2015-1-1", "2015-2-1"), "hello world<br>", Promotion.Type.FREE, typeInsertBuilder)
 																	  .addMember(m1.getId()).addMember(m2.getId());
@@ -69,7 +89,10 @@ public class TestPromotionDao {
 			compare(promotionId, Coupon.Status.CREATED, couponTypeId, m2, CouponDao.getByCond(mStaff, new CouponDao.ExtraCond().setMember(m2).setPromotion(promotionId), null).get(0));
 			
 			//--------Test to update a promotion-----------
-			CouponType.UpdateBuilder typeUpdateBuilder = new CouponType.UpdateBuilder(couponTypeId, "修改测试优惠券类型").setComment("修改测试备注").setImage("3912w3slka.jpg").setPrice(50);
+			CouponType.UpdateBuilder typeUpdateBuilder = new CouponType.UpdateBuilder(couponTypeId, "修改测试优惠券类型")
+																	   .setComment("修改测试备注")
+																	   .setImage(OssImage.ImageType.JPG, new FileInputStream(new File(fileName)))
+																	   .setPrice(50);
 			Promotion.UpdateBuilder promotionUpdateBuilder = new Promotion.UpdateBuilder(promotionId).setRange(new DateRange("2015-2-1", "2015-3-1"))
 																									 .setTitle("修改优惠活动")
 																									 .setBody("hello jingjing<br>")
@@ -123,6 +146,7 @@ public class TestPromotionDao {
 
 		}finally{
 			if(promotionId != 0){
+				Promotion original = PromotionDao.getById(mStaff, promotionId);
 				PromotionDao.delete(mStaff, promotionId);
 				try{
 					PromotionDao.getById(mStaff, promotionId);
@@ -133,6 +157,16 @@ public class TestPromotionDao {
 						CouponTypeDao.getById(mStaff, couponTypeId);
 					}catch(BusinessException e2){
 						Assert.assertEquals("failed to delete the promotion", PromotionError.COUPON_TYPE_NOT_EXIST, e2.getErrCode());
+					}
+					try{
+						OssImageDao.getById(mStaff, original.getCouponType().getImage().getId());
+					}catch(BusinessException e2){
+						Assert.assertEquals("failed to delete oss image", OssImageError.OSS_IMAGE_NOT_EXIST, e2.getErrCode());
+					}
+					try{
+						ossClient.getObject(OssImage.Params.instance().getBucket(), original.getCouponType().getImage().getObjectKey());
+						Assert.assertTrue("failed to delete the image from aliyun oss storage", false);
+					}catch(OSSException ignored){
 					}
 				}
 			}
@@ -157,7 +191,11 @@ public class TestPromotionDao {
 		Assert.assertEquals("restaurant : insert coupon type", mStaff.getRestaurantId(), actual.getCouponType().getRestaurantId());
 		Assert.assertEquals("expired : insert coupon type", expected.getCouponType().getExpired(), actual.getCouponType().getExpired());
 		Assert.assertEquals("comment : insert coupon type", expected.getCouponType().getComment(), actual.getCouponType().getComment());
-		Assert.assertEquals("image : insert image", expected.getCouponType().getImage(), actual.getCouponType().getImage());
+		
+		//The content to associated coupon type image
+		Assert.assertEquals("oss image type", OssImage.Type.WX_COUPON_TYPE, actual.getCouponType().getImage().getType());
+		Assert.assertEquals("oss image associated id", actual.getCouponType().getId(), actual.getCouponType().getImage().getAssociatedId());
+		Assert.assertTrue("failed to put image to oss storage", ossClient.getObject(OssImage.Params.instance().getBucket(), actual.getCouponType().getImage().getObjectKey()) != null);
 	}
 	
 	private void compare(int expectedPromotion, Coupon.Status expectedStatus, int expectedType, Member expectedMember, Coupon actual){

@@ -1,5 +1,6 @@
 package com.wireless.db.promotion;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -66,8 +67,10 @@ public class PromotionDao {
 	 * 			throws if failed to execute any SQL statement
 	 * @throws BusinessException
 	 * 			throws if the created date of promotion exceed current time
+	 * @throws IOException 
+	 * 			throws if failed to put the image of coupon type to oss storage 
 	 */
-	public static int create(Staff staff, Promotion.CreateBuilder builder) throws SQLException, BusinessException{
+	public static int create(Staff staff, Promotion.CreateBuilder builder) throws SQLException, BusinessException, IOException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -100,8 +103,10 @@ public class PromotionDao {
 	 * 			throws if failed to execute any SQL statement
 	 * @throws BusinessException
 	 * 			throws if the created date of promotion exceed current time
+	 * @throws IOException 
+	 * 			throws if failed to put the image of coupon type to oss storage 
 	 */
-	public static int create(DBCon dbCon, Staff staff, Promotion.CreateBuilder builder) throws SQLException, BusinessException{
+	public static int create(DBCon dbCon, Staff staff, Promotion.CreateBuilder builder) throws SQLException, BusinessException, IOException{
 		
 		Promotion promotion = builder.build();
 		
@@ -162,8 +167,10 @@ public class PromotionDao {
 	 * 			<li>throws if the promotion status does NOT belong to 'CREATED'
 	 * 			<li>throws if the promotion to update does NOT exist
 	 * 			<li>throws if the promotion's start exceed now if date range changed
+	 * @throws IOException 
+	 * 			throws if failed to put the image of coupon type to oss storage  
 	 */
-	public static void update(Staff staff, Promotion.UpdateBuilder builder) throws SQLException, BusinessException{
+	public static void update(Staff staff, Promotion.UpdateBuilder builder) throws SQLException, BusinessException, IOException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -187,8 +194,10 @@ public class PromotionDao {
 	 * 			<li>throws if the promotion status does NOT belong to 'CREATED'
 	 * 			<li>throws if the promotion to update does NOT exist
 	 * 			<li>throws if the promotion's start exceed now if date range changed
+	 * @throws IOException 
+	 * 			throws if failed to put the image of coupon type to oss storage 
 	 */
-	public static void update(DBCon dbCon, Staff staff, Promotion.UpdateBuilder builder) throws SQLException, BusinessException{
+	public static void update(DBCon dbCon, Staff staff, Promotion.UpdateBuilder builder) throws SQLException, BusinessException, IOException{
 
 		Promotion promotion = builder.build();
 		
@@ -289,8 +298,11 @@ public class PromotionDao {
 		}
 		
 		//Assure the opening time to this promotion before now
-		if(promotion.getDateRange().getOpeningTime() < System.currentTimeMillis()){
-			throw new BusinessException("活动的开始日期应该在当前日期之后", PromotionError.PROMOTION_PUBLISH_NOT_ALLOW);
+		//Check to see whether the start date exceed now.
+		Calendar c = Calendar.getInstance();
+		c.add(Calendar.DAY_OF_YEAR, -1);
+		if(promotion.getDateRange().getOpeningTime() < c.getTimeInMillis()){
+			throw new BusinessException("活动的开始日期应该在当前日期之后", PromotionError.PROMOTION_START_DATE_EXCEED_NOW);
 		}
 		
 		String sql;

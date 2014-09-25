@@ -1,7 +1,6 @@
 package com.wireless.db.promotion;
 
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,6 +14,7 @@ import com.wireless.exception.PromotionError;
 import com.wireless.pojo.client.Member;
 import com.wireless.pojo.client.MemberOperation;
 import com.wireless.pojo.client.MemberType;
+import com.wireless.pojo.oss.OssImage;
 import com.wireless.pojo.promotion.Coupon;
 import com.wireless.pojo.promotion.CouponType;
 import com.wireless.pojo.promotion.Promotion;
@@ -28,6 +28,7 @@ public class CouponDao {
 		private int memberId;
 		private int couponTypeId;
 		private int promotionId;
+		private final List<Promotion.Status> promotionStatus = new ArrayList<Promotion.Status>();
 		
 		public ExtraCond setId(int id){
 			this.id = id;
@@ -64,6 +65,11 @@ public class CouponDao {
 			return this;
 		}
 		
+		public ExtraCond addPromotionStatus(Promotion.Status status){
+			this.promotionStatus.add(status);
+			return this;
+		}
+		
 		@Override
 		public String toString(){
 			StringBuilder extraCond = new StringBuilder();
@@ -81,6 +87,17 @@ public class CouponDao {
 			}
 			if(promotionId != 0){
 				extraCond.append(" AND C.promotion_id = " + promotionId);
+			}
+			StringBuilder psCond = new StringBuilder();
+			for(Promotion.Status status : promotionStatus){
+				if(psCond.length() == 0){
+					psCond.append(" P.status = " + status.getVal());
+				}else{
+					psCond.append(" OR P.status = " + status.getVal());
+				}
+			}
+			if(psCond.length() != 0){
+				extraCond.append(" AND (" + psCond.toString() + ")");
 			}
 			return extraCond.toString();
 		}
@@ -246,6 +263,7 @@ public class CouponDao {
 			String sql;
 			sql = " UPDATE " + Params.dbName + ".coupon SET " +
 				  " status = " + Coupon.Status.DRAWN.getVal() +
+				  " ,draw_date = NOW() " +
 				  " WHERE coupon_id = " + couponId;
 			if(dbCon.stmt.executeUpdate(sql) == 0){
 				throw new BusinessException(PromotionError.COUPON_NOT_EXIST);
@@ -373,23 +391,23 @@ public class CouponDao {
 			coupon.setPromotion(promotion);
 
 			if(coupon.getStatus() == Coupon.Status.PUBLISHED && promotion.getStatus() == Promotion.Status.PROGRESS){
-				if(promotion.getType() == Promotion.Type.FREE){
-					coupon.setDrawProgress(0);
-				}else{
+				if(promotion.getType() == Promotion.Type.TOTAL || promotion.getType() == Promotion.Type.ONCE){
 					String sql;
-					sql = " SELECT delta_point FROM " + Params.dbName + ".member_operation " +
+					sql = " SELECT delta_point, operate_date FROM " + Params.dbName + ".member_operation " +
 						  " WHERE 1 = 1 " +
 						  " AND member_id = " + coupon.getMember().getId() +
 						  " AND operate_type = " + MemberOperation.OperationType.CONSUME.getValue() + 
 						  " AND operate_date BETWEEN '" + promotion.getDateRange().getOpeningFormat() + "' AND '" + promotion.getDateRange().getEndingFormat() + "'" +
 						  " UNION " +
-						  " SELECT delta_point FROM " + Params.dbName + ".member_operation_history " +
+						  " SELECT delta_point, operate_date FROM " + Params.dbName + ".member_operation_history " +
 						  " WHERE 1 = 1 " +
 						  " AND member_id = " + coupon.getMember().getId() +
 						  " AND operate_type = " + MemberOperation.OperationType.CONSUME.getValue() + 
 						  " AND operate_date BETWEEN '" + promotion.getDateRange().getOpeningFormat() + "' AND '" + promotion.getDateRange().getEndingFormat() + "'";
 					
 					if(promotion.getType() == Promotion.Type.ONCE){
+						//String sql4LastestDraw = " SELECT draw_date FROM " + Params.dbName + ".coupon WHERE promotion_id = " + promotion.getId() + " ORDER BY draw_date DESC LIMIT 1 ";
+						//sql = " SELECT MAX(delta_point) AS max_point FROM ( " + sql + " ) AS TMP WHERE TMP.operate_date >= ( " + sql4LastestDraw + ")";
 						sql = " SELECT MAX(delta_point) AS max_point FROM ( " + sql + " ) AS TMP ";
 					}else if(promotion.getType() == Promotion.Type.TOTAL){
 						sql = " SELECT SUM(delta_point) AS total_point FROM ( " + sql + " ) AS TMP ";
@@ -447,8 +465,8 @@ public class CouponDao {
 		List<Coupon> result = new ArrayList<Coupon>();
 		String sql;
 		sql = " SELECT " +
-			  " C.coupon_id, C.restaurant_id, C.birth_date, C.order_id, C.order_date, C.status, " +
-			  " C.coupon_type_id, CT.name, CT.price, CT.expired, CT.image, " +
+			  " C.coupon_id, C.restaurant_id, C.birth_date, C.draw_date, C.order_id, C.order_date, C.status, " +
+			  " C.coupon_type_id, CT.name, CT.price, CT.expired, CT.oss_image_id, " +
 			  " C.member_id, M.name AS member_name, M.mobile, M.member_card, M.`consumption_amount`, M.point, M.`base_balance`, M.`extra_balance`, MT.name AS memberTypeName, " +
 			  " C.promotion_id, P.title " +
 			  " FROM " + Params.dbName + ".coupon C " +
@@ -465,10 +483,12 @@ public class CouponDao {
 			Coupon coupon = new Coupon(dbCon.rs.getInt("coupon_id"));
 			coupon.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
 			coupon.setBirthDate(dbCon.rs.getTimestamp("birth_date").getTime());
+			if(dbCon.rs.getTimestamp("draw_date") != null){
+				coupon.setDrawDate(dbCon.rs.getTimestamp("draw_date").getTime());
+			}
 			coupon.setOrderId(dbCon.rs.getInt("order_id"));
-			Timestamp ts = dbCon.rs.getTimestamp("order_date");
-			if(ts != null){
-				coupon.setOrderDate(ts.getTime());
+			if(dbCon.rs.getTimestamp("order_date") != null){
+				coupon.setOrderDate(dbCon.rs.getTimestamp("order_date").getTime());
 			}
 			coupon.setStatus(Coupon.Status.valueOf(dbCon.rs.getInt("status")));
 			
@@ -477,7 +497,7 @@ public class CouponDao {
 			ct.setPrice(dbCon.rs.getFloat("price"));
 			ct.setName(dbCon.rs.getString("name"));
 			ct.setExpired(dbCon.rs.getTimestamp("expired").getTime());
-			ct.setImage(dbCon.rs.getString("image"));
+			ct.setImage(new OssImage(dbCon.rs.getInt("oss_image_id")));
 			coupon.setCouponType(ct);
 			
 			Member m = new Member(dbCon.rs.getInt("member_id"));

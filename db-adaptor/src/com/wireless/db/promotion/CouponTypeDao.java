@@ -1,5 +1,6 @@
 package com.wireless.db.promotion;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -8,8 +9,10 @@ import java.util.List;
 import com.mysql.jdbc.Statement;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
+import com.wireless.db.oss.OssImageDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.PromotionError;
+import com.wireless.pojo.oss.OssImage;
 import com.wireless.pojo.promotion.Coupon;
 import com.wireless.pojo.promotion.CouponType;
 import com.wireless.pojo.staffMgr.Staff;
@@ -26,12 +29,22 @@ public class CouponTypeDao {
 	 * @return the id to coupon type just inserted
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException 
+	 * 			throws if the image resource to coupon type does NOT exist
+	 * @throws IOException 
+	 * 			throws if failed to upload the image to coupon type
 	 */
-	public static int insert(Staff staff, CouponType.InsertBuilder builder) throws SQLException{
+	public static int insert(Staff staff, CouponType.InsertBuilder builder) throws SQLException, IOException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return insert(dbCon, staff, builder);
+			dbCon.conn.setAutoCommit(false);
+			int id = insert(dbCon, staff, builder);
+			dbCon.conn.commit();
+			return id;
+		}catch(BusinessException | IOException | SQLException e){
+			dbCon.conn.rollback();
+			throw e;
 		}finally{
 			dbCon.disconnect();
 		}
@@ -48,26 +61,41 @@ public class CouponTypeDao {
 	 * @return the id to coupon type just inserted
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
+	 * @throws BusinessException 
+	 * 			throws if the image resource to coupon type does NOT exist
+	 * @throws IOException 
+	 * 			throws if failed to upload the image to coupon type
 	 */
-	public static int insert(DBCon dbCon, Staff staff, CouponType.InsertBuilder builder) throws SQLException{
+	public static int insert(DBCon dbCon, Staff staff, CouponType.InsertBuilder builder) throws SQLException, IOException, BusinessException{
 		CouponType type = builder.build();
+		
 		String sql;
 		sql = " INSERT INTO " + Params.dbName + ".coupon_type " +
-			  " (`restaurant_id`, `name`, `price`, `expired`, `comment`, `image`) VALUES(" +
+			  " (`restaurant_id`, `name`, `price`, `expired`, `oss_image_id`, `comment`) VALUES(" +
 			  staff.getRestaurantId() + "," +
 			  "'" + type.getName() + "'," +
 			  type.getPrice() + "," +
 			  "'" + DateUtil.format(type.getExpired(), DateUtil.Pattern.DATE_TIME) + "'," +
-			  "'" + type.getComment() + "'," +
-			  "'" + type.getImage() + "'" +
+			  type.getImage().getId() + "," +
+			  "'" + type.getComment() + "'" +
 			  ")";
 		dbCon.stmt.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
 		dbCon.rs = dbCon.stmt.getGeneratedKeys();
+		int id = 0;
 		if(dbCon.rs.next()){
-			return dbCon.rs.getInt(1);
+			id = dbCon.rs.getInt(1);
 		}else{
 			throw new SQLException("The id of coupon type is not generated successfully.");
 		}
+		dbCon.rs.close();
+		
+		//Married the oss image with this coupon type.
+		if(builder.hasImage()){
+			OssImageDao.update(dbCon, staff, new OssImage.UpdateBuilder(type.getImage().getId()).setAssociated(OssImage.Type.WX_COUPON_TYPE, id));
+		}
+		
+		return id;
+		
 	}
 	
 	/**
@@ -80,8 +108,10 @@ public class CouponTypeDao {
 	 * 			throws if the coupon type to update does NOT exist
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
+	 * @throws IOException 
+	 * 			throws if failed to upload the image to oss storage
 	 */
-	public static void update(Staff staff, CouponType.UpdateBuilder builder) throws BusinessException, SQLException{
+	public static void update(Staff staff, CouponType.UpdateBuilder builder) throws BusinessException, SQLException, IOException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -108,8 +138,10 @@ public class CouponTypeDao {
 	 * 			throws if the coupon type to update does NOT exist
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
+	 * @throws IOException 
+	 * 			throws if failed to upload the image to oss storage
 	 */
-	public static void update(DBCon dbCon, Staff staff, CouponType.UpdateBuilder builder) throws BusinessException, SQLException{
+	public static void update(DBCon dbCon, Staff staff, CouponType.UpdateBuilder builder) throws BusinessException, SQLException, IOException{
 		CouponType type = builder.build();
 		String sql;
 		
@@ -133,13 +165,24 @@ public class CouponTypeDao {
 			}
 		}
 		
+		if(builder.isImageChanged()){
+			//Update the other oss images to this coupon type to be single. 
+			sql = " UPDATE " + Params.dbName + ".oss_image SET " +
+			      " associated_id = 0 " +
+				  " status = " + OssImage.Status.SINGLE.getVal() +
+				  " WHERE type = " + OssImage.Type.WX_COUPON_TYPE.getVal() +
+				  " AND associated_id = " + type.getId();
+			dbCon.stmt.executeUpdate(sql);
+			//Married the oss image with this coupon type.
+			OssImageDao.update(dbCon, staff, new OssImage.UpdateBuilder(type.getImage().getId()).setAssociated(OssImage.Type.WX_COUPON_TYPE, type.getId()));
+		}
+		
 		sql = " UPDATE " + Params.dbName + ".coupon_type SET " +
 			  " coupon_type_id = " + type.getId() +
 			  (builder.isNameChanged() ? " ,name = '" + type.getName() + "'" : "") +
 			  (builder.isPriceChanged() ? " ,price = " + type.getPrice() : "") +
 			  (builder.isExpiredChanged() ? " ,expired = '" + DateUtil.format(type.getExpired()) + "'" : "") +
 			  (builder.isCommentChanged() ? " ,comment = '" + type.getComment() + "'" : "") +
-			  (builder.isImageChanged() ? " ,image = '" + type.getImage() + "'" : "") +
 			  " WHERE coupon_type_id = " + type.getId();
 		if(dbCon.stmt.executeUpdate(sql) == 0){
 			throw new BusinessException(PromotionError.COUPON_TYPE_NOT_EXIST);
@@ -190,6 +233,9 @@ public class CouponTypeDao {
 		
 		//Delete the associated coupon.
 		CouponDao.delete(dbCon, staff, new CouponDao.ExtraCond().setCouponType(couponTypeId));
+		
+		//Delete the associated coupon type image.
+		OssImageDao.delete(dbCon, staff, new OssImageDao.ExtraCond().setAssociated(OssImage.Type.WX_COUPON_TYPE, couponTypeId));
 		
 		String sql;
 		//Delete the coupon type.
@@ -272,14 +318,18 @@ public class CouponTypeDao {
 		if(result.isEmpty()){
 			throw new BusinessException(PromotionError.COUPON_TYPE_NOT_EXIST);
 		}else{
-			return result.get(0);
+			CouponType type = result.get(0);
+			if(type.hasImage()){
+				type.setImage(OssImageDao.getById(dbCon, staff, type.getImage().getId()));
+			}
+			return type;
 		}
 	}
 	
 	private static List<CouponType> getByCond(DBCon dbCon, Staff staff, String extraCond, String orderClause) throws SQLException{
 		String sql;
 		sql = " SELECT " +
-			  " coupon_type_id, restaurant_id, name, price, expired, comment, image " +
+			  " coupon_type_id, restaurant_id, name, price, expired, comment, oss_image_id " +
 			  " FROM " + Params.dbName + ".coupon_type " +
 			  " WHERE restaurant_id = " + staff.getRestaurantId() +
 			  (extraCond != null ? extraCond : " ") +
@@ -294,7 +344,9 @@ public class CouponTypeDao {
 			type.setPrice(dbCon.rs.getFloat("price"));
 			type.setExpired(dbCon.rs.getTimestamp("expired").getTime());
 			type.setComment(dbCon.rs.getString("comment"));
-			type.setImage(dbCon.rs.getString("image"));
+			if(dbCon.rs.getInt("oss_image_id") != 0){
+				type.setImage(new OssImage(dbCon.rs.getInt("oss_image_id")));
+			}
 			result.add(type);
 		}
 		dbCon.rs.close();
