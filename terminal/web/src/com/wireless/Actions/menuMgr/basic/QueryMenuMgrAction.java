@@ -84,7 +84,7 @@ public class QueryMenuMgrAction extends Action {
 					operqtor = "=";
 				}
 			}
-			if(kitchen != null && !kitchen.trim().isEmpty()){
+			if(kitchen != null && !kitchen.trim().isEmpty() && !kitchen.equals("-1")){
 				extraCond += (" AND FOOD.kitchen_id = " + kitchen);
 			}
 			if(deptId != null && !deptId.trim().isEmpty()){

@@ -125,8 +125,8 @@ public class QueryStockActionAction extends Action{
 				
 				root = DataPaging.getPagingData(root, isPaging, start, limit);
 				root.add(totalStockAction);
-				jobject.setRoot(root);
 			}
+			jobject.setRoot(root);
 			response.getWriter().print(jobject.toString());
 		}
 		return null;

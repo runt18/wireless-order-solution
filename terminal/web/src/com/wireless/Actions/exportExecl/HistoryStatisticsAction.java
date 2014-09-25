@@ -2394,12 +2394,12 @@ public class HistoryStatisticsAction extends DispatchAction{
 /*				if(totalBalance != null && !totalBalance.trim().isEmpty())
 				extraCond += (" AND (M.base_balance + M.extra_balance) " + so + totalBalance);*/
 			
-			if(usedBalance != null && !usedBalance.trim().isEmpty())
+/*			if(usedBalance != null && !usedBalance.trim().isEmpty())
 				extraCond.setTotalConsume(0, Integer.parseInt(usedBalance));
 				
 			
 			if(consumptionAmount != null && !consumptionAmount.trim().isEmpty())
-				extraCond.setConsumeRange(0, Integer.parseInt(consumptionAmount));
+				extraCond.setConsumeRange(0, Integer.parseInt(consumptionAmount));*/
 			
 /*				if(usedPoint != null && !usedPoint.trim().isEmpty())
 				extraCond += (" AND M.total_point " + so + usedPoint);

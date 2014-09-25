@@ -1,5 +1,6 @@
 package com.wireless.Actions.inventoryMgr.materialCate;
 
+import java.sql.SQLException;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -90,46 +91,67 @@ public class QueryMaterialCateAction extends DispatchAction{
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
 		
+		String pin = (String) request.getAttribute("pin");
+		Staff staff = StaffDao.verify(Integer.parseInt(pin));
+		StringBuilder tree = new StringBuilder();
 		
-		JObject jobject = new JObject();
-		List<MaterialCate> list = null;
-		MaterialCate item = null;
-		StringBuffer tree = new StringBuffer();
 		try{
-//			String pin = (String)request.getAttribute("pin");
-			String restaurantID = (String) request.getAttribute("restaurantID");
-			String type = request.getParameter("type");
-			
-			String extra = "";
-			extra = " AND MC.restaurant_id = " + restaurantID;
-			extra += (" AND MC.type = " + (type != null && !type.isEmpty() ? type : "2"));
-			
-			Map<Object, Object> params = new LinkedHashMap<Object, Object>();
-			params.put(SQLUtil.SQL_PARAMS_EXTRA, extra);
-			list = MaterialCateDao.getContent(params);
-			tree.append("[");
-			for(int i = 0; i < list.size(); i++){
-				item = list.get(i);
-				if(i>0)
-					tree.append(",");	
-				tree.append("{");
-				tree.append("leaf:true");
-				tree.append(",text:'" + item.getName() + "'");
-				tree.append(",cateId:" + item.getId());
-				tree.append(",name:'" + item.getName() + "'");
-				tree.append(",type:" + item.getType().getValue());
-				tree.append("}");
+			String good = children(staff, MaterialCate.Type.GOOD);
+			if(!good.isEmpty()){
+				tree.append("{")
+				.append("text:'商品'")
+				.append(",expanded:true")
+				.append(",cate:" + MaterialCate.Type.GOOD.getValue())
+				.append(",children:[" + good + "]") 
+				.append("}");						
 			}
-			tree.append("]");
+			
+			String material = children(staff, MaterialCate.Type.MATERIAL);
+			if(!material.isEmpty()){
+				if(!tree.toString().isEmpty()){
+					tree.append(",");
+				}
+				tree.append("{")
+				.append("text:'原料'")
+				.append(",expanded:true")
+				.append(",cate:" + MaterialCate.Type.MATERIAL.getValue())
+				.append(",children:[" + material + "]") 
+				.append("}");						
+			}			
 		}catch(Exception e){
-			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, 9999, WebParams.TIP_CONTENT_SQLEXCEPTION);
 			e.printStackTrace();
 		}finally{
-			response.getWriter().print(tree.toString());
+			response.getWriter().print("[" + tree.toString() + "]");
 		}
 		
 		return null;
 	}
+	
+	private String children(Staff staff, MaterialCate.Type type) throws SQLException{
+		List<MaterialCate> list;
+		StringBuilder tree = new StringBuilder();
+		String extra = "";
+		extra = " AND MC.restaurant_id = " + staff.getRestaurantId();
+		extra += (" AND MC.type = " + type.getValue());
+		
+		Map<Object, Object> params = new LinkedHashMap<Object, Object>();
+		params.put(SQLUtil.SQL_PARAMS_EXTRA, extra);
+		list = MaterialCateDao.getContent(params);
+		for(int i = 0; i < list.size(); i++){
+			MaterialCate item = list.get(i);
+			if(i>0)
+				tree.append(",");	
+			tree.append("{");
+			tree.append("leaf:true");
+			tree.append(",text:'" + item.getName() + "'");
+			tree.append(",cateId:" + item.getId());
+			tree.append(",name:'" + item.getName() + "'");
+			tree.append(",type:" + item.getType().getValue());
+			tree.append("}");
+		}
+		return tree.toString();	
+
+	}		
 	
 	/**
 	 * MonthSettle tree

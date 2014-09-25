@@ -31,6 +31,22 @@ public class UpdateSupplierAction extends Action{
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			Supplier supplier = new Supplier(Integer.valueOf(supplierId), staff.getRestaurantId(), name, tele, addr, contact, comment);
 			
+			if(tele != null){
+				supplier.setTele(tele);
+			}
+			
+			if(addr != null){
+				supplier.setAddr(addr);
+			}
+			
+			if(contact != null){
+				supplier.setContact(contact);
+			}
+			
+			if(comment != null){
+				supplier.setComment(comment);
+			}
+			
 			SupplierDao.update(staff, supplier);
 			jobject.initTip(true, "修改成功");
 		}catch(BusinessException e){

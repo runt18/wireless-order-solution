@@ -29,7 +29,28 @@ public class InsertSupplierAction extends Action {
 			String contact = request.getParameter("contact");
 			String comment = request.getParameter("comment");
 			
-			Supplier supplier = new Supplier(staff.getRestaurantId(), supplierName, tele, addr, contact, comment);
+			Supplier supplier = new Supplier();
+			
+			supplier.setRestaurantid(staff.getRestaurantId());
+			
+			supplier.setName(supplierName);
+			
+			if(tele != null){
+				supplier.setTele(tele);
+			}
+			
+			if(addr != null){
+				supplier.setAddr(addr);
+			}
+			
+			if(contact != null){
+				supplier.setContact(contact);
+			}
+			
+			if(comment != null){
+				supplier.setComment(comment);
+			}
+			
 			SupplierDao.insert(supplier);
 			jobject.initTip(true, "添加成功!");
 			

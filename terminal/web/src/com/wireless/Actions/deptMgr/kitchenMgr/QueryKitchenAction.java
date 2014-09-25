@@ -152,11 +152,13 @@ public class QueryKitchenAction extends DispatchAction {
 		
 		JObject jobject = new JObject();
 		List<Kitchen> root = null;
-		
+		String flag = request.getParameter("flag");
 		try{
 			String pin = (String)request.getAttribute("pin");
 			
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			
+			
 			
 //			root = KitchenDao.getByType(staff, Type.NORMAL);
 			root = new DepartmentTree.Builder(DepartmentDao.getByType(staff, Department.Type.NORMAL), KitchenDao.getByType(staff, Kitchen.Type.NORMAL)).build().asKitchenList();
@@ -169,7 +171,7 @@ public class QueryKitchenAction extends DispatchAction {
 				jobject.setTotalProperty(root.size());
 				jobject.setRoot(root);
 			}
-			response.getWriter().print(jobject.toString());
+			response.getWriter().print(jobject.toString(flag != null?Kitchen.KITCHEN_JSONABLE_SIMPLE : Kitchen.KITCHEN_JSONABLE_COMPLEX));
 		}
 		return null;
 	}

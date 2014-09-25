@@ -10,7 +10,9 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
+import com.wireless.db.DBCon;
 import com.wireless.db.inventoryMgr.MaterialDao;
+import com.wireless.db.menuMgr.FoodDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
@@ -41,9 +43,11 @@ public class OperateMaterialAction extends DispatchAction {
 			String restaurantID = (String) request.getAttribute("restaurantID");
 			String name = request.getParameter("name");
 			String cateId = request.getParameter("cateId");
+			String price = request.getParameter("price");
 			
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			Material m = new Material(Integer.valueOf(restaurantID), name, Integer.valueOf(cateId), staff.getName(), Material.Status.NORMAL.getValue());
+			m.setPrice(Float.valueOf(price));
 			MaterialDao.insert(m);
 			jobject.initTip(true, "操作成功, 已添加新原料信息.");
 		}catch(BusinessException e){
@@ -79,11 +83,30 @@ public class OperateMaterialAction extends DispatchAction {
 			String id = request.getParameter("id");
 			String name = request.getParameter("name");
 			String cateId = request.getParameter("cateId");
+			String price = request.getParameter("price");
+//			String cType = request.getParameter("cType");
 			
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
-			Material m = new Material(Integer.valueOf(id), Integer.valueOf(restaurantID), Integer.valueOf(cateId), name, staff.getName());
+			
+			
+			Material m = new Material();
+			m.setId(Integer.valueOf(id));
+			m.setRestaurantId(Integer.valueOf(restaurantID));
+			m.setLastModStaff(staff.getName());
+			
+			if(cateId != null && !cateId.isEmpty()){
+				m.setCate(Integer.valueOf(cateId), "");
+			}
+			if(name != null && !name.isEmpty()){
+				m.setName(name);
+			}
+			
+			if(price != null && !price.isEmpty()){
+				m.setPrice(Float.valueOf(price));
+			}
+			
 			MaterialDao.update(m);
-			jobject.initTip(true, "操作成功, 已修改原料信息.");
+			jobject.initTip(true, "操作成功, 已修改物品信息.");
 		}catch(BusinessException e){	
 			e.printStackTrace();
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getCode(), e.getDesc());
@@ -114,7 +137,7 @@ public class OperateMaterialAction extends DispatchAction {
 		try{
 			String id = request.getParameter("id");
 			MaterialDao.delete(Integer.valueOf(id));
-			jobject.initTip(true, "操作成功, 已删除原料信息.");
+			jobject.initTip(true, "操作成功, 已删除物品信息.");
 		}catch(BusinessException e){	
 			e.printStackTrace();
 			jobject.initTip(false, WebParams.TIP_TITLE_EXCEPTION, e.getCode(), e.getDesc());
@@ -188,6 +211,46 @@ public class OperateMaterialAction extends DispatchAction {
 		}
 		return null;
 	}
+	/**
+	 * 把菜品设置为商品
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward setToBeGood(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		JObject jobject = new JObject();
+		try{
+			String pin = (String)request.getAttribute("pin");
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			String material_goodList = request.getParameter("material_goodList");
+			if(!material_goodList.isEmpty()){
+				String[] foods = material_goodList.split(",");
+				DBCon dbCon = new DBCon();
+				dbCon.connect();
+				for (String food : foods) {
+					MaterialDao.insertGoods(dbCon, staff, FoodDao.getById(dbCon, staff, Integer.parseInt(food)));
+				}
+				
+				dbCon.disconnect();
+			}
+			jobject.initTip(true, "设置成功");
+		}catch(SQLException e){	
+			e.printStackTrace();
+			jobject.initTip(e);
+			
+		}catch(Exception e){
+			e.printStackTrace();
+			jobject.initTip(e);
+		}finally{
+			response.getWriter().print(jobject.toString());
+		}
+		return null;
+	}	
 	
 	
 }

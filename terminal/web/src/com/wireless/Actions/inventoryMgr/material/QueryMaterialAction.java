@@ -15,10 +15,13 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
 import com.wireless.db.inventoryMgr.MaterialDao;
+import com.wireless.db.menuMgr.FoodDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.stockMgr.MaterialDeptDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
+import com.wireless.json.JsonMap;
+import com.wireless.json.Jsonable;
 import com.wireless.pojo.inventoryMgr.Material;
 import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.staffMgr.Staff;
@@ -38,9 +41,12 @@ public class QueryMaterialAction extends DispatchAction{
 		String isPaging = request.getParameter("isPaging");
 		String start = request.getParameter("start");
 		String limit = request.getParameter("limit");
+		String pin = (String)request.getAttribute("pin");
+		Staff staff = StaffDao.verify(Integer.parseInt(pin));
+		
+		List<Jsonable> list = new ArrayList<>();
 		try{
-			String pin = (String)request.getAttribute("pin");
-			StaffDao.verify(Integer.parseInt(pin));
+
 			
 			String restaurantID = (String) request.getAttribute("restaurantID");
 			String name = request.getParameter("name");
@@ -67,7 +73,8 @@ public class QueryMaterialAction extends DispatchAction{
 			params.put(SQLUtil.SQL_PARAMS_EXTRA, extra);
 			
 			root = MaterialDao.getContent(params);
-		}catch(BusinessException e){
+			
+		}catch(SQLException e){
 			jobject.initTip(e);
 			e.printStackTrace();
 			
@@ -77,7 +84,36 @@ public class QueryMaterialAction extends DispatchAction{
 		}finally{
 			if(root != null){
 				jobject.setTotalProperty(root.size());
-				jobject.setRoot(DataPaging.getPagingData(root, isPaging, start, limit));
+				root = DataPaging.getPagingData(root, isPaging, start, limit);
+				
+				for (final Material m : root) {
+					if(m.isGood()){
+						final Food food = FoodDao.relativeToFood(staff, m.getId());
+						if(food != null){
+							Jsonable j = new Jsonable() {
+								
+								@Override
+								public JsonMap toJsonMap(int flag) {
+									JsonMap jm = new JsonMap();
+									jm.putJsonable(m, flag);
+									jm.putString("reName", m.getName() + " ←→ " + food.getName() + " (" + food.getKitchen().getName() + ")");
+									return jm;
+								}
+								
+								@Override
+								public void fromJsonMap(JsonMap jsonMap, int flag) {
+									
+								}
+							};
+							
+							list.add(j);
+						}
+					}else{
+						list.add(m);
+					}
+				}				
+				
+				jobject.setRoot(list);
 			}
 			response.getWriter().print(jobject.toString());
 		}
@@ -191,6 +227,52 @@ public class QueryMaterialAction extends DispatchAction{
 		}
 		return null;
 	}
+	
+	public ActionForward selectToBeGood(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		
+		
+		JObject jobject = new JObject();
+		String isPaging = request.getParameter("isPaging");
+		String start = request.getParameter("start");
+		String limit = request.getParameter("limit");
+		try{
+			String pin = (String)request.getAttribute("pin");
+			Staff staff = StaffDao.verify(Integer.parseInt(pin));
+			String kitchenId = request.getParameter("kitchen");
+			String foodName = request.getParameter("name");
+			
+			String extra = "";
+			if(kitchenId != null && !kitchenId.isEmpty() && !kitchenId.equals("-1")){
+				extra += " AND F.kitchen_id = " + kitchenId;
+			}
+			
+			if(foodName != null && !foodName.isEmpty()){
+				extra += " AND F.name LIKE  '%" + foodName + "%' ";
+			}
+			
+			List<Food> foods = FoodDao.selectToBeFood(staff, extra, null);
+			
+			if(foods.isEmpty()){
+				jobject.initTip(false, "此菜品不存在或已设置为商品");	
+			}else{
+				jobject.setTotalProperty(foods.size());
+				foods = DataPaging.getPagingData(foods, isPaging, start, limit);
+				jobject.setRoot(foods);				
+			}			
+		}catch(BusinessException e){
+			jobject.initTip(e);
+			e.printStackTrace();
+			
+		}catch(Exception e){
+			jobject.initTip(e);
+			e.printStackTrace();
+		}finally{
+			response.getWriter().print(jobject.toString());
+		}
+		return null;
+	}	
 
 	
 	
