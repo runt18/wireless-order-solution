@@ -389,7 +389,7 @@ function fnUpdatePromotion(){
 var promotionPreviewPanel, memberCountGrid;
 var sendCouponWin, couponViewBillWin;
 var member_searchType = false;
-var bar = {treeId : 'promotionTree', mult : [{status : 1, option :[{name : '发布', fn : "fnPublishPromotion()"}, {name : '修改', fn : "fnUpdatePromotion()"}, {name : '删除', fn : "fnDeletePromotionPromotion()"}]}, 
+var bar = {treeId : 'promotionTree',operateTree:Ext.ux.operateTree_promotion, mult : [{status : 1, option :[{name : '发布', fn : "fnPublishPromotion()"}, {name : '修改', fn : "fnUpdatePromotion()"}, {name : '删除', fn : "fnDeletePromotionPromotion()"}]}, 
 											{status : 2, option :[{name : '撤销', fn : "fnCancelPublishPromotion()"}]},
 											{status : 3, option :[{name : '结束', fn : "fnFinishPromotion()"}]},
 											{status : 4, option :[{name : '删除', fn : "fnDeletePromotionPromotion()"}]} ]};

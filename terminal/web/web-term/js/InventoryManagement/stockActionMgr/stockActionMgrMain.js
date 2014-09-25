@@ -358,11 +358,11 @@ function stockTaskNavHandler(e){
 						var jr = Ext.decode(res.responseText);
 						if(jr.success){
 							Ext.example.msg(jr.title, jr.msg);
-							if(id.getValue() == ''){
-								operateExportExcel(jr.root[0].id);
+/*							if(id.getValue() == ''){
+								stockTaskNavWin.opId = jr.root[0].id;
 							}else{
-								operateExportExcel(id.getValue());
-							}
+								stockTaskNavWin.opId = id.getValue();
+							}	*/							
 							stockTaskNavWin.hide();
 							Ext.getCmp('comboSearchForStockType').setValue(stockType);
 							Ext.getCmp('sam_comboSearchForCateType').setValue(stockCate);
@@ -431,11 +431,23 @@ function operateStockActionBasic(c){
 		}
 		
 		id.setValue(data['id']);
-		deptIn.setValue(deptInData['id']);
-		supplier.setValue(supplierData['supplierID']);
+		if(deptInData['id']){
+			deptIn.setValue(deptInData['id']);
+		}
+		
+		if(supplierData['supplierID']){
+			supplier.setValue(supplierData['supplierID']);
+		}
+		
+		if(data['oriStockDateFormat']){
+			oriStockDate.setValue(data['oriStockDateFormat']);
+		}else{
+			oriStockDate.setValue(new Date());
+			
+		}
+		
 		deptOut.setValue(deptOutData['id']);
-		oriStockId.setValue(data['oriStockId']);
-		oriStockDate.setValue(data['oriStockDateFormat']);
+		oriStockId.setValue(data['oriStockId']);		
 		comment.setValue(data['comment']);
 		operatorName.setValue(data['operatorName']);
 		operatorDate.setValue(data['birthDateFormat']);
@@ -616,8 +628,8 @@ function deleteStockActionHandler(){
 						var jr = Ext.decode(res.responseText);
 						if(jr.success){
 							Ext.example.msg(jr.title, jr.msg);
-							stockTaskNavWin.hide();
-							Ext.getCmp('btnSearchForStockBasicMsg').handler();
+//							stockTaskNavWin.hide();
+							stockBasicGrid.getStore().reload();
 						}else{
 							Ext.ux.showMsg(jr);
 						}
@@ -925,7 +937,7 @@ function initControl(){
 					var subType = Ext.getCmp('sam_comboSearchForSubType');
 					if(thiz.getValue() == 1){
 						subType.store.loadData(stockInDate);
-						subType.setValue(-1);
+						subType.setValue(1);
 					}else{
 						subType.store.loadData(stockOutDate);
 						subType.setValue(-1);
@@ -942,7 +954,7 @@ function initControl(){
 			readOnly : false,
 			forceSelection : true,
 			width : 100,
-			value : -1,
+			value : 1,
 			store : new Ext.data.SimpleStore({
 				data : stockInDate,
 				fields : ['value', 'text']
@@ -1114,7 +1126,7 @@ function initControl(){
 			iconCls : 'btn_refresh',
 			handler : function(){
 				Ext.getCmp('comboSearchForStockType').setValue(1);
-				Ext.getCmp('sam_comboSearchForSubType').setValue(-1);
+				Ext.getCmp('sam_comboSearchForSubType').setValue(1);
 				Ext.getCmp('sam_comboSearchForCateType').setValue(1);
 				Ext.getCmp('sam_comboSearchForDept').setValue(-1);
 				Ext.getCmp('sam_comboSearchForStockStatus').setValue(-1);
@@ -1194,7 +1206,7 @@ function initControl(){
 		}
 	}];
 	stockBasicGrid.on('render', function(thiz){
-		Ext.getCmp('btnSearchForStockBasicMsg').handler();
+		//Ext.getCmp('btnSearchForStockBasicMsg').handler();
 	});
 	stockBasicGrid.on('rowdblclick', function(){
 		updateStockActionHandler();		
@@ -1210,6 +1222,7 @@ function initControl(){
 		}
 		sumRow = null;
 		if(store.getCount() > 0){
+
 			sumRow = stockBasicGrid.getView().getRow(store.getCount() - 1);	
 			sumRow.style.backgroundColor = '#EEEEEE';			
 			for(var i = 0; i < stockBasicGrid.getColumnModel().getColumnCount(); i++){
@@ -1218,6 +1231,8 @@ function initControl(){
 				sumCell.style.fontWeight = 'bold';
 				sumCell.style.color = 'green';
 			}
+			
+			
 			stockBasicGrid.getView().getCell(store.getCount()-1, 1).innerHTML = '汇总';
 			stockBasicGrid.getView().getCell(store.getCount()-1, 2).innerHTML = '--';
 			stockBasicGrid.getView().getCell(store.getCount()-1, 3).innerHTML = '--';
@@ -1230,7 +1245,9 @@ function initControl(){
 			stockBasicGrid.getView().getCell(store.getCount()-1, 12).innerHTML = '--';
 			stockBasicGrid.getView().getCell(store.getCount()-1, 13).innerHTML = '--';
 			stockBasicGrid.getView().getCell(store.getCount()-1, 14).innerHTML = '--';
+			
 		}
+		
 	});
 	if(!firstStepPanel){
 		firstStepPanel = new Ext.Panel({
@@ -1543,6 +1560,7 @@ function initControl(){
 					xtype : 'datefield',
 					width : 103,
 					fieldLabel : '日期',
+					value : new Date(),
 					format : 'Y-m-d',
 					readOnly : false,
 					allowBlank : false,
@@ -2074,6 +2092,7 @@ function initControl(){
 	    	items: [firstStepPanel, secondStepPanel],
 		    listeners : {
 		    	show : function(thiz){
+		    		Ext.getCmp('comboSupplierForStockActionBasic').store.load();
 		    		thiz.center();
 		    	},
 		    	hide : function(thiz){
@@ -2286,8 +2305,9 @@ Ext.onReady(function(){
 	stockTaskNavWin.render(document.body);
 	
 	Ext.getCmp('comboDeptInForStockActionBasic').store.load();
-	Ext.getCmp('comboSupplierForStockActionBasic').store.load();
 	Ext.getCmp('comboDeptOutForStockActionBasic').store.load();
+	
+	Ext.getCmp('btnSearchForStockBasicMsg').handler();
 	
 	showUnitPriceMenu();
 });

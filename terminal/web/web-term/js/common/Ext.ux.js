@@ -480,6 +480,13 @@ Ext.ux.checkPaddingTop = function(e){
 	else
 		e.getEl().dom.parentNode.style.paddingTop = '5px';
 };
+
+//获取本月第一天
+function getCurrentMonthFirst(){
+	 var date=new Date();
+	 date.setDate(1);
+	 return date;
+}
 //获得某月的天数 
 function getMonthDays(myMonth){ 
 	var now = new Date(); //当前日期 
@@ -552,12 +559,26 @@ Ext.ux.createDateCombo = function(_c){
 					now.setMonth(now.getMonth()-3);
 				}else if(record.data.value == 5){//本周
 					now.setDate(now.getDate() - (nowDayOfWeek - 1));
+					//为避免当天无数据显示, 删除当天 
+					if(nowDayOfWeek != 1){
+						var nowWeek = new Date();
+						nowWeek.setDate(nowWeek.getDate()-1);
+						dateEnd.setValue(nowWeek);
+					}
+					
 				}else if(record.data.value == 6){//上周
 					now.setDate(now.getDate() - nowDayOfWeek);
 					dateEnd.setValue(now);
 					now.setDate(now.getDate() - 6);
 				}else if(record.data.value == 7){//本月
+					//为避免当天无数据显示, 删除当天 
+					if(now.getDate() != 1){
+						var nowWeek = new Date();
+						nowWeek.setDate(nowWeek.getDate()-1);
+						dateEnd.setValue(nowWeek);
+					}					
 					now.setDate(now.getDate() - (now.getDate() -1));
+				
 				}else if(record.data.value == 8){//上个月
 					//FIXME 月份加减遇12时
 					dateEnd.setValue(new Date(nowYear, nowMonth-1, getMonthDays(nowMonth-1)));

@@ -254,7 +254,7 @@ var commonTasteGridForTabPanel = new Ext.grid.GridPanel({
 		}
 	}),
 	listeners : {
-		rowdblclick : function(thiz, ri){
+		rowclick : function(thiz, ri){
 			addTasteHandler(thiz);
 		}
 	}
@@ -281,7 +281,7 @@ var allTasteGridForTabPanel = new Ext.grid.GridPanel({
 		fields : FoodTasteRecord.getKeys()
 	}),
 	listeners : {
-		rowdblclick : function(thiz, ri){
+		rowclick : function(thiz, ri){
 			addTasteHandler(thiz);
 		}
 	}
@@ -308,7 +308,7 @@ var ggForTabPanel = new Ext.grid.GridPanel({
 		fields : FoodTasteRecord.getKeys()
 	}),
 	listeners : {
-		rowdblclick : function(thiz, ri){
+		rowclick : function(thiz, ri){
 			addTasteHandler(thiz);
 		}
 	}

@@ -127,7 +127,7 @@ function insertStockTakeHandler(){
 							dept.setDisabled(false);
 							cate.setDisabled(false);
 							cateId.setDisabled(false);
-							cate.fireEvent('select', cate);
+//							cate.fireEvent('select', cate);
 							
 							Ext.getCmp('btnAuditStockTake').hide();
 							Ext.getCmp('btnSaveStockTake').show();
@@ -606,7 +606,21 @@ function initWin(){
     						dataSource : 'normal',
     						restaurantID : restaurantID
     					},
-    					fields : MaterialCateRecord.getKeys()
+    					fields : MaterialCateRecord.getKeys(),
+	    				listeners : {
+	    					load : function(thiz, records, opts){
+	    						if(records.length > 0){
+	    							stockTakeWin.cateId = records[0].get('id');
+	    							Ext.getCmp('comboMaterialCateId').setValue(records[0].get('id'));
+	    							
+	    							if(!stockTakeWin.otype == Ext.ux.otype['update']){
+										//触发小类别变动
+										checkTakeContentChange('cateId', Ext.getCmp('comboMaterialCateId'));   	    							
+	    							}
+ 							
+	    						}
+	    					}
+	    				}
     				}),
     				valueField : 'id',
     				displayField : 'name',
@@ -616,6 +630,7 @@ function initWin(){
     				selectOnFocus : true,
     				listeners : {
     					select : function(thiz){
+    						stockTakeWin.cateId = thiz.getValue();
     						checkTakeContentChange('cateId', thiz);
     					}
     				}
@@ -1111,6 +1126,11 @@ function loadOperateMaterial(c){
 			mstore.baseParams['deptId'] = content.dept;
 			mstore.baseParams['cateId'] = content.cateId;
 			mstore.load();
+			
+			//解决货物小类第一次打开不加载值的问题
+			mstore.on('load', function(){
+				Ext.getCmp('comboMaterialCateId').setValue(stockTakeWin.cateId);
+			});
 		}else{
 			mstore.removeAll();
 		}

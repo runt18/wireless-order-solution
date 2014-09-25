@@ -976,48 +976,48 @@ function submitRepaidOrderHandler(_c){
  */
 function submitSingleOrderHandler(_c){
 	var orderFoods = _c.grid.order.orderFoods;
-	if(orderFoods.length > 0){
-		orderDataModel.tableAlias = tableAliasID;
-		orderDataModel.customNum = 1;
-		orderDataModel.orderFoods = (typeof _c.commitType != 'undefined'? frontNewOrderFood : orderFoods);
-		orderDataModel.categoryValue = tableCategory;
-		orderDataModel.id = _c.grid.order.id;
-		orderDataModel.orderDate = (typeof _c.grid.order == 'undefined' ? '' : _c.grid.order.orderDate);
-		
-		setButtonDisabled(true);
-		Ext.Ajax.request({
-			url : '../../InsertOrder.do',
-			params : {
-				commitOrderData : JSON.stringify(Wireless.ux.commitOrderData(orderDataModel)),
-				type : (typeof _c.commitType != 'undefined'? _c.commitType : isFree ? 1 : 7),
-				notPrint : _c.notPrint === true ? true : false
-			},
-			success : function(response, options) {
+	orderDataModel.tableAlias = tableAliasID;
+	orderDataModel.customNum = 1;
+	orderDataModel.orderFoods = (typeof _c.commitType != 'undefined'? frontNewOrderFood : orderFoods);
+	orderDataModel.categoryValue = tableCategory;
+	orderDataModel.id = _c.grid.order.id;
+	orderDataModel.orderDate = (typeof _c.grid.order == 'undefined' ? '' : _c.grid.order.orderDate);
+	
+	setButtonDisabled(true);
+	Ext.Ajax.request({
+		url : '../../InsertOrder.do',
+		params : {
+			commitOrderData : JSON.stringify(Wireless.ux.commitOrderData(orderDataModel)),
+			type : (typeof _c.commitType != 'undefined'? _c.commitType : isFree ? 1 : 7),
+			notPrint : _c.notPrint === true ? true : false
+		},
+		success : function(response, options) {
 
-				var jr = Ext.util.JSON.decode(response.responseText);
-				_c.title = jr.title;
-				_c.msg = jr.msg;
-				if (jr.success == true) {
-					skip(_c);
-				} else {
-					jr.reCommitData = _c;
-					jr.reCommitData.commitType = 23;
-					refreshOrder(jr);
-					setButtonDisabled(false);
-				}
-			},
-			failure : function(response, options) {
+			var jr = Ext.util.JSON.decode(response.responseText);
+			_c.title = jr.title;
+			_c.msg = jr.msg;
+			if (jr.success == true) {
+				skip(_c);
+			} else {
+				jr.reCommitData = _c;
+				jr.reCommitData.commitType = 23;
+				refreshOrder(jr);
 				setButtonDisabled(false);
-				Ext.ux.showMsg(Ext.util.JSON.decode(response.responseText));
 			}
-		});
-	}else if(orderFoods.length == 0){
+		},
+		failure : function(response, options) {
+			setButtonDisabled(false);
+			Ext.ux.showMsg(Ext.util.JSON.decode(response.responseText));
+		}
+	});
+/*	现在可以空单提交
+ * else if(orderFoods.length == 0){
 		Ext.MessageBox.show({
 			msg : '还没有选择任何菜品，暂时不能提交',
 			width : 300,
 			buttons : Ext.MessageBox.OK
 		});
-	}
+	}*/
 }
 
 /**

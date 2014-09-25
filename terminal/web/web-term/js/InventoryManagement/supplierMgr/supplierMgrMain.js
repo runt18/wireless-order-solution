@@ -23,7 +23,7 @@ if(!addSupplier){
 					var sComment = Ext.getCmp('txtSComment').getValue();
 					
 					var actionUrl = '';
-					if(!Ext.getCmp('txtSName').isValid() || !Ext.getCmp('txtSTele').isValid() || !Ext.getCmp('txtSContact').isValid()){
+					if(!Ext.getCmp('txtSName').isValid()){
 						return;
 					}
 					if(addSupplier.operationType == 'insert'){
@@ -95,60 +95,40 @@ if(!addSupplier){
 				fieldLabel : '联系方式',
 				allowBlank : false,
 				regex : Ext.ux.RegText.phone.reg,
-				regexText : Ext.ux.RegText.phone.error,
-				validator : function(v){
-					if(Ext.util.Format.trim(v).length > 0){
-						return true;
-					}else{
-						return '联系方式不允许为空';
-					}
-				}
+				regexText : Ext.ux.RegText.phone.error
 				
 			},{
 				xtype : 'textfield',
 				id : 'txtSContact',
 				width : 130,
-				fieldLabel : '联系人',
-				allowBlank : false,
-				validator : function(v){
-					if(Ext.util.Format.trim(v).length > 0){
-						return true;
-					}else{
-						return '联系人不能为空';
-					}
-				}
+				fieldLabel : '联系人'
 			},{
 				xtype : 'textfield',
 				id : 'txtSAddr',
 				width : 130,
-				fieldLabel : '地址',
-				validator : function(v){
-					if(Ext.util.Format.trim(v).length > 0){
-						return true;
-					}else{
-						return '地址不能为空';
-					}
-				}
+				fieldLabel : '地址'
 			},{
 				xtype : 'textfield',
 				id : 'txtSComment',
 				width : 130,
-				fieldLabel : '备注',
-				validator : function(v){
+				fieldLabel : '备注'
+/*				validator : function(v){
 					if(Ext.util.Format.trim(v).length > 0 ){
 						return true;
 					}else{
 						return '写上评价';
 					}
-				} 
+				} */
 			}]
 	
 		}],
 		listeners : {
 			'show' : function(thiz){
+				var fn = Ext.getCmp('txtSName');
 				if(addSupplier.operationType == 'insert'){
-					Ext.getCmp('txtSName').setValue('');
-					Ext.getCmp('txtSName').clearInvalid();
+					
+					fn.setValue('');
+					fn.clearInvalid();
 					
 					Ext.getCmp('txtSTele').setValue('');
 					Ext.getCmp('txtSTele').clearInvalid();
@@ -160,9 +140,12 @@ if(!addSupplier){
 					
 					Ext.getCmp('txtSComment').setValue('');
 					
-					var fn = Ext.getCmp('txtSName');
-					fn.focus.defer(100, fn);
+					
+					
+				}else{
+					Ext.getCmp('txtSTele').clearInvalid();
 				}
+				fn.focus(true, 100);
 			}
 		},
 		keys : [{

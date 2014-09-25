@@ -374,7 +374,7 @@ function bindActiveEvent(id, sbg, bg, href){
 	return active;
 }
 
-function promotion_showFloatOptionForMult(node, mult){
+/*function promotion_showFloatOptionForMult(node, mult){
 		for (var j = 0; j < mult.length; j++) {
 			if(node.attributes.status == mult[j].status){
 				if(!$("#div_floatBar").status || $("#div_floatBar").status != node.attributes.status){
@@ -392,6 +392,46 @@ function promotion_showFloatOptionForMult(node, mult){
 
 			}
 		}
+}*/
+
+Ext.ux.operateTree_promotion = function (node, mult){
+	for (var j = 0; j < mult.length; j++) {
+		if(node.attributes.status == mult[j].status){
+			if(!$("#div_floatBar").status || $("#div_floatBar").status != node.attributes.status){
+				$('#div_floatBar').html("");
+				for (var i = 0; i < mult[j].option.length; i++) {
+					if(i > 0){
+						$("#div_floatBar").append('|&nbsp;');
+					}
+					$("#div_floatBar").append('<a href="javascript:void(0)" onclick='+mult[j].option[i].fn+'>'+ mult[j].option[i].name +'</a>&nbsp;');
+				}	
+				$("#div_floatBar").status = node.attributes.status; 
+				
+				break;
+			}
+
+		}
+	}
+}
+
+Ext.ux.operateTree_material = function (node, mult){
+	for (var j = 0; j < mult.length; j++) {
+		if(node.attributes.type == mult[j].type){
+			if(!$("#div_floatBar").type || $("#div_floatBar").type != node.attributes.type){
+				$('#div_floatBar').html("");
+				for (var i = 0; i < mult[j].option.length; i++) {
+					if(i > 0){
+						$("#div_floatBar").append('|&nbsp;');
+					}
+					$("#div_floatBar").append('<a href="javascript:void(0)" onclick='+mult[j].option[i].fn+'>'+ mult[j].option[i].name +'</a>&nbsp;');
+				}	
+				$("#div_floatBar").type = node.attributes.type; 
+				
+				break;
+			}
+
+		}
+	}
 }
 
 function showFloatOption(obj_b){
@@ -424,7 +464,7 @@ function showFloatOption(obj_b){
 			nodex = offset.left - 18;
 			barX = (offset.left + $(this).find("a").width() + 100);
 			if(obj_b.mult){
-				promotion_showFloatOptionForMult(Ext.getCmp(obj_b.treeId).getNodeById(floatBarNodeId), obj_b.mult);
+				obj_b.operateTree(Ext.getCmp(obj_b.treeId).getNodeById(floatBarNodeId), obj_b.mult);
 			}
 			
 			if($('#div_floatBar').html()){
@@ -433,9 +473,6 @@ function showFloatOption(obj_b){
 			}else{
 				$('#div_floatBar').hide();		
 			}
-
-			
-			
 			
 		});
 		

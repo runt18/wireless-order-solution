@@ -16,7 +16,7 @@ function print(obj){
         return e;
     }
 }
-function NewDate(str) { 
+function newDate(str) { 
 	str = str.split('-'); 
 	var date = new Date(); 
 	date.setUTCFullYear(str[0], str[1] - 1, str[2]); 
@@ -25,7 +25,7 @@ function NewDate(str) {
 } 
 
 function each(x){
-	var date = NewDate(x).getTime();
+	var date = newDate(x).getTime();
 	businessStatWin = new Ext.Window({
 		title : '营业统计 -- <font style="color:green;">历史</font>',
 		id : 'businessDetailWin',
@@ -132,15 +132,12 @@ function showChart(time){
 	            }]
 	        },
 	        tooltip: {
+//	        	crosshairs: true,
                 formatter: function() {
                     return '<b>' + this.series.name + '</b><br/>'+
                         this.x +': '+ '<b>'+this.y+'</b> ';
                 }
 	        },
-//	        series : [{  
-//	            name: 'aaaaaa',  
-//	            data: [6, 9, 2, 7, 13, 21, 10]
-//	        }],
 	        series : chartData.ser,
 	        exporting : {
 	        	enabled : false

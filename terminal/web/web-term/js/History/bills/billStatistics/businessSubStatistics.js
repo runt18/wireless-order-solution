@@ -149,7 +149,7 @@ function businessSub_showChart(c){
         },
         labels: {
         	items : [{
-        		html : '<b>总营业额:' + chartData.totalMoney + ' 元</b><br><b>日均收入:' + chartData.avgMoney + ' 元</b><br><b>日均账单:' + chartData.avgCount + ' 张</b>',
+        		html : '<b>总营业额:' + chartData.totalMoney + ' 元</b>, <b>日均收入:' + chartData.avgMoney + ' 元</b>, <b>日均账单:' + chartData.avgCount + ' 张</b>',
 	        	style : {left :/*($('#businessReceiptsChart').width()*0.80)*/'0px', top: '0px'}
         	}]
         },
@@ -351,6 +351,9 @@ Ext.onReady(function(){
 					
 					Ext.getDom('businessSub_bssiPaidAmount').innerHTML = businessSub_business.paidAmount;
 					Ext.getDom('businessSub_bssiPaidIncome').innerHTML = businessSub_business.paidIncome.toFixed(2);
+					
+/*					Ext.getDom('businessSub_bssiCommissionAmount').innerHTML = businessSub_business.paidAmount;
+					Ext.getDom('businessSub_bssiCommissionIncome').innerHTML = businessSub_business.paidIncome.toFixed(2);*/					
 					
 					Ext.getDom('businessSub_bssiServiceAmount').innerHTML = businessSub_business.serviceAmount;
 					Ext.getDom('businessSub_bssiServiceIncome').innerHTML = businessSub_business.serviceIncome.toFixed(2);	

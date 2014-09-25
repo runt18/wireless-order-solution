@@ -2,14 +2,17 @@
 //--------------------------月结-----------------
 var unStockActionCount = 0, unStockTakeCount = 0;
 var settle = {
-	id : 'secondStepPanelSouth',
-	region : 'center',
+	id : 'monthSettleDetail',
+//	region : 'north',
 	frame : true,
-	height : 300,
+	height : 160,
 	border : false,
-	bodyStyle : 'font-size:30px;text-align:center;',
-	html : '<div align="center" ><br><br>当前会计月份 : <label id="labCurrentMonth" style="color:green"> </label>&nbsp;月<br> 未审核的库单 : <label id="labStockAction" style="color:red" >0</label>&nbsp;张</br>' +
-			'未审核的盘点 : <label id="labStockTake" style="color:red" >0</label>&nbsp;张</div>',
+	bodyStyle : 'font-size:14px;',
+	html : '<div align="center" style="font-size:30px;">当前会计月份 : <label id="labCurrentMonth" style="color:green"> </label>&nbsp;月<br> ' +
+			'未审核的库单 : <label id="labStockAction" style="color:red" >0</label>&nbsp;张</br>' +
+			'未审核的盘点 : <label id="labStockTake" style="color:red" >0</label>&nbsp;张<br>' +
+			'<span style="font-size:20px;color:green;">注 : 月结之前请确认商品和原料的参考成本是否正确</span></div>'
+/*	,
 	buttons:[{
 		text : '月结',
 		handler: function() {
@@ -39,7 +42,7 @@ var settle = {
 		 	
 		 	}
 		}
-	}]
+	}]*/
 };
 /*var form = new Ext.form.FormPanel({
 	height : 200,
@@ -95,16 +98,72 @@ var monthSettleWin = new Ext.Window({
 	closable : false,
 	resizable : false,
 	modal : true,
+	border : 'fit',
+	items : [settle],
 	listeners : {
 		show : function(thiz){
-			thiz.center();
+/*			thiz.center();
 			thiz.load({
 				url : '../InventoryManagement_Module/MonthSettle.html',
 				scripts : true,
 				params : {
 					loadPage : true
 				}
+			});*/
+			Ext.Ajax.request({
+				url : '../../QueryCurrentMonth.do',
+				params : {
+					restaurantID : restaurantID
+				},
+				success : function(res, opt){
+					var jr = Ext.decode(res.responseText);
+					if(jr.success){
+						Ext.getDom('labCurrentMonth').innerHTML = jr.msg;
+					}else{
+						Ext.ux.showMsg(jr);
+					}
+				},
+				failure : function(res, opt){
+					Ext.ux.showMsg(Ext.decode(res.responseText));
+				}
 			});
+			Ext.Ajax.request({
+				url : '../../QueryStockTake.do',
+				params : {
+					
+					status : 1
+				},
+				success : function(res, opt){
+					var jr = Ext.decode(res.responseText);
+					if(jr.success){
+						Ext.getDom('labStockTake').innerHTML = jr.totalProperty;
+					}else{
+						Ext.ux.showMsg(jr);
+					}
+				},
+				failure : function(res, opt){
+					Ext.ux.showMsg(Ext.decode(res.responseText));
+				}
+			});
+			Ext.Ajax.request({
+				url : '../../QueryStockAction.do',
+				params : {
+					
+					status : 1
+				},
+				success : function(res, opt){
+					var jr = Ext.decode(res.responseText);
+					if(jr.success){
+						Ext.getDom('labStockAction').innerHTML = jr.totalProperty;
+					}else{
+						Ext.ux.showMsg(jr);
+					}
+				},
+				failure : function(res, opt){
+					Ext.ux.showMsg(Ext.decode(res.reponseText));
+				}
+			});			
+			
 		}
 	},
 	bbar : ['->',{

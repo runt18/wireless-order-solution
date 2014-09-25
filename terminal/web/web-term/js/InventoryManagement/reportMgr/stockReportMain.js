@@ -297,11 +297,11 @@ Ext.onReady(function(){
 		width : 160,
 		border : false,
 		frame : true, //采用渲染
-		rootVisible : true,//显示根节点 
+		rootVisible : false,//显示根节点 
 		autoScroll : true,
 		bodyStyle : 'backgroundColor:#FFFFFF; border:1px solid #99BBE8;',
 		loader: new Ext.tree.TreeLoader({
-			dataUrl : '../../QueryMaterialCate.do?',
+			dataUrl : '../../QueryMaterialCate.do',
 			baseParams : {
 				dataSource : 'tree',
 				restaurantID : restaurantID
@@ -311,17 +311,7 @@ Ext.onReady(function(){
             expanded: true,
             text : '全部货品',
             typeId : '',
-            leaf : false,
-            children: [{
-            	text : '原料',
-            	typeId: '2',
-            	leaf : false
-            },{
-                text: '商品',
-                typeId: '1',
-                leaf: true
-            }]
-            	
+            leaf : false
         }),
 		listeners : {
 			click : function(e){

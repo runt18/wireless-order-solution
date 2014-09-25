@@ -9,7 +9,7 @@ function initOperateMaterialCateWin(){
 		});
 		var cateName = new Ext.form.TextField({
 			id : 'txtMaterialCateName',
-			fieldLabel : '类别名称',
+			fieldLabel : '名称',
 			width : 130,
 			allowBlank : false
 		});
@@ -157,30 +157,32 @@ function operateMaterialCateHandler(c){
 	var cateId = Ext.getCmp('hideMaterialCateId');
 	var cateName = Ext.getCmp('txtMaterialCateName');
 	if(c.otype == Ext.ux.otype['insert']){
+		operateMaterialCateWin.setTitle('添加原料类别');
 		operateMaterialCateWin.show();
 		cateId.setValue();
 		cateName.setValue();
 		cateName.clearInvalid();
 		cateName.focus(true, 100);
 	}else if(c.otype == Ext.ux.otype['update']){
-		var sn = materialCateTree.getSelectionModel().getSelectedNode();
+		var sn = Ext.ux.getSelNode(materialCateTree);
 		if(!sn || sn.attributes.cateID == -1){
 			Ext.example.msg('提示', '请选中一个原料类别再进行操作.');
 			return;
 		}
+		operateMaterialCateWin.setTitle('修改原料类别');
 		operateMaterialCateWin.show();
 		cateId.setValue(sn.attributes.cateId);
 		cateName.setValue(sn.attributes.name);
 		cateName.focus(true, 100);
 	}else if(c.otype == Ext.ux.otype['delete']){
-		var sn = materialCateTree.getSelectionModel().getSelectedNode();
+		var sn = Ext.ux.getSelNode(materialCateTree);
 		if(!sn || sn.attributes.cateID == -1){
 			Ext.example.msg('提示', '请选中一个原料类别再进行操作.');
 			return;
 		}
 		Ext.Msg.show({
 			title : '重要',
-			msg : '是否删除原料类别?',
+			msg : '是否删除类别?',
 			icon: Ext.MessageBox.QUESTION,
 			buttons : Ext.Msg.YESNO,
 			fn : function(e){
@@ -222,14 +224,19 @@ function initOperateMaterialWin(){
 		});
 		var materialName = new Ext.form.TextField({
 			id : 'txtMaterialName',
-			fieldLabel : '原料名称',
+			fieldLabel : '名称',
 			allowBlank : false
 		});
+		var materialPrice = new Ext.form.TextField({
+			id : 'txtMaterialPrice',
+			fieldLabel : '参考成本',
+			allowBlank : false
+		});		
+		
 		var initMaterialCate = new Ext.form.ComboBox({
 			id : 'txtMaterialCate',
 			fieldLabel : '所属类别',
-		    store : new Ext.data.JsonStore({
-		    	root : 'root',
+		    store : new Ext.data.SimpleStore({
 				fields : ['cateId', 'cateName']
 			}),
 			valueField : 'cateId',
@@ -258,7 +265,7 @@ function initOperateMaterialWin(){
 				defaults : {
 					width : 130
 				},
-				items : [materialId, materialName, initMaterialCate]
+				items : [materialId, materialName,materialPrice, initMaterialCate]
 			}],
 			keys : [{
 				key : Ext.EventObject.ESC,
@@ -286,7 +293,7 @@ function initOperateMaterialWin(){
 					}else{
 						return;
 					}
-					if(!materialName.isValid() || !initMaterialCate.isValid()){
+					if(!materialName.isValid() || !initMaterialCate.isValid() || !materialPrice.isValid()){
 						return;
 					}
 					Ext.Ajax.request({
@@ -296,8 +303,10 @@ function initOperateMaterialWin(){
 							
 							restaurantID : restaurantID,
 							id : materialId.getValue(),
+							price : materialPrice.getValue(),
 							name : materialName.getValue(),
-							cateId : initMaterialCate.getValue()
+							cateId : initMaterialCate.getValue(),
+							cType : operateMaterialWin.cateType
 						},
 						success : function(res, opt){
 							var jr = Ext.decode(res.responseText);
@@ -305,10 +314,15 @@ function initOperateMaterialWin(){
 								Ext.example.msg(jr.title, jr.msg);
 								if(dataSource == 'update'){
 									operateMaterialWin.hide();
+									operateMaterialWin.cateType = '';
 									Ext.getCmp('btnSearchMaterial').handler();
 								}else{
 									Ext.getCmp('txtMaterialName').setValue();
+									Ext.getCmp('txtMaterialPrice').setValue();
+									
+									Ext.getCmp('txtMaterialPrice').clearInvalid();
 									Ext.getCmp('txtMaterialName').focus(true, 100);
+									
 								}
 								
 							}else{
@@ -326,32 +340,41 @@ function initOperateMaterialWin(){
 				iconCls : 'btn_save',
 				handler : function(){
 					var dataSource = "";
+					var cateId;
 					if(operateMaterialWin.otype == Ext.ux.otype['insert']){
 						dataSource = 'insert';
+						if(!materialName.isValid() || !initMaterialCate.isValid() || !materialPrice.isValid()){
+							return;
+						}						
+						cateId = initMaterialCate.getValue();
 					}else if(operateMaterialWin.otype == Ext.ux.otype['update']){
 						dataSource = 'update';
+						if(!materialPrice.isValid()){
+							return;
+						}		
+						cateId = operateMaterialWin.cateId;
 					}else{
-						return;
-					}
-					if(!materialName.isValid() || !initMaterialCate.isValid()){
 						return;
 					}
 					Ext.Ajax.request({
 						url : '../../OperateMaterial.do',
 						params : {
 							dataSource : dataSource,
-							
+							price : materialPrice.getValue(),
 							restaurantID : restaurantID,
 							id : materialId.getValue(),
 							name : materialName.getValue(),
-							cateId : initMaterialCate.getValue()
+							cateId : cateId,
+							cType : operateMaterialWin.cateType
 						},
 						success : function(res, opt){
 							var jr = Ext.decode(res.responseText);
 							if(jr.success){
+								operateMaterialWin.cateType = '';
 								Ext.example.msg(jr.title, jr.msg);
 								operateMaterialWin.hide();
 								Ext.getCmp('btnSearchMaterial').handler();
+								operateMaterialWin.cateId = null;
 							}else{
 								Ext.ux.showMsg(jr);
 							}
@@ -373,7 +396,13 @@ function initOperateMaterialWin(){
 				show : function(thiz){
 					thiz.center();
 					initMaterialCate.store.loadData(materialCateData);
+				},
+				hide : function(){
+					Ext.getCmp('txtMaterialName').setValue();
+					Ext.getCmp('txtMaterialPrice').setValue();
 					
+					Ext.getCmp('txtMaterialName').clearInvalid();
+					Ext.getCmp('txtMaterialPrice').clearInvalid();
 				}
 			}
 		});
@@ -395,8 +424,8 @@ function operateMaterialHandler(c){
 	var materialId = Ext.getCmp('hideMaterialId');
 	var materialName = Ext.getCmp('txtMaterialName');
 	var materialCate = Ext.getCmp('txtMaterialCate');
+	var materialPrice = Ext.getCmp('txtMaterialPrice');
 	if(c.otype == Ext.ux.otype['insert']){
-		operateMaterialWin.show();
 		
 		materialId.setValue();
 		materialName.setValue();
@@ -405,10 +434,19 @@ function operateMaterialHandler(c){
 		materialCate.clearInvalid();
 		materialCate.setDisabled(false);
 		
+		operateMaterialWin.setTitle('');
+		materialName.show();
+		materialCate.show();
+		materialName.getEl().up('.x-form-item').setDisplayed(true);
+		materialCate.getEl().up('.x-form-item').setDisplayed(true);		
+		
 		var node = materialCateTree.getSelectionModel().getSelectedNode();
 		if(node && typeof node.attributes.cateId != 'undefined' && node.attributes.cateId != -1) {
 			materialCate.setValue(node.attributes.cateId);
 		}
+		
+		operateMaterialWin.show();
+		operateMaterialWin.center();		
 		
 		materialName.focus(true, 100);
 	}else if(c.otype == Ext.ux.otype['update']){
@@ -417,13 +455,39 @@ function operateMaterialHandler(c){
 			Ext.example.msg('提示', '请选中一条原料信息再进行操作.');
 			return;
 		}
+		
 		operateMaterialWin.show();
+
+		operateMaterialWin.cateType = data['cateType'];
 		
-		materialId.setValue(data['id']);
-		materialName.setValue(data['name']);
-		materialCate.setValue(data['cateId']);
+		if(data['cateType'] == 1){
+			operateMaterialWin.setTitle('商品名称 -- ' + data['name']);
+			operateMaterialWin.cateId = data['cateId'];
+			materialId.setValue(data['id']);
+			materialPrice.setValue(data['price']);
+			materialName.hide();
+			materialCate.hide();
+			
+			materialName.getEl().up('.x-form-item').setDisplayed(false);
+			materialCate.getEl().up('.x-form-item').setDisplayed(false);
+			
+			materialPrice.focus(true, 100);
+		}else{
+			operateMaterialWin.setTitle('');
+			materialName.show();
+			materialCate.show();
+			materialName.getEl().up('.x-form-item').setDisplayed(true);
+			materialCate.getEl().up('.x-form-item').setDisplayed(true);
+			materialId.setValue(data['id']);
+			materialName.setValue(data['name']);
+			materialCate.setValue(data['cateId']);	
+			materialPrice.setValue(data['price']);
+			
+			materialName.focus(true, 100);
+		}
 		
-		materialName.focus(true, 100);
+		operateMaterialWin.center();		
+		
 	}else if(c.otype == Ext.ux.otype['delete']){
 		var data = Ext.ux.getSelData(inventory_materialBasicGrid);
 		if(!data){
@@ -432,7 +496,7 @@ function operateMaterialHandler(c){
 		}
 		Ext.Msg.show({
 			title : '重要',
-			msg : '是否删除原料信息?',
+			msg : '是否删除物品信息?',
 			icon: Ext.MessageBox.QUESTION,
 			buttons : Ext.Msg.YESNO,
 			fn : function(e){
@@ -481,16 +545,11 @@ function initControl(){
 				operateMaterialCateHandler({otype:Ext.ux.otype['insert']});
 			}
 		}, {
-			text : '修改',
+			text : '设置商品',
 			iconCls : 'btn_edit',
 			handler : function(){
-				operateMaterialCateHandler({otype:Ext.ux.otype['update']});
-			}
-		}, {
-			text : '删除',
-			iconCls : 'btn_delete',
-			handler : function(){
-				operateMaterialCateHandler({otype:Ext.ux.otype['delete']});
+				fnSetGoodWin();
+				setGoodWin.show();
 			}
 		}, {
 			text : '刷新',
@@ -501,16 +560,17 @@ function initControl(){
 		}]
 	});
 	materialCateTree = new Ext.tree.TreePanel({
-		title : '原料类别信息',
+		id : 'materialCateTree',
+		title : '类别信息',
 		region : 'west',
 		width : 200,
 		border : true,
-		rootVisible : true,
+		rootVisible : false,
 		frame : true,
 		bodyStyle : 'backgroundColor:#FFFFFF; border:1px solid #99BBE8;',
 		tbar : materialCateTreeTbae,
 		loader : new Ext.tree.TreeLoader({
-			dataUrl : '../../QueryMaterialCate.do?',
+			dataUrl : '../../QueryMaterialCate.do',
 			baseParams : {
 				dataSource : 'tree',
 				restaurantID : restaurantID
@@ -525,32 +585,32 @@ function initControl(){
 	        name : '全部',
 	        listeners : {
 	        	load : function(thiz){
-	        		materialCateData.root = [];
-	        		for(var i = 0; i < thiz.childNodes.length; i++){
-	        			materialCateData.root.push({
-	        				cateId : thiz.childNodes[i].attributes.cateId,
-	        				cateName : thiz.childNodes[i].attributes.name
-	        			});
-	        		}
+	        		materialCateData = [];
+	        		Ext.Ajax.request({
+	        			url : '../../QueryMaterialCate.do',
+	        			params : {dataSource : 'normal', type : 2},
+						success : function(res, opt){
+							var jr = Ext.decode(res.responseText);
+							for (var i = 0; i < jr.root.length; i++) {
+								materialCateData.push([jr.root[i].id, jr.root[i].name]);
+							}
+						},
+						failure : function(res, opt){
+							Ext.ux.showMsg(Ext.decode(res.responseText));
+						}
+	        		});
 	        		Ext.getCmp('btnSearchMaterial').handler();
 	        	}
-	        	/*,beforecollapse : function(thiz){
-					if(thiz.getSelectionModal().getSelectedNode().attributes.cateId == -1){
-						Ext.getCmp('btnSearchMaterial').handler();
-						return false;
-					}
-				}*/
 	        }
 		}),
 		listeners : {
 			click : function(e){
-				Ext.getDom('displayQueryMaterialCate').innerHTML = e.attributes.name;
-			},
-			dblclick : function(e){
+				Ext.getDom('displayQueryMaterialCate').innerHTML = e.text;
+				
 				Ext.getCmp('btnSearchMaterial').handler();
 				if(e.attributes.cateId == -1){
 					return false;
-				}
+				}				
 			}
 		}
 	});
@@ -562,7 +622,7 @@ function initControl(){
 			text : String.format(Ext.ux.txtFormat.typeName, '类别', 'displayQueryMaterialCate', '----')
 		}, {
 			xtype : 'tbtext',
-			text : '原料名称:'
+			text : '物品名称:'
 		}, {
 			xtype : 'textfield',
 			id : 'txtSearchForMaterialName',
@@ -612,7 +672,7 @@ function initControl(){
 		'../../QueryMaterial.do',
 		[
 			[true, false, false, true], 
-			['原料名称', 'name', 150],
+			['物品名称', 'reName', 300],
 			['所属类别', 'cateName'],
 			['总数量', 'stock'],
 			['单位成本', 'price'],
@@ -621,10 +681,10 @@ function initControl(){
 			['最后修改时间', 'lastModDateFormat', 150],
 			['操作', 'operate', 150, 'center', 'materialBasicGridOperateRenderer']
 		],
-		['id', 'name', 'cateId', 'cateName', 'stock', 'price', 'statusValue', 'statusText',
-		 'lastModStaff', 'lastModDate', 'lastModDateFormat'],
-		[['isPaging', true],  ['restaurantID', restaurantID], ['dataSource', 'normal'], ['cateType', 2]],
-		GRID_PADDING_LIMIT_20,
+		['id', 'name', 'reName', 'cateId', 'cateName','cateType', 'stock', 'price', 'statusValue', 'statusText',
+		 'lastModStaff', 'lastModDate', 'lastModDateFormat', 'isGood'],
+		[['isPaging', true],  ['restaurantID', restaurantID], ['dataSource', 'normal']],
+		GRID_PADDING_LIMIT_25,
 		'',
 		materialBasicGridTbar
 	);
@@ -639,6 +699,19 @@ function initControl(){
 		 },
 		 scope : this 
 	}];
+	
+	inventory_materialBasicGrid.getStore().on('load', function(thiz, records){
+		
+		for(var i = 0; i < records.length; i++){
+			var record = records[i];
+			var type = record.get('isGood');
+			if(!type){
+				record.set('reName', record.get('name'));
+				record.commit();
+			}
+		}
+			
+	});	
 }
 	
 
@@ -663,6 +736,165 @@ var btnAddMaterial = new Ext.ux.ImageButton({
 	}
 });
 
+
+var material_selectGoodTbar = new Ext.Toolbar({
+	items : [{xtype : 'tbtext', text : '类型:'},{
+			id : 'material_goodCombo',
+			xtype : 'combo',
+			readOnly : false,
+			forceSelection : true,
+			value : -1,
+			width : 100,
+			store : new Ext.data.SimpleStore({
+				fields : ['id', 'name']
+			}),
+			valueField : 'id',
+			displayField : 'name',
+			listeners : {
+				render : function(thiz){
+					var data = [[-1,'全部']];
+					Ext.Ajax.request({
+						url : '../../QueryKitchen.do',
+						params : {dataSource : 'normal', flag : 'simple'},
+						success : function(res, opt){
+							var jr = Ext.decode(res.responseText);
+							for(var i = 0; i < jr.root.length; i++){
+								data.push([jr.root[i]['id'], jr.root[i]['name']]);
+							}
+							thiz.store.loadData(data);
+							thiz.setValue(-1);
+						},
+						failure : function(res, opt){
+							thiz.store.loadData(data);
+							thiz.setValue(-1);
+						}
+					});
+				},
+				select : function(){
+					Ext.getCmp('material_btnSearchGood').handler();
+				}
+			},
+			typeAhead : true,
+			mode : 'local',
+			triggerAction : 'all',
+			selectOnFocus : true
+		}, {xtype : 'tbtext', text : '&nbsp;&nbsp;&nbsp;'},
+		{xtype : 'tbtext', text : '名称:'},{
+			xtype : 'textfield',
+			id : 'material_goodName'
+		},'->',	 
+	{
+		text : '搜索',
+		id : 'material_btnSearchGood',
+		iconCls : 'btn_search',
+		handler : function(){
+			var goodType = Ext.getCmp('material_goodCombo');
+			
+			var gs = selectGoodGrid.getStore();	
+			
+			gs.baseParams['kitchen'] = goodType.getValue();
+			gs.baseParams['name'] = Ext.getCmp('material_goodName').getValue();
+			
+			gs.load({
+				params : {
+					start : 0,
+					limit : 200
+				}
+			});	
+			
+			gs.on('load', function(store, records, options){
+				material_goodList = '';
+				for (var i = 0; i < records.length; i++) {
+					if(i > 0){
+						material_goodList += ",";
+					}
+					material_goodList += records[i].get('id');
+				}
+			});		
+		}
+	}]		
+});
+
+var selectGoodGrid = createGridPanel(
+	'',
+	'',
+	480,
+	400,
+	'../../QueryMaterial.do',
+	[
+		[true, false, false, true],
+		['名称', 'name']
+	],
+	['id','name'],
+	[['isPaging', true], ['dataSource', 'selectToBeGood']],
+	200,
+	'',
+	[material_selectGoodTbar]
+);	
+selectGoodGrid.keys = [{
+	 key : Ext.EventObject.ENTER,
+	 fn : function(){ 
+		 Ext.getCmp('material_btnSearchGood').handler();
+	 },
+	 scope : this 
+}];
+
+
+function fnSetGoodWin(){
+	
+	
+	if(!setGoodWin){
+		setGoodWin = new Ext.Window({
+			id : 'setGoodWin',
+			title : '选择菜品',
+			modal : true,
+			resizable : false,
+			closable : false,
+			width : 400,
+			layout : 'fit',
+			items : [selectGoodGrid],	
+			bbar : ['->', {
+				text : '设置为商品',
+				iconCls : 'btn_save',
+				handler : function(){
+					Ext.Ajax.request({
+						url : '../../OperateMaterial.do',
+						params : {dataSource : 'setToBeGood', material_goodList : material_goodList},
+						success : function(res, opt){
+							setGoodWin.hide();
+							var jr = Ext.decode(res.responseText);
+							if(jr.success){
+								materialCateTree.getRootNode().reload();
+								Ext.example.msg(jr.title, jr.msg);
+							}
+						},
+						failure : function(res, opt){
+							Ext.example.msg(Ext.decode(res.responseText));
+						}
+					});					
+				}
+			}, {
+				text : '关闭',
+				iconCls : 'btn_close',
+				handler : function(){
+					setGoodWin.hide();
+				}
+			}],
+			listeners : {
+				hide : function(thiz){
+					Ext.getCmp('material_goodCombo').setValue(-1);	
+					selectGoodGrid.getStore().removeAll();
+					Ext.getCmp('material_goodName').setValue();
+				}
+			}
+		});		
+	}
+
+}
+
+var material_bar = {treeId : 'materialCateTree',operateTree:Ext.ux.operateTree_material, mult : [{type : 2, option :[{name : '修改', fn : "operateMaterialCateHandler({otype:Ext.ux.otype['update']})"}, {name : '删除', fn : "operateMaterialCateHandler({otype:Ext.ux.otype['delete']})"}]}, 
+											{type : 1, option :[{name : '删除', fn : "operateMaterialCateHandler({otype:Ext.ux.otype['delete']})"}]} ]};
+
 Ext.onReady(function(){
 	
 	initControl();
@@ -683,4 +915,6 @@ Ext.onReady(function(){
 			}, btnAddMaterial]
 		})*/
 	});
+	
+	showFloatOption(material_bar);
 });
