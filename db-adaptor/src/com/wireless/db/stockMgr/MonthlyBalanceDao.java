@@ -69,7 +69,8 @@ public class MonthlyBalanceDao {
 			if(dbCon.rs.next()){
 				openingBalance = dbCon.rs.getFloat("ending_balance");
 			}else{
-				openingBalance = CostAnalyzeReportDao.getBalance(beginDate, dept.getId(), staff.getRestaurantId());
+//				openingBalance = CostAnalyzeReportDao.getBalance(beginDate, dept.getId(), staff.getRestaurantId());
+				openingBalance = 0;
 			}
 		
 			dbCon.rs.close();

@@ -13,7 +13,6 @@ import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.stockMgr.CostAnalyze;
 import com.wireless.pojo.stockMgr.MaterialDept;
 import com.wireless.pojo.stockMgr.StockAction;
-import com.wireless.pojo.stockMgr.StockAction.Status;
 import com.wireless.pojo.stockMgr.StockAction.SubType;
 
 public class CostAnalyzeReportDao {
@@ -192,12 +191,13 @@ public class CostAnalyzeReportDao {
 	
 	public static float getBalance(DBCon dbCon, String data, int deptId, int restaurantId) throws SQLException{
 		float endMoney = 0;
-		String dept_material = "SELECT material_id, dept_id FROM " + Params.dbName + ".material_dept " +
+		String dept_material = "SELECT material_id, dept_id, stock FROM " + Params.dbName + ".material_dept " +
 								" WHERE restaurant_id = " + restaurantId +
 								" AND dept_id = " + deptId;
 		dbCon.rs = dbCon.stmt.executeQuery(dept_material);
 		while(dbCon.rs.next()){
-			String endAmount = "SELECT S.sub_type, S.dept_in, S.dept_out, D.remaining, ROUND(D.dept_in_remaining * M.price, 2) as dept_in_money, ROUND(D.dept_out_remaining * M.price, 2) as dept_out_money, D.price FROM " + Params.dbName + ".stock_action as S " + 
+			//直接用stock * material的参考单价
+/*			String endAmount = "SELECT S.sub_type, S.dept_in, S.dept_out, D.remaining, ROUND(D.dept_in_remaining * M.price, 2) as dept_in_money, ROUND(D.dept_out_remaining * M.price, 2) as dept_out_money, D.price FROM " + Params.dbName + ".stock_action as S " + 
 					" INNER JOIN " + Params.dbName + ".stock_action_detail as D ON S.id = D.stock_action_id " +
 					" JOIN " + Params.dbName + ".material M ON M.material_id = D.material_id " +
 					" WHERE 1 = 1 " +
@@ -205,13 +205,19 @@ public class CostAnalyzeReportDao {
 					" AND S.ori_stock_date <= '" + data + "'" + 
 					" AND S.status = " + Status.AUDIT.getVal() +
 					" AND D.material_id = " + dbCon.rs.getInt("material_id") +
-					" ORDER BY D.id DESC LIMIT 0,1";
+					" ORDER BY D.id DESC LIMIT 0,1";*/
+			
+			String endAmount = "SELECT SUM(ROUND(MD.stock * M.price, 2)) AS endMoney FROM " + Params.dbName + ".material_dept MD "
+							+ " JOIN " + Params.dbName + ".material M ON M.material_id = MD.material_id "
+							+ " WHERE MD.restaurant_id = " + restaurantId 
+							+ " AND MD.dept_id = " + deptId;
+			
 			DBCon balance = new DBCon();
 			balance.connect();
 			balance.rs = balance.stmt.executeQuery(endAmount);
 			
 			if(balance.rs.next()){
-				SubType actionSubType = SubType.valueOf(balance.rs.getInt("sub_type"));
+/*				SubType actionSubType = SubType.valueOf(balance.rs.getInt("sub_type"));
 				if(actionSubType == SubType.STOCK_IN || actionSubType == SubType.MORE || actionSubType == SubType.SPILL){
 					endMoney += balance.rs.getFloat("dept_in_money");
 				}else if(actionSubType == SubType.STOCK_IN_TRANSFER || actionSubType == SubType.STOCK_OUT_TRANSFER){
@@ -223,7 +229,8 @@ public class CostAnalyzeReportDao {
 					
 				}else{
 					endMoney += balance.rs.getFloat("dept_out_money");
-				}
+				}*/
+				endMoney += balance.rs.getFloat("endMoney");
 			}
 			balance.disconnect();
 		}

@@ -1,6 +1,7 @@
 package com.wireless.db.inventoryMgr;
 
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedHashMap;
@@ -51,6 +52,9 @@ public class MaterialDao {
 			item.setLastModStaff(dbCon.rs.getString("last_mod_staff"));
 			item.setStatus(dbCon.rs.getInt("status"));
 			item.setCate(dbCon.rs.getInt("cate_id"), dbCon.rs.getString("cate_name"), dbCon.rs.getInt("cate_type"));
+			if(item.getCate().getType() == MaterialCate.Type.GOOD){
+				item.setGood(true);
+			}
 			item.setPinyin(PinyinUtil.cn2FirstSpell(dbCon.rs.getString("name")).toUpperCase());
 			
 			list.add(item);
@@ -163,10 +167,10 @@ public class MaterialDao {
 		int count = 0;
 		String updateSQL;
 		updateSQL = "UPDATE " + Params.dbName + ".material SET "
-				 + " cate_id = " + m.getCate().getId() 
-				 + " ,price = " + m.getPrice()
-				 + " ,stock = " + m.getStock()
-				 + " ,name = '" + m.getName() + "'"
+				 + (m.getCate().getId() != 0? " cate_id = " + m.getCate().getId() : "") 
+				 + (m.getPrice() != 0 ? " ,price = " + m.getPrice() : "")
+				 + (m.getStock() != 0 ? " ,stock = " + m.getStock() : "")
+				 + (m.getName() != null?" ,name = '" + m.getName() + "'" : "")
 				 + " ,last_mod_staff = '" + m.getLastModStaff() + "'"
 				 + " ,last_mod_date = '" + DateUtil.format(new Date().getTime()) + "'"
 				 + " WHERE material_id = " + m.getId()
@@ -402,6 +406,77 @@ public class MaterialDao {
 		return good;
 	}
 	
+	public static Material insertGoods(DBCon dbCon, Staff term, Food food) throws BusinessException, SQLException{
+//		checkMaterialFoodEx(dbCon, foodId);
+		// 查找系统保留的商品类型
+		
+/*		String querySQL = "SELECT cate_id, kitchen_id FROM " + Params.dbName + ".material_cate " 
+				 + " WHERE restaurant_id = " + term.getRestaurantId() + " AND type = " + MaterialCate.Type.GOOD.getValue()
+				 + " AND kitchen_id = " + food.getKitchen().getId();*/
+		
+		String querySQL = " SELECT MAX(F.kitchen_id) AS kitchen, FM.material_id, M.cate_id FROM " + Params.dbName + ".food F  " 
+						+ " JOIN " + Params.dbName + ".food_material FM ON F.food_id = FM.food_id " 
+						+ " JOIN " + Params.dbName + ".material M ON M.material_id = FM.material_id "
+						+ " WHERE F.kitchen_id = " + food.getKitchen().getId() +" AND F.food_id IN( "
+						+ " SELECT FM.food_id FROM " + Params.dbName + ".food_material FM "
+						+ " WHERE FM.restaurant_id = " + term.getRestaurantId() + " AND F.food_id = FM.food_id ) ";
+		
+		int cateId = 0;
+		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
+		if(dbCon.rs != null && dbCon.rs.next()){
+			cateId = dbCon.rs.getInt("cate_id");
+		}
+		if(cateId <= 0){
+			String insertCate = "INSERT INTO " + Params.dbName + ".material_cate (restaurant_id, name, type)" 
+						+ " VALUES("
+						  + term.getRestaurantId() + ", "
+						  + "'" + food.getKitchen().getName() + "', "
+						  + MaterialCate.Type.GOOD.getValue()
+						  + ")";
+			dbCon.stmt.executeUpdate(insertCate, Statement.RETURN_GENERATED_KEYS);
+			dbCon.rs = dbCon.stmt.getGeneratedKeys();
+			if(dbCon.rs.next()){
+				cateId = dbCon.rs.getInt(1);
+			}
+		}
+		
+		// 生成新商品库存信息
+		Material good = new Material(term.getRestaurantId(), 
+				food.getName(), 
+				cateId, 
+				term.getName(), 
+				Material.Status.NORMAL.getValue()
+		);
+		try{
+			MaterialDao.insert(dbCon, good);
+		}catch(SQLException e){
+			e.printStackTrace();
+			throw new BusinessException(MaterialError.INSERT_FAIL);
+		}
+		dbCon.rs = dbCon.stmt.executeQuery(SQLUtil.SQL_QUERY_LAST_INSERT_ID);
+		if(dbCon.rs != null && dbCon.rs.next()){
+			good.setId(dbCon.rs.getInt(1));
+			dbCon.rs.close();
+			dbCon.rs = null;
+		}
+		
+		// 添加菜品和库存资料之间的关系
+		String insertSQL = "INSERT INTO " + Params.dbName + ".food_material (food_id, material_id, restaurant_id, consumption)"
+				  + " VALUES("
+				  + food.getFoodId() + ", "
+				  + good.getId() + ", "
+				  + good.getRestaurantId() + ", "
+				  + "1"
+				  + ")";
+		try{
+			dbCon.stmt.executeUpdate(insertSQL);
+		}catch(SQLException e){
+			e.printStackTrace();
+			throw new BusinessException(FoodError.INSERT_FAIL_BIND_MATERIAL_FAIL);
+		}
+		return good;
+	}	
+	
 	/**
 	 * Get monthSettle materials  
 	 * @param dbCon
@@ -507,7 +582,6 @@ public class MaterialDao {
 			dbCon.disconnect();
 		}
 	}
-	
 	
 	
 }
