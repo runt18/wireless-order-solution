@@ -467,6 +467,7 @@ public class Kitchen implements Parcelable, Comparable<Kitchen>, Jsonable{
 		
 		if(flag == KITCHEN_JSONABLE_SIMPLE){
 			jm.putInt(Key4Json.KITCHEN_ID.key, this.kitchenId);
+			jm.putString(Key4Json.KITCHEN_NAME.key, this.name);
 			jm.putJsonable(Key4Json.ASSOCIATED_DEPT.key, this.dept, Department.DEPT_JSONABLE_SIMPLE);
 		}else{
 			jm.putInt(Key4Json.KITCHEN_ID.key, this.kitchenId);
