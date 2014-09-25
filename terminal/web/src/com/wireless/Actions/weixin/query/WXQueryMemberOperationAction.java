@@ -15,6 +15,8 @@ import org.apache.struts.actions.DispatchAction;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.client.member.MemberOperationDao;
+import com.wireless.db.oss.OSSParams;
+import com.wireless.db.oss.OSSUtil;
 import com.wireless.db.promotion.CouponDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.weixin.member.WeixinMemberDao;
@@ -27,8 +29,6 @@ import com.wireless.pojo.client.MemberOperation;
 import com.wireless.pojo.promotion.Coupon;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.NumericUtil;
-import com.wireless.util.OSSParams;
-import com.wireless.util.OSSUtil;
 import com.wireless.util.SQLUtil;
 
 public class WXQueryMemberOperationAction extends DispatchAction{

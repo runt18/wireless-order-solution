@@ -23,13 +23,13 @@ import com.oreilly.servlet.multipart.FilePart;
 import com.oreilly.servlet.multipart.MultipartParser;
 import com.oreilly.servlet.multipart.Part;
 import com.wireless.db.menuMgr.FoodDao;
+import com.wireless.db.oss.OSSUtil;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.util.CompressImage;
-import com.wireless.util.OSSUtil;
 import com.wireless.util.WebParams;
 
 public class ImageFileUploadAction extends Action{

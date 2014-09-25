@@ -59,6 +59,7 @@ import org.marker.weixin.msg.Msg4Text;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.billStatistics.CalcBillStatisticsDao;
+import com.wireless.db.oss.OssImageDao;
 import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.db.shift.ShiftDao;
 import com.wireless.db.staffMgr.StaffDao;
@@ -68,12 +69,12 @@ import com.wireless.pojo.billStatistics.DutyRange;
 import com.wireless.pojo.billStatistics.IncomeByDept;
 import com.wireless.pojo.billStatistics.IncomeByEachDay;
 import com.wireless.pojo.billStatistics.ShiftDetail;
+import com.wireless.pojo.oss.OssImage;
 import com.wireless.pojo.restaurantMgr.Restaurant;
+import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.DateUtil;
 import com.wireless.pojo.util.NumericUtil;
 import com.wireless.util.DateType;
-import com.wireless.util.OSSParams;
-import com.wireless.util.OSSUtil;
 
 public class FinanceWeixinAction extends Action {
 	
@@ -84,8 +85,6 @@ public class FinanceWeixinAction extends Action {
 	//final static String APP_SECRET = "4322fbf1c4bba4cccd90424e2e16306b";
 	
 	private final static int WEIXIN_CONTENT_LENGTH = 34;
-	
-	private String financeBucket;
 	
 	private final static String PROMPT_HELP_MSG = "用管理员账号登陆后台，按图片提示，扫描验证二维码绑定您的餐厅";
 	private final static String PROMPT_HELP_PIC_URL = "http://wx.e-tones.net/web-term/images/interestHelp.jpg?" + System.currentTimeMillis();
@@ -98,7 +97,6 @@ public class FinanceWeixinAction extends Action {
 		if(request.getMethod().equalsIgnoreCase("get")){
 			doGet(request, response);
 		}else if(request.getMethod().equalsIgnoreCase("post")){
-			financeBucket = getServlet().getInitParameter("oss_bucket_finance");
 			doPost(request, response);
 		}
 		return null;
@@ -502,6 +500,7 @@ public class FinanceWeixinAction extends Action {
 		
 		try{
 			int restaurantId = WeixinFinanceDao.getRestaurantIdByWeixin(msg.getFromUserName());
+			Staff staff = StaffDao.getAdminByRestaurant(restaurantId);
 			Calendar c = Calendar.getInstance();
 			c.setFirstDayOfWeek(Calendar.MONDAY);
 			// first day of this week
@@ -515,26 +514,37 @@ public class FinanceWeixinAction extends Action {
 			}
 			long endDate = c.getTimeInMillis();
 			
-			List<IncomeByEachDay> incomes = CalcBillStatisticsDao.calcIncomeByEachDay(StaffDao.getAdminByRestaurant(restaurantId), 
-														new DutyRange(
-														DateUtil.format(beginDate, DateUtil.Pattern.DATE),
-														DateUtil.format(endDate, DateUtil.Pattern.DATE)),
-														//"2014-08-18",
-														//"2014-08-18"),
+			List<IncomeByEachDay> incomes = CalcBillStatisticsDao.calcIncomeByEachDay(staff, 
+														new DutyRange(DateUtil.format(beginDate, DateUtil.Pattern.DATE),
+																	  DateUtil.format(endDate, DateUtil.Pattern.DATE)),
+																	  //"2014-08-18",
+																	  //"2014-08-18"),
 														new CalcBillStatisticsDao.ExtraCond(DateType.HISTORY));
 			
-			final String fileNameJpg = "trend_chart_" + msg.getFromUserName() + ".jpg";
+			final String associatedSerial = "trend_chart_thisWeek_" + msg.getFromUserName();
+			final String fileNameJpg = associatedSerial + ".jpg";
 			
 			ByteArrayOutputStream bosJpg = new ByteArrayOutputStream();
 			ChartUtilities.writeChartAsJPEG(bosJpg, 1, createChart(msg, incomes), 360, 280, null);
 			
 			ByteArrayInputStream bisJpg = new ByteArrayInputStream(bosJpg.toByteArray());
-			OSSUtil.upload(bisJpg, financeBucket, fileNameJpg);
+			
+			List<OssImage> result = OssImageDao.getByCond(staff, new OssImageDao.ExtraCond().setAssociated(OssImage.Type.WX_FINANCE, associatedSerial));
+			int ossImageId;
+			if(result.isEmpty()){
+				ossImageId = OssImageDao.insert(staff, new OssImage.InsertBuilder(OssImage.Type.WX_FINANCE, associatedSerial).setImgResource(fileNameJpg, bisJpg));
+			}else{
+				ossImageId = result.get(0).getId();
+				OssImageDao.update(staff, new OssImage.UpdateBuilder(ossImageId).setImgResource(fileNameJpg, bisJpg));
+			}
+			
+			String picUrl = OssImageDao.getById(staff, ossImageId).getObjectUrl() + "?" + System.currentTimeMillis();
+			
 			bosJpg.close();
 	    	bisJpg.close();
 			
 			Data4Item d1 = new Data4Item("本周(" + new SimpleDateFormat("M月d日").format(beginDate) + " - " + new SimpleDateFormat("M月d日").format(endDate) + ")", 
-										 "走势图", "http://" + financeBucket + "." + OSSParams.instance().OSS_OUTER_POINT + "/" + fileNameJpg + "?" + System.currentTimeMillis(), "");
+										 "走势图", picUrl, "");
 			
 			Data4Item d2 = new Data4Item("最近一天营业额：" + NumericUtil.CURRENCY_SIGN + NumericUtil.float2String2(incomes.get(incomes.size() - 1).getIncomeByPay().getTotalActual()), 
 										 "", "http://wx.e-tones.net/web-term/images/recentIncome.png", ""); 
@@ -570,6 +580,7 @@ public class FinanceWeixinAction extends Action {
 		
 		try{
 			int restaurantId = WeixinFinanceDao.getRestaurantIdByWeixin(msg.getFromUserName());
+			Staff staff = StaffDao.getAdminByRestaurant(restaurantId);
 			
 			Calendar c = Calendar.getInstance();
 			c.setFirstDayOfWeek(Calendar.MONDAY);
@@ -586,7 +597,7 @@ public class FinanceWeixinAction extends Action {
 	        c.add(Calendar.DAY_OF_MONTH, -1);
 			long endDate = c.getTimeInMillis();
 			
-			List<IncomeByEachDay> incomes = CalcBillStatisticsDao.calcIncomeByEachDay(StaffDao.getAdminByRestaurant(restaurantId), 
+			List<IncomeByEachDay> incomes = CalcBillStatisticsDao.calcIncomeByEachDay(staff, 
 														new DutyRange(
 														DateUtil.format(beginDate, DateUtil.Pattern.DATE),
 														DateUtil.format(endDate, DateUtil.Pattern.DATE)),
@@ -594,18 +605,30 @@ public class FinanceWeixinAction extends Action {
 														//"2013-08-5"
 														new CalcBillStatisticsDao.ExtraCond(DateType.HISTORY));
 			
-			final String fileNameJpg = "trend_chart_" + msg.getFromUserName() + ".jpg";
+			final String associatedSerial = "trend_chart_lastWeek_" + msg.getFromUserName();
+			final String fileNameJpg = associatedSerial + ".jpg";
 			
 			ByteArrayOutputStream bosJpg = new ByteArrayOutputStream();
 			ChartUtilities.writeChartAsJPEG(bosJpg, 1, createChart(msg, incomes), 360, 280, null);
 			
 			ByteArrayInputStream bisJpg = new ByteArrayInputStream(bosJpg.toByteArray());
-			OSSUtil.upload(bisJpg, financeBucket, fileNameJpg);
+
+			List<OssImage> result = OssImageDao.getByCond(staff, new OssImageDao.ExtraCond().setAssociated(OssImage.Type.WX_FINANCE, associatedSerial));
+			int ossImageId;
+			if(result.isEmpty()){
+				ossImageId = OssImageDao.insert(staff, new OssImage.InsertBuilder(OssImage.Type.WX_FINANCE, associatedSerial).setImgResource(fileNameJpg, bisJpg));
+			}else{
+				ossImageId = result.get(0).getId();
+				OssImageDao.update(staff, new OssImage.UpdateBuilder(ossImageId).setImgResource(fileNameJpg, bisJpg));
+			}
+			
+			String picUrl = OssImageDao.getById(staff, ossImageId).getObjectUrl() + "?" + System.currentTimeMillis();
+			
 			bosJpg.close();
 	    	bisJpg.close();
 			
 			Data4Item d1 = new Data4Item("上周(" + new SimpleDateFormat("M月d日").format(beginDate) + " - " + new SimpleDateFormat("M月d日").format(endDate) + ")",
-									     "走势图", "http://" + financeBucket + "." + OSSParams.instance().OSS_OUTER_POINT + "/" + fileNameJpg + "?" + System.currentTimeMillis(), "");
+									     "走势图", picUrl, "");
 			
 			
 			float averageIncome = 0;

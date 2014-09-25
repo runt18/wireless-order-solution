@@ -11,11 +11,10 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 
+import com.wireless.db.oss.OSSParams;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.staffMgr.Staff;
-import com.wireless.util.OSSParams;
-import com.wireless.util.OSSUtil;
 
 public class QueryOTAction extends Action {
 
@@ -54,7 +53,7 @@ public class QueryOTAction extends Action {
 				int pin = Integer.parseInt(request.getParameter("pin"));
 				Staff staff = StaffDao.getById(pin);
 				// 获取图片操作路径(物理路径)
-				String url = "http://" + OSSUtil.BUCKET_IMAGE + "." + OSSParams.instance().OSS_OUTER_POINT + "/" + staff.getRestaurantId() + "/";
+				String url = "http://" + getServlet().getInitParameter("oss_bucket_image") + "." + OSSParams.instance().OSS_OUTER_POINT + "/" + staff.getRestaurantId() + "/";
 				result = result.replace("$(result)", "true").replace("$(value)", url);
 			}			
 			

@@ -13,13 +13,13 @@ import org.apache.struts.actions.DispatchAction;
 import com.wireless.Actions.menuMgr.basic.ImageFileUploadAction;
 import com.wireless.db.DBCon;
 import com.wireless.db.menuMgr.FoodDao;
+import com.wireless.db.oss.OSSParams;
+import com.wireless.db.oss.OSSUtil;
 import com.wireless.db.weixin.restaurant.WeixinRestaurantDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.menuMgr.Food;
 import com.wireless.util.DataPaging;
-import com.wireless.util.OSSParams;
-import com.wireless.util.OSSUtil;
 
 public class WXQueryFoodAction extends DispatchAction{
 	

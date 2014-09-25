@@ -18,13 +18,13 @@ import com.aliyun.common.utils.IOUtils;
 import com.oreilly.servlet.multipart.FilePart;
 import com.oreilly.servlet.multipart.MultipartParser;
 import com.oreilly.servlet.multipart.Part;
+import com.wireless.db.oss.OSSUtil;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.weixin.restaurant.WeixinRestaurantDao;
 import com.wireless.json.JObject;
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.pojo.weixin.restaurant.WeixinRestaurant;
-import com.wireless.util.OSSUtil;
 import com.wireless.util.WebParams;
 
 public class WXOperateMaterialAction extends DispatchAction {

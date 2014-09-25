@@ -8,9 +8,9 @@ import javax.servlet.ServletException;
 import org.apache.struts.action.ActionServlet;
 
 import com.wireless.db.DBCon;
+import com.wireless.db.oss.OSSParams;
+import com.wireless.pojo.oss.OssImage;
 import com.wireless.sccon.ServerConnector;
-import com.wireless.util.OSSParams;
-import com.wireless.util.OSSUtil;
 
 public class InitServlet extends ActionServlet {
 	
@@ -44,8 +44,9 @@ public class InitServlet extends ActionServlet {
 					   	   getServletConfig().getInitParameter("oss_access_key"), 
 					   	   getServletConfig().getInitParameter("oss_inner_point"), 
 					   	   getServletConfig().getInitParameter("oss_outer_point"));
+			OssImage.Params.init(getServletConfig().getInitParameter("oss_bucket"), OSSParams.instance());
 			/**/
-			OSSUtil.init(OSSParams.instance(), getServletConfig().getInitParameter("oss_bucket_image"));
+			//OSSUtil.init(OSSParams.instance(), getServletConfig().getInitParameter("oss_bucket_image"));
 			
 		} catch (Exception e) {
 			throw new ServletException(e);

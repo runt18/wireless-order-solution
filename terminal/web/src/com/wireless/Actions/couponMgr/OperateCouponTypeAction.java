@@ -21,6 +21,7 @@ import com.aliyun.common.utils.IOUtils;
 import com.oreilly.servlet.multipart.FilePart;
 import com.oreilly.servlet.multipart.MultipartParser;
 import com.oreilly.servlet.multipart.Part;
+import com.wireless.db.oss.OSSUtil;
 import com.wireless.db.promotion.CouponTypeDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
@@ -30,7 +31,6 @@ import com.wireless.json.Jsonable;
 import com.wireless.pojo.promotion.CouponType;
 import com.wireless.pojo.promotion.CouponType.InsertBuilder;
 import com.wireless.pojo.staffMgr.Staff;
-import com.wireless.util.OSSUtil;
 import com.wireless.util.WebParams;
 
 public class OperateCouponTypeAction extends DispatchAction{
