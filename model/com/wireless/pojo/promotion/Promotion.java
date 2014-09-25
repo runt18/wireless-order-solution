@@ -41,6 +41,9 @@ public class Promotion implements Jsonable{
 		}
 		
 		public CreateBuilder setPoint(int point){
+			if(point <= 0){
+				throw new IllegalArgumentException("积分条件不能小于0");
+			}
 			this.point = point;
 			return this;
 		}

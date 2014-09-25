@@ -2,6 +2,7 @@ package com.wireless.pojo.promotion;
 
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
+import com.wireless.pojo.oss.OssImage;
 import com.wireless.pojo.util.DateUtil;
 
 public class CouponType implements Jsonable{
@@ -11,7 +12,8 @@ public class CouponType implements Jsonable{
 		private final float price;
 		private long expired;
 		private String comment;
-		private String image;
+		
+		private OssImage ossImage;
 		
 		public InsertBuilder(String name, float price){
 			this.name = name;
@@ -35,9 +37,18 @@ public class CouponType implements Jsonable{
 			return this;
 		}
 		
-		public InsertBuilder setImage(String image){
-			this.image = image;
+		public InsertBuilder setImage(int ossImageId){
+			this.ossImage = new OssImage(ossImageId);
 			return this;
+		}
+		
+		public InsertBuilder setImage(OssImage ossImage){
+			this.ossImage = ossImage;
+			return this;
+		}
+		
+		public boolean hasImage(){
+			return this.ossImage != null;
 		}
 		
 		public CouponType build(){
@@ -50,8 +61,8 @@ public class CouponType implements Jsonable{
 		private final String name;
 		private long expired = Integer.MIN_VALUE;
 		private String comment;
-		private String image;
 		private float price = -1;
+		private OssImage ossImage;
 		
 		public UpdateBuilder(int id, String name){
 			this.id = id;
@@ -87,13 +98,13 @@ public class CouponType implements Jsonable{
 			return this;
 		}
 		
-		public UpdateBuilder setImage(String image){
-			this.image = image;
+		public UpdateBuilder setImage(OssImage ossImage){
+			this.ossImage = ossImage;
 			return this;
 		}
 		
 		public boolean isImageChanged(){
-			return this.image != null;
+			return this.ossImage != null;
 		}
 		
 		public UpdateBuilder setPrice(float price){
@@ -116,15 +127,15 @@ public class CouponType implements Jsonable{
 	private float price;
 	private long expired;
 	private String comment;
-	private String image;
+	private OssImage image;
 	
 	private CouponType(UpdateBuilder builder){
 		setId(builder.id);
 		setName(builder.name);
 		setExpired(builder.expired);
 		setComment(builder.comment);
-		setImage(builder.image);
 		setPrice(builder.price);
+		setImage(builder.ossImage);
 	}
 	
 	private CouponType(InsertBuilder builder){
@@ -132,7 +143,7 @@ public class CouponType implements Jsonable{
 		setPrice(builder.price);
 		setExpired(builder.expired);
 		setComment(builder.comment);
-		setImage(builder.image);
+		setImage(builder.ossImage);
 	}
 	
 	public CouponType(int id){
@@ -219,20 +230,16 @@ public class CouponType implements Jsonable{
 		return this.comment;
 	}
 	
-	public String getImage(){
-		if(image != null){
-			return image;
-		}else{
-			return "";
-		}
+	public OssImage getImage(){
+		return image;
 	}
 	
-	public void setImage(String image){
+	public void setImage(OssImage image){
 		this.image = image;
 	}
 	
 	public boolean hasImage(){
-		return image != null ? image.length() != 0 : false;
+		return image != null;
 	}
 	
 	@Override
@@ -263,7 +270,7 @@ public class CouponType implements Jsonable{
 		jm.putFloat("price", this.price);
 		jm.putFloat("expired", this.expired);
 		jm.putString("expiredFormat", DateUtil.formatToDate(this.expired));
-		jm.putString("image", this.image);
+		jm.putJsonable("image", this.image, 0);
 		return jm;
 	}
 

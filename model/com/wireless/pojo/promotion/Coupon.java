@@ -103,10 +103,13 @@ public class Coupon implements Jsonable{
 		}
 	}
 	
-	public class DrawProgress implements Jsonable{
-		private final int point;
-		private DrawProgress(int point){
+	public static class DrawProgress implements Jsonable{
+		
+		private int point;
+		private final Coupon coupon;
+		private DrawProgress(int point, Coupon coupon){
 			this.point = point;
+			this.coupon = coupon;
 		}
 		
 		public int getPoint(){
@@ -114,10 +117,14 @@ public class Coupon implements Jsonable{
 		}
 		
 		public boolean isOk(){
-			if(promotion.getType() == Promotion.Type.FREE){
-				return true;
-			}else if(promotion.getType() == Promotion.Type.ONCE || promotion.getType() == Promotion.Type.TOTAL){
-				return point >= promotion.getPoint();
+			if(coupon.getStatus() == Coupon.Status.PUBLISHED && coupon.getPromotion().getStatus() == Promotion.Status.PROGRESS){
+				if(coupon.getPromotion().getType() == Promotion.Type.FREE){
+					return true;
+				}else if(coupon.getPromotion().getType() == Promotion.Type.ONCE || coupon.getPromotion().getType() == Promotion.Type.TOTAL){
+					return point >= coupon.getPromotion().getPoint();
+				}else{
+					return false;
+				}
 			}else{
 				return false;
 			}
@@ -125,7 +132,7 @@ public class Coupon implements Jsonable{
 		
 		@Override
 		public String toString(){
-			return promotion.getType().toString() + promotion.getPoint() + ", 当前积分" + point;
+			return coupon.getPromotion().getTitle() + ", " + coupon.getPromotion().getType().toString() + coupon.getPromotion().getPoint() + ", 当前积分" + point;
 		}
 
 		@Override
@@ -148,10 +155,11 @@ public class Coupon implements Jsonable{
 	private Promotion promotion;
 	private long birthDate;
 	private Member member;
+	private long drawDate;
 	private int orderId;
 	private long orderDate;
 	private Status status = Status.UNKNOWN;
-	private DrawProgress drawProgress;
+	private final DrawProgress drawProgress = new DrawProgress(0, this);
 	
 	private Coupon(InsertBuilder builder){
 		setCouponType(new CouponType(builder.couponTypeId));
@@ -217,6 +225,14 @@ public class Coupon implements Jsonable{
 	public void setPromotion(Promotion promotion){
 		this.promotion = promotion;
 	}
+
+	public long getDrawDate(){
+		return this.drawDate;
+	}
+	
+	public void setDrawDate(long drawDate){
+		this.drawDate = drawDate;
+	}
 	
 	public int getOrderId() {
 		return orderId;
@@ -279,7 +295,7 @@ public class Coupon implements Jsonable{
 	}
 	
 	public void setDrawProgress(int point){
-		drawProgress = new DrawProgress(point);
+		drawProgress.point = point;
 	}
 	
 	public DrawProgress getDrawProgress(){
