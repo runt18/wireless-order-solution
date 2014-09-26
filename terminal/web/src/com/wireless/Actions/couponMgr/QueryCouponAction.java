@@ -14,11 +14,14 @@ import org.apache.struts.actions.DispatchAction;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.promotion.CouponDao;
+import com.wireless.db.promotion.CouponDao.ExtraCond;
 import com.wireless.db.staffMgr.StaffDao;
+import com.wireless.db.weixin.member.WeixinMemberDao;
 import com.wireless.db.weixin.restaurant.WeixinRestaurantDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.promotion.Coupon;
+import com.wireless.pojo.promotion.Promotion;
 import com.wireless.pojo.staffMgr.Staff;
 
 public class QueryCouponAction extends DispatchAction{
@@ -96,10 +99,6 @@ public class QueryCouponAction extends DispatchAction{
 		List<Coupon> list = new ArrayList<>();
 		try{
 			Coupon coupon = CouponDao.getById(staff, Integer.parseInt(couponId));
-/*			String couponImg = "http://" + getServlet().getInitParameter("oss_bucket_image")
-	        		+ "." + getServlet().getInitParameter("oss_outer_point") 
-	        		+ "/" + staff.getRestaurantId() + "/" + coupon.getCouponType().getImage();
-			coupon.getCouponType().setImage(couponImg);*/
 			list.add(coupon);
 			jobject.setRoot(list);
 		}catch(BusinessException e){
@@ -116,4 +115,45 @@ public class QueryCouponAction extends DispatchAction{
 		}
 		return null;
 	}
+	
+	public ActionForward defaultCoupon(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		String formId = request.getParameter("fid");
+		String openId = request.getParameter("oid");
+				
+		int rid = 0;
+		int mid = 0;
+		DBCon dbCon = new DBCon();
+		dbCon.connect();
+		rid = WeixinRestaurantDao.getRestaurantIdByWeixin(dbCon, formId);
+		Staff staff = StaffDao.getByRestaurant(dbCon, rid).get(0);
+		mid = WeixinMemberDao.getBoundMemberIdByWeixin(dbCon, openId, formId);
+		dbCon.disconnect();
+		
+		
+		JObject jobject = new JObject();
+		List<Coupon> list = new ArrayList<>();
+		try{
+			CouponDao.ExtraCond extra = new ExtraCond();
+			extra.setMember(mid);
+			extra.addPromotionStatus(Promotion.Status.PROGRESS);
+			extra.addPromotionStatus(Promotion.Status.PUBLISH);
+			
+			List<Coupon> coupons = CouponDao.getByCond(staff, extra, null);
+			if(!coupons.isEmpty()){
+				list.add(coupons.get(0));
+			}
+			jobject.setRoot(list);
+		}catch(SQLException e){
+			e.printStackTrace();
+			jobject.initTip(e);
+		}catch(Exception e){
+			e.printStackTrace();
+			jobject.initTip(e);
+		}finally{
+			response.getWriter().print(jobject.toString());
+		}
+		return null;
+	}	
 }

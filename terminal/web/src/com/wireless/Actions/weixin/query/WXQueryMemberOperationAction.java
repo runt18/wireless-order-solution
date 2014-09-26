@@ -15,8 +15,6 @@ import org.apache.struts.actions.DispatchAction;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.client.member.MemberOperationDao;
-import com.wireless.db.oss.OSSParams;
-import com.wireless.db.oss.OSSUtil;
 import com.wireless.db.promotion.CouponDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.db.weixin.member.WeixinMemberDao;
@@ -317,7 +315,7 @@ public class WXQueryMemberOperationAction extends DispatchAction{
 		response.setCharacterEncoding("UTF-8");
 		
 		JObject jobject = new JObject();
-		String imageBrowseDefaultFile = this.getServlet().getInitParameter("imageBrowseDefaultFile");
+//		String imageBrowseDefaultFile = this.getServlet().getInitParameter("imageBrowseDefaultFile");
 		DBCon dbCon = null;
 		try{
 			dbCon = new DBCon();
@@ -350,14 +348,14 @@ public class WXQueryMemberOperationAction extends DispatchAction{
 			}
 			
 			jobject.getOther().put("root", root);*/
-			for (Coupon temp : couponList) {
+/*			for (Coupon temp : couponList) {
 				if(temp.getCouponType().hasImage()){
 					temp.getCouponType().setImage(("http://" + OSSUtil.BUCKET_IMAGE + "." + OSSParams.instance().OSS_OUTER_POINT + "/" + temp.getRestaurantId() + "/" + temp.getCouponType().getImage()));
 				}else{
 					temp.getCouponType().setImage(imageBrowseDefaultFile);
 				}
 			}
-			
+*/			
 			jobject.setRoot(couponList);
 		}catch(BusinessException e){	
 			e.printStackTrace();
