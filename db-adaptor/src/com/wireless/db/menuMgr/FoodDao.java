@@ -1062,7 +1062,6 @@ public class FoodDao {
 	
 	public static Food relativeToFood(DBCon dbCon, Staff staff, int materialId) throws SQLException{
 		Food food = null;
-		
 		String sql = "SELECT FM.food_id,  F.name AS foodName, F.kitchen_id, K.name AS kitchenName FROM food_material FM "
 					+ " JOIN food F ON FM.food_id = F.food_id " 
 					+ " JOIN kitchen K ON K.kitchen_id = F.kitchen_id " 
