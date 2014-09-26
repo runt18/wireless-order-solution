@@ -461,7 +461,7 @@ function toggleCouponContent(){
 									for(var i = 0; i < data.root.length; i++){
 										temp = data.root[i];
 										html.push(templet.format({
-											couponImg : temp.couponType.image,
+											couponImg : temp.couponType.ossImage.image,
 											name : temp.couponType.name,
 											cPrice : temp.couponType.price,
 											expiredTime : temp.couponType.expiredFormat,
