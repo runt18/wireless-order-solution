@@ -198,9 +198,13 @@ function getPromotionBodyById(id){
 																'<div style="margin: 10px 10px 10px 10px; color:LightSkyBlue; font-szie:15px;font-weight:bold">活动日期 : <font color="red">' + jr.root[0].promotionBeginDate + '</font>&nbsp;至&nbsp;<font color="red">' + jr.root[0].promotionEndDate + '</font></div>' +
 																promotionRule(jr.root[0].pType, jr.root[0].point) +
 																jr.root[0].body);
-																
-				Ext.getCmp('promotionCouponPreview').body.update('<div style="text-align:left; margin: 10px 10px 10px 20px;float:left;"><img height="160"  src="' + jr.root[0].coupon.image + '" /></div>'
-																+ '<div style="float:left;vertical-align: middle;line-height: 40px;"><br><span style="margin-top: 15px;">' + jr.root[0].coupon.name + '</span><br><span >面额 : ' + jr.root[0].coupon.price + ' 元</span><br><span >到期 : ' + jr.root[0].coupon.expiredFormat + '</span></div>');												
+				if(jr.root[0].coupon){
+					Ext.getCmp('promotionCouponPreview').body.update('<div style="text-align:left; margin: 10px 10px 10px 20px;float:left;"><img height="160"  src="' + jr.root[0].coupon.ossImage.image + '" /></div>'
+																+ '<div style="float:left;vertical-align: middle;line-height: 40px;"><br><span style="margin-top: 15px;">' + jr.root[0].coupon.name + '</span><br><span >面额 : ' + jr.root[0].coupon.price + ' 元</span><br><span >到期 : ' + jr.root[0].coupon.expiredFormat + '</span></div>');							
+				}else{
+					Ext.getCmp('promotionCouponPreview').body.update('<div style="text-align:center; margin: 10px 10px 10px 10px;"><img height="160"  src="../../images/noCouponNow.png" /></div>');
+				}												
+											
 			}
 		},
 		failure : function(res, opt){
@@ -333,7 +337,7 @@ function operatePromotionData(data){
 		couponName.setValue(data.coupon.name);
 		price.setValue(data.coupon.price);
 		expiredDate.setValue(data.coupon.expiredFormat);
-		Ext.getCmp('couponTypeBox').setImg(data.coupon.image);
+		Ext.getCmp('couponTypeBox').setImg(data.coupon.ossImage.image);
 	}
 	
 	if(data.members.length > 0){
@@ -596,13 +600,15 @@ Ext.onReady(function() {
         	}
         	coupon_uploadMask.show();
         	Ext.Ajax.request({
-        		url : '../../OperateCouponType.do?dataSource=updateCouponImg&couponTypeId' + couponImgId,
+        		url : '../../OperateImage.do?dataSource=upload&ossType=3',
  	   			isUpload : true,
  	   			form : form.getForm().getEl(),
  	   			success : function(response, options){
  	   				coupon_uploadMask.hide();
  	   				var jr = Ext.decode(response.responseText.replace(/<\/?[^>]*>/g,''));
- 	   				operatePromotTypeWin.image = jr.other.imagePath;
+ 	   				var ossImage = jr.root[0];
+ 	   				operatePromotTypeWin.image = ossImage.image;
+ 	   				operatePromotTypeWin.ossId = ossImage.imageId;
  	   				Ext.ux.showMsg(jr);
  	   			},
  	   			failure : function(response, options){
@@ -652,7 +658,7 @@ Ext.onReady(function() {
         enableSourceEdit: true,
 //        fontFamilies: ["宋体", "隶书", "黑体"],
         plugins : [new Ext.ux.plugins.HEInsertImage({
-        	url : '../../WXOperateMaterial.do?dataSource=upload&time=' + new Date().getTime()
+        	url : '../../OperateImage.do?dataSource=upload&ossType=1'
         })]
 	});
 	var btnPreview = new Ext.Button({
