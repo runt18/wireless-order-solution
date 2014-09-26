@@ -23,6 +23,7 @@ import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.pojo.billStatistics.DateRange;
 import com.wireless.pojo.client.Member;
+import com.wireless.pojo.oss.OssImage;
 import com.wireless.pojo.promotion.Coupon;
 import com.wireless.pojo.promotion.CouponType;
 import com.wireless.pojo.promotion.Promotion;
@@ -68,7 +69,7 @@ public class OperatePromotionAction extends DispatchAction{
 				promotionCreateBuilder = Promotion.CreateBuilder.newInstance(title, new DateRange(beginDate, endDate), body);
 			}else{
 //				CouponType.InsertBuilder typeInsertBuilder = new CouponType.InsertBuilder(couponName, Integer.parseInt(price)).setComment("活动优惠劵").setImage(image).setExpired(DateUtil.parseDate(expiredDate));
-				promotionCreateBuilder = Promotion.CreateBuilder.newInstance(title, new DateRange(beginDate, endDate), body, Promotion.Type.valueOf(Integer.parseInt(pType)), new CouponType.InsertBuilder(couponName, Integer.parseInt(price)).setComment("活动优惠劵").setImage(image).setExpired(DateUtil.parseDate(expiredDate)));
+				promotionCreateBuilder = Promotion.CreateBuilder.newInstance(title, new DateRange(beginDate, endDate), body, Promotion.Type.valueOf(Integer.parseInt(pType)), new CouponType.InsertBuilder(couponName, Integer.parseInt(price)).setComment("活动优惠劵").setImage(Integer.parseInt(image)).setExpired(DateUtil.parseDate(expiredDate)));
 				if(point != null && !point.isEmpty()){
 					promotionCreateBuilder.setPoint(Integer.parseInt(point));
 				}
@@ -141,7 +142,7 @@ public class OperatePromotionAction extends DispatchAction{
 			}else{
 				CouponType.UpdateBuilder typeUpdateBuilder = new CouponType.UpdateBuilder(Integer.parseInt(couponTypeId), couponName).setComment("").setPrice(Integer.parseInt(price)).setExpired(expiredDate);
 				if(image != null && !image.isEmpty()){
-					typeUpdateBuilder.setImage(image);
+					typeUpdateBuilder.setImage(new OssImage(Integer.parseInt(image)));
 				}
 				promotionUpdateBuilder = new Promotion.UpdateBuilder(Integer.parseInt(pId)).setRange(new DateRange(beginDate, endDate))
 										 .setTitle(title)
@@ -199,12 +200,12 @@ public class OperatePromotionAction extends DispatchAction{
 		JObject jobject = new JObject();
 		try{
 			Promotion promo = PromotionDao.getById(staff, Integer.parseInt(promotionId));
-			
+/*			
 			String image = "http://" + getServlet().getInitParameter("oss_bucket_image")
 	        		+ "." + getServlet().getInitParameter("oss_outer_point") 
 	        		+ "/" + staff.getRestaurantId() + "/" + promo.getCouponType().getImage();
 			
-			promo.getCouponType().setImage(image);
+			promo.getCouponType().setImage(image);*/
 			List<Promotion> p_List = new ArrayList<>();
 			p_List.add(promo);
 			jobject.setRoot(p_List);
@@ -236,15 +237,6 @@ public class OperatePromotionAction extends DispatchAction{
 		JObject jobject = new JObject();
 		try{
 			final Promotion p = PromotionDao.getById(staff, Integer.parseInt(promotionId));
-			
-			if(p.getType() != Promotion.Type.DISPLAY_ONLY){
-				String image = "http://" + getServlet().getInitParameter("oss_bucket_image")
-		        		+ "." + getServlet().getInitParameter("oss_outer_point") 
-		        		+ "/" + staff.getRestaurantId() + "/" + p.getCouponType().getImage();
-				
-				p.getCouponType().setImage(image);				
-			}
-
 			
 			final Promotion promo = p;
 			List<Coupon> p_List = CouponDao.getByCond(staff, new CouponDao.ExtraCond().setPromotion(p.getId()), null);

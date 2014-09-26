@@ -1,13 +1,6 @@
 package com.wireless.Actions.couponMgr;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.security.MessageDigest;
 import java.sql.SQLException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -17,21 +10,13 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
-import com.aliyun.common.utils.IOUtils;
-import com.oreilly.servlet.multipart.FilePart;
-import com.oreilly.servlet.multipart.MultipartParser;
-import com.oreilly.servlet.multipart.Part;
-import com.wireless.db.oss.OSSUtil;
 import com.wireless.db.promotion.CouponTypeDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
-import com.wireless.json.JsonMap;
-import com.wireless.json.Jsonable;
+import com.wireless.pojo.oss.OssImage;
 import com.wireless.pojo.promotion.CouponType;
 import com.wireless.pojo.promotion.CouponType.InsertBuilder;
-import com.wireless.pojo.staffMgr.Staff;
-import com.wireless.util.WebParams;
 
 public class OperateCouponTypeAction extends DispatchAction{
 
@@ -48,7 +33,7 @@ public class OperateCouponTypeAction extends DispatchAction{
 		JObject jobject = new JObject();
 		try{
 			CouponTypeDao.insert(StaffDao.verify(Integer.parseInt(pin)), new InsertBuilder(typeName, Float.parseFloat(price))
-																			.setImage(image)
+																			.setImage(Integer.parseInt(image))
 																			.setExpired(Long.parseLong(date))
 																			.setComment(desc));
 			jobject.initTip(true, "添加成功");
@@ -81,7 +66,7 @@ public class OperateCouponTypeAction extends DispatchAction{
 		JObject jobject = new JObject();
 		try{
 			CouponTypeDao.update(StaffDao.verify(Integer.parseInt(pin)), new CouponType.UpdateBuilder(Integer.parseInt(typeId), typeName)
-																			.setImage(image)
+																			.setImage(new OssImage(Integer.parseInt(image)))
 																			.setExpired(Long.parseLong(date))
 																			.setComment(desc));
 			jobject.initTip(true, "修改成功");
@@ -128,7 +113,7 @@ public class OperateCouponTypeAction extends DispatchAction{
 	}
 	
 	
-	public ActionForward updateCouponImg(ActionMapping mapping, ActionForm form,
+/*	public ActionForward updateCouponImg(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {	
 		
@@ -268,6 +253,6 @@ public class OperateCouponTypeAction extends DispatchAction{
 		}
 		
 		return null;
-	}
+	}*/
 
 }

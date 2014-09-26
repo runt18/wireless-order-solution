@@ -15,8 +15,6 @@ import com.wireless.db.promotion.CouponTypeDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
-import com.wireless.json.JsonMap;
-import com.wireless.json.Jsonable;
 import com.wireless.pojo.promotion.CouponType;
 
 public class QueryCouponTypeAction extends DispatchAction{
@@ -122,7 +120,7 @@ public class QueryCouponTypeAction extends DispatchAction{
 			// 获取菜品原图信息,用于更新图片成功之后删除原文件,否则保留原文件
 			 	 
 			
-			if(coupon.getImage() != null && !coupon.getImage().isEmpty()){
+/*			if(coupon.getImage() != null && !coupon.getImage().isEmpty()){
 				final String oldName = "http://" + getServlet().getInitParameter("oss_bucket_image")
 						        		+ "." + getServlet().getInitParameter("oss_outer_point") 
 						        		+ "/" + restaurantID + "/" + coupon.getImage();
@@ -143,7 +141,7 @@ public class QueryCouponTypeAction extends DispatchAction{
 				});				
 			}else{
 				jobject.initTip(false, "无图片");
-			}
+			}*/
 			
 
 		}catch(Exception e){

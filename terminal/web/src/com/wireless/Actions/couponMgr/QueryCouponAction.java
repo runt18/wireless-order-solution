@@ -96,10 +96,10 @@ public class QueryCouponAction extends DispatchAction{
 		List<Coupon> list = new ArrayList<>();
 		try{
 			Coupon coupon = CouponDao.getById(staff, Integer.parseInt(couponId));
-			String couponImg = "http://" + getServlet().getInitParameter("oss_bucket_image")
+/*			String couponImg = "http://" + getServlet().getInitParameter("oss_bucket_image")
 	        		+ "." + getServlet().getInitParameter("oss_outer_point") 
 	        		+ "/" + staff.getRestaurantId() + "/" + coupon.getCouponType().getImage();
-			coupon.getCouponType().setImage(couponImg);
+			coupon.getCouponType().setImage(couponImg);*/
 			list.add(coupon);
 			jobject.setRoot(list);
 		}catch(BusinessException e){
