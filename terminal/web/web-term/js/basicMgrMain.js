@@ -181,7 +181,8 @@ var monthSettleWin = new Ext.Window({
 						var jr = Ext.decode(res.responseText);
 						if(jr.success){
 							Ext.ux.showMsg(jr);
-							monthlySet = true;
+//							monthlySet = true;
+							monthSettleWin.hide();
 						}else{
 							Ext.ux.showMsg(jr);
 						}

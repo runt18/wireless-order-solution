@@ -358,13 +358,10 @@ function stockTaskNavHandler(e){
 						var jr = Ext.decode(res.responseText);
 						if(jr.success){
 							Ext.example.msg(jr.title, jr.msg);
-/*							if(id.getValue() == ''){
-								stockTaskNavWin.opId = jr.root[0].id;
-							}else{
-								stockTaskNavWin.opId = id.getValue();
-							}	*/							
 							stockTaskNavWin.hide();
 							Ext.getCmp('comboSearchForStockType').setValue(stockType);
+							Ext.getCmp('comboSearchForStockType').fireEvent('select', Ext.getCmp('comboSearchForStockType'));
+							Ext.getCmp('sam_comboSearchForSubType').setValue(stockSubType);
 							Ext.getCmp('sam_comboSearchForCateType').setValue(stockCate);
 							
 							Ext.getCmp('btnSearchForStockBasicMsg').handler();
