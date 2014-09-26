@@ -674,9 +674,9 @@ function initControl(){
 			[true, false, false, true], 
 			['物品名称', 'reName', 300],
 			['所属类别', 'cateName'],
-			['总数量', 'stock'],
-			['单位成本', 'price'],
-			['状态', 'statusText'],
+			['总数量', 'stock',,'right'],
+			['单位成本', 'price',,'right'],
+			['状态', 'statusText',,'center'],
 			['最后修改人', 'lastModStaff'],
 			['最后修改时间', 'lastModDateFormat', 150],
 			['操作', 'operate', 150, 'center', 'materialBasicGridOperateRenderer']

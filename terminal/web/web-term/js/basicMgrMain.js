@@ -170,7 +170,27 @@ var monthSettleWin = new Ext.Window({
 		text : '月结',
 		iconCls : 'btn_save',
 		handler : function(){
-			monthSettleHandler();
+			var stockActionCount = Ext.getDom('labStockAction').innerHTML;
+		 	var stockTakeCount = Ext.getDom('labStockTake').innerHTML;
+		 	if(eval(stockActionCount + '+' + stockTakeCount) > 0){
+		 		Ext.MessageBox.alert('提示', '还有未审核的库单或盘点单');
+		 	}else{			
+				Ext.Ajax.request({
+		 			url : '../../UpdateCurrentMonth.do',
+		 			success : function(res, opt){
+						var jr = Ext.decode(res.responseText);
+						if(jr.success){
+							Ext.ux.showMsg(jr);
+							monthlySet = true;
+						}else{
+							Ext.ux.showMsg(jr);
+						}
+					},
+					failure : function(res, opt){
+						Ext.ux.showMsg(Ext.decode(res.responseText));
+					}
+		 		});
+		 	}
 		}
 	},{
 		text : '取消',

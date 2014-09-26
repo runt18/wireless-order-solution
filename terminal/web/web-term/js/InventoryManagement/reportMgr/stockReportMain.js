@@ -230,16 +230,15 @@ Ext.onReady(function(){
 				}
 				sgs.baseParams['beginDate'] = Ext.getCmp('sr_beginDate').getValue().format('Y-m-d');
 				sgs.baseParams['endDate'] = Ext.getCmp('sr_endDate').getValue().format('Y-m-d');
-				
+				sgs.baseParams['cateType'] = cateType;
+				sgs.baseParams['cateId'] = cateId;
+				sgs.baseParams['materialId'] = materialId;
+				sgs.baseParams['deptId'] = deptComb.getValue();
 				//load两种加载方式,远程和本地
 				sgs.load({
 					params : {
 						start : 0,
-						limit : 17,
-						cateType : cateType,
-						cateId : cateId,
-						materialId : materialId,
-						deptId : deptComb.getValue()
+						limit : 17
 					}
 				});
 			}

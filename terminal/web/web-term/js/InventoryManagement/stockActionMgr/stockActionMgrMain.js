@@ -755,6 +755,9 @@ function getCurrentDay(){
 			if(jr.other.minDay){
 				Ext.getCmp('datetOriStockDateForStockActionBasic').setMinValue(NewDate(jr.other.minDay));
 			}
+			if(NewDate(jr.other.currentDay) < new Date()){
+				Ext.getCmp('datetOriStockDateForStockActionBasic').setValue(NewDate(jr.other.currentDay));
+			}
 		},
 		failure : function(res, opt){
 			Ext.ux.showMsg(Ext.decode(res.responseText));
