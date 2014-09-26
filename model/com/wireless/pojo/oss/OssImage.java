@@ -404,8 +404,10 @@ public class OssImage implements Jsonable{
 
 	@Override
 	public JsonMap toJsonMap(int flag) {
-		// TODO Auto-generated method stub
-		return null;
+		JsonMap jm = new JsonMap();
+		jm.putString("image", this.getObjectUrl());
+		jm.putInt("imageId", this.getId());
+		return jm;
 	}
 
 	@Override

@@ -270,7 +270,7 @@ public class CouponType implements Jsonable{
 		jm.putFloat("price", this.price);
 		jm.putFloat("expired", this.expired);
 		jm.putString("expiredFormat", DateUtil.formatToDate(this.expired));
-		jm.putJsonable("image", this.image, 0);
+		jm.putJsonable("ossImage", this.image, 0);
 		return jm;
 	}
 
