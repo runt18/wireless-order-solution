@@ -634,6 +634,7 @@ public class FoodDao {
 				OssImage image = new OssImage(ossImageId);
 				image.setImage(dbCon.rs.getString("image"));
 				image.setType(OssImage.Type.valueOf(dbCon.rs.getInt("oss_image_type")));
+				image.setRestaurantId(restaurantId);
 				f.setImage(image);
 			}
 			f.setKitchen(new Kitchen.QueryBuilder(dbCon.rs.getInt("kitchen_id"), dbCon.rs.getString("kitchen_name")) 

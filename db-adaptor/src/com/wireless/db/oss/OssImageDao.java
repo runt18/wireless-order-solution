@@ -219,7 +219,12 @@ public class OssImageDao {
 
 	}
 	
-	private static void upload(Staff staff, OssImage ossImage, OssImage.ImageType imgType, InputStream istream) throws IOException{
+	private static void upload(Staff staff, OssImage ossImage, OssImage.ImageType imgType, InputStream istream) throws IOException, BusinessException{
+		
+		if(istream.available() > ossImage.getType().getSize()){
+			throw new BusinessException("您上传的图片大小是【" + istream.available() / 1024 + "KB】，超过【" + ossImage.getType().toString() + "】类型的图片大小【" + ossImage.getType().getSize() / 1024 + "KB】限制", OssImageError.OSS_IMAGE_EXCEED_SIZE);
+		}
+		
 		if(ossImage.getImage().trim().isEmpty()){
 			ossImage.setImage(new SimpleDateFormat("yyyyMMddHHmmss").format(System.currentTimeMillis()) + (int)(Math.random() * 1000) + "." + imgType);
 		}
