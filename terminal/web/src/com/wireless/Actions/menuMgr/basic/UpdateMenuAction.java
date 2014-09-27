@@ -39,8 +39,8 @@ public class UpdateMenuAction extends Action {
 			String isWeight = request.getParameter("isWeight");
 			String isCommission = request.getParameter("isCommission");
 			String commission = request.getParameter("commission");
-			String stockStatus = request.getParameter("stockStatus");
 			String foodAliasId = request.getParameter("foodAliasID");
+			String foodImage = request.getParameter("foodImage");
 			
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
@@ -49,7 +49,6 @@ public class UpdateMenuAction extends Action {
 												 .setPrice(Float.parseFloat(foodPrice))
 												 .setKitchen(new Kitchen(Integer.parseInt(kitchenID)))
 												 .setDesc(foodDesc)
-												 .setStockStatus(Food.StockStatus.valueOf(Integer.parseInt(stockStatus)))
 												 .setSpecial(Boolean.parseBoolean(isSpecial))
 												 .setRecommend(Boolean.parseBoolean(isRecommend))
 												 .setSellOut(Boolean.parseBoolean(isStop))
@@ -57,6 +56,10 @@ public class UpdateMenuAction extends Action {
 												 .setCurPrice(Boolean.parseBoolean(isCurrPrice))
 												 .setHot(Boolean.parseBoolean(isHot))
 												 .setWeigh(Boolean.parseBoolean(isWeight));
+			
+			if(foodImage != null && !foodImage.isEmpty()){
+				builder.setImage(Integer.parseInt(foodImage));
+			}
 			
 			if(!foodAliasId.isEmpty()){
 				builder.setAliasId(Integer.parseInt(foodAliasId));

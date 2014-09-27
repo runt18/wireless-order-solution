@@ -163,13 +163,6 @@ public class QueryMenuMgrAction extends Action {
 			if(root != null){
 				jobject.setTotalProperty(root.size());
 				root = DataPaging.getPagingData(root, isPaging, start, limit);
-				for(Food temp : root){
-					if(temp.hasImage()){
-						temp.setImage((imageBrowsePath + "/" + temp.getRestaurantId() + "/" + temp.getImage()));
-					}else{
-						temp.setImage(imageBrowseDefaultFile);
-					}
-				}
 				jobject.setRoot(root);
 			}
 			response.getWriter().print(jobject.toString());
