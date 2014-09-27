@@ -1076,7 +1076,7 @@ function operateWXLogo(c){
 	        	}
  	        	uploadMask.show();
  	        	Ext.Ajax.request({
- 	        		url : '../../WXOperateMaterial.do?dataSource=updateLogo&time=' + new Date().getTime(),
+ 	        		url : '../../OperateImage.do?dataSource=upload&ossType=5',
 	 	   			isUpload : true,
 	 	   			form : form.getForm().getEl(),
 	 	   			success : function(response, options){
