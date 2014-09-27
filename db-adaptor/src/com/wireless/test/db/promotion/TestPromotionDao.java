@@ -65,7 +65,7 @@ public class TestPromotionDao {
 			//--------Test to create a promotion-----------
 			String fileName = System.getProperty("user.dir") + "/src/" + TestOssImage.class.getPackage().getName().replaceAll("\\.", "/") + "/test.jpg";
 			
-			int ossImageId = OssImageDao.insert(mStaff, new OssImage.InsertBuilder(OssImage.Type.WX_PROMOTION, 1).setImgResource(OssImage.ImageType.JPG, new FileInputStream(new File(fileName))));
+			int ossImageId = OssImageDao.insert(mStaff, new OssImage.InsertBuilder(OssImage.Type.WX_COUPON_TYPE).setImgResource(OssImage.ImageType.JPG, new FileInputStream(new File(fileName))));
 
 			CouponType.InsertBuilder typeInsertBuilder = new CouponType.InsertBuilder("测试优惠券类型", 30)
 																	   .setComment("测试备注")
@@ -89,9 +89,12 @@ public class TestPromotionDao {
 			compare(promotionId, Coupon.Status.CREATED, couponTypeId, m2, CouponDao.getByCond(mStaff, new CouponDao.ExtraCond().setMember(m2).setPromotion(promotionId), null).get(0));
 			
 			//--------Test to update a promotion-----------
+			int oriImageId = ossImageId;
+			ossImageId = OssImageDao.insert(mStaff, new OssImage.InsertBuilder(OssImage.Type.WX_COUPON_TYPE).setImgResource(OssImage.ImageType.JPG, new FileInputStream(new File(fileName))));
+
 			CouponType.UpdateBuilder typeUpdateBuilder = new CouponType.UpdateBuilder(couponTypeId, "修改测试优惠券类型")
 																	   .setComment("修改测试备注")
-																	   .setImage(OssImage.ImageType.JPG, new FileInputStream(new File(fileName)))
+																	   .setImage(ossImageId)
 																	   .setPrice(50);
 			Promotion.UpdateBuilder promotionUpdateBuilder = new Promotion.UpdateBuilder(promotionId).setRange(new DateRange("2015-2-1", "2015-3-1"))
 																									 .setTitle("修改优惠活动")
@@ -111,6 +114,23 @@ public class TestPromotionDao {
 			compare(promotionId, Coupon.Status.CREATED, couponTypeId, m1, CouponDao.getByCond(mStaff, new CouponDao.ExtraCond().setMember(m1).setPromotion(promotionId), null).get(0));
 			compare(promotionId, Coupon.Status.CREATED, couponTypeId, m2, CouponDao.getByCond(mStaff, new CouponDao.ExtraCond().setMember(m2).setPromotion(promotionId), null).get(0));
 			compare(promotionId, Coupon.Status.CREATED, couponTypeId, m3, CouponDao.getByCond(mStaff, new CouponDao.ExtraCond().setMember(m3).setPromotion(promotionId), null).get(0));
+			
+			//---------- Test the original oss image after promotion update --------------
+			OssImage oriImage = OssImageDao.getById(mStaff, oriImageId);
+			Assert.assertEquals("original oss image status", OssImage.Status.SINGLE, oriImage.getStatus());
+			Assert.assertEquals("original oss image associated id", 0, oriImage.getAssociatedId());
+			OssImageDao.delete(mStaff, new OssImageDao.ExtraCond().setId(oriImageId));
+
+			try{
+				OssImageDao.getById(mStaff, oriImage.getId());
+			}catch(BusinessException e2){
+				Assert.assertEquals("failed to delete original oss image after update", OssImageError.OSS_IMAGE_NOT_EXIST, e2.getErrCode());
+			}
+			try{
+				ossClient.getObject(OssImage.Params.instance().getBucket(), oriImage.getObjectKey());
+				Assert.assertTrue("failed to delete the original image from aliyun oss storage after update", false);
+			}catch(OSSException ignored){
+			}
 
 			//--------Test to cancel publish a promotion whose status is NOT 'CREATE'-----------
 			try{
@@ -193,8 +213,9 @@ public class TestPromotionDao {
 		Assert.assertEquals("comment : insert coupon type", expected.getCouponType().getComment(), actual.getCouponType().getComment());
 		
 		//The content to associated coupon type image
-		Assert.assertEquals("oss image type", OssImage.Type.WX_COUPON_TYPE, actual.getCouponType().getImage().getType());
-		Assert.assertEquals("oss image associated id", actual.getCouponType().getId(), actual.getCouponType().getImage().getAssociatedId());
+		Assert.assertEquals("oss image type to coupon type", OssImage.Type.WX_COUPON_TYPE, actual.getCouponType().getImage().getType());
+		Assert.assertEquals("oss image associated id to coupon type", actual.getCouponType().getId(), actual.getCouponType().getImage().getAssociatedId());
+		Assert.assertEquals("oss image id to coupon type", expected.getCouponType().getImage().getId(), actual.getCouponType().getImage().getId());
 		Assert.assertTrue("failed to put image to oss storage", ossClient.getObject(OssImage.Params.instance().getBucket(), actual.getCouponType().getImage().getObjectKey()) != null);
 	}
 	

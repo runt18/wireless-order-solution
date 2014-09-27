@@ -1,5 +1,6 @@
 package com.wireless.db.menuMgr;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -10,7 +11,7 @@ import java.util.Map.Entry;
 import com.mysql.jdbc.Statement;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
-import com.wireless.db.inventoryMgr.MaterialDao;
+import com.wireless.db.oss.OssImageDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.FoodError;
 import com.wireless.pojo.dishesOrder.Order;
@@ -20,6 +21,7 @@ import com.wireless.pojo.menuMgr.Department.DeptId;
 import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.menuMgr.FoodStatistics;
 import com.wireless.pojo.menuMgr.Kitchen;
+import com.wireless.pojo.oss.OssImage;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.tasteMgr.Taste;
 import com.wireless.util.PinyinUtil;
@@ -134,7 +136,7 @@ public class FoodDao {
 		}
 		
 		sql = " INSERT INTO " + Params.dbName + ".food" +
-			  " (`name`, `food_alias`, `price`, `commission`, `restaurant_id`, `kitchen_id`, `status`, `desc`, `stock_status`) VALUES ( " +
+			  " (`name`, `food_alias`, `price`, `commission`, `restaurant_id`, `kitchen_id`, `status`, `oss_image_id`, `desc` ) VALUES ( " +
 			  "'" + f.getName() + "'," +
 			  f.getAliasId() + "," +
 			  f.getPrice() + "," +
@@ -142,8 +144,8 @@ public class FoodDao {
 			  staff.getRestaurantId() + "," +
 			  f.getKitchen().getId() + "," +
 			  f.getStatus() + "," +
-			  (f.hasDesc() ? "'" + f.getDesc() + "'" : "NULL") + "," +
-			  f.getStockStatus().getVal() + 
+			  (f.hasImage() ? f.getImage().getId() : "NULL") + "," +
+			  (f.hasDesc() ? "'" + f.getDesc() + "'" : "NULL") + 
 			  ")";
 		
 		dbCon.stmt.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
@@ -156,10 +158,13 @@ public class FoodDao {
 		}
 		dbCon.rs.close();
 		
-		//设为商品出库时，在库存中增加这条菜品的商品记录
-		if(f.getStockStatus() == Food.StockStatus.GOOD){
-			MaterialDao.insertGood(dbCon, staff, foodId, f.getName());
+		//Married the oss image with this food.
+		if(f.hasImage()){
+			try{
+				OssImageDao.update(dbCon, staff, new OssImage.UpdateBuilder(f.getImage().getId()).setAssociated(OssImage.Type.FOOD_IMAGE, foodId));
+			}catch(IOException ignored){}
 		}
+		
 		return foodId;
 	}
 	
@@ -236,20 +241,21 @@ public class FoodDao {
 		}
 		dbCon.rs.close();
 		
-		//Check to see whether the food has stock status
-		sql = " SELECT stock_status FROM " + Params.dbName + ".food WHERE food_id = " + foodId;
-		dbCon.rs = dbCon.stmt.executeQuery(sql);
-		if(dbCon.rs.next()){
-			if(dbCon.rs.getInt("stock_status") != Food.StockStatus.NONE.getVal()){
-				throw new BusinessException(FoodError.DELETE_FAIL_SINCE_STILL_STOCK);
-			}
-		}
-		dbCon.rs.close();
-		
 		//Delete the associated combo info
 		sql = " DELETE FROM " + Params.dbName + ".combo WHERE food_id = " + foodId;
 		dbCon.stmt.executeUpdate(sql);
 
+		//Check to see whether or not the food to delete contains image.
+		sql  =" SELECT oss_image_id FROM " + Params.dbName + ".food WHERE food_id = " + foodId;
+		dbCon.rs = dbCon.stmt.executeQuery(sql);
+		if(dbCon.rs.next()){
+			if(dbCon.rs.getInt("oss_image_id") != 0){
+				//Delete the associated oss image.
+				OssImageDao.delete(dbCon, staff, new OssImageDao.ExtraCond().setId(dbCon.rs.getInt("oss_image_id")));
+			}
+		}
+		dbCon.rs.close();
+		
 		//Delete the food info
 		sql = " DELETE FROM " + Params.dbName + ".food WHERE food_id = " + foodId;
 		if(dbCon.stmt.executeUpdate(sql) == 0){
@@ -258,24 +264,26 @@ public class FoodDao {
 	}
 	
 	/**
-	 * Update the food according to specific builder.
+	 * Update the food according to specific builder {@link Food#UpdateBuilder}.
 	 * @param staff
 	 * 			the staff to perform this action
 	 * @param builder
-	 * 			the builder to update a food
+	 * 			the builder to update a food {@link Food#UpdateBuilder}
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 * @throws BusinessException
-	 * 			throws if the food to update does NOT exist
+	 * 			throws if cases below 
+	 * 			<li>the food to update does NOT exist
+	 * 			<li>the food alias is duplicated
 	 */
-	public static void update(Staff staff, Food.UpdateBuilder builder) throws SQLException, BusinessException{
+	public static void update(Staff staff, Food.UpdateBuilder builder) throws BusinessException, SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
 			dbCon.conn.setAutoCommit(false);
 			update(dbCon, staff, builder);
 			dbCon.conn.commit();
-		}catch(Exception e){
+		}catch(BusinessException | SQLException e){
 			dbCon.conn.rollback();
 			throw e;
 		}finally{
@@ -284,13 +292,13 @@ public class FoodDao {
 	}
 	
 	/**
-	 * Update the food according to specific builder.
+	 * Update the food according to specific builder {@link Food#UpdateBuilder}.
 	 * @param dbCon
 	 * 			the database connection
 	 * @param staff
 	 * 			the staff to perform this action
 	 * @param builder
-	 * 			the builder to update a food
+	 * 			the builder to update a food {@link Food#UpdateBuilder}
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 * @throws BusinessException
@@ -348,27 +356,21 @@ public class FoodDao {
 		}
 		f.setTemp(false);
 		
-		//Delete the food material relationship if cancel the stock status
-		if(f.getStockStatus() == Food.StockStatus.NONE){
-			int materialId = -1;
-			sql = "SELECT material_id FROM "+ Params.dbName + ".food_material WHERE food_id = " + f.getFoodId();
-			dbCon.rs = dbCon.stmt.executeQuery(sql);
-			if(dbCon.rs.next()){
-				materialId = dbCon.rs.getInt(1);
-			}
-			dbCon.rs.close();
-			if(materialId > -1){
-				MaterialDao.delete(materialId);
-			}
-			sql = " DELETE FROM " + Params.dbName + ".food_material WHERE food_id = " + f.getFoodId();
+		if(builder.isImageChanged()){
+			//Update the other oss images to this food to be single. 
+			sql = " UPDATE " + Params.dbName + ".oss_image SET " +
+			      " associated_id = 0 " +
+				  " ,status = " + OssImage.Status.SINGLE.getVal() +
+				  " ,last_modified = NOW() " +
+				  " WHERE type = " + OssImage.Type.FOOD_IMAGE.getVal() +
+				  " AND associated_id = " + f.getFoodId();
 			dbCon.stmt.executeUpdate(sql);
-
-		}else if(f.getStockStatus() == Food.StockStatus.GOOD){
-			if(!MaterialDao.checkMaterialFoodEx(dbCon, f.getFoodId())){
-				MaterialDao.insertGood(dbCon, staff, f.getFoodId(), f.getName());
-			}
+			//Married the oss image with this food.
+			try{
+				OssImageDao.update(dbCon, staff, new OssImage.UpdateBuilder(f.getImage().getId()).setAssociated(OssImage.Type.FOOD_IMAGE, f.getFoodId()));
+			}catch(IOException ignored){}
 		}
-
+		
 		sql = " UPDATE " + Params.dbName + ".food SET " +
 			  " food_id = " + f.getFoodId() +
 			  " ,status = " + f.getStatus() +
@@ -377,9 +379,8 @@ public class FoodDao {
 			  (builder.isKitchenChanged() ? ",kitchen_id = " + f.getKitchen().getId() : "") +
 			  (builder.isPriceChanged() ? ",price = " + f.getPrice() : "") +
 			  (builder.isCommissionChanged() ? ",commission = " + f.getCommission() : "") +
-			  (builder.isStockChanged() ? ",stock_status = " + f.getStockStatus().getVal() : "") +
+			  (builder.isImageChanged() ? ",oss_image_id = " + f.getImage().getId() : "") +
 			  (builder.isDescChanged() ? ",`desc` = '" + f.getDesc() + "'" : "") +
-			  (builder.isImageChanged() ? ",img = '" + f.getImage() + "'" : "") +
 			  " WHERE food_id = " + f.getFoodId();
 		
 		if(dbCon.stmt.executeUpdate(sql) == 0){
@@ -484,7 +485,11 @@ public class FoodDao {
 		if(result.isEmpty()){
 			throw new BusinessException(FoodError.FOOD_NOT_EXIST);
 		}else{
-			return result.get(0);
+			Food food = result.get(0);
+			if(food.hasImage()){
+				food.setImage(OssImageDao.getById(dbCon, staff, food.getImage().getId()));
+			}
+			return food;
 		}
 	}
 
@@ -590,22 +595,18 @@ public class FoodDao {
 		List<Food> foods = new ArrayList<Food>();
 	    //get all the food information to this restaurant
 		String sql = " SELECT " +
-					 " FOOD.restaurant_id, FOOD.food_id, FOOD.food_alias, FOOD.stock_status, " +
-					 " FOOD.name, FOOD.price, FOOD.commission, FOOD.status, " +
-					 " FOOD.desc, FOOD.img, " +
+					 " FOOD.restaurant_id, FOOD.food_id, FOOD.food_alias, " +
+					 " FOOD.name, FOOD.price, FOOD.commission, FOOD.status, FOOD.desc, " +
 					 " FOOD.order_amount, " +
 					 " KITCHEN.kitchen_id, KITCHEN.display_id AS kitchen_display_id, KITCHEN.name AS kitchen_name, " +
 					 " KITCHEN.type AS kitchen_type , KITCHEN.is_allow_temp AS is_allow_temp, " +
-					 " DEPT.dept_id, DEPT.name AS dept_name, DEPT.type AS dept_type, DEPT.display_id AS dept_display_id " +
-					 " FROM " + 
-					 Params.dbName + ".food FOOD " +
-					 " JOIN " +
-					 Params.dbName + ".kitchen KITCHEN " +
-					 " ON FOOD.kitchen_id = KITCHEN.kitchen_id " +
-					 " JOIN " +
-					 Params.dbName + ".department DEPT " +
-					 " ON KITCHEN.dept_id = DEPT.dept_id AND KITCHEN.restaurant_id = DEPT.restaurant_id " +
-					 " WHERE 1=1 " +
+					 " DEPT.dept_id, DEPT.name AS dept_name, DEPT.type AS dept_type, DEPT.display_id AS dept_display_id, " +
+					 " OI.oss_image_id, OI.image, OI.type AS oss_image_type " +
+					 " FROM " + Params.dbName + ".food FOOD " +
+					 " JOIN " + Params.dbName + ".kitchen KITCHEN ON FOOD.kitchen_id = KITCHEN.kitchen_id " +
+					 " JOIN " + Params.dbName + ".department DEPT ON KITCHEN.dept_id = DEPT.dept_id AND KITCHEN.restaurant_id = DEPT.restaurant_id " +
+					 " LEFT JOIN " + Params.dbName + ".oss_image OI ON FOOD.oss_image_id = OI.oss_image_id " +
+					 " WHERE 1 = 1 " +
 					 (extraCondition == null ? "" : extraCondition) + " " +
 					 (orderClause == null ? "" : orderClause); 
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
@@ -628,7 +629,13 @@ public class FoodDao {
 			f.setStatistics(new FoodStatistics(dbCon.rs.getInt("order_amount")));
 			f.setStatus(dbCon.rs.getShort("status"));
 			f.setDesc(dbCon.rs.getString("desc"));
-			f.setImage(dbCon.rs.getString("img"));
+			int ossImageId = dbCon.rs.getInt("oss_image_id");
+			if(ossImageId != 0){
+				OssImage image = new OssImage(ossImageId);
+				image.setImage(dbCon.rs.getString("image"));
+				image.setType(OssImage.Type.valueOf(dbCon.rs.getInt("oss_image_type")));
+				f.setImage(image);
+			}
 			f.setKitchen(new Kitchen.QueryBuilder(dbCon.rs.getInt("kitchen_id"), dbCon.rs.getString("kitchen_name")) 
 									.setDisplayId(dbCon.rs.getInt("kitchen_display_id"))
 	 				   				.setRestaurantId(restaurantId)
@@ -640,7 +647,6 @@ public class FoodDao {
  				   				    		   		  	    Department.Type.valueOf(dbCon.rs.getShort("dept_type")),
  				   				    		   		  	    dbCon.rs.getInt("dept_display_id")))
  			   				        .build());
-			f.setStockStatus(dbCon.rs.getInt("stock_status"));
 			
 			foods.add(f);
 		}

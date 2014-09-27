@@ -49,7 +49,7 @@ public class OssImageDao {
 		public String toString(){
 			StringBuilder extraCond = new StringBuilder();
 			if(id != 0){
-				extraCond.append(" AND id = " + id);
+				extraCond.append(" AND oss_image_id = " + id);
 			}
 			if(associatedId != 0){
 				extraCond.append(" AND associated_id = " + associatedId);
@@ -114,10 +114,11 @@ public class OssImageDao {
 			
 			String sql;
 			sql = " INSERT INTO " + Params.dbName + ".oss_image " +
-				  " (restaurant_id, image, type, associated_id, associated_serial, associated_serial_crc, status, last_modified) " +
+				  " (restaurant_id, image, image_crc, type, associated_id, associated_serial, associated_serial_crc, status, last_modified) " +
 				  " VALUES (" +
 				  staff.getRestaurantId() + "," +
 				  "'" + ossImage.getImage() + "'," +
+				  "CRC32('" + ossImage.getImage() + "')," +
 				  ossImage.getType().getVal() + "," +
 				  ossImage.getAssociatedId() + "," +
 				  "'" + ossImage.getAssociatedSerial() + "'," +
@@ -190,15 +191,15 @@ public class OssImageDao {
 
 		String sql;
 		sql = " UPDATE " + Params.dbName + ".oss_image SET " +
-			  " id = " + ossImage.getId() +
+			  " oss_image_id = " + ossImage.getId() +
 			  (builder.isAssociatedChanged() ? " ,type = " + ossImage.getType().getVal() +
 					  						   " ,associated_id = " + ossImage.getAssociatedId() +
 					  						   " ,associated_serial = '" + ossImage.getAssociatedSerial() + "'" +
 					  						   " ,associated_serial_crc = CRC32('" + ossImage.getAssociatedSerial() + "')" : "") +
 					  						   " ,status = " + ossImage.getStatus().getVal() + 
-			  (builder.isImageNameChanged() ? " ,image = '" + ossImage.getImage() + "'" : "") +
+			  (builder.isImageNameChanged() ? " ,image = '" + ossImage.getImage() + "' ,image_crc = CRC32('" + ossImage.getImage() + "')" : "") +
 			  " ,last_modified = NOW() " +
-			  " WHERE id = " + ossImage.getId();
+			  " WHERE oss_image_id = " + ossImage.getId();
 		if(dbCon.stmt.executeUpdate(sql) == 0){
 			throw new BusinessException(OssImageError.OSS_IMAGE_NOT_EXIST);
 		}
@@ -325,7 +326,7 @@ public class OssImageDao {
      */
     public static List<OssImage> getByCond(DBCon dbCon, Staff staff, ExtraCond extraCond) throws SQLException{
     	String sql;
-    	sql = " SELECT id, restaurant_id, image, type, associated_id, associated_serial, status, last_modified FROM " +
+    	sql = " SELECT oss_image_id, restaurant_id, image, type, associated_id, associated_serial, status, last_modified FROM " +
     		  Params.dbName + ".oss_image" +
     		  " WHERE 1 = 1 " +
     		  " AND restaurant_id = " + staff.getRestaurantId() +
@@ -334,7 +335,7 @@ public class OssImageDao {
     	
     	List<OssImage> result = new ArrayList<OssImage>();
     	while(dbCon.rs.next()){
-    		OssImage ossImage = new OssImage(dbCon.rs.getInt("id"));
+    		OssImage ossImage = new OssImage(dbCon.rs.getInt("oss_image_id"));
     		ossImage.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
     		ossImage.setAssociatedId(dbCon.rs.getInt("associated_id"));
     		ossImage.setAssociatedSerial(dbCon.rs.getString("associated_serial"));
@@ -385,7 +386,7 @@ public class OssImageDao {
   					 	  OssImage.Params.instance().getOssParam().ACCESS_OSS_ID, 
   					 	  OssImage.Params.instance().getOssParam().ACCESS_OSS_KEY).deleteObject(OssImage.Params.instance().getBucket(), ossImage.getObjectKey());
     		String sql;
-    		sql = " DELETE FROM " + Params.dbName + ".oss_image WHERE id = " + ossImage.getId();
+    		sql = " DELETE FROM " + Params.dbName + ".oss_image WHERE oss_image_id = " + ossImage.getId();
     		dbCon.stmt.executeUpdate(sql);
     	}
     }

@@ -10,7 +10,6 @@ import com.wireless.db.Params;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.DeptError;
 import com.wireless.pojo.menuMgr.Department;
-import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.pojo.menuMgr.Kitchen.Type;
 import com.wireless.pojo.staffMgr.Staff;
@@ -537,24 +536,24 @@ public class KitchenDao {
 	 * @return
 	 * @throws SQLException
 	 */
-	public static List<Kitchen> getMonthSettleKitchen(DBCon dbCon, Staff staff, String extraCond, String otherClause) throws SQLException{
-		
-		String sql = "SELECT K.kitchen_id, K.name FROM " + Params.dbName + ".kitchen K " + 
-					" JOIN food F ON K.kitchen_id = F.kitchen_id " +
-					" WHERE K.restaurant_id = " + staff.getRestaurantId() + 
-					" AND F.stock_status = " + Food.StockStatus.GOOD.getVal() +
-					(extraCond == null ? "" : extraCond) + " " +
-			  		(otherClause == null ? "" : otherClause);
-		dbCon.rs = dbCon.stmt.executeQuery(sql);
-		
-		List<Kitchen> kitchens = new ArrayList<Kitchen>();
-		while(dbCon.rs.next()){
-			Kitchen k = new Kitchen(dbCon.rs.getInt("kitchen_id"));
-			k.setName(dbCon.rs.getString("name"));
-			kitchens.add(k);
-		}
-		return kitchens;
-	}
+//	public static List<Kitchen> getMonthSettleKitchen(DBCon dbCon, Staff staff, String extraCond, String otherClause) throws SQLException{
+//		
+//		String sql = "SELECT K.kitchen_id, K.name FROM " + Params.dbName + ".kitchen K " + 
+//					" JOIN food F ON K.kitchen_id = F.kitchen_id " +
+//					" WHERE K.restaurant_id = " + staff.getRestaurantId() + 
+//					" AND F.stock_status = " + Food.StockStatus.GOOD.getVal() +
+//					(extraCond == null ? "" : extraCond) + " " +
+//			  		(otherClause == null ? "" : otherClause);
+//		dbCon.rs = dbCon.stmt.executeQuery(sql);
+//		
+//		List<Kitchen> kitchens = new ArrayList<Kitchen>();
+//		while(dbCon.rs.next()){
+//			Kitchen k = new Kitchen(dbCon.rs.getInt("kitchen_id"));
+//			k.setName(dbCon.rs.getString("name"));
+//			kitchens.add(k);
+//		}
+//		return kitchens;
+//	}
 	
 	/**
 	 * Get the monthSettle kitchens. 
@@ -564,15 +563,15 @@ public class KitchenDao {
 	 * @return
 	 * @throws SQLException
 	 */
-	public static List<Kitchen> getMonthSettleKitchen(Staff staff, String extraCond, String otherClause) throws SQLException{
-		DBCon dbCon = new DBCon();
-		try{
-			dbCon.connect();
-			return getMonthSettleKitchen(dbCon, staff, extraCond, otherClause);
-		}finally{
-			dbCon.disconnect();
-		}
-		
-	}
+//	public static List<Kitchen> getMonthSettleKitchen(Staff staff, String extraCond, String otherClause) throws SQLException{
+//		DBCon dbCon = new DBCon();
+//		try{
+//			dbCon.connect();
+//			return getMonthSettleKitchen(dbCon, staff, extraCond, otherClause);
+//		}finally{
+//			dbCon.disconnect();
+//		}
+//		
+//	}
 	
 }

@@ -1,6 +1,9 @@
 package com.wireless.test.db.menuMgr;
 
 import java.beans.PropertyVetoException;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -8,23 +11,35 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import com.aliyun.openservices.oss.OSSClient;
+import com.aliyun.openservices.oss.OSSException;
 import com.wireless.db.deptMgr.KitchenDao;
 import com.wireless.db.menuMgr.FoodDao;
 import com.wireless.db.menuMgr.FoodDao.ExtraCond4Combo;
+import com.wireless.db.oss.OssImageDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.FoodError;
+import com.wireless.exception.OssImageError;
 import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.menuMgr.Kitchen;
+import com.wireless.pojo.oss.OssImage;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.test.db.TestInit;
+import com.wireless.test.db.oss.TestOssImage;
 
 public class TestFoodDao {
+	
 	private static Staff mStaff;
+
+	private static OSSClient ossClient;
 	
 	@BeforeClass
 	public static void beforeClass() throws PropertyVetoException, BusinessException{
 		TestInit.init();
+		ossClient = new OSSClient("http://" + OssImage.Params.instance().getOssParam().OSS_INNER_POINT, 
+				OssImage.Params.instance().getOssParam().ACCESS_OSS_ID, 
+				OssImage.Params.instance().getOssParam().ACCESS_OSS_KEY);
 		try {
 			mStaff = StaffDao.getByRestaurant(26).get(0);
 		} catch (SQLException e) {
@@ -71,21 +86,36 @@ public class TestFoodDao {
 	}
 	
 	@Test
-	public void testFoodDao() throws SQLException, BusinessException{
+	public void testFoodDao() throws SQLException, BusinessException, IOException{
+
 		int foodId = 0;
 		try {
+			String fileName = System.getProperty("user.dir") + "/src/" + TestOssImage.class.getPackage().getName().replaceAll("\\.", "/") + "/test.jpg";
+			
+			//---------- Test to insert a new food --------------
+			int ossImageId = OssImageDao.insert(mStaff, new OssImage.InsertBuilder(OssImage.Type.FOOD_IMAGE)
+			 													    .setImgResource(OssImage.ImageType.JPG, new FileInputStream(new File(fileName))));
+			
 			Food.InsertBuilder insertBuilder = new Food.InsertBuilder("测试菜品", 15.4f, KitchenDao.getByType(mStaff, Kitchen.Type.NORMAL).get(0))
+													   .setImage(ossImageId)
 													   .setAliasId(100).setDesc("测试描述").setHot(true).setCommission(2.0f).setGift(true).setWeigh(false);
 			foodId = FoodDao.insert(mStaff, insertBuilder); 
 			
 			Food expected = insertBuilder.build();
+			expected.setImage(new OssImage(ossImageId));
+			
 			Food actual = FoodDao.getById(mStaff, foodId);
 			
 			compare(foodId, expected, actual, "insert food");
 
+			//---------- Test to update the food --------------
+			int oriImageId = ossImageId;
+			ossImageId = OssImageDao.insert(mStaff, new OssImage.InsertBuilder(OssImage.Type.FOOD_IMAGE)
+			    												.setImgResource(OssImage.ImageType.JPG, new FileInputStream(new File(fileName))));
+
 			Food.UpdateBuilder updateBuilder = new Food.UpdateBuilder(foodId).setAliasId(100).setName("测试修改菜品")
 													   .setKitchen(KitchenDao.getByType(mStaff, Kitchen.Type.NORMAL).get(1))
-													   .setImage("hello")
+													   .setImage(ossImageId)
 													   .setPrice(34.2f).setDesc("测试修改描述")
 													   .setHot(false).setCommission(3).setSellOut(true).setRecommend(true)
 													   .setGift(false).setWeigh(true);
@@ -95,9 +125,27 @@ public class TestFoodDao {
 			actual = FoodDao.getById(mStaff, foodId);
 
 			compare(foodId, expected, actual, "update food");
+
+			//---------- Test the original oss image after update --------------
+			OssImage oriImage = OssImageDao.getById(mStaff, oriImageId);
+			Assert.assertEquals("original oss image status", OssImage.Status.SINGLE, oriImage.getStatus());
+			Assert.assertEquals("original oss image associated id", 0, oriImage.getAssociatedId());
+			OssImageDao.delete(mStaff, new OssImageDao.ExtraCond().setId(oriImageId));
+
+			try{
+				OssImageDao.getById(mStaff, oriImage.getId());
+			}catch(BusinessException e2){
+				Assert.assertEquals("failed to delete original oss image after update", OssImageError.OSS_IMAGE_NOT_EXIST, e2.getErrCode());
+			}
+			try{
+				ossClient.getObject(OssImage.Params.instance().getBucket(), oriImage.getObjectKey());
+				Assert.assertTrue("failed to delete the original image from aliyun oss storage after update", false);
+			}catch(OSSException ignored){
+			}
 			
 		} finally{
 			if(foodId != 0){
+				Food original = FoodDao.getById(mStaff, foodId);
 				FoodDao.delete(mStaff, foodId);
 				try{
 					FoodDao.getById(mStaff, foodId);
@@ -105,11 +153,22 @@ public class TestFoodDao {
 				}catch(BusinessException e){
 					Assert.assertEquals("failed to delete the food", FoodError.FOOD_NOT_EXIST, e.getErrCode());
 				}
+				try{
+					OssImageDao.getById(mStaff, original.getImage().getId());
+				}catch(BusinessException e2){
+					Assert.assertEquals("failed to delete oss image", OssImageError.OSS_IMAGE_NOT_EXIST, e2.getErrCode());
+				}
+				try{
+					ossClient.getObject(OssImage.Params.instance().getBucket(), original.getImage().getObjectKey());
+					Assert.assertTrue("failed to delete the image from aliyun oss storage", false);
+				}catch(OSSException ignored){
+				}
 			}
 		}
 	}
 	
 	private void compare(int foodId, Food expected, Food actual, final String tag){
+		//------- the content to food --------
 		Assert.assertEquals("id : " + tag, foodId, actual.getFoodId());
 		Assert.assertEquals("restaurant : " + tag, mStaff.getRestaurantId(), actual.getRestaurantId());
 		Assert.assertEquals("name : " + tag, expected.getName(), actual.getName());
@@ -117,7 +176,6 @@ public class TestFoodDao {
 		Assert.assertEquals("kitchen : " + tag, expected.getKitchen(), actual.getKitchen());
 		Assert.assertEquals("alias : " + tag, expected.getAliasId(), actual.getAliasId());
 		Assert.assertEquals("desc : " + tag, expected.getDesc(), actual.getDesc());
-		Assert.assertEquals("image : " + tag, expected.getImage(), actual.getImage());
 		Assert.assertEquals("current price : " + tag, expected.isCurPrice(), actual.isCurPrice());
 		Assert.assertEquals("recommend : " + tag, expected.isRecommend(), actual.isRecommend());
 		Assert.assertEquals("sell out : " + tag, expected.isSellOut(), actual.isSellOut());
@@ -125,7 +183,12 @@ public class TestFoodDao {
 		Assert.assertEquals("weight : " + tag, expected.isWeigh(), actual.isWeigh());
 		Assert.assertEquals("hot : " + tag, expected.isHot(), actual.isHot());
 		Assert.assertEquals("gift : " + tag, expected.isGift(), actual.isGift());
-		Assert.assertEquals("commission : " + tag, expected.isCommission(), actual.isCommission());
 		Assert.assertEquals("commission : " + tag, expected.getCommission(), actual.getCommission(), 0.01);
+		//------- the content to associated image --------
+		Assert.assertEquals("oss image type to food : " + tag, OssImage.Type.FOOD_IMAGE, actual.getImage().getType());
+		Assert.assertEquals("oss image associated id to food : " + tag, actual.getFoodId(), actual.getImage().getAssociatedId());
+		Assert.assertEquals("oss image status to food : " + tag, OssImage.Status.MARRIED, actual.getImage().getStatus());
+		Assert.assertEquals("oss image id to food : " + tag, expected.getImage().getId(), actual.getImage().getId());
+		Assert.assertTrue("failed to put image to oss storage", ossClient.getObject(OssImage.Params.instance().getBucket(), actual.getImage().getObjectKey()) != null);
 	}
 }

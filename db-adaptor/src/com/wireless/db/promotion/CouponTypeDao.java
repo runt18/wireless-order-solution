@@ -21,20 +21,18 @@ import com.wireless.pojo.util.DateUtil;
 public class CouponTypeDao {
 	
 	/**
-	 * Insert a coupon type according to specific builder.
+	 * Insert a coupon type according to specific builder {@link CouponType#InsertBuilder}.
 	 * @param staff
 	 * 			the staff to perform this action
 	 * @param builder
-	 * 			the insert builder
+	 * 			the insert builder {@link CouponType#InsertBuilder}
 	 * @return the id to coupon type just inserted
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 * @throws BusinessException 
 	 * 			throws if the image resource to coupon type does NOT exist
-	 * @throws IOException 
-	 * 			throws if failed to upload the image to coupon type
 	 */
-	public static int insert(Staff staff, CouponType.InsertBuilder builder) throws SQLException, IOException, BusinessException{
+	public static int insert(Staff staff, CouponType.InsertBuilder builder) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -42,7 +40,7 @@ public class CouponTypeDao {
 			int id = insert(dbCon, staff, builder);
 			dbCon.conn.commit();
 			return id;
-		}catch(BusinessException | IOException | SQLException e){
+		}catch(BusinessException | SQLException e){
 			dbCon.conn.rollback();
 			throw e;
 		}finally{
@@ -51,22 +49,20 @@ public class CouponTypeDao {
 	}
 	
 	/**
-	 * Insert a coupon type according to specific builder.
+	 * Insert a coupon type according to specific builder {@link CouponType#InsertBuilder}.
 	 * @param dbCon
 	 * 			the database connection
 	 * @param staff
 	 * 			the staff to perform this action
 	 * @param builder
-	 * 			the insert builder
+	 * 			the insert builder {@link CouponType#InsertBuilder}
 	 * @return the id to coupon type just inserted
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 * @throws BusinessException 
 	 * 			throws if the image resource to coupon type does NOT exist
-	 * @throws IOException 
-	 * 			throws if failed to upload the image to coupon type
 	 */
-	public static int insert(DBCon dbCon, Staff staff, CouponType.InsertBuilder builder) throws SQLException, IOException, BusinessException{
+	public static int insert(DBCon dbCon, Staff staff, CouponType.InsertBuilder builder) throws SQLException, BusinessException{
 		CouponType type = builder.build();
 		
 		String sql;
@@ -91,7 +87,9 @@ public class CouponTypeDao {
 		
 		//Married the oss image with this coupon type.
 		if(builder.hasImage()){
-			OssImageDao.update(dbCon, staff, new OssImage.UpdateBuilder(type.getImage().getId()).setAssociated(OssImage.Type.WX_COUPON_TYPE, id));
+			try{
+				OssImageDao.update(dbCon, staff, new OssImage.UpdateBuilder(type.getImage().getId()).setAssociated(OssImage.Type.WX_COUPON_TYPE, id));
+			}catch(IOException ignored){}
 		}
 		
 		return id;
@@ -99,19 +97,17 @@ public class CouponTypeDao {
 	}
 	
 	/**
-	 * Update the coupon type according to specific builder.
+	 * Update the coupon type according to specific builder {@link CouponType#UpdateBuilder}.
 	 * @param staff
 	 * 			the staff to perform this action
 	 * @param builder
-	 * 			the update builder
+	 * 			the update builder {@link CouponType#UpdateBuilder}
 	 * @throws BusinessException
 	 * 			throws if the coupon type to update does NOT exist
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
-	 * @throws IOException 
-	 * 			throws if failed to upload the image to oss storage
 	 */
-	public static void update(Staff staff, CouponType.UpdateBuilder builder) throws BusinessException, SQLException, IOException{
+	public static void update(Staff staff, CouponType.UpdateBuilder builder) throws BusinessException, SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -127,21 +123,19 @@ public class CouponTypeDao {
 	}
 	
 	/**
-	 * Update the coupon type according to specific builder.
+	 * Update the coupon type according to specific builder {@link CouponType#UpdateBuilder}.
 	 * @param dbCon
 	 * 			the database connection
 	 * @param staff
 	 * 			the staff to perform this action
 	 * @param builder
-	 * 			the update builder
+	 * 			the update builder {@link CouponType#UpdateBuilder}
 	 * @throws BusinessException
 	 * 			throws if the coupon type to update does NOT exist
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
-	 * @throws IOException 
-	 * 			throws if failed to upload the image to oss storage
 	 */
-	public static void update(DBCon dbCon, Staff staff, CouponType.UpdateBuilder builder) throws BusinessException, SQLException, IOException{
+	public static void update(DBCon dbCon, Staff staff, CouponType.UpdateBuilder builder) throws BusinessException, SQLException{
 		CouponType type = builder.build();
 		String sql;
 		
@@ -169,12 +163,15 @@ public class CouponTypeDao {
 			//Update the other oss images to this coupon type to be single. 
 			sql = " UPDATE " + Params.dbName + ".oss_image SET " +
 			      " associated_id = 0 " +
-				  " status = " + OssImage.Status.SINGLE.getVal() +
+				  " ,status = " + OssImage.Status.SINGLE.getVal() +
+				  " ,last_modified = NOW() " +
 				  " WHERE type = " + OssImage.Type.WX_COUPON_TYPE.getVal() +
 				  " AND associated_id = " + type.getId();
 			dbCon.stmt.executeUpdate(sql);
 			//Married the oss image with this coupon type.
-			OssImageDao.update(dbCon, staff, new OssImage.UpdateBuilder(type.getImage().getId()).setAssociated(OssImage.Type.WX_COUPON_TYPE, type.getId()));
+			try{
+				OssImageDao.update(dbCon, staff, new OssImage.UpdateBuilder(type.getImage().getId()).setAssociated(OssImage.Type.WX_COUPON_TYPE, type.getId()));
+			}catch(IOException ignored){}
 		}
 		
 		sql = " UPDATE " + Params.dbName + ".coupon_type SET " +
@@ -183,6 +180,7 @@ public class CouponTypeDao {
 			  (builder.isPriceChanged() ? " ,price = " + type.getPrice() : "") +
 			  (builder.isExpiredChanged() ? " ,expired = '" + DateUtil.format(type.getExpired()) + "'" : "") +
 			  (builder.isCommentChanged() ? " ,comment = '" + type.getComment() + "'" : "") +
+			  (builder.isImageChanged() ? " ,oss_image_id = " + type.getImage().getId() : "") +
 			  " WHERE coupon_type_id = " + type.getId();
 		if(dbCon.stmt.executeUpdate(sql) == 0){
 			throw new BusinessException(PromotionError.COUPON_TYPE_NOT_EXIST);

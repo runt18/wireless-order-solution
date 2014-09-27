@@ -486,36 +486,36 @@ public class MaterialDao {
 	 * @return
 	 * @throws SQLException
 	 */
-	public static List<Material> getMonthSettleMaterial(DBCon dbCon, Staff staff, String extraCond, String otherClause) throws SQLException{
-		String sql;
-		List<Material> materials = new ArrayList<Material>();
-		try{
-			sql = "SELECT M.material_id,M.cate_id, M.name, M.price, M.delta, F.kitchen_id, F.stock_status FROM " + Params.dbName + ".food F " +
-					" JOIN " + Params.dbName + ".food_material FM ON FM.food_id = F.food_id " +
-					" JOIN " + Params.dbName + ".material M ON M.material_id = FM.material_id " +
-					" WHERE F.restaurant_id = " + staff.getRestaurantId() +
-					" AND F.stock_status = " + Food.StockStatus.GOOD.getVal() +
-			  		 (extraCond == null ? "" : extraCond) + " " +
-			  		 (otherClause == null ? "" : otherClause);
-			
-			dbCon.rs = dbCon.stmt.executeQuery(sql);
-			
-			while (dbCon.rs != null && dbCon.rs.next()) {
-				Material m = new Material();
-				m.setId(dbCon.rs.getInt("material_id"));
-				m.setCate(dbCon.rs.getInt("kitchen_id"), "", dbCon.rs.getInt("stock_status"));
-				m.setName(dbCon.rs.getString("name"));
-				m.setPrice(dbCon.rs.getFloat("price"));
-				m.setDelta(dbCon.rs.getFloat("delta"));
-				m.setGood(true);
-				materials.add(m);
-			}
-		}catch(SQLException e){
-			e.printStackTrace();
-			throw new SQLException("Failed to get the materials");
-		}
-		return materials;
-	}
+//	public static List<Material> getMonthSettleMaterial(DBCon dbCon, Staff staff, String extraCond, String otherClause) throws SQLException{
+//		String sql;
+//		List<Material> materials = new ArrayList<Material>();
+//		try{
+//			sql = "SELECT M.material_id,M.cate_id, M.name, M.price, M.delta, F.kitchen_id, F.stock_status FROM " + Params.dbName + ".food F " +
+//					" JOIN " + Params.dbName + ".food_material FM ON FM.food_id = F.food_id " +
+//					" JOIN " + Params.dbName + ".material M ON M.material_id = FM.material_id " +
+//					" WHERE F.restaurant_id = " + staff.getRestaurantId() +
+//					" AND F.stock_status = " + Food.StockStatus.GOOD.getVal() +
+//			  		 (extraCond == null ? "" : extraCond) + " " +
+//			  		 (otherClause == null ? "" : otherClause);
+//			
+//			dbCon.rs = dbCon.stmt.executeQuery(sql);
+//			
+//			while (dbCon.rs != null && dbCon.rs.next()) {
+//				Material m = new Material();
+//				m.setId(dbCon.rs.getInt("material_id"));
+//				m.setCate(dbCon.rs.getInt("kitchen_id"), "", dbCon.rs.getInt("stock_status"));
+//				m.setName(dbCon.rs.getString("name"));
+//				m.setPrice(dbCon.rs.getFloat("price"));
+//				m.setDelta(dbCon.rs.getFloat("delta"));
+//				m.setGood(true);
+//				materials.add(m);
+//			}
+//		}catch(SQLException e){
+//			e.printStackTrace();
+//			throw new SQLException("Failed to get the materials");
+//		}
+//		return materials;
+//	}
 	
 	/**
 	 * Get monthSettle materials.
@@ -525,47 +525,47 @@ public class MaterialDao {
 	 * @return
 	 * @throws SQLException
 	 */
-	public static List<Material> getMonthSettleMaterial(Staff staff, String extraCond, String otherClause) throws SQLException{
-		DBCon dbCon = new DBCon();
-		try{
-			dbCon.connect();
-			return getMonthSettleMaterial(dbCon, staff, extraCond, otherClause);
-		}finally{
-			dbCon.disconnect();
-		}
-		
-	}
+//	public static List<Material> getMonthSettleMaterial(Staff staff, String extraCond, String otherClause) throws SQLException{
+//		DBCon dbCon = new DBCon();
+//		try{
+//			dbCon.connect();
+//			return getMonthSettleMaterial(dbCon, staff, extraCond, otherClause);
+//		}finally{
+//			dbCon.disconnect();
+//		}
+//		
+//	}
 	
-	public static List<Material> getAllMonthSettleMaterial(DBCon dbCon, int restaurant) throws SQLException{
-		List<Material> list = new ArrayList<Material>();
-		Material item = null;
-		String querySQL = "SELECT F.kitchen_id, F.stock_status, M.material_id, M.restaurant_id, M.price, M.delta, M.stock, M.name,"
-						+ " MC.cate_id, MC.name cate_name, MC.type cate_type"
-						+ " FROM material_cate MC, material M "
-						+ " LEFT JOIN " + Params.dbName + ".food_material FM ON FM.material_id = M.material_id " 
-						+ " LEFT JOIN " + Params.dbName + ".food F ON F.food_id = FM.food_id AND F.stock_status < " + Food.StockStatus.MATERIAL.getVal() + " " 
-						+ " WHERE MC.restaurant_id = M.restaurant_id "
-						+ " AND MC.cate_id = M.cate_id " 
-						+ " AND M.restaurant_id = " + restaurant
-						+ " ORDER BY ABS(delta) DESC";
-		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
-		while(dbCon.rs != null && dbCon.rs.next()){
-			item = new Material();
-			item.setId(dbCon.rs.getInt("material_id"));
-			item.setPrice(dbCon.rs.getFloat("price"));
-			item.setDelta(dbCon.rs.getFloat("delta"));
-			item.setStock(dbCon.rs.getFloat("stock"));
-			item.setName(dbCon.rs.getString("name"));
-			if(dbCon.rs.getString("kitchen_id") != null){
-				item.setCate(dbCon.rs.getInt("kitchen_id"), dbCon.rs.getString("cate_name"), dbCon.rs.getInt("stock_status"));
-				item.setGood(true);
-			}else{
-				item.setCate(dbCon.rs.getInt("cate_id"), dbCon.rs.getString("cate_name"), dbCon.rs.getInt("cate_type"));
-			}
-			list.add(item);
-		}
-		return list;
-	}
+//	public static List<Material> getAllMonthSettleMaterial(DBCon dbCon, int restaurant) throws SQLException{
+//		List<Material> list = new ArrayList<Material>();
+//		Material item = null;
+//		String querySQL = "SELECT F.kitchen_id, F.stock_status, M.material_id, M.restaurant_id, M.price, M.delta, M.stock, M.name,"
+//						+ " MC.cate_id, MC.name cate_name, MC.type cate_type"
+//						+ " FROM material_cate MC, material M "
+//						+ " LEFT JOIN " + Params.dbName + ".food_material FM ON FM.material_id = M.material_id " 
+//						+ " LEFT JOIN " + Params.dbName + ".food F ON F.food_id = FM.food_id AND F.stock_status < " + Food.StockStatus.MATERIAL.getVal() + " " 
+//						+ " WHERE MC.restaurant_id = M.restaurant_id "
+//						+ " AND MC.cate_id = M.cate_id " 
+//						+ " AND M.restaurant_id = " + restaurant
+//						+ " ORDER BY ABS(delta) DESC";
+//		dbCon.rs = dbCon.stmt.executeQuery(querySQL);
+//		while(dbCon.rs != null && dbCon.rs.next()){
+//			item = new Material();
+//			item.setId(dbCon.rs.getInt("material_id"));
+//			item.setPrice(dbCon.rs.getFloat("price"));
+//			item.setDelta(dbCon.rs.getFloat("delta"));
+//			item.setStock(dbCon.rs.getFloat("stock"));
+//			item.setName(dbCon.rs.getString("name"));
+//			if(dbCon.rs.getString("kitchen_id") != null){
+//				item.setCate(dbCon.rs.getInt("kitchen_id"), dbCon.rs.getString("cate_name"), dbCon.rs.getInt("stock_status"));
+//				item.setGood(true);
+//			}else{
+//				item.setCate(dbCon.rs.getInt("cate_id"), dbCon.rs.getString("cate_name"), dbCon.rs.getInt("cate_type"));
+//			}
+//			list.add(item);
+//		}
+//		return list;
+//	}
 	
 	/**
 	 * 
@@ -573,15 +573,15 @@ public class MaterialDao {
 	 * @return
 	 * @throws SQLException
 	 */
-	public static List<Material> getAllMonthSettleMaterial(int restaurant) throws SQLException{
-		DBCon dbCon = new DBCon();
-		try{
-			dbCon.connect();
-			return MaterialDao.getAllMonthSettleMaterial(dbCon, restaurant);
-		}finally{
-			dbCon.disconnect();
-		}
-	}
+//	public static List<Material> getAllMonthSettleMaterial(int restaurant) throws SQLException{
+//		DBCon dbCon = new DBCon();
+//		try{
+//			dbCon.connect();
+//			return MaterialDao.getAllMonthSettleMaterial(dbCon, restaurant);
+//		}finally{
+//			dbCon.disconnect();
+//		}
+//	}
 	
 	
 }
