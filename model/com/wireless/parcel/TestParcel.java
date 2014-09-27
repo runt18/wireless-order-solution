@@ -22,6 +22,7 @@ import com.wireless.pojo.menuMgr.Department;
 import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.menuMgr.FoodStatistics;
 import com.wireless.pojo.menuMgr.Kitchen;
+import com.wireless.pojo.oss.OssImage;
 import com.wireless.pojo.regionMgr.Region;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.restaurantMgr.Restaurant;
@@ -54,7 +55,7 @@ public class TestParcel {
 		foodToParcel.setHot(true);
 		foodToParcel.setSpecial(true);
 		foodToParcel.setName("测试菜品");
-		foodToParcel.setImage("238f91a1.jpg");
+		foodToParcel.setImage(new OssImage(1));
 		foodToParcel.setStatistics(new FoodStatistics(15367));
 		
 		List<Taste> popTastes = new ArrayList<Taste>();
@@ -114,7 +115,7 @@ public class TestParcel {
 		assertEquals("food name", foodToParcel.getName(), parcelableFood.getName());
 		
 		// Check the image to food
-		assertEquals("food image", foodToParcel.getImage(), parcelableFood.getImage());
+		assertEquals("food image", foodToParcel.getImage().getImage(), parcelableFood.getImage().getImage());
 
 		// Check the the order count
 		assertEquals("order count to food", foodToParcel.getStatistics().getOrderCnt(), parcelableFood.getStatistics().getOrderCnt());

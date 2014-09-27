@@ -5,8 +5,10 @@ import java.io.InputStream;
 import com.wireless.db.oss.OSSParams;
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
+import com.wireless.parcel.Parcel;
+import com.wireless.parcel.Parcelable;
 
-public class OssImage implements Jsonable{
+public class OssImage implements Jsonable, Parcelable{
 
 	public static class Params{
 		
@@ -236,7 +238,8 @@ public class OssImage implements Jsonable{
 	public static enum Type{
 		WX_PROMOTION(1, "WxPromotion", "微信优惠活动"),
 		WX_FINANCE(2, "WxFinance", "微信财务端"),
-		WX_COUPON_TYPE(3, "WxCouponType", "微信优惠券类型");
+		WX_COUPON_TYPE(3, "WxCouponType", "微信优惠券类型"),
+		FOOD_IMAGE(4, "FoodImage", "菜品图片");
 		
 		private final int val;
 		private final String dir;
@@ -414,5 +417,28 @@ public class OssImage implements Jsonable{
 	public void fromJsonMap(JsonMap jsonMap, int flag) {
 		
 	}
+
+	@Override
+	public void writeToParcel(Parcel dest, int flag) {
+		dest.writeString(getImage());
+	}
+
+	@Override
+	public void createFromParcel(Parcel source) {
+		setImage(source.readString());
+	}
 	
+	public final static Parcelable.Creator<OssImage> CREATOR = new Parcelable.Creator<OssImage>(){
+
+		@Override
+		public OssImage newInstance() {
+			return new OssImage(0);
+		}
+		
+		@Override
+		public OssImage[] newInstance(int size){
+			return new OssImage[size];
+		}
+		
+	};
 }

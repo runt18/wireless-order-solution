@@ -98,6 +98,11 @@ public class CouponType implements Jsonable{
 			return this;
 		}
 		
+		public UpdateBuilder setImage(int ossImageId){
+			this.ossImage = new OssImage(ossImageId);
+			return this;
+		}
+		
 		public UpdateBuilder setImage(OssImage ossImage){
 			this.ossImage = ossImage;
 			return this;
