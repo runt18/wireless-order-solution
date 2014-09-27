@@ -13,14 +13,11 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
-import com.wireless.db.deptMgr.KitchenDao;
 import com.wireless.db.inventoryMgr.MaterialCateDao;
 import com.wireless.db.staffMgr.StaffDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.pojo.inventoryMgr.MaterialCate;
-import com.wireless.pojo.menuMgr.Food;
-import com.wireless.pojo.menuMgr.Kitchen;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.util.DataPaging;
 import com.wireless.util.SQLUtil;
@@ -162,7 +159,7 @@ public class QueryMaterialCateAction extends DispatchAction{
 	 * @return
 	 * @throws Exception
 	 */
-	public ActionForward monthSettleTree(ActionMapping mapping, ActionForm form,
+/*	public ActionForward monthSettleTree(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
 		
@@ -248,5 +245,5 @@ public class QueryMaterialCateAction extends DispatchAction{
 			response.getWriter().print(tree.toString());
 		}
 		return null;
-	}
+	}*/
 }

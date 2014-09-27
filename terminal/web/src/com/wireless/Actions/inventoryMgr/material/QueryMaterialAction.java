@@ -130,7 +130,7 @@ public class QueryMaterialAction extends DispatchAction{
 	 * @return
 	 * @throws Exception
 	 */
-	public ActionForward monthSettleMaterial(ActionMapping mapping, ActionForm form,
+/*	public ActionForward monthSettleMaterial(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
 		
@@ -185,7 +185,7 @@ public class QueryMaterialAction extends DispatchAction{
 			response.getWriter().print(jobject.toString());
 		}
 		return null;
-	}
+	}*/
 	
 	/**
 	 * 

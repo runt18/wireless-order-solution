@@ -10,11 +10,8 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
-import com.wireless.Actions.menuMgr.basic.ImageFileUploadAction;
 import com.wireless.db.DBCon;
 import com.wireless.db.menuMgr.FoodDao;
-import com.wireless.db.oss.OSSParams;
-import com.wireless.db.oss.OSSUtil;
 import com.wireless.db.weixin.restaurant.WeixinRestaurantDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
@@ -38,7 +35,6 @@ public class WXQueryFoodAction extends DispatchAction{
 		
 		
 		JObject jobject = new JObject();
-		String imageBrowseDefaultFile = this.getServlet().getInitParameter("imageBrowseDefaultFile");
 		try{
 			String fid = request.getParameter("fid");
 			int rid = WeixinRestaurantDao.getRestaurantIdByWeixin(fid);
@@ -51,13 +47,6 @@ public class WXQueryFoodAction extends DispatchAction{
 			if(list != null){
 				jobject.setTotalProperty(list.size());
 				list = DataPaging.getPagingData(list, true, 0, 20);
-				for(Food temp : list){
-					if(temp.hasImage()){
-						temp.setImage(("http://" + OSSUtil.BUCKET_IMAGE + "." + OSSParams.instance().OSS_OUTER_POINT + "/" + temp.getRestaurantId() + "/" + ImageFileUploadAction.CI_PRIEX + temp.getImage()));
-					}else{
-						temp.setImage(imageBrowseDefaultFile);
-					}
-				}
 				jobject.setRoot(list);
 			}
 		}catch(BusinessException e){
@@ -93,7 +82,6 @@ public class WXQueryFoodAction extends DispatchAction{
 		String start = request.getParameter("start");
 		String limit = request.getParameter("limit");
 		
-		String imageBrowseDefaultFile = this.getServlet().getInitParameter("imageBrowseDefaultFile");
 		DBCon dbCon = null;
 		try{
 			dbCon = new DBCon();
@@ -122,13 +110,6 @@ public class WXQueryFoodAction extends DispatchAction{
 			if(root != null && !root.isEmpty()){
 				jobject.setTotalProperty(root.size());
 				root = DataPaging.getPagingData(root, isPaging, start, limit);
-				for(Food temp : root){
-					if(temp.hasImage()){
-						temp.setImage(("http://" + OSSUtil.BUCKET_IMAGE + "." + OSSParams.instance().OSS_OUTER_POINT + "/" + temp.getRestaurantId() + "/" + ImageFileUploadAction.CI_PRIEX + temp.getImage()));
-					}else{
-						temp.setImage(imageBrowseDefaultFile);
-					}
-				}
 			}
 			jobject.setRoot(root);
 			response.getWriter().print(jobject.toString());

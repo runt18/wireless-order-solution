@@ -1,31 +1,6 @@
 package com.wireless.Actions.weixin.operate;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
-
-import com.aliyun.common.utils.IOUtils;
-import com.oreilly.servlet.multipart.FilePart;
-import com.oreilly.servlet.multipart.MultipartParser;
-import com.oreilly.servlet.multipart.Part;
-import com.wireless.db.oss.OSSUtil;
-import com.wireless.db.staffMgr.StaffDao;
-import com.wireless.db.weixin.restaurant.WeixinRestaurantDao;
-import com.wireless.json.JObject;
-import com.wireless.json.JsonMap;
-import com.wireless.json.Jsonable;
-import com.wireless.pojo.weixin.restaurant.WeixinRestaurant;
-import com.wireless.util.WebParams;
 
 public class WXOperateMaterialAction extends DispatchAction {
 	
@@ -38,7 +13,7 @@ public class WXOperateMaterialAction extends DispatchAction {
 	 * @return
 	 * @throws Exception
 	 */
-	public ActionForward upload(ActionMapping mapping, ActionForm form,
+/*	public ActionForward upload(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
 		request.setCharacterEncoding("UTF-8");
@@ -117,7 +92,7 @@ public class WXOperateMaterialAction extends DispatchAction {
 		return null;
 	}
 	
-	/**
+	*//**
 	 * 上传logo
 	 * @param mapping
 	 * @param form
@@ -125,7 +100,7 @@ public class WXOperateMaterialAction extends DispatchAction {
 	 * @param response
 	 * @return
 	 * @throws Exception
-	 */
+	 *//*
 	public ActionForward updateLogo(ActionMapping mapping, ActionForm form,
 			HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
@@ -208,7 +183,7 @@ public class WXOperateMaterialAction extends DispatchAction {
 			response.getWriter().print(jobject.toString());
 		}
 		return null;
-	}
+	}*/
 	
 	
 }

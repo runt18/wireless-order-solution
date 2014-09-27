@@ -33,9 +33,9 @@ public class QueryMenuMgrAction extends Action {
 		JObject jobject = new JObject();
 		List<Food> root = null;
 		
-		String imageBrowseDefaultFile = this.getServlet().getInitParameter("imageBrowseDefaultFile");
+/*		String imageBrowseDefaultFile = this.getServlet().getInitParameter("imageBrowseDefaultFile");
 		String imageBrowsePath = "http://" + getServlet().getInitParameter("oss_bucket_image") 
-				+ "." + getServlet().getInitParameter("oss_outer_point");
+				+ "." + getServlet().getInitParameter("oss_outer_point");*/
 		
 		try{
 			

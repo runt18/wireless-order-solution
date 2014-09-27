@@ -50,13 +50,13 @@ public class InsertMenuAction extends Action {
 			String isWeight = request.getParameter("isWeight");
 			String isCommission = request.getParameter("isCommission");
 			String commission = request.getParameter("commission");
-			String stockStatus = request.getParameter("stockStatus");
+//			String stockStatus = request.getParameter("stockStatus");
 			
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			
 			Food.InsertBuilder builder = new Food.InsertBuilder(foodName, Float.parseFloat(foodPrice), new Kitchen(Integer.parseInt(kitchenId)))
 												 .setDesc(foodDesc)
-												 .setStockStatus(Food.StockStatus.valueOf(Integer.valueOf(stockStatus)))
+//												 .setStockStatus(Food.StockStatus.valueOf(Integer.valueOf(stockStatus)))
 												 .setSpecial(Boolean.valueOf(isSpecial))
 												 .setRecommend(Boolean.valueOf(isRecommend))
 												 .setSellOut(Boolean.valueOf(isSellout))
