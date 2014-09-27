@@ -7,6 +7,7 @@ public class OssImageError extends ErrorEnum{
 	 */
 	public static final ErrorCode OSS_IMAGE_NOT_EXIST = build(7150, "操作失败, 该图片不存在");
 	public static final ErrorCode OSS_IMAGE_RESOURCE_NOT_EXIST = build(7150, "操作失败, 该图片资源不存在");
+	public static final ErrorCode OSS_IMAGE_EXCEED_SIZE = build(7150, "操作失败, 上传图片超过限定的大小");
 	
 	private OssImageError(){
 		

@@ -236,18 +236,20 @@ public class OssImage implements Jsonable, Parcelable{
 	}
 	
 	public static enum Type{
-		WX_PROMOTION(1, "WxPromotion", "微信优惠活动"),
-		WX_FINANCE(2, "WxFinance", "微信财务端"),
-		WX_COUPON_TYPE(3, "WxCouponType", "微信优惠券类型"),
-		FOOD_IMAGE(4, "FoodImage", "菜品图片");
+		WX_PROMOTION(1, "WxPromotion", 100, "微信优惠活动"),
+		WX_FINANCE(2, "WxFinance", 100, "微信财务端"),
+		WX_COUPON_TYPE(3, "WxCouponType", 100, "微信优惠券类型"),
+		FOOD_IMAGE(4, "FoodImage", 300, "菜品图片");
 		
 		private final int val;
 		private final String dir;
+		private final int size;			//unit is kb
 		private final String desc;
 		
-		Type(int val, String dir, String desc){
+		Type(int val, String dir, int size, String desc){
 			this.val = val;
 			this.dir = dir;
+			this.size = size;
 			this.desc = desc;
 		}
 		
@@ -266,6 +268,10 @@ public class OssImage implements Jsonable, Parcelable{
 		
 		public String getDir(){
 			return this.dir;
+		}
+		
+		public int getSize(){
+			return this.size * 1024;
 		}
 		
 		@Override
