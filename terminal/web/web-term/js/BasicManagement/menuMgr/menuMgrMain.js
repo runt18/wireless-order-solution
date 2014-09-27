@@ -1485,7 +1485,8 @@ function resetbBasicOperation(_d){
 		isCommission.fireEvent('check', isCommission, true);
 	}
 	commission.setValue(data.commission);
-	img.src = typeof(data.img) == 'undefined' || data.img == '' ? '../../images/nophoto.jpg' : data.img;
+	//FIXME 图片hardcore
+	img.src = typeof(data.img) == 'undefined' || data.img == '' ? 'http://digie-image-real.oss.aliyuncs.com/nophoto.jpg' : data.img.image;
 	stockStatus.setValue(typeof(data.stockStatusValue) == 'undefined' ? 1 : data.stockStatusValue);
 	
 	foodName.focus(true, 100);
@@ -1606,7 +1607,7 @@ function basicOperationBasicHandler(c){
 			isCommission : isCommission.getValue(),
 			commission : commission.getValue(),
 			comboContent : comboContent,
-			stockStatus : stockStatus.getValue()
+			foodImage : foodOperationWin.foodImage
 		},
 		success : function(res, opt){
 			var jr = Ext.util.JSON.decode(res.responseText);
@@ -1698,6 +1699,8 @@ function basicOperationBasicHandler(c){
 				setButtonStateOne(false);
 			}
 			
+			foodOperationWin.foodImage = '';
+			
 		},
 		failure : function(res, opt) {
 			Ext.ux.showMsg(Ext.util.JSON.decode(res.responseText));
@@ -1746,7 +1749,7 @@ function uploadFoodImage(c){
 	foodImageUpdateLoaddingMask.show();		
 	
 	Ext.Ajax.request({
-		url : '../../ImageFileUpload.do?foodID=' + c.id + '&otype=' + otype + '&time=' + new Date(),
+		url : '../../OperateImage.do?dataSource=upload&ossType=4',
 		isUpload : true,
 		form : Ext.getCmp('imgFileUploadForm').getForm().getEl(),
 		success : function(response, options){
@@ -1754,9 +1757,10 @@ function uploadFoodImage(c){
 			var jr = Ext.decode(response.responseText.replace(/<\/?[^>]*>/g,''));
 			if(eval(jr.success)){
 				Ext.example.msg(jr.title, jr.msg);
+				foodOperationWin.foodImage = jr.root[0].imageId;
 				Ext.getCmp('menuMgrGrid').getStore().each(function(record){
 					if(record.get('id') == c.id){
-						record.set('img', jr.root[0].img);
+						record.set('img', jr.root[0].image);
 						record.commit();
 						return;
 					}
@@ -2213,9 +2217,9 @@ function initKitchenTreeForSreach(){
 }
 function menuIsHaveImage(value, cellmeta, record, rowIndex, columnIndex, store){
 	var style = '', content = '';
-	if(record.get('img').indexOf('nophoto.jpg') == -1){
+	if(record.get('img')){
 		style = 'style="color:green;"';
-		content = '已上传';
+		content = '已上传';		
 	}else{
 		content = '未设置';
 	}
