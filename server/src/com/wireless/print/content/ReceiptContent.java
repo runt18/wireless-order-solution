@@ -35,9 +35,9 @@ public class ReceiptContent extends ConcreteContent {
 	public String toString(){
 		if(mPrintType == PType.PRINT_RECEIPT){
 			//generate the title and replace the "$(title)" with it
-			mTemplate = mTemplate.replace(PVar.TITLE, new CenterAlignedDecorator(mOrder.isRepaid() ? "反结帐单" : "结帐单", mStyle).toString());
+			mTemplate = mTemplate.replace(PVar.TITLE, new ExtraFormatDecorator(new CenterAlignedDecorator(mOrder.isRepaid() ? "反结帐单" : "结帐单", mStyle), ExtraFormatDecorator.LARGE_FONT_V_1X).toString());
 			//replace the $(restaurant)
-			mTemplate = mTemplate.replace(PVar.RESTAURANT, new CenterAlignedDecorator(mRestaurant.getName(), mStyle).toString());
+			mTemplate = mTemplate.replace(PVar.RESTAURANT, new ExtraFormatDecorator(new CenterAlignedDecorator(mRestaurant.getName(), mStyle), ExtraFormatDecorator.LARGE_FONT_V_1X).toString());
 			//generate the total price string and replace the $(var_2) with this string
 			mTemplate = mTemplate.replace(PVar.VAR_2, buildTotalPrice(false));
 			

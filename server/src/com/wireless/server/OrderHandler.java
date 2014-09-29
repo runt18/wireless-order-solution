@@ -27,6 +27,7 @@ import com.wireless.db.orderMgr.PayOrder;
 import com.wireless.db.orderMgr.UpdateOrder;
 import com.wireless.db.orderMgr.UpdateOrder.DiffResult;
 import com.wireless.db.printScheme.PrinterDao;
+import com.wireless.db.promotion.CouponDao;
 import com.wireless.db.regionMgr.RegionDao;
 import com.wireless.db.regionMgr.TableDao;
 import com.wireless.db.restaurantMgr.RestaurantDao;
@@ -54,6 +55,8 @@ import com.wireless.pojo.foodGroup.Pager;
 import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.printScheme.PType;
 import com.wireless.pojo.printScheme.Printer;
+import com.wireless.pojo.promotion.Coupon;
+import com.wireless.pojo.promotion.Promotion;
 import com.wireless.pojo.regionMgr.Region;
 import com.wireless.pojo.regionMgr.Table;
 import com.wireless.pojo.staffMgr.Device;
@@ -455,12 +458,29 @@ class OrderHandler implements Runnable{
 			
 			final Order order = PayOrder.pay(staff, payParam);
 			
-			//Perform SMS notification to member consumption & upgrade in another thread
+			//Perform SMS notification to member coupon dispatch & member upgrade in another thread
 			//so that not affect the order payment.
 			if(payParam.getSettleType() == Order.SettleType.MEMBER){
 				WirelessSocketServer.threadPool.execute(new Runnable(){
 					@Override
 					public void run() {
+						try{
+							//Perform this coupon draw.
+							List<Coupon> coupons = CouponDao.getByCond(staff, new CouponDao.ExtraCond().setMember(payParam.getMemberId())
+																									   .addPromotionStatus(Promotion.Status.PROGRESS), null);
+							//Check to see whether or not any coupons associated with this member is qualified to take.
+							for(Coupon coupon : coupons){
+								coupon = CouponDao.getById(staff, coupon.getId());
+								if(coupon.getPromotion().getType() == Promotion.Type.ONCE || coupon.getPromotion().getType() == Promotion.Type.TOTAL){
+									if(coupon.getDrawProgress().isOk()){
+										CouponDao.draw(staff, coupon.getId());
+									}
+								}
+							}
+						}catch(SQLException | BusinessException e){
+							e.printStackTrace();
+						} 
+						
 						try{
 							//Perform the member upgrade
 							Msg4Upgrade msg4Upgrade = MemberLevelDao.upgrade(staff, payParam.getMemberId());
