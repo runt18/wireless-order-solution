@@ -2373,8 +2373,8 @@ public class HistoryStatisticsAction extends DispatchAction{
 		String memberTypeAttr = request.getParameter("memberTypeAttr");
 		String memberCardOrMobileOrName = request.getParameter("memberCardOrMobileOrName");
 //		String totalBalance = request.getParameter("usedBalance");
-		String usedBalance = request.getParameter("usedBalance");
-		String consumptionAmount = request.getParameter("consumptionAmount");
+//		String usedBalance = request.getParameter("usedBalance");
+//		String consumptionAmount = request.getParameter("consumptionAmount");
 		
 //		String point = request.getParameter("point");
 //		String usedPoint = request.getParameter("usedPoint");
