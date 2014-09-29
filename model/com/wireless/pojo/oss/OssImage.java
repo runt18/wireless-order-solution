@@ -1,5 +1,6 @@
 package com.wireless.pojo.oss;
 
+import java.awt.Dimension;
 import java.io.InputStream;
 
 import com.wireless.json.JsonMap;
@@ -120,6 +121,7 @@ public class OssImage implements Jsonable, Parcelable{
 		private String image;
 		private ImageType imgType;
 		private InputStream istream;
+		private Dimension dimension;
 		
 		private final OssImage.Type type;
 		private final int associatedId;
@@ -161,6 +163,11 @@ public class OssImage implements Jsonable, Parcelable{
 			return this;
 		}
 		
+		public InsertBuilder setThumbnailSize(Dimension dimension){
+			this.dimension = dimension;
+			return this;
+		}
+		
 		public ImageType getImgType(){
 			return this.imgType;
 		}
@@ -171,6 +178,14 @@ public class OssImage implements Jsonable, Parcelable{
 		
 		public boolean hasImgResource(){
 			return imgType != null && istream != null;
+		}
+		
+		public boolean hasThumbnail(){
+			return this.dimension != null;
+		}
+		
+		public Dimension getThumbnailSize(){
+			return this.dimension;
 		}
 		
 		public OssImage build(){
@@ -190,6 +205,7 @@ public class OssImage implements Jsonable, Parcelable{
 		private int associatedId;
 		private String associatedSerial;
 		private AssociatedType associatedType;
+		private Dimension dimension;
 		private Status status;
 		
 		public UpdateBuilder(int id){
@@ -239,8 +255,17 @@ public class OssImage implements Jsonable, Parcelable{
 			return this;
 		}
 		
-		public boolean isImageNameChanged(){
-			return this.image != null;
+		public UpdateBuilder setThumbnailSize(Dimension dimension){
+			this.dimension = dimension;
+			return this;
+		}
+		
+		public Dimension getThumbnailSize(){
+			return this.dimension;
+		}
+		
+		public boolean isThumbnailChanged(){ 
+			return this.dimension != null;
 		}
 		
 		public boolean isAssociatedChanged(){
@@ -301,7 +326,8 @@ public class OssImage implements Jsonable, Parcelable{
 		WX_PROMOTION(1, "WxPromotion", 100, "微信优惠活动"),
 		WX_FINANCE(2, "WxFinance", 100, "微信财务端"),
 		WX_COUPON_TYPE(3, "WxCouponType", 100, "微信优惠券类型"),
-		FOOD_IMAGE(4, "FoodImage", 300, "菜品图片");
+		FOOD_IMAGE(4, "FoodImage", 300, "菜品图片"),
+		THUMB_NAIL(5, "thumbnail", 100, "缩略图");
 		
 		private final int val;
 		private final String dir;
@@ -351,6 +377,7 @@ public class OssImage implements Jsonable, Parcelable{
 	private int associatedId;
 	private String associatedSerial;
 	private long lastModified;
+	private OssImage thumbnail;
 	
 	private OssImage(InsertBuilder builder){
 		this.associatedId = builder.associatedId;
@@ -458,6 +485,18 @@ public class OssImage implements Jsonable, Parcelable{
 
 	public void setLastModified(long lastModified) {
 		this.lastModified = lastModified;
+	}
+	
+	public boolean hasThumbnail(){
+		return thumbnail != null;
+	}
+	
+	public void setThumbnail(OssImage thumbnail){
+		this.thumbnail = thumbnail;
+	}
+	
+	public OssImage getThumbnail(){
+		return this.thumbnail;
 	}
 	
 	@Override
