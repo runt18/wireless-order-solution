@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import com.aliyun.openservices.ClientException;
+import com.aliyun.openservices.oss.OSSException;
 import com.mysql.jdbc.Statement;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
@@ -102,7 +104,7 @@ public class FoodDao {
 			dbCon.conn.commit();
 			return foodId;
 			
-		}catch(Exception e){
+		}catch(SQLException | BusinessException | OSSException | ClientException e){
 			dbCon.conn.rollback();
 			throw e;
 		}finally{
@@ -119,12 +121,14 @@ public class FoodDao {
 	 * @param builder
 	 * 			the builder to insert a new food
 	 * @return the id to food just inserted
-	 * @throws SQLException
-	 * 			throws if failed to execute any SQL statement
+	 * @throws Exception 
+	 * @throws ClientException 
+	 * @throws OSSException 
 	 * @throws BusinessException 
-	 * 			throws if the food alias is duplicated
+	 * @throws SQLException 
+	 * @throws IOException 
 	 */
-	public static int insert(DBCon dbCon, Staff staff, Food.InsertBuilder builder) throws SQLException, BusinessException{
+	public static int insert(DBCon dbCon, Staff staff, Food.InsertBuilder builder) throws OSSException, ClientException, SQLException, BusinessException{
 		String sql;
 		Food f = builder.build();
 
@@ -161,8 +165,11 @@ public class FoodDao {
 		//Married the oss image with this food.
 		if(f.hasImage()){
 			try{
+				//Associated the oss image with this food
 				OssImageDao.update(dbCon, staff, new OssImage.UpdateBuilder(f.getImage().getId()).setAssociated(OssImage.Type.FOOD_IMAGE, foodId));
+				
 			}catch(IOException ignored){}
+			
 		}
 		
 		return foodId;

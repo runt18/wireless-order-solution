@@ -535,22 +535,4 @@ public class CouponDao {
 		return dbCon.stmt.executeUpdate(sql);
 	}
 	
-	/**
-	 * Update the coupon status while perform daily settlement.
-	 * @param dbCon
-	 * 			the database connection
-	 * @throws SQLException
-	 * 			throws if failed to execute any SQL statement
-	 */
-	public static void updateStatus(DBCon dbCon) throws SQLException{
-		String sql;
-		//Update the coupon to be expired if the coupon has been drawn and exceeded now.
-		sql = " SELECT coupon_type_id FROM " + Params.dbName + ".coupon_type WHERE expired > NOW() ";
-		sql = " UPDATE " + Params.dbName + ".coupon SET " +
-			  " status = " + Coupon.Status.EXPIRED.getVal() +
-			  " WHERE status = " + Coupon.Status.DRAWN.getVal() +
-			  " AND coupon_type_id IN (" + sql + ")";
-		dbCon.stmt.executeUpdate(sql);
-	} 
-	
 }

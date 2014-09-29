@@ -1,5 +1,6 @@
 package com.wireless.db.oss;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
@@ -9,8 +10,11 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.aliyun.openservices.ClientException;
 import com.aliyun.openservices.oss.OSSClient;
+import com.aliyun.openservices.oss.OSSException;
 import com.aliyun.openservices.oss.model.CannedAccessControlList;
+import com.aliyun.openservices.oss.model.OSSObject;
 import com.aliyun.openservices.oss.model.ObjectMetadata;
 import com.mysql.jdbc.Statement;
 import com.wireless.db.DBCon;
@@ -112,7 +116,9 @@ public class OssImageDao {
 			OssImage ossImage = builder.build();
 			
 	    	//Upload the image.
-	    	upload(staff, ossImage, builder.getImgType(), builder.getImgStream());
+			byte[] bytesToImg = new byte[builder.getImgStream().available()];
+			builder.getImgStream().read(bytesToImg);
+	    	upload(staff, ossImage, builder.getImgType(), new ByteArrayInputStream(bytesToImg));
 			
 			String sql;
 			sql = " INSERT INTO " + Params.dbName + ".oss_image " +
@@ -137,6 +143,20 @@ public class OssImageDao {
 			}else{
 				throw new SQLException("Failed to generated the oss image id.");
 			}
+			
+			//Upload the thumb nail of the image if set.
+			if(builder.hasThumbnail()){
+				//Build the thumb nail associated with this oss image.
+				int thumbNailId = OssImageDao.insert(dbCon, staff, 
+													 new OssImage.InsertBuilder(OssImage.Type.THUMB_NAIL, id)
+															 	 .setImgResource(OssImage.ImageType.JPG, 
+																	 		 new CompressImage().imageZoomOut(new ByteArrayInputStream(bytesToImg), builder.getThumbnailSize())));
+				sql = " UPDATE " + Params.dbName + ".oss_image SET " +
+					  " oss_thumbnail_id = " + thumbNailId +
+					  " WHERE oss_image_id = " + id;
+				dbCon.stmt.executeUpdate(sql);
+			}
+			
 			return id;
 		}else{
 			throw new BusinessException(OssImageError.OSS_IMAGE_RESOURCE_NOT_EXIST);
@@ -212,7 +232,6 @@ public class OssImageDao {
 					  						   " ,associated_serial = '" + ossImage.getAssociatedSerial() + "'" +
 					  						   " ,associated_serial_crc = CRC32('" + ossImage.getAssociatedSerial() + "')" : "") +
 					  						   " ,status = " + ossImage.getStatus().getVal() + 
-			  (builder.isImageNameChanged() ? " ,image = '" + ossImage.getImage() + "' ,image_crc = CRC32('" + ossImage.getImage() + "')" : "") +
 			  " ,last_modified = NOW() " +
 			  " WHERE oss_image_id = " + ossImage.getId();
 		if(dbCon.stmt.executeUpdate(sql) == 0){
@@ -222,14 +241,31 @@ public class OssImageDao {
 		if(builder.isImgResourceChanged()){
 			//Delete the original image from oss storage.
 			OSSClient ossClient = new OSSClient("http://" + OssImage.Params.instance().getOssParam().OSS_INNER_POINT, 
-					    OssImage.Params.instance().getOssParam().ACCESS_OSS_ID, 
-					    OssImage.Params.instance().getOssParam().ACCESS_OSS_KEY);
+					    						OssImage.Params.instance().getOssParam().ACCESS_OSS_ID, 
+					    						OssImage.Params.instance().getOssParam().ACCESS_OSS_KEY);
 			ossClient.deleteObject(OssImage.Params.instance().getBucket(), oriImage.getObjectKey());
 			
-			//Upload the new image to oss storage.
-			ossImage = getById(dbCon, staff, ossImage.getId());
-			upload(staff, ossImage, builder.getImgType(), builder.getImgStream());
+			byte[] bytesToImg = new byte[builder.getImgStream().available()];
+			builder.getImgStream().read(bytesToImg);
 			
+			//Upload the new image to oss storage.
+			upload(staff, getById(dbCon, staff, ossImage.getId()), builder.getImgType(), builder.getImgStream());
+
+			if(builder.isThumbnailChanged()){
+				//Delete the original thumb nail.
+				if(oriImage.hasThumbnail()){
+					delete(dbCon, staff, new OssImageDao.ExtraCond().setId(oriImage.getThumbnail().getId()));
+				}
+				//Insert a new thumb nail.
+				int thumbNailId = insert(dbCon, staff, new OssImage.InsertBuilder(OssImage.Type.THUMB_NAIL, ossImage.getId())
+					     										   .setImgResource(OssImage.ImageType.JPG, new CompressImage().imageZoomOut(new ByteArrayInputStream(bytesToImg), builder.getThumbnailSize())));
+				//Associated the new thumb nail.
+				sql = " UPDATE " + Params.dbName + ".oss_image SET " +
+					  " oss_thumbnail_id = " + thumbNailId +
+					  " WHERE oss_image_id = " + ossImage.getId();
+				dbCon.stmt.executeUpdate(sql);
+			}
+
 		}
 
 	}
@@ -302,6 +338,30 @@ public class OssImageDao {
         }
 	}
 	
+	/**
+	 * Get the oss object according to specific id.
+	 * @param dbCon
+	 * 			the database connection
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param id
+	 * 			the oss image id
+	 * @return the oss object to this id
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 * @throws OSSException
+	 * 			throws if failed to get the oss image object
+	 * @throws ClientException
+	 * 			throws if failed to get the oss image object
+	 * @throws BusinessException
+	 * 			throws if the oss image does NOT exist
+	 */
+	public static OSSObject getObjectById(DBCon dbCon, Staff staff, int id) throws SQLException, OSSException, ClientException, BusinessException{
+		return new OSSClient("http://" + OssImage.Params.instance().getOssParam().OSS_INNER_POINT, 
+			    OssImage.Params.instance().getOssParam().ACCESS_OSS_ID, 
+			    OssImage.Params.instance().getOssParam().ACCESS_OSS_KEY).getObject(OssImage.Params.instance().getBucket(), getById(dbCon, staff, id).getObjectKey());
+	}
+	
     /**
      * Get the oss image according to specific id
      * @param staff
@@ -355,8 +415,10 @@ public class OssImageDao {
      * @return the list result to oss image
      * @throws SQLException
      * 			throws if failed to execute any SQL statement
-     */
-    public static List<OssImage> getByCond(Staff staff, ExtraCond extraCond) throws SQLException{
+     * @throws BusinessException 
+     * 			throws if the any associated thumb nail does NOT exist 
+     **/
+    public static List<OssImage> getByCond(Staff staff, ExtraCond extraCond) throws SQLException, BusinessException{
     	DBCon dbCon = new DBCon();
     	try{
     		dbCon.connect();
@@ -377,10 +439,12 @@ public class OssImageDao {
      * @return the list result to oss image
      * @throws SQLException
      * 			throws if failed to execute any SQL statement
+     * @throws BusinessException 
+     * 			throws if the any associated thumb nail does NOT exist 
      */
-    public static List<OssImage> getByCond(DBCon dbCon, Staff staff, ExtraCond extraCond) throws SQLException{
+    public static List<OssImage> getByCond(DBCon dbCon, Staff staff, ExtraCond extraCond) throws SQLException, BusinessException{
     	String sql;
-    	sql = " SELECT oss_image_id, restaurant_id, image, type, associated_id, associated_serial, status, last_modified FROM " +
+    	sql = " SELECT oss_image_id, restaurant_id, image, type, associated_id, associated_serial, status, last_modified, oss_thumbnail_id FROM " +
     		  Params.dbName + ".oss_image" +
     		  " WHERE 1 = 1 " +
     		  " AND restaurant_id = " + staff.getRestaurantId() +
@@ -397,9 +461,18 @@ public class OssImageDao {
     		ossImage.setType(OssImage.Type.valueOf(dbCon.rs.getInt("type")));
     		ossImage.setStatus(OssImage.Status.valueOf(dbCon.rs.getInt("status")));
     		ossImage.setLastModified(dbCon.rs.getLong("last_modified"));
+    		if(dbCon.rs.getInt("oss_thumbnail_id") != 0){
+    			ossImage.setThumbnail(new OssImage(dbCon.rs.getInt("oss_thumbnail_id")));
+    		}
     		result.add(ossImage);
     	}
     	dbCon.rs.close();
+    	
+    	for(OssImage ossImage : result){
+    		if(ossImage.hasThumbnail()){
+    			ossImage.setThumbnail(getById(dbCon, staff, ossImage.getThumbnail().getId()));
+    		}
+    	}
     	
     	return result;
     }
@@ -412,12 +485,19 @@ public class OssImageDao {
      * 			the extra condition.
      * @throws SQLException
      * 			throws if failed to execute any SQL statement
-     */
-    public static void delete(Staff staff, ExtraCond extraCond) throws SQLException{
+     * @throws BusinessException 
+     * 			throws if the any associated thumb nail does NOT exist 
+     **/
+    public static void delete(Staff staff, ExtraCond extraCond) throws SQLException, BusinessException{
     	DBCon dbCon = new DBCon();
     	try{
     		dbCon.connect();
+    		dbCon.conn.setAutoCommit(false);
     		delete(dbCon, staff, extraCond);
+    		dbCon.conn.commit();
+    	}catch(SQLException | BusinessException e){
+    		dbCon.conn.rollback();
+    		throw e;
     	}finally{
     		dbCon.disconnect();
     	}
@@ -433,13 +513,26 @@ public class OssImageDao {
      * 			the extra condition.
      * @throws SQLException
      * 			throws if failed to execute any SQL statement
+     * @throws BusinessException 
+     * 			throws if the any associated thumb nail does NOT exist 
      */
-    public static void delete(DBCon dbCon, Staff staff, ExtraCond extraCond) throws SQLException{
+    public static void delete(DBCon dbCon, Staff staff, ExtraCond extraCond) throws SQLException, BusinessException{
     	for(OssImage ossImage : getByCond(dbCon, staff, extraCond)){
-    		new OSSClient("http://" + OssImage.Params.instance().getOssParam().OSS_INNER_POINT, 
-  					 	  OssImage.Params.instance().getOssParam().ACCESS_OSS_ID, 
-  					 	  OssImage.Params.instance().getOssParam().ACCESS_OSS_KEY).deleteObject(OssImage.Params.instance().getBucket(), ossImage.getObjectKey());
     		String sql;
+    		
+    		OSSClient ossClient = new OSSClient("http://" + OssImage.Params.instance().getOssParam().OSS_INNER_POINT, 
+  					 	  OssImage.Params.instance().getOssParam().ACCESS_OSS_ID, 
+  					 	  OssImage.Params.instance().getOssParam().ACCESS_OSS_KEY);
+    		
+    		//Delete the associated thumb nail.
+    		if(ossImage.hasThumbnail()){
+    			ossClient.deleteObject(OssImage.Params.instance().getBucket(), ossImage.getThumbnail().getObjectKey());
+        		sql = " DELETE FROM " + Params.dbName + ".oss_image WHERE oss_image_id = " + ossImage.getThumbnail().getId();
+        		dbCon.stmt.executeUpdate(sql);
+    		}
+    		
+    		//Delete the oss image.
+    		ossClient.deleteObject(OssImage.Params.instance().getBucket(), ossImage.getObjectKey());
     		sql = " DELETE FROM " + Params.dbName + ".oss_image WHERE oss_image_id = " + ossImage.getId();
     		dbCon.stmt.executeUpdate(sql);
     	}

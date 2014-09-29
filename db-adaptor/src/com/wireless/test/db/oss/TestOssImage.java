@@ -1,5 +1,6 @@
 package com.wireless.test.db.oss;
 
+import java.awt.Dimension;
 import java.beans.PropertyVetoException;
 import java.io.File;
 import java.io.FileInputStream;
@@ -45,7 +46,8 @@ public class TestOssImage {
 			//---------- Test to insert a new oss image --------------
 			OssImage.InsertBuilder builder = new OssImage.//InsertBuilder(OssImage.Type.WX_PROMOTION)
 														  InsertBuilder(OssImage.Type.WX_PROMOTION, 1)
-														 .setImgResource(OssImage.ImageType.JPG, new FileInputStream(new File(fileName)));
+														 .setImgResource(OssImage.ImageType.JPG, new FileInputStream(new File(fileName)))
+														 .setThumbnailSize(new Dimension(500, 400));
 			ossImageId = OssImageDao.insert(mStaff, builder);
 			
 			OssImage actual = OssImageDao.getById(mStaff, ossImageId);
@@ -55,38 +57,66 @@ public class TestOssImage {
 			Assert.assertEquals("oss associated id", expected.getAssociatedId(), actual.getAssociatedId());
 			Assert.assertEquals("oss image status", expected.getStatus(), actual.getStatus());
 			Assert.assertTrue("failed to put the image to aliyunc oss storage", ossClient.getObject(OssImage.Params.instance().getBucket(), actual.getObjectKey()) != null);
+			if(builder.hasThumbnail()){
+				Assert.assertEquals("the thumb nail associated id", actual.getId(), actual.getThumbnail().getAssociatedId());
+				Assert.assertEquals("thumb nail type", OssImage.Type.THUMB_NAIL, actual.getThumbnail().getType());
+				Assert.assertTrue("failed to put the thumbnail image to aliyunc oss storage", ossClient.getObject(OssImage.Params.instance().getBucket(), actual.getThumbnail().getObjectKey()) != null);
+			}
 			
 			//---------- Test to update a oss image --------------
 			OssImage.UpdateBuilder updateBuilder = new OssImage.UpdateBuilder(ossImageId)
 															   .setAssociated(OssImage.Type.WX_FINANCE, "VZtrdLaO6WFcJQrvffO9XBPVpbKGRP")
-															   .setImgResource("test.jpg", new FileInputStream(new File(fileName)));
+															   .setImgResource("test.jpg", new FileInputStream(new File(fileName)))
+															   .setThumbnailSize(new Dimension(500, 300));
 			String originalImgKey = actual.getObjectKey();
 			OssImageDao.update(mStaff, updateBuilder);
 			expected = updateBuilder.build();
 			actual = OssImageDao.getByCond(mStaff, new OssImageDao.ExtraCond().setAssociated(expected.getType(), expected.getAssociatedSerial())).get(0);
 			Assert.assertEquals("oss image id", ossImageId, actual.getId());
 			Assert.assertEquals("oss image type", expected.getType(), actual.getType());
-			Assert.assertEquals("oss image", expected.getImage(), actual.getImage());
 			Assert.assertEquals("oss image status", expected.getStatus(), actual.getStatus());
 			try{
 				ossClient.getObject(OssImage.Params.instance().getBucket(), originalImgKey);
 				Assert.assertTrue("failed to remove the original image to aliyunc oss storage", false);
 			}catch(OSSException ignored){}
 			Assert.assertTrue("failed to put the image to aliyunc oss storage", ossClient.getObject(OssImage.Params.instance().getBucket(), actual.getObjectKey()) != null);
+			if(updateBuilder.isThumbnailChanged()){
+				Assert.assertEquals("the thumb nail associated id", actual.getId(), actual.getThumbnail().getAssociatedId());
+				Assert.assertEquals("thumb nail type", OssImage.Type.THUMB_NAIL, actual.getThumbnail().getType());
+				Assert.assertTrue("failed to put the thumbnail image to aliyunc oss storage", ossClient.getObject(OssImage.Params.instance().getBucket(), actual.getThumbnail().getObjectKey()) != null);
+			}
 			
 		}finally{
 			if(ossImageId != 0){
 				OssImage original = OssImageDao.getById(mStaff, ossImageId);
 				OssImageDao.delete(mStaff, new OssImageDao.ExtraCond().setId(ossImageId));
+				//Check to see whether the oss image has been deleted from database.
 				try{
 					OssImageDao.getById(mStaff, ossImageId);
+					Assert.assertTrue("failed to delete the oss image", false);
 				}catch(BusinessException e){
 					Assert.assertEquals("failed to delete oss image", OssImageError.OSS_IMAGE_NOT_EXIST, e.getErrCode());
 				}
+				//Check to see whether the image has been removed from oss storage.
 				try{
 					ossClient.getObject(OssImage.Params.instance().getBucket(), original.getObjectKey());
 					Assert.assertTrue("failed to delete the image from aliyun oss storage", true);
 				}catch(OSSException ignored){
+				}
+				if(original.hasThumbnail()){
+					//Check to see whether the thumb nail has been removed from database.
+					try{
+						OssImageDao.getById(mStaff, original.getThumbnail().getId());
+						Assert.assertTrue("failed to delete the thumb nail", false);
+					}catch(BusinessException e){
+						Assert.assertEquals("failed to delete thumb nail", OssImageError.OSS_IMAGE_NOT_EXIST, e.getErrCode());
+					}
+					//Check to see whether the thumb nail has been removed from oss storage.
+					try{
+						ossClient.getObject(OssImage.Params.instance().getBucket(), original.getThumbnail().getObjectKey());
+						Assert.assertTrue("failed to delete the thumb nail from aliyun oss storage", true);
+					}catch(OSSException ignored){
+					}
 				}
 			}
 		}

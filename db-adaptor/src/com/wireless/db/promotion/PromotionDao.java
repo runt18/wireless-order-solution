@@ -648,30 +648,78 @@ public class PromotionDao {
 		}
 	}
 	
+	public static class Result{
+		private final int nPromotionPublished;
+		private final int nPromotionFinished;
+		private final int nCouponExpired;
+		
+		public Result(int nPromotionPublished, int nPromotionFinished, int nCouponExpired){
+			this.nPromotionPublished = nPromotionPublished;
+			this.nPromotionFinished = nPromotionFinished;
+			this.nCouponExpired = nCouponExpired;
+		}
+		
+		public int getPromotionPublished(){
+			return this.nPromotionPublished;
+		}
+		
+		public int getPromotionFinished(){
+			return this.nPromotionFinished;
+		}
+		
+		public int getCouponExpired(){
+			return this.nCouponExpired;
+		}
+		
+		@Override
+		public String toString(){
+			return "promotion published : " + nPromotionPublished + 
+				   ",promotion finished : " + nPromotionFinished +
+				   ",coupon expired : " + nCouponExpired;
+		}
+	}
+	
 	/**
-	 * Update the promotion status after published in daily settlement.
+	 * Update the promotion and coupon status after published in daily settlement.
 	 * @param dbCon
 	 * 			the database connection
 	 * @throws SQLException
 	 * 			throws if failed to execute any SQL statement
 	 */
-	public static void updateStatus(DBCon dbCon) throws SQLException{
-		String sql;
-		//Update the promotion has been published to 'PROGRESS' if the start date exceed now. 
-		sql = " UPDATE " + Params.dbName + ".promotion SET " +
-			  " status = " + Promotion.Status.PROGRESS.getVal() + 
-			  " WHERE 1 = 1 " +
-			  " AND start_date > NOW() " +
-			  " AND status = " + Promotion.Status.PUBLISH.getVal();
-		dbCon.stmt.executeUpdate(sql);
-		
-		//Update the promotion has been progressed to 'FINISH' if the finish date exceed now. 
-		sql = " UPDATE " + Params.dbName + ".promotion SET " +
-			  " status = " + Promotion.Status.FINISH.getVal() +
-			  " WHERE 1 = 1 " +
-			  " AND finish_date > NOW() " +
-			  " AND status = " + Promotion.Status.PROGRESS.getVal();
-		dbCon.stmt.executeUpdate(sql);
+	public static Result calcStatus() throws SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			String sql;
+			//Update the promotion has been published to 'PROGRESS' if the start date exceed now. 
+			sql = " UPDATE " + Params.dbName + ".promotion SET " +
+				  " status = " + Promotion.Status.PROGRESS.getVal() + 
+				  " WHERE 1 = 1 " +
+				  " AND start_date > NOW() " +
+				  " AND status = " + Promotion.Status.PUBLISH.getVal();
+			int nPromotionPublished = dbCon.stmt.executeUpdate(sql);
+			
+			//Update the promotion has been progressed to 'FINISH' if the finish date exceed now. 
+			sql = " UPDATE " + Params.dbName + ".promotion SET " +
+				  " status = " + Promotion.Status.FINISH.getVal() +
+				  " WHERE 1 = 1 " +
+				  " AND finish_date > NOW() " +
+				  " AND status = " + Promotion.Status.PROGRESS.getVal();
+			int nPromotionFinished = dbCon.stmt.executeUpdate(sql);
+			
+			//Update the coupon to be expired if the coupon has been drawn and exceeded now.
+			sql = " SELECT coupon_type_id FROM " + Params.dbName + ".coupon_type WHERE expired > NOW() ";
+			sql = " UPDATE " + Params.dbName + ".coupon SET " +
+				  " status = " + Coupon.Status.EXPIRED.getVal() +
+				  " WHERE status = " + Coupon.Status.DRAWN.getVal() +
+				  " AND coupon_type_id IN (" + sql + ")";
+			int nCouponExpired = dbCon.stmt.executeUpdate(sql);
+			
+			return new Result(nPromotionPublished, nPromotionFinished, nCouponExpired);
+			
+		}finally{
+			dbCon.disconnect();
+		}
 	}
 	
 }
