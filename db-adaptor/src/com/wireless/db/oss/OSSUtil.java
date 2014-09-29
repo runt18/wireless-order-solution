@@ -21,6 +21,7 @@ import com.aliyun.openservices.oss.model.GetObjectRequest;
 import com.aliyun.openservices.oss.model.ListObjectsRequest;
 import com.aliyun.openservices.oss.model.OSSObjectSummary;
 import com.aliyun.openservices.oss.model.ObjectMetadata;
+import com.wireless.pojo.oss.OSSParams;
 
 class OSSUtil {
 	

@@ -357,18 +357,25 @@ public class FoodDao {
 		f.setTemp(false);
 		
 		if(builder.isImageChanged()){
-			//Update the other oss images to this food to be single. 
-			sql = " UPDATE " + Params.dbName + ".oss_image SET " +
-			      " associated_id = 0 " +
-				  " ,status = " + OssImage.Status.SINGLE.getVal() +
-				  " ,last_modified = NOW() " +
-				  " WHERE type = " + OssImage.Type.FOOD_IMAGE.getVal() +
-				  " AND associated_id = " + f.getFoodId();
-			dbCon.stmt.executeUpdate(sql);
-			//Married the oss image with this food.
-			try{
-				OssImageDao.update(dbCon, staff, new OssImage.UpdateBuilder(f.getImage().getId()).setAssociated(OssImage.Type.FOOD_IMAGE, f.getFoodId()));
-			}catch(IOException ignored){}
+			if(f.hasImage()){
+				//Married the oss image with this food.
+				try{
+					OssImageDao.update(dbCon, staff, new OssImage.UpdateBuilder(f.getImage().getId()).setSingleAssociated(OssImage.Type.FOOD_IMAGE, f.getFoodId()));
+				}catch(IOException ignored){}
+				//Update the oss image id.
+				sql = " UPDATE " + Params.dbName + ".food SET " +
+				      " oss_image_id = " + f.getImage().getId() +
+					  " WHERE food_id = " + f.getFoodId();
+				dbCon.stmt.executeUpdate(sql);
+			}else{
+				//Delete the associated oss image.
+				OssImageDao.delete(dbCon, staff, new OssImageDao.ExtraCond().setAssociated(OssImage.Type.FOOD_IMAGE, f.getFoodId()));
+				//Update the oss image id to zero.
+				sql = " UPDATE " + Params.dbName + ".food SET " +
+				      " oss_image_id = 0 " +
+					  " WHERE food_id = " + f.getFoodId();
+				dbCon.stmt.executeUpdate(sql);
+			}
 		}
 		
 		sql = " UPDATE " + Params.dbName + ".food SET " +
@@ -379,7 +386,6 @@ public class FoodDao {
 			  (builder.isKitchenChanged() ? ",kitchen_id = " + f.getKitchen().getId() : "") +
 			  (builder.isPriceChanged() ? ",price = " + f.getPrice() : "") +
 			  (builder.isCommissionChanged() ? ",commission = " + f.getCommission() : "") +
-			  (builder.isImageChanged() ? ",oss_image_id = " + f.getImage().getId() : "") +
 			  (builder.isDescChanged() ? ",`desc` = '" + f.getDesc() + "'" : "") +
 			  " WHERE food_id = " + f.getFoodId();
 		

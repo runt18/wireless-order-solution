@@ -143,6 +143,21 @@ public class TestFoodDao {
 			}catch(OSSException ignored){
 			}
 			
+			//---------- Test to delete the oss image --------------
+//			oriImage = OssImageDao.getById(mStaff, ossImageId);
+//			FoodDao.update(mStaff, new Food.UpdateBuilder(foodId).setImage(null));
+//			try{
+//				OssImageDao.getById(mStaff, ossImageId);
+//				Assert.assertTrue("failed to delete the image", false);
+//			}catch(BusinessException e){
+//				Assert.assertEquals("failed to delete oss image", OssImageError.OSS_IMAGE_NOT_EXIST, e.getErrCode());
+//			}
+//			try{
+//				ossClient.getObject(OssImage.Params.instance().getBucket(), oriImage.getObjectKey());
+//				Assert.assertTrue("failed to delete the image from aliyun oss storage", false);
+//			}catch(OSSException ignored){
+//			}
+			
 		} finally{
 			if(foodId != 0){
 				Food original = FoodDao.getById(mStaff, foodId);
@@ -153,15 +168,18 @@ public class TestFoodDao {
 				}catch(BusinessException e){
 					Assert.assertEquals("failed to delete the food", FoodError.FOOD_NOT_EXIST, e.getErrCode());
 				}
-				try{
-					OssImageDao.getById(mStaff, original.getImage().getId());
-				}catch(BusinessException e2){
-					Assert.assertEquals("failed to delete oss image", OssImageError.OSS_IMAGE_NOT_EXIST, e2.getErrCode());
-				}
-				try{
-					ossClient.getObject(OssImage.Params.instance().getBucket(), original.getImage().getObjectKey());
-					Assert.assertTrue("failed to delete the image from aliyun oss storage", false);
-				}catch(OSSException ignored){
+				if(original.hasImage()){
+					try{
+						OssImageDao.getById(mStaff, original.getImage().getId());
+						Assert.assertTrue("failed to delete the image", false);
+					}catch(BusinessException e2){
+						Assert.assertEquals("failed to delete oss image", OssImageError.OSS_IMAGE_NOT_EXIST, e2.getErrCode());
+					}
+					try{
+						ossClient.getObject(OssImage.Params.instance().getBucket(), original.getImage().getObjectKey());
+						Assert.assertTrue("failed to delete the image from aliyun oss storage", false);
+					}catch(OSSException ignored){
+					}
 				}
 			}
 		}

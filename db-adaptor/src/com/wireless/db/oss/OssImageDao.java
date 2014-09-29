@@ -6,6 +6,8 @@ import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import com.aliyun.openservices.oss.OSSClient;
 import com.aliyun.openservices.oss.model.CannedAccessControlList;
@@ -190,6 +192,19 @@ public class OssImageDao {
 		OssImage oriImage = getById(dbCon, staff, ossImage.getId());
 
 		String sql;
+		
+		if(builder.isAssociatedChanged() && builder.isSingleAssociated()){
+			//Update the other oss images associated with this type and serial to be single. 
+			sql = " UPDATE " + Params.dbName + ".oss_image SET " +
+			      " associated_id = 0 " +
+				  " ,status = " + OssImage.Status.SINGLE.getVal() +
+				  " ,last_modified = NOW() " +
+				  " WHERE type = " + ossImage.getType().getVal() +
+				  (ossImage.getAssociatedId() != 0 ? " AND associated_id = " + ossImage.getAssociatedId() : "") +
+				  (ossImage.getAssociatedSerial().length() != 0 ? " AND associated_serial = '" + ossImage.getAssociatedSerial() + "' AND associated_serial_crc = CRC32('" + ossImage.getAssociatedSerial() + "')" : "");
+			dbCon.stmt.executeUpdate(sql);
+		}
+		
 		sql = " UPDATE " + Params.dbName + ".oss_image SET " +
 			  " oss_image_id = " + ossImage.getId() +
 			  (builder.isAssociatedChanged() ? " ,type = " + ossImage.getType().getVal() +
@@ -251,6 +266,40 @@ public class OssImageDao {
 		}
     	//Upload the image.
     	ossClient.putObject(OssImage.Params.instance().getBucket(), ossImage.getObjectKey(), istream, objectMeta);
+	}
+	
+	public static void update(DBCon dbCon, Staff staff, OssImage.UpdateBuilder4HtmlAssociated builder) throws SQLException{
+		final String searchImgReg = "(?x)(src|SRC)=('|\")(http://([\\w-]+\\.)+[\\w-]+(:[0-9]+)*(/[\\w-]+)*(/[\\w-]+\\.(jpg|jpeg|JPEG|JPG|png|PNG|gif|GIF)))('|\")";
+		Pattern pattern = Pattern.compile(searchImgReg);
+        Matcher matcher = pattern.matcher(builder.getHtml());
+        
+        while(matcher.find()){
+        	OssImage image = builder.build();
+        	String str = matcher.group(3);
+        	image.setImage(str.substring(str.lastIndexOf("/") + 1));
+        	
+        	String sql;
+        	
+        	sql = " UPDATE " + Params.dbName + ".oss_image SET " +
+        		  " associated_id = 0 " +
+        		  " ,status = " + OssImage.Status.SINGLE.getVal() +
+        		  " WHERE 1 = 1 " +
+        		  " AND restaurant_id = " + staff.getRestaurantId() +
+        		  " AND type = " + image.getType().getVal();
+        	dbCon.stmt.executeUpdate(sql);
+        	
+        	sql = " UPDATE " + Params.dbName + ".oss_image SET " +
+        		  " associated_id = " + image.getAssociatedId() +
+        		  " ,associated_serial = '" + image.getAssociatedSerial() + "'" +
+        		  " ,associated_serial_crc = CRC32('" + image.getAssociatedSerial() + "')" +
+        		  " ,status = " + OssImage.Status.MARRIED.getVal() +
+        		  " WHERE 1 = 1 " +
+        		  " AND restaurant_id = " + staff.getRestaurantId() +
+        		  " AND image = '" + image.getImage() + "'" +
+        		  " AND image_crc = CRC32('" + image.getImage() + "')" +
+        		  " AND type = " + image.getType().getVal();
+        	dbCon.stmt.executeUpdate(sql);
+        }
 	}
 	
     /**

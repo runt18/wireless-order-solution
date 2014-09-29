@@ -89,7 +89,7 @@ public class TestPromotionDao {
 			compare(promotionId, Coupon.Status.CREATED, couponTypeId, m2, CouponDao.getByCond(mStaff, new CouponDao.ExtraCond().setMember(m2).setPromotion(promotionId), null).get(0));
 			
 			//--------Test to update a promotion-----------
-			int oriImageId = ossImageId;
+			int oriImageToCouponType = ossImageId;
 			ossImageId = OssImageDao.insert(mStaff, new OssImage.InsertBuilder(OssImage.Type.WX_COUPON_TYPE).setImgResource(OssImage.ImageType.JPG, new FileInputStream(new File(fileName))));
 
 			CouponType.UpdateBuilder typeUpdateBuilder = new CouponType.UpdateBuilder(couponTypeId, "修改测试优惠券类型")
@@ -116,10 +116,10 @@ public class TestPromotionDao {
 			compare(promotionId, Coupon.Status.CREATED, couponTypeId, m3, CouponDao.getByCond(mStaff, new CouponDao.ExtraCond().setMember(m3).setPromotion(promotionId), null).get(0));
 			
 			//---------- Test the original oss image after promotion update --------------
-			OssImage oriImage = OssImageDao.getById(mStaff, oriImageId);
+			OssImage oriImage = OssImageDao.getById(mStaff, oriImageToCouponType);
 			Assert.assertEquals("original oss image status", OssImage.Status.SINGLE, oriImage.getStatus());
 			Assert.assertEquals("original oss image associated id", 0, oriImage.getAssociatedId());
-			OssImageDao.delete(mStaff, new OssImageDao.ExtraCond().setId(oriImageId));
+			OssImageDao.delete(mStaff, new OssImageDao.ExtraCond().setId(oriImageToCouponType));
 
 			try{
 				OssImageDao.getById(mStaff, oriImage.getId());

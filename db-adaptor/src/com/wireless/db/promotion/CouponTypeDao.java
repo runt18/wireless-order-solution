@@ -160,18 +160,27 @@ public class CouponTypeDao {
 		}
 		
 		if(builder.isImageChanged()){
-			//Update the other oss images to this coupon type to be single. 
-			sql = " UPDATE " + Params.dbName + ".oss_image SET " +
-			      " associated_id = 0 " +
-				  " ,status = " + OssImage.Status.SINGLE.getVal() +
-				  " ,last_modified = NOW() " +
-				  " WHERE type = " + OssImage.Type.WX_COUPON_TYPE.getVal() +
-				  " AND associated_id = " + type.getId();
-			dbCon.stmt.executeUpdate(sql);
-			//Married the oss image with this coupon type.
-			try{
-				OssImageDao.update(dbCon, staff, new OssImage.UpdateBuilder(type.getImage().getId()).setAssociated(OssImage.Type.WX_COUPON_TYPE, type.getId()));
-			}catch(IOException ignored){}
+			if(type.hasImage()){
+				//Married the oss image with this coupon type.
+				try{
+					OssImageDao.update(dbCon, staff, new OssImage.UpdateBuilder(type.getImage().getId()).setSingleAssociated(OssImage.Type.WX_COUPON_TYPE, type.getId()));
+				}catch(IOException ignored){}
+				
+				//Update the oss image id.
+				sql = " UPDATE " + Params.dbName + ".coupon_type SET " +
+					  " oss_image_id = " + type.getImage().getId() +
+					  " WHERE coupon_type_id = " + type.getId();
+				dbCon.stmt.executeUpdate(sql);
+			}else{
+				//Delete the associated oss image.
+				OssImageDao.delete(dbCon, staff, new OssImageDao.ExtraCond().setAssociated(OssImage.Type.WX_COUPON_TYPE, type.getId()));
+				//Update the oss image id.
+				sql = " UPDATE " + Params.dbName + ".coupon_type SET " +
+					  " oss_image_id = 0 " +
+					  " WHERE coupon_type_id = " + type.getId();
+				dbCon.stmt.executeUpdate(sql);
+			}
+
 		}
 		
 		sql = " UPDATE " + Params.dbName + ".coupon_type SET " +
@@ -180,7 +189,6 @@ public class CouponTypeDao {
 			  (builder.isPriceChanged() ? " ,price = " + type.getPrice() : "") +
 			  (builder.isExpiredChanged() ? " ,expired = '" + DateUtil.format(type.getExpired()) + "'" : "") +
 			  (builder.isCommentChanged() ? " ,comment = '" + type.getComment() + "'" : "") +
-			  (builder.isImageChanged() ? " ,oss_image_id = " + type.getImage().getId() : "") +
 			  " WHERE coupon_type_id = " + type.getId();
 		if(dbCon.stmt.executeUpdate(sql) == 0){
 			throw new BusinessException(PromotionError.COUPON_TYPE_NOT_EXIST);

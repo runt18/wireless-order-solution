@@ -3,7 +3,7 @@ package com.wireless.test.db;
 import java.beans.PropertyVetoException;
 
 import com.wireless.db.DBCon;
-import com.wireless.db.oss.OSSParams;
+import com.wireless.pojo.oss.OSSParams;
 import com.wireless.pojo.oss.OssImage;
 
 public final class TestInit {
