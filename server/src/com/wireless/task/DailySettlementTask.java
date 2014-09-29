@@ -12,6 +12,7 @@ import com.wireless.db.client.member.MemberDao;
 import com.wireless.db.foodAssociation.CalcFoodAssociationDao;
 import com.wireless.db.foodStatistics.CalcFoodStatisticsDao;
 import com.wireless.db.frontBusiness.DailySettleDao;
+import com.wireless.db.promotion.PromotionDao;
 import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.db.sms.VerifySMSDao;
 import com.wireless.db.tasteRef.TasteRefDao;
@@ -59,6 +60,9 @@ public class DailySettlementTask extends SchedulerTask{
 			
 			//Perform to calculate member recommended foods.
 			taskInfo.append("info : " + MemberDao.calcRecommendFoods()).append(sep);
+			
+			//Perform to calculate the promotion and coupon status.
+			taskInfo.append("info : " + PromotionDao.calcStatus()).append(sep);
 			
 		}catch(SQLException | BusinessException e){
 			taskInfo.append("error : " + e.getMessage()).append(sep);
