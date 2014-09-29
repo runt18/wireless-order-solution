@@ -1389,17 +1389,32 @@ var basicOperationPanel = new Ext.Panel({
 		 	        		if(!selData)
 		 	        			return;
 		 	        	    
-		 	        		if(selData.img.indexOf('nophoto.jpg') != -1){
+		 	        		if(!selData.img){
 		 	        			Ext.example.msg('提示', '该菜品没有图片,无需删除.');
 		 	        			return;
 		 	        		}
 		 	        		 
 		 	        		Ext.Msg.confirm('提示', '是否确定删除菜品图片?', function(e){
 		 	        			if(e == 'yes'){
-		 	        				selData.arrt = {
-		 	        				    type : mmObj.operation.img.del
-			 	       				};
-		 	        				uploadFoodImage(selData);
+									Ext.Ajax.request({
+										url : '../../OperateImage.do',
+										params : {
+											dataSource : 'deleteFoodImg',
+											foodId : selData.id
+										},
+										success : function(res, opt){
+											var jr = Ext.util.JSON.decode(res.responseText);
+											if(jr.success){
+												Ext.example.msg(jr.title, jr.msg);
+												refreshFoodImageMsg();
+											}else{
+												Ext.ux.showMsg(jr);
+											}
+										},
+										failure : function(res, opt){
+											Ext.ux.showMsg(Ext.decode(res.responseText));
+										}
+									});
 		 	        			 }
 		 	        		}, this);
 		 	        	}
@@ -1485,8 +1500,14 @@ function resetbBasicOperation(_d){
 		isCommission.fireEvent('check', isCommission, true);
 	}
 	commission.setValue(data.commission);
-	//FIXME 图片hardcore
-	img.src = typeof(data.img) == 'undefined' || data.img == '' ? 'http://digie-image-real.oss.aliyuncs.com/nophoto.jpg' : data.img.image;
+	
+	if(typeof(data.img) == 'undefined' || data.img == ''){
+		//FIXME 图片hardcore
+		img.src = 'http://digie-image-real.oss.aliyuncs.com/nophoto.jpg';
+	}else{
+		img.src = data.img.image;
+	}
+	
 	stockStatus.setValue(typeof(data.stockStatusValue) == 'undefined' ? 1 : data.stockStatusValue);
 	
 	foodName.focus(true, 100);
@@ -1720,15 +1741,17 @@ function basicOperationBasicHandler(c){
  * 图片操作
  */
 function uploadFoodImage(c){
-	var otype = null;
+	var params = {};
 	if(typeof(c.arrt) == 'undefined' || typeof(c.arrt.type) == 'undefined'){
 		Ext.example.msg('提示', '操作失败, 获取图片操作类型失败, 请联系客服人员.');
 		return;
 	}
 	if(c.arrt.type == mmObj.operation.img.upload){
-		otype = 0;
+		params.dataSource = 'upload';
+		params.ossType = 4;
 	}else if(c.arrt.type == mmObj.operation.img.del){
-		otype = 1;
+		params.dataSource = 'deleteFoodImg';
+		params.foodId = c.id;
 	}else{
 		Ext.example.msg('提示', '操作失败, 获取图片操作类型失败, 请联系客服人员.');
 		return;
@@ -1749,7 +1772,8 @@ function uploadFoodImage(c){
 	foodImageUpdateLoaddingMask.show();		
 	
 	Ext.Ajax.request({
-		url : '../../OperateImage.do?dataSource=upload&ossType=4',
+		url : '../../OperateImage.do',
+		params : params,
 		isUpload : true,
 		form : Ext.getCmp('imgFileUploadForm').getForm().getEl(),
 		success : function(response, options){
@@ -1757,14 +1781,17 @@ function uploadFoodImage(c){
 			var jr = Ext.decode(response.responseText.replace(/<\/?[^>]*>/g,''));
 			if(eval(jr.success)){
 				Ext.example.msg(jr.title, jr.msg);
-				foodOperationWin.foodImage = jr.root[0].imageId;
-				Ext.getCmp('menuMgrGrid').getStore().each(function(record){
-					if(record.get('id') == c.id){
-						record.set('img', jr.root[0].image);
-						record.commit();
-						return;
-					}
-				});
+				
+				if(c.arrt.type == mmObj.operation.img.upload){
+					foodOperationWin.foodImage = jr.root[0].imageId;
+					Ext.getCmp('menuMgrGrid').getStore().each(function(record){
+						if(record.get('id') == c.id){
+							record.set('img', jr.root[0].image);
+							record.commit();
+							return;
+						}
+					});				
+				}
 				
 				if(typeof(c.arrt) != 'undefined' && typeof(c.arrt.type) != 'undefined' && c.arrt.type == mmObj.operation.img.del)
 					refreshFoodImageMsg();
