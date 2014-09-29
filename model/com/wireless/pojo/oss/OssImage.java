@@ -2,7 +2,6 @@ package com.wireless.pojo.oss;
 
 import java.io.InputStream;
 
-import com.wireless.db.oss.OSSParams;
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.parcel.Parcel;
@@ -101,6 +100,22 @@ public class OssImage implements Jsonable, Parcelable{
 		}
 	}
 	
+	public static enum AssociatedType{
+		SINGLE("独自关联"),
+		MULTI("多个关联");
+		
+		private final String desc;
+		
+		private AssociatedType(String desc) {
+			this.desc = desc;
+		}
+		
+		@Override
+		public String toString(){
+			return desc;
+		}
+	}
+	
 	public static class InsertBuilder{
 		private String image;
 		private ImageType imgType;
@@ -174,6 +189,7 @@ public class OssImage implements Jsonable, Parcelable{
 		private OssImage.Type type;
 		private int associatedId;
 		private String associatedSerial;
+		private AssociatedType associatedType;
 		private Status status;
 		
 		public UpdateBuilder(int id){
@@ -181,11 +197,24 @@ public class OssImage implements Jsonable, Parcelable{
 		}
 		
 		public UpdateBuilder setAssociated(OssImage.Type type, int associatedId){ 
+			return setAssociated(type, associatedId, AssociatedType.MULTI);
+		}
+
+		public UpdateBuilder setSingleAssociated(OssImage.Type type, int associatedId){ 
+			return setAssociated(type, associatedId, AssociatedType.SINGLE);
+		}
+		
+		public UpdateBuilder setAssociated(OssImage.Type type, int associatedId, AssociatedType associatedType){ 
 			this.type = type;
 			this.associatedId = associatedId;
 			this.associatedSerial = null;
+			this.associatedType = associatedType;
 			this.status = Status.MARRIED;
 			return this;
+		}
+
+		public boolean isSingleAssociated(){
+			return associatedType == AssociatedType.SINGLE;
 		}
 		
 		public UpdateBuilder setAssociated(OssImage.Type type, String associatedSerial){ 
@@ -228,6 +257,39 @@ public class OssImage implements Jsonable, Parcelable{
 		
 		public InputStream getImgStream(){
 			return this.istream;
+		}
+		
+		public OssImage build(){
+			return new OssImage(this);
+		}
+	}
+	
+	public static class UpdateBuilder4HtmlAssociated{
+		private final OssImage.Type type;
+		private final int associatedId;
+		private final String associatedSerial;
+		
+		private String htmlBody;
+		
+		public UpdateBuilder4HtmlAssociated(OssImage.Type type, int associatedId){
+			this.type = type;
+			this.associatedId = associatedId;
+			this.associatedSerial = null;
+		}
+		
+		public UpdateBuilder4HtmlAssociated(OssImage.Type type, String associatedSerial){
+			this.type = type;
+			this.associatedId = 0;
+			this.associatedSerial = associatedSerial;
+		}
+
+		public UpdateBuilder4HtmlAssociated setHtml(String html){
+			this.htmlBody = html;
+			return this;
+		}
+		
+		public String getHtml(){
+			return this.htmlBody;
 		}
 		
 		public OssImage build(){
@@ -307,6 +369,12 @@ public class OssImage implements Jsonable, Parcelable{
 		this.type = builder.type;
 		this.image = builder.image;
 		this.status = builder.status;
+	}
+	
+	private OssImage(UpdateBuilder4HtmlAssociated builder){
+		this.associatedId = builder.associatedId;
+		this.associatedSerial = builder.associatedSerial;
+		this.type = builder.type;
 	}
 	
 	public OssImage(int id){
