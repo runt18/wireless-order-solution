@@ -63,6 +63,7 @@ function initOperateMaterialCateWin(){
 							dataSource : dataSource,
 							restaurantID : restaurantID,
 							cateId : cateId.getValue(),
+							cateType : operateMaterialCateWin.cateType,
 							name : cateName.getValue()
 						},
 						success : function(res, opt){
@@ -71,6 +72,7 @@ function initOperateMaterialCateWin(){
 								Ext.example.msg(jr.title, jr.msg);
 								if(dataSource == 'update'){
 									operateMaterialCateWin.hide();
+									operateMaterialCateWin.cateType = '';
 									materialCateTree.getRootNode().reload();
 								}else{
 									Ext.getCmp('txtMaterialCateName').setValue();
@@ -108,6 +110,7 @@ function initOperateMaterialCateWin(){
 							dataSource : dataSource,
 							restaurantID : restaurantID,
 							cateId : cateId.getValue(),
+							cateType : operateMaterialCateWin.cateType,
 							name : cateName.getValue()
 						},
 						success : function(res, opt){
@@ -115,6 +118,7 @@ function initOperateMaterialCateWin(){
 							if(jr.success){
 								Ext.example.msg(jr.title, jr.msg);
 								operateMaterialCateWin.hide();
+								operateMaterialCateWin.cateType = '';
 								materialCateTree.getRootNode().reload();
 							}else{
 								Ext.ux.showMsg(jr);
@@ -169,8 +173,9 @@ function operateMaterialCateHandler(c){
 			Ext.example.msg('提示', '请选中一个原料类别再进行操作.');
 			return;
 		}
-		operateMaterialCateWin.setTitle('修改原料类别');
+		operateMaterialCateWin.setTitle('修改类别');
 		operateMaterialCateWin.show();
+		operateMaterialCateWin.cateType = sn.attributes.type;
 		cateId.setValue(sn.attributes.cateId);
 		cateName.setValue(sn.attributes.name);
 		cateName.focus(true, 100);
@@ -322,7 +327,6 @@ function initOperateMaterialWin(){
 									
 									Ext.getCmp('txtMaterialPrice').clearInvalid();
 									Ext.getCmp('txtMaterialName').focus(true, 100);
-									
 								}
 								
 							}else{
@@ -461,23 +465,18 @@ function operateMaterialHandler(c){
 		operateMaterialWin.cateType = data['cateType'];
 		
 		if(data['cateType'] == 1){
-			operateMaterialWin.setTitle('商品名称 -- ' + data['name']);
+			Ext.getCmp('txtMaterialCate').store.loadData(materialGoodCateData);
+			operateMaterialWin.setTitle('商品名称');
 			operateMaterialWin.cateId = data['cateId'];
 			materialId.setValue(data['id']);
+			materialName.setValue(data['name']);
 			materialPrice.setValue(data['price']);
-			materialName.hide();
-			materialCate.hide();
-			
-			materialName.getEl().up('.x-form-item').setDisplayed(false);
-			materialCate.getEl().up('.x-form-item').setDisplayed(false);
+			materialCate.setValue(data['cateId']);	
 			
 			materialPrice.focus(true, 100);
 		}else{
+			Ext.getCmp('txtMaterialCate').store.loadData(materialCateData);
 			operateMaterialWin.setTitle('');
-			materialName.show();
-			materialCate.show();
-			materialName.getEl().up('.x-form-item').setDisplayed(true);
-			materialCate.getEl().up('.x-form-item').setDisplayed(true);
 			materialId.setValue(data['id']);
 			materialName.setValue(data['name']);
 			materialCate.setValue(data['cateId']);	
@@ -584,16 +583,25 @@ function initControl(){
 	        cateId : -1,
 	        name : '全部',
 	        listeners : {
-	        	load : function(thiz){
+	        	load : function(thiz, records){
 	        		materialCateData = [];
+	        		materialGoodCateData = [];
 	        		Ext.Ajax.request({
 	        			url : '../../QueryMaterialCate.do',
-	        			params : {dataSource : 'normal', type : 2},
+	        			params : {dataSource : 'normal'},
 						success : function(res, opt){
 							var jr = Ext.decode(res.responseText);
 							for (var i = 0; i < jr.root.length; i++) {
-								materialCateData.push([jr.root[i].id, jr.root[i].name]);
+								if(jr.root[i].typeValue == 2){
+									materialCateData.push([jr.root[i].id, jr.root[i].name]);
+								}else{
+									materialGoodCateData.push([jr.root[i].id, jr.root[i].name]);
+								}
+								
 							}
+							
+							console.log(materialCateData)
+							console.log(materialGoodCateData)
 						},
 						failure : function(res, opt){
 							Ext.ux.showMsg(Ext.decode(res.responseText));
@@ -611,6 +619,12 @@ function initControl(){
 				if(e.attributes.cateId == -1){
 					return false;
 				}				
+				
+				if(e.attributes.type == 2){
+					inventory_materialBasicGrid.getColumnModel().setHidden(3,true);  
+				}else{
+					inventory_materialBasicGrid.getColumnModel().setHidden(3,false);
+				}
 			}
 		}
 	});
@@ -635,6 +649,7 @@ function initControl(){
 				var sn = materialCateTree.getSelectionModel().getSelectedNode();
 				var name = Ext.getCmp('txtSearchForMaterialName');
 				var gs = inventory_materialBasicGrid.getStore();
+				gs.baseParams['cateType'] = (sn == null || !sn || sn.attributes.cate == -1 ? '' : sn.attributes.cate);
 				gs.baseParams['cateId'] = (sn == null || !sn || sn.attributes.cateId == -1 ? '' : sn.attributes.cateId);
 				gs.baseParams['name'] = name.getValue();
 				gs.load({
@@ -672,8 +687,9 @@ function initControl(){
 		'../../QueryMaterial.do',
 		[
 			[true, false, false, true], 
-			['物品名称', 'reName', 300],
+			['物品名称', 'name', 150],
 			['所属类别', 'cateName'],
+			['对应菜品', 'belongFood', 220],
 			['总数量', 'stock',,'right'],
 			['单位成本', 'price',,'right'],
 			['状态', 'statusText',,'center'],
@@ -681,7 +697,7 @@ function initControl(){
 			['最后修改时间', 'lastModDateFormat', 150],
 			['操作', 'operate', 150, 'center', 'materialBasicGridOperateRenderer']
 		],
-		['id', 'name', 'reName', 'cateId', 'cateName','cateType', 'stock', 'price', 'statusValue', 'statusText',
+		['id', 'name', 'belongFood', 'cateId', 'cateName','cateType', 'stock', 'price', 'statusValue', 'statusText',
 		 'lastModStaff', 'lastModDate', 'lastModDateFormat', 'isGood'],
 		[['isPaging', true],  ['restaurantID', restaurantID], ['dataSource', 'normal']],
 		GRID_PADDING_LIMIT_25,
@@ -700,18 +716,6 @@ function initControl(){
 		 scope : this 
 	}];
 	
-	inventory_materialBasicGrid.getStore().on('load', function(thiz, records){
-		
-		for(var i = 0; i < records.length; i++){
-			var record = records[i];
-			var type = record.get('isGood');
-			if(!type){
-				record.set('reName', record.get('name'));
-				record.commit();
-			}
-		}
-			
-	});	
 }
 	
 
@@ -892,8 +896,7 @@ function fnSetGoodWin(){
 
 }
 
-var material_bar = {treeId : 'materialCateTree',operateTree:Ext.ux.operateTree_material, mult : [{type : 2, option :[{name : '修改', fn : "operateMaterialCateHandler({otype:Ext.ux.otype['update']})"}, {name : '删除', fn : "operateMaterialCateHandler({otype:Ext.ux.otype['delete']})"}]}, 
-											{type : 1, option :[{name : '删除', fn : "operateMaterialCateHandler({otype:Ext.ux.otype['delete']})"}]} ]};
+var material_bar = {treeId : 'materialCateTree',option : [{name : '修改', fn : "operateMaterialCateHandler({otype:Ext.ux.otype['update']})"}, {name : '删除', fn : "operateMaterialCateHandler({otype:Ext.ux.otype['delete']})"}]};
 
 Ext.onReady(function(){
 	

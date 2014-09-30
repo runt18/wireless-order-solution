@@ -1746,13 +1746,7 @@ function uploadFoodImage(c){
 		Ext.example.msg('提示', '操作失败, 获取图片操作类型失败, 请联系客服人员.');
 		return;
 	}
-	if(c.arrt.type == mmObj.operation.img.upload){
-		params.dataSource = 'upload';
-		params.ossType = 4;
-	}else if(c.arrt.type == mmObj.operation.img.del){
-		params.dataSource = 'deleteFoodImg';
-		params.foodId = c.id;
-	}else{
+	if(c.arrt.type != mmObj.operation.img.upload){
 		Ext.example.msg('提示', '操作失败, 获取图片操作类型失败, 请联系客服人员.');
 		return;
 	}
@@ -1772,8 +1766,7 @@ function uploadFoodImage(c){
 	foodImageUpdateLoaddingMask.show();		
 	
 	Ext.Ajax.request({
-		url : '../../OperateImage.do',
-		params : params,
+		url : '../../OperateImage.do?dataSource=upload&ossType=4',
 		isUpload : true,
 		form : Ext.getCmp('imgFileUploadForm').getForm().getEl(),
 		success : function(response, options){

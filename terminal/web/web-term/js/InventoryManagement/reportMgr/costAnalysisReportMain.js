@@ -110,5 +110,5 @@ Ext.onReady(function(){
 		}]
 	});
 	
-	onLoad();
+//	onLoad();
 });	

@@ -606,10 +606,17 @@ Ext.onReady(function() {
  	   			success : function(response, options){
  	   				coupon_uploadMask.hide();
  	   				var jr = Ext.decode(response.responseText.replace(/<\/?[^>]*>/g,''));
- 	   				var ossImage = jr.root[0];
- 	   				operatePromotTypeWin.image = ossImage.image;
- 	   				operatePromotTypeWin.ossId = ossImage.imageId;
- 	   				Ext.ux.showMsg(jr);
+ 	   				if(jr.success){
+// 	   					Ext.ux.showMsg(jr);
+	  	   				var ossImage = jr.root[0];
+	 	   				operatePromotTypeWin.image = ossImage.image;
+	 	   				operatePromotTypeWin.ossId = ossImage.imageId;	   				
+ 	   				}else{
+ 	   					Ext.ux.showMsg(jr);
+ 	   					Ext.getCmp('couponTypeBox').setImg();
+ 	   				}
+
+ 	   				
  	   			},
  	   			failure : function(response, options){
  	   				coupon_uploadMask.hide();
