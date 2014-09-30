@@ -72,8 +72,12 @@ public class OperateMaterialCateAction extends DispatchAction {
 		try{
 			String restaurantID = (String) request.getAttribute("restaurantID");
 			String cateId = request.getParameter("cateId");
+			String cateType = request.getParameter("cateType");
 			String name = request.getParameter("name");
 			MaterialCate mc = new MaterialCate(Integer.valueOf(cateId), Integer.valueOf(restaurantID), name);
+			if(cateType != null && !cateType.isEmpty()){
+				mc.setType(Integer.parseInt(cateType));
+			}
 			MaterialCateDao.update(mc);
 			jobject.initTip(true, "操作成功, 已修改原料类别信息.");
 		}catch(BusinessException e){

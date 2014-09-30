@@ -53,7 +53,11 @@ public class QueryMaterialCateAction extends DispatchAction{
 			String type = request.getParameter("type");
 			String extra = "";
 			extra += " AND MC.restaurant_id = " + restaurantID;
-			extra += " AND MC.type = " + type;
+			
+			if(type != null && !type.isEmpty()){
+				extra += " AND MC.type = " + type;
+			}
+			
 			Map<Object, Object> params = new LinkedHashMap<Object, Object>();
 			params.put(SQLUtil.SQL_PARAMS_EXTRA, extra);
 			root = MaterialCateDao.getContent(params);
@@ -99,6 +103,7 @@ public class QueryMaterialCateAction extends DispatchAction{
 				.append("text:'商品'")
 				.append(",expanded:true")
 				.append(",cate:" + MaterialCate.Type.GOOD.getValue())
+				.append(",type:" + MaterialCate.Type.GOOD.getValue())
 				.append(",children:[" + good + "]") 
 				.append("}");						
 			}
@@ -112,6 +117,7 @@ public class QueryMaterialCateAction extends DispatchAction{
 				.append("text:'原料'")
 				.append(",expanded:true")
 				.append(",cate:" + MaterialCate.Type.MATERIAL.getValue())
+				.append(",type:" + MaterialCate.Type.MATERIAL.getValue())
 				.append(",children:[" + material + "]") 
 				.append("}");						
 			}			

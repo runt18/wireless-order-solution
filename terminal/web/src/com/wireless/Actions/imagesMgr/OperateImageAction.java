@@ -18,9 +18,12 @@ import org.apache.struts.actions.DispatchAction;
 import com.oreilly.servlet.multipart.FilePart;
 import com.oreilly.servlet.multipart.MultipartParser;
 import com.oreilly.servlet.multipart.Part;
+import com.wireless.db.menuMgr.FoodDao;
 import com.wireless.db.oss.OssImageDao;
 import com.wireless.db.staffMgr.StaffDao;
+import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
+import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.oss.OssImage;
 import com.wireless.pojo.staffMgr.Staff;
 
@@ -36,7 +39,7 @@ public class OperateImageAction extends DispatchAction{
 		
 		JObject jobject = new JObject();
 		
-		MultipartParser parser = new MultipartParser(request, (300 * 1024), true, true);
+		MultipartParser parser = new MultipartParser(request, (3000 * 1024), true, true);
 		
 		Part imagePart = parser.readNextPart();
 		
@@ -60,11 +63,21 @@ public class OperateImageAction extends DispatchAction{
 	    			OssImage.InsertBuilder builder = new OssImage.InsertBuilder(OssImage.Type.valueOf(Integer.parseInt(ossType)))
 							 .setImgResource(OssImage.ImageType.valueOf(imageType, 0), uploadStream);
 	    			
-	    			ossImageId = OssImageDao.insert(staff, builder);        		
+	    			ossImageId = OssImageDao.insert(staff, builder);    
+	    			
+	    			List<OssImage> list = new ArrayList<>();
+	    			OssImage image = OssImageDao.getById(staff, ossImageId);
+	    			list.add(image);
+	    			jobject.setRoot(list);
+	    			
+	    			jobject.initTip(true, "操作成功, 上传图片信息成功!");
 	            }
 	        }
 			
 			
+		}catch(BusinessException e){
+			e.printStackTrace();
+			jobject.initTip(e);
 		}catch(SQLException e){
 			e.printStackTrace();
 			jobject.initTip(e);
@@ -72,15 +85,39 @@ public class OperateImageAction extends DispatchAction{
 			e.printStackTrace();
 			jobject.initTip(e);
 		}finally{
-			List<OssImage> list = new ArrayList<>();
-			OssImage image = OssImageDao.getById(staff, ossImageId);
-			list.add(image);
-			jobject.setRoot(list);
-			
-			jobject.initTip(true, "操作成功, 上传图片信息成功!");
+
 			response.getWriter().print(jobject.toString());
 		}
 		return null;
 	}
+	
+	public ActionForward deleteFoodImg(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		
+		String pin = (String)request.getAttribute("pin");
+		Staff staff = StaffDao.verify(Integer.parseInt(pin));
+		
+		JObject jobject = new JObject();
+		
+		String foodId = request.getParameter("foodId");
+		
+		Food.UpdateBuilder builder = new Food.UpdateBuilder(Integer.parseInt(foodId));
+		builder.setImage(null);
+		
+		try{
+			FoodDao.update(staff, builder);
+			jobject.initTip(true, "图片删除成功");
+		}catch(SQLException e){
+			jobject.initTip(e);
+		}catch(Exception e){
+			jobject.initTip(e);
+		}finally{
+			response.getWriter().print(jobject.toString());
+		}
+		
+		return null;
+	}
+	
 
 }

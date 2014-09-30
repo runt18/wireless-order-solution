@@ -96,7 +96,7 @@ public class QueryMaterialAction extends DispatchAction{
 								public JsonMap toJsonMap(int flag) {
 									JsonMap jm = new JsonMap();
 									jm.putJsonable(m, flag);
-									jm.putString("reName", m.getName() + " ←→ " + food.getName() + " (" + food.getKitchen().getName() + ")");
+									jm.putString("belongFood", food.getName() + " (" + food.getKitchen().getName() + ")");
 									return jm;
 								}
 								
