@@ -614,11 +614,13 @@ public class FoodDao {
 					 " KITCHEN.kitchen_id, KITCHEN.display_id AS kitchen_display_id, KITCHEN.name AS kitchen_name, " +
 					 " KITCHEN.type AS kitchen_type , KITCHEN.is_allow_temp AS is_allow_temp, " +
 					 " DEPT.dept_id, DEPT.name AS dept_name, DEPT.type AS dept_type, DEPT.display_id AS dept_display_id, " +
-					 " OI.oss_image_id, OI.image, OI.type AS oss_image_type " +
+					 " OI.oss_image_id, OI.image, OI.type AS oss_image_type, " +
+					 " TOI.oss_image_id AS oss_thumbnail_id, TOI.image AS thumbnail_image, TOI.type AS thumbnail_type " +
 					 " FROM " + Params.dbName + ".food FOOD " +
 					 " JOIN " + Params.dbName + ".kitchen KITCHEN ON FOOD.kitchen_id = KITCHEN.kitchen_id " +
 					 " JOIN " + Params.dbName + ".department DEPT ON KITCHEN.dept_id = DEPT.dept_id AND KITCHEN.restaurant_id = DEPT.restaurant_id " +
 					 " LEFT JOIN " + Params.dbName + ".oss_image OI ON FOOD.oss_image_id = OI.oss_image_id " +
+					 " LEFT JOIN " + Params.dbName + ".oss_image TOI ON TOI.oss_thumbnail_id = OI.oss_image_id " +
 					 " WHERE 1 = 1 " +
 					 (extraCondition == null ? "" : extraCondition) + " " +
 					 (orderClause == null ? "" : orderClause); 
@@ -648,6 +650,14 @@ public class FoodDao {
 				image.setImage(dbCon.rs.getString("image"));
 				image.setType(OssImage.Type.valueOf(dbCon.rs.getInt("oss_image_type")));
 				image.setRestaurantId(restaurantId);
+				int thumbnailId = dbCon.rs.getInt("oss_thumbnail_id");
+				if(thumbnailId != 0){
+					OssImage thumbnail = new OssImage(thumbnailId);
+					thumbnail.setImage(dbCon.rs.getString("oss_thumbnail_image"));
+					thumbnail.setType(OssImage.Type.valueOf(dbCon.rs.getInt("oss_thumbnail_type")));
+					thumbnail.setRestaurantId(restaurantId);
+					image.setThumbnail(thumbnail);
+				}
 				f.setImage(image);
 			}
 			f.setKitchen(new Kitchen.QueryBuilder(dbCon.rs.getInt("kitchen_id"), dbCon.rs.getString("kitchen_name")) 

@@ -150,7 +150,7 @@ public class OssImageDao {
 				int thumbNailId = OssImageDao.insert(dbCon, staff, 
 													 new OssImage.InsertBuilder(OssImage.Type.THUMB_NAIL, id)
 															 	 .setImgResource(OssImage.ImageType.JPG, 
-																	 		 new CompressImage().imageZoomOut(new ByteArrayInputStream(bytesToImg), builder.getThumbnailSize())));
+																	 		 new CompressImage().imageZoomOut(new ByteArrayInputStream(bytesToImg), OssImage.ImageType.JPG, builder.getThumbnailSize())));
 				sql = " UPDATE " + Params.dbName + ".oss_image SET " +
 					  " oss_thumbnail_id = " + thumbNailId +
 					  " WHERE oss_image_id = " + id;
@@ -230,8 +230,8 @@ public class OssImageDao {
 			  (builder.isAssociatedChanged() ? " ,type = " + ossImage.getType().getVal() +
 					  						   " ,associated_id = " + ossImage.getAssociatedId() +
 					  						   " ,associated_serial = '" + ossImage.getAssociatedSerial() + "'" +
-					  						   " ,associated_serial_crc = CRC32('" + ossImage.getAssociatedSerial() + "')" : "") +
-					  						   " ,status = " + ossImage.getStatus().getVal() + 
+					  						   " ,associated_serial_crc = CRC32('" + ossImage.getAssociatedSerial() + "')"  +
+					  						   " ,status = " + ossImage.getStatus().getVal() : "") +
 			  " ,last_modified = NOW() " +
 			  " WHERE oss_image_id = " + ossImage.getId();
 		if(dbCon.stmt.executeUpdate(sql) == 0){
@@ -258,7 +258,7 @@ public class OssImageDao {
 				}
 				//Insert a new thumb nail.
 				int thumbNailId = insert(dbCon, staff, new OssImage.InsertBuilder(OssImage.Type.THUMB_NAIL, ossImage.getId())
-					     										   .setImgResource(OssImage.ImageType.JPG, new CompressImage().imageZoomOut(new ByteArrayInputStream(bytesToImg), builder.getThumbnailSize())));
+					     										   .setImgResource(OssImage.ImageType.JPG, new CompressImage().imageZoomOut(new ByteArrayInputStream(bytesToImg), OssImage.ImageType.JPG, builder.getThumbnailSize())));
 				//Associated the new thumb nail.
 				sql = " UPDATE " + Params.dbName + ".oss_image SET " +
 					  " oss_thumbnail_id = " + thumbNailId +

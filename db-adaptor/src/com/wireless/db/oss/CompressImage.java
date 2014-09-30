@@ -10,6 +10,8 @@ import java.io.InputStream;
 
 import javax.imageio.ImageIO;
 
+import com.wireless.pojo.oss.OssImage;
+
 public class CompressImage {
 	private File fFile = null, sFile = null; // 文件对象 
     private int width;
@@ -38,7 +40,7 @@ public class CompressImage {
         sFile = saveFile;
     }
     
-    public InputStream imageZoomOut(InputStream is, Dimension dimension) throws IOException  {
+    public InputStream imageZoomOut(InputStream is, OssImage.ImageType imgType, Dimension dimension) throws IOException  {
     	BufferedImage srcBufferImage = javax.imageio.ImageIO.read(is);
     	width = srcBufferImage.getWidth();
     	height = srcBufferImage.getHeight();
@@ -46,14 +48,14 @@ public class CompressImage {
     	scaleWidth = size[0];
     	ByteArrayOutputStream out = new ByteArrayOutputStream();
     	if (DetermineResultSize(size[0], size[1]) == 1) {
-    		ImageIO.write(srcBufferImage, "jpg", out);
+    		ImageIO.write(srcBufferImage, imgType.getSuffix(), out);
     		return new ByteArrayInputStream(out.toByteArray());
     	}
     	CalContrib();
     	BufferedImage pbOut = HorizontalFiltering(srcBufferImage, size[0]);
     	BufferedImage pbFinalOut = VerticalFiltering(pbOut, size[1]);
     	
-    	ImageIO.write(pbFinalOut, "jpg", out);
+    	ImageIO.write(pbFinalOut, imgType.getSuffix(), out);
     	
     	out.flush();
     	out.close();

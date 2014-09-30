@@ -208,5 +208,8 @@ public class TestFoodDao {
 		Assert.assertEquals("oss image status to food : " + tag, OssImage.Status.MARRIED, actual.getImage().getStatus());
 		Assert.assertEquals("oss image id to food : " + tag, expected.getImage().getId(), actual.getImage().getId());
 		Assert.assertTrue("failed to put image to oss storage", ossClient.getObject(OssImage.Params.instance().getBucket(), actual.getImage().getObjectKey()) != null);
+		//------- the content to thumb nail image --------
+		Assert.assertEquals("oss thumbnail type to food" + tag, OssImage.Type.THUMB_NAIL, actual.getImage().getThumbnail().getType());
+		Assert.assertEquals("oss thumbnail id to food" + tag, actual.getImage().getId(), actual.getImage().getThumbnail().getAssociatedId());
 	}
 }
