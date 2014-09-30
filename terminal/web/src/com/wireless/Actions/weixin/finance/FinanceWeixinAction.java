@@ -529,14 +529,8 @@ public class FinanceWeixinAction extends Action {
 			
 			ByteArrayInputStream bisJpg = new ByteArrayInputStream(bosJpg.toByteArray());
 			
-			List<OssImage> result = OssImageDao.getByCond(staff, new OssImageDao.ExtraCond().setAssociated(OssImage.Type.WX_FINANCE, associatedSerial));
-			int ossImageId;
-			if(result.isEmpty()){
-				ossImageId = OssImageDao.insert(staff, new OssImage.InsertBuilder(OssImage.Type.WX_FINANCE, associatedSerial).setImgResource(fileNameJpg, bisJpg));
-			}else{
-				ossImageId = result.get(0).getId();
-				OssImageDao.update(staff, new OssImage.UpdateBuilder(ossImageId).setImgResource(fileNameJpg, bisJpg));
-			}
+			OssImageDao.delete(staff, new OssImageDao.ExtraCond().setAssociated(OssImage.Type.WX_FINANCE, associatedSerial));
+			int	ossImageId = OssImageDao.insert(staff, new OssImage.InsertBuilder(OssImage.Type.WX_FINANCE, associatedSerial).setImgResource(fileNameJpg, bisJpg));
 			
 			String picUrl = OssImageDao.getById(staff, ossImageId).getObjectUrl() + "?" + System.currentTimeMillis();
 			
@@ -613,14 +607,8 @@ public class FinanceWeixinAction extends Action {
 			
 			ByteArrayInputStream bisJpg = new ByteArrayInputStream(bosJpg.toByteArray());
 
-			List<OssImage> result = OssImageDao.getByCond(staff, new OssImageDao.ExtraCond().setAssociated(OssImage.Type.WX_FINANCE, associatedSerial));
-			int ossImageId;
-			if(result.isEmpty()){
-				ossImageId = OssImageDao.insert(staff, new OssImage.InsertBuilder(OssImage.Type.WX_FINANCE, associatedSerial).setImgResource(fileNameJpg, bisJpg));
-			}else{
-				ossImageId = result.get(0).getId();
-				OssImageDao.update(staff, new OssImage.UpdateBuilder(ossImageId).setImgResource(fileNameJpg, bisJpg));
-			}
+			OssImageDao.delete(staff, new OssImageDao.ExtraCond().setAssociated(OssImage.Type.WX_FINANCE, associatedSerial));
+			int	ossImageId = OssImageDao.insert(staff, new OssImage.InsertBuilder(OssImage.Type.WX_FINANCE, associatedSerial).setImgResource(fileNameJpg, bisJpg));
 			
 			String picUrl = OssImageDao.getById(staff, ossImageId).getObjectUrl() + "?" + System.currentTimeMillis();
 			

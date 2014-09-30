@@ -2,7 +2,6 @@ package com.wireless.Actions.weixin;
 
 import gui.ava.html.image.generator.HtmlImageGenerator;
 
-import java.awt.Dimension;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -22,6 +21,7 @@ import org.marker.weixin.msg.Msg4Text;
 
 import com.wireless.Actions.init.InitServlet;
 import com.wireless.db.client.member.MemberDao;
+import com.wireless.db.oss.CompressImage;
 import com.wireless.db.oss.OssImageDao;
 import com.wireless.db.promotion.CouponDao;
 import com.wireless.db.restaurantMgr.RestaurantDao;
@@ -234,23 +234,16 @@ public class WeiXinHandleMessage extends HandleMessageAdapter {
 							String picUrl = "";
 							try{
 								HtmlImageGenerator imageGenerator = new HtmlImageGenerator();
-								imageGenerator.loadHtml(coupon.getPromotion().getBody().replaceAll("<img.*src=(.*?)[^>]*?>", "<font size=\"5\" color=\"0000FF\">" + coupon.getPromotion().getTitle() + "</font>"));
-								imageGenerator.setSize(new Dimension(360, 280));
+								imageGenerator.loadHtml(coupon.getPromotion().getBody());
 								ByteArrayOutputStream bosJpg = new ByteArrayOutputStream();
-								ImageIO.write(imageGenerator.getBufferedImage(), "png", bosJpg);
+								ImageIO.write(new CompressImage().imageZoomOut(imageGenerator.getBufferedImage(), 360, 280), "jpg", bosJpg);
 								bosJpg.flush();
 								
 								ByteArrayInputStream bisJpg = new ByteArrayInputStream(bosJpg.toByteArray());
 								String associatedSerial = "promotion_large_" + msg.getFromUserName();
-								String fileName = associatedSerial + ".png";
-								List<OssImage> result = OssImageDao.getByCond(staff, new OssImageDao.ExtraCond().setAssociated(OssImage.Type.WX_PROMOTION, associatedSerial));
-								final int ossImageId;
-								if(result.isEmpty()){
-									ossImageId = OssImageDao.insert(staff, new OssImage.InsertBuilder(OssImage.Type.WX_PROMOTION, associatedSerial).setImgResource(fileName, bisJpg));
-								}else{
-									ossImageId = result.get(0).getId();
-									OssImageDao.update(staff, new OssImage.UpdateBuilder(ossImageId).setImgResource(fileName, bisJpg));
-								}
+								String fileName = associatedSerial + ".jpg";
+								OssImageDao.delete(staff, new OssImageDao.ExtraCond().setAssociated(OssImage.Type.WX_PROMOTION, associatedSerial));
+								int ossImageId = OssImageDao.insert(staff, new OssImage.InsertBuilder(OssImage.Type.WX_PROMOTION, associatedSerial).setImgResource(fileName, bisJpg));
 								bosJpg.close();
 						    	bisJpg.close();
 						    	picUrl = OssImageDao.getById(staff, ossImageId).getObjectUrl() + "?" + System.currentTimeMillis();
