@@ -55,6 +55,10 @@ public class OssImage implements Jsonable, Parcelable{
 			this.suffix = suffix;
 		}
 		
+		public String getSuffix(){
+			return this.suffix;
+		}
+		
 		public static ImageType valueOf(String val, int flag){
 			for(ImageType type : values()){
 				if(type.suffix.equalsIgnoreCase(val)){
@@ -121,7 +125,7 @@ public class OssImage implements Jsonable, Parcelable{
 		private String image;
 		private ImageType imgType;
 		private InputStream istream;
-		private Dimension dimension;
+		private Dimension thumbnail;
 		
 		private final OssImage.Type type;
 		private final int associatedId;
@@ -130,6 +134,7 @@ public class OssImage implements Jsonable, Parcelable{
 		
 		public InsertBuilder(OssImage.Type type){
 			this.type = type;
+			this.thumbnail = type.thumbnail;
 			this.associatedId = 0;
 			this.associatedSerial = null;
 			this.status = Status.SINGLE;
@@ -137,6 +142,7 @@ public class OssImage implements Jsonable, Parcelable{
 		
 		public InsertBuilder(OssImage.Type type, int associatedId){ 
 			this.type = type;
+			this.thumbnail = type.thumbnail;
 			this.associatedId = associatedId;
 			this.associatedSerial = null;
 			this.status = Status.MARRIED;
@@ -164,7 +170,7 @@ public class OssImage implements Jsonable, Parcelable{
 		}
 		
 		public InsertBuilder setThumbnailSize(Dimension dimension){
-			this.dimension = dimension;
+			this.thumbnail = dimension;
 			return this;
 		}
 		
@@ -181,11 +187,11 @@ public class OssImage implements Jsonable, Parcelable{
 		}
 		
 		public boolean hasThumbnail(){
-			return this.dimension != null;
+			return this.thumbnail != null;
 		}
 		
 		public Dimension getThumbnailSize(){
-			return this.dimension;
+			return this.thumbnail;
 		}
 		
 		public OssImage build(){
@@ -205,7 +211,7 @@ public class OssImage implements Jsonable, Parcelable{
 		private int associatedId;
 		private String associatedSerial;
 		private AssociatedType associatedType;
-		private Dimension dimension;
+		private Dimension thumbnail;
 		private Status status;
 		
 		public UpdateBuilder(int id){
@@ -222,6 +228,7 @@ public class OssImage implements Jsonable, Parcelable{
 		
 		public UpdateBuilder setAssociated(OssImage.Type type, int associatedId, AssociatedType associatedType){ 
 			this.type = type;
+			this.thumbnail = type.thumbnail;
 			this.associatedId = associatedId;
 			this.associatedSerial = null;
 			this.associatedType = associatedType;
@@ -256,16 +263,16 @@ public class OssImage implements Jsonable, Parcelable{
 		}
 		
 		public UpdateBuilder setThumbnailSize(Dimension dimension){
-			this.dimension = dimension;
+			this.thumbnail = dimension;
 			return this;
 		}
 		
 		public Dimension getThumbnailSize(){
-			return this.dimension;
+			return this.thumbnail;
 		}
 		
 		public boolean isThumbnailChanged(){ 
-			return this.dimension != null;
+			return this.thumbnail != null;
 		}
 		
 		public boolean isAssociatedChanged(){
@@ -323,21 +330,23 @@ public class OssImage implements Jsonable, Parcelable{
 	}
 	
 	public static enum Type{
-		WX_PROMOTION(1, "WxPromotion", 100, "微信优惠活动"),
-		WX_FINANCE(2, "WxFinance", 100, "微信财务端"),
-		WX_COUPON_TYPE(3, "WxCouponType", 100, "微信优惠券类型"),
-		FOOD_IMAGE(4, "FoodImage", 300, "菜品图片"),
-		THUMB_NAIL(5, "thumbnail", 100, "缩略图");
+		WX_PROMOTION(1, "WxPromotion", 100, new Dimension(360, 280), "微信优惠活动"),
+		WX_FINANCE(2, "WxFinance", 100, new Dimension(360, 280), "微信财务端"),
+		WX_COUPON_TYPE(3, "WxCouponType", 100, null, "微信优惠券类型"),
+		FOOD_IMAGE(4, "FoodImage", 300, new Dimension(500, 400), "菜品图片"),
+		THUMB_NAIL(5, "thumbnail", 100, null, "缩略图");
 		
 		private final int val;
 		private final String dir;
 		private final int size;			//unit is kb
+		private final Dimension thumbnail;	//the default size of thumb nail
 		private final String desc;
 		
-		Type(int val, String dir, int size, String desc){
+		Type(int val, String dir, int size, Dimension thumbnail, String desc){
 			this.val = val;
 			this.dir = dir;
 			this.size = size;
+			this.thumbnail = thumbnail;
 			this.desc = desc;
 		}
 		
@@ -360,6 +369,14 @@ public class OssImage implements Jsonable, Parcelable{
 		
 		public int getSize(){
 			return this.size * 1024;
+		}
+		
+		public boolean hasThumbnail(){
+			return this.thumbnail != null;
+		}
+		
+		public Dimension getThumbnailSize(){
+			return this.thumbnail;
 		}
 		
 		@Override
