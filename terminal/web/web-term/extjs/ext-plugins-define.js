@@ -204,8 +204,8 @@ Ext.ux.plugins.HEInsertImage = function(config){
 		 	   				if(jr.success){
 		 	   					config.win.hide();
 		 	   					if(!heObject.activated){ heObject.onFirstFocus(); };
-		 	   					console.log(jr.other.url);
-		 	   					var imsg = '<div align="center" style="width:100%;"><img src="' + jr.other.url + '" style="max-width:95%;"/></div>';
+		 	   					var ossImage = jr.root[0];
+		 	   					var imsg = '<div align="center" style="width:100%;"><img src="' + ossImage.image + '" style="max-width:95%;"/></div>';
 		 	   					heObject.focus();
 		 	   					if(Ext.isIE){
 		 	   						heObject.setValue(heObject.getValue() + imsg);
