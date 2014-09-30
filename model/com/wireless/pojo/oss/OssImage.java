@@ -150,6 +150,7 @@ public class OssImage implements Jsonable, Parcelable{
 		
 		public InsertBuilder(OssImage.Type type, String associatedSerial){ 
 			this.type = type;
+			this.thumbnail = type.thumbnail;
 			this.associatedId = 0;
 			this.associatedSerial = associatedSerial;
 			this.status = Status.MARRIED;
@@ -539,6 +540,7 @@ public class OssImage implements Jsonable, Parcelable{
 	public JsonMap toJsonMap(int flag) {
 		JsonMap jm = new JsonMap();
 		jm.putString("image", this.getObjectUrl());
+		jm.putString("thumbnail", this.hasThumbnail()? this.thumbnail.getObjectUrl():"");
 		jm.putInt("imageId", this.getId());
 		return jm;
 	}
