@@ -615,12 +615,12 @@ public class FoodDao {
 					 " KITCHEN.type AS kitchen_type , KITCHEN.is_allow_temp AS is_allow_temp, " +
 					 " DEPT.dept_id, DEPT.name AS dept_name, DEPT.type AS dept_type, DEPT.display_id AS dept_display_id, " +
 					 " OI.oss_image_id, OI.image, OI.type AS oss_image_type, " +
-					 " TOI.oss_image_id AS oss_thumbnail_id, TOI.image AS thumbnail_image, TOI.type AS thumbnail_type " +
+					 " TOI.oss_image_id AS oss_thumbnail_id, TOI.image AS oss_thumbnail_image, TOI.type AS oss_thumbnail_type " +
 					 " FROM " + Params.dbName + ".food FOOD " +
 					 " JOIN " + Params.dbName + ".kitchen KITCHEN ON FOOD.kitchen_id = KITCHEN.kitchen_id " +
 					 " JOIN " + Params.dbName + ".department DEPT ON KITCHEN.dept_id = DEPT.dept_id AND KITCHEN.restaurant_id = DEPT.restaurant_id " +
 					 " LEFT JOIN " + Params.dbName + ".oss_image OI ON FOOD.oss_image_id = OI.oss_image_id " +
-					 " LEFT JOIN " + Params.dbName + ".oss_image TOI ON TOI.oss_thumbnail_id = OI.oss_image_id " +
+					 " LEFT JOIN " + Params.dbName + ".oss_image TOI ON OI.oss_thumbnail_id = TOI.oss_image_id " +
 					 " WHERE 1 = 1 " +
 					 (extraCondition == null ? "" : extraCondition) + " " +
 					 (orderClause == null ? "" : orderClause); 
