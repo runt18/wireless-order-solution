@@ -237,7 +237,8 @@ public class PromotionDao {
 		//Create the associated coupons if the member changed.
 		if(builder.isMemberChanged()){
 			CouponDao.delete(dbCon, staff, new CouponDao.ExtraCond().setPromotion(promotion.getId()));
-			CouponDao.create(dbCon, staff, new Coupon.CreateBuilder(original.getCouponType().getId(), promotion.getId()).setMembers(builder.getMembers()));
+			
+			CouponDao.create(dbCon, staff, new Coupon.CreateBuilder(original.getType() == Promotion.Type.DISPLAY_ONLY? 0 : original.getCouponType().getId(), promotion.getId()).setMembers(builder.getMembers()));
 		}
 		
 	} 
