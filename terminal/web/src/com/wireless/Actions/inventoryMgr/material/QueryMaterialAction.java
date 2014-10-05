@@ -89,25 +89,23 @@ public class QueryMaterialAction extends DispatchAction{
 				for (final Material m : root) {
 					if(m.isGood()){
 						final Food food = FoodDao.relativeToFood(staff, m.getId());
-						if(food != null){
-							Jsonable j = new Jsonable() {
-								
-								@Override
-								public JsonMap toJsonMap(int flag) {
-									JsonMap jm = new JsonMap();
-									jm.putJsonable(m, flag);
-									jm.putString("belongFood", food.getName() + " (" + food.getKitchen().getName() + ")");
-									return jm;
-								}
-								
-								@Override
-								public void fromJsonMap(JsonMap jsonMap, int flag) {
-									
-								}
-							};
+						Jsonable j = new Jsonable() {
 							
-							list.add(j);
-						}
+							@Override
+							public JsonMap toJsonMap(int flag) {
+								JsonMap jm = new JsonMap();
+								jm.putJsonable(m, flag);
+								jm.putString("belongFood", food != null?food.getName() + " (" + food.getKitchen().getName() + ")":"无对应菜品");
+								return jm;
+							}
+							
+							@Override
+							public void fromJsonMap(JsonMap jsonMap, int flag) {
+								
+							}
+						};
+						
+						list.add(j);
 					}else{
 						list.add(m);
 					}
