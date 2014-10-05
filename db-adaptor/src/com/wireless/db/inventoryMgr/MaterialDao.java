@@ -297,13 +297,20 @@ public class MaterialDao {
 	 * @return
 	 * @throws SQLException
 	 */
-	public static int delete(DBCon dbCon, int id) throws SQLException{
+	public static int delete(DBCon dbCon, Material m) throws SQLException{
 		int count = 0;
 		//TODO 未检查历史记录
 		
 		String deleteSQL = "DELETE FROM material "
-						 + " WHERE material_id = " + id;
+						 + " WHERE material_id = " + m.getId();
 		count = dbCon.stmt.executeUpdate(deleteSQL);
+		
+		if(m.isGood()){
+			String deleteFoodMaterial = "DELETE FROM food_material "
+					 + " WHERE material_id = " + m.getId();
+			dbCon.stmt.executeUpdate(deleteFoodMaterial);				
+		}
+	
 		return count;
 	}
 	
@@ -317,7 +324,7 @@ public class MaterialDao {
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			int count = MaterialDao.delete(dbCon, id);
+			int count = MaterialDao.delete(dbCon, MaterialDao.getById(dbCon, id));
 			if(count == 0){
 				throw new BusinessException(MaterialError.DELETE_FAIL);
 			}
