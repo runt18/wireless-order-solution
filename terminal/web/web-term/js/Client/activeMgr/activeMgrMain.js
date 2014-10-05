@@ -507,7 +507,7 @@ Ext.onReady(function() {
 		items : [new Ext.Panel({
 			id : 'promotionPreviewBody',
 			region : 'center',
-			html : '<div style="text-align:center;background-color:#F5F5F5;height:100%"><img src="../../images/noPromotionNow.png" width="100%" /></div>'			
+			html : '<div style="text-align:center;background-color:#F5F5F5;height:100%"><img src="http://digie-image-real.oss-cn-hangzhou.aliyuncs.com/WxPromotion/noPromotion.png" width="100%" /></div>'			
 		}), new Ext.Panel({
 			region : 'east',
 			width : 450,
@@ -517,7 +517,7 @@ Ext.onReady(function() {
 				id : 'promotionCouponPreview',
 				region : 'north',
 				height : 210,
-				html : '<div style="text-align:center; margin: 10px 10px 10px 10px;"><img height="160"  src="../../images/noCouponNow.png" /></div>'
+				html : '<div style="text-align:center; margin: 10px 10px 10px 10px;"><img height="160"  src="http://digie-image-real.oss-cn-hangzhou.aliyuncs.com/WxPromotion/noCoupon.png" /></div>'
 			}),new Ext.Panel({
 				title : '活动信息汇总',
 				id : 'promotionGeneral',
