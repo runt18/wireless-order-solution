@@ -254,13 +254,11 @@ public class QueryMaterialAction extends DispatchAction{
 			
 			List<Food> foods = FoodDao.selectToBeFood(staff, extra, null);
 			
-			if(foods.isEmpty()){
-				jobject.initTip(false, "此菜品不存在或已设置为商品");	
-			}else{
+			if(!foods.isEmpty()){
 				jobject.setTotalProperty(foods.size());
 				foods = DataPaging.getPagingData(foods, isPaging, start, limit);
-				jobject.setRoot(foods);				
 			}			
+			jobject.setRoot(foods);	
 		}catch(BusinessException e){
 			jobject.initTip(e);
 			e.printStackTrace();
