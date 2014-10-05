@@ -805,16 +805,21 @@ var material_selectGoodTbar = new Ext.Toolbar({
 					limit : 200
 				}
 			});	
-			
-			gs.on('load', function(store, records, options){
+/*			gs.on('load', function(store, records, options){
 				material_goodList = '';
-				for (var i = 0; i < records.length; i++) {
-					if(i > 0){
-						material_goodList += ",";
-					}
-					material_goodList += records[i].get('id');
+				if(records.length == 0){
+					Ext.example.msg('提示', '此菜品不存在或已设置为商品');
+					Ext.getCmp('material_goodName').focus(true, 100);
+				}else{
+					for (var i = 0; i < records.length; i++) {
+						if(i > 0){
+							material_goodList += ",";
+						}
+						material_goodList += records[i].get('id');
+					}				
 				}
-			});		
+
+			});	*/	
 		}
 	}]		
 });
@@ -835,6 +840,22 @@ var selectGoodGrid = createGridPanel(
 	'',
 	[material_selectGoodTbar]
 );	
+
+selectGoodGrid.getStore().on('load', function(store, records, options){
+	material_goodList = '';
+	if(records.length == 0){
+		Ext.example.msg('提示', '此菜品不存在或已设置为商品');
+		Ext.getCmp('material_goodName').focus(true, 100);
+	}else{
+		for (var i = 0; i < records.length; i++) {
+			if(i > 0){
+				material_goodList += ",";
+			}
+			material_goodList += records[i].get('id');
+		}				
+	}
+
+});
 selectGoodGrid.keys = [{
 	 key : Ext.EventObject.ENTER,
 	 fn : function(){ 
