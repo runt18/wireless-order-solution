@@ -87,7 +87,7 @@ function initFoodData(c){
 					count = getOrderFoodCount(temp.id);
 					html.push(Templet.foodBox.format({
 						id : temp.id,
-						img : temp.img,
+						img : temp.img.thumbnail,
 						name : temp.name,
 						unitPrice : temp.unitPrice.toFixed(2),
 						point : parseInt(temp.unitPrice),

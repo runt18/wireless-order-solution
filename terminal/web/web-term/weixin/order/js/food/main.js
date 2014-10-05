@@ -267,7 +267,7 @@ function foodShowAbout(c){
 			temp = params.foodData[i];
 			if(temp.id == c.id){
 				box.find('div:first-child > div').css({
-					'background' : 'url({0})'.format(temp.img),
+					'background' : 'url({0})'.format(temp.img.image),
 					'background-size' : '100% 100%'
 				});
 				box.find('div[data-region=desc]').html(typeof temp.desc == 'string' && temp.desc.trim().length > 0 ? '&nbsp;&nbsp;&nbsp;&nbsp;'+temp.desc : '暂无简介');
