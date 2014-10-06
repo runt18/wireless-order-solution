@@ -39,7 +39,7 @@ public class Promotion implements Jsonable{
 		}
 		
 		public static CreateBuilder newInstance(String title, DateRange range, String body, String entire){
-			CreateBuilder instance = new CreateBuilder(title, range, body, Type.DISPLAY_ONLY, null, entire);
+			CreateBuilder instance = new CreateBuilder(title, range, body, Type.DISPLAY_ONLY, new CouponType.InsertBuilder(title, 0, range.getEndingTime()), entire);
 			return instance;
 		}
 		

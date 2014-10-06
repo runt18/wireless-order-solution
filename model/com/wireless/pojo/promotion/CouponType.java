@@ -10,26 +10,21 @@ public class CouponType implements Jsonable{
 	public static class InsertBuilder{
 		private final String name;
 		private final float price;
-		private long expired;
+		private final long expired;
 		private String comment;
 		
 		private OssImage ossImage;
 		
-		public InsertBuilder(String name, float price){
+		public InsertBuilder(String name, float price, String expiredDate){
 			this.name = name;
 			this.price = price;
-		}
-		
-		public InsertBuilder setExpired(String expiredDate){
 			this.expired = DateUtil.parseDate(expiredDate);
-			return this;
 		}
 		
-		public InsertBuilder setExpired(long expired){
-			if(expired >= 0){
-				this.expired = expired;
-			}
-			return this;
+		public InsertBuilder(String name, float price, long expiredDate){
+			this.name = name;
+			this.price = price;
+			this.expired = expiredDate;
 		}
 		
 		public InsertBuilder setComment(String comment){
