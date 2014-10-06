@@ -56,6 +56,8 @@ public class TestPromotionDao {
 	public void testCreatePromotion() throws SQLException, BusinessException, ParseException, IOException{
 		int promotionId = 0;
 		int couponTypeId = 0;
+		int promotionImg1 = 0;
+		int promotionImg2 = 0;
 		try{
 			List<Member> members = MemberDao.getByCond(mStaff, null, null);
 			Member m1 = members.get(0);
@@ -66,12 +68,18 @@ public class TestPromotionDao {
 			String fileName = System.getProperty("user.dir") + "/src/" + TestOssImage.class.getPackage().getName().replaceAll("\\.", "/") + "/test.jpg";
 			
 			int ossImageId = OssImageDao.insert(mStaff, new OssImage.InsertBuilder(OssImage.Type.WX_COUPON_TYPE).setImgResource(OssImage.ImageType.JPG, new FileInputStream(new File(fileName))));
+			promotionImg1 = OssImageDao.insert(mStaff, new OssImage.InsertBuilder(OssImage.Type.WX_PROMOTION).setImgResource(OssImage.ImageType.JPG, new FileInputStream(new File(fileName))));
+			promotionImg2 = OssImageDao.insert(mStaff, new OssImage.InsertBuilder(OssImage.Type.WX_PROMOTION).setImgResource(OssImage.ImageType.JPG, new FileInputStream(new File(fileName))));
 
 			CouponType.InsertBuilder typeInsertBuilder = new CouponType.InsertBuilder("测试优惠券类型", 30, "2015-2-1")
 																	   .setComment("测试备注")
-																	   .setImage(ossImageId);//.setExpired(System.currentTimeMillis() / 1000 * 1000);
+																	   .setImage(ossImageId);
+			
+			String htmlTxt = "<br>数量份金沙路<div align=\"center\" style=\"width:100%;\"><img src='$(pic_1)' style=\"max-width:95%;\"></div>谁加路费金沙路费<br><br><div align=\"center\" style=\"width:100%;\"></div><br>";
+			String body = htmlTxt.replace("$(pic_1)", OssImageDao.getById(mStaff, promotionImg1).getObjectUrl());
+
 			Promotion.CreateBuilder promotionCreateBuilder = Promotion.CreateBuilder
-																	  .newInstance("测试优惠活动", new DateRange("2015-1-1", "2015-2-1"), "hello world<br>", Promotion.Type.FREE, typeInsertBuilder, "hello jingjing<br>")
+																	  .newInstance("测试优惠活动", new DateRange("2015-1-1", "2015-2-1"), body, Promotion.Type.FREE, typeInsertBuilder, "hello jingjing<br>")
 																	  .addMember(m1.getId()).addMember(m2.getId());
 			promotionId = PromotionDao.create(mStaff, promotionCreateBuilder);
 			
@@ -84,6 +92,12 @@ public class TestPromotionDao {
 			
 			//Compare the promotion.
 			compare(expected, actual);
+			//Compare the oss image to promotion body
+			OssImage ossPromotionImg1 = OssImageDao.getById(mStaff, promotionImg1);
+			Assert.assertEquals("type to promotion image", OssImage.Type.WX_PROMOTION, ossPromotionImg1.getType());
+			Assert.assertEquals("associated id to promotion image", actual.getId(), ossPromotionImg1.getAssociatedId());
+			Assert.assertEquals("status to promotion image", OssImage.Status.MARRIED, ossPromotionImg1.getStatus());
+			Assert.assertTrue("failed to upload promotion image to oss storage", ossClient.getObject(OssImage.Params.instance().getBucket(), ossPromotionImg1.getObjectKey()) != null);
 			//Compare the coupon related to this promotion.
 			compare(promotionId, Coupon.Status.CREATED, couponTypeId, m1, CouponDao.getByCond(mStaff, new CouponDao.ExtraCond().setMember(m1).setPromotion(promotionId), null).get(0));
 			compare(promotionId, Coupon.Status.CREATED, couponTypeId, m2, CouponDao.getByCond(mStaff, new CouponDao.ExtraCond().setMember(m2).setPromotion(promotionId), null).get(0));
@@ -96,9 +110,10 @@ public class TestPromotionDao {
 																	   .setComment("修改测试备注")
 																	   .setImage(ossImageId)
 																	   .setPrice(50);
+			body = htmlTxt.replace("$(pic_1)", OssImageDao.getById(mStaff, promotionImg2).getObjectUrl());
 			Promotion.UpdateBuilder promotionUpdateBuilder = new Promotion.UpdateBuilder(promotionId).setRange(new DateRange("2015-2-1", "2015-3-1"))
 																									 .setTitle("修改优惠活动")
-																									 .setBody("hello jingjing<br>", "hello jingjing<br>")
+																									 .setBody(body, "hello jingjing<br>")
 																									 .addMember(m1.getId()).addMember(m2.getId()).addMember(m3.getId())
 																									 .setCouponTypeBuilder(typeUpdateBuilder);
 			expected = promotionUpdateBuilder.build();
@@ -110,6 +125,18 @@ public class TestPromotionDao {
 
 			//Compare the promotion.
 			compare(expected, actual);
+			//Compare the oss image to promotion body
+			//Check to see the promotion image 1
+			ossPromotionImg1 = OssImageDao.getById(mStaff, promotionImg1);
+			Assert.assertEquals("associated id to promotion image", 0, ossPromotionImg1.getAssociatedId());
+			Assert.assertEquals("status to promotion image", OssImage.Status.SINGLE, ossPromotionImg1.getStatus());
+			Assert.assertTrue("original promotion image to oss storage does NOT exist", ossClient.getObject(OssImage.Params.instance().getBucket(), ossPromotionImg1.getObjectKey()) != null);
+			//Check to see the promotion image 2
+			OssImage ossPromotionImg2 = OssImageDao.getById(mStaff, promotionImg2);
+			Assert.assertEquals("type to promotion image", OssImage.Type.WX_PROMOTION, ossPromotionImg2.getType());
+			Assert.assertEquals("associated id to promotion image", actual.getId(), ossPromotionImg2.getAssociatedId());
+			Assert.assertEquals("status to promotion image", OssImage.Status.MARRIED, ossPromotionImg2.getStatus());
+			Assert.assertTrue("failed to upload promotion image 2 to oss storage", ossClient.getObject(OssImage.Params.instance().getBucket(), ossPromotionImg2.getObjectKey()) != null);
 			//Compare the coupon related to this promotion.
 			compare(promotionId, Coupon.Status.CREATED, couponTypeId, m1, CouponDao.getByCond(mStaff, new CouponDao.ExtraCond().setMember(m1).setPromotion(promotionId), null).get(0));
 			compare(promotionId, Coupon.Status.CREATED, couponTypeId, m2, CouponDao.getByCond(mStaff, new CouponDao.ExtraCond().setMember(m2).setPromotion(promotionId), null).get(0));
@@ -166,12 +193,31 @@ public class TestPromotionDao {
 
 		}finally{
 			if(promotionId != 0){
+				OssImage promotionImage2 = OssImageDao.getById(mStaff, promotionImg2);
 				Promotion original = PromotionDao.getById(mStaff, promotionId);
 				PromotionDao.delete(mStaff, promotionId);
 				try{
 					PromotionDao.getById(mStaff, promotionId);
 				}catch(BusinessException e){
 					Assert.assertEquals("failed to delete the promotion", PromotionError.PROMOTION_NOT_EXIST, e.getErrCode());
+					//Check to see whether or not the promotion image1 still survive
+					try{
+						OssImage promotionImage1 = OssImageDao.getById(mStaff, promotionImg1);
+						Assert.assertTrue("promotion image 1 should survive in oss storage", ossClient.getObject(OssImage.Params.instance().getBucket(), promotionImage1.getObjectKey()) != null);
+					}catch(BusinessException e2){
+						Assert.assertTrue("promotion image 1 should survive", false);
+					}
+					//Check to see whether or not the promotion image2 is removed
+					try{
+						OssImageDao.getById(mStaff, promotionImg2);
+						Assert.assertTrue("promotion image 2 should be removed", false);
+					}catch(BusinessException e2){
+						Assert.assertTrue("promotion image 2 should be removed", e2.getErrCode() == OssImageError.OSS_IMAGE_NOT_EXIST);
+					}
+					try{
+						ossClient.getObject(OssImage.Params.instance().getBucket(), promotionImage2.getObjectKey());
+						Assert.assertTrue("failed to delete the promotion image 2 from aliyun oss storage", false);
+					}catch(OSSException e3){}
 					//Check to see whether or not the associated oss image to promotion is deleted.
 					try{
 						OssImageDao.getById(mStaff, original.getImage().getId());

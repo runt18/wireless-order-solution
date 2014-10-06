@@ -153,8 +153,12 @@ public class PromotionDao {
 			throw new SQLException("Failed to generated the promotion id.");
 		}
 		
-		//Generate the image to this promotion's body.
 		if(!promotion.getBody().isEmpty()){
+			
+			//Update the associated oss image to this promotion's body.
+			OssImageDao.update(dbCon, staff, new OssImage.UpdateBuilder4Html(OssImage.Type.WX_PROMOTION, promotionId).setHtml(promotion.getBody()));
+			
+			//Generate the image to this promotion's body.
 			try{
 				HtmlImageGenerator imageGenerator = new HtmlImageGenerator();
 				imageGenerator.loadHtml(promotion.getBody());
@@ -258,8 +262,12 @@ public class PromotionDao {
 			throw new BusinessException(PromotionError.PROMOTION_NOT_EXIST);
 		}
 		
-		//Re-Generate the image to promotion's body if it is changed. 
 		if(builder.isBodyChanged() && !promotion.getBody().isEmpty()){
+			
+			//Update the associated oss image to this promotion's body.
+			OssImageDao.update(dbCon, staff, new OssImage.UpdateBuilder4Html(OssImage.Type.WX_PROMOTION, promotion.getId()).setHtml(promotion.getBody()));
+			
+			//Re-Generate the image to promotion's body. 
 			try{
 				HtmlImageGenerator imageGenerator = new HtmlImageGenerator();
 				imageGenerator.loadHtml(promotion.getBody());
