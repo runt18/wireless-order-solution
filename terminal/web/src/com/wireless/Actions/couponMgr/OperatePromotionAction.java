@@ -38,6 +38,7 @@ public class OperatePromotionAction extends DispatchAction{
 		String beginDate = request.getParameter("beginDate");
 		String endDate = request.getParameter("endDate");
 		String body = request.getParameter("body");
+		String entire = request.getParameter("entire");
 		String pType = request.getParameter("pType");
 		String point = request.getParameter("point");
 		String members = request.getParameter("members");
@@ -56,18 +57,19 @@ public class OperatePromotionAction extends DispatchAction{
 				promotionCreateBuilder = Promotion.CreateBuilder.newInstance(title, 
 																			 new DateRange(beginDate, endDate), 
 																			 body,
-																			 //FIXME
-																			 "");
+																			 entire);
 			}else{
-//				CouponType.InsertBuilder typeInsertBuilder = new CouponType.InsertBuilder(couponName, Integer.parseInt(price)).setComment("活动优惠劵").setImage(image).setExpired(DateUtil.parseDate(expiredDate));
+				CouponType.InsertBuilder typeInsertBuilder = new CouponType.InsertBuilder(couponName, Integer.parseInt(price), DateUtil.parseDate(expiredDate)).setComment("活动优惠劵");
+				if(image != null && !image.isEmpty()){
+					typeInsertBuilder.setImage(Integer.parseInt(image));
+				}
 				promotionCreateBuilder = Promotion.CreateBuilder.newInstance(title, 
 																			 new DateRange(beginDate, endDate),
 																			 body,
 																			 Promotion.Type.valueOf(Integer.parseInt(pType)),
-																			 new CouponType.InsertBuilder(couponName, Integer.parseInt(price), DateUtil.parseDate(expiredDate)).setComment("活动优惠劵").setImage(Integer.parseInt(image)),
-																			 //FIXME
-																			 "");
-				if(point != null && !point.isEmpty()){
+																			 typeInsertBuilder,
+																			 entire);
+				if(point != null && !point.isEmpty() && Promotion.Type.valueOf(Integer.parseInt(pType)) != Promotion.Type.FREE){
 					promotionCreateBuilder.setPoint(Integer.parseInt(point));
 				}
 				
@@ -106,6 +108,7 @@ public class OperatePromotionAction extends DispatchAction{
 		String beginDate = request.getParameter("beginDate");
 		String endDate = request.getParameter("endDate");
 		String body = request.getParameter("body");
+		String entire = request.getParameter("entire");
 		String pType = request.getParameter("pType");
 		String point = request.getParameter("point");
 		String members = request.getParameter("members");
@@ -125,8 +128,7 @@ public class OperatePromotionAction extends DispatchAction{
 			if(Promotion.Type.valueOf(Integer.parseInt(pType)) == Promotion.Type.DISPLAY_ONLY){
 				promotionUpdateBuilder = new Promotion.UpdateBuilder(Integer.parseInt(pId)).setRange(new DateRange(beginDate, endDate))
 										 .setTitle(title)
-										 //FIXME
-										 .setBody(body, "");
+										 .setBody(body, entire);
 			}else{
 				CouponType.UpdateBuilder typeUpdateBuilder = new CouponType.UpdateBuilder(Integer.parseInt(couponTypeId), couponName).setComment("").setPrice(Integer.parseInt(price)).setExpired(expiredDate);
 				if(image != null && !image.isEmpty()){
@@ -134,8 +136,7 @@ public class OperatePromotionAction extends DispatchAction{
 				}
 				promotionUpdateBuilder = new Promotion.UpdateBuilder(Integer.parseInt(pId)).setRange(new DateRange(beginDate, endDate))
 										 .setTitle(title)
-										 //FIXME
-										 .setBody(body, "")
+										 .setBody(body, entire)
 										 .setCouponTypeBuilder(typeUpdateBuilder);
 				if(point != null && !point.isEmpty()){
 					promotionUpdateBuilder.setPoint(Integer.parseInt(point));
