@@ -6,6 +6,7 @@ import java.util.List;
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.pojo.billStatistics.DateRange;
+import com.wireless.pojo.oss.OssImage;
 import com.wireless.pojo.util.SortedList;
 
 public class Promotion implements Jsonable{
@@ -14,29 +15,31 @@ public class Promotion implements Jsonable{
 		private final DateRange range;
 		private final String title;
 		private final String body;
+		private final String entire;
 		private final Type type;
 		private int point;
 		private final CouponType.InsertBuilder typeBuilder;
 		private final List<Integer> members = SortedList.newInstance();
 		
-		private CreateBuilder(String title, DateRange range, String body, Type type, CouponType.InsertBuilder typeBuilder){
+		private CreateBuilder(String title, DateRange range, String body, Type type, CouponType.InsertBuilder typeBuilder, String entire){
 			this.title = title;
 			this.range = range;
 			this.body = body;
+			this.entire = entire;
 			this.type = type;
 			this.typeBuilder = typeBuilder;
 		}
 		
-		public static CreateBuilder newInstance(String title, DateRange range, String body, Type type, CouponType.InsertBuilder typeBuilder){
+		public static CreateBuilder newInstance(String title, DateRange range, String body, Type type, CouponType.InsertBuilder typeBuilder, String entire){
 			if(type == Type.DISPLAY_ONLY){
 				throw new IllegalArgumentException("【" + Type.DISPLAY_ONLY.desc + "】类型不能创建优惠券");
 			}
-			CreateBuilder instance = new CreateBuilder(title, range, body, type, typeBuilder);
+			CreateBuilder instance = new CreateBuilder(title, range, body, type, typeBuilder, entire);
 			return instance;
 		}
 		
-		public static CreateBuilder newInstance(String title, DateRange range, String body){
-			CreateBuilder instance = new CreateBuilder(title, range, body, Type.DISPLAY_ONLY, null);
+		public static CreateBuilder newInstance(String title, DateRange range, String body, String entire){
+			CreateBuilder instance = new CreateBuilder(title, range, body, Type.DISPLAY_ONLY, null, entire);
 			return instance;
 		}
 		
@@ -76,6 +79,7 @@ public class Promotion implements Jsonable{
 		private DateRange range;
 		private String title;
 		private String body;
+		private String entire;
 		private int point = -1;
 		private CouponType.UpdateBuilder typeBuilder;
 		private List<Integer> members;
@@ -93,8 +97,9 @@ public class Promotion implements Jsonable{
 			return this.title != null;
 		}
 		
-		public UpdateBuilder setBody(String body){
+		public UpdateBuilder setBody(String body, String entire){
 			this.body = body;
+			this.entire = entire;
 			return this;
 		}
 		
@@ -230,16 +235,19 @@ public class Promotion implements Jsonable{
 	private DateRange dateRange;;
 	private String title;
 	private String body;
+	private String entire;
 	private CouponType couponType;
 	private Status status = Status.CREATED;
 	private Type type = Type.FREE;
 	private int point;
+	private OssImage image;
 	
 	private Promotion(CreateBuilder builder){
 		this.createDate = System.currentTimeMillis();
 		this.dateRange = builder.range;
 		this.title = builder.title;
 		this.body = builder.body;
+		this.entire = builder.entire;
 		this.type = builder.type;
 		this.point = builder.point;
 		if(builder.type != Type.DISPLAY_ONLY){
@@ -258,6 +266,7 @@ public class Promotion implements Jsonable{
 		}
 		if(builder.isBodyChanged()){
 			this.body = builder.body;
+			this.entire = builder.entire;
 		}
 		if(builder.isPointChanged()){
 			this.point = builder.point;
@@ -325,6 +334,17 @@ public class Promotion implements Jsonable{
 		this.body = body;
 	}
 	
+	public void setEntire(String entire){
+		this.entire = entire;
+	}
+	
+	public String getEntire(){
+		if(entire == null){
+			return "";
+		}
+		return this.entire;
+	}
+	
 	public Status getStatus() {
 		return status;
 	}
@@ -355,6 +375,18 @@ public class Promotion implements Jsonable{
 	
 	public void setPoint(int point){
 		this.point = point;
+	}
+	
+	public void setImage(OssImage image){
+		this.image = image;
+	}
+	
+	public OssImage getImage(){
+		return this.image;
+	}
+	
+	public boolean hasImage(){
+		return this.image != null;
 	}
 	
 	@Override

@@ -20,13 +20,13 @@ public final class OSSParams {
     	return mInstance;
     }
     
-    public static OSSParams instance(){
-    	if(mInstance != null){
-    		return mInstance;
-    	}else{
-    		throw new IllegalStateException("The OSS parameters does NOT initiate.");
-    	}
-    }
+//    public static OSSParams instance(){
+//    	if(mInstance != null){
+//    		return mInstance;
+//    	}else{
+//    		throw new IllegalStateException("The OSS parameters does NOT initiate.");
+//    	}
+//    }
     
 //    public static String getAccessId(){
 //    	return instance().ACCESS_OSS_ID;

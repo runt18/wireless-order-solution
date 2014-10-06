@@ -331,11 +331,12 @@ public class OssImage implements Jsonable, Parcelable{
 	}
 	
 	public static enum Type{
-		WX_PROMOTION(1, "WxPromotion", 100, new Dimension(360, 280), "微信优惠活动"),
-		WX_FINANCE(2, "WxFinance", 100, new Dimension(360, 280), "微信财务端"),
+		WX_PROMOTION(1, "WxPromotion", 100, null, "微信优惠活动"),
+		WX_FINANCE(2, "WxFinance", 100, null, "微信财务端"),
 		WX_COUPON_TYPE(3, "WxCouponType", 100, null, "微信优惠券类型"),
 		FOOD_IMAGE(4, "FoodImage", 300, new Dimension(500, 400), "菜品图片"),
-		THUMB_NAIL(5, "thumbnail", 100, null, "缩略图");
+		THUMB_NAIL(5, "thumbnail", 100, null, "缩略图"),
+		PROMOTION(6, "Promotion", 300, null, "优惠活动全图");
 		
 		private final int val;
 		private final String dir;
