@@ -334,10 +334,8 @@ function operatePromotionData(data){
 	if(promotionType > 1){
 		Ext.getDom('radioSelfCoupon').checked = true; 
 		couponTypeId = data.coupon.id;
-		couponName.setValue(data.coupon.name);
-		price.setValue(data.coupon.price);
 		expiredDate.setValue(data.coupon.expiredFormat);
-		Ext.getCmp('couponTypeBox').setImg(data.coupon.ossImage.image);
+		Ext.getCmp('couponTypeBox').setImg(data.coupon.ossImage?data.coupon.ossImage.image:'http://digie-image-real.oss-cn-hangzhou.aliyuncs.com/WxPromotion/noCoupon.png');
 	}
 	
 	if(data.members.length > 0){
