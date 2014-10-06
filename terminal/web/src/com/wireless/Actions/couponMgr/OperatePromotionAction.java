@@ -64,7 +64,7 @@ public class OperatePromotionAction extends DispatchAction{
 																			 new DateRange(beginDate, endDate),
 																			 body,
 																			 Promotion.Type.valueOf(Integer.parseInt(pType)),
-																			 new CouponType.InsertBuilder(couponName, Integer.parseInt(price)).setComment("活动优惠劵").setImage(Integer.parseInt(image)).setExpired(DateUtil.parseDate(expiredDate)),
+																			 new CouponType.InsertBuilder(couponName, Integer.parseInt(price), DateUtil.parseDate(expiredDate)).setComment("活动优惠劵").setImage(Integer.parseInt(image)),
 																			 //FIXME
 																			 "");
 				if(point != null && !point.isEmpty()){

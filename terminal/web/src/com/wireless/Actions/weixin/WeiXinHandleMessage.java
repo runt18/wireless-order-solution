@@ -1,6 +1,8 @@
 package com.wireless.Actions.weixin;
 
 import java.sql.SQLException;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import org.marker.weixin.DefaultSession;
@@ -237,30 +239,38 @@ public class WeiXinHandleMessage extends HandleMessageAdapter {
 															 createUrl(msg, WEIXIN_COUPON) + "&e=" + coupon.getId()));
 							
 						}else{
+							
+							//TODO 多个优惠活动
 							for(Coupon coupon : coupons){
-								//TODO 多个优惠活动
 								coupon = CouponDao.getById(staff, coupon.getId());
-//								String picUrl = "";
-//								try{
-//									HtmlImageGenerator imageGenerator = new HtmlImageGenerator();
-//									imageGenerator.loadHtml(coupon.getPromotion().getBody());
-//									ByteArrayOutputStream bosJpg = new ByteArrayOutputStream();
-//									ImageIO.write(new CompressImage().imageZoomOut(imageGenerator.getBufferedImage(), 360, 280), "jpg", bosJpg);
-//									bosJpg.flush();
-//									
-//									ByteArrayInputStream bisJpg = new ByteArrayInputStream(bosJpg.toByteArray());
-//									String associatedSerial = "promotion_large_" + msg.getFromUserName();
-//									String fileName = associatedSerial + "_" + coupon.getId() +".jpg";
-//									OssImageDao.delete(staff, new OssImageDao.ExtraCond().setAssociated(OssImage.Type.WX_PROMOTION, associatedSerial));
-//									int ossImageId = OssImageDao.insert(staff, new OssImage.InsertBuilder(OssImage.Type.WX_PROMOTION, associatedSerial).setImgResource(fileName, bisJpg));
-//									bosJpg.close();
-//							    	bisJpg.close();
-//							    	picUrl = OssImageDao.getById(staff, ossImageId).getObjectUrl() + "?" + System.currentTimeMillis();
-//								}catch(IOException e){
-//									e.printStackTrace();
-//								}
-						    	
-								couponItem.addItem(new Data4Item(coupon.getPromotion().getTitle(), "", 
+							}
+							
+							Collections.sort(coupons, new Comparator<Coupon>(){
+
+								@Override
+								public int compare(Coupon c1, Coupon c2) {
+									if(c1.getPromotion().getStatus() != c2.getPromotion().getStatus()){
+										if(c1.getPromotion().getStatus() == Promotion.Status.PROGRESS){
+											return -1;
+										}else if(c2.getPromotion().getStatus() == Promotion.Status.PROGRESS){
+											return -1;
+										}else{
+											return 0;
+										}
+									}else{
+										return 0;
+									}
+								}
+								
+							});
+							for(Coupon coupon : coupons){
+								String progress;
+								if(coupon.getPromotion().getStatus() == Promotion.Status.PROGRESS){
+									progress = "(火热进行中...)";
+								}else{
+									progress = "(敬请期待...)";
+								}
+								couponItem.addItem(new Data4Item(coupon.getPromotion().getTitle() + progress, "", 
 												   coupon.getPromotion().getImage().getObjectUrl(), 
 												   createUrl(msg, WEIXIN_COUPON) + "&e=" + coupon.getId()));
 							}

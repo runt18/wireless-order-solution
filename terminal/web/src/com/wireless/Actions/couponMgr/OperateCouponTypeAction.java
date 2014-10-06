@@ -32,9 +32,8 @@ public class OperateCouponTypeAction extends DispatchAction{
 		String pin = (String) request.getAttribute("pin");
 		JObject jobject = new JObject();
 		try{
-			CouponTypeDao.insert(StaffDao.verify(Integer.parseInt(pin)), new InsertBuilder(typeName, Float.parseFloat(price))
+			CouponTypeDao.insert(StaffDao.verify(Integer.parseInt(pin)), new InsertBuilder(typeName, Float.parseFloat(price), Long.parseLong(date))
 																			.setImage(Integer.parseInt(image))
-																			.setExpired(Long.parseLong(date))
 																			.setComment(desc));
 			jobject.initTip(true, "添加成功");
 		}catch(BusinessException e){
