@@ -13,6 +13,7 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 
 import com.wireless.db.DBCon;
+import com.wireless.db.oss.OssImageDao;
 import com.wireless.db.promotion.CouponDao;
 import com.wireless.db.promotion.CouponDao.ExtraCond;
 import com.wireless.db.staffMgr.StaffDao;
@@ -142,7 +143,11 @@ public class QueryCouponAction extends DispatchAction{
 			
 			List<Coupon> coupons = CouponDao.getByCond(staff, extra, null);
 			if(!coupons.isEmpty()){
-				list.add(coupons.get(0));
+				Coupon coupon = coupons.get(0);
+				if(coupon.getCouponType().getImage() != null){
+					coupon.getCouponType().setImage(OssImageDao.getById(staff, coupon.getCouponType().getImage().getId()));
+				} 
+				list.add(coupon);
 			}
 			jobject.setRoot(list);
 		}catch(SQLException e){
