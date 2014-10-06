@@ -501,10 +501,6 @@
 			type="com.wireless.Actions.weixin.operate.WXOperateMemberAction"
 			scope="request" parameter="dataSource">
 		</action>
-		<action path="/WXOperateMaterial"
-			type="com.wireless.Actions.weixin.operate.WXOperateMaterialAction"
-			scope="request" parameter="dataSource">
-		</action>
 		<action path="/WXOperateInfo"
 			type="com.wireless.Actions.weixin.operate.WXOperateInfoAction" scope="request"
 			parameter="dataSource">
@@ -602,6 +598,10 @@
 		<action path="/OperateImage"
 			type="com.wireless.Actions.imagesMgr.OperateImageAction"
 			scope="request" parameter="dataSource">
+		</action>		
+		<action path="/QueryStockInGeneral"
+			type="com.wireless.Actions.inventoryMgr.report.QueryStockInGeneralAction"
+			scope="request" >
 		</action>			
 		
 	</action-mappings>
