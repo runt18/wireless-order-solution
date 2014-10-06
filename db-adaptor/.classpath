@@ -14,5 +14,6 @@
 	<classpathentry kind="lib" path="/WirelessOrderWeb/web-term/WEB-INF/lib/aliyun-openservices-1.0.12.jar"/>
 	<classpathentry kind="lib" path="/WirelessOrderWeb/web-term/WEB-INF/lib/commons-codec-1.4.jar"/>
 	<classpathentry kind="lib" path="/WirelessOrderWeb/web-term/WEB-INF/lib/jdom-1.1.jar"/>
+	<classpathentry kind="lib" path="/WirelessOrderWeb/web-term/WEB-INF/lib/html2image-0.9.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
