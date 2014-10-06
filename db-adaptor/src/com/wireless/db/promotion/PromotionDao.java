@@ -124,10 +124,7 @@ public class PromotionDao {
 		}
 		
 		//Insert the associated coupon type.
-		int couponTypeId = 0;
-		if(promotion.getType() != Promotion.Type.DISPLAY_ONLY){
-			couponTypeId = CouponTypeDao.insert(dbCon, staff, builder.getTypeBuilder());
-		}
+		int couponTypeId = CouponTypeDao.insert(dbCon, staff, builder.getTypeBuilder());
 		
 		//Insert the promotion.
 		String sql;

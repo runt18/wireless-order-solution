@@ -255,6 +255,10 @@ public class CouponDao {
 			throw new BusinessException("只有【已发布】的优惠券才可领取", PromotionError.COUPON_DRAW_NOT_ALLOW);
 		}
 		
+		if(coupon.getPromotion().getType() == Promotion.Type.DISPLAY_ONLY){
+			throw new BusinessException("【纯展示】的优惠活动没有优惠券", PromotionError.COUPON_DRAW_NOT_ALLOW);
+		}
+		
 		if(coupon.getPromotion().getStatus() != Promotion.Status.PROGRESS){
 			throw new BusinessException("只有【进行中】的优惠活动才可领取优惠券", PromotionError.COUPON_DRAW_NOT_ALLOW);
 		}
