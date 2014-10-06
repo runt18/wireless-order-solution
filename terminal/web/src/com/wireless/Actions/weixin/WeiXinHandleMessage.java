@@ -22,12 +22,12 @@ import com.wireless.db.weixin.member.WeixinMemberDao;
 import com.wireless.db.weixin.restaurant.WeixinRestaurantDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.pojo.client.Member;
-import com.wireless.pojo.oss.OssImage;
 import com.wireless.pojo.promotion.Coupon;
 import com.wireless.pojo.promotion.Promotion;
 import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.NumericUtil;
+import com.wireless.pojo.weixin.restaurant.WeixinRestaurant;
 
 public class WeiXinHandleMessage extends HandleMessageAdapter {
 	
@@ -82,15 +82,11 @@ public class WeiXinHandleMessage extends HandleMessageAdapter {
 		Restaurant restaurant = null;
 		try {
 			restaurant = RestaurantDao.getByAccount(account);
-			String logo = WeixinRestaurantDao.get(StaffDao.getAdminByRestaurant(restaurant.getId())).getWeixinLogo();
-			if(logo.isEmpty()){
-				mainItem = new Data4Item(restaurant.getName(), "点击查看【" + restaurant.getName() + "】主页", 
-						   				 "", createUrl(msg, WEIXIN_INDEX));
+			WeixinRestaurant wr = WeixinRestaurantDao.get(StaffDao.getAdminByRestaurant(restaurant.getId()));
+			if(wr.hasWeixinLogo()){
+				mainItem = new Data4Item(restaurant.getName(), "", wr.getWeixinLogo().getObjectUrl(), createUrl(msg, WEIXIN_INDEX)); 
 			}else{
-				logo = "http://" + OssImage.Params.instance().getBucket() + "." + 
-						OssImage.Params.instance().getOssParam().OSS_OUTER_POINT + "/" + 
-					   logo;
-				mainItem = new Data4Item(restaurant.getName(), "", logo, createUrl(msg, WEIXIN_INDEX)); 
+				mainItem = new Data4Item(restaurant != null ? restaurant.getName() : "", "点击查看主页", "", createUrl(msg, WEIXIN_INDEX));
 			}
 		} catch (SQLException | BusinessException e) {
 			mainItem = new Data4Item(restaurant != null ? restaurant.getName() : "", "点击查看主页", "", createUrl(msg, WEIXIN_INDEX));
