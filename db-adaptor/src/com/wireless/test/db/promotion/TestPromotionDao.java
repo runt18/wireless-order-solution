@@ -71,7 +71,7 @@ public class TestPromotionDao {
 																	   .setComment("测试备注")
 																	   .setImage(ossImageId);//.setExpired(System.currentTimeMillis() / 1000 * 1000);
 			Promotion.CreateBuilder promotionCreateBuilder = Promotion.CreateBuilder
-																	  .newInstance("测试优惠活动", new DateRange("2015-1-1", "2015-2-1"), "hello world<br>", Promotion.Type.FREE, typeInsertBuilder)
+																	  .newInstance("测试优惠活动", new DateRange("2015-1-1", "2015-2-1"), "hello world<br>", Promotion.Type.FREE, typeInsertBuilder, "hello jingjing<br>")
 																	  .addMember(m1.getId()).addMember(m2.getId());
 			promotionId = PromotionDao.create(mStaff, promotionCreateBuilder);
 			
@@ -98,7 +98,7 @@ public class TestPromotionDao {
 																	   .setPrice(50);
 			Promotion.UpdateBuilder promotionUpdateBuilder = new Promotion.UpdateBuilder(promotionId).setRange(new DateRange("2015-2-1", "2015-3-1"))
 																									 .setTitle("修改优惠活动")
-																									 .setBody("hello jingjing<br>")
+																									 .setBody("hello jingjing<br>", "hello jingjing<br>")
 																									 .addMember(m1.getId()).addMember(m2.getId()).addMember(m3.getId())
 																									 .setCouponTypeBuilder(typeUpdateBuilder);
 			expected = promotionUpdateBuilder.build();
@@ -172,20 +172,36 @@ public class TestPromotionDao {
 					PromotionDao.getById(mStaff, promotionId);
 				}catch(BusinessException e){
 					Assert.assertEquals("failed to delete the promotion", PromotionError.PROMOTION_NOT_EXIST, e.getErrCode());
+					//Check to see whether or not the associated oss image to promotion is deleted.
+					try{
+						OssImageDao.getById(mStaff, original.getImage().getId());
+					}catch(BusinessException e2){
+						Assert.assertEquals("failed to delete oss image", OssImageError.OSS_IMAGE_NOT_EXIST, e2.getErrCode());
+					}
+					//Check to see whether or not the promotion image is deleted from oss storage.
+					try{
+						Assert.assertTrue("failed to put image to oss storage", ossClient.getObject(OssImage.Params.instance().getBucket(), original.getImage().getObjectKey()) != null);
+						Assert.assertTrue("failed to delete the promotion image from aliyun oss storage", false);
+					}catch(OSSException ignored){}
+					
+					//Check to see whether or not the associated coupon is deleted.
 					Assert.assertTrue("failed to delete the associated coupon", CouponDao.getByCond(mStaff, new CouponDao.ExtraCond().setPromotion(promotionId), null).isEmpty());
+					//Check to see whether or not the associated coupon type is deleted.
 					try{
 						CouponTypeDao.getById(mStaff, couponTypeId);
 					}catch(BusinessException e2){
 						Assert.assertEquals("failed to delete the promotion", PromotionError.COUPON_TYPE_NOT_EXIST, e2.getErrCode());
 					}
+					//Check to see whether or not the associated oss image to coupon type is deleted.
 					try{
 						OssImageDao.getById(mStaff, original.getCouponType().getImage().getId());
 					}catch(BusinessException e2){
 						Assert.assertEquals("failed to delete oss image", OssImageError.OSS_IMAGE_NOT_EXIST, e2.getErrCode());
 					}
+					//Check to see whether or not the associated oss image to coupon type is deleted from oss storage.
 					try{
 						ossClient.getObject(OssImage.Params.instance().getBucket(), original.getCouponType().getImage().getObjectKey());
-						Assert.assertTrue("failed to delete the image from aliyun oss storage", false);
+						Assert.assertTrue("failed to delete the coupon type image from aliyun oss storage", false);
 					}catch(OSSException ignored){
 					}
 				}
@@ -200,9 +216,15 @@ public class TestPromotionDao {
 		Assert.assertEquals("promotion restaurant id", mStaff.getRestaurantId(), actual.getRestaurantId());
 		Assert.assertTrue("promotion create date", Math.abs(expected.getCreateDate() - actual.getCreateDate()) < 24 * 3600 * 1000);
 		Assert.assertEquals("promotion body", expected.getBody(), actual.getBody());
+		Assert.assertEquals("promotion body", expected.getEntire(), actual.getEntire());
 		Assert.assertEquals("promotion date range", expected.getDateRange(), actual.getDateRange());
 		Assert.assertEquals("promotion status", expected.getStatus(), actual.getStatus());
 		Assert.assertEquals("promotion type", expected.getType(), actual.getType());
+		
+		//The content to associated promotion image
+		Assert.assertEquals("oss image type to promotion", OssImage.Type.WX_PROMOTION, actual.getImage().getType());
+		Assert.assertEquals("oss image associated id to promotion", actual.getId(), actual.getImage().getAssociatedId());
+		Assert.assertTrue("failed to put image to oss storage", ossClient.getObject(OssImage.Params.instance().getBucket(), actual.getImage().getObjectKey()) != null);
 		
 		//The content to associated coupon type
 		//Assert.assertEquals("id : insert coupon type", expected.getCouponType().getId(), actual.getCouponType().getId());

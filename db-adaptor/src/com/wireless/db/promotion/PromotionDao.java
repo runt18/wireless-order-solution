@@ -1,22 +1,32 @@
 package com.wireless.db.promotion;
 
+import gui.ava.html.image.generator.HtmlImageGenerator;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
+import javax.imageio.ImageIO;
+
 import com.mysql.jdbc.Statement;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
+import com.wireless.db.oss.CompressImage;
+import com.wireless.db.oss.OssImageDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.PromotionError;
 import com.wireless.pojo.billStatistics.DateRange;
+import com.wireless.pojo.oss.OssImage;
 import com.wireless.pojo.promotion.Coupon;
 import com.wireless.pojo.promotion.CouponType;
 import com.wireless.pojo.promotion.Promotion;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.DateUtil;
+import com.wireless.util.StringHtml;
 
 public class PromotionDao {
 
@@ -67,10 +77,8 @@ public class PromotionDao {
 	 * 			throws if failed to execute any SQL statement
 	 * @throws BusinessException
 	 * 			throws if the created date of promotion exceed current time
-	 * @throws IOException 
-	 * 			throws if failed to put the image of coupon type to oss storage 
 	 */
-	public static int create(Staff staff, Promotion.CreateBuilder builder) throws SQLException, BusinessException, IOException{
+	public static int create(Staff staff, Promotion.CreateBuilder builder) throws SQLException, BusinessException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -103,10 +111,8 @@ public class PromotionDao {
 	 * 			throws if failed to execute any SQL statement
 	 * @throws BusinessException
 	 * 			throws if the created date of promotion exceed current time
-	 * @throws IOException 
-	 * 			throws if failed to put the image of coupon type to oss storage 
 	 */
-	public static int create(DBCon dbCon, Staff staff, Promotion.CreateBuilder builder) throws SQLException, BusinessException, IOException{
+	public static int create(DBCon dbCon, Staff staff, Promotion.CreateBuilder builder) throws SQLException, BusinessException{
 		
 		Promotion promotion = builder.build();
 		
@@ -126,14 +132,15 @@ public class PromotionDao {
 		//Insert the promotion.
 		String sql;
 		sql = " INSERT INTO " + Params.dbName + ".promotion " +
-			  " (restaurant_id, create_date, start_date, finish_date, title, body, coupon_type_id, type, point, status) " +
+			  " (restaurant_id, create_date, start_date, finish_date, title, body, entire, coupon_type_id, type, point, status) " +
 			  " VALUES ( " +
 			  staff.getRestaurantId() + "," +
 			  "'" + DateUtil.format(promotion.getCreateDate(), DateUtil.Pattern.DATE) + "'," +
 			  "'" + promotion.getDateRange().getOpeningFormat() + "'," +
 			  "'" + promotion.getDateRange().getEndingFormat() + "'," +
 			  "'" + promotion.getTitle() + "'," +
-			  "'" + promotion.getBody() + "'," +
+			  "'" + new StringHtml(promotion.getBody(), StringHtml.ConvertTo.TO_NORMAL) + "'," +
+			  "'" + promotion.getEntire() + "'," +
 			  couponTypeId + "," +
 			  promotion.getType().getVal() + "," +
 			  promotion.getPoint() + "," +
@@ -147,6 +154,26 @@ public class PromotionDao {
 			promotionId = dbCon.rs.getInt(1);
 		}else{
 			throw new SQLException("Failed to generated the promotion id.");
+		}
+		
+		//Generate the image to this promotion's body.
+		if(!promotion.getBody().isEmpty()){
+			try{
+				HtmlImageGenerator imageGenerator = new HtmlImageGenerator();
+				imageGenerator.loadHtml(promotion.getBody());
+				ByteArrayOutputStream bosJpg = new ByteArrayOutputStream();
+				ImageIO.write(new CompressImage().imageZoomOut(imageGenerator.getBufferedImage(), 360, 280), OssImage.ImageType.PNG.getSuffix(), bosJpg);
+				bosJpg.flush();
+			
+				int ossImageId = OssImageDao.insert(dbCon, staff, 
+								   					new OssImage.InsertBuilder(OssImage.Type.PROMOTION, promotionId)
+									 		   				    .setImgResource(OssImage.ImageType.PNG, new ByteArrayInputStream(bosJpg.toByteArray())));
+				
+				sql = " UPDATE " + Params.dbName + ".promotion SET oss_image_id = " + ossImageId + " WHERE promotion_id = " + promotionId;
+				dbCon.stmt.executeUpdate(sql);
+			}catch(IOException e){
+				e.printStackTrace();
+			}
 		}
 		
 		//Create the coupon with members.
@@ -225,7 +252,7 @@ public class PromotionDao {
 		String sql;
 		sql = " UPDATE " + Params.dbName + ".promotion SET " +
 			  " promotion_id = " + promotion.getId() +
-			  (builder.isBodyChanged() ? " ,body = '" + promotion.getBody() + "'" : "") +
+			  (builder.isBodyChanged() ? " ,body = '" + new StringHtml(promotion.getBody(), StringHtml.ConvertTo.TO_NORMAL) + "', entire = '" + new StringHtml(promotion.getEntire(), StringHtml.ConvertTo.TO_NORMAL) + "'" : "") +
 			  (builder.isPointChanged() ? ",point = " + promotion.getPoint() : "") +
 			  (builder.isRangeChanged() ? ",start_date = '" + promotion.getDateRange().getOpeningFormat() + "',finish_date = '" + promotion.getDateRange().getEndingFormat() + "'" : "") +
 			  (builder.isTitleChanged() ? ",title = '" + promotion.getTitle() + "'" : "") +
@@ -234,11 +261,36 @@ public class PromotionDao {
 			throw new BusinessException(PromotionError.PROMOTION_NOT_EXIST);
 		}
 		
+		//Re-Generate the image to promotion's body if it is changed. 
+		if(builder.isBodyChanged() && !promotion.getBody().isEmpty()){
+			try{
+				HtmlImageGenerator imageGenerator = new HtmlImageGenerator();
+				imageGenerator.loadHtml(promotion.getBody());
+				ByteArrayOutputStream bosJpg = new ByteArrayOutputStream();
+				ImageIO.write(new CompressImage().imageZoomOut(imageGenerator.getBufferedImage(), 360, 280), OssImage.ImageType.PNG.getSuffix(), bosJpg);
+				bosJpg.flush();
+
+				if(original.hasImage()){
+					OssImageDao.update(dbCon, staff, new OssImage.UpdateBuilder(original.getImage().getId()).setImgResource(OssImage.ImageType.PNG, new ByteArrayInputStream(bosJpg.toByteArray())));
+				}else{
+					int ossImageId = OssImageDao.insert(dbCon, staff, 
+		   											    new OssImage.InsertBuilder(OssImage.Type.PROMOTION, promotion.getId())
+			 		   				    						    .setImgResource(OssImage.ImageType.PNG, new ByteArrayInputStream(bosJpg.toByteArray())));
+
+					sql = " UPDATE " + Params.dbName + ".promotion SET oss_image_id = " + ossImageId + " WHERE promotion_id = " + promotion.getId();
+					dbCon.stmt.executeUpdate(sql);
+				}
+				
+			}catch(IOException e){
+				e.printStackTrace();
+			}
+		}
+		
 		//Create the associated coupons if the member changed.
 		if(builder.isMemberChanged()){
 			CouponDao.delete(dbCon, staff, new CouponDao.ExtraCond().setPromotion(promotion.getId()));
 			
-			CouponDao.create(dbCon, staff, new Coupon.CreateBuilder(original.getType() == Promotion.Type.DISPLAY_ONLY? 0 : original.getCouponType().getId(), promotion.getId()).setMembers(builder.getMembers()));
+			CouponDao.create(dbCon, staff, new Coupon.CreateBuilder(original.getType() == Promotion.Type.DISPLAY_ONLY ? 0 : original.getCouponType().getId(), promotion.getId()).setMembers(builder.getMembers()));
 		}
 		
 	} 
@@ -503,7 +555,9 @@ public class PromotionDao {
 			if(promotion.getType() != Promotion.Type.DISPLAY_ONLY){
 				promotion.setCouponType(CouponTypeDao.getById(dbCon, staff, promotion.getCouponType().getId()));
 			}
-			
+			if(promotion.hasImage()){
+				promotion.setImage(OssImageDao.getById(dbCon, staff, promotion.getImage().getId()));
+			}
 			return promotion;
 		}
 	}
@@ -544,10 +598,12 @@ public class PromotionDao {
 		List<Promotion> result = new ArrayList<Promotion>();
 		
 		String sql;
-		sql = " SELECT P.promotion_id, P.restaurant_id, P.create_date, P.start_date, P.finish_date, P.title, P.body, P.type, P.point, P.status, " +
-			  " P.coupon_type_id, CT.name " +
+		sql = " SELECT P.promotion_id, P.restaurant_id, P.create_date, P.start_date, P.finish_date, P.title, P.body, P.entire, P.type, P.point, P.status, " +
+			  " P.coupon_type_id, CT.name, " +
+			  " OI.oss_image_id, OI.image, OI.type AS oss_type " +	
 			  " FROM " + Params.dbName + ".promotion P " +
 			  " LEFT JOIN " + Params.dbName + ".coupon_type CT ON P.coupon_type_id = CT.coupon_type_id " +
+			  " LEFT JOIN " + Params.dbName + ".oss_image OI ON P.oss_image_id = OI.oss_image_id " +
 			  " WHERE 1 = 1 " +
 			  " AND P.restaurant_id = " + staff.getRestaurantId() +
 			  (extraCond != null ? extraCond : "") +
@@ -562,17 +618,13 @@ public class PromotionDao {
 			promotion.setTitle(dbCon.rs.getString("title"));
 			String body = dbCon.rs.getString("body");
 			if(!body.isEmpty()){
-				promotion.setBody(body.replaceAll("&amp;", "&")
-								     .replaceAll("&lt;", "<")
-								     .replaceAll("&gt;", ">")
-								     .replaceAll("&quot;", "\"")
-								     .replaceAll("\r&#10;", "　\n")
-								     .replaceAll("&#10;", "　\n")
-								     .replaceAll("&#032;", " ")
-								     .replaceAll("&#039;", "'")
-								     .replaceAll("&#033;", "!"));
+				promotion.setBody(new StringHtml(body, StringHtml.ConvertTo.TO_HTML).toString());
 				
-			}			
+			}	
+			String entire = dbCon.rs.getString("entire");
+			if(!entire.isEmpty()){
+				promotion.setEntire(new StringHtml(entire, StringHtml.ConvertTo.TO_HTML).toString());
+			}
 			promotion.setType(Promotion.Type.valueOf(dbCon.rs.getInt("type")));
 			promotion.setPoint(dbCon.rs.getInt("point"));
 			promotion.setStatus(Promotion.Status.valueOf(dbCon.rs.getInt("status")));
@@ -581,6 +633,14 @@ public class PromotionDao {
 				CouponType type = new CouponType(dbCon.rs.getInt("coupon_type_id"));
 				type.setName(dbCon.rs.getString("name"));
 				promotion.setCouponType(type);
+			}
+			
+			if(dbCon.rs.getInt("oss_image_id") != 0){
+				OssImage image = new OssImage(dbCon.rs.getInt("oss_image_id"));
+				image.setRestaurantId(dbCon.rs.getInt("restaurant_id"));
+				image.setImage(dbCon.rs.getString("image"));
+				image.setType(OssImage.Type.valueOf(dbCon.rs.getInt("oss_type")));
+				promotion.setImage(image);
 			}
 			
 			result.add(promotion);
@@ -638,6 +698,11 @@ public class PromotionDao {
 			//Delete the associated coupon type & coupons.
 			CouponTypeDao.delete(dbCon, staff, promotion.getCouponType().getId());
 			
+			//Delete the associated oss image.
+			if(promotion.hasImage()){
+				OssImageDao.delete(dbCon, staff, new OssImageDao.ExtraCond().setId(promotion.getImage().getId()));
+			}
+			
 			String sql;
 			//Delete the promotion.
 			sql = " DELETE FROM " + Params.dbName + ".promotion WHERE promotion_id = " + promotionId;
@@ -650,18 +715,18 @@ public class PromotionDao {
 	}
 	
 	public static class Result{
-		private final int nPromotionPublished;
+		private final int nPromotionProgressed;
 		private final int nPromotionFinished;
 		private final int nCouponExpired;
 		
 		public Result(int nPromotionPublished, int nPromotionFinished, int nCouponExpired){
-			this.nPromotionPublished = nPromotionPublished;
+			this.nPromotionProgressed = nPromotionPublished;
 			this.nPromotionFinished = nPromotionFinished;
 			this.nCouponExpired = nCouponExpired;
 		}
 		
 		public int getPromotionPublished(){
-			return this.nPromotionPublished;
+			return this.nPromotionProgressed;
 		}
 		
 		public int getPromotionFinished(){
@@ -674,9 +739,9 @@ public class PromotionDao {
 		
 		@Override
 		public String toString(){
-			return "promotion published : " + nPromotionPublished + 
-				   ",promotion finished : " + nPromotionFinished +
-				   ",coupon expired : " + nCouponExpired;
+			return "promotion progressed : " + nPromotionProgressed + 
+				   ", promotion finished : " + nPromotionFinished +
+				   ", coupon expired : " + nCouponExpired;
 		}
 	}
 	
@@ -696,15 +761,15 @@ public class PromotionDao {
 			sql = " UPDATE " + Params.dbName + ".promotion SET " +
 				  " status = " + Promotion.Status.PROGRESS.getVal() + 
 				  " WHERE 1 = 1 " +
-				  " AND start_date > NOW() " +
+				  " AND NOW() > start_date " +
 				  " AND status = " + Promotion.Status.PUBLISH.getVal();
-			int nPromotionPublished = dbCon.stmt.executeUpdate(sql);
+			int nPromotionProgress = dbCon.stmt.executeUpdate(sql);
 			
 			//Update the promotion has been progressed to 'FINISH' if the finish date exceed now. 
 			sql = " UPDATE " + Params.dbName + ".promotion SET " +
 				  " status = " + Promotion.Status.FINISH.getVal() +
 				  " WHERE 1 = 1 " +
-				  " AND finish_date > NOW() " +
+				  " AND NOW() > finish_date " +
 				  " AND status = " + Promotion.Status.PROGRESS.getVal();
 			int nPromotionFinished = dbCon.stmt.executeUpdate(sql);
 			
@@ -716,7 +781,7 @@ public class PromotionDao {
 				  " AND coupon_type_id IN (" + sql + ")";
 			int nCouponExpired = dbCon.stmt.executeUpdate(sql);
 			
-			return new Result(nPromotionPublished, nPromotionFinished, nCouponExpired);
+			return new Result(nPromotionProgress, nPromotionFinished, nCouponExpired);
 			
 		}finally{
 			dbCon.disconnect();

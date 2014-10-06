@@ -1303,12 +1303,9 @@ public class MemberDao {
 			dbCon.conn.commit();
 			return mo;
 			
-		}catch(BusinessException e){
+		}catch(BusinessException | SQLException e){
 			dbCon.conn.rollback();
 			throw e;	
-		}catch(SQLException e){
-			dbCon.conn.rollback();
-			throw e;
 		}finally{
 			dbCon.disconnect();
 		}

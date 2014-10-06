@@ -249,7 +249,7 @@ public class OssImageDao {
 			builder.getImgStream().read(bytesToImg);
 			
 			//Upload the new image to oss storage.
-			upload(staff, getById(dbCon, staff, ossImage.getId()), builder.getImgType(), builder.getImgStream());
+			upload(staff, getById(dbCon, staff, ossImage.getId()), builder.getImgType(), new ByteArrayInputStream(bytesToImg));
 
 			if(builder.isThumbnailChanged()){
 				//Delete the original thumb nail.
