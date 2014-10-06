@@ -19,6 +19,7 @@ import com.wireless.exception.BusinessException;
 import com.wireless.json.JObject;
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
+import com.wireless.pojo.oss.OssImage;
 import com.wireless.pojo.restaurantMgr.Module.Code;
 import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.restaurantMgr.Restaurant.InsertBuilder;
@@ -160,7 +161,7 @@ public class OperateRestaurantAction extends DispatchAction {
 	}
 	
 	/**
-	 * 
+	 * 修改微信餐厅简介
 	 * @param mapping
 	 * @param form
 	 * @param request
@@ -177,17 +178,9 @@ public class OperateRestaurantAction extends DispatchAction {
 			int rid = Integer.parseInt(request.getAttribute("restaurantID").toString());
 			
 			if(!info.isEmpty()){
-//				info = info.replaceAll("&", "&amp;")
-//						.replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll("\"", "&quot;")
-//						.replaceAll("\n\r", "&#10;").replaceAll("\r\n", "&#10;").replaceAll("\n", "&#10;")
-//						.replaceAll(" ", "&#032;").replaceAll("'", "&#039;").replaceAll("!", "&#033;");
-	    		
 				WeixinRestaurantDao.update(StaffDao.getAdminByRestaurant(rid), new WeixinRestaurant.UpdateBuilder().setWeixinInfo(info));
 			}
 
-    		
-    		
-//			WeixinRestaurantDao.updateInfo(Integer.valueOf(rid), info);
 			jobject.initTip(true, "操作成功, 已修改微信餐厅简介信息.");
 		}catch(Exception e){
 			e.printStackTrace();
@@ -249,21 +242,19 @@ public class OperateRestaurantAction extends DispatchAction {
 			throws Exception {
 		JObject jobject = new JObject();
 		try{
-			final StringBuilder logo = new StringBuilder(WeixinRestaurantDao.get(StaffDao.getAdminByRestaurant(Integer.valueOf(request.getAttribute("restaurantID").toString()))).getWeixinLogo());
-			if(logo.length() == 0){
-				logo.setLength(0);
-				logo.append(getServlet().getInitParameter("imageBrowseDefaultFile"));
+			OssImage image = WeixinRestaurantDao.get(StaffDao.getAdminByRestaurant(Integer.valueOf(request.getAttribute("restaurantID").toString()))).getWeixinLogo();
+			final String logo;
+			if(image != null){
+				logo = image.getObjectUrl();
 			}else{
-				String path = "http://" + getServlet().getInitParameter("oss_bucket_image")	+
-							   "." + getServlet().getInitParameter("oss_outer_point") + "/";
-				logo.insert(0, path);
+				logo = this.getServlet().getInitParameter("imageBrowseDefaultFile");
 			}
 			jobject.setExtra(new Jsonable(){
 
 				@Override
 				public JsonMap toJsonMap(int flag) {
 					JsonMap jm = new JsonMap();
-					jm.putString("logo", logo.toString());
+					jm.putString("logo", logo);
 					return jm;
 				}
 
@@ -282,4 +273,37 @@ public class OperateRestaurantAction extends DispatchAction {
 		}
 		return null;
 	}
+	
+	/**
+	 * 上传微信餐厅logo
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception
+	 */
+	public ActionForward updateLogo(ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		request.setCharacterEncoding("UTF-8");
+		response.setCharacterEncoding("UTF-8");
+		String logo = request.getParameter("logo");
+		String pin = (String) request.getAttribute("pin");
+		JObject jobject = new JObject();
+		try{
+			WeixinRestaurant.UpdateBuilder builder = new WeixinRestaurant.UpdateBuilder();
+			builder.setWeixinLogo(Integer.parseInt(logo));
+			
+			WeixinRestaurantDao.update(StaffDao.verify(Integer.parseInt(pin)), builder);
+			
+			jobject.initTip(true, "上传ＬＯＧＯ成功");
+		}catch(Exception e){
+			e.printStackTrace();
+			jobject.initTip(e);
+		}finally{
+			response.getWriter().print(jobject.toString());
+		}
+		return null;
+	}	
 }

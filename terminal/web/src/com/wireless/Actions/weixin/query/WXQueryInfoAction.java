@@ -14,6 +14,7 @@ import com.wireless.db.weixin.restaurant.WeixinRestaurantDao;
 import com.wireless.json.JObject;
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
+import com.wireless.pojo.oss.OssImage;
 import com.wireless.pojo.system.BillBoard;
 
 public class WXQueryInfoAction extends DispatchAction{
@@ -61,13 +62,12 @@ public class WXQueryInfoAction extends DispatchAction{
 		JObject jobject = new JObject();
 		try{
 			int restaurantId = WeixinRestaurantDao.getRestaurantIdByWeixin(request.getParameter("fid"));
-			String logo = WeixinRestaurantDao.get(StaffDao.getAdminByRestaurant(restaurantId)).getWeixinLogo();
-			if(logo.trim().isEmpty()){
+			OssImage oss = WeixinRestaurantDao.get(StaffDao.getAdminByRestaurant(restaurantId)).getWeixinLogo();
+			String logo;
+			if(oss == null){
 				logo = getServlet().getInitParameter("imageBrowseDefaultFile");
 			}else{
-				logo = "http://" + getServlet().getInitParameter("oss_bucket_image")
-			    		+ "." + getServlet().getInitParameter("oss_outer_point") 
-			    		+ "/" + logo;
+				logo = oss.getObjectUrl();
 			}
 			
 			final String logoPath = logo;

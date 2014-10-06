@@ -83,7 +83,7 @@ public class WeiXinHandleMessage extends HandleMessageAdapter {
 		try {
 			restaurant = RestaurantDao.getByAccount(account);
 			WeixinRestaurant wr = WeixinRestaurantDao.get(StaffDao.getAdminByRestaurant(restaurant.getId()));
-			if(wr.hasWeixinLogo()){
+			if(wr.getWeixinLogo() != null){
 				mainItem = new Data4Item(restaurant.getName(), "", wr.getWeixinLogo().getObjectUrl(), createUrl(msg, WEIXIN_INDEX)); 
 			}else{
 				mainItem = new Data4Item(restaurant != null ? restaurant.getName() : "", "点击查看主页", "", createUrl(msg, WEIXIN_INDEX));
