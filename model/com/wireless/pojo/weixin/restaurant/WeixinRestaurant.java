@@ -1,15 +1,22 @@
 package com.wireless.pojo.weixin.restaurant;
 
+import com.wireless.pojo.oss.OssImage;
+
 
 public class WeixinRestaurant {
 
 	public static class UpdateBuilder{
-		private String weixinLogo;
+		private OssImage weixinLogo;
 		private String weixinInfo;
 		private String weixinAppId;
 		private String weixinAppSecret;
 		
-		public UpdateBuilder setWeixinLogo(String logo){
+		public UpdateBuilder setWeixinLogo(int ossImageId){
+			this.weixinLogo = new OssImage(ossImageId);
+			return this;
+		}
+		
+		public UpdateBuilder setWeixinLogo(OssImage logo){
 			this.weixinLogo = logo;
 			return this;
 		}
@@ -89,7 +96,7 @@ public class WeixinRestaurant {
 	private int restaurantId;
 	private long bindDate;
 	private Status status = Status.CREATED;
-	private String weixinLogo;
+	private OssImage weixinLogo;
 	private String weixinInfo;
 	private String weixinAppId;
 	private String weixinAppSecret;
@@ -137,14 +144,15 @@ public class WeixinRestaurant {
 		this.status = status;
 	}
 	
-	public String getWeixinLogo() {
-		if(weixinLogo == null){
-			return "";
-		}
+	public boolean hasImage(){
+		return this.weixinLogo != null;
+	}
+	
+	public OssImage getWeixinLogo() {
 		return weixinLogo;
 	}
 
-	public void setWeixinLogo(String weixinLogo) {
+	public void setWeixinLogo(OssImage weixinLogo) {
 		this.weixinLogo = weixinLogo;
 	}
 

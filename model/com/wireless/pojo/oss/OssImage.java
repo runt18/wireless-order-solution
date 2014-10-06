@@ -297,26 +297,26 @@ public class OssImage implements Jsonable, Parcelable{
 		}
 	}
 	
-	public static class UpdateBuilder4HtmlAssociated{
+	public static class UpdateBuilder4Html{
 		private final OssImage.Type type;
 		private final int associatedId;
 		private final String associatedSerial;
 		
 		private String htmlBody;
 		
-		public UpdateBuilder4HtmlAssociated(OssImage.Type type, int associatedId){
+		public UpdateBuilder4Html(OssImage.Type type, int associatedId){
 			this.type = type;
 			this.associatedId = associatedId;
 			this.associatedSerial = null;
 		}
 		
-		public UpdateBuilder4HtmlAssociated(OssImage.Type type, String associatedSerial){
+		public UpdateBuilder4Html(OssImage.Type type, String associatedSerial){
 			this.type = type;
 			this.associatedId = 0;
 			this.associatedSerial = associatedSerial;
 		}
 
-		public UpdateBuilder4HtmlAssociated setHtml(String html){
+		public UpdateBuilder4Html setHtml(String html){
 			this.htmlBody = html;
 			return this;
 		}
@@ -335,8 +335,10 @@ public class OssImage implements Jsonable, Parcelable{
 		WX_FINANCE(2, "WxFinance", 100, null, "微信财务端"),
 		WX_COUPON_TYPE(3, "WxCouponType", 100, null, "微信优惠券类型"),
 		FOOD_IMAGE(4, "FoodImage", 300, new Dimension(500, 400), "菜品图片"),
-		THUMB_NAIL(5, "thumbnail", 100, null, "缩略图"),
-		PROMOTION(6, "Promotion", 300, null, "优惠活动全图");
+		PROMOTION(6, "Promotion", 300, null, "优惠活动全图"),
+		WX_LOGO(7, "WxLogo", 100, null, "微信餐厅Logo"),
+		WX_INFO(8, "WxInfo", 100, null, "微信餐厅简介"),
+		THUMB_NAIL(100, "thumbnail", 100, null, "缩略图");
 		
 		private final int val;
 		private final String dir;
@@ -417,7 +419,7 @@ public class OssImage implements Jsonable, Parcelable{
 		this.status = builder.status;
 	}
 	
-	private OssImage(UpdateBuilder4HtmlAssociated builder){
+	private OssImage(UpdateBuilder4Html builder){
 		this.associatedId = builder.associatedId;
 		this.associatedSerial = builder.associatedSerial;
 		this.type = builder.type;
