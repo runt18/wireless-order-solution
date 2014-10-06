@@ -124,12 +124,6 @@ public class WeiXinHandleMessage extends HandleMessageAdapter {
 		memberItem.setPicUrl(WEIXIN_MEMBER_ICON);
 		naviItem.addItem(memberItem);
 		
-//		Data4Item promotionItem = new Data4Item();
-//		promotionItem.setTitle("优惠信息");
-//		promotionItem.setUrl(createUrl(msg, WEIXIN_SALES));
-//		promotionItem.setPicUrl(WEIXIN_SALES_ICON);
-//		naviItem.addItem(promotionItem);
-		
 		Data4Item intrcItem = new Data4Item();
 		intrcItem.setTitle("餐厅简介");
 		intrcItem.setUrl(createUrl(msg, WEIXIN_ABOUT));
@@ -196,6 +190,7 @@ public class WeiXinHandleMessage extends HandleMessageAdapter {
 					}else{
 						Msg4ImageText couponItem = new Msg4ImageText(msg);
 						if(coupons.size() == 1){
+							//只有一个优惠活动
 							Coupon coupon = CouponDao.getById(staff, coupons.get(0).getId());
 							StringBuilder desc = new StringBuilder();
 							//活动时间
@@ -240,9 +235,9 @@ public class WeiXinHandleMessage extends HandleMessageAdapter {
 							
 						}else{
 							
-							//TODO 多个优惠活动
-							for(Coupon coupon : coupons){
-								coupon = CouponDao.getById(staff, coupon.getId());
+							//多个优惠活动
+							for(int i = 0; i < coupons.size(); i++){
+								coupons.set(i, CouponDao.getById(staff, coupons.get(i).getId()));
 							}
 							
 							Collections.sort(coupons, new Comparator<Coupon>(){
@@ -264,15 +259,20 @@ public class WeiXinHandleMessage extends HandleMessageAdapter {
 								
 							});
 							for(Coupon coupon : coupons){
-								String progress;
+								final String progress;
 								if(coupon.getPromotion().getStatus() == Promotion.Status.PROGRESS){
 									progress = "(火热进行中...)";
 								}else{
 									progress = "(敬请期待...)";
 								}
+								final String picUrl;
+								if(coupon.getPromotion().hasImage()){
+									picUrl = coupon.getPromotion().getImage().getObjectUrl();
+								}else{
+									picUrl = "";
+								}
 								couponItem.addItem(new Data4Item(coupon.getPromotion().getTitle() + progress, "", 
-												   coupon.getPromotion().getImage().getObjectUrl(), 
-												   createUrl(msg, WEIXIN_COUPON) + "&e=" + coupon.getId()));
+												   picUrl, createUrl(msg, WEIXIN_COUPON) + "&e=" + coupon.getId()));
 							}
 						}
 						session.callback(couponItem);
