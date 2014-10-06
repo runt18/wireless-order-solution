@@ -144,7 +144,7 @@ public class WeixinRestaurant {
 		this.status = status;
 	}
 	
-	public boolean hasImage(){
+	public boolean hasWeixinLogo(){
 		return this.weixinLogo != null;
 	}
 	
