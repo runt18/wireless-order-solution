@@ -19,6 +19,7 @@ import com.wireless.pojo.promotion.Coupon;
 import com.wireless.pojo.promotion.CouponType;
 import com.wireless.pojo.promotion.Promotion;
 import com.wireless.pojo.staffMgr.Staff;
+import com.wireless.util.StringHtml;
 
 public class CouponDao {
 
@@ -469,7 +470,7 @@ public class CouponDao {
 		List<Coupon> result = new ArrayList<Coupon>();
 		String sql;
 		sql = " SELECT " +
-			  " C.coupon_id, C.restaurant_id, C.birth_date, C.draw_date, C.order_id, C.order_date, C.status, " +
+			  " C.coupon_id, P.entire, C.restaurant_id, C.birth_date, C.draw_date, C.order_id, C.order_date, C.status, " +
 			  " C.coupon_type_id, CT.name, CT.price, CT.expired, CT.oss_image_id, " +
 			  " C.member_id, M.name AS member_name, M.mobile, M.member_card, M.`consumption_amount`, M.point, M.`base_balance`, M.`extra_balance`, MT.name AS memberTypeName, " +
 			  " C.promotion_id, P.title " +
@@ -501,7 +502,9 @@ public class CouponDao {
 			ct.setPrice(dbCon.rs.getFloat("price"));
 			ct.setName(dbCon.rs.getString("name"));
 			ct.setExpired(dbCon.rs.getTimestamp("expired").getTime());
-			ct.setImage(new OssImage(dbCon.rs.getInt("oss_image_id")));
+			if(dbCon.rs.getInt("oss_image_id") != 0){
+				ct.setImage(new OssImage(dbCon.rs.getInt("oss_image_id")));
+			}
 			coupon.setCouponType(ct);
 			
 			Member m = new Member(dbCon.rs.getInt("member_id"));
@@ -519,6 +522,7 @@ public class CouponDao {
 			
 			Promotion promotion = new Promotion(dbCon.rs.getInt("promotion_id"));
 			promotion.setTitle(dbCon.rs.getString("title"));
+			promotion.setEntire(new StringHtml(dbCon.rs.getString("entire"), StringHtml.ConvertTo.TO_HTML).toString());
 			coupon.setPromotion(promotion);
 			
 			result.add(coupon);

@@ -286,8 +286,7 @@ public class PromotionDao {
 		//Create the associated coupons if the member changed.
 		if(builder.isMemberChanged()){
 			CouponDao.delete(dbCon, staff, new CouponDao.ExtraCond().setPromotion(promotion.getId()));
-			
-			CouponDao.create(dbCon, staff, new Coupon.CreateBuilder(original.getType() == Promotion.Type.DISPLAY_ONLY ? 0 : original.getCouponType().getId(), promotion.getId()).setMembers(builder.getMembers()));
+			CouponDao.create(dbCon, staff, new Coupon.CreateBuilder(original.getCouponType().getId(), promotion.getId()).setMembers(builder.getMembers()));
 		}
 		
 	} 
@@ -549,9 +548,9 @@ public class PromotionDao {
 			throw new BusinessException(PromotionError.PROMOTION_NOT_EXIST);
 		}else{
 			Promotion promotion = result.get(0);
-			if(promotion.getType() != Promotion.Type.DISPLAY_ONLY){
+//			if(promotion.getType() != Promotion.Type.DISPLAY_ONLY){
 				promotion.setCouponType(CouponTypeDao.getById(dbCon, staff, promotion.getCouponType().getId()));
-			}
+//			}
 			if(promotion.hasImage()){
 				promotion.setImage(OssImageDao.getById(dbCon, staff, promotion.getImage().getId()));
 			}
@@ -626,11 +625,11 @@ public class PromotionDao {
 			promotion.setPoint(dbCon.rs.getInt("point"));
 			promotion.setStatus(Promotion.Status.valueOf(dbCon.rs.getInt("status")));
 			
-			if(promotion.getType() != Promotion.Type.DISPLAY_ONLY){
+//			if(promotion.getType() != Promotion.Type.DISPLAY_ONLY){
 				CouponType type = new CouponType(dbCon.rs.getInt("coupon_type_id"));
 				type.setName(dbCon.rs.getString("name"));
 				promotion.setCouponType(type);
-			}
+//			}
 			
 			if(dbCon.rs.getInt("oss_image_id") != 0){
 				OssImage image = new OssImage(dbCon.rs.getInt("oss_image_id"));
