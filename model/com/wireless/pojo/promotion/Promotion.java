@@ -417,6 +417,7 @@ public class Promotion implements Jsonable{
 		jm.putString("promotionEndDate", this.dateRange != null ? this.dateRange.getEndingFormat() : "");
 		jm.putString("title", this.title);
 		jm.putString("body", this.body);
+		jm.putString("entire", this.entire);
 		jm.putInt("point", this.point);
 		jm.putInt("status", this.status.getVal());
 		jm.putInt("pType", this.type.getVal());
