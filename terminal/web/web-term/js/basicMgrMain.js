@@ -887,7 +887,7 @@ function operateWXInfo(){
 	        enableSourceEdit: true,
 //	        fontFamilies: ["宋体", "隶书", "黑体"],
 	        plugins : [new Ext.ux.plugins.HEInsertImage({
-	        	url : '../../WXOperateMaterial.do?dataSource=upload&time=' + new Date().getTime()
+	        	url : '../../OperateImage.do?dataSource=upload&ossType=8'
 	        })]
 		});
 		var btnPreview = new Ext.Button({
@@ -1076,13 +1076,28 @@ function operateWXLogo(c){
 	        	}
  	        	uploadMask.show();
  	        	Ext.Ajax.request({
- 	        		url : '../../OperateImage.do?dataSource=upload&ossType=5',
+ 	        		url : '../../OperateImage.do?dataSource=upload&ossType=7',
 	 	   			isUpload : true,
 	 	   			form : form.getForm().getEl(),
 	 	   			success : function(response, options){
-	 	   				uploadMask.hide();
 	 	   				var jr = Ext.decode(response.responseText.replace(/<\/?[^>]*>/g,''));
-	 	   				Ext.ux.showMsg(jr);
+						Ext.Ajax.request({
+							url : '../../OperateRestaurant.do',
+							params : {
+								dataSource : 'updateLogo',
+								logo : jr.root[0].imageId
+							},
+							success : function(res, opt){
+								uploadMask.hide();
+								var jr = Ext.decode(res.responseText);
+								Ext.example.msg('提示', jr.msg);
+							},
+							fialure : function(res, opt){
+								wx.lm.hide();
+								Ext.ux.showMsg(res.responseText);
+							}
+						});	 	   				
+	 	   				
 	 	   			},
 	 	   			failure : function(response, options){
 	 	   				uploadMask.hide();
@@ -1119,6 +1134,7 @@ function operateWXLogo(c){
 		wx.logo.win = new Ext.Window({
 			title : '&nbsp;',
 			closable : false,
+//			closeAction:'hide',
 			resizeble : false,
 			modal : true,
 			width : 500,

@@ -199,7 +199,7 @@ function getPromotionBodyById(id){
 																promotionRule(jr.root[0].pType, jr.root[0].point) +
 																jr.root[0].body);
 				if(jr.root[0].coupon){
-					Ext.getCmp('promotionCouponPreview').body.update('<div style="text-align:left; margin: 10px 10px 10px 20px;float:left;"><img height="160"  src="' + jr.root[0].coupon.ossImage.image + '" /></div>'
+					Ext.getCmp('promotionCouponPreview').body.update('<div style="text-align:left; margin: 10px 10px 10px 20px;float:left;"><img height="160"  src="' + (jr.root[0].coupon.ossImage?jr.root[0].coupon.ossImage.image:'http://digie-image-real.oss.aliyuncs.com/nophoto.jpg') + '" /></div>'
 																+ '<div style="float:left;vertical-align: middle;line-height: 40px;"><br><span style="margin-top: 15px;">' + jr.root[0].coupon.name + '</span><br><span >面额 : ' + jr.root[0].coupon.price + ' 元</span><br><span >到期 : ' + jr.root[0].coupon.expiredFormat + '</span></div>');							
 				}else{
 					Ext.getCmp('promotionCouponPreview').body.update('<div style="text-align:center; margin: 10px 10px 10px 10px;"><img height="160"  src="../../images/noCouponNow.png" /></div>');
@@ -335,7 +335,7 @@ function operatePromotionData(data){
 		Ext.getDom('radioSelfCoupon').checked = true; 
 		couponTypeId = data.coupon.id;
 		expiredDate.setValue(data.coupon.expiredFormat);
-		Ext.getCmp('couponTypeBox').setImg(data.coupon.ossImage?data.coupon.ossImage.image:'http://digie-image-real.oss-cn-hangzhou.aliyuncs.com/WxPromotion/noCoupon.png');
+		Ext.getCmp('couponTypeBox').setImg(data.coupon.ossImage?data.coupon.ossImage.image:'http://digie-image-real.oss.aliyuncs.com/nophoto.jpg');
 	}
 	
 	if(data.members.length > 0){
@@ -591,10 +591,6 @@ Ext.onReady(function() {
         	}else{
         		Ext.example.msg('提示', '未选择图片.');
  	        	return;
-        	}
-        	var couponImgId = '';
-        	if(operatePromotTypeWin.otype == 'update'){
-        		couponImgId = Ext.getCmp('txtCouponTypeId').getValue();
         	}
         	coupon_uploadMask.show();
         	Ext.Ajax.request({
