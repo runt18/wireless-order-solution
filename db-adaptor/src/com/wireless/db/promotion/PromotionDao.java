@@ -694,8 +694,11 @@ public class PromotionDao {
 		if(promotion.getStatus() == Promotion.Status.CREATED || promotion.getStatus() == Promotion.Status.FINISH){
 			//Delete the associated coupon type & coupons.
 			CouponTypeDao.delete(dbCon, staff, promotion.getCouponType().getId());
+
+			//Delete the associated oss image to this promotion
+			OssImageDao.delete(dbCon, staff, new OssImageDao.ExtraCond().setAssociated(OssImage.Type.WX_PROMOTION, promotion.getId()));
 			
-			//Delete the associated oss image.
+			//Delete the associated full oss image to this promotion.
 			if(promotion.hasImage()){
 				OssImageDao.delete(dbCon, staff, new OssImageDao.ExtraCond().setId(promotion.getImage().getId()));
 			}

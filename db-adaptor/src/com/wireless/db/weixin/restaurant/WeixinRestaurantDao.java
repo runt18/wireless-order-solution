@@ -1,5 +1,6 @@
 package com.wireless.db.weixin.restaurant;
 
+import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -7,13 +8,16 @@ import java.util.List;
 
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
+import com.wireless.db.oss.OssImageDao;
 import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.db.weixin.CalcWeixinSignature;
 import com.wireless.exception.BusinessException;
 import com.wireless.exception.WeixinRestaurantError;
+import com.wireless.pojo.oss.OssImage;
 import com.wireless.pojo.restaurantMgr.Restaurant;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.weixin.restaurant.WeixinRestaurant;
+import com.wireless.util.StringHtml;
 
 public class WeixinRestaurantDao {
 	
@@ -91,23 +95,27 @@ public class WeixinRestaurantDao {
 		WeixinRestaurant wr = builder.build();
 		sql = " UPDATE " + Params.dbName + ".weixin_restaurant SET " +
 			  " restaurant_id = " + staff.getRestaurantId() + 
-			  (builder.isWeixinLogoChanged() ? " ,weixin_logo = '" + wr.getWeixinLogo() + "'" : "") +
-			  (builder.isWeixinInfoChanged() ? " ,weixin_info = '" + wr.getWeixinInfo()
-					  												   .replaceAll("&", "&amp;")
-																	   .replaceAll("<", "&lt;")
-																	   .replaceAll(">", "&gt;")
-																	   .replaceAll("\"", "&quot;")
-																	   .replaceAll("\n\r", "&#10;")
-																	   .replaceAll("\r\n", "&#10;")
-																	   .replaceAll("\n", "&#10;")
-																	   .replaceAll(" ", "&#032;")
-																	   .replaceAll("'", "&#039;")
-																	   .replaceAll("!", "&#033;") + "'" : "") +
+			  (builder.isWeixinLogoChanged() ? " ,weixin_logo = '" + wr.getWeixinLogo().getId() + "'" : "") +
+			  (builder.isWeixinInfoChanged() ? " ,weixin_info = '" + new StringHtml(wr.getWeixinInfo(), StringHtml.ConvertTo.TO_NORMAL) + "'" : "") +
 			  (builder.isWeixinAppIdChanged() ? " ,app_id = '" + wr.getWeixinAppId() + "'" : "") +
 			  (builder.isWeixinSecretChanged() ? " ,app_secret = '" + wr.getWeixinAppSecret() + "'" : "") +
 			  " WHERE restaurant_id = " + staff.getRestaurantId();
 		if(dbCon.stmt.executeUpdate(sql) == 0){
 			throw new BusinessException(WeixinRestaurantError.WEIXIN_RESTAURANT_NOT_EXIST);
+		}
+		
+		//Associated with the logo oss image.
+		if(builder.isWeixinInfoChanged()){
+			try{
+				OssImageDao.update(dbCon, staff, new OssImage.UpdateBuilder(wr.getWeixinLogo().getId()).setSingleAssociated(OssImage.Type.WX_LOGO, staff.getRestaurantId()));
+			}catch(IOException e){
+				e.printStackTrace();
+			}
+		}
+		
+		//Associated with the info oss image.
+		if(builder.isWeixinInfoChanged()){
+			OssImageDao.update(dbCon, staff, new OssImage.UpdateBuilder4Html(OssImage.Type.WX_INFO, staff.getRestaurantId()).setHtml(wr.getWeixinInfo()));
 		}
 	}
 
@@ -148,7 +156,9 @@ public class WeixinRestaurantDao {
 		if(result.isEmpty()){
 			throw new BusinessException(WeixinRestaurantError.WEIXIN_RESTAURANT_NOT_EXIST);
 		}else{
-			return result.get(0);
+			WeixinRestaurant wr = result.get(0);
+			wr.setWeixinLogo(OssImageDao.getById(dbCon, staff, wr.getWeixinLogo().getId()));
+			return wr;
 		}
 	}
 	
@@ -173,18 +183,10 @@ public class WeixinRestaurantDao {
 			wr.setWeixinAppSecret(dbCon.rs.getString("app_secret"));
 			String info = dbCon.rs.getString("weixin_info");
 			if(!info.isEmpty()){
-				wr.setWeixinInfo(info.replaceAll("&amp;", "&")
-								     .replaceAll("&lt;", "<")
-								     .replaceAll("&gt;", ">")
-								     .replaceAll("&quot;", "\"")
-								     .replaceAll("\r&#10;", "　\n")
-								     .replaceAll("&#10;", "　\n").replaceAll("&#032;", " ")
-								     .replaceAll("&#039;", "'")
-								     .replaceAll("&#033;", "!"));
-				
+				wr.setWeixinInfo(new StringHtml(info, StringHtml.ConvertTo.TO_HTML).toString());
 			}
 			wr.setWeixinSerial(dbCon.rs.getString("weixin_serial"));
-			wr.setWeixinLogo(dbCon.rs.getString("weixin_logo"));
+			wr.setWeixinLogo(new OssImage(dbCon.rs.getInt("weixin_logo")));
 			result.add(wr);
 		}
 		dbCon.rs.close();

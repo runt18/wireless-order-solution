@@ -304,25 +304,64 @@ public class OssImageDao {
     	ossClient.putObject(OssImage.Params.instance().getBucket(), ossImage.getObjectKey(), istream, objectMeta);
 	}
 	
-	public static void update(DBCon dbCon, Staff staff, OssImage.UpdateBuilder4HtmlAssociated builder) throws SQLException{
+	/**
+	 * Update the oss image from HTML.
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param builder
+	 * 			the builder 
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static void update(Staff staff, OssImage.UpdateBuilder4Html builder) throws SQLException{
+		DBCon dbCon = new DBCon();
+		try{
+			dbCon.connect();
+			dbCon.conn.setAutoCommit(false);
+			update(dbCon, staff, builder);
+			dbCon.conn.commit();
+		}catch(SQLException e){
+			dbCon.conn.rollback();
+			throw e;
+		}finally{
+			dbCon.disconnect();
+		}
+	}
+	
+	
+	/**
+	 * Update the oss image from HTML.
+	 * @param dbCon
+	 * 			the database connection.
+	 * @param staff
+	 * 			the staff to perform this action
+	 * @param builder
+	 * 			the builder 
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static void update(DBCon dbCon, Staff staff, OssImage.UpdateBuilder4Html builder) throws SQLException{
+
+    	OssImage image = builder.build();
+
+    	String sql;
+    	
+    	sql = " UPDATE " + Params.dbName + ".oss_image SET " +
+    		  " associated_id = 0 " +
+    		  " ,status = " + OssImage.Status.SINGLE.getVal() +
+    		  " WHERE 1 = 1 " +
+    		  " AND type = " + image.getType().getVal() +
+    		  (image.getAssociatedId() != 0 ? " AND associated_id = " + image.getAssociatedId() : "") +
+			  (image.getAssociatedSerial().length() != 0 ? " AND associated_serial = '" + image.getAssociatedSerial() + "' AND associated_serial_crc = CRC32('" + image.getAssociatedSerial() + "')" : "");
+    	dbCon.stmt.executeUpdate(sql);
+    	
 		final String searchImgReg = "(?x)(src|SRC)=('|\")(http://([\\w-]+\\.)+[\\w-]+(:[0-9]+)*(/[\\w-]+)*(/[\\w-]+\\.(jpg|jpeg|JPEG|JPG|png|PNG|gif|GIF)))('|\")";
 		Pattern pattern = Pattern.compile(searchImgReg);
         Matcher matcher = pattern.matcher(builder.getHtml());
         
         while(matcher.find()){
-        	OssImage image = builder.build();
         	String str = matcher.group(3);
         	image.setImage(str.substring(str.lastIndexOf("/") + 1));
-        	
-        	String sql;
-        	
-        	sql = " UPDATE " + Params.dbName + ".oss_image SET " +
-        		  " associated_id = 0 " +
-        		  " ,status = " + OssImage.Status.SINGLE.getVal() +
-        		  " WHERE 1 = 1 " +
-        		  " AND restaurant_id = " + staff.getRestaurantId() +
-        		  " AND type = " + image.getType().getVal();
-        	dbCon.stmt.executeUpdate(sql);
         	
         	sql = " UPDATE " + Params.dbName + ".oss_image SET " +
         		  " associated_id = " + image.getAssociatedId() +

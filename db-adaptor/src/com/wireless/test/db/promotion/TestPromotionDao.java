@@ -46,7 +46,7 @@ public class TestPromotionDao {
 								  OssImage.Params.instance().getOssParam().ACCESS_OSS_ID, 
 								  OssImage.Params.instance().getOssParam().ACCESS_OSS_KEY);
 		try {
-			mStaff = StaffDao.getByRestaurant(63).get(0);
+			mStaff = StaffDao.getAdminByRestaurant(63);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
