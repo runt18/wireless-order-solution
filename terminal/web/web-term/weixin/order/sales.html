@@ -171,8 +171,7 @@ $(function(){
 			if(data.success && data.root.length > 0){
 				
 				var temp = data.root[0].promotion;
-				console.log(temp.entire)
-				Util.getDom('divInfoContent').innerHTML = '<div>' + temp.entire + '</div>'
+				Util.getDom('divInfoContent').innerHTML = temp.entire
 					+ '<hr><div style="margin: 10px 10px 10px 10px; font-size: 14px;font-weight: bold;">'
 					+ (data.root[0].drawProgress ? (data.root[0].drawProgress.point>=temp.point?'':customerPoint(temp.pType,data.root[0].drawProgress.point,temp.point)) : '' + '</div>')
 					+ day_closeToPromotion(temp.promotionBeginDate)
