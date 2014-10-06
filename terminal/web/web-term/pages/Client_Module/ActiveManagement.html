@@ -49,7 +49,10 @@ function buildPreviewHead(){
 		head += promotionRule(promotionType, Ext.getCmp('active_point').getValue());
 //	}
 	return head;
-}	
+}
+var promotion_uploadMask = new Ext.LoadMask(document.body, {
+	msg : '正在保存活动...'
+});
 var operatePromotion = function(){
 	
 	if(active_memberList == ''){
@@ -65,6 +68,7 @@ var operatePromotion = function(){
 	var price = Ext.getCmp('active_price');
 	var expiredDate= Ext.getCmp('active_couponExpiredDate');
 	var editBody = Ext.getCmp('secondStep_edit');
+	var entire = Ext.getCmp('threeStepEastBody');
 	
 	if(operatePromotTypeWin.otype == 'insert'){
 		params.dataSource = 'insert';
@@ -85,13 +89,16 @@ var operatePromotion = function(){
 	params.point = point.getValue();
 	params.members = active_memberList;
 	params.body = editBody.getValue();	
-	
+	params.entire = entire.body.dom.innerHTML;
+
+	promotion_uploadMask.show();
 	Ext.Ajax.request({
 		url : '../../OperatePromotion.do',
 		params : params,
 		success : function(res, opt){
 			var jr = Ext.decode(res.responseText);
 			if(jr.success){
+				promotion_uploadMask.hide();
 				promotionTree.getRootNode().reload();
 				operatePromotTypeWin.hide();
 				Ext.example.msg(jr.title, jr.msg);
@@ -171,7 +178,7 @@ $(function (){
         		Ext.getCmp('active_title').focus(true, 100);
         		Ext.getCmp('btnSecondStepEastBody').handler();
         	}else if(currentIndex == 2){
-        		Ext.getCmp('threeStepEastBody').body.update(buildPreviewHead()+Ext.getCmp('secondStep_edit').getValue());
+        		Ext.getCmp('threeStepEastBody').body.update(buildPreviewHead()+'<div style="margin: 10px 10px 10px 10px; word-wrap:break-word;">'+Ext.getCmp('secondStep_edit').getValue()+'</div>');
         	}
         },
         onStepChanging : function(event, currentIndex, newIndex){
