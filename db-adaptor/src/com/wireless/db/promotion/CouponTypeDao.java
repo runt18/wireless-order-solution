@@ -72,7 +72,7 @@ public class CouponTypeDao {
 			  "'" + type.getName() + "'," +
 			  type.getPrice() + "," +
 			  "'" + DateUtil.format(type.getExpired(), DateUtil.Pattern.DATE_TIME) + "'," +
-			  type.getImage().getId() + "," +
+			  (type.hasImage() ? type.getImage().getId() : "NULL") + "," +
 			  "'" + type.getComment() + "'" +
 			  ")";
 		dbCon.stmt.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
