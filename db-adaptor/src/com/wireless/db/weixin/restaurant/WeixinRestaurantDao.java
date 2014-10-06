@@ -105,7 +105,7 @@ public class WeixinRestaurantDao {
 		}
 		
 		//Associated with the logo oss image.
-		if(builder.isWeixinInfoChanged()){
+		if(builder.isWeixinLogoChanged()){
 			try{
 				OssImageDao.update(dbCon, staff, new OssImage.UpdateBuilder(wr.getWeixinLogo().getId()).setSingleAssociated(OssImage.Type.WX_LOGO, staff.getRestaurantId()));
 			}catch(IOException e){
