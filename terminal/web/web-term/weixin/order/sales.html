@@ -171,16 +171,14 @@ $(function(){
 			if(data.success && data.root.length > 0){
 				
 				var temp = data.root[0].promotion;
-				Util.getDom('divInfoContent').innerHTML =  '<div style="margin: 10px 10px 10px 10px; text-align:center; font-size: 26px; font-weight: bold; word-wrap:break-word; color: #D2691E;">' + temp.title + '</div>'
-					+ '<div style="margin: 10px 10px 10px 10px; color:LightSkyBlue ; font-size:15px;font-weight:bold;">活动日期 : <font color="red">' + temp.promotionBeginDate + '</font>&nbsp;至&nbsp;<font color="red">' + temp.promotionEndDate + '</font></div>'
-					+ promotionRule(temp.pType, temp.point) 
-					+ '<div style="margin: 10px 10px 10px 10px; word-wrap:break-word;">' + temp.body + '</div>'
+				console.log(temp.entire)
+				Util.getDom('divInfoContent').innerHTML = '<div>' + temp.entire + '</div>'
 					+ '<hr><div style="margin: 10px 10px 10px 10px; font-size: 14px;font-weight: bold;">'
 					+ (data.root[0].drawProgress ? (data.root[0].drawProgress.point>=temp.point?'':customerPoint(temp.pType,data.root[0].drawProgress.point,temp.point)) : '' + '</div>')
 					+ day_closeToPromotion(temp.promotionBeginDate)
 					+ '<div style="margin: 10px 10px 10px 10px;">'
 					+ (temp.pType != 1 ? couponTemplet.format({
-						couponImg : data.root[0].couponType.ossImage.image,
+						couponImg : data.root[0].couponType.ossImage?data.root[0].couponType.ossImage.image:'http://digie-image-real.oss.aliyuncs.com/nophoto.jpg',
 						name : data.root[0].couponType.name,
 						cPrice : data.root[0].couponType.price,
 						expiredTime : data.root[0].couponType.expiredFormat
