@@ -87,7 +87,7 @@ public class EntryAction extends Action{
 		DefaultSession session = DefaultSession.newInstance();
 		try{
 			String account = request.getParameter("account");
-			session.addOnHandleMessageListener(new WeiXinHandleMessage(session, account));
+			session.addOnHandleMessageListener(new WeiXinHandleMessage(session, account, "http://" + request.getLocalAddr() + "/web-term"));
 			session.process(is, os);
 		}finally{
 			session.close();

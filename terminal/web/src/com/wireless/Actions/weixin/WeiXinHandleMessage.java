@@ -1,14 +1,7 @@
 package com.wireless.Actions.weixin;
 
-import gui.ava.html.image.generator.HtmlImageGenerator;
-
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
-
-import javax.imageio.ImageIO;
 
 import org.marker.weixin.DefaultSession;
 import org.marker.weixin.HandleMessageAdapter;
@@ -19,10 +12,7 @@ import org.marker.weixin.msg.Msg4Event.Event;
 import org.marker.weixin.msg.Msg4ImageText;
 import org.marker.weixin.msg.Msg4Text;
 
-import com.wireless.Actions.init.InitServlet;
 import com.wireless.db.client.member.MemberDao;
-import com.wireless.db.oss.CompressImage;
-import com.wireless.db.oss.OssImageDao;
 import com.wireless.db.promotion.CouponDao;
 import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.db.staffMgr.StaffDao;
@@ -38,19 +28,18 @@ import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.NumericUtil;
 
 public class WeiXinHandleMessage extends HandleMessageAdapter {
-	private static final String WEIXIN_BASE_SERVER = InitServlet.getConfig().getInitParameter("weixin_callback_address");
 	
-	private static final String WEIXIN_INDEX = WEIXIN_BASE_SERVER + "/weixin/order/index.html";
-	private static final String WEIXIN_FOOD = WEIXIN_BASE_SERVER + "/weixin/order/food.html";
-	private static final String WEIXIN_RFOOD = WEIXIN_BASE_SERVER + "/weixin/order/rfood.html";
-	private static final String WEIXIN_ABOUT = WEIXIN_BASE_SERVER + "/weixin/order/about.html";
-	private static final String WEIXIN_MEMBER = WEIXIN_BASE_SERVER + "/weixin/order/member.html";
-	private static final String WEIXIN_COUPON = WEIXIN_BASE_SERVER + "/weixin/order/sales.html";
+	private final String WEIXIN_INDEX;
+	private final String WEIXIN_FOOD;
+	private final String WEIXIN_RFOOD;
+	private final String WEIXIN_ABOUT;
+	private final String WEIXIN_MEMBER;
+	private final String WEIXIN_COUPON;
 	
-	private static final String WEIXIN_FOOD_ICON = WEIXIN_BASE_SERVER + "/weixin/order/images/icon_food.png";
-	private static final String WEIXIN_RFOOD_ICON = WEIXIN_BASE_SERVER + "/weixin/order/images/icon_rfood.png";
-	private static final String WEIXIN_ABOUT_ICON = WEIXIN_BASE_SERVER + "/weixin/order/images/icon_about.png";
-	private static final String WEIXIN_MEMBER_ICON = WEIXIN_BASE_SERVER + "/weixin/order/images/icon_member.png";
+	private final String WEIXIN_FOOD_ICON;
+	private final String WEIXIN_RFOOD_ICON;
+	private final String WEIXIN_ABOUT_ICON;
+	private final String WEIXIN_MEMBER_ICON;
 	
 	public final static String NAVI_EVENT_KEY = "navi_event_key";
 	public final static String PROMOTION_EVENT_KEY = "promotion_event_key";
@@ -59,9 +48,20 @@ public class WeiXinHandleMessage extends HandleMessageAdapter {
 	private final DefaultSession session;
 	private final String account;
 	
-	public WeiXinHandleMessage(DefaultSession session, String account){
+	public WeiXinHandleMessage(DefaultSession session, String account, String root){
 		this.session = session;
 		this.account = account;
+		this.WEIXIN_INDEX = root + "/weixin/order/index.html";
+		this.WEIXIN_FOOD = root + "/weixin/order/food.html";
+		this.WEIXIN_RFOOD = root + "/weixin/order/rfood.html";
+		this.WEIXIN_ABOUT = root + "/weixin/order/about.html";
+		this.WEIXIN_MEMBER = root + "/weixin/order/member.html";
+		this.WEIXIN_COUPON = root + "/weixin/order/sales.html";
+		
+		this.WEIXIN_FOOD_ICON = root + "/weixin/order/images/icon_food.png";
+		this.WEIXIN_RFOOD_ICON = root + "/weixin/order/images/icon_rfood.png";
+		this.WEIXIN_ABOUT_ICON = root + "/weixin/order/images/icon_about.png";
+		this.WEIXIN_MEMBER_ICON = root + "/weixin/order/images/icon_member.png";
 	}
 	
 	private String createUrl(Msg msg, String url){
@@ -85,8 +85,8 @@ public class WeiXinHandleMessage extends HandleMessageAdapter {
 				mainItem = new Data4Item(restaurant.getName(), "点击查看【" + restaurant.getName() + "】主页", 
 						   				 "", createUrl(msg, WEIXIN_INDEX));
 			}else{
-				logo = "http://" + InitServlet.getConfig().getInitParameter("oss_bucket_image")	+ "." + 
-					   InitServlet.getConfig().getInitParameter("oss_outer_point")	+ "/" + 
+				logo = "http://" + OssImage.Params.instance().getBucket() + "." + 
+						OssImage.Params.instance().getOssParam().OSS_OUTER_POINT + "/" + 
 					   logo;
 				mainItem = new Data4Item(restaurant.getName(), "", logo, createUrl(msg, WEIXIN_INDEX)); 
 			}
@@ -231,35 +231,38 @@ public class WeiXinHandleMessage extends HandleMessageAdapter {
 							
 							desc.append("\n点击查看优惠活动详情>>>>");
 							
-							String picUrl = "";
-							try{
-								HtmlImageGenerator imageGenerator = new HtmlImageGenerator();
-								imageGenerator.loadHtml(coupon.getPromotion().getBody());
-								ByteArrayOutputStream bosJpg = new ByteArrayOutputStream();
-								ImageIO.write(new CompressImage().imageZoomOut(imageGenerator.getBufferedImage(), 360, 280), "jpg", bosJpg);
-								bosJpg.flush();
-								
-								ByteArrayInputStream bisJpg = new ByteArrayInputStream(bosJpg.toByteArray());
-								String associatedSerial = "promotion_large_" + msg.getFromUserName();
-								String fileName = associatedSerial + ".jpg";
-								OssImageDao.delete(staff, new OssImageDao.ExtraCond().setAssociated(OssImage.Type.WX_PROMOTION, associatedSerial));
-								int ossImageId = OssImageDao.insert(staff, new OssImage.InsertBuilder(OssImage.Type.WX_PROMOTION, associatedSerial).setImgResource(fileName, bisJpg));
-								bosJpg.close();
-						    	bisJpg.close();
-						    	picUrl = OssImageDao.getById(staff, ossImageId).getObjectUrl() + "?" + System.currentTimeMillis();
-							}catch(IOException e){
-								e.printStackTrace();
-							}
-							
 							couponItem.addItem(new Data4Item(coupon.getPromotion().getTitle(), 
 															 desc.toString(), 
-															 picUrl, 
+															 coupon.getPromotion().getImage().getObjectUrl(), 
 															 createUrl(msg, WEIXIN_COUPON) + "&e=" + coupon.getId()));
 							
 						}else{
 							for(Coupon coupon : coupons){
 								//TODO 多个优惠活动
-								couponItem.addItem(new Data4Item(coupon.getPromotion().getTitle(), "", "", createUrl(msg, WEIXIN_COUPON) + "&e=" + coupon.getId()));
+								coupon = CouponDao.getById(staff, coupon.getId());
+//								String picUrl = "";
+//								try{
+//									HtmlImageGenerator imageGenerator = new HtmlImageGenerator();
+//									imageGenerator.loadHtml(coupon.getPromotion().getBody());
+//									ByteArrayOutputStream bosJpg = new ByteArrayOutputStream();
+//									ImageIO.write(new CompressImage().imageZoomOut(imageGenerator.getBufferedImage(), 360, 280), "jpg", bosJpg);
+//									bosJpg.flush();
+//									
+//									ByteArrayInputStream bisJpg = new ByteArrayInputStream(bosJpg.toByteArray());
+//									String associatedSerial = "promotion_large_" + msg.getFromUserName();
+//									String fileName = associatedSerial + "_" + coupon.getId() +".jpg";
+//									OssImageDao.delete(staff, new OssImageDao.ExtraCond().setAssociated(OssImage.Type.WX_PROMOTION, associatedSerial));
+//									int ossImageId = OssImageDao.insert(staff, new OssImage.InsertBuilder(OssImage.Type.WX_PROMOTION, associatedSerial).setImgResource(fileName, bisJpg));
+//									bosJpg.close();
+//							    	bisJpg.close();
+//							    	picUrl = OssImageDao.getById(staff, ossImageId).getObjectUrl() + "?" + System.currentTimeMillis();
+//								}catch(IOException e){
+//									e.printStackTrace();
+//								}
+						    	
+								couponItem.addItem(new Data4Item(coupon.getPromotion().getTitle(), "", 
+												   coupon.getPromotion().getImage().getObjectUrl(), 
+												   createUrl(msg, WEIXIN_COUPON) + "&e=" + coupon.getId()));
 							}
 						}
 						session.callback(couponItem);

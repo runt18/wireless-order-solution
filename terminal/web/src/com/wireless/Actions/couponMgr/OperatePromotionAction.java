@@ -33,9 +33,7 @@ import com.wireless.pojo.util.DateUtil;
 
 public class OperatePromotionAction extends DispatchAction{
 
-	public ActionForward insert(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
+	public ActionForward insert(ActionMapping mapping, ActionForm form,	HttpServletRequest request, HttpServletResponse response) throws Exception {
 		String title = request.getParameter("title");
 		String beginDate = request.getParameter("beginDate");
 		String endDate = request.getParameter("endDate");
@@ -52,24 +50,23 @@ public class OperatePromotionAction extends DispatchAction{
 		String pin = (String) request.getAttribute("pin");
 		JObject jobject = new JObject();
 		try{
-			body = body.replaceAll("&", "&amp;")
-					   .replaceAll("<", "&lt;")
-					   .replaceAll(">", "&gt;")
-					   .replaceAll("\"", "&quot;")
-					   .replaceAll("\n\r", "&#10;")
-					   .replaceAll("\r\n", "&#10;")
-					   .replaceAll("\n", "&#10;")
-					   .replaceAll(" ", "&#032;")
-					   .replaceAll("'", "&#039;")
-					   .replaceAll("!", "&#033;");
-			
 			
 			Promotion.CreateBuilder promotionCreateBuilder;
 			if(Promotion.Type.valueOf(Integer.parseInt(pType)) == Promotion.Type.DISPLAY_ONLY){
-				promotionCreateBuilder = Promotion.CreateBuilder.newInstance(title, new DateRange(beginDate, endDate), body);
+				promotionCreateBuilder = Promotion.CreateBuilder.newInstance(title, 
+																			 new DateRange(beginDate, endDate), 
+																			 body,
+																			 //FIXME
+																			 "");
 			}else{
 //				CouponType.InsertBuilder typeInsertBuilder = new CouponType.InsertBuilder(couponName, Integer.parseInt(price)).setComment("活动优惠劵").setImage(image).setExpired(DateUtil.parseDate(expiredDate));
-				promotionCreateBuilder = Promotion.CreateBuilder.newInstance(title, new DateRange(beginDate, endDate), body, Promotion.Type.valueOf(Integer.parseInt(pType)), new CouponType.InsertBuilder(couponName, Integer.parseInt(price)).setComment("活动优惠劵").setImage(Integer.parseInt(image)).setExpired(DateUtil.parseDate(expiredDate)));
+				promotionCreateBuilder = Promotion.CreateBuilder.newInstance(title, 
+																			 new DateRange(beginDate, endDate),
+																			 body,
+																			 Promotion.Type.valueOf(Integer.parseInt(pType)),
+																			 new CouponType.InsertBuilder(couponName, Integer.parseInt(price)).setComment("活动优惠劵").setImage(Integer.parseInt(image)).setExpired(DateUtil.parseDate(expiredDate)),
+																			 //FIXME
+																			 "");
 				if(point != null && !point.isEmpty()){
 					promotionCreateBuilder.setPoint(Integer.parseInt(point));
 				}
@@ -122,23 +119,14 @@ public class OperatePromotionAction extends DispatchAction{
 		String pin = (String) request.getAttribute("pin");
 		JObject jobject = new JObject();
 		try{
-			body = body.replaceAll("&", "&amp;")
-					   .replaceAll("<", "&lt;")
-					   .replaceAll(">", "&gt;")
-					   .replaceAll("\"", "&quot;")
-					   .replaceAll("\n\r", "&#10;")
-					   .replaceAll("\r\n", "&#10;")
-					   .replaceAll("\n", "&#10;")
-					   .replaceAll(" ", "&#032;")
-					   .replaceAll("'", "&#039;")
-					   .replaceAll("!", "&#033;");
 			
 			
 			Promotion.UpdateBuilder promotionUpdateBuilder;
 			if(Promotion.Type.valueOf(Integer.parseInt(pType)) == Promotion.Type.DISPLAY_ONLY){
 				promotionUpdateBuilder = new Promotion.UpdateBuilder(Integer.parseInt(pId)).setRange(new DateRange(beginDate, endDate))
 										 .setTitle(title)
-										 .setBody(body);
+										 //FIXME
+										 .setBody(body, "");
 			}else{
 				CouponType.UpdateBuilder typeUpdateBuilder = new CouponType.UpdateBuilder(Integer.parseInt(couponTypeId), couponName).setComment("").setPrice(Integer.parseInt(price)).setExpired(expiredDate);
 				if(image != null && !image.isEmpty()){
@@ -146,7 +134,8 @@ public class OperatePromotionAction extends DispatchAction{
 				}
 				promotionUpdateBuilder = new Promotion.UpdateBuilder(Integer.parseInt(pId)).setRange(new DateRange(beginDate, endDate))
 										 .setTitle(title)
-										 .setBody(body)
+										 //FIXME
+										 .setBody(body, "")
 										 .setCouponTypeBuilder(typeUpdateBuilder);
 				if(point != null && !point.isEmpty()){
 					promotionUpdateBuilder.setPoint(Integer.parseInt(point));

@@ -2,7 +2,6 @@ package com.wireless.Actions.init;
 
 import java.beans.PropertyVetoException;
 
-import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 
 import org.apache.struts.action.ActionServlet;
@@ -14,12 +13,6 @@ import com.wireless.sccon.ServerConnector;
 
 public class InitServlet extends ActionServlet {
 	
-	private static ServletConfig sc;
-	
-	public static ServletConfig getConfig() {
-		return sc;
-	}
-	
 	/**
 	 * 
 	 */
@@ -27,7 +20,6 @@ public class InitServlet extends ActionServlet {
 
 	@Override
 	public void init() throws ServletException{
-		sc = getServletConfig();
 		try {
 			DBCon.init(getServletConfig().getInitParameter("db_host"),
 					   getServletConfig().getInitParameter("db_port"), 
