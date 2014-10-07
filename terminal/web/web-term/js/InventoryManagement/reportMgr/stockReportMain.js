@@ -46,7 +46,7 @@ var deptComb = new Ext.form.ComboBox({
 			});
 		},
 		select : function(){
-			Ext.getCmp('btnSearch').handler();		
+			Ext.getCmp('general_btnSearch').handler();		
 		}
 		
 	}
@@ -114,7 +114,7 @@ var materialComb = new Ext.form.ComboBox({
 			}
 		},
 		select : function(){
-			Ext.getCmp('btnSearch').handler();		
+			Ext.getCmp('general_btnSearch').handler();		
 		}
 		
 	}
@@ -222,7 +222,7 @@ Ext.onReady(function(){
 		deptComb,
 		'->', {
 			text : '搜索',
-			id : 'btnSearch',
+			id : 'general_btnSearch',
 			iconCls : 'btn_search',
 			handler : function(){
 				var cateType = '', cateId = '', materialId = '';
@@ -328,7 +328,7 @@ Ext.onReady(function(){
 			click : function(e){
 				//var node = this.getSelectionModel().getSelectedNode();
 				Ext.getDom('cateTypeValue').innerHTML = e.text;
-				Ext.getCmp('btnSearch').handler();
+				Ext.getCmp('general_btnSearch').handler();
 				var cateType = '', cateId = '';
 				var rn = stockReportTree.getSelectionModel().getSelectedNode();
 				if(!rn){

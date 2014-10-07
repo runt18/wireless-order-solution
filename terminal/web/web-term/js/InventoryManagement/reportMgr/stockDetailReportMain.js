@@ -246,7 +246,7 @@ var materialComb = new Ext.form.ComboBox({
 			}
 		},
 		select : function(){
-			Ext.getCmp('btnSearch').handler();		
+			Ext.getCmp('stockDetail_btnSearch').handler();		
 		}
 		
 	}
@@ -376,7 +376,6 @@ Ext.onReady(function(){
 						subType.store.loadData('');
 						subType.setValue('');
 					}
-					//Ext.getCmp('btnSearch').handler();
 				}
 			}
 		}, {
@@ -402,7 +401,7 @@ Ext.onReady(function(){
 		{xtype:'tbtext', text:'&nbsp;&nbsp;'},
 		'->', {
 			text : '搜索',
-			id : 'btnSearch',
+			id : 'stockDetail_btnSearch',
 			iconCls : 'btn_search',
 			handler : function(){
 				materialComb.allowBlank = false;
@@ -495,7 +494,7 @@ Ext.onReady(function(){
 			click : function(e){
 				//var node = this.getSelectionModel().getSelectedNode();
 				Ext.getDom('dept').innerHTML = e.text;
-				Ext.getCmp('btnSearch').handler();
+				Ext.getCmp('stockDetail_btnSearch').handler();
 			}
 		},
 		tbar :	[
@@ -560,7 +559,7 @@ Ext.onReady(function(){
 			key : Ext.EventObject.ENTER,
 			scope : this,
 			fn : function(){
-				Ext.getCmp('btnSearch').handler();
+				Ext.getCmp('stockDetail_btnSearch').handler();
 			}
 		}]
 	});
