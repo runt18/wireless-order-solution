@@ -380,8 +380,14 @@ public class StockTakeDao {
 			sTake.setDeptName(dbCon.rs.getString("ST.dept_name"));
 			sTake.setCateType(dbCon.rs.getInt("ST.material_cate_type"));
 			sTake.setStatus(dbCon.rs.getInt("ST.status"));
-			sTake.getMaterialCate().setId(dbCon.rs.getInt("ST.material_cate_id"));
-			sTake.getMaterialCate().setName(dbCon.rs.getString("ST.material_cate_name"));
+			if(dbCon.rs.getInt("ST.material_cate_id") != 0){
+				sTake.getMaterialCate().setId(dbCon.rs.getInt("ST.material_cate_id"));
+				sTake.getMaterialCate().setName(dbCon.rs.getString("ST.material_cate_name"));				
+			}else{
+				sTake.getMaterialCate().setId(-1);
+				sTake.getMaterialCate().setName(sTake.getCateType() == StockTake.CateType.GOOD?"全部商品":"全部原料");					
+			}
+
 			sTake.setOperatorId(dbCon.rs.getInt("ST.operator_id"));
 			sTake.setOperator(dbCon.rs.getString("ST.operator"));
 			sTake.setApprover(dbCon.rs.getString("ST.approver"));
