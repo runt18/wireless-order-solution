@@ -216,22 +216,23 @@ public class MaterialDeptDao {
 		return mDepts;
 		
 	}
-	public static List<StockTakeDetail> getStockTakeDetails(Staff term, int deptId, int cateId, String orderClause) throws SQLException{
+	public static List<StockTakeDetail> getStockTakeDetails(Staff term, int deptId,int type, int cateId, String orderClause) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			return getStockTakeDetails(dbCon, term, deptId, cateId, orderClause);
+			return getStockTakeDetails(dbCon, term, deptId, type, cateId, orderClause);
 		}finally{
 			dbCon.disconnect();
 		}
 	}
 	
-	public static List<StockTakeDetail> getStockTakeDetails(DBCon dbCon, Staff term, int deptId, int cateId, String orderClause) throws SQLException{
+	public static List<StockTakeDetail> getStockTakeDetails(DBCon dbCon, Staff term, int deptId,int type, int cateId, String orderClause) throws SQLException{
 		List<StockTakeDetail> stockTakeDetails = new ArrayList<StockTakeDetail>();
-		String sql = "SELECT M.material_id, M.name, MD.stock FROM " + Params.dbName + ".material as M LEFT JOIN " + Params.dbName + ".material_dept as MD " + 
+		String sql = "SELECT M.material_id, M.name, MD.stock FROM " + Params.dbName + ".material as M JOIN " + Params.dbName + ".material_cate MC ON MC.cate_id = M.cate_id LEFT JOIN " + Params.dbName + ".material_dept as MD " + 
 					" ON M.material_id = MD.material_id AND MD.dept_id = " + deptId + 
 					" WHERE M.restaurant_id = " + term.getRestaurantId() +
-					" AND M.cate_id = " + cateId + 
+					" AND MC.type = " + type + 
+					(cateId != -1?" AND M.cate_id = " + cateId : "") + 
 					(orderClause == null ? "" : orderClause);
 		dbCon.rs = dbCon.stmt.executeQuery(sql);
 		while(dbCon.rs.next()){
