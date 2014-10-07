@@ -104,7 +104,7 @@ public class QueryOrderFromMemberPayAction extends Action{
 					}
 					jm.putJsonable("newOrder", order, 0);
 					if(!coupons.isEmpty()){
-						jm.putJsonableList("coupons", coupons, Coupon.ST_PARCELABLE_SIMPLE);
+						jm.putJsonableList("coupons", coupons, Coupon.COUPON_JSONABLE_SIMPLE);
 					}
 					
 					return jm;

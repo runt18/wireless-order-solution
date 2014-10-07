@@ -190,15 +190,9 @@ public class OperatePromotionAction extends DispatchAction{
 		JObject jobject = new JObject();
 		try{
 			Promotion promo = PromotionDao.getById(staff, Integer.parseInt(promotionId));
-/*			
-			String image = "http://" + getServlet().getInitParameter("oss_bucket_image")
-	        		+ "." + getServlet().getInitParameter("oss_outer_point") 
-	        		+ "/" + staff.getRestaurantId() + "/" + promo.getCouponType().getImage();
-			
-			promo.getCouponType().setImage(image);*/
-			List<Promotion> p_List = new ArrayList<>();
-			p_List.add(promo);
-			jobject.setRoot(p_List);
+			List<Promotion> promotions = new ArrayList<>();
+			promotions.add(promo);
+			jobject.setRoot(promotions);
 		}catch(BusinessException e){
 			e.printStackTrace();
 			jobject.initTip(e);

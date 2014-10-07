@@ -308,9 +308,7 @@ public class WXQueryMemberOperationAction extends DispatchAction{
 	 * @return
 	 * @throws Exception
 	 */
-	public ActionForward hasCouponDetails(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
+	public ActionForward hasCouponDetails(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)	throws Exception {
 		request.setCharacterEncoding("UTF-8");
 		response.setCharacterEncoding("UTF-8");
 		
@@ -329,33 +327,11 @@ public class WXQueryMemberOperationAction extends DispatchAction{
 			//
 			Staff staff = StaffDao.getByRestaurant(dbCon, rid).get(0);
 			
-//			List<CouponType> couponTypeList = CouponTypeDao.get(dbCon, staff);
 			List<Coupon> couponList = CouponDao.getByCond(staff, new CouponDao.ExtraCond().setMember(mid).setStatus(Coupon.Status.DRAWN), null);
-			
-			//获取所有优惠券
-/*			List<Map<String, Object>> root = new ArrayList<Map<String, Object>>(), asItems;
-			Map<String, Object> item = null;
-			for(CouponType listTemp : couponTypeList){
-				item = new HashMap<String, Object>(listTemp.toJsonMap(0));
-				asItems = new ArrayList<Map<String, Object>>();
-				for(Coupon itemTemp : couponList){
-					if(itemTemp.getCouponType().getId() == listTemp.getId()){
-						asItems.add(itemTemp.toJsonMap(0));
-					}
-				}
-				item.put("items", asItems);
-				root.add(item);
+			for(int i = 0; i < couponList.size(); i++){
+				couponList.set(i, CouponDao.getById(dbCon, staff, couponList.get(i).getId()));
 			}
 			
-			jobject.getOther().put("root", root);*/
-/*			for (Coupon temp : couponList) {
-				if(temp.getCouponType().hasImage()){
-					temp.getCouponType().setImage(("http://" + OSSUtil.BUCKET_IMAGE + "." + OSSParams.instance().OSS_OUTER_POINT + "/" + temp.getRestaurantId() + "/" + temp.getCouponType().getImage()));
-				}else{
-					temp.getCouponType().setImage(imageBrowseDefaultFile);
-				}
-			}
-*/			
 			jobject.setRoot(couponList);
 		}catch(BusinessException e){	
 			e.printStackTrace();
@@ -364,8 +340,10 @@ public class WXQueryMemberOperationAction extends DispatchAction{
 			e.printStackTrace();
 			jobject.initTip(e);
 		}finally{
-			if(dbCon != null) dbCon.disconnect();
-			response.getWriter().print(jobject.toString(Coupon.ST_PARCELABLE_COMPLEX));
+			if(dbCon != null){
+				dbCon.disconnect();
+			}
+			response.getWriter().print(jobject.toString(Coupon.COUPON_JSONABLE_COMPLEX));
 		}
 		
 		return null;
