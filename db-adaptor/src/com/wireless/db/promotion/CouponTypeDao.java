@@ -223,7 +223,7 @@ public class CouponTypeDao {
 		}
 	}
 	/**
-	 * Delete the coupon type and associated coupon to specific id.
+	 * Delete the coupon type to specific id.
 	 * @param dbCon
 	 * 			the database connection
 	 * @param staff
@@ -236,9 +236,6 @@ public class CouponTypeDao {
 	 * 			throws if the coupon type to delete does NOT exist
 	 */
 	public static void delete(DBCon dbCon, Staff staff, int couponTypeId) throws SQLException, BusinessException{
-		
-		//Delete the associated coupon.
-		CouponDao.delete(dbCon, staff, new CouponDao.ExtraCond().setCouponType(couponTypeId));
 		
 		//Delete the associated coupon type image.
 		OssImageDao.delete(dbCon, staff, new OssImageDao.ExtraCond().setAssociated(OssImage.Type.WX_COUPON_TYPE, couponTypeId));

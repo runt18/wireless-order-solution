@@ -157,7 +157,9 @@ public class WeixinRestaurantDao {
 			throw new BusinessException(WeixinRestaurantError.WEIXIN_RESTAURANT_NOT_EXIST);
 		}else{
 			WeixinRestaurant wr = result.get(0);
-			wr.setWeixinLogo(OssImageDao.getById(dbCon, staff, wr.getWeixinLogo().getId()));
+			if(wr.hasWeixinLogo()){
+				wr.setWeixinLogo(OssImageDao.getById(dbCon, staff, wr.getWeixinLogo().getId()));
+			}
 			return wr;
 		}
 	}
@@ -186,7 +188,9 @@ public class WeixinRestaurantDao {
 				wr.setWeixinInfo(new StringHtml(info, StringHtml.ConvertTo.TO_HTML).toString());
 			}
 			wr.setWeixinSerial(dbCon.rs.getString("weixin_serial"));
-			wr.setWeixinLogo(new OssImage(dbCon.rs.getInt("weixin_logo")));
+			if(dbCon.rs.getInt("weixin_logo") != 0){
+				wr.setWeixinLogo(new OssImage(dbCon.rs.getInt("weixin_logo")));
+			}
 			result.add(wr);
 		}
 		dbCon.rs.close();

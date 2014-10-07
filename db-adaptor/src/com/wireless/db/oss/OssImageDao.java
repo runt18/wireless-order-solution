@@ -31,6 +31,7 @@ public class OssImageDao {
 		private int associatedId;
 		private String associatedSerial;
 		private OssImage.Type type;
+		private OssImage.Status status;
 		
 		public ExtraCond setId(int id){
 			this.id = id;
@@ -51,6 +52,11 @@ public class OssImageDao {
 			return this;
 		}
 		
+		public ExtraCond setStatus(OssImage.Status status){
+			this.status = status;
+			return this;
+		}
+		
 		@Override
 		public String toString(){
 			StringBuilder extraCond = new StringBuilder();
@@ -65,6 +71,9 @@ public class OssImageDao {
 			}
 			if(type != null){
 				extraCond.append(" AND type = " + type.getVal());
+			}
+			if(status != null){
+				extraCond.append(" AND status = " + status.getVal());
 			}
 			return extraCond.toString();
 		}
@@ -486,7 +495,7 @@ public class OssImageDao {
     	sql = " SELECT oss_image_id, restaurant_id, image, type, associated_id, associated_serial, status, last_modified, oss_thumbnail_id FROM " +
     		  Params.dbName + ".oss_image" +
     		  " WHERE 1 = 1 " +
-    		  " AND restaurant_id = " + staff.getRestaurantId() +
+    		  (staff != null ? " AND restaurant_id = " + staff.getRestaurantId() : "") +
     		  (extraCond != null ? extraCond.toString() : "");
     	dbCon.rs = dbCon.stmt.executeQuery(sql);
     	
@@ -555,8 +564,10 @@ public class OssImageDao {
      * @throws BusinessException 
      * 			throws if the any associated thumb nail does NOT exist 
      */
-    public static void delete(DBCon dbCon, Staff staff, ExtraCond extraCond) throws SQLException, BusinessException{
+    public static int delete(DBCon dbCon, Staff staff, ExtraCond extraCond) throws SQLException, BusinessException{
+    	int amount = 0;
     	for(OssImage ossImage : getByCond(dbCon, staff, extraCond)){
+    		amount++;
     		String sql;
     		
     		OSSClient ossClient = new OSSClient("http://" + OssImage.Params.instance().getOssParam().OSS_INNER_POINT, 
@@ -574,6 +585,39 @@ public class OssImageDao {
     		ossClient.deleteObject(OssImage.Params.instance().getBucket(), ossImage.getObjectKey());
     		sql = " DELETE FROM " + Params.dbName + ".oss_image WHERE oss_image_id = " + ossImage.getId();
     		dbCon.stmt.executeUpdate(sql);
+    	}
+    	return amount;
+    }
+    
+    public static class Result{
+    	private final int amount;
+    	private final int elapsed;
+    	Result(int amount, int elapsed){
+    		this.amount = amount;
+    		this.elapsed = elapsed;
+    	}
+    	@Override
+    	public String toString(){
+    		return "remove " + amount + " single oss image(s) takes " + elapsed + " sec.";
+    	}
+    }
+    
+    /**
+     * Clean the oss image whose status belong to 'SINGLE'.
+     * @return the amount to oss image to be clean up
+     * @throws SQLException
+     * 			throws if failed to execute any SQL statement
+     * @throws BusinessException 
+     * 			throws if the any associated thumb nail does NOT exist 
+     */
+    public static Result cleanup() throws SQLException, BusinessException{
+    	DBCon dbCon = new DBCon();
+    	try{
+    		long beginTime = System.currentTimeMillis();
+    		dbCon.connect();
+    		return new Result(delete(dbCon, null, new ExtraCond().setStatus(OssImage.Status.SINGLE)), (int)(System.currentTimeMillis() - beginTime) / 1000);
+    	}finally{
+    		dbCon.disconnect();
     	}
     }
     

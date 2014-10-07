@@ -35,6 +35,11 @@ public class TestOssImage {
 	}
 	
 	@Test
+	public void testOssCleanup() throws SQLException, BusinessException{
+		System.out.println(OssImageDao.cleanup());
+	}
+	
+	@Test
 	public void testOssImageDao() throws SQLException, BusinessException, IOException{
 		OSSClient ossClient = new OSSClient("http://" + OssImage.Params.instance().getOssParam().OSS_INNER_POINT, 
 			    							OssImage.Params.instance().getOssParam().ACCESS_OSS_ID, 

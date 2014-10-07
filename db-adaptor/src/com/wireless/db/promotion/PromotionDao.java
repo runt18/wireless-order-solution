@@ -505,11 +505,11 @@ public class PromotionDao {
 			throw new BusinessException(PromotionError.PROMOTION_NOT_EXIST);
 		}
 		
-		//Update the coupon status to be finish.
+		//Update the coupon status to be finish except the drawn.
 		sql = " UPDATE " + Params.dbName + ".coupon SET " +
 			  " status = " + Coupon.Status.FINISH.getVal() +
-			  " WHERE promotion_id = " + promotionId;
-		
+			  " WHERE promotion_id = " + promotionId + 
+ 			  " AND status <> " + Coupon.Status.DRAWN.getVal();		
 		return dbCon.stmt.executeUpdate(sql);
 	}
 	
@@ -699,9 +699,11 @@ public class PromotionDao {
 	public static void delete(DBCon dbCon, Staff staff, int promotionId) throws SQLException, BusinessException{
 		Promotion promotion = getById(dbCon, staff, promotionId);
 		if(promotion.getStatus() == Promotion.Status.CREATED || promotion.getStatus() == Promotion.Status.FINISH){
-			//Delete the associated coupon type & coupons.
-			CouponTypeDao.delete(dbCon, staff, promotion.getCouponType().getId());
-
+			
+			if(!CouponDao.getByCond(dbCon, staff, new CouponDao.ExtraCond().setPromotion(promotion).setStatus(Coupon.Status.DRAWN), null).isEmpty()){
+				throw new BusinessException("还有【" + promotion.getType() + "】活动的优惠券在使用，请在此活动发放的优惠券全部使用或过期后，再删除活动", PromotionError.PROMOTION_DELETE_NOT_ALLOW);
+			}
+			
 			//Delete the associated oss image to this promotion
 			OssImageDao.delete(dbCon, staff, new OssImageDao.ExtraCond().setAssociated(OssImage.Type.WX_PROMOTION, promotion.getId()));
 			
@@ -710,7 +712,14 @@ public class PromotionDao {
 				OssImageDao.delete(dbCon, staff, new OssImageDao.ExtraCond().setId(promotion.getImage().getId()));
 			}
 			
+			//Delete the associated coupon type.
+			CouponTypeDao.delete(dbCon, staff, promotion.getCouponType().getId());
+			
+			//Delete the associated coupons.
 			String sql;
+			sql = " DELETE FROM " + Params.dbName + ".coupon WHERE promotion_id = " + promotionId;
+			dbCon.stmt.executeUpdate(sql);
+			
 			//Delete the promotion.
 			sql = " DELETE FROM " + Params.dbName + ".promotion WHERE promotion_id = " + promotionId;
 			if(dbCon.stmt.executeUpdate(sql) == 0){
@@ -781,7 +790,7 @@ public class PromotionDao {
 			int nPromotionFinished = dbCon.stmt.executeUpdate(sql);
 			
 			//Update the coupon to be expired if the coupon has been drawn and exceeded now.
-			sql = " SELECT coupon_type_id FROM " + Params.dbName + ".coupon_type WHERE expired > NOW() ";
+			sql = " SELECT coupon_type_id FROM " + Params.dbName + ".coupon_type WHERE NOW() > expired ";
 			sql = " UPDATE " + Params.dbName + ".coupon SET " +
 				  " status = " + Coupon.Status.EXPIRED.getVal() +
 				  " WHERE status = " + Coupon.Status.DRAWN.getVal() +
