@@ -504,7 +504,7 @@ public class StockTake implements Jsonable {
 		jm.putInt("approverId", this.approverId);
 		jm.putString("approver", this.approver);
 		jm.putString("finishDateFormat", DateUtil.format(this.finishDate));
-		if(this.materialCate != null && this.materialCate.getId() > 0){
+		if(this.materialCate != null){
 			jm.putJsonable("materialCate", this.materialCate, 0);			
 		}
 		jm.putString("comment", this.comment);
