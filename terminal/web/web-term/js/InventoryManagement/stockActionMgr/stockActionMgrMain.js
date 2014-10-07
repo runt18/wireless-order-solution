@@ -107,6 +107,9 @@ function stockTaskNavHandler(e){
 					deptInDom.show();
 					supplierDom.show();
 					deptOutDom.hide();
+					if(document.getElementById('displayPanelForDeptIn')){
+						document.getElementById('displayPanelForDeptIn').style.display = 'block';
+					}
 				}else if(stockSubType == 2){
 					// 调拨
 					if(stockCate == 1){
@@ -171,9 +174,14 @@ function stockTaskNavHandler(e){
 					}
 					Ext.getDom('txtActualPrice').disabled = false;
 					// 控制选择货仓
+					
+					deptOutDom.show();
 					deptInDom.hide();
 					supplierDom.show();
-					deptOutDom.show();
+					if(document.getElementById('displayPanelForDeptOut')){
+						document.getElementById('displayPanelForDeptOut').style.display = 'block';
+					}					
+					
 				}else if(stockSubType == 5){
 					// 调拨
 					if(stockCate == 1){
@@ -238,6 +246,7 @@ function stockTaskNavHandler(e){
 
 				}
 			}
+			secondStepPanelNorth.doLayout();
 			if(stockTaskNavWin.otype != Ext.ux.otype['insert']){
 				var sn = Ext.getCmp('stockBasicGrid').getSelectionModel().getSelected();
 				document.getElementById('stockActionTitle').innerHTML = diaplayTitle + '<label style="margin-left:50px">库单编号: ' + sn.data.id + '</label>';
@@ -1425,7 +1434,7 @@ function initControl(){
 	        }]
 	    });
 	}
-	var secondStepPanelNorth = null;
+	
 	if(!secondStepPanelNorth){
 		secondStepPanelNorth = new Ext.Panel({
 			title : '货单基础信息',
