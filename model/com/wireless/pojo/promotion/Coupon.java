@@ -13,9 +13,6 @@ import com.wireless.pojo.util.SortedList;
 
 public class Coupon implements Jsonable{
 
-	public final static byte ST_PARCELABLE_COMPLEX = 0;
-	public final static byte ST_PARCELABLE_SIMPLE = 1;	
-	
 	public static class CreateBuilder{
 		private final int couponTypeId;
 		private final int promotionId;
@@ -323,22 +320,27 @@ public class Coupon implements Jsonable{
 				(couponType != null ? ",type = " + couponType + "" : "") + ")";
 	}
 
+	public final static byte COUPON_JSONABLE_COMPLEX = 0;
+	public final static byte COUPON_JSONABLE_SIMPLE = 1;	
+	
 	@Override
 	public JsonMap toJsonMap(int flag) {
 		JsonMap jm = new JsonMap();
 		jm.putJsonable("member", this.member, 0);
 		jm.putInt("couponId", this.id);
 		jm.putInt("restaurantId", this.restaurantId);
-		jm.putJsonable("couponType", this.couponType, 0);
 		jm.putString("orderId", this.orderId == 0 ? "----" : Integer.toString(this.orderId));
 		jm.putString("orderDate", DateUtil.formatToDate(this.getOrderDate()));
 		jm.putString("statusText", this.status.desc);
 		jm.putInt("statusValue", this.status.val);
 		jm.putString("birthDate", DateUtil.formatToDate(this.getBirthDate()));
 		
-		if(flag == ST_PARCELABLE_COMPLEX){
+		if(flag == COUPON_JSONABLE_COMPLEX){
 			jm.putJsonable("promotion", this.promotion, 0);
 			jm.putJsonable("drawProgress", getDrawProgress(), 0);			
+			jm.putJsonable("couponType", this.couponType, CouponType.COUPON_TYPE_JSONABLE_COMPLEX);
+		}else{
+			jm.putJsonable("couponType", this.couponType, CouponType.COUPON_TYPE_JSONABLE_SIMPLE);
 		}
 
 		return jm;

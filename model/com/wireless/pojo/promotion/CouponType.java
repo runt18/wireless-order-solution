@@ -261,6 +261,9 @@ public class CouponType implements Jsonable{
 		return "coupon type(id = " + getId() + ",name = " + getName() + ")";
 	}
 
+	public final static byte COUPON_TYPE_JSONABLE_COMPLEX = 0;
+	public final static byte COUPON_TYPE_JSONABLE_SIMPLE = 1;
+	
 	@Override
 	public JsonMap toJsonMap(int flag) {
 		JsonMap jm = new JsonMap();
@@ -270,7 +273,9 @@ public class CouponType implements Jsonable{
 		jm.putFloat("price", this.price);
 		jm.putFloat("expired", this.expired);
 		jm.putString("expiredFormat", DateUtil.formatToDate(this.expired));
-		jm.putJsonable("ossImage", this.image, 0);
+		if(flag == COUPON_TYPE_JSONABLE_COMPLEX){
+			jm.putJsonable("ossImage", this.image, 0);
+		}
 		return jm;
 	}
 
