@@ -63,7 +63,7 @@ public class QueryMaterialAction extends DispatchAction{
 			if(name != null && !name.trim().isEmpty()){
 				extra += (" AND M.name like '%" + name + "%' ");
 			}
-			if(cateId != null && !cateId.trim().isEmpty()){
+			if(cateId != null && !cateId.trim().isEmpty() && !cateId.equals("-1")){
 				extra += (" AND MC.cate_id = " + cateId);
 			}
 			if(materialId != null && !materialId.trim().isEmpty()){
@@ -206,8 +206,9 @@ public class QueryMaterialAction extends DispatchAction{
 			Staff staff = StaffDao.verify(Integer.parseInt(pin));
 			String cateId = request.getParameter("cateId");
 			String deptId = request.getParameter("deptId");
+			String cateType = request.getParameter("cateType");
 			if(cateId != null && !cateId.trim().isEmpty() && deptId != null){
-				root = MaterialDeptDao.getStockTakeDetails(staff, Integer.parseInt(deptId), Integer.parseInt(cateId), " ORDER BY MD.stock DESC");
+				root = MaterialDeptDao.getStockTakeDetails(staff, Integer.parseInt(deptId), Integer.parseInt(cateType), Integer.parseInt(cateId), " ORDER BY MD.stock DESC");
 			}
 		}catch(BusinessException e){
 			jobject.initTip(e);
