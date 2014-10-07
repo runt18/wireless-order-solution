@@ -8,8 +8,15 @@ import java.text.SimpleDateFormat;
 
 import org.tiling.scheduling.SchedulerTask;
 
+import com.wireless.db.client.member.MemberDao;
+import com.wireless.db.foodAssociation.CalcFoodAssociationDao;
+import com.wireless.db.foodStatistics.CalcFoodStatisticsDao;
 import com.wireless.db.frontBusiness.DailySettleDao;
+import com.wireless.db.oss.OssImageDao;
 import com.wireless.db.promotion.PromotionDao;
+import com.wireless.db.restaurantMgr.RestaurantDao;
+import com.wireless.db.sms.VerifySMSDao;
+import com.wireless.db.tasteRef.TasteRefDao;
 import com.wireless.exception.BusinessException;
 import com.wireless.server.PrinterLosses;
 
@@ -31,32 +38,35 @@ public class DailySettlementTask extends SchedulerTask{
 			//Clean up the unprinted records
 			PrinterLosses.instance().clear();
 
-//			//Clean up all the verification SMS record
-//			taskInfo.append("info : " + VerifySMSDao.deleteAll() + " verification SMS record(s) are removed.").append(sep);
-//			
+			//Clean up all the verification SMS record
+			taskInfo.append("info : " + VerifySMSDao.deleteAll() + " verification SMS record(s) are removed.").append(sep);
+			
 			//Perform daily settlement.
 			taskInfo.append(DailySettleDao.exec()).append(sep);
-//			
-//			//Perform to smart taste calculation.
-//			taskInfo.append("info : " + TasteRefDao.exec()).append(sep);
-//			
-//			//Perform to food association.
-//			taskInfo.append("info : " + CalcFoodAssociationDao.exec()).append(sep);
-//			
-//			//Perform to calculate food statistics.
-//			taskInfo.append("info : " + CalcFoodStatisticsDao.exec()).append(sep);
-//			
-//			//Perform to calculate restaurant liveness.
-//			taskInfo.append("info : " + RestaurantDao.calcLiveness()).append(sep);
-//			
-//			//Perform to calculate member favor foods.
-//			taskInfo.append("info : " + MemberDao.calcFavorFoods()).append(sep);
-//			
-//			//Perform to calculate member recommended foods.
-//			taskInfo.append("info : " + MemberDao.calcRecommendFoods()).append(sep);
+			
+			//Perform to smart taste calculation.
+			taskInfo.append("info : " + TasteRefDao.exec()).append(sep);
+			
+			//Perform to food association.
+			taskInfo.append("info : " + CalcFoodAssociationDao.exec()).append(sep);
+			
+			//Perform to calculate food statistics.
+			taskInfo.append("info : " + CalcFoodStatisticsDao.exec()).append(sep);
+			
+			//Perform to calculate restaurant liveness.
+			taskInfo.append("info : " + RestaurantDao.calcLiveness()).append(sep);
+			
+			//Perform to calculate member favor foods.
+			taskInfo.append("info : " + MemberDao.calcFavorFoods()).append(sep);
+			
+			//Perform to calculate member recommended foods.
+			taskInfo.append("info : " + MemberDao.calcRecommendFoods()).append(sep);
 			
 			//Perform to calculate the promotion and coupon status.
 			taskInfo.append("info : " + PromotionDao.calcStatus()).append(sep);
+			
+			//Perform to cleanup the single oss images
+			taskInfo.append("info : " + OssImageDao.cleanup()).append(sep);
 			
 		}catch(SQLException | BusinessException e){
 			taskInfo.append("error : " + e.getMessage()).append(sep);
