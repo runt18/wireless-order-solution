@@ -60,7 +60,19 @@ var materialStore = new Ext.data.Store({
 	         {name : 'cateName'},
 	         {name : 'name'},
 	         {name : 'pinyin'}
-	])
+	]),
+	listeners : {
+		load : function(thiz, records, ops){
+			var PersonRecord = Ext.data.Record.create([
+		         {name : 'id'},
+		         {name : 'cateName'},
+		         {name : 'name'},
+		         {name : 'pinyin'}				
+			]);
+			var newRecord= new PersonRecord({cateName: "货品",id: -1,name: "全部",pinyin: "QB"});   
+			thiz.insert(0,newRecord); 
+		}
+	}
 });
 materialStore.load({  
     params: { 
@@ -316,9 +328,6 @@ Ext.onReady(function(){
 			click : function(e){
 				//var node = this.getSelectionModel().getSelectedNode();
 				Ext.getDom('cateTypeValue').innerHTML = e.text;
-
-			},
-			dblclick : function(e){
 				Ext.getCmp('btnSearch').handler();
 				var cateType = '', cateId = '';
 				var rn = stockReportTree.getSelectionModel().getSelectedNode();

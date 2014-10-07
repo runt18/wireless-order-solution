@@ -495,10 +495,7 @@ Ext.onReady(function(){
 			click : function(e){
 				//var node = this.getSelectionModel().getSelectedNode();
 				Ext.getDom('dept').innerHTML = e.text;
-			},
-			dblclick : function(){
 				Ext.getCmp('btnSearch').handler();
-				
 			}
 		},
 		tbar :	[

@@ -928,7 +928,7 @@ function initControl(){
 			id : 'comboSearchForStockType',
 			readOnly : false,
 			forceSelection : true,
-			width : 100,
+			width : 60,
 			value : 1,
 			store : new Ext.data.SimpleStore({
 				data : winParams.st,
@@ -962,7 +962,7 @@ function initControl(){
 			id : 'sam_comboSearchForSubType',
 			readOnly : false,
 			forceSelection : true,
-			width : 100,
+			width : 90,
 			value : 1,
 			store : new Ext.data.SimpleStore({
 				data : stockInDate,
@@ -987,7 +987,7 @@ function initControl(){
 			id : 'sam_comboSearchForCateType',
 			readOnly : false,
 			forceSelection : true,
-			width : 100,
+			width : 60,
 			value : -1,
 			store : new Ext.data.SimpleStore({
 				data : winParams.cate,
@@ -1061,7 +1061,7 @@ function initControl(){
 			id : 'sam_comboSearchForStockStatus',
 			readOnly : false,
 			forceSelection : true,
-			width : 100,
+			width : 80,
 			value : -1,
 			store : new Ext.data.SimpleStore({
 				data : [[-1, '全部'], [1, '未审核'], [2, '审核通过'], [3, ' 冲红']],
@@ -1128,7 +1128,7 @@ function initControl(){
 		}, {
 			xtype : 'textfield',
 			id : 'comboSearchForOriStockId',
-			width : 100
+			width : 80
 		}, '->', {
 			text : '重置',
 			id : 'btnReload',

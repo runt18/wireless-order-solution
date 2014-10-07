@@ -610,8 +610,17 @@ function initWin(){
 	    				listeners : {
 	    					load : function(thiz, records, opts){
 	    						if(records.length > 0){
-	    							stockTakeWin.cateId = records[0].get('id');
-	    							Ext.getCmp('comboMaterialCateId').setValue(records[0].get('id'));
+									var PersonRecord = Ext.data.Record.create([
+								         {name : 'id'},
+								         {name : 'typeValue'},
+								         {name : 'name'},
+								         {name : 'rid'}				
+									]);
+									var newRecord= new PersonRecord({typeValue: -1,id: -1,name: "全部",rid: -1});   
+									thiz.insert(0,newRecord); 	    							
+	    							
+	    							stockTakeWin.cateId = -1;
+	    							Ext.getCmp('comboMaterialCateId').setValue(-1);
 	    							
 	    							if(!stockTakeWin.otype == Ext.ux.otype['update']){
 										//触发小类别变动
@@ -619,6 +628,7 @@ function initWin(){
 	    							}
  							
 	    						}
+	    						
 	    					}
 	    				}
     				}),
@@ -1047,7 +1057,7 @@ function checkTakeContentChange(type, e){
 		if(content.cateType == ''){
 			content.cateType = e.getValue();
 			
-			cateId.setValue();
+//			cateId.setValue();
 			cateId.store.baseParams['type'] = e.getValue();
 			cateId.store.load();
 		}else{
@@ -1060,12 +1070,15 @@ function checkTakeContentChange(type, e){
 						fn : function(btn){
 							if(btn == 'yes'){
 								detailStore.removeAll();
+								loadOperateMaterial({selectType : 0});
 								
 								content.cateType = e.getValue();
 								content.cateId = '';
-								cateId.setValue();
+//								cateId.setValue();
 								cateId.store.baseParams['type'] = e.getValue();
 								cateId.store.load();
+								
+								
 							}else{
 								e.setValue(content.cateType);
 							}
@@ -1121,16 +1134,20 @@ function loadOperateMaterial(c){
 		mstore.load();*/
 	}else{
 		var content = stockTakeWin.takeContent;
-	
-		if((content.dept >= 0 || content.dept != '') && content.cateId != ''){
+		if((content.dept >= 0 || content.dept != '') && Ext.getCmp('comboMaterialCate').getValue() != ''){
 			mstore.baseParams['deptId'] = content.dept;
-			mstore.baseParams['cateId'] = content.cateId;
+			mstore.baseParams['cateId'] = content.cateId?content.cateId:-1;
+			mstore.baseParams['cateType'] = Ext.getCmp('comboMaterialCate').getValue();
 			mstore.load();
 			
 			//解决货物小类第一次打开不加载值的问题
 			mstore.on('load', function(){
 				Ext.getCmp('comboMaterialCateId').setValue(stockTakeWin.cateId);
 			});
+			
+			if(!stockTakeWin.takeContent.cateType){
+				stockTakeWin.takeContent.cateType = Ext.getCmp('comboMaterialCate').getValue();
+			}
 		}else{
 			mstore.removeAll();
 		}

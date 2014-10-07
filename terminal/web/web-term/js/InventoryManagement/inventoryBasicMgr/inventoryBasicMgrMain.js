@@ -441,11 +441,9 @@ function operateMaterialHandler(c){
 		operateMaterialWin.setTitle('');
 		materialName.show();
 		materialCate.show();
-		materialName.getEl().up('.x-form-item').setDisplayed(true);
-		materialCate.getEl().up('.x-form-item').setDisplayed(true);		
 		
 		var node = materialCateTree.getSelectionModel().getSelectedNode();
-		if(node && typeof node.attributes.cateId != 'undefined' && node.attributes.cateId != -1) {
+		if(node && typeof node.attributes.cateId != 'undefined' && node.attributes.cateId != -1 && node.attributes.type != 1) {
 			materialCate.setValue(node.attributes.cateId);
 		}
 		
@@ -466,8 +464,6 @@ function operateMaterialHandler(c){
 		
 		if(data['cateType'] == 1){
 			Ext.getCmp('txtMaterialCate').store.loadData(materialGoodCateData);
-			operateMaterialWin.setTitle('商品名称');
-			operateMaterialWin.cateId = data['cateId'];
 			materialId.setValue(data['id']);
 			materialName.setValue(data['name']);
 			materialPrice.setValue(data['price']);
@@ -476,7 +472,6 @@ function operateMaterialHandler(c){
 			materialPrice.focus(true, 100);
 		}else{
 			Ext.getCmp('txtMaterialCate').store.loadData(materialCateData);
-			operateMaterialWin.setTitle('');
 			materialId.setValue(data['id']);
 			materialName.setValue(data['name']);
 			materialCate.setValue(data['cateId']);	
@@ -484,6 +479,7 @@ function operateMaterialHandler(c){
 			
 			materialName.focus(true, 100);
 		}
+		operateMaterialWin.cateId = data['cateId'];
 		
 		operateMaterialWin.center();		
 		
@@ -599,9 +595,6 @@ function initControl(){
 								}
 								
 							}
-							
-							console.log(materialCateData)
-							console.log(materialGoodCateData)
 						},
 						failure : function(res, opt){
 							Ext.ux.showMsg(Ext.decode(res.responseText));
