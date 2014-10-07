@@ -243,6 +243,8 @@ function fnCancelPublishPromotion(){
 			if(jr.success){
 				Ext.example.msg(jr.title, jr.msg);
 				promotionTree.getRootNode().reload();
+			}else{
+				Ext.ux.showMsg(jr);
 			}
 		},
 		failure : function(res, opt){
@@ -270,6 +272,8 @@ function fnDeletePromotionPromotion(){
 						if(jr.success){
 							Ext.example.msg(jr.title, jr.msg);
 							promotionTree.getRootNode().reload();
+						}else{
+							Ext.ux.showMsg(jr);
 						}
 					},
 					failure : function(res, opt){
@@ -301,6 +305,8 @@ function fnFinishPromotion(){
 						if(jr.success){
 							Ext.example.msg(jr.title, jr.msg);
 							promotionTree.getRootNode().reload();
+						}else{
+							Ext.ux.showMsg(jr);
 						}
 					},
 					failure : function(res, opt){
