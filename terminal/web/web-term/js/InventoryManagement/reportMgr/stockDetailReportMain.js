@@ -137,13 +137,13 @@ var materialTypeComb = new Ext.form.ComboBox({
         	materialCateComb.reset();
         	materialComb.allowBlank = true;
         	materialComb.reset();
-        	materialCateStore.load({  
+        	sDetail_materialCateStore.load({  
 	            params: {  
 	            	type : combo.value,  
 	            	dataSource : 'normal'
 	            }  
             });     
-        	materialStore.load({
+        	sDetail_materialStore.load({
         		params: {
         			cateType : combo.value,
         			dataSource : 'normal'
@@ -153,7 +153,7 @@ var materialTypeComb = new Ext.form.ComboBox({
 	}
 	
 });
-var materialCateStore = new Ext.data.Store({
+var sDetail_materialCateStore = new Ext.data.Store({
 	//proxy : new Ext.data.MemoryProxy(data),
 	proxy : new Ext.data.HttpProxy({url:'../../QueryMaterialCate.do?restaurantID=' + restaurantID}),
 	reader : new Ext.data.JsonReader({totalProperty:'totalProperty', root : 'root'}, [
@@ -161,7 +161,7 @@ var materialCateStore = new Ext.data.Store({
 	         {name : 'name'}
 	])
 });
-materialCateStore.load({  
+sDetail_materialCateStore.load({  
     params: {  
     	type : materialTypeComb.value,  
     	dataSource : 'normal'
@@ -171,7 +171,7 @@ var materialCateComb = new Ext.form.ComboBox({
 	forceSelection : true,
 	width : 90,
 	id : 'materialCate',
-	store : materialCateStore,
+	store : sDetail_materialCateStore,
 	valueField : 'id',
 	displayField : 'name',
 	typeAhead : true,
@@ -184,7 +184,7 @@ var materialCateComb = new Ext.form.ComboBox({
         select : function(combo, record, index){ 
         	materialComb.allowBlank = true;
         	materialComb.reset();
-        	materialStore.load({  
+        	sDetail_materialStore.load({  
 	            params: {  
 	            	cateType : materialTypeComb.value,
 	            	cateId : combo.value,  
@@ -196,7 +196,7 @@ var materialCateComb = new Ext.form.ComboBox({
 	}
 	
 });
-var materialStore = new Ext.data.Store({
+var sDetail_materialStore = new Ext.data.Store({
 	//proxy : new Ext.data.MemoryProxy(data),
 	proxy : new Ext.data.HttpProxy({url:'../../QueryMaterial.do?restaurantID=' + restaurantID}),
 	reader : new Ext.data.JsonReader({totalProperty:'totalProperty', root : 'root'}, [
@@ -205,7 +205,7 @@ var materialStore = new Ext.data.Store({
          {name : 'pinyin'}
 	])
 });
-materialStore.load({  
+sDetail_materialStore.load({  
     params: { 
     	cateType : materialTypeComb.value,
     	dataSource : 'normal'
@@ -217,7 +217,7 @@ var materialComb = new Ext.form.ComboBox({
 	listWidth : 250,
 	maxheight : 300,
 	id : 'materialId',
-	store : materialStore,
+	store : sDetail_materialStore,
 	valueField : 'id',
 	displayField : 'name',
 	typeAhead : true,

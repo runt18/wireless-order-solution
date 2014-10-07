@@ -19,16 +19,16 @@ var materialTypeComb = new Ext.form.ComboBox({
         select : function(combo, record, index){ 
         	
         	drm_materialCateComb.reset();
-        	materialComb.allowBlank = true;
-        	materialComb.reset();
-        	materialCateStore.load({  
+        	sDelta_materialComb.allowBlank = true;
+        	sDelta_materialComb.reset();
+        	sDelta_materialCateStore.load({  
 	            params: {  
 	            	type : combo.value,  
 	            	dataSource : 'normal'
 	            }  
             });     
             
-        	materialStore.load({
+        	sDelta_materialStore.load({
         		params: {
         			cateType : combo.value,
         			dataSource : 'normal'
@@ -40,7 +40,7 @@ var materialTypeComb = new Ext.form.ComboBox({
 });
 
 
-var materialCateStore = new Ext.data.Store({
+var sDelta_materialCateStore = new Ext.data.Store({
 	//proxy : new Ext.data.MemoryProxy(data),
 	proxy : new Ext.data.HttpProxy({url:'../../QueryMaterialCate.do?restaurantID=' + restaurantID}),
 	reader : new Ext.data.JsonReader({totalProperty:'totalProperty', root : 'root'}, [
@@ -48,7 +48,7 @@ var materialCateStore = new Ext.data.Store({
 	         {name : 'name'}
 	])
 });
-materialCateStore.load({  
+sDelta_materialCateStore.load({  
     params: {  
     	type : materialTypeComb.value,  
     	dataSource : 'normal'
@@ -58,7 +58,7 @@ var drm_materialCateComb = new Ext.form.ComboBox({
 	forceSelection : true,
 	width : 90,
 	id : 'drm_comboMaterialCate',
-	store : materialCateStore,
+	store : sDelta_materialCateStore,
 	valueField : 'id',
 	displayField : 'name',
 	typeAhead : true,
@@ -69,9 +69,9 @@ var drm_materialCateComb = new Ext.form.ComboBox({
 	readOnly : false,
 	listeners : {
         select : function(combo, record, index){ 
-        	materialComb.allowBlank = true;
-        	materialComb.reset();
-        	materialStore.load({  
+        	sDelta_materialComb.allowBlank = true;
+        	sDelta_materialComb.reset();
+        	sDelta_materialStore.load({  
 	            params: {  
 	            	cateType : materialTypeComb.value,
 	            	cateId : combo.value,  
@@ -86,7 +86,7 @@ var drm_materialCateComb = new Ext.form.ComboBox({
 
 
 
-var materialStore = new Ext.data.Store({
+var sDelta_materialStore = new Ext.data.Store({
 	//proxy : new Ext.data.MemoryProxy(data),
 	proxy : new Ext.data.HttpProxy({url:'../../QueryMaterial.do?restaurantID=' + restaurantID}),
 	reader : new Ext.data.JsonReader({totalProperty:'totalProperty', root : 'root'}, [
@@ -95,19 +95,19 @@ var materialStore = new Ext.data.Store({
          {name : 'pinyin'}
 	])
 });
-materialStore.load({  
+sDelta_materialStore.load({  
     params: { 
     	cateType : materialTypeComb.value,
     	dataSource : 'normal'
     }  
 }); 
-var materialComb = new Ext.form.ComboBox({
+var sDelta_materialComb = new Ext.form.ComboBox({
 	forceSelection : true,
 	width : 100,
 	listWidth : 250,
 	maxheight : 300,
 	id : 'drm_comboMaterial',
-	store : materialStore,
+	store : sDelta_materialStore,
 	valueField : 'id',
 	displayField : 'name',
 	typeAhead : true,
@@ -203,7 +203,7 @@ Ext.onReady(function(){
 		{xtype : 'tbtext', text : '类别:'},
 		drm_materialCateComb,
 		{xtype : 'tbtext', text : '货品:'},
-		materialComb,
+		sDelta_materialComb,
 		'->', {
 			text : '搜索',
 			id : 'btnSearch',
