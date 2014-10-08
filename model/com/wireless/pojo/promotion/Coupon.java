@@ -16,29 +16,31 @@ public class Coupon implements Jsonable{
 	public static class CreateBuilder{
 		private final int couponTypeId;
 		private final int promotionId;
-		private final List<Integer> members = SortedList.newInstance();
+		private final SortedList<Member> members = SortedList.newInstance();
 		
 		public CreateBuilder(int couponTypeId, int promotionId){
 			this.couponTypeId = couponTypeId;
 			this.promotionId = promotionId;
 		}
 		
-		public CreateBuilder addMemberId(int memberId){
-			if(!members.contains(memberId)){
-				members.add(memberId);
+		public CreateBuilder addMember(int memberId){
+			Member member = new Member(memberId);
+			if(!members.containsElement(member)){
+				members.add(member);
 			}
 			return this;
 		}
 		
-		public CreateBuilder setMembers(List<Integer> members){
+		public CreateBuilder setMembers(List<Member> members){
+			this.members.clear();
 			this.members.addAll(members);
 			return this;
 		}
 		
 		public List<InsertBuilder> build(){
 			List<InsertBuilder> builders = new ArrayList<InsertBuilder>();
-			for(int memberId : members){
-				builders.add(new InsertBuilder(couponTypeId, memberId, promotionId));
+			for(Member member : members){
+				builders.add(new InsertBuilder(couponTypeId, member.getId(), promotionId));
 			}
 			return Collections.unmodifiableList(builders);
 		}

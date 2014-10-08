@@ -6,6 +6,7 @@ import java.util.List;
 import com.wireless.json.JsonMap;
 import com.wireless.json.Jsonable;
 import com.wireless.pojo.billStatistics.DateRange;
+import com.wireless.pojo.client.Member;
 import com.wireless.pojo.oss.OssImage;
 import com.wireless.pojo.util.SortedList;
 
@@ -19,7 +20,7 @@ public class Promotion implements Jsonable{
 		private final Type type;
 		private int point;
 		private final CouponType.InsertBuilder typeBuilder;
-		private final List<Integer> members = SortedList.newInstance();
+		private final SortedList<Member> members = SortedList.newInstance();
 		
 		private CreateBuilder(String title, DateRange range, String body, Type type, CouponType.InsertBuilder typeBuilder, String entire){
 			this.title = title;
@@ -55,13 +56,14 @@ public class Promotion implements Jsonable{
 /*			if(type == Type.DISPLAY_ONLY){
 				throw new IllegalStateException("【" + Type.DISPLAY_ONLY.desc + "】类型的优惠活动不能发放优惠券");
 			}*/
-			if(!members.contains(memberId)){
-				members.add(memberId);
+			Member member = new Member(memberId);
+			if(!members.contains(member)){
+				members.add(member);
 			}
 			return this;
 		}
 		
-		public List<Integer> getMembers(){
+		public List<Member> getMembers(){
 			return Collections.unmodifiableList(members);
 		}
 		
@@ -82,7 +84,7 @@ public class Promotion implements Jsonable{
 		private String entire;
 		private int point = -1;
 		private CouponType.UpdateBuilder typeBuilder;
-		private List<Integer> members;
+		private List<Member> members;
 		
 		public UpdateBuilder(int id){
 			this.id = id;
@@ -129,8 +131,18 @@ public class Promotion implements Jsonable{
 			if(members == null){
 				 members = SortedList.newInstance();
 			}
-			if(!members.contains(memberId)){
-				members.add(memberId);
+			Member member = new Member(memberId);
+			if(!members.contains(member)){
+				members.add(member);
+			}
+			return this;
+		}
+		
+		public UpdateBuilder setAllMember(){
+			if(members == null){
+				members = SortedList.newInstance();
+			}else{
+				members.clear();
 			}
 			return this;
 		}
@@ -139,7 +151,7 @@ public class Promotion implements Jsonable{
 			return members != null;
 		}
 		
-		public List<Integer> getMembers(){
+		public List<Member> getMembers(){
 			if(members != null){
 				return Collections.unmodifiableList(members);
 			}else{
@@ -229,6 +241,41 @@ public class Promotion implements Jsonable{
 		}
 	}
 	
+	public static enum Oriented{
+		ALL(1, "全部会员"),
+		SPECIFIC(2, "特定会员");
+		
+		private final int val;
+		private final String desc;
+		
+		Oriented(int val, String desc){
+			this.val = val;
+			this.desc = desc;
+		}
+		
+		public static Oriented valueOf(int val){
+			for(Oriented oriented : values()){
+				if(oriented.val == val){
+					return oriented;
+				}
+			}
+			throw new IllegalArgumentException("The oriented (val = " + val + ") passed is invalid.");
+		}
+		
+		public int getVal(){
+			return val;
+		}
+		
+		public String getDesc(){
+			return desc;
+		}
+		
+		@Override
+		public String toString(){
+			return this.desc;
+		}
+	}
+	
 	private int id;
 	private int restaurantId;
 	private long createDate;
@@ -239,6 +286,7 @@ public class Promotion implements Jsonable{
 	private CouponType couponType;
 	private Status status = Status.CREATED;
 	private Type type = Type.FREE;
+	private Oriented oriented;
 	private int point;
 	private OssImage image;
 	
@@ -252,6 +300,11 @@ public class Promotion implements Jsonable{
 		this.point = builder.point;
 		if(builder.type != Type.DISPLAY_ONLY){
 			this.couponType = builder.typeBuilder.build();
+		}
+		if(builder.members.isEmpty()){
+			this.oriented = Oriented.ALL;
+		}else{
+			this.oriented = Oriented.SPECIFIC;
 		}
 		this.status = Status.CREATED;
 	}
@@ -273,6 +326,13 @@ public class Promotion implements Jsonable{
 		}
 		if(builder.isCouponTypeChanged()){
 			this.couponType = builder.typeBuilder.build();
+		}
+		if(builder.isMemberChanged()){
+			if(builder.members.isEmpty()){
+				this.oriented = Oriented.ALL;
+			}else{
+				this.oriented = Oriented.SPECIFIC;
+			}
 		}
 	}
 	
@@ -359,6 +419,14 @@ public class Promotion implements Jsonable{
 	
 	public void setType(Type type) {
 		this.type = type;
+	}
+	
+	public Oriented getOriented(){
+		return this.oriented;
+	}
+	
+	public void setOriented(Oriented oriented){
+		this.oriented = oriented;
 	}
 	
 	public CouponType getCouponType(){
