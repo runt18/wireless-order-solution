@@ -585,8 +585,11 @@ Ext.ux.createDateCombo = function(_c){
 					now = new Date(nowYear, nowMonth-1, 1);
 				}else if(record.data.value == 9){//最近半年
 					now.setMonth(now.getMonth()-6);
+				}else if(record.data.value == 10){//无限期
+					now = "";
 				}
 				dateBegin.setValue(now);
+				dateBegin.clearInvalid();
 				if(typeof _c.callback == 'function'){
 					_c.callback();
 				}

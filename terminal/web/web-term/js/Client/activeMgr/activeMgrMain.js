@@ -75,6 +75,8 @@ function initCouponTypeWin(c){
 					
 					operatePromotTypeWin.otype = '';
 					operatePromotTypeWin.pId = '';
+					operatePromotTypeWin.oriented = 1;
+					Ext.getCmp('active_member_btnCommonSearch').handler({noSearch:true});
 					
 					winUnhide = true;
 					
@@ -343,6 +345,13 @@ function operatePromotionData(data){
 		expiredDate.setValue(data.coupon.expiredFormat);
 		Ext.getCmp('couponTypeBox').setImg(data.coupon.ossImage?data.coupon.ossImage.image:'http://digie-image-real.oss.aliyuncs.com/nophoto.jpg');
 	}
+	
+	if(data.oriented == 1){
+		Ext.getCmp('rdoSendAllMember').setValue(true);
+	}else{
+		Ext.getCmp('rdoSendSpecificMember').setValue(true);
+	}
+	operatePromotTypeWin.oriented = data.oriented;
 	
 	if(data.members.length > 0){
 		var gs = Ext.getCmp('active_memberBasicGrid').getStore();
@@ -1029,7 +1038,7 @@ Ext.onReady(function() {
 	var active_member_dateCombo = Ext.ux.createDateCombo({
 		id : 'active_dateSearchDateCombo',
 		width : 75,
-		data : [[3, '近一个月'], [4, '近三个月'], [9, '近半年']],
+		data : [[3, '近一个月'], [4, '近三个月'], [9, '近半年'], [10, '无限期']],
 		beginDate : active_member_beginDate,
 		endDate : active_member_endDate,
 		callback : function(){
@@ -1042,137 +1051,12 @@ Ext.onReady(function() {
 		hidden : true,
 		height : 28,
 		items : [
-			{xtype : 'tbtext', text : '日期:&nbsp;&nbsp;'},
-			{xtype : 'tbtext', text : '&nbsp;&nbsp;'},
-			active_member_dateCombo,
-			{xtype : 'tbtext', text : '&nbsp;'},
-			active_member_beginDate,
 			{
-				xtype : 'label',
-				hidden : false,
-				html : ' 至&nbsp;&nbsp;'
-			}, 
-			active_member_endDate]
-		
-	});
-	var active_memberBasicGridExcavateMemberTbar2 = new Ext.Toolbar({
-		hidden : true,
-		height : 28,
-		items : [{xtype : 'tbtext', text : '消费金额:'},
-		{
-			id : 'active_memberCostEqual',
-			xtype : 'combo',
-			readOnly : false,
-			forceSelection : true,
-			value : 3,
-			width : 80,
-			store : new Ext.data.SimpleStore({
-				fields : ['value', 'text'],
-				data : [[3, '等于'], [1, '大于等于'], [2, '小于等于']]
-			}),
-			valueField : 'value',
-			displayField : 'text',
-			typeAhead : true,
-			mode : 'local',
-			triggerAction : 'all',
-			selectOnFocus : true
-		},	
-		{
-			xtype : 'numberfield',
-			id : 'active_textTotalMemberCost',
-			width : 60
-		},
-		{xtype : 'tbtext', text : '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'},	
-		{xtype : 'tbtext', text : '消费次数:'},
-		{
-			id : 'active_memberAmountEqual',
-			xtype : 'combo',
-			readOnly : false,
-			forceSelection : true,
-			value : 3,
-			width : 80,
-			store : new Ext.data.SimpleStore({
-				fields : ['value', 'text'],
-				data : [[3, '等于'], [1, '大于等于'], [2, '小于等于']]
-			}),
-			valueField : 'value',
-			displayField : 'text',
-			typeAhead : true,
-			mode : 'local',
-			triggerAction : 'all',
-			selectOnFocus : true
-		},			
-		
-		{
-			xtype : 'numberfield',
-			id : 'active_textTotalMemberCostCount',
-			width : 50
-		},'->',	 
-		{
-			text : '搜索',
-			id : 'active_btnSearchMember',
-			iconCls : 'btn_search',
-			handler : function(){
-				
-				var memberType = Ext.getCmp('active_memberTypeCombo');
-				
-				var gs = memberBasicGrid.getStore();
-				
-				gs.baseParams['memberType'] = memberType.getValue();
-				
-				if(Ext.getCmp('active_memberCostEqual').getValue() == 1){
-					gs.baseParams['MinTotalMemberCost'] = Ext.getCmp('active_textTotalMemberCost').getValue();
-					gs.baseParams['MaxTotalMemberCost'] = '';
-					
-				}else if(Ext.getCmp('active_memberCostEqual').getValue() == 2){
-					gs.baseParams['MinTotalMemberCost'] = '';
-					gs.baseParams['MaxTotalMemberCost'] = Ext.getCmp('active_textTotalMemberCost').getValue();				
-				}else{
-					gs.baseParams['MinTotalMemberCost'] = Ext.getCmp('active_textTotalMemberCost').getValue();
-					gs.baseParams['MaxTotalMemberCost'] = Ext.getCmp('active_textTotalMemberCost').getValue();				
-				}
-				
-				if(Ext.getCmp('active_memberAmountEqual').getValue() == 1){
-					gs.baseParams['consumptionMinAmount'] = Ext.getCmp('active_textTotalMemberCostCount').getValue();
-					gs.baseParams['consumptionMaxAmount'] = '';				
-				}else if(Ext.getCmp('active_memberAmountEqual').getValue() == 2){
-					gs.baseParams['consumptionMinAmount'] = '';
-					gs.baseParams['consumptionMaxAmount'] = Ext.getCmp('active_textTotalMemberCostCount').getValue();					
-				}else{
-					gs.baseParams['consumptionMinAmount'] = Ext.getCmp('active_textTotalMemberCostCount').getValue();
-					gs.baseParams['consumptionMaxAmount'] = Ext.getCmp('active_textTotalMemberCostCount').getValue();					
-				}
-				
-				gs.baseParams['beginDate'] = Ext.getCmp('active_dateSearchDateBegin').getValue().format('Y-m-d 00:00:00');
-				gs.baseParams['endDate'] = Ext.getCmp('active_dateSearchDateEnd').getValue().format('Y-m-d 23:59:59');
-				gs.load({
-					params : {
-						start : 0,
-						limit : 200
-					}
-				});
-			
-				gs.on('load', function(store, records, options){
-					active_memberList = '';
-					for (var i = 0; i < records.length; i++) {
-						if(i > 0){
-							active_memberList += ",";
-						}
-						active_memberList += records[i].get('id');
-					}
-				});	
-			}
-		}]
-	});
-	
-	var active_memberBasicGridTbar = new Ext.Toolbar({
-		items : [{
 				text : '活跃会员',
 				iconCls : 'btn_add',
 				handler : function(e){
-					Ext.getCmp('active_member_btnHeightSearch').handler();
+//					Ext.getCmp('active_member_btnHeightSearch').handler();
 					var gs = memberBasicGrid.getStore();
-//					Ext.getCmp('active_dateSearchDateCombo').fireEvent('select', Ext.getCmp('active_dateSearchDateCombo'), null, 4);
 					Ext.Ajax.request({
 						url : '../../QueryMember.do',
 						params : {dataSource : 'active'},
@@ -1202,7 +1086,7 @@ Ext.onReady(function() {
 				text : '沉睡会员',
 				iconCls : 'btn_edit',
 				handler : function(e){
-					Ext.getCmp('active_member_btnHeightSearch').handler();
+//					Ext.getCmp('active_member_btnHeightSearch').handler();
 					var gs = memberBasicGrid.getStore();
 					Ext.Ajax.request({
 						url : '../../QueryMember.do',
@@ -1230,50 +1114,205 @@ Ext.onReady(function() {
 					});
 				}
 			},
-			{xtype : 'tbtext', text : '&nbsp;&nbsp;'},
-			{xtype : 'tbtext', text : '会员类型:'},
+			{xtype : 'tbtext', text : '&nbsp;&nbsp;&nbsp;&nbsp;'},
+			
+			{xtype : 'tbtext', text : '日期:&nbsp;&nbsp;'},
+			active_member_dateCombo,
+			active_member_beginDate,
 			{
-				id : 'active_memberTypeCombo',
-				xtype : 'combo',
-				readOnly : false,
-				forceSelection : true,
-				value : -1,
-				width : 100,
-				store : new Ext.data.SimpleStore({
-					fields : ['id', 'name']
-				}),
-				valueField : 'id',
-				displayField : 'name',
-				listeners : {
-					render : function(thiz){
-						var data = [[-1,'全部']];
-						Ext.Ajax.request({
-							url : '../../QueryMemberType.do',
-							params : {dataSource : 'normal'},
-							success : function(res, opt){
-								var jr = Ext.decode(res.responseText);
-								for(var i = 0; i < jr.root.length; i++){
-									data.push([jr.root[i]['id'], jr.root[i]['name']]);
-								}
-								thiz.store.loadData(data);
-								thiz.setValue(-1);
-							},
-							failure : function(res, opt){
-								thiz.store.loadData(data);
-								thiz.setValue(-1);
-							}
-						});
-					},
-					select : function(){
-						Ext.getCmp('active_member_btnHeightSearch').handler();
-						Ext.getCmp('active_btnSearchMember').handler();
+				xtype : 'label',
+				hidden : false,
+				html : ' 至&nbsp;&nbsp;'
+			}, 
+			active_member_endDate,'->',	 
+			{
+				text : '搜索',
+				id : 'active_btnSearchMember',
+				iconCls : 'btn_search',
+				handler : function(){
+					
+					var memberType = Ext.getCmp('active_memberTypeCombo');
+					
+					var gs = memberBasicGrid.getStore();
+					
+					gs.baseParams['memberType'] = memberType.getValue();
+					
+					if(Ext.getCmp('active_memberCostEqual').getValue() == 1){
+						gs.baseParams['MinTotalMemberCost'] = Ext.getCmp('active_textTotalMemberCost').getValue();
+						gs.baseParams['MaxTotalMemberCost'] = '';
+						
+					}else if(Ext.getCmp('active_memberCostEqual').getValue() == 2){
+						gs.baseParams['MinTotalMemberCost'] = '';
+						gs.baseParams['MaxTotalMemberCost'] = Ext.getCmp('active_textTotalMemberCost').getValue();				
+					}else{
+						gs.baseParams['MinTotalMemberCost'] = Ext.getCmp('active_textTotalMemberCost').getValue();
+						gs.baseParams['MaxTotalMemberCost'] = Ext.getCmp('active_textTotalMemberCost').getValue();				
 					}
+					
+					if(Ext.getCmp('active_memberAmountEqual').getValue() == 1){
+						gs.baseParams['consumptionMinAmount'] = Ext.getCmp('active_textTotalMemberCostCount').getValue();
+						gs.baseParams['consumptionMaxAmount'] = '';				
+					}else if(Ext.getCmp('active_memberAmountEqual').getValue() == 2){
+						gs.baseParams['consumptionMinAmount'] = '';
+						gs.baseParams['consumptionMaxAmount'] = Ext.getCmp('active_textTotalMemberCostCount').getValue();					
+					}else{
+						gs.baseParams['consumptionMinAmount'] = Ext.getCmp('active_textTotalMemberCostCount').getValue();
+						gs.baseParams['consumptionMaxAmount'] = Ext.getCmp('active_textTotalMemberCostCount').getValue();					
+					}
+					
+					if(member_searchType){
+						gs.baseParams['beginDate'] = Ext.getCmp('active_dateSearchDateBegin').getValue().format('Y-m-d 00:00:00');
+						gs.baseParams['endDate'] = Ext.getCmp('active_dateSearchDateEnd').getValue().format('Y-m-d 23:59:59');					
+					}else{
+						gs.baseParams['beginDate'] = '';
+						gs.baseParams['endDate'] = '';					
+					}
+
+					gs.load({
+						params : {
+							start : 0,
+							limit : 200
+						}
+					});
+				}
+			}]
+		
+	});
+	var active_memberBasicGridExcavateMemberTbar2 = new Ext.Toolbar({
+		hidden : true,
+		height : 28,
+		items : [{xtype : 'tbtext', text : '消费金额:'},
+		{
+			id : 'active_memberCostEqual',
+			xtype : 'combo',
+			readOnly : false,
+			forceSelection : true,
+			value : 3,
+			width : 80,
+			store : new Ext.data.SimpleStore({
+				fields : ['value', 'text'],
+				data : [[3, '等于'], [1, '大于等于'], [2, '小于等于']]
+			}),
+			valueField : 'value',
+			displayField : 'text',
+			typeAhead : true,
+			mode : 'local',
+			triggerAction : 'all',
+			selectOnFocus : true
+		},	
+		{
+			xtype : 'numberfield',
+			id : 'active_textTotalMemberCost',
+			width : 60
+		},
+		{xtype : 'tbtext', text : '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'},	
+		{xtype : 'tbtext', text : '消费次数:'},
+		{
+			id : 'active_memberAmountEqual',
+			xtype : 'combo',
+			readOnly : false,
+			forceSelection : true,
+			value : 3,
+			width : 80,
+			store : new Ext.data.SimpleStore({
+				fields : ['value', 'text'],
+				data : [[3, '等于'], [1, '大于等于'], [2, '小于等于']]
+			}),
+			valueField : 'value',
+			displayField : 'text',
+			typeAhead : true,
+			mode : 'local',
+			triggerAction : 'all',
+			selectOnFocus : true
+		},			
+		{
+			xtype : 'numberfield',
+			id : 'active_textTotalMemberCostCount',
+			width : 50
+		},
+		{xtype : 'tbtext', text : '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'},
+		{xtype : 'tbtext', text : '会员类型:'},
+		{
+			id : 'active_memberTypeCombo',
+			xtype : 'combo',
+			readOnly : false,
+			forceSelection : true,
+			value : -1,
+			width : 100,
+			store : new Ext.data.SimpleStore({
+				fields : ['id', 'name']
+			}),
+			valueField : 'id',
+			displayField : 'name',
+			listeners : {
+				render : function(thiz){
+					var data = [[-1,'全部']];
+					Ext.Ajax.request({
+						url : '../../QueryMemberType.do',
+						params : {dataSource : 'normal'},
+						success : function(res, opt){
+							var jr = Ext.decode(res.responseText);
+							for(var i = 0; i < jr.root.length; i++){
+								data.push([jr.root[i]['id'], jr.root[i]['name']]);
+							}
+							thiz.store.loadData(data);
+							thiz.setValue(-1);
+						},
+						failure : function(res, opt){
+							thiz.store.loadData(data);
+							thiz.setValue(-1);
+						}
+					});
 				},
-				typeAhead : true,
-				mode : 'local',
-				triggerAction : 'all',
-				selectOnFocus : true
-			}, '->', {
+				select : function(){
+					Ext.getCmp('active_member_btnHeightSearch').handler();
+					Ext.getCmp('active_btnSearchMember').handler();
+				}
+			},
+			typeAhead : true,
+			mode : 'local',
+			triggerAction : 'all',
+			selectOnFocus : true
+		}]
+	});
+	
+	var active_memberBasicGridTbar = new Ext.Toolbar({
+		items : [{xtype : 'tbtext', text : '&nbsp;&nbsp;&nbsp;&nbsp;'},
+			{
+				xtype : 'radio',
+				id : 'rdoSendAllMember',
+				name : 'rdoFormatType',
+				inputValue : 1,
+				boxLabel : '全部会员',
+				checked : true,
+				listeners : {
+					render : function(e){
+						Ext.getDom('rdoSendAllMember').onclick = function(){
+							e.setValue(true);
+							Ext.getCmp('active_member_btnCommonSearch').handler();
+							operatePromotTypeWin.oriented = e.inputValue;
+						};
+					}
+				}
+			},
+			{xtype : 'tbtext', text : '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'},
+			{
+				xtype : 'radio',
+				id : 'rdoSendSpecificMember',
+				name : 'rdoFormatType',
+				inputValue : 2,
+				boxLabel : '部分会员',
+				listeners : {
+					render : function(e){
+						Ext.getDom('rdoSendSpecificMember').onclick = function(){
+							e.setValue(true);
+							Ext.getCmp('active_member_btnHeightSearch').handler();
+							operatePromotTypeWin.oriented = e.inputValue;
+						};
+					}
+				}
+			},
+			{xtype : 'tbtext', text : '&nbsp;&nbsp;'}, '->', {
 			text : '高级条件↓',
 	    	id : 'active_member_btnHeightSearch',
 	    	handler : function(){
@@ -1281,6 +1320,9 @@ Ext.onReady(function() {
 				Ext.getCmp('active_member_btnCommonSearch').show();
 				
 	    		Ext.getCmp('active_member_btnHeightSearch').hide();
+	    		
+	    		Ext.getCmp('rdoSendSpecificMember').setValue(true);
+	    		operatePromotTypeWin.oriented = 2;
 	    		
 	    		if(!member_searchType){
 	    			memberBasicGrid.setHeight(memberBasicGrid.getHeight()-56);
@@ -1292,16 +1334,20 @@ Ext.onReady(function() {
 	    		
 	    		memberBasicGrid.syncSize(); //强制计算高度
 	    		memberBasicGrid.doLayout();//重新布局 	
+	    		
+//	    		Ext.getCmp('active_memberBasicGrid').getStore().removeAll();
 			}
 		}, {
 			text : '高级条件↑',
 	    	id : 'active_member_btnCommonSearch',
 			hidden : true,
-	    	handler : function(){
+	    	handler : function(e){
 	    		member_searchType = false;
 				Ext.getCmp('active_member_btnHeightSearch').show();
 	    		Ext.getCmp('active_member_btnCommonSearch').hide();
 	    		
+	    		Ext.getCmp('rdoSendAllMember').setValue(true);
+	    		operatePromotTypeWin.oriented = 1;
 	    		
 	    		active_memberBasicGridExcavateMemberTbar.hide();
 	    		active_memberBasicGridExcavateMemberTbar2.hide();
@@ -1310,14 +1356,19 @@ Ext.onReady(function() {
 	    		memberBasicGrid.syncSize(); //强制计算高度
 	    		memberBasicGrid.doLayout();//重新布局 	
 	    		
-	    		member_dateCombo.setValue(4);
-	    		member_dateCombo.fireEvent('select', member_dateCombo,null,4);
+	    		active_member_dateCombo.setValue(4);
+	    		active_member_dateCombo.fireEvent('select', active_member_dateCombo,{data : {value : 4}},4);
 	    		
+	    		Ext.getCmp('active_memberTypeCombo').setValue(-1);
 	    		Ext.getCmp('active_textTotalMemberCost').setValue();
 	    		Ext.getCmp('active_textTotalMemberCostCount').setValue();
 	    		Ext.getCmp('active_memberAmountEqual').setValue(3);
-	    		Ext.getCmp('active_numberSearchByMemberPhoneOrCard').setValue();
 	    		Ext.getCmp('active_memberCostEqual').setValue(3);
+	    		
+	    		if(!e || typeof e.noSearch == 'undefined'){
+	    			Ext.getCmp('active_btnSearchMember').handler();
+	    		}
+	    		
 			}
 		},{xtype : 'tbtext', text : '&nbsp;&nbsp;'}]
 	});	
@@ -1342,6 +1393,16 @@ Ext.onReady(function() {
 		[active_memberBasicGridTbar, active_memberBasicGridExcavateMemberTbar,active_memberBasicGridExcavateMemberTbar2]
 	);	
 	memberBasicGrid.region = 'center';
+	
+	memberBasicGrid.store.on('load', function(store, records, options){
+		active_memberList = '';
+		for (var i = 0; i < records.length; i++) {
+			if(i > 0){
+				active_memberList += ",";
+			}
+			active_memberList += records[i].get('id');
+		}
+	});		
 
 	var threeStepEast = new Ext.Panel({
 		id : 'threeStepEastBody',

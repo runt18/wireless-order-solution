@@ -285,10 +285,10 @@ function initOperateMaterialWin(){
 					Ext.getCmp('btnAddMaterial').handler();
 				}
 			}],
-			bbar : [{
-				text : '应用',
-				id : 'btnAddMoreMaterial',
-				iconCls : 'btn_app',
+			bbar : ['->', {
+				text : '保存',
+				id : 'btnAddMaterial',
+				iconCls : 'btn_save',
 				handler : function(){
 					var dataSource = "";
 					if(operateMaterialWin.otype == Ext.ux.otype['insert']){
@@ -325,60 +325,12 @@ function initOperateMaterialWin(){
 									Ext.getCmp('txtMaterialName').setValue();
 									Ext.getCmp('txtMaterialPrice').setValue();
 									
-									Ext.getCmp('txtMaterialPrice').clearInvalid();
+									
 									Ext.getCmp('txtMaterialName').focus(true, 100);
+									Ext.getCmp('txtMaterialPrice').clearInvalid();
+									Ext.getCmp('txtMaterialName').clearInvalid();
 								}
 								
-							}else{
-								Ext.ux.showMsg(jr);
-							}
-						},
-						failure : function(res, opt) {
-							Ext.ux.showMsg(Ext.decode(res.responseText));
-						}
-					});
-				}
-			},'->', {
-				text : '保存',
-				id : 'btnAddMaterial',
-				iconCls : 'btn_save',
-				handler : function(){
-					var dataSource = "";
-					var cateId;
-					if(operateMaterialWin.otype == Ext.ux.otype['insert']){
-						dataSource = 'insert';
-						if(!materialName.isValid() || !initMaterialCate.isValid() || !materialPrice.isValid()){
-							return;
-						}						
-						cateId = initMaterialCate.getValue();
-					}else if(operateMaterialWin.otype == Ext.ux.otype['update']){
-						dataSource = 'update';
-						if(!materialPrice.isValid()){
-							return;
-						}		
-						cateId = operateMaterialWin.cateId;
-					}else{
-						return;
-					}
-					Ext.Ajax.request({
-						url : '../../OperateMaterial.do',
-						params : {
-							dataSource : dataSource,
-							price : materialPrice.getValue(),
-							restaurantID : restaurantID,
-							id : materialId.getValue(),
-							name : materialName.getValue(),
-							cateId : cateId,
-							cType : operateMaterialWin.cateType
-						},
-						success : function(res, opt){
-							var jr = Ext.decode(res.responseText);
-							if(jr.success){
-								operateMaterialWin.cateType = '';
-								Ext.example.msg(jr.title, jr.msg);
-								operateMaterialWin.hide();
-								Ext.getCmp('btnSearchMaterial').handler();
-								operateMaterialWin.cateId = null;
 							}else{
 								Ext.ux.showMsg(jr);
 							}
