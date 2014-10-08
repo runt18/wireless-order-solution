@@ -489,6 +489,7 @@ public class Promotion implements Jsonable{
 		jm.putInt("point", this.point);
 		jm.putInt("status", this.status.getVal());
 		jm.putInt("pType", this.type.getVal());
+		jm.putInt("oriented", this.oriented.getVal());
 		jm.putJsonable("coupon", this.couponType, 0);
 		return jm;
 	}
