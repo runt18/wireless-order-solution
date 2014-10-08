@@ -20,27 +20,4 @@ public final class OSSParams {
     	return mInstance;
     }
     
-//    public static OSSParams instance(){
-//    	if(mInstance != null){
-//    		return mInstance;
-//    	}else{
-//    		throw new IllegalStateException("The OSS parameters does NOT initiate.");
-//    	}
-//    }
-    
-//    public static String getAccessId(){
-//    	return instance().ACCESS_OSS_ID;
-//    }
-//    
-//    public static String getAccessKey(){
-//    	return instance().ACCESS_OSS_KEY;
-//    }
-//    
-//    public static String getInnerPoint(){
-//    	return instance().OSS_INNER_POINT;
-//    }
-//    
-//    public static String getOuterPoint(){
-//    	return instance().OSS_OUTER_POINT;
-//    }
 }
