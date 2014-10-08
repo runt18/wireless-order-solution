@@ -42,11 +42,13 @@ public class OperatePromotionAction extends DispatchAction{
 		String pType = request.getParameter("pType");
 		String point = request.getParameter("point");
 		String members = request.getParameter("members");
+		String oriented = request.getParameter("oriented");
 		
 		String couponName = request.getParameter("couponName");
 		String price = request.getParameter("price");
 		String expiredDate = request.getParameter("expiredDate");
 		String image = request.getParameter("image");		
+		
 		
 		String pin = (String) request.getAttribute("pin");
 		JObject jobject = new JObject();
@@ -78,10 +80,12 @@ public class OperatePromotionAction extends DispatchAction{
 			
 			String[] memberList = members.split(",");
 			
-			for (String member : memberList) {
-				promotionCreateBuilder.addMember(Integer.parseInt(member));
+			if(Integer.parseInt(oriented) == Promotion.Oriented.SPECIFIC.getVal()){
+				for (String member : memberList) {
+					promotionCreateBuilder.addMember(Integer.parseInt(member));
+				}				
 			}
-			
+
 			PromotionDao.create(StaffDao.verify(Integer.parseInt(pin)), promotionCreateBuilder);
 			jobject.initTip(true, "活动创建成功");
 		}catch(BusinessException e){
@@ -112,6 +116,7 @@ public class OperatePromotionAction extends DispatchAction{
 		String pType = request.getParameter("pType");
 		String point = request.getParameter("point");
 		String members = request.getParameter("members");
+		String oriented = request.getParameter("oriented");
 		
 		String couponTypeId = request.getParameter("cId");
 		String couponName = request.getParameter("couponName");
@@ -146,8 +151,12 @@ public class OperatePromotionAction extends DispatchAction{
 			
 			String[] memberList = members.split(",");
 			
-			for (String member : memberList) {
-				promotionUpdateBuilder.addMember(Integer.parseInt(member));
+			if(Integer.parseInt(oriented) == Promotion.Oriented.SPECIFIC.getVal()){
+				for (String member : memberList) {
+					promotionUpdateBuilder.addMember(Integer.parseInt(member));
+				}
+			}else{
+				promotionUpdateBuilder.setAllMember();
 			}
 			
 			PromotionDao.update(StaffDao.verify(Integer.parseInt(pin)), promotionUpdateBuilder);
