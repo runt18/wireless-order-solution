@@ -78,6 +78,14 @@
 		<host>42.121.54.177</host>
 		<port>80</port>
 	</OTA>
+	<!-- the oss aliyun configuration -->
+	<oss>
+		<oss_access_id>KMLtoTwkG5Jqaapu</oss_access_id>
+		<oss_access_key>VZtrdLaO6WFcJQrvffO9XBPVpbKGRP</oss_access_key>
+		<oss_inner_point>oss.aliyuncs.com</oss_inner_point>
+		<oss_outer_point>oss.aliyuncs.com</oss_outer_point>
+		<oss_bucket>digie-image-test</oss_bucket>
+	</oss>
 </conf>
 
 
