@@ -79,6 +79,7 @@ var operatePromotion = function(){
 	}
 	
 	params.pType = promotionType;
+	params.oriented = operatePromotTypeWin.oriented;
 	params.couponName = couponName.getValue();
 	params.price = price.getValue();
 	params.expiredDate = expiredDate.getValue().format('Y-m-d');
@@ -87,7 +88,7 @@ var operatePromotion = function(){
 	params.beginDate = beginDate.getValue().format('Y-m-d');
 	params.endDate = endDate.getValue().format('Y-m-d');
 	params.point = point.getValue();
-	params.members = active_memberList;
+	params.members = operatePromotTypeWin.oriented == 2?active_memberList:'';
 	params.body = editBody.getValue();	
 	params.entire = entire.body.dom.innerHTML;
 
@@ -97,8 +98,8 @@ var operatePromotion = function(){
 		params : params,
 		success : function(res, opt){
 			var jr = Ext.decode(res.responseText);
+			promotion_uploadMask.hide();
 			if(jr.success){
-				promotion_uploadMask.hide();
 				promotionTree.getRootNode().reload();
 				operatePromotTypeWin.hide();
 				Ext.example.msg(jr.title, jr.msg);
@@ -178,7 +179,17 @@ $(function (){
         		Ext.getCmp('active_title').focus(true, 100);
         		Ext.getCmp('btnSecondStepEastBody').handler();
         	}else if(currentIndex == 2){
+        		if(operatePromotTypeWin.oriented == 2){
+        			
+        			
+        			Ext.getCmp('active_member_btnHeightSearch').handler();	
+    	    		memberBasicGrid.syncSize(); //强制计算高度
+    	    		memberBasicGrid.doLayout();//重新布局     
+    	    		
+    	    		Ext.getCmp('threeStepEastBody').body.update(buildPreviewHead()+'<div style="margin: 10px 10px 10px 10px; word-wrap:break-word;">'+Ext.getCmp('secondStep_edit').getValue()+'</div>');
+        		}
         		Ext.getCmp('threeStepEastBody').body.update(buildPreviewHead()+'<div style="margin: 10px 10px 10px 10px; word-wrap:break-word;">'+Ext.getCmp('secondStep_edit').getValue()+'</div>');
+        		
         	}
         },
         onStepChanging : function(event, currentIndex, newIndex){
