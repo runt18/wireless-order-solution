@@ -170,7 +170,7 @@ public class CouponDao {
 	 * @throws SQLException 
 	 * 			throws if database can NOT be connected
 	 */
-	static int create(Staff staff, Coupon.CreateBuilder builder) throws SQLException{
+	public static int create(Staff staff, Coupon.CreateBuilder builder) throws SQLException{
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
@@ -190,7 +190,7 @@ public class CouponDao {
 	 * 			the insert all builder
 	 * @return the amount to coupon assigned to member
 	 */
-	static int create(DBCon dbCon, Staff staff, Coupon.CreateBuilder builder){
+	public static int create(DBCon dbCon, Staff staff, Coupon.CreateBuilder builder){
 		int amount = 0;
 		for(Coupon.InsertBuilder eachBuilder : builder.build()){
 			try{

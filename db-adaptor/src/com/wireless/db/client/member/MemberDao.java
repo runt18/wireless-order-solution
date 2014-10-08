@@ -11,6 +11,7 @@ import com.mysql.jdbc.Statement;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
 import com.wireless.db.promotion.CouponDao;
+import com.wireless.db.promotion.PromotionDao;
 import com.wireless.db.restaurantMgr.RestaurantDao;
 import com.wireless.db.weixin.member.WeixinMemberDao;
 import com.wireless.exception.BusinessException;
@@ -29,6 +30,7 @@ import com.wireless.pojo.distMgr.Discount;
 import com.wireless.pojo.distMgr.Discount.Type;
 import com.wireless.pojo.menuMgr.Food;
 import com.wireless.pojo.promotion.Coupon;
+import com.wireless.pojo.promotion.Promotion;
 import com.wireless.pojo.restaurantMgr.Module;
 import com.wireless.pojo.staffMgr.Staff;
 import com.wireless.pojo.util.DateUtil;
@@ -597,6 +599,26 @@ public class MemberDao {
 	
 	/**
 	 * Get member by extra condition
+	 * @param DBCon
+	 * 			the database connection
+	 * @param extraCond
+	 * 			the extra condition {@link ExtraCond}
+	 * @param orderClause
+	 * 			the order clause 
+	 * @return the list holding the result
+	 * @throws SQLException
+	 * 			throws if failed to execute any SQL statement
+	 */
+	public static List<Member> getByCond(DBCon dbCon, Staff staff, ExtraCond extraCond, String orderClause) throws SQLException, BusinessException{
+		if(extraCond != null){
+			return MemberDao.getByCond(dbCon, staff, extraCond.toString(), orderClause);
+		}else{
+			return MemberDao.getByCond(dbCon, staff, "", orderClause);
+		}
+	}
+	
+	/**
+	 * Get member by extra condition
 	 * @param extraCond
 	 * 			the extra condition {@link ExtraCond}
 	 * @param orderClause
@@ -609,11 +631,7 @@ public class MemberDao {
 		DBCon dbCon = new DBCon();
 		try{
 			dbCon.connect();
-			if(extraCond != null){
-				return MemberDao.getByCond(dbCon, staff, extraCond.toString(), orderClause);
-			}else{
-				return MemberDao.getByCond(dbCon, staff, null, orderClause);
-			}
+			return MemberDao.getByCond(dbCon, staff, extraCond, orderClause);
 		}finally{
 			dbCon.disconnect();
 		}
@@ -823,6 +841,11 @@ public class MemberDao {
 		}else{
 			throw new SQLException("The id of member is not generated successfully.");
 		}	
+		
+		//Create the coupon to this member if the associated promotion is oriented all.
+		for(Promotion promotion : PromotionDao.getByCond(dbCon, staff, new PromotionDao.ExtraCond().setOriented(Promotion.Oriented.ALL))){
+			CouponDao.create(dbCon, staff, new Coupon.CreateBuilder(promotion.getCouponType().getId(), promotion.getId()).addMember(memberId));
+		}
 		
 		//Commit the private comment
 		if(member.hasPrivateComment()){

@@ -60,9 +60,6 @@ public class TestPromotionDao {
 		int promotionImg2 = 0;
 		try{
 			List<Member> members = MemberDao.getByCond(mStaff, null, null);
-			Member m1 = members.get(0);
-			Member m2 = members.get(1);
-			Member m3 = members.get(2);
 			
 			//--------Test to create a promotion-----------
 			String fileName = System.getProperty("user.dir") + "/src/" + TestOssImage.class.getPackage().getName().replaceAll("\\.", "/") + "/test.jpg";
@@ -80,7 +77,8 @@ public class TestPromotionDao {
 
 			Promotion.CreateBuilder promotionCreateBuilder = Promotion.CreateBuilder
 																	  .newInstance("测试优惠活动", new DateRange("2015-1-1", "2015-2-1"), body, Promotion.Type.FREE, typeInsertBuilder, "hello jingjing<br>")
-																	  .addMember(m1.getId()).addMember(m2.getId());
+																	  //.addMember(m1.getId()).addMember(m2.getId())
+																	  ;
 			promotionId = PromotionDao.create(mStaff, promotionCreateBuilder);
 			
 			Promotion expected = promotionCreateBuilder.build();
@@ -99,11 +97,16 @@ public class TestPromotionDao {
 			Assert.assertEquals("status to promotion image", OssImage.Status.MARRIED, ossPromotionImg1.getStatus());
 			Assert.assertTrue("failed to upload promotion image to oss storage", ossClient.getObject(OssImage.Params.instance().getBucket(), ossPromotionImg1.getObjectKey()) != null);
 			//Compare the coupon related to this promotion.
-			compare(promotionId, Coupon.Status.CREATED, couponTypeId, m1, CouponDao.getByCond(mStaff, new CouponDao.ExtraCond().setMember(m1).setPromotion(promotionId), null).get(0));
-			compare(promotionId, Coupon.Status.CREATED, couponTypeId, m2, CouponDao.getByCond(mStaff, new CouponDao.ExtraCond().setMember(m2).setPromotion(promotionId), null).get(0));
+			for(Member m : members){
+				compare(promotionId, Coupon.Status.CREATED, couponTypeId, m, CouponDao.getByCond(mStaff, new CouponDao.ExtraCond().setMember(m).setPromotion(promotionId), null).get(0));
+				//compare(promotionId, Coupon.Status.CREATED, couponTypeId, m2, CouponDao.getByCond(mStaff, new CouponDao.ExtraCond().setMember(m2).setPromotion(promotionId), null).get(0));
+			}
 			
 			//--------Test to update a promotion-----------
 			int oriImageToCouponType = ossImageId;
+			Member m1 = members.get(0);
+			Member m2 = members.get(1);
+			Member m3 = members.get(2);
 			ossImageId = OssImageDao.insert(mStaff, new OssImage.InsertBuilder(OssImage.Type.WX_COUPON_TYPE).setImgResource(OssImage.ImageType.JPG, new FileInputStream(new File(fileName))));
 
 			CouponType.UpdateBuilder typeUpdateBuilder = new CouponType.UpdateBuilder(couponTypeId, "修改测试优惠券类型")
@@ -266,6 +269,7 @@ public class TestPromotionDao {
 		Assert.assertEquals("promotion date range", expected.getDateRange(), actual.getDateRange());
 		Assert.assertEquals("promotion status", expected.getStatus(), actual.getStatus());
 		Assert.assertEquals("promotion type", expected.getType(), actual.getType());
+		Assert.assertEquals("promotion oriented", expected.getOriented(), actual.getOriented());
 		
 		//The content to associated promotion image
 		Assert.assertEquals("oss image type to promotion", OssImage.Type.PROMOTION, actual.getImage().getType());

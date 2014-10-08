@@ -15,6 +15,7 @@ import javax.imageio.ImageIO;
 import com.mysql.jdbc.Statement;
 import com.wireless.db.DBCon;
 import com.wireless.db.Params;
+import com.wireless.db.client.member.MemberDao;
 import com.wireless.db.oss.CompressImage;
 import com.wireless.db.oss.OssImageDao;
 import com.wireless.exception.BusinessException;
@@ -34,6 +35,7 @@ public class PromotionDao {
 		private int promotionId;
 		private Promotion.Status status;
 		private Promotion.Type type;
+		private Promotion.Oriented oriented;
 		
 		public ExtraCond setPromotionId(int id){
 			this.promotionId = id;
@@ -50,6 +52,11 @@ public class PromotionDao {
 			return this;
 		}
 		
+		public ExtraCond setOriented(Promotion.Oriented oriented){
+			this.oriented = oriented;
+			return this;
+		}
+		
 		@Override
 		public String toString(){
 			StringBuilder extraCond = new StringBuilder();
@@ -61,6 +68,9 @@ public class PromotionDao {
 			}
 			if(type != null){
 				extraCond.append(" AND P.type = " + type.getVal());
+			}
+			if(oriented != null){
+				extraCond.append(" AND P.oriented = " + oriented.getVal());
 			}
 			return extraCond.toString();
 		}
@@ -129,7 +139,7 @@ public class PromotionDao {
 		//Insert the promotion.
 		String sql;
 		sql = " INSERT INTO " + Params.dbName + ".promotion " +
-			  " (restaurant_id, create_date, start_date, finish_date, title, body, entire, coupon_type_id, type, point, status) " +
+			  " (restaurant_id, create_date, start_date, finish_date, title, body, entire, coupon_type_id, oriented, type, point, status) " +
 			  " VALUES ( " +
 			  staff.getRestaurantId() + "," +
 			  "'" + DateUtil.format(promotion.getCreateDate(), DateUtil.Pattern.DATE) + "'," +
@@ -139,6 +149,7 @@ public class PromotionDao {
 			  "'" + new StringHtml(promotion.getBody(), StringHtml.ConvertTo.TO_NORMAL) + "'," +
 			  "'" + promotion.getEntire() + "'," +
 			  couponTypeId + "," +
+			  promotion.getOriented().getVal() + "," +
 			  promotion.getType().getVal() + "," +
 			  promotion.getPoint() + "," +
 			  promotion.getStatus().getVal() +
@@ -177,8 +188,13 @@ public class PromotionDao {
 			}
 		}
 		
-		//Create the coupon with members.
-		CouponDao.create(dbCon, staff, new Coupon.CreateBuilder(couponTypeId, promotionId).setMembers(builder.getMembers()));
+		if(promotion.getOriented() == Promotion.Oriented.ALL){
+			//Create the coupon to all members.
+			CouponDao.create(dbCon, staff, new Coupon.CreateBuilder(couponTypeId, promotionId).setMembers(MemberDao.getByCond(dbCon, staff, null, null)));
+		}else{
+			//Create the coupon to specific members.
+			CouponDao.create(dbCon, staff, new Coupon.CreateBuilder(couponTypeId, promotionId).setMembers(builder.getMembers()));
+		}
 		
 		return promotionId;
 	}
@@ -257,6 +273,7 @@ public class PromotionDao {
 			  (builder.isPointChanged() ? ",point = " + promotion.getPoint() : "") +
 			  (builder.isRangeChanged() ? ",start_date = '" + promotion.getDateRange().getOpeningFormat() + "',finish_date = '" + promotion.getDateRange().getEndingFormat() + "'" : "") +
 			  (builder.isTitleChanged() ? ",title = '" + promotion.getTitle() + "'" : "") +
+			  (builder.isMemberChanged() ? ",oriented = " + promotion.getOriented().getVal() : "") +
 			  " WHERE promotion_id = " + promotion.getId();
 		if(dbCon.stmt.executeUpdate(sql) == 0){
 			throw new BusinessException(PromotionError.PROMOTION_NOT_EXIST);
@@ -294,7 +311,13 @@ public class PromotionDao {
 		//Create the associated coupons if the member changed.
 		if(builder.isMemberChanged()){
 			CouponDao.delete(dbCon, staff, new CouponDao.ExtraCond().setPromotion(promotion.getId()));
-			CouponDao.create(dbCon, staff, new Coupon.CreateBuilder(original.getCouponType().getId(), promotion.getId()).setMembers(builder.getMembers()));
+			if(promotion.getOriented() == Promotion.Oriented.ALL){
+				//Create the coupon to all members.
+				CouponDao.create(dbCon, staff, new Coupon.CreateBuilder(original.getCouponType().getId(), promotion.getId()).setMembers(MemberDao.getByCond(dbCon, staff, null, null)));
+			}else{
+				//Create the coupon to specific members.
+				CouponDao.create(dbCon, staff, new Coupon.CreateBuilder(original.getCouponType().getId(), promotion.getId()).setMembers(builder.getMembers()));
+			}
 		}
 		
 	} 
@@ -602,7 +625,7 @@ public class PromotionDao {
 		List<Promotion> result = new ArrayList<Promotion>();
 		
 		String sql;
-		sql = " SELECT P.promotion_id, P.restaurant_id, P.create_date, P.start_date, P.finish_date, P.title, P.body, P.entire, P.type, P.point, P.status, " +
+		sql = " SELECT P.promotion_id, P.restaurant_id, P.create_date, P.start_date, P.finish_date, P.title, P.body, P.entire, P.oriented, P.type, P.point, P.status, " +
 			  " P.coupon_type_id, CT.name, " +
 			  " OI.oss_image_id, OI.image, OI.type AS oss_type " +	
 			  " FROM " + Params.dbName + ".promotion P " +
@@ -629,6 +652,8 @@ public class PromotionDao {
 			if(!entire.isEmpty()){
 				promotion.setEntire(new StringHtml(entire, StringHtml.ConvertTo.TO_HTML).toString());
 			}
+			
+			promotion.setOriented(Promotion.Oriented.valueOf(dbCon.rs.getInt("oriented")));
 			promotion.setType(Promotion.Type.valueOf(dbCon.rs.getInt("type")));
 			promotion.setPoint(dbCon.rs.getInt("point"));
 			promotion.setStatus(Promotion.Status.valueOf(dbCon.rs.getInt("status")));
