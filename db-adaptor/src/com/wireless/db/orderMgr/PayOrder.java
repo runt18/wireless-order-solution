@@ -207,7 +207,7 @@ public class PayOrder {
 		
 		if(orderCalculated.isSettledByMember()){
 			
-			Member member = MemberDao.getById(staff, payBuilder.getMemberId());
+			Member member = MemberDao.getById(dbCon, staff, payBuilder.getMemberId());
 			
 			if(orderCalculated.isUnpaid()){
 				//Check to see whether be able to perform consumption.

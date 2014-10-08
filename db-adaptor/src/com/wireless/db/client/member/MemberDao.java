@@ -842,8 +842,8 @@ public class MemberDao {
 			throw new SQLException("The id of member is not generated successfully.");
 		}	
 		
-		//Create the coupon to this member if the associated promotion is oriented all.
-		for(Promotion promotion : PromotionDao.getByCond(dbCon, staff, new PromotionDao.ExtraCond().setOriented(Promotion.Oriented.ALL))){
+		//Create the coupon to this member if the associated published or progressed promotion is oriented all.
+		for(Promotion promotion : PromotionDao.getByCond(dbCon, staff, new PromotionDao.ExtraCond().addStatus(Promotion.Status.PUBLISH).addStatus(Promotion.Status.PROGRESS).setOriented(Promotion.Oriented.ALL))){
 			CouponDao.create(dbCon, staff, new Coupon.CreateBuilder(promotion.getCouponType().getId(), promotion.getId()).addMember(memberId));
 		}
 		

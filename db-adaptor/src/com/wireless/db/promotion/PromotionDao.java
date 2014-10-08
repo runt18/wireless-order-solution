@@ -33,7 +33,7 @@ public class PromotionDao {
 
 	public static class ExtraCond{
 		private int promotionId;
-		private Promotion.Status status;
+		private List<Promotion.Status> statusList = new ArrayList<Promotion.Status>();
 		private Promotion.Type type;
 		private Promotion.Oriented oriented;
 		
@@ -42,8 +42,8 @@ public class PromotionDao {
 			return this;
 		}
 		
-		public ExtraCond setStatus(Promotion.Status status){
-			this.status = status;
+		public ExtraCond addStatus(Promotion.Status status){
+			this.statusList.add(status);
 			return this;
 		}
 		
@@ -63,9 +63,19 @@ public class PromotionDao {
 			if(promotionId != 0){
 				extraCond.append(" AND P.promotion_id = " + promotionId);
 			}
-			if(status != null){
-				extraCond.append(" AND P.status = " + status.getVal());
+			
+			StringBuilder psCond = new StringBuilder();
+			for(Promotion.Status status : statusList){
+				if(psCond.length() == 0){
+					psCond.append(" P.status = " + status.getVal());
+				}else{
+					psCond.append(" OR P.status = " + status.getVal());
+				}
 			}
+			if(psCond.length() != 0){
+				extraCond.append(" AND (" + psCond.toString() + ")");
+			}
+			
 			if(type != null){
 				extraCond.append(" AND P.type = " + type.getVal());
 			}
@@ -726,7 +736,7 @@ public class PromotionDao {
 		if(promotion.getStatus() == Promotion.Status.CREATED || promotion.getStatus() == Promotion.Status.FINISH){
 			
 			if(!CouponDao.getByCond(dbCon, staff, new CouponDao.ExtraCond().setPromotion(promotion).setStatus(Coupon.Status.DRAWN), null).isEmpty()){
-				throw new BusinessException("还有【" + promotion.getType() + "】活动的优惠券在使用，请在此活动发放的优惠券全部使用或过期后，再删除活动", PromotionError.PROMOTION_DELETE_NOT_ALLOW);
+				throw new BusinessException("还有【" + promotion.getTitle() + "】活动的优惠券在使用，请在此活动发放的优惠券全部使用或过期后，再删除活动", PromotionError.PROMOTION_DELETE_NOT_ALLOW);
 			}
 			
 			//Delete the associated oss image to this promotion
