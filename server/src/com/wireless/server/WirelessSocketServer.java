@@ -23,6 +23,8 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import com.wireless.db.DBCon;
+import com.wireless.pojo.oss.OSSParams;
+import com.wireless.pojo.oss.OssImage;
 import com.wireless.pojo.printScheme.PStyle;
 import com.wireless.pojo.printScheme.PType;
 import com.wireless.sccon.ServerConnector;
@@ -168,6 +170,13 @@ public class WirelessSocketServer {
 					blockQueueSize = Integer.parseInt(nl.item(0).getFirstChild().getNodeValue());
 				}
 
+				nl = doc.getElementsByTagName("oss");
+				OssImage.Params.init(((Element)nl.item(0)).getElementsByTagName("oss_bucket").item(0).getFirstChild().getNodeValue(), 
+									  OSSParams.init(((Element)nl.item(0)).getElementsByTagName("oss_access_id").item(0).getFirstChild().getNodeValue(), 
+											         ((Element)nl.item(0)).getElementsByTagName("oss_access_key").item(0).getFirstChild().getNodeValue(), 
+											         ((Element)nl.item(0)).getElementsByTagName("oss_inner_point").item(0).getFirstChild().getNodeValue(), 
+											         ((Element)nl.item(0)).getElementsByTagName("oss_outer_point").item(0).getFirstChild().getNodeValue()));
+				
 				nl = doc.getElementsByTagName("OTA");
 				if(nl.item(0) != null){
 					NodeList hostTag = ((Element)nl.item(0)).getElementsByTagName("host");
@@ -201,27 +210,15 @@ public class WirelessSocketServer {
 				//parse the time to run sweep db task from configuration file
 				nl = doc.getElementsByTagName("sweep_db");
 				if(nl.item(0) != null){
-					String time = nl.item(0).getFirstChild().getNodeValue();
-					int pos1 = 0;
-					int pos2 = time.indexOf(",", pos1);
-					int dayOfMonth = Integer.parseInt(time.substring(pos1, pos2));
+					String[] sweepTime = nl.item(0).getFirstChild().getNodeValue().split(",");
 					
-					pos1 = pos2 + 1;
-					pos2 = time.indexOf(",", pos1);
-					int hourOfDay = Integer.parseInt(time.substring(pos1, pos2));
-					
-					pos1 = pos2 + 1;
-					pos2 = time.indexOf(",", pos1);
-					int minute = Integer.parseInt(time.substring(pos1, pos2));
-					
-					pos1 = pos2 + 1;
-					int second = Integer.parseInt(time.substring(pos1));
+					int dayOfMonth = Integer.parseInt(sweepTime[0]);
+					int hourOfDay = Integer.parseInt(sweepTime[1]);
+					int minute = Integer.parseInt(sweepTime[2]);
+					int second = Integer.parseInt(sweepTime[3]);
 					//schedule the sweep db task
 					scheDbTask.schedule(new SweepDBTask(), 
 										new MonthlyIterator(dayOfMonth, hourOfDay, minute, second));
-				}else{
-					//schedule the sweeper task on 15th 2:00am every month if not specified in conf.xml 
-					//scheDbTask.schedule(new SweepDBTask(), new MonthlyIterator(15, 2, 0, 0));
 				}
 				
 				
@@ -230,23 +227,14 @@ public class WirelessSocketServer {
 				//parse the time to run daily settlement task from configuration file
 				nl = doc.getElementsByTagName("daily_settlement");
 				if(nl.item(0) != null){
-					String time = nl.item(0).getFirstChild().getNodeValue();
-					int pos1 = 0;
-					int pos2 = time.indexOf(",", pos1);
-					int hourOfDay = Integer.parseInt(time.substring(pos1, pos2));
+					String[] dailySettleTime = nl.item(0).getFirstChild().getNodeValue().split(",");
 					
-					pos1 = pos2 + 1;
-					pos2 = time.indexOf(",", pos1);
-					int minute = Integer.parseInt(time.substring(pos1, pos2));
-					
-					pos1 = pos2 + 1;
-					int second = Integer.parseInt(time.substring(pos1));
+					int hourOfDay = Integer.parseInt(dailySettleTime[0]);
+					int minute = Integer.parseInt(dailySettleTime[1]);
+					int second = Integer.parseInt(dailySettleTime[2]);
 					//schedule the daily settlement task
 					scheDailySettlement.schedule(new DailySettlementTask(), 
 												 new DailyIterator(hourOfDay, minute, second));
-				}else{
-					//schedule the daily settlement task on 01:23:37 if not specified in conf.xml 
-					//scheDailySettlement.schedule(new DailySettlementTask(), new DailyIterator(1, 23, 37));
 				}
 				
 			}catch(ParserConfigurationException | IOException | SAXException e){
