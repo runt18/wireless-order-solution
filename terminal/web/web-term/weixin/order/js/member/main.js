@@ -123,14 +123,6 @@ function bindMember(c){
 	var mobile = $('#txtVerifyMobile');
 
 	var code = $('#txtVerifyCode');
-/*	var name = $('#txtVerifyName');	
-	var sex = $('input[name=radioVerifySex]');
-	for(var i = 0; i < sex.length; i++){
-		if(sex[i].checked){
-			sex = sex[i];
-			break;
-		}
-	}*/
 	
 	code.blur();
 	if(!params.VerifyCode.code.test(code.val().trim())){
@@ -138,34 +130,40 @@ function bindMember(c){
 		return;
 	}
 	
+	//确认绑定后跳到页眉
 	$('html, body').animate({scrollTop: 0}, 'fast',function(){
-		c.event = typeof c.event == 'undefined' ? document.getElementById('btnBindMember') : c.event;
-		setBtnDisabled(true);
-		
-		$.ajax({
-			url : '../../WXOperateMember.do',
-			type : 'post',
-			data : {
-				dataSource : 'bind',
-				oid : Util.mp.oid,
-				fid : Util.mp.fid,
-				codeId : verifyCode.id,
-				code : code.val().trim(),
-				mobile : mobile.val().trim()
-			},
-			dataType : 'json',
-			success : function(data, status, xhr){
-				Util.dialog.show({title: data.title, msg: data.msg});
-				if(data.success){
-					window.location.reload();
+		if(!c.bind){
+			//防止两次绑定
+			c.bind = true;
+			c.event = typeof c.event == 'undefined' ? document.getElementById('btnBindMember') : c.event;
+			setBtnDisabled(true);
+			$.ajax({
+				url : '../../WXOperateMember.do',
+				type : 'post',
+				data : {
+					dataSource : 'bind',
+					oid : Util.mp.oid,
+					fid : Util.mp.fid,
+					codeId : verifyCode.id,
+					code : code.val().trim(),
+					mobile : mobile.val().trim()
+				},
+				dataType : 'json',
+				success : function(data, status, xhr){
+					if(data.success){
+						window.location.reload();
+					}else{
+						Util.dialog.show({title: data.title, msg: data.msg});
+					}
+					setBtnDisabled(false);
+				},
+				error : function(data, errotType, eeor){
+					setBtnDisabled(false);
+					Util.dialog.show({msg: '服务器请求失败, 请稍候再试.'});
 				}
-				setBtnDisabled(false);
-			},
-			error : function(data, errotType, eeor){
-				setBtnDisabled(false);
-				Util.dialog.show({msg: '服务器请求失败, 请稍候再试.'});
-			}
-		});
+			});		
+		}
+
 	});
 	
 
