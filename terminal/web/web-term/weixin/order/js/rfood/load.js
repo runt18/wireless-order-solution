@@ -24,12 +24,11 @@ $(function(){
 			fid : Util.getParam('r')
 		},
 		success : function(data, status, xhr){
-//			alert(data.msg)
 			var html = [];
 			for(var i = 0; i < data.root.length; i++){
 				var temp = data.root[i];
 				html.push(Templet.mainBox.format({
-					img : temp.img,
+					img : temp.img.thumbnail,
 					name : temp.name,
 					unitPrice : temp.unitPrice.toFixed(2),
 					desc : temp.desc == null || temp.desc.isEmpty() ? '暂无简介' : temp.desc 
